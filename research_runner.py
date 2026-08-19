@@ -68,15 +68,20 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
         
     try:
         status = subprocess.check_output(
-            ["git", "status", "--porcelain"],
+            ["git", "status", "--porcelain", "--untracked-files=no"],
             cwd=work_dir,
             stderr=subprocess.DEVNULL
         ).decode("utf-8").strip()
-        is_dirty = len(status) > 0
+        dirty_lines = [
+            line for line in status.splitlines()
+            if line.strip() and not line.strip().endswith("research/index.json")
+        ]
+        is_dirty = len(dirty_lines) > 0
     except Exception:
         is_dirty = False
         
     return commit, is_dirty
+
 
 
 def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
