@@ -1,3 +1,15 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.mypy]
+ignore_missing_imports = true
+warn_unused_ignores = false
+
+[tool.pyright]
+reportMissingImports = "none"
+reportMissingTypeStubs = "none"
+reportGeneralTypeIssues = "none"
+reportUnknownMemberType = "none"
+
+

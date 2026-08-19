@@ -19,9 +19,10 @@ import converter
 import reference_data
 
 # Global memory caches
-_TRACE_CACHE: Dict[str, Tuple[np.ndarray, np.ndarray, np.ndarray]] = {}
+_TRACE_CACHE: Dict[str, Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]] = {}
 _ZERO_CACHE: Dict[str, List[float]] = {}
 _CONVERTER_CACHE: Optional[converter.PrimeReconstructionCache] = None
+
 
 
 def make_trace_key(
@@ -51,10 +52,11 @@ def get_cached_trace(
     delta: float,
     n_samples: int = 300,
     dps: int = 35
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Retrieve or compute the trace (u_grid, s_coords, (re_w, im_w)).
+    Retrieve or compute the trace (u_grid, mapped_s, re_w, im_w).
     """
+
     # Extract params
     k = getattr(transform_obj, 'k', 0.0)
     A = getattr(transform_obj, 'A', 1.0)

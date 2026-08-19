@@ -758,8 +758,10 @@ def update_all_panels(
     num_zeros = int(num_zeros if num_zeros is not None else 15)
 
     # 1. Instantiate active Transform Object
+    transform_obj: transforms.BaseTransform
     if mode == "camera":
         transform_obj = transforms.CameraTransform()
+
     elif mode == "height":
         k = float(k_val if k_val is not None else 0.0)
         transform_obj = transforms.HeightMicroscopeTransform(k=k, t0=t0, delta=delta_offset)

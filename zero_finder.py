@@ -109,9 +109,10 @@ def discover_zeros(
     Discovers all zeros independently and returns sorted list of ordinates.
     """
     brackets = find_brackets(t_min, t_max, base_step=0.08, dps=min(dps, 30))
-    zeros = []
+    zeros: List[mpmath.mpf] = []
     
     for bracket in brackets:
+
         root = refine_zero(bracket, dps=dps, max_residual=max_residual)
         if root is not None:
             # Deduplicate closely found roots
@@ -182,8 +183,9 @@ def discover_transformed_zeros(
     if re_crit is None:
         return []
         
-    discovered_roots = []
+    discovered_roots: List[mpmath.mpc] = []
     t = float(t_min)
+
     
     with mpmath.workdps(dps + 10):
         # Scan along Re(s) = re_crit

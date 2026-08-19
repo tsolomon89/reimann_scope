@@ -15,8 +15,9 @@ from __future__ import annotations
 import os
 import sys
 import json
-import yaml
+import yaml  # type: ignore[import]
 import time
+
 import hashlib
 import itertools
 import subprocess
@@ -260,11 +261,11 @@ def evaluate_point(
                 s_im = inputs.get("s_im", inputs.get("im_s", "14.134725141734693790457251983562"))
                 s_mpc = math_core.to_mpc((s_re, s_im), dps=dps)
                 
-                t_obj = transforms.KernelTransform(
+                t_obj_kernel = transforms.KernelTransform(
                     A=A_str, B=B_str, C=C_str, D=D_str, inverse_scale_lock=is_lock
                 )
                 
-                z_trans = t_obj.evaluate_function(s_mpc, dps=dps)
+                z_trans = t_obj_kernel.evaluate_function(s_mpc, dps=dps)
                 z_canon = math_core.zeta_eval(s_mpc, dps=dps)
                 abs_diff = abs(z_trans - z_canon)
                 
@@ -283,16 +284,18 @@ def evaluate_point(
                 k_str = inputs.get("k", "1.0")
                 gamma_str = inputs.get("gamma", "14.13472514173469379045725198356247027078425711569924317568556746")
                 
+                t_obj_map: transforms.BaseTransform
                 if mode == "origin_dilation":
-                    t_obj = transforms.OriginCoordinateDilation(k=k_str)
+                    t_obj_map = transforms.OriginCoordinateDilation(k=k_str)
                 elif mode == "argument":
-                    t_obj = transforms.ArgumentTransform(k=k_str)
+                    t_obj_map = transforms.ArgumentTransform(k=k_str)
                 else:
-                    t_obj = transforms.CenteredCoordinateDilation(k=k_str)
+                    t_obj_map = transforms.CenteredCoordinateDilation(k=k_str)
                     
                 rho = mpmath.mpc('0.5', str(gamma_str))
-                mapped_rho = t_obj.map_zero_mpc(rho, dps=dps)
-                val_at_mapped = t_obj.evaluate_function(mapped_rho, dps=dps)
+                mapped_rho = t_obj_map.map_zero_mpc(rho, dps=dps)
+                val_at_mapped = t_obj_map.evaluate_function(mapped_rho, dps=dps)
+
                 residual = abs(val_at_mapped)
                 
                 return "ok", {
@@ -311,17 +314,19 @@ def evaluate_point(
                 delta_str = inputs.get("delta", "0.0")
                 
                 s_mpc = mpmath.mpc(mpmath.mpf('0.5') + math_core.to_mpf(delta_str, dps=dps), math_core.to_mpf(t_str, dps=dps))
+                t_obj_trace: transforms.BaseTransform
                 if mode == "origin_dilation":
-                    t_obj = transforms.OriginCoordinateDilation(k=k_str)
+                    t_obj_trace = transforms.OriginCoordinateDilation(k=k_str)
                 elif mode == "argument":
-                    t_obj = transforms.ArgumentTransform(k=k_str)
+                    t_obj_trace = transforms.ArgumentTransform(k=k_str)
                 elif mode == "centered_dilation":
-                    t_obj = transforms.CenteredCoordinateDilation(k=k_str)
+                    t_obj_trace = transforms.CenteredCoordinateDilation(k=k_str)
                 else:
-                    t_obj = transforms.CameraTransform()
+                    t_obj_trace = transforms.CameraTransform()
                     
-                mapped_s = t_obj.map_domain_point(complex(float(s_mpc.real), float(s_mpc.imag)))
-                z_val = t_obj.evaluate_function(s_mpc, dps=dps)
+                mapped_s = t_obj_trace.map_domain_point(complex(float(s_mpc.real), float(s_mpc.imag)))
+                z_val = t_obj_trace.evaluate_function(s_mpc, dps=dps)
+
                 
                 return "ok", {
                     "mapped_s_re": str(mapped_s.real),

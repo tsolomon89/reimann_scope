@@ -20,8 +20,9 @@ real axis (as computed by scipy.special.expi in preview and mpmath.ei in audit).
 
 from __future__ import annotations
 import math
-from typing import List, Tuple, Dict, Optional, Union, Any
+from typing import List, Tuple, Dict, Optional, Union, Any, Sequence
 import numpy as np
+
 import scipy.special
 import mpmath
 import math_core
@@ -104,7 +105,7 @@ def riemann_remainder_integral_audit(
 
 def riemann_explicit_j_audit(
     x: Union[str, float, int, mpmath.mpf],
-    zeros: List[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
+    zeros: Sequence[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
     dps: int = 80
 ) -> mpmath.mpf:
     """
@@ -140,12 +141,12 @@ def riemann_explicit_j_audit(
         return j_val
 
 
-
 def riemann_explicit_pi_audit(
     x: Union[str, float, int, mpmath.mpf],
-    zeros: List[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
+    zeros: Sequence[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
     dps: int = 80
 ) -> mpmath.mpf:
+
     """
     [AUDIT PATH] Authoritative high-precision evaluation of pi_N(x) via Mobius inversion:
     pi_N(x) = sum_{m >= 1, x^{1/m} >= 2} (mu(m) / m) * J_N(x^{1/m}).

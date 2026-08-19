@@ -19,11 +19,12 @@ import numpy as np
 import mpmath
 
 try:
-    import flint
-    from flint import arb, acb, ctx as flint_ctx
+    import flint  # type: ignore[import]
+    from flint import arb, acb, ctx as flint_ctx  # type: ignore[import]
     HAS_FLINT = True
 except ImportError:
     HAS_FLINT = False
+
 
 
 # Cache for high-precision constants
