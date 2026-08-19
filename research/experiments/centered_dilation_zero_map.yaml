@@ -1,0 +1,38 @@
+schema_version: "1"
+id: centered-dilation-zero-map-001
+title: Centered coordinate dilation zero-map preservation and function residual
+
+hypothesis:
+  statement: >
+    Under centered coordinate dilation s' = 1/2 + tau^K(s - 1/2), the algebraically
+    predicted zero positions rho' = 1/2 + tau^K(rho - 1/2) yield vanishing function
+    values f_K(rho') = 0 with residual <= 1e-25 at 80 dps.
+
+criterion:
+  metric: residual
+  operator: "<="
+  threshold: "1e-25"
+
+engine:
+  operation: transform_zero_map
+
+parameters:
+  mode:
+    kind: explicit
+    values: ["centered_dilation"]
+  k:
+    kind: explicit
+    values: ["-1.0", "-0.5", "0.0", "0.5", "1.0"]
+  gamma:
+    kind: explicit
+    values: [
+      "14.13472514173469379045725198356247027078425711569924317568556746",
+      "21.02203963877155499262847959389690277733434052490278180469829596",
+      "25.01085758014568876321379099256282181865955519888407429345827115"
+    ]
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true

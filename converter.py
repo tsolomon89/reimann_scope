@@ -4,14 +4,23 @@ converter.py — Truncated Riemann Explicit Formula and Prime Reconstruction
 Implements:
 - Truncated prime power staircase J_N(x) using nontrivial zeros rho_n.
 - Mobius inversion to reconstruct pi_N(x).
+- Exact remainder integral via exponential integral E_1 series:
+    int_x^infty du / [u(u^2 - 1) ln u] = sum_{k=1}^infty E_1(2k ln x)
 - Fast cached single-zero perturbation updates Delta C(x) without full recomputation.
+- Certified high-precision audit explicit formula evaluation (Arbitrary DPS).
 
-Conforms to SPEC.md §5, §7 and MATH_CONTRACT.md §12.
+Conforms to SPEC.md §5, §7, MATH_CONTRACT.md §12, and EXPERIMENT_PROTOCOL.md.
+
+Branch Convention:
+For complex zeros rho = beta + i*gamma and real x >= 2, we define
+Li(x^rho) = Ei(rho * ln x), where ln x in R^+ is the principal real logarithm,
+and Ei(w) uses the standard principal branch with branch cut along the negative
+real axis (as computed by scipy.special.expi in preview and mpmath.ei in audit).
 """
 
 from __future__ import annotations
 import math
-from typing import List, Tuple, Dict, Optional, Union
+from typing import List, Tuple, Dict, Optional, Union, Any
 import numpy as np
 import scipy.special
 import mpmath
@@ -44,25 +53,120 @@ def mobius(m: int) -> int:
     return -1 if (factors % 2 == 1) else 1
 
 
-def riemann_remainder_integral(x: float) -> float:
+def riemann_remainder_integral_preview(x: float) -> float:
     """
-    Compute the tail integral:
-    int_x^infty du / [u(u^2 - 1) ln u]
-    Using series expansion: sum_{k=1}^infty x^(-2k) / (2k * ln x) for x >= 2.
+    [PREVIEW PATH] Compute the tail integral:
+    int_x^infty du / [u(u^2 - 1) ln u] = sum_{k=1}^infty E_1(2k ln x)
+    using scipy.special.exp1 for fast float evaluation.
     """
     if x < 2.0:
         return 0.0
     ln_x = math.log(x)
     val = 0.0
-    x_sq = x * x
-    curr_pow = x_sq
-    for k in range(1, 15):
-        term = 1.0 / (2.0 * k * ln_x * curr_pow)
+    for k in range(1, 30):
+        arg = 2.0 * k * ln_x
+        term = float(scipy.special.exp1(arg))
         val += term
-        if term < 1e-12:
+        if term < 1e-15:
             break
-        curr_pow *= x_sq
     return val
+
+
+def riemann_remainder_integral(x: float) -> float:
+    """Alias for riemann_remainder_integral_preview for backward compatibility."""
+    return riemann_remainder_integral_preview(x)
+
+
+def riemann_remainder_integral_audit(
+    x: Union[str, float, int, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Certified high-precision evaluation of the remainder integral:
+    int_x^infty du / [u(u^2 - 1) ln u] = sum_{k=1}^infty E_1(2k ln x)
+    using mpmath.e1 at declared dps without float downcast.
+    """
+    with mpmath.workdps(dps + 15):
+        x_mpf = math_core.to_mpf(x, dps=dps + 15)
+        if x_mpf < 2:
+            return mpmath.mpf('0')
+        ln_x = mpmath.log(x_mpf)
+        val = mpmath.mpf('0')
+        threshold = mpmath.power(10, -(dps + 5))
+        for k in range(1, 1000):
+            arg = mpmath.mpf(2 * k) * ln_x
+            term = mpmath.e1(arg)
+            val += term
+            if term < threshold:
+                break
+        return val
+
+
+def riemann_explicit_j_audit(
+    x: Union[str, float, int, mpmath.mpf],
+    zeros: List[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Authoritative high-precision evaluation of J_N(x):
+    J_N(x) = Li(x) - 2 * Re sum_{n=1}^N Li(x^{rho_n}) - ln 2 + int_x^infty du/[u(u^2-1)ln u]
+    using branch convention Li(x^rho) = Ei(rho * ln x).
+    """
+    with mpmath.workdps(dps + 15):
+        x_mpf = math_core.to_mpf(x, dps=dps + 15)
+        if x_mpf < 2:
+            return mpmath.mpf('0')
+        ln_x = mpmath.log(x_mpf)
+        
+        # Li(x) = Ei(ln x) for x > 1
+        li_x = mpmath.ei(ln_x)
+        
+        # Sum over zeros
+        zero_sum = mpmath.mpf('0')
+        for rho in zeros:
+            if isinstance(rho, (int, float, mpmath.mpf)):
+                rho_mpc = mpmath.mpc('0.5', str(rho))
+            elif isinstance(rho, str) and not ('+' in rho or 'j' in rho.lower() or 'i' in rho.lower()):
+                rho_mpc = mpmath.mpc('0.5', rho.strip())
+            else:
+                rho_mpc = math_core.to_mpc(rho, dps=dps + 15)
+                
+            # Li(x^rho) = Ei(rho * ln x)
+            ei_val = mpmath.ei(rho_mpc * ln_x)
+            zero_sum += 2 * mpmath.re(ei_val)
+            
+        rem = riemann_remainder_integral_audit(x_mpf, dps=dps + 15)
+        j_val = li_x - zero_sum - mpmath.log(2) + rem
+        return j_val
+
+
+
+def riemann_explicit_pi_audit(
+    x: Union[str, float, int, mpmath.mpf],
+    zeros: List[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Authoritative high-precision evaluation of pi_N(x) via Mobius inversion:
+    pi_N(x) = sum_{m >= 1, x^{1/m} >= 2} (mu(m) / m) * J_N(x^{1/m}).
+    """
+    with mpmath.workdps(dps + 15):
+        x_mpf = math_core.to_mpf(x, dps=dps + 15)
+        if x_mpf < 2:
+            return mpmath.mpf('0')
+        
+        total_pi = mpmath.mpf('0')
+        m = 1
+        while True:
+            xr = mpmath.power(x_mpf, mpmath.mpf(1) / m)
+            if xr < 2:
+                break
+            mu_m = mobius(m)
+            if mu_m != 0:
+                j_m = riemann_explicit_j_audit(xr, zeros, dps=dps)
+                total_pi += (mpmath.mpf(mu_m) / m) * j_m
+            m += 1
+        return total_pi
 
 
 def compute_single_zero_contribution_vectorized(
@@ -71,7 +175,7 @@ def compute_single_zero_contribution_vectorized(
 ) -> np.ndarray:
     """
     Fast vectorized evaluation of single zero contribution C(x, rho) across x_grid.
-    Uses scipy.special.expi for sub-millisecond calculation.
+    Uses scipy.special.expi for sub-millisecond preview calculation.
     """
     contrib = np.zeros_like(x_grid, dtype=np.float64)
     valid_mask = x_grid >= 2.0
@@ -108,7 +212,7 @@ def compute_single_zero_contribution(
 ) -> np.ndarray:
     """
     Compute total contribution of a single zero rho (and its conjugate pair)
-    to reconstructed pi_N(x) across array x_grid.
+    to reconstructed pi_N(x) across array x_grid (preview).
     """
     if isinstance(rho, (int, float)):
         rho_c = complex(0.5, float(rho))
@@ -152,7 +256,7 @@ class PrimeReconstructionCache:
                         xr = x_valid[sub_mask] ** (1.0 / m)
                         ln_xr = ln_x[sub_mask] / m
                         li_xr = scipy.special.expi(ln_xr)
-                        rem = np.array([riemann_remainder_integral(x_val) for x_val in xr])
+                        rem = np.array([riemann_remainder_integral_preview(x_val) for x_val in xr])
                         j_base = li_xr - math.log(2.0) + rem
                         base_val[sub_mask] += (float(mu_m) / float(m)) * j_base
                 m += 1

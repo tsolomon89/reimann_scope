@@ -1,0 +1,36 @@
+schema_version: "1"
+id: centrifuge-slope-001
+title: Off-line radial amplification linearity under tau grade
+
+hypothesis:
+  statement: >
+    For any nonzero delta and fixed gamma, the centrifuge log-modulus
+    log|q_rho^K| is strictly linear in grade K with slope delta*ln(tau),
+    achieving maximum absolute slope error <= 1e-30 at 80 dps.
+
+criterion:
+  metric: abs_slope_error
+  operator: "<="
+  threshold: "1e-30"
+
+engine:
+  operation: centrifuge
+
+parameters:
+  delta:
+    kind: explicit
+    values: ["-0.01", "-0.001", "0.0", "0.001", "0.01"]
+  gamma:
+    kind: explicit
+    values: ["14.13472514173469379045725198356247027078425711569924317568556746"]
+  K:
+    kind: linear
+    start: "-50"
+    stop: "50"
+    step: "10"
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true

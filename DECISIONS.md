@@ -105,3 +105,60 @@ The instrument should remain minimal and avoid experiment-framework sprawl.
 
 Mathematical / operational consequence:
 A future feature must correspond to a separately stated identity, candidate lemma, or falsifiable proof step.
+
+## 2026-08-19 — Explicit Preview vs Audit precision boundaries
+
+Status: ACCEPTED
+
+Decision:
+Establish two distinct computational tiers: Preview (NumPy / SciPy / float for responsive UI rendering <200ms) and Audit (mpmath / Arb flint for certified arbitrary precision at declared dps). Audit calculations must never cast decimal string parameters to Python float or binary float before evaluation.
+
+Reason:
+Binary-float downcasting during parameter ingestion or constructor initialization destroys precision and prevents certified residue and slope error analysis.
+
+Mathematical / operational consequence:
+All core math functions accept exact decimal strings and mpmath objects. Audit mode evaluations and batch runner points operate directly at arbitrary precision.
+
+## 2026-08-19 — Riemann remainder integral series formulation
+
+Status: ACCEPTED
+
+Decision:
+Replace the 1-term asymptotic approximation in converter.py with the exact exponential integral series:
+\[
+\int_x^\infty \frac{du}{u(u^2-1)\log u} = \sum_{k=1}^\infty E_1(2k\log x) = -\sum_{k=1}^\infty \operatorname{Ei}(-2k\log x).
+\]
+Split into `riemann_remainder_integral_preview` (fast float using `scipy.special.exp1`) and `riemann_remainder_integral_audit` (arbitrary precision using `mpmath.e1`).
+
+Reason:
+The previous 1-term asymptotic formula \(\frac{x^{-2k}}{2k\log x}\) truncated the integral definition from `MATH_CONTRACT.md §12` and introduced noticeable truncation error at low \(x\).
+
+Mathematical / operational consequence:
+The explicit formula remainder integral is now exact to declared precision `dps` across the entire domain \(x \ge 2\).
+
+## 2026-08-19 — Independent discovery for transformed zeros
+
+Status: ACCEPTED
+
+Decision:
+Transformed functions \(f_K(s)\) must have their zeros independently discovered along their image critical line via `discover_transformed_zeros` without using mapped baseline zeros as seeds.
+
+Reason:
+Comparing discovered zeros against algebraically predicted zeros \(\rho' = T(\rho)\) is mathematically meaningless if the discovery algorithm was seeded with the predicted positions.
+
+Mathematical / operational consequence:
+Transformed zero validation performs independent numerical root discovery first, and compares against algebraically predicted locations second.
+
+## 2026-08-19 — Reproducible Batch Sweep Runner
+
+Status: ACCEPTED
+
+Decision:
+Implement `research_runner.py` according to `EXPERIMENT_PROTOCOL.md` to run finite, declarative YAML experiments that reuse the canonical mathematical engine and produce immutable run artifacts (manifest, results JSONL, summary, human README).
+
+Reason:
+Interactive discoveries need a reproducible, machine-readable format for verification without proof-program framework sprawl.
+
+Mathematical / operational consequence:
+The batch runner evaluates only explicitly declared criteria over finite parameter spaces and never outputs automated proof progress or RH claims.
+

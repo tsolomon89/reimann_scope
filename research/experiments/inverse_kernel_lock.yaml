@@ -1,0 +1,45 @@
+schema_version: "1"
+id: inverse-kernel-lock-001
+title: Exact Dirichlet kernel pairing preservation under inverse scale lock AB=1
+
+hypothesis:
+  statement: >
+    When Inverse Scale Lock is active (AB=1) with shifts C=D=0, the analytically
+    continued kernel transformation Z_{A,0,1/A,0}(s) is identically equal to zeta(s),
+    achieving maximum absolute difference <= 1e-30 across sample domain points at 80 dps.
+
+criterion:
+  metric: abs_diff
+  operator: "<="
+  threshold: "1e-30"
+
+engine:
+  operation: kernel_identity
+
+parameters:
+  A:
+    kind: explicit
+    values: ["0.25", "0.5", "1.0", "2.0", "4.0"]
+  inverse_scale_lock:
+    kind: explicit
+    values: ["true"]
+  C:
+    kind: explicit
+    values: ["0.0"]
+  D:
+    kind: explicit
+    values: ["0.0"]
+  s_re:
+    kind: explicit
+    values: ["0.5", "0.75", "2.0", "-1.5"]
+  s_im:
+    kind: linear
+    start: "10.0"
+    stop: "30.0"
+    step: "5.0"
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true

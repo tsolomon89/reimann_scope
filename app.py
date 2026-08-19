@@ -103,6 +103,15 @@ def create_header():
                 ),
                 dbc.NavItem(
                     dbc.Button(
+                        [html.I(className="bi bi-file-earmark-code me-1"), "Export Sweep Draft"],
+                        id="btn-export-sweep",
+                        color="outline-warning",
+                        size="sm",
+                        className="me-2"
+                    )
+                ),
+                dbc.NavItem(
+                    dbc.Button(
                         [html.I(className="bi bi-shield-check me-1"), "Audit Mode (80+ dps)"],
                         id="btn-audit",
                         color="outline-success",
@@ -133,6 +142,7 @@ def create_header():
         dark=True,
         className="border-bottom border-secondary shadow-sm mb-3 py-2"
     )
+
 
 
 def create_active_card_panel():
@@ -320,6 +330,26 @@ def create_validation_modal():
     ], id="modal-val-report", size="lg", is_open=False)
 
 
+def create_export_modal():
+    return dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Export Current State as Sweep Draft"), className="bg-dark text-light border-secondary"),
+
+        dbc.ModalBody([
+            html.P("Export current transformation parameters, sampling bounds, and Active Mathematics metadata as a declarative YAML experiment spec conforming to EXPERIMENT_PROTOCOL.md.", className="small text-secondary"),
+            dcc.Textarea(
+                id="textarea-sweep-draft",
+                style={"width": "100%", "height": "340px", "backgroundColor": "#12151c", "color": "#00ff88", "fontFamily": "monospace", "fontSize": "12px"},
+                readOnly=True
+            ),
+            dcc.Download(id="download-sweep-yaml")
+        ], className="bg-dark text-light"),
+        dbc.ModalFooter([
+            dbc.Button([html.I(className="bi bi-download me-1"), "Download .yaml"], id="btn-download-yaml", color="success", size="sm", className="me-2"),
+            dbc.Button("Close", id="btn-close-export-modal", color="secondary", size="sm")
+        ], className="bg-dark border-secondary")
+    ], id="modal-export-sweep", size="lg", is_open=False)
+
+
 # ==============================================================================
 # MAIN APP LAYOUT
 # ==============================================================================
@@ -327,10 +357,12 @@ def create_validation_modal():
 app.layout = html.Div([
     create_header(),
     create_validation_modal(),
+    create_export_modal(),
     dcc.Store(id="store-audit-mode", data=False),
     dcc.Store(id="store-discovered-zeros", data=INITIAL_ZEROS_FLOAT),
     
     dbc.Container([
+
         # Row 1: 4 Synchronized Panels (2x2 Full Responsive Grid with 1x1 Square Coordinate System)
         dbc.Row([
             # Panel A: Domain Plane
@@ -552,9 +584,110 @@ def toggle_val_report(n_open, n_close, is_open, disc_zeros):
     return False, dash.no_update
 
 
+@app.callback(
+    [Output("modal-export-sweep", "is_open"), Output("textarea-sweep-draft", "value")],
+    [Input("btn-export-sweep", "n_clicks"), Input("btn-close-export-modal", "n_clicks")],
+    [
+        State("modal-export-sweep", "is_open"),
+        State("transform-mode-select", "value"),
+        State("slider-t0", "value"),
+        State("slider-dt", "value"),
+        State("slider-delta-offset", "value"),
+        State("dropdown-selected-zero", "value"),
+        State("input-delta-pert", "value"),
+        State("input-gamma-pert", "value"),
+        State("slider-num-zeros", "value"),
+        State("store-audit-mode", "data"),
+        State("slider-k", "value"),
+        State("slider-kernel-A", "value"),
+        State("slider-kernel-B", "value"),
+        State("input-kernel-C", "value"),
+        State("input-kernel-D", "value"),
+        State("check-kernel-lock", "value"),
+        State("slider-centered-kernel-A", "value"),
+        State("slider-aniso-delta", "value"),
+        State("slider-aniso-gamma", "value"),
+    ],
+    prevent_initial_call=True
+)
+def toggle_export_modal(
+    n_open, n_close, is_open,
+    mode, t0, dt, delta_offset, selected_zero_idx, delta_pert, gamma_pert, num_zeros, audit_mode,
+    k_val, kA, kB, kC, kD, k_lock, cA, aniso_d, aniso_g
+):
+    """Generate and display the declarative YAML sweep draft based on current UI state."""
+    if not is_open:
+        # Determine engine operation
+        if mode == "height":
+            op = "zeta_trace_compare"
+        elif mode in ["origin_dilation", "centered_dilation", "argument"]:
+            op = "transform_zero_map"
+        elif mode in ["kernel_lab", "centered_kernel"]:
+            op = "kernel_identity"
+        else:
+            op = "centrifuge"
+
+        dps = 80 if audit_mode else 35
+        k_str = f"{k_val:.4g}" if k_val is not None else "0.0"
+        d_str = f"{delta_pert:.6g}" if delta_pert is not None else "0.0"
+        g_str = f"{gamma_pert:.6g}" if gamma_pert is not None else "14.134725"
+
+        yaml_text = f"""schema_version: "1"
+id: sweep-draft-{mode.replace('_', '-')}-001
+title: "Interactive Sweep Draft — {mode.replace('_', ' ').title()}"
+
+hypothesis:
+  statement: "TODO: State the exact mathematical hypothesis to test over this finite parameter space."
+
+criterion:
+  metric: max_residual
+  operator: "<="
+  threshold: "1e-20"
+
+engine:
+  operation: {op}
+
+parameters:
+  mode:
+    kind: explicit
+    values: ["{mode}"]
+  k:
+    kind: explicit
+    values: ["{k_str}"]
+  delta:
+    kind: explicit
+    values: ["{d_str}"]
+  gamma:
+    kind: explicit
+    values: ["{g_str}"]
+
+precision:
+  dps: {dps}
+
+outputs:
+  retain_points: true
+"""
+        return True, yaml_text
+    return False, dash.no_update
+
+
+@app.callback(
+    Output("download-sweep-yaml", "data"),
+    Input("btn-download-yaml", "n_clicks"),
+    State("textarea-sweep-draft", "value"),
+    prevent_initial_call=True
+)
+def download_sweep_yaml(n_clicks, yaml_content):
+    """Trigger client-side file download of the generated sweep YAML."""
+    if yaml_content:
+        return dict(content=yaml_content, filename="sweep_draft.yaml")
+    return dash.no_update
+
+
 # ==============================================================================
 # MAIN SYNCHRONIZED UPDATE CALLBACK (4 Panels + Active Math Card)
 # ==============================================================================
+
 
 @app.callback(
     [

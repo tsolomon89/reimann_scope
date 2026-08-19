@@ -100,15 +100,16 @@ def prime_pi_array(x_arr: np.ndarray) -> np.ndarray:
 
 
 def validate_zero_discovery(
-    discovered_ordinates: List[float | mpmath.mpf],
+    discovered_ordinates: List[Union[float, str, mpmath.mpf]],
     t_min: float,
     t_max: float,
-    tolerance: float = 1e-6
+    tolerance: float = 1e-6,
+    dps: int = 35
 ) -> Dict[str, Any]:
     """
     Compare independently discovered zero ordinates against the vendored reference list.
     Calculates matched count, max difference, RMS error, unmatched roots, and residuals.
-    Strictly post-discovery validation.
+    Strictly post-discovery validation at declared precision dps.
     """
     ref_zeros_str = load_reference_zeros()
     ref_ordinates_in_range = [
@@ -139,10 +140,11 @@ def validate_zero_discovery(
     max_diff = max(diffs) if diffs else 0.0
     rms_diff = float(np.sqrt(np.mean(np.array(diffs)**2))) if diffs else 0.0
     
-    # Calculate zeta residuals for discovered zeros
+    # Calculate zeta residuals for discovered zeros at declared dps
     residuals = []
     for d in disc_ordinates:
-        z_val = math_core.zeta_eval(complex(0.5, d), dps=35)
+        s_mpc = math_core.to_mpc((mpmath.mpf('0.5'), mpmath.mpf(str(d))), dps=dps)
+        z_val = math_core.zeta_eval(s_mpc, dps=dps)
         residuals.append(float(abs(z_val)))
         
     passed = (
@@ -166,3 +168,4 @@ def validate_zero_discovery(
         "max_residual": max(residuals) if residuals else 0.0,
         "passed": passed
     }
+

@@ -23,3 +23,13 @@ When conducting mathematical audits, running experiments, or evaluating new clai
    - **Stage 2 (Numerical)**: Check certified error bounds and residuals $|\zeta(s)| < \varepsilon$.
    - **Stage 3 (Falsification)**: Test whether the property holds on non-Euler counterexamples (Davenport-Heilbronn).
    - **Stage 4 (Circularity)**: Screen against known RH-equivalent assumptions.
+
+4. **Batch Sweep and Experiment Review Order**:
+   When reviewing previous numerical experiments, inspect artifacts strictly in this order:
+   1. `research/index.json` (chronological index of all executed runs)
+   2. `research/runs/<run_id>/summary.json` (primary AI-facing summary and criterion evaluation)
+   3. `research/runs/<run_id>/manifest.json` (provenance, git commit, parameter space, runtime environment)
+   4. `research/runs/<run_id>/results.jsonl` (only if point-level inspection is needed)
+   5. Experiment YAML spec (`research/experiments/*.yaml`)
+   6. Source code only to audit a specific metric or canonical engine implementation.
+

@@ -5,20 +5,21 @@ Implements distinct, typed transform classes conforming to:
 - RIEMANN_MICROSCOPE_SPEC.md §3, §4, §10
 - MATH_CONTRACT.md §2 - §10
 - DECISIONS.md
+- EXPERIMENT_PROTOCOL.md
 
 Every transform object provides:
 - Mode Name & Parameter State
 - Exact Domain Map
 - Exact Function Evaluated
 - Original Critical Line & Image Critical Line
-- Predicted Zero Map
+- Predicted Zero Map (Preview float & Authoritative Arbitrary-Precision MPC)
 - Exact Classification
 - Callable evaluation for single points & numpy vector batches
 """
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict, Any, Optional
+from typing import Tuple, Dict, Any, Optional, Union
 import numpy as np
 import mpmath
 import math_core
@@ -64,25 +65,30 @@ class BaseTransform(ABC):
 
     @abstractmethod
     def map_domain_point(self, s: complex) -> complex:
-        """Map input coordinate s to transformed domain coordinate s'."""
+        """[Preview] Map input coordinate s to transformed domain coordinate s'."""
         pass
 
     @abstractmethod
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
-        """Evaluate the transformed function f(s) at precision dps."""
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        """[Authoritative] Evaluate the transformed function f(s) at precision dps."""
         pass
 
     @abstractmethod
     def map_zero(self, rho: complex) -> complex:
-        """Predict the mapped location of a baseline zero rho."""
+        """[Preview] Predict the mapped location of a baseline zero rho as float complex."""
+        pass
+
+    @abstractmethod
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        """[Audit/Authoritative] Predict mapped location of baseline zero rho at arbitrary precision."""
         pass
 
     def map_domain_array(self, s_arr: np.ndarray) -> np.ndarray:
-        """Vectorized domain coordinate mapping."""
+        """Vectorized domain coordinate mapping (preview)."""
         return np.array([self.map_domain_point(s) for s in s_arr], dtype=np.complex128)
 
     def evaluate_array(self, s_arr: np.ndarray, dps: int = 35) -> Tuple[np.ndarray, np.ndarray]:
-        """Vectorized evaluation along path, returns (Re f(s), Im f(s))."""
+        """Vectorized evaluation along path, returns (Re f(s), Im f(s)) float arrays (preview)."""
         re_vals = np.empty(len(s_arr), dtype=np.float64)
         im_vals = np.empty(len(s_arr), dtype=np.float64)
         for i, s in enumerate(s_arr):
@@ -154,11 +160,14 @@ class CameraTransform(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s
 
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
         return math_core.zeta_eval(s, dps=dps)
 
     def map_zero(self, rho: complex) -> complex:
         return rho
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        return math_core.to_mpc(rho, dps=dps)
 
 
 class HeightMicroscopeTransform(BaseTransform):
@@ -167,7 +176,15 @@ class HeightMicroscopeTransform(BaseTransform):
     s_K(u) = 1/2 + delta + i(t0 + tau^K * u).
     Changes the sampled height range only.
     """
-    def __init__(self, k: float = 0.0, t0: float = 14.0, delta: float = 0.0):
+    def __init__(
+        self,
+        k: Union[str, float, int, mpmath.mpf] = 0.0,
+        t0: Union[str, float, int, mpmath.mpf] = 14.0,
+        delta: Union[str, float, int, mpmath.mpf] = 0.0
+    ):
+        self.k_str = str(k)
+        self.t0_str = str(t0)
+        self.delta_str = str(delta)
         self.k = float(k)
         self.t0 = float(t0)
         self.delta = float(delta)
@@ -205,11 +222,14 @@ class HeightMicroscopeTransform(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s
 
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
         return math_core.zeta_eval(s, dps=dps)
 
     def map_zero(self, rho: complex) -> complex:
         return rho
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        return math_core.to_mpc(rho, dps=dps)
 
 
 class OriginCoordinateDilation(BaseTransform):
@@ -220,7 +240,8 @@ class OriginCoordinateDilation(BaseTransform):
     image critical line: Re(s') = tau^K / 2
     zero map: rho' = tau^K * rho
     """
-    def __init__(self, k: float = 0.0):
+    def __init__(self, k: Union[str, float, int, mpmath.mpf] = 0.0):
+        self.k_str = str(k)
         self.k = float(k)
         self.tau = float(math_core.get_tau(50))
         self.scale = self.tau ** self.k
@@ -256,15 +277,24 @@ class OriginCoordinateDilation(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s * self.scale
 
-    def evaluate_function(self, s_prime: complex, dps: int = 35) -> mpmath.mpc:
-        with mpmath.workdps(dps):
-            tau_val = math_core.get_tau(dps)
-            scale_val = mpmath.power(tau_val, mpmath.mpf(str(self.k)))
-            s_orig = math_core.to_mpc(s_prime) / scale_val
+    def evaluate_function(self, s_prime: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            tau_val = math_core.get_tau(dps + 10)
+            k_val = math_core.to_mpf(self.k_str, dps=dps + 10)
+            scale_val = mpmath.power(tau_val, k_val)
+            s_orig = math_core.to_mpc(s_prime, dps=dps + 10) / scale_val
             return math_core.zeta_eval(s_orig, dps=dps)
 
     def map_zero(self, rho: complex) -> complex:
         return rho * self.scale
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            tau_val = math_core.get_tau(dps + 10)
+            k_val = math_core.to_mpf(self.k_str, dps=dps + 10)
+            scale_val = mpmath.power(tau_val, k_val)
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 10)
+            return scale_val * rho_mpc
 
 
 class CenteredCoordinateDilation(BaseTransform):
@@ -275,7 +305,8 @@ class CenteredCoordinateDilation(BaseTransform):
     image critical line: Re(s') = 1/2 (geometrically fixed)
     zero map: rho' = 1/2 + tau^K * (rho - 1/2)
     """
-    def __init__(self, k: float = 0.0):
+    def __init__(self, k: Union[str, float, int, mpmath.mpf] = 0.0):
+        self.k_str = str(k)
         self.k = float(k)
         self.tau = float(math_core.get_tau(50))
         self.scale = self.tau ** self.k
@@ -311,16 +342,25 @@ class CenteredCoordinateDilation(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return 0.5 + self.scale * (s - 0.5)
 
-    def evaluate_function(self, s_prime: complex, dps: int = 35) -> mpmath.mpc:
-        with mpmath.workdps(dps):
-            tau_val = math_core.get_tau(dps)
-            scale_val = mpmath.power(tau_val, mpmath.mpf(str(self.k)))
-            s_mpc = math_core.to_mpc(s_prime)
+    def evaluate_function(self, s_prime: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            tau_val = math_core.get_tau(dps + 10)
+            k_val = math_core.to_mpf(self.k_str, dps=dps + 10)
+            scale_val = mpmath.power(tau_val, k_val)
+            s_mpc = math_core.to_mpc(s_prime, dps=dps + 10)
             s_orig = mpmath.mpf('0.5') + (s_mpc - mpmath.mpf('0.5')) / scale_val
             return math_core.zeta_eval(s_orig, dps=dps)
 
     def map_zero(self, rho: complex) -> complex:
         return 0.5 + self.scale * (rho - 0.5)
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            tau_val = math_core.get_tau(dps + 10)
+            k_val = math_core.to_mpf(self.k_str, dps=dps + 10)
+            scale_val = mpmath.power(tau_val, k_val)
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 10)
+            return mpmath.mpf('0.5') + scale_val * (rho_mpc - mpmath.mpf('0.5'))
 
 
 class ArgumentTransform(BaseTransform):
@@ -330,7 +370,8 @@ class ArgumentTransform(BaseTransform):
     critical-zero line: Re(s) = 1 / (2 * tau^K)
     zero map: s = rho / tau^K
     """
-    def __init__(self, k: float = 0.0):
+    def __init__(self, k: Union[str, float, int, mpmath.mpf] = 0.0):
+        self.k_str = str(k)
         self.k = float(k)
         self.tau = float(math_core.get_tau(50))
         self.scale = self.tau ** self.k
@@ -366,15 +407,24 @@ class ArgumentTransform(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s
 
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
-        with mpmath.workdps(dps):
-            tau_val = math_core.get_tau(dps)
-            scale_val = mpmath.power(tau_val, mpmath.mpf(str(self.k)))
-            s_arg = math_core.to_mpc(s) * scale_val
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            tau_val = math_core.get_tau(dps + 10)
+            k_val = math_core.to_mpf(self.k_str, dps=dps + 10)
+            scale_val = mpmath.power(tau_val, k_val)
+            s_arg = math_core.to_mpc(s, dps=dps + 10) * scale_val
             return math_core.zeta_eval(s_arg, dps=dps)
 
     def map_zero(self, rho: complex) -> complex:
         return rho / self.scale
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            tau_val = math_core.get_tau(dps + 10)
+            k_val = math_core.to_mpf(self.k_str, dps=dps + 10)
+            scale_val = mpmath.power(tau_val, k_val)
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 10)
+            return rho_mpc / scale_val
 
 
 class KernelTransform(BaseTransform):
@@ -387,19 +437,24 @@ class KernelTransform(BaseTransform):
     """
     def __init__(
         self,
-        A: float = 1.0,
-        B: float = 1.0,
-        C: float = 0.0,
-        D: float = 0.0,
+        A: Union[str, float, int, mpmath.mpf] = 1.0,
+        B: Union[str, float, int, mpmath.mpf] = 1.0,
+        C: Union[str, float, int, mpmath.mpf] = 0.0,
+        D: Union[str, float, int, mpmath.mpf] = 0.0,
         inverse_scale_lock: bool = False
     ):
+        self.A_str = str(A)
         self.A = float(A)
         self.inverse_scale_lock = inverse_scale_lock
         if inverse_scale_lock:
+            self.B_str = str(1.0 / self.A) if self.A != 0 else "1.0"
             self.B = 1.0 / self.A if self.A != 0 else 1.0
         else:
+            self.B_str = str(B)
             self.B = float(B)
+        self.C_str = str(C)
         self.C = float(C)
+        self.D_str = str(D)
         self.D = float(D)
 
     @property
@@ -440,13 +495,16 @@ class KernelTransform(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s
 
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
-        with mpmath.workdps(dps):
-            a_val = mpmath.mpf(str(self.A))
-            b_val = mpmath.mpf(str(self.B))
-            c_val = mpmath.mpf(str(self.C))
-            d_val = mpmath.mpf(str(self.D))
-            s_mpc = math_core.to_mpc(s)
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            a_val = math_core.to_mpf(self.A_str, dps=dps + 10)
+            if self.inverse_scale_lock and a_val != 0:
+                b_val = mpmath.mpf(1) / a_val
+            else:
+                b_val = math_core.to_mpf(self.B_str, dps=dps + 10)
+            c_val = math_core.to_mpf(self.C_str, dps=dps + 10)
+            d_val = math_core.to_mpf(self.D_str, dps=dps + 10)
+            s_mpc = math_core.to_mpc(s, dps=dps + 10)
             
             inner = b_val * s_mpc + d_val
             zeta_arg = a_val * inner
@@ -459,6 +517,17 @@ class KernelTransform(BaseTransform):
             return complex(float('nan'), float('nan'))
         return (rho / self.A - self.D) / self.B
 
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            a_val = math_core.to_mpf(self.A_str, dps=dps + 10)
+            if self.inverse_scale_lock and a_val != 0:
+                b_val = mpmath.mpf(1) / a_val
+            else:
+                b_val = math_core.to_mpf(self.B_str, dps=dps + 10)
+            d_val = math_core.to_mpf(self.D_str, dps=dps + 10)
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 10)
+            return (rho_mpc / a_val - d_val) / b_val
+
 
 class CenteredKernelTransform(BaseTransform):
     """
@@ -466,12 +535,20 @@ class CenteredKernelTransform(BaseTransform):
     Z^{ctr}_{A,B}(z) = zeta(1/2 + AB * z) where z = s - 1/2.
     When AB = 1: Z^{ctr}_{A,1/A}(z) = zeta(1/2 + z) = zeta(s).
     """
-    def __init__(self, A: float = 1.0, B: float = 1.0, inverse_scale_lock: bool = True):
+    def __init__(
+        self,
+        A: Union[str, float, int, mpmath.mpf] = 1.0,
+        B: Union[str, float, int, mpmath.mpf] = 1.0,
+        inverse_scale_lock: bool = True
+    ):
+        self.A_str = str(A)
         self.A = float(A)
         self.inverse_scale_lock = inverse_scale_lock
         if inverse_scale_lock:
+            self.B_str = str(1.0 / self.A) if self.A != 0 else "1.0"
             self.B = 1.0 / self.A if self.A != 0 else 1.0
         else:
+            self.B_str = str(B)
             self.B = float(B)
 
     @property
@@ -507,10 +584,15 @@ class CenteredKernelTransform(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s
 
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
-        with mpmath.workdps(dps):
-            ab_val = mpmath.mpf(str(self.A * self.B))
-            s_mpc = math_core.to_mpc(s)
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            a_val = math_core.to_mpf(self.A_str, dps=dps + 10)
+            if self.inverse_scale_lock:
+                ab_val = mpmath.mpf('1.0')
+            else:
+                b_val = math_core.to_mpf(self.B_str, dps=dps + 10)
+                ab_val = a_val * b_val
+            s_mpc = math_core.to_mpc(s, dps=dps + 10)
             z = s_mpc - mpmath.mpf('0.5')
             zeta_arg = mpmath.mpf('0.5') + ab_val * z
             return math_core.zeta_eval(zeta_arg, dps=dps)
@@ -521,6 +603,17 @@ class CenteredKernelTransform(BaseTransform):
             return complex(float('nan'), float('nan'))
         return 0.5 + (rho - 0.5) / ab
 
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            a_val = math_core.to_mpf(self.A_str, dps=dps + 10)
+            if self.inverse_scale_lock:
+                ab_val = mpmath.mpf('1.0')
+            else:
+                b_val = math_core.to_mpf(self.B_str, dps=dps + 10)
+                ab_val = a_val * b_val
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 10)
+            return mpmath.mpf('0.5') + (rho_mpc - mpmath.mpf('0.5')) / ab_val
+
 
 class AnisotropicDeformation(BaseTransform):
     """
@@ -528,7 +621,13 @@ class AnisotropicDeformation(BaseTransform):
     z = delta + i*gamma ↦ A_delta * delta + i * A_gamma * gamma.
     If A_delta != A_gamma, labeled NON-HOLOMORPHIC DEFORMATION.
     """
-    def __init__(self, A_delta: float = 1.0, A_gamma: float = 1.0):
+    def __init__(
+        self,
+        A_delta: Union[str, float, int, mpmath.mpf] = 1.0,
+        A_gamma: Union[str, float, int, mpmath.mpf] = 1.0
+    ):
+        self.A_delta_str = str(A_delta)
+        self.A_gamma_str = str(A_gamma)
         self.A_delta = float(A_delta)
         self.A_gamma = float(A_gamma)
 
@@ -569,11 +668,11 @@ class AnisotropicDeformation(BaseTransform):
     def map_domain_point(self, s: complex) -> complex:
         return s
 
-    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
-        with mpmath.workdps(dps):
-            a_del = mpmath.mpf(str(self.A_delta))
-            a_gam = mpmath.mpf(str(self.A_gamma))
-            s_mpc = math_core.to_mpc(s)
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            a_del = math_core.to_mpf(self.A_delta_str, dps=dps + 10)
+            a_gam = math_core.to_mpf(self.A_gamma_str, dps=dps + 10)
+            s_mpc = math_core.to_mpc(s, dps=dps + 10)
             delta = s_mpc.real - mpmath.mpf('0.5')
             gamma = s_mpc.imag
             arg = mpmath.mpc(mpmath.mpf('0.5') + a_del * delta, a_gam * gamma)
@@ -585,3 +684,12 @@ class AnisotropicDeformation(BaseTransform):
         if abs(self.A_delta) < 1e-12 or abs(self.A_gamma) < 1e-12:
             return complex(float('nan'), float('nan'))
         return 0.5 + (delta / self.A_delta) + 1j * (gamma / self.A_gamma)
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        with mpmath.workdps(dps + 10):
+            a_del = math_core.to_mpf(self.A_delta_str, dps=dps + 10)
+            a_gam = math_core.to_mpf(self.A_gamma_str, dps=dps + 10)
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 10)
+            delta = rho_mpc.real - mpmath.mpf('0.5')
+            gamma = rho_mpc.imag
+            return mpmath.mpc(mpmath.mpf('0.5') + delta / a_del, gamma / a_gam)
