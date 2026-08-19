@@ -1,12 +1,12 @@
 {
   "schema_version": "1",
-  "run_id": "20260819T154835Z_centrifuge-slope-001_934b6deb",
+  "run_id": "20260819T161933Z_centrifuge-slope-001_934b6deb",
   "experiment_id": "centrifuge-slope-001",
   "experiment_spec_sha256": "934b6deb2fa6ef993a170934ae1f4a85dcf1fb4be6fb720ebe138ece2b91ecab",
-  "git_commit": "a51b0a024973d88c179fadab10e66e6cc5d1a6ec",
-  "git_dirty": true,
-  "started_at": "2026-08-19T15:48:35.387835+00:00",
-  "completed_at": "2026-08-19T15:48:35.410339+00:00",
+  "git_commit": "a4f8ad3348e4308801f118ef551557156508a3bb",
+  "git_dirty": false,
+  "started_at": "2026-08-19T16:19:33.318142+00:00",
+  "completed_at": "2026-08-19T16:19:33.335989+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -74,9 +74,9 @@
     }
   },
   "code_modules": {
-    "math_core.py": "853de68c0f4435fb39d06e978036d439ba02c17c9169c78a474b8c4af4c558ac",
+    "math_core.py": "c08bea658c102ef6905d5bdf28934ba7684c9df78fb4bc3f5cb0da8c3ec27844",
     "transforms.py": "fe10e428094edcd7ccf6314cc41c968750ce6595961b330696ab4e6a38f3bb57",
-    "converter.py": "15ff4b8396e3f1db820060627b59312333ffdb71b5d29de4c5c1ee1532dcca3e",
-    "zero_finder.py": "02ef1548e9f756a38be88b64dec083e2938a866f365258c1bc3a4c78651803d0"
+    "converter.py": "8b5c57e85eb02fa6295e8798d2d726162b706839b6b34913df35b0943bf63168",
+    "zero_finder.py": "6a24493575d8156c713d83d054958c00530cc9e8aae28ff2febf3fc671f5fabb"
   }
 }

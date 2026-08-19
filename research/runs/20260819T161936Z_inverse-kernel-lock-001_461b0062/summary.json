@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "run_id": "20260819T154841Z_inverse-kernel-lock-001_461b0062",
+  "run_id": "20260819T161936Z_inverse-kernel-lock-001_461b0062",
   "experiment_id": "inverse-kernel-lock-001",
   "status": "complete",
   "hypothesis": "When Inverse Scale Lock is active (AB=1) with shifts C=D=0, the analytically continued kernel transformation Z_{A,0,1/A,0}(s) is identically equal to zeta(s), achieving maximum absolute difference <= 1e-30 across sample domain points at 80 dps.\n",

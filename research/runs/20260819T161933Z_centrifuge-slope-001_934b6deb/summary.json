@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "run_id": "20260819T154835Z_centrifuge-slope-001_934b6deb",
+  "run_id": "20260819T161933Z_centrifuge-slope-001_934b6deb",
   "experiment_id": "centrifuge-slope-001",
   "status": "complete",
   "hypothesis": "For any nonzero delta and fixed gamma, the centrifuge log-modulus log|q_rho^K| is strictly linear in grade K with slope delta*ln(tau), achieving maximum absolute slope error <= 1e-30 at 80 dps.\n",

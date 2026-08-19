@@ -1,63 +1,44 @@
 {
   "schema_version": "1",
-  "run_id": "20260819T154841Z_inverse-kernel-lock-001_461b0062",
-  "experiment_id": "inverse-kernel-lock-001",
-  "experiment_spec_sha256": "461b00623088d1209a717a617a5bda2cd5511fa9bdb49b82957e6f6c122d1c69",
-  "git_commit": "a51b0a024973d88c179fadab10e66e6cc5d1a6ec",
-  "git_dirty": true,
-  "started_at": "2026-08-19T15:48:41.931313+00:00",
-  "completed_at": "2026-08-19T15:48:42.881092+00:00",
+  "run_id": "20260819T161942Z_centered-dilation-zero-map-001_7ca0768c",
+  "experiment_id": "centered-dilation-zero-map-001",
+  "experiment_spec_sha256": "7ca0768c3f61fc53148dda167ae2b80f075a7496a73a856d165ae594978a6d57",
+  "git_commit": "a4f8ad3348e4308801f118ef551557156508a3bb",
+  "git_dirty": false,
+  "started_at": "2026-08-19T16:19:42.161272+00:00",
+  "completed_at": "2026-08-19T16:19:42.219310+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
   },
   "parameter_space": {
-    "A": {
+    "mode": {
       "kind": "explicit",
       "values": [
-        "0.25",
+        "centered_dilation"
+      ]
+    },
+    "k": {
+      "kind": "explicit",
+      "values": [
+        "-1.0",
+        "-0.5",
+        "0.0",
         "0.5",
-        "1.0",
-        "2.0",
-        "4.0"
+        "1.0"
       ]
     },
-    "inverse_scale_lock": {
+    "gamma": {
       "kind": "explicit",
       "values": [
-        "true"
+        "14.13472514173469379045725198356247027078425711569924317568556746",
+        "21.02203963877155499262847959389690277733434052490278180469829596",
+        "25.01085758014568876321379099256282181865955519888407429345827115"
       ]
-    },
-    "C": {
-      "kind": "explicit",
-      "values": [
-        "0.0"
-      ]
-    },
-    "D": {
-      "kind": "explicit",
-      "values": [
-        "0.0"
-      ]
-    },
-    "s_re": {
-      "kind": "explicit",
-      "values": [
-        "0.5",
-        "0.75",
-        "2.0",
-        "-1.5"
-      ]
-    },
-    "s_im": {
-      "kind": "linear",
-      "start": "10.0",
-      "stop": "30.0",
-      "step": "5.0"
     }
   },
-  "points_requested": 100,
-  "points_completed": 100,
+  "points_requested": 15,
+  "points_completed": 15,
   "tau": "6.283185307179586476925286766559005768394338798750211641949889184615632812572418",
   "runtime": {
     "python": "3.10.9 | packaged by Anaconda, Inc. | (main, Mar  1 2023, 18:18:15) [MSC v.1916 64 bit (AMD64)]",
@@ -95,9 +76,9 @@
     }
   },
   "code_modules": {
-    "math_core.py": "853de68c0f4435fb39d06e978036d439ba02c17c9169c78a474b8c4af4c558ac",
+    "math_core.py": "c08bea658c102ef6905d5bdf28934ba7684c9df78fb4bc3f5cb0da8c3ec27844",
     "transforms.py": "fe10e428094edcd7ccf6314cc41c968750ce6595961b330696ab4e6a38f3bb57",
-    "converter.py": "15ff4b8396e3f1db820060627b59312333ffdb71b5d29de4c5c1ee1532dcca3e",
-    "zero_finder.py": "02ef1548e9f756a38be88b64dec083e2938a866f365258c1bc3a4c78651803d0"
+    "converter.py": "8b5c57e85eb02fa6295e8798d2d726162b706839b6b34913df35b0943bf63168",
+    "zero_finder.py": "6a24493575d8156c713d83d054958c00530cc9e8aae28ff2febf3fc671f5fabb"
   }
 }
