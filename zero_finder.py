@@ -14,8 +14,9 @@ Strictly adheres to DATA_PROVENANCE.md, SPEC.md §6, and EXPERIMENT_PROTOCOL.md:
 
 from __future__ import annotations
 import math
-from typing import List, Tuple, Optional, Dict, Any, Union
+from typing import List, Tuple, Optional, Dict, Any, Union, Sequence
 import numpy as np
+
 import mpmath
 import math_core
 import transforms
@@ -230,11 +231,12 @@ def discover_transformed_zeros(
 
 def compare_discovered_vs_predicted_zeros(
     transform_obj: transforms.BaseTransform,
-    discovered_zeros: List[mpmath.mpc],
-    baseline_zeros: List[Union[float, str, mpmath.mpf, complex]],
+    discovered_zeros: Sequence[Union[complex, mpmath.mpc]],
+    baseline_zeros: Sequence[Union[float, str, mpmath.mpf, complex]],
     tolerance: float = 1e-5,
     dps: int = 80
 ) -> Dict[str, Any]:
+
     """
     Compare independently discovered transformed zeros against algebraically
     predicted mapped zeros rho' = transform_obj.map_zero_mpc(rho).

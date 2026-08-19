@@ -12,7 +12,7 @@ import os
 import json
 import hashlib
 import bisect
-from typing import List, Dict, Any, Tuple, Optional, Union
+from typing import List, Dict, Any, Tuple, Optional, Union, Sequence
 import numpy as np
 import mpmath
 
@@ -87,11 +87,12 @@ def sieve_primes(max_n: int = 2000) -> List[int]:
 
 def prime_pi(x: float, primes_list: Optional[List[int]] = None) -> int:
     """Exact prime counting function pi(x) using binary search."""
-    if primes_list is None:
-        primes_list = load_primes()
     if x < 2:
         return 0
-    return bisect.bisect_right(primes_list, int(x))
+    if primes_list is None:
+        primes_list = load_primes()
+    idx = bisect.bisect_right(primes_list, int(x))
+    return idx
 
 
 def prime_pi_array(x_arr: np.ndarray) -> np.ndarray:
@@ -101,7 +102,7 @@ def prime_pi_array(x_arr: np.ndarray) -> np.ndarray:
 
 
 def validate_zero_discovery(
-    discovered_ordinates: List[Union[float, str, mpmath.mpf]],
+    discovered_ordinates: Sequence[Union[float, str, mpmath.mpf]],
     t_min: float,
     t_max: float,
     tolerance: float = 1e-6,
