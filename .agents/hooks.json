@@ -1,0 +1,6 @@
+{
+  "harness-integrity-guard": {
+    "enabled": true,
+    "description": "Safe, deterministic hook configuration for Riemann Microscope research environment."
+  }
+}

@@ -1,0 +1,587 @@
+"""
+transforms.py — Explicit Transformation Objects and Active Mathematics Card
+
+Implements distinct, typed transform classes conforming to:
+- RIEMANN_MICROSCOPE_SPEC.md §3, §4, §10
+- MATH_CONTRACT.md §2 - §10
+- DECISIONS.md
+
+Every transform object provides:
+- Mode Name & Parameter State
+- Exact Domain Map
+- Exact Function Evaluated
+- Original Critical Line & Image Critical Line
+- Predicted Zero Map
+- Exact Classification
+- Callable evaluation for single points & numpy vector batches
+"""
+
+from __future__ import annotations
+from abc import ABC, abstractmethod
+from typing import Tuple, Dict, Any, Optional
+import numpy as np
+import mpmath
+import math_core
+
+
+class BaseTransform(ABC):
+    """Abstract base class for all coordinate and arithmetic transformations."""
+    
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def classification(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def domain_map_str(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def function_str(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    @abstractmethod
+    def image_critical_line_str(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def zero_map_str(self) -> str:
+        pass
+
+    @abstractmethod
+    def map_domain_point(self, s: complex) -> complex:
+        """Map input coordinate s to transformed domain coordinate s'."""
+        pass
+
+    @abstractmethod
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        """Evaluate the transformed function f(s) at precision dps."""
+        pass
+
+    @abstractmethod
+    def map_zero(self, rho: complex) -> complex:
+        """Predict the mapped location of a baseline zero rho."""
+        pass
+
+    def map_domain_array(self, s_arr: np.ndarray) -> np.ndarray:
+        """Vectorized domain coordinate mapping."""
+        return np.array([self.map_domain_point(s) for s in s_arr], dtype=np.complex128)
+
+    def evaluate_array(self, s_arr: np.ndarray, dps: int = 35) -> Tuple[np.ndarray, np.ndarray]:
+        """Vectorized evaluation along path, returns (Re f(s), Im f(s))."""
+        re_vals = np.empty(len(s_arr), dtype=np.float64)
+        im_vals = np.empty(len(s_arr), dtype=np.float64)
+        for i, s in enumerate(s_arr):
+            val = self.evaluate_function(s, dps=dps)
+            re_vals[i] = float(val.real)
+            im_vals[i] = float(val.imag)
+        return re_vals, im_vals
+
+    def get_card_dict(self) -> Dict[str, str]:
+        """Return key-value dictionary for Active Mathematics Card."""
+        return {
+            "mode": self.name,
+            "classification": self.classification,
+            "domain_map": self.domain_map_str,
+            "function": self.function_str,
+            "original_critical_line": self.original_critical_line_str,
+            "image_critical_line": self.image_critical_line_str,
+            "zero_map": self.zero_map_str,
+        }
+
+    def get_card_markdown(self) -> str:
+        """Format the active mathematics card as clean GitHub Markdown."""
+        d = self.get_card_dict()
+        return (
+            f"**MODE: {d['mode']}**\n\n"
+            f"- **Domain map:** `{d['domain_map']}`\n"
+            f"- **Function plotted:** `{d['function']}`\n"
+            f"- **Original critical line:** `{d['original_critical_line']}`\n"
+            f"- **Image critical line:** `{d['image_critical_line']}`\n"
+            f"- **Predicted zero map:** `{d['zero_map']}`\n\n"
+            f"**CLASS:** {d['classification']}"
+        )
+
+
+class CameraTransform(BaseTransform):
+    """Mode 1: Camera zoom and pan only. No mathematical alteration."""
+    
+    def __init__(self):
+        pass
+
+    @property
+    def name(self) -> str:
+        return "CAMERA ONLY"
+
+    @property
+    def classification(self) -> str:
+        return "Rendering only. No mathematical change."
+
+    @property
+    def domain_map_str(self) -> str:
+        return "T_camera(s) = s"
+
+    @property
+    def function_str(self) -> str:
+        return "f(s) = ζ(s)"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def zero_map_str(self) -> str:
+        return "ρ' = ρ"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s
+
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        return math_core.zeta_eval(s, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        return rho
+
+
+class HeightMicroscopeTransform(BaseTransform):
+    """
+    Mode 2: Height microscope / macroscope.
+    s_K(u) = 1/2 + delta + i(t0 + tau^K * u).
+    Changes the sampled height range only.
+    """
+    def __init__(self, k: float = 0.0, t0: float = 14.0, delta: float = 0.0):
+        self.k = float(k)
+        self.t0 = float(t0)
+        self.delta = float(delta)
+
+    @property
+    def name(self) -> str:
+        return f"HEIGHT MICROSCOPE (k={self.k:.4f})"
+
+    @property
+    def classification(self) -> str:
+        return "Height microscope/macroscope. Changes sampled ordinate range only."
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"s_K(u) = 1/2 + {self.delta:.4g} + i({self.t0:.4g} + τ^{self.k:.4g} * u)"
+
+    @property
+    def function_str(self) -> str:
+        return "f(u) = ζ(s_K(u))"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        if abs(self.delta) < 1e-12:
+            return "Re(s) = 1/2"
+        return f"Re(s) = 1/2 + {self.delta:.4g}"
+
+    @property
+    def zero_map_str(self) -> str:
+        return "ρ' = ρ (zeros on critical line unchanged)"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s
+
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        return math_core.zeta_eval(s, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        return rho
+
+
+class OriginCoordinateDilation(BaseTransform):
+    """
+    Mode 3: Origin coordinate dilation.
+    s' = tau^K * s
+    f_K(s') = zeta(s' / tau^K)
+    image critical line: Re(s') = tau^K / 2
+    zero map: rho' = tau^K * rho
+    """
+    def __init__(self, k: float = 0.0):
+        self.k = float(k)
+        self.tau = float(math_core.get_tau(50))
+        self.scale = self.tau ** self.k
+
+    @property
+    def name(self) -> str:
+        return f"ORIGIN COORDINATE DILATION (k={self.k:.4f})"
+
+    @property
+    def classification(self) -> str:
+        return "Exact coordinate re-expression of ζ. Not a claim that ζ(τ^k s) = ζ(s)."
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"s' = τ^{self.k:.4g} s"
+
+    @property
+    def function_str(self) -> str:
+        return f"f_k(s') = ζ(s' / τ^{self.k:.4g})"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        return f"Re(s') = τ^{self.k:.4g} / 2 = {self.scale / 2.0:.6g}"
+
+    @property
+    def zero_map_str(self) -> str:
+        return f"ρ' = τ^{self.k:.4g} ρ"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s * self.scale
+
+    def evaluate_function(self, s_prime: complex, dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps):
+            tau_val = math_core.get_tau(dps)
+            scale_val = mpmath.power(tau_val, mpmath.mpf(str(self.k)))
+            s_orig = math_core.to_mpc(s_prime) / scale_val
+            return math_core.zeta_eval(s_orig, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        return rho * self.scale
+
+
+class CenteredCoordinateDilation(BaseTransform):
+    """
+    Mode 4: Centered coordinate dilation.
+    s' = 1/2 + tau^K * (s - 1/2)
+    f_K(s') = zeta(1/2 + (s' - 1/2) / tau^K)
+    image critical line: Re(s') = 1/2 (geometrically fixed)
+    zero map: rho' = 1/2 + tau^K * (rho - 1/2)
+    """
+    def __init__(self, k: float = 0.0):
+        self.k = float(k)
+        self.tau = float(math_core.get_tau(50))
+        self.scale = self.tau ** self.k
+
+    @property
+    def name(self) -> str:
+        return f"CENTERED COORDINATE DILATION (k={self.k:.4f})"
+
+    @property
+    def classification(self) -> str:
+        return "Exact centered coordinate dilation. Critical line Re(s')=1/2 fixed geometrically."
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"s' = 1/2 + τ^{self.k:.4g}(s - 1/2)"
+
+    @property
+    def function_str(self) -> str:
+        return f"f_k(s') = ζ(1/2 + (s' - 1/2) / τ^{self.k:.4g})"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        return "Re(s') = 1/2"
+
+    @property
+    def zero_map_str(self) -> str:
+        return f"ρ' = 1/2 + τ^{self.k:.4g}(ρ - 1/2)"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return 0.5 + self.scale * (s - 0.5)
+
+    def evaluate_function(self, s_prime: complex, dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps):
+            tau_val = math_core.get_tau(dps)
+            scale_val = mpmath.power(tau_val, mpmath.mpf(str(self.k)))
+            s_mpc = math_core.to_mpc(s_prime)
+            s_orig = mpmath.mpf('0.5') + (s_mpc - mpmath.mpf('0.5')) / scale_val
+            return math_core.zeta_eval(s_orig, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        return 0.5 + self.scale * (rho - 0.5)
+
+
+class ArgumentTransform(BaseTransform):
+    """
+    Mode 5: Zeta argument transform.
+    f_K(s) = zeta(tau^K * s)
+    critical-zero line: Re(s) = 1 / (2 * tau^K)
+    zero map: s = rho / tau^K
+    """
+    def __init__(self, k: float = 0.0):
+        self.k = float(k)
+        self.tau = float(math_core.get_tau(50))
+        self.scale = self.tau ** self.k
+
+    @property
+    def name(self) -> str:
+        return f"ARGUMENT TRANSFORM (k={self.k:.4f})"
+
+    @property
+    def classification(self) -> str:
+        return "Analytic argument scaling. Changes the evaluated function; not a coordinate re-expression."
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"s ↦ τ^{self.k:.4g} s"
+
+    @property
+    def function_str(self) -> str:
+        return f"f_k(s) = ζ(τ^{self.k:.4g} s)"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        return f"Re(s) = 1 / (2 * τ^{self.k:.4g}) = {1.0 / (2.0 * self.scale):.6g}"
+
+    @property
+    def zero_map_str(self) -> str:
+        return f"s_ρ = ρ / τ^{self.k:.4g}"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s
+
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps):
+            tau_val = math_core.get_tau(dps)
+            scale_val = mpmath.power(tau_val, mpmath.mpf(str(self.k)))
+            s_arg = math_core.to_mpc(s) * scale_val
+            return math_core.zeta_eval(s_arg, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        return rho / self.scale
+
+
+class KernelTransform(BaseTransform):
+    """
+    Mode 6: Kernel Lab Transform.
+    log n ↦ A log n + C
+    s ↦ B s + D
+    Canonical formula: Z_{A,C,B,D}(s) = exp(-C(Bs+D)) * zeta(A(Bs+D)).
+    When Inverse Scale Lock is ON: AB = 1 (B = 1/A).
+    """
+    def __init__(
+        self,
+        A: float = 1.0,
+        B: float = 1.0,
+        C: float = 0.0,
+        D: float = 0.0,
+        inverse_scale_lock: bool = False
+    ):
+        self.A = float(A)
+        self.inverse_scale_lock = inverse_scale_lock
+        if inverse_scale_lock:
+            self.B = 1.0 / self.A if self.A != 0 else 1.0
+        else:
+            self.B = float(B)
+        self.C = float(C)
+        self.D = float(D)
+
+    @property
+    def name(self) -> str:
+        lock_status = " [LOCKED AB=1]" if self.inverse_scale_lock else ""
+        return f"KERNEL LAB (A={self.A:.4g}, B={self.B:.4g}{lock_status})"
+
+    @property
+    def classification(self) -> str:
+        if abs(self.A * self.B - 1.0) < 1e-12 and abs(self.C) < 1e-12 and abs(self.D) < 1e-12:
+            return "EXACT KERNEL PAIRING PRESERVED (AB=1, C=D=0: Z(s) = ζ(s))"
+        return "Dirichlet kernel deformation (analytically continued in critical strip)."
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"log n ↦ {self.A:.4g} log n + {self.C:.4g}, s ↦ {self.B:.4g} s + {self.D:.4g}"
+
+    @property
+    def function_str(self) -> str:
+        return f"Z_{{A,C,B,D}}(s) = exp(-{self.C:.4g}({self.B:.4g}s + {self.D:.4g})) * ζ({self.A:.4g}({self.B:.4g}s + {self.D:.4g}))"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        # A(B s + D) = 1/2 + i*t => Re(s) = (1/(2A) - Re(D)) / B
+        if abs(self.A * self.B) > 1e-12:
+            crit_re = (0.5 / self.A - self.D) / self.B
+            return f"Re(s) = (1/(2A) - D)/B = {crit_re:.6g}"
+        return "Undefined (singular scale)"
+
+    @property
+    def zero_map_str(self) -> str:
+        return "s_ρ = (ρ/A - D) / B"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s
+
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps):
+            a_val = mpmath.mpf(str(self.A))
+            b_val = mpmath.mpf(str(self.B))
+            c_val = mpmath.mpf(str(self.C))
+            d_val = mpmath.mpf(str(self.D))
+            s_mpc = math_core.to_mpc(s)
+            
+            inner = b_val * s_mpc + d_val
+            zeta_arg = a_val * inner
+            prefactor = mpmath.exp(-c_val * inner)
+            zeta_val = math_core.zeta_eval(zeta_arg, dps=dps)
+            return prefactor * zeta_val
+
+    def map_zero(self, rho: complex) -> complex:
+        if abs(self.A * self.B) < 1e-12:
+            return complex(float('nan'), float('nan'))
+        return (rho / self.A - self.D) / self.B
+
+
+class CenteredKernelTransform(BaseTransform):
+    """
+    Centered kernel mode:
+    Z^{ctr}_{A,B}(z) = zeta(1/2 + AB * z) where z = s - 1/2.
+    When AB = 1: Z^{ctr}_{A,1/A}(z) = zeta(1/2 + z) = zeta(s).
+    """
+    def __init__(self, A: float = 1.0, B: float = 1.0, inverse_scale_lock: bool = True):
+        self.A = float(A)
+        self.inverse_scale_lock = inverse_scale_lock
+        if inverse_scale_lock:
+            self.B = 1.0 / self.A if self.A != 0 else 1.0
+        else:
+            self.B = float(B)
+
+    @property
+    def name(self) -> str:
+        return f"CENTERED KERNEL MODE (A={self.A:.4g}, B={self.B:.4g})"
+
+    @property
+    def classification(self) -> str:
+        if abs(self.A * self.B - 1.0) < 1e-12:
+            return "EXACT KERNEL PAIRING PRESERVED: ζ argument unchanged (AB=1)."
+        return "Centered kernel deformation."
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"z = s - 1/2 ↦ {self.A * self.B:.4g} z"
+
+    @property
+    def function_str(self) -> str:
+        return f"Z^{{ctr}}_{{A,B}}(z) = ζ(1/2 + {self.A * self.B:.4g}(s - 1/2))"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def zero_map_str(self) -> str:
+        return f"s_ρ = 1/2 + (ρ - 1/2) / {self.A * self.B:.4g}"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s
+
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps):
+            ab_val = mpmath.mpf(str(self.A * self.B))
+            s_mpc = math_core.to_mpc(s)
+            z = s_mpc - mpmath.mpf('0.5')
+            zeta_arg = mpmath.mpf('0.5') + ab_val * z
+            return math_core.zeta_eval(zeta_arg, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        ab = self.A * self.B
+        if abs(ab) < 1e-12:
+            return complex(float('nan'), float('nan'))
+        return 0.5 + (rho - 0.5) / ab
+
+
+class AnisotropicDeformation(BaseTransform):
+    """
+    Anisotropic centered deformation:
+    z = delta + i*gamma ↦ A_delta * delta + i * A_gamma * gamma.
+    If A_delta != A_gamma, labeled NON-HOLOMORPHIC DEFORMATION.
+    """
+    def __init__(self, A_delta: float = 1.0, A_gamma: float = 1.0):
+        self.A_delta = float(A_delta)
+        self.A_gamma = float(A_gamma)
+
+    @property
+    def is_holomorphic(self) -> bool:
+        return abs(self.A_delta - self.A_gamma) < 1e-12
+
+    @property
+    def name(self) -> str:
+        return f"ANISOTROPIC DEFORMATION (A_δ={self.A_delta:.4g}, A_γ={self.A_gamma:.4g})"
+
+    @property
+    def classification(self) -> str:
+        if not self.is_holomorphic:
+            return "NON-HOLOMORPHIC DEFORMATION (A_δ ≠ A_γ breaks Cauchy-Riemann equations)"
+        return f"Isotropic centered dilation (A={self.A_delta:.4g})"
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"δ + iγ ↦ {self.A_delta:.4g}δ + i{self.A_gamma:.4g}γ"
+
+    @property
+    def function_str(self) -> str:
+        return f"f(s) = ζ(1/2 + {self.A_delta:.4g}(Re s - 1/2) + i{self.A_gamma:.4g} Im s)"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        return "Re(s) = 1/2 (since δ=0 ↦ 0)"
+
+    @property
+    def zero_map_str(self) -> str:
+        return f"s_ρ = 1/2 + (Re ρ - 1/2)/{self.A_delta:.4g} + i(Im ρ)/{self.A_gamma:.4g}"
+
+    def map_domain_point(self, s: complex) -> complex:
+        return s
+
+    def evaluate_function(self, s: complex, dps: int = 35) -> mpmath.mpc:
+        with mpmath.workdps(dps):
+            a_del = mpmath.mpf(str(self.A_delta))
+            a_gam = mpmath.mpf(str(self.A_gamma))
+            s_mpc = math_core.to_mpc(s)
+            delta = s_mpc.real - mpmath.mpf('0.5')
+            gamma = s_mpc.imag
+            arg = mpmath.mpc(mpmath.mpf('0.5') + a_del * delta, a_gam * gamma)
+            return math_core.zeta_eval(arg, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        delta = rho.real - 0.5
+        gamma = rho.imag
+        if abs(self.A_delta) < 1e-12 or abs(self.A_gamma) < 1e-12:
+            return complex(float('nan'), float('nan'))
+        return 0.5 + (delta / self.A_delta) + 1j * (gamma / self.A_gamma)
