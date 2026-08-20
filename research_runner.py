@@ -388,10 +388,10 @@ def evaluate_point(
                     outputs["cj_transformed"] = mpmath.nstr(cj_trans, n=dps)
                     outputs["cj_covariance_residual"] = mpmath.nstr(e_cj, n=dps)
                     
-                    # Evaluate C_pi if mapped_x >= 2
-                    if mapped_x >= 2 and x_mpf >= 2:
-                        cpi_clean = converter.zero_pi_contribution_audit(x_mpf, rho_mpc, dps=dps + 10)
-                        cpi_trans = converter.zero_pi_contribution_audit(mapped_x, mapped_rho, dps=dps + 10)
+                    # Evaluate C_pi if mapped_x >= 2 and mapped_x <= 1e5 (prevent astronomical Mobius truncation counts)
+                    if 2 <= mapped_x <= 100000 and 2 <= x_mpf <= 100000:
+                        cpi_clean = converter.zero_pi_contribution_audit(x_mpf, rho_mpc, dps=dps + 10, max_m=50)
+                        cpi_trans = converter.zero_pi_contribution_audit(mapped_x, mapped_rho, dps=dps + 10, max_m=50)
                         e_cpi = abs(cpi_trans - cpi_clean)
                         outputs["cpi_clean"] = mpmath.nstr(cpi_clean, n=dps)
                         outputs["cpi_transformed"] = mpmath.nstr(cpi_trans, n=dps)
@@ -402,6 +402,7 @@ def evaluate_point(
                     outputs["residual"] = mpmath.nstr(max_cov_res, n=dps)
                 
                 return "ok", outputs, None
+
 
             elif operation == "converter_perturbation":
                 zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))

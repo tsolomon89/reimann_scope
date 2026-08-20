@@ -133,13 +133,14 @@ def zero_j_contribution_audit(
 def zero_pi_contribution_audit(
     x: Union[str, float, int, mpmath.mpf],
     rho: Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]],
-    dps: int = 80
+    dps: int = 80,
+    max_m: int = 100
 ) -> mpmath.mpf:
     """
     [AUDIT PATH] Authoritative high-precision evaluation of single-zero pi contribution
     via Mobius inversion:
     C_pi(x, rho) = sum_{m >= 1, x^{1/m} >= 2} (mu(m) / m) * C_J(x^{1/m}, rho).
-    Terminates once x^{1/m} < 2.
+    Terminates once x^{1/m} < 2 or m > max_m.
     """
     with mpmath.workdps(dps + 15):
         x_mpf = math_core.to_mpf(x, dps=dps + 15)
@@ -147,7 +148,7 @@ def zero_pi_contribution_audit(
             return mpmath.mpf('0')
         total = mpmath.mpf('0')
         m = 1
-        while True:
+        while m <= max_m:
             xr = mpmath.power(x_mpf, mpmath.mpf(1) / m)
             if xr < 2:
                 break
@@ -172,7 +173,7 @@ def zero_j_contribution_preview(x: float, rho: Union[complex, float]) -> float:
     return -2.0 * float(np.real(ei_val))
 
 
-def zero_pi_contribution_preview(x: float, rho: Union[complex, float]) -> float:
+def zero_pi_contribution_preview(x: float, rho: Union[complex, float], max_m: int = 100) -> float:
     """[PREVIEW PATH] Fast float evaluation of C_pi(x, rho) via Mobius inversion."""
     if x < 2.0:
         return 0.0
@@ -183,7 +184,7 @@ def zero_pi_contribution_preview(x: float, rho: Union[complex, float]) -> float:
     ln_x = math.log(x)
     total = 0.0
     m = 1
-    while True:
+    while m <= max_m:
         xr = x ** (1.0 / m)
         if xr < 2.0:
             break
@@ -194,6 +195,7 @@ def zero_pi_contribution_preview(x: float, rho: Union[complex, float]) -> float:
             total += (float(mu_m) / float(m)) * cj
         m += 1
     return total
+
 
 
 def construct_perturbed_zeros_audit(
