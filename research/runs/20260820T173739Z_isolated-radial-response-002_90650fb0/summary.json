@@ -1,0 +1,1372 @@
+{
+  "schema_version": "1",
+  "run_id": "20260820T173739Z_isolated-radial-response-002_90650fb0",
+  "experiment_id": "isolated-radial-response-002",
+  "status": "complete",
+  "hypothesis": "Characterize the isolated zero converter response and the symmetric split defect S_J(delta) = C_J(x, 1/2+delta+igamma) + C_J(x, 1/2-delta+igamma) - 2*C_J(x, 1/2+igamma) and S_pi(delta) across single-pair diagnostic and symmetry-complete split modes at 80 dps. Observational experiment characterizing even symmetry S(-delta) = S(delta), baseline vanishing S(0) = 0, and local quadratic scaling without asserting an artificial pass/fail threshold.\n",
+  "points_requested": 198,
+  "points_completed": 198,
+  "points_failed": 0,
+  "metrics": {
+    "residual": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+    "delta_cj": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+    "delta_cpi": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+    "delta_pi_n": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+    "split_defect_cj": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+    "split_defect_cpi": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+    "split_defect_pi_n": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+    "symmetry_error_cj": "0.0",
+    "symmetry_error_cpi": "0.0",
+    "symmetry_error": "0.0",
+    "normalized_quadratic_cj": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+    "normalized_quadratic_cpi": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+    "quadratic_ratio_cj": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+    "quadratic_ratio_cpi": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+    "quadratic_ratio_error_cj": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+    "quadratic_ratio_error_cpi": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883"
+  },
+  "report_metrics": {
+    "residual": {
+      "metric": "residual",
+      "label": "Primary metric: residual",
+      "kind": "observational_metric",
+      "count": 198,
+      "min": "0.0",
+      "max": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+      "max_abs": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+      "argmax_abs": {
+        "point_id": 64,
+        "value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+        "abs_value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "single_pair_diagnostic"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 64,
+          "value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+          "abs_value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 4,
+          "value": "0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+          "abs_value": "0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 62,
+          "value": "0.043543836700242597728536196562408128038576507270439322576300732353882628055031899",
+          "abs_value": "0.043543836700242597728536196562408128038576507270439322576300732353882628055031899",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 2,
+          "value": "0.038232309100192297296204595599619804363132932398694833494629184245803228464182798",
+          "abs_value": "0.038232309100192297296204595599619804363132932398694833494629184245803228464182798",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 60,
+          "value": "0.028966468974777859673656623456503190729998221645231261797300759528803669318324947",
+          "abs_value": "0.028966468974777859673656623456503190729998221645231261797300759528803669318324947",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        }
+      ]
+    },
+    "delta_cj": {
+      "metric": "delta_cj",
+      "label": "Single-zero J contribution shift Delta C_J",
+      "kind": "perturbation_response",
+      "count": 99,
+      "min": "-0.042640732852180293374433427833242356756293333859658931148020593996148365830388284",
+      "max": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+      "max_abs": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+      "argmax_abs": {
+        "point_id": 64,
+        "value": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+        "abs_value": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "single_pair_diagnostic"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 64,
+          "value": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+          "abs_value": "0.051778998431037126208431441889330649531023760676454918328921870756583436879059914",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 4,
+          "value": "-0.042640732852180293374433427833242356756293333859658931148020593996148365830388284",
+          "abs_value": "0.042640732852180293374433427833242356756293333859658931148020593996148365830388284",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 62,
+          "value": "0.034092356197622723293092340143411829985718757325344850594803708097598598193181121",
+          "abs_value": "0.034092356197622723293092340143411829985718757325344850594803708097598598193181121",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 2,
+          "value": "-0.029350152874735913722172904350628856858494412386495559286207502969699159272012622",
+          "abs_value": "0.029350152874735913722172904350628856858494412386495559286207502969699159272012622",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 60,
+          "value": "-0.021795077334298030284843632626689937651140601080334469554531915775724751714086637",
+          "abs_value": "0.021795077334298030284843632626689937651140601080334469554531915775724751714086637",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        }
+      ]
+    },
+    "delta_cpi": {
+      "metric": "delta_cpi",
+      "label": "Single-zero pi contribution shift Delta C_pi",
+      "kind": "perturbation_response",
+      "count": 99,
+      "min": "-0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+      "max": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+      "max_abs": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+      "argmax_abs": {
+        "point_id": 64,
+        "value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+        "abs_value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "single_pair_diagnostic"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 64,
+          "value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+          "abs_value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 4,
+          "value": "-0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+          "abs_value": "0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 62,
+          "value": "0.043543836700242597728536196562408128038576507270439322576300732353882628055031899",
+          "abs_value": "0.043543836700242597728536196562408128038576507270439322576300732353882628055031899",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 2,
+          "value": "-0.038232309100192297296204595599619804363132932398694833494629184245803228464182798",
+          "abs_value": "0.038232309100192297296204595599619804363132932398694833494629184245803228464182798",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 60,
+          "value": "-0.028966468974777859673656623456503190729998221645231261797300759528803669318324947",
+          "abs_value": "0.028966468974777859673656623456503190729998221645231261797300759528803669318324947",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        }
+      ]
+    },
+    "delta_pi_n": {
+      "metric": "delta_pi_n",
+      "label": "Full spectrum prime count shift Delta pi_N(x)",
+      "kind": "perturbation_response",
+      "count": 99,
+      "min": "-0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+      "max": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+      "max_abs": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+      "argmax_abs": {
+        "point_id": 64,
+        "value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+        "abs_value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "single_pair_diagnostic"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 64,
+          "value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+          "abs_value": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 4,
+          "value": "-0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+          "abs_value": "0.043963533835825557069754001101642952250492551798844869329174806449432344400246635",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 62,
+          "value": "0.043543836700242597728536196562408128038576507270439322576300732353882628055031899",
+          "abs_value": "0.043543836700242597728536196562408128038576507270439322576300732353882628055031899",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 2,
+          "value": "-0.038232309100192297296204595599619804363132932398694833494629184245803228464182798",
+          "abs_value": "0.038232309100192297296204595599619804363132932398694833494629184245803228464182798",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        },
+        {
+          "point_id": 60,
+          "value": "-0.028966468974777859673656623456503190729998221645231261797300759528803669318324947",
+          "abs_value": "0.028966468974777859673656623456503190729998221645231261797300759528803669318324947",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "single_pair_diagnostic"
+          }
+        }
+      ]
+    },
+    "split_defect_cj": {
+      "metric": "split_defect_cj",
+      "label": "Symmetric split defect S_J(delta) = C_J(rho_+) + C_J(rho_-) - 2*C_J(rho_0)",
+      "kind": "perturbation_response",
+      "count": 99,
+      "min": "-0.0036884329364066550663020783928629949235971076259343838357033705157394986937702615",
+      "max": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+      "max_abs": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+      "argmax_abs": {
+        "point_id": 5,
+        "value": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+        "abs_value": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 5,
+          "value": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+          "abs_value": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 65,
+          "value": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+          "abs_value": "0.0091382655788568328339980140560882927747304268167959871809012767604350710486716299",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 3,
+          "value": "0.0047422033228868095709194357927829731272243449388492913085962051278994389211684992",
+          "abs_value": "0.0047422033228868095709194357927829731272243449388492913085962051278994389211684992",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 63,
+          "value": "0.0047422033228868095709194357927829731272243449388492913085962051278994389211684992",
+          "abs_value": "0.0047422033228868095709194357927829731272243449388492913085962051278994389211684992",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 71,
+          "value": "-0.0036884329364066550663020783928629949235971076259343838357033705157394986937702615",
+          "abs_value": "0.0036884329364066550663020783928629949235971076259343838357033705157394986937702615",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "split_defect_cpi": {
+      "metric": "split_defect_cpi",
+      "label": "Symmetric split defect S_pi(delta) = C_pi(rho_+) + C_pi(rho_-) - 2*C_pi(rho_0)",
+      "kind": "perturbation_response",
+      "count": 99,
+      "min": "-0.0037849568533919090380398040879382026905267835419540063789949451395997027607473656",
+      "max": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+      "max_abs": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+      "argmax_abs": {
+        "point_id": 5,
+        "value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+        "abs_value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 5,
+          "value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "abs_value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 65,
+          "value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "abs_value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 3,
+          "value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "abs_value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 63,
+          "value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "abs_value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 71,
+          "value": "-0.0037849568533919090380398040879382026905267835419540063789949451395997027607473656",
+          "abs_value": "0.0037849568533919090380398040879382026905267835419540063789949451395997027607473656",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "split_defect_pi_n": {
+      "metric": "split_defect_pi_n",
+      "label": "Symmetric split reconstructed prime shift S_pi_N(x)",
+      "kind": "perturbation_response",
+      "count": 99,
+      "min": "-0.0037849568533919090380398040879382026905267835419540063789949451395997027607473656",
+      "max": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+      "max_abs": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+      "argmax_abs": {
+        "point_id": 5,
+        "value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+        "abs_value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 5,
+          "value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "abs_value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 65,
+          "value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "abs_value": "0.0094474019743504952890502410300139749827838606933327780198711860042459369180750953",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 3,
+          "value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "abs_value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 63,
+          "value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "abs_value": "0.0053115276000503004323316009627883236754435748717444890816715481080793995908491004",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 71,
+          "value": "-0.0037849568533919090380398040879382026905267835419540063789949451395997027607473656",
+          "abs_value": "0.0037849568533919090380398040879382026905267835419540063789949451395997027607473656",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "symmetry_error_cj": {
+      "metric": "symmetry_error_cj",
+      "label": "Split defect J even symmetry error |S_J(delta) - S_J(-delta)|",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 99,
+      "min": "0.0",
+      "max": "0.0",
+      "max_abs": "0.0",
+      "argmax_abs": {
+        "point_id": 1,
+        "value": "0.0",
+        "abs_value": "0.0",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "10.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 1,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 3,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 5,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 7,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 9,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "symmetry_error_cpi": {
+      "metric": "symmetry_error_cpi",
+      "label": "Split defect pi even symmetry error |S_pi(delta) - S_pi(-delta)|",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 99,
+      "min": "0.0",
+      "max": "0.0",
+      "max_abs": "0.0",
+      "argmax_abs": {
+        "point_id": 1,
+        "value": "0.0",
+        "abs_value": "0.0",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "10.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 1,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 3,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 5,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 7,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 9,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "symmetry_error": {
+      "metric": "symmetry_error",
+      "label": "Split defect max even symmetry error max(|S_J - S_J(-delta)|, |S_pi - S_pi(-delta)|)",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 99,
+      "min": "0.0",
+      "max": "0.0",
+      "max_abs": "0.0",
+      "argmax_abs": {
+        "point_id": 1,
+        "value": "0.0",
+        "abs_value": "0.0",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "10.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 1,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 3,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 5,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 7,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "10.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 9,
+          "value": "0.0",
+          "abs_value": "0.0",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "20.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "normalized_quadratic_cj": {
+      "metric": "normalized_quadratic_cj",
+      "label": "Normalized quadratic split defect S_J(delta) / delta^2",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 90,
+      "min": "-1.4753731745626620265208313571451979694388430503737535342813482062957994775081046",
+      "max": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+      "max_abs": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+      "argmax_abs": {
+        "point_id": 5,
+        "value": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+        "abs_value": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 5,
+          "value": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+          "abs_value": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 65,
+          "value": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+          "abs_value": "3.655306231542733133599205622435317109892170726718394872360510704174028419468652",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 11,
+          "value": "3.6443238879476801744309964321120010204061483061796293112896467601145512443736361",
+          "abs_value": "3.6443238879476801744309964321120010204061483061796293112896467601145512443736361",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 59,
+          "value": "3.6443238879476801744309964321120010204061483061796293112896467601145512443736361",
+          "abs_value": "3.6443238879476801744309964321120010204061483061796293112896467601145512443736361",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 17,
+          "value": "3.6439811143970267149784248643303094939287536155564450588964976748988829396273337",
+          "abs_value": "3.6439811143970267149784248643303094939287536155564450588964976748988829396273337",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.005",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "normalized_quadratic_cpi": {
+      "metric": "normalized_quadratic_cpi",
+      "label": "Normalized quadratic split defect S_pi(delta) / delta^2",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 90,
+      "min": "-1.5139827413567636152159216351752810762107134167816025515979780558398811042989462",
+      "max": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+      "max_abs": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+      "argmax_abs": {
+        "point_id": 5,
+        "value": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+        "abs_value": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+        "inputs": {
+          "zero_index": "0",
+          "delta": "-0.05",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 5,
+          "value": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+          "abs_value": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 65,
+          "value": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+          "abs_value": "3.7789607897401981156200964120055899931135442773331112079484744016983747672300381",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.05",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 11,
+          "value": "3.7678607999679276120043807016273812384502942775980304584632676412538936178360827",
+          "abs_value": "3.7678607999679276120043807016273812384502942775980304584632676412538936178360827",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 59,
+          "value": "3.7678607999679276120043807016273812384502942775980304584632676412538936178360827",
+          "abs_value": "3.7678607999679276120043807016273812384502942775980304584632676412538936178360827",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 17,
+          "value": "3.7675143510423887895413081174203455884944784602517376836502142653787527671725588",
+          "abs_value": "3.7675143510423887895413081174203455884944784602517376836502142653787527671725588",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.005",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "quadratic_ratio_cj": {
+      "metric": "quadratic_ratio_cj",
+      "label": "Quadratic scaling ratio S_J(delta) / S_J(delta/2)",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 36,
+      "min": "4.0000013355798614641822024628326135790748545800696307229807934681518934620568777",
+      "max": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+      "max_abs": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+      "argmax_abs": {
+        "point_id": 143,
+        "value": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+        "abs_value": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+        "inputs": {
+          "zero_index": "2",
+          "delta": "-0.01",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 143,
+          "value": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+          "abs_value": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 191,
+          "value": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+          "abs_value": "4.0003971562693129012373964321459576026476637902627796722842016750566954028649378",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 77,
+          "value": "4.0003959383477648294497170153892816683462528818165301045922816815590122819907324",
+          "abs_value": "4.0003959383477648294497170153892816683462528818165301045922816815590122819907324",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 125,
+          "value": "4.0003959383477648294497170153892816683462528818165301045922816815590122819907324",
+          "abs_value": "4.0003959383477648294497170153892816683462528818165301045922816815590122819907324",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 11,
+          "value": "4.0003762627081673869134365902614737162043282326052242757107882302288430823406751",
+          "abs_value": "4.0003762627081673869134365902614737162043282326052242757107882302288430823406751",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "quadratic_ratio_cpi": {
+      "metric": "quadratic_ratio_cpi",
+      "label": "Quadratic scaling ratio S_pi(delta) / S_pi(delta/2)",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 36,
+      "min": "4.0000012123644035851883885158863994872346008898109997104229852621825212272723243",
+      "max": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+      "max_abs": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+      "argmax_abs": {
+        "point_id": 143,
+        "value": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+        "abs_value": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+        "inputs": {
+          "zero_index": "2",
+          "delta": "-0.01",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 143,
+          "value": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+          "abs_value": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 191,
+          "value": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+          "abs_value": "4.0004339813553804544735788287865140354008098258002961898330099730639082496976571",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 77,
+          "value": "4.0003902537807523578843862689526419278443811970229448714097610917292029128924132",
+          "abs_value": "4.0003902537807523578843862689526419278443811970229448714097610917292029128924132",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 125,
+          "value": "4.0003902537807523578843862689526419278443811970229448714097610917292029128924132",
+          "abs_value": "4.0003902537807523578843862689526419278443811970229448714097610917292029128924132",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 11,
+          "value": "4.0003678275841927106401184095248973706597638004059877204674599278798926353040446",
+          "abs_value": "4.0003678275841927106401184095248973706597638004059877204674599278798926353040446",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "quadratic_ratio_error_cj": {
+      "metric": "quadratic_ratio_error_cj",
+      "label": "Quadratic scaling error |S_J(delta)/S_J(delta/2) - 4|",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 36,
+      "min": "0.0000013355798614641822024628326135790748545800696307229807934681518934620568777235413",
+      "max": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+      "max_abs": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+      "argmax_abs": {
+        "point_id": 143,
+        "value": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+        "abs_value": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+        "inputs": {
+          "zero_index": "2",
+          "delta": "-0.01",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 143,
+          "value": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+          "abs_value": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 191,
+          "value": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+          "abs_value": "0.00039715626931290123739643214595760264766379026277967228420167505669540286493777866",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 77,
+          "value": "0.00039593834776482944971701538928166834625288181653010459228168155901228199073242775",
+          "abs_value": "0.00039593834776482944971701538928166834625288181653010459228168155901228199073242775",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 125,
+          "value": "0.00039593834776482944971701538928166834625288181653010459228168155901228199073242775",
+          "abs_value": "0.00039593834776482944971701538928166834625288181653010459228168155901228199073242775",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 11,
+          "value": "0.00037626270816738691343659026147371620432823260522427571078823022884308234067505255",
+          "abs_value": "0.00037626270816738691343659026147371620432823260522427571078823022884308234067505255",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    },
+    "quadratic_ratio_error_cpi": {
+      "metric": "quadratic_ratio_error_cpi",
+      "label": "Quadratic scaling error |S_pi(delta)/S_pi(delta/2) - 4|",
+      "kind": "fixed_m_truncation_diagnostic",
+      "count": 36,
+      "min": "0.0000012123644035851883885158863994872346008898109997104229852621825212272723243443021",
+      "max": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+      "max_abs": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+      "argmax_abs": {
+        "point_id": 143,
+        "value": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+        "abs_value": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+        "inputs": {
+          "zero_index": "2",
+          "delta": "-0.01",
+          "x": "50.0",
+          "num_zeros": "10",
+          "perturbation_mode": "symmetry_complete_split"
+        }
+      },
+      "worst_points": [
+        {
+          "point_id": 143,
+          "value": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+          "abs_value": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 191,
+          "value": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+          "abs_value": "0.00043398135538045447357882878651403540080982580029618983300997306390824969765706883",
+          "inputs": {
+            "zero_index": "2",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 77,
+          "value": "0.0003902537807523578843862689526419278443811970229448714097610917292029128924132154",
+          "abs_value": "0.0003902537807523578843862689526419278443811970229448714097610917292029128924132154",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 125,
+          "value": "0.0003902537807523578843862689526419278443811970229448714097610917292029128924132154",
+          "abs_value": "0.0003902537807523578843862689526419278443811970229448714097610917292029128924132154",
+          "inputs": {
+            "zero_index": "1",
+            "delta": "0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        },
+        {
+          "point_id": 11,
+          "value": "0.00036782758419271064011840952489737065976380040598772046745992787989263530404457292",
+          "abs_value": "0.00036782758419271064011840952489737065976380040598772046745992787989263530404457292",
+          "inputs": {
+            "zero_index": "0",
+            "delta": "-0.01",
+            "x": "50.0",
+            "num_zeros": "10",
+            "perturbation_mode": "symmetry_complete_split"
+          }
+        }
+      ]
+    }
+  },
+  "criterion": {
+    "metric": "residual",
+    "aggregation": "none",
+    "operator": "N/A",
+    "threshold": "N/A",
+    "observed": null,
+    "criterion_met": null
+  },
+  "extrema": {
+    "min": "0.0",
+    "max": "0.053410935810176052358804242131656927233276412492177647349045992453678281318321731"
+  },
+  "anomalies": [],
+  "warnings": []
+}
