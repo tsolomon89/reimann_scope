@@ -478,7 +478,7 @@ def evaluate_point(
                 outputs: Dict[str, str] = {
                     "zero_index": str(zero_idx),
                     "gamma": mpmath.nstr(rho_clean.imag, n=dps),
-                    "delta": str(delta_str),
+                    "delta": delta_str,
                     "perturbation_mode": mode,
                     "clean_rho": f"{mpmath.nstr(rho_clean.real, n=dps)} + {mpmath.nstr(rho_clean.imag, n=dps)}j",
                     "perturbed_rhos": pert_rhos_str,
@@ -590,9 +590,9 @@ def evaluate_point(
                     small_arg_ratio_str = "N/A"
                     
                 return "ok", {
-                    "delta": str(delta_str),
-                    "gamma": str(gamma_str),
-                    "K": str(k_str),
+                    "delta": delta_str,
+                    "gamma": gamma_str,
+                    "K": k_str,
                     "D_K_re": mpmath.nstr(D_K.real, n=dps),
                     "D_K_im": mpmath.nstr(D_K.imag, n=dps),
                     "abs_D_K": mpmath.nstr(abs_D_K, n=dps),
@@ -649,8 +649,8 @@ def evaluate_point(
                     )
                     pert_cj_residual = abs(pert_cj_prime - pert_cj)
                     
-                    split_defect = pert_cj - mpmath.mpf(2) * clean_cj
-                    split_defect_prime = pert_cj_prime - mpmath.mpf(2) * clean_cj_prime
+                    split_defect = pert_cj - (mpmath.mpf(2) * clean_cj)
+                    split_defect_prime = pert_cj_prime - (mpmath.mpf(2) * clean_cj_prime)
                     delta_cj_residual = abs(split_defect_prime - split_defect)
                 else:
                     # single_pair_diagnostic
@@ -667,14 +667,14 @@ def evaluate_point(
                 cov_residual = max(clean_cj_residual, pert_cj_residual, delta_cj_residual)
                 
                 return "ok", {
-                    "k": str(k_str),
+                    "k": k_str,
                     "A": mpmath.nstr(A, n=dps),
                     "x": mpmath.nstr(x_mpf, n=dps),
                     "x_prime": mpmath.nstr(x_prime, n=dps),
                     "zero_index": str(zero_idx),
                     "gamma": mpmath.nstr(rho_clean.imag, n=dps),
                     "A_gamma": mpmath.nstr(A * rho_clean.imag, n=dps),
-                    "delta": str(delta_str),
+                    "delta": delta_str,
                     "A_delta": mpmath.nstr(A * d_val, n=dps),
                     "perturbation_mode": mode,
                     "clean_cj": mpmath.nstr(clean_cj, n=dps),
