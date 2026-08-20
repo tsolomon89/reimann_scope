@@ -13,8 +13,20 @@ criterion:
   operator: ">="
   threshold: "0.0"
 
+report_metrics:
+  - metric: delta_cj
+    label: "Isolated single-zero J contribution shift Delta C_J"
+    kind: perturbation_response
+  - metric: delta_cpi
+    label: "Isolated single-zero pi contribution shift Delta C_pi"
+    kind: perturbation_response
+  - metric: delta_pi_n
+    label: "Full spectrum reconstructed prime count shift Delta pi_N(x)"
+    kind: perturbation_response
+
 engine:
   operation: converter_perturbation
+
 
 parameters:
   zero_index:
