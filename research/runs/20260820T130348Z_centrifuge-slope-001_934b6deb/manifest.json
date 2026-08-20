@@ -1,0 +1,82 @@
+{
+  "schema_version": "1",
+  "run_id": "20260820T130348Z_centrifuge-slope-001_934b6deb",
+  "experiment_id": "centrifuge-slope-001",
+  "experiment_spec_sha256": "934b6deb2fa6ef993a170934ae1f4a85dcf1fb4be6fb720ebe138ece2b91ecab",
+  "git_commit": "10be6b46af780f66dab638540ec67e0dfaaf9d2e",
+  "git_dirty": false,
+  "started_at": "2026-08-20T13:03:48.271977+00:00",
+  "completed_at": "2026-08-20T13:03:48.290505+00:00",
+  "status": "complete",
+  "precision": {
+    "dps": 80
+  },
+  "parameter_space": {
+    "delta": {
+      "kind": "explicit",
+      "values": [
+        "-0.01",
+        "-0.001",
+        "0.0",
+        "0.001",
+        "0.01"
+      ]
+    },
+    "gamma": {
+      "kind": "explicit",
+      "values": [
+        "14.13472514173469379045725198356247027078425711569924317568556746"
+      ]
+    },
+    "K": {
+      "kind": "linear",
+      "start": "-50",
+      "stop": "50",
+      "step": "10"
+    }
+  },
+  "points_requested": 55,
+  "points_completed": 55,
+  "tau": "6.283185307179586476925286766559005768394338798750211641949889184615632812572418",
+  "runtime": {
+    "python": "3.10.9 | packaged by Anaconda, Inc. | (main, Mar  1 2023, 18:18:15) [MSC v.1916 64 bit (AMD64)]",
+    "platform": "win32",
+    "packages": {
+      "mpmath": "1.3.0",
+      "flint": true
+    }
+  },
+  "data_provenance": {
+    "zeta_zeros": {
+      "source_name": "mpmath.zetazero-generated reference snapshot",
+      "source_author_or_org": "Fredrik Johansson / mpmath / Arb library",
+      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
+      "retrieved_at": "2026-08-19",
+      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
+      "vendored_count": 200,
+      "first_ordinate": "14.13472514173469379045725198356247027078",
+      "last_ordinate": "396.3818542225921869319994544917305290638",
+      "format": "decimal strings in json",
+      "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+      "preparation_script": "scripts/fetch_reference_zeros.py"
+    },
+    "primes": {
+      "source": "locally generated",
+      "algorithm": "Deterministic Sieve of Eratosthenes",
+      "max_x": 4999,
+      "count": 669,
+      "sha256": "8b9ac6ab4a8adf57614dd182063552f3d1f64a0feb0e6bdf1de52bae4e599429"
+    },
+    "tau": {
+      "source": "high-precision library",
+      "library": "python-flint / mpmath",
+      "precision_digits": 80
+    }
+  },
+  "code_modules": {
+    "math_core.py": "c08bea658c102ef6905d5bdf28934ba7684c9df78fb4bc3f5cb0da8c3ec27844",
+    "transforms.py": "0680333fe4e678bf33ee8724ce3324c54f793320b3f606c5f084420f16bf578e",
+    "converter.py": "d83cbf0e7e9fdd174e27664725c7fc4d75f622325f30c2742d99dca95d18cd13",
+    "zero_finder.py": "6a24493575d8156c713d83d054958c00530cc9e8aae28ff2febf3fc671f5fabb"
+  }
+}
