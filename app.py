@@ -17,7 +17,7 @@ from __future__ import annotations
 import numpy as np
 import plotly.graph_objects as go
 import dash
-from dash import dcc, html, Input, Output, State
+from dash import dcc, html, Input, Output, State, ctx
 import dash_bootstrap_components as dbc
 
 import reference_data
