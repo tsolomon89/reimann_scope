@@ -14,8 +14,20 @@ criterion:
   operator: "<="
   threshold: "1e-25"
 
+report_metrics:
+  - metric: zeta_covariance_residual
+    label: "Zeta coordinate representation covariance residual |Z_A(As) - zeta(s)|"
+    kind: criterion_component
+  - metric: cj_covariance_residual
+    label: "Single-zero J converter wave coupled covariance residual |C_J(x^(1/A), A*rho) - C_J(x, rho)|"
+    kind: criterion_component
+  - metric: cpi_covariance_residual
+    label: "Single-zero pi converter wave fixed-m truncation residual |C_pi(x^(1/A), A*rho) - C_pi(x, rho)|"
+    kind: fixed_m_truncation_diagnostic
+
 engine:
   operation: zeta_trace_compare
+
 
 parameters:
   k:

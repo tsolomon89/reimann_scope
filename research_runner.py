@@ -504,13 +504,89 @@ def evaluate_criterion(
         return False
 
 
+def compute_metric_stats(
+    metric_name: str,
+    results: List[Dict[str, Any]],
+    dps: int,
+    kind: str = "criterion_component",
+    label: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Compute statistics, argmax, and up to 5 worst points for a single metric across results.
+    Authoritative values are preserved as decimal strings.
+    """
+    valid_points = []
+    for idx, r in enumerate(results):
+        if r.get("status") == "ok" and metric_name in r.get("outputs", {}):
+            try:
+                raw_val = r["outputs"][metric_name]
+                mpf_val = mpmath.mpf(str(raw_val).strip())
+                point_id = r.get("point_id", idx)
+                valid_points.append({
+                    "point_id": point_id,
+                    "val": mpf_val,
+                    "val_abs": abs(mpf_val),
+                    "val_str": mpmath.nstr(mpf_val, n=dps),
+                    "inputs": dict(r.get("inputs", {}))
+                })
+            except Exception:
+                pass
+                
+    if not valid_points:
+        return {
+            "metric": metric_name,
+            "label": label or metric_name,
+            "kind": kind,
+            "count": 0,
+            "min": "N/A",
+            "max": "N/A",
+            "max_abs": "N/A",
+            "argmax_abs": None,
+            "worst_points": []
+        }
+        
+    count = len(valid_points)
+    min_pt = min(valid_points, key=lambda p: p["val"])
+    max_pt = max(valid_points, key=lambda p: p["val"])
+    argmax_abs_pt = max(valid_points, key=lambda p: p["val_abs"])
+    
+    # Sort points descending by absolute value for worst points
+    sorted_by_worst = sorted(valid_points, key=lambda p: p["val_abs"], reverse=True)
+    worst_5 = sorted_by_worst[:5]
+    
+    worst_points_records = [
+        {
+            "point_id": p["point_id"],
+            "value": p["val_str"],
+            "inputs": p["inputs"]
+        }
+        for p in worst_5
+    ]
+    
+    return {
+        "metric": metric_name,
+        "label": label or metric_name,
+        "kind": kind,
+        "count": count,
+        "min": min_pt["val_str"],
+        "max": max_pt["val_str"],
+        "max_abs": argmax_abs_pt["val_str"],
+        "argmax_abs": {
+            "point_id": argmax_abs_pt["point_id"],
+            "value": argmax_abs_pt["val_str"],
+            "inputs": argmax_abs_pt["inputs"]
+        },
+        "worst_points": worst_points_records
+    }
+
+
 def compute_summary(
     spec: Dict[str, Any],
     run_id: str,
     results: List[Dict[str, Any]],
     status: str
 ) -> Dict[str, Any]:
-    """Generate canonical AI-facing summary.json artifact."""
+    """Generate canonical AI-facing summary.json artifact with multi-metric reporting."""
     dps = spec["precision"]["dps"]
     crit_spec = spec["criterion"]
     target_metric = crit_spec["metric"]
@@ -521,25 +597,69 @@ def compute_summary(
     points_completed = sum(1 for r in results if r.get("status") == "ok")
     points_failed = sum(1 for r in results if r.get("status") == "error")
     
-    # Extract values for the target metric across all completed points
-    observed_values = []
-    for r in results:
-        if r.get("status") == "ok" and target_metric in r.get("outputs", {}):
-            try:
-                observed_values.append(mpmath.mpf(r["outputs"][target_metric]))
-            except Exception:
-                pass
+    # Collect all declared report metrics
+    metric_declarations = []
+    seen_metric_names = set()
+    
+    # Primary criterion metric is always tracked
+    metric_declarations.append({
+        "metric": target_metric,
+        "kind": "primary_criterion",
+        "label": f"Primary criterion metric: {target_metric}"
+    })
+    seen_metric_names.add(target_metric)
+    
+    declared_reports = spec.get("report_metrics", [])
+    if isinstance(declared_reports, list):
+        for item in declared_reports:
+            if isinstance(item, str):
+                m_name = item
+                m_kind = "criterion_component"
+                m_label = item
+            elif isinstance(item, dict):
+                m_name = item.get("metric", "")
+                m_kind = item.get("kind", "criterion_component")
+                m_label = item.get("label", m_name)
+            else:
+                continue
                 
-    if observed_values:
-        max_observed = max(observed_values)
-        min_observed = min(observed_values)
-        observed_metric_str = mpmath.nstr(max_observed, n=dps)
+            if m_name and m_name not in seen_metric_names:
+                metric_declarations.append({
+                    "metric": m_name,
+                    "kind": m_kind,
+                    "label": m_label
+                })
+                seen_metric_names.add(m_name)
+            elif m_name and m_name == target_metric:
+                metric_declarations[0]["kind"] = m_kind
+                metric_declarations[0]["label"] = m_label
+                
+    report_metrics_dict = {}
+    metrics_summary_dict = {}
+    
+    for decl in metric_declarations:
+        m_name = decl["metric"]
+        stats = compute_metric_stats(
+            metric_name=m_name,
+            results=results,
+            dps=dps,
+            kind=decl["kind"],
+            label=decl.get("label")
+        )
+        report_metrics_dict[m_name] = stats
+        metrics_summary_dict[m_name] = stats["max_abs"]
+        
+    target_stats = report_metrics_dict.get(target_metric)
+    if target_stats and target_stats["count"] > 0:
+        observed_metric_str = target_stats["max_abs"]
         criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str)
+        min_observed = target_stats["min"]
+        max_observed = target_stats["max"]
     else:
         observed_metric_str = "N/A"
         criterion_met = None
-        min_observed = mpmath.mpf(0)
-        max_observed = mpmath.mpf(0)
+        min_observed = "N/A"
+        max_observed = "N/A"
         
     summary = {
         "schema_version": "1",
@@ -550,9 +670,8 @@ def compute_summary(
         "points_requested": points_req,
         "points_completed": points_completed,
         "points_failed": points_failed,
-        "metrics": {
-            target_metric: observed_metric_str
-        },
+        "metrics": metrics_summary_dict,
+        "report_metrics": report_metrics_dict,
         "criterion": {
             "metric": target_metric,
             "operator": operator,
@@ -561,8 +680,8 @@ def compute_summary(
             "criterion_met": criterion_met if status == "complete" else None
         },
         "extrema": {
-            "min": mpmath.nstr(min_observed, n=dps) if observed_values else "N/A",
-            "max": mpmath.nstr(max_observed, n=dps) if observed_values else "N/A"
+            "min": min_observed,
+            "max": max_observed
         },
         "anomalies": [],
         "warnings": []
@@ -579,12 +698,55 @@ def generate_run_readme(
     manifest: Dict[str, Any],
     summary: Dict[str, Any]
 ) -> str:
-    """Generate concise human-readable run README.md digest."""
+    """Generate concise human-readable run README.md digest with multi-metric reporting."""
     crit = summary["criterion"]
     crit_status = "CRITERION MET" if crit.get("criterion_met") is True else (
         "CRITERION NOT MET" if crit.get("criterion_met") is False else "INCOMPLETE / INVALID"
     )
     
+    report_metrics = summary.get("report_metrics", {})
+    table_rows = []
+    for m_name, m_data in report_metrics.items():
+        kind = m_data.get("kind", "criterion_component")
+        count = m_data.get("count", 0)
+        min_val = m_data.get("min", "N/A")
+        max_val = m_data.get("max", "N/A")
+        max_abs = m_data.get("max_abs", "N/A")
+        table_rows.append(f"| `{m_name}` | `{kind}` | {count} | `{min_val}` | `{max_val}` | `{max_abs}` |")
+        
+    metrics_table = "\n".join(table_rows) if table_rows else "| None | - | 0 | - | - | - |"
+    
+    metric_details = []
+    for m_name, m_data in report_metrics.items():
+        kind = m_data.get("kind", "criterion_component")
+        label = m_data.get("label", m_name)
+        max_abs = m_data.get("max_abs", "N/A")
+        argmax = m_data.get("argmax_abs")
+        worst = m_data.get("worst_points", [])
+        
+        detail_lines = [
+            f"### `{m_name}`",
+            f"- **Classification:** `{kind}`",
+            f"- **Description:** {label}",
+            f"- **Max Absolute Value:** `{max_abs}`"
+        ]
+        if kind == "fixed_m_truncation_diagnostic":
+            detail_lines.append("- **Note:** *Diagnostic metric only; not evaluated as part of exact covariance pass/fail criterion.*")
+            
+        if argmax and argmax.get("inputs"):
+            inputs_str = ", ".join(f"{k}={v}" for k, v in argmax["inputs"].items())
+            detail_lines.append(f"- **Argmax Parameter Point (id={argmax.get('point_id')}):** `{inputs_str}`")
+            
+        if worst:
+            detail_lines.append("- **Top Worst Parameter Points:**")
+            for wp in worst[:5]:
+                in_str = ", ".join(f"{k}={v}" for k, v in wp.get("inputs", {}).items())
+                detail_lines.append(f"  - id={wp.get('point_id')} | `val={wp.get('value')}` | `{in_str}`")
+                
+        metric_details.append("\n".join(detail_lines))
+        
+    details_block = "\n\n".join(metric_details) if metric_details else "No metric details available."
+
     return f"""# Experiment Run Digest — {spec.get('title', spec['id'])}
 
 **Run ID:** `{manifest['run_id']}`  
@@ -598,7 +760,7 @@ def generate_run_readme(
 
 - **Hypothesis:**  
   > {spec['hypothesis']['statement']}
-- **Declared Criterion:** `{crit['metric']} {crit['operator']} {crit['threshold']}`
+- **Primary Criterion:** `{crit['metric']} {crit['operator']} {crit['threshold']}`
 - **Observed Metric:** `{crit['observed']}`
 - **Criterion Met:** `{crit.get('criterion_met')}`
 
@@ -606,7 +768,21 @@ def generate_run_readme(
 
 ---
 
-## 2. Execution & Environment Metadata
+## 2. Multi-Metric Summary
+
+| Metric | Classification | Count | Min | Max | Max Abs |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+{metrics_table}
+
+---
+
+## 3. Metric Diagnostics & Worst Points
+
+{details_block}
+
+---
+
+## 4. Execution & Environment Metadata
 
 - **Git Commit:** `{manifest['git_commit']}` (Dirty: `{manifest['git_dirty']}`)
 - **Precision:** `{manifest['precision']['dps']} dps`
@@ -618,12 +794,13 @@ def generate_run_readme(
 
 ---
 
-## 3. Artifact Index
+## 5. Artifact Index
 
 - Manifest: [`manifest.json`](manifest.json)
 - Summary: [`summary.json`](summary.json)
 - Detailed Points: [`results.jsonl`](results.jsonl)
 """
+
 
 
 def update_index_file(run_entry: Dict[str, Any]):

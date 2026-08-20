@@ -307,3 +307,181 @@ def test_interactive_engine_vs_batch_engine_parity():
         
         assert abs(batch_log_mod - direct_log_mod) < mpmath.mpf("1e-50")
 
+
+def test_multi_metric_summary_and_classification():
+    """
+    Verify that compute_summary computes multiple report_metrics in addition to primary criterion,
+    preserving diagnostic vs criterion-component classification.
+    """
+    dps = 50
+    spec = {
+        "id": "test-multi-metric",
+        "title": "Test Multi Metric",
+        "hypothesis": {"statement": "Testing multi-metric summary"},
+        "criterion": {
+            "metric": "covariance_residual",
+            "operator": "<=",
+            "threshold": "1e-25"
+        },
+        "report_metrics": [
+            {
+                "metric": "zeta_covariance_residual",
+                "label": "Zeta representation covariance",
+                "kind": "criterion_component"
+            },
+            {
+                "metric": "cpi_covariance_residual",
+                "label": "Mobius truncation diagnostic",
+                "kind": "fixed_m_truncation_diagnostic"
+            }
+        ],
+        "precision": {"dps": dps}
+    }
+    
+    results = [
+        {
+            "point_id": 0,
+            "status": "ok",
+            "inputs": {"k": "1", "s_re": "0.5"},
+            "outputs": {
+                "covariance_residual": "1e-30",
+                "zeta_covariance_residual": "1e-30",
+                "cpi_covariance_residual": "2e-28"
+            }
+        },
+        {
+            "point_id": 1,
+            "status": "ok",
+            "inputs": {"k": "2", "s_re": "0.75"},
+            "outputs": {
+                "covariance_residual": "5e-30",
+                "zeta_covariance_residual": "5e-30"
+                # cpi omitted (e.g. out of range)
+            }
+        }
+    ]
+    
+    summary = research_runner.compute_summary(spec, "run-123", results, "complete")
+    
+    assert "report_metrics" in summary
+    assert "zeta_covariance_residual" in summary["report_metrics"]
+    assert "cpi_covariance_residual" in summary["report_metrics"]
+    assert "covariance_residual" in summary["report_metrics"]
+    
+    zeta_meta = summary["report_metrics"]["zeta_covariance_residual"]
+    assert zeta_meta["kind"] == "criterion_component"
+    assert zeta_meta["count"] == 2
+    
+    cpi_meta = summary["report_metrics"]["cpi_covariance_residual"]
+    assert cpi_meta["kind"] == "fixed_m_truncation_diagnostic"
+    assert cpi_meta["count"] == 1
+    
+    # Primary criterion outcome
+    assert summary["criterion"]["criterion_met"] is True
+
+
+def test_argmax_preservation_and_worst_points_ordering():
+    """
+    Verify that compute_summary accurately identifies argmax parameter points
+    and orders worst points descending by absolute value.
+    """
+    dps = 50
+    spec = {
+        "id": "test-argmax-worst",
+        "title": "Test Argmax and Worst Points",
+        "hypothesis": {"statement": "Testing argmax and worst points"},
+        "criterion": {"metric": "res", "operator": "<=", "threshold": "1.0"},
+        "precision": {"dps": dps}
+    }
+    
+    # Construct 7 points with varying magnitudes and signs
+    vals = ["1e-5", "-1e-2", "3e-3", "-1e-1", "1e-8", "5e-4", "-2e-2"]
+    results = [
+        {
+            "point_id": i,
+            "status": "ok",
+            "inputs": {"param_idx": str(i), "tag": f"p{i}"},
+            "outputs": {"res": val}
+        }
+        for i, val in enumerate(vals)
+    ]
+    
+    summary = research_runner.compute_summary(spec, "run-456", results, "complete")
+    res_stats = summary["report_metrics"]["res"]
+    
+    # Argmax should be point index 3 (-1e-1, absolute value 0.1)
+    argmax = res_stats["argmax_abs"]
+    assert argmax["point_id"] == 3
+    assert argmax["inputs"] == {"param_idx": "3", "tag": "p3"}
+    
+    # Worst points should have length <= 5
+    worst = res_stats["worst_points"]
+    assert len(worst) == 5
+    
+    # Top 5 in descending absolute order:
+    # 1. -1e-1 (id 3)
+    # 2. -2e-2 (id 6)
+    # 3. -1e-2 (id 1)
+    # 4. 3e-3  (id 2)
+    # 5. 5e-4  (id 5)
+    expected_ids = [3, 6, 1, 2, 5]
+    actual_ids = [p["point_id"] for p in worst]
+    assert actual_ids == expected_ids
+
+
+def test_decimal_string_serialization_and_readme():
+    """
+    Verify that all values in summary serialize as exact decimal strings and
+    README renders the multi-metric table and diagnostics.
+    """
+    dps = 80
+    spec = {
+        "id": "test-serialization",
+        "title": "Test Serialization",
+        "hypothesis": {"statement": "Testing decimal serialization"},
+        "criterion": {"metric": "err", "operator": "<=", "threshold": "1e-25"},
+        "report_metrics": [
+            {"metric": "err", "kind": "primary_criterion", "label": "Error metric"},
+            {"metric": "diag", "kind": "fixed_m_truncation_diagnostic", "label": "Diagnostic"}
+        ],
+        "precision": {"dps": dps}
+    }
+    
+    results = [
+        {
+            "point_id": 0,
+            "status": "ok",
+            "inputs": {"x": "10"},
+            "outputs": {"err": "1.234567890123456789012345678901234567890e-80", "diag": "0.0"}
+        }
+    ]
+    
+    summary = research_runner.compute_summary(spec, "run-789", results, "complete")
+    
+    # Verify decimal string serialization
+    for m_name, m_data in summary["report_metrics"].items():
+        assert isinstance(m_data["min"], str)
+        assert isinstance(m_data["max"], str)
+        assert isinstance(m_data["max_abs"], str)
+        for wp in m_data["worst_points"]:
+            assert isinstance(wp["value"], str)
+            
+    manifest = {
+        "run_id": "run-789",
+        "git_commit": "abcdef0123456789",
+        "git_dirty": False,
+        "precision": {"dps": dps},
+        "tau": "6.283185307179586476925286766559005768394338798750211641949889184615632812572418",
+        "points_requested": 1,
+        "points_completed": 1,
+        "started_at": "2026-08-20T12:00:00Z",
+        "completed_at": "2026-08-20T12:00:01Z"
+    }
+    
+    readme = research_runner.generate_run_readme(spec, manifest, summary)
+    assert "Multi-Metric Summary" in readme
+    assert "fixed_m_truncation_diagnostic" in readme
+    assert "Diagnostic metric only" in readme
+    assert "Argmax Parameter Point" in readme
+
+

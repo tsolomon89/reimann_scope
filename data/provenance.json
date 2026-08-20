@@ -1,10 +1,10 @@
 {
   "zeta_zeros": {
-    "source_name": "mpmath certified zetazero high-precision table",
+    "source_name": "mpmath.zetazero-generated reference snapshot",
     "source_author_or_org": "Fredrik Johansson / mpmath / Arb library",
     "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
     "retrieved_at": "2026-08-19",
-    "stated_precision": "40 decimal digits certified",
+    "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
     "vendored_count": 200,
     "first_ordinate": "14.13472514173469379045725198356247027078",
     "last_ordinate": "396.3818542225921869319994544917305290638",
@@ -12,6 +12,7 @@
     "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
     "preparation_script": "scripts/fetch_reference_zeros.py"
   },
+
   "primes": {
     "source": "locally generated",
     "algorithm": "Deterministic Sieve of Eratosthenes",

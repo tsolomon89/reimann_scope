@@ -87,11 +87,11 @@ def main():
     # Provenance metadata
     provenance = {
         "zeta_zeros": {
-            "source_name": "mpmath certified zetazero high-precision table",
+            "source_name": "mpmath.zetazero-generated reference snapshot",
             "source_author_or_org": "Fredrik Johansson / mpmath / Arb library",
             "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
             "retrieved_at": "2026-08-19",
-            "stated_precision": "40 decimal digits certified",
+            "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
             "vendored_count": len(ordinates),
             "first_ordinate": ordinates[0],
             "last_ordinate": ordinates[-1],
@@ -99,6 +99,7 @@ def main():
             "sha256": zeros_sha256,
             "preparation_script": "scripts/fetch_reference_zeros.py"
         },
+
         "primes": {
             "source": "locally generated",
             "algorithm": "Deterministic Sieve of Eratosthenes",
