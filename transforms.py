@@ -99,7 +99,7 @@ class BaseTransform(ABC):
 
     def get_card_dict(self) -> Dict[str, str]:
         """Return key-value dictionary for Active Mathematics Card."""
-        return {
+        d = {
             "mode": self.name,
             "classification": self.classification,
             "domain_map": self.domain_map_str,
@@ -108,19 +108,26 @@ class BaseTransform(ABC):
             "image_critical_line": self.image_critical_line_str,
             "zero_map": self.zero_map_str,
         }
+        if hasattr(self, "converter_identity_str") and getattr(self, "converter_identity_str"):
+            d["coupled_converter_identity"] = getattr(self, "converter_identity_str")
+        return d
 
     def get_card_markdown(self) -> str:
         """Format the active mathematics card as clean GitHub Markdown."""
         d = self.get_card_dict()
-        return (
+        md = (
             f"**MODE: {d['mode']}**\n\n"
             f"- **Domain map:** `{d['domain_map']}`\n"
             f"- **Function plotted:** `{d['function']}`\n"
             f"- **Original critical line:** `{d['original_critical_line']}`\n"
             f"- **Image critical line:** `{d['image_critical_line']}`\n"
-            f"- **Predicted zero map:** `{d['zero_map']}`\n\n"
-            f"**CLASS:** {d['classification']}"
+            f"- **Predicted zero map:** `{d['zero_map']}`\n"
         )
+        if "coupled_converter_identity" in d:
+            md += f"- **Coupled converter identity:** `{d['coupled_converter_identity']}`\n"
+        md += f"\n**CLASS:** {d['classification']}"
+        return md
+
 
 
 class CameraTransform(BaseTransform):
@@ -273,6 +280,11 @@ class OriginCoordinateDilation(BaseTransform):
     @property
     def zero_map_str(self) -> str:
         return f"ρ' = τ^{self.k:.4g} ρ"
+
+    @property
+    def converter_identity_str(self) -> str:
+        return f"A = τ^{self.k:.4g}, ρ' = Aρ, x' = x^(1/A) ⇒ ρ' log x' = ρ log x ⇒ C_J(x^(1/A), Aρ) = C_J(x, ρ)"
+
 
     def map_domain_point(self, s: complex) -> complex:
         return s * self.scale

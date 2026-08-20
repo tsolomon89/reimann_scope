@@ -1,0 +1,41 @@
+schema_version: "1"
+id: isolated-radial-perturbation-001
+title: Isolated off-critical radial perturbation of Riemann zeros and prime reconstruction response
+
+hypothesis:
+  statement: >
+    For a selected reference zero rho_n = 1/2 + i*gamma_n, an off-critical radial perturbation
+    delta = Re(rho) - 1/2 != 0 produces a nonzero isolated converter deformation Delta C_J and
+    reconstructed prime count shift Delta pi_N, with delta = 0 exactly recovering baseline (Delta pi_N = 0)
+    across both single-pair diagnostic and symmetry-complete quartet modes at 80 dps.
+
+criterion:
+  metric: residual
+  operator: ">="
+  threshold: "0.0"
+
+engine:
+  operation: converter_perturbation
+
+parameters:
+  zero_index:
+    kind: explicit
+    values: ["0", "1", "2"]
+  delta:
+    kind: explicit
+    values: ["-0.05", "-0.01", "-0.001", "0.0", "0.001", "0.01", "0.05"]
+  x:
+    kind: explicit
+    values: ["10.0", "20.0", "50.0"]
+  num_zeros:
+    kind: explicit
+    values: ["10"]
+  perturbation_mode:
+    kind: explicit
+    values: ["single_pair_diagnostic", "symmetry_complete_quartet"]
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true

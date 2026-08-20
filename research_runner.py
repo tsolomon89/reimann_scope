@@ -313,51 +313,161 @@ def evaluate_point(
                 }, None
 
             elif operation == "zeta_trace_compare":
-                mode = inputs.get("mode", "camera")
-                k_str = inputs.get("k", "0.0")
-                t_str = inputs.get("t", inputs.get("im_s", "14.134725"))
-                delta_str = inputs.get("delta", "0.0")
+                k_str = inputs.get("k", inputs.get("K", "0.0"))
+                s_re_str = inputs.get("s_re", inputs.get("sigma", inputs.get("re_s", None)))
+                if s_re_str is None:
+                    if "delta" in inputs:
+                        s_re_str = str(mpmath.mpf('0.5') + math_core.to_mpf(inputs["delta"], dps=dps + 10))
+                    else:
+                        s_re_str = "0.5"
+                s_im_str = inputs.get("s_im", inputs.get("t", inputs.get("gamma", inputs.get("im_s", "14.13472514173469379045725198356247027078425711569924317568556746"))))
                 
-                s_mpc = mpmath.mpc(mpmath.mpf('0.5') + math_core.to_mpf(delta_str, dps=dps), math_core.to_mpf(t_str, dps=dps))
-                t_obj_trace: transforms.BaseTransform
-                if mode == "origin_dilation":
-                    t_obj_trace = transforms.OriginCoordinateDilation(k=k_str)
-                elif mode == "argument":
-                    t_obj_trace = transforms.ArgumentTransform(k=k_str)
-                elif mode == "centered_dilation":
-                    t_obj_trace = transforms.CenteredCoordinateDilation(k=k_str)
-                else:
-                    t_obj_trace = transforms.CameraTransform()
+                s_mpc = mpmath.mpc(s_re_str, s_im_str)
+                tau = math_core.get_tau(dps=dps + 10)
+                k_mpf = math_core.to_mpf(k_str, dps=dps + 10)
+                scale_A = mpmath.power(tau, k_mpf)
+                
+                # Mapped coordinate: s' = A * s
+                mapped_s = scale_A * s_mpc
+                
+                # Baseline value: W = zeta(s)
+                W = math_core.zeta_eval(s_mpc, dps=dps + 10)
+                
+                # Transformed coordinate representation evaluated AT MAPPED POINT:
+                # W_A = Z_A(s') = zeta(s' / A)
+                t_orig = transforms.OriginCoordinateDilation(k=k_str)
+                W_A = t_orig.evaluate_function(mapped_s, dps=dps + 10)
+                
+                # Covariance residual: E_zeta = |W_A - W|
+                E_zeta = abs(W_A - W)
+                
+                sigma_c = mpmath.mpf('0.5')
+                sigma_c_prime = scale_A / 2
+                
+                outputs = {
+                    "s_re": mpmath.nstr(s_mpc.real, n=dps),
+                    "s_im": mpmath.nstr(s_mpc.imag, n=dps),
+                    "k": str(k_str),
+                    "scale_A": mpmath.nstr(scale_A, n=dps),
+                    "mapped_s_re": mpmath.nstr(mapped_s.real, n=dps),
+                    "mapped_s_im": mpmath.nstr(mapped_s.imag, n=dps),
+                    "baseline_re": mpmath.nstr(W.real, n=dps),
+                    "baseline_im": mpmath.nstr(W.imag, n=dps),
+                    "transformed_re": mpmath.nstr(W_A.real, n=dps),
+                    "transformed_im": mpmath.nstr(W_A.imag, n=dps),
+                    "sigma_c": mpmath.nstr(sigma_c, n=dps),
+                    "sigma_c_prime": mpmath.nstr(sigma_c_prime, n=dps),
+                    "zeta_covariance_residual": mpmath.nstr(E_zeta, n=dps),
+                    "covariance_residual": mpmath.nstr(E_zeta, n=dps),
+                    "residual": mpmath.nstr(E_zeta, n=dps)
+                }
+                
+                # Single-zero converter covariance check if x or rho/gamma are provided
+                if "x" in inputs or "rho" in inputs or "gamma" in inputs or "rho_im" in inputs:
+                    x_str = inputs.get("x", "10.0")
+                    x_mpf = math_core.to_mpf(x_str, dps=dps + 10)
+                    rho_re = inputs.get("rho_re", "0.5")
+                    rho_im = inputs.get("rho_im", inputs.get("gamma", inputs.get("rho", "14.13472514173469379045725198356247027078425711569924317568556746")))
+                    rho_mpc = math_core.to_mpc((rho_re, rho_im), dps=dps + 10)
                     
-                mapped_s = t_obj_trace.map_domain_point(complex(float(s_mpc.real), float(s_mpc.imag)))
-                z_val = t_obj_trace.evaluate_function(s_mpc, dps=dps)
-
+                    # Coupled transformation: rho' = A * rho, x' = x^(1/A)
+                    mapped_rho = scale_A * rho_mpc
+                    mapped_x = mpmath.power(x_mpf, mpmath.mpf(1) / scale_A)
+                    
+                    cj_clean = converter.zero_j_contribution_audit(x_mpf, rho_mpc, dps=dps + 10)
+                    cj_trans = converter.zero_j_contribution_audit(mapped_x, mapped_rho, dps=dps + 10)
+                    e_cj = abs(cj_trans - cj_clean)
+                    
+                    outputs["x"] = mpmath.nstr(x_mpf, n=dps)
+                    outputs["mapped_x"] = mpmath.nstr(mapped_x, n=dps)
+                    outputs["rho_re"] = mpmath.nstr(rho_mpc.real, n=dps)
+                    outputs["rho_im"] = mpmath.nstr(rho_mpc.imag, n=dps)
+                    outputs["mapped_rho_re"] = mpmath.nstr(mapped_rho.real, n=dps)
+                    outputs["mapped_rho_im"] = mpmath.nstr(mapped_rho.imag, n=dps)
+                    outputs["cj_clean"] = mpmath.nstr(cj_clean, n=dps)
+                    outputs["cj_transformed"] = mpmath.nstr(cj_trans, n=dps)
+                    outputs["cj_covariance_residual"] = mpmath.nstr(e_cj, n=dps)
+                    
+                    # Evaluate C_pi if mapped_x >= 2
+                    if mapped_x >= 2 and x_mpf >= 2:
+                        cpi_clean = converter.zero_pi_contribution_audit(x_mpf, rho_mpc, dps=dps + 10)
+                        cpi_trans = converter.zero_pi_contribution_audit(mapped_x, mapped_rho, dps=dps + 10)
+                        e_cpi = abs(cpi_trans - cpi_clean)
+                        outputs["cpi_clean"] = mpmath.nstr(cpi_clean, n=dps)
+                        outputs["cpi_transformed"] = mpmath.nstr(cpi_trans, n=dps)
+                        outputs["cpi_covariance_residual"] = mpmath.nstr(e_cpi, n=dps)
+                    
+                    max_cov_res = max(E_zeta, e_cj)
+                    outputs["covariance_residual"] = mpmath.nstr(max_cov_res, n=dps)
+                    outputs["residual"] = mpmath.nstr(max_cov_res, n=dps)
                 
-                return "ok", {
-                    "mapped_s_re": str(mapped_s.real),
-                    "mapped_s_im": str(mapped_s.imag),
-                    "zeta_re": mpmath.nstr(z_val.real, n=dps),
-                    "zeta_im": mpmath.nstr(z_val.imag, n=dps),
-                    "modulus": mpmath.nstr(abs(z_val), n=dps)
-                }, None
+                return "ok", outputs, None
 
             elif operation == "converter_perturbation":
+                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
+                delta_str = inputs.get("delta", "0.0")
                 x_str = inputs.get("x", "20.0")
                 num_zeros = int(inputs.get("num_zeros", "10"))
-                ref_zeros_str = reference_data.load_reference_zeros()[:num_zeros]
-                if not ref_zeros_str:
-                    ref_zeros_str = ["14.134725", "21.022040", "25.010858"]
+                mode = inputs.get("perturbation_mode", inputs.get("mode", "single_pair_diagnostic"))
                 
-                pi_val = converter.riemann_explicit_pi_audit(x_str, ref_zeros_str, dps=dps)
-                true_pi_val = reference_data.prime_pi(float(x_str))
-                diff = abs(pi_val - mpmath.mpf(true_pi_val))
+                ref_zeros_str = reference_data.load_reference_zeros()[:max(num_zeros, zero_idx + 1)]
+                if not ref_zeros_str:
+                    ref_zeros_str = ["14.13472514173469379045725198356247027078425711569924317568556746"]
+                
+                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if zero_idx < len(ref_zeros_str) else ref_zeros_str[0])
+                rho_clean = mpmath.mpc('0.5', gamma_str)
+                
+                # Compute isolated single-zero contributions
+                contrib_dict = converter.compute_perturbed_contributions_audit(
+                    x_str, rho_clean, delta_str, mode=mode, dps=dps + 10
+                )
+                
+                # Build clean baseline zeros list up to num_zeros
+                clean_zeros_mpc = [mpmath.mpc('0.5', g) for g in ref_zeros_str[:num_zeros]]
+                
+                # Build modified synthetic spectrum
+                pert_rhos = contrib_dict["perturbed_rhos"]
+                modified_zeros_mpc = list(clean_zeros_mpc)
+                if 0 <= zero_idx < len(modified_zeros_mpc):
+                    # Replace single zero with perturbed rhos
+                    modified_zeros_mpc = clean_zeros_mpc[:zero_idx] + pert_rhos + clean_zeros_mpc[zero_idx + 1:]
+                
+                # Compute full explicit formula reconstructions
+                full_clean_pi = converter.riemann_explicit_pi_audit(x_str, clean_zeros_mpc, dps=dps + 10)
+                full_pert_pi = converter.riemann_explicit_pi_audit(x_str, modified_zeros_mpc, dps=dps + 10)
+                delta_pi_n = full_pert_pi - full_clean_pi
+                
+                # True prime pi(x)
+                x_mpf = math_core.to_mpf(x_str, dps=dps + 10)
+                try:
+                    true_pi_val = reference_data.prime_pi(float(x_mpf)) if x_mpf <= 100000 else "N/A"
+                except Exception:
+                    true_pi_val = "N/A"
+                    
+                pert_rhos_str = "; ".join(f"{mpmath.nstr(r.real, n=dps)} + {mpmath.nstr(r.imag, n=dps)}j" for r in pert_rhos)
                 
                 return "ok", {
-                    "reconstructed_pi": mpmath.nstr(pi_val, n=dps),
+                    "zero_index": str(zero_idx),
+                    "gamma": mpmath.nstr(rho_clean.imag, n=dps),
+                    "delta": str(delta_str),
+                    "perturbation_mode": mode,
+                    "clean_rho": f"{mpmath.nstr(rho_clean.real, n=dps)} + {mpmath.nstr(rho_clean.imag, n=dps)}j",
+                    "perturbed_rhos": pert_rhos_str,
+                    "x": mpmath.nstr(x_mpf, n=dps),
+                    "clean_cj": mpmath.nstr(contrib_dict["cj_clean"], n=dps),
+                    "perturbed_cj": mpmath.nstr(contrib_dict["cj_perturbed"], n=dps),
+                    "delta_cj": mpmath.nstr(contrib_dict["delta_cj"], n=dps),
+                    "clean_cpi": mpmath.nstr(contrib_dict["cpi_clean"], n=dps),
+                    "perturbed_cpi": mpmath.nstr(contrib_dict["cpi_perturbed"], n=dps),
+                    "delta_cpi": mpmath.nstr(contrib_dict["delta_cpi"], n=dps),
+                    "full_clean_pi": mpmath.nstr(full_clean_pi, n=dps),
+                    "full_perturbed_pi": mpmath.nstr(full_pert_pi, n=dps),
+                    "delta_pi_n": mpmath.nstr(delta_pi_n, n=dps),
+                    "full_reconstruction_diff": mpmath.nstr(delta_pi_n, n=dps),
                     "true_pi": str(true_pi_val),
-                    "abs_diff": mpmath.nstr(diff, n=dps),
-                    "residual": mpmath.nstr(diff, n=dps)
+                    "residual": mpmath.nstr(abs(delta_pi_n), n=dps)
                 }, None
+
 
             else:
                 return "error", {}, f"Unknown operation '{operation}'"

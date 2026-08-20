@@ -103,6 +103,187 @@ def riemann_remainder_integral_audit(
         return val
 
 
+def zero_j_contribution_audit(
+    x: Union[str, float, int, mpmath.mpf],
+    rho: Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Authoritative high-precision evaluation of single-zero J contribution:
+    C_J(x, rho) = -2 * Re[Ei(rho * ln x)]
+    for one positive-imaginary zero rho, where factor 2*Re incorporates its complex-conjugate partner.
+    Branch convention: Li(x^rho) = Ei(rho * ln x), principal branch of Ei.
+    """
+    with mpmath.workdps(dps + 15):
+        x_mpf = math_core.to_mpf(x, dps=dps + 15)
+        if x_mpf <= 1:
+            return mpmath.mpf('0')
+        ln_x = mpmath.log(x_mpf)
+        if isinstance(rho, (int, float, mpmath.mpf)):
+            rho_mpc = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(rho, dps=dps + 15))
+        elif isinstance(rho, str) and not ('+' in rho or 'j' in rho.lower() or 'i' in rho.lower()):
+            rho_mpc = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(rho.strip(), dps=dps + 15))
+        else:
+            rho_mpc = math_core.to_mpc(rho, dps=dps + 15)
+        ei_val = mpmath.ei(rho_mpc * ln_x)
+        return mpmath.mpf(-2) * mpmath.re(ei_val)
+
+
+
+def zero_pi_contribution_audit(
+    x: Union[str, float, int, mpmath.mpf],
+    rho: Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Authoritative high-precision evaluation of single-zero pi contribution
+    via Mobius inversion:
+    C_pi(x, rho) = sum_{m >= 1, x^{1/m} >= 2} (mu(m) / m) * C_J(x^{1/m}, rho).
+    Terminates once x^{1/m} < 2.
+    """
+    with mpmath.workdps(dps + 15):
+        x_mpf = math_core.to_mpf(x, dps=dps + 15)
+        if x_mpf < 2:
+            return mpmath.mpf('0')
+        total = mpmath.mpf('0')
+        m = 1
+        while True:
+            xr = mpmath.power(x_mpf, mpmath.mpf(1) / m)
+            if xr < 2:
+                break
+            mu_m = mobius(m)
+            if mu_m != 0:
+                cj_m = zero_j_contribution_audit(xr, rho, dps=dps)
+                total += (mpmath.mpf(mu_m) / m) * cj_m
+            m += 1
+        return total
+
+
+def zero_j_contribution_preview(x: float, rho: Union[complex, float]) -> float:
+    """[PREVIEW PATH] Fast float evaluation of C_J(x, rho) = -2 * Re[Ei(rho * ln x)]."""
+    if x <= 1.0:
+        return 0.0
+    if isinstance(rho, (int, float)):
+        rho_c = complex(0.5, float(rho))
+    else:
+        rho_c = complex(rho)
+    ln_x = math.log(x)
+    ei_val = scipy.special.expi(rho_c * ln_x)
+    return -2.0 * float(np.real(ei_val))
+
+
+def zero_pi_contribution_preview(x: float, rho: Union[complex, float]) -> float:
+    """[PREVIEW PATH] Fast float evaluation of C_pi(x, rho) via Mobius inversion."""
+    if x < 2.0:
+        return 0.0
+    if isinstance(rho, (int, float)):
+        rho_c = complex(0.5, float(rho))
+    else:
+        rho_c = complex(rho)
+    ln_x = math.log(x)
+    total = 0.0
+    m = 1
+    while True:
+        xr = x ** (1.0 / m)
+        if xr < 2.0:
+            break
+        mu_m = mobius(m)
+        if mu_m != 0:
+            ei_val = scipy.special.expi(rho_c * (ln_x / m))
+            cj = -2.0 * float(np.real(ei_val))
+            total += (float(mu_m) / float(m)) * cj
+        m += 1
+    return total
+
+
+def construct_perturbed_zeros_audit(
+    rho_clean: Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]],
+    delta: Union[str, float, mpmath.mpf],
+    mode: str = "single_pair_diagnostic",
+    dps: int = 80
+) -> List[mpmath.mpc]:
+    """
+    Construct the perturbed zero set corresponding to a clean reference zero.
+    
+    Modes:
+    - single_pair_diagnostic:
+        Returns [1/2 + delta + i*gamma]. Diagnostic deformation (single wave).
+    - symmetry_complete_quartet:
+        If delta == 0: Returns [1/2 + i*gamma] (baseline single pair).
+        If delta != 0: Returns [1/2 + delta + i*gamma, 1/2 - delta + i*gamma],
+        representing the full 4-point orbit {1/2 +/- delta +/- i*gamma}
+        via upper-half-plane zeros incorporated through 2*Re.
+    """
+    with mpmath.workdps(dps + 15):
+        if isinstance(rho_clean, (int, float, mpmath.mpf)):
+            gamma = math_core.to_mpf(rho_clean, dps=dps + 15)
+        elif isinstance(rho_clean, str) and not ('+' in rho_clean or 'j' in rho_clean.lower() or 'i' in rho_clean.lower()):
+            gamma = math_core.to_mpf(rho_clean.strip(), dps=dps + 15)
+        else:
+            rho_mpc = math_core.to_mpc(rho_clean, dps=dps + 15)
+            gamma = rho_mpc.imag
+            
+        d_val = math_core.to_mpf(delta, dps=dps + 15)
+        
+        if mode == "symmetry_complete_quartet":
+            if abs(d_val) < mpmath.mpf("1e-50"):
+                return [mpmath.mpc(mpmath.mpf('0.5'), gamma)]
+            rho_plus = mpmath.mpc(mpmath.mpf('0.5') + d_val, gamma)
+            rho_minus = mpmath.mpc(mpmath.mpf('0.5') - d_val, gamma)
+            return [rho_plus, rho_minus]
+        else:
+            # single_pair_diagnostic
+            return [mpmath.mpc(mpmath.mpf('0.5') + d_val, gamma)]
+
+
+def compute_perturbed_contributions_audit(
+    x: Union[str, float, int, mpmath.mpf],
+    rho_clean: Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]],
+    delta: Union[str, float, mpmath.mpf],
+    mode: str = "single_pair_diagnostic",
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [AUDIT PATH] Compute clean vs perturbed C_J and C_pi contributions.
+    Returns dictionary with exact mpmath values:
+    - clean_rho, perturbed_rhos
+    - cj_clean, cj_perturbed, delta_cj
+    - cpi_clean, cpi_perturbed, delta_cpi
+    """
+    with mpmath.workdps(dps + 15):
+        if isinstance(rho_clean, (int, float, mpmath.mpf)):
+            clean_mpc = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(rho_clean, dps=dps + 15))
+        elif isinstance(rho_clean, str) and not ('+' in rho_clean or 'j' in rho_clean.lower() or 'i' in rho_clean.lower()):
+            clean_mpc = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(rho_clean.strip(), dps=dps + 15))
+        else:
+            clean_mpc = math_core.to_mpc(rho_clean, dps=dps + 15)
+            
+        pert_rhos = construct_perturbed_zeros_audit(clean_mpc, delta, mode=mode, dps=dps)
+        
+        cj_clean = zero_j_contribution_audit(x, clean_mpc, dps=dps)
+        cpi_clean = zero_pi_contribution_audit(x, clean_mpc, dps=dps)
+        
+        cj_pert = mpmath.mpf('0')
+        cpi_pert = mpmath.mpf('0')
+        for r in pert_rhos:
+            cj_pert += zero_j_contribution_audit(x, r, dps=dps)
+            cpi_pert += zero_pi_contribution_audit(x, r, dps=dps)
+            
+        delta_cj = cj_pert - cj_clean
+        delta_cpi = cpi_pert - cpi_clean
+        
+        return {
+            "clean_rho": clean_mpc,
+            "perturbed_rhos": pert_rhos,
+            "cj_clean": cj_clean,
+            "cj_perturbed": cj_pert,
+            "delta_cj": delta_cj,
+            "cpi_clean": cpi_clean,
+            "cpi_perturbed": cpi_pert,
+            "delta_cpi": delta_cpi
+        }
+
+
 def riemann_explicit_j_audit(
     x: Union[str, float, int, mpmath.mpf],
     zeros: Sequence[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
@@ -122,13 +303,13 @@ def riemann_explicit_j_audit(
         # Li(x) = Ei(ln x) for x > 1
         li_x = mpmath.ei(ln_x)
         
-        # Sum over zeros
+        # Sum over zeros: -2 * Re[Ei(rho * ln x)] = C_J(x, rho)
         zero_sum = mpmath.mpf('0')
         for rho in zeros:
             if isinstance(rho, (int, float, mpmath.mpf)):
-                rho_mpc = mpmath.mpc('0.5', str(rho))
+                rho_mpc = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(rho, dps=dps + 15))
             elif isinstance(rho, str) and not ('+' in rho or 'j' in rho.lower() or 'i' in rho.lower()):
-                rho_mpc = mpmath.mpc('0.5', rho.strip())
+                rho_mpc = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(rho.strip(), dps=dps + 15))
             else:
                 rho_mpc = math_core.to_mpc(rho, dps=dps + 15)
                 
@@ -141,12 +322,12 @@ def riemann_explicit_j_audit(
         return j_val
 
 
+
 def riemann_explicit_pi_audit(
     x: Union[str, float, int, mpmath.mpf],
     zeros: Sequence[Union[complex, mpmath.mpc, str, float, Tuple[Any, Any]]],
     dps: int = 80
 ) -> mpmath.mpf:
-
     """
     [AUDIT PATH] Authoritative high-precision evaluation of pi_N(x) via Mobius inversion:
     pi_N(x) = sum_{m >= 1, x^{1/m} >= 2} (mu(m) / m) * J_N(x^{1/m}).
@@ -225,6 +406,7 @@ def compute_single_zero_contribution(
     return compute_single_zero_contribution_vectorized(x_grid, rho_c)
 
 
+
 class PrimeReconstructionCache:
     """
     Manages baseline explicit formula evaluations and provides instantaneous
@@ -281,7 +463,10 @@ class PrimeReconstructionCache:
         self,
         num_zeros: int,
         perturbed_zero_idx: int,
-        perturbed_rho: complex
+        perturbed_rho: Optional[complex] = None,
+        delta: Optional[float] = None,
+        gamma: Optional[float] = None,
+        mode: str = "single_pair_diagnostic"
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Reconstruct both clean pi_N(x) and perturbed pi_N_pert(x).
@@ -293,8 +478,30 @@ class PrimeReconstructionCache:
             return clean_pi, clean_pi.copy()
             
         orig_contrib = self.zero_contributions[perturbed_zero_idx]
-        new_contrib = compute_single_zero_contribution_vectorized(self.x_grid, complex(perturbed_rho))
+        orig_zero = self.baseline_zeros[perturbed_zero_idx]
         
+        if delta is not None:
+            g = gamma if gamma is not None else orig_zero.imag
+            if mode == "symmetry_complete_quartet":
+                if abs(delta) < 1e-12:
+                    new_contrib = orig_contrib
+                else:
+                    rho_p = complex(0.5 + delta, g)
+                    rho_m = complex(0.5 - delta, g)
+                    new_contrib = (
+                        compute_single_zero_contribution_vectorized(self.x_grid, rho_p) +
+                        compute_single_zero_contribution_vectorized(self.x_grid, rho_m)
+                    )
+            else:
+                # single_pair_diagnostic
+                rho_pert = complex(0.5 + delta, g)
+                new_contrib = compute_single_zero_contribution_vectorized(self.x_grid, rho_pert)
+        elif perturbed_rho is not None:
+            new_contrib = compute_single_zero_contribution_vectorized(self.x_grid, complex(perturbed_rho))
+        else:
+            new_contrib = orig_contrib
+            
         # Delta C = new - orig
         perturbed_pi = clean_pi - (new_contrib - orig_contrib)
         return clean_pi, perturbed_pi
+

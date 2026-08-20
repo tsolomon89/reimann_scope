@@ -338,6 +338,57 @@ x^{1/m}<2.
 
 Use one documented branch convention consistently for complex logarithms and \(\operatorname{Li}(x^\rho)\).
 
+### 12.1 Exact Coupled Converter Covariance
+
+Define the signed single-zero contribution of a conjugate pair \(\rho, \bar{\rho}\) to \(J(x)\) as:
+
+\[
+C_J(x, \rho) = -2\Re\left[\operatorname{Ei}(\rho\log x)\right].
+\]
+
+Let \(A = \tau^k\), and transform simultaneously:
+
+\[
+\rho' = A\rho,
+\qquad
+\log x' = \frac{\log x}{A} \iff x' = x^{1/A}.
+\]
+
+Then
+
+\[
+\rho'\log x' = (A\rho)\left(\frac{\log x}{A}\right) = \rho\log x.
+\]
+
+Therefore
+
+\[
+\operatorname{Ei}(\rho'\log x') = \operatorname{Ei}(\rho\log x).
+\]
+
+Hence the signed single-zero \(J\) contribution obeys the exact covariance:
+
+\[
+\boxed{C_J(x^{1/A}, A\rho) = C_J(x, \rho)}.
+\]
+
+Because the same cancellation occurs after replacing \(x\) by \(x^{1/m}\):
+
+\[
+(A\rho)\log\left((x^{1/A})^{1/m}\right) = (A\rho)\frac{\log x}{mA} = \rho\frac{\log x}{m},
+\]
+
+the Möbius-inverted single-zero contribution \(C_\pi(x, \rho) = \sum_{m\ge1}\frac{\mu(m)}{m}C_J(x^{1/m}, \rho)\) also obeys the corresponding coupled covariance:
+
+\[
+\boxed{C_\pi(x^{1/A}, A\rho) = C_\pi(x, \rho)},
+\]
+
+subject to matching truncation and domain semantics.
+
+*Note:* This is an exact covariance under the explicitly coupled change of coordinates, **not** a non-trivial automorphism of \(\zeta(s)\).
+
+
 ## 13. Deterministic test vectors
 
 ### A — Identity

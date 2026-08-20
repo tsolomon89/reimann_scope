@@ -276,8 +276,19 @@ def create_controls_panel():
                 ]),
                 dbc.Tab(label="Perturbation & Primes", tab_id="tab-perturb", children=[
                     html.Div([
+                        html.Label("Perturbation Semantics:", className="fw-bold small text-light mt-2"),
+                        dbc.RadioItems(
+                            id="radio-perturb-mode",
+                            options=[
+                                {"label": " SINGLE-PAIR DIAGNOSTIC (ρ = 1/2+δ+iγ)", "value": "single_pair_diagnostic"},
+                                {"label": " SYMMETRY-COMPLETE QUARTET (1/2±δ±iγ)", "value": "symmetry_complete_quartet"},
+                            ],
+                            value="single_pair_diagnostic",
+                            className="small text-warning mb-2"
+                        ),
                         html.Label("Select Zero to Perturb:", className="fw-bold small text-light mt-2"),
                         dcc.Dropdown(
+
                             id="dropdown-selected-zero",
                             options=[
                                 {"label": f"Zero #{i+1} (γ ≈ {INITIAL_ZEROS_FLOAT[i]:.4f})", "value": i}
@@ -411,10 +422,12 @@ app.layout = html.Div([
                     dbc.CardBody([
                         dcc.Graph(
                             id="graph-converter",
-                            style={"height": "380px", "width": "100%"},
+                            style={"height": "320px", "width": "100%"},
                             config={"responsive": True, "scrollZoom": True, "displayModeBar": "hover"}
-                        )
+                        ),
+                        html.Div(id="converter-metrics-display", className="small font-monospace p-2 border-top border-secondary bg-black bg-opacity-25 text-light")
                     ], className="p-1")
+
                 ], className="border-secondary shadow-sm mb-3")
             ], xs=12, lg=6),
 
@@ -696,6 +709,7 @@ def download_sweep_yaml(n_clicks, yaml_content):
         Output("graph-zeta-trace", "figure"),
         Output("graph-converter", "figure"),
         Output("graph-centrifuge", "figure"),
+        Output("converter-metrics-display", "children"),
     ],
     [
         Input("transform-mode-select", "value"),
@@ -717,6 +731,7 @@ def download_sweep_yaml(n_clicks, yaml_content):
         Input("check-centered-kernel-lock", "value"),
         Input("slider-aniso-delta", "value"),
         Input("slider-aniso-gamma", "value"),
+        Input("radio-perturb-mode", "value"),
     ],
     State("store-discovered-zeros", "data")
 )
@@ -740,8 +755,10 @@ def update_all_panels(
     c_lock: list,
     aniso_d: float,
     aniso_g: float,
+    perturb_mode_val: str,
     disc_zeros: list
 ):
+
     """
     Unified callback to update the Active Mathematics Card and all 4 panels
     with 1x1 isotropic square Cartesian grids, matching metric scale steps (dtick),
@@ -923,11 +940,17 @@ def update_all_panels(
         name="True Prime Count π(x)"
     ))
 
+    perturb_mode = perturb_mode_val if perturb_mode_val is not None else "single_pair_diagnostic"
+    clean_gamma = INITIAL_ZEROS_FLOAT[selected_zero_idx] if selected_zero_idx < len(INITIAL_ZEROS_FLOAT) else 14.134725
+    clean_rho_val = complex(0.5, clean_gamma)
+    
     # Clean & Perturbed Reconstruction
     clean_pi, pert_pi = rec_cache.reconstruct_pi_perturbed(
         num_zeros=num_zeros,
         perturbed_zero_idx=selected_zero_idx,
-        perturbed_rho=complex(0.5 + delta_pert, gamma_pert)
+        delta=delta_pert,
+        gamma=gamma_pert,
+        mode=perturb_mode
     )
 
     fig_c.add_trace(go.Scatter(
@@ -936,12 +959,66 @@ def update_all_panels(
         name="Clean π_N(x)"
     ))
 
-    if abs(delta_pert) > 1e-10 or abs(gamma_pert - INITIAL_ZEROS_FLOAT[selected_zero_idx]) > 1e-4:
+    if abs(delta_pert) > 1e-10 or abs(gamma_pert - clean_gamma) > 1e-4:
         fig_c.add_trace(go.Scatter(
             x=x_pts, y=pert_pi,
             mode="lines", line=dict(color="#ff007f", dash="dot", width=2),
             name="Perturbed π_N(x)"
         ))
+
+    # Single-Zero Isolated Contribution Metrics at x=20.0
+    eval_x = 20.0
+    if audit_mode:
+        contrib_info = converter.compute_perturbed_contributions_audit(
+            str(eval_x), clean_rho_val, str(delta_pert), mode=perturb_mode, dps=80
+        )
+        cj_clean_str = f"{float(contrib_info['cj_clean']):.6f}"
+        cj_pert_str = f"{float(contrib_info['cj_perturbed']):.6f}"
+        cj_diff_str = f"{float(contrib_info['delta_cj']):.6f}"
+        cpi_clean_str = f"{float(contrib_info['cpi_clean']):.6f}"
+        cpi_pert_str = f"{float(contrib_info['cpi_perturbed']):.6f}"
+        cpi_diff_str = f"{float(contrib_info['delta_cpi']):.6f}"
+    else:
+        cj_c = converter.zero_j_contribution_preview(eval_x, clean_rho_val)
+        cpi_c = converter.zero_pi_contribution_preview(eval_x, clean_rho_val)
+        if perturb_mode == "symmetry_complete_quartet":
+            if abs(delta_pert) < 1e-12:
+                cj_p = cj_c
+                cpi_p = cpi_c
+            else:
+                rp = complex(0.5 + delta_pert, gamma_pert)
+                rm = complex(0.5 - delta_pert, gamma_pert)
+                cj_p = converter.zero_j_contribution_preview(eval_x, rp) + converter.zero_j_contribution_preview(eval_x, rm)
+                cpi_p = converter.zero_pi_contribution_preview(eval_x, rp) + converter.zero_pi_contribution_preview(eval_x, rm)
+        else:
+            r_pert = complex(0.5 + delta_pert, gamma_pert)
+            cj_p = converter.zero_j_contribution_preview(eval_x, r_pert)
+            cpi_p = converter.zero_pi_contribution_preview(eval_x, r_pert)
+        cj_clean_str = f"{cj_c:.6f}"
+        cj_pert_str = f"{cj_p:.6f}"
+        cj_diff_str = f"{cj_p - cj_c:+.6f}"
+        cpi_clean_str = f"{cpi_c:.6f}"
+        cpi_pert_str = f"{cpi_p:.6f}"
+        cpi_diff_str = f"{cpi_p - cpi_c:+.6f}"
+
+    idx_20 = int(np.argmin(np.abs(x_pts - 20.0)))
+    pi_clean_20 = clean_pi[idx_20]
+    pi_pert_20 = pert_pi[idx_20]
+    pi_diff_20 = pi_pert_20 - pi_clean_20
+    
+    mode_label = "SINGLE-PAIR DIAGNOSTIC" if perturb_mode == "single_pair_diagnostic" else "SYMMETRY-COMPLETE QUARTET"
+    
+    metrics_ui = html.Div([
+        html.Div([
+            dbc.Badge(f"MODE: {mode_label}", color="warning" if perturb_mode == "single_pair_diagnostic" else "info", className="me-2 p-1"),
+            html.Span(f"Selected ρ: 0.5000 + {delta_pert:+.4f} + {gamma_pert:.4f}i", className="text-warning fw-bold small")
+        ], className="mb-1"),
+        html.Div([
+            html.Span(f"C_J(x=20): clean={cj_clean_str} | pert={cj_pert_str} | Δ={cj_diff_str}", className="d-block text-secondary small"),
+            html.Span(f"C_π(x=20): clean={cpi_clean_str} | pert={cpi_pert_str} | Δ={cpi_diff_str}", className="d-block text-secondary small"),
+            html.Span(f"π_N(x=20): clean={pi_clean_20:.4f} | pert={pi_pert_20:.4f} | Δ={pi_diff_20:+.4f}", className="d-block text-info small fw-bold")
+        ])
+    ])
 
     # --------------------------------------------------------------------------
     # Panel D: Radial Centrifuge (Matching dtick on X and Y)
@@ -974,7 +1051,8 @@ def update_all_panels(
         name="On-Line Invariant (δ=0)"
     ))
 
-    return card_md, fig_a, fig_b, fig_c, fig_d
+    return card_md, fig_a, fig_b, fig_c, fig_d, metrics_ui
+
 
 
 # ==============================================================================
