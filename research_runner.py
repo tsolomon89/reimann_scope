@@ -495,16 +495,16 @@ def evaluate_point(
                 }
 
                 if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
-                    split_defect_cj = contrib_dict.get("split_defect_cj", contrib_dict.get("delta_cj"))
-                    split_defect_cpi = contrib_dict.get("split_defect_cpi", contrib_dict.get("delta_cpi"))
+                    split_defect_cj = contrib_dict.get("split_defect_cj", contrib_dict.get("delta_cj", mpmath.mpf(0)))
+                    split_defect_cpi = contrib_dict.get("split_defect_cpi", contrib_dict.get("delta_cpi", mpmath.mpf(0)))
                     split_defect_pi_n = full_diff
                     
                     # Evaluate symmetry error S(delta) - S(-delta)
                     neg_contrib = converter.compute_perturbed_contributions_audit(
                         x_str, rho_clean, str(-d_mpf), mode=mode, dps=dps + 15
                     )
-                    neg_s_cj = neg_contrib.get("split_defect_cj", neg_contrib.get("delta_cj"))
-                    neg_s_cpi = neg_contrib.get("split_defect_cpi", neg_contrib.get("delta_cpi"))
+                    neg_s_cj = neg_contrib.get("split_defect_cj", neg_contrib.get("delta_cj", mpmath.mpf(0)))
+                    neg_s_cpi = neg_contrib.get("split_defect_cpi", neg_contrib.get("delta_cpi", mpmath.mpf(0)))
                     
                     sym_err_cj = abs(split_defect_cj - neg_s_cj)
                     sym_err_cpi = abs(split_defect_cpi - neg_s_cpi)
@@ -540,23 +540,23 @@ def evaluate_point(
                                 half_contrib = converter.compute_perturbed_contributions_audit(
                                     x_str, rho_clean, str(half_d_mpf), mode=mode, dps=dps + 15
                                 )
-                                half_s_cj = half_contrib.get("split_defect_cj", half_contrib.get("delta_cj"))
-                                half_s_cpi = half_contrib.get("split_defect_cpi", half_contrib.get("delta_cpi"))
+                                half_s_cj = half_contrib.get("split_defect_cj", half_contrib.get("delta_cj", mpmath.mpf(0)))
+                                half_s_cpi = half_contrib.get("split_defect_cpi", half_contrib.get("delta_cpi", mpmath.mpf(0)))
 
-                                if abs(half_s_cj) > mpmath.mpf('1e-50'):
+                                if half_s_cj is not None and abs(half_s_cj) > mpmath.mpf('1e-50'):
                                     quad_ratio_cj = split_defect_cj / half_s_cj
                                     outputs["quadratic_ratio_cj"] = mpmath.nstr(quad_ratio_cj, n=dps)
                                     outputs["quadratic_ratio_error_cj"] = mpmath.nstr(abs(quad_ratio_cj - 4), n=dps)
 
-                                if abs(half_s_cpi) > mpmath.mpf('1e-50'):
+                                if half_s_cpi is not None and abs(half_s_cpi) > mpmath.mpf('1e-50'):
                                     quad_ratio_cpi = split_defect_cpi / half_s_cpi
                                     outputs["quadratic_ratio_cpi"] = mpmath.nstr(quad_ratio_cpi, n=dps)
                                     outputs["quadratic_ratio_error_cpi"] = mpmath.nstr(abs(quad_ratio_cpi - 4), n=dps)
 
                 else:
                     # single_pair_diagnostic
-                    delta_cj = contrib_dict.get("delta_cj", contrib_dict.get("split_defect_cj"))
-                    delta_cpi = contrib_dict.get("delta_cpi", contrib_dict.get("split_defect_cpi"))
+                    delta_cj = contrib_dict.get("delta_cj", contrib_dict.get("split_defect_cj", mpmath.mpf(0)))
+                    delta_cpi = contrib_dict.get("delta_cpi", contrib_dict.get("split_defect_cpi", mpmath.mpf(0)))
                     delta_pi_n = full_diff
 
                     outputs["delta_cj"] = mpmath.nstr(delta_cj, n=dps)
