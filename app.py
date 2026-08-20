@@ -14,6 +14,7 @@ All 4 panels feature equal Cartesian scaling and identical metric step sizes (dt
 """
 
 from __future__ import annotations
+from typing import Optional, List, Any
 import numpy as np
 import plotly.graph_objects as go
 import dash
@@ -733,26 +734,26 @@ def download_sweep_yaml(n_clicks, yaml_content):
 )
 def update_all_panels(
     mode: str,
-    t0: float,
-    dt: float,
-    delta_offset: float,
-    selected_zero_idx: int,
-    delta_pert: float,
-    gamma_pert: float,
-    num_zeros: int,
+    t0: Optional[float],
+    dt: Optional[float],
+    delta_offset: Optional[float],
+    selected_zero_idx: Optional[int],
+    delta_pert: Optional[float],
+    gamma_pert: Optional[float],
+    num_zeros: Optional[int],
     audit_mode: bool,
-    k_val: float,
-    kA: float,
-    kB: float,
-    kC: float,
-    kD: float,
-    k_lock: list,
-    cA: float,
-    c_lock: list,
-    aniso_d: float,
-    aniso_g: float,
-    perturb_mode_val: str,
-    disc_zeros: list
+    k_val: Optional[float],
+    kA: Optional[float],
+    kB: Optional[float],
+    kC: Optional[float],
+    kD: Optional[float],
+    k_lock: Optional[List[str]],
+    cA: Optional[float],
+    c_lock: Optional[List[str]],
+    aniso_d: Optional[float],
+    aniso_g: Optional[float],
+    perturb_mode_val: Optional[str],
+    disc_zeros: Optional[List[float]]
 ):
 
     """
@@ -763,44 +764,41 @@ def update_all_panels(
     dps = 80 if audit_mode else 35
     n_samples = 500 if audit_mode else 250
     
-    t0 = float(t0 if t0 is not None else 14.0)
-    dt = float(dt if dt is not None else 20.0)
-    delta_offset = float(delta_offset if delta_offset is not None else 0.0)
-    delta_pert = float(delta_pert if delta_pert is not None else 0.0)
-    gamma_pert = float(gamma_pert if gamma_pert is not None else INITIAL_ZEROS_FLOAT[0])
-    num_zeros = int(num_zeros if num_zeros is not None else 15)
+    t0_val = float(t0) if t0 is not None else 14.0
+    dt_val = float(dt) if dt is not None else 20.0
+    delta_offset_val = float(delta_offset) if delta_offset is not None else 0.0
+    selected_idx_val = int(selected_zero_idx) if selected_zero_idx is not None else 0
+    delta_pert_val = float(delta_pert) if delta_pert is not None else 0.0
+    gamma_pert_val = float(gamma_pert) if gamma_pert is not None else INITIAL_ZEROS_FLOAT[0]
+    num_zeros_val = int(num_zeros) if num_zeros is not None else 15
+    k = float(k_val) if k_val is not None else 0.0
 
     # 1. Instantiate active Transform Object
     transform_obj: transforms.BaseTransform
     if mode == "camera":
         transform_obj = transforms.CameraTransform()
-
     elif mode == "height":
-        k = float(k_val if k_val is not None else 0.0)
-        transform_obj = transforms.HeightMicroscopeTransform(k=k, t0=t0, delta=delta_offset)
+        transform_obj = transforms.HeightMicroscopeTransform(k=k, t0=t0_val, delta=delta_offset_val)
     elif mode == "origin_dilation":
-        k = float(k_val if k_val is not None else 0.0)
         transform_obj = transforms.OriginCoordinateDilation(k=k)
     elif mode == "centered_dilation":
-        k = float(k_val if k_val is not None else 0.0)
         transform_obj = transforms.CenteredCoordinateDilation(k=k)
     elif mode == "argument":
-        k = float(k_val if k_val is not None else 0.0)
         transform_obj = transforms.ArgumentTransform(k=k)
     elif mode == "kernel_lab":
-        A = float(kA if kA is not None else 1.0)
+        A = float(kA) if kA is not None else 1.0
         is_locked = bool(k_lock and "lock" in k_lock)
-        B = (1.0 / A) if is_locked else float(kB if kB is not None else 1.0)
-        C = float(kC if kC is not None else 0.0)
-        D = float(kD if kD is not None else 0.0)
+        B = (1.0 / A) if is_locked else (float(kB) if kB is not None else 1.0)
+        C = float(kC) if kC is not None else 0.0
+        D = float(kD) if kD is not None else 0.0
         transform_obj = transforms.KernelTransform(A=A, B=B, C=C, D=D, inverse_scale_lock=is_locked)
     elif mode == "centered_kernel":
-        A = float(cA if cA is not None else 1.0)
+        A = float(cA) if cA is not None else 1.0
         is_locked = bool(c_lock and "lock" in c_lock)
         transform_obj = transforms.CenteredKernelTransform(A=A, inverse_scale_lock=is_locked)
     elif mode == "anisotropic":
-        A_del = float(aniso_d if aniso_d is not None else 1.0)
-        A_gam = float(aniso_g if aniso_g is not None else 1.0)
+        A_del = float(aniso_d) if aniso_d is not None else 1.0
+        A_gam = float(aniso_g) if aniso_g is not None else 1.0
         transform_obj = transforms.AnisotropicDeformation(A_delta=A_del, A_gamma=A_gam)
     else:
         transform_obj = transforms.CameraTransform()
@@ -810,7 +808,7 @@ def update_all_panels(
 
     # Compute Complex Trace via Cache
     u_vals, s_coords, re_w, im_w = cache.get_cached_trace(
-        transform_obj, t0, dt, delta_offset, n_samples=n_samples, dps=dps
+        transform_obj, t0_val, dt_val, delta_offset_val, n_samples=n_samples, dps=dps
     )
 
     # --------------------------------------------------------------------------
@@ -818,7 +816,7 @@ def update_all_panels(
     # --------------------------------------------------------------------------
     fig_a = go.Figure(layout=DARK_LAYOUT)
     x_min_a, x_max_a = -1.0, 4.0
-    y_min_a, y_max_a = t0 - 2.0, t0 + dt + 2.0
+    y_min_a, y_max_a = t0_val - 2.0, t0_val + dt_val + 2.0
     dtick_a = 5.0
     
     fig_a.update_layout(
@@ -874,7 +872,7 @@ def update_all_panels(
     ))
 
     # Highlight Selected Zero
-    selected_rho = complex(0.5 + delta_pert, gamma_pert)
+    selected_rho = complex(0.5 + delta_pert_val, gamma_pert_val)
     mapped_selected = transform_obj.map_zero(selected_rho)
     fig_a.add_trace(go.Scatter(
         x=[mapped_selected.real], y=[mapped_selected.imag],
@@ -920,7 +918,7 @@ def update_all_panels(
     dtick_c = 5.0
 
     fig_c.update_layout(
-        title=dict(text=f"Panel C: Prime Reconstruction π_N(x) (N={num_zeros})", font=dict(size=12)),
+        title=dict(text=f"Panel C: Prime Reconstruction π_N(x) (N={num_zeros_val})", font=dict(size=12)),
         xaxis=dict(range=[x_min_c, x_max_c], title="x", dtick=dtick_c, tick0=0),
         yaxis=dict(range=[y_min_c, y_max_c], title="Count π(x)", scaleanchor="x", scaleratio=1.0, constrain="range", dtick=dtick_c, tick0=0)
     )
@@ -937,15 +935,15 @@ def update_all_panels(
     ))
 
     perturb_mode = perturb_mode_val if perturb_mode_val is not None else "single_pair_diagnostic"
-    clean_gamma = INITIAL_ZEROS_FLOAT[selected_zero_idx] if selected_zero_idx < len(INITIAL_ZEROS_FLOAT) else 14.134725
+    clean_gamma = INITIAL_ZEROS_FLOAT[selected_idx_val] if selected_idx_val < len(INITIAL_ZEROS_FLOAT) else 14.134725
     clean_rho_val = complex(0.5, clean_gamma)
     
     # Clean & Perturbed Reconstruction
     clean_pi, pert_pi = rec_cache.reconstruct_pi_perturbed(
-        num_zeros=num_zeros,
-        perturbed_zero_idx=selected_zero_idx,
-        delta=delta_pert,
-        gamma=gamma_pert,
+        num_zeros=num_zeros_val,
+        perturbed_zero_idx=selected_idx_val,
+        delta=delta_pert_val,
+        gamma=gamma_pert_val,
         mode=perturb_mode
     )
 
@@ -955,7 +953,7 @@ def update_all_panels(
         name="Clean π_N(x)"
     ))
 
-    if abs(delta_pert) > 1e-10 or abs(gamma_pert - clean_gamma) > 1e-4:
+    if abs(delta_pert_val) > 1e-10 or abs(gamma_pert_val - clean_gamma) > 1e-4:
         fig_c.add_trace(go.Scatter(
             x=x_pts, y=pert_pi,
             mode="lines", line=dict(color="#ff007f", dash="dot", width=2),
@@ -966,7 +964,7 @@ def update_all_panels(
     eval_x = 20.0
     if audit_mode:
         contrib_info = converter.compute_perturbed_contributions_audit(
-            str(eval_x), clean_rho_val, str(delta_pert), mode=perturb_mode, dps=80
+            str(eval_x), clean_rho_val, str(delta_pert_val), mode=perturb_mode, dps=80
         )
         cj_clean_str = f"{float(contrib_info['cj_clean']):.6f}"
         cj_pert_str = f"{float(contrib_info['cj_perturbed']):.6f}"
@@ -978,16 +976,16 @@ def update_all_panels(
         cj_c = converter.zero_j_contribution_preview(eval_x, clean_rho_val)
         cpi_c = converter.zero_pi_contribution_preview(eval_x, clean_rho_val)
         if perturb_mode == "symmetry_complete_quartet":
-            if abs(delta_pert) < 1e-12:
+            if abs(delta_pert_val) < 1e-12:
                 cj_p = cj_c
                 cpi_p = cpi_c
             else:
-                rp = complex(0.5 + delta_pert, gamma_pert)
-                rm = complex(0.5 - delta_pert, gamma_pert)
+                rp = complex(0.5 + delta_pert_val, gamma_pert_val)
+                rm = complex(0.5 - delta_pert_val, gamma_pert_val)
                 cj_p = converter.zero_j_contribution_preview(eval_x, rp) + converter.zero_j_contribution_preview(eval_x, rm)
                 cpi_p = converter.zero_pi_contribution_preview(eval_x, rp) + converter.zero_pi_contribution_preview(eval_x, rm)
         else:
-            r_pert = complex(0.5 + delta_pert, gamma_pert)
+            r_pert = complex(0.5 + delta_pert_val, gamma_pert_val)
             cj_p = converter.zero_j_contribution_preview(eval_x, r_pert)
             cpi_p = converter.zero_pi_contribution_preview(eval_x, r_pert)
         cj_clean_str = f"{cj_c:.6f}"
@@ -1007,7 +1005,7 @@ def update_all_panels(
     metrics_ui = html.Div([
         html.Div([
             dbc.Badge(f"MODE: {mode_label}", color="warning" if perturb_mode == "single_pair_diagnostic" else "info", className="me-2 p-1"),
-            html.Span(f"Selected ρ: 0.5000 + {delta_pert:+.4f} + {gamma_pert:.4f}i", className="text-warning fw-bold small")
+            html.Span(f"Selected ρ: 0.5000 + {delta_pert_val:+.4f} + {gamma_pert_val:.4f}i", className="text-warning fw-bold small")
         ], className="mb-1"),
         html.Div([
             html.Span(f"C_J(x=20): clean={cj_clean_str} | pert={cj_pert_str} | Δ={cj_diff_str}", className="d-block text-secondary small"),
@@ -1022,17 +1020,17 @@ def update_all_panels(
     fig_d = go.Figure(layout=DARK_LAYOUT)
     x_min_d, x_max_d = -20.0, 20.0
     tau_approx = 2.0 * np.pi
-    y_limit_d = max(1.0, 20.0 * abs(delta_pert) * np.log(tau_approx) * 1.25)
+    y_limit_d = max(1.0, 20.0 * abs(delta_pert_val) * np.log(tau_approx) * 1.25)
     dtick_d = 5.0
 
     fig_d.update_layout(
-        title=dict(text=f"Panel D: Centrifuge log |q_ρ^K| = K·δ·ln(τ) (δ={delta_pert:.4g})", font=dict(size=12)),
+        title=dict(text=f"Panel D: Centrifuge log |q_ρ^K| = K·δ·ln(τ) (δ={delta_pert_val:.4g})", font=dict(size=12)),
         xaxis=dict(range=[x_min_d, x_max_d], title="Grade K", dtick=dtick_d, tick0=0),
         yaxis=dict(range=[-y_limit_d, y_limit_d], title="log |q_ρ^K|", scaleanchor="x", scaleratio=1.0, constrain="range", dtick=dtick_d, tick0=0)
     )
 
     k_grid = np.linspace(-20.0, 20.0, 100)
-    log_mod_vals = k_grid * delta_pert * np.log(tau_approx)
+    log_mod_vals = k_grid * delta_pert_val * np.log(tau_approx)
 
     fig_d.add_trace(go.Scatter(
         x=k_grid, y=log_mod_vals,
