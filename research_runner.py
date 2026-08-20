@@ -320,7 +320,7 @@ def evaluate_point(
                 else:
                     t_obj_map = transforms.CenteredCoordinateDilation(k=k_str)
                     
-                rho = mpmath.mpc('0.5', str(gamma_str))
+                rho = mpmath.mpc('0.5', gamma_str)
                 mapped_rho = t_obj_map.map_zero_mpc(rho, dps=dps)
                 val_at_mapped = t_obj_map.evaluate_function(mapped_rho, dps=dps)
 
@@ -370,7 +370,7 @@ def evaluate_point(
                 outputs = {
                     "s_re": mpmath.nstr(s_mpc.real, n=dps),
                     "s_im": mpmath.nstr(s_mpc.imag, n=dps),
-                    "k": str(k_str),
+                    "k": k_str,
                     "scale_A": mpmath.nstr(scale_A, n=dps),
                     "mapped_s_re": mpmath.nstr(mapped_s.real, n=dps),
                     "mapped_s_im": mpmath.nstr(mapped_s.imag, n=dps),
