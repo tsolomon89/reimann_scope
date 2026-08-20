@@ -1,1 +1,89 @@
-[]
+[
+  {
+    "run_id": "20260820T180255Z_centered-dilation-zero-map-001_7ca0768c",
+    "experiment_id": "centered-dilation-zero-map-001",
+    "classification": "canonical_experiment",
+    "timestamp": "2026-08-20T18:02:55.850663+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260820T180255Z_centered-dilation-zero-map-001_7ca0768c/summary.json",
+    "manifest_path": "research/runs/20260820T180255Z_centered-dilation-zero-map-001_7ca0768c/manifest.json",
+    "results_path": "research/runs/20260820T180255Z_centered-dilation-zero-map-001_7ca0768c/results.jsonl"
+  },
+  {
+    "run_id": "20260820T180256Z_centrifuge-slope-001_934b6deb",
+    "experiment_id": "centrifuge-slope-001",
+    "classification": "canonical_experiment",
+    "timestamp": "2026-08-20T18:02:56.581934+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260820T180256Z_centrifuge-slope-001_934b6deb/summary.json",
+    "manifest_path": "research/runs/20260820T180256Z_centrifuge-slope-001_934b6deb/manifest.json",
+    "results_path": "research/runs/20260820T180256Z_centrifuge-slope-001_934b6deb/results.jsonl"
+  },
+  {
+    "run_id": "20260820T180257Z_coupled-scale-covariance-001_e772ca28",
+    "experiment_id": "coupled-scale-covariance-001",
+    "classification": "canonical_experiment",
+    "timestamp": "2026-08-20T18:02:57.294276+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260820T180257Z_coupled-scale-covariance-001_e772ca28/summary.json",
+    "manifest_path": "research/runs/20260820T180257Z_coupled-scale-covariance-001_e772ca28/manifest.json",
+    "results_path": "research/runs/20260820T180257Z_coupled-scale-covariance-001_e772ca28/results.jsonl"
+  },
+  {
+    "run_id": "20260820T180305Z_inverse-kernel-lock-001_461b0062",
+    "experiment_id": "inverse-kernel-lock-001",
+    "classification": "canonical_experiment",
+    "timestamp": "2026-08-20T18:03:05.835330+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260820T180305Z_inverse-kernel-lock-001_461b0062/summary.json",
+    "manifest_path": "research/runs/20260820T180305Z_inverse-kernel-lock-001_461b0062/manifest.json",
+    "results_path": "research/runs/20260820T180305Z_inverse-kernel-lock-001_461b0062/results.jsonl"
+  },
+  {
+    "run_id": "20260820T180312Z_symmetric-centrifuge-defect-001_f57159b0",
+    "experiment_id": "symmetric-centrifuge-defect-001",
+    "classification": "valid control",
+    "timestamp": "2026-08-20T18:03:12.264191+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260820T180312Z_symmetric-centrifuge-defect-001_f57159b0/summary.json",
+    "manifest_path": "research/runs/20260820T180312Z_symmetric-centrifuge-defect-001_f57159b0/manifest.json",
+    "results_path": "research/runs/20260820T180312Z_symmetric-centrifuge-defect-001_f57159b0/results.jsonl",
+    "notes": "Exact algebraic identity verification of symmetric centrifuge defect |D_K| = 4 sinh^2(K*delta*ln(tau)/2)"
+  },
+  {
+    "run_id": "20260820T180313Z_coupled-perturbation-covariance-001_0d4e4b51",
+    "experiment_id": "coupled-perturbation-covariance-001",
+    "classification": "valid control",
+    "timestamp": "2026-08-20T18:03:13.011596+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260820T180313Z_coupled-perturbation-covariance-001_0d4e4b51/summary.json",
+    "manifest_path": "research/runs/20260820T180313Z_coupled-perturbation-covariance-001_0d4e4b51/manifest.json",
+    "results_path": "research/runs/20260820T180313Z_coupled-perturbation-covariance-001_0d4e4b51/results.jsonl",
+    "notes": "Coupled coordinate dilation gauge covariance for clean and perturbed converter waves"
+  },
+  {
+    "run_id": "20260820T180317Z_isolated-radial-response-002_90650fb0",
+    "experiment_id": "isolated-radial-response-002",
+    "classification": "observational response",
+    "timestamp": "2026-08-20T18:03:17.203709+00:00",
+    "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+    "status": "complete",
+    "criterion_met": null,
+    "summary_path": "research/runs/20260820T180317Z_isolated-radial-response-002_90650fb0/summary.json",
+    "manifest_path": "research/runs/20260820T180317Z_isolated-radial-response-002_90650fb0/manifest.json",
+    "results_path": "research/runs/20260820T180317Z_isolated-radial-response-002_90650fb0/results.jsonl",
+    "notes": "Characterizes single-pair response and symmetry-complete split defect across delta in [-0.05, 0.05]"
+  }
+]

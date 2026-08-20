@@ -1,0 +1,106 @@
+{
+  "schema_version": "1",
+  "run_id": "20260820T180257Z_coupled-scale-covariance-001_e772ca28",
+  "experiment_id": "coupled-scale-covariance-001",
+  "experiment_spec_sha256": "e772ca2808cecd11f029847092f9c95022b87c740489c81e2c157a609ad12e60",
+  "git_commit": "987ccb58f331306e001a6f2c6ba2845a707f761f",
+  "git_dirty": false,
+  "started_at": "2026-08-20T18:02:57.294276+00:00",
+  "completed_at": "2026-08-20T18:03:05.062573+00:00",
+  "status": "complete",
+  "precision": {
+    "dps": 80
+  },
+  "parameter_space": {
+    "k": {
+      "kind": "explicit",
+      "values": [
+        "-10",
+        "-5",
+        "-2",
+        "-1",
+        "0",
+        "1",
+        "2",
+        "5",
+        "10"
+      ]
+    },
+    "s_re": {
+      "kind": "explicit",
+      "values": [
+        "0.5",
+        "0.75",
+        "2.0",
+        "-1.5"
+      ]
+    },
+    "s_im": {
+      "kind": "explicit",
+      "values": [
+        "14.13472514173469379045725198356247027078425711569924317568556746",
+        "21.02203963877155499262847959389690277733434052490278180469829596",
+        "5.0",
+        "30.0"
+      ]
+    },
+    "x": {
+      "kind": "explicit",
+      "values": [
+        "10.0",
+        "50.0"
+      ]
+    },
+    "rho_im": {
+      "kind": "explicit",
+      "values": [
+        "14.13472514173469379045725198356247027078425711569924317568556746",
+        "21.02203963877155499262847959389690277733434052490278180469829596"
+      ]
+    }
+  },
+  "points_requested": 576,
+  "points_completed": 576,
+  "tau": "6.283185307179586476925286766559005768394338798750211641949889184615632812572418",
+  "runtime": {
+    "python": "3.10.9 | packaged by Anaconda, Inc. | (main, Mar  1 2023, 18:18:15) [MSC v.1916 64 bit (AMD64)]",
+    "platform": "win32",
+    "packages": {
+      "mpmath": "1.3.0",
+      "flint": true
+    }
+  },
+  "data_provenance": {
+    "zeta_zeros": {
+      "source_name": "mpmath.zetazero-generated reference snapshot",
+      "source_author_or_org": "Fredrik Johansson / mpmath / Arb library",
+      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
+      "retrieved_at": "2026-08-19",
+      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
+      "vendored_count": 200,
+      "first_ordinate": "14.13472514173469379045725198356247027078",
+      "last_ordinate": "396.3818542225921869319994544917305290638",
+      "format": "decimal strings in json",
+      "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+      "preparation_script": "scripts/fetch_reference_zeros.py"
+    },
+    "primes": {
+      "source": "locally generated",
+      "algorithm": "Deterministic Sieve of Eratosthenes",
+      "max_x": 4999,
+      "count": 669,
+      "sha256": "8b9ac6ab4a8adf57614dd182063552f3d1f64a0feb0e6bdf1de52bae4e599429"
+    },
+    "tau": {
+      "source": "high-precision library",
+      "library": "python-flint / mpmath",
+      "precision_digits": 80
+    }
+  },
+  "code_modules": {
+    "math_core.py": "13026e8c2d875fe09809aa1985b30c6a2a8aa3cb4b16ab04cf3bdb4d247566a8",
+    "transforms.py": "0680333fe4e678bf33ee8724ce3324c54f793320b3f606c5f084420f16bf578e",
+    "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
+    "zero_finder.py": "0637386b1fe9831eb03d89da3b8a924611c6631d6549dc01b44f13add44927ca"
+  }
+}
