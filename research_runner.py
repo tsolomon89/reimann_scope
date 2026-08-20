@@ -230,7 +230,7 @@ def generate_parameter_grid(
     
     grid = []
     for combination in itertools.product(*param_values_list):
-        point_dict = {name: str(val) for name, val in zip(param_names, combination)}
+        point_dict = {name: val for name, val in zip(param_names, combination)}
         grid.append(point_dict)
         
     return grid
@@ -705,8 +705,8 @@ def evaluate_criterion(
     """Evaluate declared mathematical criterion with arbitrary-precision comparison."""
     try:
         with mpmath.workdps(dps + 15):
-            obs = mpmath.mpf(str(observed_str).strip())
-            thresh = mpmath.mpf(str(threshold_str).strip())
+            obs = mpmath.mpf(observed_str.strip())
+            thresh = mpmath.mpf(threshold_str.strip())
             
             if operator == "<=":
                 return bool(obs <= thresh)
