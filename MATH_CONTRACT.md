@@ -306,6 +306,49 @@ For \(\delta=0\):
 
 for all \(K\).
 
+### 11.1 Exact Symmetry-Complete Centrifuge Defect
+
+For an off-critical zero pair at \(\rho_+ = 1/2 + \delta + i\gamma\) and its reflection partner \(\rho_- = 1/2 - \delta + i\gamma\), let \(\rho_0 = 1/2 + i\gamma\) denote the clean critical-line baseline.
+
+The characters under grade \(K\) are:
+
+\[
+q_+^K = \tau^{K\delta}e^{iK\gamma\log\tau},
+\qquad
+q_-^K = \tau^{-K\delta}e^{iK\gamma\log\tau},
+\qquad
+2 q_0^K = 2 e^{iK\gamma\log\tau}.
+\]
+
+Define the symmetry-complete grade defect against the double-critical-line baseline:
+
+\[
+D_K = q_+^K + q_-^K - 2 q_0^K.
+\]
+
+Then exactly:
+
+\[
+D_K = 2 e^{iK\gamma\log\tau}\left[\cosh(K\delta\log\tau) - 1\right].
+\]
+
+Taking absolute values:
+
+\[
+\boxed{|D_K| = 2\left[\cosh(K\delta\log\tau) - 1\right] = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right)}.
+\]
+
+Properties:
+1. **Vanishing Baseline**: \(D_K = 0\) for \(\delta = 0\), and \(D_0 = 0\) for all \(\delta\).
+2. **Even Symmetry**: \(D_K(-\delta) = D_K(\delta)\), and \(|D_{-K}| = |D_K|\).
+3. **Small-Argument Quadratic Scaling**: Near \(K\delta \to 0\),
+   \[
+   |D_K| = (K\delta\log\tau)^2 + \mathcal{O}((K\delta)^4).
+   \]
+4. **Hyperbolic Radial Amplification**: For any fixed \(\delta \neq 0\), \(|D_K| \to \infty\) exponentially as \(|K| \to \infty\).
+
+*Note:* This is an algebraic property of the grade character, not proof or refutation of RH.
+
 ## 12. Converter formulas
 
 For positive-imaginary nontrivial zeros included through a declared cutoff:
@@ -387,6 +430,73 @@ the Möbius-inverted single-zero contribution \(C_\pi(x, \rho) = \sum_{m\ge1}\fr
 subject to matching truncation and domain semantics.
 
 *Note:* This is an exact covariance under the explicitly coupled change of coordinates, **not** a non-trivial automorphism of \(\zeta(s)\).
+
+### 12.2 Symmetry-Complete Split Defect and Local Taylor Behavior
+
+When a double critical-line pair splits symmetrically into a quartet \(\{1/2 \pm \delta \pm i\gamma\}\), the baseline contains two coincident critical-line pairs at \(\rho_0 = 1/2 + i\gamma\).
+
+The symmetric split defect is defined as:
+
+\[
+\boxed{S_J(\delta) = C_J(x, 1/2 + \delta + i\gamma) + C_J(x, 1/2 - \delta + i\gamma) - 2 C_J(x, 1/2 + i\gamma)}
+\]
+
+and analogously
+
+\[
+\boxed{S_\pi(\delta) = C_\pi(x, 1/2 + \delta + i\gamma) + C_\pi(x, 1/2 - \delta + i\gamma) - 2 C_\pi(x, 1/2 + i\gamma)}.
+\]
+
+For any sufficiently smooth converter contribution \(C(\beta)\) at fixed \(x\) and \(\gamma\), the Taylor expansion around \(\beta = 1/2\) is:
+
+\[
+C(1/2 + \delta) = C(1/2) + C'(1/2)\delta + \frac{1}{2}C''(1/2)\delta^2 + \frac{1}{6}C'''(1/2)\delta^3 + \mathcal{O}(\delta^4),
+\]
+\[
+C(1/2 - \delta) = C(1/2) - C'(1/2)\delta + \frac{1}{2}C''(1/2)\delta^2 - \frac{1}{6}C'''(1/2)\delta^3 + \mathcal{O}(\delta^4).
+\]
+
+Adding these and subtracting \(2 C(1/2)\), all odd-order terms cancel identically:
+
+\[
+\boxed{S(\delta) = C''(1/2)\delta^2 + \mathcal{O}(\delta^4)}.
+\]
+
+Consequences:
+1. **Even Symmetry**: \(S(-\delta) = S(\delta)\).
+2. **Vanishing Baseline**: \(S(0) = 0\).
+3. **Stationary Point**: \(\left.\frac{dS}{d\delta}\right|_{\delta=0} = 0\).
+4. **Small-\(\delta\) Quadratic Scaling**: \(\frac{S(\lambda\delta)}{S(\delta)} \to \lambda^2\) as \(\delta \to 0\) where \(S(\delta) \neq 0\).
+
+### 12.3 Separation of Gauge Covariance vs Grade Amplification
+
+The repository strictly distinguishes two fundamentally different mathematical operations:
+
+1. **Coupled Coordinate Covariance (Scale Gauge)**:
+   \[
+   A = \tau^k,
+   \qquad
+   \rho' = A\rho,
+   \qquad
+   x' = x^{1/A}.
+   \]
+   Because \(\rho'\log x' = \rho\log x\), this is an exact coordinate re-expression.
+   It leaves converter wave contributions \(C_J(x', \rho') = C_J(x, \rho)\) and \(\zeta\)-representation \(Z_A(As) = \zeta(s)\) exactly invariant.
+   **It does NOT produce arithmetic amplification.**
+
+2. **Grade / Centrifuge Evolution**:
+   \[
+   q_\rho = \tau^{\rho - 1/2},
+   \qquad
+   q_\rho \mapsto q_\rho^K.
+   \]
+   For off-critical zeros (\(\delta \neq 0\)), this produces genuine exponential radial magnification:
+   \[
+   |D_K| = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right).
+   \]
+
+These mechanisms are mathematically distinct and are evaluated by separate code paths.
+
 
 
 ## 13. Deterministic test vectors

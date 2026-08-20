@@ -307,3 +307,50 @@ def centrifuge_q_k(
         phase = k_val * g_val * mpmath.log(tau)
         
         return modulus * (mpmath.cos(phase) + mpmath.j * mpmath.sin(phase))
+
+
+def symmetric_centrifuge_defect(
+    delta: Union[float, str, mpmath.mpf, int],
+    gamma: Union[float, str, mpmath.mpf, int],
+    K: Union[float, str, mpmath.mpf, int],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [AUDIT PATH] Exact algebraic calculation of the symmetry-complete centrifuge defect:
+    D_K = q_+^K + q_-^K - 2 * q_0^K
+    where q_+^K = tau^(K*delta) * exp(i*K*gamma*ln(tau)),
+          q_-^K = tau^(-K*delta) * exp(i*K*gamma*ln(tau)),
+          q_0^K = exp(i*K*gamma*ln(tau)).
+    Evaluated at arbitrary precision dps without binary-float downcast.
+    """
+    with mpmath.workdps(dps + 15):
+        d_val = to_mpf(delta, dps=dps + 15)
+        g_val = to_mpf(gamma, dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        
+        q_plus = centrifuge_q_k(d_val, g_val, k_val, dps=dps + 15)
+        q_minus = centrifuge_q_k(-d_val, g_val, k_val, dps=dps + 15)
+        q_zero = centrifuge_q_k(mpmath.mpf('0'), g_val, k_val, dps=dps + 15)
+        
+        return q_plus + q_minus - mpmath.mpf(2) * q_zero
+
+
+def symmetric_centrifuge_defect_expected(
+    delta: Union[float, str, mpmath.mpf, int],
+    K: Union[float, str, mpmath.mpf, int],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Exact closed-form absolute value of the symmetric centrifuge defect:
+    |D_K| = 2 * [cosh(K * delta * ln(tau)) - 1] = 4 * sinh^2(K * delta * ln(tau) / 2).
+    Evaluated at arbitrary precision dps.
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps)
+        d_val = to_mpf(delta, dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        
+        arg = k_val * d_val * mpmath.log(tau) / mpmath.mpf(2)
+        sh = mpmath.sinh(arg)
+        return mpmath.mpf(4) * (sh * sh)
+

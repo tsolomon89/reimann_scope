@@ -485,3 +485,103 @@ def test_decimal_string_serialization_and_readme():
     assert "Argmax Parameter Point" in readme
 
 
+def test_precision_preservation_without_float_downcast():
+    """
+    Verify that summary statistics retain 80+ dps precision and do not downcast
+    tiny high-precision values (e.g. 1e-120) through IEEE float.
+    """
+    dps = 80
+    spec = {
+        "id": "test-extreme-precision",
+        "title": "Test Extreme Precision",
+        "hypothesis": {"statement": "Testing precision without float downcast"},
+        "criterion": {"metric": "val", "operator": "<=", "threshold": "1e-100", "aggregation": "max_abs"},
+        "precision": {"dps": dps}
+    }
+    
+    val1 = "1.00000000000000000000000000000000000000000000000000000000000000000000000000000001e-120"
+    val2 = "-2.00000000000000000000000000000000000000000000000000000000000000000000000000000002e-120"
+    
+    results = [
+        {"point_id": 0, "status": "ok", "inputs": {"p": "0"}, "outputs": {"val": val1}},
+        {"point_id": 1, "status": "ok", "inputs": {"p": "1"}, "outputs": {"val": val2}}
+    ]
+    
+    summary = research_runner.compute_summary(spec, "run-prec", results, "complete")
+    stats = summary["report_metrics"]["val"]
+    
+    # max_abs must be positive magnitude of val2
+    assert stats["max_abs"].startswith("2.0")
+    assert "e-120" in stats["max_abs"]
+    assert not stats["max_abs"].startswith("-")
+    
+    # argmax value must preserve signed string
+    assert stats["argmax_abs"]["value"].startswith("-2.0")
+    assert stats["argmax_abs"]["abs_value"].startswith("2.0")
+    
+    # criterion met at extreme precision
+    assert summary["criterion"]["criterion_met"] is True
+
+
+def test_criterion_aggregations_all_modes():
+    """
+    Verify all criterion aggregation modes: max_abs, max, min, all, none.
+    """
+    dps = 50
+    results = [
+        {"point_id": 0, "status": "ok", "inputs": {"p": "0"}, "outputs": {"val": "-5.0"}},
+        {"point_id": 1, "status": "ok", "inputs": {"p": "1"}, "outputs": {"val": "3.0"}},
+        {"point_id": 2, "status": "ok", "inputs": {"p": "2"}, "outputs": {"val": "-1.0"}}
+    ]
+    
+    # 1. max_abs: max abs is 5.0 <= 4.0 -> False
+    spec_max_abs = {
+        "id": "t1", "title": "t1", "hypothesis": {"statement": "h"},
+        "criterion": {"metric": "val", "operator": "<=", "threshold": "4.0", "aggregation": "max_abs"},
+        "precision": {"dps": dps}
+    }
+    s_max_abs = research_runner.compute_summary(spec_max_abs, "r1", results, "complete")
+    assert s_max_abs["criterion"]["criterion_met"] is False
+    assert s_max_abs["criterion"]["observed"] == "5.0"
+    
+    # 2. max: max signed is 3.0 <= 4.0 -> True
+    spec_max = {
+        "id": "t2", "title": "t2", "hypothesis": {"statement": "h"},
+        "criterion": {"metric": "val", "operator": "<=", "threshold": "4.0", "aggregation": "max"},
+        "precision": {"dps": dps}
+    }
+    s_max = research_runner.compute_summary(spec_max, "r2", results, "complete")
+    assert s_max["criterion"]["criterion_met"] is True
+    assert s_max["criterion"]["observed"] == "3.0"
+    
+    # 3. min: min signed is -5.0 <= -4.0 -> True
+    spec_min = {
+        "id": "t3", "title": "t3", "hypothesis": {"statement": "h"},
+        "criterion": {"metric": "val", "operator": "<=", "threshold": "-4.0", "aggregation": "min"},
+        "precision": {"dps": dps}
+    }
+    s_min = research_runner.compute_summary(spec_min, "r3", results, "complete")
+    assert s_min["criterion"]["criterion_met"] is True
+    assert s_min["criterion"]["observed"] == "-5.0"
+    
+    # 4. all: all points <= 4.0 -> (-5.0 <= 4, 3.0 <= 4, -1.0 <= 4) -> True
+    spec_all = {
+        "id": "t4", "title": "t4", "hypothesis": {"statement": "h"},
+        "criterion": {"metric": "val", "operator": "<=", "threshold": "4.0", "aggregation": "all"},
+        "precision": {"dps": dps}
+    }
+    s_all = research_runner.compute_summary(spec_all, "r4", results, "complete")
+    assert s_all["criterion"]["criterion_met"] is True
+    
+    # 5. none (observational): criterion_met = None, observed = None
+    spec_none = {
+        "id": "t5", "title": "t5", "hypothesis": {"statement": "h"},
+        "criterion": {"metric": "val", "aggregation": "none"},
+        "precision": {"dps": dps}
+    }
+    s_none = research_runner.compute_summary(spec_none, "r5", results, "complete")
+    assert s_none["criterion"]["criterion_met"] is None
+    assert s_none["criterion"]["observed"] is None
+
+
+

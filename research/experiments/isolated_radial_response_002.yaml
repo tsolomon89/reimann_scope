@@ -1,0 +1,76 @@
+schema_version: "1"
+id: isolated-radial-response-002
+title: Isolated off-critical radial response and symmetric split defect in prime reconstruction
+
+hypothesis:
+  statement: >
+    Characterize the isolated zero converter response and the symmetric split defect
+    S_J(delta) = C_J(x, 1/2+delta+igamma) + C_J(x, 1/2-delta+igamma) - 2*C_J(x, 1/2+igamma)
+    and S_pi(delta) across single-pair diagnostic and symmetry-complete split modes at 80 dps.
+    Observational experiment characterizing even symmetry S(-delta) = S(delta), baseline vanishing
+    S(0) = 0, and local quadratic scaling without asserting an artificial pass/fail threshold.
+
+criterion:
+  metric: residual
+  aggregation: none
+
+report_metrics:
+  - metric: delta_cj
+    label: "Single-zero J contribution shift Delta C_J"
+    kind: perturbation_response
+  - metric: delta_cpi
+    label: "Single-zero pi contribution shift Delta C_pi"
+    kind: perturbation_response
+  - metric: delta_pi_n
+    label: "Full spectrum prime count shift Delta pi_N(x)"
+    kind: perturbation_response
+  - metric: split_defect_cj
+    label: "Symmetric split defect S_J(delta) = C_J(rho_+) + C_J(rho_-) - 2*C_J(rho_0)"
+    kind: perturbation_response
+  - metric: split_defect_cpi
+    label: "Symmetric split defect S_pi(delta) = C_pi(rho_+) + C_pi(rho_-) - 2*C_pi(rho_0)"
+    kind: perturbation_response
+  - metric: split_defect_pi_n
+    label: "Symmetric split reconstructed prime shift S_pi_N(x)"
+    kind: perturbation_response
+  - metric: symmetry_error
+    label: "Split defect even symmetry error |S(delta) - S(-delta)|"
+    kind: fixed_m_truncation_diagnostic
+
+engine:
+  operation: converter_perturbation
+
+parameters:
+  zero_index:
+    kind: explicit
+    values: ["0", "1", "2"]
+  delta:
+    kind: explicit
+    values: [
+      "-0.05",
+      "-0.01",
+      "-0.005",
+      "-0.001",
+      "-0.0005",
+      "0.0",
+      "0.0005",
+      "0.001",
+      "0.005",
+      "0.01",
+      "0.05"
+    ]
+  x:
+    kind: explicit
+    values: ["10.0", "20.0", "50.0"]
+  num_zeros:
+    kind: explicit
+    values: ["10"]
+  perturbation_mode:
+    kind: explicit
+    values: ["single_pair_diagnostic", "symmetry_complete_split"]
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true

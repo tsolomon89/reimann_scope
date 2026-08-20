@@ -209,12 +209,12 @@ def construct_perturbed_zeros_audit(
     
     Modes:
     - single_pair_diagnostic:
-        Returns [1/2 + delta + i*gamma]. Diagnostic deformation (single wave).
-    - symmetry_complete_quartet:
-        If delta == 0: Returns [1/2 + i*gamma] (baseline single pair).
-        If delta != 0: Returns [1/2 + delta + i*gamma, 1/2 - delta + i*gamma],
-        representing the full 4-point orbit {1/2 +/- delta +/- i*gamma}
-        via upper-half-plane zeros incorporated through 2*Re.
+        Returns [1/2 + delta + i*gamma]. Diagnostic single-wave displacement.
+    - symmetry_complete_split (alias: symmetry_complete_quartet):
+        Returns [1/2 + delta + i*gamma, 1/2 - delta + i*gamma],
+        representing the full reflection/conjugation quartet orbit
+        {1/2 +/- delta +/- i*gamma} via upper-half-plane zeros incorporated through 2*Re.
+        As delta -> 0, the two zeros coalesce into two coincident critical-line zeros.
     """
     with mpmath.workdps(dps + 15):
         if isinstance(rho_clean, (int, float, mpmath.mpf)):
@@ -227,9 +227,7 @@ def construct_perturbed_zeros_audit(
             
         d_val = math_core.to_mpf(delta, dps=dps + 15)
         
-        if mode == "symmetry_complete_quartet":
-            if abs(d_val) < mpmath.mpf("1e-50"):
-                return [mpmath.mpc(mpmath.mpf('0.5'), gamma)]
+        if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
             rho_plus = mpmath.mpc(mpmath.mpf('0.5') + d_val, gamma)
             rho_minus = mpmath.mpc(mpmath.mpf('0.5') - d_val, gamma)
             return [rho_plus, rho_minus]
@@ -247,10 +245,17 @@ def compute_perturbed_contributions_audit(
 ) -> Dict[str, Any]:
     """
     [AUDIT PATH] Compute clean vs perturbed C_J and C_pi contributions.
-    Returns dictionary with exact mpmath values:
-    - clean_rho, perturbed_rhos
-    - cj_clean, cj_perturbed, delta_cj
-    - cpi_clean, cpi_perturbed, delta_cpi
+    
+    For symmetry_complete_split:
+      Baseline uses multiplicity 2 (two coincident critical-line pairs):
+        S_J(delta) = C_J(x, rho_+) + C_J(x, rho_-) - 2 * C_J(x, rho_0)
+        S_pi(delta) = C_pi(x, rho_+) + C_pi(x, rho_-) - 2 * C_pi(x, rho_0)
+      At delta = 0, S_J(0) = 0 and S_pi(0) = 0 exactly.
+      
+    For single_pair_diagnostic:
+      Baseline uses multiplicity 1:
+        Delta C_J(delta) = C_J(x, rho_+) - C_J(x, rho_0)
+        Delta C_pi(delta) = C_pi(x, rho_+) - C_pi(x, rho_0)
     """
     with mpmath.workdps(dps + 15):
         if isinstance(rho_clean, (int, float, mpmath.mpf)):
@@ -262,9 +267,16 @@ def compute_perturbed_contributions_audit(
             
         pert_rhos = construct_perturbed_zeros_audit(clean_mpc, delta, mode=mode, dps=dps)
         
-        cj_clean = zero_j_contribution_audit(x, clean_mpc, dps=dps)
-        cpi_clean = zero_pi_contribution_audit(x, clean_mpc, dps=dps)
+        single_cj_clean = zero_j_contribution_audit(x, clean_mpc, dps=dps)
+        single_cpi_clean = zero_pi_contribution_audit(x, clean_mpc, dps=dps)
         
+        if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
+            cj_clean = mpmath.mpf(2) * single_cj_clean
+            cpi_clean = mpmath.mpf(2) * single_cpi_clean
+        else:
+            cj_clean = single_cj_clean
+            cpi_clean = single_cpi_clean
+            
         cj_pert = mpmath.mpf('0')
         cpi_pert = mpmath.mpf('0')
         for r in pert_rhos:
@@ -280,10 +292,13 @@ def compute_perturbed_contributions_audit(
             "cj_clean": cj_clean,
             "cj_perturbed": cj_pert,
             "delta_cj": delta_cj,
+            "split_defect_cj": delta_cj,
             "cpi_clean": cpi_clean,
             "cpi_perturbed": cpi_pert,
-            "delta_cpi": delta_cpi
+            "delta_cpi": delta_cpi,
+            "split_defect_cpi": delta_cpi
         }
+
 
 
 def riemann_explicit_j_audit(
@@ -484,16 +499,17 @@ class PrimeReconstructionCache:
         
         if delta is not None:
             g = gamma if gamma is not None else orig_zero.imag
-            if mode == "symmetry_complete_quartet":
-                if abs(delta) < 1e-12:
-                    new_contrib = orig_contrib
-                else:
-                    rho_p = complex(0.5 + delta, g)
-                    rho_m = complex(0.5 - delta, g)
-                    new_contrib = (
-                        compute_single_zero_contribution_vectorized(self.x_grid, rho_p) +
-                        compute_single_zero_contribution_vectorized(self.x_grid, rho_m)
-                    )
+            if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
+                rho_p = complex(0.5 + delta, g)
+                rho_m = complex(0.5 - delta, g)
+                new_contrib = (
+                    compute_single_zero_contribution_vectorized(self.x_grid, rho_p) +
+                    compute_single_zero_contribution_vectorized(self.x_grid, rho_m)
+                )
+                # Baseline for split mode contains 2 copies of orig_contrib
+                clean_pi = clean_pi - orig_contrib
+                perturbed_pi = clean_pi - (new_contrib - 2.0 * orig_contrib)
+                return clean_pi, perturbed_pi
             else:
                 # single_pair_diagnostic
                 rho_pert = complex(0.5 + delta, g)
@@ -506,4 +522,5 @@ class PrimeReconstructionCache:
         # Delta C = new - orig
         perturbed_pi = clean_pi - (new_contrib - orig_contrib)
         return clean_pi, perturbed_pi
+
 

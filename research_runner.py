@@ -98,12 +98,20 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         return False, "Spec missing 'hypothesis.statement'"
         
     crit = spec["criterion"]
-    if not isinstance(crit, dict) or not all(k in crit for k in ["metric", "operator", "threshold"]):
-        return False, "Spec 'criterion' must define 'metric', 'operator', and 'threshold'"
+    if not isinstance(crit, dict) or "metric" not in crit:
+        return False, "Spec 'criterion' must be a mapping defining at least 'metric'"
         
-    valid_ops = ["<=", "<", ">=", ">", "==", "!="]
-    if crit["operator"] not in valid_ops:
-        return False, f"Invalid criterion operator '{crit['operator']}', must be one of {valid_ops}"
+    aggregation = crit.get("aggregation", "max_abs")
+    valid_aggs = ["max_abs", "max", "min", "all", "none"]
+    if aggregation not in valid_aggs:
+        return False, f"Invalid criterion aggregation '{aggregation}', must be one of {valid_aggs}"
+        
+    if aggregation != "none":
+        if "operator" not in crit or "threshold" not in crit:
+            return False, "Spec 'criterion' with active aggregation must define 'operator' and 'threshold'"
+        valid_ops = ["<=", "<", ">=", ">", "==", "!="]
+        if crit["operator"] not in valid_ops:
+            return False, f"Invalid criterion operator '{crit['operator']}', must be one of {valid_ops}"
         
     engine = spec["engine"]
     if not isinstance(engine, dict) or "operation" not in engine:
@@ -114,10 +122,13 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         "kernel_identity",
         "transform_zero_map",
         "zeta_trace_compare",
-        "converter_perturbation"
+        "converter_perturbation",
+        "symmetric_centrifuge",
+        "coupled_perturbation_covariance"
     ]
     if engine["operation"] not in valid_engine_ops:
         return False, f"Unknown engine operation '{engine['operation']}'. Permitted: {valid_engine_ops}"
+
         
     params = spec["parameters"]
     if not isinstance(params, dict) or len(params) == 0:
@@ -418,28 +429,40 @@ def evaluate_point(
                 gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if zero_idx < len(ref_zeros_str) else ref_zeros_str[0])
                 rho_clean = mpmath.mpc('0.5', gamma_str)
                 
-                # Compute isolated single-zero contributions
+                # Compute isolated single-zero / split contributions
                 contrib_dict = converter.compute_perturbed_contributions_audit(
-                    x_str, rho_clean, delta_str, mode=mode, dps=dps + 10
+                    x_str, rho_clean, delta_str, mode=mode, dps=dps + 15
                 )
                 
                 # Build clean baseline zeros list up to num_zeros
                 clean_zeros_mpc = [mpmath.mpc('0.5', g) for g in ref_zeros_str[:num_zeros]]
-                
-                # Build modified synthetic spectrum
                 pert_rhos = contrib_dict["perturbed_rhos"]
-                modified_zeros_mpc = list(clean_zeros_mpc)
-                if 0 <= zero_idx < len(modified_zeros_mpc):
-                    # Replace single zero with perturbed rhos
+                
+                if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
+                    # Baseline contains two coincident copies of rho_clean for split mode
+                    clean_for_recon = clean_zeros_mpc[:zero_idx] + [rho_clean, rho_clean] + clean_zeros_mpc[zero_idx + 1:]
                     modified_zeros_mpc = clean_zeros_mpc[:zero_idx] + pert_rhos + clean_zeros_mpc[zero_idx + 1:]
+                else:
+                    clean_for_recon = clean_zeros_mpc
+                    modified_zeros_mpc = list(clean_zeros_mpc)
+                    if 0 <= zero_idx < len(modified_zeros_mpc):
+                        modified_zeros_mpc = clean_zeros_mpc[:zero_idx] + pert_rhos + clean_zeros_mpc[zero_idx + 1:]
                 
                 # Compute full explicit formula reconstructions
-                full_clean_pi = converter.riemann_explicit_pi_audit(x_str, clean_zeros_mpc, dps=dps + 10)
-                full_pert_pi = converter.riemann_explicit_pi_audit(x_str, modified_zeros_mpc, dps=dps + 10)
+                full_clean_pi = converter.riemann_explicit_pi_audit(x_str, clean_for_recon, dps=dps + 15)
+                full_pert_pi = converter.riemann_explicit_pi_audit(x_str, modified_zeros_mpc, dps=dps + 15)
                 delta_pi_n = full_pert_pi - full_clean_pi
                 
+                # Evaluate symmetry error S(delta) - S(-delta)
+                neg_contrib = converter.compute_perturbed_contributions_audit(
+                    x_str, rho_clean, str(-mpmath.mpf(delta_str)), mode=mode, dps=dps + 15
+                )
+                sym_err_cj = abs(contrib_dict["delta_cj"] - neg_contrib["delta_cj"])
+                sym_err_cpi = abs(contrib_dict["delta_cpi"] - neg_contrib["delta_cpi"])
+                symmetry_error = max(sym_err_cj, sym_err_cpi)
+                
                 # True prime pi(x)
-                x_mpf = math_core.to_mpf(x_str, dps=dps + 10)
+                x_mpf = math_core.to_mpf(x_str, dps=dps + 15)
                 try:
                     true_pi_val = reference_data.prime_pi(float(x_mpf)) if x_mpf <= 100000 else "N/A"
                 except Exception:
@@ -458,15 +481,142 @@ def evaluate_point(
                     "clean_cj": mpmath.nstr(contrib_dict["cj_clean"], n=dps),
                     "perturbed_cj": mpmath.nstr(contrib_dict["cj_perturbed"], n=dps),
                     "delta_cj": mpmath.nstr(contrib_dict["delta_cj"], n=dps),
+                    "split_defect_cj": mpmath.nstr(contrib_dict["delta_cj"], n=dps),
                     "clean_cpi": mpmath.nstr(contrib_dict["cpi_clean"], n=dps),
                     "perturbed_cpi": mpmath.nstr(contrib_dict["cpi_perturbed"], n=dps),
                     "delta_cpi": mpmath.nstr(contrib_dict["delta_cpi"], n=dps),
+                    "split_defect_cpi": mpmath.nstr(contrib_dict["delta_cpi"], n=dps),
                     "full_clean_pi": mpmath.nstr(full_clean_pi, n=dps),
                     "full_perturbed_pi": mpmath.nstr(full_pert_pi, n=dps),
                     "delta_pi_n": mpmath.nstr(delta_pi_n, n=dps),
+                    "split_defect_pi_n": mpmath.nstr(delta_pi_n, n=dps),
+                    "symmetry_error": mpmath.nstr(symmetry_error, n=dps),
                     "full_reconstruction_diff": mpmath.nstr(delta_pi_n, n=dps),
                     "true_pi": str(true_pi_val),
                     "residual": mpmath.nstr(abs(delta_pi_n), n=dps)
+                }, None
+
+
+            elif operation == "symmetric_centrifuge":
+                delta_str = inputs.get("delta", "0.0")
+                gamma_str = inputs.get("gamma", "14.13472514173469379045725198356247027078425711569924317568556746")
+                k_str = inputs.get("K", inputs.get("k", "0"))
+                
+                D_K = math_core.symmetric_centrifuge_defect(delta_str, gamma_str, k_str, dps=dps + 15)
+                expected_abs_D_K = math_core.symmetric_centrifuge_defect_expected(delta_str, k_str, dps=dps + 15)
+                abs_D_K = abs(D_K)
+                identity_error = abs(abs_D_K - expected_abs_D_K)
+                
+                k_val = math_core.to_mpf(k_str, dps=dps + 15)
+                d_val = math_core.to_mpf(delta_str, dps=dps + 15)
+                tau = math_core.get_tau(dps=dps + 15)
+                arg_scale = abs(k_val * d_val * mpmath.log(tau))
+                
+                if arg_scale > mpmath.mpf("1e-40"):
+                    small_arg_ratio = abs_D_K / (k_val * d_val * mpmath.log(tau))**2
+                    small_arg_ratio_str = mpmath.nstr(small_arg_ratio, n=dps)
+                elif abs(d_val) < mpmath.mpf("1e-40") or abs(k_val) < mpmath.mpf("1e-40"):
+                    small_arg_ratio_str = "1.0"
+                else:
+                    small_arg_ratio_str = "N/A"
+                    
+                return "ok", {
+                    "delta": str(delta_str),
+                    "gamma": str(gamma_str),
+                    "K": str(k_str),
+                    "D_K_re": mpmath.nstr(D_K.real, n=dps),
+                    "D_K_im": mpmath.nstr(D_K.imag, n=dps),
+                    "abs_D_K": mpmath.nstr(abs_D_K, n=dps),
+                    "expected_abs_D_K": mpmath.nstr(expected_abs_D_K, n=dps),
+                    "identity_error": mpmath.nstr(identity_error, n=dps),
+                    "small_arg_ratio": small_arg_ratio_str,
+                    "residual": mpmath.nstr(identity_error, n=dps)
+                }, None
+
+
+            elif operation == "coupled_perturbation_covariance":
+                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
+                delta_str = inputs.get("delta", "0.0")
+                k_str = inputs.get("k", inputs.get("K", "0"))
+                x_str = inputs.get("x", "20.0")
+                num_zeros = int(inputs.get("num_zeros", "10"))
+                mode = inputs.get("perturbation_mode", inputs.get("mode", "single_pair_diagnostic"))
+                
+                ref_zeros_str = reference_data.load_reference_zeros()[:max(num_zeros, zero_idx + 1)]
+                if not ref_zeros_str:
+                    ref_zeros_str = ["14.13472514173469379045725198356247027078425711569924317568556746"]
+                
+                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if zero_idx < len(ref_zeros_str) else ref_zeros_str[0])
+                
+                k_val = math_core.to_mpf(k_str, dps=dps + 15)
+                tau = math_core.get_tau(dps=dps + 15)
+                A = mpmath.power(tau, k_val)
+                x_mpf = math_core.to_mpf(x_str, dps=dps + 15)
+                x_prime = mpmath.power(x_mpf, mpmath.mpf(1) / A)
+                
+                rho_clean = mpmath.mpc('0.5', gamma_str)
+                rho_clean_prime = A * rho_clean
+                d_val = math_core.to_mpf(delta_str, dps=dps + 15)
+                
+                # Unperturbed clean converter wave covariance
+                clean_cj = converter.zero_j_contribution_audit(x_mpf, rho_clean, dps=dps + 15)
+                clean_cj_prime = converter.zero_j_contribution_audit(x_prime, rho_clean_prime, dps=dps + 15)
+                clean_cj_residual = abs(clean_cj_prime - clean_cj)
+                
+                # Perturbed converter wave covariance
+                if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
+                    rho_plus = mpmath.mpc(mpmath.mpf('0.5') + d_val, rho_clean.imag)
+                    rho_minus = mpmath.mpc(mpmath.mpf('0.5') - d_val, rho_clean.imag)
+                    rho_plus_prime = A * rho_plus
+                    rho_minus_prime = A * rho_minus
+                    
+                    pert_cj = (
+                        converter.zero_j_contribution_audit(x_mpf, rho_plus, dps=dps + 15) +
+                        converter.zero_j_contribution_audit(x_mpf, rho_minus, dps=dps + 15)
+                    )
+                    pert_cj_prime = (
+                        converter.zero_j_contribution_audit(x_prime, rho_plus_prime, dps=dps + 15) +
+                        converter.zero_j_contribution_audit(x_prime, rho_minus_prime, dps=dps + 15)
+                    )
+                    pert_cj_residual = abs(pert_cj_prime - pert_cj)
+                    
+                    split_defect = pert_cj - mpmath.mpf(2) * clean_cj
+                    split_defect_prime = pert_cj_prime - mpmath.mpf(2) * clean_cj_prime
+                    delta_cj_residual = abs(split_defect_prime - split_defect)
+                else:
+                    # single_pair_diagnostic
+                    rho_pert = mpmath.mpc(mpmath.mpf('0.5') + d_val, rho_clean.imag)
+                    rho_pert_prime = A * rho_pert
+                    pert_cj = converter.zero_j_contribution_audit(x_mpf, rho_pert, dps=dps + 15)
+                    pert_cj_prime = converter.zero_j_contribution_audit(x_prime, rho_pert_prime, dps=dps + 15)
+                    pert_cj_residual = abs(pert_cj_prime - pert_cj)
+                    
+                    delta_cj = pert_cj - clean_cj
+                    delta_cj_prime = pert_cj_prime - clean_cj_prime
+                    delta_cj_residual = abs(delta_cj_prime - delta_cj)
+                    
+                cov_residual = max(clean_cj_residual, pert_cj_residual, delta_cj_residual)
+                
+                return "ok", {
+                    "k": str(k_str),
+                    "A": mpmath.nstr(A, n=dps),
+                    "x": mpmath.nstr(x_mpf, n=dps),
+                    "x_prime": mpmath.nstr(x_prime, n=dps),
+                    "zero_index": str(zero_idx),
+                    "gamma": mpmath.nstr(rho_clean.imag, n=dps),
+                    "A_gamma": mpmath.nstr(A * rho_clean.imag, n=dps),
+                    "delta": str(delta_str),
+                    "A_delta": mpmath.nstr(A * d_val, n=dps),
+                    "perturbation_mode": mode,
+                    "clean_cj": mpmath.nstr(clean_cj, n=dps),
+                    "clean_cj_prime": mpmath.nstr(clean_cj_prime, n=dps),
+                    "clean_cj_residual": mpmath.nstr(clean_cj_residual, n=dps),
+                    "pert_cj": mpmath.nstr(pert_cj, n=dps),
+                    "pert_cj_prime": mpmath.nstr(pert_cj_prime, n=dps),
+                    "pert_cj_residual": mpmath.nstr(pert_cj_residual, n=dps),
+                    "delta_cj_residual": mpmath.nstr(delta_cj_residual, n=dps),
+                    "covariance_residual": mpmath.nstr(cov_residual, n=dps),
+                    "residual": mpmath.nstr(cov_residual, n=dps)
                 }, None
 
 
@@ -480,26 +630,28 @@ def evaluate_point(
 def evaluate_criterion(
     observed_str: str,
     operator: str,
-    threshold_str: str
+    threshold_str: str,
+    dps: int = 80
 ) -> bool:
     """Evaluate declared mathematical criterion with arbitrary-precision comparison."""
     try:
-        obs = mpmath.mpf(str(observed_str).strip())
-        thresh = mpmath.mpf(str(threshold_str).strip())
-        
-        if operator == "<=":
-            return bool(obs <= thresh)
-        elif operator == "<":
-            return bool(obs < thresh)
-        elif operator == ">=":
-            return bool(obs >= thresh)
-        elif operator == ">":
-            return bool(obs > thresh)
-        elif operator == "==":
-            return bool(abs(obs - thresh) < mpmath.mpf('1e-50'))
-        elif operator == "!=":
-            return bool(abs(obs - thresh) >= mpmath.mpf('1e-50'))
-        return False
+        with mpmath.workdps(dps + 15):
+            obs = mpmath.mpf(str(observed_str).strip())
+            thresh = mpmath.mpf(str(threshold_str).strip())
+            
+            if operator == "<=":
+                return bool(obs <= thresh)
+            elif operator == "<":
+                return bool(obs < thresh)
+            elif operator == ">=":
+                return bool(obs >= thresh)
+            elif operator == ">":
+                return bool(obs > thresh)
+            elif operator == "==":
+                return bool(abs(obs - thresh) < mpmath.mpf('1e-50'))
+            elif operator == "!=":
+                return bool(abs(obs - thresh) >= mpmath.mpf('1e-50'))
+            return False
     except Exception:
         return False
 
@@ -513,71 +665,83 @@ def compute_metric_stats(
 ) -> Dict[str, Any]:
     """
     Compute statistics, argmax, and up to 5 worst points for a single metric across results.
+    All calculations, parsing, comparisons, and formatting are strictly executed within
+    mpmath.workdps(dps + 15).
     Authoritative values are preserved as decimal strings.
     """
-    valid_points = []
-    for idx, r in enumerate(results):
-        if r.get("status") == "ok" and metric_name in r.get("outputs", {}):
-            try:
-                raw_val = r["outputs"][metric_name]
-                mpf_val = mpmath.mpf(str(raw_val).strip())
-                point_id = r.get("point_id", idx)
-                valid_points.append({
-                    "point_id": point_id,
-                    "val": mpf_val,
-                    "val_abs": abs(mpf_val),
-                    "val_str": mpmath.nstr(mpf_val, n=dps),
-                    "inputs": dict(r.get("inputs", {}))
-                })
-            except Exception:
-                pass
-                
-    if not valid_points:
+    with mpmath.workdps(dps + 15):
+        valid_points = []
+        for idx, r in enumerate(results):
+            if r.get("status") == "ok" and metric_name in r.get("outputs", {}):
+                try:
+                    raw_val = r["outputs"][metric_name]
+                    raw_str = str(raw_val).strip()
+                    if raw_str.lower() in ("n/a", "none", "null", ""):
+                        continue
+                    mpf_val = mpmath.mpf(raw_str)
+                    val_abs = abs(mpf_val)
+                    point_id = r.get("point_id", idx)
+                    val_str = mpmath.nstr(mpf_val, n=dps)
+                    abs_val_str = mpmath.nstr(val_abs, n=dps)
+                    valid_points.append({
+                        "point_id": point_id,
+                        "val": mpf_val,
+                        "val_abs": val_abs,
+                        "val_str": val_str,
+                        "abs_val_str": abs_val_str,
+                        "inputs": dict(r.get("inputs", {}))
+                    })
+                except Exception:
+                    pass
+                    
+        if not valid_points:
+            return {
+                "metric": metric_name,
+                "label": label or metric_name,
+                "kind": kind,
+                "count": 0,
+                "min": "N/A",
+                "max": "N/A",
+                "max_abs": "N/A",
+                "argmax_abs": None,
+                "worst_points": []
+            }
+            
+        count = len(valid_points)
+        min_pt = min(valid_points, key=lambda p: p["val"])
+        max_pt = max(valid_points, key=lambda p: p["val"])
+        argmax_abs_pt = max(valid_points, key=lambda p: p["val_abs"])
+        
+        # Sort points descending by absolute value for worst points
+        sorted_by_worst = sorted(valid_points, key=lambda p: p["val_abs"], reverse=True)
+        worst_5 = sorted_by_worst[:5]
+        
+        worst_points_records = [
+            {
+                "point_id": p["point_id"],
+                "value": p["val_str"],
+                "abs_value": p["abs_val_str"],
+                "inputs": p["inputs"]
+            }
+            for p in worst_5
+        ]
+        
         return {
             "metric": metric_name,
             "label": label or metric_name,
             "kind": kind,
-            "count": 0,
-            "min": "N/A",
-            "max": "N/A",
-            "max_abs": "N/A",
-            "argmax_abs": None,
-            "worst_points": []
+            "count": count,
+            "min": min_pt["val_str"],
+            "max": max_pt["val_str"],
+            "max_abs": argmax_abs_pt["abs_val_str"],
+            "argmax_abs": {
+                "point_id": argmax_abs_pt["point_id"],
+                "value": argmax_abs_pt["val_str"],
+                "abs_value": argmax_abs_pt["abs_val_str"],
+                "inputs": argmax_abs_pt["inputs"]
+            },
+            "worst_points": worst_points_records
         }
-        
-    count = len(valid_points)
-    min_pt = min(valid_points, key=lambda p: p["val"])
-    max_pt = max(valid_points, key=lambda p: p["val"])
-    argmax_abs_pt = max(valid_points, key=lambda p: p["val_abs"])
-    
-    # Sort points descending by absolute value for worst points
-    sorted_by_worst = sorted(valid_points, key=lambda p: p["val_abs"], reverse=True)
-    worst_5 = sorted_by_worst[:5]
-    
-    worst_points_records = [
-        {
-            "point_id": p["point_id"],
-            "value": p["val_str"],
-            "inputs": p["inputs"]
-        }
-        for p in worst_5
-    ]
-    
-    return {
-        "metric": metric_name,
-        "label": label or metric_name,
-        "kind": kind,
-        "count": count,
-        "min": min_pt["val_str"],
-        "max": max_pt["val_str"],
-        "max_abs": argmax_abs_pt["val_str"],
-        "argmax_abs": {
-            "point_id": argmax_abs_pt["point_id"],
-            "value": argmax_abs_pt["val_str"],
-            "inputs": argmax_abs_pt["inputs"]
-        },
-        "worst_points": worst_points_records
-    }
 
 
 def compute_summary(
@@ -590,107 +754,139 @@ def compute_summary(
     dps = spec["precision"]["dps"]
     crit_spec = spec["criterion"]
     target_metric = crit_spec["metric"]
-    operator = crit_spec["operator"]
-    threshold_str = str(crit_spec["threshold"])
+    aggregation = crit_spec.get("aggregation", "max_abs")
+    operator = crit_spec.get("operator", "<=")
+    threshold_str = str(crit_spec.get("threshold", "0.0"))
     
     points_req = len(results)
     points_completed = sum(1 for r in results if r.get("status") == "ok")
     points_failed = sum(1 for r in results if r.get("status") == "error")
     
-    # Collect all declared report metrics
-    metric_declarations = []
-    seen_metric_names = set()
-    
-    # Primary criterion metric is always tracked
-    metric_declarations.append({
-        "metric": target_metric,
-        "kind": "primary_criterion",
-        "label": f"Primary criterion metric: {target_metric}"
-    })
-    seen_metric_names.add(target_metric)
-    
-    declared_reports = spec.get("report_metrics", [])
-    if isinstance(declared_reports, list):
-        for item in declared_reports:
-            if isinstance(item, str):
-                m_name = item
-                m_kind = "criterion_component"
-                m_label = item
-            elif isinstance(item, dict):
-                m_name = item.get("metric", "")
-                m_kind = item.get("kind", "criterion_component")
-                m_label = item.get("label", m_name)
-            else:
-                continue
-                
-            if m_name and m_name not in seen_metric_names:
-                metric_declarations.append({
-                    "metric": m_name,
-                    "kind": m_kind,
-                    "label": m_label
-                })
-                seen_metric_names.add(m_name)
-            elif m_name and m_name == target_metric:
-                metric_declarations[0]["kind"] = m_kind
-                metric_declarations[0]["label"] = m_label
-                
-    report_metrics_dict = {}
-    metrics_summary_dict = {}
-    
-    for decl in metric_declarations:
-        m_name = decl["metric"]
-        stats = compute_metric_stats(
-            metric_name=m_name,
-            results=results,
-            dps=dps,
-            kind=decl["kind"],
-            label=decl.get("label")
-        )
-        report_metrics_dict[m_name] = stats
-        metrics_summary_dict[m_name] = stats["max_abs"]
+    with mpmath.workdps(dps + 15):
+        # Collect all declared report metrics
+        metric_declarations = []
+        seen_metric_names = set()
         
-    target_stats = report_metrics_dict.get(target_metric)
-    if target_stats and target_stats["count"] > 0:
-        observed_metric_str = target_stats["max_abs"]
-        criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str)
-        min_observed = target_stats["min"]
-        max_observed = target_stats["max"]
-    else:
-        observed_metric_str = "N/A"
-        criterion_met = None
-        min_observed = "N/A"
-        max_observed = "N/A"
-        
-    summary = {
-        "schema_version": "1",
-        "run_id": run_id,
-        "experiment_id": spec["id"],
-        "status": status,
-        "hypothesis": spec["hypothesis"]["statement"],
-        "points_requested": points_req,
-        "points_completed": points_completed,
-        "points_failed": points_failed,
-        "metrics": metrics_summary_dict,
-        "report_metrics": report_metrics_dict,
-        "criterion": {
+        # Primary criterion metric is always tracked
+        metric_declarations.append({
             "metric": target_metric,
-            "operator": operator,
-            "threshold": threshold_str,
+            "kind": "primary_criterion" if aggregation != "none" else "observational_metric",
+            "label": f"Primary metric: {target_metric}"
+        })
+        seen_metric_names.add(target_metric)
+        
+        declared_reports = spec.get("report_metrics", [])
+        if isinstance(declared_reports, list):
+            for item in declared_reports:
+                if isinstance(item, str):
+                    m_name = item
+                    m_kind = "criterion_component"
+                    m_label = item
+                elif isinstance(item, dict):
+                    m_name = item.get("metric", "")
+                    m_kind = item.get("kind", "criterion_component")
+                    m_label = item.get("label", m_name)
+                else:
+                    continue
+                    
+                if m_name and m_name not in seen_metric_names:
+                    metric_declarations.append({
+                        "metric": m_name,
+                        "kind": m_kind,
+                        "label": m_label
+                    })
+                    seen_metric_names.add(m_name)
+                elif m_name and m_name == target_metric:
+                    metric_declarations[0]["kind"] = m_kind
+                    metric_declarations[0]["label"] = m_label
+                    
+        report_metrics_dict = {}
+        metrics_summary_dict = {}
+        
+        for decl in metric_declarations:
+            m_name = decl["metric"]
+            stats = compute_metric_stats(
+                metric_name=m_name,
+                results=results,
+                dps=dps,
+                kind=decl["kind"],
+                label=decl.get("label")
+            )
+            report_metrics_dict[m_name] = stats
+            metrics_summary_dict[m_name] = stats["max_abs"]
+            
+        target_stats = report_metrics_dict.get(target_metric)
+        
+        if aggregation == "none":
+            observed_metric_str = None
+            criterion_met = None
+            min_observed = target_stats["min"] if target_stats else "N/A"
+            max_observed = target_stats["max"] if target_stats else "N/A"
+        elif target_stats and target_stats["count"] > 0:
+            if aggregation == "max_abs":
+                observed_metric_str = target_stats["max_abs"]
+                criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str, dps=dps)
+            elif aggregation == "max":
+                observed_metric_str = target_stats["max"]
+                criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str, dps=dps)
+            elif aggregation == "min":
+                observed_metric_str = target_stats["min"]
+                criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str, dps=dps)
+            elif aggregation == "all":
+                # Check every point
+                all_met = True
+                for r in results:
+                    if r.get("status") == "ok" and target_metric in r.get("outputs", {}):
+                        raw_v = str(r["outputs"][target_metric]).strip()
+                        if not evaluate_criterion(raw_v, operator, threshold_str, dps=dps):
+                            all_met = False
+                observed_metric_str = target_stats["max_abs"]
+                criterion_met = all_met
+            else:
+                observed_metric_str = target_stats["max_abs"]
+                criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str, dps=dps)
+                
+            min_observed = target_stats["min"]
+            max_observed = target_stats["max"]
+        else:
+            observed_metric_str = "N/A"
+            criterion_met = None
+            min_observed = "N/A"
+            max_observed = "N/A"
+            
+        criterion_dict = {
+            "metric": target_metric,
+            "aggregation": aggregation,
+            "operator": operator if aggregation != "none" else "N/A",
+            "threshold": threshold_str if aggregation != "none" else "N/A",
             "observed": observed_metric_str,
             "criterion_met": criterion_met if status == "complete" else None
-        },
-        "extrema": {
-            "min": min_observed,
-            "max": max_observed
-        },
-        "anomalies": [],
-        "warnings": []
-    }
-    
-    if points_failed > 0:
-        summary["warnings"].append(f"{points_failed} points encountered execution errors")
+        }
         
-    return summary
+        summary = {
+            "schema_version": "1",
+            "run_id": run_id,
+            "experiment_id": spec["id"],
+            "status": status,
+            "hypothesis": spec["hypothesis"]["statement"],
+            "points_requested": points_req,
+            "points_completed": points_completed,
+            "points_failed": points_failed,
+            "metrics": metrics_summary_dict,
+            "report_metrics": report_metrics_dict,
+            "criterion": criterion_dict,
+            "extrema": {
+                "min": min_observed,
+                "max": max_observed
+            },
+            "anomalies": [],
+            "warnings": []
+        }
+        
+        if points_failed > 0:
+            summary["warnings"].append(f"{points_failed} points encountered execution errors")
+            
+        return summary
 
 
 def generate_run_readme(
@@ -700,10 +896,18 @@ def generate_run_readme(
 ) -> str:
     """Generate concise human-readable run README.md digest with multi-metric reporting."""
     crit = summary["criterion"]
-    crit_status = "CRITERION MET" if crit.get("criterion_met") is True else (
-        "CRITERION NOT MET" if crit.get("criterion_met") is False else "INCOMPLETE / INVALID"
-    )
+    crit_agg = crit.get("aggregation", "max_abs")
+    crit_met = crit.get("criterion_met")
     
+    if crit_agg == "none":
+        crit_status = "OBSERVATIONAL / NO CRITERION DECLARED"
+    elif crit_met is True:
+        crit_status = "CRITERION MET"
+    elif crit_met is False:
+        crit_status = "CRITERION NOT MET"
+    else:
+        crit_status = "INCOMPLETE / INVALID"
+        
     report_metrics = summary.get("report_metrics", {})
     table_rows = []
     for m_name, m_data in report_metrics.items():
@@ -732,20 +936,42 @@ def generate_run_readme(
         ]
         if kind == "fixed_m_truncation_diagnostic":
             detail_lines.append("- **Note:** *Diagnostic metric only; not evaluated as part of exact covariance pass/fail criterion.*")
+        elif kind == "observational_metric":
+            detail_lines.append("- **Note:** *Observational response metric; no pass/fail criterion declared.*")
             
         if argmax and argmax.get("inputs"):
             inputs_str = ", ".join(f"{k}={v}" for k, v in argmax["inputs"].items())
-            detail_lines.append(f"- **Argmax Parameter Point (id={argmax.get('point_id')}):** `{inputs_str}`")
-            
+            val_display = argmax.get("value")
+            abs_display = argmax.get("abs_value")
+            if val_display and abs_display and val_display != abs_display:
+                detail_lines.append(f"- **Argmax Parameter Point (id={argmax.get('point_id')}):** `val={val_display} (|val|={abs_display})` | `{inputs_str}`")
+            else:
+                detail_lines.append(f"- **Argmax Parameter Point (id={argmax.get('point_id')}):** `val={val_display}` | `{inputs_str}`")
+                
         if worst:
             detail_lines.append("- **Top Worst Parameter Points:**")
             for wp in worst[:5]:
                 in_str = ", ".join(f"{k}={v}" for k, v in wp.get("inputs", {}).items())
-                detail_lines.append(f"  - id={wp.get('point_id')} | `val={wp.get('value')}` | `{in_str}`")
+                w_val = wp.get("value")
+                w_abs = wp.get("abs_value")
+                if w_val and w_abs and w_val != w_abs:
+                    detail_lines.append(f"  - id={wp.get('point_id')} | `val={w_val} (|val|={w_abs})` | `{in_str}`")
+                else:
+                    detail_lines.append(f"  - id={wp.get('point_id')} | `val={w_val}` | `{in_str}`")
                 
         metric_details.append("\n".join(detail_lines))
         
     details_block = "\n\n".join(metric_details) if metric_details else "No metric details available."
+
+    crit_summary_line = (
+        f"- **Primary Criterion ({crit_agg}):** `{crit['metric']} {crit['operator']} {crit['threshold']}`\n"
+        f"- **Observed Metric:** `{crit['observed']}`\n"
+        f"- **Criterion Met:** `{crit['criterion_met']}`"
+        if crit_agg != "none" else
+        "- **Primary Criterion:** `N/A (Observational)`\n"
+        "- **Observed Metric:** `N/A`\n"
+        "- **Criterion Met:** `null (Observational)`"
+    )
 
     return f"""# Experiment Run Digest — {spec.get('title', spec['id'])}
 
@@ -759,10 +985,9 @@ def generate_run_readme(
 ## 1. Mathematical Statement & Criterion
 
 - **Hypothesis:**  
-  > {spec['hypothesis']['statement']}
-- **Primary Criterion:** `{crit['metric']} {crit['operator']} {crit['threshold']}`
-- **Observed Metric:** `{crit['observed']}`
-- **Criterion Met:** `{crit.get('criterion_met')}`
+  > {summary['hypothesis'].strip()}
+
+{crit_summary_line}
 
 *Note: This result applies strictly to the evaluated finite parameter space. It does not constitute proof or refutation of broader conjectures.*
 
@@ -790,7 +1015,7 @@ def generate_run_readme(
 - **Points Requested:** `{manifest['points_requested']}`
 - **Points Completed:** `{manifest['points_completed']}`
 - **Started At:** `{manifest['started_at']}`
-- **Completed At:** `{manifest['completed_at'] or 'In Progress'}`
+- **Completed At:** `{manifest['completed_at']}`
 
 ---
 
@@ -800,7 +1025,6 @@ def generate_run_readme(
 - Summary: [`summary.json`](summary.json)
 - Detailed Points: [`results.jsonl`](results.jsonl)
 """
-
 
 
 def update_index_file(run_entry: Dict[str, Any]):

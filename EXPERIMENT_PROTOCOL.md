@@ -90,6 +90,7 @@ criterion:
   metric: max_abs_slope_error
   operator: "<="
   threshold: "1e-30"
+  aggregation: max_abs
 
 engine:
   operation: centrifuge
@@ -125,7 +126,27 @@ Required fields:
 - `parameters`
 - `precision.dps`
 
+### Criterion Specification and Aggregation Modes
+
+The `criterion` section defines how the experiment's hypothesis is evaluated across the parameter space:
+
+```yaml
+criterion:
+  metric: <metric_name>
+  operator: "<=" | "<" | ">=" | ">" | "==" | "!="
+  threshold: "<decimal_string>"
+  aggregation: max_abs | max | min | all | none
+```
+
+Aggregation modes:
+- `max_abs` (default): Evaluates the criterion predicate on the maximum absolute value of the target metric across all completed points.
+- `max`: Evaluates the criterion predicate on the maximum signed value.
+- `min`: Evaluates the criterion predicate on the minimum signed value.
+- `all`: Requires every completed point in the parameter sweep to individually satisfy the criterion predicate.
+- `none`: Used for observational or response-characterization experiments where no binary pass/fail proposition is claimed. Sets `criterion_met: null` and `observed: null` in summary artifacts.
+
 Reject malformed specs before computation begins.
+
 
 ---
 

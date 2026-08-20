@@ -263,9 +263,11 @@ def test_isolated_delta_update_equals_full_recomputation():
         
         assert abs(fast_pert_diag - full_pert_diag) < mpmath.mpf("1e-35")
         
-        # 2. Symmetry complete quartet mode
-        info_quart = converter.compute_perturbed_contributions_audit(x, ref_zeros[0], "0.03", mode="symmetry_complete_quartet", dps=dps)
-        fast_pert_quart = clean_pi + info_quart["delta_cpi"]
+        # 2. Symmetry complete split mode (with multiplicity 2 baseline)
+        info_quart = converter.compute_perturbed_contributions_audit(x, ref_zeros[0], "0.03", mode="symmetry_complete_split", dps=dps)
+        clean_zeros_double = [ref_zeros[0], ref_zeros[0]] + ref_zeros[1:]
+        clean_pi_double = converter.riemann_explicit_pi_audit(x, clean_zeros_double, dps=dps)
+        fast_pert_quart = clean_pi_double + info_quart["split_defect_cpi"]
         
         modified_zeros_quart = info_quart["perturbed_rhos"] + ref_zeros[1:]
         full_pert_quart = converter.riemann_explicit_pi_audit(x, modified_zeros_quart, dps=dps)
@@ -276,14 +278,14 @@ def test_isolated_delta_update_equals_full_recomputation():
 def test_delta_zero_reduces_to_baseline():
     """
     Test 11: delta = 0 reduces correctly to baseline (Delta C_J = 0, Delta C_pi = 0, full diff = 0)
-    for both single_pair_diagnostic and symmetry_complete_quartet modes.
+    for both single_pair_diagnostic and symmetry_complete_split modes.
     """
     dps = 80
     with mpmath.workdps(dps + 15):
         x = "20.0"
         rho = mpmath.mpc("0.5", "14.134725141734693790457251983562")
         
-        for mode in ["single_pair_diagnostic", "symmetry_complete_quartet"]:
+        for mode in ["single_pair_diagnostic", "symmetry_complete_split", "symmetry_complete_quartet"]:
             info = converter.compute_perturbed_contributions_audit(x, rho, "0.0", mode=mode, dps=dps)
             assert abs(info["delta_cj"]) < mpmath.mpf("1e-70")
             assert abs(info["delta_cpi"]) < mpmath.mpf("1e-70")
@@ -343,7 +345,7 @@ def test_batch_and_direct_canonical_engine_agreement():
             "delta": "0.01",
             "x": "25.0",
             "num_zeros": "6",
-            "perturbation_mode": "symmetry_complete_quartet"
+            "perturbation_mode": "symmetry_complete_split"
         }
         status, out_pert, err = research_runner.evaluate_point("converter_perturbation", inputs_pert, dps=dps)
         assert status == "ok"
@@ -351,7 +353,7 @@ def test_batch_and_direct_canonical_engine_agreement():
         # Direct canonical evaluation
         ref_zeros = reference_data.load_reference_zeros()[:6]
         rho_clean = mpmath.mpc("0.5", ref_zeros[1])
-        direct_info = converter.compute_perturbed_contributions_audit("25.0", rho_clean, "0.01", mode="symmetry_complete_quartet", dps=dps)
+        direct_info = converter.compute_perturbed_contributions_audit("25.0", rho_clean, "0.01", mode="symmetry_complete_split", dps=dps)
         
         batch_delta_cj = mpmath.mpf(out_pert["delta_cj"])
         assert abs(batch_delta_cj - direct_info["delta_cj"]) < mpmath.mpf("1e-70")
@@ -374,9 +376,143 @@ def test_authoritative_outputs_remain_decimal_strings():
         
         for key, val in outputs.items():
             assert isinstance(val, str), f"Output '{key}' was not a string: {type(val)}"
-            # Should be parseable by mpmath without error
             try:
                 mpmath.mpf(val)
             except Exception:
-                # could be complex or label
                 pass
+
+
+def test_symmetry_complete_split_multiplicity_2_baseline():
+    """
+    Test 15: Symmetry-complete split uses multiplicity 2 baseline so S_J(0) = 0 and S_pi(0) = 0.
+    """
+    dps = 80
+    with mpmath.workdps(dps + 15):
+        x = "20.0"
+        rho_clean = mpmath.mpc("0.5", "14.134725141734693790457251983562")
+        info = converter.compute_perturbed_contributions_audit(x, rho_clean, "0.0", mode="symmetry_complete_split", dps=dps)
+        assert abs(info["split_defect_cj"]) < mpmath.mpf("1e-70")
+        assert abs(info["split_defect_cpi"]) < mpmath.mpf("1e-70")
+
+
+def test_split_defect_evenness_and_odd_term_cancellation():
+    """
+    Test 16: S_J(-delta) = S_J(delta), S_pi(-delta) = S_pi(delta), and odd first-order term cancels.
+    """
+    dps = 80
+    with mpmath.workdps(dps + 15):
+        x = "20.0"
+        rho_clean = mpmath.mpc("0.5", "14.134725141734693790457251983562")
+        delta = "0.005"
+        
+        info_pos = converter.compute_perturbed_contributions_audit(x, rho_clean, delta, mode="symmetry_complete_split", dps=dps)
+        info_neg = converter.compute_perturbed_contributions_audit(x, rho_clean, f"-{delta}", mode="symmetry_complete_split", dps=dps)
+        
+        # Even symmetry
+        assert abs(info_pos["split_defect_cj"] - info_neg["split_defect_cj"]) < mpmath.mpf("1e-70")
+        assert abs(info_pos["split_defect_cpi"] - info_neg["split_defect_cpi"]) < mpmath.mpf("1e-70")
+        
+        # First derivative / odd slope at 0
+        d_val = mpmath.mpf(delta)
+        slope_odd = (info_pos["split_defect_cj"] - info_neg["split_defect_cj"]) / (mpmath.mpf(2) * d_val)
+        assert abs(slope_odd) < mpmath.mpf("1e-65")
+
+
+def test_small_delta_quadratic_scaling():
+    """
+    Test 17: Local quadratic scaling S_J(lambda * delta) / S_J(delta) -> lambda^2 near delta = 0.
+    """
+    dps = 80
+    with mpmath.workdps(dps + 15):
+        x = "20.0"
+        rho_clean = mpmath.mpc("0.5", "14.134725141734693790457251983562")
+        delta1 = "0.001"
+        delta2 = "0.002"  # lambda = 2 -> expected ratio = 4
+        
+        info1 = converter.compute_perturbed_contributions_audit(x, rho_clean, delta1, mode="symmetry_complete_split", dps=dps)
+        info2 = converter.compute_perturbed_contributions_audit(x, rho_clean, delta2, mode="symmetry_complete_split", dps=dps)
+        
+        s1 = info1["split_defect_cj"]
+        s2 = info2["split_defect_cj"]
+        
+        ratio = s2 / s1
+        assert abs(ratio - mpmath.mpf(4)) < mpmath.mpf("1e-4")
+
+
+def test_symmetric_centrifuge_exact_identity():
+    """
+    Test 18: Exact closed form |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2) across K and delta.
+    """
+    dps = 80
+    with mpmath.workdps(dps + 15):
+        gamma = "14.134725141734693790457251983562"
+        for delta in ["-0.01", "-0.001", "0.0", "0.001", "0.01"]:
+            for K in ["-20", "-5", "-1", "0", "1", "5", "20"]:
+                D_K = math_core.symmetric_centrifuge_defect(delta, gamma, K, dps=dps)
+                expected_abs = math_core.symmetric_centrifuge_defect_expected(delta, K, dps=dps)
+                abs_D_K = abs(D_K)
+                
+                diff = abs(abs_D_K - expected_abs)
+                assert diff < mpmath.mpf("1e-70"), f"Centrifuge identity failed at delta={delta}, K={K}: diff={diff}"
+
+
+def test_symmetric_centrifuge_defect_symmetries():
+    """
+    Test 19: D_K is even in delta, |D_K| is even in K, D_K = 0 for K=0 or delta=0.
+    """
+    dps = 80
+    with mpmath.workdps(dps + 15):
+        gamma = "14.134725141734693790457251983562"
+        # D_K = 0 for delta = 0
+        D_0_delta = math_core.symmetric_centrifuge_defect("0.0", gamma, "10", dps=dps)
+        assert abs(D_0_delta) < mpmath.mpf("1e-70")
+        
+        # D_K = 0 for K = 0
+        D_0_k = math_core.symmetric_centrifuge_defect("0.01", gamma, "0", dps=dps)
+        assert abs(D_0_k) < mpmath.mpf("1e-70")
+        
+        # Even in delta
+        D_pos = math_core.symmetric_centrifuge_defect("0.005", gamma, "5", dps=dps)
+        D_neg = math_core.symmetric_centrifuge_defect("-0.005", gamma, "5", dps=dps)
+        assert abs(D_pos - D_neg) < mpmath.mpf("1e-70")
+        
+        # |D_K| even in K
+        D_k_pos = math_core.symmetric_centrifuge_defect("0.005", gamma, "8", dps=dps)
+        D_k_neg = math_core.symmetric_centrifuge_defect("0.005", gamma, "-8", dps=dps)
+        assert abs(abs(D_k_pos) - abs(D_k_neg)) < mpmath.mpf("1e-70")
+
+
+def test_coupled_perturbed_covariance_engine_consumes_k():
+    """
+    Test 20 & 21: coupled_perturbation_covariance engine genuinely consumes k,
+    maps coordinates x' = x^(1/A) and rho' = A*rho, and achieves exact covariance <= 1e-25.
+    """
+    dps = 80
+    with mpmath.workdps(dps + 15):
+        inputs = {
+            "zero_index": "0",
+            "delta": "0.01",
+            "k": "1.0",
+            "x": "20.0",
+            "num_zeros": "5",
+            "perturbation_mode": "symmetry_complete_split"
+        }
+        status, outputs, err = research_runner.evaluate_point("coupled_perturbation_covariance", inputs, dps=dps)
+        assert status == "ok"
+        assert err is None
+        
+        # Verify k was consumed to produce tau^1
+        A_val = mpmath.mpf(outputs["A"])
+        tau = math_core.get_tau(dps=dps)
+        assert abs(A_val - tau) < mpmath.mpf("1e-70")
+        
+        # Verify x' = x^(1/A) != x
+        x_val = mpmath.mpf(outputs["x"])
+        x_prime = mpmath.mpf(outputs["x_prime"])
+        assert abs(x_prime - mpmath.power(x_val, mpmath.mpf(1) / tau)) < mpmath.mpf("1e-70")
+        assert abs(x_prime - x_val) > mpmath.mpf("0.1")
+        
+        # Verify exact covariance residual <= 1e-25
+        cov_res = mpmath.mpf(outputs["covariance_residual"])
+        assert cov_res < mpmath.mpf("1e-25")
+
