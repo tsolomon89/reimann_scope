@@ -584,4 +584,96 @@ def test_criterion_aggregations_all_modes():
     assert s_none["criterion"]["observed"] is None
 
 
+def test_conditional_metric_counts_in_summary():
+    """
+    Test 9: Summary engine computes statistics strictly over points that actually emit each metric.
+    Inapplicable metrics are NOT emitted as zeros, NaNs, or placeholders.
+    """
+    dps = 80
+    spec = {
+        "id": "test-conditional-counts",
+        "title": "Test Conditional Counts",
+        "hypothesis": {"statement": "Testing conditional counts"},
+        "criterion": {"metric": "residual", "aggregation": "none"},
+        "report_metrics": [
+            {"metric": "delta_cj", "kind": "perturbation_response", "label": "Single-pair delta C_J"},
+            {"metric": "split_defect_cj", "kind": "perturbation_response", "label": "Split defect S_J"},
+            {"metric": "symmetry_error", "kind": "fixed_m_truncation_diagnostic", "label": "Symmetry error"},
+            {"metric": "quadratic_ratio_cj", "kind": "fixed_m_truncation_diagnostic", "label": "Quadratic ratio"}
+        ],
+        "precision": {"dps": dps}
+    }
+    
+    # 2 single-pair points, 3 split points (2 with quadratic ratio, 1 without)
+    results = [
+        # Single-pair points
+        {"point_id": 0, "status": "ok", "inputs": {"m": "single"}, "outputs": {"delta_cj": "0.01", "residual": "0.01"}},
+        {"point_id": 1, "status": "ok", "inputs": {"m": "single"}, "outputs": {"delta_cj": "0.02", "residual": "0.02"}},
+        # Split points
+        {"point_id": 2, "status": "ok", "inputs": {"m": "split"}, "outputs": {
+            "split_defect_cj": "0.0004", "symmetry_error": "1e-65", "quadratic_ratio_cj": "4.0001", "residual": "0.0004"
+        }},
+        {"point_id": 3, "status": "ok", "inputs": {"m": "split"}, "outputs": {
+            "split_defect_cj": "0.0016", "symmetry_error": "2e-65", "quadratic_ratio_cj": "4.0004", "residual": "0.0016"
+        }},
+        {"point_id": 4, "status": "ok", "inputs": {"m": "split"}, "outputs": {
+            "split_defect_cj": "0.0000", "symmetry_error": "0.0", "residual": "0.0"
+        }}
+    ]
+    
+    summary = research_runner.compute_summary(spec, "run-cond", results, "complete")
+    rep = summary["report_metrics"]
+    
+    assert rep["delta_cj"]["count"] == 2
+    assert rep["split_defect_cj"]["count"] == 3
+    assert rep["symmetry_error"]["count"] == 3
+    assert rep["quadratic_ratio_cj"]["count"] == 2
+    assert rep["residual"]["count"] == 5
+
+
+def test_dirty_state_detection_rules(monkeypatch):
+    """
+    Tests 28, 29, 30:
+    - 28: dirty-state detection catches modified tracked source files
+    - 29: dirty-state detection catches tracked deletions BEFORE the producing commit
+    - 30: newly-created experiment output does not falsely mark an otherwise clean producing state as dirty.
+    """
+    # Helper to mock git status porcelain output
+    def mock_git(porcelain_output: str):
+        def _check_output(cmd, cwd=None, stderr=None):
+            if "rev-parse" in cmd:
+                return b"80b70e18df678ad9fbba49c470f142c5767fdc96\n"
+            if "status" in cmd:
+                return porcelain_output.encode("utf-8")
+            return b""
+        return _check_output
+
+    # Test 28: Modified tracked source file -> dirty
+    monkeypatch.setattr(research_runner.subprocess, "check_output", mock_git(" M math_core.py\n"))
+    commit, is_dirty = research_runner.get_git_info()
+    assert is_dirty is True
+    
+    # Test 29: Tracked deletion -> dirty
+    monkeypatch.setattr(research_runner.subprocess, "check_output", mock_git(" D research/experiments/macroscope_perturbation_001.yaml\n"))
+    commit, is_dirty = research_runner.get_git_info()
+    assert is_dirty is True
+
+    # Untracked source file -> dirty
+    monkeypatch.setattr(research_runner.subprocess, "check_output", mock_git("?? tests/test_new.py\n"))
+    commit, is_dirty = research_runner.get_git_info()
+    assert is_dirty is True
+
+    # Test 30: Newly created experiment outputs and index.json -> NOT dirty
+    clean_runner_output = (
+        "?? research/runs/20260820T160000Z_isolated-radial-response-002_12345678/manifest.json\n"
+        "?? research/runs/20260820T160000Z_isolated-radial-response-002_12345678/results.jsonl\n"
+        "?? research/runs/20260820T160000Z_isolated-radial-response-002_12345678/summary.json\n"
+        "?? research/runs/20260820T160000Z_isolated-radial-response-002_12345678/README.md\n"
+        " M research/index.json\n"
+    )
+    monkeypatch.setattr(research_runner.subprocess, "check_output", mock_git(clean_runner_output))
+    commit, is_dirty = research_runner.get_git_info()
+    assert is_dirty is False
+
+
 

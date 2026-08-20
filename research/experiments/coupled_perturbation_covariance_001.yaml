@@ -2,6 +2,9 @@ schema_version: "1"
 id: coupled-perturbation-covariance-001
 title: Coupled coordinate covariance invariance of clean and perturbed converter waves
 
+classification: valid control
+notes: "Coupled coordinate dilation gauge covariance for clean and perturbed converter waves"
+
 hypothesis:
   statement: >
     Under simultaneous origin coordinate dilation A = tau^k, s' = A*s, x' = x^(1/A),

@@ -2,6 +2,9 @@ schema_version: "1"
 id: symmetric-centrifuge-defect-001
 title: Exact algebraic identity verification of the symmetry-complete centrifuge defect
 
+classification: valid control
+notes: "Exact algebraic identity verification of symmetric centrifuge defect |D_K| = 4 sinh^2(K*delta*ln(tau)/2)"
+
 hypothesis:
   statement: >
     For an off-critical zero pair at rho_+ = 1/2+delta+igamma and its reflection partner

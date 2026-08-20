@@ -68,14 +68,25 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
         
     try:
         status = subprocess.check_output(
-            ["git", "status", "--porcelain", "--untracked-files=no"],
+            ["git", "status", "--porcelain"],
             cwd=work_dir,
             stderr=subprocess.DEVNULL
         ).decode("utf-8").strip()
-        dirty_lines = [
-            line for line in status.splitlines()
-            if line.strip() and not line.strip().endswith("research/index.json")
-        ]
+        dirty_lines = []
+        for line in status.splitlines():
+            line_str = line.strip()
+            if not line_str:
+                continue
+            # Match status: code followed by file path
+            parts = line_str.split(None, 1)
+            if len(parts) < 2:
+                dirty_lines.append(line_str)
+                continue
+            path = parts[1].strip().strip('"').replace("\\", "/")
+            # Ignore runner's own output artifacts
+            if path == "research/index.json" or path.startswith("research/runs/"):
+                continue
+            dirty_lines.append(line_str)
         is_dirty = len(dirty_lines) > 0
     except Exception:
         is_dirty = False
@@ -232,7 +243,8 @@ def generate_parameter_grid(
 def evaluate_point(
     operation: str,
     inputs: Dict[str, str],
-    dps: int = 80
+    dps: int = 80,
+    param_space: Optional[Dict[str, Any]] = None
 ) -> Tuple[str, Dict[str, str], Optional[str]]:
     """
     Evaluate a single parameter space point using the canonical math engine.
@@ -451,15 +463,7 @@ def evaluate_point(
                 # Compute full explicit formula reconstructions
                 full_clean_pi = converter.riemann_explicit_pi_audit(x_str, clean_for_recon, dps=dps + 15)
                 full_pert_pi = converter.riemann_explicit_pi_audit(x_str, modified_zeros_mpc, dps=dps + 15)
-                delta_pi_n = full_pert_pi - full_clean_pi
-                
-                # Evaluate symmetry error S(delta) - S(-delta)
-                neg_contrib = converter.compute_perturbed_contributions_audit(
-                    x_str, rho_clean, str(-mpmath.mpf(delta_str)), mode=mode, dps=dps + 15
-                )
-                sym_err_cj = abs(contrib_dict["delta_cj"] - neg_contrib["delta_cj"])
-                sym_err_cpi = abs(contrib_dict["delta_cpi"] - neg_contrib["delta_cpi"])
-                symmetry_error = max(sym_err_cj, sym_err_cpi)
+                full_diff = full_pert_pi - full_clean_pi
                 
                 # True prime pi(x)
                 x_mpf = math_core.to_mpf(x_str, dps=dps + 15)
@@ -469,8 +473,9 @@ def evaluate_point(
                     true_pi_val = "N/A"
                     
                 pert_rhos_str = "; ".join(f"{mpmath.nstr(r.real, n=dps)} + {mpmath.nstr(r.imag, n=dps)}j" for r in pert_rhos)
-                
-                return "ok", {
+                d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
+
+                outputs: Dict[str, str] = {
                     "zero_index": str(zero_idx),
                     "gamma": mpmath.nstr(rho_clean.imag, n=dps),
                     "delta": str(delta_str),
@@ -480,21 +485,85 @@ def evaluate_point(
                     "x": mpmath.nstr(x_mpf, n=dps),
                     "clean_cj": mpmath.nstr(contrib_dict["cj_clean"], n=dps),
                     "perturbed_cj": mpmath.nstr(contrib_dict["cj_perturbed"], n=dps),
-                    "delta_cj": mpmath.nstr(contrib_dict["delta_cj"], n=dps),
-                    "split_defect_cj": mpmath.nstr(contrib_dict["delta_cj"], n=dps),
                     "clean_cpi": mpmath.nstr(contrib_dict["cpi_clean"], n=dps),
                     "perturbed_cpi": mpmath.nstr(contrib_dict["cpi_perturbed"], n=dps),
-                    "delta_cpi": mpmath.nstr(contrib_dict["delta_cpi"], n=dps),
-                    "split_defect_cpi": mpmath.nstr(contrib_dict["delta_cpi"], n=dps),
                     "full_clean_pi": mpmath.nstr(full_clean_pi, n=dps),
                     "full_perturbed_pi": mpmath.nstr(full_pert_pi, n=dps),
-                    "delta_pi_n": mpmath.nstr(delta_pi_n, n=dps),
-                    "split_defect_pi_n": mpmath.nstr(delta_pi_n, n=dps),
-                    "symmetry_error": mpmath.nstr(symmetry_error, n=dps),
-                    "full_reconstruction_diff": mpmath.nstr(delta_pi_n, n=dps),
+                    "full_reconstruction_diff": mpmath.nstr(full_diff, n=dps),
                     "true_pi": str(true_pi_val),
-                    "residual": mpmath.nstr(abs(delta_pi_n), n=dps)
-                }, None
+                    "residual": mpmath.nstr(abs(full_diff), n=dps)
+                }
+
+                if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
+                    split_defect_cj = contrib_dict.get("split_defect_cj", contrib_dict.get("delta_cj"))
+                    split_defect_cpi = contrib_dict.get("split_defect_cpi", contrib_dict.get("delta_cpi"))
+                    split_defect_pi_n = full_diff
+                    
+                    # Evaluate symmetry error S(delta) - S(-delta)
+                    neg_contrib = converter.compute_perturbed_contributions_audit(
+                        x_str, rho_clean, str(-d_mpf), mode=mode, dps=dps + 15
+                    )
+                    neg_s_cj = neg_contrib.get("split_defect_cj", neg_contrib.get("delta_cj"))
+                    neg_s_cpi = neg_contrib.get("split_defect_cpi", neg_contrib.get("delta_cpi"))
+                    
+                    sym_err_cj = abs(split_defect_cj - neg_s_cj)
+                    sym_err_cpi = abs(split_defect_cpi - neg_s_cpi)
+                    symmetry_error = max(sym_err_cj, sym_err_cpi)
+
+                    outputs["split_defect_cj"] = mpmath.nstr(split_defect_cj, n=dps)
+                    outputs["split_defect_cpi"] = mpmath.nstr(split_defect_cpi, n=dps)
+                    outputs["split_defect_pi_n"] = mpmath.nstr(split_defect_pi_n, n=dps)
+                    outputs["symmetry_error_cj"] = mpmath.nstr(sym_err_cj, n=dps)
+                    outputs["symmetry_error_cpi"] = mpmath.nstr(sym_err_cpi, n=dps)
+                    outputs["symmetry_error"] = mpmath.nstr(symmetry_error, n=dps)
+
+                    # Quadratic scaling diagnostics
+                    if abs(d_mpf) > mpmath.mpf('1e-50'):
+                        d_sq = d_mpf * d_mpf
+                        norm_quad_cj = split_defect_cj / d_sq
+                        norm_quad_cpi = split_defect_cpi / d_sq
+                        outputs["normalized_quadratic_cj"] = mpmath.nstr(norm_quad_cj, n=dps)
+                        outputs["normalized_quadratic_cpi"] = mpmath.nstr(norm_quad_cpi, n=dps)
+
+                        # Pairwise ratio where half-delta exists
+                        declared_deltas_raw = None
+                        if param_space and "delta" in param_space:
+                            declared_deltas_raw = expand_parameter(param_space["delta"], dps=dps)
+                        elif "declared_deltas" in inputs:
+                            declared_deltas_raw = inputs["declared_deltas"]
+
+                        if declared_deltas_raw:
+                            declared_deltas_mpf = [math_core.to_mpf(v, dps=dps + 15) for v in declared_deltas_raw]
+                            half_d_mpf = d_mpf / 2
+                            has_half_delta = any(abs(half_d_mpf - v) < mpmath.mpf('1e-25') for v in declared_deltas_mpf)
+                            if has_half_delta:
+                                half_contrib = converter.compute_perturbed_contributions_audit(
+                                    x_str, rho_clean, str(half_d_mpf), mode=mode, dps=dps + 15
+                                )
+                                half_s_cj = half_contrib.get("split_defect_cj", half_contrib.get("delta_cj"))
+                                half_s_cpi = half_contrib.get("split_defect_cpi", half_contrib.get("delta_cpi"))
+
+                                if abs(half_s_cj) > mpmath.mpf('1e-50'):
+                                    quad_ratio_cj = split_defect_cj / half_s_cj
+                                    outputs["quadratic_ratio_cj"] = mpmath.nstr(quad_ratio_cj, n=dps)
+                                    outputs["quadratic_ratio_error_cj"] = mpmath.nstr(abs(quad_ratio_cj - 4), n=dps)
+
+                                if abs(half_s_cpi) > mpmath.mpf('1e-50'):
+                                    quad_ratio_cpi = split_defect_cpi / half_s_cpi
+                                    outputs["quadratic_ratio_cpi"] = mpmath.nstr(quad_ratio_cpi, n=dps)
+                                    outputs["quadratic_ratio_error_cpi"] = mpmath.nstr(abs(quad_ratio_cpi - 4), n=dps)
+
+                else:
+                    # single_pair_diagnostic
+                    delta_cj = contrib_dict.get("delta_cj", contrib_dict.get("split_defect_cj"))
+                    delta_cpi = contrib_dict.get("delta_cpi", contrib_dict.get("split_defect_cpi"))
+                    delta_pi_n = full_diff
+
+                    outputs["delta_cj"] = mpmath.nstr(delta_cj, n=dps)
+                    outputs["delta_cpi"] = mpmath.nstr(delta_cpi, n=dps)
+                    outputs["delta_pi_n"] = mpmath.nstr(delta_pi_n, n=dps)
+
+                return "ok", outputs, None
 
 
             elif operation == "symmetric_centrifuge":
@@ -1028,7 +1097,7 @@ def generate_run_readme(
 
 
 def update_index_file(run_entry: Dict[str, Any]):
-    """Update research/index.json with the given run entry."""
+    """Update research/index.json with the given canonical run entry (one per experiment_id)."""
     os.makedirs(RESEARCH_DIR, exist_ok=True)
     entries = []
     if os.path.exists(INDEX_FILE):
@@ -1040,10 +1109,10 @@ def update_index_file(run_entry: Dict[str, Any]):
         except Exception:
             entries = []
             
-    # Update existing entry or append
+    # Update existing entry by experiment_id or run_id, or append
     found = False
     for i, e in enumerate(entries):
-        if e.get("run_id") == run_entry["run_id"]:
+        if e.get("experiment_id") == run_entry.get("experiment_id") or e.get("run_id") == run_entry.get("run_id"):
             entries[i] = run_entry
             found = True
             break
@@ -1176,7 +1245,9 @@ def run_experiment(
             if point_id in completed_point_ids:
                 continue
                 
-            status, outputs, err_msg = evaluate_point(operation, inputs, dps=dps)
+            status, outputs, err_msg = evaluate_point(
+                operation, inputs, dps=dps, param_space=spec.get("parameters")
+            )
             point_record = {
                 "point_id": point_id,
                 "inputs": inputs,
@@ -1208,9 +1279,10 @@ def run_experiment(
         f.write(readme_content)
         
     # Update index
-    run_entry = {
+    run_entry: Dict[str, Any] = {
         "run_id": run_id,
         "experiment_id": spec["id"],
+        "classification": spec.get("classification", "canonical_experiment"),
         "timestamp": manifest["started_at"],
         "git_commit": git_commit,
         "status": final_status,
@@ -1219,6 +1291,8 @@ def run_experiment(
         "manifest_path": f"research/runs/{run_id}/manifest.json",
         "results_path": f"research/runs/{run_id}/results.jsonl"
     }
+    if "notes" in spec:
+        run_entry["notes"] = spec["notes"]
     update_index_file(run_entry)
     
     return run_id

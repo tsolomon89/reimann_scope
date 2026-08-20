@@ -354,9 +354,8 @@ def test_batch_and_direct_canonical_engine_agreement():
         ref_zeros = reference_data.load_reference_zeros()[:6]
         rho_clean = mpmath.mpc("0.5", ref_zeros[1])
         direct_info = converter.compute_perturbed_contributions_audit("25.0", rho_clean, "0.01", mode="symmetry_complete_split", dps=dps)
-        
-        batch_delta_cj = mpmath.mpf(out_pert["delta_cj"])
-        assert abs(batch_delta_cj - direct_info["delta_cj"]) < mpmath.mpf("1e-70")
+        batch_split_cj = mpmath.mpf(out_pert["split_defect_cj"])
+        assert abs(batch_split_cj - direct_info["split_defect_cj"]) < mpmath.mpf("1e-70")
 
 
 def test_authoritative_outputs_remain_decimal_strings():
@@ -515,4 +514,152 @@ def test_coupled_perturbed_covariance_engine_consumes_k():
         # Verify exact covariance residual <= 1e-25
         cov_res = mpmath.mpf(outputs["covariance_residual"])
         assert cov_res < mpmath.mpf("1e-25")
+
+
+def test_mode_separated_metrics_emission():
+    """
+    Test mode-separated metric emission:
+    - single_pair_diagnostic emits delta_cj, delta_cpi, delta_pi_n ONLY.
+    - single_pair_diagnostic does NOT emit split_defect_*, symmetry_error*, or quadratic_* metrics.
+    - symmetry_complete_split emits split_defect_*, symmetry_error*, normalized_quadratic_*, quadratic_ratio_* ONLY.
+    - symmetry_complete_split does NOT emit delta_cj, delta_cpi, delta_pi_n.
+    """
+    dps = 80
+    param_space = {
+        "delta": {
+            "kind": "explicit",
+            "values": ["-0.01", "-0.005", "0.0", "0.005", "0.01"]
+        }
+    }
+    
+    # 1. Single pair diagnostic point
+    inputs_single = {
+        "zero_index": "0",
+        "delta": "0.01",
+        "x": "20.0",
+        "num_zeros": "5",
+        "perturbation_mode": "single_pair_diagnostic"
+    }
+    status, out_single, err = research_runner.evaluate_point(
+        "converter_perturbation", inputs_single, dps=dps, param_space=param_space
+    )
+    assert status == "ok"
+    assert "delta_cj" in out_single
+    assert "delta_cpi" in out_single
+    assert "delta_pi_n" in out_single
+    
+    # Forbidden in single-pair
+    forbidden_in_single = [
+        "split_defect_cj", "split_defect_cpi", "split_defect_pi_n",
+        "symmetry_error", "symmetry_error_cj", "symmetry_error_cpi",
+        "normalized_quadratic_cj", "normalized_quadratic_cpi",
+        "quadratic_ratio_cj", "quadratic_ratio_cpi",
+        "quadratic_ratio_error_cj", "quadratic_ratio_error_cpi"
+    ]
+    for key in forbidden_in_single:
+        assert key not in out_single, f"Metric '{key}' should not be emitted for single_pair_diagnostic"
+        
+    # 2. Symmetry complete split point (with delta=0.01 where delta/2=0.005 is present)
+    inputs_split = {
+        "zero_index": "0",
+        "delta": "0.01",
+        "x": "20.0",
+        "num_zeros": "5",
+        "perturbation_mode": "symmetry_complete_split"
+    }
+    status, out_split, err = research_runner.evaluate_point(
+        "converter_perturbation", inputs_split, dps=dps, param_space=param_space
+    )
+    assert status == "ok"
+    assert "split_defect_cj" in out_split
+    assert "split_defect_cpi" in out_split
+    assert "split_defect_pi_n" in out_split
+    assert "symmetry_error" in out_split
+    assert "symmetry_error_cj" in out_split
+    assert "symmetry_error_cpi" in out_split
+    assert "normalized_quadratic_cj" in out_split
+    assert "normalized_quadratic_cpi" in out_split
+    assert "quadratic_ratio_cj" in out_split
+    assert "quadratic_ratio_cpi" in out_split
+    assert "quadratic_ratio_error_cj" in out_split
+    assert "quadratic_ratio_error_cpi" in out_split
+    
+    # Forbidden in split-mode
+    forbidden_in_split = ["delta_cj", "delta_cpi", "delta_pi_n"]
+    for key in forbidden_in_split:
+        assert key not in out_split, f"Metric '{key}' should not be emitted for symmetry_complete_split"
+
+
+def test_split_symmetry_error_audit_precision():
+    """
+    Test split defect symmetry error is audit-precision small:
+    |S_J(delta) - S_J(-delta)| < 1e-60 and |S_pi(delta) - S_pi(-delta)| < 1e-60.
+    """
+    dps = 80
+    inputs = {
+        "zero_index": "0",
+        "delta": "0.005",
+        "x": "20.0",
+        "num_zeros": "5",
+        "perturbation_mode": "symmetry_complete_split"
+    }
+    status, outputs, err = research_runner.evaluate_point("converter_perturbation", inputs, dps=dps)
+    assert status == "ok"
+    
+    sym_cj = mpmath.mpf(outputs["symmetry_error_cj"])
+    sym_cpi = mpmath.mpf(outputs["symmetry_error_cpi"])
+    sym_err = mpmath.mpf(outputs["symmetry_error"])
+    
+    assert sym_cj < mpmath.mpf("1e-60")
+    assert sym_cpi < mpmath.mpf("1e-60")
+    assert sym_err < mpmath.mpf("1e-60")
+
+
+def test_quadratic_scaling_and_half_delta_ratio():
+    """
+    Test local quadratic scaling:
+    - S(delta) / delta^2 is finite and approaches local coefficient c_2.
+    - S(delta/2) / S(delta) approaches 1/4 (i.e. S(delta) / S(delta/2) approaches 4).
+    - quadratic_ratio_error is precision-controlled small.
+    """
+    dps = 80
+    param_space = {
+        "delta": {
+            "kind": "explicit",
+            "values": ["0.0005", "0.001", "0.005", "0.01"]
+        }
+    }
+    
+    inputs_1 = {
+        "zero_index": "0",
+        "delta": "0.001",
+        "x": "20.0",
+        "num_zeros": "5",
+        "perturbation_mode": "symmetry_complete_split"
+    }
+    status, out_1, err = research_runner.evaluate_point(
+        "converter_perturbation", inputs_1, dps=dps, param_space=param_space
+    )
+    assert status == "ok"
+    
+    # delta = 0.001 has half-delta = 0.0005 in param_space
+    assert "quadratic_ratio_cj" in out_1
+    assert "quadratic_ratio_cpi" in out_1
+    
+    ratio_cj = mpmath.mpf(out_1["quadratic_ratio_cj"])
+    ratio_cpi = mpmath.mpf(out_1["quadratic_ratio_cpi"])
+    err_cj = mpmath.mpf(out_1["quadratic_ratio_error_cj"])
+    err_cpi = mpmath.mpf(out_1["quadratic_ratio_error_cpi"])
+    
+    assert abs(ratio_cj - 4) < mpmath.mpf("1e-3")
+    assert abs(ratio_cpi - 4) < mpmath.mpf("1e-3")
+    assert err_cj < mpmath.mpf("1e-3")
+    assert err_cpi < mpmath.mpf("1e-3")
+    
+    # Normalized quadratic is finite
+    norm_cj = mpmath.mpf(out_1["normalized_quadratic_cj"])
+    norm_cpi = mpmath.mpf(out_1["normalized_quadratic_cpi"])
+    assert mpmath.isfinite(norm_cj)
+    assert mpmath.isfinite(norm_cpi)
+    assert abs(norm_cj) > mpmath.mpf("1e-5")
 
