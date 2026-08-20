@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "run_id": "20260820T122548Z_coupled-scale-covariance-001_86ca4c69",
+  "experiment_id": "coupled-scale-covariance-001",
+  "status": "complete",
+  "hypothesis": "Under the coupled coordinate scale transformation A = tau^k, s' = A*s, x' = x^(1/A), and rho' = A*rho, both the origin-dilated zeta coordinate representation Z_A(A*s) = zeta(s) and the single-zero Riemann converter wave C_J(x^(1/A), A*rho) = C_J(x, rho) are exact mathematical identities, achieving maximum absolute covariance residual <= 1e-25 across the evaluated parameter space at 80 dps.\n",
+  "points_requested": 576,
+  "points_completed": 576,
+  "points_failed": 0,
+  "metrics": {
+    "covariance_residual": "9.4389143194307694978905209794759040283245039987980262026398527570449187965387926e-89"
+  },
+  "criterion": {
+    "metric": "covariance_residual",
+    "operator": "<=",
+    "threshold": "1e-25",
+    "observed": "9.4389143194307694978905209794759040283245039987980262026398527570449187965387926e-89",
+    "criterion_met": true
+  },
+  "extrema": {
+    "min": "2.0335390740411024381823996327485920221731395274016507303804279549236413166271063e-97",
+    "max": "9.4389143194307694978905209794759040283245039987980262026398527570449187965387926e-89"
+  },
+  "anomalies": [],
+  "warnings": []
+}
