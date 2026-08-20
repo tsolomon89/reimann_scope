@@ -764,14 +764,14 @@ def update_all_panels(
     dps = 80 if audit_mode else 35
     n_samples = 500 if audit_mode else 250
     
-    t0_val = float(t0) if t0 is not None else 14.0
-    dt_val = float(dt) if dt is not None else 20.0
-    delta_offset_val = float(delta_offset) if delta_offset is not None else 0.0
-    selected_idx_val = int(selected_zero_idx) if selected_zero_idx is not None else 0
-    delta_pert_val = float(delta_pert) if delta_pert is not None else 0.0
-    gamma_pert_val = float(gamma_pert) if gamma_pert is not None else INITIAL_ZEROS_FLOAT[0]
-    num_zeros_val = int(num_zeros) if num_zeros is not None else 15
-    k = float(k_val) if k_val is not None else 0.0
+    t0_val = t0 if t0 is not None else 14.0
+    dt_val = dt if dt is not None else 20.0
+    delta_offset_val = delta_offset if delta_offset is not None else 0.0
+    selected_idx_val = selected_zero_idx if selected_zero_idx is not None else 0
+    delta_pert_val = delta_pert if delta_pert is not None else 0.0
+    gamma_pert_val = gamma_pert if gamma_pert is not None else INITIAL_ZEROS_FLOAT[0]
+    num_zeros_val = num_zeros if num_zeros is not None else 15
+    k = k_val if k_val is not None else 0.0
 
     # 1. Instantiate active Transform Object
     transform_obj: transforms.BaseTransform
@@ -786,19 +786,19 @@ def update_all_panels(
     elif mode == "argument":
         transform_obj = transforms.ArgumentTransform(k=k)
     elif mode == "kernel_lab":
-        A = float(kA) if kA is not None else 1.0
+        A = kA if kA is not None else 1.0
         is_locked = bool(k_lock and "lock" in k_lock)
-        B = (1.0 / A) if is_locked else (float(kB) if kB is not None else 1.0)
-        C = float(kC) if kC is not None else 0.0
-        D = float(kD) if kD is not None else 0.0
+        B = (1.0 / A) if is_locked else (kB if kB is not None else 1.0)
+        C = kC if kC is not None else 0.0
+        D = kD if kD is not None else 0.0
         transform_obj = transforms.KernelTransform(A=A, B=B, C=C, D=D, inverse_scale_lock=is_locked)
     elif mode == "centered_kernel":
-        A = float(cA) if cA is not None else 1.0
+        A = cA if cA is not None else 1.0
         is_locked = bool(c_lock and "lock" in c_lock)
         transform_obj = transforms.CenteredKernelTransform(A=A, inverse_scale_lock=is_locked)
     elif mode == "anisotropic":
-        A_del = float(aniso_d) if aniso_d is not None else 1.0
-        A_gam = float(aniso_g) if aniso_g is not None else 1.0
+        A_del = aniso_d if aniso_d is not None else 1.0
+        A_gam = aniso_g if aniso_g is not None else 1.0
         transform_obj = transforms.AnisotropicDeformation(A_delta=A_del, A_gamma=A_gam)
     else:
         transform_obj = transforms.CameraTransform()
