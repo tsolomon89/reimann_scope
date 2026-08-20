@@ -32,7 +32,7 @@ def find_brackets(
     Uses density-adjusted step size to guard against closely spaced zeros.
     """
     brackets = []
-    t = float(t_min)
+    t = t_min
     
     # Evaluate starting point
     z_prev = float(math_core.hardy_z(t, dps=dps))
@@ -184,7 +184,7 @@ def discover_transformed_zeros(
         return []
         
     discovered_roots: List[mpmath.mpc] = []
-    t = float(t_min)
+    t = t_min
 
     
     with mpmath.workdps(dps + 10):
