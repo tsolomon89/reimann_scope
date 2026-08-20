@@ -14,20 +14,14 @@ All 4 panels feature equal Cartesian scaling and identical metric step sizes (dt
 """
 
 from __future__ import annotations
-import json
 import numpy as np
 import plotly.graph_objects as go
 import dash
-from dash import dcc, html, Input, Output, State, ctx
+from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
-import mpmath
 
-import math_core
-import transforms
-import zero_finder
 import reference_data
 import converter
-import cache
 
 # Initialize Dash App with Dark theme
 app = dash.Dash(

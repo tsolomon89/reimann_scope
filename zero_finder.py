@@ -15,7 +15,6 @@ Strictly adheres to DATA_PROVENANCE.md, SPEC.md §6, and EXPERIMENT_PROTOCOL.md:
 from __future__ import annotations
 import math
 from typing import List, Tuple, Optional, Dict, Any, Union, Sequence
-import numpy as np
 
 import mpmath
 import math_core
