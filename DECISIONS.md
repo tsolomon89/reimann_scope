@@ -769,3 +769,77 @@ The UI may display candidate proof steps and formalization targets, but finite c
 Supersedes:
 
 Any wording that prohibits a proof-path research layer altogether.
+
+---
+
+## 2026-08-21 — Rigorous mathematical certification engine and machine-verifiable certificates
+
+Status: ACCEPTED
+
+Decision:
+
+Implement a rigorous, multi-tiered FLINT/Arb ball arithmetic certification engine (`certification.py`) producing standalone machine-verifiable JSON certificate artifacts under `data/certificates/`.
+Explicit certification levels are:
+- `candidate`
+- `residual_verified`
+- `isolated_zero_certified`
+- `simple_zero_certified` (requiring $0 \notin \zeta'(B_n)$)
+- `complete_block_certified` (Turing zero count matching isolated zeros)
+- `worldline_certified` (bilateral propagation and radial leaf invariance)
+
+Reason:
+
+Numerical agreement and floating-point residuals are empirical heuristics, not certified mathematical objects. A proof-facing instrument requires certified ball enclosures, rigorous derivative non-vanishing, and cryptographic SHA-256 verification.
+
+Mathematical / operational consequence:
+
+Certificate generation (`scripts/generate_certificates.py`) is decoupled from fast verification (`scripts/verify_certificates.py`). Verification runs in CI and fails closed upon any schema, interval, derivative, or hash anomaly.
+
+Supersedes:
+
+Unconditional strings and heuristic float-based "Verified Simple" classifications.
+
+---
+
+## 2026-08-21 — Overwrite-only experiment run policy with atomic replacement
+
+Status: ACCEPTED
+
+Decision:
+
+Ordinary experiment sweeps have exactly one canonical live result at `research/runs/<experiment-id>/`. Rerunning an experiment replaces its stable directory atomically via a temporary sibling directory (`.tmp_<exp_id>_<pid>`), updating `research/index.json` in place. No historical timestamped run directories are archived.
+
+Reason:
+
+Historical accumulation of ordinary runs clutters the repository without adding scientific value, as Git history provides complete historical versioning.
+
+Mathematical / operational consequence:
+
+Live repository runs reflect the current committed state with zero duplicate clutter. Reusable computations with declared downstream consumers are persisted under `data/` rather than historical run directories.
+
+Supersedes:
+
+Timestamped run directory accumulation (`research/runs/<timestamp>_<id>/`).
+
+---
+
+## 2026-08-21 — Classification of coupled-scale C_pi residual as a finite-m truncation diagnostic
+
+Status: ACCEPTED
+
+Decision:
+
+Classify `cpi_covariance_residual` as `fixed_m_truncation_diagnostic` rather than an exact criterion component. The exact covariance criterion evaluates zeta coordinate representation covariance and single-zero $C_J$ wave covariance (which are exact to $\le 10^{-45}$).
+
+Reason:
+
+The single-zero $C_\pi$ explicit formula component involves an infinite Möbius-weighted series $\sum \frac{\mu(m)}{m} C_J(x^{1/m}, \dots)$. Truncating to finite $m \le 50$ produces an expected truncation error $\approx 0.150872$ that is a truncation diagnostic, not a failure of exact scale covariance.
+
+Mathematical / operational consequence:
+
+The observed $C_\pi$ truncation error remains reported and displayed as a diagnostic metric without falsely failing the exact coordinate covariance control.
+
+Supersedes:
+
+Treating $C_\pi$ truncation error as a criterion component of exact covariance.
+

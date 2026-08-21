@@ -28,7 +28,11 @@ jobs:
 
     - name: Smoke check module imports
       run: |
-        python -c "import app, math_core, transcendental, transforms, reference_data, research_runner, zero_finder; print('All core modules imported successfully.')"
+        python -c "import app, math_core, transcendental, transforms, reference_data, research_runner, zero_finder, certification; print('All core modules imported successfully.')"
+
+    - name: Validate experiment schemas
+      run: |
+        python -c "import glob, yaml, research_runner; [research_runner.validate_spec(yaml.safe_load(open(f, encoding='utf-8')))[0] or exit(f'Invalid spec {f}') for f in glob.glob('research/experiments/*.yaml')]; print('All experiment schemas validated successfully.')"
 
     - name: Verify data provenance
       run: |

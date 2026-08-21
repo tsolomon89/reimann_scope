@@ -1,0 +1,79 @@
+"""
+tests/test_frontend.py — Tests for Dash UI layout, laboratories, certification modes, and aspect ratio contracts.
+"""
+
+import json
+import pytest
+import plotly.graph_objects as go
+import dash
+from dash import html, dcc
+
+import app
+import certification
+
+
+def test_app_layout_and_laboratories_exist():
+    """Verify Dash app initializes with all 4 required research laboratories."""
+    assert app.app.layout is not None
+    layout_str = str(app.app.layout)
+    
+    # Check that all 4 main tabs exist
+    assert "tab-instrument" in layout_str
+    assert "tab-cross-height" in layout_str
+    assert "tab-worldline" in layout_str
+    assert "tab-proof-programme" in layout_str
+
+
+def test_compute_modes_declared_and_distinct():
+    """Verify Preview (35 dps), Audit (80 dps), and Certified (FLINT/Arb) modes exist and are distinct."""
+    header = app.create_header()
+    header_str = str(header)
+    
+    assert "Preview (35 dps)" in header_str
+    assert "Audit (80 dps)" in header_str
+    assert "Certified (FLINT/Arb)" in header_str
+    assert "radio-cert-mode" in header_str
+
+
+def test_dark_layout_preserves_equal_cartesian_aspect_ratio():
+    """Verify that Plotly layouts enforce equal aspect ratio (scaleanchor='x', scaleratio=1.0)."""
+    layout = app.DARK_LAYOUT
+    assert layout["yaxis"]["scaleanchor"] == "x"
+    assert layout["yaxis"]["scaleratio"] == 1.0
+
+
+def test_cross_height_tab_components():
+    """Verify Cross-Height laboratory components: overlay, deviation, distance matrix, Taylor shapes."""
+    ch_tab = app.create_cross_height_tab()
+    ch_str = str(ch_tab)
+    
+    assert "graph-ch-overlay" in ch_str
+    assert "graph-ch-deviation" in ch_str
+    assert "graph-ch-matrix" in ch_str
+    assert "graph-ch-taylor" in ch_str
+    assert "check-ch-blocks" in ch_str
+
+
+def test_worldline_tab_components_and_bilateral_sequence():
+    """Verify Bilateral Worldline laboratory components: trajectory, radial invariance, defect scaling, grade strip."""
+    wl_tab = app.create_worldline_tab()
+    wl_str = str(wl_tab)
+    
+    assert "graph-wl-trajectory" in wl_str
+    assert "graph-wl-radial" in wl_str
+    assert "graph-wl-defect" in wl_str
+    assert "τ⁰ = 1 (Native ζ)" in wl_str
+
+
+def test_proof_programme_dependency_map_and_missing_step():
+    """Verify that proof programme explicitly displays the missing global coherence => radial rigidity step."""
+    prog_tab = app.create_proof_programme_tab()
+    prog_str = str(prog_tab)
+    
+    assert "Bilateral Continuation" in prog_str
+    assert "Native Zero Blocks" in prog_str
+    assert "Worldline Covariance" in prog_str
+    assert "Radial Invariance" in prog_str
+    assert "Exact Global Coherence Law" in prog_str
+    assert "Coherence => Radial Rigidity" in prog_str
+    assert "OPEN RESEARCH TARGET (Missing)" in prog_str

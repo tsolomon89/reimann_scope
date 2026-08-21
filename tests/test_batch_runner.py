@@ -676,4 +676,69 @@ def test_dirty_state_detection_rules(monkeypatch):
     assert is_dirty is False
 
 
+def test_experiment_overwrite_only_semantics(temp_research_env):
+    """
+    Verify overwrite-only run semantics:
+    - Running an experiment creates stable directory research/runs/<exp_id>/
+    - Rerunning the experiment replaces that stable directory
+    - No timestamped directory is created
+    - index.json entry is updated in-place rather than appended (runs count remains 1)
+    - No temporary .tmp_ or backup directories remain
+    """
+    spec = {
+        "schema_version": "2",
+        "id": "test-overwrite-001",
+        "title": "Test Overwrite Run",
+        "hypothesis": {"statement": "Testing overwrite semantics"},
+        "criterion": {"metric": "residual", "operator": "<=", "threshold": "1e-20", "aggregation": "max_abs"},
+        "engine": {"operation": "centrifuge"},
+        "parameters": {
+            "delta": {"kind": "explicit", "values": ["0.01", "0.02"]}
+        },
+        "precision": {"dps": 50}
+    }
+    
+    spec_file = os.path.join(temp_research_env["experiments"], "test-overwrite-001.yaml")
+    with open(spec_file, "w", encoding="utf-8") as f:
+        yaml.dump(spec, f)
+        
+    # Run 1
+    run_id_1 = research_runner.run_experiment(spec_file)
+    assert run_id_1 == "test-overwrite-001"
+    
+    runs_dir = temp_research_env["runs"]
+    stable_exp_dir = os.path.join(runs_dir, "test-overwrite-001")
+    assert os.path.isdir(stable_exp_dir)
+    assert os.path.exists(os.path.join(stable_exp_dir, "manifest.json"))
+    assert os.path.exists(os.path.join(stable_exp_dir, "summary.json"))
+    assert os.path.exists(os.path.join(stable_exp_dir, "results.jsonl"))
+    assert os.path.exists(os.path.join(stable_exp_dir, "README.md"))
+    
+    # Check index.json after Run 1
+    with open(temp_research_env["index"], "r", encoding="utf-8") as f:
+        idx1 = json.load(f)
+    assert len(idx1["runs"]) == 1
+    assert idx1["runs"][0]["experiment_id"] == "test-overwrite-001"
+    
+    # Run 2 (re-run)
+    run_id_2 = research_runner.run_experiment(spec_file)
+    assert run_id_2 == "test-overwrite-001"
+    
+    # Check directory listing: exactly one directory in runs/
+    all_runs_dirs = os.listdir(runs_dir)
+    assert len(all_runs_dirs) == 1
+    assert all_runs_dirs[0] == "test-overwrite-001"
+    
+    # No .tmp_ or backup directories
+    assert not any(d.startswith(".tmp") for d in all_runs_dirs)
+    assert not any("backup" in d for d in all_runs_dirs)
+    
+    # Check index.json after Run 2: still exactly 1 entry (updated, not appended)
+    with open(temp_research_env["index"], "r", encoding="utf-8") as f:
+        idx2 = json.load(f)
+    assert len(idx2["runs"]) == 1
+    assert idx2["runs"][0]["experiment_id"] == "test-overwrite-001"
+
+
+
 
