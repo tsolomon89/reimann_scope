@@ -12,9 +12,9 @@ hypothesis:
     coordinate R_tau(s_rho(k), k) = 0 identically.
 prediction:
   statement: Transformed function residual |Z_tau(s_rho(k), k)| and radial coordinate error
-    |R_tau - 0| are below 1e-45 across all integer grades K in [-5, 5].
+    |R_tau - 0| are below 1e-35 across all integer grades K in [-5, 5] given 40-digit reference zeros.
 falsification:
-  statement: Residual of Z_tau at s_rho(k) exceeds 1e-45, or radial coordinate differs from 0.
+  statement: Residual of Z_tau at s_rho(k) exceeds 1e-35, or radial coordinate differs from 0.
 interpretation_limit:
   statement: Passing this coordinate control verifies the mathematical implementation
     of transcendental continuation; it is an exact control, not evidence for RH.
@@ -23,7 +23,7 @@ formalization_target:
 criterion:
   metric: max_residual
   operator: <=
-  threshold: 1e-45
+  threshold: 1e-35
   aggregation: max_abs
 report_metrics:
 - metric: zeta_residual
