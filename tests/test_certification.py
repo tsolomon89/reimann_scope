@@ -16,10 +16,10 @@ def test_certify_and_verify_single_zero():
         pytest.skip("FLINT/python-flint not available")
         
     cert = certification.certify_zero(1, dps=50)
-    assert cert["certificate_type"] == "isolated_simple_zero"
+    assert cert["certificate_type"] == "zero_isolation_and_simplicity"
     assert cert["zero_index"] == 1
-    assert cert["is_simple_zero"] is True
-    assert cert["derivative_non_vanishing_proved"] is True
+    assert cert["status"] == "simple_zero_certified"
+    assert cert["derivative_enclosure"]["excludes_zero"] is True
     
     is_valid, msg = certification.verify_certificate(cert)
     assert is_valid, f"Certificate verification failed: {msg}"
@@ -49,14 +49,15 @@ def test_certify_and_verify_worldline():
     
     # Actual zero worldline
     wl_actual = certification.certify_worldline(z_cert, grade=1, delta=0.0, dps=50)
-    assert wl_actual["certificate_type"] == "transcendental_worldline"
-    assert wl_actual["radial_leaf_type"] == "actual_zero_worldline"
+    assert wl_actual["certificate_type"] == "worldline_certificate"
+    assert wl_actual["claim_type"] == "actual_zero_worldline"
     is_valid, msg = certification.verify_certificate(wl_actual)
     assert is_valid, f"Actual worldline verification failed: {msg}"
     
     # Synthetic leaf
     wl_synth = certification.certify_worldline(z_cert, grade=2, delta=0.05, dps=50)
-    assert wl_synth["radial_leaf_type"] == "synthetic_radial_leaf"
+    assert wl_synth["certificate_type"] == "worldline_certificate"
+    assert wl_synth["claim_type"] == "synthetic_radial_leaf"
     is_valid, msg = certification.verify_certificate(wl_synth)
     assert is_valid, f"Synthetic worldline verification failed: {msg}"
 
@@ -75,7 +76,7 @@ def test_tampered_certificate_fails_closed():
     
     is_valid, msg = certification.verify_certificate(cert_tampered)
     assert not is_valid
-    assert "SHA-256 integrity hash mismatch" in msg
+    assert any("Hash mismatch" in m for m in msg)
 
 
 def test_all_persisted_certificates_pass_verification():
