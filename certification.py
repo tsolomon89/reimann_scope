@@ -139,7 +139,7 @@ def certify_zero(index: int, dps: int = 80) -> Dict[str, Any]:
         ctx.dps = old_dps
 
 
-def certify_block(block_id: str, zero_indices: List[int], dps: int = 80) -> Dict[str, Any]:
+def certify_block(block_id: str, zero_indices: List[int], dps: int = 80) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """Certify consecutive zero block completeness and collect constituent zero certificates.
     
     Args:
@@ -284,7 +284,7 @@ def certify_worldline(
 
 def _parse_arb_str_to_float(val_str: str) -> float:
     """Safely extract float midpoint from exact decimal or Arb interval string."""
-    s = str(val_str).strip()
+    s = val_str.strip()
     if s.startswith("[") and "+/-" in s:
         s = s.strip("[]").split("+/-")[0].strip()
     return float(s)

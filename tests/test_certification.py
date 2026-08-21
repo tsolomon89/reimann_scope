@@ -31,9 +31,10 @@ def test_certify_and_verify_block():
         pytest.skip("FLINT/python-flint not available")
         
     zero_indices = list(range(1, 11))
-    cert = certification.certify_block("low_validation", zero_indices, dps=50)
-    assert cert["certificate_type"] == "complete_zero_block"
+    cert, zero_certs = certification.certify_block("low_validation", zero_indices, dps=50)
+    assert cert["certificate_type"] == "complete_block_certificate"
     assert cert["zero_count"] == 10
+    assert len(zero_certs) == 10
     
     is_valid, msg = certification.verify_certificate(cert)
     assert is_valid, f"Block certificate verification failed: {msg}"
