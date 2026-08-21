@@ -3,10 +3,10 @@
   "run_id": "coupled-scale-covariance-001",
   "experiment_id": "coupled-scale-covariance-001",
   "experiment_spec_sha256": "a28d5cee43ea6ac51945b442681a7f8fbe73d2c74e8ab3e8db608cb7e311aa79",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:49:33.849194+00:00",
-  "completed_at": "2026-08-21T19:49:34.482642+00:00",
+  "started_at": "2026-08-21T20:38:49.348772+00:00",
+  "completed_at": "2026-08-21T20:38:50.082247+00:00",
   "status": "complete",
   "precision": {
     "dps": 80

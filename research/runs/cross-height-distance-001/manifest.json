@@ -3,10 +3,10 @@
   "run_id": "cross-height-distance-001",
   "experiment_id": "cross-height-distance-001",
   "experiment_spec_sha256": "ef6696444ac87bfac6f217f8e28c9eed5f7ea3bd8f9d582519544494e5534cc9",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:49:34.672692+00:00",
-  "completed_at": "2026-08-21T19:49:41.217300+00:00",
+  "started_at": "2026-08-21T20:38:50.389963+00:00",
+  "completed_at": "2026-08-21T20:38:57.113021+00:00",
   "status": "complete",
   "precision": {
     "dps": 80

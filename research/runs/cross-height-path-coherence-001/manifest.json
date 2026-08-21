@@ -3,10 +3,10 @@
   "run_id": "cross-height-path-coherence-001",
   "experiment_id": "cross-height-path-coherence-001",
   "experiment_spec_sha256": "64b4fe387d81a1a374d963cdc977806ff3ecf79e2bdaed496a207b96f2028166",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:49:41.383628+00:00",
-  "completed_at": "2026-08-21T19:50:33.231468+00:00",
+  "started_at": "2026-08-21T20:38:57.275423+00:00",
+  "completed_at": "2026-08-21T20:39:46.914402+00:00",
   "status": "complete",
   "precision": {
     "dps": 80

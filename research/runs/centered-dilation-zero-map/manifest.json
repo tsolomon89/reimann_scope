@@ -3,10 +3,10 @@
   "run_id": "centered-dilation-zero-map",
   "experiment_id": "centered-dilation-zero-map",
   "experiment_spec_sha256": "4e6ca7f689e910ce87133c1eadddf51568e2a0c3928abed9e8b896298bd592ff",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:49:32.731801+00:00",
-  "completed_at": "2026-08-21T19:49:32.818590+00:00",
+  "started_at": "2026-08-21T20:38:48.058449+00:00",
+  "completed_at": "2026-08-21T20:38:48.159966+00:00",
   "status": "complete",
   "precision": {
     "dps": 80

@@ -3,10 +3,10 @@
   "run_id": "inverse-kernel-lock-identity",
   "experiment_id": "inverse-kernel-lock-identity",
   "experiment_spec_sha256": "fd97ab82cec1f32803184fb5e79b1d7b25d41176badb215d4c345968d6ff4c20",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:50:33.642345+00:00",
-  "completed_at": "2026-08-21T19:50:33.895841+00:00",
+  "started_at": "2026-08-21T20:39:47.309861+00:00",
+  "completed_at": "2026-08-21T20:39:47.572514+00:00",
   "status": "complete",
   "precision": {
     "dps": 80

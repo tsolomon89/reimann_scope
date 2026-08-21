@@ -3,10 +3,10 @@
   "run_id": "synthetic-radial-leaves-001",
   "experiment_id": "synthetic-radial-leaves-001",
   "experiment_spec_sha256": "b3a6e6fbbade2a41d5b1f529637bc8b8d14919c64a5d7e9a96d0565ee6b85596",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:51:32.179961+00:00",
-  "completed_at": "2026-08-21T19:51:32.201990+00:00",
+  "started_at": "2026-08-21T20:40:47.901949+00:00",
+  "completed_at": "2026-08-21T20:40:47.929060+00:00",
   "status": "complete",
   "precision": {
     "dps": 80

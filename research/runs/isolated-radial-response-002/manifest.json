@@ -3,10 +3,10 @@
   "run_id": "isolated-radial-response-002",
   "experiment_id": "isolated-radial-response-002",
   "experiment_spec_sha256": "9f516257ea49e92da33d2cfa6588e834466b4c8166d3e8e2131d87e5d57c59d7",
-  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
+  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:50:34.091450+00:00",
-  "completed_at": "2026-08-21T19:51:31.738599+00:00",
+  "started_at": "2026-08-21T20:39:47.751987+00:00",
+  "completed_at": "2026-08-21T20:40:47.431175+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
