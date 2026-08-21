@@ -30,3 +30,19 @@ jobs:
     - name: Run pytest test suite
       run: |
         pytest
+
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install elan
+      run: |
+        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+        echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+    - name: Build Lean formalization
+      run: |
+        cd formal
+        lake build
+

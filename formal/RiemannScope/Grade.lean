@@ -1,7 +1,7 @@
 /-
 RiemannScope.Grade
 Tau-grade group structure and bilateral integer scale inverses.
-Reference: docs/LEAN_FORMALIZATION_PLAN.md §5
+Reference: MATH_CONTRACT.md §2
 -/
 
 import Mathlib.Data.Real.Basic
@@ -36,6 +36,6 @@ theorem integerGradeScale_bilateral_inverse (K : ℤ) (htau : 0 < tau) :
   have hpos : 0 < integerGradeScale K := by
     dsimp [integerGradeScale]
     exact Real.rpow_pos_of_pos htau (K : ℝ)
-  exact mul_inv_cancel₀ (ne_of_gt hpos)
+  exact mul_inv_cancel (ne_of_gt hpos)
 
 end RiemannScope

@@ -20,3 +20,8 @@ htmlcov/
 Thumbs.db
 .vscode/
 .idea/
+
+# Lean
+.lake/
+formal/.lake/
+

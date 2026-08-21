@@ -1,10 +1,10 @@
 /-
 RiemannScope.Contradiction
 Abstract contradiction skeleton for radial leaf rigidity.
-Reference: docs/LEAN_FORMALIZATION_PLAN.md §13, §14
+Reference: MATH_CONTRACT.md §8
 -/
 
-import Mathlib.Data.Set.Basic
+import Mathlib.Data.Real.Basic
 
 namespace RiemannScope
 
@@ -13,18 +13,16 @@ structure AbstractZero where
   id : ℕ
   radial : ℝ
 
-/-- Single radial leaf property: all zeros in the spectrum share identical radial coordinate -/
-def SingleRadialLeaf (spectrum : Set AbstractZero) : Prop :=
-  ∀ z1 ∈ spectrum, ∀ z2 ∈ spectrum, z1.radial = z2.radial
-
-/-- Contradiction theorem: If a spectrum satisfies SingleRadialLeaf and contains an on-line zero
-    (radial = 0), then any hypothetical zero with non-zero radial coordinate is impossible. -/
-theorem radial_rigidity_contradiction (spectrum : Set AbstractZero)
-    (h_leaf : SingleRadialLeaf spectrum)
-    (z0 : AbstractZero) (hz0 : z0 ∈ spectrum) (h_online : z0.radial = 0)
-    (z_pert : AbstractZero) (hz_pert : z_pert ∈ spectrum) (h_offline : z_pert.radial ≠ 0) :
+/-- Contradiction theorem: If all zeros in a spectrum have equal radial coordinate,
+    and an on-line zero (radial = 0) exists in the spectrum,
+    then any zero with non-zero radial coordinate is impossible. -/
+theorem radial_rigidity_contradiction
+    (radial_fn : ℕ → ℝ)
+    (h_leaf : ∀ i j, radial_fn i = radial_fn j)
+    (i0 : ℕ) (h_online : radial_fn i0 = 0)
+    (i_pert : ℕ) (h_offline : radial_fn i_pert ≠ 0) :
     False := by
-  have h_eq : z_pert.radial = z0.radial := h_leaf z_pert hz_pert z0 hz0
+  have h_eq : radial_fn i_pert = radial_fn i0 := h_leaf i_pert i0
   rw [h_online] at h_eq
   exact h_offline h_eq
 
