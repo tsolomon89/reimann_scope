@@ -863,8 +863,8 @@ def evaluate_point(
                     b1, b2 = "low_validation", "high_research"
                 elif pair_key == "low_to_very_high":
                     b1, b2 = "low_validation", "very_high_sparse"
-                elif "_to_" in str(pair_key):
-                    parts = str(pair_key).split("_to_")
+                elif "_to_" in pair_key:
+                    parts = pair_key.split("_to_")
                     b1, b2 = parts[0], parts[1]
                 else:
                     b1, b2 = "low_validation", "medium_research"
