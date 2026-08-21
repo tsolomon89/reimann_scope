@@ -55,6 +55,11 @@ def certify_zero(index: int, dps: int = 80) -> Dict[str, Any]:
     """
     if index < 1:
         raise ValueError(f"Zero index must be positive integer >= 1, got {index}")
+    if not FLINT_AVAILABLE:
+        raise RuntimeError(
+            "FLINT/python-flint is required for rigorous mathematical certification. "
+            "Please ensure python-flint>=0.6.0 is installed in your Python environment."
+        )
 
     old_dps = ctx.dps
     try:
@@ -195,6 +200,12 @@ def certify_worldline(
         delta: Radial perturbation displacement (0.0 for actual zeros).
         dps: Precision in decimal digits.
     """
+    if not FLINT_AVAILABLE:
+        raise RuntimeError(
+            "FLINT/python-flint is required for rigorous mathematical certification. "
+            "Please ensure python-flint>=0.6.0 is installed in your Python environment."
+        )
+
     old_dps = ctx.dps
     try:
         ctx.dps = dps + 20

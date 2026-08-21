@@ -132,6 +132,19 @@ def discover_zeros_float(
     return [float(z) for z in discover_zeros(t_min, t_max, dps=dps)]
 
 
+def generate_baseline_validation_report(
+    t_min: float = 10.0,
+    t_max: float = 60.0,
+    dps: int = 35
+) -> Dict[str, Any]:
+    """Discover baseline zeros and validate against reference dataset."""
+    import reference_data
+    disc = discover_zeros(t_min, t_max, dps=dps)
+    rep = reference_data.validate_zero_discovery(disc, t_min, t_max, dps=dps)
+    rep["zeros_evaluated"] = rep.get("discovered_count", len(disc))
+    return rep
+
+
 # ==============================================================================
 # TRANSFORMED ZERO DISCOVERY (Independent discovery of f(s) zeros)
 # ==============================================================================
