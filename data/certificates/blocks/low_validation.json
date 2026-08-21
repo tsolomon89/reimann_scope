@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "complete_block_certificate",
+  "status": "complete_block_certified",
+  "block_id": "low_validation",
+  "index_range": [
+    1,
+    10
+  ],
+  "zero_count": 10,
+  "mathematical_claim": "Canonical block 'low_validation' contains exactly 10 certified consecutive simple zeros for indices 1..10",
+  "constituent_zero_hashes": [
+    "eddf4ebef57461bf0cc1e27883f62dc2c418ffe8094878f5614e2386f90ad381",
+    "5ea3356aff3298df3497bc4e6cd74860d4b2a73591eb9c0ed92a4bad90a4e8da",
+    "3213b2b53f61a164052b6306b1b65bee9622cd99a0346249fb957a0e94c3b85d",
+    "c8d0cdf6d72528815a688ea3bf9d1b468cc21f43f884372c670a2510b1c3becb",
+    "ed5a9aa350d85a680e7563fc43697e097117e4e5927fe74e35452282cbb3201d",
+    "7562abb765c9856f3cda5c1ac751644efcd02c8e4d7b3090b83ccef1b00f7059",
+    "f1379b61831cd407803b74a699db002224cf5a8ea1568ab8173482f0f6cd98cb",
+    "7a0750ba0d9798679d33a39a113bdc2da30a2eb6dd738d931e2812673da38bc3",
+    "ce24d98ae896588b9e5d95674f910d8e5e974b3b3a229a38ae024e9fd2e90985",
+    "1d3255a2e517dacd3f287bcf3b3daf2bc8fa4421cf3ac94cc1958b48ec925782"
+  ],
+  "height_range": [
+    "[14.13472514173469379045725198356247027078425711569924317568556746014996342980925676494901039317156101 +/- 2.72e-99]",
+    "[49.77383247767230218191678467856372405772317829967666210078195575043351161151573927873270750740093133 +/- 5.59e-101]"
+  ],
+  "all_zeros_simple": true,
+  "method": "flint.acb.zeta_zero consecutive root isolation and Turing completeness verification",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "certificate_hash": "1105966883e6ac1cbbd62668f66b098552fdd50fa92309459d6a73d5340386f3"
+}

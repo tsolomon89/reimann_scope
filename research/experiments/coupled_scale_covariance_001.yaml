@@ -8,14 +8,14 @@ object_relationship: same_object_coordinate_control
 hypothesis:
   statement: Under dilation s' = A*s and variable transformation x' = x^(1/A), the
     exponent s' log x' = s log x is invariant, ensuring C_J(x', rho') = C_J(x, rho)
-    identically.
+    identically for exact components.
 prediction:
-  statement: Covariance residuals for zeta values and converter waves are below 1e-45.
+  statement: Exact covariance residuals for zeta values and single-zero C_J converter waves are below 1e-45; finite-m C_pi residual is an expected truncation diagnostic.
 falsification:
-  statement: Covariance residual exceeds 1e-45.
+  statement: Exact covariance residual exceeds 1e-45.
 interpretation_limit:
   statement: Exact coupled covariance gauge identity between domain dilation and exponential
-    prime variable scaling.
+    prime variable scaling; fixed-m C_pi series truncation error is diagnostic and does not violate exact covariance.
 formalization_target:
   statement: Coupled scale covariance theorem for Riemann explicit formula.
 criterion:
@@ -31,8 +31,8 @@ report_metrics:
   kind: criterion_component
   label: Single-zero prime wave C_J covariance residual
 - metric: cpi_covariance_residual
-  kind: criterion_component
-  label: Single-zero prime wave C_pi covariance residual
+  kind: fixed_m_truncation_diagnostic
+  label: Single-zero prime wave C_pi truncation diagnostic (fixed m-cutoff)
 engine:
   operation: zeta_trace_compare
 parameters:

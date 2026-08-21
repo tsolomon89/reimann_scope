@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "worldline_certificate",
+  "status": "worldline_certified",
+  "claim_type": "synthetic_radial_leaf",
+  "source_zero_hash": "3bc11f0bde25dcde3a030f5cc99158aa22c3cf6e4a78e4f9e17ce06ac0fc612e",
+  "source_zero_index": 100,
+  "grade_K": -1,
+  "symbolic_scale": "tau^-1",
+  "delta": "0.1",
+  "transformed_point": {
+    "real_mid": "[0.09549296585513720146133025802350861722067578744427386924860040643533807858053592105406828165975185157 +/- 2.02e-102]",
+    "imag_mid": "[37.64400031231736078558601684246468783686643763046174315239687115577825727737664091555097361068361673 +/- 4.12e-99]"
+  },
+  "critical_surface_real": "[0.07957747154594766788444188168625718101722982287022822437383367202944839881711326754505690138312654298 +/- 2.13e-102]",
+  "normalized_radial": "[0.09999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 +/- 1.44e-102]",
+  "radial_residual": "[4.458954944786056471026525841836426477684775923726516475531756670941040300662568169039611573338589630e-101 +/- 4.90e-201]",
+  "defect_residual": "[6.665266394546980111414658628019551317096891566764399084968642142747091666369834329733614664704024117e-102 +/- 1.75e-202]",
+  "mathematical_claim": "Bilateral graded worldline s_rho(-1) = tau^-1 * rho occupies radial leaf R_tau = 0.1 (synthetic radial perturbation leaf)",
+  "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "certificate_hash": "4f994231e71f23d3c4de2bf4f68ea1812b5cad589b6435b867334518cd2160f8"
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "complete_block_certificate",
+  "status": "complete_block_certified",
+  "block_id": "very_high_sparse",
+  "index_range": [
+    10000,
+    10002
+  ],
+  "zero_count": 3,
+  "mathematical_claim": "Canonical block 'very_high_sparse' contains exactly 3 certified consecutive simple zeros for indices 10000..10002",
+  "constituent_zero_hashes": [
+    "05a59d9b346318acf2bcbdc677daf4964899550bed5173418411f1975f3e39c8",
+    "8732e47d364dd28aa50efa6a5a7104404587323b6cd52696b883840a49803078",
+    "135cded3f24998641df06c8e64aa2cd832ea89573ed29e06e9d2f8fa200506ca"
+  ],
+  "height_range": [
+    "[9877.782654005501142774099070690123577622468051781115996005448274058955511917303507774113266200856117 +/- 2.13e-97]",
+    "[9879.036733396568730710035818664754545337389423137407798782870355076655203904475097336874701395549657 +/- 1.38e-97]"
+  ],
+  "all_zeros_simple": true,
+  "method": "flint.acb.zeta_zero consecutive root isolation and Turing completeness verification",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "certificate_hash": "5fe3f07168cb7a213712f23ed53f6f1641c9eb25690fde544016bd929c25472b"
+}

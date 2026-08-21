@@ -1,0 +1,29 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "complete_block_certificate",
+  "status": "complete_block_certified",
+  "block_id": "medium_research",
+  "index_range": [
+    100,
+    104
+  ],
+  "zero_count": 5,
+  "mathematical_claim": "Canonical block 'medium_research' contains exactly 5 certified consecutive simple zeros for indices 100..104",
+  "constituent_zero_hashes": [
+    "3bc11f0bde25dcde3a030f5cc99158aa22c3cf6e4a78e4f9e17ce06ac0fc612e",
+    "709e35d362449f8bd7e659912f24d1233eaae7d5b6ca64adc694a9fd9527677f",
+    "92bb1638bf27ffec7e0fb4dab66f0b0eec5471fcb410506b38b53df32a620a76",
+    "204defb0e6f8e5ab285d90ab8afa8b245b3a41a39015c20097f53b973970d9ea",
+    "ec935502a99566483d0e4e02ae5d05b6e3ba95608f4b941771021d373146ab4f"
+  ],
+  "height_range": [
+    "[236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740 +/- 1.53e-98]",
+    "[242.8232719342226000168264744588785499539405437676149323831693082575287402605378973831174125968060324 +/- 2.27e-98]"
+  ],
+  "all_zeros_simple": true,
+  "method": "flint.acb.zeta_zero consecutive root isolation and Turing completeness verification",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "certificate_hash": "c92d25e78805059f7fc3053bef5b8552908cc534d4e98c8df59620d0f18e7ea4"
+}

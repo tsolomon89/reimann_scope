@@ -21,6 +21,7 @@ import time
 import hashlib
 import itertools
 import glob
+import shutil
 import subprocess
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Tuple, Optional, Union
@@ -32,6 +33,7 @@ import converter
 import zero_finder
 import reference_data
 import transcendental
+import certification
 
 
 RESEARCH_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "research")
@@ -1415,13 +1417,17 @@ def run_experiment(
     total_points = len(grid)
     
     # Determine run identity
+    exp_id = spec["id"]
+    stable_dir = os.path.join(RUNS_DIR, exp_id)
+    run_id = exp_id
+    
+    # Determine run identity and working directory
     if resume_run_id:
-        run_id = resume_run_id
-        run_dir = os.path.join(RUNS_DIR, run_id)
-        if not os.path.exists(run_dir):
-            raise FileNotFoundError(f"Cannot resume: Run directory '{run_dir}' does not exist")
+        work_dir = stable_dir
+        if not os.path.exists(work_dir):
+            raise FileNotFoundError(f"Cannot resume: Run directory '{work_dir}' does not exist")
             
-        manifest_path = os.path.join(run_dir, "manifest.json")
+        manifest_path = os.path.join(work_dir, "manifest.json")
         if not os.path.exists(manifest_path):
             raise FileNotFoundError(f"Cannot resume: Missing '{manifest_path}'")
             
@@ -1434,11 +1440,11 @@ def run_experiment(
                 f"Refusing resume: Spec hash mismatch! (Recorded: {manifest.get('experiment_spec_sha256')}, Current: {spec_sha})"
             )
     else:
-        timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        short_hash = spec_sha[:8]
-        run_id = f"{timestamp_str}_{spec['id']}_{short_hash}"
-        run_dir = os.path.join(RUNS_DIR, run_id)
-        os.makedirs(run_dir, exist_ok=True)
+        # Atomic replacement: work in temporary sibling directory
+        work_dir = os.path.join(RUNS_DIR, f".tmp_{exp_id}_{os.getpid()}")
+        if os.path.exists(work_dir):
+            shutil.rmtree(work_dir)
+        os.makedirs(work_dir, exist_ok=True)
         
         # Source module hashes
         code_root = os.path.dirname(os.path.abspath(__file__))
@@ -1446,13 +1452,14 @@ def run_experiment(
             "math_core.py": hash_file_bytes(os.path.join(code_root, "math_core.py")),
             "transforms.py": hash_file_bytes(os.path.join(code_root, "transforms.py")),
             "converter.py": hash_file_bytes(os.path.join(code_root, "converter.py")),
-            "zero_finder.py": hash_file_bytes(os.path.join(code_root, "zero_finder.py"))
+            "zero_finder.py": hash_file_bytes(os.path.join(code_root, "zero_finder.py")),
+            "certification.py": hash_file_bytes(os.path.join(code_root, "certification.py"))
         }
         
         manifest = {
             "schema_version": "2",
-            "run_id": run_id,
-            "experiment_id": spec["id"],
+            "run_id": exp_id,
+            "experiment_id": exp_id,
             "experiment_spec_sha256": spec_sha,
             "git_commit": git_commit,
             "git_dirty": git_dirty,
@@ -1481,10 +1488,10 @@ def run_experiment(
             "code_modules": code_modules
         }
         
-        with open(os.path.join(run_dir, "manifest.json"), "w", encoding="utf-8") as f:
+        with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
 
-    results_path = os.path.join(run_dir, "results.jsonl")
+    results_path = os.path.join(work_dir, "results.jsonl")
     
     # Read already completed point IDs if resuming
     completed_point_ids = set()
@@ -1531,23 +1538,29 @@ def run_experiment(
     manifest["points_completed"] = completed_points
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
     
-    with open(os.path.join(run_dir, "manifest.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
         
-    summary = compute_summary(spec, run_id, all_results, status=final_status)
-    with open(os.path.join(run_dir, "summary.json"), "w", encoding="utf-8") as f:
+    summary = compute_summary(spec, exp_id, all_results, status=final_status)
+    with open(os.path.join(work_dir, "summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
         
     readme_content = generate_run_readme(spec, manifest, summary)
-    with open(os.path.join(run_dir, "README.md"), "w", encoding="utf-8") as f:
+    with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
+        
+    # Atomic replacement: move work_dir to stable_dir
+    if not resume_run_id:
+        if os.path.exists(stable_dir):
+            shutil.rmtree(stable_dir)
+        shutil.move(work_dir, stable_dir)
         
     # Update index
     run_entry: Dict[str, Any] = {
         "schema_version": "2",
-        "run_id": run_id,
-        "experiment_id": spec["id"],
-        "title": spec.get("title", spec["id"]),
+        "run_id": exp_id,
+        "experiment_id": exp_id,
+        "title": spec.get("title", exp_id),
         "epistemic_class": spec.get("epistemic_class", "exact_control"),
         "object_relationship": spec.get("object_relationship", "unknown"),
         "classification": spec.get("classification", "canonical_experiment"),
@@ -1556,15 +1569,15 @@ def run_experiment(
         "git_dirty": git_dirty,
         "status": final_status,
         "criterion_met": summary["criterion"].get("criterion_met"),
-        "summary_path": f"research/runs/{run_id}/summary.json",
-        "manifest_path": f"research/runs/{run_id}/manifest.json",
-        "results_path": f"research/runs/{run_id}/results.jsonl"
+        "summary_path": f"research/runs/{exp_id}/summary.json",
+        "manifest_path": f"research/runs/{exp_id}/manifest.json",
+        "results_path": f"research/runs/{exp_id}/results.jsonl"
     }
     if "notes" in spec:
         run_entry["notes"] = spec["notes"]
     update_index_file(run_entry)
     
-    return run_id
+    return exp_id
 
 
 def summarize_run(run_id: str) -> Dict[str, Any]:

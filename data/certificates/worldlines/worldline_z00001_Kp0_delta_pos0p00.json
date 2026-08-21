@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "worldline_certificate",
+  "status": "worldline_certified",
+  "claim_type": "actual_zero_worldline",
+  "source_zero_hash": "eddf4ebef57461bf0cc1e27883f62dc2c418ffe8094878f5614e2386f90ad381",
+  "source_zero_index": 1,
+  "grade_K": 0,
+  "symbolic_scale": "1",
+  "delta": "0.0",
+  "transformed_point": {
+    "real_mid": "0.5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "imag_mid": "[14.13472514173469379045725198356247027078425711569924317568556746014996342980925676494901039317156101 +/- 2.94e-101]"
+  },
+  "critical_surface_real": "0.5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "normalized_radial": "0",
+  "radial_residual": "0",
+  "defect_residual": "0",
+  "mathematical_claim": "Bilateral graded worldline s_rho(0) = tau^0 * rho occupies radial leaf R_tau = 0.0 (critical surface on-line zero)",
+  "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "certificate_hash": "a6ebe317b7958aa5b97aa7079833f9eafc17476c10de8916c6930f4d5c7f9e96"
+}
