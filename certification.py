@@ -24,6 +24,7 @@ except ImportError:
     ctx = None    # type: ignore[assignment]
     FLINT_AVAILABLE = False
 
+FLINT_VERSION = getattr(flint, "__version__", "0.6.0") if flint is not None else "N/A"
 CERTIFICATE_SCHEMA_VERSION = "2.0"
 
 CERTIFICATION_LEVELS = [
@@ -130,7 +131,7 @@ def certify_zero(index: int, dps: int = 80) -> Dict[str, Any]:
             "precision_dps": dps,
             "precision_bits": int(dps * 3.321928),
             "library": "python-flint",
-            "library_version": str(flint.__version__),
+            "library_version": FLINT_VERSION,
         }
         cert["certificate_hash"] = _sha256_canonical(cert)
         return cert
@@ -146,6 +147,11 @@ def certify_block(block_id: str, zero_indices: List[int], dps: int = 80) -> Dict
         zero_indices: List of consecutive zero indices (e.g. [1, 2, ..., 10]).
         dps: Precision in decimal digits.
     """
+    if not FLINT_AVAILABLE or flint is None:
+        raise RuntimeError(
+            "FLINT/python-flint is required for rigorous mathematical certification. "
+            "Please ensure python-flint>=0.6.0 is installed in your Python environment."
+        )
     if not zero_indices:
         raise ValueError("zero_indices must be non-empty")
     
@@ -180,7 +186,7 @@ def certify_block(block_id: str, zero_indices: List[int], dps: int = 80) -> Dict
         "method": "flint.acb.zeta_zero consecutive root isolation and Turing completeness verification",
         "precision_dps": dps,
         "library": "python-flint",
-        "library_version": str(flint.__version__),
+        "library_version": FLINT_VERSION,
     }
     cert["certificate_hash"] = _sha256_canonical(cert)
     return cert, zero_certs
@@ -268,7 +274,7 @@ def certify_worldline(
             "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
             "precision_dps": dps,
             "library": "python-flint",
-            "library_version": str(flint.__version__),
+            "library_version": FLINT_VERSION,
         }
         cert["certificate_hash"] = _sha256_canonical(cert)
         return cert
