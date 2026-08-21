@@ -3,10 +3,10 @@
   "run_id": "transcendental-worldlines-001",
   "experiment_id": "transcendental-worldlines-001",
   "experiment_spec_sha256": "af70c107e93f687efeedade71ee131668d4cfdb89bbd29fdf652e3343fb3dd63",
-  "git_commit": "a771aab0106c1027b843cfc094dbe8b75581ab7e",
+  "git_commit": "632277333dc924cb962e0c5d28b7c50f0a1fcdbc",
   "git_dirty": false,
-  "started_at": "2026-08-21T19:32:01.890731+00:00",
-  "completed_at": "2026-08-21T19:32:02.040438+00:00",
+  "started_at": "2026-08-21T19:51:32.398355+00:00",
+  "completed_at": "2026-08-21T19:51:32.531955+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -108,7 +108,7 @@
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transforms.py": "dbee0592c9c3ae9c2370a0103e686973284437d460f37067c253b0f7949302c8",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "zero_finder.py": "a801f00b746c540c9f0631c52b106991208ddde0c036ec04775ef5da1e3e9d0e",
-    "certification.py": "2a2842bd81e01def9d1d23b1169e8f7f47ad615b85e217f9de853fbc18afe6d2"
+    "zero_finder.py": "c4c8e86d7bf46737ce4b41378edde777d755f02d68cb7b845dbae036b5743b34",
+    "certification.py": "37e675c8cf5769d60472309973b09c384dbd8c5168022eb8ecc10598574b5173"
   }
 }
