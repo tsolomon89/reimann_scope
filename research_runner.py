@@ -1665,6 +1665,18 @@ def main():
                 print(f"Observed: {crit['observed']}")
                 print(f"Criterion Met: {crit['criterion_met']}")
 
+    elif cmd in ("run-all", "run_all", "batch"):
+        specs = sorted(glob.glob(os.path.join(EXPERIMENTS_DIR, "*.yaml")))
+        print(f"Executing {len(specs)} canonical experiment sweeps...")
+        for sf in specs:
+            name = os.path.basename(sf)
+            print(f"\n--- Running {name} ---")
+            r_id = run_experiment(sf)
+            s_dict = summarize_run(r_id)
+            c = s_dict.get("criterion", {})
+            print(f"[{name}] {r_id}: status={s_dict.get('status')} criterion_met={c.get('criterion_met')} observed={c.get('observed')}")
+        print("\nAll canonical experiment sweeps complete.")
+
     elif cmd == "summarize":
         if len(sys.argv) < 3:
             print("Error: Run ID required: python research_runner.py summarize <run_id>")
