@@ -1,27 +1,25 @@
 schema_version: '2'
 id: transcendental-worldlines-001
-title: Transcendental Continuation Zero Worldline and Radial Invariant Sweep
+title: Transcendental Continuation Actual Zero Worldline Invariant Sweep
 research_question: Does the extended domain function Z_tau(s, k) = zeta(tau^(-k) s)
-  preserve zero worldlines s_rho(k) = tau^k rho and radial coordinate R_tau = delta
-  across integer and continuous grades?
+  preserve zero worldlines s_rho(k) = tau^k rho and radial coordinate R_tau = 0
+  identically for verified critical-line zeros across bilateral integer grades?
 epistemic_class: exact_control
 object_relationship: same_object_coordinate_control
 hypothesis:
-  statement: For any zero rho = 1/2 + delta + i*gamma, the transformed zero s_rho(k)
-    = tau^k * rho is an exact zero of Z_tau(s, k), and its normalized radial coordinate
-    R_tau(s_rho(k), k) = delta identically.
+  statement: For any actual critical-line zero rho = 1/2 + i*gamma (delta = 0), the transformed
+    point s_rho(k) = tau^k * rho is an exact zero of Z_tau(s, k), and its normalized radial
+    coordinate R_tau(s_rho(k), k) = 0 identically.
 prediction:
-  statement: Transformed function value |Z_tau(s_rho(k), k)| and radial coordinate
-    error |R_tau - delta| are below 1e-45.
+  statement: Transformed function residual |Z_tau(s_rho(k), k)| and radial coordinate error
+    |R_tau - 0| are below 1e-45 across all integer grades K in [-5, 5].
 falsification:
-  statement: Residual of Z_tau at s_rho(k) exceeds 1e-45, or radial coordinate differs
-    from delta.
+  statement: Residual of Z_tau at s_rho(k) exceeds 1e-45, or radial coordinate differs from 0.
 interpretation_limit:
   statement: Passing this coordinate control verifies the mathematical implementation
-    of transcendental continuation; it is not evidence for RH.
+    of transcendental continuation; it is an exact control, not evidence for RH.
 formalization_target:
-  statement: Exact zero worldline and radial coordinate preservation identity for
-    Z_tau(s, k).
+  statement: Exact zero worldline and radial coordinate preservation identity for Z_tau(s, k).
 criterion:
   metric: max_residual
   operator: <=
@@ -33,10 +31,10 @@ report_metrics:
   label: Residual of Z_tau at transformed zero point
 - metric: radial_residual
   kind: criterion_component
-  label: Radial coordinate error |R_tau(s, k) - delta|
+  label: Radial coordinate error |R_tau(s, k) - 0|
 - metric: max_residual
   kind: criterion_component
-  label: Combined maximum residual
+  label: Combined maximum residual max(zeta_residual, radial_residual)
 engine:
   operation: transcendental_worldline
 parameters:
@@ -49,9 +47,7 @@ parameters:
   delta:
     kind: explicit
     values:
-    - '-0.01'
     - '0.0'
-    - '0.01'
   K:
     kind: integer_grade
     start: -5

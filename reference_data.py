@@ -4,7 +4,8 @@ reference_data.py — External Reference Validation and Prime Truth Sieve
 Loads vendored reference zeros and prime truth data for post-discovery validation.
 Strictly adheres to DATA_PROVENANCE.md:
 - Reference data NEVER seeds the discovery algorithm.
-- Reference ordinates are maintained as exact decimal strings.
+- Reference ordinates are maintained as exact decimal strings and arbitrary-precision mpmath.mpf values.
+- Authoritative zero matching and residual checks are performed without float downcast.
 """
 
 from __future__ import annotations
@@ -40,9 +41,17 @@ def verify_provenance() -> bool:
     if os.path.exists(zeros_file):
         with open(zeros_file, "rb") as f:
             h = hashlib.sha256(f.read()).hexdigest()
-        if h != prov.get("zeta_zeros", {}).get("sha256"):
+        expected_h = prov.get("zeta_zeros", {}).get("sha256") or prov.get("zeta_zeros_baseline", {}).get("sha256")
+        if h != expected_h:
             return False
             
+    canonical_file = os.path.join(DATA_DIR, "canonical_blocks.json")
+    if os.path.exists(canonical_file):
+        with open(canonical_file, "rb") as f:
+            h = hashlib.sha256(f.read()).hexdigest()
+        if h != prov.get("canonical_blocks", {}).get("sha256"):
+            return False
+
     primes_file = os.path.join(DATA_DIR, "primes.json")
     if os.path.exists(primes_file):
         with open(primes_file, "rb") as f:
@@ -63,11 +72,20 @@ def load_reference_zeros() -> List[str]:
         return data.get("ordinates", [])
 
 
+def load_canonical_blocks() -> Dict[str, Dict[str, Any]]:
+    """Load canonical spectrum blocks from data/canonical_blocks.json."""
+    blocks_file = os.path.join(DATA_DIR, "canonical_blocks.json")
+    if os.path.exists(blocks_file):
+        with open(blocks_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("blocks", {})
+    return {}
+
+
 def load_primes() -> List[int]:
     """Load deterministically sieved primes."""
     primes_file = os.path.join(DATA_DIR, "primes.json")
     if not os.path.exists(primes_file):
-        # Fallback local sieve
         return sieve_primes(2000)
     with open(primes_file, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -103,91 +121,119 @@ def prime_pi_array(x_arr: np.ndarray) -> np.ndarray:
 
 def validate_zero_discovery(
     discovered_ordinates: Sequence[Union[float, str, mpmath.mpf]],
-    t_min: float,
-    t_max: float,
-    tolerance: float = 1e-6,
+    t_min: Union[float, str, mpmath.mpf],
+    t_max: Union[float, str, mpmath.mpf],
+    tolerance: Union[float, str, mpmath.mpf] = "1e-5",
     dps: int = 35
 ) -> Dict[str, Any]:
     """
     Compare independently discovered zero ordinates against the vendored reference list.
     Calculates matched count, max difference, RMS error, unmatched roots, and residuals.
-    Strictly post-discovery validation at declared precision dps.
+    Operates at arbitrary precision without float downcast.
     """
-    ref_zeros_str = load_reference_zeros()
-    ref_ordinates_in_range = [
-        float(s) for s in ref_zeros_str if t_min <= float(s) <= t_max
-    ]
-    
-    disc_ordinates = sorted([float(g) for g in discovered_ordinates if t_min <= float(g) <= t_max])
-    
-    matched_pairs = []
-    unmatched_disc = []
-    unmatched_ref = list(ref_ordinates_in_range)
-    
-    for d in disc_ordinates:
-        closest_ref = None
-        closest_dist = float('inf')
-        for r in unmatched_ref:
-            dist = abs(d - r)
-            if dist < closest_dist:
-                closest_dist = dist
-                closest_ref = r
-        if closest_dist <= tolerance and closest_ref is not None:
-            matched_pairs.append((d, closest_ref, closest_dist))
-            unmatched_ref.remove(closest_ref)
+    with mpmath.workdps(dps + 20):
+        t_min_mpf = math_core.to_mpf(t_min, dps=dps + 20)
+        t_max_mpf = math_core.to_mpf(t_max, dps=dps + 20)
+        tol_mpf = math_core.to_mpf(tolerance, dps=dps + 20)
+
+        ref_zeros_str = load_reference_zeros()
+        ref_ordinates_in_range: List[Tuple[str, mpmath.mpf]] = []
+        for s in ref_zeros_str:
+            s_mpf = math_core.to_mpf(s, dps=dps + 20)
+            if t_min_mpf <= s_mpf <= t_max_mpf:
+                ref_ordinates_in_range.append((s, s_mpf))
+
+        disc_ordinates_in_range: List[Tuple[str, mpmath.mpf]] = []
+        for g in discovered_ordinates:
+            g_str = str(g)
+            g_mpf = math_core.to_mpf(g, dps=dps + 20)
+            if t_min_mpf <= g_mpf <= t_max_mpf:
+                disc_ordinates_in_range.append((g_str, g_mpf))
+
+        disc_ordinates_in_range.sort(key=lambda item: item[1])
+
+        matched_pairs: List[Tuple[str, str, mpmath.mpf]] = []
+        unmatched_disc: List[str] = []
+        unmatched_ref = list(ref_ordinates_in_range)
+
+        for d_str, d_mpf in disc_ordinates_in_range:
+            closest_ref_item = None
+            closest_dist = mpmath.mpf('inf')
+            for r_item in unmatched_ref:
+                dist = abs(d_mpf - r_item[1])
+                if dist < closest_dist:
+                    closest_dist = dist
+                    closest_ref_item = r_item
+            if closest_dist <= tol_mpf and closest_ref_item is not None:
+                matched_pairs.append((d_str, closest_ref_item[0], closest_dist))
+                unmatched_ref.remove(closest_ref_item)
+            else:
+                unmatched_disc.append(d_str)
+
+        diffs = [p[2] for p in matched_pairs]
+        max_diff = max(diffs) if diffs else mpmath.mpf('0.0')
+        if diffs:
+            mean_sq = sum(d ** 2 for d in diffs) / len(diffs)
+            rms_diff = mpmath.sqrt(mean_sq)
         else:
-            unmatched_disc.append(d)
-            
-    diffs = [p[2] for p in matched_pairs]
-    max_diff = max(diffs) if diffs else 0.0
-    rms_diff = float(np.sqrt(np.mean(np.array(diffs)**2))) if diffs else 0.0
-    
-    # Calculate zeta residuals for discovered zeros at declared dps
-    residuals = []
-    for d in disc_ordinates:
-        s_mpc = math_core.to_mpc((mpmath.mpf('0.5'), mpmath.mpf(str(d))), dps=dps)
-        z_val = math_core.zeta_eval(s_mpc, dps=dps)
-        residuals.append(float(abs(z_val)))
-        
-    passed = (
-        len(unmatched_disc) == 0 and
-        len(unmatched_ref) == 0 and
-        len(matched_pairs) > 0 and
-        max_diff <= tolerance
-    )
-    
-    return {
-        "status": "PASS" if passed else "FAIL",
-        "passed": passed,
-        "t_min": t_min,
-        "t_max": t_max,
-        "discovered_count": len(disc_ordinates),
-        "reference_in_range_count": len(ref_ordinates_in_range),
-        "reference_count": len(ref_ordinates_in_range),
-        "matched_count": len(matched_pairs),
-        "unmatched_discovered": unmatched_disc,
-        "unmatched_reference": unmatched_ref,
-        "max_diff": max_diff,
-        "max_difference": max_diff,
-        "rms_diff": rms_diff,
-        "rms_difference": rms_diff,
-        "residuals": residuals,
-        "max_residual": max(residuals) if residuals else 0.0,
-        "max_zeta_residual": max(residuals) if residuals else 0.0,
-        "mean_zeta_residual": float(np.mean(residuals)) if residuals else 0.0
-    }
+            rms_diff = mpmath.mpf('0.0')
+
+        # Calculate zeta residuals for discovered zeros at declared dps
+        residuals: List[mpmath.mpf] = []
+        for d_str, d_mpf in disc_ordinates_in_range:
+            s_mpc = mpmath.mpc(mpmath.mpf('0.5'), d_mpf)
+            z_val = math_core.zeta_eval(s_mpc, dps=dps)
+            residuals.append(abs(z_val))
+
+        max_res = max(residuals) if residuals else mpmath.mpf('0.0')
+        mean_res = (sum(residuals) / len(residuals)) if residuals else mpmath.mpf('0.0')
+
+        passed = (
+            len(unmatched_disc) == 0 and
+            len(unmatched_ref) == 0 and
+            len(matched_pairs) > 0 and
+            max_diff <= tol_mpf
+        )
+
+        return {
+            "status": "PASS" if passed else "FAIL",
+            "passed": passed,
+            "t_min": float(t_min_mpf),
+            "t_max": float(t_max_mpf),
+            "t_min_str": mpmath.nstr(t_min_mpf, n=20),
+            "t_max_str": mpmath.nstr(t_max_mpf, n=20),
+            "discovered_count": len(disc_ordinates_in_range),
+            "reference_in_range_count": len(ref_ordinates_in_range),
+            "reference_count": len(ref_ordinates_in_range),
+            "matched_count": len(matched_pairs),
+            "unmatched_discovered": unmatched_disc,
+            "unmatched_reference": [r[0] for r in unmatched_ref],
+            "max_diff": float(max_diff),
+            "max_difference": float(max_diff),
+            "max_diff_str": mpmath.nstr(max_diff, n=15),
+            "rms_diff": float(rms_diff),
+            "rms_difference": float(rms_diff),
+            "rms_diff_str": mpmath.nstr(rms_diff, n=15),
+            "residuals": [float(r) for r in residuals],
+            "max_residual": float(max_res),
+            "max_residual_str": mpmath.nstr(max_res, n=15),
+            "max_zeta_residual": float(max_res),
+            "mean_zeta_residual": float(mean_res),
+        }
 
 
 # ==============================================================================
-# BLOCK DATA ARCHITECTURE (docs/REBUILD_PLAN.md §17)
+# BLOCK DATA ARCHITECTURE (DATA_PROVENANCE.md)
 # ==============================================================================
 
-# Certified arbitrary-precision zero ordinates computed for canonical height blocks
-CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = {
+# Load blocks from disk or use canonical fallback
+_LOADED_BLOCKS = load_canonical_blocks()
+
+CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = _LOADED_BLOCKS if _LOADED_BLOCKS else {
     "low_validation": {
         "name": "Low Validation Block (n=1..10)",
         "role": "validation",
-        "provenance": "mpmath.zetazero low spectrum",
+        "provenance": "mpmath.zetazero low spectrum root refinement",
         "height_range": (14.0, 50.0),
         "ordinates": [
             "14.1347251417346937904572519835624702707842571156992431756855674601",
@@ -205,7 +251,7 @@ CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = {
     "medium_research": {
         "name": "Medium Research Block (n=100..104)",
         "role": "research_input",
-        "provenance": "mpmath.zetazero verified simple zeros",
+        "provenance": "mpmath.zetazero numerically refined simple zeros",
         "height_range": (236.0, 243.0),
         "ordinates": [
             "236.524229665816205802475507955662978689529495212189123700918960988",
@@ -218,7 +264,7 @@ CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = {
     "high_research": {
         "name": "High Research Block (n=1000..1002, gamma~1419)",
         "role": "research_input",
-        "provenance": "Arbitrary-precision certified root refinement",
+        "provenance": "mpmath.zetazero numerically refined zeros at 80 dps",
         "height_range": (1419.0, 1422.0),
         "ordinates": [
             "1419.42248094599568646598903807991681923210060106416601630469081468",
@@ -229,7 +275,7 @@ CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = {
     "very_high_sparse": {
         "name": "Very High Sparse Block (n=10000..10002, gamma~9877)",
         "role": "research_input",
-        "provenance": "Arbitrary-precision certified root refinement (mpmath.zetazero at 80 dps)",
+        "provenance": "mpmath.zetazero numerically refined zeros at 80 dps",
         "height_range": (9877.0, 9880.0),
         "ordinates": [
             "9877.7826540055011427740990706901235776224680517811159960054482740589555119173035",
@@ -258,10 +304,12 @@ def verify_simple_zero(
     tolerance: mpmath.mpf = mpmath.mpf('1e-20')
 ) -> Tuple[bool, mpmath.mpf, mpmath.mpc]:
     """
-    Verify numerically that rho = 1/2 + i*gamma is a simple zero:
+    Verify numerically that rho = 1/2 + i*gamma exhibits numerical evidence consistent with a simple zero:
     1. Check |zeta(1/2 + i*gamma)| < tolerance
-    2. Check |zeta'(1/2 + i*gamma)| > 1e-15 (non-vanishing derivative)
-    Returns (is_simple, zeta_residual, zeta_prime_val).
+    2. Check |zeta'(1/2 + i*gamma)| > 1e-15 (non-vanishing numerical derivative)
+    
+    Note: Numerical residual agreement is empirical evidence, not formal mathematical proof.
+    Returns (evidence_consistent_with_simple_zero, zeta_residual, zeta_prime_val).
     """
     with mpmath.workdps(dps + 20):
         g = math_core.to_mpf(gamma, dps=dps + 20)

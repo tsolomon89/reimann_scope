@@ -63,3 +63,40 @@ def test_independent_transformed_zero_discovery_centered_dilation():
     )
     assert comparison["matched_count"] > 0
     assert float(comparison["max_difference"]) < 1e-4
+
+
+@pytest.mark.parametrize("k_val", [-2, 0, 2])
+def test_transcendental_continuation_bilateral_zeros(k_val):
+    """
+    Test TranscendentalContinuationTransform across bilateral grades k in {-2, 0, 2}:
+    1. Image critical line position is exactly tau^k / 2
+    2. Zero mapping rho' = tau^k * rho
+    3. Transformed function evaluation Z_tau(tau^k * rho, k) = zeta(rho) = 0
+    4. Normalized radial leaf invariance R_tau(tau^k * rho, k) = delta = 0
+    """
+    dps = 80
+    with mpmath.workdps(dps + 10):
+        t_obj = transforms.TranscendentalContinuationTransform(grade=k_val)
+        
+        # 1. Critical line position
+        re_crit = zero_finder.get_image_critical_line_re(t_obj, dps=dps)
+        expected_re = math_core.get_tau(dps=dps) ** k_val / 2
+        assert abs(re_crit - expected_re) < mpmath.mpf('1e-50'), f"Failed for k={k_val}: {re_crit} vs {expected_re}"
+        
+        # 2. Zero mapping and function evaluation for first zero
+        gamma_str = "14.1347251417346937904572519835624702707842571156992431756855674601"
+        rho_native = mpmath.mpc(mpmath.mpf('0.5'), math_core.to_mpf(gamma_str, dps=dps))
+        
+        rho_mapped = t_obj.map_zero_mpc(rho_native, dps=dps)
+        expected_mapped = (math_core.get_tau(dps=dps) ** k_val) * rho_native
+        assert abs(rho_mapped - expected_mapped) < mpmath.mpf('1e-50')
+        
+        # Transformed function evaluates to 0
+        z_res = t_obj.evaluate_function(rho_mapped, dps=dps)
+        assert abs(z_res) < mpmath.mpf('1e-50'), f"Transformed zero residual {z_res} too large for k={k_val}"
+        
+        # 3. Normalized radial leaf coordinate R_tau(rho_mapped, k) == 0.0
+        scale = math_core.get_tau(dps=dps) ** k_val
+        r_tau = (rho_mapped.real / scale) - mpmath.mpf('0.5')
+        assert abs(r_tau) < mpmath.mpf('1e-50'), f"Radial coordinate {r_tau} != 0 for k={k_val}"
+

@@ -137,9 +137,16 @@ def discover_zeros_float(
 # ==============================================================================
 
 def get_image_critical_line_re(transform_obj: transforms.BaseTransform, dps: int = 80) -> Optional[mpmath.mpf]:
-    """Determine the real coordinate Re(s') of the image critical line for a transform."""
+    """
+    Determine the real coordinate Re(s') of the image critical line for a transform.
+    For Transcendental Continuation Z_tau(s, k) across any bilateral grade k in R:
+    Re(s_critical) = tau^k / 2.
+    """
     with mpmath.workdps(dps + 10):
-        if isinstance(transform_obj, (transforms.CameraTransform, transforms.CenteredCoordinateDilation, transforms.CenteredKernelTransform)):
+        if isinstance(transform_obj, transforms.TranscendentalContinuationTransform):
+            scale_val = transform_obj.grade.numeric_scale(dps=dps)
+            return scale_val / 2
+        elif isinstance(transform_obj, (transforms.CameraTransform, transforms.CenteredCoordinateDilation, transforms.CenteredKernelTransform)):
             return mpmath.mpf('0.5')
         elif isinstance(transform_obj, transforms.HeightMicroscopeTransform):
             return mpmath.mpf('0.5') + math_core.to_mpf(transform_obj.delta_str, dps=dps)

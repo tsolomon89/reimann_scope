@@ -1,14 +1,13 @@
 schema_version: '2'
 id: grade-constraints-001
 title: Bilateral Symmetric Defect and Hyperbolic Scaling Invariant Sweep
-research_question: Does the discrete bilateral defect D_K(rho) satisfy the hyperbolic
-  identity |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2) across integer grades?
+research_question: Does the discrete bilateral defect D_K satisfy the hyperbolic
+  identity |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2) identically across bilateral integer grades K in [-10, 10]?
 epistemic_class: exact_control
 object_relationship: grade_constraint_comparison
 hypothesis:
   statement: The bilateral defect D_K = (tau^(K*delta) - 1)*(1 - tau^(-K*delta)) satisfies
-    |D_K| = 4*sinh^2(K*delta*ln(tau)/2) identically, vanishing if and only if delta
-    = 0 or K = 0.
+    |D_K| = 4*sinh^2(K*delta*ln(tau)/2) identically for all K and delta, vanishing if and only if delta = 0 or K = 0.
 prediction:
   statement: Identity error | |D_K| - 4*sinh^2(K*delta*ln(tau)/2) | is below 1e-50
     across all K and delta.
@@ -16,7 +15,7 @@ falsification:
   statement: Identity error exceeds 1e-50.
 interpretation_limit:
   statement: This algebraic identity holds for all complex numbers; it confirms hyperbolic
-    amplification of off-line roots without asserting RH.
+    amplification of off-line roots under bilateral grading without asserting RH.
 formalization_target:
   statement: Hyperbolic identity for bilateral grade defect D_K.
 criterion:
@@ -37,10 +36,6 @@ report_metrics:
 engine:
   operation: grade_constraint
 parameters:
-  zero_index:
-    kind: explicit
-    values:
-    - 0
   delta:
     kind: explicit
     values:

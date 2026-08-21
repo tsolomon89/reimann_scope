@@ -7,15 +7,15 @@ epistemic_class: observational_pattern
 object_relationship: actual_cross_height_comparison
 hypothesis:
   statement: Derivative-normalized paths P_n(u) from different height blocks lie within
-    an O(Delta_n) bounded envelope around the leading linear term u.
+    an O(Delta_n) bounded envelope around the leading linear term u on compact sampling intervals.
 prediction:
-  statement: Normalized path distances ||P_m - P_n|| remain bounded by 2.0 on u in
+  statement: Normalized path distances ||P_m - P_n||_{infty} remain bounded by 2.0 on u in
     [-0.5, 0.5].
 falsification:
-  statement: Path distance diverges on compact sampling intervals.
+  statement: Path distance diverges or exceeds 2.0 on compact sampling intervals.
 interpretation_limit:
   statement: Bounded trajectory distance reflects local asymptotic Taylor structure;
-    it is not a proof of spectral rigidity.
+    it is an observational pattern across zero heights, not a proof of spectral rigidity or RH.
 criterion:
   metric: max_distance
   operator: <=
@@ -24,7 +24,13 @@ criterion:
 report_metrics:
 - metric: max_distance
   kind: criterion_component
-  label: Maximum normalized trajectory distance ||P_m - P_n||
+  label: Maximum normalized trajectory L_infty distance ||P_m - P_n||_infty
+- metric: L_infty_distance
+  kind: observational_metric
+  label: Discrete supremum path distance L_infty
+- metric: L_2_distance
+  kind: observational_metric
+  label: Root-mean-square path distance L_2
 engine:
   operation: cross_height_distance
 parameters:
@@ -34,6 +40,10 @@ parameters:
     - low_to_medium
     - low_to_high
     - low_to_very_high
+  zero_index:
+    kind: explicit
+    values:
+    - 0
   u_max:
     kind: explicit
     values:

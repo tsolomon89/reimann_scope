@@ -1,99 +1,55 @@
 {
   "schema_version": "2",
-  "zero_blocks": [
-    {
-      "block_id": "low_validation",
-      "name": "Low Validation Block (n=1..10)",
-      "role": "validation",
-      "source_name": "mpmath.zetazero low spectrum",
-      "source_author_or_org": "mpmath / Arb library (Fredrik Johansson)",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "stated_source_precision": "80 decimal digits root refinement",
-      "stored_precision": "80 decimal digits",
-      "record_count": 10,
-      "height_range": [
-        14.0,
-        50.0
-      ],
-      "sha256": "7df780ac193a8d5a498ce2055fd214d0107102eb7760c585cf360e161590af61",
-      "format": "decimal strings"
-    },
-    {
-      "block_id": "medium_research",
-      "name": "Medium Research Block (n=100..104)",
-      "role": "research_input",
-      "source_name": "mpmath.zetazero verified simple zeros",
-      "source_author_or_org": "mpmath / Arb library (Fredrik Johansson)",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "stated_source_precision": "80 decimal digits root refinement",
-      "stored_precision": "80 decimal digits",
-      "record_count": 5,
-      "height_range": [
-        236.0,
-        243.0
-      ],
-      "sha256": "33d8f25f1a7fc1a7ed07f7f6be0166a69b17eecf66ac094e5c307d126cb69a43",
-      "format": "decimal strings"
-    },
-    {
-      "block_id": "high_research",
-      "name": "High Research Block (n=1000..1002, gamma~1419)",
-      "role": "research_input",
-      "source_name": "Arbitrary-precision certified root refinement",
-      "source_author_or_org": "mpmath / Arb library (Fredrik Johansson)",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "stated_source_precision": "80 decimal digits root refinement",
-      "stored_precision": "80 decimal digits",
-      "record_count": 3,
-      "height_range": [
-        1419.0,
-        1422.0
-      ],
-      "sha256": "cbc3740e7c41f161ddc87bb7b1bd6b1abcdaacfab36c81376dc99173dcd3c244",
-      "format": "decimal strings"
-    },
-    {
-      "block_id": "very_high_sparse",
-      "name": "Very High Sparse Block (n=10000..10002, gamma~9877)",
-      "role": "research_input",
-      "source_name": "Arbitrary-precision certified root refinement (mpmath.zetazero at 80 dps)",
-      "source_author_or_org": "mpmath / Arb library (Fredrik Johansson)",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "stated_source_precision": "80 decimal digits root refinement",
-      "stored_precision": "80 decimal digits",
-      "record_count": 3,
-      "height_range": [
-        9877.0,
-        9880.0
-      ],
-      "sha256": "93411a2f8e6243bf14a56049d29214fbd5b12d4ce65a98659f8132a50579f536",
-      "format": "decimal strings"
-    }
-  ],
-  "zeta_zeros_baseline": {
-    "source_name": "mpmath.zetazero-generated reference snapshot",
-    "source_author_or_org": "Fredrik Johansson / mpmath / Arb library",
+  "zeta_zeros": {
+    "source_name": "mpmath.zetazero reference snapshot",
+    "source_author_or_org": "Fredrik Johansson / mpmath",
     "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
     "retrieved_at": "2026-08-19",
     "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
     "vendored_count": 200,
     "first_ordinate": "14.13472514173469379045725198356247027078",
     "last_ordinate": "396.3818542225921869319994544917305290638",
+    "file_path": "data/zeros_reference.json",
     "format": "decimal strings in json",
     "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
     "preparation_script": "scripts/fetch_reference_zeros.py"
+  },
+  "zeta_zeros_baseline": {
+    "source_name": "mpmath.zetazero reference snapshot",
+    "source_author_or_org": "Fredrik Johansson / mpmath",
+    "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
+    "retrieved_at": "2026-08-19",
+    "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
+    "vendored_count": 200,
+    "first_ordinate": "14.13472514173469379045725198356247027078",
+    "last_ordinate": "396.3818542225921869319994544917305290638",
+    "file_path": "data/zeros_reference.json",
+    "format": "decimal strings in json",
+    "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+    "preparation_script": "scripts/fetch_reference_zeros.py"
+  },
+  "canonical_blocks": {
+    "source_name": "mpmath.zetazero high-precision spectrum blocks",
+    "source_author_or_org": "Fredrik Johansson / mpmath",
+    "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
+    "retrieved_at": "2026-08-21",
+    "stated_precision": "80 decimal digits (numerical root refinement)",
+    "file_path": "data/canonical_blocks.json",
+    "format": "json dictionary of blocks with exact decimal strings",
+    "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
   },
   "primes": {
     "source": "locally generated",
     "algorithm": "Deterministic Sieve of Eratosthenes",
     "max_x": 4999,
     "count": 669,
+    "file_path": "data/primes.json",
     "sha256": "8b9ac6ab4a8adf57614dd182063552f3d1f64a0feb0e6bdf1de52bae4e599429"
   },
   "tau": {
     "symbolic": "2*pi",
     "source": "high-precision library",
-    "library": "python-flint / mpmath",
+    "library": "mpmath",
     "precision_digits": 80
   }
 }

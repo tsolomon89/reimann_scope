@@ -137,7 +137,9 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         "converter_perturbation",
         "symmetric_centrifuge",
         "coupled_perturbation_covariance",
+        "coupled_scale_covariance",
         "transcendental_worldline",
+        "synthetic_radial_leaf",
         "cross_height_coherence",
         "cross_height_distance",
         "grade_constraint"
@@ -717,7 +719,7 @@ def evaluate_point(
                 grade_type = inputs.get("grade_type", "auto")
                 
                 ref_zeros_str = reference_data.load_reference_zeros()
-                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx % len(ref_zeros_str)] if ref_zeros_str else "14.13472514173469379045725198356247027078425711569924317568556746")
                 rho_clean = mpmath.mpc('0.5', gamma_str)
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
                 
@@ -727,17 +729,15 @@ def evaluate_point(
                 s_world = transcendental.zero_worldline_point(rho_clean, g_obj, delta=delta_str, dps=dps + 15)
                 sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
                 radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
-                abs_defect = transcendental.absolute_radial_defect(s_world, g_obj, dps=dps + 15)
                 
-                # Invariance error: R_tau(s_world, k) - delta == 0
+                # Invariance error: |R_tau(s_world, k) - delta|
                 leaf_inv_err = abs(radial_leaf - d_val)
-                expected_abs_defect = scale_A * d_val
-                defect_scale_err = abs(abs_defect - expected_abs_defect)
                 
                 # Extended function evaluation at worldline point
                 z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
+                zeta_res = abs(z_world)
                 
-                residual = max(leaf_inv_err, defect_scale_err)
+                max_res = max(zeta_res, leaf_inv_err)
                 
                 return "ok", {
                     "k": k_str,
@@ -751,14 +751,65 @@ def evaluate_point(
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
                     "radial_leaf": mpmath.nstr(radial_leaf, n=dps),
+                    "zeta_residual": mpmath.nstr(zeta_res, n=dps),
+                    "radial_residual": mpmath.nstr(leaf_inv_err, n=dps),
+                    "max_residual": mpmath.nstr(max_res, n=dps),
+                    "residual": mpmath.nstr(max_res, n=dps)
+                }, None
+
+            elif operation == "synthetic_radial_leaf":
+                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
+                delta_str = inputs.get("delta", "0.01")
+                k_str = inputs.get("k", inputs.get("K", "0"))
+                grade_type = inputs.get("grade_type", "auto")
+                
+                ref_zeros_str = reference_data.load_reference_zeros()
+                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx % len(ref_zeros_str)] if ref_zeros_str else "14.13472514173469379045725198356247027078425711569924317568556746")
+                rho_base = mpmath.mpc(mpmath.mpf('0.5'), gamma_str)
+                d_val = math_core.to_mpf(delta_str, dps=dps + 15)
+                
+                g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
+                scale_A = g_obj.numeric_scale(dps=dps + 15)
+                
+                s_world = transcendental.zero_worldline_point(rho_base, g_obj, delta=delta_str, dps=dps + 15)
+                sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
+                radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
+                
+                # Invariance error: |R_tau(s_world, k) - delta|
+                radial_residual = abs(radial_leaf - d_val)
+                
+                # Signed and absolute defect
+                signed_defect = s_world.real - sigma_c
+                expected_signed_defect = scale_A * d_val
+                signed_defect_error = abs(signed_defect - expected_signed_defect)
+                
+                abs_defect = abs(signed_defect)
+                expected_abs_defect = scale_A * abs(d_val)
+                defect_scaling_error = abs(abs_defect - expected_abs_defect)
+                
+                max_res = max(radial_residual, defect_scaling_error)
+                
+                return "ok", {
+                    "k": k_str,
+                    "grade_type": g_obj.semantic_type,
+                    "symbolic_scale": g_obj.symbolic_expression(),
+                    "scale_A": mpmath.nstr(scale_A, n=dps),
+                    "zero_index": str(zero_idx),
+                    "gamma": gamma_str,
+                    "delta": delta_str,
+                    "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
+                    "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
+                    "sigma_c": mpmath.nstr(sigma_c, n=dps),
+                    "radial_leaf": mpmath.nstr(radial_leaf, n=dps),
+                    "signed_defect": mpmath.nstr(signed_defect, n=dps),
+                    "expected_signed_defect": mpmath.nstr(expected_signed_defect, n=dps),
+                    "signed_defect_error": mpmath.nstr(signed_defect_error, n=dps),
                     "abs_defect": mpmath.nstr(abs_defect, n=dps),
                     "expected_abs_defect": mpmath.nstr(expected_abs_defect, n=dps),
-                    "leaf_invariance_error": mpmath.nstr(leaf_inv_err, n=dps),
-                    "defect_scaling_error": mpmath.nstr(defect_scale_err, n=dps),
-                    "z_world_re": mpmath.nstr(z_world.real, n=dps),
-                    "z_world_im": mpmath.nstr(z_world.imag, n=dps),
-                    "abs_z_world": mpmath.nstr(abs(z_world), n=dps),
-                    "residual": mpmath.nstr(residual, n=dps)
+                    "defect_scaling_error": mpmath.nstr(defect_scaling_error, n=dps),
+                    "radial_residual": mpmath.nstr(radial_residual, n=dps),
+                    "max_residual": mpmath.nstr(max_res, n=dps),
+                    "residual": mpmath.nstr(max_res, n=dps)
                 }, None
 
             elif operation == "cross_height_coherence":
@@ -801,29 +852,57 @@ def evaluate_point(
                 }, None
 
             elif operation == "cross_height_distance":
-                g1_str = inputs.get("gamma_1", "14.13472514173469379045725198356247027078425711569924317568556746")
-                g2_str = inputs.get("gamma_2", "236.52422966581620580247556086603099718420653634047805178651817457")
+                pair_key = inputs.get("block_pair", "low_to_medium")
+                zero_idx = int(inputs.get("zero_index", "0"))
+                u_max_val = mpmath.mpf(inputs.get("u_max", "0.5"))
                 
-                dist_res = transcendental.compute_cross_height_path_distance(g1_str, g2_str, dps=dps + 20)
+                if pair_key == "low_to_medium":
+                    b1, b2 = "low_validation", "medium_research"
+                elif pair_key == "low_to_high":
+                    b1, b2 = "low_validation", "high_research"
+                elif pair_key == "low_to_very_high":
+                    b1, b2 = "low_validation", "very_high_sparse"
+                elif "_to_" in str(pair_key):
+                    parts = str(pair_key).split("_to_")
+                    b1, b2 = parts[0], parts[1]
+                else:
+                    b1, b2 = "low_validation", "medium_research"
+                    
+                blk1 = reference_data.get_zero_block(b1)
+                blk2 = reference_data.get_zero_block(b2)
+                ords1 = blk1.get("ordinates", [])
+                ords2 = blk2.get("ordinates", [])
+                
+                g1_str = ords1[zero_idx % len(ords1)]
+                g2_str = ords2[zero_idx % len(ords2)]
+                
+                # Construct 21-point symmetric grid on [-u_max, u_max]
+                u_points = [str(mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8)) for i in range(-10, 11)]
+                
+                dist_res = transcendental.compute_cross_height_path_distance(g1_str, g2_str, u_points=u_points, dps=dps + 20)
+                
+                l_inf = dist_res["L_infty_distance"]
+                l_2 = dist_res["L_2_distance"]
                 
                 return "ok", {
+                    "block_pair": pair_key,
+                    "block_1": b1,
+                    "block_2": b2,
+                    "zero_index": str(zero_idx),
                     "gamma_1": g1_str,
                     "gamma_2": g2_str,
+                    "u_max": str(u_max_val),
                     "num_u_points": str(dist_res["num_u_points"]),
-                    "L_infty_distance": dist_res["L_infty_distance"],
-                    "L_2_distance": dist_res["L_2_distance"],
-                    "residual": dist_res["L_infty_distance"]
+                    "max_distance": l_inf,
+                    "L_infty_distance": l_inf,
+                    "L_2_distance": l_2,
+                    "residual": l_inf
                 }, None
 
             elif operation == "grade_constraint":
-                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
                 k_str = inputs.get("K", inputs.get("k", "1"))
                 delta_str = inputs.get("delta", "0.0")
                 
-                ref_zeros_str = reference_data.load_reference_zeros()
-                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
-                
-                g_obj = transcendental.parse_grade(k_str, grade_type="integer")
                 tau = math_core.get_tau(dps=dps + 15)
                 k_mpf = math_core.to_mpf(k_str, dps=dps + 15)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
@@ -838,7 +917,6 @@ def evaluate_point(
                 
                 return "ok", {
                     "K": k_str,
-                    "gamma": gamma_str,
                     "delta": delta_str,
                     "abs_D_K": mpmath.nstr(abs_d_k, n=dps),
                     "expected_abs_D_K": mpmath.nstr(expected_abs_d_k, n=dps),
@@ -1042,6 +1120,8 @@ def compute_summary(
             metrics_summary_dict[m_name] = stats["max_abs"]
             
         target_stats = report_metrics_dict.get(target_metric)
+        anomalies = []
+        warnings = []
         
         if aggregation == "none":
             observed_metric_str = None
@@ -1076,9 +1156,16 @@ def compute_summary(
             max_observed = target_stats["max"]
         else:
             observed_metric_str = "N/A"
-            criterion_met = None
+            criterion_met = False
+            status = "failed"
             min_observed = "N/A"
             max_observed = "N/A"
+            anomalies.append(f"Criterion metric '{target_metric}' was never emitted by any point.")
+            
+        for decl in metric_declarations:
+            m_name = decl["metric"]
+            if report_metrics_dict.get(m_name, {}).get("count", 0) == 0:
+                warnings.append(f"Declared report metric '{m_name}' was not emitted by any point.")
             
         criterion_dict = {
             "metric": target_metric,
@@ -1105,8 +1192,8 @@ def compute_summary(
                 "min": min_observed,
                 "max": max_observed
             },
-            "anomalies": [],
-            "warnings": []
+            "anomalies": anomalies,
+            "warnings": warnings
         }
         
         if points_failed > 0:
@@ -1199,6 +1286,14 @@ def generate_run_readme(
         "- **Criterion Met:** `null (Observational)`"
     )
 
+    tau_val = manifest.get('tau', '')
+    if isinstance(tau_val, dict):
+        tau_display = f"{tau_val.get('numeric_decimal', '')[:24]}... ({tau_val.get('symbolic', '2*pi')})"
+    elif isinstance(tau_val, str):
+        tau_display = f"{tau_val[:24]}..."
+    else:
+        tau_display = str(tau_val)
+
     return f"""# Experiment Run Digest — {spec.get('title', spec['id'])}
 
 **Run ID:** `{manifest['run_id']}`  
@@ -1237,7 +1332,7 @@ def generate_run_readme(
 
 - **Git Commit:** `{manifest['git_commit']}` (Dirty: `{manifest['git_dirty']}`)
 - **Precision:** `{manifest['precision']['dps']} dps`
-- **Tau Value:** `{manifest['tau'][:24]}...`
+- **Tau Value:** `{tau_display}`
 - **Points Requested:** `{manifest['points_requested']}`
 - **Points Completed:** `{manifest['points_completed']}`
 - **Started At:** `{manifest['started_at']}`
@@ -1254,30 +1349,36 @@ def generate_run_readme(
 
 
 def update_index_file(run_entry: Dict[str, Any]):
-    """Update research/index.json with the given canonical run entry (one per experiment_id)."""
+    """Update research/index.json with the given canonical run entry in Schema v2 format."""
     os.makedirs(RESEARCH_DIR, exist_ok=True)
-    entries = []
+    index_data: Dict[str, Any] = {"schema_version": "2", "runs": []}
     if os.path.exists(INDEX_FILE):
         try:
             with open(INDEX_FILE, "r", encoding="utf-8") as f:
-                entries = json.load(f)
-                if not isinstance(entries, list):
-                    entries = []
+                raw = json.load(f)
+                if isinstance(raw, dict) and "runs" in raw:
+                    index_data = raw
+                elif isinstance(raw, list):
+                    index_data = {"schema_version": "2", "runs": raw}
         except Exception:
-            entries = []
+            index_data = {"schema_version": "2", "runs": []}
             
-    # Update existing entry by experiment_id or run_id, or append
+    runs = index_data.get("runs", [])
     found = False
-    for i, e in enumerate(entries):
+    for i, e in enumerate(runs):
         if e.get("experiment_id") == run_entry.get("experiment_id") or e.get("run_id") == run_entry.get("run_id"):
-            entries[i] = run_entry
+            runs[i] = run_entry
             found = True
             break
     if not found:
-        entries.append(run_entry)
+        runs.append(run_entry)
         
+    index_data["runs"] = runs
+    index_data["total_runs"] = len(runs)
+    index_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
     with open(INDEX_FILE, "w", encoding="utf-8") as f:
-        json.dump(entries, f, indent=2)
+        json.dump(index_data, f, indent=2)
 
 
 # ==============================================================================
@@ -1361,7 +1462,12 @@ def run_experiment(
             "parameter_space": spec["parameters"],
             "points_requested": total_points,
             "points_completed": 0,
-            "tau": tau_str,
+            "tau": {
+                "symbolic": "2*pi",
+                "numeric_decimal": tau_str,
+                "precision_dps": dps,
+                "library": "mpmath"
+            },
             "runtime": {
                 "python": sys.version,
                 "platform": sys.platform,
@@ -1437,11 +1543,16 @@ def run_experiment(
         
     # Update index
     run_entry: Dict[str, Any] = {
+        "schema_version": "2",
         "run_id": run_id,
         "experiment_id": spec["id"],
+        "title": spec.get("title", spec["id"]),
+        "epistemic_class": spec.get("epistemic_class", "exact_control"),
+        "object_relationship": spec.get("object_relationship", "unknown"),
         "classification": spec.get("classification", "canonical_experiment"),
         "timestamp": manifest["started_at"],
         "git_commit": git_commit,
+        "git_dirty": git_dirty,
         "status": final_status,
         "criterion_met": summary["criterion"].get("criterion_met"),
         "summary_path": f"research/runs/{run_id}/summary.json",
@@ -1510,7 +1621,12 @@ def list_runs() -> List[Dict[str, Any]]:
     if not os.path.exists(INDEX_FILE):
         return []
     with open(INDEX_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+        if isinstance(data, dict) and "runs" in data:
+            return data["runs"]
+        elif isinstance(data, list):
+            return data
+        return []
 
 
 # ==============================================================================

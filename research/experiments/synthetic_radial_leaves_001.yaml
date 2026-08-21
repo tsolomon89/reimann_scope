@@ -1,0 +1,64 @@
+schema_version: '2'
+id: synthetic-radial-leaves-001
+title: Synthetic Off-Line Radial Leaf Invariance and Defect Scaling Sweep
+research_question: Do synthetic off-line test points s(0) = 1/2 + delta + i*gamma (delta != 0)
+  preserve normalized radial coordinate R_tau(s(k), k) = delta and hyperbolic defect
+  scaling across bilateral integer grades K in [-5, 5]?
+epistemic_class: exact_control
+object_relationship: synthetic_perturbation_control
+hypothesis:
+  statement: For any synthetic off-line point s(0) = 1/2 + delta + i*gamma with injected delta != 0,
+    the transformed point s(k) = tau^k * s(0) satisfies R_tau(s(k), k) = tau^(-k) Re(s(k)) - 1/2 = delta identically,
+    and absolute defect |Re(s(k)) - tau^k / 2| = tau^k * |delta|.
+prediction:
+  statement: Radial coordinate invariance error |R_tau - delta| and defect scaling error
+    | |Re(s) - tau^k/2| - tau^k*|delta| | are below 1e-45 across all K and delta.
+falsification:
+  statement: Radial coordinate error or defect scaling error exceeds 1e-45.
+interpretation_limit:
+  statement: These test points are synthetic radial perturbations, not zeros of zeta.
+    This experiment verifies radial coordinate invariance and hyperbolic dilation of defect;
+    it does not predict that Z_tau vanishes.
+formalization_target:
+  statement: Radial leaf coordinate invariance identity R_tau(s, k) = delta under graded dilation.
+criterion:
+  metric: max_residual
+  operator: <=
+  threshold: 1e-45
+  aggregation: max_abs
+report_metrics:
+- metric: radial_residual
+  kind: criterion_component
+  label: Radial coordinate error |R_tau(s, k) - delta|
+- metric: signed_defect_error
+  kind: criterion_component
+  label: Signed defect error |(Re(s) - tau^k/2) - tau^k*delta|
+- metric: defect_scaling_error
+  kind: criterion_component
+  label: Absolute defect scaling error | |Re(s) - tau^k/2| - tau^k*|delta| |
+- metric: max_residual
+  kind: criterion_component
+  label: Combined maximum residual max(radial_residual, defect_scaling_error)
+engine:
+  operation: synthetic_radial_leaf
+parameters:
+  zero_index:
+    kind: explicit
+    values:
+    - 0
+  delta:
+    kind: explicit
+    values:
+    - '-0.1'
+    - '-0.01'
+    - '0.01'
+    - '0.1'
+  K:
+    kind: integer_grade
+    start: -5
+    stop: 5
+    step: 1
+precision:
+  dps: 80
+outputs:
+  retain_points: true
