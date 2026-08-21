@@ -1,51 +1,51 @@
-schema_version: "1"
+schema_version: '2'
 id: symmetric-centrifuge-defect-001
-title: Exact algebraic identity verification of the symmetry-complete centrifuge defect
-
-classification: valid control
-notes: "Exact algebraic identity verification of symmetric centrifuge defect |D_K| = 4 sinh^2(K*delta*ln(tau)/2)"
-
+title: Symmetric Centrifuge Defect and Discrete Hyperbolic Amplification
+research_question: Does the symmetric centrifuge defect D_K satisfy the exact hyperbolic
+  identity across grades?
+epistemic_class: exact_control
+object_relationship: grade_constraint_comparison
 hypothesis:
-  statement: >
-    For an off-critical zero pair at rho_+ = 1/2+delta+igamma and its reflection partner
-    rho_- = 1/2-delta+igamma, the symmetry-complete grade defect against the double-critical-line
-    baseline D_K = q_+^K + q_-^K - 2*q_0^K identically satisfies the exact closed form
-    |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2), achieving maximum absolute identity error
-    <= 1e-30 across bilateral grades K in [-50, 50] at 80 dps.
-
+  statement: The bilateral defect D_K(rho) = (tau^(K*delta) - 1)*(1 - tau^(-K*delta))
+    satisfies |D_K| = 4*sinh^2(K*delta*ln(tau)/2) identically.
+prediction:
+  statement: Defect identity error is below 1e-45.
+falsification:
+  statement: Identity error exceeds 1e-45.
+interpretation_limit:
+  statement: Algebraic identity for symmetric radial divergence.
+formalization_target:
+  statement: Symmetric centrifuge defect identity.
 criterion:
   metric: identity_error
-  operator: "<="
-  threshold: "1e-30"
+  operator: <=
+  threshold: 1e-45
   aggregation: max_abs
-
 report_metrics:
-  - metric: identity_error
-    label: "Identity error ||D_K| - 4 sinh^2(K*delta*ln(tau)/2)|"
-    kind: primary_criterion
-  - metric: abs_D_K
-    label: "Defect magnitude |D_K|"
-    kind: perturbation_response
-  - metric: small_arg_ratio
-    label: "Normalized small-argument ratio |D_K| / (K*delta*ln(tau))^2"
-    kind: fixed_m_truncation_diagnostic
-
+- metric: identity_error
+  kind: criterion_component
+  label: Defect identity absolute error
 engine:
   operation: symmetric_centrifuge
-
 parameters:
   delta:
     kind: explicit
-    values: ["-0.01", "-0.001", "0.0", "0.001", "0.01"]
+    values:
+    - '-0.1'
+    - '-0.01'
+    - '0.0'
+    - '0.01'
+    - '0.1'
+  K:
+    kind: linear
+    start: '-10'
+    stop: '10'
+    step: '2'
   gamma:
     kind: explicit
-    values: ["14.13472514173469379045725198356247027078425711569924317568556746"]
-  K:
-    kind: explicit
-    values: ["-50", "-40", "-20", "-10", "-5", "-1", "0", "1", "5", "10", "20", "40", "50"]
-
+    values:
+    - '14.13472514173469379045725198356247027078425711569924317568556746'
 precision:
   dps: 80
-
 outputs:
   retain_points: true

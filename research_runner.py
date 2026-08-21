@@ -164,6 +164,13 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         elif kind == "log":
             if "exponents" not in p_def or not isinstance(p_def["exponents"], list) or len(p_def["exponents"]) == 0:
                 return False, f"Log parameter '{p_name}' requires non-empty 'exponents' list"
+        elif kind == "integer_grade":
+            for req in ["start", "stop"]:
+                if req not in p_def:
+                    return False, f"Integer grade parameter '{p_name}' requires '{req}'"
+        elif kind == "rational_grade":
+            if "values" not in p_def or not isinstance(p_def["values"], list) or len(p_def["values"]) == 0:
+                return False, f"Rational grade parameter '{p_name}' requires non-empty 'values' list"
         else:
             return False, f"Unknown parameter kind '{kind}' for parameter '{p_name}'"
             
@@ -217,6 +224,16 @@ def expand_parameter(p_def: Dict[str, Any], dps: int = 80) -> List[str]:
                 val = mpmath.power(base, exp_val)
                 values.append(mpmath.nstr(val, n=dps, strip_zeros=False))
             return values
+            
+        elif kind == "integer_grade":
+            start_k = int(p_def["start"])
+            stop_k = int(p_def["stop"])
+            step_k = int(p_def.get("step", 1))
+            step_dir = 1 if step_k > 0 else -1
+            return [str(k) for k in range(start_k, stop_k + step_dir, step_k)]
+            
+        elif kind == "rational_grade":
+            return [str(v).strip() for v in p_def["values"]]
             
         else:
             raise ValueError(f"Unsupported parameter kind '{kind}'")
@@ -1073,7 +1090,7 @@ def compute_summary(
         }
         
         summary = {
-            "schema_version": "1",
+            "schema_version": "2",
             "run_id": run_id,
             "experiment_id": spec["id"],
             "status": status,
@@ -1331,7 +1348,7 @@ def run_experiment(
         }
         
         manifest = {
-            "schema_version": "1",
+            "schema_version": "2",
             "run_id": run_id,
             "experiment_id": spec["id"],
             "experiment_spec_sha256": spec_sha,

@@ -1,36 +1,43 @@
-schema_version: "1"
-id: centrifuge-slope-001
-title: Off-line radial amplification linearity under tau grade
-
+schema_version: '2'
+id: centrifuge-slope-verification
+title: Radial Centrifuge Logarithmic Slope Verification
+research_question: Does the radial centrifuge log |q_rho^K| have exact linear slope
+  delta * ln(tau) with respect to grade K?
+epistemic_class: exact_control
+object_relationship: grade_constraint_comparison
 hypothesis:
-  statement: >
-    For any nonzero delta and fixed gamma, the centrifuge log-modulus
-    log|q_rho^K| is strictly linear in grade K with slope delta*ln(tau),
-    achieving maximum absolute slope error <= 1e-30 at 80 dps.
-
+  statement: The discrete radial amplification factor satisfies d/dK [ log |q_rho^K|
+    ] = delta * ln(tau) identically.
+prediction:
+  statement: Absolute slope error |slope - delta*ln(tau)| is below 1e-45.
+falsification:
+  statement: Slope error exceeds 1e-45.
+interpretation_limit:
+  statement: Exact logarithmic slope identity for geometric scaling factor.
+formalization_target:
+  statement: Radial centrifuge logarithmic slope identity.
 criterion:
   metric: abs_slope_error
-  operator: "<="
-  threshold: "1e-30"
-
+  operator: <=
+  threshold: 1e-45
+  aggregation: max_abs
+report_metrics:
+- metric: abs_slope_error
+  kind: criterion_component
+  label: Absolute slope error
 engine:
   operation: centrifuge
-
 parameters:
   delta:
-    kind: explicit
-    values: ["-0.01", "-0.001", "0.0", "0.001", "0.01"]
-  gamma:
-    kind: explicit
-    values: ["14.13472514173469379045725198356247027078425711569924317568556746"]
-  K:
     kind: linear
-    start: "-50"
-    stop: "50"
-    step: "10"
-
+    start: '-0.1'
+    stop: '0.1'
+    step: '0.02'
+  K_max:
+    kind: explicit
+    values:
+    - '20'
 precision:
   dps: 80
-
 outputs:
   retain_points: true

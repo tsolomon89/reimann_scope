@@ -22,6 +22,7 @@ from dash import dcc, html, Input, Output, State, ctx
 import dash_bootstrap_components as dbc
 
 import transforms
+import zero_finder
 import reference_data
 import converter
 import cache
@@ -776,25 +777,31 @@ def toggle_audit_mode(n_audit, n_reset, current_state):
     prevent_initial_call=True
 )
 def toggle_val_report(n_open, n_close, is_open, disc_zeros):
-    """Populate and toggle the zero validation report modal."""
+    """Populate and toggle the zero validation report modal with true independent root discovery."""
     if not is_open:
-        report = reference_data.validate_zero_discovery(disc_zeros or INITIAL_ZEROS_FLOAT, 10.0, 60.0, tolerance=1e-5)
+        # Perform true independent root discovery using Z(t) sign-change brackets and Brent refinement
+        discovered_roots = zero_finder.discover_zeros_float(10.0, 60.0, dps=35)
+        report = reference_data.validate_zero_discovery(discovered_roots, 10.0, 60.0, tolerance=1e-5, dps=35)
         prov = reference_data.load_provenance()
         
         status_badge = dbc.Badge("VERIFIED PASS", color="success", className="fs-6 p-2 mb-3") if report["passed"] else dbc.Badge("DISCOVERY MISMATCH", color="danger", className="fs-6 p-2 mb-3")
         
+        source_name = prov.get("zeta_zeros_baseline", {}).get("source_name", prov.get("zeta_zeros", {}).get("source_name", "Vendored Reference"))
+        sha_str = prov.get("zeta_zeros_baseline", {}).get("sha256", prov.get("zeta_zeros", {}).get("sha256", "N/A"))[:16] + "..."
+        
         content = html.Div([
             status_badge,
             html.Table([
-                html.Tr([html.Th("Searched Ordinate Interval:"), html.Td(f"[{report['t_min']:.1f}, {report['t_max']:.1f}]")]),
+                html.Tr([html.Th("Searched Ordinate Interval:"), html.Td(f"[{report.get('t_min', 10.0):.1f}, {report.get('t_max', 60.0):.1f}]")]),
                 html.Tr([html.Th("Independently Discovered Roots:"), html.Td(f"{report['discovered_count']}")]),
                 html.Tr([html.Th("Reference Table Roots in Range:"), html.Td(f"{report['reference_count']}")]),
                 html.Tr([html.Th("Matched Zero Count:"), html.Td(f"{report['matched_count']}")]),
                 html.Tr([html.Th("Max |γ_found - γ_ref|:"), html.Td(f"{report['max_difference']:.2e}")]),
                 html.Tr([html.Th("RMS Ordinate Difference:"), html.Td(f"{report['rms_difference']:.2e}")]),
                 html.Tr([html.Th("Max Residual |ζ(1/2+iγ)|:"), html.Td(f"{report['max_residual']:.2e}")]),
-                html.Tr([html.Th("Reference Source:"), html.Td(prov.get("zeta_zeros", {}).get("source_name", "Vendored Tables"))]),
-                html.Tr([html.Th("Provenance SHA-256:"), html.Td(prov.get("zeta_zeros", {}).get("sha256", "N/A")[:16] + "...")])
+                html.Tr([html.Th("Discovery Engine:"), html.Td("Hardy Z(t) Sign Change + Brent Root Refinement")]),
+                html.Tr([html.Th("Reference Source:"), html.Td(source_name)]),
+                html.Tr([html.Th("Provenance SHA-256:"), html.Td(sha_str)])
             ], className="table table-dark table-sm table-striped mt-2")
         ])
         return True, content
@@ -1050,9 +1057,28 @@ def update_all_panels(
     # Panel A: Domain Plane (Matching dtick on X and Y)
     # --------------------------------------------------------------------------
     fig_a = go.Figure(layout=DARK_LAYOUT)
-    x_min_a, x_max_a = -1.0, 4.0
-    y_min_a, y_max_a = t0_val - 2.0, t0_val + dt_val + 2.0
-    dtick_a = 5.0
+    
+    # Transformed Image Critical Line
+    img_re = None
+    if isinstance(transform_obj, transforms.TranscendentalContinuationTransform):
+        scale_val = float(transform_obj.grade.numeric_scale(dps=15))
+        img_re = scale_val / 2.0
+    elif isinstance(transform_obj, transforms.OriginCoordinateDilation):
+        img_re = transform_obj.scale / 2.0
+    elif isinstance(transform_obj, transforms.ArgumentTransform):
+        img_re = 1.0 / (2.0 * transform_obj.scale)
+    elif isinstance(transform_obj, transforms.KernelTransform):
+        if abs(transform_obj.A * transform_obj.B) > 1e-12:
+            img_re = (0.5 / transform_obj.A - transform_obj.D) / transform_obj.B
+
+    max_s_re = float(np.max(s_coords.real)) if len(s_coords) > 0 else 0.5
+    min_s_re = float(np.min(s_coords.real)) if len(s_coords) > 0 else 0.5
+    target_max_x = max(4.0, (img_re * 1.3) if img_re else 4.0, max_s_re + 1.0)
+    target_min_x = min(-1.0, min_s_re - 1.0)
+
+    x_min_a, x_max_a = target_min_x, target_max_x
+    y_min_a, y_max_a = float(np.min(s_coords.imag)) - 2.0, float(np.max(s_coords.imag)) + 2.0
+    dtick_a = compute_matching_dtick(x_max_a - x_min_a, target_ticks=6)
     
     fig_a.update_layout(
         title=dict(text="Panel A: Domain Plane (s = σ + it)", font=dict(size=12)),
@@ -1066,16 +1092,6 @@ def update_all_panels(
         mode="lines", line=dict(color="#4a5568", dash="dash", width=1.5),
         name="Original Critical Line (Re=1/2)"
     ))
-
-    # Transformed Image Critical Line
-    img_re = None
-    if isinstance(transform_obj, transforms.OriginCoordinateDilation):
-        img_re = transform_obj.scale / 2.0
-    elif isinstance(transform_obj, transforms.ArgumentTransform):
-        img_re = 1.0 / (2.0 * transform_obj.scale)
-    elif isinstance(transform_obj, transforms.KernelTransform):
-        if abs(transform_obj.A * transform_obj.B) > 1e-12:
-            img_re = (0.5 / transform_obj.A - transform_obj.D) / transform_obj.B
 
     if img_re is not None and abs(img_re - 0.5) > 1e-4:
         fig_a.add_trace(go.Scatter(

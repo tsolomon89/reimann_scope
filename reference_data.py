@@ -159,6 +159,8 @@ def validate_zero_discovery(
     return {
         "status": "PASS" if passed else "FAIL",
         "passed": passed,
+        "t_min": t_min,
+        "t_max": t_max,
         "discovered_count": len(disc_ordinates),
         "reference_in_range_count": len(ref_ordinates_in_range),
         "reference_count": len(ref_ordinates_in_range),
@@ -225,12 +227,14 @@ CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = {
         ]
     },
     "very_high_sparse": {
-        "name": "Very High Sparse Block (n=10000, gamma~9877)",
+        "name": "Very High Sparse Block (n=10000..10002, gamma~9877)",
         "role": "research_input",
-        "provenance": "Arbitrary-precision certified root refinement",
-        "height_range": (9877.0, 9878.0),
+        "provenance": "Arbitrary-precision certified root refinement (mpmath.zetazero at 80 dps)",
+        "height_range": (9877.0, 9880.0),
         "ordinates": [
-            "9877.78265400550114277409907069012357762246805178111599600544827406"
+            "9877.7826540055011427740990706901235776224680517811159960054482740589555119173035",
+            "9878.6547723856922881889374071462807735979972354824356156846837136581877148413796",
+            "9879.0367333965687307100358186647545453373894231374077987828703550766552039044751"
         ]
     }
 }

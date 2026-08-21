@@ -1,61 +1,62 @@
-schema_version: "1"
+schema_version: '2'
 id: coupled-scale-covariance-001
-title: Coupled scale covariance of zeta coordinate representation and single-zero converter wave
-
+title: Coupled Coordinate/Converter Scale Covariance Verification
+research_question: Does the coupled transformation (s' = A*s, x' = x^(1/A)) preserve
+  complex trace and prime-power wave contributions C_J(x, rho) = C_J(x^(1/A), A*rho)?
+epistemic_class: exact_control
+object_relationship: same_object_coordinate_control
 hypothesis:
-  statement: >
-    Under the coupled coordinate scale transformation A = tau^k, s' = A*s, x' = x^(1/A), and rho' = A*rho,
-    both the origin-dilated zeta coordinate representation Z_A(A*s) = zeta(s) and the single-zero
-    Riemann converter wave C_J(x^(1/A), A*rho) = C_J(x, rho) are exact mathematical identities,
-    achieving maximum absolute covariance residual <= 1e-25 across the evaluated parameter space at 80 dps.
-
+  statement: Under dilation s' = A*s and variable transformation x' = x^(1/A), the
+    exponent s' log x' = s log x is invariant, ensuring C_J(x', rho') = C_J(x, rho)
+    identically.
+prediction:
+  statement: Covariance residuals for zeta values and converter waves are below 1e-45.
+falsification:
+  statement: Covariance residual exceeds 1e-45.
+interpretation_limit:
+  statement: Exact coupled covariance gauge identity between domain dilation and exponential
+    prime variable scaling.
+formalization_target:
+  statement: Coupled scale covariance theorem for Riemann explicit formula.
 criterion:
   metric: covariance_residual
-  operator: "<="
-  threshold: "1e-25"
-
+  operator: <=
+  threshold: 1e-45
+  aggregation: max_abs
 report_metrics:
-  - metric: zeta_covariance_residual
-    label: "Zeta coordinate representation covariance residual |Z_A(As) - zeta(s)|"
-    kind: criterion_component
-  - metric: cj_covariance_residual
-    label: "Single-zero J converter wave coupled covariance residual |C_J(x^(1/A), A*rho) - C_J(x, rho)|"
-    kind: criterion_component
-  - metric: cpi_covariance_residual
-    label: "Single-zero pi converter wave fixed-m truncation residual |C_pi(x^(1/A), A*rho) - C_pi(x, rho)|"
-    kind: fixed_m_truncation_diagnostic
-
+- metric: zeta_covariance_residual
+  kind: criterion_component
+  label: Zeta function domain trace covariance residual
+- metric: cj_covariance_residual
+  kind: criterion_component
+  label: Single-zero prime wave C_J covariance residual
+- metric: cpi_covariance_residual
+  kind: criterion_component
+  label: Single-zero prime wave C_pi covariance residual
 engine:
   operation: zeta_trace_compare
-
-
 parameters:
   k:
+    kind: linear
+    start: '-2.0'
+    stop: '2.0'
+    step: '0.5'
+  delta:
     kind: explicit
-    values: ["-10", "-5", "-2", "-1", "0", "1", "2", "5", "10"]
-  s_re:
+    values:
+    - '0.0'
+    - '0.05'
+  gamma:
     kind: explicit
-    values: ["0.5", "0.75", "2.0", "-1.5"]
-  s_im:
-    kind: explicit
-    values: [
-      "14.13472514173469379045725198356247027078425711569924317568556746",
-      "21.02203963877155499262847959389690277733434052490278180469829596",
-      "5.0",
-      "30.0"
-    ]
+    values:
+    - '14.13472514173469379045725198356247027078425711569924317568556746'
   x:
     kind: explicit
-    values: ["10.0", "50.0"]
-  rho_im:
-    kind: explicit
-    values: [
-      "14.13472514173469379045725198356247027078425711569924317568556746",
-      "21.02203963877155499262847959389690277733434052490278180469829596"
-    ]
-
+    values:
+    - '10.0'
+    - '20.0'
+    - '50.0'
 precision:
   dps: 80
-
 outputs:
   retain_points: true

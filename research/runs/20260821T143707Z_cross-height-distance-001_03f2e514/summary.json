@@ -1,0 +1,40 @@
+{
+  "schema_version": "2",
+  "run_id": "20260821T143707Z_cross-height-distance-001_03f2e514",
+  "experiment_id": "cross-height-distance-001",
+  "status": "complete",
+  "hypothesis": "Derivative-normalized paths P_n(u) from different height blocks lie within an O(Delta_n) bounded envelope around the leading linear term u.",
+  "points_requested": 3,
+  "points_completed": 3,
+  "points_failed": 0,
+  "metrics": {
+    "max_distance": "N/A"
+  },
+  "report_metrics": {
+    "max_distance": {
+      "metric": "max_distance",
+      "label": "Maximum normalized trajectory distance ||P_m - P_n||",
+      "kind": "criterion_component",
+      "count": 0,
+      "min": "N/A",
+      "max": "N/A",
+      "max_abs": "N/A",
+      "argmax_abs": null,
+      "worst_points": []
+    }
+  },
+  "criterion": {
+    "metric": "max_distance",
+    "aggregation": "max",
+    "operator": "<=",
+    "threshold": "2.0",
+    "observed": "N/A",
+    "criterion_met": null
+  },
+  "extrema": {
+    "min": "N/A",
+    "max": "N/A"
+  },
+  "anomalies": [],
+  "warnings": []
+}

@@ -1,170 +1,358 @@
-# Riemann Microscope / Macroscope — Canonical Spec
+# Riemann Scope — Canonical Application Specification
 
-## 1. Purpose
+## 0. Purpose
 
-Build a minimal, Desmos-like mathematical instrument for interactively exploring the Riemann zeta function, its zeros, scale transformations, and the explicit-formula relationship between zeros and primes.
+Build a small, auditable, Desmos-like mathematical instrument for studying:
 
-The app has four jobs:
+- the analytically continued Riemann zeta function;
+- its trivial and nontrivial zeros;
+- the project-defined transcendental-continuation domain;
+- exact coordinate and kernel transformations;
+- zero worldlines and radial leaves;
+- the explicit-formula relationship between zeros and primes;
+- actual cross-height path coherence;
+- controlled synthetic off-line perturbations.
 
-1. Plot the actual complex path of zeta.
-2. Find and validate zeros.
-3. Let the user scale/reparameterize the domain and arithmetic kernel without hiding what transformation is being applied.
-4. Show how zeta zeros reconstruct the prime-counting staircase and how perturbing one zero changes that reconstruction.
+The application is explicitly part of a proof-search programme, but it is **not itself a proof engine**.
 
-This is **not** a proof engine, experiment registry, or theorem-scoring system.
+It should help the user:
+
+1. see exact mathematics behave as claimed;
+2. distinguish trivial coordinate identities from nontrivial observations;
+3. test candidate coherence laws;
+4. kill false branches quickly;
+5. hand surviving exact statements to algebra and Lean.
 
 ---
 
-## 2. Mathematical coordinates
+# 1. Canonical mathematical framework
+
+Use:
+
+\[
+\tau=2\pi.
+\]
 
 Raw coordinate:
 
 \[
-s = \sigma + it.
+s=\sigma+it.
 \]
 
 Centered coordinate:
 
 \[
-z = s - \frac12 = \delta + it.
+z=s-\frac12=\delta+it.
 \]
 
-Thus
+Transcendental-continuation coordinate:
 
 \[
-s = \frac12 + z
+k\in\mathbb R.
 \]
 
-and the RH condition is
+Canonical integer grade:
 
 \[
-\delta = 0.
+K\in\mathbb Z.
 \]
 
-Use
+Define:
 
 \[
-\tau = 2\pi
+\boxed{
+\mathcal Z_\tau(s,k)
+=
+\zeta(\tau^{-k}s).
+}
 \]
 
-as the default scale base.
+At
 
-Do not assume tau is a zeta symmetry or the unique possible base.
+\[
+k=0,
+\]
+
+\[
+\boxed{
+\mathcal Z_\tau(s,0)=\zeta(s).
+}
+\]
+
+The ordinary analytically continued zeta function is therefore the native slice of the enlarged domain.
 
 ---
 
-## 3. Transformation rule
+# 2. Grade semantics
 
-The UI and code must make it impossible to confuse:
+The UI must make it impossible to confuse:
 
-- camera zoom;
-- sampling-range changes;
-- coordinate transformations;
-- zeta argument transformations;
-- arithmetic-kernel transformations;
-- non-holomorphic deformations.
+```text
+continuous k
+integer K
+rational q
+generic positive scale A
+camera zoom
+```
 
-Every active transform must show the exact equation being used.
-
-### 3.1 Camera
-
-Rendering only. No mathematical change.
-
-### 3.2 Height microscope / macroscope
+## 2.1 Continuous grade
 
 \[
-s_K(u) = \frac12 + \delta + i(t_0 + \tau^K u).
+k\in\mathbb R.
 \]
 
-This changes the sampled height range only.
+Use for:
 
-### 3.3 Origin coordinate dilation
+- continuous interpolation;
+- compression/expansion;
+- animation;
+- arbitrary scale comparison.
+
+## 2.2 Integer grade
 
 \[
-s' = \tau^K s.
+K\in\mathbb Z.
 \]
 
-The image of the original critical line is
+Use as canonical bilateral checkpoints:
 
 \[
-\Re(s') = \frac{\tau^K}{2}.
+\ldots,-2,-1,0,1,2,\ldots
 \]
 
-For the same object in transformed coordinates:
+with scales
 
 \[
-f_K(s') = \zeta(s'/\tau^K).
+\ldots,\tau^{-2},\tau^{-1},1,\tau,\tau^2,\ldots
 \]
 
-Predicted zero map:
+## 2.3 Rational grade
 
 \[
-\rho' = \tau^K \rho.
+q\in\mathbb Q.
 \]
 
-### 3.4 Centered coordinate dilation
+Use for exact root refinements where explicitly selected.
+
+## 2.4 Generic scale
 
 \[
-s' = \frac12 + \tau^K(s-\frac12).
+A>0.
 \]
 
-The image of the critical line remains
-
-\[
-\Re(s') = \frac12.
-\]
-
-Predicted zero map:
-
-\[
-\rho' = \frac12 + \tau^K(\rho-\frac12).
-\]
-
-### 3.5 Zeta argument transform
-
-\[
-f_K(s) = \zeta(\tau^K s).
-\]
-
-Predicted zeros:
-
-\[
-s = \rho/\tau^K.
-\]
-
-Critical-zero line:
-
-\[
-\Re(s)=\frac{1}{2\tau^K}.
-\]
-
-This is not the same operation as origin coordinate dilation.
+Use for control transforms not intended to assert tau specificity.
 
 ---
 
-## 4. Kernel Lab
+# 3. Parallel grade construction
 
-Start from
-
-\[
-n^{-s}=e^{-s\log n}.
-\]
-
-The natural scaling variables are therefore \(s\) and \(\log n\).
-
-Expose an advanced Kernel Lab with:
+The application should expose the arithmetic analogy:
 
 \[
-\log n \mapsto A\log n + C
+L_K=\tau^K\mathbb Z.
 \]
 
-and
+Each \(L_K\) is countably infinite.
+
+Distinct integer grades have no shared nonzero arithmetic stops:
 
 \[
-s \mapsto Bs + D.
+L_J\cap L_K=\{0\},
+\qquad J\neq K.
 \]
 
-The transformed object is
+The UI should not imply that one line is numerically traversed until it becomes another.
+
+Instead:
+
+> grade selects which parallel scale system is active.
+
+The app may display a compact **Train-Line / Grade Model** explanation, but this should remain subordinate to the actual zeta mathematics.
+
+---
+
+# 4. Exact symbolic grade versus numerical realization
+
+Whenever the active scale comes from an integer/rational grade, display both:
+
+```text
+SYMBOLIC: τ^-3
+NUMERIC:  0.004031...
+PRECISION: 80 dps
+```
+
+Do not display the decimal alone as though it were the definition of the grade.
+
+The Active Mathematics card must preserve symbolic grade identity.
+
+---
+
+# 5. Zero worldlines
+
+If
+
+\[
+\zeta(\rho)=0,
+\]
+
+the corresponding transcendental-continuation zero is
+
+\[
+\boxed{
+s_\rho(k)=\tau^k\rho.
+}
+\]
+
+The application should be able to display the same zero across multiple grades.
+
+At canonical grades:
+
+\[
+s_{\rho,K}=\tau^K\rho.
+\]
+
+This is the **Zero Worldline** view.
+
+---
+
+# 6. Critical surface
+
+The native critical line is
+
+\[
+\Re(s)=\frac12.
+\]
+
+Across transcendental continuation:
+
+\[
+\boxed{
+\Re(s)=\frac{\tau^k}{2}.
+}
+\]
+
+The application must display the appropriate critical line/surface for the active grade.
+
+In a 3D worldline view, use coordinates such as:
+
+- \(\Re(s)\);
+- \(\Im(s)\);
+- \(k\).
+
+The critical surface and selected zero worldlines may be shown together.
+
+Do not force 3D rendering everywhere; a 2D slice plus grade selector remains the primary simple interface.
+
+---
+
+# 7. Radial leaves
+
+Define:
+
+\[
+\boxed{
+R_\tau(s,k)
+=
+\tau^{-k}\Re(s)-\frac12.
+}
+\]
+
+For a zero worldline generated by
+
+\[
+\rho=\frac12+\delta+i\gamma,
+\]
+
+\[
+\boxed{
+R_\tau(s_\rho(k),k)=\delta.
+}
+\]
+
+The UI should display:
+
+```text
+ABSOLUTE RADIAL DEFECT
+NORMALIZED RADIAL CLASS
+```
+
+separately.
+
+For origin scaling:
+
+\[
+d(k)=\tau^k\delta
+\]
+
+while normalized class remains
+
+\[
+\delta.
+\]
+
+This prevents the user from mistaking compressed absolute defect for movement toward the critical class.
+
+---
+
+# 8. Transformation taxonomy
+
+The UI and code must keep the following operations distinct.
+
+## 8.1 Camera
+
+Rendering only.
+
+## 8.2 Height sampling
+
+Changes sampled \(t\)-range only.
+
+## 8.3 Generic origin coordinate dilation
+
+\[
+s'=As.
+\]
+
+Same object in new coordinate:
+
+\[
+f_A(s')=\zeta(s'/A).
+\]
+
+## 8.4 Transcendental continuation
+
+Canonical origin-dilation family:
+
+\[
+A=\tau^k.
+\]
+
+\[
+\mathcal Z_\tau(s,k)=\zeta(\tau^{-k}s).
+\]
+
+## 8.5 Centered coordinate dilation
+
+\[
+s'
+=
+\frac12+A(s-\frac12).
+\]
+
+Critical line stays fixed.
+
+## 8.6 Argument transform
+
+\[
+f_A(s)=\zeta(As).
+\]
+
+Zeros map oppositely:
+
+\[
+s=\rho/A.
+\]
+
+## 8.7 Kernel transform
 
 \[
 \mathcal Z_{A,C,B,D}(s)
@@ -173,99 +361,372 @@ e^{-C(Bs+D)}
 \zeta(A(Bs+D)).
 \]
 
-This right-hand side is the canonical implementation in the critical strip.
-
-### Inverse Scale Lock
-
-When ON:
+## 8.8 Non-holomorphic deformation
 
 \[
-AB=1.
-\]
-
-Changing \(A\) sets
-
-\[
-B=1/A.
-\]
-
-This preserves the exponent pairing \(s\log n\) exactly.
-
-Label this:
-
-**EXACT KERNEL PAIRING PRESERVED**
-
-### Centered kernel mode
-
-\[
-\mathcal Z^{ctr}_{A,B}(z)
-=
-\zeta\left(\frac12 + ABz\right).
-\]
-
-When \(AB=1\), the zeta argument is exactly unchanged.
-
-### Optional anisotropic deformation
-
-\[
-z=\delta+i\gamma
+\delta+i\gamma
 \mapsto
-A_\delta\delta + iA_\gamma\gamma.
+A_\delta\delta+iA_\gamma\gamma.
 \]
 
-If \(A_\delta \neq A_\gamma\), label it:
+If anisotropic, label:
 
-**NON-HOLOMORPHIC DEFORMATION**
+```text
+NON-HOLOMORPHIC DEFORMATION
+```
 
 ---
 
-## 5. Main UI
+# 9. Primary application modes
 
-Keep four synchronized panels.
+Keep the interface small by organizing the instrument into modes rather than multiplying independent widgets.
 
-### Panel A — Domain plane
+Required top-level modes:
+
+```text
+1. ZETA / NATIVE
+2. TRANSCENDENTAL CONTINUATION
+3. CONVERTER
+4. COHERENCE
+5. PERTURBATION
+6. KERNEL LAB
+```
+
+Panels can remain synchronized across modes.
+
+---
+
+# 10. Core synchronized panels
+
+The current four-panel structure remains useful.
+
+## Panel A — Domain / Transcendental Domain
+
+Native mode:
+
+- critical line;
+- active sampling path;
+- discovered zeros;
+- optional reference overlay;
+- selected zero.
+
+Transcendental mode:
+
+- active grade;
+- transformed critical line;
+- transformed zero positions;
+- worldline breadcrumb across selected grades;
+- normalized radial class;
+- optional 3D worldline/critical-surface toggle.
+
+## Panel B — Complex Zeta Trace
+
+For active path \(s(u)\), evaluate the exact active function and plot:
+
+\[
+(\Re w(u),\Im w(u)).
+\]
+
+Always state whether \(w\) is:
+
+```text
+ζ(s)
+ζ(s/A)
+ζ(A s)
+𝒵τ(s,k)
+kernel-transformed ζ
+synthetic modified object
+```
+
+Never label all of them merely `zeta`.
+
+## Panel C — Riemann Converter
+
+Display:
+
+- true \(\pi(x)\);
+- reconstructed \(\pi_N(x)\);
+- optional \(\operatorname{Li}(x)\);
+- zero count/cutoff;
+- trivial-zero/archimedean remainder;
+- clean vs synthetic perturbed reconstruction;
+- selected-zero contribution.
+
+## Panel D — Grade / Coherence
+
+Depending on mode, show:
+
+- \(K\mapsto\log|q_\rho^K|\);
+- symmetry-complete defect;
+- normalized radial leaf;
+- grade-wide candidate invariant;
+- cross-height path overlays;
+- coefficient diagnostics;
+- pairwise distance summaries.
+
+Do not force all diagnostics into one view simultaneously.
+
+---
+
+# 11. Transcendental Continuation mode
+
+Required controls:
+
+- continuous \(k\) input/slider;
+- integer \(K\) stepper;
+- rational-grade entry;
+- mode selector:
+  - continuous;
+  - integer grade;
+  - rational grade;
+- positive/negative grade navigation;
+- `Return to K=0`;
+- selected zero;
+- number/range of displayed worldline grades;
+- origin vs centered comparison toggle;
+- optional generic-base control.
+
+Required displays:
+
+- exact grade expression;
+- numerical scale;
+- active slice function;
+- critical line;
+- selected zero coordinate;
+- worldline coordinate;
+- absolute radial defect;
+- normalized radial class;
+- covariance residual.
+
+---
+
+# 12. Compression / expansion interaction
+
+The user should be able to select an actual region at native height and choose:
+
+```text
+Compress to target height
+Expand by grade
+Set K
+Set continuous k
+```
+
+If target-height mode is used, derive \(k\) from the requested scale rather than silently replacing the grade semantics.
 
 Show:
 
-- original critical line;
-- transformed image of the critical line;
-- active sampling path;
-- program-discovered zeros;
-- optional external-reference zero overlay;
-- selected zero.
+- source height;
+- source zero/index;
+- target height;
+- derived \(k\);
+- nearest integer grade \(K\);
+- distance to that grade if useful;
+- transformed critical line;
+- transformed radial defect;
+- invariant normalized radial class.
 
-### Panel B — Complex zeta trace
+This interaction is a research view, not merely camera zoom.
 
-For active path \(s(u)\), compute
+---
+
+# 13. Native zero discovery
+
+At native grade \(k=0\), the app should be capable of independent zero discovery.
+
+Use Hardy \(Z\) or another stable real-valued formulation on the critical line.
+
+Workflow:
+
+1. scan selected range;
+2. detect candidates;
+3. refine at high precision;
+4. evaluate zeta residual;
+5. compare afterward against validation data.
+
+Do not rely only on coarse sign changes.
+
+Use cautious language about completeness unless a rigorous method justifies it.
+
+---
+
+# 14. Reference zero data
+
+Reference data have explicit roles:
+
+```text
+VALIDATION
+RESEARCH INPUT
+```
+
+Validation blocks do not seed the discovery being validated.
+
+High sparse research-input blocks may directly supply actual zero coordinates for structural experiments.
+
+The UI must display the role.
+
+---
+
+# 15. High-zero block selector
+
+Coherence mode must support non-contiguous blocks.
+
+Required metadata shown on selection:
+
+- block ID;
+- role;
+- source;
+- ordinate range;
+- zero-index range if known;
+- source precision;
+- checksum status.
+
+The user should be able to compare zeros from radically separated blocks in one experiment.
+
+---
+
+# 16. Cross-height Coherence mode
+
+For verified simple zeros, compute:
 
 \[
-w(u)=\zeta(s(u))
+\Delta_n
+=
+\frac{\tau}{\log(\gamma_n/\tau)}
 \]
 
-and plot
+and
 
 \[
-(\Re w(u), \Im w(u)).
+P_n(u)
+=
+\frac{
+\zeta(
+\frac12+i(\gamma_n+\Delta_nu)
+)
+}{
+i\Delta_n\zeta'(\rho_n)
+}.
 \]
 
-This is the primary Desmos-like view.
+Required views:
 
-### Panel C — Riemann Converter
+### Raw local paths
 
-Use a faithful truncated explicit formula:
+Different actual heights without shape normalization.
+
+### Normalized complex paths
+
+Overlay \(P_n(u)\).
+
+### Distance matrix
+
+Show selected:
+
+- \(D_\infty\);
+- \(D_2\);
+- coefficient distance.
+
+### Shape coefficients
+
+Show:
+
+\[
+c_{2,n},c_{3,n},\ldots,c_{M,n}.
+\]
+
+### Normalization controls
+
+Switch among:
+
+- asymptotic mean spacing;
+- local neighbor spacing;
+- raw control.
+
+No adaptive “best fit” normalization in the canonical first campaign.
+
+---
+
+# 17. Candidate grade-constraint view
+
+Provide a small research slot for a mathematically declared candidate \(G_K\).
+
+The UI should show:
+
+- exact equation;
+- grade range;
+- positive/negative \(K\);
+- observed residual;
+- whether the candidate is exact control, observation, or conjecture;
+- generic-base comparison if applicable.
+
+Do not implement an arbitrary expression language unless needed.
+
+Candidate observables should be added through canonical math functions with tests.
+
+---
+
+# 18. Centrifuge / zero character
+
+For
+
+\[
+q_\rho=\tau^{\rho-\frac12},
+\]
+
+show:
+
+\[
+\log|q_\rho^K|
+=
+K\delta\log\tau.
+\]
+
+Positive and negative \(K\) must both be visible.
+
+For \(\delta=0\), the graph is identically zero.
+
+For \(\delta\neq0\), the graph is a nonzero line with opposite behavior under grade reversal.
+
+Also support the exact symmetric defect:
+
+\[
+|D_K|
+=
+4\sinh^2
+\left(
+\frac{K\delta\log\tau}{2}
+\right).
+\]
+
+Label these as algebraic grade diagnostics.
+
+---
+
+# 19. Riemann Converter
+
+Use the faithful truncated explicit formula:
 
 \[
 J_N(x)
 =
 \operatorname{Li}(x)
 -
-2\Re\sum_{0<\Im\rho\le T_N}
+2\Re
+\sum_{0<\Im\rho\le T_N}
 \operatorname{Li}(x^\rho)
 -
-\log 2
+\log2
 +
-\int_x^\infty
-\frac{du}{u(u^2-1)\log u}.
+R(x),
+\]
+
+where
+
+\[
+R(x)
+=
+\sum_{m=1}^{\infty}
+E_1(2m\log x).
 \]
 
 Then
@@ -275,324 +736,366 @@ Then
 =
 \sum_{m\ge1}
 \frac{\mu(m)}{m}
-J_N(x^{1/m}),
+J_N(x^{1/m})
 \]
 
-terminating when \(x^{1/m}<2\).
-
-Plot:
-
-- true \(\pi(x)\);
-- reconstructed \(\pi_N(x)\);
-- optional \(\operatorname{Li}(x)\);
-- clean vs perturbed reconstruction.
-
-### Panel D — Centrifuge / radial character
-
-For
+until
 
 \[
-\rho=\frac12+\delta+i\gamma,
+x^{1/m}<2.
 \]
 
-define
+Use the branch convention in `MATH_CONTRACT.md`.
 
-\[
-q_\rho = \tau^{\rho-1/2}.
-\]
-
-Under grade \(K\),
-
-\[
-q_\rho^K
-=
-\tau^{K\delta}
-e^{iK\gamma\ln\tau}.
-\]
-
-Plot
-
-\[
-K \mapsto \log|q_\rho^K|
-=
-K\delta\ln\tau.
-\]
-
-Optionally show \(q_\rho^K\) in the complex plane.
+The converter should make the trivial-zero/archimedean correction visible rather than implying only nontrivial zeros matter.
 
 ---
 
-## 6. Zero discovery and validation
+# 20. Synthetic Perturbation mode
 
-At baseline \(k=0\), the app must find zeros itself.
+Allow selected-zero displacement:
 
-Do not seed the zero finder from the reference table.
+\[
+\delta,
+\qquad
+\gamma.
+\]
 
-On the critical line use the Hardy Z-function or an equivalent stable real-valued formulation.
+But central theorem-facing perturbation should be **symmetry-complete**.
 
-Workflow:
+Required labels:
 
-1. Scan the selected t-range.
-2. Detect candidate brackets / near-zero regions.
-3. Refine each candidate at high precision.
-4. Verify
-   \[
-   |\zeta(1/2+i\gamma)| < \varepsilon.
-   \]
-5. Compare only afterward against independent reference data.
+```text
+SYNTHETIC MODIFIED OBJECT
+NOT ANOTHER RIEMANN ZETA FUNCTION
+```
 
-Do not rely only on coarse sign changes; guard against missed roots from under-sampling.
+When a candidate invariant exists, show:
 
-### External reference zeros
+\[
+\Delta I(\delta,K).
+\]
 
-During implementation, use web research to select a reputable public source of rigorously computed Riemann-zeta zeros.
-
-Do not depend on live internet at runtime.
-
-Vendor a small immutable validation snapshot, roughly first \(10^3\)–\(10^4\) ordinates.
-
-Record:
-
-- source name;
-- source URL;
-- retrieval date;
-- precision;
-- count;
-- checksum.
-
-At \(k=0\), report:
-
-- discovered count;
-- matched count;
-- max ordinate difference;
-- RMS difference;
-- unmatched discovered roots;
-- unmatched reference roots.
-
-For transformed functions with exact zero maps, discover transformed zeros independently and compare them against the algebraically predicted positions.
+Before a candidate invariant exists, perturbation remains a sensitivity/educational diagnostic.
 
 ---
 
-## 7. Zero perturbation
+# 21. Kernel Lab
 
-Allow the user to select one zero and edit independently:
+Retain:
 
 \[
-\delta = \Re\rho - \frac12
+\log n\mapsto A\log n+C,
+\]
+
+\[
+s\mapsto Bs+D,
 \]
 
 and
 
 \[
-\gamma = \Im\rho.
+\mathcal Z_{A,C,B,D}(s)
+=
+e^{-C(Bs+D)}
+\zeta(A(Bs+D)).
 \]
 
-Radial presets:
-
-- 0
-- \(10^{-8}\)
-- \(10^{-6}\)
-- \(10^{-4}\)
-- \(10^{-2}\)
-
-Cache each zero's baseline explicit-formula contribution.
-
-When one zero moves, update using only
+Retain **Inverse Scale Lock**:
 
 \[
-\Delta C_n(x)
-=
-C(x,\rho'_n)-C(x,\rho_n)
+AB=1.
 \]
 
-instead of recomputing the full converter.
+When
+
+\[
+C=D=0,
+\]
+
+show:
+
+```text
+EXACT KERNEL PAIRING PRESERVED
+```
+
+Keep this advanced mode visually separate from transcendental continuation.
 
 ---
 
-## 8. Responsiveness
+# 22. Active Mathematics card
 
-### Preview tier
+Always display:
 
-While dragging:
+- mode;
+- epistemic classification;
+- exact domain map;
+- exact function evaluated;
+- grade type;
+- symbolic scale;
+- numeric scale/precision;
+- original critical line;
+- active critical line/surface;
+- predicted zero map;
+- radial coordinate if applicable;
+- object relationship;
+- allowed interpretation.
 
-- 30–40 decimal digits;
-- ~200–500 path samples;
-- cached or reduced work;
-- target sub-200 ms interaction where practical.
+Example:
 
-### Audit tier
+```text
+MODE:
+TRANSCENDENTAL CONTINUATION — INTEGER GRADE
 
-On slider release or **High Precision**:
+GRADE:
+K = -3
 
-- 80+ decimal digits;
-- ~1,000–5,000 samples;
-- selected full zero count;
-- replace preview with audited result.
+SCALE:
+τ^-3
+
+FUNCTION:
+𝒵τ(s,-3) = ζ(τ^3 s)
+
+ZERO MAP:
+ρ_-3 = τ^-3 ρ
+
+CRITICAL LINE:
+Re(s) = τ^-3 / 2
+
+RADIAL CLASS:
+Rτ = δ
+
+CLASS:
+Exact coordinate slice of the transcendental-continuation family.
+
+INTERPRETATION:
+Coordinate covariance is a control, not RH evidence.
+```
+
+Generate this card from the same mathematical object used by the evaluator.
+
+---
+
+# 23. Preview and Audit tiers
+
+## Preview
+
+Target:
+
+- approximately 30–40 decimal digits where needed;
+- reduced path samples;
+- cached/reduced zero work;
+- responsive interaction;
+- float rendering permitted.
+
+## Audit
+
+Target:
+
+- 80+ decimal digits, configurable higher;
+- full selected samples;
+- arbitrary/high precision through authoritative metrics;
+- source precision checks;
+- provenance capture.
 
 The UI must display the active tier.
 
 ---
 
-## 9. Numeric input
+# 24. Numeric input
 
-Accept decimal-string input for \(k,A,B,C,D,\delta,\gamma\).
+Accept decimal strings and exact rational syntax where applicable.
 
-Do not force user input through binary float before high-precision parsing.
+Examples:
 
-The mathematical parameters are real-valued; finite decimal UI input is only an implementation representation.
+```text
+0.125
+-7
+3/2
+```
+
+Do not force authoritative inputs through binary float before high-precision parsing.
+
+For grade inputs, preserve semantic type:
+
+- `-7` entered as integer \(K\);
+- `3/2` entered as rational \(q\);
+- `0.125` entered as continuous \(k\), unless explicitly switched to rational mode.
 
 ---
 
-## 10. Active Mathematics card
+# 25. Generic-base controls
 
-Always display:
+When a theorem-facing tau claim is being tested, permit control base
 
-- mode name;
-- exact domain map;
-- exact function being evaluated;
-- original critical line;
-- transformed/image critical line;
-- predicted zero map if applicable;
-- classification:
-  - camera;
-  - exact coordinate re-expression;
-  - analytic reparameterization;
-  - kernel deformation;
-  - non-holomorphic deformation.
+\[
+b>1.
+\]
 
-Generate this card from the same transformation object used by the math engine.
+Do not rename the whole project around generic \(b\).
 
-Example:
+Tau remains the canonical project base.
+
+The control exists to distinguish:
 
 ```text
-MODE: ORIGIN COORDINATE DILATION
-BASE: τ
-k = 1.25
-
-Domain map:
-s' = τ^k s
-
-Function plotted:
-f_k(s') = ζ(s'/τ^k)
-
-Original critical line:
-Re(s) = 1/2
-
-Image critical line:
-Re(s') = τ^k/2
-
-Predicted zero map:
-ρ' = τ^k ρ
-
-CLASS:
-Exact coordinate re-expression of ζ.
-Not a claim that ζ(τ^k s)=ζ(s).
+GENERIC SCALE FACT
+TAU-GRADE FACT
+TAU-SPECIFIC ZETA FACT
 ```
 
 ---
 
-## 11. Stack
+# 26. Research status labels
 
-Preferred MVP:
-
-- Python;
-- Plotly Dash;
-- `python-flint` / Arb where practical;
-- `mpmath` as fallback/secondary;
-- NumPy for arrays and caching.
-
-Avoid a separate frontend unless a concrete limitation requires it.
-
-Suggested repository:
+Allowed UI labels:
 
 ```text
-riemann-microscope/
+EXACT
+CONTROL
+DEFINED OBSERVABLE
+OBSERVED
+CANDIDATE
+SYNTHETIC
+OPEN
+FALSE / KILLED
+CIRCULAR
+KNOWN INSUFFICIENT
+```
+
+Do not use:
+
+```text
+PROOF PROGRESS
+RH LIKELIHOOD
+SUPPORTS RH
+```
+
+for finite experiments.
+
+---
+
+# 27. Suggested repository structure
+
+```text
+reimann_scope/
     app.py
     math_core.py
+    transcendental.py
     transforms.py
     zero_finder.py
     converter.py
+    coherence.py
     cache.py
     reference_data.py
+    research_runner.py
+
     data/
-        zeros_reference.*
-        primes.*
+        zeros/
         provenance.json
+
+    research/
+        experiments/
+        runs/
+        index.json
+
+    formal/
+        ...
+
     tests/
         test_zeta_values.py
-        test_zero_finder.py
+        test_transcendental.py
+        test_zero_worldlines.py
+        test_radial_leaves.py
         test_transforms.py
         test_kernel_lab.py
         test_converter.py
+        test_coherence.py
         test_perturbation.py
-    SPEC.md
+        test_research_runner.py
+
+    TRANSCENDENTAL_CONTINUATION.md
+    RESEARCH_HYPOTHESIS.md
+    RESEARCH_LEDGER.md
+    MATH_CONTRACT.md
+    TRANSCENDENTAL_COHERENCE_EXPERIMENT.md
+    EXPERIMENT_PROTOCOL.md
+    RIEMANN_MICROSCOPE_SPEC.md
+    DATA_PROVENANCE.md
+    LEAN_FORMALIZATION_PLAN.md
+    DECISIONS.md
+    REBUILD_PLAN.md
     README.md
 ```
 
+The exact Python module split may be adjusted if a smaller structure is clearer.
+
 ---
 
-## 12. Trust tests
+# 28. Mandatory trust tests
 
-Before exploratory use, require tests for:
+Before interpreting new research output, require tests for:
 
 1. generic high-precision zeta values;
-2. Schwarz reality:
-   \[
-   \zeta(\bar s)=\overline{\zeta(s)};
-   \]
-3. the functional equation at generic points;
-4. baseline zero finder vs external reference data;
-5. exact transformed critical-line formulas;
-6. exact zero-map formulas where applicable;
-7. inverse kernel lock \(AB=1\);
-8. converter against known prime counts over a controlled range;
-9. perturbation delta-update vs full recomputation;
-10. centrifuge identity:
-    \[
-    |q_\rho^K|=\tau^{K\delta};
-    \]
-11. slope:
-    \[
-    \frac{d}{dK}\log|q_\rho^K|
-    =
-    \delta\ln\tau.
-    \]
+2. Schwarz reality;
+3. functional equation at generic points;
+4. baseline zero discovery vs validation data;
+5. \(\mathcal Z_\tau(s,0)=\zeta(s)\);
+6. grade composition;
+7. positive/negative reciprocal grades;
+8. zero worldline map;
+9. critical surface;
+10. radial invariant;
+11. origin dilation;
+12. centered dilation;
+13. argument transform;
+14. inverse kernel lock;
+15. zero-character modulus;
+16. symmetric grade defect;
+17. converter remainder;
+18. converter covariance;
+19. perturbation delta-update vs full recomputation;
+20. cross-height normalization \(P_n(0)=0,P_n'(0)=1\);
+21. interactive vs batch engine equality.
 
 ---
 
-## 13. Acceptance criteria
+# 29. Acceptance criteria
 
-MVP is complete when:
+The reconfigured application is ready for the next research campaign when:
 
-1. `python app.py` starts locally.
-2. Default view plots a recognizable correct critical-line zeta trace.
-3. The app discovers zeros in the displayed range itself.
-4. Those zeros match the vendored external reference snapshot to declared tolerance.
-5. Camera, height, origin, centered, argument, and kernel transforms are visibly distinct.
-6. The transformed critical line is derived and displayed live.
-7. Directly discovered transformed zeros match predicted mapped zeros where an exact map exists.
-8. The Riemann Converter reconstructs the prime staircase from a selectable number of zeros.
-9. A single zero can be moved off line and the converter updates without a full expensive recomputation.
-10. The centrifuge graph shows
-    \[
-    \log|q_\rho^K|=K\delta\ln\tau.
-    \]
-11. Preview interactions are responsive.
-12. High-precision mode audits the current view.
-13. No UI copy overclaims a proof or hides which mathematical object is being plotted.
-14. The code remains small and auditable.
+1. `python app.py` starts locally;
+2. native zeta behavior remains correct;
+3. existing zero discovery and converter functionality still work;
+4. \(k=0\) is visibly the native transcendental-continuation slice;
+5. positive and negative integer grades can be selected;
+6. continuous \(k\) interpolation is available;
+7. symbolic grade and numerical realization are both displayed;
+8. zero worldlines and critical surface are correct;
+9. normalized radial class remains invariant under exact origin-grade transforms;
+10. arithmetic grade-line explanation is available without being conflated with zero-set claims;
+11. high sparse zero blocks can be selected with provenance;
+12. cross-height normalized paths can be overlaid;
+13. grade-wide candidate constraints can be run bilaterally;
+14. generic-base controls exist;
+15. synthetic perturbations are clearly labeled;
+16. current canonical batch artifacts remain reproducible;
+17. no old exact control is reinterpreted as RH evidence;
+18. the code remains small enough to audit.
 
 ---
 
-## 14. Rule for future additions
+# 30. Rule for future additions
 
-Do not add an experiment merely because it is interesting.
+No new feature is admitted merely because it is visually interesting.
 
-A future feature is admitted only when:
+A new feature requires:
 
-1. a specific mathematical identity or candidate proof step is written first;
-2. the visualization/calculation directly tests that statement;
-3. the allowed conclusion is explicit;
-4. existing controls cannot already test it.
+1. a mathematical definition or candidate proof step;
+2. an epistemic classification;
+3. a declared falsifier;
+4. a reason existing controls are insufficient;
+5. a canonical engine implementation;
+6. tests before interpretive UI.
 
-The software stays simple; the mathematics does the research.
+The application serves the proof search; it does not become a general RH visualization warehouse.

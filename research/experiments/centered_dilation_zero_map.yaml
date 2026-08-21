@@ -1,38 +1,49 @@
-schema_version: "1"
-id: centered-dilation-zero-map-001
-title: Centered coordinate dilation zero-map preservation and function residual
-
+schema_version: '2'
+id: centered-dilation-zero-map
+title: Centered Coordinate Dilation Zero Map Invariance
+research_question: Does centered dilation map zeros rho to 1/2 + tau^k (rho - 1/2)
+  with exact vanishing of f_k(s')?
+epistemic_class: exact_control
+object_relationship: same_object_coordinate_control
 hypothesis:
-  statement: >
-    Under centered coordinate dilation s' = 1/2 + tau^K(s - 1/2), the algebraically
-    predicted zero positions rho' = 1/2 + tau^K(rho - 1/2) yield vanishing function
-    values f_K(rho') = 0 with residual <= 1e-25 at 80 dps.
-
+  statement: For centered dilation s' = 1/2 + tau^k (s - 1/2), mapped zeros rho' =
+    1/2 + tau^k (rho - 1/2) satisfy f_k(rho') = 0 identically.
+prediction:
+  statement: The transformed function value at mapped zeros is below 1e-45.
+falsification:
+  statement: Residual exceeds 1e-45.
+interpretation_limit:
+  statement: Coordinate dilation control verifying implementation.
+formalization_target:
+  statement: Centered dilation zero mapping theorem.
 criterion:
-  metric: residual
-  operator: "<="
-  threshold: "1e-25"
-
+  metric: max_residual
+  operator: <=
+  threshold: 1e-45
+  aggregation: max_abs
+report_metrics:
+- metric: residual
+  kind: criterion_component
+  label: Residual at mapped zero
 engine:
   operation: transform_zero_map
-
 parameters:
   mode:
     kind: explicit
-    values: ["centered_dilation"]
+    values:
+    - centered_dilation
   k:
-    kind: explicit
-    values: ["-1.0", "-0.5", "0.0", "0.5", "1.0"]
+    kind: linear
+    start: '-2.0'
+    stop: '2.0'
+    step: '0.5'
   gamma:
     kind: explicit
-    values: [
-      "14.13472514173469379045725198356247027078425711569924317568556746",
-      "21.02203963877155499262847959389690277733434052490278180469829596",
-      "25.01085758014568876321379099256282181865955519888407429345827115"
-    ]
-
+    values:
+    - '14.13472514173469379045725198356247027078425711569924317568556746'
+    - '21.02203963877155499262847959389690277733434052490278175462952040'
+    - '25.01085758014568876321379099256282181865954967255799667249654200'
 precision:
   dps: 80
-
 outputs:
   retain_points: true

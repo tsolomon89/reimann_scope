@@ -1,0 +1,64 @@
+{
+  "schema_version": "2",
+  "run_id": "20260821T144007Z_transcendental-worldlines-001_6c9c685a",
+  "experiment_id": "transcendental-worldlines-001",
+  "status": "complete",
+  "hypothesis": "For any zero rho = 1/2 + delta + i*gamma, the transformed zero s_rho(k) = tau^k * rho is an exact zero of Z_tau(s, k), and its normalized radial coordinate R_tau(s_rho(k), k) = delta identically.",
+  "points_requested": 99,
+  "points_completed": 99,
+  "points_failed": 0,
+  "metrics": {
+    "max_residual": "N/A",
+    "zeta_residual": "N/A",
+    "radial_residual": "N/A"
+  },
+  "report_metrics": {
+    "max_residual": {
+      "metric": "max_residual",
+      "label": "Combined maximum residual",
+      "kind": "criterion_component",
+      "count": 0,
+      "min": "N/A",
+      "max": "N/A",
+      "max_abs": "N/A",
+      "argmax_abs": null,
+      "worst_points": []
+    },
+    "zeta_residual": {
+      "metric": "zeta_residual",
+      "label": "Residual of Z_tau at transformed zero point",
+      "kind": "criterion_component",
+      "count": 0,
+      "min": "N/A",
+      "max": "N/A",
+      "max_abs": "N/A",
+      "argmax_abs": null,
+      "worst_points": []
+    },
+    "radial_residual": {
+      "metric": "radial_residual",
+      "label": "Radial coordinate error |R_tau(s, k) - delta|",
+      "kind": "criterion_component",
+      "count": 0,
+      "min": "N/A",
+      "max": "N/A",
+      "max_abs": "N/A",
+      "argmax_abs": null,
+      "worst_points": []
+    }
+  },
+  "criterion": {
+    "metric": "max_residual",
+    "aggregation": "max_abs",
+    "operator": "<=",
+    "threshold": "1e-45",
+    "observed": "N/A",
+    "criterion_met": null
+  },
+  "extrema": {
+    "min": "N/A",
+    "max": "N/A"
+  },
+  "anomalies": [],
+  "warnings": []
+}

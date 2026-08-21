@@ -1,154 +1,676 @@
 # Mathematical Contract
 
-This file is the compact implementation-level mathematical contract for the Riemann Microscope / Macroscope.
+This is the authoritative implementation-level mathematical contract for `reimann_scope`.
 
-The purpose is to prevent different modules from silently using different meanings for the same transformation. All identities below should have direct unit tests.
+Its purpose is to prevent the UI, numerical engine, batch runner, and formal layer from silently using different meanings for the same transformation or research object.
 
-## 1. Constants and coordinates
+Every identity marked **EXACT** should have a direct unit or formal regression test where practical.
+
+---
+
+# 1. Constants and coordinates
+
+Use
 
 \[
-\tau=2\pi.
+\boxed{\tau=2\pi.}
 \]
 
-Raw coordinate:
+Ordinary complex coordinate:
 
 \[
-s=\sigma+it.
+\boxed{s=\sigma+it.}
 \]
 
 Centered coordinate:
 
 \[
+\boxed{
 z=s-\frac12=\delta+it.
+}
 \]
 
 Therefore
 
 \[
-s=\frac12+z,
-\qquad
+s=\frac12+z
+\]
+
+and
+
+\[
+\boxed{
 \delta=\Re(s)-\frac12.
+}
 \]
 
-At baseline, the critical line is
+The ordinary critical line is
 
 \[
+\boxed{
 \Re(s)=\frac12.
+}
 \]
 
-## 2. Camera transform
+---
 
-Camera zoom and pan do not alter mathematical coordinates:
+# 2. Grade notation
+
+The repository distinguishes three grade types.
+
+## 2.1 Continuous grade
 
 \[
-T_{\mathrm{camera}}(s)=s.
+\boxed{k\in\mathbb R.}
 \]
-
-## 3. Height microscope / macroscope
-
-\[
-s_K(u)=\frac12+\delta+i(t_0+\tau^K u).
-\]
-
-This changes the sampled ordinate range only. The vertical sampling line remains
-
-\[
-\Re(s)=\frac12+\delta.
-\]
-
-## 4. Origin coordinate dilation
 
 Define
 
 \[
-s'=\tau^K s.
-\]
-
-For the same zeta object expressed in the new coordinate:
-
-\[
-f_K(s')=\zeta\!\left(\frac{s'}{\tau^K}\right).
-\]
-
-If \(\zeta(\rho)=0\), then
-
-\[
-f_K(\tau^K\rho)=0.
-\]
-
-Hence
-
-\[
-\boxed{\rho'=\tau^K\rho}.
-\]
-
-The image of the ordinary critical line is
-
-\[
-\boxed{\Re(s')=\frac{\tau^K}{2}}.
-\]
-
-This does **not** assert
-
-\[
-\zeta(\tau^K s)=\zeta(s).
-\]
-
-## 5. Centered coordinate dilation
-
-Define
-
-\[
-s'=\frac12+\tau^K\left(s-\frac12\right),
-\qquad
-z'=\tau^K z.
-\]
-
-For the same object in the new centered coordinate:
-
-\[
-f_K(s')=\zeta\!\left(\frac12+\frac{s'-\frac12}{\tau^K}\right).
-\]
-
-The exact zero map is
-
-\[
-\boxed{\rho'=\frac12+\tau^K\left(\rho-\frac12\right)}.
-\]
-
-The critical line is fixed geometrically:
-
-\[
-\boxed{\Re(s')=\frac12}.
-\]
-
-## 6. Argument transform
-
-Define
-
-\[
-f_K(s)=\zeta(\tau^K s).
+\boxed{
+a(k)=\tau^k.
+}
 \]
 
 Then
 
 \[
-f_K(s)=0\iff \tau^K s=\rho,
+a(k)>0,
 \]
 
-so
+\[
+a(k_1+k_2)=a(k_1)a(k_2),
+\]
 
 \[
-\boxed{s=\rho/\tau^K}.
+a(-k)=a(k)^{-1},
+\]
+
+and
+
+\[
+a(0)=1.
+\]
+
+Since \(k\mapsto\tau^k\) is a bijection,
+
+\[
+\boxed{
+\tau^\mathbb R=\mathbb R_{>0}.
+}
+\]
+
+## 2.2 Canonical integer grade
+
+\[
+\boxed{K\in\mathbb Z.}
+\]
+
+Define
+
+\[
+\boxed{
+A_K=\tau^K.
+}
+\]
+
+The canonical bilateral sequence is
+
+\[
+\ldots,\tau^{-2},\tau^{-1},1,\tau,\tau^2,\ldots
+\]
+
+with
+
+\[
+A_{-K}=A_K^{-1}.
+\]
+
+## 2.3 Rational/root grade
+
+For
+
+\[
+q\in\mathbb Q,
+\]
+
+define
+
+\[
+\boxed{
+A_q=\tau^q.
+}
+\]
+
+Rational grades contain exact root refinements of the integer-grade family.
+
+Do not use one variable interchangeably for continuous \(k\), integer \(K\), and rational \(q\).
+
+---
+
+# 3. Transcendental continuation
+
+The project-defined transcendental-continuation family uses origin-dilation semantics.
+
+Define
+
+\[
+\boxed{
+\mathcal Z_\tau(s,k)
+=
+\zeta(\tau^{-k}s).
+}
+\]
+
+This is an exact family built from the analytically continued zeta function.
+
+At native grade,
+
+\[
+\boxed{
+\mathcal Z_\tau(s,0)=\zeta(s).
+}
+\]
+
+For any \(u\in\mathbb C\),
+
+\[
+\boxed{
+\mathcal Z_\tau(\tau^k u,k)=\zeta(u).
+}
+\]
+
+This is **EXACT COORDINATE COVARIANCE**.
+
+It is not an RH result.
+
+---
+
+# 4. Completed transcendental continuation
+
+Define
+
+\[
+\boxed{
+\xi(s)
+=
+\frac12s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s).
+}
+\]
+
+For proof-facing nontrivial-zero work, define
+
+\[
+\boxed{
+\mathcal X_\tau(s,k)
+=
+\xi(\tau^{-k}s).
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathcal X_\tau(s,0)=\xi(s).
+}
+\]
+
+The zeros of \(\xi\) are the nontrivial zeros of \(\zeta\).
+
+---
+
+# 5. Zero worldlines
+
+Let
+
+\[
+\zeta(\rho)=0.
+\]
+
+Then
+
+\[
+\mathcal Z_\tau(s,k)=0
+\]
+
+iff
+
+\[
+\tau^{-k}s=\rho.
+\]
+
+Hence the exact zero map is
+
+\[
+\boxed{
+s_\rho(k)=\tau^k\rho.
+}
+\]
+
+At integer grade,
+
+\[
+\boxed{
+s_{\rho,K}=\tau^K\rho.
+}
+\]
+
+Define the continuous zero worldline
+
+\[
+\boxed{
+W_\rho
+=
+\{(\tau^k\rho,k):k\in\mathbb R\}.
+}
+\]
+
+For proof-facing nontrivial zeros, the same map holds for \(\mathcal X_\tau\).
+
+---
+
+# 6. Critical surface
+
+The ordinary critical line is
+
+\[
+\Re(s)=\frac12.
+\]
+
+Under grade \(k\), its image is
+
+\[
+\boxed{
+\Re(s)=\frac{\tau^k}{2}.
+}
+\]
+
+Define
+
+\[
+\boxed{
+\mathcal C_\tau
+=
+\left\{
+(s,k):
+\Re(s)=\frac{\tau^k}{2}
+\right\}.
+}
+\]
+
+A critical-line zero worldline lies entirely on \(\mathcal C_\tau\).
+
+---
+
+# 7. Transcendental radial coordinate
+
+Define
+
+\[
+\boxed{
+R_\tau(s,k)
+=
+\tau^{-k}\Re(s)-\frac12.
+}
+\]
+
+Let
+
+\[
+\rho=\frac12+\delta+i\gamma.
+\]
+
+Along its worldline,
+
+\[
+s_\rho(k)
+=
+\tau^k
+\left(
+\frac12+\delta+i\gamma
+\right).
+\]
+
+Then
+
+\[
+\boxed{
+R_\tau(s_\rho(k),k)=\delta.
+}
+\]
+
+This is an **EXACT WORLDLINE INVARIANT**.
+
+It is a coordinate identity.
+
+It does not prove that only \(\delta=0\) occurs.
+
+---
+
+# 8. Radial leaves
+
+For each
+
+\[
+\delta\in\mathbb R,
+\]
+
+define
+
+\[
+\boxed{
+\mathcal R_\delta
+=
+\{(s,k):R_\tau(s,k)=\delta\}.
+}
+\]
+
+The critical surface is
+
+\[
+\boxed{
+\mathcal R_0=\mathcal C_\tau.
+}
+\]
+
+A native zero
+
+\[
+\rho=\frac12+\delta+i\gamma
+\]
+
+generates a worldline entirely contained in \(\mathcal R_\delta\).
+
+RH is equivalent to:
+
+\[
+\boxed{
+\text{all nontrivial zero worldlines occupy }\mathcal R_0.
+}
+\]
+
+---
+
+# 9. Arithmetic grade lattices
+
+For integer grade,
+
+\[
+\boxed{
+L_K=\tau^K\mathbb Z.
+}
+\]
+
+Each is countably infinite and scale-isomorphic to \(\mathbb Z\).
+
+For distinct integers \(J\neq K\),
+
+\[
+\boxed{
+L_J\cap L_K=\{0\}.
+}
+\]
+
+Reason:
+
+A nonzero common point would imply
+
+\[
+\tau^{K-J}\in\mathbb Q,
+\]
+
+contradicting transcendence of \(\tau\).
+
+For distinct rational grades \(r\neq q\),
+
+\[
+\boxed{
+\tau^r\mathbb Z
+\cap
+\tau^q\mathbb Z
+=
+\{0\}.
+}
+\]
+
+Do not extend this result to arbitrary real grades.
+
+Do not infer from arithmetic-lattice noncoincidence that zeta zero sets at distinct grades are automatically disjoint.
+
+---
+
+# 10. Structural versus numerical grade representation
+
+An integer-grade point can be represented structurally by
+
+\[
+\boxed{
+(K,n)
+}
+\]
+
+with numerical realization
+
+\[
+n\tau^K.
+\]
+
+The structural pair is exact.
+
+The authoritative numerical realization is finite-precision/arbitrary-precision and must carry declared precision.
+
+The implementation must not represent \(\tau\) by a hand-entered authoritative decimal constant.
+
+Compute it from the high-precision library.
+
+---
+
+# 11. Camera transform
+
+Camera zoom and pan do not alter mathematical coordinates.
+
+\[
+\boxed{
+T_{\mathrm{camera}}(s)=s.
+}
+\]
+
+Classification:
+
+```text
+RENDERING ONLY
+```
+
+---
+
+# 12. Height microscope / macroscope
+
+For selected center \(t_0\), centered horizontal displacement \(\delta\), and continuous scale \(k\), define
+
+\[
+\boxed{
+s_k(u)
+=
+\frac12+\delta+i(t_0+\tau^k u).
+}
+\]
+
+This changes only the sampled ordinate range.
+
+The sampling line remains
+
+\[
+\boxed{
+\Re(s)=\frac12+\delta.
+}
+\]
+
+Classification:
+
+```text
+SAMPLING-RANGE TRANSFORM
+```
+
+This is not the same object as transcendental continuation of the complete \(s\)-coordinate.
+
+---
+
+# 13. Generic origin coordinate dilation
+
+For arbitrary positive scale
+
+\[
+A>0,
+\]
+
+define
+
+\[
+\boxed{
+s'=As.
+}
+\]
+
+For the same zeta object expressed in the new coordinate,
+
+\[
+\boxed{
+f_A(s')=\zeta(s'/A).
+}
+\]
+
+If
+
+\[
+\zeta(\rho)=0,
+\]
+
+then
+
+\[
+\boxed{
+\rho'=A\rho.
+}
+\]
+
+The critical line maps to
+
+\[
+\boxed{
+\Re(s')=\frac A2.
+}
+\]
+
+Transcendental continuation is the canonical subfamily
+
+\[
+\boxed{
+A=\tau^k.
+}
+\]
+
+---
+
+# 14. Centered coordinate dilation
+
+For
+
+\[
+A>0,
+\]
+
+define
+
+\[
+\boxed{
+s'
+=
+\frac12+A\left(s-\frac12\right).
+}
+\]
+
+Equivalently,
+
+\[
+z'=Az.
+\]
+
+The same zeta object in the transformed centered coordinate is
+
+\[
+\boxed{
+f_A(s')
+=
+\zeta\left(
+\frac12+\frac{s'-\frac12}{A}
+\right).
+}
+\]
+
+The exact zero map is
+
+\[
+\boxed{
+\rho'
+=
+\frac12+A\left(\rho-\frac12\right).
+}
+\]
+
+The critical line remains
+
+\[
+\boxed{
+\Re(s')=\frac12.
+}
+\]
+
+This is not the same operation as origin dilation.
+
+---
+
+# 15. Zeta argument transform
+
+Define
+
+\[
+\boxed{
+f_A(s)=\zeta(As).
+}
+\]
+
+Then
+
+\[
+f_A(s)=0
+\iff
+As=\rho.
+\]
+
+Hence
+
+\[
+\boxed{
+s=\rho/A.
+}
 \]
 
 Critical-line zeros map to
 
 \[
-\boxed{\Re(s)=\frac{1}{2\tau^K}}.
+\boxed{
+\Re(s)=\frac1{2A}.
+}
 \]
 
-## 7. Kernel transformation
+This changes the function being evaluated in the displayed coordinate.
+
+Do not conflate it with origin coordinate dilation.
+
+---
+
+# 16. Kernel transformation
 
 Start from
 
@@ -173,37 +695,51 @@ Then
 \[
 \left(e^C n^A\right)^{-(Bs+D)}
 =
-e^{-C(Bs+D)}n^{-A(Bs+D)}.
+e^{-C(Bs+D)}
+n^{-A(Bs+D)}.
 \]
 
-Therefore, where the Dirichlet series converges,
+Where the Dirichlet series converges,
 
 \[
+\boxed{
 \mathcal Z_{A,C,B,D}(s)
 =
-e^{-C(Bs+D)}\zeta(A(Bs+D)).
+e^{-C(Bs+D)}
+\zeta(A(Bs+D)).
+}
 \]
 
-The analytically continued right-hand side is the canonical implementation elsewhere.
+The analytically continued right-hand side is the canonical implementation outside the convergence half-plane.
 
-The exponential prefactor does not create zeros, so for \(AB\neq0\):
+The exponential prefactor has no zeros.
+
+For
 
 \[
-A(Bs+D)=\rho
+AB\neq0,
 \]
 
-gives
+the zero map is
 
 \[
-\boxed{s_\rho=\frac{\rho/A-D}{B}}.
+\boxed{
+s_\rho
+=
+\frac{\rho/A-D}{B}.
+}
 \]
 
-## 8. Inverse Scale Lock
+---
 
-When enabled:
+# 17. Inverse Scale Lock
+
+When enabled,
 
 \[
-\boxed{AB=1}.
+\boxed{
+AB=1.
+}
 \]
 
 Then
@@ -212,45 +748,95 @@ Then
 (Bs)(A\log n)=s\log n.
 \]
 
-For \(C=D=0\):
+For
 
 \[
+C=D=0,
+\]
+
+\[
+\boxed{
 \mathcal Z_{A,0,1/A,0}(s)=\zeta(s).
+}
 \]
 
 This is an exact identity.
 
-## 9. Centered kernel mode
+Classification:
 
-Let
+```text
+EXACT KERNEL PAIRING PRESERVED
+```
 
-\[
-s=\frac12+z.
-\]
+---
 
-Define
+# 18. Centered kernel mode
 
-\[
-\boxed{\mathcal Z^{\mathrm{ctr}}_{A,B}(z)=\zeta\left(\frac12+ABz\right)}.
-\]
-
-When \(AB=1\):
+With
 
 \[
-\mathcal Z^{\mathrm{ctr}}_{A,1/A}(z)=\zeta\left(\frac12+z\right).
+s=\frac12+z,
 \]
 
-## 10. Anisotropic centered deformation
-
-For exploratory visualization only:
+define
 
 \[
-z=\delta+i\gamma\mapsto A_\delta\delta+iA_\gamma\gamma.
+\boxed{
+\mathcal Z^{\mathrm{ctr}}_{A,B}(z)
+=
+\zeta\left(
+\frac12+ABz
+\right).
+}
 \]
 
-If \(A_\delta\neq A_\gamma\), label it `NON-HOLOMORPHIC DEFORMATION`.
+When
 
-## 11. Zero character
+\[
+AB=1,
+\]
+
+\[
+\boxed{
+\mathcal Z^{\mathrm{ctr}}_{A,1/A}(z)
+=
+\zeta\left(
+\frac12+z
+\right).
+}
+\]
+
+---
+
+# 19. Anisotropic centered deformation
+
+For exploratory visualization only,
+
+\[
+\boxed{
+z=\delta+i\gamma
+\mapsto
+A_\delta\delta+iA_\gamma\gamma.
+}
+\]
+
+If
+
+\[
+A_\delta\neq A_\gamma,
+\]
+
+label it:
+
+```text
+NON-HOLOMORPHIC DEFORMATION
+```
+
+Do not describe it as conformal or analytic.
+
+---
+
+# 20. Tau-grade zero character
 
 For
 
@@ -261,116 +847,365 @@ For
 define
 
 \[
-\boxed{q_\rho=\tau^{\rho-\frac12}}.
+\boxed{
+q_\rho
+=
+\tau^{\rho-\frac12}.
+}
+\]
+
+Using the real logarithm of positive \(\tau\),
+
+\[
+q_\rho
+=
+e^{(\rho-\frac12)\log\tau}
+=
+\tau^\delta e^{i\gamma\log\tau}.
+\]
+
+Therefore
+
+\[
+\boxed{
+|q_\rho|=\tau^\delta.
+}
+\]
+
+At integer grade \(K\),
+
+\[
+\boxed{
+q_\rho^K
+=
+\tau^{K\delta}
+e^{iK\gamma\log\tau}.
+}
 \]
 
 Hence
 
 \[
-q_\rho=\tau^\delta e^{i\gamma\log\tau}
-\]
-
-and
-
-\[
-\boxed{|q_\rho|=\tau^\delta}.
-\]
-
-Under real grade \(K\):
-
-\[
-\boxed{q_\rho^K=\tau^{K\delta}e^{iK\gamma\log\tau}},
-\]
-
-so
-
-\[
-\boxed{|q_\rho^K|=\tau^{K\delta}},
-\]
-
-\[
-\boxed{\log|q_\rho^K|=K\delta\log\tau},
-\]
-
-and
-
-\[
-\boxed{\frac{d}{dK}\log|q_\rho^K|=\delta\log\tau}.
-\]
-
-For \(\delta=0\):
-
-\[
-|q_\rho^K|=1
-\]
-
-for all \(K\).
-
-### 11.1 Exact Symmetry-Complete Centrifuge Defect
-
-For an off-critical zero pair at \(\rho_+ = 1/2 + \delta + i\gamma\) and its reflection partner \(\rho_- = 1/2 - \delta + i\gamma\), let \(\rho_0 = 1/2 + i\gamma\) denote the clean critical-line baseline.
-
-The characters under grade \(K\) are:
-
-\[
-q_+^K = \tau^{K\delta}e^{iK\gamma\log\tau},
-\qquad
-q_-^K = \tau^{-K\delta}e^{iK\gamma\log\tau},
-\qquad
-2 q_0^K = 2 e^{iK\gamma\log\tau}.
-\]
-
-Define the symmetry-complete grade defect against the double-critical-line baseline:
-
-\[
-D_K = q_+^K + q_-^K - 2 q_0^K.
-\]
-
-Then exactly:
-
-\[
-D_K = 2 e^{iK\gamma\log\tau}\left[\cosh(K\delta\log\tau) - 1\right].
-\]
-
-Taking absolute values:
-
-\[
-\boxed{|D_K| = 2\left[\cosh(K\delta\log\tau) - 1\right] = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right)}.
-\]
-
-Properties:
-1. **Vanishing Baseline**: \(D_K = 0\) for \(\delta = 0\), and \(D_0 = 0\) for all \(\delta\).
-2. **Even Symmetry**: \(D_K(-\delta) = D_K(\delta)\), and \(|D_{-K}| = |D_K|\).
-3. **Small-Argument Quadratic Scaling**: Near \(K\delta \to 0\),
-   \[
-   |D_K| = (K\delta\log\tau)^2 + \mathcal{O}((K\delta)^4).
-   \]
-4. **Hyperbolic Radial Amplification**: For any fixed \(\delta \neq 0\), \(|D_K| \to \infty\) exponentially as \(|K| \to \infty\).
-
-*Note:* This is an algebraic property of the grade character, not proof or refutation of RH.
-
-## 12. Converter formulas
-
-For positive-imaginary nontrivial zeros included through a declared cutoff:
-
-\[
-J_N(x)
+\boxed{
+|q_\rho^K|
 =
-\operatorname{Li}(x)
--
-2\Re\sum_\rho \operatorname{Li}(x^\rho)
--
-\log 2
-+
-\int_x^\infty\frac{du}{u(u^2-1)\log u}.
+\tau^{K\delta},
+}
+\]
+
+\[
+\boxed{
+\log|q_\rho^K|
+=
+K\delta\log\tau.
+}
+\]
+
+For real grade parameter \(k\), avoid generic complex-power branch ambiguity by defining the continuous grade character directly:
+
+\[
+\boxed{
+Q_\rho(k)
+=
+\tau^{k(\rho-\frac12)}
+=
+e^{k(\rho-\frac12)\log\tau}.
+}
+\]
+
+Hence
+
+\[
+\boxed{
+Q_\rho(k)
+=
+\tau^{k\delta}
+e^{ik\gamma\log\tau}
+}
+\]
+
+and
+
+\[
+\boxed{
+\frac{d}{dk}
+\log|Q_\rho(k)|
+=
+\delta\log\tau.
+}
+\]
+
+For
+
+\[
+\delta=0,
+\]
+
+\[
+\boxed{
+|q_\rho^K|=1
+\quad
+\forall K\in\mathbb Z.
+}
+\]
+
+---
+
+# 21. Symmetry-complete grade defect
+
+Let
+
+\[
+\rho_+
+=
+\frac12+\delta+i\gamma,
+\]
+
+\[
+\rho_-
+=
+\frac12-\delta+i\gamma,
+\]
+
+and baseline
+
+\[
+\rho_0
+=
+\frac12+i\gamma.
 \]
 
 Then
 
 \[
+q_+^K
+=
+\tau^{K\delta}
+e^{iK\gamma\log\tau},
+\]
+
+\[
+q_-^K
+=
+\tau^{-K\delta}
+e^{iK\gamma\log\tau},
+\]
+
+\[
+q_0^K
+=
+e^{iK\gamma\log\tau}.
+\]
+
+Define
+
+\[
+\boxed{
+D_K
+=
+q_+^K+q_-^K-2q_0^K.
+}
+\]
+
+Then
+
+\[
+\boxed{
+D_K
+=
+2e^{iK\gamma\log\tau}
+\left[
+\cosh(K\delta\log\tau)-1
+\right].
+}
+\]
+
+Therefore
+
+\[
+\boxed{
+|D_K|
+=
+4\sinh^2
+\left(
+\frac{K\delta\log\tau}{2}
+\right).
+}
+\]
+
+Properties:
+
+\[
+D_K=0
+\quad
+\text{for }\delta=0,
+\]
+
+\[
+D_0=0,
+\]
+
+\[
+|D_{-K}|=|D_K|,
+\]
+
+and near
+
+\[
+K\delta=0,
+\]
+
+\[
+\boxed{
+|D_K|
+=
+(K\delta\log\tau)^2
++
+O((K\delta)^4).
+}
+\]
+
+For fixed nonzero \(\delta\),
+
+\[
+|D_K|\to\infty
+\]
+
+as
+
+\[
+|K|\to\infty.
+\]
+
+This is an exact grade-character identity, not a proof of RH.
+
+---
+
+# 22. Explicit formula for \(\psi\)
+
+For suitable \(x>1\), with the nontrivial zero sum interpreted in the standard symmetric sense,
+
+\[
+\boxed{
+\psi(x)
+=
+x
+-
+\sum_\rho\frac{x^\rho}{\rho}
+-
+\log(2\pi)
+-
+\frac12\log(1-x^{-2}).
+}
+\]
+
+Set
+
+\[
+x=\tau^K,
+\qquad
+K>0.
+\]
+
+Since
+
+\[
+x^\rho
+=
+\tau^{K/2}q_\rho^K,
+\]
+
+we obtain the exact spectrum-wide grade identity
+
+\[
+\boxed{
+\sum_\rho
+\frac{q_\rho^K}{\rho}
+=
+\tau^{-K/2}
+\left[
+\tau^K
+-
+\psi(\tau^K)
+-
+\log\tau
+-
+\frac12\log(1-\tau^{-2K})
+\right].
+}
+\]
+
+Important:
+
+- this displayed arithmetic realization uses \(K>0\);
+- do not call it bilateral without a separate derivation;
+- do not impose an RH-equivalent size bound and call that an intermediate proof.
+
+---
+
+# 23. Riemann explicit-formula converter
+
+For a declared set of positive-imaginary nontrivial zeros,
+
+\[
+\boxed{
+J_N(x)
+=
+\operatorname{Li}(x)
+-
+2\Re
+\sum_{0<\Im\rho\le T_N}
+\operatorname{Li}(x^\rho)
+-
+\log2
++
+R(x),
+}
+\]
+
+where
+
+\[
+\boxed{
+R(x)
+=
+\int_x^\infty
+\frac{du}
+{u(u^2-1)\log u}.
+}
+\]
+
+For
+
+\[
+x>1,
+\]
+
+use the exact expansion
+
+\[
+\boxed{
+R(x)
+=
+\sum_{m=1}^{\infty}
+E_1(2m\log x)
+=
+-
+\sum_{m=1}^{\infty}
+\operatorname{Ei}(-2m\log x).
+}
+\]
+
+Then recover the prime-counting approximation through Möbius inversion:
+
+\[
+\boxed{
 \pi_N(x)
 =
-\sum_{m\ge1}\frac{\mu(m)}{m}J_N(x^{1/m}),
+\sum_{m\ge1}
+\frac{\mu(m)}{m}
+J_N(x^{1/m}),
+}
 \]
 
 stopping once
@@ -379,225 +1214,614 @@ stopping once
 x^{1/m}<2.
 \]
 
-Use one documented branch convention consistently for complex logarithms and \(\operatorname{Li}(x^\rho)\).
+The remainder term encodes the trivial-zero / archimedean correction. The nontrivial-zero sum alone is not the complete formula.
 
-### 12.1 Exact Coupled Converter Covariance
+---
 
-Define the signed single-zero contribution of a conjugate pair \(\rho, \bar{\rho}\) to \(J(x)\) as:
+# 24. Branch convention for complex \(\operatorname{Li}\)
+
+For real
 
 \[
-C_J(x, \rho) = -2\Re\left[\operatorname{Ei}(\rho\log x)\right].
+x>1
 \]
 
-Let \(A = \tau^k\), and transform simultaneously:
+and complex \(\rho\), use real
 
 \[
-\rho' = A\rho,
-\qquad
-\log x' = \frac{\log x}{A} \iff x' = x^{1/A}.
+\log x>0
 \]
 
-Then
+and define
 
 \[
-\rho'\log x' = (A\rho)\left(\frac{\log x}{A}\right) = \rho\log x.
+\boxed{
+\operatorname{Li}(x^\rho)
+=
+\operatorname{Ei}(\rho\log x)
+}
 \]
 
-Therefore
+with one documented principal branch convention for \(\operatorname{Ei}\).
+
+Preview and Audit implementations must use compatible branch semantics.
+
+---
+
+# 25. Single-zero converter contribution
+
+For an upper-half-plane zero and conjugate pair, define
 
 \[
-\operatorname{Ei}(\rho'\log x') = \operatorname{Ei}(\rho\log x).
+\boxed{
+C_J(x,\rho)
+=
+-2\Re
+\operatorname{Ei}(\rho\log x).
+}
 \]
 
-Hence the signed single-zero \(J\) contribution obeys the exact covariance:
+For Möbius inversion,
 
 \[
-\boxed{C_J(x^{1/A}, A\rho) = C_J(x, \rho)}.
+\boxed{
+C_\pi(x,\rho)
+=
+\sum_{m\ge1}
+\frac{\mu(m)}{m}
+C_J(x^{1/m},\rho),
+}
 \]
 
-Because the same cancellation occurs after replacing \(x\) by \(x^{1/m}\):
+subject to the same truncation rule as the full converter.
+
+---
+
+# 26. Coupled converter covariance
+
+Let
 
 \[
-(A\rho)\log\left((x^{1/A})^{1/m}\right) = (A\rho)\frac{\log x}{mA} = \rho\frac{\log x}{m},
+A>0.
 \]
 
-the Möbius-inverted single-zero contribution \(C_\pi(x, \rho) = \sum_{m\ge1}\frac{\mu(m)}{m}C_J(x^{1/m}, \rho)\) also obeys the corresponding coupled covariance:
+Transform
 
 \[
-\boxed{C_\pi(x^{1/A}, A\rho) = C_\pi(x, \rho)},
-\]
-
-subject to matching truncation and domain semantics.
-
-*Note:* This is an exact covariance under the explicitly coupled change of coordinates, **not** a non-trivial automorphism of \(\zeta(s)\).
-
-### 12.2 Symmetry-Complete Split Defect and Local Taylor Behavior
-
-When a double critical-line pair splits symmetrically into a quartet \(\{1/2 \pm \delta \pm i\gamma\}\), the baseline contains two coincident critical-line pairs at \(\rho_0 = 1/2 + i\gamma\).
-
-The symmetric split defect is defined as:
-
-\[
-\boxed{S_J(\delta) = C_J(x, 1/2 + \delta + i\gamma) + C_J(x, 1/2 - \delta + i\gamma) - 2 C_J(x, 1/2 + i\gamma)}
-\]
-
-and analogously
-
-\[
-\boxed{S_\pi(\delta) = C_\pi(x, 1/2 + \delta + i\gamma) + C_\pi(x, 1/2 - \delta + i\gamma) - 2 C_\pi(x, 1/2 + i\gamma)}.
-\]
-
-For any sufficiently smooth converter contribution \(C(\beta)\) at fixed \(x\) and \(\gamma\), the Taylor expansion around \(\beta = 1/2\) is:
-
-\[
-C(1/2 + \delta) = C(1/2) + C'(1/2)\delta + \frac{1}{2}C''(1/2)\delta^2 + \frac{1}{6}C'''(1/2)\delta^3 + \mathcal{O}(\delta^4),
-\]
-\[
-C(1/2 - \delta) = C(1/2) - C'(1/2)\delta + \frac{1}{2}C''(1/2)\delta^2 - \frac{1}{6}C'''(1/2)\delta^3 + \mathcal{O}(\delta^4).
-\]
-
-Adding these and subtracting \(2 C(1/2)\), all odd-order terms cancel identically:
-
-\[
-\boxed{S(\delta) = C''(1/2)\delta^2 + \mathcal{O}(\delta^4)}.
-\]
-
-Consequences:
-1. **Even Symmetry**: \(S(-\delta) = S(\delta)\).
-2. **Vanishing Baseline**: \(S(0) = 0\).
-3. **Stationary Point**: \(\left.\frac{dS}{d\delta}\right|_{\delta=0} = 0\).
-4. **Small-\(\delta\) Quadratic Scaling**: \(\frac{S(\lambda\delta)}{S(\delta)} \to \lambda^2\) as \(\delta \to 0\) where \(S(\delta) \neq 0\).
-
-### 12.3 Separation of Gauge Covariance vs Grade Amplification
-
-The repository strictly distinguishes two fundamentally different mathematical operations:
-
-1. **Coupled Coordinate Covariance (Scale Gauge)**:
-   \[
-   A = \tau^k,
-   \qquad
-   \rho' = A\rho,
-   \qquad
-   x' = x^{1/A}.
-   \]
-   Because \(\rho'\log x' = \rho\log x\), this is an exact coordinate re-expression.
-   It leaves converter wave contributions \(C_J(x', \rho') = C_J(x, \rho)\) and \(\zeta\)-representation \(Z_A(As) = \zeta(s)\) exactly invariant.
-   **It does NOT produce arithmetic amplification.**
-
-2. **Grade / Centrifuge Evolution**:
-   \[
-   q_\rho = \tau^{\rho - 1/2},
-   \qquad
-   q_\rho \mapsto q_\rho^K.
-   \]
-   For off-critical zeros (\(\delta \neq 0\)), this produces genuine exponential radial magnification:
-   \[
-   |D_K| = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right).
-   \]
-
-These mechanisms are mathematically distinct and are evaluated by separate code paths.
-
-
-
-## 13. Deterministic test vectors
-
-### A — Identity
-
-\[
-K=0.
-\]
-
-All scale factors equal 1.
-
-### B — Origin dilation
-
-\[
-K=1.
-\]
-
-Expected image critical line:
-
-\[
-\Re(s')=\tau/2=\pi.
-\]
-
-Expected zero map:
-
-\[
-\rho'=\tau\rho.
-\]
-
-### C — Centered dilation
-
-\[
-K=1.
-\]
-
-Expected image critical line:
-
-\[
-\Re(s')=1/2.
-\]
-
-Expected zero map:
-
-\[
-\rho'=1/2+\tau(\rho-1/2).
-\]
-
-### D — Inverse kernel lock
-
-\[
-A=2,
-\qquad
-B=1/2,
-\qquad
-C=D=0.
-\]
-
-Expected:
-
-\[
-AB=1
+\rho'=A\rho
 \]
 
 and
 
 \[
-\mathcal Z_{2,0,1/2,0}(s)=\zeta(s).
+x'=x^{1/A}.
 \]
 
-### E — Radial centrifuge
-
-Take
+Then
 
 \[
-\delta=10^{-4},
+\rho'\log x'
+=
+A\rho
+\frac{\log x}{A}
+=
+\rho\log x.
+\]
+
+Therefore
+
+\[
+\boxed{
+C_J(x^{1/A},A\rho)
+=
+C_J(x,\rho).
+}
+\]
+
+Similarly,
+
+\[
+\boxed{
+C_\pi(x^{1/A},A\rho)
+=
+C_\pi(x,\rho)
+}
+\]
+
+under matching domain and truncation semantics.
+
+This is exact coupled coordinate covariance, not a nontrivial automorphism of zeta.
+
+---
+
+# 27. Symmetry-complete converter split
+
+Let
+
+\[
+C(\beta)
+\]
+
+be a sufficiently smooth converter contribution at fixed \(x,\gamma\).
+
+Define
+
+\[
+\boxed{
+S(\delta)
+=
+C\left(\frac12+\delta\right)
++
+C\left(\frac12-\delta\right)
+-
+2C\left(\frac12\right).
+}
+\]
+
+Then
+
+\[
+\boxed{
+S(-\delta)=S(\delta),
+}
+\]
+
+\[
+\boxed{
+S(0)=0,
+}
+\]
+
+and Taylor expansion gives
+
+\[
+\boxed{
+S(\delta)
+=
+C''\left(\frac12\right)\delta^2
++
+O(\delta^4).
+}
+\]
+
+Therefore, where the quadratic coefficient is nonzero,
+
+\[
+\boxed{
+\frac{S(\lambda\delta)}{S(\delta)}
+\to
+\lambda^2
+}
+\]
+
+as
+
+\[
+\delta\to0.
+\]
+
+In particular,
+
+\[
+S(\delta)/S(\delta/2)\to4
+\]
+
+is generic quadratic-even behavior, not evidence of an exact universal hyperbolic converter law.
+
+---
+
+# 28. Local cross-height normalization
+
+For a numerically verified simple critical-line zero
+
+\[
+\rho_n
+=
+\frac12+i\gamma_n,
+\]
+
+define the baseline asymptotic mean-spacing scale
+
+\[
+\boxed{
+\Delta_n
+=
+\frac{\tau}
+{\log(\gamma_n/\tau)}.
+}
+\]
+
+Define
+
+\[
+\boxed{
+s_n(u)
+=
+\frac12+i(\gamma_n+\Delta_nu).
+}
+\]
+
+Then define derivative-normalized path
+
+\[
+\boxed{
+P_n(u)
+=
+\frac{
+\zeta(s_n(u))
+}{
+i\Delta_n\zeta'(\rho_n)
+}.
+}
+\]
+
+Since
+
+\[
+\zeta(\rho_n)=0,
+\]
+
+\[
+\boxed{
+P_n(0)=0.
+}
+\]
+
+Differentiating in \(u\),
+
+\[
+\boxed{
+P_n'(0)=1.
+}
+\]
+
+This normalization is valid only for a verified simple zero with numerically well-conditioned nonzero derivative.
+
+---
+
+# 29. Local shape coefficients
+
+Expand
+
+\[
+P_n(u)
+=
+u
++
+c_{2,n}u^2
++
+c_{3,n}u^3
++\cdots.
+\]
+
+Then
+
+\[
+\boxed{
+c_{m,n}
+=
+\frac{
+(i\Delta_n)^{m-1}
+\zeta^{(m)}(\rho_n)
+}{
+m!\zeta'(\rho_n)
+},
 \qquad
-K=100.
+m\ge2.
+}
 \]
 
-Expected:
+These are defined observables.
+
+They are not asserted to be constant, convergent, or RH-forcing.
+
+---
+
+# 30. Generic-base control
+
+For any
 
 \[
-\log|q_\rho^K|=0.01\log\tau.
+b>1,
 \]
 
-### F — On-line centrifuge
-
-For \(\delta=0\) and arbitrary tested \(K\):
+define
 
 \[
-|q_\rho^K|=1.
+\boxed{
+q_{\rho,b}
+=
+b^{\rho-\frac12}.
+}
 \]
 
-## 14. Forbidden shortcuts
+Then
 
-Do not:
+\[
+\boxed{
+|q_{\rho,b}^K|
+=
+b^{K\delta}.
+}
+\]
 
-- evaluate \(\sum n^{-s}\) in the critical strip as if it were the analytic continuation;
-- use reference zeros as discovery seeds in baseline validation;
-- infer same-object status from visual similarity;
-- treat coordinate dilation and argument transformation as interchangeable;
-- convert high-precision decimal inputs through binary float before evaluation;
-- silently change branch conventions between modules.
+Therefore the bare radial-amplification formula is generic in the positive base.
+
+Any claim of specifically tau-dependent proof leverage must identify an additional exact property tied to
+
+\[
+\tau=2\pi.
+\]
+
+---
+
+# 31. Exact versus conjectural classifications
+
+Every active mathematics card or research artifact should classify a formula as one of:
+
+```text
+EXACT_IDENTITY
+COORDINATE_CONTROL
+DEFINED_OBSERVABLE
+NUMERICAL_OBSERVATION
+CANDIDATE_INVARIANT
+CONJECTURAL_IMPLICATION
+SYNTHETIC_DIAGNOSTIC
+```
+
+Do not display a conjectural implication as an exact identity.
+
+---
+
+# 32. Forbidden shortcuts
+
+The implementation must not:
+
+1. use the raw Dirichlet series
+   \[
+   \sum n^{-s}
+   \]
+   as the numerical definition of zeta in the critical strip;
+
+2. seed baseline zero discovery from the external reference list and then call the result independent validation;
+
+3. conflate camera, height sampling, origin dilation, centered dilation, argument scaling, kernel transformation, or transcendental continuation;
+
+4. treat integer \(K\) and real \(k\) as semantically interchangeable;
+
+5. infer zero-slice disjointness from arithmetic-lattice noncoincidence;
+
+6. claim that compression forces an off-line zero onto the critical surface;
+
+7. call synthetic moved-zero configurations another zeta function;
+
+8. silently cast authoritative decimal inputs to Python `float` or NumPy `complex128` before the authoritative metric is formed;
+
+9. infer RH from finite zero verification;
+
+10. promote an RH-equivalent bound as a softer intermediate lemma.
+
+---
+
+# 33. Deterministic trust vectors
+
+These are minimum mathematical regression vectors.
+
+## Vector A — native transcendental grade
+
+Set
+
+\[
+k=0.
+\]
+
+Require
+
+\[
+\boxed{
+\mathcal Z_\tau(s,0)=\zeta(s).
+}
+\]
+
+## Vector B — grade composition
+
+For arbitrary test values \(k_1,k_2\),
+
+\[
+\boxed{
+\tau^{k_1+k_2}
+=
+\tau^{k_1}\tau^{k_2}
+}
+\]
+
+to declared precision.
+
+## Vector C — reciprocal grades
+
+For nonzero integer \(K\),
+
+\[
+\boxed{
+\tau^K\tau^{-K}=1.
+}
+\]
+
+## Vector D — zero worldline
+
+For a reference zero \(\rho\) and selected real \(k\),
+
+\[
+\boxed{
+\mathcal Z_\tau(\tau^k\rho,k)=0
+}
+\]
+
+to the declared numerical residual tolerance.
+
+## Vector E — critical surface
+
+For
+
+\[
+s=\frac12+it,
+\]
+
+require
+
+\[
+\boxed{
+\Re(\tau^k s)=\frac{\tau^k}{2}.
+}
+\]
+
+## Vector F — radial invariant
+
+For
+
+\[
+\rho=\frac12+\delta+i\gamma,
+\]
+
+require
+
+\[
+\boxed{
+R_\tau(\tau^k\rho,k)=\delta.
+}
+\]
+
+## Vector G — origin dilation
+
+For generic \(A>0\),
+
+\[
+\boxed{
+f_A(A s)=\zeta(s).
+}
+\]
+
+## Vector H — centered dilation
+
+For
+
+\[
+s'
+=
+\frac12+A(s-\frac12),
+\]
+
+require inverse mapping back to the original zeta argument.
+
+## Vector I — argument transform zero map
+
+For
+
+\[
+f_A(s)=\zeta(As),
+\]
+
+require predicted zero
+
+\[
+s=\rho/A.
+\]
+
+## Vector J — inverse kernel lock
+
+For
+
+\[
+AB=1,
+\quad
+C=D=0,
+\]
+
+require
+
+\[
+\boxed{
+\mathcal Z_{A,0,B,0}(s)=\zeta(s).
+}
+\]
+
+## Vector K — zero character
+
+Require
+
+\[
+\boxed{
+|q_\rho^K|=\tau^{K\delta}.
+}
+\]
+
+## Vector L — symmetric grade defect
+
+Require
+
+\[
+\boxed{
+|D_K|
+=
+4\sinh^2
+\left(
+\frac{K\delta\log\tau}{2}
+\right).
+}
+\]
+
+## Vector M — converter remainder
+
+Audit numerical integration of
+
+\[
+R(x)
+\]
+
+against the \(E_1\) series at controlled \(x\).
+
+## Vector N — converter covariance
+
+Require
+
+\[
+\boxed{
+C_J(x^{1/A},A\rho)=C_J(x,\rho).
+}
+\]
+
+## Vector O — split quadratic behavior
+
+For sufficiently small declared \(\delta\), verify the computed split against the exact Taylor expansion order without claiming an exact hyperbolic converter law.
+
+## Vector P — cross-height normalization
+
+At a verified simple zero require
+
+\[
+\boxed{
+P_n(0)=0,
+\qquad
+P_n'(0)=1
+}
+\]
+
+to declared numerical tolerance.
+
+---
+
+# 34. Proof-facing non-identity
+
+The following is deliberately **not** part of the mathematical contract:
+
+\[
+\boxed{
+\text{Transcendental Coherence}
+\Longrightarrow
+\text{one occupied radial leaf}.
+}
+\]
+
+That is the central open research theorem.
+
+The implementation may test candidate forms but must not encode the conclusion as an identity, axiom, or automatic verdict.

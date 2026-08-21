@@ -124,8 +124,18 @@ class BaseTransform(ABC):
             f"- **Image critical line:** `{d['image_critical_line']}`\n"
             f"- **Predicted zero map:** `{d['zero_map']}`\n"
         )
+        if "grade_type" in d:
+            md += f"- **Grade Taxonomy Class:** `{d['grade_type']}`\n"
+        if "symbolic_scale" in d:
+            md += f"- **Symbolic Scale:** `{d['symbolic_scale']}`\n"
+        if "numeric_scale" in d:
+            md += f"- **Numeric Scale:** `{d['numeric_scale']}`\n"
+        if "radial_coordinate" in d:
+            md += f"- **Normalized Radial Leaf:** `{d['radial_coordinate']}`\n"
         if "coupled_converter_identity" in d:
             md += f"- **Coupled converter identity:** `{d['coupled_converter_identity']}`\n"
+        if "epistemic_class" in d:
+            md += f"- **Epistemic Class:** `{d['epistemic_class']}`\n"
         md += f"\n**CLASS:** {d['classification']}"
         return md
 
@@ -739,11 +749,11 @@ class TranscendentalContinuationTransform(BaseTransform):
 
     @property
     def domain_map_str(self) -> str:
-        return f"s ↦ tau^(-k) s = s / {self.grade.symbolic_expression()}"
+        return f"s ↦ tau^k s = {self.grade.symbolic_expression()} * s"
 
     @property
     def function_str(self) -> str:
-        return f"Z_tau(s, k) = ζ(tau^(-k) s)"
+        return f"Z_tau(s, k) = ζ(tau^(-k) s) = ζ(s / {self.grade.symbolic_expression()})"
 
     @property
     def original_critical_line_str(self) -> str:
@@ -764,7 +774,7 @@ class TranscendentalContinuationTransform(BaseTransform):
 
     def map_domain_point(self, s: complex) -> complex:
         scale_val = float(self.grade.numeric_scale(dps=15))
-        return s / scale_val if scale_val != 0 else s
+        return s * scale_val
 
     def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
         return transcendental.evaluate_extended_zeta(s, grade=self.grade, dps=dps)

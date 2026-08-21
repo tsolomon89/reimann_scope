@@ -1,43 +1,60 @@
-schema_version: "2.0"
+schema_version: '2'
 id: grade-constraints-001
-title: "Bilateral Grade Constraint Identity Verification"
-classification: exact_identity_control
-
+title: Bilateral Symmetric Defect and Hyperbolic Scaling Invariant Sweep
+research_question: Does the discrete bilateral defect D_K(rho) satisfy the hyperbolic
+  identity |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2) across integer grades?
+epistemic_class: exact_control
+object_relationship: grade_constraint_comparison
 hypothesis:
-  statement: "For any bilateral integer grade K in Z and radial displacement delta in R, the bilateral symmetric defect satisfies |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2) identically at arbitrary precision, vanishing if and only if delta = 0 or K = 0."
-  falsifier: "Discrepancy | |D_K| - 4 sinh^2(K * delta * ln(tau) / 2) | > 1e-30."
-
+  statement: The bilateral defect D_K = (tau^(K*delta) - 1)*(1 - tau^(-K*delta)) satisfies
+    |D_K| = 4*sinh^2(K*delta*ln(tau)/2) identically, vanishing if and only if delta
+    = 0 or K = 0.
+prediction:
+  statement: Identity error | |D_K| - 4*sinh^2(K*delta*ln(tau)/2) | is below 1e-50
+    across all K and delta.
+falsification:
+  statement: Identity error exceeds 1e-50.
+interpretation_limit:
+  statement: This algebraic identity holds for all complex numbers; it confirms hyperbolic
+    amplification of off-line roots without asserting RH.
+formalization_target:
+  statement: Hyperbolic identity for bilateral grade defect D_K.
 criterion:
-  metric: residual
-  operator: "<="
-  threshold: "1e-30"
-
+  metric: identity_error
+  operator: <=
+  threshold: 1e-50
+  aggregation: max_abs
 report_metrics:
-  - metric: identity_error
-    kind: criterion_component
-    label: "Defect identity error | |D_K| - 4 sinh^2(K * delta * ln(tau) / 2) |"
-  - metric: abs_D_K
-    kind: observational_metric
-    label: "Bilateral symmetric defect magnitude |D_K|"
-
+- metric: abs_D_K
+  kind: observational_metric
+  label: Observed bilateral defect magnitude |D_K|
+- metric: expected_abs_D_K
+  kind: observational_metric
+  label: Theoretically expected defect magnitude 4*sinh^2(K*delta*ln(tau)/2)
+- metric: identity_error
+  kind: criterion_component
+  label: Defect identity absolute error
 engine:
   operation: grade_constraint
-
 parameters:
-  K:
-    kind: explicit
-    values: ["-3", "-2", "-1", "1", "2", "3"]
-  delta:
-    kind: explicit
-    values: ["-0.05", "-0.01", "0.0", "0.01", "0.05"]
   zero_index:
     kind: explicit
-    values: [0, 1]
-
+    values:
+    - 0
+  delta:
+    kind: explicit
+    values:
+    - '-0.1'
+    - '-0.01'
+    - '0.0'
+    - '0.01'
+    - '0.1'
+  K:
+    kind: integer_grade
+    start: -10
+    stop: 10
+    step: 1
 precision:
   dps: 80
-
 outputs:
   retain_points: true
-
-notes: "Verifies the bilateral grade defect identity across positive and negative integer grades."

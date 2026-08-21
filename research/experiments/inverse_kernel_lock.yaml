@@ -1,45 +1,53 @@
-schema_version: "1"
-id: inverse-kernel-lock-001
-title: Exact Dirichlet kernel pairing preservation under inverse scale lock AB=1
-
+schema_version: '2'
+id: inverse-kernel-lock-identity
+title: Inverse Scale Lock Kernel Lab Identity Verification
+research_question: Does the Dirichlet kernel transform Z_{A,B,C,D}(s) identically
+  reproduce zeta(s) when AB = 1 and C = D = 0?
+epistemic_class: exact_control
+object_relationship: same_object_coordinate_control
 hypothesis:
-  statement: >
-    When Inverse Scale Lock is active (AB=1) with shifts C=D=0, the analytically
-    continued kernel transformation Z_{A,0,1/A,0}(s) is identically equal to zeta(s),
-    achieving maximum absolute difference <= 1e-30 across sample domain points at 80 dps.
-
+  statement: Under inverse scale lock AB = 1 and C = D = 0, Z_{A,1/A,0,0}(s) = zeta(s)
+    identically for all s.
+prediction:
+  statement: Absolute difference |Z_{A,1/A,0,0}(s) - zeta(s)| is below 1e-45.
+falsification:
+  statement: Difference exceeds 1e-45.
+interpretation_limit:
+  statement: Exact algebraic identity for locked Dirichlet kernel dilation.
+formalization_target:
+  statement: Inverse scale lock kernel theorem.
 criterion:
   metric: abs_diff
-  operator: "<="
-  threshold: "1e-30"
-
+  operator: <=
+  threshold: 1e-45
+  aggregation: max_abs
+report_metrics:
+- metric: abs_diff
+  kind: criterion_component
+  label: Kernel identity absolute difference
 engine:
   operation: kernel_identity
-
 parameters:
   A:
-    kind: explicit
-    values: ["0.25", "0.5", "1.0", "2.0", "4.0"]
+    kind: linear
+    start: '0.2'
+    stop: '5.0'
+    step: '0.4'
   inverse_scale_lock:
     kind: explicit
-    values: ["true"]
-  C:
-    kind: explicit
-    values: ["0.0"]
-  D:
-    kind: explicit
-    values: ["0.0"]
+    values:
+    - 'true'
   s_re:
     kind: explicit
-    values: ["0.5", "0.75", "2.0", "-1.5"]
+    values:
+    - '0.5'
+    - '1.5'
+    - '2.0'
   s_im:
-    kind: linear
-    start: "10.0"
-    stop: "30.0"
-    step: "5.0"
-
+    kind: explicit
+    values:
+    - '14.13472514173469379045725198356247027078425711569924317568556746'
 precision:
   dps: 80
-
 outputs:
   retain_points: true

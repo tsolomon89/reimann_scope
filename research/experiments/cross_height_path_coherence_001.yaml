@@ -1,49 +1,66 @@
-schema_version: "2.0"
+schema_version: '2'
 id: cross-height-path-coherence-001
-title: "Cross-Height Path Coherence and Taylor Shape Metric Sweep"
-classification: observational_coherence_experiment
-
+title: Cross-Height Path Coherence and Taylor Shape Metric Sweep
+research_question: Do derivative-normalized trajectories P_n(u) across widely separated
+  spectrum blocks exhibit well-conditioned local geometry and non-divergent Taylor
+  shape coefficients?
+epistemic_class: observational_pattern
+object_relationship: actual_cross_height_comparison
 hypothesis:
-  statement: "Derivative-normalized trajectories P_n(u) = zeta(s_n(u)) / [i * Delta_n * zeta'(rho_n)] evaluated at numerically verified simple zeros share common local geometric structures, with well-defined Taylor shape coefficients c_{2,n} and c_{3,n} across low, medium, high, and very-high spectrum blocks."
-  falsifier: "Simplicity check fails (residual >= 1e-20 or vanishing derivative), or Taylor shape coefficients diverge."
-
+  statement: Derivative-normalized trajectories P_n(u) = zeta(s_n(u)) / [i * Delta_n
+    * zeta'(rho_n)] evaluated at verified simple zeros share common local geometric
+    structures across spectrum blocks.
+prediction:
+  statement: All evaluated zeros satisfy simplicity residual < 1e-20 and non-vanishing
+    derivative, while Taylor shape coefficients c_{2,n}, c_{3,n} remain finite and
+    bounded.
+falsification:
+  statement: Simplicity check fails (residual >= 1e-20 or vanishing derivative), or
+    Taylor shape coefficients diverge.
+interpretation_limit:
+  statement: This is an observational pattern characterization across heights; it
+    does not prove global cross-height rigidity or RH.
 criterion:
-  metric: residual
-  operator: "<="
-  threshold: "1e-20"
-
+  metric: zeta_residual
+  aggregation: none
 report_metrics:
-  - metric: zeta_residual
-    kind: criterion_component
-    label: "Zeta residual at zero ordinate |zeta(1/2 + i*gamma)|"
-  - metric: abs_c2
-    kind: observational_metric
-    label: "Second-order Taylor shape coefficient magnitude |c_{2,n}|"
-  - metric: abs_c3
-    kind: observational_metric
-    label: "Third-order Taylor shape coefficient magnitude |c_{3,n}|"
-  - metric: abs_P_n
-    kind: observational_metric
-    label: "Derivative-normalized path magnitude |P_n(u)|"
-
+- metric: zeta_residual
+  kind: observational_metric
+  label: Zeta residual at zero ordinate |zeta(1/2 + i*gamma)|
+- metric: abs_c2
+  kind: observational_metric
+  label: Second-order Taylor shape coefficient magnitude |c_{2,n}|
+- metric: abs_c3
+  kind: observational_metric
+  label: Third-order Taylor shape coefficient magnitude |c_{3,n}|
+- metric: abs_P_n
+  kind: observational_metric
+  label: Derivative-normalized path magnitude |P_n(u)|
 engine:
   operation: cross_height_coherence
-
 parameters:
   block:
     kind: explicit
-    values: ["low_validation", "medium_research", "high_research", "very_high_sparse"]
+    values:
+    - low_validation
+    - medium_research
+    - high_research
+    - very_high_sparse
   zero_index:
     kind: explicit
-    values: [0, 1, 2]
+    values:
+    - 0
+    - 1
+    - 2
   u:
     kind: explicit
-    values: ["-0.5", "-0.2", "0.0", "0.2", "0.5"]
-
+    values:
+    - '-0.5'
+    - '-0.2'
+    - '0.0'
+    - '0.2'
+    - '0.5'
 precision:
   dps: 80
-
 outputs:
   retain_points: true
-
-notes: "Evaluates derivative-normalized trajectory P_n(u) and Taylor shape coefficients across widely separated spectrum blocks."

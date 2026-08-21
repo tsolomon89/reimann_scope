@@ -1,61 +1,68 @@
-schema_version: "1"
+schema_version: '2'
 id: coupled-perturbation-covariance-001
-title: Coupled coordinate covariance invariance of clean and perturbed converter waves
-
-classification: valid control
-notes: "Coupled coordinate dilation gauge covariance for clean and perturbed converter waves"
-
+title: Coupled Perturbation Covariance and Gauge Invariance
+research_question: Does the coupled coordinate/converter gauge covariance hold identically
+  for perturbed off-line roots and reflection-symmetric pairs?
+epistemic_class: exact_control
+object_relationship: same_object_coordinate_control
 hypothesis:
-  statement: >
-    Under simultaneous origin coordinate dilation A = tau^k, s' = A*s, x' = x^(1/A),
-    rho_clean' = A*rho_clean, and rho_pert' = A*rho_pert, both clean single-zero converter
-    contributions C_J(x', rho_clean') = C_J(x, rho_clean) and perturbed converter contributions
-    C_J(x', rho_pert') = C_J(x, rho_pert) are exact mathematical identities, achieving maximum
-    absolute covariance residual <= 1e-25 across single-pair diagnostic and symmetry-complete
-    split modes at 80 dps.
-
+  statement: Coupled scale covariance C_J(x^(1/A), A*rho_pert) = C_J(x, rho_pert)
+    holds for arbitrary off-line roots rho_pert = 1/2 + delta + i*gamma.
+prediction:
+  statement: Perturbed converter wave covariance residual is below 1e-45.
+falsification:
+  statement: Covariance residual exceeds 1e-45.
+interpretation_limit:
+  statement: Confirms that gauge covariance is an algebraic property of the explicit
+    formula kernel holding for arbitrary complex exponents.
+formalization_target:
+  statement: Perturbed explicit formula covariance theorem.
 criterion:
   metric: covariance_residual
-  operator: "<="
-  threshold: "1e-25"
+  operator: <=
+  threshold: 1e-45
   aggregation: max_abs
-
 report_metrics:
-  - metric: clean_cj_residual
-    label: "Clean converter wave covariance residual |C_J(x^(1/A), A*rho_0) - C_J(x, rho_0)|"
-    kind: criterion_component
-  - metric: pert_cj_residual
-    label: "Perturbed converter wave covariance residual |C_J(x^(1/A), A*rho_pert) - C_J(x, rho_pert)|"
-    kind: criterion_component
-  - metric: delta_cj_residual
-    label: "Converter perturbation response covariance residual |Delta C_J' - Delta C_J|"
-    kind: criterion_component
-
+- metric: clean_cj_residual
+  kind: criterion_component
+  label: Unperturbed wave covariance residual
+- metric: pert_cj_residual
+  kind: criterion_component
+  label: Perturbed wave covariance residual
+- metric: delta_cj_residual
+  kind: criterion_component
+  label: Wave perturbation difference covariance residual
 engine:
   operation: coupled_perturbation_covariance
-
 parameters:
-  zero_index:
-    kind: explicit
-    values: ["0", "1"]
+  k:
+    kind: linear
+    start: '-1.0'
+    stop: '1.0'
+    step: '0.5'
   delta:
     kind: explicit
-    values: ["-0.01", "0.0", "0.01"]
-  k:
+    values:
+    - '-0.1'
+    - '-0.01'
+    - '0.0'
+    - '0.01'
+    - '0.1'
+  zero_index:
     kind: explicit
-    values: ["-2", "-1", "0", "1", "2"]
-  x:
-    kind: explicit
-    values: ["10.0", "20.0"]
-  num_zeros:
-    kind: explicit
-    values: ["10"]
+    values:
+    - 0
+    - 1
   perturbation_mode:
     kind: explicit
-    values: ["single_pair_diagnostic", "symmetry_complete_split"]
-
+    values:
+    - single_pair_diagnostic
+    - symmetry_complete_split
+  x:
+    kind: explicit
+    values:
+    - '20.0'
 precision:
   dps: 80
-
 outputs:
   retain_points: true
