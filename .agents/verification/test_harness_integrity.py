@@ -99,9 +99,10 @@ def test_root_markdown_files_preserved():
     expected_root_files = [
         "README.md", "MATH_CONTRACT.md", "DECISIONS.md",
         "DATA_PROVENANCE.md", "RIEMANN_MICROSCOPE_SPEC.md",
-        "RIEMANN_MICROSCOPE_CODING_AGENT_PROMPT.md"
+        "EXPERIMENT_PROTOCOL.md", "TRANSCENDENTAL_CONTINUATION.md"
     ]
     for filename in expected_root_files:
         file_path = WORKSPACE_ROOT / filename
         assert file_path.exists(), f"Root file {filename} must not be deleted or moved"
         assert file_path.stat().st_size > 0, f"Root file {filename} must not be empty"
+

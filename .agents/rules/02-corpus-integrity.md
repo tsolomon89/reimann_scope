@@ -6,7 +6,7 @@ description: Mandatory corpus integrity, notation preservation, tau-scale conven
 # Corpus Integrity and Notation Preservation
 
 1. **Root Document Preservation**:
-   - Do not move, rename, delete, reorganize, or rewrite root Markdown files (`README.md`, `MATH_CONTRACT.md`, `DECISIONS.md`, `DATA_PROVENANCE.md`, `RIEMANN_MICROSCOPE_SPEC.md`, `RIEMANN_MICROSCOPE_CODING_AGENT_PROMPT.md`).
+   - Do not move, rename, delete, reorganize, or rewrite root Markdown files (`README.md`, `MATH_CONTRACT.md`, `DECISIONS.md`, `DATA_PROVENANCE.md`, `RIEMANN_MICROSCOPE_SPEC.md`, `EXPERIMENT_PROTOCOL.md`, `TRANSCENDENTAL_CONTINUATION.md`).
    - Ordinary Markdown files are research data and specifications; only `.agents/` configuration controls agent behavior.
 
 2. **Preserve Project Notation**:
