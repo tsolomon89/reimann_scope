@@ -1,154 +1,364 @@
-# Riemann Microscope / Macroscope
+# Riemann Scope
 
-Minimal interactive research instrument for visualizing the Riemann zeta function, its zeros, scale transformations, and the explicit-formula relationship between zeros and primes.
+`reimann_scope` is an interactive mathematical research instrument for the Riemann zeta function, its zeros, explicit-formula reconstruction, and a project-defined extension of the zeta domain called **transcendental continuation**.
 
-## Authority
+The application is intended to help discover, visualize, falsify, and formalize a specific path toward a proof of the Riemann Hypothesis. It is not itself a proof engine, and finite numerical agreement is never treated as a proof.
 
-- `SPEC.md` is authoritative for mathematical and product behavior.
-- `MATH_CONTRACT.md` is authoritative for exact identities, invariants, and implementation-level mathematical tests.
-- `DATA_PROVENANCE.md` is authoritative for trusted external datasets and validation rules.
-- `DECISIONS.md` is append-only and records consequential implementation decisions.
+---
 
-If code behavior conflicts with these documents, treat the conflict as a bug until resolved.
+## Central research programme
 
-## Scope
+Write a nontrivial zero as
 
-The app should let a user:
+\[
+\rho=\frac12+\delta+i\gamma.
+\]
 
-- plot the complex trace of \(\zeta(s)\);
-- see the corresponding sampling path in the \(s\)-plane;
-- discover zeros computationally;
-- validate baseline zeros against an independent reference dataset;
-- apply explicit camera, coordinate, argument, and kernel transformations;
-- see where the critical line and zeros move under those transforms;
-- reconstruct the prime staircase from zeta zeros;
-- perturb an individual zero and see the converter response;
-- inspect the exact tau-grade radial amplification
+RH is the statement
+
+\[
+\boxed{\delta=0}
+\]
+
+for every nontrivial zero.
+
+The working contradiction programme is:
+
+\[
+\boxed{
+\begin{aligned}
+1.&\ \text{Assume RH is false.}\\
+2.&\ \text{Then the nontrivial spectrum contains both }
+\delta=0\text{ and }\delta\neq0\text{ radial classes.}\\
+3.&\ \text{Construct the complete }\tau\text{-graded transcendental continuation.}\\
+4.&\ \text{Derive an exact global coherence law across that family.}\\
+5.&\ \text{Prove that the law admits only one occupied radial class.}\\
+6.&\ \text{Known critical-line zeros fix that class at }\delta=0.\\
+7.&\ \delta\neq0\text{ is contradictory.}
+\end{aligned}
+}
+\]
+
+Steps 4–5 are the missing mathematics. The project exists to discover, kill, or formalize them.
+
+---
+
+## Transcendental continuation
+
+Let
+
+\[
+\tau=2\pi.
+\]
+
+Define the project-facing extended family
+
+\[
+\boxed{
+\mathcal Z_\tau(s,k)=\zeta(\tau^{-k}s),
+\qquad
+(s,k)\in\mathbb C\times\mathbb R.
+}
+\]
+
+The ordinary analytically continued zeta function is the native grade:
+
+\[
+\boxed{
+\mathcal Z_\tau(s,0)=\zeta(s).
+}
+\]
+
+Thus \(k=0\) is not outside transcendental continuation. It is its standard analytic-continuation state.
+
+The project distinguishes:
+
+- \(k\in\mathbb R\): continuous transcendental-continuation coordinate;
+- \(K\in\mathbb Z\): canonical bilateral integer grade;
+- \(q\in\mathbb Q\): rational/root grade refinement.
+
+The exact integer-grade family is
+
+\[
+\boxed{
+\ldots,\tau^{-2},\tau^{-1},1,\tau,\tau^2,\ldots
+}
+\]
+
+with
+
+\[
+\tau^{-K}=(\tau^K)^{-1}.
+\]
+
+See `TRANSCENDENTAL_CONTINUATION.md`.
+
+---
+
+## Parallel construction principle
+
+For the arithmetic model
+
+\[
+L_K=\tau^K\mathbb Z,
+\qquad K\in\mathbb Z,
+\]
+
+every line has countably infinitely many stops and is scale-isomorphic to every other line.
+
+For \(J\neq K\),
+
+\[
+\boxed{
+L_J\cap L_K=\{0\}.
+}
+\]
+
+So the integer-grade lines are **scale-isomorphic but arithmetically noncoincident**.
+
+Transcendental continuation does not numerically traverse one infinite line until it reaches another. It formally constructs the family in parallel by making the grade part of the coordinate.
+
+A lattice point may therefore be represented structurally by
+
+\[
+(K,n)
+\]
+
+with numerical realization
+
+\[
+n\tau^K.
+\]
+
+For \(K\neq0\), the grade is exactly specified symbolically even though any positional numerical realization is finite-precision.
+
+---
+
+## Zero worldlines and radial leaves
+
+If
+
+\[
+\zeta(\rho)=0,
+\]
+
+then in the \(k\)-slice
+
+\[
+\boxed{
+s_\rho(k)=\tau^k\rho
+}
+\]
+
+is the corresponding zero.
+
+The critical line becomes the critical surface
+
+\[
+\boxed{
+\mathcal C_\tau
+=
+\left\{
+(s,k):
+\Re(s)=\frac{\tau^k}{2}
+\right\}.
+}
+\]
+
+Define normalized radial coordinate
+
+\[
+\boxed{
+R_\tau(s,k)
+=
+\tau^{-k}\Re(s)-\frac12.
+}
+\]
+
+Along the worldline of
+
+\[
+\rho=\frac12+\delta+i\gamma,
+\]
+
+\[
+\boxed{
+R_\tau(s_\rho(k),k)=\delta
+}
+\]
+
+for every real \(k\).
+
+Therefore transcendental continuation partitions possible zero worldlines into exact radial leaves
+
+\[
+R_\tau=\delta.
+\]
+
+RH becomes:
+
+\[
+\boxed{
+\text{all actual nontrivial zero worldlines occupy the leaf }R_\tau=0.
+}
+\]
+
+A false RH would require simultaneous occupation of \(R_\tau=0\) and at least one \(R_\tau\neq0\) leaf.
+
+The research target is **not** to claim that there is literally no geometric room for another leaf. The target is to determine whether the full arithmetic/analytic constraint system permits more than one occupied radial leaf.
+
+---
+
+## Core experimental layers
+
+The application should distinguish four kinds of work.
+
+### 1. Exact gauge / coordinate controls
+
+Verify and visualize exact coordinate transformations of the same mathematical object.
+
+These are calibration identities, not RH evidence.
+
+### 2. Transcendental continuation and compression
+
+Move through \(k\), including negative grades, to compress or expand zeta geometry while preserving exact transform semantics.
+
+Compression does not itself prove anything about RH; it is a way to inspect grade-independent structure.
+
+### 3. Actual cross-height coherence
+
+Compare genuinely different regions of the unmodified zeta function at widely separated zero heights after a fixed normalization.
+
+This is where candidate global invariants may be discovered or falsified.
+
+### 4. Synthetic off-line perturbation
+
+After a candidate invariant exists, introduce a declared symmetry-complete off-line displacement and test whether it violates the retained coherence law.
+
+A perturbed object is a sensitivity diagnostic, not another zeta function.
+
+---
+
+## Full zeta architecture remains visible
+
+The instrument retains:
+
+- the pole at \(s=1\);
+- trivial zeros
   \[
-  q_\rho^K=\tau^{K(\rho-\frac12)}.
+  -2,-4,-6,\ldots;
   \]
+- nontrivial zeros;
+- the complex zeta trace;
+- completed-function / \(\xi\) views where useful;
+- the explicit formula and prime-counting reconstruction;
+- kernel and coordinate transforms;
+- \(\tau\)-grade radial diagnostics;
+- cross-height and transcendental-continuation views.
 
-It is not a proof engine or theorem-scoring system.
+For proof-facing work on the nontrivial spectrum, the completed function
+
+\[
+\xi(s)
+=
+\frac12s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)
+\]
+
+is often the cleaner object.
+
+---
+
+## Canonical documentation authority
+
+Read the root documents in this order:
+
+1. `TRANSCENDENTAL_CONTINUATION.md`
+2. `RESEARCH_HYPOTHESIS.md`
+3. `RESEARCH_LEDGER.md`
+4. `MATH_CONTRACT.md`
+5. `TRANSCENDENTAL_COHERENCE_EXPERIMENT.md`
+6. `EXPERIMENT_PROTOCOL.md`
+7. `RIEMANN_MICROSCOPE_SPEC.md`
+8. `DATA_PROVENANCE.md`
+9. `LEAN_FORMALIZATION_PLAN.md`
+10. `DECISIONS.md`
+11. `REBUILD_PLAN.md`
+
+If implementation behavior conflicts with an authoritative mathematical document, treat the conflict as a bug until resolved.
+
+---
 
 ## Preferred stack
 
 - Python 3.12+
 - Plotly Dash
-- `python-flint` / Arb for high-precision zeta and root refinement where practical
+- `python-flint` / Arb where practical for authoritative high-precision evaluation
 - `mpmath` as secondary/fallback
-- NumPy for arrays and caching
-- Pytest for tests
+- NumPy for arrays/rendering
+- Pytest
+- Lean + Mathlib as a proof firewall
 
-Do not introduce a separate frontend unless a concrete limitation requires it.
+Keep the system small and auditable. Do not introduce a separate frontend unless a concrete limitation requires it.
 
-## Expected repository
-
-```text
-riemann-microscope/
-    app.py
-    math_core.py
-    transforms.py
-    zero_finder.py
-    converter.py
-    cache.py
-    reference_data.py
-    data/
-        zeros_reference.*
-        primes.*
-        provenance.json
-    tests/
-        test_zeta_values.py
-        test_zero_finder.py
-        test_transforms.py
-        test_kernel_lab.py
-        test_converter.py
-        test_perturbation.py
-    SPEC.md
-    MATH_CONTRACT.md
-    DATA_PROVENANCE.md
-    DECISIONS.md
-    README.md
-```
-
-## Install
-
-Use a virtual environment.
-
-```bash
-python -m venv .venv
-```
-
-Activate it, then install the project dependencies.
-
-The coding agent should create a pinned `requirements.txt` or `pyproject.toml` once the implementation stack is confirmed.
-
-## Run
-
-Expected local command:
-
-```bash
-python app.py
-```
-
-The app should start locally and print the address to open in a browser.
-
-## Test
-
-```bash
-pytest -q
-```
-
-Mathematical trust tests must pass before UI polish or exploratory use.
+---
 
 ## Compute tiers
 
 ### Preview
 
-Used while dragging controls.
+For interactive navigation:
 
-Target:
-
-- 30–40 decimal digits
-- ~200–500 path samples
-- cached/reduced zero work
-- interactive latency under ~200 ms where practical
+- reduced precision;
+- reduced path samples;
+- cached/reduced work;
+- float rendering allowed and clearly labeled.
 
 ### Audit
 
-Used on slider release or explicit high-precision action.
+For authoritative experimental output:
 
-Target:
-
-- 80+ decimal digits
-- ~1,000–5,000 path samples
-- full selected zero count
-- independent recomputation
+- arbitrary/high precision;
+- declared precision;
+- full selected samples;
+- provenance recorded;
+- no silent binary-float reduction before the authoritative metric is formed.
 
 The UI must always show which tier is active.
 
-## Baseline startup behavior
+---
 
-At default \(k=0\):
+## Research interpretation rules
 
-1. evaluate the critical-line zeta trace;
-2. discover zeros without using the external reference table as seeds;
-3. refine discovered roots;
-4. verify residuals against \(\zeta\);
-5. compare afterward against the vendored reference-zero snapshot;
-6. show validation statistics.
+Finite computation may:
 
-## Definition of done
+- validate an exact control;
+- falsify a candidate statement;
+- retain an observational pattern;
+- identify a candidate invariant;
+- characterize a perturbation defect;
+- identify a formalization target.
 
-The MVP is complete when a user can:
+Finite computation must not automatically conclude:
 
-- recognize the critical-line zeta trace;
-- see where it is sampled in the \(s\)-plane;
-- see the program independently discover and validate known zeros;
-- move \(k,A,B,\delta,\gamma\) and always know what mathematical object changed;
-- see the transformed critical line move or remain fixed according to the selected transform;
-- compare baseline and transformed traces;
-- change the zero count in the converter and watch the prime reconstruction respond;
-- move one zero off the line and see the clean/perturbed difference immediately;
-- inspect the exact \(\tau^{K\delta}\) amplification independently of aggregate reconstruction noise.
+- `supports_rh`
+- `refutes_rh`
+- `proof_progress`
+- probability that RH is true.
 
-When this works, stop. Do not add a proof-program layer.
+The required transition is:
+
+\[
+\boxed{
+\text{observe}
+\to
+\text{state}
+\to
+\text{derive}
+\to
+\text{prove radial rigidity}
+\to
+\text{formalize}.
+}
+\]
+
+If a simple invariant is discovered, stop broad numerical expansion until it is derived or killed.

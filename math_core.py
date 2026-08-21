@@ -183,6 +183,23 @@ def completed_xi(
         return res
 
 
+xi_eval = completed_xi
+
+
+def zeta_derivative(
+    s: Union[complex, mpmath.mpc, str, Tuple[Any, Any]],
+    n: int = 1,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    Evaluate the n-th complex derivative d^n/ds^n zeta(s) at arbitrary precision dps.
+    Uses mpmath.zeta analytic derivative evaluation.
+    """
+    with mpmath.workdps(dps + 15):
+        s_mpc = to_mpc(s, dps=dps + 15)
+        return mpmath.zeta(s_mpc, derivative=n)
+
+
 def hardy_theta(
     t: Union[float, str, mpmath.mpf, int],
     dps: int = 35

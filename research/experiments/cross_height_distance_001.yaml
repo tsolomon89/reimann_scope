@@ -1,0 +1,44 @@
+schema_version: "2.0"
+id: cross-height-distance-001
+title: "Pairwise Cross-Height Path Distance Matrix Sweep"
+classification: observational_coherence_experiment
+
+hypothesis:
+  statement: "Derivative-normalized paths P_n(u) exhibit bounded L_2 and L_infty distances across widely separated spectrum blocks (low, medium, high), reflecting shared local Taylor geometries."
+  falsifier: "Pairwise distance diverges (L_infty distance >= 10.0) across tested simple zeros."
+
+criterion:
+  metric: residual
+  operator: "<="
+  threshold: "5.0"
+
+report_metrics:
+  - metric: L_2_distance
+    kind: criterion_component
+    label: "L_2 path distance between normalized local paths"
+  - metric: L_infty_distance
+    kind: observational_metric
+    label: "L_infty path distance between normalized local paths"
+
+engine:
+  operation: cross_height_distance
+
+parameters:
+  gamma_1:
+    kind: explicit
+    values:
+      - "14.1347251417346937904572519835624702707842571156992431756855674601"
+      - "21.0220396387715549926284795938969027773343405249027817546295204036"
+  gamma_2:
+    kind: explicit
+    values:
+      - "236.524229665816205802475507955662978689529495212189123700918960988"
+      - "1419.42248094599568646598903807991681923210060106416601630469081468"
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true
+
+notes: "Evaluates pairwise L_2 and L_infty trajectory distances between low and high spectrum blocks."

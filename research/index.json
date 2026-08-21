@@ -85,5 +85,57 @@
     "manifest_path": "research/runs/20260820T180317Z_isolated-radial-response-002_90650fb0/manifest.json",
     "results_path": "research/runs/20260820T180317Z_isolated-radial-response-002_90650fb0/results.jsonl",
     "notes": "Characterizes single-pair response and symmetry-complete split defect across delta in [-0.05, 0.05]"
+  },
+  {
+    "run_id": "20260821T120347Z_transcendental-worldlines-001_41a62826",
+    "experiment_id": "transcendental-worldlines-001",
+    "classification": "exact_identity_control",
+    "timestamp": "2026-08-21T12:03:47.966051+00:00",
+    "git_commit": "1c04fbf57b6e1801d3966965234991391a42cb09",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260821T120347Z_transcendental-worldlines-001_41a62826/summary.json",
+    "manifest_path": "research/runs/20260821T120347Z_transcendental-worldlines-001_41a62826/manifest.json",
+    "results_path": "research/runs/20260821T120347Z_transcendental-worldlines-001_41a62826/results.jsonl",
+    "notes": "Exact algebraic and numerical verification of zero worldlines and radial leaf invariance across bilateral integer grades."
+  },
+  {
+    "run_id": "20260821T120354Z_cross-height-path-coherence-001_2c1a93dd",
+    "experiment_id": "cross-height-path-coherence-001",
+    "classification": "observational_coherence_experiment",
+    "timestamp": "2026-08-21T12:03:54.431043+00:00",
+    "git_commit": "1c04fbf57b6e1801d3966965234991391a42cb09",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260821T120354Z_cross-height-path-coherence-001_2c1a93dd/summary.json",
+    "manifest_path": "research/runs/20260821T120354Z_cross-height-path-coherence-001_2c1a93dd/manifest.json",
+    "results_path": "research/runs/20260821T120354Z_cross-height-path-coherence-001_2c1a93dd/results.jsonl",
+    "notes": "Evaluates derivative-normalized trajectory P_n(u) and Taylor shape coefficients across widely separated spectrum blocks."
+  },
+  {
+    "run_id": "20260821T120715Z_grade-constraints-001_17eddbf0",
+    "experiment_id": "grade-constraints-001",
+    "classification": "exact_identity_control",
+    "timestamp": "2026-08-21T12:07:15.458026+00:00",
+    "git_commit": "1c04fbf57b6e1801d3966965234991391a42cb09",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260821T120715Z_grade-constraints-001_17eddbf0/summary.json",
+    "manifest_path": "research/runs/20260821T120715Z_grade-constraints-001_17eddbf0/manifest.json",
+    "results_path": "research/runs/20260821T120715Z_grade-constraints-001_17eddbf0/results.jsonl",
+    "notes": "Verifies the bilateral grade defect identity across positive and negative integer grades."
+  },
+  {
+    "run_id": "20260821T120716Z_cross-height-distance-001_20b1c6e2",
+    "experiment_id": "cross-height-distance-001",
+    "classification": "observational_coherence_experiment",
+    "timestamp": "2026-08-21T12:07:16.214467+00:00",
+    "git_commit": "1c04fbf57b6e1801d3966965234991391a42cb09",
+    "status": "complete",
+    "criterion_met": true,
+    "summary_path": "research/runs/20260821T120716Z_cross-height-distance-001_20b1c6e2/summary.json",
+    "manifest_path": "research/runs/20260821T120716Z_cross-height-distance-001_20b1c6e2/manifest.json",
+    "results_path": "research/runs/20260821T120716Z_cross-height-distance-001_20b1c6e2/results.jsonl",
+    "notes": "Evaluates pairwise L_2 and L_infty trajectory distances between low and high spectrum blocks."
   }
 ]

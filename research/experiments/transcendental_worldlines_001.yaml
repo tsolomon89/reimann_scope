@@ -1,0 +1,46 @@
+schema_version: "2.0"
+id: transcendental-worldlines-001
+title: "Transcendental Continuation Zero Worldlines and Radial Leaf Invariance"
+classification: exact_identity_control
+
+hypothesis:
+  statement: "For any nontrivial zero rho = 1/2 + delta + i*gamma, the zero worldline s_rho(k) = tau^k * rho has critical surface real coordinate sigma_c(k) = tau^k / 2, normalized radial leaf R_tau(s_rho(k), k) = delta identically for all grades k, and absolute defect d_tau(s_rho(k), k) = tau^k * delta."
+  falsifier: "Normalized radial leaf R_tau differs from delta by > 1e-30, or defect scaling deviates from tau^k * delta by > 1e-30."
+
+criterion:
+  metric: residual
+  operator: "<="
+  threshold: "1e-30"
+
+report_metrics:
+  - metric: leaf_invariance_error
+    kind: criterion_component
+    label: "Radial leaf invariance error |R_tau(s_world, k) - delta|"
+  - metric: defect_scaling_error
+    kind: criterion_component
+    label: "Absolute defect scaling error |d_tau - tau^k * delta|"
+  - metric: abs_z_world
+    kind: observational_metric
+    label: "Extended zeta magnitude |Z_tau(s_world, k)| (zero when delta=0)"
+
+engine:
+  operation: transcendental_worldline
+
+parameters:
+  zero_index:
+    kind: explicit
+    values: [0, 1, 2, 3, 4]
+  K:
+    kind: explicit
+    values: ["-3", "-2", "-1", "0", "1", "2", "3"]
+  delta:
+    kind: explicit
+    values: ["-0.1", "-0.01", "0.0", "0.01", "0.1"]
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true
+
+notes: "Exact algebraic and numerical verification of zero worldlines and radial leaf invariance across bilateral integer grades."

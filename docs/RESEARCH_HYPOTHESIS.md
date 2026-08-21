@@ -1,0 +1,699 @@
+# Research Hypothesis
+
+## 0. Purpose
+
+This document states the current proof-facing research programme for `reimann_scope`.
+
+The project is explicitly searching for a path to proof of the Riemann Hypothesis. It does so by introducing a project-defined framework, **transcendental continuation**, and asking whether the additional grade structure exposes a global incompatibility between:
+
+- the established critical-line radial class; and
+- any hypothetical off-critical radial class.
+
+The application may use visualization and finite computation to discover or falsify candidate laws. Those observations are not promoted to proof until the law is derived mathematically and, where practical, formalized.
+
+---
+
+# 1. RH in radial coordinates
+
+Write a nontrivial zero as
+
+\[
+\boxed{
+\rho=\frac12+\delta+i\gamma.
+}
+\]
+
+Then
+
+\[
+\delta=\Re(\rho)-\frac12.
+\]
+
+RH is equivalent to
+
+\[
+\boxed{
+\delta=0
+\quad
+\text{for every nontrivial zero.}
+}
+\]
+
+The upper-half-plane zero ordinates usually quoted as
+
+\[
+14.1347\ldots,\ 21.0220\ldots,\ldots
+\]
+
+are the \(\gamma\)-coordinates of zeros whose full coordinates are
+
+\[
+\frac12+i\gamma.
+\]
+
+The trivial zeros
+
+\[
+-2,-4,-6,\ldots
+\]
+
+belong to a separate structural sector and are not the target of RH.
+
+---
+
+# 2. Why the completed function is useful
+
+Define
+
+\[
+\boxed{
+\xi(s)
+=
+\frac12s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s).
+}
+\]
+
+The zeros of \(\xi\) are precisely the nontrivial zeros of \(\zeta\).
+
+The proof-facing radial-class argument can therefore use \(\xi\) without losing the full zeta architecture used elsewhere in the instrument.
+
+---
+
+# 3. Transcendental continuation of the proof object
+
+Define
+
+\[
+\boxed{
+\mathcal X_\tau(s,k)
+=
+\xi(\tau^{-k}s),
+}
+\]
+
+with
+
+\[
+\tau=2\pi.
+\]
+
+At native grade,
+
+\[
+\boxed{
+\mathcal X_\tau(s,0)=\xi(s).
+}
+\]
+
+If
+
+\[
+\xi(\rho)=0,
+\]
+
+then the corresponding zero worldline is
+
+\[
+\boxed{
+s_\rho(k)=\tau^k\rho.
+}
+\]
+
+The critical surface is
+
+\[
+\boxed{
+\mathcal C_\tau
+=
+\left\{
+(s,k):
+\Re(s)=\frac{\tau^k}{2}
+\right\}.
+}
+\]
+
+Define normalized radial coordinate
+
+\[
+\boxed{
+R_\tau(s,k)
+=
+\tau^{-k}\Re(s)-\frac12.
+}
+\]
+
+For
+
+\[
+\rho=\frac12+\delta+i\gamma,
+\]
+
+\[
+\boxed{
+R_\tau(s_\rho(k),k)=\delta
+}
+\]
+
+for every grade \(k\).
+
+Thus each zero worldline belongs to one exact radial leaf
+
+\[
+\mathcal R_\delta.
+\]
+
+---
+
+# 4. The contradiction programme
+
+The current intended proof structure is:
+
+\[
+\boxed{
+\begin{aligned}
+1.&\ \textbf{Assume RH is false.}\\
+2.&\ \textbf{Construct the counterexample worldline.}\\
+3.&\ \textbf{Expose its bilateral radial defect across }\tau\text{-grades.}\\
+4.&\ \textbf{Derive a global transcendental-coherence law.}\\
+5.&\ \textbf{Prove radial rigidity / no mixed-leaf occupancy.}\\
+6.&\ \textbf{Use the established critical class to select }\mathcal R_0.\\
+7.&\ \textbf{Contradict the assumed off-critical leaf.}
+\end{aligned}
+}
+\]
+
+The exact content of steps 4–5 is not known. That is the research problem.
+
+---
+
+# 5. Step 1 — assume a counterexample
+
+Assume there exists a nontrivial zero
+
+\[
+\boxed{
+\rho_*=
+\frac12+\delta+i\gamma,
+\qquad
+\delta\neq0.
+}
+\]
+
+Because many nontrivial zeros are rigorously established on the critical line, a false RH would then imply at least two occupied radial classes in the actual nontrivial spectrum:
+
+\[
+\boxed{
+\mathcal R_0
+\quad\text{and}\quad
+\mathcal R_\delta,\ \delta\neq0.
+}
+\]
+
+By functional-equation and conjugation symmetry, an off-line zero also requires the corresponding reflected/conjugate structure. The counterexample is therefore not treated as a single isolated complex point.
+
+---
+
+# 6. Step 2 — construct the complete counterexample worldline
+
+Transcendental continuation maps the assumed zero to
+
+\[
+\boxed{
+\rho_{*,k}
+=
+\tau^k\rho_*.
+}
+\]
+
+At integer grades,
+
+\[
+\boxed{
+\rho_{*,K}
+=
+\tau^K\rho_*,
+\qquad
+K\in\mathbb Z.
+}
+\]
+
+The worldline misses the critical surface at every grade because
+
+\[
+R_\tau(\rho_{*,k},k)=\delta\neq0.
+\]
+
+Compression and expansion alter absolute coordinates but do not change the normalized radial class.
+
+Thus the assumed counterexample becomes an exact **transcendental radial defect worldline**.
+
+---
+
+# 7. Step 3 — bilateral grade signature
+
+Define the zero character
+
+\[
+\boxed{
+q_\rho
+=
+\tau^{\rho-\frac12}.
+}
+\]
+
+For
+
+\[
+\rho=\frac12+\delta+i\gamma,
+\]
+
+\[
+q_\rho^K
+=
+\tau^{K\delta}
+e^{iK\gamma\log\tau}
+\]
+
+and therefore
+
+\[
+\boxed{
+|q_\rho^K|
+=
+\tau^{K\delta}.
+}
+\]
+
+For the critical class,
+
+\[
+\delta=0
+\]
+
+gives
+
+\[
+\boxed{
+|q_\rho^K|=1
+\quad
+\forall K\in\mathbb Z.
+}
+\]
+
+For an off-critical class,
+
+\[
+\delta\neq0,
+\]
+
+the modulus grows exponentially in one grade direction and contracts in the other.
+
+The reflected partner supplies the complementary radial behavior.
+
+Therefore a false RH introduces a bilateral family of nonunit radial modes into the same globally constrained spectrum.
+
+This is exact algebra, not yet a contradiction.
+
+---
+
+# 8. Step 4 — derive Transcendental Coherence
+
+The central missing theorem must come from the actual analytic/arithmetic structure of zeta or xi.
+
+Call the desired law provisionally:
+
+\[
+\boxed{
+\mathcal T[\Xi]=0
+}
+\]
+
+or
+
+\[
+\boxed{
+I_K=C.
+}
+\]
+
+The exact notation is deliberately unspecified until the law is discovered.
+
+A valid Transcendental Coherence Law must satisfy all of the following:
+
+1. **Global**  
+   It must depend on the actual globally constrained zeta/xi object, not be defined independently zero-by-zero.
+
+2. **Grade-wide**  
+   It must hold across a nontrivial family of \(K\)-states or arise from simultaneous constraints across them.
+
+3. **Independent of RH**  
+   Its derivation must not assume
+   \[
+   \Re(\rho)=\frac12
+   \]
+   or any equivalent RH-strength bound.
+
+4. **Stronger than coordinate covariance**  
+   It cannot merely restate
+   \[
+   \mathcal X_\tau(\tau^k s,k)=\xi(s).
+   \]
+
+5. **Arithmetic/analytic**  
+   It should be tied to the zeta/xi object, explicit formula, prime structure, functional equation, or another exact defining relation.
+
+6. **Falsifiable**  
+   The Scope must be able to test candidate forms numerically across distinct actual regions and grades.
+
+---
+
+# 9. Step 5 — Transcendental Radial Rigidity
+
+The desired consequence is a theorem of the form:
+
+\[
+\boxed{
+\mathcal T
+\Longrightarrow
+\text{the actual nontrivial spectrum occupies only one radial leaf}.
+}
+\]
+
+Equivalent possible forms include:
+
+\[
+\boxed{
+\mathcal T
+\Longrightarrow
+R_\tau(W_{\rho_m})=R_\tau(W_{\rho_n})
+\quad
+\text{for all nontrivial zeros }\rho_m,\rho_n,
+}
+\]
+
+or
+
+\[
+\boxed{
+\mathcal T
++
+\text{full bilateral grade constraints}
+\Longrightarrow
+\delta=0.
+}
+\]
+
+The theorem may ultimately be phrased as a uniqueness, rigidity, no-compensation, or constraint-intersection statement.
+
+This theorem is currently **OPEN**.
+
+---
+
+# 10. Constraint-intersection formulation
+
+The train-line intuition is not used as a literal “no space remains” claim.
+
+Instead, assign to each grade \(K\) the complete exact constraint set
+
+\[
+\mathcal C_K.
+\]
+
+The actual zeta/xi spectrum must satisfy all of them:
+
+\[
+\boxed{
+\text{Spectrum}
+\in
+\bigcap_{K\in\mathbb Z}
+\mathcal C_K.
+}
+\]
+
+The proof question becomes:
+
+\[
+\boxed{
+\text{Can the intersection of all grade constraints contain a spectrum}
+\text{ occupying both }\mathcal R_0
+\text{ and }\mathcal R_\delta,\ \delta\neq0?
+}
+\]
+
+If the answer can be proved to be no, then the intersection of constraints enforces radial rigidity.
+
+This is the mathematically preferred version of the original train-line intersection intuition.
+
+---
+
+# 11. No-compensation requirement
+
+A simple growth argument is insufficient.
+
+An off-critical reflected pair supplies complementary factors
+
+\[
+\tau^{K\delta}
+\]
+
+and
+
+\[
+\tau^{-K\delta}.
+\]
+
+Global sums may contain cancellation or compensation.
+
+Therefore the missing theorem must show more than:
+
+\[
+\text{one component grows}.
+\]
+
+It must establish something like:
+
+\[
+\boxed{
+\text{the exact grade-wide arithmetic/analytic object cannot compensate}
+\text{ mixed radial exponents for all required grades}.
+}
+\]
+
+This is the candidate **Transcendental No-Compensation** form of radial rigidity.
+
+---
+
+# 12. Existing exact spectrum-wide grade relation
+
+The explicit formula already yields a genuine global grade relation.
+
+For \(K>0\),
+
+\[
+\boxed{
+\sum_\rho
+\frac{q_\rho^K}{\rho}
+=
+\tau^{-K/2}
+\left[
+\tau^K
+-\psi(\tau^K)
+-\log\tau
+-\frac12\log(1-\tau^{-2K})
+\right].
+}
+\]
+
+This is important because it proves that the grade characters participate in an exact spectrum-wide arithmetic identity.
+
+But it does **not** by itself establish radial rigidity.
+
+Attempting to impose an RH-strength bound on the right-hand side as the missing theorem risks circularity.
+
+The task is to find a more structural uniqueness or compatibility condition.
+
+---
+
+# 13. Why the integer grades are privileged but not exclusive
+
+The canonical grade family is
+
+\[
+K\in\mathbb Z.
+\]
+
+It is bilateral, multiplicatively generated by one full-turn scale, and gives pairwise noncoincident arithmetic lattices
+
+\[
+L_K=\tau^K\mathbb Z.
+\]
+
+Rational grades
+
+\[
+q\in\mathbb Q
+\]
+
+supply exact root refinements and preserve the same arithmetic noncoincidence property for distinct rational grades.
+
+Real grades provide the full continuous interpolation.
+
+The proof programme should begin with the integer skeleton because it is discrete, exact, bilateral, and computationally manageable.
+
+It may use rational or real grades when a candidate theorem requires them.
+
+---
+
+# 14. Why high zeros still matter
+
+A hypothetical RH counterexample may occur at an enormous finite ordinate.
+
+The project must therefore test any proposed coherence law across widely separated actual heights.
+
+The reason is not:
+
+> more verified zeros make RH numerically more likely.
+
+The reason is:
+
+> a claimed height-independent law must survive actual high-height zeta geometry.
+
+Negative grades allow high finite structures to be compressed into tractable coordinate ranges, but compression alone does not remove normalized radial defect.
+
+---
+
+# 15. Cross-height path normalization
+
+For a verified simple critical-line zero
+
+\[
+\rho_n
+=
+\frac12+i\gamma_n,
+\]
+
+one baseline local scale is
+
+\[
+\boxed{
+\Delta_n
+=
+\frac{\tau}
+{\log(\gamma_n/\tau)}.
+}
+\]
+
+Define
+
+\[
+s_n(u)
+=
+\frac12+i(\gamma_n+\Delta_n u)
+\]
+
+and
+
+\[
+\boxed{
+P_n(u)
+=
+\frac{
+\zeta(s_n(u))
+}{
+i\Delta_n\zeta'(\rho_n)
+}.
+}
+\]
+
+Then
+
+\[
+P_n(0)=0,
+\qquad
+P_n'(0)=1.
+\]
+
+This removes trivial local translation, chosen local scale, first-order magnitude, and first-order orientation.
+
+It is an experimental instrument for discovering candidate coherence laws across genuinely different actual zeta regions.
+
+It is not the definition of transcendental continuation itself.
+
+---
+
+# 16. What would count as a proof lead
+
+A candidate law becomes proof-facing only if it passes all stages:
+
+### Observed
+
+A simple pattern survives the declared numerical controls.
+
+### Normalized
+
+The pattern is not explained by trivial coordinate covariance, arbitrary plotting scale, or precision artifacts.
+
+### Derived
+
+The pattern is proved as an exact identity of the zeta/xi system.
+
+### Radially rigid
+
+The exact identity excludes simultaneous occupancy of multiple radial leaves.
+
+### Formalized
+
+The logical implication is checked in Lean or another proof framework where practical.
+
+The desired chain is:
+
+\[
+\boxed{
+\text{transcendental coherence}
+\Rightarrow
+\text{radial rigidity}
+\Rightarrow
+\delta=0
+\Rightarrow
+\text{RH}.
+}
+\]
+
+---
+
+# 17. Falsification criteria
+
+The programme must be weakened or killed if:
+
+- every apparent transcendental-continuation invariant reduces to trivial coordinate covariance;
+- integer-grade effects are reproduced identically by generic scale bases with no tau-specific structure;
+- high-height actual paths show no stable global coherence beyond known local/statistical behavior;
+- a proposed radial-rigidity theorem smuggles in RH or an equivalent bound;
+- off-critical comparison functions satisfy the same proposed coherence law;
+- mixed radial exponents can satisfy the exact grade constraints without contradiction;
+- the constraint-intersection formulation leaves multiple radial leaves admissible.
+
+A clean falsification is a successful research outcome.
+
+---
+
+# 18. Current missing statement
+
+The current proof programme is concentrated in one unresolved implication:
+
+\[
+\boxed{
+\text{Transcendental Coherence}
+\Longrightarrow
+\text{Transcendental Radial Rigidity}.
+}
+\]
+
+Everything in the application should either:
+
+- establish exact prerequisite structure;
+- search for the coherence law;
+- test candidate radial rigidity;
+- or falsify an attempted formulation.
+
+The project should not broaden into unrelated RH machinery unless the current programme produces a specific mathematical reason to do so.

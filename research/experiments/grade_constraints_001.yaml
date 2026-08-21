@@ -1,0 +1,43 @@
+schema_version: "2.0"
+id: grade-constraints-001
+title: "Bilateral Grade Constraint Identity Verification"
+classification: exact_identity_control
+
+hypothesis:
+  statement: "For any bilateral integer grade K in Z and radial displacement delta in R, the bilateral symmetric defect satisfies |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2) identically at arbitrary precision, vanishing if and only if delta = 0 or K = 0."
+  falsifier: "Discrepancy | |D_K| - 4 sinh^2(K * delta * ln(tau) / 2) | > 1e-30."
+
+criterion:
+  metric: residual
+  operator: "<="
+  threshold: "1e-30"
+
+report_metrics:
+  - metric: identity_error
+    kind: criterion_component
+    label: "Defect identity error | |D_K| - 4 sinh^2(K * delta * ln(tau) / 2) |"
+  - metric: abs_D_K
+    kind: observational_metric
+    label: "Bilateral symmetric defect magnitude |D_K|"
+
+engine:
+  operation: grade_constraint
+
+parameters:
+  K:
+    kind: explicit
+    values: ["-3", "-2", "-1", "1", "2", "3"]
+  delta:
+    kind: explicit
+    values: ["-0.05", "-0.01", "0.0", "0.01", "0.05"]
+  zero_index:
+    kind: explicit
+    values: [0, 1]
+
+precision:
+  dps: 80
+
+outputs:
+  retain_points: true
+
+notes: "Verifies the bilateral grade defect identity across positive and negative integer grades."

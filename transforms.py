@@ -23,6 +23,7 @@ from typing import Tuple, Dict, Any, Optional, Union
 import numpy as np
 import mpmath
 import math_core
+import transcendental
 
 
 class BaseTransform(ABC):
@@ -705,3 +706,81 @@ class AnisotropicDeformation(BaseTransform):
             delta = rho_mpc.real - mpmath.mpf('0.5')
             gamma = rho_mpc.imag
             return mpmath.mpc(mpmath.mpf('0.5') + delta / a_del, gamma / a_gam)
+
+
+class TranscendentalContinuationTransform(BaseTransform):
+    """
+    Transcendental Continuation Transform:
+    Represents the extended domain function Z_tau(s, k) = zeta(tau^(-k) * s).
+    Supports explicit BaseGrade instances (IntegerTauGrade, RationalTauGrade, ContinuousGrade, GenericScale).
+    At k = 0 (native analytic slice): identically Z_tau(s, 0) = zeta(s).
+    """
+    def __init__(
+        self,
+        grade: Union[transcendental.BaseGrade, str, int, float] = 0,
+        grade_type: str = "auto"
+    ):
+        if isinstance(grade, transcendental.BaseGrade):
+            self.grade = grade
+        else:
+            self.grade = transcendental.parse_grade(grade, grade_type=grade_type)
+
+    @property
+    def name(self) -> str:
+        if self.grade.semantic_type == "integer_tau" and getattr(self.grade, "K", None) == 0:
+            return "TRANSCENDENTAL CONTINUATION (k = 0, Native Analytic Slice)"
+        return f"TRANSCENDENTAL CONTINUATION ({self.grade.display_label()})"
+
+    @property
+    def classification(self) -> str:
+        if self.grade.semantic_type == "integer_tau" and getattr(self.grade, "K", None) == 0:
+            return "NATIVE ANALYTIC SLICE: Z_tau(s, 0) = zeta(s)"
+        return f"EXTENDED DOMAIN SLICE ({self.grade.semantic_type}): Z_tau(s, k) = zeta(tau^(-k) * s)"
+
+    @property
+    def domain_map_str(self) -> str:
+        return f"s ↦ tau^(-k) s = s / {self.grade.symbolic_expression()}"
+
+    @property
+    def function_str(self) -> str:
+        return f"Z_tau(s, k) = ζ(tau^(-k) s)"
+
+    @property
+    def original_critical_line_str(self) -> str:
+        return "Re(s) = 1/2"
+
+    @property
+    def image_critical_line_str(self) -> str:
+        scale_val = float(self.grade.numeric_scale(dps=15))
+        return f"Re(s) = tau^k / 2 = {scale_val / 2.0:.6g}"
+
+    @property
+    def zero_map_str(self) -> str:
+        return f"s_ρ(k) = tau^k ρ = {self.grade.symbolic_expression()} * ρ"
+
+    @property
+    def radial_leaf_str(self) -> str:
+        return "R_tau(s, k) = tau^(-k) Re(s) - 1/2 = δ"
+
+    def map_domain_point(self, s: complex) -> complex:
+        scale_val = float(self.grade.numeric_scale(dps=15))
+        return s / scale_val if scale_val != 0 else s
+
+    def evaluate_function(self, s: Union[complex, mpmath.mpc, str], dps: int = 35) -> mpmath.mpc:
+        return transcendental.evaluate_extended_zeta(s, grade=self.grade, dps=dps)
+
+    def map_zero(self, rho: complex) -> complex:
+        scale_val = float(self.grade.numeric_scale(dps=15))
+        return scale_val * rho
+
+    def map_zero_mpc(self, rho: Union[complex, mpmath.mpc, str, Tuple[Any, Any]], dps: int = 80) -> mpmath.mpc:
+        return transcendental.zero_worldline_point(rho, grade=self.grade, delta="0.0", dps=dps)
+
+    def get_card_dict(self) -> Dict[str, str]:
+        d = super().get_card_dict()
+        d["grade_type"] = self.grade.semantic_type
+        d["symbolic_scale"] = self.grade.symbolic_expression()
+        d["numeric_scale"] = mpmath.nstr(self.grade.numeric_scale(dps=30), n=15)
+        d["radial_coordinate"] = self.radial_leaf_str
+        d["epistemic_class"] = "canonical_continuation_slice"
+        return d

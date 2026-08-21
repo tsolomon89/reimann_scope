@@ -25,6 +25,8 @@ import transforms
 import reference_data
 import converter
 import cache
+import transcendental
+import math_core
 
 # Initialize Dash App with Dark theme
 app = dash.Dash(
@@ -168,19 +170,90 @@ def create_controls_panel():
                         dcc.Dropdown(
                             id="transform-mode-select",
                             options=[
-                                {"label": "1. Camera Only (Rendering)", "value": "camera"},
-                                {"label": "2. Height Microscope / Macroscope", "value": "height"},
-                                {"label": "3. Origin Coordinate Dilation (s' = τ^k s)", "value": "origin_dilation"},
-                                {"label": "4. Centered Coordinate Dilation (s' = 1/2 + τ^k z)", "value": "centered_dilation"},
-                                {"label": "5. Argument Transform (f(s) = ζ(τ^k s))", "value": "argument"},
-                                {"label": "6. Kernel Lab (Dirichlet Scaling)", "value": "kernel_lab"},
-                                {"label": "7. Centered Kernel Mode", "value": "centered_kernel"},
-                                {"label": "8. Anisotropic Deformation", "value": "anisotropic"}
+                                {"label": "1. Transcendental Continuation Z_tau(s, k)", "value": "transcendental"},
+                                {"label": "2. Camera Only (Rendering)", "value": "camera"},
+                                {"label": "3. Height Microscope / Macroscope", "value": "height"},
+                                {"label": "4. Origin Coordinate Dilation (s' = τ^k s)", "value": "origin_dilation"},
+                                {"label": "5. Centered Coordinate Dilation (s' = 1/2 + τ^k z)", "value": "centered_dilation"},
+                                {"label": "6. Argument Transform (f(s) = ζ(τ^k s))", "value": "argument"},
+                                {"label": "7. Kernel Lab (Dirichlet Scaling)", "value": "kernel_lab"},
+                                {"label": "8. Centered Kernel Mode", "value": "centered_kernel"},
+                                {"label": "9. Anisotropic Deformation", "value": "anisotropic"}
                             ],
-                            value="height",
+                            value="transcendental",
                             clearable=False,
                             className="text-dark small mb-3"
                         ),
+                        # Container 0: Transcendental Continuation controls
+                        html.Div(id="container-mode-transcendental", children=[
+                            html.Label("Grade Taxonomy Class:", className="fw-bold small text-light mt-1"),
+                            dbc.RadioItems(
+                                id="radio-grade-type",
+                                options=[
+                                    {"label": " Integer K ∈ ℤ (A = τ^K)", "value": "integer_tau"},
+                                    {"label": " Rational q ∈ ℚ (A = τ^(n/d))", "value": "rational_tau"},
+                                    {"label": " Continuous k ∈ ℝ (A = τ^k)", "value": "continuous_tau"},
+                                    {"label": " Generic Base b > 1", "value": "generic_scale"},
+                                ],
+                                value="integer_tau",
+                                className="small text-info mb-2"
+                            ),
+                            # Subcontainer for Integer Grade
+                            html.Div(id="subcontainer-grade-integer", children=[
+                                html.Label("Canonical Bilateral Grade K:", className="small text-light"),
+                                dbc.Row([
+                                    dbc.Col(dbc.Button("K - 1 (Compress)", id="btn-k-minus", size="sm", color="outline-info", className="w-100"), width=4),
+                                    dbc.Col(dbc.Input(id="input-grade-k-int", type="number", value=0, step=1, size="sm", className="text-center font-monospace"), width=4),
+                                    dbc.Col(dbc.Button("K + 1 (Expand)", id="btn-k-plus", size="sm", color="outline-info", className="w-100"), width=4),
+                                ], className="mb-2"),
+                                dbc.Button("Return to K = 0 (Native Slice)", id="btn-k-reset-zero", size="sm", color="outline-secondary", className="w-100 mb-2")
+                            ]),
+                            # Subcontainer for Rational Grade
+                            html.Div(id="subcontainer-grade-rational", style={"display": "none"}, children=[
+                                html.Label("Rational Grade q (e.g. 1/2, -3/4, 7/4):", className="small text-light"),
+                                dbc.Input(id="input-grade-q-rat", type="text", value="1/2", size="sm", className="mb-2 font-monospace")
+                            ]),
+                            # Subcontainer for Continuous Grade
+                            html.Div(id="subcontainer-grade-continuous", style={"display": "none"}, children=[
+                                html.Label("Continuous Real Grade k:", className="small text-light"),
+                                dcc.Slider(
+                                    id="slider-grade-k-cont", min=-3.0, max=3.0, step=0.05, value=0.0,
+                                    marks={-3: "-3", -2: "-2", -1: "-1", 0: "0", 1: "1", 2: "2", 3: "3"},
+                                    tooltip={"placement": "bottom", "always_visible": False}
+                                )
+                            ]),
+                            # Subcontainer for Generic Base
+                            html.Div(id="subcontainer-grade-generic", style={"display": "none"}, children=[
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.Label("Generic Base b:", className="small text-light"),
+                                        dbc.Input(id="input-generic-base", type="number", value=10.0, step=0.1, size="sm")
+                                    ], width=6),
+                                    dbc.Col([
+                                        html.Label("Scale A:", className="small text-light"),
+                                        dbc.Input(id="input-generic-scale", type="number", value=1.0, step=0.1, size="sm")
+                                    ], width=6),
+                                ], className="mb-2")
+                            ]),
+                            # Target Height Compression Tool
+                            dbc.Accordion([
+                                dbc.AccordionItem([
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.Label("Source Height:", className="small text-light"),
+                                            dbc.Input(id="input-comp-source", type="number", value=INITIAL_ZEROS_FLOAT[0], step=0.1, size="sm")
+                                        ], width=6),
+                                        dbc.Col([
+                                            html.Label("Target Height:", className="small text-light"),
+                                            dbc.Input(id="input-comp-target", type="number", value=100.0, step=1.0, size="sm")
+                                        ], width=6),
+                                    ], className="mb-2"),
+                                    dbc.Button("Derive Grade k", id="btn-comp-derive", size="sm", color="outline-warning", className="w-100 mb-2"),
+                                    html.Div(id="comp-result-display", className="small font-monospace text-warning")
+                                ], title="Target Height Compression Calculator")
+                            ], start_collapsed=True, className="mt-2 mb-2")
+                        ], style={"display": "block"}),
+
                         # Container 1: Grade k slider for height, origin, centered, argument
                         html.Div(id="container-mode-scale", children=[
                             html.Label("Scale Grade k (Scale = τ^k):", className="fw-bold small text-light mt-1"),
@@ -189,7 +262,7 @@ def create_controls_panel():
                                 marks={-2: "-2", -1: "-1", 0: "0", 1: "1", 2: "2"},
                                 tooltip={"placement": "bottom", "always_visible": False}
                             )
-                        ], style={"display": "block"}),
+                        ], style={"display": "none"}),
 
                         # Container 2: Kernel Lab controls
                         html.Div(id="container-mode-kernel", children=[
@@ -253,6 +326,35 @@ def create_controls_panel():
                                 ], width=6),
                             ])
                         ], style={"display": "none"}),
+                    ])
+                ]),
+                dbc.Tab(label="Cross-Height Coherence", tab_id="tab-coherence", children=[
+                    html.Div([
+                        html.Label("Height Block Spectrum:", className="fw-bold small text-light mt-2"),
+                        dcc.Dropdown(
+                            id="dropdown-coherence-block",
+                            options=[
+                                {"label": "Low Validation Block (n=1..10, γ ∈ [14, 50])", "value": "low_validation"},
+                                {"label": "Medium Research Block (n=100..104, γ ≈ 236)", "value": "medium_research"},
+                                {"label": "High Research Block (n=1000..1002, γ ≈ 1419)", "value": "high_research"},
+                                {"label": "Very High Sparse Block (n=10000, γ ≈ 9877)", "value": "very_high_sparse"}
+                            ],
+                            value="low_validation",
+                            clearable=False,
+                            className="text-dark small mb-2"
+                        ),
+                        html.Label("Select Zero within Block:", className="fw-bold small text-light"),
+                        dcc.Dropdown(
+                            id="dropdown-coherence-zero",
+                            options=[
+                                {"label": f"Zero #{i+1} (γ ≈ {INITIAL_ZEROS_FLOAT[i]:.4f})", "value": i}
+                                for i in range(min(10, len(INITIAL_ZEROS_FLOAT)))
+                            ],
+                            value=0,
+                            clearable=False,
+                            className="text-dark small mb-2"
+                        ),
+                        html.Div(id="coherence-metrics-panel", className="small font-monospace p-2 border border-secondary rounded bg-dark text-light mb-2")
                     ])
                 ]),
                 dbc.Tab(label="Sampling Range", tab_id="tab-sampling", children=[
@@ -466,6 +568,7 @@ app.layout = html.Div([
 
 @app.callback(
     [
+        Output("container-mode-transcendental", "style"),
         Output("container-mode-scale", "style"),
         Output("container-mode-kernel", "style"),
         Output("container-mode-centered-kernel", "style"),
@@ -478,12 +581,116 @@ def toggle_mode_control_visibility(mode: str):
     show = {"display": "block"}
     hide = {"display": "none"}
     
+    trans_style = show if mode == "transcendental" else hide
     scale_style = show if mode in ["height", "origin_dilation", "centered_dilation", "argument"] else hide
     kernel_style = show if mode == "kernel_lab" else hide
     ctr_kernel_style = show if mode == "centered_kernel" else hide
     aniso_style = show if mode == "anisotropic" else hide
     
-    return scale_style, kernel_style, ctr_kernel_style, aniso_style
+    return trans_style, scale_style, kernel_style, ctr_kernel_style, aniso_style
+
+
+@app.callback(
+    [
+        Output("subcontainer-grade-integer", "style"),
+        Output("subcontainer-grade-rational", "style"),
+        Output("subcontainer-grade-continuous", "style"),
+        Output("subcontainer-grade-generic", "style"),
+    ],
+    Input("radio-grade-type", "value")
+)
+def toggle_grade_subcontainers(grade_type: str):
+    """Toggle inputs for integer, rational, continuous, and generic grade."""
+    show = {"display": "block"}
+    hide = {"display": "none"}
+    return (
+        show if grade_type == "integer_tau" else hide,
+        show if grade_type == "rational_tau" else hide,
+        show if grade_type == "continuous_tau" else hide,
+        show if grade_type == "generic_scale" else hide,
+    )
+
+
+@app.callback(
+    Output("input-grade-k-int", "value"),
+    [
+        Input("btn-k-minus", "n_clicks"),
+        Input("btn-k-plus", "n_clicks"),
+        Input("btn-k-reset-zero", "n_clicks"),
+    ],
+    State("input-grade-k-int", "value"),
+    prevent_initial_call=True
+)
+def step_integer_grade(n_minus, n_plus, n_reset, current_k):
+    """Step canonical bilateral integer grade K forward, backward, or reset to 0."""
+    t_id = ctx.triggered_id
+    curr = int(current_k or 0)
+    if t_id == "btn-k-minus":
+        return curr - 1
+    elif t_id == "btn-k-plus":
+        return curr + 1
+    elif t_id == "btn-k-reset-zero":
+        return 0
+    return curr
+
+
+@app.callback(
+    Output("comp-result-display", "children"),
+    Input("btn-comp-derive", "n_clicks"),
+    [
+        State("input-comp-source", "value"),
+        State("input-comp-target", "value"),
+    ],
+    prevent_initial_call=True
+)
+def compute_compression_summary(n_clicks, src_h, tgt_h):
+    """Compute and display compression grade summary."""
+    if src_h and tgt_h and src_h > 0 and tgt_h > 0:
+        info = transcendental.derive_compression_grade(str(src_h), str(tgt_h), dps=30)
+        return (
+            f"Derived k = {info['continuous_k']} | Nearest K = {info['nearest_integer_K']} "
+            f"(Mapped Height: {info['actual_mapped_height'][:8]}...)"
+        )
+    return "Enter valid positive heights."
+
+
+@app.callback(
+    [
+        Output("dropdown-coherence-zero", "options"),
+        Output("dropdown-coherence-zero", "value"),
+        Output("coherence-metrics-panel", "children"),
+    ],
+    [
+        Input("dropdown-coherence-block", "value"),
+        Input("dropdown-coherence-zero", "value"),
+    ]
+)
+def update_coherence_block_info(block_name: str, zero_idx: Optional[int]):
+    """Update coherence tab zero list and metrics when block or zero changes."""
+    blk = reference_data.get_zero_block(block_name or "low_validation")
+    ords = blk.get("ordinates", [])
+    idx = (zero_idx or 0) % len(ords)
+    
+    opts = [{"label": f"#{i+1} (γ ≈ {float(ords[i]):.4f})", "value": i} for i in range(len(ords))]
+    
+    gamma_str = ords[idx]
+    delta_n = transcendental.mean_zero_spacing_delta(gamma_str, dps=30)
+    coeffs = transcendental.extract_taylor_shape_coefficients(gamma_str, dps=30)
+    is_simple, z_res, _ = reference_data.verify_simple_zero(gamma_str, dps=30)
+    
+    simplicity_str = "Verified Simple (Residual < 1e-20)" if is_simple else f"Residual = {z_res:.2e}"
+    
+    metrics_md = (
+        f"**Block:** `{blk['name']}` ({blk['role']})\n"
+        f"- **Ordinate γ:** `{gamma_str[:18]}...`\n"
+        f"- **Simplicity:** `{simplicity_str}`\n"
+        f"- **Local Spacing Scale Δ_n:** `{float(delta_n):.6f}`\n"
+        f"- **ζ'(ρ_n):** `{coeffs['zeta_prime'][:24]}...`\n"
+        f"- **Taylor c_2,n:** `Re={float(coeffs['c2_re']):.6f}, Im={float(coeffs['c2_im']):.6f}, |c_2|={float(coeffs['abs_c2']):.6f}`\n"
+        f"- **Taylor c_3,n:** `Re={float(coeffs['c3_re']):.6f}, Im={float(coeffs['c3_im']):.6f}, |c_3|={float(coeffs['abs_c3']):.6f}`"
+    )
+    
+    return opts, idx, dcc.Markdown(metrics_md, className="small text-light mb-0")
 
 
 @app.callback(
@@ -729,6 +936,12 @@ def download_sweep_yaml(n_clicks, yaml_content):
         Input("slider-aniso-delta", "value"),
         Input("slider-aniso-gamma", "value"),
         Input("radio-perturb-mode", "value"),
+        Input("radio-grade-type", "value"),
+        Input("input-grade-k-int", "value"),
+        Input("input-grade-q-rat", "value"),
+        Input("slider-grade-k-cont", "value"),
+        Input("input-generic-scale", "value"),
+        Input("input-generic-base", "value"),
     ],
     State("store-discovered-zeros", "data")
 )
@@ -753,6 +966,12 @@ def update_all_panels(
     aniso_d: Optional[float],
     aniso_g: Optional[float],
     perturb_mode_val: Optional[str],
+    grade_type_val: Optional[str],
+    grade_k_int: Optional[int],
+    grade_q_rat: Optional[str],
+    grade_k_cont: Optional[float],
+    gen_scale: Optional[float],
+    gen_base: Optional[float],
     disc_zeros: Optional[List[float]]
 ):
 
@@ -775,7 +994,23 @@ def update_all_panels(
 
     # 1. Instantiate active Transform Object
     transform_obj: transforms.BaseTransform
-    if mode == "camera":
+    if mode == "transcendental":
+        g_type = grade_type_val or "integer_tau"
+        if g_type == "integer_tau":
+            k_int = grade_k_int if grade_k_int is not None else 0
+            grade_obj = transcendental.IntegerTauGrade(K=k_int)
+        elif g_type == "rational_tau":
+            q_str = grade_q_rat or "1/2"
+            grade_obj = transcendental.RationalTauGrade.from_str(q_str)
+        elif g_type == "continuous_tau":
+            k_cont = grade_k_cont if grade_k_cont is not None else 0.0
+            grade_obj = transcendental.ContinuousGrade.from_value(k_cont)
+        else:
+            a_gen = str(gen_scale if gen_scale is not None else 1.0)
+            b_gen = str(gen_base if gen_base is not None else 10.0)
+            grade_obj = transcendental.GenericScale(A_str=a_gen, base_str=b_gen)
+        transform_obj = transforms.TranscendentalContinuationTransform(grade=grade_obj)
+    elif mode == "camera":
         transform_obj = transforms.CameraTransform()
     elif mode == "height":
         transform_obj = transforms.HeightMicroscopeTransform(k=k, t0=t0_val, delta=delta_offset_val)

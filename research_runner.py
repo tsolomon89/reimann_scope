@@ -30,6 +30,7 @@ import transforms
 import converter
 import zero_finder
 import reference_data
+import transcendental
 
 
 RESEARCH_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "research")
@@ -135,7 +136,11 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         "zeta_trace_compare",
         "converter_perturbation",
         "symmetric_centrifuge",
-        "coupled_perturbation_covariance"
+        "coupled_perturbation_covariance",
+        "transcendental_worldline",
+        "cross_height_coherence",
+        "cross_height_distance",
+        "grade_constraint"
     ]
     if engine["operation"] not in valid_engine_ops:
         return False, f"Unknown engine operation '{engine['operation']}'. Permitted: {valid_engine_ops}"
@@ -688,6 +693,141 @@ def evaluate_point(
                     "residual": mpmath.nstr(cov_residual, n=dps)
                 }, None
 
+            elif operation == "transcendental_worldline":
+                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
+                delta_str = inputs.get("delta", "0.0")
+                k_str = inputs.get("k", inputs.get("K", "0"))
+                grade_type = inputs.get("grade_type", "auto")
+                
+                ref_zeros_str = reference_data.load_reference_zeros()
+                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                rho_clean = mpmath.mpc('0.5', gamma_str)
+                d_val = math_core.to_mpf(delta_str, dps=dps + 15)
+                
+                g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
+                scale_A = g_obj.numeric_scale(dps=dps + 15)
+                
+                s_world = transcendental.zero_worldline_point(rho_clean, g_obj, delta=delta_str, dps=dps + 15)
+                sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
+                radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
+                abs_defect = transcendental.absolute_radial_defect(s_world, g_obj, dps=dps + 15)
+                
+                # Invariance error: R_tau(s_world, k) - delta == 0
+                leaf_inv_err = abs(radial_leaf - d_val)
+                expected_abs_defect = scale_A * d_val
+                defect_scale_err = abs(abs_defect - expected_abs_defect)
+                
+                # Extended function evaluation at worldline point
+                z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
+                
+                residual = max(leaf_inv_err, defect_scale_err)
+                
+                return "ok", {
+                    "k": k_str,
+                    "grade_type": g_obj.semantic_type,
+                    "symbolic_scale": g_obj.symbolic_expression(),
+                    "scale_A": mpmath.nstr(scale_A, n=dps),
+                    "zero_index": str(zero_idx),
+                    "gamma": gamma_str,
+                    "delta": delta_str,
+                    "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
+                    "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
+                    "sigma_c": mpmath.nstr(sigma_c, n=dps),
+                    "radial_leaf": mpmath.nstr(radial_leaf, n=dps),
+                    "abs_defect": mpmath.nstr(abs_defect, n=dps),
+                    "expected_abs_defect": mpmath.nstr(expected_abs_defect, n=dps),
+                    "leaf_invariance_error": mpmath.nstr(leaf_inv_err, n=dps),
+                    "defect_scaling_error": mpmath.nstr(defect_scale_err, n=dps),
+                    "z_world_re": mpmath.nstr(z_world.real, n=dps),
+                    "z_world_im": mpmath.nstr(z_world.imag, n=dps),
+                    "abs_z_world": mpmath.nstr(abs(z_world), n=dps),
+                    "residual": mpmath.nstr(residual, n=dps)
+                }, None
+
+            elif operation == "cross_height_coherence":
+                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
+                u_str = inputs.get("u", "0.0")
+                block_name = inputs.get("block", None)
+                
+                if block_name:
+                    blk = reference_data.get_zero_block(block_name)
+                    ords = blk.get("ordinates", [])
+                    gamma_str = inputs.get("gamma", ords[zero_idx % len(ords)])
+                else:
+                    ref_zeros_str = reference_data.load_reference_zeros()
+                    gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                    
+                delta_n = transcendental.mean_zero_spacing_delta(gamma_str, dps=dps + 20)
+                taylor_info = transcendental.extract_taylor_shape_coefficients(gamma_str, dps=dps + 20)
+                path_info = transcendental.evaluate_derivative_normalized_path(gamma_str, u_str, dps=dps + 20)
+                
+                # Check simplicity
+                is_simple, z_res, _ = reference_data.verify_simple_zero(gamma_str, dps=dps + 20)
+                
+                return "ok", {
+                    "gamma": gamma_str,
+                    "u": u_str,
+                    "is_simple_zero": "true" if is_simple else "false",
+                    "zeta_residual": mpmath.nstr(z_res, n=dps),
+                    "Delta_n": mpmath.nstr(delta_n, n=dps),
+                    "zeta_prime": taylor_info["zeta_prime"],
+                    "c2_re": taylor_info["c2_re"],
+                    "c2_im": taylor_info["c2_im"],
+                    "abs_c2": taylor_info["abs_c2"],
+                    "c3_re": taylor_info["c3_re"],
+                    "c3_im": taylor_info["c3_im"],
+                    "abs_c3": taylor_info["abs_c3"],
+                    "P_n_re": path_info["P_n_re"],
+                    "P_n_im": path_info["P_n_im"],
+                    "abs_P_n": path_info["abs_P_n"],
+                    "residual": mpmath.nstr(z_res, n=dps)
+                }, None
+
+            elif operation == "cross_height_distance":
+                g1_str = inputs.get("gamma_1", "14.13472514173469379045725198356247027078425711569924317568556746")
+                g2_str = inputs.get("gamma_2", "236.52422966581620580247556086603099718420653634047805178651817457")
+                
+                dist_res = transcendental.compute_cross_height_path_distance(g1_str, g2_str, dps=dps + 20)
+                
+                return "ok", {
+                    "gamma_1": g1_str,
+                    "gamma_2": g2_str,
+                    "num_u_points": str(dist_res["num_u_points"]),
+                    "L_infty_distance": dist_res["L_infty_distance"],
+                    "L_2_distance": dist_res["L_2_distance"],
+                    "residual": dist_res["L_infty_distance"]
+                }, None
+
+            elif operation == "grade_constraint":
+                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
+                k_str = inputs.get("K", inputs.get("k", "1"))
+                delta_str = inputs.get("delta", "0.0")
+                
+                ref_zeros_str = reference_data.load_reference_zeros()
+                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                
+                g_obj = transcendental.parse_grade(k_str, grade_type="integer")
+                tau = math_core.get_tau(dps=dps + 15)
+                k_mpf = math_core.to_mpf(k_str, dps=dps + 15)
+                d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
+                
+                # Bilateral symmetric defect: D_K = (tau^(K*delta) - 1) * (1 - tau^(-K*delta))
+                # Theoretical identity: |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2)
+                phi = k_mpf * d_mpf * mpmath.log(tau)
+                d_k = (mpmath.power(tau, k_mpf * d_mpf) - 1) * (1 - mpmath.power(tau, -k_mpf * d_mpf))
+                abs_d_k = abs(d_k)
+                expected_abs_d_k = 4 * mpmath.power(mpmath.sinh(phi / 2), 2)
+                identity_error = abs(abs_d_k - expected_abs_d_k)
+                
+                return "ok", {
+                    "K": k_str,
+                    "gamma": gamma_str,
+                    "delta": delta_str,
+                    "abs_D_K": mpmath.nstr(abs_d_k, n=dps),
+                    "expected_abs_D_K": mpmath.nstr(expected_abs_d_k, n=dps),
+                    "identity_error": mpmath.nstr(identity_error, n=dps),
+                    "residual": mpmath.nstr(identity_error, n=dps)
+                }, None
 
             else:
                 return "error", {}, f"Unknown operation '{operation}'"

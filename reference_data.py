@@ -157,17 +157,117 @@ def validate_zero_discovery(
     )
     
     return {
-        "t_min": t_min,
-        "t_max": t_max,
+        "status": "PASS" if passed else "FAIL",
+        "passed": passed,
         "discovered_count": len(disc_ordinates),
+        "reference_in_range_count": len(ref_ordinates_in_range),
         "reference_count": len(ref_ordinates_in_range),
         "matched_count": len(matched_pairs),
-        "max_difference": max_diff,
-        "rms_difference": rms_diff,
         "unmatched_discovered": unmatched_disc,
         "unmatched_reference": unmatched_ref,
+        "max_diff": max_diff,
+        "max_difference": max_diff,
+        "rms_diff": rms_diff,
+        "rms_difference": rms_diff,
         "residuals": residuals,
         "max_residual": max(residuals) if residuals else 0.0,
-        "passed": passed
+        "max_zeta_residual": max(residuals) if residuals else 0.0,
+        "mean_zeta_residual": float(np.mean(residuals)) if residuals else 0.0
     }
 
+
+# ==============================================================================
+# BLOCK DATA ARCHITECTURE (docs/REBUILD_PLAN.md §17)
+# ==============================================================================
+
+# Certified arbitrary-precision zero ordinates computed for canonical height blocks
+CANONICAL_BLOCKS: Dict[str, Dict[str, Any]] = {
+    "low_validation": {
+        "name": "Low Validation Block (n=1..10)",
+        "role": "validation",
+        "provenance": "mpmath.zetazero low spectrum",
+        "height_range": (14.0, 50.0),
+        "ordinates": [
+            "14.1347251417346937904572519835624702707842571156992431756855674601",
+            "21.0220396387715549926284795938969027773343405249027817546295204036",
+            "25.0108575801456887632137909925628218186595496725579966724965420067",
+            "30.424876125859513210311897530584091320181560023715440180962146037",
+            "32.9350615877391896906623689640749034888127156035170390092800034408",
+            "37.5861781588256712572177634807053328214055973508307932183330011136",
+            "40.9187190121474951873981269146332543957261659627772795361613036673",
+            "43.3270732809149995194961221654068057826456683718368714468788936855",
+            "48.0051508811671597279424727494275160416868440011444251177753125198",
+            "49.7738324776723021819167846785637240577231782996766621007819557504"
+        ]
+    },
+    "medium_research": {
+        "name": "Medium Research Block (n=100..104)",
+        "role": "research_input",
+        "provenance": "mpmath.zetazero verified simple zeros",
+        "height_range": (236.0, 243.0),
+        "ordinates": [
+            "236.524229665816205802475507955662978689529495212189123700918960988",
+            "237.769820480925204003236625926387107794160619352116061306831441881",
+            "239.55547757332762874026893203433449248170831832670616223135120843",
+            "241.049157796216586412837921410335670549645682844722093845319867364",
+            "242.823271934222600016826474458878549953940543767614932383169308258"
+        ]
+    },
+    "high_research": {
+        "name": "High Research Block (n=1000..1002, gamma~1419)",
+        "role": "research_input",
+        "provenance": "Arbitrary-precision certified root refinement",
+        "height_range": (1419.0, 1422.0),
+        "ordinates": [
+            "1419.42248094599568646598903807991681923210060106416601630469081468",
+            "1420.41652632375113603437525093291515974188139311280252287235808927",
+            "1421.85056718704865391070680755098475060378464860608233005021146223"
+        ]
+    },
+    "very_high_sparse": {
+        "name": "Very High Sparse Block (n=10000, gamma~9877)",
+        "role": "research_input",
+        "provenance": "Arbitrary-precision certified root refinement",
+        "height_range": (9877.0, 9878.0),
+        "ordinates": [
+            "9877.78265400550114277409907069012357762246805178111599600544827406"
+        ]
+    }
+}
+
+
+def get_block_names() -> List[str]:
+    """Return available zero block identifiers."""
+    return list(CANONICAL_BLOCKS.keys())
+
+
+def get_zero_block(block_name: str) -> Dict[str, Any]:
+    """Retrieve block metadata and ordinates for declared block."""
+    if block_name not in CANONICAL_BLOCKS:
+        raise KeyError(f"Block '{block_name}' not found. Available: {get_block_names()}")
+    return CANONICAL_BLOCKS[block_name]
+
+
+def verify_simple_zero(
+    gamma: Union[str, float, mpmath.mpf],
+    dps: int = 80,
+    tolerance: mpmath.mpf = mpmath.mpf('1e-20')
+) -> Tuple[bool, mpmath.mpf, mpmath.mpc]:
+    """
+    Verify numerically that rho = 1/2 + i*gamma is a simple zero:
+    1. Check |zeta(1/2 + i*gamma)| < tolerance
+    2. Check |zeta'(1/2 + i*gamma)| > 1e-15 (non-vanishing derivative)
+    Returns (is_simple, zeta_residual, zeta_prime_val).
+    """
+    with mpmath.workdps(dps + 20):
+        g = math_core.to_mpf(gamma, dps=dps + 20)
+        s_0 = mpmath.mpc(mpmath.mpf('0.5'), g)
+        
+        z_val = math_core.zeta_eval(s_0, dps=dps + 20)
+        z_prime = math_core.zeta_derivative(s_0, n=1, dps=dps + 20)
+        
+        res = abs(z_val)
+        deriv_abs = abs(z_prime)
+        
+        is_simple = (res <= tolerance) and (deriv_abs >= mpmath.mpf('1e-15'))
+        return bool(is_simple), res, z_prime
