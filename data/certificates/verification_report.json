@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "report_type": "certificate_verification_report",
   "status": "verified",
-  "timestamp": "2026-08-22T20:44:04.715899+00:00",
+  "timestamp": "2026-08-22T20:48:02.202715+00:00",
   "total_inventory": 507,
   "nontrivial_zeros_count": 110,
   "trivial_zeros_count": 100,
@@ -36,7 +36,7 @@
     "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
     "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
   },
-  "producing_git_commit": "be8db0d7ceddadce866813a2f1eefd998a22fbc9",
+  "producing_git_commit": "5b13547802ccd1896252f913d5ecd6f63e5da067",
   "failures": [],
-  "report_hash": "741ba18d6658748b4fef211ef05b3155010973a868a2b5646ae4780bb07cce82"
+  "report_hash": "d3a3ecdb94167133470f8c9fb190751391e103bd4d647a24ed46686c1a0faded"
 }
