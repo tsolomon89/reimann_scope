@@ -122,6 +122,33 @@ def _get_dependency_fingerprint() -> Dict[str, str]:
     }
 
 
+_GIT_BLOB_CACHE: Dict[Tuple[str, str], Optional[str]] = {}
+_GIT_COMMIT_VALID_CACHE: Dict[Tuple[str, bool], Tuple[bool, str]] = {}
+
+
+def _get_historical_git_blob_hash(commit_sha: str, path: str) -> Optional[str]:
+    cache_key = (commit_sha, path)
+    if cache_key in _GIT_BLOB_CACHE:
+        return _GIT_BLOB_CACHE[cache_key]
+    try:
+        proc = subprocess.run(
+            ["git", "show", f"{commit_sha}:{path}"],
+            cwd=REPO_ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
+        )
+        if proc.returncode != 0:
+            _GIT_BLOB_CACHE[cache_key] = None
+            return None
+        blob_content = proc.stdout.replace(b"\r\n", b"\n")
+        b_hash = hashlib.sha256(blob_content).hexdigest()
+        _GIT_BLOB_CACHE[cache_key] = b_hash
+        return b_hash
+    except Exception:
+        _GIT_BLOB_CACHE[cache_key] = None
+        return None
+
+
 def _is_valid_git_commit(
     commit_sha: str,
     source_code_hashes: Optional[Dict[str, str]] = None,
@@ -138,72 +165,69 @@ def _is_valid_git_commit(
     if commit_sha.lower() in ("0000000000000000000000000000000000000000", "fake", "unknown", "forged"):
         return False, f"Prohibited placeholder commit SHA: '{commit_sha}'"
 
-    try:
-        res = subprocess.run(
-            ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
-            cwd=REPO_ROOT,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-        if res.returncode != 0:
-            return False, f"Commit SHA '{commit_sha}' does not exist as a commit object in git"
-    except Exception as e:
-        return False, f"Git error verifying commit '{commit_sha}': {e}"
-
-    if check_ancestor:
+    cache_commit_key = (commit_sha, check_ancestor)
+    if cache_commit_key in _GIT_COMMIT_VALID_CACHE:
+        base_ok, base_err = _GIT_COMMIT_VALID_CACHE[cache_commit_key]
+        if not base_ok:
+            return False, base_err
+    else:
         try:
             res = subprocess.run(
-                ["git", "merge-base", "--is-ancestor", commit_sha, "HEAD"],
+                ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
                 cwd=REPO_ROOT,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
             if res.returncode != 0:
-                return False, f"Producing commit '{commit_sha}' is not an ancestor of current HEAD"
+                err = f"Commit SHA '{commit_sha}' does not exist as a commit object in git"
+                _GIT_COMMIT_VALID_CACHE[cache_commit_key] = (False, err)
+                return False, err
         except Exception as e:
-            return False, f"Git error checking ancestor status for '{commit_sha}': {e}"
+            err = f"Git error verifying commit '{commit_sha}': {e}"
+            _GIT_COMMIT_VALID_CACHE[cache_commit_key] = (False, err)
+            return False, err
+
+        if check_ancestor:
+            try:
+                res = subprocess.run(
+                    ["git", "merge-base", "--is-ancestor", commit_sha, "HEAD"],
+                    cwd=REPO_ROOT,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                if res.returncode != 0:
+                    err = f"Producing commit '{commit_sha}' is not an ancestor of current HEAD"
+                    _GIT_COMMIT_VALID_CACHE[cache_commit_key] = (False, err)
+                    return False, err
+            except Exception as e:
+                err = f"Git error checking ancestor status for '{commit_sha}': {e}"
+                _GIT_COMMIT_VALID_CACHE[cache_commit_key] = (False, err)
+                return False, err
+
+        _GIT_COMMIT_VALID_CACHE[cache_commit_key] = (True, "")
 
     if source_code_hashes:
         for mod, expected_hash in source_code_hashes.items():
             if not expected_hash or expected_hash == "N/A":
                 continue
-            try:
-                proc = subprocess.run(
-                    ["git", "show", f"{commit_sha}:{mod}"],
-                    cwd=REPO_ROOT,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL
-                )
-                if proc.returncode != 0:
-                    return False, f"Source module '{mod}' does not exist at commit '{commit_sha}'"
-                blob_content = proc.stdout.replace(b"\r\n", b"\n")
-                blob_hash = hashlib.sha256(blob_content).hexdigest()
-                if blob_hash != expected_hash:
-                    return False, f"Source module '{mod}' blob hash at commit '{commit_sha}' ({blob_hash}) does not match claimed hash ({expected_hash})"
-            except Exception as e:
-                return False, f"Error reading historical git blob for '{mod}' at commit '{commit_sha}': {e}"
+            blob_hash = _get_historical_git_blob_hash(commit_sha, mod)
+            if blob_hash is None:
+                return False, f"Source module '{mod}' does not exist at commit '{commit_sha}'"
+            if blob_hash != expected_hash:
+                return False, f"Source module '{mod}' blob hash at commit '{commit_sha}' ({blob_hash}) does not match claimed hash ({expected_hash})"
 
     if input_data_hashes:
         for df, expected_hash in input_data_hashes.items():
             if not expected_hash or expected_hash == "N/A":
                 continue
-            try:
-                proc = subprocess.run(
-                    ["git", "show", f"{commit_sha}:data/{df}"],
-                    cwd=REPO_ROOT,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL
-                )
-                if proc.returncode != 0:
-                    return False, f"Data file 'data/{df}' does not exist at commit '{commit_sha}'"
-                blob_content = proc.stdout.replace(b"\r\n", b"\n")
-                blob_hash = hashlib.sha256(blob_content).hexdigest()
-                if blob_hash != expected_hash:
-                    return False, f"Data file 'data/{df}' blob hash at commit '{commit_sha}' ({blob_hash}) does not match claimed hash ({expected_hash})"
-            except Exception as e:
-                return False, f"Error reading historical git blob for 'data/{df}' at commit '{commit_sha}': {e}"
+            blob_hash = _get_historical_git_blob_hash(commit_sha, f"data/{df}")
+            if blob_hash is None:
+                return False, f"Data file 'data/{df}' does not exist at commit '{commit_sha}'"
+            if blob_hash != expected_hash:
+                return False, f"Data file 'data/{df}' blob hash at commit '{commit_sha}' ({blob_hash}) does not match claimed hash ({expected_hash})"
 
     return True, ""
+
 
 
 def _get_git_commit() -> str:
