@@ -3,10 +3,10 @@
   "run_id": "grade-constraints-001",
   "experiment_id": "grade-constraints-001",
   "experiment_spec_sha256": "8f2d200ac4c215ac0f33835ff6a7ec6c9b4b04cb7ad095834680fb079257873a",
-  "git_commit": "5bfacb7c345bf9374b693a458cf61aaf75150f3c",
-  "git_dirty": false,
-  "started_at": "2026-08-22T09:36:54.819234+00:00",
-  "completed_at": "2026-08-22T09:36:54.837649+00:00",
+  "git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
+  "git_dirty": true,
+  "started_at": "2026-08-22T10:47:39.672576+00:00",
+  "completed_at": "2026-08-22T10:47:39.691496+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -47,6 +47,20 @@
   },
   "data_provenance": {
     "schema_version": "2",
+    "zeros_first_100_reference": {
+      "source_name": "Andrew Odlyzko: Tables of zeros of the Riemann zeta function (zeros1)",
+      "source_author_or_org": "Andrew Odlyzko / University of Minnesota Digital Technology Center",
+      "source_url": "http://www.dtc.umn.edu/~odlyzko/zeta_tables/zeros1",
+      "retrieved_at": "2026-08-22",
+      "stated_precision": "9 decimal digits, accurate to within 3*10^(-9)",
+      "precision_digits": 9,
+      "vendored_count": 100,
+      "first_ordinate": "14.134725142",
+      "last_ordinate": "236.524229666",
+      "file_path": "data/zeros_first_100_reference.json",
+      "format": "decimal strings in json",
+      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
+    },
     "zeta_zeros": {
       "source_name": "mpmath.zetazero reference snapshot",
       "source_author_or_org": "Fredrik Johansson / mpmath",
@@ -101,14 +115,14 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "e75cc2dfaec495300c2b58cdc06671bc3c9d73f8a556b296c93ca9ad0dc7a77d",
+    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
-    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
+    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "zero_finder.py": "c4c8e86d7bf46737ce4b41378edde777d755f02d68cb7b845dbae036b5743b34",
-    "certification.py": "5222cf8ad0fb1cc0118e532e62a47d21037f977111c7b842be153c242513b90f"
+    "zero_finder.py": "74cfd1683c50345934038f60bd47f5827ca155aae4bb7f99ed61ae00115d091f",
+    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283"
   },
   "consumed_certificates": []
 }

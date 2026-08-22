@@ -10,11 +10,11 @@
   "zero_count": 5,
   "mathematical_claim": "Canonical block 'medium_research' contains exactly 5 certified consecutive simple zeros for indices 100..104",
   "constituent_zero_hashes": [
-    "1091064e4f36e50891de37141bd21e80b33994f9545cc55b7beb4ded768bd291",
-    "fe72f17d21ab35db1822ff1b6ee1b562c2efef7827e591fa55d0c505247798aa",
-    "08be3335a262f987125d5cfea609fe356368b40df824ce28430b2493246ab2ed",
-    "0c7458ee6984ba954680d7ffa05ca1a7f3821d4a838d3c065278a5c411efa45d",
-    "82e7d8c9fb5df9dc1da587c20997c9c1b19d8db4338d194a3bfa37508161eb08"
+    "1a9bc39cba162e03b72510975f2e60c3554673291e19e166b99fe447554b32da",
+    "ba80cd75c5411a74683c4ef4449e1f79e83170a33ba50dd8f99e60ccac0ab485",
+    "68b9fcb6d2c356df3f9bc6d6e29e075ab7557e3d500f32b2c803fcd10d55b217",
+    "79bbfdbb97b505a3e7c8bb7a478db9a239da3478f1d08fa3730882440e40f6a6",
+    "a8de0d8217ff950a9e2409887d54b85a9a45e114a4a0b77f027150908cad1bf9"
   ],
   "height_range": [
     "236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740",
@@ -35,16 +35,20 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "5bfacb7c345bf9374b693a458cf61aaf75150f3c",
+  "producing_git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
   "source_code_hashes": {
-    "certification.py": "5222cf8ad0fb1cc0118e532e62a47d21037f977111c7b842be153c242513b90f",
+    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
-    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
+    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
-    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
+    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
+    "zero_finder.py": "74cfd1683c50345934038f60bd47f5827ca155aae4bb7f99ed61ae00115d091f"
   },
   "input_data_hashes": {
     "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
     "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
     "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
   },
@@ -54,11 +58,11 @@
     "mpmath": "1.3.0",
     "platform": "win32"
   },
-  "created_at": "2026-08-22T09:36:16.291307+00:00",
+  "created_at": "2026-08-22T10:46:46.101176+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "a708c266958851ee7b641e43898e20314f48662cca5f038b67db4dc039b06a3b"
+  "certificate_hash": "6817356daaa2253199e12df0ee914eec3e594e2ddebba3cba7f11b3782587dcb"
 }

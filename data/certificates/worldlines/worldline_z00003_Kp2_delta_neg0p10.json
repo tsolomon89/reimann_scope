@@ -1,0 +1,62 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "worldline_certificate",
+  "status": "worldline_certified",
+  "claim_type": "synthetic_radial_leaf",
+  "zero_family": "nontrivial",
+  "trivial_index": null,
+  "nontrivial_index": 3,
+  "source_zero_hash": "003ed8ff8fc7b60363f538f6544e007ec0799d150149dd51abf9fe355a2933f8",
+  "source_zero_family": "nontrivial",
+  "source_zero_index": 3,
+  "grade_K": 2,
+  "symbolic_scale": "tau^2",
+  "delta": "-0.10",
+  "transformed_point": {
+    "real_mid": "15.79136704174297379013518559980184181650191905158526500226135900195207171587072838880283744594968357",
+    "real_rad": "1.15e-99",
+    "imag_mid": "987.389080192100142911276228081787550950514472694140697743365346773943638760539588807011732928536182",
+    "imag_rad": "1.21e-97"
+  },
+  "critical_surface_real": "19.73920880217871723766898199975230227062739881448158125282669875244008964483841048600354680743710446",
+  "normalized_radial": "-0.1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "radial_residual": "4.695147213160786997654483653117489047451739311992248060053085902573830401663793792658966145906977751e-101",
+  "defect_residual": "1.143952415300414429494943962879591249529276603506662834093159496580448706003685087611615662619499998e-99",
+  "mathematical_claim": "Bilateral graded worldline s_rho(2) = tau^2 * rho occupies radial leaf R_tau = -0.10 (synthetic radial perturbation leaf)",
+  "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
+  "source_code_hashes": {
+    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
+    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
+    "zero_finder.py": "74cfd1683c50345934038f60bd47f5827ca155aae4bb7f99ed61ae00115d091f"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32"
+  },
+  "created_at": "2026-08-22T10:46:52.778508+00:00",
+  "invalidation_conditions": [
+    "source_zero_hash_mismatch",
+    "radial_residual_tolerance_exceeded",
+    "formal_theorem_missing"
+  ],
+  "certificate_hash": "b52c412a64b8de95f4804bac3cb8a702f8094f004f46eb881cff2d76eb424d05"
+}

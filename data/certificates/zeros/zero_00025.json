@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "zero_isolation_and_simplicity",
+  "status": "simple_zero_certified",
+  "zero_family": "nontrivial",
+  "nontrivial_index": 25,
+  "zero_index": 25,
+  "mathematical_claim": "Nontrivial Riemann zeta zero index 25 uniquely isolated on critical line; simplicity verified via 0 \u2209 \u03b6'(B_25)",
+  "enclosure": {
+    "real_mid": "0.5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "real_rad": "0",
+    "imag_mid": "88.80911120763446542368234807950937839544489340981867504219987161881401355918219843952079327950393306",
+    "imag_rad": "4.30e-99",
+    "exact_real": true
+  },
+  "isolation_interval": {
+    "lower_bound": "88.11719291037984741510700796521429582380838990554385161432771477862685230435351459489352538014968629",
+    "upper_bound": "90.65050523909647485997103666066003163708334371877466060864831105399752079262048466442932851858626085",
+    "isolated": true
+  },
+  "derivative_enclosure": {
+    "real_mid": "1.150191361839591932900115927204287057467130402964988349817668784080938584929531087852711732231061",
+    "real_rad": "2.75e-97",
+    "imag_mid": "1.847712467798885082468957844925639374658675182830863033596182032684925873708086962678754912631566",
+    "imag_rad": "2.01e-97",
+    "abs_lower": "2.176460781293763868972578079719487753232712762756320129378978966304108140170060158721650330425094019",
+    "excludes_zero": true
+  },
+  "higher_coefficients": {
+    "c2_real": "-0.338670631022717139682748163110118854884309677331765649862241539625791679025296731745639061476451",
+    "c2_imag": "-3.184296827511851110112710273547631293324839926338368132480266361924858884084669993548685739407483",
+    "c3_real": "-0.321880858132702840909875638454352834314685917230039327443269582641403789098430871523987942722176",
+    "c3_imag": "2.990994575335526163246621981573679141123258422653190194449243140398952083927024885078159207031439"
+  },
+  "method": "flint.acb.zeta_zero via Arb Turing-method isolating balls and acb_series Taylor expansion",
+  "precision_dps": 80,
+  "precision_bits": 265,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
+  "source_code_hashes": {
+    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
+    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
+    "zero_finder.py": "74cfd1683c50345934038f60bd47f5827ca155aae4bb7f99ed61ae00115d091f"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32"
+  },
+  "created_at": "2026-08-22T10:46:45.175936+00:00",
+  "invalidation_conditions": [
+    "source_code_hash_mismatch",
+    "dependency_fingerprint_mismatch",
+    "input_data_hash_mismatch",
+    "flint_replay_containment_failure"
+  ],
+  "certificate_hash": "9f2ec7dcaf96181d5d5d157b90da9019c85c4774833f052b5c95db59d72d0ee7"
+}
