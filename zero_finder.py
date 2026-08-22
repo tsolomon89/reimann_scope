@@ -198,9 +198,10 @@ def discover_trivial_zeros(count: int = 100) -> List[Dict[str, Any]]:
             "exact_location": s_m,
             "real_coordinate": float(s_m),
             "imag_coordinate": 0.0,
-            "isolation_interval": [float(s_m - 0.5), float(s_m + 0.5)],
+            "isolation_interval": [s_m - 0.5, s_m + 0.5],
             "discovery_method": "Exact trivial zero construction s = -2m (Riemann functional equation pole of Gamma(s/2))"
         })
+
     return records
 
 

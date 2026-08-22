@@ -138,14 +138,15 @@ def _reconstruct_arb_ball(mid_str: str, rad_str: Optional[str] = None) -> Any:
     """Reconstruct an Arb ball without float downcast."""
     if not FLINT_AVAILABLE or arb is None:
         raise RuntimeError("FLINT is not available")
-    m_clean = str(mid_str).strip()
+    m_clean = mid_str.strip()
     if m_clean.startswith("[") and "+/-" in m_clean:
         return arb(m_clean)
     if rad_str is not None:
-        r_clean = str(rad_str).strip("[]").split("+/-")[0].strip()
+        r_clean = rad_str.strip("[]").split("+/-")[0].strip()
         if r_clean and r_clean not in ["0", "0.0"]:
             return arb(f"[{m_clean} +/- {r_clean}]")
     return arb(m_clean)
+
 
 
 def certify_zero(index: int, dps: int = 80, git_commit: Optional[str] = None) -> Dict[str, Any]:

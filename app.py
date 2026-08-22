@@ -1660,8 +1660,9 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
                 pts2 = block_eval_pts.get(b2, [])
                 if pts1 and pts2:
                     diffs = [abs(p1 - p2) for p1, p2 in zip(pts1, pts2)]
-                    l_inf = float(max(diffs))
+                    l_inf = max(diffs)
                     l_2 = float(np.sqrt(np.mean([d**2 for d in diffs])))
+
                 else:
                     l_inf, l_2 = 0.0, 0.0
                 dist_matrix[i, j] = l_inf
