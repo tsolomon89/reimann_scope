@@ -14,7 +14,8 @@ import os
 import sys
 import subprocess
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
 
 try:
     import flint
@@ -1477,8 +1478,12 @@ def load_verification_report(
     if not isinstance(rep_inventory, list) or len(rep_inventory) != total_inv:
         anomalies.append(f"Report inventory list length ({len(rep_inventory) if isinstance(rep_inventory, list) else 'invalid'}) does not match total_inventory ({total_inv})")
 
-    rep_rel_set = {entry.get("relative_path") for entry in rep_inventory if isinstance(entry, dict)}
-    actual_rel_set = set(actual_rel_map.keys())
+    rep_rel_set: Set[str] = {
+        str(entry["relative_path"])
+        for entry in rep_inventory
+        if isinstance(entry, dict) and entry.get("relative_path") is not None
+    }
+    actual_rel_set: Set[str] = set(actual_rel_map.keys())
 
     missing_on_disk = rep_rel_set - actual_rel_set
     if missing_on_disk:
@@ -1488,13 +1493,18 @@ def load_verification_report(
     if extra_on_disk:
         anomalies.append(f"Certificates present on disk but missing from report: {sorted(list(extra_on_disk))[:5]}")
 
+
     # 4. Verify individual file byte hashes and recompute inventory_root_hash
     for entry in rep_inventory:
         if not isinstance(entry, dict):
             anomalies.append("Malformed entry in report inventory list")
             continue
         rel = entry.get("relative_path")
+        if not isinstance(rel, str):
+            anomalies.append("Inventory entry missing 'relative_path' string")
+            continue
         disk_path = actual_rel_map.get(rel)
+
         if disk_path and os.path.exists(disk_path):
             try:
                 with open(disk_path, "rb") as f:
