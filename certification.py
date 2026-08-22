@@ -121,14 +121,22 @@ def _get_dependency_fingerprint() -> Dict[str, str]:
     }
 
 
-def _is_valid_git_commit(commit_sha: str) -> bool:
-    """Verify that a producing commit SHA is a valid, existing 40-char hex Git commit."""
+def _is_valid_git_commit(
+    commit_sha: str,
+    source_code_hashes: Optional[Dict[str, str]] = None,
+    input_data_hashes: Optional[Dict[str, str]] = None,
+    check_ancestor: bool = True
+) -> Tuple[bool, str]:
+    """Verify that a producing commit SHA is a valid, existing 40-char hex Git commit,
+    is an ancestor of HEAD, and binds historical blobs to claimed source and data hashes.
+    """
     if not isinstance(commit_sha, str) or len(commit_sha) != 40:
-        return False
+        return False, f"Commit SHA must be a 40-character hexadecimal string, got '{commit_sha}'"
     if not all(c in "0123456789abcdefABCDEF" for c in commit_sha):
-        return False
+        return False, f"Commit SHA contains non-hexadecimal characters: '{commit_sha}'"
     if commit_sha.lower() in ("0000000000000000000000000000000000000000", "fake", "unknown", "forged"):
-        return False
+        return False, f"Prohibited placeholder commit SHA: '{commit_sha}'"
+
     try:
         res = subprocess.run(
             ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
@@ -136,9 +144,65 @@ def _is_valid_git_commit(commit_sha: str) -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
-        return res.returncode == 0
-    except Exception:
-        return False
+        if res.returncode != 0:
+            return False, f"Commit SHA '{commit_sha}' does not exist as a commit object in git"
+    except Exception as e:
+        return False, f"Git error verifying commit '{commit_sha}': {e}"
+
+    if check_ancestor:
+        try:
+            res = subprocess.run(
+                ["git", "merge-base", "--is-ancestor", commit_sha, "HEAD"],
+                cwd=REPO_ROOT,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            if res.returncode != 0:
+                return False, f"Producing commit '{commit_sha}' is not an ancestor of current HEAD"
+        except Exception as e:
+            return False, f"Git error checking ancestor status for '{commit_sha}': {e}"
+
+    if source_code_hashes:
+        for mod, expected_hash in source_code_hashes.items():
+            if not expected_hash or expected_hash == "N/A":
+                continue
+            try:
+                proc = subprocess.run(
+                    ["git", "show", f"{commit_sha}:{mod}"],
+                    cwd=REPO_ROOT,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.DEVNULL
+                )
+                if proc.returncode != 0:
+                    return False, f"Source module '{mod}' does not exist at commit '{commit_sha}'"
+                blob_content = proc.stdout.replace(b"\r\n", b"\n")
+                blob_hash = hashlib.sha256(blob_content).hexdigest()
+                if blob_hash != expected_hash:
+                    return False, f"Source module '{mod}' blob hash at commit '{commit_sha}' ({blob_hash}) does not match claimed hash ({expected_hash})"
+            except Exception as e:
+                return False, f"Error reading historical git blob for '{mod}' at commit '{commit_sha}': {e}"
+
+    if input_data_hashes:
+        for df, expected_hash in input_data_hashes.items():
+            if not expected_hash or expected_hash == "N/A":
+                continue
+            try:
+                proc = subprocess.run(
+                    ["git", "show", f"{commit_sha}:data/{df}"],
+                    cwd=REPO_ROOT,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.DEVNULL
+                )
+                if proc.returncode != 0:
+                    return False, f"Data file 'data/{df}' does not exist at commit '{commit_sha}'"
+                blob_content = proc.stdout.replace(b"\r\n", b"\n")
+                blob_hash = hashlib.sha256(blob_content).hexdigest()
+                if blob_hash != expected_hash:
+                    return False, f"Data file 'data/{df}' blob hash at commit '{commit_sha}' ({blob_hash}) does not match claimed hash ({expected_hash})"
+            except Exception as e:
+                return False, f"Error reading historical git blob for 'data/{df}' at commit '{commit_sha}': {e}"
+
+    return True, ""
 
 
 def _get_git_commit() -> str:
@@ -747,13 +811,7 @@ def verify_certificate(
     if plat in ("forged", "unknown", "fake", ""):
         anomalies.append(f"Invalid platform policy value in dependency fingerprint: '{plat}'")
 
-    # 2. Producing Git Commit Validation
-    commit = cert.get("producing_git_commit")
-    if not _is_valid_git_commit(str(commit)):
-        anomalies.append(f"Invalid, fake, or non-existent producing_git_commit: '{commit}'")
-
-
-    # 3. Source Code Hashes Validation
+    # 2. Source Code Hashes Validation
     cert_src = cert.get("source_code_hashes")
     if not isinstance(cert_src, dict) or not cert_src:
         anomalies.append("Missing or empty source_code_hashes map")
@@ -773,7 +831,7 @@ def verify_certificate(
         if mod not in cert_src or not cert_src[mod] or len(cert_src[mod]) != 64 or cert_src[mod] == "N/A":
             anomalies.append(f"source_code_hashes missing or invalid for required module '{mod}'")
 
-    # 4. Input Data Hashes Validation
+    # 3. Input Data Hashes Validation
     cert_data = cert.get("input_data_hashes")
     if not isinstance(cert_data, dict) or not cert_data:
         anomalies.append("Missing or empty input_data_hashes map")
@@ -790,15 +848,15 @@ def verify_certificate(
             anomalies.append(f"input_data_hashes missing or invalid for required file '{df}'")
 
     if check_provenance:
-        curr_src = _get_source_code_hashes()
-        for mod in expected_modules:
-            if mod in curr_src and curr_src[mod] != cert_src.get(mod):
-                anomalies.append(f"Source module '{mod}' hash mismatch: cert {cert_src.get(mod)}, current {curr_src[mod]}")
-
-        curr_data = _get_input_data_hashes()
-        for df in expected_data_files:
-            if df in curr_data and curr_data[df] != cert_data.get(df):
-                anomalies.append(f"Input data '{df}' hash mismatch: cert {cert_data.get(df)}, current {curr_data[df]}")
+        # 4. Producing Git Commit Validation (with historical blob binding)
+        commit = str(cert.get("producing_git_commit", "")).strip()
+        commit_ok, commit_err = _is_valid_git_commit(
+            commit,
+            source_code_hashes=cert_src,
+            input_data_hashes=cert_data
+        )
+        if not commit_ok:
+            anomalies.append(f"Invalid producing_git_commit provenance: {commit_err}")
 
     if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
         return False, ["FLINT/python-flint is required for independent mathematical verification"]
@@ -1231,52 +1289,98 @@ def generate_verification_report(
     zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
     trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
-    worldline_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
+    worldlines_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
 
-    all_files = zeros_files + trivial_files + blocks_files + worldline_files
+    all_files = sorted(zeros_files + trivial_files + blocks_files + worldlines_files)
     total_inventory = len(all_files)
 
     # Preload in-memory cert store for fast cross-resolution
     cert_store: Dict[str, Dict[str, Any]] = {}
-    parsed_certs: List[Tuple[str, Dict[str, Any]]] = []
+    parsed_files: List[Tuple[str, Optional[Dict[str, Any]], str, Optional[str]]] = []
     for fpath in all_files:
+        file_sha256 = ""
         try:
-            with open(fpath, "r", encoding="utf-8") as f:
-                c = json.load(f)
-                h = c.get("certificate_hash")
-                if h:
-                    cert_store[h] = c
-                c_type = c.get("certificate_type")
-                if c_type == "zero_isolation_and_simplicity":
-                    z_idx = c.get("nontrivial_index") or c.get("zero_index")
-                    if z_idx is not None:
-                        cert_store[f"zero_{z_idx:05d}"] = c
-                elif c_type == "trivial_zero_certificate":
-                    m_idx = c.get("trivial_index")
-                    if m_idx is not None:
-                        cert_store[f"trivial_zero_{m_idx:05d}"] = c
-                parsed_certs.append((fpath, c))
-        except Exception:
-            pass
+            with open(fpath, "rb") as f:
+                content = f.read().replace(b"\r\n", b"\n")
+            file_sha256 = hashlib.sha256(content).hexdigest()
+            c = json.loads(content.decode("utf-8"))
+            h = c.get("certificate_hash")
+            if h:
+                cert_store[h] = c
+            c_type = c.get("certificate_type")
+            if c_type == "zero_isolation_and_simplicity":
+                z_idx = c.get("nontrivial_index") or c.get("zero_index")
+                if z_idx is not None:
+                    cert_store[f"zero_{z_idx:05d}"] = c
+            elif c_type == "trivial_zero_certificate":
+                m_idx = c.get("trivial_index")
+                if m_idx is not None:
+                    cert_store[f"trivial_zero_{m_idx:05d}"] = c
+            parsed_files.append((fpath, c, file_sha256, None))
+        except Exception as e:
+            parsed_files.append((fpath, None, file_sha256, str(e)))
 
     passed_count = 0
     failed_count = 0
     failures: List[Dict[str, Any]] = []
+    inventory: List[Dict[str, Any]] = []
 
-    for fpath, cert in parsed_certs:
+    for fpath, cert, file_sha, parse_err in parsed_files:
         fname = os.path.basename(fpath)
+        rel_path = os.path.relpath(fpath, REPO_ROOT).replace("\\", "/")
+        if parse_err is not None or cert is None:
+            failed_count += 1
+            failures.append({"file": fname, "errors": [f"Parse error: {parse_err}"]})
+            inventory.append({
+                "relative_path": rel_path,
+                "certificate_type": "unparseable",
+                "status": "parse_error",
+                "certificate_hash": "N/A",
+                "file_sha256": file_sha,
+                "producing_git_commit": "N/A"
+            })
+            continue
+
         try:
             ok, errs = verify_certificate(cert, cert_store=cert_store, check_provenance=check_provenance)
             if ok:
                 passed_count += 1
+                inventory.append({
+                    "relative_path": rel_path,
+                    "certificate_type": cert.get("certificate_type", "unknown"),
+                    "status": "passed",
+                    "certificate_hash": cert.get("certificate_hash", "N/A"),
+                    "file_sha256": file_sha,
+                    "producing_git_commit": cert.get("producing_git_commit", "N/A")
+                })
             else:
                 failed_count += 1
                 failures.append({"file": fname, "hash": cert.get("certificate_hash"), "errors": errs})
+                inventory.append({
+                    "relative_path": rel_path,
+                    "certificate_type": cert.get("certificate_type", "unknown"),
+                    "status": "failed",
+                    "certificate_hash": cert.get("certificate_hash", "N/A"),
+                    "file_sha256": file_sha,
+                    "producing_git_commit": cert.get("producing_git_commit", "N/A")
+                })
         except Exception as e:
             failed_count += 1
             failures.append({"file": fname, "errors": [str(e)]})
+            inventory.append({
+                "relative_path": rel_path,
+                "certificate_type": cert.get("certificate_type", "unknown"),
+                "status": "exception",
+                "certificate_hash": cert.get("certificate_hash", "N/A"),
+                "file_sha256": file_sha,
+                "producing_git_commit": cert.get("producing_git_commit", "N/A")
+            })
 
-    status = "verified" if (failed_count == 0 and total_inventory > 0) else ("unverified" if total_inventory == 0 else "failed")
+    # Sort inventory deterministically by relative_path
+    inventory.sort(key=lambda x: x["relative_path"])
+    inventory_root_hash = hashlib.sha256(json.dumps(inventory, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    status = "verified" if (failed_count == 0 and total_inventory > 0 and passed_count == total_inventory) else ("unverified" if total_inventory == 0 else "failed")
 
     report: Dict[str, Any] = {
         "schema_version": CERTIFICATE_SCHEMA_VERSION,
@@ -1287,9 +1391,11 @@ def generate_verification_report(
         "nontrivial_zeros_count": len(zeros_files),
         "trivial_zeros_count": len(trivial_files),
         "blocks_count": len(blocks_files),
-        "worldlines_count": len(worldline_files),
+        "worldlines_count": len(worldlines_files),
         "passed_count": passed_count,
         "failed_count": failed_count,
+        "inventory_root_hash": inventory_root_hash,
+        "inventory": inventory,
         "dependency_fingerprint": _get_dependency_fingerprint(),
         "source_code_hashes": _get_source_code_hashes(),
         "input_data_hashes": _get_input_data_hashes(),
@@ -1306,13 +1412,17 @@ def generate_verification_report(
     return report
 
 
-def load_verification_report(report_path: Optional[str] = None) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
-    """Load and validate verification_report.json for truthfulness against current workspace.
+def load_verification_report(
+    report_path: Optional[str] = None,
+    cert_dir: Optional[str] = None
+) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
+    """Load and strictly validate verification_report.json against exact current on-disk inventory.
 
     Returns:
         (is_authentic_and_passing, report_dict_or_None, anomalies)
     """
-    target_path = report_path or os.path.join(CERT_DIR, "verification_report.json")
+    target_dir = cert_dir or CERT_DIR
+    target_path = report_path or os.path.join(target_dir, "verification_report.json")
     if not os.path.exists(target_path):
         return False, None, ["Verification report not found (status: unverified)"]
 
@@ -1322,30 +1432,115 @@ def load_verification_report(report_path: Optional[str] = None) -> Tuple[bool, O
     except Exception as e:
         return False, None, [f"Failed to read verification report JSON: {e}"]
 
+    if not isinstance(report, dict):
+        return False, None, ["Verification report must be a JSON object"]
+
     anomalies: List[str] = []
-    # Check self hash
+
+    # 1. Check self-hash (content-integrity hash)
     exp_h = report.get("report_hash")
     if not exp_h or _sha256_canonical(report) != exp_h:
         anomalies.append("Verification report self-hash mismatch or missing")
 
-    # Check status and failure counts
+    # 2. Check status and count equalities
+    total_inv = report.get("total_inventory", 0)
+    passed_cnt = report.get("passed_count", 0)
+    failed_cnt = report.get("failed_count", 0)
+    if total_inv <= 0:
+        anomalies.append(f"Report total_inventory must be positive, got {total_inv}")
+    if passed_cnt + failed_cnt != total_inv:
+        anomalies.append(f"Count mismatch: passed ({passed_cnt}) + failed ({failed_cnt}) != total ({total_inv})")
+    if failed_cnt > 0:
+        anomalies.append(f"Report contains {failed_cnt} failed certificates")
+    if passed_cnt != total_inv:
+        anomalies.append(f"Report passed count ({passed_cnt}) != total inventory ({total_inv})")
     if report.get("status") != "verified":
         anomalies.append(f"Report status is '{report.get('status')}', expected 'verified'")
-    if report.get("failed_count", 0) > 0:
-        anomalies.append(f"Report contains {report.get('failed_count')} failed certificates")
 
-    # Check source code hash match
+    # 3. Enumerate actual on-disk certificate inventory
+    zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
+    trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
+    blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
+    worldlines_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
+    actual_files = sorted(zeros_files + trivial_files + blocks_files + worldlines_files)
+
+    if len(actual_files) != total_inv:
+        anomalies.append(f"On-disk certificate count ({len(actual_files)}) does not match report total_inventory ({total_inv})")
+
+    # Map actual files to repo-relative paths
+    actual_rel_map = {}
+    for af in actual_files:
+        rel = os.path.relpath(af, REPO_ROOT).replace("\\", "/")
+        actual_rel_map[rel] = af
+
+    rep_inventory = report.get("inventory", [])
+    if not isinstance(rep_inventory, list) or len(rep_inventory) != total_inv:
+        anomalies.append(f"Report inventory list length ({len(rep_inventory) if isinstance(rep_inventory, list) else 'invalid'}) does not match total_inventory ({total_inv})")
+
+    rep_rel_set = {entry.get("relative_path") for entry in rep_inventory if isinstance(entry, dict)}
+    actual_rel_set = set(actual_rel_map.keys())
+
+    missing_on_disk = rep_rel_set - actual_rel_set
+    if missing_on_disk:
+        anomalies.append(f"Certificates declared in report but missing on disk: {sorted(list(missing_on_disk))[:5]}")
+
+    extra_on_disk = actual_rel_set - rep_rel_set
+    if extra_on_disk:
+        anomalies.append(f"Certificates present on disk but missing from report: {sorted(list(extra_on_disk))[:5]}")
+
+    # 4. Verify individual file byte hashes and recompute inventory_root_hash
+    for entry in rep_inventory:
+        if not isinstance(entry, dict):
+            anomalies.append("Malformed entry in report inventory list")
+            continue
+        rel = entry.get("relative_path")
+        disk_path = actual_rel_map.get(rel)
+        if disk_path and os.path.exists(disk_path):
+            try:
+                with open(disk_path, "rb") as f:
+                    content = f.read().replace(b"\r\n", b"\n")
+                disk_sha = hashlib.sha256(content).hexdigest()
+                rep_sha = entry.get("file_sha256")
+                if disk_sha != rep_sha:
+                    anomalies.append(f"File SHA-256 mismatch for '{rel}': on-disk {disk_sha}, report {rep_sha}")
+            except Exception as e:
+                anomalies.append(f"Failed reading on-disk certificate '{rel}': {e}")
+
+    # Recompute inventory root hash
+    exp_root_hash = report.get("inventory_root_hash")
+    calc_root_hash = hashlib.sha256(json.dumps(rep_inventory, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    if not exp_root_hash or calc_root_hash != exp_root_hash:
+        anomalies.append(f"Inventory root hash mismatch: reported {exp_root_hash}, computed {calc_root_hash}")
+
+    # 5. Check dependency fingerprint
+    rep_dep = report.get("dependency_fingerprint", {})
+    flint_ver = rep_dep.get("python_flint")
+    if flint_ver not in SUPPORTED_FLINT_VERSIONS:
+        anomalies.append(f"Unsupported python_flint version in report: {flint_ver}")
+    if FLINT_AVAILABLE and FLINT_VERSION not in SUPPORTED_FLINT_VERSIONS:
+        anomalies.append(f"Current runtime python-flint version ({FLINT_VERSION}) is unsupported")
+    if rep_dep.get("mpmath") not in SUPPORTED_MPMATH_VERSIONS:
+        anomalies.append(f"Unsupported mpmath version in report: {rep_dep.get('mpmath')}")
+    import mpmath
+    if getattr(mpmath, "__version__", None) not in SUPPORTED_MPMATH_VERSIONS:
+        anomalies.append(f"Current runtime mpmath version ({getattr(mpmath, '__version__', None)}) is unsupported")
+
+    # 6. Check producing git commit
+    rep_commit = str(report.get("producing_git_commit", "")).strip()
+    commit_ok, commit_err = _is_valid_git_commit(
+        rep_commit,
+        source_code_hashes=report.get("source_code_hashes"),
+        input_data_hashes=report.get("input_data_hashes")
+    )
+    if not commit_ok:
+        anomalies.append(f"Invalid report producing_git_commit provenance: {commit_err}")
+
+    # 7. Check source code hash match against current workspace if in same repo
     curr_src = _get_source_code_hashes()
     rep_src = report.get("source_code_hashes", {})
     for mod, h in curr_src.items():
-        if rep_src.get(mod) != h:
-            anomalies.append(f"Source code hash mismatch for '{mod}': report {rep_src.get(mod)}, current {h}")
+        if h != "N/A" and rep_src.get(mod) != h:
+            anomalies.append(f"Current source module '{mod}' hash ({h}) differs from verified report ({rep_src.get(mod)})")
 
-    # Check dependency fingerprint
-    curr_dep = _get_dependency_fingerprint()
-    rep_dep = report.get("dependency_fingerprint", {})
-    if rep_dep.get("python_flint") not in SUPPORTED_FLINT_VERSIONS:
-        anomalies.append(f"Unsupported python_flint version in report: {rep_dep.get('python_flint')}")
-
-    is_valid = (len(anomalies) == 0 and report.get("status") == "verified" and report.get("failed_count", 0) == 0)
+    is_valid = (len(anomalies) == 0 and report.get("status") == "verified" and failed_cnt == 0)
     return is_valid, report, anomalies

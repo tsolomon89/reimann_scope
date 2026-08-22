@@ -847,13 +847,33 @@ def test_cross_height_distance_emits_l_infty_and_l_2_distance():
 
 def test_validate_manifest_accepts_valid_manifest_and_rejects_discrepancies():
     """Verify that validate_manifest passes valid certificate bindings and catches anomalies."""
+    z1_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "certificates", "zeros", "zero_00001.json")
+    wl1_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "certificates", "worldlines", "worldline_z00001_Kp1_delta_pos0p00.json")
+
+    if not os.path.exists(z1_path) or not os.path.exists(wl1_path):
+        pytest.skip("Certificate files not found on disk")
+
+    with open(z1_path, "r", encoding="utf-8") as f:
+        z1 = json.load(f)
+    with open(wl1_path, "r", encoding="utf-8") as f:
+        wl1 = json.load(f)
+
+    h1 = z1["certificate_hash"]
+    h2 = wl1["certificate_hash"]
+
     valid_manifest = {
-        "consumed_certificates": ["hash_1", "hash_2"]
+        "experiment_id": "test-exp",
+        "git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
+        "status": "complete",
+        "precision": {"dps": 50},
+        "points_requested": 1,
+        "points_completed": 1,
+        "consumed_certificates": [h1, h2]
     }
     valid_results = [
-        {"point_id": 0, "outputs": {
-            "source_zero_cert_hash": "hash_1",
-            "worldline_cert_hash": "hash_2",
+        {"point_id": 0, "status": "ok", "inputs": {"nontrivial_index": "1"}, "outputs": {
+            "source_zero_cert_hash": h1,
+            "worldline_cert_hash": h2,
             "source_zero_certificate_status": "certified",
             "worldline_certificate_status": "certified",
             "worldline_certified": "true"
@@ -863,26 +883,65 @@ def test_validate_manifest_accepts_valid_manifest_and_rejects_discrepancies():
     assert ok, f"Expected valid manifest: {errs}"
 
     # Missing from consumed certificates
-    invalid_manifest1 = {"consumed_certificates": ["hash_1"]}
+    invalid_manifest1 = dict(valid_manifest)
+    invalid_manifest1["consumed_certificates"] = [h1]
     ok1, errs1 = research_runner.validate_manifest(invalid_manifest1, valid_results)
     assert not ok1
     assert any("missing from manifest consumed_certificates" in e for e in errs1)
 
     # Worldline certified true but hash is N/A
     bad_results = [
-        {"point_id": 0, "outputs": {
-            "source_zero_cert_hash": "hash_1",
+        {"point_id": 0, "status": "ok", "inputs": {"nontrivial_index": "1"}, "outputs": {
+            "source_zero_cert_hash": h1,
             "worldline_cert_hash": "N/A",
             "worldline_certified": "true",
             "worldline_certificate_status": "not_available",
             "source_zero_certificate_status": "certified"
         }}
     ]
-    ok2, errs2 = research_runner.validate_manifest({"consumed_certificates": ["hash_1"]}, bad_results)
+    ok2, errs2 = research_runner.validate_manifest(valid_manifest, bad_results)
     assert not ok2
     assert any("worldline_cert_hash is 'N/A'" in e for e in errs2)
 
 
+def test_publication_gate_rejects_invalid_run_and_preserves_canonical_run(temp_research_env, monkeypatch):
+    """Test that if a run fails manifest validation, the canonical run directory and index remain intact."""
+    spec_dict = {
+        "schema_version": "1",
+        "id": "gate-test-sweep",
+        "title": "Gate Test Sweep",
+        "hypothesis": {"statement": "Test publication gate"},
+        "criterion": {"metric": "abs_slope_error", "operator": "<=", "threshold": "1e-25"},
+        "engine": {"operation": "centrifuge"},
+        "parameters": {
+            "delta": {"kind": "explicit", "values": ["0.01"]},
+            "K": {"kind": "explicit", "values": ["1", "2"]}
+        },
+        "precision": {"dps": 50}
+    }
+    spec_path = os.path.join(temp_research_env["experiments"], "gate-test-sweep.yaml")
+    with open(spec_path, "w", encoding="utf-8") as f:
+        yaml.dump(spec_dict, f)
 
+    # Run successfully first
+    run_id = research_runner.run_experiment(spec_path)
+    run_dir = os.path.join(temp_research_env["runs"], run_id)
+    assert os.path.exists(run_dir)
+    with open(os.path.join(run_dir, "manifest.json"), "r", encoding="utf-8") as f:
+        orig_manifest = json.load(f)
 
+    # Now monkeypatch evaluate_point to simulate point failure on a re-run
+    def mock_eval(*args, **kwargs):
+        return "error", {"point_error": "Simulated hardware failure"}, "Simulated hardware failure"
 
+    monkeypatch.setattr(research_runner, "evaluate_point", mock_eval)
+
+    # Rerunning must fail publication gate and preserve original canonical files
+    with pytest.raises(RuntimeError, match="Canonical run publication rejected"):
+        research_runner.run_experiment(spec_path)
+
+    # Verify original canonical directory is unchanged
+    assert os.path.exists(run_dir)
+    with open(os.path.join(run_dir, "manifest.json"), "r", encoding="utf-8") as f:
+        preserved_manifest = json.load(f)
+    assert preserved_manifest == orig_manifest

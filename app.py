@@ -36,6 +36,8 @@ import transcendental
 import math_core
 import certification
 
+REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 # Initialize Dash App with Dark theme
 app = dash.Dash(
     __name__,
@@ -43,6 +45,7 @@ app = dash.Dash(
     title="Riemann Microscope / Macroscope",
     suppress_callback_exceptions=True
 )
+
 server = app.server
 
 # Pre-load reference zeros & initial zero list
@@ -668,15 +671,16 @@ def create_worldline_tab():
                         dbc.Checklist(
                             id="check-wl-deltas",
                             options=[
-                                {"label": "δ = 0.0 (Actual Zero Worldline on Critical Surface)", "value": 0.0},
-                                {"label": "δ = +0.05 (Synthetic Outer Leaf)", "value": 0.05},
-                                {"label": "δ = -0.05 (Synthetic Inner Leaf)", "value": -0.05},
-                                {"label": "δ = +0.01 (Synthetic Fine Perturbation)", "value": 0.01},
-                                {"label": "δ = -0.01 (Synthetic Fine Perturbation)", "value": -0.01},
+                                {"label": "δ = 0.00 (Actual Zero Worldline on Critical Surface)", "value": 0.0},
+                                {"label": "δ = +0.10 (Synthetic Coarse Outer Leaf)", "value": 0.10},
+                                {"label": "δ = -0.10 (Synthetic Coarse Inner Leaf)", "value": -0.10},
+                                {"label": "δ = +0.01 (Synthetic Fine Outer Perturbation)", "value": 0.01},
+                                {"label": "δ = -0.01 (Synthetic Fine Inner Perturbation)", "value": -0.01},
                             ],
-                            value=[0.0, 0.05, -0.05],
+                            value=[0.0, 0.10, -0.10],
                             className="text-light small font-monospace mb-3"
                         ),
+
                         html.Div([
                             html.Span("Canonical Grade Sequence: ", className="fw-bold text-light d-block mb-1"),
                             html.Span("... τ⁻², τ⁻¹, τ⁰ = 1 (Native ζ), τ¹, τ², ...", className="font-monospace text-info small")
@@ -1593,7 +1597,8 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
     dps = 40 if cert_mode in ["audit", "certified"] else 25
     u_max = float(u_max_val or 0.5)
     zero_idx = int(zero_idx_val or 0)
-    blocks = selected_blocks or CANONICAL_BLOCK_KEYS
+    blocks = selected_blocks if selected_blocks is not None else CANONICAL_BLOCK_KEYS
+
 
     # 1. Gather zeros for selected blocks
     block_colors = {
@@ -1754,9 +1759,49 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
 
     info_children = []
     if cert_mode == "certified":
-        info_children.append(
-            dbc.Badge(f"CERTIFIED: All {len(selected_ordinates)} spectrum zeros verified in Arb", color="success", className="d-block p-1 mb-2 font-monospace")
-        )
+        all_passed = True
+        failed_msgs = []
+        for b_key, g_str in selected_ordinates:
+            blk = reference_data.get_zero_block(b_key)
+            ords = blk.get("ordinates", [])
+            idx_in_blk = zero_idx % len(ords)
+            if b_key == "low_validation":
+                global_idx = 1 + idx_in_blk
+            elif b_key == "medium_research":
+                global_idx = 100 + idx_in_blk
+            elif b_key == "high_research":
+                global_idx = 1000 + idx_in_blk
+            elif b_key == "very_high_sparse":
+                global_idx = 10000 + idx_in_blk
+            else:
+                global_idx = 1 + idx_in_blk
+
+            cert_path = os.path.join(REPO_ROOT, "data", "certificates", "zeros", f"zero_{global_idx:05d}.json")
+            if not os.path.exists(cert_path):
+                all_passed = False
+                failed_msgs.append(f"Zero #{global_idx} certificate missing on disk")
+            else:
+                try:
+                    with open(cert_path, "r", encoding="utf-8") as f:
+                        zc = json.load(f)
+                    ok, errs = certification.verify_certificate(zc, check_provenance=False)
+                    if not ok or zc.get("status") != "simple_zero_certified":
+                        all_passed = False
+                        failed_msgs.append(f"Zero #{global_idx} verification failed: {'; '.join(errs)}")
+                except Exception as e:
+                    all_passed = False
+                    failed_msgs.append(f"Zero #{global_idx} parse error: {e}")
+
+        if all_passed and selected_ordinates:
+            info_children.append(
+                dbc.Badge(f"CERTIFIED: All {len(selected_ordinates)} spectrum zeros verified in Arb", color="success", className="d-block p-1 mb-2 font-monospace")
+            )
+        else:
+            err_summary = "; ".join(failed_msgs[:2]) if failed_msgs else "No spectrum zeros selected"
+            info_children.append(
+                dbc.Badge(f"CERTIFICATION REJECTED: {err_summary}", color="danger", className="d-block p-1 mb-2 font-monospace")
+            )
+
     info_children.extend([
         html.Span(f"Comparing {len(selected_ordinates)} spectrum blocks at zero index {zero_idx}:", className="fw-bold d-block mb-1"),
         html.Div([html.Span(lbl, className="d-block text-light") for lbl in selected_zero_labels])
@@ -1792,11 +1837,80 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
     deltas = selected_deltas or [0.0]
 
     k_range = list(range(k_min, k_max + 1))
-    cert_prefix = "CERTIFIED " if cert_mode == "certified" else ""
+
+    # Map selected zero gamma to exact index
+    gamma_to_idx = {
+        14.134725: 1,
+        21.022040: 2,
+        25.010858: 3,
+        236.524230: 100,
+        1419.422481: 1000,
+        9877.782654: 10000
+    }
+    z_idx = None
+    for g_val, idx_val in gamma_to_idx.items():
+        if abs(gamma - g_val) < 1e-4:
+            z_idx = idx_val
+            break
+
+    all_certified = True
+    unverified_reasons = []
+
+    if cert_mode == "certified":
+        if z_idx is None:
+            all_certified = False
+            unverified_reasons.append(f"Selected gamma {gamma} is not a canonical certified zero")
+        else:
+            # Check source zero cert
+            src_path = os.path.join(REPO_ROOT, "data", "certificates", "zeros", f"zero_{z_idx:05d}.json")
+            if not os.path.exists(src_path):
+                all_certified = False
+                unverified_reasons.append(f"Source zero #{z_idx} certificate missing")
+            else:
+                try:
+                    with open(src_path, "r", encoding="utf-8") as f:
+                        szc = json.load(f)
+                    ok, errs = certification.verify_certificate(szc, check_provenance=False)
+                    if not ok:
+                        all_certified = False
+                        unverified_reasons.append(f"Source zero #{z_idx} invalid")
+                except Exception:
+                    all_certified = False
+                    unverified_reasons.append(f"Source zero #{z_idx} unreadable")
+
+            # Check worldline certs for all deltas and grades
+            for d in deltas:
+                for K in k_range:
+                    k_str = f"Kp{K}" if K >= 0 else f"Km{abs(K)}"
+                    d_tag = "pos0p00" if abs(d) < 1e-6 else ("pos0p10" if abs(d - 0.10) < 1e-4 else ("neg0p10" if abs(d + 0.10) < 1e-4 else ("pos0p01" if abs(d - 0.01) < 1e-4 else ("neg0p01" if abs(d + 0.01) < 1e-4 else None))))
+                    if d_tag is None:
+                        all_certified = False
+                        unverified_reasons.append(f"Delta {d} has no canonical certificate")
+                        continue
+
+                    wl_filename = f"worldline_z{z_idx:05d}_{k_str}_delta_{d_tag}.json"
+                    wl_path = os.path.join(REPO_ROOT, "data", "certificates", "worldlines", wl_filename)
+                    if not os.path.exists(wl_path):
+                        all_certified = False
+                        unverified_reasons.append(f"Missing certificate for z={z_idx}, K={K}, delta={d}")
+                    else:
+                        try:
+                            with open(wl_path, "r", encoding="utf-8") as f:
+                                wlc = json.load(f)
+                            ok, errs = certification.verify_certificate(wlc, check_provenance=False)
+                            if not ok:
+                                all_certified = False
+                                unverified_reasons.append(f"Invalid certificate for z={z_idx}, K={K}, delta={d}")
+                        except Exception:
+                            all_certified = False
+                            unverified_reasons.append(f"Unreadable certificate for z={z_idx}, K={K}, delta={d}")
+
+    cert_prefix = "CERTIFIED " if (cert_mode == "certified" and all_certified) else ""
+    uncert_notice = f" [UNCERTIFIED: {unverified_reasons[0]}]" if (cert_mode == "certified" and not all_certified and unverified_reasons) else ""
 
     fig_traj = go.Figure(layout=DARK_LAYOUT)
     fig_traj.update_layout(
-        title=dict(text=f"{cert_prefix}Bilateral Worldlines in Complex Plane for γ = {gamma:.4f}", font=dict(size=12)),
+        title=dict(text=f"{cert_prefix}Bilateral Worldlines in Complex Plane for γ = {gamma:.4f}{uncert_notice}", font=dict(size=12)),
         xaxis=dict(title="Re(s)", zeroline=True),
         yaxis=dict(title="Im(s)", scaleanchor="x", scaleratio=1.0, constrain="range", zeroline=True),
         showlegend=True
@@ -1804,16 +1918,15 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
 
     fig_rad = go.Figure(layout=DARK_LAYOUT)
     fig_rad.update_layout(
-        title=dict(text=f"{cert_prefix}Normalized Radial Coordinate K ↦ R_τ(s_ρ(K), K)", font=dict(size=12)),
+        title=dict(text=f"{cert_prefix}Normalized Radial Coordinate K ↦ R_τ(s_ρ(K), K){uncert_notice}", font=dict(size=12)),
         xaxis=dict(title="Bilateral Grade K", dtick=1),
         yaxis=dict(title="R_τ(s, K)", dtick=0.05),
         showlegend=True
     )
 
-
     fig_def = go.Figure(layout=DARK_LAYOUT)
     fig_def.update_layout(
-        title=dict(text="Hyperbolic Defect Scaling: |Re(s) - τ^K / 2| = τ^K |δ|", font=dict(size=12)),
+        title=dict(text=f"Hyperbolic Defect Scaling: |Re(s) - τ^K / 2| = τ^K |δ|{uncert_notice}", font=dict(size=12)),
         xaxis=dict(title="Bilateral Grade K", dtick=1),
         yaxis=dict(title="Defect |Re(s) - σ_c(K)|", type="log"),
         showlegend=True
@@ -1821,8 +1934,8 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
 
     delta_colors = {
         0.0: "#00ff88",
-        0.05: "#ffea00",
-        -0.05: "#ff007f",
+        0.10: "#ffea00",
+        -0.10: "#ff007f",
         0.01: "#00d2ff",
         -0.01: "#ff9900"
     }
@@ -1868,6 +1981,7 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
             ))
 
     return fig_traj, fig_rad, fig_def
+
 
 
 # ==============================================================================

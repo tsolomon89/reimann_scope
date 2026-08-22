@@ -580,3 +580,90 @@ def test_adversarial_trivial_nontrivial_family_confusion():
     ok, msgs = certification.verify_certificate(tampered, cert_store=cert_store, check_provenance=False)
     assert not ok
     assert any("Source zero family mismatch" in m or "could not be resolved" in m for m in msgs)
+
+
+def test_adversarial_historical_commit_blob_mismatch():
+    """Adversarial: An older existing commit whose historical source blobs differ must be rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    # 9f47fbf is an older commit where certification.py had a different hash
+    tampered["producing_git_commit"] = "9f47fbf0146784ef8d18ffd5774474d421b646bf"
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered, check_provenance=True)
+    assert not ok
+    assert any("blob hash" in m or "does not match" in m for m in msgs)
+
+
+def test_verification_report_missing_or_extra_file_fails(tmp_path):
+    """Adversarial: Verification report fails if a certificate is missing or an extra untracked certificate exists."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    # Create temporary cert tree with 2 certs
+    cert_dir = tmp_path / "certificates"
+    (cert_dir / "zeros").mkdir(parents=True)
+    (cert_dir / "trivial_zeros").mkdir(parents=True)
+    (cert_dir / "blocks").mkdir(parents=True)
+    (cert_dir / "worldlines").mkdir(parents=True)
+
+    z1 = certification.certify_zero(1, dps=50)
+    z2 = certification.certify_zero(2, dps=50)
+    with open(cert_dir / "zeros" / "zero_00001.json", "w", encoding="utf-8") as f:
+        json.dump(z1, f, indent=2)
+    with open(cert_dir / "zeros" / "zero_00002.json", "w", encoding="utf-8") as f:
+        json.dump(z2, f, indent=2)
+
+    rep = certification.generate_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert rep["status"] == "verified"
+    assert rep["total_inventory"] == 2
+
+    # Verify report loads cleanly
+    ok, _, anomalies = certification.load_verification_report(cert_dir=str(cert_dir))
+    assert ok, f"Expected clean report load: {anomalies}"
+
+    # Remove 1 file -> must fail
+    os.remove(cert_dir / "zeros" / "zero_00002.json")
+    ok_missing, _, anomalies_missing = certification.load_verification_report(cert_dir=str(cert_dir))
+    assert not ok_missing
+    assert any("does not match report total_inventory" in a or "missing on disk" in a for a in anomalies_missing)
+
+    # Restore and add extra file -> must fail
+    with open(cert_dir / "zeros" / "zero_00002.json", "w", encoding="utf-8") as f:
+        json.dump(z2, f, indent=2)
+    z3 = certification.certify_zero(3, dps=50)
+    with open(cert_dir / "zeros" / "zero_00003.json", "w", encoding="utf-8") as f:
+        json.dump(z3, f, indent=2)
+
+    ok_extra, _, anomalies_extra = certification.load_verification_report(cert_dir=str(cert_dir))
+    assert not ok_extra
+    assert any("does not match report total_inventory" in a or "missing from report" in a for a in anomalies_extra)
+
+
+def test_verification_report_tampered_bytes_fails(tmp_path):
+    """Adversarial: Verification report fails if a certificate file's bytes are tampered."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    cert_dir = tmp_path / "certificates"
+    (cert_dir / "zeros").mkdir(parents=True)
+    (cert_dir / "trivial_zeros").mkdir(parents=True)
+    (cert_dir / "blocks").mkdir(parents=True)
+    (cert_dir / "worldlines").mkdir(parents=True)
+
+    z1 = certification.certify_zero(1, dps=50)
+    fpath = cert_dir / "zeros" / "zero_00001.json"
+    with open(fpath, "w", encoding="utf-8") as f:
+        json.dump(z1, f, indent=2)
+
+    rep = certification.generate_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert rep["status"] == "verified"
+
+    # Tamper with file
+    with open(fpath, "a", encoding="utf-8") as f:
+        f.write(" ")
+
+    ok, _, anomalies = certification.load_verification_report(cert_dir=str(cert_dir))
+    assert not ok
+    assert any("File SHA-256 mismatch" in a or "Inventory root hash mismatch" in a for a in anomalies)

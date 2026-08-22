@@ -170,5 +170,49 @@ def test_certified_mode_fails_closed_on_missing_or_invalid():
     assert "CERTIFIED" in metrics_str
 
 
+def test_cross_height_lab_certified_mode_truthfulness():
+    """Verify Cross-Height laboratory displays CERTIFIED badge only when all selected zeros are certified."""
+    # Certified mode with valid block
+    info_text, fig_overlay, fig_dev, fig_matrix, fig_taylor = app.update_cross_height_lab(
+        selected_blocks=["low_validation", "medium_research"],
+        zero_idx_val=0,
+        u_max_val=0.5,
+        cert_mode="certified"
+    )
+    info_str = str(info_text)
+    assert "CERTIFIED: All 2 spectrum zeros verified in Arb" in info_str
+
+    # Certified mode with no blocks
+    info_empty, _, _, _, _ = app.update_cross_height_lab(
+        selected_blocks=[],
+        zero_idx_val=0,
+        u_max_val=0.5,
+        cert_mode="certified"
+    )
+    assert "CERTIFICATION REJECTED" in str(info_empty)
 
 
+
+def test_worldline_lab_certified_mode_truthfulness():
+    """Verify Bilateral Worldline laboratory displays CERTIFIED title only when 100% of curves are certified."""
+    # Certified mode with canonical zero 1 and certified deltas [0.0, 0.10, -0.10]
+    fig_traj, fig_rad, fig_def = app.update_worldline_lab(
+        zero_gamma=14.134725,
+        k_min_val=-2,
+        k_max_val=2,
+        selected_deltas=[0.0, 0.10, -0.10],
+        cert_mode="certified"
+    )
+    assert fig_traj.layout.title.text.startswith("CERTIFIED Bilateral Worldlines")
+    assert "UNCERTIFIED" not in fig_traj.layout.title.text
+
+    # Certified mode with uncertified delta (e.g. 0.05) -> must fail closed
+    fig_traj_bad, _, _ = app.update_worldline_lab(
+        zero_gamma=14.134725,
+        k_min_val=-2,
+        k_max_val=2,
+        selected_deltas=[0.05],
+        cert_mode="certified"
+    )
+    assert not fig_traj_bad.layout.title.text.startswith("CERTIFIED Bilateral Worldlines")
+    assert "UNCERTIFIED" in fig_traj_bad.layout.title.text
