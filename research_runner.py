@@ -1905,8 +1905,18 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
 
     # Find corresponding experiment spec
     exp_id = manifest["experiment_id"]
-    spec_path = os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml")
-    if not os.path.exists(spec_path):
+    candidates = [
+        os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
+        os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('-', '_')}.yaml"),
+        os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('_', '-')}.yaml"),
+    ]
+    spec_path = None
+    for cand in candidates:
+        if os.path.exists(cand):
+            spec_path = cand
+            break
+
+    if not spec_path:
         # Scan experiments dir
         for fname in os.listdir(EXPERIMENTS_DIR):
             if fname.endswith(".yaml") or fname.endswith(".yml"):
@@ -1914,14 +1924,15 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
                 with open(p, "r", encoding="utf-8") as sf:
                     try:
                         s_data = yaml.safe_load(sf)
-                        if s_data and s_data.get("experiment_id") == exp_id:
+                        if s_data and (s_data.get("experiment_id") == exp_id or s_data.get("id") == exp_id):
                             spec_path = p
                             break
                     except Exception:
                         pass
 
-    if not os.path.exists(spec_path):
+    if not spec_path or not os.path.exists(spec_path):
         raise FileNotFoundError(f"Experiment spec for '{exp_id}' not found")
+
 
     with open(spec_path, "r", encoding="utf-8") as f:
         spec = yaml.safe_load(f)
