@@ -69,7 +69,7 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
         ).decode("utf-8").strip()
     except Exception:
         commit = "UNKNOWN"
-        
+
     try:
         status = subprocess.check_output(
             ["git", "status", "--porcelain"],
@@ -95,7 +95,7 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
         is_dirty = len(dirty_lines) > 0
     except Exception:
         is_dirty = False
-        
+
     return commit, is_dirty
 
 
@@ -109,30 +109,30 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     for field in required_top:
         if field not in spec:
             return False, f"Missing required spec field: '{field}'"
-            
+
     if not isinstance(spec["hypothesis"], dict) or "statement" not in spec["hypothesis"]:
         return False, "Spec missing 'hypothesis.statement'"
-        
+
     crit = spec["criterion"]
     if not isinstance(crit, dict) or "metric" not in crit:
         return False, "Spec 'criterion' must be a mapping defining at least 'metric'"
-        
+
     aggregation = crit.get("aggregation", "max_abs")
     valid_aggs = ["max_abs", "max", "min", "all", "none"]
     if aggregation not in valid_aggs:
         return False, f"Invalid criterion aggregation '{aggregation}', must be one of {valid_aggs}"
-        
+
     if aggregation != "none":
         if "operator" not in crit or "threshold" not in crit:
             return False, "Spec 'criterion' with active aggregation must define 'operator' and 'threshold'"
         valid_ops = ["<=", "<", ">=", ">", "==", "!="]
         if crit["operator"] not in valid_ops:
             return False, f"Invalid criterion operator '{crit['operator']}', must be one of {valid_ops}"
-        
+
     engine = spec["engine"]
     if not isinstance(engine, dict) or "operation" not in engine:
         return False, "Spec missing 'engine.operation'"
-        
+
     valid_engine_ops = [
         "centrifuge",
         "kernel_identity",
@@ -153,11 +153,11 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         return False, f"Unknown engine operation '{engine['operation']}'. Permitted: {valid_engine_ops}"
 
 
-        
+
     params = spec["parameters"]
     if not isinstance(params, dict) or len(params) == 0:
         return False, "Spec 'parameters' must be a non-empty mapping of parameter names"
-        
+
     for p_name, p_def in params.items():
         if not isinstance(p_def, dict) or "kind" not in p_def:
             return False, f"Parameter '{p_name}' missing 'kind'"
@@ -181,11 +181,11 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
                 return False, f"Rational grade parameter '{p_name}' requires non-empty 'values' list"
         else:
             return False, f"Unknown parameter kind '{kind}' for parameter '{p_name}'"
-            
+
     prec = spec["precision"]
     if not isinstance(prec, dict) or "dps" not in prec or not isinstance(prec["dps"], int) or prec["dps"] <= 0:
         return False, "Spec 'precision.dps' must be a positive integer"
-        
+
     return True, None
 
 
@@ -198,17 +198,17 @@ def expand_parameter(p_def: Dict[str, Any], dps: int = 80) -> List[str]:
     with mpmath.workdps(dps + 15):
         if kind == "explicit":
             return [str(v).strip() for v in p_def["values"]]
-            
+
         elif kind == "linear":
             start = mpmath.mpf(str(p_def["start"]).strip())
             stop = mpmath.mpf(str(p_def["stop"]).strip())
             step = mpmath.mpf(str(p_def["step"]).strip())
-            
+
             if step <= 0 and start < stop:
                 raise ValueError("Positive step required when start < stop")
             if step >= 0 and start > stop:
                 raise ValueError("Negative step required when start > stop")
-                
+
             values = []
             curr = start
             # Guard against floating comparison issues with high-precision tolerance
@@ -222,7 +222,7 @@ def expand_parameter(p_def: Dict[str, Any], dps: int = 80) -> List[str]:
                     values.append(mpmath.nstr(curr, n=dps, strip_zeros=False))
                     curr += step
             return values
-            
+
         elif kind == "log":
             base_str = str(p_def.get("base", "10")).strip()
             base = mpmath.mpf(base_str)
@@ -232,17 +232,17 @@ def expand_parameter(p_def: Dict[str, Any], dps: int = 80) -> List[str]:
                 val = mpmath.power(base, exp_val)
                 values.append(mpmath.nstr(val, n=dps, strip_zeros=False))
             return values
-            
+
         elif kind == "integer_grade":
             start_k = int(p_def["start"])
             stop_k = int(p_def["stop"])
             step_k = int(p_def.get("step", 1))
             step_dir = 1 if step_k > 0 else -1
             return [str(k) for k in range(start_k, stop_k + step_dir, step_k)]
-            
+
         elif kind == "rational_grade":
             return [str(v).strip() for v in p_def["values"]]
-            
+
         else:
             raise ValueError(f"Unsupported parameter kind '{kind}'")
 
@@ -257,12 +257,12 @@ def generate_parameter_grid(
     """
     param_names = list(parameters_def.keys())
     param_values_list = [expand_parameter(parameters_def[name], dps=dps) for name in param_names]
-    
+
     grid = []
     for combination in itertools.product(*param_values_list):
         point_dict = {name: val for name, val in zip(param_names, combination)}
         grid.append(point_dict)
-        
+
     return grid
 
 
@@ -284,31 +284,31 @@ def _lookup_zero_certificate(
         cert_path = os.path.join(code_root, "data", "certificates", "trivial_zeros", f"trivial_zero_{zero_index:05d}.json")
     else:
         return None, False, None, [f"Unknown zero_family: {zero_family}"]
-        
+
     if not os.path.exists(cert_path):
         return None, False, None, [f"Certificate file '{cert_path}' does not exist"]
-        
+
     try:
         with open(cert_path, "r", encoding="utf-8") as f:
             zc = json.load(f)
     except Exception as e:
         return None, False, None, [f"Failed to read certificate JSON: {e}"]
-        
+
     # Check family and index
     cert_fam = zc.get("zero_family", "nontrivial" if zc.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
     if cert_fam != zero_family:
         return zc.get("certificate_hash"), False, zc, [f"Zero family mismatch: requested {zero_family}, certificate has {cert_fam}"]
-        
+
     c_idx = zc.get("nontrivial_index") if zero_family == "nontrivial" else zc.get("trivial_index")
     if c_idx is None:
         c_idx = zc.get("zero_index") if zero_family == "nontrivial" else zc.get("exact_location", 0) // -2
     if c_idx != zero_index:
         return zc.get("certificate_hash"), False, zc, [f"Zero index mismatch: requested {zero_index}, certificate has {c_idx}"]
-        
+
     # Check required status
     if zc.get("status") not in ("simple_zero_certified", "isolated_zero_certified"):
         return zc.get("certificate_hash"), False, zc, [f"Certificate status is not certified: {zc.get('status')}"]
-        
+
     # Check ordinate containment if provided
     if expected_ordinate is not None and zero_family == "nontrivial":
         exp_ord = mpmath.mpf(expected_ordinate)
@@ -320,22 +320,55 @@ def _lookup_zero_certificate(
             rad_val = mpmath.mpf(re_rad)
             if abs(exp_ord - mid_val) > (rad_val + mpmath.mpf("1e-4")):
                 return zc.get("certificate_hash"), False, zc, [f"Ordinate mismatch: expected {expected_ordinate}, certificate has {re_mid}"]
-                
+
     ok, errs = certification.verify_certificate(zc, check_provenance=check_provenance)
     if not ok:
         return zc.get("certificate_hash"), False, zc, errs
-        
+
     return zc.get("certificate_hash"), True, zc, []
 
 
+def _lookup_worldline_certificate(
+    zero_family: str,
+    index: int,
+    grade: int,
+    delta: str = "0.0",
+    check_provenance: bool = True
+) -> Tuple[Optional[str], bool, Optional[Dict[str, Any]], List[str]]:
+    """Look up and strictly verify a worldline certificate from data/certificates/worldlines/."""
+    code_root = os.path.dirname(os.path.abspath(__file__))
+    delta_str = str(delta).strip()
+    d_float = float(delta_str)
+    delta_tag = f"delta_{d_float:+.2f}".replace(".", "p").replace("+", "pos").replace("-", "neg")
+    if zero_family == "trivial":
+        wl_filename = f"worldline_trivial_m{index:05d}_K{grade:+d}.json".replace("+", "p").replace("-", "m")
+    else:
+        wl_filename = f"worldline_z{index:05d}_K{grade:+d}_{delta_tag}.json".replace("+", "p").replace("-", "m")
+
+    cert_path = os.path.join(code_root, "data", "certificates", "worldlines", wl_filename)
+    if not os.path.exists(cert_path):
+        return None, False, None, [f"Worldline certificate '{wl_filename}' does not exist"]
+
+    try:
+        with open(cert_path, "r", encoding="utf-8") as f:
+            wlc = json.load(f)
+    except Exception as e:
+        return None, False, None, [f"Failed to read worldline certificate JSON: {e}"]
+
+    ok, errs = certification.verify_certificate(wlc, check_provenance=check_provenance)
+    if not ok:
+        return wlc.get("certificate_hash"), False, wlc, errs
+
+    return wlc.get("certificate_hash"), True, wlc, []
+
 
 def evaluate_point(
-
     operation: str,
     inputs: Dict[str, str],
     dps: int = 80,
     param_space: Optional[Dict[str, Any]] = None
 ) -> Tuple[str, Dict[str, str], Optional[str]]:
+
     """
     Evaluate a single parameter space point using the canonical math engine.
     Returns (status, outputs_dict, error_message).
@@ -347,18 +380,18 @@ def evaluate_point(
                 delta_str = inputs.get("delta", "0.0")
                 gamma_str = inputs.get("gamma", "14.13472514173469379045725198356247027078425711569924317568556746")
                 k_str = inputs.get("K", inputs.get("k", "0.0"))
-                
+
                 log_mod = math_core.centrifuge_log_modulus(delta_str, k_str, dps=dps)
                 q_k = math_core.centrifuge_q_k(delta_str, gamma_str, k_str, dps=dps)
                 abs_q_k = abs(q_k)
-                
+
                 # Theoretical line: K * delta * ln(tau)
                 tau = math_core.get_tau(dps=dps)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps)
                 k_mpf = math_core.to_mpf(k_str, dps=dps)
                 expected_log_mod = k_mpf * d_mpf * mpmath.log(tau)
                 abs_slope_error = abs(log_mod - expected_log_mod)
-                
+
                 return "ok", {
                     "log_modulus": mpmath.nstr(log_mod, n=dps),
                     "abs_q_k": mpmath.nstr(abs_q_k, n=dps),
@@ -374,19 +407,19 @@ def evaluate_point(
                 B_str = inputs.get("B", "1.0")
                 C_str = inputs.get("C", "0.0")
                 D_str = inputs.get("D", "0.0")
-                
+
                 s_re = inputs.get("s_re", inputs.get("re_s", "0.5"))
                 s_im = inputs.get("s_im", inputs.get("im_s", "14.134725141734693790457251983562"))
                 s_mpc = math_core.to_mpc((s_re, s_im), dps=dps)
-                
+
                 t_obj_kernel = transforms.KernelTransform(
                     A=A_str, B=B_str, C=C_str, D=D_str, inverse_scale_lock=is_lock
                 )
-                
+
                 z_trans = t_obj_kernel.evaluate_function(s_mpc, dps=dps)
                 z_canon = math_core.zeta_eval(s_mpc, dps=dps)
                 abs_diff = abs(z_trans - z_canon)
-                
+
                 return "ok", {
                     "transformed_re": mpmath.nstr(z_trans.real, n=dps),
                     "transformed_im": mpmath.nstr(z_trans.imag, n=dps),
@@ -401,7 +434,7 @@ def evaluate_point(
                 mode = inputs.get("mode", "centered_dilation")
                 k_str = inputs.get("k", "1.0")
                 gamma_str = inputs.get("gamma", "14.13472514173469379045725198356247027078425711569924317568556746")
-                
+
                 t_obj_map: transforms.BaseTransform
                 if mode == "origin_dilation":
                     t_obj_map = transforms.OriginCoordinateDilation(k=k_str)
@@ -409,13 +442,13 @@ def evaluate_point(
                     t_obj_map = transforms.ArgumentTransform(k=k_str)
                 else:
                     t_obj_map = transforms.CenteredCoordinateDilation(k=k_str)
-                    
+
                 rho = mpmath.mpc('0.5', gamma_str)
                 mapped_rho = t_obj_map.map_zero_mpc(rho, dps=dps)
                 val_at_mapped = t_obj_map.evaluate_function(mapped_rho, dps=dps)
 
                 residual = abs(val_at_mapped)
-                
+
                 return "ok", {
                     "mapped_rho_re": mpmath.nstr(mapped_rho.real, n=dps),
                     "mapped_rho_im": mpmath.nstr(mapped_rho.imag, n=dps),
@@ -434,29 +467,29 @@ def evaluate_point(
                     else:
                         s_re_str = "0.5"
                 s_im_str = inputs.get("s_im", inputs.get("t", inputs.get("gamma", inputs.get("im_s", "14.13472514173469379045725198356247027078425711569924317568556746"))))
-                
+
                 s_mpc = mpmath.mpc(s_re_str, s_im_str)
                 tau = math_core.get_tau(dps=dps + 10)
                 k_mpf = math_core.to_mpf(k_str, dps=dps + 10)
                 scale_A = mpmath.power(tau, k_mpf)
-                
+
                 # Mapped coordinate: s' = A * s
                 mapped_s = scale_A * s_mpc
-                
+
                 # Baseline value: W = zeta(s)
                 W = math_core.zeta_eval(s_mpc, dps=dps + 10)
-                
+
                 # Transformed coordinate representation evaluated AT MAPPED POINT:
                 # W_A = Z_A(s') = zeta(s' / A)
                 t_orig = transforms.OriginCoordinateDilation(k=k_str)
                 W_A = t_orig.evaluate_function(mapped_s, dps=dps + 10)
-                
+
                 # Covariance residual: E_zeta = |W_A - W|
                 E_zeta = abs(W_A - W)
-                
+
                 sigma_c = mpmath.mpf('0.5')
                 sigma_c_prime = scale_A / 2
-                
+
                 outputs = {
                     "s_re": mpmath.nstr(s_mpc.real, n=dps),
                     "s_im": mpmath.nstr(s_mpc.imag, n=dps),
@@ -474,7 +507,7 @@ def evaluate_point(
                     "covariance_residual": mpmath.nstr(E_zeta, n=dps),
                     "residual": mpmath.nstr(E_zeta, n=dps)
                 }
-                
+
                 # Single-zero converter covariance check if x or rho/gamma are provided
                 if "x" in inputs or "rho" in inputs or "gamma" in inputs or "rho_im" in inputs:
                     x_str = inputs.get("x", "10.0")
@@ -482,15 +515,15 @@ def evaluate_point(
                     rho_re = inputs.get("rho_re", "0.5")
                     rho_im = inputs.get("rho_im", inputs.get("gamma", inputs.get("rho", "14.13472514173469379045725198356247027078425711569924317568556746")))
                     rho_mpc = math_core.to_mpc((rho_re, rho_im), dps=dps + 10)
-                    
+
                     # Coupled transformation: rho' = A * rho, x' = x^(1/A)
                     mapped_rho = scale_A * rho_mpc
                     mapped_x = mpmath.power(x_mpf, mpmath.mpf(1) / scale_A)
-                    
+
                     cj_clean = converter.zero_j_contribution_audit(x_mpf, rho_mpc, dps=dps + 10)
                     cj_trans = converter.zero_j_contribution_audit(mapped_x, mapped_rho, dps=dps + 10)
                     e_cj = abs(cj_trans - cj_clean)
-                    
+
                     outputs["x"] = mpmath.nstr(x_mpf, n=dps)
                     outputs["mapped_x"] = mpmath.nstr(mapped_x, n=dps)
                     outputs["rho_re"] = mpmath.nstr(rho_mpc.real, n=dps)
@@ -500,7 +533,7 @@ def evaluate_point(
                     outputs["cj_clean"] = mpmath.nstr(cj_clean, n=dps)
                     outputs["cj_transformed"] = mpmath.nstr(cj_trans, n=dps)
                     outputs["cj_covariance_residual"] = mpmath.nstr(e_cj, n=dps)
-                    
+
                     # Evaluate C_pi if mapped_x >= 2 and mapped_x <= 1e5 (prevent astronomical Mobius truncation counts)
                     if 2 <= mapped_x <= 100000 and 2 <= x_mpf <= 100000:
                         cpi_clean = converter.zero_pi_contribution_audit(x_mpf, rho_mpc, dps=dps + 10, max_m=50)
@@ -509,11 +542,11 @@ def evaluate_point(
                         outputs["cpi_clean"] = mpmath.nstr(cpi_clean, n=dps)
                         outputs["cpi_transformed"] = mpmath.nstr(cpi_trans, n=dps)
                         outputs["cpi_covariance_residual"] = mpmath.nstr(e_cpi, n=dps)
-                    
+
                     max_cov_res = max(E_zeta, e_cj)
                     outputs["covariance_residual"] = mpmath.nstr(max_cov_res, n=dps)
                     outputs["residual"] = mpmath.nstr(max_cov_res, n=dps)
-                
+
                 return "ok", outputs, None
 
 
@@ -523,23 +556,23 @@ def evaluate_point(
                 x_str = inputs.get("x", "20.0")
                 num_zeros = int(inputs.get("num_zeros", "10"))
                 mode = inputs.get("perturbation_mode", inputs.get("mode", "single_pair_diagnostic"))
-                
+
                 ref_zeros_str = reference_data.load_reference_zeros()[:max(num_zeros, zero_idx + 1)]
                 if not ref_zeros_str:
                     ref_zeros_str = ["14.13472514173469379045725198356247027078425711569924317568556746"]
-                
+
                 gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if zero_idx < len(ref_zeros_str) else ref_zeros_str[0])
                 rho_clean = mpmath.mpc('0.5', gamma_str)
-                
+
                 # Compute isolated single-zero / split contributions
                 contrib_dict = converter.compute_perturbed_contributions_audit(
                     x_str, rho_clean, delta_str, mode=mode, dps=dps + 15
                 )
-                
+
                 # Build clean baseline zeros list up to num_zeros
                 clean_zeros_mpc = [mpmath.mpc('0.5', g) for g in ref_zeros_str[:num_zeros]]
                 pert_rhos = contrib_dict["perturbed_rhos"]
-                
+
                 if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
                     # Baseline contains two coincident copies of rho_clean for split mode
                     clean_for_recon = clean_zeros_mpc[:zero_idx] + [rho_clean, rho_clean] + clean_zeros_mpc[zero_idx + 1:]
@@ -549,19 +582,19 @@ def evaluate_point(
                     modified_zeros_mpc = list(clean_zeros_mpc)
                     if 0 <= zero_idx < len(modified_zeros_mpc):
                         modified_zeros_mpc = clean_zeros_mpc[:zero_idx] + pert_rhos + clean_zeros_mpc[zero_idx + 1:]
-                
+
                 # Compute full explicit formula reconstructions
                 full_clean_pi = converter.riemann_explicit_pi_audit(x_str, clean_for_recon, dps=dps + 15)
                 full_pert_pi = converter.riemann_explicit_pi_audit(x_str, modified_zeros_mpc, dps=dps + 15)
                 full_diff = full_pert_pi - full_clean_pi
-                
+
                 # True prime pi(x)
                 x_mpf = math_core.to_mpf(x_str, dps=dps + 15)
                 try:
                     true_pi_val = reference_data.prime_pi(float(x_mpf)) if x_mpf <= 100000 else "N/A"
                 except Exception:
                     true_pi_val = "N/A"
-                    
+
                 pert_rhos_str = "; ".join(f"{mpmath.nstr(r.real, n=dps)} + {mpmath.nstr(r.imag, n=dps)}j" for r in pert_rhos)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
 
@@ -588,14 +621,14 @@ def evaluate_point(
                     split_defect_cj = math_core.to_mpf(contrib_dict.get("split_defect_cj", contrib_dict.get("delta_cj", 0)), dps=dps + 15)
                     split_defect_cpi = math_core.to_mpf(contrib_dict.get("split_defect_cpi", contrib_dict.get("delta_cpi", 0)), dps=dps + 15)
                     split_defect_pi_n = full_diff
-                    
+
                     # Evaluate symmetry error S(delta) - S(-delta)
                     neg_contrib = converter.compute_perturbed_contributions_audit(
                         x_str, rho_clean, str(-d_mpf), mode=mode, dps=dps + 15
                     )
                     neg_s_cj = math_core.to_mpf(neg_contrib.get("split_defect_cj", neg_contrib.get("delta_cj", 0)), dps=dps + 15)
                     neg_s_cpi = math_core.to_mpf(neg_contrib.get("split_defect_cpi", neg_contrib.get("delta_cpi", 0)), dps=dps + 15)
-                    
+
                     sym_err_cj = abs(split_defect_cj - neg_s_cj)
                     sym_err_cpi = abs(split_defect_cpi - neg_s_cpi)
                     symmetry_error = max(sym_err_cj, sym_err_cpi)
@@ -662,17 +695,17 @@ def evaluate_point(
                 delta_str = inputs.get("delta", "0.0")
                 gamma_str = inputs.get("gamma", "14.13472514173469379045725198356247027078425711569924317568556746")
                 k_str = inputs.get("K", inputs.get("k", "0"))
-                
+
                 D_K = math_core.symmetric_centrifuge_defect(delta_str, gamma_str, k_str, dps=dps + 15)
                 expected_abs_D_K = math_core.symmetric_centrifuge_defect_expected(delta_str, k_str, dps=dps + 15)
                 abs_D_K = abs(D_K)
                 identity_error = abs(abs_D_K - expected_abs_D_K)
-                
+
                 k_val = math_core.to_mpf(k_str, dps=dps + 15)
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
                 tau = math_core.get_tau(dps=dps + 15)
                 arg_scale = abs(k_val * d_val * mpmath.log(tau))
-                
+
                 if arg_scale > mpmath.mpf("1e-40"):
                     small_arg_ratio = abs_D_K / (k_val * d_val * mpmath.log(tau))**2
                     small_arg_ratio_str = mpmath.nstr(small_arg_ratio, n=dps)
@@ -680,7 +713,7 @@ def evaluate_point(
                     small_arg_ratio_str = "1.0"
                 else:
                     small_arg_ratio_str = "N/A"
-                    
+
                 return "ok", {
                     "delta": delta_str,
                     "gamma": gamma_str,
@@ -702,35 +735,35 @@ def evaluate_point(
                 x_str = inputs.get("x", "20.0")
                 num_zeros = int(inputs.get("num_zeros", "10"))
                 mode = inputs.get("perturbation_mode", inputs.get("mode", "single_pair_diagnostic"))
-                
+
                 ref_zeros_str = reference_data.load_reference_zeros()[:max(num_zeros, zero_idx + 1)]
                 if not ref_zeros_str:
                     ref_zeros_str = ["14.13472514173469379045725198356247027078425711569924317568556746"]
-                
+
                 gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if zero_idx < len(ref_zeros_str) else ref_zeros_str[0])
-                
+
                 k_val = math_core.to_mpf(k_str, dps=dps + 15)
                 tau = math_core.get_tau(dps=dps + 15)
                 A = mpmath.power(tau, k_val)
                 x_mpf = math_core.to_mpf(x_str, dps=dps + 15)
                 x_prime = mpmath.power(x_mpf, mpmath.mpf(1) / A)
-                
+
                 rho_clean = mpmath.mpc('0.5', gamma_str)
                 rho_clean_prime = A * rho_clean
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
-                
+
                 # Unperturbed clean converter wave covariance
                 clean_cj = converter.zero_j_contribution_audit(x_mpf, rho_clean, dps=dps + 15)
                 clean_cj_prime = converter.zero_j_contribution_audit(x_prime, rho_clean_prime, dps=dps + 15)
                 clean_cj_residual = abs(clean_cj_prime - clean_cj)
-                
+
                 # Perturbed converter wave covariance
                 if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
                     rho_plus = mpmath.mpc(mpmath.mpf('0.5') + d_val, rho_clean.imag)
                     rho_minus = mpmath.mpc(mpmath.mpf('0.5') - d_val, rho_clean.imag)
                     rho_plus_prime = A * rho_plus
                     rho_minus_prime = A * rho_minus
-                    
+
                     pert_cj = (
                         converter.zero_j_contribution_audit(x_mpf, rho_plus, dps=dps + 15) +
                         converter.zero_j_contribution_audit(x_mpf, rho_minus, dps=dps + 15)
@@ -740,7 +773,7 @@ def evaluate_point(
                         converter.zero_j_contribution_audit(x_prime, rho_minus_prime, dps=dps + 15)
                     )
                     pert_cj_residual = abs(pert_cj_prime - pert_cj)
-                    
+
                     split_defect = pert_cj - (mpmath.mpf(2) * clean_cj)
                     split_defect_prime = pert_cj_prime - (mpmath.mpf(2) * clean_cj_prime)
                     delta_cj_residual = abs(split_defect_prime - split_defect)
@@ -751,13 +784,13 @@ def evaluate_point(
                     pert_cj = converter.zero_j_contribution_audit(x_mpf, rho_pert, dps=dps + 15)
                     pert_cj_prime = converter.zero_j_contribution_audit(x_prime, rho_pert_prime, dps=dps + 15)
                     pert_cj_residual = abs(pert_cj_prime - pert_cj)
-                    
+
                     delta_cj = pert_cj - clean_cj
                     delta_cj_prime = pert_cj_prime - clean_cj_prime
                     delta_cj_residual = abs(delta_cj_prime - delta_cj)
-                    
+
                 cov_residual = max(clean_cj_residual, pert_cj_residual, delta_cj_residual)
-                
+
                 return "ok", {
                     "k": k_str,
                     "A": mpmath.nstr(A, n=dps),
@@ -786,15 +819,15 @@ def evaluate_point(
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
                 zero_fam = inputs.get("zero_family", "nontrivial")
-                
+
                 if "nontrivial_index" in inputs:
                     z_1based = int(inputs["nontrivial_index"])
                 else:
                     z_1based = zero_idx + 1 if zero_idx >= 0 else 1
-                    
+
                 ref_zeros_str = reference_data.load_reference_zeros()
                 gamma_str = inputs.get("gamma", ref_zeros_str[z_1based - 1] if 0 < z_1based <= len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
-                
+
                 cert_hash, cert_ok, zc, errs = _lookup_zero_certificate(
                     z_1based,
                     zero_family=zero_fam,
@@ -802,26 +835,34 @@ def evaluate_point(
                 )
                 if not cert_ok:
                     return "error", {}, f"Zero #{z_1based} certificate verification failed: {errs}"
-                
+
+                grade_int = int(k_str) if k_str.lstrip("-+").isdigit() else 0
+                wl_hash, wl_ok, wlc, wl_errs = _lookup_worldline_certificate(
+                    zero_family=zero_fam,
+                    index=z_1based,
+                    grade=grade_int,
+                    delta=delta_str
+                )
+
                 rho_clean = mpmath.mpc('0.5', gamma_str)
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
-                
+
                 g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
                 scale_A = g_obj.numeric_scale(dps=dps + 15)
-                
+
                 s_world = transcendental.zero_worldline_point(rho_clean, g_obj, delta=delta_str, dps=dps + 15)
                 sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
                 radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
-                
+
                 # Invariance error: |R_tau(s_world, k) - delta|
                 leaf_inv_err = abs(radial_leaf - d_val)
-                
+
                 # Extended function evaluation at worldline point
                 z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
                 zeta_res = abs(z_world)
-                
+
                 max_res = max(zeta_res, leaf_inv_err)
-                
+
                 return "ok", {
                     "k": k_str,
                     "grade_type": g_obj.semantic_type,
@@ -833,7 +874,8 @@ def evaluate_point(
                     "gamma": gamma_str,
                     "delta": delta_str,
                     "source_zero_cert_hash": cert_hash or "N/A",
-                    "certificate_verified": "true" if cert_ok else "false",
+                    "worldline_cert_hash": wl_hash or "N/A",
+                    "certificate_verified": "true" if (cert_ok and (wl_ok or wl_hash is None)) else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -850,15 +892,15 @@ def evaluate_point(
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
                 zero_fam = inputs.get("zero_family", "nontrivial")
-                
+
                 if "nontrivial_index" in inputs:
                     z_1based = int(inputs["nontrivial_index"])
                 else:
                     z_1based = zero_idx + 1 if zero_idx >= 0 else 1
-                    
+
                 ref_zeros_str = reference_data.load_reference_zeros()
                 gamma_str = inputs.get("gamma", ref_zeros_str[z_1based - 1] if 0 < z_1based <= len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
-                
+
                 cert_hash, cert_ok, zc, errs = _lookup_zero_certificate(
                     z_1based,
                     zero_family=zero_fam,
@@ -866,31 +908,39 @@ def evaluate_point(
                 )
                 if not cert_ok:
                     return "error", {}, f"Zero #{z_1based} certificate verification failed: {errs}"
-                
+
+                grade_int = int(k_str) if k_str.lstrip("-+").isdigit() else 0
+                wl_hash, wl_ok, wlc, wl_errs = _lookup_worldline_certificate(
+                    zero_family=zero_fam,
+                    index=z_1based,
+                    grade=grade_int,
+                    delta=delta_str
+                )
+
                 rho_base = mpmath.mpc(mpmath.mpf('0.5'), gamma_str)
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
-                
+
                 g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
                 scale_A = g_obj.numeric_scale(dps=dps + 15)
-                
+
                 s_world = transcendental.zero_worldline_point(rho_base, g_obj, delta=delta_str, dps=dps + 15)
                 sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
                 radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
-                
+
                 # Invariance error: |R_tau(s_world, k) - delta|
                 radial_residual = abs(radial_leaf - d_val)
-                
+
                 # Signed and absolute defect
                 signed_defect = s_world.real - sigma_c
                 expected_signed_defect = scale_A * d_val
                 signed_defect_error = abs(signed_defect - expected_signed_defect)
-                
+
                 abs_defect = abs(signed_defect)
                 expected_abs_defect = scale_A * abs(d_val)
                 defect_scaling_error = abs(abs_defect - expected_abs_defect)
-                
+
                 max_res = max(radial_residual, defect_scaling_error)
-                
+
                 return "ok", {
                     "k": k_str,
                     "grade_type": g_obj.semantic_type,
@@ -902,7 +952,8 @@ def evaluate_point(
                     "gamma": gamma_str,
                     "delta": delta_str,
                     "source_zero_cert_hash": cert_hash or "N/A",
-                    "certificate_verified": "true" if cert_ok else "false",
+                    "worldline_cert_hash": wl_hash or "N/A",
+                    "certificate_verified": "true" if (cert_ok and (wl_ok or wl_hash is None)) else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -924,29 +975,38 @@ def evaluate_point(
                     m_idx = int(inputs.get("zero_index", 0)) + 1
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
-                
+
                 cert_hash, cert_ok, zc, errs = _lookup_zero_certificate(
                     m_idx,
                     zero_family="trivial"
                 )
                 if not cert_ok:
                     return "error", {}, f"Trivial zero #{m_idx} certificate verification failed: {errs}"
-                
+
+                grade_int = int(k_str) if k_str.lstrip("-+").isdigit() else 0
                 s_exact = -2 * m_idx
+
+                wl_hash, wl_ok, wlc, wl_errs = _lookup_worldline_certificate(
+                    zero_family="trivial",
+                    index=m_idx,
+                    grade=grade_int,
+                    delta=str(s_exact - 0.5)
+                )
+
                 g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
                 scale_A = g_obj.numeric_scale(dps=dps + 15)
-                
+
                 s_world = mpmath.mpc(s_exact, 0) * scale_A
                 sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
                 radial_leaf = (s_world.real / scale_A) - mpmath.mpf("0.5")
                 expected_R = mpmath.mpf(s_exact) - mpmath.mpf("0.5")
-                
+
                 leaf_inv_err = abs(radial_leaf - expected_R)
-                
+
                 z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
                 zeta_res = abs(z_world)
                 max_res = max(zeta_res, leaf_inv_err)
-                
+
                 return "ok", {
                     "k": k_str,
                     "grade_type": g_obj.semantic_type,
@@ -956,7 +1016,8 @@ def evaluate_point(
                     "trivial_index": str(m_idx),
                     "exact_s": str(s_exact),
                     "source_zero_cert_hash": cert_hash or "N/A",
-                    "certificate_verified": "true" if cert_ok else "false",
+                    "worldline_cert_hash": wl_hash or "N/A",
+                    "certificate_verified": "true" if (cert_ok and (wl_ok or wl_hash is None)) else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -968,11 +1029,12 @@ def evaluate_point(
                     "residual": mpmath.nstr(max_res, n=dps)
                 }, None
 
+
             elif operation == "cross_height_coherence":
                 zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
                 u_str = inputs.get("u", "0.0")
                 block_name = inputs.get("block", None)
-                
+
                 z_idx_1based = 1
                 if block_name:
                     blk = reference_data.get_zero_block(block_name)
@@ -990,15 +1052,15 @@ def evaluate_point(
                     ref_zeros_str = reference_data.load_reference_zeros()
                     gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
                     z_idx_1based = zero_idx + 1 if zero_idx < 10 else 1
-                    
+
                 cert_hash, cert_ok, zc, _ = _lookup_zero_certificate(z_idx_1based)
                 delta_n = transcendental.mean_zero_spacing_delta(gamma_str, dps=dps + 20)
                 taylor_info = transcendental.extract_taylor_shape_coefficients(gamma_str, dps=dps + 20)
                 path_info = transcendental.evaluate_derivative_normalized_path(gamma_str, u_str, dps=dps + 20)
-                
+
                 # Check simplicity via analytical audit
                 is_simple, z_res, _ = reference_data.audit_simple_zero_residual(gamma_str, dps=dps + 20)
-                
+
                 return "ok", {
                     "gamma": gamma_str,
                     "u": u_str,
@@ -1024,7 +1086,7 @@ def evaluate_point(
                 pair_key = inputs.get("block_pair", "low_to_medium")
                 zero_idx = int(inputs.get("zero_index", "0"))
                 u_max_val = mpmath.mpf(inputs.get("u_max", "0.5"))
-                
+
                 if pair_key == "low_to_medium":
                     b1, b2 = "low_validation", "medium_research"
                 elif pair_key == "low_to_high":
@@ -1036,28 +1098,28 @@ def evaluate_point(
                     b1, b2 = parts[0], parts[1]
                 else:
                     b1, b2 = "low_validation", "medium_research"
-                    
+
                 blk1 = reference_data.get_zero_block(b1)
                 blk2 = reference_data.get_zero_block(b2)
                 ords1 = blk1.get("ordinates", [])
                 ords2 = blk2.get("ordinates", [])
-                
+
                 g1_str = ords1[zero_idx % len(ords1)]
                 g2_str = ords2[zero_idx % len(ords2)]
-                
+
                 z1_idx = 1 + (zero_idx % len(ords1))
                 z2_idx = 100 + (zero_idx % len(ords2)) if b2 == "medium_research" else (1000 + (zero_idx % len(ords2)) if b2 == "high_research" else 10000 + (zero_idx % len(ords2)))
                 h1, ok1, _, _ = _lookup_zero_certificate(z1_idx)
                 h2, ok2, _, _ = _lookup_zero_certificate(z2_idx)
-                
+
                 # Construct 21-point symmetric grid on [-u_max, u_max]
                 u_points = [str(mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8)) for i in range(-10, 11)]
-                
+
                 dist_res = transcendental.compute_cross_height_path_distance(g1_str, g2_str, u_points=u_points, dps=dps + 20)
-                
+
                 l_inf = dist_res["L_infty_distance"]
                 l_2 = dist_res["L_2_distance"]
-                
+
                 return "ok", {
                     "block_pair": pair_key,
                     "block_1": b1,
@@ -1081,11 +1143,11 @@ def evaluate_point(
             elif operation == "grade_constraint":
                 k_str = inputs.get("K", inputs.get("k", "1"))
                 delta_str = inputs.get("delta", "0.0")
-                
+
                 tau = math_core.get_tau(dps=dps + 15)
                 k_mpf = math_core.to_mpf(k_str, dps=dps + 15)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
-                
+
                 # Bilateral symmetric defect: D_K = (tau^(K*delta) - 1) * (1 - tau^(-K*delta))
                 # Theoretical identity: |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2)
                 phi = k_mpf * d_mpf * mpmath.log(tau)
@@ -1093,7 +1155,7 @@ def evaluate_point(
                 abs_d_k = abs(d_k)
                 expected_abs_d_k = 4 * mpmath.power(mpmath.sinh(phi / 2), 2)
                 identity_error = abs(abs_d_k - expected_abs_d_k)
-                
+
                 return "ok", {
                     "K": k_str,
                     "delta": delta_str,
@@ -1105,7 +1167,7 @@ def evaluate_point(
 
             else:
                 return "error", {}, f"Unknown operation '{operation}'"
-                
+
         except Exception as e:
             return "error", {}, str(e)
 
@@ -1121,7 +1183,7 @@ def evaluate_criterion(
         with mpmath.workdps(dps + 15):
             obs = mpmath.mpf(observed_str.strip())
             thresh = mpmath.mpf(threshold_str.strip())
-            
+
             if operator == "<=":
                 return bool(obs <= thresh)
             elif operator == "<":
@@ -1176,7 +1238,7 @@ def compute_metric_stats(
                     })
                 except Exception:
                     pass
-                    
+
         if not valid_points:
             return {
                 "metric": metric_name,
@@ -1189,16 +1251,16 @@ def compute_metric_stats(
                 "argmax_abs": None,
                 "worst_points": []
             }
-            
+
         count = len(valid_points)
         min_pt = min(valid_points, key=lambda p: p["val"])
         max_pt = max(valid_points, key=lambda p: p["val"])
         argmax_abs_pt = max(valid_points, key=lambda p: p["val_abs"])
-        
+
         # Sort points descending by absolute value for worst points
         sorted_by_worst = sorted(valid_points, key=lambda p: p["val_abs"], reverse=True)
         worst_5 = sorted_by_worst[:5]
-        
+
         worst_points_records = [
             {
                 "point_id": p["point_id"],
@@ -1208,7 +1270,7 @@ def compute_metric_stats(
             }
             for p in worst_5
         ]
-        
+
         return {
             "metric": metric_name,
             "label": label or metric_name,
@@ -1240,16 +1302,16 @@ def compute_summary(
     aggregation = crit_spec.get("aggregation", "max_abs")
     operator = crit_spec.get("operator", "<=")
     threshold_str = str(crit_spec.get("threshold", "0.0"))
-    
+
     points_req = len(results)
     points_completed = sum(1 for r in results if r.get("status") == "ok")
     points_failed = sum(1 for r in results if r.get("status") == "error")
-    
+
     with mpmath.workdps(dps + 15):
         # Collect all declared report metrics
         metric_declarations = []
         seen_metric_names = set()
-        
+
         # Primary criterion metric is always tracked
         metric_declarations.append({
             "metric": target_metric,
@@ -1257,7 +1319,7 @@ def compute_summary(
             "label": f"Primary metric: {target_metric}"
         })
         seen_metric_names.add(target_metric)
-        
+
         declared_reports = spec.get("report_metrics", [])
         if isinstance(declared_reports, list):
             for item in declared_reports:
@@ -1271,7 +1333,7 @@ def compute_summary(
                     m_label = item.get("label", m_name)
                 else:
                     continue
-                    
+
                 if m_name and m_name not in seen_metric_names:
                     metric_declarations.append({
                         "metric": m_name,
@@ -1282,10 +1344,10 @@ def compute_summary(
                 elif m_name and m_name == target_metric:
                     metric_declarations[0]["kind"] = m_kind
                     metric_declarations[0]["label"] = m_label
-                    
+
         report_metrics_dict = {}
         metrics_summary_dict = {}
-        
+
         for decl in metric_declarations:
             m_name = decl["metric"]
             stats = compute_metric_stats(
@@ -1297,11 +1359,11 @@ def compute_summary(
             )
             report_metrics_dict[m_name] = stats
             metrics_summary_dict[m_name] = stats["max_abs"]
-            
+
         target_stats = report_metrics_dict.get(target_metric)
         anomalies = []
         warnings = []
-        
+
         if aggregation == "none":
             observed_metric_str = None
             criterion_met = None
@@ -1330,7 +1392,7 @@ def compute_summary(
             else:
                 observed_metric_str = target_stats["max_abs"]
                 criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str, dps=dps)
-                
+
             min_observed = target_stats["min"]
             max_observed = target_stats["max"]
         else:
@@ -1340,12 +1402,12 @@ def compute_summary(
             min_observed = "N/A"
             max_observed = "N/A"
             anomalies.append(f"Criterion metric '{target_metric}' was never emitted by any point.")
-            
+
         for decl in metric_declarations:
             m_name = decl["metric"]
             if report_metrics_dict.get(m_name, {}).get("count", 0) == 0:
                 warnings.append(f"Declared report metric '{m_name}' was not emitted by any point.")
-            
+
         criterion_dict = {
             "metric": target_metric,
             "aggregation": aggregation,
@@ -1354,7 +1416,7 @@ def compute_summary(
             "observed": observed_metric_str,
             "criterion_met": criterion_met if status == "complete" else None
         }
-        
+
         summary = {
             "schema_version": "2",
             "run_id": run_id,
@@ -1374,10 +1436,10 @@ def compute_summary(
             "anomalies": anomalies,
             "warnings": warnings
         }
-        
+
         if points_failed > 0:
             summary["warnings"].append(f"{points_failed} points encountered execution errors")
-            
+
         return summary
 
 
@@ -1390,7 +1452,7 @@ def generate_run_readme(
     crit = summary["criterion"]
     crit_agg = crit.get("aggregation", "max_abs")
     crit_met = crit.get("criterion_met")
-    
+
     if crit_agg == "none":
         crit_status = "OBSERVATIONAL / NO CRITERION DECLARED"
     elif crit_met is True:
@@ -1399,7 +1461,7 @@ def generate_run_readme(
         crit_status = "CRITERION NOT MET"
     else:
         crit_status = "INCOMPLETE / INVALID"
-        
+
     report_metrics = summary.get("report_metrics", {})
     table_rows = []
     for m_name, m_data in report_metrics.items():
@@ -1409,9 +1471,9 @@ def generate_run_readme(
         max_val = m_data.get("max", "N/A")
         max_abs = m_data.get("max_abs", "N/A")
         table_rows.append(f"| `{m_name}` | `{kind}` | {count} | `{min_val}` | `{max_val}` | `{max_abs}` |")
-        
+
     metrics_table = "\n".join(table_rows) if table_rows else "| None | - | 0 | - | - | - |"
-    
+
     metric_details = []
     for m_name, m_data in report_metrics.items():
         kind = m_data.get("kind", "criterion_component")
@@ -1419,7 +1481,7 @@ def generate_run_readme(
         max_abs = m_data.get("max_abs", "N/A")
         argmax = m_data.get("argmax_abs")
         worst = m_data.get("worst_points", [])
-        
+
         detail_lines = [
             f"### `{m_name}`",
             f"- **Classification:** `{kind}`",
@@ -1430,7 +1492,7 @@ def generate_run_readme(
             detail_lines.append("- **Note:** *Diagnostic metric only; not evaluated as part of exact covariance pass/fail criterion.*")
         elif kind == "observational_metric":
             detail_lines.append("- **Note:** *Observational response metric; no pass/fail criterion declared.*")
-            
+
         if argmax and argmax.get("inputs"):
             inputs_str = ", ".join(f"{k}={v}" for k, v in argmax["inputs"].items())
             val_display = argmax.get("value")
@@ -1439,7 +1501,7 @@ def generate_run_readme(
                 detail_lines.append(f"- **Argmax Parameter Point (id={argmax.get('point_id')}):** `val={val_display} (|val|={abs_display})` | `{inputs_str}`")
             else:
                 detail_lines.append(f"- **Argmax Parameter Point (id={argmax.get('point_id')}):** `val={val_display}` | `{inputs_str}`")
-                
+
         if worst:
             detail_lines.append("- **Top Worst Parameter Points:**")
             for wp in worst[:5]:
@@ -1450,9 +1512,9 @@ def generate_run_readme(
                     detail_lines.append(f"  - id={wp.get('point_id')} | `val={w_val} (|val|={w_abs})` | `{in_str}`")
                 else:
                     detail_lines.append(f"  - id={wp.get('point_id')} | `val={w_val}` | `{in_str}`")
-                
+
         metric_details.append("\n".join(detail_lines))
-        
+
     details_block = "\n\n".join(metric_details) if metric_details else "No metric details available."
 
     crit_summary_line = (
@@ -1475,16 +1537,16 @@ def generate_run_readme(
 
     return f"""# Experiment Run Digest — {spec.get('title', spec['id'])}
 
-**Run ID:** `{manifest['run_id']}`  
-**Experiment ID:** `{spec['id']}`  
-**Status:** `{summary['status'].upper()}`  
+**Run ID:** `{manifest['run_id']}`
+**Experiment ID:** `{spec['id']}`
+**Status:** `{summary['status'].upper()}`
 **Criterion Outcome:** **{crit_status}**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > {summary['hypothesis'].strip()}
 
 {crit_summary_line}
@@ -1541,7 +1603,7 @@ def update_index_file(run_entry: Dict[str, Any]):
                     index_data = {"schema_version": "2", "runs": raw}
         except Exception:
             index_data = {"schema_version": "2", "runs": []}
-            
+
     runs = index_data.get("runs", [])
     found = False
     for i, e in enumerate(runs):
@@ -1551,11 +1613,11 @@ def update_index_file(run_entry: Dict[str, Any]):
             break
     if not found:
         runs.append(run_entry)
-        
+
     index_data["runs"] = runs
     index_data["total_runs"] = len(runs)
     index_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+
     with open(INDEX_FILE, "w", encoding="utf-8") as f:
         json.dump(index_data, f, indent=2)
 
@@ -1574,42 +1636,42 @@ def run_experiment(
     """
     if not os.path.exists(spec_path):
         raise FileNotFoundError(f"Spec file not found: {spec_path}")
-        
+
     with open(spec_path, "r", encoding="utf-8") as f:
         raw_yaml = f.read()
         spec = yaml.safe_load(raw_yaml)
-        
+
     is_valid, err_msg = validate_spec(spec)
     if not is_valid:
         raise ValueError(f"Invalid experiment specification in '{spec_path}': {err_msg}")
-        
+
     spec_sha = hash_string(raw_yaml)
     git_commit, git_dirty = get_git_info()
     dps = spec["precision"]["dps"]
     tau_str = math_core.get_tau_str(dps=dps)
-    
+
     # Expand parameter grid
     grid = generate_parameter_grid(spec["parameters"], dps=dps)
     total_points = len(grid)
-    
+
     # Determine run identity
     exp_id = spec["id"]
     stable_dir = os.path.join(RUNS_DIR, exp_id)
     run_id = exp_id
-    
+
     # Determine run identity and working directory
     if resume_run_id:
         work_dir = stable_dir
         if not os.path.exists(work_dir):
             raise FileNotFoundError(f"Cannot resume: Run directory '{work_dir}' does not exist")
-            
+
         manifest_path = os.path.join(work_dir, "manifest.json")
         if not os.path.exists(manifest_path):
             raise FileNotFoundError(f"Cannot resume: Missing '{manifest_path}'")
-            
+
         with open(manifest_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
-            
+
         # Verify compatibility for resume
         if manifest.get("experiment_spec_sha256") != spec_sha:
             raise ValueError(
@@ -1621,7 +1683,7 @@ def run_experiment(
         if os.path.exists(work_dir):
             shutil.rmtree(work_dir)
         os.makedirs(work_dir, exist_ok=True)
-        
+
         # Source module hashes
         code_root = os.path.dirname(os.path.abspath(__file__))
         code_modules = {
@@ -1634,7 +1696,7 @@ def run_experiment(
             "zero_finder.py": hash_file_bytes(os.path.join(code_root, "zero_finder.py")),
             "certification.py": hash_file_bytes(os.path.join(code_root, "certification.py"))
         }
-        
+
         manifest = {
             "schema_version": "2",
             "run_id": exp_id,
@@ -1667,13 +1729,13 @@ def run_experiment(
             "code_modules": code_modules,
             "consumed_certificates": []
         }
-        
+
         with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
 
 
     results_path = os.path.join(work_dir, "results.jsonl")
-    
+
     # Read already completed point IDs if resuming
     completed_point_ids = set()
     existing_results = []
@@ -1691,12 +1753,12 @@ def run_experiment(
     # Open results.jsonl in append mode with immediate flushing
     operation = spec["engine"]["operation"]
     all_results = list(existing_results)
-    
+
     with open(results_path, "a", encoding="utf-8") as results_file:
         for point_id, inputs in enumerate(grid):
             if point_id in completed_point_ids:
                 continue
-                
+
             status, outputs, err_msg = evaluate_point(
                 operation, inputs, dps=dps, param_space=spec.get("parameters")
             )
@@ -1710,11 +1772,11 @@ def run_experiment(
             results_file.write(json.dumps(point_record) + "\n")
             results_file.flush()
             all_results.append(point_record)
-            
+
     # Mark completion
     completed_points = len(all_results)
     final_status = "complete" if completed_points == total_points else "incomplete"
-    
+
     # Collect all consumed certificate hashes
     consumed_cert_hashes: Set[str] = set()
     for rec in all_results:
@@ -1724,30 +1786,30 @@ def run_experiment(
                 val = outs.get(k)
                 if val and val != "N/A":
                     consumed_cert_hashes.add(str(val))
-                    
+
     manifest["status"] = final_status
     manifest["points_completed"] = completed_points
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
     manifest["consumed_certificates"] = sorted(list(consumed_cert_hashes))
-    
+
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
 
-        
+
     summary = compute_summary(spec, exp_id, all_results, status=final_status)
     with open(os.path.join(work_dir, "summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
-        
+
     readme_content = generate_run_readme(spec, manifest, summary)
     with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
-        
+
     # Atomic replacement: move work_dir to stable_dir
     if not resume_run_id:
         if os.path.exists(stable_dir):
             shutil.rmtree(stable_dir)
         shutil.move(work_dir, stable_dir)
-        
+
     # Update index
     run_entry: Dict[str, Any] = {
         "schema_version": "2",
@@ -1769,7 +1831,7 @@ def run_experiment(
     if "notes" in spec:
         run_entry["notes"] = spec["notes"]
     update_index_file(run_entry)
-    
+
     return exp_id
 
 
@@ -1778,11 +1840,11 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
     run_dir = os.path.join(RUNS_DIR, run_id)
     if not os.path.exists(run_dir):
         raise FileNotFoundError(f"Run directory '{run_dir}' not found")
-        
+
     manifest_path = os.path.join(run_dir, "manifest.json")
     with open(manifest_path, "r", encoding="utf-8") as f:
         manifest = json.load(f)
-        
+
     # Find corresponding experiment spec
     exp_id = manifest["experiment_id"]
     spec_path = os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml")
@@ -1799,13 +1861,13 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
                             break
                     except Exception:
                         pass
-                        
+
     if not os.path.exists(spec_path):
         raise FileNotFoundError(f"Spec for experiment '{exp_id}' not found in {EXPERIMENTS_DIR}")
-        
+
     with open(spec_path, "r", encoding="utf-8") as f:
         spec = yaml.safe_load(f)
-        
+
     results_path = os.path.join(run_dir, "results.jsonl")
     results = []
     if os.path.exists(results_path):
@@ -1813,13 +1875,13 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
             for line in f:
                 if line.strip():
                     results.append(json.loads(line))
-                    
+
     status = "complete" if len(results) >= manifest.get("points_requested", 0) else "incomplete"
     summary = compute_summary(spec, run_id, results, status=status)
-    
+
     with open(os.path.join(run_dir, "summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
-        
+
     return summary
 
 
@@ -1844,9 +1906,9 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python research_runner.py [run <spec.yaml> [--resume <run_id>] | summarize <run_id> | list]")
         sys.exit(1)
-        
+
     cmd = sys.argv[1]
-    
+
     if cmd == "run":
         if len(sys.argv) < 3:
             print("Error: Spec file required: python research_runner.py run <spec.yaml> [--resume <run_id>]")
@@ -1855,11 +1917,11 @@ def main():
         resume_id = None
         if len(sys.argv) >= 5 and sys.argv[3] == "--resume":
             resume_id = sys.argv[4]
-            
+
         print(f"Executing experiment sweep: {spec_file}...")
         run_id = run_experiment(spec_file, resume_run_id=resume_id)
         print(f"Run completed successfully: {run_id}")
-        
+
         # Print summary digest
         sum_path = os.path.join(RUNS_DIR, run_id, "summary.json")
         if os.path.exists(sum_path):

@@ -120,9 +120,30 @@ def get_first_100_trivial_zeros() -> List[int]:
     return [-2 * m for m in range(1, 101)]
 
 
-def evaluate_trivial_zero_exact(s_val: Union[int, float, mpmath.mpf]) -> Dict[str, Any]:
-    """Audit mathematical properties of integer/real point under Riemann zeta."""
-    s_int = int(s_val)
+def evaluate_trivial_zero_exact(s_val: Union[int, float, mpmath.mpf, str]) -> Dict[str, Any]:
+    """Audit mathematical properties of exact integer point under Riemann zeta.
+
+    Strictly requires an exact integer input s = -2m. Rejects non-integral floats,
+    decimal strings, or non-integral mpf values.
+    """
+    if isinstance(s_val, int):
+        s_int = s_val
+    elif isinstance(s_val, float):
+        if not s_val.is_integer():
+            raise ValueError(f"evaluate_trivial_zero_exact requires an exact integer, got non-integral float {s_val}")
+        s_int = int(s_val)
+    elif isinstance(s_val, mpmath.mpf):
+        if s_val != int(s_val):
+            raise ValueError(f"evaluate_trivial_zero_exact requires an exact integer, got non-integral mpf {s_val}")
+        s_int = int(s_val)
+    elif isinstance(s_val, str):
+        try:
+            s_int = int(s_val)
+        except ValueError:
+            raise ValueError(f"evaluate_trivial_zero_exact requires an exact integer, got non-integral string '{s_val}'")
+    else:
+        raise TypeError(f"Unsupported type for evaluate_trivial_zero_exact: {type(s_val)}")
+
     is_neg_even = (s_int < 0) and (s_int % 2 == 0)
     is_simple = is_neg_even
     is_isolated = is_neg_even
@@ -141,7 +162,6 @@ def evaluate_trivial_zero_exact(s_val: Union[int, float, mpmath.mpf]) -> Dict[st
     }
 
 
-
 def match_candidate_against_reference_interval(
     candidate_ordinate: Union[float, mpmath.mpf, str],
     ref_str: str,
@@ -150,7 +170,7 @@ def match_candidate_against_reference_interval(
     """
     Match a discovered or certified ordinate against an external reference decimal rounding interval:
         [d - 0.5 * 10^(-p), d + 0.5 * 10^(-p)]
-    
+
     Treats sourced decimal with p digits after the decimal point as a rounding interval.
     Returns (is_contained, absolute_difference, (lower_bound, upper_bound)).
     """
@@ -160,16 +180,17 @@ def match_candidate_against_reference_interval(
             precision_digits = len(ref_str.split(".")[1])
         else:
             precision_digits = 0
-            
+
     half_ulp = mpmath.mpf('0.5') * (mpmath.mpf(10) ** (-precision_digits))
     lower_b = d_ref - half_ulp
     upper_b = d_ref + half_ulp
-    
+
     cand = mpmath.mpf(candidate_ordinate)
     diff = abs(cand - d_ref)
     is_contained = bool(lower_b <= cand <= upper_b)
-    
+
     return is_contained, diff, (lower_b, upper_b)
+
 
 
 

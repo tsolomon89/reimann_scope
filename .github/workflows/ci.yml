@@ -28,7 +28,7 @@ jobs:
 
     - name: Check git diff whitespace
       run: |
-        git diff --check HEAD~2 HEAD || true
+        git diff --check HEAD~2 HEAD
 
     - name: Smoke check module imports
       run: |

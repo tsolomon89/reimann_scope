@@ -756,9 +756,13 @@ def create_proof_programme_tab():
         except Exception:
             runs_list = []
 
-    # Count certificates
+    # Count certificates dynamically
     cert_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "certificates")
-    cert_count = len(glob.glob(os.path.join(cert_dir, "**", "*.json"), recursive=True))
+    zeros_count = len(glob.glob(os.path.join(cert_dir, "zeros", "*.json")))
+    trivial_count = len(glob.glob(os.path.join(cert_dir, "trivial_zeros", "*.json")))
+    blocks_count = len(glob.glob(os.path.join(cert_dir, "blocks", "*.json")))
+    worldlines_count = len(glob.glob(os.path.join(cert_dir, "worldlines", "*.json")))
+    cert_count = zeros_count + trivial_count + blocks_count + worldlines_count
 
     prog_stages = [
         {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": "Constructed & Formally Checked", "color": "success"},
@@ -817,11 +821,12 @@ def create_proof_programme_tab():
                             className="small text-secondary mb-2"
                         ),
                         html.Ul([
-                            html.Li([html.Strong("Zero Certificates: "), "21 consecutive simple zeros across 4 spectrum blocks (Low n=1..10, Medium n=100..104, High n=1000..1002, Very High n=10000..10002). 0 ∉ ζ'(B_n) verified."], className="small text-light mb-1"),
-                            html.Li([html.Strong("Block Certificates: "), "4 complete block certificates verifying Turing zero counts and consecutiveness."], className="small text-light mb-1"),
-                            html.Li([html.Strong("Worldline Certificates: "), "100 bilateral worldline certificates across grades K in [-2..2] and radial leaves δ in {-0.1, -0.01, 0, 0.01, 0.1}."], className="small text-light mb-1"),
+                            html.Li([html.Strong(f"Nontrivial Zero Certificates ({zeros_count}): "), "Certified simple zeros across 4 spectrum blocks (Low n=1..100, Medium n=100..104, High n=1000..1002, Very High n=10000..10002). 0 ∉ ζ'(B_n) verified in Arb."], className="small text-light mb-1"),
+                            html.Li([html.Strong(f"Trivial Zero Controls ({trivial_count}): "), "Certified trivial zeros s_m = -2m (m=1..100) with non-vanishing derivative 0 ∉ ζ'(-2m)."], className="small text-light mb-1"),
+                            html.Li([html.Strong(f"Block Certificates ({blocks_count}): "), f"{blocks_count} complete block certificates verifying Turing zero counts N(t_max)-N(t_min) and consecutiveness."], className="small text-light mb-1"),
+                            html.Li([html.Strong(f"Worldline Certificates ({worldlines_count}): "), f"{worldlines_count} bilateral worldline certificates across grades K in [-2..2] and radial leaves δ."], className="small text-light mb-1"),
                         ]),
-                        dbc.Alert("All 125 mathematical certificates in data/certificates/ have been verified independently.", color="success", className="small py-2 mb-0")
+                        dbc.Alert(f"Total of {cert_count} machine-verifiable certificates in data/certificates/ verified fail-closed via Python-FLINT/Arb ball arithmetic.", color="success", className="small py-2 mb-0")
                     ], className="p-3")
                 ], className="border-secondary shadow-sm mb-3")
             ], xs=12, lg=6),
@@ -914,7 +919,7 @@ app.layout = html.Div([
     create_export_modal(),
     dcc.Store(id="store-audit-mode", data=False),
     dcc.Store(id="store-discovered-zeros", data=INITIAL_ZEROS_FLOAT),
-    
+
     dbc.Container([
         dbc.Tabs([
             dbc.Tab(label="Microscope / Macroscope (4-Panel Visualizer)", tab_id="tab-instrument", children=create_instrument_tab()),
@@ -1061,7 +1066,7 @@ def toggle_validation_report_modal(n_open, n_close, is_open):
         ref_meta = prov.get("reference_datasets", {}).get("zeta_zeros", {})
         source_name = ref_meta.get("source", "Odlyzko Tables")
         sha_str = ref_meta.get("sha256", "N/A")[:16] + "..." if ref_meta.get("sha256") else "N/A"
-        
+
         content = html.Div([
             html.Table([
                 html.Tr([html.Th("Validation Status:"), html.Td(dbc.Badge("PASS", color="success") if report["status"] == "PASS" else dbc.Badge("FAIL", color="danger"))]),
@@ -1240,7 +1245,7 @@ def update_all_panels(
 ):
     dps = 80 if cert_mode in ["audit", "certified"] else 35
     n_samples = 500 if cert_mode in ["audit", "certified"] else 250
-    
+
     t0_val = t0 if t0 is not None else 14.0
     dt_val = dt if dt is not None else 20.0
     delta_offset_val = delta_offset if delta_offset is not None else 0.0
@@ -1326,7 +1331,7 @@ def update_all_panels(
     x_min_a, x_max_a = target_min_x, target_max_x
     y_min_a, y_max_a = float(np.min(s_coords.imag)) - 2.0, float(np.max(s_coords.imag)) + 2.0
     dtick_a = compute_matching_dtick(x_max_a - x_min_a, target_ticks=6)
-    
+
     fig_a.update_layout(
         title=dict(text="Panel A: Domain Plane (s = σ + it)", font=dict(size=12)),
         xaxis=dict(range=[x_min_a, x_max_a], title="Re(s)", dtick=dtick_a, tick0=0),
@@ -1417,7 +1422,7 @@ def update_all_panels(
 
     rec_cache = cache.get_converter_cache(max_x=50.0, n_points=300)
     x_pts = rec_cache.x_grid
-    
+
     true_pi = reference_data.prime_pi_array(x_pts)
     fig_c.add_trace(go.Scatter(
         x=x_pts, y=true_pi,
@@ -1428,7 +1433,7 @@ def update_all_panels(
     perturb_mode = perturb_mode_val if perturb_mode_val is not None else "single_pair_diagnostic"
     clean_gamma = INITIAL_ZEROS_FLOAT[selected_idx_val] if selected_idx_val < len(INITIAL_ZEROS_FLOAT) else 14.134725
     clean_rho_val = complex(0.5, clean_gamma)
-    
+
     clean_pi, pert_pi = rec_cache.reconstruct_pi_perturbed(
         num_zeros=num_zeros_val,
         perturbed_zero_idx=selected_idx_val,
@@ -1471,9 +1476,9 @@ def update_all_panels(
     idx_20 = int(np.argmin(np.abs(x_pts - 20.0)))
     pi_clean_20 = clean_pi[idx_20]
     pi_pert_20 = pert_pi[idx_20]
-    
+
     mode_label = "SINGLE-PAIR DIAGNOSTIC" if perturb_mode == "single_pair_diagnostic" else "SYMMETRY-COMPLETE QUARTET"
-    
+
     # Certification Badge in Certified Mode (Fails Closed with FLINT Replay Verification)
     cert_badge = None
     if cert_mode == "certified":
@@ -1565,7 +1570,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
     u_max = float(u_max_val or 0.5)
     zero_idx = int(zero_idx_val or 0)
     blocks = selected_blocks or CANONICAL_BLOCK_KEYS
-    
+
     # 1. Gather zeros for selected blocks
     block_colors = {
         "low_validation": "#00d2ff",
@@ -1573,9 +1578,9 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
         "high_research": "#ffea00",
         "very_high_sparse": "#ff007f"
     }
-    
+
     u_grid = np.linspace(-u_max, u_max, 41)
-    
+
     fig_overlay = go.Figure(layout=DARK_LAYOUT)
     fig_overlay.update_layout(
         title=dict(text=f"Normalized Paths u ↦ P_n(u) in Complex Plane (u ∈ [-{u_max}, {u_max}])", font=dict(size=12)),
@@ -1601,7 +1606,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
     selected_ordinates = []
     matrix_labels = []
     block_eval_pts = {}
-    
+
     for b_key in blocks:
         blk = reference_data.get_zero_block(b_key)
         ords = blk.get("ordinates", [])
@@ -1611,10 +1616,10 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
         selected_ordinates.append((b_key, g_str))
         label = f"{blk.get('name', b_key).split('(')[0].strip()} (γ ≈ {float(g_str):.2f})"
         matrix_labels.append(f"{b_key[:4]}_z{zero_idx}")
-        
+
         # Precompute zeta'(rho_n) once for this zero
         zp = transcendental.evaluate_zeta_derivative_at_zero(g_str, dps=dps)
-        
+
         # Evaluate P_n(u) curve
         p_re_list, p_im_list, dev_list = [], [], []
         c_pts = []
@@ -1627,7 +1632,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
             c_val = complex(re_val, im_val)
             c_pts.append(c_val)
             dev_list.append(abs(c_val - u_val))
-            
+
         block_eval_pts[b_key] = c_pts
         col = block_colors.get(b_key, "#ffffff")
         fig_overlay.add_trace(go.Scatter(
@@ -1646,7 +1651,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
     N = len(selected_ordinates)
     dist_matrix = np.zeros((N, N))
     hover_matrix = []
-    
+
     for i in range(N):
         hover_row = []
         for j in range(N):
@@ -1755,9 +1760,9 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
     k_min = int(k_min_val if k_min_val is not None else -5)
     k_max = int(k_max_val if k_max_val is not None else 5)
     deltas = selected_deltas or [0.0]
-    
+
     k_range = list(range(k_min, k_max + 1))
-    
+
     fig_traj = go.Figure(layout=DARK_LAYOUT)
     fig_traj.update_layout(
         title=dict(text=f"Bilateral Worldlines in Complex Plane for γ = {gamma:.4f}", font=dict(size=12)),
@@ -1795,16 +1800,16 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
         col = delta_colors.get(d, "#ffffff")
         is_actual = (d == 0.0)
         label = f"δ = {d:+.2f} ({'Actual Zero Worldline' if is_actual else 'Synthetic Radial Leaf'})"
-        
+
         for K in k_range:
             g_obj = transcendental.IntegerTauGrade(K=K)
             s_pt = transcendental.zero_worldline_point(complex(0.5, gamma), g_obj, delta=str(d), dps=dps)
             re_pts.append(float(s_pt.real))
             im_pts.append(float(s_pt.imag))
-            
+
             r_val = float(transcendental.normalized_radial_leaf(s_pt, g_obj, dps=dps))
             r_tau_pts.append(r_val)
-            
+
             sigma_c = float(transcendental.critical_surface_sigma(g_obj, dps=dps))
             defect_pts.append(max(1e-15, abs(float(s_pt.real) - sigma_c)))
 

@@ -37,5 +37,7 @@ This directory houses the formal Lean 4 verification layer for `reimann_scope` c
    - Identical vanishing for on-line zeros ($\delta = 0 \implies D_K = 0$)
 
 8. **`Contradiction.lean`**:
-   - Abstract `AbstractZero` structure and `SingleRadialLeaf` predicate
-   - Radial rigidity contradiction skeleton
+   - Radial displacement coordinate $\delta(s) = \Re(s) - 1/2$
+   - Functional equation reflection theorem $\delta(1 - s) = -\delta(s)$
+   - Conditional reflection theorem: reflection closure + radial rigidity ($\forall s \in S, \delta(s) = \delta_0$) forces $\delta_0 = 0$ and $\Re(s) = 1/2$ for all $s \in S$
+   - Deductive contradiction corollary forbidding off-line zeros under radial rigidity

@@ -15,13 +15,13 @@ def test_certify_and_verify_single_zero():
     """Verify zero certification on the first Riemann zero."""
     if not certification.FLINT_AVAILABLE:
         pytest.skip("FLINT/python-flint not available")
-        
+
     cert = certification.certify_zero(1, dps=50)
     assert cert["certificate_type"] == "zero_isolation_and_simplicity"
     assert cert["zero_index"] == 1
     assert cert["status"] == "simple_zero_certified"
     assert cert["derivative_enclosure"]["excludes_zero"] is True
-    
+
     is_valid, msg = certification.verify_certificate(cert)
     assert is_valid, f"Certificate verification failed: {msg}"
 
@@ -30,14 +30,14 @@ def test_certify_and_verify_block():
     """Verify block certification on low validation block."""
     if not certification.FLINT_AVAILABLE:
         pytest.skip("FLINT/python-flint not available")
-        
+
     zero_indices = list(range(1, 11))
     cert, zero_certs = certification.certify_block("low_validation", zero_indices, dps=50)
     assert cert["certificate_type"] == "complete_block_certificate"
     assert cert["zero_count"] == 10
     assert len(zero_certs) == 10
     assert cert["status"] == "complete_block_certified"
-    
+
     cert_store = {zc["certificate_hash"]: zc for zc in zero_certs}
     is_valid, msg = certification.verify_certificate(cert, cert_store=cert_store)
     assert is_valid, f"Block certificate verification failed: {msg}"
@@ -47,17 +47,17 @@ def test_certify_and_verify_worldline():
     """Verify worldline certification for actual zero (delta=0) and synthetic leaf (delta=0.05)."""
     if not certification.FLINT_AVAILABLE:
         pytest.skip("FLINT/python-flint not available")
-        
+
     z_cert = certification.certify_zero(1, dps=50)
     cert_store = {z_cert["certificate_hash"]: z_cert}
-    
+
     # Actual zero worldline
     wl_actual = certification.certify_worldline(z_cert, grade=1, delta="0.0", dps=50)
     assert wl_actual["certificate_type"] == "worldline_certificate"
     assert wl_actual["claim_type"] == "actual_zero_worldline"
     is_valid, msg = certification.verify_certificate(wl_actual, cert_store=cert_store)
     assert is_valid, f"Actual worldline verification failed: {msg}"
-    
+
     # Synthetic leaf
     wl_synth = certification.certify_worldline(z_cert, grade=2, delta="0.05", dps=50)
     assert wl_synth["certificate_type"] == "worldline_certificate"
@@ -77,18 +77,18 @@ def test_authoritative_certification_path_prohibits_float_downcasts():
     """Verify that all ball midpoints and radii in certificates are stored as exact strings, not Python floats."""
     if not certification.FLINT_AVAILABLE:
         pytest.skip("FLINT/python-flint not available")
-        
+
     cert = certification.certify_zero(1, dps=50)
     enc = cert["enclosure"]
     assert isinstance(enc["real_mid"], str)
     assert isinstance(enc["real_rad"], str)
     assert isinstance(enc["imag_mid"], str)
     assert isinstance(enc["imag_rad"], str)
-    
+
     iso = cert["isolation_interval"]
     assert isinstance(iso["lower_bound"], str)
     assert isinstance(iso["upper_bound"], str)
-    
+
     deriv = cert["derivative_enclosure"]
     assert isinstance(deriv["real_mid"], str)
     assert isinstance(deriv["real_rad"], str)
@@ -112,7 +112,7 @@ def test_adversarial_01_zero_ordinate_moved_to_999():
     tampered["certificate_hash"] = certification._sha256_canonical(tampered)
     ok, msgs = certification.verify_certificate(tampered)
     assert not ok
-    assert any("does not overlap stored enclosure" in m for m in msgs)
+    assert any("not contained in stored enclosure" in m for m in msgs)
 
 
 def test_adversarial_02_wrong_zero_index_with_valid_fields():
@@ -127,8 +127,7 @@ def test_adversarial_02_wrong_zero_index_with_valid_fields():
     tampered["certificate_hash"] = certification._sha256_canonical(tampered)
     ok, msgs = certification.verify_certificate(tampered)
     assert not ok
-    assert any("Replayed zero #2 ordinate" in m for m in msgs)
-
+    assert any("Replayed zero #2" in m for m in msgs)
 
 
 def test_adversarial_03_zero_enclosure_radius_removed_or_narrowed():
@@ -143,7 +142,7 @@ def test_adversarial_03_zero_enclosure_radius_removed_or_narrowed():
     tampered["certificate_hash"] = certification._sha256_canonical(tampered)
     ok, msgs = certification.verify_certificate(tampered)
     assert not ok
-    assert any("does not overlap stored enclosure" in m for m in msgs)
+    assert any("not contained in stored enclosure" in m for m in msgs)
 
 
 def test_adversarial_04_claimed_simplicity_with_derivative_containing_zero():
@@ -159,7 +158,6 @@ def test_adversarial_04_claimed_simplicity_with_derivative_containing_zero():
     ok, msgs = certification.verify_certificate(tampered)
     assert not ok
     assert any("derivative" in m.lower() for m in msgs)
-
 
 
 def test_adversarial_05_block_nonexistent_constituent_hashes():
@@ -255,7 +253,8 @@ def test_adversarial_10_worldline_arbitrary_transformed_point():
     cert_store = {z["certificate_hash"]: z}
     ok, msgs = certification.verify_certificate(tampered, cert_store=cert_store)
     assert not ok
-    assert any("does not overlap recomputed worldline point" in m for m in msgs)
+    assert any("does not contain recomputed worldline point" in m for m in msgs)
+
 
 
 def test_adversarial_11_worldline_dropped_source_radius():
@@ -347,6 +346,146 @@ def test_adversarial_16_negative_or_malformed_radius():
     assert any("negative" in m.lower() for m in msgs)
 
 
+def test_adversarial_missing_dependency_fingerprint():
+    """Adversarial: Certificate with missing or empty dependency fingerprint rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    del tampered["dependency_fingerprint"]
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("dependency_fingerprint" in m for m in msgs)
+
+
+def test_adversarial_forged_incompatible_dependency_version():
+    """Adversarial: Certificate with incompatible/unsupported library or missing version rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    tampered["dependency_fingerprint"]["python_flint"] = "N/A"
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("python_flint" in m for m in msgs)
+
+
+def test_adversarial_empty_source_hash_map():
+    """Adversarial: Certificate with empty source_code_hashes rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["source_code_hashes"] = {}
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("source_code_hashes" in m for m in msgs)
+
+
+def test_adversarial_omitted_required_source_hash():
+    """Adversarial: Certificate omitting a required source module hash rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["source_code_hashes"] = dict(z["source_code_hashes"])
+    del tampered["source_code_hashes"]["transforms.py"]
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("transforms.py" in m for m in msgs)
+
+
+def test_adversarial_empty_input_hash_map():
+    """Adversarial: Certificate with empty input_data_hashes rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["input_data_hashes"] = {}
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("input_data_hashes" in m for m in msgs)
+
+
+def test_adversarial_omitted_required_data_hash():
+    """Adversarial: Certificate omitting a required input data hash rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["input_data_hashes"] = dict(z["input_data_hashes"])
+    del tampered["input_data_hashes"]["canonical_blocks.json"]
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("canonical_blocks.json" in m for m in msgs)
+
+
+def test_adversarial_fake_or_malformed_producing_commit():
+    """Adversarial: Certificate with fake or malformed producing git commit rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    for bad_commit in ["FAKE", "FORGED", "UNKNOWN", "abc"]:
+        tampered = dict(z)
+        tampered["producing_git_commit"] = bad_commit
+        tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+        ok, msgs = certification.verify_certificate(tampered)
+        assert not ok
+        assert any("producing_git_commit" in m for m in msgs)
+
+
+def test_adversarial_overlap_without_containment():
+    """Adversarial: Stored ball that merely overlaps but does not contain the authoritative replay enclosure is rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["enclosure"] = dict(z["enclosure"])
+    # Shift midpoint by 1e-10 and set radius to 2e-10 so it overlaps the true zero (~14.1347) but does not contain the 80-dps root
+    true_im = float(tampered["enclosure"]["imag_mid"])
+    tampered["enclosure"]["imag_mid"] = str(true_im + 1e-10)
+    tampered["enclosure"]["imag_rad"] = "1e-12"
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("is not contained in stored enclosure" in m for m in msgs)
+
+
+def test_adversarial_contradictory_block_status():
+    """Adversarial: Block claiming complete_block_certified but all_zeros_simple is False."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    blk, z_certs = certification.certify_block("test_blk", [1, 2, 3], dps=50)
+    tampered = dict(blk)
+    tampered["all_zeros_simple"] = False
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    cert_store = {zc["certificate_hash"]: zc for zc in z_certs}
+    ok, msgs = certification.verify_certificate(tampered, cert_store=cert_store)
+    assert not ok
+    assert any("Contradictory block status" in m for m in msgs)
+
+
+def test_adversarial_missing_isolation_count_evidence():
+    """Adversarial: Block certificate missing endpoint bounds for Turing zero counting."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    blk, z_certs = certification.certify_block("test_blk", [1, 2, 3], dps=50)
+    tampered = dict(blk)
+    tampered["endpoint_bounds"] = {}
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    cert_store = {zc["certificate_hash"]: zc for zc in z_certs}
+    ok, msgs = certification.verify_certificate(tampered, cert_store=cert_store)
+    assert not ok
+    assert any("Missing endpoint bounds" in m for m in msgs)
+
+
 def test_trivial_zero_certification_and_verification():
     """Test certification and verification of trivial zeros s_m = -2m."""
     if not certification.FLINT_AVAILABLE:
@@ -359,9 +498,8 @@ def test_trivial_zero_certification_and_verification():
         assert cert["exact_location"] == -2 * m
         assert cert["status"] in ("simple_zero_certified", "isolated_zero_certified")
         assert cert["derivative_enclosure"]["excludes_zero"] is True
-        
-        ok, msgs = certification.verify_certificate(cert, check_provenance=False)
 
+        ok, msgs = certification.verify_certificate(cert, check_provenance=False)
         assert ok, f"Trivial zero m={m} failed verification: {msgs}"
 
 
@@ -371,14 +509,13 @@ def test_trivial_zero_worldline_certification():
         pytest.skip("FLINT/python-flint not available")
     tzc = certification.certify_trivial_zero(1, dps=50)
     cert_store = {tzc["certificate_hash"]: tzc}
-    
+
     for K in [-2, 0, 2]:
         wl = certification.certify_worldline(tzc, grade=K, delta="0.0", dps=50)
         assert wl["certificate_type"] == "worldline_certificate"
         assert wl["claim_type"] == "trivial_zero_worldline"
         assert wl["zero_family"] == "trivial"
         assert wl["trivial_index"] == 1
-        
+
         ok, msgs = certification.verify_certificate(wl, cert_store=cert_store, check_provenance=False)
         assert ok, f"Trivial zero worldline K={K} failed verification: {msgs}"
-
