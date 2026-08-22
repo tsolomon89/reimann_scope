@@ -337,7 +337,7 @@ def _lookup_worldline_certificate(
 ) -> Tuple[Optional[str], bool, Optional[Dict[str, Any]], List[str]]:
     """Look up and strictly verify a worldline certificate from data/certificates/worldlines/."""
     code_root = os.path.dirname(os.path.abspath(__file__))
-    delta_str = str(delta).strip()
+    delta_str = delta.strip()
     d_float = float(delta_str)
     delta_tag = f"delta_{d_float:+.2f}".replace(".", "p").replace("+", "pos").replace("-", "neg")
     if zero_family == "trivial":
