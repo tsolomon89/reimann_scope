@@ -39,9 +39,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "be8db0d7ceddadce866813a2f1eefd998a22fbc9",
+  "producing_git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
   "source_code_hashes": {
-    "certification.py": "db21b28838b1ea58453741673717774d06ee099462d32a0af79411c58a7ffb9f",
+    "certification.py": "44a7d38f86db425a5e60378fbbe9c824a9c48ed8ee44687be56967c11baa2f2a",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -66,12 +66,12 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-22T20:38:58.540702+00:00",
+  "created_at": "2026-08-22T20:54:56.821742+00:00",
   "invalidation_conditions": [
     "derivative_enclosure_contains_zero",
     "isolation_interval_overlap",
     "source_code_hash_mismatch",
     "input_data_hash_mismatch"
   ],
-  "certificate_hash": "ff16e88bc7b49b5e1bb6464d0ba46a8d66bb6e60b8d26c925e89ff022791adff"
+  "certificate_hash": "a82d12bbfe0023640f69aed8413eae9d894ef7eecbf315d76085ff0b167ddd69"
 }

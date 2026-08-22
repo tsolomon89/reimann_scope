@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "report_type": "certificate_verification_report",
   "status": "verified",
-  "timestamp": "2026-08-22T20:48:02.202715+00:00",
+  "timestamp": "2026-08-22T20:56:32.299853+00:00",
   "total_inventory": 507,
   "nontrivial_zeros_count": 110,
   "trivial_zeros_count": 100,
@@ -21,7 +21,7 @@
     "algorithm_version": "2.0.0"
   },
   "source_code_hashes": {
-    "certification.py": "db21b28838b1ea58453741673717774d06ee099462d32a0af79411c58a7ffb9f",
+    "certification.py": "44a7d38f86db425a5e60378fbbe9c824a9c48ed8ee44687be56967c11baa2f2a",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -36,7 +36,7 @@
     "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
     "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
   },
-  "producing_git_commit": "5b13547802ccd1896252f913d5ecd6f63e5da067",
+  "producing_git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
   "failures": [],
-  "report_hash": "d3a3ecdb94167133470f8c9fb190751391e103bd4d647a24ed46686c1a0faded"
+  "report_hash": "c0fd015465c0ebe7bebddb11337dd8a653b56c2ade5d7fb8a6264c95d7865d61"
 }

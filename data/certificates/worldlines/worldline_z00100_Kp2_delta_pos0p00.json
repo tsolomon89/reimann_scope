@@ -3,7 +3,7 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "actual_zero_worldline",
-  "source_zero_hash": "26df71971a02300b0072dd7dcf59e1b213f186a7f253eced1cde46f1fc038dcb",
+  "source_zero_hash": "20f4b92d4160b8cf752cafb8c94b3ea204f40690103dbbac0cebffbbfe543d2b",
   "source_zero_family": "nontrivial",
   "source_zero_index": 100,
   "zero_family": "nontrivial",
@@ -29,9 +29,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "be8db0d7ceddadce866813a2f1eefd998a22fbc9",
+  "producing_git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
   "source_code_hashes": {
-    "certification.py": "db21b28838b1ea58453741673717774d06ee099462d32a0af79411c58a7ffb9f",
+    "certification.py": "44a7d38f86db425a5e60378fbbe9c824a9c48ed8ee44687be56967c11baa2f2a",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -56,11 +56,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-22T20:39:13.193286+00:00",
+  "created_at": "2026-08-22T20:55:11.711998+00:00",
   "invalidation_conditions": [
     "source_zero_hash_mismatch",
     "radial_residual_tolerance_exceeded",
     "formal_theorem_missing"
   ],
-  "certificate_hash": "e7ac35211e4c2e07aebdbb3048d052de016eb17edbb1e4247edd303cfc01a67e"
+  "certificate_hash": "90e0305b1beee706a4dd1c12edb7757ee9285674aa98d2d70256af9a9584ea58"
 }
