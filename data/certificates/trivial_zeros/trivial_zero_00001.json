@@ -41,15 +41,15 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
+  "producing_git_commit": "c42abca1318ae5031b1972af785ef49e772d359c",
   "source_code_hashes": {
-    "certification.py": "44a7d38f86db425a5e60378fbbe9c824a9c48ed8ee44687be56967c11baa2f2a",
+    "certification.py": "5be1873ddaa6acec496237ebe53ede2f4010176989a53ccd6499e636b92d9967",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "e37afc4bbaba463c40510f063a91614fcd7b202a731c046b74899fed8dccdffe",
+    "research_runner.py": "83df30dd938ce8bfbc6bb8af54a7624d5c150b8869cf81a733d557b20957e453",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -68,11 +68,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-22T20:55:01.356095+00:00",
+  "created_at": "2026-08-22T21:59:21.795699+00:00",
   "invalidation_conditions": [
     "zeta_eval_nonzero",
     "derivative_enclosure_contains_zero",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "243c344fb5561cfe8f2936bf55afb8c4709b83865a6e10cff41c4d961ae801d0"
+  "certificate_hash": "b33a53944ad107126a05153ec4a6647f56be28a490d4e7b1f0bddf478960284f"
 }

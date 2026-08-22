@@ -3,10 +3,10 @@
   "run_id": "cross-height-path-coherence-001",
   "experiment_id": "cross-height-path-coherence-001",
   "experiment_spec_sha256": "64b4fe387d81a1a374d963cdc977806ff3ecf79e2bdaed496a207b96f2028166",
-  "git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
+  "git_commit": "c42abca1318ae5031b1972af785ef49e772d359c",
   "git_dirty": false,
-  "started_at": "2026-08-22T20:56:46.075757+00:00",
-  "completed_at": "2026-08-22T20:57:12.598664+00:00",
+  "started_at": "2026-08-22T21:59:58.832101+00:00",
+  "completed_at": "2026-08-22T22:00:23.967392+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -126,27 +126,27 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "e37afc4bbaba463c40510f063a91614fcd7b202a731c046b74899fed8dccdffe",
+    "research_runner.py": "83df30dd938ce8bfbc6bb8af54a7624d5c150b8869cf81a733d557b20957e453",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887",
-    "certification.py": "44a7d38f86db425a5e60378fbbe9c824a9c48ed8ee44687be56967c11baa2f2a"
+    "certification.py": "5be1873ddaa6acec496237ebe53ede2f4010176989a53ccd6499e636b92d9967"
   },
   "consumed_certificates": [
-    "20f4b92d4160b8cf752cafb8c94b3ea204f40690103dbbac0cebffbbfe543d2b",
-    "3dc2b15d008d9d8d82058edcd13ec1266459d31f8092a1afdbfbc3608fe24976",
-    "3e88e10c3d4d3d6ee9d9afecf17435a54f05d41d52f28c3613f4a0a21575e65f",
-    "5c931fd9a55e54bcdb844aee8c040211b1bb44ea33bd9d14ef934d4be641b567",
-    "7ca79f720cf1243e76eaf98f5030b58a080b97afb5c2b60ed02c5da6aeb6e058",
-    "8815235d4aba93de66424a7939386041eee66bea4d325f170c43ed2b9e752d8c",
-    "8c8a54fbc6b56c07645229dd1e7a5601afe246c7e622c66a0f1fa6fe8a16ff4a",
-    "b02b136c28ee8f80de48e7ac9e221d907bb8dc19e2d80b76b3cf59376d74c2d2",
-    "b5f6b2c3e749f07cc34770639fe67bf3884329c17f6d1203ad804a56d92b39f4",
-    "c66ee478acccfff4562c23690e3cf9444602e3e0e26169b4f38b76e6730ec5ea",
-    "d836a1bbfc141aa127c52f12c5f4b222b9ee6ff11aebfc792aafd418486fb213",
-    "da1a6aadeaf1f40b29f9760587c66e91b123b750ddf4dc973841ac21680222b6"
+    "0d16890e21949c56f858e52beabf294977124f38c384cd90c3f5004edaa8d7d6",
+    "1198320dff9cd91a6b6630073d4cd1a40ecd08324dcf718c2eb3d4080cd34c3a",
+    "1ba03247810b571be05a3d03e0083683831ebdc0a349c6f5a100dbb6617fc430",
+    "425fa61202c772d87e357efd611dfc62760ff0ef15185ee117efb1b1289b70b9",
+    "6d6016d3165edf441f8d1ece6888824150c5cdf51078886fb641a38f81dacc34",
+    "c5ac99d4915804e5031e28c16ab4eebf38bcc861497c0d3a96a7b3a6295767f0",
+    "cfe43719101ece1a8a45be3ccea9aa871ea94bcc3ab8424378cd9f6acbe0c87a",
+    "d6dcbc96850ebcc22ba4e85ce7f1fa35ffe54eea91a6ba52c31833250755771c",
+    "d8de662aae136b6328c6d2420a2abb0c65807f577873fc54704c8ffe066c2ef0",
+    "f3ffde1fc0a58d96382c31437c523c43d230479b6043c562ee1d3aae36b88721",
+    "f529964e8aa02e3bc0b524189a3dcdd361e7f55d47e8b3c00304e8affc85531c",
+    "fd6f6abfa0978266bbc2d0301aaee934bd7975ed60a6b15d7aa2a18c814b0e7c"
   ]
 }
