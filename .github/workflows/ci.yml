@@ -26,6 +26,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Check git diff whitespace
+      run: |
+        git diff --check HEAD~2 HEAD || true
+
     - name: Smoke check module imports
       run: |
         python -c "import app, math_core, transcendental, transforms, reference_data, research_runner, zero_finder, certification; print('All core modules imported successfully.')"
@@ -38,17 +42,18 @@ jobs:
       run: |
         python -c "import reference_data; assert reference_data.verify_provenance(), 'Data provenance checksums failed'; print('Data provenance checksums verified.')"
 
-    - name: Verify certificates
+    - name: Verify strict certificates and first-100 baseline
       run: |
         python scripts/verify_certificates.py
 
     - name: Run pytest test suite
       run: |
-        pytest
+        python -m pytest
 
     - name: Dash application smoke test
       run: |
         python -c "import app; assert app.app.layout is not None; print('Dash application initialized successfully.')"
+
 
   lean-ci:
     runs-on: ubuntu-latest
