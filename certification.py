@@ -607,7 +607,11 @@ def verify_certificate(
                 expected_c_hash = const_hashes[i] if i < len(const_hashes) else None
                 zc = None
                 if cert_store:
-                    zc = cert_store.get(expected_c_hash) or cert_store.get(f"zero_{expected_zero_idx:05d}")
+                    if expected_c_hash is not None:
+                        zc = cert_store.get(expected_c_hash)
+                    if zc is None:
+                        zc = cert_store.get(f"zero_{expected_zero_idx:05d}")
+
                 if zc is None:
                     # Look up on filesystem
                     disk_path = os.path.join(ZEROS_DIR, f"zero_{expected_zero_idx:05d}.json")
