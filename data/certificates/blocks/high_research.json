@@ -10,9 +10,9 @@
   "zero_count": 3,
   "mathematical_claim": "Canonical block 'high_research' contains exactly 3 certified consecutive simple zeros for indices 1000..1002",
   "constituent_zero_hashes": [
-    "2a1377d27d6e019de0463dcd48e9f3c95940a9f44b57d0b2442f78ad3cbf6b32",
-    "aef21f35a8f121bed303796cd442f0ecce2761b44adffdf60ef620ddf88192e5",
-    "18d1665959235c8b7b5dd208cdf1307d27f0d5788a87f2b5c2f3ac2aee601961"
+    "6f4d978b2f1764ed6b1b797bd4702d48ac80bc9facdecc63b22d9095a951993d",
+    "e9a333cae90317a8b410e9a07dab5786e681cba59e825c5361919bcd09639ce6",
+    "ce9249ea61f8dc6d262165c98d060850ad7049a1eee949d4bfb0c69cac5ea90c"
   ],
   "height_range": [
     "1419.422480945995686465989038079916819232100601064166016304690814684608676417593010417911343291179210",
@@ -33,9 +33,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
+  "producing_git_commit": "269911e4bca5a18b72d8388f20d17c2f000c9540",
   "source_code_hashes": {
-    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283",
+    "certification.py": "4af9b84e3146f668406e63433bf9bfa7f6b1019663cb8faa2886d3c768311524",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -56,11 +56,11 @@
     "mpmath": "1.3.0",
     "platform": "win32"
   },
-  "created_at": "2026-08-22T10:46:46.219439+00:00",
+  "created_at": "2026-08-22T12:57:45.099328+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "43d7d36a030dc8cf316bf61c90ec6eba7a36bc3a13b738c0c3b56066c247e725"
+  "certificate_hash": "8ac8ede766197afafc8e2ba4fe0bb46324a078ccbb4f9ada2ad04d357db6d3a8"
 }

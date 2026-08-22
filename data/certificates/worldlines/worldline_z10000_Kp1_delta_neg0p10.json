@@ -6,7 +6,7 @@
   "zero_family": "nontrivial",
   "trivial_index": null,
   "nontrivial_index": 10000,
-  "source_zero_hash": "b3fc00327ad1fbdc3feb7da9159302d352f0f721bfd469e947b1ffc8a9b9320b",
+  "source_zero_hash": "db0a75fb0b87673b8cee4c2b738d688306c2cac892cb28ee4e2dabec204b6962",
   "source_zero_family": "nontrivial",
   "source_zero_index": 10000,
   "grade_K": 1,
@@ -29,9 +29,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
+  "producing_git_commit": "269911e4bca5a18b72d8388f20d17c2f000c9540",
   "source_code_hashes": {
-    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283",
+    "certification.py": "4af9b84e3146f668406e63433bf9bfa7f6b1019663cb8faa2886d3c768311524",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -52,11 +52,11 @@
     "mpmath": "1.3.0",
     "platform": "win32"
   },
-  "created_at": "2026-08-22T10:46:55.274968+00:00",
+  "created_at": "2026-08-22T12:57:54.022132+00:00",
   "invalidation_conditions": [
     "source_zero_hash_mismatch",
     "radial_residual_tolerance_exceeded",
     "formal_theorem_missing"
   ],
-  "certificate_hash": "40d22417c9a06061a570fdc0089b05073836054c86ab3f7394deadd976c01e01"
+  "certificate_hash": "f4303fb52db42ebd0e6d987b2bfca85702e23237c4a845b85d22750e47ad992b"
 }

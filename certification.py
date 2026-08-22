@@ -796,9 +796,10 @@ def verify_certificate(
             if not isinstance(m_idx, int) or m_idx < 1:
                 anomalies.append(f"Invalid trivial_index: {m_idx}")
                 return False, anomalies
-            if s_exact != -2 * m_idx:
+            if not isinstance(s_exact, int) or s_exact != -2 * m_idx:
                 anomalies.append(f"exact_location ({s_exact}) does not match -2 * trivial_index ({-2 * m_idx})")
                 return False, anomalies
+
                 
             # Replay FLINT evaluation of zeta(-2m)
             s_ball = acb(s_exact, 0)
