@@ -1,0 +1,66 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "worldline_certificate",
+  "status": "worldline_certified",
+  "claim_type": "trivial_zero_worldline",
+  "source_zero_hash": "65ea95f1566295acb9dada4ac2d4eb9c18f1f9ff3409982775af91a73f90cf62",
+  "source_zero_family": "trivial",
+  "source_zero_index": 7,
+  "zero_family": "trivial",
+  "trivial_index": 7,
+  "nontrivial_index": null,
+  "grade_K": 1,
+  "symbolic_scale": "tau^1",
+  "delta": "-14.5",
+  "transformed_point": {
+    "real_mid": "-87.96459430051421067695401473182608075752074318250296298729844858461885937601385196158497510957927790",
+    "real_rad": "4.40e-99",
+    "imag_mid": "0",
+    "imag_rad": "0"
+  },
+  "critical_surface_real": "3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068",
+  "normalized_radial": "-14.50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "radial_residual": "6.585641271078223080512728270447773697362050567023304300665457029150508205494049950882010683163220282e-100",
+  "defect_residual": "4.486225524408400793223032730810635157840135044068594295063550057628618389842455670011900321913293244e-99",
+  "mathematical_claim": "Trivial zero worldline s(1) = tau^1 * (-14) occupies exact radial leaf R_tau = -14.5 (non-critical zero, R_tau != 0)",
+  "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
+  "precision_dps": 80,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "be8db0d7ceddadce866813a2f1eefd998a22fbc9",
+  "source_code_hashes": {
+    "certification.py": "db21b28838b1ea58453741673717774d06ee099462d32a0af79411c58a7ffb9f",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
+    "research_runner.py": "e37afc4bbaba463c40510f063a91614fcd7b202a731c046b74899fed8dccdffe",
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
+  },
+  "created_at": "2026-08-22T20:39:16.181396+00:00",
+  "invalidation_conditions": [
+    "source_zero_hash_mismatch",
+    "radial_residual_tolerance_exceeded",
+    "formal_theorem_missing"
+  ],
+  "certificate_hash": "8bc982dace1fe149c4dba62f855e4c60ae40d6f2c2b60b6598a2dca6b0af58d5"
+}
