@@ -11,6 +11,7 @@ Implements the canonical mathematical framework defined in:
 from __future__ import annotations
 
 import fractions
+import functools
 import math
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
@@ -381,6 +382,7 @@ def mean_zero_spacing_delta(
         return tau / mpmath.log(g / tau)
 
 
+@functools.lru_cache(maxsize=256)
 def evaluate_zeta_derivative_at_zero(
     gamma: Union[str, float, mpmath.mpf],
     dps: int = 80
@@ -416,7 +418,7 @@ def evaluate_derivative_normalized_path(
         zeta_val = math_core.zeta_eval(s_sample, dps=dps + 25)
         
         if zeta_prime is None:
-            zeta_prime = evaluate_zeta_derivative_at_zero(g, dps=dps + 25)
+            zeta_prime = evaluate_zeta_derivative_at_zero(str(g), dps=dps)
             
         denom = mpmath.mpc('0', '1') * delta_n * zeta_prime
         if abs(denom) < mpmath.mpf('1e-50'):
@@ -438,6 +440,7 @@ def evaluate_derivative_normalized_path(
         }
 
 
+@functools.lru_cache(maxsize=256)
 def extract_taylor_shape_coefficients(
     gamma: Union[str, float, mpmath.mpf],
     dps: int = 80

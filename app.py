@@ -1591,6 +1591,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
     selected_zero_labels = []
     selected_ordinates = []
     matrix_labels = []
+    block_eval_pts = {}
     
     for b_key in blocks:
         blk = reference_data.get_zero_block(b_key)
@@ -1602,16 +1603,23 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
         label = f"{blk.get('name', b_key).split('(')[0].strip()} (γ ≈ {float(g_str):.2f})"
         matrix_labels.append(f"{b_key[:4]}_z{zero_idx}")
         
+        # Precompute zeta'(rho_n) once for this zero
+        zp = transcendental.evaluate_zeta_derivative_at_zero(g_str, dps=dps)
+        
         # Evaluate P_n(u) curve
         p_re_list, p_im_list, dev_list = [], [], []
+        c_pts = []
         for u_val in u_grid:
-            p_res = transcendental.evaluate_derivative_normalized_path(g_str, str(u_val), dps=dps)
+            p_res = transcendental.evaluate_derivative_normalized_path(g_str, str(u_val), dps=dps, zeta_prime=zp)
             re_val = float(p_res["P_n_re"])
             im_val = float(p_res["P_n_im"])
             p_re_list.append(re_val)
             p_im_list.append(im_val)
-            dev_list.append(abs(complex(re_val, im_val) - u_val))
+            c_val = complex(re_val, im_val)
+            c_pts.append(c_val)
+            dev_list.append(abs(c_val - u_val))
             
+        block_eval_pts[b_key] = c_pts
         col = block_colors.get(b_key, "#ffffff")
         fig_overlay.add_trace(go.Scatter(
             x=p_re_list, y=p_im_list, mode="lines",
@@ -1625,12 +1633,11 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
         ))
         selected_zero_labels.append(f"• {label}: γ = {g_str[:12]}...")
 
-    # Pairwise Distance Matrix Heatmap
+    # Pairwise Distance Matrix Heatmap (using cached point arrays)
     N = len(selected_ordinates)
     dist_matrix = np.zeros((N, N))
     hover_matrix = []
     
-    u_points_str = [str(u) for u in u_grid]
     for i in range(N):
         hover_row = []
         for j in range(N):
@@ -1638,11 +1645,16 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
                 dist_matrix[i, j] = 0.0
                 hover_row.append(f"Same zero: {matrix_labels[i]}")
             else:
-                g1 = selected_ordinates[i][1]
-                g2 = selected_ordinates[j][1]
-                d_res = transcendental.compute_cross_height_path_distance(g1, g2, u_points=u_points_str, dps=dps)
-                l_inf = d_res["L_infty_distance"]
-                l_2 = d_res["L_2_distance"]
+                b1 = selected_ordinates[i][0]
+                b2 = selected_ordinates[j][0]
+                pts1 = block_eval_pts.get(b1, [])
+                pts2 = block_eval_pts.get(b2, [])
+                if pts1 and pts2:
+                    diffs = [abs(p1 - p2) for p1, p2 in zip(pts1, pts2)]
+                    l_inf = float(max(diffs))
+                    l_2 = float(np.sqrt(np.mean([d**2 for d in diffs])))
+                else:
+                    l_inf, l_2 = 0.0, 0.0
                 dist_matrix[i, j] = l_inf
                 hover_row.append(f"Pair: {matrix_labels[i]} vs {matrix_labels[j]}<br>L_inf: {l_inf:.4f}<br>L_2: {l_2:.4f}")
         hover_matrix.append(hover_row)
