@@ -3,10 +3,10 @@
   "run_id": "coupled-scale-covariance-001",
   "experiment_id": "coupled-scale-covariance-001",
   "experiment_spec_sha256": "a28d5cee43ea6ac51945b442681a7f8fbe73d2c74e8ab3e8db608cb7e311aa79",
-  "git_commit": "08243ae4fe96d6a51011143c7420058f8757d350",
+  "git_commit": "28fb8bfda3d2f98200676ccc43c851b0f35f6f1f",
   "git_dirty": false,
-  "started_at": "2026-08-22T17:48:54.437744+00:00",
-  "completed_at": "2026-08-22T17:48:55.081793+00:00",
+  "started_at": "2026-08-22T20:02:33.314092+00:00",
+  "completed_at": "2026-08-22T20:02:33.943630+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -126,7 +126,7 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "44bd0bd7ca122558f33faedc0c5286a51849135521f62bbd47f423ab9609d8bb",
+    "research_runner.py": "952931f9be3acf045416a5312f91eb2dbceacdb0a8a746eb56d62814bb5228d0",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",

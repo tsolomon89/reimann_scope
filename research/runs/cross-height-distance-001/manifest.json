@@ -3,10 +3,10 @@
   "run_id": "cross-height-distance-001",
   "experiment_id": "cross-height-distance-001",
   "experiment_spec_sha256": "ef6696444ac87bfac6f217f8e28c9eed5f7ea3bd8f9d582519544494e5534cc9",
-  "git_commit": "08243ae4fe96d6a51011143c7420058f8757d350",
+  "git_commit": "28fb8bfda3d2f98200676ccc43c851b0f35f6f1f",
   "git_dirty": false,
-  "started_at": "2026-08-22T17:48:55.240650+00:00",
-  "completed_at": "2026-08-22T17:49:02.125754+00:00",
+  "started_at": "2026-08-22T20:02:34.162687+00:00",
+  "completed_at": "2026-08-22T20:02:40.887403+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -119,7 +119,7 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "44bd0bd7ca122558f33faedc0c5286a51849135521f62bbd47f423ab9609d8bb",
+    "research_runner.py": "952931f9be3acf045416a5312f91eb2dbceacdb0a8a746eb56d62814bb5228d0",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -129,9 +129,9 @@
     "certification.py": "d7d1a3993b127d212b893e12ee664455098684819bad2955d50bd0e852c0d4f9"
   },
   "consumed_certificates": [
-    "0202b684ffe329afbc222d7abad8b475b62e43fedbf46f16fe6797cfce321786",
-    "36a4d1b39dbc91dad0c1384ca36beac8a799e674e7e9b2db158a1af45f218adc",
-    "7022f4a7c962e4e7607f5bdf18032ddbdef5b0b0071146c2df27e98f72ee1913",
-    "c4c2b874effd415001c2eb7421b22b2bcc1eb66f210560fa5a88446c0eb5e353"
+    "ad3a3de8528ab908cef1fc6cebc94d941cdff4968f81f084adefb90aa6c68810",
+    "c2831b74bc0eabe110c225ddec2882dd45d08d749b9413b2744a319416ae0626",
+    "f1d5ec4eeb1e42ead6a29a5bb0fb7921096a76e50f6ac35b161f3d56ae7ed0d6",
+    "f5cb13463133e20bdaa180c286aa6d2d295ae9a8023e972dff69c45ee02e37c1"
   ]
 }
