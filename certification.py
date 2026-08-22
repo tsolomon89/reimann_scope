@@ -56,8 +56,8 @@ WORLDLINES_DIR = os.path.join(CERT_DIR, "worldlines")
 
 
 def _sha256_canonical(obj: Dict[str, Any]) -> str:
-    """Compute SHA-256 of JSON object without the 'certificate_hash' field."""
-    clean_obj = {k: v for k, v in obj.items() if k != "certificate_hash"}
+    """Compute SHA-256 of JSON object without the 'certificate_hash' or 'report_hash' fields."""
+    clean_obj = {k: v for k, v in obj.items() if k not in ("certificate_hash", "report_hash")}
     encoded = json.dumps(clean_obj, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
