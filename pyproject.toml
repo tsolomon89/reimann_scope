@@ -9,7 +9,9 @@ warn_unused_ignores = false
 [tool.pyright]
 reportMissingImports = "none"
 reportMissingTypeStubs = "none"
+reportMissingModuleSource = "none"
 reportGeneralTypeIssues = "none"
 reportUnknownMemberType = "none"
+extraPaths = ["C:/Development/anaconda3/Lib/site-packages", "."]
 
 
