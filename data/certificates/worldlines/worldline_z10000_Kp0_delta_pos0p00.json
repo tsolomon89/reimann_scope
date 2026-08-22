@@ -3,14 +3,16 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "actual_zero_worldline",
-  "source_zero_hash": "05a59d9b346318acf2bcbdc677daf4964899550bed5173418411f1975f3e39c8",
+  "source_zero_hash": "8e02d23f59d0d50a3064783d518c0bc1142f06a4bcaa1514faa0a602ab7eeb2b",
   "source_zero_index": 10000,
   "grade_K": 0,
   "symbolic_scale": "1",
   "delta": "0.0",
   "transformed_point": {
     "real_mid": "0.5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-    "imag_mid": "[9877.782654005501142774099070690123577622468051781115996005448274058955511917303507774113266200856117 +/- 2.18e-98]"
+    "real_rad": "0",
+    "imag_mid": "9877.782654005501142774099070690123577622468051781115996005448274058955511917303507774113266200856117",
+    "imag_rad": "4.69e-97"
   },
   "critical_surface_real": "0.5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
   "normalized_radial": "0",
@@ -21,5 +23,32 @@
   "precision_dps": 80,
   "library": "python-flint",
   "library_version": "0.6.0",
-  "certificate_hash": "060db0772b2e7022840791ba71e0ad17a1556d27b5d1a6be8b6c25c7168bfdb7"
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
+  "source_code_hashes": {
+    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32"
+  },
+  "created_at": "2026-08-22T09:22:57.406736+00:00",
+  "invalidation_conditions": [
+    "source_zero_hash_mismatch",
+    "radial_residual_tolerance_exceeded",
+    "formal_theorem_missing"
+  ],
+  "certificate_hash": "0f5fbe63e4b44622358cf11f69267b58bda42b3977beac483a2509834c9bbdc7"
 }

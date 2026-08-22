@@ -10,20 +10,55 @@
   "zero_count": 5,
   "mathematical_claim": "Canonical block 'medium_research' contains exactly 5 certified consecutive simple zeros for indices 100..104",
   "constituent_zero_hashes": [
-    "3bc11f0bde25dcde3a030f5cc99158aa22c3cf6e4a78e4f9e17ce06ac0fc612e",
-    "709e35d362449f8bd7e659912f24d1233eaae7d5b6ca64adc694a9fd9527677f",
-    "92bb1638bf27ffec7e0fb4dab66f0b0eec5471fcb410506b38b53df32a620a76",
-    "204defb0e6f8e5ab285d90ab8afa8b245b3a41a39015c20097f53b973970d9ea",
-    "ec935502a99566483d0e4e02ae5d05b6e3ba95608f4b941771021d373146ab4f"
+    "e6753dbf0188f58d456051950233c493a1082b47e99878dad162a21da05ee390",
+    "953be991a11f413f85410c70fb943a2dfc2d3ea5a94c872ef6a25c5c265be306",
+    "c7287b5c007afc7d446e34a8cdf4818b3f0b388db06b7654f90cf7be67288096",
+    "7ec2702f104cf30560dc2ab4bccca200df438d9c4db0616c383b0a9d912782be",
+    "02c90ceb06f06b95342018bcc38c3e0dedf6f2dd834ffc6f16d49af410d279b5"
   ],
   "height_range": [
-    "[236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740 +/- 1.53e-98]",
-    "[242.8232719342226000168264744588785499539405437676149323831693082575287402605378973831174125968060324 +/- 2.27e-98]"
+    "236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740",
+    "242.8232719342226000168264744588785499539405437676149323831693082575287402605378973831174125968060324"
   ],
+  "endpoint_bounds": {
+    "t_min": "235.1088169223622532215900013441163834345333614833774800319668848633796525427704400946017209446938220",
+    "t_max": "243.4470852156503791268215012243615256505203672421926299200194745162256513374994707702562753591966381",
+    "N_t_min": "99",
+    "N_t_max": "104",
+    "turing_count": 5,
+    "count_verified": true
+  },
   "all_zeros_simple": true,
-  "method": "flint.acb.zeta_zero consecutive root isolation and Turing completeness verification",
+  "method": "flint.arb.zeta_nzeros Turing zero-count difference across isolating boundary endpoints",
   "precision_dps": 80,
   "library": "python-flint",
   "library_version": "0.6.0",
-  "certificate_hash": "c92d25e78805059f7fc3053bef5b8552908cc534d4e98c8df59620d0f18e7ea4"
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
+  "source_code_hashes": {
+    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32"
+  },
+  "created_at": "2026-08-22T09:22:56.960600+00:00",
+  "invalidation_conditions": [
+    "constituent_zero_hash_mismatch",
+    "turing_endpoint_count_mismatch",
+    "source_code_hash_mismatch"
+  ],
+  "certificate_hash": "2c1b063f0914322a4f935ab37fd52b104af665912fd2e0dbabc28a94ac224e50"
 }

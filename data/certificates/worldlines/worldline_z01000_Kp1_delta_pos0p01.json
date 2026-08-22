@@ -3,23 +3,52 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "synthetic_radial_leaf",
-  "source_zero_hash": "7d90991eed0139d4d9469a66c3f97cda70d29ad4677d0096eb0837d6b3813bd2",
+  "source_zero_hash": "312b54fab799771eba58fddfa3a3f8fbef9f101a419f78ba9006191ab2684582",
   "source_zero_index": 1000,
   "grade_K": 1,
   "symbolic_scale": "tau^1",
-  "delta": "0.01",
+  "delta": "+0.01",
   "transformed_point": {
-    "real_mid": "[3.204424506661589103231896250945092941881112787362607937394443484153972734411933178600595521848959409 +/- 3.07e-100]",
-    "imag_mid": "[8918.494476960276640310122428706107039602191594620572054169937006738659137095238708449197520494980556 +/- 6.40e-98]"
+    "real_mid": "3.204424506661589103231896250945092941881112787362607937394443484153972734411933178600595521848959409",
+    "real_rad": "3.96e-100",
+    "imag_mid": "8918.494476960276640310122428706107039602191594620572054169937006738659137095238708449197520494980556",
+    "imag_rad": "5.19e-97"
   },
-  "critical_surface_real": "[3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068 +/- 2.08e-101]",
-  "normalized_radial": "[0.009999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999990 +/- 2.85e-103]",
-  "radial_residual": "[3.913094526114884567939190743477590391061035903431442313836687428815609601918191116875090966462899758e-101 +/- 2.45e-201]",
-  "defect_residual": "[1.370480095233579615865409211514640594153582525964407246414827477497531106599291126544982581091569496e-100 +/- 1.63e-201]",
-  "mathematical_claim": "Bilateral graded worldline s_rho(1) = tau^1 * rho occupies radial leaf R_tau = 0.01 (synthetic radial perturbation leaf)",
+  "critical_surface_real": "3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068",
+  "normalized_radial": "0.010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "radial_residual": "3.913094526114884567939190743477590391061035903431442313836687428815609601918191116875090966462899758e-101",
+  "defect_residual": "1.370480095233579615865409211514640594153582525964407246414827477497531106599291126544982581091569496e-100",
+  "mathematical_claim": "Bilateral graded worldline s_rho(1) = tau^1 * rho occupies radial leaf R_tau = +0.01 (synthetic radial perturbation leaf)",
   "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
   "precision_dps": 80,
   "library": "python-flint",
   "library_version": "0.6.0",
-  "certificate_hash": "7e38aa5b57c42e95297a922b95132ba48a9bce109e529a27aae4a9531b701145"
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
+  "source_code_hashes": {
+    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32"
+  },
+  "created_at": "2026-08-22T09:22:57.375588+00:00",
+  "invalidation_conditions": [
+    "source_zero_hash_mismatch",
+    "radial_residual_tolerance_exceeded",
+    "formal_theorem_missing"
+  ],
+  "certificate_hash": "fd89955d875d84bd4b3c2d59b9472f88ce5198afa5e3d454223d550f7c1567d1"
 }

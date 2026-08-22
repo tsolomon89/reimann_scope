@@ -3,10 +3,10 @@
   "run_id": "centrifuge-slope-verification",
   "experiment_id": "centrifuge-slope-verification",
   "experiment_spec_sha256": "7d97f33a06ea0a90e837924a18ab60e685661721588a0894812f935223065aba",
-  "git_commit": "60b445938c97c457014e40a42d2fd3edbd8ad693",
+  "git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
   "git_dirty": false,
-  "started_at": "2026-08-21T20:38:48.331946+00:00",
-  "completed_at": "2026-08-21T20:38:48.336975+00:00",
+  "started_at": "2026-08-22T09:23:02.464051+00:00",
+  "completed_at": "2026-08-22T09:23:02.470914+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -54,7 +54,7 @@
       "last_ordinate": "396.3818542225921869319994544917305290638",
       "file_path": "data/zeros_reference.json",
       "format": "decimal strings in json",
-      "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
       "preparation_script": "scripts/fetch_reference_zeros.py"
     },
     "zeta_zeros_baseline": {
@@ -68,7 +68,7 @@
       "last_ordinate": "396.3818542225921869319994544917305290638",
       "file_path": "data/zeros_reference.json",
       "format": "decimal strings in json",
-      "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
       "preparation_script": "scripts/fetch_reference_zeros.py"
     },
     "canonical_blocks": {
@@ -87,7 +87,7 @@
       "max_x": 4999,
       "count": 669,
       "file_path": "data/primes.json",
-      "sha256": "8b9ac6ab4a8adf57614dd182063552f3d1f64a0feb0e6bdf1de52bae4e599429"
+      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
     },
     "tau": {
       "symbolic": "2*pi",
@@ -97,10 +97,14 @@
     }
   },
   "code_modules": {
+    "research_runner.py": "da5306a89089dbec9ad387376eacef4757eef98a09d8256006ec13873d622f62",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
-    "transforms.py": "dbee0592c9c3ae9c2370a0103e686973284437d460f37067c253b0f7949302c8",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
     "zero_finder.py": "c4c8e86d7bf46737ce4b41378edde777d755f02d68cb7b845dbae036b5743b34",
-    "certification.py": "37e675c8cf5769d60472309973b09c384dbd8c5168022eb8ecc10598574b5173"
-  }
+    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15"
+  },
+  "consumed_certificates": []
 }

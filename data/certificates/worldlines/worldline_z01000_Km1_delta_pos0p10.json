@@ -3,23 +3,52 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "synthetic_radial_leaf",
-  "source_zero_hash": "7d90991eed0139d4d9469a66c3f97cda70d29ad4677d0096eb0837d6b3813bd2",
+  "source_zero_hash": "312b54fab799771eba58fddfa3a3f8fbef9f101a419f78ba9006191ab2684582",
   "source_zero_index": 1000,
   "grade_K": -1,
   "symbolic_scale": "tau^-1",
-  "delta": "0.1",
+  "delta": "+0.10",
   "transformed_point": {
-    "real_mid": "[0.09549296585513720146133025802350861722067578744427386924860040643533807858053592105406828165975185157 +/- 2.02e-102]",
-    "imag_mid": "[225.9081041783168350421746462758892427090133463718068941145299983542165098748070018890217467364748777 +/- 2.21e-98]"
+    "real_mid": "0.09549296585513720146133025802350861722067578744427386924860040643533807858053592105406828165975185157",
+    "real_rad": "5.70e-102",
+    "imag_mid": "225.9081041783168350421746462758892427090133463718068941145299983542165098748070018890217467364748777",
+    "imag_rad": "3.51e-98"
   },
-  "critical_surface_real": "[0.07957747154594766788444188168625718101722982287022822437383367202944839881711326754505690138312654298 +/- 2.13e-102]",
-  "normalized_radial": "[0.09999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 +/- 1.44e-102]",
-  "radial_residual": "[4.458954944786056471026525841836426477684775923726516475531756670941040300662568169039611573338589630e-101 +/- 4.90e-201]",
-  "defect_residual": "[6.665266394546980111414658628019551317096891566764399084968642142747091666369834329733614664704024117e-102 +/- 1.75e-202]",
-  "mathematical_claim": "Bilateral graded worldline s_rho(-1) = tau^-1 * rho occupies radial leaf R_tau = 0.1 (synthetic radial perturbation leaf)",
+  "critical_surface_real": "0.07957747154594766788444188168625718101722982287022822437383367202944839881711326754505690138312654298",
+  "normalized_radial": "0.100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "radial_residual": "4.458954944786056471026525841836426477684775923726516475531756670941040300662568169039611573338589630e-101",
+  "defect_residual": "6.665266394546980111414658628019551317096891566764399084968642142747091666369834329733614664704024117e-102",
+  "mathematical_claim": "Bilateral graded worldline s_rho(-1) = tau^-1 * rho occupies radial leaf R_tau = +0.10 (synthetic radial perturbation leaf)",
   "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
   "precision_dps": 80,
   "library": "python-flint",
   "library_version": "0.6.0",
-  "certificate_hash": "85068f3fbeb7f2494818904377ebb8ed19d070242d89a651d650336f466186b6"
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
+  "source_code_hashes": {
+    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
+    "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32"
+  },
+  "created_at": "2026-08-22T09:22:57.357950+00:00",
+  "invalidation_conditions": [
+    "source_zero_hash_mismatch",
+    "radial_residual_tolerance_exceeded",
+    "formal_theorem_missing"
+  ],
+  "certificate_hash": "8092042999bf5b8d4ce02236df96bdaca79c4f266f4e8a90fd186a250a7fb790"
 }
