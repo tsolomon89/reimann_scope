@@ -3,10 +3,10 @@
   "run_id": "coupled-perturbation-covariance-001",
   "experiment_id": "coupled-perturbation-covariance-001",
   "experiment_spec_sha256": "be2dc8c0b0c4ad5180f36baadfba056601858c89a6c9908d1a87760a101d78c4",
-  "git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
+  "git_commit": "5bfacb7c345bf9374b693a458cf61aaf75150f3c",
   "git_dirty": false,
-  "started_at": "2026-08-22T09:23:02.619273+00:00",
-  "completed_at": "2026-08-22T09:23:03.286435+00:00",
+  "started_at": "2026-08-22T09:36:21.849821+00:00",
+  "completed_at": "2026-08-22T09:36:22.407946+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -121,14 +121,14 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "da5306a89089dbec9ad387376eacef4757eef98a09d8256006ec13873d622f62",
+    "research_runner.py": "e75cc2dfaec495300c2b58cdc06671bc3c9d73f8a556b296c93ca9ad0dc7a77d",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
     "zero_finder.py": "c4c8e86d7bf46737ce4b41378edde777d755f02d68cb7b845dbae036b5743b34",
-    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15"
+    "certification.py": "5222cf8ad0fb1cc0118e532e62a47d21037f977111c7b842be153c242513b90f"
   },
   "consumed_certificates": []
 }

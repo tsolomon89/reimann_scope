@@ -10,11 +10,11 @@
   "zero_count": 5,
   "mathematical_claim": "Canonical block 'medium_research' contains exactly 5 certified consecutive simple zeros for indices 100..104",
   "constituent_zero_hashes": [
-    "e6753dbf0188f58d456051950233c493a1082b47e99878dad162a21da05ee390",
-    "953be991a11f413f85410c70fb943a2dfc2d3ea5a94c872ef6a25c5c265be306",
-    "c7287b5c007afc7d446e34a8cdf4818b3f0b388db06b7654f90cf7be67288096",
-    "7ec2702f104cf30560dc2ab4bccca200df438d9c4db0616c383b0a9d912782be",
-    "02c90ceb06f06b95342018bcc38c3e0dedf6f2dd834ffc6f16d49af410d279b5"
+    "1091064e4f36e50891de37141bd21e80b33994f9545cc55b7beb4ded768bd291",
+    "fe72f17d21ab35db1822ff1b6ee1b562c2efef7827e591fa55d0c505247798aa",
+    "08be3335a262f987125d5cfea609fe356368b40df824ce28430b2493246ab2ed",
+    "0c7458ee6984ba954680d7ffa05ca1a7f3821d4a838d3c065278a5c411efa45d",
+    "82e7d8c9fb5df9dc1da587c20997c9c1b19d8db4338d194a3bfa37508161eb08"
   ],
   "height_range": [
     "236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740",
@@ -35,9 +35,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "a8e7f982f1baaeaefb6ee39d20d8c588588411cf",
+  "producing_git_commit": "5bfacb7c345bf9374b693a458cf61aaf75150f3c",
   "source_code_hashes": {
-    "certification.py": "3dbff7c7e97aa3a1a6fb67401b8bb8dda1381078d8ef800b5e11bd1baca00c15",
+    "certification.py": "5222cf8ad0fb1cc0118e532e62a47d21037f977111c7b842be153c242513b90f",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "86d8c70d0bce13eade478694c9ca2aa05035b8e0add9ec39c24746959ebac645",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
@@ -54,11 +54,11 @@
     "mpmath": "1.3.0",
     "platform": "win32"
   },
-  "created_at": "2026-08-22T09:22:56.960600+00:00",
+  "created_at": "2026-08-22T09:36:16.291307+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "2c1b063f0914322a4f935ab37fd52b104af665912fd2e0dbabc28a94ac224e50"
+  "certificate_hash": "a708c266958851ee7b641e43898e20314f48662cca5f038b67db4dc039b06a3b"
 }
