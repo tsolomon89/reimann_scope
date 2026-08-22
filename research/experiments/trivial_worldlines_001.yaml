@@ -1,0 +1,63 @@
+schema_version: '2'
+id: trivial-worldlines-001
+title: Trivial Zero Transcendental Continuation Worldline Invariant Sweep
+research_question: Do the trivial zeros s_m = -2m under transcendental continuation
+  Z_tau(s, K) form exact zero worldlines s_m(K) = tau^K (-2m) with off-critical
+  radial leaf coordinate R_tau = -2m - 1/2 != 0?
+epistemic_class: exact_control
+object_relationship: same_object_coordinate_control
+hypothesis:
+  statement: For any trivial zero s_m = -2m (m in Z+), the continuation point s_m(K) = tau^K * (-2m)
+    satisfies Z_tau(s_m(K), K) = 0 identically, and has normalized radial leaf coordinate
+    R_tau(s_m(K), K) = -2m - 1/2 != 0.
+prediction:
+  statement: Extended function residual |Z_tau(s_m(K), K)| and radial coordinate error
+    |R_tau - (-2m - 1/2)| are <= 1e-35 across all integer grades K in [-2, 2] for m in [1..10].
+falsification:
+  statement: Residual of Z_tau at s_m(K) exceeds 1e-35, or radial coordinate differs from -2m - 1/2.
+interpretation_limit:
+  statement: Exact algebraic and numerical control verifying that trivial zeros are faithfully
+    continued off the critical surface and never conflated with critical-line nontrivial zeros.
+criterion:
+  metric: max_residual
+  operator: <=
+  threshold: 1e-35
+  aggregation: max_abs
+report_metrics:
+- metric: zeta_residual
+  kind: criterion_component
+  label: Residual of Z_tau at transformed trivial zero point
+- metric: radial_residual
+  kind: criterion_component
+  label: Radial coordinate error |R_tau(s, K) - (-2m - 1/2)|
+- metric: max_residual
+  kind: criterion_component
+  label: Combined maximum residual max(zeta_residual, radial_residual)
+engine:
+  operation: trivial_zero_worldlines
+parameters:
+  trivial_index:
+    kind: explicit
+    values:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  K:
+    kind: explicit
+    values:
+    - -2
+    - -1
+    - 0
+    - 1
+    - 2
+precision:
+  dps: 80
+outputs:
+  retain_points: true

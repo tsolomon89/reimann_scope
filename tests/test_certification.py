@@ -122,10 +122,13 @@ def test_adversarial_02_wrong_zero_index_with_valid_fields():
     cert = certification.certify_zero(1, dps=50)
     tampered = dict(cert)
     tampered["zero_index"] = 2
+    if "nontrivial_index" in tampered:
+        tampered["nontrivial_index"] = 2
     tampered["certificate_hash"] = certification._sha256_canonical(tampered)
     ok, msgs = certification.verify_certificate(tampered)
     assert not ok
     assert any("Replayed zero #2 ordinate" in m for m in msgs)
+
 
 
 def test_adversarial_03_zero_enclosure_radius_removed_or_narrowed():
@@ -314,3 +317,68 @@ def test_adversarial_14_tampered_certificate_without_recomputing_hash():
     ok, msgs = certification.verify_certificate(tampered)
     assert not ok
     assert any("Hash mismatch" in m for m in msgs)
+
+
+def test_adversarial_15_oversized_zero_enclosure_ball():
+    """Adversarial 15: Oversized enclosure radius exceeding isolation width / 2 rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["enclosure"] = dict(z["enclosure"])
+    tampered["enclosure"]["imag_rad"] = "5.0"  # Radius 5.0 exceeds isolation half-width
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("exceeds half-width" in m for m in msgs)
+
+
+def test_adversarial_16_negative_or_malformed_radius():
+    """Adversarial 16: Negative or malformed radius string rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    tampered = dict(z)
+    tampered["enclosure"] = dict(z["enclosure"])
+    tampered["enclosure"]["imag_rad"] = "-0.001"
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok, msgs = certification.verify_certificate(tampered)
+    assert not ok
+    assert any("negative" in m.lower() for m in msgs)
+
+
+def test_trivial_zero_certification_and_verification():
+    """Test certification and verification of trivial zeros s_m = -2m."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    for m in [1, 2, 10, 50, 100]:
+        cert = certification.certify_trivial_zero(m, dps=50)
+        assert cert["certificate_type"] == "trivial_zero_certificate"
+        assert cert["zero_family"] == "trivial"
+        assert cert["trivial_index"] == m
+        assert cert["exact_location"] == -2 * m
+        assert cert["status"] in ("simple_zero_certified", "isolated_zero_certified")
+        assert cert["derivative_enclosure"]["excludes_zero"] is True
+        
+        ok, msgs = certification.verify_certificate(cert, check_provenance=False)
+
+        assert ok, f"Trivial zero m={m} failed verification: {msgs}"
+
+
+def test_trivial_zero_worldline_certification():
+    """Test worldline certification of trivial zeros."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    tzc = certification.certify_trivial_zero(1, dps=50)
+    cert_store = {tzc["certificate_hash"]: tzc}
+    
+    for K in [-2, 0, 2]:
+        wl = certification.certify_worldline(tzc, grade=K, delta="0.0", dps=50)
+        assert wl["certificate_type"] == "worldline_certificate"
+        assert wl["claim_type"] == "trivial_zero_worldline"
+        assert wl["zero_family"] == "trivial"
+        assert wl["trivial_index"] == 1
+        
+        ok, msgs = certification.verify_certificate(wl, cert_store=cert_store, check_provenance=False)
+        assert ok, f"Trivial zero worldline K={K} failed verification: {msgs}"
+

@@ -27,35 +27,42 @@ ZEROS_DIR = os.path.join(CERT_DIR, "zeros")
 BLOCKS_DIR = os.path.join(CERT_DIR, "blocks")
 WORLDLINES_DIR = os.path.join(CERT_DIR, "worldlines")
 
+TRIVIAL_ZEROS_DIR = os.path.join(CERT_DIR, "trivial_zeros")
+
 CANONICAL_BLOCKS = {
-    "low_validation": list(range(1, 11)),
+    "low_validation": list(range(1, 101)),
     "medium_research": list(range(100, 105)),
     "high_research": list(range(1000, 1003)),
     "very_high_sparse": list(range(10000, 10003)),
 }
 
+
 GRADES_TO_CERTIFY = [-2, -1, 0, 1, 2]
 DELTAS_TO_CERTIFY = ["0.0", "-0.10", "-0.01", "+0.01", "+0.10"]
 
 
-def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int]:
+def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
     os.makedirs(ZEROS_DIR, exist_ok=True)
+    os.makedirs(TRIVIAL_ZEROS_DIR, exist_ok=True)
     os.makedirs(BLOCKS_DIR, exist_ok=True)
     os.makedirs(WORLDLINES_DIR, exist_ok=True)
 
     print("=== Generating Canonical Mathematical Certificates ===")
     
-    # 1. Blocks and constituent zeros
+    # 1. Blocks and constituent nontrivial zeros
     all_zero_certs: Dict[int, Dict[str, Any]] = {}
     block_count = 0
     
     for block_id, indices in CANONICAL_BLOCKS.items():
         print(f"[*] Certifying block '{block_id}' (n={indices[0]}..{indices[-1]})...")
-        block_cert, zero_certs = certification.certify_block(block_id, indices, dps=80, git_commit=git_commit)
+        block_cert, zero_certs = certification.certify_block(
+            block_id, indices, dps=80, git_commit=git_commit, existing_zero_certs=all_zero_certs
+        )
+
         
         # Save each zero certificate first
         for zc in zero_certs:
-            idx = zc["zero_index"]
+            idx = zc["nontrivial_index"]
             all_zero_certs[idx] = zc
             z_path = os.path.join(ZEROS_DIR, f"zero_{idx:05d}.json")
             with open(z_path, "w", encoding="utf-8") as f:
@@ -68,11 +75,23 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int]:
         block_count += 1
             
     zero_count = len(all_zero_certs)
-    print(f"[+] Certified {zero_count} individual zeros across {len(CANONICAL_BLOCKS)} blocks.")
+    print(f"[+] Certified {zero_count} individual nontrivial zeros across {len(CANONICAL_BLOCKS)} blocks.")
     
-    # 2. Bilateral worldlines for reference zero 1 (and sample higher zeros)
+    # 2. Trivial zeros (m=1..100)
+    print("[*] Certifying 100 trivial zeros (m=1..100, s_m = -2m)...")
+    all_trivial_certs: Dict[int, Dict[str, Any]] = {}
+    for m in range(1, 101):
+        tz_cert = certification.certify_trivial_zero(m, dps=80, git_commit=git_commit)
+        all_trivial_certs[m] = tz_cert
+        tz_path = os.path.join(TRIVIAL_ZEROS_DIR, f"trivial_zero_{m:05d}.json")
+        with open(tz_path, "w", encoding="utf-8") as f:
+            json.dump(tz_cert, f, indent=2)
+    trivial_count = len(all_trivial_certs)
+    print(f"[+] Certified {trivial_count} individual trivial zeros.")
+    
+    # 3. Bilateral worldlines for sample nontrivial zeros
     worldline_count = 0
-    test_zero_indices = [1, 100, 1000, 10000]
+    test_zero_indices = [1, 2, 3, 100, 1000, 10000]
     
     for z_idx in test_zero_indices:
         zc = all_zero_certs[z_idx]
@@ -87,9 +106,20 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int]:
                     json.dump(wl_cert, f, indent=2)
                 worldline_count += 1
                 
+    # 4. Trivial zero worldlines for sample trivial zeros
+    for m_idx in [1, 2, 5, 10, 100]:
+        tzc = all_trivial_certs[m_idx]
+        for K in [-2, 0, 2]:
+            wl_cert = certification.certify_worldline(tzc, grade=K, delta="0.0", dps=80, git_commit=git_commit)
+            wl_filename = f"worldline_trivial_m{m_idx:05d}_K{K:+d}.json".replace("+", "p").replace("-", "m")
+            wl_path = os.path.join(WORLDLINES_DIR, wl_filename)
+            with open(wl_path, "w", encoding="utf-8") as f:
+                json.dump(wl_cert, f, indent=2)
+            worldline_count += 1
+                
     print(f"[+] Certified {worldline_count} bilateral worldlines & radial leaves.")
     print("=== Certificate Generation Complete ===")
-    return zero_count, block_count, worldline_count
+    return zero_count, trivial_count, block_count, worldline_count
 
 
 def main() -> None:

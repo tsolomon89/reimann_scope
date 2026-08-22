@@ -1437,10 +1437,11 @@ def update_all_panels(
         mode=perturb_mode
     )
 
-
-
-    clean_rho_val = complex(0.5, gamma_pert_val)
-    pert_rho_val = complex(0.5 + delta_pert_val, gamma_pert_val)
+    fig_c.add_trace(go.Scatter(
+        x=x_pts, y=clean_pi,
+        mode="lines", line=dict(color="#00d2ff", width=2),
+        name="Clean π_N(x)"
+    ))
 
     if abs(delta_pert_val) > 1e-12:
         fig_c.add_trace(go.Scatter(
@@ -1448,6 +1449,7 @@ def update_all_panels(
             mode="lines", line=dict(color="#ffea00", width=2, dash="dash"),
             name="Perturbed π_N(x)"
         ))
+
 
     eval_x = 20.0
     cj_c = converter.zero_j_contribution_preview(eval_x, clean_rho_val)

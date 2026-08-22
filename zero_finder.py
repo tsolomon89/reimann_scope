@@ -132,6 +132,78 @@ def discover_zeros_float(
     return [float(z) for z in discover_zeros(t_min, t_max, dps=dps)]
 
 
+def discover_first_n_nontrivial_zeros(
+    n_zeros: int = 100,
+    dps: int = 80,
+    max_residual: float = 1e-12
+) -> List[Dict[str, Any]]:
+    """
+    Layer A: Independently discover the first n consecutive nontrivial zeros on the critical line.
+    
+    Adheres strictly to DATA_PROVENANCE.md:
+    - NEVER seeded from stored reference ordinates.
+    - Scans real-valued Hardy Z(t) for sign-change brackets.
+    - Refines candidates via Brent/Anderson solver to precision dps.
+    - Audits residual |zeta(1/2 + i*gamma)| and non-vanishing derivative |zeta'(1/2 + i*gamma)|.
+    - Emits structured records with explicit zero_family="nontrivial" and nontrivial_index.
+    """
+    # Estimate upper bound for t: 100th zero is at gamma ~ 236.5. A scan up to 245.0 is guaranteed to contain >= 100 zeros.
+    t_min = 10.0
+    t_max = 245.0 if n_zeros <= 100 else 245.0 + (n_zeros - 100) * 2.5
+    
+    brackets = find_brackets(t_min, t_max, base_step=0.08, dps=min(dps, 30))
+    discovered_records: List[Dict[str, Any]] = []
+    
+    with mpmath.workdps(dps + 10):
+        for b in brackets:
+            root = refine_zero(b, dps=dps, max_residual=max_residual)
+            if root is not None:
+                # Deduplicate closely found roots
+                if not any(abs(root - mpmath.mpf(r["refined_ordinate"])) < 1e-4 for r in discovered_records):
+                    s_0 = mpmath.mpc('0.5', root)
+                    zeta_val = math_core.zeta_eval(s_0, dps=dps)
+                    zeta_prime = math_core.zeta_derivative(s_0, n=1, dps=dps)
+                    hardy_z_val = math_core.hardy_z(root, dps=dps)
+                    
+                    idx = len(discovered_records) + 1
+                    rec = {
+                        "zero_family": "nontrivial",
+                        "nontrivial_index": idx,
+                        "discovered_index": idx,
+                        "search_bracket": [str(b[0]), str(b[1])],
+                        "refined_ordinate": str(root),
+                        "working_precision": f"{dps} dps",
+                        "hardy_z_residual": str(abs(hardy_z_val)),
+                        "zeta_residual": str(abs(zeta_val)),
+                        "derivative_audit": str(abs(zeta_prime)),
+                        "discovery_method": "Hardy Z(t) sign-change bracket scan + Anderson/Brent root refinement"
+                    }
+                    discovered_records.append(rec)
+                    if len(discovered_records) >= n_zeros:
+                        break
+                        
+    return discovered_records
+
+
+def discover_trivial_zeros(count: int = 100) -> List[Dict[str, Any]]:
+    """
+    Construct exact trivial zeros s_m = -2m for m = 1..count as exact controls.
+    """
+    records: List[Dict[str, Any]] = []
+    for m in range(1, count + 1):
+        s_m = -2 * m
+        records.append({
+            "zero_family": "trivial",
+            "trivial_index": m,
+            "exact_location": s_m,
+            "real_coordinate": float(s_m),
+            "imag_coordinate": 0.0,
+            "isolation_interval": [float(s_m - 0.5), float(s_m + 0.5)],
+            "discovery_method": "Exact trivial zero construction s = -2m (Riemann functional equation pole of Gamma(s/2))"
+        })
+    return records
+
+
 def generate_baseline_validation_report(
     t_min: float = 10.0,
     t_max: float = 60.0,
@@ -143,6 +215,7 @@ def generate_baseline_validation_report(
     rep = reference_data.validate_zero_discovery(disc, t_min, t_max, dps=dps)
     rep["zeros_evaluated"] = rep.get("discovered_count", len(disc))
     return rep
+
 
 
 # ==============================================================================

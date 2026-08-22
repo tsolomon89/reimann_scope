@@ -143,6 +143,7 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         "coupled_perturbation_covariance",
         "coupled_scale_covariance",
         "transcendental_worldline",
+        "trivial_zero_worldlines",
         "synthetic_radial_leaf",
         "cross_height_coherence",
         "cross_height_distance",
@@ -150,6 +151,7 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     ]
     if engine["operation"] not in valid_engine_ops:
         return False, f"Unknown engine operation '{engine['operation']}'. Permitted: {valid_engine_ops}"
+
 
         
     params = spec["parameters"]
@@ -268,20 +270,63 @@ def generate_parameter_grid(
 # CANONICAL ENGINE DISPATCH (Strictly delegates to canonical math modules)
 # ==============================================================================
 
-def _lookup_zero_certificate(zero_index: int) -> Tuple[Optional[str], bool]:
-    """Look up zero certificate by 1-based index and verify it."""
+def _lookup_zero_certificate(
+    zero_index: int,
+    zero_family: str = "nontrivial",
+    expected_ordinate: Optional[Union[str, float, mpmath.mpf]] = None,
+    check_provenance: bool = True
+) -> Tuple[Optional[str], bool, Optional[Dict[str, Any]], List[str]]:
+    """Look up zero certificate by 1-based index and family, and verify all mathematical and provenance claims."""
     code_root = os.path.dirname(os.path.abspath(__file__))
-    cert_path = os.path.join(code_root, "data", "certificates", "zeros", f"zero_{zero_index:05d}.json")
-    if os.path.exists(cert_path):
-        try:
-            with open(cert_path, "r", encoding="utf-8") as f:
-                zc = json.load(f)
-            ok, _ = certification.verify_certificate(zc)
-            if ok:
-                return zc.get("certificate_hash"), True
-        except Exception:
-            pass
-    return None, False
+    if zero_family == "nontrivial":
+        cert_path = os.path.join(code_root, "data", "certificates", "zeros", f"zero_{zero_index:05d}.json")
+    elif zero_family == "trivial":
+        cert_path = os.path.join(code_root, "data", "certificates", "trivial_zeros", f"trivial_zero_{zero_index:05d}.json")
+    else:
+        return None, False, None, [f"Unknown zero_family: {zero_family}"]
+        
+    if not os.path.exists(cert_path):
+        return None, False, None, [f"Certificate file '{cert_path}' does not exist"]
+        
+    try:
+        with open(cert_path, "r", encoding="utf-8") as f:
+            zc = json.load(f)
+    except Exception as e:
+        return None, False, None, [f"Failed to read certificate JSON: {e}"]
+        
+    # Check family and index
+    cert_fam = zc.get("zero_family", "nontrivial" if zc.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
+    if cert_fam != zero_family:
+        return zc.get("certificate_hash"), False, zc, [f"Zero family mismatch: requested {zero_family}, certificate has {cert_fam}"]
+        
+    c_idx = zc.get("nontrivial_index") if zero_family == "nontrivial" else zc.get("trivial_index")
+    if c_idx is None:
+        c_idx = zc.get("zero_index") if zero_family == "nontrivial" else zc.get("exact_location", 0) // -2
+    if c_idx != zero_index:
+        return zc.get("certificate_hash"), False, zc, [f"Zero index mismatch: requested {zero_index}, certificate has {c_idx}"]
+        
+    # Check required status
+    if zc.get("status") not in ("simple_zero_certified", "isolated_zero_certified"):
+        return zc.get("certificate_hash"), False, zc, [f"Certificate status is not certified: {zc.get('status')}"]
+        
+    # Check ordinate containment if provided
+    if expected_ordinate is not None and zero_family == "nontrivial":
+        exp_ord = mpmath.mpf(expected_ordinate)
+        enc = zc.get("enclosure", {})
+        re_mid = enc.get("imag_mid")
+        re_rad = enc.get("imag_rad", "1e-50")
+        if re_mid:
+            mid_val = mpmath.mpf(re_mid)
+            rad_val = mpmath.mpf(re_rad)
+            if abs(exp_ord - mid_val) > (rad_val + mpmath.mpf("1e-4")):
+                return zc.get("certificate_hash"), False, zc, [f"Ordinate mismatch: expected {expected_ordinate}, certificate has {re_mid}"]
+                
+    ok, errs = certification.verify_certificate(zc, check_provenance=check_provenance)
+    if not ok:
+        return zc.get("certificate_hash"), False, zc, errs
+        
+    return zc.get("certificate_hash"), True, zc, []
+
 
 
 def evaluate_point(
@@ -740,12 +785,24 @@ def evaluate_point(
                 delta_str = inputs.get("delta", "0.0")
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
+                zero_fam = inputs.get("zero_family", "nontrivial")
                 
-                z_1based = zero_idx if zero_idx >= 1 else 1
-                cert_hash, cert_ok = _lookup_zero_certificate(z_1based)
-                
+                if "nontrivial_index" in inputs:
+                    z_1based = int(inputs["nontrivial_index"])
+                else:
+                    z_1based = zero_idx + 1 if zero_idx >= 0 else 1
+                    
                 ref_zeros_str = reference_data.load_reference_zeros()
-                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx % len(ref_zeros_str)] if ref_zeros_str else "14.13472514173469379045725198356247027078425711569924317568556746")
+                gamma_str = inputs.get("gamma", ref_zeros_str[z_1based - 1] if 0 < z_1based <= len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                
+                cert_hash, cert_ok, zc, errs = _lookup_zero_certificate(
+                    z_1based,
+                    zero_family=zero_fam,
+                    expected_ordinate=gamma_str
+                )
+                if not cert_ok:
+                    return "error", {}, f"Zero #{z_1based} certificate verification failed: {errs}"
+                
                 rho_clean = mpmath.mpc('0.5', gamma_str)
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
                 
@@ -770,6 +827,8 @@ def evaluate_point(
                     "grade_type": g_obj.semantic_type,
                     "symbolic_scale": g_obj.symbolic_expression(),
                     "scale_A": mpmath.nstr(scale_A, n=dps),
+                    "zero_family": zero_fam,
+                    "nontrivial_index": str(z_1based),
                     "zero_index": str(zero_idx),
                     "gamma": gamma_str,
                     "delta": delta_str,
@@ -790,12 +849,24 @@ def evaluate_point(
                 delta_str = inputs.get("delta", "0.01")
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
+                zero_fam = inputs.get("zero_family", "nontrivial")
                 
-                z_1based = zero_idx if zero_idx >= 1 else 1
-                cert_hash, cert_ok = _lookup_zero_certificate(z_1based)
-                
+                if "nontrivial_index" in inputs:
+                    z_1based = int(inputs["nontrivial_index"])
+                else:
+                    z_1based = zero_idx + 1 if zero_idx >= 0 else 1
+                    
                 ref_zeros_str = reference_data.load_reference_zeros()
-                gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx % len(ref_zeros_str)] if ref_zeros_str else "14.13472514173469379045725198356247027078425711569924317568556746")
+                gamma_str = inputs.get("gamma", ref_zeros_str[z_1based - 1] if 0 < z_1based <= len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                
+                cert_hash, cert_ok, zc, errs = _lookup_zero_certificate(
+                    z_1based,
+                    zero_family=zero_fam,
+                    expected_ordinate=gamma_str
+                )
+                if not cert_ok:
+                    return "error", {}, f"Zero #{z_1based} certificate verification failed: {errs}"
+                
                 rho_base = mpmath.mpc(mpmath.mpf('0.5'), gamma_str)
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
                 
@@ -825,6 +896,8 @@ def evaluate_point(
                     "grade_type": g_obj.semantic_type,
                     "symbolic_scale": g_obj.symbolic_expression(),
                     "scale_A": mpmath.nstr(scale_A, n=dps),
+                    "zero_family": zero_fam,
+                    "nontrivial_index": str(z_1based),
                     "zero_index": str(zero_idx),
                     "gamma": gamma_str,
                     "delta": delta_str,
@@ -841,6 +914,56 @@ def evaluate_point(
                     "expected_abs_defect": mpmath.nstr(expected_abs_defect, n=dps),
                     "defect_scaling_error": mpmath.nstr(defect_scaling_error, n=dps),
                     "radial_residual": mpmath.nstr(radial_residual, n=dps),
+                    "max_residual": mpmath.nstr(max_res, n=dps),
+                    "residual": mpmath.nstr(max_res, n=dps)
+                }, None
+
+            elif operation == "trivial_zero_worldlines":
+                m_idx = int(inputs.get("trivial_index", inputs.get("m", inputs.get("zero_index", "1"))))
+                if m_idx < 1:
+                    m_idx = int(inputs.get("zero_index", 0)) + 1
+                k_str = inputs.get("k", inputs.get("K", "0"))
+                grade_type = inputs.get("grade_type", "auto")
+                
+                cert_hash, cert_ok, zc, errs = _lookup_zero_certificate(
+                    m_idx,
+                    zero_family="trivial"
+                )
+                if not cert_ok:
+                    return "error", {}, f"Trivial zero #{m_idx} certificate verification failed: {errs}"
+                
+                s_exact = -2 * m_idx
+                g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
+                scale_A = g_obj.numeric_scale(dps=dps + 15)
+                
+                s_world = mpmath.mpc(s_exact, 0) * scale_A
+                sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
+                radial_leaf = (s_world.real / scale_A) - mpmath.mpf("0.5")
+                expected_R = mpmath.mpf(s_exact) - mpmath.mpf("0.5")
+                
+                leaf_inv_err = abs(radial_leaf - expected_R)
+                
+                z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
+                zeta_res = abs(z_world)
+                max_res = max(zeta_res, leaf_inv_err)
+                
+                return "ok", {
+                    "k": k_str,
+                    "grade_type": g_obj.semantic_type,
+                    "symbolic_scale": g_obj.symbolic_expression(),
+                    "scale_A": mpmath.nstr(scale_A, n=dps),
+                    "zero_family": "trivial",
+                    "trivial_index": str(m_idx),
+                    "exact_s": str(s_exact),
+                    "source_zero_cert_hash": cert_hash or "N/A",
+                    "certificate_verified": "true" if cert_ok else "false",
+                    "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
+                    "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
+                    "sigma_c": mpmath.nstr(sigma_c, n=dps),
+                    "radial_leaf": mpmath.nstr(radial_leaf, n=dps),
+                    "expected_radial_leaf": mpmath.nstr(expected_R, n=dps),
+                    "zeta_residual": mpmath.nstr(zeta_res, n=dps),
+                    "radial_residual": mpmath.nstr(leaf_inv_err, n=dps),
                     "max_residual": mpmath.nstr(max_res, n=dps),
                     "residual": mpmath.nstr(max_res, n=dps)
                 }, None
@@ -868,7 +991,7 @@ def evaluate_point(
                     gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
                     z_idx_1based = zero_idx + 1 if zero_idx < 10 else 1
                     
-                cert_hash, cert_ok = _lookup_zero_certificate(z_idx_1based)
+                cert_hash, cert_ok, zc, _ = _lookup_zero_certificate(z_idx_1based)
                 delta_n = transcendental.mean_zero_spacing_delta(gamma_str, dps=dps + 20)
                 taylor_info = transcendental.extract_taylor_shape_coefficients(gamma_str, dps=dps + 20)
                 path_info = transcendental.evaluate_derivative_normalized_path(gamma_str, u_str, dps=dps + 20)
@@ -924,8 +1047,8 @@ def evaluate_point(
                 
                 z1_idx = 1 + (zero_idx % len(ords1))
                 z2_idx = 100 + (zero_idx % len(ords2)) if b2 == "medium_research" else (1000 + (zero_idx % len(ords2)) if b2 == "high_research" else 10000 + (zero_idx % len(ords2)))
-                h1, ok1 = _lookup_zero_certificate(z1_idx)
-                h2, ok2 = _lookup_zero_certificate(z2_idx)
+                h1, ok1, _, _ = _lookup_zero_certificate(z1_idx)
+                h2, ok2, _, _ = _lookup_zero_certificate(z2_idx)
                 
                 # Construct 21-point symmetric grid on [-u_max, u_max]
                 u_points = [str(mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8)) for i in range(-10, 11)]
@@ -947,9 +1070,12 @@ def evaluate_point(
                     "gamma_2": g2_str,
                     "u_max": str(u_max_val),
                     "num_u_points": str(dist_res["num_u_points"]),
+                    "L_infty_distance": l_inf,
+                    "L_2_distance": l_2,
                     "max_distance": l_inf,
                     "residual": l_inf
                 }, None
+
 
 
             elif operation == "grade_constraint":

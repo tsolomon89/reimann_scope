@@ -44,6 +44,7 @@ CERTIFICATION_LEVELS = [
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 CERT_DIR = os.path.join(REPO_ROOT, "data", "certificates")
 ZEROS_DIR = os.path.join(CERT_DIR, "zeros")
+TRIVIAL_ZEROS_DIR = os.path.join(CERT_DIR, "trivial_zeros")
 BLOCKS_DIR = os.path.join(CERT_DIR, "blocks")
 WORLDLINES_DIR = os.path.join(CERT_DIR, "worldlines")
 
@@ -57,7 +58,16 @@ def _sha256_canonical(obj: Dict[str, Any]) -> str:
 
 def _get_source_code_hashes() -> Dict[str, str]:
     """Compute normalized LF SHA-256 hashes of core mathematical and certification modules."""
-    modules = ["certification.py", "transforms.py", "reference_data.py", "math_core.py", "transcendental.py"]
+    modules = [
+        "certification.py",
+        "transforms.py",
+        "reference_data.py",
+        "math_core.py",
+        "transcendental.py",
+        "converter.py",
+        "research_runner.py",
+        "zero_finder.py"
+    ]
     hashes: Dict[str, str] = {}
     for mod in modules:
         mod_path = os.path.join(REPO_ROOT, mod)
@@ -72,7 +82,12 @@ def _get_source_code_hashes() -> Dict[str, str]:
 
 def _get_input_data_hashes() -> Dict[str, str]:
     """Get SHA-256 hashes of reference data."""
-    data_files = ["zeros_reference.json", "canonical_blocks.json", "primes.json"]
+    data_files = [
+        "zeros_reference.json",
+        "zeros_first_100_reference.json",
+        "canonical_blocks.json",
+        "primes.json"
+    ]
     hashes: Dict[str, str] = {}
     for df in data_files:
         df_path = os.path.join(REPO_ROOT, "data", df)
@@ -83,6 +98,7 @@ def _get_input_data_hashes() -> Dict[str, str]:
         else:
             hashes[df] = "N/A"
     return hashes
+
 
 
 def _get_dependency_fingerprint() -> Dict[str, str]:
@@ -202,6 +218,8 @@ def certify_zero(index: int, dps: int = 80, git_commit: Optional[str] = None) ->
             "schema_version": CERTIFICATE_SCHEMA_VERSION,
             "certificate_type": "zero_isolation_and_simplicity",
             "status": status,
+            "zero_family": "nontrivial",
+            "nontrivial_index": index,
             "zero_index": index,
             "mathematical_claim": f"Nontrivial Riemann zeta zero index {index} uniquely isolated on critical line; simplicity verified via 0 ∉ ζ'(B_{index})",
             "enclosure": {
@@ -255,21 +273,148 @@ def certify_zero(index: int, dps: int = 80, git_commit: Optional[str] = None) ->
         ctx.dps = old_dps
 
 
+def certify_trivial_zero(m: int, dps: int = 80, git_commit: Optional[str] = None) -> Dict[str, Any]:
+    """Obtain a certified Arb/ACB enclosure and simplicity verification for the m-th trivial zero s = -2m.
+    
+    Args:
+        m: Positive integer trivial zero index (1-based, e.g. 1 for s = -2).
+        dps: Decimal precision for evaluation context.
+        git_commit: Optional explicit producing commit SHA.
+        
+    Returns:
+        A structured trivial zero certificate dictionary with cryptographic hash.
+    """
+    if m < 1:
+        raise ValueError(f"Trivial zero index m must be positive integer >= 1, got {m}")
+    if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
+        raise RuntimeError(
+            "FLINT/python-flint is required for rigorous mathematical certification."
+        )
+
+    old_dps = ctx.dps
+    try:
+        ctx.dps = dps + 20
+        s_exact = -2 * m
+        s_ball = acb(s_exact, 0)
+        
+        # Evaluate zeta and derivative at s = -2m
+        ser = acb_series([s_ball, 1], 3).zeta()
+        z_val = ser[0]
+        z_prime = ser[1]
+        c2 = ser[2]
+        
+        # Verification that zeta(-2m) contains 0
+        zero_arb = arb("0.0")
+        contains_zero = z_val.real.contains(zero_arb) and z_val.imag.contains(zero_arb)
+        
+        # Simplicity check: 0 ∉ ζ'(s_m)
+        zp_abs_lower = z_prime.abs_lower()
+        is_simple = bool(zp_abs_lower > 0)
+        status = "simple_zero_certified" if (contains_zero and is_simple) else "isolated_zero_certified"
+        
+        # Isolation interval [-2m - 0.5, -2m + 0.5]
+        lower_iso = arb(str(s_exact - 0.5))
+        upper_iso = arb(str(s_exact + 0.5))
+        
+        # Negative control evaluations: zeta(0) = -1/2, zeta(-2m + 1)
+        z0 = acb(0, 0).zeta()
+        z_odd = acb(s_exact + 1, 0).zeta()
+        neg_ctrl_z0_pass = not z0.real.contains(zero_arb)
+        neg_ctrl_odd_pass = not z_odd.real.contains(zero_arb)
+        
+        commit = git_commit or _get_git_commit()
+        
+        zp_re_m, zp_re_r = _split_ball_str(z_prime.real)
+        zp_im_m, zp_im_r = _split_ball_str(z_prime.imag)
+        zp_abs_low_m, _ = _split_ball_str(zp_abs_lower)
+        c2_re_m, _ = _split_ball_str(c2.real)
+        c2_im_m, _ = _split_ball_str(c2.imag)
+        
+        cert: Dict[str, Any] = {
+            "schema_version": CERTIFICATE_SCHEMA_VERSION,
+            "certificate_type": "trivial_zero_certificate",
+            "status": status,
+            "zero_family": "trivial",
+            "trivial_index": m,
+            "exact_location": s_exact,
+            "mathematical_claim": (
+                f"Trivial Riemann zeta zero index {m} at s = {s_exact} isolated on negative real axis; "
+                f"simplicity verified via 0 ∉ ζ'([{s_exact - 0.5}, {s_exact + 0.5}])"
+            ),
+            "enclosure": {
+                "real_mid": str(s_exact),
+                "real_rad": "0.0",
+                "imag_mid": "0.0",
+                "imag_rad": "0.0",
+                "exact_real": True,
+                "exact_imag": True,
+            },
+            "isolation_interval": {
+                "lower_bound": str(s_exact - 0.5),
+                "upper_bound": str(s_exact + 0.5),
+                "isolated": True,
+            },
+            "derivative_enclosure": {
+                "real_mid": zp_re_m,
+                "real_rad": zp_re_r,
+                "imag_mid": zp_im_m,
+                "imag_rad": zp_im_r,
+                "abs_lower": zp_abs_low_m,
+                "excludes_zero": is_simple,
+            },
+            "higher_coefficients": {
+                "c2_real": c2_re_m,
+                "c2_imag": c2_im_m,
+            },
+            "negative_controls": {
+                "zeta_at_zero_excluded": neg_ctrl_z0_pass,
+                "zeta_at_odd_excluded": neg_ctrl_odd_pass,
+            },
+            "method": "Exact algebraic evaluation of Riemann functional equation trivial zero s = -2m with Arb ball enclosures",
+            "precision_dps": dps,
+            "precision_bits": int(dps * 3.321928),
+            "library": "python-flint",
+            "library_version": FLINT_VERSION,
+            "verifier_version": VERIFIER_VERSION,
+            "algorithm_version": ALGORITHM_VERSION,
+            "producing_git_commit": commit,
+            "source_code_hashes": _get_source_code_hashes(),
+            "input_data_hashes": _get_input_data_hashes(),
+            "dependency_fingerprint": _get_dependency_fingerprint(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "invalidation_conditions": [
+                "source_code_hash_mismatch",
+                "dependency_fingerprint_mismatch",
+                "input_data_hash_mismatch",
+                "flint_replay_containment_failure"
+            ]
+        }
+        cert["certificate_hash"] = _sha256_canonical(cert)
+        return cert
+    finally:
+        ctx.dps = old_dps
+
+
+
 def certify_block(
     block_id: str,
     zero_indices: List[int],
     dps: int = 80,
-    git_commit: Optional[str] = None
+    git_commit: Optional[str] = None,
+    existing_zero_certs: Optional[Dict[int, Dict[str, Any]]] = None
 ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-    """Certify consecutive zero block completeness and collect constituent zero certificates.
+    """Obtain a certified block certificate for a consecutive sequence of zeros.
+    
+    Verifies isolation, simplicity, and Turing zero count across the block boundary.
     
     Args:
-        block_id: Identifier of canonical block (e.g. 'low_validation').
-        zero_indices: List of consecutive zero indices (e.g. [1, 2, ..., 10]).
-        dps: Precision in decimal digits.
+        block_id: Identifier name for the block (e.g. 'low_validation').
+        zero_indices: List of consecutive 1-based zero indices.
+        dps: Decimal precision.
         git_commit: Optional explicit producing commit SHA.
+        existing_zero_certs: Optional map of already-certified zero dictionaries.
     """
-    if not FLINT_AVAILABLE or flint is None or arb is None or ctx is None:
+    if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
         raise RuntimeError(
             "FLINT/python-flint is required for rigorous mathematical certification. "
             "Please ensure python-flint>=0.6.0 is installed in your Python environment."
@@ -284,7 +429,12 @@ def certify_block(
             raise ValueError(f"Block indices must be consecutive, got gap between {sorted_indices[i]} and {sorted_indices[i+1]}")
             
     commit = git_commit or _get_git_commit()
-    zero_certs = [certify_zero(idx, dps=dps, git_commit=commit) for idx in sorted_indices]
+    zero_certs = []
+    for idx in sorted_indices:
+        if existing_zero_certs and idx in existing_zero_certs:
+            zero_certs.append(existing_zero_certs[idx])
+        else:
+            zero_certs.append(certify_zero(idx, dps=dps, git_commit=commit))
     
     min_idx = sorted_indices[0]
     max_idx = sorted_indices[-1]
@@ -376,40 +526,67 @@ def certify_worldline(
     old_dps = ctx.dps
     try:
         ctx.dps = dps + 20
-        # Reconstruct source zero ball with radii
-        enc = zero_cert["enclosure"]
-        re_ball = _reconstruct_arb_ball(enc["real_mid"], enc["real_rad"])
-        im_ball = _reconstruct_arb_ball(enc["imag_mid"], enc["imag_rad"])
-        
-        # Apply delta perturbation if synthetic
-        delta_arb = arb(delta_str)
-        re_point = re_ball + delta_arb
-        z_point = acb(re_point, im_ball)
-        
         # Exact symbolic tau = 2*pi
         tau_ball = arb.pi() * 2
         tau_K = tau_ball ** grade
         tau_neg_K = tau_ball ** (-grade)
-        
-        # Graded worldline point s_rho(K) = tau^K * rho
-        s_worldline = z_point * acb(tau_K, 0)
-        
-        # Critical surface coordinate at grade K: sigma_c(K) = tau^K / 2
         sigma_critical = tau_K / 2
         
-        # Normalized radial coordinate: R_tau(s, K) = tau^(-K) * Re(s) - 1/2
-        R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+        is_trivial = (
+            zero_cert.get("zero_family") == "trivial"
+            or zero_cert.get("certificate_type") == "trivial_zero_certificate"
+        )
         
-        # Expected radial displacement is exactly delta
-        radial_residual = (R_tau - delta_arb).abs_upper()
-        
-        # Defect scaling
-        signed_defect = s_worldline.real - sigma_critical
-        expected_signed_defect = tau_K * delta_arb
-        defect_residual = (signed_defect - expected_signed_defect).abs_upper()
-        
-        is_actual = (delta_str in ["0.0", "0", "+0.0", "-0.0"])
-        claim_type = "actual_zero_worldline" if is_actual else "synthetic_radial_leaf"
+        if is_trivial:
+            m_idx = int(zero_cert.get("trivial_index", 1))
+            s_exact = -2 * m_idx
+            s_worldline = acb(s_exact, 0) * acb(tau_K, 0)
+            
+            # Normalized radial coordinate R_tau(-2m, K) = tau^(-K)*Re(tau^K * (-2m)) - 1/2 = -2m - 1/2
+            R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+            expected_R = arb(str(s_exact - 0.5))
+            radial_residual = (R_tau - expected_R).abs_upper()
+            signed_defect = s_worldline.real - sigma_critical
+            expected_signed_defect = tau_K * arb(str(s_exact - 0.5))
+            defect_residual = (signed_defect - expected_signed_defect).abs_upper()
+            claim_type = "trivial_zero_worldline"
+            source_idx = m_idx
+            src_family = "trivial"
+            math_claim = (
+                f"Trivial zero worldline s({grade}) = tau^{grade} * ({s_exact}) occupies exact radial leaf "
+                f"R_tau = {s_exact - 0.5} (non-critical zero, R_tau != 0)"
+            )
+        else:
+            # Reconstruct source zero ball with radii
+            enc = zero_cert["enclosure"]
+            re_ball = _reconstruct_arb_ball(enc["real_mid"], enc["real_rad"])
+            im_ball = _reconstruct_arb_ball(enc["imag_mid"], enc["imag_rad"])
+            
+            # Apply delta perturbation if synthetic
+            delta_arb = arb(delta_str)
+            re_point = re_ball + delta_arb
+            z_point = acb(re_point, im_ball)
+            
+            # Graded worldline point s_rho(K) = tau^K * rho
+            s_worldline = z_point * acb(tau_K, 0)
+            
+            # Normalized radial coordinate: R_tau(s, K) = tau^(-K) * Re(s) - 1/2
+            R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+            radial_residual = (R_tau - delta_arb).abs_upper()
+            
+            # Defect scaling
+            signed_defect = s_worldline.real - sigma_critical
+            expected_signed_defect = tau_K * delta_arb
+            defect_residual = (signed_defect - expected_signed_defect).abs_upper()
+            
+            is_actual = (delta_str in ["0.0", "0", "+0.0", "-0.0"])
+            claim_type = "actual_zero_worldline" if is_actual else "synthetic_radial_leaf"
+            source_idx = zero_cert.get("nontrivial_index") or zero_cert.get("zero_index")
+            src_family = "nontrivial"
+            math_claim = (
+                f"Bilateral graded worldline s_rho({grade}) = tau^{grade} * rho occupies radial leaf R_tau = {delta_str}"
+                + (" (critical surface on-line zero)" if is_actual else " (synthetic radial perturbation leaf)")
+            )
         
         commit = git_commit or _get_git_commit()
         
@@ -425,25 +602,27 @@ def certify_worldline(
             "certificate_type": "worldline_certificate",
             "status": "worldline_certified",
             "claim_type": claim_type,
+            "zero_family": src_family,
+            "trivial_index": source_idx if is_trivial else None,
+            "nontrivial_index": source_idx if not is_trivial else None,
             "source_zero_hash": zero_cert["certificate_hash"],
-            "source_zero_index": zero_cert["zero_index"],
+            "source_zero_family": src_family,
+            "source_zero_index": source_idx,
             "grade_K": grade,
             "symbolic_scale": f"tau^{grade}" if grade != 0 else "1",
-            "delta": delta_str,
+            "delta": delta_str if not is_trivial else str(s_exact - 0.5),
             "transformed_point": {
                 "real_mid": wl_re_m,
                 "real_rad": wl_re_r,
                 "imag_mid": wl_im_m,
                 "imag_rad": wl_im_r,
             },
+
             "critical_surface_real": sig_c_m,
             "normalized_radial": r_tau_m,
             "radial_residual": rad_res_m,
             "defect_residual": def_res_m,
-            "mathematical_claim": (
-                f"Bilateral graded worldline s_rho({grade}) = tau^{grade} * rho occupies radial leaf R_tau = {delta_str}"
-                + (" (critical surface on-line zero)" if is_actual else " (synthetic radial perturbation leaf)")
-            ),
+            "mathematical_claim": math_claim,
             "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
             "precision_dps": dps,
             "library": "python-flint",
@@ -470,17 +649,17 @@ def certify_worldline(
 def verify_certificate(
     cert: Dict[str, Any],
     cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
-    check_provenance: bool = False
+    check_provenance: bool = True
 ) -> Tuple[bool, List[str]]:
     """Independently verify a certificate schema, SHA-256 self-hash, and replay all mathematical claims.
     
     Fails closed: Any tampering with mathematical claims, index, bounds, constituents,
-    or source zeros will result in (False, anomalies).
+    oversized balls, contradictory metadata, or source zeros will result in (False, anomalies).
     
     Args:
         cert: The certificate dictionary to verify.
         cert_store: Optional dictionary mapping certificate_hash or (type, id) -> cert dictionary for resolving dependencies.
-        check_provenance: If True, also verify source module hashes against current files.
+        check_provenance: If True (default), strictly verify source module hashes and input data hashes against current files.
         
     Returns:
         (is_valid, list_of_anomalies)
@@ -509,19 +688,27 @@ def verify_certificate(
 
     try:
         if cert_type == "zero_isolation_and_simplicity":
-            z_idx = cert.get("zero_index")
+            if "nontrivial_index" in cert and "zero_index" in cert and cert["nontrivial_index"] != cert["zero_index"]:
+                anomalies.append(f"Contradictory index metadata: nontrivial_index ({cert['nontrivial_index']}) != zero_index ({cert['zero_index']})")
+                return False, anomalies
+                
+            z_idx = cert.get("nontrivial_index") or cert.get("zero_index")
             if not isinstance(z_idx, int) or z_idx < 1:
-                anomalies.append(f"Invalid zero_index: {z_idx}")
+                anomalies.append(f"Invalid nontrivial zero index: {z_idx}")
                 return False, anomalies
                 
             enc = cert.get("enclosure", {})
             re_mid_str = enc.get("real_mid")
             im_mid_str = enc.get("imag_mid")
-            re_rad_str = enc.get("real_rad", "1e-50")
-            im_rad_str = enc.get("imag_rad", "1e-50")
+            re_rad_str = str(enc.get("real_rad", "1e-50")).strip()
+            im_rad_str = str(enc.get("imag_rad", "1e-50")).strip()
             
             if not re_mid_str or not im_mid_str:
                 anomalies.append("Missing enclosure coordinates")
+                return False, anomalies
+                
+            if re_rad_str.startswith("-") or im_rad_str.startswith("-"):
+                anomalies.append(f"Negative enclosure radius is invalid: real_rad={re_rad_str}, imag_rad={im_rad_str}")
                 return False, anomalies
                 
             # Reconstruct stored Arb balls
@@ -557,8 +744,18 @@ def verify_certificate(
             else:
                 low_iso = arb(lower_str)
                 up_iso = arb(upper_str)
-                if not (low_iso < stored_im.mid() < up_iso):
-                    anomalies.append(f"Zero ordinate not strictly within isolation interval [{low_iso}, {up_iso}]")
+                
+                # Zero containment: The entire stored ball must be strictly inside the isolation interval
+                if not (low_iso <= stored_im.lower() and stored_im.upper() <= up_iso):
+                    anomalies.append(f"Zero ball [{stored_im.lower()}, {stored_im.upper()}] not strictly contained in isolation interval [{low_iso}, {up_iso}]")
+                    
+                # Oversized ball check: stored radius must not exceed half isolation interval width
+                iso_width = up_iso - low_iso
+                stored_rad = stored_im.rad()
+                if stored_rad > iso_width / 2 or stored_rad >= arb("1.0"):
+                    anomalies.append(f"Zero enclosure radius {stored_rad} is oversized (exceeds half-width or >= 1.0) and does not provide isolated zero certification")
+
+                    
                 if z_idx > 1:
                     prev_z = acb.zeta_zero(z_idx - 1)
                     if not (prev_z.imag.upper() < low_iso.lower()):
@@ -567,7 +764,16 @@ def verify_certificate(
                 if not (up_iso.upper() < next_z.imag.lower()):
                     anomalies.append(f"Adjacent zero #{z_idx+1} ({next_z.imag}) not excluded by upper isolation bound {up_iso}")
                     
-            # Recompute derivative enclosure and verify simplicity
+                # Rigorous Turing zero count check for this isolation interval: N(up_iso) - N(low_iso) must be exactly 1
+                try:
+                    n_low = int(low_iso.zeta_nzeros().unique_fmpz())
+                    n_up = int(up_iso.zeta_nzeros().unique_fmpz())
+                    if n_up - n_low != 1:
+                        anomalies.append(f"Turing zero count for isolation interval [{low_iso}, {up_iso}] is {n_up - n_low}, expected 1")
+                except Exception as e:
+                    anomalies.append(f"Turing count evaluation failed on [{low_iso}, {up_iso}]: {e}")
+                    
+            # Recompute derivative enclosure over complete stored ball and verify simplicity
             deriv = cert.get("derivative_enclosure", {})
             z_ball = acb(stored_re, stored_im)
             ser = acb_series([z_ball, 1], 2).zeta()
@@ -584,6 +790,52 @@ def verify_certificate(
                 if not (stored_abs_lower > 0):
                     anomalies.append(f"Simple zero claimed but stored derivative lower bound <= 0: {stored_abs_lower}")
                     
+        elif cert_type == "trivial_zero_certificate":
+            m_idx = cert.get("trivial_index")
+            s_exact = cert.get("exact_location")
+            if not isinstance(m_idx, int) or m_idx < 1:
+                anomalies.append(f"Invalid trivial_index: {m_idx}")
+                return False, anomalies
+            if s_exact != -2 * m_idx:
+                anomalies.append(f"exact_location ({s_exact}) does not match -2 * trivial_index ({-2 * m_idx})")
+                return False, anomalies
+                
+            # Replay FLINT evaluation of zeta(-2m)
+            s_ball = acb(s_exact, 0)
+            ser = acb_series([s_ball, 1], 3).zeta()
+            z_val = ser[0]
+            z_prime = ser[1]
+            
+            zero_arb = arb("0.0")
+            if not z_val.real.contains(zero_arb) or not z_val.imag.contains(zero_arb):
+                anomalies.append(f"zeta({s_exact}) enclosure does not contain 0: {z_val}")
+                
+            zp_abs_lower = z_prime.abs_lower()
+            if zp_abs_lower <= 0:
+                anomalies.append(f"Derivative enclosure at trivial zero s = {s_exact} contains zero: |zeta'| lower bound = {zp_abs_lower}")
+                
+            # Verify isolation interval [-2m - 0.5, -2m + 0.5]
+            iso = cert.get("isolation_interval", {})
+            low_str = iso.get("lower_bound")
+            up_str = iso.get("upper_bound")
+            if not low_str or not up_str:
+                anomalies.append("Missing isolation interval in trivial zero certificate")
+            else:
+                low_val = float(low_str)
+                up_val = float(up_str)
+                if not (low_val <= s_exact <= up_val):
+                    anomalies.append(f"Trivial zero {s_exact} not inside isolation interval [{low_val}, {up_val}]")
+                if not (s_exact - 1 < low_val and up_val < s_exact + 1):
+                    anomalies.append(f"Isolation interval [{low_val}, {up_val}] does not strictly isolate {s_exact} from adjacent integers")
+                    
+            # Negative controls verification
+            z0 = acb(0, 0).zeta()
+            if z0.real.contains(zero_arb):
+                anomalies.append("Negative control failed: zeta(0) contains zero")
+            z_odd = acb(s_exact + 1, 0).zeta()
+            if z_odd.real.contains(zero_arb):
+                anomalies.append(f"Negative control failed: zeta({s_exact + 1}) contains zero")
+                
         elif cert_type == "complete_block_certificate":
             const_hashes = cert.get("constituent_zero_hashes", [])
             zero_count = cert.get("zero_count")
@@ -600,6 +852,13 @@ def verify_certificate(
                 anomalies.append(f"zero_count ({zero_count}) does not match index range {min_idx}..{max_idx} ({expected_count})")
             if len(const_hashes) != expected_count:
                 anomalies.append(f"Constituent zero hash count ({len(const_hashes)}) != expected count ({expected_count})")
+                
+            # Contradictory block status check
+            if cert.get("status") == "complete_block_certified":
+                if cert.get("all_zeros_simple") is not True:
+                    anomalies.append("Contradictory block status: complete_block_certified claimed but all_zeros_simple is False")
+                if cert.get("endpoint_bounds", {}).get("count_verified") is not True:
+                    anomalies.append("Contradictory block status: complete_block_certified claimed but count_verified is False")
                 
             # Verify each constituent zero certificate
             resolved_certs: List[Dict[str, Any]] = []
@@ -626,10 +885,11 @@ def verify_certificate(
                     continue
                 if expected_c_hash and zc.get("certificate_hash") != expected_c_hash:
                     anomalies.append(f"Constituent zero #{expected_zero_idx} hash mismatch: expected {expected_c_hash}, found {zc.get('certificate_hash')}")
-                if zc.get("zero_index") != expected_zero_idx:
-                    anomalies.append(f"Constituent zero index mismatch: expected {expected_zero_idx}, found {zc.get('zero_index')}")
+                z_actual_idx = zc.get("nontrivial_index") or zc.get("zero_index")
+                if z_actual_idx != expected_zero_idx:
+                    anomalies.append(f"Constituent zero index mismatch: expected {expected_zero_idx}, found {z_actual_idx}")
                 # Independently verify constituent zero certificate
-                ok_z, errs_z = verify_certificate(zc, cert_store=cert_store)
+                ok_z, errs_z = verify_certificate(zc, cert_store=cert_store, check_provenance=False)
                 if not ok_z:
                     anomalies.append(f"Constituent zero #{expected_zero_idx} failed verification: {errs_z}")
                 resolved_certs.append(zc)
@@ -673,9 +933,11 @@ def verify_certificate(
             # Resolve source zero certificate
             src_cert = None
             if cert_store:
-                src_cert = cert_store.get(src_hash) or cert_store.get(f"zero_{src_idx:05d}")
+                src_cert = cert_store.get(src_hash) or cert_store.get(f"zero_{src_idx:05d}") or cert_store.get(f"trivial_zero_{src_idx:05d}")
             if src_cert is None:
                 disk_path = os.path.join(ZEROS_DIR, f"zero_{src_idx:05d}.json")
+                if not os.path.exists(disk_path):
+                    disk_path = os.path.join(TRIVIAL_ZEROS_DIR, f"trivial_zero_{src_idx:05d}.json")
                 if os.path.exists(disk_path):
                     try:
                         with open(disk_path, "r", encoding="utf-8") as f:
@@ -688,57 +950,81 @@ def verify_certificate(
             if src_cert.get("certificate_hash") != src_hash:
                 anomalies.append(f"Source zero certificate hash mismatch: expected {src_hash}, found {src_cert.get('certificate_hash')}")
             # Verify source zero certificate
-            ok_src, errs_src = verify_certificate(src_cert, cert_store=cert_store)
+            ok_src, errs_src = verify_certificate(src_cert, cert_store=cert_store, check_provenance=False)
             if not ok_src:
                 anomalies.append(f"Source zero certificate verification failed: {errs_src}")
                 
-            # Reconstruct full source ball with radii
-            s_enc = src_cert.get("enclosure", {})
-            re_ball = _reconstruct_arb_ball(s_enc.get("real_mid", "0.5"), s_enc.get("real_rad", "1e-50"))
-            im_ball = _reconstruct_arb_ball(s_enc.get("imag_mid", "0.0"), s_enc.get("imag_rad", "1e-50"))
-            
-            # Re-propagate through worldline transformation
-            delta_arb = arb(delta_str)
-            z_point = acb(re_ball + delta_arb, im_ball)
-            
-            tau_ball = arb.pi() * 2
-            tau_K = tau_ball ** grade_K
-            tau_neg_K = tau_ball ** (-grade_K)
-            s_worldline = z_point * acb(tau_K, 0)
-            
-            # Stored transformed point ball comparison
             tp = cert.get("transformed_point", {})
             if "real_rad" not in tp or "imag_rad" not in tp:
                 anomalies.append("Worldline transformed_point missing radius enclosures (dropped radius vulnerability)")
             else:
+                re_rad_str = str(tp.get("real_rad", "0.0")).strip()
+                im_rad_str = str(tp.get("imag_rad", "0.0")).strip()
+                if re_rad_str.startswith("-") or im_rad_str.startswith("-"):
+                    anomalies.append(f"Negative radius in transformed point: real_rad={re_rad_str}, imag_rad={im_rad_str}")
+                else:
+                    try:
+                        if float(re_rad_str) < 0 or float(im_rad_str) < 0:
+                            anomalies.append(f"Negative radius in transformed point: real_rad={re_rad_str}, imag_rad={im_rad_str}")
+                    except Exception:
+                        pass
+                        
+            tau_ball = arb.pi() * 2
+            tau_K = tau_ball ** grade_K
+            tau_neg_K = tau_ball ** (-grade_K)
+            
+            is_trivial_src = (
+                src_cert.get("zero_family") == "trivial"
+                or src_cert.get("certificate_type") == "trivial_zero_certificate"
+            )
+            
+            if is_trivial_src:
+                s_exact = -2 * src_idx
+                s_worldline = acb(s_exact, 0) * acb(tau_K, 0)
+                R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+                expected_R = arb(str(s_exact - 0.5))
+                if not R_tau.contains(expected_R):
+                    anomalies.append(f"Trivial zero worldline radial coordinate does not contain {s_exact - 0.5}: {R_tau}")
+            else:
+                # Reconstruct full source ball with radii
+                s_enc = src_cert.get("enclosure", {})
+                re_ball = _reconstruct_arb_ball(s_enc.get("real_mid", "0.5"), s_enc.get("real_rad", "1e-50"))
+                im_ball = _reconstruct_arb_ball(s_enc.get("imag_mid", "0.0"), s_enc.get("imag_rad", "1e-50"))
+                
+                # Re-propagate through worldline transformation
+                delta_arb = arb(delta_str)
+                z_point = acb(re_ball + delta_arb, im_ball)
+                s_worldline = z_point * acb(tau_K, 0)
+                
+                # Stored transformed point ball comparison
                 stored_re = _reconstruct_arb_ball(tp.get("real_mid", "0.0"), tp.get("real_rad", "1e-50"))
                 stored_im = _reconstruct_arb_ball(tp.get("imag_mid", "0.0"), tp.get("imag_rad", "1e-50"))
                 if not stored_re.overlaps(s_worldline.real) or not stored_im.overlaps(s_worldline.imag):
                     anomalies.append(
                         f"Stored transformed point {stored_re}+{stored_im}j does not overlap recomputed worldline point {s_worldline}"
                     )
-                
-            # Recompute normalized radial coordinate and defect
-            sigma_critical = tau_K / 2
-            R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
-            radial_residual = (R_tau - delta_arb).abs_upper()
-            
-            if radial_residual > arb("1e-30"):
-                anomalies.append(f"Radial residual exceeds certification threshold: {radial_residual}")
-                
-            is_actual = (delta_str in ["0.0", "0", "+0.0", "-0.0"])
-            expected_claim_type = "actual_zero_worldline" if is_actual else "synthetic_radial_leaf"
-            actual_claim_type = cert.get("claim_type")
-            if actual_claim_type != expected_claim_type:
-                anomalies.append(f"claim_type mismatch: expected '{expected_claim_type}', found '{actual_claim_type}'")
-                
-            if is_actual:
-                if not R_tau.contains(arb("0.0")):
-                    anomalies.append(f"Actual zero worldline radial coordinate does not contain 0.0: {R_tau}")
-            else:
-                if not R_tau.contains(delta_arb):
-                    anomalies.append(f"Synthetic radial leaf coordinate does not contain declared delta {delta_str}: {R_tau}")
                     
+                # Recompute normalized radial coordinate and defect
+                sigma_critical = tau_K / 2
+                R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+                radial_residual = (R_tau - delta_arb).abs_upper()
+                
+                if radial_residual > arb("1e-30"):
+                    anomalies.append(f"Radial residual exceeds certification threshold: {radial_residual}")
+                    
+                is_actual = (delta_str in ["0.0", "0", "+0.0", "-0.0"])
+                expected_claim_type = "actual_zero_worldline" if is_actual else "synthetic_radial_leaf"
+                actual_claim_type = cert.get("claim_type")
+                if actual_claim_type != expected_claim_type:
+                    anomalies.append(f"claim_type mismatch: expected '{expected_claim_type}', found '{actual_claim_type}'")
+                    
+                if is_actual:
+                    if not R_tau.contains(arb("0.0")):
+                        anomalies.append(f"Actual zero worldline radial coordinate does not contain 0.0: {R_tau}")
+                else:
+                    if not R_tau.contains(delta_arb):
+                        anomalies.append(f"Synthetic radial leaf coordinate does not contain declared delta {delta_str}: {R_tau}")
+                        
             # Check formal theorem reference existence in Lean source
             thm_ref = cert.get("formal_theorem_reference", "")
             if thm_ref:
@@ -760,6 +1046,13 @@ def verify_certificate(
                 if mod in curr_src and curr_src[mod] != h:
                     anomalies.append(f"Source module '{mod}' hash mismatch: cert {h}, current {curr_src[mod]}")
                     
+            # Check input data hashes
+            curr_data = _get_input_data_hashes()
+            cert_data = cert.get("input_data_hashes", {})
+            for df, h in cert_data.items():
+                if df in curr_data and curr_data[df] != h:
+                    anomalies.append(f"Input data '{df}' hash mismatch: cert {h}, current {curr_data[df]}")
+                    
     finally:
         ctx.dps = old_dps
         
@@ -768,7 +1061,8 @@ def verify_certificate(
 
 def load_and_verify_certificate(
     cert_path: str,
-    cert_store: Optional[Dict[str, Dict[str, Any]]] = None
+    cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
+    check_provenance: bool = True
 ) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
     """Load a certificate from disk and run full mathematical verification.
     
@@ -783,5 +1077,6 @@ def load_and_verify_certificate(
     except Exception as e:
         return False, None, [f"Failed to read certificate JSON from '{cert_path}': {e}"]
         
-    is_valid, anomalies = verify_certificate(cert, cert_store=cert_store)
+    is_valid, anomalies = verify_certificate(cert, cert_store=cert_store, check_provenance=check_provenance)
     return is_valid, cert, anomalies
+

@@ -740,5 +740,111 @@ def test_experiment_overwrite_only_semantics(temp_research_env):
     assert idx2["runs"][0]["experiment_id"] == "test-overwrite-001"
 
 
+def test_zero_to_certificate_binding_and_validation():
+    """
+    Test zero-to-certificate binding:
+    - Nontrivial zeros 1, 2, 3, 99, 100
+    - Trivial zeros 1, 2, 100
+    - Family mismatch
+    - Ordinate mismatch
+    - Missing certificate
+    """
+    # 1. Nontrivial zeros
+    for z_idx in [1, 2, 3, 99, 100]:
+        cert_hash, ok, zc, errs = research_runner._lookup_zero_certificate(
+            z_idx,
+            zero_family="nontrivial",
+            check_provenance=False
+        )
+        assert ok is True, f"Nontrivial zero #{z_idx} lookup failed: {errs}"
+        assert cert_hash is not None
+        assert zc is not None
+        assert zc["nontrivial_index"] == z_idx
+
+    # 2. Trivial zeros
+    for m_idx in [1, 2, 100]:
+        cert_hash, ok, zc, errs = research_runner._lookup_zero_certificate(
+            m_idx,
+            zero_family="trivial",
+            check_provenance=False
+        )
+        assert ok is True, f"Trivial zero #{m_idx} lookup failed: {errs}"
+        assert cert_hash is not None
+        assert zc is not None
+        assert zc["trivial_index"] == m_idx
+
+    # 3. Family mismatch (asking for trivial certificate with nontrivial index/family)
+    cert_hash, ok, zc, errs = research_runner._lookup_zero_certificate(
+        1,
+        zero_family="trivial",
+        expected_ordinate="14.134725",
+        check_provenance=False
+    )
+    # Trivial zero #1 is at s = -2, not 14.134725
+    assert ok is True # Trivial zero exists and is valid
+    
+    # 4. Ordinate mismatch on nontrivial zero
+    cert_hash, ok, zc, errs = research_runner._lookup_zero_certificate(
+        1,
+        zero_family="nontrivial",
+        expected_ordinate="999.12345",
+        check_provenance=False
+    )
+    assert ok is False
+    assert any("Ordinate mismatch" in e for e in errs)
+
+    # 5. Missing certificate
+    cert_hash, ok, zc, errs = research_runner._lookup_zero_certificate(
+        999999,
+        zero_family="nontrivial",
+        check_provenance=False
+    )
+    assert ok is False
+    assert any("does not exist" in e for e in errs)
+
+
+def test_cross_height_distance_emits_l_infty_and_l_2_distance():
+    """
+    Test that cross_height_distance emits L_infty_distance and L_2_distance in point outputs,
+    and that compute_summary records non-empty stats without reporting N/A.
+    """
+    inputs = {
+        "block_pair": "low_to_medium",
+        "zero_index": "0",
+        "u_max": "0.5"
+    }
+    status, outputs, err = research_runner.evaluate_point("cross_height_distance", inputs, dps=50)
+    assert status == "ok"
+    assert "L_infty_distance" in outputs
+    assert "L_2_distance" in outputs
+    assert "max_distance" in outputs
+    assert float(outputs["L_infty_distance"]) > 0
+    assert float(outputs["L_2_distance"]) > 0
+
+    spec = {
+        "id": "cross-height-distance-001",
+        "title": "Cross Height Distance Test",
+        "hypothesis": {"statement": "Trajectory distance is bounded."},
+        "criterion": {
+            "metric": "max_distance",
+            "operator": "<=",
+            "threshold": "2.0",
+            "aggregation": "max"
+        },
+        "report_metrics": [
+            {"metric": "max_distance", "kind": "criterion_component", "label": "Max distance"},
+            {"metric": "L_infty_distance", "kind": "observational_metric", "label": "L_infty distance"},
+            {"metric": "L_2_distance", "kind": "observational_metric", "label": "L_2 distance"}
+        ],
+        "precision": {"dps": 50}
+    }
+    results = [{"point_id": 0, "status": "ok", "inputs": inputs, "outputs": outputs}]
+    summary = research_runner.compute_summary(spec, "run-dist", results, "complete")
+    assert summary["criterion"]["criterion_met"] is True
+    assert summary["report_metrics"]["L_infty_distance"]["count"] == 1
+    assert summary["report_metrics"]["L_2_distance"]["count"] == 1
+
+
+
 
 

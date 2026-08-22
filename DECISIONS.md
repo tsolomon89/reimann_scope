@@ -868,4 +868,37 @@ Supersedes:
 
 Any formulation implying that bilateral coordinate dilation alone excludes off-line zeros.
 
+---
+
+## 2026-08-22 — Zero Family Ontology and Archimedean Separation in Explicit Prime Reconstruction
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Explicit Zero Family Segregation**: The repository strictly categorizes all evaluated zeros into three non-overlapping families:
+   - `nontrivial`: Critical-strip zeros indexed $n \ge 1$ ($\rho_n = 1/2 + i\gamma_n$, $\gamma_n > 0$) with critical-surface worldlines $s_n(K) = \tau^K \rho_n$ and radial coordinate $R_\tau \equiv 0$.
+   - `trivial`: Exact negative even integer zeros indexed $m \ge 1$ ($s_m = -2m$) with off-critical worldlines $s_m(K) = \tau^K (-2m)$ and radial coordinate $R_\tau \equiv -2m - 1/2 \ne 0$.
+   - `synthetic`: Perturbed off-line test points ($\delta \ne 0$) for defect and sensitivity studies.
+   The un-scoped identifier `zero_index` is deprecated in favor of `nontrivial_index` and `trivial_index`.
+
+2. **Explicit Formula Summation Convention**: In Riemann explicit prime reconstruction $\pi_N(x)$ and $J_N(x)$, the sum over zeros $\sum_\rho \operatorname{Li}(x^\rho)$ runs strictly and exclusively over nontrivial zeros in the critical strip. The trivial zeros $s_m = -2m$ are completely and accurately accounted for by the archimedean integral term:
+   \[
+   -\frac{1}{2}\log(1 - x^{-2}) = \int_x^\infty \frac{dt}{t (t^2 - 1) \ln t} = \sum_{m=1}^\infty \operatorname{Li}(x^{-2m})
+   \]
+   No trivial zero ordinate or location shall ever be injected into the $\sum_\rho$ sum, preventing double-counting anomalies.
+
+Reason:
+
+Prevent conflation of trivial and nontrivial zeros, eliminate ambiguous indexing, and guarantee rigorous conformance to the Riemann explicit formula analytical contract.
+
+Mathematical / operational consequence:
+
+Certificates, batch runners, frontend badges, and validation suites enforce separate namespaces, explicit family tags, and distinct verification rules.
+
+Supersedes:
+
+Ambiguous generic `zero_index` and any potential double counting of trivial zeros.
+
+
 

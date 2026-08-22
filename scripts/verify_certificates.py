@@ -43,22 +43,27 @@ def verify_all() -> Tuple[bool, int, List[str]]:
             if c_hash:
                 cert_store[c_hash] = c_dict
             if c_dict.get("certificate_type") == "zero_isolation_and_simplicity":
-                z_idx = c_dict.get("zero_index")
+                z_idx = c_dict.get("nontrivial_index") or c_dict.get("zero_index")
                 if z_idx is not None:
                     cert_store[f"zero_{z_idx:05d}"] = c_dict
+            elif c_dict.get("certificate_type") == "trivial_zero_certificate":
+                m_idx = c_dict.get("trivial_index")
+                if m_idx is not None:
+                    cert_store[f"trivial_zero_{m_idx:05d}"] = c_dict
             parsed_certs.append((c_path, c_dict))
         except Exception as e:
             all_anomalies.append(f"[{os.path.basename(c_path)}] JSON parse failure: {e}")
 
     for c_path, cert_data in parsed_certs:
         try:
-            ok, errs = certification.verify_certificate(cert_data, cert_store=cert_store)
+            ok, errs = certification.verify_certificate(cert_data, cert_store=cert_store, check_provenance=True)
             if not ok:
                 all_anomalies.extend([f"[{os.path.basename(c_path)}] {e}" for e in errs])
             else:
                 total_verified += 1
         except Exception as e:
             all_anomalies.append(f"[{os.path.basename(c_path)}] Exception during verification: {e}")
+
             
     return (len(all_anomalies) == 0), total_verified, all_anomalies
 

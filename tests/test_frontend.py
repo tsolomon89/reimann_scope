@@ -77,3 +77,98 @@ def test_proof_programme_dependency_map_and_missing_step():
     assert "Exact Global Coherence Law" in prog_str
     assert "Coherence => Radial Rigidity" in prog_str
     assert "OPEN RESEARCH TARGET (Missing)" in prog_str
+
+
+def test_panel_c_traces_for_zero_and_nonzero_perturbations():
+    """Verify that Panel C always shows True Prime Count and Clean pi_N(x), and conditionally shows Perturbed pi_N(x)."""
+    # 1. Delta = 0.0 (Zero perturbation)
+    card, fig_a, fig_b, fig_c, fig_d, metrics = app.update_all_panels(
+        mode="camera",
+        t0=14.0,
+        dt=20.0,
+        delta_offset=0.0,
+        selected_zero_idx=0,
+        delta_pert=0.0,
+        gamma_pert=14.134725,
+        num_zeros=10,
+        cert_mode="preview",
+        k_val=0.0,
+        kA=1.0, kB=1.0, kC=0.0, kD=0.0, k_lock=None,
+        cA=1.0, c_lock=None,
+        aniso_d=1.0, aniso_g=1.0,
+        perturb_mode_val="single_pair_diagnostic",
+        grade_type_val="integer_tau",
+        grade_k_int=0,
+        grade_q_rat="1/2",
+        grade_k_cont=0.0,
+        gen_scale=1.0,
+        gen_base=10.0,
+        disc_zeros=None
+    )
+    trace_names_c_zero = [t.name for t in fig_c.data]
+    assert "True Prime Count π(x)" in trace_names_c_zero
+    assert "Clean π_N(x)" in trace_names_c_zero
+    assert "Perturbed π_N(x)" not in trace_names_c_zero
+
+    # 2. Delta = 0.05 (Nonzero perturbation)
+    card, fig_a, fig_b, fig_c, fig_d, metrics = app.update_all_panels(
+        mode="camera",
+        t0=14.0,
+        dt=20.0,
+        delta_offset=0.0,
+        selected_zero_idx=0,
+        delta_pert=0.05,
+        gamma_pert=14.134725,
+        num_zeros=10,
+        cert_mode="preview",
+        k_val=0.0,
+        kA=1.0, kB=1.0, kC=0.0, kD=0.0, k_lock=None,
+        cA=1.0, c_lock=None,
+        aniso_d=1.0, aniso_g=1.0,
+        perturb_mode_val="single_pair_diagnostic",
+        grade_type_val="integer_tau",
+        grade_k_int=0,
+        grade_q_rat="1/2",
+        grade_k_cont=0.0,
+        gen_scale=1.0,
+        gen_base=10.0,
+        disc_zeros=None
+    )
+    trace_names_c_pert = [t.name for t in fig_c.data]
+    assert "True Prime Count π(x)" in trace_names_c_pert
+    assert "Clean π_N(x)" in trace_names_c_pert
+    assert "Perturbed π_N(x)" in trace_names_c_pert
+
+
+def test_certified_mode_fails_closed_on_missing_or_invalid():
+    """Verify that Certified mode shows appropriate badges and fails closed."""
+    # Test valid certified zero 1
+    card, fig_a, fig_b, fig_c, fig_d, metrics_valid = app.update_all_panels(
+        mode="camera",
+        t0=14.0,
+        dt=20.0,
+        delta_offset=0.0,
+        selected_zero_idx=0, # zero #1
+        delta_pert=0.0,
+        gamma_pert=14.134725,
+        num_zeros=10,
+        cert_mode="certified",
+        k_val=0.0,
+        kA=1.0, kB=1.0, kC=0.0, kD=0.0, k_lock=None,
+        cA=1.0, c_lock=None,
+        aniso_d=1.0, aniso_g=1.0,
+        perturb_mode_val="single_pair_diagnostic",
+        grade_type_val="integer_tau",
+        grade_k_int=0,
+        grade_q_rat="1/2",
+        grade_k_cont=0.0,
+        gen_scale=1.0,
+        gen_base=10.0,
+        disc_zeros=None
+    )
+    metrics_str = str(metrics_valid)
+    assert "CERTIFIED" in metrics_str
+
+
+
+

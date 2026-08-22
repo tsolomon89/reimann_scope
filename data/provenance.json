@@ -1,5 +1,19 @@
 {
   "schema_version": "2",
+  "zeros_first_100_reference": {
+    "source_name": "Andrew Odlyzko: Tables of zeros of the Riemann zeta function (zeros1)",
+    "source_author_or_org": "Andrew Odlyzko / University of Minnesota Digital Technology Center",
+    "source_url": "http://www.dtc.umn.edu/~odlyzko/zeta_tables/zeros1",
+    "retrieved_at": "2026-08-22",
+    "stated_precision": "9 decimal digits, accurate to within 3*10^(-9)",
+    "precision_digits": 9,
+    "vendored_count": 100,
+    "first_ordinate": "14.134725142",
+    "last_ordinate": "236.524229666",
+    "file_path": "data/zeros_first_100_reference.json",
+    "format": "decimal strings in json",
+    "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
+  },
   "zeta_zeros": {
     "source_name": "mpmath.zetazero reference snapshot",
     "source_author_or_org": "Fredrik Johansson / mpmath",
@@ -14,6 +28,7 @@
     "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
     "preparation_script": "scripts/fetch_reference_zeros.py"
   },
+
   "zeta_zeros_baseline": {
     "source_name": "mpmath.zetazero reference snapshot",
     "source_author_or_org": "Fredrik Johansson / mpmath",

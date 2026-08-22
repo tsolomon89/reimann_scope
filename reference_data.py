@@ -60,6 +60,12 @@ def verify_provenance() -> bool:
         if h != expected_h:
             return False
             
+    first_100_file = os.path.join(DATA_DIR, "zeros_first_100_reference.json")
+    if os.path.exists(first_100_file):
+        h = hash_normalized_bytes(first_100_file)
+        if h != prov.get("zeros_first_100_reference", {}).get("sha256"):
+            return False
+
     canonical_file = os.path.join(DATA_DIR, "canonical_blocks.json")
     if os.path.exists(canonical_file):
         h = hash_normalized_bytes(canonical_file)
@@ -83,6 +89,88 @@ def load_reference_zeros() -> List[str]:
     with open(zeros_file, "r", encoding="utf-8") as f:
         data = json.load(f)
         return data.get("ordinates", [])
+
+
+def load_first_100_reference_zeros() -> List[str]:
+    """Load authoritative first 100 Odlyzko reference zeros as exact decimal strings."""
+    first_100_file = os.path.join(DATA_DIR, "zeros_first_100_reference.json")
+    if not os.path.exists(first_100_file):
+        return []
+    with open(first_100_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        return data.get("ordinates", [])
+
+
+def get_trivial_zero(m: int) -> complex:
+    """Return trivial zero s = -2m as a complex number."""
+    if m < 1:
+        raise ValueError(f"Trivial zero index m must be >= 1, got {m}")
+    return complex(-2 * m, 0.0)
+
+
+def get_trivial_zero_exact(m: int) -> int:
+    """Return exact integer location s = -2m for trivial zero m."""
+    if m < 1:
+        raise ValueError(f"Trivial zero index m must be >= 1, got {m}")
+    return -2 * m
+
+
+def get_first_100_trivial_zeros() -> List[int]:
+    """Return exact negative even integer locations for m=1..100."""
+    return [-2 * m for m in range(1, 101)]
+
+
+def evaluate_trivial_zero_exact(s_val: Union[int, float, mpmath.mpf]) -> Dict[str, Any]:
+    """Audit mathematical properties of integer/real point under Riemann zeta."""
+    s_int = int(s_val)
+    is_neg_even = (s_int < 0) and (s_int % 2 == 0)
+    is_simple = is_neg_even
+    is_isolated = is_neg_even
+    if s_int == 0:
+        zeta_val = "-0.5"
+    elif is_neg_even:
+        zeta_val = "0.0"
+    else:
+        zeta_val = str(mpmath.zeta(s_int))
+    return {
+        "s": s_int,
+        "is_trivial_zero": is_neg_even,
+        "is_simple": is_simple,
+        "is_isolated": is_isolated,
+        "zeta_value": zeta_val
+    }
+
+
+
+def match_candidate_against_reference_interval(
+    candidate_ordinate: Union[float, mpmath.mpf, str],
+    ref_str: str,
+    precision_digits: Optional[int] = None
+) -> Tuple[bool, mpmath.mpf, Tuple[mpmath.mpf, mpmath.mpf]]:
+    """
+    Match a discovered or certified ordinate against an external reference decimal rounding interval:
+        [d - 0.5 * 10^(-p), d + 0.5 * 10^(-p)]
+    
+    Treats sourced decimal with p digits after the decimal point as a rounding interval.
+    Returns (is_contained, absolute_difference, (lower_bound, upper_bound)).
+    """
+    d_ref = mpmath.mpf(ref_str)
+    if precision_digits is None:
+        if "." in ref_str:
+            precision_digits = len(ref_str.split(".")[1])
+        else:
+            precision_digits = 0
+            
+    half_ulp = mpmath.mpf('0.5') * (mpmath.mpf(10) ** (-precision_digits))
+    lower_b = d_ref - half_ulp
+    upper_b = d_ref + half_ulp
+    
+    cand = mpmath.mpf(candidate_ordinate)
+    diff = abs(cand - d_ref)
+    is_contained = bool(lower_b <= cand <= upper_b)
+    
+    return is_contained, diff, (lower_b, upper_b)
+
 
 
 def load_canonical_blocks() -> Dict[str, Dict[str, Any]]:
