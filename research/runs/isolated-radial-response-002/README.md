@@ -1,15 +1,15 @@
 # Experiment Run Digest — Isolated Radial Perturbation and Wave-Component Sensitivity Sweep
 
-**Run ID:** `isolated-radial-response-002`  
-**Experiment ID:** `isolated-radial-response-002`  
-**Status:** `COMPLETE`  
+**Run ID:** `isolated-radial-response-002`
+**Experiment ID:** `isolated-radial-response-002`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **OBSERVATIONAL / NO CRITERION DECLARED**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > Off-line zero perturbation delta != 0 induces a continuous, non-zero deviation in explicit-formula prime reconstruction waves C_J, C_pi and total pi_N(x).
 
 - **Primary Criterion:** `N/A (Observational)`
@@ -117,13 +117,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `88`
 - **Points Completed:** `88`
-- **Started At:** `2026-08-22T10:47:40.198493+00:00`
-- **Completed At:** `2026-08-22T10:48:40.938154+00:00`
+- **Started At:** `2026-08-22T17:49:29.459569+00:00`
+- **Completed At:** `2026-08-22T17:50:30.202591+00:00`
 
 ---
 

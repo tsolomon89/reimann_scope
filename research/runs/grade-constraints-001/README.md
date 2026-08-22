@@ -1,15 +1,15 @@
 # Experiment Run Digest — Bilateral Symmetric Defect and Hyperbolic Scaling Invariant Sweep
 
-**Run ID:** `grade-constraints-001`  
-**Experiment ID:** `grade-constraints-001`  
-**Status:** `COMPLETE`  
+**Run ID:** `grade-constraints-001`
+**Experiment ID:** `grade-constraints-001`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **CRITERION MET**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > The bilateral defect D_K = (tau^(K*delta) - 1)*(1 - tau^(-K*delta)) satisfies |D_K| = 4*sinh^2(K*delta*ln(tau)/2) identically for all K and delta, vanishing if and only if delta = 0 or K = 0.
 
 - **Primary Criterion (max_abs):** `identity_error <= 1e-50`
@@ -74,13 +74,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `105`
 - **Points Completed:** `105`
-- **Started At:** `2026-08-22T10:47:39.672576+00:00`
-- **Completed At:** `2026-08-22T10:47:39.691496+00:00`
+- **Started At:** `2026-08-22T17:49:28.708007+00:00`
+- **Completed At:** `2026-08-22T17:49:28.724164+00:00`
 
 ---
 

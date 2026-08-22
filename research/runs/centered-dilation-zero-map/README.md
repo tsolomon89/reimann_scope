@@ -1,15 +1,15 @@
 # Experiment Run Digest — Centered Coordinate Dilation Zero Map Invariance
 
-**Run ID:** `centered-dilation-zero-map`  
-**Experiment ID:** `centered-dilation-zero-map`  
-**Status:** `COMPLETE`  
+**Run ID:** `centered-dilation-zero-map`
+**Experiment ID:** `centered-dilation-zero-map`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **CRITERION MET**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > For centered dilation s' = 1/2 + tau^k (s - 1/2), mapped zeros rho' = 1/2 + tau^k (rho - 1/2) satisfy f_k(rho') = 0 identically.
 
 - **Primary Criterion (max_abs):** `max_residual <= 1e-45`
@@ -59,13 +59,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `27`
 - **Points Completed:** `27`
-- **Started At:** `2026-08-22T10:47:04.495878+00:00`
-- **Completed At:** `2026-08-22T10:47:04.587630+00:00`
+- **Started At:** `2026-08-22T17:48:53.332734+00:00`
+- **Completed At:** `2026-08-22T17:48:53.424743+00:00`
 
 ---
 

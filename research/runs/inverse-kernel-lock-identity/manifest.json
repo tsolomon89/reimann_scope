@@ -3,10 +3,10 @@
   "run_id": "inverse-kernel-lock-identity",
   "experiment_id": "inverse-kernel-lock-identity",
   "experiment_spec_sha256": "fd97ab82cec1f32803184fb5e79b1d7b25d41176badb215d4c345968d6ff4c20",
-  "git_commit": "2eb8a4d2f9452829a4783a9059f93cfcb896b3ef",
-  "git_dirty": true,
-  "started_at": "2026-08-22T10:47:39.823484+00:00",
-  "completed_at": "2026-08-22T10:47:40.078499+00:00",
+  "git_commit": "08243ae4fe96d6a51011143c7420058f8757d350",
+  "git_dirty": false,
+  "started_at": "2026-08-22T17:49:28.921098+00:00",
+  "completed_at": "2026-08-22T17:49:29.286929+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -125,14 +125,14 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
+    "research_runner.py": "44bd0bd7ca122558f33faedc0c5286a51849135521f62bbd47f423ab9609d8bb",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
-    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
+    "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "zero_finder.py": "74cfd1683c50345934038f60bd47f5827ca155aae4bb7f99ed61ae00115d091f",
-    "certification.py": "070289e14cad1eeddcc4a2c6864ac063a55b5b92b8529b595a5dfe4ddd5d5283"
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887",
+    "certification.py": "d7d1a3993b127d212b893e12ee664455098684819bad2955d50bd0e852c0d4f9"
   },
   "consumed_certificates": []
 }

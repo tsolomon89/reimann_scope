@@ -1,15 +1,15 @@
 # Experiment Run Digest — Cross-Height Path Coherence and Taylor Shape Metric Sweep
 
-**Run ID:** `cross-height-path-coherence-001`  
-**Experiment ID:** `cross-height-path-coherence-001`  
-**Status:** `COMPLETE`  
+**Run ID:** `cross-height-path-coherence-001`
+**Experiment ID:** `cross-height-path-coherence-001`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **OBSERVATIONAL / NO CRITERION DECLARED**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > Derivative-normalized trajectories P_n(u) = zeta(s_n(u)) / [i * Delta_n * zeta'(rho_n)] evaluated at verified simple zeros share common local geometric structures across spectrum blocks.
 
 - **Primary Criterion:** `N/A (Observational)`
@@ -89,13 +89,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `60`
 - **Points Completed:** `60`
-- **Started At:** `2026-08-22T10:47:13.244020+00:00`
-- **Completed At:** `2026-08-22T10:47:39.547041+00:00`
+- **Started At:** `2026-08-22T17:49:02.292612+00:00`
+- **Completed At:** `2026-08-22T17:49:28.536437+00:00`
 
 ---
 

@@ -1,15 +1,15 @@
 # Experiment Run Digest — Coupled Coordinate/Converter Scale Covariance Verification
 
-**Run ID:** `coupled-scale-covariance-001`  
-**Experiment ID:** `coupled-scale-covariance-001`  
-**Status:** `COMPLETE`  
+**Run ID:** `coupled-scale-covariance-001`
+**Experiment ID:** `coupled-scale-covariance-001`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **CRITERION MET**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > Under dilation s' = A*s and variable transformation x' = x^(1/A), the exponent s' log x' = s log x is invariant, ensuring C_J(x', rho') = C_J(x, rho) identically for exact components.
 
 - **Primary Criterion (max_abs):** `covariance_residual <= 1e-45`
@@ -86,13 +86,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `54`
 - **Points Completed:** `54`
-- **Started At:** `2026-08-22T10:47:05.526475+00:00`
-- **Completed At:** `2026-08-22T10:47:06.149308+00:00`
+- **Started At:** `2026-08-22T17:48:54.437744+00:00`
+- **Completed At:** `2026-08-22T17:48:55.081793+00:00`
 
 ---
 

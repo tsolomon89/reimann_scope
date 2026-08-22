@@ -1,15 +1,15 @@
 # Experiment Run Digest — Cross-Height Trajectory Distance and Norm Sweep
 
-**Run ID:** `cross-height-distance-001`  
-**Experiment ID:** `cross-height-distance-001`  
-**Status:** `COMPLETE`  
+**Run ID:** `cross-height-distance-001`
+**Experiment ID:** `cross-height-distance-001`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **CRITERION MET**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > Derivative-normalized paths P_n(u) from different height blocks lie within an O(Delta_n) bounded envelope around the leading linear term u on compact sampling intervals.
 
 - **Primary Criterion (max):** `max_distance <= 2.0`
@@ -68,13 +68,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `3`
 - **Points Completed:** `3`
-- **Started At:** `2026-08-22T10:47:06.272537+00:00`
-- **Completed At:** `2026-08-22T10:47:13.119955+00:00`
+- **Started At:** `2026-08-22T17:48:55.240650+00:00`
+- **Completed At:** `2026-08-22T17:49:02.125754+00:00`
 
 ---
 

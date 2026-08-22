@@ -32,22 +32,22 @@
     "c3_real": "4.70096015404676554417047014038646871041451649581435529439608382492544990877742798584989280035869",
     "c3_imag": "-0.545615354813874045050139508814316996907908310233903795208613744010051688017614382266994196166447"
   },
-  "method": "flint.acb.zeta_zero via Arb Turing-method isolating balls and acb_series Taylor expansion",
+  "formal_theorem_reference": "RiemannScope.ZeroCharacter.zeroCharacter_isolated_simple",
   "precision_dps": 80,
   "precision_bits": 265,
   "library": "python-flint",
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "5bf0832e02cb5b953efe68d2b5b1c212e0dbcb63",
+  "producing_git_commit": "08243ae4fe96d6a51011143c7420058f8757d350",
   "source_code_hashes": {
-    "certification.py": "a5be6d7a645c7c817e886dfcf978579b1bcfaa7b92af18b1d3ac98a0df112679",
+    "certification.py": "d7d1a3993b127d212b893e12ee664455098684819bad2955d50bd0e852c0d4f9",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
-    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
+    "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
+    "research_runner.py": "44bd0bd7ca122558f33faedc0c5286a51849135521f62bbd47f423ab9609d8bb",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -60,14 +60,18 @@
     "python": "3.10.9",
     "python_flint": "0.6.0",
     "mpmath": "1.3.0",
-    "platform": "win32"
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-22T13:24:05.873316+00:00",
+  "created_at": "2026-08-22T17:47:23.553090+00:00",
   "invalidation_conditions": [
+    "derivative_enclosure_contains_zero",
+    "isolation_interval_overlap",
     "source_code_hash_mismatch",
-    "dependency_fingerprint_mismatch",
-    "input_data_hash_mismatch",
-    "flint_replay_containment_failure"
+    "input_data_hash_mismatch"
   ],
-  "certificate_hash": "db283ed619a83811dee896d93f92fcef774a50d5fd3a542071368b46881bbeff"
+  "certificate_hash": "9525acb5e0e4bdd8db1842ac6d3df7b03677ff5c4a8bab2ee18c0ab581f5e170"
 }

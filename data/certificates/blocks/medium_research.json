@@ -3,47 +3,44 @@
   "certificate_type": "complete_block_certificate",
   "status": "complete_block_certified",
   "block_id": "medium_research",
+  "zero_family": "nontrivial",
   "index_range": [
     100,
     104
   ],
   "zero_count": 5,
-  "mathematical_claim": "Canonical block 'medium_research' contains exactly 5 certified consecutive simple zeros for indices 100..104",
+  "all_zeros_simple": true,
   "constituent_zero_hashes": [
-    "d7785550aa733f24e63ee2b7dc7254f877edfc910bc30cf5cf547d80cb8fd3c0",
-    "2333906aa45509304c11e3e99f578179367b038ac7f8996de27a165216869d41",
-    "a144e85992514a46f1b7529f52bb6ba2b0fde7bb12eb4498c2562715abd1888c",
-    "7ea8534a2eda619451e52027f3a1ca3f5ab489eb20b4bf04cf4165a2e88d2224",
-    "54053ee5be4f6e28a7a9660907485c8d7ba84476e47517fe2c5ac95b44e57149"
-  ],
-  "height_range": [
-    "236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740",
-    "242.8232719342226000168264744588785499539405437676149323831693082575287402605378973831174125968060324"
+    "c4c2b874effd415001c2eb7421b22b2bcc1eb66f210560fa5a88446c0eb5e353",
+    "7b67a2baab19cae3e1535818a61a00f45a0f3f451ff033fdfb290ab4f4468f99",
+    "a53297877f882eedffc8f3a3f22a93d13cda65dfc95d8c0da348edadf3ac0ab2",
+    "5f8e2721513a3aa1c1edbe9908e764718101c835710628bb240c9f1ca19f9737",
+    "fcbb64bea870ec30c371370307395e9944b2426c10afe56a6f68773b4eb9b1c0"
   ],
   "endpoint_bounds": {
     "t_min": "235.1088169223622532215900013441163834345333614833774800319668848633796525427704400946017209446938220",
     "t_max": "243.4470852156503791268215012243615256505203672421926299200194745162256513374994707702562753591966381",
-    "N_t_min": "99",
-    "N_t_max": "104",
+    "n_zeros_at_t_min": 99,
+    "n_zeros_at_t_max": 104,
     "turing_count": 5,
     "count_verified": true
   },
-  "all_zeros_simple": true,
-  "method": "flint.arb.zeta_nzeros Turing zero-count difference across isolating boundary endpoints",
+  "mathematical_claim": "Block 'medium_research' contains exactly 5 consecutive simple nontrivial zeros for indices 100..104; Turing zero count rigorously verified via FLINT N(t_max)-N(t_min)=5.",
+  "formal_theorem_reference": "RiemannScope.ZeroCharacter.zeroBlock_complete",
   "precision_dps": 80,
   "library": "python-flint",
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "5bf0832e02cb5b953efe68d2b5b1c212e0dbcb63",
+  "producing_git_commit": "08243ae4fe96d6a51011143c7420058f8757d350",
   "source_code_hashes": {
-    "certification.py": "a5be6d7a645c7c817e886dfcf978579b1bcfaa7b92af18b1d3ac98a0df112679",
+    "certification.py": "d7d1a3993b127d212b893e12ee664455098684819bad2955d50bd0e852c0d4f9",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
-    "reference_data.py": "176c9df8be0dc9022ef67ef6178063390a7d8ede7e866f0cfec6cbddbb40502d",
+    "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "cf974e5bcf7edb2a88e813b8734c452343cf890973ff5d011906e740f38e3b7f",
+    "research_runner.py": "44bd0bd7ca122558f33faedc0c5286a51849135521f62bbd47f423ab9609d8bb",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -56,13 +53,17 @@
     "python": "3.10.9",
     "python_flint": "0.6.0",
     "mpmath": "1.3.0",
-    "platform": "win32"
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-22T13:24:06.528956+00:00",
+  "created_at": "2026-08-22T17:47:25.308395+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "7027b0ea6cba65fffa6a6af7eae4ba8d13631ba633a0df5b212a6562c1843bcb"
+  "certificate_hash": "a2b8ffdc7d25dff86df229280272368dc54d3eb767f6c43eb8f2cef451878e91"
 }

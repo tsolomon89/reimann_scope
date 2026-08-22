@@ -1,15 +1,15 @@
 # Experiment Run Digest — Radial Centrifuge Logarithmic Slope Verification
 
-**Run ID:** `centrifuge-slope-verification`  
-**Experiment ID:** `centrifuge-slope-verification`  
-**Status:** `COMPLETE`  
+**Run ID:** `centrifuge-slope-verification`
+**Experiment ID:** `centrifuge-slope-verification`
+**Status:** `COMPLETE`
 **Criterion Outcome:** **CRITERION MET**
 
 ---
 
 ## 1. Mathematical Statement & Criterion
 
-- **Hypothesis:**  
+- **Hypothesis:**
   > The discrete radial amplification factor satisfies d/dK [ log |q_rho^K| ] = delta * ln(tau) identically.
 
 - **Primary Criterion (max_abs):** `abs_slope_error <= 1e-45`
@@ -46,13 +46,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `2eb8a4d2f9452829a4783a9059f93cfcb896b3ef` (Dirty: `True`)
+- **Git Commit:** `08243ae4fe96d6a51011143c7420058f8757d350` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `11`
 - **Points Completed:** `11`
-- **Started At:** `2026-08-22T10:47:04.711975+00:00`
-- **Completed At:** `2026-08-22T10:47:04.716975+00:00`
+- **Started At:** `2026-08-22T17:48:53.564525+00:00`
+- **Completed At:** `2026-08-22T17:48:53.569034+00:00`
 
 ---
 
