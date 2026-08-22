@@ -845,6 +845,44 @@ def test_cross_height_distance_emits_l_infty_and_l_2_distance():
     assert summary["report_metrics"]["L_2_distance"]["count"] == 1
 
 
+def test_validate_manifest_accepts_valid_manifest_and_rejects_discrepancies():
+    """Verify that validate_manifest passes valid certificate bindings and catches anomalies."""
+    valid_manifest = {
+        "consumed_certificates": ["hash_1", "hash_2"]
+    }
+    valid_results = [
+        {"point_id": 0, "outputs": {
+            "source_zero_cert_hash": "hash_1",
+            "worldline_cert_hash": "hash_2",
+            "source_zero_certificate_status": "certified",
+            "worldline_certificate_status": "certified",
+            "worldline_certified": "true"
+        }}
+    ]
+    ok, errs = research_runner.validate_manifest(valid_manifest, valid_results)
+    assert ok, f"Expected valid manifest: {errs}"
+
+    # Missing from consumed certificates
+    invalid_manifest1 = {"consumed_certificates": ["hash_1"]}
+    ok1, errs1 = research_runner.validate_manifest(invalid_manifest1, valid_results)
+    assert not ok1
+    assert any("missing from manifest consumed_certificates" in e for e in errs1)
+
+    # Worldline certified true but hash is N/A
+    bad_results = [
+        {"point_id": 0, "outputs": {
+            "source_zero_cert_hash": "hash_1",
+            "worldline_cert_hash": "N/A",
+            "worldline_certified": "true",
+            "worldline_certificate_status": "not_available",
+            "source_zero_certificate_status": "certified"
+        }}
+    ]
+    ok2, errs2 = research_runner.validate_manifest({"consumed_certificates": ["hash_1"]}, bad_results)
+    assert not ok2
+    assert any("worldline_cert_hash is 'N/A'" in e for e in errs2)
+
+
 
 
 

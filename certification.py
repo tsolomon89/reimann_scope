@@ -7,6 +7,7 @@ verify consecutive block completeness via Turing zero counting, and certify bila
 
 from __future__ import annotations
 
+import glob
 import hashlib
 import json
 import os
@@ -27,7 +28,11 @@ except ImportError:
     ctx = None    # type: ignore[assignment]
     FLINT_AVAILABLE = False
 
-FLINT_VERSION = getattr(flint, "__version__", "0.6.0") if flint is not None else "N/A"
+AUTHORITATIVE_FLINT_VERSION = "0.6.0"
+SUPPORTED_FLINT_VERSIONS = {"0.6.0"}
+AUTHORITATIVE_MPMATH_VERSION = "1.3.0"
+SUPPORTED_MPMATH_VERSIONS = {"1.3.0"}
+FLINT_VERSION = getattr(flint, "__version__", AUTHORITATIVE_FLINT_VERSION) if flint is not None else "N/A"
 CERTIFICATE_SCHEMA_VERSION = "2.0"
 VERIFIER_VERSION = "2.0.0"
 ALGORITHM_VERSION = "2.0.0"
@@ -40,6 +45,7 @@ CERTIFICATION_LEVELS = [
     "complete_block_certified",
     "worldline_certified",
 ]
+
 
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 CERT_DIR = os.path.join(REPO_ROOT, "data", "certificates")
@@ -115,6 +121,26 @@ def _get_dependency_fingerprint() -> Dict[str, str]:
     }
 
 
+def _is_valid_git_commit(commit_sha: str) -> bool:
+    """Verify that a producing commit SHA is a valid, existing 40-char hex Git commit."""
+    if not isinstance(commit_sha, str) or len(commit_sha) != 40:
+        return False
+    if not all(c in "0123456789abcdefABCDEF" for c in commit_sha):
+        return False
+    if commit_sha.lower() in ("0000000000000000000000000000000000000000", "fake", "unknown", "forged"):
+        return False
+    try:
+        res = subprocess.run(
+            ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
+            cwd=REPO_ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return res.returncode == 0
+    except Exception:
+        return False
+
+
 def _get_git_commit() -> str:
     """Retrieve current Git commit hash or fallback."""
     try:
@@ -126,6 +152,7 @@ def _get_git_commit() -> str:
         return commit
     except Exception:
         return "UNKNOWN"
+
 
 
 def _split_ball_str(ball: Any) -> Tuple[str, str]:
@@ -687,23 +714,44 @@ def verify_certificate(
         anomalies.append("Missing or empty dependency_fingerprint")
         return False, anomalies
 
-    required_dep_keys = ["python", "python_flint", "mpmath", "platform"]
+    required_dep_keys = [
+        "python", "python_flint", "mpmath", "platform",
+        "library", "library_version", "verifier_version", "algorithm_version"
+    ]
     for k in required_dep_keys:
-        if k not in dep_fp or not dep_fp[k] or dep_fp[k] == "N/A":
-            anomalies.append(f"dependency_fingerprint missing or invalid key '{k}'")
+        val = str(dep_fp.get(k, "")).strip()
+        if not val or val in ("N/A", "0.0", "forged"):
+            anomalies.append(f"dependency_fingerprint missing or invalid key '{k}' ('{dep_fp.get(k)}')")
 
-    flint_ver = dep_fp.get("python_flint", "")
-    if not flint_ver or flint_ver == "N/A":
-        anomalies.append("dependency_fingerprint python_flint version is missing or invalid")
+    flint_ver = str(dep_fp.get("python_flint", "")).strip()
+    if flint_ver not in SUPPORTED_FLINT_VERSIONS:
+        anomalies.append(f"Unsupported python_flint version '{flint_ver}'. Supported: {sorted(list(SUPPORTED_FLINT_VERSIONS))}")
 
     lib_name = dep_fp.get("library", "python-flint")
     if lib_name != "python-flint":
         anomalies.append(f"Unsupported certification library: {lib_name}")
 
+    lib_ver = str(dep_fp.get("library_version", "")).strip()
+    if lib_ver != flint_ver:
+        anomalies.append(f"Contradictory library_version ({lib_ver}) != python_flint ({flint_ver})")
+
+    ver_ver = str(dep_fp.get("verifier_version", "")).strip()
+    if ver_ver != VERIFIER_VERSION:
+        anomalies.append(f"Unsupported verifier_version '{ver_ver}'. Expected: '{VERIFIER_VERSION}'")
+
+    algo_ver = str(dep_fp.get("algorithm_version", "")).strip()
+    if algo_ver != ALGORITHM_VERSION:
+        anomalies.append(f"Unsupported algorithm_version '{algo_ver}'. Expected: '{ALGORITHM_VERSION}'")
+
+    plat = str(dep_fp.get("platform", "")).strip().lower()
+    if plat in ("forged", "unknown", "fake", ""):
+        anomalies.append(f"Invalid platform policy value in dependency fingerprint: '{plat}'")
+
     # 2. Producing Git Commit Validation
     commit = cert.get("producing_git_commit")
-    if not commit or not isinstance(commit, str) or len(commit) < 7 or commit in ["UNKNOWN", "FAKE", "FORGED"]:
-        anomalies.append(f"Invalid or missing producing_git_commit: '{commit}'")
+    if not _is_valid_git_commit(str(commit)):
+        anomalies.append(f"Invalid, fake, or non-existent producing_git_commit: '{commit}'")
+
 
     # 3. Source Code Hashes Validation
     cert_src = cert.get("source_code_hashes")
@@ -1006,34 +1054,58 @@ def verify_certificate(
             src_idx = cert.get("source_zero_index")
             grade_K = cert.get("grade_K")
             delta_str = str(cert.get("delta", "0.0")).strip()
+            src_fam = cert.get("source_zero_family") or cert.get("zero_family", "nontrivial")
 
             if src_hash is None or src_idx is None or grade_K is None:
                 anomalies.append("Worldline certificate missing source_zero_hash, source_zero_index, or grade_K")
                 return False, anomalies
 
-            # Resolve source zero certificate
+            # Resolve source zero certificate strictly by family
             src_cert = None
             if cert_store:
-                src_cert = cert_store.get(src_hash) or cert_store.get(f"zero_{src_idx:05d}") or cert_store.get(f"trivial_zero_{src_idx:05d}")
+                if src_hash:
+                    cand = cert_store.get(src_hash)
+                    if cand:
+                        cand_fam = cand.get("zero_family", "nontrivial" if cand.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
+                        if cand_fam != src_fam:
+                            anomalies.append(f"Source zero family mismatch: worldline declared {src_fam}, but source hash {src_hash} is {cand_fam}")
+                        src_cert = cand
+                if src_cert is None:
+                    if src_fam == "trivial":
+                        src_cert = cert_store.get(f"trivial_zero_{src_idx:05d}")
+                    else:
+                        src_cert = cert_store.get(f"zero_{src_idx:05d}")
+
             if src_cert is None:
-                disk_path = os.path.join(ZEROS_DIR, f"zero_{src_idx:05d}.json")
-                if not os.path.exists(disk_path):
+                if src_fam == "trivial":
                     disk_path = os.path.join(TRIVIAL_ZEROS_DIR, f"trivial_zero_{src_idx:05d}.json")
+                else:
+                    disk_path = os.path.join(ZEROS_DIR, f"zero_{src_idx:05d}.json")
                 if os.path.exists(disk_path):
                     try:
                         with open(disk_path, "r", encoding="utf-8") as f:
                             src_cert = json.load(f)
                     except Exception:
                         src_cert = None
+
             if src_cert is None:
-                anomalies.append(f"Source zero certificate for index {src_idx} (hash {src_hash}) could not be resolved")
+                anomalies.append(f"Source {src_fam} zero certificate for index {src_idx} (hash {src_hash}) could not be resolved")
                 return False, anomalies
+
+            # Verify family matches
+            cand_fam = src_cert.get("zero_family", "nontrivial" if src_cert.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
+            if cand_fam != src_fam:
+                anomalies.append(f"Source zero family mismatch: expected {src_fam}, resolved certificate is {cand_fam}")
+
             if src_cert.get("certificate_hash") != src_hash:
                 anomalies.append(f"Source zero certificate hash mismatch: expected {src_hash}, found {src_cert.get('certificate_hash')}")
+
+
             # Verify source zero certificate
             ok_src, errs_src = verify_certificate(src_cert, cert_store=cert_store, check_provenance=check_provenance)
             if not ok_src:
                 anomalies.append(f"Source zero certificate verification failed: {errs_src}")
+
 
             tp = cert.get("transformed_point", {})
             if "real_rad" not in tp or "imag_rad" not in tp:
@@ -1145,3 +1217,135 @@ def load_and_verify_certificate(
 
     is_valid, anomalies = verify_certificate(cert, cert_store=cert_store, check_provenance=check_provenance)
     return is_valid, cert, anomalies
+
+
+def generate_verification_report(
+    cert_dir: Optional[str] = None,
+    check_provenance: bool = True
+) -> Dict[str, Any]:
+    """Strictly verify all persisted certificates on disk and write a cryptographic verification report.
+
+    Saves to data/certificates/verification_report.json.
+    """
+    target_dir = cert_dir or CERT_DIR
+    zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
+    trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
+    blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
+    worldline_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
+
+    all_files = zeros_files + trivial_files + blocks_files + worldline_files
+    total_inventory = len(all_files)
+
+    # Preload in-memory cert store for fast cross-resolution
+    cert_store: Dict[str, Dict[str, Any]] = {}
+    parsed_certs: List[Tuple[str, Dict[str, Any]]] = []
+    for fpath in all_files:
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                c = json.load(f)
+                h = c.get("certificate_hash")
+                if h:
+                    cert_store[h] = c
+                c_type = c.get("certificate_type")
+                if c_type == "zero_isolation_and_simplicity":
+                    z_idx = c.get("nontrivial_index") or c.get("zero_index")
+                    if z_idx is not None:
+                        cert_store[f"zero_{z_idx:05d}"] = c
+                elif c_type == "trivial_zero_certificate":
+                    m_idx = c.get("trivial_index")
+                    if m_idx is not None:
+                        cert_store[f"trivial_zero_{m_idx:05d}"] = c
+                parsed_certs.append((fpath, c))
+        except Exception:
+            pass
+
+    passed_count = 0
+    failed_count = 0
+    failures: List[Dict[str, Any]] = []
+
+    for fpath, cert in parsed_certs:
+        fname = os.path.basename(fpath)
+        try:
+            ok, errs = verify_certificate(cert, cert_store=cert_store, check_provenance=check_provenance)
+            if ok:
+                passed_count += 1
+            else:
+                failed_count += 1
+                failures.append({"file": fname, "hash": cert.get("certificate_hash"), "errors": errs})
+        except Exception as e:
+            failed_count += 1
+            failures.append({"file": fname, "errors": [str(e)]})
+
+    status = "verified" if (failed_count == 0 and total_inventory > 0) else ("unverified" if total_inventory == 0 else "failed")
+
+    report: Dict[str, Any] = {
+        "schema_version": CERTIFICATE_SCHEMA_VERSION,
+        "report_type": "certificate_verification_report",
+        "status": status,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "total_inventory": total_inventory,
+        "nontrivial_zeros_count": len(zeros_files),
+        "trivial_zeros_count": len(trivial_files),
+        "blocks_count": len(blocks_files),
+        "worldlines_count": len(worldline_files),
+        "passed_count": passed_count,
+        "failed_count": failed_count,
+        "dependency_fingerprint": _get_dependency_fingerprint(),
+        "source_code_hashes": _get_source_code_hashes(),
+        "input_data_hashes": _get_input_data_hashes(),
+        "producing_git_commit": _get_git_commit(),
+        "failures": failures
+    }
+    report_hash = _sha256_canonical(report)
+    report["report_hash"] = report_hash
+
+    report_path = os.path.join(target_dir, "verification_report.json")
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2)
+
+    return report
+
+
+def load_verification_report(report_path: Optional[str] = None) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
+    """Load and validate verification_report.json for truthfulness against current workspace.
+
+    Returns:
+        (is_authentic_and_passing, report_dict_or_None, anomalies)
+    """
+    target_path = report_path or os.path.join(CERT_DIR, "verification_report.json")
+    if not os.path.exists(target_path):
+        return False, None, ["Verification report not found (status: unverified)"]
+
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            report = json.load(f)
+    except Exception as e:
+        return False, None, [f"Failed to read verification report JSON: {e}"]
+
+    anomalies: List[str] = []
+    # Check self hash
+    exp_h = report.get("report_hash")
+    if not exp_h or _sha256_canonical(report) != exp_h:
+        anomalies.append("Verification report self-hash mismatch or missing")
+
+    # Check status and failure counts
+    if report.get("status") != "verified":
+        anomalies.append(f"Report status is '{report.get('status')}', expected 'verified'")
+    if report.get("failed_count", 0) > 0:
+        anomalies.append(f"Report contains {report.get('failed_count')} failed certificates")
+
+    # Check source code hash match
+    curr_src = _get_source_code_hashes()
+    rep_src = report.get("source_code_hashes", {})
+    for mod, h in curr_src.items():
+        if rep_src.get(mod) != h:
+            anomalies.append(f"Source code hash mismatch for '{mod}': report {rep_src.get(mod)}, current {h}")
+
+    # Check dependency fingerprint
+    curr_dep = _get_dependency_fingerprint()
+    rep_dep = report.get("dependency_fingerprint", {})
+    if rep_dep.get("python_flint") not in SUPPORTED_FLINT_VERSIONS:
+        anomalies.append(f"Unsupported python_flint version in report: {rep_dep.get('python_flint')}")
+
+    is_valid = (len(anomalies) == 0 and report.get("status") == "verified" and report.get("failed_count", 0) == 0)
+    return is_valid, report, anomalies

@@ -756,13 +756,36 @@ def create_proof_programme_tab():
         except Exception:
             runs_list = []
 
-    # Count certificates dynamically
+    # Load verification report
+    rep_ok, rep, rep_errs = certification.load_verification_report()
     cert_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "certificates")
     zeros_count = len(glob.glob(os.path.join(cert_dir, "zeros", "*.json")))
     trivial_count = len(glob.glob(os.path.join(cert_dir, "trivial_zeros", "*.json")))
     blocks_count = len(glob.glob(os.path.join(cert_dir, "blocks", "*.json")))
     worldlines_count = len(glob.glob(os.path.join(cert_dir, "worldlines", "*.json")))
-    cert_count = zeros_count + trivial_count + blocks_count + worldlines_count
+    inventory_count = zeros_count + trivial_count + blocks_count + worldlines_count
+
+    if rep_ok and rep:
+        status_color = "success"
+        flint_v = rep.get("dependency_fingerprint", {}).get("python_flint", "0.6.0")
+        commit_s = str(rep.get("producing_git_commit", "clean"))[:7]
+        cert_alert = dbc.Alert(
+            f"Certification Status: VERIFIED ({rep.get('passed_count')}/{rep.get('total_inventory')} certificates valid, 0 failures) — Engine: python-flint {flint_v} (Commit {commit_s})",
+            color="success",
+            className="small py-2 mb-0 font-monospace"
+        )
+    elif rep and rep.get("failed_count", 0) > 0:
+        cert_alert = dbc.Alert(
+            f"Certification Status: FAILED ({rep.get('failed_count')} certificate failures detected). Failures: {rep.get('failures', [])[:2]}",
+            color="danger",
+            className="small py-2 mb-0 font-monospace"
+        )
+    else:
+        cert_alert = dbc.Alert(
+            f"Certification Status: UNVERIFIED ({inventory_count} certificates present on disk, verification report absent or stale). Run `python scripts/verify_certificates.py` to certify.",
+            color="secondary",
+            className="small py-2 mb-0 font-monospace"
+        )
 
     prog_stages = [
         {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": "Constructed & Formally Checked", "color": "success"},
@@ -772,7 +795,7 @@ def create_proof_programme_tab():
         {"stage": "5. Cross-Height Observations", "requirement": "Evaluate normalized trajectory distances L_inf, L_2", "status": "Active Research Campaign", "color": "info"},
         {"stage": "6. Exact Global Coherence Law", "requirement": "Derive universal multi-height trajectory constraint law", "status": "OPEN RESEARCH TARGET (Missing)", "color": "warning"},
         {"stage": "7. Coherence => Radial Rigidity", "requirement": "Prove global coherence forbids multiple occupied radial leaves", "status": "OPEN RESEARCH TARGET (Missing)", "color": "danger"},
-        {"stage": "8. Contradiction (delta = 0)", "requirement": "Fix unique occupied leaf at R_tau = 0 by known zeros", "status": "Not Reached", "color": "secondary"},
+        {"stage": "8. Contradiction (delta_0 = 0)", "requirement": "Functional equation reflection closes unique radial class: delta_0 = -delta_0 => delta_0 = 0", "status": "Not Reached (Conditional on Rigidity)", "color": "secondary"},
     ]
 
     return html.Div([
@@ -813,7 +836,7 @@ def create_proof_programme_tab():
                 dbc.Card([
                     dbc.CardHeader([
                         html.I(className="bi bi-award me-2 text-success"),
-                        html.Span(f"Machine-Verifiable Certificate Inventory ({cert_count} Artifacts)", className="fw-bold small text-light")
+                        html.Span(f"Machine-Verifiable Certificate Inventory ({inventory_count} Artifacts)", className="fw-bold small text-light")
                     ], className="py-1 px-3 bg-dark border-secondary"),
                     dbc.CardBody([
                         html.P(
@@ -822,15 +845,16 @@ def create_proof_programme_tab():
                         ),
                         html.Ul([
                             html.Li([html.Strong(f"Nontrivial Zero Certificates ({zeros_count}): "), "Certified simple zeros across 4 spectrum blocks (Low n=1..100, Medium n=100..104, High n=1000..1002, Very High n=10000..10002). 0 ∉ ζ'(B_n) verified in Arb."], className="small text-light mb-1"),
-                            html.Li([html.Strong(f"Trivial Zero Controls ({trivial_count}): "), "Certified trivial zeros s_m = -2m (m=1..100) with non-vanishing derivative 0 ∉ ζ'(-2m)."], className="small text-light mb-1"),
+                            html.Li([html.Strong(f"Trivial Zero Controls ({trivial_count}): "), "Certified trivial zeros s_m = -2m (m=1..100) with non-vanishing derivative 0 ∉ ζ'(-2m) proving simplicity and local isolation."], className="small text-light mb-1"),
                             html.Li([html.Strong(f"Block Certificates ({blocks_count}): "), f"{blocks_count} complete block certificates verifying Turing zero counts N(t_max)-N(t_min) and consecutiveness."], className="small text-light mb-1"),
-                            html.Li([html.Strong(f"Worldline Certificates ({worldlines_count}): "), f"{worldlines_count} bilateral worldline certificates across grades K in [-2..2] and radial leaves δ."], className="small text-light mb-1"),
+                            html.Li([html.Strong(f"Worldline Certificates ({worldlines_count}): "), f"{worldlines_count} bilateral worldline certificates across grades K in [-5..5] and radial leaves δ."], className="small text-light mb-1"),
                         ]),
-                        dbc.Alert(f"Total of {cert_count} machine-verifiable certificates in data/certificates/ verified fail-closed via Python-FLINT/Arb ball arithmetic.", color="success", className="small py-2 mb-0")
+                        cert_alert
                     ], className="p-3")
                 ], className="border-secondary shadow-sm mb-3")
             ], xs=12, lg=6),
         ], className="g-3 mb-2"),
+
 
         dbc.Row([
             dbc.Col([
@@ -1728,10 +1752,16 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
         showlegend=True
     )
 
-    info_text = html.Div([
+    info_children = []
+    if cert_mode == "certified":
+        info_children.append(
+            dbc.Badge(f"CERTIFIED: All {len(selected_ordinates)} spectrum zeros verified in Arb", color="success", className="d-block p-1 mb-2 font-monospace")
+        )
+    info_children.extend([
         html.Span(f"Comparing {len(selected_ordinates)} spectrum blocks at zero index {zero_idx}:", className="fw-bold d-block mb-1"),
         html.Div([html.Span(lbl, className="d-block text-light") for lbl in selected_zero_labels])
     ])
+    info_text = html.Div(info_children)
 
     return info_text, fig_overlay, fig_dev, fig_matrix, fig_taylor
 
@@ -1762,10 +1792,11 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
     deltas = selected_deltas or [0.0]
 
     k_range = list(range(k_min, k_max + 1))
+    cert_prefix = "CERTIFIED " if cert_mode == "certified" else ""
 
     fig_traj = go.Figure(layout=DARK_LAYOUT)
     fig_traj.update_layout(
-        title=dict(text=f"Bilateral Worldlines in Complex Plane for γ = {gamma:.4f}", font=dict(size=12)),
+        title=dict(text=f"{cert_prefix}Bilateral Worldlines in Complex Plane for γ = {gamma:.4f}", font=dict(size=12)),
         xaxis=dict(title="Re(s)", zeroline=True),
         yaxis=dict(title="Im(s)", scaleanchor="x", scaleratio=1.0, constrain="range", zeroline=True),
         showlegend=True
@@ -1773,11 +1804,12 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
 
     fig_rad = go.Figure(layout=DARK_LAYOUT)
     fig_rad.update_layout(
-        title=dict(text="Normalized Radial Coordinate K ↦ R_τ(s_ρ(K), K)", font=dict(size=12)),
+        title=dict(text=f"{cert_prefix}Normalized Radial Coordinate K ↦ R_τ(s_ρ(K), K)", font=dict(size=12)),
         xaxis=dict(title="Bilateral Grade K", dtick=1),
         yaxis=dict(title="R_τ(s, K)", dtick=0.05),
         showlegend=True
     )
+
 
     fig_def = go.Figure(layout=DARK_LAYOUT)
     fig_def.update_layout(

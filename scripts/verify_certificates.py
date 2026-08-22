@@ -22,19 +22,23 @@ CERT_DIR = os.path.join(REPO_ROOT, "data", "certificates")
 
 
 def verify_all() -> Tuple[bool, int, List[str]]:
-    cert_pattern = os.path.join(CERT_DIR, "**", "*.json")
-    cert_files = glob.glob(cert_pattern, recursive=True)
-    
+    zeros_files = sorted(glob.glob(os.path.join(CERT_DIR, "zeros", "*.json")))
+    trivial_files = sorted(glob.glob(os.path.join(CERT_DIR, "trivial_zeros", "*.json")))
+    blocks_files = sorted(glob.glob(os.path.join(CERT_DIR, "blocks", "*.json")))
+    worldline_files = sorted(glob.glob(os.path.join(CERT_DIR, "worldlines", "*.json")))
+
+    cert_files = zeros_files + trivial_files + blocks_files + worldline_files
+
     if not cert_files:
         return False, 0, ["No certificates found in data/certificates/"]
-        
+
     all_anomalies: List[str] = []
     total_verified = 0
-    
+
     # Pre-load all certificate dictionaries into memory for fast dependency resolution
     cert_store: Dict[str, Dict[str, Any]] = {}
     parsed_certs: List[Tuple[str, Dict[str, Any]]] = []
-    
+
     for c_path in cert_files:
         try:
             with open(c_path, "r", encoding="utf-8") as f:
@@ -64,7 +68,9 @@ def verify_all() -> Tuple[bool, int, List[str]]:
         except Exception as e:
             all_anomalies.append(f"[{os.path.basename(c_path)}] Exception during verification: {e}")
 
-            
+    # Generate verification report artifact
+    certification.generate_verification_report(cert_dir=CERT_DIR, check_provenance=True)
+
     return (len(all_anomalies) == 0), total_verified, all_anomalies
 
 

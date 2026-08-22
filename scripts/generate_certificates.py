@@ -91,11 +91,11 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
     
     # 3. Bilateral worldlines for sample nontrivial zeros
     worldline_count = 0
-    test_zero_indices = [1, 2, 3, 100, 1000, 10000]
-    
-    for z_idx in test_zero_indices:
+    # Zeros 1, 2, 3 get full bilateral grade sweep K in [-5..5] for all 5 deltas (covers transcendental-worldlines-001 & synthetic-radial-leaves-001)
+    primary_zero_indices = [1, 2, 3]
+    for z_idx in primary_zero_indices:
         zc = all_zero_certs[z_idx]
-        for K in GRADES_TO_CERTIFY:
+        for K in range(-5, 6):
             for delta_val in DELTAS_TO_CERTIFY:
                 wl_cert = certification.certify_worldline(zc, grade=K, delta=delta_val, dps=80, git_commit=git_commit)
                 d_float = float(delta_val)
@@ -105,21 +105,47 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
                 with open(wl_path, "w", encoding="utf-8") as f:
                     json.dump(wl_cert, f, indent=2)
                 worldline_count += 1
-                
-    # 4. Trivial zero worldlines for sample trivial zeros
-    for m_idx in [1, 2, 5, 10, 100]:
+
+    # Research block zeros 100, 1000, 10000 get K in [-2..2]
+    research_zero_indices = [100, 1000, 10000]
+    for z_idx in research_zero_indices:
+        zc = all_zero_certs[z_idx]
+        for K in range(-2, 3):
+            for delta_val in DELTAS_TO_CERTIFY:
+                wl_cert = certification.certify_worldline(zc, grade=K, delta=delta_val, dps=80, git_commit=git_commit)
+                d_float = float(delta_val)
+                delta_tag = f"delta_{d_float:+.2f}".replace(".", "p").replace("+", "pos").replace("-", "neg")
+                wl_filename = f"worldline_z{z_idx:05d}_K{K:+d}_{delta_tag}.json".replace("+", "p").replace("-", "m")
+                wl_path = os.path.join(WORLDLINES_DIR, wl_filename)
+                with open(wl_path, "w", encoding="utf-8") as f:
+                    json.dump(wl_cert, f, indent=2)
+                worldline_count += 1
+
+    # 4. Trivial zero worldlines for canonical trivial sweep (m=1..10, K in [-2..2]) + sample m=100
+    for m_idx in range(1, 11):
         tzc = all_trivial_certs[m_idx]
-        for K in [-2, 0, 2]:
+        for K in range(-2, 3):
             wl_cert = certification.certify_worldline(tzc, grade=K, delta="0.0", dps=80, git_commit=git_commit)
             wl_filename = f"worldline_trivial_m{m_idx:05d}_K{K:+d}.json".replace("+", "p").replace("-", "m")
             wl_path = os.path.join(WORLDLINES_DIR, wl_filename)
             with open(wl_path, "w", encoding="utf-8") as f:
                 json.dump(wl_cert, f, indent=2)
             worldline_count += 1
-                
+
+    # Extra sample m=100
+    tzc_100 = all_trivial_certs[100]
+    for K in [-2, 0, 2]:
+        wl_cert = certification.certify_worldline(tzc_100, grade=K, delta="0.0", dps=80, git_commit=git_commit)
+        wl_filename = f"worldline_trivial_m00100_K{K:+d}.json".replace("+", "p").replace("-", "m")
+        wl_path = os.path.join(WORLDLINES_DIR, wl_filename)
+        with open(wl_path, "w", encoding="utf-8") as f:
+            json.dump(wl_cert, f, indent=2)
+        worldline_count += 1
+
     print(f"[+] Certified {worldline_count} bilateral worldlines & radial leaves.")
     print("=== Certificate Generation Complete ===")
     return zero_count, trivial_count, block_count, worldline_count
+
 
 
 def main() -> None:

@@ -863,6 +863,10 @@ def evaluate_point(
 
                 max_res = max(zeta_res, leaf_inv_err)
 
+                src_status = "certified" if cert_ok else ("verification_failed" if cert_hash else "not_available")
+                wl_status = "certified" if wl_ok else ("verification_failed" if wl_hash else "not_available")
+                wl_certified = bool(wl_ok and cert_ok and wl_hash and wl_hash != "N/A")
+
                 return "ok", {
                     "k": k_str,
                     "grade_type": g_obj.semantic_type,
@@ -873,9 +877,12 @@ def evaluate_point(
                     "zero_index": str(zero_idx),
                     "gamma": gamma_str,
                     "delta": delta_str,
+                    "source_zero_certificate_status": src_status,
                     "source_zero_cert_hash": cert_hash or "N/A",
+                    "worldline_certificate_status": wl_status,
                     "worldline_cert_hash": wl_hash or "N/A",
-                    "certificate_verified": "true" if (cert_ok and (wl_ok or wl_hash is None)) else "false",
+                    "worldline_certified": "true" if wl_certified else "false",
+                    "certificate_verified": "true" if wl_certified else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -941,6 +948,10 @@ def evaluate_point(
 
                 max_res = max(radial_residual, defect_scaling_error)
 
+                src_status = "certified" if cert_ok else ("verification_failed" if cert_hash else "not_available")
+                wl_status = "certified" if wl_ok else ("verification_failed" if wl_hash else "not_available")
+                wl_certified = bool(wl_ok and cert_ok and wl_hash and wl_hash != "N/A")
+
                 return "ok", {
                     "k": k_str,
                     "grade_type": g_obj.semantic_type,
@@ -951,9 +962,12 @@ def evaluate_point(
                     "zero_index": str(zero_idx),
                     "gamma": gamma_str,
                     "delta": delta_str,
+                    "source_zero_certificate_status": src_status,
                     "source_zero_cert_hash": cert_hash or "N/A",
+                    "worldline_certificate_status": wl_status,
                     "worldline_cert_hash": wl_hash or "N/A",
-                    "certificate_verified": "true" if (cert_ok and (wl_ok or wl_hash is None)) else "false",
+                    "worldline_certified": "true" if wl_certified else "false",
+                    "certificate_verified": "true" if wl_certified else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -990,7 +1004,7 @@ def evaluate_point(
                     zero_family="trivial",
                     index=m_idx,
                     grade=grade_int,
-                    delta=str(s_exact - 0.5)
+                    delta="0.0"
                 )
 
                 g_obj = transcendental.parse_grade(k_str, grade_type=grade_type)
@@ -1007,6 +1021,10 @@ def evaluate_point(
                 zeta_res = abs(z_world)
                 max_res = max(zeta_res, leaf_inv_err)
 
+                src_status = "certified" if cert_ok else ("verification_failed" if cert_hash else "not_available")
+                wl_status = "certified" if wl_ok else ("verification_failed" if wl_hash else "not_available")
+                wl_certified = bool(wl_ok and cert_ok and wl_hash and wl_hash != "N/A")
+
                 return "ok", {
                     "k": k_str,
                     "grade_type": g_obj.semantic_type,
@@ -1015,9 +1033,12 @@ def evaluate_point(
                     "zero_family": "trivial",
                     "trivial_index": str(m_idx),
                     "exact_s": str(s_exact),
+                    "source_zero_certificate_status": src_status,
                     "source_zero_cert_hash": cert_hash or "N/A",
+                    "worldline_certificate_status": wl_status,
                     "worldline_cert_hash": wl_hash or "N/A",
-                    "certificate_verified": "true" if (cert_ok and (wl_ok or wl_hash is None)) else "false",
+                    "worldline_certified": "true" if wl_certified else "false",
+                    "certificate_verified": "true" if wl_certified else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -1028,6 +1049,7 @@ def evaluate_point(
                     "max_residual": mpmath.nstr(max_res, n=dps),
                     "residual": mpmath.nstr(max_res, n=dps)
                 }, None
+
 
 
             elif operation == "cross_height_coherence":
@@ -1060,11 +1082,16 @@ def evaluate_point(
 
                 # Check simplicity via analytical audit
                 is_simple, z_res, _ = reference_data.audit_simple_zero_residual(gamma_str, dps=dps + 20)
+                src_status = "certified" if cert_ok else ("verification_failed" if cert_hash else "not_available")
 
                 return "ok", {
                     "gamma": gamma_str,
                     "u": u_str,
+                    "source_zero_certificate_status": src_status,
                     "source_zero_cert_hash": cert_hash or "N/A",
+                    "worldline_certificate_status": "not_required",
+                    "worldline_cert_hash": "N/A",
+                    "worldline_certified": "false",
                     "certificate_verified": "true" if cert_ok else "false",
                     "is_simple_zero": "true" if (is_simple and cert_ok) else "false",
                     "zeta_residual": mpmath.nstr(z_res, n=dps),
@@ -1125,8 +1152,12 @@ def evaluate_point(
                     "block_1": b1,
                     "block_2": b2,
                     "zero_index": str(zero_idx),
+                    "source_zero_certificate_status": "certified" if (ok1 and ok2) else ("verification_failed" if (h1 or h2) else "not_available"),
                     "zero1_cert_hash": h1 or "N/A",
                     "zero2_cert_hash": h2 or "N/A",
+                    "worldline_certificate_status": "not_required",
+                    "worldline_cert_hash": "N/A",
+                    "worldline_certified": "false",
                     "certificate_verified": "true" if (ok1 and ok2) else "false",
                     "gamma_1": g1_str,
                     "gamma_2": g2_str,
@@ -1137,6 +1168,7 @@ def evaluate_point(
                     "max_distance": l_inf,
                     "residual": l_inf
                 }, None
+
 
 
 
@@ -1885,6 +1917,55 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
     return summary
 
 
+def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str, Any]]] = None) -> Tuple[bool, List[str]]:
+    """Validate a run manifest and results for exact certificate bindings, consumed certificates, and provenance.
+
+    Fails closed if:
+    - Declared consumed certificate is not used by any result point.
+    - Required point certificate is missing from consumed_certificates.
+    - A point claiming worldline_certified=true contains "N/A" certificate hash.
+    - A point claiming worldline_certified=true has worldline_certificate_status != "certified".
+    - A failed certificate exists in a run claiming successful criterion.
+    """
+    errors: List[str] = []
+    if not isinstance(manifest, dict):
+        return False, ["Manifest must be a dictionary"]
+
+    consumed = set(manifest.get("consumed_certificates", []))
+
+    if results is not None:
+        used_in_points: Set[str] = set()
+        for idx, rec in enumerate(results):
+            outs = rec.get("outputs", {})
+            if not isinstance(outs, dict):
+                continue
+
+            for k in ["source_zero_cert_hash", "worldline_cert_hash", "cert_hash", "zero1_cert_hash", "zero2_cert_hash"]:
+                h_val = outs.get(k)
+                if h_val and h_val != "N/A":
+                    used_in_points.add(str(h_val))
+                    if str(h_val) not in consumed:
+                        errors.append(f"Point {idx} uses certificate {h_val} which is missing from manifest consumed_certificates")
+
+            wl_cert = outs.get("worldline_certified")
+            if str(wl_cert).lower() == "true":
+                wl_h = outs.get("worldline_cert_hash")
+                if not wl_h or wl_h == "N/A":
+                    errors.append(f"Point {idx} claims worldline_certified=true but worldline_cert_hash is '{wl_h}'")
+                wl_stat = outs.get("worldline_certificate_status")
+                if wl_stat != "certified":
+                    errors.append(f"Point {idx} claims worldline_certified=true but worldline_certificate_status is '{wl_stat}'")
+                src_stat = outs.get("source_zero_certificate_status")
+                if src_stat != "certified":
+                    errors.append(f"Point {idx} claims worldline_certified=true but source_zero_certificate_status is '{src_stat}'")
+
+        unused_consumed = consumed - used_in_points
+        if unused_consumed:
+            errors.append(f"Declared consumed certificates unused by any point: {sorted(list(unused_consumed))}")
+
+    return len(errors) == 0, errors
+
+
 def list_runs() -> List[Dict[str, Any]]:
     """List all recorded runs in research/index.json."""
     if not os.path.exists(INDEX_FILE):
@@ -1900,7 +1981,9 @@ def list_runs() -> List[Dict[str, Any]]:
 
 # ==============================================================================
 # CLI INTERFACE
+
 # ==============================================================================
+
 
 def main():
     if len(sys.argv) < 2:

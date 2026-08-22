@@ -519,3 +519,64 @@ def test_trivial_zero_worldline_certification():
 
         ok, msgs = certification.verify_certificate(wl, cert_store=cert_store, check_provenance=False)
         assert ok, f"Trivial zero worldline K={K} failed verification: {msgs}"
+
+
+def test_adversarial_forged_dependency_fingerprint():
+    """Adversarial: Certificate with forged dependency fingerprint (e.g. flint 0.0 or platform forged) rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+
+    # Bad flint version
+    t1 = dict(z)
+    t1["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    t1["dependency_fingerprint"]["python_flint"] = "0.0"
+    t1["certificate_hash"] = certification._sha256_canonical(t1)
+    ok1, msgs1 = certification.verify_certificate(t1)
+    assert not ok1
+    assert any("python_flint" in m for m in msgs1)
+
+    # Forged platform
+    t2 = dict(z)
+    t2["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    t2["dependency_fingerprint"]["platform"] = "forged"
+    t2["certificate_hash"] = certification._sha256_canonical(t2)
+    ok2, msgs2 = certification.verify_certificate(t2)
+    assert not ok2
+    assert any("platform" in m for m in msgs2)
+
+
+def test_adversarial_40char_nonexistent_git_commit():
+    """Adversarial: Certificate with 40-character hex commit that does not exist in git repo rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+    for fake_sha in ["0000000000000000000000000000000000000000", "ffffffffffffffffffffffffffffffffffffffff"]:
+        tampered = dict(z)
+        tampered["producing_git_commit"] = fake_sha
+        tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+        ok, msgs = certification.verify_certificate(tampered)
+        assert not ok
+        assert any("producing_git_commit" in m for m in msgs)
+
+
+def test_adversarial_trivial_nontrivial_family_confusion():
+    """Adversarial: Worldline certificate declaring trivial family resolving nontrivial certificate rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z_nontrivial = certification.certify_zero(1, dps=50)
+    z_trivial = certification.certify_trivial_zero(1, dps=50)
+
+    # Trivial worldline pointing to nontrivial hash
+    wl = certification.certify_worldline(z_trivial, grade=1, delta="0.0", dps=50)
+    tampered = dict(wl)
+    tampered["source_zero_hash"] = z_nontrivial["certificate_hash"]
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+
+    cert_store = {
+        z_nontrivial["certificate_hash"]: z_nontrivial,
+        z_trivial["certificate_hash"]: z_trivial
+    }
+    ok, msgs = certification.verify_certificate(tampered, cert_store=cert_store, check_provenance=False)
+    assert not ok
+    assert any("Source zero family mismatch" in m or "could not be resolved" in m for m in msgs)
