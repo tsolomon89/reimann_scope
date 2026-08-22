@@ -8,6 +8,7 @@ Tests:
 - Preview vs Audit separation
 """
 
+import json
 import pytest
 import mpmath
 import numpy as np
@@ -89,3 +90,30 @@ def test_explicit_formula_pi_audit_vs_prime_truth():
     
     assert true_pi_20 == 8
     assert abs(pi_audit_20 - 8) < 1.5
+
+
+def test_provenance_verification_and_crlf_lf_invariance(tmp_path):
+    """
+    Verify that reference data passes provenance verification and that
+    the hash_normalized_bytes function produces identical hashes for LF and CRLF encodings.
+    """
+    assert reference_data.verify_provenance() is True
+    
+    # Create test files with identical content but LF vs CRLF line endings
+    sample_obj = {"test_key": "test_value", "numbers": [1, 2, 3]}
+    json_lf = json.dumps(sample_obj, indent=2).encode("utf-8")
+    json_crlf = json_lf.replace(b"\n", b"\r\n")
+    
+    lf_file = str(tmp_path / "sample_lf.json")
+    crlf_file = str(tmp_path / "sample_crlf.json")
+    
+    with open(lf_file, "wb") as f:
+        f.write(json_lf)
+    with open(crlf_file, "wb") as f:
+        f.write(json_crlf)
+        
+    hash_lf = reference_data.hash_normalized_bytes(lf_file)
+    hash_crlf = reference_data.hash_normalized_bytes(crlf_file)
+    
+    assert hash_lf == hash_crlf, "hash_normalized_bytes must be invariant across CRLF and LF line endings"
+

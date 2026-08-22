@@ -31,31 +31,44 @@ def load_provenance() -> Dict[str, Any]:
         return json.load(f)
 
 
+def hash_normalized_bytes(filepath: str) -> str:
+    """Compute SHA-256 of file bytes after normalizing CRLF line endings to LF.
+    
+    This provides cross-platform invariance between Windows and Linux checkouts.
+    """
+    if not os.path.exists(filepath):
+        return ""
+    with open(filepath, "rb") as f:
+        data = f.read()
+    normalized = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def verify_provenance() -> bool:
-    """Verify that stored reference files match their SHA-256 hashes in provenance.json."""
+    """Verify that stored reference files match their SHA-256 hashes in provenance.json.
+    
+    Hash scheme: Canonical LF-normalized bytes (SHA-256).
+    """
     prov = load_provenance()
     if not prov:
         return False
     
     zeros_file = os.path.join(DATA_DIR, "zeros_reference.json")
     if os.path.exists(zeros_file):
-        with open(zeros_file, "rb") as f:
-            h = hashlib.sha256(f.read()).hexdigest()
+        h = hash_normalized_bytes(zeros_file)
         expected_h = prov.get("zeta_zeros", {}).get("sha256") or prov.get("zeta_zeros_baseline", {}).get("sha256")
         if h != expected_h:
             return False
             
     canonical_file = os.path.join(DATA_DIR, "canonical_blocks.json")
     if os.path.exists(canonical_file):
-        with open(canonical_file, "rb") as f:
-            h = hashlib.sha256(f.read()).hexdigest()
+        h = hash_normalized_bytes(canonical_file)
         if h != prov.get("canonical_blocks", {}).get("sha256"):
             return False
 
     primes_file = os.path.join(DATA_DIR, "primes.json")
     if os.path.exists(primes_file):
-        with open(primes_file, "rb") as f:
-            h = hashlib.sha256(f.read()).hexdigest()
+        h = hash_normalized_bytes(primes_file)
         if h != prov.get("primes", {}).get("sha256"):
             return False
             
@@ -298,17 +311,18 @@ def get_zero_block(block_name: str) -> Dict[str, Any]:
     return CANONICAL_BLOCKS[block_name]
 
 
-def verify_simple_zero(
+def audit_simple_zero_residual(
     gamma: Union[str, float, mpmath.mpf],
     dps: int = 80,
     tolerance: mpmath.mpf = mpmath.mpf('1e-20')
 ) -> Tuple[bool, mpmath.mpf, mpmath.mpc]:
     """
-    Verify numerically that rho = 1/2 + i*gamma exhibits numerical evidence consistent with a simple zero:
+    Audit-mode numerical diagnostic: check that rho = 1/2 + i*gamma exhibits empirical evidence consistent with a simple zero:
     1. Check |zeta(1/2 + i*gamma)| < tolerance
     2. Check |zeta'(1/2 + i*gamma)| > 1e-15 (non-vanishing numerical derivative)
     
-    Note: Numerical residual agreement is empirical evidence, not formal mathematical proof.
+    CRITICAL DISTINCTION: Numerical residual agreement is empirical evidence, NEVER mathematical proof or certification.
+    Authoritative certification requires certified Arb/ACB ball enclosures (certification.certify_zero / verify_certificate).
     Returns (evidence_consistent_with_simple_zero, zeta_residual, zeta_prime_val).
     """
     with mpmath.workdps(dps + 20):
@@ -323,3 +337,15 @@ def verify_simple_zero(
         
         is_simple = (res <= tolerance) and (deriv_abs >= mpmath.mpf('1e-15'))
         return bool(is_simple), res, z_prime
+
+
+def verify_simple_zero(
+    gamma: Union[str, float, mpmath.mpf],
+    dps: int = 80,
+    tolerance: mpmath.mpf = mpmath.mpf('1e-20')
+) -> Tuple[bool, mpmath.mpf, mpmath.mpc]:
+    """Deprecated alias for audit_simple_zero_residual.
+    
+    Use certification.certify_zero and certification.verify_certificate for authoritative mathematical certification.
+    """
+    return audit_simple_zero_residual(gamma=gamma, dps=dps, tolerance=tolerance)

@@ -1434,19 +1434,18 @@ def update_all_panels(
         perturbed_zero_idx=selected_idx_val,
         delta=delta_pert_val,
         gamma=gamma_pert_val,
-        mode=perturb_mode
+        mode=perturb_mode,
+        dps=dps
     )
 
-    fig_c.add_trace(go.Scatter(
-        x=x_pts, y=clean_pi,
-        mode="lines", line=dict(color="#00ff88", width=2),
-        name="Clean π_N(x)"
-    ))
 
-    if abs(delta_pert_val) > 1e-10 or abs(gamma_pert_val - clean_gamma) > 1e-4:
+    clean_rho_val = complex(0.5, gamma_pert_val)
+    pert_rho_val = complex(0.5 + delta_pert_val, gamma_pert_val)
+
+    if abs(delta_pert_val) > 1e-12:
         fig_c.add_trace(go.Scatter(
             x=x_pts, y=pert_pi,
-            mode="lines", line=dict(color="#ff007f", dash="dot", width=2),
+            mode="lines", line=dict(color="#ffea00", width=2, dash="dash"),
             name="Perturbed π_N(x)"
         ))
 
@@ -1473,20 +1472,28 @@ def update_all_panels(
     
     mode_label = "SINGLE-PAIR DIAGNOSTIC" if perturb_mode == "single_pair_diagnostic" else "SYMMETRY-COMPLETE QUARTET"
     
-    # Certification Badge in Certified Mode
+    # Certification Badge in Certified Mode (Fails Closed with FLINT Replay Verification)
     cert_badge = None
     if cert_mode == "certified":
         cert_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "certificates", "zeros", f"zero_{selected_idx_val+1:05d}.json")
         if os.path.exists(cert_path):
-            with open(cert_path, "r", encoding="utf-8") as cf:
-                zc = json.load(cf)
-            cert_badge = dbc.Badge(
-                f"CERTIFIED: Zero #{selected_idx_val+1} simple zero | Enclosure radius: {zc['enclosure']['imag_rad'][:10]}... | 0 ∉ ζ'(B_{selected_idx_val+1})",
-                color="success",
-                className="p-1 d-block mb-1 font-monospace"
-            )
+            is_valid, zc, errs = certification.load_and_verify_certificate(cert_path)
+            if is_valid and zc is not None:
+                rad_disp = str(zc.get("enclosure", {}).get("imag_rad", ""))[:12]
+                cert_badge = dbc.Badge(
+                    f"CERTIFIED: Zero #{selected_idx_val+1} simple zero | Enclosure radius: {rad_disp}... | 0 ∉ ζ'(B_{selected_idx_val+1}) | SHA-256 verified",
+                    color="success",
+                    className="p-1 d-block mb-1 font-monospace"
+                )
+            else:
+                err_str = "; ".join(errs) if errs else "Unknown validation error"
+                cert_badge = dbc.Badge(
+                    f"CERTIFICATION REJECTED: Zero #{selected_idx_val+1} verification failed: {err_str}",
+                    color="danger",
+                    className="p-1 d-block mb-1 font-monospace"
+                )
         else:
-            cert_badge = dbc.Badge(f"CERTIFICATION PENDING: Zero #{selected_idx_val+1}", color="warning", className="p-1 d-block mb-1")
+            cert_badge = dbc.Badge(f"CERTIFICATE MISSING: Zero #{selected_idx_val+1} not in certificate store", color="warning", className="p-1 d-block mb-1")
 
     metrics_ui = html.Div([
         cert_badge if cert_badge else html.Div(),
@@ -1698,13 +1705,14 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
     fig_taylor.add_trace(go.Scatter(
         x=log_gammas, y=abs_c2_list, mode="lines+markers",
         line=dict(color="#00d2ff", width=2), marker=dict(size=8),
-        name="|c_{2,n}| = |ζ''(ρ_n) / (2·i·Δ_n·ζ'(ρ_n))|"
+        name="|c_{2,n}| = |(i·Δ_n·ζ''(ρ_n)) / (2·ζ'(ρ_n))|"
     ))
     fig_taylor.add_trace(go.Scatter(
         x=log_gammas, y=abs_c3_list, mode="lines+markers",
         line=dict(color="#ffea00", width=2), marker=dict(size=8),
-        name="|c_{3,n}| = |ζ'''(ρ_n) / (6·i·Δ_n·ζ'(ρ_n))|"
+        name="|c_{3,n}| = |((i·Δ_n)^2·ζ'''(ρ_n)) / (6·ζ'(ρ_n))|"
     ))
+
     fig_taylor.update_layout(
         title=dict(text="Taylor Shape Coefficients |c_2|, |c_3| across Spectrum Heights log(γ_n)", font=dict(size=12)),
         xaxis=dict(title="log(γ_n)", dtick=1.0),

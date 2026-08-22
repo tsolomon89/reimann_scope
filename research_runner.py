@@ -43,14 +43,14 @@ INDEX_FILE = os.path.join(RESEARCH_DIR, "index.json")
 
 
 def hash_file_bytes(filepath: str) -> str:
-    """Compute SHA-256 hash of a file."""
+    """Compute SHA-256 hash of a file after normalizing CRLF line endings to LF."""
     if not os.path.exists(filepath):
         return "N/A"
-    h = hashlib.sha256()
     with open(filepath, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()
+        data = f.read()
+    normalized = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
 
 
 def hash_string(text: str) -> str:
@@ -87,9 +87,10 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
                 dirty_lines.append(line_str)
                 continue
             path = parts[1].strip().strip('"').replace("\\", "/")
-            # Ignore runner's own output artifacts
-            if path == "research/index.json" or path.startswith("research/runs/"):
+            # Ignore runner's own output artifacts and generated certificates
+            if path == "research/index.json" or path.startswith("research/runs/") or path.startswith("data/certificates/"):
                 continue
+
             dirty_lines.append(line_str)
         is_dirty = len(dirty_lines) > 0
     except Exception:
@@ -267,7 +268,24 @@ def generate_parameter_grid(
 # CANONICAL ENGINE DISPATCH (Strictly delegates to canonical math modules)
 # ==============================================================================
 
+def _lookup_zero_certificate(zero_index: int) -> Tuple[Optional[str], bool]:
+    """Look up zero certificate by 1-based index and verify it."""
+    code_root = os.path.dirname(os.path.abspath(__file__))
+    cert_path = os.path.join(code_root, "data", "certificates", "zeros", f"zero_{zero_index:05d}.json")
+    if os.path.exists(cert_path):
+        try:
+            with open(cert_path, "r", encoding="utf-8") as f:
+                zc = json.load(f)
+            ok, _ = certification.verify_certificate(zc)
+            if ok:
+                return zc.get("certificate_hash"), True
+        except Exception:
+            pass
+    return None, False
+
+
 def evaluate_point(
+
     operation: str,
     inputs: Dict[str, str],
     dps: int = 80,
@@ -502,7 +520,7 @@ def evaluate_point(
                 pert_rhos_str = "; ".join(f"{mpmath.nstr(r.real, n=dps)} + {mpmath.nstr(r.imag, n=dps)}j" for r in pert_rhos)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
 
-                outputs: Dict[str, str] = {
+                outputs = {
                     "zero_index": str(zero_idx),
                     "gamma": mpmath.nstr(rho_clean.imag, n=dps),
                     "delta": delta_str,
@@ -553,11 +571,13 @@ def evaluate_point(
                         outputs["normalized_quadratic_cpi"] = mpmath.nstr(norm_quad_cpi, n=dps)
 
                         # Pairwise ratio where half-delta exists
-                        declared_deltas_raw = None
+                        declared_deltas_raw: Optional[List[Any]] = None
                         if param_space and "delta" in param_space:
                             declared_deltas_raw = expand_parameter(param_space["delta"], dps=dps)
                         elif "declared_deltas" in inputs:
-                            declared_deltas_raw = inputs["declared_deltas"]
+                            val = inputs["declared_deltas"]
+                            declared_deltas_raw = val if isinstance(val, list) else [val]
+
 
                         if declared_deltas_raw:
                             declared_deltas_mpf = [math_core.to_mpf(v, dps=dps + 15) for v in declared_deltas_raw]
@@ -721,6 +741,9 @@ def evaluate_point(
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
                 
+                z_1based = zero_idx if zero_idx >= 1 else 1
+                cert_hash, cert_ok = _lookup_zero_certificate(z_1based)
+                
                 ref_zeros_str = reference_data.load_reference_zeros()
                 gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx % len(ref_zeros_str)] if ref_zeros_str else "14.13472514173469379045725198356247027078425711569924317568556746")
                 rho_clean = mpmath.mpc('0.5', gamma_str)
@@ -750,6 +773,8 @@ def evaluate_point(
                     "zero_index": str(zero_idx),
                     "gamma": gamma_str,
                     "delta": delta_str,
+                    "source_zero_cert_hash": cert_hash or "N/A",
+                    "certificate_verified": "true" if cert_ok else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -765,6 +790,9 @@ def evaluate_point(
                 delta_str = inputs.get("delta", "0.01")
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 grade_type = inputs.get("grade_type", "auto")
+                
+                z_1based = zero_idx if zero_idx >= 1 else 1
+                cert_hash, cert_ok = _lookup_zero_certificate(z_1based)
                 
                 ref_zeros_str = reference_data.load_reference_zeros()
                 gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx % len(ref_zeros_str)] if ref_zeros_str else "14.13472514173469379045725198356247027078425711569924317568556746")
@@ -800,6 +828,8 @@ def evaluate_point(
                     "zero_index": str(zero_idx),
                     "gamma": gamma_str,
                     "delta": delta_str,
+                    "source_zero_cert_hash": cert_hash or "N/A",
+                    "certificate_verified": "true" if cert_ok else "false",
                     "worldline_s_re": mpmath.nstr(s_world.real, n=dps),
                     "worldline_s_im": mpmath.nstr(s_world.imag, n=dps),
                     "sigma_c": mpmath.nstr(sigma_c, n=dps),
@@ -820,25 +850,38 @@ def evaluate_point(
                 u_str = inputs.get("u", "0.0")
                 block_name = inputs.get("block", None)
                 
+                z_idx_1based = 1
                 if block_name:
                     blk = reference_data.get_zero_block(block_name)
                     ords = blk.get("ordinates", [])
                     gamma_str = inputs.get("gamma", ords[zero_idx % len(ords)])
+                    if block_name == "low_validation":
+                        z_idx_1based = 1 + (zero_idx % 10)
+                    elif block_name == "medium_research":
+                        z_idx_1based = 100 + (zero_idx % 5)
+                    elif block_name == "high_research":
+                        z_idx_1based = 1000 + (zero_idx % 3)
+                    elif block_name == "very_high_sparse":
+                        z_idx_1based = 10000 + (zero_idx % 3)
                 else:
                     ref_zeros_str = reference_data.load_reference_zeros()
                     gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if ref_zeros_str and zero_idx < len(ref_zeros_str) else "14.13472514173469379045725198356247027078425711569924317568556746")
+                    z_idx_1based = zero_idx + 1 if zero_idx < 10 else 1
                     
+                cert_hash, cert_ok = _lookup_zero_certificate(z_idx_1based)
                 delta_n = transcendental.mean_zero_spacing_delta(gamma_str, dps=dps + 20)
                 taylor_info = transcendental.extract_taylor_shape_coefficients(gamma_str, dps=dps + 20)
                 path_info = transcendental.evaluate_derivative_normalized_path(gamma_str, u_str, dps=dps + 20)
                 
-                # Check simplicity
-                is_simple, z_res, _ = reference_data.verify_simple_zero(gamma_str, dps=dps + 20)
+                # Check simplicity via analytical audit
+                is_simple, z_res, _ = reference_data.audit_simple_zero_residual(gamma_str, dps=dps + 20)
                 
                 return "ok", {
                     "gamma": gamma_str,
                     "u": u_str,
-                    "is_simple_zero": "true" if is_simple else "false",
+                    "source_zero_cert_hash": cert_hash or "N/A",
+                    "certificate_verified": "true" if cert_ok else "false",
+                    "is_simple_zero": "true" if (is_simple and cert_ok) else "false",
                     "zeta_residual": mpmath.nstr(z_res, n=dps),
                     "Delta_n": mpmath.nstr(delta_n, n=dps),
                     "zeta_prime": taylor_info["zeta_prime"],
@@ -879,6 +922,11 @@ def evaluate_point(
                 g1_str = ords1[zero_idx % len(ords1)]
                 g2_str = ords2[zero_idx % len(ords2)]
                 
+                z1_idx = 1 + (zero_idx % len(ords1))
+                z2_idx = 100 + (zero_idx % len(ords2)) if b2 == "medium_research" else (1000 + (zero_idx % len(ords2)) if b2 == "high_research" else 10000 + (zero_idx % len(ords2)))
+                h1, ok1 = _lookup_zero_certificate(z1_idx)
+                h2, ok2 = _lookup_zero_certificate(z2_idx)
+                
                 # Construct 21-point symmetric grid on [-u_max, u_max]
                 u_points = [str(mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8)) for i in range(-10, 11)]
                 
@@ -892,15 +940,17 @@ def evaluate_point(
                     "block_1": b1,
                     "block_2": b2,
                     "zero_index": str(zero_idx),
+                    "zero1_cert_hash": h1 or "N/A",
+                    "zero2_cert_hash": h2 or "N/A",
+                    "certificate_verified": "true" if (ok1 and ok2) else "false",
                     "gamma_1": g1_str,
                     "gamma_2": g2_str,
                     "u_max": str(u_max_val),
                     "num_u_points": str(dist_res["num_u_points"]),
                     "max_distance": l_inf,
-                    "L_infty_distance": l_inf,
-                    "L_2_distance": l_2,
                     "residual": l_inf
                 }, None
+
 
             elif operation == "grade_constraint":
                 k_str = inputs.get("K", inputs.get("k", "1"))
@@ -1449,6 +1499,9 @@ def run_experiment(
         # Source module hashes
         code_root = os.path.dirname(os.path.abspath(__file__))
         code_modules = {
+            "research_runner.py": hash_file_bytes(os.path.join(code_root, "research_runner.py")),
+            "transcendental.py": hash_file_bytes(os.path.join(code_root, "transcendental.py")),
+            "reference_data.py": hash_file_bytes(os.path.join(code_root, "reference_data.py")),
             "math_core.py": hash_file_bytes(os.path.join(code_root, "math_core.py")),
             "transforms.py": hash_file_bytes(os.path.join(code_root, "transforms.py")),
             "converter.py": hash_file_bytes(os.path.join(code_root, "converter.py")),
@@ -1485,11 +1538,13 @@ def run_experiment(
                 }
             },
             "data_provenance": reference_data.load_provenance(),
-            "code_modules": code_modules
+            "code_modules": code_modules,
+            "consumed_certificates": []
         }
         
         with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
+
 
     results_path = os.path.join(work_dir, "results.jsonl")
     
@@ -1534,12 +1589,24 @@ def run_experiment(
     completed_points = len(all_results)
     final_status = "complete" if completed_points == total_points else "incomplete"
     
+    # Collect all consumed certificate hashes
+    consumed_cert_hashes: Set[str] = set()
+    for rec in all_results:
+        outs = rec.get("outputs", {})
+        if isinstance(outs, dict):
+            for k in ["source_zero_cert_hash", "worldline_cert_hash", "cert_hash", "zero1_cert_hash", "zero2_cert_hash"]:
+                val = outs.get(k)
+                if val and val != "N/A":
+                    consumed_cert_hashes.add(str(val))
+                    
     manifest["status"] = final_status
     manifest["points_completed"] = completed_points
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
+    manifest["consumed_certificates"] = sorted(list(consumed_cert_hashes))
     
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
+
         
     summary = compute_summary(spec, exp_id, all_results, status=final_status)
     with open(os.path.join(work_dir, "summary.json"), "w", encoding="utf-8") as f:

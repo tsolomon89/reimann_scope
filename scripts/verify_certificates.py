@@ -9,6 +9,7 @@ import glob
 import json
 import os
 import sys
+from typing import Dict, Any, List, Tuple
 
 # Ensure repository root is on Python path
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -30,11 +31,28 @@ def verify_all() -> Tuple[bool, int, List[str]]:
     all_anomalies: List[str] = []
     total_verified = 0
     
+    # Pre-load all certificate dictionaries into memory for fast dependency resolution
+    cert_store: Dict[str, Dict[str, Any]] = {}
+    parsed_certs: List[Tuple[str, Dict[str, Any]]] = []
+    
     for c_path in cert_files:
         try:
             with open(c_path, "r", encoding="utf-8") as f:
-                cert_data = json.load(f)
-            ok, errs = certification.verify_certificate(cert_data)
+                c_dict = json.load(f)
+            c_hash = c_dict.get("certificate_hash")
+            if c_hash:
+                cert_store[c_hash] = c_dict
+            if c_dict.get("certificate_type") == "zero_isolation_and_simplicity":
+                z_idx = c_dict.get("zero_index")
+                if z_idx is not None:
+                    cert_store[f"zero_{z_idx:05d}"] = c_dict
+            parsed_certs.append((c_path, c_dict))
+        except Exception as e:
+            all_anomalies.append(f"[{os.path.basename(c_path)}] JSON parse failure: {e}")
+
+    for c_path, cert_data in parsed_certs:
+        try:
+            ok, errs = certification.verify_certificate(cert_data, cert_store=cert_store)
             if not ok:
                 all_anomalies.extend([f"[{os.path.basename(c_path)}] {e}" for e in errs])
             else:

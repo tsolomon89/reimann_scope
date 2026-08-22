@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests"]
+testpaths = ["tests", ".agents/verification"]
 
 [tool.mypy]
 ignore_missing_imports = true
@@ -12,6 +12,4 @@ reportMissingTypeStubs = "none"
 reportMissingModuleSource = "none"
 reportGeneralTypeIssues = "none"
 reportUnknownMemberType = "none"
-extraPaths = ["C:/Development/anaconda3/Lib/site-packages", "."]
-
-
+extraPaths = ["."]

@@ -843,3 +843,29 @@ Supersedes:
 
 Treating $C_\pi$ truncation error as a criterion component of exact covariance.
 
+---
+
+## 2026-08-22 — Distinction between coordinate covariance gauge G_K, arithmetic constraint A_K, and infinite spectrum uniqueness
+
+Status: ACCEPTED
+
+Decision:
+
+Explicitly separate the coordinate covariance gauge identity $\mathcal{G}_K$, positive-grade arithmetic constraints $\mathcal{A}_K$, and the unresolved infinite spectrum uniqueness problem across all mathematical contracts, research specifications, and verifiers:
+1. **Coordinate Covariance Gauge $\mathcal{G}_K$**: The identity $\mathcal{Z}_\tau(\tau^K \rho, K) = \zeta(\rho) = 0$ is an exact coordinate gauge tautology holding for all continuous dilations and all $s \in \mathbb{C}$, imposing zero constraints on zero locations on or off the critical line ($\delta = 0$ vs $\delta \ne 0$).
+2. **Arithmetic Constraint $\mathcal{A}_K$**: For integer $K \ge 1$, evaluating $\zeta(\tau^K s)$ relates dilated values to the native zeta function through Euler product and explicit formula structures, restricting admissible Dirichlet series.
+3. **Unresolved Infinite Spectrum Intersection**: The central open conjecture of transcendental continuation is whether $(\bigcap_{K \ge 1} \mathcal{A}_K) \cap \mathfrak{S}_{\mathrm{mixed}} = \varnothing$.
+
+Reason:
+
+Conflating gauge covariance with arithmetic constraints creates false proof claims or hidden circularities. The repository must maintain absolute epistemic rigor by separating tautological coordinate transforms from non-trivial arithmetic spectrum restrictions.
+
+Mathematical / operational consequence:
+
+The verifier, certification engine, and frontend distinguish exact worldline gauge covariance ($R_\tau(s_\rho(K), K) = \delta$) from open arithmetic rigidity theorems. No stage of the research runner assumes radial rigidity as an external premise.
+
+Supersedes:
+
+Any formulation implying that bilateral coordinate dilation alone excludes off-line zeros.
+
+

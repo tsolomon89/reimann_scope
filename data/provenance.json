@@ -11,7 +11,7 @@
     "last_ordinate": "396.3818542225921869319994544917305290638",
     "file_path": "data/zeros_reference.json",
     "format": "decimal strings in json",
-    "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+    "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
     "preparation_script": "scripts/fetch_reference_zeros.py"
   },
   "zeta_zeros_baseline": {
@@ -25,7 +25,7 @@
     "last_ordinate": "396.3818542225921869319994544917305290638",
     "file_path": "data/zeros_reference.json",
     "format": "decimal strings in json",
-    "sha256": "375b90c4bdf8d69f9ff3c58705fb47e7a64bf3746101495804f1f3318b988d04",
+    "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
     "preparation_script": "scripts/fetch_reference_zeros.py"
   },
   "canonical_blocks": {
@@ -44,7 +44,7 @@
     "max_x": 4999,
     "count": 669,
     "file_path": "data/primes.json",
-    "sha256": "8b9ac6ab4a8adf57614dd182063552f3d1f64a0feb0e6bdf1de52bae4e599429"
+    "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
   },
   "tau": {
     "symbolic": "2*pi",

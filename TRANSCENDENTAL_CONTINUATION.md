@@ -942,39 +942,42 @@ The strongest current interpretation of the train-line intuition is not literal 
 
 It is **intersection of constraints**.
 
-Let
+We rigorously distinguish between two mathematically distinct layers:
 
+### 19.1 Coordinate Covariance Gauge ($\mathcal{G}_K$)
+For any $K \in \mathbb{R}$, the graded family definition:
 \[
-\mathcal C_K
+\mathcal{Z}_\tau(s, K) = \zeta(\tau^{-K} s)
+\]
+induces the exact tautological coordinate covariance identity:
+\[
+\mathcal{Z}_\tau(\tau^K \rho, K) = \zeta(\rho) = 0.
+\]
+This gauge transformation preserves the radial coordinate $R_\tau(W_\rho(K), K) = \delta$ for **any** zero $\rho = 1/2 + \delta + i\gamma$, whether on the critical line ($\delta = 0$) or off the critical line ($\delta \ne 0$). Because $\mathcal{G}_K$ holds tautologically for every dilation and every complex root, $\mathcal{G}_K$ alone imposes **zero restriction** on the location of $\rho$ and cannot prove radial rigidity.
+
+### 19.2 Positive-Grade Arithmetic Constraints ($\mathcal{A}_K$)
+For integer $K \ge 1$, evaluating the dilated function $\zeta(\tau^K s)$ relates dilated values to the native Euler product, Dirichlet series, and explicit formula constraints:
+\[
+\mathcal{A}_K = \left\{ \text{Dirichlet series / spectra admissible under grade } K \text{ arithmetic functional equations} \right\}.
 \]
 
-denote the complete analytic/arithmetic constraints imposed at grade \(K\).
-
-The actual spectrum must satisfy every grade simultaneously:
-
+### 19.3 The Infinite Spectrum Intersection Open Problem
+The actual zero spectrum must satisfy every positive grade simultaneously:
 \[
 \boxed{
-\text{Spectrum}\in
-\bigcap_{K\in\mathbb Z}\mathcal C_K.
+\text{Spectrum} \in \bigcap_{K \ge 1} \mathcal{A}_K.
 }
 \]
 
-The candidate proof question is:
+Let $\mathfrak{S}_{\mathrm{mixed}}$ denote the hypothetical set of off-line zero roots with $\delta \ne 0$. The core open question of the transcendental continuation programme is:
 
 \[
 \boxed{
-\text{Does }
-\bigcap_{K\in\mathbb Z}\mathcal C_K
-\text{ permit simultaneous occupancy of }
-\mathcal R_0
-\text{ and }
-\mathcal R_\delta,\ \delta\neq0?
+\left(\bigcap_{K \ge 1} \mathcal{A}_K\right) \cap \mathfrak{S}_{\mathrm{mixed}} \stackrel{?}{=} \varnothing
 }
 \]
 
-If an exact theorem proves the answer is no, radial rigidity follows.
-
-This is the proof-facing content of transcendental continuation.
+If an exact deductive theorem proves that this infinite intersection is empty, radial rigidity ($\delta = 0$) follows. Until such a deductive proof is constructed, the repository treats this intersection property as an open research question, and never assumes it as a premise or conflates it with the coordinate gauge identity $\mathcal{G}_K$.
 
 ---
 
