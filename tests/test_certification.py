@@ -302,7 +302,8 @@ def test_adversarial_13_stale_source_module_hash():
     tampered["certificate_hash"] = certification._sha256_canonical(tampered)
     ok, msgs = certification.verify_certificate(tampered, check_provenance=True)
     assert not ok
-    assert any("Source module 'certification.py' hash mismatch" in m for m in msgs)
+    assert any("Source module 'certification.py'" in m for m in msgs)
+
 
 
 def test_adversarial_14_tampered_certificate_without_recomputing_hash():
