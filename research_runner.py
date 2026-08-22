@@ -2053,10 +2053,13 @@ def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str,
                     wlc = cert_map[wl_h]
                     rec_in = rec.get("inputs", {})
                     # Check zero index if present
-                    pt_idx = rec_in.get("nontrivial_index") or rec_in.get("zero_index")
+                    pt_idx = rec.get("outputs", {}).get("nontrivial_index") or rec_in.get("nontrivial_index")
+                    if pt_idx is None and "zero_index" in rec_in:
+                        pt_idx = int(rec_in["zero_index"]) + 1
                     if pt_idx is not None and wlc.get("source_zero_index") is not None:
                         if int(pt_idx) != int(wlc["source_zero_index"]):
                             errors.append(f"Point {idx} index ({pt_idx}) does not match worldline cert source_zero_index ({wlc['source_zero_index']})")
+
 
         unused_consumed = consumed - used_in_points
         if unused_consumed:
