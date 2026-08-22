@@ -1434,9 +1434,9 @@ def update_all_panels(
         perturbed_zero_idx=selected_idx_val,
         delta=delta_pert_val,
         gamma=gamma_pert_val,
-        mode=perturb_mode,
-        dps=dps
+        mode=perturb_mode
     )
+
 
 
     clean_rho_val = complex(0.5, gamma_pert_val)

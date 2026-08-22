@@ -12,6 +12,8 @@ import argparse
 import json
 import os
 import sys
+from typing import Optional, Tuple, Dict, Any, List
+
 
 # Ensure repository root is on Python path
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
