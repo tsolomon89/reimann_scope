@@ -6,13 +6,13 @@
   "epistemic_class": "observational_pattern",
   "object_relationship": "same_object_coordinate_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T18:47:19.857204+00:00",
-  "completed_at": "2026-08-23T18:52:34.430891+00:00",
+  "started_at": "2026-08-23T19:39:06.945056+00:00",
+  "completed_at": "2026-08-23T19:44:52.830047+00:00",
   "status": "complete",
-  "git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
-  "producing_git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
+  "git_commit": "21f44c24b5ad39c817c31148b055650a4d56721a",
+  "producing_git_commit": "21f44c24b5ad39c817c31148b055650a4d56721a",
   "git_dirty": false,
-  "experiment_spec_sha256": "321bbb6ef13dfabe4631640d6c8b13e525232bf172c1c82310347165f9d2b92e",
+  "experiment_spec_sha256": "d7b11b28672cf9142ffeddde8e4c65c5fea9e2f27a2d65b47043bfe3d5243d51",
   "precision": {
     "dps": 80
   },
@@ -71,10 +71,10 @@
     "certification.py": "3c2325a6277dd177ca11f9c3b6404c30ba9d6d9a22fc775ed24fd4df40dff991",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "math_core.py": "839d63dabe496816c915ccc42c7bec7d6e6ceecedda764d69c15d38f7682bc7c",
+    "math_core.py": "88125b4552d9567a7189cc4f0a26275583606ab26eb0c791011c8810aaa18fe1",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
-    "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "9a07d63f25c6552494cbe1cc028687703b23a86499f29e1caa4cbd28f85aa367",
+    "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
+    "research_runner.py": "9680149944694e720ce9859a90e9d05ad0e9bfe551a298199fd6b035c19acf43",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -98,7 +98,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "839d63dabe496816c915ccc42c7bec7d6e6ceecedda764d69c15d38f7682bc7c"
+      "sha256": "88125b4552d9567a7189cc4f0a26275583606ab26eb0c791011c8810aaa18fe1"
     },
     {
       "path": "transcendental.py",
@@ -106,11 +106,11 @@
     },
     {
       "path": "converter.py",
-      "sha256": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a"
+      "sha256": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264"
     },
     {
       "path": "research_runner.py",
-      "sha256": "9a07d63f25c6552494cbe1cc028687703b23a86499f29e1caa4cbd28f85aa367"
+      "sha256": "9680149944694e720ce9859a90e9d05ad0e9bfe551a298199fd6b035c19acf43"
     },
     {
       "path": "zero_finder.py",
@@ -139,15 +139,15 @@
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "b312c27138e0bf5165457ee2f52e2556f902445258850a214c457314177d5ae4"
+      "sha256": "bb6acc1e940b54c5704dfd66e6649280ddf2c95a05df9ef4203eb0cee0ad4ed6"
     },
     "summary_json": {
       "path": "summary.json",
-      "sha256": "f66a207e5e8743ef9f37b759a497bea6bfffe31690dffc10ca887ee2fb558667"
+      "sha256": "fd548f3d3f9fb0d8998b76dbecf25d37cf20c121f489e6dda95b482d155fa6c5"
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "290fb268e8be6a081c15453ee649715e580b5ff932f0c0daf5513c9e0c4b6c5a"
+      "sha256": "0dd1ec405ab5ed56299466c72274f94df7f22a079dbda55088d1d1c3439f0ed6"
     }
   }
 }
