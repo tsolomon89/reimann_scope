@@ -2178,16 +2178,36 @@ def compute_summary(
 
         elif spec.get("id") == "explicit-formula-radial-second-variation-001":
             try:
+                comp_found_count = sum(1 for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true")
+                comp_not_found_count = sum(1 for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false")
+                comp_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true")), key=lambda x: int(x))
+                comp_not_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false")), key=lambda x: int(x))
+                rel_residuals = [math_core.to_mpf(r.get("outputs", {}).get("nnls_relative_residual", "0"), dps=50) for r in results if "nnls_relative_residual" in r.get("outputs", {})]
+                min_rel_res = mpmath.nstr(min(rel_residuals), n=10) if rel_residuals else "0"
+                max_rel_res = mpmath.nstr(max(rel_residuals), n=10) if rel_residuals else "0"
+
                 summary["radial_second_order_summary"] = {
                     "radial_projection_operator": "P_0(1/2 + delta + i*gamma) = 1/2 + i*gamma",
                     "radial_defect_divisor": "Delta D_rad = D - P_0(D)",
                     "leading_taylor_coefficient": "-2*delta^2*H''(gamma)",
                     "fourth_order_coefficient": "(delta^4/12)*H''''(gamma)",
                     "quadratic_energy_definition": "E(u) = u^T K^T K u with u_n = delta_n^2 >= 0",
-                    "nnls_compensation_status": "no_non_negative_compensation_possible",
-                    "anti_circularity_screening": "screened_no_rh_or_weil_assumed",
+                    "single_target_energy_status": "strictly_positive_for_all_sampled_zeros",
+                    "nnls_compensation_status": "heterogeneous_finite_compensation",
+                    "compensation_found_count": comp_found_count,
+                    "compensation_not_found_count": comp_not_found_count,
+                    "compensation_found_zero_indices": comp_found_zeros,
+                    "compensation_not_found_zero_indices": comp_not_found_zeros,
+                    "min_relative_nnls_residual": min_rel_res,
+                    "max_relative_nnls_residual": max_rel_res,
+                    "numerical_rank": "13-14",
+                    "nullity": "85-86",
+                    "condition_number": "~2.4e+15",
+                    "conditioning_caveats": "Finite 30-channel basis has high numerical nullity (~85) and condition number (~10^15); target columns for zeros 10 and 50 are well within the convex cone of remaining columns, whereas zeros 1 and 100 are not.",
                     "theoretical_classification": "coordinate_redundant",
                     "finite_basis_classification": "finite_basis_enrichment_only",
+                    "epistemic_classification": "exact_finite_synthetic_sensitivity_diagnostic",
+                    "projection_trap_note": "Actual divisor D_zeta has an arithmetic explicit-formula representation, while its critical-line projection P_0(D_zeta) has no established independent arithmetic representation; inferring radial rigidity from projected defect remains an open theorem."
                 }
             except Exception as e:
                 summary["warnings"].append(f"Radial second variation summary calculation failed: {e}")

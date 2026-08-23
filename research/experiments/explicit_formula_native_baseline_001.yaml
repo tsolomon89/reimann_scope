@@ -5,13 +5,13 @@ research_question: Does the authoritative Riemann–Weil explicit formula vanish
 epistemic_class: observational_pattern
 object_relationship: same_object_coordinate_control
 hypothesis:
-  statement: For admissible modulated Gaussian packets H_j (j=1..6), the native explicit formula residual EF[H_j; D_zeta, A_zeta] = Spectral_Sum - (Pole + Prime + Gamma) vanishes within the observational zero-sum and prime-sum truncation bounds.
+  statement: For admissible modulated Gaussian packets H_j (j=1..6), the native explicit formula residual EF[H_j; D_zeta, A_zeta] = Spectral_Sum - (Pole + Prime + Gamma) evaluates close to zero within empirical truncation tolerances. The 100-to-200 zero cutoff shift exhibits a substantial spectral tail change (~5.48) as packet tails extend beyond gamma_100, while the 150-to-200 shift stabilizes (< 1e-15).
 prediction:
-  statement: The absolute explicit formula residual is below 1e-15 across all test functions j=1..6.
+  statement: The absolute explicit formula residual is below empirical truncation benchmark 1e-15 across all test functions j=1..6 under 200 reference zeros and 50000 prime sieve.
 falsification:
-  statement: Residual exceeds 1e-15 under 200 reference zeros and 50000 prime sieve.
+  statement: Residual exceeds empirical benchmark 1e-15 under 200 reference zeros and 50000 prime sieve.
 interpretation_limit:
-  statement: High-precision observational validation of native explicit formula components, normalization, signs, and truncation behavior.
+  statement: High-precision observational validation of native explicit formula components, normalization, signs, and empirical truncation behavior; 1e-15 is an empirical truncation benchmark rather than a derived rigorous analytic truncation bound.
 formalization_target:
   statement: Riemann–Weil explicit formula native baseline.
 criterion:
@@ -24,19 +24,19 @@ report_metrics:
   kind: criterion_component
   label: Explicit formula absolute residual
 - metric: relative_error
-  kind: criterion_component
+  kind: diagnostic
   label: Relative error
 - metric: spectral_cutoff_change_100_to_200
-  kind: criterion_component
+  kind: diagnostic
   label: Spectral cutoff sensitivity (100 to 200 zeros)
 - metric: spectral_cutoff_change_150_to_200
-  kind: criterion_component
+  kind: diagnostic
   label: Spectral cutoff sensitivity (150 to 200 zeros)
 - metric: prime_cutoff_change_10k_to_50k
-  kind: criterion_component
+  kind: diagnostic
   label: Arithmetic prime cutoff sensitivity (10k to 50k)
 - metric: precision_change_70_to_110
-  kind: criterion_component
+  kind: diagnostic
   label: Working precision sensitivity (70 to 110 dps)
 engine:
   operation: explicit_formula_native_baseline

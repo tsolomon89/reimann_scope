@@ -1451,6 +1451,7 @@ def test_explicit_formula_experiment_specs_execute_and_validate(temp_research_en
         "explicit_formula_native_baseline_001.yaml",
         "explicit_formula_grade_covariance_001.yaml",
         "explicit_formula_perturbation_rank_001.yaml",
+        "explicit_formula_radial_second_variation_001.yaml",
     ]
 
     for sf in spec_files:
@@ -1468,10 +1469,78 @@ def test_explicit_formula_experiment_specs_execute_and_validate(temp_research_en
         run_id = research_runner.run_experiment(temp_spec_path, canonical_current=False)
         assert run_id == exp_id
 
-
         run_dir = os.path.join(temp_research_env["runs"], exp_id)
         assert os.path.exists(run_dir)
 
         # Validate generated bundle
         ok, errs = research_runner.validate_run_bundle(run_dir, canonical_current=False)
         assert ok, f"Bundle validation failed for {exp_id}: {errs}"
+
+
+def test_radial_second_order_summary_metrics_structure():
+    """Verify that compute_summary on radial second variation creates categorical NNLS summary metrics."""
+    spec = {
+        "id": "explicit-formula-radial-second-variation-001",
+        "title": "Riemann–Weil Explicit Formula Radial Second-Variation",
+        "criterion": {
+            "metric": "relative_second_order_error",
+            "operator": "<=",
+            "threshold": "0.01",
+            "aggregation": "max_abs"
+        },
+        "report_metrics": [
+            {"metric": "relative_second_order_error", "kind": "criterion_component"}
+        ],
+        "precision": {"dps": 80}
+    }
+
+    # Simulate results with 8 found and 8 not found
+    mock_results = []
+    # 4 points for zero 1 (comp false)
+    for i in range(4):
+        mock_results.append({
+            "point_id": i, "status": "ok",
+            "outputs": {
+                "zero_index": "1", "relative_second_order_error": "0.0001",
+                "nnls_compensation_found": "false", "nnls_relative_residual": "0.99"
+            }
+        })
+    # 4 points for zero 10 (comp true)
+    for i in range(4, 8):
+        mock_results.append({
+            "point_id": i, "status": "ok",
+            "outputs": {
+                "zero_index": "10", "relative_second_order_error": "0.0001",
+                "nnls_compensation_found": "true", "nnls_relative_residual": "1e-9"
+            }
+        })
+    # 4 points for zero 50 (comp true)
+    for i in range(8, 12):
+        mock_results.append({
+            "point_id": i, "status": "ok",
+            "outputs": {
+                "zero_index": "50", "relative_second_order_error": "0.0001",
+                "nnls_compensation_found": "true", "nnls_relative_residual": "2e-7"
+            }
+        })
+    # 4 points for zero 100 (comp false)
+    for i in range(12, 16):
+        mock_results.append({
+            "point_id": i, "status": "ok",
+            "outputs": {
+                "zero_index": "100", "relative_second_order_error": "0.0001",
+                "nnls_compensation_found": "false", "nnls_relative_residual": "3e-5"
+            }
+        })
+
+    summary = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", mock_results, "complete")
+    rad_summary = summary.get("radial_second_order_summary", {})
+
+    assert rad_summary.get("compensation_found_count") == 8
+    assert rad_summary.get("compensation_not_found_count") == 8
+    assert rad_summary.get("compensation_found_zero_indices") == ["10", "50"]
+    assert rad_summary.get("compensation_not_found_zero_indices") == ["1", "100"]
+    assert rad_summary.get("nnls_compensation_status") == "heterogeneous_finite_compensation"
+    assert "projection" in rad_summary.get("projection_trap_note", "").lower()
+    assert summary["criterion"]["criterion_met"] is True
+

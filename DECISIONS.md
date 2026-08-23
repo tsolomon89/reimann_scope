@@ -928,26 +928,27 @@ Naive undivided Fourier quadrature in negative grades and any ambiguous classifi
 
 ---
 
-## 2026-08-23 — Second-Order Radial Rigidity, Defect Divisors, and Non-Negative Quadratic Energy Analysis
+## 2026-08-23 — Second-Order Radial Sensitivity, Defect Divisors, and Non-Negative Least Squares Analysis
 
 Status: ACCEPTED
 
 Decision:
 
-1. **Radial Projection Operator and Defect Divisor**: Formalize the critical-line projection operator $\mathcal P_0(\rho) = 1/2 + i\gamma$ and the defect divisor $\Delta\mathcal D_{\mathrm{rad}} = \mathcal D - \mathcal P_0(\mathcal D)$, ensuring exact separation between on-line spectrum and radial displacements.
-2. **Second-Order Taylor Response**: Model the pure radial defect response under even holomorphic test functions as $\Delta\mathcal C_h[\mathcal O(\rho)] = -2\delta^2 h''(\gamma) + \mathcal O(\delta^4) = -2 u h''(\gamma) + \mathcal O(u^2)$, where $u = \delta^2 \ge 0$ is the non-negative orbit variable.
-3. **Quadratic Radial Energy**: Define the multi-orbit response matrix $K_{(K,j), n} = -2 a_K^2 H_j''(a_K \gamma_n)$ and quadratic energy $E(u) = u^T K^T K u$.
-4. **Non-Negative Least Squares (NNLS) Constraint**: Evaluate compensation feasibility under the strict physical cone constraint $u \ge 0$. While unconstrained linear combinations can achieve cancellation in over-complete bases, non-negativity $u_n = \delta_n^2 \ge 0$ creates a non-trivial positive energy obstruction.
-5. **Anti-Circularity and Non-Euler Screening**: Screen the framework against circular assumptions (RH, Weil positivity of the full sum, Li's criterion) and maintain non-Euler product controls (Davenport–Heilbronn).
+1. **Radial Projection Operator and Defect Divisor**: Formalize the critical-line projection operator \(\mathcal P_0(\rho) = 1/2 + i\gamma\) and the defect divisor \(\Delta\mathcal D_{\mathrm{rad}} = \mathcal D - \mathcal P_0(\mathcal D)\), ensuring exact separation between on-line spectrum and radial displacements.
+2. **Second-Order Taylor Response**: Model the pure radial defect response under even holomorphic test functions as \(\Delta\mathcal C_h[\mathcal O(\rho)] = -2\delta^2 h''(\gamma) + \mathcal O(\delta^4) = -2 u h''(\gamma) + \mathcal O(u^2)\), where \(u = \delta^2 \ge 0\) is the non-negative orbit variable.
+3. **Single-Target Quadratic Radial Energy vs Cone Compensation**: Define the single-target energy \(E(u_n) = u_n^2 \|K_{\cdot, n}\|^2 \ge 0\). Note that single-target positivity does not preclude non-negative linear combinations of remaining columns from matching target columns in a high-nullity finite basis.
+4. **Non-Negative Least Squares (NNLS) Diagnostic**: Evaluate finite compensation feasibility under the cone constraint \(u \ge 0\). In the sampled 30-channel basis over 100 zeros (nullity \(\approx 85\), \(\kappa \sim 10^{15}\)), NNLS yields heterogeneous compensation (found for zeros 10 and 50; uncompensated for zeros 1 and 100).
+5. **The Projection Trap & Epistemic Classification**: Classify the experiment as an exact finite synthetic sensitivity diagnostic. Formally note the Projection Trap: \(\mathcal P_0(\mathcal D_\zeta)\) lacks an independent arithmetic explicit formula, so inferring radial rigidity from \(\Delta\mathcal D_{\mathrm{rad}}\) remains an unproved theorem.
 
 Reason:
 
-Provides an exact, non-circular mathematical instrument to analyze whether off-line zero configurations can self-compensate at leading quadratic order under the Riemann–Weil explicit formula.
+Provides an exact, non-circular mathematical instrument to evaluate local quadratic Taylor fidelity while honestly reporting finite basis subspace geometry without overstating proof implications.
 
 Mathematical / operational consequence:
 
-Implemented experiment `explicit-formula-radial-second-variation-001`, verified Lean 4 formal foundations (`RiemannScope.RadialDefect`), and integrated NNLS diagnostics into `diagnostics.json`.
+Implemented canonical experiment `explicit-formula-radial-second-variation-001`, verified Lean 4 formal foundations (`RiemannScope.RadialDefect`), and published categorical NNLS metrics and reconstructible diagnostics.
 
 Supersedes:
 
-None.
+Any interpretation of finite single-target positive energy as a universal proof of global non-compensation.
+

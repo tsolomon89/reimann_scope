@@ -1554,15 +1554,17 @@ def solve_radial_second_order_nnls(
 ) -> Dict[str, Any]:
     """
     [AUDIT PATH] Solves radial second-order zero-compensation problem:
-    K_{-n} * u_{-n} = -K_n * u_n with u_{-n} >= 0.
+    K_{-n} * u_{-n} \approx v_target = K_n * u_n with u_{-n} >= 0.
 
     Evaluates:
     - SVD of K_{-n}, singular values, rank, nullity, condition number
     - Complete threshold sweep across [1e-18, 1e-20, 1e-25, 1e-30, 1e-35, 1e-40]
     - Unconstrained least squares solution and residual
     - Non-negative least squares (NNLS) solution (u >= 0) and residual
-    - Quadratic radial energy E(u) = ||v_target||^2
-    - Non-compensation verification: whether NNLS relative residual remains > 1e-5.
+    - Single-target quadratic radial energy E(u) = ||v_target||^2 = u^2 ||K_n||^2 >= 0
+    - Finite cone compensation diagnostic: whether NNLS relative residual < 1e-5.
+      Note: Positive target energy E(u) > 0 does NOT preclude non-negative compensation
+      by other zero columns in a high-nullity finite subspace (~85 nullity).
     """
     with mpmath.workdps(dps + 30):
         num_rows = len(K_mat)

@@ -327,3 +327,75 @@ def test_radial_second_order_jacobian_and_nnls():
         # Verify all NNLS components are >= 0
         for x in nnls_res["nnls_solution"]:
             assert x >= -mpmath.mpf('1e-60')
+
+
+def test_radial_second_order_heterogeneous_nnls_and_positive_energy():
+    """
+    Verify that across 100 zeros in the 30-channel basis:
+    1. Positive target energy E(u) > 0 holds for all target zeros.
+    2. NNLS compensation is heterogeneous: compensation IS found for zeros 10 and 50
+       (residual < 1e-6), but NOT found for zeros 1 and 100 (residual > 1e-5).
+    3. Positive target energy and compensation-found coexist, proving positive target
+       energy does not preclude subspace cone compensation.
+    """
+    with mpmath.workdps(80):
+        ref_zeros = reference_data.load_first_100_reference_zeros()
+        j_list = [1, 2, 3, 4, 5, 6]
+        k_list = [-2, -1, 0, 1, 2]
+        K_mat = math_core.radial_second_order_jacobian(j_list, k_list, ref_zeros, dps=80)
+
+        # Zero 1 (col 0)
+        res_1 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=0, u_val='1e-6', dps=80)
+        assert res_1["positive_energy_holds"] is True
+        assert res_1["nnls_compensation_found"] is False
+        assert res_1["nnls_relative_residual"] > mpmath.mpf('0.9')
+
+        # Zero 10 (col 9)
+        res_10 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=9, u_val='1e-6', dps=80)
+        assert res_10["positive_energy_holds"] is True
+        assert res_10["nnls_compensation_found"] is True
+        assert res_10["nnls_relative_residual"] < mpmath.mpf('1e-6')
+
+        # Zero 50 (col 49)
+        res_50 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=49, u_val='1e-6', dps=80)
+        assert res_50["positive_energy_holds"] is True
+        assert res_50["nnls_compensation_found"] is True
+        assert res_50["nnls_relative_residual"] < mpmath.mpf('1e-6')
+
+        # Zero 100 (col 99)
+        res_100 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=99, u_val='1e-6', dps=80)
+        assert res_100["positive_energy_holds"] is True
+        assert res_100["nnls_compensation_found"] is False
+        assert res_100["nnls_relative_residual"] > mpmath.mpf('1e-5')
+
+
+def test_native_baseline_metric_semantics():
+    """Verify that only the residual is marked criterion_component in native baseline spec."""
+    import yaml
+    with open("research/experiments/explicit_formula_native_baseline_001.yaml", "r", encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+
+    report_metrics = {m["metric"]: m.get("kind") for m in spec.get("report_metrics", [])}
+    assert report_metrics.get("residual") == "criterion_component"
+    assert report_metrics.get("relative_error") == "diagnostic"
+    assert report_metrics.get("spectral_cutoff_change_100_to_200") == "diagnostic"
+    assert report_metrics.get("spectral_cutoff_change_150_to_200") == "diagnostic"
+    assert report_metrics.get("prime_cutoff_change_10k_to_50k") == "diagnostic"
+    assert report_metrics.get("precision_change_70_to_110") == "diagnostic"
+
+
+def test_lean_formal_file_boundary():
+    """Verify that formal Lean 4 module proves algebraic lemmas without overclaiming global RH proof."""
+    with open("formal/RiemannScope/RadialDefect.lean", "r", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "def radialProjection" in content
+    assert "def pureRadialDefectQuartet" in content
+    assert "theorem pureRadialDefectQuartet_zero_delta" in content
+    assert "theorem second_order_orbit_variable_nonneg" in content
+    assert "0 ≤ δ ^ 2" in content or "0 \u2264 \u03b4 ^ 2" in content
+    # Verify no ungrounded claim that RH or global non-compensation is proven in Lean
+    assert "theorem riemann_hypothesis" not in content.lower()
+    assert "rh_proved" not in content.lower()
+
+

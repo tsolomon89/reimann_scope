@@ -921,14 +921,21 @@ def create_proof_programme_tab():
                                 ], className="mb-1"),
                                 html.Div([
                                     html.Span("Radial Second Variation: ", className="small text-secondary"),
-                                    dbc.Badge("POSITIVE ENERGY (u ≥ 0)", color="success", className="p-1 font-monospace small")
+                                    dbc.Badge("EXACT TAYLOR MODEL (< 0.04% err)", color="success", className="p-1 font-monospace small")
                                 ], className="mb-1"),
                                 html.Div([
-                                    html.Span("NNLS Compensation: ", className="small text-secondary"),
-                                    dbc.Badge("OBSTRUCTED (E(u) > 0)", color="warning", className="p-1 font-monospace small")
+                                    html.Span("NNLS Finite Compensation: ", className="small text-secondary"),
+                                    dbc.Badge("HETEROGENEOUS (8/16 cases)", color="warning", className="p-1 font-monospace small")
                                 ], className="mb-1"),
                             ], xs=12, md=6),
                         ]),
+                        html.Div([
+                            html.Span("Projection Trap Note: ", className="small text-secondary fw-bold"),
+                            html.Span(
+                                "Actual divisor D_zeta has an arithmetic explicit formula, whereas critical-line projection P_0(D_zeta) has no established independent arithmetic representation; inferring radial rigidity from projected defect remains the missing theorem.",
+                                className="small text-muted font-monospace"
+                            )
+                        ], className="mt-2 pt-2 border-top border-secondary"),
                     ], className="p-3")
                 ], className="border-secondary shadow-sm mb-3")
             ], xs=12)

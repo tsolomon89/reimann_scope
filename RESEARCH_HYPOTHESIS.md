@@ -727,9 +727,9 @@ The project has established the direct mathematical-discrimination campaign for 
 
 ---
 
-# 20. Second-Order Radial Rigidity and Quadratic Energy Formulation
+# 20. Second-Order Radial Sensitivity and Quadratic Energy Formulation
 
-The research campaign formulates the second-order radial response of the Riemann–Weil explicit formula under the radial projection operator \(\mathcal P_0\):
+The research campaign evaluates the second-order radial response of the Riemann–Weil explicit formula under the radial projection operator \(\mathcal P_0\):
 
 1. **Defect Divisor**:
    \[
@@ -740,16 +740,18 @@ The research campaign formulates the second-order radial response of the Riemann
    \[
    \Delta\mathcal C_h[\mathcal O(\rho)] = -2 u h''(\gamma) + \mathcal O(u^2).
    \]
-3. **Multi-Orbit Linearized Matrix and Quadratic Energy**:
-   For \(N\) off-line orbits with ordinates \(\gamma_n\) and displacements \(u_n = \delta_n^2 \ge 0\):
-   \[
-   \Delta\mathcal C^{\mathrm{linear}}_j = \sum_{n=1}^N K_{j,n} u_n, \qquad K_{j,n} = -2 h''_j(\gamma_n), \qquad E(u) = u^T K^T K u.
-   \]
-4. **Candidate Theorem 1 (Orbit Separation)**:
-   For any single off-line orbit \(\delta_0 \ne 0\), \(\exists h\) such that \(h''(\gamma_0) \ne 0 \implies \Delta\mathcal C_h \ne 0\).
-5. **Candidate Theorem 2 (Positive Radial Energy / No-Compensation)**:
-   For any \(u \in \mathbb R_+^N \setminus \{0\}\), the second-derivative evaluation functionals are linearly independent in \(\mathcal H^*\), preventing exact simultaneous cancellation across all admissible test functions.
-6. **Anti-Circularity and Non-Euler Screening**:
-   - The formulation does not assume RH, Weil positivity of the full sum, or Li's criterion.
-   - Non-Euler systems (Davenport–Heilbronn) serve as counterexample controls.
-   - Sprint 2 Gate Verdict: `candidate_exact_non_circular`.
+3. **Single-Target Quadratic Energy vs Subspace Cone Compensation**:
+   - Single-target energy \(E(u_n) = u_n^2 \|K_{\cdot, n}\|^2 \ge 0\) is strictly positive for any non-trivial test function where \(h''(\gamma_n) \ne 0\).
+   - However, single-target positivity does **NOT** forbid compensation by other zero columns in a finite subspace:
+     \[
+     \min_{u_{-n} \ge 0} \|K_{\cdot, n} u_n - K_{-n} u_{-n}\|^2.
+     \]
+   - In the sampled 30-channel basis over 100 zeros, numerical nullity is high (\(\approx 85\)) and conditioning is \(\sim 10^{15}\); non-negative least squares yields heterogeneous results (compensation found for zeros 10 and 50 with relative residuals \(\sim 10^{-10}\) and \(\sim 10^{-7}\); compensation obstructed for peripheral zeros 1 and 100).
+4. **The Projection Trap**:
+   - The actual zero divisor \(\mathcal D_\zeta\) has an arithmetic explicit-formula representation, while its critical-line projection \(\mathcal P_0(\mathcal D_\zeta)\) has no known independent arithmetic representation.
+   - Inferring radial rigidity (\(\Delta\mathcal D_{\mathrm{rad}} = 0\)) from the projected defect remains the unproved missing theorem.
+5. **Structural Countermodels**:
+   - Davenport–Heilbronn and Epstein zeta functions demonstrate that functional-equation reflection symmetry and coordinate covariance alone do not exclude off-line zeros.
+6. **Epistemic Classification**:
+   - The construction is classified as an **exact finite synthetic sensitivity diagnostic**.
+

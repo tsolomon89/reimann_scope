@@ -2042,7 +2042,7 @@ Defining the non-negative second-order orbit variable \(u = \delta^2 \ge 0\):
 }
 \]
 
-## 36.3 Multi-orbit linearized radial response matrix and quadratic energy
+## 36.3 Multi-orbit linearized radial response matrix, quadratic energy, and finite compensation
 
 For \(N\) hypothetical off-line zero orbits \(\{\mathcal O(\rho_n)\}_{n=1}^N\) with distinct ordinates \(\gamma_n\) and radial displacements \(u_n = \delta_n^2 \ge 0\) (\(u \in \mathbb R_+^N\)), the linearized radial defect vector across a family of test functions \(\{h_j\}_{j=1}^M\) is:
 
@@ -2052,32 +2052,38 @@ For \(N\) hypothetical off-line zero orbits \(\{\mathcal O(\rho_n)\}_{n=1}^N\) w
 }
 \]
 
-The associated quadratic radial energy is:
+The single-target quadratic radial energy for orbit \(n\) is:
 
 \[
 \boxed{
-E(u) = \|\Delta\mathcal C^{\mathrm{linear}}\|^2 = u^T K^T K u.
+E(u_n) = \|K_{\cdot, n} u_n\|^2 = u_n^2 \|K_{\cdot, n}\|^2 \ge 0.
 }
 \]
 
-Because \(u_n = \delta_n^2 \ge 0\), exact second-order compensation across the test family requires:
+### Mathematical Distinction: Single-Target Energy vs Subspace Cone Compensation
+1. **Single-Target Positivity**: For any non-trivial test packet \(h\) where \(h''(\gamma_n) \ne 0\), the single-target energy \(E(u_n) > 0\) for \(u_n > 0\).
+2. **Subspace Non-Negative Compensation**: Single-target positivity does **NOT** preclude non-negative linear combinations of the remaining columns \(K_{-n} u_{-n}\) with \(u_{-n} \ge 0\) from matching or canceling \(K_{\cdot, n} u_n\) in a finite-dimensional test space:
+   \[
+   \min_{u_{-n} \ge 0} \|K_{\cdot, n} u_n - K_{-n} u_{-n}\|^2.
+   \]
+3. **Finite Basis Nullity**: In any finite basis of \(M\) test functions (e.g. \(M=30\) channels across 100 zeros), the high numerical nullity (\(\approx 85\)) and ill-conditioning (\(\kappa \sim 10^{15}\)) mean that target columns for internal subspace zeros (e.g. zeros 10 and 50) lie well within the convex cone spanned by the remaining columns, yielding relative NNLS residuals \(< 10^{-6}\).
 
-\[
-\operatorname{ker}(K) \cap (\mathbb R_+^N \setminus \{0\}) \ne \varnothing.
-\]
+## 36.4 The Projection Trap and Open Mathematical Obligations
 
-## 36.4 Candidate theorems formulation
+1. **The Projection Trap**:
+   - The actual zero divisor \(\mathcal D_\zeta = \sum_\rho [\rho]\) has an established arithmetic explicit-formula representation connecting its spectral sum to primes and poles: \(\operatorname{EF}[h; \mathcal D_\zeta, \mathcal A_\zeta] = 0\).
+   - However, its critical-line projection \(\mathcal P_0(\mathcal D_\zeta) = \sum_\rho [1/2 + i\gamma_\rho]\) is **NOT** known to be the divisor of any Dirichlet series or Euler product, and has **NO** established independent arithmetic representation.
+   - Consequently, \(\langle \mathcal P_0(\mathcal D_\zeta), h \rangle\) cannot be independently evaluated via arithmetic data without already assuming that all zeros lie on the critical line (\(\mathcal D_\zeta = \mathcal P_0(\mathcal D_\zeta)\)), which is circular.
+2. **Missing Theorem Status**:
+   - Inferring radial rigidity (\(\Delta\mathcal D_{\mathrm{rad}} = 0\)) from the projected-divisor defect remains an unproved theorem requiring a global arithmetic or spectral constraint.
 
-- **Candidate Theorem 1 (Orbit Separation)**: For any isolated off-line orbit \(\mathcal O(\rho_0)\) with \(\delta_0 \ne 0\) and ordinate \(\gamma_0\), there exists an admissible even Schwartz test function \(h\) such that \(h''(\gamma_0) \ne 0\), producing a strictly non-zero second-order radial defect \(\Delta\mathcal C_h = -2\delta_0^2 h''(\gamma_0) + \mathcal O(\delta_0^4) \ne 0\).
-- **Candidate Theorem 2 (Positive Radial Energy / No-Compensation)**: For any non-empty configuration of off-line zero orbits \(\{\mathcal O(\rho_n)\}_{n=1}^N\) with \(u \in \mathbb R_+^N \setminus \{0\}\), the linear evaluation \(u \mapsto (-2\sum_{n=1}^N u_n h''_j(\gamma_n))_{j \in \mathcal J}\) cannot vanish identically on the dense space of admissible test functions \(\mathcal H\). That is, the second-derivative evaluation functionals \(\{-2 h''(\gamma_n)\}_{n=1}^N\) are linearly independent in \(\mathcal H^*\).
+## 36.5 Countermodel Controls and Epistemic Classification
 
-## 36.5 Anti-circularity and non-Euler screening
+1. **Structural Countermodels**:
+   - Davenport–Heilbronn and Epstein zeta functions possess functional-equation reflection symmetry \(\delta \mapsto -\delta\) and exact coordinate covariance, yet possess off-line zeros.
+   - They serve as structural countermodels demonstrating that functional symmetry and coordinate covariance alone are mathematically insufficient to exclude off-line zeros.
+   - We do not claim their off-line zeros are caused by one isolated missing ingredient unless proved.
+2. **Epistemic Classification**:
+   - The finite second-order radial response construction is classified as an **exact finite synthetic sensitivity diagnostic**.
+   - It validates the local quadratic Taylor fidelity (\(\mathcal O(\delta^2)\) relative error \(< 0.04\%\)), while finite NNLS compensation remains heterogeneous and dependent on the chosen test family.
 
-1. **Screening against RH and Weil Positivity**:
-   - The formulation evaluates the defect operator \(\Delta\mathcal D_{\mathrm{rad}}\) purely on test functions without assuming \(\operatorname{EF}[h; \mathcal D, \mathcal A] = 0\) for perturbed divisors or invoking global Weil positivity for the complete zeta sum.
-   - The non-negativity \(u_n = \delta_n^2 \ge 0\) is an exact property of real displacement \(\delta_n \in \mathbb R\), not an assumed premise.
-2. **Screening against Non-Euler Counterexamples**:
-   - For Davenport–Heilbronn and Epstein zeta functions, off-line zeros exist because their arithmetic explicit formula lacks the unique Euler product constraints of \(\zeta(s)\). The radial second-variation framework isolates zero-divisor deformation under frozen arithmetic data, explicitly screening against false generalization to non-Euler systems.
-3. **Sprint 2 Gate Verdict**:
-   - The second-order radial-rigidity formulation is exact, deductive, coordinate-gauge-free, and screened against circular dependencies.
-   - Classification: `candidate_exact_non_circular`.

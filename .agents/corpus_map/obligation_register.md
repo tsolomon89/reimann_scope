@@ -28,6 +28,8 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-007` | Single Zero Perturbation Response | Exact differential update $\Delta C_n(x) = C(x, \rho'_n) - C(x, \rho_n)$ | Unit test comparing delta update to full recomputation | `Specified in Harness` |
 | `OBL-008` | Centrifuge Derivative Invariant | $\frac{d}{dK} \log \|q_\rho^K\| = \delta \log \tau$ | Exact symbolic derivation & numerical gradient test | `Verified in Harness` |
 | `OBL-009` | Counterexample Falsification Control | Davenport-Heilbronn function fails on-line zero hypothesis | Numerical search finding off-line zeros for non-Euler zeta | `Verified in Harness` |
+| `OBL-EF-003` | Projection Trap Resolution | Derive independent arithmetic or spectral representation of $\mathcal P_0(\mathcal D_\zeta)$ to deduce $\Delta\mathcal D_{\mathrm{rad}} = 0$ | Open global constraint derivation | `OPEN OBLIGATION` |
+
 
 ---
 

@@ -1,17 +1,17 @@
 schema_version: '2'
 id: explicit-formula-radial-second-variation-001
 title: Riemann–Weil Explicit Formula Radial Second-Variation and Non-Negative Energy Analysis
-research_question: Does a finite collection of off-line zero orbits induce a non-vanishing second-order radial defect Delta C_h ~ -2 u h''(gamma) with strictly positive quadratic energy, and do non-negative radial variables u_n = delta_n^2 >= 0 forbid simultaneous compensation across admissible test functions?
+research_question: Does a finite collection of off-line zero orbits induce a leading second-order radial defect Delta C_h ~ -2 u h''(gamma) with quadratic scaling in delta, and how does finite non-negative least squares (NNLS) behave across sampled zero orbits in the 30-channel basis?
 epistemic_class: sensitivity_diagnostic
 object_relationship: synthetic_perturbation_diagnostic
 hypothesis:
-  statement: Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive quadratic radial energy E(u) = u^T K^T K u; non-negativity u_n = delta_n^2 >= 0 prevents exact non-negative least-squares compensation across the sampled test family under fixed arithmetic data.
+  statement: Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive single-target quadratic energy E(u) = ||v_target||^2; finite NNLS compensation behavior is an observational diagnostic of subspace geometry, exhibiting heterogeneous compensation across sampled zeros under fixed arithmetic data.
 prediction:
-  statement: Across all sampled zero orbits and radial displacements delta in [0.001, 0.005, 0.01, 0.05], the relative second-order Taylor error |R(delta)| / |Delta C| scales as O(delta^2), quadratic ratio Delta C(delta) / Delta C(delta/2) converges to 4.0, and non-negative least squares residual remains strictly positive (positive_energy_holds = true).
+  statement: Across all sampled zero orbits and radial displacements delta in [0.001, 0.005, 0.01, 0.05], the relative second-order Taylor error |R(delta)| / |Delta C| scales as O(delta^2) below 0.01, quadratic ratio Delta C(delta) / Delta C(delta/2) converges to 4.0, and finite NNLS compensation is observed for zeros within the convex cone of the sampled 100-zero basis (zeros 10, 50) while remaining uncompensated for peripheral zeros (zeros 1, 100).
 falsification:
-  statement: Second-order Taylor remainder fails O(delta^2) relative error convergence or exact zero-residual non-negative compensation is found with u >= 0.
+  statement: Second-order Taylor remainder fails O(delta^2) relative error convergence (relative_second_order_error > 0.01) or quadratic halving ratio deviates substantially from 4.0.
 interpretation_limit:
-  statement: Sensitivity diagnostic analyzing second-order radial response under fixed arithmetic data and finite sampled representations; does not constitute a proof of global non-compensation across the infinite zero spectrum or the complete Riemann Hypothesis.
+  statement: Synthetic sensitivity diagnostic verifying local second-order Taylor fidelity; heterogeneous finite NNLS compensation is an observational diagnostic of the high nullity (~85) of the 30-channel basis over 100 zeros and does not prove global radial rigidity or non-compensation across the infinite divisor.
 formalization_target:
   statement: Radial projection operator P_0, radial defect divisor Delta D_rad, second-order Taylor response -2*u*h''(gamma), and quadratic energy E(u).
 criterion:
