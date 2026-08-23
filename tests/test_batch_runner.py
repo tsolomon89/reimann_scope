@@ -40,16 +40,16 @@ def temp_research_env(tmp_path, monkeypatch):
     runs_dir = res_dir / "runs"
     exp_dir.mkdir(parents=True)
     runs_dir.mkdir(parents=True)
-    
+
     index_file = res_dir / "index.json"
     with open(index_file, "w", encoding="utf-8") as f:
         json.dump([], f)
-        
+
     monkeypatch.setattr(research_runner, "RESEARCH_DIR", str(res_dir))
     monkeypatch.setattr(research_runner, "EXPERIMENTS_DIR", str(exp_dir))
     monkeypatch.setattr(research_runner, "RUNS_DIR", str(runs_dir))
     monkeypatch.setattr(research_runner, "INDEX_FILE", str(index_file))
-    
+
     return {
         "root": tmp_path,
         "research": res_dir,
@@ -75,19 +75,19 @@ def test_spec_validation():
     }
     is_valid, err = research_runner.validate_spec(valid_spec)
     assert is_valid, f"Validation failed on valid spec: {err}"
-    
+
     # Missing hypothesis
     bad_spec1 = dict(valid_spec)
     del bad_spec1["hypothesis"]
     is_valid, err = research_runner.validate_spec(bad_spec1)
     assert not is_valid
-    
+
     # Invalid operator
     bad_spec2 = dict(valid_spec)
     bad_spec2["criterion"] = {"metric": "res", "operator": "APPROX", "threshold": "0.1"}
     is_valid, err = research_runner.validate_spec(bad_spec2)
     assert not is_valid
-    
+
     # Unknown engine operation
     bad_spec3 = dict(valid_spec)
     bad_spec3["engine"] = {"operation": "non_existent_engine_op"}
@@ -102,14 +102,14 @@ def test_parameter_expansion_and_cartesian_product():
     exp_def = {"kind": "explicit", "values": ["0.1", "0.2", "0.3"]}
     expanded_exp = research_runner.expand_parameter(exp_def, dps=dps)
     assert expanded_exp == ["0.1", "0.2", "0.3"]
-    
+
     # Linear with exact decimal values
     lin_def = {"kind": "linear", "start": "0.0", "stop": "1.0", "step": "0.25"}
     expanded_lin = research_runner.expand_parameter(lin_def, dps=dps)
     assert len(expanded_lin) == 5
     assert mpmath.mpf(expanded_lin[0]) == mpmath.mpf("0.0")
     assert mpmath.mpf(expanded_lin[-1]) == mpmath.mpf("1.0")
-    
+
     # Log
     log_def = {"kind": "log", "base": "10", "exponents": ["-2", "-1", "0"]}
     expanded_log = research_runner.expand_parameter(log_def, dps=dps)
@@ -117,7 +117,7 @@ def test_parameter_expansion_and_cartesian_product():
     assert mpmath.mpf(expanded_log[0]) == mpmath.mpf("0.01")
     assert mpmath.mpf(expanded_log[1]) == mpmath.mpf("0.1")
     assert mpmath.mpf(expanded_log[2]) == mpmath.mpf("1.0")
-    
+
     # Cartesian product ordering
     params_def = {
         "p1": {"kind": "explicit", "values": ["A", "B"]},
@@ -140,7 +140,7 @@ def test_spec_hashing_and_git_capture():
     h2 = research_runner.hash_string(sample_text)
     assert h1 == h2
     assert len(h1) == 64
-    
+
     commit, is_dirty = research_runner.get_git_info()
     assert isinstance(commit, str)
     assert len(commit) > 0
@@ -168,10 +168,10 @@ def test_experiment_run_and_artifacts(temp_research_env):
     spec_path = os.path.join(temp_research_env["experiments"], "centrifuge-test-sweep.yaml")
     with open(spec_path, "w", encoding="utf-8") as f:
         yaml.dump(spec_dict, f)
-        
+
     run_id = research_runner.run_experiment(spec_path)
     run_dir = os.path.join(temp_research_env["runs"], run_id)
-    
+
     # 1. Verify manifest.json
     manifest_path = os.path.join(run_dir, "manifest.json")
     assert os.path.exists(manifest_path)
@@ -182,7 +182,7 @@ def test_experiment_run_and_artifacts(temp_research_env):
     assert manifest["points_completed"] == 6
     assert "tau" in manifest
     assert manifest["git_commit"] is not None
-    
+
     # 2. Verify results.jsonl
     results_path = os.path.join(run_dir, "results.jsonl")
     assert os.path.exists(results_path)
@@ -196,7 +196,7 @@ def test_experiment_run_and_artifacts(temp_research_env):
         assert pt["point_id"] == i
         assert pt["status"] == "ok"
         assert "log_modulus" in pt["outputs"]
-        
+
     # 3. Verify summary.json
     summary_path = os.path.join(run_dir, "summary.json")
     assert os.path.exists(summary_path)
@@ -207,7 +207,7 @@ def test_experiment_run_and_artifacts(temp_research_env):
     assert summary["criterion"]["criterion_met"] is True
     assert "supports_rh" not in summary
     assert "proof_progress" not in summary
-    
+
     # 4. Verify README.md
     readme_path = os.path.join(run_dir, "README.md")
     assert os.path.exists(readme_path)
@@ -215,7 +215,7 @@ def test_experiment_run_and_artifacts(temp_research_env):
         readme = f.read()
     assert "Centrifuge Unit Test Sweep" in readme
     assert "CRITERION MET" in readme
-    
+
     # 5. Verify index.json
     runs = research_runner.list_runs()
     assert len(runs) == 1
@@ -241,20 +241,20 @@ def test_resume_and_refusal_semantics(temp_research_env):
     spec_path = os.path.join(temp_research_env["experiments"], "resume-test-sweep.yaml")
     with open(spec_path, "w", encoding="utf-8") as f:
         yaml.dump(spec_dict, f)
-        
+
     # Simulate a partial run by running 1st time, then truncating results.jsonl to 3 points
     run_id = research_runner.run_experiment(spec_path)
     run_dir = os.path.join(temp_research_env["runs"], run_id)
     results_path = os.path.join(run_dir, "results.jsonl")
-    
+
     with open(results_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
     assert len(lines) == 8
-    
+
     # Truncate to 3 points and set status back to running
     with open(results_path, "w", encoding="utf-8") as f:
         f.writelines(lines[:3])
-        
+
     manifest_path = os.path.join(run_dir, "manifest.json")
     with open(manifest_path, "r", encoding="utf-8") as f:
         manifest = json.load(f)
@@ -262,27 +262,27 @@ def test_resume_and_refusal_semantics(temp_research_env):
     manifest["points_completed"] = 3
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
-        
+
     # Resume the partial run
     resumed_run_id = research_runner.run_experiment(spec_path, resume_run_id=run_id)
     assert resumed_run_id == run_id
-    
+
     with open(results_path, "r", encoding="utf-8") as f:
         all_lines = f.readlines()
     assert len(all_lines) == 8  # Appended the remaining 5 points
-    
+
     with open(manifest_path, "r", encoding="utf-8") as f:
         final_manifest = json.load(f)
     assert final_manifest["status"] == "complete"
     assert final_manifest["points_completed"] == 8
-    
+
     # Test refusal when spec hash differs
     modified_spec_dict = dict(spec_dict)
     modified_spec_dict["title"] = "Modified Title Changes Hash"
     modified_spec_path = os.path.join(temp_research_env["experiments"], "modified-spec.yaml")
     with open(modified_spec_path, "w", encoding="utf-8") as f:
         yaml.dump(modified_spec_dict, f)
-        
+
     with pytest.raises(ValueError, match="Spec hash mismatch"):
         research_runner.run_experiment(modified_spec_path, resume_run_id=run_id)
 
@@ -296,17 +296,17 @@ def test_interactive_engine_vs_batch_engine_parity():
     delta_str = "0.005"
     k_str = "12.5"
     gamma_str = "14.134725141734693790457251983562"
-    
+
     with mpmath.workdps(dps + 10):
         # 1. Batch runner evaluation
         inputs = {"delta": delta_str, "k": k_str, "gamma": gamma_str}
         status, outputs, err = research_runner.evaluate_point("centrifuge", inputs, dps=dps)
         assert status == "ok"
         batch_log_mod = mpmath.mpf(outputs["log_modulus"])
-        
+
         # 2. Canonical math_core evaluation
         direct_log_mod = math_core.centrifuge_log_modulus(delta_str, k_str, dps=dps)
-        
+
         assert abs(batch_log_mod - direct_log_mod) < mpmath.mpf("1e-50")
 
 
@@ -339,7 +339,7 @@ def test_multi_metric_summary_and_classification():
         ],
         "precision": {"dps": dps}
     }
-    
+
     results = [
         {
             "point_id": 0,
@@ -362,22 +362,22 @@ def test_multi_metric_summary_and_classification():
             }
         }
     ]
-    
+
     summary = research_runner.compute_summary(spec, "run-123", results, "complete")
-    
+
     assert "report_metrics" in summary
     assert "zeta_covariance_residual" in summary["report_metrics"]
     assert "cpi_covariance_residual" in summary["report_metrics"]
     assert "covariance_residual" in summary["report_metrics"]
-    
+
     zeta_meta = summary["report_metrics"]["zeta_covariance_residual"]
     assert zeta_meta["kind"] == "criterion_component"
     assert zeta_meta["count"] == 2
-    
+
     cpi_meta = summary["report_metrics"]["cpi_covariance_residual"]
     assert cpi_meta["kind"] == "fixed_m_truncation_diagnostic"
     assert cpi_meta["count"] == 1
-    
+
     # Primary criterion outcome
     assert summary["criterion"]["criterion_met"] is True
 
@@ -395,7 +395,7 @@ def test_argmax_preservation_and_worst_points_ordering():
         "criterion": {"metric": "res", "operator": "<=", "threshold": "1.0"},
         "precision": {"dps": dps}
     }
-    
+
     # Construct 7 points with varying magnitudes and signs
     vals = ["1e-5", "-1e-2", "3e-3", "-1e-1", "1e-8", "5e-4", "-2e-2"]
     results = [
@@ -407,19 +407,19 @@ def test_argmax_preservation_and_worst_points_ordering():
         }
         for i, val in enumerate(vals)
     ]
-    
+
     summary = research_runner.compute_summary(spec, "run-456", results, "complete")
     res_stats = summary["report_metrics"]["res"]
-    
+
     # Argmax should be point index 3 (-1e-1, absolute value 0.1)
     argmax = res_stats["argmax_abs"]
     assert argmax["point_id"] == 3
     assert argmax["inputs"] == {"param_idx": "3", "tag": "p3"}
-    
+
     # Worst points should have length <= 5
     worst = res_stats["worst_points"]
     assert len(worst) == 5
-    
+
     # Top 5 in descending absolute order:
     # 1. -1e-1 (id 3)
     # 2. -2e-2 (id 6)
@@ -448,7 +448,7 @@ def test_decimal_string_serialization_and_readme():
         ],
         "precision": {"dps": dps}
     }
-    
+
     results = [
         {
             "point_id": 0,
@@ -457,9 +457,9 @@ def test_decimal_string_serialization_and_readme():
             "outputs": {"err": "1.234567890123456789012345678901234567890e-80", "diag": "0.0"}
         }
     ]
-    
+
     summary = research_runner.compute_summary(spec, "run-789", results, "complete")
-    
+
     # Verify decimal string serialization
     for m_name, m_data in summary["report_metrics"].items():
         assert isinstance(m_data["min"], str)
@@ -467,7 +467,7 @@ def test_decimal_string_serialization_and_readme():
         assert isinstance(m_data["max_abs"], str)
         for wp in m_data["worst_points"]:
             assert isinstance(wp["value"], str)
-            
+
     manifest = {
         "run_id": "run-789",
         "git_commit": "abcdef0123456789",
@@ -479,7 +479,7 @@ def test_decimal_string_serialization_and_readme():
         "started_at": "2026-08-20T12:00:00Z",
         "completed_at": "2026-08-20T12:00:01Z"
     }
-    
+
     readme = research_runner.generate_run_readme(spec, manifest, summary)
     assert "Multi-Metric Summary" in readme
     assert "fixed_m_truncation_diagnostic" in readme
@@ -500,27 +500,27 @@ def test_precision_preservation_without_float_downcast():
         "criterion": {"metric": "val", "operator": "<=", "threshold": "1e-100", "aggregation": "max_abs"},
         "precision": {"dps": dps}
     }
-    
+
     val1 = "1.00000000000000000000000000000000000000000000000000000000000000000000000000000001e-120"
     val2 = "-2.00000000000000000000000000000000000000000000000000000000000000000000000000000002e-120"
-    
+
     results = [
         {"point_id": 0, "status": "ok", "inputs": {"p": "0"}, "outputs": {"val": val1}},
         {"point_id": 1, "status": "ok", "inputs": {"p": "1"}, "outputs": {"val": val2}}
     ]
-    
+
     summary = research_runner.compute_summary(spec, "run-prec", results, "complete")
     stats = summary["report_metrics"]["val"]
-    
+
     # max_abs must be positive magnitude of val2
     assert stats["max_abs"].startswith("2.0")
     assert "e-120" in stats["max_abs"]
     assert not stats["max_abs"].startswith("-")
-    
+
     # argmax value must preserve signed string
     assert stats["argmax_abs"]["value"].startswith("-2.0")
     assert stats["argmax_abs"]["abs_value"].startswith("2.0")
-    
+
     # criterion met at extreme precision
     assert summary["criterion"]["criterion_met"] is True
 
@@ -535,7 +535,7 @@ def test_criterion_aggregations_all_modes():
         {"point_id": 1, "status": "ok", "inputs": {"p": "1"}, "outputs": {"val": "3.0"}},
         {"point_id": 2, "status": "ok", "inputs": {"p": "2"}, "outputs": {"val": "-1.0"}}
     ]
-    
+
     # 1. max_abs: max abs is 5.0 <= 4.0 -> False
     spec_max_abs = {
         "id": "t1", "title": "t1", "hypothesis": {"statement": "h"},
@@ -545,7 +545,7 @@ def test_criterion_aggregations_all_modes():
     s_max_abs = research_runner.compute_summary(spec_max_abs, "r1", results, "complete")
     assert s_max_abs["criterion"]["criterion_met"] is False
     assert s_max_abs["criterion"]["observed"] == "5.0"
-    
+
     # 2. max: max signed is 3.0 <= 4.0 -> True
     spec_max = {
         "id": "t2", "title": "t2", "hypothesis": {"statement": "h"},
@@ -555,7 +555,7 @@ def test_criterion_aggregations_all_modes():
     s_max = research_runner.compute_summary(spec_max, "r2", results, "complete")
     assert s_max["criterion"]["criterion_met"] is True
     assert s_max["criterion"]["observed"] == "3.0"
-    
+
     # 3. min: min signed is -5.0 <= -4.0 -> True
     spec_min = {
         "id": "t3", "title": "t3", "hypothesis": {"statement": "h"},
@@ -565,7 +565,7 @@ def test_criterion_aggregations_all_modes():
     s_min = research_runner.compute_summary(spec_min, "r3", results, "complete")
     assert s_min["criterion"]["criterion_met"] is True
     assert s_min["criterion"]["observed"] == "-5.0"
-    
+
     # 4. all: all points <= 4.0 -> (-5.0 <= 4, 3.0 <= 4, -1.0 <= 4) -> True
     spec_all = {
         "id": "t4", "title": "t4", "hypothesis": {"statement": "h"},
@@ -574,7 +574,7 @@ def test_criterion_aggregations_all_modes():
     }
     s_all = research_runner.compute_summary(spec_all, "r4", results, "complete")
     assert s_all["criterion"]["criterion_met"] is True
-    
+
     # 5. none (observational): criterion_met = None, observed = None
     spec_none = {
         "id": "t5", "title": "t5", "hypothesis": {"statement": "h"},
@@ -605,7 +605,7 @@ def test_conditional_metric_counts_in_summary():
         ],
         "precision": {"dps": dps}
     }
-    
+
     # 2 single-pair points, 3 split points (2 with quadratic ratio, 1 without)
     results = [
         # Single-pair points
@@ -622,10 +622,10 @@ def test_conditional_metric_counts_in_summary():
             "split_defect_cj": "0.0000", "symmetry_error": "0.0", "residual": "0.0"
         }}
     ]
-    
+
     summary = research_runner.compute_summary(spec, "run-cond", results, "complete")
     rep = summary["report_metrics"]
-    
+
     assert rep["delta_cj"]["count"] == 2
     assert rep["split_defect_cj"]["count"] == 3
     assert rep["symmetry_error"]["count"] == 3
@@ -654,7 +654,7 @@ def test_dirty_state_detection_rules(monkeypatch):
     monkeypatch.setattr(research_runner.subprocess, "check_output", mock_git(" M math_core.py\n"))
     commit, is_dirty = research_runner.get_git_info()
     assert is_dirty is True
-    
+
     # Test 29: Tracked deletion -> dirty
     monkeypatch.setattr(research_runner.subprocess, "check_output", mock_git(" D research/experiments/macroscope_perturbation_001.yaml\n"))
     commit, is_dirty = research_runner.get_git_info()
@@ -699,15 +699,15 @@ def test_experiment_overwrite_only_semantics(temp_research_env):
         },
         "precision": {"dps": 50}
     }
-    
+
     spec_file = os.path.join(temp_research_env["experiments"], "test-overwrite-001.yaml")
     with open(spec_file, "w", encoding="utf-8") as f:
         yaml.dump(spec, f)
-        
+
     # Run 1
     run_id_1 = research_runner.run_experiment(spec_file)
     assert run_id_1 == "test-overwrite-001"
-    
+
     runs_dir = temp_research_env["runs"]
     stable_exp_dir = os.path.join(runs_dir, "test-overwrite-001")
     assert os.path.isdir(stable_exp_dir)
@@ -715,26 +715,26 @@ def test_experiment_overwrite_only_semantics(temp_research_env):
     assert os.path.exists(os.path.join(stable_exp_dir, "summary.json"))
     assert os.path.exists(os.path.join(stable_exp_dir, "results.jsonl"))
     assert os.path.exists(os.path.join(stable_exp_dir, "README.md"))
-    
+
     # Check index.json after Run 1
     with open(temp_research_env["index"], "r", encoding="utf-8") as f:
         idx1 = json.load(f)
     assert len(idx1["runs"]) == 1
     assert idx1["runs"][0]["experiment_id"] == "test-overwrite-001"
-    
+
     # Run 2 (re-run)
     run_id_2 = research_runner.run_experiment(spec_file)
     assert run_id_2 == "test-overwrite-001"
-    
+
     # Check directory listing: exactly one directory in runs/
     all_runs_dirs = os.listdir(runs_dir)
     assert len(all_runs_dirs) == 1
     assert all_runs_dirs[0] == "test-overwrite-001"
-    
+
     # No .tmp_ or backup directories
     assert not any(d.startswith(".tmp") for d in all_runs_dirs)
     assert not any("backup" in d for d in all_runs_dirs)
-    
+
     # Check index.json after Run 2: still exactly 1 entry (updated, not appended)
     with open(temp_research_env["index"], "r", encoding="utf-8") as f:
         idx2 = json.load(f)
@@ -784,7 +784,7 @@ def test_zero_to_certificate_binding_and_validation():
     )
     # Trivial zero #1 is at s = -2, not 14.134725
     assert ok is True # Trivial zero exists and is valid
-    
+
     # 4. Ordinate mismatch on nontrivial zero
     cert_hash, ok, zc, errs = research_runner._lookup_zero_certificate(
         1,
@@ -1427,3 +1427,41 @@ def test_adversarial_index_field_mutations_and_duplicates(tmp_path):
             assert any("Duplicate entries" in e for e in errs)
         finally:
             research_runner.INDEX_FILE = orig_index
+
+
+def test_explicit_formula_experiment_specs_execute_and_validate(temp_research_env, monkeypatch):
+    """Test that all three explicit formula experiment specs execute and produce valid bundles."""
+    real_commit, _ = research_runner.get_git_info()
+    monkeypatch.setattr(research_runner, "get_git_info", lambda cwd=None: (real_commit, False))
+    monkeypatch.setattr(certification, "_get_source_code_hashes", lambda commit=None: {m: research_runner.hash_file_bytes(m) for m in certification.REQUIRED_SOURCE_MODULES})
+    monkeypatch.setattr(certification, "_is_valid_git_commit", lambda *args, **kwargs: (True, None))
+
+    experiments_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "experiments")
+
+    spec_files = [
+        "explicit_formula_native_baseline_001.yaml",
+        "explicit_formula_grade_covariance_001.yaml",
+        "explicit_formula_perturbation_rank_001.yaml",
+    ]
+
+    for sf in spec_files:
+        spec_path = os.path.join(experiments_dir, sf)
+        assert os.path.exists(spec_path), f"Missing experiment spec file: {sf}"
+
+        # Copy spec to temporary experiments directory
+        temp_spec_path = os.path.join(temp_research_env["experiments"], sf)
+        shutil.copyfile(spec_path, temp_spec_path)
+
+        with open(temp_spec_path, "r", encoding="utf-8") as f:
+            spec = yaml.safe_load(f)
+
+        exp_id = spec["id"]
+        run_id = research_runner.run_experiment(temp_spec_path)
+        assert run_id == exp_id
+
+        run_dir = os.path.join(temp_research_env["runs"], exp_id)
+        assert os.path.exists(run_dir)
+
+        # Validate generated bundle
+        ok, errs = research_runner.validate_run_bundle(run_dir, canonical_current=False)
+        assert ok, f"Bundle validation failed for {exp_id}: {errs}"

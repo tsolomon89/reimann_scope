@@ -925,3 +925,19 @@ The batch/research layer is correct when:
 8. cross-height and grade-constraint campaigns are reproducible;
 9. perturbation results are labeled synthetic;
 10. no automated RH verdict or proof-progress ontology exists.
+
+---
+
+# 33. Explicit Formula Discrimination Suite
+
+The suite comprises three canonical experiments evaluating the Riemann–Weil explicit formula under transcendental continuation:
+
+1. `explicit-formula-native-baseline-001`
+   - **Epistemic Class**: `observational_pattern`
+   - **Scope**: Validates native explicit formula components, signs, normalization, and truncation error budgets across test functions \(j=1..6\) at \(K=0\).
+2. `explicit-formula-grade-covariance-001`
+   - **Epistemic Class**: `exact_control`
+   - **Scope**: Validates exact Fourier scaling \(\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x)\), pullback identity \(\mathcal C_{K,j}[H] \equiv \mathcal C_0[H(a_K \cdot)]\), and expanded-\(K=0\) basis rank equivalence.
+3. `explicit-formula-perturbation-rank-001`
+   - **Epistemic Class**: `sensitivity_diagnostic`
+   - **Scope**: Evaluates finite divisor defects \(\Delta \mathcal C_{K,j}\), rejection of unsymmetric single-zero mutations, symmetry-complete radial quartet defects, Jacobian SVD, numerical rank, and minimum-norm linearized compensation.

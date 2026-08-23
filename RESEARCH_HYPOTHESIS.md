@@ -340,29 +340,29 @@ The exact notation is deliberately unspecified until the law is discovered.
 
 A valid Transcendental Coherence Law must satisfy all of the following:
 
-1. **Global**  
+1. **Global**
    It must depend on the actual globally constrained zeta/xi object, not be defined independently zero-by-zero.
 
-2. **Grade-wide**  
+2. **Grade-wide**
    It must hold across a nontrivial family of \(K\)-states or arise from simultaneous constraints across them.
 
-3. **Independent of RH**  
+3. **Independent of RH**
    Its derivation must not assume
    \[
    \Re(\rho)=\frac12
    \]
    or any equivalent RH-strength bound.
 
-4. **Stronger than coordinate covariance**  
+4. **Stronger than coordinate covariance**
    It cannot merely restate
    \[
    \mathcal X_\tau(\tau^k s,k)=\xi(s).
    \]
 
-5. **Arithmetic/analytic**  
+5. **Arithmetic/analytic**
    It should be tied to the zeta/xi object, explicit formula, prime structure, functional equation, or another exact defining relation.
 
-6. **Falsifiable**  
+6. **Falsifiable**
    The Scope must be able to test candidate forms numerically across distinct actual regions and grades.
 
 ---
@@ -697,3 +697,25 @@ Everything in the application should either:
 - or falsify an attempted formulation.
 
 The project should not broaden into unrelated RH machinery unless the current programme produces a specific mathematical reason to do so.
+
+---
+
+# 19. Explicit Formula Discrimination Framework
+
+The project has established the direct mathematical-discrimination campaign for the proposed role of transcendental continuation in explicit-formula constraints:
+
+1. **Grade Covariance**: The grade-\(K\) representation correctly transports the explicit formula according to exact Fourier scaling \(\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x)\).
+2. **Defect Exposure**: Changing the zero divisor while holding arithmetic data \(\mathcal A_\zeta\) fixed produces a non-zero finite divisor defect \(\Delta \mathcal C_{K,j}\) that exactly detects the change while canceling all unchanged terms.
+3. **Absence of Additional Grade Rigidity**: The combined \(K\)-family satisfies \(\mathcal C_{K,j}[H] \equiv \mathcal C_0[H(a_K \cdot)]\). The constraint space of the \(K\)-family is completely spanned by the expanded \(K=0\) native basis \(\{ H_j(a_K \cdot) : K \in \mathcal K, j \in \mathcal J \}\).
+   The discrimination outcome is classified as:
+   \[
+   \boxed{\text{coordinate\_redundant} \quad / \quad \text{finite\_basis\_enrichment\_only}.}
+   \]
+
+**Crucial Distinction**:
+- Detecting a local divisor perturbation with fixed arithmetic data demonstrates sensitivity of the explicit formula to spectral modifications, but does not by itself exclude an off-line zero of the actual zeta function (where arithmetic data might hypothetically conspire or where global compensation could exist).
+- The missing theorem remains:
+  \[
+  \text{zeta-specific global constraint} \Longrightarrow \text{radial rigidity}.
+  \]
+  This implication is not assumed or axiomatized.

@@ -1,0 +1,53 @@
+schema_version: '2'
+id: explicit-formula-perturbation-rank-001
+title: Riemann–Weil Explicit Formula Divisor Perturbation Jacobian and Compensation Diagnostic
+research_question: Does an isolated local zero-divisor perturbation induce a detectable explicit formula defect, and does finite linearized compensation across other sampled zeros reproduce the native constraint?
+epistemic_class: sensitivity_diagnostic
+object_relationship: synthetic_perturbation_diagnostic
+hypothesis:
+  statement: Holding arithmetic data fixed while perturbing a zero orbit produces a non-zero finite divisor defect Delta C_{K,j} that is detected by the explicit formula; linearized compensation can find a minimum-norm candidate within the sampled subspace.
+prediction:
+  statement: Isolated zero perturbations are detected (defect_vector_norm > 1e-25), invalid single-zero perturbations are rejected, and linearized compensation solutions are computed with bounded residuals.
+falsification:
+  statement: Non-zero valid perturbation yields zero defect norm or invalid single-zero mutation is accepted.
+interpretation_limit:
+  statement: Sensitivity diagnostic characterizing linear response and defect exposure under fixed arithmetic data; does not construct alternative zeta functions or prove global non-compensation.
+formalization_target:
+  statement: Explicit formula finite divisor defect and Jacobian response.
+criterion:
+  metric: defect_vector_norm
+  operator: '>='
+  threshold: 1e-25
+  aggregation: max_abs
+report_metrics:
+- metric: defect_vector_norm
+  kind: criterion_component
+  label: Defect vector L2 norm
+- metric: compensation_residual_norm
+  kind: criterion_component
+  label: Compensation residual norm
+engine:
+  operation: explicit_formula_perturbation_rank
+parameters:
+  mode:
+    kind: explicit
+    values:
+    - negative_control_invalid
+    - critical_height
+    - radial_quartet
+  zero_index:
+    kind: explicit
+    values:
+    - 0
+    - 9
+    - 49
+  epsilon:
+    kind: explicit
+    values:
+    - '0.0001'
+    - '0.001'
+    - '0.01'
+precision:
+  dps: 80
+outputs:
+  retain_points: true

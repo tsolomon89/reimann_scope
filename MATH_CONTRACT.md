@@ -1825,3 +1825,106 @@ The following is deliberately **not** part of the mathematical contract:
 That is the central open research theorem.
 
 The implementation may test candidate forms but must not encode the conclusion as an identity, axiom, or automatic verdict.
+
+---
+
+# 35. Riemann–Weil Explicit Formula & Grade-Indexed Constraints
+
+## 35.1 Authoritative explicit formula normalization
+
+For an even holomorphic test function \(h(t)\) on \(|\Im(t)| \le 1/2 + \delta\) satisfying rapid Schwartz decay on \(\mathbb R\), define the Fourier transform convention:
+
+\[
+\boxed{
+\widehat h(x) = \int_{-\infty}^\infty h(t) e^{-i x t} \, dt = 2 \int_0^\infty h(t) \cos(x t) \, dt.
+}
+\]
+
+The Riemann–Weil Explicit Formula residual is defined as:
+
+\[
+\boxed{
+\operatorname{EF}[h; \mathcal D, \mathcal A] = \sum_{\rho \in \mathcal D} h\left(\frac{\rho - 1/2}{i}\right) - \left[ 2 \Re h(i/2) - \frac{1}{\pi} \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}} \widehat h(\log n) + \frac{1}{\pi} \int_0^\infty h(t) \Re\left(\psi\left(\frac{1}{4} + \frac{it}{2}\right) - \log \pi\right) dt \right],
+}
+\]
+
+where:
+- \(\mathcal D\) is the zero divisor (for native \(\zeta\), \(\rho_n = 1/2 \pm i\gamma_n\));
+- \(\mathcal A\) represents the fixed arithmetic data: primes, von Mangoldt weights \(\Lambda(n)\), pole at \(s=1\), and gamma factor \(\Gamma(s/2)\);
+- \(\psi(z) = \Gamma'(z)/\Gamma(z)\) is the digamma function;
+- \(2 \Re h(i/2)\) is the pole contribution at \(s=0, 1\).
+
+For the true zeta divisor \(\mathcal D_\zeta\) and arithmetic data \(\mathcal A_\zeta\):
+
+\[
+\boxed{
+\operatorname{EF}[h; \mathcal D_\zeta, \mathcal A_\zeta] = 0.
+}
+\]
+
+## 35.2 Definition of \(\mathcal C_{K,j}\) and Fourier grade scaling
+
+For a shared test function \(H_j(t)\) defined in grade coordinates, the grade-\(K\) representation induces:
+
+\[
+\boxed{
+h_{K,j}(t) = H_j(a_K t), \qquad a_K = \tau^K = (2\pi)^K.
+}
+\]
+
+The grade constraint is defined as:
+
+\[
+\boxed{
+\mathcal C_{K,j} = \operatorname{EF}[h_{K,j}; \mathcal D_\zeta, \mathcal A_\zeta].
+}
+\]
+
+Under the project Fourier convention, the Fourier transform scales as:
+
+\[
+\boxed{
+\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x).
+}
+\]
+
+Therefore, prime frequencies scale as \(a_K^{-1} \log n = \tau^{-K} \log n\).
+
+## 35.3 Mandatory coordinate-equivalence control
+
+By direct substitution, the grade-\(K\) constraint is an evaluation of the native explicit formula against a scaled test function:
+
+\[
+\boxed{
+\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K].
+}
+\]
+
+The constraint subspace spanned by \(\{ \mathcal C_{K,j} : K \in \mathcal K, j \in \mathcal J \}\) is identical to that spanned by the expanded \(K=0\) basis \(\{ \mathcal C_0[H_j(a_K \cdot)] : K \in \mathcal K, j \in \mathcal J \}\).
+The discrimination classification is:
+
+\[
+\boxed{
+\text{finite\_basis\_enrichment\_only \quad / \quad coordinate\_redundant.}
+}
+\]
+
+## 35.4 Finite divisor defect \(\Delta \mathcal C_{K,j}\)
+
+When arithmetic data \(\mathcal A_\zeta\) is held fixed while the zero divisor is modified \(\mathcal D \to \mathcal D + \Delta \mathcal D\), all arithmetic, pole, and gamma terms cancel identically:
+
+\[
+\boxed{
+\Delta \mathcal C_{K,j} = \operatorname{EF}[h_{K,j}; \mathcal D_\zeta + \Delta\mathcal D, \mathcal A_\zeta] - \operatorname{EF}[h_{K,j}; \mathcal D_\zeta, \mathcal A_\zeta] = \sum_{\rho \in \mathcal D_{\text{new}}} h_{K,j}\left(\frac{\rho - 1/2}{i}\right) - \sum_{\rho \in \mathcal D_{\text{old}}} h_{K,j}\left(\frac{\rho - 1/2}{i}\right).
+}
+\]
+
+- **Critical-line height perturbation**: For \(1/2 \pm i\gamma_n \mapsto 1/2 \pm i(\gamma_n + \varepsilon)\):
+  \[
+  \Delta \mathcal C_{K,j} = 2 \left[ H_j(a_K(\gamma_n + \varepsilon)) - H_j(a_K \gamma_n) \right].
+  \]
+- **Symmetry-complete radial quartet defect**: Replacing pairs \(1/2 \pm i\gamma_a\) and \(1/2 \pm i\gamma_b\) with quartet \(1/2 \pm \delta \pm i\gamma_0\) (\(\gamma_0 = (\gamma_a + \gamma_b)/2\), total 4 zeros):
+  \[
+  \Delta \mathcal C_{K,j} = 4 \Re\left[ H_j(a_K(\gamma_0 + i\delta)) \right] - 2 H_j(a_K \gamma_a) - 2 H_j(a_K \gamma_b).
+  \]
+- **Invalid single-zero mutation**: Any mutation violating \(\rho \mapsto \overline\rho\) or \(\rho \mapsto 1-\rho\) is rejected prior to evaluation.

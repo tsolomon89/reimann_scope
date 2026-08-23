@@ -986,3 +986,32 @@ If an exact deductive theorem proves that this infinite intersection is empty, r
 The compact definition used by the repository is:
 
 > **Transcendental continuation** is the \(\tau\)-generated extension of the analytically continued zeta domain into a grade coordinate \(k\), with ordinary analytic continuation recovered at \(k=0\). Integer \(K\) values form canonical bilateral grade states, rational grades supply exact root refinements, and real \(k\) supplies continuous interpolation. The family is constructed in parallel, not by finitely traversing one infinite grade into another. The research programme asks whether the simultaneous arithmetic/analytic constraints across this family impose radial rigidity on the nontrivial zero spectrum.
+
+---
+
+# 21. Fourier Scaling and the Scaffold vs Frequency Separation
+
+Transcendental continuation acts on the Riemann–Weil explicit formula through exact Fourier dilation:
+
+\[
+\boxed{
+h_{K,j}(t) = H_j(a_K t) \implies \widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x), \qquad a_K = \tau^K.
+}
+\]
+
+### 21.1 Scaffold vs Frequency Separation
+The project maintains a strict mathematical distinction between two structures:
+1. **Additive Station Scaffold**: The lattice \(L_K = a_K \mathbb Z = \tau^K \mathbb Z\).
+2. **Multiplicative Frequency System**: The prime-logarithm frequencies \(\{ a_K^{-1} \log n = \tau^{-K} \log n \}\) appearing in the explicit formula prime sums.
+
+These are fundamentally different mathematical objects:
+- Lattice stations \(a_K \mathbb Z\) have disjoint non-zero intersections across distinct integer grades (\(L_J \cap L_K = \{0\}\) for \(J \ne K\)) due to the transcendence of \(\tau\).
+- Prime-logarithm frequencies \(\tau^{-K} \log n\) scale continuously with the inverse dilation \(a_K^{-1}\).
+- No theorem regarding lattice station non-coincidence may be applied to the zero divisor or the prime frequencies without an explicit, proved mathematical bridge.
+
+### 21.2 Grade Redundancy of Explicit-Formula Constraints
+Because \(h_{K,j}(t) = H_j(a_K t)\) is simply a scaled element of the admissible native test function space on \(\mathbb R\), the constraint \(\mathcal C_{K,j}[H] = \operatorname{EF}[h_{K,j}; \mathcal D_\zeta, \mathcal A_\zeta]\) satisfies the exact pullback identity:
+\[
+\boxed{\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K].}
+\]
+The grade-\(K\) constraint family enriches the finite basis of tested functions, but does not impose constraints outside the native explicit formula constraint space (\(\text{coordinate\_redundant}\)).

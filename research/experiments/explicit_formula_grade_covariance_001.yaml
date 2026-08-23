@@ -1,0 +1,55 @@
+schema_version: '2'
+id: explicit-formula-grade-covariance-001
+title: Riemann–Weil Explicit Formula Grade Covariance and Expanded-Native-Basis Equivalence
+research_question: Does the grade-indexed test function family h_{K,j}(t) = H_j(a_K * t) transport the explicit formula via Fourier scaling without imposing new independent constraints beyond the expanded K=0 basis?
+epistemic_class: exact_control
+object_relationship: grade_constraint_comparison
+hypothesis:
+  statement: The grade-K representation transports the explicit formula according to exact Fourier scaling h_hat_{K,j}(x) = a_K^{-1} * H_hat_j(a_K^{-1} * x), coordinate pullback C_{K,j}[H] = C_0[H(a_K * .)], and the constraint space is coordinate_redundant (finite_basis_enrichment_only) with respect to the expanded K=0 native basis.
+prediction:
+  statement: The covariance and pullback identity error is below 1e-45, and the rank of the joint system equals the rank of the native system.
+falsification:
+  statement: Covariance error exceeds 1e-45 or rank discrepancy is observed.
+interpretation_limit:
+  statement: Exact mathematical control confirming that grade-K explicit formula constraints are identical to evaluating scaled test functions at native grade K=0.
+formalization_target:
+  statement: Grade-K Fourier scaling and explicit formula coordinate redundancy.
+criterion:
+  metric: residual
+  operator: <=
+  threshold: 1e-45
+  aggregation: max_abs
+report_metrics:
+- metric: residual
+  kind: criterion_component
+  label: Grade covariance maximum discrepancy
+- metric: fourier_scaling_error
+  kind: criterion_component
+  label: Fourier scaling error
+- metric: pullback_identity_error
+  kind: criterion_component
+  label: Pullback identity error
+engine:
+  operation: explicit_formula_grade_covariance
+parameters:
+  j:
+    kind: explicit
+    values:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+  k:
+    kind: explicit
+    values:
+    - -2
+    - -1
+    - 0
+    - 1
+    - 2
+precision:
+  dps: 80
+outputs:
+  retain_points: true

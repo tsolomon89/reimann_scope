@@ -324,3 +324,18 @@ The next work should not broaden into additional RH machinery until the followin
 If no such law survives the declared controls, the current proof programme should be revised or killed.
 
 If a simple law survives, broad computation should stop until that law is algebraically derived or falsified.
+
+---
+
+# 18. Explicit formula discrimination framework
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| EF-001 | \(\operatorname{EF}[h; \mathcal D, \mathcal A]\) is the Riemann–Weil explicit formula residual with Weil normalization. | **DESIGN DEFINITION** | Project authoritative explicit formula definition. |
+| EF-002 | The true zeta divisor satisfies \(\operatorname{EF}[h; \mathcal D_\zeta, \mathcal A_\zeta] = 0\) for admissible test functions. | **PROVED / STANDARD** | Classical Riemann–Weil explicit formula theorem. |
+| EF-003 | Grade-\(K\) test function \(h_{K,j}(t) = H_j(a_K t)\) has Fourier transform \(\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x)\). | **PROVED** | Change of variables in Fourier integral. |
+| EF-004 | Prime frequencies in grade \(K\) scale as \(a_K^{-1} \log n = \tau^{-K} \log n\). | **PROVED** | Follows from EF-003. |
+| EF-005 | \(\mathcal C_{K,j}[H] \equiv \mathcal C_0[H(a_K \cdot)]\). | **PROVED** | Direct coordinate pullback identity. |
+| EF-006 | The grade-\(K\) constraint family is coordinate-redundant with the expanded \(K=0\) basis \(\{ H_j(a_K \cdot) \}\). | **PROVED / REDUNDANT** | The span of grade-\(K\) constraints is identical to scaled native constraints (`finite_basis_enrichment_only`). |
+| EF-007 | Isolated zero-divisor modifications produce non-zero finite divisor defects \(\Delta \mathcal C_{K,j}\) while holding \(\mathcal A_\zeta\) fixed. | **PROVED** | Exact cancellation of unchanged arithmetic and gamma terms. |
+| EF-008 | Defect exposure under fixed arithmetic data proves radial rigidity of actual zeta zeros. | **FALSE INFERENCE** | Modifying zero divisor with fixed \(\mathcal A\) tests a synthetic non-zeta object; does not prove impossibility of off-line zeros of actual \(\zeta\). |
