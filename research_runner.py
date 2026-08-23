@@ -1326,7 +1326,8 @@ def evaluate_point(
                 h1, ok1, _, _ = _lookup_zero_certificate(z1_idx)
                 h2, ok2, _, _ = _lookup_zero_certificate(z2_idx)
 
-                u_points = [str(mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8)) for i in range(-10, 11)]
+                u_points = [mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8) for i in range(-10, 11)]
+
                 dist_res = transcendental.compute_cross_height_path_distance(g1_str, g2_str, u_points=u_points, dps=dps + 20)
 
                 l_inf = dist_res["L_infty_distance"]
@@ -1419,7 +1420,7 @@ def evaluate_point(
                 return "ok", {
                     "test_function_index": str(j_idx),
                     "j": str(j_idx),
-                    "k": str(k_str),
+                    "k": k_str,
                     "sigma": mpmath.nstr(sigma, n=dps),
                     "t0": mpmath.nstr(t0, n=dps),
                     "spectral_sum": mpmath.nstr(eval_res["spectral_sum"], n=dps),
@@ -1432,7 +1433,8 @@ def evaluate_point(
                     "relative_error": mpmath.nstr(rel_err, n=dps),
                     "zero_count": str(len(ref_zeros)),
                     "highest_included_zero_index": str(len(ref_zeros)),
-                    "highest_included_zero_ordinate": str(highest_zero_ord),
+                    "highest_included_zero_ordinate": highest_zero_ord,
+
                     "certified_zero_count": "100",
                     "reference_approximation_zero_count": str(len(ref_zeros) - 100),
                     "prime_power_cutoff": str(prime_cutoff),
@@ -1499,7 +1501,7 @@ def evaluate_point(
                 return "ok", {
                     "test_function_index": str(j_idx),
                     "j": str(j_idx),
-                    "k": str(k_str),
+                    "k": k_str,
                     "a_K": mpmath.nstr(a_K, n=dps),
                     "fourier_scaling_error": mpmath.nstr(max_fourier_err, n=dps),
                     "pullback_identity_error": mpmath.nstr(max_pullback_err, n=dps),
@@ -1516,8 +1518,9 @@ def evaluate_point(
 
             elif operation == "explicit_formula_perturbation_rank":
                 mode = inputs.get("mode", inputs.get("perturbation_type", "critical_height"))
-                case_str = str(inputs.get("case", inputs.get("zero_index", inputs.get("n", "1")))).strip()
-                mag_str = str(inputs.get("magnitude", inputs.get("epsilon", inputs.get("delta", "0.001")))).strip()
+                case_str = inputs.get("case", inputs.get("zero_index", inputs.get("n", "1"))).strip()
+                mag_str = inputs.get("magnitude", inputs.get("epsilon", inputs.get("delta", "0.001"))).strip()
+
 
                 j_list = [1, 2, 3, 4, 5, 6]
                 k_list = [-2, -1, 0, 1, 2]
@@ -1603,9 +1606,10 @@ def evaluate_point(
                         "case": str(n_idx),
                         "zero_index": str(n_idx),
                         "target_gamma": ord_str,
-                        "zero1_cert_hash": str(c_hash),
+                        "zero1_cert_hash": c_hash,
                         "epsilon": mag_str,
                         "magnitude": mag_str,
+
                         "validator_status": "valid",
                         "symmetries_preserved": "conjugation_and_functional_reflection",
                         "multiplicity_preserved": "true",
@@ -1709,9 +1713,10 @@ def evaluate_point(
                         "gamma_a": ga_str,
                         "gamma_b": gb_str,
                         "gamma_0": mpmath.nstr(g0_mpf, n=dps),
-                        "zero1_cert_hash": str(c_hash_a),
-                        "zero2_cert_hash": str(c_hash_b),
+                        "zero1_cert_hash": c_hash_a,
+                        "zero2_cert_hash": c_hash_b,
                         "delta": mag_str,
+
                         "magnitude": mag_str,
                         "validator_status": "valid",
                         "symmetries_preserved": "conjugation_and_functional_reflection",
@@ -2203,8 +2208,9 @@ def update_index_file(run_entry: Dict[str, Any]):
 def run_experiment(
     spec_path: str,
     resume_run_id: Optional[str] = None,
-    canonical_current: bool = True
+    canonical_current: bool = False
 ) -> str:
+
 
     """
     Execute or resume an experiment sweep declared in a YAML spec file.
@@ -2678,6 +2684,8 @@ def validate_manifest(
     if manifest.get("git_dirty") is not False:
         errors.append(f"Manifest git_dirty must be boolean False, got {manifest.get('git_dirty')}")
 
+
+
     # 4. Commit and producing commit validation
     commit = str(manifest.get("git_commit", "")).strip()
     prod_commit = str(manifest.get("producing_git_commit", "")).strip()
@@ -2718,9 +2726,12 @@ def validate_manifest(
                 continue
             p = m_entry.get("path")
             sh = m_entry.get("sha256")
+            if not isinstance(p, str):
+                errors.append("Malformed entry in code_modules list: missing string 'path'")
+                continue
             if p in seen_mods:
                 errors.append(f"Duplicate module '{p}' in code_modules")
-            seen_mods.add(str(p))
+            seen_mods.add(p)
             if p not in certification.REQUIRED_SOURCE_MODULES:
                 errors.append(f"Unexpected module '{p}' in code_modules")
             elif sh != src_hashes.get(p):
@@ -2747,9 +2758,13 @@ def validate_manifest(
                 continue
             p = d_entry.get("path", "")
             sh = d_entry.get("sha256")
+            if not isinstance(p, str):
+                errors.append("Malformed entry in data_provenance list: missing string 'path'")
+                continue
             if p in seen_data:
                 errors.append(f"Duplicate data file '{p}' in data_provenance")
-            seen_data.add(str(p))
+            seen_data.add(p)
+
             df_name = p.replace("data/", "", 1) if p.startswith("data/") else p
             if df_name not in certification.REQUIRED_INPUT_DATA_FILES:
                 errors.append(f"Unexpected data file '{p}' in data_provenance")
