@@ -41,7 +41,7 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "b1e4d97d091b3256a16d42e36943d205ad51e367",
+  "producing_git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
   "source_code_hashes": {
     "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
@@ -49,7 +49,7 @@
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "d13218abb46909a99f84d6a8d580b1f469d0f4fe43dcb97b85948b1e7fa1adae",
+    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -68,11 +68,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-23T07:59:10.316692+00:00",
+  "created_at": "2026-08-23T08:05:14.778087+00:00",
   "invalidation_conditions": [
     "zeta_eval_nonzero",
     "derivative_enclosure_contains_zero",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "32d0fff8d8f0283dff46306f48638172d9457a4c2237cbe70f15c00807fd25a8"
+  "certificate_hash": "cb275d015a05ce08192aa9953db71710ac57fae4086d9b3d7fede2d10ceace56"
 }

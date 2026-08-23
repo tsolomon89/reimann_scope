@@ -3,10 +3,10 @@
   "run_id": "centrifuge-slope-verification",
   "experiment_id": "centrifuge-slope-verification",
   "experiment_spec_sha256": "7d97f33a06ea0a90e837924a18ab60e685661721588a0894812f935223065aba",
-  "git_commit": "b1e4d97d091b3256a16d42e36943d205ad51e367",
+  "git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
   "git_dirty": false,
-  "started_at": "2026-08-23T07:59:49.455865+00:00",
-  "completed_at": "2026-08-23T07:59:49.461060+00:00",
+  "started_at": "2026-08-23T08:05:55.909755+00:00",
+  "completed_at": "2026-08-23T08:05:55.914723+00:00",
   "status": "complete",
   "precision": {
     "dps": 80
@@ -111,7 +111,7 @@
     }
   },
   "code_modules": {
-    "research_runner.py": "d13218abb46909a99f84d6a8d580b1f469d0f4fe43dcb97b85948b1e7fa1adae",
+    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
