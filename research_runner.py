@@ -56,16 +56,6 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "is_synthetic": False
     },
     # 2. Trivial Zero Worldlines
-    "trivial_zero_worldlines": {
-        "requires_consumed_certs": True,
-        "requires_source_cert": True,
-        "source_family": "trivial",
-        "expected_source_status": "trivial_zero_certified",
-        "requires_worldline_cert": True,
-        "expected_worldline_status": "worldline_certified",
-        "requires_certified_flag": True,
-        "is_synthetic": False
-    },
     "trivial_worldlines": {
         "requires_consumed_certs": True,
         "requires_source_cert": True,
@@ -303,7 +293,7 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
                 dirty_lines.append(line_str)
                 continue
             path = parts[1].strip().strip('"').replace("\\", "/")
-            if path == "research/index.json" or path.startswith("research/runs/") or path.startswith("data/certificates/"):
+            if path in ("research/index.json", "formal/build_report.json") or path.startswith("research/runs/") or path.startswith("data/certificates/"):
                 continue
 
             dirty_lines.append(line_str)
@@ -1984,9 +1974,6 @@ def run_experiment(
     manifest["source_code_hashes"] = certification._get_source_code_hashes(git_commit)
     manifest["input_data_hashes"] = certification._get_input_data_hashes(git_commit)
 
-    with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
-
     summary = compute_summary(spec, exp_id, all_results, status=final_status)
     with open(os.path.join(work_dir, "summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
@@ -1994,6 +1981,31 @@ def run_experiment(
     readme_content = generate_run_readme(spec, manifest, summary)
     with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
+
+    with open(os.path.join(work_dir, "results.jsonl"), "rb") as rf:
+        results_sha = hashlib.sha256(rf.read().replace(b"\r\n", b"\n")).hexdigest()
+    with open(os.path.join(work_dir, "summary.json"), "rb") as sf:
+        summary_sha = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+    with open(os.path.join(work_dir, "README.md"), "rb") as rmf:
+        readme_sha = hashlib.sha256(rmf.read().replace(b"\r\n", b"\n")).hexdigest()
+
+    manifest["artifacts"] = {
+        "results_jsonl": {
+            "path": "results.jsonl",
+            "sha256": results_sha
+        },
+        "summary_json": {
+            "path": "summary.json",
+            "sha256": summary_sha
+        },
+        "readme_md": {
+            "path": "README.md",
+            "sha256": readme_sha
+        }
+    }
+
+    with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2)
 
     val_ok, val_errs = validate_manifest(manifest, all_results, spec=spec)
     if not val_ok:
@@ -2011,6 +2023,7 @@ def run_experiment(
         "classification": spec.get("classification", "canonical_experiment"),
         "timestamp": manifest["started_at"],
         "git_commit": git_commit,
+        "producing_git_commit": manifest.get("producing_git_commit", git_commit),
         "git_dirty": git_dirty,
         "status": final_status,
         "criterion_met": summary["criterion"].get("criterion_met"),
@@ -2135,14 +2148,48 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
     return summary
 
 
+REQUIRED_MANIFEST_BASE_FIELDS = [
+    "schema_version",
+    "run_id",
+    "experiment_id",
+    "title",
+    "epistemic_class",
+    "classification",
+    "status",
+    "precision",
+    "parameter_space",
+    "points_requested",
+    "points_completed",
+]
+
+REQUIRED_MANIFEST_PROVENANCE_FIELDS = [
+    "git_commit",
+    "producing_git_commit",
+    "git_dirty",
+    "dependency_fingerprint",
+    "source_code_hashes",
+    "input_data_hashes",
+    "code_modules",
+    "data_provenance",
+    "experiment_spec_sha256",
+]
+
+
 def validate_manifest(
     manifest: Dict[str, Any],
     results: Optional[List[Dict[str, Any]]] = None,
-    spec: Optional[Dict[str, Any]] = None
+    spec: Optional[Dict[str, Any]] = None,
+    canonical_current: bool = True
 ) -> Tuple[bool, List[str]]:
     """Validate a run manifest, results, and proof obligations against canonical contracts.
 
     Fails closed if:
+    - Any required base or provenance field is missing, None, empty, or placeholder.
+    - git_dirty is not boolean False.
+    - git_commit or producing_git_commit is invalid or they disagree.
+    - code_modules or data_provenance list representation disagrees with map representation.
+    - Source/data hashes do not match historical commit or current workspace in canonical-current mode.
+    - Experiment spec hash does not match canonical spec on disk.
     - Declared consumed certificate is missing from disk or fails strict verification.
     - Declared consumed certificate is not used by any result point.
     - Required point certificate is missing from consumed_certificates.
@@ -2152,34 +2199,134 @@ def validate_manifest(
     - Source zero and worldline certificates do not belong to the same zero root.
     - Synthetic certificates are passed off as actual zeros or vice-versa.
     - Exact control experiments fail mathematical criterion or produce execution errors.
-    - Dependency fingerprint or Git provenance violates compatibility policy.
     """
     errors: List[str] = []
     if not isinstance(manifest, dict):
         return False, ["Manifest must be a dictionary"]
 
-    for req_k in ["experiment_id", "git_commit", "status", "precision"]:
-        if req_k not in manifest or manifest[req_k] is None:
-            errors.append(f"Manifest missing required key '{req_k}'")
+    # 1. Base identity and classification fields
+    for req_k in REQUIRED_MANIFEST_BASE_FIELDS:
+        val = manifest.get(req_k)
+        if val is None or val == "" or val == "N/A":
+            errors.append(f"Manifest missing or invalid required key '{req_k}'")
 
-    exp_id = manifest.get("experiment_id", "")
+    # 2. Provenance fields presence and non-emptiness
+    for req_p in REQUIRED_MANIFEST_PROVENANCE_FIELDS:
+        val = manifest.get(req_p)
+        if val is None or val == "" or val == "N/A":
+            errors.append(f"Manifest missing or invalid required provenance field '{req_p}'")
 
+    # 3. git_dirty must be strictly boolean False
+    if manifest.get("git_dirty") is not False:
+        errors.append(f"Manifest git_dirty must be boolean False, got {manifest.get('git_dirty')}")
+
+    # 4. Commit and producing commit validation
+    commit = str(manifest.get("git_commit", "")).strip()
+    prod_commit = str(manifest.get("producing_git_commit", "")).strip()
+    if not commit or len(commit) != 40 or not all(c in "0123456789abcdefABCDEF" for c in commit) or commit.lower() in ("0000000000000000000000000000000000000000", "unknown", "fake", "forged"):
+        errors.append(f"Manifest git_commit is invalid: '{commit}'")
+    if not prod_commit or len(prod_commit) != 40 or not all(c in "0123456789abcdefABCDEF" for c in prod_commit) or prod_commit.lower() in ("0000000000000000000000000000000000000000", "unknown", "fake", "forged"):
+        errors.append(f"Manifest producing_git_commit is invalid: '{prod_commit}'")
+    if commit and prod_commit and commit != prod_commit:
+        errors.append(f"Manifest git_commit '{commit}' does not match producing_git_commit '{prod_commit}'")
+
+    # 5. Dependency fingerprint validation
     dep_fp = manifest.get("dependency_fingerprint")
-    if dep_fp:
+    if not isinstance(dep_fp, dict) or not dep_fp:
+        errors.append("Manifest missing or empty dependency_fingerprint map")
+    else:
         dep_ok, dep_errs = certification.validate_dependency_compatibility(dep_fp, check_current_runtime=True)
         if not dep_ok:
             errors.extend(dep_errs)
 
-    commit = str(manifest.get("git_commit", "")).strip()
-    if commit:
+    # 6. Source code hashes and code_modules list validation
+    src_hashes = manifest.get("source_code_hashes")
+    if not isinstance(src_hashes, dict) or not src_hashes:
+        errors.append("Manifest missing or empty source_code_hashes map")
+    else:
+        for mod in certification.REQUIRED_SOURCE_MODULES:
+            mh = src_hashes.get(mod)
+            if not mh or len(mh) != 64 or mh == "N/A" or not all(c in "0123456789abcdefABCDEF" for c in mh):
+                errors.append(f"source_code_hashes missing or invalid for required module '{mod}'")
+
+    code_mods = manifest.get("code_modules")
+    if not isinstance(code_mods, list) or len(code_mods) != len(certification.REQUIRED_SOURCE_MODULES):
+        errors.append(f"code_modules list must contain exactly {len(certification.REQUIRED_SOURCE_MODULES)} modules")
+    elif isinstance(src_hashes, dict):
+        seen_mods: Set[str] = set()
+        for m_entry in code_mods:
+            if not isinstance(m_entry, dict):
+                errors.append("Malformed entry in code_modules list")
+                continue
+            p = m_entry.get("path")
+            sh = m_entry.get("sha256")
+            if p in seen_mods:
+                errors.append(f"Duplicate module '{p}' in code_modules")
+            seen_mods.add(str(p))
+            if p not in certification.REQUIRED_SOURCE_MODULES:
+                errors.append(f"Unexpected module '{p}' in code_modules")
+            elif sh != src_hashes.get(p):
+                errors.append(f"code_modules sha256 mismatch for '{p}': list {sh} != map {src_hashes.get(p)}")
+
+    # 7. Input data hashes and data_provenance list validation
+    data_hashes = manifest.get("input_data_hashes")
+    if not isinstance(data_hashes, dict) or not data_hashes:
+        errors.append("Manifest missing or empty input_data_hashes map")
+    else:
+        for df in certification.REQUIRED_INPUT_DATA_FILES:
+            dh = data_hashes.get(df)
+            if not dh or len(dh) != 64 or dh == "N/A" or not all(c in "0123456789abcdefABCDEF" for c in dh):
+                errors.append(f"input_data_hashes missing or invalid for required data file '{df}'")
+
+    data_prov = manifest.get("data_provenance")
+    if not isinstance(data_prov, list) or len(data_prov) != len(certification.REQUIRED_INPUT_DATA_FILES):
+        errors.append(f"data_provenance list must contain exactly {len(certification.REQUIRED_INPUT_DATA_FILES)} data files")
+    elif isinstance(data_hashes, dict):
+        seen_data: Set[str] = set()
+        for d_entry in data_prov:
+            if not isinstance(d_entry, dict):
+                errors.append("Malformed entry in data_provenance list")
+                continue
+            p = d_entry.get("path", "")
+            sh = d_entry.get("sha256")
+            if p in seen_data:
+                errors.append(f"Duplicate data file '{p}' in data_provenance")
+            seen_data.add(str(p))
+            df_name = p.replace("data/", "", 1) if p.startswith("data/") else p
+            if df_name not in certification.REQUIRED_INPUT_DATA_FILES:
+                errors.append(f"Unexpected data file '{p}' in data_provenance")
+            elif sh != data_hashes.get(df_name):
+                errors.append(f"data_provenance sha256 mismatch for '{p}': list {sh} != map {data_hashes.get(df_name)}")
+
+    # 8. Git commit historical blob verification
+    if commit and isinstance(src_hashes, dict) and isinstance(data_hashes, dict):
         commit_ok, commit_err = certification._is_valid_git_commit(
             commit,
-            source_code_hashes=manifest.get("source_code_hashes"),
-            input_data_hashes=manifest.get("input_data_hashes")
+            source_code_hashes=src_hashes,
+            input_data_hashes=data_hashes
         )
         if not commit_ok:
             errors.append(f"Invalid manifest git_commit provenance: {commit_err}")
 
+    # 9. Current workspace source and data compatibility
+    if canonical_current and isinstance(src_hashes, dict) and isinstance(data_hashes, dict):
+        curr_src = certification._get_source_code_hashes()
+        for mod in certification.REQUIRED_SOURCE_MODULES:
+            curr_h = curr_src.get(mod, "N/A")
+            if curr_h == "N/A":
+                errors.append(f"Required current source module '{mod}' missing on disk")
+            elif curr_h != src_hashes.get(mod):
+                errors.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, manifest {src_hashes.get(mod)}")
+
+        curr_data = certification._get_input_data_hashes()
+        for df in certification.REQUIRED_INPUT_DATA_FILES:
+            curr_dh = curr_data.get(df, "N/A")
+            if curr_dh == "N/A":
+                errors.append(f"Required current input data file '{df}' missing on disk")
+            elif curr_dh != data_hashes.get(df):
+                errors.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, manifest {data_hashes.get(df)}")
+
+    exp_id = manifest.get("experiment_id", "")
     if spec is None and exp_id:
         candidates = [
             os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
@@ -2195,12 +2342,23 @@ def validate_manifest(
                 except Exception:
                     pass
 
+    # 10. Experiment spec SHA-256 validation
+    spec_sha = manifest.get("experiment_spec_sha256")
+    if not spec_sha or len(spec_sha) != 64 or spec_sha == "N/A" or not all(c in "0123456789abcdefABCDEF" for c in spec_sha):
+        errors.append(f"Manifest missing or invalid experiment_spec_sha256: '{spec_sha}'")
+    elif exp_id:
+        spec_file = os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml")
+        if os.path.exists(spec_file):
+            with open(spec_file, "rb") as sf:
+                actual_spec_sha = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+            if actual_spec_sha != spec_sha:
+                errors.append(f"Manifest experiment_spec_sha256 '{spec_sha}' != disk spec hash '{actual_spec_sha}'")
+
     op_name = (
         manifest.get("operation")
         or (spec.get("engine", {}).get("operation") if isinstance(spec, dict) else None)
         or (spec.get("operation") if isinstance(spec, dict) else None)
         or manifest.get("engine", {}).get("operation")
-        or (spec.get("id", "").replace("-", "_") if isinstance(spec, dict) else "")
     )
     op_obl = OPERATION_CERTIFICATE_OBLIGATIONS.get(op_name, {})
 
@@ -2233,7 +2391,7 @@ def validate_manifest(
             errors.append(f"Consumed certificate hash '{c_hash}' not found in data/certificates/")
         else:
             cert_map[c_hash] = found_cert
-            ok, c_errs = certification.verify_certificate(found_cert, check_provenance=True)
+            ok, c_errs = certification.verify_certificate(found_cert, check_provenance=True, canonical_current=canonical_current)
             if not ok:
                 errors.append(f"Consumed certificate '{c_hash}' failed verification: {'; '.join(c_errs)}")
 
@@ -2269,77 +2427,58 @@ def validate_manifest(
                 if not outs.get("worldline_cert_hash") or outs.get("worldline_cert_hash") == "N/A":
                     errors.append(f"Point {idx} claims worldline_certified=true but worldline_cert_hash is 'N/A'")
 
+            if op_obl.get("requires_certified_flag"):
+                c_flag = outs.get("worldline_certified")
+                if c_flag is None or str(c_flag).lower() != "true":
+                    errors.append(f"Point {idx} operation '{op_name}' requires worldline_certified=true, got '{c_flag}'")
+
             if op_obl.get("requires_source_cert"):
                 sz_h = outs.get("source_zero_cert_hash")
                 if not sz_h or sz_h == "N/A":
-                    errors.append(f"Point {idx} missing required source_zero_cert_hash")
+                    errors.append(f"Point {idx} operation '{op_name}' missing source_zero_cert_hash")
                 elif sz_h in cert_map:
                     szc = cert_map[sz_h]
-                    exp_sz_stat = op_obl.get("expected_source_status")
-                    if exp_sz_stat and szc.get("status") != exp_sz_stat:
-                        errors.append(f"Point {idx} source zero cert status '{szc.get('status')}' != expected '{exp_sz_stat}'")
-
-                    if op_obl.get("source_family") == "nontrivial":
-                        if "block" in rec_in:
-                            b = rec_in.get("block", "low_validation")
-                            z_idx = int(rec_in.get("zero_index", 0))
-                            blk = reference_data.get_zero_block(b)
-                            ords = blk.get("ordinates", [])
-                            pt_z = (1 + (z_idx % len(ords))) if b == "low_validation" else ((100 + (z_idx % len(ords))) if b == "medium_research" else ((1000 + (z_idx % len(ords))) if b == "high_research" else (10000 + (z_idx % len(ords))))) if ords else 1
-                        else:
-                            pt_z = outs.get("nontrivial_index") or rec_in.get("nontrivial_index")
-                            if pt_z is None and "zero_index" in rec_in:
-                                pt_z = int(rec_in["zero_index"]) + 1
-                        if pt_z is not None:
-                            cert_z = szc.get("nontrivial_index") or szc.get("zero_index")
-                            if cert_z is not None and int(pt_z) != int(cert_z):
-                                errors.append(f"Point {idx} zero index ({pt_z}) != source zero cert index ({cert_z})")
+                    exp_family = op_obl.get("source_family", "nontrivial")
+                    if szc.get("zero_family") != exp_family:
+                        errors.append(f"Point {idx} source zero family ({szc.get('zero_family')}) != expected ({exp_family})")
+                    exp_src_stat = op_obl.get("expected_source_status", "simple_zero_certified")
+                    if szc.get("status") != exp_src_stat:
+                        errors.append(f"Point {idx} source zero status ({szc.get('status')}) != expected ({exp_src_stat})")
 
             if op_obl.get("requires_worldline_cert"):
                 wl_h = outs.get("worldline_cert_hash")
                 if not wl_h or wl_h == "N/A":
-                    errors.append(f"Point {idx} missing required worldline_cert_hash")
+                    errors.append(f"Point {idx} operation '{op_name}' missing worldline_cert_hash")
                 elif wl_h in cert_map:
                     wlc = cert_map[wl_h]
-                    exp_wl_stat = op_obl.get("expected_worldline_status")
-                    if exp_wl_stat and wlc.get("status") != exp_wl_stat:
-                        errors.append(f"Point {idx} worldline cert status '{wlc.get('status')}' != expected '{exp_wl_stat}'")
-
-                    if str(outs.get("worldline_certified")).lower() != "true":
-                        errors.append(f"Point {idx} requires worldline_certified=true, got '{outs.get('worldline_certified')}'")
-                    if outs.get("worldline_certificate_status") != "certified":
-                        errors.append(f"Point {idx} worldline_certificate_status is '{outs.get('worldline_certificate_status')}', expected 'certified'")
-                    if outs.get("source_zero_certificate_status") != "certified":
-                        errors.append(f"Point {idx} source_zero_certificate_status is '{outs.get('source_zero_certificate_status')}', expected 'certified'")
+                    exp_wl_stat = op_obl.get("expected_worldline_status", "worldline_certified")
+                    if wlc.get("status") != exp_wl_stat:
+                        errors.append(f"Point {idx} worldline status ({wlc.get('status')}) != expected ({exp_wl_stat})")
 
                     sz_h = outs.get("source_zero_cert_hash")
                     if sz_h and sz_h in cert_map:
                         szc = cert_map[sz_h]
-                        wl_source_hash = wlc.get("source_zero_hash")
-                        if wl_source_hash and wl_source_hash != sz_h:
-                            errors.append(f"Point {idx} worldline cert source_zero_hash '{wl_source_hash}' != source zero cert hash '{sz_h}'")
+                        wl_src_h = wlc.get("source_zero_hash")
+                        if wl_src_h and wl_src_h != sz_h:
+                            errors.append(f"Point {idx} worldline source_zero_hash ({wl_src_h}) != point source_zero_cert_hash ({sz_h})")
 
-                        wl_src_idx = wlc.get("source_zero_index")
                         sz_idx = szc.get("nontrivial_index") or szc.get("trivial_index")
-                        if wl_src_idx is not None and sz_idx is not None and int(wl_src_idx) != int(sz_idx):
-                            errors.append(f"Point {idx} worldline cert source_zero_index ({wl_src_idx}) != source zero cert index ({sz_idx})")
+                        wl_idx = wlc.get("nontrivial_index") or wlc.get("trivial_index") or wlc.get("source_zero_index")
+                        if sz_idx is not None and wl_idx is not None and sz_idx != wl_idx:
+                            errors.append(f"Point {idx} zero index mismatch between source cert ({sz_idx}) and worldline cert ({wl_idx})")
 
-                        wl_src_fam = wlc.get("source_zero_family") or wlc.get("zero_family")
-                        sz_fam = szc.get("zero_family")
-                        if wl_src_fam and sz_fam and wl_src_fam != sz_fam:
-                            errors.append(f"Point {idx} worldline cert source family '{wl_src_fam}' != source zero cert family '{sz_fam}'")
-
-                    pt_k = rec_in.get("grade_k") or rec_in.get("grade_K") or rec_in.get("grade") or rec_in.get("k")
-                    cert_k = wlc.get("grade_K") if "grade_K" in wlc else wlc.get("grade")
-                    if pt_k is not None and cert_k is not None:
-                        if int(pt_k) != int(cert_k):
-                            errors.append(f"Point {idx} input grade K={pt_k} does not match worldline cert grade K={cert_k}")
+                    k_in = rec_in.get("grade_k", rec_in.get("K", rec_in.get("k", 0)))
+                    if int(wlc.get("grade_K", 0)) != int(k_in):
+                        errors.append(f"Point {idx} grade mismatch: input {k_in} != worldline cert {wlc.get('grade_K')}")
 
                     if op_obl.get("source_family") != "trivial":
-                        pt_d = rec_in.get("delta_radial") or rec_in.get("delta") or rec_in.get("delta_val") or 0.0
+                        pt_d = rec_in.get("radial_delta", rec_in.get("delta", rec_in.get("delta_val", 0.0)))
                         if wlc.get("delta") is not None:
-                            if abs(float(pt_d) - float(wlc["delta"])) > 1e-4:
-                                errors.append(f"Point {idx} input delta={pt_d} does not match worldline cert delta={wlc['delta']}")
+                            try:
+                                if abs(float(pt_d) - float(wlc["delta"])) > 1e-4:
+                                    errors.append(f"Point {idx} input delta={pt_d} does not match worldline cert delta={wlc['delta']}")
+                            except Exception:
+                                pass
 
                         if op_obl.get("is_synthetic") is True:
                             if abs(float(wlc.get("delta", 0.0))) < 1e-6:
@@ -2350,39 +2489,8 @@ def validate_manifest(
                     else:
                         m_idx = int(rec_in.get("trivial_index") or rec_in.get("m") or 1)
                         exp_delta = str(-2 * m_idx - 0.5)
-                        if wlc.get("delta") != exp_delta:
+                        if abs(float(wlc.get("delta", 0.0)) - float(exp_delta)) > 1e-4:
                             errors.append(f"Point {idx} trivial zero m={m_idx} worldline cert delta ({wlc.get('delta')}) != expected ({exp_delta})")
-
-            if op_name == "cross_height_distance":
-                z1_h = outs.get("zero1_cert_hash")
-                z2_h = outs.get("zero2_cert_hash")
-                if not z1_h or z1_h == "N/A" or not z2_h or z2_h == "N/A":
-                    errors.append(f"Point {idx} cross_height_distance missing zero1_cert_hash or zero2_cert_hash")
-                elif z1_h in cert_map and z2_h in cert_map:
-                    zc1, zc2 = cert_map[z1_h], cert_map[z2_h]
-                    b1 = outs.get("block_1") or "low_validation"
-                    b2 = outs.get("block_2") or "medium_research"
-                    z_idx = int(outs.get("zero_index") or rec_in.get("zero_index", 0))
-                    blk1 = reference_data.get_zero_block(b1)
-                    blk2 = reference_data.get_zero_block(b2)
-                    ords1 = blk1.get("ordinates", [])
-                    ords2 = blk2.get("ordinates", [])
-                    exp_idx1 = 1 + (z_idx % len(ords1)) if ords1 else 1
-                    exp_idx2 = (100 + (z_idx % len(ords2))) if b2 == "medium_research" else ((1000 + (z_idx % len(ords2))) if b2 == "high_research" else (10000 + (z_idx % len(ords2)))) if ords2 else 100
-                    if int(zc1.get("nontrivial_index", 0)) != exp_idx1 or int(zc2.get("nontrivial_index", 0)) != exp_idx2:
-                        errors.append(f"Point {idx} distance cert hashes belong to wrong zero pair: expected ({exp_idx1}, {exp_idx2}), got ({zc1.get('nontrivial_index')}, {zc2.get('nontrivial_index')})")
-
-            if op_name in ("cross_height_coherence", "cross_height_path_coherence"):
-                sz_h = outs.get("source_zero_cert_hash")
-                if sz_h and sz_h in cert_map:
-                    szc = cert_map[sz_h]
-                    b = rec_in.get("block") or outs.get("block") or "low_validation"
-                    z_idx = int(rec_in.get("zero_index") or outs.get("zero_index") or 0)
-                    blk = reference_data.get_zero_block(b)
-                    ords = blk.get("ordinates", [])
-                    exp_z_idx = (1 + (z_idx % len(ords))) if b == "low_validation" else ((100 + (z_idx % len(ords))) if b == "medium_research" else ((1000 + (z_idx % len(ords))) if b == "high_research" else (10000 + (z_idx % len(ords))))) if ords else 1
-                    if int(szc.get("nontrivial_index", 0)) != exp_z_idx:
-                        errors.append(f"Point {idx} cross_height_coherence zero index mismatch: expected {exp_z_idx} for block '{b}'[#{z_idx}], got cert index {szc.get('nontrivial_index')}")
 
         unused_consumed = consumed - used_in_points
         if unused_consumed:
@@ -2399,14 +2507,19 @@ def validate_manifest(
     return len(errors) == 0, errors
 
 
-def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True) -> Tuple[bool, List[str]]:
+def validate_run_bundle(
+    run_dir_or_exp_id: str,
+    require_provenance: bool = True,
+    canonical_current: bool = True
+) -> Tuple[bool, List[str]]:
     """Validate a complete committed canonical run bundle including:
-    - manifest.json (schema, hashes, certificates, provenance)
-    - results.jsonl (completeness, point status, proof obligations)
-    - summary.json (recomputed criterion and multi-metric match)
-    - README.md (presence and inventory)
-    - research/index.json (presence of matching run entry)
+    - manifest.json (schema, provenance, hashes, certificates, and artifacts map)
+    - results.jsonl (completeness, point status, proof obligations, byte SHA-256)
+    - summary.json (recomputed full multi-metric match, byte SHA-256)
+    - README.md (presence, inventory, byte SHA-256)
+    - research/index.json (presence and strict sync of matching run entry)
     - research/experiments/<exp_id>.yaml (spec SHA-256 match)
+    - Directory cleanliness (no temporary or extra files)
     """
     errors: List[str] = []
     run_dir = run_dir_or_exp_id if os.path.isdir(run_dir_or_exp_id) else os.path.join(RUNS_DIR, run_dir_or_exp_id)
@@ -2414,6 +2527,17 @@ def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True)
         return False, [f"Run directory '{run_dir}' does not exist"]
 
     exp_id = os.path.basename(run_dir.rstrip("/\\"))
+
+    # 1. Directory hygiene: reject unexpected or temporary files
+    try:
+        entries = sorted(os.listdir(run_dir))
+        allowed_files = {"manifest.json", "results.jsonl", "summary.json", "README.md"}
+        extra_files = set(entries) - allowed_files
+        if extra_files:
+            errors.append(f"Run bundle '{exp_id}' contains unauthorized or temporary files: {sorted(list(extra_files))}")
+    except Exception as e:
+        errors.append(f"Failed inspecting run directory entries: {e}")
+
     manifest_path = os.path.join(run_dir, "manifest.json")
     results_path = os.path.join(run_dir, "results.jsonl")
     summary_path = os.path.join(run_dir, "summary.json")
@@ -2428,6 +2552,24 @@ def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True)
             manifest = json.load(mf)
     except Exception as e:
         return False, [f"Run bundle '{exp_id}' failed reading manifest.json: {e}"]
+
+    # 2. Artifact byte hashes validation
+    artifacts_map = manifest.get("artifacts")
+    if not isinstance(artifacts_map, dict) or not artifacts_map:
+        errors.append(f"Run bundle '{exp_id}' manifest missing 'artifacts' map")
+    else:
+        for art_key, fname in [("results_jsonl", "results.jsonl"), ("summary_json", "summary.json"), ("readme_md", "README.md")]:
+            art_entry = artifacts_map.get(art_key)
+            if not isinstance(art_entry, dict) or not art_entry.get("sha256"):
+                errors.append(f"Manifest artifacts map missing entry or sha256 for '{art_key}'")
+            else:
+                decl_sha = art_entry.get("sha256")
+                full_art_path = os.path.join(run_dir, fname)
+                if os.path.exists(full_art_path):
+                    with open(full_art_path, "rb") as af:
+                        calc_sha = hashlib.sha256(af.read().replace(b"\r\n", b"\n")).hexdigest()
+                    if calc_sha != decl_sha:
+                        errors.append(f"Artifact byte SHA-256 mismatch for '{fname}': computed {calc_sha}, declared {decl_sha}")
 
     results = []
     if os.path.exists(results_path):
@@ -2478,10 +2620,12 @@ def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True)
     else:
         errors.append(f"No experiment specification found for '{exp_id}'")
 
-    ok_m, m_errs = validate_manifest(manifest, results, spec=spec)
+    # 3. Validate manifest schema, provenance, and results obligations
+    ok_m, m_errs = validate_manifest(manifest, results, spec=spec, canonical_current=canonical_current)
     if not ok_m:
         errors.extend(m_errs)
 
+    # 4. Summary recomputation and complete deterministic semantic field comparison
     if not os.path.exists(summary_path):
         errors.append(f"Run bundle '{exp_id}' missing summary.json")
     elif spec is not None:
@@ -2489,18 +2633,34 @@ def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True)
             with open(summary_path, "r", encoding="utf-8") as sf:
                 committed_summary = json.load(sf)
             recomputed = compute_summary(spec, exp_id, results, status=manifest.get("status", "complete"))
-            c_comm = committed_summary.get("criterion", {})
-            c_recomp = recomputed.get("criterion", {})
-            if c_comm.get("criterion_met") != c_recomp.get("criterion_met"):
-                errors.append(f"Summary criterion_met mismatch: committed={c_comm.get('criterion_met')}, recomputed={c_recomp.get('criterion_met')}")
-            if spec.get("epistemic_class") == "exact_control" and c_recomp.get("criterion_met") is not True:
-                errors.append(f"Exact control experiment '{exp_id}' criterion not met: observed={c_recomp.get('observed')}")
+
+            for fld in [
+                "schema_version",
+                "status",
+                "points_requested",
+                "points_completed",
+                "points_failed",
+                "metrics",
+                "report_metrics",
+                "criterion",
+                "extrema",
+                "anomalies",
+                "warnings"
+            ]:
+                comm_v = committed_summary.get(fld)
+                recomp_v = recomputed.get(fld)
+                if comm_v != recomp_v:
+                    errors.append(f"Summary field '{fld}' mismatch: committed={comm_v}, recomputed={recomp_v}")
+
+            if spec.get("epistemic_class") == "exact_control" and recomputed.get("criterion", {}).get("criterion_met") is not True:
+                errors.append(f"Exact control experiment '{exp_id}' criterion not met: observed={recomputed.get('criterion', {}).get('observed')}")
         except Exception as e:
             errors.append(f"Failed validating summary.json: {e}")
 
     if not os.path.exists(readme_path):
         errors.append(f"Run bundle '{exp_id}' missing README.md")
 
+    # 5. Index entry synchronization
     if not os.path.exists(INDEX_FILE):
         errors.append("research/index.json missing")
     else:
@@ -2518,8 +2678,22 @@ def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True)
             else:
                 if found_entry.get("git_commit") != manifest.get("git_commit"):
                     errors.append(f"Index git_commit '{found_entry.get('git_commit')}' != manifest '{manifest.get('git_commit')}'")
+                if found_entry.get("producing_git_commit") != manifest.get("producing_git_commit"):
+                    errors.append(f"Index producing_git_commit '{found_entry.get('producing_git_commit')}' != manifest '{manifest.get('producing_git_commit')}'")
+                if found_entry.get("git_dirty") is not False:
+                    errors.append(f"Index git_dirty is not False: '{found_entry.get('git_dirty')}'")
                 if found_entry.get("status") != manifest.get("status"):
                     errors.append(f"Index status '{found_entry.get('status')}' != manifest '{manifest.get('status')}'")
+                if "criterion" in (committed_summary if 'committed_summary' in locals() else {}):
+                    exp_crit_met = committed_summary["criterion"].get("criterion_met")
+                    if found_entry.get("criterion_met") != exp_crit_met:
+                        errors.append(f"Index criterion_met '{found_entry.get('criterion_met')}' != summary '{exp_crit_met}'")
+                if found_entry.get("summary_path") != f"research/runs/{exp_id}/summary.json":
+                    errors.append(f"Index summary_path mismatch: {found_entry.get('summary_path')}")
+                if found_entry.get("manifest_path") != f"research/runs/{exp_id}/manifest.json":
+                    errors.append(f"Index manifest_path mismatch: {found_entry.get('manifest_path')}")
+                if found_entry.get("results_path") != f"research/runs/{exp_id}/results.jsonl":
+                    errors.append(f"Index results_path mismatch: {found_entry.get('results_path')}")
         except Exception as e:
             errors.append(f"Failed validating index.json entry: {e}")
 

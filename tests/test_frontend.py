@@ -236,3 +236,17 @@ def test_proof_programme_status_panel_dynamic_derivation(monkeypatch):
     tab_bad_str = str(tab_layout_bad)
     assert "UNVERIFIED" in tab_bad_str
     assert "Rigorously Certified (FLINT Arb)" not in tab_bad_str
+
+
+def test_proof_programme_lean_badge_states(monkeypatch):
+    """Verify that Stage 1 badge reflects Lean 4 formal build report verification state."""
+    # 1. When formal build report verifies
+    monkeypatch.setattr(certification, "verify_formal_build_report", lambda *args, **kwargs: (True, "verified", {}, []))
+    tab = app.create_proof_programme_tab()
+    assert "Constructed & Formally Checked (Lean 4)" in str(tab)
+
+    # 2. When formal build report is missing or fails verification
+    monkeypatch.setattr(certification, "verify_formal_build_report", lambda *args, **kwargs: (False, "missing", {}, ["lake build required"]))
+    tab_fail = app.create_proof_programme_tab()
+    assert "Formal Verification Pending (lake build required)" in str(tab_fail)
+    assert "Constructed & Formally Checked (Lean 4)" not in str(tab_fail)

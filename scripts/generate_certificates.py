@@ -42,6 +42,11 @@ DELTAS_TO_CERTIFY = ["0.0", "-0.10", "-0.01", "+0.01", "+0.10"]
 
 
 def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
+    env_ok, env_err = certification.validate_generation_environment(git_commit)
+    if not env_ok:
+        print(f"[ERROR] Certificate generation aborted: {env_err}")
+        sys.exit(1)
+
     os.makedirs(ZEROS_DIR, exist_ok=True)
     os.makedirs(TRIVIAL_ZEROS_DIR, exist_ok=True)
     os.makedirs(BLOCKS_DIR, exist_ok=True)

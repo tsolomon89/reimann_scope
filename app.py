@@ -801,11 +801,13 @@ def create_proof_programme_tab():
         stage3_status, stage3_color = "UNVERIFIED", "secondary"
         stage4_status, stage4_color = "UNVERIFIED", "secondary"
 
-    lean_spec_path = os.path.join(REPO_ROOT, "formal", "RiemannScope.lean")
-    lean_lake_path = os.path.join(REPO_ROOT, "formal", "lakefile.lean")
-    stage1_verified = os.path.exists(lean_spec_path) or os.path.exists(lean_lake_path)
-    stage1_status = "Constructed & Formally Checked (Lean 4)" if stage1_verified else "UNVERIFIED"
-    stage1_color = "success" if stage1_verified else "secondary"
+    formal_ok, formal_state, formal_rep, formal_errs = certification.verify_formal_build_report()
+    if formal_ok:
+        stage1_status = "Constructed & Formally Checked (Lean 4)"
+        stage1_color = "success"
+    else:
+        stage1_status = "Formal Verification Pending (lake build required)"
+        stage1_color = "warning"
 
     prog_stages = [
         {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": stage1_status, "color": stage1_color},

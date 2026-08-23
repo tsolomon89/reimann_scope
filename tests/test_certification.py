@@ -867,6 +867,54 @@ def test_report_loader_rejects_rehashed_invalid_certificate(tmp_path, monkeypatc
     with open(cert_dir / "verification_report.json", "w", encoding="utf-8") as f:
         json.dump(rep, f, indent=2)
 
-    ok, loaded_rep, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    ok, loaded_rep, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False, canonical_current=False)
     assert not ok
     assert any("incompatible" in e.lower() or "failed independent verification" in e.lower() or "failed verification" in e.lower() for e in errs)
+
+
+def test_canonical_current_source_mismatch_rejection():
+    """Test that canonical_current=True fails if disk source code differs from certificate hash."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    cert = certification.certify_zero(1, dps=50)
+    # Tamper with recorded source hash
+    cert["source_code_hashes"]["app.py"] = "0" * 64
+    cert["certificate_hash"] = certification._sha256_canonical(cert)
+
+    # In canonical_current=True mode, should fail because disk hash != "0"*64
+    ok, errs = certification.verify_certificate(cert, check_provenance=True, canonical_current=True)
+    assert not ok
+    assert any("mismatch" in e.lower() or "does not match" in e.lower() for e in errs)
+
+
+def test_formal_build_report_verification(tmp_path):
+    """Test verification of Lean 4 build report and tamper rejection."""
+    # If formal/build_report.json exists, verify it
+    formal_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "formal")
+    report_path = os.path.join(formal_dir, "build_report.json")
+    if os.path.exists(report_path):
+        ok, state, rep, errs = certification.verify_formal_build_report(report_path=report_path, check_current=True)
+        assert ok, f"Existing formal build report failed verification: {errs}"
+
+    # Corrupt report in temporary location
+    fake_report = {
+        "schema_version": "1",
+        "report_type": "lean4_formal_build_report",
+        "status": "passed",
+        "lean_version": "4.8.0",
+        "lake_version": "5.0.0",
+        "build_exit_code": 0,
+        "source_files": {"formal/RiemannScope.lean": "0" * 64},
+        "lakefile_hash": "0" * 64,
+        "toolchain_hash": "0" * 64
+    }
+    fake_report["report_hash"] = certification._sha256_canonical(fake_report)
+
+    tmp_rep_file = tmp_path / "fake_report.json"
+    with open(tmp_rep_file, "w", encoding="utf-8") as f:
+        json.dump(fake_report, f, indent=2)
+
+    ok, state, rep, errs = certification.verify_formal_build_report(report_path=str(tmp_rep_file), check_current=True)
+    assert not ok
+    assert any("mismatch" in e.lower() or "missing" in e.lower() for e in errs)

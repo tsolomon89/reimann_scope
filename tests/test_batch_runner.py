@@ -863,12 +863,26 @@ def test_validate_manifest_accepts_valid_manifest_and_rejects_discrepancies():
     h2 = wl1["certificate_hash"]
 
     valid_manifest = {
+        "schema_version": "2",
+        "run_id": "test-exp",
         "experiment_id": "test-exp",
-        "git_commit": "e32966b5bd2349fb5612f7782a5d09991cde6a5f",
+        "title": "Test Experiment",
+        "epistemic_class": "exact_control",
+        "classification": "canonical_experiment",
         "status": "complete",
         "precision": {"dps": 50},
+        "parameter_space": {},
         "points_requested": 1,
         "points_completed": 1,
+        "git_commit": z1["producing_git_commit"],
+        "producing_git_commit": z1["producing_git_commit"],
+        "git_dirty": False,
+        "dependency_fingerprint": certification._get_dependency_fingerprint(),
+        "source_code_hashes": certification._get_source_code_hashes(z1["producing_git_commit"]),
+        "input_data_hashes": certification._get_input_data_hashes(z1["producing_git_commit"]),
+        "code_modules": [{"path": m, "sha256": certification._get_source_code_hashes(z1["producing_git_commit"])[m]} for m in certification.REQUIRED_SOURCE_MODULES],
+        "data_provenance": [{"path": f"data/{d}", "sha256": certification._get_input_data_hashes(z1["producing_git_commit"])[d]} for d in certification.REQUIRED_INPUT_DATA_FILES],
+        "experiment_spec_sha256": "0" * 64,
         "consumed_certificates": [h1, h2]
     }
     valid_results = [
@@ -880,7 +894,7 @@ def test_validate_manifest_accepts_valid_manifest_and_rejects_discrepancies():
             "worldline_certified": "true"
         }}
     ]
-    ok, errs = research_runner.validate_manifest(valid_manifest, valid_results)
+    ok, errs = research_runner.validate_manifest(valid_manifest, valid_results, canonical_current=False)
     assert ok, f"Expected valid manifest: {errs}"
 
     # Missing from consumed certificates
@@ -1158,3 +1172,108 @@ def test_validate_run_bundle_canonical_runs():
             if os.path.isdir(r_path) and not r.startswith("."):
                 ok, errs = research_runner.validate_run_bundle(r_path)
                 assert ok, f"Canonical run bundle '{r}' failed validation: {errs}"
+
+
+def test_manifest_provenance_mandatory_fields_and_corruptions():
+    """Test that removing or corrupting any mandatory provenance field fails validate_manifest."""
+    base_manifest = {
+        "schema_version": "2",
+        "run_id": "test_exp",
+        "experiment_id": "test_exp",
+        "title": "Test Experiment",
+        "epistemic_class": "exact_control",
+        "classification": "canonical_experiment",
+        "status": "complete",
+        "precision": {"dps": 50},
+        "parameter_space": {},
+        "points_requested": 1,
+        "points_completed": 1,
+        "git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
+        "producing_git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
+        "git_dirty": False,
+        "dependency_fingerprint": certification._get_dependency_fingerprint(),
+        "source_code_hashes": certification._get_source_code_hashes("47aa916b941bcce79aa7c7a3b8b9faf3a0be1185"),
+        "input_data_hashes": certification._get_input_data_hashes("47aa916b941bcce79aa7c7a3b8b9faf3a0be1185"),
+        "code_modules": [{"path": m, "sha256": certification._get_source_code_hashes("47aa916b941bcce79aa7c7a3b8b9faf3a0be1185")[m]} for m in certification.REQUIRED_SOURCE_MODULES],
+        "data_provenance": [{"path": f"data/{d}", "sha256": certification._get_input_data_hashes("47aa916b941bcce79aa7c7a3b8b9faf3a0be1185")[d]} for d in certification.REQUIRED_INPUT_DATA_FILES],
+        "experiment_spec_sha256": "0" * 64,
+        "consumed_certificates": []
+    }
+
+    # 1. Check each required field deletion
+    for req_field in research_runner.REQUIRED_MANIFEST_PROVENANCE_FIELDS:
+        corrupt = dict(base_manifest)
+        del corrupt[req_field]
+        ok, errs = research_runner.validate_manifest(corrupt, canonical_current=False)
+        assert not ok, f"Expected failure when missing '{req_field}'"
+        assert any(req_field in e for e in errs)
+
+    # 2. git_dirty = True
+    dirty_manifest = dict(base_manifest)
+    dirty_manifest["git_dirty"] = True
+    ok, errs = research_runner.validate_manifest(dirty_manifest, canonical_current=False)
+    assert not ok
+    assert any("git_dirty" in e for e in errs)
+
+    # 3. Disagreeing commit vs producing commit
+    mismatched_commit = dict(base_manifest)
+    mismatched_commit["producing_git_commit"] = "1111111111111111111111111111111111111111"
+    ok, errs = research_runner.validate_manifest(mismatched_commit, canonical_current=False)
+    assert not ok
+    assert any("does not match producing_git_commit" in e for e in errs)
+
+    # 4. List representation mismatch for code_modules
+    bad_code_mods = dict(base_manifest)
+    bad_code_mods["code_modules"] = [{"path": "app.py", "sha256": "f" * 64}]
+    ok, errs = research_runner.validate_manifest(bad_code_mods, canonical_current=False)
+    assert not ok
+
+    # 5. List representation mismatch for data_provenance
+    bad_data_prov = dict(base_manifest)
+    bad_data_prov["data_provenance"] = [{"path": "data/zeros/first_100_zeros.json", "sha256": "f" * 64}]
+    ok, errs = research_runner.validate_manifest(bad_data_prov, canonical_current=False)
+    assert not ok
+
+
+def test_validate_run_bundle_tamper_detection(tmp_path):
+    """Test that tampering with any bundle artifact, adding files, or changing summary fields is rejected."""
+    real_runs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "runs")
+    run_names = [r for r in os.listdir(real_runs_dir) if os.path.isdir(os.path.join(real_runs_dir, r)) and not r.startswith(".")]
+    if not run_names:
+        pytest.skip("No canonical runs found")
+
+    sample_name = run_names[0]
+    src_run = os.path.join(real_runs_dir, sample_name)
+    dst_run = tmp_path / sample_name
+    shutil.copytree(src_run, dst_run)
+
+    # 1. Adding an unauthorized file fails validation
+    extra_file = dst_run / "temp_scratch.tmp"
+    extra_file.write_text("scratch", encoding="utf-8")
+    ok, errs = research_runner.validate_run_bundle(str(dst_run), canonical_current=False)
+    assert not ok
+    assert any("unauthorized or temporary files" in e for e in errs)
+    extra_file.unlink()
+
+    # 2. Corrupting results.jsonl byte SHA fails validation
+    results_file = dst_run / "results.jsonl"
+    with open(results_file, "a", encoding="utf-8") as f:
+        f.write("\n")
+    ok, errs = research_runner.validate_run_bundle(str(dst_run), canonical_current=False)
+    assert not ok
+    assert any("Artifact byte SHA-256 mismatch" in e for e in errs)
+
+    # Restore
+    shutil.rmtree(dst_run)
+    shutil.copytree(src_run, dst_run)
+
+    # 3. Corrupting summary.json metric fails validation
+    sum_file = dst_run / "summary.json"
+    with open(sum_file, "r", encoding="utf-8") as f:
+        sum_data = json.load(f)
+    sum_data["status"] = "failed"
+    with open(sum_file, "w", encoding="utf-8") as f:
+        json.dump(sum_data, f, indent=2)
+    ok, errs = research_runner.validate_run_bundle(str(dst_run), canonical_current=False)
+    assert not ok
+    assert any("mismatch" in e.lower() or "sha-256" in e.lower() for e in errs)

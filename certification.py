@@ -347,6 +347,116 @@ def _get_git_commit() -> str:
         return "UNKNOWN"
 
 
+def validate_generation_environment(target_commit: Optional[str] = None) -> Tuple[bool, str]:
+    """Ensure the generation environment satisfies the strict implementation commit boundary.
+
+    Fails closed if:
+    - Current working tree contains uncommitted changes in required source, data, or specs.
+    - An explicit target commit is specified that differs from HEAD or has different source/data hashes.
+    """
+    head = _get_git_commit()
+    if head == "UNKNOWN":
+        return False, "Cannot determine current Git HEAD commit"
+
+    # Check git status for required source files, specs, or data files
+    try:
+        proc = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=REPO_ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True
+        )
+        if proc.returncode == 0 and proc.stdout:
+            for line in proc.stdout.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(maxsplit=1)
+                if len(parts) == 2:
+                    p = parts[1].replace("\\", "/")
+                    if any(p == mod or p.startswith("research/experiments/") or (p.startswith("data/") and p.endswith(".csv")) for mod in REQUIRED_SOURCE_MODULES):
+                        if not p.startswith("data/certificates/") and not p.startswith("research/runs/") and p != "research/index.json" and p != "formal/build_report.json":
+                            return False, f"Generation aborted: working tree contains uncommitted changes in '{p}'"
+    except Exception as e:
+        return False, f"Git status check failed: {e}"
+
+    if target_commit:
+        if target_commit != head:
+            # Check if source hashes at target commit match current disk
+            for mod in REQUIRED_SOURCE_MODULES:
+                blob_h = _get_historical_git_blob_hash(target_commit, mod)
+                disk_h = _get_source_code_hashes().get(mod)
+                if blob_h != disk_h:
+                    return False, f"Target commit '{target_commit}' source module '{mod}' ({blob_h}) differs from current disk implementation ({disk_h})"
+            for df in REQUIRED_INPUT_DATA_FILES:
+                blob_h = _get_historical_git_blob_hash(target_commit, f"data/{df}")
+                disk_h = _get_input_data_hashes().get(df)
+                if blob_h != disk_h:
+                    return False, f"Target commit '{target_commit}' data file 'data/{df}' ({blob_h}) differs from current disk data ({disk_h})"
+
+    return True, ""
+
+
+def verify_formal_build_report(
+    report_path: Optional[str] = None,
+    check_current: bool = True
+) -> Tuple[bool, str, Dict[str, Any], List[str]]:
+    """Validate formal/build_report.json machine-readable evidence of lake build.
+
+    Returns (is_verified, state_string, report_dict, errors).
+    state_string is one of: "verified", "missing", "failed", "stale".
+    """
+    path = report_path or os.path.join(REPO_ROOT, "formal", "build_report.json")
+    if not os.path.exists(path):
+        return False, "missing", {}, ["formal/build_report.json does not exist"]
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            report = json.load(f)
+    except Exception as e:
+        return False, "failed", {}, [f"Failed reading formal/build_report.json: {e}"]
+
+    errors: List[str] = []
+    rep_hash = report.get("report_hash")
+    clean_rep = {k: v for k, v in report.items() if k != "report_hash"}
+    calc_hash = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    if not rep_hash or rep_hash != calc_hash:
+        errors.append(f"Formal build report hash mismatch: reported {rep_hash}, computed {calc_hash}")
+
+    if report.get("status") != "passed" or report.get("exit_code") != 0:
+        errors.append(f"Formal build status is '{report.get('status')}' (exit code {report.get('exit_code')})")
+
+    if check_current:
+        f_hashes = report.get("formal_source_hashes", {})
+        for rel_p, exp_h in f_hashes.items():
+            full_p = os.path.join(REPO_ROOT, rel_p)
+            if not os.path.exists(full_p):
+                errors.append(f"Formal source file '{rel_p}' missing on disk")
+            else:
+                with open(full_p, "rb") as sf:
+                    cur_h = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+                if cur_h != exp_h:
+                    errors.append(f"Formal source file '{rel_p}' hash mismatch: disk {cur_h}, report {exp_h}")
+
+        tc_path = os.path.join(REPO_ROOT, "formal", "lean-toolchain")
+        if os.path.exists(tc_path):
+            with open(tc_path, "rb") as tcf:
+                cur_tc_h = hashlib.sha256(tcf.read().replace(b"\r\n", b"\n")).hexdigest()
+            if cur_tc_h != report.get("lean_toolchain_hash"):
+                errors.append("formal/lean-toolchain hash mismatch against report")
+
+        lf_path = os.path.join(REPO_ROOT, "formal", "lakefile.toml")
+        if os.path.exists(lf_path):
+            with open(lf_path, "rb") as lff:
+                cur_lf_h = hashlib.sha256(lff.read().replace(b"\r\n", b"\n")).hexdigest()
+            if cur_lf_h != report.get("lakefile_hash"):
+                errors.append("formal/lakefile.toml hash mismatch against report")
+
+    is_verified = (len(errors) == 0 and report.get("status") == "passed" and report.get("exit_code") == 0)
+    state = "verified" if is_verified else ("stale" if report.get("status") == "passed" else "failed")
+    return is_verified, state, report, errors
+
 
 def _split_ball_str(ball: Any) -> Tuple[str, str]:
     """Extract midpoint and radius strings from an Arb ball representation."""
@@ -868,7 +978,8 @@ def certify_worldline(
 def verify_certificate(
     cert: Dict[str, Any],
     cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
-    check_provenance: bool = True
+    check_provenance: bool = True,
+    canonical_current: bool = True
 ) -> Tuple[bool, List[str]]:
     """Independently verify a certificate schema, SHA-256 self-hash, provenance, and replay all mathematical claims.
 
@@ -879,6 +990,7 @@ def verify_certificate(
         cert: The certificate dictionary to verify.
         cert_store: Optional dictionary mapping certificate_hash or (type, id) -> cert dictionary for resolving dependencies.
         check_provenance: If True (default), strictly verify source module hashes and input data hashes against current files.
+        canonical_current: If True (default), enforce that current disk source code hashes match certificate hashes.
 
     Returns:
         (is_valid, list_of_anomalies)
@@ -938,12 +1050,14 @@ def verify_certificate(
         if not commit_ok:
             anomalies.append(f"Invalid producing_git_commit provenance: {commit_err}")
 
-        # 5. Verify current source code files exist on disk
+        # 5. Verify current source code files exist on disk and match in canonical-current mode
         curr_src = _get_source_code_hashes()
         for mod in REQUIRED_SOURCE_MODULES:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
+            elif canonical_current and curr_h != cert_src.get(mod):
+                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
 
         # 6. Verify current input data files exist and match certificate
         curr_data = _get_input_data_hashes()
@@ -1376,31 +1490,46 @@ def load_and_verify_certificate(
 
 def generate_verification_report(
     cert_dir: Optional[str] = None,
-    check_provenance: bool = True
+    check_provenance: bool = True,
+    git_commit: Optional[str] = None
 ) -> Dict[str, Any]:
-    """Strictly verify all persisted certificates on disk and write a cryptographic verification report.
+    """Inspect all certificates in data/certificates/, verify each independently,
+    and generate the canonical verification_report.json artifact.
 
-    Saves to data/certificates/verification_report.json.
+    Fails closed: If any certificate is corrupted, fails mathematical bounds, or has
+    missing/mismatched provenance, it will be listed under 'failures' and status set to 'failed'.
+
+    Returns:
+        The generated verification report dictionary.
     """
     target_dir = cert_dir or CERT_DIR
+    if not os.path.exists(target_dir):
+        raise FileNotFoundError(f"Certificate directory '{target_dir}' does not exist")
+
+    report_commit = git_commit or _get_git_commit()
+    env_ok, env_err = validate_generation_environment(report_commit)
+    if not env_ok:
+        raise RuntimeError(f"Report generation environment invalid: {env_err}")
+
+    # Enumerate on-disk certificates
     zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
     trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
     worldlines_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
 
-    all_files = sorted(zeros_files + trivial_files + blocks_files + worldlines_files)
-    total_inventory = len(all_files)
+    total_inventory = len(zeros_files) + len(trivial_files) + len(blocks_files) + len(worldlines_files)
+    all_files = zeros_files + trivial_files + blocks_files + worldlines_files
 
-    # Preload in-memory cert store for fast cross-resolution
     cert_store: Dict[str, Dict[str, Any]] = {}
     parsed_files: List[Tuple[str, Optional[Dict[str, Any]], str, Optional[str]]] = []
+
     for fpath in all_files:
-        file_sha256 = ""
+        with open(fpath, "rb") as f:
+            raw_bytes = f.read()
+        normalized_bytes = raw_bytes.replace(b"\r\n", b"\n")
+        file_sha256 = hashlib.sha256(normalized_bytes).hexdigest()
         try:
-            with open(fpath, "rb") as f:
-                content = f.read().replace(b"\r\n", b"\n")
-            file_sha256 = hashlib.sha256(content).hexdigest()
-            c = json.loads(content.decode("utf-8"))
+            c = json.loads(normalized_bytes.decode("utf-8"))
             h = c.get("certificate_hash")
             if h:
                 cert_store[h] = c
@@ -1443,7 +1572,7 @@ def generate_verification_report(
             continue
 
         try:
-            ok, errs = verify_certificate(cert, cert_store=cert_store, check_provenance=check_provenance)
+            ok, errs = verify_certificate(cert, cert_store=cert_store, check_provenance=check_provenance, canonical_current=True)
             if ok:
                 passed_count += 1
                 inventory.append({
@@ -1488,7 +1617,6 @@ def generate_verification_report(
     inventory_root_hash = hashlib.sha256(json.dumps(inventory, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
     status = "verified" if (failed_count == 0 and total_inventory > 0 and passed_count == total_inventory) else ("unverified" if total_inventory == 0 else "failed")
-    report_commit = _get_git_commit()
 
     report: Dict[str, Any] = {
         "schema_version": CERTIFICATE_SCHEMA_VERSION,
@@ -1523,7 +1651,8 @@ def generate_verification_report(
 def load_verification_report(
     report_path: Optional[str] = None,
     cert_dir: Optional[str] = None,
-    check_provenance: bool = True
+    check_provenance: bool = True,
+    canonical_current: bool = True
 ) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
     """Load and strictly validate verification_report.json against exact current on-disk inventory.
 
@@ -1539,23 +1668,19 @@ def load_verification_report(
         with open(target_path, "r", encoding="utf-8") as f:
             report = json.load(f)
     except Exception as e:
-        return False, None, [f"Failed to read verification report JSON: {e}"]
-
-    if not isinstance(report, dict):
-        return False, None, ["Verification report must be a JSON object"]
+        return False, None, [f"Failed to read/parse verification report: {e}"]
 
     anomalies: List[str] = []
 
-    # 1. Check schema version and report type
-    schema_ver = str(report.get("schema_version", ""))
-    if schema_ver != CERTIFICATE_SCHEMA_VERSION:
-        anomalies.append(f"Unsupported report schema_version '{schema_ver}'. Expected '{CERTIFICATE_SCHEMA_VERSION}'")
+    # 1. Validate report schema type
+    if not isinstance(report, dict):
+        return False, None, ["Verification report must be a dictionary"]
+    if report.get("schema_version") != CERTIFICATE_SCHEMA_VERSION:
+        anomalies.append(f"Unsupported schema_version: expected '{CERTIFICATE_SCHEMA_VERSION}', got '{report.get('schema_version')}'")
+    if report.get("report_type") != "certificate_verification_report":
+        anomalies.append(f"Invalid report_type: expected 'certificate_verification_report', got '{report.get('report_type')}'")
 
-    rep_type = str(report.get("report_type", ""))
-    if rep_type not in SUPPORTED_REPORT_TYPES:
-        anomalies.append(f"Fabricated or unsupported report_type '{rep_type}'. Supported: {sorted(list(SUPPORTED_REPORT_TYPES))}")
-
-    # 2. Check self-hash (content-integrity hash)
+    # 2. Check self-hash
     exp_h = report.get("report_hash")
     if not exp_h or _sha256_canonical(report) != exp_h:
         anomalies.append("Verification report self-hash mismatch or missing")
@@ -1706,7 +1831,7 @@ def load_verification_report(
                     anomalies.append(f"Certificate '{rel}' has incompatible dependency fingerprint: {'; '.join(cdep_errs)}")
 
                 # Independently verify certificate correctness and mathematical bounds
-                c_ok, c_errs = verify_certificate(cert_dict, cert_store=loaded_cert_map, check_provenance=check_provenance)
+                c_ok, c_errs = verify_certificate(cert_dict, cert_store=loaded_cert_map, check_provenance=check_provenance, canonical_current=canonical_current)
                 if not c_ok:
                     anomalies.append(f"Certificate '{rel}' failed independent verification: {'; '.join(c_errs)}")
 
@@ -1738,10 +1863,13 @@ def load_verification_report(
 
         # 10. Check current workspace source files & input data files
         curr_src = _get_source_code_hashes()
+        rep_src = report.get("source_code_hashes", {})
         for mod in REQUIRED_SOURCE_MODULES:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
+            elif canonical_current and curr_h != rep_src.get(mod):
+                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, report {rep_src.get(mod)}")
 
         curr_data = _get_input_data_hashes()
         rep_data = report.get("input_data_hashes", {})

@@ -26,7 +26,7 @@ import certification
 CERT_DIR = os.path.join(REPO_ROOT, "data", "certificates")
 
 
-def verify_all(write_report: bool = False) -> Tuple[bool, int, List[str]]:
+def verify_all(write_report: bool = False, canonical_current: bool = True) -> Tuple[bool, int, List[str]]:
     """Verify all stored certificates.
 
     If write_report is True, generates/updates data/certificates/verification_report.json.
@@ -35,9 +35,9 @@ def verify_all(write_report: bool = False) -> Tuple[bool, int, List[str]]:
     zeros_files = sorted(glob.glob(os.path.join(CERT_DIR, "zeros", "*.json")))
     trivial_files = sorted(glob.glob(os.path.join(CERT_DIR, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(CERT_DIR, "blocks", "*.json")))
-    worldline_files = sorted(glob.glob(os.path.join(CERT_DIR, "worldlines", "*.json")))
+    worldlines_files = sorted(glob.glob(os.path.join(CERT_DIR, "worldlines", "*.json")))
 
-    cert_files = zeros_files + trivial_files + blocks_files + worldline_files
+    cert_files = zeros_files + trivial_files + blocks_files + worldlines_files
 
     if not cert_files:
         return False, 0, ["No certificates found in data/certificates/"]
@@ -70,7 +70,7 @@ def verify_all(write_report: bool = False) -> Tuple[bool, int, List[str]]:
 
     for c_path, cert_data in parsed_certs:
         try:
-            ok, errs = certification.verify_certificate(cert_data, cert_store=cert_store, check_provenance=True)
+            ok, errs = certification.verify_certificate(cert_data, cert_store=cert_store, check_provenance=True, canonical_current=canonical_current)
             if not ok:
                 all_anomalies.extend([f"[{os.path.basename(c_path)}] {e}" for e in errs])
             else:
@@ -83,7 +83,7 @@ def verify_all(write_report: bool = False) -> Tuple[bool, int, List[str]]:
         certification.generate_verification_report(cert_dir=CERT_DIR, check_provenance=True)
     else:
         # Read-only mode: validate existing report without modifying it
-        rep_ok, rep_data, rep_errs = certification.load_verification_report(cert_dir=CERT_DIR)
+        rep_ok, rep_data, rep_errs = certification.load_verification_report(cert_dir=CERT_DIR, check_provenance=True, canonical_current=canonical_current)
         if not rep_ok:
             all_anomalies.extend([f"[verification_report.json] {e}" for e in rep_errs])
 
