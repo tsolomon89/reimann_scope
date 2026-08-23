@@ -6,11 +6,11 @@
   "epistemic_class": "sensitivity_diagnostic",
   "object_relationship": "synthetic_perturbation_diagnostic",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T20:23:34.565323+00:00",
-  "completed_at": "2026-08-23T20:25:11.736973+00:00",
+  "started_at": "2026-08-23T20:46:52.597024+00:00",
+  "completed_at": "2026-08-23T20:48:29.677809+00:00",
   "status": "complete",
-  "git_commit": "acaa862a769f84f747bed75f4898b3174e1d985b",
-  "producing_git_commit": "acaa862a769f84f747bed75f4898b3174e1d985b",
+  "git_commit": "72aac6eefa0665b2348c729cefa0e534dc6e932a",
+  "producing_git_commit": "72aac6eefa0665b2348c729cefa0e534dc6e932a",
   "git_dirty": false,
   "experiment_spec_sha256": "674def9dfe3261b85d2dd0cc9839bb4feac9782757a9d2aeca682c7a16b320ac",
   "precision": {
@@ -140,7 +140,7 @@
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "64dc5528df6526d49037e795b4a96a5e21da8db4be3936f35150534580385e3b"
+      "sha256": "61620409533b9770fcf104921070cd5008882f23ff2f15a4c32df80c7f5e9def"
     },
     "summary_json": {
       "path": "summary.json",
@@ -148,11 +148,11 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "4da353b7e28a9caecd6a9baee55482186a79d8fc5a1d7ada7458890b0f2265c7"
+      "sha256": "01b103c11080f56ea8f180ec5355f6e158b06cafdaa1f7e29b9c349c82bf8a7d"
     },
     "diagnostics_json": {
       "path": "diagnostics.json",
-      "sha256": "74f8348bc075a74b0f279159cc45cad444806fa318001d86eeea8446d64c343e"
+      "sha256": "b624fff5fafb3a02e3202b6c987112da2c15a26a30c7660fe9b7948bf1d7b8b7"
     }
   }
 }
