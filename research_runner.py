@@ -2174,6 +2174,11 @@ def validate_manifest(
                     if h_str not in consumed:
                         errors.append(f"Point {idx} uses certificate {h_str} which is missing from manifest consumed_certificates")
 
+            # Check worldline_certified consistency
+            if str(outs.get("worldline_certified")).lower() == "true":
+                if not outs.get("worldline_cert_hash") or outs.get("worldline_cert_hash") == "N/A":
+                    errors.append(f"Point {idx} claims worldline_certified=true but worldline_cert_hash is 'N/A'")
+
             # Operation Obligation Checks
             if op_obl.get("requires_source_cert"):
                 sz_h = outs.get("source_zero_cert_hash")
