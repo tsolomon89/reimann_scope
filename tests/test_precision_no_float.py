@@ -84,4 +84,3 @@ def test_explicit_formula_high_precision_no_float_downcast():
         assert isinstance(defect_res["merge_defect"], mpmath.mpf)
         # Radial defect for 1e-35 delta is non-zero in 80 dps but would be completely zero under float
         assert defect_res["radial_defect"] != mpmath.mpf(0)
-

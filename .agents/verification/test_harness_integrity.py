@@ -105,4 +105,3 @@ def test_root_markdown_files_preserved():
         file_path = WORKSPACE_ROOT / filename
         assert file_path.exists(), f"Root file {filename} must not be deleted or moved"
         assert file_path.stat().st_size > 0, f"Root file {filename} must not be empty"
-

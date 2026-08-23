@@ -26,6 +26,18 @@ report_metrics:
 - metric: relative_error
   kind: criterion_component
   label: Relative error
+- metric: spectral_cutoff_change_100_to_200
+  kind: criterion_component
+  label: Spectral cutoff sensitivity (100 to 200 zeros)
+- metric: spectral_cutoff_change_150_to_200
+  kind: criterion_component
+  label: Spectral cutoff sensitivity (150 to 200 zeros)
+- metric: prime_cutoff_change_10k_to_50k
+  kind: criterion_component
+  label: Arithmetic prime cutoff sensitivity (10k to 50k)
+- metric: precision_change_70_to_110
+  kind: criterion_component
+  label: Working precision sensitivity (70 to 110 dps)
 engine:
   operation: explicit_formula_native_baseline
 parameters:

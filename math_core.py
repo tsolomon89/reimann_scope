@@ -397,19 +397,19 @@ EXPLICIT_FORMULA_TEST_FUNCTIONS: Dict[int, Dict[str, str]] = {
     },
     4: {
         "sigma": "3.0",
-        "t0": "75.7046906990839331683269167620303459228108420959063854964645284000305844837583689400262118357771343714",
+        "t0": "75.70469069908393316832691676203034592281190353069740030164777530157419702770632360838403702183465280",
         "target": "zero_19",
         "description": "Gaussian packet centered at zero #19 (gamma_19 ~ 75.7047)",
     },
     5: {
         "sigma": "3.5",
-        "t0": "141.118403367500587216142646603099951664166299109051877685601267807095982845648839077277684074813589993",
+        "t0": "143.1118458076206327394051238689139299662331024303546325485985229572806931441333492275444274025136984",
         "target": "zero_50",
-        "description": "Gaussian packet centered at zero #50 (gamma_50 ~ 141.1184)",
+        "description": "Gaussian packet centered at zero #50 (gamma_50 ~ 143.1118)",
     },
     6: {
         "sigma": "4.0",
-        "t0": "236.524229665816205802475560866573887093259648946765792942475681600861184288078330756784570494498394468",
+        "t0": "236.5242296658162058024755079556629786895294952121891237009189609878191503842923328262614446040651740",
         "target": "zero_100",
         "description": "Gaussian packet centered at zero #100 (gamma_100 ~ 236.5242)",
     },
@@ -561,6 +561,61 @@ def h_kj_scaled_prime(
             t_val = to_mpf(t, dps=dps + 15)
             scaled_t = a_K * t_val
         return a_K * H_test_function_prime(scaled_t, j, dps=dps + 15)
+
+
+def compute_grade_quadrature_fourier(
+    j: int,
+    K: Union[int, float, str, mpmath.mpf],
+    x: Union[int, float, str, mpmath.mpf],
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [INDEPENDENT NUMERICAL CONTROL] Computes independent numerical Fourier quadrature:
+    \\widehat{h}_{K,j}(x) = \\int_{-\\infty}^\\infty h_{K,j}(t) e^{-i x t} dt
+                         = \\frac{2}{a_K} \\int_0^\\infty H_j(u) \\cos((x/a_K) u) du
+    using panel-subdivided tanh-sinh quadrature over the compact effective support [0, t0 + 15*sigma].
+    Returns complete error and convergence metrics without calling closed-form Fourier transform for the integral.
+    """
+    with mpmath.workdps(dps + 20):
+        tau = get_tau(dps=dps + 20)
+        k_val = to_mpf(K, dps=dps + 20)
+        a_K = mpmath.power(tau, k_val)
+        x_val = to_mpf(x, dps=dps + 20)
+        sigma, t0 = get_test_function_params(j, dps=dps + 20)
+
+        ana_hat = h_kj_scaled_hat(x_val, j, k_val, dps=dps + 20)
+
+        omega = x_val / a_K
+        u_max = t0 + mpmath.mpf(15) * sigma
+        num_panels = min(30, max(10, int(u_max * omega / 20) + 1))
+        pts = [i * u_max / num_panels for i in range(num_panels + 1)]
+
+        num_int = mpmath.quad(
+            lambda u: H_test_function(u, j, dps=dps + 20) * mpmath.cos(omega * u),
+            pts,
+            method='tanh-sinh',
+            maxdegree=8
+        )
+        num_hat = (mpmath.mpf(2) / a_K) * num_int
+
+        abs_err = abs(ana_hat - num_hat)
+        scale = max(abs(ana_hat), abs(num_hat), mpmath.mpf('1e-30'))
+        rel_err = abs_err / scale
+
+        return {
+            "j": j,
+            "K": k_val,
+            "x": x_val,
+            "a_K": a_K,
+            "analytic_value": ana_hat,
+            "numerical_value": num_hat,
+            "absolute_error": abs_err,
+            "relative_error": rel_err,
+            "integration_domain": f"[0, {mpmath.nstr(u_max / a_K, n=8)}]",
+            "transformed_domain": f"[0, {mpmath.nstr(u_max, n=8)}]",
+            "quadrature_precision": dps + 20,
+            "convergence_evidence": f"panel_subdivided_tanh_sinh_{num_panels}_panels"
+        }
 
 
 
@@ -1119,6 +1174,17 @@ def check_expanded_native_basis_equivalence(
         cutoff_stacked = S_stacked[0] * mpmath.mpf('1e-25') if len(S_stacked) > 0 else mpmath.mpf(0)
         rank_stacked = sum(1 for s in S_stacked if s > cutoff_stacked)
 
+        # Threshold sweep for grade matrix
+        sweep_thresholds = ['1e-18', '1e-20', '1e-25', '1e-30', '1e-35', '1e-40']
+        grade_sweep: Dict[str, Any] = {}
+        s0_grade = S_grade[0] if len(S_grade) > 0 else mpmath.mpf(0)
+        for t_val in sweep_thresholds:
+            t_mpf = to_mpf(t_val, dps=dps + 25)
+            cut = s0_grade * t_mpf
+            rk = sum(1 for s in S_grade if s > cut)
+            nl = len(zeros_mpf) - rk
+            grade_sweep[t_val] = {"relative_threshold": t_val, "absolute_cutoff": mpmath.nstr(cut, n=dps), "numerical_rank": rk, "nullity": nl}
+
         is_equivalent = bool(
             max_diff < mpmath.mpf('1e-50')
             and max_val_diff < mpmath.mpf('1e-50')
@@ -1132,10 +1198,19 @@ def check_expanded_native_basis_equivalence(
             "max_discrepancy": max_diff,
             "max_value_discrepancy": max_val_diff,
             "max_fourier_discrepancy": max_hat_diff,
+            "grade_matrix_dims": [len(J_grade), len(zeros_mpf)],
+            "native_matrix_dims": [len(J_native), len(zeros_mpf)],
+            "stacked_matrix_dims": [len(stacked), len(zeros_mpf)],
             "rank_grade": rank_grade,
             "rank_native": rank_native,
             "rank_stacked": rank_stacked,
+            "singular_values_grade": [s for s in S_grade],
+            "singular_values_native": [s for s in S_native],
+            "singular_values_stacked": [s for s in S_stacked],
+            "rank_threshold": cutoff_grade,
+            "threshold_sweep": grade_sweep,
             "is_equivalent": is_equivalent,
+            "categorical_equivalence_result": is_equivalent,
             "classification": classification,
             "theoretical_classification": classification,
             "finite_basis_classification": "finite_basis_enrichment_only",
@@ -1278,5 +1353,3 @@ def solve_linearized_compensation(
             "participating_indices": part_indices,
             "other_indices": other_indices,
         }
-
-

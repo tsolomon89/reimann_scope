@@ -718,9 +718,9 @@ The project has established the direct mathematical-discrimination campaign for 
 
 **Crucial Epistemic Distinction**:
 - Detecting a local divisor perturbation with fixed arithmetic data demonstrates sensitivity of the explicit formula to isolated spectral modifications, but does not model an alternative zeta function or a zero belonging to an actual complete divisor (where the complete zero spectrum and the arithmetic data satisfy the explicit formula collectively).
+- The explicit formula family \(\mathcal C_{K,j}\) operates purely via coordinate pullback \(\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K]\); any candidate for a genuine non-dilation joint arithmetic constraint remains an **OPEN / UNDEFINED CANDIDATE**.
 - The missing theorem remains:
   \[
   \text{zeta-specific global constraint} \Longrightarrow \text{radial rigidity}.
   \]
   This implication is not assumed or axiomatized.
-

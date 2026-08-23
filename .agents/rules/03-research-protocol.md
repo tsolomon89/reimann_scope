@@ -32,4 +32,3 @@ When conducting mathematical audits, running experiments, or evaluating new clai
    4. `research/runs/<run_id>/results.jsonl` (only if point-level inspection is needed)
    5. Experiment YAML spec (`research/experiments/*.yaml`)
    6. Source code only to audit a specific metric or canonical engine implementation.
-

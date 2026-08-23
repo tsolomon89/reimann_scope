@@ -22,13 +22,19 @@ criterion:
 report_metrics:
 - metric: residual
   kind: criterion_component
-  label: Grade covariance maximum discrepancy
+  label: Grade covariance maximum compound discrepancy
 - metric: fourier_scaling_error
   kind: criterion_component
   label: Fourier scaling error
 - metric: pullback_identity_error
   kind: criterion_component
   label: Pullback identity error
+- metric: quadrature_fourier_error
+  kind: criterion_component
+  label: Independent Fourier quadrature error
+- metric: basis_equivalence_discrepancy
+  kind: criterion_component
+  label: Expanded native basis discrepancy
 engine:
   operation: explicit_formula_grade_covariance
 parameters:

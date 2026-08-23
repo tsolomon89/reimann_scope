@@ -116,4 +116,3 @@ def test_provenance_verification_and_crlf_lf_invariance(tmp_path):
     hash_crlf = reference_data.hash_normalized_bytes(crlf_file)
     
     assert hash_lf == hash_crlf, "hash_normalized_bytes must be invariant across CRLF and LF line endings"
-

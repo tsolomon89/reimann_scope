@@ -942,4 +942,3 @@ The suite comprises three canonical experiments evaluating the Riemann–Weil ex
 3. `explicit-formula-perturbation-rank-001`
    - **Epistemic Class**: `sensitivity_diagnostic`
    - **Scope**: Evaluates finite divisor defects \(\Delta \mathcal C_{K,j} = \langle\Delta\mathcal D, h_{K,j}\rangle\), exact validator rejection of unsymmetric or multiplicity-violating mutations, symmetry-complete radial quartet exact decomposition into height merging \(\Delta\mathcal C^{\mathrm{merge}}\) and pure radial \(\Delta\mathcal C^{\mathrm{radial}}(\delta)\), Jacobian SVD with threshold sweep across \([10^{-18}, 10^{-20}, 10^{-25}, 10^{-30}, 10^{-35}, 10^{-40}]\), rank stability classification `threshold_dependent`, and minimum-norm linearized compensation vectors with forward residuals. Consumes verified zero certificates for all perturbed cases.
-

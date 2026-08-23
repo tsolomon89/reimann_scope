@@ -1473,18 +1473,12 @@ def evaluate_point(
                     pullback_errs.append(abs(h_val - h_direct))
                 max_pullback_err = max(pullback_errs)
 
-                # 3. Direct numerical quadrature vs scaled Fourier transform
-                sigma_j, t0_j = math_core.get_test_function_params(j_idx, dps=dps + 20)
+                # 3. Direct independent numerical quadrature vs scaled Fourier transform
                 quad_errs = []
                 for x_test_str in ["0.5", "1.0", "2.0"]:
                     x_mpf = math_core.to_mpf(x_test_str, dps=dps + 20)
-                    ana_hat = math_core.h_kj_scaled_hat(x_mpf, j_idx, k_mpf, dps=dps + 20)
-                    t_upper = (t0_j + mpmath.mpf(15) * sigma_j) / a_K
-                    num_hat = mpmath.mpf(2) * mpmath.quad(
-                        lambda t_var: math_core.h_kj_scaled(t_var, j_idx, k_mpf, dps=dps + 20) * mpmath.cos(x_mpf * t_var),
-                        [0, t_upper]
-                    )
-                    quad_errs.append(abs(ana_hat - num_hat))
+                    q_res = math_core.compute_grade_quadrature_fourier(j_idx, k_mpf, x_mpf, dps=dps)
+                    quad_errs.append(q_res["absolute_error"])
                 max_quad_err = max(quad_errs)
 
                 # 4. Expanded native basis equivalence test with independent paths
@@ -1496,7 +1490,11 @@ def evaluate_point(
                     dps=dps + 20
                 )
 
-                total_cov_err = max(max_fourier_err, max_pullback_err, equiv_check["max_discrepancy"])
+                # 5. Compound exact-control consistency (rank equivalence across paths)
+                rank_consistent = bool(equiv_check["rank_grade"] == equiv_check["rank_native"] == equiv_check["rank_stacked"])
+                rank_penalty = mpmath.mpf(0) if rank_consistent else mpmath.mpf(1)
+
+                total_cov_err = max(max_fourier_err, max_pullback_err, max_quad_err, equiv_check["max_discrepancy"], rank_penalty)
 
                 return "ok", {
                     "test_function_index": str(j_idx),
@@ -1510,6 +1508,7 @@ def evaluate_point(
                     "rank_grade": str(equiv_check["rank_grade"]),
                     "rank_native": str(equiv_check["rank_native"]),
                     "rank_stacked": str(equiv_check["rank_stacked"]),
+                    "categorical_equivalence_verified": "true" if (equiv_check["is_equivalent"] and rank_consistent) else "false",
                     "theoretical_classification": "coordinate_redundant",
                     "finite_basis_classification": "finite_basis_enrichment_only",
                     "discrimination_classification": "coordinate_redundant",
@@ -2007,6 +2006,44 @@ def compute_summary(
             "warnings": warnings
         }
 
+        if spec.get("id") == "explicit-formula-grade-covariance-001":
+            try:
+                j_list = [1, 2, 3, 4, 5, 6]
+                k_list = [-2, -1, 0, 1, 2]
+                zeros_sub = reference_data.load_reference_zeros()[:100]
+                g_eq = math_core.check_expanded_native_basis_equivalence(j_list=j_list, k_list=k_list, zeros_subset=zeros_sub, dps=dps + 20)
+                summary["global_30_channel_equivalence"] = {
+                    "grade_matrix_dims": g_eq["grade_matrix_dims"],
+                    "native_matrix_dims": g_eq["native_matrix_dims"],
+                    "stacked_matrix_dims": g_eq["stacked_matrix_dims"],
+                    "rank_grade": g_eq["rank_grade"],
+                    "rank_native": g_eq["rank_native"],
+                    "rank_stacked": g_eq["rank_stacked"],
+                    "singular_values_grade": [mpmath.nstr(s, n=dps) for s in g_eq["singular_values_grade"]],
+                    "threshold_sweep": g_eq["threshold_sweep"],
+                    "max_discrepancy": mpmath.nstr(g_eq["max_discrepancy"], n=dps),
+                    "theoretical_classification": g_eq["theoretical_classification"],
+                    "finite_basis_classification": g_eq["finite_basis_classification"],
+                    "categorical_equivalence_result": g_eq["categorical_equivalence_result"],
+                }
+            except Exception as e:
+                summary["warnings"].append(f"Global 30-channel equivalence summary calculation failed: {e}")
+
+        elif spec.get("id") == "explicit-formula-native-baseline-001":
+            try:
+                ref_zeros = reference_data.load_reference_zeros()
+                summary["dataset_and_convergence_summary"] = {
+                    "total_reference_zero_count": len(ref_zeros),
+                    "certified_zero_count": 100,
+                    "reference_approximation_zero_count": len(ref_zeros) - 100,
+                    "highest_included_zero_index": len(ref_zeros),
+                    "highest_included_zero_ordinate": ref_zeros[-1] if ref_zeros else "0",
+                    "prime_power_cutoff": 50000,
+                    "dominant_observed_error_source": "spectral_truncation_200_zeros_plus_prime_sieve_50000"
+                }
+            except Exception as e:
+                summary["warnings"].append(f"Native baseline convergence summary calculation failed: {e}")
+
         if points_failed > 0:
             summary["warnings"].append(f"{points_failed} points encountered execution errors")
 
@@ -2105,58 +2142,150 @@ def generate_run_readme(
     else:
         tau_display = str(tau_val)
 
-    return f"""# Experiment Run Digest — {spec.get('title', spec['id'])}
+    readme_lines = [
+        f"# Experiment Run Digest — {spec.get('title', spec['id'])}\n",
+        f"**Run ID:** `{manifest['run_id']}`",
+        f"**Experiment ID:** `{spec['id']}`",
+        f"**Status:** `{summary['status'].upper()}`",
+        f"**Criterion Outcome:** **{crit_status}**\n",
+        "---\n",
+        "## 1. Mathematical Statement & Criterion\n",
+        f"- **Hypothesis:**\n  > {summary['hypothesis'].strip()}\n",
+        f"{crit_summary_line}\n",
+        "*Note: This result applies strictly to the evaluated finite parameter space. It does not constitute proof or refutation of broader conjectures.*\n",
+        "---\n",
+        "## 2. Multi-Metric Summary\n",
+        "| Metric | Classification | Count | Min | Max | Max Abs |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- |",
+        f"{metrics_table}\n",
+        "---\n",
+        "## 3. Metric Diagnostics & Worst Points\n",
+        f"{details_block}\n",
+        "---\n",
+        "## 4. Execution & Environment Metadata\n",
+        f"- **Git Commit:** `{manifest['git_commit']}` (Dirty: `{manifest['git_dirty']}`)",
+        f"- **Precision:** `{manifest['precision']['dps']} dps`",
+        f"- **Tau Value:** `{tau_display}`",
+        f"- **Points Requested:** `{manifest['points_requested']}`",
+        f"- **Points Completed:** `{manifest['points_completed']}`",
+        f"- **Started At:** `{manifest['started_at']}`",
+        f"- **Completed At:** `{manifest['completed_at']}`\n",
+        "---\n",
+        "## 5. Artifact Index\n",
+        "- Manifest: [`manifest.json`](manifest.json)",
+        "- Summary: [`summary.json`](summary.json)",
+        "- Detailed Points: [`results.jsonl`](results.jsonl)",
+    ]
+    if manifest.get("artifacts", {}).get("diagnostics_json"):
+        readme_lines.append("- Diagnostics: [`diagnostics.json`](diagnostics.json)")
+    readme_lines.append("")
+    return "\n".join(readme_lines)
 
-**Run ID:** `{manifest['run_id']}`
-**Experiment ID:** `{spec['id']}`
-**Status:** `{summary['status'].upper()}`
-**Criterion Outcome:** **{crit_status}**
 
----
+def generate_perturbation_rank_diagnostics(spec: Dict[str, Any], results: List[Dict[str, Any]], dps: int = 80) -> Dict[str, Any]:
+    """Build complete, reconstructible linearized compensation diagnostics."""
+    j_list = [1, 2, 3, 4, 5, 6]
+    k_list = [-2, -1, 0, 1, 2]
+    channels = [{"channel_index": i, "K": k, "j": j} for i, (k, j) in enumerate([(k, j) for k in k_list for j in j_list])]
 
-## 1. Mathematical Statement & Criterion
+    first_100_zeros = []
+    first_100_ords = []
+    for idx_100 in range(1, 101):
+        ch, ok, zc, _ = _lookup_zero_certificate(idx_100, zero_family="nontrivial", check_provenance=False)
+        ord_val = zc["enclosure"]["imag_mid"] if (zc and "enclosure" in zc) else reference_data.load_first_100_reference_zeros()[idx_100 - 1]
+        first_100_ords.append(ord_val)
+        first_100_zeros.append({
+            "zero_index": idx_100,
+            "ordinate": ord_val,
+            "certificate_hash": ch if ch else "N/A"
+        })
 
-- **Hypothesis:**
-  > {summary['hypothesis'].strip()}
+    J = math_core.explicit_formula_jacobian(j_list=j_list, k_list=k_list, zeros_subset=first_100_ords, dps=dps + 20)
 
-{crit_summary_line}
+    cases_diag = {}
+    for rec in results:
+        outs = rec.get("outputs", {})
+        mode = outs.get("mode")
+        if mode == "critical_height":
+            n_idx = int(outs.get("zero_index", 1))
+            eps_str = outs.get("epsilon", "0.001")
+            eps_mpf = math_core.to_mpf(eps_str, dps=dps + 20)
+            target_col = n_idx - 1
+            comp_res = math_core.solve_linearized_compensation(
+                J=J,
+                target_col_idx=target_col,
+                epsilon=eps_mpf,
+                rank_tol_rel='1e-25',
+                dps=dps + 20
+            )
+            case_key = f"critical_height_zero_{n_idx}_eps_{eps_str}"
+            cases_diag[case_key] = {
+                "mode": "critical_height",
+                "target_zero_index": n_idx,
+                "epsilon": eps_str,
+                "excluded_target_column": target_col,
+                "matrix_dimensions": [len(J), len(comp_res["other_indices"])],
+                "singular_values": [mpmath.nstr(s, n=dps) for s in comp_res["singular_values"]],
+                "threshold_sweep": comp_res["threshold_sweep"],
+                "primary_threshold": "1e-25",
+                "numerical_rank": comp_res["numerical_rank"],
+                "nullity": comp_res["nullity"],
+                "condition_number": mpmath.nstr(comp_res["condition_number"], n=8),
+                "target_defect_vector": [mpmath.nstr(v, n=dps) for v in comp_res["v_target"]],
+                "compensation_vector": [mpmath.nstr(x, n=dps) for x in comp_res["compensation_vector"]],
+                "zero_index_mapping": [i + 1 for i in comp_res["other_indices"]],
+                "forward_residual_vector": [mpmath.nstr(r, n=dps) for r in comp_res["residual_vector"]],
+                "target_norm": mpmath.nstr(comp_res["v_norm"], n=dps),
+                "compensation_norm": mpmath.nstr(comp_res["compensation_norm"], n=dps),
+                "residual_norm": mpmath.nstr(comp_res["residual_norm"], n=dps),
+                "relative_residual": mpmath.nstr(comp_res["relative_residual"], n=dps),
+                "participating_indices": [i + 1 for i in comp_res["participating_indices"]],
+                "participation_rule": "abs(x_i) > 1e-12 * norm(x)",
+                "compensation_found": comp_res["compensation_found"],
+                "working_precision_dps": dps
+            }
 
-*Note: This result applies strictly to the evaluated finite parameter space. It does not constitute proof or refutation of broader conjectures.*
+    return {
+        "schema_version": "2",
+        "experiment_id": "explicit-formula-perturbation-rank-001",
+        "channel_ordering": channels,
+        "zero_column_ordering": first_100_zeros,
+        "cases": cases_diag,
+        "working_precision_dps": dps
+    }
 
----
 
-## 2. Multi-Metric Summary
+def generate_grade_covariance_diagnostics(spec: Dict[str, Any], results: List[Dict[str, Any]], dps: int = 80) -> Dict[str, Any]:
+    """Build complete 30-channel global grade covariance diagnostics."""
+    j_list = [1, 2, 3, 4, 5, 6]
+    k_list = [-2, -1, 0, 1, 2]
+    channels = [{"channel_index": i, "K": k, "j": j} for i, (k, j) in enumerate([(k, j) for k in k_list for j in j_list])]
+    zeros = reference_data.load_reference_zeros()[:100]
+    global_equiv = math_core.check_expanded_native_basis_equivalence(j_list=j_list, k_list=k_list, zeros_subset=zeros, dps=dps + 20)
 
-| Metric | Classification | Count | Min | Max | Max Abs |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-{metrics_table}
-
----
-
-## 3. Metric Diagnostics & Worst Points
-
-{details_block}
-
----
-
-## 4. Execution & Environment Metadata
-
-- **Git Commit:** `{manifest['git_commit']}` (Dirty: `{manifest['git_dirty']}`)
-- **Precision:** `{manifest['precision']['dps']} dps`
-- **Tau Value:** `{tau_display}`
-- **Points Requested:** `{manifest['points_requested']}`
-- **Points Completed:** `{manifest['points_completed']}`
-- **Started At:** `{manifest['started_at']}`
-- **Completed At:** `{manifest['completed_at']}`
-
----
-
-## 5. Artifact Index
-
-- Manifest: [`manifest.json`](manifest.json)
-- Summary: [`summary.json`](summary.json)
-- Detailed Points: [`results.jsonl`](results.jsonl)
-"""
+    return {
+        "schema_version": "2",
+        "experiment_id": "explicit-formula-grade-covariance-001",
+        "channel_ordering": channels,
+        "num_zeros": len(zeros),
+        "grade_matrix_dims": global_equiv["grade_matrix_dims"],
+        "native_matrix_dims": global_equiv["native_matrix_dims"],
+        "stacked_matrix_dims": global_equiv["stacked_matrix_dims"],
+        "rank_grade": global_equiv["rank_grade"],
+        "rank_native": global_equiv["rank_native"],
+        "rank_stacked": global_equiv["rank_stacked"],
+        "singular_values_grade": [mpmath.nstr(s, n=dps) for s in global_equiv["singular_values_grade"]],
+        "singular_values_native": [mpmath.nstr(s, n=dps) for s in global_equiv["singular_values_native"]],
+        "singular_values_stacked": [mpmath.nstr(s, n=dps) for s in global_equiv["singular_values_stacked"]],
+        "threshold_sweep": global_equiv["threshold_sweep"],
+        "max_discrepancy": mpmath.nstr(global_equiv["max_discrepancy"], n=dps),
+        "max_value_discrepancy": mpmath.nstr(global_equiv["max_value_discrepancy"], n=dps),
+        "max_fourier_discrepancy": mpmath.nstr(global_equiv["max_fourier_discrepancy"], n=dps),
+        "theoretical_classification": global_equiv["theoretical_classification"],
+        "finite_basis_classification": global_equiv["finite_basis_classification"],
+        "categorical_equivalence_result": global_equiv["categorical_equivalence_result"],
+        "working_precision_dps": dps
+    }
 
 
 def update_index_file(run_entry: Dict[str, Any]):
@@ -2387,6 +2516,15 @@ def run_experiment(
     with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
 
+    if exp_id == "explicit-formula-perturbation-rank-001":
+        diag_data = generate_perturbation_rank_diagnostics(spec, all_results, dps=dps)
+        with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
+            json.dump(diag_data, df, indent=2)
+    elif exp_id == "explicit-formula-grade-covariance-001":
+        diag_data = generate_grade_covariance_diagnostics(spec, all_results, dps=dps)
+        with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
+            json.dump(diag_data, df, indent=2)
+
     with open(os.path.join(work_dir, "results.jsonl"), "rb") as rf:
         results_sha = hashlib.sha256(rf.read().replace(b"\r\n", b"\n")).hexdigest()
     with open(os.path.join(work_dir, "summary.json"), "rb") as sf:
@@ -2408,6 +2546,14 @@ def run_experiment(
             "sha256": readme_sha
         }
     }
+    diag_file = os.path.join(work_dir, "diagnostics.json")
+    if os.path.exists(diag_file):
+        with open(diag_file, "rb") as df:
+            diag_sha = hashlib.sha256(df.read().replace(b"\r\n", b"\n")).hexdigest()
+        manifest["artifacts"]["diagnostics_json"] = {
+            "path": "diagnostics.json",
+            "sha256": diag_sha
+        }
 
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
@@ -2570,6 +2716,10 @@ REQUIRED_ARTIFACT_MAPPINGS = {
     "readme_md": "README.md",
 }
 
+OPTIONAL_ARTIFACT_MAPPINGS = {
+    "diagnostics_json": "diagnostics.json",
+}
+
 
 def project_canonical_index_entry(manifest: Dict[str, Any], summary: Dict[str, Any], exp_id: str) -> Dict[str, Any]:
     """Derive the canonical index entry projection from authoritative manifest and summary."""
@@ -2646,16 +2796,18 @@ def validate_manifest(
         errors.append("Manifest missing or empty 'artifacts' map")
     else:
         req_art_keys = set(REQUIRED_ARTIFACT_MAPPINGS.keys())
+        allowed_art_keys = req_art_keys | set(OPTIONAL_ARTIFACT_MAPPINGS.keys())
         act_art_keys = set(artifacts_map.keys())
         missing_art = req_art_keys - act_art_keys
         if missing_art:
             errors.append(f"Manifest artifacts map missing required entries: {sorted(list(missing_art))}")
-        extra_art = act_art_keys - req_art_keys
+        extra_art = act_art_keys - allowed_art_keys
         if extra_art:
             errors.append(f"Manifest artifacts map contains unauthorized entries: {sorted(list(extra_art))}")
 
+        all_art_mappings = {**REQUIRED_ARTIFACT_MAPPINGS, **OPTIONAL_ARTIFACT_MAPPINGS}
         seen_paths: Set[str] = set()
-        for art_key, exp_fname in REQUIRED_ARTIFACT_MAPPINGS.items():
+        for art_key, exp_fname in all_art_mappings.items():
             if art_key not in artifacts_map:
                 continue
             art_entry = artifacts_map[art_key]
@@ -3004,7 +3156,7 @@ def validate_run_bundle(
     # 1. Directory hygiene: reject unexpected or temporary files
     try:
         entries = sorted(os.listdir(run_dir))
-        allowed_files = {"manifest.json", "results.jsonl", "summary.json", "README.md"}
+        allowed_files = {"manifest.json", "results.jsonl", "summary.json", "README.md", "diagnostics.json"}
         extra_files = set(entries) - allowed_files
         if extra_files:
             errors.append(f"Run bundle '{exp_id}' contains unauthorized or temporary files: {sorted(list(extra_files))}")
@@ -3031,7 +3183,14 @@ def validate_run_bundle(
     if not isinstance(artifacts_map, dict) or not artifacts_map:
         errors.append(f"Run bundle '{exp_id}' manifest missing 'artifacts' map")
     else:
+        all_art_mappings = {**REQUIRED_ARTIFACT_MAPPINGS, **OPTIONAL_ARTIFACT_MAPPINGS}
         for art_key, exp_fname in REQUIRED_ARTIFACT_MAPPINGS.items():
+            if art_key not in artifacts_map:
+                errors.append(f"Manifest artifacts map missing required entry '{art_key}'")
+
+        for art_key, exp_fname in all_art_mappings.items():
+            if art_key not in artifacts_map:
+                continue
             art_entry = artifacts_map.get(art_key)
             if not isinstance(art_entry, dict) or not art_entry.get("sha256"):
                 errors.append(f"Manifest artifacts map missing entry or sha256 for '{art_key}'")

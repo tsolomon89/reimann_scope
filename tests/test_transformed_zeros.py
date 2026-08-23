@@ -99,4 +99,3 @@ def test_transcendental_continuation_bilateral_zeros(k_val):
         scale = math_core.get_tau(dps=dps) ** k_val
         r_tau = (rho_mapped.real / scale) - mpmath.mpf('0.5')
         assert abs(r_tau) < mpmath.mpf('1e-50'), f"Radial coordinate {r_tau} != 0 for k={k_val}"
-

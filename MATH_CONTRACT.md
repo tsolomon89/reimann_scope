@@ -1963,3 +1963,8 @@ A non-zero divisor perturbation produces a non-zero defect on at least some sepa
 
 - **Epistemic boundary**: These perturbation metrics constitute a local sensitivity diagnostic under frozen arithmetic data. They do not constitute an alternative zeta function or a proof of global non-compensation across the infinite zero set.
 
+## 35.5 Explicit formula grade independence and future candidates
+
+1. The explicit formula family \(\mathcal C_{K,j}\) operates exclusively via the coordinate pullback identity \(\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K]\) and is **coordinate-redundant** with respect to the native explicit formula evaluated on scaled test functions.
+2. Any prospective mathematical mechanism attempting to impose cross-grade constraints without test-function dilation remains an **OPEN / UNDEFINED CANDIDATE** and must not be identified with \(\mathcal C_{K,j}\).
+3. The coordinate dilation \(a_K = \tau^K\) does not imply or assume any non-trivial automorphism \(\zeta(\tau^K s) = \zeta(s)\).

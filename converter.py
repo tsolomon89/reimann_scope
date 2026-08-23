@@ -522,5 +522,3 @@ class PrimeReconstructionCache:
         # Delta C = new - orig
         perturbed_pi = clean_pi - (new_contrib - orig_contrib)
         return clean_pi, perturbed_pi
-
-

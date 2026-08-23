@@ -662,4 +662,3 @@ def test_quadratic_scaling_and_half_delta_ratio():
     assert mpmath.isfinite(norm_cj)
     assert mpmath.isfinite(norm_cpi)
     assert abs(norm_cj) > mpmath.mpf("1e-5")
-

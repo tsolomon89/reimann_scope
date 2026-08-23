@@ -900,5 +900,28 @@ Supersedes:
 
 Ambiguous generic `zero_index` and any potential double counting of trivial zeros.
 
+---
 
+## 2026-08-23 — Reconciling Explicit Formula Grade Covariance, Independent Quadrature Control, and Separation of Coordinate Redundancy from Undefined Arithmetic Constraints
 
+Status: ACCEPTED
+
+Decision:
+
+1. **Test Function Enclosure Digits**: Ensure test function center ordinates (especially zero-50) are populated from certified ball enclosure midpoints (e.g. $\gamma_{50} \approx 143.1118458...$).
+2. **Independent Fourier Quadrature Control**: Implement panel-subdivided tanh-sinh quadrature in native variable $u = a_K t$ over compact effective support $[0, t_0 + 15\sigma]$ to eliminate frequency oscillation instability and achieve $< 10^{-45}$ error control across all grades $K \in \{-2..2\}$ and test functions $j \in \{1..6\}$.
+3. **Compound Exact-Control Pass/Fail Criterion**: Enforce simultaneous compound verification across Fourier scaling error, coordinate pullback error, independent Fourier quadrature error, expanded-native basis discrepancy, and cross-path matrix rank equality ($14 = 14 = 14$).
+4. **Coordinate Redundancy Distinction**: Maintain explicit distinction between the exact infinite coordinate pullback identity $\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K]$ (`coordinate_redundant`) and comparison against an unexpanded finite basis (`finite_basis_enrichment_only`).
+5. **Future Arithmetic Constraints**: Classify any prospective joint arithmetic constraint operating without test function dilation as an `OPEN / UNDEFINED CANDIDATE` distinct from $\mathcal C_{K,j}$.
+
+Reason:
+
+Guarantee rigorous independent mathematical control, eliminate numerical quadrature artifacts, publish reconstructible linearized compensation diagnostics, and ensure flawless epistemic integrity across the proof programme.
+
+Mathematical / operational consequence:
+
+The test suite, batch runner, certificate verifier, and UI dashboards verify exact covariance and quadrature controls, publish reconstructible `diagnostics.json`, and prevent any conflation between coordinate dilation and non-trivial Euler product automorphisms.
+
+Supersedes:
+
+Naive undivided Fourier quadrature in negative grades and any ambiguous classification of $\mathcal C_{K,j}$.
