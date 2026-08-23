@@ -192,12 +192,11 @@ def test_cross_height_lab_certified_mode_truthfulness():
     assert "CERTIFICATION REJECTED" in str(info_empty)
 
 
-
 def test_worldline_lab_certified_mode_truthfulness():
     """Verify Bilateral Worldline laboratory displays CERTIFIED title only when 100% of curves are certified."""
-    # Certified mode with canonical zero 1 and certified deltas [0.0, 0.10, -0.10]
+    # Certified mode with canonical certified zero and standard deltas
     fig_traj, fig_rad, fig_def = app.update_worldline_lab(
-        zero_gamma=14.134725,
+        zero_val="zero_00001",
         k_min_val=-2,
         k_max_val=2,
         selected_deltas=[0.0, 0.10, -0.10],
@@ -209,7 +208,7 @@ def test_worldline_lab_certified_mode_truthfulness():
 
     # Certified mode with uncertified delta (e.g. 0.05) -> must fail closed
     fig_traj_bad, _, _ = app.update_worldline_lab(
-        zero_gamma=14.134725,
+        zero_val="zero_00001",
         k_min_val=-2,
         k_max_val=2,
         selected_deltas=[0.05],
@@ -237,4 +236,3 @@ def test_proof_programme_status_panel_dynamic_derivation(monkeypatch):
     tab_bad_str = str(tab_layout_bad)
     assert "UNVERIFIED" in tab_bad_str
     assert "Rigorously Certified (FLINT Arb)" not in tab_bad_str
-

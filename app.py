@@ -645,14 +645,14 @@ def create_worldline_tab():
                         dcc.Dropdown(
                             id="dropdown-wl-zero",
                             options=[
-                                {"label": f"Zero #{i+1}: γ = {z:.6f} (Low Block)", "value": z}
+                                {"label": f"Zero #{i+1}: γ = {z:.6f} (Low Block)", "value": f"zero_{i+1:05d}"}
                                 for i, z in enumerate(INITIAL_ZEROS_FLOAT[:10])
                             ] + [
-                                {"label": "Zero #100: γ = 236.524230 (Medium Block)", "value": 236.524230},
-                                {"label": "Zero #1000: γ = 1419.422481 (High Block)", "value": 1419.422481},
-                                {"label": "Zero #10000: γ = 9877.782654 (Very High Block)", "value": 9877.782654},
+                                {"label": "Zero #100: γ = 236.524230 (Medium Block)", "value": "zero_00100"},
+                                {"label": "Zero #1000: γ = 1419.422481 (High Block)", "value": "zero_01000"},
+                                {"label": "Zero #10000: γ = 9877.782654 (Very High Block)", "value": "zero_10000"},
                             ],
-                            value=INITIAL_ZEROS_FLOAT[0],
+                            value="zero_00001",
                             clearable=False,
                             className="dash-dropdown-dark mb-3"
                         ),
@@ -801,8 +801,14 @@ def create_proof_programme_tab():
         stage3_status, stage3_color = "UNVERIFIED", "secondary"
         stage4_status, stage4_color = "UNVERIFIED", "secondary"
 
+    lean_spec_path = os.path.join(REPO_ROOT, "formal", "RiemannScope.lean")
+    lean_lake_path = os.path.join(REPO_ROOT, "formal", "lakefile.lean")
+    stage1_verified = os.path.exists(lean_spec_path) or os.path.exists(lean_lake_path)
+    stage1_status = "Constructed & Formally Checked (Lean 4)" if stage1_verified else "UNVERIFIED"
+    stage1_color = "success" if stage1_verified else "secondary"
+
     prog_stages = [
-        {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": "Constructed & Formally Checked (Lean 4)", "color": "success"},
+        {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": stage1_status, "color": stage1_color},
         {"stage": "2. Native Zero Blocks", "requirement": "Rigorously certify zero isolation and simplicity in Arb", "status": stage2_status, "color": stage2_color},
         {"stage": "3. Worldline Covariance", "requirement": "Z_tau(tau^K rho, K) = zeta(rho) for all K in Z", "status": stage3_status, "color": stage3_color},
         {"stage": "4. Radial Invariance", "requirement": "R_tau(s_rho(k), k) = delta invariant across all grades", "status": stage4_status, "color": stage4_color},
@@ -1839,29 +1845,43 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
         Input("radio-cert-mode", "value")
     ]
 )
-def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert_mode):
+def update_worldline_lab(zero_val, k_min_val, k_max_val, selected_deltas, cert_mode):
     dps = 40 if cert_mode in ["audit", "certified"] else 25
-    gamma = float(zero_gamma or INITIAL_ZEROS_FLOAT[0])
     k_min = int(k_min_val if k_min_val is not None else -5)
     k_max = int(k_max_val if k_max_val is not None else 5)
     deltas = selected_deltas or [0.0]
 
     k_range = list(range(k_min, k_max + 1))
 
-    # Map selected zero gamma to exact index
-    gamma_to_idx = {
-        14.134725: 1,
-        21.022040: 2,
-        25.010858: 3,
-        236.524230: 100,
-        1419.422481: 1000,
-        9877.782654: 10000
-    }
+    # Map selected zero id or value to exact integer index and canonical gamma
+    ref_zeros = reference_data.load_reference_zeros()
     z_idx = None
-    for g_val, idx_val in gamma_to_idx.items():
-        if abs(gamma - g_val) < 1e-4:
-            z_idx = idx_val
-            break
+    if isinstance(zero_val, str):
+        if zero_val.startswith("zero_"):
+            try:
+                z_idx = int(zero_val.split("_")[1])
+            except Exception:
+                z_idx = None
+        elif zero_val.isdigit():
+            z_idx = int(zero_val)
+    elif isinstance(zero_val, int):
+        z_idx = zero_val
+
+    if z_idx is None:
+        # Fallback index resolution for legacy inputs
+        try:
+            f_val = float(zero_val)
+            for i, rz in enumerate(ref_zeros):
+                if abs(f_val - float(rz)) < 1e-4:
+                    z_idx = i + 1
+                    break
+        except Exception:
+            z_idx = 1
+
+    if z_idx is not None and 1 <= z_idx <= len(ref_zeros):
+        gamma = float(ref_zeros[z_idx - 1])
+    else:
+        gamma = float(INITIAL_ZEROS_FLOAT[0])
 
     all_certified = True
     unverified_reasons = []
@@ -1870,7 +1890,7 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
     if cert_mode == "certified":
         if z_idx is None:
             all_certified = False
-            unverified_reasons.append(f"Selected gamma {gamma} is not a canonical certified zero")
+            unverified_reasons.append(f"Selected zero '{zero_val}' is not a canonical certified zero")
         else:
             # Check source zero cert
             src_path = os.path.join(REPO_ROOT, "data", "certificates", "zeros", f"zero_{z_idx:05d}.json")
@@ -1918,7 +1938,7 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
                             all_certified = False
                             unverified_reasons.append(f"Unreadable certificate for z={z_idx}, K={K}, delta={d}: {e}")
 
-    hash_display = f" [{src_cert_hash[:12]}...]" if src_cert_hash else ""
+    hash_display = f" [Cert: {src_cert_hash}]" if src_cert_hash else ""
     cert_prefix = f"CERTIFIED{hash_display} " if (cert_mode == "certified" and all_certified) else ""
     uncert_notice = f" [UNCERTIFIED: {unverified_reasons[0]}]" if (cert_mode == "certified" and not all_certified and unverified_reasons) else ""
 

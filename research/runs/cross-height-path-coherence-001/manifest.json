@@ -2,12 +2,17 @@
   "schema_version": "2",
   "run_id": "cross-height-path-coherence-001",
   "experiment_id": "cross-height-path-coherence-001",
-  "experiment_spec_sha256": "64b4fe387d81a1a374d963cdc977806ff3ecf79e2bdaed496a207b96f2028166",
-  "git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
-  "git_dirty": false,
-  "started_at": "2026-08-23T08:06:05.607065+00:00",
-  "completed_at": "2026-08-23T08:06:32.530415+00:00",
+  "title": "Cross-Height Path Coherence and Taylor Shape Metric Sweep",
+  "epistemic_class": "observational_pattern",
+  "object_relationship": "actual_cross_height_comparison",
+  "classification": "canonical_experiment",
+  "started_at": "2026-08-23T09:45:48.471077+00:00",
+  "completed_at": "2026-08-23T09:46:15.193307+00:00",
   "status": "complete",
+  "git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
+  "producing_git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
+  "git_dirty": true,
+  "experiment_spec_sha256": "64b4fe387d81a1a374d963cdc977806ff3ecf79e2bdaed496a207b96f2028166",
   "precision": {
     "dps": 80
   },
@@ -56,97 +61,96 @@
       "flint": true
     }
   },
-  "data_provenance": {
-    "schema_version": "2",
-    "zeros_first_100_reference": {
-      "source_name": "Andrew Odlyzko: Tables of zeros of the Riemann zeta function (zeros1)",
-      "source_author_or_org": "Andrew Odlyzko / University of Minnesota Digital Technology Center",
-      "source_url": "http://www.dtc.umn.edu/~odlyzko/zeta_tables/zeros1",
-      "retrieved_at": "2026-08-22",
-      "stated_precision": "9 decimal digits, accurate to within 3*10^(-9)",
-      "precision_digits": 9,
-      "vendored_count": 100,
-      "first_ordinate": "14.134725142",
-      "last_ordinate": "236.524229666",
-      "file_path": "data/zeros_first_100_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
-    },
-    "zeta_zeros": {
-      "source_name": "mpmath.zetazero reference snapshot",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-19",
-      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
-      "vendored_count": 200,
-      "first_ordinate": "14.13472514173469379045725198356247027078",
-      "last_ordinate": "396.3818542225921869319994544917305290638",
-      "file_path": "data/zeros_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
-      "preparation_script": "scripts/fetch_reference_zeros.py"
-    },
-    "zeta_zeros_baseline": {
-      "source_name": "mpmath.zetazero reference snapshot",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-19",
-      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
-      "vendored_count": 200,
-      "first_ordinate": "14.13472514173469379045725198356247027078",
-      "last_ordinate": "396.3818542225921869319994544917305290638",
-      "file_path": "data/zeros_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
-      "preparation_script": "scripts/fetch_reference_zeros.py"
-    },
-    "canonical_blocks": {
-      "source_name": "mpmath.zetazero high-precision spectrum blocks",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-21",
-      "stated_precision": "80 decimal digits (numerical root refinement)",
-      "file_path": "data/canonical_blocks.json",
-      "format": "json dictionary of blocks with exact decimal strings",
-      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
-    },
-    "primes": {
-      "source": "locally generated",
-      "algorithm": "Deterministic Sieve of Eratosthenes",
-      "max_x": 4999,
-      "count": 669,
-      "file_path": "data/primes.json",
-      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
-    },
-    "tau": {
-      "symbolic": "2*pi",
-      "source": "high-precision library",
-      "library": "mpmath",
-      "precision_digits": 80
-    }
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
   },
-  "code_modules": {
-    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
-    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+  "source_code_hashes": {
+    "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
-    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887",
-    "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19"
+    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "code_modules": [
+    {
+      "path": "certification.py",
+      "sha256": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19"
+    },
+    {
+      "path": "transforms.py",
+      "sha256": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7"
+    },
+    {
+      "path": "reference_data.py",
+      "sha256": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5"
+    },
+    {
+      "path": "math_core.py",
+      "sha256": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9"
+    },
+    {
+      "path": "transcendental.py",
+      "sha256": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+    },
+    {
+      "path": "converter.py",
+      "sha256": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a"
+    },
+    {
+      "path": "research_runner.py",
+      "sha256": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a"
+    },
+    {
+      "path": "zero_finder.py",
+      "sha256": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+    }
+  ],
+  "data_provenance": [
+    {
+      "path": "data/zeros_reference.json",
+      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909"
+    },
+    {
+      "path": "data/zeros_first_100_reference.json",
+      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
+    },
+    {
+      "path": "data/canonical_blocks.json",
+      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
+    },
+    {
+      "path": "data/primes.json",
+      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+    }
+  ],
   "consumed_certificates": [
-    "12f70ee41162bfe03cff1241164aab5e1c51e46e02176c2043a028f074c4f493",
-    "1e438903725342a2821341a41cb0d7b7532ef48bdfdf75647a8741a00ff9834d",
-    "4c6d1b61e1c173e75e25fa9eb5c8ef42237385330e825224667e9b4d2b0beb06",
-    "6313a0fbaa0a787c11b80a09fe77795d7275adaafe383dec2c803f1403197d67",
-    "7e28032d9ccbd18d237de3f8fc528cbd053f035bc2eaaabb79b3db13005c3c22",
-    "95eaed642e3a72f5cb9319cad777bedf43f272244c11d1ece3719add01516f17",
-    "ac2786fa6e8bf70725decb1d79bd13f15d232b3271c59353ee04275cff0c48d1",
-    "b472edd971863a626d3601024d394f02fb1fe0e059ff9d5243324b8e0466d4fe",
-    "dae37327f7e1b9591b8da70e1ab5eec28759742c4cbab9ba04100fe7f65b3568",
-    "e5ea38e03e8d13b04bf8edcd7806876d5eb81c498d63d69490f8c286ac0a9e93",
-    "ebf31b28d846ba9f480958eb952640ffa6b59e678b4dbae281f34b3f6b3a5193",
-    "fd2fbd7a3a718f1ebdb9ae8a06f512d7adb8265968a12c577d02030378a1d771"
+    "1aee49d721ebbc43da8d7a2f9ed0c4631d4177c447af5580ca32c93f854d0dff",
+    "20ba6d8b1d7549c711b3ada8460fd7273914164a874d25c02b4c9a73113aaab9",
+    "3b23a769dfce11d16aca9b7977e3bec03c367254ffb7ea6e9486280ca1f061b9",
+    "496eabc471a72574755f179f6731810cfbe19af398f720d5d034e7fcdb11f352",
+    "6d6a1ee8ee1225bf7f590477509ce2ad6f6a9b2ae3affdd2c2f301209c6677a5",
+    "741dadf47d6e4e16f781298684c9494ed02010e4b66f71eded0576abafaa3253",
+    "89bbcccc0617cafe565a783af371c4b2fc6470dd0febfeccc5f01374e425d140",
+    "95d152cc32c3bbfa8a6a4d651ccd6292b46bb8547a2c86bcedf0623658887c6e",
+    "a94f55c788a1dcc20d56d05405cfa57b424f5eb48c01a8c7d2aa2bf9d636d635",
+    "df65da4e719445de1d847d93deb06e9eb4f9a5805d52b61731ab7b8e0b79b09a",
+    "e6e9885037f140f4995f7e34ee2f783631983fbf208fe4696f95959cad3557ae",
+    "e73fcaf53f184f3331f028304c0a02096ea4d7926ed91dbd87b16dd51d18999f"
   ]
 }

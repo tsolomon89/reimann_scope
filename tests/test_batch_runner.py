@@ -26,6 +26,7 @@ import pytest
 import mpmath
 
 import research_runner
+import certification
 import math_core
 import transforms
 
@@ -1091,3 +1092,69 @@ def test_operation_obligations_adversarial_rejections():
         assert not ok3
         assert any("synthetic" in e.lower() or "delta" in e.lower() for e in errs3)
 
+
+def test_validate_manifest_rejects_source_worldline_root_mismatch():
+    """Test that validate_manifest fails if source zero cert and worldline cert belong to different zeros."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    z2_path = os.path.join(root, "data", "certificates", "zeros", "zero_00002.json")
+    wl1_path = os.path.join(root, "data", "certificates", "worldlines", "worldline_z00001_Kp1_delta_pos0p00.json")
+
+    if os.path.exists(z2_path) and os.path.exists(wl1_path):
+        with open(z2_path, "r", encoding="utf-8") as f:
+            z2 = json.load(f)
+        with open(wl1_path, "r", encoding="utf-8") as f:
+            wl1 = json.load(f)
+
+        h_z2 = z2["certificate_hash"]
+        h_wl1 = wl1["certificate_hash"]
+
+        spec = {
+            "id": "transcendental_worldline_test",
+            "epistemic_class": "exact_control",
+            "precision": {"dps": 50},
+            "engine": {"operation": "transcendental_worldline"},
+            "criterion": {"metric": "worldline_defect", "operator": "<=", "threshold": 1e-15},
+            "metrics": [{"name": "worldline_defect", "criterion": {"operator": "<=", "threshold": 1e-15}}]
+        }
+        manifest = {
+            "schema_version": "2",
+            "experiment_id": "transcendental_worldline_test",
+            "status": "complete",
+            "precision": {"dps": 50},
+            "points_requested": 1,
+            "points_completed": 1,
+            "git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
+            "git_dirty": False,
+            "dependency_fingerprint": certification._get_dependency_fingerprint(),
+            "consumed_certificates": [h_z2, h_wl1]
+        }
+        results = [
+            {
+                "point_id": 0,
+                "status": "ok",
+                "inputs": {"zero_index": 1, "grade_k": 1, "delta": "0.0"},
+                "outputs": {
+                    "source_zero_cert_hash": h_z2,
+                    "worldline_cert_hash": h_wl1,
+                    "worldline_certified": "true",
+                    "worldline_certificate_status": "certified",
+                    "source_zero_certificate_status": "certified",
+                    "worldline_defect": "1e-30"
+                }
+            }
+        ]
+
+        ok, errs = research_runner.validate_manifest(manifest, results=results, spec=spec)
+        assert not ok
+        assert any("source_zero_hash" in e.lower() or "source_zero_index" in e.lower() for e in errs)
+
+
+def test_validate_run_bundle_canonical_runs():
+    """Test that validate_run_bundle verifies all canonical runs in research/runs/."""
+    runs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "runs")
+    if os.path.exists(runs_dir):
+        for r in os.listdir(runs_dir):
+            r_path = os.path.join(runs_dir, r)
+            if os.path.isdir(r_path) and not r.startswith("."):
+                ok, errs = research_runner.validate_run_bundle(r_path)
+                assert ok, f"Canonical run bundle '{r}' failed validation: {errs}"

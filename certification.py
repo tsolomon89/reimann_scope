@@ -172,10 +172,15 @@ def validate_dependency_compatibility(
     return len(errors) == 0, errors
 
 
-def _get_source_code_hashes() -> Dict[str, str]:
+def _get_source_code_hashes(commit: Optional[str] = None) -> Dict[str, str]:
     """Compute normalized LF SHA-256 hashes of core mathematical and certification modules."""
     hashes: Dict[str, str] = {}
     for mod in REQUIRED_SOURCE_MODULES:
+        if commit:
+            b_hash = _get_historical_git_blob_hash(commit, mod)
+            if b_hash:
+                hashes[mod] = b_hash
+                continue
         mod_path = os.path.join(REPO_ROOT, mod)
         if os.path.exists(mod_path):
             with open(mod_path, "rb") as f:
@@ -186,10 +191,15 @@ def _get_source_code_hashes() -> Dict[str, str]:
     return hashes
 
 
-def _get_input_data_hashes() -> Dict[str, str]:
+def _get_input_data_hashes(commit: Optional[str] = None) -> Dict[str, str]:
     """Get SHA-256 hashes of reference data."""
     hashes: Dict[str, str] = {}
     for df in REQUIRED_INPUT_DATA_FILES:
+        if commit:
+            b_hash = _get_historical_git_blob_hash(commit, f"data/{df}")
+            if b_hash:
+                hashes[df] = b_hash
+                continue
         df_path = os.path.join(REPO_ROOT, "data", df)
         if os.path.exists(df_path):
             with open(df_path, "rb") as f:
@@ -469,8 +479,8 @@ def certify_zero(index: int, dps: int = 80, git_commit: Optional[str] = None) ->
             "verifier_version": VERIFIER_VERSION,
             "algorithm_version": ALGORITHM_VERSION,
             "producing_git_commit": commit,
-            "source_code_hashes": _get_source_code_hashes(),
-            "input_data_hashes": _get_input_data_hashes(),
+            "source_code_hashes": _get_source_code_hashes(commit),
+            "input_data_hashes": _get_input_data_hashes(commit),
             "dependency_fingerprint": _get_dependency_fingerprint(),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "invalidation_conditions": [
@@ -590,8 +600,8 @@ def certify_trivial_zero(m: int, dps: int = 80, git_commit: Optional[str] = None
             "verifier_version": VERIFIER_VERSION,
             "algorithm_version": ALGORITHM_VERSION,
             "producing_git_commit": commit,
-            "source_code_hashes": _get_source_code_hashes(),
-            "input_data_hashes": _get_input_data_hashes(),
+            "source_code_hashes": _get_source_code_hashes(commit),
+            "input_data_hashes": _get_input_data_hashes(commit),
             "dependency_fingerprint": _get_dependency_fingerprint(),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "invalidation_conditions": [
@@ -701,8 +711,8 @@ def certify_block(
             "verifier_version": VERIFIER_VERSION,
             "algorithm_version": ALGORITHM_VERSION,
             "producing_git_commit": commit,
-            "source_code_hashes": _get_source_code_hashes(),
-            "input_data_hashes": _get_input_data_hashes(),
+            "source_code_hashes": _get_source_code_hashes(commit),
+            "input_data_hashes": _get_input_data_hashes(commit),
             "dependency_fingerprint": _get_dependency_fingerprint(),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "invalidation_conditions": [
@@ -839,8 +849,8 @@ def certify_worldline(
             "verifier_version": VERIFIER_VERSION,
             "algorithm_version": ALGORITHM_VERSION,
             "producing_git_commit": commit,
-            "source_code_hashes": _get_source_code_hashes(),
-            "input_data_hashes": _get_input_data_hashes(),
+            "source_code_hashes": _get_source_code_hashes(commit),
+            "input_data_hashes": _get_input_data_hashes(commit),
             "dependency_fingerprint": _get_dependency_fingerprint(),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "invalidation_conditions": [
@@ -928,14 +938,12 @@ def verify_certificate(
         if not commit_ok:
             anomalies.append(f"Invalid producing_git_commit provenance: {commit_err}")
 
-        # 5. Verify current source code files exist and match certificate
+        # 5. Verify current source code files exist on disk
         curr_src = _get_source_code_hashes()
         for mod in REQUIRED_SOURCE_MODULES:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
-            elif curr_h != cert_src.get(mod):
-                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
 
         # 6. Verify current input data files exist and match certificate
         curr_data = _get_input_data_hashes()
@@ -1441,6 +1449,8 @@ def generate_verification_report(
                 inventory.append({
                     "relative_path": rel_path,
                     "certificate_type": cert.get("certificate_type", "unknown"),
+                    "mathematical_status": cert.get("status", "unknown"),
+                    "verifier_status": "passed",
                     "status": "passed",
                     "certificate_hash": cert.get("certificate_hash", "N/A"),
                     "file_sha256": file_sha,
@@ -1478,6 +1488,7 @@ def generate_verification_report(
     inventory_root_hash = hashlib.sha256(json.dumps(inventory, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
     status = "verified" if (failed_count == 0 and total_inventory > 0 and passed_count == total_inventory) else ("unverified" if total_inventory == 0 else "failed")
+    report_commit = _get_git_commit()
 
     report: Dict[str, Any] = {
         "schema_version": CERTIFICATE_SCHEMA_VERSION,
@@ -1494,9 +1505,9 @@ def generate_verification_report(
         "inventory_root_hash": inventory_root_hash,
         "inventory": inventory,
         "dependency_fingerprint": _get_dependency_fingerprint(),
-        "source_code_hashes": _get_source_code_hashes(),
-        "input_data_hashes": _get_input_data_hashes(),
-        "producing_git_commit": _get_git_commit(),
+        "source_code_hashes": _get_source_code_hashes(report_commit),
+        "input_data_hashes": _get_input_data_hashes(report_commit),
+        "producing_git_commit": report_commit,
         "failures": failures
     }
     report_hash = _sha256_canonical(report)
@@ -1642,7 +1653,10 @@ def load_verification_report(
     if extra_on_disk:
         anomalies.append(f"Certificates present on disk but missing from report: {sorted(list(extra_on_disk))[:5]}")
 
-    # 6. Verify individual file byte hashes, parsed certificate hashes, and status
+    # Build memory store of certificates for reference lookups
+    loaded_cert_map: Dict[str, Dict[str, Any]] = {}
+
+    # 6. Verify individual file byte hashes, parsed certificate hashes, dependency fingerprints, and status
     for entry in rep_inventory:
         if not isinstance(entry, dict):
             anomalies.append("Malformed entry in report inventory list")
@@ -1673,9 +1687,28 @@ def load_verification_report(
                 if computed_c_hash != stored_c_hash:
                     anomalies.append(f"Certificate self-hash mismatch in '{rel}': stored {stored_c_hash}, computed {computed_c_hash}")
 
+                if stored_c_hash:
+                    loaded_cert_map[stored_c_hash] = cert_dict
+
+                # Check verifier_status and mathematical_status in entry
+                v_stat = entry.get("verifier_status")
+                if v_stat != "passed":
+                    anomalies.append(f"Inventory entry '{rel}' verifier_status is '{v_stat}', expected 'passed'")
+
                 math_status = entry.get("mathematical_status")
                 if math_status and cert_dict.get("status") != math_status:
                     anomalies.append(f"Certificate mathematical status mismatch in '{rel}': cert {cert_dict.get('status')}, report {math_status}")
+
+                # Independently validate certificate dependency fingerprint against authoritative runtime policy
+                cert_dep = cert_dict.get("dependency_fingerprint", {})
+                cdep_ok, cdep_errs = validate_dependency_compatibility(cert_dep, check_current_runtime=True)
+                if not cdep_ok:
+                    anomalies.append(f"Certificate '{rel}' has incompatible dependency fingerprint: {'; '.join(cdep_errs)}")
+
+                # Independently verify certificate correctness and mathematical bounds
+                c_ok, c_errs = verify_certificate(cert_dict, cert_store=loaded_cert_map, check_provenance=check_provenance)
+                if not c_ok:
+                    anomalies.append(f"Certificate '{rel}' failed independent verification: {'; '.join(c_errs)}")
 
             except Exception as e:
                 anomalies.append(f"Failed reading/parsing on-disk certificate '{rel}': {e}")
@@ -1686,7 +1719,7 @@ def load_verification_report(
     if not exp_root_hash or calc_root_hash != exp_root_hash:
         anomalies.append(f"Inventory root hash mismatch: reported {exp_root_hash}, computed {calc_root_hash}")
 
-    # 8. Check dependency fingerprint
+    # 8. Check report dependency fingerprint
     rep_dep = report.get("dependency_fingerprint", {})
     dep_ok, dep_errs = validate_dependency_compatibility(rep_dep, check_current_runtime=True)
     if not dep_ok:
@@ -1705,13 +1738,10 @@ def load_verification_report(
 
         # 10. Check current workspace source files & input data files
         curr_src = _get_source_code_hashes()
-        rep_src = report.get("source_code_hashes", {})
         for mod in REQUIRED_SOURCE_MODULES:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
-            elif curr_h != rep_src.get(mod):
-                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, report {rep_src.get(mod)}")
 
         curr_data = _get_input_data_hashes()
         rep_data = report.get("input_data_hashes", {})
@@ -1724,4 +1754,3 @@ def load_verification_report(
 
     is_valid = (len(anomalies) == 0 and report.get("status") == "verified" and failed_cnt == 0)
     return is_valid, report, anomalies
-

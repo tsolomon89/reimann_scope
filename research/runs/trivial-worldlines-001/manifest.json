@@ -2,12 +2,17 @@
   "schema_version": "2",
   "run_id": "trivial-worldlines-001",
   "experiment_id": "trivial-worldlines-001",
-  "experiment_spec_sha256": "5f7b236e22f104e57d04d19e7604caa4a4b30b72c2444bd94fa92e3fb6193f01",
-  "git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
-  "git_dirty": false,
-  "started_at": "2026-08-23T08:07:40.927942+00:00",
-  "completed_at": "2026-08-23T08:07:41.410520+00:00",
+  "title": "Trivial Zero Transcendental Continuation Worldline Invariant Sweep",
+  "epistemic_class": "exact_control",
+  "object_relationship": "same_object_coordinate_control",
+  "classification": "canonical_experiment",
+  "started_at": "2026-08-23T09:47:27.074827+00:00",
+  "completed_at": "2026-08-23T09:47:27.757872+00:00",
   "status": "complete",
+  "git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
+  "producing_git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
+  "git_dirty": true,
+  "experiment_spec_sha256": "5f7b236e22f104e57d04d19e7604caa4a4b30b72c2444bd94fa92e3fb6193f01",
   "precision": {
     "dps": 80
   },
@@ -54,145 +59,144 @@
       "flint": true
     }
   },
-  "data_provenance": {
-    "schema_version": "2",
-    "zeros_first_100_reference": {
-      "source_name": "Andrew Odlyzko: Tables of zeros of the Riemann zeta function (zeros1)",
-      "source_author_or_org": "Andrew Odlyzko / University of Minnesota Digital Technology Center",
-      "source_url": "http://www.dtc.umn.edu/~odlyzko/zeta_tables/zeros1",
-      "retrieved_at": "2026-08-22",
-      "stated_precision": "9 decimal digits, accurate to within 3*10^(-9)",
-      "precision_digits": 9,
-      "vendored_count": 100,
-      "first_ordinate": "14.134725142",
-      "last_ordinate": "236.524229666",
-      "file_path": "data/zeros_first_100_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
-    },
-    "zeta_zeros": {
-      "source_name": "mpmath.zetazero reference snapshot",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-19",
-      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
-      "vendored_count": 200,
-      "first_ordinate": "14.13472514173469379045725198356247027078",
-      "last_ordinate": "396.3818542225921869319994544917305290638",
-      "file_path": "data/zeros_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
-      "preparation_script": "scripts/fetch_reference_zeros.py"
-    },
-    "zeta_zeros_baseline": {
-      "source_name": "mpmath.zetazero reference snapshot",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-19",
-      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
-      "vendored_count": 200,
-      "first_ordinate": "14.13472514173469379045725198356247027078",
-      "last_ordinate": "396.3818542225921869319994544917305290638",
-      "file_path": "data/zeros_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
-      "preparation_script": "scripts/fetch_reference_zeros.py"
-    },
-    "canonical_blocks": {
-      "source_name": "mpmath.zetazero high-precision spectrum blocks",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-21",
-      "stated_precision": "80 decimal digits (numerical root refinement)",
-      "file_path": "data/canonical_blocks.json",
-      "format": "json dictionary of blocks with exact decimal strings",
-      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
-    },
-    "primes": {
-      "source": "locally generated",
-      "algorithm": "Deterministic Sieve of Eratosthenes",
-      "max_x": 4999,
-      "count": 669,
-      "file_path": "data/primes.json",
-      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
-    },
-    "tau": {
-      "symbolic": "2*pi",
-      "source": "high-precision library",
-      "library": "mpmath",
-      "precision_digits": 80
-    }
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
   },
-  "code_modules": {
-    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
-    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+  "source_code_hashes": {
+    "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
-    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887",
-    "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19"
+    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "code_modules": [
+    {
+      "path": "certification.py",
+      "sha256": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19"
+    },
+    {
+      "path": "transforms.py",
+      "sha256": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7"
+    },
+    {
+      "path": "reference_data.py",
+      "sha256": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5"
+    },
+    {
+      "path": "math_core.py",
+      "sha256": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9"
+    },
+    {
+      "path": "transcendental.py",
+      "sha256": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+    },
+    {
+      "path": "converter.py",
+      "sha256": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a"
+    },
+    {
+      "path": "research_runner.py",
+      "sha256": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a"
+    },
+    {
+      "path": "zero_finder.py",
+      "sha256": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+    }
+  ],
+  "data_provenance": [
+    {
+      "path": "data/zeros_reference.json",
+      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909"
+    },
+    {
+      "path": "data/zeros_first_100_reference.json",
+      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
+    },
+    {
+      "path": "data/canonical_blocks.json",
+      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
+    },
+    {
+      "path": "data/primes.json",
+      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+    }
+  ],
   "consumed_certificates": [
-    "01cad945d7a900a6fe744885a651f936ce092dcc2ce78f24025a8708957fbaa0",
-    "0e490935ebd2ac3eab15898357c7fcee5743c24d8d91ddb183e17048ca84c1c5",
-    "0e5368271954f604312e2100104635a8e26b848762868b52be1f72c93c1a431a",
-    "11c88a1d8eb3bd12c5a9eb5af2205f3325278cc82d2df3ce86cba0f7789fb5c2",
-    "125faeb2d1b839ddc18f57fb5e62c70d23b00d8fa858dc91ba89e39c8db27488",
-    "190d45ca68fef5492fbcea92b9477ff4b29d5f21072ba3c642da83697980658d",
-    "1ab3b25c0c0a5bdbe0d6d297c1567a7d9df5bfeee298d123bbcc85ea820e67b7",
-    "1bdcbe86b36125f3e2bb9a16cc9a133f22c7ec67492c335881e50e4c40f7ab28",
-    "1d56f8b70e19a042212167c444314a383c6c3a904cfaf1620e4644822a25cb14",
-    "1e78ed3799e6f73c4ccfdb0dafb6b046fe0d2c972261363eb72be0591aa585ad",
-    "22280c25e65fb3b35da40abd45a264db5ee88af9d911619436d805e856dc19bb",
-    "2b50485d1b775ff0770044c8d9dc2fa7a7395c6a01f414735ac651a95f7b2670",
-    "3604b21f21ecb4f3e9e60688d0c77f346168c2ac838f90d35ad1612672d0d393",
-    "3d7a65da658e674dbba03465482b82eedd631ab59b2f9ba29714763989f57f39",
-    "3ea26769e260e9fd2f8fc282bddd48f1169efb54ccee2b75d9819054fb737c37",
-    "3ffa649d8593e94151b15bff6e140ccd3eebdfd0567649847fcd607555d74080",
-    "487e3c0b6df14d340ef84733454c1949b020fa3f79f0c365230f1488d0617f79",
-    "4b9c39d4d6418fb633d1c76af119713be8885eaac418d2beba44ebdb45a2d2f6",
-    "4db39d099e6a7b4378fc25b27acf091133b0092944f56a4daf40820ccb2da132",
-    "5032222d3897cfc478e7b86b41c44d963ccbfa311ab12957be4947f831ffd28a",
-    "503e0d1d3511a45e5bd18bc5e6c2c3df884f57ec970c5e3450679cfc9c2fb2c3",
-    "5e04fb8d7c7e001feec55cdfda191e828ebb696de2cbe24fd5c45aa813d0d938",
-    "5fde6ab1c68f09f665179cd1fa099bf29fc7f2814d86fc9fe2992881b3555546",
-    "634feacb269d88bde50745adea681a328e39f242cb5712e335ec24b887983254",
-    "678b8f56b0d056f58564cb1588b09bc4a6d23d36cc87d11b303129455f7f6c57",
-    "681b6eb1c19f8b97632688d88310af0df602e605bb763e1b0320c1a4cbe9dbfd",
-    "699572ba006712e97606cbc771b0e72568e9874d767ef07c0620abe40e95dcd9",
-    "6e623909f44a2526464d9c38495d764fe4b29cde130371b4f717a86e1251de38",
-    "76fad09752babf1505d1cfda3051788de679768cfd211c086579bb350a6d7607",
-    "78fc9339662d0abc273e8a98cc1263a91112f24b2d769b8a490bdd0a67286244",
-    "7c769e1b2c563d0b8d89f3c31af698e74c45628478a6018a29f6f227cea870bc",
-    "7f65b8f0ade9b582c1c71bbfe04f2768d92a6bca76194bbdaec9cbf844ce6d06",
-    "8cc44ad07c27c228f97f9b0911d69557fc183b0a466287a3e81c5f70a17375f9",
-    "937b7268fbd9f1a20cb5a4a9f108939be91e3c97e7f49e2f632d1ce6df8adfb4",
-    "a340827d4f8dacd296dae1f7d3fea74f0419a6fd2417b173bb44d925e935e79b",
-    "ae074d6a9d9b41d56a29bca000e5667d6fe5d1a126f94a90ee710d30453c7f8b",
-    "b154a4506f487e973e06203ccd4e629782f6f74b76afc09fa2d48b856d64ec6d",
-    "b6e24091065da4ad48ac4296ecf71b8148a56753b27aa44f52bc46742a024f06",
-    "ba0c4ea7f53f0f8fdbdfa54497c0179ba5445eeb9bf8d278053ea6faa48d0776",
-    "bc8e5323fcf93f948ee636f63de900043c45479c9e246a83c434a2198fdab848",
-    "c290382860f6d3139a826d574a656c7e97e90518973dce6f4dbcb72f9c4833dd",
-    "c2a342419ee09d57bc1517cdc8bdc46418cfc3fb4047ecb237df8dd6b9626abd",
-    "c37f7e500f402696a3e55b831c4756a8af02b340fe68178226d262c98116a36e",
-    "c8a580ca07772453eedc31606c6e531c46db8af89b0d8c75551d09bbebc4f465",
-    "ca82b7491a9246cbf4c99c646f39b9866c106c723de7d87a87fc2ccd2478ce5e",
-    "d03439f8afc83d0440eb9e557ba5f06a050cfa6784fb0d58a10d1c581c56b640",
-    "d092882b4035d4b89e6e65f294616ce82c858f06dced08fe38ac886cb775577f",
-    "d210c26ee9da2dbaf5511460792138d3d7095244a333e8652ace6a5699c75b17",
-    "d2974927d89f82d8199155ac92300773424e6e19efeedcefe072d558a0c50415",
-    "d4a6b43bfe0f7bf3dd0b004b189445abb71c07db3a0d51085500d1e26007a3f7",
-    "d5a144a2c7c5e969a90c3ed3107d8cb2f0de3b5828e3ca879e12c3329dd9cac6",
-    "d5df081df220cef196a28cf9937ac939feea6a2f98441903d553f8dd4a8ed236",
-    "d8d3f1aa720e3f1f225bb06d54e71c089815f6e562cc47155c77b7d2e5192b77",
-    "daba13b65982eadacc29f2b7cd6b3301d7d2fde4121559247d7a8855d8660339",
-    "db9127b0531441adae335a3fa8f878f08f5dbc335ec90fdefd4415099ebc783d",
-    "e2f08dd6e31da0467e0696f0d29fe2d63d0ec54fe768631f75d8024e67fce7ef",
-    "e4ea676e59445c0382434fea421911c36354f9e81afae7ee3f2205b65ed252a2",
-    "f04b46eb1f06f72b08d2a2c6463f15ae6ec981133a3946b7b63e035505fa2038",
-    "f9b1b823ac41f681f58eab3e095ed7270f4881517491f71424077fe555e32612",
-    "ffb8d92099bbe05903467b1afdebf4464ce7b32ae0b4f41f7cfa0f8cc47510f8"
+    "0550e82d699f0fe1c2ff3a43c5fffcb128f411c443d984fbc40f9f3a7b0e6213",
+    "0e27d9b42063df357bd50f63617dd5d1a34cbdb7adfea83b0d84ec55c16a4299",
+    "0e42a47c24f60b2a2f879f15cf5bd27e2f4dcbdccdc6310deb14ff0a04e6f7ce",
+    "133635b04753e9691a3ae6c89c22bbb8dc19f5a15417d583e180382a9e3b364a",
+    "1550f2c29c05fbeeee28776dfc803201e51479dad47f15d49262e5ff66c232ab",
+    "16057b353f579751ce02f85c765b70b19db19b03a40c1e9a0ad8ca8864be50e6",
+    "182ce862e6238b34d2b3d710dda744cb6a9939e2fdb47f033bdf0d78ed85fdc0",
+    "1bedbf29c8aa8b75937273bead5a7ac22783cf88b1c66d3badae9b3151be94cb",
+    "1c03a06ea2983ae06ebc461f3bf39a7fa6e893c210ccc17c563e076e3873f7a7",
+    "25a16adc213594d1c9d43429f841de50d8f2a6e0daf3ca2406da803c4f1d67b3",
+    "2755612742f2d100a903558b60ec4586d3d9d4e6d98f28c1c793ca468cf3ad07",
+    "2b1d73f6d7fdb4b82a601decc741b60688dff228deb7b0c3733b5e27f59af90f",
+    "318ebe06f28ae90b57359cafcbe95870e7683f828211aadc9c4f469355990b6b",
+    "3325436acb589fcc981b5fa606b1f0c6876ec1f5bf4c7b698e8d1caaa5870cf3",
+    "388c45ede1f54ae68cf37e55dec39abdc7ffb6c6612e1a36d417669165f4ad88",
+    "3a398bec3c35e74ca999c10b8d763a72cd12b259f62b598312758c4375582b3c",
+    "3c92cac201cb57f302c7e0e9dfdce59f4bd0614815dc0dc21260a0490116aab4",
+    "3e512198ada89aa1166d4164bf96f3e8135d479f9aa741099c6126c14e3c30d0",
+    "3f629580774224c0307477cca33e8781f717067a7daeba5eb5fce0012b1ad5fd",
+    "45cd76f942b8db461a49ec7b2c830df00f654b36fc5c9016e61808157d21013f",
+    "4d8e0ef7fa1d106109b2528d0c60337d31c772bc745ca28459d719892d19d19c",
+    "4ec0c6736a684f1b36786b105f995107b4c310f5a3786ebebf9fb180e70c6309",
+    "50f2eb0593258d198596a7a0cff9dd459dc22a710836666d3262c6388337b654",
+    "53234ba7f126bcf6105f71c30daa6f03c0ba8cc60409b9fd9a869aa0a833cccf",
+    "5537ec89cf9b2158330e34a63d07fc550da369057d5e652c8205790f1321b6e0",
+    "5668c18fd27a9560fac1a77cbb6211b7c4f932d16e8cfdc05b8a5e4d826b0ee7",
+    "6340130c40437ac1d4dec7f5627bc55e5db8464a705e4db893aaa39be7f9b44a",
+    "6ff5c3f45962b8f32946485badd6ec01f50497d87b2cd93bcbbf702b09c43710",
+    "766f5aeab0da29146e0060431322b9560cc037acaa580f040d624f881cbf201a",
+    "770ab7c4ef4760b5960771d130c7114dcb1ccfe7b640b89e5e07cd3b57680435",
+    "7e7b0563ae7c734fe20a208114ea206a7173a98105712e1dbe8b43eebdb390aa",
+    "8059898f60f7710ec8989b36973de8eefa559f2c82e672d4ec966e416f7c87b8",
+    "834e7fa9f8a76d4a192f21fab18b6d34b5ab874ea5a70543aa31a8bd12c7b3c8",
+    "85e96308b14b2b33da219d95fc316808f5ca681ac3c0c32a6a3ad8b0550768b5",
+    "89f7002cf39f8c77dbb0e94aa0556c936fe07b418ad4915ff66c26378326fc99",
+    "8fc5b43f9e05bb4eadba6894ef95cdb8fabad47496f950707cb9449ad064923e",
+    "9ca587243f186260112ae310ed50468e002cbc3be8c5e7ae8671f15dac045fd7",
+    "a191e5ff6695936f68fb080752a4aa1c9bf0a269963678228ce76f752d4dc0c3",
+    "a25ac9e160c9fededb42190624e2579cbe8c43c8e053283dc94f9c082f11df19",
+    "a6010d7079b0c63dc4f549bf7d8a624584ee9074884729deee33cd71a82d105b",
+    "a77f395da7cb197e1e5f5809ee4797442932f7aeda34c42d56312fe6dbd8fde4",
+    "a8decb9ce707bee5b447b6f9235f914ccf1ebcd5c5eca76fa2258d4c25e8643a",
+    "b55f8ce08b3b0b531cb2043aff55bfcf6cb5b3ee723aa2a4e2210a6c3fc9dcbb",
+    "b584baf48fff739b8fbbe2ba745cf377a59bb2e84015886c631a999f8c42cd76",
+    "b73633dca76df826bb58f105a74ce72c252f04a0eda3dc9d481aac0b64025b7f",
+    "beffbb8ae60bb3b28c4e2bb7342234d713a433b01541b670b74294932427f15c",
+    "c8350cddbfb82e622b9ace0efb64d6ac6e5153ff116a541a5cb6779bb2355405",
+    "cf14b099fb94403b72859df8ec51d8eddec1a1132cb96e2fda4f5d0e387c6ad2",
+    "d150de0b056414a7603d5b385e8e8a98dcee9a7bd5e2dac625de17e5693748b2",
+    "d2c5411ca9af43fd25bf2b4fbbbf6e13903def7f121cbe1792d095b1a681fca0",
+    "d4256524041546f653e1f5b6fbdbecd45ea3134ad22f81f9c55eed9a5962b016",
+    "d9c8e6c70dfcbfd3c20c17cceed59bfcfbee7e8ce28cfd4b8ad5ef4eec6701f5",
+    "de111322f19f2726ff63d6cff84395364f2176898ad03aaa53cea59c5b36a847",
+    "e37f31678a58f6bd8dd3238dbb1df6104a999989a9f27efe59c96d007e050dde",
+    "e52236ada9e01bb570883ee19cbbb01f5045cb31378109e0cddcc946273ab1b9",
+    "e645ef57c639abd13a295834586bcc3aa7ba2c53fb503497e162c22dd28bbd74",
+    "e8b1bfc588798ccbc35569ad4336a580785ce009d598d159cff23844b76c94c3",
+    "e9047795844f340b6359b77f3c753d3e81e1039caeab48d3f5345bd4f9d64acc",
+    "eadbc958de27de81c1b270733962fca7840d1c1af545451bf53c70b6b1721159",
+    "f6408f2fafd8ae20a453ad6480f9756e4c30b316089c1aaf3f34bfe446ee93a3"
   ]
 }

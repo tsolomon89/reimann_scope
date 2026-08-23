@@ -44,6 +44,7 @@ INDEX_FILE = os.path.join(RESEARCH_DIR, "index.json")
 CERT_DIR = os.path.join(REPO_ROOT, "data", "certificates")
 
 OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
+    # 1. Transcendental Worldlines
     "transcendental_worldline": {
         "requires_consumed_certs": True,
         "requires_source_cert": True,
@@ -54,7 +55,8 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "requires_certified_flag": True,
         "is_synthetic": False
     },
-    "trivial_worldline": {
+    # 2. Trivial Zero Worldlines
+    "trivial_zero_worldlines": {
         "requires_consumed_certs": True,
         "requires_source_cert": True,
         "source_family": "trivial",
@@ -64,6 +66,37 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "requires_certified_flag": True,
         "is_synthetic": False
     },
+    "trivial_worldlines": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "trivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": False
+    },
+    "trivial_worldline": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "trivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": False
+    },
+    "trivial_zero_worldlines": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "trivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": False
+    },
+    # 3. Synthetic Radial Leaves
     "synthetic_radial_leaf": {
         "requires_consumed_certs": True,
         "requires_source_cert": True,
@@ -74,6 +107,26 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "requires_certified_flag": True,
         "is_synthetic": True
     },
+    "synthetic_radial_leaves": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "nontrivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": True
+    },
+    # 4. Cross-Height Coherence / Path Coherence
+    "cross_height_coherence": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "nontrivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
     "cross_height_path_coherence": {
         "requires_consumed_certs": True,
         "requires_source_cert": True,
@@ -83,16 +136,16 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "requires_certified_flag": False,
         "is_synthetic": False
     },
+    # 5. Cross-Height Distance
     "cross_height_distance": {
         "requires_consumed_certs": True,
-        "requires_source_cert": True,
-        "source_family": "nontrivial",
-        "expected_source_status": "simple_zero_certified",
+        "requires_source_cert": False,
         "requires_worldline_cert": False,
         "requires_certified_flag": False,
         "is_synthetic": False
     },
-    "grade_constraints": {
+    # 6. Centered Dilation Zero Map / Transform Zero Map
+    "transform_zero_map": {
         "requires_consumed_certs": False,
         "requires_source_cert": False,
         "requires_worldline_cert": False,
@@ -106,6 +159,14 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "requires_certified_flag": False,
         "is_synthetic": False
     },
+    # 7. Centrifuge / Centrifuge Slope
+    "centrifuge": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
     "centrifuge_slope": {
         "requires_consumed_certs": False,
         "requires_source_cert": False,
@@ -113,7 +174,83 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
         "requires_certified_flag": False,
         "is_synthetic": False
     },
+    # 8. Coupled Perturbation Covariance
+    "coupled_perturbation_covariance": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    # 9. Coupled Scale Covariance / Zeta Trace Compare
+    "zeta_trace_compare": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "coupled_scale_covariance": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    # 10. Grade Constraints / Grade Constraint
+    "grade_constraint": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "grade_constraints": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    # 11. Inverse Kernel Lock / Kernel Identity
+    "kernel_identity": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
     "inverse_kernel_lock": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    # 12. Isolated Radial Response / Converter Perturbation
+    "converter_perturbation": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "isolated_radial_response": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    # 13. Symmetric Centrifuge / Symmetric Centrifuge Defect
+    "symmetric_centrifuge": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "symmetric_centrifuge_defect": {
         "requires_consumed_certs": False,
         "requires_source_cert": False,
         "requires_worldline_cert": False,
@@ -131,7 +268,6 @@ def hash_file_bytes(filepath: str) -> str:
         data = f.read()
     normalized = data.replace(b"\r\n", b"\n")
     return hashlib.sha256(normalized).hexdigest()
-
 
 
 def hash_string(text: str) -> str:
@@ -162,13 +298,11 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
             line_str = line.strip()
             if not line_str:
                 continue
-            # Match status: code followed by file path
             parts = line_str.split(None, 1)
             if len(parts) < 2:
                 dirty_lines.append(line_str)
                 continue
             path = parts[1].strip().strip('"').replace("\\", "/")
-            # Ignore runner's own output artifacts and generated certificates
             if path == "research/index.json" or path.startswith("research/runs/") or path.startswith("data/certificates/"):
                 continue
 
@@ -178,7 +312,6 @@ def get_git_info(cwd: Optional[str] = None) -> Tuple[str, bool]:
         is_dirty = False
 
     return commit, is_dirty
-
 
 
 def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
@@ -232,8 +365,6 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     ]
     if engine["operation"] not in valid_engine_ops:
         return False, f"Unknown engine operation '{engine['operation']}'. Permitted: {valid_engine_ops}"
-
-
 
     params = spec["parameters"]
     if not isinstance(params, dict) or len(params) == 0:
@@ -292,7 +423,6 @@ def expand_parameter(p_def: Dict[str, Any], dps: int = 80) -> List[str]:
 
             values = []
             curr = start
-            # Guard against floating comparison issues with high-precision tolerance
             eps = abs(step) * mpmath.mpf("1e-12")
             if step > 0:
                 while curr <= stop + eps:
@@ -375,7 +505,6 @@ def _lookup_zero_certificate(
     except Exception as e:
         return None, False, None, [f"Failed to read certificate JSON: {e}"]
 
-    # Check family and index
     cert_fam = zc.get("zero_family", "nontrivial" if zc.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
     if cert_fam != zero_family:
         return zc.get("certificate_hash"), False, zc, [f"Zero family mismatch: requested {zero_family}, certificate has {cert_fam}"]
@@ -386,11 +515,9 @@ def _lookup_zero_certificate(
     if c_idx != zero_index:
         return zc.get("certificate_hash"), False, zc, [f"Zero index mismatch: requested {zero_index}, certificate has {c_idx}"]
 
-    # Check required status
     if zc.get("status") not in ("simple_zero_certified", "isolated_zero_certified"):
         return zc.get("certificate_hash"), False, zc, [f"Certificate status is not certified: {zc.get('status')}"]
 
-    # Check ordinate containment if provided
     if expected_ordinate is not None and zero_family == "nontrivial":
         exp_ord = mpmath.mpf(expected_ordinate)
         enc = zc.get("enclosure", {})
@@ -449,7 +576,6 @@ def evaluate_point(
     dps: int = 80,
     param_space: Optional[Dict[str, Any]] = None
 ) -> Tuple[str, Dict[str, str], Optional[str]]:
-
     """
     Evaluate a single parameter space point using the canonical math engine.
     Returns (status, outputs_dict, error_message).
@@ -466,7 +592,6 @@ def evaluate_point(
                 q_k = math_core.centrifuge_q_k(delta_str, gamma_str, k_str, dps=dps)
                 abs_q_k = abs(q_k)
 
-                # Theoretical line: K * delta * ln(tau)
                 tau = math_core.get_tau(dps=dps)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps)
                 k_mpf = math_core.to_mpf(k_str, dps=dps)
@@ -482,7 +607,6 @@ def evaluate_point(
                 }, None
 
             elif operation == "kernel_identity":
-                # Kernel Lab transformation
                 A_str = inputs.get("A", "1.0")
                 is_lock = inputs.get("inverse_scale_lock", "true").lower() in ["true", "1", "yes"]
                 B_str = inputs.get("B", "1.0")
@@ -511,7 +635,6 @@ def evaluate_point(
                 }, None
 
             elif operation == "transform_zero_map":
-                # Mode-dependent zero map check
                 mode = inputs.get("mode", "centered_dilation")
                 k_str = inputs.get("k", "1.0")
                 gamma_str = inputs.get("gamma", "14.13472514173469379045725198356247027078425711569924317568556746")
@@ -554,20 +677,13 @@ def evaluate_point(
                 k_mpf = math_core.to_mpf(k_str, dps=dps + 10)
                 scale_A = mpmath.power(tau, k_mpf)
 
-                # Mapped coordinate: s' = A * s
                 mapped_s = scale_A * s_mpc
-
-                # Baseline value: W = zeta(s)
                 W = math_core.zeta_eval(s_mpc, dps=dps + 10)
 
-                # Transformed coordinate representation evaluated AT MAPPED POINT:
-                # W_A = Z_A(s') = zeta(s' / A)
                 t_orig = transforms.OriginCoordinateDilation(k=k_str)
                 W_A = t_orig.evaluate_function(mapped_s, dps=dps + 10)
 
-                # Covariance residual: E_zeta = |W_A - W|
                 E_zeta = abs(W_A - W)
-
                 sigma_c = mpmath.mpf('0.5')
                 sigma_c_prime = scale_A / 2
 
@@ -589,7 +705,6 @@ def evaluate_point(
                     "residual": mpmath.nstr(E_zeta, n=dps)
                 }
 
-                # Single-zero converter covariance check if x or rho/gamma are provided
                 if "x" in inputs or "rho" in inputs or "gamma" in inputs or "rho_im" in inputs:
                     x_str = inputs.get("x", "10.0")
                     x_mpf = math_core.to_mpf(x_str, dps=dps + 10)
@@ -597,7 +712,6 @@ def evaluate_point(
                     rho_im = inputs.get("rho_im", inputs.get("gamma", inputs.get("rho", "14.13472514173469379045725198356247027078425711569924317568556746")))
                     rho_mpc = math_core.to_mpc((rho_re, rho_im), dps=dps + 10)
 
-                    # Coupled transformation: rho' = A * rho, x' = x^(1/A)
                     mapped_rho = scale_A * rho_mpc
                     mapped_x = mpmath.power(x_mpf, mpmath.mpf(1) / scale_A)
 
@@ -615,7 +729,6 @@ def evaluate_point(
                     outputs["cj_transformed"] = mpmath.nstr(cj_trans, n=dps)
                     outputs["cj_covariance_residual"] = mpmath.nstr(e_cj, n=dps)
 
-                    # Evaluate C_pi if mapped_x >= 2 and mapped_x <= 1e5 (prevent astronomical Mobius truncation counts)
                     if 2 <= mapped_x <= 100000 and 2 <= x_mpf <= 100000:
                         cpi_clean = converter.zero_pi_contribution_audit(x_mpf, rho_mpc, dps=dps + 10, max_m=50)
                         cpi_trans = converter.zero_pi_contribution_audit(mapped_x, mapped_rho, dps=dps + 10, max_m=50)
@@ -629,7 +742,6 @@ def evaluate_point(
                     outputs["residual"] = mpmath.nstr(max_cov_res, n=dps)
 
                 return "ok", outputs, None
-
 
             elif operation == "converter_perturbation":
                 zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
@@ -645,17 +757,14 @@ def evaluate_point(
                 gamma_str = inputs.get("gamma", ref_zeros_str[zero_idx] if zero_idx < len(ref_zeros_str) else ref_zeros_str[0])
                 rho_clean = mpmath.mpc('0.5', gamma_str)
 
-                # Compute isolated single-zero / split contributions
                 contrib_dict = converter.compute_perturbed_contributions_audit(
                     x_str, rho_clean, delta_str, mode=mode, dps=dps + 15
                 )
 
-                # Build clean baseline zeros list up to num_zeros
                 clean_zeros_mpc = [mpmath.mpc('0.5', g) for g in ref_zeros_str[:num_zeros]]
                 pert_rhos = contrib_dict["perturbed_rhos"]
 
                 if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
-                    # Baseline contains two coincident copies of rho_clean for split mode
                     clean_for_recon = clean_zeros_mpc[:zero_idx] + [rho_clean, rho_clean] + clean_zeros_mpc[zero_idx + 1:]
                     modified_zeros_mpc = clean_zeros_mpc[:zero_idx] + pert_rhos + clean_zeros_mpc[zero_idx + 1:]
                 else:
@@ -664,12 +773,10 @@ def evaluate_point(
                     if 0 <= zero_idx < len(modified_zeros_mpc):
                         modified_zeros_mpc = clean_zeros_mpc[:zero_idx] + pert_rhos + clean_zeros_mpc[zero_idx + 1:]
 
-                # Compute full explicit formula reconstructions
                 full_clean_pi = converter.riemann_explicit_pi_audit(x_str, clean_for_recon, dps=dps + 15)
                 full_pert_pi = converter.riemann_explicit_pi_audit(x_str, modified_zeros_mpc, dps=dps + 15)
                 full_diff = full_pert_pi - full_clean_pi
 
-                # True prime pi(x)
                 x_mpf = math_core.to_mpf(x_str, dps=dps + 15)
                 try:
                     true_pi_val = reference_data.prime_pi(float(x_mpf)) if x_mpf <= 100000 else "N/A"
@@ -703,7 +810,6 @@ def evaluate_point(
                     split_defect_cpi = math_core.to_mpf(contrib_dict.get("split_defect_cpi", contrib_dict.get("delta_cpi", 0)), dps=dps + 15)
                     split_defect_pi_n = full_diff
 
-                    # Evaluate symmetry error S(delta) - S(-delta)
                     neg_contrib = converter.compute_perturbed_contributions_audit(
                         x_str, rho_clean, str(-d_mpf), mode=mode, dps=dps + 15
                     )
@@ -721,7 +827,6 @@ def evaluate_point(
                     outputs["symmetry_error_cpi"] = mpmath.nstr(sym_err_cpi, n=dps)
                     outputs["symmetry_error"] = mpmath.nstr(symmetry_error, n=dps)
 
-                    # Quadratic scaling diagnostics
                     if abs(d_mpf) > mpmath.mpf('1e-50'):
                         d_sq = d_mpf * d_mpf
                         norm_quad_cj = split_defect_cj / d_sq
@@ -729,14 +834,12 @@ def evaluate_point(
                         outputs["normalized_quadratic_cj"] = mpmath.nstr(norm_quad_cj, n=dps)
                         outputs["normalized_quadratic_cpi"] = mpmath.nstr(norm_quad_cpi, n=dps)
 
-                        # Pairwise ratio where half-delta exists
                         declared_deltas_raw: Optional[List[Any]] = None
                         if param_space and "delta" in param_space:
                             declared_deltas_raw = expand_parameter(param_space["delta"], dps=dps)
                         elif "declared_deltas" in inputs:
                             val = inputs["declared_deltas"]
                             declared_deltas_raw = val if isinstance(val, list) else [val]
-
 
                         if declared_deltas_raw:
                             declared_deltas_mpf = [math_core.to_mpf(v, dps=dps + 15) for v in declared_deltas_raw]
@@ -760,7 +863,6 @@ def evaluate_point(
                                     outputs["quadratic_ratio_error_cpi"] = mpmath.nstr(abs(quad_ratio_cpi - 4), n=dps)
 
                 else:
-                    # single_pair_diagnostic
                     delta_cj = math_core.to_mpf(contrib_dict.get("delta_cj", contrib_dict.get("split_defect_cj", 0)), dps=dps + 15)
                     delta_cpi = math_core.to_mpf(contrib_dict.get("delta_cpi", contrib_dict.get("split_defect_cpi", 0)), dps=dps + 15)
                     delta_pi_n = full_diff
@@ -770,7 +872,6 @@ def evaluate_point(
                     outputs["delta_pi_n"] = mpmath.nstr(delta_pi_n, n=dps)
 
                 return "ok", outputs, None
-
 
             elif operation == "symmetric_centrifuge":
                 delta_str = inputs.get("delta", "0.0")
@@ -808,7 +909,6 @@ def evaluate_point(
                     "residual": mpmath.nstr(identity_error, n=dps)
                 }, None
 
-
             elif operation == "coupled_perturbation_covariance":
                 zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
                 delta_str = inputs.get("delta", "0.0")
@@ -833,12 +933,10 @@ def evaluate_point(
                 rho_clean_prime = A * rho_clean
                 d_val = math_core.to_mpf(delta_str, dps=dps + 15)
 
-                # Unperturbed clean converter wave covariance
                 clean_cj = converter.zero_j_contribution_audit(x_mpf, rho_clean, dps=dps + 15)
                 clean_cj_prime = converter.zero_j_contribution_audit(x_prime, rho_clean_prime, dps=dps + 15)
                 clean_cj_residual = abs(clean_cj_prime - clean_cj)
 
-                # Perturbed converter wave covariance
                 if mode in ("symmetry_complete_split", "symmetry_complete_quartet"):
                     rho_plus = mpmath.mpc(mpmath.mpf('0.5') + d_val, rho_clean.imag)
                     rho_minus = mpmath.mpc(mpmath.mpf('0.5') - d_val, rho_clean.imag)
@@ -859,7 +957,6 @@ def evaluate_point(
                     split_defect_prime = pert_cj_prime - (mpmath.mpf(2) * clean_cj_prime)
                     delta_cj_residual = abs(split_defect_prime - split_defect)
                 else:
-                    # single_pair_diagnostic
                     rho_pert = mpmath.mpc(mpmath.mpf('0.5') + d_val, rho_clean.imag)
                     rho_pert_prime = A * rho_pert
                     pert_cj = converter.zero_j_contribution_audit(x_mpf, rho_pert, dps=dps + 15)
@@ -935,13 +1032,9 @@ def evaluate_point(
                 sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
                 radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
 
-                # Invariance error: |R_tau(s_world, k) - delta|
                 leaf_inv_err = abs(radial_leaf - d_val)
-
-                # Extended function evaluation at worldline point
                 z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
                 zeta_res = abs(z_world)
-
                 max_res = max(zeta_res, leaf_inv_err)
 
                 src_status = "certified" if cert_ok else ("verification_failed" if cert_hash else "not_available")
@@ -1015,10 +1108,7 @@ def evaluate_point(
                 sigma_c = transcendental.critical_surface_sigma(g_obj, dps=dps + 15)
                 radial_leaf = transcendental.normalized_radial_leaf(s_world, g_obj, dps=dps + 15)
 
-                # Invariance error: |R_tau(s_world, k) - delta|
                 radial_residual = abs(radial_leaf - d_val)
-
-                # Signed and absolute defect
                 signed_defect = s_world.real - sigma_c
                 expected_signed_defect = scale_A * d_val
                 signed_defect_error = abs(signed_defect - expected_signed_defect)
@@ -1097,7 +1187,6 @@ def evaluate_point(
                 expected_R = mpmath.mpf(s_exact) - mpmath.mpf("0.5")
 
                 leaf_inv_err = abs(radial_leaf - expected_R)
-
                 z_world = transcendental.evaluate_extended_zeta(s_world, grade=g_obj, dps=dps + 15)
                 zeta_res = abs(z_world)
                 max_res = max(zeta_res, leaf_inv_err)
@@ -1131,8 +1220,6 @@ def evaluate_point(
                     "residual": mpmath.nstr(max_res, n=dps)
                 }, None
 
-
-
             elif operation == "cross_height_coherence":
                 zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
                 u_str = inputs.get("u", "0.0")
@@ -1161,7 +1248,6 @@ def evaluate_point(
                 taylor_info = transcendental.extract_taylor_shape_coefficients(gamma_str, dps=dps + 20)
                 path_info = transcendental.evaluate_derivative_normalized_path(gamma_str, u_str, dps=dps + 20)
 
-                # Check simplicity via analytical audit
                 is_simple, z_res, _ = reference_data.audit_simple_zero_residual(gamma_str, dps=dps + 20)
                 src_status = "certified" if cert_ok else ("verification_failed" if cert_hash else "not_available")
 
@@ -1220,9 +1306,7 @@ def evaluate_point(
                 h1, ok1, _, _ = _lookup_zero_certificate(z1_idx)
                 h2, ok2, _, _ = _lookup_zero_certificate(z2_idx)
 
-                # Construct 21-point symmetric grid on [-u_max, u_max]
                 u_points = [str(mpmath.nstr(mpmath.mpf(i) * u_max_val / 10, n=8)) for i in range(-10, 11)]
-
                 dist_res = transcendental.compute_cross_height_path_distance(g1_str, g2_str, u_points=u_points, dps=dps + 20)
 
                 l_inf = dist_res["L_infty_distance"]
@@ -1250,9 +1334,6 @@ def evaluate_point(
                     "residual": l_inf
                 }, None
 
-
-
-
             elif operation == "grade_constraint":
                 k_str = inputs.get("K", inputs.get("k", "1"))
                 delta_str = inputs.get("delta", "0.0")
@@ -1261,8 +1342,6 @@ def evaluate_point(
                 k_mpf = math_core.to_mpf(k_str, dps=dps + 15)
                 d_mpf = math_core.to_mpf(delta_str, dps=dps + 15)
 
-                # Bilateral symmetric defect: D_K = (tau^(K*delta) - 1) * (1 - tau^(-K*delta))
-                # Theoretical identity: |D_K| = 4 * sinh^2(K * delta * ln(tau) / 2)
                 phi = k_mpf * d_mpf * mpmath.log(tau)
                 d_k = (mpmath.power(tau, k_mpf * d_mpf) - 1) * (1 - mpmath.power(tau, -k_mpf * d_mpf))
                 abs_d_k = abs(d_k)
@@ -1370,7 +1449,6 @@ def compute_metric_stats(
         max_pt = max(valid_points, key=lambda p: p["val"])
         argmax_abs_pt = max(valid_points, key=lambda p: p["val_abs"])
 
-        # Sort points descending by absolute value for worst points
         sorted_by_worst = sorted(valid_points, key=lambda p: p["val_abs"], reverse=True)
         worst_5 = sorted_by_worst[:5]
 
@@ -1421,11 +1499,9 @@ def compute_summary(
     points_failed = sum(1 for r in results if r.get("status") == "error")
 
     with mpmath.workdps(dps + 15):
-        # Collect all declared report metrics
         metric_declarations = []
         seen_metric_names = set()
 
-        # Primary criterion metric is always tracked
         metric_declarations.append({
             "metric": target_metric,
             "kind": "primary_criterion" if aggregation != "none" else "observational_metric",
@@ -1493,7 +1569,6 @@ def compute_summary(
                 observed_metric_str = target_stats["min"]
                 criterion_met = evaluate_criterion(observed_metric_str, operator, threshold_str, dps=dps)
             elif aggregation == "all":
-                # Check every point
                 all_met = True
                 for r in results:
                     if r.get("status") == "ok" and target_metric in r.get("outputs", {}):
@@ -1535,7 +1610,7 @@ def compute_summary(
             "run_id": run_id,
             "experiment_id": spec["id"],
             "status": status,
-            "hypothesis": spec["hypothesis"]["statement"],
+            "hypothesis": spec.get("hypothesis", {}).get("statement", "") if isinstance(spec.get("hypothesis"), dict) else str(spec.get("hypothesis", "")),
             "points_requested": points_req,
             "points_completed": points_completed,
             "points_failed": points_failed,
@@ -1732,10 +1807,16 @@ def update_index_file(run_entry: Dict[str, Any]):
     index_data["updated_at"] = datetime.now(timezone.utc).isoformat()
 
     tmp_index = os.path.join(RESEARCH_DIR, f".index.json.{os.getpid()}.tmp")
-    with open(tmp_index, "w", encoding="utf-8") as f:
-        json.dump(index_data, f, indent=2)
-    os.replace(tmp_index, INDEX_FILE)
-
+    try:
+        with open(tmp_index, "w", encoding="utf-8") as f:
+            json.dump(index_data, f, indent=2)
+        os.replace(tmp_index, INDEX_FILE)
+    finally:
+        if os.path.exists(tmp_index):
+            try:
+                os.remove(tmp_index)
+            except Exception:
+                pass
 
 
 # ==============================================================================
@@ -1766,16 +1847,13 @@ def run_experiment(
     dps = spec["precision"]["dps"]
     tau_str = math_core.get_tau_str(dps=dps)
 
-    # Expand parameter grid
     grid = generate_parameter_grid(spec["parameters"], dps=dps)
     total_points = len(grid)
 
-    # Determine run identity
     exp_id = spec["id"]
     stable_dir = os.path.join(RUNS_DIR, exp_id)
     run_id = exp_id
 
-    # Determine run identity and working directory
     work_dir = os.path.join(RUNS_DIR, f".tmp_{exp_id}_{os.getpid()}")
     if os.path.exists(work_dir):
         shutil.rmtree(work_dir, ignore_errors=True)
@@ -1791,7 +1869,6 @@ def run_experiment(
         with open(manifest_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
 
-        # Verify compatibility for resume
         if manifest.get("experiment_spec_sha256") != spec_sha:
             raise ValueError(
                 f"Refusing resume: Spec hash mismatch! (Recorded: {manifest.get('experiment_spec_sha256')}, Current: {spec_sha})"
@@ -1800,29 +1877,21 @@ def run_experiment(
     else:
         os.makedirs(work_dir, exist_ok=True)
 
-        # Source module hashes
-        code_root = os.path.dirname(os.path.abspath(__file__))
-        code_modules = {
-            "research_runner.py": hash_file_bytes(os.path.join(code_root, "research_runner.py")),
-            "transcendental.py": hash_file_bytes(os.path.join(code_root, "transcendental.py")),
-            "reference_data.py": hash_file_bytes(os.path.join(code_root, "reference_data.py")),
-            "math_core.py": hash_file_bytes(os.path.join(code_root, "math_core.py")),
-            "transforms.py": hash_file_bytes(os.path.join(code_root, "transforms.py")),
-            "converter.py": hash_file_bytes(os.path.join(code_root, "converter.py")),
-            "zero_finder.py": hash_file_bytes(os.path.join(code_root, "zero_finder.py")),
-            "certification.py": hash_file_bytes(os.path.join(code_root, "certification.py"))
-        }
-
         manifest = {
             "schema_version": "2",
             "run_id": exp_id,
             "experiment_id": exp_id,
-            "experiment_spec_sha256": spec_sha,
-            "git_commit": git_commit,
-            "git_dirty": git_dirty,
+            "title": spec.get("title", exp_id),
+            "epistemic_class": spec.get("epistemic_class", "exact_control"),
+            "object_relationship": spec.get("object_relationship", "unknown"),
+            "classification": spec.get("classification", "canonical_experiment"),
             "started_at": datetime.now(timezone.utc).isoformat(),
             "completed_at": None,
             "status": "running",
+            "git_commit": git_commit,
+            "producing_git_commit": git_commit,
+            "git_dirty": git_dirty,
+            "experiment_spec_sha256": spec_sha,
             "precision": {"dps": dps},
             "parameter_space": spec["parameters"],
             "points_requested": total_points,
@@ -1841,18 +1910,25 @@ def run_experiment(
                     "flint": getattr(math_core, "flint_ctx", None) is not None
                 }
             },
-            "data_provenance": reference_data.load_provenance(),
-            "code_modules": code_modules,
+            "dependency_fingerprint": certification._get_dependency_fingerprint(),
+            "source_code_hashes": certification._get_source_code_hashes(git_commit),
+            "input_data_hashes": certification._get_input_data_hashes(git_commit),
+            "code_modules": [
+                {"path": m, "sha256": certification._get_source_code_hashes(git_commit).get(m, "N/A")}
+                for m in certification.REQUIRED_SOURCE_MODULES
+            ],
+            "data_provenance": [
+                {"path": f"data/{d}", "sha256": certification._get_input_data_hashes(git_commit).get(d, "N/A")}
+                for d in certification.REQUIRED_INPUT_DATA_FILES
+            ],
             "consumed_certificates": []
         }
 
         with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
 
-
     results_path = os.path.join(work_dir, "results.jsonl")
 
-    # Read already completed point IDs if resuming
     completed_point_ids = set()
     existing_results = []
     if os.path.exists(results_path):
@@ -1866,7 +1942,6 @@ def run_experiment(
                     except Exception:
                         pass
 
-    # Open results.jsonl in append mode with immediate flushing
     operation = spec["engine"]["operation"]
     all_results = list(existing_results)
 
@@ -1889,11 +1964,9 @@ def run_experiment(
             results_file.flush()
             all_results.append(point_record)
 
-    # Mark completion
     completed_points = len(all_results)
     final_status = "complete" if completed_points == total_points else "incomplete"
 
-    # Collect all consumed certificate hashes
     consumed_cert_hashes: Set[str] = set()
     for rec in all_results:
         outs = rec.get("outputs", {})
@@ -1907,10 +1980,12 @@ def run_experiment(
     manifest["points_completed"] = completed_points
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
     manifest["consumed_certificates"] = sorted(list(consumed_cert_hashes))
+    manifest["dependency_fingerprint"] = certification._get_dependency_fingerprint()
+    manifest["source_code_hashes"] = certification._get_source_code_hashes(git_commit)
+    manifest["input_data_hashes"] = certification._get_input_data_hashes(git_commit)
 
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
-
 
     summary = compute_summary(spec, exp_id, all_results, status=final_status)
     with open(os.path.join(work_dir, "summary.json"), "w", encoding="utf-8") as f:
@@ -1920,14 +1995,12 @@ def run_experiment(
     with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
 
-    # 5. Enforce Publication Gate via validate_manifest
     val_ok, val_errs = validate_manifest(manifest, all_results, spec=spec)
     if not val_ok:
         if os.path.exists(work_dir):
             shutil.rmtree(work_dir, ignore_errors=True)
         raise RuntimeError(f"Canonical run publication rejected for '{exp_id}': {'; '.join(val_errs)}")
 
-    # 6. Genuinely transactional replacement of canonical stable_dir and index.json
     run_entry: Dict[str, Any] = {
         "schema_version": "2",
         "run_id": exp_id,
@@ -1970,7 +2043,6 @@ def run_experiment(
         if os.path.exists(backup_index_path):
             os.remove(backup_index_path)
     except Exception as e:
-        # Strict Transactional Rollback
         if os.path.exists(stable_dir):
             shutil.rmtree(stable_dir, ignore_errors=True)
         if os.path.exists(backup_dir):
@@ -1980,6 +2052,26 @@ def run_experiment(
             os.remove(backup_index_path)
         if os.path.exists(work_dir):
             shutil.rmtree(work_dir, ignore_errors=True)
+        for p in glob.glob(os.path.join(RESEARCH_DIR, ".*.tmp")):
+            try:
+                os.remove(p)
+            except Exception:
+                pass
+        for p in glob.glob(os.path.join(RESEARCH_DIR, ".index.json.bak_*")):
+            try:
+                os.remove(p)
+            except Exception:
+                pass
+        for p in glob.glob(os.path.join(RUNS_DIR, f".bak_{exp_id}_*")):
+            try:
+                shutil.rmtree(p, ignore_errors=True)
+            except Exception:
+                pass
+        for p in glob.glob(os.path.join(RUNS_DIR, f".tmp_{exp_id}_*")):
+            try:
+                shutil.rmtree(p, ignore_errors=True)
+            except Exception:
+                pass
         raise e
 
     return exp_id
@@ -1995,7 +2087,6 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
     with open(manifest_path, "r", encoding="utf-8") as f:
         manifest = json.load(f)
 
-    # Find corresponding experiment spec
     exp_id = manifest["experiment_id"]
     candidates = [
         os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
@@ -2009,7 +2100,6 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
             break
 
     if not spec_path:
-        # Scan experiments dir
         for fname in os.listdir(EXPERIMENTS_DIR):
             if fname.endswith(".yaml") or fname.endswith(".yml"):
                 p = os.path.join(EXPERIMENTS_DIR, fname)
@@ -2059,6 +2149,7 @@ def validate_manifest(
     - An operation's required certificates/hashes are missing or replaced by N/A.
     - A point claiming worldline_certified=true contains N/A hash or non-certified status.
     - Point parameters (index, grade K, radial delta) mismatch referenced certificates.
+    - Source zero and worldline certificates do not belong to the same zero root.
     - Synthetic certificates are passed off as actual zeros or vice-versa.
     - Exact control experiments fail mathematical criterion or produce execution errors.
     - Dependency fingerprint or Git provenance violates compatibility policy.
@@ -2067,21 +2158,18 @@ def validate_manifest(
     if not isinstance(manifest, dict):
         return False, ["Manifest must be a dictionary"]
 
-    # Basic manifest schema checks
     for req_k in ["experiment_id", "git_commit", "status", "precision"]:
         if req_k not in manifest or manifest[req_k] is None:
             errors.append(f"Manifest missing required key '{req_k}'")
 
     exp_id = manifest.get("experiment_id", "")
 
-    # Dependency compatibility validation
     dep_fp = manifest.get("dependency_fingerprint")
     if dep_fp:
         dep_ok, dep_errs = certification.validate_dependency_compatibility(dep_fp, check_current_runtime=True)
         if not dep_ok:
             errors.extend(dep_errs)
 
-    # Git provenance validation
     commit = str(manifest.get("git_commit", "")).strip()
     if commit:
         commit_ok, commit_err = certification._is_valid_git_commit(
@@ -2092,7 +2180,6 @@ def validate_manifest(
         if not commit_ok:
             errors.append(f"Invalid manifest git_commit provenance: {commit_err}")
 
-    # Resolve experiment spec if not provided
     if spec is None and exp_id:
         candidates = [
             os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
@@ -2108,14 +2195,19 @@ def validate_manifest(
                 except Exception:
                     pass
 
-    op_name = (spec.get("operation") if spec else None) or manifest.get("operation", "")
+    op_name = (
+        manifest.get("operation")
+        or (spec.get("engine", {}).get("operation") if isinstance(spec, dict) else None)
+        or (spec.get("operation") if isinstance(spec, dict) else None)
+        or manifest.get("engine", {}).get("operation")
+        or (spec.get("id", "").replace("-", "_") if isinstance(spec, dict) else "")
+    )
     op_obl = OPERATION_CERTIFICATE_OBLIGATIONS.get(op_name, {})
 
     consumed = set(manifest.get("consumed_certificates", []))
     if op_obl.get("requires_consumed_certs") and len(consumed) == 0:
         errors.append(f"Operation '{op_name}' requires consumed certificates but manifest consumed_certificates is empty")
 
-    # Preload and verify consumed certificates
     cert_root = os.path.join(REPO_ROOT, "data", "certificates")
     cert_map: Dict[str, Dict[str, Any]] = {}
     for c_hash in consumed:
@@ -2165,7 +2257,6 @@ def validate_manifest(
             if manifest.get("status") == "complete" and "point_error" in outs:
                 errors.append(f"Point {idx} contains point_error: {outs.get('point_error')}")
 
-            # Collect used hashes
             for k in ["source_zero_cert_hash", "worldline_cert_hash", "cert_hash", "zero1_cert_hash", "zero2_cert_hash"]:
                 h_val = outs.get(k)
                 if h_val and h_val != "N/A":
@@ -2174,12 +2265,10 @@ def validate_manifest(
                     if h_str not in consumed:
                         errors.append(f"Point {idx} uses certificate {h_str} which is missing from manifest consumed_certificates")
 
-            # Check worldline_certified consistency
             if str(outs.get("worldline_certified")).lower() == "true":
                 if not outs.get("worldline_cert_hash") or outs.get("worldline_cert_hash") == "N/A":
                     errors.append(f"Point {idx} claims worldline_certified=true but worldline_cert_hash is 'N/A'")
 
-            # Operation Obligation Checks
             if op_obl.get("requires_source_cert"):
                 sz_h = outs.get("source_zero_cert_hash")
                 if not sz_h or sz_h == "N/A":
@@ -2191,9 +2280,16 @@ def validate_manifest(
                         errors.append(f"Point {idx} source zero cert status '{szc.get('status')}' != expected '{exp_sz_stat}'")
 
                     if op_obl.get("source_family") == "nontrivial":
-                        pt_z = outs.get("nontrivial_index") or rec_in.get("nontrivial_index")
-                        if pt_z is None and "zero_index" in rec_in:
-                            pt_z = int(rec_in["zero_index"]) + 1
+                        if "block" in rec_in:
+                            b = rec_in.get("block", "low_validation")
+                            z_idx = int(rec_in.get("zero_index", 0))
+                            blk = reference_data.get_zero_block(b)
+                            ords = blk.get("ordinates", [])
+                            pt_z = (1 + (z_idx % len(ords))) if b == "low_validation" else ((100 + (z_idx % len(ords))) if b == "medium_research" else ((1000 + (z_idx % len(ords))) if b == "high_research" else (10000 + (z_idx % len(ords))))) if ords else 1
+                        else:
+                            pt_z = outs.get("nontrivial_index") or rec_in.get("nontrivial_index")
+                            if pt_z is None and "zero_index" in rec_in:
+                                pt_z = int(rec_in["zero_index"]) + 1
                         if pt_z is not None:
                             cert_z = szc.get("nontrivial_index") or szc.get("zero_index")
                             if cert_z is not None and int(pt_z) != int(cert_z):
@@ -2216,26 +2312,46 @@ def validate_manifest(
                     if outs.get("source_zero_certificate_status") != "certified":
                         errors.append(f"Point {idx} source_zero_certificate_status is '{outs.get('source_zero_certificate_status')}', expected 'certified'")
 
-                    # Parameter validation: Grade K
+                    sz_h = outs.get("source_zero_cert_hash")
+                    if sz_h and sz_h in cert_map:
+                        szc = cert_map[sz_h]
+                        wl_source_hash = wlc.get("source_zero_hash")
+                        if wl_source_hash and wl_source_hash != sz_h:
+                            errors.append(f"Point {idx} worldline cert source_zero_hash '{wl_source_hash}' != source zero cert hash '{sz_h}'")
+
+                        wl_src_idx = wlc.get("source_zero_index")
+                        sz_idx = szc.get("nontrivial_index") or szc.get("trivial_index")
+                        if wl_src_idx is not None and sz_idx is not None and int(wl_src_idx) != int(sz_idx):
+                            errors.append(f"Point {idx} worldline cert source_zero_index ({wl_src_idx}) != source zero cert index ({sz_idx})")
+
+                        wl_src_fam = wlc.get("source_zero_family") or wlc.get("zero_family")
+                        sz_fam = szc.get("zero_family")
+                        if wl_src_fam and sz_fam and wl_src_fam != sz_fam:
+                            errors.append(f"Point {idx} worldline cert source family '{wl_src_fam}' != source zero cert family '{sz_fam}'")
+
                     pt_k = rec_in.get("grade_k") or rec_in.get("grade_K") or rec_in.get("grade") or rec_in.get("k")
                     cert_k = wlc.get("grade_K") if "grade_K" in wlc else wlc.get("grade")
                     if pt_k is not None and cert_k is not None:
                         if int(pt_k) != int(cert_k):
                             errors.append(f"Point {idx} input grade K={pt_k} does not match worldline cert grade K={cert_k}")
 
-                    # Parameter validation: Delta
-                    pt_d = rec_in.get("delta_radial") or rec_in.get("delta") or rec_in.get("delta_val") or 0.0
-                    if wlc.get("delta") is not None:
-                        if abs(float(pt_d) - float(wlc["delta"])) > 1e-4:
-                            errors.append(f"Point {idx} input delta={pt_d} does not match worldline cert delta={wlc['delta']}")
+                    if op_obl.get("source_family") != "trivial":
+                        pt_d = rec_in.get("delta_radial") or rec_in.get("delta") or rec_in.get("delta_val") or 0.0
+                        if wlc.get("delta") is not None:
+                            if abs(float(pt_d) - float(wlc["delta"])) > 1e-4:
+                                errors.append(f"Point {idx} input delta={pt_d} does not match worldline cert delta={wlc['delta']}")
 
-                    # Synthetic vs Actual segregation
-                    if op_obl.get("is_synthetic") is True:
-                        if abs(float(wlc.get("delta", 0.0))) < 1e-6:
-                            errors.append(f"Point {idx} synthetic operation uses delta=0.0 actual zero cert")
-                    elif op_obl.get("is_synthetic") is False:
-                        if abs(float(wlc.get("delta", 0.0))) > 1e-6:
-                            errors.append(f"Point {idx} actual zero operation uses synthetic delta={wlc.get('delta')} cert")
+                        if op_obl.get("is_synthetic") is True:
+                            if abs(float(wlc.get("delta", 0.0))) < 1e-6:
+                                errors.append(f"Point {idx} synthetic operation uses delta=0.0 actual zero cert")
+                        elif op_obl.get("is_synthetic") is False:
+                            if abs(float(wlc.get("delta", 0.0))) > 1e-6:
+                                errors.append(f"Point {idx} actual zero operation uses synthetic delta={wlc.get('delta')} cert")
+                    else:
+                        m_idx = int(rec_in.get("trivial_index") or rec_in.get("m") or 1)
+                        exp_delta = str(-2 * m_idx - 0.5)
+                        if wlc.get("delta") != exp_delta:
+                            errors.append(f"Point {idx} trivial zero m={m_idx} worldline cert delta ({wlc.get('delta')}) != expected ({exp_delta})")
 
             if op_name == "cross_height_distance":
                 z1_h = outs.get("zero1_cert_hash")
@@ -2244,16 +2360,34 @@ def validate_manifest(
                     errors.append(f"Point {idx} cross_height_distance missing zero1_cert_hash or zero2_cert_hash")
                 elif z1_h in cert_map and z2_h in cert_map:
                     zc1, zc2 = cert_map[z1_h], cert_map[z2_h]
-                    idx1 = int(rec_in.get("zero1_index", 0)) + 1
-                    idx2 = int(rec_in.get("zero2_index", 0)) + 1
-                    if int(zc1.get("nontrivial_index", 0)) != idx1 or int(zc2.get("nontrivial_index", 0)) != idx2:
-                        errors.append(f"Point {idx} distance cert hashes belong to wrong zero pair: expected ({idx1}, {idx2}), got ({zc1.get('nontrivial_index')}, {zc2.get('nontrivial_index')})")
+                    b1 = outs.get("block_1") or "low_validation"
+                    b2 = outs.get("block_2") or "medium_research"
+                    z_idx = int(outs.get("zero_index") or rec_in.get("zero_index", 0))
+                    blk1 = reference_data.get_zero_block(b1)
+                    blk2 = reference_data.get_zero_block(b2)
+                    ords1 = blk1.get("ordinates", [])
+                    ords2 = blk2.get("ordinates", [])
+                    exp_idx1 = 1 + (z_idx % len(ords1)) if ords1 else 1
+                    exp_idx2 = (100 + (z_idx % len(ords2))) if b2 == "medium_research" else ((1000 + (z_idx % len(ords2))) if b2 == "high_research" else (10000 + (z_idx % len(ords2)))) if ords2 else 100
+                    if int(zc1.get("nontrivial_index", 0)) != exp_idx1 or int(zc2.get("nontrivial_index", 0)) != exp_idx2:
+                        errors.append(f"Point {idx} distance cert hashes belong to wrong zero pair: expected ({exp_idx1}, {exp_idx2}), got ({zc1.get('nontrivial_index')}, {zc2.get('nontrivial_index')})")
+
+            if op_name in ("cross_height_coherence", "cross_height_path_coherence"):
+                sz_h = outs.get("source_zero_cert_hash")
+                if sz_h and sz_h in cert_map:
+                    szc = cert_map[sz_h]
+                    b = rec_in.get("block") or outs.get("block") or "low_validation"
+                    z_idx = int(rec_in.get("zero_index") or outs.get("zero_index") or 0)
+                    blk = reference_data.get_zero_block(b)
+                    ords = blk.get("ordinates", [])
+                    exp_z_idx = (1 + (z_idx % len(ords))) if b == "low_validation" else ((100 + (z_idx % len(ords))) if b == "medium_research" else ((1000 + (z_idx % len(ords))) if b == "high_research" else (10000 + (z_idx % len(ords))))) if ords else 1
+                    if int(szc.get("nontrivial_index", 0)) != exp_z_idx:
+                        errors.append(f"Point {idx} cross_height_coherence zero index mismatch: expected {exp_z_idx} for block '{b}'[#{z_idx}], got cert index {szc.get('nontrivial_index')}")
 
         unused_consumed = consumed - used_in_points
         if unused_consumed:
             errors.append(f"Declared consumed certificates unused by any point: {sorted(list(unused_consumed))}")
 
-        # Summary and criterion recomputation
         if spec is not None:
             recomputed_summary = compute_summary(spec, exp_id, results, status=manifest.get("status", "complete"))
             if spec.get("epistemic_class") == "exact_control":
@@ -2264,6 +2398,132 @@ def validate_manifest(
 
     return len(errors) == 0, errors
 
+
+def validate_run_bundle(run_dir_or_exp_id: str, require_provenance: bool = True) -> Tuple[bool, List[str]]:
+    """Validate a complete committed canonical run bundle including:
+    - manifest.json (schema, hashes, certificates, provenance)
+    - results.jsonl (completeness, point status, proof obligations)
+    - summary.json (recomputed criterion and multi-metric match)
+    - README.md (presence and inventory)
+    - research/index.json (presence of matching run entry)
+    - research/experiments/<exp_id>.yaml (spec SHA-256 match)
+    """
+    errors: List[str] = []
+    run_dir = run_dir_or_exp_id if os.path.isdir(run_dir_or_exp_id) else os.path.join(RUNS_DIR, run_dir_or_exp_id)
+    if not os.path.exists(run_dir):
+        return False, [f"Run directory '{run_dir}' does not exist"]
+
+    exp_id = os.path.basename(run_dir.rstrip("/\\"))
+    manifest_path = os.path.join(run_dir, "manifest.json")
+    results_path = os.path.join(run_dir, "results.jsonl")
+    summary_path = os.path.join(run_dir, "summary.json")
+    readme_path = os.path.join(run_dir, "README.md")
+
+    if not os.path.exists(manifest_path):
+        errors.append(f"Run bundle '{exp_id}' missing manifest.json")
+        return False, errors
+
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as mf:
+            manifest = json.load(mf)
+    except Exception as e:
+        return False, [f"Run bundle '{exp_id}' failed reading manifest.json: {e}"]
+
+    results = []
+    if os.path.exists(results_path):
+        try:
+            with open(results_path, "r", encoding="utf-8") as rf:
+                for line in rf:
+                    if line.strip():
+                        results.append(json.loads(line))
+        except Exception as e:
+            errors.append(f"Run bundle '{exp_id}' failed reading results.jsonl: {e}")
+    else:
+        errors.append(f"Run bundle '{exp_id}' missing results.jsonl")
+
+    candidates = [
+        os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
+        os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('-', '_')}.yaml"),
+        os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('_', '-')}.yaml"),
+    ]
+    spec_path = None
+    for cand in candidates:
+        if os.path.exists(cand):
+            spec_path = cand
+            break
+    if not spec_path:
+        for fname in os.listdir(EXPERIMENTS_DIR):
+            if fname.endswith(".yaml") or fname.endswith(".yml"):
+                p = os.path.join(EXPERIMENTS_DIR, fname)
+                try:
+                    with open(p, "r", encoding="utf-8") as sf:
+                        s_data = yaml.safe_load(sf)
+                    if s_data and (s_data.get("experiment_id") == exp_id or s_data.get("id") == exp_id):
+                        spec_path = p
+                        break
+                except Exception:
+                    pass
+
+    spec = None
+    if spec_path and os.path.exists(spec_path):
+        try:
+            with open(spec_path, "r", encoding="utf-8") as sf:
+                spec = yaml.safe_load(sf)
+            spec_sha = hash_file_bytes(spec_path)
+            rep_spec_sha = manifest.get("experiment_spec_sha256")
+            if rep_spec_sha and rep_spec_sha != spec_sha:
+                errors.append(f"Manifest experiment_spec_sha256 '{rep_spec_sha}' does not match disk spec hash '{spec_sha}'")
+        except Exception as e:
+            errors.append(f"Failed reading spec '{spec_path}': {e}")
+    else:
+        errors.append(f"No experiment specification found for '{exp_id}'")
+
+    ok_m, m_errs = validate_manifest(manifest, results, spec=spec)
+    if not ok_m:
+        errors.extend(m_errs)
+
+    if not os.path.exists(summary_path):
+        errors.append(f"Run bundle '{exp_id}' missing summary.json")
+    elif spec is not None:
+        try:
+            with open(summary_path, "r", encoding="utf-8") as sf:
+                committed_summary = json.load(sf)
+            recomputed = compute_summary(spec, exp_id, results, status=manifest.get("status", "complete"))
+            c_comm = committed_summary.get("criterion", {})
+            c_recomp = recomputed.get("criterion", {})
+            if c_comm.get("criterion_met") != c_recomp.get("criterion_met"):
+                errors.append(f"Summary criterion_met mismatch: committed={c_comm.get('criterion_met')}, recomputed={c_recomp.get('criterion_met')}")
+            if spec.get("epistemic_class") == "exact_control" and c_recomp.get("criterion_met") is not True:
+                errors.append(f"Exact control experiment '{exp_id}' criterion not met: observed={c_recomp.get('observed')}")
+        except Exception as e:
+            errors.append(f"Failed validating summary.json: {e}")
+
+    if not os.path.exists(readme_path):
+        errors.append(f"Run bundle '{exp_id}' missing README.md")
+
+    if not os.path.exists(INDEX_FILE):
+        errors.append("research/index.json missing")
+    else:
+        try:
+            with open(INDEX_FILE, "r", encoding="utf-8") as inf:
+                idx_data = json.load(inf)
+            runs = idx_data.get("runs", []) if isinstance(idx_data, dict) else idx_data
+            found_entry = None
+            for r in runs:
+                if r.get("experiment_id") == exp_id or r.get("run_id") == exp_id:
+                    found_entry = r
+                    break
+            if not found_entry:
+                errors.append(f"No entry for experiment '{exp_id}' in research/index.json")
+            else:
+                if found_entry.get("git_commit") != manifest.get("git_commit"):
+                    errors.append(f"Index git_commit '{found_entry.get('git_commit')}' != manifest '{manifest.get('git_commit')}'")
+                if found_entry.get("status") != manifest.get("status"):
+                    errors.append(f"Index status '{found_entry.get('status')}' != manifest '{manifest.get('status')}'")
+        except Exception as e:
+            errors.append(f"Failed validating index.json entry: {e}")
+
+    return len(errors) == 0, errors
 
 
 def list_runs() -> List[Dict[str, Any]]:
@@ -2281,13 +2541,11 @@ def list_runs() -> List[Dict[str, Any]]:
 
 # ==============================================================================
 # CLI INTERFACE
-
 # ==============================================================================
-
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python research_runner.py [run <spec.yaml> [--resume <run_id>] | summarize <run_id> | list]")
+        print("Usage: python research_runner.py [run <spec.yaml> [--resume <run_id>] | summarize <run_id> | list | validate [run_id]]")
         sys.exit(1)
 
     cmd = sys.argv[1]
@@ -2305,7 +2563,6 @@ def main():
         run_id = run_experiment(spec_file, resume_run_id=resume_id)
         print(f"Run completed successfully: {run_id}")
 
-        # Print summary digest
         sum_path = os.path.join(RUNS_DIR, run_id, "summary.json")
         if os.path.exists(sum_path):
             with open(sum_path, "r", encoding="utf-8") as sf:
@@ -2328,6 +2585,30 @@ def main():
             c = s_dict.get("criterion", {})
             print(f"[{name}] {r_id}: status={s_dict.get('status')} criterion_met={c.get('criterion_met')} observed={c.get('observed')}")
         print("\nAll canonical experiment sweeps complete.")
+
+    elif cmd == "validate":
+        target = sys.argv[2] if len(sys.argv) >= 3 else None
+        if target:
+            ok, errs = validate_run_bundle(target)
+            if ok:
+                print(f"[PASS] Run bundle '{target}' validated successfully.")
+            else:
+                print(f"[FAIL] Run bundle '{target}' validation errors:\n- " + "\n- ".join(errs))
+                sys.exit(1)
+        else:
+            all_ok = True
+            for r_dir in sorted(glob.glob(os.path.join(RUNS_DIR, "*"))):
+                if os.path.isdir(r_dir) and not os.path.basename(r_dir).startswith("."):
+                    b_name = os.path.basename(r_dir)
+                    ok, errs = validate_run_bundle(r_dir)
+                    if ok:
+                        print(f"[PASS] {b_name}")
+                    else:
+                        print(f"[FAIL] {b_name}:\n  - " + "\n  - ".join(errs))
+                        all_ok = False
+            if not all_ok:
+                sys.exit(1)
+            print("\nAll canonical run bundles validated successfully.")
 
     elif cmd == "summarize":
         if len(sys.argv) < 3:

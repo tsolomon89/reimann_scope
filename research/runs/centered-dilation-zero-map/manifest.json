@@ -2,12 +2,17 @@
   "schema_version": "2",
   "run_id": "centered-dilation-zero-map",
   "experiment_id": "centered-dilation-zero-map",
-  "experiment_spec_sha256": "4e6ca7f689e910ce87133c1eadddf51568e2a0c3928abed9e8b896298bd592ff",
-  "git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
-  "git_dirty": false,
-  "started_at": "2026-08-23T08:05:55.537592+00:00",
-  "completed_at": "2026-08-23T08:05:55.643524+00:00",
+  "title": "Centered Coordinate Dilation Zero Map Invariance",
+  "epistemic_class": "exact_control",
+  "object_relationship": "same_object_coordinate_control",
+  "classification": "canonical_experiment",
+  "started_at": "2026-08-23T09:45:38.681415+00:00",
+  "completed_at": "2026-08-23T09:45:39.195551+00:00",
   "status": "complete",
+  "git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
+  "producing_git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
+  "git_dirty": true,
+  "experiment_spec_sha256": "4e6ca7f689e910ce87133c1eadddf51568e2a0c3928abed9e8b896298bd592ff",
   "precision": {
     "dps": 80
   },
@@ -49,84 +54,83 @@
       "flint": true
     }
   },
-  "data_provenance": {
-    "schema_version": "2",
-    "zeros_first_100_reference": {
-      "source_name": "Andrew Odlyzko: Tables of zeros of the Riemann zeta function (zeros1)",
-      "source_author_or_org": "Andrew Odlyzko / University of Minnesota Digital Technology Center",
-      "source_url": "http://www.dtc.umn.edu/~odlyzko/zeta_tables/zeros1",
-      "retrieved_at": "2026-08-22",
-      "stated_precision": "9 decimal digits, accurate to within 3*10^(-9)",
-      "precision_digits": 9,
-      "vendored_count": 100,
-      "first_ordinate": "14.134725142",
-      "last_ordinate": "236.524229666",
-      "file_path": "data/zeros_first_100_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
-    },
-    "zeta_zeros": {
-      "source_name": "mpmath.zetazero reference snapshot",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-19",
-      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
-      "vendored_count": 200,
-      "first_ordinate": "14.13472514173469379045725198356247027078",
-      "last_ordinate": "396.3818542225921869319994544917305290638",
-      "file_path": "data/zeros_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
-      "preparation_script": "scripts/fetch_reference_zeros.py"
-    },
-    "zeta_zeros_baseline": {
-      "source_name": "mpmath.zetazero reference snapshot",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-19",
-      "stated_precision": "40 decimal digits (mpmath.zetazero numerical root refinement)",
-      "vendored_count": 200,
-      "first_ordinate": "14.13472514173469379045725198356247027078",
-      "last_ordinate": "396.3818542225921869319994544917305290638",
-      "file_path": "data/zeros_reference.json",
-      "format": "decimal strings in json",
-      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
-      "preparation_script": "scripts/fetch_reference_zeros.py"
-    },
-    "canonical_blocks": {
-      "source_name": "mpmath.zetazero high-precision spectrum blocks",
-      "source_author_or_org": "Fredrik Johansson / mpmath",
-      "source_url": "https://mpmath.org/doc/current/functions/zeta.html#zetazero",
-      "retrieved_at": "2026-08-21",
-      "stated_precision": "80 decimal digits (numerical root refinement)",
-      "file_path": "data/canonical_blocks.json",
-      "format": "json dictionary of blocks with exact decimal strings",
-      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
-    },
-    "primes": {
-      "source": "locally generated",
-      "algorithm": "Deterministic Sieve of Eratosthenes",
-      "max_x": 4999,
-      "count": 669,
-      "file_path": "data/primes.json",
-      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
-    },
-    "tau": {
-      "symbolic": "2*pi",
-      "source": "high-precision library",
-      "library": "mpmath",
-      "precision_digits": 80
-    }
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
   },
-  "code_modules": {
-    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
-    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+  "source_code_hashes": {
+    "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9",
-    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887",
-    "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19"
+    "research_runner.py": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a",
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "code_modules": [
+    {
+      "path": "certification.py",
+      "sha256": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19"
+    },
+    {
+      "path": "transforms.py",
+      "sha256": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7"
+    },
+    {
+      "path": "reference_data.py",
+      "sha256": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5"
+    },
+    {
+      "path": "math_core.py",
+      "sha256": "3b8dc40fb17efa66fddbf575b3cadbde4e785151861b0f6ec8817f484f924bd9"
+    },
+    {
+      "path": "transcendental.py",
+      "sha256": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+    },
+    {
+      "path": "converter.py",
+      "sha256": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a"
+    },
+    {
+      "path": "research_runner.py",
+      "sha256": "af0533bbfdf43eb8a0cc4f4f0efb6525874e5914e03bce3231df5f9767382e3a"
+    },
+    {
+      "path": "zero_finder.py",
+      "sha256": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+    }
+  ],
+  "data_provenance": [
+    {
+      "path": "data/zeros_reference.json",
+      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909"
+    },
+    {
+      "path": "data/zeros_first_100_reference.json",
+      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
+    },
+    {
+      "path": "data/canonical_blocks.json",
+      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
+    },
+    {
+      "path": "data/primes.json",
+      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+    }
+  ],
   "consumed_certificates": []
 }

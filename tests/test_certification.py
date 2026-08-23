@@ -800,16 +800,73 @@ def test_adversarial_report_path_traversal_and_duplicates(tmp_path):
 
     rep = certification.generate_verification_report(cert_dir=str(cert_dir), check_provenance=False)
     rep_file = cert_dir / "verification_report.json"
-
     # 1. Path traversal in inventory entry
     t_rep = dict(rep)
     t_rep["inventory"] = [dict(rep["inventory"][0])]
     t_rep["inventory"][0]["relative_path"] = "data/certificates/zeros/../../etc/passwd"
-    t_rep["inventory_root_hash"] = hashlib.sha256(json.dumps(t_rep["inventory"], sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     t_rep["report_hash"] = certification._sha256_canonical(t_rep)
     with open(rep_file, "w", encoding="utf-8") as f:
-        json.dump(t_rep, f)
+        json.dump(t_rep, f, indent=2)
     ok, _, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
     assert not ok
     assert any("traversal" in e.lower() or "missing on disk" in e.lower() for e in errs)
 
+
+def test_report_loader_rejects_rehashed_invalid_certificate(tmp_path, monkeypatch):
+    """Test that load_verification_report fails if a certificate on disk fails mathematical or dependency validation even if rehashed."""
+    monkeypatch.setattr(certification, "REPO_ROOT", str(tmp_path))
+    monkeypatch.setattr(certification, "CERT_DIR", str(tmp_path / "data" / "certificates"))
+
+    cert_dir = tmp_path / "data" / "certificates"
+    (cert_dir / "zeros").mkdir(parents=True)
+    (cert_dir / "trivial_zeros").mkdir(parents=True)
+    (cert_dir / "blocks").mkdir(parents=True)
+    (cert_dir / "worldlines").mkdir(parents=True)
+
+    z1 = certification.certify_zero(1, dps=50)
+    # Corrupt enclosure to not bound zero
+    z1["enclosure"]["imag_rad"] = "1e-100"
+    z1["dependency_fingerprint"]["python"] = "9.9.9"
+    z1["certificate_hash"] = certification._sha256_canonical(z1)
+
+    z_bytes = (json.dumps(z1, indent=2) + "\n").encode("utf-8")
+    file_sha = hashlib.sha256(z_bytes.replace(b"\r\n", b"\n")).hexdigest()
+
+    with open(cert_dir / "zeros" / "zero_00001.json", "wb") as f:
+        f.write(z_bytes)
+
+    rep = {
+        "schema_version": "2",
+        "report_type": "certificate_verification_report",
+        "status": "verified",
+        "timestamp": "2026-08-23T00:00:00Z",
+        "total_inventory": 1,
+        "nontrivial_zeros_count": 1,
+        "trivial_zeros_count": 0,
+        "blocks_count": 0,
+        "worldlines_count": 0,
+        "passed_count": 1,
+        "failed_count": 0,
+        "producing_git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
+        "failures": [],
+        "inventory": [
+            {
+                "certificate_hash": z1["certificate_hash"],
+                "file_sha256": file_sha,
+                "relative_path": "data/certificates/zeros/zero_00001.json",
+                "certificate_type": "zero_isolation_and_simplicity",
+                "mathematical_status": "simple_zero_certified",
+                "verifier_status": "passed",
+                "status": "passed"
+            }
+        ]
+    }
+    rep["inventory_root_hash"] = hashlib.sha256(json.dumps(rep["inventory"], sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    rep["report_hash"] = certification._sha256_canonical(rep)
+
+    with open(cert_dir / "verification_report.json", "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, loaded_rep, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert not ok
+    assert any("incompatible" in e.lower() or "failed independent verification" in e.lower() or "failed verification" in e.lower() for e in errs)

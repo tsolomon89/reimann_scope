@@ -3,7 +3,7 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "synthetic_radial_leaf",
-  "source_zero_hash": "dae37327f7e1b9591b8da70e1ab5eec28759742c4cbab9ba04100fe7f65b3568",
+  "source_zero_hash": "6d6a1ee8ee1225bf7f590477509ce2ad6f6a9b2ae3affdd2c2f301209c6677a5",
   "source_zero_family": "nontrivial",
   "source_zero_index": 100,
   "zero_family": "nontrivial",
@@ -29,7 +29,7 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "47aa916b941bcce79aa7c7a3b8b9faf3a0be1185",
+  "producing_git_commit": "c471cb1b78d0780e97e807ee9aefc50999e91daa",
   "source_code_hashes": {
     "certification.py": "e6713b83b0e4ba4f83437ced156cbb74ed855815edb2675801bf54dc0a125f19",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
@@ -56,11 +56,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-23T08:05:22.929808+00:00",
+  "created_at": "2026-08-23T09:39:24.036758+00:00",
   "invalidation_conditions": [
     "source_zero_hash_mismatch",
     "radial_residual_tolerance_exceeded",
     "formal_theorem_missing"
   ],
-  "certificate_hash": "6e73fa3fba8bd34adbbe2d10caf99194f907e56c0cb6305c623f15adb327572f"
+  "certificate_hash": "8abc2fade47544c6277fef968d9bb57b268d6d52d1afb69f2903db2129acf5bb"
 }
