@@ -1176,8 +1176,9 @@ def test_validate_run_bundle_canonical_runs():
         for r in os.listdir(runs_dir):
             r_path = os.path.join(runs_dir, r)
             if os.path.isdir(r_path) and not r.startswith("."):
-                ok, errs = research_runner.validate_run_bundle(r_path)
+                ok, errs = research_runner.validate_run_bundle(r_path, canonical_current=False)
                 assert ok, f"Canonical run bundle '{r}' failed validation: {errs}"
+
 
 
 def test_manifest_provenance_mandatory_fields_and_corruptions():

@@ -6,13 +6,13 @@
   "epistemic_class": "sensitivity_diagnostic",
   "object_relationship": "synthetic_perturbation_diagnostic",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T14:16:27.117142+00:00",
-  "completed_at": "2026-08-23T14:16:33.426472+00:00",
+  "started_at": "2026-08-23T15:44:34.968592+00:00",
+  "completed_at": "2026-08-23T15:45:24.251874+00:00",
   "status": "complete",
-  "git_commit": "21e81963a0272add656d543510c9d5bcd904a228",
-  "producing_git_commit": "21e81963a0272add656d543510c9d5bcd904a228",
+  "git_commit": "ada7969fd08e930750a6b0ce5e471d44094cce27",
+  "producing_git_commit": "ada7969fd08e930750a6b0ce5e471d44094cce27",
   "git_dirty": false,
-  "experiment_spec_sha256": "019bcb12b11c43c6556e3bf6dad1246971040631bd82b65d6a36e56029714594",
+  "experiment_spec_sha256": "fc780d619fc24c925fc391ead9fc53fd769a8f96c55f7fca52e1529eddc2b0f3",
   "precision": {
     "dps": 80
   },
@@ -20,20 +20,19 @@
     "mode": {
       "kind": "explicit",
       "values": [
-        "negative_control_invalid",
         "critical_height",
         "radial_quartet"
       ]
     },
-    "zero_index": {
+    "case": {
       "kind": "explicit",
       "values": [
-        0,
-        9,
-        49
+        "1",
+        "10",
+        "50"
       ]
     },
-    "epsilon": {
+    "magnitude": {
       "kind": "explicit",
       "values": [
         "0.0001",
@@ -42,8 +41,8 @@
       ]
     }
   },
-  "points_requested": 27,
-  "points_completed": 27,
+  "points_requested": 18,
+  "points_completed": 18,
   "tau": {
     "symbolic": "2*pi",
     "numeric_decimal": "6.283185307179586476925286766559005768394338798750211641949889184615632812572418",
@@ -72,10 +71,10 @@
     "certification.py": "3c2325a6277dd177ca11f9c3b6404c30ba9d6d9a22fc775ed24fd4df40dff991",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "math_core.py": "592288b56caabaa7395d0e4dc39e8f84f6afbef0f07dee4f68d0f76f71ac3447",
+    "math_core.py": "839d63dabe496816c915ccc42c7bec7d6e6ceecedda764d69c15d38f7682bc7c",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "b286c3a439fddab1df0d81518592343d6bb0b55053225453c6af2fc2f73fb0ef",
+    "research_runner.py": "bbd912eee6c4579f21f6ba15b25eea53e550750d431c23232931f5796125b79d",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -99,7 +98,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "592288b56caabaa7395d0e4dc39e8f84f6afbef0f07dee4f68d0f76f71ac3447"
+      "sha256": "839d63dabe496816c915ccc42c7bec7d6e6ceecedda764d69c15d38f7682bc7c"
     },
     {
       "path": "transcendental.py",
@@ -111,7 +110,7 @@
     },
     {
       "path": "research_runner.py",
-      "sha256": "b286c3a439fddab1df0d81518592343d6bb0b55053225453c6af2fc2f73fb0ef"
+      "sha256": "bbd912eee6c4579f21f6ba15b25eea53e550750d431c23232931f5796125b79d"
     },
     {
       "path": "zero_finder.py",
@@ -136,19 +135,26 @@
       "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
     }
   ],
-  "consumed_certificates": [],
+  "consumed_certificates": [
+    "74d3f6c833764f9f613c874838694357b50dbe5377265e0237ced43aaf96b9fc",
+    "92f2a97e9f021257eafb5c9ea030f893cd1e2da88f62e74d11d79b139465df91",
+    "9c62600e13eca9eacde2b622c6f0cdc22c5df0ed21da83d005cd76612fe7a458",
+    "9dbd348f84438feaa11ad0923489fcbb2080cdd68cf3801618f1cb008f2fb805",
+    "a4c7229013691a861f252897788334d98468db07f8b64709c2302e19316f0b89",
+    "ab774f0a5046fc0a3aece0540446c8c29ec5f81dc9a640661ffc429eac5fdc78"
+  ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "e5615e0fc3f71392f1bb4fd7de4a776e5ede529b53d63b6702056baf9e1573f6"
+      "sha256": "372c805540b236185791eea569817c6c5de769e0fd4abc645668879d1fa83cc0"
     },
     "summary_json": {
       "path": "summary.json",
-      "sha256": "7b906f223573fa6a461d9c0566c2e59a39161b95cd3c11472a3c8158cc7dbe40"
+      "sha256": "446a1c468a35a7f42ddd665d7b5ced1e93d986125736dbf13e80dd41e532b771"
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "6c351b9a728bd231ec50b5c10cb6b58bea7aeacb173408bfbea749bd4669e9e2"
+      "sha256": "b7371325e2626061526351d4d115e001d6f010c5342b4058f543aaed47a4341e"
     }
   }
 }
