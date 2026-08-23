@@ -888,33 +888,273 @@ def test_canonical_current_source_mismatch_rejection():
     assert any("mismatch" in e.lower() or "does not match" in e.lower() for e in errs)
 
 
-def test_formal_build_report_verification(tmp_path):
-    """Test verification of Lean 4 build report and tamper rejection."""
-    # If formal/build_report.json exists, verify it
-    formal_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "formal")
-    report_path = os.path.join(formal_dir, "build_report.json")
-    if os.path.exists(report_path):
-        ok, state, rep, errs = certification.verify_formal_build_report(report_path=report_path, check_current=True)
-        assert ok, f"Existing formal build report failed verification: {errs}"
+def _make_valid_formal_report_dict():
+    """Helper to create a syntactically valid baseline formal report dictionary."""
+    import subprocess
+    try:
+        current_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=certification.REPO_ROOT,
+            stderr=subprocess.DEVNULL
+        ).decode("utf-8").strip()
+    except Exception:
+        current_commit = "d42876e3a5af4ddf41248baf982fcd1ffb859c81"
 
-    # Corrupt report in temporary location
-    fake_report = {
-        "schema_version": "1",
-        "report_type": "lean4_formal_build_report",
+    formal_hashes = {}
+    for f in certification.REQUIRED_FORMAL_SOURCES:
+        full_p = os.path.join(certification.REPO_ROOT, f)
+        if os.path.exists(full_p):
+            with open(full_p, "rb") as sf:
+                formal_hashes[f] = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+        else:
+            formal_hashes[f] = "a" * 64
+
+    def _h(rel):
+        full_p = os.path.join(certification.REPO_ROOT, rel)
+        if os.path.exists(full_p):
+            with open(full_p, "rb") as sf:
+                return hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+        return "b" * 64
+
+    builder_hashes = {}
+    for b in certification.REQUIRED_FORMAL_BUILDER_MODULES:
+        builder_hashes[b] = _h(b)
+
+    rep = {
+        "schema_version": "1.0.0",
+        "report_type": "formal_build_report",
         "status": "passed",
-        "lean_version": "4.8.0",
-        "lake_version": "5.0.0",
-        "build_exit_code": 0,
-        "source_files": {"formal/RiemannScope.lean": "0" * 64},
-        "lakefile_hash": "0" * 64,
-        "toolchain_hash": "0" * 64
+        "command": "lake build",
+        "exit_code": 0,
+        "producing_git_commit": current_commit,
+        "timestamp": "2026-08-23T12:00:00.000000+00:00",
+        "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
+        "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
+        "formal_source_hashes": formal_hashes,
+        "lean_toolchain_hash": _h("formal/lean-toolchain"),
+        "lakefile_hash": _h("formal/lakefile.toml"),
+        "lake_manifest_hash": _h("formal/lake-manifest.json"),
+        "builder_source_hashes": builder_hashes,
+        "build_stdout": "Build completed successfully.",
+        "build_stderr": ""
     }
-    fake_report["report_hash"] = certification._sha256_canonical(fake_report)
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    return rep
 
-    tmp_rep_file = tmp_path / "fake_report.json"
-    with open(tmp_rep_file, "w", encoding="utf-8") as f:
-        json.dump(fake_report, f, indent=2)
 
-    ok, state, rep, errs = certification.verify_formal_build_report(report_path=str(tmp_rep_file), check_current=True)
+def test_adversarial_formal_build_report_forged_commit(tmp_path):
+    """Test rejection of rehashed formal report with forged producing commit."""
+    rep = _make_valid_formal_report_dict()
+    rep["producing_git_commit"] = "0000000000000000000000000000000000000000"
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "forged_commit.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
     assert not ok
-    assert any("mismatch" in e.lower() or "missing" in e.lower() for e in errs)
+    assert any("producing_git_commit" in e or "placeholder" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_nonexistent_commit(tmp_path):
+    """Test rejection of rehashed formal report with nonexistent git commit."""
+    rep = _make_valid_formal_report_dict()
+    rep["producing_git_commit"] = "1234567890abcdef1234567890abcdef12345678"
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "nonexistent_commit.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("producing_git_commit" in e or "does not exist" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_empty_formal_inventory(tmp_path):
+    """Test rejection of rehashed formal report with empty formal inventory."""
+    rep = _make_valid_formal_report_dict()
+    rep["formal_source_hashes"] = {}
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "empty_formal_inv.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("formal_source_hashes" in e or "missing required files" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_omitted_formal_source(tmp_path):
+    """Test rejection of rehashed formal report missing one required formal source file."""
+    rep = _make_valid_formal_report_dict()
+    del rep["formal_source_hashes"]["formal/RiemannScope/Contradiction.lean"]
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "omitted_formal_src.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("missing required files" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_unexpected_formal_source(tmp_path):
+    """Test rejection of rehashed formal report containing an unexpected extra file."""
+    rep = _make_valid_formal_report_dict()
+    rep["formal_source_hashes"]["formal/RiemannScope/ForgedExtra.lean"] = "f" * 64
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "unexpected_formal_src.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("unexpected files" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_forged_formal_source_hash(tmp_path):
+    """Test rejection of rehashed formal report with forged formal source hash."""
+    rep = _make_valid_formal_report_dict()
+    rep["formal_source_hashes"]["formal/RiemannScope/Basic.lean"] = "0" * 64
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "forged_formal_hash.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("invalid SHA-256 hash" in e or "hash mismatch" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_omitted_toolchain_hash(tmp_path):
+    """Test rejection of rehashed formal report missing lean_toolchain_hash."""
+    rep = _make_valid_formal_report_dict()
+    del rep["lean_toolchain_hash"]
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "omitted_toolchain_hash.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("lean_toolchain_hash" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_forged_lakefile_hash(tmp_path):
+    """Test rejection of rehashed formal report with forged lakefile_hash."""
+    rep = _make_valid_formal_report_dict()
+    rep["lakefile_hash"] = "0" * 64
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "forged_lakefile_hash.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("lakefile_hash" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_missing_builder_hashes(tmp_path):
+    """Test rejection of rehashed formal report missing builder_source_hashes."""
+    rep = _make_valid_formal_report_dict()
+    del rep["builder_source_hashes"]
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "missing_builder_hashes.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("builder_source_hashes" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_forged_builder_hash(tmp_path):
+    """Test rejection of rehashed formal report with forged builder hash."""
+    rep = _make_valid_formal_report_dict()
+    rep["builder_source_hashes"]["certification.py"] = "0" * 64
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "forged_builder_hash.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("builder source" in e.lower() or "invalid sha-256" in e.lower() for e in errs)
+
+
+def test_adversarial_formal_build_report_placeholder_versions(tmp_path):
+    """Test rejection of rehashed formal report with placeholder Lake/Lean versions."""
+    rep = _make_valid_formal_report_dict()
+    rep["lake_version"] = "UNKNOWN"
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "placeholder_lake.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("lake_version" in e for e in errs)
+
+    rep["lake_version"] = "Lake version 5.0.0"
+    rep["lean_version"] = "placeholder"
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("lean_version" in e for e in errs)
+
+
+def test_adversarial_formal_build_report_wrong_command_and_contradictory_status(tmp_path):
+    """Test rejection of rehashed formal report with invalid command or contradictory status."""
+    rep = _make_valid_formal_report_dict()
+    rep["command"] = "cargo build"
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    tmp_file = tmp_path / "wrong_cmd.json"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("command" in e for e in errs)
+
+    rep["command"] = "lake build"
+    rep["status"] = "passed"
+    rep["exit_code"] = 1
+    clean_rep = {k: v for k, v in rep.items() if k != "report_hash"}
+    rep["report_hash"] = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(rep, f, indent=2)
+
+    ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
+    assert not ok
+    assert any("exit code" in e for e in errs)

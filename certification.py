@@ -73,6 +73,29 @@ REQUIRED_INPUT_DATA_FILES = [
     "primes.json"
 ]
 
+REQUIRED_FORMAL_SOURCES = [
+    "formal/RiemannScope.lean",
+    "formal/RiemannScope/Basic.lean",
+    "formal/RiemannScope/Grade.lean",
+    "formal/RiemannScope/TranscendentalContinuation.lean",
+    "formal/RiemannScope/ZeroWorldline.lean",
+    "formal/RiemannScope/RadialLeaf.lean",
+    "formal/RiemannScope/ZeroCharacter.lean",
+    "formal/RiemannScope/SymmetricDefect.lean",
+    "formal/RiemannScope/Contradiction.lean",
+]
+
+REQUIRED_FORMAL_CONFIG_FILES = {
+    "lean_toolchain": "formal/lean-toolchain",
+    "lakefile": "formal/lakefile.toml",
+    "lake_manifest": "formal/lake-manifest.json",
+}
+
+REQUIRED_FORMAL_BUILDER_MODULES = [
+    "scripts/build_formal.py",
+    "certification.py",
+]
+
 CERTIFICATION_LEVELS = [
     "candidate",
     "residual_verified",
@@ -418,40 +441,138 @@ def verify_formal_build_report(
         return False, "failed", {}, [f"Failed reading formal/build_report.json: {e}"]
 
     errors: List[str] = []
+    if not isinstance(report, dict):
+        return False, "failed", {}, ["Formal build report must be a dictionary"]
+
+    # 1. Schema & Type
+    if report.get("schema_version") != "1.0.0":
+        errors.append(f"Unsupported schema_version: expected '1.0.0', got '{report.get('schema_version')}'")
+    if report.get("report_type") != "formal_build_report":
+        errors.append(f"Invalid report_type: expected 'formal_build_report', got '{report.get('report_type')}'")
+    if report.get("command") != "lake build":
+        errors.append(f"Invalid command: expected 'lake build', got '{report.get('command')}'")
+    if report.get("status") != "passed" or report.get("exit_code") != 0:
+        errors.append(f"Formal build status is '{report.get('status')}' (exit code {report.get('exit_code')})")
+
+    # 2. Canonical self-hash
     rep_hash = report.get("report_hash")
     clean_rep = {k: v for k, v in report.items() if k != "report_hash"}
     calc_hash = hashlib.sha256(json.dumps(clean_rep, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     if not rep_hash or rep_hash != calc_hash:
-        errors.append(f"Formal build report hash mismatch: reported {rep_hash}, computed {calc_hash}")
+        errors.append(f"Formal build report self-hash mismatch: reported '{rep_hash}', computed '{calc_hash}'")
 
-    if report.get("status") != "passed" or report.get("exit_code") != 0:
-        errors.append(f"Formal build status is '{report.get('status')}' (exit code {report.get('exit_code')})")
+    # 3. Toolchain metadata
+    lake_ver = str(report.get("lake_version", "")).strip()
+    lean_ver = str(report.get("lean_version", "")).strip()
+    if not lake_ver or lake_ver.lower() in ("unknown", "placeholder", "none", "fake", "forged", "n/a"):
+        errors.append(f"Invalid or placeholder lake_version: '{lake_ver}'")
+    if not lean_ver or lean_ver.lower() in ("unknown", "placeholder", "none", "fake", "forged", "n/a"):
+        errors.append(f"Invalid or placeholder lean_version: '{lean_ver}'")
 
-    if check_current:
-        f_hashes = report.get("formal_source_hashes", {})
+    # 4. Producing Git Commit Validation
+    prod_commit = str(report.get("producing_git_commit", "")).strip()
+    commit_ok, commit_err = _is_valid_git_commit(prod_commit, check_ancestor=False)
+    if not commit_ok:
+        errors.append(f"Invalid producing_git_commit provenance: {commit_err}")
+
+    # 5. Formal Source Hashes Inventory & Hash Binding
+    f_hashes = report.get("formal_source_hashes")
+    if not isinstance(f_hashes, dict) or not f_hashes:
+        errors.append("Missing or empty formal_source_hashes map")
+    else:
+        req_set = set(REQUIRED_FORMAL_SOURCES)
+        rep_set = set(f_hashes.keys())
+        missing_src = req_set - rep_set
+        if missing_src:
+            errors.append(f"Formal source inventory missing required files: {sorted(list(missing_src))}")
+        extra_src = rep_set - req_set
+        if extra_src:
+            errors.append(f"Formal source inventory contains unexpected files: {sorted(list(extra_src))}")
+
         for rel_p, exp_h in f_hashes.items():
-            full_p = os.path.join(REPO_ROOT, rel_p)
-            if not os.path.exists(full_p):
-                errors.append(f"Formal source file '{rel_p}' missing on disk")
+            if not exp_h or len(exp_h) != 64 or not all(c in "0123456789abcdefABCDEF" for c in exp_h) or exp_h.lower() in ("0" * 64, "fake", "none"):
+                errors.append(f"Formal source '{rel_p}' has invalid SHA-256 hash: '{exp_h}'")
+                continue
+
+            # Historical blob binding at producing commit
+            if commit_ok:
+                blob_h = _get_historical_git_blob_hash(prod_commit, rel_p)
+                if blob_h is None:
+                    errors.append(f"Formal source '{rel_p}' does not exist in git at commit '{prod_commit}'")
+                elif blob_h != exp_h:
+                    errors.append(f"Formal source '{rel_p}' git blob hash ({blob_h}) != report hash ({exp_h}) at commit '{prod_commit}'")
+
+            # Current workspace disk binding
+            if check_current:
+                full_p = os.path.join(REPO_ROOT, rel_p)
+                if not os.path.exists(full_p):
+                    errors.append(f"Formal source file '{rel_p}' missing on disk")
+                else:
+                    with open(full_p, "rb") as sf:
+                        cur_h = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+                    if cur_h != exp_h:
+                        errors.append(f"Formal source file '{rel_p}' hash mismatch: disk {cur_h}, report {exp_h}")
+
+    # 6. Formal Config Files (lean-toolchain, lakefile.toml, lake-manifest.json)
+    for cfg_key, cfg_rel in REQUIRED_FORMAL_CONFIG_FILES.items():
+        field_name = f"{cfg_key}_hash"
+        cfg_h = report.get(field_name)
+        if not cfg_h or len(cfg_h) != 64 or not all(c in "0123456789abcdefABCDEF" for c in cfg_h) or cfg_h.lower() in ("0" * 64, "fake", "none"):
+            errors.append(f"Report missing or invalid {field_name}: '{cfg_h}'")
+            continue
+
+        if commit_ok:
+            blob_h = _get_historical_git_blob_hash(prod_commit, cfg_rel)
+            if blob_h is None:
+                errors.append(f"Formal config '{cfg_rel}' does not exist in git at commit '{prod_commit}'")
+            elif blob_h != cfg_h:
+                errors.append(f"Formal config '{cfg_rel}' git blob hash ({blob_h}) != report hash ({cfg_h}) at commit '{prod_commit}'")
+
+        if check_current:
+            cfg_full = os.path.join(REPO_ROOT, cfg_rel)
+            if not os.path.exists(cfg_full):
+                errors.append(f"Formal config file '{cfg_rel}' missing on disk")
             else:
-                with open(full_p, "rb") as sf:
-                    cur_h = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
-                if cur_h != exp_h:
-                    errors.append(f"Formal source file '{rel_p}' hash mismatch: disk {cur_h}, report {exp_h}")
+                with open(cfg_full, "rb") as cf:
+                    cur_h = hashlib.sha256(cf.read().replace(b"\r\n", b"\n")).hexdigest()
+                if cur_h != cfg_h:
+                    errors.append(f"Formal config file '{cfg_rel}' hash mismatch: disk {cur_h}, report {cfg_h}")
 
-        tc_path = os.path.join(REPO_ROOT, "formal", "lean-toolchain")
-        if os.path.exists(tc_path):
-            with open(tc_path, "rb") as tcf:
-                cur_tc_h = hashlib.sha256(tcf.read().replace(b"\r\n", b"\n")).hexdigest()
-            if cur_tc_h != report.get("lean_toolchain_hash"):
-                errors.append("formal/lean-toolchain hash mismatch against report")
+    # 7. Builder / Verifier Source Code Hashes
+    builder_hashes = report.get("builder_source_hashes")
+    if not isinstance(builder_hashes, dict) or not builder_hashes:
+        errors.append("Report missing or empty builder_source_hashes map")
+    else:
+        req_b_set = set(REQUIRED_FORMAL_BUILDER_MODULES)
+        rep_b_set = set(builder_hashes.keys())
+        missing_b = req_b_set - rep_b_set
+        if missing_b:
+            errors.append(f"Builder source inventory missing required files: {sorted(list(missing_b))}")
+        extra_b = rep_b_set - req_b_set
+        if extra_b:
+            errors.append(f"Builder source inventory contains unexpected files: {sorted(list(extra_b))}")
 
-        lf_path = os.path.join(REPO_ROOT, "formal", "lakefile.toml")
-        if os.path.exists(lf_path):
-            with open(lf_path, "rb") as lff:
-                cur_lf_h = hashlib.sha256(lff.read().replace(b"\r\n", b"\n")).hexdigest()
-            if cur_lf_h != report.get("lakefile_hash"):
-                errors.append("formal/lakefile.toml hash mismatch against report")
+        for b_rel, b_h in builder_hashes.items():
+            if not b_h or len(b_h) != 64 or not all(c in "0123456789abcdefABCDEF" for c in b_h) or b_h.lower() in ("0" * 64, "fake", "none"):
+                errors.append(f"Builder source '{b_rel}' has invalid SHA-256 hash: '{b_h}'")
+                continue
+
+            if commit_ok:
+                blob_h = _get_historical_git_blob_hash(prod_commit, b_rel)
+                if blob_h is None:
+                    errors.append(f"Builder source '{b_rel}' does not exist in git at commit '{prod_commit}'")
+                elif blob_h != b_h:
+                    errors.append(f"Builder source '{b_rel}' git blob hash ({blob_h}) != report hash ({b_h}) at commit '{prod_commit}'")
+
+            if check_current:
+                b_full = os.path.join(REPO_ROOT, b_rel)
+                if not os.path.exists(b_full):
+                    errors.append(f"Builder source file '{b_rel}' missing on disk")
+                else:
+                    with open(b_full, "rb") as bf:
+                        cur_h = hashlib.sha256(bf.read().replace(b"\r\n", b"\n")).hexdigest()
+                    if cur_h != b_h:
+                        errors.append(f"Builder source file '{b_rel}' hash mismatch: disk {cur_h}, report {b_h}")
 
     is_verified = (len(errors) == 0 and report.get("status") == "passed" and report.get("exit_code") == 0)
     state = "verified" if is_verified else ("stale" if report.get("status") == "passed" else "failed")

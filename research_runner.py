@@ -2013,25 +2013,8 @@ def run_experiment(
             shutil.rmtree(work_dir, ignore_errors=True)
         raise RuntimeError(f"Canonical run publication rejected for '{exp_id}': {'; '.join(val_errs)}")
 
-    run_entry: Dict[str, Any] = {
-        "schema_version": "2",
-        "run_id": exp_id,
-        "experiment_id": exp_id,
-        "title": spec.get("title", exp_id),
-        "epistemic_class": spec.get("epistemic_class", "exact_control"),
-        "object_relationship": spec.get("object_relationship", "unknown"),
-        "classification": spec.get("classification", "canonical_experiment"),
-        "timestamp": manifest["started_at"],
-        "git_commit": git_commit,
-        "producing_git_commit": manifest.get("producing_git_commit", git_commit),
-        "git_dirty": git_dirty,
-        "status": final_status,
-        "criterion_met": summary["criterion"].get("criterion_met"),
-        "summary_path": f"research/runs/{exp_id}/summary.json",
-        "manifest_path": f"research/runs/{exp_id}/manifest.json",
-        "results_path": f"research/runs/{exp_id}/results.jsonl"
-    }
-    if "notes" in spec:
+    run_entry = project_canonical_index_entry(manifest, summary, exp_id)
+    if "notes" in spec and "notes" not in run_entry:
         run_entry["notes"] = spec["notes"]
 
     pid = os.getpid()
@@ -2160,6 +2143,7 @@ REQUIRED_MANIFEST_BASE_FIELDS = [
     "parameter_space",
     "points_requested",
     "points_completed",
+    "artifacts",
 ]
 
 REQUIRED_MANIFEST_PROVENANCE_FIELDS = [
@@ -2173,6 +2157,40 @@ REQUIRED_MANIFEST_PROVENANCE_FIELDS = [
     "data_provenance",
     "experiment_spec_sha256",
 ]
+
+REQUIRED_ARTIFACT_MAPPINGS = {
+    "results_jsonl": "results.jsonl",
+    "summary_json": "summary.json",
+    "readme_md": "README.md",
+}
+
+
+def project_canonical_index_entry(manifest: Dict[str, Any], summary: Dict[str, Any], exp_id: str) -> Dict[str, Any]:
+    """Derive the canonical index entry projection from authoritative manifest and summary."""
+    crit = summary.get("criterion", {}) if isinstance(summary, dict) else {}
+    crit_met = crit.get("criterion_met") if isinstance(crit, dict) else None
+
+    entry: Dict[str, Any] = {
+        "schema_version": "2",
+        "run_id": exp_id,
+        "experiment_id": exp_id,
+        "title": manifest.get("title", exp_id),
+        "epistemic_class": manifest.get("epistemic_class", "exact_control"),
+        "object_relationship": manifest.get("object_relationship", "unknown"),
+        "classification": manifest.get("classification", "canonical_experiment"),
+        "timestamp": manifest.get("started_at", ""),
+        "git_commit": manifest.get("git_commit", ""),
+        "producing_git_commit": manifest.get("producing_git_commit", ""),
+        "git_dirty": manifest.get("git_dirty", False),
+        "status": manifest.get("status", "complete"),
+        "criterion_met": crit_met,
+        "summary_path": f"research/runs/{exp_id}/summary.json",
+        "manifest_path": f"research/runs/{exp_id}/manifest.json",
+        "results_path": f"research/runs/{exp_id}/results.jsonl",
+    }
+    if "notes" in manifest:
+        entry["notes"] = manifest["notes"]
+    return entry
 
 
 def validate_manifest(
@@ -2215,6 +2233,46 @@ def validate_manifest(
         val = manifest.get(req_p)
         if val is None or val == "" or val == "N/A":
             errors.append(f"Manifest missing or invalid required provenance field '{req_p}'")
+
+    # 2b. Artifacts map schema, path integrity, and hash formatting
+    artifacts_map = manifest.get("artifacts")
+    if not isinstance(artifacts_map, dict) or not artifacts_map:
+        errors.append("Manifest missing or empty 'artifacts' map")
+    else:
+        req_art_keys = set(REQUIRED_ARTIFACT_MAPPINGS.keys())
+        act_art_keys = set(artifacts_map.keys())
+        missing_art = req_art_keys - act_art_keys
+        if missing_art:
+            errors.append(f"Manifest artifacts map missing required entries: {sorted(list(missing_art))}")
+        extra_art = act_art_keys - req_art_keys
+        if extra_art:
+            errors.append(f"Manifest artifacts map contains unauthorized entries: {sorted(list(extra_art))}")
+
+        seen_paths: Set[str] = set()
+        for art_key, exp_fname in REQUIRED_ARTIFACT_MAPPINGS.items():
+            if art_key not in artifacts_map:
+                continue
+            art_entry = artifacts_map[art_key]
+            if not isinstance(art_entry, dict):
+                errors.append(f"Manifest artifacts entry '{art_key}' must be a dictionary")
+                continue
+
+            decl_path = art_entry.get("path")
+            if not isinstance(decl_path, str) or not decl_path:
+                errors.append(f"Manifest artifacts entry '{art_key}' missing 'path'")
+            else:
+                if "\\" in decl_path or decl_path.startswith("/") or ".." in decl_path or ":" in decl_path:
+                    errors.append(f"Manifest artifacts entry '{art_key}' path has invalid format, traversal, or backslash: '{decl_path}'")
+                elif decl_path != exp_fname:
+                    errors.append(f"Manifest artifacts entry '{art_key}' declared path '{decl_path}' != expected canonical path '{exp_fname}'")
+                elif decl_path in seen_paths:
+                    errors.append(f"Manifest artifacts entry '{art_key}' duplicate destination path: '{decl_path}'")
+                else:
+                    seen_paths.add(decl_path)
+
+            decl_sha = art_entry.get("sha256")
+            if not decl_sha or len(decl_sha) != 64 or not all(c in "0123456789abcdefABCDEF" for c in decl_sha) or decl_sha.lower() in ("0" * 64, "fake", "none"):
+                errors.append(f"Manifest artifacts entry '{art_key}' missing or invalid 64-hex SHA-256: '{decl_sha}'")
 
     # 3. git_dirty must be strictly boolean False
     if manifest.get("git_dirty") is not False:
@@ -2553,23 +2611,26 @@ def validate_run_bundle(
     except Exception as e:
         return False, [f"Run bundle '{exp_id}' failed reading manifest.json: {e}"]
 
-    # 2. Artifact byte hashes validation
+    # 2. Artifact byte hashes validation against declared paths
     artifacts_map = manifest.get("artifacts")
     if not isinstance(artifacts_map, dict) or not artifacts_map:
         errors.append(f"Run bundle '{exp_id}' manifest missing 'artifacts' map")
     else:
-        for art_key, fname in [("results_jsonl", "results.jsonl"), ("summary_json", "summary.json"), ("readme_md", "README.md")]:
+        for art_key, exp_fname in REQUIRED_ARTIFACT_MAPPINGS.items():
             art_entry = artifacts_map.get(art_key)
             if not isinstance(art_entry, dict) or not art_entry.get("sha256"):
                 errors.append(f"Manifest artifacts map missing entry or sha256 for '{art_key}'")
             else:
+                decl_path = art_entry.get("path", exp_fname)
                 decl_sha = art_entry.get("sha256")
-                full_art_path = os.path.join(run_dir, fname)
-                if os.path.exists(full_art_path):
+                full_art_path = os.path.join(run_dir, decl_path)
+                if not os.path.exists(full_art_path):
+                    errors.append(f"Declared artifact file '{decl_path}' missing in run bundle '{exp_id}'")
+                else:
                     with open(full_art_path, "rb") as af:
                         calc_sha = hashlib.sha256(af.read().replace(b"\r\n", b"\n")).hexdigest()
-                    if calc_sha != decl_sha:
-                        errors.append(f"Artifact byte SHA-256 mismatch for '{fname}': computed {calc_sha}, declared {decl_sha}")
+                    if decl_sha and calc_sha != decl_sha:
+                        errors.append(f"Artifact byte SHA-256 mismatch for '{decl_path}': computed {calc_sha}, declared {decl_sha}")
 
     results = []
     if os.path.exists(results_path):
@@ -2626,6 +2687,7 @@ def validate_run_bundle(
         errors.extend(m_errs)
 
     # 4. Summary recomputation and complete deterministic semantic field comparison
+    committed_summary: Dict[str, Any] = {}
     if not os.path.exists(summary_path):
         errors.append(f"Run bundle '{exp_id}' missing summary.json")
     elif spec is not None:
@@ -2660,40 +2722,53 @@ def validate_run_bundle(
     if not os.path.exists(readme_path):
         errors.append(f"Run bundle '{exp_id}' missing README.md")
 
-    # 5. Index entry synchronization
+    # 5. Index entry synchronization against complete canonical projection
     if not os.path.exists(INDEX_FILE):
         errors.append("research/index.json missing")
     else:
         try:
             with open(INDEX_FILE, "r", encoding="utf-8") as inf:
                 idx_data = json.load(inf)
-            runs = idx_data.get("runs", []) if isinstance(idx_data, dict) else idx_data
-            found_entry = None
-            for r in runs:
-                if r.get("experiment_id") == exp_id or r.get("run_id") == exp_id:
-                    found_entry = r
-                    break
-            if not found_entry:
+            runs = idx_data.get("runs", []) if isinstance(idx_data, dict) else (idx_data if isinstance(idx_data, list) else [])
+            matching_entries = [r for r in runs if isinstance(r, dict) and (r.get("experiment_id") == exp_id or r.get("run_id") == exp_id)]
+            if not matching_entries:
                 errors.append(f"No entry for experiment '{exp_id}' in research/index.json")
+            elif len(matching_entries) > 1:
+                errors.append(f"Duplicate entries ({len(matching_entries)}) for experiment '{exp_id}' in research/index.json")
             else:
-                if found_entry.get("git_commit") != manifest.get("git_commit"):
-                    errors.append(f"Index git_commit '{found_entry.get('git_commit')}' != manifest '{manifest.get('git_commit')}'")
-                if found_entry.get("producing_git_commit") != manifest.get("producing_git_commit"):
-                    errors.append(f"Index producing_git_commit '{found_entry.get('producing_git_commit')}' != manifest '{manifest.get('producing_git_commit')}'")
-                if found_entry.get("git_dirty") is not False:
-                    errors.append(f"Index git_dirty is not False: '{found_entry.get('git_dirty')}'")
-                if found_entry.get("status") != manifest.get("status"):
-                    errors.append(f"Index status '{found_entry.get('status')}' != manifest '{manifest.get('status')}'")
-                if "criterion" in (committed_summary if 'committed_summary' in locals() else {}):
-                    exp_crit_met = committed_summary["criterion"].get("criterion_met")
-                    if found_entry.get("criterion_met") != exp_crit_met:
-                        errors.append(f"Index criterion_met '{found_entry.get('criterion_met')}' != summary '{exp_crit_met}'")
-                if found_entry.get("summary_path") != f"research/runs/{exp_id}/summary.json":
-                    errors.append(f"Index summary_path mismatch: {found_entry.get('summary_path')}")
-                if found_entry.get("manifest_path") != f"research/runs/{exp_id}/manifest.json":
-                    errors.append(f"Index manifest_path mismatch: {found_entry.get('manifest_path')}")
-                if found_entry.get("results_path") != f"research/runs/{exp_id}/results.jsonl":
-                    errors.append(f"Index results_path mismatch: {found_entry.get('results_path')}")
+                found_entry = matching_entries[0]
+                expected_entry = project_canonical_index_entry(manifest, committed_summary, exp_id)
+                if "notes" in (spec or {}) and "notes" not in expected_entry:
+                    expected_entry["notes"] = spec["notes"]
+
+                REQUIRED_INDEX_FIELDS = [
+                    "schema_version",
+                    "run_id",
+                    "experiment_id",
+                    "title",
+                    "epistemic_class",
+                    "object_relationship",
+                    "classification",
+                    "timestamp",
+                    "git_commit",
+                    "producing_git_commit",
+                    "git_dirty",
+                    "status",
+                    "criterion_met",
+                    "manifest_path",
+                    "results_path",
+                    "summary_path",
+                ]
+                for fld in REQUIRED_INDEX_FIELDS:
+                    act_v = found_entry.get(fld)
+                    exp_v = expected_entry.get(fld)
+                    if act_v != exp_v:
+                        errors.append(f"Index entry '{fld}' mismatch for '{exp_id}': index '{act_v}' != expected '{exp_v}'")
+
+                for k, v in found_entry.items():
+                    if isinstance(v, str) and v.lower() in ("placeholder", "unknown", "fake", "forged"):
+                        errors.append(f"Index entry contains placeholder for '{k}': '{v}'")
+
         except Exception as e:
             errors.append(f"Failed validating index.json entry: {e}")
 

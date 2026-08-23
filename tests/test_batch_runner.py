@@ -18,6 +18,7 @@ Tests all requirements from EXPERIMENT_PROTOCOL.md and prompt:
 """
 
 import os
+import sys
 import json
 import yaml
 import shutil
@@ -883,6 +884,11 @@ def test_validate_manifest_accepts_valid_manifest_and_rejects_discrepancies():
         "code_modules": [{"path": m, "sha256": certification._get_source_code_hashes(z1["producing_git_commit"])[m]} for m in certification.REQUIRED_SOURCE_MODULES],
         "data_provenance": [{"path": f"data/{d}", "sha256": certification._get_input_data_hashes(z1["producing_git_commit"])[d]} for d in certification.REQUIRED_INPUT_DATA_FILES],
         "experiment_spec_sha256": "0" * 64,
+        "artifacts": {
+            "results_jsonl": {"path": "results.jsonl", "sha256": "1" * 64},
+            "summary_json": {"path": "summary.json", "sha256": "2" * 64},
+            "readme_md": {"path": "README.md", "sha256": "3" * 64}
+        },
         "consumed_certificates": [h1, h2]
     }
     valid_results = [
@@ -1277,3 +1283,147 @@ def test_validate_run_bundle_tamper_detection(tmp_path):
     ok, errs = research_runner.validate_run_bundle(str(dst_run), canonical_current=False)
     assert not ok
     assert any("mismatch" in e.lower() or "sha-256" in e.lower() for e in errs)
+
+
+def test_adversarial_manifest_artifact_path_mutations():
+    """Test rejection of altered, traversal, backslash, missing, or unauthorized artifact paths in manifest."""
+    base_manifest = {
+        "schema_version": "2",
+        "run_id": "test_exp",
+        "experiment_id": "test_exp",
+        "title": "Test Title",
+        "epistemic_class": "exact_control",
+        "classification": "canonical_experiment",
+        "status": "complete",
+        "precision": {"dps": 80},
+        "parameter_space": {},
+        "points_requested": 1,
+        "points_completed": 1,
+        "git_commit": "d42876e3a5af4ddf41248baf982fcd1ffb859c81",
+        "producing_git_commit": "d42876e3a5af4ddf41248baf982fcd1ffb859c81",
+        "git_dirty": False,
+        "dependency_fingerprint": {
+            "python": sys.version.split()[0],
+            "python_flint": "0.6.0",
+            "mpmath": "1.3.0",
+            "platform": sys.platform.lower(),
+            "library": "flint",
+            "library_version": "0.6.0",
+            "verifier_version": "2.0.0",
+            "algorithm_version": "2.0.0"
+        },
+        "source_code_hashes": {m: "a" * 64 for m in certification.REQUIRED_SOURCE_MODULES},
+        "input_data_hashes": {d: "b" * 64 for d in certification.REQUIRED_INPUT_DATA_FILES},
+        "code_modules": [{"path": m, "sha256": "a" * 64} for m in certification.REQUIRED_SOURCE_MODULES],
+        "data_provenance": [{"path": f"data/{d}", "sha256": "b" * 64} for d in certification.REQUIRED_INPUT_DATA_FILES],
+        "experiment_spec_sha256": "c" * 64,
+        "artifacts": {
+            "results_jsonl": {"path": "results.jsonl", "sha256": "1" * 64},
+            "summary_json": {"path": "summary.json", "sha256": "2" * 64},
+            "readme_md": {"path": "README.md", "sha256": "3" * 64}
+        },
+        "consumed_certificates": []
+    }
+
+    # 1. Altered filename e.g. FORGED.json
+    m1 = dict(base_manifest)
+    m1["artifacts"] = dict(base_manifest["artifacts"])
+    m1["artifacts"]["results_jsonl"] = {"path": "FORGED.json", "sha256": "1" * 64}
+    ok, errs = research_runner.validate_manifest(m1, canonical_current=False)
+    assert not ok
+    assert any("declared path" in e or "canonical path" in e for e in errs)
+
+    # 2. Path traversal e.g. ../secret.json
+    m2 = dict(base_manifest)
+    m2["artifacts"] = dict(base_manifest["artifacts"])
+    m2["artifacts"]["summary_json"] = {"path": "../secret.json", "sha256": "2" * 64}
+    ok, errs = research_runner.validate_manifest(m2, canonical_current=False)
+    assert not ok
+    assert any("traversal" in e or "invalid format" in e for e in errs)
+
+    # 3. Backslash in path e.g. results\results.jsonl
+    m3 = dict(base_manifest)
+    m3["artifacts"] = dict(base_manifest["artifacts"])
+    m3["artifacts"]["readme_md"] = {"path": "sub\\README.md", "sha256": "3" * 64}
+    ok, errs = research_runner.validate_manifest(m3, canonical_current=False)
+    assert not ok
+    assert any("backslash" in e or "invalid format" in e for e in errs)
+
+    # 4. Missing required artifact entry
+    m4 = dict(base_manifest)
+    m4["artifacts"] = {"summary_json": {"path": "summary.json", "sha256": "2" * 64}}
+    ok, errs = research_runner.validate_manifest(m4, canonical_current=False)
+    assert not ok
+    assert any("missing required entries" in e for e in errs)
+
+    # 5. Unauthorized extra artifact entry
+    m5 = dict(base_manifest)
+    m5["artifacts"] = dict(base_manifest["artifacts"])
+    m5["artifacts"]["forged_extra"] = {"path": "extra.json", "sha256": "4" * 64}
+    ok, errs = research_runner.validate_manifest(m5, canonical_current=False)
+    assert not ok
+    assert any("unauthorized entries" in e for e in errs)
+
+
+def test_adversarial_index_field_mutations_and_duplicates(tmp_path):
+    """Test that mutating any index field or adding duplicate index entries fails validation."""
+    real_runs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "runs")
+    run_names = [r for r in os.listdir(real_runs_dir) if os.path.isdir(os.path.join(real_runs_dir, r)) and not r.startswith(".")]
+    if not run_names:
+        pytest.skip("No canonical runs found")
+
+    sample_name = run_names[0]
+    src_run = os.path.join(real_runs_dir, sample_name)
+    dst_run = tmp_path / sample_name
+    shutil.copytree(src_run, dst_run)
+
+    # Load canonical index.json
+    real_index_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "index.json")
+    with open(real_index_path, "r", encoding="utf-8") as f:
+        real_index = json.load(f)
+
+    # Create temporary research directory structure
+    tmp_research = tmp_path / "research"
+    tmp_research.mkdir(exist_ok=True)
+    tmp_index_file = tmp_research / "index.json"
+
+    # Test mutation of index fields: timestamp, classification, epistemic_class, title, object_relationship
+    fields_to_test = ["timestamp", "classification", "epistemic_class", "title", "object_relationship"]
+    for fld in fields_to_test:
+        tampered_index = json.loads(json.dumps(real_index))
+        for entry in tampered_index.get("runs", []):
+            if entry.get("experiment_id") == sample_name:
+                entry[fld] = "MUTATED_VALUE"
+        with open(tmp_index_file, "w", encoding="utf-8") as f:
+            json.dump(tampered_index, f, indent=2)
+
+        # Point INDEX_FILE temporarily to tmp_index_file
+        orig_index = research_runner.INDEX_FILE
+        try:
+            research_runner.INDEX_FILE = str(tmp_index_file)
+            ok, errs = research_runner.validate_run_bundle(str(dst_run), canonical_current=False)
+            assert not ok, f"Expected validation failure for mutated index field '{fld}'"
+            assert any(fld in e or "mismatch" in e for e in errs)
+        finally:
+            research_runner.INDEX_FILE = orig_index
+
+    # Test duplicate index entries for same experiment
+    tampered_index = json.loads(json.dumps(real_index))
+    target_entry = None
+    for entry in tampered_index.get("runs", []):
+        if entry.get("experiment_id") == sample_name:
+            target_entry = dict(entry)
+            break
+    if target_entry:
+        tampered_index["runs"].append(dict(target_entry))
+        with open(tmp_index_file, "w", encoding="utf-8") as f:
+            json.dump(tampered_index, f, indent=2)
+
+        orig_index = research_runner.INDEX_FILE
+        try:
+            research_runner.INDEX_FILE = str(tmp_index_file)
+            ok, errs = research_runner.validate_run_bundle(str(dst_run), canonical_current=False)
+            assert not ok, "Expected validation failure for duplicate index entries"
+            assert any("Duplicate entries" in e for e in errs)
+        finally:
+            research_runner.INDEX_FILE = orig_index

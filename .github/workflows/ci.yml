@@ -84,4 +84,4 @@ jobs:
         cd formal
         lake build
         cd ..
-        python -c "import certification; ok, errs = certification.verify_formal_build_report(); assert ok, f'Formal report failed: {errs}'; print('Formal build report verified.')"
+        python -c "import certification; ok, state, rep, errs = certification.verify_formal_build_report(); assert ok, f'Formal report verification failed (state={state}): {errs}'; print('Formal build report verified.')"
