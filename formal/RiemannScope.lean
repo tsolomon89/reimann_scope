@@ -11,3 +11,4 @@ import RiemannScope.RadialLeaf
 import RiemannScope.ZeroCharacter
 import RiemannScope.SymmetricDefect
 import RiemannScope.Contradiction
+import RiemannScope.RadialDefect

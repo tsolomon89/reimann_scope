@@ -1,0 +1,65 @@
+schema_version: '2'
+id: explicit-formula-radial-second-variation-001
+title: Riemann–Weil Explicit Formula Radial Second-Variation and Non-Negative Energy Analysis
+research_question: Does a finite collection of off-line zero orbits induce a non-vanishing second-order radial defect Delta C_h ~ -2 u h''(gamma) with strictly positive quadratic energy, and do non-negative radial variables u_n = delta_n^2 >= 0 forbid simultaneous compensation across admissible test functions?
+epistemic_class: sensitivity_diagnostic
+object_relationship: synthetic_perturbation_diagnostic
+hypothesis:
+  statement: Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive quadratic radial energy E(u) = u^T K^T K u; non-negativity u_n = delta_n^2 >= 0 prevents exact non-negative least-squares compensation across the sampled test family under fixed arithmetic data.
+prediction:
+  statement: Across all sampled zero orbits and radial displacements delta in [0.001, 0.005, 0.01, 0.05], the relative second-order Taylor error |R(delta)| / |Delta C| scales as O(delta^2), quadratic ratio Delta C(delta) / Delta C(delta/2) converges to 4.0, and non-negative least squares residual remains strictly positive (positive_energy_holds = true).
+falsification:
+  statement: Second-order Taylor remainder fails O(delta^2) relative error convergence or exact zero-residual non-negative compensation is found with u >= 0.
+interpretation_limit:
+  statement: Sensitivity diagnostic analyzing second-order radial response under fixed arithmetic data and finite sampled representations; does not constitute a proof of global non-compensation across the infinite zero spectrum or the complete Riemann Hypothesis.
+formalization_target:
+  statement: Radial projection operator P_0, radial defect divisor Delta D_rad, second-order Taylor response -2*u*h''(gamma), and quadratic energy E(u).
+criterion:
+  metric: relative_second_order_error
+  operator: <=
+  threshold: '0.01'
+  aggregation: max_abs
+report_metrics:
+- metric: relative_second_order_error
+  kind: criterion_component
+  label: Relative second-order Taylor linearization error
+- metric: exact_radial_defect_norm
+  kind: diagnostic
+  label: Exact pure radial defect L2 norm
+- metric: linear_second_order_norm
+  kind: diagnostic
+  label: Linearized second-order response L2 norm
+- metric: quadratic_ratio
+  kind: diagnostic
+  label: Quadratic halving ratio Delta C(delta) / Delta C(delta/2)
+- metric: quadratic_energy
+  kind: diagnostic
+  label: Quadratic radial energy E(u)
+- metric: nnls_residual_norm
+  kind: diagnostic
+  label: Non-negative least squares compensation residual norm
+engine:
+  operation: explicit_formula_radial_second_variation
+parameters:
+  mode:
+    kind: explicit
+    values:
+    - pure_radial_variation
+  zero_index:
+    kind: explicit
+    values:
+    - '1'
+    - '10'
+    - '50'
+    - '100'
+  delta:
+    kind: explicit
+    values:
+    - '0.001'
+    - '0.005'
+    - '0.01'
+    - '0.05'
+precision:
+  dps: 80
+outputs:
+  retain_points: true

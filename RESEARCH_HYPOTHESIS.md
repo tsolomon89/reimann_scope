@@ -724,3 +724,32 @@ The project has established the direct mathematical-discrimination campaign for 
   \text{zeta-specific global constraint} \Longrightarrow \text{radial rigidity}.
   \]
   This implication is not assumed or axiomatized.
+
+---
+
+# 20. Second-Order Radial Rigidity and Quadratic Energy Formulation
+
+The research campaign formulates the second-order radial response of the Riemann–Weil explicit formula under the radial projection operator \(\mathcal P_0\):
+
+1. **Defect Divisor**:
+   \[
+   \Delta\mathcal D_{\mathrm{rad}} = \mathcal D - \mathcal P_0(\mathcal D).
+   \]
+2. **Second-Order Taylor Response**:
+   For any even holomorphic test function \(h\) and orbit \(\mathcal O(\rho) = \{1/2 \pm \delta \pm i\gamma\}\), with \(u = \delta^2 \ge 0\):
+   \[
+   \Delta\mathcal C_h[\mathcal O(\rho)] = -2 u h''(\gamma) + \mathcal O(u^2).
+   \]
+3. **Multi-Orbit Linearized Matrix and Quadratic Energy**:
+   For \(N\) off-line orbits with ordinates \(\gamma_n\) and displacements \(u_n = \delta_n^2 \ge 0\):
+   \[
+   \Delta\mathcal C^{\mathrm{linear}}_j = \sum_{n=1}^N K_{j,n} u_n, \qquad K_{j,n} = -2 h''_j(\gamma_n), \qquad E(u) = u^T K^T K u.
+   \]
+4. **Candidate Theorem 1 (Orbit Separation)**:
+   For any single off-line orbit \(\delta_0 \ne 0\), \(\exists h\) such that \(h''(\gamma_0) \ne 0 \implies \Delta\mathcal C_h \ne 0\).
+5. **Candidate Theorem 2 (Positive Radial Energy / No-Compensation)**:
+   For any \(u \in \mathbb R_+^N \setminus \{0\}\), the second-derivative evaluation functionals are linearly independent in \(\mathcal H^*\), preventing exact simultaneous cancellation across all admissible test functions.
+6. **Anti-Circularity and Non-Euler Screening**:
+   - The formulation does not assume RH, Weil positivity of the full sum, or Li's criterion.
+   - Non-Euler systems (Davenport–Heilbronn) serve as counterexample controls.
+   - Sprint 2 Gate Verdict: `candidate_exact_non_circular`.

@@ -925,3 +925,29 @@ The test suite, batch runner, certificate verifier, and UI dashboards verify exa
 Supersedes:
 
 Naive undivided Fourier quadrature in negative grades and any ambiguous classification of $\mathcal C_{K,j}$.
+
+---
+
+## 2026-08-23 — Second-Order Radial Rigidity, Defect Divisors, and Non-Negative Quadratic Energy Analysis
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Radial Projection Operator and Defect Divisor**: Formalize the critical-line projection operator $\mathcal P_0(\rho) = 1/2 + i\gamma$ and the defect divisor $\Delta\mathcal D_{\mathrm{rad}} = \mathcal D - \mathcal P_0(\mathcal D)$, ensuring exact separation between on-line spectrum and radial displacements.
+2. **Second-Order Taylor Response**: Model the pure radial defect response under even holomorphic test functions as $\Delta\mathcal C_h[\mathcal O(\rho)] = -2\delta^2 h''(\gamma) + \mathcal O(\delta^4) = -2 u h''(\gamma) + \mathcal O(u^2)$, where $u = \delta^2 \ge 0$ is the non-negative orbit variable.
+3. **Quadratic Radial Energy**: Define the multi-orbit response matrix $K_{(K,j), n} = -2 a_K^2 H_j''(a_K \gamma_n)$ and quadratic energy $E(u) = u^T K^T K u$.
+4. **Non-Negative Least Squares (NNLS) Constraint**: Evaluate compensation feasibility under the strict physical cone constraint $u \ge 0$. While unconstrained linear combinations can achieve cancellation in over-complete bases, non-negativity $u_n = \delta_n^2 \ge 0$ creates a non-trivial positive energy obstruction.
+5. **Anti-Circularity and Non-Euler Screening**: Screen the framework against circular assumptions (RH, Weil positivity of the full sum, Li's criterion) and maintain non-Euler product controls (Davenport–Heilbronn).
+
+Reason:
+
+Provides an exact, non-circular mathematical instrument to analyze whether off-line zero configurations can self-compensate at leading quadratic order under the Riemann–Weil explicit formula.
+
+Mathematical / operational consequence:
+
+Implemented experiment `explicit-formula-radial-second-variation-001`, verified Lean 4 formal foundations (`RiemannScope.RadialDefect`), and integrated NNLS diagnostics into `diagnostics.json`.
+
+Supersedes:
+
+None.

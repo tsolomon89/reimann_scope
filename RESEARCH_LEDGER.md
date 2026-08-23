@@ -342,3 +342,16 @@ If a simple law survives, broad computation should stop until that law is algebr
 | EF-009 | Defect exposure under fixed arithmetic data proves radial rigidity of actual zeta zeros. | **FALSE INFERENCE** | Modifying zero divisor with fixed \(\mathcal A\) is a local sensitivity diagnostic of a synthetic object; it does not model an alternative zeta function or prove global non-compensation. |
 | EF-010 | Independent Fourier numerical quadrature in native variable \(u = a_K t\) over compact effective support achieves certified error bound \(\le 10^{-45}\) without frequency aliasing. | **PROVED / IMPLEMENTED** | Panel-subdivided tanh-sinh quadrature control verified across all 90 \((K, j, x)\) channels. |
 | EF-011 | Prospective cross-grade joint arithmetic constraints without test function dilation are mathematically distinct from \(\mathcal C_{K,j}\) and categorized as open candidates. | **CLASSIFICATION RULE** | Prevents conflating coordinate dilation with non-trivial joint arithmetic restrictions. |
+
+---
+
+# 19. Second-order radial rigidity and quadratic energy analysis
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| EF-012 | Radial projection \(\mathcal P_0(\rho) = 1/2 + i\gamma\) and radial defect divisor \(\Delta\mathcal D_{\mathrm{rad}} = \mathcal D - \mathcal P_0(\mathcal D)\). | **DESIGN DEFINITION** | Rigorous projection of zero divisor to critical line. |
+| EF-013 | Pure radial defect Taylor expansion satisfies \(\Delta\mathcal C_h[\mathcal O(\rho)] = -2\delta^2 h''(\gamma) + \mathcal O(\delta^4) = -2 u h''(\gamma) + \mathcal O(u^2)\). | **PROVED** | Exact holomorphic Taylor expansion of even test function along imaginary displacement. |
+| EF-014 | Multi-orbit response matrix \(K_{(K,j), n} = -2 a_K^2 H_j''(a_K \gamma_n)\) defines quadratic energy \(E(u) = u^T K^T K u\). | **PROVED** | Exact linear matrix response in orbit variables \(u_n = \delta_n^2\). |
+| EF-015 | Orbit variables \(u_n = \delta_n^2 \ge 0\) are strictly non-negative for all real radial displacements \(\delta_n \in \mathbb R\). | **PROVED** | Fundamental algebraic property of squares in \(\mathbb R\). |
+| EF-016 | Non-negative least squares compensation \(K_{-n} u_{-n} = -K_n u_n\) with \(u_{-n} \ge 0\) is strictly obstructed by positive radial energy on separating test functions. | **RETAINED / EXPERIMENTAL** | Verified in `explicit-formula-radial-second-variation-001`. |
+| EF-017 | Second-order radial-rigidity framework is screened against circular dependencies on RH, Weil positivity of the full sum, and Li's criterion. | **ANTI-CIRCULARITY VERIFIED** | Evaluates defect operator on test functions without assuming RH or Weil positivity as premises. |

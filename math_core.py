@@ -563,6 +563,111 @@ def h_kj_scaled_prime(
         return a_K * H_test_function_prime(scaled_t, j, dps=dps + 15)
 
 
+def H_test_function_double_prime(
+    t: Union[mpmath.mpf, mpmath.mpc, float, str],
+    j: int,
+    dps: int = 80
+) -> Union[mpmath.mpf, mpmath.mpc]:
+    """
+    Analytic second derivative H_j''(t) = d^2 H_j / dt^2:
+    H_j''(t) = ((t - t0)^2 - sigma^2)/sigma^4 * exp(-(t-t0)^2/(2*sigma^2))
+             + ((t + t0)^2 - sigma^2)/sigma^4 * exp(-(t+t0)^2/(2*sigma^2)).
+    """
+    with mpmath.workdps(dps + 15):
+        sigma, t0 = get_test_function_params(j, dps=dps + 15)
+        sigma_sq = sigma * sigma
+        sigma_4 = sigma_sq * sigma_sq
+        two_sigma_sq = mpmath.mpf(2) * sigma_sq
+
+        t_val = to_mpc(t, dps=dps + 15) if isinstance(t, (complex, mpmath.mpc)) or (isinstance(t, str) and ("j" in t or "+" in t.lstrip("+-"))) else to_mpf(t, dps=dps + 15)
+
+        term_minus = ((mpmath.power(t_val - t0, 2) - sigma_sq) / sigma_4) * mpmath.exp(-mpmath.power(t_val - t0, 2) / two_sigma_sq)
+        term_plus = ((mpmath.power(t_val + t0, 2) - sigma_sq) / sigma_4) * mpmath.exp(-mpmath.power(t_val + t0, 2) / two_sigma_sq)
+        res = term_minus + term_plus
+        if isinstance(t_val, mpmath.mpf):
+            return mpmath.re(res)
+        return res
+
+
+def H_test_function_fourth_prime(
+    t: Union[mpmath.mpf, mpmath.mpc, float, str],
+    j: int,
+    dps: int = 80
+) -> Union[mpmath.mpf, mpmath.mpc]:
+    """
+    Analytic fourth derivative H_j^{(4)}(t) = d^4 H_j / dt^4:
+    H_j^{(4)}(t) = ((t-t0)^4 - 6*sigma^2*(t-t0)^2 + 3*sigma^4)/sigma^8 * exp(-(t-t0)^2/(2*sigma^2))
+                 + ((t+t0)^4 - 6*sigma^2*(t+t0)^2 + 3*sigma^4)/sigma^8 * exp(-(t+t0)^2/(2*sigma^2)).
+    """
+    with mpmath.workdps(dps + 15):
+        sigma, t0 = get_test_function_params(j, dps=dps + 15)
+        sigma_sq = sigma * sigma
+        sigma_4 = sigma_sq * sigma_sq
+        sigma_8 = sigma_4 * sigma_4
+        two_sigma_sq = mpmath.mpf(2) * sigma_sq
+
+        t_val = to_mpc(t, dps=dps + 15) if isinstance(t, (complex, mpmath.mpc)) or (isinstance(t, str) and ("j" in t or "+" in t.lstrip("+-"))) else to_mpf(t, dps=dps + 15)
+
+        poly_minus = mpmath.power(t_val - t0, 4) - mpmath.mpf(6) * sigma_sq * mpmath.power(t_val - t0, 2) + mpmath.mpf(3) * sigma_4
+        term_minus = (poly_minus / sigma_8) * mpmath.exp(-mpmath.power(t_val - t0, 2) / two_sigma_sq)
+
+        poly_plus = mpmath.power(t_val + t0, 4) - mpmath.mpf(6) * sigma_sq * mpmath.power(t_val + t0, 2) + mpmath.mpf(3) * sigma_4
+        term_plus = (poly_plus / sigma_8) * mpmath.exp(-mpmath.power(t_val + t0, 2) / two_sigma_sq)
+
+        res = term_minus + term_plus
+        if isinstance(t_val, mpmath.mpf):
+            return mpmath.re(res)
+        return res
+
+
+def h_kj_scaled_double_prime(
+    t: Union[mpmath.mpf, mpmath.mpc, float, str],
+    j: int,
+    K: Union[int, float, str, mpmath.mpf],
+    dps: int = 80
+) -> Union[mpmath.mpf, mpmath.mpc]:
+    """
+    Second derivative of h_{K,j}(t): h_{K,j}''(t) = a_K^2 * H_j''(a_K * t).
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        a_K = mpmath.power(tau, k_val)
+        a_K_sq = a_K * a_K
+
+        if isinstance(t, (complex, mpmath.mpc)) or (isinstance(t, str) and ("j" in t or "+" in t.lstrip("+-"))):
+            t_val = to_mpc(t, dps=dps + 15)
+            scaled_t = a_K * t_val
+        else:
+            t_val = to_mpf(t, dps=dps + 15)
+            scaled_t = a_K * t_val
+        return a_K_sq * H_test_function_double_prime(scaled_t, j, dps=dps + 15)
+
+
+def h_kj_scaled_fourth_prime(
+    t: Union[mpmath.mpf, mpmath.mpc, float, str],
+    j: int,
+    K: Union[int, float, str, mpmath.mpf],
+    dps: int = 80
+) -> Union[mpmath.mpf, mpmath.mpc]:
+    """
+    Fourth derivative of h_{K,j}(t): h_{K,j}^{(4)}(t) = a_K^4 * H_j^{(4)}(a_K * t).
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        a_K = mpmath.power(tau, k_val)
+        a_K_4 = mpmath.power(a_K, 4)
+
+        if isinstance(t, (complex, mpmath.mpc)) or (isinstance(t, str) and ("j" in t or "+" in t.lstrip("+-"))):
+            t_val = to_mpc(t, dps=dps + 15)
+            scaled_t = a_K * t_val
+        else:
+            t_val = to_mpf(t, dps=dps + 15)
+            scaled_t = a_K * t_val
+        return a_K_4 * H_test_function_fourth_prime(scaled_t, j, dps=dps + 15)
+
+
 def compute_grade_quadrature_fourier(
     j: int,
     K: Union[int, float, str, mpmath.mpf],
@@ -1350,6 +1455,243 @@ def solve_linearized_compensation(
             "residual_norm": res_norm,
             "relative_residual": rel_residual,
             "compensation_found": compensation_found,
+            "participating_indices": part_indices,
+            "other_indices": other_indices,
+        }
+
+
+def pure_radial_defect_exact_and_second_order(
+    j: int,
+    K: Union[int, float, str, mpmath.mpf],
+    gamma: Union[str, float, mpmath.mpf],
+    delta: Union[str, float, mpmath.mpf],
+    dps: int = 80
+) -> Dict[str, mpmath.mpf]:
+    """
+    Computes exact pure radial quartet defect and its second-order / fourth-order Taylor expansion:
+    - exact_radial_defect: 4*Re[H_j(a_K*(gamma + i*delta))] - 4*H_j(a_K*gamma)
+    - linear_second_order: -2 * a_K^2 * delta^2 * H_j''(a_K*gamma)
+    - fourth_order_term: (a_K^4 * delta^4 / 12) * H_j^{(4)}(a_K*gamma)
+    - remainder: exact - linear
+    - relative_error: |remainder| / |exact| (if exact != 0)
+    """
+    with mpmath.workdps(dps + 20):
+        g_val = to_mpf(gamma, dps=dps + 20)
+        d_val = to_mpf(delta, dps=dps + 20)
+        k_val = to_mpf(K, dps=dps + 20)
+        tau = get_tau(dps=dps + 20)
+        a_K = mpmath.power(tau, k_val)
+
+        z_pert = a_K * mpmath.mpc(g_val, d_val)
+        z_mid = a_K * g_val
+
+        val_pert = H_test_function(z_pert, j, dps=dps + 20)
+        val_mid = H_test_function(z_mid, j, dps=dps + 20)
+
+        exact_def = mpmath.mpf(4) * mpmath.re(val_pert) - mpmath.mpf(4) * val_mid
+
+        h_pp = H_test_function_double_prime(z_mid, j, dps=dps + 20)
+        u_val = d_val * d_val
+        linear_def = -mpmath.mpf(2) * (a_K * a_K) * u_val * h_pp
+
+        h_4 = H_test_function_fourth_prime(z_mid, j, dps=dps + 20)
+        fourth_term = ((mpmath.power(a_K, 4) * mpmath.power(d_val, 4)) / mpmath.mpf(12)) * h_4
+
+        rem = exact_def - linear_def
+        rel_err = (abs(rem) / abs(exact_def)) if abs(exact_def) > mpmath.mpf('1e-50') else mpmath.mpf(0)
+
+        return {
+            "exact_radial_defect": exact_def,
+            "linear_second_order": linear_def,
+            "fourth_order_term": fourth_term,
+            "remainder": rem,
+            "relative_error": rel_err,
+            "h_double_prime": h_pp,
+            "h_fourth_prime": h_4,
+            "u": u_val,
+        }
+
+
+def radial_second_order_jacobian(
+    j_list: Sequence[int],
+    k_list: Sequence[Union[int, float, str, mpmath.mpf]],
+    zeros_subset: Sequence[Union[str, float, mpmath.mpf]],
+    dps: int = 80
+) -> List[List[mpmath.mpf]]:
+    """
+    Second-order radial response matrix K_{(K,j), n} = -2 * a_K^2 * H_j''(a_K * gamma_n).
+    Rows: (K, j) combinations in Cartesian order.
+    Columns: zeros n in zeros_subset.
+    """
+    with mpmath.workdps(dps + 20):
+        tau = get_tau(dps=dps + 20)
+        matrix: List[List[mpmath.mpf]] = []
+
+        for k_val in k_list:
+            k_mpf = to_mpf(k_val, dps=dps + 20)
+            a_K = mpmath.power(tau, k_mpf)
+            a_K_sq = a_K * a_K
+
+            for j_val in j_list:
+                row: List[mpmath.mpf] = []
+                for g_val in zeros_subset:
+                    g_mpf = to_mpf(g_val, dps=dps + 20)
+                    scaled_gamma = a_K * g_mpf
+                    h_pp = H_test_function_double_prime(scaled_gamma, j_val, dps=dps + 20)
+                    k_entry = -mpmath.mpf(2) * a_K_sq * h_pp
+                    row.append(k_entry)
+                matrix.append(row)
+        return matrix
+
+
+def solve_radial_second_order_nnls(
+    K_mat: List[List[mpmath.mpf]],
+    target_col_idx: int,
+    u_val: Union[str, mpmath.mpf],
+    rank_tol_rel: Union[str, mpmath.mpf] = '1e-25',
+    rank_threshold_sweep: Optional[Sequence[Union[str, mpmath.mpf]]] = None,
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [AUDIT PATH] Solves radial second-order zero-compensation problem:
+    K_{-n} * u_{-n} = -K_n * u_n with u_{-n} >= 0.
+
+    Evaluates:
+    - SVD of K_{-n}, singular values, rank, nullity, condition number
+    - Complete threshold sweep across [1e-18, 1e-20, 1e-25, 1e-30, 1e-35, 1e-40]
+    - Unconstrained least squares solution and residual
+    - Non-negative least squares (NNLS) solution (u >= 0) and residual
+    - Quadratic radial energy E(u) = ||v_target||^2
+    - Non-compensation verification: whether NNLS relative residual remains > 1e-5.
+    """
+    with mpmath.workdps(dps + 30):
+        num_rows = len(K_mat)
+        num_cols = len(K_mat[0]) if num_rows > 0 else 0
+        if target_col_idx < 0 or target_col_idx >= num_cols:
+            raise ValueError(f"target_col_idx {target_col_idx} out of range (0..{num_cols-1})")
+
+        u_mpf = to_mpf(u_val, dps=dps + 30)
+        v_target = [K_mat[r][target_col_idx] * u_mpf for r in range(num_rows)]
+        v_norm = mpmath.sqrt(sum(v * v for v in v_target))
+        energy = v_norm * v_norm
+
+        other_indices = [c for c in range(num_cols) if c != target_col_idx]
+        K_other_list = [[K_mat[r][c] for c in other_indices] for r in range(num_rows)]
+
+        # SVD via mpmath.svd_r
+        K_other_mat = mpmath.matrix(K_other_list)
+        U, S, V = mpmath.svd_r(K_other_mat)
+
+        s_max = S[0] if len(S) > 0 else mpmath.mpf(0)
+        matrix_norm = s_max
+
+        primary_tol = to_mpf(rank_tol_rel, dps=dps + 30)
+        primary_cutoff = s_max * primary_tol
+
+        primary_rank = 0
+        primary_s_min_nz = s_max
+        for s in S:
+            if s > primary_cutoff:
+                primary_rank += 1
+                primary_s_min_nz = s
+
+        primary_nullity = len(other_indices) - primary_rank
+        primary_cond = (s_max / primary_s_min_nz) if primary_s_min_nz > 0 else mpmath.inf
+
+        if rank_threshold_sweep is None:
+            rank_threshold_sweep = ['1e-18', '1e-20', '1e-25', '1e-30', '1e-35', '1e-40']
+
+        sweep_results: Dict[str, Dict[str, Any]] = {}
+        distinct_ranks: Set[int] = set()
+
+        for t_val in rank_threshold_sweep:
+            t_mpf = to_mpf(t_val, dps=dps + 30)
+            cutoff = s_max * t_mpf
+            rk = 0
+            s_min_sw = s_max
+            for s in S:
+                if s > cutoff:
+                    rk += 1
+                    s_min_sw = s
+            nl = len(other_indices) - rk
+            c_num = (s_max / s_min_sw) if s_min_sw > 0 else mpmath.inf
+            distinct_ranks.add(rk)
+
+            t_key = str(t_val)
+            sweep_results[t_key] = {
+                "relative_threshold": mpmath.nstr(t_mpf, n=8),
+                "absolute_cutoff": mpmath.nstr(cutoff, n=dps),
+                "numerical_rank": rk,
+                "nullity": nl,
+                "condition_number": mpmath.nstr(c_num, n=8) if c_num != mpmath.inf else "inf"
+            }
+
+        rank_stability = "stable" if len(distinct_ranks) <= 1 else "threshold_dependent"
+
+        # Unconstrained pseudoinverse solution
+        x_unconstrained = [mpmath.mpf(0)] * len(other_indices)
+        for i in range(len(S)):
+            s_i = S[i]
+            if s_i > primary_cutoff:
+                proj = sum(U[r, i] * (-v_target[r]) for r in range(num_rows))
+                inv_s = proj / s_i
+                for c in range(len(other_indices)):
+                    x_unconstrained[c] += inv_s * V[i, c]
+
+        res_unconstrained = [
+            sum(K_other_list[r][c] * x_unconstrained[c] for c in range(len(other_indices))) + v_target[r]
+            for r in range(num_rows)
+        ]
+        res_unconstrained_norm = mpmath.sqrt(sum(r * r for r in res_unconstrained))
+        rel_unconstrained = (res_unconstrained_norm / v_norm) if v_norm > 0 else mpmath.mpf(0)
+
+        # NNLS solution via scipy
+        import scipy.optimize
+        A_np = np.array([[float(K_other_list[r][c]) for c in range(len(other_indices))] for r in range(num_rows)], dtype=np.float64)
+        b_np = np.array([-float(v_target[r]) for r in range(num_rows)], dtype=np.float64)
+        x_nnls_np, _ = scipy.optimize.nnls(A_np, b_np)
+
+        x_nnls = [to_mpf(float(x), dps=dps + 30) for x in x_nnls_np]
+        res_nnls = [
+            sum(K_other_list[r][c] * x_nnls[c] for c in range(len(other_indices))) + v_target[r]
+            for r in range(num_rows)
+        ]
+        res_nnls_norm = mpmath.sqrt(sum(r * r for r in res_nnls))
+        nnls_sol_norm = mpmath.sqrt(sum(x * x for x in x_nnls))
+        rel_nnls_residual = (res_nnls_norm / v_norm) if v_norm > 0 else mpmath.mpf(0)
+
+        nnls_compensation_found = bool(rel_nnls_residual < mpmath.mpf('1e-5'))
+        positive_energy_holds = bool(res_nnls_norm > mpmath.mpf('1e-25'))
+
+        part_indices = [
+            other_indices[c] for c in range(len(other_indices))
+            if abs(x_nnls[c]) > mpmath.mpf('1e-12') * max(nnls_sol_norm, mpmath.mpf('1e-30'))
+        ]
+
+        return {
+            "target_index": target_col_idx,
+            "u": u_mpf,
+            "v_target": v_target,
+            "v_norm": v_norm,
+            "quadratic_energy": energy,
+            "matrix_norm": matrix_norm,
+            "singular_values": [s for s in S],
+            "numerical_rank": primary_rank,
+            "nullity": primary_nullity,
+            "condition_number": primary_cond,
+            "rank_threshold": primary_cutoff,
+            "threshold_sweep": sweep_results,
+            "rank_stability": rank_stability,
+            "unconstrained_solution": x_unconstrained,
+            "unconstrained_residual_norm": res_unconstrained_norm,
+            "unconstrained_relative_residual": rel_unconstrained,
+            "nnls_solution": x_nnls,
+            "nnls_solution_norm": nnls_sol_norm,
+            "nnls_residual_vector": res_nnls,
+            "nnls_residual_norm": res_nnls_norm,
+            "nnls_relative_residual": rel_nnls_residual,
+            "nnls_compensation_found": nnls_compensation_found,
+            "positive_energy_holds": positive_energy_holds,
             "participating_indices": part_indices,
             "other_indices": other_indices,
         }

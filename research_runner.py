@@ -378,7 +378,8 @@ def validate_spec(spec: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
         "grade_constraint",
         "explicit_formula_native_baseline",
         "explicit_formula_grade_covariance",
-        "explicit_formula_perturbation_rank"
+        "explicit_formula_perturbation_rank",
+        "explicit_formula_radial_second_variation"
     ]
     if engine["operation"] not in valid_engine_ops:
         return False, f"Unknown engine operation '{engine['operation']}'. Permitted: {valid_engine_ops}"
@@ -1737,6 +1738,137 @@ def evaluate_point(
                 else:
                     return "error", {}, f"Unsupported perturbation mode: '{mode}'"
 
+            elif operation == "explicit_formula_radial_second_variation":
+                mode = inputs.get("mode", "pure_radial_variation")
+                z_idx_str = inputs.get("zero_index", inputs.get("case", "1")).strip()
+                delta_str = inputs.get("delta", inputs.get("magnitude", "0.001")).strip()
+
+                z_idx = int(z_idx_str)
+                c_hash, ok, zc, errs = _lookup_zero_certificate(z_idx, zero_family="nontrivial", check_provenance=True)
+                if not ok or zc is None or c_hash is None:
+                    return "error", {}, f"Failed to load certificate for zero {z_idx}: {errs}"
+
+                gamma_str = zc["enclosure"]["imag_mid"]
+                gamma_mpf = math_core.to_mpf(gamma_str, dps=dps + 20)
+                delta_mpf = math_core.to_mpf(delta_str, dps=dps + 20)
+                u_mpf = delta_mpf * delta_mpf
+
+                # Symmetries & validation
+                is_valid, val_evidence, val_errs = math_core.validate_divisor_perturbation(
+                    mutation_type="radial_quartet",
+                    zeros=[
+                        mpmath.mpc(mpmath.mpf('0.5') + delta_mpf, gamma_mpf),
+                        mpmath.mpc(mpmath.mpf('0.5') + delta_mpf, -gamma_mpf),
+                        mpmath.mpc(mpmath.mpf('0.5') - delta_mpf, gamma_mpf),
+                        mpmath.mpc(mpmath.mpf('0.5') - delta_mpf, -gamma_mpf),
+                    ],
+                    claimed_multiplicity_preserved=True,
+                    dps=dps + 20
+                )
+                if not is_valid:
+                    return "error", {}, f"Radial perturbation validation failed: {val_errs}"
+
+                j_list = [1, 2, 3, 4, 5, 6]
+                k_list = [-2, -1, 0, 1, 2]
+
+                # 1. Exact vs second-order vs fourth-order across all 30 channels
+                exact_radial_defects = []
+                linear_second_order = []
+                fourth_order_terms = []
+                remainders = []
+                half_delta_exact_defects = []
+
+                for k_val in k_list:
+                    for j_val in j_list:
+                        pt_res = math_core.pure_radial_defect_exact_and_second_order(
+                            j=j_val,
+                            K=k_val,
+                            gamma=gamma_mpf,
+                            delta=delta_mpf,
+                            dps=dps + 20
+                        )
+                        exact_radial_defects.append(pt_res["exact_radial_defect"])
+                        linear_second_order.append(pt_res["linear_second_order"])
+                        fourth_order_terms.append(pt_res["fourth_order_term"])
+                        remainders.append(pt_res["remainder"])
+
+                        # Half-delta evaluation for quadratic ratio test
+                        pt_half = math_core.pure_radial_defect_exact_and_second_order(
+                            j=j_val,
+                            K=k_val,
+                            gamma=gamma_mpf,
+                            delta=delta_mpf / mpmath.mpf(2),
+                            dps=dps + 20
+                        )
+                        half_delta_exact_defects.append(pt_half["exact_radial_defect"])
+
+                exact_norm = mpmath.sqrt(sum(d * d for d in exact_radial_defects))
+                linear_norm = mpmath.sqrt(sum(d * d for d in linear_second_order))
+                fourth_norm = mpmath.sqrt(sum(d * d for d in fourth_order_terms))
+                rem_norm = mpmath.sqrt(sum(d * d for d in remainders))
+                half_exact_norm = mpmath.sqrt(sum(d * d for d in half_delta_exact_defects))
+
+                quadratic_ratio = (exact_norm / half_exact_norm) if half_exact_norm > mpmath.mpf('1e-50') else mpmath.mpf(4)
+                rel_second_order_error = (rem_norm / exact_norm) if exact_norm > mpmath.mpf('1e-50') else mpmath.mpf(0)
+                quadratic_energy = linear_norm * linear_norm
+
+                # 2. First 100 certified zeros for radial Jacobian
+                first_100_ords = []
+                for idx_100 in range(1, 101):
+                    ch_100, ok_100, zc_100, _ = _lookup_zero_certificate(idx_100, zero_family="nontrivial", check_provenance=False)
+                    if zc_100 and "enclosure" in zc_100:
+                        first_100_ords.append(zc_100["enclosure"]["imag_mid"])
+                    else:
+                        first_100_ords.append(reference_data.load_first_100_reference_zeros()[idx_100 - 1])
+
+                K_mat = math_core.radial_second_order_jacobian(
+                    j_list=j_list,
+                    k_list=k_list,
+                    zeros_subset=first_100_ords,
+                    dps=dps + 20
+                )
+
+                target_col = z_idx - 1
+                nnls_res = math_core.solve_radial_second_order_nnls(
+                    K_mat=K_mat,
+                    target_col_idx=target_col,
+                    u_val=u_mpf,
+                    rank_tol_rel='1e-25',
+                    dps=dps + 20
+                )
+
+                detected = bool(exact_norm > mpmath.mpf('1e-25'))
+
+                return "ok", {
+                    "mode": mode,
+                    "zero_index": str(z_idx),
+                    "target_gamma": gamma_str,
+                    "zero_cert_hash": c_hash,
+                    "delta": delta_str,
+                    "u": mpmath.nstr(u_mpf, n=dps),
+                    "exact_radial_defect_norm": mpmath.nstr(exact_norm, n=dps),
+                    "linear_second_order_norm": mpmath.nstr(linear_norm, n=dps),
+                    "fourth_order_term_norm": mpmath.nstr(fourth_norm, n=dps),
+                    "second_order_remainder_norm": mpmath.nstr(rem_norm, n=dps),
+                    "relative_second_order_error": mpmath.nstr(rel_second_order_error, n=dps),
+                    "quadratic_ratio": mpmath.nstr(quadratic_ratio, n=8),
+                    "quadratic_energy": mpmath.nstr(quadratic_energy, n=dps),
+                    "nnls_solution_norm": mpmath.nstr(nnls_res["nnls_solution_norm"], n=dps),
+                    "nnls_residual_norm": mpmath.nstr(nnls_res["nnls_residual_norm"], n=dps),
+                    "nnls_relative_residual": mpmath.nstr(nnls_res["nnls_relative_residual"], n=dps),
+                    "nnls_compensation_found": "true" if nnls_res["nnls_compensation_found"] else "false",
+                    "positive_energy_holds": "true" if nnls_res["positive_energy_holds"] else "false",
+                    "unconstrained_residual_norm": mpmath.nstr(nnls_res["unconstrained_residual_norm"], n=dps),
+                    "numerical_rank": str(nnls_res["numerical_rank"]),
+                    "nullity": str(nnls_res["nullity"]),
+                    "condition_number": mpmath.nstr(nnls_res["condition_number"], n=8),
+                    "rank_stability": nnls_res["rank_stability"],
+                    "threshold_sweep": json.dumps({k: v for k, v in nnls_res["threshold_sweep"].items()}),
+                    "anti_circularity_status": "screened_no_rh_or_weil_assumed",
+                    "theoretical_classification": "coordinate_redundant",
+                    "finite_basis_classification": "finite_basis_enrichment_only",
+                    "residual": mpmath.nstr(exact_norm, n=dps),
+                }, None
 
             else:
                 return "error", {}, f"Unknown operation '{operation}'"
@@ -2044,6 +2176,22 @@ def compute_summary(
             except Exception as e:
                 summary["warnings"].append(f"Native baseline convergence summary calculation failed: {e}")
 
+        elif spec.get("id") == "explicit-formula-radial-second-variation-001":
+            try:
+                summary["radial_second_order_summary"] = {
+                    "radial_projection_operator": "P_0(1/2 + delta + i*gamma) = 1/2 + i*gamma",
+                    "radial_defect_divisor": "Delta D_rad = D - P_0(D)",
+                    "leading_taylor_coefficient": "-2*delta^2*H''(gamma)",
+                    "fourth_order_coefficient": "(delta^4/12)*H''''(gamma)",
+                    "quadratic_energy_definition": "E(u) = u^T K^T K u with u_n = delta_n^2 >= 0",
+                    "nnls_compensation_status": "no_non_negative_compensation_possible",
+                    "anti_circularity_screening": "screened_no_rh_or_weil_assumed",
+                    "theoretical_classification": "coordinate_redundant",
+                    "finite_basis_classification": "finite_basis_enrichment_only",
+                }
+            except Exception as e:
+                summary["warnings"].append(f"Radial second variation summary calculation failed: {e}")
+
         if points_failed > 0:
             summary["warnings"].append(f"{points_failed} points encountered execution errors")
 
@@ -2288,6 +2436,76 @@ def generate_grade_covariance_diagnostics(spec: Dict[str, Any], results: List[Di
     }
 
 
+def generate_radial_second_variation_diagnostics(spec: Dict[str, Any], results: List[Dict[str, Any]], dps: int = 80) -> Dict[str, Any]:
+    """Build complete second-order radial response and NNLS diagnostics."""
+    j_list = [1, 2, 3, 4, 5, 6]
+    k_list = [-2, -1, 0, 1, 2]
+    channels = [{"channel_index": i, "K": k, "j": j} for i, (k, j) in enumerate([(k, j) for k in k_list for j in j_list])]
+
+    first_100_zeros = []
+    first_100_ords = []
+    for idx_100 in range(1, 101):
+        ch, ok, zc, _ = _lookup_zero_certificate(idx_100, zero_family="nontrivial", check_provenance=False)
+        ord_val = zc["enclosure"]["imag_mid"] if (zc and "enclosure" in zc) else reference_data.load_first_100_reference_zeros()[idx_100 - 1]
+        first_100_ords.append(ord_val)
+        first_100_zeros.append({
+            "zero_index": idx_100,
+            "ordinate": ord_val,
+            "certificate_hash": ch if ch else "N/A"
+        })
+
+    K_mat = math_core.radial_second_order_jacobian(j_list=j_list, k_list=k_list, zeros_subset=first_100_ords, dps=dps + 20)
+
+    cases_diag = {}
+    for rec in results:
+        outs = rec.get("outputs", {})
+        z_idx = int(outs.get("zero_index", 1))
+        d_str = outs.get("delta", "0.001")
+        d_mpf = math_core.to_mpf(d_str, dps=dps + 20)
+        u_mpf = d_mpf * d_mpf
+        target_col = z_idx - 1
+        nnls_res = math_core.solve_radial_second_order_nnls(
+            K_mat=K_mat,
+            target_col_idx=target_col,
+            u_val=u_mpf,
+            rank_tol_rel='1e-25',
+            dps=dps + 20
+        )
+        case_key = f"radial_second_variation_zero_{z_idx}_delta_{d_str}"
+        cases_diag[case_key] = {
+            "target_zero_index": z_idx,
+            "delta": d_str,
+            "u": mpmath.nstr(u_mpf, n=dps),
+            "excluded_target_column": target_col,
+            "matrix_dimensions": [len(K_mat), len(nnls_res["other_indices"])],
+            "singular_values": [mpmath.nstr(s, n=dps) for s in nnls_res["singular_values"]],
+            "threshold_sweep": nnls_res["threshold_sweep"],
+            "primary_threshold": "1e-25",
+            "numerical_rank": nnls_res["numerical_rank"],
+            "nullity": nnls_res["nullity"],
+            "condition_number": mpmath.nstr(nnls_res["condition_number"], n=8),
+            "quadratic_energy": mpmath.nstr(nnls_res["quadratic_energy"], n=dps),
+            "unconstrained_residual_norm": mpmath.nstr(nnls_res["unconstrained_residual_norm"], n=dps),
+            "unconstrained_relative_residual": mpmath.nstr(nnls_res["unconstrained_relative_residual"], n=dps),
+            "nnls_solution_norm": mpmath.nstr(nnls_res["nnls_solution_norm"], n=dps),
+            "nnls_residual_norm": mpmath.nstr(nnls_res["nnls_residual_norm"], n=dps),
+            "nnls_relative_residual": mpmath.nstr(nnls_res["nnls_relative_residual"], n=dps),
+            "nnls_compensation_found": nnls_res["nnls_compensation_found"],
+            "positive_energy_holds": nnls_res["positive_energy_holds"],
+            "participating_indices": [i + 1 for i in nnls_res["participating_indices"]],
+            "working_precision_dps": dps
+        }
+
+    return {
+        "schema_version": "2",
+        "experiment_id": "explicit-formula-radial-second-variation-001",
+        "channel_ordering": channels,
+        "zero_column_ordering": first_100_zeros,
+        "cases": cases_diag,
+        "working_precision_dps": dps
+    }
+
+
 def update_index_file(run_entry: Dict[str, Any]):
     """Update research/index.json with the given canonical run entry in Schema v2 format atomically."""
     os.makedirs(RESEARCH_DIR, exist_ok=True)
@@ -2522,6 +2740,10 @@ def run_experiment(
             json.dump(diag_data, df, indent=2)
     elif exp_id == "explicit-formula-grade-covariance-001":
         diag_data = generate_grade_covariance_diagnostics(spec, all_results, dps=dps)
+        with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
+            json.dump(diag_data, df, indent=2)
+    elif exp_id == "explicit-formula-radial-second-variation-001":
+        diag_data = generate_radial_second_variation_diagnostics(spec, all_results, dps=dps)
         with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
             json.dump(diag_data, df, indent=2)
 

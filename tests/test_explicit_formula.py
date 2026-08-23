@@ -279,3 +279,51 @@ def test_linearized_compensation_threshold_sweep_and_reconstructibility():
         # Verify residual norm matches norm of residual vector
         computed_res_norm = mpmath.sqrt(sum(r * r for r in comp["residual_vector"]))
         assert abs(computed_res_norm - comp["residual_norm"]) < mpmath.mpf('1e-65')
+
+
+def test_pure_radial_defect_second_order_taylor_convergence():
+    """Verify exact pure radial defect matches -2*delta^2*H''(gamma) with O(delta^2) relative error."""
+    with mpmath.workdps(80):
+        gamma_1 = '14.13472514173469379'
+        for j in [1, 2, 3]:
+            for K in [-1, 0, 1]:
+                # Test delta = 0.01 vs delta = 0.001
+                res_1 = math_core.pure_radial_defect_exact_and_second_order(j=j, K=K, gamma=gamma_1, delta='0.01', dps=80)
+                res_2 = math_core.pure_radial_defect_exact_and_second_order(j=j, K=K, gamma=gamma_1, delta='0.001', dps=80)
+
+                # Relative error scaling: should decrease by ~100x
+                assert res_1["relative_error"] < mpmath.mpf('1e-2')
+                assert res_2["relative_error"] < mpmath.mpf('1e-4')
+
+                # Quadratic halving ratio: delta -> delta/2 scales defect by 4
+                res_fine = math_core.pure_radial_defect_exact_and_second_order(j=j, K=K, gamma=gamma_1, delta='0.0001', dps=80)
+                res_fine_half = math_core.pure_radial_defect_exact_and_second_order(j=j, K=K, gamma=gamma_1, delta='0.00005', dps=80)
+                ratio = res_fine["exact_radial_defect"] / res_fine_half["exact_radial_defect"]
+                assert abs(ratio - mpmath.mpf('4.0')) < mpmath.mpf('1e-4')
+
+
+def test_radial_second_order_jacobian_and_nnls():
+    """Verify second-order radial Jacobian construction, quadratic energy, and NNLS non-compensation."""
+    with mpmath.workdps(80):
+        ref_zeros = reference_data.load_reference_zeros()[:50]
+        j_list = [1, 2, 3, 4, 5, 6]
+        k_list = [-2, -1, 0, 1, 2]
+
+        K_mat = math_core.radial_second_order_jacobian(j_list, k_list, ref_zeros, dps=80)
+        assert len(K_mat) == 30
+        assert len(K_mat[0]) == 50
+
+        # Solve NNLS for target zero 1 with u = delta^2 = 1e-6
+        nnls_res = math_core.solve_radial_second_order_nnls(
+            K_mat=K_mat,
+            target_col_idx=0,
+            u_val='1e-6',
+            dps=80
+        )
+
+        assert nnls_res["positive_energy_holds"] is True
+        assert nnls_res["quadratic_energy"] > mpmath.mpf('1e-30')
+        assert len(nnls_res["nnls_solution"]) == 49
+        # Verify all NNLS components are >= 0
+        for x in nnls_res["nnls_solution"]:
+            assert x >= -mpmath.mpf('1e-60')

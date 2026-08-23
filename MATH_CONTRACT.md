@@ -1968,3 +1968,116 @@ A non-zero divisor perturbation produces a non-zero defect on at least some sepa
 1. The explicit formula family \(\mathcal C_{K,j}\) operates exclusively via the coordinate pullback identity \(\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K]\) and is **coordinate-redundant** with respect to the native explicit formula evaluated on scaled test functions.
 2. Any prospective mathematical mechanism attempting to impose cross-grade constraints without test-function dilation remains an **OPEN / UNDEFINED CANDIDATE** and must not be identified with \(\mathcal C_{K,j}\).
 3. The coordinate dilation \(a_K = \tau^K\) does not imply or assume any non-trivial automorphism \(\zeta(\tau^K s) = \zeta(s)\).
+
+# 36. Second-Order Radial Variation and Defect Divisor Formulation
+
+## 36.1 Radial projection operator and defect divisor
+
+Let \(\mathcal D\) be a divisor of points in the critical strip \(0 < \Re(s) < 1\).
+For \(\rho = 1/2 + \delta + i\gamma\), define the radial projection onto the critical line:
+
+\[
+\boxed{
+\mathcal P_0(\rho) = \frac{1}{2} + i\gamma.
+}
+\]
+
+For a general zero divisor \(\mathcal D = \sum_{\rho} m_\rho [\rho]\), the projected divisor is:
+
+\[
+\boxed{
+\mathcal P_0(\mathcal D) = \sum_{\rho} m_\rho [\mathcal P_0(\rho)],
+}
+\]
+
+and the radial defect divisor is:
+
+\[
+\boxed{
+\Delta\mathcal D_{\mathrm{rad}} = \mathcal D - \mathcal P_0(\mathcal D).
+}
+\]
+
+For a single symmetry-complete orbit \(\mathcal O(\rho) = \{1/2 \pm \delta \pm i\gamma\}\), the projected divisor is the critical-line pair \(2[1/2 + i\gamma] + 2[1/2 - i\gamma]\), and:
+
+\[
+\boxed{
+\Delta\mathcal D_{\mathrm{rad}}(\mathcal O(\rho)) = [1/2 + \delta + i\gamma] + [1/2 - \delta + i\gamma] + [1/2 + \delta - i\gamma] + [1/2 - \delta - i\gamma] - 2[1/2 + i\gamma] - 2[1/2 - i\gamma].
+}
+\]
+
+## 36.2 Exact finite-orbit second-order response
+
+For an even, real-entire test function \(h(t)\) (with \(h(-t) = h(t)\) and \(h(t) \in \mathbb R\) for \(t \in \mathbb R\)), the evaluation on \(\mathcal O(\rho)\) is:
+
+\[
+\langle \mathcal O(\rho), h \rangle = 4 \Re\left[ h(\gamma + i\delta) \right].
+\]
+
+Holomorphic Taylor expansion along the imaginary displacement \(i\delta\) gives:
+
+\[
+h(\gamma + i\delta) = h(\gamma) + i\delta h'(\gamma) - \frac{\delta^2}{2} h''(\gamma) - i\frac{\delta^3}{6} h^{(3)}(\gamma) + \frac{\delta^4}{24} h^{(4)}(\gamma) + \mathcal O(\delta^6).
+\]
+
+Taking the real part:
+
+\[
+\Re\left[ h(\gamma + i\delta) \right] = h(\gamma) - \frac{\delta^2}{2} h''(\gamma) + \frac{\delta^4}{24} h^{(4)}(\gamma) + \mathcal O(\delta^6).
+\]
+
+Therefore, the pure radial defect response is:
+
+\[
+\boxed{
+\Delta\mathcal C_h[\mathcal O(\rho)] = \langle \Delta\mathcal D_{\mathrm{rad}}(\mathcal O(\rho)), h \rangle = -2\delta^2 h''(\gamma) + \frac{\delta^4}{12} h^{(4)}(\gamma) + \mathcal O(\delta^6).
+}
+\]
+
+Defining the non-negative second-order orbit variable \(u = \delta^2 \ge 0\):
+
+\[
+\boxed{
+\Delta\mathcal C_h[\mathcal O(\rho)] = -2 u h''(\gamma) + \mathcal O(u^2).
+}
+\]
+
+## 36.3 Multi-orbit linearized radial response matrix and quadratic energy
+
+For \(N\) hypothetical off-line zero orbits \(\{\mathcal O(\rho_n)\}_{n=1}^N\) with distinct ordinates \(\gamma_n\) and radial displacements \(u_n = \delta_n^2 \ge 0\) (\(u \in \mathbb R_+^N\)), the linearized radial defect vector across a family of test functions \(\{h_j\}_{j=1}^M\) is:
+
+\[
+\boxed{
+\Delta\mathcal C^{\mathrm{linear}}_j = \sum_{n=1}^N K_{j,n} u_n, \qquad K_{j,n} = -2 h''_j(\gamma_n).
+}
+\]
+
+The associated quadratic radial energy is:
+
+\[
+\boxed{
+E(u) = \|\Delta\mathcal C^{\mathrm{linear}}\|^2 = u^T K^T K u.
+}
+\]
+
+Because \(u_n = \delta_n^2 \ge 0\), exact second-order compensation across the test family requires:
+
+\[
+\operatorname{ker}(K) \cap (\mathbb R_+^N \setminus \{0\}) \ne \varnothing.
+\]
+
+## 36.4 Candidate theorems formulation
+
+- **Candidate Theorem 1 (Orbit Separation)**: For any isolated off-line orbit \(\mathcal O(\rho_0)\) with \(\delta_0 \ne 0\) and ordinate \(\gamma_0\), there exists an admissible even Schwartz test function \(h\) such that \(h''(\gamma_0) \ne 0\), producing a strictly non-zero second-order radial defect \(\Delta\mathcal C_h = -2\delta_0^2 h''(\gamma_0) + \mathcal O(\delta_0^4) \ne 0\).
+- **Candidate Theorem 2 (Positive Radial Energy / No-Compensation)**: For any non-empty configuration of off-line zero orbits \(\{\mathcal O(\rho_n)\}_{n=1}^N\) with \(u \in \mathbb R_+^N \setminus \{0\}\), the linear evaluation \(u \mapsto (-2\sum_{n=1}^N u_n h''_j(\gamma_n))_{j \in \mathcal J}\) cannot vanish identically on the dense space of admissible test functions \(\mathcal H\). That is, the second-derivative evaluation functionals \(\{-2 h''(\gamma_n)\}_{n=1}^N\) are linearly independent in \(\mathcal H^*\).
+
+## 36.5 Anti-circularity and non-Euler screening
+
+1. **Screening against RH and Weil Positivity**:
+   - The formulation evaluates the defect operator \(\Delta\mathcal D_{\mathrm{rad}}\) purely on test functions without assuming \(\operatorname{EF}[h; \mathcal D, \mathcal A] = 0\) for perturbed divisors or invoking global Weil positivity for the complete zeta sum.
+   - The non-negativity \(u_n = \delta_n^2 \ge 0\) is an exact property of real displacement \(\delta_n \in \mathbb R\), not an assumed premise.
+2. **Screening against Non-Euler Counterexamples**:
+   - For Davenport–Heilbronn and Epstein zeta functions, off-line zeros exist because their arithmetic explicit formula lacks the unique Euler product constraints of \(\zeta(s)\). The radial second-variation framework isolates zero-divisor deformation under frozen arithmetic data, explicitly screening against false generalization to non-Euler systems.
+3. **Sprint 2 Gate Verdict**:
+   - The second-order radial-rigidity formulation is exact, deductive, coordinate-gauge-free, and screened against circular dependencies.
+   - Classification: `candidate_exact_non_circular`.

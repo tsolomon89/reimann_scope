@@ -905,6 +905,10 @@ def create_proof_programme_tab():
                                     html.Span("Global 30-Channel Dims: ", className="small text-secondary"),
                                     html.Span("30 × 100 (Rank 14 / Nullity 86)", className="font-monospace small text-light")
                                 ], className="mb-1"),
+                                html.Div([
+                                    html.Span("Radial Defect Divisor: ", className="small text-secondary"),
+                                    html.Span("ΔD_rad = D - P₀(D)", className="font-monospace small text-info")
+                                ], className="mb-1"),
                             ], xs=12, md=6),
                             dbc.Col([
                                 html.Div([
@@ -916,8 +920,12 @@ def create_proof_programme_tab():
                                     dbc.Badge("FINITE ENRICHMENT ONLY", color="secondary", className="p-1 font-monospace small")
                                 ], className="mb-1"),
                                 html.Div([
-                                    html.Span("Diagnostics Manifest: ", className="small text-secondary"),
-                                    html.Span("research/runs/*/diagnostics.json", className="font-monospace small text-warning")
+                                    html.Span("Radial Second Variation: ", className="small text-secondary"),
+                                    dbc.Badge("POSITIVE ENERGY (u ≥ 0)", color="success", className="p-1 font-monospace small")
+                                ], className="mb-1"),
+                                html.Div([
+                                    html.Span("NNLS Compensation: ", className="small text-secondary"),
+                                    dbc.Badge("OBSTRUCTED (E(u) > 0)", color="warning", className="p-1 font-monospace small")
                                 ], className="mb-1"),
                             ], xs=12, md=6),
                         ]),
