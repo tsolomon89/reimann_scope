@@ -705,17 +705,22 @@ The project should not broaden into unrelated RH machinery unless the current pr
 The project has established the direct mathematical-discrimination campaign for the proposed role of transcendental continuation in explicit-formula constraints:
 
 1. **Grade Covariance**: The grade-\(K\) representation correctly transports the explicit formula according to exact Fourier scaling \(\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x)\).
-2. **Defect Exposure**: Changing the zero divisor while holding arithmetic data \(\mathcal A_\zeta\) fixed produces a non-zero finite divisor defect \(\Delta \mathcal C_{K,j}\) that exactly detects the change while canceling all unchanged terms.
+2. **Defect Exposure**: Changing the zero divisor while holding arithmetic data \(\mathcal A_\zeta\) fixed produces a non-zero finite divisor defect \(\Delta \mathcal C_{K,j} = \langle\Delta\mathcal D, h_{K,j}\rangle\) that detects the perturbation on separating test functions while canceling all unchanged terms.
 3. **Absence of Additional Grade Rigidity**: The combined \(K\)-family satisfies \(\mathcal C_{K,j}[H] \equiv \mathcal C_0[H(a_K \cdot)]\). The constraint space of the \(K\)-family is completely spanned by the expanded \(K=0\) native basis \(\{ H_j(a_K \cdot) : K \in \mathcal K, j \in \mathcal J \}\).
-   The discrimination outcome is classified as:
-   \[
-   \boxed{\text{coordinate\_redundant} \quad / \quad \text{finite\_basis\_enrichment\_only}.}
-   \]
+   - Exact theoretical classification:
+     \[
+     \boxed{\text{coordinate\_redundant}}
+     \]
+   - Finite basis enrichment relative to an unexpanded native basis:
+     \[
+     \boxed{\text{finite\_basis\_enrichment\_only}}
+     \]
 
-**Crucial Distinction**:
-- Detecting a local divisor perturbation with fixed arithmetic data demonstrates sensitivity of the explicit formula to spectral modifications, but does not by itself exclude an off-line zero of the actual zeta function (where arithmetic data might hypothetically conspire or where global compensation could exist).
+**Crucial Epistemic Distinction**:
+- Detecting a local divisor perturbation with fixed arithmetic data demonstrates sensitivity of the explicit formula to isolated spectral modifications, but does not model an alternative zeta function or a zero belonging to an actual complete divisor (where the complete zero spectrum and the arithmetic data satisfy the explicit formula collectively).
 - The missing theorem remains:
   \[
   \text{zeta-specific global constraint} \Longrightarrow \text{radial rigidity}.
   \]
   This implication is not assumed or axiomatized.
+

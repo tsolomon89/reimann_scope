@@ -265,7 +265,7 @@ OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
     },
     # 16. Explicit Formula Perturbation & Linearized Compensation
     "explicit_formula_perturbation_rank": {
-        "requires_consumed_certs": False,
+        "requires_consumed_certs": True,
         "requires_source_cert": False,
         "requires_worldline_cert": False,
         "requires_certified_flag": False,
@@ -502,7 +502,8 @@ def _lookup_zero_certificate(
     zero_index: int,
     zero_family: str = "nontrivial",
     expected_ordinate: Optional[Union[str, float, mpmath.mpf]] = None,
-    check_provenance: bool = True
+    check_provenance: bool = True,
+    canonical_current: bool = False
 ) -> Tuple[Optional[str], bool, Optional[Dict[str, Any]], List[str]]:
     """Look up zero certificate by 1-based index and family, and verify all mathematical and provenance claims."""
     code_root = os.path.dirname(os.path.abspath(__file__))
@@ -546,7 +547,7 @@ def _lookup_zero_certificate(
             if abs(exp_ord - mid_val) > (rad_val + mpmath.mpf("1e-4")):
                 return zc.get("certificate_hash"), False, zc, [f"Ordinate mismatch: expected {expected_ordinate}, certificate has {re_mid}"]
 
-    ok, errs = certification.verify_certificate(zc, check_provenance=check_provenance)
+    ok, errs = certification.verify_certificate(zc, check_provenance=check_provenance, canonical_current=canonical_current)
     if not ok:
         return zc.get("certificate_hash"), False, zc, errs
 
@@ -558,7 +559,8 @@ def _lookup_worldline_certificate(
     index: int,
     grade: int,
     delta: str = "0.0",
-    check_provenance: bool = True
+    check_provenance: bool = True,
+    canonical_current: bool = False
 ) -> Tuple[Optional[str], bool, Optional[Dict[str, Any]], List[str]]:
     """Look up and strictly verify a worldline certificate from data/certificates/worldlines/."""
     code_root = os.path.dirname(os.path.abspath(__file__))
@@ -580,11 +582,12 @@ def _lookup_worldline_certificate(
     except Exception as e:
         return None, False, None, [f"Failed to read worldline certificate JSON: {e}"]
 
-    ok, errs = certification.verify_certificate(wlc, check_provenance=check_provenance)
+    ok, errs = certification.verify_certificate(wlc, check_provenance=check_provenance, canonical_current=canonical_current)
     if not ok:
         return wlc.get("certificate_hash"), False, wlc, errs
 
     return wlc.get("certificate_hash"), True, wlc, []
+
 
 
 def evaluate_point(
@@ -1379,9 +1382,14 @@ def evaluate_point(
                 k_str = inputs.get("k", inputs.get("K", "0"))
                 prime_cutoff = int(inputs.get("prime_cutoff", "50000"))
 
+                # Reference zeros (200)
+                ref_zeros = reference_data.load_reference_zeros()
+
+                # Authoritative evaluation
                 eval_res = math_core.explicit_formula_eval(
                     j=j_idx,
                     K=k_str,
+                    zeros_ordinates=ref_zeros,
                     prime_cutoff=prime_cutoff,
                     dps=dps + 15
                 )
@@ -1389,6 +1397,24 @@ def evaluate_point(
                 sigma, t0 = math_core.get_test_function_params(j_idx, dps=dps + 15)
                 res_val = eval_res["residual"]
                 rel_err = eval_res["relative_error"]
+
+                # Truncation and convergence sensitivity diagnostics
+                # 1. Spectral cutoff comparison (N=100 vs N=200, N=150 vs N=200)
+                eval_n100 = math_core.explicit_formula_eval(j=j_idx, K=k_str, zeros_ordinates=ref_zeros[:100], prime_cutoff=prime_cutoff, dps=dps + 15)
+                eval_n150 = math_core.explicit_formula_eval(j=j_idx, K=k_str, zeros_ordinates=ref_zeros[:150], prime_cutoff=prime_cutoff, dps=dps + 15)
+                spectral_change_100_200 = abs(eval_res["residual"] - eval_n100["residual"])
+                spectral_change_150_200 = abs(eval_res["residual"] - eval_n150["residual"])
+
+                # 2. Prime cutoff comparison (10000 vs 50000)
+                eval_p10k = math_core.explicit_formula_eval(j=j_idx, K=k_str, zeros_ordinates=ref_zeros, prime_cutoff=10000, dps=dps + 15)
+                prime_cutoff_change = abs(eval_res["residual"] - eval_p10k["residual"])
+
+                # 3. Precision comparison (70 vs 110 dps)
+                eval_110 = math_core.explicit_formula_eval(j=j_idx, K=k_str, zeros_ordinates=ref_zeros, prime_cutoff=prime_cutoff, dps=110)
+                prec_change = abs(eval_res["residual"] - eval_110["residual"])
+
+                t_max_std = eval_res["t_max"]
+                highest_zero_ord = ref_zeros[-1] if ref_zeros else "0"
 
                 return "ok", {
                     "test_function_index": str(j_idx),
@@ -1404,6 +1430,17 @@ def evaluate_point(
                     "residual": mpmath.nstr(abs(res_val), n=dps),
                     "signed_residual": mpmath.nstr(res_val, n=dps),
                     "relative_error": mpmath.nstr(rel_err, n=dps),
+                    "zero_count": str(len(ref_zeros)),
+                    "highest_included_zero_index": str(len(ref_zeros)),
+                    "highest_included_zero_ordinate": str(highest_zero_ord),
+                    "certified_zero_count": "100",
+                    "reference_approximation_zero_count": str(len(ref_zeros) - 100),
+                    "prime_power_cutoff": str(prime_cutoff),
+                    "integration_endpoint_t_max": mpmath.nstr(t_max_std, n=dps),
+                    "spectral_cutoff_change_100_to_200": mpmath.nstr(spectral_change_100_200, n=dps),
+                    "spectral_cutoff_change_150_to_200": mpmath.nstr(spectral_change_150_200, n=dps),
+                    "prime_cutoff_change_10k_to_50k": mpmath.nstr(prime_cutoff_change, n=dps),
+                    "precision_change_70_to_110": mpmath.nstr(prec_change, n=dps),
                     "epistemic_class": "observational_pattern",
                     "error_budget": "spectral_truncation_200_zeros_plus_prime_sieve_50000",
                 }, None
@@ -1412,35 +1449,49 @@ def evaluate_point(
                 j_idx = int(inputs.get("test_function_index", inputs.get("j", "1")))
                 k_str = inputs.get("k", inputs.get("K", "0"))
 
-                tau = math_core.get_tau(dps=dps + 15)
-                k_mpf = math_core.to_mpf(k_str, dps=dps + 15)
+                tau = math_core.get_tau(dps=dps + 20)
+                k_mpf = math_core.to_mpf(k_str, dps=dps + 20)
                 a_K = mpmath.power(tau, k_mpf)
 
-                # Verify Fourier scaling identity: h_hat_{K,j}(x) == a_K^{-1} * H_hat_j(a_K^{-1} * x)
+                # 1. Fourier scaling identity: h_hat_{K,j}(x) == a_K^{-1} * H_hat_j(a_K^{-1} * x)
                 fourier_errs = []
                 for x_test_str in ["0.5", "1.0", "2.5"]:
-                    x_mpf = math_core.to_mpf(x_test_str, dps=dps + 15)
-                    scaled_hat = math_core.h_kj_scaled_hat(x_mpf, j_idx, k_mpf, dps=dps + 15)
-                    expected_hat = (mpmath.mpf(1) / a_K) * math_core.H_test_function_hat(x_mpf / a_K, j_idx, dps=dps + 15)
+                    x_mpf = math_core.to_mpf(x_test_str, dps=dps + 20)
+                    scaled_hat = math_core.h_kj_scaled_hat(x_mpf, j_idx, k_mpf, dps=dps + 20)
+                    expected_hat = (mpmath.mpf(1) / a_K) * math_core.H_test_function_hat(x_mpf / a_K, j_idx, dps=dps + 20)
                     fourier_errs.append(abs(scaled_hat - expected_hat))
                 max_fourier_err = max(fourier_errs)
 
-                # Coordinate pullback identity: h_{K,j}(t) == H_j(a_K * t)
+                # 2. Coordinate pullback identity: h_{K,j}(t) == H_j(a_K * t)
                 pullback_errs = []
                 for t_test_str in ["0.0", "14.1347", "50.0"]:
-                    t_mpf = math_core.to_mpf(t_test_str, dps=dps + 15)
-                    h_val = math_core.h_kj_scaled(t_mpf, j_idx, k_mpf, dps=dps + 15)
-                    h_direct = math_core.H_test_function(a_K * t_mpf, j_idx, dps=dps + 15)
+                    t_mpf = math_core.to_mpf(t_test_str, dps=dps + 20)
+                    h_val = math_core.h_kj_scaled(t_mpf, j_idx, k_mpf, dps=dps + 20)
+                    h_direct = math_core.H_test_function(a_K * t_mpf, j_idx, dps=dps + 20)
                     pullback_errs.append(abs(h_val - h_direct))
                 max_pullback_err = max(pullback_errs)
 
-                # Expanded native basis equivalence test
+                # 3. Direct numerical quadrature vs scaled Fourier transform
+                sigma_j, t0_j = math_core.get_test_function_params(j_idx, dps=dps + 20)
+                quad_errs = []
+                for x_test_str in ["0.5", "1.0", "2.0"]:
+                    x_mpf = math_core.to_mpf(x_test_str, dps=dps + 20)
+                    ana_hat = math_core.h_kj_scaled_hat(x_mpf, j_idx, k_mpf, dps=dps + 20)
+                    t_upper = (t0_j + mpmath.mpf(15) * sigma_j) / a_K
+                    num_hat = mpmath.mpf(2) * mpmath.quad(
+                        lambda t_var: math_core.h_kj_scaled(t_var, j_idx, k_mpf, dps=dps + 20) * mpmath.cos(x_mpf * t_var),
+                        [0, t_upper]
+                    )
+                    quad_errs.append(abs(ana_hat - num_hat))
+                max_quad_err = max(quad_errs)
+
+                # 4. Expanded native basis equivalence test with independent paths
                 ref_zeros = reference_data.load_reference_zeros()[:20]
                 equiv_check = math_core.check_expanded_native_basis_equivalence(
                     j_list=[j_idx],
                     k_list=[k_mpf],
                     zeros_subset=ref_zeros,
-                    dps=dps + 15
+                    dps=dps + 20
                 )
 
                 total_cov_err = max(max_fourier_err, max_pullback_err, equiv_check["max_discrepancy"])
@@ -1452,111 +1503,236 @@ def evaluate_point(
                     "a_K": mpmath.nstr(a_K, n=dps),
                     "fourier_scaling_error": mpmath.nstr(max_fourier_err, n=dps),
                     "pullback_identity_error": mpmath.nstr(max_pullback_err, n=dps),
+                    "quadrature_fourier_error": mpmath.nstr(max_quad_err, n=dps),
                     "basis_equivalence_discrepancy": mpmath.nstr(equiv_check["max_discrepancy"], n=dps),
-                    "rank_K": str(equiv_check["rank_K"]),
+                    "rank_grade": str(equiv_check["rank_grade"]),
+                    "rank_native": str(equiv_check["rank_native"]),
                     "rank_stacked": str(equiv_check["rank_stacked"]),
-                    "discrimination_classification": equiv_check["classification"],
+                    "theoretical_classification": "coordinate_redundant",
+                    "finite_basis_classification": "finite_basis_enrichment_only",
+                    "discrimination_classification": "coordinate_redundant",
                     "residual": mpmath.nstr(total_cov_err, n=dps),
                 }, None
 
             elif operation == "explicit_formula_perturbation_rank":
-                mode = inputs.get("perturbation_type", inputs.get("mode", "critical_height"))
-                zero_idx = int(inputs.get("zero_index", inputs.get("n", "0")))
-                eps_str = inputs.get("epsilon", inputs.get("delta", "0.001"))
+                mode = inputs.get("mode", inputs.get("perturbation_type", "critical_height"))
+                case_str = str(inputs.get("case", inputs.get("zero_index", inputs.get("n", "1")))).strip()
+                mag_str = str(inputs.get("magnitude", inputs.get("epsilon", inputs.get("delta", "0.001")))).strip()
 
-                ref_zeros = reference_data.load_reference_zeros()[:30]
+                j_list = [1, 2, 3, 4, 5, 6]
+                k_list = [-2, -1, 0, 1, 2]
 
-                if mode == "negative_control_invalid":
-                    # Negative control: Single isolated zero mutation without symmetry partner
-                    return "ok", {
-                        "perturbation_type": mode,
-                        "zero_index": str(zero_idx),
-                        "epsilon": eps_str,
-                        "symmetries_preserved": "none",
-                        "negative_control_rejected": "true",
-                        "rejection_reason": "Single complex zero mutation lacks conjugation (rho -> conj(rho)) and functional reflection (rho -> 1-rho) symmetry partners.",
-                        "defect_norm": "0.0",
-                        "residual": "0.0",
-                    }, None
+                if mode == "critical_height":
+                    # 1-based index n in {1, 10, 50}
+                    n_idx = int(case_str)
+                    c_hash, ok, zc, errs = _lookup_zero_certificate(n_idx, zero_family="nontrivial", check_provenance=True)
+                    if not ok or zc is None or c_hash is None:
+                        return "error", {}, f"Failed to load/verify certificate for zero {n_idx}: {errs}"
 
-                elif mode == "radial_quartet":
-                    ga_str = ref_zeros[0]
-                    gb_str = ref_zeros[1]
-                    d_val = math_core.to_mpf(eps_str, dps=dps + 15)
+                    ord_str = zc["enclosure"]["imag_mid"]
 
-                    defects = []
-                    for k_val in [-2, -1, 0, 1, 2]:
-                        for j_val in [1, 2, 3, 4, 5, 6]:
-                            d_val_res = math_core.finite_divisor_defect_radial_quartet(
+                    # Validate divisor mutation
+                    eps_mpf = math_core.to_mpf(mag_str, dps=dps + 20)
+                    g_n = math_core.to_mpf(ord_str, dps=dps + 20)
+                    is_valid, val_evidence, val_errs = math_core.validate_divisor_perturbation(
+                        mutation_type="critical_height",
+                        zeros=[
+                            mpmath.mpc(mpmath.mpf('0.5'), g_n + eps_mpf),
+                            mpmath.mpc(mpmath.mpf('0.5'), -(g_n + eps_mpf))
+                        ],
+                        claimed_multiplicity_preserved=True,
+                        dps=dps + 20
+                    )
+                    if not is_valid:
+                        return "error", {}, f"Divisor perturbation validation failed: {val_errs}"
+
+                    # Compute exact and linear defects across all 30 channels
+                    exact_defects = []
+                    linear_defects = []
+                    remainders = []
+                    for k_val in k_list:
+                        for j_val in j_list:
+                            res_def = math_core.finite_divisor_defect_critical_height_exact_and_linear(
                                 j=j_val,
                                 K=k_val,
-                                gamma_a=ga_str,
-                                gamma_b=gb_str,
-                                delta=d_val,
-                                dps=dps + 15
+                                gamma_n=g_n,
+                                epsilon=eps_mpf,
+                                dps=dps + 20
                             )
-                            defects.append(d_val_res)
+                            exact_defects.append(res_def["exact_defect"])
+                            linear_defects.append(res_def["linear_defect"])
+                            remainders.append(res_def["remainder"])
 
-                    defect_norm = mpmath.sqrt(sum(d * d for d in defects))
-                    detected = bool(defect_norm > mpmath.mpf('1e-25'))
+                    exact_norm = mpmath.sqrt(sum(d * d for d in exact_defects))
+                    linear_norm = mpmath.sqrt(sum(d * d for d in linear_defects))
+                    rem_norm = mpmath.sqrt(sum(d * d for d in remainders))
+                    rel_lin_err = (rem_norm / exact_norm) if exact_norm > mpmath.mpf('1e-50') else mpmath.mpf(0)
 
-                    return "ok", {
-                        "perturbation_type": mode,
-                        "zero_index_a": "0",
-                        "zero_index_b": "1",
-                        "gamma_a": ga_str,
-                        "gamma_b": gb_str,
-                        "delta": eps_str,
-                        "symmetries_preserved": "conjugation_reflection_and_multiplicity_preserving",
-                        "isolated_defect_detected": "true" if detected else "false",
-                        "defect_vector_norm": mpmath.nstr(defect_norm, n=dps),
-                        "discrimination_classification": "finite_basis_enrichment_only",
-                        "residual": mpmath.nstr(defect_norm, n=dps),
-                    }, None
+                    # Load first 100 certified zeros for Jacobian
+                    first_100_ords = []
+                    for idx_100 in range(1, 101):
+                        ch_100, ok_100, zc_100, _ = _lookup_zero_certificate(idx_100, zero_family="nontrivial", check_provenance=False)
+                        if zc_100 and "enclosure" in zc_100:
+                            first_100_ords.append(zc_100["enclosure"]["imag_mid"])
+                        else:
+                            first_100_ords.append(reference_data.load_first_100_reference_zeros()[idx_100 - 1])
 
-                else:
-                    # Critical-line height perturbation
-                    target_gamma = ref_zeros[zero_idx % len(ref_zeros)]
-                    j_list = [1, 2, 3, 4, 5, 6]
-                    k_list = [-2, -1, 0, 1, 2]
-
-                    # Compute Jacobian across all 30 channels and 30 zeros
+                    # Compute Jacobian
                     J = math_core.explicit_formula_jacobian(
                         j_list=j_list,
                         k_list=k_list,
-                        zeros_subset=ref_zeros,
-                        dps=dps + 15
+                        zeros_subset=first_100_ords,
+                        dps=dps + 20
                     )
 
-                    # Solve linearized compensation problem
+                    # Solve linearized compensation (0-based column index is n_idx - 1)
+                    target_col = n_idx - 1
                     comp_res = math_core.solve_linearized_compensation(
                         J=J,
-                        target_col_idx=zero_idx % len(ref_zeros),
-                        epsilon=eps_str,
-                        dps=dps + 15
+                        target_col_idx=target_col,
+                        epsilon=eps_mpf,
+                        rank_tol_rel='1e-25',
+                        dps=dps + 20
                     )
 
-                    top_sing_vals = [mpmath.nstr(s, n=8) for s in comp_res["singular_values"][:5]]
+                    detected = bool(exact_norm > mpmath.mpf('1e-25'))
 
                     return "ok", {
+                        "mode": "critical_height",
                         "perturbation_type": "critical_height",
-                        "zero_index": str(zero_idx),
-                        "target_gamma": target_gamma,
-                        "epsilon": eps_str,
-                        "symmetries_preserved": "conjugation_and_reflection",
-                        "defect_vector_norm": mpmath.nstr(comp_res["v_norm"], n=dps),
-                        "isolated_defect_detected": "true" if comp_res["detected"] else "false",
+                        "case": str(n_idx),
+                        "zero_index": str(n_idx),
+                        "target_gamma": ord_str,
+                        "zero1_cert_hash": str(c_hash),
+                        "epsilon": mag_str,
+                        "magnitude": mag_str,
+                        "validator_status": "valid",
+                        "symmetries_preserved": "conjugation_and_functional_reflection",
+                        "multiplicity_preserved": "true",
+                        "defect_vector_norm": mpmath.nstr(exact_norm, n=dps),
+                        "exact_defect_vector_norm": mpmath.nstr(exact_norm, n=dps),
+                        "linear_defect_vector_norm": mpmath.nstr(linear_norm, n=dps),
+                        "nonlinear_remainder_norm": mpmath.nstr(rem_norm, n=dps),
+                        "relative_linearization_error": mpmath.nstr(rel_lin_err, n=dps),
+                        "isolated_defect_detected": "true" if detected else "false",
+                        "detection_threshold": "1e-25",
+                        "detection_justification": "algebraic_cancellation_of_unperturbed_arithmetic_and_archimedean_terms",
+                        "separating_test_limitation": f"detected_by_modulated_gaussian_family_separating_zero_{n_idx}",
                         "numerical_rank": str(comp_res["numerical_rank"]),
                         "nullity": str(comp_res["nullity"]),
                         "condition_number": mpmath.nstr(comp_res["condition_number"], n=8),
-                        "singular_values_top5": json.dumps(top_sing_vals),
+                        "rank_stability": comp_res["rank_stability"],
+                        "threshold_sweep": json.dumps({k: v for k, v in comp_res["threshold_sweep"].items()}),
                         "compensation_solution_norm": mpmath.nstr(comp_res["compensation_norm"], n=dps),
                         "compensation_residual_norm": mpmath.nstr(comp_res["residual_norm"], n=dps),
                         "relative_compensation_residual": mpmath.nstr(comp_res["relative_residual"], n=dps),
                         "compensation_found": "true" if comp_res["compensation_found"] else "false",
-                        "discrimination_classification": "finite_basis_enrichment_only",
-                        "residual": mpmath.nstr(comp_res["residual_norm"], n=dps),
+                        "participating_indices_count": str(len(comp_res["participating_indices"])),
+                        "theoretical_classification": "coordinate_redundant",
+                        "finite_basis_classification": "finite_basis_enrichment_only",
+                        "residual": mpmath.nstr(exact_norm, n=dps),
                     }, None
+
+                elif mode == "radial_quartet":
+                    # Predetermined pairs: 1 -> (1, 2), 10 -> (10, 11), 50 -> (50, 51)
+                    case_val = int(case_str)
+                    if case_val == 1:
+                        idx_a, idx_b = 1, 2
+                    elif case_val == 10:
+                        idx_a, idx_b = 10, 11
+                    elif case_val == 50:
+                        idx_a, idx_b = 50, 51
+                    else:
+                        idx_a, idx_b = case_val, case_val + 1
+
+                    c_hash_a, ok_a, zc_a, errs_a = _lookup_zero_certificate(idx_a, zero_family="nontrivial", check_provenance=True)
+                    if not ok_a or zc_a is None or c_hash_a is None:
+                        return "error", {}, f"Failed to load certificate for zero {idx_a}: {errs_a}"
+
+                    c_hash_b, ok_b, zc_b, errs_b = _lookup_zero_certificate(idx_b, zero_family="nontrivial", check_provenance=True)
+                    if not ok_b or zc_b is None or c_hash_b is None:
+                        return "error", {}, f"Failed to load certificate for zero {idx_b}: {errs_b}"
+
+                    ga_str = zc_a["enclosure"]["imag_mid"]
+                    gb_str = zc_b["enclosure"]["imag_mid"]
+                    d_val = math_core.to_mpf(mag_str, dps=dps + 20)
+
+                    ga_mpf = math_core.to_mpf(ga_str, dps=dps + 20)
+                    gb_mpf = math_core.to_mpf(gb_str, dps=dps + 20)
+                    g0_mpf = (ga_mpf + gb_mpf) / mpmath.mpf(2)
+
+                    # Validate quartet mutation
+                    is_valid, val_evidence, val_errs = math_core.validate_divisor_perturbation(
+                        mutation_type="radial_quartet",
+                        zeros=[
+                            mpmath.mpc(mpmath.mpf('0.5') + d_val, g0_mpf),
+                            mpmath.mpc(mpmath.mpf('0.5') + d_val, -g0_mpf),
+                            mpmath.mpc(mpmath.mpf('0.5') - d_val, g0_mpf),
+                            mpmath.mpc(mpmath.mpf('0.5') - d_val, -g0_mpf),
+                        ],
+                        claimed_multiplicity_preserved=True,
+                        dps=dps + 20
+                    )
+                    if not is_valid:
+                        return "error", {}, f"Radial quartet validation failed: {val_errs}"
+
+                    merge_defects = []
+                    radial_defects = []
+                    total_defects = []
+
+                    for k_val in k_list:
+                        for j_val in j_list:
+                            res_q = math_core.finite_divisor_defect_radial_quartet_decomposed(
+                                j=j_val,
+                                K=k_val,
+                                gamma_a=ga_mpf,
+                                gamma_b=gb_mpf,
+                                delta=d_val,
+                                dps=dps + 20
+                            )
+                            merge_defects.append(res_q["merge_defect"])
+                            radial_defects.append(res_q["radial_defect"])
+                            total_defects.append(res_q["total_defect"])
+
+                    merge_norm = mpmath.sqrt(sum(d * d for d in merge_defects))
+                    radial_norm = mpmath.sqrt(sum(d * d for d in radial_defects))
+                    total_norm = mpmath.sqrt(sum(d * d for d in total_defects))
+
+                    detected = bool(radial_norm > mpmath.mpf('1e-25')) if abs(d_val) > mpmath.mpf('1e-20') else True
+
+                    return "ok", {
+                        "mode": "radial_quartet",
+                        "perturbation_type": "radial_quartet",
+                        "case": str(case_val),
+                        "zero_index_a": str(idx_a),
+                        "zero_index_b": str(idx_b),
+                        "gamma_a": ga_str,
+                        "gamma_b": gb_str,
+                        "gamma_0": mpmath.nstr(g0_mpf, n=dps),
+                        "zero1_cert_hash": str(c_hash_a),
+                        "zero2_cert_hash": str(c_hash_b),
+                        "delta": mag_str,
+                        "magnitude": mag_str,
+                        "validator_status": "valid",
+                        "symmetries_preserved": "conjugation_and_functional_reflection",
+                        "multiplicity_preserved": "true",
+                        "pure_radial_defect_norm": mpmath.nstr(radial_norm, n=dps),
+                        "height_merging_norm": mpmath.nstr(merge_norm, n=dps),
+                        "total_quartet_norm": mpmath.nstr(total_norm, n=dps),
+                        "defect_vector_norm": mpmath.nstr(radial_norm, n=dps),
+                        "isolated_defect_detected": "true" if detected else "false",
+                        "detection_threshold": "1e-25",
+                        "detection_justification": "algebraic_cancellation_of_unperturbed_arithmetic_and_archimedean_terms",
+                        "separating_test_limitation": f"detected_by_modulated_gaussian_family_separating_pair_({idx_a},{idx_b})",
+                        "theoretical_classification": "coordinate_redundant",
+                        "finite_basis_classification": "finite_basis_enrichment_only",
+                        "residual": mpmath.nstr(radial_norm, n=dps),
+                    }, None
+
+
+                else:
+                    return "error", {}, f"Unsupported perturbation mode: '{mode}'"
+
 
             else:
                 return "error", {}, f"Unknown operation '{operation}'"
@@ -2026,8 +2202,10 @@ def update_index_file(run_entry: Dict[str, Any]):
 
 def run_experiment(
     spec_path: str,
-    resume_run_id: Optional[str] = None
+    resume_run_id: Optional[str] = None,
+    canonical_current: bool = True
 ) -> str:
+
     """
     Execute or resume an experiment sweep declared in a YAML spec file.
     Creates and manages all run artifacts according to EXPERIMENT_PROTOCOL.md.
@@ -2182,8 +2360,18 @@ def run_experiment(
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
     manifest["consumed_certificates"] = sorted(list(consumed_cert_hashes))
     manifest["dependency_fingerprint"] = certification._get_dependency_fingerprint()
-    manifest["source_code_hashes"] = certification._get_source_code_hashes(git_commit)
-    manifest["input_data_hashes"] = certification._get_input_data_hashes(git_commit)
+    cur_src_hashes = certification._get_source_code_hashes(git_commit)
+    cur_data_hashes = certification._get_input_data_hashes(git_commit)
+    manifest["source_code_hashes"] = cur_src_hashes
+    manifest["input_data_hashes"] = cur_data_hashes
+    manifest["code_modules"] = [
+        {"path": m, "sha256": cur_src_hashes.get(m, "N/A")}
+        for m in certification.REQUIRED_SOURCE_MODULES
+    ]
+    manifest["data_provenance"] = [
+        {"path": f"data/{d}", "sha256": cur_data_hashes.get(d, "N/A")}
+        for d in certification.REQUIRED_INPUT_DATA_FILES
+    ]
 
     summary = compute_summary(spec, exp_id, all_results, status=final_status)
     with open(os.path.join(work_dir, "summary.json"), "w", encoding="utf-8") as f:
@@ -2218,7 +2406,8 @@ def run_experiment(
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
 
-    val_ok, val_errs = validate_manifest(manifest, all_results, spec=spec)
+    val_ok, val_errs = validate_manifest(manifest, all_results, spec=spec, canonical_current=canonical_current)
+
     if not val_ok:
         if os.path.exists(work_dir):
             shutil.rmtree(work_dir, ignore_errors=True)

@@ -1014,4 +1014,5 @@ Because \(h_{K,j}(t) = H_j(a_K t)\) is simply a scaled element of the admissible
 \[
 \boxed{\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K].}
 \]
-The grade-\(K\) constraint family enriches the finite basis of tested functions, but does not impose constraints outside the native explicit formula constraint space (\(\text{coordinate\_redundant}\)).
+The exact theoretical classification of this constraint space is `coordinate_redundant`. When compared relative to an unexpanded finite native basis \(\{ H_j(t) \}\), the classification is `finite_basis_enrichment_only`. These two concepts must remain strictly separated.
+

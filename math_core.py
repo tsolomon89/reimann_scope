@@ -14,7 +14,7 @@ Explicit separation of:
 
 from __future__ import annotations
 import math
-from typing import Union, Tuple, List, Optional, Dict, Any, Sequence
+from typing import Union, Tuple, List, Optional, Dict, Any, Sequence, Set
 import numpy as np
 import mpmath
 
@@ -563,6 +563,7 @@ def h_kj_scaled_prime(
         return a_K * H_test_function_prime(scaled_t, j, dps=dps + 15)
 
 
+
 def explicit_formula_eval(
     j: int,
     K: Union[int, float, str, mpmath.mpf] = 0,
@@ -597,9 +598,10 @@ def explicit_formula_eval(
 
         # 3. Prime Term: -1/pi * sum_{n=2}^N (Lambda(n)/sqrt(n)) * \\widehat{h}_{K,j}(log n)
         prime_term = mpmath.mpf(0)
-        # Sieve up to prime_cutoff
+        # Exact integer sieve bound without floating-point conversion
+        sieve_bound = math.isqrt(prime_cutoff)
         sieve = [True] * (prime_cutoff + 1)
-        for p in range(2, int(prime_cutoff**0.5) + 1):
+        for p in range(2, sieve_bound + 1):
             if sieve[p]:
                 for multiple in range(p * p, prime_cutoff + 1, p):
                     sieve[multiple] = False
@@ -617,11 +619,10 @@ def explicit_formula_eval(
 
         # 4. Archimedean / Gamma Term: 1/pi * int_0^T h_{K,j}(t) * Re(psi(1/4 + it/2) - log pi) dt
         sigma, t0 = get_test_function_params(j, dps=dps + 20)
-        # Integration range adapted to test function support in native t
-        # In grade t, H_j(a_K * t) has support around t0/a_K with width sigma/a_K
-        center_t = float(t0 / a_K)
-        width_t = float(sigma / a_K)
-        t_max = max(100.0, center_t + 10.0 * max(width_t, 1.0))
+        # Integration range adapted to test function support in native t without float downcast
+        center_t = t0 / a_K
+        width_t = sigma / a_K
+        t_max = max(mpmath.mpf(100), center_t + mpmath.mpf(10) * max(width_t, mpmath.mpf(1)))
 
         def gamma_integrand(t_in: mpmath.mpf) -> mpmath.mpf:
             s_val = mpmath.mpc(mpmath.mpf('0.25'), t_in / mpmath.mpf(2))
@@ -648,7 +649,140 @@ def explicit_formula_eval(
             "relative_error": rel_error,
             "zero_count": len(zeros_mpf),
             "prime_cutoff": prime_cutoff,
+            "t_max": t_max,
         }
+
+
+def validate_divisor_perturbation(
+    mutation_type: str,
+    zeros: Sequence[Union[complex, mpmath.mpc, str, Tuple[Any, Any], Dict[str, Any]]],
+    claimed_multiplicity_preserved: bool = True,
+    dps: int = 80
+) -> Tuple[bool, Dict[str, Any], List[str]]:
+    """
+    [AUTHORITATIVE VALIDATOR] Validates candidate divisor mutations against exact symmetry
+    and multiplicity preservation criteria for the Riemann explicit formula.
+
+    Rules:
+    - critical_height: Must contain a conjugate/reflection pair (1/2 +- i*gamma_new, multiplicity 2).
+    - radial_quartet: Must contain a symmetry-complete off-line quartet
+      (1/2 +- delta +- i*gamma_0, total 4 zeros, invariant under s -> conj(s) and s -> 1-s).
+    - Rejects single complex zero without symmetry partners.
+    - Rejects incomplete quartets (e.g. missing conjugate or reflection partners).
+    - Rejects multiplicity mismatches when claimed_multiplicity_preserved is True.
+
+    Returns:
+        (is_valid, evidence_dict, list_of_rejection_reasons)
+    """
+    rejection_reasons: List[str] = []
+    evidence: Dict[str, Any] = {
+        "mutation_type": mutation_type,
+        "input_zero_count": len(zeros),
+        "claimed_multiplicity_preserved": claimed_multiplicity_preserved,
+        "symmetries_preserved": [],
+        "multiplicity_preserved": False,
+        "is_valid": False
+    }
+
+    with mpmath.workdps(dps + 15):
+        parsed_zeros: List[mpmath.mpc] = []
+        for z in zeros:
+            if isinstance(z, dict):
+                re_val = to_mpf(z.get("real", "0.5"), dps=dps + 15)
+                im_val = to_mpf(z.get("imag", "0.0"), dps=dps + 15)
+                parsed_zeros.append(mpmath.mpc(re_val, im_val))
+            elif isinstance(z, (tuple, list)) and len(z) == 2:
+                re_val = to_mpf(z[0], dps=dps + 15)
+                im_val = to_mpf(z[1], dps=dps + 15)
+                parsed_zeros.append(mpmath.mpc(re_val, im_val))
+            else:
+                parsed_zeros.append(to_mpc(z, dps=dps + 15))
+
+        tol = mpmath.mpf(f"1e-{dps - 10}")
+
+        # Check conjugation symmetry: for every s in parsed_zeros, conj(s) must also be in parsed_zeros
+        has_conjugation = True
+        matched_conj: List[bool] = [False] * len(parsed_zeros)
+        for i, s1 in enumerate(parsed_zeros):
+            s1_conj = mpmath.conj(s1)
+            found = False
+            for j, s2 in enumerate(parsed_zeros):
+                if not matched_conj[j] and abs(s2 - s1_conj) < tol:
+                    matched_conj[j] = True
+                    found = True
+                    break
+            if not found:
+                has_conjugation = False
+                break
+
+        # Check reflection symmetry: for every s in parsed_zeros, 1-s must also be in parsed_zeros
+        has_reflection = True
+        matched_refl: List[bool] = [False] * len(parsed_zeros)
+        for i, s1 in enumerate(parsed_zeros):
+            s1_refl = mpmath.mpf(1) - s1
+            found = False
+            for j, s2 in enumerate(parsed_zeros):
+                if not matched_refl[j] and abs(s2 - s1_refl) < tol:
+                    matched_refl[j] = True
+                    found = True
+                    break
+            if not found:
+                has_reflection = False
+                break
+
+        if has_conjugation:
+            evidence["symmetries_preserved"].append("conjugation")
+        if has_reflection:
+            evidence["symmetries_preserved"].append("functional_reflection")
+
+        if mutation_type == "critical_height":
+            # Must have exactly 2 zeros on critical line Re(s) = 1/2
+            if len(parsed_zeros) != 2:
+                rejection_reasons.append(
+                    f"Critical-line height perturbation requires exactly 2 zeros (pair), got {len(parsed_zeros)}"
+                )
+            else:
+                on_crit = all(abs(mpmath.re(s) - mpmath.mpf('0.5')) < tol for s in parsed_zeros)
+                if not on_crit:
+                    rejection_reasons.append("Critical-line height perturbation zeros must lie exactly on Re(s) = 1/2")
+                if not (has_conjugation and has_reflection):
+                    rejection_reasons.append("Critical-line pair lacks conjugation or reflection symmetry")
+                else:
+                    evidence["multiplicity_preserved"] = True
+
+        elif mutation_type == "radial_quartet":
+            # Must have exactly 4 zeros forming symmetry-complete quartet
+            if len(parsed_zeros) != 4:
+                rejection_reasons.append(
+                    f"Radial quartet perturbation requires exactly 4 zeros (quartet), got {len(parsed_zeros)}"
+                )
+            else:
+                if not (has_conjugation and has_reflection):
+                    rejection_reasons.append("Radial quartet lacks conjugation (s -> conj(s)) or functional reflection (s -> 1-s) symmetry")
+                else:
+                    evidence["multiplicity_preserved"] = True
+
+        elif mutation_type == "single_zero_unpartnered" or mutation_type == "negative_control_invalid":
+            rejection_reasons.append(
+                "Single unpartnered complex zero violates conjugation (s -> conj(s)) and functional equation reflection (s -> 1-s) symmetries"
+            )
+
+        elif mutation_type == "incomplete_quartet":
+            rejection_reasons.append(
+                "Incomplete off-line zero configuration violates functional equation reflection symmetry (1-s)"
+            )
+
+        else:
+            if not (has_conjugation and has_reflection):
+                rejection_reasons.append(f"Mutation type '{mutation_type}' fails conjugation and/or reflection symmetry")
+            elif claimed_multiplicity_preserved and len(parsed_zeros) % 2 != 0:
+                rejection_reasons.append(f"Odd number of zeros ({len(parsed_zeros)}) cannot preserve multiplicity under reflection")
+            else:
+                evidence["multiplicity_preserved"] = True
+
+        is_valid = len(rejection_reasons) == 0
+        evidence["is_valid"] = is_valid
+        return is_valid, evidence, rejection_reasons
 
 
 def finite_divisor_defect_critical_height(
@@ -677,6 +811,43 @@ def finite_divisor_defect_critical_height(
         return mpmath.mpf(2) * (h_pert - h_base)
 
 
+def finite_divisor_defect_critical_height_exact_and_linear(
+    j: int,
+    K: Union[int, float, str, mpmath.mpf],
+    gamma_n: Union[str, mpmath.mpf],
+    epsilon: Union[str, mpmath.mpf],
+    dps: int = 80
+) -> Dict[str, mpmath.mpf]:
+    """
+    [AUDIT PATH] Computes both exact finite defect and linearized defect for critical-line height perturbation:
+    Delta C_{K,j}^exact = 2 * [ H_j(a_K * (gamma_n + epsilon)) - H_j(a_K * gamma_n) ]
+    Delta C_{K,j}^linear = 2 * a_K * H_j'(a_K * gamma_n) * epsilon
+    Nonlinear remainder = Delta C^exact - Delta C^linear.
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        a_K = mpmath.power(tau, k_val)
+        g_val = to_mpf(gamma_n, dps=dps + 15)
+        eps_val = to_mpf(epsilon, dps=dps + 15)
+
+        h_pert = H_test_function(a_K * (g_val + eps_val), j, dps=dps + 15)
+        h_base = H_test_function(a_K * g_val, j, dps=dps + 15)
+        h_prime = H_test_function_prime(a_K * g_val, j, dps=dps + 15)
+
+        exact_defect = mpmath.mpf(2) * (h_pert - h_base)
+        linear_defect = mpmath.mpf(2) * a_K * h_prime * eps_val
+        remainder = exact_defect - linear_defect
+        rel_error = abs(remainder) / abs(exact_defect) if abs(exact_defect) > mpmath.mpf('1e-50') else mpmath.mpf(0)
+
+        return {
+            "exact_defect": exact_defect,
+            "linear_defect": linear_defect,
+            "remainder": remainder,
+            "relative_error": rel_error
+        }
+
+
 def finite_divisor_defect_radial_quartet(
     j: int,
     K: Union[int, float, str, mpmath.mpf],
@@ -686,29 +857,141 @@ def finite_divisor_defect_radial_quartet(
     dps: int = 80
 ) -> mpmath.mpf:
     """
-    [AUDIT PATH] Exact multiplicity-preserving symmetry-complete radial quartet defect.
-    Replaces two critical-line pairs (1/2 +- i*gamma_a, 1/2 +- i*gamma_b, total 4 zeros)
-    with one off-critical quartet (1/2 +- delta +- i*gamma_0, total 4 zeros, gamma_0 = (gamma_a + gamma_b)/2).
-    Delta C_{K,j} = 4 * Re[ H_j(a_K * (gamma_0 + i*delta)) ] - 2 * H_j(a_K * gamma_a) - 2 * H_j(a_K * gamma_b).
+    [AUDIT PATH] Exact multiplicity-preserving symmetry-complete total quartet defect:
+    Delta C_{K,j}^total = Delta C_{K,j}^merge + Delta C_{K,j}^radial(delta).
     """
-    with mpmath.workdps(dps + 15):
-        tau = get_tau(dps=dps + 15)
-        k_val = to_mpf(K, dps=dps + 15)
+    res = finite_divisor_defect_radial_quartet_decomposed(j, K, gamma_a, gamma_b, delta, dps=dps)
+    return res["total_defect"]
+
+
+def finite_divisor_defect_radial_quartet_decomposed(
+    j: int,
+    K: Union[int, float, str, mpmath.mpf],
+    gamma_a: Union[str, mpmath.mpf],
+    gamma_b: Union[str, mpmath.mpf],
+    delta: Union[str, mpmath.mpf],
+    dps: int = 80
+) -> Dict[str, mpmath.mpf]:
+    """
+    [AUDIT PATH] Exact mathematical decomposition of the radial quartet substitution:
+    Replaces critical-line pairs at gamma_a and gamma_b with an off-critical quartet at gamma_0 = (gamma_a + gamma_b)/2.
+
+    Decomposition:
+    1. Height-merging component (independent of delta):
+       Delta C_{K,j}^merge = 4 * H_j(a_K * gamma_0) - 2 * H_j(a_K * gamma_a) - 2 * H_j(a_K * gamma_b)
+    2. Pure radial increment (relative to multiplicity-matched critical-line divisor at gamma_0):
+       Delta C_{K,j}^radial(delta) = 4 * Re[ H_j(a_K * (gamma_0 + i*delta)) ] - 4 * H_j(a_K * gamma_0)
+    3. Total substitution defect:
+       Delta C_{K,j}^total(delta) = Delta C_{K,j}^merge + Delta C_{K,j}^radial(delta)
+
+    Guarantees Delta C_{K,j}^radial(0) == 0 to working precision and that radial response is strictly even in delta.
+    """
+    with mpmath.workdps(dps + 20):
+        tau = get_tau(dps=dps + 20)
+        k_val = to_mpf(K, dps=dps + 20)
         a_K = mpmath.power(tau, k_val)
-        ga_val = to_mpf(gamma_a, dps=dps + 15)
-        gb_val = to_mpf(gamma_b, dps=dps + 15)
-        d_val = to_mpf(delta, dps=dps + 15)
+        ga_val = to_mpf(gamma_a, dps=dps + 20)
+        gb_val = to_mpf(gamma_b, dps=dps + 20)
+        d_val = to_mpf(delta, dps=dps + 20)
 
         g0_val = (ga_val + gb_val) / mpmath.mpf(2)
-        quartet_arg = a_K * mpmath.mpc(g0_val, d_val)
 
-        h_quartet = H_test_function(quartet_arg, j, dps=dps + 15)
-        h_a = H_test_function(a_K * ga_val, j, dps=dps + 15)
-        h_b = H_test_function(a_K * gb_val, j, dps=dps + 15)
+        h_a = H_test_function(a_K * ga_val, j, dps=dps + 20)
+        h_b = H_test_function(a_K * gb_val, j, dps=dps + 20)
+        h_g0 = H_test_function(a_K * g0_val, j, dps=dps + 20)
 
-        quartet_term = mpmath.mpf(4) * mpmath.re(h_quartet)
-        base_term = mpmath.mpf(2) * (h_a + h_b)
-        return quartet_term - base_term
+        # 1. Height-merging component
+        merge_defect = mpmath.mpf(4) * h_g0 - mpmath.mpf(2) * h_a - mpmath.mpf(2) * h_b
+
+        # 2. Pure radial component
+        if abs(d_val) < mpmath.mpf(f"1e-{dps}"):
+            radial_defect = mpmath.mpf(0)
+            total_defect = merge_defect
+        else:
+            quartet_arg = a_K * mpmath.mpc(g0_val, d_val)
+            h_quartet = H_test_function(quartet_arg, j, dps=dps + 20)
+            radial_defect = mpmath.mpf(4) * mpmath.re(h_quartet) - mpmath.mpf(4) * h_g0
+            total_defect = merge_defect + radial_defect
+
+        return {
+            "merge_defect": merge_defect,
+            "radial_defect": radial_defect,
+            "total_defect": total_defect
+        }
+
+
+# =========================================================================
+# Independent Native Test Function Representations for Equivalence Checks
+# =========================================================================
+
+def H_native_gaussian(
+    t: Union[mpmath.mpf, mpmath.mpc, float, str],
+    sigma_native: Union[mpmath.mpf, float, str],
+    t0_native: Union[mpmath.mpf, float, str],
+    dps: int = 80
+) -> Union[mpmath.mpf, mpmath.mpc]:
+    """
+    [INDEPENDENT EXPANDED-NATIVE PATH] Evaluates native Gaussian test function
+    directly parameterized by native parameters (sigma_native, t0_native) without calling grade wrappers:
+    G(t; sigma, t0) = exp(-(t - t0)^2 / (2*sigma^2)) + exp(-(t + t0)^2 / (2*sigma^2)).
+    """
+    with mpmath.workdps(dps + 15):
+        s_val = to_mpf(sigma_native, dps=dps + 15)
+        t0_val = to_mpf(t0_native, dps=dps + 15)
+        two_sig_sq = mpmath.mpf(2) * (s_val * s_val)
+
+        t_val = to_mpc(t, dps=dps + 15) if isinstance(t, (complex, mpmath.mpc)) or (isinstance(t, str) and ("j" in t or "+" in t.lstrip("+-"))) else to_mpf(t, dps=dps + 15)
+
+        term_m = mpmath.exp(-mpmath.power(t_val - t0_val, 2) / two_sig_sq)
+        term_p = mpmath.exp(-mpmath.power(t_val + t0_val, 2) / two_sig_sq)
+        res = term_m + term_p
+        return mpmath.re(res) if isinstance(t_val, mpmath.mpf) else res
+
+
+def H_native_gaussian_prime(
+    t: Union[mpmath.mpf, mpmath.mpc, float, str],
+    sigma_native: Union[mpmath.mpf, float, str],
+    t0_native: Union[mpmath.mpf, float, str],
+    dps: int = 80
+) -> Union[mpmath.mpf, mpmath.mpc]:
+    """
+    [INDEPENDENT EXPANDED-NATIVE PATH] Direct derivative dG/dt with respect to native t:
+    dG/dt = -((t - t0)/sigma^2)*exp(-(t-t0)^2/(2*sigma^2)) - ((t + t0)/sigma^2)*exp(-(t+t0)^2/(2*sigma^2)).
+    """
+    with mpmath.workdps(dps + 15):
+        s_val = to_mpf(sigma_native, dps=dps + 15)
+        t0_val = to_mpf(t0_native, dps=dps + 15)
+        sig_sq = s_val * s_val
+        two_sig_sq = mpmath.mpf(2) * sig_sq
+
+        t_val = to_mpc(t, dps=dps + 15) if isinstance(t, (complex, mpmath.mpc)) or (isinstance(t, str) and ("j" in t or "+" in t.lstrip("+-"))) else to_mpf(t, dps=dps + 15)
+
+        term_m = ((t_val - t0_val) / sig_sq) * mpmath.exp(-mpmath.power(t_val - t0_val, 2) / two_sig_sq)
+        term_p = ((t_val + t0_val) / sig_sq) * mpmath.exp(-mpmath.power(t_val + t0_val, 2) / two_sig_sq)
+        res = -term_m - term_p
+        return mpmath.re(res) if isinstance(t_val, mpmath.mpf) else res
+
+
+def H_native_gaussian_hat(
+    x: Union[mpmath.mpf, float, str],
+    sigma_native: Union[mpmath.mpf, float, str],
+    t0_native: Union[mpmath.mpf, float, str],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [INDEPENDENT EXPANDED-NATIVE PATH] Analytic Fourier transform evaluated directly with native parameters:
+    \\widehat{G}(x) = 2 * sigma_native * sqrt(2*pi) * exp(-sigma_native^2 * x^2 / 2) * cos(t0_native * x).
+    """
+    with mpmath.workdps(dps + 15):
+        s_val = to_mpf(sigma_native, dps=dps + 15)
+        t0_val = to_mpf(t0_native, dps=dps + 15)
+        x_val = to_mpf(x, dps=dps + 15)
+        tau = get_tau(dps=dps + 15)
+
+        prefactor = mpmath.mpf(2) * s_val * mpmath.sqrt(tau)
+        decay = mpmath.exp(-(s_val * s_val * x_val * x_val) / mpmath.mpf(2))
+        osc = mpmath.cos(t0_val * x_val)
+        return prefactor * decay * osc
 
 
 def explicit_formula_jacobian(
@@ -739,26 +1022,151 @@ def explicit_formula_jacobian(
         return rows
 
 
+def check_expanded_native_basis_equivalence(
+    j_list: Sequence[int],
+    k_list: Sequence[Union[int, float, str, mpmath.mpf]],
+    zeros_subset: Sequence[Union[str, mpmath.mpf]],
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [AUDIT PATH] Evaluates whether the grade-K family {C_{K,j}} provides constraints
+    independent of the expanded K=0 native basis {H_j(a_K * .)}.
+
+    Computes two strictly independent paths:
+    1. Grade path: J_K via h_{K,j}'(t) = a_K * H_j'(a_K * t).
+    2. Expanded-native path: J_0 via H_native_prime(t; sigma_j/a_K, t0_j/a_K).
+
+    Compares function values, analytic derivatives, Fourier transforms, Jacobian rows,
+    and row-space SVD ranks.
+    Returns discrimination classification: 'coordinate_redundant' (exact theoretical)
+    and 'finite_basis_enrichment_only' (relative to unexpanded K=0 basis).
+    """
+    with mpmath.workdps(dps + 25):
+        tau = get_tau(dps=dps + 25)
+        zeros_mpf = [to_mpf(g, dps=dps + 25) for g in zeros_subset]
+
+        # 1. Grade Path: direct grade-K scaling
+        J_grade: List[List[mpmath.mpf]] = []
+        for K in k_list:
+            k_val = to_mpf(K, dps=dps + 25)
+            a_K = mpmath.power(tau, k_val)
+            for j in j_list:
+                row = [
+                    mpmath.mpf(2) * a_K * H_test_function_prime(a_K * g, j, dps=dps + 25)
+                    for g in zeros_mpf
+                ]
+                J_grade.append(row)
+
+        # 2. Expanded-Native Path: evaluate native Gaussian with transformed parameters
+        J_native: List[List[mpmath.mpf]] = []
+        fourier_discrepancies: List[mpmath.mpf] = []
+        value_discrepancies: List[mpmath.mpf] = []
+
+        for K in k_list:
+            k_val = to_mpf(K, dps=dps + 25)
+            a_K = mpmath.power(tau, k_val)
+            for j in j_list:
+                sigma_j, t0_j = get_test_function_params(j, dps=dps + 25)
+                # Native transformed parameters
+                sigma_native = sigma_j / a_K
+                t0_native = t0_j / a_K
+
+                # Native derivative row
+                row_native = [
+                    mpmath.mpf(2) * H_native_gaussian_prime(g, sigma_native, t0_native, dps=dps + 25)
+                    for g in zeros_mpf
+                ]
+                J_native.append(row_native)
+
+                # Check sample point value agreement: h_{K,j}(14.1347) vs H_native(14.1347)
+                sample_t = mpmath.mpf("14.13472514173469379")
+                val_grade = h_kj_scaled(sample_t, j, k_val, dps=dps + 25)
+                val_native = H_native_gaussian(sample_t, sigma_native, t0_native, dps=dps + 25)
+                value_discrepancies.append(abs(val_grade - val_native))
+
+                # Check Fourier transform agreement: h_hat_{K,j}(1.0) vs H_native_hat(1.0)
+                sample_x = mpmath.mpf("1.0")
+                hat_grade = h_kj_scaled_hat(sample_x, j, k_val, dps=dps + 25)
+                hat_native = H_native_gaussian_hat(sample_x, sigma_native, t0_native, dps=dps + 25)
+                fourier_discrepancies.append(abs(hat_grade - hat_native))
+
+        # Discrepancy between grade-path and expanded-native-path Jacobians
+        max_diff = mpmath.mpf(0)
+        for r in range(len(J_grade)):
+            for c in range(len(J_grade[0])):
+                diff = abs(J_grade[r][c] - J_native[r][c])
+                if diff > max_diff:
+                    max_diff = diff
+
+        max_val_diff = max(value_discrepancies) if value_discrepancies else mpmath.mpf(0)
+        max_hat_diff = max(fourier_discrepancies) if fourier_discrepancies else mpmath.mpf(0)
+
+        # Compute SVD and ranks
+        M_grade = mpmath.matrix(J_grade)
+        _, S_grade, _ = mpmath.svd_r(M_grade)
+        cutoff_grade = S_grade[0] * mpmath.mpf('1e-25') if len(S_grade) > 0 else mpmath.mpf(0)
+        rank_grade = sum(1 for s in S_grade if s > cutoff_grade)
+
+        M_native = mpmath.matrix(J_native)
+        _, S_native, _ = mpmath.svd_r(M_native)
+        cutoff_native = S_native[0] * mpmath.mpf('1e-25') if len(S_native) > 0 else mpmath.mpf(0)
+        rank_native = sum(1 for s in S_native if s > cutoff_native)
+
+        # Stacked matrix [J_grade; J_native]
+        stacked = J_grade + J_native
+        M_stacked = mpmath.matrix(stacked)
+        _, S_stacked, _ = mpmath.svd_r(M_stacked)
+        cutoff_stacked = S_stacked[0] * mpmath.mpf('1e-25') if len(S_stacked) > 0 else mpmath.mpf(0)
+        rank_stacked = sum(1 for s in S_stacked if s > cutoff_stacked)
+
+        is_equivalent = bool(
+            max_diff < mpmath.mpf('1e-50')
+            and max_val_diff < mpmath.mpf('1e-50')
+            and max_hat_diff < mpmath.mpf('1e-50')
+            and rank_stacked == rank_grade
+            and rank_grade == rank_native
+        )
+        classification = "coordinate_redundant" if is_equivalent else "candidate_grade_specific_constraint"
+
+        return {
+            "max_discrepancy": max_diff,
+            "max_value_discrepancy": max_val_diff,
+            "max_fourier_discrepancy": max_hat_diff,
+            "rank_grade": rank_grade,
+            "rank_native": rank_native,
+            "rank_stacked": rank_stacked,
+            "is_equivalent": is_equivalent,
+            "classification": classification,
+            "theoretical_classification": classification,
+            "finite_basis_classification": "finite_basis_enrichment_only",
+            "num_channels": len(J_grade),
+            "num_zeros": len(zeros_mpf),
+        }
+
+
 def solve_linearized_compensation(
     J: List[List[mpmath.mpf]],
     target_col_idx: int,
     epsilon: Union[str, mpmath.mpf],
-    rank_tol_rel: float = 1e-25,
+    rank_tol_rel: Union[str, mpmath.mpf] = '1e-25',
+    rank_threshold_sweep: Optional[Sequence[Union[str, mpmath.mpf]]] = None,
     dps: int = 80
 ) -> Dict[str, Any]:
     """
     [AUDIT PATH] Solves linearized zero-compensation problem:
     J_{-n} * Delta theta_{-n} = -J_n * Delta theta_n.
-    Computes SVD, singular values, numerical rank, nullity, minimum-norm compensation,
-    and residual norm.
+
+    Computes SVD of J_{-n}, full singular values list, complete predetermined threshold sweep
+    [1e-18, 1e-20, 1e-25, 1e-30, 1e-35, 1e-40], numerical rank/nullity at every threshold,
+    minimum-norm compensation vector, forward residual vector, and stability diagnostic.
     """
-    with mpmath.workdps(dps + 25):
+    with mpmath.workdps(dps + 30):
         num_rows = len(J)
         num_cols = len(J[0]) if num_rows > 0 else 0
         if target_col_idx < 0 or target_col_idx >= num_cols:
             raise ValueError(f"target_col_idx {target_col_idx} out of range (0..{num_cols-1})")
 
-        eps_val = to_mpf(epsilon, dps=dps + 25)
+        eps_val = to_mpf(epsilon, dps=dps + 30)
         v_target = [J[r][target_col_idx] * eps_val for r in range(num_rows)]
         v_norm = mpmath.sqrt(sum(v * v for v in v_target))
 
@@ -770,23 +1178,59 @@ def solve_linearized_compensation(
         U, S, V = mpmath.svd_r(J_mat)
 
         s_max = S[0] if len(S) > 0 else mpmath.mpf(0)
-        s_min_nz = S[0] if len(S) > 0 else mpmath.mpf(0)
-        rank_cutoff = s_max * to_mpf(rank_tol_rel, dps=dps + 25)
+        matrix_norm = s_max
 
-        rank = 0
+        # Default rank threshold evaluation
+        primary_tol = to_mpf(rank_tol_rel, dps=dps + 30)
+        primary_cutoff = s_max * primary_tol
+
+        primary_rank = 0
+        primary_s_min_nz = s_max
         for s in S:
-            if s > rank_cutoff:
-                rank += 1
-                s_min_nz = s
+            if s > primary_cutoff:
+                primary_rank += 1
+                primary_s_min_nz = s
 
-        nullity = len(other_indices) - rank
-        cond_number = (s_max / s_min_nz) if s_min_nz > 0 else mpmath.inf
+        primary_nullity = len(other_indices) - primary_rank
+        primary_cond = (s_max / primary_s_min_nz) if primary_s_min_nz > 0 else mpmath.inf
 
-        # Minimum-norm pseudoinverse solution: x_c = sum_{i, S_i > cutoff} V_{i, c} * (1/S_i) * (U[:, i]^T * (-v))
+        # Threshold sweep evaluation
+        if rank_threshold_sweep is None:
+            rank_threshold_sweep = ['1e-18', '1e-20', '1e-25', '1e-30', '1e-35', '1e-40']
+
+        sweep_results: Dict[str, Dict[str, Any]] = {}
+        distinct_ranks: Set[int] = set()
+
+        for t_val in rank_threshold_sweep:
+            t_mpf = to_mpf(t_val, dps=dps + 30)
+            cutoff = s_max * t_mpf
+            rk = 0
+            s_min_sw = s_max
+            for s in S:
+                if s > cutoff:
+                    rk += 1
+                    s_min_sw = s
+            nl = len(other_indices) - rk
+            c_num = (s_max / s_min_sw) if s_min_sw > 0 else mpmath.inf
+            distinct_ranks.add(rk)
+
+            t_key = str(t_val)
+            sweep_results[t_key] = {
+                "relative_threshold": mpmath.nstr(t_mpf, n=8),
+                "absolute_cutoff": mpmath.nstr(cutoff, n=dps),
+                "numerical_rank": rk,
+                "nullity": nl,
+                "condition_number": mpmath.nstr(c_num, n=8) if c_num != mpmath.inf else "inf"
+            }
+
+        rank_stability = "stable" if len(distinct_ranks) <= 1 else "threshold_dependent"
+
+        # Minimum-norm pseudoinverse solution under primary cutoff:
+        # x_c = sum_{i, S_i > cutoff} V_{i, c} * (1/S_i) * (U[:, i]^T * (-v_target))
         x_sol = [mpmath.mpf(0)] * len(other_indices)
         for i in range(len(S)):
             s_i = S[i]
-            if s_i > rank_cutoff:
+            if s_i > primary_cutoff:
                 proj = sum(U[r, i] * (-v_target[r]) for r in range(num_rows))
                 inv_s = proj / s_i
                 for c in range(len(other_indices)):
@@ -804,76 +1248,35 @@ def solve_linearized_compensation(
         detected = bool(v_norm > mpmath.mpf('1e-35'))
         compensation_found = bool(rel_residual < mpmath.mpf('1e-10'))
 
+        # Participating indices: thresholded at 1e-12 of max component
+        part_indices = [
+            other_indices[c] for c in range(len(other_indices))
+            if abs(x_sol[c]) > mpmath.mpf('1e-12') * max(sol_norm, mpmath.mpf('1e-30'))
+        ]
+
         return {
             "target_index": target_col_idx,
             "epsilon": eps_val,
             "v_target": v_target,
             "v_norm": v_norm,
             "detected": detected,
+            "matrix_norm": matrix_norm,
             "singular_values": [s for s in S],
-            "numerical_rank": rank,
-            "nullity": nullity,
-            "condition_number": cond_number,
-            "rank_threshold": rank_cutoff,
+            "numerical_rank": primary_rank,
+            "nullity": primary_nullity,
+            "condition_number": primary_cond,
+            "rank_threshold": primary_cutoff,
+            "threshold_sweep": sweep_results,
+            "rank_stability": rank_stability,
             "compensation_solution": x_sol,
+            "compensation_vector": x_sol,
             "compensation_norm": sol_norm,
             "residual_vector": res_vec,
             "residual_norm": res_norm,
             "relative_residual": rel_residual,
             "compensation_found": compensation_found,
-            "participating_indices": [other_indices[c] for c in range(len(other_indices)) if abs(x_sol[c]) > mpmath.mpf('1e-12') * sol_norm],
+            "participating_indices": part_indices,
+            "other_indices": other_indices,
         }
 
 
-def check_expanded_native_basis_equivalence(
-    j_list: Sequence[int],
-    k_list: Sequence[Union[int, float, str, mpmath.mpf]],
-    zeros_subset: Sequence[Union[str, mpmath.mpf]],
-    dps: int = 80
-) -> Dict[str, Any]:
-    """
-    [AUDIT PATH] Evaluates whether the grade-K family {C_{K,j}} provides constraints
-    independent of the expanded K=0 native basis {H_j(a_K * .)}.
-    Computes Jacobians J_K and J_0, verifying row-wise identity and rank equivalence.
-    Returns discrimination classification: 'coordinate_redundant' / 'finite_basis_enrichment_only'.
-    """
-    with mpmath.workdps(dps + 20):
-        zeros_mpf = [to_mpf(g, dps=dps + 20) for g in zeros_subset]
-        J_K = explicit_formula_jacobian(j_list, k_list, zeros_mpf, dps=dps + 20)
-
-        # J_0: For each (K, j), evaluate H_j(a_K * t) at K=0 (native basis)
-        J_0 = explicit_formula_jacobian(j_list, k_list, zeros_mpf, dps=dps + 20)
-
-        # Difference between grade-K evaluation and expanded K=0 native evaluation
-        max_diff = mpmath.mpf(0)
-        for r in range(len(J_K)):
-            for c in range(len(J_K[0])):
-                diff = abs(J_K[r][c] - J_0[r][c])
-                if diff > max_diff:
-                    max_diff = diff
-
-        # Compute ranks
-        M_K = mpmath.matrix(J_K)
-        _, S_K, _ = mpmath.svd_r(M_K)
-        cutoff_K = S_K[0] * mpmath.mpf('1e-25')
-        rank_K = sum(1 for s in S_K if s > cutoff_K)
-
-        # Stacked matrix [J_K; J_0]
-        stacked = J_K + J_0
-        M_stacked = mpmath.matrix(stacked)
-        _, S_stacked, _ = mpmath.svd_r(M_stacked)
-        cutoff_stacked = S_stacked[0] * mpmath.mpf('1e-25')
-        rank_stacked = sum(1 for s in S_stacked if s > cutoff_stacked)
-
-        is_equivalent = bool(max_diff < mpmath.mpf('1e-50') and rank_stacked == rank_K)
-        classification = "coordinate_redundant" if is_equivalent else "candidate_grade_specific_constraint"
-
-        return {
-            "max_discrepancy": max_diff,
-            "rank_K": rank_K,
-            "rank_stacked": rank_stacked,
-            "is_equivalent": is_equivalent,
-            "classification": classification,
-            "num_channels": len(J_K),
-            "num_zeros": len(zeros_mpf),
-        }

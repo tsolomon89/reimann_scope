@@ -1900,31 +1900,66 @@ By direct substitution, the grade-\(K\) constraint is an evaluation of the nativ
 }
 \]
 
-The constraint subspace spanned by \(\{ \mathcal C_{K,j} : K \in \mathcal K, j \in \mathcal J \}\) is identical to that spanned by the expanded \(K=0\) basis \(\{ \mathcal C_0[H_j(a_K \cdot)] : K \in \mathcal K, j \in \mathcal J \}\).
-The discrimination classification is:
+The constraint subspace spanned by \(\{ \mathcal C_{K,j} : K \in \mathcal K, j \in \mathcal J \}\) is identical to that spanned by the expanded \(K=0\) native basis \(\{ \mathcal C_0[H_j(a_K \cdot)] : K \in \mathcal K, j \in \mathcal J \}\).
+The exact theoretical classification is:
 
 \[
 \boxed{
-\text{finite\_basis\_enrichment\_only \quad / \quad coordinate\_redundant.}
+\text{coordinate\_redundant}
 }
 \]
 
-## 35.4 Finite divisor defect \(\Delta \mathcal C_{K,j}\)
+When compared strictly against a finite unexpanded \(K=0\) basis \(\{ H_j(t) \}\), the classification is:
+
+\[
+\boxed{
+\text{finite\_basis\_enrichment\_only}
+}
+\]
+
+These two classifications address distinct mathematical questions and must never be combined into a single interchangeable label.
+
+## 35.4 Finite divisor defect \(\Delta \mathcal C_{K,j}\) and decomposition
 
 When arithmetic data \(\mathcal A_\zeta\) is held fixed while the zero divisor is modified \(\mathcal D \to \mathcal D + \Delta \mathcal D\), all arithmetic, pole, and gamma terms cancel identically:
 
 \[
 \boxed{
-\Delta \mathcal C_{K,j} = \operatorname{EF}[h_{K,j}; \mathcal D_\zeta + \Delta\mathcal D, \mathcal A_\zeta] - \operatorname{EF}[h_{K,j}; \mathcal D_\zeta, \mathcal A_\zeta] = \sum_{\rho \in \mathcal D_{\text{new}}} h_{K,j}\left(\frac{\rho - 1/2}{i}\right) - \sum_{\rho \in \mathcal D_{\text{old}}} h_{K,j}\left(\frac{\rho - 1/2}{i}\right).
+\Delta \mathcal C_{K,j} = \operatorname{EF}[h_{K,j}; \mathcal D_\zeta + \Delta\mathcal D, \mathcal A_\zeta] - \operatorname{EF}[h_{K,j}; \mathcal D_\zeta, \mathcal A_\zeta] = \langle \Delta\mathcal D, h_{K,j} \rangle = \sum_{\rho \in \mathcal D_{\text{new}}} h_{K,j}\left(\frac{\rho - 1/2}{i}\right) - \sum_{\rho \in \mathcal D_{\text{old}}} h_{K,j}\left(\frac{\rho - 1/2}{i}\right).
 }
 \]
 
+A non-zero divisor perturbation produces a non-zero defect on at least some separating test functions in the infinite space of admissible test functions, though it may have smaller projection onto any finite selected family.
+
 - **Critical-line height perturbation**: For \(1/2 \pm i\gamma_n \mapsto 1/2 \pm i(\gamma_n + \varepsilon)\):
-  \[
-  \Delta \mathcal C_{K,j} = 2 \left[ H_j(a_K(\gamma_n + \varepsilon)) - H_j(a_K \gamma_n) \right].
-  \]
-- **Symmetry-complete radial quartet defect**: Replacing pairs \(1/2 \pm i\gamma_a\) and \(1/2 \pm i\gamma_b\) with quartet \(1/2 \pm \delta \pm i\gamma_0\) (\(\gamma_0 = (\gamma_a + \gamma_b)/2\), total 4 zeros):
-  \[
-  \Delta \mathcal C_{K,j} = 4 \Re\left[ H_j(a_K(\gamma_0 + i\delta)) \right] - 2 H_j(a_K \gamma_a) - 2 H_j(a_K \gamma_b).
-  \]
-- **Invalid single-zero mutation**: Any mutation violating \(\rho \mapsto \overline\rho\) or \(\rho \mapsto 1-\rho\) is rejected prior to evaluation.
+  - Exact defect:
+    \[
+    \Delta \mathcal C_{K,j}(\varepsilon) = 2 \left[ H_j(a_K(\gamma_n + \varepsilon)) - H_j(a_K \gamma_n) \right].
+    \]
+  - Linearized defect and Jacobian column:
+    \[
+    \Delta \mathcal C_{K,j}^{\mathrm{linear}}(\varepsilon) = 2 a_K H_j'(a_K \gamma_n) \varepsilon = J_{(K,j), n} \varepsilon.
+    \]
+  - Non-linear remainder:
+    \[
+    R_{K,j}(\varepsilon) = \Delta \mathcal C_{K,j}(\varepsilon) - \Delta \mathcal C_{K,j}^{\mathrm{linear}}(\varepsilon) = \mathcal O(\varepsilon^2).
+    \]
+
+- **Symmetry-complete radial quartet decomposition**: Replacing pairs \(1/2 \pm i\gamma_a\) and \(1/2 \pm i\gamma_b\) with quartet \(1/2 \pm \delta \pm i\gamma_0\) (\(\gamma_0 = (\gamma_a + \gamma_b)/2\), total 4 zeros):
+  - Height-merging baseline defect (independent of \(\delta\)):
+    \[
+    \Delta \mathcal C_{K,j}^{\mathrm{merge}} = 4 H_j(a_K \gamma_0) - 2 H_j(a_K \gamma_a) - 2 H_j(a_K \gamma_b).
+    \]
+  - Pure radial defect (strictly vanishes at \(\delta = 0\), even in \(\delta\)):
+    \[
+    \Delta \mathcal C_{K,j}^{\mathrm{radial}}(\delta) = 4 \Re\left[ H_j(a_K(\gamma_0 + i\delta)) \right] - 4 H_j(a_K \gamma_0) = 4 \Re\left[ H_j(a_K \gamma_0 + i a_K \delta) - H_j(a_K \gamma_0) \right].
+    \]
+  - Total defect:
+    \[
+    \Delta \mathcal C_{K,j}^{\mathrm{total}}(\delta) = \Delta \mathcal C_{K,j}^{\mathrm{merge}} + \Delta \mathcal C_{K,j}^{\mathrm{radial}}(\delta).
+    \]
+
+- **Divisor perturbation validation**: Any proposed zero-divisor mutation must be verified by `validate_divisor_perturbation` to confirm symmetry completeness (\(\rho \mapsto \overline\rho\) and \(\rho \mapsto 1-\rho\)) and multiplicity preservation before evaluation. Single un-partnered complex zero mutations are rejected.
+
+- **Epistemic boundary**: These perturbation metrics constitute a local sensitivity diagnostic under frozen arithmetic data. They do not constitute an alternative zeta function or a proof of global non-compensation across the infinite zero set.
+

@@ -5,26 +5,30 @@ research_question: Does an isolated local zero-divisor perturbation induce a det
 epistemic_class: sensitivity_diagnostic
 object_relationship: synthetic_perturbation_diagnostic
 hypothesis:
-  statement: Holding arithmetic data fixed while perturbing a zero orbit produces a non-zero finite divisor defect Delta C_{K,j} that is detected by the explicit formula; linearized compensation can find a minimum-norm candidate within the sampled subspace.
+  statement: Holding arithmetic data fixed while perturbing a zero orbit produces a non-zero finite divisor defect Delta C_{K,j} = <Delta D, h_{K,j}> that is detected by separating test functions; linearized compensation can find a minimum-norm candidate within the sampled subspace.
 prediction:
-  statement: Isolated zero perturbations are detected (defect_vector_norm > 1e-25), invalid single-zero perturbations are rejected, and linearized compensation solutions are computed with bounded residuals.
+  statement: Valid critical-line and radial zero perturbations produce detected defects (defect_vector_norm >= 1e-25), with pure radial defects vanishing at delta=0, and linearized compensation solutions characterize the finite sampled representation.
 falsification:
-  statement: Non-zero valid perturbation yields zero defect norm or invalid single-zero mutation is accepted.
+  statement: Valid non-zero perturbation yields zero defect norm or fails detection by separating test functions.
 interpretation_limit:
-  statement: Sensitivity diagnostic characterizing linear response and defect exposure under fixed arithmetic data; does not construct alternative zeta functions or prove global non-compensation.
+  statement: Sensitivity diagnostic characterizing linear response, defect exposure, and rank structure under fixed arithmetic data; does not construct alternative zeta functions or prove global non-compensation.
 formalization_target:
-  statement: Explicit formula finite divisor defect and Jacobian response.
+  statement: Explicit formula finite divisor defect, exact radial decomposition, and Jacobian response.
 criterion:
   metric: defect_vector_norm
-  operator: '>='
-  threshold: 1e-25
-  aggregation: max_abs
+  aggregation: none
 report_metrics:
 - metric: defect_vector_norm
-  kind: criterion_component
+  kind: diagnostic
   label: Defect vector L2 norm
+- metric: pure_radial_defect_norm
+  kind: diagnostic
+  label: Pure radial defect L2 norm
+- metric: height_merging_norm
+  kind: diagnostic
+  label: Height merging baseline L2 norm
 - metric: compensation_residual_norm
-  kind: criterion_component
+  kind: diagnostic
   label: Compensation residual norm
 engine:
   operation: explicit_formula_perturbation_rank
@@ -32,16 +36,15 @@ parameters:
   mode:
     kind: explicit
     values:
-    - negative_control_invalid
     - critical_height
     - radial_quartet
-  zero_index:
+  case:
     kind: explicit
     values:
-    - 0
-    - 9
-    - 49
-  epsilon:
+    - '1'
+    - '10'
+    - '50'
+  magnitude:
     kind: explicit
     values:
     - '0.0001'
@@ -51,3 +54,4 @@ precision:
   dps: 80
 outputs:
   retain_points: true
+

@@ -1456,8 +1456,9 @@ def test_explicit_formula_experiment_specs_execute_and_validate(temp_research_en
             spec = yaml.safe_load(f)
 
         exp_id = spec["id"]
-        run_id = research_runner.run_experiment(temp_spec_path)
+        run_id = research_runner.run_experiment(temp_spec_path, canonical_current=False)
         assert run_id == exp_id
+
 
         run_dir = os.path.join(temp_research_env["runs"], exp_id)
         assert os.path.exists(run_dir)

@@ -5,7 +5,7 @@ research_question: Does the grade-indexed test function family h_{K,j}(t) = H_j(
 epistemic_class: exact_control
 object_relationship: grade_constraint_comparison
 hypothesis:
-  statement: The grade-K representation transports the explicit formula according to exact Fourier scaling h_hat_{K,j}(x) = a_K^{-1} * H_hat_j(a_K^{-1} * x), coordinate pullback C_{K,j}[H] = C_0[H(a_K * .)], and the constraint space is coordinate_redundant (finite_basis_enrichment_only) with respect to the expanded K=0 native basis.
+  statement: The grade-K representation transports the explicit formula according to exact Fourier scaling h_hat_{K,j}(x) = a_K^{-1} * H_hat_j(a_K^{-1} * x), coordinate pullback C_{K,j}[H] = C_0[H(a_K * .)], and the constraint space is coordinate_redundant (finite_basis_enrichment_only with respect to an unexpanded finite K=0 basis).
 prediction:
   statement: The covariance and pullback identity error is below 1e-45, and the rank of the joint system equals the rank of the native system.
 falsification:

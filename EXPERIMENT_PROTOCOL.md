@@ -934,10 +934,12 @@ The suite comprises three canonical experiments evaluating the Riemann–Weil ex
 
 1. `explicit-formula-native-baseline-001`
    - **Epistemic Class**: `observational_pattern`
-   - **Scope**: Validates native explicit formula components, signs, normalization, and truncation error budgets across test functions \(j=1..6\) at \(K=0\).
+   - **Scope**: Validates native explicit formula components, signs, normalization, and truncation error budgets across test functions \(j=1..6\) at \(K=0\) with sensitivity diagnostics for spectral cutoff, prime sieve cutoff, precision, and integration window.
 2. `explicit-formula-grade-covariance-001`
    - **Epistemic Class**: `exact_control`
-   - **Scope**: Validates exact Fourier scaling \(\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x)\), pullback identity \(\mathcal C_{K,j}[H] \equiv \mathcal C_0[H(a_K \cdot)]\), and expanded-\(K=0\) basis rank equivalence.
+   - **Scope**: Validates exact Fourier scaling \(\widehat h_{K,j}(x) = a_K^{-1} \widehat H_j(a_K^{-1} x)\), pullback identity \(\mathcal C_{K,j}[H] \equiv \mathcal C_0[H(a_K \cdot)]\), numerical quadrature verification, and independent expanded-native basis rank equivalence.
+   - **Classifications**: Exact theoretical classification `coordinate_redundant`; finite basis comparison relative to an unexpanded native basis `finite_basis_enrichment_only`.
 3. `explicit-formula-perturbation-rank-001`
    - **Epistemic Class**: `sensitivity_diagnostic`
-   - **Scope**: Evaluates finite divisor defects \(\Delta \mathcal C_{K,j}\), rejection of unsymmetric single-zero mutations, symmetry-complete radial quartet defects, Jacobian SVD, numerical rank, and minimum-norm linearized compensation.
+   - **Scope**: Evaluates finite divisor defects \(\Delta \mathcal C_{K,j} = \langle\Delta\mathcal D, h_{K,j}\rangle\), exact validator rejection of unsymmetric or multiplicity-violating mutations, symmetry-complete radial quartet exact decomposition into height merging \(\Delta\mathcal C^{\mathrm{merge}}\) and pure radial \(\Delta\mathcal C^{\mathrm{radial}}(\delta)\), Jacobian SVD with threshold sweep across \([10^{-18}, 10^{-20}, 10^{-25}, 10^{-30}, 10^{-35}, 10^{-40}]\), rank stability classification `threshold_dependent`, and minimum-norm linearized compensation vectors with forward residuals. Consumes verified zero certificates for all perturbed cases.
+

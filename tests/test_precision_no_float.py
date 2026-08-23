@@ -60,3 +60,28 @@ def test_transcendental_high_precision_no_float_downcast():
         
         diff = abs(scale - expected_scale)
         assert diff < mpmath.mpf('1e-70'), f"Scale precision loss: {diff}"
+
+
+def test_explicit_formula_high_precision_no_float_downcast():
+    """Verify that explicit-formula evaluations, integrals, and defect decompositions maintain 80+ dps without float downcasts."""
+    dps = 80
+    with mpmath.workdps(dps + 20):
+        ref_zeros = reference_data.load_reference_zeros()[:20]
+        # Exact evaluation at 80 dps
+        eval_res = math_core.explicit_formula_eval(
+            j=1, K=0, zeros_ordinates=ref_zeros, prime_cutoff=1000, dps=dps
+        )
+        assert isinstance(eval_res["spectral_sum"], mpmath.mpf)
+        assert isinstance(eval_res["gamma_term"], mpmath.mpf)
+        assert isinstance(eval_res["residual"], mpmath.mpf)
+        assert isinstance(eval_res["t_max"], mpmath.mpf)
+
+        # Defect decomposition at 80 dps
+        defect_res = math_core.finite_divisor_defect_radial_quartet_decomposed(
+            j=1, K=0, gamma_a=ref_zeros[0], gamma_b=ref_zeros[1], delta="1e-35", dps=dps
+        )
+        assert isinstance(defect_res["radial_defect"], mpmath.mpf)
+        assert isinstance(defect_res["merge_defect"], mpmath.mpf)
+        # Radial defect for 1e-35 delta is non-zero in 80 dps but would be completely zero under float
+        assert defect_res["radial_defect"] != mpmath.mpf(0)
+
