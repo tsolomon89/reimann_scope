@@ -6,11 +6,11 @@
   "epistemic_class": "observational_pattern",
   "object_relationship": "actual_cross_height_comparison",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T15:56:57.336518+00:00",
-  "completed_at": "2026-08-23T15:57:04.080244+00:00",
+  "started_at": "2026-08-23T18:36:13.949572+00:00",
+  "completed_at": "2026-08-23T18:36:21.187391+00:00",
   "status": "complete",
-  "git_commit": "7a86f0b7b5e77c1e5ea9ae8a9b2ea88258a35f64",
-  "producing_git_commit": "7a86f0b7b5e77c1e5ea9ae8a9b2ea88258a35f64",
+  "git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
+  "producing_git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
   "git_dirty": false,
   "experiment_spec_sha256": "ef6696444ac87bfac6f217f8e28c9eed5f7ea3bd8f9d582519544494e5534cc9",
   "precision": {
@@ -71,7 +71,7 @@
     "math_core.py": "839d63dabe496816c915ccc42c7bec7d6e6ceecedda764d69c15d38f7682bc7c",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "cdaefe0d54c8780821676d2bcc838972f26c49f39f0c832c9437026436d1f64a",
-    "research_runner.py": "bbd912eee6c4579f21f6ba15b25eea53e550750d431c23232931f5796125b79d",
+    "research_runner.py": "9a07d63f25c6552494cbe1cc028687703b23a86499f29e1caa4cbd28f85aa367",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -107,7 +107,7 @@
     },
     {
       "path": "research_runner.py",
-      "sha256": "bbd912eee6c4579f21f6ba15b25eea53e550750d431c23232931f5796125b79d"
+      "sha256": "9a07d63f25c6552494cbe1cc028687703b23a86499f29e1caa4cbd28f85aa367"
     },
     {
       "path": "zero_finder.py",
@@ -133,15 +133,15 @@
     }
   ],
   "consumed_certificates": [
-    "1eaceb62b4e76b4cf203b2c7ce69c5496e74ace45fcb41be50030e4d6002d9f0",
-    "54005519898d2e4ed68ed5ccc4493623027d64e9a692fb0f260ccfc5628c2db7",
-    "9173510baf1b4484098c04987d471abf5110096fa83ed7ed07156e0b8ab112f7",
-    "c0cc7cd891342c33a18811b52aea264d9c56d2bc211fbf088281dea10deb7e87"
+    "28f23659a1663ef88deb695874359d74798810b2cb9b565548d23e2264574f49",
+    "47b2d17cf4d37575cf60ebb568962c7d6975f1b9a1cf7b7b65407650769d82a8",
+    "68a7ebf49a755ebe4cb3668aaa320206d2dd34cef2f719c97f8919e20cf37c61",
+    "8dc67bdbce259b94ba785f9021fb87da92cb3a99fb692c9cf22783a258ee39a2"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "7cb9a190e1d064f756d60f1798b364452a129305b6f8dce3b1bdc93177903a4f"
+      "sha256": "5990f82a36ddc48731af67cce0b9d79175859c0d54fb7e5a82d8c62af83ce05f"
     },
     "summary_json": {
       "path": "summary.json",
@@ -149,7 +149,7 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "461c4569e80aa7f1335a556280c0b58488b50307c8189fde12b7f37551627808"
+      "sha256": "f757e5a988738a397c17b0688abde1ea04f1eff321f62d71938b57befb3a9a47"
     }
   }
 }

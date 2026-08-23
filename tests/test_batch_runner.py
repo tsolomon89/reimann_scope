@@ -22,9 +22,11 @@ import sys
 import json
 import yaml
 import shutil
+import copy
 import tempfile
 import pytest
 import mpmath
+
 
 import research_runner
 import certification
@@ -1327,43 +1329,40 @@ def test_adversarial_manifest_artifact_path_mutations():
     }
 
     # 1. Altered filename e.g. FORGED.json
-    m1 = dict(base_manifest)
-    m1["artifacts"] = dict(base_manifest["artifacts"])
+    m1 = copy.deepcopy(base_manifest)
     m1["artifacts"]["results_jsonl"] = {"path": "FORGED.json", "sha256": "1" * 64}
     ok, errs = research_runner.validate_manifest(m1, canonical_current=False)
     assert not ok
     assert any("declared path" in e or "canonical path" in e for e in errs)
 
     # 2. Path traversal e.g. ../secret.json
-    m2 = dict(base_manifest)
-    m2["artifacts"] = dict(base_manifest["artifacts"])
+    m2 = copy.deepcopy(base_manifest)
     m2["artifacts"]["summary_json"] = {"path": "../secret.json", "sha256": "2" * 64}
     ok, errs = research_runner.validate_manifest(m2, canonical_current=False)
     assert not ok
     assert any("traversal" in e or "invalid format" in e for e in errs)
 
     # 3. Backslash in path e.g. results\results.jsonl
-    m3 = dict(base_manifest)
-    m3["artifacts"] = dict(base_manifest["artifacts"])
+    m3 = copy.deepcopy(base_manifest)
     m3["artifacts"]["readme_md"] = {"path": "sub\\README.md", "sha256": "3" * 64}
     ok, errs = research_runner.validate_manifest(m3, canonical_current=False)
     assert not ok
     assert any("backslash" in e or "invalid format" in e for e in errs)
 
     # 4. Missing required artifact entry
-    m4 = dict(base_manifest)
+    m4 = copy.deepcopy(base_manifest)
     m4["artifacts"] = {"summary_json": {"path": "summary.json", "sha256": "2" * 64}}
     ok, errs = research_runner.validate_manifest(m4, canonical_current=False)
     assert not ok
     assert any("missing required entries" in e for e in errs)
 
     # 5. Unauthorized extra artifact entry
-    m5 = dict(base_manifest)
-    m5["artifacts"] = dict(base_manifest["artifacts"])
+    m5 = copy.deepcopy(base_manifest)
     m5["artifacts"]["forged_extra"] = {"path": "extra.json", "sha256": "4" * 64}
     ok, errs = research_runner.validate_manifest(m5, canonical_current=False)
     assert not ok
     assert any("unauthorized entries" in e for e in errs)
+
 
 
 def test_adversarial_index_field_mutations_and_duplicates(tmp_path):
