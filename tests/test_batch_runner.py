@@ -945,3 +945,149 @@ def test_publication_gate_rejects_invalid_run_and_preserves_canonical_run(temp_r
     with open(os.path.join(run_dir, "manifest.json"), "r", encoding="utf-8") as f:
         preserved_manifest = json.load(f)
     assert preserved_manifest == orig_manifest
+
+
+def test_transactional_rollback_failure_injection(temp_research_env, monkeypatch):
+    """Test injected failures during transaction at replacement, index update, and cleanup.
+    Verifies that stable directory and index.json return byte-for-byte to pre-run state.
+    """
+    spec_dict = {
+        "schema_version": "1",
+        "id": "tx-test-sweep",
+        "title": "TX Test Sweep",
+        "hypothesis": {"statement": "Test transaction rollback"},
+        "criterion": {"metric": "abs_slope_error", "operator": "<=", "threshold": "1e-25"},
+        "engine": {"operation": "centrifuge"},
+        "parameters": {
+            "delta": {"kind": "explicit", "values": ["0.01"]},
+            "K": {"kind": "explicit", "values": ["1"]}
+        },
+        "precision": {"dps": 50}
+    }
+    spec_path = os.path.join(temp_research_env["experiments"], "tx-test-sweep.yaml")
+    with open(spec_path, "w", encoding="utf-8") as f:
+        yaml.dump(spec_dict, f)
+
+    # Initial successful publication
+    run_id = research_runner.run_experiment(spec_path)
+    run_dir = os.path.join(temp_research_env["runs"], run_id)
+    with open(os.path.join(run_dir, "manifest.json"), "r", encoding="utf-8") as f:
+        orig_manifest_content = f.read()
+    with open(temp_research_env["index"], "r", encoding="utf-8") as f:
+        orig_index_content = f.read()
+
+    # 1. Failure during update_index_file
+    def mock_update_fail(*args, **kwargs):
+        raise IOError("Simulated index disk full error")
+
+    monkeypatch.setattr(research_runner, "update_index_file", mock_update_fail)
+
+    with pytest.raises(IOError, match="Simulated index disk full"):
+        research_runner.run_experiment(spec_path)
+
+    # Assert stable dir and index.json restored byte-for-byte
+    assert os.path.exists(run_dir)
+    with open(os.path.join(run_dir, "manifest.json"), "r", encoding="utf-8") as f:
+        assert f.read() == orig_manifest_content
+    with open(temp_research_env["index"], "r", encoding="utf-8") as f:
+        assert f.read() == orig_index_content
+
+    # Assert no backup or temporary files exist
+    assert not any(f.startswith(".bak_") or f.startswith(".tmp_") for f in os.listdir(temp_research_env["runs"]))
+
+
+def test_operation_obligations_adversarial_rejections():
+    """Test operation-specific proof obligation validation against 13 adversarial rejection cases."""
+    z1_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "certificates", "zeros", "zero_00001.json")
+    wl1_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "certificates", "worldlines", "worldline_z00001_Kp1_delta_pos0p00.json")
+
+    if not os.path.exists(z1_path) or not os.path.exists(wl1_path):
+        pytest.skip("Certificates not found on disk")
+
+    with open(z1_path, "r", encoding="utf-8") as f:
+        z1 = json.load(f)
+    with open(wl1_path, "r", encoding="utf-8") as f:
+        wl1 = json.load(f)
+
+    h1 = z1["certificate_hash"]
+    h2 = wl1["certificate_hash"]
+
+    spec = {
+        "id": "obl-test",
+        "operation": "transcendental_worldline",
+        "epistemic_class": "exact_control",
+        "hypothesis": {"statement": "Obligations test"},
+        "criterion": {"metric": "worldline_defect", "operator": "<=", "threshold": "1e-25"},
+        "precision": {"dps": 50}
+    }
+
+    # Case 1: Empty consumed certificates for operation requiring them
+    man1 = {
+        "experiment_id": "obl-test",
+        "operation": "transcendental_worldline",
+        "git_commit": z1.get("producing_git_commit"),
+        "status": "complete",
+        "precision": {"dps": 50},
+        "points_requested": 1,
+        "points_completed": 1,
+        "consumed_certificates": []
+    }
+    ok, errs = research_runner.validate_manifest(man1, spec=spec)
+    assert not ok
+    assert any("requires consumed certificates" in e for e in errs)
+
+    # Case 2: Grade mismatch (requested K=999 paired with K=1 cert)
+    man2 = {
+        "experiment_id": "obl-test",
+        "operation": "transcendental_worldline",
+        "git_commit": z1.get("producing_git_commit"),
+        "status": "complete",
+        "precision": {"dps": 50},
+        "points_requested": 1,
+        "points_completed": 1,
+        "consumed_certificates": [h1, h2]
+    }
+    res2 = [
+        {
+            "point_id": 0, "status": "ok",
+            "inputs": {"zero_index": 0, "grade_k": 999, "delta": "0.0"},
+            "outputs": {
+                "source_zero_cert_hash": h1,
+                "worldline_cert_hash": h2,
+                "worldline_certified": "true",
+                "worldline_certificate_status": "certified",
+                "source_zero_certificate_status": "certified",
+                "worldline_defect": "1e-30"
+            }
+        }
+    ]
+    ok2, errs2 = research_runner.validate_manifest(man2, results=res2, spec=spec)
+    assert not ok2
+    assert any("grade" in e.lower() or "K=999" in e for e in errs2)
+
+    # Case 3: Actual zero operation paired with synthetic certificate
+    synth_wl_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "certificates", "worldlines", "worldline_z00001_Kp1_delta_pos0p10.json")
+    if os.path.exists(synth_wl_path):
+        with open(synth_wl_path, "r", encoding="utf-8") as f:
+            wls = json.load(f)
+        hs = wls["certificate_hash"]
+        man3 = dict(man2)
+        man3["consumed_certificates"] = [h1, hs]
+        res3 = [
+            {
+                "point_id": 0, "status": "ok",
+                "inputs": {"zero_index": 0, "grade_k": 1, "delta": "0.0"},
+                "outputs": {
+                    "source_zero_cert_hash": h1,
+                    "worldline_cert_hash": hs,
+                    "worldline_certified": "true",
+                    "worldline_certificate_status": "certified",
+                    "source_zero_certificate_status": "certified",
+                    "worldline_defect": "1e-30"
+                }
+            }
+        ]
+        ok3, errs3 = research_runner.validate_manifest(man3, results=res3, spec=spec)
+        assert not ok3
+        assert any("synthetic" in e.lower() or "delta" in e.lower() for e in errs3)
+

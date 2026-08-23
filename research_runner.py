@@ -43,6 +43,84 @@ RUNS_DIR = os.path.join(RESEARCH_DIR, "runs")
 INDEX_FILE = os.path.join(RESEARCH_DIR, "index.json")
 CERT_DIR = os.path.join(REPO_ROOT, "data", "certificates")
 
+OPERATION_CERTIFICATE_OBLIGATIONS: Dict[str, Dict[str, Any]] = {
+    "transcendental_worldline": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "nontrivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": False
+    },
+    "trivial_worldline": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "trivial",
+        "expected_source_status": "trivial_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": False
+    },
+    "synthetic_radial_leaf": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "nontrivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": True,
+        "expected_worldline_status": "worldline_certified",
+        "requires_certified_flag": True,
+        "is_synthetic": True
+    },
+    "cross_height_path_coherence": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "nontrivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "cross_height_distance": {
+        "requires_consumed_certs": True,
+        "requires_source_cert": True,
+        "source_family": "nontrivial",
+        "expected_source_status": "simple_zero_certified",
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "grade_constraints": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "centered_dilation_zero_map": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "centrifuge_slope": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    },
+    "inverse_kernel_lock": {
+        "requires_consumed_certs": False,
+        "requires_source_cert": False,
+        "requires_worldline_cert": False,
+        "requires_certified_flag": False,
+        "is_synthetic": False
+    }
+}
 
 
 def hash_file_bytes(filepath: str) -> str:
@@ -1698,12 +1776,15 @@ def run_experiment(
     run_id = exp_id
 
     # Determine run identity and working directory
-    if resume_run_id:
-        work_dir = stable_dir
-        if not os.path.exists(work_dir):
-            raise FileNotFoundError(f"Cannot resume: Run directory '{work_dir}' does not exist")
+    work_dir = os.path.join(RUNS_DIR, f".tmp_{exp_id}_{os.getpid()}")
+    if os.path.exists(work_dir):
+        shutil.rmtree(work_dir, ignore_errors=True)
 
-        manifest_path = os.path.join(work_dir, "manifest.json")
+    if resume_run_id:
+        if not os.path.exists(stable_dir):
+            raise FileNotFoundError(f"Cannot resume: Run directory '{stable_dir}' does not exist")
+
+        manifest_path = os.path.join(stable_dir, "manifest.json")
         if not os.path.exists(manifest_path):
             raise FileNotFoundError(f"Cannot resume: Missing '{manifest_path}'")
 
@@ -1715,11 +1796,8 @@ def run_experiment(
             raise ValueError(
                 f"Refusing resume: Spec hash mismatch! (Recorded: {manifest.get('experiment_spec_sha256')}, Current: {spec_sha})"
             )
+        shutil.copytree(stable_dir, work_dir)
     else:
-        # Atomic replacement: work in temporary sibling directory
-        work_dir = os.path.join(RUNS_DIR, f".tmp_{exp_id}_{os.getpid()}")
-        if os.path.exists(work_dir):
-            shutil.rmtree(work_dir)
         os.makedirs(work_dir, exist_ok=True)
 
         # Source module hashes
@@ -1843,13 +1921,13 @@ def run_experiment(
         f.write(readme_content)
 
     # 5. Enforce Publication Gate via validate_manifest
-    val_ok, val_errs = validate_manifest(manifest, all_results)
+    val_ok, val_errs = validate_manifest(manifest, all_results, spec=spec)
     if not val_ok:
-        if not resume_run_id and os.path.exists(work_dir):
+        if os.path.exists(work_dir):
             shutil.rmtree(work_dir, ignore_errors=True)
         raise RuntimeError(f"Canonical run publication rejected for '{exp_id}': {'; '.join(val_errs)}")
 
-    # 6. Transactional replacement of canonical stable_dir
+    # 6. Genuinely transactional replacement of canonical stable_dir and index.json
     run_entry: Dict[str, Any] = {
         "schema_version": "2",
         "run_id": exp_id,
@@ -1870,25 +1948,39 @@ def run_experiment(
     if "notes" in spec:
         run_entry["notes"] = spec["notes"]
 
-    if not resume_run_id:
-        backup_dir = os.path.join(RUNS_DIR, f".bak_{exp_id}_{os.getpid()}")
+    pid = os.getpid()
+    backup_dir = os.path.join(RUNS_DIR, f".bak_{exp_id}_{pid}")
+    backup_index_path = os.path.join(RESEARCH_DIR, f".index.json.bak_{pid}")
+
+    if os.path.exists(backup_dir):
+        shutil.rmtree(backup_dir, ignore_errors=True)
+    if os.path.exists(backup_index_path):
+        os.remove(backup_index_path)
+
+    if os.path.exists(INDEX_FILE):
+        shutil.copy2(INDEX_FILE, backup_index_path)
+    if os.path.exists(stable_dir):
+        os.rename(stable_dir, backup_dir)
+
+    try:
+        shutil.move(work_dir, stable_dir)
+        update_index_file(run_entry)
         if os.path.exists(backup_dir):
             shutil.rmtree(backup_dir, ignore_errors=True)
+        if os.path.exists(backup_index_path):
+            os.remove(backup_index_path)
+    except Exception as e:
+        # Strict Transactional Rollback
         if os.path.exists(stable_dir):
-            os.rename(stable_dir, backup_dir)
-        try:
-            shutil.move(work_dir, stable_dir)
-            update_index_file(run_entry)
-            if os.path.exists(backup_dir):
-                shutil.rmtree(backup_dir, ignore_errors=True)
-        except Exception as e:
-            if os.path.exists(backup_dir) and not os.path.exists(stable_dir):
-                os.rename(backup_dir, stable_dir)
-            if os.path.exists(work_dir):
-                shutil.rmtree(work_dir, ignore_errors=True)
-            raise e
-    else:
-        update_index_file(run_entry)
+            shutil.rmtree(stable_dir, ignore_errors=True)
+        if os.path.exists(backup_dir):
+            os.rename(backup_dir, stable_dir)
+        if os.path.exists(backup_index_path):
+            shutil.copy2(backup_index_path, INDEX_FILE)
+            os.remove(backup_index_path)
+        if os.path.exists(work_dir):
+            shutil.rmtree(work_dir, ignore_errors=True)
+        raise e
 
     return exp_id
 
@@ -1933,7 +2025,6 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
     if not spec_path or not os.path.exists(spec_path):
         raise FileNotFoundError(f"Experiment spec for '{exp_id}' not found")
 
-
     with open(spec_path, "r", encoding="utf-8") as f:
         spec = yaml.safe_load(f)
 
@@ -1954,18 +2045,23 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
     return summary
 
 
-def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str, Any]]] = None) -> Tuple[bool, List[str]]:
-    """Validate a run manifest and results for exact certificate bindings, consumed certificates, schema, and provenance.
+def validate_manifest(
+    manifest: Dict[str, Any],
+    results: Optional[List[Dict[str, Any]]] = None,
+    spec: Optional[Dict[str, Any]] = None
+) -> Tuple[bool, List[str]]:
+    """Validate a run manifest, results, and proof obligations against canonical contracts.
 
     Fails closed if:
     - Declared consumed certificate is missing from disk or fails strict verification.
     - Declared consumed certificate is not used by any result point.
     - Required point certificate is missing from consumed_certificates.
-    - A point claiming worldline_certified=true contains "N/A" certificate hash.
-    - A point claiming worldline_certified=true has worldline_certificate_status != "certified".
-    - A point claiming worldline_certified=true has source_zero_certificate_status != "certified".
-    - A point claiming status="complete" contains execution errors or incomplete points.
-    - A failed certificate exists in a run claiming successful criterion.
+    - An operation's required certificates/hashes are missing or replaced by N/A.
+    - A point claiming worldline_certified=true contains N/A hash or non-certified status.
+    - Point parameters (index, grade K, radial delta) mismatch referenced certificates.
+    - Synthetic certificates are passed off as actual zeros or vice-versa.
+    - Exact control experiments fail mathematical criterion or produce execution errors.
+    - Dependency fingerprint or Git provenance violates compatibility policy.
     """
     errors: List[str] = []
     if not isinstance(manifest, dict):
@@ -1976,7 +2072,48 @@ def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str,
         if req_k not in manifest or manifest[req_k] is None:
             errors.append(f"Manifest missing required key '{req_k}'")
 
+    exp_id = manifest.get("experiment_id", "")
+
+    # Dependency compatibility validation
+    dep_fp = manifest.get("dependency_fingerprint")
+    if dep_fp:
+        dep_ok, dep_errs = certification.validate_dependency_compatibility(dep_fp, check_current_runtime=True)
+        if not dep_ok:
+            errors.extend(dep_errs)
+
+    # Git provenance validation
+    commit = str(manifest.get("git_commit", "")).strip()
+    if commit:
+        commit_ok, commit_err = certification._is_valid_git_commit(
+            commit,
+            source_code_hashes=manifest.get("source_code_hashes"),
+            input_data_hashes=manifest.get("input_data_hashes")
+        )
+        if not commit_ok:
+            errors.append(f"Invalid manifest git_commit provenance: {commit_err}")
+
+    # Resolve experiment spec if not provided
+    if spec is None and exp_id:
+        candidates = [
+            os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
+            os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('-', '_')}.yaml"),
+            os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('_', '-')}.yaml"),
+        ]
+        for cand in candidates:
+            if os.path.exists(cand):
+                try:
+                    with open(cand, "r", encoding="utf-8") as sf:
+                        spec = yaml.safe_load(sf)
+                    break
+                except Exception:
+                    pass
+
+    op_name = (spec.get("operation") if spec else None) or manifest.get("operation", "")
+    op_obl = OPERATION_CERTIFICATE_OBLIGATIONS.get(op_name, {})
+
     consumed = set(manifest.get("consumed_certificates", []))
+    if op_obl.get("requires_consumed_certs") and len(consumed) == 0:
+        errors.append(f"Operation '{op_name}' requires consumed certificates but manifest consumed_certificates is empty")
 
     # Preload and verify consumed certificates
     cert_root = os.path.join(REPO_ROOT, "data", "certificates")
@@ -1985,7 +2122,6 @@ def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str,
         if not isinstance(c_hash, str) or len(c_hash) != 64:
             errors.append(f"Invalid consumed certificate hash format: '{c_hash}'")
             continue
-        # Locate certificate file on disk
         found_cert = None
         for subdir in ["zeros", "trivial_zeros", "blocks", "worldlines"]:
             cand_files = glob.glob(os.path.join(cert_root, subdir, "*.json"))
@@ -2022,12 +2158,14 @@ def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str,
                 errors.append(f"Point {idx} (id={rec.get('point_id')}) has failed status '{rec.get('status')}'")
 
             outs = rec.get("outputs", {})
+            rec_in = rec.get("inputs", {})
             if not isinstance(outs, dict):
                 continue
 
             if manifest.get("status") == "complete" and "point_error" in outs:
                 errors.append(f"Point {idx} contains point_error: {outs.get('point_error')}")
 
+            # Collect used hashes
             for k in ["source_zero_cert_hash", "worldline_cert_hash", "cert_hash", "zero1_cert_hash", "zero2_cert_hash"]:
                 h_val = outs.get(k)
                 if h_val and h_val != "N/A":
@@ -2036,36 +2174,91 @@ def validate_manifest(manifest: Dict[str, Any], results: Optional[List[Dict[str,
                     if h_str not in consumed:
                         errors.append(f"Point {idx} uses certificate {h_str} which is missing from manifest consumed_certificates")
 
-            wl_cert = outs.get("worldline_certified")
-            if str(wl_cert).lower() == "true":
+            # Operation Obligation Checks
+            if op_obl.get("requires_source_cert"):
+                sz_h = outs.get("source_zero_cert_hash")
+                if not sz_h or sz_h == "N/A":
+                    errors.append(f"Point {idx} missing required source_zero_cert_hash")
+                elif sz_h in cert_map:
+                    szc = cert_map[sz_h]
+                    exp_sz_stat = op_obl.get("expected_source_status")
+                    if exp_sz_stat and szc.get("status") != exp_sz_stat:
+                        errors.append(f"Point {idx} source zero cert status '{szc.get('status')}' != expected '{exp_sz_stat}'")
+
+                    if op_obl.get("source_family") == "nontrivial":
+                        pt_z = outs.get("nontrivial_index") or rec_in.get("nontrivial_index")
+                        if pt_z is None and "zero_index" in rec_in:
+                            pt_z = int(rec_in["zero_index"]) + 1
+                        if pt_z is not None:
+                            cert_z = szc.get("nontrivial_index") or szc.get("zero_index")
+                            if cert_z is not None and int(pt_z) != int(cert_z):
+                                errors.append(f"Point {idx} zero index ({pt_z}) != source zero cert index ({cert_z})")
+
+            if op_obl.get("requires_worldline_cert"):
                 wl_h = outs.get("worldline_cert_hash")
                 if not wl_h or wl_h == "N/A":
-                    errors.append(f"Point {idx} claims worldline_certified=true but worldline_cert_hash is '{wl_h}'")
-                wl_stat = outs.get("worldline_certificate_status")
-                if wl_stat != "certified":
-                    errors.append(f"Point {idx} claims worldline_certified=true but worldline_certificate_status is '{wl_stat}'")
-                src_stat = outs.get("source_zero_certificate_status")
-                if src_stat != "certified":
-                    errors.append(f"Point {idx} claims worldline_certified=true but source_zero_certificate_status is '{src_stat}'")
-
-                # Verify worldline certificate matches point parameters
-                if wl_h and wl_h in cert_map:
+                    errors.append(f"Point {idx} missing required worldline_cert_hash")
+                elif wl_h in cert_map:
                     wlc = cert_map[wl_h]
-                    rec_in = rec.get("inputs", {})
-                    # Check zero index if present
-                    pt_idx = rec.get("outputs", {}).get("nontrivial_index") or rec_in.get("nontrivial_index")
-                    if pt_idx is None and "zero_index" in rec_in:
-                        pt_idx = int(rec_in["zero_index"]) + 1
-                    if pt_idx is not None and wlc.get("source_zero_index") is not None:
-                        if int(pt_idx) != int(wlc["source_zero_index"]):
-                            errors.append(f"Point {idx} index ({pt_idx}) does not match worldline cert source_zero_index ({wlc['source_zero_index']})")
+                    exp_wl_stat = op_obl.get("expected_worldline_status")
+                    if exp_wl_stat and wlc.get("status") != exp_wl_stat:
+                        errors.append(f"Point {idx} worldline cert status '{wlc.get('status')}' != expected '{exp_wl_stat}'")
 
+                    if str(outs.get("worldline_certified")).lower() != "true":
+                        errors.append(f"Point {idx} requires worldline_certified=true, got '{outs.get('worldline_certified')}'")
+                    if outs.get("worldline_certificate_status") != "certified":
+                        errors.append(f"Point {idx} worldline_certificate_status is '{outs.get('worldline_certificate_status')}', expected 'certified'")
+                    if outs.get("source_zero_certificate_status") != "certified":
+                        errors.append(f"Point {idx} source_zero_certificate_status is '{outs.get('source_zero_certificate_status')}', expected 'certified'")
+
+                    # Parameter validation: Grade K
+                    pt_k = rec_in.get("grade_k") or rec_in.get("grade_K") or rec_in.get("grade") or rec_in.get("k")
+                    cert_k = wlc.get("grade_K") if "grade_K" in wlc else wlc.get("grade")
+                    if pt_k is not None and cert_k is not None:
+                        if int(pt_k) != int(cert_k):
+                            errors.append(f"Point {idx} input grade K={pt_k} does not match worldline cert grade K={cert_k}")
+
+                    # Parameter validation: Delta
+                    pt_d = rec_in.get("delta_radial") or rec_in.get("delta") or rec_in.get("delta_val") or 0.0
+                    if wlc.get("delta") is not None:
+                        if abs(float(pt_d) - float(wlc["delta"])) > 1e-4:
+                            errors.append(f"Point {idx} input delta={pt_d} does not match worldline cert delta={wlc['delta']}")
+
+                    # Synthetic vs Actual segregation
+                    if op_obl.get("is_synthetic") is True:
+                        if abs(float(wlc.get("delta", 0.0))) < 1e-6:
+                            errors.append(f"Point {idx} synthetic operation uses delta=0.0 actual zero cert")
+                    elif op_obl.get("is_synthetic") is False:
+                        if abs(float(wlc.get("delta", 0.0))) > 1e-6:
+                            errors.append(f"Point {idx} actual zero operation uses synthetic delta={wlc.get('delta')} cert")
+
+            if op_name == "cross_height_distance":
+                z1_h = outs.get("zero1_cert_hash")
+                z2_h = outs.get("zero2_cert_hash")
+                if not z1_h or z1_h == "N/A" or not z2_h or z2_h == "N/A":
+                    errors.append(f"Point {idx} cross_height_distance missing zero1_cert_hash or zero2_cert_hash")
+                elif z1_h in cert_map and z2_h in cert_map:
+                    zc1, zc2 = cert_map[z1_h], cert_map[z2_h]
+                    idx1 = int(rec_in.get("zero1_index", 0)) + 1
+                    idx2 = int(rec_in.get("zero2_index", 0)) + 1
+                    if int(zc1.get("nontrivial_index", 0)) != idx1 or int(zc2.get("nontrivial_index", 0)) != idx2:
+                        errors.append(f"Point {idx} distance cert hashes belong to wrong zero pair: expected ({idx1}, {idx2}), got ({zc1.get('nontrivial_index')}, {zc2.get('nontrivial_index')})")
 
         unused_consumed = consumed - used_in_points
         if unused_consumed:
             errors.append(f"Declared consumed certificates unused by any point: {sorted(list(unused_consumed))}")
 
+        # Summary and criterion recomputation
+        if spec is not None:
+            recomputed_summary = compute_summary(spec, exp_id, results, status=manifest.get("status", "complete"))
+            if spec.get("epistemic_class") == "exact_control":
+                if recomputed_summary["criterion"].get("criterion_met") is not True:
+                    errors.append(f"Exact control experiment '{exp_id}' failed criterion check: observed={recomputed_summary['criterion'].get('observed')}")
+            if manifest.get("status") == "complete" and recomputed_summary.get("points_failed", 0) > 0:
+                errors.append(f"Run claims status='complete' but {recomputed_summary['points_failed']} points failed")
+
     return len(errors) == 0, errors
+
 
 
 def list_runs() -> List[Dict[str, Any]]:

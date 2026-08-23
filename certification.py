@@ -33,10 +33,45 @@ AUTHORITATIVE_FLINT_VERSION = "0.6.0"
 SUPPORTED_FLINT_VERSIONS = {"0.6.0"}
 AUTHORITATIVE_MPMATH_VERSION = "1.3.0"
 SUPPORTED_MPMATH_VERSIONS = {"1.3.0"}
-FLINT_VERSION = getattr(flint, "__version__", AUTHORITATIVE_FLINT_VERSION) if flint is not None else "N/A"
+SUPPORTED_PYTHON_MAJOR_MINOR = {"3.10", "3.11", "3.12", "3.13"}
+SUPPORTED_PLATFORMS = {"win32", "linux", "darwin"}
 CERTIFICATE_SCHEMA_VERSION = "2.0"
 VERIFIER_VERSION = "2.0.0"
 ALGORITHM_VERSION = "2.0.0"
+SUPPORTED_VERIFIER_VERSIONS = {"2.0.0"}
+SUPPORTED_ALGORITHM_VERSIONS = {"2.0.0"}
+SUPPORTED_REPORT_TYPES = {"certificate_verification_report"}
+
+FLINT_VERSION = getattr(flint, "__version__", AUTHORITATIVE_FLINT_VERSION) if flint is not None else "N/A"
+
+REQUIRED_DEPENDENCY_KEYS = (
+    "python",
+    "python_flint",
+    "mpmath",
+    "platform",
+    "library",
+    "library_version",
+    "verifier_version",
+    "algorithm_version",
+)
+
+REQUIRED_SOURCE_MODULES = [
+    "certification.py",
+    "transforms.py",
+    "reference_data.py",
+    "math_core.py",
+    "transcendental.py",
+    "converter.py",
+    "research_runner.py",
+    "zero_finder.py"
+]
+
+REQUIRED_INPUT_DATA_FILES = [
+    "zeros_reference.json",
+    "zeros_first_100_reference.json",
+    "canonical_blocks.json",
+    "primes.json"
+]
 
 CERTIFICATION_LEVELS = [
     "candidate",
@@ -63,20 +98,84 @@ def _sha256_canonical(obj: Dict[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def validate_dependency_compatibility(
+    dep_fp: Optional[Dict[str, Any]],
+    check_current_runtime: bool = True
+) -> Tuple[bool, List[str]]:
+    """Validate dependency fingerprint against authoritative compatibility policy."""
+    errors: List[str] = []
+    if not isinstance(dep_fp, dict) or not dep_fp:
+        return False, ["Missing or empty dependency_fingerprint"]
+
+    for k in REQUIRED_DEPENDENCY_KEYS:
+        val = dep_fp.get(k)
+        if val is None or not str(val).strip() or str(val).strip() in ("N/A", "0.0", "forged", "unknown", "fake"):
+            errors.append(f"dependency_fingerprint missing or invalid key '{k}': got '{val}'")
+
+    py_ver = str(dep_fp.get("python", "")).strip()
+    if not any(py_ver.startswith(f"{v}.") or py_ver == v for v in SUPPORTED_PYTHON_MAJOR_MINOR):
+        errors.append(f"Unsupported python version in metadata: '{py_ver}'. Supported: {sorted(list(SUPPORTED_PYTHON_MAJOR_MINOR))}")
+
+    flint_ver = str(dep_fp.get("python_flint", "")).strip()
+    if flint_ver not in SUPPORTED_FLINT_VERSIONS:
+        errors.append(f"Unsupported python_flint version '{flint_ver}'. Supported: {sorted(list(SUPPORTED_FLINT_VERSIONS))}")
+
+    mp_ver = str(dep_fp.get("mpmath", "")).strip()
+    if mp_ver not in SUPPORTED_MPMATH_VERSIONS:
+        errors.append(f"Unsupported mpmath version '{mp_ver}'. Supported: {sorted(list(SUPPORTED_MPMATH_VERSIONS))}")
+
+    plat = str(dep_fp.get("platform", "")).strip().lower()
+    if plat not in SUPPORTED_PLATFORMS:
+        errors.append(f"Unsupported platform in dependency fingerprint: '{plat}'. Supported: {sorted(list(SUPPORTED_PLATFORMS))}")
+
+    lib_name = dep_fp.get("library")
+    if lib_name != "python-flint":
+        errors.append(f"Unsupported certification library '{lib_name}'. Expected 'python-flint'")
+
+    lib_ver = str(dep_fp.get("library_version", "")).strip()
+    if lib_ver != flint_ver:
+        errors.append(f"Contradictory library_version ('{lib_ver}') != python_flint ('{flint_ver}')")
+
+    ver_ver = str(dep_fp.get("verifier_version", "")).strip()
+    if ver_ver not in SUPPORTED_VERIFIER_VERSIONS:
+        errors.append(f"Unsupported verifier_version '{ver_ver}'. Expected one of: {sorted(list(SUPPORTED_VERIFIER_VERSIONS))}")
+
+    algo_ver = str(dep_fp.get("algorithm_version", "")).strip()
+    if algo_ver not in SUPPORTED_ALGORITHM_VERSIONS:
+        errors.append(f"Unsupported algorithm_version '{algo_ver}'. Expected one of: {sorted(list(SUPPORTED_ALGORITHM_VERSIONS))}")
+
+    if check_current_runtime:
+        # Check current running python
+        curr_py = sys.version.split()[0]
+        if not any(curr_py.startswith(f"{v}.") or curr_py == v for v in SUPPORTED_PYTHON_MAJOR_MINOR):
+            errors.append(f"Current runtime Python ({curr_py}) is unsupported")
+
+        # Check current python-flint
+        if not FLINT_AVAILABLE or FLINT_VERSION not in SUPPORTED_FLINT_VERSIONS:
+            errors.append(f"Current runtime python-flint version ({FLINT_VERSION}) is unsupported")
+        elif flint_ver != FLINT_VERSION:
+            errors.append(f"Certificate python_flint version '{flint_ver}' differs from running verifier '{FLINT_VERSION}'")
+
+        # Check current mpmath
+        import mpmath
+        curr_mp = getattr(mpmath, "__version__", "N/A")
+        if curr_mp not in SUPPORTED_MPMATH_VERSIONS:
+            errors.append(f"Current runtime mpmath version ({curr_mp}) is unsupported")
+        elif mp_ver != curr_mp:
+            errors.append(f"Certificate mpmath version '{mp_ver}' differs from running verifier '{curr_mp}'")
+
+        # Check current platform
+        curr_plat = sys.platform.lower()
+        if curr_plat not in SUPPORTED_PLATFORMS:
+            errors.append(f"Current runtime platform '{curr_plat}' is unsupported")
+
+    return len(errors) == 0, errors
+
+
 def _get_source_code_hashes() -> Dict[str, str]:
     """Compute normalized LF SHA-256 hashes of core mathematical and certification modules."""
-    modules = [
-        "certification.py",
-        "transforms.py",
-        "reference_data.py",
-        "math_core.py",
-        "transcendental.py",
-        "converter.py",
-        "research_runner.py",
-        "zero_finder.py"
-    ]
     hashes: Dict[str, str] = {}
-    for mod in modules:
+    for mod in REQUIRED_SOURCE_MODULES:
         mod_path = os.path.join(REPO_ROOT, mod)
         if os.path.exists(mod_path):
             with open(mod_path, "rb") as f:
@@ -89,14 +188,8 @@ def _get_source_code_hashes() -> Dict[str, str]:
 
 def _get_input_data_hashes() -> Dict[str, str]:
     """Get SHA-256 hashes of reference data."""
-    data_files = [
-        "zeros_reference.json",
-        "zeros_first_100_reference.json",
-        "canonical_blocks.json",
-        "primes.json"
-    ]
     hashes: Dict[str, str] = {}
-    for df in data_files:
+    for df in REQUIRED_INPUT_DATA_FILES:
         df_path = os.path.join(REPO_ROOT, "data", df)
         if os.path.exists(df_path):
             with open(df_path, "rb") as f:
@@ -120,6 +213,7 @@ def _get_dependency_fingerprint() -> Dict[str, str]:
         "verifier_version": VERIFIER_VERSION,
         "algorithm_version": ALGORITHM_VERSION
     }
+
 
 
 _GIT_BLOB_CACHE: Dict[Tuple[str, str], Optional[str]] = {}
@@ -799,42 +893,9 @@ def verify_certificate(
 
     # 1. Dependency Fingerprint Validation
     dep_fp = cert.get("dependency_fingerprint")
-    if not isinstance(dep_fp, dict) or not dep_fp:
-        anomalies.append("Missing or empty dependency_fingerprint")
-        return False, anomalies
-
-    required_dep_keys = [
-        "python", "python_flint", "mpmath", "platform",
-        "library", "library_version", "verifier_version", "algorithm_version"
-    ]
-    for k in required_dep_keys:
-        val = str(dep_fp.get(k, "")).strip()
-        if not val or val in ("N/A", "0.0", "forged"):
-            anomalies.append(f"dependency_fingerprint missing or invalid key '{k}' ('{dep_fp.get(k)}')")
-
-    flint_ver = str(dep_fp.get("python_flint", "")).strip()
-    if flint_ver not in SUPPORTED_FLINT_VERSIONS:
-        anomalies.append(f"Unsupported python_flint version '{flint_ver}'. Supported: {sorted(list(SUPPORTED_FLINT_VERSIONS))}")
-
-    lib_name = dep_fp.get("library", "python-flint")
-    if lib_name != "python-flint":
-        anomalies.append(f"Unsupported certification library: {lib_name}")
-
-    lib_ver = str(dep_fp.get("library_version", "")).strip()
-    if lib_ver != flint_ver:
-        anomalies.append(f"Contradictory library_version ({lib_ver}) != python_flint ({flint_ver})")
-
-    ver_ver = str(dep_fp.get("verifier_version", "")).strip()
-    if ver_ver != VERIFIER_VERSION:
-        anomalies.append(f"Unsupported verifier_version '{ver_ver}'. Expected: '{VERIFIER_VERSION}'")
-
-    algo_ver = str(dep_fp.get("algorithm_version", "")).strip()
-    if algo_ver != ALGORITHM_VERSION:
-        anomalies.append(f"Unsupported algorithm_version '{algo_ver}'. Expected: '{ALGORITHM_VERSION}'")
-
-    plat = str(dep_fp.get("platform", "")).strip().lower()
-    if plat in ("forged", "unknown", "fake", ""):
-        anomalies.append(f"Invalid platform policy value in dependency fingerprint: '{plat}'")
+    dep_ok, dep_errs = validate_dependency_compatibility(dep_fp, check_current_runtime=check_provenance)
+    if not dep_ok:
+        anomalies.extend(dep_errs)
 
     # 2. Source Code Hashes Validation
     cert_src = cert.get("source_code_hashes")
@@ -842,17 +903,7 @@ def verify_certificate(
         anomalies.append("Missing or empty source_code_hashes map")
         return False, anomalies
 
-    expected_modules = [
-        "certification.py",
-        "transforms.py",
-        "reference_data.py",
-        "math_core.py",
-        "transcendental.py",
-        "converter.py",
-        "research_runner.py",
-        "zero_finder.py"
-    ]
-    for mod in expected_modules:
+    for mod in REQUIRED_SOURCE_MODULES:
         if mod not in cert_src or not cert_src[mod] or len(cert_src[mod]) != 64 or cert_src[mod] == "N/A":
             anomalies.append(f"source_code_hashes missing or invalid for required module '{mod}'")
 
@@ -862,13 +913,7 @@ def verify_certificate(
         anomalies.append("Missing or empty input_data_hashes map")
         return False, anomalies
 
-    expected_data_files = [
-        "zeros_reference.json",
-        "zeros_first_100_reference.json",
-        "canonical_blocks.json",
-        "primes.json"
-    ]
-    for df in expected_data_files:
+    for df in REQUIRED_INPUT_DATA_FILES:
         if df not in cert_data or not cert_data[df] or len(cert_data[df]) != 64 or cert_data[df] == "N/A":
             anomalies.append(f"input_data_hashes missing or invalid for required file '{df}'")
 
@@ -882,6 +927,25 @@ def verify_certificate(
         )
         if not commit_ok:
             anomalies.append(f"Invalid producing_git_commit provenance: {commit_err}")
+
+        # 5. Verify current source code files exist and match certificate
+        curr_src = _get_source_code_hashes()
+        for mod in REQUIRED_SOURCE_MODULES:
+            curr_h = curr_src.get(mod, "N/A")
+            if curr_h == "N/A":
+                anomalies.append(f"Required current source module '{mod}' missing on disk")
+            elif curr_h != cert_src.get(mod):
+                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
+
+        # 6. Verify current input data files exist and match certificate
+        curr_data = _get_input_data_hashes()
+        for df in REQUIRED_INPUT_DATA_FILES:
+            curr_dh = curr_data.get(df, "N/A")
+            if curr_dh == "N/A":
+                anomalies.append(f"Required current input data file '{df}' missing on disk")
+            elif curr_dh != cert_data.get(df):
+                anomalies.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, cert {cert_data.get(df)}")
+
 
     if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
         return False, ["FLINT/python-flint is required for independent mathematical verification"]
@@ -1352,7 +1416,11 @@ def generate_verification_report(
 
     for fpath, cert, file_sha, parse_err in parsed_files:
         fname = os.path.basename(fpath)
-        rel_path = os.path.relpath(fpath, REPO_ROOT).replace("\\", "/")
+        if os.path.abspath(fpath).startswith(os.path.abspath(REPO_ROOT)):
+            rel_path = os.path.relpath(fpath, REPO_ROOT).replace("\\", "/")
+        else:
+            sub_p = os.path.relpath(fpath, target_dir).replace("\\", "/")
+            rel_path = f"data/certificates/{sub_p}"
         if parse_err is not None or cert is None:
             failed_count += 1
             failures.append({"file": fname, "errors": [f"Parse error: {parse_err}"]})
@@ -1384,6 +1452,8 @@ def generate_verification_report(
                 inventory.append({
                     "relative_path": rel_path,
                     "certificate_type": cert.get("certificate_type", "unknown"),
+                    "mathematical_status": cert.get("status", "unknown"),
+                    "verifier_status": "failed",
                     "status": "failed",
                     "certificate_hash": cert.get("certificate_hash", "N/A"),
                     "file_sha256": file_sha,
@@ -1394,11 +1464,13 @@ def generate_verification_report(
             failures.append({"file": fname, "errors": [str(e)]})
             inventory.append({
                 "relative_path": rel_path,
-                "certificate_type": cert.get("certificate_type", "unknown"),
+                "certificate_type": cert.get("certificate_type", "unknown") if cert else "unknown",
+                "mathematical_status": cert.get("status", "unknown") if cert else "unknown",
+                "verifier_status": "exception",
                 "status": "exception",
-                "certificate_hash": cert.get("certificate_hash", "N/A"),
+                "certificate_hash": cert.get("certificate_hash", "N/A") if cert else "N/A",
                 "file_sha256": file_sha,
-                "producing_git_commit": cert.get("producing_git_commit", "N/A")
+                "producing_git_commit": cert.get("producing_git_commit", "N/A") if cert else "N/A"
             })
 
     # Sort inventory deterministically by relative_path
@@ -1439,7 +1511,8 @@ def generate_verification_report(
 
 def load_verification_report(
     report_path: Optional[str] = None,
-    cert_dir: Optional[str] = None
+    cert_dir: Optional[str] = None,
+    check_provenance: bool = True
 ) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
     """Load and strictly validate verification_report.json against exact current on-disk inventory.
 
@@ -1462,27 +1535,53 @@ def load_verification_report(
 
     anomalies: List[str] = []
 
-    # 1. Check self-hash (content-integrity hash)
+    # 1. Check schema version and report type
+    schema_ver = str(report.get("schema_version", ""))
+    if schema_ver != CERTIFICATE_SCHEMA_VERSION:
+        anomalies.append(f"Unsupported report schema_version '{schema_ver}'. Expected '{CERTIFICATE_SCHEMA_VERSION}'")
+
+    rep_type = str(report.get("report_type", ""))
+    if rep_type not in SUPPORTED_REPORT_TYPES:
+        anomalies.append(f"Fabricated or unsupported report_type '{rep_type}'. Supported: {sorted(list(SUPPORTED_REPORT_TYPES))}")
+
+    # 2. Check self-hash (content-integrity hash)
     exp_h = report.get("report_hash")
     if not exp_h or _sha256_canonical(report) != exp_h:
         anomalies.append("Verification report self-hash mismatch or missing")
 
-    # 2. Check status and count equalities
+    # 3. Check status and count equalities
     total_inv = report.get("total_inventory", 0)
     passed_cnt = report.get("passed_count", 0)
     failed_cnt = report.get("failed_count", 0)
-    if total_inv <= 0:
-        anomalies.append(f"Report total_inventory must be positive, got {total_inv}")
+    rep_failures = report.get("failures", [])
+
+    if not isinstance(total_inv, int) or total_inv <= 0:
+        anomalies.append(f"Report total_inventory must be positive integer, got {total_inv}")
     if passed_cnt + failed_cnt != total_inv:
         anomalies.append(f"Count mismatch: passed ({passed_cnt}) + failed ({failed_cnt}) != total ({total_inv})")
     if failed_cnt > 0:
         anomalies.append(f"Report contains {failed_cnt} failed certificates")
     if passed_cnt != total_inv:
         anomalies.append(f"Report passed count ({passed_cnt}) != total inventory ({total_inv})")
+    if not isinstance(rep_failures, list):
+        anomalies.append("Report failures field must be a list")
+    elif len(rep_failures) != failed_cnt:
+        anomalies.append(f"Report failures list length ({len(rep_failures)}) does not match failed_count ({failed_cnt})")
+    elif failed_cnt == 0 and len(rep_failures) > 0:
+        anomalies.append("Nonempty failures list with failed_count=0")
+
     if report.get("status") != "verified":
         anomalies.append(f"Report status is '{report.get('status')}', expected 'verified'")
 
-    # 3. Enumerate actual on-disk certificate inventory
+    # Category counts validation
+    nz_cnt = report.get("nontrivial_zeros_count", 0)
+    tz_cnt = report.get("trivial_zeros_count", 0)
+    blk_cnt = report.get("blocks_count", 0)
+    wl_cnt = report.get("worldlines_count", 0)
+    if nz_cnt + tz_cnt + blk_cnt + wl_cnt != total_inv:
+        anomalies.append(f"Category count sum ({nz_cnt + tz_cnt + blk_cnt + wl_cnt}) != total_inventory ({total_inv})")
+
+    # 4. Enumerate actual on-disk certificate inventory
     zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
     trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
@@ -1491,22 +1590,48 @@ def load_verification_report(
 
     if len(actual_files) != total_inv:
         anomalies.append(f"On-disk certificate count ({len(actual_files)}) does not match report total_inventory ({total_inv})")
+    if len(zeros_files) != nz_cnt:
+        anomalies.append(f"On-disk nontrivial zeros count ({len(zeros_files)}) != report ({nz_cnt})")
+    if len(trivial_files) != tz_cnt:
+        anomalies.append(f"On-disk trivial zeros count ({len(trivial_files)}) != report ({tz_cnt})")
+    if len(blocks_files) != blk_cnt:
+        anomalies.append(f"On-disk blocks count ({len(blocks_files)}) != report ({blk_cnt})")
+    if len(worldlines_files) != wl_cnt:
+        anomalies.append(f"On-disk worldlines count ({len(worldlines_files)}) != report ({wl_cnt})")
 
     # Map actual files to repo-relative paths
     actual_rel_map = {}
     for af in actual_files:
-        rel = os.path.relpath(af, REPO_ROOT).replace("\\", "/")
+        if os.path.abspath(af).startswith(os.path.abspath(REPO_ROOT)):
+            rel = os.path.relpath(af, REPO_ROOT).replace("\\", "/")
+        else:
+            sub_p = os.path.relpath(af, target_dir).replace("\\", "/")
+            rel = f"data/certificates/{sub_p}"
         actual_rel_map[rel] = af
 
     rep_inventory = report.get("inventory", [])
     if not isinstance(rep_inventory, list) or len(rep_inventory) != total_inv:
         anomalies.append(f"Report inventory list length ({len(rep_inventory) if isinstance(rep_inventory, list) else 'invalid'}) does not match total_inventory ({total_inv})")
 
-    rep_rel_set: Set[str] = {
-        str(entry["relative_path"])
-        for entry in rep_inventory
-        if isinstance(entry, dict) and entry.get("relative_path") is not None
-    }
+    # 5. Inventory ordering, path normalization, and uniqueness
+    rep_rel_list: List[str] = []
+    for entry in rep_inventory:
+        if isinstance(entry, dict) and isinstance(entry.get("relative_path"), str):
+            r_path = entry["relative_path"]
+            # Reject absolute paths, backslashes, leading slash, traversal paths
+            if "\\" in r_path or r_path.startswith("/") or ".." in r_path or ":" in r_path:
+                anomalies.append(f"Invalid path format or traversal in inventory entry: '{r_path}'")
+            if not r_path.startswith("data/certificates/"):
+                anomalies.append(f"Inventory entry path '{r_path}' does not start with 'data/certificates/'")
+            rep_rel_list.append(r_path)
+
+    if rep_rel_list != sorted(rep_rel_list):
+        anomalies.append("Report inventory is not sorted deterministically by relative_path")
+
+    rep_rel_set: Set[str] = set(rep_rel_list)
+    if len(rep_rel_set) != len(rep_rel_list):
+        anomalies.append("Duplicate relative_path entries detected in report inventory")
+
     actual_rel_set: Set[str] = set(actual_rel_map.keys())
 
     missing_on_disk = rep_rel_set - actual_rel_set
@@ -1517,8 +1642,7 @@ def load_verification_report(
     if extra_on_disk:
         anomalies.append(f"Certificates present on disk but missing from report: {sorted(list(extra_on_disk))[:5]}")
 
-
-    # 4. Verify individual file byte hashes and recompute inventory_root_hash
+    # 6. Verify individual file byte hashes, parsed certificate hashes, and status
     for entry in rep_inventory:
         if not isinstance(entry, dict):
             anomalies.append("Malformed entry in report inventory list")
@@ -1532,49 +1656,72 @@ def load_verification_report(
         if disk_path and os.path.exists(disk_path):
             try:
                 with open(disk_path, "rb") as f:
-                    content = f.read().replace(b"\r\n", b"\n")
+                    raw_bytes = f.read()
+                content = raw_bytes.replace(b"\r\n", b"\n")
                 disk_sha = hashlib.sha256(content).hexdigest()
                 rep_sha = entry.get("file_sha256")
                 if disk_sha != rep_sha:
                     anomalies.append(f"File SHA-256 mismatch for '{rel}': on-disk {disk_sha}, report {rep_sha}")
-            except Exception as e:
-                anomalies.append(f"Failed reading on-disk certificate '{rel}': {e}")
 
-    # Recompute inventory root hash
+                cert_dict = json.loads(content.decode("utf-8"))
+                stored_c_hash = cert_dict.get("certificate_hash")
+                computed_c_hash = _sha256_canonical(cert_dict)
+                entry_c_hash = entry.get("certificate_hash")
+
+                if stored_c_hash != entry_c_hash:
+                    anomalies.append(f"Certificate hash mismatch in '{rel}': cert file {stored_c_hash}, report entry {entry_c_hash}")
+                if computed_c_hash != stored_c_hash:
+                    anomalies.append(f"Certificate self-hash mismatch in '{rel}': stored {stored_c_hash}, computed {computed_c_hash}")
+
+                math_status = entry.get("mathematical_status")
+                if math_status and cert_dict.get("status") != math_status:
+                    anomalies.append(f"Certificate mathematical status mismatch in '{rel}': cert {cert_dict.get('status')}, report {math_status}")
+
+            except Exception as e:
+                anomalies.append(f"Failed reading/parsing on-disk certificate '{rel}': {e}")
+
+    # 7. Recompute inventory root hash
     exp_root_hash = report.get("inventory_root_hash")
     calc_root_hash = hashlib.sha256(json.dumps(rep_inventory, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     if not exp_root_hash or calc_root_hash != exp_root_hash:
         anomalies.append(f"Inventory root hash mismatch: reported {exp_root_hash}, computed {calc_root_hash}")
 
-    # 5. Check dependency fingerprint
+    # 8. Check dependency fingerprint
     rep_dep = report.get("dependency_fingerprint", {})
-    flint_ver = rep_dep.get("python_flint")
-    if flint_ver not in SUPPORTED_FLINT_VERSIONS:
-        anomalies.append(f"Unsupported python_flint version in report: {flint_ver}")
-    if FLINT_AVAILABLE and FLINT_VERSION not in SUPPORTED_FLINT_VERSIONS:
-        anomalies.append(f"Current runtime python-flint version ({FLINT_VERSION}) is unsupported")
-    if rep_dep.get("mpmath") not in SUPPORTED_MPMATH_VERSIONS:
-        anomalies.append(f"Unsupported mpmath version in report: {rep_dep.get('mpmath')}")
-    import mpmath
-    if getattr(mpmath, "__version__", None) not in SUPPORTED_MPMATH_VERSIONS:
-        anomalies.append(f"Current runtime mpmath version ({getattr(mpmath, '__version__', None)}) is unsupported")
+    dep_ok, dep_errs = validate_dependency_compatibility(rep_dep, check_current_runtime=True)
+    if not dep_ok:
+        anomalies.extend(dep_errs)
 
-    # 6. Check producing git commit
-    rep_commit = str(report.get("producing_git_commit", "")).strip()
-    commit_ok, commit_err = _is_valid_git_commit(
-        rep_commit,
-        source_code_hashes=report.get("source_code_hashes"),
-        input_data_hashes=report.get("input_data_hashes")
-    )
-    if not commit_ok:
-        anomalies.append(f"Invalid report producing_git_commit provenance: {commit_err}")
+    if check_provenance:
+        # 9. Check producing git commit
+        rep_commit = str(report.get("producing_git_commit", "")).strip()
+        commit_ok, commit_err = _is_valid_git_commit(
+            rep_commit,
+            source_code_hashes=report.get("source_code_hashes"),
+            input_data_hashes=report.get("input_data_hashes")
+        )
+        if not commit_ok:
+            anomalies.append(f"Invalid report producing_git_commit provenance: {commit_err}")
 
-    # 7. Check source code hash match against current workspace if in same repo
-    curr_src = _get_source_code_hashes()
-    rep_src = report.get("source_code_hashes", {})
-    for mod, h in curr_src.items():
-        if h != "N/A" and rep_src.get(mod) != h:
-            anomalies.append(f"Current source module '{mod}' hash ({h}) differs from verified report ({rep_src.get(mod)})")
+        # 10. Check current workspace source files & input data files
+        curr_src = _get_source_code_hashes()
+        rep_src = report.get("source_code_hashes", {})
+        for mod in REQUIRED_SOURCE_MODULES:
+            curr_h = curr_src.get(mod, "N/A")
+            if curr_h == "N/A":
+                anomalies.append(f"Required current source module '{mod}' missing on disk")
+            elif curr_h != rep_src.get(mod):
+                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, report {rep_src.get(mod)}")
+
+        curr_data = _get_input_data_hashes()
+        rep_data = report.get("input_data_hashes", {})
+        for df in REQUIRED_INPUT_DATA_FILES:
+            curr_dh = curr_data.get(df, "N/A")
+            if curr_dh == "N/A":
+                anomalies.append(f"Required current input data file '{df}' missing on disk")
+            elif curr_dh != rep_data.get(df):
+                anomalies.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, report {rep_data.get(df)}")
 
     is_valid = (len(anomalies) == 0 and report.get("status") == "verified" and failed_cnt == 0)
     return is_valid, report, anomalies
+

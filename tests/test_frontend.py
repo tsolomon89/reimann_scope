@@ -203,7 +203,8 @@ def test_worldline_lab_certified_mode_truthfulness():
         selected_deltas=[0.0, 0.10, -0.10],
         cert_mode="certified"
     )
-    assert fig_traj.layout.title.text.startswith("CERTIFIED Bilateral Worldlines")
+    assert "CERTIFIED" in fig_traj.layout.title.text
+    assert "Bilateral Worldlines" in fig_traj.layout.title.text
     assert "UNCERTIFIED" not in fig_traj.layout.title.text
 
     # Certified mode with uncertified delta (e.g. 0.05) -> must fail closed
@@ -214,5 +215,26 @@ def test_worldline_lab_certified_mode_truthfulness():
         selected_deltas=[0.05],
         cert_mode="certified"
     )
-    assert not fig_traj_bad.layout.title.text.startswith("CERTIFIED Bilateral Worldlines")
+    assert not fig_traj_bad.layout.title.text.startswith("CERTIFIED [")
     assert "UNCERTIFIED" in fig_traj_bad.layout.title.text
+
+
+def test_proof_programme_status_panel_dynamic_derivation(monkeypatch):
+    """Verify Proof-Programme status panel is dynamically derived and changes state on report failure."""
+    # 1. Normal state with valid verification report
+    tab_layout = app.create_proof_programme_tab()
+    tab_str = str(tab_layout)
+    assert "VERIFIED" in tab_str
+    assert "Rigorously Certified (FLINT Arb)" in tab_str
+
+    # 2. Simulated report failure
+    def mock_load_report(*args, **kwargs):
+        return False, None, ["Verification report missing or stale"]
+
+    monkeypatch.setattr(certification, "load_verification_report", mock_load_report)
+
+    tab_layout_bad = app.create_proof_programme_tab()
+    tab_bad_str = str(tab_layout_bad)
+    assert "UNVERIFIED" in tab_bad_str
+    assert "Rigorously Certified (FLINT Arb)" not in tab_bad_str
+

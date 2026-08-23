@@ -778,24 +778,34 @@ def create_proof_programme_tab():
             color="success",
             className="small py-2 mb-0 font-monospace"
         )
+        stage2_status, stage2_color = "Rigorously Certified (FLINT Arb)", "success"
+        stage3_status, stage3_color = "Rigorously Certified (FLINT Arb)", "success"
+        stage4_status, stage4_color = "Formally Proved & Certified", "success"
     elif rep and rep.get("failed_count", 0) > 0:
         cert_alert = dbc.Alert(
             f"Certification Status: FAILED ({rep.get('failed_count')} certificate failures detected). Failures: {rep.get('failures', [])[:2]}",
             color="danger",
             className="small py-2 mb-0 font-monospace"
         )
+        stage2_status, stage2_color = "UNVERIFIED / FAILING", "danger"
+        stage3_status, stage3_color = "UNVERIFIED / FAILING", "danger"
+        stage4_status, stage4_color = "UNVERIFIED / FAILING", "danger"
     else:
+        err_msg = rep_errs[0] if rep_errs else "report absent or stale"
         cert_alert = dbc.Alert(
-            f"Certification Status: UNVERIFIED ({inventory_count} certificates present on disk, verification report absent or stale). Run `python scripts/verify_certificates.py` to certify.",
+            f"Certification Status: UNVERIFIED ({err_msg}). Run `python scripts/verify_certificates.py` to certify.",
             color="secondary",
             className="small py-2 mb-0 font-monospace"
         )
+        stage2_status, stage2_color = "UNVERIFIED", "secondary"
+        stage3_status, stage3_color = "UNVERIFIED", "secondary"
+        stage4_status, stage4_color = "UNVERIFIED", "secondary"
 
     prog_stages = [
-        {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": "Constructed & Formally Checked", "color": "success"},
-        {"stage": "2. Native Zero Blocks", "requirement": "Rigorously certify zero isolation and simplicity in Arb", "status": "Rigorously Certified (FLINT)", "color": "success"},
-        {"stage": "3. Worldline Covariance", "requirement": "Z_tau(tau^K rho, K) = zeta(rho) for all K in Z", "status": "Formally Proved & Certified", "color": "success"},
-        {"stage": "4. Radial Invariance", "requirement": "R_tau(s_rho(k), k) = delta invariant across all grades", "status": "Formally Proved & Certified", "color": "success"},
+        {"stage": "1. Bilateral Continuation", "requirement": "Construct graded family Z_tau(s, k) = zeta(tau^(-k) s)", "status": "Constructed & Formally Checked (Lean 4)", "color": "success"},
+        {"stage": "2. Native Zero Blocks", "requirement": "Rigorously certify zero isolation and simplicity in Arb", "status": stage2_status, "color": stage2_color},
+        {"stage": "3. Worldline Covariance", "requirement": "Z_tau(tau^K rho, K) = zeta(rho) for all K in Z", "status": stage3_status, "color": stage3_color},
+        {"stage": "4. Radial Invariance", "requirement": "R_tau(s_rho(k), k) = delta invariant across all grades", "status": stage4_status, "color": stage4_color},
         {"stage": "5. Cross-Height Observations", "requirement": "Evaluate normalized trajectory distances L_inf, L_2", "status": "Active Research Campaign", "color": "info"},
         {"stage": "6. Exact Global Coherence Law", "requirement": "Derive universal multi-height trajectory constraint law", "status": "OPEN RESEARCH TARGET (Missing)", "color": "warning"},
         {"stage": "7. Coherence => Radial Rigidity", "requirement": "Prove global coherence forbids multiple occupied radial leaves", "status": "OPEN RESEARCH TARGET (Missing)", "color": "danger"},
@@ -1784,7 +1794,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
                 try:
                     with open(cert_path, "r", encoding="utf-8") as f:
                         zc = json.load(f)
-                    ok, errs = certification.verify_certificate(zc, check_provenance=False)
+                    ok, errs = certification.verify_certificate(zc, check_provenance=True)
                     if not ok or zc.get("status") != "simple_zero_certified":
                         all_passed = False
                         failed_msgs.append(f"Zero #{global_idx} verification failed: {'; '.join(errs)}")
@@ -1794,7 +1804,7 @@ def update_cross_height_lab(selected_blocks, zero_idx_val, u_max_val, cert_mode)
 
         if all_passed and selected_ordinates:
             info_children.append(
-                dbc.Badge(f"CERTIFIED: All {len(selected_ordinates)} spectrum zeros verified in Arb", color="success", className="d-block p-1 mb-2 font-monospace")
+                dbc.Badge(f"CERTIFIED: All {len(selected_ordinates)} spectrum zeros verified in Arb (FLINT 0.6.0)", color="success", className="d-block p-1 mb-2 font-monospace")
             )
         else:
             err_summary = "; ".join(failed_msgs[:2]) if failed_msgs else "No spectrum zeros selected"
@@ -1855,6 +1865,7 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
 
     all_certified = True
     unverified_reasons = []
+    src_cert_hash = ""
 
     if cert_mode == "certified":
         if z_idx is None:
@@ -1870,13 +1881,15 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
                 try:
                     with open(src_path, "r", encoding="utf-8") as f:
                         szc = json.load(f)
-                    ok, errs = certification.verify_certificate(szc, check_provenance=False)
+                    ok, errs = certification.verify_certificate(szc, check_provenance=True)
                     if not ok:
                         all_certified = False
-                        unverified_reasons.append(f"Source zero #{z_idx} invalid")
-                except Exception:
+                        unverified_reasons.append(f"Source zero #{z_idx} invalid: {'; '.join(errs[:1])}")
+                    else:
+                        src_cert_hash = str(szc.get("certificate_hash", ""))
+                except Exception as e:
                     all_certified = False
-                    unverified_reasons.append(f"Source zero #{z_idx} unreadable")
+                    unverified_reasons.append(f"Source zero #{z_idx} unreadable: {e}")
 
             # Check worldline certs for all deltas and grades
             for d in deltas:
@@ -1897,16 +1910,18 @@ def update_worldline_lab(zero_gamma, k_min_val, k_max_val, selected_deltas, cert
                         try:
                             with open(wl_path, "r", encoding="utf-8") as f:
                                 wlc = json.load(f)
-                            ok, errs = certification.verify_certificate(wlc, check_provenance=False)
+                            ok, errs = certification.verify_certificate(wlc, check_provenance=True)
                             if not ok:
                                 all_certified = False
-                                unverified_reasons.append(f"Invalid certificate for z={z_idx}, K={K}, delta={d}")
-                        except Exception:
+                                unverified_reasons.append(f"Invalid certificate for z={z_idx}, K={K}, delta={d}: {'; '.join(errs[:1])}")
+                        except Exception as e:
                             all_certified = False
-                            unverified_reasons.append(f"Unreadable certificate for z={z_idx}, K={K}, delta={d}")
+                            unverified_reasons.append(f"Unreadable certificate for z={z_idx}, K={K}, delta={d}: {e}")
 
-    cert_prefix = "CERTIFIED " if (cert_mode == "certified" and all_certified) else ""
+    hash_display = f" [{src_cert_hash[:12]}...]" if src_cert_hash else ""
+    cert_prefix = f"CERTIFIED{hash_display} " if (cert_mode == "certified" and all_certified) else ""
     uncert_notice = f" [UNCERTIFIED: {unverified_reasons[0]}]" if (cert_mode == "certified" and not all_certified and unverified_reasons) else ""
+
 
     fig_traj = go.Figure(layout=DARK_LAYOUT)
     fig_traj.update_layout(

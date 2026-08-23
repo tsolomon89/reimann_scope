@@ -5,6 +5,7 @@ Tests legitimate mathematical certification, full artifact verification, and rej
 
 import os
 import json
+import hashlib
 import pytest
 import certification
 import math_core
@@ -621,12 +622,12 @@ def test_verification_report_missing_or_extra_file_fails(tmp_path):
     assert rep["total_inventory"] == 2
 
     # Verify report loads cleanly
-    ok, _, anomalies = certification.load_verification_report(cert_dir=str(cert_dir))
+    ok, _, anomalies = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
     assert ok, f"Expected clean report load: {anomalies}"
 
     # Remove 1 file -> must fail
     os.remove(cert_dir / "zeros" / "zero_00002.json")
-    ok_missing, _, anomalies_missing = certification.load_verification_report(cert_dir=str(cert_dir))
+    ok_missing, _, anomalies_missing = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
     assert not ok_missing
     assert any("does not match report total_inventory" in a or "missing on disk" in a for a in anomalies_missing)
 
@@ -637,7 +638,7 @@ def test_verification_report_missing_or_extra_file_fails(tmp_path):
     with open(cert_dir / "zeros" / "zero_00003.json", "w", encoding="utf-8") as f:
         json.dump(z3, f, indent=2)
 
-    ok_extra, _, anomalies_extra = certification.load_verification_report(cert_dir=str(cert_dir))
+    ok_extra, _, anomalies_extra = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
     assert not ok_extra
     assert any("does not match report total_inventory" in a or "missing from report" in a for a in anomalies_extra)
 
@@ -668,3 +669,147 @@ def test_verification_report_tampered_bytes_fails(tmp_path):
     ok, _, anomalies = certification.load_verification_report(cert_dir=str(cert_dir))
     assert not ok
     assert any("File SHA-256 mismatch" in a or "Inventory root hash mismatch" in a for a in anomalies)
+
+
+def test_adversarial_incompatible_dependency_fingerprint_versions():
+    """Adversarial: Dependency fingerprint with mpmath=9.9.9, python=9.9.9, platform=plan9, or mismatched flint rejected even with recomputed self-hash."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+    z = certification.certify_zero(1, dps=50)
+
+    # 1. mpmath = 9.9.9
+    t_mp = dict(z)
+    t_mp["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    t_mp["dependency_fingerprint"]["mpmath"] = "9.9.9"
+    t_mp["certificate_hash"] = certification._sha256_canonical(t_mp)
+    ok, msgs = certification.verify_certificate(t_mp)
+    assert not ok
+    assert any("mpmath" in m for m in msgs)
+
+    # 2. python = 9.9.9
+    t_py = dict(z)
+    t_py["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    t_py["dependency_fingerprint"]["python"] = "9.9.9"
+    t_py["certificate_hash"] = certification._sha256_canonical(t_py)
+    ok, msgs = certification.verify_certificate(t_py)
+    assert not ok
+    assert any("python version" in m.lower() for m in msgs)
+
+    # 3. platform = plan9
+    t_plat = dict(z)
+    t_plat["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    t_plat["dependency_fingerprint"]["platform"] = "plan9"
+    t_plat["certificate_hash"] = certification._sha256_canonical(t_plat)
+    ok, msgs = certification.verify_certificate(t_plat)
+    assert not ok
+    assert any("platform" in m.lower() for m in msgs)
+
+    # 4. python_flint mismatch (0.5.0)
+    t_flint = dict(z)
+    t_flint["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    t_flint["dependency_fingerprint"]["python_flint"] = "0.5.0"
+    t_flint["dependency_fingerprint"]["library_version"] = "0.5.0"
+    t_flint["certificate_hash"] = certification._sha256_canonical(t_flint)
+    ok, msgs = certification.verify_certificate(t_flint)
+    assert not ok
+    assert any("python_flint" in m.lower() for m in msgs)
+
+    # 5. Missing required dependency field
+    t_miss = dict(z)
+    t_miss["dependency_fingerprint"] = dict(z["dependency_fingerprint"])
+    del t_miss["dependency_fingerprint"]["verifier_version"]
+    t_miss["certificate_hash"] = certification._sha256_canonical(t_miss)
+    ok, msgs = certification.verify_certificate(t_miss)
+    assert not ok
+    assert any("verifier_version" in m for m in msgs)
+
+
+def test_adversarial_report_schema_and_type_tampering(tmp_path):
+    """Adversarial: Verification report with unsupported schema_version, fabricated report_type, or inconsistent failures rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    cert_dir = tmp_path / "certificates"
+    (cert_dir / "zeros").mkdir(parents=True)
+    (cert_dir / "trivial_zeros").mkdir(parents=True)
+    (cert_dir / "blocks").mkdir(parents=True)
+    (cert_dir / "worldlines").mkdir(parents=True)
+
+    z1 = certification.certify_zero(1, dps=50)
+    with open(cert_dir / "zeros" / "zero_00001.json", "w", encoding="utf-8") as f:
+        json.dump(z1, f, indent=2)
+
+    rep = certification.generate_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    rep_file = cert_dir / "verification_report.json"
+
+    # 1. Unsupported schema_version
+    t_rep = dict(rep)
+    t_rep["schema_version"] = "99.0"
+    t_rep["report_hash"] = certification._sha256_canonical(t_rep)
+    with open(rep_file, "w", encoding="utf-8") as f:
+        json.dump(t_rep, f)
+    ok, _, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert not ok
+    assert any("schema_version" in e for e in errs)
+
+    # 2. Fabricated report_type
+    t_rep = dict(rep)
+    t_rep["report_type"] = "fabricated_audit_report"
+    t_rep["report_hash"] = certification._sha256_canonical(t_rep)
+    with open(rep_file, "w", encoding="utf-8") as f:
+        json.dump(t_rep, f)
+    ok, _, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert not ok
+    assert any("report_type" in e for e in errs)
+
+    # 3. Nonempty failures with failed_count=0
+    t_rep = dict(rep)
+    t_rep["failures"] = [{"file": "zero_00001.json", "errors": ["Fake failure"]}]
+    t_rep["report_hash"] = certification._sha256_canonical(t_rep)
+    with open(rep_file, "w", encoding="utf-8") as f:
+        json.dump(t_rep, f)
+    ok, _, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert not ok
+    assert any("failures" in e.lower() for e in errs)
+
+    # 4. Category count mismatch
+    t_rep = dict(rep)
+    t_rep["nontrivial_zeros_count"] = 999
+    t_rep["report_hash"] = certification._sha256_canonical(t_rep)
+    with open(rep_file, "w", encoding="utf-8") as f:
+        json.dump(t_rep, f)
+    ok, _, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert not ok
+    assert any("count" in e.lower() for e in errs)
+
+
+def test_adversarial_report_path_traversal_and_duplicates(tmp_path):
+    """Adversarial: Verification report with traversal path or duplicate inventory rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    cert_dir = tmp_path / "certificates"
+    (cert_dir / "zeros").mkdir(parents=True)
+    (cert_dir / "trivial_zeros").mkdir(parents=True)
+    (cert_dir / "blocks").mkdir(parents=True)
+    (cert_dir / "worldlines").mkdir(parents=True)
+
+    z1 = certification.certify_zero(1, dps=50)
+    with open(cert_dir / "zeros" / "zero_00001.json", "w", encoding="utf-8") as f:
+        json.dump(z1, f, indent=2)
+
+    rep = certification.generate_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    rep_file = cert_dir / "verification_report.json"
+
+    # 1. Path traversal in inventory entry
+    t_rep = dict(rep)
+    t_rep["inventory"] = [dict(rep["inventory"][0])]
+    t_rep["inventory"][0]["relative_path"] = "data/certificates/zeros/../../etc/passwd"
+    t_rep["inventory_root_hash"] = hashlib.sha256(json.dumps(t_rep["inventory"], sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    t_rep["report_hash"] = certification._sha256_canonical(t_rep)
+    with open(rep_file, "w", encoding="utf-8") as f:
+        json.dump(t_rep, f)
+    ok, _, errs = certification.load_verification_report(cert_dir=str(cert_dir), check_provenance=False)
+    assert not ok
+    assert any("traversal" in e.lower() or "missing on disk" in e.lower() for e in errs)
+
