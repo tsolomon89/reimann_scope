@@ -1,0 +1,158 @@
+{
+  "schema_version": "2",
+  "run_id": "explicit-formula-radial-second-variation-001",
+  "experiment_id": "explicit-formula-radial-second-variation-001",
+  "title": "Riemann\u2013Weil Explicit Formula Radial Second-Variation and Non-Negative Energy Analysis",
+  "epistemic_class": "sensitivity_diagnostic",
+  "object_relationship": "synthetic_perturbation_diagnostic",
+  "classification": "canonical_experiment",
+  "started_at": "2026-08-23T20:23:34.565323+00:00",
+  "completed_at": "2026-08-23T20:25:11.736973+00:00",
+  "status": "complete",
+  "git_commit": "acaa862a769f84f747bed75f4898b3174e1d985b",
+  "producing_git_commit": "acaa862a769f84f747bed75f4898b3174e1d985b",
+  "git_dirty": false,
+  "experiment_spec_sha256": "674def9dfe3261b85d2dd0cc9839bb4feac9782757a9d2aeca682c7a16b320ac",
+  "precision": {
+    "dps": 80
+  },
+  "parameter_space": {
+    "mode": {
+      "kind": "explicit",
+      "values": [
+        "pure_radial_variation"
+      ]
+    },
+    "zero_index": {
+      "kind": "explicit",
+      "values": [
+        "1",
+        "10",
+        "50",
+        "100"
+      ]
+    },
+    "delta": {
+      "kind": "explicit",
+      "values": [
+        "0.001",
+        "0.005",
+        "0.01",
+        "0.05"
+      ]
+    }
+  },
+  "points_requested": 16,
+  "points_completed": 16,
+  "tau": {
+    "symbolic": "2*pi",
+    "numeric_decimal": "6.283185307179586476925286766559005768394338798750211641949889184615632812572418",
+    "precision_dps": 80,
+    "library": "mpmath"
+  },
+  "runtime": {
+    "python": "3.10.9 | packaged by Anaconda, Inc. | (main, Mar  1 2023, 18:18:15) [MSC v.1916 64 bit (AMD64)]",
+    "platform": "win32",
+    "packages": {
+      "mpmath": "1.3.0",
+      "flint": true
+    }
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
+  },
+  "source_code_hashes": {
+    "certification.py": "3c2325a6277dd177ca11f9c3b6404c30ba9d6d9a22fc775ed24fd4df40dff991",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
+    "math_core.py": "4313eb128e5bd442318a99350455a40cc9c3c7aad3a63241ee11b47b3ada85bf",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
+    "research_runner.py": "83ca20edd0128038cb1748fb0c378c7e2e77eef9820b16da9665a534089aa209",
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "code_modules": [
+    {
+      "path": "certification.py",
+      "sha256": "3c2325a6277dd177ca11f9c3b6404c30ba9d6d9a22fc775ed24fd4df40dff991"
+    },
+    {
+      "path": "transforms.py",
+      "sha256": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7"
+    },
+    {
+      "path": "reference_data.py",
+      "sha256": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5"
+    },
+    {
+      "path": "math_core.py",
+      "sha256": "4313eb128e5bd442318a99350455a40cc9c3c7aad3a63241ee11b47b3ada85bf"
+    },
+    {
+      "path": "transcendental.py",
+      "sha256": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+    },
+    {
+      "path": "converter.py",
+      "sha256": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264"
+    },
+    {
+      "path": "research_runner.py",
+      "sha256": "83ca20edd0128038cb1748fb0c378c7e2e77eef9820b16da9665a534089aa209"
+    },
+    {
+      "path": "zero_finder.py",
+      "sha256": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+    }
+  ],
+  "data_provenance": [
+    {
+      "path": "data/zeros_reference.json",
+      "sha256": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909"
+    },
+    {
+      "path": "data/zeros_first_100_reference.json",
+      "sha256": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902"
+    },
+    {
+      "path": "data/canonical_blocks.json",
+      "sha256": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d"
+    },
+    {
+      "path": "data/primes.json",
+      "sha256": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+    }
+  ],
+  "consumed_certificates": [],
+  "artifacts": {
+    "results_jsonl": {
+      "path": "results.jsonl",
+      "sha256": "64dc5528df6526d49037e795b4a96a5e21da8db4be3936f35150534580385e3b"
+    },
+    "summary_json": {
+      "path": "summary.json",
+      "sha256": "af975d635a23fcec8d09c7acffaca100ce1cb48795180414edc87acae0d3c1c3"
+    },
+    "readme_md": {
+      "path": "README.md",
+      "sha256": "4da353b7e28a9caecd6a9baee55482186a79d8fc5a1d7ada7458890b0f2265c7"
+    },
+    "diagnostics_json": {
+      "path": "diagnostics.json",
+      "sha256": "74f8348bc075a74b0f279159cc45cad444806fa318001d86eeea8446d64c343e"
+    }
+  }
+}

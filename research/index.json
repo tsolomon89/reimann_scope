@@ -288,8 +288,26 @@
       "summary_path": "research/runs/explicit-formula-perturbation-rank-001/summary.json",
       "manifest_path": "research/runs/explicit-formula-perturbation-rank-001/manifest.json",
       "results_path": "research/runs/explicit-formula-perturbation-rank-001/results.jsonl"
+    },
+    {
+      "schema_version": "2",
+      "run_id": "explicit-formula-radial-second-variation-001",
+      "experiment_id": "explicit-formula-radial-second-variation-001",
+      "title": "Riemann\u2013Weil Explicit Formula Radial Second-Variation and Non-Negative Energy Analysis",
+      "epistemic_class": "sensitivity_diagnostic",
+      "object_relationship": "synthetic_perturbation_diagnostic",
+      "classification": "canonical_experiment",
+      "timestamp": "2026-08-23T20:23:34.565323+00:00",
+      "git_commit": "acaa862a769f84f747bed75f4898b3174e1d985b",
+      "producing_git_commit": "acaa862a769f84f747bed75f4898b3174e1d985b",
+      "git_dirty": false,
+      "status": "complete",
+      "criterion_met": true,
+      "summary_path": "research/runs/explicit-formula-radial-second-variation-001/summary.json",
+      "manifest_path": "research/runs/explicit-formula-radial-second-variation-001/manifest.json",
+      "results_path": "research/runs/explicit-formula-radial-second-variation-001/results.jsonl"
     }
   ],
-  "total_runs": 16,
-  "updated_at": "2026-08-23T20:09:26.356542+00:00"
+  "total_runs": 17,
+  "updated_at": "2026-08-23T20:26:28.450877+00:00"
 }
