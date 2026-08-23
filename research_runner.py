@@ -2738,7 +2738,7 @@ def validate_run_bundle(
             else:
                 found_entry = matching_entries[0]
                 expected_entry = project_canonical_index_entry(manifest, committed_summary, exp_id)
-                if "notes" in (spec or {}) and "notes" not in expected_entry:
+                if spec is not None and "notes" in spec and "notes" not in expected_entry:
                     expected_entry["notes"] = spec["notes"]
 
                 REQUIRED_INDEX_FIELDS = [
