@@ -1881,7 +1881,7 @@ def update_worldline_lab(zero_val, k_min_val, k_max_val, selected_deltas, cert_m
     if z_idx is not None and 1 <= z_idx <= len(ref_zeros):
         gamma = float(ref_zeros[z_idx - 1])
     else:
-        gamma = float(INITIAL_ZEROS_FLOAT[0])
+        gamma = INITIAL_ZEROS_FLOAT[0]
 
     all_certified = True
     unverified_reasons = []
