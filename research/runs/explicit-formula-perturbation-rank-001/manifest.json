@@ -6,11 +6,11 @@
   "epistemic_class": "sensitivity_diagnostic",
   "object_relationship": "synthetic_perturbation_diagnostic",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T18:43:28.152309+00:00",
-  "completed_at": "2026-08-23T18:44:17.617286+00:00",
+  "started_at": "2026-08-23T18:52:34.625093+00:00",
+  "completed_at": "2026-08-23T18:53:23.147271+00:00",
   "status": "complete",
-  "git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
-  "producing_git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
+  "git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
+  "producing_git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
   "git_dirty": false,
   "experiment_spec_sha256": "fc780d619fc24c925fc391ead9fc53fd769a8f96c55f7fca52e1529eddc2b0f3",
   "precision": {
@@ -136,17 +136,17 @@
     }
   ],
   "consumed_certificates": [
-    "1a873e24cde04d20f7ac8495615ac9df6c92c3b09be1315be095a8004ca68204",
-    "28f23659a1663ef88deb695874359d74798810b2cb9b565548d23e2264574f49",
-    "356c6364b8fbdae398c9c5b623c802009e82d2e8da93cadef19ddf3825954224",
-    "4e7927acb423a84a21acb7438c2ae03e7f20c802821dc819c8678d715da38917",
-    "95ab29faa6070ff6797f3c7693483748525cac2439625a78e0584f89474ffbc8",
-    "c8a711717dfca3e3b979765278a22f58266444f703211e6b182f895f6f01693f"
+    "48e55c4905635235fdbd3bb80ee6e46fc5c628f41246cba3681bc7694b3ac8a6",
+    "6ed079b8b5f3a0b006927bc65154e37a804db5ee4dbc9e80d3d63d1071cf6d48",
+    "8b971478c9749a61402f07d4e2b876397492f55af006b8ccf2f13cdd6969e51a",
+    "8d53e7ca5df5bd9891f82c906167373dc438cf6ca00b1494d61a5b645496d40c",
+    "c83fb973a69e116f2271ebbe1d06ed19485d3e527db08858a962a10ab642bda4",
+    "edd91453a50aaec888fb76169caa6fedceb000b01343a8f284ae419aa13aa281"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "89894629c334b9e28ac9aaa38e0c76e7e7c0600aca69ee5edda8e7ccbf56e60c"
+      "sha256": "e8dac3b157057bccc3fced814e6a21c4ce1220e198442ffab38337d1993fe991"
     },
     "summary_json": {
       "path": "summary.json",
@@ -154,7 +154,7 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "8f25b79297648cc4224af2167881aebe8e2e4cef63fa99f15b7614f0e2c7d050"
+      "sha256": "43263cd207c54cea75c140ed9be7652e74a259586b78670932e34d1864686cf3"
     }
   }
 }

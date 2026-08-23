@@ -6,11 +6,11 @@
   "epistemic_class": "observational_pattern",
   "object_relationship": "actual_cross_height_comparison",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T18:36:13.949572+00:00",
-  "completed_at": "2026-08-23T18:36:21.187391+00:00",
+  "started_at": "2026-08-23T18:46:03.983653+00:00",
+  "completed_at": "2026-08-23T18:46:10.858190+00:00",
   "status": "complete",
-  "git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
-  "producing_git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
+  "git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
+  "producing_git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
   "git_dirty": false,
   "experiment_spec_sha256": "ef6696444ac87bfac6f217f8e28c9eed5f7ea3bd8f9d582519544494e5534cc9",
   "precision": {
@@ -133,15 +133,15 @@
     }
   ],
   "consumed_certificates": [
-    "28f23659a1663ef88deb695874359d74798810b2cb9b565548d23e2264574f49",
-    "47b2d17cf4d37575cf60ebb568962c7d6975f1b9a1cf7b7b65407650769d82a8",
-    "68a7ebf49a755ebe4cb3668aaa320206d2dd34cef2f719c97f8919e20cf37c61",
-    "8dc67bdbce259b94ba785f9021fb87da92cb3a99fb692c9cf22783a258ee39a2"
+    "49e4cb84197f7b8e1b7f58c91a79414ed560a39ec6246982189720c2fa82d5b2",
+    "852c5c1355bc612c0671550284fe0339b6de7e66c3fe0a4a39f7f7cf757d1745",
+    "c83fb973a69e116f2271ebbe1d06ed19485d3e527db08858a962a10ab642bda4",
+    "eafed1133c7d749782373816ab69c568be3c8d9bd5468a6138e9ebd5a4159834"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "5990f82a36ddc48731af67cce0b9d79175859c0d54fb7e5a82d8c62af83ce05f"
+      "sha256": "d438cc6bc41a3e4a80b30250d59b385c9737d2985edca248624711e6b2f64c9c"
     },
     "summary_json": {
       "path": "summary.json",
@@ -149,7 +149,7 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "f757e5a988738a397c17b0688abde1ea04f1eff321f62d71938b57befb3a9a47"
+      "sha256": "3917a9235bedc84f3f23e88e8cd9f57bf0298b8995c574f9ab0366e740cc9bf6"
     }
   }
 }

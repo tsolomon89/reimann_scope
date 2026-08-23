@@ -6,11 +6,11 @@
   "epistemic_class": "sensitivity_diagnostic",
   "object_relationship": "synthetic_modified_object",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T18:44:18.606768+00:00",
-  "completed_at": "2026-08-23T18:45:20.975301+00:00",
+  "started_at": "2026-08-23T18:53:24.033052+00:00",
+  "completed_at": "2026-08-23T18:54:20.760156+00:00",
   "status": "complete",
-  "git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
-  "producing_git_commit": "6437155b95db1d98163fd886b4f607084b90c90b",
+  "git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
+  "producing_git_commit": "7812e08596b06fbbded8854d88dff79ee83c027b",
   "git_dirty": false,
   "experiment_spec_sha256": "9f516257ea49e92da33d2cfa6588e834466b4c8166d3e8e2131d87e5d57c59d7",
   "precision": {
@@ -151,7 +151,7 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "bf6aecc601f4af3dac6386586d726b94e4ba0c38feb7012f382da25be1a14c2e"
+      "sha256": "2bb87cf74c86b7d6ee147fed13ce7b5b3ef04f0871cfb27f6b9d70a14a9fc653"
     }
   }
 }
