@@ -1708,7 +1708,7 @@ def verify_certificate(
     else:
         computed_hash = _sha256_canonical(cert)
         if computed_hash != stored_hash:
-            anomalies.append(f"Tamper detected: certificate_hash {stored_hash} does not match computed {computed_hash}")
+            anomalies.append(f"Hash mismatch: stored {stored_hash}, computed {computed_hash}")
 
     # 3. Dependency fingerprint validation
     dep_fp = cert.get("dependency_fingerprint")
