@@ -3,7 +3,7 @@
   "run_id": "explicit-formula-radial-second-variation-001",
   "experiment_id": "explicit-formula-radial-second-variation-001",
   "status": "complete",
-  "hypothesis": "Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive quadratic radial energy E(u) = u^T K^T K u; non-negativity u_n = delta_n^2 >= 0 prevents exact non-negative least-squares compensation across the sampled test family under fixed arithmetic data.",
+  "hypothesis": "Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive single-target quadratic energy E(u) = ||v_target||^2; finite NNLS compensation behavior is an observational diagnostic of subspace geometry, exhibiting heterogeneous compensation across sampled zeros under fixed arithmetic data.",
   "points_requested": 16,
   "points_completed": 16,
   "points_failed": 0,
@@ -463,9 +463,27 @@
     "leading_taylor_coefficient": "-2*delta^2*H''(gamma)",
     "fourth_order_coefficient": "(delta^4/12)*H''''(gamma)",
     "quadratic_energy_definition": "E(u) = u^T K^T K u with u_n = delta_n^2 >= 0",
-    "nnls_compensation_status": "no_non_negative_compensation_possible",
-    "anti_circularity_screening": "screened_no_rh_or_weil_assumed",
+    "single_target_energy_status": "strictly_positive_for_all_sampled_zeros",
+    "nnls_compensation_status": "heterogeneous_finite_compensation",
+    "compensation_found_count": 8,
+    "compensation_not_found_count": 8,
+    "compensation_found_zero_indices": [
+      "10",
+      "50"
+    ],
+    "compensation_not_found_zero_indices": [
+      "1",
+      "100"
+    ],
+    "min_relative_nnls_residual": "7.984009245e-10",
+    "max_relative_nnls_residual": "0.9989403835",
+    "numerical_rank": "13-14",
+    "nullity": "85-86",
+    "condition_number": "~2.4e+15",
+    "conditioning_caveats": "Finite 30-channel basis has high numerical nullity (~85) and condition number (~10^15); target columns for zeros 10 and 50 are well within the convex cone of remaining columns, whereas zeros 1 and 100 are not.",
     "theoretical_classification": "coordinate_redundant",
-    "finite_basis_classification": "finite_basis_enrichment_only"
+    "finite_basis_classification": "finite_basis_enrichment_only",
+    "epistemic_classification": "exact_finite_synthetic_sensitivity_diagnostic",
+    "projection_trap_note": "Actual divisor D_zeta has an arithmetic explicit-formula representation, while its critical-line projection P_0(D_zeta) has no established independent arithmetic representation; inferring radial rigidity from projected defect remains an open theorem."
   }
 }

@@ -6,11 +6,11 @@
   "epistemic_class": "sensitivity_diagnostic",
   "object_relationship": "synthetic_perturbation_diagnostic",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-23T20:45:03.995805+00:00",
-  "completed_at": "2026-08-23T20:46:05.974795+00:00",
+  "started_at": "2026-08-24T00:19:54.579037+00:00",
+  "completed_at": "2026-08-24T00:20:42.604128+00:00",
   "status": "complete",
-  "git_commit": "72aac6eefa0665b2348c729cefa0e534dc6e932a",
-  "producing_git_commit": "72aac6eefa0665b2348c729cefa0e534dc6e932a",
+  "git_commit": "df8b9a5e44afd864086536729c16543200a5d36c",
+  "producing_git_commit": "df8b9a5e44afd864086536729c16543200a5d36c",
   "git_dirty": false,
   "experiment_spec_sha256": "943ba3f362c12d1d52ed89993c675cbc697b8467765221f6fe4f179b22cae544",
   "precision": {
@@ -71,10 +71,10 @@
     "certification.py": "3c2325a6277dd177ca11f9c3b6404c30ba9d6d9a22fc775ed24fd4df40dff991",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "math_core.py": "4313eb128e5bd442318a99350455a40cc9c3c7aad3a63241ee11b47b3ada85bf",
+    "math_core.py": "e66eb34a123a332b0c97bb3c41e8d0b75319d9e94e8c7a26a7b10f5a0df72035",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "research_runner.py": "83ca20edd0128038cb1748fb0c378c7e2e77eef9820b16da9665a534089aa209",
+    "research_runner.py": "58e82c45cb815ee14cefd48a9d087facdb3ac01df56c9f3a78102cb90374ab2b",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -98,7 +98,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "4313eb128e5bd442318a99350455a40cc9c3c7aad3a63241ee11b47b3ada85bf"
+      "sha256": "e66eb34a123a332b0c97bb3c41e8d0b75319d9e94e8c7a26a7b10f5a0df72035"
     },
     {
       "path": "transcendental.py",
@@ -110,7 +110,7 @@
     },
     {
       "path": "research_runner.py",
-      "sha256": "83ca20edd0128038cb1748fb0c378c7e2e77eef9820b16da9665a534089aa209"
+      "sha256": "58e82c45cb815ee14cefd48a9d087facdb3ac01df56c9f3a78102cb90374ab2b"
     },
     {
       "path": "zero_finder.py",
@@ -136,17 +136,17 @@
     }
   ],
   "consumed_certificates": [
-    "64e1cbd7fd084b4b5d8ac8e553e944b145af0380b6e87b86964a159742a4e2c0",
-    "6dc61661395b67d2ba6b148f9906e9d9d17b2a32cf0ec5a71f88f4e4aa8866fd",
-    "6eaf994a7d700697f2a3e11677ff9aa13d0c019cbbf4dbc48023c22738946d95",
-    "8a5d00f3f425eab3d51960ceb51a95c04e67e5801e642a540272f7c710abb019",
-    "9e8de04a63061019fa4a0c4e14df67de52c5061e40e06558856ac6ad4cd743b7",
-    "b2d25877a0690937ede3f06b63a8a75a90865f26b96942322fc8175f679c8d6a"
+    "103e4fab2f2be71e0ba673d56f8146b59bf239ab4c7aebdddd45a630bfc60727",
+    "74de5e385c231e472865336b2a1270f3d2716865fe12204e5cc817b1aa3d2b0b",
+    "b8b7ebc3e09d83c7f1ffc2196ced152bd43326aab2bab55dfdbeca5c65972dad",
+    "c3af6a9695f93c9a1ef33a37e0aaadc1d94c0d6ae61ca7351290b359aa26164a",
+    "d2c85484332c095e0db44ea3bf5771b956cad377cb598a8f6f94b4aef680fff5",
+    "f1fa4f7066f564c74498331ba3882d10f912f94ea0b1b2d83b1fd8144e7a4b21"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "cc57e0c5915d6141eb1e77d5439cd153b557f8b38be5d5b62e146a183082f482"
+      "sha256": "82a7a30d9a23bd4ee04c3e982127cfa8a252962d35a33b6715b94c11b91fe323"
     },
     "summary_json": {
       "path": "summary.json",
@@ -154,11 +154,11 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "2a4e73a95ecfc2e59f88d6d6fee2a89c36808b127706b5a9658a8f927c7e6273"
+      "sha256": "1c9b4d65cefdb63ca3ff3abe42206dd08d7d014765411d8ff897af4a45f37c67"
     },
     "diagnostics_json": {
       "path": "diagnostics.json",
-      "sha256": "5953684954e812886ccafcaa4dcdc603c512dfd106be6d22f8feb1428292c03d"
+      "sha256": "78ffe90e5d5d7ac1e6cd7bafc3bb49e4d8c2685896d2808b8f859fe4d1e52286"
     }
   }
 }

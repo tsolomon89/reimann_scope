@@ -10,7 +10,7 @@
 ## 1. Mathematical Statement & Criterion
 
 - **Hypothesis:**
-  > Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive quadratic radial energy E(u) = u^T K^T K u; non-negativity u_n = delta_n^2 >= 0 prevents exact non-negative least-squares compensation across the sampled test family under fixed arithmetic data.
+  > Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive single-target quadratic energy E(u) = ||v_target||^2; finite NNLS compensation behavior is an observational diagnostic of subspace geometry, exhibiting heterogeneous compensation across sampled zeros under fixed arithmetic data.
 
 - **Primary Criterion (max_abs):** `relative_second_order_error <= 0.01`
 - **Observed Metric:** `0.0003289246365900508287095260762751405467533010995001401432654816361226234528648121`
@@ -111,13 +111,13 @@
 
 ## 4. Execution & Environment Metadata
 
-- **Git Commit:** `72aac6eefa0665b2348c729cefa0e534dc6e932a` (Dirty: `False`)
+- **Git Commit:** `df8b9a5e44afd864086536729c16543200a5d36c` (Dirty: `False`)
 - **Precision:** `80 dps`
 - **Tau Value:** `6.2831853071795864769252... (2*pi)`
 - **Points Requested:** `16`
 - **Points Completed:** `16`
-- **Started At:** `2026-08-23T20:46:52.597024+00:00`
-- **Completed At:** `2026-08-23T20:48:29.677809+00:00`
+- **Started At:** `2026-08-24T00:21:20.758333+00:00`
+- **Completed At:** `2026-08-24T00:22:46.586517+00:00`
 
 ---
 

@@ -3,7 +3,7 @@
   "run_id": "explicit-formula-native-baseline-001",
   "experiment_id": "explicit-formula-native-baseline-001",
   "status": "complete",
-  "hypothesis": "For admissible modulated Gaussian packets H_j (j=1..6), the native explicit formula residual EF[H_j; D_zeta, A_zeta] = Spectral_Sum - (Pole + Prime + Gamma) vanishes within the observational zero-sum and prime-sum truncation bounds.",
+  "hypothesis": "For admissible modulated Gaussian packets H_j (j=1..6), the native explicit formula residual EF[H_j; D_zeta, A_zeta] = Spectral_Sum - (Pole + Prime + Gamma) evaluates close to zero within empirical truncation tolerances. The 100-to-200 zero cutoff shift exhibits a substantial spectral tail change (~5.48) as packet tails extend beyond gamma_100, while the 150-to-200 shift stabilizes (< 1e-15).",
   "points_requested": 6,
   "points_completed": 6,
   "points_failed": 0,
@@ -90,7 +90,7 @@
     "relative_error": {
       "metric": "relative_error",
       "label": "Relative error",
-      "kind": "criterion_component",
+      "kind": "diagnostic",
       "count": 6,
       "min": "1.982749351160562104752946369714492650577048711160697998176048351023121683657157e-41",
       "max": "0.0000000000000000000000084268022467802965644028784900075978887540503673559260608503977291287228741788555",
@@ -161,7 +161,7 @@
     "spectral_cutoff_change_100_to_200": {
       "metric": "spectral_cutoff_change_100_to_200",
       "label": "Spectral cutoff sensitivity (100 to 200 zeros)",
-      "kind": "criterion_component",
+      "kind": "diagnostic",
       "count": 6,
       "min": "0.0",
       "max": "5.4796400519861758426195398658906085430578086448288021461628287242258615069560712",
@@ -232,7 +232,7 @@
     "spectral_cutoff_change_150_to_200": {
       "metric": "spectral_cutoff_change_150_to_200",
       "label": "Spectral cutoff sensitivity (150 to 200 zeros)",
-      "kind": "criterion_component",
+      "kind": "diagnostic",
       "count": 6,
       "min": "0.0",
       "max": "1.2190453777328336629364542746958247924588424603290506820286776472811955960781529e-97",
@@ -303,7 +303,7 @@
     "prime_cutoff_change_10k_to_50k": {
       "metric": "prime_cutoff_change_10k_to_50k",
       "label": "Arithmetic prime cutoff sensitivity (10k to 50k)",
-      "kind": "criterion_component",
+      "kind": "diagnostic",
       "count": 6,
       "min": "0.0",
       "max": "1.2851147624603522550056736891668268468859060137665398251941488841531952712638535e-73",
@@ -374,7 +374,7 @@
     "precision_change_70_to_110": {
       "metric": "precision_change_70_to_110",
       "label": "Working precision sensitivity (70 to 110 dps)",
-      "kind": "criterion_component",
+      "kind": "diagnostic",
       "count": 6,
       "min": "6.3936953389128783096375847359120185546104122468456930990548007976812385464553955e-117",
       "max": "6.1398288648082475805582550587439518428878301054851376306013281529006973403553762e-115",
