@@ -35,6 +35,9 @@ import reference_data
 import transcendental
 import certification
 
+from research.handlers.registry import get_handler, list_registered_handlers, register_handler
+from research.handlers.base import ExperimentHandler, HandlerDependencies
+
 
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 RESEARCH_DIR = os.path.join(REPO_ROOT, "research")
@@ -591,6 +594,56 @@ def _lookup_worldline_certificate(
 
 
 
+OPERATION_TO_EXPERIMENT_ID: Dict[str, str] = {
+    "dilation_zero_map": "centered-dilation-zero-map",
+    "transform_zero_map": "centered-dilation-zero-map",
+    "centered_dilation_zero_map": "centered-dilation-zero-map",
+    "centered-dilation-zero-map": "centered-dilation-zero-map",
+    "centrifuge": "centrifuge-slope-verification",
+    "centrifuge_slope": "centrifuge-slope-verification",
+    "centrifuge-slope-verification": "centrifuge-slope-verification",
+    "symmetric_centrifuge": "symmetric-centrifuge-defect-001",
+    "symmetric_centrifuge_defect": "symmetric-centrifuge-defect-001",
+    "symmetric-centrifuge-defect-001": "symmetric-centrifuge-defect-001",
+    "coupled_perturbation_covariance": "coupled-perturbation-covariance-001",
+    "coupled-perturbation-covariance-001": "coupled-perturbation-covariance-001",
+    "zeta_trace_compare": "coupled-scale-covariance-001",
+    "coupled_scale_covariance": "coupled-scale-covariance-001",
+    "coupled-scale-covariance-001": "coupled-scale-covariance-001",
+    "cross_height_distance": "cross-height-distance-001",
+    "cross-height-distance-001": "cross-height-distance-001",
+    "cross_height_coherence": "cross-height-path-coherence-001",
+    "cross_height_path_coherence": "cross-height-path-coherence-001",
+    "cross-height-path-coherence-001": "cross-height-path-coherence-001",
+    "explicit_formula_native_baseline": "explicit-formula-native-baseline-001",
+    "explicit-formula-native-baseline-001": "explicit-formula-native-baseline-001",
+    "explicit_formula_grade_covariance": "explicit-formula-grade-covariance-001",
+    "explicit-formula-grade-covariance-001": "explicit-formula-grade-covariance-001",
+    "explicit_formula_perturbation_rank": "explicit-formula-perturbation-rank-001",
+    "explicit-formula-perturbation-rank-001": "explicit-formula-perturbation-rank-001",
+    "explicit_formula_radial_second_variation": "explicit-formula-radial-second-variation-001",
+    "explicit-formula-radial-second-variation-001": "explicit-formula-radial-second-variation-001",
+    "grade_constraint": "grade-constraints-001",
+    "grade_constraints": "grade-constraints-001",
+    "grade-constraints-001": "grade-constraints-001",
+    "kernel_identity": "inverse-kernel-lock-identity",
+    "inverse_kernel_lock": "inverse-kernel-lock-identity",
+    "inverse-kernel-lock-identity": "inverse-kernel-lock-identity",
+    "converter_perturbation": "isolated-radial-response-002",
+    "isolated_radial_response": "isolated-radial-response-002",
+    "isolated-radial-response-002": "isolated-radial-response-002",
+    "synthetic_radial_leaf": "synthetic-radial-leaves-001",
+    "synthetic_radial_leaves": "synthetic-radial-leaves-001",
+    "synthetic-radial-leaves-001": "synthetic-radial-leaves-001",
+    "transcendental_worldline": "transcendental-worldlines-001",
+    "transcendental_worldlines": "transcendental-worldlines-001",
+    "transcendental-worldlines-001": "transcendental-worldlines-001",
+    "trivial_zero_worldlines": "trivial-worldlines-001",
+    "trivial_worldlines": "trivial-worldlines-001",
+    "trivial-worldlines-001": "trivial-worldlines-001",
+}
+
+
 def evaluate_point(
     operation: str,
     inputs: Dict[str, str],
@@ -598,10 +651,20 @@ def evaluate_point(
     param_space: Optional[Dict[str, Any]] = None
 ) -> Tuple[str, Dict[str, str], Optional[str]]:
     """
-    Evaluate a single parameter space point using the canonical math engine.
+    Evaluate a single parameter space point using the registered experiment handler or canonical math engine.
     Returns (status, outputs_dict, error_message).
     All outputs serialize as exact decimal strings.
     """
+    exp_id = OPERATION_TO_EXPERIMENT_ID.get(operation, operation)
+    try:
+        handler = get_handler(exp_id)
+        with mpmath.workdps(dps + 15):
+            return handler.evaluate_point(inputs, dps=dps, param_space=param_space)
+    except KeyError:
+        pass
+    except Exception as e:
+        return "error", {}, str(e)
+
     with mpmath.workdps(dps + 15):
         try:
             if operation == "centrifuge":
@@ -2139,247 +2202,17 @@ def compute_summary(
             "warnings": warnings
         }
 
-        if spec.get("id") == "explicit-formula-grade-covariance-001":
-            try:
-                j_list = [1, 2, 3, 4, 5, 6]
-                k_list = [-2, -1, 0, 1, 2]
-                zeros_sub = reference_data.load_reference_zeros()[:100]
-                g_eq = math_core.check_expanded_native_basis_equivalence(j_list=j_list, k_list=k_list, zeros_subset=zeros_sub, dps=dps + 20)
-                summary["global_30_channel_equivalence"] = {
-                    "grade_matrix_dims": g_eq["grade_matrix_dims"],
-                    "native_matrix_dims": g_eq["native_matrix_dims"],
-                    "stacked_matrix_dims": g_eq["stacked_matrix_dims"],
-                    "rank_grade": g_eq["rank_grade"],
-                    "rank_native": g_eq["rank_native"],
-                    "rank_stacked": g_eq["rank_stacked"],
-                    "singular_values_grade": [mpmath.nstr(s, n=dps) for s in g_eq["singular_values_grade"]],
-                    "threshold_sweep": g_eq["threshold_sweep"],
-                    "max_discrepancy": mpmath.nstr(g_eq["max_discrepancy"], n=dps),
-                    "theoretical_classification": g_eq["theoretical_classification"],
-                    "finite_basis_classification": g_eq["finite_basis_classification"],
-                    "categorical_equivalence_result": g_eq["categorical_equivalence_result"],
-                }
-            except Exception as e:
-                summary["warnings"].append(f"Global 30-channel equivalence summary calculation failed: {e}")
-
-        elif spec.get("id") == "explicit-formula-native-baseline-001":
-            try:
-                ref_zeros = reference_data.load_reference_zeros()
-                summary["dataset_and_convergence_summary"] = {
-                    "total_reference_zero_count": len(ref_zeros),
-                    "certified_zero_count": 100,
-                    "reference_approximation_zero_count": len(ref_zeros) - 100,
-                    "highest_included_zero_index": len(ref_zeros),
-                    "highest_included_zero_ordinate": ref_zeros[-1] if ref_zeros else "0",
-                    "prime_power_cutoff": 50000,
-                    "dominant_observed_error_source": "spectral_truncation_200_zeros_plus_prime_sieve_50000"
-                }
-            except Exception as e:
-                summary["warnings"].append(f"Native baseline convergence summary calculation failed: {e}")
-
-        elif spec.get("id") == "explicit-formula-radial-second-variation-001":
-            try:
-                def _safe_zero_sort_key(s: str) -> int:
-                    try:
-                        return int(s)
-                    except Exception:
-                        return 999999
-
-                comp_found_count = sum(1 for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true")
-                comp_not_found_count = sum(1 for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false")
-                comp_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true" and r.get("outputs", {}).get("zero_index") is not None)), key=_safe_zero_sort_key)
-                comp_not_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false" and r.get("outputs", {}).get("zero_index") is not None)), key=_safe_zero_sort_key)
-                rel_residuals = [math_core.to_mpf(r.get("outputs", {}).get("nnls_relative_residual", "0"), dps=50) for r in results if "nnls_relative_residual" in r.get("outputs", {})]
-                min_rel_res = mpmath.nstr(min(rel_residuals), n=10) if rel_residuals else "0"
-                max_rel_res = mpmath.nstr(max(rel_residuals), n=10) if rel_residuals else "0"
-
-                ranks: List[int] = []
-                nullities: List[int] = []
-                cond_nums: List[float] = []
-                stabilities: List[str] = []
-                anomalies: List[Dict[str, Any]] = []
-
-                for idx, r in enumerate(results):
-                    pid = r.get("point_id")
-                    if pid is None:
-                        pid = r.get("inputs", {}).get("point_id")
-                    if pid is None:
-                        pid = idx
-
-                    out = r.get("outputs", {})
-                    if not isinstance(out, dict):
-                        out = {}
-
-                    # 1. numerical_rank
-                    if "numerical_rank" not in out or out["numerical_rank"] is None:
-                        anomalies.append({
-                            "point_id": pid,
-                            "field": "numerical_rank",
-                            "anomaly_type": "missing",
-                            "supplied_value": None
-                        })
-                    else:
-                        try:
-                            ranks.append(int(out["numerical_rank"]))
-                        except Exception:
-                            anomalies.append({
-                                "point_id": pid,
-                                "field": "numerical_rank",
-                                "anomaly_type": "invalid",
-                                "supplied_value": str(out["numerical_rank"])
-                            })
-
-                    # 2. nullity
-                    if "nullity" not in out or out["nullity"] is None:
-                        anomalies.append({
-                            "point_id": pid,
-                            "field": "nullity",
-                            "anomaly_type": "missing",
-                            "supplied_value": None
-                        })
-                    else:
-                        try:
-                            nullities.append(int(out["nullity"]))
-                        except Exception:
-                            anomalies.append({
-                                "point_id": pid,
-                                "field": "nullity",
-                                "anomaly_type": "invalid",
-                                "supplied_value": str(out["nullity"])
-                            })
-
-                    # 3. condition_number
-                    if "condition_number" not in out or out["condition_number"] is None:
-                        anomalies.append({
-                            "point_id": pid,
-                            "field": "condition_number",
-                            "anomaly_type": "missing",
-                            "supplied_value": None
-                        })
-                    else:
-                        try:
-                            c_val = float(out["condition_number"])
-                            import math
-                            if math.isnan(c_val) or math.isinf(c_val):
-                                anomalies.append({
-                                    "point_id": pid,
-                                    "field": "condition_number",
-                                    "anomaly_type": "invalid",
-                                    "supplied_value": str(out["condition_number"])
-                                })
-                            else:
-                                cond_nums.append(c_val)
-                        except Exception:
-                            anomalies.append({
-                                "point_id": pid,
-                                "field": "condition_number",
-                                "anomaly_type": "invalid",
-                                "supplied_value": str(out["condition_number"])
-                            })
-
-                    # 4. rank_stability
-                    if "rank_stability" not in out or out["rank_stability"] is None:
-                        anomalies.append({
-                            "point_id": pid,
-                            "field": "rank_stability",
-                            "anomaly_type": "missing",
-                            "supplied_value": None
-                        })
-                    else:
-                        s_val = str(out["rank_stability"]).strip()
-                        if not s_val or s_val.lower() in ("none", "null", "nan", "invalid", "unknown"):
-                            anomalies.append({
-                                "point_id": pid,
-                                "field": "rank_stability",
-                                "anomaly_type": "invalid",
-                                "supplied_value": str(out["rank_stability"])
-                            })
-                        else:
-                            stabilities.append(s_val)
-
-                if anomalies:
-                    summary["warnings"].append(f"{len(anomalies)} missing or invalid metric anomaly records detected in radial summary input.")
-
-                min_rank = min(ranks) if ranks else None
-                max_rank = max(ranks) if ranks else None
-                rank_range_str = f"{min_rank}-{max_rank}" if (min_rank is not None and max_rank is not None and min_rank != max_rank) else (str(min_rank) if min_rank is not None else "N/A")
-
-                min_nullity = min(nullities) if nullities else None
-                max_nullity = max(nullities) if nullities else None
-                nullity_range_str = f"{min_nullity}-{max_nullity}" if (min_nullity is not None and max_nullity is not None and min_nullity != max_nullity) else (str(min_nullity) if min_nullity is not None else "N/A")
-
-                min_cond = min(cond_nums) if cond_nums else None
-                max_cond = max(cond_nums) if cond_nums else None
-                cond_range_str = f"~{min_cond:.1e} to ~{max_cond:.1e}" if (min_cond is not None and max_cond is not None) else "N/A"
-
-                distinct_stabilities = sorted(list(set(stabilities)))
-                if not distinct_stabilities:
-                    rank_stability_val = "unknown"
-                    summary["warnings"].append("No valid rank_stability labels found in results.")
-                    rank_stability_labels: List[str] = []
-                elif len(distinct_stabilities) == 1:
-                    rank_stability_val = distinct_stabilities[0]
-                    rank_stability_labels = [distinct_stabilities[0]]
-                else:
-                    rank_stability_val = "mixed"
-                    rank_stability_labels = distinct_stabilities
-
-                per_zero_counts = {}
-                valid_zero_indices = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("zero_index") is not None)), key=_safe_zero_sort_key)
-                for z_str in valid_zero_indices:
-                    z_pts = [r for r in results if str(r.get("outputs", {}).get("zero_index")) == z_str]
-                    z_found = sum(1 for r in z_pts if r.get("outputs", {}).get("nnls_compensation_found") == "true")
-                    z_not_found = sum(1 for r in z_pts if r.get("outputs", {}).get("nnls_compensation_found") == "false")
-                    z_res_vals = [math_core.to_mpf(r.get("outputs", {}).get("nnls_relative_residual", "0"), dps=50) for r in z_pts if "nnls_relative_residual" in r.get("outputs", {})]
-                    per_zero_counts[z_str] = {
-                        "total_cases": len(z_pts),
-                        "compensation_found_count": z_found,
-                        "compensation_not_found_count": z_not_found,
-                        "min_relative_residual": mpmath.nstr(min(z_res_vals), n=10) if z_res_vals else "N/A",
-                        "max_relative_residual": mpmath.nstr(max(z_res_vals), n=10) if z_res_vals else "N/A",
-                        "status": "found" if z_found == len(z_pts) else ("not_found" if z_not_found == len(z_pts) else "mixed")
-                    }
-
-                summary["radial_second_order_summary"] = {
-                    "total_cases": len(results),
-                    "radial_projection_operator": "P_0(1/2 + delta + i*gamma) = 1/2 + i*gamma",
-                    "radial_defect_divisor": "Delta D_rad = D - P_0(D)",
-                    "leading_taylor_coefficient": "-2*delta^2*H''(gamma)",
-                    "fourth_order_coefficient": "(delta^4/12)*H''''(gamma)",
-                    "quadratic_energy_definition": "E(u) = u^T K^T K u with u_n = delta_n^2 >= 0",
-                    "finite_response_energy_positive": "strictly_positive_for_all_sampled_zeros",
-                    "single_target_energy_status": "strictly_positive_for_all_sampled_zeros",
-                    "nnls_compensation_status": "heterogeneous_finite_compensation",
-                    "compensation_threshold_used": "1e-5",
-                    "compensation_found_count": comp_found_count,
-                    "compensation_not_found_count": comp_not_found_count,
-                    "compensation_found_zero_indices": comp_found_zeros,
-                    "compensation_not_found_zero_indices": comp_not_found_zeros,
-                    "per_zero_breakdown": per_zero_counts,
-                    "min_relative_nnls_residual": min_rel_res,
-                    "max_relative_nnls_residual": max_rel_res,
-                    "min_numerical_rank": min_rank,
-                    "max_numerical_rank": max_rank,
-                    "numerical_rank_range": rank_range_str,
-                    "min_nullity": min_nullity,
-                    "max_nullity": max_nullity,
-                    "nullity_range": nullity_range_str,
-                    "min_condition_number": f"{min_cond:.7e}" if min_cond is not None else None,
-                    "max_condition_number": f"{max_cond:.7e}" if max_cond is not None else None,
-                    "condition_number_range": cond_range_str,
-                    "rank_stability": rank_stability_val,
-                    "rank_stability_labels": rank_stability_labels,
-                    "input_complete": len(anomalies) == 0,
-                    "input_anomalies": anomalies,
-                    "input_anomaly_count": len(anomalies),
-                    "conditioning_caveats": f"Finite 30-channel basis has high numerical nullity ({nullity_range_str}) and condition number ({cond_range_str}); compensation was found in the declared basis at the 1e-5 threshold for interior zeros (zeros 10 and 50) and was not found at this threshold for peripheral zeros (zeros 1 and 100).",
-                    "theoretical_classification": "coordinate_redundant",
-                    "finite_basis_classification": "finite_basis_enrichment_only",
-                    "epistemic_classification": "finite_synthetic_sensitivity_diagnostic",
-                    "projection_trap_note": "Actual divisor D_zeta has an arithmetic explicit-formula representation, while its critical-line projection P_0(D_zeta) has no established independent arithmetic representation; inferring radial rigidity from projected defect remains an open theorem."
-                }
-            except Exception as e:
-                summary["warnings"].append(f"Radial second variation summary calculation failed: {e}")
+        exp_id = spec.get("id", run_id)
+        try:
+            handler = get_handler(exp_id)
+            with mpmath.workdps(dps + 15):
+                handler_summary = handler.compute_summary(results, spec, summary, status=status)
+            if isinstance(handler_summary, dict):
+                summary.update(handler_summary)
+        except KeyError:
+            pass
+        except Exception as e:
+            summary.setdefault("warnings", []).append(f"Handler summary computation failed: {e}")
 
         if points_failed > 0:
             summary["warnings"].append(f"{points_failed} points encountered execution errors")
@@ -2924,18 +2757,13 @@ def run_experiment(
     with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
 
-    if exp_id == "explicit-formula-perturbation-rank-001":
-        diag_data = generate_perturbation_rank_diagnostics(spec, all_results, dps=dps)
-        with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
-            json.dump(diag_data, df, indent=2)
-    elif exp_id == "explicit-formula-grade-covariance-001":
-        diag_data = generate_grade_covariance_diagnostics(spec, all_results, dps=dps)
-        with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
-            json.dump(diag_data, df, indent=2)
-    elif exp_id == "explicit-formula-radial-second-variation-001":
-        diag_data = generate_radial_second_variation_diagnostics(spec, all_results, dps=dps)
-        with open(os.path.join(work_dir, "diagnostics.json"), "w", encoding="utf-8") as df:
-            json.dump(diag_data, df, indent=2)
+    try:
+        handler = get_handler(exp_id)
+        handler.generate_diagnostics(all_results, spec, work_dir)
+    except KeyError:
+        pass
+    except Exception as e:
+        manifest.setdefault("warnings", []).append(f"Diagnostics generation failed: {e}")
 
     with open(os.path.join(work_dir, "results.jsonl"), "rb") as rf:
         results_sha = hashlib.sha256(rf.read().replace(b"\r\n", b"\n")).hexdigest()
@@ -2959,6 +2787,7 @@ def run_experiment(
         }
     }
     diag_file = os.path.join(work_dir, "diagnostics.json")
+    diag_sha = None
     if os.path.exists(diag_file):
         with open(diag_file, "rb") as df:
             diag_sha = hashlib.sha256(df.read().replace(b"\r\n", b"\n")).hexdigest()
@@ -2966,6 +2795,29 @@ def run_experiment(
             "path": "diagnostics.json",
             "sha256": diag_sha
         }
+
+    manifest["execution_provenance"] = {
+        "results_sha256": results_sha,
+        "producing_git_commit": git_commit,
+        "git_dirty": git_dirty,
+        "started_at": manifest["started_at"],
+        "completed_at": manifest["completed_at"],
+        "source_code_hashes": cur_src_hashes,
+        "input_data_hashes": cur_data_hashes,
+        "dependency_fingerprint": manifest["dependency_fingerprint"],
+        "code_modules": manifest["code_modules"],
+        "data_provenance": manifest["data_provenance"],
+    }
+    manifest["summary_provenance"] = {
+        "summary_sha256": summary_sha,
+        "readme_sha256": readme_sha,
+        "diagnostics_sha256": diag_sha,
+        "summary_git_commit": git_commit,
+        "summarized_at": manifest["completed_at"],
+        "summarizer_source_hashes": {
+            "research_runner.py": cur_src_hashes.get("research_runner.py", "N/A"),
+        }
+    }
 
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
@@ -2993,9 +2845,12 @@ def run_experiment(
     if os.path.exists(INDEX_FILE):
         shutil.copy2(INDEX_FILE, backup_index_path)
     if os.path.exists(stable_dir):
-        os.rename(stable_dir, backup_dir)
+        shutil.copytree(stable_dir, backup_dir)
 
+    # Atomic publication into stable_dir
     try:
+        if os.path.exists(stable_dir):
+            shutil.rmtree(stable_dir, ignore_errors=True)
         shutil.move(work_dir, stable_dir)
         update_index_file(run_entry)
         if os.path.exists(backup_dir):
@@ -3006,32 +2861,12 @@ def run_experiment(
         if os.path.exists(stable_dir):
             shutil.rmtree(stable_dir, ignore_errors=True)
         if os.path.exists(backup_dir):
-            os.rename(backup_dir, stable_dir)
+            shutil.move(backup_dir, stable_dir)
         if os.path.exists(backup_index_path):
             shutil.copy2(backup_index_path, INDEX_FILE)
             os.remove(backup_index_path)
         if os.path.exists(work_dir):
             shutil.rmtree(work_dir, ignore_errors=True)
-        for p in glob.glob(os.path.join(RESEARCH_DIR, ".*.tmp")):
-            try:
-                os.remove(p)
-            except Exception:
-                pass
-        for p in glob.glob(os.path.join(RESEARCH_DIR, ".index.json.bak_*")):
-            try:
-                os.remove(p)
-            except Exception:
-                pass
-        for p in glob.glob(os.path.join(RUNS_DIR, f".bak_{exp_id}_*")):
-            try:
-                shutil.rmtree(p, ignore_errors=True)
-            except Exception:
-                pass
-        for p in glob.glob(os.path.join(RUNS_DIR, f".tmp_{exp_id}_*")):
-            try:
-                shutil.rmtree(p, ignore_errors=True)
-            except Exception:
-                pass
         raise e
 
     return exp_id
@@ -3080,17 +2915,72 @@ def summarize_run(run_id: str) -> Dict[str, Any]:
 
     results_path = os.path.join(run_dir, "results.jsonl")
     results = []
-    if os.path.exists(results_path):
-        with open(results_path, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.strip():
-                    results.append(json.loads(line))
+    if not os.path.exists(results_path):
+        raise FileNotFoundError(f"Results file '{results_path}' not found")
+
+    with open(results_path, "rb") as rf:
+        raw_results_bytes = rf.read()
+    results_sha_before = hashlib.sha256(raw_results_bytes.replace(b"\r\n", b"\n")).hexdigest()
+
+    for line in raw_results_bytes.decode("utf-8").splitlines():
+        if line.strip():
+            results.append(json.loads(line))
 
     status = "complete" if len(results) >= manifest.get("points_requested", 0) else "incomplete"
     summary = compute_summary(spec, run_id, results, status=status)
 
     with open(os.path.join(run_dir, "summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
+
+    readme_content = generate_run_readme(spec, manifest, summary)
+    with open(os.path.join(run_dir, "README.md"), "w", encoding="utf-8") as f:
+        f.write(readme_content)
+
+    try:
+        handler = get_handler(exp_id)
+        handler.generate_diagnostics(results, spec, run_dir)
+    except KeyError:
+        pass
+    except Exception as e:
+        manifest.setdefault("warnings", []).append(f"Diagnostics generation failed: {e}")
+
+    with open(results_path, "rb") as rf:
+        results_sha_after = hashlib.sha256(rf.read().replace(b"\r\n", b"\n")).hexdigest()
+    if results_sha_before != results_sha_after:
+        raise RuntimeError(f"summarize_run corrupted results.jsonl: SHA mismatch ({results_sha_before} != {results_sha_after})")
+
+    with open(os.path.join(run_dir, "summary.json"), "rb") as sf:
+        summary_sha = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+    with open(os.path.join(run_dir, "README.md"), "rb") as rmf:
+        readme_sha = hashlib.sha256(rmf.read().replace(b"\r\n", b"\n")).hexdigest()
+
+    manifest.setdefault("artifacts", {})
+    manifest["artifacts"]["results_jsonl"] = {"path": "results.jsonl", "sha256": results_sha_after}
+    manifest["artifacts"]["summary_json"] = {"path": "summary.json", "sha256": summary_sha}
+    manifest["artifacts"]["readme_md"] = {"path": "README.md", "sha256": readme_sha}
+
+    diag_file = os.path.join(run_dir, "diagnostics.json")
+    diag_sha = None
+    if os.path.exists(diag_file):
+        with open(diag_file, "rb") as df:
+            diag_sha = hashlib.sha256(df.read().replace(b"\r\n", b"\n")).hexdigest()
+        manifest["artifacts"]["diagnostics_json"] = {"path": "diagnostics.json", "sha256": diag_sha}
+
+    commit, _ = get_git_info()
+    cur_src = certification._get_source_code_hashes(commit)
+    manifest["summary_provenance"] = {
+        "summary_sha256": summary_sha,
+        "readme_sha256": readme_sha,
+        "diagnostics_sha256": diag_sha,
+        "summary_git_commit": commit,
+        "summarized_at": datetime.now(timezone.utc).isoformat(),
+        "summarizer_source_hashes": {
+            "research_runner.py": cur_src.get("research_runner.py", "N/A"),
+        }
+    }
+
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2)
 
     return summary
 
@@ -3345,25 +3235,48 @@ def validate_manifest(
         if not commit_ok:
             errors.append(f"Invalid manifest git_commit provenance: {commit_err}")
 
+    exp_id = manifest.get("experiment_id", "")
+    try:
+        handler = get_handler(exp_id)
+        req_mods = handler.declared_dependencies.all_source_files
+        req_data = handler.declared_dependencies.all_data_files
+    except KeyError:
+        req_mods = certification.REQUIRED_SOURCE_MODULES
+        req_data = certification.REQUIRED_INPUT_DATA_FILES
+
     # 9. Current workspace source and data compatibility
     if canonical_current and isinstance(src_hashes, dict) and isinstance(data_hashes, dict):
-        curr_src = certification._get_source_code_hashes()
-        for mod in certification.REQUIRED_SOURCE_MODULES:
+        curr_src = certification._get_source_code_hashes(modules=req_mods)
+        for mod in req_mods:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 errors.append(f"Required current source module '{mod}' missing on disk")
             elif curr_h != src_hashes.get(mod):
                 errors.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, manifest {src_hashes.get(mod)}")
 
-        curr_data = certification._get_input_data_hashes()
-        for df in certification.REQUIRED_INPUT_DATA_FILES:
-            curr_dh = curr_data.get(df, "N/A")
+        curr_data = certification._get_input_data_hashes(files=req_data)
+        for df in req_data:
+            df_name = df.replace("data/", "", 1) if df.startswith("data/") else df
+            curr_dh = curr_data.get(df_name, "N/A")
             if curr_dh == "N/A":
-                errors.append(f"Required current input data file '{df}' missing on disk")
-            elif curr_dh != data_hashes.get(df):
-                errors.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, manifest {data_hashes.get(df)}")
+                errors.append(f"Required current input data file '{df_name}' missing on disk")
+            elif curr_dh != data_hashes.get(df_name):
+                errors.append(f"Current input data file '{df_name}' hash mismatch: disk {curr_dh}, manifest {data_hashes.get(df_name)}")
 
-    exp_id = manifest.get("experiment_id", "")
+    # 9b. Execution and Summary Provenance structure validation (when present)
+    exec_prov = manifest.get("execution_provenance")
+    if exec_prov is not None:
+        if not isinstance(exec_prov, dict):
+            errors.append("Manifest 'execution_provenance' must be a dictionary")
+        elif not exec_prov.get("results_sha256") or len(exec_prov.get("results_sha256", "")) != 64:
+            errors.append("Manifest 'execution_provenance' missing valid 64-hex 'results_sha256'")
+
+    summ_prov = manifest.get("summary_provenance")
+    if summ_prov is not None:
+        if not isinstance(summ_prov, dict):
+            errors.append("Manifest 'summary_provenance' must be a dictionary")
+        elif not summ_prov.get("summary_sha256") or len(summ_prov.get("summary_sha256", "")) != 64:
+            errors.append("Manifest 'summary_provenance' missing valid 64-hex 'summary_sha256'")
     if spec is None and exp_id:
         candidates = [
             os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),

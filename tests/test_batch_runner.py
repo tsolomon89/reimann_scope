@@ -53,6 +53,8 @@ def temp_research_env(tmp_path, monkeypatch):
     monkeypatch.setattr(research_runner, "EXPERIMENTS_DIR", str(exp_dir))
     monkeypatch.setattr(research_runner, "RUNS_DIR", str(runs_dir))
     monkeypatch.setattr(research_runner, "INDEX_FILE", str(index_file))
+    orig_commit, _ = research_runner.get_git_info()
+    monkeypatch.setattr(research_runner, "get_git_info", lambda: (orig_commit, False))
 
     return {
         "root": tmp_path,

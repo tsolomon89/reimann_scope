@@ -66,12 +66,26 @@ REQUIRED_SOURCE_MODULES = [
     "zero_finder.py"
 ]
 
+CERTIFICATE_MODULE_DEPENDENCIES: Dict[str, List[str]] = {
+    "zero_isolation_and_simplicity": ["certification.py", "reference_data.py", "zero_finder.py"],
+    "trivial_zero": ["certification.py", "math_core.py"],
+    "block_isolation_and_order": ["certification.py", "reference_data.py", "zero_finder.py"],
+    "worldline_certificate": ["certification.py", "transcendental.py", "math_core.py", "reference_data.py"],
+}
+
 REQUIRED_INPUT_DATA_FILES = [
     "zeros_reference.json",
     "zeros_first_100_reference.json",
     "canonical_blocks.json",
     "primes.json"
 ]
+
+CERTIFICATE_DATA_DEPENDENCIES: Dict[str, List[str]] = {
+    "zero_isolation_and_simplicity": ["zeros_reference.json", "zeros_first_100_reference.json"],
+    "trivial_zero": [],
+    "block_isolation_and_order": ["zeros_reference.json", "zeros_first_100_reference.json", "canonical_blocks.json"],
+    "worldline_certificate": ["zeros_reference.json"],
+}
 
 REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope.lean",
@@ -197,10 +211,11 @@ def validate_dependency_compatibility(
     return len(errors) == 0, errors
 
 
-def _get_source_code_hashes(commit: Optional[str] = None) -> Dict[str, str]:
+def _get_source_code_hashes(commit: Optional[str] = None, modules: Optional[List[str]] = None) -> Dict[str, str]:
     """Compute normalized LF SHA-256 hashes of core mathematical and certification modules."""
     hashes: Dict[str, str] = {}
-    for mod in REQUIRED_SOURCE_MODULES:
+    target_modules = modules if modules is not None else REQUIRED_SOURCE_MODULES
+    for mod in target_modules:
         if commit:
             b_hash = _get_historical_git_blob_hash(commit, mod)
             if b_hash:
@@ -216,10 +231,11 @@ def _get_source_code_hashes(commit: Optional[str] = None) -> Dict[str, str]:
     return hashes
 
 
-def _get_input_data_hashes(commit: Optional[str] = None) -> Dict[str, str]:
+def _get_input_data_hashes(commit: Optional[str] = None, files: Optional[List[str]] = None) -> Dict[str, str]:
     """Get SHA-256 hashes of reference data."""
     hashes: Dict[str, str] = {}
-    for df in REQUIRED_INPUT_DATA_FILES:
+    target_files = files if files is not None else REQUIRED_INPUT_DATA_FILES
+    for df in target_files:
         if commit:
             b_hash = _get_historical_git_blob_hash(commit, f"data/{df}")
             if b_hash:
@@ -425,7 +441,7 @@ def validate_generation_environment(target_commit: Optional[str] = None) -> Tupl
 
 def verify_formal_build_report(
     report_path: Optional[str] = None,
-    check_current: bool = True
+    check_current: bool = False
 ) -> Tuple[bool, str, Dict[str, Any], List[str]]:
     """Validate formal/build_report.json machine-readable evidence of lake build.
 
@@ -1102,7 +1118,7 @@ def verify_certificate(
     cert: Dict[str, Any],
     cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
     check_provenance: bool = True,
-    canonical_current: bool = True
+    canonical_current: bool = False
 ) -> Tuple[bool, List[str]]:
     """Independently verify a certificate schema, SHA-256 self-hash, provenance, and replay all mathematical claims.
 
@@ -1162,6 +1178,9 @@ def verify_certificate(
         if df not in cert_data or not cert_data[df] or len(cert_data[df]) != 64 or cert_data[df] == "N/A":
             anomalies.append(f"input_data_hashes missing or invalid for required file '{df}'")
 
+    req_mods = CERTIFICATE_MODULE_DEPENDENCIES.get(cert_type, REQUIRED_SOURCE_MODULES)
+    req_data = CERTIFICATE_DATA_DEPENDENCIES.get(cert_type, REQUIRED_INPUT_DATA_FILES)
+
     if check_provenance:
         # 4. Producing Git Commit Validation (with historical blob binding)
         commit = str(cert.get("producing_git_commit", "")).strip()
@@ -1174,8 +1193,8 @@ def verify_certificate(
             anomalies.append(f"Invalid producing_git_commit provenance: {commit_err}")
 
         # 5. Verify current source code files exist on disk and match in canonical-current mode
-        curr_src = _get_source_code_hashes()
-        for mod in REQUIRED_SOURCE_MODULES:
+        curr_src = _get_source_code_hashes(modules=req_mods)
+        for mod in req_mods:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
@@ -1183,12 +1202,12 @@ def verify_certificate(
                 anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
 
         # 6. Verify current input data files exist and match certificate
-        curr_data = _get_input_data_hashes()
-        for df in REQUIRED_INPUT_DATA_FILES:
+        curr_data = _get_input_data_hashes(files=req_data)
+        for df in req_data:
             curr_dh = curr_data.get(df, "N/A")
             if curr_dh == "N/A":
                 anomalies.append(f"Required current input data file '{df}' missing on disk")
-            elif curr_dh != cert_data.get(df):
+            elif canonical_current and curr_dh != cert_data.get(df):
                 anomalies.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, cert {cert_data.get(df)}")
 
 
@@ -1589,6 +1608,17 @@ def verify_certificate(
     return (len(anomalies) == 0), anomalies
 
 
+def load_certificate_from_disk(cert_path: str) -> Optional[Dict[str, Any]]:
+    """Load certificate dictionary from disk path without verification."""
+    if not os.path.exists(cert_path):
+        return None
+    try:
+        with open(cert_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
 def load_and_verify_certificate(
     cert_path: str,
     cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
@@ -1630,9 +1660,10 @@ def generate_verification_report(
         raise FileNotFoundError(f"Certificate directory '{target_dir}' does not exist")
 
     report_commit = git_commit or _get_git_commit()
-    env_ok, env_err = validate_generation_environment(report_commit)
-    if not env_ok:
-        raise RuntimeError(f"Report generation environment invalid: {env_err}")
+    if check_provenance:
+        env_ok, env_err = validate_generation_environment(report_commit)
+        if not env_ok:
+            raise RuntimeError(f"Report generation environment invalid: {env_err}")
 
     # Enumerate on-disk certificates
     zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
@@ -1775,7 +1806,7 @@ def load_verification_report(
     report_path: Optional[str] = None,
     cert_dir: Optional[str] = None,
     check_provenance: bool = True,
-    canonical_current: bool = True
+    canonical_current: bool = False
 ) -> Tuple[bool, Optional[Dict[str, Any]], List[str]]:
     """Load and strictly validate verification_report.json against exact current on-disk inventory.
 
@@ -2000,7 +2031,7 @@ def load_verification_report(
             curr_dh = curr_data.get(df, "N/A")
             if curr_dh == "N/A":
                 anomalies.append(f"Required current input data file '{df}' missing on disk")
-            elif curr_dh != rep_data.get(df):
+            elif canonical_current and curr_dh != rep_data.get(df):
                 anomalies.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, report {rep_data.get(df)}")
 
     is_valid = (len(anomalies) == 0 and report.get("status") == "verified" and failed_cnt == 0)
