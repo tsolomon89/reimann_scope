@@ -67,15 +67,16 @@ REQUIRED_SOURCE_MODULES = [
 ]
 
 CERTIFICATE_MODULE_DEPENDENCIES: Dict[str, List[str]] = {
-    "zero_isolation_and_simplicity": ["reference_data.py", "zero_finder.py"],
-    "trivial_zero_certificate": ["math_core.py"],
-    "trivial_zero": ["math_core.py"],
-    "complete_block_certificate": ["reference_data.py", "zero_finder.py"],
-    "block_isolation_and_order": ["reference_data.py", "zero_finder.py"],
-    "worldline_certificate": ["transcendental.py", "math_core.py", "reference_data.py"],
+    "zero_isolation_and_simplicity": ["certification.py", "reference_data.py", "zero_finder.py"],
+    "trivial_zero_certificate": ["certification.py", "math_core.py"],
+    "trivial_zero": ["certification.py", "math_core.py"],
+    "complete_block_certificate": ["certification.py", "reference_data.py", "zero_finder.py"],
+    "block_isolation_and_order": ["certification.py", "reference_data.py", "zero_finder.py"],
+    "worldline_certificate": ["certification.py", "transcendental.py", "math_core.py", "reference_data.py"],
 }
 
 CERTIFICATE_MATHEMATICAL_MODULES: List[str] = [
+    "certification.py",
     "math_core.py",
     "zero_finder.py",
     "transcendental.py",
@@ -594,7 +595,7 @@ def verify_formal_build_report(
                 elif blob_h != b_h:
                     errors.append(f"Builder source '{b_rel}' git blob hash ({blob_h}) != report hash ({b_h}) at commit '{prod_commit}'")
 
-            if check_current and b_rel == "scripts/build_formal.py":
+            if check_current:
                 b_full = os.path.join(REPO_ROOT, b_rel)
                 if not os.path.exists(b_full):
                     errors.append(f"Builder source file '{b_rel}' missing on disk")

@@ -3108,6 +3108,15 @@ def summarize_run(run_id: str, spec_path: Optional[str] = None) -> Dict[str, Any
         cur_src = certification._get_source_code_hashes(modules=summarizer_mods)
         summarizer_src_hashes = {m: cur_src.get(m, "N/A") for m in sorted(list(set(summarizer_mods)))}
 
+        mat_pkgs = handler.declared_dependencies.material_packages if handler else ["mpmath", "flint"]
+        new_manifest.setdefault("runtime", {})
+        new_manifest["runtime"].setdefault("packages", {})
+        for pkg in mat_pkgs:
+            try:
+                new_manifest["runtime"]["packages"][pkg] = get_package_version(pkg)
+            except Exception:
+                pass
+
         new_manifest["summary_provenance"] = {
             "summary_sha256": summary_sha,
             "readme_sha256": readme_sha,
@@ -3460,7 +3469,10 @@ def validate_manifest(
             rep_ver = rep_pkgs.get(pkg)
             if not rep_ver:
                 errors.append(f"Manifest runtime packages missing declared material package '{pkg}'")
-            elif str(rep_ver) != str(curr_ver) and str(rep_ver) != "True":
+            elif str(rep_ver) == "True" or rep_ver is True or str(rep_ver) == "true":
+                if canonical_current:
+                    errors.append(f"Material package '{pkg}' has legacy incomplete version (boolean True); exact version required in current mode")
+            elif str(rep_ver) != str(curr_ver):
                 errors.append(f"Material package '{pkg}' version mismatch: current {curr_ver}, manifest {rep_ver}")
 
         # Summary provenance check
@@ -3485,8 +3497,19 @@ def validate_manifest(
     if summ_prov is not None:
         if not isinstance(summ_prov, dict):
             errors.append("Manifest 'summary_provenance' must be a dictionary")
-        elif not summ_prov.get("summary_sha256") or len(summ_prov.get("summary_sha256", "")) != 64:
-            errors.append("Manifest 'summary_provenance' missing valid 64-hex 'summary_sha256'")
+        else:
+            if not summ_prov.get("summary_sha256") or len(summ_prov.get("summary_sha256", "")) != 64:
+                errors.append("Manifest 'summary_provenance' missing valid 64-hex 'summary_sha256'")
+            summ_commit = summ_prov.get("summary_git_commit")
+            summ_src = summ_prov.get("summarizer_source_hashes")
+            if summ_commit and isinstance(summ_src, dict):
+                for s_mod, s_h in summ_src.items():
+                    if s_h and s_h != "N/A":
+                        blob_h = certification._get_historical_git_blob_hash(summ_commit, s_mod)
+                        if blob_h is not None and blob_h != s_h:
+                            errors.append(
+                                f"summary_provenance summarizer source '{s_mod}' git blob hash ({blob_h}) != recorded summary hash ({s_h}) at commit '{summ_commit}'"
+                            )
 
     for w in manifest.get("warnings", []):
         if "Diagnostics generation failed" in str(w):

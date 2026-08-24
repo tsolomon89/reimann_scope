@@ -25,10 +25,12 @@ class HandlerDependencies:
 
     @property
     def execution_source_modules(self) -> List[str]:
-        """Return distinct source code modules genuinely consumed during numerical point execution."""
+        """Return distinct source code modules genuinely consumed during numerical point execution.
+        Includes both handler evaluator code (handler_modules) and mathematical libraries (math_modules).
+        """
         seen = set()
         out = []
-        for f in self.math_modules:
+        for f in self.handler_modules + self.math_modules:
             norm = f.replace("\\", "/")
             if norm not in seen:
                 seen.add(norm)
