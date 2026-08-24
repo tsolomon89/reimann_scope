@@ -100,8 +100,8 @@ def test_math_module_mutation_stales_execution():
     assert any("Current source module 'math_core.py' hash mismatch" in e for e in errors)
 
 
-def test_certificate_math_mutation_stales_certificates(tmp_path):
-    """Mutating certification.py must cause load_verification_report in current mode to fail."""
+def test_certificate_math_mutation_stales_certificates(tmp_path, monkeypatch):
+    """Mutating mathematical functions in certification.py must cause load_verification_report to fail."""
     rep_path = os.path.join(certification.REPO_ROOT, "data", "certificates", "verification_report.json")
     if not os.path.exists(rep_path):
         pytest.skip("verification_report.json not found")
@@ -109,6 +109,7 @@ def test_certificate_math_mutation_stales_certificates(tmp_path):
     with open(rep_path, "r", encoding="utf-8") as f:
         real_rep = json.load(f)
 
+    # 1. Mutate report's source_code_hashes
     stale_rep = copy.deepcopy(real_rep)
     stale_rep["source_code_hashes"]["certification.py"] = "0" * 64
 
@@ -118,7 +119,13 @@ def test_certificate_math_mutation_stales_certificates(tmp_path):
 
     is_val, rep, anomalies = certification.load_verification_report(tmp_file, canonical_current=True)
     assert not is_val
-    assert any("Current source module 'certification.py' hash mismatch" in a for a in anomalies)
+    assert any("certification.py" in a and "match" in a.lower() for a in anomalies)
+
+    # 2. Mutate active math hash in memory
+    monkeypatch.setattr(certification, "_get_module_math_hash", lambda mod, commit=None: "deadbeef" * 8 if not commit else "cafebeef" * 8)
+    is_val2, rep2, anomalies2 = certification.load_verification_report(rep_path, canonical_current=True)
+    assert not is_val2
+    assert any("Current source module 'certification.py' mathematical component hash mismatch" in a for a in anomalies2)
 
 
 def test_orchestration_change_stales_summary_only():

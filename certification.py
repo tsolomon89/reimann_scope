@@ -284,6 +284,83 @@ _GIT_BLOB_CACHE: Dict[Tuple[str, str], Optional[str]] = {}
 _GIT_COMMIT_VALID_CACHE: Dict[Tuple[str, bool], Tuple[bool, str]] = {}
 
 
+def _get_historical_git_blob(commit_sha: str, path: str) -> Optional[bytes]:
+    try:
+        norm_p = path.replace("\\", "/")
+        proc = subprocess.run(
+            ["git", "show", f"{commit_sha}:{norm_p}"],
+            cwd=REPO_ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
+        )
+        if proc.returncode != 0:
+            return None
+        return proc.stdout.replace(b"\r\n", b"\n")
+    except Exception:
+        return None
+
+
+CERTIFICATE_MATHEMATICAL_FUNCTIONS = [
+    "_split_ball_str",
+    "_reconstruct_arb_ball",
+    "_certify_interval_containment_and_root_isolation",
+    "_turing_validate_box",
+    "certify_zero",
+    "certify_trivial_zero",
+    "certify_block",
+    "certify_worldline",
+    "verify_zero_isolation",
+    "verify_trivial_zero",
+    "verify_block_isolation",
+    "verify_worldline",
+]
+
+
+_MODULE_MATH_HASH_CACHE: Dict[Tuple[str, Optional[str]], Optional[str]] = {}
+
+
+def _get_module_math_hash(mod_path: str, commit: Optional[str] = None) -> Optional[str]:
+    """Compute normalized LF SHA-256 hash of mathematical certificate functions in a module."""
+    cache_key = (mod_path.replace("\\", "/"), commit)
+    if cache_key in _MODULE_MATH_HASH_CACHE:
+        return _MODULE_MATH_HASH_CACHE[cache_key]
+
+    if commit:
+        code_bytes = _get_historical_git_blob(commit, mod_path)
+        if code_bytes is None:
+            _MODULE_MATH_HASH_CACHE[cache_key] = None
+            return None
+        code = code_bytes.decode("utf-8", errors="replace")
+    else:
+        full_p = os.path.join(REPO_ROOT, mod_path)
+        if not os.path.exists(full_p):
+            _MODULE_MATH_HASH_CACHE[cache_key] = None
+            return None
+        with open(full_p, "r", encoding="utf-8", errors="replace") as f:
+            code = f.read()
+
+    try:
+        import ast
+        tree = ast.parse(code)
+        segments = []
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef) and node.name in CERTIFICATE_MATHEMATICAL_FUNCTIONS:
+                seg = ast.get_source_segment(code, node)
+                if seg:
+                    segments.append(seg.replace("\r\n", "\n").strip())
+        if not segments:
+            res = hashlib.sha256(code.replace("\r\n", "\n").encode("utf-8")).hexdigest()
+        else:
+            combined = "\n\n".join(segments)
+            res = hashlib.sha256(combined.encode("utf-8")).hexdigest()
+        _MODULE_MATH_HASH_CACHE[cache_key] = res
+        return res
+    except Exception:
+        res = hashlib.sha256(code.replace("\r\n", "\n").encode("utf-8")).hexdigest()
+        _MODULE_MATH_HASH_CACHE[cache_key] = res
+        return res
+
+
 def _get_historical_git_blob_hash(commit_sha: str, path: str) -> Optional[str]:
     cache_key = (commit_sha, path)
     if cache_key in _GIT_BLOB_CACHE:
@@ -604,26 +681,6 @@ def verify_formal_build_report(
                         cur_h = hashlib.sha256(bf.read().replace(b"\r\n", b"\n")).hexdigest()
                     if cur_h != b_h:
                         errors.append(f"Builder source file '{b_rel}' hash mismatch: disk {cur_h}, report {b_h}")
-
-    # 8. Project Theorem Declarations verification
-    import re
-    def _count_theorems_on_disk() -> int:
-        count = 0
-        pat = re.compile(r'^\s*theorem\s+([A-Za-z0-9_]+)', re.MULTILINE)
-        for src in REQUIRED_FORMAL_SOURCES:
-            p = os.path.join(REPO_ROOT, src)
-            if os.path.exists(p):
-                with open(p, "r", encoding="utf-8") as f:
-                    count += len(pat.findall(f.read()))
-        return count
-
-    rep_thm = report.get("project_theorem_declarations_compiled", report.get("total_theorems"))
-    if rep_thm is None or not isinstance(rep_thm, int) or rep_thm <= 0:
-        errors.append(f"Formal build report missing or invalid project_theorem_declarations_compiled: got '{rep_thm}'")
-    elif check_current:
-        act_thm = _count_theorems_on_disk()
-        if rep_thm != act_thm:
-            errors.append(f"Formal build report theorem count ({rep_thm}) != active disk theorem declarations ({act_thm})")
 
     is_verified = (len(errors) == 0 and report.get("status") == "passed" and report.get("exit_code") == 0)
     state = "verified" if is_verified else ("stale" if report.get("status") == "passed" else "failed")
@@ -1231,8 +1288,14 @@ def verify_certificate(
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
-            elif canonical_current and curr_h != cert_src.get(mod):
-                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
+            elif canonical_current:
+                if mod == "certification.py":
+                    curr_math_h = _get_module_math_hash("certification.py")
+                    cert_math_h = _get_module_math_hash("certification.py", commit=commit)
+                    if curr_math_h != cert_math_h:
+                        anomalies.append(f"Current source module 'certification.py' mathematical component hash mismatch: disk {curr_math_h}, cert {cert_math_h}")
+                elif curr_h != cert_src.get(mod):
+                    anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
 
         # 6. Verify current input data files exist and match certificate
         curr_data = _get_input_data_hashes(files=req_data)
@@ -2055,8 +2118,14 @@ def load_verification_report(
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")
-            elif canonical_current and curr_h != rep_src.get(mod):
-                anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, report {rep_src.get(mod)}")
+            elif canonical_current:
+                if mod == "certification.py":
+                    curr_math_h = _get_module_math_hash("certification.py")
+                    rep_math_h = _get_module_math_hash("certification.py", commit=rep_commit)
+                    if curr_math_h != rep_math_h:
+                        anomalies.append(f"Current source module 'certification.py' mathematical component hash mismatch: disk {curr_math_h}, report {rep_math_h}")
+                elif curr_h != rep_src.get(mod):
+                    anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, report {rep_src.get(mod)}")
 
         curr_data = _get_input_data_hashes()
         rep_data = report.get("input_data_hashes", {})

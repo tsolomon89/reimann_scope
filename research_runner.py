@@ -3048,7 +3048,19 @@ def summarize_run(run_id: str, spec_path: Optional[str] = None) -> Dict[str, Any
             if os.path.exists(cand):
                 with open(cand, "r", encoding="utf-8") as f:
                     spec = yaml.safe_load(f)
+                spec_path = cand
                 break
+        if not spec:
+            for sf in glob.glob(os.path.join(EXPERIMENTS_DIR, "*.yaml")):
+                try:
+                    with open(sf, "r", encoding="utf-8") as f:
+                        s_data = yaml.safe_load(f)
+                        if isinstance(s_data, dict) and s_data.get("id") == exp_id:
+                            spec = s_data
+                            spec_path = sf
+                            break
+                except Exception:
+                    continue
     if not spec:
         raise FileNotFoundError(f"No experiment specification found for '{exp_id}'")
 
