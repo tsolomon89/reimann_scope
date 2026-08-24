@@ -248,8 +248,9 @@ class ExplicitFormulaGradeCovarianceHandler(ExperimentHandler):
         spec: Dict[str, Any],
         run_dir: str
     ) -> Optional[Dict[str, Any]]:
-        ref_zeros = reference_data.load_zeros_reference()[:10]
-        g_eq = math_core.verify_grade_covariance_global_basis(
+        ref_zeros = reference_data.load_reference_zeros()[:10]
+        g_eq = math_core.check_expanded_native_basis_equivalence(
+            j_list=[1, 2, 3, 4, 5, 6],
             k_list=[-2, -1, 0, 1, 2],
             zeros_subset=ref_zeros,
             dps=80
