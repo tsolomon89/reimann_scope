@@ -11,11 +11,11 @@
   "zero_count": 5,
   "all_zeros_simple": true,
   "constituent_zero_hashes": [
-    "3c7dce4b253315e3233e72205b443aaa6dc0c24c69425e007a7f2f5c276312e9",
-    "5c47223b103740eba4a5c142a7229bb45d011064cda71fcf6d89320d44385537",
-    "414d6a48b96db2ca96dba481b8ac14c865d6554c1eb495c78be5f6d04fb84ab8",
-    "89a4be44ed80190528aaca1f115cd04e4fcea457824464b02b4fe0a437f55a43",
-    "77bc1e2132e80acac44d6f691489ed2f98ef5ea062d4c6def248819164249e22"
+    "bf1383842bda19ef7c805afc4224d797a58f314ad05d69bfbb32bec4c63f1ab4",
+    "4aa54c01631ced8746ff2dab5444fc129b0f1d3cadebd8f83b48e1cbcbaf103f",
+    "b5b57e387c9f8ba5f179e7965c734aa002063e0f3bf007b1a6e9bb92ae15269f",
+    "10e5fa814d521a5bc769191fce0f463ad1dd17e4b672868e6c5f35aab1895e24",
+    "9d018d473439eed370d114c2be392991beedaaff9616bc41b2fba92d12a2cc70"
   ],
   "endpoint_bounds": {
     "t_min": "235.1088169223622532215900013441163834345333614833774800319668848633796525427704400946017209446938220",
@@ -32,7 +32,7 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "cf4566f7b20f5ae601b2fd6ee588dd920fb27607",
+  "producing_git_commit": "a8368d5d1a2b9b1801cd8cc60fea26beb53cb108",
   "source_code_hashes": {
     "certification.py": "bdb81a7c3e0f0a0ed18677e21adaa4e7eb5fb865e6f2a52a7a618f4e3b61db60",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
@@ -40,7 +40,7 @@
     "math_core.py": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "research_runner.py": "2f17114482ade37e168235db754e7c942bc57219a33d2bf237717cea5087eec1",
+    "research_runner.py": "d3ae01c4d4bf04295d2ccb1c8e2bacb29cbe44112def1cad34485d1eca4fbd2b",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -59,11 +59,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-24T13:57:18.505149+00:00",
+  "created_at": "2026-08-24T14:26:30.118341+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "cac913bdfbb1f1f829ddedfc5ca162adbe2c210f4ac5ac2eca2aead1b5a6d72e"
+  "certificate_hash": "9bc2ad6b8eeea43f0f1e3eb5e74ef67a3d4f048713e941b15114d8034856edeb"
 }
