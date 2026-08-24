@@ -2529,6 +2529,52 @@ def generate_radial_second_variation_diagnostics(spec: Dict[str, Any], results: 
     }
 
 
+_EVALUATOR_SOURCE_HASH_CACHE: Dict[Tuple[str, Optional[str]], Optional[str]] = {}
+
+
+def _get_evaluator_source_hash(mod_path: str, commit: Optional[str] = None) -> Optional[str]:
+    """Compute normalized LF SHA-256 hash of evaluate_point and execution logic in a handler module."""
+    norm_p = mod_path.replace("\\", "/")
+    cache_key = (norm_p, commit)
+    if cache_key in _EVALUATOR_SOURCE_HASH_CACHE:
+        return _EVALUATOR_SOURCE_HASH_CACHE[cache_key]
+
+    if commit:
+        code_bytes = certification._get_historical_git_blob(commit, norm_p)
+        if code_bytes is None:
+            _EVALUATOR_SOURCE_HASH_CACHE[cache_key] = None
+            return None
+        code = code_bytes.decode("utf-8", errors="replace")
+    else:
+        full_p = os.path.join(REPO_ROOT, norm_p)
+        if not os.path.exists(full_p):
+            _EVALUATOR_SOURCE_HASH_CACHE[cache_key] = None
+            return None
+        with open(full_p, "r", encoding="utf-8", errors="replace") as f:
+            code = f.read()
+
+    try:
+        import ast
+        tree = ast.parse(code)
+        segments = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in ("evaluate_point", "evaluate_experiment_point"):
+                seg = ast.get_source_segment(code, node)
+                if seg:
+                    segments.append(seg.replace("\r\n", "\n").strip())
+        if not segments:
+            res = hashlib.sha256(code.replace("\r\n", "\n").encode("utf-8")).hexdigest()
+        else:
+            combined = "\n\n".join(segments)
+            res = hashlib.sha256(combined.encode("utf-8")).hexdigest()
+        _EVALUATOR_SOURCE_HASH_CACHE[cache_key] = res
+        return res
+    except Exception:
+        res = hashlib.sha256(code.replace("\r\n", "\n").encode("utf-8")).hexdigest()
+        _EVALUATOR_SOURCE_HASH_CACHE[cache_key] = res
+        return res
+
+
 def update_index_file(run_entry: Dict[str, Any]):
     """Update research/index.json with the given canonical run entry in Schema v2 format atomically."""
     os.makedirs(RESEARCH_DIR, exist_ok=True)
@@ -3456,6 +3502,16 @@ def validate_manifest(
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 errors.append(f"Required current source module '{mod}' missing on disk")
+            elif mod == "certification.py":
+                curr_math_h = certification._get_module_math_hash("certification.py")
+                man_math_h = certification._get_module_math_hash("certification.py", commit=commit)
+                if curr_math_h != man_math_h:
+                    errors.append(f"Current source module 'certification.py' mathematical component hash mismatch: disk {curr_math_h}, manifest {man_math_h}")
+            elif mod.startswith("research/handlers/"):
+                curr_eval_h = _get_evaluator_source_hash(mod)
+                man_eval_h = _get_evaluator_source_hash(mod, commit=commit)
+                if curr_eval_h != man_eval_h:
+                    errors.append(f"Current source module '{mod}' evaluator hash mismatch: disk {curr_eval_h}, manifest {man_eval_h}")
             elif curr_h != src_hashes.get(mod):
                 errors.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, manifest {src_hashes.get(mod)}")
 
