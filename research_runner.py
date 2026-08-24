@@ -3508,10 +3508,13 @@ def validate_manifest(
                 if curr_math_h != man_math_h:
                     errors.append(f"Current source module 'certification.py' mathematical component hash mismatch: disk {curr_math_h}, manifest {man_math_h}")
             elif mod.startswith("research/handlers/"):
-                curr_eval_h = _get_evaluator_source_hash(mod)
-                man_eval_h = _get_evaluator_source_hash(mod, commit=commit)
-                if curr_eval_h != man_eval_h:
-                    errors.append(f"Current source module '{mod}' evaluator hash mismatch: disk {curr_eval_h}, manifest {man_eval_h}")
+                if commit:
+                    curr_eval_h = _get_evaluator_source_hash(mod)
+                    man_eval_h = _get_evaluator_source_hash(mod, commit=commit)
+                    if curr_eval_h != man_eval_h:
+                        errors.append(f"Current source module '{mod}' evaluator hash mismatch: disk {curr_eval_h}, manifest commit {man_eval_h}")
+                elif curr_h != src_hashes.get(mod):
+                    errors.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, manifest {src_hashes.get(mod)}")
             elif curr_h != src_hashes.get(mod):
                 errors.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, manifest {src_hashes.get(mod)}")
 

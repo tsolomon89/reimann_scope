@@ -67,7 +67,7 @@ def test_evaluator_mutation_stales_execution():
 
     ok, errors = research_runner.validate_manifest(manifest, canonical_current=True)
     assert not ok
-    assert any("Current source module 'research/handlers/cross_height.py' hash mismatch" in e for e in errors)
+    assert any("research/handlers/cross_height.py" in e and "mismatch" in e for e in errors)
 
 
 def test_math_module_mutation_stales_execution():
