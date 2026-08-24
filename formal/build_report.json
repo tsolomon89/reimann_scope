@@ -4,10 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "b4e031820abaa3dc0ee680984bf8d9b4e1c0b74e",
-  "timestamp": "2026-08-24T10:06:03.842945+00:00",
+  "producing_git_commit": "9a60a778f8b1c46e9f0e9997b141cf85822a7aa3",
+  "timestamp": "2026-08-24T18:13:15.826271+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
+  "project_theorem_declarations_compiled": 19,
+  "total_theorems": 19,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "41a323a1c086f162f960df25a3d2b6810e474cf67a0f496cc91ff57e336a9da2",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -24,10 +26,10 @@
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
-    "scripts/build_formal.py": "af22998ec1d0dd2308df8d1539e5a075ecb50f6986d2b48dd45233ee43c11272",
-    "certification.py": "4b241a32c20a2e7dc210d3aafe051dae0af983017c5263e4baa5582d5f16dbdf"
+    "scripts/build_formal.py": "9b21d71ecddf543c61899588cc19d317e39a152ff561dfbec5ad3a2aa03eef66",
+    "certification.py": "278e932013b4cb3628bcb746738b931b447504333f06ddd3b30dedd60331bcd5"
   },
   "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "61155b7c992d2817fc8dc626b8eea46aea9330705cdebeb9124f084f8c663e9e"
+  "report_hash": "4842c9dc8fd999c7c70393d9a8306bd852119cb7fe7272f4fff647bd52dde8ce"
 }
