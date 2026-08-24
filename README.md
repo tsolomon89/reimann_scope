@@ -362,3 +362,31 @@ The required transition is:
 \]
 
 If a simple invariant is discovered, stop broad numerical expansion until it is derived or killed.
+
+---
+
+## Authoritative Research Workflow
+
+All local validation, testing, and canonical regeneration workflows are driven by `scripts/workflow.py`:
+
+```bash
+# 1. Fast operational verification (Pytest unit/integration suite + spec schema validations)
+python scripts/workflow.py check-fast
+
+# 2. Slow numerical regression suite (arbitrary-precision Arb/mpmath sweeps)
+python scripts/workflow.py check-numerical
+
+# 3. Read-only artifact validation (mathematical certificates, formal theorems, canonical runs)
+python scripts/workflow.py validate-artifacts
+
+# 4. Plan canonical regeneration (inspect stale runs & certificates relative to current implementation)
+python scripts/workflow.py plan-canonical
+
+# 5. Execute canonical regeneration (enforces clean git worktree)
+python scripts/workflow.py run-canonical
+```
+
+### Modular Experiment Handlers
+
+All experiment runners are organized under `research/handlers/` conforming to `ExperimentHandler` (`research/handlers/base.py`). New mathematical campaigns (e.g. \((Q, \Xi^\flat, L_Q)\)) register new handlers via `@register_handler` without modifying the core research runner or historical run data.
+

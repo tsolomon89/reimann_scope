@@ -942,3 +942,58 @@ The suite comprises three canonical experiments evaluating the Riemann–Weil ex
 3. `explicit-formula-perturbation-rank-001`
    - **Epistemic Class**: `sensitivity_diagnostic`
    - **Scope**: Evaluates finite divisor defects \(\Delta \mathcal C_{K,j} = \langle\Delta\mathcal D, h_{K,j}\rangle\), exact validator rejection of unsymmetric or multiplicity-violating mutations, symmetry-complete radial quartet exact decomposition into height merging \(\Delta\mathcal C^{\mathrm{merge}}\) and pure radial \(\Delta\mathcal C^{\mathrm{radial}}(\delta)\), Jacobian SVD with threshold sweep across \([10^{-18}, 10^{-20}, 10^{-25}, 10^{-30}, 10^{-35}, 10^{-40}]\), rank stability classification `threshold_dependent`, and minimum-norm linearized compensation vectors with forward residuals. Consumes verified zero certificates for all perturbed cases.
+
+---
+
+# 34. Research Instrument Lifecycle and Modular Architecture
+
+The research-instrument architecture guarantees a strict recurring execution cycle:
+
+\[
+\text{mathematical formulation}
+\rightarrow
+\text{small implementation}
+\rightarrow
+\text{fast operational verification}
+\rightarrow
+\text{numerical regression}
+\rightarrow
+\text{canonical execution when required}
+\rightarrow
+\text{published evidence}.
+\]
+
+### 1. Authoritative Workflow Interface (`scripts/workflow.py`)
+
+All development, verification, and canonical publication workflows are standardized via `scripts/workflow.py`:
+
+- `python scripts/workflow.py check-fast`: Runs fast operational unit/integration tests and validates all experiment specification YAMLs (read-only).
+- `python scripts/workflow.py check-numerical`: Runs slow arbitrary-precision numerical regression suite (read-only).
+- `python scripts/workflow.py validate-artifacts`: Validates all mathematical certificates, formal Lean 4 build report, and canonical run bundles without modifying disk state.
+- `python scripts/workflow.py plan-canonical`: Inspects whether any certificates or canonical runs are stale relative to the workspace or git HEAD, reporting exact point counts and reasons (read-only).
+- `python scripts/workflow.py run-canonical`: Executes planned canonical regeneration, enforcing clean git worktree before publication.
+
+### 2. Modular Experiment-Handler Boundary (`research/handlers/`)
+
+All canonical experiments implement the `ExperimentHandler` interface (`research/handlers/base.py`):
+
+- **Declaration of Dependencies**: Declares fine-grained source modules, math engines, input data files, and consumed certificates via `declared_dependencies`.
+- **Decoupled Evaluation**: Implements `evaluate_point(inputs, dps, param_space, context)`.
+- **Isolated Summary Computation**: Implements `compute_summary(results, spec, manifest, status)`.
+- **Diagnostic Generation**: Implements `generate_diagnostics(results, spec, run_dir)`.
+
+New experimental campaigns (e.g. \((Q, \Xi^\flat, L_Q)\)) register new handlers via `@register_handler` without modifying core orchestration or historical experiment code.
+
+### 3. Separation of Execution vs Summary Provenance
+
+To maintain byte-level reproducibility and distinguish raw numerical evaluation from digest formatting:
+
+- `execution_provenance`: Captures raw simulation output SHA-256 (`results.jsonl`), producing Git commit, dependency fingerprint, and source code hashes active during point evaluation.
+- `summary_provenance`: Captures summary SHA-256 (`summary.json`), digest SHA-256 (`README.md`), diagnostics SHA-256 (`diagnostics.json`), and the summarizer source hash (`research_runner.py`).
+- `research_runner.summarize_run` strictly asserts byte-for-byte SHA-256 invariance on `results.jsonl` before and after updating summary metadata.
+
+### 4. Transactional Atomic Swap & Rollback
+
+- Sweeps execute in isolated temporary working directories (`research/runs/.tmp_<exp_id>_<pid>`).
+- On successful completion and strict validator passage, the run directory is atomically swapped into `research/runs/<exp_id>`.
+- In the event of disk full, power failure, or index update exception, pre-run states are automatically restored byte-for-byte from transactional backup directories (`.bak_<exp_id>_<pid>`).
