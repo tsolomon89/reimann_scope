@@ -1536,11 +1536,14 @@ def test_radial_second_order_summary_metrics_structure():
     summary = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", mock_results, "complete")
     rad_summary = summary.get("radial_second_order_summary", {})
 
+    assert rad_summary.get("total_cases") == 16
     assert rad_summary.get("compensation_found_count") == 8
     assert rad_summary.get("compensation_not_found_count") == 8
     assert rad_summary.get("compensation_found_zero_indices") == ["10", "50"]
     assert rad_summary.get("compensation_not_found_zero_indices") == ["1", "100"]
+    assert rad_summary.get("epistemic_classification") == "finite_synthetic_sensitivity_diagnostic"
     assert rad_summary.get("nnls_compensation_status") == "heterogeneous_finite_compensation"
     assert "projection" in rad_summary.get("projection_trap_note", "").lower()
     assert summary["criterion"]["criterion_met"] is True
+
 

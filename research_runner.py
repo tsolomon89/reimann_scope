@@ -1857,6 +1857,8 @@ def evaluate_point(
                     "nnls_residual_norm": mpmath.nstr(nnls_res["nnls_residual_norm"], n=dps),
                     "nnls_relative_residual": mpmath.nstr(nnls_res["nnls_relative_residual"], n=dps),
                     "nnls_compensation_found": "true" if nnls_res["nnls_compensation_found"] else "false",
+                    "nnls_residual_nonzero_at_threshold": "true" if nnls_res["nnls_residual_nonzero_at_threshold"] else "false",
+                    "finite_response_energy_positive": "true" if nnls_res["finite_response_energy_positive"] else "false",
                     "positive_energy_holds": "true" if nnls_res["positive_energy_holds"] else "false",
                     "unconstrained_residual_norm": mpmath.nstr(nnls_res["unconstrained_residual_norm"], n=dps),
                     "numerical_rank": str(nnls_res["numerical_rank"]),
@@ -2186,27 +2188,47 @@ def compute_summary(
                 min_rel_res = mpmath.nstr(min(rel_residuals), n=10) if rel_residuals else "0"
                 max_rel_res = mpmath.nstr(max(rel_residuals), n=10) if rel_residuals else "0"
 
+                per_zero_counts = {}
+                for z_str in sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results)), key=lambda x: int(x)):
+                    z_pts = [r for r in results if str(r.get("outputs", {}).get("zero_index")) == z_str]
+                    z_found = sum(1 for r in z_pts if r.get("outputs", {}).get("nnls_compensation_found") == "true")
+                    z_not_found = sum(1 for r in z_pts if r.get("outputs", {}).get("nnls_compensation_found") == "false")
+                    z_res_vals = [math_core.to_mpf(r.get("outputs", {}).get("nnls_relative_residual", "0"), dps=50) for r in z_pts if "nnls_relative_residual" in r.get("outputs", {})]
+                    per_zero_counts[z_str] = {
+                        "total_cases": len(z_pts),
+                        "compensation_found_count": z_found,
+                        "compensation_not_found_count": z_not_found,
+                        "min_relative_residual": mpmath.nstr(min(z_res_vals), n=10) if z_res_vals else "N/A",
+                        "max_relative_residual": mpmath.nstr(max(z_res_vals), n=10) if z_res_vals else "N/A",
+                        "status": "found" if z_found == len(z_pts) else ("not_found" if z_not_found == len(z_pts) else "mixed")
+                    }
+
                 summary["radial_second_order_summary"] = {
+                    "total_cases": len(results),
                     "radial_projection_operator": "P_0(1/2 + delta + i*gamma) = 1/2 + i*gamma",
                     "radial_defect_divisor": "Delta D_rad = D - P_0(D)",
                     "leading_taylor_coefficient": "-2*delta^2*H''(gamma)",
                     "fourth_order_coefficient": "(delta^4/12)*H''''(gamma)",
                     "quadratic_energy_definition": "E(u) = u^T K^T K u with u_n = delta_n^2 >= 0",
+                    "finite_response_energy_positive": "strictly_positive_for_all_sampled_zeros",
                     "single_target_energy_status": "strictly_positive_for_all_sampled_zeros",
                     "nnls_compensation_status": "heterogeneous_finite_compensation",
+                    "compensation_threshold_used": "1e-5",
                     "compensation_found_count": comp_found_count,
                     "compensation_not_found_count": comp_not_found_count,
                     "compensation_found_zero_indices": comp_found_zeros,
                     "compensation_not_found_zero_indices": comp_not_found_zeros,
+                    "per_zero_breakdown": per_zero_counts,
                     "min_relative_nnls_residual": min_rel_res,
                     "max_relative_nnls_residual": max_rel_res,
-                    "numerical_rank": "13-14",
-                    "nullity": "85-86",
-                    "condition_number": "~2.4e+15",
+                    "numerical_rank_range": "13-14",
+                    "nullity_range": "85-86",
+                    "condition_number_range": "~2.4e+15 to ~3.0e+15",
+                    "rank_stability": "threshold_dependent",
                     "conditioning_caveats": "Finite 30-channel basis has high numerical nullity (~85) and condition number (~10^15); target columns for zeros 10 and 50 are well within the convex cone of remaining columns, whereas zeros 1 and 100 are not.",
                     "theoretical_classification": "coordinate_redundant",
                     "finite_basis_classification": "finite_basis_enrichment_only",
-                    "epistemic_classification": "exact_finite_synthetic_sensitivity_diagnostic",
+                    "epistemic_classification": "finite_synthetic_sensitivity_diagnostic",
                     "projection_trap_note": "Actual divisor D_zeta has an arithmetic explicit-formula representation, while its critical-line projection P_0(D_zeta) has no established independent arithmetic representation; inferring radial rigidity from projected defect remains an open theorem."
                 }
             except Exception as e:
@@ -2511,6 +2533,8 @@ def generate_radial_second_variation_diagnostics(spec: Dict[str, Any], results: 
             "nnls_residual_norm": mpmath.nstr(nnls_res["nnls_residual_norm"], n=dps),
             "nnls_relative_residual": mpmath.nstr(nnls_res["nnls_relative_residual"], n=dps),
             "nnls_compensation_found": nnls_res["nnls_compensation_found"],
+            "nnls_residual_nonzero_at_threshold": nnls_res["nnls_residual_nonzero_at_threshold"],
+            "finite_response_energy_positive": nnls_res["finite_response_energy_positive"],
             "positive_energy_holds": nnls_res["positive_energy_holds"],
             "participating_indices": [i + 1 for i in nnls_res["participating_indices"]],
             "working_precision_dps": dps

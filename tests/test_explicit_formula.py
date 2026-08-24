@@ -369,6 +369,101 @@ def test_radial_second_order_heterogeneous_nnls_and_positive_energy():
         assert res_100["nnls_relative_residual"] > mpmath.mpf('1e-5')
 
 
+def test_radial_second_order_summary_and_breakdown_derivation():
+    """Verify that compute_summary derives categorical NNLS metrics and per-zero breakdown directly from results."""
+    import yaml
+    import research_runner
+
+    with open("research/experiments/explicit_formula_radial_second_variation_001.yaml", "r", encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+
+    # Load canonical results
+    results_path = "research/runs/explicit-formula-radial-second-variation-001/results.jsonl"
+    with open(results_path, "r", encoding="utf-8") as f:
+        results = [json.loads(line) for line in f if line.strip()]
+
+    summary = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", results, "complete")
+    rad_sum = summary.get("radial_second_order_summary", {})
+
+    assert rad_sum.get("total_cases") == 16
+    assert rad_sum.get("compensation_found_count") == 8
+    assert rad_sum.get("compensation_not_found_count") == 8
+    assert rad_sum.get("compensation_found_zero_indices") == ["10", "50"]
+    assert rad_sum.get("compensation_not_found_zero_indices") == ["1", "100"]
+
+    per_zero = rad_sum.get("per_zero_breakdown", {})
+    assert "1" in per_zero and per_zero["1"]["compensation_found_count"] == 0 and per_zero["1"]["compensation_not_found_count"] == 4
+    assert "10" in per_zero and per_zero["10"]["compensation_found_count"] == 4 and per_zero["10"]["compensation_not_found_count"] == 0
+    assert "50" in per_zero and per_zero["50"]["compensation_found_count"] == 4 and per_zero["50"]["compensation_not_found_count"] == 0
+    assert "100" in per_zero and per_zero["100"]["compensation_found_count"] == 0 and per_zero["100"]["compensation_not_found_count"] == 4
+
+    assert rad_sum.get("compensation_threshold_used") == "1e-5"
+    assert rad_sum.get("epistemic_classification") == "finite_synthetic_sensitivity_diagnostic"
+    assert rad_sum.get("single_target_energy_status") == "strictly_positive_for_all_sampled_zeros"
+
+    # Criterion check: governed exclusively by relative_second_order_error <= 0.01
+    assert summary["criterion"]["metric"] == "relative_second_order_error"
+    assert summary["criterion"]["operator"] == "<="
+    assert float(summary["criterion"]["threshold"]) == 0.01
+    assert summary["criterion"]["criterion_met"] is True
+
+
+def test_native_baseline_summary_semantics_preserves_roles():
+    """Verify that compute_summary on native baseline preserves diagnostic roles and large cutoff change."""
+    import yaml
+    import research_runner
+
+    with open("research/experiments/explicit_formula_native_baseline_001.yaml", "r", encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+
+    results_path = "research/runs/explicit-formula-native-baseline-001/results.jsonl"
+    with open(results_path, "r", encoding="utf-8") as f:
+        results = [json.loads(line) for line in f if line.strip()]
+
+    summary = research_runner.compute_summary(spec, "explicit-formula-native-baseline-001", results, "complete")
+    rep_metrics = summary.get("report_metrics", {})
+
+    assert rep_metrics["residual"]["kind"] == "criterion_component"
+    assert rep_metrics["spectral_cutoff_change_100_to_200"]["kind"] == "diagnostic"
+    assert rep_metrics["spectral_cutoff_change_150_to_200"]["kind"] == "diagnostic"
+    assert rep_metrics["prime_cutoff_change_10k_to_50k"]["kind"] == "diagnostic"
+    assert rep_metrics["precision_change_70_to_110"]["kind"] == "diagnostic"
+
+    # Large 100->200 change (~5.48) is preserved in report_metrics
+    val_100_200 = float(rep_metrics["spectral_cutoff_change_100_to_200"]["max_abs"])
+    assert 5.0 < val_100_200 < 6.0
+
+
+def test_repository_consistency_against_misleading_assertions():
+    """Verify repository authority docs and code do not reintroduce misleading non-compensation or anti-circularity claims."""
+    import os
+    files_to_check = [
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md",
+        "DECISIONS.md",
+        "EXPERIMENT_PROTOCOL.md",
+        "app.py",
+        "math_core.py",
+        "research_runner.py",
+        ".agents/corpus_map/claim_register.md",
+        ".agents/corpus_map/contradiction_register.md",
+        ".agents/corpus_map/obligation_register.md"
+    ]
+    forbidden_phrases = [
+        "ANTI-CIRCULARITY VERIFIED",
+        "no_non_negative_compensation_possible",
+        "candidate_exact_non_circular",
+        "strictly obstructs compensation"
+    ]
+    for rel_path in files_to_check:
+        if os.path.exists(rel_path):
+            with open(rel_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            for phrase in forbidden_phrases:
+                assert phrase not in content, f"Forbidden phrase '{phrase}' found in {rel_path}"
+
+
 def test_native_baseline_metric_semantics():
     """Verify that only the residual is marked criterion_component in native baseline spec."""
     import yaml
@@ -397,5 +492,6 @@ def test_lean_formal_file_boundary():
     # Verify no ungrounded claim that RH or global non-compensation is proven in Lean
     assert "theorem riemann_hypothesis" not in content.lower()
     assert "rh_proved" not in content.lower()
+
 
 
