@@ -2,109 +2,8 @@
   "experiment_id": "explicit-formula-perturbation-rank-001",
   "diagnostics": [
     {
-      "point_id": 0,
-      "mode": "critical_height",
-      "case": "1",
-      "magnitude": "0.0001",
-      "numerical_rank": "13",
-      "nullity": "86",
-      "condition_number": "3.8737268e+13",
-      "compensation_found": "false",
-      "relative_compensation_residual": "0.14176104581331389746256200878576256214398445133000985766902157698355330335419008"
-    },
-    {
-      "point_id": 1,
-      "mode": "critical_height",
-      "case": "1",
-      "magnitude": "0.001",
-      "numerical_rank": "13",
-      "nullity": "86",
-      "condition_number": "3.8737268e+13",
-      "compensation_found": "false",
-      "relative_compensation_residual": "0.14176104581331389746256200878576256214398445133000985766902157698355330335419008"
-    },
-    {
-      "point_id": 2,
-      "mode": "critical_height",
-      "case": "1",
-      "magnitude": "0.01",
-      "numerical_rank": "13",
-      "nullity": "86",
-      "condition_number": "3.8737268e+13",
-      "compensation_found": "false",
-      "relative_compensation_residual": "0.14176104581331389746256200878576256214398445133000985766902157698355330335419008"
-    },
-    {
-      "point_id": 3,
-      "mode": "critical_height",
-      "case": "10",
-      "magnitude": "0.0001",
-      "numerical_rank": "14",
-      "nullity": "85",
-      "condition_number": "3.8737269e+13",
-      "compensation_found": "true",
-      "relative_compensation_residual": "4.1639848267368367377874931800227405213785078119373256392663953483606496360709845e-39"
-    },
-    {
-      "point_id": 4,
-      "mode": "critical_height",
-      "case": "10",
-      "magnitude": "0.001",
-      "numerical_rank": "14",
-      "nullity": "85",
-      "condition_number": "3.8737269e+13",
-      "compensation_found": "true",
-      "relative_compensation_residual": "4.1639848267368367377874931800227405213785078119373256392663953483606496360709845e-39"
-    },
-    {
-      "point_id": 5,
-      "mode": "critical_height",
-      "case": "10",
-      "magnitude": "0.01",
-      "numerical_rank": "14",
-      "nullity": "85",
-      "condition_number": "3.8737269e+13",
-      "compensation_found": "true",
-      "relative_compensation_residual": "4.1639848267368367377874931800227405213785078119373256392663953483606496360709845e-39"
-    },
-    {
-      "point_id": 6,
-      "mode": "critical_height",
-      "case": "50",
-      "magnitude": "0.0001",
-      "numerical_rank": "14",
-      "nullity": "85",
-      "condition_number": "3.8737076e+13",
-      "compensation_found": "true",
-      "relative_compensation_residual": "2.2436439983852633661467203695215062478594356957681708594765928559636592058573147e-40"
-    },
-    {
-      "point_id": 7,
-      "mode": "critical_height",
-      "case": "50",
-      "magnitude": "0.001",
-      "numerical_rank": "14",
-      "nullity": "85",
-      "condition_number": "3.8737076e+13",
-      "compensation_found": "true",
-      "relative_compensation_residual": "2.2436439983852633661467203695215062478594356957681708594765928559636592058573147e-40"
-    },
-    {
-      "point_id": 8,
-      "mode": "critical_height",
-      "case": "50",
-      "magnitude": "0.01",
-      "numerical_rank": "14",
-      "nullity": "85",
-      "condition_number": "3.8737076e+13",
-      "compensation_found": "true",
-      "relative_compensation_residual": "2.2436439983852633661467203695215062478594356957681708594765928559636592058573147e-40"
-    },
-    {
-      "point_id": 9,
-      "mode": "radial_quartet",
-      "case": "1",
-      "magnitude": "0.0001",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -112,10 +11,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 10,
-      "mode": "radial_quartet",
-      "case": "1",
-      "magnitude": "0.001",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -123,10 +20,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 11,
-      "mode": "radial_quartet",
-      "case": "1",
-      "magnitude": "0.01",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -134,10 +29,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 12,
-      "mode": "radial_quartet",
-      "case": "10",
-      "magnitude": "0.0001",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -145,10 +38,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 13,
-      "mode": "radial_quartet",
-      "case": "10",
-      "magnitude": "0.001",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -156,10 +47,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 14,
-      "mode": "radial_quartet",
-      "case": "10",
-      "magnitude": "0.01",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -167,10 +56,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 15,
-      "mode": "radial_quartet",
-      "case": "50",
-      "magnitude": "0.0001",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -178,10 +65,8 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 16,
-      "mode": "radial_quartet",
-      "case": "50",
-      "magnitude": "0.001",
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,
@@ -189,10 +74,89 @@
       "relative_compensation_residual": null
     },
     {
-      "point_id": 17,
-      "mode": "radial_quartet",
-      "case": "50",
-      "magnitude": "0.01",
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
+      "numerical_rank": null,
+      "nullity": null,
+      "condition_number": null,
+      "compensation_found": null,
+      "relative_compensation_residual": null
+    },
+    {
+      "target_gamma": null,
+      "perturbation_mode": null,
       "numerical_rank": null,
       "nullity": null,
       "condition_number": null,

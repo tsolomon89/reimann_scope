@@ -293,11 +293,11 @@
     "summary_sha256": "f707311b66dfd83baafdf9815196c52d410b3368f03772d653494ce5bb0bdaee",
     "readme_sha256": "b8a3874ff706ff0717b63620696e7df4cb6a99b959bc69abfe91fbe116d04e44",
     "diagnostics_sha256": null,
-    "summary_git_commit": "e88f743efdcbffe1859ddf50842d868311375fcc",
-    "summarized_at": "2026-08-24T19:29:59.012580+00:00",
+    "summary_git_commit": "1f0d98038c5482d83f363b7973422d1ed11de029",
+    "summarized_at": "2026-08-24T19:35:20.128220+00:00",
     "summarizer_source_hashes": {
-      "research/handlers/base.py": "5e57b063eaa90669b044605db1faa3ad967f461982f8cb8feb8bcf689f496e9f",
-      "research/handlers/worldlines.py": "9f0ac35515e02c0ce52ea5ea855becdeaaf80a82963656a44505eec00038631a",
+      "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
+      "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
       "research_runner.py": "b6835e84fa9a3ec830d2862599085eed72afd1fbb78f6ae6e2ca4e29a6bb91cc"
     }
   },
