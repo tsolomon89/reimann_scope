@@ -4,17 +4,17 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "9a60a778f8b1c46e9f0e9997b141cf85822a7aa3",
-  "timestamp": "2026-08-24T18:13:15.826271+00:00",
+  "producing_git_commit": "93ff4a2794cdba89a708de3b98b7e8805ea6dc22",
+  "timestamp": "2026-08-24T22:24:38.032957+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 19,
-  "total_theorems": 19,
+  "project_theorem_declarations_compiled": 25,
+  "total_theorems": 25,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "41a323a1c086f162f960df25a3d2b6810e474cf67a0f496cc91ff57e336a9da2",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
     "formal/RiemannScope/Grade.lean": "3dce81c95f33724812270729a307d074f6bfcf9c26345998cc5ed2360f1348fe",
-    "formal/RiemannScope/RadialDefect.lean": "4a4b1810641bfb26d906b350fc9cd827935275e3e1eb4a4fff52358062fbadef",
+    "formal/RiemannScope/RadialDefect.lean": "efa5a0a26dc27e876ee7fd1783bfe1f132e4d721526d6937420d2e99331f9e35",
     "formal/RiemannScope/TranscendentalContinuation.lean": "3d1482a1a5846c2383fac46a367e7068d7256619fba1996c7b405639e91c9e98",
     "formal/RiemannScope/ZeroWorldline.lean": "d87674c0ba57bd0899ff0b2bd39c0f9da5ff7e2e96a92dae5f16ad13725afcbf",
     "formal/RiemannScope/RadialLeaf.lean": "ffe4c48fa5365a562399cb824c51549086c523854d934fa012e4802a9bba0028",
@@ -27,9 +27,9 @@
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
     "scripts/build_formal.py": "9b21d71ecddf543c61899588cc19d317e39a152ff561dfbec5ad3a2aa03eef66",
-    "certification.py": "278e932013b4cb3628bcb746738b931b447504333f06ddd3b30dedd60331bcd5"
+    "certification.py": "eb22bac3e290adb9c8864dce043b65540413b3935019b532babc220c7be2dac0"
   },
   "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "4842c9dc8fd999c7c70393d9a8306bd852119cb7fe7272f4fff647bd52dde8ce"
+  "report_hash": "31f7da53b6a753b87cbadefdc44fcd07c829b753ab6d4bf122431a66cc9e84ca"
 }

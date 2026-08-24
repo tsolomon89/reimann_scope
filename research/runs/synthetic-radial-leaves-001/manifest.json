@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "synthetic_perturbation_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-24T15:07:09.149338+00:00",
-  "completed_at": "2026-08-24T15:07:09.805281+00:00",
+  "started_at": "2026-08-24T22:44:05.364371+00:00",
+  "completed_at": "2026-08-24T22:44:06.146878+00:00",
   "status": "complete",
-  "git_commit": "862f5e877282796b7c6cb41a35b6f73630f8c204",
-  "producing_git_commit": "862f5e877282796b7c6cb41a35b6f73630f8c204",
+  "git_commit": "93ff4a2794cdba89a708de3b98b7e8805ea6dc22",
+  "producing_git_commit": "93ff4a2794cdba89a708de3b98b7e8805ea6dc22",
   "git_dirty": false,
   "experiment_spec_sha256": "b3a6e6fbbade2a41d5b1f529637bc8b8d14919c64a5d7e9a96d0565ee6b85596",
   "precision": {
@@ -52,7 +52,8 @@
     "platform": "win32",
     "packages": {
       "mpmath": "1.3.0",
-      "flint": "0.6.0"
+      "flint": "0.6.0",
+      "python_flint": "0.6.0"
     }
   },
   "dependency_fingerprint": {
@@ -66,13 +67,13 @@
     "algorithm_version": "2.0.0"
   },
   "source_code_hashes": {
-    "certification.py": "5a42f45330a409d009d883f931b2181b28d3d630c9320d28f0a4aee56da4cb52",
+    "certification.py": "eb22bac3e290adb9c8864dce043b65540413b3935019b532babc220c7be2dac0",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b",
+    "math_core.py": "d80e5f4d3e08dff9d1f036b2efc165255d293f4c62e4170fe49451fd4f9e063b",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "research/handlers/base.py": "4743214861fb40ba6e9a7ce1a51b59a86fe959a7683960bc4862884af4da4bc0",
+    "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
-    "research_runner.py": "d3ae01c4d4bf04295d2ccb1c8e2bacb29cbe44112def1cad34485d1eca4fbd2b",
+    "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
@@ -86,7 +87,7 @@
   "code_modules": [
     {
       "path": "certification.py",
-      "sha256": "5a42f45330a409d009d883f931b2181b28d3d630c9320d28f0a4aee56da4cb52"
+      "sha256": "eb22bac3e290adb9c8864dce043b65540413b3935019b532babc220c7be2dac0"
     },
     {
       "path": "converter.py",
@@ -94,7 +95,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b"
+      "sha256": "d80e5f4d3e08dff9d1f036b2efc165255d293f4c62e4170fe49451fd4f9e063b"
     },
     {
       "path": "reference_data.py",
@@ -102,7 +103,7 @@
     },
     {
       "path": "research/handlers/base.py",
-      "sha256": "4743214861fb40ba6e9a7ce1a51b59a86fe959a7683960bc4862884af4da4bc0"
+      "sha256": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30"
     },
     {
       "path": "research/handlers/worldlines.py",
@@ -110,7 +111,7 @@
     },
     {
       "path": "research_runner.py",
-      "sha256": "d3ae01c4d4bf04295d2ccb1c8e2bacb29cbe44112def1cad34485d1eca4fbd2b"
+      "sha256": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9"
     },
     {
       "path": "transcendental.py",
@@ -144,56 +145,56 @@
     }
   ],
   "consumed_certificates": [
-    "02e40717114607959d6778515611e1ef406f74539ccbc0a7cc1219e032533661",
-    "039b761e6341ef33ec95ddbece8683b329840e86624cd0376d9e3f79e34a2ad7",
-    "03e9b3f383414d10d284e5f9a5a3c8064a88c476d02176bf3f4793a17296926c",
-    "04f939b44163299abe73bdab2027a5f2d137e870631ad6d54ef831fcbaef635e",
-    "0a4f156c262d15eb17f848549323cec38a4e8657a2bfa6f8beb08426e8c48352",
-    "0b081534d09b403eea6a7331186468170cb08e6d48073c7455e55f7f6432b848",
-    "15e70991eb0cb80dd449589f0180140a810a3a4886ef14ada55e00332c0764a0",
-    "1e5101f9917daa4e8e1dd6dd408ee72153623291b0740228d88ebda20ab6bd81",
-    "2e3cafcdce07995864a666c738a99ac77122ab0f5c0af2638955578b94b6bfda",
-    "307c0340a183d91ebabaf1ddf94a9e07e0908b26fc95c9eab1346c08dd87b17d",
-    "310ee26e7ad15fcdeda745ac6d0f31008e86150fcde6afca4c1bb3bfcfa6863c",
-    "335cafa1e420191804ed723c799090d180004c72870b5190fe8882c60d541c42",
-    "3e8c1206b4be623e7379d01af6812cd6964970362cf0caa4f2121ad95bdfab91",
-    "3ff659c1d169c97bafaed5eb55c302bd036c89be0242fabb2e397b2573e606e2",
-    "3fff0a8913c760a48864237637ff2d27cfcf1db35bd4d6f72ca019b50868f8ec",
-    "48cb901a8de2d0136389178c28a85f847ecd11eb071fb748dcbaa06eeddd8059",
-    "4e26d752436874f577ecb99108cf591fd5ec2770f6405d1d7db8d6ab17038732",
-    "5360c8a385dadd7f6ebed7f41fb67722fb24428b1be44edb101926dfb3f88662",
-    "574fb05764867ad1d98a4807b5fa080a9eb7e777ececaf4e53e7f524d3abedf0",
-    "577b71cc8ced1d827ecdea0d5db084c63d0804e290fad026ba1be74f79702e49",
-    "5d7faeaf50f3b8273fcefee31b1e63a8a1c81e9101a3acbdefd052065afed77e",
-    "640b1edd81fbed8d227d079230c907c7c702ec02ea90134d4194a5cac772c584",
-    "69c42e5328fe693d4a1d90ba823cdea7d3f4d2af31ff344031b1d2250c8a8ad0",
-    "6bd0ca5ecf59d2474bf38dcaa8e7ff851f8a6bd7bc1938ab9edb8e02168db115",
-    "7967dd7fd7b91474da283f21e06e3edc6337b0b2de3854bc6c3e600d567e7c37",
-    "80ad441967dbb272c46b0f2a6ac3c773cc2d77ef78264d8b7209505e907dc001",
-    "8fc845eb84ee49fd12344019b5dcaaee40310ae9eef1de90c93797ef27c0b885",
-    "949d6c23420099e04a1bd308cb798e51ef169da76ff517600290be3b16cd5de1",
-    "9614e3c5c5e7a859b1e45364134b536ff2f7e44da5850c73cc10f6cde3a63d53",
-    "9877b10abccfb56674c2afa62793f7c9dc18caa517392daef8e73a1af8b78a3b",
-    "9df1b964399738af4f583b994753677a8cef80c0d521ccc94c0edd33fcaa44e8",
-    "9df29b9c1b311f59b7d381a065e8c2c5e93889270179492e33c6b8353aca4555",
-    "a097d20993f6dffcb516a10db8f2bd8fb8b8d6168a5429ab8b5c2a01a35cea76",
-    "a0d638b2ece48a7654ab32ce9f35bd4fc06570804a755cff7ef638f0bd0f417f",
-    "ace5bb55a417bf5bfaaf6f3030e5499524b3257ba5876ac8a4049b59017be0db",
-    "ae8a63512afc16de5896f4b87c6d0a0e0a47d2dcbbe8230a4e41beb7d5d8704a",
-    "b11c4d471735ecd80fd66c54834da68fac2106f0cb9d6794db7834de50c676b4",
-    "b7414c04eaf73021503fbb3f4d6db9ab29b5469c8a0b760e9069a0f5726f90f4",
-    "b83d71db1eb8061404c704451ec0f91f68fbfc4f0e21376baba17766cd9a5228",
-    "bb0c114a5626b0b9ba1d8185b169aa791f9493d41e9d540d301b54d853096475",
-    "bc0e8a2c09ee96a9351e89ae2273d500d2061d4f6f239e0a0dc463dbce0d18db",
-    "d1b306376e2a12f47fa37817b2ec200de67a300a88ea1962ad7f0e1f5397a264",
-    "ef0ae059536428b5c8622bd078016ccb679013a2fc5d80157698a5945dfa0c5d",
-    "f5dd464e92924ccc7aa4b9c65d97a7e3376e8119c237b4fd1b2abf563031c6d7",
-    "f9f05efa3e7d8d0f57babbf8d8af00ee4f5687c3ae30f9f488f69a868f728fff"
+    "04ab86b7baf8324a4b81a58784251da6343e1448fd42f18306539fa6d9dfdef3",
+    "115662c4dfc46a66451ae49b7cb7ce086c24728f7f37ae3a2c09a78a74aeaae0",
+    "11b392a3a0aadc6e517f99e2225bebd30127394babaf2d87e0e60381ad3d01aa",
+    "1580427fa81bae56eaf258ae6ffadfd77707a14080da460460817a14ef276815",
+    "2693bc53194f4383276938c8e323346c3772289f1ddcb0f6fc7a2970bd42268e",
+    "32478eeb5c0d6261d3585fff42b750023f2e3bc5c7dd921bce82484f1259d827",
+    "38b249c5c372f7c7e55a04cf61a2a53e87014aeb657a55ca974516b50e68644b",
+    "413149bb2c58bb172a58e4c51fd78f7bbade9e80eb0975b0735484c643cf42cd",
+    "449ace09bc029514438365922db4c46db04c9e153de5c50e9c409107eadc9092",
+    "4836ef0174c449b51637a4a1fd21f3454340ee55aaa904702d3427146ea5d67b",
+    "51187966547d25e4ca19403463eb4900ec40771903f3916b7383783854d91ec6",
+    "54092040aebced8564ebac2a36ccccb98224a07dc72fc5b8059ef2bcaa0271f5",
+    "5839cdbd0032210e749d80654c9451423e1d5de836a6cf8556f3ff85396cd7a4",
+    "58f092a6bcb4fc23f9302eb8250cce8b7a0d5fff5ff2588ccbb02a40d854a40f",
+    "594b8e7e86f9b637456b7b866f93b8aa5ffce8f1fe50c7bbf18d96392d110def",
+    "5f9aeb3947ed2c0d5f250638967f0ae1d6fd4d24eb07d2044ff9be671be876a7",
+    "698b470aaee0ed400cdf5938626e56d72bbc7a74dd2dacaff83ef2cd8c260312",
+    "75f3212a3355a958de44447672301c08bbc1a324de04a6f0ae85d158643d92db",
+    "8cb9b1abe66445eca0f21139979e9b73e3b1436bb0d22c0a73c17cbe18af6b8a",
+    "967baf788308c30de08d50ca562e6f0734212be9f46a3449b53b578440f2c5e2",
+    "98c3dfcaf22d003838095fe3f06cbfdf373162137c043abada55981022d0d201",
+    "992dea80cb07f41c99e9aff787ebe2f63bd7142676775afa9cde0ba3c38b8259",
+    "9ba7a47501d934afb2b667397097eb87d13dc077d5a63156c75520ec575be4a1",
+    "9c83dd21fb03f5a95d7943faf34cbb31d39673fcaa718856d91c3f4273230576",
+    "9d31004de0e1e2ab1b840665fa6abbb0d71272389b3d6bf683d5a18b86eacccd",
+    "a03fd8eda44a0d9cc66c5ba4ea7b292c5376fdf8f070d0c06ff6d30ff0ec0faf",
+    "a28f36d98ec68419917eafea24c1eb968ed4b18197738f83ea19648ccd6d20c3",
+    "a5979b3d48e636ca7da05d36ecd298f229b4e7727fe9fbc0eed02ccd50206b57",
+    "ab6587bf360c91ee30b647fc07fa54cba4819121106cb77f198674b7973b5177",
+    "abb240913bf4e8cceabe1d9d2505ba4380fc9d58e63c7163e7d539091ccbbc55",
+    "adac7302e704dc5ef3ec7464c1315990078fee327ddc317db46ad557caaeacfb",
+    "afa6803dee781ad0a366ed98398c7410ecbaa723e015ff50c710a14232e9f7cc",
+    "b2974d58cf768a79d6d775624e6f0c83138b6406a46cd1bd13ca5c51d09aaba5",
+    "b3487da28bbf7e0028950d12ad6f6679eabd0aae06d85e42646d86fb0ded3a64",
+    "bd34533fdaa98abdb7c9194137c214fdc440feda4d3f465d3676989dd4f805cd",
+    "c59a6a67c37bd64d1e1f28faab7924d2637d837141a9367875325b10279c0376",
+    "c5ed6c1e53ca6ff5c478c273383843361b021cc8e32e1dc3c1db937d8509bb16",
+    "ca343b4bd49f8e11e595033069b8735ea3b90fdbd7e0ce24e2f419f920a1216f",
+    "cb8986d8bcf18830d419994cdcb6ec7bd83af0b441751d9cad45d14083935711",
+    "dea974aebf59838d4e4cf7f208d0f61f8dadc3cde391da81cf7564ec01bdc666",
+    "e22365ed5ac28d24eb61dd2631891eb2a0b9b1d2589c83690d86aa0e1d3d30a2",
+    "e43730998c8ca280f3ca2f34648c66768fff07dc2afaf2b6930550ef0b6ce180",
+    "f02a878d60880666e1911a53a8221a18ca46423b8f11c3df59113a75ddd26926",
+    "f17d529a543aaa275bf8cdb2b8d247337f60285b3e76fd5f3fc14f02f2416eff",
+    "ffbaba5143e631afad2919e35c717f50b6bc7dd57433f0f229a78b5c9979f1b8"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "835698eaeb28549cf3cc006f121194c8eaef2a98ac4351c729c9487471d05551"
+      "sha256": "5b711e5ad238a565c906562142b6ae377d97e44a253b5752d4091fb65472293e"
     },
     "summary_json": {
       "path": "summary.json",
@@ -201,23 +202,23 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "a6fdd225f8c7f009e90b9faacadf8449ddcd3e3976cfb8bea5f90ad677747b66"
+      "sha256": "97a6c4ceb4dfeb19ce63258e12927c1b1935a9b45148672abb78f08dcb02b016"
     }
   },
   "execution_provenance": {
-    "results_sha256": "835698eaeb28549cf3cc006f121194c8eaef2a98ac4351c729c9487471d05551",
-    "producing_git_commit": "862f5e877282796b7c6cb41a35b6f73630f8c204",
+    "results_sha256": "5b711e5ad238a565c906562142b6ae377d97e44a253b5752d4091fb65472293e",
+    "producing_git_commit": "93ff4a2794cdba89a708de3b98b7e8805ea6dc22",
     "git_dirty": false,
-    "started_at": "2026-08-24T15:07:09.149338+00:00",
-    "completed_at": "2026-08-24T15:07:09.805281+00:00",
+    "started_at": "2026-08-24T22:44:05.364371+00:00",
+    "completed_at": "2026-08-24T22:44:06.146878+00:00",
     "source_code_hashes": {
-      "certification.py": "5a42f45330a409d009d883f931b2181b28d3d630c9320d28f0a4aee56da4cb52",
+      "certification.py": "eb22bac3e290adb9c8864dce043b65540413b3935019b532babc220c7be2dac0",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b",
+      "math_core.py": "d80e5f4d3e08dff9d1f036b2efc165255d293f4c62e4170fe49451fd4f9e063b",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-      "research/handlers/base.py": "4743214861fb40ba6e9a7ce1a51b59a86fe959a7683960bc4862884af4da4bc0",
+      "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
-      "research_runner.py": "d3ae01c4d4bf04295d2ccb1c8e2bacb29cbe44112def1cad34485d1eca4fbd2b",
+      "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
       "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
       "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
       "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
@@ -238,10 +239,15 @@
       "verifier_version": "2.0.0",
       "algorithm_version": "2.0.0"
     },
+    "material_runtime": {
+      "mpmath": "1.3.0",
+      "flint": "0.6.0",
+      "python_flint": "0.6.0"
+    },
     "code_modules": [
       {
         "path": "certification.py",
-        "sha256": "5a42f45330a409d009d883f931b2181b28d3d630c9320d28f0a4aee56da4cb52"
+        "sha256": "eb22bac3e290adb9c8864dce043b65540413b3935019b532babc220c7be2dac0"
       },
       {
         "path": "converter.py",
@@ -249,7 +255,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b"
+        "sha256": "d80e5f4d3e08dff9d1f036b2efc165255d293f4c62e4170fe49451fd4f9e063b"
       },
       {
         "path": "reference_data.py",
@@ -257,7 +263,7 @@
       },
       {
         "path": "research/handlers/base.py",
-        "sha256": "4743214861fb40ba6e9a7ce1a51b59a86fe959a7683960bc4862884af4da4bc0"
+        "sha256": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30"
       },
       {
         "path": "research/handlers/worldlines.py",
@@ -265,7 +271,7 @@
       },
       {
         "path": "research_runner.py",
-        "sha256": "d3ae01c4d4bf04295d2ccb1c8e2bacb29cbe44112def1cad34485d1eca4fbd2b"
+        "sha256": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9"
       },
       {
         "path": "transcendental.py",
@@ -301,17 +307,14 @@
   },
   "summary_provenance": {
     "summary_sha256": "6745dc63770fb3c304be51b54afa57390aa8dab73336416dd33426bd5f51d27d",
-    "readme_sha256": "a6fdd225f8c7f009e90b9faacadf8449ddcd3e3976cfb8bea5f90ad677747b66",
+    "readme_sha256": "97a6c4ceb4dfeb19ce63258e12927c1b1935a9b45148672abb78f08dcb02b016",
     "diagnostics_sha256": null,
-    "summary_git_commit": "e8aa06fb35ba47ebae2bf005bed3cc81d72a6298",
-    "summarized_at": "2026-08-24T20:59:24.330649+00:00",
+    "summary_git_commit": "93ff4a2794cdba89a708de3b98b7e8805ea6dc22",
+    "summarized_at": "2026-08-24T22:44:06.146878+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
       "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9"
     }
-  },
-  "warnings": [],
-  "provenance_completeness": "complete",
-  "missing_material_versions": []
+  }
 }
