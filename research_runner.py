@@ -2179,10 +2179,16 @@ def compute_summary(
 
         elif spec.get("id") == "explicit-formula-radial-second-variation-001":
             try:
+                def _safe_zero_sort_key(s: str) -> int:
+                    try:
+                        return int(s)
+                    except Exception:
+                        return 999999
+
                 comp_found_count = sum(1 for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true")
                 comp_not_found_count = sum(1 for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false")
-                comp_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true")), key=lambda x: int(x))
-                comp_not_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false")), key=lambda x: int(x))
+                comp_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "true" and r.get("outputs", {}).get("zero_index") is not None)), key=_safe_zero_sort_key)
+                comp_not_found_zeros = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("nnls_compensation_found") == "false" and r.get("outputs", {}).get("zero_index") is not None)), key=_safe_zero_sort_key)
                 rel_residuals = [math_core.to_mpf(r.get("outputs", {}).get("nnls_relative_residual", "0"), dps=50) for r in results if "nnls_relative_residual" in r.get("outputs", {})]
                 min_rel_res = mpmath.nstr(min(rel_residuals), n=10) if rel_residuals else "0"
                 max_rel_res = mpmath.nstr(max(rel_residuals), n=10) if rel_residuals else "0"
@@ -2191,29 +2197,108 @@ def compute_summary(
                 nullities: List[int] = []
                 cond_nums: List[float] = []
                 stabilities: List[str] = []
+                anomalies: List[Dict[str, Any]] = []
 
-                for r in results:
+                for idx, r in enumerate(results):
+                    pid = r.get("point_id")
+                    if pid is None:
+                        pid = r.get("inputs", {}).get("point_id")
+                    if pid is None:
+                        pid = idx
+
                     out = r.get("outputs", {})
-                    if "numerical_rank" in out and out["numerical_rank"] is not None:
+                    if not isinstance(out, dict):
+                        out = {}
+
+                    # 1. numerical_rank
+                    if "numerical_rank" not in out or out["numerical_rank"] is None:
+                        anomalies.append({
+                            "point_id": pid,
+                            "field": "numerical_rank",
+                            "anomaly_type": "missing",
+                            "supplied_value": None
+                        })
+                    else:
                         try:
                             ranks.append(int(out["numerical_rank"]))
                         except Exception:
-                            pass
-                    if "nullity" in out and out["nullity"] is not None:
+                            anomalies.append({
+                                "point_id": pid,
+                                "field": "numerical_rank",
+                                "anomaly_type": "invalid",
+                                "supplied_value": str(out["numerical_rank"])
+                            })
+
+                    # 2. nullity
+                    if "nullity" not in out or out["nullity"] is None:
+                        anomalies.append({
+                            "point_id": pid,
+                            "field": "nullity",
+                            "anomaly_type": "missing",
+                            "supplied_value": None
+                        })
+                    else:
                         try:
                             nullities.append(int(out["nullity"]))
                         except Exception:
-                            pass
-                    if "condition_number" in out and out["condition_number"] is not None:
-                        try:
-                            cond_nums.append(float(out["condition_number"]))
-                        except Exception:
-                            pass
-                    if "rank_stability" in out and out["rank_stability"] is not None:
-                        stabilities.append(str(out["rank_stability"]))
+                            anomalies.append({
+                                "point_id": pid,
+                                "field": "nullity",
+                                "anomaly_type": "invalid",
+                                "supplied_value": str(out["nullity"])
+                            })
 
-                if not ranks or not nullities or not cond_nums:
-                    summary["warnings"].append("Missing or invalid numerical rank, nullity, or condition number in results.")
+                    # 3. condition_number
+                    if "condition_number" not in out or out["condition_number"] is None:
+                        anomalies.append({
+                            "point_id": pid,
+                            "field": "condition_number",
+                            "anomaly_type": "missing",
+                            "supplied_value": None
+                        })
+                    else:
+                        try:
+                            c_val = float(out["condition_number"])
+                            import math
+                            if math.isnan(c_val) or math.isinf(c_val):
+                                anomalies.append({
+                                    "point_id": pid,
+                                    "field": "condition_number",
+                                    "anomaly_type": "invalid",
+                                    "supplied_value": str(out["condition_number"])
+                                })
+                            else:
+                                cond_nums.append(c_val)
+                        except Exception:
+                            anomalies.append({
+                                "point_id": pid,
+                                "field": "condition_number",
+                                "anomaly_type": "invalid",
+                                "supplied_value": str(out["condition_number"])
+                            })
+
+                    # 4. rank_stability
+                    if "rank_stability" not in out or out["rank_stability"] is None:
+                        anomalies.append({
+                            "point_id": pid,
+                            "field": "rank_stability",
+                            "anomaly_type": "missing",
+                            "supplied_value": None
+                        })
+                    else:
+                        s_val = str(out["rank_stability"]).strip()
+                        if not s_val or s_val.lower() in ("none", "null", "nan", "invalid", "unknown"):
+                            anomalies.append({
+                                "point_id": pid,
+                                "field": "rank_stability",
+                                "anomaly_type": "invalid",
+                                "supplied_value": str(out["rank_stability"])
+                            })
+                        else:
+                            stabilities.append(s_val)
+
+                if anomalies:
+                    summary["warnings"].append(f"{len(anomalies)} missing or invalid metric anomaly records detected in radial summary input.")
 
                 min_rank = min(ranks) if ranks else None
                 max_rank = max(ranks) if ranks else None
@@ -2227,10 +2312,21 @@ def compute_summary(
                 max_cond = max(cond_nums) if cond_nums else None
                 cond_range_str = f"~{min_cond:.1e} to ~{max_cond:.1e}" if (min_cond is not None and max_cond is not None) else "N/A"
 
-                rank_stability_val = "threshold_dependent" if "threshold_dependent" in stabilities else (stabilities[0] if stabilities else "unknown")
+                distinct_stabilities = sorted(list(set(stabilities)))
+                if not distinct_stabilities:
+                    rank_stability_val = "unknown"
+                    summary["warnings"].append("No valid rank_stability labels found in results.")
+                    rank_stability_labels: List[str] = []
+                elif len(distinct_stabilities) == 1:
+                    rank_stability_val = distinct_stabilities[0]
+                    rank_stability_labels = [distinct_stabilities[0]]
+                else:
+                    rank_stability_val = "mixed"
+                    rank_stability_labels = distinct_stabilities
 
                 per_zero_counts = {}
-                for z_str in sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results)), key=lambda x: int(x)):
+                valid_zero_indices = sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results if r.get("outputs", {}).get("zero_index") is not None)), key=_safe_zero_sort_key)
+                for z_str in valid_zero_indices:
                     z_pts = [r for r in results if str(r.get("outputs", {}).get("zero_index")) == z_str]
                     z_found = sum(1 for r in z_pts if r.get("outputs", {}).get("nnls_compensation_found") == "true")
                     z_not_found = sum(1 for r in z_pts if r.get("outputs", {}).get("nnls_compensation_found") == "false")
@@ -2272,6 +2368,10 @@ def compute_summary(
                     "max_condition_number": f"{max_cond:.7e}" if max_cond is not None else None,
                     "condition_number_range": cond_range_str,
                     "rank_stability": rank_stability_val,
+                    "rank_stability_labels": rank_stability_labels,
+                    "input_complete": len(anomalies) == 0,
+                    "input_anomalies": anomalies,
+                    "input_anomaly_count": len(anomalies),
                     "conditioning_caveats": f"Finite 30-channel basis has high numerical nullity ({nullity_range_str}) and condition number ({cond_range_str}); compensation was found in the declared basis at the 1e-5 threshold for interior zeros (zeros 10 and 50) and was not found at this threshold for peripheral zeros (zeros 1 and 100).",
                     "theoretical_classification": "coordinate_redundant",
                     "finite_basis_classification": "finite_basis_enrichment_only",

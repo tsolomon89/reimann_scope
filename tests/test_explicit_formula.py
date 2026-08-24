@@ -564,7 +564,225 @@ def test_radial_second_order_summary_derived_from_result_rows_with_fixtures():
     assert rad_sum["nullity_range"] == "75-80"
     assert rad_sum["condition_number_range"] == "~5.0e+10 to ~9.0e+12"
     assert rad_sum["rank_stability"] == "stable_fixed"
+    assert rad_sum["input_complete"] is True
+    assert rad_sum["input_anomaly_count"] == 0
+    assert rad_sum["input_anomalies"] == []
 
 
+def test_radial_summary_hardening_partial_invalid_and_missing_metrics():
+    """Verify anomaly detection and reporting for missing/invalid numerical rank, nullity, and condition numbers."""
+    import yaml
+    import research_runner
+
+    with open("research/experiments/explicit_formula_radial_second_variation_001.yaml", "r", encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+
+    # 1. Complete input producing no warnings
+    clean_results = [
+        {
+            "point_id": "pt_0",
+            "outputs": {
+                "zero_index": "1",
+                "nnls_compensation_found": "false",
+                "nnls_relative_residual": "0.99",
+                "numerical_rank": "20",
+                "nullity": "80",
+                "condition_number": "5.0e+10",
+                "rank_stability": "threshold_dependent"
+            }
+        },
+        {
+            "point_id": "pt_1",
+            "outputs": {
+                "zero_index": "10",
+                "nnls_compensation_found": "true",
+                "nnls_relative_residual": "1e-8",
+                "numerical_rank": "25",
+                "nullity": "75",
+                "condition_number": "9.0e+12",
+                "rank_stability": "threshold_dependent"
+            }
+        }
+    ]
+    sum_clean = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", clean_results, "complete")
+    rad_clean = sum_clean["radial_second_order_summary"]
+    assert rad_clean["input_complete"] is True
+    assert rad_clean["input_anomaly_count"] == 0
+    assert rad_clean["input_anomalies"] == []
+    assert not any("anomaly records detected" in w for w in sum_clean["warnings"])
+
+    # 2. One invalid rank among valid ranks
+    inv_rank_results = [
+        {
+            "point_id": "pt_0",
+            "outputs": {
+                "zero_index": "1",
+                "numerical_rank": "invalid_rank_str",
+                "nullity": "80",
+                "condition_number": "5.0e+10",
+                "rank_stability": "threshold_dependent"
+            }
+        },
+        {
+            "point_id": "pt_1",
+            "outputs": {
+                "zero_index": "10",
+                "numerical_rank": "25",
+                "nullity": "75",
+                "condition_number": "9.0e+12",
+                "rank_stability": "threshold_dependent"
+            }
+        }
+    ]
+    sum_inv_rank = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", inv_rank_results, "complete")
+    rad_inv_rank = sum_inv_rank["radial_second_order_summary"]
+    assert rad_inv_rank["input_complete"] is False
+    assert rad_inv_rank["input_anomaly_count"] == 1
+    assert rad_inv_rank["input_anomalies"][0] == {
+        "point_id": "pt_0",
+        "field": "numerical_rank",
+        "anomaly_type": "invalid",
+        "supplied_value": "invalid_rank_str"
+    }
+    assert rad_inv_rank["min_numerical_rank"] == 25
+    assert rad_inv_rank["max_numerical_rank"] == 25
+    assert rad_inv_rank["numerical_rank_range"] == "25"
+
+    # 3. One missing nullity among valid nullities
+    missing_nullity_results = [
+        {
+            "point_id": "pt_0",
+            "outputs": {
+                "zero_index": "1",
+                "numerical_rank": "20",
+                "condition_number": "5.0e+10",
+                "rank_stability": "threshold_dependent"
+            }
+        },
+        {
+            "point_id": "pt_1",
+            "outputs": {
+                "zero_index": "10",
+                "numerical_rank": "25",
+                "nullity": "75",
+                "condition_number": "9.0e+12",
+                "rank_stability": "threshold_dependent"
+            }
+        }
+    ]
+    sum_miss_null = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", missing_nullity_results, "complete")
+    rad_miss_null = sum_miss_null["radial_second_order_summary"]
+    assert rad_miss_null["input_complete"] is False
+    assert rad_miss_null["input_anomaly_count"] == 1
+    assert rad_miss_null["input_anomalies"][0] == {
+        "point_id": "pt_0",
+        "field": "nullity",
+        "anomaly_type": "missing",
+        "supplied_value": None
+    }
+    assert rad_miss_null["min_nullity"] == 75
+    assert rad_miss_null["max_nullity"] == 75
+    assert rad_miss_null["nullity_range"] == "75"
+
+    # 4. One invalid condition number among valid condition numbers
+    inv_cond_results = [
+        {
+            "point_id": "pt_0",
+            "outputs": {
+                "zero_index": "1",
+                "numerical_rank": "20",
+                "nullity": "80",
+                "condition_number": "nan",
+                "rank_stability": "threshold_dependent"
+            }
+        },
+        {
+            "point_id": "pt_1",
+            "outputs": {
+                "zero_index": "10",
+                "numerical_rank": "25",
+                "nullity": "75",
+                "condition_number": "9.0e+12",
+                "rank_stability": "threshold_dependent"
+            }
+        }
+    ]
+    sum_inv_cond = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", inv_cond_results, "complete")
+    rad_inv_cond = sum_inv_cond["radial_second_order_summary"]
+    assert rad_inv_cond["input_complete"] is False
+    assert rad_inv_cond["input_anomaly_count"] == 1
+    assert rad_inv_cond["input_anomalies"][0] == {
+        "point_id": "pt_0",
+        "field": "condition_number",
+        "anomaly_type": "invalid",
+        "supplied_value": "nan"
+    }
+    assert rad_inv_cond["min_condition_number"] == "9.0000000e+12"
+    assert rad_inv_cond["max_condition_number"] == "9.0000000e+12"
+
+    # 5. All values missing
+    all_missing_results = [
+        {
+            "point_id": "pt_0",
+            "outputs": {
+                "zero_index": "1"
+            }
+        }
+    ]
+    sum_all_miss = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", all_missing_results, "complete")
+    rad_all_miss = sum_all_miss["radial_second_order_summary"]
+    assert rad_all_miss["input_complete"] is False
+    assert rad_all_miss["input_anomaly_count"] == 4  # 4 fields missing
+    assert rad_all_miss["min_numerical_rank"] is None
+    assert rad_all_miss["numerical_rank_range"] == "N/A"
+    assert rad_all_miss["min_nullity"] is None
+    assert rad_all_miss["nullity_range"] == "N/A"
+    assert rad_all_miss["min_condition_number"] is None
+    assert rad_all_miss["condition_number_range"] == "N/A"
+    assert rad_all_miss["rank_stability"] == "unknown"
 
 
+def test_radial_summary_hardening_rank_stability_logic():
+    """Verify uniform, mixed, missing and invalid rank stability label processing."""
+    import yaml
+    import research_runner
+
+    with open("research/experiments/explicit_formula_radial_second_variation_001.yaml", "r", encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+
+    # 1. Uniform label
+    res_uniform = [
+        {"point_id": 0, "outputs": {"numerical_rank": 10, "nullity": 90, "condition_number": 1e5, "rank_stability": "stable_fixed"}},
+        {"point_id": 1, "outputs": {"numerical_rank": 10, "nullity": 90, "condition_number": 1e5, "rank_stability": "stable_fixed"}}
+    ]
+    sum_u = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", res_uniform, "complete")
+    assert sum_u["radial_second_order_summary"]["rank_stability"] == "stable_fixed"
+    assert sum_u["radial_second_order_summary"]["rank_stability_labels"] == ["stable_fixed"]
+
+    # 2. Mixed labels
+    res_mixed = [
+        {"point_id": 0, "outputs": {"numerical_rank": 10, "nullity": 90, "condition_number": 1e5, "rank_stability": "threshold_dependent"}},
+        {"point_id": 1, "outputs": {"numerical_rank": 12, "nullity": 88, "condition_number": 1e6, "rank_stability": "stable_fixed"}}
+    ]
+    sum_m = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", res_mixed, "complete")
+    assert sum_m["radial_second_order_summary"]["rank_stability"] == "mixed"
+    assert sum_m["radial_second_order_summary"]["rank_stability_labels"] == ["stable_fixed", "threshold_dependent"]
+
+    # 3. Missing labels
+    res_missing = [
+        {"point_id": 0, "outputs": {"numerical_rank": 10, "nullity": 90, "condition_number": 1e5}},
+        {"point_id": 1, "outputs": {"numerical_rank": 12, "nullity": 88, "condition_number": 1e6}}
+    ]
+    sum_miss = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", res_missing, "complete")
+    assert sum_miss["radial_second_order_summary"]["rank_stability"] == "unknown"
+    assert sum_miss["radial_second_order_summary"]["rank_stability_labels"] == []
+    assert any("No valid rank_stability labels found" in w for w in sum_miss["warnings"])
+
+    # 4. Invalid labels
+    res_invalid = [
+        {"point_id": 0, "outputs": {"numerical_rank": 10, "nullity": 90, "condition_number": 1e5, "rank_stability": "nan"}},
+        {"point_id": 1, "outputs": {"numerical_rank": 12, "nullity": 88, "condition_number": 1e6, "rank_stability": "   "}}
+    ]
+    sum_inv = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", res_invalid, "complete")
+    assert sum_inv["radial_second_order_summary"]["rank_stability"] == "unknown"
+    assert sum_inv["radial_second_order_summary"]["rank_stability_labels"] == []
