@@ -256,12 +256,12 @@
     "summary_sha256": "56b74e4d7fdbcde18366f62ac4c6e7f4a24801c501578c3328010119178a5d62",
     "readme_sha256": "902bf9882057096908cafb4262dcad57d9301ae748d9213373257a79b0d471c2",
     "diagnostics_sha256": null,
-    "summary_git_commit": "1f0d98038c5482d83f363b7973422d1ed11de029",
-    "summarized_at": "2026-08-24T19:34:55.997545+00:00",
+    "summary_git_commit": "64eb1e2a4ac4fbc15697a3383b4aad79f20ac0a0",
+    "summarized_at": "2026-08-24T19:36:56.047902+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/dilation.py": "9bc66805491f78604a75b9c1cdc902f0673f33e9a80e42d72bd300ff7150703b",
-      "research_runner.py": "b6835e84fa9a3ec830d2862599085eed72afd1fbb78f6ae6e2ca4e29a6bb91cc"
+      "research_runner.py": "f5bdbfa862028b5a1b9b6983f1c93f0f129b8b2a7747ca3d8a4bbe5a474c367a"
     }
   },
   "warnings": []
