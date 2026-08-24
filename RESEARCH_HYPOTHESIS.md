@@ -755,3 +755,64 @@ The research campaign evaluates the second-order radial response of the Riemannâ
 6. **Epistemic Classification**:
    - The construction is classified as an **exact finite synthetic sensitivity diagnostic**.
 
+---
+
+# 21. Radial-Defect Quotient, Relative Fredholm Formulation, and the Live Research Kernel
+
+The project focuses its live research kernel on the canonical Radial-Defect Quotient and its relative Fredholm formulation:
+
+1. **The Radial-Defect Quotient \(Q(z)\)**:
+   In centered coordinates \(z = s - 1/2 = \delta + it\), let \(\Xi(z) = \xi(1/2 + z)\). With baseline reference function \(\Xi^\flat(z) = \prod_{\gamma > 0} (1 + z^2/\gamma^2)^{m_\gamma}\), define:
+   \[
+   \boxed{
+   Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)}.
+   }
+   \]
+   On the real centered axis \(z = x \in \mathbb R\), each off-line quartet contributes a factor \(0 < q_{\delta,\gamma}(x) \le 1\) with unique minimum \(x_*^2 = \delta^2 + 3\gamma^2\) and minimum value \(q_{\min} = \frac{4}{(1+r)^2(4+r)}\) (\(r = \delta^2/\gamma^2\)).
+
+2. **The Limiting Invariant \(L_Q\)**:
+   \[
+   \boxed{
+   L_Q = \lim_{x\to\infty} Q(x) = \prod_{\text{off-line quartets}} \left(\frac{\gamma^2}{\gamma^2+\delta^2}\right)^{2n_\gamma}.
+   }
+   \]
+   Spectral equivalence: \(0 < L_Q \le 1\), and \(L_Q = 1 \iff \mathrm{RH}\).
+
+3. **Relative Fredholm Spectral Formulation**:
+   Define the positive diagonal trace-class operator \(\mathcal R e_\lambda = \frac{\delta_\lambda^2}{\gamma_\lambda^2} e_\lambda\) on \(\ell^2(\Lambda^+)\).
+   Then:
+   \[
+   \operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \frac{\delta_\lambda^2}{\gamma_\lambda^2} < \infty,
+   \qquad
+   \det_{\mathrm F}(I + \mathcal R) = L_Q^{-1},
+   \qquad
+   -\log L_Q = \operatorname{Tr}\log(I + \mathcal R).
+   \]
+   Positivity \(\mathcal R \ge 0\) yields \(\operatorname{Tr}\mathcal R = 0 \iff \mathcal R = 0 \iff \mathrm{RH}\).
+
+4. **Reflection-Paired Involution Kernel \(\kappa_1\)**:
+   For \(z = \delta + i\gamma\) and \(z^\# = -\bar z = -\delta + i\gamma\), the rational pairing kernel:
+   \[
+   \kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1
+   \]
+   satisfies:
+   \[
+   \boxed{
+   \kappa_1(\lambda, \lambda^\#) = \frac{\delta^2}{\gamma^2},
+   \qquad
+   \operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \kappa_1(\lambda, \lambda^\#).
+   }
+   \]
+
+5. **The Minimal Live Open Theorem**:
+   \[
+   \boxed{
+   \text{Can a divisor-independent arithmetic construction isolate the } (\lambda, \lambda^\#) \text{ pairs and evaluate } \kappa_1?
+   }
+   \]
+   - Functional equation and Schwarz reflection supply zero-set closure under \(\lambda \mapsto \lambda^\#\).
+   - Isolating the pairs without direct access to the zero divisor is the exact unresolved barrier.
+   - Transcendental continuation preserves radial class \(R_\tau \equiv \delta\), but ordinary grade dilation does not supply the rigidity law (\(Q, L_Q, \mathcal R\) are grade-invariant).
+   - The rigidity source must contain additional zeta-specific arithmetic content.
+
+

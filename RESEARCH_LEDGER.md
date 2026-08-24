@@ -355,5 +355,36 @@ If a simple law survives, broad computation should stop until that law is algebr
 | EF-015 | Orbit variables \(u_n = \delta_n^2 \ge 0\) are strictly non-negative for all real radial displacements \(\delta_n \in \mathbb R\). | **PROVED** | Fundamental algebraic property of squares in \(\mathbb R\). |
 | EF-016 | Finite non-negative least squares (NNLS) compensation \(K_{-n} u_{-n} \approx K_n u_n\) with \(u \ge 0\) yields heterogeneous diagnostic results in the 30-channel basis over 100 zeros (compensation found in 8 cases for zeros 10 and 50 at the \(10^{-5}\) threshold; compensation not found at this threshold in 8 cases for zeros 1 and 100) due to finite basis nullity \(\approx 85\) and condition number \(\sim 10^{15}\). | **HETEROGENEOUS FINITE OBSERVATION** | Verified in `explicit-formula-radial-second-variation-001`. |
 | EF-017 | Avoiding RH in the calculation of the Taylor response does not prove that inferring radial rigidity from the projected-divisor defect \(\Delta\mathcal D_{\mathrm{rad}}\) is non-circular or complete. | **METHODOLOGICAL STATUS** | Exact Taylor derivation is unconditioned, but downstream radial-rigidity deduction remains open. |
-| EF-018 | The critical-line projection \(\mathcal P_0(\mathcal D_\zeta)\) is not known to be the zero divisor of any zeta function and has no independent arithmetic representation; inferring \(\Delta\mathcal D_{\mathrm{rad}} = 0\) without assuming RH is the Projection Trap. | **OPEN OBLIGATION (PROJECTION TRAP)** | Open research obligation (OBL-EF-003) requiring an independent global constraint. |
+| EF-018 | The critical-line projection \(\mathcal P_0(\mathcal D_\zeta)\) has no independent arithmetic representation for direct 1-point linear explicit formula statistics; inferring \(\Delta\mathcal D_{\mathrm{rad}} = 0\) without assuming RH is the Projection Trap. | **SCOPED PROJECTION TRAP** | **CLOSED** for fixed linear combinations of direct one-point holomorphic Riemann–Weil statistics over an open displacement family; **OPEN** for nonlinear paired, determinantal, operator, or independently constructed comparison objects (OBL-EF-003 / OBL-RDQ-001). |
+
+---
+
+# 20. Radial-Defect Quotient, limiting invariant \(L_Q\), and relative Fredholm formulation
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| RDQ-001 | Baseline completed reference function \(\Xi^\flat(z) = \prod_{\gamma>0}(1 + z^2/\gamma^2)^{m_\gamma}\) matches \(\Xi(z)\) for all critical-line zeros (\(\delta=0\)). | **PROVED / EXACT** | Exact factorization cancellation for \(\delta=0\) pairs \(\pm i\gamma\). |
+| RDQ-002 | Radial-Defect Quotient \(Q(z) = \frac{\Xi(z)}{\Xi(0)\Xi^\flat(z)}\) decomposes on off-line quartets into real-axis factor \(q_{\delta,\gamma}(x) = \frac{\gamma^4[(x^2+\gamma^2-\delta^2)^2+4\delta^2\gamma^2]}{(\gamma^2+\delta^2)^2(x^2+\gamma^2)^2}\). | **PROVED / EXACT** | Exact algebraic normalization of 4-zero product divided by baseline factor. |
+| RDQ-003 | Real-axis factor satisfies \(0 < q_{\delta,\gamma}(x) \le 1\) for all \(x \in \mathbb R\), with equality \(q=1\) iff \(x=0\) (for \(\delta \ne 0\)) and \(q_{0,\gamma}(x) \equiv 1\). | **PROVED / EXACT** | Exact rational difference \(1 - q_{\delta,\gamma}(x) \ge 0\). |
+| RDQ-004 | The unique minimum of \(q_{\delta,\gamma}(x)\) occurs at \(x_*^2 = \delta^2 + 3\gamma^2\). | **PROVED / EXACT** | Exact derivative root analysis of rational function. |
+| RDQ-005 | For \(r = \delta^2/\gamma^2\), the minimum value is \(q_{\min} = \frac{4}{(1+r)^2(4+r)}\). | **PROVED / EXACT** | Direct evaluation at \(x_*\). |
+| RDQ-006 | Exact uniform estimate \(\sup_x \|\log q_{\delta,\gamma}(x)\| = 2\log(1+r) + \log(1+r/4) \le \frac{9}{4}r\) supplies domination for infinite product/limit interchange. | **PROVED / EXACT** | Exact calculus extremum of log-ratio and \(\sum \delta^2/\gamma^2 < \infty\). |
+| RDQ-007 | Limiting invariant \(L_Q = \lim_{x\to\infty} Q(x) = \prod_{\text{quartets}} (\frac{\gamma^2}{\gamma^2+\delta^2})^{2n_\gamma}\) satisfies \(0 < L_Q \le 1\), with \(L_Q = 1 \iff \mathrm{RH}\). | **PROVED SPECTRAL EQUIVALENCE** | Asymptotic limit of uniform convergent product; exact spectral criterion. |
+| RDQ-008 | For \(H(z) = \log z\), projection-subtracted quartet response is \(2\Re\log(\delta+i\gamma) - 2\Re\log(i\gamma) = \log(1+\delta^2/\gamma^2) = d(\delta,\gamma)\). | **PROVED / EXACT** | Exact complex logarithm real-part identity. |
+| RDQ-009 | The defect \(-\log L_Q = 2\sum d(\delta,\gamma)\) lies inside the projection-subtracted EF-013 construction; its bridge failure is due to test-class inadmissibility, the projected-divisor problem, and unproved finite compensation. | **METHODOLOGICAL STATUS** | Rigorous attribution of EF-013 structural content. |
+| RDQ-010 | Positive diagonal spectral operator \(\mathcal R e_\lambda = \frac{\delta_\lambda^2}{\gamma_\lambda^2} e_\lambda\) on \(\ell^2(\Lambda^+)\) is trace-class with \(\operatorname{Tr}\mathcal R = \sum \frac{\delta^2}{\gamma^2} < \infty\). | **PROVED / EXACT** | Convergence follows from \(\sum \gamma^{-2} < \infty\) and \(|\delta| < 1/2\). |
+| RDQ-011 | Relative Fredholm determinant satisfies \(\det_{\mathrm F}(I + \mathcal R) = L_Q^{-1}\) and \(-\log L_Q = \operatorname{Tr}\log(I+\mathcal R) = \log\det_{\mathrm F}(I+\mathcal R)\). | **PROVED / EXACT** | Classical spectral theory of positive trace-class operators. |
+| RDQ-012 | Minimal scalar target \(\operatorname{Tr}\mathcal R = 0 \iff \mathcal R = 0 \iff \mathrm{RH}\) is logically equivalent to RH and structurally minimal. | **PROVED EQUIVALENCE** | Non-negativity of eigenvalues \(\delta^2/\gamma^2 \ge 0\). |
+| RDQ-013 | Rational pairing kernel \(\kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1\) satisfies \(\kappa_1(\lambda, \lambda^\#) = \frac{\delta^2}{\gamma^2}\) for \(\lambda^\# = -\bar\lambda\). | **PROVED / EXACT** | Exact rational algebraic identity. |
+| RDQ-014 | Relative trace satisfies \(\operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \kappa_1(\lambda, \lambda^\#)\). | **PROVED / EXACT** | Substitution of RDQ-013 into trace definition. |
+| RDQ-015 | Divisor-independent arithmetic evaluation of \(\operatorname{Tr}\mathcal R\) or \(D_\zeta(1)\) by isolating \((\lambda, \lambda^\#)\) without constructing the projected divisor is the live open theorem. | **OPEN / LIVE TARGET** | Central research goal (OBL-RDQ-001). |
+
+---
+
+# 21. Withdrawn claims register
+
+| ID | Historical Claim | Former Status | Withdrawn Status | Reason for Withdrawal |
+|---|---|---|---|---|
+| WDR-001 | EF-013 failed because the explicit formula had the "wrong \(\gamma\)-curvature". | FORMER WORKING CONJECTURE | **WITHDRAWN (AUDITED)** | Audited exact identity shows \(H(z)=\log z\) projection-subtraction yields \(2\Re\log(\delta+i\gamma) - 2\Re\log(i\gamma) = \log(1+\delta^2/\gamma^2) = d(\delta,\gamma)\), which matches the exact \(L_Q\) curvature. The failure is due to test function inadmissibility, projected-divisor lack of arithmetic representation, and unproved finite compensation. |
+
 

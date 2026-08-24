@@ -27,8 +27,8 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-006` | Explicit Formula Truncation | Prime reconstruction $J_N(x)$ and $\pi_N(x)$ convergence | Möbius inversion unit tests against known prime sieve | `Specified in Harness` |
 | `OBL-007` | Single Zero Perturbation Response | Exact differential update $\Delta C_n(x) = C(x, \rho'_n) - C(x, \rho_n)$ | Unit test comparing delta update to full recomputation | `Specified in Harness` |
 | `OBL-008` | Centrifuge Derivative Invariant | $\frac{d}{dK} \log \|q_\rho^K\| = \delta \log \tau$ | Exact symbolic derivation & numerical gradient test | `Verified in Harness` |
-| `OBL-009` | Counterexample Falsification Control | Davenport-Heilbronn function fails on-line zero hypothesis | Numerical search finding off-line zeros for non-Euler zeta | `Verified in Harness` |
-| `OBL-EF-003` | Projection Trap Resolution | Derive independent arithmetic or spectral representation of $\mathcal P_0(\mathcal D_\zeta)$ to deduce $\Delta\mathcal D_{\mathrm{rad}} = 0$ | Open global constraint derivation | `OPEN OBLIGATION` |
+| `OBL-EF-003` | Projection Trap Resolution (Linear 1-Point Statistics) | Independent arithmetic representation of $\mathcal P_0(\mathcal D_\zeta)$ via direct linear 1-point test functions | No-go theorem: CLOSED for fixed linear combinations of direct 1-point holomorphic statistics over open displacement family | `CLOSED (NO-GO FOR LINEAR 1-POINT)` |
+| `OBL-RDQ-001` | Nonlinear Paired / Relative Trace Realization | Derive divisor-independent arithmetic realization of relative trace $\operatorname{Tr}\mathcal R = \sum \kappa_1(\lambda, \lambda^\#)$ or Fredholm determinant $\det_{\mathrm F}(I+\mathcal R) = L_Q^{-1}$ without evaluating $\mathcal P_0(\mathcal D_\zeta)$ | Divisor-independent reflection pairing kernel evaluation | `OPEN OBLIGATION` |
 
 
 ---

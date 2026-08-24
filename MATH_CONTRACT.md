@@ -2087,3 +2087,102 @@ E(u_n) = \|K_{\cdot, n} u_n\|^2 = u_n^2 \|K_{\cdot, n}\|^2 \ge 0.
    - The finite second-order radial response construction is classified as an **exact finite synthetic sensitivity diagnostic**.
    - It validates the local quadratic Taylor fidelity (\(\mathcal O(\delta^2)\) relative error \(< 0.04\%\)), while finite NNLS compensation remains heterogeneous and dependent on the chosen test family.
 
+# 37. Radial-Defect Quotient \(Q(z)\), Limiting Invariant \(L_Q\), and Relative Fredholm Determinants
+
+## 37.1 Centered coordinates and reference objects
+In centered coordinate \(z = s - 1/2 = \delta + it\), let \(\Xi(z) = \xi(1/2 + z)\).
+Let \(\Lambda^+\) be the multiset of upper-half-plane centered nontrivial zeros \(\lambda = \delta + i\gamma\) (\(\gamma > 0\)).
+Define \(m_\gamma\) as the total multiplicity of all upper-half-plane zeros at height \(\gamma\).
+Define the critical-line baseline reference function:
+\[
+\boxed{
+\Xi^\flat(z) = \prod_{\gamma > 0} \left(1 + \frac{z^2}{\gamma^2}\right)^{m_\gamma}.
+}
+\]
+The Radial-Defect Quotient is:
+\[
+\boxed{
+Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)}.
+}
+\]
+
+## 37.2 Real-axis quartet factor and audited properties
+For an off-line quartet \(\{\pm\delta \pm i\gamma\}\), the factor evaluated on \(z = x \in \mathbb R\) is:
+\[
+\boxed{
+q_{\delta,\gamma}(x) = \frac{\gamma^4 \left[ (x^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2 \right]}{(\gamma^2+\delta^2)^2 (x^2+\gamma^2)^2}.
+}
+\]
+Exact audited properties:
+1. **Positivity and Boundedness**: \(0 < q_{\delta,\gamma}(x) \le 1\) for all \(x\in\mathbb R\), with equality iff \(x=0\) (for \(\delta \ne 0\)) and \(q_{0,\gamma}(x) \equiv 1\).
+2. **Unique Minimum**: \(x_*^2 = \delta^2 + 3\gamma^2\).
+3. **Minimum Value**: \(q_{\min} = \frac{4}{(1+r)^2(4+r)}\) where \(r = \delta^2/\gamma^2\).
+4. **Uniform Domination Estimate**:
+   \[
+   \sup_{x\in\mathbb R} |\log q_{\delta,\gamma}(x)| = 2\log(1+r) + \log\left(1 + \frac{r}{4}\right) \le \frac{9}{4}r.
+   \]
+5. **Limiting Invariant**:
+   \[
+   \boxed{
+   L_Q = \lim_{x\to\infty} Q(x) = \prod_{\text{off-line quartets}} \left(\frac{\gamma^2}{\gamma^2+\delta^2}\right)^{2n_\gamma}.
+   }
+   \]
+   Spectral equivalence: \(0 < L_Q \le 1\), and \(L_Q = 1 \iff \mathrm{RH}\).
+
+## 37.3 Relative Fredholm spectral formulation
+Define the positive diagonal trace-class operator \(\mathcal R\) on \(\ell^2(\Lambda^+)\) by:
+\[
+\boxed{
+\mathcal R e_\lambda = \frac{\delta_\lambda^2}{\gamma_\lambda^2} e_\lambda.
+}
+\]
+Then:
+\[
+\operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \frac{\delta_\lambda^2}{\gamma_\lambda^2} < \infty,
+\qquad
+\det_{\mathrm F}(I + \mathcal R) = L_Q^{-1},
+\qquad
+-\log L_Q = \operatorname{Tr}\log(I + \mathcal R) = \log\det_{\mathrm F}(I + \mathcal R).
+\]
+Because \(\mathcal R \ge 0\):
+\[
+\operatorname{Tr}\mathcal R = 0 \iff \mathcal R = 0 \iff \mathrm{RH},
+\qquad
+\det_{\mathrm F}(I + \mathcal R) = 1 \iff \mathrm{RH}.
+\]
+
+## 37.4 Target hierarchy
+1. **Minimal Scalar Target**: \(\operatorname{Tr}\mathcal R = \sum \frac{\delta^2}{\gamma^2}\) (RH equivalent, minimal complexity).
+2. **Scalar Determinant Target**: \(D_\zeta(1) = \det_{\mathrm F}(I+\mathcal R) = L_Q^{-1}\).
+3. **Full Determinant Family**: \(D_\zeta(t) = \det_{\mathrm F}(I + t\mathcal R)\).
+4. **Operator Target**: Arithmetic operator isospectral to \(\mathcal R\).
+
+# 38. Reflection-Paired Involution Kernel \(\kappa_1(z,w)\) and Arithmetic Trace Target
+
+## 38.1 Rational involution pairing kernel
+For \(z = \delta + i\gamma\), define the involution \(z^\# = -\bar z = -\delta + i\gamma\).
+Define the rational kernel:
+\[
+\boxed{
+\kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1.
+}
+\]
+Exact involution identity:
+\[
+\boxed{
+\kappa_1(z, z^\#) = \frac{\delta^2}{\gamma^2}.
+}
+\]
+Therefore:
+\[
+\boxed{
+\operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \kappa_1(\lambda, \lambda^\#).
+}
+\]
+
+## 38.2 Epistemic boundary and open research obligation
+1. **Closure under involution**: Functional equation and Schwarz reflection guarantee that the zero set is closed under \(\lambda \mapsto \lambda^\#\).
+2. **Open Research Theorem (OBL-RDQ-001)**: Can a divisor-independent arithmetic or spectral construction isolate the pairs \((\lambda, \lambda^\#)\) and evaluate \(\kappa_1\) to compute \(\operatorname{Tr}\mathcal R\) or \(D_\zeta(1)\)?
+3. **Grade Invariance**: \(Q(z)\), \(L_Q\), and \(\mathcal R\) are grade-invariant under \((x,\delta,\gamma)\mapsto(\tau^K x, \tau^K \delta, \tau^K \gamma)\); grade dilation alone does not force \(\operatorname{Tr}\mathcal R = 0\). Additional zeta-specific arithmetic content is required.
+
+

@@ -1701,3 +1701,205 @@ def solve_radial_second_order_nnls(
         }
 
 
+# =============================================================================
+# Radial-Defect Quotient Q(z), Limiting Invariant L_Q, and Fredholm Spectral Theory
+# (Reference: RADIAL_DEFECT_QUOTIENT.md, MATH_CONTRACT.md §§37-38)
+# =============================================================================
+
+def radial_factor_q(
+    x: Union[str, float, int, mpmath.mpf],
+    delta: Union[str, float, int, mpmath.mpf],
+    gamma: Union[str, float, int, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the exact real-axis quartet quotient factor q_{delta, gamma}(x):
+    q_{delta, gamma}(x) = gamma^4 * [ (x^2 + gamma^2 - delta^2)^2 + 4 * delta^2 * gamma^2 ]
+                          / [ (gamma^2 + delta^2)^2 * (x^2 + gamma^2)^2 ]
+
+    Properties (audited):
+    - 0 < q_{delta, gamma}(x) <= 1 for all real x, with q=1 iff x=0 (when delta != 0).
+    - If delta == 0, returns mpmath.mpf(1) identically.
+    - Unique minimum at x_* = sqrt(delta^2 + 3*gamma^2).
+    """
+    with mpmath.workdps(dps + 15):
+        x_m = to_mpf(x, dps=dps + 15)
+        d_m = to_mpf(delta, dps=dps + 15)
+        g_m = to_mpf(gamma, dps=dps + 15)
+
+        if d_m == 0:
+            return mpmath.mpf('1.0')
+        if g_m == 0:
+            raise ValueError("gamma cannot be zero for upper-half-plane zeros.")
+
+        x2 = x_m * x_m
+        g2 = g_m * g_m
+        d2 = d_m * d_m
+
+        term1 = x2 + g2 - d2
+        num = (g2 * g2) * (term1 * term1 + mpmath.mpf(4) * d2 * g2)
+        den = ((g2 + d2) * (g2 + d2)) * ((x2 + g2) * (x2 + g2))
+        return num / den
+
+
+def radial_factor_q_min(
+    delta: Union[str, float, int, mpmath.mpf],
+    gamma: Union[str, float, int, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates exact minimum value of q_{delta, gamma}(x):
+    q_min = 4 / [ (1 + r)^2 * (4 + r) ] where r = delta^2 / gamma^2.
+    """
+    with mpmath.workdps(dps + 15):
+        d_m = to_mpf(delta, dps=dps + 15)
+        g_m = to_mpf(gamma, dps=dps + 15)
+        if d_m == 0:
+            return mpmath.mpf('1.0')
+        if g_m == 0:
+            raise ValueError("gamma cannot be zero.")
+        r = (d_m * d_m) / (g_m * g_m)
+        one_plus_r = mpmath.mpf(1) + r
+        four_plus_r = mpmath.mpf(4) + r
+        return mpmath.mpf(4) / (one_plus_r * one_plus_r * four_plus_r)
+
+
+def radial_factor_q_min_x(
+    delta: Union[str, float, int, mpmath.mpf],
+    gamma: Union[str, float, int, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the location of the unique positive minimum x_* = sqrt(delta^2 + 3*gamma^2).
+    """
+    with mpmath.workdps(dps + 15):
+        d_m = to_mpf(delta, dps=dps + 15)
+        g_m = to_mpf(gamma, dps=dps + 15)
+        return mpmath.sqrt(d_m * d_m + mpmath.mpf(3) * g_m * g_m)
+
+
+def radial_factor_log_bound(
+    delta: Union[str, float, int, mpmath.mpf],
+    gamma: Union[str, float, int, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the exact supremum of |log q_{delta, gamma}(x)|:
+    sup_x |log q(x)| = 2*log(1 + r) + log(1 + r/4) <= (9/4)*r, where r = delta^2 / gamma^2.
+    """
+    with mpmath.workdps(dps + 15):
+        d_m = to_mpf(delta, dps=dps + 15)
+        g_m = to_mpf(gamma, dps=dps + 15)
+        if d_m == 0:
+            return mpmath.mpf(0)
+        if g_m == 0:
+            raise ValueError("gamma cannot be zero.")
+        r = (d_m * d_m) / (g_m * g_m)
+        return mpmath.mpf(2) * mpmath.log(mpmath.mpf(1) + r) + mpmath.log(mpmath.mpf(1) + r / mpmath.mpf(4))
+
+
+def projection_subtracted_defect_d(
+    delta: Union[str, float, int, mpmath.mpf],
+    gamma: Union[str, float, int, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the single-zero projection-subtracted defect:
+    d(delta, gamma) = log(1 + delta^2 / gamma^2).
+    Identical to the projection-subtracted quartet response 2*Re log(delta + i*gamma) - 2*Re log(i*gamma).
+    """
+    with mpmath.workdps(dps + 15):
+        d_m = to_mpf(delta, dps=dps + 15)
+        g_m = to_mpf(gamma, dps=dps + 15)
+        if g_m == 0:
+            raise ValueError("gamma cannot be zero.")
+        r = (d_m * d_m) / (g_m * g_m)
+        return mpmath.log(mpmath.mpf(1) + r)
+
+
+def involution_pairing_kernel_kappa1(
+    z: Union[complex, str, Tuple[Any, Any], mpmath.mpc],
+    w: Union[complex, str, Tuple[Any, Any], mpmath.mpc],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [AUDIT PATH] Evaluates the rational involution pairing kernel:
+    kappa_1(z, w) = 4*z*w / (z + w)^2 - 1.
+
+    When w = z^# = -conj(z) for z = delta + i*gamma, kappa_1(z, z^#) = delta^2 / gamma^2 identically.
+    """
+    with mpmath.workdps(dps + 15):
+        z_c = to_mpc(z, dps=dps + 15)
+        w_c = to_mpc(w, dps=dps + 15)
+        sum_zw = z_c + w_c
+        if sum_zw == 0:
+            raise ValueError("z + w cannot be zero for kernel kappa_1.")
+        return (mpmath.mpf(4) * z_c * w_c) / (sum_zw * sum_zw) - mpmath.mpf(1)
+
+
+def finite_radial_operator_trace(
+    zeros_delta_gamma: Sequence[Tuple[Union[str, float, int, mpmath.mpf], Union[str, float, int, mpmath.mpf]]],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the finite trace of the relative radial spectral operator R:
+    Tr(R_fin) = sum_{j=1}^N (delta_j^2 / gamma_j^2).
+    Non-negative; vanishes if and only if all delta_j == 0.
+    """
+    with mpmath.workdps(dps + 15):
+        total = mpmath.mpf(0)
+        for d_val, g_val in zeros_delta_gamma:
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            if g_m == 0:
+                raise ValueError("gamma cannot be zero.")
+            total += (d_m * d_m) / (g_m * g_m)
+        return total
+
+
+def finite_radial_fredholm_det(
+    zeros_delta_gamma: Sequence[Tuple[Union[str, float, int, mpmath.mpf], Union[str, float, int, mpmath.mpf]]],
+    t: Union[str, float, int, mpmath.mpf] = 1,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the finite Fredholm determinant family:
+    D_fin(t) = det(I + t * R_fin) = prod_{j=1}^N (1 + t * delta_j^2 / gamma_j^2).
+    At t=1, det(I + R_fin) = L_Q_fin^(-1).
+    """
+    with mpmath.workdps(dps + 15):
+        t_m = to_mpf(t, dps=dps + 15)
+        prod_val = mpmath.mpf(1)
+        for d_val, g_val in zeros_delta_gamma:
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            if g_m == 0:
+                raise ValueError("gamma cannot be zero.")
+            r = (d_m * d_m) / (g_m * g_m)
+            prod_val *= (mpmath.mpf(1) + t_m * r)
+        return prod_val
+
+
+def finite_radial_defect_quotient_limit(
+    quartets_delta_gamma: Sequence[Tuple[Union[str, float, int, mpmath.mpf], Union[str, float, int, mpmath.mpf]]],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates finite limiting invariant L_Q for a collection of off-line quartets:
+    L_{Q, fin} = prod_{quartets} (gamma_j^2 / (gamma_j^2 + delta_j^2))^2 = prod_{quartets} (1 + delta_j^2 / gamma_j^2)^(-2).
+    Satisfies 0 < L_{Q, fin} <= 1, with L_{Q, fin} == 1 iff all delta_j == 0.
+    """
+    with mpmath.workdps(dps + 15):
+        prod_val = mpmath.mpf(1)
+        for d_val, g_val in quartets_delta_gamma:
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            if g_m == 0:
+                raise ValueError("gamma cannot be zero.")
+            r = (d_m * d_m) / (g_m * g_m)
+            term = (mpmath.mpf(1) + r)
+            prod_val /= (term * term)
+        return prod_val
+
+
+

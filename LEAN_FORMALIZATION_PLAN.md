@@ -655,3 +655,28 @@ The eventual formal target is:
 At present, only the logical skeleton and prerequisite coordinate/grade identities are candidates for formalization.
 
 The first implication remains the central mathematical discovery problem.
+
+---
+
+# 21. Phase 12 — Radial-defect quotient and involution pairing firewalls
+
+Formalize finite algebraic firewall theorems in Lean 4 without introducing unproved infinite analytic axioms:
+
+1. **Rational involution pairing identity**:
+   For \(\kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1\), prove:
+   \[
+   \kappa_1(z, -\bar z) = \frac{\delta^2}{\gamma^2}, \qquad z = \delta + i\gamma, \ \gamma \ne 0.
+   \]
+2. **Finite trace non-negativity and vanishing**:
+   For any finite list of non-negative displacement ratios \(r_n = \delta_n^2 / \gamma_n^2 \ge 0\), prove:
+   \[
+   \sum_{n=1}^N r_n = 0 \iff \forall n \in \{1,\dots,N\},\ r_n = 0.
+   \]
+3. **Finite determinant product equivalence**:
+   For any finite list of non-negative displacement ratios \(r_n \ge 0\), prove:
+   \[
+   \prod_{n=1}^N (1 + r_n) = 1 \iff \forall n \in \{1,\dots,N\},\ r_n = 0.
+   \]
+
+Do not formalize infinite Hadamard products, infinite Fredholm determinants, or explicit-formula arithmetic representations as axioms. Record infinite analytic convergence as an explicit future formalization obligation.
+
