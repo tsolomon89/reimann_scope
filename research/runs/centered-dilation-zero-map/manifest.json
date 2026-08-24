@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "same_object_coordinate_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-24T00:10:42.088102+00:00",
-  "completed_at": "2026-08-24T00:10:42.601799+00:00",
+  "started_at": "2026-08-24T08:11:05.191342+00:00",
+  "completed_at": "2026-08-24T08:11:05.719959+00:00",
   "status": "complete",
-  "git_commit": "df8b9a5e44afd864086536729c16543200a5d36c",
-  "producing_git_commit": "df8b9a5e44afd864086536729c16543200a5d36c",
+  "git_commit": "41c76aa3a714a94ed2acf9a49b85b2a404afff9a",
+  "producing_git_commit": "41c76aa3a714a94ed2acf9a49b85b2a404afff9a",
   "git_dirty": false,
   "experiment_spec_sha256": "4e6ca7f689e910ce87133c1eadddf51568e2a0c3928abed9e8b896298bd592ff",
   "precision": {
@@ -68,10 +68,10 @@
     "certification.py": "3c2325a6277dd177ca11f9c3b6404c30ba9d6d9a22fc775ed24fd4df40dff991",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "math_core.py": "e66eb34a123a332b0c97bb3c41e8d0b75319d9e94e8c7a26a7b10f5a0df72035",
+    "math_core.py": "8f66ecac35366bc6a7723026f857ac6f2e5005fcf467a169ff64d094da0a432b",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "research_runner.py": "58e82c45cb815ee14cefd48a9d087facdb3ac01df56c9f3a78102cb90374ab2b",
+    "research_runner.py": "8d9c39db0f36d9a824b0a4793fb52e5a4235eb124449d24dd77b8d55f262508f",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -95,7 +95,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "e66eb34a123a332b0c97bb3c41e8d0b75319d9e94e8c7a26a7b10f5a0df72035"
+      "sha256": "8f66ecac35366bc6a7723026f857ac6f2e5005fcf467a169ff64d094da0a432b"
     },
     {
       "path": "transcendental.py",
@@ -107,7 +107,7 @@
     },
     {
       "path": "research_runner.py",
-      "sha256": "58e82c45cb815ee14cefd48a9d087facdb3ac01df56c9f3a78102cb90374ab2b"
+      "sha256": "8d9c39db0f36d9a824b0a4793fb52e5a4235eb124449d24dd77b8d55f262508f"
     },
     {
       "path": "zero_finder.py",
@@ -144,7 +144,7 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "9150f3e9f7bf6623cf3540c50d9ec84320f3389d45bd5ed495444a1ff1c3d832"
+      "sha256": "27566f25a0bb47092d006d127d273647e75f05316cfbad561f997aec63a1daa5"
     }
   }
 }

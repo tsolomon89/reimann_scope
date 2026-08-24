@@ -458,13 +458,16 @@
   "anomalies": [],
   "warnings": [],
   "radial_second_order_summary": {
+    "total_cases": 16,
     "radial_projection_operator": "P_0(1/2 + delta + i*gamma) = 1/2 + i*gamma",
     "radial_defect_divisor": "Delta D_rad = D - P_0(D)",
     "leading_taylor_coefficient": "-2*delta^2*H''(gamma)",
     "fourth_order_coefficient": "(delta^4/12)*H''''(gamma)",
     "quadratic_energy_definition": "E(u) = u^T K^T K u with u_n = delta_n^2 >= 0",
+    "finite_response_energy_positive": "strictly_positive_for_all_sampled_zeros",
     "single_target_energy_status": "strictly_positive_for_all_sampled_zeros",
     "nnls_compensation_status": "heterogeneous_finite_compensation",
+    "compensation_threshold_used": "1e-5",
     "compensation_found_count": 8,
     "compensation_not_found_count": 8,
     "compensation_found_zero_indices": [
@@ -475,15 +478,50 @@
       "1",
       "100"
     ],
+    "per_zero_breakdown": {
+      "1": {
+        "total_cases": 4,
+        "compensation_found_count": 0,
+        "compensation_not_found_count": 4,
+        "min_relative_residual": "0.9989403834",
+        "max_relative_residual": "0.9989403835",
+        "status": "not_found"
+      },
+      "10": {
+        "total_cases": 4,
+        "compensation_found_count": 4,
+        "compensation_not_found_count": 0,
+        "min_relative_residual": "7.984009245e-10",
+        "max_relative_residual": "7.984009245e-10",
+        "status": "found"
+      },
+      "50": {
+        "total_cases": 4,
+        "compensation_found_count": 4,
+        "compensation_not_found_count": 0,
+        "min_relative_residual": "2.348824071e-7",
+        "max_relative_residual": "2.348824071e-7",
+        "status": "found"
+      },
+      "100": {
+        "total_cases": 4,
+        "compensation_found_count": 0,
+        "compensation_not_found_count": 4,
+        "min_relative_residual": "2.99819354e-5",
+        "max_relative_residual": "2.99819354e-5",
+        "status": "not_found"
+      }
+    },
     "min_relative_nnls_residual": "7.984009245e-10",
     "max_relative_nnls_residual": "0.9989403835",
-    "numerical_rank": "13-14",
-    "nullity": "85-86",
-    "condition_number": "~2.4e+15",
+    "numerical_rank_range": "13-14",
+    "nullity_range": "85-86",
+    "condition_number_range": "~2.4e+15 to ~3.0e+15",
+    "rank_stability": "threshold_dependent",
     "conditioning_caveats": "Finite 30-channel basis has high numerical nullity (~85) and condition number (~10^15); target columns for zeros 10 and 50 are well within the convex cone of remaining columns, whereas zeros 1 and 100 are not.",
     "theoretical_classification": "coordinate_redundant",
     "finite_basis_classification": "finite_basis_enrichment_only",
-    "epistemic_classification": "exact_finite_synthetic_sensitivity_diagnostic",
+    "epistemic_classification": "finite_synthetic_sensitivity_diagnostic",
     "projection_trap_note": "Actual divisor D_zeta has an arithmetic explicit-formula representation, while its critical-line projection P_0(D_zeta) has no established independent arithmetic representation; inferring radial rigidity from projected defect remains an open theorem."
   }
 }
