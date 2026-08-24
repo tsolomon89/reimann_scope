@@ -61,7 +61,7 @@ class TranscendentalWorldlinesHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/worldlines.py"],
-            math_modules=["transcendental.py", "math_core.py", "reference_data.py"],
+            math_modules=["transcendental.py", "math_core.py", "reference_data.py", "certification.py"],
             data_files=["data/zeros_reference.json"],
             consumed_certificates=["data/certificates/zeros/*.json", "data/certificates/worldlines/*.json"],
             material_packages=["mpmath", "flint"]
@@ -160,7 +160,7 @@ class SyntheticRadialLeavesHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/worldlines.py"],
-            math_modules=["transcendental.py", "math_core.py", "reference_data.py"],
+            math_modules=["transcendental.py", "math_core.py", "reference_data.py", "certification.py"],
             data_files=["data/zeros_reference.json"],
             consumed_certificates=["data/certificates/zeros/*.json", "data/certificates/worldlines/*.json"],
             material_packages=["mpmath", "flint"]
@@ -270,7 +270,7 @@ class TrivialWorldlinesHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/worldlines.py"],
-            math_modules=["transcendental.py", "math_core.py"],
+            math_modules=["transcendental.py", "math_core.py", "certification.py"],
             data_files=[],
             consumed_certificates=["data/certificates/trivial_zeros/*.json", "data/certificates/worldlines/*.json"],
             material_packages=["mpmath", "flint"]

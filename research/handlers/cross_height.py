@@ -51,7 +51,7 @@ class CrossHeightPathCoherenceHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/cross_height.py"],
-            math_modules=["transcendental.py", "reference_data.py"],
+            math_modules=["transcendental.py", "reference_data.py", "certification.py"],
             data_files=["data/zeros_reference.json", "data/canonical_blocks.json"],
             consumed_certificates=["data/certificates/zeros/*.json"],
             material_packages=["mpmath", "flint"]
@@ -131,7 +131,7 @@ class CrossHeightDistanceHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/cross_height.py"],
-            math_modules=["transcendental.py", "reference_data.py"],
+            math_modules=["transcendental.py", "reference_data.py", "certification.py"],
             data_files=["data/canonical_blocks.json"],
             consumed_certificates=["data/certificates/zeros/*.json"],
             material_packages=["mpmath", "flint"]

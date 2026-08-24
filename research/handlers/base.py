@@ -25,9 +25,7 @@ class HandlerDependencies:
 
     @property
     def execution_source_modules(self) -> List[str]:
-        """Return distinct source code modules genuinely consumed during numerical point execution.
-        Includes both handler evaluator code (handler_modules) and mathematical libraries (math_modules).
-        """
+        """Return distinct source code modules consumed during numerical point execution."""
         seen = set()
         out = []
         for f in self.handler_modules + self.math_modules:
@@ -127,6 +125,8 @@ class ExperimentHandler(ABC):
 
         Default implementation returns empty dict. Handlers override with experiment-specific summary tables.
         """
+        return {}
+
     @property
     def has_diagnostics(self) -> bool:
         """Whether this experiment produces structured diagnostics (diagnostics.json)."""

@@ -238,10 +238,6 @@ class ExplicitFormulaGradeCovarianceHandler(ExperimentHandler):
             }
         }
 
-    @property
-    def has_diagnostics(self) -> bool:
-        return True
-
     def generate_diagnostics(
         self,
         results: List[Dict[str, Any]],
@@ -260,6 +256,8 @@ class ExplicitFormulaGradeCovarianceHandler(ExperimentHandler):
             "global_basis_equivalence": g_eq,
             "summary_classification": "coordinate_redundant"
         }
+        with open(os.path.join(run_dir, "diagnostics.json"), "w", encoding="utf-8") as f:
+            json.dump(diag, f, indent=2)
         return diag
 
 
@@ -273,7 +271,7 @@ class ExplicitFormulaPerturbationRankHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/explicit_formula.py"],
-            math_modules=["math_core.py", "reference_data.py"],
+            math_modules=["math_core.py", "reference_data.py", "certification.py"],
             data_files=["data/zeros_reference.json", "data/zeros_first_100_reference.json"],
             consumed_certificates=["data/certificates/zeros/*.json"],
             material_packages=["mpmath", "flint", "numpy", "scipy"]
@@ -493,10 +491,6 @@ class ExplicitFormulaPerturbationRankHandler(ExperimentHandler):
 
         return "error", {}, f"Unsupported perturbation mode: '{mode}'"
 
-    @property
-    def has_diagnostics(self) -> bool:
-        return True
-
     def generate_diagnostics(
         self,
         results: List[Dict[str, Any]],
@@ -521,6 +515,8 @@ class ExplicitFormulaPerturbationRankHandler(ExperimentHandler):
             "experiment_id": "explicit-formula-perturbation-rank-001",
             "diagnostics": diag_data
         }
+        with open(os.path.join(run_dir, "diagnostics.json"), "w", encoding="utf-8") as f:
+            json.dump(diag, f, indent=2)
         return diag
 
 
@@ -534,7 +530,7 @@ class ExplicitFormulaRadialSecondVariationHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/explicit_formula.py"],
-            math_modules=["math_core.py", "reference_data.py"],
+            math_modules=["math_core.py", "reference_data.py", "certification.py"],
             data_files=["data/zeros_reference.json", "data/zeros_first_100_reference.json"],
             consumed_certificates=["data/certificates/zeros/*.json"],
             material_packages=["mpmath", "flint", "numpy", "scipy"]
@@ -883,10 +879,6 @@ class ExplicitFormulaRadialSecondVariationHandler(ExperimentHandler):
         }
         return summary_dict
 
-    @property
-    def has_diagnostics(self) -> bool:
-        return True
-
     def generate_diagnostics(
         self,
         results: List[Dict[str, Any]],
@@ -916,4 +908,6 @@ class ExplicitFormulaRadialSecondVariationHandler(ExperimentHandler):
             "experiment_id": "explicit-formula-radial-second-variation-001",
             "diagnostics": diag_data
         }
+        with open(os.path.join(run_dir, "diagnostics.json"), "w", encoding="utf-8") as f:
+            json.dump(diag, f, indent=2)
         return diag

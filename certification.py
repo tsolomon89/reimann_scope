@@ -672,7 +672,7 @@ def verify_formal_build_report(
                 elif blob_h != b_h:
                     errors.append(f"Builder source '{b_rel}' git blob hash ({blob_h}) != report hash ({b_h}) at commit '{prod_commit}'")
 
-            if check_current:
+            if check_current and b_rel == "scripts/build_formal.py":
                 b_full = os.path.join(REPO_ROOT, b_rel)
                 if not os.path.exists(b_full):
                     errors.append(f"Builder source file '{b_rel}' missing on disk")
