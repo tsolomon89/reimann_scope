@@ -3171,17 +3171,26 @@ def validate_manifest(
 
     # 6. Source code hashes and code_modules list validation
     src_hashes = manifest.get("source_code_hashes")
+    try:
+        exp_id_val = manifest.get("experiment_id") or manifest.get("run_id")
+        handler = get_handler(exp_id_val)
+        declared_modules = handler.declared_dependencies.all_code_modules
+    except Exception:
+        declared_modules = []
+
+    expected_modules = set(certification.REQUIRED_SOURCE_MODULES) | set(declared_modules)
+
     if not isinstance(src_hashes, dict) or not src_hashes:
         errors.append("Manifest missing or empty source_code_hashes map")
     else:
-        for mod in certification.REQUIRED_SOURCE_MODULES:
+        for mod in expected_modules:
             mh = src_hashes.get(mod)
             if not mh or len(mh) != 64 or mh == "N/A" or not all(c in "0123456789abcdefABCDEF" for c in mh):
                 errors.append(f"source_code_hashes missing or invalid for required module '{mod}'")
 
     code_mods = manifest.get("code_modules")
-    if not isinstance(code_mods, list) or len(code_mods) != len(certification.REQUIRED_SOURCE_MODULES):
-        errors.append(f"code_modules list must contain exactly {len(certification.REQUIRED_SOURCE_MODULES)} modules")
+    if not isinstance(code_mods, list) or len(code_mods) < len(certification.REQUIRED_SOURCE_MODULES):
+        errors.append(f"code_modules list must be a list containing at least {len(certification.REQUIRED_SOURCE_MODULES)} modules")
     elif isinstance(src_hashes, dict):
         seen_mods: Set[str] = set()
         for m_entry in code_mods:
@@ -3196,10 +3205,11 @@ def validate_manifest(
             if p in seen_mods:
                 errors.append(f"Duplicate module '{p}' in code_modules")
             seen_mods.add(p)
-            if p not in certification.REQUIRED_SOURCE_MODULES:
-                errors.append(f"Unexpected module '{p}' in code_modules")
-            elif sh != src_hashes.get(p):
+            if sh != src_hashes.get(p):
                 errors.append(f"code_modules sha256 mismatch for '{p}': list {sh} != map {src_hashes.get(p)}")
+        for req_m in expected_modules:
+            if req_m not in seen_mods:
+                errors.append(f"Missing required module '{req_m}' from code_modules list")
 
     # 7. Input data hashes and data_provenance list validation
     data_hashes = manifest.get("input_data_hashes")
