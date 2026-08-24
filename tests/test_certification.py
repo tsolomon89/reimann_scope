@@ -67,6 +67,7 @@ def test_certify_and_verify_worldline():
     assert is_valid, f"Synthetic worldline verification failed: {msg}"
 
 
+@pytest.mark.slow_numerical
 def test_all_persisted_certificates_pass_verification():
     """Run full verification across all certificates in data/certificates/."""
     passed, failed, errors = verify_all_certificates()

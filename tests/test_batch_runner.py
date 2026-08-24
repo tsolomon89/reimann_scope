@@ -1174,6 +1174,7 @@ def test_validate_manifest_rejects_source_worldline_root_mismatch():
         assert any("source_zero_hash" in e.lower() or "source_zero_index" in e.lower() for e in errs)
 
 
+@pytest.mark.slow_numerical
 def test_validate_run_bundle_canonical_runs():
     """Test that validate_run_bundle verifies all canonical runs in research/runs/."""
     runs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "runs")
@@ -1438,6 +1439,7 @@ def test_adversarial_index_field_mutations_and_duplicates(tmp_path):
             research_runner.INDEX_FILE = orig_index
 
 
+@pytest.mark.slow_numerical
 def test_explicit_formula_experiment_specs_execute_and_validate(temp_research_env, monkeypatch):
     """Test that all three explicit formula experiment specs execute and produce valid bundles."""
     real_commit, _ = research_runner.get_git_info()

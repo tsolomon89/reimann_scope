@@ -66,6 +66,7 @@ def test_taylor_shape_coefficients():
         assert abs(p_val - p_taylor) < 1e-18
 
 
+@pytest.mark.slow_numerical
 def test_simple_zero_verification():
     """Verify verify_simple_zero confirms simple zeros from canonical blocks."""
     for blk_name in reference_data.get_block_names():

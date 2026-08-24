@@ -16,6 +16,7 @@ import zero_finder
 import reference_data
 
 
+@pytest.mark.slow_numerical
 def test_independent_transformed_zero_discovery_origin_dilation():
     """
     Test that transformed zeros of f_K(s') = zeta(s'/tau^K) for K=0.5 are
@@ -44,6 +45,7 @@ def test_independent_transformed_zero_discovery_origin_dilation():
     assert float(comparison["max_difference"]) < 1e-4
 
 
+@pytest.mark.slow_numerical
 def test_independent_transformed_zero_discovery_centered_dilation():
     """
     Test independent discovery for centered coordinate dilation s' = 1/2 + tau^K(s-1/2) for K=0.25.

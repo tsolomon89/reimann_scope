@@ -30,6 +30,7 @@ def test_test_function_evenness_and_derivatives():
                 assert abs(analytic_prime - numerical_prime) < mpmath.mpf('1e-20'), f"j={j} derivative mismatch at t={t_val}"
 
 
+@pytest.mark.slow_numerical
 def test_fourier_transform_analytic_vs_quadrature():
     """Verify analytic Fourier transform H_hat_j(x) against numerical quadrature."""
     with mpmath.workdps(70):
@@ -58,6 +59,7 @@ def test_grade_k_fourier_scaling():
                     assert abs(h_hat_scaled - expected_hat) < mpmath.mpf('1e-70'), f"K={K}, j={j} Fourier scaling error at x={x_val}"
 
 
+@pytest.mark.slow_numerical
 def test_explicit_formula_native_baseline_eval():
     """Verify native explicit formula residual is within observational error budget (< 1e-15) for j=1..6."""
     with mpmath.workdps(80):
@@ -78,6 +80,7 @@ def test_explicit_formula_native_baseline_eval():
             assert res["total_rhs"] > 0
 
 
+@pytest.mark.slow_numerical
 def test_grade_covariance_and_expanded_basis_equivalence():
     """Verify that grade-K explicit formula constraints are coordinate_redundant with the expanded K=0 basis."""
     with mpmath.workdps(80):
@@ -252,6 +255,7 @@ def test_target_zero_1_based_indexing_and_ordering():
         assert g1_mpf < g10_mpf < g50_mpf
 
 
+@pytest.mark.slow_numerical
 def test_linearized_compensation_threshold_sweep_and_reconstructibility():
     """Verify SVD threshold sweep, threshold_dependent classification, and compensation reconstructibility."""
     with mpmath.workdps(80):
@@ -302,6 +306,7 @@ def test_pure_radial_defect_second_order_taylor_convergence():
                 assert abs(ratio - mpmath.mpf('4.0')) < mpmath.mpf('1e-4')
 
 
+@pytest.mark.slow_numerical
 def test_radial_second_order_jacobian_and_nnls():
     """Verify second-order radial Jacobian construction, quadratic energy, and NNLS non-compensation."""
     with mpmath.workdps(80):
@@ -330,6 +335,7 @@ def test_radial_second_order_jacobian_and_nnls():
             assert x >= -mpmath.mpf('1e-60')
 
 
+@pytest.mark.slow_numerical
 def test_radial_second_order_heterogeneous_nnls_and_positive_energy():
     """
     Verify that across 100 zeros in the 30-channel basis:

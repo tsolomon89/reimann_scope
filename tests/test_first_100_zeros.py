@@ -23,6 +23,8 @@ import reference_data
 import zero_finder
 import certification
 
+pytestmark = pytest.mark.slow_numerical
+
 
 def test_first_100_nontrivial_zeros_end_to_end_baseline():
     """Execute the complete 100-zero validation chain across discovery, reference matching, and certification."""

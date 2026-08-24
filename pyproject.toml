@@ -1,6 +1,10 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests", ".agents/verification"]
+addopts = "--strict-markers"
+markers = [
+    "slow_numerical: materially expensive numerical regression tests, zero discovery baselines, and full artifact suites",
+]
 
 [tool.mypy]
 ignore_missing_imports = true

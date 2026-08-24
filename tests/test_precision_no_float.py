@@ -62,6 +62,7 @@ def test_transcendental_high_precision_no_float_downcast():
         assert diff < mpmath.mpf('1e-70'), f"Scale precision loss: {diff}"
 
 
+@pytest.mark.slow_numerical
 def test_explicit_formula_high_precision_no_float_downcast():
     """Verify that explicit-formula evaluations, integrals, and defect decompositions maintain 80+ dps without float downcasts."""
     dps = 80
