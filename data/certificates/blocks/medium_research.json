@@ -11,11 +11,11 @@
   "zero_count": 5,
   "all_zeros_simple": true,
   "constituent_zero_hashes": [
-    "bf1383842bda19ef7c805afc4224d797a58f314ad05d69bfbb32bec4c63f1ab4",
-    "4aa54c01631ced8746ff2dab5444fc129b0f1d3cadebd8f83b48e1cbcbaf103f",
-    "b5b57e387c9f8ba5f179e7965c734aa002063e0f3bf007b1a6e9bb92ae15269f",
-    "10e5fa814d521a5bc769191fce0f463ad1dd17e4b672868e6c5f35aab1895e24",
-    "9d018d473439eed370d114c2be392991beedaaff9616bc41b2fba92d12a2cc70"
+    "9cfe8876bb61931d1f944229d40e366908bdf6de729324b67f1c2467870dc317",
+    "eda6f06526c0a194214b22db16bd06c6aee6a439442fb564fe23dc80141003d8",
+    "bc69bd30cd7bb304268dade45888bdd1c23aa04e4a0a48fd00dcfadd45220b67",
+    "b70850a0fdcbfc365f5a4ae79f84a8d28097aa6c55dd5c8724e49427d1aabcad",
+    "e79a89c0a8ee385da101498893dd5fe3ece1e8e51f8badf2029b84531499dea1"
   ],
   "endpoint_bounds": {
     "t_min": "235.1088169223622532215900013441163834345333614833774800319668848633796525427704400946017209446938220",
@@ -32,9 +32,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "a8368d5d1a2b9b1801cd8cc60fea26beb53cb108",
+  "producing_git_commit": "862f5e877282796b7c6cb41a35b6f73630f8c204",
   "source_code_hashes": {
-    "certification.py": "bdb81a7c3e0f0a0ed18677e21adaa4e7eb5fb865e6f2a52a7a618f4e3b61db60",
+    "certification.py": "5a42f45330a409d009d883f931b2181b28d3d630c9320d28f0a4aee56da4cb52",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b",
@@ -59,11 +59,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-24T14:26:30.118341+00:00",
+  "created_at": "2026-08-24T14:50:29.845088+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "9bc2ad6b8eeea43f0f1e3eb5e74ef67a3d4f048713e941b15114d8034856edeb"
+  "certificate_hash": "a0cbabd8b9f6e6e34547162d9e735a03543301aec01182978f3ec55600468d1f"
 }

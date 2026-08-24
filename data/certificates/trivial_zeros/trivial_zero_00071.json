@@ -41,9 +41,9 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "a8368d5d1a2b9b1801cd8cc60fea26beb53cb108",
+  "producing_git_commit": "862f5e877282796b7c6cb41a35b6f73630f8c204",
   "source_code_hashes": {
-    "certification.py": "bdb81a7c3e0f0a0ed18677e21adaa4e7eb5fb865e6f2a52a7a618f4e3b61db60",
+    "certification.py": "5a42f45330a409d009d883f931b2181b28d3d630c9320d28f0a4aee56da4cb52",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b",
@@ -68,11 +68,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-24T14:26:34.467626+00:00",
+  "created_at": "2026-08-24T14:50:35.015326+00:00",
   "invalidation_conditions": [
     "zeta_eval_nonzero",
     "derivative_enclosure_contains_zero",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "24323afee7f3cd56ddf83ce78cbea0e194b19b597094d04c1f38b565f5b4794f"
+  "certificate_hash": "10cd551ca49ec9047aff1abd34a368cc428f0d9ab3c119c6aa0415a36fd6a2ea"
 }
