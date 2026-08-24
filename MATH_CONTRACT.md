@@ -2066,7 +2066,7 @@ E(u_n) = \|K_{\cdot, n} u_n\|^2 = u_n^2 \|K_{\cdot, n}\|^2 \ge 0.
    \[
    \min_{u_{-n} \ge 0} \|K_{\cdot, n} u_n - K_{-n} u_{-n}\|^2.
    \]
-3. **Finite Basis Nullity**: In any finite basis of \(M\) test functions (e.g. \(M=30\) channels across 100 zeros), the high numerical nullity (\(\approx 85\)) and ill-conditioning (\(\kappa \sim 10^{15}\)) mean that target columns for internal subspace zeros (e.g. zeros 10 and 50) lie well within the convex cone spanned by the remaining columns, yielding relative NNLS residuals \(< 10^{-6}\).
+3. **Finite Basis Nullity**: In any finite basis of \(M\) test functions (e.g. \(M=30\) channels across 100 zeros), the high numerical nullity (\(\approx 85\)) and ill-conditioning (\(\kappa \sim 10^{15}\)) produce threshold-dependent numerical behavior: compensation was found in the declared basis at the \(10^{-5}\) threshold for interior zeros (zeros 10 and 50 with relative residuals \(< 10^{-6}\)) and was not found at this threshold for peripheral zeros (zeros 1 and 100). This observational diagnostic does not prove nonexistence of a compensating measure or global radial rigidity.
 
 ## 36.4 The Projection Trap and Open Mathematical Obligations
 

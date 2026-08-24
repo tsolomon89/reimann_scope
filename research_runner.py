@@ -1859,7 +1859,6 @@ def evaluate_point(
                     "nnls_compensation_found": "true" if nnls_res["nnls_compensation_found"] else "false",
                     "nnls_residual_nonzero_at_threshold": "true" if nnls_res["nnls_residual_nonzero_at_threshold"] else "false",
                     "finite_response_energy_positive": "true" if nnls_res["finite_response_energy_positive"] else "false",
-                    "positive_energy_holds": "true" if nnls_res["positive_energy_holds"] else "false",
                     "unconstrained_residual_norm": mpmath.nstr(nnls_res["unconstrained_residual_norm"], n=dps),
                     "numerical_rank": str(nnls_res["numerical_rank"]),
                     "nullity": str(nnls_res["nullity"]),
@@ -2188,6 +2187,48 @@ def compute_summary(
                 min_rel_res = mpmath.nstr(min(rel_residuals), n=10) if rel_residuals else "0"
                 max_rel_res = mpmath.nstr(max(rel_residuals), n=10) if rel_residuals else "0"
 
+                ranks: List[int] = []
+                nullities: List[int] = []
+                cond_nums: List[float] = []
+                stabilities: List[str] = []
+
+                for r in results:
+                    out = r.get("outputs", {})
+                    if "numerical_rank" in out and out["numerical_rank"] is not None:
+                        try:
+                            ranks.append(int(out["numerical_rank"]))
+                        except Exception:
+                            pass
+                    if "nullity" in out and out["nullity"] is not None:
+                        try:
+                            nullities.append(int(out["nullity"]))
+                        except Exception:
+                            pass
+                    if "condition_number" in out and out["condition_number"] is not None:
+                        try:
+                            cond_nums.append(float(out["condition_number"]))
+                        except Exception:
+                            pass
+                    if "rank_stability" in out and out["rank_stability"] is not None:
+                        stabilities.append(str(out["rank_stability"]))
+
+                if not ranks or not nullities or not cond_nums:
+                    summary["warnings"].append("Missing or invalid numerical rank, nullity, or condition number in results.")
+
+                min_rank = min(ranks) if ranks else None
+                max_rank = max(ranks) if ranks else None
+                rank_range_str = f"{min_rank}-{max_rank}" if (min_rank is not None and max_rank is not None and min_rank != max_rank) else (str(min_rank) if min_rank is not None else "N/A")
+
+                min_nullity = min(nullities) if nullities else None
+                max_nullity = max(nullities) if nullities else None
+                nullity_range_str = f"{min_nullity}-{max_nullity}" if (min_nullity is not None and max_nullity is not None and min_nullity != max_nullity) else (str(min_nullity) if min_nullity is not None else "N/A")
+
+                min_cond = min(cond_nums) if cond_nums else None
+                max_cond = max(cond_nums) if cond_nums else None
+                cond_range_str = f"~{min_cond:.1e} to ~{max_cond:.1e}" if (min_cond is not None and max_cond is not None) else "N/A"
+
+                rank_stability_val = "threshold_dependent" if "threshold_dependent" in stabilities else (stabilities[0] if stabilities else "unknown")
+
                 per_zero_counts = {}
                 for z_str in sorted(list(set(str(r.get("outputs", {}).get("zero_index")) for r in results)), key=lambda x: int(x)):
                     z_pts = [r for r in results if str(r.get("outputs", {}).get("zero_index")) == z_str]
@@ -2221,11 +2262,17 @@ def compute_summary(
                     "per_zero_breakdown": per_zero_counts,
                     "min_relative_nnls_residual": min_rel_res,
                     "max_relative_nnls_residual": max_rel_res,
-                    "numerical_rank_range": "13-14",
-                    "nullity_range": "85-86",
-                    "condition_number_range": "~2.4e+15 to ~3.0e+15",
-                    "rank_stability": "threshold_dependent",
-                    "conditioning_caveats": "Finite 30-channel basis has high numerical nullity (~85) and condition number (~10^15); target columns for zeros 10 and 50 are well within the convex cone of remaining columns, whereas zeros 1 and 100 are not.",
+                    "min_numerical_rank": min_rank,
+                    "max_numerical_rank": max_rank,
+                    "numerical_rank_range": rank_range_str,
+                    "min_nullity": min_nullity,
+                    "max_nullity": max_nullity,
+                    "nullity_range": nullity_range_str,
+                    "min_condition_number": f"{min_cond:.7e}" if min_cond is not None else None,
+                    "max_condition_number": f"{max_cond:.7e}" if max_cond is not None else None,
+                    "condition_number_range": cond_range_str,
+                    "rank_stability": rank_stability_val,
+                    "conditioning_caveats": f"Finite 30-channel basis has high numerical nullity ({nullity_range_str}) and condition number ({cond_range_str}); compensation was found in the declared basis at the 1e-5 threshold for interior zeros (zeros 10 and 50) and was not found at this threshold for peripheral zeros (zeros 1 and 100).",
                     "theoretical_classification": "coordinate_redundant",
                     "finite_basis_classification": "finite_basis_enrichment_only",
                     "epistemic_classification": "finite_synthetic_sensitivity_diagnostic",
@@ -2535,7 +2582,6 @@ def generate_radial_second_variation_diagnostics(spec: Dict[str, Any], results: 
             "nnls_compensation_found": nnls_res["nnls_compensation_found"],
             "nnls_residual_nonzero_at_threshold": nnls_res["nnls_residual_nonzero_at_threshold"],
             "finite_response_energy_positive": nnls_res["finite_response_energy_positive"],
-            "positive_energy_holds": nnls_res["positive_energy_holds"],
             "participating_indices": [i + 1 for i in nnls_res["participating_indices"]],
             "working_precision_dps": dps
         }

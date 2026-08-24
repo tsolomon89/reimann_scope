@@ -1496,44 +1496,52 @@ def test_radial_second_order_summary_metrics_structure():
 
     # Simulate results with 8 found and 8 not found
     mock_results = []
-    # 4 points for zero 1 (comp false)
+    # 4 points for zero 1 (comp false, rank 13, nullity 86, cond 2.4e15)
     for i in range(4):
         mock_results.append({
             "point_id": i, "status": "ok",
             "outputs": {
                 "zero_index": "1", "relative_second_order_error": "0.0001",
-                "nnls_compensation_found": "false", "nnls_relative_residual": "0.99"
+                "nnls_compensation_found": "false", "nnls_relative_residual": "0.99",
+                "numerical_rank": "13", "nullity": "86", "condition_number": "2.4129594e+15",
+                "rank_stability": "threshold_dependent"
             }
         })
-    # 4 points for zero 10 (comp true)
+    # 4 points for zero 10 (comp true, rank 14, nullity 85, cond 2.4e15)
     for i in range(4, 8):
         mock_results.append({
             "point_id": i, "status": "ok",
             "outputs": {
                 "zero_index": "10", "relative_second_order_error": "0.0001",
-                "nnls_compensation_found": "true", "nnls_relative_residual": "1e-9"
+                "nnls_compensation_found": "true", "nnls_relative_residual": "1e-9",
+                "numerical_rank": "14", "nullity": "85", "condition_number": "2.4129594e+15",
+                "rank_stability": "threshold_dependent"
             }
         })
-    # 4 points for zero 50 (comp true)
+    # 4 points for zero 50 (comp true, rank 14, nullity 85, cond 2.4e15)
     for i in range(8, 12):
         mock_results.append({
             "point_id": i, "status": "ok",
             "outputs": {
                 "zero_index": "50", "relative_second_order_error": "0.0001",
-                "nnls_compensation_found": "true", "nnls_relative_residual": "2e-7"
+                "nnls_compensation_found": "true", "nnls_relative_residual": "2e-7",
+                "numerical_rank": "14", "nullity": "85", "condition_number": "2.4136525e+15",
+                "rank_stability": "threshold_dependent"
             }
         })
-    # 4 points for zero 100 (comp false)
+    # 4 points for zero 100 (comp false, rank 14, nullity 85, cond 3.0e15)
     for i in range(12, 16):
         mock_results.append({
             "point_id": i, "status": "ok",
             "outputs": {
                 "zero_index": "100", "relative_second_order_error": "0.0001",
-                "nnls_compensation_found": "false", "nnls_relative_residual": "3e-5"
+                "nnls_compensation_found": "false", "nnls_relative_residual": "3e-5",
+                "numerical_rank": "14", "nullity": "85", "condition_number": "3.0336525e+15",
+                "rank_stability": "threshold_dependent"
             }
         })
 
-    summary = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", mock_results, "complete")
+    summary = research_runner.compute_summary(spec, mock_results)
     rad_summary = summary.get("radial_second_order_summary", {})
 
     assert rad_summary.get("total_cases") == 16
@@ -1541,6 +1549,14 @@ def test_radial_second_order_summary_metrics_structure():
     assert rad_summary.get("compensation_not_found_count") == 8
     assert rad_summary.get("compensation_found_zero_indices") == ["10", "50"]
     assert rad_summary.get("compensation_not_found_zero_indices") == ["1", "100"]
+    assert rad_summary.get("min_numerical_rank") == 13
+    assert rad_summary.get("max_numerical_rank") == 14
+    assert rad_summary.get("numerical_rank_range") == "13-14"
+    assert rad_summary.get("min_nullity") == 85
+    assert rad_summary.get("max_nullity") == 86
+    assert rad_summary.get("nullity_range") == "85-86"
+    assert rad_summary.get("condition_number_range") == "~2.4e+15 to ~3.0e+15"
+    assert rad_summary.get("rank_stability") == "threshold_dependent"
     assert rad_summary.get("epistemic_classification") == "finite_synthetic_sensitivity_diagnostic"
     assert rad_summary.get("nnls_compensation_status") == "heterogeneous_finite_compensation"
     assert "projection" in rad_summary.get("projection_trap_note", "").lower()

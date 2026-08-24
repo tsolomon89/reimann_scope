@@ -1665,7 +1665,6 @@ def solve_radial_second_order_nnls(
         nnls_compensation_found = bool(rel_nnls_residual < mpmath.mpf('1e-5'))
         nnls_residual_nonzero_at_threshold = bool(rel_nnls_residual >= mpmath.mpf('1e-5'))
         finite_response_energy_positive = bool(energy > mpmath.mpf('1e-25'))
-        positive_energy_holds = finite_response_energy_positive
 
         part_indices = [
             other_indices[c] for c in range(len(other_indices))
@@ -1697,8 +1696,8 @@ def solve_radial_second_order_nnls(
             "nnls_compensation_found": nnls_compensation_found,
             "nnls_residual_nonzero_at_threshold": nnls_residual_nonzero_at_threshold,
             "finite_response_energy_positive": finite_response_energy_positive,
-            "positive_energy_holds": positive_energy_holds,
             "participating_indices": part_indices,
             "other_indices": other_indices,
         }
+
 

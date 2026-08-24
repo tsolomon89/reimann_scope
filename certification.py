@@ -77,6 +77,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope.lean",
     "formal/RiemannScope/Basic.lean",
     "formal/RiemannScope/Grade.lean",
+    "formal/RiemannScope/RadialDefect.lean",
     "formal/RiemannScope/TranscendentalContinuation.lean",
     "formal/RiemannScope/ZeroWorldline.lean",
     "formal/RiemannScope/RadialLeaf.lean",
@@ -84,6 +85,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/SymmetricDefect.lean",
     "formal/RiemannScope/Contradiction.lean",
 ]
+
 
 REQUIRED_FORMAL_CONFIG_FILES = {
     "lean_toolchain": "formal/lean-toolchain",

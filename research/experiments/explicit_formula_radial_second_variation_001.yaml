@@ -7,7 +7,7 @@ object_relationship: synthetic_perturbation_diagnostic
 hypothesis:
   statement: Radial zero-orbit displacement delta produces a leading second-order defect Delta C_h = -2 delta^2 h''(gamma) + O(delta^4) with strictly positive single-target quadratic energy E(u) = ||v_target||^2; finite NNLS compensation behavior is an observational diagnostic of subspace geometry, exhibiting heterogeneous compensation across sampled zeros under fixed arithmetic data.
 prediction:
-  statement: Across all sampled zero orbits and radial displacements delta in [0.001, 0.005, 0.01, 0.05], the relative second-order Taylor error |R(delta)| / |Delta C| scales as O(delta^2) below 0.01, quadratic ratio Delta C(delta) / Delta C(delta/2) converges to 4.0, and finite NNLS compensation is observed for zeros within the convex cone of the sampled 100-zero basis (zeros 10, 50) while remaining uncompensated for peripheral zeros (zeros 1, 100).
+  statement: Across all sampled zero orbits and radial displacements delta in [0.001, 0.005, 0.01, 0.05], the relative second-order Taylor error |R(delta)| / |Delta C| scales as O(delta^2) below 0.01, quadratic ratio Delta C(delta) / Delta C(delta/2) converges to 4.0, and compensation is found in the declared 30-channel basis at the 1e-5 threshold for interior zeros (zeros 10, 50) while compensation is not found at this threshold for peripheral zeros (zeros 1, 100).
 falsification:
   statement: Second-order Taylor remainder fails O(delta^2) relative error convergence (relative_second_order_error > 0.01) or quadratic halving ratio deviates substantially from 4.0.
 interpretation_limit:

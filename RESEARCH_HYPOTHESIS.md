@@ -746,7 +746,7 @@ The research campaign evaluates the second-order radial response of the Riemannâ
      \[
      \min_{u_{-n} \ge 0} \|K_{\cdot, n} u_n - K_{-n} u_{-n}\|^2.
      \]
-   - In the sampled 30-channel basis over 100 zeros, numerical nullity is high (\(\approx 85\)) and conditioning is \(\sim 10^{15}\); non-negative least squares yields heterogeneous results (compensation found for zeros 10 and 50 with relative residuals \(\sim 10^{-10}\) and \(\sim 10^{-7}\); compensation obstructed for peripheral zeros 1 and 100).
+   - In the sampled 30-channel basis over 100 zeros, numerical nullity is high (\(\approx 85\)) and conditioning is \(\sim 10^{15}\); non-negative least squares yields heterogeneous diagnostic results (compensation was found at the \(10^{-5}\) threshold for zeros 10 and 50 with relative residuals \(\sim 10^{-10}\) and \(\sim 10^{-7}\); compensation was not found at this threshold for peripheral zeros 1 and 100).
 4. **The Projection Trap**:
    - The actual zero divisor \(\mathcal D_\zeta\) has an arithmetic explicit-formula representation, while its critical-line projection \(\mathcal P_0(\mathcal D_\zeta)\) has no known independent arithmetic representation.
    - Inferring radial rigidity (\(\Delta\mathcal D_{\mathrm{rad}} = 0\)) from the projected defect remains the unproved missing theorem.

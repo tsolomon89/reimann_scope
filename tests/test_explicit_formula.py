@@ -321,7 +321,8 @@ def test_radial_second_order_jacobian_and_nnls():
             dps=80
         )
 
-        assert nnls_res["positive_energy_holds"] is True
+        assert nnls_res["finite_response_energy_positive"] is True
+        assert "positive_energy_holds" not in nnls_res
         assert nnls_res["quadratic_energy"] > mpmath.mpf('1e-30')
         assert len(nnls_res["nnls_solution"]) == 49
         # Verify all NNLS components are >= 0
@@ -346,25 +347,29 @@ def test_radial_second_order_heterogeneous_nnls_and_positive_energy():
 
         # Zero 1 (col 0)
         res_1 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=0, u_val='1e-6', dps=80)
-        assert res_1["positive_energy_holds"] is True
+        assert res_1["finite_response_energy_positive"] is True
+        assert "positive_energy_holds" not in res_1
         assert res_1["nnls_compensation_found"] is False
         assert res_1["nnls_relative_residual"] > mpmath.mpf('0.9')
 
         # Zero 10 (col 9)
         res_10 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=9, u_val='1e-6', dps=80)
-        assert res_10["positive_energy_holds"] is True
+        assert res_10["finite_response_energy_positive"] is True
+        assert "positive_energy_holds" not in res_10
         assert res_10["nnls_compensation_found"] is True
         assert res_10["nnls_relative_residual"] < mpmath.mpf('1e-6')
 
         # Zero 50 (col 49)
         res_50 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=49, u_val='1e-6', dps=80)
-        assert res_50["positive_energy_holds"] is True
+        assert res_50["finite_response_energy_positive"] is True
+        assert "positive_energy_holds" not in res_50
         assert res_50["nnls_compensation_found"] is True
         assert res_50["nnls_relative_residual"] < mpmath.mpf('1e-6')
 
         # Zero 100 (col 99)
         res_100 = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=99, u_val='1e-6', dps=80)
-        assert res_100["positive_energy_holds"] is True
+        assert res_100["finite_response_energy_positive"] is True
+        assert "positive_energy_holds" not in res_100
         assert res_100["nnls_compensation_found"] is False
         assert res_100["nnls_relative_residual"] > mpmath.mpf('1e-5')
 
@@ -492,6 +497,74 @@ def test_lean_formal_file_boundary():
     # Verify no ungrounded claim that RH or global non-compensation is proven in Lean
     assert "theorem riemann_hypothesis" not in content.lower()
     assert "rh_proved" not in content.lower()
+
+
+def test_positive_energy_holds_obsolete_alias_not_emitted():
+    """Verify that positive_energy_holds is not emitted by math_core or research_runner."""
+    ref_zeros = reference_data.load_first_100_reference_zeros()
+    j_list = [1, 2]
+    k_list = [0]
+    K_mat = math_core.radial_second_order_jacobian(j_list, k_list, ref_zeros, dps=30)
+    nnls_res = math_core.solve_radial_second_order_nnls(K_mat, target_col_idx=0, u_val='1e-6', dps=30)
+
+    assert "positive_energy_holds" not in nnls_res
+    assert "finite_response_energy_positive" in nnls_res
+
+
+def test_radial_second_order_summary_derived_from_result_rows_with_fixtures():
+    """Verify that altering fixture rows changes summary statistics, proving dynamic derivation."""
+    import yaml
+    import research_runner
+
+    with open("research/experiments/explicit_formula_radial_second_variation_001.yaml", "r", encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+
+    fake_results = [
+        {
+            "point_id": 0,
+            "inputs": {"zero_index": "1", "delta": "0.01"},
+            "outputs": {
+                "zero_index": "1",
+                "relative_second_order_error": "0.0001",
+                "nnls_compensation_found": "false",
+                "nnls_relative_residual": "0.99",
+                "numerical_rank": "20",
+                "nullity": "80",
+                "condition_number": "5.0e+10",
+                "rank_stability": "stable_fixed"
+            }
+        },
+        {
+            "point_id": 1,
+            "inputs": {"zero_index": "10", "delta": "0.01"},
+            "outputs": {
+                "zero_index": "10",
+                "relative_second_order_error": "0.00005",
+                "nnls_compensation_found": "true",
+                "nnls_relative_residual": "1e-8",
+                "numerical_rank": "25",
+                "nullity": "75",
+                "condition_number": "9.0e+12",
+                "rank_stability": "stable_fixed"
+            }
+        }
+    ]
+
+    summary = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", fake_results, "complete")
+    rad_sum = summary["radial_second_order_summary"]
+
+    assert rad_sum["total_cases"] == 2
+    assert rad_sum["compensation_found_count"] == 1
+    assert rad_sum["compensation_not_found_count"] == 1
+    assert rad_sum["min_numerical_rank"] == 20
+    assert rad_sum["max_numerical_rank"] == 25
+    assert rad_sum["numerical_rank_range"] == "20-25"
+    assert rad_sum["min_nullity"] == 75
+    assert rad_sum["max_nullity"] == 80
+    assert rad_sum["nullity_range"] == "75-80"
+    assert rad_sum["condition_number_range"] == "~5.0e+10 to ~9.0e+12"
+    assert rad_sum["rank_stability"] == "stable_fixed"
+
 
 
 

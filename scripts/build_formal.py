@@ -31,6 +31,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope.lean",
     "formal/RiemannScope/Basic.lean",
     "formal/RiemannScope/Grade.lean",
+    "formal/RiemannScope/RadialDefect.lean",
     "formal/RiemannScope/TranscendentalContinuation.lean",
     "formal/RiemannScope/ZeroWorldline.lean",
     "formal/RiemannScope/RadialLeaf.lean",
@@ -38,6 +39,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/SymmetricDefect.lean",
     "formal/RiemannScope/Contradiction.lean",
 ]
+
 
 REQUIRED_BUILDER_FILES = [
     "scripts/build_formal.py",

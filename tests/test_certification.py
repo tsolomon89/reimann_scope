@@ -1158,3 +1158,32 @@ def test_adversarial_formal_build_report_wrong_command_and_contradictory_status(
     ok, state, _, errs = certification.verify_formal_build_report(str(tmp_file), check_current=False)
     assert not ok
     assert any("exit code" in e for e in errs)
+
+
+def test_formal_source_files_complete_and_tracked():
+    """Verify that all project-owned git-tracked .lean sources under formal/ are in the formal inventory."""
+    import subprocess
+    import scripts.build_formal
+
+    tracked_lean = subprocess.check_output(
+        ["git", "ls-files", "formal/*.lean", "formal/**/*.lean"],
+        cwd=certification.REPO_ROOT
+    ).decode("utf-8").strip().splitlines()
+
+    tracked_set = set(p.replace("\\", "/") for p in tracked_lean if p.strip())
+    req_set = set(certification.REQUIRED_FORMAL_SOURCES)
+    builder_set = set(scripts.build_formal.FORMAL_SOURCE_FILES)
+
+    # 1. No tracked Lean source is omitted
+    missing_from_req = tracked_set - req_set
+    assert not missing_from_req, f"Tracked Lean sources missing from certification.REQUIRED_FORMAL_SOURCES: {missing_from_req}"
+
+    missing_from_builder = tracked_set - builder_set
+    assert not missing_from_builder, f"Tracked Lean sources missing from scripts.build_formal.FORMAL_SOURCE_FILES: {missing_from_builder}"
+
+    # 2. Both inventories are identical
+    assert req_set == builder_set, f"Inventory mismatch between certification.py and scripts/build_formal.py: {req_set ^ builder_set}"
+
+    # 3. Explicitly check RadialDefect.lean is present
+    assert "formal/RiemannScope/RadialDefect.lean" in req_set
+
