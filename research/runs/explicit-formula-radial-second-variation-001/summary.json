@@ -524,6 +524,12 @@
     "max_condition_number": "3.0284180e+15",
     "condition_number_range": "~2.4e+15 to ~3.0e+15",
     "rank_stability": "threshold_dependent",
+    "rank_stability_labels": [
+      "threshold_dependent"
+    ],
+    "input_complete": true,
+    "input_anomalies": [],
+    "input_anomaly_count": 0,
     "conditioning_caveats": "Finite 30-channel basis has high numerical nullity (85-86) and condition number (~2.4e+15 to ~3.0e+15); compensation was found in the declared basis at the 1e-5 threshold for interior zeros (zeros 10 and 50) and was not found at this threshold for peripheral zeros (zeros 1 and 100).",
     "theoretical_classification": "coordinate_redundant",
     "finite_basis_classification": "finite_basis_enrichment_only",

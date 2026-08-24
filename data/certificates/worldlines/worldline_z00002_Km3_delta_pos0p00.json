@@ -3,7 +3,7 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "actual_zero_worldline",
-  "source_zero_hash": "9ea6086f66f5a9cb5255c5a2a592a64966b0c8ceb30c5af2e7e00975df421f86",
+  "source_zero_hash": "db9b668b24c6777fc209082ba6e33e513e72d54ec59f1f28356316e590f3071b",
   "source_zero_family": "nontrivial",
   "source_zero_index": 2,
   "zero_family": "nontrivial",
@@ -29,15 +29,15 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "fd527318e6a3d67064c20b373e87570fd696a954",
+  "producing_git_commit": "cf4566f7b20f5ae601b2fd6ee588dd920fb27607",
   "source_code_hashes": {
-    "certification.py": "4b241a32c20a2e7dc210d3aafe051dae0af983017c5263e4baa5582d5f16dbdf",
+    "certification.py": "bdb81a7c3e0f0a0ed18677e21adaa4e7eb5fb865e6f2a52a7a618f4e3b61db60",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "6565ad16ccfc867d43928ca78a780bd904459b51a67cac52ab2f639b408f685b",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "research_runner.py": "c149ea31d8c260b982aeaaeefef258b26ed45fbbbbc9fb206c57cea2a11e41a3",
+    "research_runner.py": "2f17114482ade37e168235db754e7c942bc57219a33d2bf237717cea5087eec1",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
   "input_data_hashes": {
@@ -56,11 +56,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-24T09:30:23.253288+00:00",
+  "created_at": "2026-08-24T13:57:28.151859+00:00",
   "invalidation_conditions": [
     "source_zero_hash_mismatch",
     "radial_residual_tolerance_exceeded",
     "formal_theorem_missing"
   ],
-  "certificate_hash": "e1ac080f2ce4d38cb6b74545ad89954dfd026bd65c7ffc483d4e43a59ec67f6d"
+  "certificate_hash": "14ca8e2e01151a0c9590002f023445a29cbe973901979b3522475b47546ddde5"
 }
