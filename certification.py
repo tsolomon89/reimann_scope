@@ -593,6 +593,26 @@ def verify_formal_build_report(
                     if cur_h != b_h:
                         errors.append(f"Builder source file '{b_rel}' hash mismatch: disk {cur_h}, report {b_h}")
 
+    # 8. Project Theorem Declarations verification
+    import re
+    def _count_theorems_on_disk() -> int:
+        count = 0
+        pat = re.compile(r'^\s*theorem\s+([A-Za-z0-9_]+)', re.MULTILINE)
+        for src in REQUIRED_FORMAL_SOURCES:
+            p = os.path.join(REPO_ROOT, src)
+            if os.path.exists(p):
+                with open(p, "r", encoding="utf-8") as f:
+                    count += len(pat.findall(f.read()))
+        return count
+
+    rep_thm = report.get("project_theorem_declarations_compiled", report.get("total_theorems"))
+    if rep_thm is None or not isinstance(rep_thm, int) or rep_thm <= 0:
+        errors.append(f"Formal build report missing or invalid project_theorem_declarations_compiled: got '{rep_thm}'")
+    elif check_current:
+        act_thm = _count_theorems_on_disk()
+        if rep_thm != act_thm:
+            errors.append(f"Formal build report theorem count ({rep_thm}) != active disk theorem declarations ({act_thm})")
+
     is_verified = (len(errors) == 0 and report.get("status") == "passed" and report.get("exit_code") == 0)
     state = "verified" if is_verified else ("stale" if report.get("status") == "passed" else "failed")
     return is_verified, state, report, errors

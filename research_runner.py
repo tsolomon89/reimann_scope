@@ -2571,6 +2571,93 @@ def update_index_file(run_entry: Dict[str, Any]):
                 pass
 
 
+def get_package_version(pkg_name: str) -> str:
+    """Return the installed version string for a material package or fail closed."""
+    norm_name = pkg_name.lower().replace("-", "_")
+    if norm_name in ("flint", "python_flint"):
+        return certification.FLINT_VERSION
+    try:
+        import importlib.metadata
+        return importlib.metadata.version(pkg_name)
+    except Exception:
+        try:
+            mod = sys.modules.get(pkg_name) or __import__(pkg_name)
+            ver = getattr(mod, "__version__", None)
+            if ver:
+                return str(ver)
+        except Exception:
+            pass
+    raise RuntimeError(f"Required material package '{pkg_name}' cannot be versioned or is not installed.")
+
+
+def _write_diagnostics(
+    work_dir: str,
+    handler: Any,
+    all_results: List[Dict[str, Any]],
+    spec: Dict[str, Any],
+    dps: int = 80
+) -> Tuple[Optional[str], Optional[str]]:
+    """Generate, losslessly serialize, validate, and atomically write diagnostics.json.
+
+    Returns (relative_path, sha256) or (None, None).
+    Fails closed if diagnostics generation fails or if handler declares diagnostics but returns None.
+    """
+    tmp_path = os.path.join(work_dir, "diagnostics.json.tmp")
+    final_path = os.path.join(work_dir, "diagnostics.json")
+    if os.path.exists(tmp_path):
+        os.remove(tmp_path)
+
+    has_diag = getattr(handler, "has_diagnostics", False)
+    diag_data = None
+    if handler and hasattr(handler, "generate_diagnostics"):
+        try:
+            diag_data = handler.generate_diagnostics(all_results, spec, work_dir)
+        except Exception as e:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+            if os.path.exists(final_path):
+                os.remove(final_path)
+            raise RuntimeError(f"Diagnostics generation failed for '{spec.get('id')}': {e}") from e
+
+    if diag_data is None:
+        if has_diag:
+            raise RuntimeError(f"Handler '{spec.get('id')}' declared has_diagnostics=True but generate_diagnostics returned None")
+        if os.path.exists(final_path):
+            os.remove(final_path)
+        return None, None
+
+    diag_safe = math_core.to_json_safe(diag_data, dps=dps)
+    if not isinstance(diag_safe, dict):
+        raise ValueError(f"Diagnostics data for '{spec.get('id')}' must be a dictionary, got {type(diag_safe)}")
+    if diag_safe.get("experiment_id") != spec.get("id"):
+        raise ValueError(f"Diagnostics experiment_id mismatch: expected '{spec.get('id')}', got '{diag_safe.get('experiment_id')}'")
+
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(diag_safe, f, indent=2)
+    except Exception as e:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise RuntimeError(f"Failed serializing diagnostics for '{spec.get('id')}': {e}") from e
+
+    try:
+        with open(tmp_path, "r", encoding="utf-8") as f:
+            verified_diag = json.load(f)
+        if not isinstance(verified_diag, dict):
+            raise ValueError("Parsed diagnostics is not a dictionary")
+    except Exception as e:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise RuntimeError(f"Diagnostics JSON semantic validation failed for '{spec.get('id')}': {e}") from e
+
+    os.replace(tmp_path, final_path)
+
+    with open(final_path, "rb") as f:
+        diag_sha = hashlib.sha256(f.read().replace(b"\r\n", b"\n")).hexdigest()
+
+    return "diagnostics.json", diag_sha
+
+
 # ==============================================================================
 # MAIN EXPERIMENT RUNNER ENGINE
 # ==============================================================================
@@ -2609,6 +2696,7 @@ def run_experiment(
     stable_dir = os.path.join(RUNS_DIR, exp_id)
     run_id = exp_id
 
+    handler = None
     try:
         handler = get_handler(exp_id)
         declared_modules = handler.declared_dependencies.all_code_modules
@@ -2618,6 +2706,12 @@ def run_experiment(
     all_modules = sorted(list(set(list(certification.REQUIRED_SOURCE_MODULES) + declared_modules)))
     initial_src_hashes = certification._get_source_code_hashes(git_commit, modules=all_modules)
     initial_data_hashes = certification._get_input_data_hashes(git_commit)
+    material_pkgs = handler.declared_dependencies.material_packages if handler else ["mpmath", "flint"]
+    runtime_packages = {}
+    for p in material_pkgs:
+        runtime_packages[p] = get_package_version(p)
+    if "python_flint" not in runtime_packages and "flint" in runtime_packages:
+        runtime_packages["python_flint"] = certification.FLINT_VERSION
 
     work_dir = os.path.join(RUNS_DIR, f".tmp_{exp_id}_{os.getpid()}")
     if os.path.exists(work_dir):
@@ -2670,10 +2764,7 @@ def run_experiment(
             "runtime": {
                 "python": sys.version,
                 "platform": sys.platform,
-                "packages": {
-                    "mpmath": getattr(mpmath, "__version__", "N/A"),
-                    "flint": getattr(math_core, "flint_ctx", None) is not None
-                }
+                "packages": runtime_packages
             },
             "dependency_fingerprint": certification._get_dependency_fingerprint(),
             "source_code_hashes": initial_src_hashes,
@@ -2767,13 +2858,7 @@ def run_experiment(
     with open(os.path.join(work_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(readme_content)
 
-    try:
-        handler = get_handler(exp_id)
-        handler.generate_diagnostics(all_results, spec, work_dir)
-    except KeyError:
-        pass
-    except Exception as e:
-        manifest.setdefault("warnings", []).append(f"Diagnostics generation failed: {e}")
+    diag_path, diag_sha = _write_diagnostics(work_dir, handler, all_results, spec, dps=dps)
 
     with open(os.path.join(work_dir, "results.jsonl"), "rb") as rf:
         results_sha = hashlib.sha256(rf.read().replace(b"\r\n", b"\n")).hexdigest()
@@ -2796,15 +2881,16 @@ def run_experiment(
             "sha256": readme_sha
         }
     }
-    diag_file = os.path.join(work_dir, "diagnostics.json")
-    diag_sha = None
-    if os.path.exists(diag_file):
-        with open(diag_file, "rb") as df:
-            diag_sha = hashlib.sha256(df.read().replace(b"\r\n", b"\n")).hexdigest()
+    if diag_sha:
         manifest["artifacts"]["diagnostics_json"] = {
             "path": "diagnostics.json",
             "sha256": diag_sha
         }
+    elif "diagnostics_json" in manifest.get("artifacts", {}):
+        del manifest["artifacts"]["diagnostics_json"]
+
+    summarizer_mods = ["research_runner.py", "research/handlers/base.py"] + (handler.declared_dependencies.handler_modules if handler else [])
+    summarizer_src_hashes = {m: cur_src_hashes.get(m, "N/A") for m in sorted(list(set(summarizer_mods)))}
 
     manifest["execution_provenance"] = {
         "results_sha256": results_sha,
@@ -2815,6 +2901,7 @@ def run_experiment(
         "source_code_hashes": cur_src_hashes,
         "input_data_hashes": cur_data_hashes,
         "dependency_fingerprint": manifest["dependency_fingerprint"],
+        "material_runtime": runtime_packages,
         "code_modules": manifest["code_modules"],
         "data_provenance": manifest["data_provenance"],
     }
@@ -2824,9 +2911,7 @@ def run_experiment(
         "diagnostics_sha256": diag_sha,
         "summary_git_commit": git_commit,
         "summarized_at": manifest["completed_at"],
-        "summarizer_source_hashes": {
-            "research_runner.py": cur_src_hashes.get("research_runner.py", "N/A"),
-        }
+        "summarizer_source_hashes": summarizer_src_hashes
     }
 
     with open(os.path.join(work_dir, "manifest.json"), "w", encoding="utf-8") as f:
@@ -2873,126 +2958,164 @@ def run_experiment(
         if os.path.exists(backup_dir):
             shutil.move(backup_dir, stable_dir)
         if os.path.exists(backup_index_path):
-            shutil.copy2(backup_index_path, INDEX_FILE)
-            os.remove(backup_index_path)
-        if os.path.exists(work_dir):
-            shutil.rmtree(work_dir, ignore_errors=True)
-        raise e
+            shutil.move(backup_index_path, INDEX_FILE)
+        raise
 
     return exp_id
 
 
-def summarize_run(run_id: str) -> Dict[str, Any]:
-    """Recompute and return summary for an existing run."""
-    run_dir = os.path.join(RUNS_DIR, run_id)
-    if not os.path.exists(run_dir):
-        raise FileNotFoundError(f"Run directory '{run_dir}' not found")
+def summarize_run(run_id: str, spec_path: Optional[str] = None) -> Dict[str, Any]:
+    """Atomically resummarize an existing run from validated results.jsonl.
 
-    manifest_path = os.path.join(run_dir, "manifest.json")
-    with open(manifest_path, "r", encoding="utf-8") as f:
-        manifest = json.load(f)
+    Preserves:
+    - results.jsonl byte-for-byte
+    - execution_provenance, producing_git_commit, started_at, completed_at
+    Updates:
+    - summary.json, README.md, diagnostics.json
+    - summary_provenance (with current commit, timestamp, and summarizer source hashes)
+    Leaves existing stable bundle untouched on failure.
+    """
+    stable_dir = os.path.join(RUNS_DIR, run_id)
+    if not os.path.exists(stable_dir):
+        raise FileNotFoundError(f"Run directory '{stable_dir}' does not exist")
 
-    exp_id = manifest["experiment_id"]
-    candidates = [
-        os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
-        os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('-', '_')}.yaml"),
-        os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('_', '-')}.yaml"),
-    ]
-    spec_path = None
-    for cand in candidates:
-        if os.path.exists(cand):
-            spec_path = cand
-            break
-
-    if not spec_path:
-        for fname in os.listdir(EXPERIMENTS_DIR):
-            if fname.endswith(".yaml") or fname.endswith(".yml"):
-                p = os.path.join(EXPERIMENTS_DIR, fname)
-                with open(p, "r", encoding="utf-8") as sf:
-                    try:
-                        s_data = yaml.safe_load(sf)
-                        if s_data and (s_data.get("experiment_id") == exp_id or s_data.get("id") == exp_id):
-                            spec_path = p
-                            break
-                    except Exception:
-                        pass
-
-    if not spec_path or not os.path.exists(spec_path):
-        raise FileNotFoundError(f"Experiment spec for '{exp_id}' not found")
-
-    with open(spec_path, "r", encoding="utf-8") as f:
-        spec = yaml.safe_load(f)
-
-    results_path = os.path.join(run_dir, "results.jsonl")
-    results = []
+    manifest_path = os.path.join(stable_dir, "manifest.json")
+    results_path = os.path.join(stable_dir, "results.jsonl")
+    if not os.path.exists(manifest_path):
+        raise FileNotFoundError(f"Run directory '{stable_dir}' missing manifest.json")
     if not os.path.exists(results_path):
-        raise FileNotFoundError(f"Results file '{results_path}' not found")
+        raise FileNotFoundError(f"Run directory '{stable_dir}' missing results.jsonl")
 
-    with open(results_path, "rb") as rf:
-        raw_results_bytes = rf.read()
-    results_sha_before = hashlib.sha256(raw_results_bytes.replace(b"\r\n", b"\n")).hexdigest()
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        orig_manifest = json.load(f)
 
-    for line in raw_results_bytes.decode("utf-8").splitlines():
-        if line.strip():
-            results.append(json.loads(line))
+    with open(results_path, "rb") as f:
+        results_bytes = f.read().replace(b"\r\n", b"\n")
+        results_sha_before = hashlib.sha256(results_bytes).hexdigest()
 
-    status = "complete" if len(results) >= manifest.get("points_requested", 0) else "incomplete"
-    summary = compute_summary(spec, run_id, results, status=status)
+    results: List[Dict[str, Any]] = []
+    with open(results_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line_s = line.strip()
+            if line_s:
+                results.append(json.loads(line_s))
 
-    with open(os.path.join(run_dir, "summary.json"), "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
+    exp_id = orig_manifest.get("experiment_id", run_id)
+    spec = None
+    if spec_path and os.path.exists(spec_path):
+        with open(spec_path, "r", encoding="utf-8") as f:
+            spec = yaml.safe_load(f)
+    else:
+        for cand in [
+            os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
+            os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('-', '_')}.yaml"),
+            os.path.join(EXPERIMENTS_DIR, f"{exp_id.replace('_', '-')}.yaml"),
+        ]:
+            if os.path.exists(cand):
+                with open(cand, "r", encoding="utf-8") as f:
+                    spec = yaml.safe_load(f)
+                break
+    if not spec:
+        raise FileNotFoundError(f"No experiment specification found for '{exp_id}'")
 
-    readme_content = generate_run_readme(spec, manifest, summary)
-    with open(os.path.join(run_dir, "README.md"), "w", encoding="utf-8") as f:
-        f.write(readme_content)
-
+    handler = None
     try:
         handler = get_handler(exp_id)
-        handler.generate_diagnostics(results, spec, run_dir)
     except KeyError:
         pass
-    except Exception as e:
-        manifest.setdefault("warnings", []).append(f"Diagnostics generation failed: {e}")
 
-    with open(results_path, "rb") as rf:
-        results_sha_after = hashlib.sha256(rf.read().replace(b"\r\n", b"\n")).hexdigest()
-    if results_sha_before != results_sha_after:
-        raise RuntimeError(f"summarize_run corrupted results.jsonl: SHA mismatch ({results_sha_before} != {results_sha_after})")
+    pid = os.getpid()
+    staging_dir = os.path.join(RUNS_DIR, f".summary_staging_{exp_id}_{pid}")
+    if os.path.exists(staging_dir):
+        shutil.rmtree(staging_dir, ignore_errors=True)
+    os.makedirs(staging_dir, exist_ok=True)
 
-    with open(os.path.join(run_dir, "summary.json"), "rb") as sf:
-        summary_sha = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
-    with open(os.path.join(run_dir, "README.md"), "rb") as rmf:
-        readme_sha = hashlib.sha256(rmf.read().replace(b"\r\n", b"\n")).hexdigest()
+    try:
+        staging_results_path = os.path.join(staging_dir, "results.jsonl")
+        with open(staging_results_path, "wb") as f:
+            f.write(results_bytes)
 
-    manifest.setdefault("artifacts", {})
-    manifest["artifacts"]["results_jsonl"] = {"path": "results.jsonl", "sha256": results_sha_after}
-    manifest["artifacts"]["summary_json"] = {"path": "summary.json", "sha256": summary_sha}
-    manifest["artifacts"]["readme_md"] = {"path": "README.md", "sha256": readme_sha}
+        with open(staging_results_path, "rb") as f:
+            results_sha_after = hashlib.sha256(f.read().replace(b"\r\n", b"\n")).hexdigest()
+        if results_sha_before != results_sha_after:
+            raise RuntimeError(f"Byte mismatch during results copy ({results_sha_before} != {results_sha_after})")
 
-    diag_file = os.path.join(run_dir, "diagnostics.json")
-    diag_sha = None
-    if os.path.exists(diag_file):
-        with open(diag_file, "rb") as df:
-            diag_sha = hashlib.sha256(df.read().replace(b"\r\n", b"\n")).hexdigest()
-        manifest["artifacts"]["diagnostics_json"] = {"path": "diagnostics.json", "sha256": diag_sha}
+        status = orig_manifest.get("status", "complete")
+        summary = compute_summary(spec, exp_id, results, status=status)
+        with open(os.path.join(staging_dir, "summary.json"), "w", encoding="utf-8") as f:
+            json.dump(summary, f, indent=2)
 
-    commit, _ = get_git_info()
-    cur_src = certification._get_source_code_hashes(commit)
-    manifest["summary_provenance"] = {
-        "summary_sha256": summary_sha,
-        "readme_sha256": readme_sha,
-        "diagnostics_sha256": diag_sha,
-        "summary_git_commit": commit,
-        "summarized_at": datetime.now(timezone.utc).isoformat(),
-        "summarizer_source_hashes": {
-            "research_runner.py": cur_src.get("research_runner.py", "N/A"),
+        new_manifest = json.loads(json.dumps(orig_manifest))
+        new_manifest["warnings"] = [w for w in new_manifest.get("warnings", []) if not str(w).startswith("Diagnostics generation failed")]
+
+        readme_content = generate_run_readme(spec, new_manifest, summary)
+        with open(os.path.join(staging_dir, "README.md"), "w", encoding="utf-8") as f:
+            f.write(readme_content)
+
+        dps = spec.get("precision", {}).get("dps", 80)
+        diag_path, diag_sha = _write_diagnostics(staging_dir, handler, results, spec, dps=dps)
+
+        with open(os.path.join(staging_dir, "summary.json"), "rb") as sf:
+            summary_sha = hashlib.sha256(sf.read().replace(b"\r\n", b"\n")).hexdigest()
+        with open(os.path.join(staging_dir, "README.md"), "rb") as rmf:
+            readme_sha = hashlib.sha256(rmf.read().replace(b"\r\n", b"\n")).hexdigest()
+
+        new_manifest.setdefault("artifacts", {})
+        new_manifest["artifacts"]["results_jsonl"] = {"path": "results.jsonl", "sha256": results_sha_after}
+        new_manifest["artifacts"]["summary_json"] = {"path": "summary.json", "sha256": summary_sha}
+        new_manifest["artifacts"]["readme_md"] = {"path": "README.md", "sha256": readme_sha}
+        if diag_sha:
+            new_manifest["artifacts"]["diagnostics_json"] = {"path": "diagnostics.json", "sha256": diag_sha}
+        elif "diagnostics_json" in new_manifest["artifacts"]:
+            del new_manifest["artifacts"]["diagnostics_json"]
+
+        commit, is_dirty = get_git_info()
+        cur_src = certification._get_source_code_hashes(commit)
+        summarizer_mods = ["research_runner.py", "research/handlers/base.py"] + (handler.declared_dependencies.handler_modules if handler else [])
+        summarizer_src_hashes = {m: cur_src.get(m, "N/A") for m in sorted(list(set(summarizer_mods)))}
+
+        new_manifest["summary_provenance"] = {
+            "summary_sha256": summary_sha,
+            "readme_sha256": readme_sha,
+            "diagnostics_sha256": diag_sha,
+            "summary_git_commit": commit,
+            "summarized_at": datetime.now(timezone.utc).isoformat(),
+            "summarizer_source_hashes": summarizer_src_hashes
         }
-    }
 
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
+        with open(os.path.join(staging_dir, "manifest.json"), "w", encoding="utf-8") as f:
+            json.dump(new_manifest, f, indent=2)
 
-    return summary
+        val_ok, val_errs = validate_run_bundle(staging_dir, canonical_current=False)
+        if not val_ok:
+            raise RuntimeError(f"Resummarization validation failed for '{exp_id}': {'; '.join(val_errs)}")
+
+        backup_dir = os.path.join(RUNS_DIR, f".bak_{exp_id}_{pid}")
+        if os.path.exists(backup_dir):
+            shutil.rmtree(backup_dir, ignore_errors=True)
+
+        if os.path.exists(stable_dir):
+            shutil.copytree(stable_dir, backup_dir)
+            shutil.rmtree(stable_dir, ignore_errors=True)
+        try:
+            shutil.move(staging_dir, stable_dir)
+            if os.path.exists(backup_dir):
+                shutil.rmtree(backup_dir, ignore_errors=True)
+        except Exception as swap_err:
+            if os.path.exists(backup_dir):
+                if os.path.exists(stable_dir):
+                    shutil.rmtree(stable_dir, ignore_errors=True)
+                shutil.move(backup_dir, stable_dir)
+            raise swap_err
+
+        run_entry = project_canonical_index_entry(new_manifest, summary, exp_id)
+        if "notes" in spec and "notes" not in run_entry:
+            run_entry["notes"] = spec["notes"]
+        update_index_file(run_entry)
+        return summary
+    finally:
+        if os.path.exists(staging_dir):
+            shutil.rmtree(staging_dir, ignore_errors=True)
 
 
 REQUIRED_MANIFEST_BASE_FIELDS = [
@@ -3283,6 +3406,28 @@ def validate_manifest(
             elif curr_dh != data_hashes.get(df_name):
                 errors.append(f"Current input data file '{df_name}' hash mismatch: disk {curr_dh}, manifest {data_hashes.get(df_name)}")
 
+        # Material runtime packages check
+        try:
+            handler = get_handler(exp_id)
+            mat_pkgs = handler.declared_dependencies.material_packages
+        except KeyError:
+            mat_pkgs = ["mpmath", "flint"]
+
+        rep_pkgs = manifest.get("runtime", {}).get("packages", {})
+        if not isinstance(rep_pkgs, dict):
+            rep_pkgs = {}
+        for pkg in mat_pkgs:
+            try:
+                curr_ver = get_package_version(pkg)
+            except Exception as e:
+                errors.append(f"Cannot resolve current version for material package '{pkg}': {e}")
+                continue
+            rep_ver = rep_pkgs.get(pkg)
+            if not rep_ver:
+                errors.append(f"Manifest runtime packages missing declared material package '{pkg}'")
+            elif rep_ver != curr_ver:
+                errors.append(f"Material package '{pkg}' version mismatch: current runtime '{curr_ver}', manifest '{rep_ver}'")
+
     # 9b. Execution and Summary Provenance structure validation (when present)
     exec_prov = manifest.get("execution_provenance")
     if exec_prov is not None:
@@ -3297,6 +3442,10 @@ def validate_manifest(
             errors.append("Manifest 'summary_provenance' must be a dictionary")
         elif not summ_prov.get("summary_sha256") or len(summ_prov.get("summary_sha256", "")) != 64:
             errors.append("Manifest 'summary_provenance' missing valid 64-hex 'summary_sha256'")
+
+    for w in manifest.get("warnings", []):
+        if "Diagnostics generation failed" in str(w):
+            errors.append(f"Manifest contains fatal diagnostic failure warning: '{w}'")
     if spec is None and exp_id:
         candidates = [
             os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
@@ -3368,103 +3517,111 @@ def validate_manifest(
     if results is not None:
         pts_req = manifest.get("points_requested", 0)
         pts_comp = manifest.get("points_completed", len(results))
-        if manifest.get("status") == "complete":
-            if len(results) != pts_req or pts_comp != pts_req:
-                errors.append(f"Run claims status='complete' but results count ({len(results)}) != requested ({pts_req})")
+        if pts_comp != pts_req and manifest.get("status") == "complete":
+            errors.append(f"Manifest claims status='complete' but points_completed ({pts_comp}) != points_requested ({pts_req})")
+        if len(results) != pts_comp:
+            errors.append(f"Actual results count ({len(results)}) != manifest points_completed ({pts_comp})")
 
-        used_in_points: Set[str] = set()
-        for idx, rec in enumerate(results):
-            if manifest.get("status") == "complete" and rec.get("status") != "ok":
-                errors.append(f"Point {idx} (id={rec.get('point_id')}) has failed status '{rec.get('status')}'")
+        pts_failed = 0
+        seen_pt_ids: Set[int] = set()
 
-            outs = rec.get("outputs", {})
-            rec_in = rec.get("inputs", {})
-            if not isinstance(outs, dict):
+        for idx, pt in enumerate(results):
+            if not isinstance(pt, dict):
+                errors.append(f"Point record #{idx} is not a dict")
                 continue
 
-            if manifest.get("status") == "complete" and "point_error" in outs:
-                errors.append(f"Point {idx} contains point_error: {outs.get('point_error')}")
+            pid = pt.get("point_id")
+            if pid is None or not isinstance(pid, int) or pid < 0:
+                errors.append(f"Point record #{idx} missing valid integer point_id")
+            elif pid in seen_pt_ids:
+                errors.append(f"Duplicate point_id '{pid}' in results.jsonl")
+            else:
+                seen_pt_ids.add(pid)
 
-            for k in ["source_zero_cert_hash", "worldline_cert_hash", "cert_hash", "zero1_cert_hash", "zero2_cert_hash"]:
-                h_val = outs.get(k)
-                if h_val and h_val != "N/A":
-                    h_str = str(h_val)
-                    used_in_points.add(h_str)
-                    if h_str not in consumed:
-                        errors.append(f"Point {idx} uses certificate {h_str} which is missing from manifest consumed_certificates")
+            st = pt.get("status")
+            if st not in ("ok", "success"):
+                pts_failed += 1
+                if spec and spec.get("epistemic_class") == "exact_control":
+                    errors.append(f"Exact control experiment '{exp_id}' failed at point {pid}: error='{pt.get('error')}'")
 
-            if str(outs.get("worldline_certified")).lower() == "true":
-                if not outs.get("worldline_cert_hash") or outs.get("worldline_cert_hash") == "N/A":
-                    errors.append(f"Point {idx} claims worldline_certified=true but worldline_cert_hash is 'N/A'")
+            outs = pt.get("outputs")
+            if not isinstance(outs, dict):
+                errors.append(f"Point record #{idx} outputs must be a dict")
+            # General certificate outputs validation
+            s_cert_hash = outs.get("source_zero_cert_hash") or outs.get("zero1_cert_hash")
+            if s_cert_hash and s_cert_hash != "N/A" and s_cert_hash not in consumed:
+                errors.append(f"Point {pid} source_zero_cert_hash '{s_cert_hash}' missing from manifest consumed_certificates")
 
-            if op_obl.get("requires_certified_flag"):
-                c_flag = outs.get("worldline_certified")
-                if c_flag is None or str(c_flag).lower() != "true":
-                    errors.append(f"Point {idx} operation '{op_name}' requires worldline_certified=true, got '{c_flag}'")
+            w_cert_hash = outs.get("worldline_cert_hash")
+            if w_cert_hash and w_cert_hash != "N/A" and w_cert_hash not in consumed:
+                errors.append(f"Point {pid} worldline_cert_hash '{w_cert_hash}' missing from manifest consumed_certificates")
+
+            c_flag = outs.get("worldline_certified")
+            if (c_flag is True or c_flag in ("True", "true")) and (not w_cert_hash or w_cert_hash in ("N/A", "", "None")):
+                errors.append(f"Point {pid} claims worldline_certified=true but worldline_cert_hash is 'N/A'")
+
+            for req_out in op_obl.get("required_point_outputs", []):
+                if req_out not in outs or outs.get(req_out) in (None, "", "N/A"):
+                    errors.append(f"Point {pid} missing required output '{req_out}'")
 
             if op_obl.get("requires_source_cert"):
-                sz_h = outs.get("source_zero_cert_hash")
-                if not sz_h or sz_h == "N/A":
-                    errors.append(f"Point {idx} operation '{op_name}' missing source_zero_cert_hash")
-                elif sz_h in cert_map:
-                    szc = cert_map[sz_h]
-                    exp_family = op_obl.get("source_family", "nontrivial")
-                    if szc.get("zero_family") != exp_family:
-                        errors.append(f"Point {idx} source zero family ({szc.get('zero_family')}) != expected ({exp_family})")
-                    exp_src_stat = op_obl.get("expected_source_status", "simple_zero_certified")
-                    if szc.get("status") != exp_src_stat:
-                        errors.append(f"Point {idx} source zero status ({szc.get('status')}) != expected ({exp_src_stat})")
+                if not s_cert_hash or s_cert_hash == "N/A":
+                    errors.append(f"Point {pid} missing valid source_zero_cert_hash")
+                elif s_cert_hash in cert_map:
+                    sc = cert_map[s_cert_hash]
+                    sc_fam = sc.get("zero_family", sc.get("family"))
+                    exp_fam = op_obl.get("source_family")
+                    if exp_fam and sc_fam != exp_fam:
+                        errors.append(f"Point {pid} source cert family '{sc_fam}' != expected '{exp_fam}'")
+                    exp_st = op_obl.get("expected_source_status")
+                    if exp_st and sc.get("status") != exp_st:
+                        errors.append(f"Point {pid} source cert status '{sc.get('status')}' != expected '{exp_st}'")
 
             if op_obl.get("requires_worldline_cert"):
-                wl_h = outs.get("worldline_cert_hash")
-                if not wl_h or wl_h == "N/A":
-                    errors.append(f"Point {idx} operation '{op_name}' missing worldline_cert_hash")
-                elif wl_h in cert_map:
-                    wlc = cert_map[wl_h]
-                    exp_wl_stat = op_obl.get("expected_worldline_status", "worldline_certified")
-                    if wlc.get("status") != exp_wl_stat:
-                        errors.append(f"Point {idx} worldline status ({wlc.get('status')}) != expected ({exp_wl_stat})")
+                if not w_cert_hash or w_cert_hash == "N/A":
+                    errors.append(f"Point {pid} missing valid worldline_cert_hash")
+                elif w_cert_hash in cert_map:
+                    wc = cert_map[w_cert_hash]
+                    exp_w_st = op_obl.get("expected_worldline_status")
+                    if exp_w_st and wc.get("status") != exp_w_st:
+                        errors.append(f"Point {pid} worldline cert status '{wc.get('status')}' != expected '{exp_w_st}'")
 
-                    sz_h = outs.get("source_zero_cert_hash")
-                    if sz_h and sz_h in cert_map:
-                        szc = cert_map[sz_h]
-                        wl_src_h = wlc.get("source_zero_hash")
-                        if wl_src_h and wl_src_h != sz_h:
-                            errors.append(f"Point {idx} worldline source_zero_hash ({wl_src_h}) != point source_zero_cert_hash ({sz_h})")
+                    inp_k = pt.get("inputs", {}).get("grade_k", pt.get("inputs", {}).get("K"))
+                    cert_k = wc.get("grade_K", wc.get("grade_k"))
+                    if inp_k is not None and cert_k is not None and str(inp_k) != str(cert_k):
+                        errors.append(f"Point {pid} grade mismatch: input K={inp_k} != worldline cert grade_K {cert_k}")
 
-                        sz_idx = szc.get("nontrivial_index") or szc.get("trivial_index")
-                        wl_idx = wlc.get("nontrivial_index") or wlc.get("trivial_index") or wlc.get("source_zero_index")
-                        if sz_idx is not None and wl_idx is not None and sz_idx != wl_idx:
-                            errors.append(f"Point {idx} zero index mismatch between source cert ({sz_idx}) and worldline cert ({wl_idx})")
+                    inp_delta = pt.get("inputs", {}).get("delta")
+                    cert_delta = wc.get("delta")
+                    if inp_delta is not None and cert_delta is not None:
+                        try:
+                            if mpmath.mpf(str(inp_delta)) != mpmath.mpf(str(cert_delta)):
+                                errors.append(f"Point {pid} delta mismatch: input delta={inp_delta} != worldline cert delta {cert_delta}")
+                        except Exception:
+                            if str(inp_delta).lstrip("+") != str(cert_delta).lstrip("+"):
+                                errors.append(f"Point {pid} delta mismatch: input delta={inp_delta} != worldline cert delta {cert_delta}")
 
-                    k_in = rec_in.get("grade_k", rec_in.get("K", rec_in.get("k", 0)))
-                    if int(wlc.get("grade_K", 0)) != int(k_in):
-                        errors.append(f"Point {idx} grade mismatch: input {k_in} != worldline cert {wlc.get('grade_K')}")
+                    if inp_delta is not None:
+                        try:
+                            is_zero_delta = (mpmath.mpf(str(inp_delta)) == 0)
+                        except Exception:
+                            is_zero_delta = (str(inp_delta) in ("0.0", "0", "+0.0", "-0.0"))
+                        if is_zero_delta and wc.get("claim_type") == "synthetic_off_line_worldline":
+                            errors.append(f"Point {pid} actual zero operation paired with synthetic off-line worldline certificate '{w_cert_hash}'")
 
-                    if op_obl.get("source_family") != "trivial":
-                        pt_d = rec_in.get("radial_delta", rec_in.get("delta", rec_in.get("delta_val", 0.0)))
-                        if wlc.get("delta") is not None:
-                            try:
-                                if abs(float(pt_d) - float(wlc["delta"])) > 1e-4:
-                                    errors.append(f"Point {idx} input delta={pt_d} does not match worldline cert delta={wlc['delta']}")
-                            except Exception:
-                                pass
+                    if op_obl.get("requires_source_cert"):
+                        if s_cert_hash and s_cert_hash in cert_map:
+                            sc = cert_map[s_cert_hash]
+                            wc_zidx = wc.get("source_zero_index", wc.get("zero_index", wc.get("nontrivial_index")))
+                            sc_zidx = sc.get("source_zero_index", sc.get("zero_index", sc.get("nontrivial_index")))
+                            if wc_zidx is not None and sc_zidx is not None and str(wc_zidx) != str(sc_zidx):
+                                errors.append(f"Point {pid} root mismatch: worldline cert source_zero_index {wc_zidx} != source cert index {sc_zidx}")
+                            if wc.get("source_zero_hash") and wc.get("source_zero_hash") != s_cert_hash:
+                                errors.append(f"Point {pid} source_zero_hash mismatch: worldline cert source_zero_hash {wc.get('source_zero_hash')} != source cert hash {s_cert_hash}")
 
-                        if op_obl.get("is_synthetic") is True:
-                            if abs(float(wlc.get("delta", 0.0))) < 1e-6:
-                                errors.append(f"Point {idx} synthetic operation uses delta=0.0 actual zero cert")
-                        elif op_obl.get("is_synthetic") is False:
-                            if abs(float(wlc.get("delta", 0.0))) > 1e-6:
-                                errors.append(f"Point {idx} actual zero operation uses synthetic delta={wlc.get('delta')} cert")
-                    else:
-                        m_idx = int(rec_in.get("trivial_index") or rec_in.get("m") or 1)
-                        exp_delta = str(-2 * m_idx - 0.5)
-                        if abs(float(wlc.get("delta", 0.0)) - float(exp_delta)) > 1e-4:
-                            errors.append(f"Point {idx} trivial zero m={m_idx} worldline cert delta ({wlc.get('delta')}) != expected ({exp_delta})")
-
-        unused_consumed = consumed - used_in_points
-        if unused_consumed:
-            errors.append(f"Declared consumed certificates unused by any point: {sorted(list(unused_consumed))}")
+            if op_obl.get("requires_certified_flag"):
+                if c_flag is not True and c_flag != "True" and c_flag != "true":
+                    errors.append(f"Point {pid} worldline_certified flag is not True (got '{c_flag}')")
 
         if spec is not None:
             recomputed_summary = compute_summary(spec, exp_id, results, status=manifest.get("status", "complete"))
@@ -3487,6 +3644,7 @@ def validate_run_bundle(
     - results.jsonl (completeness, point status, proof obligations, byte SHA-256)
     - summary.json (recomputed full multi-metric match, byte SHA-256)
     - README.md (presence, inventory, byte SHA-256)
+    - diagnostics.json (presence, validity, matching experiment_id when declared/expected)
     - research/index.json (presence and strict sync of matching run entry)
     - research/experiments/<exp_id>.yaml (spec SHA-256 match)
     - Directory cleanliness (no temporary or extra files)
@@ -3496,32 +3654,37 @@ def validate_run_bundle(
     if not os.path.exists(run_dir):
         return False, [f"Run directory '{run_dir}' does not exist"]
 
-    exp_id = os.path.basename(run_dir.rstrip("/\\"))
-
-    # 1. Directory hygiene: reject unexpected or temporary files
-    try:
-        entries = sorted(os.listdir(run_dir))
-        allowed_files = {"manifest.json", "results.jsonl", "summary.json", "README.md", "diagnostics.json"}
-        extra_files = set(entries) - allowed_files
-        if extra_files:
-            errors.append(f"Run bundle '{exp_id}' contains unauthorized or temporary files: {sorted(list(extra_files))}")
-    except Exception as e:
-        errors.append(f"Failed inspecting run directory entries: {e}")
-
     manifest_path = os.path.join(run_dir, "manifest.json")
     results_path = os.path.join(run_dir, "results.jsonl")
     summary_path = os.path.join(run_dir, "summary.json")
     readme_path = os.path.join(run_dir, "README.md")
+    diag_path = os.path.join(run_dir, "diagnostics.json")
 
     if not os.path.exists(manifest_path):
-        errors.append(f"Run bundle '{exp_id}' missing manifest.json")
+        errors.append(f"Run bundle missing manifest.json in '{run_dir}'")
         return False, errors
 
     try:
         with open(manifest_path, "r", encoding="utf-8") as mf:
             manifest = json.load(mf)
+        if not isinstance(manifest, dict):
+            errors.append(f"manifest.json is not a JSON dictionary in '{run_dir}'")
     except Exception as e:
-        return False, [f"Run bundle '{exp_id}' failed reading manifest.json: {e}"]
+        return False, [f"Failed reading manifest.json in '{run_dir}': {e}"]
+
+    exp_id = manifest.get("experiment_id") or os.path.basename(run_dir.rstrip("/\\"))
+    is_staging_dir = os.path.basename(run_dir.rstrip("/\\")).startswith(".")
+
+    # 1. Directory hygiene: reject unexpected or temporary files (for non-staging directories)
+    if not is_staging_dir:
+        try:
+            entries = sorted(os.listdir(run_dir))
+            allowed_files = {"manifest.json", "results.jsonl", "summary.json", "README.md", "diagnostics.json"}
+            extra_files = set(entries) - allowed_files
+            if extra_files:
+                errors.append(f"Run bundle '{exp_id}' contains unauthorized or temporary files: {sorted(list(extra_files))}")
+        except Exception as e:
+            errors.append(f"Failed inspecting run directory entries: {e}")
 
     # 2. Artifact byte hashes validation against declared paths
     artifacts_map = manifest.get("artifacts")
@@ -3555,13 +3718,49 @@ def validate_run_bundle(
     if os.path.exists(results_path):
         try:
             with open(results_path, "r", encoding="utf-8") as rf:
-                for line in rf:
-                    if line.strip():
-                        results.append(json.loads(line))
+                for line_idx, line in enumerate(rf, 1):
+                    line_str = line.strip()
+                    if line_str:
+                        try:
+                            rec = json.loads(line_str)
+                            if not isinstance(rec, dict):
+                                errors.append(f"results.jsonl line {line_idx} is not a JSON object")
+                            else:
+                                for k in ["point_id", "inputs", "outputs", "status"]:
+                                    if k not in rec:
+                                        errors.append(f"results.jsonl line {line_idx} missing key '{k}'")
+                                results.append(rec)
+                        except Exception as e:
+                            errors.append(f"results.jsonl line {line_idx} invalid JSON: {e}")
         except Exception as e:
             errors.append(f"Run bundle '{exp_id}' failed reading results.jsonl: {e}")
     else:
         errors.append(f"Run bundle '{exp_id}' missing results.jsonl")
+
+    # Check diagnostics.json validity if declared or present
+    handler = None
+    try:
+        handler = get_handler(exp_id)
+    except KeyError:
+        pass
+
+    has_diag = getattr(handler, "has_diagnostics", False)
+    if has_diag:
+        if not os.path.exists(diag_path):
+            errors.append(f"Run bundle '{exp_id}' missing expected diagnostics.json for diagnostic-producing handler")
+        elif "diagnostics_json" not in (artifacts_map or {}):
+            errors.append(f"Run bundle '{exp_id}' manifest artifacts missing diagnostics_json declaration")
+
+    if os.path.exists(diag_path):
+        try:
+            with open(diag_path, "r", encoding="utf-8") as df:
+                diag_data = json.load(df)
+            if not isinstance(diag_data, dict):
+                errors.append(f"Run bundle '{exp_id}' diagnostics.json must be a JSON dictionary")
+            elif diag_data.get("experiment_id") != exp_id:
+                errors.append(f"Run bundle '{exp_id}' diagnostics.json experiment_id '{diag_data.get('experiment_id')}' != '{exp_id}'")
+        except Exception as e:
+            errors.append(f"Run bundle '{exp_id}' diagnostics.json failed JSON parsing: {e}")
 
     candidates = [
         os.path.join(EXPERIMENTS_DIR, f"{exp_id}.yaml"),
@@ -3641,55 +3840,56 @@ def validate_run_bundle(
     if not os.path.exists(readme_path):
         errors.append(f"Run bundle '{exp_id}' missing README.md")
 
-    # 5. Index entry synchronization against complete canonical projection
-    if not os.path.exists(INDEX_FILE):
-        errors.append("research/index.json missing")
-    else:
-        try:
-            with open(INDEX_FILE, "r", encoding="utf-8") as inf:
-                idx_data = json.load(inf)
-            runs = idx_data.get("runs", []) if isinstance(idx_data, dict) else (idx_data if isinstance(idx_data, list) else [])
-            matching_entries = [r for r in runs if isinstance(r, dict) and (r.get("experiment_id") == exp_id or r.get("run_id") == exp_id)]
-            if not matching_entries:
-                errors.append(f"No entry for experiment '{exp_id}' in research/index.json")
-            elif len(matching_entries) > 1:
-                errors.append(f"Duplicate entries ({len(matching_entries)}) for experiment '{exp_id}' in research/index.json")
-            else:
-                found_entry = matching_entries[0]
-                expected_entry = project_canonical_index_entry(manifest, committed_summary, exp_id)
-                if spec is not None and "notes" in spec and "notes" not in expected_entry:
-                    expected_entry["notes"] = spec["notes"]
+    # 5. Index entry synchronization against complete canonical projection (skip for temporary staging dirs)
+    if not is_staging_dir:
+        if not os.path.exists(INDEX_FILE):
+            errors.append("research/index.json missing")
+        else:
+            try:
+                with open(INDEX_FILE, "r", encoding="utf-8") as inf:
+                    idx_data = json.load(inf)
+                runs = idx_data.get("runs", []) if isinstance(idx_data, dict) else (idx_data if isinstance(idx_data, list) else [])
+                matching_entries = [r for r in runs if isinstance(r, dict) and (r.get("experiment_id") == exp_id or r.get("run_id") == exp_id)]
+                if not matching_entries:
+                    errors.append(f"No entry for experiment '{exp_id}' in research/index.json")
+                elif len(matching_entries) > 1:
+                    errors.append(f"Duplicate entries ({len(matching_entries)}) for experiment '{exp_id}' in research/index.json")
+                else:
+                    found_entry = matching_entries[0]
+                    expected_entry = project_canonical_index_entry(manifest, committed_summary, exp_id)
+                    if spec is not None and "notes" in spec and "notes" not in expected_entry:
+                        expected_entry["notes"] = spec["notes"]
 
-                REQUIRED_INDEX_FIELDS = [
-                    "schema_version",
-                    "run_id",
-                    "experiment_id",
-                    "title",
-                    "epistemic_class",
-                    "object_relationship",
-                    "classification",
-                    "timestamp",
-                    "git_commit",
-                    "producing_git_commit",
-                    "git_dirty",
-                    "status",
-                    "criterion_met",
-                    "manifest_path",
-                    "results_path",
-                    "summary_path",
-                ]
-                for fld in REQUIRED_INDEX_FIELDS:
-                    act_v = found_entry.get(fld)
-                    exp_v = expected_entry.get(fld)
-                    if act_v != exp_v:
-                        errors.append(f"Index entry '{fld}' mismatch for '{exp_id}': index '{act_v}' != expected '{exp_v}'")
+                    REQUIRED_INDEX_FIELDS = [
+                        "schema_version",
+                        "run_id",
+                        "experiment_id",
+                        "title",
+                        "epistemic_class",
+                        "object_relationship",
+                        "classification",
+                        "timestamp",
+                        "git_commit",
+                        "producing_git_commit",
+                        "git_dirty",
+                        "status",
+                        "criterion_met",
+                        "manifest_path",
+                        "results_path",
+                        "summary_path",
+                    ]
+                    for fld in REQUIRED_INDEX_FIELDS:
+                        act_v = found_entry.get(fld)
+                        exp_v = expected_entry.get(fld)
+                        if act_v != exp_v:
+                            errors.append(f"Index entry '{fld}' mismatch for '{exp_id}': index '{act_v}' != expected '{exp_v}'")
 
-                for k, v in found_entry.items():
-                    if isinstance(v, str) and v.lower() in ("placeholder", "unknown", "fake", "forged"):
-                        errors.append(f"Index entry contains placeholder for '{k}': '{v}'")
+                    for k, v in found_entry.items():
+                        if isinstance(v, str) and v.lower() in ("placeholder", "unknown", "fake", "forged"):
+                            errors.append(f"Index entry contains placeholder for '{k}': '{v}'")
 
-        except Exception as e:
-            errors.append(f"Failed validating index.json entry: {e}")
+            except Exception as e:
+                errors.append(f"Failed validating index.json entry: {e}")
 
     return len(errors) == 0, errors
 

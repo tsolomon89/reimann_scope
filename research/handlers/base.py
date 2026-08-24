@@ -101,7 +101,10 @@ class ExperimentHandler(ABC):
 
         Default implementation returns empty dict. Handlers override with experiment-specific summary tables.
         """
-        return {}
+    @property
+    def has_diagnostics(self) -> bool:
+        """Whether this experiment produces structured diagnostics (diagnostics.json)."""
+        return False
 
     def generate_diagnostics(
         self,

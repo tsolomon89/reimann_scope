@@ -23,6 +23,7 @@ import json
 import yaml
 import shutil
 import copy
+import hashlib
 import tempfile
 from typing import Dict, Any, List, Optional, Tuple, cast, Set
 import pytest
@@ -1567,3 +1568,78 @@ def test_radial_second_order_summary_metrics_structure():
     assert summary["criterion"]["criterion_met"] is True
 
 
+def test_malformed_diagnostic_rejected_even_if_manifest_hash_matches(tmp_path, monkeypatch):
+    """Verify that validate_run_bundle deeply parses diagnostics.json and rejects malformed content even if SHA matches."""
+    exp_dir = tmp_path / "explicit-formula-grade-covariance-001"
+    exp_dir.mkdir()
+
+    results_file = exp_dir / "results.jsonl"
+    results_file.write_text('{"point_id": 0, "status": "success", "inputs": {"K": 0}, "outputs": {"val": "1.0"}}\n', encoding="utf-8")
+    res_sha = hashlib.sha256(results_file.read_bytes()).hexdigest()
+
+    summary_file = exp_dir / "summary.json"
+    summary_file.write_text('{"schema_version": "1.0.0", "status": "complete", "criterion": {"criterion_met": true, "observed": "0.0"}}\n', encoding="utf-8")
+    summ_sha = hashlib.sha256(summary_file.read_bytes()).hexdigest()
+
+    readme_file = exp_dir / "README.md"
+    readme_file.write_text("# Test Spec\n\nRun documentation.", encoding="utf-8")
+    readme_sha = hashlib.sha256(readme_file.read_bytes()).hexdigest()
+
+    # Create malformed/truncated diagnostics.json
+    diag_file = exp_dir / "diagnostics.json"
+    diag_file.write_text('{\n  "experiment_id": "explicit-formula-grade-covariance-001",\n  "max_discrepancy": \n', encoding="utf-8")
+    diag_sha = hashlib.sha256(diag_file.read_bytes()).hexdigest()
+
+    manifest = {
+        "schema_version": "2",
+        "run_id": "explicit-formula-grade-covariance-001",
+        "experiment_id": "explicit-formula-grade-covariance-001",
+        "title": "Grade Covariance Test",
+        "epistemic_class": "exact_control",
+        "classification": "canonical_experiment",
+        "status": "complete",
+        "git_commit": "0123456789abcdef0123456789abcdef01234567",
+        "producing_git_commit": "0123456789abcdef0123456789abcdef01234567",
+        "git_dirty": False,
+        "precision": {"dps": 80},
+        "parameter_space": {"K": [0]},
+        "points_requested": 1,
+        "points_completed": 1,
+        "experiment_spec_sha256": "0" * 64,
+        "dependency_fingerprint": certification._get_dependency_fingerprint(),
+        "source_code_hashes": certification._get_source_code_hashes(),
+        "input_data_hashes": certification._get_input_data_hashes(),
+        "code_modules": [{"path": m, "sha256": certification._get_source_code_hashes()[m]} for m in certification.REQUIRED_SOURCE_MODULES],
+        "data_provenance": [{"path": f"data/{d}", "sha256": certification._get_input_data_hashes()[d]} for d in certification.REQUIRED_INPUT_DATA_FILES],
+        "artifacts": {
+            "results_jsonl": {"path": "results.jsonl", "sha256": res_sha},
+            "summary_json": {"path": "summary.json", "sha256": summ_sha},
+            "readme_md": {"path": "README.md", "sha256": readme_sha},
+            "diagnostics_json": {"path": "diagnostics.json", "sha256": diag_sha}
+        }
+    }
+    manifest_file = exp_dir / "manifest.json"
+    manifest_file.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    ok, errs = research_runner.validate_run_bundle(str(exp_dir), canonical_current=False)
+    assert ok is False
+    assert any("diagnostics.json failed JSON parsing" in e or "failed JSON" in e for e in errs)
+
+
+def test_diagnostic_serialization_failure_leaves_stable_bundle_untouched(tmp_path, monkeypatch):
+    """Verify that a failure in diagnostics generation aborts cleanly without mutating existing run bundle."""
+    from research.handlers.registry import get_handler
+    handler = get_handler("explicit-formula-grade-covariance-001")
+
+    # Mock handler generate_diagnostics to raise an exception
+    def bad_gen(*args, **kwargs):
+        raise TypeError("Object of type mpf is not JSON serializable")
+
+    monkeypatch.setattr(handler, "generate_diagnostics", bad_gen)
+
+    # Calling _write_diagnostics should raise RuntimeError and clean up temp files
+    with pytest.raises(RuntimeError, match="Diagnostics generation failed"):
+        research_runner._write_diagnostics(str(tmp_path), handler, [], {"id": "explicit-formula-grade-covariance-001"}, dps=80)
+
+    assert not (tmp_path / "diagnostics.json.tmp").exists()
+    assert not (tmp_path / "diagnostics.json").exists()

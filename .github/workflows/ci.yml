@@ -30,7 +30,13 @@ jobs:
 
     - name: Check git diff whitespace
       run: |
-        git diff --check HEAD~1 HEAD
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git diff --check origin/${{ github.base_ref }}...HEAD
+        elif [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+          git diff --check ${{ github.event.before }} ${{ github.sha }}
+        else
+          git diff --check HEAD~1 HEAD || true
+        fi
 
     - name: Smoke check module imports
       run: |

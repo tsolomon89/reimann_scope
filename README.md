@@ -379,14 +379,27 @@ python scripts/workflow.py check-numerical
 # 3. Read-only artifact validation (mathematical certificates, formal theorems, canonical runs)
 python scripts/workflow.py validate-artifacts
 
-# 4. Plan canonical regeneration (inspect stale runs & certificates relative to current implementation)
+# 4. Strict currentness validation against active disk source files
+python scripts/workflow.py validate-artifacts --current
+
+# 5. Plan canonical regeneration (inspect component-level staleness relative to current implementation)
 python scripts/workflow.py plan-canonical
 
-# 5. Execute canonical regeneration (enforces clean git worktree)
+# 6. Execute selective canonical regeneration (runs only stale/missing/invalid components)
 python scripts/workflow.py run-canonical
+
+# 7. Execute targeted experiment runs or complete rebuild
+python scripts/workflow.py run-canonical --experiments <exp_id>
+python scripts/workflow.py run-canonical --all
 ```
+
+### Key Workflow Guarantees
+
+- **Selective Execution**: `run-canonical` executes only components classified as stale, missing, or invalid. If all components are current, it exits 0 without modifying files.
+- **Atomic Resummarization**: If only summary/diagnostics are stale, `summarize_run` regenerates `summary.json`, `README.md`, and `diagnostics.json` atomically in a staging directory, preserving `results.jsonl` byte-for-byte without rerunning expensive numerical evaluations.
+- **Execution vs Summary Provenance**: Manifests cryptographically bind `execution_provenance` (results, spec, math modules, material packages, producing commit) separately from `summary_provenance` (summary, readme, diagnostics, summarizer modules, summary engine, producing commit).
+- **Formal Build Report**: `scripts/build_formal.py` and `formal/build_report.json` dynamically track project theorem declarations (`project_theorem_declarations_compiled: 19`) and verify them alongside Lean 4 `lake build` compiler output.
 
 ### Modular Experiment Handlers
 
-All experiment runners are organized under `research/handlers/` conforming to `ExperimentHandler` (`research/handlers/base.py`). New mathematical campaigns (e.g. \((Q, \Xi^\flat, L_Q)\)) register new handlers via `@register_handler` without modifying the core research runner or historical run data.
-
+All experiment runners are organized under `research/handlers/` conforming to `ExperimentHandler` (`research/handlers/base.py`). Handlers explicitly declare code modules and material runtime dependencies, enabling fine-grained invalidation without monolithic sweeps. New mathematical campaigns register new handlers via `@register_handler` without modifying core infrastructure.

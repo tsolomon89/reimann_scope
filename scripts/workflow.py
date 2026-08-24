@@ -86,14 +86,15 @@ def run_validate_artifacts(canonical_current: bool = False) -> int:
 
     print("\n=== [2/3] Validating Formal Lean 4 Build Report ===")
     formal_ok, formal_state, formal_rep, formal_errs = certification.verify_formal_build_report(
-        check_current=False
+        check_current=canonical_current
     )
     if not formal_ok:
         print(f"[FAIL] Formal build report invalid ({formal_state}):")
         for err in formal_errs:
             print(f"  - {err}")
         return 1
-    print(f"[PASS] Formal build report verified: {formal_rep.get('total_theorems', 0)} theorems checked in Lean 4.")
+    thm_count = formal_rep.get("project_theorem_declarations_compiled", formal_rep.get("total_theorems", 0))
+    print(f"[PASS] Formal build report verified: {thm_count} project theorem declarations compiled in Lean 4.")
 
     print("\n=== [3/3] Validating Canonical Experiment Run Bundles ===")
     runs_dir = os.path.join(REPO_ROOT, "research", "runs")
@@ -126,82 +127,174 @@ def run_validate_artifacts(canonical_current: bool = False) -> int:
     return 0
 
 
-def plan_canonical_regeneration() -> Dict[str, Any]:
-    """Inspect and report which certificates and experiment runs are stale."""
+def inspect_canonical_state(target_experiments: Optional[List[str]] = None) -> Dict[str, Any]:
+    """Component-level inspection of certificates, formal report, and experiment runs."""
     head_commit, is_dirty = research_runner.get_git_info()
 
-    print(f"=== Planning Canonical Regeneration ===")
-    print(f"Current Git HEAD: {head_commit} (Dirty: {is_dirty})")
-
     # 1. Inspect Certificates
-    cert_plan: Dict[str, Any] = {"status": "up_to_date", "stale_reasons": []}
+    cert_state: Dict[str, Any] = {"status": "current", "stale_reasons": []}
     rep_ok, rep, rep_errs = certification.load_verification_report(check_provenance=True, canonical_current=True)
     if not rep_ok:
-        cert_plan["status"] = "stale"
-        cert_plan["stale_reasons"] = rep_errs
-    print(f"\nCertificates Status: {cert_plan['status'].upper()}")
-    if cert_plan["stale_reasons"]:
-        for r in cert_plan["stale_reasons"][:5]:
-            print(f"  - {r}")
+        cert_state["status"] = "stale"
+        cert_state["stale_reasons"] = rep_errs
 
-    # 2. Inspect Canonical Runs
+    # 2. Inspect Formal Build Report
+    formal_state_dict: Dict[str, Any] = {"status": "current", "theorems": 0, "stale_reasons": []}
+    formal_ok, f_state, f_rep, f_errs = certification.verify_formal_build_report(check_current=True)
+    if not formal_ok:
+        formal_state_dict["status"] = "stale"
+        formal_state_dict["stale_reasons"] = f_errs
+    else:
+        formal_state_dict["theorems"] = f_rep.get("project_theorem_declarations_compiled", f_rep.get("total_theorems", 0))
+
+    # 3. Inspect Canonical Experiment Runs
     runs_dir = os.path.join(REPO_ROOT, "research", "runs")
     exp_dir = os.path.join(REPO_ROOT, "research", "experiments")
-    specs = sorted(glob.glob(os.path.join(exp_dir, "*.yaml")))
+    all_specs = sorted(glob.glob(os.path.join(exp_dir, "*.yaml")))
 
     run_plans: List[Dict[str, Any]] = []
-    total_stale_points = 0
-
     import yaml
-    for sf in specs:
+    for sf in all_specs:
         with open(sf, "r", encoding="utf-8") as f:
             spec = yaml.safe_load(f)
         exp_id = spec["id"]
+        if target_experiments and exp_id not in target_experiments and sf not in target_experiments:
+            continue
+
         r_dir = os.path.join(runs_dir, exp_id)
-        r_plan = {
+        points_count = len(research_runner.generate_parameter_grid(
+            spec.get("parameters", {}),
+            dps=spec.get("precision", {}).get("dps", 50)
+        ))
+
+        r_plan: Dict[str, Any] = {
             "experiment_id": exp_id,
-            "status": "up_to_date",
-            "points": len(research_runner.generate_parameter_grid(spec.get("parameters", {}), dps=spec.get("precision", {}).get("dps", 50))),
+            "spec_file": sf,
+            "points": points_count,
+            "execution_status": "execution_current",
+            "summary_status": "summary_current",
+            "overall_status": "current",
+            "needs_execution": False,
+            "needs_summary": False,
             "reasons": []
         }
 
         if not os.path.exists(r_dir):
-            r_plan["status"] = "missing"
-            r_plan["reasons"].append(f"Run directory '{r_dir}' not found on disk")
+            r_plan["execution_status"] = "missing"
+            r_plan["summary_status"] = "missing"
+            r_plan["overall_status"] = "missing"
+            r_plan["needs_execution"] = True
+            r_plan["needs_summary"] = True
+            r_plan["reasons"].append(f"Run directory '{r_dir}' missing on disk")
         else:
-            ok, errs = research_runner.validate_run_bundle(r_dir, canonical_current=True)
-            if not ok:
-                r_plan["status"] = "stale"
-                r_plan["reasons"] = errs
+            manifest_p = os.path.join(r_dir, "manifest.json")
+            results_p = os.path.join(r_dir, "results.jsonl")
+            if not os.path.exists(manifest_p) or not os.path.exists(results_p):
+                r_plan["execution_status"] = "missing"
+                r_plan["summary_status"] = "missing"
+                r_plan["overall_status"] = "missing"
+                r_plan["needs_execution"] = True
+                r_plan["needs_summary"] = True
+                r_plan["reasons"].append("Missing manifest.json or results.jsonl")
+            else:
+                ok, errs = research_runner.validate_run_bundle(r_dir, canonical_current=True)
+                if not ok:
+                    exec_errs = []
+                    summ_errs = []
+                    for e in errs:
+                        if any(k in e for k in ["source module 'research/handlers", "summary.json", "README.md", "diagnostics.json", "summarizer", "Diagnostics generation failed"]):
+                            summ_errs.append(e)
+                        else:
+                            exec_errs.append(e)
 
-        if r_plan["status"] != "up_to_date":
-            total_stale_points += r_plan["points"]
+                    if exec_errs:
+                        r_plan["execution_status"] = "stale_execution"
+                        r_plan["needs_execution"] = True
+                        r_plan["needs_summary"] = True
+                        r_plan["overall_status"] = "stale_execution"
+                        r_plan["reasons"].extend(exec_errs)
+                        if summ_errs:
+                            r_plan["reasons"].extend(summ_errs)
+                    elif summ_errs:
+                        r_plan["execution_status"] = "execution_current"
+                        r_plan["summary_status"] = "stale_summary"
+                        r_plan["needs_execution"] = False
+                        r_plan["needs_summary"] = True
+                        r_plan["overall_status"] = "stale_summary"
+                        r_plan["reasons"].extend(summ_errs)
+                    else:
+                        r_plan["execution_status"] = "stale_execution"
+                        r_plan["needs_execution"] = True
+                        r_plan["needs_summary"] = True
+                        r_plan["overall_status"] = "stale_execution"
+                        r_plan["reasons"].extend(errs)
+
         run_plans.append(r_plan)
 
-    print("\nCanonical Experiment Runs Plan:")
-    for rp in run_plans:
-        status_str = f"[{rp['status'].upper()}]"
-        print(f"  {status_str:12s} {rp['experiment_id']} ({rp['points']} points)")
-        if rp["reasons"]:
-            for reason in rp["reasons"][:2]:
-                print(f"      Reason: {reason}")
-
-    print(f"\nSummary: {sum(1 for r in run_plans if r['status'] == 'up_to_date')}/{len(run_plans)} runs up-to-date.")
-    if total_stale_points > 0:
-        print(f"Regeneration required for {total_stale_points} points across {sum(1 for r in run_plans if r['status'] != 'up_to_date')} experiment(s).")
-    else:
-        print("All canonical runs are completely up-to-date with current disk implementation.")
+    total_exec_points = sum(r["points"] for r in run_plans if r["needs_execution"])
+    total_summ_runs = sum(1 for r in run_plans if r["needs_summary"] and not r["needs_execution"])
 
     return {
         "head_commit": head_commit,
         "is_dirty": is_dirty,
-        "certificates": cert_plan,
+        "certificates": cert_state,
+        "formal_report": formal_state_dict,
         "runs": run_plans,
-        "total_stale_points": total_stale_points
+        "total_execution_points": total_exec_points,
+        "total_resummarize_runs": total_summ_runs
     }
 
 
-def run_canonical(allow_dirty: bool = False, experiments: Optional[List[str]] = None) -> int:
+def plan_canonical_regeneration() -> Dict[str, Any]:
+    """Inspect and report which certificates and experiment runs are stale."""
+    plan = inspect_canonical_state()
+
+    print(f"=== Planning Canonical Regeneration ===")
+    print(f"Current Git HEAD: {plan['head_commit']} (Dirty: {plan['is_dirty']})")
+
+    # 1. Report Certificates
+    print(f"\nCertificates Status: {plan['certificates']['status'].upper()}")
+    if plan['certificates']['stale_reasons']:
+        for r in plan['certificates']['stale_reasons'][:5]:
+            print(f"  - {r}")
+
+    # 2. Report Formal Build Report
+    print(f"\nFormal Build Report Status: {plan['formal_report']['status'].upper()}")
+    if plan['formal_report']['stale_reasons']:
+        for r in plan['formal_report']['stale_reasons'][:5]:
+            print(f"  - {r}")
+    else:
+        print(f"  - Compiled theorems: {plan['formal_report']['theorems']}")
+
+    # 3. Report Canonical Runs
+    print("\nCanonical Experiment Runs Plan:")
+    for rp in plan["runs"]:
+        status_str = f"[{rp['overall_status'].upper()}]"
+        print(f"  {status_str:18s} {rp['experiment_id']} ({rp['points']} points)")
+        if rp["reasons"]:
+            for reason in rp["reasons"][:2]:
+                print(f"      Reason: {reason}")
+
+    current_count = sum(1 for r in plan["runs"] if r["overall_status"] == "current")
+    total_count = len(plan["runs"])
+    print(f"\nSummary: {current_count}/{total_count} runs up-to-date.")
+    if plan["total_execution_points"] > 0 or plan["total_resummarize_runs"] > 0:
+        print(f"Planned actions:")
+        if plan["total_execution_points"] > 0:
+            print(f"  - Numerical point sweeps: {plan['total_execution_points']} points across {sum(1 for r in plan['runs'] if r['needs_execution'])} experiment(s)")
+        if plan["total_resummarize_runs"] > 0:
+            print(f"  - Atomic resummarizations: {plan['total_resummarize_runs']} run(s) (reusing raw results)")
+    else:
+        print("All canonical runs are completely up-to-date with current disk implementation.")
+
+    return plan
+
+
+def run_canonical(
+    allow_dirty: bool = False,
+    experiments: Optional[List[str]] = None,
+    all_runs: bool = False
+) -> int:
     """Execute planned canonical regeneration with clean-tree enforcement."""
     _, is_dirty = research_runner.get_git_info()
     if is_dirty and not allow_dirty:
@@ -209,54 +302,61 @@ def run_canonical(allow_dirty: bool = False, experiments: Optional[List[str]] = 
         print("Please commit all changes or pass --allow-dirty for test runs.")
         return 1
 
-    print("=== [1/3] Generating Mathematical Certificates ===")
-    gen_cert_cmd = [sys.executable, os.path.join(REPO_ROOT, "scripts", "generate_certificates.py")]
-    res = subprocess.run(gen_cert_cmd, cwd=REPO_ROOT)
-    if res.returncode != 0:
-        print("[FAIL] Certificate generation failed.")
-        return res.returncode
+    if all_runs:
+        print("=== [1/3] Generating Mathematical Certificates ===")
+        gen_cert_cmd = [sys.executable, os.path.join(REPO_ROOT, "scripts", "generate_certificates.py")]
+        res = subprocess.run(gen_cert_cmd, cwd=REPO_ROOT)
+        if res.returncode != 0:
+            print("[FAIL] Certificate generation failed.")
+            return res.returncode
 
-    print("\n=== [2/3] Executing Canonical Experiment Sweeps ===")
-    exp_dir = os.path.join(REPO_ROOT, "research", "experiments")
-    target_specs = []
-    if experiments:
-        import yaml
-        for e in experiments:
-            candidates = [
-                e,
-                os.path.join(exp_dir, e),
-                os.path.join(exp_dir, f"{e}.yaml"),
-                os.path.join(exp_dir, f"{e.replace('-', '_')}.yaml"),
-                os.path.join(exp_dir, f"{e.replace('_', '-')}.yaml"),
-            ]
-            found = None
-            for cand in candidates:
-                if os.path.exists(cand):
-                    found = cand
-                    break
-            if not found:
-                for sf in glob.glob(os.path.join(exp_dir, "*.yaml")):
-                    with open(sf, "r", encoding="utf-8") as f:
-                        s_data = yaml.safe_load(f)
-                    if s_data and s_data.get("id") == e:
-                        found = sf
-                        break
-            if found:
-                target_specs.append(found)
-            else:
-                raise FileNotFoundError(f"Experiment spec for '{e}' not found in {exp_dir}")
-    else:
+        print("\n=== [2/3] Executing All Canonical Experiment Sweeps ===")
+        exp_dir = os.path.join(REPO_ROOT, "research", "experiments")
         target_specs = sorted(glob.glob(os.path.join(exp_dir, "*.yaml")))
+        for sf in target_specs:
+            name = os.path.basename(sf)
+            print(f"\n--- Running Canonical Sweep: {name} ---")
+            run_id = research_runner.run_experiment(sf, canonical_current=True)
+            print(f"[{name}] {run_id}: completed and published.")
 
-    for sf in target_specs:
-        name = os.path.basename(sf)
-        print(f"\n--- Running Canonical Sweep: {name} ---")
-        run_id = research_runner.run_experiment(sf)
-        summary = research_runner.summarize_run(run_id)
-        c = summary.get("criterion", {})
-        print(f"[{name}] {run_id}: status={summary.get('status')} criterion_met={c.get('criterion_met')} observed={c.get('observed')}")
+        print("\n=== [3/3] Validating Regenerated Canonical Artifacts ===")
+        return run_validate_artifacts(canonical_current=True)
 
-    print("\n=== [3/3] Validating Regenerated Canonical Artifacts ===")
+    # Default selective execution mode
+    plan = inspect_canonical_state(target_experiments=experiments)
+
+    print("=== Planned Selective Canonical Execution ===")
+    print(f"Target experiments: {len(plan['runs'])}")
+    print(f"Points to execute: {plan['total_execution_points']}")
+    print(f"Runs to resummarize: {plan['total_resummarize_runs']}")
+
+    if plan['total_execution_points'] == 0 and plan['total_resummarize_runs'] == 0 and plan['certificates']['status'] == 'current':
+        print("\n[SUCCESS] All targeted canonical components are completely current. No regeneration needed.")
+        return run_validate_artifacts(canonical_current=True)
+
+    # 1. Certificates
+    if plan["certificates"]["status"] != "current":
+        print("\n=== Generating Stale Mathematical Certificates ===")
+        gen_cert_cmd = [sys.executable, os.path.join(REPO_ROOT, "scripts", "generate_certificates.py")]
+        res = subprocess.run(gen_cert_cmd, cwd=REPO_ROOT)
+        if res.returncode != 0:
+            print("[FAIL] Certificate generation failed.")
+            return res.returncode
+
+    # 2. Experiment runs
+    for run in plan["runs"]:
+        if run["needs_execution"]:
+            name = os.path.basename(run["spec_file"])
+            print(f"\n--- Executing Canonical Sweep: {name} ({run['points']} points) ---")
+            run_id = research_runner.run_experiment(run["spec_file"], canonical_current=True)
+            print(f"[{name}] {run_id}: sweep completed.")
+        elif run["needs_summary"]:
+            print(f"\n--- Resummarizing Canonical Run: {run['experiment_id']} (reusing results.jsonl) ---")
+            summary = research_runner.summarize_run(run["experiment_id"], spec_path=run["spec_file"])
+            c = summary.get("criterion", {})
+            print(f"[{run['experiment_id']}] status={summary.get('status')} criterion_met={c.get('criterion_met')} observed={c.get('observed')}")
+
+    print("\n=== Validating Regenerated Canonical Artifacts ===")
     return run_validate_artifacts(canonical_current=True)
 
 
@@ -283,6 +383,7 @@ def main() -> None:
     run_parser = subparsers.add_parser("run-canonical", help="Execute canonical regeneration.")
     run_parser.add_argument("--allow-dirty", action="store_true", help="Allow running on dirty working tree (non-canonical test mode).")
     run_parser.add_argument("--experiments", nargs="+", help="Specific experiment IDs or YAML files to run.")
+    run_parser.add_argument("--all", action="store_true", help="Force complete regeneration of all certificates and runs.")
 
     args = parser.parse_args()
 
@@ -296,7 +397,7 @@ def main() -> None:
         plan_canonical_regeneration()
         sys.exit(0)
     elif args.command == "run-canonical":
-        sys.exit(run_canonical(allow_dirty=args.allow_dirty, experiments=args.experiments))
+        sys.exit(run_canonical(allow_dirty=args.allow_dirty, experiments=args.experiments, all_runs=args.all))
     else:
         parser.print_help()
         sys.exit(1)

@@ -238,6 +238,10 @@ class ExplicitFormulaGradeCovarianceHandler(ExperimentHandler):
             }
         }
 
+    @property
+    def has_diagnostics(self) -> bool:
+        return True
+
     def generate_diagnostics(
         self,
         results: List[Dict[str, Any]],
@@ -256,8 +260,6 @@ class ExplicitFormulaGradeCovarianceHandler(ExperimentHandler):
             "global_basis_equivalence": g_eq,
             "summary_classification": "coordinate_redundant"
         }
-        with open(os.path.join(run_dir, "diagnostics.json"), "w", encoding="utf-8") as f:
-            json.dump(diag, f, indent=2)
         return diag
 
 
@@ -491,6 +493,10 @@ class ExplicitFormulaPerturbationRankHandler(ExperimentHandler):
 
         return "error", {}, f"Unsupported perturbation mode: '{mode}'"
 
+    @property
+    def has_diagnostics(self) -> bool:
+        return True
+
     def generate_diagnostics(
         self,
         results: List[Dict[str, Any]],
@@ -515,8 +521,6 @@ class ExplicitFormulaPerturbationRankHandler(ExperimentHandler):
             "experiment_id": "explicit-formula-perturbation-rank-001",
             "diagnostics": diag_data
         }
-        with open(os.path.join(run_dir, "diagnostics.json"), "w", encoding="utf-8") as f:
-            json.dump(diag, f, indent=2)
         return diag
 
 
@@ -879,6 +883,10 @@ class ExplicitFormulaRadialSecondVariationHandler(ExperimentHandler):
         }
         return summary_dict
 
+    @property
+    def has_diagnostics(self) -> bool:
+        return True
+
     def generate_diagnostics(
         self,
         results: List[Dict[str, Any]],
@@ -908,6 +916,4 @@ class ExplicitFormulaRadialSecondVariationHandler(ExperimentHandler):
             "experiment_id": "explicit-formula-radial-second-variation-001",
             "diagnostics": diag_data
         }
-        with open(os.path.join(run_dir, "diagnostics.json"), "w", encoding="utf-8") as f:
-            json.dump(diag, f, indent=2)
         return diag

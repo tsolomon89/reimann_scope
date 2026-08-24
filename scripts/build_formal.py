@@ -70,6 +70,22 @@ def get_builder_source_hashes() -> Dict[str, str]:
     return hashes
 
 
+import re
+
+
+def count_project_theorems() -> int:
+    """Count the number of project theorem declarations across formal source files."""
+    count = 0
+    pattern = re.compile(r'^\s*theorem\s+([A-Za-z0-9_]+)', re.MULTILINE)
+    for src in FORMAL_SOURCE_FILES:
+        p = os.path.join(REPO_ROOT, src)
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                content = f.read()
+            count += len(pattern.findall(content))
+    return count
+
+
 def _is_formal_env_dirty() -> Tuple[bool, List[str]]:
     """Check if any formal source, config, or builder file is dirty in git."""
     try:
@@ -190,6 +206,7 @@ def build_formal(git_commit: Optional[str] = None) -> Tuple[bool, Dict[str, Any]
         build_passed = False
         exit_code = -1
 
+    theorems_count = count_project_theorems()
     report = {
         "schema_version": "1.0.0",
         "report_type": "formal_build_report",
@@ -200,6 +217,8 @@ def build_formal(git_commit: Optional[str] = None) -> Tuple[bool, Dict[str, Any]
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "lake_version": lake_ver,
         "lean_version": lean_ver,
+        "project_theorem_declarations_compiled": theorems_count,
+        "total_theorems": theorems_count,
         "formal_source_hashes": formal_hashes,
         "lean_toolchain_hash": toolchain_hash,
         "lakefile_hash": lakefile_hash,

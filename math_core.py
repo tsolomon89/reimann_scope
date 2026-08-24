@@ -88,6 +88,40 @@ def to_mpc(
 
 
 
+def to_json_safe(obj: Any, dps: int = 80) -> Any:
+    """Recursively convert arbitrary precision and numerical structures into lossless JSON-safe values.
+
+    mpmath.mpf -> exact decimal string (n=dps)
+    mpmath.mpc -> {"real": ..., "imag": ...}
+    numpy array -> list of converted items
+    numpy scalars -> native python items
+    dict -> dict of converted items
+    list/tuple/set -> list of converted items
+    """
+    if isinstance(obj, mpmath.mpf):
+        return mpmath.nstr(obj, n=dps)
+    if isinstance(obj, mpmath.mpc):
+        return {
+            "real": mpmath.nstr(obj.real, n=dps),
+            "imag": mpmath.nstr(obj.imag, n=dps)
+        }
+    if isinstance(obj, dict):
+        return {str(k): to_json_safe(v, dps=dps) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [to_json_safe(x, dps=dps) for x in obj]
+    if hasattr(obj, "item") and callable(getattr(obj, "item")):
+        try:
+            return to_json_safe(obj.item(), dps=dps)
+        except Exception:
+            pass
+    if hasattr(obj, "tolist") and callable(getattr(obj, "tolist")):
+        try:
+            return to_json_safe(obj.tolist(), dps=dps)
+        except Exception:
+            pass
+    return obj
+
+
 def to_mpf(
     val: Union[str, float, int, mpmath.mpf],
     dps: int = 80
@@ -1299,7 +1333,7 @@ def check_expanded_native_basis_equivalence(
         )
         classification = "coordinate_redundant" if is_equivalent else "candidate_grade_specific_constraint"
 
-        return {
+        res = {
             "max_discrepancy": max_diff,
             "max_value_discrepancy": max_val_diff,
             "max_fourier_discrepancy": max_hat_diff,
@@ -1322,6 +1356,7 @@ def check_expanded_native_basis_equivalence(
             "num_channels": len(J_grade),
             "num_zeros": len(zeros_mpf),
         }
+        return to_json_safe(res, dps=dps)
 
 
 def solve_linearized_compensation(

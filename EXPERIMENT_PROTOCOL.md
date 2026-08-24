@@ -970,17 +970,18 @@ All development, verification, and canonical publication workflows are standardi
 - `python scripts/workflow.py check-fast`: Runs fast operational unit/integration tests and validates all experiment specification YAMLs (read-only).
 - `python scripts/workflow.py check-numerical`: Runs slow arbitrary-precision numerical regression suite (read-only).
 - `python scripts/workflow.py validate-artifacts`: Validates all mathematical certificates, formal Lean 4 build report, and canonical run bundles without modifying disk state.
-- `python scripts/workflow.py plan-canonical`: Inspects whether any certificates or canonical runs are stale relative to the workspace or git HEAD, reporting exact point counts and reasons (read-only).
-- `python scripts/workflow.py run-canonical`: Executes planned canonical regeneration, enforcing clean git worktree before publication.
+- `python scripts/workflow.py validate-artifacts --current`: Validates that committed artifacts and certificates match active disk implementation.
+- `python scripts/workflow.py plan-canonical`: Inspects whether any certificates, formal reports, or canonical runs are stale relative to the workspace or git HEAD, reporting exact component states and reasons (read-only).
+- `python scripts/workflow.py run-canonical`: Executes planned canonical regeneration selectively (only stale/missing/invalid components), enforcing clean git worktree before publication. Supports `--experiments <ids>` and `--all`.
 
 ### 2. Modular Experiment-Handler Boundary (`research/handlers/`)
 
 All canonical experiments implement the `ExperimentHandler` interface (`research/handlers/base.py`):
 
-- **Declaration of Dependencies**: Declares fine-grained source modules, math engines, input data files, and consumed certificates via `declared_dependencies`.
+- **Declaration of Dependencies**: Declares fine-grained source modules, math engines, input data files, material runtime packages (`mpmath`, `python-flint`, `numpy`, `scipy`, `sympy`), and consumed certificates via `declared_dependencies`.
 - **Decoupled Evaluation**: Implements `evaluate_point(inputs, dps, param_space, context)`.
 - **Isolated Summary Computation**: Implements `compute_summary(results, spec, manifest, status)`.
-- **Diagnostic Generation**: Implements `generate_diagnostics(results, spec, run_dir)`.
+- **Diagnostic Generation**: Implements `generate_diagnostics(results, spec, run_dir)` with lossless decimal string serialization via `to_json_safe`.
 
 New experimental campaigns (e.g. \((Q, \Xi^\flat, L_Q)\)) register new handlers via `@register_handler` without modifying core orchestration or historical experiment code.
 
@@ -988,9 +989,9 @@ New experimental campaigns (e.g. \((Q, \Xi^\flat, L_Q)\)) register new handlers 
 
 To maintain byte-level reproducibility and distinguish raw numerical evaluation from digest formatting:
 
-- `execution_provenance`: Captures raw simulation output SHA-256 (`results.jsonl`), producing Git commit, dependency fingerprint, and source code hashes active during point evaluation.
-- `summary_provenance`: Captures summary SHA-256 (`summary.json`), digest SHA-256 (`README.md`), diagnostics SHA-256 (`diagnostics.json`), and the summarizer source hash (`research_runner.py`).
-- `research_runner.summarize_run` strictly asserts byte-for-byte SHA-256 invariance on `results.jsonl` before and after updating summary metadata.
+- `execution_provenance`: Captures raw simulation output SHA-256 (`results.jsonl`), producing Git commit, dependency fingerprint, material package versions, and source code hashes active during point evaluation.
+- `summary_provenance`: Captures summary SHA-256 (`summary.json`), digest SHA-256 (`README.md`), diagnostics SHA-256 (`diagnostics.json`), and summarizer source hashes (`research_runner.py` and handler modules).
+- `research_runner.summarize_run` strictly asserts byte-for-byte SHA-256 invariance on `results.jsonl` before and after updating summary metadata, operating in a temporary staging directory and performing atomic replacement.
 
 ### 4. Transactional Atomic Swap & Rollback
 
