@@ -2609,6 +2609,16 @@ def run_experiment(
     stable_dir = os.path.join(RUNS_DIR, exp_id)
     run_id = exp_id
 
+    try:
+        handler = get_handler(exp_id)
+        declared_modules = handler.declared_dependencies.all_code_modules
+    except KeyError:
+        declared_modules = list(certification.REQUIRED_SOURCE_MODULES)
+
+    all_modules = sorted(list(set(list(certification.REQUIRED_SOURCE_MODULES) + declared_modules)))
+    initial_src_hashes = certification._get_source_code_hashes(git_commit, modules=all_modules)
+    initial_data_hashes = certification._get_input_data_hashes(git_commit)
+
     work_dir = os.path.join(RUNS_DIR, f".tmp_{exp_id}_{os.getpid()}")
     if os.path.exists(work_dir):
         shutil.rmtree(work_dir, ignore_errors=True)
@@ -2666,14 +2676,14 @@ def run_experiment(
                 }
             },
             "dependency_fingerprint": certification._get_dependency_fingerprint(),
-            "source_code_hashes": certification._get_source_code_hashes(git_commit),
-            "input_data_hashes": certification._get_input_data_hashes(git_commit),
+            "source_code_hashes": initial_src_hashes,
+            "input_data_hashes": initial_data_hashes,
             "code_modules": [
-                {"path": m, "sha256": certification._get_source_code_hashes(git_commit).get(m, "N/A")}
-                for m in certification.REQUIRED_SOURCE_MODULES
+                {"path": m, "sha256": initial_src_hashes.get(m, "N/A")}
+                for m in all_modules
             ],
             "data_provenance": [
-                {"path": f"data/{d}", "sha256": certification._get_input_data_hashes(git_commit).get(d, "N/A")}
+                {"path": f"data/{d}", "sha256": initial_data_hashes.get(d, "N/A")}
                 for d in certification.REQUIRED_INPUT_DATA_FILES
             ],
             "consumed_certificates": []
@@ -2736,13 +2746,13 @@ def run_experiment(
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
     manifest["consumed_certificates"] = sorted(list(consumed_cert_hashes))
     manifest["dependency_fingerprint"] = certification._get_dependency_fingerprint()
-    cur_src_hashes = certification._get_source_code_hashes(git_commit)
+    cur_src_hashes = certification._get_source_code_hashes(git_commit, modules=all_modules)
     cur_data_hashes = certification._get_input_data_hashes(git_commit)
     manifest["source_code_hashes"] = cur_src_hashes
     manifest["input_data_hashes"] = cur_data_hashes
     manifest["code_modules"] = [
         {"path": m, "sha256": cur_src_hashes.get(m, "N/A")}
-        for m in certification.REQUIRED_SOURCE_MODULES
+        for m in all_modules
     ]
     manifest["data_provenance"] = [
         {"path": f"data/{d}", "sha256": cur_data_hashes.get(d, "N/A")}
