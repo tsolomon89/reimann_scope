@@ -1446,7 +1446,7 @@ def test_explicit_formula_experiment_specs_execute_and_validate(temp_research_en
     """Test that all three explicit formula experiment specs execute and produce valid bundles."""
     real_commit, _ = research_runner.get_git_info()
     monkeypatch.setattr(research_runner, "get_git_info", lambda cwd=None: (real_commit, False))
-    monkeypatch.setattr(certification, "_get_source_code_hashes", lambda commit=None: {m: research_runner.hash_file_bytes(m) for m in certification.REQUIRED_SOURCE_MODULES})
+    monkeypatch.setattr(certification, "_get_source_code_hashes", lambda commit=None, modules=None: {m: research_runner.hash_file_bytes(m) for m in (modules if modules is not None else certification.REQUIRED_SOURCE_MODULES)})
     monkeypatch.setattr(certification, "_is_valid_git_commit", lambda *args, **kwargs: (True, None))
 
     experiments_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research", "experiments")
