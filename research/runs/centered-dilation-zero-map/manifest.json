@@ -264,5 +264,7 @@
       "research_runner.py": "208b1d4678043feaa347c4bb51c4984cf70b86f61000ac16b07537eea87ac374"
     }
   },
-  "warnings": []
+  "warnings": [],
+  "provenance_completeness": "complete",
+  "missing_material_versions": []
 }

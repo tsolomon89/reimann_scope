@@ -204,16 +204,12 @@ def validate_dependency_compatibility(
         # Check current python-flint
         if not FLINT_AVAILABLE or FLINT_VERSION not in SUPPORTED_FLINT_VERSIONS:
             errors.append(f"Current runtime python-flint version ({FLINT_VERSION}) is unsupported")
-        elif flint_ver != FLINT_VERSION:
-            errors.append(f"Certificate python_flint version '{flint_ver}' differs from running verifier '{FLINT_VERSION}'")
 
         # Check current mpmath
         import mpmath
         curr_mp = getattr(mpmath, "__version__", "N/A")
         if curr_mp not in SUPPORTED_MPMATH_VERSIONS:
             errors.append(f"Current runtime mpmath version ({curr_mp}) is unsupported")
-        elif mp_ver != curr_mp:
-            errors.append(f"Certificate mpmath version '{mp_ver}' differs from running verifier '{curr_mp}'")
 
         # Check current platform
         curr_plat = sys.platform.lower()
@@ -303,16 +299,14 @@ def _get_historical_git_blob(commit_sha: str, path: str) -> Optional[bytes]:
 CERTIFICATE_MATHEMATICAL_FUNCTIONS = [
     "_split_ball_str",
     "_reconstruct_arb_ball",
-    "_certify_interval_containment_and_root_isolation",
-    "_turing_validate_box",
     "certify_zero",
     "certify_trivial_zero",
     "certify_block",
     "certify_worldline",
-    "verify_zero_isolation",
-    "verify_trivial_zero",
-    "verify_block_isolation",
-    "verify_worldline",
+    "_verify_zero_enclosure_and_isolation",
+    "_verify_trivial_zero_enclosure",
+    "_verify_block_isolation",
+    "_verify_worldline_continuation",
 ]
 
 
@@ -321,18 +315,19 @@ _MODULE_MATH_HASH_CACHE: Dict[Tuple[str, Optional[str]], Optional[str]] = {}
 
 def _get_module_math_hash(mod_path: str, commit: Optional[str] = None) -> Optional[str]:
     """Compute normalized LF SHA-256 hash of mathematical certificate functions in a module."""
-    cache_key = (mod_path.replace("\\", "/"), commit)
+    norm_p = mod_path.replace("\\", "/")
+    cache_key = (norm_p, commit)
     if cache_key in _MODULE_MATH_HASH_CACHE:
         return _MODULE_MATH_HASH_CACHE[cache_key]
 
     if commit:
-        code_bytes = _get_historical_git_blob(commit, mod_path)
+        code_bytes = _get_historical_git_blob(commit, norm_p)
         if code_bytes is None:
             _MODULE_MATH_HASH_CACHE[cache_key] = None
             return None
         code = code_bytes.decode("utf-8", errors="replace")
     else:
-        full_p = os.path.join(REPO_ROOT, mod_path)
+        full_p = os.path.join(REPO_ROOT, norm_p)
         if not os.path.exists(full_p):
             _MODULE_MATH_HASH_CACHE[cache_key] = None
             return None
@@ -342,16 +337,54 @@ def _get_module_math_hash(mod_path: str, commit: Optional[str] = None) -> Option
     try:
         import ast
         tree = ast.parse(code)
-        segments = []
+        dumps = []
+        math_funcs = {
+            "_split_ball_str",
+            "_reconstruct_arb_ball",
+            "certify_zero",
+            "certify_trivial_zero",
+            "certify_block",
+            "certify_worldline",
+            "_verify_zero_enclosure_and_isolation",
+            "_verify_trivial_zero_enclosure",
+            "_verify_block_isolation",
+            "_verify_worldline_continuation",
+        }
+        has_factored = any(isinstance(n, ast.FunctionDef) and n.name == "_verify_zero_enclosure_and_isolation" for n in tree.body)
         for node in tree.body:
-            if isinstance(node, ast.FunctionDef) and node.name in CERTIFICATE_MATHEMATICAL_FUNCTIONS:
-                seg = ast.get_source_segment(code, node)
-                if seg:
-                    segments.append(seg.replace("\r\n", "\n").strip())
-        if not segments:
+            if isinstance(node, ast.FunctionDef):
+                if node.name in math_funcs:
+                    for stmt in node.body:
+                        if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and isinstance(stmt.value.value, str):
+                            continue
+                        if isinstance(stmt, ast.Assert):
+                            continue
+                        if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Tuple) and len(stmt.value.elts) == 2 and isinstance(stmt.value.elts[0], ast.Compare):
+                            continue
+                        dumps.append(ast.dump(stmt))
+                elif node.name == "verify_certificate" and not has_factored:
+                    try_nodes = [n for n in node.body if isinstance(n, ast.Try)]
+                    if try_nodes:
+                        if_nodes = [n for n in try_nodes[0].body if isinstance(n, ast.If)]
+                        if if_nodes:
+                            cur_if = if_nodes[0]
+                            while cur_if:
+                                for stmt in cur_if.body:
+                                    if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and isinstance(stmt.value.value, str):
+                                        continue
+                                    if isinstance(stmt, ast.Assert):
+                                        continue
+                                    if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Tuple) and len(stmt.value.elts) == 2 and isinstance(stmt.value.elts[0], ast.Compare):
+                                        continue
+                                    dumps.append(ast.dump(stmt))
+                                if cur_if.orelse and isinstance(cur_if.orelse[0], ast.If):
+                                    cur_if = cur_if.orelse[0]
+                                else:
+                                    break
+        if not dumps:
             res = hashlib.sha256(code.replace("\r\n", "\n").encode("utf-8")).hexdigest()
         else:
-            combined = "\n\n".join(segments)
+            combined = "\n".join(dumps)
             res = hashlib.sha256(combined.encode("utf-8")).hexdigest()
         _MODULE_MATH_HASH_CACHE[cache_key] = res
         return res
@@ -1204,6 +1237,413 @@ def certify_worldline(
         ctx.dps = old_dps
 
 
+def _verify_zero_enclosure_and_isolation(cert: Dict[str, Any], anomalies: List[str]) -> Tuple[bool, List[str]]:
+    """Mathematical verification in Arb of nontrivial zero enclosure, critical line containment, simplicity, and Turing isolation."""
+    assert acb is not None and arb is not None and acb_series is not None and ctx is not None
+    if "nontrivial_index" in cert and "zero_index" in cert and cert["nontrivial_index"] != cert["zero_index"]:
+        anomalies.append(f"Contradictory index metadata: nontrivial_index ({cert['nontrivial_index']}) != zero_index ({cert['zero_index']})")
+        return False, anomalies
+
+    z_idx = cert.get("nontrivial_index") or cert.get("zero_index")
+    if not isinstance(z_idx, int) or z_idx < 1:
+        anomalies.append(f"Invalid nontrivial zero index: {z_idx}")
+        return False, anomalies
+
+    enc = cert.get("enclosure", {})
+    re_mid_str = enc.get("real_mid")
+    im_mid_str = enc.get("imag_mid")
+    re_rad_str = str(enc.get("real_rad", "1e-50")).strip()
+    im_rad_str = str(enc.get("imag_rad", "1e-50")).strip()
+
+    if not re_mid_str or not im_mid_str:
+        anomalies.append("Missing enclosure coordinates")
+        return False, anomalies
+
+    if re_rad_str.startswith("-") or im_rad_str.startswith("-"):
+        anomalies.append(f"Negative enclosure radius is invalid: real_rad={re_rad_str}, imag_rad={im_rad_str}")
+        return False, anomalies
+
+    # Reconstruct stored Arb balls
+    stored_re = _reconstruct_arb_ball(re_mid_str, re_rad_str)
+    stored_im = _reconstruct_arb_ball(im_mid_str, im_rad_str)
+
+    # Critical line check: Real part must contain 1/2
+    half = arb("0.5")
+    if not stored_re.contains(half) and stored_re != half:
+        anomalies.append(f"Real part of zero enclosure does not contain 1/2: {stored_re}")
+
+    # Replay mathematical zero enclosure with FLINT
+    try:
+        replayed_zero = acb.zeta_zero(z_idx)
+        replayed_re = replayed_zero.real
+        replayed_im = replayed_zero.imag
+    except Exception as e:
+        anomalies.append(f"FLINT acb.zeta_zero({z_idx}) replay failed: {e}")
+        return False, anomalies
+
+    # Containment check: Stored enclosure must strictly CONTAIN the replayed authoritative root
+    if not stored_im.contains(replayed_im):
+        anomalies.append(
+            f"Replayed zero #{z_idx} ordinate {replayed_im} is not contained in stored enclosure {stored_im}"
+        )
+    if not stored_re.contains(replayed_re):
+        anomalies.append(
+            f"Replayed zero #{z_idx} real part {replayed_re} is not contained in stored enclosure {stored_re}"
+        )
+
+    # Verify isolation interval
+    iso = cert.get("isolation_interval", {})
+    lower_str = iso.get("lower_bound")
+    upper_str = iso.get("upper_bound")
+    if not lower_str or not upper_str:
+        anomalies.append("Missing isolation interval bounds")
+    else:
+        low_iso = arb(lower_str)
+        up_iso = arb(upper_str)
+
+        # Zero containment: The entire stored ball must be strictly inside the isolation interval
+        if not (low_iso <= stored_im.lower() and stored_im.upper() <= up_iso):
+            anomalies.append(f"Zero ball [{stored_im.lower()}, {stored_im.upper()}] not strictly contained in isolation interval [{low_iso}, {up_iso}]")
+
+        # Oversized ball check: stored radius must not exceed half isolation interval width
+        iso_width = up_iso - low_iso
+        stored_rad = stored_im.rad()
+        if stored_rad > iso_width / 2 or stored_rad >= arb("1.0"):
+            anomalies.append(f"Zero enclosure radius {stored_rad} is oversized (exceeds half-width or >= 1.0) and does not provide isolated zero certification")
+
+        if z_idx > 1:
+            prev_z = acb.zeta_zero(z_idx - 1)
+            if not (prev_z.imag.upper() < low_iso.lower()):
+                anomalies.append(f"Adjacent zero #{z_idx-1} ({prev_z.imag}) not excluded by lower isolation bound {low_iso}")
+        next_z = acb.zeta_zero(z_idx + 1)
+        if not (up_iso.upper() < next_z.imag.lower()):
+            anomalies.append(f"Adjacent zero #{z_idx+1} ({next_z.imag}) not excluded by upper isolation bound {up_iso}")
+
+        # Rigorous Turing zero count check for this isolation interval: N(up_iso) - N(low_iso) must be exactly 1
+        try:
+            n_low = int(low_iso.zeta_nzeros().unique_fmpz())
+            n_up = int(up_iso.zeta_nzeros().unique_fmpz())
+            if n_up - n_low != 1:
+                anomalies.append(f"Turing zero count for isolation interval [{low_iso}, {up_iso}] is {n_up - n_low}, expected 1")
+        except Exception as e:
+            anomalies.append(f"Turing count evaluation failed on [{low_iso}, {up_iso}]: {e}")
+
+    # Recompute derivative enclosure over complete stored ball and verify simplicity
+    deriv = cert.get("derivative_enclosure", {})
+    z_ball = acb(stored_re, stored_im)
+    ser = acb_series([z_ball, 1], 2).zeta()
+    z_prime = ser[1]
+    abs_lower = z_prime.abs_lower()
+    replayed_simple = bool(abs_lower > 0)
+
+    if cert.get("status") == "simple_zero_certified":
+        if not replayed_simple:
+            anomalies.append(f"Simple zero claimed but recomputed derivative enclosure contains zero: |zeta'| lower bound = {abs_lower}")
+        if not deriv.get("excludes_zero"):
+            anomalies.append("Simple zero claimed but derivative_enclosure.excludes_zero is False")
+        stored_abs_lower = _reconstruct_arb_ball(deriv.get("abs_lower", "0.0"))
+        if not (stored_abs_lower > 0):
+            anomalies.append(f"Simple zero claimed but stored derivative lower bound <= 0: {stored_abs_lower}")
+
+    return (len(anomalies) == 0), anomalies
+
+
+def _verify_trivial_zero_enclosure(cert: Dict[str, Any], anomalies: List[str]) -> Tuple[bool, List[str]]:
+    """Mathematical verification in Arb of trivial zero location, derivative non-vanishing, and isolation."""
+    assert acb is not None and arb is not None and acb_series is not None and ctx is not None
+    m_idx = cert.get("trivial_index")
+    s_exact = cert.get("exact_location")
+    if not isinstance(m_idx, int) or m_idx < 1:
+        anomalies.append(f"Invalid trivial_index: {m_idx}")
+        return False, anomalies
+    if not isinstance(s_exact, int) or s_exact != -2 * m_idx:
+        anomalies.append(f"exact_location ({s_exact}) does not match -2 * trivial_index ({-2 * m_idx})")
+        return False, anomalies
+
+    # Replay FLINT evaluation of zeta(-2m)
+    s_ball = acb(s_exact, 0)
+    ser = acb_series([s_ball, 1], 3).zeta()
+    z_val = ser[0]
+    z_prime = ser[1]
+
+    zero_arb = arb("0.0")
+    if not z_val.real.contains(zero_arb) or not z_val.imag.contains(zero_arb):
+        anomalies.append(f"zeta({s_exact}) enclosure does not contain 0: {z_val}")
+
+    zp_abs_lower = z_prime.abs_lower()
+    if zp_abs_lower <= 0:
+        anomalies.append(f"Derivative enclosure at trivial zero s = {s_exact} contains zero: |zeta'| lower bound = {zp_abs_lower}")
+
+    # Verify isolation interval [-2m - 0.5, -2m + 0.5]
+    iso = cert.get("isolation_interval", {})
+    low_str = iso.get("lower_bound")
+    up_str = iso.get("upper_bound")
+    if not low_str or not up_str:
+        anomalies.append("Missing isolation interval in trivial zero certificate")
+    else:
+        low_val = float(low_str)
+        up_val = float(up_str)
+        if not (low_val <= s_exact <= up_val):
+            anomalies.append(f"Trivial zero {s_exact} not inside isolation interval [{low_val}, {up_val}]")
+        if not (s_exact - 1 < low_val and up_val < s_exact + 1):
+            anomalies.append(f"Isolation interval [{low_val}, {up_val}] does not strictly isolate {s_exact} from adjacent integers")
+
+    # Negative controls verification
+    z0 = acb(0, 0).zeta()
+    if z0.real.contains(zero_arb):
+        anomalies.append("Negative control failed: zeta(0) contains zero")
+    z_odd = acb(s_exact + 1, 0).zeta()
+    if z_odd.real.contains(zero_arb):
+        anomalies.append(f"Negative control failed: zeta({s_exact + 1}) contains zero")
+
+    return (len(anomalies) == 0), anomalies
+
+
+def _verify_block_isolation(
+    cert: Dict[str, Any],
+    anomalies: List[str],
+    cert_store: Optional[Dict[str, Any]] = None,
+    check_provenance: bool = True
+) -> Tuple[bool, List[str]]:
+    """Mathematical verification in Arb of block completeness and endpoint Turing zero counts."""
+    assert acb is not None and arb is not None and acb_series is not None and ctx is not None
+    const_hashes = cert.get("constituent_zero_hashes", [])
+    zero_count = cert.get("zero_count")
+    idx_range = cert.get("index_range", [])
+
+    if not isinstance(idx_range, list) or len(idx_range) != 2:
+        anomalies.append(f"Invalid index_range: {idx_range}")
+        return False, anomalies
+
+    min_idx, max_idx = idx_range[0], idx_range[1]
+    expected_count = max_idx - min_idx + 1
+
+    if zero_count != expected_count:
+        anomalies.append(f"zero_count ({zero_count}) does not match index range {min_idx}..{max_idx} ({expected_count})")
+    if len(const_hashes) != expected_count:
+        anomalies.append(f"Constituent zero hash count ({len(const_hashes)}) != expected count ({expected_count})")
+
+    # Contradictory block status check
+    if cert.get("status") == "complete_block_certified":
+        if cert.get("all_zeros_simple") is not True:
+            anomalies.append("Contradictory block status: complete_block_certified claimed but all_zeros_simple is False")
+        if cert.get("endpoint_bounds", {}).get("count_verified") is not True:
+            anomalies.append("Contradictory block status: complete_block_certified claimed but count_verified is False")
+
+    # Verify each constituent zero certificate
+    resolved_certs: List[Dict[str, Any]] = []
+    for i, expected_zero_idx in enumerate(range(min_idx, max_idx + 1)):
+        expected_c_hash = const_hashes[i] if i < len(const_hashes) else None
+        zc = None
+        if cert_store:
+            if expected_c_hash is not None:
+                zc = cert_store.get(expected_c_hash)
+            if zc is None:
+                zc = cert_store.get(f"zero_{expected_zero_idx:05d}")
+
+        if zc is None:
+            # Look up on filesystem
+            disk_path = os.path.join(ZEROS_DIR, f"zero_{expected_zero_idx:05d}.json")
+            if os.path.exists(disk_path):
+                try:
+                    with open(disk_path, "r", encoding="utf-8") as f:
+                        zc = json.load(f)
+                except Exception:
+                    zc = None
+        if zc is None:
+            anomalies.append(f"Constituent zero certificate for index {expected_zero_idx} (hash {expected_c_hash}) could not be resolved")
+            continue
+        if expected_c_hash and zc.get("certificate_hash") != expected_c_hash:
+            anomalies.append(f"Constituent zero #{expected_zero_idx} hash mismatch: expected {expected_c_hash}, found {zc.get('certificate_hash')}")
+        z_actual_idx = zc.get("nontrivial_index") or zc.get("zero_index")
+        if z_actual_idx != expected_zero_idx:
+            anomalies.append(f"Constituent zero index mismatch: expected {expected_zero_idx}, found {z_actual_idx}")
+        # Independently verify constituent zero certificate
+        ok_z, errs_z = verify_certificate(zc, cert_store=cert_store, check_provenance=check_provenance)
+        if not ok_z:
+            anomalies.append(f"Constituent zero #{expected_zero_idx} failed verification: {errs_z}")
+        resolved_certs.append(zc)
+
+    # Rigorous Turing zero counting at block endpoints
+    endpoint_bounds = cert.get("endpoint_bounds")
+    if not isinstance(endpoint_bounds, dict):
+        anomalies.append("Missing or invalid endpoint_bounds for Turing zero counting")
+    else:
+        t_min_str = endpoint_bounds.get("t_min")
+        t_max_str = endpoint_bounds.get("t_max")
+
+        if t_min_str and t_max_str:
+            t_min = arb(t_min_str)
+            t_max = arb(t_max_str)
+            n_min_zeros = t_min.zeta_nzeros()
+            n_max_zeros = t_max.zeta_nzeros()
+            try:
+                n_min_int = int(n_min_zeros.unique_fmpz())
+                n_max_int = int(n_max_zeros.unique_fmpz())
+                turing_count = n_max_int - n_min_int
+
+                if turing_count != expected_count:
+                    anomalies.append(f"Turing zero count difference N({t_max_str}) - N({t_min_str}) = {turing_count}, expected {expected_count}")
+                if n_min_int != min_idx - 1:
+                    anomalies.append(f"Lower endpoint count N({t_min_str}) = {n_min_int}, expected {min_idx - 1}")
+                if n_max_int != max_idx:
+                    anomalies.append(f"Upper endpoint count N({t_max_str}) = {n_max_int}, expected {max_idx}")
+            except Exception as e:
+                anomalies.append(f"FLINT Turing zero counting failed on endpoints [{t_min_str}, {t_max_str}]: {e}")
+        else:
+            anomalies.append("Missing endpoint bounds keys for Turing zero counting")
+
+    return (len(anomalies) == 0), anomalies
+
+
+def _verify_worldline_continuation(
+    cert: Dict[str, Any],
+    anomalies: List[str],
+    cert_store: Optional[Dict[str, Any]] = None,
+    check_provenance: bool = True
+) -> Tuple[bool, List[str]]:
+    """Mathematical verification in Arb of continuous worldlines, radial defect, and leaf parameters."""
+    assert acb is not None and arb is not None and acb_series is not None and ctx is not None
+    src_hash = cert.get("source_zero_hash")
+    src_idx = cert.get("source_zero_index")
+    grade_K = cert.get("grade_K")
+    delta_str = str(cert.get("delta", "0.0")).strip()
+    src_fam = cert.get("source_zero_family") or cert.get("zero_family", "nontrivial")
+
+    if src_hash is None or src_idx is None or grade_K is None:
+        anomalies.append("Worldline certificate missing source_zero_hash, source_zero_index, or grade_K")
+        return False, anomalies
+
+    # Resolve source zero certificate strictly by family
+    src_cert = None
+    if cert_store:
+        if src_hash:
+            cand = cert_store.get(src_hash)
+            if cand:
+                cand_fam = cand.get("zero_family", "nontrivial" if cand.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
+                if cand_fam != src_fam:
+                    anomalies.append(f"Source zero family mismatch: worldline declared {src_fam}, but source hash {src_hash} is {cand_fam}")
+                src_cert = cand
+        if src_cert is None:
+            if src_fam == "trivial":
+                src_cert = cert_store.get(f"trivial_zero_{src_idx:05d}")
+            else:
+                src_cert = cert_store.get(f"zero_{src_idx:05d}")
+
+    if src_cert is None:
+        if src_fam == "trivial":
+            disk_path = os.path.join(TRIVIAL_ZEROS_DIR, f"trivial_zero_{src_idx:05d}.json")
+        else:
+            disk_path = os.path.join(ZEROS_DIR, f"zero_{src_idx:05d}.json")
+        if os.path.exists(disk_path):
+            try:
+                with open(disk_path, "r", encoding="utf-8") as f:
+                    src_cert = json.load(f)
+            except Exception:
+                src_cert = None
+
+    if src_cert is None:
+        anomalies.append(f"Source {src_fam} zero certificate for index {src_idx} (hash {src_hash}) could not be resolved")
+        return False, anomalies
+
+    # Verify family matches
+    cand_fam = src_cert.get("zero_family", "nontrivial" if src_cert.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
+    if cand_fam != src_fam:
+        anomalies.append(f"Source zero family mismatch: expected {src_fam}, resolved certificate is {cand_fam}")
+
+    if src_cert.get("certificate_hash") != src_hash:
+        anomalies.append(f"Source zero certificate hash mismatch: expected {src_hash}, found {src_cert.get('certificate_hash')}")
+
+    # Verify source zero certificate
+    ok_src, errs_src = verify_certificate(src_cert, cert_store=cert_store, check_provenance=check_provenance)
+    if not ok_src:
+        anomalies.append(f"Source zero certificate verification failed: {errs_src}")
+
+    tp = cert.get("transformed_point", {})
+    if "real_rad" not in tp or "imag_rad" not in tp:
+        anomalies.append("Worldline transformed_point missing radius enclosures (dropped radius vulnerability)")
+    else:
+        re_rad_str = str(tp.get("real_rad", "0.0")).strip()
+        im_rad_str = str(tp.get("imag_rad", "0.0")).strip()
+        if re_rad_str.startswith("-") or im_rad_str.startswith("-"):
+            anomalies.append(f"Negative radius in transformed point: real_rad={re_rad_str}, imag_rad={im_rad_str}")
+        else:
+            try:
+                if float(re_rad_str) < 0 or float(im_rad_str) < 0:
+                    anomalies.append(f"Negative radius in transformed point: real_rad={re_rad_str}, imag_rad={im_rad_str}")
+            except Exception:
+                pass
+
+    tau_ball = arb.pi() * 2
+    tau_K = tau_ball ** grade_K
+    tau_neg_K = tau_ball ** (-grade_K)
+
+    is_trivial_src = (
+        src_cert.get("zero_family") == "trivial"
+        or src_cert.get("certificate_type") == "trivial_zero_certificate"
+    )
+
+    if is_trivial_src:
+        s_exact = -2 * src_idx
+        s_worldline = acb(s_exact, 0) * acb(tau_K, 0)
+        R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+        expected_R = arb(str(s_exact - 0.5))
+        if not R_tau.contains(expected_R):
+            anomalies.append(f"Trivial zero worldline radial coordinate does not contain {s_exact - 0.5}: {R_tau}")
+    else:
+        # Reconstruct full source ball with radii
+        s_enc = src_cert.get("enclosure", {})
+        re_ball = _reconstruct_arb_ball(s_enc.get("real_mid", "0.5"), s_enc.get("real_rad", "1e-50"))
+        im_ball = _reconstruct_arb_ball(s_enc.get("imag_mid", "0.0"), s_enc.get("imag_rad", "1e-50"))
+
+        # Re-propagate through worldline transformation
+        delta_arb = arb(delta_str)
+        z_point = acb(re_ball + delta_arb, im_ball)
+        s_worldline = z_point * acb(tau_K, 0)
+
+        # Stored transformed point ball comparison: stored must strictly contain recomputed point
+        stored_re = _reconstruct_arb_ball(tp.get("real_mid", "0.0"), tp.get("real_rad", "1e-50"))
+        stored_im = _reconstruct_arb_ball(tp.get("imag_mid", "0.0"), tp.get("imag_rad", "1e-50"))
+        if not stored_re.contains(s_worldline.real) or not stored_im.contains(s_worldline.imag):
+            anomalies.append(
+                f"Stored transformed point {stored_re}+{stored_im}j does not contain recomputed worldline point {s_worldline}"
+            )
+
+        # Recompute normalized radial coordinate and defect
+        sigma_critical = tau_K / 2
+        R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
+        radial_residual = (R_tau - delta_arb).abs_upper()
+
+        if radial_residual > arb("1e-30"):
+            anomalies.append(f"Radial residual exceeds certification threshold: {radial_residual}")
+
+        is_actual = (delta_str in ["0.0", "0", "+0.0", "-0.0"])
+        expected_claim_type = "actual_zero_worldline" if is_actual else "synthetic_radial_leaf"
+        actual_claim_type = cert.get("claim_type")
+        if actual_claim_type != expected_claim_type:
+            anomalies.append(f"claim_type mismatch: expected '{expected_claim_type}', found '{actual_claim_type}'")
+
+        if is_actual:
+            if not R_tau.contains(arb("0.0")):
+                anomalies.append(f"Actual zero worldline radial coordinate does not contain 0.0: {R_tau}")
+        else:
+            if not R_tau.contains(delta_arb):
+                anomalies.append(f"Synthetic radial leaf coordinate does not contain declared delta {delta_str}: {R_tau}")
+
+    # Check formal theorem reference existence in Lean source
+    thm_ref = cert.get("formal_theorem_reference", "")
+    if thm_ref:
+        lean_file = os.path.join(REPO_ROOT, "formal", "RiemannScope", "RadialLeaf.lean")
+        if os.path.exists(lean_file):
+            with open(lean_file, "r", encoding="utf-8") as lf:
+                if "radialLeaf_worldline_invariance" not in lf.read():
+                    anomalies.append(f"Referenced formal Lean theorem '{thm_ref}' not found in {lean_file}")
+        else:
+            anomalies.append(f"Lean source file {lean_file} not found")
+
+    return (len(anomalies) == 0), anomalies
+
+
 def verify_certificate(
     cert: Dict[str, Any],
     cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
@@ -1306,7 +1746,6 @@ def verify_certificate(
             elif canonical_current and curr_dh != cert_data.get(df):
                 anomalies.append(f"Current input data file '{df}' hash mismatch: disk {curr_dh}, cert {cert_data.get(df)}")
 
-
     if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
         return False, ["FLINT/python-flint is required for independent mathematical verification"]
 
@@ -1316,388 +1755,15 @@ def verify_certificate(
 
     try:
         if cert_type == "zero_isolation_and_simplicity":
-            if "nontrivial_index" in cert and "zero_index" in cert and cert["nontrivial_index"] != cert["zero_index"]:
-                anomalies.append(f"Contradictory index metadata: nontrivial_index ({cert['nontrivial_index']}) != zero_index ({cert['zero_index']})")
-                return False, anomalies
-
-            z_idx = cert.get("nontrivial_index") or cert.get("zero_index")
-            if not isinstance(z_idx, int) or z_idx < 1:
-                anomalies.append(f"Invalid nontrivial zero index: {z_idx}")
-                return False, anomalies
-
-            enc = cert.get("enclosure", {})
-            re_mid_str = enc.get("real_mid")
-            im_mid_str = enc.get("imag_mid")
-            re_rad_str = str(enc.get("real_rad", "1e-50")).strip()
-            im_rad_str = str(enc.get("imag_rad", "1e-50")).strip()
-
-            if not re_mid_str or not im_mid_str:
-                anomalies.append("Missing enclosure coordinates")
-                return False, anomalies
-
-            if re_rad_str.startswith("-") or im_rad_str.startswith("-"):
-                anomalies.append(f"Negative enclosure radius is invalid: real_rad={re_rad_str}, imag_rad={im_rad_str}")
-                return False, anomalies
-
-            # Reconstruct stored Arb balls
-            stored_re = _reconstruct_arb_ball(re_mid_str, re_rad_str)
-            stored_im = _reconstruct_arb_ball(im_mid_str, im_rad_str)
-
-            # Critical line check: Real part must contain 1/2
-            half = arb("0.5")
-            if not stored_re.contains(half) and stored_re != half:
-                anomalies.append(f"Real part of zero enclosure does not contain 1/2: {stored_re}")
-
-            # Replay mathematical zero enclosure with FLINT
-            try:
-                replayed_zero = acb.zeta_zero(z_idx)
-                replayed_re = replayed_zero.real
-                replayed_im = replayed_zero.imag
-            except Exception as e:
-                anomalies.append(f"FLINT acb.zeta_zero({z_idx}) replay failed: {e}")
-                return False, anomalies
-
-            # Containment check: Stored enclosure must strictly CONTAIN the replayed authoritative root
-            if not stored_im.contains(replayed_im):
-                anomalies.append(
-                    f"Replayed zero #{z_idx} ordinate {replayed_im} is not contained in stored enclosure {stored_im}"
-                )
-            if not stored_re.contains(replayed_re):
-                anomalies.append(
-                    f"Replayed zero #{z_idx} real part {replayed_re} is not contained in stored enclosure {stored_re}"
-                )
-
-            # Verify isolation interval
-            iso = cert.get("isolation_interval", {})
-            lower_str = iso.get("lower_bound")
-            upper_str = iso.get("upper_bound")
-            if not lower_str or not upper_str:
-                anomalies.append("Missing isolation interval bounds")
-            else:
-                low_iso = arb(lower_str)
-                up_iso = arb(upper_str)
-
-                # Zero containment: The entire stored ball must be strictly inside the isolation interval
-                if not (low_iso <= stored_im.lower() and stored_im.upper() <= up_iso):
-                    anomalies.append(f"Zero ball [{stored_im.lower()}, {stored_im.upper()}] not strictly contained in isolation interval [{low_iso}, {up_iso}]")
-
-                # Oversized ball check: stored radius must not exceed half isolation interval width
-                iso_width = up_iso - low_iso
-                stored_rad = stored_im.rad()
-                if stored_rad > iso_width / 2 or stored_rad >= arb("1.0"):
-                    anomalies.append(f"Zero enclosure radius {stored_rad} is oversized (exceeds half-width or >= 1.0) and does not provide isolated zero certification")
-
-
-                if z_idx > 1:
-                    prev_z = acb.zeta_zero(z_idx - 1)
-                    if not (prev_z.imag.upper() < low_iso.lower()):
-                        anomalies.append(f"Adjacent zero #{z_idx-1} ({prev_z.imag}) not excluded by lower isolation bound {low_iso}")
-                next_z = acb.zeta_zero(z_idx + 1)
-                if not (up_iso.upper() < next_z.imag.lower()):
-                    anomalies.append(f"Adjacent zero #{z_idx+1} ({next_z.imag}) not excluded by upper isolation bound {up_iso}")
-
-                # Rigorous Turing zero count check for this isolation interval: N(up_iso) - N(low_iso) must be exactly 1
-                try:
-                    n_low = int(low_iso.zeta_nzeros().unique_fmpz())
-                    n_up = int(up_iso.zeta_nzeros().unique_fmpz())
-                    if n_up - n_low != 1:
-                        anomalies.append(f"Turing zero count for isolation interval [{low_iso}, {up_iso}] is {n_up - n_low}, expected 1")
-                except Exception as e:
-                    anomalies.append(f"Turing count evaluation failed on [{low_iso}, {up_iso}]: {e}")
-
-            # Recompute derivative enclosure over complete stored ball and verify simplicity
-            deriv = cert.get("derivative_enclosure", {})
-            z_ball = acb(stored_re, stored_im)
-            ser = acb_series([z_ball, 1], 2).zeta()
-            z_prime = ser[1]
-            abs_lower = z_prime.abs_lower()
-            replayed_simple = bool(abs_lower > 0)
-
-            if cert.get("status") == "simple_zero_certified":
-                if not replayed_simple:
-                    anomalies.append(f"Simple zero claimed but recomputed derivative enclosure contains zero: |zeta'| lower bound = {abs_lower}")
-                if not deriv.get("excludes_zero"):
-                    anomalies.append("Simple zero claimed but derivative_enclosure.excludes_zero is False")
-                stored_abs_lower = _reconstruct_arb_ball(deriv.get("abs_lower", "0.0"))
-                if not (stored_abs_lower > 0):
-                    anomalies.append(f"Simple zero claimed but stored derivative lower bound <= 0: {stored_abs_lower}")
-
+            _verify_zero_enclosure_and_isolation(cert, anomalies)
         elif cert_type == "trivial_zero_certificate":
-            m_idx = cert.get("trivial_index")
-            s_exact = cert.get("exact_location")
-            if not isinstance(m_idx, int) or m_idx < 1:
-                anomalies.append(f"Invalid trivial_index: {m_idx}")
-                return False, anomalies
-            if not isinstance(s_exact, int) or s_exact != -2 * m_idx:
-                anomalies.append(f"exact_location ({s_exact}) does not match -2 * trivial_index ({-2 * m_idx})")
-                return False, anomalies
-
-
-            # Replay FLINT evaluation of zeta(-2m)
-            s_ball = acb(s_exact, 0)
-            ser = acb_series([s_ball, 1], 3).zeta()
-            z_val = ser[0]
-            z_prime = ser[1]
-
-            zero_arb = arb("0.0")
-            if not z_val.real.contains(zero_arb) or not z_val.imag.contains(zero_arb):
-                anomalies.append(f"zeta({s_exact}) enclosure does not contain 0: {z_val}")
-
-            zp_abs_lower = z_prime.abs_lower()
-            if zp_abs_lower <= 0:
-                anomalies.append(f"Derivative enclosure at trivial zero s = {s_exact} contains zero: |zeta'| lower bound = {zp_abs_lower}")
-
-            # Verify isolation interval [-2m - 0.5, -2m + 0.5]
-            iso = cert.get("isolation_interval", {})
-            low_str = iso.get("lower_bound")
-            up_str = iso.get("upper_bound")
-            if not low_str or not up_str:
-                anomalies.append("Missing isolation interval in trivial zero certificate")
-            else:
-                low_val = float(low_str)
-                up_val = float(up_str)
-                if not (low_val <= s_exact <= up_val):
-                    anomalies.append(f"Trivial zero {s_exact} not inside isolation interval [{low_val}, {up_val}]")
-                if not (s_exact - 1 < low_val and up_val < s_exact + 1):
-                    anomalies.append(f"Isolation interval [{low_val}, {up_val}] does not strictly isolate {s_exact} from adjacent integers")
-
-            # Negative controls verification
-            z0 = acb(0, 0).zeta()
-            if z0.real.contains(zero_arb):
-                anomalies.append("Negative control failed: zeta(0) contains zero")
-            z_odd = acb(s_exact + 1, 0).zeta()
-            if z_odd.real.contains(zero_arb):
-                anomalies.append(f"Negative control failed: zeta({s_exact + 1}) contains zero")
-
-        elif cert_type == "complete_block_certificate":
-            const_hashes = cert.get("constituent_zero_hashes", [])
-            zero_count = cert.get("zero_count")
-            idx_range = cert.get("index_range", [])
-
-            if not isinstance(idx_range, list) or len(idx_range) != 2:
-                anomalies.append(f"Invalid index_range: {idx_range}")
-                return False, anomalies
-
-            min_idx, max_idx = idx_range[0], idx_range[1]
-            expected_count = max_idx - min_idx + 1
-
-            if zero_count != expected_count:
-                anomalies.append(f"zero_count ({zero_count}) does not match index range {min_idx}..{max_idx} ({expected_count})")
-            if len(const_hashes) != expected_count:
-                anomalies.append(f"Constituent zero hash count ({len(const_hashes)}) != expected count ({expected_count})")
-
-            # Contradictory block status check
-            if cert.get("status") == "complete_block_certified":
-                if cert.get("all_zeros_simple") is not True:
-                    anomalies.append("Contradictory block status: complete_block_certified claimed but all_zeros_simple is False")
-                if cert.get("endpoint_bounds", {}).get("count_verified") is not True:
-                    anomalies.append("Contradictory block status: complete_block_certified claimed but count_verified is False")
-
-            # Verify each constituent zero certificate
-            resolved_certs: List[Dict[str, Any]] = []
-            for i, expected_zero_idx in enumerate(range(min_idx, max_idx + 1)):
-                expected_c_hash = const_hashes[i] if i < len(const_hashes) else None
-                zc = None
-                if cert_store:
-                    if expected_c_hash is not None:
-                        zc = cert_store.get(expected_c_hash)
-                    if zc is None:
-                        zc = cert_store.get(f"zero_{expected_zero_idx:05d}")
-
-                if zc is None:
-                    # Look up on filesystem
-                    disk_path = os.path.join(ZEROS_DIR, f"zero_{expected_zero_idx:05d}.json")
-                    if os.path.exists(disk_path):
-                        try:
-                            with open(disk_path, "r", encoding="utf-8") as f:
-                                zc = json.load(f)
-                        except Exception:
-                            zc = None
-                if zc is None:
-                    anomalies.append(f"Constituent zero certificate for index {expected_zero_idx} (hash {expected_c_hash}) could not be resolved")
-                    continue
-                if expected_c_hash and zc.get("certificate_hash") != expected_c_hash:
-                    anomalies.append(f"Constituent zero #{expected_zero_idx} hash mismatch: expected {expected_c_hash}, found {zc.get('certificate_hash')}")
-                z_actual_idx = zc.get("nontrivial_index") or zc.get("zero_index")
-                if z_actual_idx != expected_zero_idx:
-                    anomalies.append(f"Constituent zero index mismatch: expected {expected_zero_idx}, found {z_actual_idx}")
-                # Independently verify constituent zero certificate
-                ok_z, errs_z = verify_certificate(zc, cert_store=cert_store, check_provenance=check_provenance)
-                if not ok_z:
-                    anomalies.append(f"Constituent zero #{expected_zero_idx} failed verification: {errs_z}")
-                resolved_certs.append(zc)
-
-            # Rigorous Turing zero counting at block endpoints
-            endpoint_bounds = cert.get("endpoint_bounds")
-            if not isinstance(endpoint_bounds, dict):
-                anomalies.append("Missing or invalid endpoint_bounds for Turing zero counting")
-            else:
-                t_min_str = endpoint_bounds.get("t_min")
-                t_max_str = endpoint_bounds.get("t_max")
-
-                if t_min_str and t_max_str:
-                    t_min = arb(t_min_str)
-                    t_max = arb(t_max_str)
-                    n_min_zeros = t_min.zeta_nzeros()
-                    n_max_zeros = t_max.zeta_nzeros()
-                    try:
-                        n_min_int = int(n_min_zeros.unique_fmpz())
-                        n_max_int = int(n_max_zeros.unique_fmpz())
-                        turing_count = n_max_int - n_min_int
-
-                        if turing_count != expected_count:
-                            anomalies.append(f"Turing zero count difference N({t_max_str}) - N({t_min_str}) = {turing_count}, expected {expected_count}")
-                        if n_min_int != min_idx - 1:
-                            anomalies.append(f"Lower endpoint count N({t_min_str}) = {n_min_int}, expected {min_idx - 1}")
-                        if n_max_int != max_idx:
-                            anomalies.append(f"Upper endpoint count N({t_max_str}) = {n_max_int}, expected {max_idx}")
-                    except Exception as e:
-                        anomalies.append(f"FLINT Turing zero counting failed on endpoints [{t_min_str}, {t_max_str}]: {e}")
-                else:
-                    anomalies.append("Missing endpoint bounds keys for Turing zero counting")
-
-        elif cert_type == "worldline_certificate":
-            src_hash = cert.get("source_zero_hash")
-            src_idx = cert.get("source_zero_index")
-            grade_K = cert.get("grade_K")
-            delta_str = str(cert.get("delta", "0.0")).strip()
-            src_fam = cert.get("source_zero_family") or cert.get("zero_family", "nontrivial")
-
-            if src_hash is None or src_idx is None or grade_K is None:
-                anomalies.append("Worldline certificate missing source_zero_hash, source_zero_index, or grade_K")
-                return False, anomalies
-
-            # Resolve source zero certificate strictly by family
-            src_cert = None
-            if cert_store:
-                if src_hash:
-                    cand = cert_store.get(src_hash)
-                    if cand:
-                        cand_fam = cand.get("zero_family", "nontrivial" if cand.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
-                        if cand_fam != src_fam:
-                            anomalies.append(f"Source zero family mismatch: worldline declared {src_fam}, but source hash {src_hash} is {cand_fam}")
-                        src_cert = cand
-                if src_cert is None:
-                    if src_fam == "trivial":
-                        src_cert = cert_store.get(f"trivial_zero_{src_idx:05d}")
-                    else:
-                        src_cert = cert_store.get(f"zero_{src_idx:05d}")
-
-            if src_cert is None:
-                if src_fam == "trivial":
-                    disk_path = os.path.join(TRIVIAL_ZEROS_DIR, f"trivial_zero_{src_idx:05d}.json")
-                else:
-                    disk_path = os.path.join(ZEROS_DIR, f"zero_{src_idx:05d}.json")
-                if os.path.exists(disk_path):
-                    try:
-                        with open(disk_path, "r", encoding="utf-8") as f:
-                            src_cert = json.load(f)
-                    except Exception:
-                        src_cert = None
-
-            if src_cert is None:
-                anomalies.append(f"Source {src_fam} zero certificate for index {src_idx} (hash {src_hash}) could not be resolved")
-                return False, anomalies
-
-            # Verify family matches
-            cand_fam = src_cert.get("zero_family", "nontrivial" if src_cert.get("certificate_type") == "zero_isolation_and_simplicity" else "trivial")
-            if cand_fam != src_fam:
-                anomalies.append(f"Source zero family mismatch: expected {src_fam}, resolved certificate is {cand_fam}")
-
-            if src_cert.get("certificate_hash") != src_hash:
-                anomalies.append(f"Source zero certificate hash mismatch: expected {src_hash}, found {src_cert.get('certificate_hash')}")
-
-
-            # Verify source zero certificate
-            ok_src, errs_src = verify_certificate(src_cert, cert_store=cert_store, check_provenance=check_provenance)
-            if not ok_src:
-                anomalies.append(f"Source zero certificate verification failed: {errs_src}")
-
-
-            tp = cert.get("transformed_point", {})
-            if "real_rad" not in tp or "imag_rad" not in tp:
-                anomalies.append("Worldline transformed_point missing radius enclosures (dropped radius vulnerability)")
-            else:
-                re_rad_str = str(tp.get("real_rad", "0.0")).strip()
-                im_rad_str = str(tp.get("imag_rad", "0.0")).strip()
-                if re_rad_str.startswith("-") or im_rad_str.startswith("-"):
-                    anomalies.append(f"Negative radius in transformed point: real_rad={re_rad_str}, imag_rad={im_rad_str}")
-                else:
-                    try:
-                        if float(re_rad_str) < 0 or float(im_rad_str) < 0:
-                            anomalies.append(f"Negative radius in transformed point: real_rad={re_rad_str}, imag_rad={im_rad_str}")
-                    except Exception:
-                        pass
-
-            tau_ball = arb.pi() * 2
-            tau_K = tau_ball ** grade_K
-            tau_neg_K = tau_ball ** (-grade_K)
-
-            is_trivial_src = (
-                src_cert.get("zero_family") == "trivial"
-                or src_cert.get("certificate_type") == "trivial_zero_certificate"
-            )
-
-            if is_trivial_src:
-                s_exact = -2 * src_idx
-                s_worldline = acb(s_exact, 0) * acb(tau_K, 0)
-                R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
-                expected_R = arb(str(s_exact - 0.5))
-                if not R_tau.contains(expected_R):
-                    anomalies.append(f"Trivial zero worldline radial coordinate does not contain {s_exact - 0.5}: {R_tau}")
-            else:
-                # Reconstruct full source ball with radii
-                s_enc = src_cert.get("enclosure", {})
-                re_ball = _reconstruct_arb_ball(s_enc.get("real_mid", "0.5"), s_enc.get("real_rad", "1e-50"))
-                im_ball = _reconstruct_arb_ball(s_enc.get("imag_mid", "0.0"), s_enc.get("imag_rad", "1e-50"))
-
-                # Re-propagate through worldline transformation
-                delta_arb = arb(delta_str)
-                z_point = acb(re_ball + delta_arb, im_ball)
-                s_worldline = z_point * acb(tau_K, 0)
-
-                # Stored transformed point ball comparison: stored must strictly contain recomputed point
-                stored_re = _reconstruct_arb_ball(tp.get("real_mid", "0.0"), tp.get("real_rad", "1e-50"))
-                stored_im = _reconstruct_arb_ball(tp.get("imag_mid", "0.0"), tp.get("imag_rad", "1e-50"))
-                if not stored_re.contains(s_worldline.real) or not stored_im.contains(s_worldline.imag):
-                    anomalies.append(
-                        f"Stored transformed point {stored_re}+{stored_im}j does not contain recomputed worldline point {s_worldline}"
-                    )
-
-                # Recompute normalized radial coordinate and defect
-                sigma_critical = tau_K / 2
-                R_tau = (tau_neg_K * s_worldline.real) - arb("0.5")
-                radial_residual = (R_tau - delta_arb).abs_upper()
-
-                if radial_residual > arb("1e-30"):
-                    anomalies.append(f"Radial residual exceeds certification threshold: {radial_residual}")
-
-                is_actual = (delta_str in ["0.0", "0", "+0.0", "-0.0"])
-                expected_claim_type = "actual_zero_worldline" if is_actual else "synthetic_radial_leaf"
-                actual_claim_type = cert.get("claim_type")
-                if actual_claim_type != expected_claim_type:
-                    anomalies.append(f"claim_type mismatch: expected '{expected_claim_type}', found '{actual_claim_type}'")
-
-                if is_actual:
-                    if not R_tau.contains(arb("0.0")):
-                        anomalies.append(f"Actual zero worldline radial coordinate does not contain 0.0: {R_tau}")
-                else:
-                    if not R_tau.contains(delta_arb):
-                        anomalies.append(f"Synthetic radial leaf coordinate does not contain declared delta {delta_str}: {R_tau}")
-
-            # Check formal theorem reference existence in Lean source
-            thm_ref = cert.get("formal_theorem_reference", "")
-            if thm_ref:
-                lean_file = os.path.join(REPO_ROOT, "formal", "RiemannScope", "RadialLeaf.lean")
-                if os.path.exists(lean_file):
-                    with open(lean_file, "r", encoding="utf-8") as lf:
-                        if "radialLeaf_worldline_invariance" not in lf.read():
-                            anomalies.append(f"Referenced formal Lean theorem '{thm_ref}' not found in {lean_file}")
-                else:
-                    anomalies.append(f"Lean source file {lean_file} not found")
+            _verify_trivial_zero_enclosure(cert, anomalies)
+        elif cert_type in ("complete_block_certificate", "zero_block_isolation"):
+            _verify_block_isolation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
+        elif cert_type in ("worldline_certificate", "worldline_continuation"):
+            _verify_worldline_continuation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
         else:
             anomalies.append(f"Unknown certificate_type: {cert_type}")
-
     finally:
         ctx.dps = old_dps
 

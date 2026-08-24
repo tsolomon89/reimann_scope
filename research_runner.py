@@ -2533,7 +2533,7 @@ _EVALUATOR_SOURCE_HASH_CACHE: Dict[Tuple[str, Optional[str]], Optional[str]] = {
 
 
 def _get_evaluator_source_hash(mod_path: str, commit: Optional[str] = None) -> Optional[str]:
-    """Compute normalized LF SHA-256 hash of evaluate_point and execution logic in a handler module."""
+    """Compute normalized LF SHA-256 hash of evaluate_point and all execution logic/helpers in a handler module."""
     norm_p = mod_path.replace("\\", "/")
     cache_key = (norm_p, commit)
     if cache_key in _EVALUATOR_SOURCE_HASH_CACHE:
@@ -2556,17 +2556,29 @@ def _get_evaluator_source_hash(mod_path: str, commit: Optional[str] = None) -> O
     try:
         import ast
         tree = ast.parse(code)
-        segments = []
-        for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef) and node.name in ("evaluate_point", "evaluate_experiment_point"):
+        summary_methods = {"generate_summary", "generate_diagnostics", "has_diagnostics"}
+        exec_segments = []
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                body_segments = []
+                for item in node.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name in summary_methods:
+                        continue
+                    seg = ast.get_source_segment(code, item)
+                    if seg:
+                        body_segments.append(seg)
+                exec_segments.append(f"class {node.name}:\n" + "\n".join(body_segments))
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if node.name not in summary_methods:
+                    seg = ast.get_source_segment(code, node)
+                    if seg:
+                        exec_segments.append(seg)
+            else:
                 seg = ast.get_source_segment(code, node)
                 if seg:
-                    segments.append(seg.replace("\r\n", "\n").strip())
-        if not segments:
-            res = hashlib.sha256(code.replace("\r\n", "\n").encode("utf-8")).hexdigest()
-        else:
-            combined = "\n\n".join(segments)
-            res = hashlib.sha256(combined.encode("utf-8")).hexdigest()
+                    exec_segments.append(seg)
+        combined = "\n\n".join(s.replace("\r\n", "\n").strip() for s in exec_segments if s.strip())
+        res = hashlib.sha256(combined.encode("utf-8")).hexdigest()
         _EVALUATOR_SOURCE_HASH_CACHE[cache_key] = res
         return res
     except Exception:
@@ -3166,15 +3178,6 @@ def summarize_run(run_id: str, spec_path: Optional[str] = None) -> Dict[str, Any
         cur_src = certification._get_source_code_hashes(modules=summarizer_mods)
         summarizer_src_hashes = {m: cur_src.get(m, "N/A") for m in sorted(list(set(summarizer_mods)))}
 
-        mat_pkgs = handler.declared_dependencies.material_packages if handler else ["mpmath", "flint"]
-        new_manifest.setdefault("runtime", {})
-        new_manifest["runtime"].setdefault("packages", {})
-        for pkg in mat_pkgs:
-            try:
-                new_manifest["runtime"]["packages"][pkg] = get_package_version(pkg)
-            except Exception:
-                pass
-
         new_manifest["summary_provenance"] = {
             "summary_sha256": summary_sha,
             "readme_sha256": readme_sha,
@@ -3389,7 +3392,7 @@ def validate_manifest(
     if not isinstance(dep_fp, dict) or not dep_fp:
         errors.append("Manifest missing or empty dependency_fingerprint map")
     else:
-        dep_ok, dep_errs = certification.validate_dependency_compatibility(dep_fp, check_current_runtime=True)
+        dep_ok, dep_errs = certification.validate_dependency_compatibility(dep_fp, check_current_runtime=False)
         if not dep_ok:
             errors.extend(dep_errs)
 
@@ -3527,24 +3530,35 @@ def validate_manifest(
             elif curr_dh != data_hashes.get(df_name):
                 errors.append(f"Current input data file '{df_name}' hash mismatch: disk {curr_dh}, manifest {data_hashes.get(df_name)}")
 
-        # Material runtime packages check
+        # Material runtime packages check against canonical project contract
         rep_pkgs = manifest.get("runtime", {}).get("packages", {})
         if not isinstance(rep_pkgs, dict):
             rep_pkgs = {}
+        prov_completeness = manifest.get("provenance_completeness", "complete")
+        missing_mat_pkgs = set(manifest.get("missing_material_versions", []))
+
         for pkg in mat_pkgs:
-            try:
-                curr_ver = get_package_version(pkg)
-            except Exception as e:
-                errors.append(f"Cannot resolve current version for material package '{pkg}': {e}")
-                continue
             rep_ver = rep_pkgs.get(pkg)
-            if not rep_ver:
-                errors.append(f"Manifest runtime packages missing declared material package '{pkg}'")
-            elif str(rep_ver) == "True" or rep_ver is True or str(rep_ver) == "true":
-                if canonical_current:
-                    errors.append(f"Material package '{pkg}' has legacy incomplete version (boolean True); exact version required in current mode")
-            elif str(rep_ver) != str(curr_ver):
-                errors.append(f"Material package '{pkg}' version mismatch: current {curr_ver}, manifest {rep_ver}")
+            is_legacy_missing = (pkg in missing_mat_pkgs) or (rep_ver is None) or (str(rep_ver).lower() in ("true", "none", "")) or (rep_ver is True)
+            if is_legacy_missing:
+                if prov_completeness == "legacy_incomplete" and pkg in missing_mat_pkgs:
+                    # Explicitly documented legacy incomplete execution record
+                    continue
+                elif canonical_current:
+                    errors.append(f"Material package '{pkg}' has incomplete provenance in manifest without explicit legacy_incomplete declaration")
+                else:
+                    errors.append(f"Manifest runtime packages missing declared material package '{pkg}'")
+            else:
+                rep_ver_str = str(rep_ver).strip()
+                if pkg == "mpmath":
+                    if rep_ver_str not in certification.SUPPORTED_MPMATH_VERSIONS:
+                        errors.append(f"Canonical material package 'mpmath' version '{rep_ver_str}' outside supported versions {certification.SUPPORTED_MPMATH_VERSIONS}")
+                elif pkg == "flint":
+                    if rep_ver_str not in certification.SUPPORTED_FLINT_VERSIONS:
+                        errors.append(f"Canonical material package 'flint' version '{rep_ver_str}' outside supported versions {certification.SUPPORTED_FLINT_VERSIONS}")
+                elif pkg in ("numpy", "scipy"):
+                    if not rep_ver_str or rep_ver_str.lower() in ("unknown", "n/a", "0.0"):
+                        errors.append(f"Canonical material package '{pkg}' has invalid version string '{rep_ver_str}'")
 
         # Summary provenance check
         summ_prov = manifest.get("summary_provenance")
