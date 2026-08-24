@@ -1541,7 +1541,7 @@ def test_radial_second_order_summary_metrics_structure():
             }
         })
 
-    summary = research_runner.compute_summary(spec, mock_results)
+    summary = research_runner.compute_summary(spec, "explicit-formula-radial-second-variation-001", mock_results, "complete")
     rad_summary = summary.get("radial_second_order_summary", {})
 
     assert rad_summary.get("total_cases") == 16
