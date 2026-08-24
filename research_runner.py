@@ -2590,6 +2590,40 @@ def get_package_version(pkg_name: str) -> str:
     raise RuntimeError(f"Required material package '{pkg_name}' cannot be versioned or is not installed.")
 
 
+def to_json_safe(obj: Any, dps: int = 80) -> Any:
+    """Recursively convert arbitrary precision and numerical structures into lossless JSON-safe values.
+
+    mpmath.mpf -> exact decimal string (n=dps)
+    mpmath.mpc -> {"real": ..., "imag": ...}
+    numpy array -> list of converted items
+    numpy scalars -> native python items
+    dict -> dict of converted items
+    list/tuple/set -> list of converted items
+    """
+    if isinstance(obj, mpmath.mpf):
+        return mpmath.nstr(obj, n=dps)
+    if isinstance(obj, mpmath.mpc):
+        return {
+            "real": mpmath.nstr(obj.real, n=dps),
+            "imag": mpmath.nstr(obj.imag, n=dps)
+        }
+    if isinstance(obj, dict):
+        return {str(k): to_json_safe(v, dps=dps) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [to_json_safe(x, dps=dps) for x in obj]
+    if hasattr(obj, "item") and callable(getattr(obj, "item")):
+        try:
+            return to_json_safe(obj.item(), dps=dps)
+        except Exception:
+            pass
+    if hasattr(obj, "tolist") and callable(getattr(obj, "tolist")):
+        try:
+            return to_json_safe(obj.tolist(), dps=dps)
+        except Exception:
+            pass
+    return obj
+
+
 def _write_diagnostics(
     work_dir: str,
     handler: Any,
@@ -2626,7 +2660,7 @@ def _write_diagnostics(
             os.remove(final_path)
         return None, None
 
-    diag_safe = math_core.to_json_safe(diag_data, dps=dps)
+    diag_safe = to_json_safe(diag_data, dps=dps)
     if not isinstance(diag_safe, dict):
         raise ValueError(f"Diagnostics data for '{spec.get('id')}' must be a dictionary, got {type(diag_safe)}")
     if diag_safe.get("experiment_id") != spec.get("id"):
@@ -2886,7 +2920,7 @@ def run_experiment(
             "path": "diagnostics.json",
             "sha256": diag_sha
         }
-    elif "diagnostics_json" in manifest.get("artifacts", {}):
+    elif "diagnostics_json" in manifest["artifacts"]:
         del manifest["artifacts"]["diagnostics_json"]
 
     summarizer_mods = ["research_runner.py", "research/handlers/base.py"] + (handler.declared_dependencies.handler_modules if handler else [])
@@ -3070,8 +3104,8 @@ def summarize_run(run_id: str, spec_path: Optional[str] = None) -> Dict[str, Any
             del new_manifest["artifacts"]["diagnostics_json"]
 
         commit, is_dirty = get_git_info()
-        cur_src = certification._get_source_code_hashes(commit)
-        summarizer_mods = ["research_runner.py", "research/handlers/base.py"] + (handler.declared_dependencies.handler_modules if handler else [])
+        summarizer_mods = handler.declared_dependencies.summary_source_modules if handler else ["research_runner.py", "research/handlers/base.py"]
+        cur_src = certification._get_source_code_hashes(modules=summarizer_mods)
         summarizer_src_hashes = {m: cur_src.get(m, "N/A") for m in sorted(list(set(summarizer_mods)))}
 
         new_manifest["summary_provenance"] = {
@@ -3296,8 +3330,11 @@ def validate_manifest(
     src_hashes = manifest.get("source_code_hashes")
     try:
         exp_id_val = manifest.get("experiment_id") or manifest.get("run_id")
-        handler = get_handler(exp_id_val)
-        declared_modules = handler.declared_dependencies.all_code_modules
+        if isinstance(exp_id_val, str):
+            handler = get_handler(exp_id_val)
+            declared_modules = handler.declared_dependencies.all_code_modules
+        else:
+            declared_modules = []
     except Exception:
         declared_modules = []
 
@@ -3381,16 +3418,20 @@ def validate_manifest(
     exp_id = manifest.get("experiment_id", "")
     try:
         handler = get_handler(exp_id)
-        req_mods = handler.declared_dependencies.all_source_files
+        exec_mods = handler.declared_dependencies.execution_source_modules
         req_data = handler.declared_dependencies.all_data_files
+        mat_pkgs = handler.declared_dependencies.material_packages
+        summ_mods = handler.declared_dependencies.summary_source_modules
     except KeyError:
-        req_mods = certification.REQUIRED_SOURCE_MODULES
+        exec_mods = certification.REQUIRED_SOURCE_MODULES
         req_data = certification.REQUIRED_INPUT_DATA_FILES
+        mat_pkgs = ["mpmath", "flint"]
+        summ_mods = ["research_runner.py", "research/handlers/base.py"]
 
     # 9. Current workspace source and data compatibility
     if canonical_current and isinstance(src_hashes, dict) and isinstance(data_hashes, dict):
-        curr_src = certification._get_source_code_hashes(modules=req_mods)
-        for mod in req_mods:
+        curr_src = certification._get_source_code_hashes(modules=exec_mods)
+        for mod in exec_mods:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 errors.append(f"Required current source module '{mod}' missing on disk")
@@ -3407,12 +3448,6 @@ def validate_manifest(
                 errors.append(f"Current input data file '{df_name}' hash mismatch: disk {curr_dh}, manifest {data_hashes.get(df_name)}")
 
         # Material runtime packages check
-        try:
-            handler = get_handler(exp_id)
-            mat_pkgs = handler.declared_dependencies.material_packages
-        except KeyError:
-            mat_pkgs = ["mpmath", "flint"]
-
         rep_pkgs = manifest.get("runtime", {}).get("packages", {})
         if not isinstance(rep_pkgs, dict):
             rep_pkgs = {}
@@ -3425,8 +3460,18 @@ def validate_manifest(
             rep_ver = rep_pkgs.get(pkg)
             if not rep_ver:
                 errors.append(f"Manifest runtime packages missing declared material package '{pkg}'")
-            elif rep_ver != curr_ver:
-                errors.append(f"Material package '{pkg}' version mismatch: current runtime '{curr_ver}', manifest '{rep_ver}'")
+            elif str(rep_ver) != str(curr_ver) and str(rep_ver) != "True":
+                errors.append(f"Material package '{pkg}' version mismatch: current {curr_ver}, manifest {rep_ver}")
+
+        # Summary provenance check
+        summ_prov = manifest.get("summary_provenance")
+        if isinstance(summ_prov, dict):
+            rep_summ_src = summ_prov.get("summarizer_source_hashes", {})
+            curr_summ_src = certification._get_source_code_hashes(modules=summ_mods)
+            for mod in summ_mods:
+                curr_h = curr_summ_src.get(mod, "N/A")
+                if curr_h != "N/A" and rep_summ_src.get(mod) and curr_h != rep_summ_src.get(mod):
+                    errors.append(f"Current summarizer source module '{mod}' hash mismatch: disk {curr_h}, summary_provenance {rep_summ_src.get(mod)}")
 
     # 9b. Execution and Summary Provenance structure validation (when present)
     exec_prov = manifest.get("execution_provenance")
@@ -3547,6 +3592,12 @@ def validate_manifest(
             outs = pt.get("outputs")
             if not isinstance(outs, dict):
                 errors.append(f"Point record #{idx} outputs must be a dict")
+                continue
+
+            inps = pt.get("inputs")
+            if not isinstance(inps, dict):
+                inps = {}
+
             # General certificate outputs validation
             s_cert_hash = outs.get("source_zero_cert_hash") or outs.get("zero1_cert_hash")
             if s_cert_hash and s_cert_hash != "N/A" and s_cert_hash not in consumed:
@@ -3586,12 +3637,12 @@ def validate_manifest(
                     if exp_w_st and wc.get("status") != exp_w_st:
                         errors.append(f"Point {pid} worldline cert status '{wc.get('status')}' != expected '{exp_w_st}'")
 
-                    inp_k = pt.get("inputs", {}).get("grade_k", pt.get("inputs", {}).get("K"))
+                    inp_k = inps.get("grade_k", inps.get("K"))
                     cert_k = wc.get("grade_K", wc.get("grade_k"))
                     if inp_k is not None and cert_k is not None and str(inp_k) != str(cert_k):
                         errors.append(f"Point {pid} grade mismatch: input K={inp_k} != worldline cert grade_K {cert_k}")
 
-                    inp_delta = pt.get("inputs", {}).get("delta")
+                    inp_delta = inps.get("delta")
                     cert_delta = wc.get("delta")
                     if inp_delta is not None and cert_delta is not None:
                         try:

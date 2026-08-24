@@ -202,7 +202,7 @@ def inspect_canonical_state(target_experiments: Optional[List[str]] = None) -> D
                     exec_errs = []
                     summ_errs = []
                     for e in errs:
-                        if any(k in e for k in ["source module 'research/handlers", "summary.json", "README.md", "diagnostics.json", "summarizer", "Diagnostics generation failed"]):
+                        if any(k in e for k in ["summary_provenance", "summarizer", "summary.json", "README.md", "diagnostics.json", "Diagnostics generation failed", "research/handlers/base.py", "research_runner.py"]):
                             summ_errs.append(e)
                         else:
                             exec_errs.append(e)

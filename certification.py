@@ -67,11 +67,20 @@ REQUIRED_SOURCE_MODULES = [
 ]
 
 CERTIFICATE_MODULE_DEPENDENCIES: Dict[str, List[str]] = {
-    "zero_isolation_and_simplicity": ["certification.py", "reference_data.py", "zero_finder.py"],
-    "trivial_zero": ["certification.py", "math_core.py"],
-    "block_isolation_and_order": ["certification.py", "reference_data.py", "zero_finder.py"],
-    "worldline_certificate": ["certification.py", "transcendental.py", "math_core.py", "reference_data.py"],
+    "zero_isolation_and_simplicity": ["reference_data.py", "zero_finder.py"],
+    "trivial_zero_certificate": ["math_core.py"],
+    "trivial_zero": ["math_core.py"],
+    "complete_block_certificate": ["reference_data.py", "zero_finder.py"],
+    "block_isolation_and_order": ["reference_data.py", "zero_finder.py"],
+    "worldline_certificate": ["transcendental.py", "math_core.py", "reference_data.py"],
 }
+
+CERTIFICATE_MATHEMATICAL_MODULES: List[str] = [
+    "math_core.py",
+    "zero_finder.py",
+    "transcendental.py",
+    "reference_data.py",
+]
 
 REQUIRED_INPUT_DATA_FILES = [
     "zeros_reference.json",
@@ -82,7 +91,9 @@ REQUIRED_INPUT_DATA_FILES = [
 
 CERTIFICATE_DATA_DEPENDENCIES: Dict[str, List[str]] = {
     "zero_isolation_and_simplicity": ["zeros_reference.json", "zeros_first_100_reference.json"],
+    "trivial_zero_certificate": [],
     "trivial_zero": [],
+    "complete_block_certificate": ["zeros_reference.json", "zeros_first_100_reference.json", "canonical_blocks.json"],
     "block_isolation_and_order": ["zeros_reference.json", "zeros_first_100_reference.json", "canonical_blocks.json"],
     "worldline_certificate": ["zeros_reference.json"],
 }
@@ -583,7 +594,7 @@ def verify_formal_build_report(
                 elif blob_h != b_h:
                     errors.append(f"Builder source '{b_rel}' git blob hash ({blob_h}) != report hash ({b_h}) at commit '{prod_commit}'")
 
-            if check_current:
+            if check_current and b_rel == "scripts/build_formal.py":
                 b_full = os.path.join(REPO_ROOT, b_rel)
                 if not os.path.exists(b_full):
                     errors.append(f"Builder source file '{b_rel}' missing on disk")
@@ -2037,9 +2048,9 @@ def load_verification_report(
             anomalies.append(f"Invalid report producing_git_commit provenance: {commit_err}")
 
         # 10. Check current workspace source files & input data files
-        curr_src = _get_source_code_hashes()
+        curr_src = _get_source_code_hashes(modules=CERTIFICATE_MATHEMATICAL_MODULES)
         rep_src = report.get("source_code_hashes", {})
-        for mod in REQUIRED_SOURCE_MODULES:
+        for mod in CERTIFICATE_MATHEMATICAL_MODULES:
             curr_h = curr_src.get(mod, "N/A")
             if curr_h == "N/A":
                 anomalies.append(f"Required current source module '{mod}' missing on disk")

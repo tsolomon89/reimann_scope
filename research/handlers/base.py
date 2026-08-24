@@ -24,6 +24,30 @@ class HandlerDependencies:
     material_packages: List[str] = field(default_factory=lambda: ["mpmath", "flint"])
 
     @property
+    def execution_source_modules(self) -> List[str]:
+        """Return distinct source code modules genuinely consumed during numerical point execution."""
+        seen = set()
+        out = []
+        for f in self.math_modules:
+            norm = f.replace("\\", "/")
+            if norm not in seen:
+                seen.add(norm)
+                out.append(norm)
+        return sorted(out)
+
+    @property
+    def summary_source_modules(self) -> List[str]:
+        """Return distinct source code modules consumed during summary and diagnostic generation."""
+        seen = set()
+        out = []
+        for f in self.common_modules + self.handler_modules:
+            norm = f.replace("\\", "/")
+            if norm not in seen:
+                seen.add(norm)
+                out.append(norm)
+        return sorted(out)
+
+    @property
     def all_source_files(self) -> List[str]:
         """Return all distinct source code files this handler depends on."""
         seen = set()

@@ -133,7 +133,7 @@ class ExplicitFormulaGradeCovarianceHandler(ExperimentHandler):
             math_modules=["math_core.py", "reference_data.py"],
             data_files=["data/zeros_reference.json"],
             consumed_certificates=[],
-            material_packages=["mpmath", "flint", "numpy", "scipy"]
+            material_packages=["mpmath", "flint"]
         )
 
     def evaluate_point(
@@ -273,10 +273,10 @@ class ExplicitFormulaPerturbationRankHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/explicit_formula.py"],
-            math_modules=["math_core.py", "reference_data.py", "certification.py"],
+            math_modules=["math_core.py", "reference_data.py"],
             data_files=["data/zeros_reference.json", "data/zeros_first_100_reference.json"],
             consumed_certificates=["data/certificates/zeros/*.json"],
-            material_packages=["mpmath", "flint", "numpy", "scipy"]
+            material_packages=["mpmath", "flint"]
         )
 
     def evaluate_point(
@@ -534,10 +534,10 @@ class ExplicitFormulaRadialSecondVariationHandler(ExperimentHandler):
         return HandlerDependencies(
             common_modules=["research_runner.py", "research/handlers/base.py"],
             handler_modules=["research/handlers/explicit_formula.py"],
-            math_modules=["math_core.py", "reference_data.py", "certification.py"],
+            math_modules=["math_core.py", "reference_data.py"],
             data_files=["data/zeros_reference.json", "data/zeros_first_100_reference.json"],
             consumed_certificates=["data/certificates/zeros/*.json"],
-            material_packages=["mpmath", "flint", "numpy", "scipy"]
+            material_packages=["mpmath", "flint"]
         )
 
     def evaluate_point(

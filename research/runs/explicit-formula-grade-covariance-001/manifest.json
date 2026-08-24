@@ -152,7 +152,7 @@
     },
     "summary_json": {
       "path": "summary.json",
-      "sha256": "4c9775cca58c0e71eccf2eaa52a98cf863082e6c3fc15429a1d5707cdbf44ec3"
+      "sha256": "dfb64924687c689b919895989f224f0e31f19a6060104c8362d9a6121c56f424"
     },
     "readme_md": {
       "path": "README.md",
@@ -259,15 +259,15 @@
     ]
   },
   "summary_provenance": {
-    "summary_sha256": "4c9775cca58c0e71eccf2eaa52a98cf863082e6c3fc15429a1d5707cdbf44ec3",
+    "summary_sha256": "dfb64924687c689b919895989f224f0e31f19a6060104c8362d9a6121c56f424",
     "readme_sha256": "aed4d43358aa2d7febc71f875c6d5584520e4bb3fbd973e06de831dcab4f2698",
     "diagnostics_sha256": "dc408bf60d3ee65a6239b798628d66928395221a105aa1920cd715d43d57db73",
-    "summary_git_commit": "72db93dc5ed80eaa68f636d3b5a425b27594d98a",
-    "summarized_at": "2026-08-24T17:48:08.616172+00:00",
+    "summary_git_commit": "c5ccd1014ae44776c9528ce1a5af7faf6cf037e5",
+    "summarized_at": "2026-08-24T18:55:05.353054+00:00",
     "summarizer_source_hashes": {
-      "research/handlers/base.py": "N/A",
-      "research/handlers/explicit_formula.py": "N/A",
-      "research_runner.py": "d3ae01c4d4bf04295d2ccb1c8e2bacb29cbe44112def1cad34485d1eca4fbd2b"
+      "research/handlers/base.py": "bc460418509752878dbb97283630c81c3bc21f7bc0a120201f2e821953a8a822",
+      "research/handlers/explicit_formula.py": "944dab7ac50390fcec2370a609ac8bcb86883e9cea602b31ef01760cd6839530",
+      "research_runner.py": "71661b86b097b70a69d9826b769bb156b2c84fe8a718c0af22f59a321951646b"
     }
   }
 }
