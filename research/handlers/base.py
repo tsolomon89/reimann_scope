@@ -36,6 +36,11 @@ class HandlerDependencies:
         return sorted(out)
 
     @property
+    def all_code_modules(self) -> List[str]:
+        """Alias for all_source_files."""
+        return self.all_source_files
+
+    @property
     def all_data_files(self) -> List[str]:
         """Return all distinct input data files this handler depends on."""
         seen = set()
