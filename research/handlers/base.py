@@ -46,7 +46,7 @@ class HandlerDependencies:
         seen = set()
         out = []
         for f in self.data_files:
-            norm = f.replace("\\", "/")
+            norm = f.replace("\\", "/").replace("data/", "", 1) if f.startswith("data/") else f.replace("\\", "/")
             if norm not in seen:
                 seen.add(norm)
                 out.append(norm)

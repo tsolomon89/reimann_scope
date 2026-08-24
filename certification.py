@@ -235,7 +235,8 @@ def _get_input_data_hashes(commit: Optional[str] = None, files: Optional[List[st
     """Get SHA-256 hashes of reference data."""
     hashes: Dict[str, str] = {}
     target_files = files if files is not None else REQUIRED_INPUT_DATA_FILES
-    for df in target_files:
+    for raw_df in target_files:
+        df = raw_df.replace("data/", "", 1) if raw_df.startswith("data/") else raw_df
         if commit:
             b_hash = _get_historical_git_blob_hash(commit, f"data/{df}")
             if b_hash:
