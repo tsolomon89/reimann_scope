@@ -148,6 +148,13 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
         worldline_count += 1
 
     print(f"[+] Certified {worldline_count} bilateral worldlines & radial leaves.")
+    report_path = os.path.join(CERT_DIR, "verification_report.json")
+    print(f"[*] Updating verification report at {report_path}...")
+    rep_ok, rep_data = certification.generate_verification_report(output_path=report_path, check_provenance=True)
+    if not rep_ok:
+        print("[WARN] Verification report generated with warnings.")
+    else:
+        print(f"[+] Verification report generated successfully ({rep_data.get('total_inventory', 0)} items).")
     print("=== Certificate Generation Complete ===")
     return zero_count, trivial_count, block_count, worldline_count
 
