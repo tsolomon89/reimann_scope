@@ -54,7 +54,9 @@
     "platform": "win32",
     "packages": {
       "mpmath": "1.3.0",
-      "flint": true
+      "flint": "0.6.0",
+      "numpy": "2.0.2",
+      "scipy": "1.13.0"
     }
   },
   "dependency_fingerprint": {
@@ -270,12 +272,12 @@
     "summary_sha256": "dfe0a5e4f5b6e64845404f7ca4c08622b058e29c2954adc7703c9723cb714cbf",
     "readme_sha256": "7fee5e70f86947ac88a6b37efebdda221966f63383195b1048d84d57ce5d7a91",
     "diagnostics_sha256": "e05497c0e5900906695c031c1f1fa214c2a5b0c0c079063efcb3130099e73dd7",
-    "summary_git_commit": "c5ccd1014ae44776c9528ce1a5af7faf6cf037e5",
-    "summarized_at": "2026-08-24T18:55:14.743929+00:00",
+    "summary_git_commit": "e88f743efdcbffe1859ddf50842d868311375fcc",
+    "summarized_at": "2026-08-24T19:29:53.318962+00:00",
     "summarizer_source_hashes": {
-      "research/handlers/base.py": "bc460418509752878dbb97283630c81c3bc21f7bc0a120201f2e821953a8a822",
-      "research/handlers/explicit_formula.py": "944dab7ac50390fcec2370a609ac8bcb86883e9cea602b31ef01760cd6839530",
-      "research_runner.py": "71661b86b097b70a69d9826b769bb156b2c84fe8a718c0af22f59a321951646b"
+      "research/handlers/base.py": "5e57b063eaa90669b044605db1faa3ad967f461982f8cb8feb8bcf689f496e9f",
+      "research/handlers/explicit_formula.py": "297f7e3cece1629f017e8f72db7c9f0af1be75c12bdb029a1c119c5d24340e07",
+      "research_runner.py": "b6835e84fa9a3ec830d2862599085eed72afd1fbb78f6ae6e2ca4e29a6bb91cc"
     }
   },
   "warnings": []

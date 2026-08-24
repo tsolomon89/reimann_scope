@@ -52,7 +52,7 @@
     "platform": "win32",
     "packages": {
       "mpmath": "1.3.0",
-      "flint": true
+      "flint": "0.6.0"
     }
   },
   "dependency_fingerprint": {
@@ -303,12 +303,12 @@
     "summary_sha256": "6745dc63770fb3c304be51b54afa57390aa8dab73336416dd33426bd5f51d27d",
     "readme_sha256": "a6fdd225f8c7f009e90b9faacadf8449ddcd3e3976cfb8bea5f90ad677747b66",
     "diagnostics_sha256": null,
-    "summary_git_commit": "c5ccd1014ae44776c9528ce1a5af7faf6cf037e5",
-    "summarized_at": "2026-08-24T18:55:16.254809+00:00",
+    "summary_git_commit": "e88f743efdcbffe1859ddf50842d868311375fcc",
+    "summarized_at": "2026-08-24T19:29:55.362395+00:00",
     "summarizer_source_hashes": {
-      "research/handlers/base.py": "bc460418509752878dbb97283630c81c3bc21f7bc0a120201f2e821953a8a822",
+      "research/handlers/base.py": "5e57b063eaa90669b044605db1faa3ad967f461982f8cb8feb8bcf689f496e9f",
       "research/handlers/worldlines.py": "9f0ac35515e02c0ce52ea5ea855becdeaaf80a82963656a44505eec00038631a",
-      "research_runner.py": "71661b86b097b70a69d9826b769bb156b2c84fe8a718c0af22f59a321951646b"
+      "research_runner.py": "b6835e84fa9a3ec830d2862599085eed72afd1fbb78f6ae6e2ca4e29a6bb91cc"
     }
   },
   "warnings": []

@@ -57,7 +57,7 @@
     "platform": "win32",
     "packages": {
       "mpmath": "1.3.0",
-      "flint": true
+      "flint": "0.6.0"
     }
   },
   "dependency_fingerprint": {
@@ -262,12 +262,12 @@
     "summary_sha256": "c17beb4510c49c594096aca1ab66abe910843263a862f0e8a1cf7fd072ff855b",
     "readme_sha256": "59de89854174950091c4664a92337647c250c72f1ec59a99595fb5cd8f4dfe28",
     "diagnostics_sha256": null,
-    "summary_git_commit": "c5ccd1014ae44776c9528ce1a5af7faf6cf037e5",
-    "summarized_at": "2026-08-24T18:55:15.525323+00:00",
+    "summary_git_commit": "e88f743efdcbffe1859ddf50842d868311375fcc",
+    "summarized_at": "2026-08-24T19:29:54.311830+00:00",
     "summarizer_source_hashes": {
-      "research/handlers/base.py": "bc460418509752878dbb97283630c81c3bc21f7bc0a120201f2e821953a8a822",
+      "research/handlers/base.py": "5e57b063eaa90669b044605db1faa3ad967f461982f8cb8feb8bcf689f496e9f",
       "research/handlers/kernel_lock.py": "e3e9332299dc9834553997ad7f69aa7a26517187eae371cabd78859996cfdb65",
-      "research_runner.py": "71661b86b097b70a69d9826b769bb156b2c84fe8a718c0af22f59a321951646b"
+      "research_runner.py": "b6835e84fa9a3ec830d2862599085eed72afd1fbb78f6ae6e2ca4e29a6bb91cc"
     }
   },
   "warnings": []
