@@ -2556,7 +2556,13 @@ def _get_evaluator_source_hash(mod_path: str, commit: Optional[str] = None) -> O
     try:
         import ast
         tree = ast.parse(code)
-        summary_methods = {"generate_summary", "generate_diagnostics", "has_diagnostics"}
+        summary_methods = {
+            "compute_summary",
+            "generate_summary",
+            "compute_diagnostics",
+            "generate_diagnostics",
+            "has_diagnostics"
+        }
         exec_segments = []
         for node in tree.body:
             if isinstance(node, ast.ClassDef):

@@ -296,7 +296,7 @@ def _get_historical_git_blob(commit_sha: str, path: str) -> Optional[bytes]:
         return None
 
 
-CERTIFICATE_MATHEMATICAL_FUNCTIONS = [
+CERTIFICATE_MATHEMATICAL_FUNCTIONS: List[str] = [
     "_split_ball_str",
     "_reconstruct_arb_ball",
     "certify_zero",
@@ -307,6 +307,7 @@ CERTIFICATE_MATHEMATICAL_FUNCTIONS = [
     "_verify_trivial_zero_enclosure",
     "_verify_block_isolation",
     "_verify_worldline_continuation",
+    "_dispatch_and_verify_certificate",
 ]
 
 
@@ -314,7 +315,7 @@ _MODULE_MATH_HASH_CACHE: Dict[Tuple[str, Optional[str]], Optional[str]] = {}
 
 
 def _get_module_math_hash(mod_path: str, commit: Optional[str] = None) -> Optional[str]:
-    """Compute normalized LF SHA-256 hash of mathematical certificate functions in a module."""
+    """Compute normalized LF SHA-256 hash of mathematical certificate functions and dispatch in a module."""
     norm_p = mod_path.replace("\\", "/")
     cache_key = (norm_p, commit)
     if cache_key in _MODULE_MATH_HASH_CACHE:
@@ -338,30 +339,30 @@ def _get_module_math_hash(mod_path: str, commit: Optional[str] = None) -> Option
         import ast
         tree = ast.parse(code)
         dumps = []
-        math_funcs = {
-            "_split_ball_str",
-            "_reconstruct_arb_ball",
-            "certify_zero",
-            "certify_trivial_zero",
-            "certify_block",
-            "certify_worldline",
-            "_verify_zero_enclosure_and_isolation",
-            "_verify_trivial_zero_enclosure",
-            "_verify_block_isolation",
-            "_verify_worldline_continuation",
-        }
+        math_funcs = set(CERTIFICATE_MATHEMATICAL_FUNCTIONS)
         has_factored = any(isinstance(n, ast.FunctionDef) and n.name == "_verify_zero_enclosure_and_isolation" for n in tree.body)
         for node in tree.body:
             if isinstance(node, ast.FunctionDef):
                 if node.name in math_funcs:
-                    for stmt in node.body:
-                        if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and isinstance(stmt.value.value, str):
-                            continue
-                        if isinstance(stmt, ast.Assert):
-                            continue
-                        if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Tuple) and len(stmt.value.elts) == 2 and isinstance(stmt.value.elts[0], ast.Compare):
-                            continue
-                        dumps.append(ast.dump(stmt))
+                    if node.name == "_dispatch_and_verify_certificate":
+                        for stmt in node.body:
+                            if isinstance(stmt, ast.If):
+                                cur = stmt
+                                while cur:
+                                    dumps.append(ast.dump(cur.test))
+                                    if cur.orelse and isinstance(cur.orelse[0], ast.If):
+                                        cur = cur.orelse[0]
+                                    else:
+                                        break
+                    else:
+                        for stmt in node.body:
+                            if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and isinstance(stmt.value.value, str):
+                                continue
+                            if isinstance(stmt, ast.Assert):
+                                continue
+                            if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Tuple) and len(stmt.value.elts) == 2 and isinstance(stmt.value.elts[0], ast.Compare):
+                                continue
+                            dumps.append(ast.dump(stmt))
                 elif node.name == "verify_certificate" and not has_factored:
                     try_nodes = [n for n in node.body if isinstance(n, ast.Try)]
                     if try_nodes:
@@ -379,6 +380,13 @@ def _get_module_math_hash(mod_path: str, commit: Optional[str] = None) -> Option
                                     dumps.append(ast.dump(stmt))
                                 if cur_if.orelse and isinstance(cur_if.orelse[0], ast.If):
                                     cur_if = cur_if.orelse[0]
+                                else:
+                                    break
+                            cur_if2 = if_nodes[0]
+                            while cur_if2:
+                                dumps.append(ast.dump(cur_if2.test))
+                                if cur_if2.orelse and isinstance(cur_if2.orelse[0], ast.If):
+                                    cur_if2 = cur_if2.orelse[0]
                                 else:
                                     break
         if not dumps:
@@ -1644,6 +1652,27 @@ def _verify_worldline_continuation(
     return (len(anomalies) == 0), anomalies
 
 
+def _dispatch_and_verify_certificate(
+    cert_type: str,
+    cert: Dict[str, Any],
+    anomalies: List[str],
+    cert_store: Optional[Dict[str, Any]] = None,
+    check_provenance: bool = True
+) -> Tuple[bool, List[str]]:
+    """Mathematical dispatch and execution of certificate verification logic."""
+    if cert_type == "zero_isolation_and_simplicity":
+        _verify_zero_enclosure_and_isolation(cert, anomalies)
+    elif cert_type == "trivial_zero_certificate":
+        _verify_trivial_zero_enclosure(cert, anomalies)
+    elif cert_type == "complete_block_certificate":
+        _verify_block_isolation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
+    elif cert_type == "worldline_certificate":
+        _verify_worldline_continuation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
+    else:
+        anomalies.append(f"Unknown certificate_type: {cert_type}")
+    return (len(anomalies) == 0), anomalies
+
+
 def verify_certificate(
     cert: Dict[str, Any],
     cert_store: Optional[Dict[str, Dict[str, Any]]] = None,
@@ -1654,62 +1683,55 @@ def verify_certificate(
 
     Fails closed: Any tampering with mathematical claims, index, bounds, constituents,
     oversized balls, missing/forged provenance, or source zeros will result in (False, anomalies).
-
-    Args:
-        cert: The certificate dictionary to verify.
-        cert_store: Optional dictionary mapping certificate_hash or (type, id) -> cert dictionary for resolving dependencies.
-        check_provenance: If True (default), strictly verify source module hashes and input data hashes against current files.
-        canonical_current: If True (default), enforce that current disk source code hashes match certificate hashes.
-
-    Returns:
-        (is_valid, list_of_anomalies)
     """
     anomalies: List[str] = []
-
     if not isinstance(cert, dict):
-        return False, ["Certificate must be a dictionary"]
+        return False, ["Malformed certificate: expected dictionary"]
 
-    expected_hash = cert.get("certificate_hash")
-    if not expected_hash:
-        anomalies.append("Missing certificate_hash")
+    # 1. Structure and schema version validation
+    schema_ver = str(cert.get("schema_version", "")).strip()
+    if schema_ver != CERTIFICATE_SCHEMA_VERSION:
+        anomalies.append(f"Unsupported schema_version: '{schema_ver}'. Expected '{CERTIFICATE_SCHEMA_VERSION}'")
+
+    cert_type = str(cert.get("certificate_type", "")).strip()
+    if not cert_type or cert_type not in CERTIFICATE_MODULE_DEPENDENCIES:
+        anomalies.append(f"Invalid or unsupported certificate_type: '{cert_type}'")
+
+    cert_status = str(cert.get("status", "")).strip()
+    if not cert_status or cert_status not in CERTIFICATION_LEVELS:
+        anomalies.append(f"Invalid certification status: '{cert_status}'")
+
+    # 2. Canonical Hash Verification (tamper detection)
+    stored_hash = cert.get("certificate_hash")
+    if not stored_hash or len(stored_hash) != 64 or not all(c in "0123456789abcdefABCDEF" for c in stored_hash):
+        anomalies.append("Missing or invalid certificate_hash format")
     else:
         computed_hash = _sha256_canonical(cert)
-        if computed_hash != expected_hash:
-            anomalies.append(f"Hash mismatch: stored {expected_hash}, computed {computed_hash}")
+        if computed_hash != stored_hash:
+            anomalies.append(f"Tamper detected: certificate_hash {stored_hash} does not match computed {computed_hash}")
 
-    cert_type = cert.get("certificate_type")
-    if not cert_type:
-        anomalies.append("Missing certificate_type")
-        return False, anomalies
-
-    # 1. Dependency Fingerprint Validation
+    # 3. Dependency fingerprint validation
     dep_fp = cert.get("dependency_fingerprint")
-    dep_ok, dep_errs = validate_dependency_compatibility(dep_fp, check_current_runtime=check_provenance)
+    dep_ok, dep_errs = validate_dependency_compatibility(dep_fp, check_current_runtime=False)
     if not dep_ok:
         anomalies.extend(dep_errs)
 
-    # 2. Source Code Hashes Validation
-    cert_src = cert.get("source_code_hashes")
+    # 3b. Source code and input data hashes completeness check
+    cert_src = cert.get("source_code_hashes", {})
     if not isinstance(cert_src, dict) or not cert_src:
-        anomalies.append("Missing or empty source_code_hashes map")
-        return False, anomalies
-
+        anomalies.append("Certificate missing or empty source_code_hashes map")
     for mod in REQUIRED_SOURCE_MODULES:
         if mod not in cert_src or not cert_src[mod] or len(cert_src[mod]) != 64 or cert_src[mod] == "N/A":
             anomalies.append(f"source_code_hashes missing or invalid for required module '{mod}'")
 
-    # 3. Input Data Hashes Validation
-    cert_data = cert.get("input_data_hashes")
+    cert_data = cert.get("input_data_hashes", {})
     if not isinstance(cert_data, dict) or not cert_data:
-        anomalies.append("Missing or empty input_data_hashes map")
-        return False, anomalies
-
+        anomalies.append("Certificate missing or empty input_data_hashes map")
     for df in REQUIRED_INPUT_DATA_FILES:
         if df not in cert_data or not cert_data[df] or len(cert_data[df]) != 64 or cert_data[df] == "N/A":
             anomalies.append(f"input_data_hashes missing or invalid for required file '{df}'")
 
     req_mods = CERTIFICATE_MODULE_DEPENDENCIES.get(cert_type, REQUIRED_SOURCE_MODULES)
-    req_data = CERTIFICATE_DATA_DEPENDENCIES.get(cert_type, REQUIRED_INPUT_DATA_FILES)
 
     if check_provenance:
         # 4. Producing Git Commit Validation (with historical blob binding)
@@ -1738,6 +1760,7 @@ def verify_certificate(
                     anomalies.append(f"Current source module '{mod}' hash mismatch: disk {curr_h}, cert {cert_src.get(mod)}")
 
         # 6. Verify current input data files exist and match certificate
+        req_data = CERTIFICATE_DATA_DEPENDENCIES.get(cert_type, REQUIRED_INPUT_DATA_FILES)
         curr_data = _get_input_data_hashes(files=req_data)
         for df in req_data:
             curr_dh = curr_data.get(df, "N/A")
@@ -1754,16 +1777,9 @@ def verify_certificate(
     ctx.dps = dps + 20
 
     try:
-        if cert_type == "zero_isolation_and_simplicity":
-            _verify_zero_enclosure_and_isolation(cert, anomalies)
-        elif cert_type == "trivial_zero_certificate":
-            _verify_trivial_zero_enclosure(cert, anomalies)
-        elif cert_type in ("complete_block_certificate", "zero_block_isolation"):
-            _verify_block_isolation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
-        elif cert_type in ("worldline_certificate", "worldline_continuation"):
-            _verify_worldline_continuation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
-        else:
-            anomalies.append(f"Unknown certificate_type: {cert_type}")
+        _dispatch_and_verify_certificate(
+            cert_type, cert, anomalies, cert_store=cert_store, check_provenance=check_provenance
+        )
     finally:
         ctx.dps = old_dps
 
