@@ -264,12 +264,12 @@
     "summary_sha256": "fb81fe38a8422e63e26885f287139084e315892d739b4fcd4e702b3b0438cffb",
     "readme_sha256": "dedfc564513443103499455781e65935c8b278390c302195bdded646763fd52a",
     "diagnostics_sha256": "cdee5224ce019e45e73ed957ab4720fa685b4d9da5d48a95f3bbb2fb4eaf33d7",
-    "summary_git_commit": "441cbf6d719be2b0ce7ee015f89a9b546566f416",
-    "summarized_at": "2026-08-24T19:43:44.613576+00:00",
+    "summary_git_commit": "243fb2e64a142b0a152646d86216c94a6597cff5",
+    "summarized_at": "2026-08-24T20:36:47.148854+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/explicit_formula.py": "7760877f041e5ad81bbcfe79a549f5ae3ac8b70bf5d2c482c3335fae3acf463f",
-      "research_runner.py": "208b1d4678043feaa347c4bb51c4984cf70b86f61000ac16b07537eea87ac374"
+      "research_runner.py": "ae396755213c09783beeafc79f124b86356a2ef327dabf0ee3bc3137d19a623e"
     }
   },
   "warnings": [],

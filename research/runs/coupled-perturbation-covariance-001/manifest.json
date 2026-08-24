@@ -272,12 +272,12 @@
     "summary_sha256": "f45123632721d09627018e56c6682778b87a0b21f3eb8b21e1c7da520b5431f6",
     "readme_sha256": "37e517bc45fba36a9225b0e9b54ff38fa7eb27b025621b7851a77c6992a0f789",
     "diagnostics_sha256": null,
-    "summary_git_commit": "441cbf6d719be2b0ce7ee015f89a9b546566f416",
-    "summarized_at": "2026-08-24T19:43:26.634519+00:00",
+    "summary_git_commit": "243fb2e64a142b0a152646d86216c94a6597cff5",
+    "summarized_at": "2026-08-24T20:36:30.353067+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/covariance.py": "459a3fc3290604a0d9d7daf5aca3185ed5888e5d2663b63186ace66b2dd81139",
-      "research_runner.py": "208b1d4678043feaa347c4bb51c4984cf70b86f61000ac16b07537eea87ac374"
+      "research_runner.py": "ae396755213c09783beeafc79f124b86356a2ef327dabf0ee3bc3137d19a623e"
     }
   },
   "warnings": [],

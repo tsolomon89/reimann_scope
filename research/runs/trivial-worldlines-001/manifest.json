@@ -322,12 +322,12 @@
     "summary_sha256": "4af7001becdb4e9bd9971ea5b24eb6a9ef7a67adea0f6391d6a19cb090c5ed86",
     "readme_sha256": "b971f81fa6e3a5c2d6933a5479956d37a3a8f92e2a9173e79f063e01b8b22df1",
     "diagnostics_sha256": null,
-    "summary_git_commit": "441cbf6d719be2b0ce7ee015f89a9b546566f416",
-    "summarized_at": "2026-08-24T19:43:52.385505+00:00",
+    "summary_git_commit": "243fb2e64a142b0a152646d86216c94a6597cff5",
+    "summarized_at": "2026-08-24T20:36:54.285057+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
-      "research_runner.py": "208b1d4678043feaa347c4bb51c4984cf70b86f61000ac16b07537eea87ac374"
+      "research_runner.py": "ae396755213c09783beeafc79f124b86356a2ef327dabf0ee3bc3137d19a623e"
     }
   },
   "warnings": [],
