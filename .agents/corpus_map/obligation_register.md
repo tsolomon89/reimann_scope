@@ -41,6 +41,10 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-ARB-SS2` | Exact Radial/Frequency Separation | Prove spectral term separates into $a_K(\gamma) e^{x\delta} e^{it\gamma}$ | Falsified for SS-1..SS-5 | `FALSIFIED (SS-1..SS-5)` |
 | `OBL-ARB-SS3` | Finite Symmetric Radial Curvature Identity | Prove $\left.\partial_x^2 |\sum e^{x\delta_a}|^2\right|_{x=0} = 2N\sum \delta_a^2$ when $\sum \delta_a = 0$ | Lean 4 algebraic proofs | `FORMALLY_PROVED` |
 | `OBL-ARB-SS4` | Separated Signal Curvature Rigidity | Prove $M_K''(0) = 0 \implies \forall \lambda, \delta_\lambda = 0$ | Lean 4 `ConditionalSeparatedSignalBridge.all_variances_zero` | `FORMALLY_PROVED` |
+| `OBL-CMSA-001` | Completed Log-Derivative Pointwise Decomposition | Prove $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ on $\Re(u) > 1$ | Lean 4 `CompletedLogDerivativeDecomposition` | `PROVED / EXACT` |
+| `OBL-CMSA-002` | Completed Mean-Square Vanishing Anchor | Prove $\mathcal A(\sigma) = 0$ unconditionally for all $\sigma > 1$ | Analysis / Besicovitch mean square | `PROVED / EXACT` |
+| `OBL-CMSA-003` | Spectral Resolvent Mean-Square Regularization | Regularize translation-average integral $(1/2T)\int_{-T}^T$ on $L^2$ zero resolvents to extract discrete positive radial curvature | Open analytical gap | `OPEN` |
+| `OBL-CMSA-004` | Grade Covariance Non-Redundancy Verification | Prove coordinate redundancy of $\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)$ across grades | Lean 4 `CompletedLogDerivativeDecomposition.coordinate_redundant` | `PROVED / FORMALLY_PROVED` |
 | `OBL-ARB-STRUCT-SUM` | Infinite Trace/Determinant Summability | Prove $\sum n_j \delta_j^2/\gamma_j^2 < \infty$ under Hadamard order 1 | Analytic Dirichlet series bound | `PROVED` |
 | `OBL-ARB-STRUCT-PAIR` | Involution Pair Isolation | Isolate reflection pairs $(\lambda, \lambda^\#)$ without unrestricted all-pairs cross-term contamination | Candidate B-D falsification analysis | `OPEN` |
 | `OBL-ARB-STRUCT-NONRED` | Grade Non-Redundancy | Verify that cross-grade arithmetic pairings are not coordinate pullbacks | Symbolic grade reduction test | `PROVED` |

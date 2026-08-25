@@ -163,6 +163,36 @@ theorem sum_pairs_sq_two_terms (d1 d2 : ℝ) :
     2 * 2 * (d1 ^ 2 + d2 ^ 2) + 2 * (d1 + d2) ^ 2 := by
   ring
 
+/-- 2-term curvature sum of squares is unconditionally non-negative. -/
+theorem sum_pairs_sq_two_nonneg (d1 d2 : ℝ) :
+    0 ≤ (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 := by
+  positivity
+
+/-- 2-term curvature zero-rigidity:
+    The sum of squared pair displacements vanishes if and only if every displacement d_a = 0. -/
+theorem sum_pairs_sq_two_eq_zero_iff (d1 d2 : ℝ) :
+    (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 = 0 ↔ d1 = 0 ∧ d2 = 0 := by
+  constructor
+  · intro h
+    have h1 : (d1 + d1) ^ 2 ≤ (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 := by
+      have : 0 ≤ (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 := by positivity
+      linarith
+    have hd1_sq : (d1 + d1) ^ 2 ≤ 0 := by linarith [h, h1]
+    have hd1_nonneg : 0 ≤ (d1 + d1) ^ 2 := sq_nonneg _
+    have hd1_eq : (d1 + d1) ^ 2 = 0 := le_antisymm hd1_sq hd1_nonneg
+    have hd1_zero : d1 + d1 = 0 := sq_eq_zero_iff.mp hd1_eq
+
+    have h2 : (d2 + d2) ^ 2 ≤ (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 := by
+      have : 0 ≤ (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 := by positivity
+      linarith
+    have hd2_sq : (d2 + d2) ^ 2 ≤ 0 := by linarith [h, h2]
+    have hd2_nonneg : 0 ≤ (d2 + d2) ^ 2 := sq_nonneg _
+    have hd2_eq : (d2 + d2) ^ 2 = 0 := le_antisymm hd2_sq hd2_nonneg
+    have hd2_zero : d2 + d2 = 0 := sq_eq_zero_iff.mp hd2_eq
+    constructor <;> linarith
+  · rintro ⟨rfl, rfl⟩
+    ring
+
 /-- 2-term reflection pair curvature theorem under d1 + d2 = 0:
     The pair sum of squared displacements equals 2 * N * (d1^2 + d2^2) = 4 * (d1^2 + d2^2) = 8 * d1^2. -/
 theorem curvature_pair_symmetric (d1 d2 : ℝ) (h_sum : d1 + d2 = 0) :
@@ -194,14 +224,26 @@ theorem curvature_quartet_symmetric (d1 d2 d3 d4 : ℝ) (h_sum : d1 + d2 + d3 + 
   rw [h_sum] at h_id
   linarith [h_id]
 
-/-- Off-line quartet {δ, -δ, δ, -δ} exact curvature reduction:
-    Evaluates to 32 * δ^2, strictly positive whenever δ ≠ 0. -/
-theorem offline_quartet_curvature_val (δ : ℝ) :
-    (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (δ + δ) ^ 2 + (δ + -δ) ^ 2 +
-    (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 +
-    (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (δ + δ) ^ 2 + (δ + -δ) ^ 2 +
-    (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 =
+/-- Single upper-half-plane frequency fibre {δ, -δ} at ordinate γ > 0 (multiplicity n=1, N=2):
+    Evaluates to 8 * δ^2, strictly positive whenever δ ≠ 0. -/
+theorem upper_fibre_simple_quartet_curvature_val (δ : ℝ) :
+    (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 = 8 * δ ^ 2 := by
+  ring
+
+/-- Multiplicity-n upper-half-plane fibre {n*δ, n*(-δ)} has N = 2n and evaluates to 8 * n^2 * δ^2.
+    For n=2 (N=4), evaluates to 32 * δ^2. -/
+theorem upper_fibre_multiplicity_two_curvature_val (δ : ℝ) :
+    (δ + δ) ^ 2 + (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (δ + -δ) ^ 2 +
+    (δ + δ) ^ 2 + (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (δ + -δ) ^ 2 +
+    (-δ + δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 + (-δ + -δ) ^ 2 +
+    (-δ + δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 + (-δ + -δ) ^ 2 =
     32 * δ ^ 2 := by
+  ring
+
+/-- Normalized fibre curvature identity for simple upper-half-plane fibre (N = 2):
+    C_γ = M_γ''(0) / (2 * N) = (8 * δ^2) / (2 * 2) = 2 * δ^2 = δ^2 + (-δ)^2. -/
+theorem normalized_fibre_curvature_simple (δ : ℝ) :
+    (8 * δ ^ 2) / (2 * 2) = δ ^ 2 + (-δ) ^ 2 := by
   ring
 
 /-- Structure representing a hypothetical divisor-independent separated sesquilinear signal bridge.
@@ -230,5 +272,31 @@ theorem ConditionalSeparatedSignalBridge.all_variances_zero
   have h_sum_zero : (List.zipWith (· * ·) B.weights B.radial_variances).sum = 0 := by
     rw [← B.spectral_expansion, h_spec]
   exact (list_weighted_sum_nonneg_eq_zero_iff B.weights B.radial_variances B.pos_weights B.nonneg_variances B.lengths_match).mp h_sum_zero
+
+/-- Structure representing the exact completed logarithmic derivative decomposition:
+    P(u) = A(u) - ξ'/ξ(u) on Re(u) > 1, and its dilated representation D_K^ξ(s_K) = τ^(-K) * ξ'/ξ(tau^(-K) * s_K). -/
+structure CompletedLogDerivativeDecomposition where
+    scale : ℝ
+    pos_scale : 0 < scale
+    xi_log_der : ℝ → ℝ
+    archimedean_A : ℝ → ℝ
+    prime_P : ℝ → ℝ
+    identity_on_domain : ∀ u, prime_P u = archimedean_A u - xi_log_der u
+    dilated_D : ℝ → ℝ
+    dilation_def : ∀ s, dilated_D s = (1 / scale) * xi_log_der ((1 / scale) * s)
+
+/-- Theorem: The normalized dilated completed logarithmic derivative scale * D_K(scale * u)
+    recovers ξ'/ξ(u) identically, proving strict coordinate redundancy across grades. -/
+theorem CompletedLogDerivativeDecomposition.coordinate_redundant
+    (D : CompletedLogDerivativeDecomposition) (u : ℝ) :
+    D.scale * D.dilated_D (D.scale * u) = D.xi_log_der u := by
+  have h_dil := D.dilation_def (D.scale * u)
+  rw [h_dil]
+  have h_pos_ne : D.scale ≠ 0 := ne_of_gt D.pos_scale
+  have h_cancel_arg : 1 / D.scale * (D.scale * u) = u := by
+    rw [← mul_assoc, one_div_mul_cancel h_pos_ne, one_mul]
+  rw [h_cancel_arg]
+  have h_cancel_outer : D.scale * (1 / D.scale * D.xi_log_der u) = (D.scale * (1 / D.scale)) * D.xi_log_der u := by ring
+  rw [h_cancel_outer, mul_one_div_cancel h_pos_ne, one_mul]
 
 end RiemannScope

@@ -51,7 +51,7 @@ or an equivalent two-slot quadratic form, where:
 - $a_K$ provides spectral decay;
 - $K \in \mathbb Z$ is the transcendental continuation grade.
 
-At a fixed ordinate $\gamma$, functional reflection yields a symmetric radial multiset $\Delta_\gamma = \{\delta_{\gamma,1}, \dots, \delta_{\gamma,N_\gamma}\}$ with $\sum_a \delta_{\gamma,a} = 0$.
+At a fixed ordinate $\gamma > 0$, functional reflection yields a symmetric upper-half-plane radial multiset $\Delta_\gamma = \{\delta_{\gamma,1}, \dots, \delta_{\gamma,N_\gamma}\}$ with $\sum_a \delta_{\gamma,a} = 0$.
 When the coefficients satisfy $\sum_\lambda |a_K(\lambda)| < \infty$ ($\ell^1$ absolute summability), the double sum converges absolutely, and dominated convergence justifies the translation-average limit directly without requiring Montgomery pair correlation:
 $$M_K(x) := \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T |S_K(x, t)|^2 dt = \sum_\gamma |a_K(\gamma)|^2 \left| \sum_{a=1}^{N_\gamma} e^{x\delta_{\gamma,a}} \right|^2.$$
 Differentiating twice at $x=0$ yields the exact nonnegative curvature:
@@ -59,7 +59,11 @@ $$M_K''(0) = 2 \sum_\gamma |a_K(\gamma)|^2 N_\gamma \sum_{a=1}^{N_\gamma} \delta
 where $W_K(\gamma) = 2 |a_K(\gamma)|^2 N_\gamma > 0$.
 Because $W_K(\gamma) > 0$ strictly:
 $$M_K''(0) = 0 \iff \forall \lambda, \delta_\lambda = 0 \iff \mathrm{RH}.$$
-This achieves implicit frequency projection without explicit projected-divisor construction.
+For an off-line quartet at positive height $\gamma > 0$ with multiplicity $n$, the upper fibre $\{\delta, -\delta\}$ has $N = 2n$, giving unnormalized curvature $M_\gamma''(0) = 8 n^2 \delta^2$.
+The normalized fibre curvature is:
+$$C_\gamma := \frac{M_\gamma''(0)}{2N_\gamma} = \sum_{a=1}^{N_\gamma} \delta_{\gamma,a}^2 = 2n\delta^2,$$
+which recovers the trace defect $\sum_{\gamma > 0} C_\gamma / \gamma^2 = \operatorname{Tr}\mathcal R$.
+However, normalizing by $2N_\gamma$ requires access to the spectral fibre multiplicity $N_\gamma$.
 
 ---
 
@@ -120,6 +124,8 @@ At a distinct ordinate $\gamma_j > 0$:
    The raw unsmoothed signal $x^{\rho-1/2} = e^{\delta \log x} e^{i\gamma \log x}$ uses a single parameter for both amplitude and frequency. If $\delta \ne 0$, its mean-square growth rate is governed by $\Theta = \sup_\rho \Re\rho$, rendering $\Theta$-dependent normalizations circular (`CRAMER_TYPE_OBSTRUCTION`).
 3. **Pair Correlation Scope**:
    If spectral coefficients satisfy $\sum_\lambda |a_K(\lambda)| < \infty$, the double sum converges absolutely, and dominated convergence justifies the translation average limit directly. Montgomery-type pair correlation is relevant only when coefficients lack $\ell^1$ domination.
+4. **Holomorphic Rigidity Scope**:
+   Direct 1-point holomorphic parameter separation $h(\delta+i\gamma) = a(\gamma)e^{x\delta}e^{it\gamma}$ violates Cauchy-Riemann equations on open sets unless $x=t$ and $a'(\gamma)=0$.
 
 ---
 
@@ -142,8 +148,14 @@ Stable obligation identifiers govern the formalization of the arithmetic radial 
 ### Separated Signal Route
 - $\mathrm{ARB\text{-}SS1}$: Divisor-independent arithmetic signal $S_K^{\mathrm{arith}}(x, t)$ [`OPEN`].
 - $\mathrm{ARB\text{-}SS2}$: Exact radial/frequency separation $a_K(\gamma) e^{x\delta} e^{it\gamma}$ [`FALSIFIED` for SS-1..SS-5].
-- $\mathrm{ARB\text{-}SS3}$: Finite algebraic curvature identity $\left.\partial_x^2 |\sum e^{x\delta_a}|^2\right|_{x=0} = 2N\sum \delta_a^2$ [`FORMALLY_PROVED` in Lean 4].
+- $\mathrm{ARB\text{-}SS3}$: Finite algebraic curvature identity $\left.\partial_x^2 |\sum e^{x\delta_a}|^2\right|_{x=0} = 2N\sum \delta_a^2 + 2(\sum \delta_a)^2$ [`FORMALLY_PROVED` in Lean 4].
 - $\mathrm{ARB\text{-}SS4}$: Curvature rigidity $M_K''(0) = 0 \implies \forall \lambda, \delta_\lambda = 0$ [`FORMALLY_PROVED` in Lean 4].
+
+### Completed Mean-Square Anchor (CMSA) Route
+- $\mathrm{ARB\text{-}CMSA1}$: Exact completed log-derivative decomposition $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ [`PROVED` on $\Re(u) > 1$].
+- $\mathrm{ARB\text{-}CMSA2}$: Arithmetic mean-square vanishing anchor $\mathcal A(\sigma) = 0$ [`PROVED` for all $\sigma > 1$].
+- $\mathrm{ARB\text{-}CMSA3}$: Complete spectral kernel evaluation without unconstrained cross-term cancellation [`OPEN`].
+- $\mathrm{ARB\text{-}CMSA4}$: Rigidity to RH via positive spectral curvature [`OPEN`].
 
 ### Structural Obligations
 - $\mathrm{ARB\text{-}STRUCT\text{-}SUM}$: Infinite summability of $T$ and $D$ [`PROVED` under Hadamard order 1].
@@ -191,17 +203,25 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 
 | Candidate ID | Name | Target | Gate Status | Earliest Failed Gate | Structural Obstruction / Witness | Final Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CANDIDATE_SS1** | Conjugated Explicit-Formula Pair | Separated Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Holomorphic Rigidity / Cramér Obstruction**: $\partial_\delta \Re(\log h) - \partial_\gamma \Im(\log h) = x - t \ne 0$ unless $x=t$. Holomorphic kernel $e^{(x+it)z}$ produces $e^{x\delta - t\gamma}$, inducing exponential translation divergence $\sinh(2T\gamma)/\gamma$. | `FAIL_CRAMER_TYPE_NORMALIZATION` |
-| **CANDIDATE_SS2** | Two-Slot Logarithmic Derivative | Bilinear Form | `FALSIFIED_GATE_2_3` | Gate 2 & 3 (Cross-terms) | **Double-Sum Cross-Term Dominance**: $D_K(s_1)\overline{D_K(s_2)}$ yields double sum over all zero pairs $(\rho_1, \rho_2)$. Off-diagonal terms scale as $O((T\log T)^2)$ against $O(T\log T)$ diagonal and do not cancel under translation averaging. | `FAIL_OFF_DIAGONAL_CROSS_TERM_DOMINANCE` |
-| **CANDIDATE_SS3** | Rapidly Smoothed Transform | Smoothed Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Cramér-Type Translation Divergence**: Gaussian smoothing leaves $-t\gamma$ in the real exponential slot. Translation average $\int_{-T}^T e^{-2t\gamma}dt = \sinh(2T\gamma)/\gamma$ diverges exponentially as $T\to\infty$ ($>10^{240}$ for $\gamma \approx 14.13, T=20$). Normalization requires circular $\Theta = \sup \Re\rho$. | `FAIL_CRAMER_TYPE_NORMALIZATION` |
-| **CANDIDATE_SS4** | Cross-Grade Sesquilinear Form | Cross-Grade Coupling | `FALSIFIED_GATE_5` | Gate 5 (Grade Nonredundancy) | **Transcendental Non-Resonance & Coordinate Pullback**: For $K \ne L$, $\tau^{-K}\log n \ne \tau^{-L}\log m$ because $\tau = 2\pi$ is transcendental, yielding zero cross-grade arithmetic resonance. Single-grade sums collapse to grade-zero pullbacks by coordinate covariance ($z_K = \tau^K z$). | `GRADE_COORDINATE_REDUNDANT` |
-| **CANDIDATE_SS5** | Direct Positive Quadratic Kernel | Quadratic Form | `FALSIFIED_GATE_1_6` | Gate 1 & 6 (Holomorphy/Anchor) | **Non-Holomorphic Firewall / Identity Theorem**: Any holomorphic kernel vanishing on $\Re(s)=1/2$ vanishes identically everywhere on $\mathbb C^2$. Non-holomorphic pairing $\rho - \rho^\# = 2\delta$ couples $\rho$ with $1-\bar\rho$, which cannot be pulled back to Dirichlet series via Cauchy residue calculus. | `FAIL_NON_HOLOMORPHIC_ARITHMETIC_FIREWALL` |
+| **CANDIDATE_SS1** | Conjugated Explicit-Formula Pair | Separated Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Direct Holomorphic Parameter Separation Failure**: Cauchy-Riemann equations force $x=t, a'(\gamma)=0$ on open sets. Holomorphic kernel $e^{(x+it)z}$ produces $e^{x\delta - t\gamma}$, inducing exponential translation divergence $\sinh(2T\gamma)/\gamma$. | `FAIL_DIRECT_HOLOMORPHIC_PARAMETER_SEPARATION` |
+| **CANDIDATE_SS2** | Two-Slot Logarithmic Derivative | Bilinear Form | `FALSIFIED_GATE_2_3` | Gate 2 & 3 (Cross-terms) | **Unconstrained Double-Sum Resolution Failure**: $D_K(s_1)\overline{D_K(s_2)}$ yields double sum over all zero pairs $(\rho_1, \rho_2)$. Off-diagonal terms scale as $O((T\log T)^2)$ against $O(T\log T)$ diagonal and do not cancel without projected divisor subtraction. | `FAIL_UNCONSTRAINED_DOUBLE_SUM_WITHOUT_PAIR_ISOLATION` |
+| **CANDIDATE_SS3** | Rapidly Smoothed Transform | Smoothed Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Ordinate Slot Exponential Growth**: Translation parameter enters real exponential slot as $-t\gamma$, causing translation average $\int_{-T}^T e^{-2t\gamma}dt = \sinh(2T\gamma)/\gamma$ to diverge exponentially as $T\to\infty$ ($>10^{240}$ for $\gamma \approx 14.13, T=20$). | `FAIL_ORDINATE_SLOT_EXPONENTIAL_GROWTH` |
+| **CANDIDATE_SS4** | Cross-Grade Sesquilinear Form | Cross-Grade Coupling | `FALSIFIED_GATE_5` | Gate 5 (Grade Nonredundancy) | **Transcendental Cross-Grade Scope & Coordinate Redundancy**: Bounded frequency gap searches show no non-trivial resonances up to tested bounds (numerical evidence only; exact non-resonance for $2\pi$ is open). Single-grade sums collapse to grade-zero pullbacks by coordinate covariance ($z_K = \tau^K z$). | `GRADE_COORDINATE_REDUNDANT` |
+| **CANDIDATE_SS5** | Direct Positive Quadratic Kernel | Quadratic Form | `FALSIFIED_GATE_1_6` | Gate 1 & 6 (Holomorphy/Anchor) | **Non-Holomorphic Arithmetic Firewall**: Any holomorphic kernel vanishing on $\Re(s)=1/2$ vanishes identically everywhere on $\mathbb C^2$. Non-holomorphic pairing couples $\rho$ with $1-\bar\rho$, which cannot be pulled back to Dirichlet series via Cauchy residue calculus. | `FAIL_NON_HOLOMORPHIC_ARITHMETIC_FIREWALL` |
+
+### 7.3 Completed Mean-Square Anchor Candidates (CMSA-1–CMSA-3)
+
+| Candidate ID | Name | Target | Gate Status | Earliest Failed Gate | Structural Obstruction / Witness | Final Classification |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **CANDIDATE_CMSA1** | Base Completed Mean-Square Anchor | $\mathcal A(\sigma) = 0$ | `LIVE_G5_PROVED_G6_OPEN` | Gate 6 (Positivity) | **Besicovitch Translation Mean-Square vs $L^2$ Spectral Residue**: Pointwise identity $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ is exact on $\Re(u) > 1$ and gives arithmetic anchor $=0$. However, translation averaging $(1/2T)\int_{-T}^T$ evaluates almost-periodic Dirichlet frequencies while discrete zero resolvent terms in $L^2(\mathbb R, dt)$ integrate to zero under $(1/2T)$ scaling. | `LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP` |
+| **CANDIDATE_CMSA2** | Polarized Completed Mean-Square Anchor | $\mathcal A(\sigma_1, \sigma_2) = 0$ | `LIVE_G5_PROVED_G6_OPEN` | Gate 6 (Positivity) | **Spectral Cross-Term Cancellation**: Expanding the polarized anchor produces Archimedean-Archimedean, Archimedean-Zero, and Zero-Zero integrals. In the zero-zero integral $\int_{-T}^T dt/[(w_1+it)(w_2-it)] = 2\pi/(w_1+w_2)$, the integral scales as $O(1/T)$ under the $(1/2T)$ factor. Mixed partial derivatives do not isolate a strictly positive radial quadratic form on the spectral side. | `LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP` |
+| **CANDIDATE_CMSA3** | Grade-Normalized Completed Mean-Square Anchor | $\mathcal A_K(\sigma) = 0$ | `FALSIFIED_GATE_8` | Gate 8 (Grade Nonredundancy) | **Grade Covariance Redundancy**: The normalized completed logarithmic derivative $\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)$ is strictly coordinate-redundant for all $K \in \mathbb Z$. Grade dilation yields no additional arithmetic constraints or non-redundant radial invariants beyond $K=0$. | `GRADE_COORDINATE_REDUNDANT` |
 
 ---
 
 ## 8. Lean 4 Formalization Inventory
 
-The formalization in `formal/RiemannScope/` contains the following compiled theorems (0 `sorry`, 0 axioms):
+The formalization in `formal/RiemannScope/` contains the following compiled theorems (0 `sorry`, 0 `admit`, 0 project axioms):
 
 1. **`RiemannScope.centeredGradeCoord_eq_tau_pow_mul_z`**:
    Exact centered grade dilation: $z_K = s_K - c_K = \tau^K (s - 1/2)$.
@@ -215,21 +235,84 @@ The formalization in `formal/RiemannScope/` contains the following compiled theo
    Proves covariance, reflection, and conjugation symmetries are jointly compatible with $\delta \ne 0$.
 6. **`RiemannScope.ConditionalArithmeticRadialBridge.all_defects_zero`**:
    Rigidity theorem: under any valid conditional arithmetic bridge, all represented zero defects vanish ($r_j = 0 \implies \delta_j = 0$).
-7. **`RiemannScope.sum_pairs_sq_two_terms` & `curvature_pair_symmetric`**:
-   Exact 2-term algebraic curvature identity: $\sum_{a,b=1}^2 (\delta_a + \delta_b)^2 = 2 \cdot 2 \cdot (\delta_1^2 + \delta_2^2) = 4 (\delta_1^2 + \delta_2^2)$ under $\delta_1 + \delta_2 = 0$.
-8. **`RiemannScope.sum_pairs_sq_four_terms` & `curvature_quartet_symmetric`**:
-   Exact 4-term algebraic curvature identity: $\sum_{a,b=1}^4 (\delta_a + \delta_b)^2 = 2 \cdot 4 \cdot \sum_{a=1}^4 \delta_a^2 = 8 \sum_{a=1}^4 \delta_a^2$ under $\sum_{a=1}^4 \delta_a = 0$.
-9. **`RiemannScope.offline_quartet_curvature_val`**:
-   Off-line quartet exact curvature reduction to $32 \delta^2$, strictly positive for $\delta \ne 0$.
-10. **`RiemannScope.ConditionalSeparatedSignalBridge.all_variances_zero`**:
+7. **`RiemannScope.sum_pairs_sq_two_terms`**:
+   Exact 2-term algebraic curvature identity: $\sum_{a,b=1}^2 (\delta_a + \delta_b)^2 = 2 \cdot 2 \cdot (\delta_1^2 + \delta_2^2) + 2(\delta_1+\delta_2)^2$.
+8. **`RiemannScope.sum_pairs_sq_two_nonneg` & `sum_pairs_sq_two_eq_zero_iff`**:
+   Unconditional nonnegativity and zero-rigidity: $\sum_{a,b=1}^2 (\delta_a+\delta_b)^2 \ge 0$, and equals 0 iff $\delta_1 = 0 \wedge \delta_2 = 0$.
+9. **`RiemannScope.curvature_pair_symmetric`**:
+   2-term reflection pair curvature theorem under $\delta_1 + \delta_2 = 0$: evaluates to $8 \delta_1^2$.
+10. **`RiemannScope.sum_pairs_sq_four_terms` & `curvature_quartet_symmetric`**:
+    Exact 4-term algebraic curvature identity: $\sum_{a,b=1}^4 (\delta_a + \delta_b)^2 = 2 \cdot 4 \cdot \sum_{a=1}^4 \delta_a^2 + 2(\sum_{a=1}^4 \delta_a)^2$.
+11. **`RiemannScope.upper_fibre_simple_quartet_curvature_val`**:
+    Single upper-half-plane fibre $\{\delta, -\delta\}$ ($N=2$, multiplicity $n=1$) evaluates to $8\delta^2$.
+12. **`RiemannScope.upper_fibre_multiplicity_two_curvature_val`**:
+    Multiplicity $n=2$ upper-half-plane fibre ($N=4$) evaluates to $32\delta^2 = 8(2^2)\delta^2$.
+13. **`RiemannScope.normalized_fibre_curvature_simple`**:
+    Normalized fibre curvature: $C_\gamma = (8\delta^2)/(2 \cdot 2) = 2\delta^2 = \delta^2 + (-\delta)^2$.
+14. **`RiemannScope.ConditionalSeparatedSignalBridge.all_variances_zero`**:
     Separated Signal Bridge Rigidity Theorem: under any arithmetic-anchored separated signal bridge, all represented radial variances vanish, forcing $\delta = 0$.
+15. **`RiemannScope.CompletedLogDerivativeDecomposition.coordinate_redundant`**:
+    Proves that the normalized dilated completed logarithmic derivative $\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)$ is strictly coordinate-redundant.
 
 ---
 
-## 9. Current Status and Research Protocol
+## 9. Dependency Ledger
+
+| Dependency / Identity | Type | Mathematical Status | Lean Status | Role in Research |
+| :--- | :--- | :--- | :--- | :--- |
+| $\xi(s) = \xi(1-s)$ | Functional Equation | Standard Theorem (Riemann 1859) | External / Native | Root reflection symmetry |
+| $z_K = \tau^K z$ | Coordinate Dilation | Proved Internally (Algebraic) | Formalized (`centeredGradeCoord_eq_tau_pow_mul_z`) | Transcendental grade transport |
+| $\kappa_1(\lambda, \lambda^\#) = \delta^2/\gamma^2$ | Rational Involution Kernel | Proved Internally (Algebraic) | Formalized (`kappa1_val`) | Spectral defect conversion |
+| $L_Q = 1 \iff \mathrm{RH}$ | Spectral Equivalence | Proved Internally (Analytic) | Formalized (`list_prod_one_plus_nonneg_eq_one_iff`) | Spectral target criterion |
+| $\operatorname{Tr}\mathcal R = 0 \iff \mathrm{RH}$ | Spectral Equivalence | Proved Internally (Analytic) | Formalized (`list_sum_nonneg_eq_zero_iff`) | Spectral target criterion |
+| $\sum_{a,b=1}^N (\delta_a+\delta_b)^2 = 2N\sum \delta_a^2 + 2(\sum \delta_a)^2$ | Algebraic Curvature | Proved Internally (Exact) | Formalized (`sum_pairs_sq_two_terms`, `four_terms`) | Radial variation detector |
+| $\Xi'/\Xi(z) = \sum \frac{2z}{z^2-\lambda^2}$ | Hadamard Log-Derivative | Standard Theorem (Hadamard 1893) | Unformalized Analytic | Exact spectral representation |
+| $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Formalized Structure (`CompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
+| $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T \|P(\sigma+it)\|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
+| $\mathcal A(\sigma) = 0$ | Completed Mean-Square Anchor | Proved Internally (Analytic) | Unformalized Analytic | Divisor-independent arithmetic anchor |
+| Single-grade coordinate pullback | Grade Covariance | Proved Internally (Algebraic) | Formalized (`coordinate_redundant`) | Coordinate redundancy exclusion |
+| Cross-grade exact non-resonance for $2\pi$ | Transcendental Number Theory | Open / Numerical Evidence Only | Unformalized | Cross-grade coupling |
+| $\mathrm{OBL\text{-}RDQ\text{-}001}$ | Arithmetic Radial Bridge | Open Research Obligation | Conditional Structure Only | Central Research Goal |
+
+---
+
+## 10. Completed Mean-Square Arithmetic Anchor (CMSA) Suite
+
+### 10.1 Mathematical Definition
+For $\Re(u) > 1$, let:
+$$P(u) = \sum_{n=2}^\infty \frac{\Lambda(n)}{n^u} = -\frac{\zeta'}{\zeta}(u).$$
+The Archimedean and pole logarithmic derivative is:
+$$A(u) = \frac{1}{u} + \frac{1}{u-1} - \frac{1}{2}\log \pi + \frac{1}{2}\psi(u/2).$$
+The fundamental completed logarithmic derivative identity is:
+$$\boxed{P(u) = A(u) - \frac{\Xi'}{\Xi}\left(u - \frac{1}{2}\right)} \qquad (\Re u > 1).$$
+
+### 10.2 Arithmetic Mean-Square Vanishing Anchor
+For real $\sigma > 1$:
+$$\mathcal P_\sigma(t) := A(\sigma + it) - \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right) = P(\sigma + it).$$
+The completed mean-square anchor is:
+$$\boxed{\mathcal A(\sigma) := \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left| A(\sigma+it) - \frac{\Xi'}{\Xi}\left(\sigma-\frac{1}{2}+it\right) \right|^2 dt - \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}} = 0.}$$
+This quantity:
+1. Is completely divisor-independent on the arithmetic side;
+2. Vanishes identically ($\mathcal A(\sigma) = 0$) unconditionally for all $\sigma > 1$;
+3. Contains all nontrivial zeros via the symmetrically paired Hadamard logarithmic derivative $\Xi'/\Xi$.
+
+### 10.3 Analytic Gap and Falsification Findings
+When expanding the spectral side:
+1. **Besicovitch Mean Square vs $L^2(\mathbb R)$ Resolvents**:
+   The individual zero resolvent terms $\frac{1}{\sigma-\rho+it}$ belong to $L^2(\mathbb R, dt)$ with finite total norm $\int_{-\infty}^\infty \frac{dt}{|\sigma-\rho+it|^2} = \frac{\pi}{\sigma - \Re\rho}$.
+   Under translation averaging, $\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \sim \frac{\pi}{2T(\sigma-\Re\rho)} \to 0$ as $T\to\infty$.
+   Thus individual zero resolvents do not produce non-zero almost-periodic discrete frequencies without regularized Mellin-transform weighting.
+2. **Spectral Real-Axis Defect Sign**:
+   Evaluating $\Xi'/\Xi(z)$ on the real axis $z = \sigma - 1/2 > 1/2$ demonstrates that moving an on-line pair to an off-line quartet $\{\delta, -\delta\}$ with $\delta \ne 0$ at ordinate $\gamma$ induces a spectral variation:
+   $$\Delta(\delta) = \frac{4z(z^2 - 3\gamma^2 - \delta^2)}{(z^2+\gamma^2-\delta^2)^2 + 4\delta^2\gamma^2}\delta^2 < 0 \qquad (\text{for } z^2 < 3\gamma^2).$$
+   Because $z^2 < 3\gamma^2$ holds for all critical strip heights ($\gamma > 14$), the unregularized spectral difference is negative, proving that the raw mean-square anchor does not directly produce a positive quadratic radial defect without regularized weighting.
+
+---
+
+## 11. Current Status and Research Protocol
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
-- **Separated Signal Sprint Outcome**:
-  - The spectral side of the separated signal $S_K(x, t)$ rigorously detects off-line zeros with positive curvature $M_K''(0) > 0 \iff \delta \ne 0$ without requiring Montgomery pair correlation when $\ell^1$-summable.
-  - However, Candidates SS-1 through SS-5 are rigorously falsified on the arithmetic side by Holomorphic Rigidity (SS-1), Double-Sum Cross-Term Dominance (SS-2), Cramér Translation Divergence (SS-3), Transcendental Grade Non-Resonance (SS-4), and the Non-Holomorphic Arithmetic Firewall (SS-5).
+- **Completed Mean-Square Anchor Outcome**:
+  - The arithmetic identity $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ and mean-square vanishing anchor $\mathcal A(\sigma) = 0$ are exact and proved.
+  - Candidates CMSA-1 and CMSA-2 are live with explicit unproved analytic gaps regarding spectral resolvent regularization; Candidate CMSA-3 is coordinate-redundant.
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.

@@ -57,10 +57,10 @@ class TestAlgebraicCurvatureIdentities:
             assert mpmath.almosteq(mpmath.mpf(res["sum_pairs"]), expected, abs_eps=mpmath.mpf('1e-75'))
 
     def test_four_term_symmetric_quartet_identity(self):
-        """For quartet {delta, -delta, delta, -delta}, double sum equals 2 * 4 * (4*delta^2) = 32 * delta^2."""
+        """For multiplicity n=2 upper fibre {d, d, -d, -d} (N=4), double sum equals 2 * 4 * (4*delta^2) = 32 * delta^2."""
         with mpmath.workdps(80):
             d = mpmath.mpf('0.075')
-            deltas = [d, -d, d, -d]
+            deltas = [d, d, -d, -d]
             res = verify_algebraic_curvature_identity(deltas)
             assert res["is_exact"] is True
             assert res["zero_sum_reduction"] is True
@@ -82,6 +82,19 @@ class TestAlgebraicCurvatureIdentities:
             assert res["is_exact"] is True
             assert res["zero_sum_reduction"] is True
 
+    def test_general_non_zero_sum_identity(self):
+        """Tests general non-zero-sum multiset: sum_{a,b} (d_a+d_b)^2 = 2N*sum(d_a^2) + 2*(sum d_a)^2."""
+        with mpmath.workdps(80):
+            deltas = [
+                mpmath.mpf('0.12'),
+                mpmath.mpf('0.05'),
+                mpmath.mpf('-0.03'),
+                mpmath.mpf('0.07')
+            ]
+            res = verify_algebraic_curvature_identity(deltas)
+            assert res["is_exact"] is True
+            assert res["zero_sum_reduction"] is False
+
 
 class TestSpectralDetectorAndCurvature:
     """Verifies synthetic spectral signal evaluation, mean-square energy, and curvature."""
@@ -101,7 +114,7 @@ class TestSpectralDetectorAndCurvature:
     def test_single_offline_quartet_curvature_positivity(self):
         """A single off-line quartet produces strictly positive curvature M_K''(0) > 0."""
         with mpmath.workdps(80):
-            # Quartet at gamma = 14.1347 with upper zeros (+delta, -delta)
+            # Upper-half-plane fibre at gamma = 14.1347 with zeros (+delta, -delta), N_gamma = 2
             quartet = [
                 ('0.1', '14.134725141734693790', 1),
                 ('-0.1', '14.134725141734693790', 1),
@@ -109,12 +122,18 @@ class TestSpectralDetectorAndCurvature:
             curv = spectral_curvature_m_double_prime(quartet, K=0, dps=80)
             assert curv > 0
 
-            # Verify against analytical formula: 2 * |a(gamma)|^2 * N * (delta_1^2 + delta_2^2)
+            # Verify against analytical formula: 2 * |a(gamma)|^2 * N * (delta_1^2 + delta_2^2) = 2 * |a|^2 * 2 * (2*delta^2) = 8*|a|^2*delta^2
             gamma = mpmath.mpf('14.134725141734693790')
             delta = mpmath.mpf('0.1')
             a_val = mpmath.exp(-mpmath.mpf('0.01') * gamma**2)
             expected = 2 * (a_val**2) * 2 * (2 * delta**2)
             assert mpmath.almosteq(curv, expected, abs_eps=mpmath.mpf('1e-75'))
+
+            # Test normalized fibre curvature: C_gamma = curv / (2 * N_gamma * a_val^2) = delta^2 + (-delta)^2 = 2*delta^2
+            from math_core import normalized_fibre_curvature
+            c_gamma = normalized_fibre_curvature(curv / (a_val**2), N_gamma=2)
+            expected_norm = 2 * delta**2
+            assert mpmath.almosteq(c_gamma, expected_norm, abs_eps=mpmath.mpf('1e-75'))
 
     def test_mixed_online_and_offline_zeros_at_single_height(self):
         """Mixed on-line and off-line zeros at a single ordinate produce positive curvature solely from off-line roots."""
@@ -176,10 +195,12 @@ class TestCandidateFalsificationWitnesses:
         assert mpmath.mpf(res["integrals"]["T_20"]) > mpmath.mpf('1e240')
 
     def test_candidate_ss4_transcendental_nonresonance_witness(self):
-        """Candidate SS-4 fails at Gate 5 because (2*pi)^K * log(n) != log(m) for all integers n,m >= 2."""
-        res = verify_transcendental_nonresonance_ss4(K=1, max_n=100, max_m=100)
+        """Candidate SS-4 search verifies minimum frequency gap in finite search box (numerical evidence only)."""
+        from math_core import search_bounded_transcendental_cross_grade_frequencies_ss4
+        res = search_bounded_transcendental_cross_grade_frequencies_ss4(K=1, max_n=100, max_m=100)
         assert res["has_exact_resonance"] is False
         assert res["min_frequency_gap"] > 0
+        assert res["epistemic_status"] == "NUMERICAL_SEARCH_EVIDENCE_ONLY_NOT_PROOF"
 
     def test_candidate_ss5_non_holomorphic_firewall(self):
         """Candidate SS-5 fails at Gate 1/6 because non-holomorphic pairing cannot be derived from Dirichlet series."""
@@ -223,3 +244,4 @@ class TestArithmeticFirewallsAndRegistry:
             assert "earliest_failure" in entry
             assert entry["arithmetic_independence"] is True
             assert entry["pair_isolation"] is False
+
