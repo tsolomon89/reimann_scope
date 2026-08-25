@@ -2074,8 +2074,11 @@ E(u_n) = \|K_{\cdot, n} u_n\|^2 = u_n^2 \|K_{\cdot, n}\|^2 \ge 0.
    - The actual zero divisor \(\mathcal D_\zeta = \sum_\rho [\rho]\) has an established arithmetic explicit-formula representation connecting its spectral sum to primes and poles: \(\operatorname{EF}[h; \mathcal D_\zeta, \mathcal A_\zeta] = 0\).
    - However, its critical-line projection \(\mathcal P_0(\mathcal D_\zeta) = \sum_\rho [1/2 + i\gamma_\rho]\) is **NOT** known to be the divisor of any Dirichlet series or Euler product, and has **NO** established independent arithmetic representation.
    - Consequently, \(\langle \mathcal P_0(\mathcal D_\zeta), h \rangle\) cannot be independently evaluated via arithmetic data without already assuming that all zeros lie on the critical line (\(\mathcal D_\zeta = \mathcal P_0(\mathcal D_\zeta)\)), which is circular.
-2. **Missing Theorem Status**:
-   - Inferring radial rigidity (\(\Delta\mathcal D_{\mathrm{rad}} = 0\)) from the projected-divisor defect remains an unproved theorem requiring a global arithmetic or spectral constraint.
+2. **The Scoped One-Point No-Go Theorem**:
+   - Let \(H\) be a holomorphic test function defined on a vertical strip containing the critical strip, and let \(G = H + H \circ (-\mathrm{id})\) be the symmetrized even holomorphic function.
+   - If the quartet response \(A_H(\delta, \gamma) = 2 \Re G(\delta + i\gamma)\) is independent of \(\delta\) on an open interval \(I \ni 0\) for each \(\gamma\) in an open interval, then Cauchy-Riemann equations force \(G(z)\) to be identically constant.
+   - **Scope**: Rigorously proves the **CLOSED** status of `OBL-EF-003` for fixed linear combinations and locally uniform limits of direct 1-point holomorphic Riemann–Weil evaluations.
+   - Does **not** preclude nonlinear paired, sesquilinear, determinantal, operator, or zeta-divisor-specific comparison objects (`OBL-RDQ-001`, **OPEN**).
 
 ## 36.5 Countermodel Controls and Epistemic Classification
 
@@ -2091,18 +2094,27 @@ E(u_n) = \|K_{\cdot, n} u_n\|^2 = u_n^2 \|K_{\cdot, n}\|^2 \ge 0.
 
 ## 37.1 Centered coordinates and reference objects
 In centered coordinate \(z = s - 1/2 = \delta + it\), let \(\Xi(z) = \xi(1/2 + z)\).
-Let \(\Lambda^+\) be the multiset of upper-half-plane centered nontrivial zeros \(\lambda = \delta + i\gamma\) (\(\gamma > 0\)).
-Define \(m_\gamma\) as the total multiplicity of all upper-half-plane zeros at height \(\gamma\).
-Define the critical-line baseline reference function:
-\[
-\boxed{
-\Xi^\flat(z) = \prod_{\gamma > 0} \left(1 + \frac{z^2}{\gamma^2}\right)^{m_\gamma}.
-}
-\]
+Product premises:
+1. **Exclusion of Real Nontrivial Zeros**: \(\zeta(s) \ne 0\) for \(s \in (0, 1)\), so \(\gamma = \Im \lambda \ne 0\).
+2. **Paired Hadamard Factorization**:
+   \[
+   \Xi(z) = \Xi(0) \prod_{\lambda \in \Lambda^+} \left(1 - \frac{z^2}{\lambda^2}\right)^{m_\lambda}.
+   \]
+3. **General Multiplicity Formula**: At each distinct zero height \(\gamma > 0\):
+   \[
+   m_\gamma = m_{0,\gamma} + 2 \sum_{j} n_{j,\gamma},
+   \]
+   where \(m_{0,\gamma} \ge 0\) is critical-line multiplicity (\(\delta=0\)) and \(n_{j,\gamma} \ge 0\) is off-line quartet multiplicity for radial orbit \(j\) (\(\delta_{j,\gamma} > 0\)).
+4. **Baseline Reference Function**:
+   \[
+   \boxed{
+   \Xi^\flat(z) = \prod_{\gamma > 0} \left(1 + \frac{z^2}{\gamma^2}\right)^{m_\gamma}.
+   }
+   \]
 The Radial-Defect Quotient is:
 \[
 \boxed{
-Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)}.
+Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)} = \prod_{j} \left( Q_{\delta_j,\gamma_j}(z) \right)^{n_j}.
 }
 \]
 
@@ -2114,8 +2126,14 @@ q_{\delta,\gamma}(x) = \frac{\gamma^4 \left[ (x^2 + \gamma^2 - \delta^2)^2 + 4\d
 }
 \]
 Exact audited properties:
-1. **Positivity and Boundedness**: \(0 < q_{\delta,\gamma}(x) \le 1\) for all \(x\in\mathbb R\), with equality iff \(x=0\) (for \(\delta \ne 0\)) and \(q_{0,\gamma}(x) \equiv 1\).
-2. **Unique Minimum**: \(x_*^2 = \delta^2 + 3\gamma^2\).
+1. **Positivity, Boundedness, and Exact Defect Factorization**:
+   \[
+   0 < q_{\delta,\gamma}(x) \le 1 \quad \forall x\in\mathbb R,
+   \qquad
+   1 - q_{\delta,\gamma}(x) = \frac{\delta^2 x^2 \left[(\delta^2 + 2\gamma^2)x^2 + 2\gamma^2(\delta^2 + 3\gamma^2)\right]}{(\delta^2+\gamma^2)^2 (x^2+\gamma^2)^2} \ge 0.
+   \]
+   Equality \(q(x)=1\) holds iff \(x=0\) (for \(\delta \ne 0\)) and \(q_{0,\gamma}(x) \equiv 1\).
+2. **Extremum in \(u = x^2\) and Real Minimizers**: Unique minimum in \(u = x^2 \ge 0\) at \(u_* = \delta^2 + 3\gamma^2\), corresponding to two real minimizers \(x = \pm\sqrt{\delta^2 + 3\gamma^2}\).
 3. **Minimum Value**: \(q_{\min} = \frac{4}{(1+r)^2(4+r)}\) where \(r = \delta^2/\gamma^2\).
 4. **Uniform Domination Estimate**:
    \[
@@ -2124,10 +2142,19 @@ Exact audited properties:
 5. **Limiting Invariant**:
    \[
    \boxed{
-   L_Q = \lim_{x\to\infty} Q(x) = \prod_{\text{off-line quartets}} \left(\frac{\gamma^2}{\gamma^2+\delta^2}\right)^{2n_\gamma}.
+   L_Q = \lim_{x\to\infty} Q(x) = \prod_{j} \left(\frac{\gamma_j^2}{\gamma_j^2+\delta_j^2}\right)^{2n_j} = \prod_j (1 + r_j)^{-2n_j}.
    }
    \]
    Spectral equivalence: \(0 < L_Q \le 1\), and \(L_Q = 1 \iff \mathrm{RH}\).
+6. **Grade-Indexed Covariance**: Under grade dilation \(s_K = \tau^K s \implies z_K = \tau^K z\):
+   \[
+   \boxed{
+   Q_K(z_K) = Q_0(\tau^{-K} z_K),
+   \qquad
+   Q_K(\tau^K z) = Q_0(z),
+   }
+   \]
+   while the displacement spectrum \(\{r_\lambda = \delta_\lambda^2/\gamma_\lambda^2\}\), \(L_Q\), and \(\operatorname{Tr}\mathcal R\) are strictly grade-invariant.
 
 ## 37.3 Relative Fredholm spectral formulation
 Define the positive diagonal trace-class operator \(\mathcal R\) on \(\ell^2(\Lambda^+)\) by:
@@ -2169,8 +2196,13 @@ Define the rational kernel:
 \]
 Exact involution identity:
 \[
+z + z^\# = 2i\gamma \implies (z+z^\#)^2 = -4\gamma^2,
+\qquad
+z z^\# = -(\delta^2+\gamma^2).
+\]
+\[
 \boxed{
-\kappa_1(z, z^\#) = \frac{\delta^2}{\gamma^2}.
+\kappa_1(z, z^\#) = \frac{4(-(\delta^2+\gamma^2))}{-4\gamma^2} - 1 = \frac{\delta^2+\gamma^2}{\gamma^2} - 1 = \frac{\delta^2}{\gamma^2}.
 }
 \]
 Therefore:
@@ -2183,6 +2215,6 @@ Therefore:
 ## 38.2 Epistemic boundary and open research obligation
 1. **Closure under involution**: Functional equation and Schwarz reflection guarantee that the zero set is closed under \(\lambda \mapsto \lambda^\#\).
 2. **Open Research Theorem (OBL-RDQ-001)**: Can a divisor-independent arithmetic or spectral construction isolate the pairs \((\lambda, \lambda^\#)\) and evaluate \(\kappa_1\) to compute \(\operatorname{Tr}\mathcal R\) or \(D_\zeta(1)\)?
-3. **Grade Invariance**: \(Q(z)\), \(L_Q\), and \(\mathcal R\) are grade-invariant under \((x,\delta,\gamma)\mapsto(\tau^K x, \tau^K \delta, \tau^K \gamma)\); grade dilation alone does not force \(\operatorname{Tr}\mathcal R = 0\). Additional zeta-specific arithmetic content is required.
+3. **Grade Invariance**: \(L_Q\), \(\{r_\lambda\}\), and \(\mathcal R\) are grade-invariant under \((x,\delta,\gamma)\mapsto(\tau^K x, \tau^K \delta, \tau^K \gamma)\); grade dilation alone does not force \(\operatorname{Tr}\mathcal R = 0\). Additional zeta-specific arithmetic content is required.
 
 

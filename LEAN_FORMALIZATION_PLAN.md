@@ -662,20 +662,20 @@ The first implication remains the central mathematical discovery problem.
 
 Formalize finite algebraic firewall theorems in Lean 4 without introducing unproved infinite analytic axioms:
 
-1. **Rational involution pairing identity**:
-   For \(\kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1\), prove:
+1. **Rational involution pairing identity** (`kappa1_involutionSharp_eq_of_im_ne_zero`):
+   For \(\kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1\) and \(z^\# = -\bar z = -\delta + i\gamma\), prove in \(\mathbb C\):
    \[
-   \kappa_1(z, -\bar z) = \frac{\delta^2}{\gamma^2}, \qquad z = \delta + i\gamma, \ \gamma \ne 0.
+   \kappa_1(z, z^\#) = \frac{\delta^2}{\gamma^2}, \qquad z = \delta + i\gamma, \ \gamma \ne 0.
    \]
-2. **Finite trace non-negativity and vanishing**:
-   For any finite list of non-negative displacement ratios \(r_n = \delta_n^2 / \gamma_n^2 \ge 0\), prove:
+2. **Finite trace non-negativity and vanishing** (`list_sum_nonneg_eq_zero_iff`):
+   For any finite list \(l\) of non-negative displacement ratios \(r_n = \delta_n^2 / \gamma_n^2 \ge 0\), prove:
    \[
-   \sum_{n=1}^N r_n = 0 \iff \forall n \in \{1,\dots,N\},\ r_n = 0.
+   l.\mathrm{sum} = 0 \iff \forall x \in l,\ x = 0.
    \]
-3. **Finite determinant product equivalence**:
-   For any finite list of non-negative displacement ratios \(r_n \ge 0\), prove:
+3. **Finite determinant product equivalence** (`list_prod_one_plus_nonneg_eq_one_iff`):
+   For any finite list \(l\) of non-negative displacement ratios \(x \ge 0\), prove:
    \[
-   \prod_{n=1}^N (1 + r_n) = 1 \iff \forall n \in \{1,\dots,N\},\ r_n = 0.
+   (l.\mathrm{map}(1 + \cdot)).\mathrm{prod} = 1 \iff \forall x \in l,\ x = 0.
    \]
 
 Do not formalize infinite Hadamard products, infinite Fredholm determinants, or explicit-formula arithmetic representations as axioms. Record infinite analytic convergence as an explicit future formalization obligation.

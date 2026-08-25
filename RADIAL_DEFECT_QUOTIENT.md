@@ -16,7 +16,7 @@ s = \frac12 + z.
 }
 \]
 
-Define the centered completed Riemann zeta function:
+Define the centered completed Riemann xi function:
 
 \[
 \boxed{
@@ -34,11 +34,33 @@ The nontrivial zeros of \(\zeta(s)\) correspond to the centered zeros of \(\Xi(z
 \lambda = \delta + i\gamma.
 \]
 
-Let \(\Lambda^+\) be the multiset of centered nontrivial zeros in the upper half-plane (\(\gamma > 0\)), counted with multiplicity.
+### Product Premises and Hadamard Factorization
+1. **Exclusion of Real Nontrivial Zeros**: Since \(\zeta(s) \ne 0\) for \(s \in (0, 1)\), every nontrivial zero has non-zero imaginary coordinate \(\gamma = \Im \lambda \ne 0\).
+2. **Paired Hadamard Factorization**: Because \(\Xi(z)\) is an entire function of order 1, \(\Xi(0) \ne 0\), and \(\Xi(-z) = \Xi(z)\) is even, its zeros pair symmetrically as \(\pm \lambda\). The genus-1 Hadamard product with symmetric \(\pm \lambda\) pairing takes the form:
 
-For each distinct height \(\gamma > 0\), define \(m_\gamma\) as the total multiplicity of **all** upper-half-plane zeros at height \(\gamma\) (including hypothetical off-line zeros \(\delta \ne 0\)).
+\[
+\boxed{
+\Xi(z) = \Xi(0) \prod_{\lambda \in \Lambda^+} \left(1 - \frac{z^2}{\lambda^2}\right)^{m_\lambda},
+}
+\]
 
-Define the critical-line baseline reference function:
+where \(\Lambda^+\) is the multiset of centered nontrivial zeros in the upper half-plane (\(\gamma > 0\)).
+
+3. **General Multiplicity Formula**:
+At each distinct zero height \(\gamma > 0\), the total zero multiplicity \(m_\gamma\) is:
+
+\[
+\boxed{
+m_\gamma = m_{0,\gamma} + 2 \sum_{j} n_{j,\gamma},
+}
+\]
+
+where:
+- \(m_{0,\gamma} \ge 0\) is the multiplicity of on-line critical-line zeros at height \(\gamma\) (\(\delta = 0\));
+- \(n_{j,\gamma} \ge 0\) is the multiplicity of off-line quartets in radial orbit \(j\) at height \(\gamma\) with displacement \(\delta_{j,\gamma} > 0\).
+
+4. **Baseline Reference Function**:
+Define the critical-line baseline reference function matching total zero multiplicity at each height \(\gamma > 0\):
 
 \[
 \boxed{
@@ -58,23 +80,29 @@ Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)}.
 }
 \]
 
-By Hadamard's factorization theorem of genus 1, since \(\Xi(z)\) is an entire function of order 1 and even in \(z\) (\(\Xi(-z) = \Xi(z)\)), the zeros of \(\Xi(z)\) occur in symmetric quartets \(\pm\delta \pm i\gamma\) (for \(\delta \ne 0\)) or pairs \(\pm i\gamma\) (for \(\delta = 0\)).
+For each on-line zero pair (\(\delta = 0\)), the factor \((1 + z^2/\gamma^2)^{m_{0,\gamma}}\) in \(\Xi(z)/\Xi(0)\) cancels identically with the corresponding factor in \(\Xi^\flat(z)\).
 
-For a critical-line pair (\(\delta = 0\)), the factor in \(\Xi(z)/\Xi(0)\) is \(1 + z^2/\gamma^2\), which cancels identically with the corresponding factor in \(\Xi^\flat(z)\).
-
-For a hypothetical off-line quartet \(\{\pm\delta \pm i\gamma\}\) with multiplicity \(n_\gamma\) (such that \(m_\gamma = 2n_\gamma\)), the four zeros contribute to \(\Xi(z)/\Xi(0)\) the normalized factor:
+For each off-line quartet \(\{\pm\delta_j \pm i\gamma_j\}\) with multiplicity \(n_j\), the four zeros contribute to \(\Xi(z)/\Xi(0)\) the normalized factor:
 
 \[
-\left(1 - \frac{z}{\delta + i\gamma}\right)\left(1 - \frac{z}{-\delta + i\gamma}\right)\left(1 - \frac{z}{\delta - i\gamma}\right)\left(1 - \frac{z}{-\delta - i\gamma}\right)
+\left(1 - \frac{z}{\delta_j + i\gamma_j}\right)\left(1 - \frac{z}{-\delta_j + i\gamma_j}\right)\left(1 - \frac{z}{\delta_j - i\gamma_j}\right)\left(1 - \frac{z}{-\delta_j - i\gamma_j}\right)
 =
-\frac{(z^2 - (\delta+i\gamma)^2)(z^2 - (\delta-i\gamma)^2)}{(\delta^2+\gamma^2)^2}.
+\frac{(z^2 - (\delta_j+i\gamma_j)^2)(z^2 - (\delta_j-i\gamma_j)^2)}{(\delta_j^2+\gamma_j^2)^2}.
 \]
 
-Dividing by the corresponding baseline factor in \(\Xi^\flat(z)\), namely \((1 + z^2/\gamma^2)^2 = \frac{(z^2+\gamma^2)^2}{\gamma^4}\), yields the quartet quotient factor:
+Dividing by the corresponding baseline factor in \(\Xi^\flat(z)\), namely \((1 + z^2/\gamma_j^2)^2 = \frac{(z^2+\gamma_j^2)^2}{\gamma_j^4}\), yields the quartet quotient factor:
 
 \[
 \boxed{
-Q_{\delta,\gamma}(z) = \frac{\gamma^4 \left[ (z^2 - \delta^2 + \gamma^2)^2 + 4\delta^2\gamma^2 \right]}{(\gamma^2+\delta^2)^2 (z^2+\gamma^2)^2}.
+Q_{\delta_j,\gamma_j}(z) = \frac{\gamma_j^4 \left[ (z^2 - \delta_j^2 + \gamma_j^2)^2 + 4\delta_j^2\gamma_j^2 \right]}{(\gamma_j^2+\delta_j^2)^2 (z^2+\gamma_j^2)^2}.
+}
+\]
+
+The full quotient is therefore factored over all off-line radial orbits \(j\):
+
+\[
+\boxed{
+Q(z) = \prod_{j} \left( Q_{\delta_j,\gamma_j}(z) \right)^{n_j}.
 }
 \]
 
@@ -98,26 +126,40 @@ q_{\delta,\gamma}(x) = \frac{\gamma^4 \left[ (x^2 + \gamma^2 - \delta^2)^2 + 4\d
 \]
 Equality \(q_{\delta,\gamma}(x) = 1\) holds if and only if \(x = 0\) (when \(\delta \ne 0\)). If \(\delta = 0\), \(q_{0,\gamma}(x) \equiv 1\).
 
-*Proof*:
-Subtracting \(q_{\delta,\gamma}(x)\) from 1:
-\[
-1 - q_{\delta,\gamma}(x) = \frac{x^2 \delta^2 \gamma^4 \left[ 2(\gamma^2+\delta^2)x^2 + 2(\gamma^2+\delta^2)^2 + 4\gamma^2(\gamma^2-\delta^2) \right]}{(\gamma^2+\delta^2)^2 (x^2+\gamma^2)^2} \ge 0.
-\]
-Because \(\delta^2 < 1/4 < \gamma_1^2 \approx 199.8\), the numerator is strictly positive for all \(x \ne 0\).
+*Exact Defect Factorization*:
+Subtracting \(q_{\delta,\gamma}(x)\) from 1 gives the exact algebraic factorization:
 
-### Property 2: Unique Extremum
-The unique minimum of \(q_{\delta,\gamma}(x)\) occurs at:
 \[
 \boxed{
-x_*^2 = \delta^2 + 3\gamma^2.
+1 - q_{\delta,\gamma}(x) = \frac{\delta^2 x^2 \left[(\delta^2 + 2\gamma^2)x^2 + 2\gamma^2(\delta^2 + 3\gamma^2)\right]}{(\delta^2+\gamma^2)^2 (x^2+\gamma^2)^2} \ge 0.
+}
+\]
+
+Because \(\delta^2 \ge 0\) and \(\gamma > 0\), the numerator is strictly positive for all \(x \ne 0\) when \(\delta \ne 0\).
+
+### Property 2: Extremum in \(u = x^2\) and Real Minimizers
+In the variable \(u = x^2 \ge 0\), \(q(u)\) has a **unique minimum** at:
+
+\[
+\boxed{
+u_* = \delta^2 + 3\gamma^2.
+}
+\]
+
+Equivalently, along the real line \(x \in \mathbb R\), \(q_{\delta,\gamma}(x)\) has **two symmetric real minimizers** at:
+
+\[
+\boxed{
+x = \pm \sqrt{\delta^2 + 3\gamma^2}.
 }
 \]
 
 ### Property 3: Exact Minimum Value
 Writing the scale-invariant ratio \(r = \frac{\delta^2}{\gamma^2}\):
+
 \[
 \boxed{
-q_{\min} = q_{\delta,\gamma}(x_*) = \frac{4}{(1+r)^2(4+r)}.
+q_{\min} = q_{\delta,\gamma}\left(\pm\sqrt{\delta^2+3\gamma^2}\right) = \frac{4}{(1+r)^2(4+r)}.
 }
 \]
 
@@ -127,7 +169,7 @@ q_{\min} = q_{\delta,\gamma}(x_*) = \frac{4}{(1+r)^2(4+r)}.
 \sup_{x\in\mathbb R} |\log q_{\delta,\gamma}(x)| = 2\log(1+r) + \log\left(1 + \frac{r}{4}\right) \le \frac{9}{4}r.
 }
 \]
-*Significance*: Because \(\sum_{\gamma} \frac{\delta^2}{\gamma^2} < \infty\), the bound \(\frac{9}{4}\frac{\delta^2}{\gamma^2}\) provides the uniform domination necessary for absolute and uniform convergence and limit/product interchange.
+*Significance*: Because \(\sum_{j} n_j \frac{\delta_j^2}{\gamma_j^2} < \infty\), the bound \(\frac{9}{4}\frac{\delta^2}{\gamma^2}\) provides the uniform domination necessary for absolute and uniform convergence and limit/product interchange.
 
 ---
 
@@ -139,11 +181,11 @@ Taking the asymptotic limit as \(x \to \infty\) along the real centered axis:
 \lim_{x\to\infty} q_{\delta,\gamma}(x) = \frac{\gamma^4}{(\gamma^2+\delta^2)^2} = \left(\frac{\gamma^2}{\gamma^2+\delta^2}\right)^2 = (1+r)^{-2}.
 \]
 
-Therefore, the limiting invariant is:
+Therefore, the limiting invariant indexed over all off-line radial orbits \(j\) is:
 
 \[
 \boxed{
-L_Q = \lim_{x\to\infty} Q(x) = \prod_{\text{off-line quartets}} \left(\frac{\gamma^2}{\gamma^2+\delta^2}\right)^{2n_\gamma}.
+L_Q = \lim_{x\to\infty} Q(x) = \prod_{j} \left(\frac{\gamma_j^2}{\gamma_j^2+\delta_j^2}\right)^{2n_j} = \prod_j (1 + r_j)^{-2n_j}.
 }
 \]
 
@@ -180,7 +222,7 @@ For the test function \(H(z) = \log z\), the projection-subtracted quartet respo
 Thus, the \(L_Q\) defect already lies inside the projection-subtracted EF-013 construction:
 
 \[
--\log L_Q = 2 \sum_{\text{quartets}} d(\delta,\gamma).
+-\log L_Q = 2 \sum_{j} n_j d(\delta_j,\gamma_j).
 \]
 
 ### Reasons for Bridge Failure
@@ -191,27 +233,59 @@ The failure of EF-013 to provide an arithmetic proof of RH stems from three dist
 
 ### Audited Withdrawal
 > [!NOTE]
-> The historical conjecture that EF-013 had the "wrong \(\gamma\)-curvature" was audited and found to be incorrect: \(H(z)=\log z\) yields exactly the curvature \(d(\delta,\gamma)\). The claim of wrong \(\gamma\)-curvature is **withdrawn** and preserved in the ledger with its mathematical justification.
+> The historical conjecture that EF-013 had the "wrong \(\gamma\)-curvature" was audited and found to be incorrect: \(H(z)=\log z\) yields exactly the curvature \(d(\delta,\gamma)\). The claim of wrong \(\gamma\)-curvature is **withdrawn** (`WDR-001`) and preserved in the ledger with its mathematical justification.
 
 ---
 
 ## 6. Scoped Classification of the Projection Trap (EF-018 / OBL-EF-003)
 
-The Projection Trap is formally classified with precise method-class boundaries:
+### The Scoped One-Point No-Go Theorem
+
+Let \(H\) be a holomorphic test function defined on a vertical strip containing the critical strip, and let \(G = H + H \circ (-\mathrm{id})\) be the symmetrized even holomorphic function.
+
+The quartet response of \(H\) across a symmetric configuration at \(z = \delta + i\gamma\) is:
+
+\[
+A_H(\delta, \gamma) = 2 \Re G(\delta + i\gamma).
+\]
+
+**Theorem (Scoped One-Point No-Go)**:
+If \(A_H(\delta, \gamma)\) is independent of \(\delta\) on an open displacement interval \(I \ni 0\) for each \(\gamma\) in an open interval, then \(G(z)\) is identically constant on its domain of holomorphy.
+
+*Proof*:
+Write \(G(u + iv) = U(u,v) + iV(u,v)\) in real and imaginary parts. Then \(A_H(\delta, \gamma) = 2 U(\delta, \gamma)\).
+The hypothesis that \(A_H(\delta, \gamma)\) is independent of \(\delta\) implies:
+
+\[
+\frac{\partial U}{\partial u}(\delta, \gamma) = 0
+\]
+
+identically on an open set \(I \times J \subset \mathbb R^2\).
+By the Cauchy-Riemann equations for the holomorphic function \(G\):
+
+\[
+\frac{\partial V}{\partial v} = \frac{\partial U}{\partial u} = 0,
+\qquad
+\frac{\partial V}{\partial u} = -\frac{\partial U}{\partial v}.
+\]
+
+Differentiating \(\frac{\partial U}{\partial u} = 0\) with respect to \(v\) yields \(\frac{\partial^2 U}{\partial v \partial u} = 0\), which together with harmonicity \(\frac{\partial^2 U}{\partial u^2} + \frac{\partial^2 U}{\partial v^2} = 0\) and \(\frac{\partial U}{\partial u} = 0\) implies \(\frac{\partial^2 U}{\partial v^2} = 0\).
+Therefore \(\frac{\partial U}{\partial v}\) is constant. Since \(G\) is even, \(U(u,v) = U(-u, -v)\), which forces \(\frac{\partial U}{\partial v}(0,0) = 0\), so \(\frac{\partial U}{\partial v} = 0\) everywhere.
+Thus \(G'(z) = \frac{\partial U}{\partial u} - i\frac{\partial U}{\partial v} = 0\) on an open connected domain, forcing \(G(z) \equiv C\) to be constant. \(\blacksquare\)
+
+### Method-Class Boundaries
 
 \[
 \boxed{
 \begin{aligned}
 \textbf{CLOSED:}&\ \text{For fixed linear combinations of direct one-point holomorphic} \\
-&\ \text{Riemann–Weil statistics over an open displacement family.} \\
-\textbf{OPEN:}&\ \text{For nonlinear paired, determinantal, operator, or independently} \\
-&\ \text{constructed comparison objects.}
+&\ \text{Riemann–Weil statistics over an open displacement family, and locally} \\
+&\ \text{uniform limits of such linear combinations.} \\
+\textbf{OPEN:}&\ \text{For nonlinear paired, sesquilinear, determinantal, operator, or} \\
+&\ \text{independently constructed zeta-divisor-specific comparison objects.}
 \end{aligned}
 }
 \]
-
-- The no-go result proves that no linear 1-point test function can independently evaluate the projected divisor \(\mathcal P_0(\mathcal D_\zeta)\) from arithmetic data alone.
-- It does **not** prove that nonlinear paired or determinantal constructions are impossible.
 
 ---
 
@@ -302,12 +376,13 @@ Define the rational pairing kernel:
 Evaluating \(\kappa_1\) on the pair \((z, z^\#)\):
 
 \[
-z + z^\# = 2i\gamma,
-\qquad
-z z^\# = -(\delta^2 - \gamma^2 + 2i\delta\gamma)^\# \dots = -(\delta+i\gamma)(\delta-i\gamma) = -(\delta^2+\gamma^2).
+z + z^\# = (\delta + i\gamma) + (-\delta + i\gamma) = 2i\gamma \implies (z + z^\#)^2 = -4\gamma^2.
 \]
 \[
-\kappa_1(z, z^\#) = \frac{4(-(\delta^2+\gamma^2))}{(2i\gamma)^2} - 1 = \frac{-4(\delta^2+\gamma^2)}{-4\gamma^2} - 1 = \frac{\delta^2+\gamma^2}{\gamma^2} - 1 = \frac{\delta^2}{\gamma^2}.
+z z^\# = (\delta + i\gamma)(-\delta + i\gamma) = -\delta^2 + i\delta\gamma - i\delta\gamma - \gamma^2 = -(\delta^2+\gamma^2).
+\]
+\[
+\kappa_1(z, z^\#) = \frac{4(-(\delta^2+\gamma^2))}{-4\gamma^2} - 1 = \frac{\delta^2+\gamma^2}{\gamma^2} - 1 = \frac{\delta^2}{\gamma^2}.
 \]
 
 \[
@@ -324,7 +399,7 @@ Therefore, the relative trace is:
 }
 \]
 
-### The Open Research Theorem
+### The Open Research Theorem (OBL-RDQ-001)
 \[
 \boxed{
 \text{Can a divisor-independent arithmetic construction isolate the } (\lambda, \lambda^\#) \text{ pairs and evaluate } \kappa_1?
@@ -338,10 +413,20 @@ Therefore, the relative trace is:
 
 ---
 
-## 10. Transcendental Continuation and Grade Invariance
+## 10. Transcendental Continuation and Grade Covariance
 
 1. **Radial Class Preservation**: Transcendental continuation \(\mathcal X_\tau(s,k) = \xi(\tau^{-k}s)\) transports zero worldlines \(s_\rho(k) = \tau^k\rho\) while preserving normalized radial coordinate \(R_\tau \equiv \delta\).
-2. **Grade Invariance of \(Q\), \(L_Q\), and \(\mathcal R\)**:
+2. **Grade-Indexed Covariance of \(Q\)**:
+   - Under coordinate dilation at grade \(K\), \(s_K = \tau^K s \implies z_K = \tau^K z\).
+   - The grade-\(K\) quotient \(Q_K(z_K) = \frac{\Xi_K(z_K)}{\Xi_K(0)\Xi_K^\flat(z_K)}\) satisfies the exact covariance relation:
+     \[
+     \boxed{
+     Q_K(z_K) = Q_0(\tau^{-K} z_K),
+     \qquad
+     Q_K(\tau^K z) = Q_0(z).
+     }
+     \]
+3. **Grade Invariance of Spectrum and Limits**:
    - Under uniform dilation \((x, \delta, \gamma) \mapsto (\tau^K x, \tau^K \delta, \tau^K \gamma)\), the dimensionless ratios \(x/\gamma\) and \(\delta/\gamma\) are strictly invariant.
-   - Consequently, \(q_{\delta,\gamma}(x)\), \(Q(z)\), \(L_Q\), and the spectral operator \(\mathcal R\) are **grade-invariant**.
-3. **Rigidity Requirement**: Ordinary coordinate grade dilation does not supply the rigidity law. The rigidity source must contain additional zeta-specific arithmetic content (the Euler product / prime structure).
+   - Consequently, the limiting invariant \(L_Q = \lim_{x\to\infty} Q_0(x) = \lim_{x_K\to\infty} Q_K(x_K)\), the displacement spectrum \(\{r_\lambda = \delta_\lambda^2/\gamma_\lambda^2\}\), and the spectral operator trace \(\operatorname{Tr}\mathcal R\) are **strictly grade-invariant**.
+4. **Rigidity Requirement**: Coordinate grade dilation does not supply the rigidity law. The rigidity source must contain additional zeta-specific arithmetic content (the Euler product / prime structure).

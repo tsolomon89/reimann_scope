@@ -1,11 +1,11 @@
 /-
 RiemannScope.RadialDefect
 Radial projection operator, defect divisor, and second-order orbit energy.
-Reference: MATH_CONTRACT.md §36
+Reference: MATH_CONTRACT.md §36, §37, §38
 -/
-
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
+import Mathlib.Algebra.BigOperators.Group.List
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
@@ -69,6 +69,133 @@ theorem kappa1_pairing_algebraic (δ γ : ℝ) (hγ : γ ≠ 0) :
     _ = (4 / 4) * (δ ^ 2 / γ ^ 2) := by ring
     _ = 1 * (δ ^ 2 / γ ^ 2) := by rw [div_self h4]
     _ = δ ^ 2 / γ ^ 2 := by ring
+
+/-- Exact complex involution pairing theorem:
+    For any centered zero z with z.im ≠ 0, kappa_1(z, z^#) evaluates in ℂ to ⟨z.re^2 / z.im^2, 0⟩. -/
+theorem kappa1_involutionSharp_eq_of_im_ne_zero (z : ℂ) (hz : z.im ≠ 0) :
+    kappa1 z (involutionSharp z) = ⟨z.re ^ 2 / z.im ^ 2, 0⟩ := by
+  dsimp [kappa1, involutionSharp]
+  have h4 : (-4 : ℝ) ≠ 0 := by norm_num
+  have hzim2 : z.im ^ 2 ≠ 0 := pow_ne_zero 2 hz
+  have hdenom_nz : -4 * z.im ^ 2 ≠ 0 := mul_ne_zero h4 hzim2
+  have h_sum : z + (⟨-z.re, z.im⟩ : ℂ) = ⟨0, 2 * z.im⟩ := by
+    apply Complex.ext
+    · dsimp; ring
+    · dsimp; ring
+  have h_denom : ((z + (⟨-z.re, z.im⟩ : ℂ)) ^ 2) = Complex.ofReal (-4 * z.im ^ 2) := by
+    rw [h_sum, sq]
+    apply Complex.ext
+    · dsimp [Complex.ofReal]
+      ring
+    · dsimp [Complex.ofReal]
+      ring
+  have h_num : 4 * z * (⟨-z.re, z.im⟩ : ℂ) = Complex.ofReal (-4 * (z.re ^ 2 + z.im ^ 2)) := by
+    apply Complex.ext
+    · dsimp [Complex.ofReal]
+      ring
+    · dsimp [Complex.ofReal]
+      ring
+  rw [h_denom, h_num]
+  have h_div : Complex.ofReal (-4 * (z.re ^ 2 + z.im ^ 2)) / Complex.ofReal (-4 * z.im ^ 2) =
+      Complex.ofReal ((-4 * (z.re ^ 2 + z.im ^ 2)) / (-4 * z.im ^ 2)) := by
+    exact (Complex.ofReal_div _ _).symm
+  rw [h_div]
+  have h_one : (1 : ℂ) = Complex.ofReal 1 := rfl
+  rw [h_one]
+  have h_sub : Complex.ofReal ((-4 * (z.re ^ 2 + z.im ^ 2)) / (-4 * z.im ^ 2)) - Complex.ofReal 1 =
+      Complex.ofReal (((-4 * (z.re ^ 2 + z.im ^ 2)) / (-4 * z.im ^ 2)) - 1) := by
+    exact (Complex.ofReal_sub _ _).symm
+  rw [h_sub]
+  have h_alg : (-4 * (z.re ^ 2 + z.im ^ 2)) / (-4 * z.im ^ 2) - 1 = z.re ^ 2 / z.im ^ 2 := by
+    calc (-4 * (z.re ^ 2 + z.im ^ 2)) / (-4 * z.im ^ 2) - 1
+      _ = (-4 * (z.re ^ 2 + z.im ^ 2)) / (-4 * z.im ^ 2) - 1 := rfl
+      _ = (-4 * z.re ^ 2 + -4 * z.im ^ 2) / (-4 * z.im ^ 2) - 1 := by ring_nf
+      _ = (-4 * z.re ^ 2) / (-4 * z.im ^ 2) + (-4 * z.im ^ 2) / (-4 * z.im ^ 2) - 1 := by rw [add_div]
+      _ = (-4 * z.re ^ 2) / (-4 * z.im ^ 2) + 1 - 1 := by rw [div_self hdenom_nz]
+      _ = (-4 * z.re ^ 2) / (-4 * z.im ^ 2) := by ring
+      _ = (-4 / -4) * (z.re ^ 2 / z.im ^ 2) := by ring
+      _ = 1 * (z.re ^ 2 / z.im ^ 2) := by rw [div_self h4]
+      _ = z.re ^ 2 / z.im ^ 2 := by ring
+  rw [h_alg]
+  rfl
+
+/-- Non-negativity lemma for list sum of non-negative reals. -/
+lemma list_sum_nonneg (l : List ℝ) (hl : ∀ x ∈ l, 0 ≤ x) : 0 ≤ l.sum := by
+  induction l with
+  | nil => simp
+  | cons head tail ih =>
+    simp only [List.sum_cons]
+    have h_head : 0 ≤ head := hl head (List.Mem.head _)
+    have h_tail : ∀ x ∈ tail, 0 ≤ x := fun x hx => hl x (List.Mem.tail _ hx)
+    have h_tail_sum : 0 ≤ tail.sum := ih h_tail
+    exact add_nonneg h_head h_tail_sum
+
+/-- Arbitrary finite-family sum vanishing firewall:
+    For any finite list of non-negative reals, their sum is zero if and only if every element is zero. -/
+theorem list_sum_nonneg_eq_zero_iff (l : List ℝ) (hl : ∀ x ∈ l, 0 ≤ x) :
+    l.sum = 0 ↔ ∀ x ∈ l, x = 0 := by
+  induction l with
+  | nil =>
+    simp
+  | cons head tail ih =>
+    simp only [List.sum_cons, List.mem_cons, forall_eq_or_imp]
+    have h_head : 0 ≤ head := hl head (List.Mem.head _)
+    have h_tail : ∀ x ∈ tail, 0 ≤ x := fun x hx => hl x (List.Mem.tail _ hx)
+    have ih' := ih h_tail
+    have h_tail_sum_nonneg : 0 ≤ tail.sum := list_sum_nonneg tail h_tail
+    constructor
+    · intro h_sum
+      have h_zeroes : head = 0 ∧ tail.sum = 0 := by
+        constructor <;> linarith
+      have h_tail_all_zero := ih'.mp h_zeroes.2
+      exact ⟨h_zeroes.1, h_tail_all_zero⟩
+    · intro ⟨h_head_zero, h_tail_zero⟩
+      rw [h_head_zero]
+      have h_tail_sum_zero : tail.sum = 0 := ih'.mpr h_tail_zero
+      rw [h_tail_sum_zero, add_zero]
+
+/-- Lower bound lemma for product of (1 + x) over non-negative reals. -/
+lemma list_prod_one_plus_ge_one (l : List ℝ) (hl : ∀ x ∈ l, 0 ≤ x) : 1 ≤ (l.map (fun x => 1 + x)).prod := by
+  induction l with
+  | nil => simp
+  | cons head tail ih =>
+    simp only [List.map_cons, List.prod_cons]
+    have h_head : 0 ≤ head := hl head (List.Mem.head _)
+    have h_tail : ∀ x ∈ tail, 0 ≤ x := fun x hx => hl x (List.Mem.tail _ hx)
+    have ih' := ih h_tail
+    have h1head : 1 ≤ 1 + head := by linarith
+    have h_prod_ge : 1 * 1 ≤ (1 + head) * (tail.map (fun x => 1 + x)).prod :=
+      mul_le_mul h1head ih' (by linarith) (by linarith)
+    rw [one_mul] at h_prod_ge
+    exact h_prod_ge
+
+/-- Arbitrary finite-family Fredholm determinant product firewall:
+    For any finite list of non-negative reals, the product of (1 + x) is one if and only if every element is zero. -/
+theorem list_prod_one_plus_nonneg_eq_one_iff (l : List ℝ) (hl : ∀ x ∈ l, 0 ≤ x) :
+    (l.map (fun x => 1 + x)).prod = 1 ↔ ∀ x ∈ l, x = 0 := by
+  induction l with
+  | nil =>
+    simp
+  | cons head tail ih =>
+    simp only [List.map_cons, List.prod_cons, List.mem_cons, forall_eq_or_imp]
+    have h_head : 0 ≤ head := hl head (List.Mem.head _)
+    have h_tail : ∀ x ∈ tail, 0 ≤ x := fun x hx => hl x (List.Mem.tail _ hx)
+    have ih' := ih h_tail
+    have h_tail_prod_ge_one : 1 ≤ (tail.map (fun x => 1 + x)).prod := list_prod_one_plus_ge_one tail h_tail
+    constructor
+    · intro h_prod
+      have h1head : 0 ≤ 1 + head := by linarith
+      have h_prod_ge : (1 + head) * 1 ≤ (1 + head) * (tail.map (fun x => 1 + x)).prod :=
+        mul_le_mul_of_nonneg_left h_tail_prod_ge_one h1head
+      rw [mul_one] at h_prod_ge
+      rw [h_prod] at h_prod_ge
+      have h_head_zero : head = 0 := by linarith
+      rw [h_head_zero, add_zero, one_mul] at h_prod
+      have h_tail_all_zero := ih'.mp h_prod
+      exact ⟨h_head_zero, h_tail_all_zero⟩
+    · intro ⟨h_head_zero, h_tail_zero⟩
+      rw [h_head_zero, add_zero, one_mul]
+      exact ih'.mpr h_tail_zero
 
 /-- Finite non-negative sum vanishing firewall: r1 ≥ 0 ∧ r2 ≥ 0 ∧ r1 + r2 = 0 ⟹ r1 = 0 ∧ r2 = 0. -/
 theorem nonneg_sum_two_eq_zero (r1 r2 : ℝ) (h1 : 0 ≤ r1) (h2 : 0 ≤ r2) (h : r1 + r2 = 0) :

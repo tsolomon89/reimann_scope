@@ -129,6 +129,19 @@ class TestRadialFactorProperties:
                 assert mpmath.almosteq(q_native, q_scaled, abs_eps=mpmath.mpf('1e-75'))
 
 
+    def test_exact_symbolic_factorization_one_minus_q(self):
+        r"""Exact symbolic regression test verifying:
+        1 - q_{\delta,\gamma}(x) \equiv \frac{\delta^2 x^2 [(\delta^2 + 2\gamma^2)x^2 + 2\gamma^2(\delta^2 + 3\gamma^2)]}{(\delta^2+\gamma^2)^2 (x^2+\gamma^2)^2}.
+        """
+        import sympy as sp
+        x, d, g = sp.symbols('x delta gamma', real=True)
+        q_expr = (g**4 * ((x**2 + g**2 - d**2)**2 + 4 * d**2 * g**2)) / ((g**2 + d**2)**2 * (x**2 + g**2)**2)
+        one_minus_q_direct = 1 - q_expr
+        one_minus_q_formula = (d**2 * x**2 * ((d**2 + 2 * g**2) * x**2 + 2 * g**2 * (d**2 + 3 * g**2))) / ((d**2 + g**2)**2 * (x**2 + g**2)**2)
+        diff = sp.simplify(one_minus_q_direct - one_minus_q_formula)
+        assert diff == 0
+
+
 class TestExplicitFormulaProjectionIdentity:
     """Verifies the exact identity between H = log z projection-subtraction and L_Q defect."""
 
@@ -174,28 +187,66 @@ class TestRelativeFredholmAndInvolutionKernel:
                 assert mpmath.almosteq(k1_val.imag, mpmath.mpf('0.0'), abs_eps=mpmath.mpf('1e-75'))
 
     def test_finite_trace_and_determinant_bookkeeping(self):
-        """Tr(R) = sum (delta_i^2 / gamma_i^2), det(I + R) = L_Q^(-1), and log det(I + R) = Tr log(I + R)."""
+        """Tr(R) = sum (delta_i^2 / gamma_i^2), det(I + R_fin) = L_Q_fin^(-1), log det(I + R_fin) = Tr log(I + R_fin).
+        
+        Properly represents:
+        - both upper-half-plane members (+delta + i*gamma) and (-delta + i*gamma) of each off-line quartet;
+        - multiplicities n > 1;
+        - mixed on-line and off-line zeros at the same height;
+        - direct invocation and equality with finite_radial_defect_quotient_limit.
+        """
         with mpmath.workdps(80):
-            # Synthetic 4-zero upper-half-plane configuration (2 on-line, 2 off-line)
-            zeros = [
-                ('0.0', '14.134725141734693790457251983562470270784257115699243175685567460149963429809256765'),
-                ('0.05', '21.0220396387715549926284795938969027773343405240800097280697728819448216345688564'),
-                ('0.0', '25.0108575801456887632137909925628218186595503025257913077395041042735787611029285'),
-                ('0.10', '30.4248761258595132103118975305840213005930600857105404054974154970420912180405298'),
+            g1 = '14.134725141734693790457251983562470270784257115699243175685567460149963429809256765'
+            g2 = '21.0220396387715549926284795938969027773343405240800097280697728819448216345688564'
+            g3 = '25.0108575801456887632137909925628218186595503025257913077395041042735787611029285'
+
+            d1 = '0.05'
+            d2 = '0.10'
+
+            # Define quartets:
+            # - Quartet 1 at height g2 with displacement d1 (multiplicity 1)
+            # - Quartet 2 at height g3 with displacement d2 (multiplicity 2)
+            quartets = [
+                (d1, g2),
+                (d2, g3),
+                (d2, g3),  # Multiplicity 2
             ]
 
-            trace_val = finite_radial_operator_trace(zeros, dps=80)
-            det_val = finite_radial_fredholm_det(zeros, t=1, dps=80)
+            # In upper half-plane Lambda^+, each off-line quartet has two roots (+-delta + i*gamma).
+            # We also include mixed on-line zeros at g1 (multiplicity 2) and g2 (multiplicity 1, coexisting with quartet 1).
+            zeros_upper = [
+                # On-line zeros at g1
+                ('0.0', g1),
+                ('0.0', g1),
+                # Mixed on-line zero at g2
+                ('0.0', g2),
+                # Quartet 1 upper members at g2 (+- d1 + i*g2)
+                (d1, g2),
+                (f'-{d1}', g2),
+                # Quartet 2 upper members at g3 (multiplicity 2 -> 2 pairs of +- d2 + i*g3)
+                (d2, g3),
+                (f'-{d2}', g3),
+                (d2, g3),
+                (f'-{d2}', g3),
+            ]
 
-            # Manual sum
-            r1 = (mpmath.mpf('0.05') ** 2) / (mpmath.mpf('21.0220396387715549926284795938969027773343405240800097280697728819448216345688564') ** 2)
-            r2 = (mpmath.mpf('0.10') ** 2) / (mpmath.mpf('30.4248761258595132103118975305840213005930600857105404054974154970420912180405298') ** 2)
-            expected_trace = r1 + r2
-            expected_det = (1 + r1) * (1 + r2)
+            # Trace of R over Lambda^+
+            trace_val = finite_radial_operator_trace(zeros_upper, dps=80)
+            det_val = finite_radial_fredholm_det(zeros_upper, t=1, dps=80)
+            lq_val = finite_radial_defect_quotient_limit(quartets, dps=80)
 
+            # Verification of exact identities:
+            # 1. det(I + R_fin) == L_Q_fin^(-1)
+            assert mpmath.almosteq(det_val, mpmath.mpf(1) / lq_val, abs_eps=mpmath.mpf('1e-75'))
+
+            # 2. log det(I + R_fin) == -log L_Q_fin
+            assert mpmath.almosteq(mpmath.log(det_val), -mpmath.log(lq_val), abs_eps=mpmath.mpf('1e-75'))
+
+            # 3. Explicit ratio sum
+            r1 = (to_mpf(d1, dps=80) ** 2) / (to_mpf(g2, dps=80) ** 2)
+            r2 = (to_mpf(d2, dps=80) ** 2) / (to_mpf(g3, dps=80) ** 2)
+            expected_trace = 2 * r1 + 4 * r2  # 2 upper zeros for quartet 1, 4 for quartet 2
             assert mpmath.almosteq(trace_val, expected_trace, abs_eps=mpmath.mpf('1e-75'))
-            assert mpmath.almosteq(det_val, expected_det, abs_eps=mpmath.mpf('1e-75'))
-            assert mpmath.almosteq(mpmath.log(det_val), mpmath.log(1 + r1) + mpmath.log(1 + r2), abs_eps=mpmath.mpf('1e-75'))
 
     def test_finite_trace_zero_equivalence(self):
         """Tr(R_fin) == 0 iff all delta_i == 0."""

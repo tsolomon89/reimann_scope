@@ -747,9 +747,10 @@ The research campaign evaluates the second-order radial response of the Riemannâ
      \min_{u_{-n} \ge 0} \|K_{\cdot, n} u_n - K_{-n} u_{-n}\|^2.
      \]
    - In the sampled 30-channel basis over 100 zeros, numerical nullity is high (\(\approx 85\)) and conditioning is \(\sim 10^{15}\); non-negative least squares yields heterogeneous diagnostic results (compensation was found at the \(10^{-5}\) threshold for zeros 10 and 50 with relative residuals \(\sim 10^{-10}\) and \(\sim 10^{-7}\); compensation was not found at this threshold for peripheral zeros 1 and 100).
-4. **The Projection Trap**:
+4. **The Scoped Projection Trap (OBL-EF-003)**:
    - The actual zero divisor \(\mathcal D_\zeta\) has an arithmetic explicit-formula representation, while its critical-line projection \(\mathcal P_0(\mathcal D_\zeta)\) has no known independent arithmetic representation.
-   - Inferring radial rigidity (\(\Delta\mathcal D_{\mathrm{rad}} = 0\)) from the projected defect remains the unproved missing theorem.
+   - For any even holomorphic test function \(G\), the Cauchy-Riemann equations prove that \(\delta\)-independence of the quartet response \(2\Re G(\delta+i\gamma)\) forces \(G\) to be constant.
+   - **Classification**: **CLOSED** for fixed linear combinations and locally uniform limits of direct 1-point holomorphic Riemannâ€“Weil evaluations; **OPEN** for nonlinear paired, determinantal, operator, or independently constructed comparison objects (`OBL-RDQ-001`).
 5. **Structural Countermodels**:
    - Davenportâ€“Heilbronn and Epstein zeta functions demonstrate that functional-equation reflection symmetry and coordinate covariance alone do not exclude off-line zeros.
 6. **Epistemic Classification**:
@@ -762,18 +763,28 @@ The research campaign evaluates the second-order radial response of the Riemannâ
 The project focuses its live research kernel on the canonical Radial-Defect Quotient and its relative Fredholm formulation:
 
 1. **The Radial-Defect Quotient \(Q(z)\)**:
-   In centered coordinates \(z = s - 1/2 = \delta + it\), let \(\Xi(z) = \xi(1/2 + z)\). With baseline reference function \(\Xi^\flat(z) = \prod_{\gamma > 0} (1 + z^2/\gamma^2)^{m_\gamma}\), define:
+   In centered coordinates \(z = s - 1/2 = \delta + it\), let \(\Xi(z) = \xi(1/2 + z)\).
+   Product premises:
+   - Exclusion of real nontrivial zeros (\(\zeta(s) \ne 0\) on \((0,1) \implies \gamma = \Im \lambda \ne 0\)).
+   - Paired Hadamard factorization: \(\Xi(z) = \Xi(0) \prod_{\lambda\in\Lambda^+} (1 - z^2/\lambda^2)^{m_\lambda}\).
+   - General multiplicity formula: \(m_\gamma = m_{0,\gamma} + 2\sum_j n_{j,\gamma}\).
+   - Baseline reference function: \(\Xi^\flat(z) = \prod_{\gamma > 0} (1 + z^2/\gamma^2)^{m_\gamma}\).
+   Define:
    \[
    \boxed{
-   Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)}.
+   Q(z) = \frac{\Xi(z)}{\Xi(0) \Xi^\flat(z)} = \prod_j \left( Q_{\delta_j, \gamma_j}(z) \right)^{n_j}.
    }
    \]
-   On the real centered axis \(z = x \in \mathbb R\), each off-line quartet contributes a factor \(0 < q_{\delta,\gamma}(x) \le 1\) with unique minimum \(x_*^2 = \delta^2 + 3\gamma^2\) and minimum value \(q_{\min} = \frac{4}{(1+r)^2(4+r)}\) (\(r = \delta^2/\gamma^2\)).
+   On the real centered axis \(z = x \in \mathbb R\), each off-line quartet contributes a factor \(0 < q_{\delta,\gamma}(x) \le 1\) with exact defect factorization:
+   \[
+   1 - q_{\delta,\gamma}(x) = \frac{\delta^2 x^2 \left[(\delta^2 + 2\gamma^2)x^2 + 2\gamma^2(\delta^2 + 3\gamma^2)\right]}{(\delta^2+\gamma^2)^2 (x^2+\gamma^2)^2} \ge 0.
+   \]
+   Unique minimum in \(u = x^2 \ge 0\) at \(u_* = \delta^2 + 3\gamma^2\), corresponding to two real minimizers \(x = \pm\sqrt{\delta^2 + 3\gamma^2}\), with minimum value \(q_{\min} = \frac{4}{(1+r)^2(4+r)}\) (\(r = \delta^2/\gamma^2\)).
 
 2. **The Limiting Invariant \(L_Q\)**:
    \[
    \boxed{
-   L_Q = \lim_{x\to\infty} Q(x) = \prod_{\text{off-line quartets}} \left(\frac{\gamma^2}{\gamma^2+\delta^2}\right)^{2n_\gamma}.
+   L_Q = \lim_{x\to\infty} Q(x) = \prod_{j} \left(\frac{\gamma_j^2}{\gamma_j^2+\delta_j^2}\right)^{2n_j} = \prod_j (1 + r_j)^{-2n_j}.
    }
    \]
    Spectral equivalence: \(0 < L_Q \le 1\), and \(L_Q = 1 \iff \mathrm{RH}\).
@@ -791,7 +802,7 @@ The project focuses its live research kernel on the canonical Radial-Defect Quot
    Positivity \(\mathcal R \ge 0\) yields \(\operatorname{Tr}\mathcal R = 0 \iff \mathcal R = 0 \iff \mathrm{RH}\).
 
 4. **Reflection-Paired Involution Kernel \(\kappa_1\)**:
-   For \(z = \delta + i\gamma\) and \(z^\# = -\bar z = -\delta + i\gamma\), the rational pairing kernel:
+   For \(z = \delta + i\gamma\) and \(z^\# = -\bar z = -\delta + i\gamma\), with \((z+z^\#)^2 = -4\gamma^2\) and \(zz^\# = -(\delta^2+\gamma^2)\), the rational pairing kernel:
    \[
    \kappa_1(z,w) = \frac{4zw}{(z+w)^2} - 1
    \]
@@ -804,7 +815,18 @@ The project focuses its live research kernel on the canonical Radial-Defect Quot
    }
    \]
 
-5. **The Minimal Live Open Theorem**:
+5. **Grade-Indexed Covariance**:
+   Under coordinate dilation \(s_K = \tau^K s \implies z_K = \tau^K z\):
+   \[
+   \boxed{
+   Q_K(z_K) = Q_0(\tau^{-K} z_K),
+   \qquad
+   Q_K(\tau^K z) = Q_0(z),
+   }
+   \]
+   while \(L_Q\), \(\{r_\lambda\}\), and \(\operatorname{Tr}\mathcal R\) are strictly grade-invariant.
+
+6. **The Minimal Live Open Theorem (OBL-RDQ-001)**:
    \[
    \boxed{
    \text{Can a divisor-independent arithmetic construction isolate the } (\lambda, \lambda^\#) \text{ pairs and evaluate } \kappa_1?
@@ -812,7 +834,6 @@ The project focuses its live research kernel on the canonical Radial-Defect Quot
    \]
    - Functional equation and Schwarz reflection supply zero-set closure under \(\lambda \mapsto \lambda^\#\).
    - Isolating the pairs without direct access to the zero divisor is the exact unresolved barrier.
-   - Transcendental continuation preserves radial class \(R_\tau \equiv \delta\), but ordinary grade dilation does not supply the rigidity law (\(Q, L_Q, \mathcal R\) are grade-invariant).
-   - The rigidity source must contain additional zeta-specific arithmetic content.
+   - Ordinary grade dilation does not supply the rigidity law; the rigidity source must contain additional zeta-specific arithmetic content.
 
 
