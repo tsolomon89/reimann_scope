@@ -156,4 +156,79 @@ theorem ConditionalArithmeticRadialBridge.all_defects_zero
     rw [← B.spectral_expansion, h_spec]
   exact (list_sum_nonneg_eq_zero_iff B.zero_defects B.nonneg_defects).mp h_sum_zero
 
+/-- 2-term symmetric radial curvature algebraic identity:
+    (d1 + d1)^2 + (d1 + d2)^2 + (d2 + d1)^2 + (d2 + d2)^2 = 2 * 2 * (d1^2 + d2^2) + 2 * (d1 + d2)^2. -/
+theorem sum_pairs_sq_two_terms (d1 d2 : ℝ) :
+    (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 =
+    2 * 2 * (d1 ^ 2 + d2 ^ 2) + 2 * (d1 + d2) ^ 2 := by
+  ring
+
+/-- 2-term reflection pair curvature theorem under d1 + d2 = 0:
+    The pair sum of squared displacements equals 2 * N * (d1^2 + d2^2) = 4 * (d1^2 + d2^2) = 8 * d1^2. -/
+theorem curvature_pair_symmetric (d1 d2 : ℝ) (h_sum : d1 + d2 = 0) :
+    (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d2 + d1) ^ 2 + (d2 + d2) ^ 2 =
+    2 * 2 * (d1 ^ 2 + d2 ^ 2) := by
+  have h_id := sum_pairs_sq_two_terms d1 d2
+  rw [h_sum] at h_id
+  linarith [h_id]
+
+/-- 4-term symmetric radial curvature algebraic identity:
+    The double sum of all pairs (d_a + d_b)^2 equals 2 * 4 * sum(d_a^2) + 2 * (sum d_a)^2. -/
+theorem sum_pairs_sq_four_terms (d1 d2 d3 d4 : ℝ) :
+    (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d1 + d3) ^ 2 + (d1 + d4) ^ 2 +
+    (d2 + d1) ^ 2 + (d2 + d2) ^ 2 + (d2 + d3) ^ 2 + (d2 + d4) ^ 2 +
+    (d3 + d1) ^ 2 + (d3 + d2) ^ 2 + (d3 + d3) ^ 2 + (d3 + d4) ^ 2 +
+    (d4 + d1) ^ 2 + (d4 + d2) ^ 2 + (d4 + d3) ^ 2 + (d4 + d4) ^ 2 =
+    2 * 4 * (d1 ^ 2 + d2 ^ 2 + d3 ^ 2 + d4 ^ 2) + 2 * (d1 + d2 + d3 + d4) ^ 2 := by
+  ring
+
+/-- 4-term symmetry-complete quartet curvature theorem under d1 + d2 + d3 + d4 = 0:
+    The double sum of squared displacements evaluates exactly to 2 * 4 * sum(d_a^2) = 8 * sum(d_a^2). -/
+theorem curvature_quartet_symmetric (d1 d2 d3 d4 : ℝ) (h_sum : d1 + d2 + d3 + d4 = 0) :
+    (d1 + d1) ^ 2 + (d1 + d2) ^ 2 + (d1 + d3) ^ 2 + (d1 + d4) ^ 2 +
+    (d2 + d1) ^ 2 + (d2 + d2) ^ 2 + (d2 + d3) ^ 2 + (d2 + d4) ^ 2 +
+    (d3 + d1) ^ 2 + (d3 + d2) ^ 2 + (d3 + d3) ^ 2 + (d3 + d4) ^ 2 +
+    (d4 + d1) ^ 2 + (d4 + d2) ^ 2 + (d4 + d3) ^ 2 + (d4 + d4) ^ 2 =
+    2 * 4 * (d1 ^ 2 + d2 ^ 2 + d3 ^ 2 + d4 ^ 2) := by
+  have h_id := sum_pairs_sq_four_terms d1 d2 d3 d4
+  rw [h_sum] at h_id
+  linarith [h_id]
+
+/-- Off-line quartet {δ, -δ, δ, -δ} exact curvature reduction:
+    Evaluates to 32 * δ^2, strictly positive whenever δ ≠ 0. -/
+theorem offline_quartet_curvature_val (δ : ℝ) :
+    (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (δ + δ) ^ 2 + (δ + -δ) ^ 2 +
+    (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 +
+    (δ + δ) ^ 2 + (δ + -δ) ^ 2 + (δ + δ) ^ 2 + (δ + -δ) ^ 2 +
+    (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 + (-δ + δ) ^ 2 + (-δ + -δ) ^ 2 =
+    32 * δ ^ 2 := by
+  ring
+
+/-- Structure representing a hypothetical divisor-independent separated sesquilinear signal bridge.
+    Models an arithmetic evaluator A_K''(0) matching the spectral second radial derivative M_K''(0). -/
+structure ConditionalSeparatedSignalBridge where
+    radial_variances : List ℝ
+    nonneg_variances : ∀ v ∈ radial_variances, 0 ≤ v
+    weights : List ℝ
+    pos_weights : ∀ w ∈ weights, 0 < w
+    lengths_match : weights.length = radial_variances.length
+    arithmetic_curvature_eval : ℤ → ℝ
+    spectral_curvature_eval : ℝ
+    bridge_identity : ∀ K : ℤ, arithmetic_curvature_eval K = spectral_curvature_eval
+    spectral_expansion : spectral_curvature_eval = (List.zipWith (· * ·) weights radial_variances).sum
+    arithmetic_anchor : ∃ K : ℤ, arithmetic_curvature_eval K = 0
+
+/-- Separated Signal Bridge Rigidity Theorem:
+    Under any valid ConditionalSeparatedSignalBridge with arithmetic vanishing anchor,
+    every represented radial variance vanishes (v_γ = 0), forcing all represented radial displacements δ = 0. -/
+theorem ConditionalSeparatedSignalBridge.all_variances_zero
+    (B : ConditionalSeparatedSignalBridge) :
+    ∀ v ∈ B.radial_variances, v = 0 := by
+  rcases B.arithmetic_anchor with ⟨K0, hK0⟩
+  have h_spec : B.spectral_curvature_eval = 0 := by
+    rw [← B.bridge_identity K0, hK0]
+  have h_sum_zero : (List.zipWith (· * ·) B.weights B.radial_variances).sum = 0 := by
+    rw [← B.spectral_expansion, h_spec]
+  exact (list_weighted_sum_nonneg_eq_zero_iff B.weights B.radial_variances B.pos_weights B.nonneg_variances B.lengths_match).mp h_sum_zero
+
 end RiemannScope

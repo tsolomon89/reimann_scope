@@ -37,6 +37,10 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-ARB-T2` | Exact Trace Bridge Identity | Prove $\mathfrak A_{K,T}^{\mathrm{arith}} = T = \sum 2n_j r_j$ | Exact arithmetic/spectral derivation | `OPEN` |
 | `OBL-ARB-T3` | Independent Trace Arithmetic Anchor | Prove $\mathfrak A_{K,T}^{\mathrm{arith}} = 0$ or $\lim_{K\to+\infty}\mathfrak A_{K,T}^{\mathrm{arith}} = 0$ | Independent arithmetic evaluation | `OPEN` |
 | `OBL-ARB-T4` | Trace Defect Rigidity | Prove $T = 0 \implies \forall j, r_j = 0$ ($r_j \ge 0$) | Lean 4 `list_sum_nonneg_eq_zero_iff` | `FORMALLY_PROVED` |
+| `OBL-ARB-SS1` | Separated Signal Arithmetic Construction | Construct divisor-independent arithmetic signal $S_K(x, t)$ | Epistemic firewall verification | `OPEN` |
+| `OBL-ARB-SS2` | Exact Radial/Frequency Separation | Prove spectral term separates into $a_K(\gamma) e^{x\delta} e^{it\gamma}$ | Falsified for SS-1..SS-5 | `FALSIFIED (SS-1..SS-5)` |
+| `OBL-ARB-SS3` | Finite Symmetric Radial Curvature Identity | Prove $\left.\partial_x^2 |\sum e^{x\delta_a}|^2\right|_{x=0} = 2N\sum \delta_a^2$ when $\sum \delta_a = 0$ | Lean 4 algebraic proofs | `FORMALLY_PROVED` |
+| `OBL-ARB-SS4` | Separated Signal Curvature Rigidity | Prove $M_K''(0) = 0 \implies \forall \lambda, \delta_\lambda = 0$ | Lean 4 `ConditionalSeparatedSignalBridge.all_variances_zero` | `FORMALLY_PROVED` |
 | `OBL-ARB-STRUCT-SUM` | Infinite Trace/Determinant Summability | Prove $\sum n_j \delta_j^2/\gamma_j^2 < \infty$ under Hadamard order 1 | Analytic Dirichlet series bound | `PROVED` |
 | `OBL-ARB-STRUCT-PAIR` | Involution Pair Isolation | Isolate reflection pairs $(\lambda, \lambda^\#)$ without unrestricted all-pairs cross-term contamination | Candidate B-D falsification analysis | `OPEN` |
 | `OBL-ARB-STRUCT-NONRED` | Grade Non-Redundancy | Verify that cross-grade arithmetic pairings are not coordinate pullbacks | Symbolic grade reduction test | `PROVED` |

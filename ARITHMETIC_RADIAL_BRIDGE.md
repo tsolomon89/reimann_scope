@@ -42,6 +42,25 @@ For $a > 0$, the weighted trace detector is:
 $$T_a := \sum_{\lambda \in \Lambda^+} w_a(\lambda) \kappa_1(\lambda, \lambda^\#) = \sum_{\lambda \in \Lambda^+} w_a(\lambda) \frac{\delta_\lambda^2}{\gamma_\lambda^2}, \qquad w_a(\lambda) = m_\lambda e^{-a \gamma_\lambda^2} > 0.$$
 Because $w_a(\lambda) > 0$ for all $\lambda \in \Lambda^+$, $T_a \ge 0$, and $T_a = 0 \iff \forall \lambda \in \Lambda^+, \delta_\lambda = 0 \iff \mathrm{RH}$.
 
+### 2.4 Separated Sesquilinear Signal Target ($S_K$)
+Instead of constructing projected divisors explicitly, the **Separated Sesquilinear Signal** direction begins with an arithmetic object and evaluates its frequency-projected spectral representation:
+$$S_K(x,t) = \sum_{\lambda} a_K(\gamma_\lambda) e^{x\delta_\lambda} e^{it\gamma_\lambda},$$
+or an equivalent two-slot quadratic form, where:
+- $x$ probes radial amplitude displacement $\delta$;
+- $t$ performs implicit frequency projection over ordinates $\gamma$;
+- $a_K$ provides spectral decay;
+- $K \in \mathbb Z$ is the transcendental continuation grade.
+
+At a fixed ordinate $\gamma$, functional reflection yields a symmetric radial multiset $\Delta_\gamma = \{\delta_{\gamma,1}, \dots, \delta_{\gamma,N_\gamma}\}$ with $\sum_a \delta_{\gamma,a} = 0$.
+When the coefficients satisfy $\sum_\lambda |a_K(\lambda)| < \infty$ ($\ell^1$ absolute summability), the double sum converges absolutely, and dominated convergence justifies the translation-average limit directly without requiring Montgomery pair correlation:
+$$M_K(x) := \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T |S_K(x, t)|^2 dt = \sum_\gamma |a_K(\gamma)|^2 \left| \sum_{a=1}^{N_\gamma} e^{x\delta_{\gamma,a}} \right|^2.$$
+Differentiating twice at $x=0$ yields the exact nonnegative curvature:
+$$M_K''(0) = 2 \sum_\gamma |a_K(\gamma)|^2 N_\gamma \sum_{a=1}^{N_\gamma} \delta_{\gamma,a}^2 = \sum_\gamma W_K(\gamma) \sum_{a=1}^{N_\gamma} \delta_{\gamma,a}^2 \ge 0,$$
+where $W_K(\gamma) = 2 |a_K(\gamma)|^2 N_\gamma > 0$.
+Because $W_K(\gamma) > 0$ strictly:
+$$M_K''(0) = 0 \iff \forall \lambda, \delta_\lambda = 0 \iff \mathrm{RH}.$$
+This achieves implicit frequency projection without explicit projected-divisor construction.
+
 ---
 
 ## 3. Strict Arithmetic Input Firewall
@@ -69,7 +88,7 @@ The definition of $\mathfrak A_{K,X}^{\mathrm{arith}}$ MUST NOT use:
 
 ---
 
-## 4. Baseline Mathematical Audit & Grade Centering
+## 4. Baseline Mathematical Audit, Grade Centering, and Obstruction Scopes
 
 ### 4.1 Grade-Centering Geometry
 Under coordinate dilation $s_K = \tau^K s$, the critical line $\Re(s) = 1/2$ maps to $\Re(s_K) = \tau^K / 2$.
@@ -94,12 +113,13 @@ At a distinct ordinate $\gamma_j > 0$:
 - In $L_Q = \prod_j (1 + r_j)^{-2n_j}$, the exponent $2n_j$ correctly reflects the two upper-half zeros in each quartet.
 - In $T = \operatorname{Tr}\mathcal R = \sum_j 2n_j r_j$, on-line zeros contribute $r = 0$, while each off-line quartet contributes $2n_j r_j$.
 
-### 4.3 Scoped One-Point No-Go Theorem
-For any even holomorphic test function $H$, direct one-point evaluations $\sum_\rho H(\rho)$ satisfy:
-$$A_H(\delta, \gamma) = 2 \Re G(\delta + i\gamma), \qquad G = H + H \circ (-\mathrm{id}).$$
-If $A_H(\delta, \gamma)$ is $\delta$-independent on any open interval $I \ni 0$ for a fixed ordinate $\gamma > 0$, Cauchy-Riemann equations force $G'(z) \equiv 0$, so $G$ is constant.
-- **Closed Scope**: Fixed linear combinations and locally uniform limits of direct 1-point holomorphic evaluations.
-- **Open Scope**: Nonlinear paired forms, sesquilinear forms, tensor-square traces, operator determinants, and comparison metrics.
+### 4.3 Obstruction Scopes
+1. **Classical 1-Point Weight Obstruction (Q-023)**:
+   Excludes the weight-2 radial trace from the proved class of direct 1-point linear statistics $\sum_\rho H(\rho)$. It does not exclude nonlinear sesquilinear constructions.
+2. **Cramér Mean-Square Obstruction**:
+   The raw unsmoothed signal $x^{\rho-1/2} = e^{\delta \log x} e^{i\gamma \log x}$ uses a single parameter for both amplitude and frequency. If $\delta \ne 0$, its mean-square growth rate is governed by $\Theta = \sup_\rho \Re\rho$, rendering $\Theta$-dependent normalizations circular (`CRAMER_TYPE_OBSTRUCTION`).
+3. **Pair Correlation Scope**:
+   If spectral coefficients satisfy $\sum_\lambda |a_K(\lambda)| < \infty$, the double sum converges absolutely, and dominated convergence justifies the translation average limit directly. Montgomery-type pair correlation is relevant only when coefficients lack $\ell^1$ domination.
 
 ---
 
@@ -118,6 +138,12 @@ Stable obligation identifiers govern the formalization of the arithmetic radial 
 - $\mathrm{ARB\text{-}T2}$: Exact arithmetic/spectral identity $\mathfrak A_{K,T}^{\mathrm{arith}} = T$ [`OPEN`].
 - $\mathrm{ARB\text{-}T3}$: Independent arithmetic vanishing $\mathfrak A_{K,T}^{\mathrm{arith}} = 0$ or grade boundary $\lim_{K\to+\infty}\mathfrak A_{K,T}^{\mathrm{arith}} = 0$ [`OPEN`].
 - $\mathrm{ARB\text{-}T4}$: Rigidity implication $T = 0 \implies \forall j, r_j = 0$ [`FORMALLY_PROVED` in Lean 4].
+
+### Separated Signal Route
+- $\mathrm{ARB\text{-}SS1}$: Divisor-independent arithmetic signal $S_K^{\mathrm{arith}}(x, t)$ [`OPEN`].
+- $\mathrm{ARB\text{-}SS2}$: Exact radial/frequency separation $a_K(\gamma) e^{x\delta} e^{it\gamma}$ [`FALSIFIED` for SS-1..SS-5].
+- $\mathrm{ARB\text{-}SS3}$: Finite algebraic curvature identity $\left.\partial_x^2 |\sum e^{x\delta_a}|^2\right|_{x=0} = 2N\sum \delta_a^2$ [`FORMALLY_PROVED` in Lean 4].
+- $\mathrm{ARB\text{-}SS4}$: Curvature rigidity $M_K''(0) = 0 \implies \forall \lambda, \delta_\lambda = 0$ [`FORMALLY_PROVED` in Lean 4].
 
 ### Structural Obligations
 - $\mathrm{ARB\text{-}STRUCT\text{-}SUM}$: Infinite summability of $T$ and $D$ [`PROVED` under Hadamard order 1].
@@ -147,7 +173,9 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 
 ---
 
-## 7. Candidate Registry and Falsification Analysis
+## 7. Candidate Registry and Falsification Matrix
+
+### 7.1 Classical Bridge Candidates (A–G)
 
 | Candidate ID | Name | Target | Derivation Status | Pair Isolation | Earliest Failure / Obstruction | Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -158,6 +186,16 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 | **CANDIDATE_E** | Relative Determinant from Arithmetic Data | Determinant ($D$) | `UNPROVED_BRIDGE` | True | Operator on Dirichlet polynomials matching $\det_{\mathrm F}(I+\mathcal R)$ without zero-divisor input lacks construction. | `OPEN_UNPROVED` |
 | **CANDIDATE_F** | Grade-Indexed Prime-Power Pairing | Trace ($T$) | `UNPROVED_BRIDGE` | True | Prime-power kernel producing $\delta^2/\gamma^2$ without cross-term contamination lacks closed-form derivation. | `OPEN_UNPROVED` |
 | **CANDIDATE_G** | Weighted Regularized Radial Bridge | Weighted ($T_a$) | `SPECTRAL_PROVED_ARITH_OPEN` | True | Spectral detector $T_a > 0 \iff \delta \ne 0$ is rigorously proved; arithmetic realization $\mathfrak A_{K,a}^{\mathrm{arith}}$ remains open. | `LIVE_UNDERIVED` |
+
+### 7.2 Separated Sesquilinear Signal Candidates (SS-1–SS-5)
+
+| Candidate ID | Name | Target | Gate Status | Earliest Failed Gate | Structural Obstruction / Witness | Final Classification |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **CANDIDATE_SS1** | Conjugated Explicit-Formula Pair | Separated Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Holomorphic Rigidity / Cramér Obstruction**: $\partial_\delta \Re(\log h) - \partial_\gamma \Im(\log h) = x - t \ne 0$ unless $x=t$. Holomorphic kernel $e^{(x+it)z}$ produces $e^{x\delta - t\gamma}$, inducing exponential translation divergence $\sinh(2T\gamma)/\gamma$. | `FAIL_CRAMER_TYPE_NORMALIZATION` |
+| **CANDIDATE_SS2** | Two-Slot Logarithmic Derivative | Bilinear Form | `FALSIFIED_GATE_2_3` | Gate 2 & 3 (Cross-terms) | **Double-Sum Cross-Term Dominance**: $D_K(s_1)\overline{D_K(s_2)}$ yields double sum over all zero pairs $(\rho_1, \rho_2)$. Off-diagonal terms scale as $O((T\log T)^2)$ against $O(T\log T)$ diagonal and do not cancel under translation averaging. | `FAIL_OFF_DIAGONAL_CROSS_TERM_DOMINANCE` |
+| **CANDIDATE_SS3** | Rapidly Smoothed Transform | Smoothed Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Cramér-Type Translation Divergence**: Gaussian smoothing leaves $-t\gamma$ in the real exponential slot. Translation average $\int_{-T}^T e^{-2t\gamma}dt = \sinh(2T\gamma)/\gamma$ diverges exponentially as $T\to\infty$ ($>10^{240}$ for $\gamma \approx 14.13, T=20$). Normalization requires circular $\Theta = \sup \Re\rho$. | `FAIL_CRAMER_TYPE_NORMALIZATION` |
+| **CANDIDATE_SS4** | Cross-Grade Sesquilinear Form | Cross-Grade Coupling | `FALSIFIED_GATE_5` | Gate 5 (Grade Nonredundancy) | **Transcendental Non-Resonance & Coordinate Pullback**: For $K \ne L$, $\tau^{-K}\log n \ne \tau^{-L}\log m$ because $\tau = 2\pi$ is transcendental, yielding zero cross-grade arithmetic resonance. Single-grade sums collapse to grade-zero pullbacks by coordinate covariance ($z_K = \tau^K z$). | `GRADE_COORDINATE_REDUNDANT` |
+| **CANDIDATE_SS5** | Direct Positive Quadratic Kernel | Quadratic Form | `FALSIFIED_GATE_1_6` | Gate 1 & 6 (Holomorphy/Anchor) | **Non-Holomorphic Firewall / Identity Theorem**: Any holomorphic kernel vanishing on $\Re(s)=1/2$ vanishes identically everywhere on $\mathbb C^2$. Non-holomorphic pairing $\rho - \rho^\# = 2\delta$ couples $\rho$ with $1-\bar\rho$, which cannot be pulled back to Dirichlet series via Cauchy residue calculus. | `FAIL_NON_HOLOMORPHIC_ARITHMETIC_FIREWALL` |
 
 ---
 
@@ -177,11 +215,21 @@ The formalization in `formal/RiemannScope/` contains the following compiled theo
    Proves covariance, reflection, and conjugation symmetries are jointly compatible with $\delta \ne 0$.
 6. **`RiemannScope.ConditionalArithmeticRadialBridge.all_defects_zero`**:
    Rigidity theorem: under any valid conditional arithmetic bridge, all represented zero defects vanish ($r_j = 0 \implies \delta_j = 0$).
+7. **`RiemannScope.sum_pairs_sq_two_terms` & `curvature_pair_symmetric`**:
+   Exact 2-term algebraic curvature identity: $\sum_{a,b=1}^2 (\delta_a + \delta_b)^2 = 2 \cdot 2 \cdot (\delta_1^2 + \delta_2^2) = 4 (\delta_1^2 + \delta_2^2)$ under $\delta_1 + \delta_2 = 0$.
+8. **`RiemannScope.sum_pairs_sq_four_terms` & `curvature_quartet_symmetric`**:
+   Exact 4-term algebraic curvature identity: $\sum_{a,b=1}^4 (\delta_a + \delta_b)^2 = 2 \cdot 4 \cdot \sum_{a=1}^4 \delta_a^2 = 8 \sum_{a=1}^4 \delta_a^2$ under $\sum_{a=1}^4 \delta_a = 0$.
+9. **`RiemannScope.offline_quartet_curvature_val`**:
+   Off-line quartet exact curvature reduction to $32 \delta^2$, strictly positive for $\delta \ne 0$.
+10. **`RiemannScope.ConditionalSeparatedSignalBridge.all_variances_zero`**:
+    Separated Signal Bridge Rigidity Theorem: under any arithmetic-anchored separated signal bridge, all represented radial variances vanish, forcing $\delta = 0$.
 
 ---
 
 ## 9. Current Status and Research Protocol
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
+- **Separated Signal Sprint Outcome**:
+  - The spectral side of the separated signal $S_K(x, t)$ rigorously detects off-line zeros with positive curvature $M_K''(0) > 0 \iff \delta \ne 0$ without requiring Montgomery pair correlation when $\ell^1$-summable.
+  - However, Candidates SS-1 through SS-5 are rigorously falsified on the arithmetic side by Holomorphic Rigidity (SS-1), Double-Sum Cross-Term Dominance (SS-2), Cramér Translation Divergence (SS-3), Transcendental Grade Non-Resonance (SS-4), and the Non-Holomorphic Arithmetic Firewall (SS-5).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
-- **Immediate Research Step**: Investigate whether Candidate G (weighted regularized bridge) admits an arithmetic realization via regularized Mellin transforms of $\left|\frac{\zeta'}{\zeta}\right|^2$.

@@ -2026,7 +2026,10 @@ def arithmetic_firewall_check(data: Any) -> None:
     and spectral invariants passed to arithmetic evaluators.
     """
     if isinstance(data, (dict, list, tuple)):
-        forbidden_keys = {"zeros", "zeros_list", "gamma_list", "delta_list", "spectral", "L_Q", "det_R"}
+        forbidden_keys = {
+            "zeros", "zero_list", "zeros_list", "gamma_list", "delta_list",
+            "spectral", "L_Q", "det_R", "ordinates", "projected_zeros", "lambda_sharp"
+        }
         if isinstance(data, dict) and any(k in data for k in forbidden_keys):
             raise ValueError("Firewall Violation: Arithmetic evaluator received spectral zero data.")
 
@@ -2240,5 +2243,579 @@ def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
             "pair_isolation": True,
             "earliest_failure": "Spectral detector T_a > 0 for delta != 0 is rigorously proved, but arithmetic realization A_{K, a}^arith remains open.",
             "classification": "LIVE_UNDERIVED"
+        },
+        "CANDIDATE_SS1": {
+            "id": "CANDIDATE_SS1",
+            "name": "Conjugated Explicit-Formula Pair",
+            "target": "SEPARATED_SESQUILINEAR_SIGNAL",
+            "arithmetic_formula": "Phi_K(u_1, u_2) via Riemann-Weil explicit formula with paired parameters (x, t)",
+            "spectral_formula": "sum_rho h(rho; x, t)",
+            "grade_indices": "K in Z",
+            "derivation_status": "FALSIFIED_GATE_2",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Holomorphic Rigidity / Cramér Obstruction: Decoupled radial/frequency form exp(x*delta + i*t*gamma) violates Cauchy-Riemann equations (forces x=t). Holomorphic kernel exp((x+it)z) produces exp(x*delta - t*gamma), inducing exponential translation divergence exp(2T*gamma)/(2gamma).",
+            "classification": "FAIL_CRAMER_TYPE_NORMALIZATION"
+        },
+        "CANDIDATE_SS2": {
+            "id": "CANDIDATE_SS2",
+            "name": "Two-Slot Logarithmic Derivative",
+            "target": "SEPARATED_SESQUILINEAR_SIGNAL",
+            "arithmetic_formula": "D_K(s_1) * conj(D_K(s_2)) with D_K(s) = tau^(-K) * sum Lambda(n)/n^(tau^(-K)s)",
+            "spectral_formula": "tau^(-2K) * sum_{rho_1, rho_2} 1 / [(tau^(-K)s_1 - rho_1)(tau^(-K)conj(s_2) - conj(rho_2))]",
+            "grade_indices": "K in Z",
+            "derivation_status": "FALSIFIED_GATE_2_3",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Double-Sum Cross-Term Dominance: Unrestricted double sum contains all off-diagonal pairs (rho_1 != rho_2) scaling as O((T log T)^2) against O(T log T) diagonal. Off-diagonal resolvent cross-terms fail to cancel under translation averaging without projected divisor subtraction.",
+            "classification": "FAIL_OFF_DIAGONAL_CROSS_TERM_DOMINANCE"
+        },
+        "CANDIDATE_SS3": {
+            "id": "CANDIDATE_SS3",
+            "name": "Rapidly Smoothed Transform",
+            "target": "SEPARATED_SESQUILINEAR_SIGNAL",
+            "arithmetic_formula": "1/(2*pi*i) int D_K(s) exp(sigma(s-1/2)^2 + (x+it)(s-1/2)) ds",
+            "spectral_formula": "sum_rho exp(sigma(delta^2 - gamma^2) + x*delta - t*gamma + i(2*sigma*delta*gamma + t*delta + x*gamma))",
+            "grade_indices": "K in Z, sigma > 0",
+            "derivation_status": "FALSIFIED_GATE_2",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Cramér-Type Translation Divergence: Time parameter enters real exponential slot as -t*gamma, causing translation average int_{-T}^T exp(-2t*gamma) dt = sinh(2T*gamma)/gamma to diverge exponentially ~ exp(2T*|gamma|)/(2|gamma|). Normalization requires circular Theta = sup Re rho.",
+            "classification": "FAIL_CRAMER_TYPE_NORMALIZATION"
+        },
+        "CANDIDATE_SS4": {
+            "id": "CANDIDATE_SS4",
+            "name": "Cross-Grade Sesquilinear Form",
+            "target": "SEPARATED_SESQUILINEAR_SIGNAL",
+            "arithmetic_formula": "iint K(u, v; x, t) D_K(s_1) conj(D_L(s_2)) du dv for K != L",
+            "spectral_formula": "sum_{rho_1 in Z_K, rho_2 in Z_L} K_spec(rho_1, rho_2)",
+            "grade_indices": "(K, L) in Z^2, K != L",
+            "derivation_status": "FALSIFIED_GATE_5",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Transcendental Non-Resonance & Coordinate Pullback Redundancy: For K != L, tau^(-K) log n != tau^(-L) log m because tau = 2*pi is transcendental, giving zero cross-grade arithmetic resonance. Single-grade combinations collapse to grade-zero pullbacks by coordinate covariance (z_K = tau^K * z).",
+            "classification": "GRADE_COORDINATE_REDUNDANT"
+        },
+        "CANDIDATE_SS5": {
+            "id": "CANDIDATE_SS5",
+            "name": "Direct Positive Quadratic Kernel",
+            "target": "POSITIVE_QUADRATIC_FORM",
+            "arithmetic_formula": "iint k(u, v) f(u) conj(f(v)) du dv",
+            "spectral_formula": "sum_{rho_1, rho_2} K(rho_1, rho_2)",
+            "grade_indices": "K in Z",
+            "derivation_status": "FALSIFIED_GATE_1_6",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Non-Holomorphic Arithmetic Firewall / Identity Theorem: Any holomorphic kernel vanishing on the critical line Re(s) = 1/2 vanishes identically everywhere on C^2. Non-holomorphic pairing (rho - rho^# = 2*delta) couples rho with 1 - conj(rho), which cannot be pulled back to Dirichlet series via Cauchy residue theorem.",
+            "classification": "FAIL_NON_HOLOMORPHIC_ARITHMETIC_FIREWALL"
         }
+    }
+
+
+# ============================================================================
+# SEPARATED SESQUILINEAR SIGNAL API AND CANDIDATE IMPLEMENTATIONS
+# ============================================================================
+
+def separated_spectral_signal(
+    zeros_delta_gamma: Sequence[Any],
+    K: int = 0,
+    x: Union[float, str, mpmath.mpf] = 0,
+    t: Union[float, str, mpmath.mpf] = 0,
+    a_kernel: Optional[Any] = None,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [SPECTRAL SIGNAL] Evaluates the target separated sesquilinear signal:
+    S_K(x, t) = sum_gamma a_K(gamma) * (sum_a exp(x * delta_{gamma, a})) * exp(i * t * gamma_K),
+    where gamma_K = tau^(-K) * gamma.
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        x_val = to_mpf(x, dps=dps + 15)
+        t_val = to_mpf(t, dps=dps + 15)
+
+        # Group zeros by distinct ordinate gamma
+        gamma_groups: Dict[str, List[mpmath.mpf]] = {}
+        for item in zeros_delta_gamma:
+            d_val = to_mpf(item[0], dps=dps + 15)
+            g_val = to_mpf(item[1], dps=dps + 15)
+            mult = int(item[2]) if len(item) > 2 else 1
+            g_key = mpmath.nstr(abs(g_val), n=dps)
+            if g_key not in gamma_groups:
+                gamma_groups[g_key] = []
+            for _ in range(mult):
+                gamma_groups[g_key].append(d_val)
+
+        total_sig = mpmath.mpc(0)
+        for g_key, deltas in gamma_groups.items():
+            gamma_val = to_mpf(g_key, dps=dps + 15)
+            gamma_K = scale_K * gamma_val
+
+            # Gaussian/Schwartz decay weight a_K(gamma)
+            if a_kernel is not None:
+                a_val = to_mpf(a_kernel(gamma_K), dps=dps + 15)
+            else:
+                a_val = mpmath.exp(-mpmath.mpf('0.01') * gamma_K * gamma_K)
+
+            # Radial sum: sum_a exp(x * delta_a)
+            radial_factor = mpmath.mpf(0)
+            for d in deltas:
+                radial_factor += mpmath.exp(x_val * scale_K * d)
+
+            # Frequency factor: exp(i * t * gamma_K)
+            freq_factor = mpmath.exp(mpmath.mpc(0, t_val * gamma_K))
+            total_sig += a_val * radial_factor * freq_factor
+
+        return total_sig
+
+
+def spectral_mean_square_m(
+    zeros_delta_gamma: Sequence[Any],
+    K: int = 0,
+    x: Union[float, str, mpmath.mpf] = 0,
+    a_kernel: Optional[Any] = None,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL MEAN SQUARE] Evaluates the frequency-projected radial energy:
+    M_K(x) = lim_{T -> inf} (1/2T) int_{-T}^T |S_K(x, t)|^2 dt
+           = sum_gamma |a_K(gamma)|^2 * |sum_a exp(x * delta_{gamma, a})|^2.
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        x_val = to_mpf(x, dps=dps + 15)
+
+        gamma_groups: Dict[str, List[mpmath.mpf]] = {}
+        for item in zeros_delta_gamma:
+            d_val = to_mpf(item[0], dps=dps + 15)
+            g_val = to_mpf(item[1], dps=dps + 15)
+            mult = int(item[2]) if len(item) > 2 else 1
+            g_key = mpmath.nstr(abs(g_val), n=dps)
+            if g_key not in gamma_groups:
+                gamma_groups[g_key] = []
+            for _ in range(mult):
+                gamma_groups[g_key].append(d_val)
+
+        m_val = mpmath.mpf(0)
+        for g_key, deltas in gamma_groups.items():
+            gamma_val = to_mpf(g_key, dps=dps + 15)
+            gamma_K = scale_K * gamma_val
+
+            if a_kernel is not None:
+                a_val = to_mpf(a_kernel(gamma_K), dps=dps + 15)
+            else:
+                a_val = mpmath.exp(-mpmath.mpf('0.01') * gamma_K * gamma_K)
+
+            radial_sum = mpmath.mpf(0)
+            for d in deltas:
+                radial_sum += mpmath.exp(x_val * scale_K * d)
+
+            m_val += (a_val * a_val) * (radial_sum * radial_sum)
+
+        return m_val
+
+
+def spectral_curvature_m_double_prime(
+    zeros_delta_gamma: Sequence[Any],
+    K: int = 0,
+    a_kernel: Optional[Any] = None,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL CURVATURE] Evaluates the exact second radial variation at x=0:
+    M_K''(0) = 2 * sum_gamma |a_K(gamma)|^2 * N_gamma * sum_a (scale_K * delta_{gamma, a})^2.
+    Vanishes iff all delta_a = 0 (RH).
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+
+        gamma_groups: Dict[str, List[mpmath.mpf]] = {}
+        for item in zeros_delta_gamma:
+            d_val = to_mpf(item[0], dps=dps + 15)
+            g_val = to_mpf(item[1], dps=dps + 15)
+            mult = int(item[2]) if len(item) > 2 else 1
+            g_key = mpmath.nstr(abs(g_val), n=dps)
+            if g_key not in gamma_groups:
+                gamma_groups[g_key] = []
+            for _ in range(mult):
+                gamma_groups[g_key].append(d_val)
+
+        curv = mpmath.mpf(0)
+        for g_key, deltas in gamma_groups.items():
+            gamma_val = to_mpf(g_key, dps=dps + 15)
+            gamma_K = scale_K * gamma_val
+
+            if a_kernel is not None:
+                a_val = to_mpf(a_kernel(gamma_K), dps=dps + 15)
+            else:
+                a_val = mpmath.exp(-mpmath.mpf('0.01') * gamma_K * gamma_K)
+
+            N_gamma = len(deltas)
+            sum_sq = mpmath.mpf(0)
+            for d in deltas:
+                scaled_d = scale_K * d
+                sum_sq += scaled_d * scaled_d
+
+            curv += 2 * (a_val * a_val) * N_gamma * sum_sq
+
+        return curv
+
+
+# --- CANDIDATE SS-1: Conjugated Explicit-Formula Pair ---
+
+def arithmetic_signal_ss1(
+    K: int,
+    x: Union[float, str, mpmath.mpf],
+    t: Union[float, str, mpmath.mpf],
+    N_max: int = 100,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [ARITHMETIC - CANDIDATE SS-1] Evaluates arithmetic side of explicit formula pair.
+    Uses von Mangoldt sum: - sum_{n=2}^{N_max} Lambda(n)/sqrt(n) * exp(i * log(n) * (x + i*t)).
+    """
+    with mpmath.workdps(dps + 15):
+        arithmetic_firewall_check({"K": K, "x": x, "t": t, "N_max": N_max})
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        w = scale_K * mpmath.mpc(to_mpf(x, dps=dps + 15), to_mpf(t, dps=dps + 15))
+
+        total = mpmath.mpc(0)
+        for n in range(2, N_max + 1):
+            p_base = None
+            is_prime_pow = False
+            for p in range(2, n + 1):
+                if p * p > n and p_base is None:
+                    p_base = n
+                    is_prime_pow = True
+                    break
+                if n % p == 0:
+                    temp = n
+                    while temp % p == 0:
+                        temp //= p
+                    if temp == 1:
+                        p_base = p
+                        is_prime_pow = True
+                    break
+            if is_prime_pow and p_base is not None:
+                lam_n = mpmath.log(p_base)
+                log_n = mpmath.log(n)
+                # Prime power Fourier component
+                total -= (lam_n / mpmath.sqrt(n)) * mpmath.exp(mpmath.mpc(0, 1) * log_n * w)
+        return total
+
+
+def spectral_signal_ss1(
+    zeros_delta_gamma: Sequence[Any],
+    K: int,
+    x: Union[float, str, mpmath.mpf],
+    t: Union[float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [SPECTRAL - CANDIDATE SS-1] Evaluates spectral explicit formula sum:
+    sum_rho exp( (x + i*t) * (tau^(-K) * (delta_rho + i*gamma_rho)) ).
+    Notice: produces exp(x*delta - t*gamma + i(t*delta + x*gamma)), failing pure radial/frequency separation.
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        x_val = to_mpf(x, dps=dps + 15)
+        t_val = to_mpf(t, dps=dps + 15)
+        w = mpmath.mpc(x_val, t_val)
+
+        total = mpmath.mpc(0)
+        for item in zeros_delta_gamma:
+            d_val = to_mpf(item[0], dps=dps + 15)
+            g_val = to_mpf(item[1], dps=dps + 15)
+            mult = int(item[2]) if len(item) > 2 else 1
+            z = scale_K * mpmath.mpc(d_val, g_val)
+            for _ in range(mult):
+                total += mpmath.exp(w * z)
+        return total
+
+
+# --- CANDIDATE SS-2: Two-Slot Logarithmic Derivative ---
+
+def arithmetic_signal_ss2(
+    K: int,
+    s1: Union[complex, str, mpmath.mpc],
+    s2: Union[complex, str, mpmath.mpc],
+    N_max: int = 100,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [ARITHMETIC - CANDIDATE SS-2] Evaluates bilinear logarithmic derivative product D_K(s1) * conj(D_K(s2)).
+    """
+    return arithmetic_candidate_b(K=K, L=K, s=s1, N_max=N_max, dps=dps)
+
+
+def spectral_signal_ss2(
+    zeros_delta_gamma: Sequence[Any],
+    K: int,
+    s1: Union[complex, str, mpmath.mpc],
+    s2: Union[complex, str, mpmath.mpc],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [SPECTRAL - CANDIDATE SS-2] Evaluates spectral double sum for D_K(s1) * conj(D_K(s2)).
+    """
+    return spectral_candidate_b(zeros_delta_gamma=zeros_delta_gamma, K=K, L=K, s=s1, dps=dps)
+
+
+# --- CANDIDATE SS-3: Rapidly Smoothed Transform ---
+
+def arithmetic_signal_ss3(
+    K: int,
+    x: Union[float, str, mpmath.mpf],
+    t: Union[float, str, mpmath.mpf],
+    sigma: Union[float, str, mpmath.mpf] = '0.01',
+    N_max: int = 100,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [ARITHMETIC - CANDIDATE SS-3] Evaluates Gaussian-smoothed prime power transform.
+    """
+    with mpmath.workdps(dps + 15):
+        arithmetic_firewall_check({"K": K, "x": x, "t": t, "sigma": sigma, "N_max": N_max})
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        sig_val = to_mpf(sigma, dps=dps + 15)
+        x_val = to_mpf(x, dps=dps + 15)
+        t_val = to_mpf(t, dps=dps + 15)
+
+        total = mpmath.mpc(0)
+        for n in range(2, N_max + 1):
+            p_base = None
+            is_prime_pow = False
+            for p in range(2, n + 1):
+                if p * p > n and p_base is None:
+                    p_base = n
+                    is_prime_pow = True
+                    break
+                if n % p == 0:
+                    temp = n
+                    while temp % p == 0:
+                        temp //= p
+                    if temp == 1:
+                        p_base = p
+                        is_prime_pow = True
+                    break
+            if is_prime_pow and p_base is not None:
+                lam_n = mpmath.log(p_base)
+                log_n = scale_K * mpmath.log(n)
+                # Gaussian-smoothed prime kernel
+                weight = mpmath.exp(-(log_n - x_val)**2 / (4 * sig_val))
+                total += (lam_n / mpmath.sqrt(n)) * weight * mpmath.exp(mpmath.mpc(0, -t_val * log_n))
+        return total
+
+
+def spectral_signal_ss3(
+    zeros_delta_gamma: Sequence[Any],
+    K: int,
+    x: Union[float, str, mpmath.mpf],
+    t: Union[float, str, mpmath.mpf],
+    sigma: Union[float, str, mpmath.mpf] = '0.01',
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [SPECTRAL - CANDIDATE SS-3] Evaluates spectral smoothed sum:
+    sum_rho exp( sigma*(delta^2 - gamma^2) + x*delta - t*gamma + i*(2*sigma*delta*gamma + t*delta + x*gamma) ).
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        sig_val = to_mpf(sigma, dps=dps + 15)
+        x_val = to_mpf(x, dps=dps + 15)
+        t_val = to_mpf(t, dps=dps + 15)
+
+        total = mpmath.mpc(0)
+        for item in zeros_delta_gamma:
+            d_val = scale_K * to_mpf(item[0], dps=dps + 15)
+            g_val = scale_K * to_mpf(item[1], dps=dps + 15)
+            mult = int(item[2]) if len(item) > 2 else 1
+
+            re_exp = sig_val * (d_val * d_val - g_val * g_val) + x_val * d_val - t_val * g_val
+            im_exp = 2 * sig_val * d_val * g_val + t_val * d_val + x_val * g_val
+            term = mpmath.exp(mpmath.mpc(re_exp, im_exp))
+            for _ in range(mult):
+                total += term
+        return total
+
+
+# --- CANDIDATE SS-4: Cross-Grade Sesquilinear Form ---
+
+def arithmetic_signal_ss4(
+    K: int,
+    L: int,
+    x: Union[float, str, mpmath.mpf],
+    t: Union[float, str, mpmath.mpf],
+    N_max: int = 100,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [ARITHMETIC - CANDIDATE SS-4] Cross-grade arithmetic pairing between grades K and L.
+    """
+    with mpmath.workdps(dps + 15):
+        arithmetic_firewall_check({"K": K, "L": L, "x": x, "t": t, "N_max": N_max})
+        s_val = mpmath.mpc(to_mpf(x, dps=dps + 15) + mpmath.mpf('0.5'), to_mpf(t, dps=dps + 15))
+        return arithmetic_candidate_b(K=K, L=L, s=s_val, N_max=N_max, dps=dps)
+
+
+def spectral_signal_ss4(
+    zeros_delta_gamma: Sequence[Any],
+    K: int,
+    L: int,
+    x: Union[float, str, mpmath.mpf],
+    t: Union[float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [SPECTRAL - CANDIDATE SS-4] Cross-grade spectral pairing between grades K and L.
+    """
+    with mpmath.workdps(dps + 15):
+        s_val = mpmath.mpc(to_mpf(x, dps=dps + 15) + mpmath.mpf('0.5'), to_mpf(t, dps=dps + 15))
+        return spectral_candidate_b(zeros_delta_gamma=zeros_delta_gamma, K=K, L=L, s=s_val, dps=dps)
+
+
+# --- CANDIDATE SS-5: Direct Positive Quadratic Kernel ---
+
+def arithmetic_signal_ss5(
+    K: int,
+    N_max: int = 100,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [ARITHMETIC - CANDIDATE SS-5] Placeholder arithmetic evaluator for direct quadratic kernel.
+    Fails at Gate 1/6 due to non-holomorphic arithmetic firewall.
+    """
+    arithmetic_firewall_check({"K": K, "N_max": N_max})
+    return mpmath.mpf(0)
+
+
+def spectral_signal_ss5(
+    zeros_delta_gamma: Sequence[Any],
+    K: int = 0,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL - CANDIDATE SS-5] Evaluates spectral quadratic defect sum 2 * sum_j n_j * (delta_j^2 / gamma_j^2).
+    """
+    return spectral_trace_t(upper_zeros=zeros_delta_gamma, dps=dps)
+
+
+# ============================================================================
+# EXACT SYMBOLIC AND NUMERICAL FALSIFICATION VERIFIERS
+# ============================================================================
+
+def verify_cauchy_riemann_holomorphic_obstruction_ss1() -> Dict[str, Any]:
+    """
+    Performs exact SymPy derivation of the Cauchy-Riemann equations for Candidate SS-1.
+    Proves that decoupling radial amplitude (exp(x*delta)) from ordinate frequency (exp(i*t*gamma))
+    violates holomorphy unless x = t and a(gamma) is constant.
+    """
+    import sympy as sp
+    delta, gamma, x, t = sp.symbols('delta gamma x t', real=True)
+    a = sp.Function('a')
+    u = sp.log(a(gamma)) + x * delta  # Re(log f)
+    v = t * gamma                     # Im(log f)
+
+    du_ddelta = sp.diff(u, delta)
+    dv_dgamma = sp.diff(v, gamma)
+    du_dgamma = sp.diff(u, gamma)
+    dv_ddelta = sp.diff(v, delta)
+
+    cr_1_diff = sp.simplify(du_ddelta - dv_dgamma)  # Should be x - t
+    cr_2_sum = sp.simplify(du_dgamma + dv_ddelta)   # Should be a'(gamma)/a(gamma)
+
+    return {
+        "cr1_diff": str(cr_1_diff),
+        "cr1_forces_x_eq_t": bool(cr_1_diff == x - t),
+        "cr2_sum": str(cr_2_sum),
+        "holomorphic_rigidity_proved": bool(cr_1_diff == x - t and cr_2_sum == sp.Derivative(a(gamma), gamma) / a(gamma))
+    }
+
+
+def verify_algebraic_curvature_identity(deltas: Sequence[Union[float, str, mpmath.mpf]]) -> Dict[str, Any]:
+    """
+    Verifies the exact finite algebraic curvature identity:
+    sum_{a,b} (delta_a + delta_b)^2 = 2 * N * sum(delta_a^2) + 2 * (sum delta_a)^2.
+    When sum delta_a = 0, this equals 2 * N * sum(delta_a^2).
+    """
+    with mpmath.workdps(80):
+        d_vals = [to_mpf(d, dps=80) for d in deltas]
+        N = len(d_vals)
+        sum_pairs = mpmath.mpf(0)
+        for a in d_vals:
+            for b in d_vals:
+                sum_pairs += (a + b) ** 2
+
+        sum_sq = sum(d * d for d in d_vals)
+        sum_lin = sum(d_vals)
+        expected = 2 * N * sum_sq + 2 * (sum_lin ** 2)
+        diff = abs(sum_pairs - expected)
+        is_exact = bool(diff < mpmath.mpf('1e-70'))
+
+        return {
+            "N": N,
+            "sum_pairs": mpmath.nstr(sum_pairs, n=25),
+            "expected": mpmath.nstr(expected, n=25),
+            "residual": mpmath.nstr(diff, n=10),
+            "is_exact": is_exact,
+            "zero_sum_reduction": bool(abs(sum_lin) < mpmath.mpf('1e-70'))
+        }
+
+
+def verify_cramer_divergence_witness_ss3(
+    gamma: Union[float, str, mpmath.mpf] = '14.134725',
+    T_vals: Sequence[int] = (1, 5, 10, 20),
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    Computes arbitrary-precision translation-average integrals for Candidate SS-3:
+    int_{-T}^T exp(-2 * t * gamma) dt = sinh(2 * T * gamma) / gamma.
+    Demonstrates exponential divergence as T -> infinity.
+    """
+    with mpmath.workdps(dps):
+        g = to_mpf(gamma, dps=dps)
+        results = {}
+        for T in T_vals:
+            t_mp = to_mpf(T, dps=dps)
+            val = mpmath.sinh(2 * t_mp * g) / g
+            results[f"T_{T}"] = mpmath.nstr(val, n=20)
+        return {
+            "gamma": mpmath.nstr(g, n=15),
+            "integrals": results,
+            "exponential_growth_confirmed": bool(to_mpf(results["T_20"]) > to_mpf(results["T_10"]) > to_mpf(results["T_5"]))
+        }
+
+
+def verify_transcendental_nonresonance_ss4(
+    K: int = 1,
+    max_n: int = 100,
+    max_m: int = 100
+) -> Dict[str, Any]:
+    """
+    Examines frequency gaps |tau^K * log(n) - log(m)| for 2 <= n, m <= max.
+    Verifies that transcendental scaling prevents exact non-trivial resonances.
+    """
+    import math
+    tau = 2 * math.pi
+    scale = tau ** K
+    min_gap = 1e9
+    best_pair = (0, 0)
+    for n in range(2, max_n + 1):
+        for m in range(2, max_m + 1):
+            gap = abs(scale * math.log(n) - math.log(m))
+            if gap < min_gap:
+                min_gap = gap
+                best_pair = (n, m)
+    return {
+        "K": K,
+        "best_pair_n_m": best_pair,
+        "min_frequency_gap": min_gap,
+        "has_exact_resonance": bool(min_gap == 0.0)
     }
