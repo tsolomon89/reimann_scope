@@ -836,4 +836,31 @@ The project focuses its live research kernel on the canonical Radial-Defect Quot
    - Isolating the pairs without direct access to the zero divisor is the exact unresolved barrier.
    - Ordinary grade dilation does not supply the rigidity law; the rigidity source must contain additional zeta-specific arithmetic content.
 
+---
+
+# 22. Arithmetic Radial Bridge Construction, Pair Isolation, and Falsification Boundaries
+
+## 22.1 Target distinctions
+1. **Determinant Target**: \(D := -\log L_Q = \log\det_{\mathrm F}(I+\mathcal R) = \sum 2n_j \log(1+r_j)\), candidate \(\mathfrak A_{K,D}^{\mathrm{arith}} = D\).
+2. **Trace Target**: \(T := \operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \frac{\delta_\lambda^2}{\gamma_\lambda^2} = \sum 2n_j r_j\), candidate \(\mathfrak A_{K,T}^{\mathrm{arith}} = T\).
+3. **Regularized Weighted Target**: \(T_a = \sum_{\lambda\in\Lambda^+} w_a(\lambda) \frac{\delta_\lambda^2}{\gamma_\lambda^2}\) with \(w_a(\lambda) > 0\).
+
+## 22.2 Strict arithmetic input firewall
+All candidate arithmetic evaluators \(\mathfrak A_{K,X}^{\mathrm{arith}}\) must be constructed purely from primes, \(\Lambda(n)\), Euler products (\(\Re(s)>1\)), the pole at \(s=1\), gamma factors, functional equation symmetries, and transcendental continuation \(\mathcal Z_\tau(s,K)=\zeta(\tau^{-K}s)\). Arithmetic evaluators must reject zero lists, projected ordinates, \(\Xi^\flat\), \(Q, L_Q, \mathcal R, D\), and \(T\).
+
+## 22.3 Grade centering geometry
+Under origin dilation \(s_K = \tau^K s\), the critical line \(\Re(s)=1/2\) maps to \(\Re(s_K) = \tau^K/2 = c_K\). The centered coordinate is \(z_K = s_K - c_K = \tau^K z\), and the centered completed xi function satisfies \(\Xi_K(\tau^K z) = \Xi_0(z)\). Normalized radial ratios \((\tau^K\delta)^2/(\tau^K\gamma)^2 = \delta^2/\gamma^2\) are strictly grade-invariant.
+
+## 22.4 Covariance countermodel (Covariance \(\ne\) Rigidity)
+The abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \pm i\gamma\}\) (\(\delta \ne 0\)) is closed under functional equation reflection, complex conjugation, and bilateral grade transport. This rigorously proves that reflection symmetries and coordinate covariance are jointly compatible with off-line zeros. Transport covariance alone cannot force \(\delta = 0\); an independent arithmetic zero-valued anchor \(\mathfrak A_K = 0\) is mandatory.
+
+## 22.5 Candidate evaluation and falsification summary
+- **Candidate A (Linear Grade Differences)**: `FALSIFIED_FOR_BRIDGE` (collapses to native explicit formula \(\mathcal C_0[H\circ\tau^K]-\mathcal C_0[H]\); 1-point direct sums fail pair isolation).
+- **Candidate B (Bilinear Cross-Grade Explicit Formula)**: `FALSIFIED_FOR_PAIR_ISOLATION` (\(D_K(s)\overline{D_L(s)}\) yields unrestricted double sum over all zero pairs; off-diagonal terms contaminate).
+- **Candidate C (Tensor-Square Trace Identity)**: `FALSIFIED_FOR_PAIR_ISOLATION` (unrestricted double sum).
+- **Candidate D (Log-Derivative Contour Identity)**: `FALSIFIED_FOR_PAIR_ISOLATION` (residue cross-terms across critical strip).
+- **Candidate E (Relative Determinant from Arithmetic Space)**: `OPEN_UNPROVED` (no zero-independent operator).
+- **Candidate F (Grade-Indexed Prime-Power Pairing)**: `OPEN_UNPROVED` (pairing law unproved).
+- **Candidate G (Weighted Regularized Bridge)**: `LIVE_UNDERIVED` (spectral detector \(T_a>0\) proved; arithmetic realization open).
+
 

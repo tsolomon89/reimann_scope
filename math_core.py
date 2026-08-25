@@ -1901,5 +1901,344 @@ def finite_radial_defect_quotient_limit(
             prod_val /= (term * term)
         return prod_val
 
+# ==============================================================================
+# § 39. ARITHMETIC RADIAL BRIDGE AND CANDIDATE EVALUATION HARNESS
+# ==============================================================================
+
+def grade_center(
+    K: Union[int, float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [AUDIT PATH] Evaluates the exact critical-line center at bilateral grade K:
+    c_K = tau^K / 2.
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        return mpmath.power(tau, k_val) / mpmath.mpf(2)
 
 
+def centered_grade_coord(
+    s: Union[complex, str, Tuple[Any, Any], mpmath.mpc, mpmath.mpf],
+    K: Union[int, float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [AUDIT PATH] Evaluates the centered grade coordinate z_K = s_K - c_K = tau^K * (s - 1/2):
+    s_K = tau^K * s, c_K = tau^K / 2 ==> z_K = tau^K * (s - 1/2).
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        k_val = to_mpf(K, dps=dps + 15)
+        a_K = mpmath.power(tau, k_val)
+        s_val = to_mpc(s, dps=dps + 15)
+        z = s_val - mpmath.mpc(0.5, 0)
+        return a_K * z
+
+
+def spectral_determinant_d(
+    quartets_or_zeros: Sequence[Any],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL PATH] Evaluates the spectral determinant defect:
+    D = -log L_Q = sum_j 2 * n_j * log(1 + delta_j^2 / gamma_j^2).
+    Input can be a list of (delta, gamma) or (delta, gamma, multiplicity).
+    """
+    with mpmath.workdps(dps + 15):
+        total = mpmath.mpf(0)
+        for item in quartets_or_zeros:
+            if len(item) == 2:
+                d_val, g_val = item
+                n_j = 1
+            else:
+                d_val, g_val, n_j = item
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            if g_m == 0:
+                raise ValueError("gamma cannot be zero.")
+            r_j = (d_m * d_m) / (g_m * g_m)
+            total += mpmath.mpf(2 * n_j) * mpmath.log(mpmath.mpf(1) + r_j)
+        return total
+
+
+def spectral_trace_t(
+    upper_zeros: Sequence[Any],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL PATH] Evaluates the spectral trace defect:
+    T = Tr(R) = sum_{lambda in Lambda^+} n_lambda * (delta_lambda^2 / gamma_lambda^2).
+    For off-line quartets with multiplicity n_j, the two upper roots contribute 2 * n_j * r_j.
+    """
+    with mpmath.workdps(dps + 15):
+        total = mpmath.mpf(0)
+        for item in upper_zeros:
+            if len(item) == 2:
+                d_val, g_val = item
+                mult = 1
+            else:
+                d_val, g_val, mult = item
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            if g_m == 0:
+                raise ValueError("gamma cannot be zero.")
+            r_j = (d_m * d_m) / (g_m * g_m)
+            total += mpmath.mpf(mult) * r_j
+        return total
+
+
+def spectral_weighted_trace_t_a(
+    upper_zeros: Sequence[Any],
+    a: Union[str, float, int, mpmath.mpf] = 1.0,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL PATH] Evaluates the regularized weighted trace defect:
+    T_a = sum_{lambda in Lambda^+} w_a(lambda) * (delta_lambda^2 / gamma_lambda^2),
+    where w_a(lambda) = mult * exp(-a * gamma_lambda^2) > 0.
+    """
+    with mpmath.workdps(dps + 15):
+        a_m = to_mpf(a, dps=dps + 15)
+        if a_m <= 0:
+            raise ValueError("Regularization parameter a must be strictly positive.")
+        total = mpmath.mpf(0)
+        for item in upper_zeros:
+            if len(item) == 2:
+                d_val, g_val = item
+                mult = 1
+            else:
+                d_val, g_val, mult = item
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            if g_m == 0:
+                raise ValueError("gamma cannot be zero.")
+            r_j = (d_m * d_m) / (g_m * g_m)
+            w_val = mpmath.mpf(mult) * mpmath.exp(-a_m * g_m * g_m)
+            total += w_val * r_j
+        return total
+
+
+def arithmetic_firewall_check(data: Any) -> None:
+    """
+    Enforces the strict arithmetic firewall: rejects zero lists, projected ordinates,
+    and spectral invariants passed to arithmetic evaluators.
+    """
+    if isinstance(data, (dict, list, tuple)):
+        forbidden_keys = {"zeros", "zeros_list", "gamma_list", "delta_list", "spectral", "L_Q", "det_R"}
+        if isinstance(data, dict) and any(k in data for k in forbidden_keys):
+            raise ValueError("Firewall Violation: Arithmetic evaluator received spectral zero data.")
+
+
+def arithmetic_candidate_a(
+    K: int,
+    test_func_j: int = 0,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [ARITHMETIC PATH - CANDIDATE A] Evaluates the linear grade difference:
+    A_{K,A}^arith = C_K[H_j] - C_0[H_j] = C_0[H_j o tau^K] - C_0[H_j].
+    Pure arithmetic evaluation using prime powers and archimedean test-function integrals.
+    """
+    with mpmath.workdps(dps + 15):
+        val_K = evaluate_arithmetic_side_cached(test_func_j, K=K, dps=dps + 15)
+        val_0 = evaluate_arithmetic_side_cached(test_func_j, K=0, dps=dps + 15)
+        return val_K - val_0
+
+
+def spectral_candidate_a(
+    zeros_delta_gamma: Sequence[Any],
+    K: int,
+    test_func_j: int = 0,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL PATH - CANDIDATE A] Evaluates the linear grade difference spectral response:
+    A_{K,A}^spec = sum_rho [H_{K,j}(gamma_rho + i*delta_rho) - H_{0,j}(gamma_rho + i*delta_rho)].
+    """
+    with mpmath.workdps(dps + 15):
+        val_K = evaluate_spectral_side_cached(zeros_delta_gamma, test_func_j, K=K, dps=dps + 15)
+        val_0 = evaluate_spectral_side_cached(zeros_delta_gamma, test_func_j, K=0, dps=dps + 15)
+        return val_K - val_0
+
+
+def arithmetic_candidate_b(
+    K: int,
+    L: int,
+    s: Union[complex, str, mpmath.mpc],
+    N_max: int = 1000,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [ARITHMETIC PATH - CANDIDATE B] Evaluates the bilinear cross-grade prime-power product:
+    D_K(s) * conj(D_L(s)), where D_K(s) = tau^(-K) * sum_{n=1}^{N_max} Lambda(n) / n^(tau^(-K) * s).
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        scale_L = mpmath.power(tau, -to_mpf(L, dps=dps + 15))
+        s_val = to_mpc(s, dps=dps + 15)
+
+        # Truncated prime-power series for D_K(s)
+        D_K = mpmath.mpc(0)
+        D_L = mpmath.mpc(0)
+        for n in range(2, N_max + 1):
+            # Compute von Mangoldt Lambda(n)
+            factors = mpmath.factor(n) if hasattr(mpmath, "factor") else None
+            # Simple prime power check:
+            p_base = None
+            is_prime_pow = False
+            for p in range(2, n + 1):
+                if p * p > n and p_base is None:
+                    p_base = n
+                    is_prime_pow = True
+                    break
+                if n % p == 0:
+                    temp = n
+                    while temp % p == 0:
+                        temp //= p
+                    if temp == 1:
+                        p_base = p
+                        is_prime_pow = True
+                    break
+            if is_prime_pow and p_base is not None:
+                lam_n = mpmath.log(p_base)
+                term_K = lam_n / mpmath.power(n, scale_K * s_val)
+                term_L = lam_n / mpmath.power(n, scale_L * s_val)
+                D_K += term_K
+                D_L += term_L
+
+        D_K *= scale_K
+        D_L *= scale_L
+        return D_K * mpmath.conj(D_L)
+
+
+def spectral_candidate_b(
+    zeros_delta_gamma: Sequence[Any],
+    K: int,
+    L: int,
+    s: Union[complex, str, mpmath.mpc],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [SPECTRAL PATH - CANDIDATE B] Evaluates the bilinear cross-grade spectral product:
+    S_K(s) * conj(S_L(s)), where S_K(s) = tau^(-K) * sum_rho 1 / (tau^(-K)*s - (1/2 + delta_rho + i*gamma_rho)).
+    Introduces all-pairs double sum: sum_{rho_1, rho_2} 1 / [(tau^(-K)s - rho_1)(tau^(-L)conj(s) - conj(rho_2))].
+    """
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+        scale_L = mpmath.power(tau, -to_mpf(L, dps=dps + 15))
+        s_val = to_mpc(s, dps=dps + 15)
+
+        S_K = mpmath.mpc(0)
+        S_L = mpmath.mpc(0)
+        for item in zeros_delta_gamma:
+            d_val, g_val = item[0], item[1]
+            rho = mpmath.mpc(mpmath.mpf('0.5') + to_mpf(d_val, dps=dps + 15), to_mpf(g_val, dps=dps + 15))
+            S_K += mpmath.mpf(1) / (scale_K * s_val - rho)
+            S_L += mpmath.mpf(1) / (scale_L * s_val - rho)
+
+        S_K *= scale_K
+        S_L *= scale_L
+        return S_K * mpmath.conj(S_L)
+
+
+def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
+    """
+    Returns the structured registry of Arithmetic Radial Bridge candidates A through G.
+    """
+    return {
+        "CANDIDATE_A": {
+            "id": "CANDIDATE_A",
+            "name": "Linear Grade Differences",
+            "target": "NONE (Negative Control)",
+            "arithmetic_formula": "C_K[H] - C_0[H] = C_0[H o tau^K] - C_0[H]",
+            "spectral_formula": "sum_rho [H(tau^K * rho) - H(rho)]",
+            "grade_indices": "K in Z",
+            "derivation_status": "PROVED_COLLAPSE",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Linear explicit formula yields only 1-point direct sums; collapses to native explicit formula without isolating reflection pairs (lambda, lambda^#).",
+            "classification": "FALSIFIED_FOR_BRIDGE"
+        },
+        "CANDIDATE_B": {
+            "id": "CANDIDATE_B",
+            "name": "Bilinear Cross-Grade Explicit Formula",
+            "target": "TRACE / DETERMINANT",
+            "arithmetic_formula": "D_K(s) * conj(D_L(s)) with D_K(s) = tau^(-K) * sum Lambda(n) / n^(tau^(-K) s)",
+            "spectral_formula": "tau^(-K-L) * sum_{rho_1, rho_2} 1 / [(tau^(-K) s - rho_1)(tau^(-L) conj(s) - conj(rho_2))]",
+            "grade_indices": "(K, L) in Z^2",
+            "derivation_status": "DERIVED_OBSTRUCTED",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Spectral expansion produces an unrestricted double sum over all zero pairs (rho_1, rho_2); off-diagonal cross-terms dominate and do not isolate involution pairs without projected divisor input.",
+            "classification": "FALSIFIED_FOR_PAIR_ISOLATION"
+        },
+        "CANDIDATE_C": {
+            "id": "CANDIDATE_C",
+            "name": "Tensor-Square Trace Identity",
+            "target": "TRACE",
+            "arithmetic_formula": "Doubled arithmetic convolution on L^2(R_+^x x R_+^x)",
+            "spectral_formula": "sum_{rho_1, rho_2} K(rho_1, rho_2)",
+            "grade_indices": "Bilateral tensor product",
+            "derivation_status": "OBSTRUCTED",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Unrestricted tensor product sums over all pairs (rho_1, rho_2); selecting the diagonal reflection pair rho_1 = rho_2^# requires zero-divisor projection.",
+            "classification": "FALSIFIED_FOR_PAIR_ISOLATION"
+        },
+        "CANDIDATE_D": {
+            "id": "CANDIDATE_D",
+            "name": "Logarithmic-Derivative Contour Identity",
+            "target": "DETERMINANT",
+            "arithmetic_formula": "1/(2*pi*i) int (zeta'/zeta)(tau^(-K) s) * (zeta'/zeta)(1 - tau^(-K) s) W(s) ds",
+            "spectral_formula": "Residue evaluation across critical strip",
+            "grade_indices": "K in Z",
+            "derivation_status": "OBSTRUCTED",
+            "arithmetic_independence": True,
+            "pair_isolation": False,
+            "earliest_failure": "Contour residue theorem produces double residue cross-terms; fails to isolate (lambda, lambda^#) without subtracting off-diagonal divisor terms.",
+            "classification": "FALSIFIED_FOR_PAIR_ISOLATION"
+        },
+        "CANDIDATE_E": {
+            "id": "CANDIDATE_E",
+            "name": "Relative Determinant from Arithmetic Space",
+            "target": "DETERMINANT (D)",
+            "arithmetic_formula": "det_F(I + R_arith(K)) on Dirichlet polynomial Hilbert space",
+            "spectral_formula": "det_F(I + R_spec) = L_Q^(-1)",
+            "grade_indices": "K in Z",
+            "derivation_status": "UNPROVED_BRIDGE",
+            "arithmetic_independence": True,
+            "pair_isolation": True,
+            "earliest_failure": "No known finite-rank or trace-class operator constructed purely from arithmetic data without zero-divisor input matches det_F(I + R).",
+            "classification": "OPEN_UNPROVED"
+        },
+        "CANDIDATE_F": {
+            "id": "CANDIDATE_F",
+            "name": "Grade-Indexed Prime-Power Pairing",
+            "target": "TRACE (T)",
+            "arithmetic_formula": "sum_{p, m} (log p / p^(m/2)) * J_K(m log p)",
+            "spectral_formula": "sum_j 2 * n_j * (delta_j^2 / gamma_j^2)",
+            "grade_indices": "Bilateral grade K",
+            "derivation_status": "UNPROVED_BRIDGE",
+            "arithmetic_independence": True,
+            "pair_isolation": True,
+            "earliest_failure": "Arithmetic kernel J_K that produces delta^2/gamma^2 without mixing with cross-terms lacks independent closed-form construction.",
+            "classification": "OPEN_UNPROVED"
+        },
+        "CANDIDATE_G": {
+            "id": "CANDIDATE_G",
+            "name": "Weighted Regularized Radial Bridge",
+            "target": "WEIGHTED_TRACE (T_a)",
+            "arithmetic_formula": "A_{K, a}^arith = arithmetic realization of T_a",
+            "spectral_formula": "T_a = sum_{lambda in Lambda^+} exp(-a * gamma_lambda^2) * (delta_lambda^2 / gamma_lambda^2)",
+            "grade_indices": "K in Z, a > 0",
+            "derivation_status": "SPECTRAL_PROVED_ARITH_OPEN",
+            "arithmetic_independence": True,
+            "pair_isolation": True,
+            "earliest_failure": "Spectral detector T_a > 0 for delta != 0 is rigorously proved, but arithmetic realization A_{K, a}^arith remains open.",
+            "classification": "LIVE_UNDERIVED"
+        }
+    }

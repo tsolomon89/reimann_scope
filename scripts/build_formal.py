@@ -38,6 +38,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/ZeroCharacter.lean",
     "formal/RiemannScope/SymmetricDefect.lean",
     "formal/RiemannScope/Contradiction.lean",
+    "formal/RiemannScope/ArithmeticBridge.lean",
 ]
 
 

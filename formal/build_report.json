@@ -1,35 +1,36 @@
 {
   "schema_version": "1.0.0",
   "report_type": "formal_build_report",
-  "status": "passed",
+  "status": "failed",
   "command": "lake build",
-  "exit_code": 0,
-  "producing_git_commit": "e898260ebe9ab35a8cdb0331af92013fe4ef3dc7",
-  "timestamp": "2026-08-25T06:42:54.543691+00:00",
+  "exit_code": -1,
+  "producing_git_commit": "795dfbcae0cc3c46acc40ccd53c44b6e84a7b73c",
+  "timestamp": "2026-08-25T10:55:02.246620+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 28,
-  "total_theorems": 28,
+  "project_theorem_declarations_compiled": 35,
+  "total_theorems": 35,
   "formal_source_hashes": {
-    "formal/RiemannScope.lean": "41a323a1c086f162f960df25a3d2b6810e474cf67a0f496cc91ff57e336a9da2",
+    "formal/RiemannScope.lean": "0eb58146de59fca0e6f55b74200233a3f22a0148c03971b2f814ff3d95055341",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
-    "formal/RiemannScope/Grade.lean": "3dce81c95f33724812270729a307d074f6bfcf9c26345998cc5ed2360f1348fe",
+    "formal/RiemannScope/Grade.lean": "12e1efe033954c17b14aec4f81e184a757599262758126793c31bf2450d861aa",
     "formal/RiemannScope/RadialDefect.lean": "d3ea82e0fc2baf1dec0fca0b15809537a140fe160c0c995ccaf6f7864a6c9921",
     "formal/RiemannScope/TranscendentalContinuation.lean": "3d1482a1a5846c2383fac46a367e7068d7256619fba1996c7b405639e91c9e98",
     "formal/RiemannScope/ZeroWorldline.lean": "d87674c0ba57bd0899ff0b2bd39c0f9da5ff7e2e96a92dae5f16ad13725afcbf",
     "formal/RiemannScope/RadialLeaf.lean": "ffe4c48fa5365a562399cb824c51549086c523854d934fa012e4802a9bba0028",
     "formal/RiemannScope/ZeroCharacter.lean": "cb35589468a974beac9cfd1979f4c889fb5e7769f98004143ffa69e58ff23acb",
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
-    "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb"
+    "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
+    "formal/RiemannScope/ArithmeticBridge.lean": "034216c299625bc791e718fe7878afa3e1f13771693ae1c42cb11c7a1e9902d7"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
-    "scripts/build_formal.py": "9b21d71ecddf543c61899588cc19d317e39a152ff561dfbec5ad3a2aa03eef66",
+    "scripts/build_formal.py": "657f16fe2d8f1cbedab800cc700a839d3d23092e0403f3c03d7872d0ffdab63c",
     "certification.py": "eb22bac3e290adb9c8864dce043b65540413b3935019b532babc220c7be2dac0"
   },
-  "build_stdout": "Build completed successfully.",
+  "build_stdout": "",
   "build_stderr": "",
-  "report_hash": "9d45d52d1e81efded3b5aca474c790000621a3c6e2ef80817aadb844df90df01"
+  "report_hash": "6d9cd46fdad7c2fc48437f4aff7401ff0cbf02e8420013ca480ce82de545e3b4"
 }

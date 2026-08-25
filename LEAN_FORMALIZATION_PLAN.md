@@ -680,3 +680,27 @@ Formalize finite algebraic firewall theorems in Lean 4 without introducing unpro
 
 Do not formalize infinite Hadamard products, infinite Fredholm determinants, or explicit-formula arithmetic representations as axioms. Record infinite analytic convergence as an explicit future formalization obligation.
 
+---
+
+# 22. Phase 13 — Arithmetic Radial Bridge, Weighted Positivity, and Covariance Countermodel
+
+Formalize exact coordinate centering, weighted sum positivity, the covariance countermodel, and the conditional bridge interface in Lean 4:
+
+1. **Grade-Centering Geometry** (`RiemannScope.Grade`):
+   - `gradeCenter (K : ℤ) : ℝ := integerGradeScale K / 2`
+   - `centeredGradeCoord (K : ℤ) (s : ℂ) : ℂ := ⟨integerGradeScale K * s.re - gradeCenter K, integerGradeScale K * s.im⟩`
+   - Theorem `centeredGradeCoord_eq_tau_pow_mul_z`:
+     \[
+     z_K = \tau^K(s - 1/2) \in \mathbb C.
+     \]
+2. **Arbitrary Finite-Family Weighted Positivity Firewall** (`list_weighted_sum_nonneg_eq_zero_iff`):
+   For any strictly positive weight list \(w\) and non-negative defect list \(l\) of matching length:
+   \[
+   (w \odot l).\mathrm{sum} = 0 \iff \forall x \in l,\ x = 0.
+   \]
+3. **Covariance Countermodel** (`offlineQuartet`, `covariance_countermodel_offline_compatible`):
+   Prove that an abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \pm i\gamma\}\) (\(\delta \ne 0\)) is closed under functional reflection \(s \mapsto 1-s\) and complex conjugation \(s \mapsto \bar s\), demonstrating that reflection symmetries and coordinate covariance are jointly compatible with off-line zeros (\(\delta \ne 0\)).
+4. **Conditional Arithmetic Radial Bridge Interface** (`ConditionalArithmeticRadialBridge`):
+   Structure containing zero defects, non-negative bounds, arithmetic evaluator, spectral evaluator, bridge identity \(\forall K, \mathfrak A_K = X\), and arithmetic vanishing anchor \(\exists K, \mathfrak A_K = 0\).
+   Theorem `ConditionalArithmeticRadialBridge.all_defects_zero`: prove that any valid instance forces all represented defects to vanish (\(r_j = 0 \implies \delta_j = 0\)).
+

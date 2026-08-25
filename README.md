@@ -277,13 +277,14 @@ Read the root documents in this order:
 3. `RESEARCH_LEDGER.md`
 4. `MATH_CONTRACT.md`
 5. `RADIAL_DEFECT_QUOTIENT.md`
-6. `TRANSCENDENTAL_COHERENCE_EXPERIMENT.md`
-7. `EXPERIMENT_PROTOCOL.md`
-8. `RIEMANN_MICROSCOPE_SPEC.md`
-9. `DATA_PROVENANCE.md`
-10. `LEAN_FORMALIZATION_PLAN.md`
-11. `DECISIONS.md`
-12. `REBUILD_PLAN.md`
+6. `ARITHMETIC_RADIAL_BRIDGE.md`
+7. `TRANSCENDENTAL_COHERENCE_EXPERIMENT.md`
+8. `EXPERIMENT_PROTOCOL.md`
+9. `RIEMANN_MICROSCOPE_SPEC.md`
+10. `DATA_PROVENANCE.md`
+11. `LEAN_FORMALIZATION_PLAN.md`
+12. `DECISIONS.md`
+13. `REBUILD_PLAN.md`
 
 If implementation behavior conflicts with an authoritative mathematical document, treat the conflict as a bug until resolved.
 

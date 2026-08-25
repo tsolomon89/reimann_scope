@@ -1,11 +1,13 @@
 /-
 RiemannScope.Grade
-Tau-grade group structure and bilateral integer scale inverses.
-Reference: MATH_CONTRACT.md §2
+Tau-grade group structure, bilateral integer scale inverses, and grade-centering geometry.
+Reference: MATH_CONTRACT.md §2, §39
 -/
 
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Tactic.Ring
 
 namespace RiemannScope
 
@@ -37,5 +39,27 @@ theorem integerGradeScale_bilateral_inverse (K : ℤ) (htau : 0 < tau) :
     dsimp [integerGradeScale]
     exact Real.rpow_pos_of_pos htau (K : ℝ)
   exact mul_inv_cancel (ne_of_gt hpos)
+
+/-- The correct critical-line center at grade K is c_K = tau^K / 2. -/
+noncomputable def gradeCenter (K : ℤ) : ℝ :=
+  integerGradeScale K / 2
+
+/-- Origin dilation on complex coordinate s at grade K: s_K = tau^K * s. -/
+noncomputable def gradeDilation (K : ℤ) (s : ℂ) : ℂ :=
+  ⟨integerGradeScale K * s.re, integerGradeScale K * s.im⟩
+
+/-- Centered coordinate at grade K: z_K = s_K - c_K = tau^K * (s - 1/2). -/
+noncomputable def centeredGradeCoord (K : ℤ) (s : ℂ) : ℂ :=
+  ⟨integerGradeScale K * s.re - gradeCenter K, integerGradeScale K * s.im⟩
+
+/-- Exact grade-centering identity: z_K = tau^K * (s - 1/2) in ℂ. -/
+theorem centeredGradeCoord_eq_tau_pow_mul_z (K : ℤ) (s : ℂ) :
+    centeredGradeCoord K s = Complex.ofReal (integerGradeScale K) * (s - ⟨1 / 2, 0⟩) := by
+  dsimp [centeredGradeCoord, gradeCenter, Complex.ofReal]
+  apply Complex.ext
+  · dsimp
+    ring
+  · dsimp
+    ring
 
 end RiemannScope

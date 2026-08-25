@@ -387,4 +387,29 @@ If a simple law survives, broad computation should stop until that law is algebr
 |---|---|---|---|---|
 | WDR-001 | EF-013 failed because the explicit formula had the "wrong \(\gamma\)-curvature". | FORMER WORKING CONJECTURE | **WITHDRAWN (AUDITED)** | Audited exact identity shows \(H(z)=\log z\) projection-subtraction yields \(2\Re\log(\delta+i\gamma) - 2\Re\log(i\gamma) = \log(1+\delta^2/\gamma^2) = d(\delta,\gamma)\), which matches the exact \(L_Q\) curvature. The failure is due to test function inadmissibility, projected-divisor lack of arithmetic representation, and unproved finite compensation. |
 
+---
+
+# 22. Arithmetic Radial Bridge claims
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| ARB-001 | Determinant target \(D := -\log L_Q = \log\det_{\mathrm F}(I+\mathcal R) = \sum 2n_j \log(1+r_j)\). | **DESIGN DEFINITION / EXACT** | Fundamental Fredholm determinant defect invariant. |
+| ARB-002 | Trace target \(T := \operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \frac{\delta_\lambda^2}{\gamma_\lambda^2} = \sum 2n_j r_j\). | **DESIGN DEFINITION / EXACT** | Minimal scalar first-moment radial defect invariant. |
+| ARB-003 | Regularized weighted target \(T_a = \sum_{\lambda\in\Lambda^+} w_a(\lambda) \kappa_1(\lambda, \lambda^\#) = \sum w_a(\lambda) \frac{\delta_\lambda^2}{\gamma_\lambda^2}\) with \(w_a(\lambda) > 0\). | **DESIGN DEFINITION / EXACT** | Analytically regularized positive radial defect detector. |
+| ARB-004 | Spectral equivalences \(D = 0 \iff L_Q = 1 \iff \mathrm{RH}\) and \(T = 0 \iff \mathrm{RH}\). | **PROVED SPECTRAL EQUIVALENCE** | Non-negativity of radial defect terms \(r_j = \delta_j^2/\gamma_j^2 \ge 0\). |
+| ARB-005 | Grade center \(c_K = \tau^K/2\), centered coordinate \(z_K = s_K - c_K = \tau^K z\), and centered completed function \(\Xi_K(\tau^K z) = \Xi_0(z)\). | **PROVED / EXACT** | Exact geometric alignment of critical line under origin dilation. |
+| ARB-006 | Grade invariance of normalized radial ratio: \(\frac{(\tau^K\delta)^2}{(\tau^K\gamma)^2} = \frac{\delta^2}{\gamma^2} = r\). | **PROVED / EXACT** | Scale factor \(\tau^{2K}\) cancels identically between numerator and denominator. |
+| ARB-007 | Covariance Countermodel: abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \pm i\gamma\}\) (\(\delta \ne 0\)) is closed under reflection, conjugation, and transport, proving covariance \(\ne\) rigidity. | **PROVED / COUNTERMODEL** | Formalized in Lean 4 (`covariance_countermodel_offline_compatible`). |
+| ARB-008 | Finite-family weighted sum vanishing firewall: \(\sum w_i r_i = 0 \iff \forall i, r_i = 0\) for \(w_i > 0, r_i \ge 0\). | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`list_weighted_sum_nonneg_eq_zero_iff`). |
+| ARB-009 | Candidate A (linear grade differences) collapses to native explicit formula \(\mathcal C_0[H \circ \tau^K] - \mathcal C_0[H]\) and produces only 1-point direct sums. | **PROVED / FALSIFIED** | Exact SymPy reduction and negative control verification. |
+| ARB-010 | Candidate B (bilinear cross-grade \(D_K(s)\overline{D_L(s)}\)) produces an unrestricted double sum over all zero pairs \((\rho_1, \rho_2)\), failing pair isolation. | **PROVED / FALSIFIED** | Spectral expansion contains off-diagonal cross-terms that do not vanish on-line. |
+| ARB-011 | Candidate C (tensor-square trace identity) fails pair isolation without zero-divisor projection. | **PROVED / FALSIFIED** | Doubled trace formula does not restrict to diagonal involution pair. |
+| ARB-012 | Candidate D (log-derivative contour identity) fails pair isolation due to double residue cross-terms across the critical strip. | **PROVED / FALSIFIED** | Contour integration does not eliminate off-diagonal zero pairings. |
+| ARB-013 | Candidate E (relative determinant from arithmetic space) lacks zero-independent construction. | **OPEN / UNPROVED** | No known arithmetic operator isospectral to \(\mathcal R\) without zero divisor. |
+| ARB-014 | Candidate F (grade-indexed prime-power pairing) lacks closed-form pairing kernel. | **OPEN / UNPROVED** | Arithmetic kernel isolating \(\delta^2/\gamma^2\) unproved. |
+| ARB-015 | Candidate G (weighted regularized bridge) spectral detector \(T_a > 0 \iff \delta \ne 0\) is proved, while arithmetic realization \(\mathfrak A_{K,a}^{\mathrm{arith}}\) is open. | **SPECTRAL_PROVED_ARITH_OPEN / LIVE** | Live candidate under regularized Mellin transform analysis. |
+| ARB-016 | Strict Arithmetic Input Firewall enforces zero-independent arithmetic evaluators. | **METHODOLOGICAL STATUS** | Pure arithmetic data boundary enforced in `math_core.py`. |
+| ARB-017 | Scoped One-Point No-Go Theorem is closed for linear 1-point statistics and open for nonlinear/paired forms. | **PROVED BOUNDARY** | Cauchy-Riemann analysis on \(2\Re G(\delta+i\gamma)\). |
+| ARB-018 | Divisor-independent closure of \(\mathfrak A_{K,X}^{\mathrm{arith}} = X\) and \(\mathfrak A_{K,X}^{\mathrm{arith}} = 0\) remains the central open obligation (OBL-RDQ-001). | **OPEN / LIVE TARGET** | Central research obligation of the Riemann Scope program. |
+
 

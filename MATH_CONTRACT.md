@@ -2217,4 +2217,49 @@ Therefore:
 2. **Open Research Theorem (OBL-RDQ-001)**: Can a divisor-independent arithmetic or spectral construction isolate the pairs \((\lambda, \lambda^\#)\) and evaluate \(\kappa_1\) to compute \(\operatorname{Tr}\mathcal R\) or \(D_\zeta(1)\)?
 3. **Grade Invariance**: \(L_Q\), \(\{r_\lambda\}\), and \(\mathcal R\) are grade-invariant under \((x,\delta,\gamma)\mapsto(\tau^K x, \tau^K \delta, \tau^K \gamma)\); grade dilation alone does not force \(\operatorname{Tr}\mathcal R = 0\). Additional zeta-specific arithmetic content is required.
 
+---
+
+# 39. Arithmetic Radial Bridge and Candidate Evaluation Harness
+
+## 39.1 Target distinction
+1. **Determinant Target**:
+   \[
+   D := -\log L_Q = \log\det_{\mathrm F}(I+\mathcal R) = \sum_j 2n_j \log(1+r_j), \qquad \mathfrak A_{K,D}^{\mathrm{arith}} = D.
+   \]
+2. **Trace Target**:
+   \[
+   T := \operatorname{Tr}\mathcal R = \sum_{\lambda\in\Lambda^+} \frac{\delta_\lambda^2}{\gamma_\lambda^2} = \sum_j 2n_j r_j, \qquad \mathfrak A_{K,T}^{\mathrm{arith}} = T.
+   \]
+3. **Regularized Weighted Target**:
+   \[
+   T_a := \sum_{\lambda\in\Lambda^+} w_a(\lambda) \frac{\delta_\lambda^2}{\gamma_\lambda^2}, \qquad w_a(\lambda) = m_\lambda e^{-a\gamma_\lambda^2} > 0.
+   \]
+
+## 39.2 Strict arithmetic input firewall
+Permitted: prime powers, von Mangoldt \(\Lambda(n)\), Euler product (\(\Re(s)>1\)), pole at \(s=1\), gamma factor, functional equation \(\xi(s)=\xi(1-s)\), Schwarz reflection, admissible test functions, exact bilateral grades \(K\in\mathbb Z\), transcendental continuation \(\mathcal Z_\tau(s,K)=\zeta(\tau^{-K}s)\).
+Forbidden: zero lists, \(\delta_j, \gamma_j, \lambda_j^\#\), projected ordinates, projected divisor \(\mathcal P_0(\mathcal D_\zeta)\), \(\Xi^\flat\), \(Q, L_Q, \mathcal R, D, T\), or circular RH-equivalent definitions.
+
+## 39.3 Grade-centering geometry
+Under origin dilation \(s_K = \tau^K s\), the critical line \(\Re(s)=1/2\) maps to \(\Re(s_K) = \tau^K/2 = c_K\).
+The centered grade coordinate is:
+\[
+z_K = s_K - c_K = \tau^K s - \frac{\tau^K}{2} = \tau^K\left(s - \frac{1}{2}\right) = \tau^K z.
+\]
+The centered completed xi function satisfies:
+\[
+\Xi_K(z_K) = \xi\left(\frac{1}{2} + \tau^{-K} z_K\right) \implies \Xi_K(\tau^K z) = \Xi_0(z).
+\]
+
+## 39.4 Covariance countermodel (Covariance \(\ne\) Rigidity)
+The abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \pm i\gamma\}\) (\(\delta \ne 0\)) is closed under reflection \(s \mapsto 1-s\), conjugation \(s \mapsto \bar s\), involution \(s \mapsto 1-\bar s\), and grade transport, proving that symmetry and covariance are fully compatible with \(\delta \ne 0\). Covariance alone does not force \(\delta = 0\); an independent arithmetic zero-valued anchor \(\mathfrak A_K = 0\) is required.
+
+## 39.5 Candidate classifications
+- **Candidate A (Linear Grade Differences)**: `FALSIFIED_FOR_BRIDGE` (collapses to native explicit formula \(\mathcal C_0[H\circ\tau^K]-\mathcal C_0[H]\)).
+- **Candidate B (Bilinear Cross-Grade Explicit Formula)**: `FALSIFIED_FOR_PAIR_ISOLATION` (\(D_K(s)\overline{D_L(s)}\) yields unrestricted double sum over all zero pairs; off-diagonal terms contaminate).
+- **Candidate C (Tensor-Square Trace Identity)**: `FALSIFIED_FOR_PAIR_ISOLATION` (unrestricted double sum).
+- **Candidate D (Log-Derivative Contour Identity)**: `FALSIFIED_FOR_PAIR_ISOLATION` (residue cross-terms across critical strip).
+- **Candidate E (Relative Determinant from Arithmetic Space)**: `OPEN_UNPROVED` (no zero-independent operator).
+- **Candidate F (Grade-Indexed Prime-Power Pairing)**: `OPEN_UNPROVED` (pairing law unproved).
+- **Candidate G (Weighted Regularized Bridge)**: `LIVE_UNDERIVED` (spectral detector \(T_a>0\) proved; arithmetic realization open).
+
 

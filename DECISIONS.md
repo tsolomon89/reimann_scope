@@ -979,4 +979,42 @@ Supersedes:
 
 Unscoped interpretation of EF-018 as a universal impossibility of all arithmetic representations, and former working conjecture that EF-013 had incorrect \(\gamma\)-curvature.
 
+---
+
+## 2026-08-25 — Arithmetic Radial Bridge Candidate Evaluation, Covariance Countermodel, and Rigidity Boundaries
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Target Hierarchy Distinction**: Maintain strict separation among the three bridge targets:
+   - Determinant Target: \(D := -\log L_Q = \log\det_{\mathrm F}(I+\mathcal R) = \sum 2n_j \log(1+r_j)\);
+   - Trace Target: \(T := \operatorname{Tr}\mathcal R = \sum 2n_j r_j\);
+   - Regularized Weighted Target: \(T_a = \sum w_a(\lambda) \kappa_1(\lambda, \lambda^\#)\) (\(w_a(\lambda) > 0\)).
+2. **Strict Arithmetic Input Firewall**: Enforce that arithmetic evaluators \(\mathfrak A_{K,X}^{\mathrm{arith}}\) receive only intrinsic arithmetic data (primes, \(\Lambda(n)\), Euler products for \(\Re(s)>1\), pole at \(s=1\), gamma factor, functional equation symmetries, and transcendental continuation \(\mathcal Z_\tau(s,K)=\zeta(\tau^{-K}s)\)), strictly rejecting zero lists, projected ordinates, \(\Xi^\flat\), \(Q, L_Q, \mathcal R, D, T\).
+3. **Correct Grade-Centering Geometry**: Reconcile grade center \(c_K = \tau^K/2\), centered coordinate \(z_K = s_K - c_K = \tau^K z\), centered completed xi \(\Xi_K(\tau^K z) = \Xi_0(z)\), and invariant ratio \((\tau^K\delta)^2/(\tau^K\gamma)^2 = \delta^2/\gamma^2\).
+4. **Covariance Countermodel (Covariance \(\ne\) Rigidity)**: Establish that an abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \pm i\gamma\}\) (\(\delta \ne 0\)) is closed under reflection, conjugation, and transport symmetries, proving that coordinate covariance alone does not force \(\delta = 0\). An independent arithmetic anchor \(\mathfrak A_K = 0\) is mandatory.
+5. **Candidate Bridge Classifications**:
+   - Candidate A (Linear Grade Differences): `FALSIFIED_FOR_BRIDGE` (collapses to native explicit formula \(\mathcal C_0[H\circ\tau^K]-\mathcal C_0[H]\)).
+   - Candidate B (Bilinear Cross-Grade Explicit Formula): `FALSIFIED_FOR_PAIR_ISOLATION` (\(D_K(s)\overline{D_L(s)}\) yields unrestricted double sum over all zero pairs; off-diagonal terms contaminate).
+   - Candidate C (Tensor-Square Trace Identity): `FALSIFIED_FOR_PAIR_ISOLATION` (unrestricted double sum).
+   - Candidate D (Log-Derivative Contour Identity): `FALSIFIED_FOR_PAIR_ISOLATION` (residue cross-terms across critical strip).
+   - Candidate E (Relative Determinant from Arithmetic Space): `OPEN_UNPROVED`.
+   - Candidate F (Grade-Indexed Prime-Power Pairing): `OPEN_UNPROVED`.
+   - Candidate G (Weighted Regularized Bridge): `LIVE_UNDERIVED` (spectral detector \(T_a>0\) proved; arithmetic realization open).
+6. **Corpus and Formal Infrastructure**: Create canonical specification `ARITHMETIC_RADIAL_BRIDGE.md`, add pure arbitrary-precision harness in `math_core.py`, comprehensive test suite in `tests/test_arithmetic_radial_bridge.py`, and formal Lean 4 theorems in `RiemannScope.ArithmeticBridge` (arbitrary-list weighted positivity, covariance countermodel, conditional bridge rigidity).
+7. **Epistemic Closure Status**: Keep `OBL-RDQ-001` **OPEN**. No arithmetic proof of RH is claimed without an independent, unconditional arithmetic bridge derivation and vanishing proof.
+
+Reason:
+
+Rigorous mathematical construction and falsification sprint isolating the exact barrier to the arithmetic radial bridge, proving that covariance is not rigidity, eliminating dead-end candidate mechanisms, and formalizing surviving structural theorems.
+
+Mathematical / operational consequence:
+
+Created canonical specification `ARITHMETIC_RADIAL_BRIDGE.md`, updated all authority documents, verified 23 targeted tests in `tests/test_arithmetic_radial_bridge.py`, compiled Lean 4 formalizations with 0 errors/warnings, and cataloged all 7 candidates in the candidate registry.
+
+Supersedes:
+
+Any conflation of coordinate transport covariance with radial rigidity, and any expectation that linear or naive bilinear explicit formulas isolate involution pairs without projected-divisor knowledge.
+
 

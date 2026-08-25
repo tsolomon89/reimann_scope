@@ -29,6 +29,19 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-008` | Centrifuge Derivative Invariant | $\frac{d}{dK} \log \|q_\rho^K\| = \delta \log \tau$ | Exact symbolic derivation & numerical gradient test | `Verified in Harness` |
 | `OBL-EF-003` | Projection Trap Resolution (Linear 1-Point Statistics) | Independent arithmetic representation of $\mathcal P_0(\mathcal D_\zeta)$ via direct linear 1-point test functions | No-go theorem: CLOSED for fixed linear combinations and locally uniform limits of direct 1-point holomorphic statistics over open displacement family (Cauchy-Riemann on $2\Re G(\delta+i\gamma)$) | `CLOSED (NO-GO FOR LINEAR 1-POINT)` |
 | `OBL-RDQ-001` | Nonlinear Paired / Relative Trace Realization | Derive divisor-independent arithmetic realization of relative trace $\operatorname{Tr}\mathcal R = \sum \kappa_1(\lambda, \lambda^\#)$ or Fredholm determinant $\det_{\mathrm F}(I+\mathcal R) = L_Q^{-1}$ without evaluating $\mathcal P_0(\mathcal D_\zeta)$ | Divisor-independent reflection pairing kernel evaluation | `OPEN OBLIGATION` |
+| `OBL-ARB-D1` | Divisor-Independent Determinant Arithmetic Definition | Construct arithmetic evaluator $\mathfrak A_{K,D}^{\mathrm{arith}}$ from prime powers and archimedean factors without zero inputs | Epistemic firewall verification | `OPEN` |
+| `OBL-ARB-D2` | Exact Determinant Bridge Identity | Prove $\mathfrak A_{K,D}^{\mathrm{arith}} = D = \sum 2n_j \log(1+r_j)$ | Exact arithmetic/spectral derivation | `OPEN` |
+| `OBL-ARB-D3` | Independent Determinant Arithmetic Anchor | Prove $\mathfrak A_{K,D}^{\mathrm{arith}} = 0$ or $\lim_{K\to+\infty}\mathfrak A_{K,D}^{\mathrm{arith}} = 0$ | Independent arithmetic evaluation | `OPEN` |
+| `OBL-ARB-D4` | Determinant Defect Rigidity | Prove $D = 0 \implies \forall j, r_j = 0$ ($r_j \ge 0$) | Lean 4 `list_sum_nonneg_eq_zero_iff` | `FORMALLY_PROVED` |
+| `OBL-ARB-T1` | Divisor-Independent Trace Arithmetic Definition | Construct arithmetic evaluator $\mathfrak A_{K,T}^{\mathrm{arith}}$ from prime powers and archimedean factors without zero inputs | Epistemic firewall verification | `OPEN` |
+| `OBL-ARB-T2` | Exact Trace Bridge Identity | Prove $\mathfrak A_{K,T}^{\mathrm{arith}} = T = \sum 2n_j r_j$ | Exact arithmetic/spectral derivation | `OPEN` |
+| `OBL-ARB-T3` | Independent Trace Arithmetic Anchor | Prove $\mathfrak A_{K,T}^{\mathrm{arith}} = 0$ or $\lim_{K\to+\infty}\mathfrak A_{K,T}^{\mathrm{arith}} = 0$ | Independent arithmetic evaluation | `OPEN` |
+| `OBL-ARB-T4` | Trace Defect Rigidity | Prove $T = 0 \implies \forall j, r_j = 0$ ($r_j \ge 0$) | Lean 4 `list_sum_nonneg_eq_zero_iff` | `FORMALLY_PROVED` |
+| `OBL-ARB-STRUCT-SUM` | Infinite Trace/Determinant Summability | Prove $\sum n_j \delta_j^2/\gamma_j^2 < \infty$ under Hadamard order 1 | Analytic Dirichlet series bound | `PROVED` |
+| `OBL-ARB-STRUCT-PAIR` | Involution Pair Isolation | Isolate reflection pairs $(\lambda, \lambda^\#)$ without unrestricted all-pairs cross-term contamination | Candidate B-D falsification analysis | `OPEN` |
+| `OBL-ARB-STRUCT-NONRED` | Grade Non-Redundancy | Verify that cross-grade arithmetic pairings are not coordinate pullbacks | Symbolic grade reduction test | `PROVED` |
+| `OBL-ARB-STRUCT-UNIF` | Grade-Limit Uniformity | Prove limit uniformity and exclude raw coordinate compression | Classical asymptotic analysis | `PROVED` |
+| `OBL-ARB-STRUCT-RH` | Radial Defect to RH Connection | Prove $\forall j, \delta_j = 0 \implies \mathrm{RH}$ predicate | Lean 4 `radial_rigidity_offline_zero_contradiction` | `FORMALLY_PROVED` |
 
 
 ---
