@@ -11,11 +11,11 @@
   "zero_count": 5,
   "all_zeros_simple": true,
   "constituent_zero_hashes": [
-    "635496bae4382d796f1326ee335ee74911f5db0ddecb8130b3db0c03787575e3",
-    "c3da590caf6fc50d55a174ee10fd4a9ee5e63f289cf8bfa608b0b644107357d7",
-    "90b4e40104b941b20fcc8bcd4dd87d6a6bbe9caebbf5f962267ccef9ab0aad98",
-    "423b1433c7ace6dd29a37d330d989997bd3ab7e4867ce050bcdfaa6f27c9ef03",
-    "63d6edf9417a326f7d9b408f34e896b72407a6e8b2fbf76e14033546caa565da"
+    "66b6c56b5e86916f8bace9bb76303f30342fbb6d0a160b08036d2ff4eabf57db",
+    "853b76ac9a8dfedf96ac5966074bf1ddfac7ac480661b18aa766e4950da0eca0",
+    "bcc0f8ea9a6db91701c2a00e49eee07adddb0c1918ca976bc052109e056ed07a",
+    "4ebb2aa6f2d35d9a937eff9281d0a5b083bad031f161d2e0ccfcc1a5340b3e41",
+    "95faffd5504cab3776aaf0b12a9d2fa85470e83c91b745efe894cc205c016443"
   ],
   "endpoint_bounds": {
     "t_min": "235.1088169223622532215900013441163834345333614833774800319668848633796525427704400946017209446938220",
@@ -32,12 +32,12 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "bf5ab57d0941dff170d5fbed30a16668aed24e5b",
+  "producing_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
   "source_code_hashes": {
     "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "math_core.py": "53da9fd994436d89e4c5cda84544c516011d435749e87ec896d258b9108ac2a3",
+    "math_core.py": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
     "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
@@ -59,11 +59,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-25T15:12:27.145243+00:00",
+  "created_at": "2026-08-26T13:53:05.605775+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "bbd55ebd1acd75a781d5232b57277aedbccc54e2323a3980e7d59d6c3699dedd"
+  "certificate_hash": "9bdbf6544fa0fe523019b9a985a3107e4f2fa76d5917bbbac2dfe29a8d0cb59e"
 }
