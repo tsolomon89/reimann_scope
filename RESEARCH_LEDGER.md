@@ -421,11 +421,11 @@ If a simple law survives, broad computation should stop until that law is algebr
 | SSB-001 | Arbitrary finite curvature identity \(\sum_{i,j=1}^N (d_i + d_j)^2 = 2N \sum_{i=1}^N d_i^2 + 2(\sum_{i=1}^N d_i)^2\). | **PROVED / FORMALLY_PROVED** | Proved in Lean 4 (`RiemannScope.list_pairs_sq_sum_eq`) for arbitrary real lists. |
 | SSB-002 | Curvature non-negativity and zero-rigidity: \(\sum_{i,j=1}^N (d_i + d_j)^2 \ge 0\) with equality iff \(\forall i, d_i = 0\). | **PROVED / FORMALLY_PROVED** | Proved in Lean 4 (`RiemannScope.list_pairs_sq_sum_nonneg`, `list_pairs_sq_sum_eq_zero_iff`). |
 | SSB-003 | Universal scale dilation cancellation \(s D_s(su) = f(u)\) for all \(s > 0\). | **PROVED / FORMALLY_PROVED** | Proved in Lean 4 (`RiemannScope.generic_scale_dilation_cancellation`). |
-| SSB-004 | Candidate SS1 (Cauchy-Riemann Holomorphic Rigidity) fails Gate 1 & 4. | **PROVED / FALSIFIED** | Cauchy-Riemann rigidity forces \(\partial_{\bar s} \mathcal S(s,s) = 0\). |
-| SSB-005 | Candidate SS2 (Polarized Bilinear Cross-Difference) fails Gate 2 & 5. | **PROVED / FALSIFIED** | Unrestricted double-sum cross-terms contaminate signal. |
+| SSB-004 | Candidate SS1 (Cauchy-Riemann Holomorphic Rigidity) fails Gate 1 & 4. | **PROVED / FALSIFIED** | Cauchy-Riemann rigidity forces $\partial_{\bar s} \mathcal S(s,s) = 0$. |
+| SSB-005 | Candidate SS2 (Polarized Bilinear Cross-Difference) fails Gate 2 & 5. | **PROVED / FALSIFIED** | Unrestricted double-sum cross-terms without involution-pair isolation; limiting off-diagonal cancellation unproved. |
 | SSB-006 | Candidate SS3 (Cramér Logarithmic Phase Variance) fails Gate 4 & 6. | **PROVED / FALSIFIED** | Divergent transform outside critical strip; firewall violation. |
-| SSB-007 | Candidate SS4 (Transcendental Scale Non-Resonance) fails Gate 2 & 3. | **PROVED / FALSIFIED** | Scale non-resonance cannot eliminate zero cross-terms. |
-| SSB-008 | Candidate SS5 (Direct Positive Quadratic Kernel) fails Gate 1 & 6. | **PROVED / FALSIFIED** | Holomorphic vanishing on critical line forces zero everywhere. |
+| SSB-007 | Candidate SS4 (Transcendental Scale Non-Resonance) fails Gate 2 & 3. | **SCOPED STATUS** | Single grades coordinate-redundant (PROVED); bounded search (NUMERICAL EVIDENCE ONLY); exact non-resonance for $2\pi$ OPEN. |
+| SSB-008 | Candidate SS5 (Direct Positive Quadratic Kernel) fails Gate 1 & 6. | **PROVED / FALSIFIED** | Direct 1-point holomorphic realization closed; nonlinear sesquilinear open. |
 
 ---
 
@@ -433,14 +433,14 @@ If a simple law survives, broad computation should stop until that law is algebr
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
-| CMSA-001 | Completed logarithmic derivative identity \(P(u) = A(u) - \Xi'/\Xi(u-1/2)\) for \(\Re(u) > 1\). | **PROVED / EXACT** | Proved analytically from Hadamard product and completed xi definition. |
-| CMSA-002 | Completed mean-square anchor \(\mathcal A(\sigma) = \lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |A(\sigma+it) - \Xi'/\Xi(\sigma-1/2+it)|^2 dt - \sum \frac{\Lambda(n)^2}{n^{2\sigma}} = 0\). | **PROVED / EXACT** | Unconditional arithmetic anchor identity for \(\sigma > 1\). |
-| CMSA-003 | Exact translation kernel \(J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}\). | **PROVED / EXACT** | Exact elementary antiderivative integration. |
-| CMSA-004 | Exact paired zero-zero kernel \(K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu)\). | **PROVED / EXACT** | Substitution into paired Hadamard resolvent product. |
-| CMSA-005 | Complete finite spectral expansion \(S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}\) closes to machine precision ($< 10^{-18}$). | **PROVED / VERIFIED** | Verified in arbitrary precision via `evaluate_complete_finite_spectral_expansion`. |
-| CMSA-006 | Real-axis spectral defect formula \(\Delta(\delta) = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2+\gamma^2)[(z^2+\gamma^2-\delta^2)^2+4\delta^2\gamma^2]}\). | **PROVED / EXACT** | Exact rational difference algebra on real axis \(z = \sigma - 1/2 > 0\). |
-| CMSA-007 | Real-axis defect sign transition: \(\Delta(\delta) < 0\) for \(z^2 < 3\gamma^2 + \delta^2\), positive for \(z^2 > 3\gamma^2 + \delta^2\). | **PROVED / EXACT** | Strict sign determined by quadratic factor \(z^2 - 3\gamma^2 - \delta^2\). |
-| CMSA-008 | Gate G4 (Infinite Spectral Interchange) is the exact earliest analytic barrier: individual zero resolvents integrate to zero under \(1/2T\) scaling. | **IDENTIFIED OPEN OBSTRUCTION** | Proved from \(L^2(\mathbb R)\) resolvent norm \(\frac{\pi}{\sigma-\Re\rho}\). |
+| CMSA-001 | Completed logarithmic derivative identity $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ for $\Re(u) > 1$. | **PROVED / EXACT** | Proved analytically from Hadamard product and completed xi definition. |
+| CMSA-002 | Completed mean-square anchor $\mathcal A(\sigma) = \lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |A(\sigma+it) - \Xi'/\Xi(\sigma-1/2+it)|^2 dt - \sum \frac{\Lambda(n)^2}{n^{2\sigma}} = 0$. | **PROVED / EXACT** | Unconditional arithmetic anchor identity for $\sigma > 1$. |
+| CMSA-003 | Exact translation kernel $J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}$. | **PROVED / EXACT** | Exact elementary antiderivative integration. |
+| CMSA-004 | Exact paired zero-zero kernel $K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu)$. | **PROVED / EXACT** | Substitution into paired Hadamard resolvent product. |
+| CMSA-005 | Complete finite spectral expansion $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ is an exact algebraic decomposition verified numerically ($< 10^{-15}$). | **PROVED / VERIFIED** | Verified in arbitrary precision via `evaluate_complete_finite_spectral_expansion`. |
+| CMSA-006 | Real-axis spectral defect formula $\Delta(\delta) = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2+\gamma^2)[(z^2+\gamma^2-\delta^2)^2+4\delta^2\gamma^2]}$. | **PROVED / EXACT** | Exact rational difference algebra on real axis $z = \sigma - 1/2 > 0$. |
+| CMSA-007 | Real-axis defect sign transition: $\Delta(\delta) < 0$ for $z^2 < 3\gamma^2 + \delta^2$, positive for $z^2 > 3\gamma^2 + \delta^2$. | **PROVED / EXACT** | Strict sign determined by quadratic factor $z^2 - 3\gamma^2 - \delta^2$. |
+| CMSA-008 | Gate G4 (Infinite Spectral Interchange) is the exact earliest analytic barrier: individual zero resolvents integrate to zero under $1/2T$ scaling. | **IDENTIFIED OPEN OBSTRUCTION** | Proved from $L^2(\mathbb R)$ resolvent norm $\frac{\pi}{\sigma-\Re\rho}$. |
 | CMSA-009 | Candidate CMSA-1 and CMSA-2 classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`. | **CLASSIFICATION** | Closed finite expansion, open infinite limit interchange. |
 | CMSA-010 | Candidate CMSA-3 classified as `GRADE_COORDINATE_REDUNDANT`. | **PROVED REDUNDANCY** | Formalized in Lean 4 (`generic_scale_dilation_cancellation`). |
 

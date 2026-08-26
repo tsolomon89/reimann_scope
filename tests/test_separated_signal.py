@@ -193,7 +193,7 @@ class TestCandidateFalsificationWitnesses:
         assert res["cr1_forces_x_eq_t"] is True
 
     def test_candidate_ss2_double_sum_cross_terms(self):
-        """Candidate SS-2 fails at Gate 2/3 because D_K(s1)*conj(D_K(s2)) has dominant off-diagonal cross-terms."""
+        """Candidate SS-2 derives an unrestricted double sum over all zero pairs without involution-pair isolation."""
         with mpmath.workdps(80):
             online_zeros = [
                 ('0.0', '14.134725141734693790', 1),
@@ -202,7 +202,7 @@ class TestCandidateFalsificationWitnesses:
             s1 = mpmath.mpc('0.6', '10.0')
             s2 = mpmath.mpc('0.6', '10.0')
             spec_ss2 = spectral_signal_ss2(online_zeros, K=0, s1=s1, s2=s2, dps=80)
-            # The bilinear product is non-zero even on the critical line because of off-diagonal terms
+            # The bilinear product yields an unconstrained double sum that is non-zero even on the critical line
             assert abs(spec_ss2) > 0
 
     def test_candidate_ss3_cramer_divergence_witness(self):
@@ -221,7 +221,7 @@ class TestCandidateFalsificationWitnesses:
         assert res["epistemic_status"] == "NUMERICAL_SEARCH_EVIDENCE_ONLY_NOT_PROOF"
 
     def test_candidate_ss5_non_holomorphic_firewall(self):
-        """Candidate SS-5 fails at Gate 1/6 because non-holomorphic pairing cannot be derived from Dirichlet series."""
+        """Candidate SS-5 direct one-point holomorphic realization is excluded by the identity theorem on the critical line."""
         with mpmath.workdps(80):
             online_zeros = [('0.0', '14.134725141734693790', 1)]
             spec_ss5_online = spectral_signal_ss5(online_zeros, K=0, dps=80)

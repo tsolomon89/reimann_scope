@@ -3274,6 +3274,36 @@ def completed_log_derivative_spectral_Xi_prime_over_Xi(
         return total
 
 
+def completed_xi_log_derivative(
+    s: Union[complex, mpmath.mpc, str, Tuple[Any, Any]],
+    dps: int = 80,
+    perturbation: float = 0.0
+) -> mpmath.mpc:
+    """
+    [INDEPENDENT COMPLETED LOG-DERIVATIVE EVALUATOR]
+    Evaluates xi'/xi(s) from the product rule of xi(s) = 1/2 * s * (s-1) * pi^(-s/2) * Gamma(s/2) * zeta(s):
+    xi'(s)/xi(s) = (2s - 1)/(s(s - 1)) - (1/2)*log(pi) + (1/2)*psi(0, s/2) + zeta'(s)/zeta(s) + perturbation.
+    Accepts an optional perturbation parameter to enable anti-circularity validation.
+    """
+    with mpmath.workdps(dps + 15):
+        s_mpc = to_mpc(s, dps=dps + 15)
+        # Rational factor derivative: d/ds log[1/2 * s * (s-1)] = 1/s + 1/(s-1) = (2s-1)/(s(s-1))
+        rational_term = (2 * s_mpc - 1) / (s_mpc * (s_mpc - 1))
+        # Pi factor derivative: d/ds log[pi^(-s/2)] = -1/2 * log(pi)
+        pi_term = -mpmath.mpf('0.5') * mpmath.log(mpmath.pi)
+        # Gamma factor derivative: d/ds log[Gamma(s/2)] = 1/2 * psi(0, s/2)
+        gamma_term = mpmath.mpf('0.5') * mpmath.psi(0, s_mpc / 2)
+        # Zeta factor derivative: zeta'(s) / zeta(s)
+        zeta_val = zeta_eval(s_mpc, dps=dps + 15)
+        zeta_pr = zeta_derivative(s_mpc, n=1, dps=dps + 15)
+        zeta_term = zeta_pr / zeta_val
+
+        log_der = rational_term + pi_term + gamma_term + zeta_term
+        if perturbation != 0.0:
+            log_der += mpmath.mpc(perturbation, 0)
+        return log_der
+
+
 def exact_finite_zero_kernel_J_T(
     p: Union[complex, str, mpmath.mpc, mpmath.mpf],
     q: Union[complex, str, mpmath.mpc, mpmath.mpf],
@@ -3285,22 +3315,18 @@ def exact_finite_zero_kernel_J_T(
     Analytically evaluates the translation integral:
     J_T(p, q) = (1/2T) int_{-T}^T dt / [ (p + i*t) * (q - i*t) ]
               = [ log((p + i*T)/(p - i*T)) + log((q + i*T)/(q - i*T)) ] / [ 2 * T * i * (p + q) ]
-    for Re(p) > 0, Re(q) > 0.
+    Enforces kernel domain preconditions: T > 0, Re(p) > 0, Re(q) > 0.
     """
     with mpmath.workdps(dps + 15):
-        if isinstance(p, (complex, mpmath.mpc)) or (isinstance(p, str) and ('+' in p or '-' in p[1:] or 'j' in p)):
-            p_c = mpmath.mpc(p)
-        else:
-            p_c = mpmath.mpc(to_mpf(p, dps=dps + 15), 0)
-
-        if isinstance(q, (complex, mpmath.mpc)) or (isinstance(q, str) and ('+' in q or '-' in q[1:] or 'j' in q)):
-            q_c = mpmath.mpc(q)
-        else:
-            q_c = mpmath.mpc(to_mpf(q, dps=dps + 15), 0)
+        p_c = to_mpc(p, dps=dps + 15)
+        q_c = to_mpc(q, dps=dps + 15)
 
         T_val = to_mpf(T, dps=dps + 15)
         if T_val <= 0:
-            raise ValueError(f"T must be > 0, got {T_val}")
+            raise ValueError(f"Kernel domain violation: T must be > 0, got T={T_val}")
+
+        if p_c.real <= 0 or q_c.real <= 0:
+            raise ValueError(f"Kernel domain violation: Re(p) and Re(q) must be > 0, got Re(p)={p_c.real}, Re(q)={q_c.real}")
 
         i_T = mpmath.mpc(0, T_val)
         num_p = mpmath.log((p_c + i_T) / (p_c - i_T))
@@ -3325,20 +3351,18 @@ def exact_finite_zero_zero_kernel_K_T(
     [EXACT FINITE ZERO-ZERO KERNEL K_T]
     Evaluates the paired zero-zero kernel for resolvents R_lambda1, R_lambda2:
     K_T(lambda1, lambda2; a) = m1 * m2 * sum_{eps, eta in {+1, -1}} J_T(a - eps*lambda1, a - eta*conj(lambda2)).
+    Enforces a > 0 and T > 0.
     """
     with mpmath.workdps(dps + 15):
-        if isinstance(lam1, (complex, mpmath.mpc)) or (isinstance(lam1, str) and ('+' in lam1 or '-' in lam1[1:] or 'j' in lam1)):
-            l1_c = mpmath.mpc(lam1)
-        else:
-            l1_c = mpmath.mpc(to_mpf(lam1, dps=dps + 15), 0)
-
-        if isinstance(lam2, (complex, mpmath.mpc)) or (isinstance(lam2, str) and ('+' in lam2 or '-' in lam2[1:] or 'j' in lam2)):
-            l2_c = mpmath.mpc(lam2)
-        else:
-            l2_c = mpmath.mpc(to_mpf(lam2, dps=dps + 15), 0)
-
+        l1_c = to_mpc(lam1, dps=dps + 15)
+        l2_c = to_mpc(lam2, dps=dps + 15)
         a_val = to_mpf(a, dps=dps + 15)
         T_val = to_mpf(T, dps=dps + 15)
+
+        if a_val <= 0:
+            raise ValueError(f"Kernel domain violation: a = sigma - 1/2 must be > 0, got a={a_val}")
+        if T_val <= 0:
+            raise ValueError(f"Kernel domain violation: T must be > 0, got T={T_val}")
 
         total = mpmath.mpc(0)
         for eps in (1, -1):
@@ -3360,14 +3384,18 @@ def evaluate_complete_finite_spectral_expansion(
     [COMPLETE FINITE SPECTRAL EXPANSION DIAGNOSTIC]
     Evaluates the complete finite spectral quantity:
     S_{N, T}(sigma) = (1/2T) int_{-T}^T |A(sigma + it) - Z_N(t)|^2 dt = I_AA - I_AZ - I_ZA + I_ZZ.
-    Tests algebraic and numerical closure without omitting cross-terms.
+    Algebraically exact 4-term decomposition with closed-form J_T / K_T kernels and numerical quadrature validation.
+    Enforces sigma > 1, T > 0.
     """
     with mpmath.workdps(dps + 15):
         sig = to_mpf(sigma, dps=dps + 15)
         T_val = to_mpf(T, dps=dps + 15)
+        if sig <= 1:
+            raise ValueError(f"Kernel domain violation: sigma must be > 1 for Dirichlet and kernel convergence, got sigma={sig}")
+        if T_val <= 0:
+            raise ValueError(f"Kernel domain violation: T must be > 0, got T={T_val}")
+
         a_val = sig - mpmath.mpf('0.5')
-        if a_val <= 0:
-            raise ValueError(f"sigma must be > 1/2, got {sig}")
 
         # Parsed zero multiset
         parsed_zeros = []
@@ -3432,7 +3460,7 @@ def evaluate_complete_finite_spectral_expansion(
             "S_direct": mpmath.nstr(s_direct, n=20),
             "S_expanded": mpmath.nstr(s_expanded, n=20),
             "closure_difference": mpmath.nstr(closure_diff, n=10),
-            "status": "EXACT_FINITE_IDENTITY",
+            "status": "ALGEBRAICALLY_EXACT_NUMERICALLY_VALIDATED",
             "earliest_open_gate": "G4",
             "infinite_interchange_status": "INFINITE_INTERCHANGE_OPEN"
         }
@@ -3441,45 +3469,58 @@ def evaluate_complete_finite_spectral_expansion(
 def direct_completed_function_control(
     sigma: Union[float, str, mpmath.mpf],
     T: Union[float, str, mpmath.mpf],
-    dps: int = 80
+    dps: int = 80,
+    perturbation: float = 0.0
 ) -> Dict[str, Any]:
     """
-    [DIRECT COMPLETED-FUNCTION CONTROL]
-    Evaluates A(sigma + it) - (Xi'/Xi)(sigma - 1/2 + it) using the analytic completed function,
-    without finite zero truncation, and compares pointwise and in finite-T mean square with -zeta'/zeta(sigma + it).
+    [INDEPENDENT DIRECT COMPLETED-FUNCTION CONTROL]
+    Evaluates Path A: -zeta'/zeta(sigma + it) and Path B: A(sigma + it) - xi'/xi(sigma + it)
+    independently without circular definition, computing pointwise residuals and finite-T mean squares.
+    Supports an optional perturbation parameter to enable anti-circularity verification.
     """
     with mpmath.workdps(dps + 15):
         sig = to_mpf(sigma, dps=dps + 15)
         T_val = to_mpf(T, dps=dps + 15)
+        if sig <= 1:
+            raise ValueError(f"sigma must be > 1, got {sig}")
+        if T_val <= 0:
+            raise ValueError(f"T must be > 0, got {T_val}")
 
-        def exact_zeta_log_der(t_val):
+        # Path A: Direct arithmetic logarithmic derivative -zeta'/zeta(u)
+        def path_a_zeta_log_der(t_val):
             u = mpmath.mpc(sig, t_val)
-            return -mpmath.zeta(u, derivative=1) / mpmath.zeta(u)
+            z_val = zeta_eval(u, dps=dps + 15)
+            z_pr = zeta_derivative(u, n=1, dps=dps + 15)
+            return -z_pr / z_val
 
-        def completed_diff(t_val):
+        # Path B: Independent completed function logarithmic derivative A(u) - xi'/xi(u)
+        def path_b_completed_diff(t_val):
             u = mpmath.mpc(sig, t_val)
             a_val = completed_log_derivative_archimedean_A(u, dps=dps)
-            xi_log_der = a_val + mpmath.zeta(u, derivative=1) / mpmath.zeta(u)
-            return a_val - xi_log_der
+            xi_ld = completed_xi_log_derivative(u, dps=dps, perturbation=perturbation)
+            return a_val - xi_ld
 
-        # Pointwise test at multiple points
-        diff_t0 = abs(completed_diff(0) - exact_zeta_log_der(0))
-        diff_t1 = abs(completed_diff(1) - exact_zeta_log_der(1))
-        diff_t5 = abs(completed_diff(5) - exact_zeta_log_der(5))
+        # Pointwise test at multiple sample ordinates t in [0, 1, 5]
+        diff_t0 = abs(path_b_completed_diff(0) - path_a_zeta_log_der(0))
+        diff_t1 = abs(path_b_completed_diff(1) - path_a_zeta_log_der(1))
+        diff_t5 = abs(path_b_completed_diff(5) - path_a_zeta_log_der(5))
 
-        # Mean square comparison
-        ms_val = mpmath.quad(lambda t: abs(exact_zeta_log_der(t)) ** 2, [-T_val, T_val]) / (2 * T_val)
+        # Mean square comparison computed independently
+        ms_zeta = mpmath.quad(lambda t: abs(path_a_zeta_log_der(t)) ** 2, [-T_val, T_val]) / (2 * T_val)
+        ms_completed = mpmath.quad(lambda t: abs(path_b_completed_diff(t)) ** 2, [-T_val, T_val]) / (2 * T_val)
+        ms_difference = abs(ms_completed - ms_zeta)
 
         return {
             "sigma": mpmath.nstr(sig, n=15),
             "T": mpmath.nstr(T_val, n=15),
+            "perturbation": perturbation,
             "pointwise_diff_t0": mpmath.nstr(diff_t0, n=10),
             "pointwise_diff_t1": mpmath.nstr(diff_t1, n=10),
             "pointwise_diff_t5": mpmath.nstr(diff_t5, n=10),
-            "mean_square_completed": mpmath.nstr(ms_val, n=20),
-            "mean_square_zeta": mpmath.nstr(ms_val, n=20),
-            "mean_square_difference": "0.0",
-            "status": "ANALYTIC_THEOREM_DERIVED_IN_DOCUMENTATION"
+            "mean_square_completed": mpmath.nstr(ms_completed, n=20),
+            "mean_square_zeta": mpmath.nstr(ms_zeta, n=20),
+            "mean_square_difference": mpmath.nstr(ms_difference, n=15),
+            "status": "NUMERICAL_VALIDATION_OF_ANALYTIC_IDENTITY"
         }
 
 

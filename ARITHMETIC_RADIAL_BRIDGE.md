@@ -204,57 +204,37 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 | Candidate ID | Name | Target | Gate Status | Earliest Failed Gate | Structural Obstruction / Witness | Final Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **CANDIDATE_SS1** | Conjugated Explicit-Formula Pair | Separated Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Direct Holomorphic Parameter Separation Failure**: Cauchy-Riemann equations force $x=t, a'(\gamma)=0$ on open sets. Holomorphic kernel $e^{(x+it)z}$ produces $e^{x\delta - t\gamma}$, inducing exponential translation divergence $\sinh(2T\gamma)/\gamma$. | `FAIL_DIRECT_HOLOMORPHIC_PARAMETER_SEPARATION` |
-| **CANDIDATE_SS2** | Two-Slot Logarithmic Derivative | Bilinear Form | `FALSIFIED_GATE_2_3` | Gate 2 & 3 (Cross-terms) | **Unconstrained Double-Sum Resolution Failure**: $D_K(s_1)\overline{D_K(s_2)}$ yields double sum over all zero pairs $(\rho_1, \rho_2)$. Off-diagonal terms scale as $O((T\log T)^2)$ against $O(T\log T)$ diagonal and do not cancel without projected divisor subtraction. | `FAIL_UNCONSTRAINED_DOUBLE_SUM_WITHOUT_PAIR_ISOLATION` |
+| **CANDIDATE_SS2** | Two-Slot Logarithmic Derivative | Bilinear Form | `FALSIFIED_GATE_2_3` | Gate 2 & 3 (Cross-terms) | **Unconstrained Double-Sum Resolution Failure**: $D_K(s_1)\overline{D_K(s_2)}$ yields an unrestricted double sum over all zero pairs $(\rho_1, \rho_2)$; involution-pair isolation is not obtained, and limiting off-diagonal cancellation remains unproved. | `FAIL_UNCONSTRAINED_DOUBLE_SUM_WITHOUT_PAIR_ISOLATION` |
 | **CANDIDATE_SS3** | Rapidly Smoothed Transform | Smoothed Signal | `FALSIFIED_GATE_2` | Gate 2 (Separation) | **Ordinate Slot Exponential Growth**: Translation parameter enters real exponential slot as $-t\gamma$, causing translation average $\int_{-T}^T e^{-2t\gamma}dt = \sinh(2T\gamma)/\gamma$ to diverge exponentially as $T\to\infty$ ($>10^{240}$ for $\gamma \approx 14.13, T=20$). | `FAIL_ORDINATE_SLOT_EXPONENTIAL_GROWTH` |
 | **CANDIDATE_SS4** | Cross-Grade Sesquilinear Form | Cross-Grade Coupling | `FALSIFIED_GATE_5` | Gate 5 (Grade Nonredundancy) | **Transcendental Cross-Grade Scope & Coordinate Redundancy**: Bounded frequency gap searches show no non-trivial resonances up to tested bounds (numerical evidence only; exact non-resonance for $2\pi$ is open). Single-grade sums collapse to grade-zero pullbacks by coordinate covariance ($z_K = \tau^K z$). | `GRADE_COORDINATE_REDUNDANT` |
-| **CANDIDATE_SS5** | Direct Positive Quadratic Kernel | Quadratic Form | `FALSIFIED_GATE_1_6` | Gate 1 & 6 (Holomorphy/Anchor) | **Non-Holomorphic Arithmetic Firewall**: Any holomorphic kernel vanishing on $\Re(s)=1/2$ vanishes identically everywhere on $\mathbb C^2$. Non-holomorphic pairing couples $\rho$ with $1-\bar\rho$, which cannot be pulled back to Dirichlet series via Cauchy residue calculus. | `FAIL_NON_HOLOMORPHIC_ARITHMETIC_FIREWALL` |
+| **CANDIDATE_SS5** | Direct Positive Quadratic Kernel | Quadratic Form | `FALSIFIED_GATE_1_6` | Gate 1 & 6 (Holomorphy/Anchor) | **Direct One-Point Holomorphic Realization Boundary**: Direct one-point holomorphic realization vanishing on $\Re(s)=1/2$ vanishes identically everywhere on $\mathbb C^2$. Non-holomorphic pairing cannot be directly evaluated via single-point Cauchy residue calculus; nonlinear sesquilinear constructions remain open. | `FAIL_DIRECT_ONE_POINT_HOLOMORPHIC_REALIZATION` |
 
 ### 7.3 Completed Mean-Square Anchor Candidates (CMSA-1–CMSA-3)
 
 | Candidate ID | Name | Target | Gate Status | Earliest Failed Gate | Structural Obstruction / Witness | Final Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CANDIDATE_CMSA1** | Base Completed Mean-Square Anchor | $\mathcal A(\sigma) = 0$ | `LIVE_G3_CLOSED_G4_OPEN` | Gate 4 (Infinite Spectral Interchange) | **Non-Uniform Infinite Interchange Obstruction**: Exact finite spectral expansion $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ closes to machine precision via analytic kernels $J_T(p,q)$ and $K_T(\lambda,\mu;a)$. However, individual zero resolvents have finite $L^2(\mathbb R, dt)$ norm $\pi/(\sigma-\Re\rho)$, so $(1/2T)\int_{-T}^T dt/|\sigma-\rho+it|^2 \to 0$ as $T\to\infty$. The non-zero Besicovitch mean of the arithmetic side is carried by non-uniform infinite collective cancellation; termwise infinite limit interchange is unproved. | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4` |
-| **CANDIDATE_CMSA2** | Polarized Completed Mean-Square Anchor | $\mathcal A(\sigma_1, \sigma_2) = 0$ | `LIVE_G3_CLOSED_G4_OPEN` | Gate 4 (Infinite Spectral Interchange) | **Cross-Slot Non-Uniform Infinite Interchange**: Two-parameter polarization $\mathcal A(\sigma_1, \sigma_2)$ inherits exact finite paired kernel representation $K_T(\lambda,\mu; a_1, a_2)$, but termwise infinite limit interchange $\lim_{T\to\infty} \sum_{\lambda,\mu} K_T = \sum_{\lambda,\mu} \lim_{T\to\infty} K_T$ remains open at Gate G4. | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4` |
+| **CANDIDATE_CMSA1** | Base Completed Mean-Square Anchor | $\mathcal A(\sigma) = 0$ | `LIVE_G3_CLOSED_G4_OPEN` | Gate 4 (Infinite Spectral Interchange) | **Non-Uniform Infinite Interchange Obstruction**: Exact finite spectral expansion $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ is an exact 4-term algebraic decomposition with closed-form analytic kernels $J_T(p,q)$ and $K_T(\lambda,\mu;a)$, validated numerically with closure residual $< 10^{-15}$. However, every fixed finite collection of individual resolvents contributes 0 under $(1/2T)\int_{-T}^T$ as $T\to\infty$. The non-zero Besicovitch mean of the arithmetic side is carried by non-uniform infinite collective cancellation; termwise infinite limit interchange is unproved. | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4` |
+| **CANDIDATE_CMSA2** | Polarized Completed Mean-Square Anchor | $\mathcal A(\sigma_1, \sigma_2) = 0$ | `LIVE_G3_CLOSED_G4_OPEN` | Gate 4 (Infinite Spectral Interchange) | **Cross-Slot Non-Uniform Infinite Interchange**: Two-parameter polarization $\mathcal A(\sigma_1, \sigma_2)$ inherits exact finite paired kernel representation $K_T(\lambda,\mu; a_1, a_2)$, but termwise infinite limit interchange remains open at Gate G4. | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4` |
 | **CANDIDATE_CMSA3** | Grade-Normalized Completed Mean-Square Anchor | $\mathcal A_K(\sigma) = 0$ | `FALSIFIED_GATE_8` | Gate 8 (Grade Nonredundancy) | **Grade Covariance Redundancy**: The normalized completed logarithmic derivative $s D_s(su) = f(u)$ (formalized in Lean 4 for arbitrary scale $s > 0$) is strictly coordinate-redundant. Grade dilation yields no additional arithmetic constraints or non-redundant radial invariants beyond $K=0$. | `GRADE_COORDINATE_REDUNDANT` |
 
 ---
 
-## 8. Lean 4 Formalization Inventory
+## 8. Lean 4 Formalization Mapping
 
-The formalization in `formal/RiemannScope/` contains the following compiled theorems (0 `sorry`, 0 `admit`, 0 project axioms):
-
-1. **`RiemannScope.centeredGradeCoord_eq_tau_pow_mul_z`**:
-   Exact centered grade dilation: $z_K = s_K - c_K = \tau^K (s - 1/2)$.
-2. **`RiemannScope.list_weighted_sum_nonneg_eq_zero_iff`**:
-   General arbitrary-family weighted positivity firewall: for any positive weight list $w$ and non-negative defect list $l$, $\sum w_i l_i = 0 \iff \forall i, l_i = 0$.
-3. **`RiemannScope.offlineQuartet_reflection`**:
-   Off-line quartet is closed under functional equation reflection $s \mapsto 1-s$.
-4. **`RiemannScope.offlineQuartet_conj`**:
-   Off-line quartet is closed under complex conjugation $s \mapsto \bar s$.
-5. **`RiemannScope.covariance_countermodel_offline_compatible`**:
-   Proves covariance, reflection, and conjugation symmetries are jointly compatible with $\delta \ne 0$.
-6. **`RiemannScope.ConditionalArithmeticRadialBridge.all_defects_zero`**:
-   Rigidity theorem: under any valid conditional arithmetic bridge, all represented zero defects vanish ($r_j = 0 \implies \delta_j = 0$).
-7. **`RiemannScope.list_pairs_sq_sum_eq`**:
-   **Arbitrary finite curvature theorem**: For any real list $l$ of length $N$, $\sum_{i,j} (d_i + d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$.
-8. **`RiemannScope.list_pairs_sq_sum_symmetric`**:
-   Symmetric zero-sum reduction: when $\sum d_i = 0$, $\sum_{i,j} (d_i + d_j)^2 = 2N\sum d_i^2$.
-9. **`RiemannScope.list_pairs_sq_sum_nonneg` & `list_pairs_sq_sum_eq_zero_iff`**:
-   Unconditional nonnegativity and zero-rigidity for arbitrary lists: $\sum_{i,j} (d_i + d_j)^2 \ge 0$, vanishing iff $\forall x \in l, x = 0$.
-10. **`RiemannScope.sum_pairs_sq_two_terms` & `sum_pairs_sq_four_terms`**:
-    Explicit 2-term and 4-term specializations of the algebraic curvature identity.
-11. **`RiemannScope.curvature_pair_symmetric` & `curvature_quartet_symmetric`**:
-    Symmetric 2-term ($8\delta^2$) and 4-term ($16\sum \delta_a^2$) curvature evaluations.
-12. **`RiemannScope.upper_fibre_simple_quartet_curvature_val` & `upper_fibre_multiplicity_two_curvature_val`**:
-    Simple quartet fibre ($8\delta^2$) and multiplicity-2 fibre ($32\delta^2$) evaluations.
-13. **`RiemannScope.normalized_fibre_curvature_simple`**:
-    Normalized fibre curvature: $C_\gamma = (8\delta^2)/(2 \cdot 2) = 2\delta^2 = \delta^2 + (-\delta)^2$.
-14. **`RiemannScope.ConditionalSeparatedSignalBridge.all_variances_zero`**:
-    Separated Signal Bridge Rigidity Theorem: under any arithmetic-anchored separated signal bridge, all represented radial variances vanish, forcing $\delta = 0$.
-15. **`RiemannScope.generic_scale_dilation_cancellation`**:
-    Universal scale dilation cancellation: for any scale $s > 0$, $s D_s(su) = f(u)$, proving coordinate redundancy for arbitrary dilation factors.
-16. **`RiemannScope.ConditionalCompletedLogDerivativeDecomposition.coordinate_redundant`**:
-    Proves that the normalized dilated completed logarithmic derivative $\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)$ is strictly coordinate-redundant.
+| Mathematical Object | Mathematical Definition | Corpus Document | Lean 4 Theorem / Structure | Proof Content |
+| :--- | :--- | :--- | :--- | :--- |
+| $\sum_{i,j} (d_i+d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$ | Arbitrary Algebraic Curvature | Proved Internally (Exact) | Formalized (`list_pairs_sq_sum_eq`) | Radial variation detector for arbitrary finite zero families |
+| $J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}$ | Exact Finite Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_kernel_J_T`) | Exact evaluation of finite spectral cross-terms |
+| $K_T(\lambda,\mu; a) = m_\lambda m_\mu \sum_{\varepsilon,\eta} J_T(a-\varepsilon\lambda, a-\eta\bar\mu)$ | Exact Paired Zero-Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_zero_kernel_K_T`) | Exact evaluation of paired spectral self-interaction |
+| $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Algebraic Identity) | Verified in Python (`evaluate_complete_finite_spectral_expansion`) | Algebraic decomposition with numerical quadrature closure |
+| $\Xi'/\Xi(z) = \sum \frac{2z}{z^2-\lambda^2}$ | Hadamard Log-Derivative | Standard Theorem (Hadamard 1893) | Unformalized Analytic | Exact spectral representation |
+| $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Conditional Representation (`ConditionalCompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
+| $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T \|P(\sigma+it)\|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
+| $\mathcal A(\sigma) = 0$ | Completed Mean-Square Anchor | Proved Internally (Analytic) | Unformalized Analytic | Divisor-independent arithmetic anchor |
+| $s D_s(su) = f(u)$ | Universal Scale Invariance | Proved Internally (Algebraic) | Formalized (`generic_scale_dilation_cancellation`) | Dilation coordinate redundancy exclusion |
+| Single-grade coordinate pullback | Grade Covariance | Proved Internally (Algebraic) | Formalized (`coordinate_redundant`) | Coordinate redundancy exclusion |
+| Gate G4: Infinite Spectral Interchange | Analytic Interchange Barrier | Identified Exact Open Obstruction | Open Analytic Gate | Earliest open gate in present CMSA derivation |
+| $\mathrm{OBL\text{-}RDQ\text{-}001}$ | Arithmetic Radial Bridge | Open Research Obligation | Conditional Structure Only | Central Research Goal |
 
 ---
 
@@ -270,14 +250,14 @@ The formalization in `formal/RiemannScope/` contains the following compiled theo
 | $\sum_{i,j} (d_i+d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$ | Arbitrary Algebraic Curvature | Proved Internally (Exact) | Formalized (`list_pairs_sq_sum_eq`) | Radial variation detector for arbitrary finite zero families |
 | $J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}$ | Exact Finite Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_kernel_J_T`) | Exact evaluation of finite spectral cross-terms |
 | $K_T(\lambda,\mu; a) = m_\lambda m_\mu \sum_{\varepsilon,\eta} J_T(a-\varepsilon\lambda, a-\eta\bar\mu)$ | Exact Paired Zero-Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_zero_kernel_K_T`) | Exact evaluation of paired spectral self-interaction |
-| $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Exact Analytic) | Verified in Python (`evaluate_complete_finite_spectral_expansion`) | Closed exact finite spectral representation |
+| $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Algebraic Identity) | Verified in Python (`evaluate_complete_finite_spectral_expansion`) | Closed exact finite spectral representation |
 | $\Xi'/\Xi(z) = \sum \frac{2z}{z^2-\lambda^2}$ | Hadamard Log-Derivative | Standard Theorem (Hadamard 1893) | Unformalized Analytic | Exact spectral representation |
-| $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Formalized Structure (`ConditionalCompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
+| $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Conditional Representation (`ConditionalCompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
 | $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T \|P(\sigma+it)\|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
 | $\mathcal A(\sigma) = 0$ | Completed Mean-Square Anchor | Proved Internally (Analytic) | Unformalized Analytic | Divisor-independent arithmetic anchor |
 | $s D_s(su) = f(u)$ | Universal Scale Invariance | Proved Internally (Algebraic) | Formalized (`generic_scale_dilation_cancellation`) | Dilation coordinate redundancy exclusion |
 | Single-grade coordinate pullback | Grade Covariance | Proved Internally (Algebraic) | Formalized (`coordinate_redundant`) | Coordinate redundancy exclusion |
-| Gate G4: Infinite Spectral Interchange | Analytic Interchange Barrier | Identified Exact Open Obstruction | Open Analytic Gate | Barrier to unregularized spectral bridge |
+| Gate G4: Infinite Spectral Interchange | Analytic Interchange Barrier | Identified Exact Open Obstruction | Open Analytic Gate | Earliest open gate in present CMSA derivation |
 | $\mathrm{OBL\text{-}RDQ\text{-}001}$ | Arithmetic Radial Bridge | Open Research Obligation | Conditional Structure Only | Central Research Goal |
 
 ---
@@ -305,24 +285,23 @@ This quantity:
 ### 10.3 Closed Finite Spectral Expansion & Exact Analytic Kernels
 For any finite subset of zeros $\mathcal Z_N = \{\lambda_k = \delta_k + i\gamma_k\}_{k=1}^N$ ($z = a + it = \sigma - 1/2 + it$), the finite spectral approximant is:
 $$Z_N(t) = \sum_{k=1}^N m_k \frac{2z}{z^2 - \lambda_k^2} = \sum_{k=1}^N m_k \left( \frac{1}{a - \lambda_k + it} + \frac{1}{a + \lambda_k + it} \right).$$
-The finite mean square decomposes exactly into four closed terms:
+The finite mean square decomposes exactly into four algebraic terms:
 $$S_{N, T}(\sigma) := \frac{1}{2T}\int_{-T}^T |A(\sigma+it) - Z_N(t)|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},$$
 where:
-1. $I_{AA} = \frac{1}{2T}\int_{-T}^T |A(\sigma+it)|^2 dt$;
-2. $I_{AZ} = \frac{1}{2T}\int_{-T}^T A(\sigma+it)\overline{Z_N(t)} dt$, and $I_{ZA} = \overline{I_{AZ}}$;
+1. $I_{AA} = \frac{1}{2T}\int_{-T}^T |A(\sigma+it)|^2 dt$ (evaluated numerically via adaptive quadrature);
+2. $I_{AZ} = \frac{1}{2T}\int_{-T}^T A(\sigma+it)\overline{Z_N(t)} dt$, and $I_{ZA} = \overline{I_{AZ}}$ (evaluated numerically via adaptive quadrature);
 3. $I_{ZZ} = \sum_{j=1}^N \sum_{k=1}^N K_T(\lambda_j, \lambda_k; a)$, evaluated exactly via the closed paired zero-zero kernel:
    $$K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu),$$
-   with exact translation kernel:
+   with exact translation kernel ($T > 0, \Re p > 0, \Re q > 0$):
    $$\boxed{J_T(p, q) := \frac{1}{2T}\int_{-T}^T \frac{dt}{(p+it)(q-it)} = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)}.}$$
-This finite spectral expansion closes exactly to machine precision ($< 10^{-18}$) in arbitrary precision.
+This finite spectral expansion is algebraically exact and numerically validated with closure residual $< 10^{-15}$ across diverse parameter configurations.
 
 ### 10.4 Exact Earliest Infinite Analytic Obstruction (Gate G4)
 1. **Besicovitch Mean Square vs $L^2(\mathbb R)$ Resolvents**:
    The individual zero resolvent terms $\frac{1}{\sigma-\rho+it}$ belong to $L^2(\mathbb R, dt)$ with finite total norm $\int_{-\infty}^\infty \frac{dt}{|\sigma-\rho+it|^2} = \frac{\pi}{\sigma - \Re\rho}$.
-   Under translation averaging, $\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \sim \frac{\pi}{2T(\sigma-\Re\rho)} \to 0$ as $T\to\infty$.
-   Consequently, termwise infinite limit interchange:
-   $$\lim_{T\to\infty} \sum_{\lambda, \mu} K_T(\lambda, \mu; a) \ne \sum_{\lambda, \mu} \lim_{T\to\infty} K_T(\lambda, \mu; a) = 0.$$
-   The non-zero Besicovitch mean on the arithmetic side ($\sum \Lambda(n)^2 n^{-2\sigma}$) is carried by a collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest obstruction to bridging the finite spectral expansion to the infinite arithmetic anchor.
+   Under translation averaging, every fixed finite collection of individual resolvents contributes zero after $1/(2T)$ normalization as $T\to\infty$:
+   $$\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \sim \frac{\pi}{2T(\sigma-\Re\rho)} \to 0 \quad (T\to\infty).$$
+   This statement applies to any fixed finite truncation. However, this does not justify interchanging the infinite spectral sum and the $T\to\infty$ limit. The arithmetic mean square $\sum \Lambda(n)^2 n^{-2\sigma}$ is strictly positive and non-zero; therefore, the non-zero mean square is carried by a collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the earliest open gate in the present CMSA derivation.
 2. **Spectral Real-Axis Defect Exact Formula & Sign Transition**:
    Evaluating the real-axis variation between an off-line quartet $\{\pm\delta \pm i\gamma\}$ and an on-line pair $\{0, \pm i\gamma\}$ at $z = \sigma - 1/2 > 0$ yields the exact rational defect:
    $$\boxed{\Delta(\delta) := \frac{4z}{z^2 - (\delta+i\gamma)^2} + \frac{4z}{z^2 - (\delta-i\gamma)^2} - \frac{8z}{z^2 + \gamma^2} = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2 + \gamma^2)[(z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2]}.}$$

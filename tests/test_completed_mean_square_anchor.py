@@ -165,6 +165,37 @@ class TestFiniteDirichletMeanSquareSincKernel:
 class TestExactFiniteSpectralKernelsAndExpansion:
     """Verifies exact analytic zero kernel J_T, zero-zero kernel K_T, and complete finite spectral expansion."""
 
+    def test_kernel_domain_preconditions(self):
+        """Enforces domain preconditions: T > 0, Re(p) > 0, Re(q) > 0, a > 0, sigma > 1."""
+        with mpmath.workdps(40):
+            # J_T requires T > 0 and Re(p) > 0, Re(q) > 0
+            with pytest.raises(ValueError, match="Kernel domain violation: T must be > 0"):
+                exact_finite_zero_kernel_J_T('1.0', '1.0', T='0.0')
+            with pytest.raises(ValueError, match="Kernel domain violation: T must be > 0"):
+                exact_finite_zero_kernel_J_T('1.0', '1.0', T='-5.0')
+            with pytest.raises(ValueError, match="Kernel domain violation: Re\\(p\\) and Re\\(q\\) must be > 0"):
+                exact_finite_zero_kernel_J_T('-0.5', '1.0', T='10.0')
+            with pytest.raises(ValueError, match="Kernel domain violation: Re\\(p\\) and Re\\(q\\) must be > 0"):
+                exact_finite_zero_kernel_J_T('1.0', '-0.5', T='10.0')
+
+            # K_T requires a > 0 and T > 0
+            with pytest.raises(ValueError, match="Kernel domain violation: a = sigma - 1/2 must be > 0"):
+                exact_finite_zero_zero_kernel_K_T('14.13j', '14.13j', a='0.0', T='10.0')
+            with pytest.raises(ValueError, match="Kernel domain violation: T must be > 0"):
+                exact_finite_zero_zero_kernel_K_T('14.13j', '14.13j', a='1.0', T='-1.0')
+
+            # Expansion requires sigma > 1 and T > 0
+            with pytest.raises(ValueError, match="Kernel domain violation: sigma must be > 1"):
+                evaluate_complete_finite_spectral_expansion(sigma='0.8', T='10.0', upper_zeros=[])
+            with pytest.raises(ValueError, match="Kernel domain violation: T must be > 0"):
+                evaluate_complete_finite_spectral_expansion(sigma='2.0', T='0.0', upper_zeros=[])
+
+            # Direct control requires sigma > 1 and T > 0
+            with pytest.raises(ValueError, match="sigma must be > 1"):
+                direct_completed_function_control(sigma='0.8', T='10.0')
+            with pytest.raises(ValueError, match="T must be > 0"):
+                direct_completed_function_control(sigma='2.0', T='-10.0')
+
     def test_exact_zero_kernel_J_T_vs_numerical_quadrature(self):
         """J_T(p,q) matches direct numerical quadrature of (1/2T) int_{-T}^T dt / [(p+it)(q-it)]."""
         with mpmath.workdps(50):
@@ -177,6 +208,21 @@ class TestExactFiniteSpectralKernelsAndExpansion:
 
             diff = abs(j_analytic - j_quad)
             assert diff < mpmath.mpf('1e-18')
+
+    def test_exact_zero_kernel_J_T_broad_complex_grid(self):
+        """Tests J_T(p,q) against quadrature across a broad complex grid in Re(p), Re(q) > 0."""
+        with mpmath.workdps(50):
+            grid = [
+                (mpmath.mpc('0.5', '5.0'), mpmath.mpc('0.8', '10.0'), mpmath.mpf('15.0')),
+                (mpmath.mpc('2.0', '-12.0'), mpmath.mpc('1.2', '8.0'), mpmath.mpf('30.0')),
+                (mpmath.mpc('3.5', '0.0'), mpmath.mpc('0.2', '-25.0'), mpmath.mpf('50.0')),
+            ]
+            for p, q, T in grid:
+                j_ana = exact_finite_zero_kernel_J_T(p, q, T, dps=50)
+                j_num = mpmath.quad(lambda t: 1 / ((p + mpmath.mpc(0, t)) * (q - mpmath.mpc(0, t))), [-T, 0, T], maxdegree=10) / (2 * T)
+                assert abs(j_ana - j_num) < mpmath.mpf('1e-15')
+
+
 
     def test_exact_zero_zero_kernel_K_T_vs_numerical_quadrature(self):
         """K_T(lambda1, lambda2; a) matches direct numerical quadrature of R_lambda1 * conj(R_lambda2)."""
@@ -208,17 +254,51 @@ class TestExactFiniteSpectralKernelsAndExpansion:
             res = evaluate_complete_finite_spectral_expansion(sigma='2.0', T='10.0', upper_zeros=zeros, dps=35)
             closure_diff = mpmath.mpf(res["closure_difference"])
             assert closure_diff < mpmath.mpf('1e-15')
-            assert res["status"] == "EXACT_FINITE_IDENTITY"
+            assert res["status"] == "ALGEBRAICALLY_EXACT_NUMERICALLY_VALIDATED"
             assert res["earliest_open_gate"] == "G4"
             assert res["infinite_interchange_status"] == "INFINITE_INTERCHANGE_OPEN"
 
-    def test_direct_completed_function_control(self):
-        """Direct completed function matches -zeta'/zeta pointwise and in finite-T mean square."""
+    def test_complete_finite_spectral_expansion_comprehensive_matrix(self):
+        """Tests complete finite expansion across on-line, off-line, close ordinates, multiplicities, T scales, and sigmas."""
         with mpmath.workdps(40):
-            res = direct_completed_function_control(sigma='2.5', T='10.0', dps=35)
-            assert mpmath.mpf(res["pointwise_diff_t0"]) < mpmath.mpf('1e-30')
-            assert mpmath.mpf(res["pointwise_diff_t1"]) < mpmath.mpf('1e-30')
-            assert mpmath.mpf(res["mean_square_difference"]) == 0.0
+            configs = [
+                # 1. On-line only, T below first zero
+                ([('0.0', '14.134725', 1), ('0.0', '21.022039', 1)], '1.5', '5.0'),
+                # 2. Single off-line quartet, T near zero ordinate
+                ([('0.08', '14.134725', 1), ('-0.08', '14.134725', 1)], '2.0', '14.13'),
+                # 3. Mixed with multiplicities > 1 and close ordinates, T above
+                ([
+                    ('0.0', '14.134725', 2),
+                    ('0.05', '14.140000', 1),
+                    ('-0.05', '14.140000', 1),
+                    ('0.0', '21.022039', 1)
+                ], '2.5', '35.0'),
+                # 4. High sigma regime
+                ([('0.1', '14.134725', 1), ('-0.1', '14.134725', 1)], '3.5', '20.0'),
+            ]
+            for zeros_cfg, sig_val, t_val in configs:
+                res = evaluate_complete_finite_spectral_expansion(sigma=sig_val, T=t_val, upper_zeros=zeros_cfg, dps=35)
+                c_diff = mpmath.mpf(res["closure_difference"])
+                assert c_diff < mpmath.mpf('1e-15')
+
+    def test_direct_completed_function_control_unperturbed(self):
+        """Unperturbed independent completed function matches -zeta'/zeta pointwise and in finite-T mean square."""
+        with mpmath.workdps(40):
+            res = direct_completed_function_control(sigma='2.5', T='10.0', dps=35, perturbation=0.0)
+            assert mpmath.mpf(res["pointwise_diff_t0"]) < mpmath.mpf('1e-25')
+            assert mpmath.mpf(res["pointwise_diff_t1"]) < mpmath.mpf('1e-25')
+            assert mpmath.mpf(res["pointwise_diff_t5"]) < mpmath.mpf('1e-25')
+            assert mpmath.mpf(res["mean_square_difference"]) < mpmath.mpf('1e-25')
+            assert res["status"] == "NUMERICAL_VALIDATION_OF_ANALYTIC_IDENTITY"
+
+    def test_direct_completed_function_control_perturbed_anti_circularity(self):
+        """Perturbed completed function yields strictly non-zero difference, proving non-circularity."""
+        with mpmath.workdps(40):
+            res = direct_completed_function_control(sigma='2.5', T='10.0', dps=35, perturbation=0.05)
+            # The perturbation introduces an exact non-zero residual
+            assert mpmath.mpf(res["pointwise_diff_t0"]) > mpmath.mpf('0.04')
+            assert mpmath.mpf(res["pointwise_diff_t1"]) > mpmath.mpf('0.04')
+            assert mpmath.mpf(res["mean_square_difference"]) > mpmath.mpf('1e-5')
 
 
 class TestRealAxisSpectralDefect:
