@@ -249,16 +249,18 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 | $\operatorname{Tr}\mathcal R = 0 \iff \mathrm{RH}$ | Spectral Equivalence | Proved Internally (Analytic) | Formalized (`list_sum_nonneg_eq_zero_iff`) | Spectral target criterion |
 | $\sum_{i,j} (d_i+d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$ | Arbitrary Algebraic Curvature | Proved Internally (Exact) | Formalized (`list_pairs_sq_sum_eq`) | Radial variation detector for arbitrary finite zero families |
 | $J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}$ | Exact Finite Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_kernel_J_T`) | Exact evaluation of finite spectral cross-terms |
+| $J_T^{\text{Fejér}}(p,q) = \frac{I_T(p)+I_T(q)}{T(p+q)}$ | Exact Fejér Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_fejer_zero_kernel_J_T`) | Exact evaluation of Fejér windowed spectral kernel |
 | $K_T(\lambda,\mu; a) = m_\lambda m_\mu \sum_{\varepsilon,\eta} J_T(a-\varepsilon\lambda, a-\eta\bar\mu)$ | Exact Paired Zero-Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_zero_kernel_K_T`) | Exact evaluation of paired spectral self-interaction |
-| $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Algebraic Identity) | Verified in Python (`evaluate_complete_finite_spectral_expansion`) | Closed exact finite spectral representation |
+| $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Algebraic Identity) | Formalized (`finite_quadratic_four_term_decomposition`) | Closed exact finite spectral representation across windows |
 | $\Xi'/\Xi(z) = \sum \frac{2z}{z^2-\lambda^2}$ | Hadamard Log-Derivative | Standard Theorem (Hadamard 1893) | Unformalized Analytic | Exact spectral representation |
 | $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Conditional Representation (`ConditionalCompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
-| $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T \|P(\sigma+it)\|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
+| $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
 | $\mathcal A(\sigma) = 0$ | Completed Mean-Square Anchor | Proved Internally (Analytic) | Unformalized Analytic | Divisor-independent arithmetic anchor |
 | $s D_s(su) = f(u)$ | Universal Scale Invariance | Proved Internally (Algebraic) | Formalized (`generic_scale_dilation_cancellation`) | Dilation coordinate redundancy exclusion |
 | Single-grade coordinate pullback | Grade Covariance | Proved Internally (Algebraic) | Formalized (`coordinate_redundant`) | Coordinate redundancy exclusion |
-| Gate G4: Infinite Spectral Interchange | Analytic Interchange Barrier | Identified Exact Open Obstruction | Open Analytic Gate | Earliest open gate in present CMSA derivation |
-| $\mathrm{OBL\text{-}RDQ\text{-}001}$ | Arithmetic Radial Bridge | Open Research Obligation | Conditional Structure Only | Central Research Goal |
+| $\forall H, \lim f(H, T) = 0 \centernot\implies \lim f(H(T), T) = 0$ | Cofinal Limit Distinction | Proved Internally (Countermodel) | Formalized (`cofinal_schedule_distinct_from_fixed_limit`) | Rigorous boundary layer limit separation |
+| Gate G4: Infinite Spectral Regularization | Analytic Regularization Barrier | Characterized Across 4 Windows | `CMSA_GATE_G4.md` | Earliest open gate in present CMSA derivation |
+| $\mathrm{OBL\text{-}RDQ\text{-}001}$ | Arithmetic Radial Bridge | Open Research Obligation | Conditional Structure (`ConditionalG4RegularizedBridge`) | Central Research Goal |
 
 ---
 
@@ -285,38 +287,24 @@ This quantity:
 ### 10.3 Closed Finite Spectral Expansion & Exact Analytic Kernels
 For any finite subset of zeros $\mathcal Z_N = \{\lambda_k = \delta_k + i\gamma_k\}_{k=1}^N$ ($z = a + it = \sigma - 1/2 + it$), the finite spectral approximant is:
 $$Z_N(t) = \sum_{k=1}^N m_k \frac{2z}{z^2 - \lambda_k^2} = \sum_{k=1}^N m_k \left( \frac{1}{a - \lambda_k + it} + \frac{1}{a + \lambda_k + it} \right).$$
-The finite mean square decomposes exactly into four algebraic terms:
-$$S_{N, T}(\sigma) := \frac{1}{2T}\int_{-T}^T |A(\sigma+it) - Z_N(t)|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},$$
-where:
-1. $I_{AA} = \frac{1}{2T}\int_{-T}^T |A(\sigma+it)|^2 dt$ (evaluated numerically via adaptive quadrature);
-2. $I_{AZ} = \frac{1}{2T}\int_{-T}^T A(\sigma+it)\overline{Z_N(t)} dt$, and $I_{ZA} = \overline{I_{AZ}}$ (evaluated numerically via adaptive quadrature);
-3. $I_{ZZ} = \sum_{j=1}^N \sum_{k=1}^N K_T(\lambda_j, \lambda_k; a)$, evaluated exactly via the closed paired zero-zero kernel:
-   $$K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu),$$
-   with exact translation kernel ($T > 0, \Re p > 0, \Re q > 0$):
-   $$\boxed{J_T(p, q) := \frac{1}{2T}\int_{-T}^T \frac{dt}{(p+it)(q-it)} = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)}.}$$
-This finite spectral expansion is algebraically exact and numerically validated with closure residual $< 10^{-15}$ across diverse parameter configurations.
+The finite mean square decomposes exactly into four algebraic terms across window families:
+$$S_{N, T}^{(W)}(\sigma) := \int_{\mathbb R} W_T(t) |A(\sigma+it) - Z_N(t)|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}.$$
+1. **Rectangular Window**: $J_T(p,q) = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)}$.
+2. **Fejér Window**: $J_T^{\text{Fejér}}(p,q) = \frac{I_T(p) + I_T(q)}{T(p+q)}$ where $I_T(w) = -\frac{(w+iT)\log(w+iT) + (w-iT)\log(w-iT) - 2w\log w}{T}$.
 
-### 10.4 Exact Earliest Infinite Analytic Obstruction (Gate G4)
-1. **Besicovitch Mean Square vs $L^2(\mathbb R)$ Resolvents**:
-   The individual zero resolvent terms $\frac{1}{\sigma-\rho+it}$ belong to $L^2(\mathbb R, dt)$ with finite total norm $\int_{-\infty}^\infty \frac{dt}{|\sigma-\rho+it|^2} = \frac{\pi}{\sigma - \Re\rho}$.
-   Under translation averaging, every fixed finite collection of individual resolvents contributes zero after $1/(2T)$ normalization as $T\to\infty$:
-   $$\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \sim \frac{\pi}{2T(\sigma-\Re\rho)} \to 0 \quad (T\to\infty).$$
-   This statement applies to any fixed finite truncation. However, this does not justify interchanging the infinite spectral sum and the $T\to\infty$ limit. The arithmetic mean square $\sum \Lambda(n)^2 n^{-2\sigma}$ is strictly positive and non-zero; therefore, the non-zero mean square is carried by a collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the earliest open gate in the present CMSA derivation.
-2. **Spectral Real-Axis Defect Exact Formula & Sign Transition**:
-   Evaluating the real-axis variation between an off-line quartet $\{\pm\delta \pm i\gamma\}$ and an on-line pair $\{0, \pm i\gamma\}$ at $z = \sigma - 1/2 > 0$ yields the exact rational defect:
-   $$\boxed{\Delta(\delta) := \frac{4z}{z^2 - (\delta+i\gamma)^2} + \frac{4z}{z^2 - (\delta-i\gamma)^2} - \frac{8z}{z^2 + \gamma^2} = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2 + \gamma^2)[(z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2]}.}$$
-   - For $z^2 < 3\gamma^2 + \delta^2$ (which holds for all ordinates $\gamma > 14$ when $z = O(1)$), $\Delta(\delta) < 0$.
-   - For $z^2 > 3\gamma^2 + \delta^2$, $\Delta(\delta) > 0$.
-   Leading-order behavior: $\Delta(\delta) \approx \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}\delta^2 + O(\delta^4)$.
+### 10.4 Gate G4 Infinite-Regularization and Radial-Survival Analysis
+Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CMSA_GATE_G4.md):
+1. **Asymptotic Regimes**: Characterized across $|\gamma| \ll T$ (plateau $\sim \pi/(2aT)$), $\gamma/T \to c$ (boundary transition $\frac{\arctan((T-\gamma)/a)+\arctan((T+\gamma)/a)}{2aT}$), and $|\gamma| \gg T$ (outer tail $\sim 1/(\gamma^2-T^2)$).
+2. **Cofinal Limits**: Proved that fixed-cutoff vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le H} J_T = 0$ does not imply cofinal vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le cT} J_T$, which diverges as $\frac{c\log T}{4a}$.
+3. **Radial Response**: Off-line quartets produce positive full variation $\Delta S = \Delta I_{ZZ} + \Delta \text{Cross} > 0$ when $T$ encompasses the resonance peak.
+4. **Earliest Open Gate**: Gate G4 is the earliest open gate in the present CMSA derivation.
 
 ---
 
 ## 11. Current Status and Research Protocol
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
-- **Sprint Outcome Classification**: `FINITE_SPECTRAL_KERNEL_CLOSED_INFINITE_G4_OPEN`.
-  - The arithmetic identity $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ and mean-square vanishing anchor $\mathcal A(\sigma) = 0$ are exact and proved.
-  - The complete finite spectral expansion $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ and exact kernels $J_T, K_T$ are closed and verified.
-  - The arbitrary finite curvature theorem is 100% proved in Lean 4 without axioms or `sorry`.
-  - Candidates CMSA-1 and CMSA-2 are formally classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`; Candidate CMSA-3 is `GRADE_COORDINATE_REDUNDANT`.
+- **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
+- **Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`.
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+

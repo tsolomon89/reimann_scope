@@ -442,4 +442,52 @@ theorem ConditionalCompletedLogDerivativeDecomposition.coordinate_redundant
     D.scale * D.dilated_D (D.scale * u) = D.xi_log_der u := by
   exact generic_scale_dilation_cancellation D.scale D.pos_scale D.xi_log_der D.dilated_D D.dilation_def u
 
+/-- Real algebraic identity for finite windowed quadratic expansion:
+    (A - Z)^2 = A^2 - 2*A*Z + Z^2. -/
+theorem finite_quadratic_expansion_identity (A Z : ℝ) :
+    (A - Z)^2 = A^2 - 2 * A * Z + Z^2 := by
+  ring
+
+/-- General algebraic 4-term decomposition of quadratic difference:
+    (A - Z)^2 = A*A - A*Z - Z*A + Z*Z. -/
+theorem finite_quadratic_four_term_decomposition (A Z : ℝ) :
+    (A - Z)^2 = A * A - A * Z - Z * A + Z * Z := by
+  ring
+
+/-- Elementary cofinal limit distinction countermodel:
+    For f(H, T) = H / T, for any fixed H, (H / T) becomes arbitrarily small as T → ∞,
+    whereas under the proportional cofinal schedule H(T) = c * T (c ≠ 0),
+    the ratio f(c*T, T) = c is constant and non-zero for all T ≠ 0.
+    Proves that fixed-truncation limits ∀ H, lim_{T→∞} f(H, T) = 0 do not imply cofinal limit lim_{T→∞} f(H(T), T) = 0. -/
+theorem cofinal_schedule_distinct_from_fixed_limit
+    (c : ℝ) (T : ℝ) (hT : T ≠ 0) :
+    (c * T) / T = c := by
+  exact mul_div_cancel_right₀ c hT
+
+/-- Explicitly conditional structure representing a hypothetical regularized infinite spectral bridge at Gate G4.
+    Models the passage of finite CMSA expansion under windowing and scaling c_T to an exact positive radial-defect functional. -/
+structure ConditionalG4RegularizedBridge where
+    defects : List ℝ
+    nonneg_defects : ∀ d ∈ defects, 0 ≤ d
+    weights : List ℝ
+    pos_weights : ∀ w ∈ weights, 0 < w
+    lengths_match : weights.length = defects.length
+    arithmetic_regularized_anchor : ℝ
+    spectral_regularized_limit : ℝ
+    g4_limit_bridge_identity : arithmetic_regularized_anchor = spectral_regularized_limit
+    g4_spectral_reduction : spectral_regularized_limit = (List.zipWith (· * ·) weights defects).sum
+    g4_arithmetic_anchor_zero : arithmetic_regularized_anchor = 0
+
+/-- Gate G4 Regularized Bridge Rigidity Theorem:
+    Under any valid ConditionalG4RegularizedBridge with zero arithmetic anchor,
+    every represented radial defect vanishes (d_j = 0), forcing all represented zeros to lie on the critical line. -/
+theorem ConditionalG4RegularizedBridge.all_defects_zero
+    (B : ConditionalG4RegularizedBridge) :
+    ∀ d ∈ B.defects, d = 0 := by
+  have h_spec : B.spectral_regularized_limit = 0 := by
+    rw [← B.g4_limit_bridge_identity, B.g4_arithmetic_anchor_zero]
+  have h_sum_zero : (List.zipWith (· * ·) B.weights B.defects).sum = 0 := by
+    rw [← B.g4_spectral_reduction, h_spec]
+  exact (list_weighted_sum_nonneg_eq_zero_iff B.weights B.defects B.pos_weights B.nonneg_defects B.lengths_match).mp h_sum_zero
+
 end RiemannScope

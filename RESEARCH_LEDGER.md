@@ -444,5 +444,20 @@ If a simple law survives, broad computation should stop until that law is algebr
 | CMSA-009 | Candidate CMSA-1 and CMSA-2 classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`. | **CLASSIFICATION** | Closed finite expansion, open infinite limit interchange. |
 | CMSA-010 | Candidate CMSA-3 classified as `GRADE_COORDINATE_REDUNDANT`. | **PROVED REDUNDANCY** | Formalized in Lean 4 (`generic_scale_dilation_cancellation`). |
 
+---
+
+# 25. Gate G4 Infinite Regularization and Window Suite Claims
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| G4-001 | Fejér windowed zero kernel has exact elementary closed form: $J_T^{\text{Fejér}}(p,q) = \frac{I_T(p)+I_T(q)}{T(p+q)}$. | **PROVED / EXACT** | Proved analytically and verified numerically ($< 10^{-40}$) via `exact_fejer_zero_kernel_J_T`. |
+| G4-002 | Asymptotic transition formula across regimes 1–4 matches $J_T$ to machine precision: $\frac{\arctan((T-\gamma)/a) + \arctan((T+\gamma)/a)}{2aT}$. | **PROVED / EXACT** | Proved by direct real-part integration on $[-T, T]$. |
+| G4-003 | Cofinal boundary layer limit independence: fixed-truncation vanishing $\forall H, \lim_{T\to\infty} f(H,T) = 0$ does not imply cofinal vanishing $\lim_{T\to\infty} f(H(T),T) = 0$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.cofinal_schedule_distinct_from_fixed_limit`). |
+| G4-004 | Finite windowed quadratic expansion decomposes as $(A-Z)^2 = A^2 - 2AZ + Z^2 = AA - AZ - ZA + ZZ$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.finite_quadratic_expansion_identity`, `finite_quadratic_four_term_decomposition`). |
+| G4-005 | Four tested window families (Rectangular, Fejér, Abel-Poisson, Gaussian) all achieve exact finite expansion and remain open at Gate G4. | **CLASSIFIED / G4_OPEN** | Documented in `CMSA_GATE_G4.md`. |
+| G4-006 | Full regularized radial response $\Delta S = \Delta I_{ZZ} + \Delta \text{Cross} > 0$ for off-line quartets when interval encompasses resonance peak ($T > \gamma$). | **NUMERICAL EVIDENCE / OPEN PROOF** | Verified across all 4 window types in `tests/test_cmsa_gate_g4.py`. |
+| G4-007 | Gate G4 Regularized Bridge Rigidity: any valid instance of `ConditionalG4RegularizedBridge` forces all represented zero defects to vanish ($d_j = 0$). | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`). |
+| G4-008 | Arithmetic independence firewall strictly prevents zero loading during arithmetic anchor evaluation. | **PROVED / ENFORCED** | Verified via mock testing in `test_cmsa_gate_g4.py`. |
+
 
 

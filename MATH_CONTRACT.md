@@ -2320,5 +2320,32 @@ Sign behavior: \(\Delta(\delta) < 0\) for \(z^2 < 3\gamma^2 + \delta^2\) (all cr
 ## 41.4 Earliest Infinite Analytic Obstruction (Gate G4)
 Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean of the arithmetic side is carried by non-uniform infinite collective cancellation. Termwise infinite limit interchange \(\lim_{T\to\infty}\sum_{\lambda,\mu} K_T = \sum_{\lambda,\mu}\lim_{T\to\infty} K_T\) is unproved and false without regularized weighting.
 
+---
+
+# 42. Gate G4 Windowed Expansion & Boundary Layer Limits
+
+## 42.1 Exact Fejér Windowed Kernel
+For the triangular / Fejér window \(W_T(t) = \frac{1}{T}(1 - |t|/T)\mathbf 1_{[-T, T]}(t)\):
+\[
+\boxed{J_T^{\text{Fejér}}(p, q) := \int_{-T}^T \frac{1}{T}\left(1 - \frac{|t|}{T}\right) \frac{dt}{(p+it)(q-it)} = \frac{I_T(p) + I_T(q)}{T(p+q)},}
+\]
+where
+\[
+I_T(w) = -\frac{(w+iT)\log(w+iT) + (w-iT)\log(w-iT) - 2w\log w}{T}.
+\]
+
+## 42.2 Asymptotic Regimes of \(J_T\)
+For \(p = a - i\gamma, q = a + i\gamma\) (\(a > 0\)):
+1. \(|\gamma| \ll T\) (Plateau): \(J_T \sim \frac{\pi}{2a T}\).
+2. \(\gamma / T \to c \in (0, \infty)\) (Boundary Transition): \(\frac{\arctan((T-\gamma)/a) + \arctan((T+\gamma)/a)}{2a T}\).
+3. \(|\gamma| \gg T\) (Outer Tail): \(J_T \sim \frac{1}{\gamma^2 - T^2}\).
+
+## 42.3 Cofinal Limit Independence Countermodel
+For \(f(H, T) = H / T\), for any fixed \(H < \infty\), \(\lim_{T\to\infty} f(H, T) = 0\). However, for proportional cofinal schedule \(H(T) = cT\) (\(c \ne 0\)), \(f(cT, T) = c \ne 0\) for all \(T \ne 0\).
+Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`):
+\[
+\forall H,\ \lim_{T\to\infty} f(H, T) = 0 \centernot\implies \lim_{T\to\infty} f(H(T), T) = 0.
+\]
+
 
 

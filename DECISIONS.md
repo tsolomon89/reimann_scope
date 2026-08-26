@@ -1056,5 +1056,37 @@ Supersedes:
 
 Any claim that the finite spectral expansion is incomplete or that CMSA-1/CMSA-2 failure is due to low-height curvature anomalies rather than non-uniform infinite spectral limit interchange.
 
+---
+
+## 2026-08-26 — Gate G4 Infinite-Regularization and Radial-Survival Resolution
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Gate G4 Sub-Gate Classification**: Systematically define, test, and classify the 7 sub-gates G4a–G4g for infinite regularization of the Completed Mean-Square Anchor:
+   - G4a (Arithmetic Independence): PROVED / ENFORCED via mock firewall.
+   - G4b (Exact Finite Expansion): PROVED / VERIFIED across Rectangular ($J_T, K_T$) and Fejér ($J_T^{\text{Fejér}}, K_T^{\text{Fejér}}$) windows.
+   - G4c (Infinite Remainder Control): OPEN.
+   - G4d (Limit-Order Control & Boundary Layer): OPEN / CHARACTERIZED. Proved asymptotic formulas across 4 regimes and formalized cofinal limit independence in Lean 4.
+   - G4e (Radial Survival and Positivity): NUMERICAL EVIDENCE / OPEN PROOF ($\Delta S = \Delta I_{ZZ} + \Delta \text{Cross} > 0$ above resonance).
+   - G4f (Pair Isolation): OPEN.
+   - G4g (Grade Covariance): PROVED / GRADE_COORDINATE_REDUNDANT.
+2. **Four Window Families (Loops 0–3)**: Derived exact Fejér closed kernel $J_T^{\text{Fejér}}(p,q) = \frac{I_T(p)+I_T(q)}{T(p+q)}$, evaluated Abel-Poisson and Gaussian windows, and classified all four families as `FINITE_IDENTITY_PROVED_G4_OPEN`.
+3. **Formalization in Lean 4**: Formalized `finite_quadratic_expansion_identity`, `finite_quadratic_four_term_decomposition`, `cofinal_schedule_distinct_from_fixed_limit`, and `ConditionalG4RegularizedBridge.all_defects_zero` in `formal/RiemannScope/ArithmeticBridge.lean`.
+4. **Epistemic Closure Status**: Keep `OBL-RDQ-001` and `OBL-CMSA-003` (Gate G4) **OPEN**. No proof of RH is claimed.
+
+Reason:
+
+Rigorous mathematical discovery and falsification sprint isolating the exact barrier to infinite regularization at Gate G4, proving cofinal boundary layer limit distinction, deriving exact windowed kernels, and synchronizing the full authority chain.
+
+Mathematical / operational consequence:
+
+Created canonical report `CMSA_GATE_G4.md`, updated `math_core.py` with Fejér kernels and G4 evaluators, added 17 comprehensive unit tests in `tests/test_cmsa_gate_g4.py`, compiled Lean 4 theorems with 0 errors/warnings, and updated all corpus registers.
+
+Supersedes:
+
+Any assumption that fixed-truncation zero-resolvent vanishing implies cofinal limit vanishing, or that infinite spectral passage can be achieved without regularizing the unnormalized arithmetic oscillation remainder.
+
 
 

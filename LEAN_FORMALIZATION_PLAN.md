@@ -736,4 +736,20 @@ Formalize universal scale dilation cancellation and coordinate redundancy in Lea
 2. **Conditional Completed Logarithmic Derivative Decomposition** (`ConditionalCompletedLogDerivativeDecomposition`):
    Prove `coordinate_redundant`: the normalized dilated completed logarithmic derivative \(\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)\) is strictly coordinate-redundant for all integer grades \(K \in \mathbb Z\).
 
+---
+
+# 25. Phase 16 — Gate G4 Windowed Expansion, Cofinal Limit Independence, and Conditional Regularized Bridge
+
+Formalize Gate G4 windowed expansion identities, cofinal limit countermodels, and conditional regularized bridge rigidity in Lean 4:
+
+1. **Finite Windowed Quadratic Expansion** (`finite_quadratic_expansion_identity`, `finite_quadratic_four_term_decomposition`):
+   - Prove \((A - Z)^2 = A^2 - 2AZ + Z^2\).
+   - Prove \((A - Z)^2 = A \cdot A - A \cdot Z - Z \cdot A + Z \cdot Z\).
+2. **Cofinal Limit Independence Countermodel** (`cofinal_schedule_distinct_from_fixed_limit`):
+   - For \(f(H, T) = H / T\), prove that \((c \cdot T) / T = c\) for all \(T \ne 0\).
+   - Demonstrates that fixed-truncation limits \(\forall H, \lim_{T\to\infty} f(H, T) = 0\) do not imply cofinal limit vanishing \(\lim_{T\to\infty} f(H(T), T) = 0\).
+3. **Conditional Gate G4 Regularized Bridge Interface** (`ConditionalG4RegularizedBridge`):
+   - Structure modeling the passage of the finite CMSA expansion to an exact positive radial-defect functional.
+   - Theorem `ConditionalG4RegularizedBridge.all_defects_zero`: prove that any valid regularized bridge with zero arithmetic anchor forces all represented zero defects to vanish (\(d_j = 0\)).
+
 
