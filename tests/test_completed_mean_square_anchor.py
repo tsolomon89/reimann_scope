@@ -38,12 +38,16 @@ from math_core import (
     exact_finite_zero_zero_kernel_K_T,
     evaluate_complete_finite_spectral_expansion,
     direct_completed_function_control,
+    completed_xi,
+    completed_xi_log_derivative_direct,
     normalized_fibre_curvature,
     get_candidate_registry,
     to_mpf,
     to_mpc,
     get_tau
 )
+from unittest.mock import patch
+import math_core
 from reference_data import load_first_100_reference_zeros
 
 
@@ -281,24 +285,54 @@ class TestExactFiniteSpectralKernelsAndExpansion:
                 c_diff = mpmath.mpf(res["closure_difference"])
                 assert c_diff < mpmath.mpf('1e-15')
 
-    def test_direct_completed_function_control_unperturbed(self):
-        """Unperturbed independent completed function matches -zeta'/zeta pointwise and in finite-T mean square."""
-        with mpmath.workdps(40):
-            res = direct_completed_function_control(sigma='2.5', T='10.0', dps=35, perturbation=0.0)
-            assert mpmath.mpf(res["pointwise_diff_t0"]) < mpmath.mpf('1e-25')
-            assert mpmath.mpf(res["pointwise_diff_t1"]) < mpmath.mpf('1e-25')
-            assert mpmath.mpf(res["pointwise_diff_t5"]) < mpmath.mpf('1e-25')
-            assert mpmath.mpf(res["mean_square_difference"]) < mpmath.mpf('1e-25')
-            assert res["status"] == "NUMERICAL_VALIDATION_OF_ANALYTIC_IDENTITY"
+    def test_direct_completed_function_control_unperturbed_multi_precision(self):
+        """Unperturbed independent completed function matches -zeta'/zeta across multiple sigmas, ordinates, and precisions."""
+        for sig_val in ['1.5', '2.0', '2.5']:
+            for dps_val in [30, 50]:
+                with mpmath.workdps(dps_val + 10):
+                    res = direct_completed_function_control(sigma=sig_val, T='10.0', dps=dps_val)
+                    tol = mpmath.mpf('1e-15') if dps_val == 30 else mpmath.mpf('1e-20')
+                    assert mpmath.mpf(res["pointwise_diff_t0"]) < tol
+                    assert mpmath.mpf(res["pointwise_diff_t1"]) < tol
+                    assert mpmath.mpf(res["pointwise_diff_t5"]) < tol
+                    assert mpmath.mpf(res["mean_square_difference"]) < tol
+                    assert res["status"] == "NUMERICAL_VALIDATION_OF_ANALYTIC_IDENTITY"
 
-    def test_direct_completed_function_control_perturbed_anti_circularity(self):
-        """Perturbed completed function yields strictly non-zero difference, proving non-circularity."""
-        with mpmath.workdps(40):
-            res = direct_completed_function_control(sigma='2.5', T='10.0', dps=35, perturbation=0.05)
-            # The perturbation introduces an exact non-zero residual
+    def test_completed_xi_log_derivative_direct_structural_independence(self):
+        """Path B direct numerical derivative never invokes zeta_derivative, proving structural firewall independence."""
+        with patch.object(math_core, 'zeta_derivative') as mock_zd:
+            val = completed_xi_log_derivative_direct(mpmath.mpc('2.0', '5.0'), dps=30)
+            mock_zd.assert_not_called()
+            assert val != 0
+
+    def test_direct_completed_function_control_monkeypatch_independence(self):
+        """Perturbing zeta_derivative alters Path A by -eps while Path B is unchanged, producing a non-zero comparison residual."""
+        orig_zd = math_core.zeta_derivative
+        eps = mpmath.mpf('0.05')
+        try:
+            # Monkeypatch zeta_derivative: zeta'(s) -> zeta'(s) + eps * zeta(s)
+            # This causes Path A: -zeta'/zeta to shift by exactly -eps = -0.05
+            math_core.zeta_derivative = lambda s, n=1, dps=80: orig_zd(s, n=n, dps=dps) + eps * math_core.zeta_eval(s, dps=dps)
+
+            # 1. Verify Path A changes by eps
+            s_test = mpmath.mpc('2.5', '1.0')
+            zeta_val = math_core.zeta_eval(s_test, dps=35)
+            perturbed_zeta_pr = math_core.zeta_derivative(s_test, n=1, dps=35)
+            path_a_val = -perturbed_zeta_pr / zeta_val
+            unperturbed_path_a = -orig_zd(s_test, n=1, dps=35) / zeta_val
+            assert abs(path_a_val - unperturbed_path_a - (-eps)) < mpmath.mpf('1e-15')
+
+            # 2. Verify Path B is completely unaffected by the monkeypatch
+            path_b_val = math_core.completed_log_derivative_archimedean_A(s_test, dps=35) - math_core.completed_xi_log_derivative_direct(s_test, dps=35)
+            assert abs(path_b_val - unperturbed_path_a) < mpmath.mpf('1e-15')
+
+            # 3. Verify direct_completed_function_control detects the non-zero discrepancy
+            res = direct_completed_function_control(sigma='2.5', T='10.0', dps=30)
             assert mpmath.mpf(res["pointwise_diff_t0"]) > mpmath.mpf('0.04')
             assert mpmath.mpf(res["pointwise_diff_t1"]) > mpmath.mpf('0.04')
             assert mpmath.mpf(res["mean_square_difference"]) > mpmath.mpf('1e-5')
+        finally:
+            math_core.zeta_derivative = orig_zd
 
 
 class TestRealAxisSpectralDefect:

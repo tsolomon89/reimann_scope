@@ -3274,34 +3274,59 @@ def completed_log_derivative_spectral_Xi_prime_over_Xi(
         return total
 
 
-def completed_xi_log_derivative(
+def completed_xi(
     s: Union[complex, mpmath.mpc, str, Tuple[Any, Any]],
-    dps: int = 80,
-    perturbation: float = 0.0
+    dps: int = 80
 ) -> mpmath.mpc:
     """
-    [INDEPENDENT COMPLETED LOG-DERIVATIVE EVALUATOR]
-    Evaluates xi'/xi(s) from the product rule of xi(s) = 1/2 * s * (s-1) * pi^(-s/2) * Gamma(s/2) * zeta(s):
-    xi'(s)/xi(s) = (2s - 1)/(s(s - 1)) - (1/2)*log(pi) + (1/2)*psi(0, s/2) + zeta'(s)/zeta(s) + perturbation.
-    Accepts an optional perturbation parameter to enable anti-circularity validation.
+    [COMPLETED RIEMANN XI FUNCTION]
+    Evaluates the completed Riemann xi function:
+    xi(s) = 1/2 * s * (s - 1) * pi^(-s/2) * Gamma(s/2) * zeta(s).
     """
-    with mpmath.workdps(dps + 15):
-        s_mpc = to_mpc(s, dps=dps + 15)
-        # Rational factor derivative: d/ds log[1/2 * s * (s-1)] = 1/s + 1/(s-1) = (2s-1)/(s(s-1))
-        rational_term = (2 * s_mpc - 1) / (s_mpc * (s_mpc - 1))
-        # Pi factor derivative: d/ds log[pi^(-s/2)] = -1/2 * log(pi)
-        pi_term = -mpmath.mpf('0.5') * mpmath.log(mpmath.pi)
-        # Gamma factor derivative: d/ds log[Gamma(s/2)] = 1/2 * psi(0, s/2)
-        gamma_term = mpmath.mpf('0.5') * mpmath.psi(0, s_mpc / 2)
-        # Zeta factor derivative: zeta'(s) / zeta(s)
-        zeta_val = zeta_eval(s_mpc, dps=dps + 15)
-        zeta_pr = zeta_derivative(s_mpc, n=1, dps=dps + 15)
-        zeta_term = zeta_pr / zeta_val
+    with mpmath.workdps(dps + 25):
+        s_mpc = to_mpc(s, dps=dps + 25)
+        # Factor 1: 1/2 * s * (s - 1)
+        poly = mpmath.mpf('0.5') * s_mpc * (s_mpc - 1)
+        # Factor 2: pi^(-s/2)
+        pi_factor = mpmath.power(mpmath.pi, -s_mpc / 2)
+        # Factor 3: Gamma(s/2)
+        gamma_factor = mpmath.gamma(s_mpc / 2)
+        # Factor 4: zeta(s)
+        zeta_val = zeta_eval(s_mpc, dps=dps + 25)
+        return poly * pi_factor * gamma_factor * zeta_val
 
-        log_der = rational_term + pi_term + gamma_term + zeta_term
-        if perturbation != 0.0:
-            log_der += mpmath.mpc(perturbation, 0)
-        return log_der
+
+def completed_xi_log_derivative_direct(
+    s: Union[complex, mpmath.mpc, str, Tuple[Any, Any]],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [DIRECT NUMERICAL COMPLETED LOG-DERIVATIVE EVALUATOR]
+    Evaluates xi'(s)/xi(s) by differentiating the completed function xi(s) directly
+    via numerical differentiation without calling zeta_derivative or reconstructing A(s) + zeta'/zeta.
+    """
+    guard = 35
+    with mpmath.workdps(dps + guard):
+        s_val = to_mpc(s, dps=dps + guard)
+        xi_val = completed_xi(s_val, dps=dps + guard)
+        if xi_val == 0:
+            raise ZeroDivisionError(f"completed_xi vanishes at s={s_val}")
+        xi_prime = mpmath.diff(
+            lambda w: completed_xi(w, dps=dps + guard),
+            s_val,
+        )
+        return xi_prime / xi_val
+
+
+def completed_xi_log_derivative(
+    s: Union[complex, mpmath.mpc, str, Tuple[Any, Any]],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [COMPLETED LOG-DERIVATIVE EVALUATOR]
+    Delegates to completed_xi_log_derivative_direct for independent numerical differentiation.
+    """
+    return completed_xi_log_derivative_direct(s, dps=dps)
 
 
 def exact_finite_zero_kernel_J_T(
@@ -3469,14 +3494,13 @@ def evaluate_complete_finite_spectral_expansion(
 def direct_completed_function_control(
     sigma: Union[float, str, mpmath.mpf],
     T: Union[float, str, mpmath.mpf],
-    dps: int = 80,
-    perturbation: float = 0.0
+    dps: int = 80
 ) -> Dict[str, Any]:
     """
     [INDEPENDENT DIRECT COMPLETED-FUNCTION CONTROL]
     Evaluates Path A: -zeta'/zeta(sigma + it) and Path B: A(sigma + it) - xi'/xi(sigma + it)
-    independently without circular definition, computing pointwise residuals and finite-T mean squares.
-    Supports an optional perturbation parameter to enable anti-circularity verification.
+    independently through direct numerical differentiation of completed_xi, computing pointwise residuals
+    and finite-T mean squares.
     """
     with mpmath.workdps(dps + 15):
         sig = to_mpf(sigma, dps=dps + 15)
@@ -3493,11 +3517,11 @@ def direct_completed_function_control(
             z_pr = zeta_derivative(u, n=1, dps=dps + 15)
             return -z_pr / z_val
 
-        # Path B: Independent completed function logarithmic derivative A(u) - xi'/xi(u)
+        # Path B: Independent completed function logarithmic derivative A(u) - xi'/xi(u) via direct numerical diff
         def path_b_completed_diff(t_val):
             u = mpmath.mpc(sig, t_val)
             a_val = completed_log_derivative_archimedean_A(u, dps=dps)
-            xi_ld = completed_xi_log_derivative(u, dps=dps, perturbation=perturbation)
+            xi_ld = completed_xi_log_derivative_direct(u, dps=dps)
             return a_val - xi_ld
 
         # Pointwise test at multiple sample ordinates t in [0, 1, 5]
@@ -3513,7 +3537,6 @@ def direct_completed_function_control(
         return {
             "sigma": mpmath.nstr(sig, n=15),
             "T": mpmath.nstr(T_val, n=15),
-            "perturbation": perturbation,
             "pointwise_diff_t0": mpmath.nstr(diff_t0, n=10),
             "pointwise_diff_t1": mpmath.nstr(diff_t1, n=10),
             "pointwise_diff_t5": mpmath.nstr(diff_t5, n=10),
