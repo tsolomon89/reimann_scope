@@ -164,6 +164,24 @@ class TestSpectralDetectorAndCurvature:
             curv = spectral_curvature_m_double_prime(zeros, K=0, a_kernel=custom_kernel, dps=120)
             assert curv > 0
 
+    def test_detailed_spectral_curvature_breakdown(self):
+        """Detailed curvature breakdown reports quadratic, centering, and reflection symmetry status."""
+        with mpmath.workdps(80):
+            # Symmetric fibre: centering component is 0
+            sym_zeros = [('0.1', '14.134725', 1), ('-0.1', '14.134725', 1)]
+            res_sym = spectral_curvature_m_double_prime(sym_zeros, K=0, detailed=True, dps=80)
+            assert res_sym["reflection_symmetric"] is True
+            assert mpmath.mpf(res_sym["centering_component"]) < mpmath.mpf('1e-50')
+            assert mpmath.almosteq(res_sym["quadratic_component"], res_sym["total_curvature"], abs_eps=mpmath.mpf('1e-75'))
+
+            # Asymmetric fibre: centering component is positive and contributes to total curvature
+            asym_zeros = [('0.1', '14.134725', 1), ('0.05', '14.134725', 1)]
+            res_asym = spectral_curvature_m_double_prime(asym_zeros, K=0, detailed=True, dps=80)
+            assert res_asym["reflection_symmetric"] is False
+            assert mpmath.mpf(res_asym["centering_component"]) > 0
+            expected_total = mpmath.mpf(res_asym["quadratic_component"]) + mpmath.mpf(res_asym["centering_component"])
+            assert mpmath.almosteq(res_asym["total_curvature"], expected_total, abs_eps=mpmath.mpf('1e-50'))
+
 
 class TestCandidateFalsificationWitnesses:
     """Verifies exact symbolic and numerical failure witnesses for Candidates SS-1 through SS-5."""

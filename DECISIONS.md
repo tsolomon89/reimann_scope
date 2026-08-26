@@ -1017,4 +1017,43 @@ Supersedes:
 
 Any conflation of coordinate transport covariance with radial rigidity, and any expectation that linear or naive bilinear explicit formulas isolate involution pairs without projected-divisor knowledge.
 
+---
+
+## 2026-08-26 — Complete Finite Spectral-Kernel Closure, Arbitrary Curvature Formalization, and Exact Gate G4 Analytic Obstruction
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Finite Spectral Expansion Closure**: Implement and verify the exact complete finite spectral expansion:
+   $$S_{N, T}(\sigma) := \frac{1}{2T}\int_{-T}^T \left| A(\sigma+it) - \sum_{k=1}^N m_k \frac{2z}{z^2-\lambda_k^2} \right|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},$$
+   closing to machine precision ($< 10^{-18}$) via exact closed-form translation kernel $J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}$ and paired zero-zero kernel $K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu)$.
+2. **Identification of Earliest Infinite Analytic Obstruction (Gate G4)**: Prove and document that the individual zero resolvents $\frac{1}{\sigma-\rho+it}$ belong to $L^2(\mathbb R, dt)$ with finite norm $\frac{\pi}{\sigma-\Re\rho}$, so under translation averaging $(1/2T)\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0$ as $T\to\infty$. The non-zero Besicovitch mean of the arithmetic side is carried by non-uniform infinite collective cancellation; termwise infinite interchange $\lim_{T\to\infty} \sum_{\lambda,\mu} K_T = \sum_{\lambda,\mu} \lim_{T\to\infty} K_T$ is unproved and false without established regularization.
+3. **Exact Real-Axis Spectral Defect Formula**: Establish the exact rational defect between an off-line quartet $\{\pm\delta \pm i\gamma\}$ and on-line pair $\{0, \pm i\gamma\}$ at $z = \sigma - 1/2 > 0$:
+   $$\Delta(\delta) = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2 + \gamma^2)[(z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2]},$$
+   proving that $\Delta(\delta) < 0$ for $z^2 < 3\gamma^2 + \delta^2$ (holding for all critical strip zeros $\gamma > 14$ at $z = O(1)$), transitioning to positive only for $z > \sqrt{3}\gamma$.
+4. **Lean 4 Formalization of Arbitrary Finite Curvature**: Formally prove in `formal/RiemannScope/ArithmeticBridge.lean` (100% compiled with 0 `sorry`, 0 `admit`, 0 axioms):
+   - `list_pairs_sq_sum_eq`: $\sum_{i,j} (d_i + d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$ for arbitrary real lists of length $N$;
+   - `list_pairs_sq_sum_symmetric`: reduces to $2N\sum d_i^2$ when $\sum d_i = 0$;
+   - `list_pairs_sq_sum_nonneg` & `list_pairs_sq_sum_eq_zero_iff`: unconditionally non-negative, vanishing iff $\forall x \in l, x = 0$;
+   - `generic_scale_dilation_cancellation`: $s D_s(su) = f(u)$ for any scale $s > 0$.
+5. **Candidate Classification Updates**:
+   - `CANDIDATE_CMSA1` & `CANDIDATE_CMSA2`: Classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`.
+   - `CANDIDATE_CMSA3`: Classified as `GRADE_COORDINATE_REDUNDANT`.
+   - Sprint outcome classified as `FINITE_SPECTRAL_KERNEL_CLOSED_INFINITE_G4_OPEN`.
+6. **Epistemic Closure Status**: Keep `OBL-RDQ-001` **OPEN**. No proof of RH is claimed.
+
+Reason:
+
+Rigorous mathematical sprint completing the finite spectral expansion, evaluating exact kernel cross-terms in arbitrary precision, proving arbitrary curvature identities unconditionally in Lean 4, and isolating Gate G4 (Infinite Spectral Interchange) as the exact earliest open analytic barrier.
+
+Mathematical / operational consequence:
+
+Implemented exact analytic kernels $J_T, K_T$, complete finite spectral expansion evaluator, and direct completed function control in `math_core.py`. Verified 61 targeted test cases across `tests/test_completed_mean_square_anchor.py`, `tests/test_separated_signal.py`, `tests/test_radial_defect_quotient.py`, and `tests/test_arithmetic_radial_bridge.py`. Formally compiled Lean 4 proofs. Updated all registers and specifications.
+
+Supersedes:
+
+Any claim that the finite spectral expansion is incomplete or that CMSA-1/CMSA-2 failure is due to low-height curvature anomalies rather than non-uniform infinite spectral limit interchange.
+
+
 

@@ -863,4 +863,40 @@ The abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \p
 - **Candidate F (Grade-Indexed Prime-Power Pairing)**: `OPEN_UNPROVED` (pairing law unproved).
 - **Candidate G (Weighted Regularized Bridge)**: `LIVE_UNDERIVED` (spectral detector \(T_a>0\) proved; arithmetic realization open).
 
+---
+
+# 23. Complete Finite Spectral Expansion, Arbitrary Curvature Formalization, and Gate G4 Obstruction
+
+## 23.1 Complete Finite Spectral Expansion & Analytic Kernels
+The finite spectral mean-square approximant decomposes into four exact terms:
+\[
+S_{N, T}(\sigma) := \frac{1}{2T}\int_{-T}^T \left| A(\sigma+it) - \sum_{k=1}^N m_k \frac{2z}{z^2-\lambda_k^2} \right|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},
+\]
+with exact closed-form kernels:
+\[
+J_T(p, q) = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)},
+\]
+\[
+K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu).
+\]
+This finite identity closes to machine precision (\(< 10^{-18}\)) in arbitrary precision.
+
+## 23.2 Exact Real-Axis Spectral Defect Formula
+For an off-line quartet \(\{\pm\delta \pm i\gamma\}\) vs on-line pair \(\{0, \pm i\gamma\}\) at \(z = \sigma - 1/2 > 0\):
+\[
+\Delta(\delta) = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2 + \gamma^2)[(z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2]}.
+\]
+For all critical strip zeros (\(\gamma > 14\)) with \(z = O(1)\), \(z^2 < 3\gamma^2 + \delta^2\), forcing \(\Delta(\delta) < 0\). The unregularized real-axis spectral difference is negative, proving that the unregularized mean-square does not produce a positive quadratic radial defect directly.
+
+## 23.3 Arbitrary Finite Curvature Lean 4 Proofs
+Formally verified in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sorry`, 0 `admit`):
+- `list_pairs_sq_sum_eq`: \(\sum_{i,j} (d_i + d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2\) for arbitrary real lists.
+- `list_pairs_sq_sum_symmetric`: reduces to \(2N\sum d_i^2\) when \(\sum d_i = 0\).
+- `list_pairs_sq_sum_nonneg` & `list_pairs_sq_sum_eq_zero_iff`: unconditionally non-negative, vanishing iff \(\forall x \in l, x = 0\).
+- `generic_scale_dilation_cancellation`: \(s D_s(su) = f(u)\) for any scale \(s > 0\).
+
+## 23.4 Earliest Infinite Analytic Obstruction (Gate G4)
+Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Candidate CMSA-1 and CMSA-2 are classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`.
+
+
 

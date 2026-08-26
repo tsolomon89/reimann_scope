@@ -156,6 +156,138 @@ theorem ConditionalArithmeticRadialBridge.all_defects_zero
     rw [← B.spectral_expansion, h_spec]
   exact (list_sum_nonneg_eq_zero_iff B.zero_defects B.nonneg_defects).mp h_sum_zero
 
+/-- Arbitrary finite-family sum of squares for a list of real numbers. -/
+def list_sum_sq (l : List ℝ) : ℝ :=
+  (l.map (fun x => x ^ 2)).sum
+
+/-- Arbitrary finite-family double sum of squared pair displacements (x + y)^2 over a list l. -/
+def list_pairs_sq_sum (l : List ℝ) : ℝ :=
+  (l.map (fun x => (l.map (fun y => (x + y) ^ 2)).sum)).sum
+
+/-- Lemma: Inner sum of squared pairs with fixed x evaluates to (length * x^2 + 2 * x * sum + sum_sq). -/
+lemma list_map_add_sq_sum (x : ℝ) (l : List ℝ) :
+    (l.map (fun y => (x + y) ^ 2)).sum = (l.length : ℝ) * x ^ 2 + 2 * x * l.sum + list_sum_sq l := by
+  induction l with
+  | nil =>
+    simp [list_sum_sq]
+  | cons y tl ih =>
+    simp only [List.map_cons, List.sum_cons, List.length_cons]
+    dsimp [list_sum_sq] at ih ⊢
+    simp only [List.sum_cons]
+    rw [ih]
+    push_cast
+    ring
+
+/-- Lemma: Distributing a linear-quadratic form A * x^2 + B * x + C over a list l. -/
+lemma list_map_quad_sum (A B C : ℝ) (l : List ℝ) :
+    (l.map (fun x => A * x ^ 2 + B * x + C)).sum = A * list_sum_sq l + B * l.sum + (l.length : ℝ) * C := by
+  induction l with
+  | nil =>
+    simp [list_sum_sq]
+  | cons x tl ih =>
+    simp only [List.map_cons, List.sum_cons, List.length_cons]
+    dsimp [list_sum_sq] at ih ⊢
+    simp only [List.sum_cons]
+    rw [ih]
+    push_cast
+    ring
+
+/-- Arbitrary Finite Curvature Algebraic Identity:
+    For any finite list l of real displacements, the double sum of all squared pair displacements
+    evaluates identically to 2 * N * sum(d_i^2) + 2 * (sum d_i)^2. -/
+theorem list_pairs_sq_sum_eq (l : List ℝ) :
+    list_pairs_sq_sum l = 2 * (l.length : ℝ) * list_sum_sq l + 2 * (l.sum) ^ 2 := by
+  dsimp [list_pairs_sq_sum]
+  have h_inner : (fun x => (l.map (fun y => (x + y) ^ 2)).sum) =
+                 (fun x => (l.length : ℝ) * x ^ 2 + (2 * l.sum) * x + list_sum_sq l) := by
+    funext x
+    have h1 := list_map_add_sq_sum x l
+    have h2 : 2 * x * l.sum = (2 * l.sum) * x := by ring
+    rw [h2] at h1
+    exact h1
+  rw [h_inner]
+  have h_quad := list_map_quad_sum (l.length : ℝ) (2 * l.sum) (list_sum_sq l) l
+  rw [h_quad]
+  push_cast
+  ring
+
+/-- Arbitrary finite curvature reflection-symmetric reduction:
+    When the family satisfies reflection symmetry (l.sum = 0), the double sum simplifies to
+    2 * N * sum(d_i^2). -/
+theorem list_pairs_sq_sum_symmetric (l : List ℝ) (h_sym : l.sum = 0) :
+    list_pairs_sq_sum l = 2 * (l.length : ℝ) * list_sum_sq l := by
+  have h_id := list_pairs_sq_sum_eq l
+  rw [h_sym] at h_id
+  linarith [h_id]
+
+/-- List sum of squares is unconditionally non-negative. -/
+lemma list_sum_sq_nonneg (l : List ℝ) : 0 ≤ list_sum_sq l := by
+  induction l with
+  | nil => simp [list_sum_sq]
+  | cons x tl ih =>
+    simp only [list_sum_sq, List.map_cons, List.sum_cons]
+    have hx : 0 ≤ x ^ 2 := sq_nonneg x
+    exact add_nonneg hx ih
+
+/-- List sum vanishes if all elements are zero. -/
+lemma list_sum_eq_zero_of_all_zero (l : List ℝ) (h : ∀ x ∈ l, x = (0 : ℝ)) : l.sum = 0 := by
+  induction l with
+  | nil => simp
+  | cons x tl ih =>
+    simp only [List.mem_cons, forall_eq_or_imp] at h
+    simp only [List.sum_cons, h.1, zero_add]
+    exact ih h.2
+
+/-- List sum of squares vanishes if and only if every element is zero. -/
+lemma list_sum_sq_eq_zero_iff (l : List ℝ) : list_sum_sq l = 0 ↔ ∀ x ∈ l, x = 0 := by
+  induction l with
+  | nil => simp [list_sum_sq]
+  | cons x tl ih =>
+    simp only [list_sum_sq, List.map_cons, List.sum_cons, List.mem_cons, forall_eq_or_imp]
+    have hx : 0 ≤ x ^ 2 := sq_nonneg x
+    have htl : 0 ≤ list_sum_sq tl := list_sum_sq_nonneg tl
+    constructor
+    · intro h
+      have h_sum : x ^ 2 + list_sum_sq tl = 0 := h
+      have hx0 : x ^ 2 = 0 := by linarith [hx, htl, h_sum]
+      have htl0 : list_sum_sq tl = 0 := by linarith [hx, htl, h_sum]
+      have hx_zero : x = 0 := sq_eq_zero_iff.mp hx0
+      have htl_zero := ih.mp htl0
+      exact ⟨hx_zero, htl_zero⟩
+    · intro ⟨hx0, htl0⟩
+      rw [hx0, sq, mul_zero, zero_add]
+      exact ih.mpr htl0
+
+/-- Arbitrary finite curvature is unconditionally non-negative. -/
+theorem list_pairs_sq_sum_nonneg (l : List ℝ) : 0 ≤ list_pairs_sq_sum l := by
+  rw [list_pairs_sq_sum_eq]
+  have : 0 ≤ list_sum_sq l := list_sum_sq_nonneg l
+  positivity
+
+/-- Arbitrary finite curvature zero-rigidity for a non-empty family (l.length > 0):
+    The double sum of squared pair displacements vanishes if and only if every displacement d_i = 0. -/
+theorem list_pairs_sq_sum_eq_zero_iff (l : List ℝ) (hlen : 0 < l.length) :
+    list_pairs_sq_sum l = 0 ↔ ∀ x ∈ l, x = 0 := by
+  rw [list_pairs_sq_sum_eq]
+  have h_len_pos : 0 < (l.length : ℝ) := Nat.cast_pos.mpr hlen
+  have h_sq_nonneg : 0 ≤ list_sum_sq l := list_sum_sq_nonneg l
+  have h_term1_nonneg : 0 ≤ 2 * (l.length : ℝ) * list_sum_sq l := by positivity
+  have h_term2_nonneg : 0 ≤ 2 * (l.sum) ^ 2 := by positivity
+  constructor
+  · intro h
+    have h_parts1 : 2 * (l.length : ℝ) * list_sum_sq l = 0 := by linarith [h_term1_nonneg, h_term2_nonneg, h]
+    have h_coeff : (2 * (l.length : ℝ)) ≠ 0 := by linarith [h_len_pos]
+    have h_sq_zero : list_sum_sq l = 0 := by
+      cases mul_eq_zero.mp h_parts1 with
+      | inl h1 => contradiction
+      | inr h2 => exact h2
+    exact list_sum_sq_eq_zero_iff l |>.mp h_sq_zero
+  · intro h_all
+    have h_sq_zero : list_sum_sq l = 0 := list_sum_sq_eq_zero_iff l |>.mpr h_all
+    have h_sum_zero : l.sum = 0 := list_sum_eq_zero_of_all_zero l h_all
+    rw [h_sq_zero, h_sum_zero]
+    ring
+
 /-- 2-term symmetric radial curvature algebraic identity:
     (d1 + d1)^2 + (d1 + d2)^2 + (d2 + d1)^2 + (d2 + d2)^2 = 2 * 2 * (d1^2 + d2^2) + 2 * (d1 + d2)^2. -/
 theorem sum_pairs_sq_two_terms (d1 d2 : ℝ) :
@@ -273,9 +405,27 @@ theorem ConditionalSeparatedSignalBridge.all_variances_zero
     rw [← B.spectral_expansion, h_spec]
   exact (list_weighted_sum_nonneg_eq_zero_iff B.weights B.radial_variances B.pos_weights B.nonneg_variances B.lengths_match).mp h_sum_zero
 
-/-- Structure representing the exact completed logarithmic derivative decomposition:
-    P(u) = A(u) - ξ'/ξ(u) on Re(u) > 1, and its dilated representation D_K^ξ(s_K) = τ^(-K) * ξ'/ξ(tau^(-K) * s_K). -/
-structure CompletedLogDerivativeDecomposition where
+/-- Generic Scale Dilation Cancellation Theorem:
+    For any non-zero real scale, if D_s(x) = s^(-1) * f(s^(-1) * x),
+    then scale * D_s(scale * u) = f(u) identically. -/
+theorem generic_scale_dilation_cancellation
+    (scale : ℝ) (h_pos : 0 < scale)
+    (f : ℝ → ℝ) (D : ℝ → ℝ)
+    (h_dil : ∀ s, D s = (1 / scale) * f ((1 / scale) * s))
+    (u : ℝ) :
+    scale * D (scale * u) = f u := by
+  rw [h_dil (scale * u)]
+  have h_pos_ne : scale ≠ 0 := ne_of_gt h_pos
+  have h_cancel_arg : 1 / scale * (scale * u) = u := by
+    rw [← mul_assoc, one_div_mul_cancel h_pos_ne, one_mul]
+  rw [h_cancel_arg]
+  have h_cancel_outer : scale * (1 / scale * f u) = (scale * (1 / scale)) * f u := by ring
+  rw [h_cancel_outer, mul_one_div_cancel h_pos_ne, one_mul]
+
+/-- Explicitly conditional completed logarithmic derivative decomposition interface.
+    NOTE: The field identity_on_domain models the analytic identity P(u) = A(u) - ξ'/ξ(u)
+    which is proved analytically in research documentation on Re(u) > 1, not proved inside Lean. -/
+structure ConditionalCompletedLogDerivativeDecomposition where
     scale : ℝ
     pos_scale : 0 < scale
     xi_log_der : ℝ → ℝ
@@ -287,16 +437,9 @@ structure CompletedLogDerivativeDecomposition where
 
 /-- Theorem: The normalized dilated completed logarithmic derivative scale * D_K(scale * u)
     recovers ξ'/ξ(u) identically, proving strict coordinate redundancy across grades. -/
-theorem CompletedLogDerivativeDecomposition.coordinate_redundant
-    (D : CompletedLogDerivativeDecomposition) (u : ℝ) :
+theorem ConditionalCompletedLogDerivativeDecomposition.coordinate_redundant
+    (D : ConditionalCompletedLogDerivativeDecomposition) (u : ℝ) :
     D.scale * D.dilated_D (D.scale * u) = D.xi_log_der u := by
-  have h_dil := D.dilation_def (D.scale * u)
-  rw [h_dil]
-  have h_pos_ne : D.scale ≠ 0 := ne_of_gt D.pos_scale
-  have h_cancel_arg : 1 / D.scale * (D.scale * u) = u := by
-    rw [← mul_assoc, one_div_mul_cancel h_pos_ne, one_mul]
-  rw [h_cancel_arg]
-  have h_cancel_outer : D.scale * (1 / D.scale * D.xi_log_der u) = (D.scale * (1 / D.scale)) * D.xi_log_der u := by ring
-  rw [h_cancel_outer, mul_one_div_cancel h_pos_ne, one_mul]
+  exact generic_scale_dilation_cancellation D.scale D.pos_scale D.xi_log_der D.dilated_D D.dilation_def u
 
 end RiemannScope

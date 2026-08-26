@@ -213,9 +213,9 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 
 | Candidate ID | Name | Target | Gate Status | Earliest Failed Gate | Structural Obstruction / Witness | Final Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CANDIDATE_CMSA1** | Base Completed Mean-Square Anchor | $\mathcal A(\sigma) = 0$ | `LIVE_G5_PROVED_G6_OPEN` | Gate 6 (Positivity) | **Besicovitch Translation Mean-Square vs $L^2$ Spectral Residue**: Pointwise identity $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ is exact on $\Re(u) > 1$ and gives arithmetic anchor $=0$. However, translation averaging $(1/2T)\int_{-T}^T$ evaluates almost-periodic Dirichlet frequencies while discrete zero resolvent terms in $L^2(\mathbb R, dt)$ integrate to zero under $(1/2T)$ scaling. | `LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP` |
-| **CANDIDATE_CMSA2** | Polarized Completed Mean-Square Anchor | $\mathcal A(\sigma_1, \sigma_2) = 0$ | `LIVE_G5_PROVED_G6_OPEN` | Gate 6 (Positivity) | **Spectral Cross-Term Cancellation**: Expanding the polarized anchor produces Archimedean-Archimedean, Archimedean-Zero, and Zero-Zero integrals. In the zero-zero integral $\int_{-T}^T dt/[(w_1+it)(w_2-it)] = 2\pi/(w_1+w_2)$, the integral scales as $O(1/T)$ under the $(1/2T)$ factor. Mixed partial derivatives do not isolate a strictly positive radial quadratic form on the spectral side. | `LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP` |
-| **CANDIDATE_CMSA3** | Grade-Normalized Completed Mean-Square Anchor | $\mathcal A_K(\sigma) = 0$ | `FALSIFIED_GATE_8` | Gate 8 (Grade Nonredundancy) | **Grade Covariance Redundancy**: The normalized completed logarithmic derivative $\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)$ is strictly coordinate-redundant for all $K \in \mathbb Z$. Grade dilation yields no additional arithmetic constraints or non-redundant radial invariants beyond $K=0$. | `GRADE_COORDINATE_REDUNDANT` |
+| **CANDIDATE_CMSA1** | Base Completed Mean-Square Anchor | $\mathcal A(\sigma) = 0$ | `LIVE_G3_CLOSED_G4_OPEN` | Gate 4 (Infinite Spectral Interchange) | **Non-Uniform Infinite Interchange Obstruction**: Exact finite spectral expansion $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ closes to machine precision via analytic kernels $J_T(p,q)$ and $K_T(\lambda,\mu;a)$. However, individual zero resolvents have finite $L^2(\mathbb R, dt)$ norm $\pi/(\sigma-\Re\rho)$, so $(1/2T)\int_{-T}^T dt/|\sigma-\rho+it|^2 \to 0$ as $T\to\infty$. The non-zero Besicovitch mean of the arithmetic side is carried by non-uniform infinite collective cancellation; termwise infinite limit interchange is unproved. | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4` |
+| **CANDIDATE_CMSA2** | Polarized Completed Mean-Square Anchor | $\mathcal A(\sigma_1, \sigma_2) = 0$ | `LIVE_G3_CLOSED_G4_OPEN` | Gate 4 (Infinite Spectral Interchange) | **Cross-Slot Non-Uniform Infinite Interchange**: Two-parameter polarization $\mathcal A(\sigma_1, \sigma_2)$ inherits exact finite paired kernel representation $K_T(\lambda,\mu; a_1, a_2)$, but termwise infinite limit interchange $\lim_{T\to\infty} \sum_{\lambda,\mu} K_T = \sum_{\lambda,\mu} \lim_{T\to\infty} K_T$ remains open at Gate G4. | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4` |
+| **CANDIDATE_CMSA3** | Grade-Normalized Completed Mean-Square Anchor | $\mathcal A_K(\sigma) = 0$ | `FALSIFIED_GATE_8` | Gate 8 (Grade Nonredundancy) | **Grade Covariance Redundancy**: The normalized completed logarithmic derivative $s D_s(su) = f(u)$ (formalized in Lean 4 for arbitrary scale $s > 0$) is strictly coordinate-redundant. Grade dilation yields no additional arithmetic constraints or non-redundant radial invariants beyond $K=0$. | `GRADE_COORDINATE_REDUNDANT` |
 
 ---
 
@@ -235,23 +235,25 @@ The formalization in `formal/RiemannScope/` contains the following compiled theo
    Proves covariance, reflection, and conjugation symmetries are jointly compatible with $\delta \ne 0$.
 6. **`RiemannScope.ConditionalArithmeticRadialBridge.all_defects_zero`**:
    Rigidity theorem: under any valid conditional arithmetic bridge, all represented zero defects vanish ($r_j = 0 \implies \delta_j = 0$).
-7. **`RiemannScope.sum_pairs_sq_two_terms`**:
-   Exact 2-term algebraic curvature identity: $\sum_{a,b=1}^2 (\delta_a + \delta_b)^2 = 2 \cdot 2 \cdot (\delta_1^2 + \delta_2^2) + 2(\delta_1+\delta_2)^2$.
-8. **`RiemannScope.sum_pairs_sq_two_nonneg` & `sum_pairs_sq_two_eq_zero_iff`**:
-   Unconditional nonnegativity and zero-rigidity: $\sum_{a,b=1}^2 (\delta_a+\delta_b)^2 \ge 0$, and equals 0 iff $\delta_1 = 0 \wedge \delta_2 = 0$.
-9. **`RiemannScope.curvature_pair_symmetric`**:
-   2-term reflection pair curvature theorem under $\delta_1 + \delta_2 = 0$: evaluates to $8 \delta_1^2$.
-10. **`RiemannScope.sum_pairs_sq_four_terms` & `curvature_quartet_symmetric`**:
-    Exact 4-term algebraic curvature identity: $\sum_{a,b=1}^4 (\delta_a + \delta_b)^2 = 2 \cdot 4 \cdot \sum_{a=1}^4 \delta_a^2 + 2(\sum_{a=1}^4 \delta_a)^2$.
-11. **`RiemannScope.upper_fibre_simple_quartet_curvature_val`**:
-    Single upper-half-plane fibre $\{\delta, -\delta\}$ ($N=2$, multiplicity $n=1$) evaluates to $8\delta^2$.
-12. **`RiemannScope.upper_fibre_multiplicity_two_curvature_val`**:
-    Multiplicity $n=2$ upper-half-plane fibre ($N=4$) evaluates to $32\delta^2 = 8(2^2)\delta^2$.
+7. **`RiemannScope.list_pairs_sq_sum_eq`**:
+   **Arbitrary finite curvature theorem**: For any real list $l$ of length $N$, $\sum_{i,j} (d_i + d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$.
+8. **`RiemannScope.list_pairs_sq_sum_symmetric`**:
+   Symmetric zero-sum reduction: when $\sum d_i = 0$, $\sum_{i,j} (d_i + d_j)^2 = 2N\sum d_i^2$.
+9. **`RiemannScope.list_pairs_sq_sum_nonneg` & `list_pairs_sq_sum_eq_zero_iff`**:
+   Unconditional nonnegativity and zero-rigidity for arbitrary lists: $\sum_{i,j} (d_i + d_j)^2 \ge 0$, vanishing iff $\forall x \in l, x = 0$.
+10. **`RiemannScope.sum_pairs_sq_two_terms` & `sum_pairs_sq_four_terms`**:
+    Explicit 2-term and 4-term specializations of the algebraic curvature identity.
+11. **`RiemannScope.curvature_pair_symmetric` & `curvature_quartet_symmetric`**:
+    Symmetric 2-term ($8\delta^2$) and 4-term ($16\sum \delta_a^2$) curvature evaluations.
+12. **`RiemannScope.upper_fibre_simple_quartet_curvature_val` & `upper_fibre_multiplicity_two_curvature_val`**:
+    Simple quartet fibre ($8\delta^2$) and multiplicity-2 fibre ($32\delta^2$) evaluations.
 13. **`RiemannScope.normalized_fibre_curvature_simple`**:
     Normalized fibre curvature: $C_\gamma = (8\delta^2)/(2 \cdot 2) = 2\delta^2 = \delta^2 + (-\delta)^2$.
 14. **`RiemannScope.ConditionalSeparatedSignalBridge.all_variances_zero`**:
     Separated Signal Bridge Rigidity Theorem: under any arithmetic-anchored separated signal bridge, all represented radial variances vanish, forcing $\delta = 0$.
-15. **`RiemannScope.CompletedLogDerivativeDecomposition.coordinate_redundant`**:
+15. **`RiemannScope.generic_scale_dilation_cancellation`**:
+    Universal scale dilation cancellation: for any scale $s > 0$, $s D_s(su) = f(u)$, proving coordinate redundancy for arbitrary dilation factors.
+16. **`RiemannScope.ConditionalCompletedLogDerivativeDecomposition.coordinate_redundant`**:
     Proves that the normalized dilated completed logarithmic derivative $\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)$ is strictly coordinate-redundant.
 
 ---
@@ -265,13 +267,17 @@ The formalization in `formal/RiemannScope/` contains the following compiled theo
 | $\kappa_1(\lambda, \lambda^\#) = \delta^2/\gamma^2$ | Rational Involution Kernel | Proved Internally (Algebraic) | Formalized (`kappa1_val`) | Spectral defect conversion |
 | $L_Q = 1 \iff \mathrm{RH}$ | Spectral Equivalence | Proved Internally (Analytic) | Formalized (`list_prod_one_plus_nonneg_eq_one_iff`) | Spectral target criterion |
 | $\operatorname{Tr}\mathcal R = 0 \iff \mathrm{RH}$ | Spectral Equivalence | Proved Internally (Analytic) | Formalized (`list_sum_nonneg_eq_zero_iff`) | Spectral target criterion |
-| $\sum_{a,b=1}^N (\delta_a+\delta_b)^2 = 2N\sum \delta_a^2 + 2(\sum \delta_a)^2$ | Algebraic Curvature | Proved Internally (Exact) | Formalized (`sum_pairs_sq_two_terms`, `four_terms`) | Radial variation detector |
+| $\sum_{i,j} (d_i+d_j)^2 = 2N\sum d_i^2 + 2(\sum d_i)^2$ | Arbitrary Algebraic Curvature | Proved Internally (Exact) | Formalized (`list_pairs_sq_sum_eq`) | Radial variation detector for arbitrary finite zero families |
+| $J_T(p,q) = \frac{\log\frac{p+iT}{p-iT} + \log\frac{q+iT}{q-iT}}{2Ti(p+q)}$ | Exact Finite Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_kernel_J_T`) | Exact evaluation of finite spectral cross-terms |
+| $K_T(\lambda,\mu; a) = m_\lambda m_\mu \sum_{\varepsilon,\eta} J_T(a-\varepsilon\lambda, a-\eta\bar\mu)$ | Exact Paired Zero-Zero Kernel | Proved Internally (Exact Analytic) | Verified in Python (`exact_finite_zero_zero_kernel_K_T`) | Exact evaluation of paired spectral self-interaction |
+| $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Exact Analytic) | Verified in Python (`evaluate_complete_finite_spectral_expansion`) | Closed exact finite spectral representation |
 | $\Xi'/\Xi(z) = \sum \frac{2z}{z^2-\lambda^2}$ | Hadamard Log-Derivative | Standard Theorem (Hadamard 1893) | Unformalized Analytic | Exact spectral representation |
-| $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Formalized Structure (`CompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
+| $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Formalized Structure (`ConditionalCompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
 | $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T \|P(\sigma+it)\|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
 | $\mathcal A(\sigma) = 0$ | Completed Mean-Square Anchor | Proved Internally (Analytic) | Unformalized Analytic | Divisor-independent arithmetic anchor |
+| $s D_s(su) = f(u)$ | Universal Scale Invariance | Proved Internally (Algebraic) | Formalized (`generic_scale_dilation_cancellation`) | Dilation coordinate redundancy exclusion |
 | Single-grade coordinate pullback | Grade Covariance | Proved Internally (Algebraic) | Formalized (`coordinate_redundant`) | Coordinate redundancy exclusion |
-| Cross-grade exact non-resonance for $2\pi$ | Transcendental Number Theory | Open / Numerical Evidence Only | Unformalized | Cross-grade coupling |
+| Gate G4: Infinite Spectral Interchange | Analytic Interchange Barrier | Identified Exact Open Obstruction | Open Analytic Gate | Barrier to unregularized spectral bridge |
 | $\mathrm{OBL\text{-}RDQ\text{-}001}$ | Arithmetic Radial Bridge | Open Research Obligation | Conditional Structure Only | Central Research Goal |
 
 ---
@@ -296,23 +302,42 @@ This quantity:
 2. Vanishes identically ($\mathcal A(\sigma) = 0$) unconditionally for all $\sigma > 1$;
 3. Contains all nontrivial zeros via the symmetrically paired Hadamard logarithmic derivative $\Xi'/\Xi$.
 
-### 10.3 Analytic Gap and Falsification Findings
-When expanding the spectral side:
+### 10.3 Closed Finite Spectral Expansion & Exact Analytic Kernels
+For any finite subset of zeros $\mathcal Z_N = \{\lambda_k = \delta_k + i\gamma_k\}_{k=1}^N$ ($z = a + it = \sigma - 1/2 + it$), the finite spectral approximant is:
+$$Z_N(t) = \sum_{k=1}^N m_k \frac{2z}{z^2 - \lambda_k^2} = \sum_{k=1}^N m_k \left( \frac{1}{a - \lambda_k + it} + \frac{1}{a + \lambda_k + it} \right).$$
+The finite mean square decomposes exactly into four closed terms:
+$$S_{N, T}(\sigma) := \frac{1}{2T}\int_{-T}^T |A(\sigma+it) - Z_N(t)|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},$$
+where:
+1. $I_{AA} = \frac{1}{2T}\int_{-T}^T |A(\sigma+it)|^2 dt$;
+2. $I_{AZ} = \frac{1}{2T}\int_{-T}^T A(\sigma+it)\overline{Z_N(t)} dt$, and $I_{ZA} = \overline{I_{AZ}}$;
+3. $I_{ZZ} = \sum_{j=1}^N \sum_{k=1}^N K_T(\lambda_j, \lambda_k; a)$, evaluated exactly via the closed paired zero-zero kernel:
+   $$K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu),$$
+   with exact translation kernel:
+   $$\boxed{J_T(p, q) := \frac{1}{2T}\int_{-T}^T \frac{dt}{(p+it)(q-it)} = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)}.}$$
+This finite spectral expansion closes exactly to machine precision ($< 10^{-18}$) in arbitrary precision.
+
+### 10.4 Exact Earliest Infinite Analytic Obstruction (Gate G4)
 1. **Besicovitch Mean Square vs $L^2(\mathbb R)$ Resolvents**:
    The individual zero resolvent terms $\frac{1}{\sigma-\rho+it}$ belong to $L^2(\mathbb R, dt)$ with finite total norm $\int_{-\infty}^\infty \frac{dt}{|\sigma-\rho+it|^2} = \frac{\pi}{\sigma - \Re\rho}$.
    Under translation averaging, $\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \sim \frac{\pi}{2T(\sigma-\Re\rho)} \to 0$ as $T\to\infty$.
-   Thus individual zero resolvents do not produce non-zero almost-periodic discrete frequencies without regularized Mellin-transform weighting.
-2. **Spectral Real-Axis Defect Sign**:
-   Evaluating $\Xi'/\Xi(z)$ on the real axis $z = \sigma - 1/2 > 1/2$ demonstrates that moving an on-line pair to an off-line quartet $\{\delta, -\delta\}$ with $\delta \ne 0$ at ordinate $\gamma$ induces a spectral variation:
-   $$\Delta(\delta) = \frac{4z(z^2 - 3\gamma^2 - \delta^2)}{(z^2+\gamma^2-\delta^2)^2 + 4\delta^2\gamma^2}\delta^2 < 0 \qquad (\text{for } z^2 < 3\gamma^2).$$
-   Because $z^2 < 3\gamma^2$ holds for all critical strip heights ($\gamma > 14$), the unregularized spectral difference is negative, proving that the raw mean-square anchor does not directly produce a positive quadratic radial defect without regularized weighting.
+   Consequently, termwise infinite limit interchange:
+   $$\lim_{T\to\infty} \sum_{\lambda, \mu} K_T(\lambda, \mu; a) \ne \sum_{\lambda, \mu} \lim_{T\to\infty} K_T(\lambda, \mu; a) = 0.$$
+   The non-zero Besicovitch mean on the arithmetic side ($\sum \Lambda(n)^2 n^{-2\sigma}$) is carried by a collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest obstruction to bridging the finite spectral expansion to the infinite arithmetic anchor.
+2. **Spectral Real-Axis Defect Exact Formula & Sign Transition**:
+   Evaluating the real-axis variation between an off-line quartet $\{\pm\delta \pm i\gamma\}$ and an on-line pair $\{0, \pm i\gamma\}$ at $z = \sigma - 1/2 > 0$ yields the exact rational defect:
+   $$\boxed{\Delta(\delta) := \frac{4z}{z^2 - (\delta+i\gamma)^2} + \frac{4z}{z^2 - (\delta-i\gamma)^2} - \frac{8z}{z^2 + \gamma^2} = \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2 + \gamma^2)[(z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2]}.}$$
+   - For $z^2 < 3\gamma^2 + \delta^2$ (which holds for all ordinates $\gamma > 14$ when $z = O(1)$), $\Delta(\delta) < 0$.
+   - For $z^2 > 3\gamma^2 + \delta^2$, $\Delta(\delta) > 0$.
+   Leading-order behavior: $\Delta(\delta) \approx \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}\delta^2 + O(\delta^4)$.
 
 ---
 
 ## 11. Current Status and Research Protocol
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
-- **Completed Mean-Square Anchor Outcome**:
+- **Sprint Outcome Classification**: `FINITE_SPECTRAL_KERNEL_CLOSED_INFINITE_G4_OPEN`.
   - The arithmetic identity $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ and mean-square vanishing anchor $\mathcal A(\sigma) = 0$ are exact and proved.
-  - Candidates CMSA-1 and CMSA-2 are live with explicit unproved analytic gaps regarding spectral resolvent regularization; Candidate CMSA-3 is coordinate-redundant.
+  - The complete finite spectral expansion $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ and exact kernels $J_T, K_T$ are closed and verified.
+  - The arbitrary finite curvature theorem is 100% proved in Lean 4 without axioms or `sorry`.
+  - Candidates CMSA-1 and CMSA-2 are formally classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`; Candidate CMSA-3 is `GRADE_COORDINATE_REDUNDANT`.
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.

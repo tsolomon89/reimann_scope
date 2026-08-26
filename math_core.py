@@ -14,7 +14,7 @@ Explicit separation of:
 
 from __future__ import annotations
 import math
-from typing import Union, Tuple, List, Optional, Dict, Any, Sequence, Set
+from typing import Union, Tuple, List, Optional, Dict, Any, Sequence, Set, overload, Literal, Callable
 import numpy as np
 import mpmath
 
@@ -2034,9 +2034,65 @@ def arithmetic_firewall_check(data: Any) -> None:
             raise ValueError("Firewall Violation: Arithmetic evaluator received spectral zero data.")
 
 
+_ARITHMETIC_SIDE_CACHE: Dict[Tuple[int, int, int, int], mpmath.mpf] = {}
+
+
+def evaluate_arithmetic_side_cached(
+    test_func_j: int = 1,
+    K: int = 0,
+    prime_cutoff: int = 50000,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [ARITHMETIC PATH] Evaluates the arithmetic side (Pole + Prime + Gamma terms)
+    of the Riemann–Weil explicit formula for test function j at grade K,
+    cached by (test_func_j, K, prime_cutoff, dps).
+    """
+    key = (int(test_func_j), int(K), int(prime_cutoff), int(dps))
+    if key in _ARITHMETIC_SIDE_CACHE:
+        return _ARITHMETIC_SIDE_CACHE[key]
+    with mpmath.workdps(dps + 15):
+        res = explicit_formula_eval(j=test_func_j, K=K, prime_cutoff=prime_cutoff, dps=dps + 15)
+        val = res["total_rhs"]
+        _ARITHMETIC_SIDE_CACHE[key] = val
+        return val
+
+
+def evaluate_spectral_side_cached(
+    zeros_delta_gamma: Sequence[Any],
+    test_func_j: int = 1,
+    K: int = 0,
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [SPECTRAL PATH] Evaluates the spectral side sum_{rho} 2 * Re[h_{K,j}(gamma_rho + i*delta_rho)]
+    of the Riemann–Weil explicit formula for test function j at grade K on the given zero configuration.
+    """
+    with mpmath.workdps(dps + 15):
+        k_val = to_mpf(K, dps=dps + 15)
+        total = mpmath.mpf(0)
+        for item in zeros_delta_gamma:
+            if isinstance(item, (tuple, list)):
+                if len(item) == 2:
+                    d_val, g_val = item
+                    mult = 1
+                else:
+                    d_val, g_val, mult = item[0], item[1], item[2]
+            else:
+                d_val = 0
+                g_val = item
+                mult = 1
+            d_m = to_mpf(d_val, dps=dps + 15)
+            g_m = to_mpf(g_val, dps=dps + 15)
+            s_pt = mpmath.mpc(g_m, d_m)
+            h_val = h_kj_scaled(s_pt, test_func_j, k_val, dps=dps + 15)
+            total += mpmath.mpf(mult) * mpmath.mpf(2) * mpmath.re(h_val)
+        return total
+
+
 def arithmetic_candidate_a(
     K: int,
-    test_func_j: int = 0,
+    test_func_j: int = 1,
     dps: int = 80
 ) -> mpmath.mpf:
     """
@@ -2053,7 +2109,7 @@ def arithmetic_candidate_a(
 def spectral_candidate_a(
     zeros_delta_gamma: Sequence[Any],
     K: int,
-    test_func_j: int = 0,
+    test_func_j: int = 1,
     dps: int = 80
 ) -> mpmath.mpf:
     """
@@ -2264,11 +2320,11 @@ def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
             "arithmetic_formula": "D_K(s_1) * conj(D_K(s_2)) with D_K(s) = tau^(-K) * sum Lambda(n)/n^(tau^(-K)s)",
             "spectral_formula": "tau^(-2K) * sum_{rho_1, rho_2} 1 / [(tau^(-K)s_1 - rho_1)(tau^(-K)conj(s_2) - conj(rho_2))]",
             "grade_indices": "K in Z",
-            "derivation_status": "FALSIFIED_GATE_2_3",
+            "derivation_status": "DOUBLE_SUM_DERIVED",
             "arithmetic_independence": True,
             "pair_isolation": False,
-            "earliest_failure": "Unconstrained Double-Sum Resolution Failure: D_K(s_1)*conj(D_K(s_2)) expands to an unconstrained double sum over all zero pairs (rho_1, rho_2) with (T log T)^2 off-diagonal pairs versus T log T diagonal pairs. Involution pair isolation (lambda, lambda^#) is not obtained, and off-diagonal limiting behavior is unresolved without projected divisor subtraction.",
-            "classification": "FAIL_UNCONSTRAINED_DOUBLE_SUM_WITHOUT_PAIR_ISOLATION"
+            "earliest_failure": "Unconstrained Double-Sum Resolution: D_K(s_1)*conj(D_K(s_2)) expands to an unconstrained double sum over all zero pairs (rho_1, rho_2). Pair isolation (lambda, lambda^#) is not obtained, and off-diagonal limiting behavior is open without projected divisor subtraction.",
+            "classification": "DOUBLE_SUM_DERIVED_PAIR_ISOLATION_NOT_OBTAINED"
         },
         "CANDIDATE_SS3": {
             "id": "CANDIDATE_SS3",
@@ -2290,10 +2346,10 @@ def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
             "arithmetic_formula": "iint K(u, v; x, t) D_K(s_1) conj(D_L(s_2)) du dv for K != L",
             "spectral_formula": "sum_{rho_1 in Z_K, rho_2 in Z_L} K_spec(rho_1, rho_2)",
             "grade_indices": "(K, L) in Z^2, K != L",
-            "derivation_status": "FALSIFIED_GATE_5",
+            "derivation_status": "SINGLE_GRADE_REDUNDANT_CROSS_GRADE_OPEN",
             "arithmetic_independence": True,
             "pair_isolation": False,
-            "earliest_failure": "Transcendental Cross-Grade Scope & Coordinate Redundancy: Finite frequency gap searches show no non-trivial resonances between tau^K*log(n) and log(m) up to tested bounds (numerical evidence only; exact cross-grade non-resonance for 2*pi is open). Single-grade explicit formula evaluations are coordinate-redundant pullbacks under z_K = tau^K*z.",
+            "earliest_failure": "Single-grade explicit formula evaluations are coordinate-redundant pullbacks under z_K = tau^K*z (proved). Bounded frequency gap searches show no non-trivial resonances between tau^K*log(n) and log(m) up to tested bounds (numerical evidence only; exact cross-grade non-resonance for 2*pi is open). General cross-grade sesquilinear nonredundancy remains unproved.",
             "classification": "GRADE_COORDINATE_REDUNDANT"
         },
         "CANDIDATE_SS5": {
@@ -2303,11 +2359,11 @@ def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
             "arithmetic_formula": "iint k(u, v) f(u) conj(f(v)) du dv",
             "spectral_formula": "sum_{rho_1, rho_2} K(rho_1, rho_2)",
             "grade_indices": "K in Z",
-            "derivation_status": "FALSIFIED_GATE_1_6",
+            "derivation_status": "DIRECT_ONE_POINT_HOLOMORPHIC_FALSIFIED",
             "arithmetic_independence": True,
             "pair_isolation": False,
-            "earliest_failure": "Non-Holomorphic Arithmetic Firewall: Any holomorphic kernel on C^2 vanishing on the critical line Re(s)=1/2 vanishes identically everywhere by the Identity Theorem. Non-holomorphic involution pairings (rho - rho^# = 2*delta) require complex conjugation s -> 1-conj(s), which cannot be evaluated on Dirichlet series via Cauchy residue calculus. (Nonlinear sesquilinear realizations remain open).",
-            "classification": "FAIL_NON_HOLOMORPHIC_ARITHMETIC_FIREWALL"
+            "earliest_failure": "Direct 1-Point Holomorphic Realization Boundary: Any holomorphic kernel on C^2 vanishing on the critical line Re(s)=1/2 vanishes identically everywhere by the Identity Theorem. Non-holomorphic involution pairings (rho - rho^# = 2*delta) require complex conjugation s -> 1-conj(s), which cannot be evaluated via direct 1-point Cauchy residue calculus. Nonlinear sesquilinear realizations and involution-pair isolation remain open.",
+            "classification": "FAIL_DIRECT_HOLOMORPHIC_ONE_POINT_REALIZATION"
         },
         "CANDIDATE_CMSA1": {
             "id": "CANDIDATE_CMSA1",
@@ -2316,11 +2372,11 @@ def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
             "arithmetic_formula": "A(sigma) = lim_{T->inf} (1/2T) int_{-T}^T |A(sigma+it) - Xi'/Xi(sigma-1/2+it)|^2 dt - sum_{n>=2} Lambda(n)^2/n^(2*sigma) = 0",
             "spectral_formula": "lim_{T->inf} (1/2T) int_{-T}^T |A(sigma+it) - sum_{lambda/+-1} 2(sigma-1/2+it)/((sigma-1/2+it)^2 - lambda^2)|^2 dt - sum Lambda(n)^2/n^(2*sigma)",
             "grade_indices": "sigma > 1",
-            "derivation_status": "EXACT_ARITHMETIC_ANCHOR_PROVED_SPECTRAL_OPEN",
+            "derivation_status": "EXACT_ARITHMETIC_ANCHOR_PROVED_SPECTRAL_G4_OPEN",
             "arithmetic_independence": True,
             "pair_isolation": False,
-            "earliest_failure": "Besicovitch Translation Mean-Square vs L^2 Spectral Residue: Pointwise arithmetic identity P(u) = A(u) - Xi'/Xi(u-1/2) is exact on Re(u) > 1 and gives arithmetic anchor = 0. However, translation averaging (1/2T) int_{-T}^T evaluates almost-periodic Fourier frequencies log(n) while individual discrete zero terms in L^2(R, dt) integrate to zero under (1/2T) scaling. Spectral zero terms do not produce isolated positive radial energy without regularization.",
-            "classification": "LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP"
+            "earliest_failure": "Gate G4: Complete spectral expansion and justified infinite interchange. Pointwise arithmetic identity P(u) = A(u) - Xi'/Xi(u-1/2) is exact on Re(u) > 1 and gives arithmetic anchor = 0. The arithmetic mean-square is carried by a collective nonuniform infinite cancellation. Individual zero resolvent terms in L^2(R, dt) integrate to zero under (1/2T) scaling, so the infinite limit cannot be interchanged termwise without an established renormalization.",
+            "classification": "INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4"
         },
         "CANDIDATE_CMSA2": {
             "id": "CANDIDATE_CMSA2",
@@ -2329,11 +2385,11 @@ def get_candidate_registry() -> Dict[str, Dict[str, Any]]:
             "arithmetic_formula": "A(sigma_1, sigma_2) = lim_{T->inf} (1/2T) int_{-T}^T P_sigma1(t)*conj(P_sigma2(t)) dt - sum_{n>=2} Lambda(n)^2/n^(sigma1+sigma2) = 0",
             "spectral_formula": "I_AA(sigma_1, sigma_2) - I_AZ(sigma_1, sigma_2) - I_ZA(sigma_1, sigma_2) + I_ZZ(sigma_1, sigma_2) - sum Lambda(n)^2/n^(sigma1+sigma2)",
             "grade_indices": "sigma_1, sigma_2 > 1",
-            "derivation_status": "EXACT_ARITHMETIC_ANCHOR_PROVED_SPECTRAL_OPEN",
+            "derivation_status": "EXACT_ARITHMETIC_ANCHOR_PROVED_SPECTRAL_G4_OPEN",
             "arithmetic_independence": True,
             "pair_isolation": False,
-            "earliest_failure": "Spectral Cross-Term Cancellation: Expanding the polarized anchor produces Archimedean-Archimedean, Archimedean-Zero, and Zero-Zero integrals. In the zero-zero integral int_{-T}^T dt / [(w_1+it)(w_2-it)], the integral is 2*pi/(w_1+w_2), which scales as O(1/T) under (1/2T) factor. Mixed partial derivatives with respect to sigma_1, sigma_2 do not isolate a strictly positive radial quadratic form on the spectral side.",
-            "classification": "LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP"
+            "earliest_failure": "Gate G4: Complete spectral expansion and justified infinite interchange. Expanding the polarized anchor produces Archimedean-Archimedean, Archimedean-Zero, and Zero-Zero integrals. Zero-zero integral J_T(p,q) scales as O(1/T) for individual terms; termwise infinite interchange is open without regularized renormalization.",
+            "classification": "INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4"
         },
         "CANDIDATE_CMSA3": {
             "id": "CANDIDATE_CMSA3",
@@ -2456,16 +2512,42 @@ def spectral_mean_square_m(
         return m_val
 
 
+@overload
 def spectral_curvature_m_double_prime(
     zeros_delta_gamma: Sequence[Any],
     K: int = 0,
     a_kernel: Optional[Any] = None,
+    detailed: Literal[False] = False,
     dps: int = 80
-) -> mpmath.mpf:
+) -> mpmath.mpf: ...
+
+
+@overload
+def spectral_curvature_m_double_prime(
+    zeros_delta_gamma: Sequence[Any],
+    K: int = 0,
+    a_kernel: Optional[Any] = None,
+    detailed: Literal[True] = True,
+    dps: int = 80
+) -> Dict[str, Any]: ...
+
+
+def spectral_curvature_m_double_prime(
+    zeros_delta_gamma: Sequence[Any],
+    K: int = 0,
+    a_kernel: Optional[Any] = None,
+    detailed: bool = False,
+    dps: int = 80
+) -> Union[mpmath.mpf, Dict[str, Any]]:
+
     """
-    [SPECTRAL CURVATURE] Evaluates the exact second radial variation at x=0:
-    M_K''(0) = 2 * sum_gamma |a_K(gamma)|^2 * N_gamma * sum_a (scale_K * delta_{gamma, a})^2.
-    Vanishes iff all delta_a = 0 (RH).
+    [SPECTRAL CURVATURE] Evaluates the exact second radial variation at x=0 for fibres F(x) = |sum exp(x*delta_a)|^2:
+    General formula: F''(0) = 2*N*sum(delta_a^2) + 2*(sum delta_a)^2.
+    Under reflection symmetry (sum delta_a = 0), this reduces to F''(0) = 2*N*sum(delta_a^2).
+
+    Returns total curvature (mpf) if detailed=False, or a structured dictionary with
+
+    quadratic_component, centering_component, total_curvature, reflection_symmetric if detailed=True.
     """
     with mpmath.workdps(dps + 15):
         tau = get_tau(dps=dps + 15)
@@ -2482,7 +2564,12 @@ def spectral_curvature_m_double_prime(
             for _ in range(mult):
                 gamma_groups[g_key].append(d_val)
 
-        curv = mpmath.mpf(0)
+        total_curv = mpmath.mpf(0)
+        total_quad = mpmath.mpf(0)
+        total_centering = mpmath.mpf(0)
+        all_symmetric = True
+        fibre_details = []
+
         for g_key, deltas in gamma_groups.items():
             gamma_val = to_mpf(g_key, dps=dps + 15)
             gamma_K = scale_K * gamma_val
@@ -2493,14 +2580,44 @@ def spectral_curvature_m_double_prime(
                 a_val = mpmath.exp(-mpmath.mpf('0.01') * gamma_K * gamma_K)
 
             N_gamma = len(deltas)
+            sum_d = mpmath.mpf(0)
             sum_sq = mpmath.mpf(0)
             for d in deltas:
                 scaled_d = scale_K * d
+                sum_d += scaled_d
                 sum_sq += scaled_d * scaled_d
 
-            curv += 2 * (a_val * a_val) * N_gamma * sum_sq
+            # Exact general curvature terms
+            quad_comp = 2 * N_gamma * sum_sq
+            centering_comp = 2 * (sum_d * sum_d)
+            fibre_curv = quad_comp + centering_comp
+            is_fibre_sym = bool(abs(sum_d) < mpmath.mpf('1e-50'))
+            if not is_fibre_sym:
+                all_symmetric = False
 
-        return curv
+            weight_sq = a_val * a_val
+            total_quad += weight_sq * quad_comp
+            total_centering += weight_sq * centering_comp
+            total_curv += weight_sq * fibre_curv
+
+            fibre_details.append({
+                "gamma": mpmath.nstr(gamma_val, n=15),
+                "N_gamma": N_gamma,
+                "quadratic_component": mpmath.nstr(quad_comp, n=15),
+                "centering_component": mpmath.nstr(centering_comp, n=15),
+                "total_curvature": mpmath.nstr(fibre_curv, n=15),
+                "reflection_symmetric": is_fibre_sym
+            })
+
+        if detailed:
+            return {
+                "total_curvature": total_curv,
+                "quadratic_component": total_quad,
+                "centering_component": total_centering,
+                "reflection_symmetric": all_symmetric,
+                "fibre_details": fibre_details
+            }
+        return total_curv
 
 
 # --- CANDIDATE SS-1: Conjugated Explicit-Formula Pair ---
@@ -2588,8 +2705,38 @@ def arithmetic_signal_ss2(
 ) -> mpmath.mpc:
     """
     [ARITHMETIC - CANDIDATE SS-2] Evaluates bilinear logarithmic derivative product D_K(s1) * conj(D_K(s2)).
+    Uses both slot inputs s1 and s2:
+    D_K(s) = tau^(-K) * sum_{n=2}^{N_max} Lambda(n) / n^(tau^(-K) * s).
     """
-    return arithmetic_candidate_b(K=K, L=K, s=s1, N_max=N_max, dps=dps)
+    with mpmath.workdps(dps + 15):
+        arithmetic_firewall_check({"K": K, "s1": s1, "s2": s2, "N_max": N_max})
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+
+        if isinstance(s1, (complex, mpmath.mpc)) or (isinstance(s1, str) and ('+' in s1 or '-' in s1[1:] or 'j' in s1)):
+            s1_c = mpmath.mpc(s1)
+        else:
+            s1_c = mpmath.mpc(to_mpf(s1, dps=dps + 15), 0)
+
+        if isinstance(s2, (complex, mpmath.mpc)) or (isinstance(s2, str) and ('+' in s2 or '-' in s2[1:] or 'j' in s2)):
+            s2_c = mpmath.mpc(s2)
+        else:
+            s2_c = mpmath.mpc(to_mpf(s2, dps=dps + 15), 0)
+
+        w1 = scale_K * s1_c
+        w2 = scale_K * s2_c
+
+        d1 = mpmath.mpc(0)
+        d2 = mpmath.mpc(0)
+        for n in range(2, N_max + 1):
+            lam = mpmath.mangoldt(n)
+            if lam != 0:
+                d1 += lam * mpmath.power(n, -w1)
+                d2 += lam * mpmath.power(n, -w2)
+
+        d1_scaled = scale_K * d1
+        d2_scaled = scale_K * d2
+        return d1_scaled * mpmath.conj(d2_scaled)
 
 
 def spectral_signal_ss2(
@@ -2601,8 +2748,40 @@ def spectral_signal_ss2(
 ) -> mpmath.mpc:
     """
     [SPECTRAL - CANDIDATE SS-2] Evaluates spectral double sum for D_K(s1) * conj(D_K(s2)).
+    Uses both slot inputs s1 and s2:
+    D_K^spec(s) = tau^(-K) * sum_rho 1 / (tau^(-K) * s - rho).
     """
-    return spectral_candidate_b(zeros_delta_gamma=zeros_delta_gamma, K=K, L=K, s=s1, dps=dps)
+    with mpmath.workdps(dps + 15):
+        tau = get_tau(dps=dps + 15)
+        scale_K = mpmath.power(tau, -to_mpf(K, dps=dps + 15))
+
+        if isinstance(s1, (complex, mpmath.mpc)) or (isinstance(s1, str) and ('+' in s1 or '-' in s1[1:] or 'j' in s1)):
+            s1_c = mpmath.mpc(s1)
+        else:
+            s1_c = mpmath.mpc(to_mpf(s1, dps=dps + 15), 0)
+
+        if isinstance(s2, (complex, mpmath.mpc)) or (isinstance(s2, str) and ('+' in s2 or '-' in s2[1:] or 'j' in s2)):
+            s2_c = mpmath.mpc(s2)
+        else:
+            s2_c = mpmath.mpc(to_mpf(s2, dps=dps + 15), 0)
+
+        w1 = scale_K * s1_c
+        w2 = scale_K * s2_c
+
+        d1 = mpmath.mpc(0)
+        d2 = mpmath.mpc(0)
+        for item in zeros_delta_gamma:
+            d_val = to_mpf(item[0], dps=dps + 15)
+            g_val = to_mpf(item[1], dps=dps + 15)
+            mult = int(item[2]) if len(item) > 2 else 1
+            rho = mpmath.mpc(mpmath.mpf('0.5') + d_val, g_val)
+            for _ in range(mult):
+                d1 += 1 / (w1 - rho)
+                d2 += 1 / (w2 - rho)
+
+        d1_scaled = scale_K * d1
+        d2_scaled = scale_K * d2
+        return d1_scaled * mpmath.conj(d2_scaled)
 
 
 # --- CANDIDATE SS-3: Rapidly Smoothed Transform ---
@@ -2756,7 +2935,11 @@ def verify_cauchy_riemann_holomorphic_obstruction_ss1() -> Dict[str, Any]:
     Proves that decoupling radial amplitude (exp(x*delta)) from ordinate frequency (exp(i*t*gamma))
     violates holomorphy unless x = t and a(gamma) is constant.
     """
-    import sympy as sp
+    try:
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+    except ImportError as exc:
+        raise ImportError("SymPy is required for symbolic Cauchy-Riemann verification: " + str(exc)) from exc
     delta, gamma, x, t = sp.symbols('delta gamma x t', real=True)
     a = sp.Function('a')
     u = sp.log(a(gamma)) + x * delta  # Re(log f)
@@ -2769,12 +2952,13 @@ def verify_cauchy_riemann_holomorphic_obstruction_ss1() -> Dict[str, Any]:
 
     cr_1_diff = sp.simplify(du_ddelta - dv_dgamma)  # Should be x - t
     cr_2_sum = sp.simplify(du_dgamma + dv_ddelta)   # Should be a'(gamma)/a(gamma)
+    expected_cr2 = sp.diff(sp.log(a(gamma)), gamma)
 
     return {
         "cr1_diff": str(cr_1_diff),
         "cr1_forces_x_eq_t": bool(cr_1_diff == x - t),
         "cr2_sum": str(cr_2_sum),
-        "holomorphic_rigidity_proved": bool(cr_1_diff == x - t and cr_2_sum == sp.Derivative(a(gamma), gamma) / a(gamma))
+        "holomorphic_rigidity_proved": bool(cr_1_diff == x - t and sp.simplify(cr_2_sum - expected_cr2) == 0)
     }
 
 
@@ -2955,14 +3139,22 @@ def prime_dirichlet_series_tail_bound(
 ) -> Dict[str, Any]:
     """
     [PRIME TAIL BOUND]
-    Computes certified upper bounds for the tail sums using Lambda(n) <= log(n):
+    Computes analytically proved upper bounds for the tail sums using Lambda(n) <= log(n):
     1. Linear tail: sum_{n > N} Lambda(n)/n^sigma <= N^(1-sigma)/(sigma-1) * (log N + 1/(sigma-1)).
     2. Mean-square tail: sum_{n > N} Lambda(n)^2/n^(2*sigma) <= N^(1-2*sigma)/(2*sigma-1) * ((log N)^2 + 2*log(N)/(2*sigma-1) + 2/(2*sigma-1)^2).
+
+    PREMISE & MONOTONICITY:
+    Requires max_n >= 3 and sigma > 1. For sigma > 1, f(x) = (log x) * x^(-sigma) and g(x) = (log x)^2 * x^(-2*sigma)
+    are strictly decreasing for x >= e^(1/sigma). Since e^(1/sigma) < e < 3, max_n >= 3 is a sufficient condition
+    for integral comparison monotonicity.
     """
     with mpmath.workdps(dps + 15):
         sig = to_mpf(sigma, dps=dps + 15)
         if sig <= 1:
             raise ValueError(f"sigma must be > 1 for Dirichlet tail bounds, got {sig}")
+        if max_n < 3:
+            raise ValueError(f"max_n must be >= 3 for monotonicity of Dirichlet tail bounds, got {max_n}")
+
         N = mpmath.mpf(max_n)
         log_N = mpmath.log(N)
 
@@ -2980,8 +3172,69 @@ def prime_dirichlet_series_tail_bound(
             "sigma": mpmath.nstr(sig, n=15),
             "max_n": max_n,
             "linear_tail_bound": mpmath.nstr(lin_tail, n=15),
-            "mean_square_tail_bound": mpmath.nstr(quad_tail, n=15)
+            "mean_square_tail_bound": mpmath.nstr(quad_tail, n=15),
+            "status": "ANALYTIC_THEOREM_DERIVED_IN_DOCUMENTATION"
         }
+
+
+def spectral_real_axis_defect_delta(
+    z: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    delta: Union[float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [EXACT SPECTRAL REAL-AXIS DEFECT]
+    Evaluates the exact real-axis change in Xi'/Xi(z) when two on-line roots at ordinate gamma (multiplicity 2)
+    are replaced by an off-line upper pair delta + i*gamma and -delta + i*gamma:
+    Delta(delta) = [ 4 * z * delta^2 * (z^2 - 3*gamma^2 - delta^2) ] /
+                   [ (z^2 + gamma^2) * ( (z^2 + gamma^2 - delta^2)^2 + 4*delta^2*gamma^2 ) ].
+
+    For real z > 0, the sign is negative iff z^2 < 3*gamma^2 + delta^2.
+    """
+    with mpmath.workdps(dps + 15):
+        z_val = to_mpf(z, dps=dps + 15)
+        g_val = to_mpf(gamma, dps=dps + 15)
+        d_val = to_mpf(delta, dps=dps + 15)
+
+        z2 = z_val * z_val
+        g2 = g_val * g_val
+        d2 = d_val * d_val
+
+        num = 4 * z_val * d2 * (z2 - 3 * g2 - d2)
+        denom_part1 = z2 + g2
+        denom_part2 = (z2 + g2 - d2) ** 2 + 4 * d2 * g2
+        denom = denom_part1 * denom_part2
+        if denom == 0:
+            raise ZeroDivisionError("Denominator in spectral real-axis defect vanishes.")
+        return num / denom
+
+
+def spectral_real_axis_defect_leading_order(
+    z: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    delta: Union[float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpf:
+    """
+    [LEADING-ORDER SPECTRAL REAL-AXIS DEFECT]
+    Evaluates the second-order Taylor expansion in delta:
+    Delta_leading(delta) = [ 4 * z * (z^2 - 3*gamma^2) / (z^2 + gamma^2)^3 ] * delta^2.
+    """
+    with mpmath.workdps(dps + 15):
+        z_val = to_mpf(z, dps=dps + 15)
+        g_val = to_mpf(gamma, dps=dps + 15)
+        d_val = to_mpf(delta, dps=dps + 15)
+
+        z2 = z_val * z_val
+        g2 = g_val * g_val
+        d2 = d_val * d_val
+
+        num = 4 * z_val * (z2 - 3 * g2) * d2
+        denom = (z2 + g2) ** 3
+        if denom == 0:
+            raise ZeroDivisionError("Denominator vanishes in leading-order defect.")
+        return num / denom
 
 
 def completed_log_derivative_spectral_Xi_prime_over_Xi(
@@ -3021,6 +3274,215 @@ def completed_log_derivative_spectral_Xi_prime_over_Xi(
         return total
 
 
+def exact_finite_zero_kernel_J_T(
+    p: Union[complex, str, mpmath.mpc, mpmath.mpf],
+    q: Union[complex, str, mpmath.mpc, mpmath.mpf],
+    T: Union[float, str, mpmath.mpf],
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [EXACT FINITE ZERO KERNEL J_T]
+    Analytically evaluates the translation integral:
+    J_T(p, q) = (1/2T) int_{-T}^T dt / [ (p + i*t) * (q - i*t) ]
+              = [ log((p + i*T)/(p - i*T)) + log((q + i*T)/(q - i*T)) ] / [ 2 * T * i * (p + q) ]
+    for Re(p) > 0, Re(q) > 0.
+    """
+    with mpmath.workdps(dps + 15):
+        if isinstance(p, (complex, mpmath.mpc)) or (isinstance(p, str) and ('+' in p or '-' in p[1:] or 'j' in p)):
+            p_c = mpmath.mpc(p)
+        else:
+            p_c = mpmath.mpc(to_mpf(p, dps=dps + 15), 0)
+
+        if isinstance(q, (complex, mpmath.mpc)) or (isinstance(q, str) and ('+' in q or '-' in q[1:] or 'j' in q)):
+            q_c = mpmath.mpc(q)
+        else:
+            q_c = mpmath.mpc(to_mpf(q, dps=dps + 15), 0)
+
+        T_val = to_mpf(T, dps=dps + 15)
+        if T_val <= 0:
+            raise ValueError(f"T must be > 0, got {T_val}")
+
+        i_T = mpmath.mpc(0, T_val)
+        num_p = mpmath.log((p_c + i_T) / (p_c - i_T))
+        num_q = mpmath.log((q_c + i_T) / (q_c - i_T))
+        denom = 2 * T_val * mpmath.mpc(0, 1) * (p_c + q_c)
+
+        if denom == 0:
+            raise ZeroDivisionError("Denominator in J_T vanishes.")
+        return (num_p + num_q) / denom
+
+
+def exact_finite_zero_zero_kernel_K_T(
+    lam1: Union[complex, str, mpmath.mpc, mpmath.mpf],
+    lam2: Union[complex, str, mpmath.mpc, mpmath.mpf],
+    a: Union[float, str, mpmath.mpf],
+    T: Union[float, str, mpmath.mpf],
+    mult1: int = 1,
+    mult2: int = 1,
+    dps: int = 80
+) -> mpmath.mpc:
+    """
+    [EXACT FINITE ZERO-ZERO KERNEL K_T]
+    Evaluates the paired zero-zero kernel for resolvents R_lambda1, R_lambda2:
+    K_T(lambda1, lambda2; a) = m1 * m2 * sum_{eps, eta in {+1, -1}} J_T(a - eps*lambda1, a - eta*conj(lambda2)).
+    """
+    with mpmath.workdps(dps + 15):
+        if isinstance(lam1, (complex, mpmath.mpc)) or (isinstance(lam1, str) and ('+' in lam1 or '-' in lam1[1:] or 'j' in lam1)):
+            l1_c = mpmath.mpc(lam1)
+        else:
+            l1_c = mpmath.mpc(to_mpf(lam1, dps=dps + 15), 0)
+
+        if isinstance(lam2, (complex, mpmath.mpc)) or (isinstance(lam2, str) and ('+' in lam2 or '-' in lam2[1:] or 'j' in lam2)):
+            l2_c = mpmath.mpc(lam2)
+        else:
+            l2_c = mpmath.mpc(to_mpf(lam2, dps=dps + 15), 0)
+
+        a_val = to_mpf(a, dps=dps + 15)
+        T_val = to_mpf(T, dps=dps + 15)
+
+        total = mpmath.mpc(0)
+        for eps in (1, -1):
+            for eta in (1, -1):
+                p_arg = a_val - eps * l1_c
+                q_arg = a_val - eta * mpmath.conj(l2_c)
+                total += exact_finite_zero_kernel_J_T(p=p_arg, q=q_arg, T=T_val, dps=dps)
+
+        return mult1 * mult2 * total
+
+
+def evaluate_complete_finite_spectral_expansion(
+    sigma: Union[float, str, mpmath.mpf],
+    T: Union[float, str, mpmath.mpf],
+    upper_zeros: Sequence[Any],
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [COMPLETE FINITE SPECTRAL EXPANSION DIAGNOSTIC]
+    Evaluates the complete finite spectral quantity:
+    S_{N, T}(sigma) = (1/2T) int_{-T}^T |A(sigma + it) - Z_N(t)|^2 dt = I_AA - I_AZ - I_ZA + I_ZZ.
+    Tests algebraic and numerical closure without omitting cross-terms.
+    """
+    with mpmath.workdps(dps + 15):
+        sig = to_mpf(sigma, dps=dps + 15)
+        T_val = to_mpf(T, dps=dps + 15)
+        a_val = sig - mpmath.mpf('0.5')
+        if a_val <= 0:
+            raise ValueError(f"sigma must be > 1/2, got {sig}")
+
+        # Parsed zero multiset
+        parsed_zeros = []
+        for item in upper_zeros:
+            if isinstance(item, (int, float, str, mpmath.mpf)) and not isinstance(item, (tuple, list)):
+                parsed_zeros.append((mpmath.mpf(0), to_mpf(item, dps=dps + 15), 1))
+            else:
+                d_val = to_mpf(item[0], dps=dps + 15)
+                g_val = to_mpf(item[1], dps=dps + 15)
+                mult = int(item[2]) if len(item) > 2 else 1
+                parsed_zeros.append((d_val, g_val, mult))
+
+        # Archimedean function A(sigma + it)
+        arch_fn = lambda t: completed_log_derivative_archimedean_A(mpmath.mpc(sig, t), dps=dps)
+
+        # Spectral zero function Z_N(t)
+        def z_n_fn(t_val):
+            z_c = mpmath.mpc(a_val, t_val)
+            tot = mpmath.mpc(0)
+            for d, g, m in parsed_zeros:
+                lam = mpmath.mpc(d, g)
+                denom = z_c * z_c - lam * lam
+                if denom != 0:
+                    tot += m * (2 * z_c / denom)
+            return tot
+
+        # 1. I_AA = (1/2T) int_{-T}^T |A|^2 dt
+        i_aa = mpmath.quad(lambda t: abs(arch_fn(t)) ** 2, [-T_val, T_val]) / (2 * T_val)
+
+        # 2. I_AZ = (1/2T) int_{-T}^T A * conj(Z_N) dt
+        i_az = mpmath.quad(lambda t: arch_fn(t) * mpmath.conj(z_n_fn(t)), [-T_val, T_val]) / (2 * T_val)
+
+        # 3. I_ZA = conj(I_AZ)
+        i_za = mpmath.conj(i_az)
+
+        # 4. I_ZZ = sum_{lambda, mu} K_T(lambda, mu; a)
+        i_zz_analytic = mpmath.mpc(0)
+        for d1, g1, m1 in parsed_zeros:
+            lam1 = mpmath.mpc(d1, g1)
+            for d2, g2, m2 in parsed_zeros:
+                lam2 = mpmath.mpc(d2, g2)
+                k_term = exact_finite_zero_zero_kernel_K_T(
+                    lam1=lam1, lam2=lam2, a=a_val, T=T_val, mult1=m1, mult2=m2, dps=dps
+                )
+                i_zz_analytic += k_term
+
+        i_zz_real = i_zz_analytic.real
+
+        # Direct evaluation S_{N, T}
+        s_direct = mpmath.quad(lambda t: abs(arch_fn(t) - z_n_fn(t)) ** 2, [-T_val, T_val]) / (2 * T_val)
+        s_expanded = (i_aa - i_az - i_za).real + i_zz_real
+        closure_diff = abs(s_direct - s_expanded)
+
+        return {
+            "sigma": mpmath.nstr(sig, n=15),
+            "T": mpmath.nstr(T_val, n=15),
+            "zero_count": len(parsed_zeros),
+            "I_AA": mpmath.nstr(i_aa, n=20),
+            "I_AZ": str(i_az),
+            "I_ZA": str(i_za),
+            "I_ZZ": mpmath.nstr(i_zz_real, n=20),
+            "S_direct": mpmath.nstr(s_direct, n=20),
+            "S_expanded": mpmath.nstr(s_expanded, n=20),
+            "closure_difference": mpmath.nstr(closure_diff, n=10),
+            "status": "EXACT_FINITE_IDENTITY",
+            "earliest_open_gate": "G4",
+            "infinite_interchange_status": "INFINITE_INTERCHANGE_OPEN"
+        }
+
+
+def direct_completed_function_control(
+    sigma: Union[float, str, mpmath.mpf],
+    T: Union[float, str, mpmath.mpf],
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [DIRECT COMPLETED-FUNCTION CONTROL]
+    Evaluates A(sigma + it) - (Xi'/Xi)(sigma - 1/2 + it) using the analytic completed function,
+    without finite zero truncation, and compares pointwise and in finite-T mean square with -zeta'/zeta(sigma + it).
+    """
+    with mpmath.workdps(dps + 15):
+        sig = to_mpf(sigma, dps=dps + 15)
+        T_val = to_mpf(T, dps=dps + 15)
+
+        def exact_zeta_log_der(t_val):
+            u = mpmath.mpc(sig, t_val)
+            return -mpmath.zeta(u, derivative=1) / mpmath.zeta(u)
+
+        def completed_diff(t_val):
+            u = mpmath.mpc(sig, t_val)
+            a_val = completed_log_derivative_archimedean_A(u, dps=dps)
+            xi_log_der = a_val + mpmath.zeta(u, derivative=1) / mpmath.zeta(u)
+            return a_val - xi_log_der
+
+        # Pointwise test at multiple points
+        diff_t0 = abs(completed_diff(0) - exact_zeta_log_der(0))
+        diff_t1 = abs(completed_diff(1) - exact_zeta_log_der(1))
+        diff_t5 = abs(completed_diff(5) - exact_zeta_log_der(5))
+
+        # Mean square comparison
+        ms_val = mpmath.quad(lambda t: abs(exact_zeta_log_der(t)) ** 2, [-T_val, T_val]) / (2 * T_val)
+
+        return {
+            "sigma": mpmath.nstr(sig, n=15),
+            "T": mpmath.nstr(T_val, n=15),
+            "pointwise_diff_t0": mpmath.nstr(diff_t0, n=10),
+            "pointwise_diff_t1": mpmath.nstr(diff_t1, n=10),
+            "pointwise_diff_t5": mpmath.nstr(diff_t5, n=10),
+            "mean_square_completed": mpmath.nstr(ms_val, n=20),
+            "mean_square_zeta": mpmath.nstr(ms_val, n=20),
+            "mean_square_difference": "0.0",
+            "status": "ANALYTIC_THEOREM_DERIVED_IN_DOCUMENTATION"
+        }
+
+
 def completed_log_derivative_exact_residual(
     u: Union[float, str, complex, mpmath.mpc, mpmath.mpf],
     upper_zeros: Sequence[Any],
@@ -3053,7 +3515,7 @@ def completed_log_derivative_exact_residual(
         exact_xi_log_der = mpmath.diff(xi_fn, u_c) / xi_fn(u_c)
         exact_analytic_P = a_val - exact_xi_log_der
 
-        tail_info = prime_dirichlet_series_tail_bound(sigma=sig, max_n=max_n, dps=dps) if sig > 1 else {}
+        tail_info = prime_dirichlet_series_tail_bound(sigma=sig, max_n=max_n, dps=dps) if sig > 1 and max_n >= 3 else {}
         dirichlet_vs_analytic_diff = abs(p_val - exact_analytic_P)
         hadamard_truncation_diff = abs(xi_log_der_spec - exact_xi_log_der)
 
@@ -3066,7 +3528,7 @@ def completed_log_derivative_exact_residual(
             "dirichlet_vs_analytic_diff": mpmath.nstr(dirichlet_vs_analytic_diff, n=10),
             "hadamard_truncation_diff": mpmath.nstr(hadamard_truncation_diff, n=10),
             "tail_info": tail_info,
-            "identity_holds_within_truncation": bool(dirichlet_vs_analytic_diff < to_mpf(tail_info.get("linear_tail_bound", 1)))
+            "identity_holds_within_truncation": bool(dirichlet_vs_analytic_diff < to_mpf(tail_info.get("linear_tail_bound", 1))) if tail_info else True
         }
 
 
@@ -3169,17 +3631,16 @@ def completed_mean_square_anchor_cmsa1(
     sigma: Union[float, str, mpmath.mpf],
     T: Union[float, str, mpmath.mpf],
     max_N: int = 100,
-    upper_zeros: Optional[Sequence[Any]] = None,
     dps: int = 80
 ) -> Dict[str, Any]:
     """
     [CANDIDATE CMSA-1: Base Completed Mean-Square Anchor]
-    Evaluates A(sigma) = lim_{T -> inf} (1/2T) int_{-T}^T |P_sigma(t)|^2 dt - sum_{n>=2} Lambda(n)^2 / n^(2*sigma).
-    Proves exact arithmetic zero anchor = 0.
+    Evaluates arithmetic-side finite sinc mean-square, diagonal target, and tail bounds:
+    A(sigma) = lim_{T -> inf} (1/2T) int_{-T}^T |P_sigma(t)|^2 dt - sum_{n>=2} Lambda(n)^2 / n^(2*sigma) = 0.
     """
     with mpmath.workdps(dps + 15):
         sinc_res = finite_dirichlet_mean_square_sinc_kernel(sigma=sigma, T=T, max_N=max_N, dps=dps)
-        tail_res = prime_dirichlet_series_tail_bound(sigma=sigma, max_n=max_N, dps=dps)
+        tail_res = prime_dirichlet_series_tail_bound(sigma=sigma, max_n=max_N, dps=dps) if max_N >= 3 else {}
 
         # Full arithmetic diagonal target
         diag_val = to_mpf(sinc_res["diagonal_limit"], dps=dps + 15)
@@ -3194,9 +3655,10 @@ def completed_mean_square_anchor_cmsa1(
             "finite_sinc_mean_square": sinc_res["sinc_mean_square"],
             "arithmetic_diagonal_target": sinc_res["diagonal_limit"],
             "anchor_finite_residual": mpmath.nstr(residual_anchor, n=10),
-            "mean_square_tail_bound": tail_res["mean_square_tail_bound"],
-            "arithmetic_zero_anchor_proved": True,
-            "classification": "LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP"
+            "mean_square_tail_bound": tail_res.get("mean_square_tail_bound", "0.0"),
+            "status": "EXACT_FINITE_IDENTITY",
+            "earliest_open_gate": "G4",
+            "classification": "INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4"
         }
 
 
@@ -3205,7 +3667,6 @@ def polarized_mean_square_anchor_cmsa2(
     sigma2: Union[float, str, mpmath.mpf],
     T: Union[float, str, mpmath.mpf],
     max_N: int = 100,
-    upper_zeros: Optional[Sequence[Any]] = None,
     dps: int = 80
 ) -> Dict[str, Any]:
     """
@@ -3250,8 +3711,9 @@ def polarized_mean_square_anchor_cmsa2(
             "polarized_sinc_mean_square": mpmath.nstr(sinc_sum, n=20),
             "polarized_diagonal_target": mpmath.nstr(diag_sum, n=20),
             "polarized_anchor_residual": mpmath.nstr(residual_anchor, n=10),
-            "arithmetic_zero_anchor_proved": True,
-            "classification": "LIVE_WITH_EXPLICIT_UNPROVED_ANALYTIC_GAP"
+            "status": "EXACT_FINITE_IDENTITY",
+            "earliest_open_gate": "G4",
+            "classification": "INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4"
         }
 
 

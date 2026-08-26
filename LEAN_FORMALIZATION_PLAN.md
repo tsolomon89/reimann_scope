@@ -704,3 +704,36 @@ Formalize exact coordinate centering, weighted sum positivity, the covariance co
    Structure containing zero defects, non-negative bounds, arithmetic evaluator, spectral evaluator, bridge identity \(\forall K, \mathfrak A_K = X\), and arithmetic vanishing anchor \(\exists K, \mathfrak A_K = 0\).
    Theorem `ConditionalArithmeticRadialBridge.all_defects_zero`: prove that any valid instance forces all represented defects to vanish (\(r_j = 0 \implies \delta_j = 0\)).
 
+---
+
+# 23. Phase 14 — Arbitrary Finite Curvature and Separated Signal Bridge
+
+Formalize arbitrary finite curvature decomposition, nonnegativity, and zero-rigidity in Lean 4:
+
+1. **Arbitrary Real-List Pairwise Squared-Sum Decomposition** (`list_pairs_sq_sum_eq`):
+   For any real list \(l\) of length \(N\):
+   \[
+   \sum_{i,j} (d_i + d_j)^2 = 2N \sum d_i^2 + 2\left(\sum d_i\right)^2.
+   \]
+2. **Symmetric Curvature Reduction** (`list_pairs_sq_sum_symmetric`):
+   When \(\sum d_i = 0\), \(\sum_{i,j} (d_i + d_j)^2 = 2N \sum d_i^2\).
+3. **Unconditional Non-negativity and Rigidity** (`list_pairs_sq_sum_nonneg`, `list_pairs_sq_sum_eq_zero_iff`):
+   Prove \(\sum_{i,j} (d_i + d_j)^2 \ge 0\), vanishing iff \(\forall x \in l, x = 0\).
+4. **Conditional Separated Signal Bridge Interface** (`ConditionalSeparatedSignalBridge`):
+   Prove `all_variances_zero`: any valid arithmetic-anchored separated signal bridge forces all represented radial variances to vanish.
+
+---
+
+# 24. Phase 15 — Universal Scale Dilation Invariance and Completed Log-Derivative
+
+Formalize universal scale dilation cancellation and coordinate redundancy in Lean 4:
+
+1. **Universal Scale Dilation Cancellation** (`generic_scale_dilation_cancellation`):
+   For any strictly positive scale \(s > 0\) and function \(f\), with \(D_s(f)(u) := f(u/s) / s\):
+   \[
+   s D_s(f)(su) = f(u).
+   \]
+2. **Conditional Completed Logarithmic Derivative Decomposition** (`ConditionalCompletedLogDerivativeDecomposition`):
+   Prove `coordinate_redundant`: the normalized dilated completed logarithmic derivative \(\tau^K D_K^\xi(\tau^K u) = \xi'/\xi(u)\) is strictly coordinate-redundant for all integer grades \(K \in \mathbb Z\).
+
+

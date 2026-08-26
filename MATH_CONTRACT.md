@@ -2262,4 +2262,63 @@ The abstract off-line quartet \(\mathcal Q_{\delta,\gamma} = \{1/2 \pm \delta \p
 - **Candidate F (Grade-Indexed Prime-Power Pairing)**: `OPEN_UNPROVED` (pairing law unproved).
 - **Candidate G (Weighted Regularized Bridge)**: `LIVE_UNDERIVED` (spectral detector \(T_a>0\) proved; arithmetic realization open).
 
+---
+
+# 40. Separated Signal Bridge & Arbitrary Algebraic Curvature Rigidity
+
+## 40.1 Arbitrary Finite Curvature Identity
+For any finite collection of real radial displacements \(\{d_i\}_{i=1}^N\), the double sum of squared pairwise sums decomposes exactly:
+\[
+\sum_{i,j=1}^N (d_i + d_j)^2 = 2N \sum_{i=1}^N d_i^2 + 2\left(\sum_{i=1}^N d_i\right)^2.
+\]
+1. **Unconditional Non-negativity**: \(\sum_{i,j=1}^N (d_i + d_j)^2 \ge 0\).
+2. **Zero-Rigidity**: \(\sum_{i,j=1}^N (d_i + d_j)^2 = 0 \iff \forall i \in \{1,\dots,N\}, d_i = 0\).
+3. **Symmetric Reduction**: When \(\sum_{i=1}^N d_i = 0\) (e.g. for reflection-symmetric pairs \(\{\delta, -\delta\}\)), the sum reduces to \(2N \sum d_i^2\).
+
+## 40.2 Separated Signal Candidate Classifications
+- **CANDIDATE_SS1 (Cauchy-Riemann Holomorphic Rigidity)**: `FALSIFIED_GATE_1_4` (Cauchy-Riemann forces holomorphic rigidity).
+- **CANDIDATE_SS2 (Polarized Bilinear Cross-Difference)**: `FALSIFIED_GATE_2_5` (Unrestricted double-sum cross-term contamination).
+- **CANDIDATE_SS3 (Cramér Logarithmic Phase Variance)**: `FALSIFIED_GATE_4_6` (Cramér transformation divergence; arithmetic firewall violation).
+- **CANDIDATE_SS4 (Transcendental Scale Non-Resonance)**: `FALSIFIED_GATE_2_3` (Non-resonance does not eliminate off-diagonal zero-pair contamination).
+- **CANDIDATE_SS5 (Direct Positive Quadratic Kernel)**: `FALSIFIED_GATE_1_6` (Holomorphic vanishing firewall).
+
+---
+
+# 41. Complete Finite Spectral Expansion & Exact Analytic Kernels
+
+## 41.1 Completed Logarithmic Derivative Identity
+For \(\Re(u) > 1\):
+\[
+P(u) := \sum_{n=2}^\infty \frac{\Lambda(n)}{n^u} = A(u) - \frac{\Xi'}{\Xi}\left(u - \frac{1}{2}\right),
+\]
+where \(A(u) = \frac{1}{u} + \frac{1}{u-1} - \frac{1}{2}\log \pi + \frac{1}{2}\psi(u/2)\).
+
+## 41.2 Complete Finite Spectral Expansion
+For any finite subset of zeros \(\mathcal Z_N = \{\lambda_k = \delta_k + i\gamma_k\}_{k=1}^N\) and \(z = a + it = \sigma - 1/2 + it\):
+\[
+S_{N, T}(\sigma) := \frac{1}{2T}\int_{-T}^T \left| A(\sigma+it) - \sum_{k=1}^N m_k \frac{2z}{z^2-\lambda_k^2} \right|^2 dt = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},
+\]
+where:
+1. \(I_{AA} = \frac{1}{2T}\int_{-T}^T |A(\sigma+it)|^2 dt\);
+2. \(I_{AZ} = \frac{1}{2T}\int_{-T}^T A(\sigma+it)\overline{Z_N(t)} dt\), \(I_{ZA} = \overline{I_{AZ}}\);
+3. \(I_{ZZ} = \sum_{j,k=1}^N K_T(\lambda_j, \lambda_k; a)\), with closed paired zero-zero kernel:
+   \[
+   K_T(\lambda, \mu; a) = m_\lambda m_\mu \sum_{\varepsilon, \eta \in \{\pm 1\}} J_T(a - \varepsilon\lambda, a - \eta\bar\mu),
+   \]
+   and exact analytic translation kernel:
+   \[
+   \boxed{J_T(p, q) := \frac{1}{2T}\int_{-T}^T \frac{dt}{(p+it)(q-it)} = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)}.}
+   \]
+
+## 41.3 Exact Real-Axis Spectral Defect Formula
+For an off-line quartet \(\{\pm\delta \pm i\gamma\}\) vs on-line pair \(\{0, \pm i\gamma\}\) at \(z = \sigma - 1/2 > 0\):
+\[
+\boxed{\Delta(\delta) := \frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2 + \gamma^2)[(z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2]}.}
+\]
+Sign behavior: \(\Delta(\delta) < 0\) for \(z^2 < 3\gamma^2 + \delta^2\) (all critical strip ordinates \(\gamma > 14\) at \(z = O(1)\)), transitioning to positive only for \(z > \sqrt{3}\gamma\).
+
+## 41.4 Earliest Infinite Analytic Obstruction (Gate G4)
+Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean of the arithmetic side is carried by non-uniform infinite collective cancellation. Termwise infinite limit interchange \(\lim_{T\to\infty}\sum_{\lambda,\mu} K_T = \sum_{\lambda,\mu}\lim_{T\to\infty} K_T\) is unproved and false without regularized weighting.
+
+
 

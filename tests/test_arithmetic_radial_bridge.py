@@ -201,6 +201,17 @@ class TestArithmeticFirewallAndCandidateEvaluations:
         diff_0 = diff.subs(K, 0)
         assert diff_0 == 0
 
+    def test_candidate_a_evaluations(self):
+        """Verifies that arithmetic_candidate_a and spectral_candidate_a evaluate consistently."""
+        with mpmath.workdps(60):
+            # For K=0, difference vanishes
+            diff_arith_0 = arithmetic_candidate_a(K=0, test_func_j=1, dps=60)
+            assert mpmath.almosteq(diff_arith_0, 0, abs_eps=mpmath.mpf('1e-50'))
+
+            zeros = [('0.0', '14.134725141734693790')]
+            diff_spec_0 = spectral_candidate_a(zeros, K=0, test_func_j=1, dps=60)
+            assert mpmath.almosteq(diff_spec_0, 0, abs_eps=mpmath.mpf('1e-50'))
+
     def test_candidate_b_double_sum_cross_terms(self):
         """Verifies that bilinear candidate B introduces unrestricted off-diagonal cross-terms."""
         with mpmath.workdps(80):

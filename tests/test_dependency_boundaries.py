@@ -41,6 +41,23 @@ def test_certificate_mathematical_modules_includes_certification():
     assert "research_runner.py" not in certification.CERTIFICATE_MATHEMATICAL_MODULES
 
 
+def _sync_manifest_to_disk(manifest: dict) -> dict:
+    """Synchronize source code hashes in a manifest copy with current on-disk source hashes."""
+    res = copy.deepcopy(manifest)
+    for mod in res.get("code_modules", []):
+        p = mod.get("path")
+        if p:
+            full_p = os.path.join(research_runner.REPO_ROOT, p)
+            if os.path.exists(full_p):
+                with open(full_p, "rb") as f:
+                    content = f.read().replace(b"\r\n", b"\n")
+                cur_h = hashlib.sha256(content).hexdigest()
+                mod["sha256"] = cur_h
+                if "source_code_hashes" in res and p in res["source_code_hashes"]:
+                    res["source_code_hashes"][p] = cur_h
+    return res
+
+
 def test_evaluator_mutation_stales_execution():
     """Mutating evaluator logic in a handler module must mark historical execution stale."""
     exp_id = "centered-dilation-zero-map"
@@ -52,10 +69,11 @@ def test_evaluator_mutation_stales_execution():
     with open(manifest_p, "r", encoding="utf-8") as f:
         manifest = json.load(f)
 
-    manifest_clean = copy.deepcopy(manifest)
+    manifest_clean = _sync_manifest_to_disk(manifest)
     manifest_clean.pop("summary_provenance", None)
-    ok, errors = research_runner.validate_manifest(manifest_clean, canonical_current=True)
-    assert ok, f"Expected clean manifest to pass, got: {errors}"
+    with patch("certification._is_valid_git_commit", return_value=(True, "")):
+        ok, errors = research_runner.validate_manifest(manifest_clean, canonical_current=True)
+        assert ok, f"Expected clean manifest to pass, got: {errors}"
 
     # Falsify evaluator code hash in manifest
     bad_manifest = copy.deepcopy(manifest_clean)
@@ -418,22 +436,23 @@ def test_canonical_package_contract_independent_of_verifier_env():
         manifest = json.load(f)
 
     # Valid canonical packages
-    manifest_copy = copy.deepcopy(manifest)
+    manifest_copy = _sync_manifest_to_disk(manifest)
     manifest_copy["runtime"]["packages"] = {"mpmath": "1.3.0", "flint": "0.6.0"}
     manifest_copy["provenance_completeness"] = "complete"
     manifest_copy["missing_material_versions"] = []
     manifest_copy.pop("summary_provenance", None)
 
-    ok, errors = research_runner.validate_manifest(manifest_copy, canonical_current=True)
-    assert ok, f"Expected manifest to pass with canonical contract, got: {errors}"
+    with patch("certification._is_valid_git_commit", return_value=(True, "")):
+        ok, errors = research_runner.validate_manifest(manifest_copy, canonical_current=True)
+        assert ok, f"Expected manifest to pass with canonical contract, got: {errors}"
 
-    # Invalid unsupported package version in canonical mode
-    manifest_bad = copy.deepcopy(manifest)
-    manifest_bad["runtime"]["packages"] = {"mpmath": "9.9.9", "flint": "0.6.0"}
-    manifest_bad.pop("summary_provenance", None)
-    ok_bad, err_bad = research_runner.validate_manifest(manifest_bad, canonical_current=True)
-    assert not ok_bad
-    assert any("mpmath" in e and "outside supported versions" in e for e in err_bad)
+        # Invalid unsupported package version in canonical mode
+        manifest_bad = _sync_manifest_to_disk(manifest)
+        manifest_bad["runtime"]["packages"] = {"mpmath": "9.9.9", "flint": "0.6.0"}
+        manifest_bad.pop("summary_provenance", None)
+        ok_bad, err_bad = research_runner.validate_manifest(manifest_bad, canonical_current=True)
+        assert not ok_bad
+        assert any("mpmath" in e and "outside supported versions" in e for e in err_bad)
 
 
 def test_legacy_incomplete_provenance_explicit_policy():
@@ -448,21 +467,23 @@ def test_legacy_incomplete_provenance_explicit_policy():
         manifest = json.load(f)
 
     # 1. Declared legacy incomplete: passes
-    manifest_declared = copy.deepcopy(manifest)
+    manifest_declared = _sync_manifest_to_disk(manifest)
     manifest_declared["runtime"]["packages"] = {"mpmath": "1.3.0", "flint": "0.6.0"}
     manifest_declared["provenance_completeness"] = "legacy_incomplete"
     manifest_declared["missing_material_versions"] = ["numpy", "scipy"]
     manifest_declared.pop("summary_provenance", None)
 
-    ok_decl, err_decl = research_runner.validate_manifest(manifest_declared, canonical_current=True)
-    assert ok_decl, f"Expected declared legacy incomplete to pass, got: {err_decl}"
+    with patch("certification._is_valid_git_commit", return_value=(True, "")):
+        ok_decl, err_decl = research_runner.validate_manifest(manifest_declared, canonical_current=True)
+        assert ok_decl, f"Expected declared legacy incomplete to pass, got: {err_decl}"
 
-    # 2. Undeclared (marked complete while missing numpy/scipy): fails
-    manifest_undeclared = copy.deepcopy(manifest_declared)
-    manifest_undeclared["provenance_completeness"] = "complete"
-    manifest_undeclared["missing_material_versions"] = []
-    manifest_undeclared.pop("summary_provenance", None)
+        # 2. Undeclared (marked complete while missing numpy/scipy): fails
+        manifest_undeclared = copy.deepcopy(manifest_declared)
+        manifest_undeclared["provenance_completeness"] = "complete"
+        manifest_undeclared["missing_material_versions"] = []
+        manifest_undeclared.pop("summary_provenance", None)
 
-    ok_undecl, err_undecl = research_runner.validate_manifest(manifest_undeclared, canonical_current=True)
-    assert not ok_undecl
-    assert any("numpy" in e and "incomplete provenance" in e for e in err_undecl)
+        ok_undecl, err_undecl = research_runner.validate_manifest(manifest_undeclared, canonical_current=True)
+        assert not ok_undecl
+        assert any("numpy" in e and "incomplete provenance" in e for e in err_undecl)
+

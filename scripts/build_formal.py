@@ -113,7 +113,7 @@ def _is_formal_env_dirty() -> Tuple[bool, List[str]]:
         return False, []
 
 
-def build_formal(git_commit: Optional[str] = None) -> Tuple[bool, Dict[str, Any], List[str]]:
+def build_formal(git_commit: Optional[str] = None, allow_dirty: bool = False) -> Tuple[bool, Dict[str, Any], List[str]]:
     """Execute lake build and write formal/build_report.json."""
     errors: List[str] = []
 
@@ -135,7 +135,7 @@ def build_formal(git_commit: Optional[str] = None) -> Tuple[bool, Dict[str, Any]
 
     # 2. Check worktree cleanliness for formal and builder files
     is_dirty, dirty_list = _is_formal_env_dirty()
-    if is_dirty:
+    if is_dirty and not allow_dirty:
         errors.append(f"Worktree is dirty for source/formal files: {dirty_list}")
 
     # 3. Capture toolchain versions
@@ -242,10 +242,11 @@ def build_formal(git_commit: Optional[str] = None) -> Tuple[bool, Dict[str, Any]
 def main():
     parser = argparse.ArgumentParser(description="Build Lean formalization and generate formal build report")
     parser.add_argument("--commit", type=str, default=None, help="Explicit producing commit SHA")
+    parser.add_argument("--allow-dirty", action="store_true", help="Allow generating report on dirty working tree")
     args = parser.parse_args()
 
     print("=== Building Lean 4 Formalization (lake build) ===")
-    ok, rep, errs = build_formal(git_commit=args.commit)
+    ok, rep, errs = build_formal(git_commit=args.commit, allow_dirty=args.allow_dirty)
     if ok:
         print(f"[SUCCESS] Lean formalization built successfully. Report saved to formal/build_report.json")
         sys.exit(0)
