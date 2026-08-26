@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "same_object_coordinate_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-26T13:53:54.724606+00:00",
-  "completed_at": "2026-08-26T13:53:55.277291+00:00",
+  "started_at": "2026-08-26T15:14:08.386829+00:00",
+  "completed_at": "2026-08-26T15:14:08.969270+00:00",
   "status": "complete",
-  "git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
-  "producing_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
+  "git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
+  "producing_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
   "git_dirty": false,
   "experiment_spec_sha256": "a28d5cee43ea6ac51945b442681a7f8fbe73d2c74e8ab3e8db608cb7e311aa79",
   "precision": {
@@ -75,7 +75,7 @@
   "source_code_hashes": {
     "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5",
+    "math_core.py": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/covariance.py": "459a3fc3290604a0d9d7daf5aca3185ed5888e5d2663b63186ace66b2dd81139",
@@ -101,7 +101,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5"
+      "sha256": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b"
     },
     {
       "path": "reference_data.py",
@@ -162,19 +162,19 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "6255fae2a4c84eab137fda3315a7a841cc10576daeaa373f7b5ebdf2403e667b"
+      "sha256": "d693af384f8468e0f44b00ce2aae3e08d267529d2d686b73461a42e1c9497384"
     }
   },
   "execution_provenance": {
     "results_sha256": "e969dfe30db3af654b711127dfeb4ea0dd6eed60421c2bb6fad9c3533c687b84",
-    "producing_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
+    "producing_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
     "git_dirty": false,
-    "started_at": "2026-08-26T13:53:54.724606+00:00",
-    "completed_at": "2026-08-26T13:53:55.277291+00:00",
+    "started_at": "2026-08-26T15:14:08.386829+00:00",
+    "completed_at": "2026-08-26T15:14:08.969270+00:00",
     "source_code_hashes": {
       "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5",
+      "math_core.py": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/covariance.py": "459a3fc3290604a0d9d7daf5aca3185ed5888e5d2663b63186ace66b2dd81139",
@@ -215,7 +215,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5"
+        "sha256": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b"
       },
       {
         "path": "reference_data.py",
@@ -267,10 +267,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "e94261aa9fe95816cfd2308f9226f5e718bf5a8a9522a9bf2e4266e9f7be7599",
-    "readme_sha256": "6255fae2a4c84eab137fda3315a7a841cc10576daeaa373f7b5ebdf2403e667b",
+    "readme_sha256": "d693af384f8468e0f44b00ce2aae3e08d267529d2d686b73461a42e1c9497384",
     "diagnostics_sha256": null,
-    "summary_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
-    "summarized_at": "2026-08-26T13:53:55.277291+00:00",
+    "summary_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
+    "summarized_at": "2026-08-26T15:14:08.969270+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/covariance.py": "459a3fc3290604a0d9d7daf5aca3185ed5888e5d2663b63186ace66b2dd81139",

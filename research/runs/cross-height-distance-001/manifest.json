@@ -6,11 +6,11 @@
   "epistemic_class": "observational_pattern",
   "object_relationship": "actual_cross_height_comparison",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-26T13:53:55.500523+00:00",
-  "completed_at": "2026-08-26T13:54:01.660339+00:00",
+  "started_at": "2026-08-26T15:14:09.179004+00:00",
+  "completed_at": "2026-08-26T15:14:15.406590+00:00",
   "status": "complete",
-  "git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
-  "producing_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
+  "git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
+  "producing_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
   "git_dirty": false,
   "experiment_spec_sha256": "ef6696444ac87bfac6f217f8e28c9eed5f7ea3bd8f9d582519544494e5534cc9",
   "precision": {
@@ -68,7 +68,7 @@
   "source_code_hashes": {
     "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5",
+    "math_core.py": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
@@ -94,7 +94,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5"
+      "sha256": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b"
     },
     {
       "path": "reference_data.py",
@@ -144,15 +144,15 @@
     }
   ],
   "consumed_certificates": [
-    "06e8aea19153a3d76ac6e9518b478415316ecbe35adb722730d8b88d98dffe4a",
-    "1fa9dae7b5a5e80f6b44434afc75468b9b83ed896abc0d7530b3f79c9452ced2",
-    "66b6c56b5e86916f8bace9bb76303f30342fbb6d0a160b08036d2ff4eabf57db",
-    "cc7b9db61d2175001326ec131f6ae04e35b8584bac3d5a447d45080676cea1ba"
+    "6248f741ed586225fc646ee917600369bb383be1c8d35ca6b69ab7fa578be3d6",
+    "661cf161986cbbd3963e431ec45fa130d046543a62949757906f6053d3e190cf",
+    "6a16104a8495da2dd061cc971be5a94918b0ffc7e7323f2834adfa77e17736d9",
+    "8daf6bd4eca303a69d9a6f5c5ecbe8ecf8dd0dcd8cdeba42a7ca5ffa2838db67"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "7613bf17d50a6860897876d0649046f7d1c9b5a674c066595ecf3ab9028a9387"
+      "sha256": "24f8cc506b9b7cfa3deda3beab9bef3e05e5fee4c79e3c5ed812cf96c2373f28"
     },
     "summary_json": {
       "path": "summary.json",
@@ -160,19 +160,19 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "23280d1319438783695e7d3a54e70d9c27172bb4cc78c59bba32b3f18c9bd1a0"
+      "sha256": "3c7684174a612b5304abb69e0005ef3e12f76dc1b6e207322eed54dabc8c6f25"
     }
   },
   "execution_provenance": {
-    "results_sha256": "7613bf17d50a6860897876d0649046f7d1c9b5a674c066595ecf3ab9028a9387",
-    "producing_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
+    "results_sha256": "24f8cc506b9b7cfa3deda3beab9bef3e05e5fee4c79e3c5ed812cf96c2373f28",
+    "producing_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
     "git_dirty": false,
-    "started_at": "2026-08-26T13:53:55.500523+00:00",
-    "completed_at": "2026-08-26T13:54:01.660339+00:00",
+    "started_at": "2026-08-26T15:14:09.179004+00:00",
+    "completed_at": "2026-08-26T15:14:15.406590+00:00",
     "source_code_hashes": {
       "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5",
+      "math_core.py": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
@@ -213,7 +213,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "b9fc94099ca0164a3a5d8b0fd756ecdcb21be4e3a51d6d502ac20e2c578ebac5"
+        "sha256": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b"
       },
       {
         "path": "reference_data.py",
@@ -265,10 +265,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "90b7cdec1d143c613d88e623188de41ceec31aa9115988f09f39b414a611e0e4",
-    "readme_sha256": "23280d1319438783695e7d3a54e70d9c27172bb4cc78c59bba32b3f18c9bd1a0",
+    "readme_sha256": "3c7684174a612b5304abb69e0005ef3e12f76dc1b6e207322eed54dabc8c6f25",
     "diagnostics_sha256": null,
-    "summary_git_commit": "e7146d70e4d83fd73660e0fcaf996d8f691963da",
-    "summarized_at": "2026-08-26T13:54:01.660339+00:00",
+    "summary_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
+    "summarized_at": "2026-08-26T15:14:15.406590+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
