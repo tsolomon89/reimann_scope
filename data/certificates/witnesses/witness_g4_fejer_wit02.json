@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0",
+  "certificate_type": "radial_witness_certificate",
+  "status": "radial_witness_certified",
+  "evidence_status": "CERTIFIED_NEGATIVE_ARB_BALL",
+  "witness_id": "WIT-02",
+  "window_type": "fejer",
+  "mathematical_claim": "Compact Fej\u00e9r windowed radial difference Delta S_Fejer(5.0, 14.0, 0.49, 16.8) is strictly negative (< 0) via certified outward-rounded Arb ball arithmetic over [-16.8, 16.8].",
+  "parameters": {
+    "sigma": "5.0",
+    "gamma": "14.0",
+    "delta": "0.49",
+    "T": "16.8",
+    "n_subdivisions": 30000,
+    "symmetric_integration_domain": [
+      -16.8,
+      16.8
+    ],
+    "parameter_representation": "exact_decimal_strings"
+  },
+  "enclosure": {
+    "enclosure_mid": "[-0.00017183798765844452731071613921960248827573980693589 +/- 2.84e-55]",
+    "enclosure_rad": "2.2540393871395281166769564151763916015625000000000e-5",
+    "interval_lower": "[-0.00019437838152983980847748570337136640429136480693589 +/- 2.84e-55]",
+    "interval_upper": "[-0.00014929759378704924614394657506783857226011480693589 +/- 2.84e-55]",
+    "strictly_negative": true
+  },
+  "evenness_reduction_derivation": "Integrand f(t) = |A(sigma+it) - Z_delta(sigma-1/2+it)|^2 - |A(sigma+it) - Z_0(sigma-1/2+it)|^2 satisfies A(sigma, -t) = conj(A(sigma, t)) and Z_delta(sigma, -t) = conj(Z_delta(sigma, t)), hence |A(sigma,-t)-Z_delta(sigma,-t)|^2 = |A(sigma,t)-Z_delta(sigma,t)|^2. Direct symmetric integration over [-T, T] is evaluated in certified Arb balls with 50,000 subintervals.",
+  "formal_theorem_reference": "RiemannScope.additive_reference_subtraction_invariance",
+  "precision_dps": 50,
+  "library": "python-flint",
+  "library_version": "0.6.0",
+  "verifier_version": "2.0.0",
+  "algorithm_version": "2.0.0",
+  "producing_git_commit": "465443983dcdd16fce9a533b5ad5709233a4ad34",
+  "source_code_hashes": {
+    "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
+    "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
+    "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
+    "math_core.py": "ed43fb59de83c86549ad9fcf23d2a21af9080e791bf2faef52e6f00dfca63366",
+    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
+    "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
+    "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
+  },
+  "input_data_hashes": {
+    "zeros_reference.json": "b1c34f1bad706f7a3fd3fa0530aaba4fb1bb9f9e646438960ad0d2a2abf5c909",
+    "zeros_first_100_reference.json": "b0494532c69a44f0a5b1983fc91c9157e7e7521ea88120a0cebaca583cecd902",
+    "canonical_blocks.json": "5a4b1fe883aa2a7d5d6e92304375a4bae32505390e4f4869616c08b93df7ea5d",
+    "primes.json": "5f294c858ae064337bec836c0b096c57b9dfbe569a4ad42b579616a921f6a292"
+  },
+  "dependency_fingerprint": {
+    "python": "3.10.9",
+    "python_flint": "0.6.0",
+    "mpmath": "1.3.0",
+    "platform": "win32",
+    "library": "python-flint",
+    "library_version": "0.6.0",
+    "verifier_version": "2.0.0",
+    "algorithm_version": "2.0.0"
+  },
+  "certificate_hash": "50fbf67eb8a2027d3dd387adb446cfaeca530a6e19e029f1fdce349d6affbcaf"
+}

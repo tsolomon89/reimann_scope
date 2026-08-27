@@ -36,8 +36,9 @@ def verify_all(write_report: bool = False, canonical_current: bool = True) -> Tu
     trivial_files = sorted(glob.glob(os.path.join(CERT_DIR, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(CERT_DIR, "blocks", "*.json")))
     worldlines_files = sorted(glob.glob(os.path.join(CERT_DIR, "worldlines", "*.json")))
+    witnesses_files = sorted(glob.glob(os.path.join(CERT_DIR, "witnesses", "*.json")))
 
-    cert_files = zeros_files + trivial_files + blocks_files + worldlines_files
+    cert_files = zeros_files + trivial_files + blocks_files + worldlines_files + witnesses_files
 
     if not cert_files:
         return False, 0, ["No certificates found in data/certificates/"]
@@ -90,10 +91,11 @@ def verify_all(write_report: bool = False, canonical_current: bool = True) -> Tu
     return (len(all_anomalies) == 0), total_verified, all_anomalies
 
 
-def verify_all_certificates() -> Tuple[int, int, List[str]]:
-    ok, count, anomalies = verify_all(write_report=False)
+def verify_all_certificates(canonical_current: bool = False) -> Tuple[int, int, List[str]]:
+    ok, count, anomalies = verify_all(write_report=False, canonical_current=canonical_current)
     failed = len(anomalies)
     return count, failed, anomalies
+
 
 
 def main() -> None:

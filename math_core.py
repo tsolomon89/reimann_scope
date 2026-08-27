@@ -4424,18 +4424,35 @@ def certify_g4_fejer_witness_arb(
     gamma: Union[float, str, mpmath.mpf] = "14.0",
     delta: Union[float, str, mpmath.mpf] = "0.49",
     T: Union[float, str, mpmath.mpf] = "16.8",
-    n_subdivisions: int = 25000,
+    n_subdivisions: int = 50000,
     dps: int = 60
 ) -> Dict[str, Any]:
     """
     [RIGOROUS ARB BALL CERTIFICATE FOR FEJÉR WITNESS WIT-02]
     Computes a certified ball enclosure for the Fejér windowed radial difference:
     Delta S_W = int_{-T}^T W_T(t) (|A(sigma+it) - Z_delta(sigma-1/2+it)|^2 - |A(sigma+it) - Z_0(sigma-1/2+it)|^2) dt
-    over compact support [-T, T] using outward-rounded Arb ball arithmetic in python-flint.
+    over the complete symmetric compact support [-T, T] using outward-rounded Arb ball arithmetic in python-flint.
 
-    Every intermediate transcendental, arithmetic, and Riemann sum operation is enclosed
-    in certified Arb balls. The upper bound of the enclosure is strictly negative (< 0),
-    providing a genuine certified mathematical witness that the raw Fejér response is negative.
+    Exact Parameters:
+    - sigma = "5.0" (exact decimal string)
+    - gamma = "14.0" (exact decimal string)
+    - delta = "0.49" (exact decimal string)
+    - T = "16.8" (exact decimal string)
+
+    Mathematical Evenness Derivation:
+    For any real sigma and t:
+    1. zeta(sigma - it) = conj(zeta(sigma + it)) and zeta'(sigma - it) = conj(zeta'(sigma + it)) by Schwarz reflection on C.
+    2. psi((sigma - it)/2) = conj(psi((sigma + it)/2)) by reflection of the digamma function.
+    3. Therefore, A(sigma, -t) = conj(A(sigma, t)).
+    4. For any reflection-symmetric pair rho = 1/2 + delta +/- i gamma:
+       Z_delta(sigma, -t) = 1/(sigma - 1/2 - delta - i(-t - gamma)) + 1/(sigma - 1/2 - delta - i(-t + gamma))
+                          = 1/(sigma - 1/2 - delta + i(t + gamma)) + 1/(sigma - 1/2 - delta + i(t - gamma))
+                          = conj(Z_delta(sigma, t)).
+    5. Taking the difference: A(sigma, -t) - Z_delta(sigma, -t) = conj(A(sigma, t) - Z_delta(sigma, t)).
+    6. Since |conj(w)|^2 = |w|^2 for all w in C, |A(sigma, -t) - Z_delta(sigma, -t)|^2 = |A(sigma, t) - Z_delta(sigma, t)|^2.
+    7. Because W_T(-t) = W_T(t) = (1 - |t|/T)/T is also even, the integrand f(t) is an exact even function.
+    This implementation directly computes the certified Riemann sum across the full symmetric interval [-T, T]
+    with n_subdivisions subintervals, enclosing all transcendental and arithmetic operations in Arb balls.
     """
     import flint
     from flint import arb, acb, ctx
@@ -4467,8 +4484,8 @@ def certify_g4_fejer_witness_arb(
         den = (z ** 2 + acb(gam_b ** 2)) * ((z ** 2 + acb(gam_b ** 2 - del_b ** 2)) ** 2 + acb(4 * del_b ** 2 * gam_b ** 2))
         return num / den
 
-    def integrand_canceled(t_ball):
-        W = (arb(1) - t_ball / T_b) / T_b
+    def integrand_canceled_full(t_ball):
+        W = (arb(1) - abs(t_ball) / T_b) / T_b
         A = eval_A(t_ball)
         Z0 = eval_Z0(t_ball)
         dZ = eval_delta_Z(t_ball)
@@ -4476,15 +4493,15 @@ def certify_g4_fejer_witness_arb(
         re_prod = F0.real * dZ.real + F0.imag * dZ.imag
         mod_sq_dZ = dZ.real ** 2 + dZ.imag ** 2
         diff = -arb(2) * re_prod + mod_sq_dZ
-        return arb(2) * W * diff
+        return W * diff
 
     total = arb(0)
-    step = T_b / arb(n_subdivisions)
+    step = (arb(2) * T_b) / arb(n_subdivisions)
     for i in range(n_subdivisions):
-        t0 = arb(i) * step
-        t1 = arb(i + 1) * step
+        t0 = -T_b + arb(i) * step
+        t1 = -T_b + arb(i + 1) * step
         t_ball = t0.union(t1)
-        f_ball = integrand_canceled(t_ball)
+        f_ball = integrand_canceled_full(t_ball)
         total += (t1 - t0) * f_ball
 
     upper_val = total.upper()
@@ -4507,6 +4524,7 @@ def certify_g4_fejer_witness_arb(
         "certification_engine": "python-flint / Arb ball arithmetic (outward rounded)",
         "status": "CERTIFIED_NEGATIVE_ARB_BALL" if is_strictly_neg else "INCONCLUSIVE"
     }
+
 
 
 def verify_additive_reference_subtraction_invariance(

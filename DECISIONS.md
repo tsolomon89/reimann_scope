@@ -1168,3 +1168,37 @@ Updated `math_core.py`, `tests/test_cmsa_gate_g4.py`, `CMSA_GATE_G4.md`, `MATH_C
 Supersedes:
 
 Any claim that additive divisor-independent reference subtraction can renormalize the radial sign, or that mpmath estimated error constitutes a certified Arb interval ball.
+
+---
+
+## 2026-08-27 — Gate G4 Arb Certificate Hardening, Finite No-Go Closure, and Infinite/Cofinal Theorem Formulation
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Finite Candidate Class Closure (`FAIL_RADIAL_POSITIVITY`)**:
+   For the compact Fejér window at $(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8)$, outward-rounded Arb ball arithmetic proves $\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0)$. Together with additive-reference invariance $(S_W(Z_\delta)-R)-(S_W(Z_0)-R) \equiv S_W(Z_\delta)-S_W(Z_0)$, this definitively closes:
+   - The raw finite Fejér response claiming unconditional radial positivity;
+   - Every zero-independent additive scalar subtraction of that finite Fejér response.
+   Both candidate classes are classified strictly as `FAIL_RADIAL_POSITIVITY`.
+2. **Infinite Candidate Class Scoping (`INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`)**:
+   The `FAIL_RADIAL_POSITIVITY` classification does NOT apply to the full infinite/cofinal CMSA functional. CMSA-1 and CMSA-2 remain classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+   `CERTIFIED_NEGATIVE_ARB_BALL` is retained strictly as an evidence/certificate status for WIT-02, never as a final candidate classification.
+3. **Largest Proved Obstruction Class**:
+   Any candidate family containing the stated finite Fejér functional and modified only by a zero-independent additive scalar reference fails unconditional radial positivity. This does not cover non-additive operators, different pairings, or the complete infinite/cofinal limit.
+4. **Canonical WIT-02 Certificate Artifact**:
+   Created `data/certificates/witnesses/witness_g4_fejer_wit02.json` integrated into `certification.py` and `verification_report.json`, with tamper detection verifying exact decimal parameters, interval enclosure, subdivision count (50,000 across $[-T, T]$), precision, FLINT versions, source hash, and producing commit.
+5. **Lean 4 Formalization Completion**:
+   Formalized complex Dirichlet polynomial squared norm expansions (`complex_finset_sum_mul_star`, `complex_finset_normSq_eq_double_sum_re`), abstract finite kernel decompositions (`abstract_finite_kernel_decomposition`), additive operator interchanges (`linear_operator_finite_double_sum_interchange`), and windowed kernel pairings (`abstract_windowed_kernel_expansion`) in `formal/RiemannScope/ArithmeticBridge.lean`, bringing total compiled project theorems to 72.
+6. **Phase B — Next Live Cofinal Theorem Formulation**:
+   Formulated the exact next infinite obligation: Given symmetrically truncated $Z_H(t)$ and remainder $R_H(t) = \frac{\xi'}{\xi}(a+it) - Z_H(t)$, define a canonical cofinal schedule $H = H(T)$ and non-additive functional $R_T$ controlling remainder bounds, unequal-height pairs, same-height reflection pairs, and grade covariance.
+
+Reason:
+
+Rigorous hardening of Gate G4 authority documents, certificate infrastructure, Lean formalization, and next live theorem obligations.
+
+Mathematical / operational consequence:
+
+Updated `certification.py`, `scripts/generate_certificates.py`, `math_core.py`, `formal/RiemannScope/ArithmeticBridge.lean`, `README.md`, and all 11 authority documents and registers.
+

@@ -7,6 +7,9 @@ Reference: MATH_CONTRACT.md §39, ARITHMETIC_RADIAL_BRIDGE.md
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.BigOperators.Group.List
+import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Algebra.BigOperators.Ring
+import Mathlib.Algebra.Star.Basic
 import Mathlib.Order.Filter.Basic
 import Mathlib.Topology.Instances.Real
 import Mathlib.Topology.MetricSpace.Basic
@@ -20,7 +23,8 @@ import RiemannScope.RadialDefect
 
 set_option linter.unnecessarySeqFocus false
 
-open Filter Topology
+open Filter Topology Finset
+
 
 namespace RiemannScope
 
@@ -619,5 +623,69 @@ theorem ConditionalG4RegularizedBridge.all_defects_zero
     rw [← B.g4_spectral_reduction, h_spec]
   exact (list_weighted_sum_nonneg_eq_zero_iff B.weights B.defects B.pos_weights B.nonneg_defects B.lengths_match).mp h_sum_zero
 
+/-- Finite complex sum product with conjugate sum expands as a double sum. -/
+theorem complex_finset_sum_mul_star {α : Type*} (s : Finset α) (b : α → ℂ) :
+    (∑ i in s, b i) * starRingEnd ℂ (∑ j in s, b j) = ∑ i in s, ∑ j in s, b i * starRingEnd ℂ (b j) := by
+  rw [map_sum]
+  exact sum_mul_sum s s b (fun j => starRingEnd ℂ (b j))
+
+/-- Complex absolute square (normSq) of a finite sum equals the real part of the double sum over conjugate pairs. -/
+theorem complex_finset_normSq_eq_double_sum_re {α : Type*} (s : Finset α) (b : α → ℂ) :
+    Complex.normSq (∑ i in s, b i) = (∑ i in s, ∑ j in s, b i * starRingEnd ℂ (b j)).re := by
+  have h := complex_finset_sum_mul_star s b
+  have h_norm : (Complex.normSq (∑ i in s, b i) : ℂ) = (∑ i in s, b i) * starRingEnd ℂ (∑ j in s, b j) := by
+    exact (Complex.mul_conj (∑ i in s, b i)).symm
+  rw [h] at h_norm
+  have h_re : ((Complex.normSq (∑ i in s, b i) : ℂ)).re = (∑ i in s, ∑ j in s, b i * starRingEnd ℂ (b j)).re := by
+    rw [h_norm]
+  rw [Complex.ofReal_re] at h_re
+  exact h_re
+
+/-- Abstract finite kernel decomposition theorem:
+    Under the abstract factorization hypothesis K(i, j) = b(i) * conj(b(j)),
+    the double sum of the pairwise kernel matrix K equals the squared norm product of the individual sums. -/
+theorem abstract_finite_kernel_decomposition {α : Type*} (s : Finset α) (b : α → ℂ) (K : α → α → ℂ)
+    (hK : ∀ i ∈ s, ∀ j ∈ s, K i j = b i * starRingEnd ℂ (b j)) :
+    (∑ i in s, ∑ j in s, K i j) = (∑ i in s, b i) * starRingEnd ℂ (∑ j in s, b j) := by
+  have h_eq : (∑ i in s, ∑ j in s, K i j) = ∑ i in s, ∑ j in s, b i * starRingEnd ℂ (b j) := by
+    apply Finset.sum_congr rfl
+    intro i hi
+    apply Finset.sum_congr rfl
+    intro j hj
+    exact hK i hi j hj
+  rw [h_eq]
+  exact (complex_finset_sum_mul_star s b).symm
+
+/-- Linear operator decomposition for finite complex double sums:
+    For any additive map L, L applied to a finite double sum
+    interchanges with the double summation. -/
+theorem linear_operator_finite_double_sum_interchange {α : Type*} (s : Finset α) (K : α → α → ℂ)
+    (L : ℂ →+ ℂ) :
+    L (∑ i in s, ∑ j in s, K i j) = ∑ i in s, ∑ j in s, L (K i j) := by
+  rw [map_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  rw [map_sum]
+
+/-- Abstract windowed Dirichlet kernel expansion theorem:
+    Under an abstract linear window pairing L and pairwise kernel components K_ij = b_i * conj(b_j),
+    the windowed mean square evaluates on the double sum of pairwise kernel components. -/
+theorem abstract_windowed_kernel_expansion {α : Type*} (s : Finset α)
+    (b : α → ℂ) (K : α → α → ℂ) (L : ℂ →+ ℂ)
+    (hK : ∀ i ∈ s, ∀ j ∈ s, K i j = b i * starRingEnd ℂ (b j)) :
+    L (Complex.normSq (∑ i in s, b i) : ℂ) = L ((∑ i in s, ∑ j in s, K i j).re : ℂ) := by
+  have h_norm := complex_finset_normSq_eq_double_sum_re s b
+  have h_eq : (∑ i in s, ∑ j in s, b i * starRingEnd ℂ (b j)) = ∑ i in s, ∑ j in s, K i j := by
+    apply Finset.sum_congr rfl
+    intro i hi
+    apply Finset.sum_congr rfl
+    intro j hj
+    exact (hK i hi j hj).symm
+  rw [h_eq] at h_norm
+  rw [h_norm]
+
 end RiemannScope
+
+
+
 

@@ -760,3 +760,11 @@ Formalize Gate G4 windowed expansion identities, complex conjugation algebra, ad
    - Proportional schedule witness: \((c \cdot T) / T = c\) for all \(T \ne 0\).
 5. **Conditional Gate G4 Regularized Bridge Interface** (`ConditionalG4RegularizedBridge`):
    - Theorem `ConditionalG4RegularizedBridge.all_defects_zero`: prove that any valid regularized bridge with zero arithmetic anchor forces all represented zero defects to vanish (\(d_j = 0\)).
+6. **Finite Dirichlet Sums and Abstract Kernel Decompositions** (`complex_finset_sum_mul_star`, `complex_finset_normSq_eq_double_sum_re`, `abstract_finite_kernel_decomposition`, `linear_operator_finite_double_sum_interchange`, `abstract_windowed_kernel_expansion`):
+   - Theorem `complex_finset_sum_mul_star`: \((\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}\).
+   - Theorem `complex_finset_normSq_eq_double_sum_re`: \(\operatorname{normSq}(\sum_{i \in s} b_i) = \Re(\sum_{i \in s} \sum_{j \in s} b_i \overline{b_j})\).
+   - Theorem `abstract_finite_kernel_decomposition`: \((\sum_{i \in s} \sum_{j \in s} K(i, j)) = (\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)}\) under hypothesis \(K(i, j) = b_i \overline{b_j}\).
+   - Theorem `linear_operator_finite_double_sum_interchange`: \(L(\sum_{i \in s} \sum_{j \in s} K(i, j)) = \sum_{i \in s} \sum_{j \in s} L(K(i, j))\) for additive maps \(L : \mathbb C \to+ \mathbb C\).
+   - Theorem `abstract_windowed_kernel_expansion`: \(L(\operatorname{normSq}(\sum_{i \in s} b_i)) = L((\sum_{i \in s} \sum_{j \in s} K(i, j)).\text{re})\).
+   Bringing the compiled project theorem declarations to 72.
+

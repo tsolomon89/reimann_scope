@@ -2362,11 +2362,11 @@ where
 \]
 Algebraic numerators verified in Lean 4 over \(\mathbb C\) and \(\mathbb R\) (`complex_radial_defect_difference_numerator`, `complex_radial_second_order_numerator_decomposition`).
 
-## 42.5 Certified Arb Ball Witness and Numerical Evidence Suite
+## 42.5 Certified Arb Ball Witness and Candidate Classification Matrix
 1. **Fejér Witness WIT-02 (Rigorous Arb Ball Certificate)**:
-   For \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8\), outward-rounded Arb ball Riemann integration on compact support \([-16.8, 16.8]\) encloses:
+   For \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8\), outward-rounded Arb ball Riemann integration across the complete symmetric compact support \([-16.8, 16.8]\) with 50,000 subintervals encloses:
    \[
-   \Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0).
+   \Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0).
    \]
    Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 2. **Numerical Evidence Witnesses (WIT 1, 3, 4)**:
@@ -2374,14 +2374,22 @@ Algebraic numerators verified in Lean 4 over \(\mathbb C\) and \(\mathbb R\) (`c
    - Abel-Poisson (\(\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05\)): \(\Delta S_W \approx -3.4414 \times 10^{-6}\) (estimated error \(\pm 2.0 \times 10^{-6}\)).
    - Gaussian (\(\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4\)): \(\Delta S_W \approx -7.2473 \times 10^{-5}\) (estimated error \(\pm 2.0 \times 10^{-19}\)).
    Status: `NUMERICAL_EVIDENCE_NEGATIVE`.
-3. **General Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on the general parameter domain and for the infinite/regularized limit. Earliest open subgate: prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
+3. **Candidate Classification Matrix**:
+   - Raw finite Fejér window response: `FAIL_RADIAL_POSITIVITY`.
+   - Every zero-independent additive scalar subtraction of that finite Fejér response: `FAIL_RADIAL_POSITIVITY`.
+   - Full infinite/cofinal CMSA-1 & CMSA-2 functionals: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+   - Finite algebraic four-term quadratic expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+   - Grade coordinate dilation: `GRADE_COORDINATE_REDUNDANT`.
+   - `CERTIFIED_NEGATIVE_ARB_BALL`: strictly an evidence/certificate status for WIT-02, never a final candidate classification.
+   - **Proved Obstruction Class**: Any candidate family containing the stated finite Fejér functional and modified only by a zero-independent additive scalar reference fails unconditional radial positivity. This does not cover non-additive operators, different pairings, or the complete infinite/cofinal limit.
 
-## 42.6 Elementary Absolutely Convergent Dirichlet-Series Mean-Square Lemma
+## 42.6 Proved Absolutely Convergent \(\ell^1\) Dirichlet-Series Mean-Square Lemma
 For complex coefficients with \(\sum_{n=1}^\infty |a_n| < \infty\) (including \(a_n = \Lambda(n)n^{-\sigma}, \sigma > 1\) since \(\Lambda(n) \le \log n\)):
 1. **Finite Identity**: \(\frac{1}{2T}\int_{-T}^T |\sum_{n=1}^N a_n n^{-it}|^2 dt = \sum_{n=1}^N |a_n|^2 + \sum_{1\le m \ne n \le N} a_m \overline{a_n} \frac{\sin(T\log(n/m))}{T\log(n/m)}\).
 2. **Fixed-\(N\) Limit**: For fixed \(N\), off-diagonal terms vanish as \(T \to \infty\).
 3. **Uniform Tail**: \(\|P - P_N\|_\infty \le \sum_{n>N} |a_n| =: \varepsilon_N \implies |\|P\|_T^2 - \|P_N\|_T^2| \le 2\varepsilon_N \sum |a_n|\) uniformly in \(T\).
 4. **Interchange**: \(\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum_{n=1}^\infty |a_n|^2\).
+This internal proof replaces all external Carlson (1914) dependency labels.
 
 ## 42.7 Additive-Reference Invariance No-Go Theorem
 Let \(S_W(Z) = \int W_T(t) |A(t) - Z(t)|^2 dt\). For any scalar reference term \(R_W(A)\) independent of \(Z, \delta, \gamma\):
@@ -2390,9 +2398,38 @@ Let \(S_W(Z) = \int W_T(t) |A(t) - Z(t)|^2 dt\). For any scalar reference term \
 \]
 Consequently, a divisor-independent additive scalar subtraction cannot alter the raw radial difference. It proves that the additive class shares identically whatever sign behaviour the raw functional exhibits. Formally proved in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
 
-## 42.8 Hypotheses for Integrated Pointwise Expansions
-To integrate the pointwise expansion \(|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^2 \Re(F_0 \overline{D_\gamma}) + O(\delta^4)\) against a window \(W_T(t)\) and obtain a valid \(O(\delta^4)\) remainder on the integral:
+## 42.8 Conditional Hypotheses for Integrated Pointwise Expansions
+The integrated leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\) is **conditional** on the following four mathematical hypotheses being established for the specified window and domain:
 1. **Window Integrability**: \(W_T(t) \ge 0\) with \(W_T \in L^1(\mathbb R) \cap L^\infty(\mathbb R)\) and \(\int_{\mathbb R} W_T(t) dt = 1\).
 2. **Denominator Separation**: For all \(\delta \in [0, \delta_0]\) with \(\delta_0 < a = \sigma - 1/2\), the denominators of \(Z_\delta(a+it)\) are separated from zero uniformly: \(|a \pm \delta + i(t \pm \gamma)| \ge a - \delta_0 > 0\).
 3. **Uniform Domination**: The Taylor remainder function \(R_4(t, \delta) = \delta^{-4} (|A-Z_\delta|^2 - |A-Z_0|^2 + 2\delta^2 \Re(F_0 \overline{D_\gamma}))\) satisfies \(|R_4(t, \delta)| \le g(t)\) for all \(\delta \in [0, \delta_0]\), where \(g \in L^1(\mathbb R, W_T(t)dt)\).
 4. **Legitimacy of Limit Interchange**: Under hypotheses 1–3, the Dominated Convergence Theorem justifies exchanging the limit \(\delta \to 0\) and the integral, establishing \(\lim_{\delta\to 0} \frac{\Delta S_W}{\delta^2} = C_W(\sigma, \gamma, T)\).
+
+## 42.9 Finite Dirichlet-Polynomial Algebraic Identities in Lean 4
+Formalized in `formal/RiemannScope/ArithmeticBridge.lean`:
+1. `complex_finset_sum_mul_star`: \((\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}\).
+2. `complex_finset_normSq_eq_double_sum_re`: \(\operatorname{normSq}(\sum_{i \in s} b_i) = \Re(\sum_{i \in s} \sum_{j \in s} b_i \overline{b_j})\).
+3. `abstract_finite_kernel_decomposition`: \((\sum_{i \in s} \sum_{j \in s} K(i, j)) = (\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)}\) under hypothesis \(K(i, j) = b_i \overline{b_j}\).
+4. `linear_operator_finite_double_sum_interchange`: \(L(\sum_{i \in s} \sum_{j \in s} K(i, j)) = \sum_{i \in s} \sum_{j \in s} L(K(i, j))\) for additive maps \(L : \mathbb C \to+ \mathbb C\).
+5. `abstract_windowed_kernel_expansion`: \(L(\operatorname{normSq}(\sum_{i \in s} b_i)) = L((\sum_{i \in s} \sum_{j \in s} K(i, j)).\text{re})\).
+
+## 42.10 Phase B — Next Live Infinite/Cofinal Theorem Formulation
+Given symmetrically truncated completed zero resolvent:
+\[
+Z_H(t) = \sum_{|\gamma_j| \le H} \left(\frac{1}{\sigma - \rho_j + it} + \frac{1}{\sigma - \bar\rho_j + it}\right),
+\]
+and remainder:
+\[
+R_H(t) = \frac{\xi'}{\xi}\left(\sigma - \frac{1}{2} + it\right) - Z_H(t).
+\]
+Define the canonical cofinal schedule \(H = H(T)\) (e.g. \(H(T) = cT\)) and non-additive functional \(\mathcal R_T\). The candidate must explicitly specify all 8 aspects:
+1. **Mathematical Definition of Candidate Functional**: Explicit non-additive regularized functional \(\mathcal S_T(Z_H; \mathcal R_T)\).
+2. **Infinite/Cofinal Structure and Limit Mechanism**: Explicit joint limit \(\lim_{T\to\infty} \mathcal S_T\) under \(H = H(T)\).
+3. **Arithmetic vs Resolvent Representation**: Exact separation of prime-power sum \(A(\sigma+it)\) and spectral resolvent \(Z_H(t)\).
+4. **Remainder Terms and Asymptotic Approximations**: Explicit bound on \(\int W_T(t) |R_{H(T)}(t)|^2 dt\) as \(T \to \infty\).
+5. **Coupling to Unequal-Height Pairs**: Off-diagonal kernel bounds for \(|\gamma_j - \gamma_k| > 0\).
+6. **Coupling to Same-Height Reflection Pairs**: Multiplicity and reflection doublet isolation.
+7. **Grade Covariance**: Transcendental invariance under origin dilation.
+8. **Exact Radial Sign Obligation**: Analytic proof that the regularized radial variation is strictly positive on non-trivial zeros.
+Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+

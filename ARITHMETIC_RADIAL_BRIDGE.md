@@ -254,7 +254,7 @@ This countermodel is formalized and verified in Lean 4 (`RiemannScope.covariance
 | $S_{N,T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ}$ | Complete Finite Spectral Expansion | Proved Internally (Algebraic Identity) | Formalized (`finite_quadratic_four_term_decomposition`) | Closed exact finite spectral representation across windows |
 | $\Xi'/\Xi(z) = \sum \frac{2z}{z^2-\lambda^2}$ | Hadamard Log-Derivative | Standard Theorem (Hadamard 1893) | Unformalized Analytic | Exact spectral representation |
 | $P(u) = A(u) - \Xi'/\Xi(u-1/2)$ | Completed Log-Derivative Identity | Proved Internally (Analytic, $\Re u > 1$) | Conditional Representation (`ConditionalCompletedLogDerivativeDecomposition`) | Arithmetic zero anchor foundation |
-| $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Standard Theorem (Carlson 1914) | Unformalized Analytic | Arithmetic zero anchor |
+| $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum \Lambda(n)^2 n^{-2\sigma}$ | Dirichlet Mean-Square | Proved Internally (Exact $\ell^1$ Lemma) | CMSA_GATE_G4.md §4 | Arithmetic zero anchor |
 | $\mathcal A(\sigma) = 0$ | Completed Mean-Square Anchor | Proved Internally (Analytic) | Unformalized Analytic | Divisor-independent arithmetic anchor |
 | $s D_s(su) = f(u)$ | Universal Scale Invariance | Proved Internally (Algebraic) | Formalized (`generic_scale_dilation_cancellation`) | Dilation coordinate redundancy exclusion |
 | Single-grade coordinate pullback | Grade Covariance | Proved Internally (Algebraic) | Formalized (`coordinate_redundant`) | Coordinate redundancy exclusion |
@@ -300,15 +300,17 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
    $$\Delta S_W = \delta^2 C_W(\sigma, \gamma, T) + O(\delta^4), \qquad C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt,$$
    where $D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}$.
 4. **Certified Arb Ball Witness & Numerical Evidence**:
-   - Witness WIT-02 (Fejér): Certified strictly negative on compact support $[-16.8, 16.8]$ via outward-rounded Arb ball arithmetic (`certify_g4_fejer_witness_arb`), proving $\Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0)$.
+   - Witness WIT-02 (Fejér): Certified strictly negative across full symmetric support $[-16.8, 16.8]$ via outward-rounded Arb ball arithmetic (`certify_g4_fejer_witness_arb`), proving $\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0)$.
    - Witnesses WIT 1, 3, 4: Negative numerical quadrature estimates with mpmath error estimates.
 5. **Additive-Reference Invariance No-Go Theorem**:
    For any scalar reference $R_W(A)$ independent of $Z, \delta, \gamma$, $(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)$. Thus, divisor-independent additive scalar subtractions cannot alter the raw radial difference. Formalized in Lean 4 (`additive_reference_subtraction_invariance`).
 6. **Classifications**:
-   - Raw Finite Synthetic-Fibre $\Delta S_W$: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on general parameters; `CERTIFIED_NEGATIVE_ARB_BALL` on compact Fejér WIT-02.
-   - Divisor-Independent Additive Scalar Renormalizations: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+   - Raw Finite Fejér Window Response: `FAIL_RADIAL_POSITIVITY`.
+   - Divisor-Independent Additive Class on Finite Fejér: `FAIL_RADIAL_POSITIVITY`.
+   - Candidate CMSA-1 & CMSA-2 (Full Infinite/Cofinal): `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
    - Complete Finite Algebraic Spectral Expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
    - Dilated Completed Log-Derivative: `GRADE_COORDINATE_REDUNDANT`.
+   - Witness WIT-02 Evidence Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 
 ---
 
@@ -317,5 +319,6 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
 - **Earliest Open Subgate**: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
-- **Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (general raw candidate and additive scalar renormalizations) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+- **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+

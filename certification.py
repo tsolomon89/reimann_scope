@@ -73,6 +73,8 @@ CERTIFICATE_MODULE_DEPENDENCIES: Dict[str, List[str]] = {
     "complete_block_certificate": ["certification.py", "reference_data.py", "zero_finder.py"],
     "block_isolation_and_order": ["certification.py", "reference_data.py", "zero_finder.py"],
     "worldline_certificate": ["certification.py", "transcendental.py", "math_core.py", "reference_data.py"],
+    "radial_witness_certificate": ["certification.py", "math_core.py"],
+    "g4_radial_witness": ["certification.py", "math_core.py"],
 }
 
 CERTIFICATE_MATHEMATICAL_MODULES: List[str] = [
@@ -97,6 +99,8 @@ CERTIFICATE_DATA_DEPENDENCIES: Dict[str, List[str]] = {
     "complete_block_certificate": ["zeros_reference.json", "zeros_first_100_reference.json", "canonical_blocks.json"],
     "block_isolation_and_order": ["zeros_reference.json", "zeros_first_100_reference.json", "canonical_blocks.json"],
     "worldline_certificate": ["zeros_reference.json"],
+    "radial_witness_certificate": [],
+    "g4_radial_witness": [],
 }
 
 REQUIRED_FORMAL_SOURCES = [
@@ -132,6 +136,7 @@ CERTIFICATION_LEVELS = [
     "simple_zero_certified",
     "complete_block_certified",
     "worldline_certified",
+    "radial_witness_certified",
 ]
 
 
@@ -141,6 +146,8 @@ ZEROS_DIR = os.path.join(CERT_DIR, "zeros")
 TRIVIAL_ZEROS_DIR = os.path.join(CERT_DIR, "trivial_zeros")
 BLOCKS_DIR = os.path.join(CERT_DIR, "blocks")
 WORLDLINES_DIR = os.path.join(CERT_DIR, "worldlines")
+WITNESSES_DIR = os.path.join(CERT_DIR, "witnesses")
+
 
 
 def _sha256_canonical(obj: Dict[str, Any]) -> str:
@@ -1246,6 +1253,78 @@ def certify_worldline(
         ctx.dps = old_dps
 
 
+def certify_g4_radial_witness(
+    witness_id: str = "WIT-02",
+    sigma: str = "5.0",
+    gamma: str = "14.0",
+    delta: str = "0.49",
+    T: str = "16.8",
+    n_subdivisions: int = 50000,
+    dps: int = 60,
+    git_commit: Optional[str] = None
+) -> Dict[str, Any]:
+    """Generate canonical certified Arb ball witness certificate for WIT-02."""
+    if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
+        raise RuntimeError("FLINT/python-flint is required for rigorous mathematical certification.")
+    import math_core
+
+    producing_commit = git_commit or _get_git_commit()
+    res = math_core.certify_g4_fejer_witness_arb(
+        sigma=sigma,
+        gamma=gamma,
+        delta=delta,
+        T=T,
+        n_subdivisions=n_subdivisions,
+        dps=dps
+    )
+
+    cert: Dict[str, Any] = {
+        "schema_version": CERTIFICATE_SCHEMA_VERSION,
+        "certificate_type": "radial_witness_certificate",
+        "status": "radial_witness_certified",
+        "evidence_status": "CERTIFIED_NEGATIVE_ARB_BALL",
+        "witness_id": witness_id,
+        "window_type": "fejer",
+        "mathematical_claim": "Compact Fejér windowed radial difference Delta S_Fejer(5.0, 14.0, 0.49, 16.8) is strictly negative (< 0) via certified outward-rounded Arb ball arithmetic over [-16.8, 16.8].",
+        "parameters": {
+            "sigma": str(sigma),
+            "gamma": str(gamma),
+            "delta": str(delta),
+            "T": str(T),
+            "n_subdivisions": n_subdivisions,
+            "symmetric_integration_domain": [-16.8, 16.8],
+            "parameter_representation": "exact_decimal_strings"
+        },
+        "enclosure": {
+            "enclosure_mid": res["enclosure_mid"],
+            "enclosure_rad": res["enclosure_rad"],
+            "interval_lower": res["interval_lower"],
+            "interval_upper": res["interval_upper"],
+            "strictly_negative": res["is_certified_negative"]
+        },
+        "evenness_reduction_derivation": "Integrand f(t) = |A(sigma+it) - Z_delta(sigma-1/2+it)|^2 - |A(sigma+it) - Z_0(sigma-1/2+it)|^2 satisfies A(sigma, -t) = conj(A(sigma, t)) and Z_delta(sigma, -t) = conj(Z_delta(sigma, t)), hence |A(sigma,-t)-Z_delta(sigma,-t)|^2 = |A(sigma,t)-Z_delta(sigma,t)|^2. Direct symmetric integration over [-T, T] is evaluated in certified Arb balls with 50,000 subintervals.",
+        "formal_theorem_reference": "RiemannScope.additive_reference_subtraction_invariance",
+        "precision_dps": dps,
+        "library": "python-flint",
+        "library_version": FLINT_VERSION,
+        "verifier_version": VERIFIER_VERSION,
+        "algorithm_version": ALGORITHM_VERSION,
+        "producing_git_commit": producing_commit,
+        "source_code_hashes": _get_source_code_hashes(producing_commit),
+        "input_data_hashes": _get_input_data_hashes(producing_commit),
+        "dependency_fingerprint": _get_dependency_fingerprint()
+    }
+    cert["certificate_hash"] = _sha256_canonical(cert)
+
+    os.makedirs(WITNESSES_DIR, exist_ok=True)
+    out_path = os.path.join(WITNESSES_DIR, f"witness_g4_fejer_{witness_id.lower().replace('-', '')}.json")
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(cert, f, indent=2)
+
+    return cert
+
+
+
 def _verify_zero_enclosure_and_isolation(cert: Dict[str, Any], anomalies: List[str]) -> Tuple[bool, List[str]]:
     """Mathematical verification in Arb of nontrivial zero enclosure, critical line containment, simplicity, and Turing isolation."""
     assert acb is not None and arb is not None and acb_series is not None and ctx is not None
@@ -1653,6 +1732,81 @@ def _verify_worldline_continuation(
     return (len(anomalies) == 0), anomalies
 
 
+def _verify_radial_witness_certificate(
+    cert: Dict[str, Any],
+    anomalies: List[str],
+    check_provenance: bool = True
+) -> Tuple[bool, List[str]]:
+    """Mathematical verification in Arb of radial sign witness enclosure."""
+    assert acb is not None and arb is not None and ctx is not None
+    import math_core
+
+    witness_id = str(cert.get("witness_id", "")).strip()
+    window_type = str(cert.get("window_type", "")).strip()
+    if witness_id != "WIT-02" or window_type != "fejer":
+        anomalies.append(f"Unsupported witness_id / window_type: {witness_id} / {window_type}")
+
+    params = cert.get("parameters", {})
+    sigma_str = str(params.get("sigma", "")).strip()
+    gamma_str = str(params.get("gamma", "")).strip()
+    delta_str = str(params.get("delta", "")).strip()
+    T_str = str(params.get("T", "")).strip()
+    n_sub = int(params.get("n_subdivisions", 50000))
+    prec_dps = int(cert.get("precision_dps", 60))
+
+    if sigma_str != "5.0" or gamma_str != "14.0" or delta_str != "0.49" or T_str != "16.8":
+        anomalies.append(f"Witness parameters do not match canonical WIT-02: sigma={sigma_str}, gamma={gamma_str}, delta={delta_str}, T={T_str}")
+
+    res = math_core.certify_g4_fejer_witness_arb(
+        sigma=sigma_str,
+        gamma=gamma_str,
+        delta=delta_str,
+        T=T_str,
+        n_subdivisions=n_sub,
+        dps=prec_dps
+    )
+
+    replayed_lower = arb(res["interval_lower"])
+    replayed_upper = arb(res["interval_upper"])
+
+    enc = cert.get("enclosure", {})
+    stored_lower_str = enc.get("interval_lower")
+    stored_upper_str = enc.get("interval_upper")
+
+    if not stored_lower_str or not stored_upper_str:
+        anomalies.append("Missing enclosure bounds in witness certificate")
+    else:
+        stored_lower = arb(stored_lower_str)
+        stored_upper = arb(stored_upper_str)
+
+        # Upper bound strictly negative
+        if stored_upper.upper() >= 0 or replayed_upper.upper() >= 0:
+            anomalies.append(f"Witness certificate upper bound is not strictly negative: stored={stored_upper}, replayed={replayed_upper}")
+
+        # Stored bounds match replayed bounds
+        if not replayed_upper.contains(stored_upper) or not replayed_lower.contains(stored_lower):
+            anomalies.append(f"Witness enclosure mismatch: stored [{stored_lower}, {stored_upper}], replayed [{replayed_lower}, {replayed_upper}]")
+
+    if cert.get("status") != "radial_witness_certified":
+        anomalies.append(f"Invalid witness certificate status: {cert.get('status')}")
+
+    if cert.get("evidence_status") != "CERTIFIED_NEGATIVE_ARB_BALL":
+        anomalies.append(f"Invalid witness evidence status: {cert.get('evidence_status')}")
+
+    # Check formal theorem reference
+    thm_ref = cert.get("formal_theorem_reference", "")
+    if thm_ref:
+        lean_file = os.path.join(REPO_ROOT, "formal", "RiemannScope", "ArithmeticBridge.lean")
+        if os.path.exists(lean_file):
+            with open(lean_file, "r", encoding="utf-8") as lf:
+                if "additive_reference_subtraction_invariance" not in lf.read():
+                    anomalies.append(f"Referenced formal Lean theorem '{thm_ref}' not found in {lean_file}")
+        else:
+            anomalies.append(f"Lean source file {lean_file} not found")
+
+    return (len(anomalies) == 0), anomalies
+
+
 def _dispatch_and_verify_certificate(
     cert_type: str,
     cert: Dict[str, Any],
@@ -1669,9 +1823,12 @@ def _dispatch_and_verify_certificate(
         _verify_block_isolation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
     elif cert_type == "worldline_certificate":
         _verify_worldline_continuation(cert, anomalies, cert_store=cert_store, check_provenance=check_provenance)
+    elif cert_type in ("radial_witness_certificate", "g4_radial_witness"):
+        _verify_radial_witness_certificate(cert, anomalies, check_provenance=check_provenance)
     else:
         anomalies.append(f"Unknown certificate_type: {cert_type}")
     return (len(anomalies) == 0), anomalies
+
 
 
 def verify_certificate(
@@ -1849,9 +2006,10 @@ def generate_verification_report(
     trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
     worldlines_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
+    witnesses_files = sorted(glob.glob(os.path.join(target_dir, "witnesses", "*.json")))
 
-    total_inventory = len(zeros_files) + len(trivial_files) + len(blocks_files) + len(worldlines_files)
-    all_files = zeros_files + trivial_files + blocks_files + worldlines_files
+    total_inventory = len(zeros_files) + len(trivial_files) + len(blocks_files) + len(worldlines_files) + len(witnesses_files)
+    all_files = zeros_files + trivial_files + blocks_files + worldlines_files + witnesses_files
 
     cert_store: Dict[str, Dict[str, Any]] = {}
     parsed_files: List[Tuple[str, Optional[Dict[str, Any]], str, Optional[str]]] = []
@@ -1961,6 +2119,7 @@ def generate_verification_report(
         "trivial_zeros_count": len(trivial_files),
         "blocks_count": len(blocks_files),
         "worldlines_count": len(worldlines_files),
+        "witnesses_count": len(witnesses_files),
         "passed_count": passed_count,
         "failed_count": failed_count,
         "inventory_root_hash": inventory_root_hash,
@@ -2047,15 +2206,17 @@ def load_verification_report(
     tz_cnt = report.get("trivial_zeros_count", 0)
     blk_cnt = report.get("blocks_count", 0)
     wl_cnt = report.get("worldlines_count", 0)
-    if nz_cnt + tz_cnt + blk_cnt + wl_cnt != total_inv:
-        anomalies.append(f"Category count sum ({nz_cnt + tz_cnt + blk_cnt + wl_cnt}) != total_inventory ({total_inv})")
+    wit_cnt = report.get("witnesses_count", 0)
+    if nz_cnt + tz_cnt + blk_cnt + wl_cnt + wit_cnt != total_inv:
+        anomalies.append(f"Category count sum ({nz_cnt + tz_cnt + blk_cnt + wl_cnt + wit_cnt}) != total_inventory ({total_inv})")
 
     # 4. Enumerate actual on-disk certificate inventory
     zeros_files = sorted(glob.glob(os.path.join(target_dir, "zeros", "*.json")))
     trivial_files = sorted(glob.glob(os.path.join(target_dir, "trivial_zeros", "*.json")))
     blocks_files = sorted(glob.glob(os.path.join(target_dir, "blocks", "*.json")))
     worldlines_files = sorted(glob.glob(os.path.join(target_dir, "worldlines", "*.json")))
-    actual_files = sorted(zeros_files + trivial_files + blocks_files + worldlines_files)
+    witnesses_files = sorted(glob.glob(os.path.join(target_dir, "witnesses", "*.json")))
+    actual_files = sorted(zeros_files + trivial_files + blocks_files + worldlines_files + witnesses_files)
 
     if len(actual_files) != total_inv:
         anomalies.append(f"On-disk certificate count ({len(actual_files)}) does not match report total_inventory ({total_inv})")
@@ -2067,6 +2228,9 @@ def load_verification_report(
         anomalies.append(f"On-disk blocks count ({len(blocks_files)}) != report ({blk_cnt})")
     if len(worldlines_files) != wl_cnt:
         anomalies.append(f"On-disk worldlines count ({len(worldlines_files)}) != report ({wl_cnt})")
+    if len(witnesses_files) != wit_cnt:
+        anomalies.append(f"On-disk witnesses count ({len(witnesses_files)}) != report ({wit_cnt})")
+
 
     # Map actual files to repo-relative paths
     actual_rel_map = {}

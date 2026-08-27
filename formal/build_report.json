@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0.0",
   "report_type": "formal_build_report",
-  "status": "passed",
+  "status": "failed",
   "command": "lake build",
-  "exit_code": 0,
-  "producing_git_commit": "f1d3f105ec65b4941f2025e96a9832bfa8d5bbe3",
-  "timestamp": "2026-08-27T13:02:38.748879+00:00",
+  "exit_code": -1,
+  "producing_git_commit": "465443983dcdd16fce9a533b5ad5709233a4ad34",
+  "timestamp": "2026-08-27T14:04:11.273458+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 67,
-  "total_theorems": 67,
+  "project_theorem_declarations_compiled": 72,
+  "total_theorems": 72,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "0eb58146de59fca0e6f55b74200233a3f22a0148c03971b2f814ff3d95055341",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -21,16 +21,16 @@
     "formal/RiemannScope/ZeroCharacter.lean": "cb35589468a974beac9cfd1979f4c889fb5e7769f98004143ffa69e58ff23acb",
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
-    "formal/RiemannScope/ArithmeticBridge.lean": "0d6a9c6710e4083c50d81700118d3c8f620b5eb75a431e259910bb93ee3ab825"
+    "formal/RiemannScope/ArithmeticBridge.lean": "43f579d99cdf4131209f5570d91a05399b1a95b0d88a394a70aca364bba21016"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
     "scripts/build_formal.py": "ddac989dcb014c313a2fbe470101fed810694df01f7e3a65e1467d24a2ad4208",
-    "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef"
+    "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938"
   },
-  "build_stdout": "Build completed successfully.",
+  "build_stdout": "",
   "build_stderr": "",
-  "report_hash": "cd038f6b02b8da79774dc291734f7b7e09ff299431b594b40c5c5b4134cf7453"
+  "report_hash": "df36021bf6bffc1600ea05016fd841a3434c2160e70a4ad8f473e70fe463a6ba"
 }

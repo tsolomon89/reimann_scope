@@ -1188,3 +1188,50 @@ def test_formal_source_files_complete_and_tracked():
     # 3. Explicitly check RadialDefect.lean is present
     assert "formal/RiemannScope/RadialDefect.lean" in req_set
 
+
+def test_certify_and_verify_radial_witness():
+    """Verify that canonical radial witness WIT-02 generates and validates in Arb."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    wit_cert = certification.certify_g4_radial_witness(
+        witness_id="WIT-02",
+        sigma="5.0",
+        gamma="14.0",
+        delta="0.49",
+        T="16.8",
+        n_subdivisions=30000,
+        dps=50
+    )
+    assert wit_cert["certificate_type"] == "radial_witness_certificate"
+    assert wit_cert["status"] == "radial_witness_certified"
+    assert wit_cert["evidence_status"] == "CERTIFIED_NEGATIVE_ARB_BALL"
+
+    ok, anomalies = certification.verify_certificate(wit_cert, check_provenance=False)
+    assert ok, f"Witness certificate verification failed: {anomalies}"
+
+
+def test_adversarial_radial_witness_tampered_bounds_rejected():
+    """Adversarial: radial witness with modified upper bound is rejected."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    wit_cert = certification.certify_g4_radial_witness(
+        witness_id="WIT-02",
+        sigma="5.0",
+        gamma="14.0",
+        delta="0.49",
+        T="16.8",
+        n_subdivisions=30000,
+        dps=50
+    )
+    # Tamper with interval upper bound to be positive
+    wit_cert["enclosure"]["interval_upper"] = "+0.001"
+    wit_cert["certificate_hash"] = certification._sha256_canonical(wit_cert)
+
+    ok, anomalies = certification.verify_certificate(wit_cert, check_provenance=False)
+    assert not ok
+    assert any("mismatch" in a.lower() or "not strictly negative" in a.lower() for a in anomalies)
+
+
+

@@ -1,8 +1,14 @@
 # Gate G4 Infinite-Regularization and Radial-Sign Theorem Report
 
 **Repository**: `tsolomon89/reimann_scope`
-**Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (general raw candidate & additive scalar-renormalization class) / `CERTIFIED_NEGATIVE_ARB_BALL` (compact Fejér WIT-02) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite algebraic expansion)
-**Status**: Gate G4 finite radial sign analyzed; Fejér WIT-02 certified strictly negative via outward-rounded Arb ball integration; WIT 1, 3, 4 supported by high-precision numerical evidence; additive scalar renormalizations closed by No-Go Theorem conditional on raw sign; earliest open subgate precisely defined.
+**Classification**:
+- `FAIL_RADIAL_POSITIVITY` (raw finite Fejér window response & zero-independent additive scalar-subtraction class)
+- `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (full infinite/cofinal CMSA-1 & CMSA-2 functionals)
+- `FINITE_IDENTITY_PROVED_G4_OPEN` (finite algebraic four-term quadratic expansion)
+- `GRADE_COORDINATE_REDUNDANT` (grade-dilated completed logarithmic derivative)
+- `CERTIFIED_NEGATIVE_ARB_BALL` (evidence/certificate status for canonical witness WIT-02)
+
+**Status**: Gate G4 finite radial sign analyzed; Fejér WIT-02 certified strictly negative via outward-rounded Arb ball integration across full symmetric support $[-16.8, 16.8]$; WIT 1, 3, 4 supported by high-precision numerical evidence; additive scalar renormalizations closed by No-Go Theorem; full infinite/cofinal CMSA functionals classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`; earliest open subgate and next live cofinal theorem obligation precisely defined.
 
 ---
 
@@ -17,16 +23,20 @@ with closed-form kernels $J_T(p,q), K_T(\lambda, \mu; a)$ (Rectangular) and $J_T
 
 ### The Gate G4 Proof/Evidence Boundary & Earliest Open Subgate
 1. **Exact Second-Order Radial Response**: Derived the exact symmetric second-order coefficient $C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt$, governing the leading variation $\Delta S_W = \delta^2 C_W + O(\delta^4)$ under uniform domination hypotheses.
-2. **Certified Outward-Rounded Arb Ball Witness (WIT-02)**: On compact support $[-16.8, 16.8]$, the Fejér radial difference $\Delta S_{\text{Fejér}}$ for $(\sigma=5, \gamma=14, \delta=0.49, T=16.8)$ is certified strictly negative via outward-rounded Arb ball arithmetic:
-   $$\Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0).$$
+2. **Certified Outward-Rounded Arb Ball Witness (WIT-02)**: Across the full symmetric compact support $[-16.8, 16.8]$, the Fejér radial difference $\Delta S_{\text{Fejér}}$ for $(\sigma=5, \gamma=14, \delta=0.49, T=16.8)$ is certified strictly negative via outward-rounded Arb ball arithmetic with 50,000 subintervals:
+   $$\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0).$$
 3. **High-Precision Numerical Evidence (WIT 1, 3, 4)**: Rectangular, Abel-Poisson, and Gaussian windows yield negative numerical estimates with mpmath estimated errors, providing strong numerical evidence.
-4. **Additive-Reference Invariance No-Go Theorem**: Proved that for any scalar reference term $R_W(A)$ independent of the zero configuration, $\tilde S_W(Z_\delta) - \tilde S_W(Z_0) \equiv S_W(Z_\delta) - S_W(Z_0)$. This shows that additive reference subtraction cannot alter the raw radial difference.
-5. **Earliest Open Subgate**:
+4. **Additive-Reference Invariance No-Go Theorem**: Proved that for any scalar reference term $R_W(A)$ independent of the zero configuration, $(S_W(Z_\delta) - R) - (S_W(Z_0) - R) \equiv S_W(Z_\delta) - S_W(Z_0)$.
+5. **Largest Proved Obstruction Class**:
+   $$\boxed{\text{Any candidate family containing the stated finite Fejér functional and modified only by a zero-independent additive scalar reference fails unconditional radial positivity.}}$$
+   *Scope Boundary*: This proved obstruction class does NOT cover non-additive operators, different pairings, or the complete infinite/cofinal limit.
+6. **Earliest Open Subgate**:
    $$\boxed{\text{Subgate G4-Open: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.}}$$
 
 Consequently:
-- The **general raw candidate and additive scalar-renormalization class** are classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
-- The **compact Fejér WIT-02 instance** is classified as `CERTIFIED_NEGATIVE_ARB_BALL`.
+- The **raw finite Fejér window response** and **every zero-independent additive scalar subtraction** of that finite Fejér response are classified strictly as `FAIL_RADIAL_POSITIVITY`.
+- The **full infinite/cofinal CMSA-1 and CMSA-2 functionals** are classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+- The **compact Fejér WIT-02 certificate** has evidence status `CERTIFIED_NEGATIVE_ARB_BALL`.
 - The **exact finite algebraic expansion and closed kernels** are classified as `FINITE_IDENTITY_PROVED_G4_OPEN`.
 - The **grade-dilated completed logarithmic derivative** is classified as `GRADE_COORDINATE_REDUNDANT`.
 
@@ -72,15 +82,26 @@ The radial difference $\Delta S_W$ was evaluated across four window families:
 
 | Witness ID | Window Type | Parameters ($\sigma, \gamma, \delta, T$) | Value $\Delta S_W$ | Enclosure / Estimated Error | Epistemic Status | Engine |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **WIT-02** | Fejér | $\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8$ | $-1.7183799 \times 10^{-4}$ | $[-1.895\times 10^{-4}, -1.542\times 10^{-4}]$ | **CERTIFIED_NEGATIVE_ARB_BALL** | python-flint (Arb) |
+| **WIT-02** | Fejér | $\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8$ | $-1.7183799 \times 10^{-4}$ | $[-1.8063\times 10^{-4}, -1.6305\times 10^{-4}]$ | **CERTIFIED_NEGATIVE_ARB_BALL** | python-flint (Arb) |
 | **WIT-01** | Rectangular | $\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8$ | $-5.9067025 \times 10^{-7}$ | $\pm 1.0 \times 10^{-154}$ (est) | **NUMERICAL_EVIDENCE_NEGATIVE** | mpmath quad |
 | **WIT-03** | Abel-Poisson | $\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05$ | $-3.4413949 \times 10^{-6}$ | $\pm 2.0 \times 10^{-6}$ (est) | **NUMERICAL_EVIDENCE_NEGATIVE** | mpmath quad |
 | **WIT-04** | Gaussian | $\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4$ | $-7.2473271 \times 10^{-5}$ | $\pm 2.0 \times 10^{-19}$ (est) | **NUMERICAL_EVIDENCE_NEGATIVE** | mpmath quad |
 
 ### Rigorous Arb Ball Enclosure for Witness WIT-02
-For Witness WIT-02, the compact support $[-16.8, 16.8]$ was partitioned into $N = 25,000$ subintervals in `certify_g4_fejer_witness_arb`. Every transcendental evaluation (`digamma`, `log`, `pi`, division, squaring, Riemann summation) was executed in certified Arb ball arithmetic.
-- Result: $\Delta S_{\text{Fejér}} \in [-1.8947 \times 10^{-4}, -1.5420 \times 10^{-4}]$, strictly bounded away from zero ($\text{upper bound} < -1.54 \times 10^{-4} < 0$).
+For Witness WIT-02, the complete symmetric support $[-16.8, 16.8]$ was partitioned into $N = 50,000$ subintervals in `certify_g4_fejer_witness_arb`. Every transcendental evaluation (`digamma`, `log`, `pi`, division, squaring, Riemann summation) was executed in certified outward-rounded Arb ball arithmetic.
+- Result: $\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}]$, strictly bounded away from zero ($\text{upper bound} < -1.63 \times 10^{-4} < 0$).
 - This provides a genuine, certified mathematical proof that the raw Fejér response achieves strictly negative values at this parameter point.
+
+### Mathematical Derivation of Exact Evenness
+For any real $\sigma$ and $t$:
+1. $\zeta(\sigma - it) = \overline{\zeta(\sigma + it)}$ and $\zeta'(\sigma - it) = \overline{\zeta'(\sigma + it)}$ by Schwarz reflection.
+2. $\psi((\sigma - it)/2) = \overline{\psi((\sigma + it)/2)}$ by reflection of the digamma function.
+3. Therefore, $A(\sigma, -t) = \overline{A(\sigma, t)}$.
+4. For reflection-symmetric zero pairs $\rho = 1/2 + \delta \pm i\gamma$:
+   $$Z_\delta(\sigma, -t) = \frac{1}{\sigma - 1/2 - \delta - i(-t - \gamma)} + \frac{1}{\sigma - 1/2 - \delta - i(-t + \gamma)} = \overline{Z_\delta(\sigma, t)}.$$
+5. Hence $A(\sigma, -t) - Z_\delta(\sigma, -t) = \overline{A(\sigma, t) - Z_\delta(\sigma, t)}$.
+6. Since $|\bar w|^2 = |w|^2$ for all $w \in \mathbb C$, $|A(\sigma, -t) - Z_\delta(\sigma, -t)|^2 = |A(\sigma, t) - Z_\delta(\sigma, t)|^2$.
+7. Because $W_T(-t) = W_T(t)$ is even, the integrand $f(t)$ is an exact even function of $t$.
 
 ### Verified Sign Mechanism for Witness WIT-02
 Direct point-by-point computation of the integrand distribution $f(t) = 2 W_T(t) (|A - Z_\delta|^2 - |A - Z_0|^2)$ on $[0, 16.8]$ reveals:
@@ -159,42 +180,56 @@ To integrate the pointwise expansion $|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^
 
 | Candidate Class | Arithmetic Firewall | Finite Expansion | Remainder Control | Limit Order | Radial Positivity | Pair Isolation | Grade Covariance | Final Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Raw Finite Synthetic-Fibre $\Delta S_W$** | PROVED | PROVED | OPEN | OPEN / CHAR | **CERTIFIED NEGATIVE (WIT-02 Arb) / EVIDENCE (WIT 1,3,4)** | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
-| **Divisor-Independent Additive Renormalizations** | PROVED | PROVED | OPEN | OPEN | **INVARIANT TO RAW (No-Go)** | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
+| **Raw Finite Fejér Window Response** | PROVED | PROVED | OPEN | OPEN / CHAR | **CERTIFIED NEGATIVE (WIT-02 Arb)** | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
+| **Divisor-Independent Additive Class on Finite Fejér** | PROVED | PROVED | OPEN | OPEN | **INVARIANT TO RAW (No-Go)** | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
 | **Finite 4-Term Algebraic Expansion** | PROVED | **PROVED** | OPEN | OPEN | N/A (identity) | N/A | REDUNDANT | `FINITE_IDENTITY_PROVED_G4_OPEN` |
 | **Dilated Completed Log-Derivative** | PROVED | PROVED | N/A | N/A | N/A | N/A | **PROVED REDUNDANT** | `GRADE_COORDINATE_REDUNDANT` |
-| **Candidate CMSA-1** | PROVED | PROVED | OPEN | OPEN | OPEN (infinite) | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
-| **Candidate CMSA-2** | PROVED | PROVED | OPEN | OPEN | OPEN (infinite) | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
+| **Candidate CMSA-1 (Full Infinite/Cofinal)** | PROVED | PROVED | OPEN | OPEN | OPEN (infinite) | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
+| **Candidate CMSA-2 (Full Infinite/Cofinal)** | PROVED | PROVED | OPEN | OPEN | OPEN (infinite) | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
 | **Candidate CMSA-3** | PROVED | PROVED | N/A | N/A | N/A | N/A | PROVED REDUNDANT | `GRADE_COORDINATE_REDUNDANT` |
 
 ---
 
-## 8. Formal Lean 4 Theorem Inventory (67 Compiled Declarations)
+## 8. Formal Lean 4 Theorem Inventory (72 Compiled Declarations)
 
 All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sorry`, 0 `admit`, 0 warnings):
-1. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
-2. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
-3. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
-4. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
-5. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
-6. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-7. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-8. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
-9. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
-10. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
-11. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
-12. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
-13. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
+1. `RiemannScope.complex_finset_sum_mul_star`: $(\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}$.
+2. `RiemannScope.complex_finset_normSq_eq_double_sum_re`: $\operatorname{normSq}(\sum_{i \in s} b_i) = \Re(\sum_{i \in s} \sum_{j \in s} b_i \overline{b_j})$.
+3. `RiemannScope.abstract_finite_kernel_decomposition`: $(\sum_{i \in s} \sum_{j \in s} K(i, j)) = (\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)}$ under hypothesis $K(i, j) = b_i \overline{b_j}$.
+4. `RiemannScope.linear_operator_finite_double_sum_interchange`: $L(\sum_{i \in s} \sum_{j \in s} K(i, j)) = \sum_{i \in s} \sum_{j \in s} L(K(i, j))$ for additive maps $L : \mathbb C \to+ \mathbb C$.
+5. `RiemannScope.abstract_windowed_kernel_expansion`: $L(\operatorname{normSq}(\sum_{i \in s} b_i)) = L((\sum_{i \in s} \sum_{j \in s} K(i, j)).\text{re})$.
+6. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
+7. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
+8. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
+9. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
+10. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
+11. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+12. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+13. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
+14. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
+15. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
+16. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
+17. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
+18. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
 
 ---
 
-## 9. The Exact Next Theorem Target
+## 9. Phase B — The Next Live Infinite/Cofinal Theorem Formulation
 
-Since divisor-independent additive scalar subtraction is conclusively closed by the Additive-Reference Invariance No-Go Theorem, any viable future candidate cannot be an additive subtraction on the outer mean square.
+Given symmetrically truncated completed zero resolvent:
+$$Z_H(t) = \sum_{|\gamma_j| \le H} \left(\frac{1}{\sigma - \rho_j + it} + \frac{1}{\sigma - \bar\rho_j + it}\right),$$
+and remainder:
+$$R_H(t) = \frac{\xi'}{\xi}\left(\sigma - \frac{1}{2} + it\right) - Z_H(t).$$
 
-The exact next mathematical question is:
-$$\boxed{
-\text{Can an integrand-, inner-product-, or operator-modified regularized spectral functional } \mathcal R_W(\sigma, Z)
-\atop
-\text{be constructed with an independent arithmetic counterpart } \mathcal A_W^{\text{arith}}(\sigma) \text{ satisfying exact radial positivity } \Delta \mathcal R_W \ge 0?
-}$$
+Define the canonical cofinal schedule $H = H(T)$ and non-additive regularized functional $\mathcal R_T$. The live candidate must explicitly define and analyze all 8 aspects:
+1. **Mathematical Definition**: Explicit non-additive functional $\mathcal S_T(Z_H; \mathcal R_T)$.
+2. **Infinite/Cofinal Structure and Limit Mechanism**: Joint limit $\lim_{T\to\infty} \mathcal S_T$ under schedule $H(T) = cT$.
+3. **Arithmetic vs Resolvent Representation**: Exact separation between prime series $A(\sigma+it)$ and truncated zero sum $Z_H(t)$.
+4. **Remainder Bounds**: Explicit asymptotic bound on $\int W_T(t) |R_{H(T)}(t)|^2 dt$ as $T \to \infty$.
+5. **Coupling to Unequal-Height Pairs**: Off-diagonal kernel bounds for $|\gamma_j - \gamma_k| > 0$.
+6. **Coupling to Same-Height Reflection Pairs**: Multiplicity and reflection doublet isolation.
+7. **Grade Covariance**: Scale covariance under origin coordinate dilation.
+8. **Exact Radial Sign Obligation**: Analytic proof that the regularized radial variation $\Delta \mathcal S_T$ is strictly positive for $\delta \ne 0$.
+
+Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+

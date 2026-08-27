@@ -27,7 +27,10 @@ ZEROS_DIR = os.path.join(CERT_DIR, "zeros")
 BLOCKS_DIR = os.path.join(CERT_DIR, "blocks")
 WORLDLINES_DIR = os.path.join(CERT_DIR, "worldlines")
 
+WITNESSES_DIR = os.path.join(CERT_DIR, "witnesses")
+
 TRIVIAL_ZEROS_DIR = os.path.join(CERT_DIR, "trivial_zeros")
+
 
 CANONICAL_BLOCKS = {
     "low_validation": list(range(1, 101)),
@@ -148,6 +151,23 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
         worldline_count += 1
 
     print(f"[+] Certified {worldline_count} bilateral worldlines & radial leaves.")
+
+    # 4. Canonical radial sign witness certificates (WIT-02)
+    print("[*] Certifying canonical radial sign witness WIT-02 in Arb...")
+    os.makedirs(WITNESSES_DIR, exist_ok=True)
+    wit_cert = certification.certify_g4_radial_witness(
+        witness_id="WIT-02",
+        sigma="5.0",
+        gamma="14.0",
+        delta="0.49",
+        T="16.8",
+        n_subdivisions=50000,
+        dps=60,
+        git_commit=git_commit
+    )
+    witness_count = 1
+    print(f"[+] Certified {witness_count} canonical radial sign witness (WIT-02).")
+
     report_path = os.path.join(CERT_DIR, "verification_report.json")
     print(f"[*] Updating verification report at {report_path}...")
     rep_data = certification.generate_verification_report(cert_dir=CERT_DIR, git_commit=git_commit, check_provenance=True)
@@ -156,7 +176,8 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
     else:
         print(f"[+] Verification report generated successfully ({rep_data.get('total_inventory', 0)} items).")
     print("=== Certificate Generation Complete ===")
-    return zero_count, trivial_count, block_count, worldline_count
+    return zero_count, trivial_count, block_count, worldline_count, witness_count
+
 
 
 

@@ -896,7 +896,7 @@ Formally verified in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sor
 - `generic_scale_dilation_cancellation`: \(s D_s(su) = f(u)\) for any scale \(s > 0\).
 
 ## 23.4 Earliest Infinite Analytic Obstruction (Gate G4)
-Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Candidate CMSA-1 and CMSA-2 are classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (general raw candidate and additive class) and `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Raw finite Fejér response and additive scalar class are classified as `FAIL_RADIAL_POSITIVITY`, full infinite Candidate CMSA-1 and CMSA-2 as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`, and finite algebraic expansion as `FINITE_IDENTITY_PROVED_G4_OPEN`.
 
 ---
 
@@ -918,14 +918,19 @@ The symmetric second-order coefficient:
 \[
 C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt, \qquad D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3},
 \]
-governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\) under uniform domination hypotheses.
-- **Fejér Witness WIT-02**: Rigorously certified negative via outward-rounded Arb ball arithmetic on compact support \([-16.8, 16.8]\) (`certify_g4_fejer_witness_arb`):
+governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\) conditionally under uniform domination hypotheses.
+- **Fejér Witness WIT-02**: Rigorously certified negative via outward-rounded Arb ball arithmetic across the full symmetric support \([-16.8, 16.8]\) with 50,000 subintervals (`certify_g4_fejer_witness_arb`):
   \[
-  \Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0).
+  \Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0).
   \]
   Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 - **Witnesses WIT 1, 3, 4**: Evaluated with negative numerical estimates and mpmath estimated error bounds (`NUMERICAL_EVIDENCE_NEGATIVE`).
-- **Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on the general parameter domain / infinite limit.
+- **Classification Matrix**:
+  - Raw Finite Fejér Window Response: `FAIL_RADIAL_POSITIVITY`.
+  - Divisor-Independent Additive Class on Finite Fejér: `FAIL_RADIAL_POSITIVITY`.
+  - Candidate CMSA-1 & CMSA-2 (Full Infinite/Cofinal): `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+  - Complete Finite Algebraic Spectral Expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+  - Dilated Completed Log-Derivative: `GRADE_COORDINATE_REDUNDANT`.
 
 ## 24.4 Additive-Reference Invariance No-Go Theorem
 For any scalar reference \(R_W(A)\) independent of \(Z, \delta, \gamma\), \((S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)\).
@@ -933,3 +938,16 @@ Thus, divisor-independent additive scalar subtraction cannot alter the raw radia
 
 ## 24.5 Earliest Open Subgate
 $$\boxed{\text{Subgate G4-Open: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.}}$$
+
+## 24.6 Phase B — Next Live Infinite/Cofinal Theorem Formulation
+Given symmetrically truncated completed zero resolvent $Z_H(t)$ and remainder $R_H(t) = \frac{\xi'}{\xi}(\sigma-1/2+it) - Z_H(t)$, define canonical cofinal schedule $H = H(T)$ and non-additive functional $\mathcal R_T$. The live candidate must explicitly define and analyze:
+1. Candidate functional $\mathcal S_T(Z_H; \mathcal R_T)$.
+2. Infinite/cofinal structure under joint limit $H(T) = cT, T \to \infty$.
+3. Arithmetic vs resolvent representation ($A(\sigma+it)$ vs $Z_H(t)$).
+4. Remainder bounds on $\int W_T |R_{H(T)}|^2 dt$.
+5. Off-diagonal unequal-height pair coupling.
+6. Same-height reflection doublet isolation.
+7. Grade covariance under origin coordinate dilation.
+8. Exact radial positivity proof obligation for $\delta \ne 0$.
+Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+
