@@ -2415,37 +2415,41 @@ Formalized in `formal/RiemannScope/ArithmeticBridge.lean`:
 6. `linear_schedule_grade_covariant`: \(\forall c, \tau\), \(H_c(T) = cT\) is discrete grade-covariant (\(H_c(\tau T) = \tau H_c(T)\)).
 7. `grade_covariant_schedule_nonuniqueness`: Grade covariance alone does NOT uniquely select a schedule; for \(c_1 \ne c_2\), \(H_{c_1}\) and \(H_{c_2}\) are covariant and distinct for all \(T > 0\).
 8. `periodic_modulated_schedule_covariant`: Periodic modulation in \(\log_\tau T\) preserves grade covariance.
+9. `exact_remainder_cancellation`: \(R = F - Z \implies Z + R = F\) identically.
+10. `functional_decomposition_independence`: \(\forall f, f(Z + R) = f(F)\) whenever \(R = F - Z\).
 
-## 42.10 Phase B — Schedule Covariance Classification & The Next Live Theorem
-### Schedule Covariance Classification
-Under grade dilation \(s' = 1/2 + \tau^K(s - 1/2)\), coordinate height scales as \(t' = \tau^K t\) and window width as \(T' = \tau^K T\). Covariance of height truncation \(H\) requires:
+## 42.10 Schedule Covariance, Exact Remainder Cancellation, and The Actual Question
+### Origin Coordinate Dilation and Schedule Covariance Law
+In Transcendental Continuation (TC), the project uses **origin coordinate dilation**:
+\[
+s_K = \tau^K s, \quad c_K = \frac{\tau^K}{2}, \quad z_K = s_K - c_K = \tau^K\left(s - \frac{1}{2}\right).
+\]
+On the imaginary axis, ordinate dilates as \(t_K = \tau^K t \implies t' = \tau t\). Scale covariance between window width \(T\) and height cutoff \(H\) requires:
 \[
 \boxed{H(\tau T) = \tau H(T), \quad \tau = 2\pi.}
 \]
-- **General Solution**: \(H(T) = T \cdot q(\log_\tau T)\) with \(q : \mathbb R \to (0, \infty)\) 1-periodic.
-- **Asymptotic Limit Collapse**: If \(\lim_{T\to\infty} H(T)/T\) exists, \(H(T) = cT\).
-- **Selection Condition**: Selecting \(c\) requires sharp remainder control \(|\mathcal R_H(t)| \le M \log(|t|+2)\), which imposes \(c \ge 1\).
+- **General Solution (Paper Proved)**: \(H(T) = T \cdot q(\log_\tau T)\) with \(q : \mathbb R \to (0, \infty)\) 1-periodic.
+- **Asymptotic Limit Collapse (Paper Proved)**: If \(\lim_{T\to\infty} H(T)/T\) exists and \(\tau > 1\), \(H(T) = cT\).
+- **Selection Condition**: Unproved heuristic note; omitted zero bounds do not force \(c \ge 1\) by proved estimate alone.
 - **Falsified Premise**: *"Bilateral discrete grade covariance uniquely determines the cofinal schedule."*
 
-### Next Live Standalone Theorem Obligation
-Given symmetrically truncated completed zero resolvent \(Z_H(t)\) and remainder \(R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)\) with \(H(T) = cT\) (\(c \ge 1\)):
-Define the schedule-indexed regularized candidate:
+### Exact Remainder Cancellation Theorem & Candidate Collapse
+Let \(Z_H(t) = \sum_{|\gamma_j| \le H} (\dots)\) and \(R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)\).
+Then:
 \[
-\mathcal S_T(Z_{cT}; \mathcal R_{cT}) = \frac{1}{2\pi} \int_{-T}^T W_T(t) \left| Z_{cT}(t) + \mathcal R_{cT}(t) \right|^2 dt.
+\forall t, \quad Z_H(t) + R_H(t) \equiv \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right).
 \]
-**Theorem Obligation**:
+Consequently, \(\mathcal S_T(Z_H; R_H) = \frac{1}{2\pi}\int_{-T}^T W_T(t) |Z_H(t) + R_H(t)|^2 dt \equiv \frac{1}{2\pi}\int_{-T}^T W_T(t) |\Xi'/\Xi|^2 dt\) is **identically independent of \(H\) and \(H(T)\)**.
+- **Case A (Recomputed Remainder)**: \(Z_{H,\delta} + R_{H,\delta} \equiv F_\delta\) (collapses to full function, \(H\)-independent).
+- **Case B (Fixed Unperturbed Remainder)**: \(Z_{H,\delta} + R_{H,0} = F_0 + (Z_{H,\delta} - Z_{H,0})\), which reduces by additive-reference invariance to the **finite raw Fejér response** (`FAIL_RADIAL_POSITIVITY`).
+- **Classification**: `COLLAPSED_COFINAL_IDENTITY` / `FAIL_RADIAL_POSITIVITY`.
+
+### The Actual Question & Open Obligation
+The noncommutation defect between finite truncation and infinite completion is:
 \[
-\forall \sigma > 1, \forall \delta \in (0, 1/2), \quad \lim_{T \to \infty} \left[ \mathcal S_T(Z_{cT, \delta}; \mathcal R_{cT}) - \mathcal S_T(Z_{cT, 0}; \mathcal R_{cT}) \right] > 0.
+\mathcal D = \mathcal R_{\mathrm{op}}(Z_\infty) - \lim_{H\to\infty} \mathcal R_{\mathrm{op}}(Z_H).
 \]
+Constructing a genuinely non-additive cofinal boundary functional that is neither algebraically collapsed nor trivially vanishing is the exact open mathematical obligation for Gate G4 (`OBL-CMSA-003-G4-BOUNDARY`).
 Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 
-1. **Mathematical Definition of Candidate Functional**: Explicit non-additive regularized functional \(\mathcal S_T(Z_H; \mathcal R_T)\).
-2. **Infinite/Cofinal Structure and Limit Mechanism**: Explicit joint limit \(\lim_{T\to\infty} \mathcal S_T\) under \(H = H(T)\).
-3. **Arithmetic vs Resolvent Representation**: Exact separation of prime-power sum \(A(\sigma+it)\) and spectral resolvent \(Z_H(t)\).
-4. **Remainder Terms and Asymptotic Approximations**: Explicit bound on \(\int W_T(t) |R_{H(T)}(t)|^2 dt\) as \(T \to \infty\).
-5. **Coupling to Unequal-Height Pairs**: Off-diagonal kernel bounds for \(|\gamma_j - \gamma_k| > 0\).
-6. **Coupling to Same-Height Reflection Pairs**: Multiplicity and reflection doublet isolation.
-7. **Grade Covariance**: Transcendental invariance under origin dilation.
-8. **Exact Radial Sign Obligation**: Analytic proof that the regularized radial variation is strictly positive on non-trivial zeros.
-Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 

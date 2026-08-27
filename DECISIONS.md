@@ -1234,3 +1234,36 @@ Mathematical / operational consequence:
 
 Updated `certification.py`, `scripts/generate_certificates.py`, `math_core.py`, `tests/test_certification.py`, `formal/RiemannScope/ArithmeticBridge.lean`, and all registers.
 
+---
+
+## 2026-08-27 — Corrective Decision: Exact Remainder Cancellation, TC Origin Dilation, and Downgraded Bounds
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Exact Remainder Cancellation & Candidate Collapse**:
+   - Proved analytically and algebraically that for $R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)$, $Z_H(t) + R_H(t) \equiv \frac{\Xi'}{\Xi}(\sigma - 1/2 + it)$ identically.
+   - Consequently, the candidate functional $\mathcal S_T(Z_H; R_H) = \frac{1}{2\pi}\int_{-T}^T W_T(t) |Z_H(t) + R_H(t)|^2 dt \equiv \frac{1}{2\pi}\int_{-T}^T W_T(t) |\Xi'/\Xi|^2 dt$ is **identically independent of $H$ and $H(T)$**, collapsing to full completed function evaluation.
+   - Formalized in Lean 4: `RiemannScope.exact_remainder_cancellation` and `RiemannScope.functional_decomposition_independence`.
+   - Classified $S_T(Z_H; R_H)$ as `COLLAPSED_COFINAL_IDENTITY` / `FAIL_RADIAL_POSITIVITY`.
+2. **Corrected TC Coordinate Derivation of Schedule Covariance**:
+   - In Transcendental Continuation (TC), origin coordinate dilation is $s_K = \tau^K s$, with real origin shift $c_K = \tau^K/2$ and centered coordinate dilation $z_K = s_K - c_K = \tau^K(s - 1/2)$.
+   - On the imaginary axis, ordinate dilates as $t_K = \tau^K t \implies t' = \tau t$. Covariance between window width $T$ and zero truncation cutoff $H$ requires $H(\tau T) = \tau H(T)$.
+3. **Downgraded Claims from Previous Decision**:
+   - The assertion that a sharp Hadamard remainder estimate forces $c \ge 1$ is **downgraded** from a proved theorem to an unproved heuristic remark (preventing omitted zeros from entering the window).
+4. **The Actual Question & Open Obligation**:
+   - Formulated the exact noncommutation defect $\mathcal D = \mathcal R_{\mathrm{op}}(Z_\infty) - \lim_{H\to\infty} \mathcal R_{\mathrm{op}}(Z_H)$ across 12 specific mathematical criteria.
+   - Recorded `OBL-CMSA-003-G4-BOUNDARY` as the open research obligation to construct a genuinely non-additive cofinal boundary functional.
+5. **Lean 4 Declaration Count**:
+   - Total compiled project theorem declarations reached **77**.
+
+Reason:
+
+Rigorous audit and repair of Gate G4 cofinal functional formulation, eliminating algebraic cancellation artifacts and establishing precise origin dilation coordinates.
+
+Mathematical / operational consequence:
+
+Updated `formal/RiemannScope/ArithmeticBridge.lean`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `RESEARCH_LEDGER.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all registers.
+
+

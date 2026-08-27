@@ -939,21 +939,32 @@ Thus, divisor-independent additive scalar subtraction cannot alter the raw radia
 ## 24.5 Earliest Open Subgate
 $$\boxed{\text{Subgate G4-Open: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.}}$$
 
-## 24.6 Phase B — Schedule Covariance Classification & Next Live Theorem Formulation
+## 24.6 Schedule Covariance, Exact Remainder Cancellation, and The Actual Question
 ### Schedule Covariance Classification
-Under grade dilation \(s' = 1/2 + \tau^K(s - 1/2)\), coordinate height scales as \(t' = \tau^K t\) and window width as \(T' = \tau^K T\). Covariance of height truncation \(H\) requires:
+Under origin coordinate dilation \(s_K = \tau^K s\) (\(z_K = \tau^K(s-1/2)\)), ordinate scales as \(t_K = \tau^K t \implies t' = \tau t\). Covariance of height truncation \(H\) requires:
 \[
 \boxed{H(\tau T) = \tau H(T), \quad \tau = 2\pi.}
 \]
-- **General Solution**: \(H(T) = T \cdot q(\log_\tau T)\) with \(q : \mathbb R \to (0, \infty)\) 1-periodic.
-- **Asymptotic Limit Collapse**: If \(\lim_{T\to\infty} H(T)/T\) exists, \(H(T) = cT\).
-- **Selection Condition**: Selecting \(c\) requires sharp remainder control \(|\mathcal R_H(t)| \le M \log(|t|+2)\), which imposes \(c \ge 1\).
+- **General Solution (Paper Proved)**: \(H(T) = T \cdot q(\log_\tau T)\) with \(q : \mathbb R \to (0, \infty)\) 1-periodic.
+- **Asymptotic Limit Collapse (Paper Proved)**: If \(\lim_{T\to\infty} H(T)/T\) exists and \(\tau > 1\), \(H(T) = cT\).
+- **Selection Condition**: Unproved heuristic note; remainder bounds do not force \(c \ge 1\) by proved estimate alone.
 - **Falsified Premise**: *"Bilateral discrete grade covariance uniquely determines the cofinal schedule."*
 
-### Live Standalone Theorem Obligation
-Given symmetrically truncated completed zero resolvent $Z_H(t)$ and remainder $R_H(t) = \frac{\xi'}{\xi}(\sigma-1/2+it) - Z_H(t)$, define canonical cofinal schedule $H(T) = cT$ ($c \ge 1$) and candidate functional $\mathcal S_T(Z_{cT}; \mathcal R_{cT})$. The theorem obligation is:
+### Exact Remainder Cancellation Theorem & Candidate Collapse
+Let \(Z_H(t) = \sum_{|\gamma_j| \le H} (\dots)\) and \(R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)\).
+Then:
 \[
-\forall \sigma > 1, \forall \delta \in (0, 1/2), \quad \lim_{T \to \infty} \left[ \mathcal S_T(Z_{cT, \delta}; \mathcal R_{cT}) - \mathcal S_T(Z_{cT, 0}; \mathcal R_{cT}) \right] > 0.
+\forall t, \quad Z_H(t) + R_H(t) \equiv \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right).
 \]
-Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+Consequently, \(\mathcal S_T(Z_H; R_H) = \frac{1}{2\pi}\int_{-T}^T W_T(t) |Z_H(t) + R_H(t)|^2 dt \equiv \frac{1}{2\pi}\int_{-T}^T W_T(t) |\Xi'/\Xi|^2 dt\) is **identically independent of \(H\) and \(H(T)\)**.
+- **Case A (Recomputed Remainder)**: \(Z_{H,\delta} + R_{H,\delta} \equiv F_\delta\) (collapses to full function, \(H\)-independent).
+- **Case B (Fixed Unperturbed Remainder)**: \(Z_{H,\delta} + R_{H,0} = F_0 + (Z_{H,\delta} - Z_{H,0})\), which reduces by additive-reference invariance to the **finite raw Fejér response** (`FAIL_RADIAL_POSITIVITY`).
+- **Classification**: `COLLAPSED_COFINAL_IDENTITY` / `FAIL_RADIAL_POSITIVITY`.
 
+### The Actual Question & Open Obligation
+The noncommutation defect between finite truncation and infinite completion is:
+\[
+\mathcal D = \mathcal R_{\mathrm{op}}(Z_\infty) - \lim_{H\to\infty} \mathcal R_{\mathrm{op}}(Z_H).
+\]
+Constructing a genuinely non-additive cofinal boundary functional that is neither algebraically collapsed nor trivially vanishing is the exact open mathematical obligation for Gate G4 (`OBL-CMSA-003-G4-BOUNDARY`).
+Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.

@@ -731,7 +731,20 @@ theorem periodic_modulated_schedule_covariant (τ : ℝ) (q : ℝ → ℝ)
   rw [hlog T hT, hq (log_τ T)]
   ring
 
+/-- Exact remainder cancellation: If R = F - Z, then Z + R = F identically. -/
+theorem exact_remainder_cancellation (F Z R : ℂ) (hR : R = F - Z) :
+    Z + R = F := by
+  rw [hR]
+  ring
+
+/-- Functional decomposition independence: Any functional depending solely on Z + R is identically independent
+    of the choice of truncation Z and remainder R = F - Z. -/
+theorem functional_decomposition_independence {α : Type*} (f : ℂ → α) (F Z R : ℂ) (hR : R = F - Z) :
+    f (Z + R) = f F := by
+  rw [exact_remainder_cancellation F Z R hR]
+
 end RiemannScope
+
 
 
 
