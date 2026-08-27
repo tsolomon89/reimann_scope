@@ -4,12 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "749f8f02e4b8ee8fd502b51ab6f639a6f18f94eb",
-  "timestamp": "2026-08-27T19:15:07.049097+00:00",
+  "producing_git_commit": "a90eadad5dc326106c6eaed4496fd903e1b3b48e",
+  "timestamp": "2026-08-27T20:26:16.230073+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 77,
-  "total_theorems": 77,
+  "project_theorem_declarations_compiled": 81,
+  "total_theorems": 81,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "0eb58146de59fca0e6f55b74200233a3f22a0148c03971b2f814ff3d95055341",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -21,16 +21,16 @@
     "formal/RiemannScope/ZeroCharacter.lean": "cb35589468a974beac9cfd1979f4c889fb5e7769f98004143ffa69e58ff23acb",
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
-    "formal/RiemannScope/ArithmeticBridge.lean": "061fd48366dc9fc0a6c05a5432c71c7b9aed3e0defa54dc356fd527caa9c80db"
+    "formal/RiemannScope/ArithmeticBridge.lean": "abe54d8624b914c33519ddada376a6ce92f859b287d077a8b3b3c22674f6e5e8"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
-    "scripts/build_formal.py": "ddac989dcb014c313a2fbe470101fed810694df01f7e3a65e1467d24a2ad4208",
+    "scripts/build_formal.py": "ee4a8622830b8f34c86cab07e2df76df9bea7aeb017747be7899e2ee1901a87c",
     "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832"
   },
-  "build_stdout": "Build completed successfully.",
+  "build_stdout": "\u2714 [1498/1500] Built RiemannScope.ArithmeticBridge\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "527607f12db26c6dfa424e96574446b752d396104572b7286364d897e49e75c1"
+  "report_hash": "0c09ccd42cd967dd80686e1db1b0746ebcc1ecee466a8ef6438aa569e26f7b00"
 }
