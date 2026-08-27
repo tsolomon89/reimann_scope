@@ -684,6 +684,53 @@ theorem abstract_windowed_kernel_expansion {α : Type*} (s : Finset α)
   rw [h_eq] at h_norm
   rw [h_norm]
 
+/-- Definition of discrete grade covariance for a height truncation schedule H(T)
+    with respect to dilation base τ (canonically τ = 2π). -/
+def is_grade_covariant_schedule (H : ℝ → ℝ) (τ : ℝ) : Prop :=
+  ∀ T > 0, H (τ * T) = τ * H T
+
+/-- Canonical linear schedule family H_c(T) = c * T. -/
+def linear_schedule (c : ℝ) (T : ℝ) : ℝ := c * T
+
+/-- Every positive linear schedule H_c(T) = c * T is discrete grade-covariant. -/
+theorem linear_schedule_grade_covariant (c τ : ℝ) :
+    is_grade_covariant_schedule (linear_schedule c) τ := by
+  intro T _
+  dsimp [linear_schedule]
+  ring
+
+/-- Non-uniqueness theorem for grade-covariant truncation schedules:
+    Grade covariance alone does NOT uniquely select a schedule H(T).
+    For any dilation base τ > 0 and distinct positive scaling factors c₁ ≠ c₂,
+    both linear schedules are grade-covariant and differ everywhere for T > 0. -/
+theorem grade_covariant_schedule_nonuniqueness (τ : ℝ) (c₁ c₂ : ℝ) (hc : c₁ ≠ c₂) :
+    ∃ H₁ H₂ : ℝ → ℝ,
+      is_grade_covariant_schedule H₁ τ ∧
+      is_grade_covariant_schedule H₂ τ ∧
+      (∀ T > 0, H₁ T ≠ H₂ T) := by
+  use linear_schedule c₁, linear_schedule c₂
+  refine ⟨linear_schedule_grade_covariant c₁ τ, linear_schedule_grade_covariant c₂ τ, ?_⟩
+  intro T hT h_eq
+  dsimp [linear_schedule] at h_eq
+  have h_diff : (c₁ - c₂) * T = 0 := by linarith
+  cases mul_eq_zero.mp h_diff with
+  | inl h_c =>
+    have : c₁ = c₂ := by linarith
+    exact hc this
+  | inr h_t =>
+    linarith
+
+/-- Periodic modulation characterization:
+    Any schedule modulated by a 1-periodic function in log_τ(T) is grade-covariant. -/
+theorem periodic_modulated_schedule_covariant (τ : ℝ) (q : ℝ → ℝ)
+    (hq : ∀ u, q (u + 1) = q u) (log_τ : ℝ → ℝ)
+    (hlog : ∀ T > 0, log_τ (τ * T) = log_τ T + 1) :
+    is_grade_covariant_schedule (fun T => T * q (log_τ T)) τ := by
+  intro T hT
+  dsimp
+  rw [hlog T hT, hq (log_τ T)]
+  ring
+
 end RiemannScope
 
 

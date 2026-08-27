@@ -2364,9 +2364,9 @@ Algebraic numerators verified in Lean 4 over \(\mathbb C\) and \(\mathbb R\) (`c
 
 ## 42.5 Certified Arb Ball Witness and Candidate Classification Matrix
 1. **Fejér Witness WIT-02 (Rigorous Arb Ball Certificate)**:
-   For \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8\), outward-rounded Arb ball Riemann integration across the complete symmetric compact support \([-16.8, 16.8]\) with 50,000 subintervals encloses:
+   For \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8\), outward-rounded Arb ball Riemann integration directly across the complete symmetric compact support \([-16.8, 16.8]\) with 50,000 subintervals encloses:
    \[
-   \Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0).
+   \Delta S_{\text{Fejér}} \in [-1.89473 \times 10^{-4}, -1.54203 \times 10^{-4}] \subset (-\infty, 0).
    \]
    Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 2. **Numerical Evidence Witnesses (WIT 1, 3, 4)**:
@@ -2405,24 +2405,40 @@ The integrated leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\) is 
 3. **Uniform Domination**: The Taylor remainder function \(R_4(t, \delta) = \delta^{-4} (|A-Z_\delta|^2 - |A-Z_0|^2 + 2\delta^2 \Re(F_0 \overline{D_\gamma}))\) satisfies \(|R_4(t, \delta)| \le g(t)\) for all \(\delta \in [0, \delta_0]\), where \(g \in L^1(\mathbb R, W_T(t)dt)\).
 4. **Legitimacy of Limit Interchange**: Under hypotheses 1–3, the Dominated Convergence Theorem justifies exchanging the limit \(\delta \to 0\) and the integral, establishing \(\lim_{\delta\to 0} \frac{\Delta S_W}{\delta^2} = C_W(\sigma, \gamma, T)\).
 
-## 42.9 Finite Dirichlet-Polynomial Algebraic Identities in Lean 4
+## 42.9 Finite Dirichlet-Polynomial Algebraic Identities and Schedule Covariance in Lean 4
 Formalized in `formal/RiemannScope/ArithmeticBridge.lean`:
 1. `complex_finset_sum_mul_star`: \((\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}\).
 2. `complex_finset_normSq_eq_double_sum_re`: \(\operatorname{normSq}(\sum_{i \in s} b_i) = \Re(\sum_{i \in s} \sum_{j \in s} b_i \overline{b_j})\).
 3. `abstract_finite_kernel_decomposition`: \((\sum_{i \in s} \sum_{j \in s} K(i, j)) = (\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)}\) under hypothesis \(K(i, j) = b_i \overline{b_j}\).
 4. `linear_operator_finite_double_sum_interchange`: \(L(\sum_{i \in s} \sum_{j \in s} K(i, j)) = \sum_{i \in s} \sum_{j \in s} L(K(i, j))\) for additive maps \(L : \mathbb C \to+ \mathbb C\).
 5. `abstract_windowed_kernel_expansion`: \(L(\operatorname{normSq}(\sum_{i \in s} b_i)) = L((\sum_{i \in s} \sum_{j \in s} K(i, j)).\text{re})\).
+6. `linear_schedule_grade_covariant`: \(\forall c, \tau\), \(H_c(T) = cT\) is discrete grade-covariant (\(H_c(\tau T) = \tau H_c(T)\)).
+7. `grade_covariant_schedule_nonuniqueness`: Grade covariance alone does NOT uniquely select a schedule; for \(c_1 \ne c_2\), \(H_{c_1}\) and \(H_{c_2}\) are covariant and distinct for all \(T > 0\).
+8. `periodic_modulated_schedule_covariant`: Periodic modulation in \(\log_\tau T\) preserves grade covariance.
 
-## 42.10 Phase B — Next Live Infinite/Cofinal Theorem Formulation
-Given symmetrically truncated completed zero resolvent:
+## 42.10 Phase B — Schedule Covariance Classification & The Next Live Theorem
+### Schedule Covariance Classification
+Under grade dilation \(s' = 1/2 + \tau^K(s - 1/2)\), coordinate height scales as \(t' = \tau^K t\) and window width as \(T' = \tau^K T\). Covariance of height truncation \(H\) requires:
 \[
-Z_H(t) = \sum_{|\gamma_j| \le H} \left(\frac{1}{\sigma - \rho_j + it} + \frac{1}{\sigma - \bar\rho_j + it}\right),
+\boxed{H(\tau T) = \tau H(T), \quad \tau = 2\pi.}
 \]
-and remainder:
+- **General Solution**: \(H(T) = T \cdot q(\log_\tau T)\) with \(q : \mathbb R \to (0, \infty)\) 1-periodic.
+- **Asymptotic Limit Collapse**: If \(\lim_{T\to\infty} H(T)/T\) exists, \(H(T) = cT\).
+- **Selection Condition**: Selecting \(c\) requires sharp remainder control \(|\mathcal R_H(t)| \le M \log(|t|+2)\), which imposes \(c \ge 1\).
+- **Falsified Premise**: *"Bilateral discrete grade covariance uniquely determines the cofinal schedule."*
+
+### Next Live Standalone Theorem Obligation
+Given symmetrically truncated completed zero resolvent \(Z_H(t)\) and remainder \(R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)\) with \(H(T) = cT\) (\(c \ge 1\)):
+Define the schedule-indexed regularized candidate:
 \[
-R_H(t) = \frac{\xi'}{\xi}\left(\sigma - \frac{1}{2} + it\right) - Z_H(t).
+\mathcal S_T(Z_{cT}; \mathcal R_{cT}) = \frac{1}{2\pi} \int_{-T}^T W_T(t) \left| Z_{cT}(t) + \mathcal R_{cT}(t) \right|^2 dt.
 \]
-Define the canonical cofinal schedule \(H = H(T)\) (e.g. \(H(T) = cT\)) and non-additive functional \(\mathcal R_T\). The candidate must explicitly specify all 8 aspects:
+**Theorem Obligation**:
+\[
+\forall \sigma > 1, \forall \delta \in (0, 1/2), \quad \lim_{T \to \infty} \left[ \mathcal S_T(Z_{cT, \delta}; \mathcal R_{cT}) - \mathcal S_T(Z_{cT, 0}; \mathcal R_{cT}) \right] > 0.
+\]
+Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+
 1. **Mathematical Definition of Candidate Functional**: Explicit non-additive regularized functional \(\mathcal S_T(Z_H; \mathcal R_T)\).
 2. **Infinite/Cofinal Structure and Limit Mechanism**: Explicit joint limit \(\lim_{T\to\infty} \mathcal S_T\) under \(H = H(T)\).
 3. **Arithmetic vs Resolvent Representation**: Exact separation of prime-power sum \(A(\sigma+it)\) and spectral resolvent \(Z_H(t)\).

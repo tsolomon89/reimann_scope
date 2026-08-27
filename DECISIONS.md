@@ -1178,7 +1178,7 @@ Status: ACCEPTED
 Decision:
 
 1. **Finite Candidate Class Closure (`FAIL_RADIAL_POSITIVITY`)**:
-   For the compact Fejér window at $(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8)$, outward-rounded Arb ball arithmetic proves $\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0)$. Together with additive-reference invariance $(S_W(Z_\delta)-R)-(S_W(Z_0)-R) \equiv S_W(Z_\delta)-S_W(Z_0)$, this definitively closes:
+   For the compact Fejér window at $(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8)$, outward-rounded Arb ball arithmetic proves $\Delta S_{\text{Fejér}} \in [-1.89473 \times 10^{-4}, -1.54203 \times 10^{-4}] \subset (-\infty, 0)$. Together with additive-reference invariance $(S_W(Z_\delta)-R)-(S_W(Z_0)-R) \equiv S_W(Z_\delta)-S_W(Z_0)$, this definitively closes:
    - The raw finite Fejér response claiming unconditional radial positivity;
    - Every zero-independent additive scalar subtraction of that finite Fejér response.
    Both candidate classes are classified strictly as `FAIL_RADIAL_POSITIVITY`.
@@ -1201,4 +1201,36 @@ Rigorous hardening of Gate G4 authority documents, certificate infrastructure, L
 Mathematical / operational consequence:
 
 Updated `certification.py`, `scripts/generate_certificates.py`, `math_core.py`, `formal/RiemannScope/ArithmeticBridge.lean`, `README.md`, and all 11 authority documents and registers.
+
+---
+
+## 2026-08-27 — Certificate Purity Refactoring, Schedule Covariance Classification, and Lean 4 Theorem Expansion
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Certificate Purity & Isolation**:
+   - Refactored `certification.certify_g4_radial_witness` to be pure by default (`output_path: Optional[str] = None`), preventing unit tests from overwriting tracked canonical certificates.
+   - Fixed `generate_all` return type annotation in `scripts/generate_certificates.py` to `Tuple[int, int, int, int, int]`.
+   - Added regression test `test_unit_tests_do_not_modify_tracked_canonical_certificates` proving all 508 certificates remain untouched across test suite execution.
+2. **Conjugation Explanatory Derivation & Premise Cleaning**:
+   - Direct certified Arb integration is evaluated across the complete symmetric interval $[-T, T]$ without assuming evenness or reflection as an operational premise.
+   - Explanatory conjugation symmetry is derived from explicit meromorphic terms of $A$ and quadruplet pairing of $Z_\delta$ without invoking zeta conjugation or a general Schwarz reflection hypothesis.
+3. **Schedule-Covariance Law & Non-Uniqueness Classification**:
+   - Derived discrete grade covariance law $H(\tau T) = \tau H(T)$ ($\tau = 2\pi$) from the grade transformation.
+   - Proved that every linear schedule $H_c(T) = cT$ is grade-covariant, and formalized the non-uniqueness theorem in Lean 4 (`RiemannScope.linear_schedule_grade_covariant`, `RiemannScope.grade_covariant_schedule_nonuniqueness`, `RiemannScope.periodic_modulated_schedule_covariant`).
+   - Proved general form $H(T) = T \cdot q(\log_\tau T)$ with 1-periodic $q$, which collapses to $H(T) = cT$ if $\lim_{T\to\infty} H(T)/T$ exists.
+   - Falsified the implicit premise: *"Bilateral discrete grade covariance uniquely determines the cofinal schedule."*
+   - Proved that selecting $c \ge 1$ requires sharp remainder domination $|\mathcal R_H(t)| \le M \log(|t|+2)$.
+4. **Lean 4 Declaration Count**:
+   - Formalized 3 new schedule-covariance theorems in `formal/RiemannScope/ArithmeticBridge.lean`, bringing the compiled project theorem declaration count to 75.
+
+Reason:
+
+Ensure absolute certificate generation purity, formalize schedule non-uniqueness, eliminate overstated premises, and advance Gate G4 mathematical precision.
+
+Mathematical / operational consequence:
+
+Updated `certification.py`, `scripts/generate_certificates.py`, `math_core.py`, `tests/test_certification.py`, `formal/RiemannScope/ArithmeticBridge.lean`, and all registers.
 

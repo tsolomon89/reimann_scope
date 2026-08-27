@@ -1261,9 +1261,15 @@ def certify_g4_radial_witness(
     T: str = "16.8",
     n_subdivisions: int = 50000,
     dps: int = 60,
-    git_commit: Optional[str] = None
+    git_commit: Optional[str] = None,
+    output_path: Optional[str] = None
 ) -> Dict[str, Any]:
-    """Generate canonical certified Arb ball witness certificate for WIT-02."""
+    """Generate certified Arb ball witness certificate for radial difference sign.
+
+    Pure function: returns the certificate dictionary. If output_path is provided,
+    saves the certificate JSON to output_path. Does NOT overwrite canonical
+    tracked certificates unless explicitly targeted.
+    """
     if not FLINT_AVAILABLE or ctx is None or acb is None or arb is None or acb_series is None:
         raise RuntimeError("FLINT/python-flint is required for rigorous mathematical certification.")
     import math_core
@@ -1285,7 +1291,7 @@ def certify_g4_radial_witness(
         "evidence_status": "CERTIFIED_NEGATIVE_ARB_BALL",
         "witness_id": witness_id,
         "window_type": "fejer",
-        "mathematical_claim": "Compact Fejér windowed radial difference Delta S_Fejer(5.0, 14.0, 0.49, 16.8) is strictly negative (< 0) via certified outward-rounded Arb ball arithmetic over [-16.8, 16.8].",
+        "mathematical_claim": "Compact Fejér windowed radial difference Delta S_Fejer(5.0, 14.0, 0.49, 16.8) is strictly negative (< 0) via certified outward-rounded Arb ball arithmetic directly evaluated over [-16.8, 16.8].",
         "parameters": {
             "sigma": str(sigma),
             "gamma": str(gamma),
@@ -1302,7 +1308,7 @@ def certify_g4_radial_witness(
             "interval_upper": res["interval_upper"],
             "strictly_negative": res["is_certified_negative"]
         },
-        "evenness_reduction_derivation": "Integrand f(t) = |A(sigma+it) - Z_delta(sigma-1/2+it)|^2 - |A(sigma+it) - Z_0(sigma-1/2+it)|^2 satisfies A(sigma, -t) = conj(A(sigma, t)) and Z_delta(sigma, -t) = conj(Z_delta(sigma, t)), hence |A(sigma,-t)-Z_delta(sigma,-t)|^2 = |A(sigma,t)-Z_delta(sigma,t)|^2. Direct symmetric integration over [-T, T] is evaluated in certified Arb balls with 50,000 subintervals.",
+        "integration_method": "Direct certified outward-rounded Arb ball Riemann integration over full symmetric domain [-T, T] with 50,000 subintervals without assuming evenness reduction or reflection as an operational premise.",
         "formal_theorem_reference": "RiemannScope.additive_reference_subtraction_invariance",
         "precision_dps": dps,
         "library": "python-flint",
@@ -1316,12 +1322,13 @@ def certify_g4_radial_witness(
     }
     cert["certificate_hash"] = _sha256_canonical(cert)
 
-    os.makedirs(WITNESSES_DIR, exist_ok=True)
-    out_path = os.path.join(WITNESSES_DIR, f"witness_g4_fejer_{witness_id.lower().replace('-', '')}.json")
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(cert, f, indent=2)
+    if output_path is not None:
+        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(cert, f, indent=2)
 
     return cert
+
 
 
 

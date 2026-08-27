@@ -1211,6 +1211,61 @@ def test_certify_and_verify_radial_witness():
     assert ok, f"Witness certificate verification failed: {anomalies}"
 
 
+def test_unit_tests_do_not_modify_tracked_canonical_certificates(tmp_path):
+    """Regression test proving that running pure certificate generation or non-canonical
+    test evaluations does not modify or overwrite tracked canonical certificates."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    # 1. Snapshot all canonical certificate hashes on disk
+    cert_hashes_before = {}
+    cert_root = certification.CERT_DIR
+    for root, _, files in os.walk(cert_root):
+        for f in files:
+            if f.endswith(".json"):
+                full_path = os.path.join(root, f)
+                with open(full_path, "rb") as fh:
+                    cert_hashes_before[full_path] = hashlib.sha256(fh.read()).hexdigest()
+
+    # 2. Call certify_g4_radial_witness with noncanonical test settings (output_path=None)
+    wit_in_mem = certification.certify_g4_radial_witness(
+        witness_id="WIT-TEST",
+        sigma="5.0",
+        gamma="14.0",
+        delta="0.49",
+        T="16.8",
+        n_subdivisions=1000,
+        dps=30,
+        output_path=None
+    )
+    assert wit_in_mem["witness_id"] == "WIT-TEST"
+
+    # 3. Call certify_g4_radial_witness with explicit tmp_path output
+    test_out = os.path.join(str(tmp_path), "witness_temp.json")
+    wit_tmp = certification.certify_g4_radial_witness(
+        witness_id="WIT-TEMP",
+        sigma="5.0",
+        gamma="14.0",
+        delta="0.49",
+        T="16.8",
+        n_subdivisions=1000,
+        dps=30,
+        output_path=test_out
+    )
+    assert os.path.exists(test_out)
+
+    # 4. Verify all canonical certificate hashes on disk are strictly identical
+    cert_hashes_after = {}
+    for root, _, files in os.walk(cert_root):
+        for f in files:
+            if f.endswith(".json"):
+                full_path = os.path.join(root, f)
+                with open(full_path, "rb") as fh:
+                    cert_hashes_after[full_path] = hashlib.sha256(fh.read()).hexdigest()
+
+    assert cert_hashes_before == cert_hashes_after, "Tracked canonical certificates were modified during test execution!"
+
+
 def test_adversarial_radial_witness_tampered_bounds_rejected():
     """Adversarial: radial witness with modified upper bound is rejected."""
     if not certification.FLINT_AVAILABLE:
@@ -1222,8 +1277,9 @@ def test_adversarial_radial_witness_tampered_bounds_rejected():
         gamma="14.0",
         delta="0.49",
         T="16.8",
-        n_subdivisions=30000,
-        dps=50
+        n_subdivisions=50000,
+        dps=60,
+        output_path=None
     )
     # Tamper with interval upper bound to be positive
     wit_cert["enclosure"]["interval_upper"] = "+0.001"

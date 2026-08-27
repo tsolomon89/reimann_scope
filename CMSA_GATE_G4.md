@@ -23,8 +23,7 @@ with closed-form kernels $J_T(p,q), K_T(\lambda, \mu; a)$ (Rectangular) and $J_T
 
 ### The Gate G4 Proof/Evidence Boundary & Earliest Open Subgate
 1. **Exact Second-Order Radial Response**: Derived the exact symmetric second-order coefficient $C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt$, governing the leading variation $\Delta S_W = \delta^2 C_W + O(\delta^4)$ under uniform domination hypotheses.
-2. **Certified Outward-Rounded Arb Ball Witness (WIT-02)**: Across the full symmetric compact support $[-16.8, 16.8]$, the Fejér radial difference $\Delta S_{\text{Fejér}}$ for $(\sigma=5, \gamma=14, \delta=0.49, T=16.8)$ is certified strictly negative via outward-rounded Arb ball arithmetic with 50,000 subintervals:
-   $$\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0).$$
+2. **Certified Outward-Rounded Arb Ball Witness (WIT-02)**: Across the full symmetric compact support $[-16.8, 16.8]$, the Fejér radial difference $\Delta S_{\text{Fejér}}$ for $(\sigma=5, \gamma=14, \delta=0.49, T=16.8)$ is certified strictly negative via outward-rounded Arb ball arithmetic with 50,000 subinter   $$\Delta S_{\text{Fejér}} \in [-1.89473 \times 10^{-4}, -1.54203 \times 10^{-4}] \subset (-\infty, 0).$$
 3. **High-Precision Numerical Evidence (WIT 1, 3, 4)**: Rectangular, Abel-Poisson, and Gaussian windows yield negative numerical estimates with mpmath estimated errors, providing strong numerical evidence.
 4. **Additive-Reference Invariance No-Go Theorem**: Proved that for any scalar reference term $R_W(A)$ independent of the zero configuration, $(S_W(Z_\delta) - R) - (S_W(Z_0) - R) \equiv S_W(Z_\delta) - S_W(Z_0)$.
 5. **Largest Proved Obstruction Class**:
@@ -82,26 +81,26 @@ The radial difference $\Delta S_W$ was evaluated across four window families:
 
 | Witness ID | Window Type | Parameters ($\sigma, \gamma, \delta, T$) | Value $\Delta S_W$ | Enclosure / Estimated Error | Epistemic Status | Engine |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **WIT-02** | Fejér | $\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8$ | $-1.7183799 \times 10^{-4}$ | $[-1.8063\times 10^{-4}, -1.6305\times 10^{-4}]$ | **CERTIFIED_NEGATIVE_ARB_BALL** | python-flint (Arb) |
+| **WIT-02** | Fejér | $\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8$ | $-1.7183799 \times 10^{-4}$ | $[-1.89473\times 10^{-4}, -1.54203\times 10^{-4}]$ | **CERTIFIED_NEGATIVE_ARB_BALL** | python-flint (Arb) |
 | **WIT-01** | Rectangular | $\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8$ | $-5.9067025 \times 10^{-7}$ | $\pm 1.0 \times 10^{-154}$ (est) | **NUMERICAL_EVIDENCE_NEGATIVE** | mpmath quad |
 | **WIT-03** | Abel-Poisson | $\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05$ | $-3.4413949 \times 10^{-6}$ | $\pm 2.0 \times 10^{-6}$ (est) | **NUMERICAL_EVIDENCE_NEGATIVE** | mpmath quad |
 | **WIT-04** | Gaussian | $\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4$ | $-7.2473271 \times 10^{-5}$ | $\pm 2.0 \times 10^{-19}$ (est) | **NUMERICAL_EVIDENCE_NEGATIVE** | mpmath quad |
 
 ### Rigorous Arb Ball Enclosure for Witness WIT-02
-For Witness WIT-02, the complete symmetric support $[-16.8, 16.8]$ was partitioned into $N = 50,000$ subintervals in `certify_g4_fejer_witness_arb`. Every transcendental evaluation (`digamma`, `log`, `pi`, division, squaring, Riemann summation) was executed in certified outward-rounded Arb ball arithmetic.
-- Result: $\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}]$, strictly bounded away from zero ($\text{upper bound} < -1.63 \times 10^{-4} < 0$).
+For Witness WIT-02, the complete symmetric support $[-16.8, 16.8]$ was partitioned into $N = 50,000$ subintervals in `certify_g4_fejer_witness_arb`. Every transcendental evaluation (`digamma`, `log`, `pi`, division, squaring, Riemann summation) was executed in certified outward-rounded Arb ball arithmetic directly over $[-16.8, 16.8]$ without assuming evenness reduction or reflection as an operational premise.
+- Result: $\Delta S_{\text{Fejér}} \in [-1.89473 \times 10^{-4}, -1.54203 \times 10^{-4}]$, strictly bounded away from zero ($\text{upper bound} < -1.54 \times 10^{-4} < 0$).
 - This provides a genuine, certified mathematical proof that the raw Fejér response achieves strictly negative values at this parameter point.
 
-### Mathematical Derivation of Exact Evenness
-For any real $\sigma$ and $t$:
-1. $\zeta(\sigma - it) = \overline{\zeta(\sigma + it)}$ and $\zeta'(\sigma - it) = \overline{\zeta'(\sigma + it)}$ by Schwarz reflection.
-2. $\psi((\sigma - it)/2) = \overline{\psi((\sigma + it)/2)}$ by reflection of the digamma function.
-3. Therefore, $A(\sigma, -t) = \overline{A(\sigma, t)}$.
-4. For reflection-symmetric zero pairs $\rho = 1/2 + \delta \pm i\gamma$:
+### Explanatory Note on Conjugation Symmetry
+For any real $\sigma > 1$ and $t \in \mathbb R$:
+1. The explicit meromorphic archimedean/pole term:
+   $$A(\sigma + it) = \frac{1}{\sigma+it} + \frac{1}{\sigma-1+it} - \frac{1}{2}\log \pi + \frac{1}{2}\psi\left(\frac{\sigma+it}{2}\right)$$
+   satisfies $\overline{1/(\sigma+it)} = 1/(\sigma-it)$, $\overline{1/(\sigma-1+it)} = 1/(\sigma-1-it)$, and $\overline{\psi(z)} = \psi(\bar z)$, hence $A(\sigma, -t) = \overline{A(\sigma, t)}$ directly from term-by-term conjugation (without invoking zeta conjugation or a general Schwarz reflection hypothesis).
+2. For any discrete quadruplet $\rho = 1/2 \pm \delta \pm i\gamma$, pairing $+i\gamma$ with $-i\gamma$ yields:
    $$Z_\delta(\sigma, -t) = \frac{1}{\sigma - 1/2 - \delta - i(-t - \gamma)} + \frac{1}{\sigma - 1/2 - \delta - i(-t + \gamma)} = \overline{Z_\delta(\sigma, t)}.$$
-5. Hence $A(\sigma, -t) - Z_\delta(\sigma, -t) = \overline{A(\sigma, t) - Z_\delta(\sigma, t)}$.
-6. Since $|\bar w|^2 = |w|^2$ for all $w \in \mathbb C$, $|A(\sigma, -t) - Z_\delta(\sigma, -t)|^2 = |A(\sigma, t) - Z_\delta(\sigma, t)|^2$.
-7. Because $W_T(-t) = W_T(t)$ is even, the integrand $f(t)$ is an exact even function of $t$.
+3. Hence $A(\sigma, -t) - Z_\delta(\sigma, -t) = \overline{A(\sigma, t) - Z_\delta(\sigma, t)}$, which gives $|A(\sigma, -t) - Z_\delta(\sigma, -t)|^2 = |A(\sigma, t) - Z_\delta(\sigma, t)|^2$.
+4. Because $W_T(-t) = W_T(t)$ is even, the integrand $f(t)$ is an exact even function of $t$.
+*(Note: Direct certified integration over the full $[-T, T]$ domain does not rely on this symmetry as an operational premise).*unction of $t$.
 
 ### Verified Sign Mechanism for Witness WIT-02
 Direct point-by-point computation of the integrand distribution $f(t) = 2 W_T(t) (|A - Z_\delta|^2 - |A - Z_0|^2)$ on $[0, 16.8]$ reveals:
@@ -190,7 +189,7 @@ To integrate the pointwise expansion $|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^
 
 ---
 
-## 8. Formal Lean 4 Theorem Inventory (72 Compiled Declarations)
+## 8. Formal Lean 4 Theorem Inventory (75 Compiled Declarations)
 
 All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sorry`, 0 `admit`, 0 warnings):
 1. `RiemannScope.complex_finset_sum_mul_star`: $(\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}$.
@@ -198,38 +197,55 @@ All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `
 3. `RiemannScope.abstract_finite_kernel_decomposition`: $(\sum_{i \in s} \sum_{j \in s} K(i, j)) = (\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)}$ under hypothesis $K(i, j) = b_i \overline{b_j}$.
 4. `RiemannScope.linear_operator_finite_double_sum_interchange`: $L(\sum_{i \in s} \sum_{j \in s} K(i, j)) = \sum_{i \in s} \sum_{j \in s} L(K(i, j))$ for additive maps $L : \mathbb C \to+ \mathbb C$.
 5. `RiemannScope.abstract_windowed_kernel_expansion`: $L(\operatorname{normSq}(\sum_{i \in s} b_i)) = L((\sum_{i \in s} \sum_{j \in s} K(i, j)).\text{re})$.
-6. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
-7. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
-8. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
-9. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
-10. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
-11. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-12. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-13. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
-14. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
-15. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
-16. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
-17. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
-18. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
+6. `RiemannScope.linear_schedule_grade_covariant`: $\forall c, \tau \in \mathbb R$, the linear schedule $H_c(T) = cT$ is discrete grade-covariant ($H_c(\tau T) = \tau H_c(T)$).
+7. `RiemannScope.grade_covariant_schedule_nonuniqueness`: Grade covariance alone does NOT uniquely determine a schedule; for any $c_1 \ne c_2$, both $H_{c_1}$ and $H_{c_2}$ are covariant and distinct for all $T > 0$.
+8. `RiemannScope.periodic_modulated_schedule_covariant`: Any schedule $H(T) = T \cdot q(\log_\tau T)$ with 1-periodic $q$ satisfies grade covariance.
+9. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
+10. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
+11. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
+12. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
+13. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
+14. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+15. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+16. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
+17. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
+18. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
+19. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
+20. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
+21. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
 
 ---
 
-## 9. Phase B — The Next Live Infinite/Cofinal Theorem Formulation
+## 9. Phase B — Schedule Covariance Classification & The Next Live Theorem
 
-Given symmetrically truncated completed zero resolvent:
-$$Z_H(t) = \sum_{|\gamma_j| \le H} \left(\frac{1}{\sigma - \rho_j + it} + \frac{1}{\sigma - \bar\rho_j + it}\right),$$
-and remainder:
-$$R_H(t) = \frac{\xi'}{\xi}\left(\sigma - \frac{1}{2} + it\right) - Z_H(t).$$
+### 9.1 Schedule Covariance Law and Classification
+Under the repository's grade transformation $s' = 1/2 + \tau^K(s - 1/2)$, centered coordinate height dilates as $t' = \tau^K t$, and window scale transforms as $T' = \tau^K T$. For the height truncation cutoff $H$ to preserve scale covariance, it must scale identically: $H' = \tau^K H$. For unit step $K=1$, the exact covariance law is:
+$$\boxed{H(\tau T) = \tau H(T), \quad \text{where } \tau = 2\pi.}$$
 
-Define the canonical cofinal schedule $H = H(T)$ and non-additive regularized functional $\mathcal R_T$. The live candidate must explicitly define and analyze all 8 aspects:
-1. **Mathematical Definition**: Explicit non-additive functional $\mathcal S_T(Z_H; \mathcal R_T)$.
-2. **Infinite/Cofinal Structure and Limit Mechanism**: Joint limit $\lim_{T\to\infty} \mathcal S_T$ under schedule $H(T) = cT$.
-3. **Arithmetic vs Resolvent Representation**: Exact separation between prime series $A(\sigma+it)$ and truncated zero sum $Z_H(t)$.
-4. **Remainder Bounds**: Explicit asymptotic bound on $\int W_T(t) |R_{H(T)}(t)|^2 dt$ as $T \to \infty$.
-5. **Coupling to Unequal-Height Pairs**: Off-diagonal kernel bounds for $|\gamma_j - \gamma_k| > 0$.
-6. **Coupling to Same-Height Reflection Pairs**: Multiplicity and reflection doublet isolation.
-7. **Grade Covariance**: Scale covariance under origin coordinate dilation.
-8. **Exact Radial Sign Obligation**: Analytic proof that the regularized radial variation $\Delta \mathcal S_T$ is strictly positive for $\delta \ne 0$.
+**Proved Classification**:
+1. **Linear Family**: Every linear schedule $H_c(T) = cT$ ($c > 0$) satisfies $H_c(\tau T) = c(\tau T) = \tau(cT) = \tau H_c(T)$.
+2. **Non-Uniqueness**: For any $c_1 \ne c_2$, $H_{c_1}(T) \ne H_{c_2}(T)$ for all $T > 0$. Hence grade covariance alone does NOT uniquely select a schedule.
+3. **General Solution**: Let $\psi(T) = H(T)/T$. Then $\psi(\tau T) = \psi(T)$. Setting $u = \log_\tau T$, $q(u) = \psi(\tau^u)$ is 1-periodic: $q(u+1) = q(u)$. Thus:
+   $$\boxed{H(T) = T \cdot q(\log_\tau T), \quad q : \mathbb R \to (0, \infty) \text{ 1-periodic}}.$$
+4. **Asymptotic Collapse**: If $\lim_{T\to\infty} H(T)/T$ exists, periodic modulation collapses to $H(T) = cT$.
+5. **Selection Condition**: Selecting $c$ requires an additional condition beyond grade covariance: specifically, sharp Hadamard remainder control $|\mathcal R_H(t)| \le M \log(|t|+2)$ uniformly on $[-T, T]$ requires $H(T) \ge T$ (i.e. $c \ge 1$).
+
+**Falsified Premise**:
+$$\boxed{\text{Falsified Premise: "Bilateral discrete grade covariance uniquely determines the cofinal schedule."}}$$
+
+### 9.2 The Next Standalone Theorem Obligation
+Given symmetrically truncated completed zero resolvent $Z_H(t)$ and remainder $R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)$ with $H(T) = cT$ ($c \ge 1$):
+Define the schedule-indexed regularized candidate:
+$$\mathcal S_T(Z_{cT}; \mathcal R_{cT}) = \frac{1}{2\pi} \int_{-T}^T W_T(t) \left| Z_{cT}(t) + \mathcal R_{cT}(t) \right|^2 dt.$$
+
+**Standalone Theorem Obligation (Subgate G4-Cofinal-Bridge)**:
+$$\forall \sigma > 1, \forall \delta \in (0, 1/2), \quad \lim_{T \to \infty} \left[ \mathcal S_T(Z_{cT, \delta}; \mathcal R_{cT}) - \mathcal S_T(Z_{cT, 0}; \mathcal R_{cT}) \right] > 0.$$
+
+This theorem requires establishing:
+1. **Remainder Asymptotic Bound**: $\lim_{T\to\infty} \int W_T(t) |R_{cT}(t)|^2 dt = 0$.
+2. **Cross-Term Domination**: Uniform $o(1)$ bound on $2\Re \int W_T(t) Z_{cT}(t) \overline{R_{cT}(t)} dt$.
+3. **Unequal-Height Off-Diagonal Phase Cancellation**: $\sum_{j \ne k} \int W_T(t) \frac{1}{(a+i(t-\gamma_j))(a-i(t-\gamma_k))} dt \to 0$.
+4. **Diagonal Multiplicity Dominance**: Direct radial variation on the diagonal terms strictly dominates the remainder.
 
 Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 

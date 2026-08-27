@@ -300,7 +300,7 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
    $$\Delta S_W = \delta^2 C_W(\sigma, \gamma, T) + O(\delta^4), \qquad C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt,$$
    where $D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}$.
 4. **Certified Arb Ball Witness & Numerical Evidence**:
-   - Witness WIT-02 (Fejér): Certified strictly negative across full symmetric support $[-16.8, 16.8]$ via outward-rounded Arb ball arithmetic (`certify_g4_fejer_witness_arb`), proving $\Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0)$.
+   - Witness WIT-02 (Fejér): Certified strictly negative across full symmetric support $[-16.8, 16.8]$ via outward-rounded Arb ball arithmetic (`certify_g4_fejer_witness_arb`), proving $\Delta S_{\text{Fejér}} \in [-1.89473 \times 10^{-4}, -1.54203 \times 10^{-4}] \subset (-\infty, 0)$.
    - Witnesses WIT 1, 3, 4: Negative numerical quadrature estimates with mpmath error estimates.
 5. **Additive-Reference Invariance No-Go Theorem**:
    For any scalar reference $R_W(A)$ independent of $Z, \delta, \gamma$, $(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)$. Thus, divisor-independent additive scalar subtractions cannot alter the raw radial difference. Formalized in Lean 4 (`additive_reference_subtraction_invariance`).

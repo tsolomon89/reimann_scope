@@ -4439,20 +4439,21 @@ def certify_g4_fejer_witness_arb(
     - delta = "0.49" (exact decimal string)
     - T = "16.8" (exact decimal string)
 
-    Mathematical Evenness Derivation:
-    For any real sigma and t:
-    1. zeta(sigma - it) = conj(zeta(sigma + it)) and zeta'(sigma - it) = conj(zeta'(sigma + it)) by Schwarz reflection on C.
-    2. psi((sigma - it)/2) = conj(psi((sigma + it)/2)) by reflection of the digamma function.
-    3. Therefore, A(sigma, -t) = conj(A(sigma, t)).
-    4. For any reflection-symmetric pair rho = 1/2 + delta +/- i gamma:
+    Direct Evaluation and Conjugation Properties:
+    The certified Riemann sum is directly evaluated across the full symmetric domain [-T, T]
+    with n_subdivisions subintervals in outward-rounded Arb ball arithmetic, without assuming
+    evenness reduction or reflection as an operational premise.
+
+    Explanatory Note on Conjugation Symmetry:
+    For any real sigma > 1 and t in R:
+    1. The archimedean/pole term A(sigma + it) = 1/(sigma + it) + 1/(sigma - 1 + it) - (1/2)*log(pi) + (1/2)*psi((sigma + it)/2)
+       satisfies conj(1/(sigma + it)) = 1/(sigma - it) and conj(psi(z)) = psi(conj(z)), whence A(sigma, -t) = conj(A(sigma, t)).
+       (Note: This follows from direct conjugation of explicit meromorphic terms; no zeta conjugation or Schwarz reflection hypothesis is invoked).
+    2. For any discrete quadruplet rho = 1/2 +/- delta +/- i*gamma, pairing +i*gamma with -i*gamma yields:
        Z_delta(sigma, -t) = 1/(sigma - 1/2 - delta - i(-t - gamma)) + 1/(sigma - 1/2 - delta - i(-t + gamma))
                           = 1/(sigma - 1/2 - delta + i(t + gamma)) + 1/(sigma - 1/2 - delta + i(t - gamma))
                           = conj(Z_delta(sigma, t)).
-    5. Taking the difference: A(sigma, -t) - Z_delta(sigma, -t) = conj(A(sigma, t) - Z_delta(sigma, t)).
-    6. Since |conj(w)|^2 = |w|^2 for all w in C, |A(sigma, -t) - Z_delta(sigma, -t)|^2 = |A(sigma, t) - Z_delta(sigma, t)|^2.
-    7. Because W_T(-t) = W_T(t) = (1 - |t|/T)/T is also even, the integrand f(t) is an exact even function.
-    This implementation directly computes the certified Riemann sum across the full symmetric interval [-T, T]
-    with n_subdivisions subintervals, enclosing all transcendental and arithmetic operations in Arb balls.
+    3. Hence A(sigma, -t) - Z_delta(sigma, -t) = conj(A(sigma, t) - Z_delta(sigma, t)), so |A - Z_delta|^2 is even.
     """
     import flint
     from flint import arb, acb, ctx

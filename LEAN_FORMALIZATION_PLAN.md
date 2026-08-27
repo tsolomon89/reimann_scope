@@ -766,5 +766,9 @@ Formalize Gate G4 windowed expansion identities, complex conjugation algebra, ad
    - Theorem `abstract_finite_kernel_decomposition`: \((\sum_{i \in s} \sum_{j \in s} K(i, j)) = (\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)}\) under hypothesis \(K(i, j) = b_i \overline{b_j}\).
    - Theorem `linear_operator_finite_double_sum_interchange`: \(L(\sum_{i \in s} \sum_{j \in s} K(i, j)) = \sum_{i \in s} \sum_{j \in s} L(K(i, j))\) for additive maps \(L : \mathbb C \to+ \mathbb C\).
    - Theorem `abstract_windowed_kernel_expansion`: \(L(\operatorname{normSq}(\sum_{i \in s} b_i)) = L((\sum_{i \in s} \sum_{j \in s} K(i, j)).\text{re})\).
-   Bringing the compiled project theorem declarations to 72.
+7. **Schedule Covariance Classification & Non-Uniqueness Theorems** (`linear_schedule_grade_covariant`, `grade_covariant_schedule_nonuniqueness`, `periodic_modulated_schedule_covariant`):
+   - Theorem `linear_schedule_grade_covariant`: \(\forall c, \tau\), \(H_c(T) = cT\) is discrete grade-covariant (\(H_c(\tau T) = \tau H_c(T)\)).
+   - Theorem `grade_covariant_schedule_nonuniqueness`: Discrete grade covariance alone does not uniquely determine a schedule; for any \(c_1 \ne c_2\), \(H_{c_1}\) and \(H_{c_2}\) are both covariant and distinct for all \(T > 0\).
+   - Theorem `periodic_modulated_schedule_covariant`: Any schedule \(H(T) = T \cdot q(\log_\tau T)\) with 1-periodic \(q\) satisfies discrete grade covariance.
+   Bringing the compiled project theorem declarations to 75.
 

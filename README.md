@@ -400,7 +400,7 @@ python scripts/workflow.py run-canonical --all
 - **Selective Execution**: `run-canonical` executes only components classified as stale, missing, or invalid. If all components are current, it exits 0 without modifying files.
 - **Atomic Resummarization**: If only summary/diagnostics are stale, `summarize_run` regenerates `summary.json`, `README.md`, and `diagnostics.json` atomically in a staging directory, preserving `results.jsonl` byte-for-byte without rerunning expensive numerical evaluations.
 - **Execution vs Summary Provenance**: Manifests cryptographically bind `execution_provenance` (results, spec, math modules, material packages, producing commit) separately from `summary_provenance` (summary, readme, diagnostics, summarizer modules, summary engine, producing commit).
-- **Formal Build Report**: `scripts/build_formal.py` and `formal/build_report.json` dynamically track project theorem declarations (`project_theorem_declarations_compiled: 72`) and verify them alongside Lean 4 `lake build` compiler output.
+- **Formal Build Report**: `scripts/build_formal.py` and `formal/build_report.json` dynamically track project theorem declarations (`project_theorem_declarations_compiled: 75`) and verify them alongside Lean 4 `lake build` compiler output.
 
 
 ### Modular Experiment Handlers

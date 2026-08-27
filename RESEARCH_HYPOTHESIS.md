@@ -921,7 +921,7 @@ C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma
 governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\) conditionally under uniform domination hypotheses.
 - **Fejér Witness WIT-02**: Rigorously certified negative via outward-rounded Arb ball arithmetic across the full symmetric support \([-16.8, 16.8]\) with 50,000 subintervals (`certify_g4_fejer_witness_arb`):
   \[
-  \Delta S_{\text{Fejér}} \in [-1.8063 \times 10^{-4}, -1.6305 \times 10^{-4}] \subset (-\infty, 0).
+  \Delta S_{\text{Fejér}} \in [-1.89473 \times 10^{-4}, -1.54203 \times 10^{-4}] \subset (-\infty, 0).
   \]
   Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 - **Witnesses WIT 1, 3, 4**: Evaluated with negative numerical estimates and mpmath estimated error bounds (`NUMERICAL_EVIDENCE_NEGATIVE`).
@@ -939,15 +939,21 @@ Thus, divisor-independent additive scalar subtraction cannot alter the raw radia
 ## 24.5 Earliest Open Subgate
 $$\boxed{\text{Subgate G4-Open: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.}}$$
 
-## 24.6 Phase B — Next Live Infinite/Cofinal Theorem Formulation
-Given symmetrically truncated completed zero resolvent $Z_H(t)$ and remainder $R_H(t) = \frac{\xi'}{\xi}(\sigma-1/2+it) - Z_H(t)$, define canonical cofinal schedule $H = H(T)$ and non-additive functional $\mathcal R_T$. The live candidate must explicitly define and analyze:
-1. Candidate functional $\mathcal S_T(Z_H; \mathcal R_T)$.
-2. Infinite/cofinal structure under joint limit $H(T) = cT, T \to \infty$.
-3. Arithmetic vs resolvent representation ($A(\sigma+it)$ vs $Z_H(t)$).
-4. Remainder bounds on $\int W_T |R_{H(T)}|^2 dt$.
-5. Off-diagonal unequal-height pair coupling.
-6. Same-height reflection doublet isolation.
-7. Grade covariance under origin coordinate dilation.
-8. Exact radial positivity proof obligation for $\delta \ne 0$.
+## 24.6 Phase B — Schedule Covariance Classification & Next Live Theorem Formulation
+### Schedule Covariance Classification
+Under grade dilation \(s' = 1/2 + \tau^K(s - 1/2)\), coordinate height scales as \(t' = \tau^K t\) and window width as \(T' = \tau^K T\). Covariance of height truncation \(H\) requires:
+\[
+\boxed{H(\tau T) = \tau H(T), \quad \tau = 2\pi.}
+\]
+- **General Solution**: \(H(T) = T \cdot q(\log_\tau T)\) with \(q : \mathbb R \to (0, \infty)\) 1-periodic.
+- **Asymptotic Limit Collapse**: If \(\lim_{T\to\infty} H(T)/T\) exists, \(H(T) = cT\).
+- **Selection Condition**: Selecting \(c\) requires sharp remainder control \(|\mathcal R_H(t)| \le M \log(|t|+2)\), which imposes \(c \ge 1\).
+- **Falsified Premise**: *"Bilateral discrete grade covariance uniquely determines the cofinal schedule."*
+
+### Live Standalone Theorem Obligation
+Given symmetrically truncated completed zero resolvent $Z_H(t)$ and remainder $R_H(t) = \frac{\xi'}{\xi}(\sigma-1/2+it) - Z_H(t)$, define canonical cofinal schedule $H(T) = cT$ ($c \ge 1$) and candidate functional $\mathcal S_T(Z_{cT}; \mathcal R_{cT})$. The theorem obligation is:
+\[
+\forall \sigma > 1, \forall \delta \in (0, 1/2), \quad \lim_{T \to \infty} \left[ \mathcal S_T(Z_{cT, \delta}; \mathcal R_{cT}) - \mathcal S_T(Z_{cT, 0}; \mathcal R_{cT}) \right] > 0.
+\]
 Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 
