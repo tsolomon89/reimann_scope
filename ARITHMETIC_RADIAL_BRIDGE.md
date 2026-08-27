@@ -292,12 +292,19 @@ $$S_{N, T}^{(W)}(\sigma) := \int_{\mathbb R} W_T(t) |A(\sigma+it) - Z_N(t)|^2 dt
 1. **Rectangular Window**: $J_T(p,q) = \frac{\log\left(\frac{p+iT}{p-iT}\right) + \log\left(\frac{q+iT}{q-iT}\right)}{2Ti(p+q)}$.
 2. **Fejér Window**: $J_T^{\text{Fejér}}(p,q) = \frac{I_T(p) + I_T(q)}{T(p+q)}$ where $I_T(w) = -\frac{(w+iT)\log(w+iT) + (w-iT)\log(w-iT) - 2w\log w}{T}$.
 
-### 10.4 Gate G4 Infinite-Regularization and Radial-Survival Analysis
+### 10.4 Gate G4 Infinite-Regularization and Radial-Sign Analysis
 Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CMSA_GATE_G4.md):
 1. **Asymptotic Regimes**: Characterized across $|\gamma| \ll T$ (plateau $\sim \pi/(2aT)$), $\gamma/T \to c$ (boundary transition $\frac{\arctan((T-\gamma)/a)+\arctan((T+\gamma)/a)}{2aT}$), and $|\gamma| \gg T$ (outer tail $\sim 1/(\gamma^2-T^2)$).
 2. **Cofinal Limits**: Proved that fixed-cutoff vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le H} J_T = 0$ does not imply cofinal vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le cT} J_T$, which diverges as $\frac{c\log T}{4a}$.
-3. **Radial Response**: Off-line quartets produce positive full variation $\Delta S = \Delta I_{ZZ} + \Delta \text{Cross} > 0$ when $T$ encompasses the resonance peak.
-4. **Earliest Open Gate**: Gate G4 is the earliest open gate in the present CMSA derivation.
+3. **Exact Radial Response Coefficient**:
+   $$\Delta S_W = \delta^2 C_W(\sigma, \gamma, T) + O(\delta^4), \qquad C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt,$$
+   where $D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}$.
+4. **Interval-Certified Negative Witnesses**:
+   High-precision error-bounded quadrature certified 4 negative witnesses (Rectangular, Fejér with $T > \gamma$, Abel-Poisson, Gaussian), proving that the unmodified full finite-window difference $\Delta S_W$ changes sign and is not globally positive.
+5. **Classifications**:
+   - Unmodified Full Finite-Window $\Delta S_W$: `FAIL_RADIAL_POSITIVITY`.
+   - Complete Finite Algebraic Spectral Expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+   - Dilated Completed Log-Derivative: `GRADE_COORDINATE_REDUNDANT`.
 
 ---
 
@@ -305,6 +312,7 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
-- **Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+- **Classification**: `FAIL_RADIAL_POSITIVITY` (unmodified full finite-window candidate) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+
 

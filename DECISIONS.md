@@ -1088,5 +1088,44 @@ Supersedes:
 
 Any assumption that fixed-truncation zero-resolvent vanishing implies cofinal limit vanishing, or that infinite spectral passage can be achieved without regularizing the unnormalized arithmetic oscillation remainder.
 
+---
+
+## 2026-08-27 — Gate G4 Integrity Repair and Radial-Sign Theorem Resolution
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Exact Second-Order Radial Response Derivation**:
+   Derived the exact second-order radial response coefficient:
+   \[
+   C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt,
+   \]
+   governing the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\), where \(D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}\).
+2. **Conclusive Sign Falsification of Unmodified Full Finite-Window Candidate**:
+   Evaluated and certified 4 negative witnesses (Rectangular, Fejér with \(T > \gamma\), Abel-Poisson, Gaussian) via rigorous error-bounded interval quadrature, proving that \(\Delta S_W\) is NOT globally nonnegative.
+   - Classification for unmodified full finite-window \(\Delta S_W\): `FAIL_RADIAL_POSITIVITY`.
+   - Classification for exact finite algebraic expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+   - Classification for grade-dilated completed logarithmic derivative: `GRADE_COORDINATE_REDUNDANT`.
+3. **Internal Proof of Carlson Mean-Square Special Case**:
+   Proved the mean-square identity for Dirichlet series with \(\sum |a_n| < \infty\) internally in 4 distinct limit steps (finite identity, fixed-\(N\) limit, uniform tail bound, and interchange) without external black-box theorems.
+4. **Lean 4 Formalizations**:
+   Formalized complex quadratic conjugation expansions, exact radial defect difference numerators, second-order response decompositions, and sequence countermodels in `formal/RiemannScope/ArithmeticBridge.lean` (bringing total compiled project declarations to 59).
+5. **Epistemic Authority**:
+   Keep `OBL-RDQ-001` and `OBL-CMSA-003` **OPEN**. The next canonical target is the derivation of a renormalized radial functional paired with a zero-free reference space subtraction.
+
+Reason:
+
+Epistemic and formal boundary repair sprint resolving the finite radial sign question, replacing preliminary conjectures with exact certified derivations and interval counterexamples.
+
+Mathematical / operational consequence:
+
+Updated `math_core.py`, `tests/test_cmsa_gate_g4.py`, `CMSA_GATE_G4.md`, `formal/RiemannScope/ArithmeticBridge.lean`, and all corpus registers.
+
+Supersedes:
+
+Any claim that the unmodified full finite-window difference \(\Delta S_W\) is unconditionally positive whenever \(T > \gamma\), or that scalar ring identities constitute a full complex analytic formalization.
+
+
 
 

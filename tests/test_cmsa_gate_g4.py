@@ -22,6 +22,8 @@ from math_core import (
     evaluate_g4_window_spectral_expansion,
     evaluate_g4_radial_variation_diagnostic,
     evaluate_g4_cofinal_schedule_sweep,
+    evaluate_g4_radial_response_coefficient,
+    certify_g4_radial_sign_witness,
     verify_g4_arithmetic_independence_firewall,
     finite_dirichlet_mean_square_sinc_kernel,
     completed_mean_square_anchor_cmsa1,
@@ -191,3 +193,60 @@ class TestGateG4RadialVariationAndPositivity:
 
         diff = abs(mpmath.mpf(res_a["S_direct"]) - mpmath.mpf(res_b["S_direct"]))
         assert diff < mpmath.mpf('1e-35')
+
+
+class TestGateG4RadialResponseCoefficientAndWitnesses:
+    """Sub-Gate G4e Rigorous Radial Sign Falsification and Coefficient Analysis."""
+
+    def test_c_w_second_order_coefficient_ratio(self):
+        """Verifies Delta S / delta^2 -> C_W as delta -> 0 for Fejer window."""
+        c_res = evaluate_g4_radial_response_coefficient(
+            sigma=5.0, gamma=14.0, T=16.8, window_type="fejer", dps=40
+        )
+        c_val = mpmath.mpf(c_res["C_W"])
+        assert c_val < 0  # Falsification of unconditional positivity!
+
+        var_res = evaluate_g4_radial_variation_diagnostic(
+            sigma=5.0, gamma=14.0, delta=0.005, T=16.8, window_type="fejer", dps=40
+        )
+        delta_s = mpmath.mpf(var_res["delta_S_full"])
+        d_sq = mpmath.mpf(0.005) ** 2
+        ratio = (delta_s / d_sq) / c_val
+        assert abs(ratio - 1.0) < mpmath.mpf('1e-4')
+
+    def test_rectangular_negative_witness_certification(self):
+        """Certifies Witness 1 (Rectangular): sigma=2, gamma=14, delta=0.1, T=2.8 -> Delta S < 0."""
+        cert = certify_g4_radial_sign_witness(
+            sigma=2.0, gamma=14.0, delta=0.1, T=2.8, window_type="rectangular", dps=50
+        )
+        assert cert["certified_negative"] is True
+        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert mpmath.mpf(cert["interval_upper"]) < 0
+
+    def test_fejer_negative_witness_certification_above_resonance(self):
+        """Certifies Witness 2 (Fejer): sigma=5, gamma=14, delta=0.49, T=16.8 (T > gamma) -> Delta S < 0."""
+        cert = certify_g4_radial_sign_witness(
+            sigma=5.0, gamma=14.0, delta=0.49, T=16.8, window_type="fejer", dps=50
+        )
+        assert cert["certified_negative"] is True
+        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert mpmath.mpf(cert["interval_upper"]) < 0
+
+    def test_abel_negative_witness_certification(self):
+        """Certifies Witness 3 (Abel): sigma=1.01, gamma=21, delta=0.49, T=1.05 -> Delta S < 0."""
+        cert = certify_g4_radial_sign_witness(
+            sigma=1.01, gamma=21.0, delta=0.49, T=1.05, window_type="abel", dps=50
+        )
+        assert cert["certified_negative"] is True
+        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert mpmath.mpf(cert["interval_upper"]) < 0
+
+    def test_gaussian_negative_witness_certification(self):
+        """Certifies Witness 4 (Gaussian): sigma=1.01, gamma=14, delta=0.49, T=1.4 -> Delta S < 0."""
+        cert = certify_g4_radial_sign_witness(
+            sigma=1.01, gamma=14.0, delta=0.49, T=1.4, window_type="gaussian", dps=50
+        )
+        assert cert["certified_negative"] is True
+        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert mpmath.mpf(cert["interval_upper"]) < 0
+

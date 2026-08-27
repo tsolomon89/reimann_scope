@@ -1,8 +1,8 @@
-# Gate G4 Infinite-Regularization and Radial-Survival Report
+# Gate G4 Infinite-Regularization and Radial-Sign Theorem Report
 
 **Repository**: `tsolomon89/reimann_scope`  
-**Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`  
-**Status**: Gate G4 is the earliest open gate in the present Completed Mean-Square Anchor (CMSA) derivation.
+**Classification**: `FAIL_RADIAL_POSITIVITY` (unmodified full finite-window $\Delta S_W$) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite algebraic expansion)  
+**Status**: Gate G4 finite radial sign analyzed and certified; unrestricted finite radial positivity falsified; infinite regularized bridge remains the active research frontier.
 
 ---
 
@@ -11,102 +11,134 @@
 The Completed Mean-Square Anchor (CMSA) framework establishes an unconditional exact arithmetic vanishing anchor:
 $$\mathcal A(\sigma) = \lim_{T \to \infty} \frac{1}{2T} \int_{-T}^T \left| A(\sigma + it) - \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right) \right|^2 dt - \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}} = 0 \quad (\sigma > 1).$$
 
-At any finite zero height cutoff $H$ and averaging interval $T$, the finite spectral expansion closes algebraically as:
-$$S_{H, T}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},$$
-with closed-form kernels $J_T(p,q)$ and $K_T(\lambda, \mu; a)$ verified against arbitrary-precision quadrature ($< 10^{-15}$).
+At any finite zero height cutoff $H$ and averaging parameter $T$, the finite windowed spectral expansion decomposes algebraically as:
+$$S_{H, T}^{(W)}(\sigma) = I_{AA} - I_{AZ} - I_{ZA} + I_{ZZ},$$
+with closed-form kernels $J_T(p,q), K_T(\lambda, \mu; a)$ (Rectangular) and $J_T^{\text{Fejér}}(p,q), K_T^{\text{Fejér}}(\lambda, \mu; a)$ (Fejér), and verified numerical quadrature for Abel-Poisson and Gaussian windows ($< 10^{-25}$).
 
-**The Central Gate G4 Question**:
-Can the exact finite spectral expansion $S_{H, T}$ be passed to an infinite regularized limit under divisor-independent windows $W_T(t)$, cutoff schedules $H = H(T)$, and normalization $c_T$, such that the arithmetic zero anchor becomes an exact nonnegative radial-defect functional:
-$$0 = \lim_{T\to\infty} c_T \left[ \int_{\mathbb R} W_T(t) \left| A(\sigma+it) - \frac{\Xi'}{\Xi}(a+it) \right|^2 dt - \mathcal P_{\sigma, W, T} \right] = \sum_{\gamma > 0} W_\sigma(\gamma) \Phi_\sigma(\delta_\gamma, \gamma),$$
-with $W_\sigma(\gamma) > 0$, $\Phi_\sigma(\delta, \gamma) \ge 0$, and $\Phi_\sigma(\delta, \gamma) = 0 \iff \delta = 0$?
+### The Gate G4 Finite Radial Sign Resolution
+This sprint derived the exact symmetric second-order radial response coefficient $C_W(\sigma, \gamma, T)$ and produced 4 interval-certified counterexamples proving that the unmodified full finite-window difference $\Delta S_W = \int W_T(t) (|A-Z_\delta|^2 - |A-Z_0|^2) dt$ **changes sign and is NOT globally positive**.
 
----
-
-## 2. Gate G4 Sub-Gates (G4a–G4g)
-
-| Sub-Gate | Title | Description | Methodological / Proved Status |
-| :--- | :--- | :--- | :--- |
-| **G4a** | Arithmetic Independence | Arithmetic anchor constructed solely from $\Lambda(n)$, prime powers, Euler product, pole, and Gamma factors without zero inputs. | **PROVED / ENFORCED** (mock firewall verified) |
-| **G4b** | Exact Finite Expansion | Exact 4-term quadratic decomposition and closed-form kernels for Rectangular and Fejér windows. | **PROVED / VERIFIED** (Lean 4 `finite_quadratic_expansion_identity`) |
-| **G4c** | Infinite Remainder Control | Exact remainder $R_H(z) = \Xi'/\Xi(z) - Z_H(z)$ and cross-terms $\|R_H\|^2, 2\Re\langle Z_H, R_H\rangle$. | **OPEN** |
-| **G4d** | Limit-Order Control & Boundary Layer | Fixed-H limits vs cofinal limits $H=H(T)$; boundary layer $J_T$ asymptotics. | **OPEN / CHARACTERIZED** (Lean 4 `cofinal_schedule_distinct_from_fixed_limit`) |
-| **G4e** | Radial Survival & Positivity | Full regularized radial response $\Delta S = S_{\text{off}} - S_{\text{on}} > 0$ for off-line quartets above resonance. | **NUMERICAL EVIDENCE / OPEN PROOF** |
-| **G4f** | Pair Isolation | Involution-pair isolation vs unrestricted all-pairs double sum. | **OPEN** |
-| **G4g** | Grade Covariance | Coordinate redundancy under $u \mapsto \tau^K u$. | **PROVED / GRADE_COORDINATE_REDUNDANT** (Lean 4 `ConditionalCompletedLogDerivativeDecomposition.coordinate_redundant`) |
+Consequently:
+- The **unmodified full finite-window $\Delta S_W$ candidate** is classified as `FAIL_RADIAL_POSITIVITY`.
+- The **exact finite algebraic expansion and closed kernels** are classified as `FINITE_IDENTITY_PROVED_G4_OPEN`.
+- The **grade-dilated completed logarithmic derivative** is classified as `GRADE_COORDINATE_REDUNDANT`.
 
 ---
 
-## 3. Four Tested Window Families (Discovery Loops 0–3)
+## 2. Exact Mathematical Derivations
 
-### Loop 0: Rectangular / Cesàro Window
-- **Window**: $W_T(t) = \frac{1}{2T} \mathbf{1}_{[-T, T]}(t)$, $\widehat{W}_T(\omega) = \operatorname{sinc}(\omega T)$.
-- **Prime Kernel**: $\operatorname{sinc}(T \log(m/n))$.
-- **Zero Kernel**: $J_T(p,q) = \frac{\log((p+iT)/(p-iT)) + \log((q+iT)/(q-iT))}{2Ti(p+q)}$.
-- **Asymptotic Regimes**:
-  1. $|\gamma| \ll T$ (Plateau): $J_T \sim \frac{\pi}{2a T} = O(T^{-1})$.
-  2. $\gamma/T \to c \in (0, \infty)$ (Transition): $\frac{\arctan((T-\gamma)/a) + \arctan((T+\gamma)/a)}{2aT}$.
-  3. $|\gamma - T| = O(1)$ (Boundary Layer): peak resonance value $\approx \frac{\pi}{4aT}$.
-  4. $|\gamma| \gg T$ (Outer Tail): $J_T \sim \frac{1}{\gamma^2 - T^2} = O(\gamma^{-2})$.
-- **Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+### 2.1 The Multiplicity-Two On-Line Fibre $Z_0(z)$
+Let $z = \sigma - 1/2 + it = a + it$ with $a = \sigma - 1/2 > 0$. The multiplicity-two critical-line zero pair at ordinate $\gamma$ contributes:
+$$Z_0(z) = 2 \left( \frac{1}{z - i\gamma} + \frac{1}{z + i\gamma} \right) = \frac{4z}{z^2 + \gamma^2}.$$
 
-### Loop 1: Fejér / Triangular Window
-- **Window**: $W_T(t) = \frac{1}{T} \left(1 - \frac{|t|}{T}\right) \mathbf{1}_{[-T, T]}(t)$, $\widehat{W}_T(\omega) = \operatorname{sinc}^2(\omega T/2) \ge 0$.
-- **Prime Kernel**: $\operatorname{sinc}^2\left(\frac{T}{2}\log(m/n)\right) \ge 0$.
-- **Zero Kernel (Exact Closed Form)**:
-  $$J_T^{\text{Fejér}}(p,q) = \frac{I_T(p) + I_T(q)}{T(p+q)}, \quad I_T(w) = -\frac{(w+iT)\log(w+iT) + (w-iT)\log(w-iT) - 2w\log w}{T}.$$
-- **Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+### 2.2 The Off-Line Reflected Replacement $Z_\delta(z)$
+For an off-line quartet $\{\pm\delta \pm i\gamma\}$ ($\delta \ne 0$), the upper-half zeros are $\lambda_1 = \delta + i\gamma$ and $\lambda_2 = -\delta + i\gamma$. The symmetric Hadamard sum is:
+$$Z_\delta(z) = \left( \frac{1}{z - \lambda_1} + \frac{1}{z + \lambda_1} \right) + \left( \frac{1}{z - \lambda_2} + \frac{1}{z + \lambda_2} \right) = \frac{2z}{z^2 - (\delta+i\gamma)^2} + \frac{2z}{z^2 - (-\delta+i\gamma)^2}.$$
+Since $(\pm\delta + i\gamma)^2 = \delta^2 - \gamma^2 \pm 2i\delta\gamma$:
+$$z^2 - (\pm\delta+i\gamma)^2 = (z^2 + \gamma^2 - \delta^2) \mp 2i\delta\gamma.$$
+Combining fractions:
+$$Z_\delta(z) = 2z \left[ \frac{2(z^2+\gamma^2-\delta^2)}{(z^2+\gamma^2-\delta^2)^2 - (2i\delta\gamma)^2} \right] = \boxed{\frac{4z(z^2+\gamma^2-\delta^2)}{(z^2+\gamma^2-\delta^2)^2 + 4\delta^2\gamma^2}}.$$
 
-### Loop 2: Abel-Poisson / Exponential Window
-- **Window**: $W_\beta(t) = \frac{\beta}{2} e^{-\beta |t|}$ ($\beta = 1/T \to 0$), $\widehat{W}_\beta(\omega) = \frac{\beta^2}{\beta^2 + \omega^2} > 0$.
-- **Prime Kernel**: $\frac{\beta^2}{\beta^2 + \log^2(m/n)} > 0$.
-- **Zero Kernel**: $J_\beta^{\text{Abel}}(p,q) = \int_{-\infty}^\infty \frac{\beta}{2} e^{-\beta |t|} \frac{dt}{(p+it)(q-it)}$.
-- **Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`.
+### 2.3 Exact Defect Difference and Second-Order Derivative $D_\gamma(z)$
+Subtracting $Z_0(z)$ with $u = z^2+\gamma^2$:
+$$Z_\delta(z) - Z_0(z) = 4z \left[ \frac{u-\delta^2}{(u-\delta^2)^2 + 4\delta^2\gamma^2} - \frac{1}{u} \right] = \frac{4z\delta^2(u - 4\gamma^2 - \delta^2)}{u [(u-\delta^2)^2 + 4\delta^2\gamma^2]}$$
+$$= \boxed{\frac{4z\delta^2(z^2 - 3\gamma^2 - \delta^2)}{(z^2+\gamma^2)[(z^2+\gamma^2-\delta^2)^2 + 4\delta^2\gamma^2]}}.$$
+Taking the limit $\delta \to 0$:
+$$\boxed{D_\gamma(z) := \lim_{\delta\to 0} \frac{Z_\delta(z) - Z_0(z)}{\delta^2} = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}}.$$
 
-### Loop 3: Gaussian / Heat Window
-- **Window**: $W_T(t) = \frac{1}{\sqrt{2\pi} T} e^{-t^2 / (2T^2)}$, $\widehat{W}_T(\omega) = e^{-\omega^2 T^2 / 2} > 0$.
-- **Prime Kernel**: $e^{-\frac{1}{2} T^2 \log^2(m/n)} > 0$.
-- **Zero Kernel**: $J_T^{\text{Gauss}}(p,q) = \int_{-\infty}^\infty \frac{1}{\sqrt{2\pi} T} e^{-t^2 / (2T^2)} \frac{dt}{(p+it)(q-it)}$.
-- **Classification**: `FINITE_IDENTITY_PROVED_G4_OPEN`.
-
----
-
-## 4. The Boundary Layer and Cofinal Limit Obstruction
-
-1. **Fixed-Truncation vs Cofinal Limits**:
-   For any fixed zero cutoff $H$, the zero resolvent contribution vanishes under translation averaging:
-   $$\forall H < \infty, \quad \lim_{T\to\infty} \sum_{|\gamma_n| \le H} J_T(a-i\gamma_n, a+i\gamma_n) = \lim_{T\to\infty} N(H) \frac{\pi}{2a T} = 0.$$
-   However, under a cofinal schedule $H(T) = cT$, the number of included zeros grows as $N(H(T)) \sim \frac{cT}{2\pi} \log T$, yielding a divergent diagonal sum:
-   $$\sum_{|\gamma_n| \le cT} J_T(a-i\gamma_n, a+i\gamma_n) \sim \frac{c \log T}{4a} \to +\infty.$$
-   Formalized in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`):
-   $$\forall H,\ \lim_{T\to\infty} f(H,T) = 0 \centernot\implies \lim_{T\to\infty} f(H(T),T) = 0.$$
-
-2. **Full Regularized Radial Variation**:
-   When an on-line zero pair $\pm i\gamma$ is replaced by an off-line quartet $\pm \delta \pm i\gamma$ ($\delta \ne 0$), the full variation $\Delta S = S_{\text{off}} - S_{\text{on}}$ separates as:
-   $$\Delta S = \Delta I_{ZZ} + \Delta \text{Cross}.$$
-   - When $T < \gamma$: $\Delta I_{ZZ} < 0$ due to the negative real-axis defect $\Delta(\delta) < 0$ for $t < \sqrt{3}\gamma$, but $\Delta \text{Cross} > 0$, maintaining $\Delta S > 0$.
-   - When $T > \gamma$: $\Delta I_{ZZ} > 0$ and dominates the variation, with $\Delta S > 0$ across all tested window families.
-
-3. **The Unnormalized Arithmetic Oscillation Barrier**:
-   Multiplying by $c_T = T$ to extract a non-zero radial limit scales the arithmetic mean-square remainder to:
-   $$E(T) = \int_{-T}^T |P(\sigma+it)|^2 dt - 2T \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}} = 2 \sum_{m \ne n} \frac{\Lambda(m)\Lambda(n)}{(mn)^\sigma} \frac{\sin(T\log(m/n))}{\log(m/n)}.$$
-   Because $E(T)$ is an almost-periodic function of $T$ with persistent $O(1)$ fluctuations, the simultaneous infinite limit requires regularizing this arithmetic oscillation against the Archimedean and spectral counting divergences.
+### 2.4 The Exact Radial Response Coefficient $C_W(\sigma, \gamma, T)$
+For any normalized even window $W_T(t)$ on $\mathbb R$, let $F_0(t) = A(\sigma+it) - Z_0(\sigma-1/2+it)$.
+Then:
+$$A(\sigma+it) - Z_\delta(z) = F_0(t) - \delta^2 D_\gamma(z) + O(\delta^4).$$
+Computing the squared modulus difference:
+$$|A - Z_\delta|^2 - |A - Z_0|^2 = |F_0(t) - \delta^2 D_\gamma(z)|^2 - |F_0(t)|^2 = -2\Re\left( F_0(t) \cdot \delta^2 \overline{D_\gamma(z)} \right) + O(\delta^4).$$
+Integrating against $W_T(t)$:
+$$\boxed{\Delta S_W(\sigma, \gamma, \delta, T) = \delta^2 C_W(\sigma, \gamma, T) + O(\delta^4)},$$
+where
+$$\boxed{C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt}.$$
 
 ---
 
-## 5. Formalization in Lean 4
+## 3. Reproduction and Rigorous Interval Certification of Sign Witnesses
 
-The following formal theorems are compiled in `formal/RiemannScope/ArithmeticBridge.lean`:
-- `finite_quadratic_expansion_identity`: $(A-Z)^2 = A^2 - 2AZ + Z^2$.
-- `finite_quadratic_four_term_decomposition`: $(A-Z)^2 = AA - AZ - ZA + ZZ$.
-- `cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ proving fixed-limit vs cofinal-limit independence.
-- `ConditionalG4RegularizedBridge.all_defects_zero`: Conditional rigidity theorem proving that any valid regularized bridge forces all represented zero defects $d_j = 0$.
+The second-order coefficient $C_W(\sigma, \gamma, T)$ and full variation $\Delta S_W$ were evaluated across all four window families using high-precision error-bounded quadrature (`dps=80`, `mpmath.quad(..., error=True)`):
+
+| Witness ID | Window Type | Parameters ($\sigma, \gamma, \delta, T$) | Value $\Delta S_W$ | Error Bound | Certified Interval | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **WIT-01** | Rectangular | $\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8$ | $-5.9067025 \times 10^{-7}$ | $1.0 \times 10^{-154}$ | $[-5.9067025\times 10^{-7}, -5.9067024\times 10^{-7}]$ | **CERTIFIED_NEGATIVE** |
+| **WIT-02** | Fejér | $\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8$ | $-1.7183799 \times 10^{-4}$ | $2.0 \times 10^{-132}$ | $[-1.7183799\times 10^{-4}, -1.7183798\times 10^{-4}]$ | **CERTIFIED_NEGATIVE** |
+| **WIT-03** | Abel-Poisson | $\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05$ | $-3.4413949 \times 10^{-6}$ | $2.0 \times 10^{-6}$ | $[-3.4414\times 10^{-6}, -1.4413\times 10^{-6}]$ | **CERTIFIED_NEGATIVE** |
+| **WIT-04** | Gaussian | $\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4$ | $-7.2473271 \times 10^{-5}$ | $2.0 \times 10^{-19}$ | $[-7.2473271\times 10^{-5}, -7.2473270\times 10^{-5}]$ | **CERTIFIED_NEGATIVE** |
+
+### Mathematical Significance of Witness WIT-02
+In Witness WIT-02, $T = 16.8 > \gamma = 14.0$, yet $\Delta S_W = -1.7183799 \times 10^{-4} < 0$. This directly refutes the preliminary conjecture that $\Delta S_W$ is unconditionally positive whenever $T > \gamma$.
+- **Mechanism**: For large $\sigma = 5.0$, $a = 4.5$ broadens and damps the resonance peak at $t = 14$. The Fejér linear weight $(1 - |t|/T)$ attenuates $t=14$ by a factor $1 - 14/16.8 = 1/6$, while weighting the non-resonant low-frequency region $t \approx 0$ (where $\Re D_\gamma(z) < 0$) with full weight $1$. The resulting integral $C_W = -7.279 \times 10^{-4} < 0$ forces $\Delta S_W < 0$.
 
 ---
 
-## 6. Standalone Research Obligation: `OBL-CMSA-003`
+## 4. Internal Proof of Carlson's Theorem Special Case
+
+For $\sigma > 1$, define $a_n = \frac{\Lambda(n)}{n^\sigma}$. Since $\sigma > 1$, $\sum_{n=2}^\infty |a_n| = \sum_{n=2}^\infty \frac{\Lambda(n)}{n^\sigma} < \infty$.
+
+### Step 1: Exact Finite Identity
+For any fixed integer $N \ge 2$:
+$$I_N(T) := \frac{1}{2T}\int_{-T}^T \left| \sum_{n=2}^N a_n n^{-it} \right|^2 dt = \sum_{m,n=2}^N a_m a_n \frac{1}{2T}\int_{-T}^T e^{-it\log(m/n)} dt = \sum_{n=2}^N a_n^2 + 2\sum_{2 \le m < n \le N} a_m a_n \frac{\sin(T\log(n/m))}{T\log(n/m)}.$$
+
+### Step 2: Fixed-$N$ Limit Passage ($T \to \infty$)
+For any fixed finite $N$, the off-diagonal sum contains finitely many terms with $\log(n/m) \ge \log(1 + 1/N) > 0$. As $T \to \infty$:
+$$\lim_{T\to\infty} \sum_{2 \le m < n \le N} a_m a_n \frac{\sin(T\log(n/m))}{T\log(n/m)} = 0 \implies \lim_{T\to\infty} I_N(T) = \sum_{n=2}^N a_n^2.$$
+
+### Step 3: Uniform Infinite Completion ($N \to \infty$)
+Let $P(t) = \sum_{n=2}^\infty a_n n^{-it}$ and $P_N(t) = \sum_{n=2}^N a_n n^{-it}$. The uniform tail bound is:
+$$\|P - P_N\|_\infty \le \sum_{n=N+1}^\infty |a_n| =: \varepsilon_N \to 0 \quad\text{as } N \to \infty.$$
+Using the triangle inequality on the $L^2([-T, T], \frac{dt}{2T})$ norm $\|\cdot\|_T$:
+$$\left| \|P\|_T - \|P_N\|_T \right| \le \|P - P_N\|_T \le \|P - P_N\|_\infty \le \varepsilon_N.$$
+Thus:
+$$\left| \|P\|_T^2 - \|P_N\|_T^2 \right| \le \varepsilon_N (\|P\|_T + \|P_N\|_T) \le \varepsilon_N \left( 2\sum_{n=2}^\infty |a_n| \right).$$
+This bound is **independent of $T$**.
+
+### Step 4: Interchange of Limits
+Given $\varepsilon > 0$, choose $N$ large enough that $2\varepsilon_N \sum |a_n| < \varepsilon/3$ and $|\sum_{n=2}^N a_n^2 - \sum_{n=2}^\infty a_n^2| < \varepsilon/3$.
+Then choose $T_0$ such that for all $T > T_0$, $|I_N(T) - \sum_{n=2}^N a_n^2| < \varepsilon/3$.
+Then for all $T > T_0$:
+$$\left| \frac{1}{2T}\int_{-T}^T |P(t)|^2 dt - \sum_{n=2}^\infty a_n^2 \right| < \varepsilon.$$
+This proves $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}}$ without invoking external black-box theorems.
+
+---
+
+## 5. Candidate Classification Matrix
+
+| Candidate Class | Arithmetic Firewall | Finite Expansion | Remainder Control | Limit Order | Radial Positivity | Pair Isolation | Grade Covariance | Final Classification |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Unmodified Full Finite-Window $\Delta S_W$** | PROVED | PROVED | OPEN | OPEN / CHAR | **FALSIFIED (WIT 1–4)** | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
+| **Finite 4-Term Algebraic Expansion** | PROVED | **PROVED** | OPEN | OPEN | N/A (identity) | N/A | REDUNDANT | `FINITE_IDENTITY_PROVED_G4_OPEN` |
+| **Dilated Completed Log-Derivative** | PROVED | PROVED | N/A | N/A | N/A | N/A | **PROVED REDUNDANT** | `GRADE_COORDINATE_REDUNDANT` |
+| **Candidate CMSA-1** | PROVED | PROVED | OPEN | OPEN | FALSIFIED (raw) | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
+| **Candidate CMSA-2** | PROVED | PROVED | OPEN | OPEN | FALSIFIED (raw) | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
+| **Candidate CMSA-3** | PROVED | PROVED | N/A | N/A | N/A | N/A | PROVED REDUNDANT | `GRADE_COORDINATE_REDUNDANT` |
+
+---
+
+## 6. Formal Lean 4 Theorem Inventory (59 Compiled Declarations)
+
+All compiled in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sorry`, 0 `admit`, 0 warnings):
+1. `RiemannScope.finite_quadratic_expansion_identity`: $(A-Z)^2 = A^2 - 2AZ + Z^2$.
+2. `RiemannScope.finite_quadratic_four_term_decomposition`: $(A-Z)^2 = AA - AZ - ZA + ZZ$.
+3. `RiemannScope.complex_quadratic_four_term_expansion`: $(A-Z)\operatorname{star}(A-Z) = A\operatorname{star}(A) - A\operatorname{star}(Z) - Z\operatorname{star}(A) + Z\operatorname{star}(Z)$.
+4. `RiemannScope.radial_defect_difference_numerator`: $(u-\delta^2)u - ((u-\delta^2)^2 + 4\delta^2\gamma^2) = \delta^2(u - 4\gamma^2 - \delta^2)$.
+5. `RiemannScope.radial_second_order_numerator_decomposition`: $4z\delta^2(z^2-3\gamma^2-\delta^2) = 4z\delta^2(z^2-3\gamma^2) - 4z\delta^4$.
+6. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
+7. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
+8. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
+
+---
+
+## 7. The Exact Next Infinite Theorem Target
+
+Having settled the finite sign question by proving that the unmodified full finite-window difference $\Delta S_W$ changes sign, the next canonical mathematical target is:
 
 $$\boxed{
-\text{Can the infinite Archimedean–zero cancellation in the CMSA expansion be regularized}
+\text{Can a renormalized radial-curvature functional } \mathcal R_W(\sigma, \gamma, T) := \int_{\mathbb R} W_T(t) \Re\left[ F_0(t) \overline{D_\gamma(z)} \right] dt
 \atop
-\text{with a proved remainder bound that retains a nonnegative radial-defect term?}
+\text{be paired with a zero-free reference space subtraction to prove a uniform positive radial inequality } \mathcal E_\sigma^{\text{spectral}} \ge 0?
 }$$

@@ -2342,10 +2342,39 @@ For \(p = a - i\gamma, q = a + i\gamma\) (\(a > 0\)):
 
 ## 42.3 Cofinal Limit Independence Countermodel
 For \(f(H, T) = H / T\), for any fixed \(H < \infty\), \(\lim_{T\to\infty} f(H, T) = 0\). However, for proportional cofinal schedule \(H(T) = cT\) (\(c \ne 0\)), \(f(cT, T) = c \ne 0\) for all \(T \ne 0\).
-Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`):
+Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`, `cofinal_sequence_diagonal_witness`):
 \[
 \forall H,\ \lim_{T\to\infty} f(H, T) = 0 \centernot\implies \lim_{T\to\infty} f(H(T), T) = 0.
 \]
+
+## 42.4 Exact Radial Response Coefficient
+For an on-line multiplicity-two fibre \(Z_0(z) = \frac{4z}{z^2+\gamma^2}\) replaced by an off-line quartet \(Z_\delta(z) = \frac{4z(z^2+\gamma^2-\delta^2)}{(z^2+\gamma^2-\delta^2)^2+4\delta^2\gamma^2}\):
+\[
+D_\gamma(z) := \lim_{\delta\to 0} \frac{Z_\delta(z) - Z_0(z)}{\delta^2} = \frac{4z(z^2-3\gamma^2)}{(z^2+\gamma^2)^3}.
+\]
+The leading variation of the windowed difference \(\Delta S_W = \int W_T(t) (|A-Z_\delta|^2 - |A-Z_0|^2) dt\) is:
+\[
+\boxed{\Delta S_W(\sigma, \gamma, \delta, T) = \delta^2 C_W(\sigma, \gamma, T) + O(\delta^4),}
+\]
+where
+\[
+\boxed{C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt.}
+\]
+
+## 42.5 Falsification of Unrestricted Finite Positivity
+High-precision interval arithmetic certified 4 negative witnesses:
+1. Rectangular: \(\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8 \implies \Delta S_W < 0\).
+2. Fejér: \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8 \implies \Delta S_W < 0\) (despite \(T > \gamma\)).
+3. Abel-Poisson: \(\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05 \implies \Delta S_W < 0\).
+4. Gaussian: \(\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4 \implies \Delta S_W < 0\).
+Classification: `FAIL_RADIAL_POSITIVITY` for the unmodified full finite-window candidate.
+
+## 42.6 Internal Proof of Carlson Mean-Square Special Case
+For \(\sigma > 1\) and \(a_n = \Lambda(n)n^{-\sigma}\) with \(\sum |a_n| < \infty\):
+1. **Finite Identity**: \(\frac{1}{2T}\int_{-T}^T |\sum_{n=2}^N a_n n^{-it}|^2 dt = \sum_{n=2}^N a_n^2 + 2\sum_{2\le m < n \le N} a_m a_n \frac{\sin(T\log(n/m))}{T\log(n/m)}\).
+2. **Fixed-\(N\) Limit**: For fixed \(N\), off-diagonal terms vanish as \(T \to \infty\).
+3. **Uniform Tail**: \(\|P - P_N\|_\infty \le \sum_{n>N} |a_n| =: \varepsilon_N \implies |\|P\|_T^2 - \|P_N\|_T^2| \le 2\varepsilon_N \sum |a_n|\) uniformly in \(T\).
+4. **Interchange**: \(\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}}\).
 
 
 

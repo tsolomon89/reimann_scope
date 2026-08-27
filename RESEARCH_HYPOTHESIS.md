@@ -896,11 +896,11 @@ Formally verified in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sor
 - `generic_scale_dilation_cancellation`: \(s D_s(su) = f(u)\) for any scale \(s > 0\).
 
 ## 23.4 Earliest Infinite Analytic Obstruction (Gate G4)
-Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Candidate CMSA-1 and CMSA-2 are classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_GATE_G4`.
+Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Candidate CMSA-1 and CMSA-2 are classified as `FAIL_RADIAL_POSITIVITY` (unmodified full finite difference) and `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 
 ---
 
-# 24. Gate G4 Infinite-Regularization and Window Suite Resolution
+# 24. Gate G4 Infinite-Regularization and Radial-Sign Theorem Resolution
 
 ## 24.1 Four Window Families (Loops 0–3)
 Evaluated across:
@@ -911,10 +911,16 @@ Evaluated across:
 All four window families achieve exact finite quadratic expansion closure and are classified as `FINITE_IDENTITY_PROVED_G4_OPEN`.
 
 ## 24.2 Cofinal Limit Independence & Boundary Layer
-Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`): fixed-truncation limits \(\forall H, \lim_{T\to\infty} f(H, T) = 0\) do not imply cofinal limit vanishing \(\lim_{T\to\infty} f(H(T), T) = 0\).
+Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`, `cofinal_sequence_diagonal_witness`): fixed-truncation limits \(\forall H, \lim_{T\to\infty} f(H, T) = 0\) do not imply cofinal limit vanishing \(\lim_{T\to\infty} f(H(T), T) = 0\).
 
-## 24.3 Full Regularized Radial Response
-For off-line quartets \(\pm\delta \pm i\gamma\), the full regularized variation \(\Delta S = S_{\text{off}} - S_{\text{on}} = \Delta I_{ZZ} + \Delta\text{Cross} > 0\) is strictly positive once the sampling interval encompasses the resonance peak (\(T > \gamma\)).
+## 24.3 Exact Radial Response Coefficient & Sign Falsification
+The symmetric second-order coefficient:
+\[
+C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt, \qquad D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3},
+\]
+governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\).
+High-precision interval quadrature certified 4 negative witnesses (WIT 1–4 across Rectangular, Fejér with \(T > \gamma\), Abel, Gaussian), proving that \(\Delta S_W\) changes sign. The unmodified full finite-window candidate is classified as `FAIL_RADIAL_POSITIVITY`.
+
 
 
 

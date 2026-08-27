@@ -738,18 +738,21 @@ Formalize universal scale dilation cancellation and coordinate redundancy in Lea
 
 ---
 
-# 25. Phase 16 — Gate G4 Windowed Expansion, Cofinal Limit Independence, and Conditional Regularized Bridge
+# 25. Phase 16 — Gate G4 Windowed Expansion, Complex Conjugation Algebra, Cofinal Limit Countermodels, and Radial Response Decompositions
 
-Formalize Gate G4 windowed expansion identities, cofinal limit countermodels, and conditional regularized bridge rigidity in Lean 4:
+Formalize Gate G4 windowed expansion identities, complex conjugation algebra, cofinal limit countermodels, radial defect difference numerators, and conditional regularized bridge rigidity in Lean 4 (59 compiled declarations total):
 
-1. **Finite Windowed Quadratic Expansion** (`finite_quadratic_expansion_identity`, `finite_quadratic_four_term_decomposition`):
-   - Prove \((A - Z)^2 = A^2 - 2AZ + Z^2\).
-   - Prove \((A - Z)^2 = A \cdot A - A \cdot Z - Z \cdot A + Z \cdot Z\).
-2. **Cofinal Limit Independence Countermodel** (`cofinal_schedule_distinct_from_fixed_limit`):
-   - For \(f(H, T) = H / T\), prove that \((c \cdot T) / T = c\) for all \(T \ne 0\).
-   - Demonstrates that fixed-truncation limits \(\forall H, \lim_{T\to\infty} f(H, T) = 0\) do not imply cofinal limit vanishing \(\lim_{T\to\infty} f(H(T), T) = 0\).
-3. **Conditional Gate G4 Regularized Bridge Interface** (`ConditionalG4RegularizedBridge`):
-   - Structure modeling the passage of the finite CMSA expansion to an exact positive radial-defect functional.
+1. **Finite Windowed Quadratic & Complex Conjugation Expansion** (`finite_quadratic_expansion_identity`, `finite_quadratic_four_term_decomposition`, `complex_quadratic_four_term_expansion`):
+   - Real scalar algebra: \((A - Z)^2 = A^2 - 2AZ + Z^2 = AA - AZ - ZA + ZZ\).
+   - Complex conjugation algebra: \((A - Z)\operatorname{star}(A - Z) = A\operatorname{star}(A) - A\operatorname{star}(Z) - Z\operatorname{star}(A) + Z\operatorname{star}(Z)\).
+2. **Radial Defect Difference & Second-Order Response Numerator** (`radial_defect_difference_numerator`, `radial_second_order_numerator_decomposition`):
+   - Prove \((u - \delta^2)u - ((u - \delta^2)^2 + 4\delta^2\gamma^2) = \delta^2(u - 4\gamma^2 - \delta^2)\).
+   - Prove \(4z\delta^2(z^2 - 3\gamma^2 - \delta^2) = 4z\delta^2(z^2 - 3\gamma^2) - 4z\delta^4\).
+3. **Cofinal Limit Independence Countermodels** (`cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`):
+   - Sequence diagonal witness: \(((n : \mathbb R) + 1) / ((n : \mathbb R) + 1) = 1\) for all \(n \in \mathbb N\).
+   - Proportional schedule witness: \((c \cdot T) / T = c\) for all \(T \ne 0\).
+4. **Conditional Gate G4 Regularized Bridge Interface** (`ConditionalG4RegularizedBridge`):
    - Theorem `ConditionalG4RegularizedBridge.all_defects_zero`: prove that any valid regularized bridge with zero arithmetic anchor forces all represented zero defects to vanish (\(d_j = 0\)).
+
 
 

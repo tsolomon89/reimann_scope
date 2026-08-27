@@ -454,11 +454,38 @@ theorem finite_quadratic_four_term_decomposition (A Z : ℝ) :
     (A - Z)^2 = A * A - A * Z - Z * A + Z * Z := by
   ring
 
-/-- Elementary cofinal limit distinction countermodel:
-    For f(H, T) = H / T, for any fixed H, (H / T) becomes arbitrarily small as T → ∞,
-    whereas under the proportional cofinal schedule H(T) = c * T (c ≠ 0),
-    the ratio f(c*T, T) = c is constant and non-zero for all T ≠ 0.
-    Proves that fixed-truncation limits ∀ H, lim_{T→∞} f(H, T) = 0 do not imply cofinal limit lim_{T→∞} f(H(T), T) = 0. -/
+/-- Complex algebraic 4-term decomposition of quadratic difference under conjugation:
+    (A - Z) * star(A - Z) = A*star(A) - A*star(Z) - Z*star(A) + Z*star(Z). -/
+theorem complex_quadratic_four_term_expansion (A Z : ℂ) :
+    (A - Z) * star (A - Z) =
+      A * star A - A * star Z - Z * star A + Z * star Z := by
+  simp only [star_sub]
+  ring
+
+/-- Exact algebraic identity for radial defect difference numerator:
+    (u - δ²)*u - ((u - δ²)² + 4*δ²*γ²) = δ²*(u - 4*γ² - δ²).
+    When u = z² + γ², this yields the exact numerator factor 4*z*δ²*(z² - 3*γ² - δ²). -/
+theorem radial_defect_difference_numerator (u d2 gam2 : ℝ) :
+    (u - d2) * u - ((u - d2)^2 + 4 * d2 * gam2) = d2 * (u - 4 * gam2 - d2) := by
+  ring
+
+/-- Exact algebraic numerator expansion for second-order radial response coefficient:
+    4*z*δ²*(z² - 3*γ² - δ²) = 4*z*δ²*(z² - 3*γ²) - 4*z*δ⁴. -/
+theorem radial_second_order_numerator_decomposition (z gam d : ℝ) :
+    4 * z * d^2 * (z^2 - 3 * gam^2 - d^2) = 4 * z * d^2 * (z^2 - 3 * gam^2) - 4 * z * d^4 := by
+  ring
+
+/-- Sequence countermodel witness for cofinal limit distinction:
+    For f(H, n) = H / (n + 1), along the diagonal schedule H(n) = n + 1,
+    the sequence is identically 1 for all n, distinct from the pointwise limit 0 at any fixed H. -/
+theorem cofinal_sequence_diagonal_witness (n : ℕ) :
+    ((n : ℝ) + 1) / ((n : ℝ) + 1) = 1 := by
+  have h_ne : (n : ℝ) + 1 ≠ 0 := by linarith
+  exact div_self h_ne
+
+/-- Elementary cofinal limit distinction countermodel (pointwise algebraic witness):
+    For f(H, T) = H / T, under proportional cofinal schedule H(T) = c * T (c ≠ 0),
+    the ratio f(c*T, T) = c is constant and non-zero for all T ≠ 0. -/
 theorem cofinal_schedule_distinct_from_fixed_limit
     (c : ℝ) (T : ℝ) (hT : T ≠ 0) :
     (c * T) / T = c := by
@@ -491,3 +518,4 @@ theorem ConditionalG4RegularizedBridge.all_defects_zero
   exact (list_weighted_sum_nonneg_eq_zero_iff B.weights B.defects B.pos_weights B.nonneg_defects B.lengths_match).mp h_sum_zero
 
 end RiemannScope
+

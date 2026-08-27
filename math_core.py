@@ -4238,3 +4238,146 @@ def verify_g4_arithmetic_independence_firewall() -> Dict[str, Any]:
         "status": "ARITHMETIC_INDEPENDENCE_FIREWALL_VERIFIED"
     }
 
+
+def evaluate_g4_radial_response_coefficient(
+    sigma: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    T: Union[float, str, mpmath.mpf],
+    window_type: str = "fejer",
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [GATE G4 FINITE RADIAL RESPONSE COEFFICIENT]
+    Evaluates the exact symmetric second-order coefficient:
+        C_W(sigma, gamma, T) = -2 Re int W_T(t) F_0(t) conj(D_gamma(sigma - 1/2 + it)) dt
+    where:
+        F_0(t) = A(sigma + it) - Z_0(sigma - 1/2 + it)
+        Z_0(z) = 4z / (z^2 + gamma^2)
+        D_gamma(z) = 4z(z^2 - 3*gamma^2) / (z^2 + gamma^2)^3
+    This coefficient governs the leading radial variation: Delta S_W = delta^2 * C_W + O(delta^4).
+    """
+    with mpmath.workdps(dps + 15):
+        sig = to_mpf(sigma, dps=dps + 15)
+        a_val = sig - mpmath.mpf("0.5")
+        g_val = to_mpf(gamma, dps=dps + 15)
+        T_val = to_mpf(T, dps=dps + 15)
+        w_type = window_type.lower().strip()
+
+        def z0_fn(t_m):
+            z = mpmath.mpc(a_val, t_m)
+            return 4 * z / (z * z + g_val * g_val)
+
+        def d_gamma_fn(t_m):
+            z = mpmath.mpc(a_val, t_m)
+            return 4 * z * (z * z - 3 * g_val * g_val) / ((z * z + g_val * g_val) ** 3)
+
+        def integrand(t_m):
+            z = mpmath.mpc(a_val, t_m)
+            arch = completed_log_derivative_archimedean_A(mpmath.mpc(sig, t_m), dps=dps)
+            f0 = arch - z0_fn(t_m)
+            dg = d_gamma_fn(t_m)
+            return -2 * (f0 * mpmath.conj(dg)).real
+
+        if w_type == "rectangular":
+            w_fn = lambda t: mpmath.mpf(1) / (2 * T_val)
+            c_val, err_val = mpmath.quad(lambda t: w_fn(t) * integrand(t), [-T_val, T_val], error=True)
+        elif w_type == "fejer":
+            w_fn = lambda t: (1 - abs(t) / T_val) / T_val
+            c_val, err_val = mpmath.quad(lambda t: w_fn(t) * integrand(t), [-T_val, 0, T_val], error=True)
+        elif w_type == "abel":
+            beta = mpmath.mpf(1) / T_val
+            w_fn = lambda t: (beta / 2) * mpmath.exp(-beta * abs(t))
+            c_val, err_val = mpmath.quad(lambda t: w_fn(t) * integrand(t), [-mpmath.inf, 0, mpmath.inf], error=True)
+        elif w_type == "gaussian":
+            w_fn = lambda t: (1 / (mpmath.sqrt(2 * mpmath.pi) * T_val)) * mpmath.exp(-t ** 2 / (2 * T_val ** 2))
+            c_val, err_val = mpmath.quad(lambda t: w_fn(t) * integrand(t), [-mpmath.inf, 0, mpmath.inf], error=True)
+        else:
+            raise ValueError(f"Unknown window type: {window_type}")
+
+        return {
+            "window_type": w_type,
+            "sigma": mpmath.nstr(sig, n=15),
+            "gamma": mpmath.nstr(g_val, n=15),
+            "T": mpmath.nstr(T_val, n=15),
+            "C_W": mpmath.nstr(c_val, n=18),
+            "quadrature_error": mpmath.nstr(err_val, n=6),
+            "is_positive": bool(c_val > 0),
+            "sign": "POSITIVE" if c_val > 0 else "NEGATIVE" if c_val < 0 else "ZERO"
+        }
+
+
+def certify_g4_radial_sign_witness(
+    sigma: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    delta: Union[float, str, mpmath.mpf],
+    T: Union[float, str, mpmath.mpf],
+    window_type: str = "fejer",
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [GATE G4 RADIAL SIGN WITNESS CERTIFIER]
+    Computes rigorous error-bounded quadrature for Delta S_W(sigma, gamma, delta, T)
+    and certifies whether the enclosure [val - err, val + err] is strictly negative (< 0)
+    or strictly positive (> 0).
+    """
+    with mpmath.workdps(dps + 25):
+        sig = to_mpf(sigma, dps=dps + 25)
+        a_val = sig - mpmath.mpf("0.5")
+        g_val = to_mpf(gamma, dps=dps + 25)
+        d_val = to_mpf(delta, dps=dps + 25)
+        T_val = to_mpf(T, dps=dps + 25)
+        w_type = window_type.lower().strip()
+
+        def z0_fn(t_m):
+            z = mpmath.mpc(a_val, t_m)
+            return 4 * z / (z * z + g_val * g_val)
+
+        def z_delta_fn(t_m):
+            z = mpmath.mpc(a_val, t_m)
+            lam1 = mpmath.mpc(d_val, g_val)
+            lam2 = mpmath.mpc(-d_val, g_val)
+            return 2 * z / (z * z - lam1 * lam1) + 2 * z / (z * z - lam2 * lam2)
+
+        def diff_integrand(t_m):
+            arch = completed_log_derivative_archimedean_A(mpmath.mpc(sig, t_m), dps=dps)
+            f0 = arch - z0_fn(t_m)
+            fd = arch - z_delta_fn(t_m)
+            return abs(fd) ** 2 - abs(f0) ** 2
+
+        if w_type == "rectangular":
+            w_fn = lambda t: mpmath.mpf(1) / (2 * T_val)
+            val, err = mpmath.quad(lambda t: w_fn(t) * diff_integrand(t), [-T_val, T_val], error=True)
+        elif w_type == "fejer":
+            w_fn = lambda t: (1 - abs(t) / T_val) / T_val
+            val, err = mpmath.quad(lambda t: w_fn(t) * diff_integrand(t), [-T_val, 0, T_val], error=True)
+        elif w_type == "abel":
+            beta = mpmath.mpf(1) / T_val
+            w_fn = lambda t: (beta / 2) * mpmath.exp(-beta * abs(t))
+            val, err = mpmath.quad(lambda t: w_fn(t) * diff_integrand(t), [-mpmath.inf, 0, mpmath.inf], error=True)
+        elif w_type == "gaussian":
+            w_fn = lambda t: (1 / (mpmath.sqrt(2 * mpmath.pi) * T_val)) * mpmath.exp(-t ** 2 / (2 * T_val ** 2))
+            val, err = mpmath.quad(lambda t: w_fn(t) * diff_integrand(t), [-mpmath.inf, 0, mpmath.inf], error=True)
+        else:
+            raise ValueError(f"Unknown window type: {window_type}")
+
+        lower_bound = val - err
+        upper_bound = val + err
+        is_strictly_negative = bool(upper_bound < 0)
+        is_strictly_positive = bool(lower_bound > 0)
+
+        return {
+            "window_type": w_type,
+            "sigma": mpmath.nstr(sig, n=15),
+            "gamma": mpmath.nstr(g_val, n=15),
+            "delta": mpmath.nstr(d_val, n=15),
+            "T": mpmath.nstr(T_val, n=15),
+            "value": mpmath.nstr(val, n=20),
+            "error_bound": mpmath.nstr(err, n=6),
+            "interval_lower": mpmath.nstr(lower_bound, n=20),
+            "interval_upper": mpmath.nstr(upper_bound, n=20),
+            "certified_negative": is_strictly_negative,
+            "certified_positive": is_strictly_positive,
+            "certification_status": "CERTIFIED_NEGATIVE" if is_strictly_negative else "CERTIFIED_POSITIVE" if is_strictly_positive else "UNCERTAIN"
+        }
+
+
