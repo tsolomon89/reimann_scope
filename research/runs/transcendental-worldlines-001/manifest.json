@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "same_object_coordinate_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-27T14:53:35.716656+00:00",
-  "completed_at": "2026-08-27T14:53:36.357349+00:00",
+  "started_at": "2026-08-27T19:13:53.745905+00:00",
+  "completed_at": "2026-08-27T19:13:54.318605+00:00",
   "status": "complete",
-  "git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
-  "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+  "git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
+  "producing_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
   "git_dirty": false,
   "experiment_spec_sha256": "af70c107e93f687efeedade71ee131668d4cfdb89bbd29fdf652e3343fb3dd63",
   "precision": {
@@ -66,9 +66,9 @@
     "algorithm_version": "2.0.0"
   },
   "source_code_hashes": {
-    "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
+    "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b",
+    "math_core.py": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
@@ -86,7 +86,7 @@
   "code_modules": [
     {
       "path": "certification.py",
-      "sha256": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938"
+      "sha256": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832"
     },
     {
       "path": "converter.py",
@@ -94,7 +94,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b"
+      "sha256": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643"
     },
     {
       "path": "reference_data.py",
@@ -144,47 +144,47 @@
     }
   ],
   "consumed_certificates": [
-    "002a73ad72133cc37e23d3963604d406ea26d0e8630a17322807a259f3952acc",
-    "058275ff9d94dd1786b7dcf910df6d6911089a04ad22d30c44535ecd37ece306",
-    "06a9c1debccc209af7935269049f4cb479c015c0742d8fb3b061fe5db4b4217a",
-    "1074c000cbca2a8d29ae35db27c48bb7cc1795cd57c5fc0ad7e98ec7091ab7e7",
-    "1df8ff9041535242be9718d7f83e95abf3dcdb644eb6869d072e56e6d273a071",
-    "23a10c7aa2967fb758833b6baa84e50cdfebea2860e243df4ec9620305d09dff",
-    "23d76709053e2b1e06aeb1e570918c8e32bbbe2e943da6f6c82e146d4333e979",
-    "26745768db2fad80793e78905be623239fe229f0431f5ea4e06cfa3a3a51a3ea",
-    "31cb159e7d4aad71dfaf63bc79052bea49d954d6ff6751d43d0e12bcfd3adc7f",
-    "3cfba6999ef2169b3ca9461e8eeb001deedfd82b5610896f7b218461c1ea645b",
-    "3f10db8ca43975b6eb5fd273262db9e6fcc7f82f2b070ca0f9daa7f1b3ebc87b",
-    "457f3b397d68a130554c68e023d3ac2181547bf2458f65418d4dce7422308672",
-    "58cbd36c3b61082a0bc73eeff5162948070d76e0a8064a9cc47213c7c9401f97",
-    "5bdf05a8a9d92da6f11c0a476e5d963890959efd32ff9be6e183af09f5b2e756",
-    "63df0e53ba30edfeb7ad647417675978cd49a12d57184f90e38331857835dda4",
-    "70cadac12358dc81c28e7c2669cc7234f2892225d6dfbf2054403823ea6f66a1",
-    "746f558a72843b7e323325e879489d80220a03e27dab86afaa8f69fc0124c961",
-    "7543a62a7fa1039d75da012967c77155330dfe42841837d6844f703bdf6e0db9",
-    "75dcd2e27e3369e16a6f7e0e8396db6ac8a0d75c56c2dc62e05f228f98b9e5dd",
-    "820648c62e724bdf4f842b52cbfb3ea4fc603c1f3fe9edaa6092196914d529cd",
-    "8429c2695c03267e22bf59df49d9686afc07ed4540f2aa090eeae5ae889ad74e",
-    "90e26aa8f5af391890dec2bb5b9e0f8d2fff6d4c5c91e25e2a509f24a3201920",
-    "97650553a42651c50e387eae1ff272e92a4623e3445e1eced15882066bfd6c95",
-    "9b3b673285263f0c95902730ed94d1b47cdd73ff87d62bfd11c7127961f4d5fd",
-    "9d13779397eee6fc5f69ccb7bb4aa03b7fdc0ee31344ee6f68ebdd84344dd705",
-    "a17235da92c21aacfa289ac5ec570e93f3f8906fe59da519e83c9b2a143ac2b8",
-    "b90ef92403ac21add2077b42cd2cf68887e9c0267b22c21aa6d1770d436bf543",
-    "ba7d2968f6b55801949571bd83235fb7ea4c0fbcbd82c55db3a7d437fda33289",
-    "ccb0623ba451cc6a40ef219e4e17ec2778a378bf1b18c850e43d3ba87be42989",
-    "e2f0a01d04d0b5bf6c2147668b49c35b99e7ac7034a854db7ba133f1e094ffec",
-    "e5a094bb809d7a975b91e023c7079e249e39eec5f89a1fba03e82ea2a9f990d1",
-    "e72dff7727f1695b4cc340e67965cf04026a4194089c100fe6a4cba4e8be3c71",
-    "ee58d1dce1643fc5981dbcc79f3766e2228a1ea5a53bb0db85a75e8cccde4792",
-    "f68e7defb90afa484aa83f720a58047f113607e3d00225b5bd0d7b05e8b13876",
-    "f7dc6040fadfd8cf1c0f811fceedd9d7200c48570ce4c7c1e268606e37aa91aa",
-    "fc679292644fe77d584bdbdc76a1356d2e67bb1ab8763edbf7117ab1532f91c6"
+    "08ad6290bd2b89d4ac28fb09d868c86920bff8b7ce09944bdbda7c63d7f1da0f",
+    "0d2dc053a5418bf7a2ed01dd48d31c3ab8910f07d462e16cc21d1abb2d300ec3",
+    "1c0597f4c57614d9afb1bfd9fba79448e765c66984ce54e813723bec0b5fe618",
+    "2038d99a0ca7d12b0a8f2e13f4336b9a73174c641a2568b02b192b95b29709aa",
+    "22bf06bf7ea09769b403adea759c5d3f35378712953bb7ba3692ad3f3c26f918",
+    "22cbac66cfb8d1bfb6932139275d4ecf421f613a801c6fd55bdec54571eb9de2",
+    "2ac7c7d86596c99f40b61cb4a636118dabb06f1c77a4d8d76a341e01a710633b",
+    "3310dc9c817f035771613925c3c76664f368863243983b4293649a24d5223beb",
+    "38645904f47121c48cbb8073b50d97271bc751707a37d8c9378b01e5c0af6287",
+    "40f6e7ece5c7ca57d7558ea96dc22ca2f501ad771c8a1ae2514d05d71513d331",
+    "49028afe27b482042171b66fa1a11e4927ab3b38236d3a5d32d75295a8cc2acf",
+    "4c71fc029382592a30966a0d8c01a97e6da1a4741a470f6c4172726833a1f28a",
+    "61c237ec76a618eee1cd8bcfa61fe9cf09924922ad5a79f8c7924a7dc3945e45",
+    "63aa97ab7a3cd9118edf49cad2ae42a6eb193a19944c1d5d64c907c2f5f8ffae",
+    "73b565f1a47c86d24f7c49ab4fb9dec974e2e2288752f034126c23d4292b0688",
+    "77ed928d56710b6cbd79a8efff3f211edf2ae5ea2dc50cc44b0c86c27dd1282e",
+    "83924075829977b2375d2a0b5bd08b086b33fbeebe047803c6f9dc30aceeb290",
+    "889645e3fe6b8b04d3590f7f24856e5677afb3f833f790fde89d2c22adf58c35",
+    "8957003d2b6abdc1bca4d6ba13624ee56cc5ddccdefeec886de70440762150ca",
+    "95b874ed5c2d4dfe47cad707ba7d22f2b8352f59618fd6f32fbd419f06a000dd",
+    "a49ddc2a2a9d892f4e91d82b2fa6d37ee1873c2431af81a8d6712c38acb551d6",
+    "a73373dbc099bbd412ab3a209334413fe53082c5c651dc279f5e2ac892de01ce",
+    "adc7c40f02f1ee018057cdb2d9ea2338ccf8813db66d84276e636ff715aded1b",
+    "cb966f0e7362c8b7afca91cf1edb0a444a0b6779726ed462cb04f015dc299972",
+    "cf6645e5f2f2bee1e155570ba6375bd334ecf6de41ef3254625b3002d625dba4",
+    "d92b5c834d4ddd170c95afcbff33dd0f151e5b8b3a73cbebea57e55576dd1652",
+    "df5ef78c39f23eb10c38a36ee35fc3f524edb606fbfb4f9854f1b9f42d213daf",
+    "e355cfddffef4121d3f2760ccaed08a0b61e36ea54b9f1ac57a7c07ca89e1270",
+    "e68e76f144e2154652ea04311dfa732842193f64335f612640dc0e2d2f897e44",
+    "e964e9b9e03c217315e3d55a5608939697f8c49c992be40341f5ee745e09ea9e",
+    "e9d23caa9a5fefca655cc8cf7e0d30c39a2a2ade4d5f285043ee69d923f20e82",
+    "ee71a60b894f45cf59e2e53d9a2620c5dcd510990c8819600567f480ecace7d2",
+    "f4cb9a21352596b7d45c1146a7f2cecf67000204e1f7dd8c94a74bbc837a3bb1",
+    "f84a138f6f2773be7fc2004fb67c1eb7cfd0d991eec30b8d5b3929d3ea451167",
+    "f95347159882f9b3a95e62e1c8edcec8590ab4c5f6602c0aa8261ccee5f2743f",
+    "feff8074c536bd42d4561fda0bd530f0fc5277a8f6f9e0e421c68e9a00c375f6"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "8653097e16db27208a166eabd9bf25abd720b59af85ce3399ad2e09bd807a9cb"
+      "sha256": "7d47570fcc4ac59ffbfa45a1eb9414ac3a86018b4bebd9732dd48bc82c7d82be"
     },
     "summary_json": {
       "path": "summary.json",
@@ -192,19 +192,19 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "3ef5e9bbafc6162c34dc8e3f39c0ccf1347d46a64439394b99770f2b7e9292f5"
+      "sha256": "734d9d66a91524e19e6c5a9834757b9ad8d0793c47bad2a4f5fe389f2c7d565b"
     }
   },
   "execution_provenance": {
-    "results_sha256": "8653097e16db27208a166eabd9bf25abd720b59af85ce3399ad2e09bd807a9cb",
-    "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+    "results_sha256": "7d47570fcc4ac59ffbfa45a1eb9414ac3a86018b4bebd9732dd48bc82c7d82be",
+    "producing_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
     "git_dirty": false,
-    "started_at": "2026-08-27T14:53:35.716656+00:00",
-    "completed_at": "2026-08-27T14:53:36.357349+00:00",
+    "started_at": "2026-08-27T19:13:53.745905+00:00",
+    "completed_at": "2026-08-27T19:13:54.318605+00:00",
     "source_code_hashes": {
-      "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
+      "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b",
+      "math_core.py": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
@@ -237,7 +237,7 @@
     "code_modules": [
       {
         "path": "certification.py",
-        "sha256": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938"
+        "sha256": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832"
       },
       {
         "path": "converter.py",
@@ -245,7 +245,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b"
+        "sha256": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643"
       },
       {
         "path": "reference_data.py",
@@ -297,10 +297,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "f707311b66dfd83baafdf9815196c52d410b3368f03772d653494ce5bb0bdaee",
-    "readme_sha256": "3ef5e9bbafc6162c34dc8e3f39c0ccf1347d46a64439394b99770f2b7e9292f5",
+    "readme_sha256": "734d9d66a91524e19e6c5a9834757b9ad8d0793c47bad2a4f5fe389f2c7d565b",
     "diagnostics_sha256": null,
-    "summary_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
-    "summarized_at": "2026-08-27T14:53:36.357349+00:00",
+    "summary_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
+    "summarized_at": "2026-08-27T19:13:54.318605+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",

@@ -5,7 +5,7 @@
   "evidence_status": "CERTIFIED_NEGATIVE_ARB_BALL",
   "witness_id": "WIT-02",
   "window_type": "fejer",
-  "mathematical_claim": "Compact Fej\u00e9r windowed radial difference Delta S_Fejer(5.0, 14.0, 0.49, 16.8) is strictly negative (< 0) via certified outward-rounded Arb ball arithmetic over [-16.8, 16.8].",
+  "mathematical_claim": "Compact Fej\u00e9r windowed radial difference Delta S_Fejer(5.0, 14.0, 0.49, 16.8) is strictly negative (< 0) via certified outward-rounded Arb ball arithmetic directly evaluated over [-16.8, 16.8].",
   "parameters": {
     "sigma": "5.0",
     "gamma": "14.0",
@@ -25,19 +25,19 @@
     "interval_upper": "[-0.000154203238976144585428040008488275471360868062081204848789797 +/- 4.61e-64]",
     "strictly_negative": true
   },
-  "evenness_reduction_derivation": "Integrand f(t) = |A(sigma+it) - Z_delta(sigma-1/2+it)|^2 - |A(sigma+it) - Z_0(sigma-1/2+it)|^2 satisfies A(sigma, -t) = conj(A(sigma, t)) and Z_delta(sigma, -t) = conj(Z_delta(sigma, t)), hence |A(sigma,-t)-Z_delta(sigma,-t)|^2 = |A(sigma,t)-Z_delta(sigma,t)|^2. Direct symmetric integration over [-T, T] is evaluated in certified Arb balls with 50,000 subintervals.",
+  "integration_method": "Direct certified outward-rounded Arb ball Riemann integration over full symmetric domain [-T, T] with 50,000 subintervals without assuming evenness reduction or reflection as an operational premise.",
   "formal_theorem_reference": "RiemannScope.additive_reference_subtraction_invariance",
   "precision_dps": 60,
   "library": "python-flint",
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+  "producing_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
   "source_code_hashes": {
-    "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
+    "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
-    "math_core.py": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b",
+    "math_core.py": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643",
     "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
     "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
@@ -59,5 +59,5 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "certificate_hash": "955bce38ddd8380f44c900b6be4d875a526646b751eba316e3454e88b75ca48f"
+  "certificate_hash": "ae1d416db0430f2513268d8af02b0638cf3ccd82671be9be438f113021a5412c"
 }

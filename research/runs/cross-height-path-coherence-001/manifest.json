@@ -6,11 +6,11 @@
   "epistemic_class": "observational_pattern",
   "object_relationship": "actual_cross_height_comparison",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-27T14:41:15.244759+00:00",
-  "completed_at": "2026-08-27T14:41:41.819797+00:00",
+  "started_at": "2026-08-27T19:01:52.280128+00:00",
+  "completed_at": "2026-08-27T19:02:17.149071+00:00",
   "status": "complete",
-  "git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
-  "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+  "git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
+  "producing_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
   "git_dirty": false,
   "experiment_spec_sha256": "64b4fe387d81a1a374d963cdc977806ff3ecf79e2bdaed496a207b96f2028166",
   "precision": {
@@ -73,9 +73,9 @@
     "algorithm_version": "2.0.0"
   },
   "source_code_hashes": {
-    "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
+    "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b",
+    "math_core.py": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
@@ -93,7 +93,7 @@
   "code_modules": [
     {
       "path": "certification.py",
-      "sha256": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938"
+      "sha256": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832"
     },
     {
       "path": "converter.py",
@@ -101,7 +101,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b"
+      "sha256": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643"
     },
     {
       "path": "reference_data.py",
@@ -151,23 +151,23 @@
     }
   ],
   "consumed_certificates": [
-    "002a73ad72133cc37e23d3963604d406ea26d0e8630a17322807a259f3952acc",
-    "076fc857a529b005af2916318a0ab2eb22bb7d612b0907c35d03629ca7b63a69",
-    "0d28e09433f59c5cd2bfdd7fc2bfefe6fab185c9a025781fd3a1441f08f8b922",
-    "3d7c3b58aea7474d403280d54d547e0d3271334dd6bdf5414e3d0e2af7f6e3ba",
-    "457f3b397d68a130554c68e023d3ac2181547bf2458f65418d4dce7422308672",
-    "4d9e3d06c70e904044ba7cafb7054ccda010688fb32e82e2976f90adac2348e0",
-    "a5f1a3482c15a9338b3ecf712198837a90744ee8aad9e843fd78c3c0e545b74d",
-    "af787ce6abbc59da5cce00abbc121bf9f68a751fe52fced3a0e6276310f3b43b",
-    "bfcc3b6e11e3ccf8559cd924f05f3409ec7c09a5e06add080f9cb08bd444e3e7",
-    "cae242006d6c6a0487b9b7dc1c4fcb8d46ebdc93818ec2e9304feb00de663fc6",
-    "f672075de0c3fde798e8fcf007ad34b5f41bfc3cb43ec476ce3c89bc477f53d7",
-    "f7dc6040fadfd8cf1c0f811fceedd9d7200c48570ce4c7c1e268606e37aa91aa"
+    "10cdcc6eda42b0f08e76d5c721e63f3701135f32d1fc5bcb0e21f23a0c79878d",
+    "1676ab3f6917a062c5639ee696c11de5bef776b2b34d83cbd0a4b4cec11407ef",
+    "2a534e99675c596f4911aa23ff5afa593f5e03354651904d8825d00c20e4ad6c",
+    "3beb17d10159b6ebc79204f58709776ef115190bd1731b8000b3feace8f03577",
+    "4c71fc029382592a30966a0d8c01a97e6da1a4741a470f6c4172726833a1f28a",
+    "a85f2827374fe8ca81a3a0ee133b05157e39703ef969536d174aff93a9172fcb",
+    "aefb9dca809ee39cdd18604b721e1f340732ed0ba1ba3056594a3cf5876b3286",
+    "bb8fdce8e88bd6ddbe607df05edad233f242bed501c5e3a95ad72be273bc0054",
+    "e4e14a914546d066c08ed851d09574b1204749885082c87e0cf26ff51fb20262",
+    "ee71a60b894f45cf59e2e53d9a2620c5dcd510990c8819600567f480ecace7d2",
+    "f3db46605f4eaefe1baab27b5239a24930a0336b7ec6b469266b0602c05bc8eb",
+    "f95347159882f9b3a95e62e1c8edcec8590ab4c5f6602c0aa8261ccee5f2743f"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "872be7df7d14908bf04cfb166fbf455ff5595c69e2bb1643eaad94a6d64564b9"
+      "sha256": "f7d85dc1dc4ba00b71b23e9f077b46fc58351383b13ed1d3cef955279c781506"
     },
     "summary_json": {
       "path": "summary.json",
@@ -175,19 +175,19 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "662b3b8ba39b06b0b6f37e1a018244719690d3b8676ba04c1323f3142cc1b41c"
+      "sha256": "9dab20fe8b664269f9f647a6623dba725390ee897a41f502e1f721e6df21adf9"
     }
   },
   "execution_provenance": {
-    "results_sha256": "872be7df7d14908bf04cfb166fbf455ff5595c69e2bb1643eaad94a6d64564b9",
-    "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+    "results_sha256": "f7d85dc1dc4ba00b71b23e9f077b46fc58351383b13ed1d3cef955279c781506",
+    "producing_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
     "git_dirty": false,
-    "started_at": "2026-08-27T14:41:15.244759+00:00",
-    "completed_at": "2026-08-27T14:41:41.819797+00:00",
+    "started_at": "2026-08-27T19:01:52.280128+00:00",
+    "completed_at": "2026-08-27T19:02:17.149071+00:00",
     "source_code_hashes": {
-      "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
+      "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b",
+      "math_core.py": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
@@ -220,7 +220,7 @@
     "code_modules": [
       {
         "path": "certification.py",
-        "sha256": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938"
+        "sha256": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832"
       },
       {
         "path": "converter.py",
@@ -228,7 +228,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "7a7ea80f0f218f227c3425451632aa799ed01fde6e619aa9f454a2124fdd2e0b"
+        "sha256": "27f899f8b34abbb2615be9e1d25928c1bc062a4ed0c0b0245abdb2979394b643"
       },
       {
         "path": "reference_data.py",
@@ -280,10 +280,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "b931326d6057544eae1e18e2e6beb49c0d6108a6ba8a8cd4791e6176c28b0e48",
-    "readme_sha256": "662b3b8ba39b06b0b6f37e1a018244719690d3b8676ba04c1323f3142cc1b41c",
+    "readme_sha256": "9dab20fe8b664269f9f647a6623dba725390ee897a41f502e1f721e6df21adf9",
     "diagnostics_sha256": null,
-    "summary_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
-    "summarized_at": "2026-08-27T14:41:41.819797+00:00",
+    "summary_git_commit": "caa417d025f3ca5242cd2c4dfcf00a8d690bd984",
+    "summarized_at": "2026-08-27T19:02:17.149071+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
