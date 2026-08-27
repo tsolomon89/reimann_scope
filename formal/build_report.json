@@ -4,12 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "b7ff2aa03a63fbdb15e10cba3ebdb87156362e8b",
-  "timestamp": "2026-08-26T15:12:34.701866+00:00",
+  "producing_git_commit": "ac1ba96958ea0affd980f8a1c78dfb8bc285fd72",
+  "timestamp": "2026-08-27T05:52:13.771853+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 55,
-  "total_theorems": 55,
+  "project_theorem_declarations_compiled": 59,
+  "total_theorems": 59,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "0eb58146de59fca0e6f55b74200233a3f22a0148c03971b2f814ff3d95055341",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -21,7 +21,7 @@
     "formal/RiemannScope/ZeroCharacter.lean": "cb35589468a974beac9cfd1979f4c889fb5e7769f98004143ffa69e58ff23acb",
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
-    "formal/RiemannScope/ArithmeticBridge.lean": "8406831a4b32b32b8a0a275096d6d0597007e3ee3f98bd429cdc9bef4334d03c"
+    "formal/RiemannScope/ArithmeticBridge.lean": "904b1beee5b076d90b7743da560611d02b54e34825854e252ddb1b43f350375d"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
@@ -30,7 +30,7 @@
     "scripts/build_formal.py": "ddac989dcb014c313a2fbe470101fed810694df01f7e3a65e1467d24a2ad4208",
     "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef"
   },
-  "build_stdout": "\u00e2\u0153\u201d [1498/1500] Built RiemannScope.ArithmeticBridge\n\u00e2\u0153\u201d [1499/1500] Built RiemannScope\nBuild completed successfully.",
+  "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "d3d45e2eb5de2488af852cb2859c6cf558e3ad605352757c2091ee689ae6a45d"
+  "report_hash": "3e6e5bd5998e3deb27fa070f86a6d2af2939699f812f728b14565642f326d684"
 }
