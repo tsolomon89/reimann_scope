@@ -41,7 +41,7 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "02955a091f9df252f2be454aaaf1c0be566bbe39",
+  "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
   "source_code_hashes": {
     "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
@@ -68,11 +68,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-27T14:06:51.355116+00:00",
+  "created_at": "2026-08-27T14:40:37.155370+00:00",
   "invalidation_conditions": [
     "zeta_eval_nonzero",
     "derivative_enclosure_contains_zero",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "c8099c43308f3b664bc1cc06fece681e9573381e41a0d13987f9d7b6d1f50020"
+  "certificate_hash": "afab9c2e19a5bdf64d4416786a1b9c4d7aaa8c29c1e5e5ebe4ce1382fab87387"
 }

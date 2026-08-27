@@ -11,11 +11,11 @@
   "zero_count": 5,
   "all_zeros_simple": true,
   "constituent_zero_hashes": [
-    "b851f1914c46949fe004369330e31659225ba62a8d16bad637049de70f624d88",
-    "6e7ad27bda469a612e6b86595d11a4580c5b196dda72ce673463123f3b928253",
-    "c59165463529000fc9ae94847ab018842678231cbf183c9d535a7c319561ad88",
-    "d69cbf0de773aceb3867aa3217e203720fdde0033d9bc29f5ccdde952506b75f",
-    "6768a95944c3272222207d5bba5b655cb598bc4ffed5ff6a08aed45ac2e15e40"
+    "f672075de0c3fde798e8fcf007ad34b5f41bfc3cb43ec476ce3c89bc477f53d7",
+    "a5f1a3482c15a9338b3ecf712198837a90744ee8aad9e843fd78c3c0e545b74d",
+    "076fc857a529b005af2916318a0ab2eb22bb7d612b0907c35d03629ca7b63a69",
+    "fb37717c0c7893cde0c7c381cd0423e0bef2085f070963b83c20b017e9ece6ce",
+    "b763f5ad207de8d4d5b6830f8c0b9d102560328cf2749d66a9ce4271555ad9af"
   ],
   "endpoint_bounds": {
     "t_min": "235.1088169223622532215900013441163834345333614833774800319668848633796525427704400946017209446938220",
@@ -32,7 +32,7 @@
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "02955a091f9df252f2be454aaaf1c0be566bbe39",
+  "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
   "source_code_hashes": {
     "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
@@ -59,11 +59,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-08-27T14:06:50.017528+00:00",
+  "created_at": "2026-08-27T14:40:35.774600+00:00",
   "invalidation_conditions": [
     "constituent_zero_hash_mismatch",
     "turing_endpoint_count_mismatch",
     "source_code_hash_mismatch"
   ],
-  "certificate_hash": "1a61f64eab751f57f88c6cbcf181b6b0e94768bcf1388ff435cf842c04de06e5"
+  "certificate_hash": "c2c1582d31058e011af28a0fd0f6bf9f79d1375d359449f9071719046f284ece"
 }

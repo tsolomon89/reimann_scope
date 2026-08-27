@@ -6,11 +6,11 @@
   "epistemic_class": "observational_pattern",
   "object_relationship": "actual_cross_height_comparison",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-27T14:07:30.290428+00:00",
-  "completed_at": "2026-08-27T14:07:56.126422+00:00",
+  "started_at": "2026-08-27T14:41:15.244759+00:00",
+  "completed_at": "2026-08-27T14:41:41.819797+00:00",
   "status": "complete",
-  "git_commit": "02955a091f9df252f2be454aaaf1c0be566bbe39",
-  "producing_git_commit": "02955a091f9df252f2be454aaaf1c0be566bbe39",
+  "git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+  "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
   "git_dirty": false,
   "experiment_spec_sha256": "64b4fe387d81a1a374d963cdc977806ff3ecf79e2bdaed496a207b96f2028166",
   "precision": {
@@ -151,23 +151,23 @@
     }
   ],
   "consumed_certificates": [
-    "02ea09611524a3cea42d846b61b44a72cab3fdac7d38f014a04b9d22fb8af10c",
-    "0df4ed20238bf4eab2a63692001afec10bbd7c86b3dd16377d764acda1eedd1d",
-    "257664b0712ca6bf5ac3b342f74d894dd8485ede63e9819f3148d1e567f71631",
-    "5f96b3c616fdcdf79527cd9a764f91fc7f16c32270ed399ff77d2064e9c01ac6",
-    "6e7ad27bda469a612e6b86595d11a4580c5b196dda72ce673463123f3b928253",
-    "78a56d79651d3433a59cf0d22b3fbf967bcff770724bae28e33887d698463482",
-    "7ffbe638fcbf965693852e97154bde6de5571325757912633d647648e080d723",
-    "ab1d015f5fd415068344234488107dd366d10d85e1f89f1fc85d2a6d10f9830f",
-    "b7d7bf668ca6abc8bf4f98bc295970a859e923ef5c325c7b73ae9e431e3c6890",
-    "b851f1914c46949fe004369330e31659225ba62a8d16bad637049de70f624d88",
-    "be527e7c7d548260eecb4950e0d77ec1c86f67248d733ef0b9fe550c93a4c66b",
-    "c59165463529000fc9ae94847ab018842678231cbf183c9d535a7c319561ad88"
+    "002a73ad72133cc37e23d3963604d406ea26d0e8630a17322807a259f3952acc",
+    "076fc857a529b005af2916318a0ab2eb22bb7d612b0907c35d03629ca7b63a69",
+    "0d28e09433f59c5cd2bfdd7fc2bfefe6fab185c9a025781fd3a1441f08f8b922",
+    "3d7c3b58aea7474d403280d54d547e0d3271334dd6bdf5414e3d0e2af7f6e3ba",
+    "457f3b397d68a130554c68e023d3ac2181547bf2458f65418d4dce7422308672",
+    "4d9e3d06c70e904044ba7cafb7054ccda010688fb32e82e2976f90adac2348e0",
+    "a5f1a3482c15a9338b3ecf712198837a90744ee8aad9e843fd78c3c0e545b74d",
+    "af787ce6abbc59da5cce00abbc121bf9f68a751fe52fced3a0e6276310f3b43b",
+    "bfcc3b6e11e3ccf8559cd924f05f3409ec7c09a5e06add080f9cb08bd444e3e7",
+    "cae242006d6c6a0487b9b7dc1c4fcb8d46ebdc93818ec2e9304feb00de663fc6",
+    "f672075de0c3fde798e8fcf007ad34b5f41bfc3cb43ec476ce3c89bc477f53d7",
+    "f7dc6040fadfd8cf1c0f811fceedd9d7200c48570ce4c7c1e268606e37aa91aa"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "26204530f606d6ccf289e0dff21248706e6bc0e3e33549161de18d9846370b8d"
+      "sha256": "872be7df7d14908bf04cfb166fbf455ff5595c69e2bb1643eaad94a6d64564b9"
     },
     "summary_json": {
       "path": "summary.json",
@@ -175,15 +175,15 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "b391b7352217f5f0380ce3a6b8abc44a299c46f6057dbb351e5b080295bb3a1d"
+      "sha256": "662b3b8ba39b06b0b6f37e1a018244719690d3b8676ba04c1323f3142cc1b41c"
     }
   },
   "execution_provenance": {
-    "results_sha256": "26204530f606d6ccf289e0dff21248706e6bc0e3e33549161de18d9846370b8d",
-    "producing_git_commit": "02955a091f9df252f2be454aaaf1c0be566bbe39",
+    "results_sha256": "872be7df7d14908bf04cfb166fbf455ff5595c69e2bb1643eaad94a6d64564b9",
+    "producing_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
     "git_dirty": false,
-    "started_at": "2026-08-27T14:07:30.290428+00:00",
-    "completed_at": "2026-08-27T14:07:56.126422+00:00",
+    "started_at": "2026-08-27T14:41:15.244759+00:00",
+    "completed_at": "2026-08-27T14:41:41.819797+00:00",
     "source_code_hashes": {
       "certification.py": "b5cef8e0c8095c95865790fe4dd3b314e9817f6a016cd8960d66594a6ac5d938",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
@@ -280,10 +280,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "b931326d6057544eae1e18e2e6beb49c0d6108a6ba8a8cd4791e6176c28b0e48",
-    "readme_sha256": "b391b7352217f5f0380ce3a6b8abc44a299c46f6057dbb351e5b080295bb3a1d",
+    "readme_sha256": "662b3b8ba39b06b0b6f37e1a018244719690d3b8676ba04c1323f3142cc1b41c",
     "diagnostics_sha256": null,
-    "summary_git_commit": "02955a091f9df252f2be454aaaf1c0be566bbe39",
-    "summarized_at": "2026-08-27T14:07:56.126422+00:00",
+    "summary_git_commit": "a232bba2ce9775899aef129fdcf8366eb543a443",
+    "summarized_at": "2026-08-27T14:41:41.819797+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/cross_height.py": "e50e1823750c41ee08c0ffe0580367dbae8885031e5090598ebe9eef7cab05a3",
