@@ -165,8 +165,13 @@ def generate_all(git_commit: Optional[str] = None) -> Tuple[int, int, int, int]:
         dps=60,
         git_commit=git_commit
     )
+    wit_filename = "witness_g4_fejer_wit02.json"
+    wit_path = os.path.join(WITNESSES_DIR, wit_filename)
+    with open(wit_path, "w", encoding="utf-8") as f:
+        json.dump(wit_cert, f, indent=2)
     witness_count = 1
     print(f"[+] Certified {witness_count} canonical radial sign witness (WIT-02).")
+
 
     report_path = os.path.join(CERT_DIR, "verification_report.json")
     print(f"[*] Updating verification report at {report_path}...")

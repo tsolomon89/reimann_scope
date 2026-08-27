@@ -246,7 +246,7 @@ class TestGateG4RadialResponseCoefficientAndWitnesses:
         """Rigorous certified outward-rounded Arb ball integration for Witness 2 (Fejer)."""
         from math_core import certify_g4_fejer_witness_arb
         cert = certify_g4_fejer_witness_arb(
-            sigma="5.0", gamma="14.0", delta="0.49", T="16.8", n_subdivisions=25000, dps=60
+            sigma="5.0", gamma="14.0", delta="0.49", T="16.8", n_subdivisions=50000, dps=60
         )
         assert cert["is_certified_negative"] is True
         assert cert["status"] == "CERTIFIED_NEGATIVE_ARB_BALL"
@@ -255,6 +255,7 @@ class TestGateG4RadialResponseCoefficientAndWitnesses:
         upper_b = arb(cert["interval_upper"])
         assert upper_b < 0
         assert upper_b < arb("-0.00015")  # Enclosed strictly below -1.5e-4
+
 
     @pytest.mark.slow_numerical
     def test_abel_negative_witness_evidence(self):
