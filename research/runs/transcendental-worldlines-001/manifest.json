@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "same_object_coordinate_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-26T15:25:28.656953+00:00",
-  "completed_at": "2026-08-26T15:25:29.160935+00:00",
+  "started_at": "2026-08-27T06:05:50.497996+00:00",
+  "completed_at": "2026-08-27T06:05:50.999256+00:00",
   "status": "complete",
-  "git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
-  "producing_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
+  "git_commit": "804e3f1fa636fde0208294b413d1e3911b6a5ad9",
+  "producing_git_commit": "804e3f1fa636fde0208294b413d1e3911b6a5ad9",
   "git_dirty": false,
   "experiment_spec_sha256": "af70c107e93f687efeedade71ee131668d4cfdb89bbd29fdf652e3343fb3dd63",
   "precision": {
@@ -68,7 +68,7 @@
   "source_code_hashes": {
     "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b",
+    "math_core.py": "c20dd14d6dd1f0b628d34d36a0e88efa40be7c596fb6a8208dca46216edf05e6",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
@@ -94,7 +94,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b"
+      "sha256": "c20dd14d6dd1f0b628d34d36a0e88efa40be7c596fb6a8208dca46216edf05e6"
     },
     {
       "path": "reference_data.py",
@@ -144,47 +144,47 @@
     }
   ],
   "consumed_certificates": [
-    "01a3b8d7546503d21d32a35f6bfb48be570f57eb8965f5f0a0774d1038fcbdb8",
-    "08b3d6e3674e49bddaf320bb14e9f0c0637366f8cc1c7dde7a1a8f70fd7d1670",
-    "12f75167616d733892b47d5746aafcca0306e55b34111ce0b4411b5f44219dbf",
-    "2330a71d04c02df8e1260e9843e0dae4b8cea292d22c2d22a4222c0641a55770",
-    "27de33b78798b6931f86990ce191fcf020ff92ff95b909c654b03c597c73702d",
-    "28b46d36d30ad9851fe8397acb4ede5c50cc0f2a9bc509d155a39cdeff024b64",
-    "299f9c7e61a87182812a711ecf16a0da8e75a1e84c03fef5c36103b469ef859f",
-    "2d141082d6b1df06e424c106cc49b76e22a1a0dec6184f2f740260688ca8c450",
-    "327cbf2b6f0d9b162262d4ec8a1bea2f9722863f34984d787d00e8e19acbeb73",
-    "33b108f612df67de5219f25b9356ef74c7effe3bf05a5adfd1b7eae8d06c45f3",
-    "437292c97f63bbcdd3b371ffee426b8d1cf6a62616c2c8420ddaf5e2e3a08c86",
-    "49314fa18910e0ca85fc7640e9d37cd3b5db42de729b59b62bd2100b65cb84cb",
-    "577f772ec948d72aee24c46d44d710492d9bd617a61becd86eb34f47b1028405",
-    "6524f31ff3c1f20151974c5337ab366ca07f088d8bff47ad1ecccfa44289d311",
-    "661cf161986cbbd3963e431ec45fa130d046543a62949757906f6053d3e190cf",
-    "68ae20adba090e2012b4f14a6d6f73975322ebdadf79d1b0aa4c61279a1e057e",
-    "6df09252840668697a11e0d90794cceb0424c1313e6612359c0fe24f354aa8fa",
-    "74775754e8acd25ce3f282bed6b16b8e171c709d0dc7e1fec98613e17d8b8e66",
-    "7abbdd5245c3d1f50682deb7357a5dd0bb94fa407ca2ac678d66a574f7227dcc",
-    "7bd214540632622aaaf28bab817516a4d9e86a6d64cbe29d202d8ab0065fd654",
-    "7f4616a97c4df09ccc04ffcff3cab14fd8f61ca7e099f5b219bacaa21d47ddf7",
-    "85bfac36523221cf0bd8ee997acdc458beca2f18f8df1a8efd445180491e2964",
-    "897e400fa6005b0f7917d512d1c7e3d6ed1800bd576556e8eb3a82332373e366",
-    "8c129352e36376fb4a050b7db4f02f7b0a77e07646a10c07fccc0b4cc8948c49",
-    "8d5fde09221bea2fdd9acd27571332bdd762468894be381503e52fccd96f6354",
-    "948ca714b8963a78a716ca6bdd9fc88824ec4dde60ab8e1a3deac29f7a0b3116",
-    "98b447640faa9033dac1b8d9cb8fee04a15eb82a1930f749fd9851cac07ac45e",
-    "9bdd9119e62fca8bae9be2f1d5d30e3e6cc0886b8958477c73de35b2f88e0842",
-    "a301912ef61c5900de0ed13b44d96e579fff2100bf1ee06d74fde3624608c18b",
-    "aaa9ea662955a2c7a0e0175c2d836c66eec80d6975b82b4eb92d4b561e885f1d",
-    "ad719e55498d2eefc598510a59ffb5532398e85365da9211e3bb4b951a5110c3",
-    "af2893f8484445d7063c5796902893a5e58f124f0cb2a4e5e3176257dbb70df8",
-    "c3f9cfd545c5e720538ae8af7aabb514f291e790fad80f59ea4b4b4c88ab9189",
-    "d4e4d50276242718588594313f9986e7352187443e0fe0a47221b025b7468755",
-    "e68566e597e348133d0f3be367ad35bde06fa80edcf90ed0df4bbd24c5c3c0f5",
-    "eaa39479cad474053283db8773c172976cb70133fcf9a971ece8febbc9d4a4bf"
+    "04f04228cc8477aa5087dc5bf09ba3b582a1bb58d083af148b1648347f967a7f",
+    "0f43c113d767d3984559b1e14b0c400d60d90cff8d7cb6ba34927f7518c6d31e",
+    "102f4b06a8e8923fbef4969e0d7d7536738288ecba0170276548f52d6ddae26d",
+    "16788d4c2bf1a018da77c81a08a0095a516f49f1ec88180e5a92dbf040d0d967",
+    "1c58518b43922ea3128dd24344ed94fb167437eefdda36934cd47aec802868f5",
+    "23134bf3763dae5e62fff007348cfe2d18cc17a1e7692def4222eeab3c8da1df",
+    "3131af588eb16564cfd98fbb7c439dac1d861a6c09d5e1b513fa0b3f7dd99f7b",
+    "31ed18ba2d2fd22ef188f46dfe27dd5f61f6a88914978ee225d266790c51a609",
+    "3fe764879d72448e39c19e4e8d0f352f9537926676e0829f9f95fa62e73703c9",
+    "4046fb4c937998da4cdb0d7ce4550ecb8458391142875bf62bb5e200facaf5db",
+    "414e18e5962b7eabe7a4cf7d7194c920c87b51bb7f5d9473f6ca49d61406ab3a",
+    "4afdae1220ac02b522ccd74f4f8016f5c9c2a1f60f58b4d20b31dff08dbf8537",
+    "51a44ff9608ec6230287054908f624dd3256ec63046ba3bbf1e0a6a3e475f643",
+    "61768566a976d7487064f401587959bfe1b8baca2efa07e18b2d63f26d7cfb05",
+    "766740563e99c462674ba86f85244a6b925624e1cdd303fc61f2ae6ee6c21c2c",
+    "7accf2840735106e81e0e2327a35f578ec29addc347b12073403768a397e6934",
+    "7e89686cdf2ecbe5fab25b3f4cd13d1b7438d1eeda0193d62492070e491db888",
+    "8299cb9ea51330a3c98e006b161adaf06f52404a1b8e56c225705145dbb93434",
+    "86947e016cb248220f2a7ff7c21dbd3b602e737dbf7093c913dff7da02a71777",
+    "8affa7d367bf504d414d406e1cc900ec72b5b62132bf56de92bffa368355465b",
+    "8e1238bdd97b0ef2eb41e9d63356ccfc1f05d9409993733d816af27ae08ab6a7",
+    "a1675a8be539c2ff90888353fa7fef350c0ec3a9b47a32b2c8c4294f0c29d14b",
+    "a6524596892766d1628701c65b6bebe97ea5c4195b25af1a012cf6121623eea8",
+    "a990fb3ead1917dd5ddb4b610d0c3a8b4cf9eb9771d3c0fdee575c26a302f5eb",
+    "aa248f5a44f4e7ffcf85c01581c38b979ca12c1275211f25863f936c0c482880",
+    "ae257124f6ddc360cba57593b88669574822a9a58c69d0b87160fe6019b53f37",
+    "b7e8a2d3d6116a565b32d2d3c712629585eccf6e4e6318fa054a52f3c71bad0f",
+    "b862b859947e1c7319215b50919cacd9ab843b4b7a2b39e859b3b93f401228ad",
+    "c3f0d88e8a7a4fa45b6a959edbe1b08535b5daf7be1034241ff13b34694bf6c9",
+    "ccb13d1267f5d4d70449322d9b4d35a747c326d0bc1ff1eab4b1aded6654c820",
+    "cf7895e3335ae581733757e28efed3c58eaaeb53893896050ad03e092adbc8ab",
+    "e3ed72ccb6e15f7145aae4d6caf5a8dd5458f327b425835274c09862c2784228",
+    "ebe5d2e4f37d4f16707efe17debf40fbd4824be0f2627e8b435b7840ae2e9cfb",
+    "f9c1f9c638f40acda23379c9c33ffa86c2d8e7d75f0dc83cea497a40bcace4d7",
+    "fc189bb502aabc50ab0fd19a5ab3bc4d60f2ebd79c9e03924fc7b41c2d283491",
+    "ff8f8aefccd4a27effbf98ee884daf6b39d94e19ecd6c67d00a2e4cc0d28d707"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "23c5c9d6b13fb60585c35e772cafc5f8c8a510181559b9e0d220cfce1bd9de75"
+      "sha256": "1570daf89d60086e5d144ca6f48bb7c8edd0bf8a13c0a1cd7f2fc3385ec2a13d"
     },
     "summary_json": {
       "path": "summary.json",
@@ -192,19 +192,19 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "49cd8adfa82d0a2f595ce372d6366e41dd01c4b1a04cfe4a643d4f12c5018ab5"
+      "sha256": "f2305f10d84420671d1b01a63b1d18756c7636f010cda9880d190dd73890649d"
     }
   },
   "execution_provenance": {
-    "results_sha256": "23c5c9d6b13fb60585c35e772cafc5f8c8a510181559b9e0d220cfce1bd9de75",
-    "producing_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
+    "results_sha256": "1570daf89d60086e5d144ca6f48bb7c8edd0bf8a13c0a1cd7f2fc3385ec2a13d",
+    "producing_git_commit": "804e3f1fa636fde0208294b413d1e3911b6a5ad9",
     "git_dirty": false,
-    "started_at": "2026-08-26T15:25:28.656953+00:00",
-    "completed_at": "2026-08-26T15:25:29.160935+00:00",
+    "started_at": "2026-08-27T06:05:50.497996+00:00",
+    "completed_at": "2026-08-27T06:05:50.999256+00:00",
     "source_code_hashes": {
       "certification.py": "f19b11c7cb92fedf6f64221218e503f5f81e7f3ef7ca114caaff0adc993b01ef",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b",
+      "math_core.py": "c20dd14d6dd1f0b628d34d36a0e88efa40be7c596fb6a8208dca46216edf05e6",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
@@ -245,7 +245,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "03c22e58408b13ace0e47eac55f0f0c0fbf0ff6a7580aca8a8630fad93eeb00b"
+        "sha256": "c20dd14d6dd1f0b628d34d36a0e88efa40be7c596fb6a8208dca46216edf05e6"
       },
       {
         "path": "reference_data.py",
@@ -297,10 +297,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "f707311b66dfd83baafdf9815196c52d410b3368f03772d653494ce5bb0bdaee",
-    "readme_sha256": "49cd8adfa82d0a2f595ce372d6366e41dd01c4b1a04cfe4a643d4f12c5018ab5",
+    "readme_sha256": "f2305f10d84420671d1b01a63b1d18756c7636f010cda9880d190dd73890649d",
     "diagnostics_sha256": null,
-    "summary_git_commit": "53241336d10f5d694de8704c102b0b3fdf5445a2",
-    "summarized_at": "2026-08-26T15:25:29.160935+00:00",
+    "summary_git_commit": "804e3f1fa636fde0208294b413d1e3911b6a5ad9",
+    "summarized_at": "2026-08-27T06:05:50.999256+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
