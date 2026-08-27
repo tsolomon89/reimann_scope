@@ -200,7 +200,7 @@ class TestGateG4RadialVariationAndPositivity:
 
 
 class TestGateG4RadialResponseCoefficientAndWitnesses:
-    """Sub-Gate G4e Rigorous Radial Sign Falsification and Coefficient Analysis."""
+    """Sub-Gate G4e Radial Sign Evidence and Certified Arb Ball Witness."""
 
     @pytest.mark.slow_numerical
     def test_c_w_second_order_coefficient_ratio(self):
@@ -209,7 +209,7 @@ class TestGateG4RadialResponseCoefficientAndWitnesses:
             sigma=5.0, gamma=14.0, T=16.8, window_type="fejer", dps=40
         )
         c_val = mpmath.mpf(c_res["C_W"])
-        assert c_val < 0  # Falsification of unconditional positivity!
+        assert c_val < 0  # Evidence against unconditional positivity on general parameters
 
         var_res = evaluate_g4_radial_variation_diagnostic(
             sigma=5.0, gamma=14.0, delta=0.005, T=16.8, window_type="fejer", dps=40
@@ -220,44 +220,63 @@ class TestGateG4RadialResponseCoefficientAndWitnesses:
         assert abs(ratio - 1.0) < mpmath.mpf('1e-4')
 
     @pytest.mark.slow_numerical
-    def test_rectangular_negative_witness_certification(self):
+    def test_rectangular_negative_witness_evidence(self):
         """Numerical evidence for Witness 1 (Rectangular): sigma=2, gamma=14, delta=0.1, T=2.8 -> Delta S < 0."""
-        cert = certify_g4_radial_sign_witness(
+        from math_core import evaluate_g4_radial_sign_evidence
+        ev = evaluate_g4_radial_sign_evidence(
             sigma=2.0, gamma=14.0, delta=0.1, T=2.8, window_type="rectangular", dps=50
         )
-        assert cert["is_negative"] is True
-        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
-        assert mpmath.mpf(cert["interval_upper"]) < 0
+        assert ev["has_negative_evidence"] is True
+        assert ev["evidence_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
+        assert mpmath.mpf(ev["estimate_upper_bound"]) < 0
 
     @pytest.mark.slow_numerical
-    def test_fejer_negative_witness_certification_above_resonance(self):
+    def test_fejer_negative_witness_evidence_above_resonance(self):
         """Numerical evidence for Witness 2 (Fejer): sigma=5, gamma=14, delta=0.49, T=16.8 (T > gamma) -> Delta S < 0."""
-        cert = certify_g4_radial_sign_witness(
+        from math_core import evaluate_g4_radial_sign_evidence
+        ev = evaluate_g4_radial_sign_evidence(
             sigma=5.0, gamma=14.0, delta=0.49, T=16.8, window_type="fejer", dps=50
         )
-        assert cert["is_negative"] is True
-        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
-        assert mpmath.mpf(cert["interval_upper"]) < 0
+        assert ev["has_negative_evidence"] is True
+        assert ev["evidence_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
+        assert mpmath.mpf(ev["estimate_upper_bound"]) < 0
 
     @pytest.mark.slow_numerical
-    def test_abel_negative_witness_certification(self):
+    def test_fejer_witness_wit02_arb_ball_certification(self):
+        """Rigorous certified outward-rounded Arb ball integration for Witness 2 (Fejer)."""
+        from math_core import certify_g4_fejer_witness_arb
+        cert = certify_g4_fejer_witness_arb(
+            sigma="5.0", gamma="14.0", delta="0.49", T="16.8", n_subdivisions=25000, dps=60
+        )
+        assert cert["is_certified_negative"] is True
+        assert cert["status"] == "CERTIFIED_NEGATIVE_ARB_BALL"
+        # The upper bound of the enclosure ball must be strictly below 0
+        from flint import arb
+        upper_b = arb(cert["interval_upper"])
+        assert upper_b < 0
+        assert upper_b < arb("-0.00015")  # Enclosed strictly below -1.5e-4
+
+    @pytest.mark.slow_numerical
+    def test_abel_negative_witness_evidence(self):
         """Numerical evidence for Witness 3 (Abel): sigma=1.01, gamma=21, delta=0.49, T=1.05 -> Delta S < 0."""
-        cert = certify_g4_radial_sign_witness(
+        from math_core import evaluate_g4_radial_sign_evidence
+        ev = evaluate_g4_radial_sign_evidence(
             sigma=1.01, gamma=21.0, delta=0.49, T=1.05, window_type="abel", dps=50
         )
-        assert cert["is_negative"] is True
-        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
-        assert mpmath.mpf(cert["interval_upper"]) < 0
+        assert ev["has_negative_evidence"] is True
+        assert ev["evidence_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
+        assert mpmath.mpf(ev["estimate_upper_bound"]) < 0
 
     @pytest.mark.slow_numerical
-    def test_gaussian_negative_witness_certification(self):
+    def test_gaussian_negative_witness_evidence(self):
         """Numerical evidence for Witness 4 (Gaussian): sigma=1.01, gamma=14, delta=0.49, T=1.4 -> Delta S < 0."""
-        cert = certify_g4_radial_sign_witness(
+        from math_core import evaluate_g4_radial_sign_evidence
+        ev = evaluate_g4_radial_sign_evidence(
             sigma=1.01, gamma=14.0, delta=0.49, T=1.4, window_type="gaussian", dps=50
         )
-        assert cert["is_negative"] is True
-        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
-        assert mpmath.mpf(cert["interval_upper"]) < 0
+        assert ev["has_negative_evidence"] is True
+        assert ev["evidence_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
+        assert mpmath.mpf(ev["estimate_upper_bound"]) < 0
 
 
 class TestAdditiveReferenceInvarianceNoGo:

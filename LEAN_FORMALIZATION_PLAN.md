@@ -750,14 +750,13 @@ Formalize Gate G4 windowed expansion identities, complex conjugation algebra, ad
 3. **Complex and Real Radial Defect Difference & Second-Order Response Numerators** (`complex_radial_defect_difference_numerator`, `complex_radial_second_order_numerator_decomposition`, `radial_defect_difference_numerator`, `radial_second_order_numerator_decomposition`):
    - Prove \((u - \delta^2)u - ((u - \delta^2)^2 + 4\delta^2\gamma^2) = \delta^2(u - 4\gamma^2 - \delta^2)\) over \(\mathbb C\) and \(\mathbb R\).
    - Prove \(4z\delta^2(z^2 - 3\gamma^2 - \delta^2) = 4z\delta^2(z^2 - 3\gamma^2) - 4z\delta^4\) over \(\mathbb C\) and \(\mathbb R\).
-4. **Cofinal Sequence Limit Theorems & Countermodels** (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`):
-   - Fixed-\(H\) limit theorem: \(\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon\).
-   - Diagonal non-convergence: \(\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)\).
+4. **Mathlib `Filter.Tendsto` Theorems & Cofinal Sequence Limit Countermodels** (`tendsto_cofinal_fixed_zero`, `not_tendsto_cofinal_diagonal_zero`, `finite_sum_tendsto_interchange`, `cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`):
+   - Mathlib Tendsto fixed-\(H\) limit: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)`.
+   - Mathlib Tendsto diagonal non-convergence: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)`.
+   - Mathlib Tendsto finite-sum limit interchange: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))`.
+   - Elementary \(\varepsilon\)-\(N\) fixed-\(H\) limit theorem: \(\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon\).
+   - Elementary \(\varepsilon\)-\(N\) diagonal non-convergence: \(\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)\).
    - Sequence diagonal witness: \(((n : \mathbb R) + 1) / ((n : \mathbb R) + 1) = 1\) for all \(n \in \mathbb N\).
    - Proportional schedule witness: \((c \cdot T) / T = c\) for all \(T \ne 0\).
 5. **Conditional Gate G4 Regularized Bridge Interface** (`ConditionalG4RegularizedBridge`):
    - Theorem `ConditionalG4RegularizedBridge.all_defects_zero`: prove that any valid regularized bridge with zero arithmetic anchor forces all represented zero defects to vanish (\(d_j = 0\)).
-
-
-
-

@@ -896,7 +896,7 @@ Formally verified in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sor
 - `generic_scale_dilation_cancellation`: \(s D_s(su) = f(u)\) for any scale \(s > 0\).
 
 ## 23.4 Earliest Infinite Analytic Obstruction (Gate G4)
-Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Candidate CMSA-1 and CMSA-2 are classified as `FAIL_RADIAL_POSITIVITY` (unmodified full finite difference) and `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+Individual zero resolvent terms belong to \(L^2(\mathbb R, dt)\) with finite norm \(\frac{\pi}{\sigma-\Re\rho}\), so \(\frac{1}{2T}\int_{-T}^T \frac{dt}{|\sigma-\rho+it|^2} \to 0\) as \(T\to\infty\). The non-zero Besicovitch mean on the arithmetic side is carried by collective non-uniform infinite cancellation. Gate G4 (Infinite Spectral Interchange) is the exact earliest open barrier. Candidate CMSA-1 and CMSA-2 are classified as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (general raw candidate and additive class) and `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 
 ---
 
@@ -911,21 +911,25 @@ Evaluated across:
 All four window families achieve exact finite quadratic expansion closure and are classified as `FINITE_IDENTITY_PROVED_G4_OPEN`.
 
 ## 24.2 Cofinal Limit Independence & Boundary Layer
-Proved in Lean 4 (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`): fixed-truncation limits \(\forall H, \lim_{n\to\infty} f(H, n) = 0\) do not imply cofinal limit vanishing \(\lim_{n\to\infty} f(H(n), n) = 0\).
+Proved in Lean 4 with Mathlib `Filter.Tendsto` (`tendsto_cofinal_fixed_zero`, `not_tendsto_cofinal_diagonal_zero`, `finite_sum_tendsto_interchange`): fixed-truncation limits \(\forall H, \lim_{n\to\infty} f(H, n) = 0\) do not imply cofinal limit vanishing \(\lim_{n\to\infty} f(H(n), n) = 0\).
 
-## 24.3 Exact Radial Response Coefficient & Sign Falsification
+## 24.3 Exact Radial Response Coefficient & Certified Arb Ball Witness
 The symmetric second-order coefficient:
 \[
 C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt, \qquad D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3},
 \]
-governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\).
-High-precision numerical quadrature produced 4 negative witnesses (WIT 1–4 across Rectangular, Fejér with \(T > \gamma\), Abel, Gaussian), proving that the raw synthetic finite-window difference \(\Delta S_W\) is not globally positive. The raw finite-window functional is classified as `FAIL_RADIAL_POSITIVITY`.
+governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\) under uniform domination hypotheses.
+- **Fejér Witness WIT-02**: Rigorously certified negative via outward-rounded Arb ball arithmetic on compact support \([-16.8, 16.8]\) (`certify_g4_fejer_witness_arb`):
+  \[
+  \Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0).
+  \]
+  Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
+- **Witnesses WIT 1, 3, 4**: Evaluated with negative numerical estimates and mpmath estimated error bounds (`NUMERICAL_EVIDENCE_NEGATIVE`).
+- **Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on the general parameter domain / infinite limit.
 
 ## 24.4 Additive-Reference Invariance No-Go Theorem
 For any scalar reference \(R_W(A)\) independent of \(Z, \delta, \gamma\), \((S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)\).
-Thus, divisor-independent additive scalar subtraction cannot alter or repair the radial sign. Divisor-independent additive renormalizations are classified as `FAIL_RADIAL_POSITIVITY` (formalized in Lean 4: `RiemannScope.additive_reference_subtraction_invariance`).
+Thus, divisor-independent additive scalar subtraction cannot alter the raw radial difference. Formally verified in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
 
-
-
-
-
+## 24.5 Earliest Open Subgate
+$$\boxed{\text{Subgate G4-Open: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.}}$$

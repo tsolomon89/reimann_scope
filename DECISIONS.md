@@ -1092,7 +1092,7 @@ Any assumption that fixed-truncation zero-resolvent vanishing implies cofinal li
 
 ## 2026-08-27 — Gate G4 Integrity Repair and Radial-Sign Theorem Resolution
 
-Status: ACCEPTED
+Status: ACCEPTED (with partial correction/withdrawal below)
 
 Decision:
 
@@ -1102,17 +1102,16 @@ Decision:
    C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt,
    \]
    governing the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\), where \(D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}\).
-2. **Conclusive Sign Falsification of Unmodified Full Finite-Window Candidate**:
-   Evaluated and certified 4 negative witnesses (Rectangular, Fejér with \(T > \gamma\), Abel-Poisson, Gaussian) via rigorous error-bounded interval quadrature, proving that \(\Delta S_W\) is NOT globally nonnegative.
-   - Classification for unmodified full finite-window \(\Delta S_W\): `FAIL_RADIAL_POSITIVITY`.
-   - Classification for exact finite algebraic expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
-   - Classification for grade-dilated completed logarithmic derivative: `GRADE_COORDINATE_REDUNDANT`.
+2. **Sign Analysis of Raw Finite-Window Difference (CORRECTED / PARTIALLY WITHDRAWN)**:
+   - *Withdrawn/Corrected Claim*: The claim that mpmath quadrature provided "rigorous error-bounded interval quadrature" is **WITHDRAWN**; `mpmath.quad(..., error=True)` returns an estimated numerical error rather than certified outward-rounded interval enclosures.
+   - *Current Rigorous Status*: Compact Fejér WIT-02 is genuinely certified negative via outward-rounded Arb ball arithmetic (`certify_g4_fejer_witness_arb`), while WIT 1, 3, 4 represent high-precision numerical evidence.
+   - Classification: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on the general parameter domain; `FINITE_IDENTITY_PROVED_G4_OPEN` for the finite expansion; `GRADE_COORDINATE_REDUNDANT` for grade coordinate dilation.
 3. **Internal Proof of Carlson Mean-Square Special Case**:
    Proved the mean-square identity for Dirichlet series with \(\sum |a_n| < \infty\) internally in 4 distinct limit steps (finite identity, fixed-\(N\) limit, uniform tail bound, and interchange) without external black-box theorems.
 4. **Lean 4 Formalizations**:
-   Formalized complex quadratic conjugation expansions, exact radial defect difference numerators, second-order response decompositions, and sequence countermodels in `formal/RiemannScope/ArithmeticBridge.lean` (bringing total compiled project declarations to 59).
+   Formalized complex quadratic conjugation expansions, exact radial defect difference numerators, second-order response decompositions, and sequence countermodels in `formal/RiemannScope/ArithmeticBridge.lean`.
 5. **Epistemic Authority**:
-   Keep `OBL-RDQ-001` and `OBL-CMSA-003` **OPEN**. The next canonical target is the derivation of a renormalized radial functional paired with a zero-free reference space subtraction.
+   Keep `OBL-RDQ-001` and `OBL-CMSA-003` **OPEN**. Earliest open subgate: prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
 
 Reason:
 
@@ -1139,24 +1138,28 @@ Decision:
    \[
    (S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0).
    \]
-   Therefore, a divisor-independent additive scalar subtraction cannot alter, repair, or renormalize the radial sign. Any candidate relying on an additive reference subtraction is classified as `FAIL_RADIAL_POSITIVITY`.
+   Therefore, a divisor-independent additive scalar subtraction cannot alter the raw radial difference. It proves that the additive class shares identically whatever sign behaviour the raw functional exhibits.
    Formalized in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
-2. **Epistemic Downgrade of Numerical Quadrature Bounds**:
-   Downgraded mpmath quadrature estimated error bounds to high-precision numerical evidence (`NUMERICAL_EVIDENCE_NEGATIVE`), explicitly disclaiming unproved "rigorous interval certificates".
-3. **Cofinal Sequence Limit Theorems in Lean 4**:
-   Formalized the full sequence limit separation in Lean 4:
-   - `cofinal_sequence_fixed_limit_zero`: \(\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon\).
-   - `cofinal_diagonal_not_tendsto_zero`: \(\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)\).
-4. **Complex Generalization of Radial Rational Numerators in Lean 4**:
-   Formalized `complex_radial_defect_difference_numerator` and `complex_radial_second_order_numerator_decomposition` over \(\mathbb C\).
-5. **Elementary Absolutely Convergent Dirichlet-Series Mean-Square Lemma**:
-   Framed the prime Dirichlet mean square as an elementary 4-step lemma for \(\sum |a_n| < \infty\) with \(a_n = \Lambda(n)n^{-\sigma}\) (\(\sigma > 1\)), rather than an external invocation of Carlson's full theorem.
-6. **Pytest Tier Performance Repair**:
-   Marked expensive numerical Gate-G4 tests with `@pytest.mark.slow_numerical`, restoring `check-fast` execution to under 2 minutes.
+2. **Classification Standardization**:
+   Classified the general raw candidate and zero-independent additive scalar-renormalization class as:
+   `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+   Defined earliest open subgate: prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
+3. **Certified Arb Ball Integration for Fejér Witness WIT-02**:
+   Implemented `certify_g4_fejer_witness_arb` in `math_core.py` enclosing the compact Fejér integral for $(\sigma=5, \gamma=14, \delta=0.49, T=16.8)$ in outward-rounded Arb ball arithmetic, proving $\Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0)$.
+4. **Correction of Explanatory Sign Mechanism for WIT-02**:
+   Corrected the mechanism analysis: local contribution at $t \in [0, 8]$ is strictly positive ($+8.43 \times 10^{-6}$ at $t=0$), while the dominant negative mass occurs around $t \in [9, 14]$ (peaking at $t=12$ with $-1.03 \times 10^{-4}$), driving the overall integral negative.
+5. **Mathlib Filter.Tendsto Theorems in Lean 4**:
+   Formalized genuine `Filter.Tendsto` theorems in `formal/RiemannScope/ArithmeticBridge.lean`:
+   - `tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)`.
+   - `not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)`.
+   - `finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))`.
+   Bringing total compiled project theorem declarations to 67.
+6. **Pytest Tier Performance & API Refactoring**:
+   Renamed `certify_g4_radial_sign_witness` to `evaluate_g4_radial_sign_evidence` (with deprecated wrapper) to accurately reflect numerical estimation vs Arb certification.
 
 Reason:
 
-Epistemic and formal boundary repair closing the additive renormalization candidate class and establishing exact Lean 4 sequence limit separation.
+Epistemic and formal boundary repair closing the additive renormalization candidate class, proving Mathlib Tendsto limits, certifying Fejér WIT-02 in Arb ball arithmetic, and standardizing classifications.
 
 Mathematical / operational consequence:
 
@@ -1165,8 +1168,3 @@ Updated `math_core.py`, `tests/test_cmsa_gate_g4.py`, `CMSA_GATE_G4.md`, `MATH_C
 Supersedes:
 
 Any claim that additive divisor-independent reference subtraction can renormalize the radial sign, or that mpmath estimated error constitutes a certified Arb interval ball.
-
-
-
-
-

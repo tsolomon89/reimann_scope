@@ -295,17 +295,18 @@ $$S_{N, T}^{(W)}(\sigma) := \int_{\mathbb R} W_T(t) |A(\sigma+it) - Z_N(t)|^2 dt
 ### 10.4 Gate G4 Infinite-Regularization and Radial-Sign Analysis
 Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CMSA_GATE_G4.md):
 1. **Asymptotic Regimes**: Characterized across $|\gamma| \ll T$ (plateau $\sim \pi/(2aT)$), $\gamma/T \to c$ (boundary transition $\frac{\arctan((T-\gamma)/a)+\arctan((T+\gamma)/a)}{2aT}$), and $|\gamma| \gg T$ (outer tail $\sim 1/(\gamma^2-T^2)$).
-2. **Cofinal Limits**: Proved that fixed-cutoff vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le H} J_T = 0$ does not imply cofinal vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le cT} J_T$, which diverges as $\frac{c\log T}{4a}$. Formalized in Lean 4 (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`).
+2. **Cofinal Limits**: Proved that fixed-cutoff vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le H} J_T = 0$ does not imply cofinal vanishing $\lim_{T\to\infty} \sum_{|\gamma|\le cT} J_T$, which diverges as $\frac{c\log T}{4a}$. Formalized in Lean 4 with Mathlib `Filter.Tendsto` (`tendsto_cofinal_fixed_zero`, `not_tendsto_cofinal_diagonal_zero`, `finite_sum_tendsto_interchange`).
 3. **Exact Radial Response Coefficient**:
    $$\Delta S_W = \delta^2 C_W(\sigma, \gamma, T) + O(\delta^4), \qquad C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt,$$
    where $D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3}$.
-4. **Negative Sign Witnesses**:
-   High-precision numerical quadrature produced 4 negative witnesses (Rectangular, Fejér with $T > \gamma$, Abel-Poisson, Gaussian), proving that the raw synthetic finite-window difference $\Delta S_W$ is not globally positive.
+4. **Certified Arb Ball Witness & Numerical Evidence**:
+   - Witness WIT-02 (Fejér): Certified strictly negative on compact support $[-16.8, 16.8]$ via outward-rounded Arb ball arithmetic (`certify_g4_fejer_witness_arb`), proving $\Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0)$.
+   - Witnesses WIT 1, 3, 4: Negative numerical quadrature estimates with mpmath error estimates.
 5. **Additive-Reference Invariance No-Go Theorem**:
-   For any scalar reference $R_W(A)$ independent of $Z, \delta, \gamma$, $(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)$. Thus, divisor-independent additive scalar subtractions cannot alter, repair, or renormalize the radial sign. Formalized in Lean 4 (`additive_reference_subtraction_invariance`).
+   For any scalar reference $R_W(A)$ independent of $Z, \delta, \gamma$, $(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)$. Thus, divisor-independent additive scalar subtractions cannot alter the raw radial difference. Formalized in Lean 4 (`additive_reference_subtraction_invariance`).
 6. **Classifications**:
-   - Raw Finite Synthetic-Fibre $\Delta S_W$: `FAIL_RADIAL_POSITIVITY`.
-   - Divisor-Independent Additive Scalar Renormalizations: `FAIL_RADIAL_POSITIVITY` (by No-Go Theorem).
+   - Raw Finite Synthetic-Fibre $\Delta S_W$: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on general parameters; `CERTIFIED_NEGATIVE_ARB_BALL` on compact Fejér WIT-02.
+   - Divisor-Independent Additive Scalar Renormalizations: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
    - Complete Finite Algebraic Spectral Expansion: `FINITE_IDENTITY_PROVED_G4_OPEN`.
    - Dilated Completed Log-Derivative: `GRADE_COORDINATE_REDUNDANT`.
 
@@ -315,8 +316,6 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
-- **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite-window candidate and additive scalar renormalizations) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+- **Earliest Open Subgate**: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
+- **Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (general raw candidate and additive scalar renormalizations) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
-
-
-

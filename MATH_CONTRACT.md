@@ -2342,9 +2342,9 @@ For \(p = a - i\gamma, q = a + i\gamma\) (\(a > 0\)):
 
 ## 42.3 Cofinal Limit Independence Countermodel
 For \(f(H, T) = H / T\), for any fixed \(H < \infty\), \(\lim_{T\to\infty} f(H, T) = 0\). However, for proportional cofinal schedule \(H(T) = cT\) (\(c \ne 0\)), \(f(cT, T) = c \ne 0\) for all \(T \ne 0\).
-Proved in Lean 4 (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`):
+Proved in Lean 4 with Mathlib `Filter.Tendsto` and elementary characterizations (`tendsto_cofinal_fixed_zero`, `not_tendsto_cofinal_diagonal_zero`, `finite_sum_tendsto_interchange`, `cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`):
 \[
-\forall H,\ \lim_{n\to\infty} f(H, n) = 0 \centernot\implies \lim_{n\to\infty} f(H(n), n) = 0.
+\forall H,\ \operatorname{Tendsto}\left(n \mapsto \frac{H}{n+1}\right)\ \text{atTop}\ (\mathcal N(0)) \centernot\implies \operatorname{Tendsto}\left(n \mapsto \frac{n+1}{n+1}\right)\ \text{atTop}\ (\mathcal N(0)).
 \]
 
 ## 42.4 Exact Radial Response Coefficient
@@ -2362,13 +2362,19 @@ where
 \]
 Algebraic numerators verified in Lean 4 over \(\mathbb C\) and \(\mathbb R\) (`complex_radial_defect_difference_numerator`, `complex_radial_second_order_numerator_decomposition`).
 
-## 42.5 Falsification of Unrestricted Finite Positivity
-High-precision numerical quadrature produced 4 negative sign witnesses:
-1. Rectangular: \(\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8 \implies \Delta S_W = -5.9067 \times 10^{-7} < 0\).
-2. Fejér: \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8 \implies \Delta S_W = -1.7184 \times 10^{-4} < 0\) (despite \(T > \gamma\)).
-3. Abel-Poisson: \(\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05 \implies \Delta S_W = -3.4414 \times 10^{-6} < 0\).
-4. Gaussian: \(\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4 \implies \Delta S_W = -7.2473 \times 10^{-5} < 0\).
-Classification: `FAIL_RADIAL_POSITIVITY` for the raw synthetic finite-window functional.
+## 42.5 Certified Arb Ball Witness and Numerical Evidence Suite
+1. **Fejér Witness WIT-02 (Rigorous Arb Ball Certificate)**:
+   For \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8\), outward-rounded Arb ball Riemann integration on compact support \([-16.8, 16.8]\) encloses:
+   \[
+   \Delta S_{\text{Fejér}} \in [-1.895 \times 10^{-4}, -1.542 \times 10^{-4}] \subset (-\infty, 0).
+   \]
+   Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
+2. **Numerical Evidence Witnesses (WIT 1, 3, 4)**:
+   - Rectangular (\(\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8\)): \(\Delta S_W \approx -5.9067 \times 10^{-7}\) (estimated error \(\pm 1.0 \times 10^{-154}\)).
+   - Abel-Poisson (\(\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05\)): \(\Delta S_W \approx -3.4414 \times 10^{-6}\) (estimated error \(\pm 2.0 \times 10^{-6}\)).
+   - Gaussian (\(\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4\)): \(\Delta S_W \approx -7.2473 \times 10^{-5}\) (estimated error \(\pm 2.0 \times 10^{-19}\)).
+   Status: `NUMERICAL_EVIDENCE_NEGATIVE`.
+3. **General Classification**: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` on the general parameter domain and for the infinite/regularized limit. Earliest open subgate: prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
 
 ## 42.6 Elementary Absolutely Convergent Dirichlet-Series Mean-Square Lemma
 For complex coefficients with \(\sum_{n=1}^\infty |a_n| < \infty\) (including \(a_n = \Lambda(n)n^{-\sigma}, \sigma > 1\) since \(\Lambda(n) \le \log n\)):
@@ -2380,10 +2386,13 @@ For complex coefficients with \(\sum_{n=1}^\infty |a_n| < \infty\) (including \(
 ## 42.7 Additive-Reference Invariance No-Go Theorem
 Let \(S_W(Z) = \int W_T(t) |A(t) - Z(t)|^2 dt\). For any scalar reference term \(R_W(A)\) independent of \(Z, \delta, \gamma\):
 \[
-\boxed{(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) = S_W(Z_\delta) - S_W(Z_0).}
+\boxed{(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0).}
 \]
-Consequently, a divisor-independent additive scalar subtraction cannot alter, repair, or renormalize the radial sign. Formally proved in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
+Consequently, a divisor-independent additive scalar subtraction cannot alter the raw radial difference. It proves that the additive class shares identically whatever sign behaviour the raw functional exhibits. Formally proved in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
 
-
-
-
+## 42.8 Hypotheses for Integrated Pointwise Expansions
+To integrate the pointwise expansion \(|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^2 \Re(F_0 \overline{D_\gamma}) + O(\delta^4)\) against a window \(W_T(t)\) and obtain a valid \(O(\delta^4)\) remainder on the integral:
+1. **Window Integrability**: \(W_T(t) \ge 0\) with \(W_T \in L^1(\mathbb R) \cap L^\infty(\mathbb R)\) and \(\int_{\mathbb R} W_T(t) dt = 1\).
+2. **Denominator Separation**: For all \(\delta \in [0, \delta_0]\) with \(\delta_0 < a = \sigma - 1/2\), the denominators of \(Z_\delta(a+it)\) are separated from zero uniformly: \(|a \pm \delta + i(t \pm \gamma)| \ge a - \delta_0 > 0\).
+3. **Uniform Domination**: The Taylor remainder function \(R_4(t, \delta) = \delta^{-4} (|A-Z_\delta|^2 - |A-Z_0|^2 + 2\delta^2 \Re(F_0 \overline{D_\gamma}))\) satisfies \(|R_4(t, \delta)| \le g(t)\) for all \(\delta \in [0, \delta_0]\), where \(g \in L^1(\mathbb R, W_T(t)dt)\).
+4. **Legitimacy of Limit Interchange**: Under hypotheses 1–3, the Dominated Convergence Theorem justifies exchanging the limit \(\delta \to 0\) and the integral, establishing \(\lim_{\delta\to 0} \frac{\Delta S_W}{\delta^2} = C_W(\sigma, \gamma, T)\).

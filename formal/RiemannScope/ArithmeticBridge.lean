@@ -7,6 +7,11 @@ Reference: MATH_CONTRACT.md §39, ARITHMETIC_RADIAL_BRIDGE.md
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.BigOperators.Group.List
+import Mathlib.Order.Filter.Basic
+import Mathlib.Topology.Instances.Real
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Basic
+import Mathlib.Topology.Algebra.Monoid
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 import RiemannScope.Basic
@@ -14,6 +19,8 @@ import RiemannScope.Grade
 import RiemannScope.RadialDefect
 
 set_option linter.unnecessarySeqFocus false
+
+open Filter Topology
 
 namespace RiemannScope
 
@@ -507,7 +514,7 @@ theorem cofinal_sequence_diagonal_witness (n : ℕ) :
   have h_ne : (n : ℝ) + 1 ≠ 0 := by linarith
   exact div_self h_ne
 
-/-- Pointwise fixed-H sequence limit theorem:
+/-- Pointwise fixed-H sequence limit theorem (elementary ε-N formulation):
     For any fixed H : ℝ and any ε > 0, the sequence f(H, n) = H / (n + 1) satisfies |f(H, n)| < ε
     for all sufficiently large n (n ≥ N). -/
 theorem cofinal_sequence_fixed_limit_zero (H : ℝ) (ε : ℝ) (hε : 0 < ε) :
@@ -533,7 +540,19 @@ theorem cofinal_sequence_fixed_limit_zero (H : ℝ) (ε : ℝ) (hε : 0 < ε) :
   rw [← div_eq_mul_inv] at h_mul2
   exact h_mul2
 
-/-- Cofinal limit separation theorem:
+/-- Pointwise fixed-H sequence limit theorem (Mathlib Filter.Tendsto formulation):
+    For any fixed H : ℝ, the sequence f(H, n) = H / (n + 1) converges to 0 along atTop. -/
+theorem tendsto_cofinal_fixed_zero (H : ℝ) :
+    Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0) := by
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  obtain ⟨N, hN⟩ := cofinal_sequence_fixed_limit_zero H ε hε
+  use N
+  intro n hn
+  rw [Real.dist_eq, sub_zero]
+  exact hN n hn
+
+/-- Cofinal limit separation theorem (elementary ε-N formulation):
     The diagonal sequence along H(n) = n + 1 does NOT converge to 0.
     Thus pointwise fixed-H vanishing f(H, n) → 0 does not imply cofinal vanishing f(H(n), n) → 0. -/
 theorem cofinal_diagonal_not_tendsto_zero :
@@ -544,6 +563,27 @@ theorem cofinal_diagonal_not_tendsto_zero :
   have hN_N := hN N (le_refl N)
   rw [cofinal_sequence_diagonal_witness, sub_zero, abs_one] at hN_N
   linarith
+
+/-- Cofinal limit separation theorem (Mathlib Filter.Tendsto formulation):
+    The diagonal sequence along H(n) = n + 1 does NOT tend to 0 along atTop in ℝ. -/
+theorem not_tendsto_cofinal_diagonal_zero :
+    ¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0) := by
+  rw [Metric.tendsto_atTop]
+  intro h
+  have h_half : 0 < (1 / 2 : ℝ) := by norm_num
+  obtain ⟨N, hN⟩ := h (1 / 2) h_half
+  have hN_N := hN N (le_refl N)
+  rw [Real.dist_eq, sub_zero] at hN_N
+  have h_ne : (N : ℝ) + 1 ≠ 0 := by linarith
+  rw [div_self h_ne, abs_one] at hN_N
+  linarith
+
+/-- Finite sum limit interchange theorem:
+    The limit of a finite sum of sequences convergent in ℝ along atTop equals the sum of the individual limits. -/
+theorem finite_sum_tendsto_interchange {α : Type*} (s : Finset α) (f : α → ℕ → ℝ) (g : α → ℝ)
+    (hf : ∀ i ∈ s, Tendsto (f i) atTop (𝓝 (g i))) :
+    Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i)) := by
+  exact tendsto_finset_sum s hf
 
 /-- Elementary cofinal limit distinction countermodel (pointwise algebraic witness):
     For f(H, T) = H / T, under proportional cofinal schedule H(T) = c * T (c ≠ 0),
