@@ -1258,12 +1258,42 @@ Decision:
 5. **Lean 4 Declaration Count**:
    - Total compiled project theorem declarations reached **77**.
 
+---
+
+## 2026-08-27 — Corrective Decision: Background-Dependence Theorem, Fixed-Finite Perturbation Invisibility, and Standardized Candidate Classifications
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Background-Dependence Theorem & Scope of Additive Invariance**:
+   - Proved analytically and algebraically that for complex background $F$ and perturbation $\Delta$, the squared-norm variation is $Q(F, \Delta) = |F + \Delta|^2 - |F|^2 = |\Delta|^2 + 2\Re(F\bar\Delta)$, with background difference $Q(F, \Delta) - Q(G, \Delta) = 2\Re((F-G)\bar\Delta)$.
+   - Constructed concrete counterexample witness $F=1, G=-1, \Delta=1 \implies Q(1, 1)=3 \ne -1=Q(-1, 1)$.
+   - Clarified that `additive_reference_subtraction_invariance` applies exclusively to *outer* scalar subtractions $(S - R)$ and does NOT apply to backgrounds placed *inside* squared norms.
+   - **Withdrew the claim** that Case B automatically reduces to the certified finite Fejér response; the sign of $Q(F_0, \Delta)$ depends explicitly on the completed-function background $F_0$.
+   - Formalized in Lean 4: `RiemannScope.complex_squared_norm_difference_expansion`, `RiemannScope.complex_squared_norm_difference_background_subtraction`, `RiemannScope.complex_squared_norm_difference_not_background_independent`.
+2. **Fixed-Finite Perturbation Invisibility Theorem**:
+   - Proved that for $\sigma > 1$, bounded prime Dirichlet polynomial $P_\sigma$, and any fixed finite linear combination of zero resolvents $\Delta = \sum_{j=1}^N \frac{c_j}{a_j + i(t-\gamma_j)}$ ($N < \infty, a_j > 0$):
+     $$\lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left( |P_\sigma(t) - \Delta(t)|^2 - |P_\sigma(t)|^2 \right) dt = 0.$$
+   - Extended to all fixed finite single zeros, conjugate pairs $\{\delta \pm i\gamma\}$, same-height functional-reflection pairs $\{\pm\delta + i\gamma\}$, and symmetric quartets $\{\pm\delta \pm i\gamma\}$.
+   - Established: *"A fixed finite divisor perturbation cannot produce a nonzero normalized infinite mean response."*
+   - Formalized normalized energy scaling in Lean 4 (`RiemannScope.fixed_finite_energy_scaling_zero`).
+3. **Standardized Candidate Classifications**:
+   - Enforced exactly one authorized classification per candidate:
+     - Recomputed exact remainder: `FAIL_LIMIT_ORDER_DEPENDENCE`
+     - Fixed finite perturbation under normalized infinite mean: `FAIL_LIMIT_ORDER_DEPENDENCE`
+     - Growing / cofinal perturbation $\Delta_{H(T)}$: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`
+     - Raw finite Fejér response: `FAIL_RADIAL_POSITIVITY`
+   - Retired `COLLAPSED_COFINAL_IDENTITY` as a final classification label (retained as descriptive rationale).
+4. **Lean 4 Project Theorem Inventory**:
+   - Reached **81 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+5. **Exact Live Growing-Perturbation Obligation**:
+   - Clarified that any non-trivial cofinal response requires an infinite growing perturbation $\Delta_{H(T)}(t)$ along a schedule $H(T) \to \infty$, governed by live open obligation `OBL-CMSA-003-G4-BOUNDARY`.
+
 Reason:
 
-Rigorous audit and repair of Gate G4 cofinal functional formulation, eliminating algebraic cancellation artifacts and establishing precise origin dilation coordinates.
+Rigorous audit and mathematical repair of background dependence and finite perturbation scaling, eliminating false reductions to isolated zero models and identifying the precise infinite growing-perturbation boundary.
 
 Mathematical / operational consequence:
 
-Updated `formal/RiemannScope/ArithmeticBridge.lean`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `RESEARCH_LEDGER.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all registers.
-
-
+Updated `formal/RiemannScope/ArithmeticBridge.lean`, `math_core.py`, `tests/test_fixed_finite_perturbation_invisibility.py`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `RESEARCH_LEDGER.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all registers.

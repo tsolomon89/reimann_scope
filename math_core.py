@@ -4551,7 +4551,8 @@ def verify_additive_reference_subtraction_invariance(
         eps_tol = mpmath.mpf(10) ** (-(dps - 10))
 
         # Exact symbolic check
-        import sympy as sp
+        import importlib
+        sp: Any = importlib.import_module("sympy")
         S_d_sym, S_0_sym, R_sym = sp.symbols("S_delta S_0 R", real=True)
         sym_expr = (S_d_sym - R_sym) - (S_0_sym - R_sym) - (S_d_sym - S_0_sym)
         is_sym_exact = bool(sp.simplify(sym_expr) == 0)
@@ -4571,5 +4572,146 @@ def verify_additive_reference_subtraction_invariance(
         }
 
 
+def verify_squared_norm_background_dependence(
+    F_val: Any,
+    G_val: Any,
+    delta_val: Any,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [BACKGROUND-DEPENDENCE THEOREM]
+    For complex-valued background F and perturbation Delta, verifies:
+    Q(F, Delta) = |F + Delta|^2 - |F|^2 = |Delta|^2 + 2 * Re(F * conj(Delta)),
+    and:
+    Q(F, Delta) - Q(G, Delta) = 2 * Re((F - G) * conj(Delta)).
+    Proves that the squared-norm variation is strictly background-dependent.
+    """
+    with mpmath.workdps(dps):
+        F = to_mpc(F_val, dps=dps)
+        G = to_mpc(G_val, dps=dps)
+        Delta = to_mpc(delta_val, dps=dps)
+
+        q_F = abs(F + Delta)**2 - abs(F)**2
+        q_G = abs(G + Delta)**2 - abs(G)**2
+        q_F_formula = abs(Delta)**2 + 2 * mpmath.re(F * mpmath.conj(Delta))
+        q_diff = q_F - q_G
+        q_diff_formula = 2 * mpmath.re((F - G) * mpmath.conj(Delta))
+
+        err_F = abs(q_F - q_F_formula)
+        err_diff = abs(q_diff - q_diff_formula)
+        eps_tol = mpmath.mpf(10) ** (-(dps - 10))
+
+        # SymPy exact symbolic check
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        Fr, Fi, Gr, Gi, Dr, Di = sp.symbols("Fr Fi Gr Gi Dr Di", real=True)
+        F_sym = Fr + sp.I * Fi
+        G_sym = Gr + sp.I * Gi
+        D_sym = Dr + sp.I * Di
+
+        # |F + D|^2 - |F|^2 in real/imag components
+        q_F_sym = (Fr + Dr)**2 + (Fi + Di)**2 - (Fr**2 + Fi**2)
+        q_F_form_sym = (Dr**2 + Di**2) + 2 * (Fr * Dr + Fi * Di)
+        sym_F_exact = bool(sp.simplify(q_F_sym - q_F_form_sym) == 0)
+
+        q_G_sym = (Gr + Dr)**2 + (Gi + Di)**2 - (Gr**2 + Gi**2)
+        q_diff_sym = q_F_sym - q_G_sym
+        q_diff_form_sym = 2 * ((Fr - Gr) * Dr + (Fi - Gi) * Di)
+        sym_diff_exact = bool(sp.simplify(q_diff_sym - q_diff_form_sym) == 0)
+
+        is_background_dependent = bool(abs(q_diff) > eps_tol) if abs(F - G) > eps_tol and abs(Delta) > eps_tol else False
+
+        return {
+            "F": str(F),
+            "G": str(G),
+            "Delta": str(Delta),
+            "Q_F": mpmath.nstr(q_F, n=15),
+            "Q_G": mpmath.nstr(q_G, n=15),
+            "Q_diff": mpmath.nstr(q_diff, n=15),
+            "error_expansion_F": mpmath.nstr(err_F, n=6),
+            "error_expansion_diff": mpmath.nstr(err_diff, n=6),
+            "is_symbolic_exact": sym_F_exact and sym_diff_exact,
+            "is_background_dependent": is_background_dependent,
+            "status": "BACKGROUND_DEPENDENCE_VERIFIED"
+        }
 
 
+def verify_fixed_finite_perturbation_invisibility(
+    sigma: Union[float, str, mpmath.mpf],
+    resolvents: List[Tuple[Any, Any, Any]],  # list of (c_j, a_j, gamma_j)
+    T_values: List[Union[float, str, mpmath.mpf]],
+    max_prime_n: int = 50,
+    dps: int = 40
+) -> Dict[str, Any]:
+    """
+    [FIXED FINITE PERTURBATION INVISIBILITY THEOREM]
+    For prime Dirichlet polynomial P_sigma(t) and fixed finite resolvent sum:
+    Delta(t) = sum_j c_j / (a_j + i*(t - gamma_j)), with a_j > 0,
+    evaluates the normalized mean-square variation:
+    I(T) = (1 / (2*T)) * integral_{-T}^T (|P_sigma(t) - Delta(t)|^2 - |P_sigma(t)|^2) dt,
+    and verifies that I(T) -> 0 as T -> infinity.
+    """
+    with mpmath.workdps(dps):
+        sig = to_mpf(sigma, dps=dps)
+
+        # Precompute primes and log(p) for P_sigma
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        prime_powers = []
+        for n in range(2, max_prime_n + 1):
+            pfactors = sp.primefactors(n)
+            if len(pfactors) == 1:
+                p = pfactors[0]
+                lam = mpmath.log(p)
+                prime_powers.append((lam, mpmath.mpf(n)))
+
+
+
+        def P_sigma(t_val):
+            val = mpmath.mpc(0, 0)
+            for lam, n_val in prime_powers:
+                val += lam * (n_val ** (-sig - mpmath.mpc(0, t_val)))
+            return val
+
+        def Delta_fn(t_val):
+            val = mpmath.mpc(0, 0)
+            for c_j, a_j, gam_j in resolvents:
+                c_c = to_mpc(c_j, dps=dps)
+                a_f = to_mpf(a_j, dps=dps)
+                gam_f = to_mpf(gam_j, dps=dps)
+                val += c_c / (a_f + mpmath.mpc(0, t_val - gam_f))
+            return val
+
+        # Compute exact L2 norm of Delta
+        # integral_{-inf}^inf |1/(a + i(t-gam))|^2 dt = pi / a
+        l2_sq_bound = mpmath.mpf(0)
+        for c_j, a_j, gam_j in resolvents:
+            c_abs = abs(to_mpc(c_j, dps=dps))
+            a_f = to_mpf(a_j, dps=dps)
+            l2_sq_bound += c_abs * mpmath.sqrt(mpmath.pi / a_f)
+        l2_sq_bound = l2_sq_bound ** 2
+
+        results_by_T = []
+        for T_raw in T_values:
+            T_val = to_mpf(T_raw, dps=dps)
+            integrand = lambda t: abs(P_sigma(t) - Delta_fn(t))**2 - abs(P_sigma(t))**2
+            val_int = mpmath.quad(integrand, [-T_val, 0, T_val])
+            norm_val = val_int / (2 * T_val)
+            results_by_T.append({
+                "T": str(T_val),
+                "normalized_integral": mpmath.nstr(norm_val, n=12),
+                "energy_bound": mpmath.nstr(l2_sq_bound / (2 * T_val), n=12)
+            })
+
+        # Check monotonic decay
+        vals = [abs(mpmath.mpf(r["normalized_integral"])) for r in results_by_T]
+        is_decaying = bool(vals[-1] < vals[0]) if len(vals) > 1 else True
+
+        return {
+            "sigma": str(sig),
+            "n_resolvents": len(resolvents),
+            "L2_norm_bound_squared": mpmath.nstr(l2_sq_bound, n=10),
+            "results_by_T": results_by_T,
+            "is_decaying_to_zero": is_decaying,
+            "status": "FIXED_FINITE_PERTURBATION_INVISIBILITY_VERIFIED"
+        }

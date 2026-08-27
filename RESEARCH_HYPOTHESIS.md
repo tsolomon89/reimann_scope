@@ -939,7 +939,7 @@ Thus, divisor-independent additive scalar subtraction cannot alter the raw radia
 ## 24.5 Earliest Open Subgate
 $$\boxed{\text{Subgate G4-Open: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.}}$$
 
-## 24.6 Schedule Covariance, Exact Remainder Cancellation, and The Actual Question
+## 24.6 Schedule Covariance, Background Dependence, and Fixed-Finite Invisibility
 ### Schedule Covariance Classification
 Under origin coordinate dilation \(s_K = \tau^K s\) (\(z_K = \tau^K(s-1/2)\)), ordinate scales as \(t_K = \tau^K t \implies t' = \tau t\). Covariance of height truncation \(H\) requires:
 \[
@@ -950,16 +950,23 @@ Under origin coordinate dilation \(s_K = \tau^K s\) (\(z_K = \tau^K(s-1/2)\)), o
 - **Selection Condition**: Unproved heuristic note; remainder bounds do not force \(c \ge 1\) by proved estimate alone.
 - **Falsified Premise**: *"Bilateral discrete grade covariance uniquely determines the cofinal schedule."*
 
-### Exact Remainder Cancellation Theorem & Candidate Collapse
-Let \(Z_H(t) = \sum_{|\gamma_j| \le H} (\dots)\) and \(R_H(t) = \frac{\Xi'}{\Xi}(\sigma - 1/2 + it) - Z_H(t)\).
-Then:
+### Background-Dependence Theorem & Scope of Additive Invariance
+For complex-valued background \(F\) and perturbation \(\Delta\), the squared-norm variation is \(Q(F, \Delta) = |F + \Delta|^2 - |F|^2 = |\Delta|^2 + 2\Re(F\bar\Delta)\).
+The theorem `additive_reference_subtraction_invariance` applies only to outer scalar subtractions \((S - R)\) and does NOT apply to backgrounds placed inside squared norms.
+**Correction**: The claim that Case B automatically reduces to the certified finite Fejér response is withdrawn; the sign of \(Q(F_0, \Delta)\) depends explicitly on the completed-function background \(F_0\).
+
+### Fixed Finite Perturbation Invisibility Theorem
+For any prime Dirichlet polynomial \(P_\sigma\) (\(\sigma > 1\)) and any fixed finite resolvent sum \(\Delta = \sum_{j=1}^N \frac{c_j}{a_j + i(t-\gamma_j)}\) (\(N < \infty, a_j > 0\)):
 \[
-\forall t, \quad Z_H(t) + R_H(t) \equiv \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right).
+\lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left( |P_\sigma(t) - \Delta(t)|^2 - |P_\sigma(t)|^2 \right) dt = 0.
 \]
-Consequently, \(\mathcal S_T(Z_H; R_H) = \frac{1}{2\pi}\int_{-T}^T W_T(t) |Z_H(t) + R_H(t)|^2 dt \equiv \frac{1}{2\pi}\int_{-T}^T W_T(t) |\Xi'/\Xi|^2 dt\) is **identically independent of \(H\) and \(H(T)\)**.
-- **Case A (Recomputed Remainder)**: \(Z_{H,\delta} + R_{H,\delta} \equiv F_\delta\) (collapses to full function, \(H\)-independent).
-- **Case B (Fixed Unperturbed Remainder)**: \(Z_{H,\delta} + R_{H,0} = F_0 + (Z_{H,\delta} - Z_{H,0})\), which reduces by additive-reference invariance to the **finite raw Fejér response** (`FAIL_RADIAL_POSITIVITY`).
-- **Classification**: `COLLAPSED_COFINAL_IDENTITY` / `FAIL_RADIAL_POSITIVITY`.
+A fixed finite divisor perturbation cannot produce a nonzero normalized infinite mean response.
+
+### Perturbation Semantics and Candidate Classifications
+- **Case A (Recomputed Remainder)**: \(Z_{H,\delta} + R_{H,\delta} \equiv F_\delta\) (collapses algebraically). Classification: `FAIL_LIMIT_ORDER_DEPENDENCE`.
+- **Case B (Fixed Finite Perturbation)**: \(Z_{H,\delta} + R_{H,0} = F_0 + \Delta\) (vanishes under infinite mean). Classification: `FAIL_LIMIT_ORDER_DEPENDENCE`.
+- **Case C (Growing / Cofinal Perturbation \(\Delta_{H(T)}\))**: Non-fixed perturbation with \(H(T) \to \infty\). Classification: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+- **Raw Finite Fejér Response**: Retained as `FAIL_RADIAL_POSITIVITY`.
 
 ### The Actual Question & Open Obligation
 The noncommutation defect between finite truncation and infinite completion is:

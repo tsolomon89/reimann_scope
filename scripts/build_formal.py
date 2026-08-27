@@ -142,7 +142,7 @@ def build_formal(git_commit: Optional[str] = None, allow_dirty: bool = False) ->
     lake_ver = "UNKNOWN"
     lean_ver = "UNKNOWN"
     try:
-        proc_lake = subprocess.run(["lake", "--version"], cwd=FORMAL_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        proc_lake = subprocess.run(["lake", "--version"], cwd=FORMAL_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
         if proc_lake.returncode == 0:
             lake_ver = proc_lake.stdout.strip()
         else:
@@ -151,7 +151,7 @@ def build_formal(git_commit: Optional[str] = None, allow_dirty: bool = False) ->
         errors.append(f"Failed executing 'lake --version': {e}")
 
     try:
-        proc_lean = subprocess.run(["lean", "--version"], cwd=FORMAL_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        proc_lean = subprocess.run(["lean", "--version"], cwd=FORMAL_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
         if proc_lean.returncode == 0:
             lean_ver = proc_lean.stdout.strip()
         else:
@@ -194,7 +194,7 @@ def build_formal(git_commit: Optional[str] = None, allow_dirty: bool = False) ->
     build_stderr = ""
     if not errors:
         try:
-            proc_build = subprocess.run(["lake", "build"], cwd=FORMAL_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            proc_build = subprocess.run(["lake", "build"], cwd=FORMAL_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
             exit_code = proc_build.returncode
             build_stdout = proc_build.stdout.strip()
             build_stderr = proc_build.stderr.strip()
@@ -203,6 +203,7 @@ def build_formal(git_commit: Optional[str] = None, allow_dirty: bool = False) ->
                 errors.append(f"lake build failed (exit code {exit_code}): {build_stderr or build_stdout}")
         except Exception as e:
             errors.append(f"Failed executing 'lake build': {e}")
+
     else:
         build_passed = False
         exit_code = -1

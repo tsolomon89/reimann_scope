@@ -182,7 +182,9 @@ To integrate the pointwise expansion $|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Raw Finite Fejér Window Response** | PROVED | PROVED | OPEN | OPEN / CHAR | **CERTIFIED NEGATIVE (WIT-02 Arb)** | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
 | **Divisor-Independent Additive Class on Finite Fejér** | PROVED | PROVED | OPEN | OPEN | **INVARIANT TO RAW (No-Go)** | OPEN | REDUNDANT | `FAIL_RADIAL_POSITIVITY` |
-| **Schedule-Indexed Candidate $S_T(Z_H; R_H)$** | PROVED | PROVED | OPEN | OPEN | **COLLAPSED TO FULL (Algebraic Identity)** | OPEN | COVARIANT | `COLLAPSED_COFINAL_IDENTITY` / `FAIL_RADIAL_POSITIVITY` |
+| **Recomputed Exact-Remainder Candidate $S_T(Z_H; R_{H,\delta})$** | PROVED | PROVED | COLLAPSED | **COLLAPSED TO FULL (Algebraic Identity)** | OPEN | OPEN | COVARIANT | `FAIL_LIMIT_ORDER_DEPENDENCE` |
+| **Fixed Finite Perturbation under Infinite Mean** | PROVED | PROVED | OPEN | **VANISHES (Invisibility Theorem)** | ZERO RESPONSE | OPEN | COVARIANT | `FAIL_LIMIT_ORDER_DEPENDENCE` |
+| **Growing / Cofinal Perturbation $\Delta_{H(T)}$** | PROVED | PROVED | OPEN | OPEN (Infinite Bridge) | OPEN | OPEN | COVARIANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
 | **Finite 4-Term Algebraic Expansion** | PROVED | **PROVED** | OPEN | OPEN | N/A (identity) | N/A | REDUNDANT | `FINITE_IDENTITY_PROVED_G4_OPEN` |
 | **Dilated Completed Log-Derivative** | PROVED | PROVED | N/A | N/A | N/A | N/A | **PROVED REDUNDANT** | `GRADE_COORDINATE_REDUNDANT` |
 | **Candidate CMSA-1 (Full Infinite/Cofinal)** | PROVED | PROVED | OPEN | OPEN | OPEN (infinite) | OPEN | REDUNDANT | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
@@ -191,7 +193,7 @@ To integrate the pointwise expansion $|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^
 
 ---
 
-## 8. Formal Lean 4 Theorem Inventory (77 Compiled Declarations)
+## 8. Formal Lean 4 Theorem Inventory (81 Compiled Declarations)
 
 All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sorry`, 0 `admit`, 0 warnings):
 1. `RiemannScope.complex_finset_sum_mul_star`: $(\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}$.
@@ -204,25 +206,29 @@ All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `
 8. `RiemannScope.periodic_modulated_schedule_covariant`: Any schedule $H(T) = T \cdot q(\log_\tau T)$ with 1-periodic $q$ satisfies grade covariance.
 9. `RiemannScope.exact_remainder_cancellation`: $R = F - Z \implies Z + R = F$ identically over $\mathbb C$.
 10. `RiemannScope.functional_decomposition_independence`: $\forall f, f(Z + R) = f(F)$ for any functional $f$ whenever $R = F - Z$.
-11. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
-12. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
-13. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
-14. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
-15. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
-16. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-17. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-18. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
-19. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
-20. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
-21. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
-22. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
-23. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
+11. `RiemannScope.complex_squared_norm_difference_expansion`: $Q(F, \Delta) = \operatorname{normSq}(F+\Delta) - \operatorname{normSq}(F) = \operatorname{normSq}(\Delta) + 2\Re(F\bar\Delta)$ over $\mathbb C$.
+12. `RiemannScope.complex_squared_norm_difference_background_subtraction`: $Q(F, \Delta) - Q(G, \Delta) = 2\Re((F-G)\bar\Delta)$ over $\mathbb C$.
+13. `RiemannScope.complex_squared_norm_difference_not_background_independent`: Counterexample $F=1, G=-1, \Delta=1 \implies Q(1, 1)=3 \ne -1=Q(-1, 1)$.
+14. `RiemannScope.fixed_finite_energy_scaling_zero`: For any fixed finite energy $E \ge 0$, $\lim_{T\to\infty} \frac{E}{2T} = 0$ (normalized energy scaling vanishes).
+15. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
+16. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
+17. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
+18. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
+19. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
+20. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+21. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+22. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
+23. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
+24. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
+25. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
+26. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
+27. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
 
-*(Formalization Boundary Note: Lean formalizes abstract finite-sum/kernel algebra and algebraic identities. The concrete continuous Dirichlet sinc-integral identity $\frac{1}{2T}\int_{-T}^T |P_N|^2 dt = \sum |a_n|^2 + \sum_{m\ne n} a_m \overline{a_n} \frac{\sin(T\log(n/m))}{T\log(n/m)}$ is retained as a rigorous internal paper derivation (§4), with its Mathlib continuous integration interface demarcated as an external formalization boundary).*
+*(Formalization Boundary Note: Lean formalizes abstract finite-sum/kernel algebra, background-dependence expansions, and algebraic identities. The concrete continuous Dirichlet sinc-integral identity $\frac{1}{2T}\int_{-T}^T |P_N|^2 dt = \sum |a_n|^2 + \sum_{m\ne n} a_m \overline{a_n} \frac{\sin(T\log(n/m))}{T\log(n/m)}$ is retained as a rigorous internal paper derivation (§4), with its Mathlib continuous integration interface demarcated as an external formalization boundary).*
 
 ---
 
-## 9. Schedule Covariance, Remainder Cancellation, and The Actual Question
+## 9. Schedule Covariance, Remainder Cancellation, Background Dependence, and Fixed-Finite Invisibility
 
 ### 9.1 Transcendental Continuation (TC) Origin Dilation & Schedule Covariance Law
 In Transcendental Continuation (TC), the project uses **origin coordinate dilation**:
@@ -248,51 +254,101 @@ $$\boxed{H(\tau T) = \tau H(T), \quad \text{with } \tau = 2\pi.}$$
 **Falsified Premise**:
 $$\boxed{\text{Falsified Premise: "Bilateral discrete grade covariance uniquely determines the cofinal schedule."}}$$
 
-### 9.3 Exact-Remainder Cancellation & Candidate Collapse
-Let $Z_H(t) = \sum_{|\gamma_j| \le H} \left( \frac{1}{\sigma - \rho_j + it} + \frac{1}{\sigma - \bar\rho_j + it} \right)$ and define the exact Hadamard remainder:
-$$R_H(t) = \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right) - Z_H(t).$$
+### 9.3 Background-Dependence Theorem and Scope of Additive Invariance
 
-**Theorem (Exact Remainder Cancellation)**:
-$$\forall t, \quad Z_H(t) + R_H(t) \equiv \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right).$$
-Consequently, the functional
-$$\mathcal S_T(Z_H; R_H) = \frac{1}{2\pi}\int_{-T}^T W_T(t) \left| Z_H(t) + R_H(t) \right|^2 dt \equiv \frac{1}{2\pi}\int_{-T}^T W_T(t) \left| \frac{\Xi'}{\Xi}\left(\sigma - \frac{1}{2} + it\right) \right|^2 dt$$
-is **identically independent of $H$ and the schedule $H(T)$**! Truncation $H$ cancels algebraically before any limit $T \to \infty$ is taken.
+For any complex-valued background $F$ and perturbation $\Delta$, define the squared-norm difference (variation):
+$$Q(F, \Delta) = |F + \Delta|^2 - |F|^2.$$
 
-#### Perturbation Semantics:
-1. **Case A (Recomputing Remainder After Perturbation)**:
-   If the full completed function is perturbed to $F_\delta$ and the remainder is recomputed as $R_{H,\delta} = F_\delta - Z_{H,\delta}$, then $Z_{H,\delta} + R_{H,\delta} \equiv F_\delta$. Truncation $H$ cancels algebraically; the functional collapses to evaluating the full completed function $F_\delta$, entirely independent of $H$ and $H(T)$.
-2. **Case B (Holding Actual Unperturbed Remainder Fixed)**:
-   If the unperturbed remainder $R_{H,0} = F_0 - Z_{H,0}$ is held fixed while replacing $Z_{H,0}$ with $Z_{H,\delta}$, then:
-   $$Z_{H,\delta} + R_{H,0} = F_0 + (Z_{H,\delta} - Z_{H,0}).$$
-   For any zero-independent reference subtraction $R(F_0)$, this is an additive reference subtraction that reduces by the additive-reference invariance no-go theorem identically to the **finite raw Fejér response** on the perturbed zeros inside $[-H, H]$, which was proved strictly negative (`FAIL_RADIAL_POSITIVITY`) by Arb certificate WIT-02.
-3. **Case C (Perturbation Granularity)**:
-   - *Single zero perturbation* $\lambda \to \lambda + \delta$: violates reflection symmetry and real Dirichlet series reality; $Z_\delta$ loses conjugation symmetry.
-   - *Equal-height reflection pair* $\{\delta \pm i\gamma\}$: generates $Z_\delta(z) = \frac{2(z-\delta)}{(z-\delta)^2 + \gamma^2}$, lacking bilateral $\delta \to -\delta$ reflection symmetry.
-   - *Symmetric quartet* $\{\pm \delta \pm i\gamma\}$: standard 4-zero Hadamard cluster $Z_\delta(z) = \frac{4z(z^2+\gamma^2-\delta^2)}{(z^2+\gamma^2-\delta^2)^2 + 4\delta^2\gamma^2}$.
-   - *Full divisor perturbation*: $\forall j, \delta_j \ne 0$.
+**Theorem (Pointwise Background Expansion)**:
+$$Q(F, \Delta) = |\Delta|^2 + 2\Re(F\bar\Delta).$$
+For two distinct backgrounds $F$ and $G$:
+$$Q(F, \Delta) - Q(G, \Delta) = 2\Re((F - G)\bar\Delta).$$
+*Proof*: $|F+\Delta|^2 - |F|^2 = (F+\Delta)(\bar F + \bar\Delta) - |F|^2 = |\Delta|^2 + F\bar\Delta + \bar F\Delta = |\Delta|^2 + 2\Re(F\bar\Delta)$. Subtracting the expression for $G$ gives $2\Re((F-G)\bar\Delta)$. Formally proved in Lean 4 (`complex_squared_norm_difference_expansion`, `complex_squared_norm_difference_background_subtraction`). $\blacksquare$
 
-**Classification**: `COLLAPSED_COFINAL_IDENTITY` / `FAIL_RADIAL_POSITIVITY`.
+**Concrete Counterexample**:
+Let $F = 1, G = -1, \Delta = 1$. Then:
+$$Q(1, 1) = |1+1|^2 - |1|^2 = 3, \quad Q(-1, 1) = |-1+1|^2 - |-1|^2 = -1.$$
+$$Q(1, 1) - Q(-1, 1) = 3 - (-1) = 4 \ne 0.$$
+Formally proved in Lean 4 (`complex_squared_norm_difference_not_background_independent`).
 
-### 9.4 The Actual Question & Non-Additive Cofinal Boundary Functional
-Starting from the arithmetic zero anchor:
-$$\mathcal A(\sigma) = \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left| A(\sigma+it) - \frac{\Xi'}{\Xi}\left(\sigma-\frac{1}{2}+it\right) \right|^2 dt - \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}} = 0,$$
-the genuine mathematical question is to identify an operator measuring the noncommutation defect between finite truncation and infinite completion:
-$$\mathcal D = \mathcal R_{\mathrm{op}}(Z_\infty) - \lim_{H\to\infty} \mathcal R_{\mathrm{op}}(Z_H).$$
+**Why `additive_reference_subtraction_invariance` Does Not Apply Inside Squared Norms**:
+The theorem `additive_reference_subtraction_invariance` applies exclusively to *outer* scalar reference subtractions:
+$$(S(Z_\delta) - R) - (S(Z_0) - R) \equiv S(Z_\delta) - S(Z_0).$$
+When a background $F_0$ is placed *inside* a squared norm $|F_0 + \Delta|^2$, it expands nonlinearly through the cross-term $2\Re(F_0\bar\Delta)$. Shifting the background from $-Z_0$ (the isolated zero model) to $F_0 - Z_0$ (the completed-function remainder model) shifts the variation by $2\Re(F_0\bar\Delta) \ne 0$.
+**Correction**: The claim that Case B automatically reduces to the certified negative finite Fejér response is **withdrawn**. The sign of $Q(F_0, \Delta)$ depends explicitly on the completed-function background $F_0$.
 
-Any genuine replacement candidate must specify:
-1. **Finite truncation**: Symmetric zero resolvent $Z_H(t) = \sum_{|\gamma_j|\le H} (\dots)$.
-2. **Complete object**: Meromorphic logarithmic derivative $\Xi'/\Xi(a+it)$.
-3. **Window normalization**: $W_T(t) \ge 0, \int W_T dt = 1$.
-4. **Subtraction or renormalization**: Non-additive / relative trace pairing (not a scalar reference subtraction).
-5. **Order of limits**: Fixed-$T$ truncation $H \to \infty$ followed by $T \to \infty$, or schedule-coupled $(T, H(T)) \to \infty$.
-6. **Schedule $H(T)$**: Grade-covariant schedule $H(T) = T q(\log_\tau T)$.
-7. **Remainder treatment**: Explicit bound on Hadamard tail $\sum_{|\gamma_j|>H} (\dots)$.
-8. **Unequal-height pairs**: Off-diagonal phase cancellation $\int W_T(t) (a+i(t-\gamma_j))^{-1}(a-i(t-\gamma_k))^{-1} dt \to 0$.
-9. **Reflection partners**: Exact pairing $+i\gamma$ with $-i\gamma$ preserving real conjugation symmetry.
-10. **Arithmetic evaluation**: Coupling to prime Dirichlet polynomial $\sum \Lambda(n) n^{-\sigma-it}$.
-11. **Grade covariance**: Scale invariance under origin coordinate dilation $s_K = \tau^K s$.
-12. **Algebraic non-collapse**: Functional must NOT reduce to $Z+R \equiv F$ or trivial $0-0=0$.
+### 9.4 Perturbation Semantics by Case
 
-**Open Obligation**: `OBL-CMSA-003-G4-BOUNDARY` (Construct a genuinely non-additive cofinal boundary functional).
+Terminology:
+- **Conjugate pair**: $\{\delta + i\gamma, \delta - i\gamma\}$
+- **Same-height functional-reflection pair**: $\{\delta + i\gamma, -\delta + i\gamma\}$
+- **Symmetric quartet**: $\{\pm\delta \pm i\gamma\}$
 
+Rigorous Distinction of Cases:
+1. **Case A (Recomputed Exact Remainder $R_{H,\delta} = F_\delta - Z_{H,\delta}$)**:
+   $$Z_{H,\delta} + R_{H,\delta} \equiv F_\delta.$$
+   The truncation parameter $H$ cancels algebraically before taking any limit. The functional collapses to evaluating the full completed function $F_\delta$, entirely independent of $H$ and $H(T)$.
+   *Classification*: `FAIL_LIMIT_ORDER_DEPENDENCE` (descriptive reason: `COLLAPSED_COFINAL_IDENTITY`).
+2. **Case B (Fixed Actual Remainder with Fixed Finite Perturbation $\Delta$)**:
+   $$Z_{H,\delta} + R_{H,0} = F_0 + \Delta \quad \text{once } H \ge \gamma.$$
+   This becomes independent of $H$, but its response $Q(F_0, \Delta) = |\Delta|^2 + 2\Re(F_0\bar\Delta)$ is background-dependent. Furthermore, under normalized infinite averaging, it vanishes identically by the Invisibility Theorem below.
+   *Classification*: `FAIL_LIMIT_ORDER_DEPENDENCE`.
+3. **Case C (Fixed Actual Remainder with Growing / Cofinal Perturbation $\Delta_{H(T)}$)**:
+   $$Z_{H(T),\delta} + R_{H(T),0} = F_0 + \Delta_{H(T)}.$$
+   This does NOT reduce to a fixed finite perturbation. The number of perturbed terms grows with $T$, creating a genuine infinite convergence and boundary layer problem.
+   *Classification*: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 
+### 9.5 Fixed Finite Perturbation Invisibility Theorem
+
+**Theorem (Invisibility of Fixed Finite Divisor Perturbations)**:
+Let $\sigma > 1$ and let $P_\sigma(t) = \sum_{n=2}^\infty \Lambda(n) n^{-\sigma-it}$ be the prime Dirichlet series.
+Let $\Delta(t) = \sum_{j=1}^N \frac{c_j}{a_j + i(t - \gamma_j)}$ be any fixed finite linear combination of zero resolvents with $N < \infty, a_j > 0, c_j \in \mathbb C$.
+Then:
+1. $\Delta \in L^2(\mathbb R)$, with $\|\Delta\|_{L^2} \le \sum_{j=1}^N |c_j| \sqrt{\frac{\pi}{a_j}} < \infty$.
+2. The normalized infinite mean-square variation vanishes identically:
+$$\lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left( |P_\sigma(t) - \Delta(t)|^2 - |P_\sigma(t)|^2 \right) dt = 0.$$
+
+**Proof**:
+1. *Uniform Bound on Arithmetic Background*: Since $\sigma > 1$, absolute convergence yields:
+   $$|P_\sigma(t)| \le \sum_{n=2}^\infty \frac{\Lambda(n)}{n^\sigma} = -\frac{\zeta'}{\zeta}(\sigma) = M_\sigma < \infty.$$
+2. *Finite Resolvent $L^2$ Norm*: For each constituent resolvent $r_j(t) = \frac{1}{a_j + i(t-\gamma_j)}$:
+   $$\int_{-\infty}^\infty |r_j(t)|^2 dt = \int_{-\infty}^\infty \frac{dt}{a_j^2 + (t-\gamma_j)^2} = \frac{\pi}{a_j}.$$
+   By Minkowski's triangle inequality on $L^2(\mathbb R)$, $\|\Delta\|_{L^2} \le \sum_{j=1}^N |c_j| \sqrt{\pi/a_j} < \infty$.
+3. *Integral Decomposition*:
+   $$\frac{1}{2T}\int_{-T}^T (|P_\sigma - \Delta|^2 - |P_\sigma|^2) dt = \frac{1}{2T}\int_{-T}^T |\Delta(t)|^2 dt - \frac{1}{T}\Re \int_{-T}^T P_\sigma(t)\overline{\Delta(t)} dt.$$
+   - *Direct $\Delta^2$ Term*:
+     $$\frac{1}{2T}\int_{-T}^T |\Delta(t)|^2 dt \le \frac{\|\Delta\|_{L^2}^2}{2T} \to 0 \quad \text{as } T \to \infty.$$
+     (Formally proved in Lean 4: `fixed_finite_energy_scaling_zero`).
+   - *Cross-Term*:
+     By Cauchy-Schwarz on $[-T, T]$:
+     $$\left| \frac{1}{T}\Re \int_{-T}^T P_\sigma(t)\overline{\Delta(t)} dt \right| \le \frac{1}{T} \left(\int_{-T}^T |P_\sigma|^2 dt\right)^{1/2} \left(\int_{-T}^T |\Delta|^2 dt\right)^{1/2} \le \frac{\sqrt{2T M_\sigma^2} \|\Delta\|_{L^2}}{T} = \frac{\sqrt{2} M_\sigma \|\Delta\|_{L^2}}{\sqrt{T}} \to 0.$$
+     Alternatively, via $L^1$ resolvent growth:
+     $$\int_{-T}^T |r_j(t)| dt = \int_{-T}^T \frac{dt}{\sqrt{a_j^2 + (t-\gamma_j)^2}} \le 2\log\left(\frac{2(T+|\gamma_j|)}{a_j} + 1\right) = O(\log T),$$
+     yielding $\frac{1}{2T}\int_{-T}^T |P_\sigma| |\Delta| dt \le \frac{M_\sigma}{2T} O(\log T) = O\left(\frac{\log T}{T}\right) \to 0$.
+Summing both terms establishes the limit $0$. $\blacksquare$
+
+**Corollary (Extension to Zero Configurations)**:
+The Invisibility Theorem applies to:
+- Every single off-line zero resolvent;
+- Every fixed finite conjugate pair $\{\delta \pm i\gamma\}$;
+- Every fixed finite same-height functional-reflection pair $\{\pm\delta + i\gamma\}$;
+- Every fixed finite symmetric quartet $\{\pm\delta \pm i\gamma\}$.
+
+**Fundamental Conclusion**:
+$$\boxed{\text{A fixed finite divisor perturbation cannot produce a nonzero normalized infinite mean response.}}$$
+
+### 9.6 The Exact Open Growing-Perturbation Obligation
+
+Because fixed finite perturbations are invisible under normalized infinite averaging, any non-trivial cofinal response requires an infinite growing perturbation $\Delta_{H(T)}(t)$ along a schedule $H(T) \to \infty$.
+
+**The Live Obligation (`OBL-CMSA-003-G4-BOUNDARY`)**:
+Formulate and evaluate the cofinal limit:
+$$\mathcal D_{\mathrm{cofinal}} = \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left( \left| P_\sigma(t) - Z_{H(T),\delta}(t) + R_{H(T),0}(t) \right|^2 - \left| P_\sigma(t) - Z_{H(T),0}(t) + R_{H(T),0}(t) \right|^2 \right) dt,$$
+which requires resolving:
+1. **Uniform $L^2$ control on growing zero clusters**: $\sum_{|\gamma_j| \le H(T)} (\dots)$ as $H(T) \to \infty$.
+2. **Unequal-height off-diagonal terms**: Phase cancellation $\sum_{j \ne k} \int_{-T}^T \frac{dt}{(a+i(t-\gamma_j))(a-i(t-\gamma_k))}$.
+3. **Reflection-pair terms**: Exact symmetry preservation between $\gamma$ and $-\gamma$.
+4. **Dependence on schedule $H(T)$**: Stability across grade-covariant schedules $H(T) = cT$ and periodic modulations.
+5. **Arithmetic evaluation**: Exact non-zero coupling with the prime Dirichlet polynomial.
+6. **Grade covariance**: Covariance under origin dilation $s_K = \tau^K s$.
+7. **Global sign**: Determining whether the full infinite limit preserves strict radial positivity ($\Delta \mathcal S > 0 \iff \delta \ne 0$) without collapsing to 0 or reducing to the finite Fejér witness.

@@ -743,8 +743,90 @@ theorem functional_decomposition_independence {α : Type*} (f : ℂ → α) (F Z
     f (Z + R) = f F := by
   rw [exact_remainder_cancellation F Z R hR]
 
-end RiemannScope
+/-- Pointwise squared norm difference identity (variation):
+    Q(F, Δ) = |F + Δ|² - |F|² = |Δ|² + 2 * Re(F * star Δ).
+    Holds identically for all complex numbers F, Δ ∈ ℂ. -/
+theorem complex_squared_norm_difference_expansion (F Δ : ℂ) :
+    Complex.normSq (F + Δ) - Complex.normSq F =
+      Complex.normSq Δ + 2 * (F * starRingEnd ℂ Δ).re := by
+  rw [Complex.normSq_apply, Complex.normSq_apply, Complex.normSq_apply, Complex.add_re, Complex.add_im]
+  have h_star : (starRingEnd ℂ Δ).re = Δ.re ∧ (starRingEnd ℂ Δ).im = -Δ.im := ⟨rfl, rfl⟩
+  have h_re : (F * starRingEnd ℂ Δ).re = F.re * Δ.re + F.im * Δ.im := by
+    rw [Complex.mul_re, h_star.1, h_star.2]
+    ring
+  rw [h_re]
+  ring
 
+/-- Background difference for the squared-norm variation Q(F, Δ) = |F + Δ|² - |F|²:
+    Q(F, Δ) - Q(G, Δ) = 2 * Re((F - G) * star Δ).
+    Proves that the squared-norm variation depends linearly on the background difference F - G. -/
+theorem complex_squared_norm_difference_background_subtraction (F G Δ : ℂ) :
+    (Complex.normSq (F + Δ) - Complex.normSq F) -
+    (Complex.normSq (G + Δ) - Complex.normSq G) =
+      2 * ((F - G) * starRingEnd ℂ Δ).re := by
+  rw [complex_squared_norm_difference_expansion F Δ]
+  rw [complex_squared_norm_difference_expansion G Δ]
+  have h_star : (starRingEnd ℂ Δ).re = Δ.re ∧ (starRingEnd ℂ Δ).im = -Δ.im := ⟨rfl, rfl⟩
+  have hF_re : (F * starRingEnd ℂ Δ).re = F.re * Δ.re + F.im * Δ.im := by
+    rw [Complex.mul_re, h_star.1, h_star.2]; ring
+  have hG_re : (G * starRingEnd ℂ Δ).re = G.re * Δ.re + G.im * Δ.im := by
+    rw [Complex.mul_re, h_star.1, h_star.2]; ring
+  have hFG_re : ((F - G) * starRingEnd ℂ Δ).re = (F.re - G.re) * Δ.re + (F.im - G.im) * Δ.im := by
+    rw [Complex.mul_re, Complex.sub_re, Complex.sub_im, h_star.1, h_star.2]; ring
+  rw [hF_re, hG_re, hFG_re]
+  ring
+
+/-- Counterexample to background independence of the squared-norm variation:
+    There exist complex backgrounds F, G and perturbation Δ such that
+    Q(F, Δ) ≠ Q(G, Δ).
+    Specifically, with F = 1, G = -1, Δ = 1, Q(1, 1) = 3 ≠ -1 = Q(-1, 1). -/
+theorem complex_squared_norm_difference_not_background_independent :
+    ∃ (F G Δ : ℂ),
+      (Complex.normSq (F + Δ) - Complex.normSq F) ≠
+      (Complex.normSq (G + Δ) - Complex.normSq G) := by
+  use 1, -1, 1
+  intro h
+  have h_eval : (Complex.normSq (1 + 1 : ℂ) - Complex.normSq (1 : ℂ)) = 3 := by
+    rw [Complex.normSq_apply, Complex.normSq_apply]
+    norm_num
+  have h_eval2 : (Complex.normSq (-1 + 1 : ℂ) - Complex.normSq (-1 : ℂ)) = -1 := by
+    rw [Complex.normSq_apply, Complex.normSq_apply]
+    norm_num
+  rw [h_eval, h_eval2] at h
+  norm_num at h
+
+/-- Fixed finite energy scaling vanishing theorem:
+    For any fixed finite energy E ≥ 0 and any ε > 0, the normalized energy E / (2 * T)
+    satisfies |E / (2 * T)| < ε for all sufficiently large T (T ≥ T₀). -/
+theorem fixed_finite_energy_scaling_zero (E : ℝ) (ε : ℝ) (hε : 0 < ε) :
+    ∃ T0 : ℝ, ∀ T : ℝ, T ≥ T0 → T > 0 → |E / (2 * T)| < ε := by
+  use (|E| / (2 * ε) + 1)
+  intro T hT hT_pos
+  have h_pos2 : 0 < 2 * T := by linarith
+  have hT_gt : |E| / (2 * ε) < T := by linarith
+  have h_eps_ne : 2 * ε ≠ 0 := by linarith
+  have h_mul : |E| < T * (2 * ε) := by
+    have h_step := mul_lt_mul_of_pos_right hT_gt (by linarith : 0 < 2 * ε)
+    rw [div_mul_cancel₀ |E| h_eps_ne] at h_step
+    exact h_step
+  have h_inv : 0 < (2 * T)⁻¹ := inv_pos.mpr h_pos2
+  have h_div : |E| / (2 * T) < ε := by
+    rw [div_eq_mul_inv]
+    have h_step := mul_lt_mul_of_pos_right h_mul h_inv
+    have h_cancel : (T * (2 * ε)) * (2 * T)⁻¹ = ε := by
+      have h2T_ne : 2 * T ≠ 0 := ne_of_gt h_pos2
+      calc (T * (2 * ε)) * (2 * T)⁻¹ = ((2 * T) * ε) * (2 * T)⁻¹ := by ring_nf
+      _ = ((2 * T) * (2 * T)⁻¹) * ε := by ring_nf
+      _ = 1 * ε := by rw [mul_inv_cancel h2T_ne]
+      _ = ε := one_mul ε
+    rw [h_cancel] at h_step
+    exact h_step
+  have h_abs_eq : |E / (2 * T)| = |E| / (2 * T) := by
+    rw [abs_div, abs_of_pos h_pos2]
+  rw [h_abs_eq]
+  exact h_div
+
+end RiemannScope
 
 
 
