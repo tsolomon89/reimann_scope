@@ -1126,6 +1126,47 @@ Supersedes:
 
 Any claim that the unmodified full finite-window difference \(\Delta S_W\) is unconditionally positive whenever \(T > \gamma\), or that scalar ring identities constitute a full complex analytic formalization.
 
+---
+
+## 2026-08-27 — Gate G4 Epistemic Repair and Additive-Renormalization No-Go Theorem
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Additive-Reference Invariance No-Go Theorem**:
+   Proved that for any scalar reference term \(R_W(A)\) independent of \(Z, \delta, \gamma\):
+   \[
+   (S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0).
+   \]
+   Therefore, a divisor-independent additive scalar subtraction cannot alter, repair, or renormalize the radial sign. Any candidate relying on an additive reference subtraction is classified as `FAIL_RADIAL_POSITIVITY`.
+   Formalized in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
+2. **Epistemic Downgrade of Numerical Quadrature Bounds**:
+   Downgraded mpmath quadrature estimated error bounds to high-precision numerical evidence (`NUMERICAL_EVIDENCE_NEGATIVE`), explicitly disclaiming unproved "rigorous interval certificates".
+3. **Cofinal Sequence Limit Theorems in Lean 4**:
+   Formalized the full sequence limit separation in Lean 4:
+   - `cofinal_sequence_fixed_limit_zero`: \(\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon\).
+   - `cofinal_diagonal_not_tendsto_zero`: \(\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)\).
+4. **Complex Generalization of Radial Rational Numerators in Lean 4**:
+   Formalized `complex_radial_defect_difference_numerator` and `complex_radial_second_order_numerator_decomposition` over \(\mathbb C\).
+5. **Elementary Absolutely Convergent Dirichlet-Series Mean-Square Lemma**:
+   Framed the prime Dirichlet mean square as an elementary 4-step lemma for \(\sum |a_n| < \infty\) with \(a_n = \Lambda(n)n^{-\sigma}\) (\(\sigma > 1\)), rather than an external invocation of Carlson's full theorem.
+6. **Pytest Tier Performance Repair**:
+   Marked expensive numerical Gate-G4 tests with `@pytest.mark.slow_numerical`, restoring `check-fast` execution to under 2 minutes.
+
+Reason:
+
+Epistemic and formal boundary repair closing the additive renormalization candidate class and establishing exact Lean 4 sequence limit separation.
+
+Mathematical / operational consequence:
+
+Updated `math_core.py`, `tests/test_cmsa_gate_g4.py`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `formal/RiemannScope/ArithmeticBridge.lean`, and all registers.
+
+Supersedes:
+
+Any claim that additive divisor-independent reference subtraction can renormalize the radial sign, or that mpmath estimated error constitutes a certified Arb interval ball.
+
+
 
 
 

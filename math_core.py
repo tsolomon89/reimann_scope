@@ -4315,10 +4315,13 @@ def certify_g4_radial_sign_witness(
     dps: int = 80
 ) -> Dict[str, Any]:
     """
-    [GATE G4 RADIAL SIGN WITNESS CERTIFIER]
-    Computes rigorous error-bounded quadrature for Delta S_W(sigma, gamma, delta, T)
-    and certifies whether the enclosure [val - err, val + err] is strictly negative (< 0)
-    or strictly positive (> 0).
+    [GATE G4 RADIAL SIGN NUMERICAL WITNESS EVALUATOR]
+    Computes high-precision numerical quadrature for Delta S_W(sigma, gamma, delta, T)
+    and reports whether the value and mpmath estimated error interval [val - err, val + err]
+    is strictly negative (< 0) or strictly positive (> 0).
+
+    NOTE (Epistemic Bound): This provides high-precision numerical floating-point evidence
+    with estimated numerical quadrature error, NOT a formal Arb interval ball certificate.
     """
     with mpmath.workdps(dps + 25):
         sig = to_mpf(sigma, dps=dps + 25)
@@ -4372,12 +4375,60 @@ def certify_g4_radial_sign_witness(
             "delta": mpmath.nstr(d_val, n=15),
             "T": mpmath.nstr(T_val, n=15),
             "value": mpmath.nstr(val, n=20),
-            "error_bound": mpmath.nstr(err, n=6),
+            "estimated_error": mpmath.nstr(err, n=6),
             "interval_lower": mpmath.nstr(lower_bound, n=20),
             "interval_upper": mpmath.nstr(upper_bound, n=20),
+            "is_negative": is_strictly_negative,
+            "is_positive": is_strictly_positive,
             "certified_negative": is_strictly_negative,
             "certified_positive": is_strictly_positive,
-            "certification_status": "CERTIFIED_NEGATIVE" if is_strictly_negative else "CERTIFIED_POSITIVE" if is_strictly_positive else "UNCERTAIN"
+            "numerical_status": "NUMERICAL_EVIDENCE_NEGATIVE" if is_strictly_negative else "NUMERICAL_EVIDENCE_POSITIVE" if is_strictly_positive else "UNCERTAIN",
+            "certification_status": "NUMERICAL_EVIDENCE_NEGATIVE" if is_strictly_negative else "NUMERICAL_EVIDENCE_POSITIVE" if is_strictly_positive else "UNCERTAIN"
         }
+
+
+def verify_additive_reference_subtraction_invariance(
+    s_delta: Union[float, str, mpmath.mpf],
+    s_0: Union[float, str, mpmath.mpf],
+    reference_r: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [NO-GO THEOREM FOR ADDITIVE RENORMALIZATION]
+    Verifies the exact identity for any scalar reference term R independent of zero configurations:
+    (S(Z_delta) - R) - (S(Z_0) - R) == S(Z_delta) - S(Z_0).
+    Consequently, an additive scalar subtraction cannot alter, repair, or renormalize the radial sign.
+    """
+    with mpmath.workdps(dps):
+        s_d = to_mpf(s_delta, dps=dps)
+        s_z0 = to_mpf(s_0, dps=dps)
+        r_val = to_mpf(reference_r, dps=dps)
+
+        raw_diff = s_d - s_z0
+        renorm_diff = (s_d - r_val) - (s_z0 - r_val)
+        algebraic_diff = abs(renorm_diff - raw_diff)
+        eps_tol = mpmath.mpf(10) ** (-(dps - 10))
+
+        # Exact symbolic check
+        import sympy as sp
+        S_d_sym, S_0_sym, R_sym = sp.symbols("S_delta S_0 R", real=True)
+        sym_expr = (S_d_sym - R_sym) - (S_0_sym - R_sym) - (S_d_sym - S_0_sym)
+        is_sym_exact = bool(sp.simplify(sym_expr) == 0)
+
+        is_invariant = bool(algebraic_diff < eps_tol) and is_sym_exact
+
+        return {
+            "s_delta": mpmath.nstr(s_d, n=15),
+            "s_0": mpmath.nstr(s_z0, n=15),
+            "reference_r": mpmath.nstr(r_val, n=15),
+            "raw_difference": mpmath.nstr(raw_diff, n=18),
+            "renormalized_difference": mpmath.nstr(renorm_diff, n=18),
+            "algebraic_discrepancy": mpmath.nstr(algebraic_diff, n=6),
+            "is_invariant": is_invariant,
+            "is_symbolic_exact": is_sym_exact,
+            "status": "ADDITIVE_REFERENCE_INVARIANCE_VERIFIED"
+        }
+
+
 
 

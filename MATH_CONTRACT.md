@@ -2342,9 +2342,9 @@ For \(p = a - i\gamma, q = a + i\gamma\) (\(a > 0\)):
 
 ## 42.3 Cofinal Limit Independence Countermodel
 For \(f(H, T) = H / T\), for any fixed \(H < \infty\), \(\lim_{T\to\infty} f(H, T) = 0\). However, for proportional cofinal schedule \(H(T) = cT\) (\(c \ne 0\)), \(f(cT, T) = c \ne 0\) for all \(T \ne 0\).
-Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`, `cofinal_sequence_diagonal_witness`):
+Proved in Lean 4 (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`):
 \[
-\forall H,\ \lim_{T\to\infty} f(H, T) = 0 \centernot\implies \lim_{T\to\infty} f(H(T), T) = 0.
+\forall H,\ \lim_{n\to\infty} f(H, n) = 0 \centernot\implies \lim_{n\to\infty} f(H(n), n) = 0.
 \]
 
 ## 42.4 Exact Radial Response Coefficient
@@ -2360,21 +2360,30 @@ where
 \[
 \boxed{C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt.}
 \]
+Algebraic numerators verified in Lean 4 over \(\mathbb C\) and \(\mathbb R\) (`complex_radial_defect_difference_numerator`, `complex_radial_second_order_numerator_decomposition`).
 
 ## 42.5 Falsification of Unrestricted Finite Positivity
-High-precision interval arithmetic certified 4 negative witnesses:
-1. Rectangular: \(\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8 \implies \Delta S_W < 0\).
-2. Fejér: \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8 \implies \Delta S_W < 0\) (despite \(T > \gamma\)).
-3. Abel-Poisson: \(\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05 \implies \Delta S_W < 0\).
-4. Gaussian: \(\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4 \implies \Delta S_W < 0\).
-Classification: `FAIL_RADIAL_POSITIVITY` for the unmodified full finite-window candidate.
+High-precision numerical quadrature produced 4 negative sign witnesses:
+1. Rectangular: \(\sigma=2.0, \gamma=14.0, \delta=0.1, T=2.8 \implies \Delta S_W = -5.9067 \times 10^{-7} < 0\).
+2. Fejér: \(\sigma=5.0, \gamma=14.0, \delta=0.49, T=16.8 \implies \Delta S_W = -1.7184 \times 10^{-4} < 0\) (despite \(T > \gamma\)).
+3. Abel-Poisson: \(\sigma=1.01, \gamma=21.0, \delta=0.49, T=1.05 \implies \Delta S_W = -3.4414 \times 10^{-6} < 0\).
+4. Gaussian: \(\sigma=1.01, \gamma=14.0, \delta=0.49, T=1.4 \implies \Delta S_W = -7.2473 \times 10^{-5} < 0\).
+Classification: `FAIL_RADIAL_POSITIVITY` for the raw synthetic finite-window functional.
 
-## 42.6 Internal Proof of Carlson Mean-Square Special Case
-For \(\sigma > 1\) and \(a_n = \Lambda(n)n^{-\sigma}\) with \(\sum |a_n| < \infty\):
-1. **Finite Identity**: \(\frac{1}{2T}\int_{-T}^T |\sum_{n=2}^N a_n n^{-it}|^2 dt = \sum_{n=2}^N a_n^2 + 2\sum_{2\le m < n \le N} a_m a_n \frac{\sin(T\log(n/m))}{T\log(n/m)}\).
+## 42.6 Elementary Absolutely Convergent Dirichlet-Series Mean-Square Lemma
+For complex coefficients with \(\sum_{n=1}^\infty |a_n| < \infty\) (including \(a_n = \Lambda(n)n^{-\sigma}, \sigma > 1\) since \(\Lambda(n) \le \log n\)):
+1. **Finite Identity**: \(\frac{1}{2T}\int_{-T}^T |\sum_{n=1}^N a_n n^{-it}|^2 dt = \sum_{n=1}^N |a_n|^2 + \sum_{1\le m \ne n \le N} a_m \overline{a_n} \frac{\sin(T\log(n/m))}{T\log(n/m)}\).
 2. **Fixed-\(N\) Limit**: For fixed \(N\), off-diagonal terms vanish as \(T \to \infty\).
 3. **Uniform Tail**: \(\|P - P_N\|_\infty \le \sum_{n>N} |a_n| =: \varepsilon_N \implies |\|P\|_T^2 - \|P_N\|_T^2| \le 2\varepsilon_N \sum |a_n|\) uniformly in \(T\).
-4. **Interchange**: \(\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum_{n=2}^\infty \frac{\Lambda(n)^2}{n^{2\sigma}}\).
+4. **Interchange**: \(\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P(\sigma+it)|^2 dt = \sum_{n=1}^\infty |a_n|^2\).
+
+## 42.7 Additive-Reference Invariance No-Go Theorem
+Let \(S_W(Z) = \int W_T(t) |A(t) - Z(t)|^2 dt\). For any scalar reference term \(R_W(A)\) independent of \(Z, \delta, \gamma\):
+\[
+\boxed{(S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) = S_W(Z_\delta) - S_W(Z_0).}
+\]
+Consequently, a divisor-independent additive scalar subtraction cannot alter, repair, or renormalize the radial sign. Formally proved in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`).
+
 
 
 

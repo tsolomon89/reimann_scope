@@ -92,6 +92,7 @@ class TestGateG4FiniteWindowExpansions:
             diff = abs(k_analytic - k_quad)
             assert diff < mpmath.mpf('1e-40')
 
+    @pytest.mark.slow_numerical
     @pytest.mark.parametrize("win_type", ["rectangular", "fejer", "abel", "gaussian"])
     def test_window_spectral_expansion_closure(self, win_type):
         """Verifies S_{N, T} = I_AA - I_AZ - I_ZA + I_ZZ across all 4 window types."""
@@ -160,6 +161,7 @@ class TestGateG4RadialVariationAndPositivity:
         delta_s = abs(mpmath.mpf(res["delta_S_full"]))
         assert delta_s < mpmath.mpf('1e-30')
 
+    @pytest.mark.slow_numerical
     @pytest.mark.parametrize("win_type", ["rectangular", "fejer", "abel", "gaussian"])
     def test_offline_quartet_radial_variation_positive_above_resonance(self, win_type):
         """Replacing an on-line pair with an off-line quartet produces Delta S > 0 when T encompasses the resonance."""
@@ -170,6 +172,7 @@ class TestGateG4RadialVariationAndPositivity:
         assert delta_s > 0
         assert res["is_full_variation_positive"] is True
 
+    @pytest.mark.slow_numerical
     def test_radial_variation_multi_precision_stability(self):
         """Verifies that Delta S is stable across dps=35, dps=50, and dps=80."""
         prec_vals = [35, 50, 80]
@@ -183,6 +186,7 @@ class TestGateG4RadialVariationAndPositivity:
         assert abs(delta_s_list[0] - delta_s_list[1]) < mpmath.mpf('1e-30')
         assert abs(delta_s_list[1] - delta_s_list[2]) < mpmath.mpf('1e-45')
 
+    @pytest.mark.slow_numerical
     def test_symmetric_permutation_invariance(self):
         """Verifies that reordering zero list does not change the spectral expansion."""
         zeros_a = [(0.0, 14.134725, 1), (0.0, 21.022040, 1), (0.0, 25.010858, 1)]
@@ -198,6 +202,7 @@ class TestGateG4RadialVariationAndPositivity:
 class TestGateG4RadialResponseCoefficientAndWitnesses:
     """Sub-Gate G4e Rigorous Radial Sign Falsification and Coefficient Analysis."""
 
+    @pytest.mark.slow_numerical
     def test_c_w_second_order_coefficient_ratio(self):
         """Verifies Delta S / delta^2 -> C_W as delta -> 0 for Fejer window."""
         c_res = evaluate_g4_radial_response_coefficient(
@@ -214,39 +219,78 @@ class TestGateG4RadialResponseCoefficientAndWitnesses:
         ratio = (delta_s / d_sq) / c_val
         assert abs(ratio - 1.0) < mpmath.mpf('1e-4')
 
+    @pytest.mark.slow_numerical
     def test_rectangular_negative_witness_certification(self):
-        """Certifies Witness 1 (Rectangular): sigma=2, gamma=14, delta=0.1, T=2.8 -> Delta S < 0."""
+        """Numerical evidence for Witness 1 (Rectangular): sigma=2, gamma=14, delta=0.1, T=2.8 -> Delta S < 0."""
         cert = certify_g4_radial_sign_witness(
             sigma=2.0, gamma=14.0, delta=0.1, T=2.8, window_type="rectangular", dps=50
         )
-        assert cert["certified_negative"] is True
-        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert cert["is_negative"] is True
+        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
         assert mpmath.mpf(cert["interval_upper"]) < 0
 
+    @pytest.mark.slow_numerical
     def test_fejer_negative_witness_certification_above_resonance(self):
-        """Certifies Witness 2 (Fejer): sigma=5, gamma=14, delta=0.49, T=16.8 (T > gamma) -> Delta S < 0."""
+        """Numerical evidence for Witness 2 (Fejer): sigma=5, gamma=14, delta=0.49, T=16.8 (T > gamma) -> Delta S < 0."""
         cert = certify_g4_radial_sign_witness(
             sigma=5.0, gamma=14.0, delta=0.49, T=16.8, window_type="fejer", dps=50
         )
-        assert cert["certified_negative"] is True
-        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert cert["is_negative"] is True
+        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
         assert mpmath.mpf(cert["interval_upper"]) < 0
 
+    @pytest.mark.slow_numerical
     def test_abel_negative_witness_certification(self):
-        """Certifies Witness 3 (Abel): sigma=1.01, gamma=21, delta=0.49, T=1.05 -> Delta S < 0."""
+        """Numerical evidence for Witness 3 (Abel): sigma=1.01, gamma=21, delta=0.49, T=1.05 -> Delta S < 0."""
         cert = certify_g4_radial_sign_witness(
             sigma=1.01, gamma=21.0, delta=0.49, T=1.05, window_type="abel", dps=50
         )
-        assert cert["certified_negative"] is True
-        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert cert["is_negative"] is True
+        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
         assert mpmath.mpf(cert["interval_upper"]) < 0
 
+    @pytest.mark.slow_numerical
     def test_gaussian_negative_witness_certification(self):
-        """Certifies Witness 4 (Gaussian): sigma=1.01, gamma=14, delta=0.49, T=1.4 -> Delta S < 0."""
+        """Numerical evidence for Witness 4 (Gaussian): sigma=1.01, gamma=14, delta=0.49, T=1.4 -> Delta S < 0."""
         cert = certify_g4_radial_sign_witness(
             sigma=1.01, gamma=14.0, delta=0.49, T=1.4, window_type="gaussian", dps=50
         )
-        assert cert["certified_negative"] is True
-        assert cert["certification_status"] == "CERTIFIED_NEGATIVE"
+        assert cert["is_negative"] is True
+        assert cert["numerical_status"] == "NUMERICAL_EVIDENCE_NEGATIVE"
         assert mpmath.mpf(cert["interval_upper"]) < 0
+
+
+class TestAdditiveReferenceInvarianceNoGo:
+    """Rigorous No-Go Theorem for Additive Divisor-Independent Renormalizations."""
+
+    def test_additive_reference_subtraction_invariance_exact(self):
+        """For any scalar R, (S(Z_delta) - R) - (S(Z_0) - R) == S(Z_delta) - S(Z_0) identically."""
+        from math_core import verify_additive_reference_subtraction_invariance
+        res = verify_additive_reference_subtraction_invariance(
+            s_delta='1.23456789',
+            s_0='1.23456700',
+            reference_r='98765.43210',
+            dps=50
+        )
+        assert res["is_invariant"] is True
+        assert res["is_symbolic_exact"] is True
+        assert res["status"] == "ADDITIVE_REFERENCE_INVARIANCE_VERIFIED"
+        assert mpmath.mpf(res["algebraic_discrepancy"]) < mpmath.mpf('1e-40')
+
+    def test_additive_reference_cannot_repair_negative_witness(self):
+        """Applying any additive reference R to Witness WIT-02 leaves Delta S < 0 invariant."""
+        from math_core import verify_additive_reference_subtraction_invariance
+        # Using Witness WIT-02 parameters
+        res = verify_additive_reference_subtraction_invariance(
+            s_delta='0.0010',
+            s_0='0.00117183799',
+            reference_r='100.5',
+            dps=50
+        )
+        assert res["is_invariant"] is True
+        raw = mpmath.mpf(res["raw_difference"])
+        renorm = mpmath.mpf(res["renormalized_difference"])
+        assert raw < 0
+        assert renorm == raw < 0
+
 

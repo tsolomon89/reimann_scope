@@ -462,14 +462,38 @@ theorem complex_quadratic_four_term_expansion (A Z : ℂ) :
   simp only [star_sub]
   ring
 
-/-- Exact algebraic identity for radial defect difference numerator:
+/-- Additive Reference Invariance Theorem (No-Go Theorem for Additive Renormalization):
+    For any functional S : α → ℝ and any scalar reference term R : ℝ independent of the configuration,
+    the variation between two configurations Z_delta and Z_0 is invariant under additive subtraction:
+    (S(Z_delta) - R) - (S(Z_0) - R) = S(Z_delta) - S(Z_0).
+    Consequently, a divisor-independent additive scalar reference subtraction cannot alter, repair,
+    or renormalize the radial sign. -/
+theorem additive_reference_subtraction_invariance {α : Type*} (S : α → ℝ) (R : ℝ) (z_delta z_0 : α) :
+    (S z_delta - R) - (S z_0 - R) = S z_delta - S z_0 := by
+  ring
+
+/-- Complex algebraic identity for radial defect difference numerator:
+    (u - δ²)*u - ((u - δ²)² + 4*δ²*γ²) = δ²*(u - 4*γ² - δ²).
+    Holds identically over the complex numbers ℂ (and any commutative ring). -/
+theorem complex_radial_defect_difference_numerator (u d2 gam2 : ℂ) :
+    (u - d2) * u - ((u - d2)^2 + 4 * d2 * gam2) = d2 * (u - 4 * gam2 - d2) := by
+  ring
+
+/-- Complex algebraic numerator expansion for second-order radial response coefficient:
+    4*z*δ²*(z² - 3*γ² - δ²) = 4*z*δ²*(z² - 3*γ²) - 4*z*δ⁴.
+    Holds identically over the complex numbers ℂ (and any commutative ring). -/
+theorem complex_radial_second_order_numerator_decomposition (z gam d : ℂ) :
+    4 * z * d^2 * (z^2 - 3 * gam^2 - d^2) = 4 * z * d^2 * (z^2 - 3 * gam^2) - 4 * z * d^4 := by
+  ring
+
+/-- Exact algebraic identity for radial defect difference numerator over ℝ:
     (u - δ²)*u - ((u - δ²)² + 4*δ²*γ²) = δ²*(u - 4*γ² - δ²).
     When u = z² + γ², this yields the exact numerator factor 4*z*δ²*(z² - 3*γ² - δ²). -/
 theorem radial_defect_difference_numerator (u d2 gam2 : ℝ) :
     (u - d2) * u - ((u - d2)^2 + 4 * d2 * gam2) = d2 * (u - 4 * gam2 - d2) := by
   ring
 
-/-- Exact algebraic numerator expansion for second-order radial response coefficient:
+/-- Exact algebraic numerator expansion for second-order radial response coefficient over ℝ:
     4*z*δ²*(z² - 3*γ² - δ²) = 4*z*δ²*(z² - 3*γ²) - 4*z*δ⁴. -/
 theorem radial_second_order_numerator_decomposition (z gam d : ℝ) :
     4 * z * d^2 * (z^2 - 3 * gam^2 - d^2) = 4 * z * d^2 * (z^2 - 3 * gam^2) - 4 * z * d^4 := by
@@ -482,6 +506,44 @@ theorem cofinal_sequence_diagonal_witness (n : ℕ) :
     ((n : ℝ) + 1) / ((n : ℝ) + 1) = 1 := by
   have h_ne : (n : ℝ) + 1 ≠ 0 := by linarith
   exact div_self h_ne
+
+/-- Pointwise fixed-H sequence limit theorem:
+    For any fixed H : ℝ and any ε > 0, the sequence f(H, n) = H / (n + 1) satisfies |f(H, n)| < ε
+    for all sufficiently large n (n ≥ N). -/
+theorem cofinal_sequence_fixed_limit_zero (H : ℝ) (ε : ℝ) (hε : 0 < ε) :
+    ∃ N : ℕ, ∀ n : ℕ, n ≥ N → |H / ((n : ℝ) + 1)| < ε := by
+  obtain ⟨N, hN⟩ := exists_nat_gt (|H| / ε)
+  use N
+  intro n hn
+  have h_pos : 0 < (n : ℝ) + 1 := by linarith
+  rw [abs_div, abs_of_pos h_pos]
+  have hn_gt : |H| / ε < (n : ℝ) + 1 := by
+    calc |H| / ε < (N : ℝ) := hN
+    _ ≤ (n : ℝ) := Nat.cast_le.mpr hn
+    _ < (n : ℝ) + 1 := by linarith
+  have h_eps_ne : ε ≠ 0 := ne_of_gt hε
+  have h_pos_ne : (n : ℝ) + 1 ≠ 0 := ne_of_gt h_pos
+  have h_mul1 : (|H| / ε) * ε < ((n : ℝ) + 1) * ε :=
+    mul_lt_mul_of_pos_right hn_gt hε
+  rw [div_mul_cancel₀ |H| h_eps_ne] at h_mul1
+  have h_pos_inv : 0 < ((n : ℝ) + 1)⁻¹ := inv_pos.mpr h_pos
+  have h_mul2 : |H| * ((n : ℝ) + 1)⁻¹ < (((n : ℝ) + 1) * ε) * ((n : ℝ) + 1)⁻¹ :=
+    mul_lt_mul_of_pos_right h_mul1 h_pos_inv
+  rw [mul_comm ((n : ℝ) + 1) ε, mul_assoc, mul_inv_cancel h_pos_ne, mul_one] at h_mul2
+  rw [← div_eq_mul_inv] at h_mul2
+  exact h_mul2
+
+/-- Cofinal limit separation theorem:
+    The diagonal sequence along H(n) = n + 1 does NOT converge to 0.
+    Thus pointwise fixed-H vanishing f(H, n) → 0 does not imply cofinal vanishing f(H(n), n) → 0. -/
+theorem cofinal_diagonal_not_tendsto_zero :
+    ¬ (∀ (ε : ℝ), 0 < ε → ∃ N : ℕ, ∀ n : ℕ, n ≥ N → |((n : ℝ) + 1) / ((n : ℝ) + 1) - 0| < ε) := by
+  intro h
+  have h_half : 0 < (1 / 2 : ℝ) := by norm_num
+  obtain ⟨N, hN⟩ := h (1 / 2) h_half
+  have hN_N := hN N (le_refl N)
+  rw [cofinal_sequence_diagonal_witness, sub_zero, abs_one] at hN_N
+  linarith
 
 /-- Elementary cofinal limit distinction countermodel (pointwise algebraic witness):
     For f(H, T) = H / T, under proportional cofinal schedule H(T) = c * T (c ≠ 0),

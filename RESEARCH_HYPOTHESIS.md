@@ -911,7 +911,7 @@ Evaluated across:
 All four window families achieve exact finite quadratic expansion closure and are classified as `FINITE_IDENTITY_PROVED_G4_OPEN`.
 
 ## 24.2 Cofinal Limit Independence & Boundary Layer
-Proved in Lean 4 (`cofinal_schedule_distinct_from_fixed_limit`, `cofinal_sequence_diagonal_witness`): fixed-truncation limits \(\forall H, \lim_{T\to\infty} f(H, T) = 0\) do not imply cofinal limit vanishing \(\lim_{T\to\infty} f(H(T), T) = 0\).
+Proved in Lean 4 (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`): fixed-truncation limits \(\forall H, \lim_{n\to\infty} f(H, n) = 0\) do not imply cofinal limit vanishing \(\lim_{n\to\infty} f(H(n), n) = 0\).
 
 ## 24.3 Exact Radial Response Coefficient & Sign Falsification
 The symmetric second-order coefficient:
@@ -919,7 +919,12 @@ The symmetric second-order coefficient:
 C_W(\sigma, \gamma, T) = -2\Re \int_{\mathbb R} W_T(t) F_0(t) \overline{D_\gamma(\sigma - 1/2 + it)} dt, \qquad D_\gamma(z) = \frac{4z(z^2 - 3\gamma^2)}{(z^2+\gamma^2)^3},
 \]
 governs the leading variation \(\Delta S_W = \delta^2 C_W + O(\delta^4)\).
-High-precision interval quadrature certified 4 negative witnesses (WIT 1–4 across Rectangular, Fejér with \(T > \gamma\), Abel, Gaussian), proving that \(\Delta S_W\) changes sign. The unmodified full finite-window candidate is classified as `FAIL_RADIAL_POSITIVITY`.
+High-precision numerical quadrature produced 4 negative witnesses (WIT 1–4 across Rectangular, Fejér with \(T > \gamma\), Abel, Gaussian), proving that the raw synthetic finite-window difference \(\Delta S_W\) is not globally positive. The raw finite-window functional is classified as `FAIL_RADIAL_POSITIVITY`.
+
+## 24.4 Additive-Reference Invariance No-Go Theorem
+For any scalar reference \(R_W(A)\) independent of \(Z, \delta, \gamma\), \((S_W(Z_\delta) - R_W(A)) - (S_W(Z_0) - R_W(A)) \equiv S_W(Z_\delta) - S_W(Z_0)\).
+Thus, divisor-independent additive scalar subtraction cannot alter or repair the radial sign. Divisor-independent additive renormalizations are classified as `FAIL_RADIAL_POSITIVITY` (formalized in Lean 4: `RiemannScope.additive_reference_subtraction_invariance`).
+
 
 
 

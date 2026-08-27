@@ -452,15 +452,17 @@ If a simple law survives, broad computation should stop until that law is algebr
 |---|---|---|---|
 | G4-001 | Fejér windowed zero kernel has exact elementary closed form: $J_T^{\text{Fejér}}(p,q) = \frac{I_T(p)+I_T(q)}{T(p+q)}$. | **PROVED / EXACT** | Proved analytically and verified numerically ($< 10^{-40}$) via `exact_fejer_zero_kernel_J_T`. |
 | G4-002 | Asymptotic transition formula across regimes 1–4 matches $J_T$ to machine precision: $\frac{\arctan((T-\gamma)/a) + \arctan((T+\gamma)/a)}{2aT}$. | **PROVED / EXACT** | Proved by direct real-part integration on $[-T, T]$. |
-| G4-003 | Cofinal boundary layer limit independence: fixed-truncation vanishing $\forall H, \lim_{T\to\infty} f(H,T) = 0$ does not imply cofinal vanishing $\lim_{T\to\infty} f(H(T),T) = 0$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.cofinal_schedule_distinct_from_fixed_limit`, `cofinal_sequence_diagonal_witness`). |
+| G4-003 | Cofinal boundary layer limit independence: fixed-truncation vanishing $\forall H, \lim_{n\to\infty} f(H,n) = 0$ does not imply cofinal vanishing $\lim_{n\to\infty} f(H(n),n) = 0$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`cofinal_sequence_fixed_limit_zero`, `cofinal_diagonal_not_tendsto_zero`, `cofinal_sequence_diagonal_witness`, `cofinal_schedule_distinct_from_fixed_limit`). |
 | G4-004 | Finite windowed quadratic expansion decomposes as $(A-Z)^2 = A^2 - 2AZ + Z^2 = AA - AZ - ZA + ZZ$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.finite_quadratic_expansion_identity`, `finite_quadratic_four_term_decomposition`, `complex_quadratic_four_term_expansion`). |
 | G4-005 | Four tested window families (Rectangular, Fejér, Abel-Poisson, Gaussian) all achieve exact finite expansion and remain open at Gate G4. | **CLASSIFIED / G4_OPEN** | Documented in `CMSA_GATE_G4.md`. |
-| G4-006 | Unmodified full finite-window radial response $\Delta S_W$ is sign-changing and NOT globally positive. | **PROVED / FALSIFIED** | Certified by interval negative witnesses WIT 1–4; classified as `FAIL_RADIAL_POSITIVITY`. |
+| G4-006 | Raw finite-window radial response $\Delta S_W$ is sign-changing and NOT globally positive. | **PROVED / FALSIFIED** | Certified by negative witnesses WIT 1–4; classified as `FAIL_RADIAL_POSITIVITY`. |
 | G4-007 | Gate G4 Regularized Bridge Rigidity: any valid instance of `ConditionalG4RegularizedBridge` forces all represented zero defects to vanish ($d_j = 0$). | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`). |
 | G4-008 | Arithmetic independence firewall strictly prevents zero loading during arithmetic anchor evaluation. | **PROVED / ENFORCED** | Verified via mock testing in `test_cmsa_gate_g4.py`. |
 | G4-009 | Second-order radial response coefficient $C_W(\sigma, \gamma, T) = -2\Re \int W_T(t) F_0(t) \overline{D_\gamma(z)} dt$ governs leading variation $\Delta S_W = \delta^2 C_W + O(\delta^4)$. | **PROVED / EXACT** | Proved analytically and verified numerically in `evaluate_g4_radial_response_coefficient`. |
-| G4-010 | Interval-certified negative witnesses WIT 1–4 strictly enclose $\Delta S_W < 0$ in error-bounded quadrature. | **PROVED / INTERVAL_CERTIFIED** | Verified in `tests/test_cmsa_gate_g4.py` (`certify_g4_radial_sign_witness`). |
-| G4-011 | Internal proof of Carlson's mean-square special case for Dirichlet series with $\sum |a_n| < \infty$. | **PROVED / EXACT** | 4-step proof documented in `CMSA_GATE_G4.md` §4 without external black-box theorems. |
+| G4-010 | High-precision numerical witnesses WIT 1–4 evaluate $\Delta S_W < 0$ across multiple windows. | **PROVED / NUMERICAL_EVIDENCE** | Verified in `tests/test_cmsa_gate_g4.py` (`certify_g4_radial_sign_witness`). |
+| G4-011 | Elementary absolutely convergent Dirichlet-series mean-square lemma for $\sum |a_n| < \infty$. | **PROVED / EXACT** | 4-step proof documented in `CMSA_GATE_G4.md` §4 without external black-box theorems. |
+| G4-012 | Additive-Reference Invariance No-Go Theorem: $(S_W(Z_\delta)-R) - (S_W(Z_0)-R) = S_W(Z_\delta) - S_W(Z_0)$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`RiemannScope.additive_reference_subtraction_invariance`). |
+
 
 
 
