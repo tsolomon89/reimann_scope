@@ -854,6 +854,6 @@ Formalized in `formal/RiemannScope/CurvatureTransport.lean` (20 compiled formal 
    - `ConditionalCurvatureRigidityBridge`: conditional bridge structure with vanishing arithmetic functional $\mathscr A_\tau = 0$ and curvature identity $\mathscr A_\tau = \sum w_j \delta_j^2$.
    - `ConditionalCurvatureRigidityBridge.all_defects_zero`: formal theorem proving $\forall j, \delta_j = 0$ (RH).
 
-Total compiled project theorem declarations: **107** (0 `sorry`, 0 `admit`, 0 warnings).
+Total compiled project theorem declarations: **106** (0 `sorry`, 0 `admit`, 0 warnings).
 
 
