@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "grade_constraint_comparison",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-28T19:44:37.635759+00:00",
-  "completed_at": "2026-08-28T19:44:37.664337+00:00",
+  "started_at": "2026-08-28T20:18:54.749099+00:00",
+  "completed_at": "2026-08-28T20:18:54.770167+00:00",
   "status": "complete",
-  "git_commit": "de87edd24b96e49ddf63538d8e0924a0246195fd",
-  "producing_git_commit": "de87edd24b96e49ddf63538d8e0924a0246195fd",
+  "git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
+  "producing_git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
   "git_dirty": false,
   "experiment_spec_sha256": "8f2d200ac4c215ac0f33835ff6a7ec6c9b4b04cb7ad095834680fb079257873a",
   "precision": {
@@ -64,7 +64,7 @@
   "source_code_hashes": {
     "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "375ff13bf58fdafb06940e98235eee88275b64aa0f9d90614d083a6a105cedcc",
+    "math_core.py": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/grade_constraints.py": "41edea2effbeed0581dcc280337cc070a6c1e54e7e39dce3cfdb5b0ce7bdbac0",
@@ -90,7 +90,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "375ff13bf58fdafb06940e98235eee88275b64aa0f9d90614d083a6a105cedcc"
+      "sha256": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b"
     },
     {
       "path": "reference_data.py",
@@ -151,19 +151,19 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "d0901d1d5d59274745bfef299c8a159f1b6eef1bf85c430a50774cb12013871c"
+      "sha256": "fdce926c0e01d0601355495edb896c65d1969fead02e839400f658d7d6db4ad0"
     }
   },
   "execution_provenance": {
     "results_sha256": "c96a672fb0fa420ef4398939264db19c4c0268f2092e363bfa081fa284277780",
-    "producing_git_commit": "de87edd24b96e49ddf63538d8e0924a0246195fd",
+    "producing_git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
     "git_dirty": false,
-    "started_at": "2026-08-28T19:44:37.635759+00:00",
-    "completed_at": "2026-08-28T19:44:37.664337+00:00",
+    "started_at": "2026-08-28T20:18:54.749099+00:00",
+    "completed_at": "2026-08-28T20:18:54.770167+00:00",
     "source_code_hashes": {
       "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "375ff13bf58fdafb06940e98235eee88275b64aa0f9d90614d083a6a105cedcc",
+      "math_core.py": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/grade_constraints.py": "41edea2effbeed0581dcc280337cc070a6c1e54e7e39dce3cfdb5b0ce7bdbac0",
@@ -204,7 +204,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "375ff13bf58fdafb06940e98235eee88275b64aa0f9d90614d083a6a105cedcc"
+        "sha256": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b"
       },
       {
         "path": "reference_data.py",
@@ -256,10 +256,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "ac1ad30570b4d1e55cb27b5dc4aae045b23f5d8e29720e3d4951daeb2035cd4a",
-    "readme_sha256": "d0901d1d5d59274745bfef299c8a159f1b6eef1bf85c430a50774cb12013871c",
+    "readme_sha256": "fdce926c0e01d0601355495edb896c65d1969fead02e839400f658d7d6db4ad0",
     "diagnostics_sha256": null,
-    "summary_git_commit": "de87edd24b96e49ddf63538d8e0924a0246195fd",
-    "summarized_at": "2026-08-28T19:44:37.664337+00:00",
+    "summary_git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
+    "summarized_at": "2026-08-28T20:18:54.770167+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/grade_constraints.py": "41edea2effbeed0581dcc280337cc070a6c1e54e7e39dce3cfdb5b0ce7bdbac0",
