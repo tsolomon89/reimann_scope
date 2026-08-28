@@ -515,12 +515,14 @@ Until a coherent, non-redundant $\Delta^{TC}_T$ is defined and proved to satisfy
 
 ---
 
-### 9.11 Curvature-Transport Unification & Supercedence of Raw $1/(2T)$ Averaging
+### 9.11 Curvature-Transport Unification & Spectral Detector Distinction
 
-The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) resolves the structural deficiency of raw translation averaging:
-1. **Native Variation at Orbit Level**: Instead of diluting finite perturbations by $1/(2T)$, Curvature Transport evaluates the native second grade variation of the reflection pair modulus sum:
-   $$B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2.$$
-2. **Orbit-Level Zero-Rigidity**: $B_\rho''(0) > 0$ for *any* off-line zero (including a single isolated off-line quartet), overcoming the finite invisibility defect of normalized mean averaging.
-3. **Canonical Open Descent**: The open barrier transfers from translation averaging to the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`): constructing a divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ matching $\sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) without zero inputs.
+The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) resolves the structural deficiency of raw translation averaging at the spectral detector level:
+1. **Native Variation at Orbit Level**: Instead of diluting finite perturbations by $1/(2T)$, Curvature Transport evaluates the native continuous second grade variation of the reflection pair modulus sum:
+   $$B_\rho''(0) = \left.\frac{d^2}{dk^2} B_\rho(k)\right|_{k=0} = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2.$$
+2. **Orbit-Level Zero-Rigidity**: $B_\rho''(0) > 0$ for *any* off-line zero (including a single isolated off-line quartet), bypassing the finite $L^2$ invisibility defect of translation-averaged mean squares at the spectral detector level.
+3. **Scalar-Transport No-Go Theorem & Holomorphic Obstruction**: Scalar multipliers $F_k = g_k L$ produce identically zero grade derivatives at zeros ($0 \equiv 0$); no fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set ($\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$).
+4. **Distinction from Gate G4 Resolution**: Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4. Constructing a zero-independent non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ matching $\sum W_\rho \delta_\rho^2$ is the program's canonical earliest open obligation: **Non-Scalar Arithmetic Functional Construction** (`OBL-CT-001A`). Whether a non-scalar arithmetic functional avoids or reproduces the pair-isolation/infinite-limit barrier remains an open research problem.
+
 
 

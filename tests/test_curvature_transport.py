@@ -117,7 +117,7 @@ class TestReflectionPairCurvature:
 
 
 class TestThetaMellinAndFalsificationControls:
-    """Tests for theta-Mellin scaling, scalar multiplication obstruction, and countermodels."""
+    """Tests for theta-Mellin scaling, numerical quadrature, scalar no-go instances, and countermodels."""
 
     @pytest.mark.parametrize("a", [0.5, 1.0, 2.0, 6.283185307179586])
     @pytest.mark.parametrize("s", [
@@ -130,15 +130,34 @@ class TestThetaMellinAndFalsificationControls:
         assert res["status"] == "THETA_MELLIN_SCALING_VERIFIED"
         assert float(res["error"]) < 1e-35
 
-    @pytest.mark.parametrize("K", [-2, 0, 1, 3])
+    @pytest.mark.parametrize("a", [0.8, 1.0, 2.0, 6.283185307179586])
+    @pytest.mark.parametrize("s", [
+        mpmath.mpc("2.0", "0.0"),
+        mpmath.mpc("2.5", "1.5"),
+        mpmath.mpc("3.0", "-2.0"),
+    ])
+    def test_numerical_theta_mellin_quadrature(self, a, s):
+        res = math_core.numerical_theta_mellin_quadrature(a=a, s=s, N_theta=40, dps=30)
+        assert res["status"] == "THETA_MELLIN_QUADRATURE_VERIFIED"
+        assert float(res["quadrature_error"]) < 1e-10
+        assert res["tail_bound_satisfied"] is True
+        assert float(res["unnormalized_tail_bound"]) > 0
+        assert float(res["halfdensity_tail_bound"]) > 0
+
+    @pytest.mark.parametrize("k", [-2.5, 0.0, 1.333, 3.14159])
     @pytest.mark.parametrize("delta,gamma", [
         ("0.0", "14.134725"),
         ("0.01", "21.022040"),
+        ("-0.025", "25.010857"),
     ])
-    def test_scalar_zero_multiplication_obstruction(self, K, delta, gamma):
-        res = math_core.verify_scalar_zero_multiplication_obstruction(K=K, delta=delta, gamma=gamma, dps=50)
-        assert res["status"] == "SCALAR_ZERO_OBSTRUCTION_CONFIRMED"
-        assert res["is_identically_zero"] is True
+    def test_scalar_transport_nogo_instances(self, k, delta, gamma):
+        res = math_core.verify_scalar_transport_nogo_instances(
+            k=k, delta=delta, gamma=gamma, max_m_order=3, dps=50
+        )
+        assert res["status"] == "SCALAR_TRANSPORT_NOGO_INSTANCES_VERIFIED"
+        assert res["all_derivatives_identically_zero"] is True
+        assert res["log_derivative_identity_holds"] is True
+        assert res["pullback_zero_worldline_vanishes"] is True
 
     @pytest.mark.parametrize("delta,gamma", [
         ("0.005", "14.134725"),

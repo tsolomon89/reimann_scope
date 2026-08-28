@@ -1034,12 +1034,15 @@ Designated as the **earliest open subgate** logically preceding \(E_T - C_T\) as
 ## 24.8 Curvature-Transport Unification and Transcendental Curvature Rigidity
 
 The repository's geometric, spectral, and arithmetic structures are unified under the **Curvature-Transport Framework**:
-- Circle geometry ($C_K = \tau^{1-K}, r_K = \tau^{-K}, \kappa_K = \tau^K$) satisfies $r_K\kappa_K = 1, C_1 = 1$, generating the angular Fourier lattice $L_K = \tau^K\mathbb Z$.
-- Zero displacement $d_{\rho,K} = \tau^K\delta$ under the transported radial unit $r_K$ recovers the invariant: $(r_K d_{\rho,K})^2 = \delta^2$.
+- Circle geometry ($C_K = \tau^{1-K}, r_K = \tau^{-K}, \kappa_K = \tau^K$) at integer checkpoints $K \in \mathbb Z$ satisfies $r_K\kappa_K = 1, C_1 = 1$, generating the angular Fourier lattice $L_K = \tau^K\mathbb Z$.
+- Zero displacement $d_{\rho}(k) = \tau^k\delta$ at continuous grade $k \in \mathbb R$ under the transported radial unit $r(k) = \tau^{-k}$ recovers the invariant: $(r(k) d_{\rho}(k))^2 = \delta^2$.
 - Half-density dilation $(U_a f)(x) = a^{1/2}f(ax)$ on $L^2(\mathbb R_{>0})$ acts as $a^{1/2-s}x^{-s}$, with the critical line $\Re(s)=1/2$ as its exact unitary-character axis $|a^{1/2-s}|=1$.
-- The reflection-pair defect $B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = 2(\cosh(K\delta\log\tau)-1) \ge 0$ yields native second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$ and normalized invariant $\mathscr K_\tau(\rho) = \delta^2$.
-- The conditional **Transcendental Curvature Rigidity Theorem** establishes:
-  $$\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.$$
-- The program's canonical open obligation is the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`), superseding raw CMSA $1/(2T)$ activation. Reference: `CURVATURE_TRANSPORT.md`.
+- The reflection-pair defect $B_\rho(k) = |\chi_\rho(k)| + |\chi_{\rho^\#}(k)| - 2 = 2(\cosh(k\delta\log\tau)-1) \ge 0$ yields native continuous second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$ and normalized invariant $\mathscr K_\tau(\rho) = \delta^2$.
+- **Theta–Mellin Scaling & Scalar No-Go**: The half-density Mellin transform $\tau^{k/2}\int_0^\infty \Theta_{\tau^k}^+(t) t^{s/2-1} dt = \chi_s(k)^{-1}\Lambda(s)$ is an exact theorem on $\Re(s)>1$. The **Scalar-Transport No-Go Theorem** proves that for scalar multipliers $F_k = g_k L$, all grade derivatives at zeros vanish identically ($0 \equiv 0$), and logarithmic derivatives on $gL \ne 0$ supply zero divisor data.
+- **Scoped One-Point Holomorphic Obstruction**: No fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set ($\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$), requiring non-scalar pairings, contour boundary terms, or regularized determinants.
+- **Transcendental Curvature Rigidity Theorem**:
+  $$\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.$$
+- **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ is the program's canonical earliest open obligation. Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair barrier remains an open problem. Reference: `CURVATURE_TRANSPORT.md`.
+
 
 

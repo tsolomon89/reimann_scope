@@ -1408,12 +1408,45 @@ Decision:
 7. **Authority Register Subsequential Correction**:
    - Corrected historical overstatements to emphasize that non-vanishing response implies a subsequential lower bound $\exists \varepsilon > 0, T_j \to \infty \text{ s.t. } \|\Delta_{T_j}\| \ge \varepsilon\sqrt{T_j}$, rather than an eventual $\Omega(\sqrt{T})$ bound.
 
+---
+
+## 2026-08-28 — Curvature-Descent Boundary Audit and Non-Scalar Bridge Construction
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Continuous vs Discrete Grade Parameter Separation**:
+   - Strictly separated continuous grade $k \in \mathbb R$ (used for differentiation, character variation, zero worldlines $s_\rho(k) = \tau^k\rho$, and curvature $B_\rho''(0)$) from discrete integer grade checkpoints $K \in \mathbb Z$ (used for bilateral lattices $L_K = \tau^K\mathbb Z$ and circle circumferences $C_K = \tau^{1-K}$).
+2. **Complete 4-Step Theta–Mellin Integral Proof**:
+   - Completed the full 4-step analytic proof of the theta–Mellin scaling law:
+     - Step 1: Explicit absolute convergence and Tonelli/Fubini interchange on $\Re(s) > 1$;
+     - Step 2: Complex Mellin evaluation $\int_0^\infty \Theta_a^+(t) t^{s/2-1} dt = a^{-s}\pi^{-s/2}\Gamma(s/2)\zeta(s) = a^{-s}\Lambda(s)$;
+     - Step 3: Half-density dilation scaling $a^{1/2}\int_0^\infty \Theta_a^+(t) t^{s/2-1} dt = a^{1/2-s}\Lambda(s) = \chi_s(k)^{-1}\Lambda(s)$ for $a = \tau^k$;
+     - Step 4: Scaled Poisson summation $\theta(a^2 t) = \frac{1}{a\sqrt{t}}\theta(1/(a^2 t))$ and explicit Dirichlet tail bounds distinguishing unnormalized from half-density normalized bounds.
+3. **Scalar-Transport No-Go Theorem**:
+   - Formulated and proved the Scalar-Transport No-Go Theorem for scalar multipliers $F(k,s) = g(k,s)L(s)$:
+     - Vanishing of all grade derivatives at zeros: $L(\rho) = 0 \implies \partial_k^m F(k,\rho) \equiv 0$ for all $m \ge 0$;
+     - Divisor preservation on $g \ne 0$;
+     - Logarithmic derivative decomposition $\partial_s \log F = \partial_s \log L + \partial_s \log g$ on $gL \ne 0$, where $\partial_s \log g = -k\log\tau$ contains zero divisor data;
+     - Vanishing along the zero worldline pullback $F_k(s(k)) \equiv 0$.
+4. **Scoped One-Point Holomorphic Obstruction**:
+   - Proved the scoped Cauchy-Riemann obstruction: no fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set, because $\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$.
+   - Determined that any non-scalar arithmetic functional must employ sesquilinear pairing, contour boundary terms, or regularized determinants.
+5. **Curvature Transport vs CMSA Gate G4 Clarification**:
+   - Documented the 8-point comparison matrix between Curvature Transport and CMSA Gate G4.
+   - Clarified that Curvature Transport operates at the orbit level and bypasses fixed-finite $L^2$ translation invisibility at the spectral detector level ($B_\rho''(0) > 0$ for a single off-line quartet), but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair-isolation/infinite-limit barrier remains an open problem.
+6. **Sharpened Canonical Open Obligations (OBL-CT-001A–D)**:
+   - Sharpened the curvature descent program into four sequential gates, establishing `OBL-CT-001A` (Non-Scalar Arithmetic Functional Construction) as the canonical earliest open obligation.
+7. **Lean 4 Project Theorem Inventory**:
+   - Expanded `RiemannScope.CurvatureTransport` with 8 new theorems (continuous grade signatures, strictly positive curvature, scalar no-go algebraic lemmas, and exact quartet roots), bringing the project total to **114 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+
 Reason:
 
-Provide a unified, rigorous, and formally verified geometric-spectral foundation connecting radial circle curvature, Fourier frequency lattices, and grade characters to spectral defect invariants, while maintaining an uncompromising epistemic firewall on the remaining open arithmetic descent obligation.
+Correct remaining theorem-boundary overclaims, establish complete mathematical precision for theta-Mellin scaling, eliminate scalar candidate illusions via the No-Go Theorem, scope the non-holomorphic obstruction, and isolate the exact open gates for non-scalar arithmetic functional construction.
 
 Mathematical / operational consequence:
 
-Created `CURVATURE_TRANSPORT.md`, `formal/RiemannScope/CurvatureTransport.lean`, and `tests/test_curvature_transport.py`; updated `math_core.py`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `TRANSCENDENTAL_CONTINUATION.md`, `CMSA_GATE_G4.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, `RESEARCH_LEDGER.md`, and all three corpus registers.
+Updated `CURVATURE_TRANSPORT.md`, `formal/RiemannScope/CurvatureTransport.lean`, `math_core.py`, `tests/test_curvature_transport.py`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `TRANSCENDENTAL_CONTINUATION.md`, `CMSA_GATE_G4.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, `RESEARCH_LEDGER.md`, and all three corpus registers.
 
 

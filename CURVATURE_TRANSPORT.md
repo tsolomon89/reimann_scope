@@ -3,7 +3,7 @@
 **Document Identifier**: `CURVATURE_TRANSPORT.md`  
 **Status**: Authoritative Research Specification & Unification Theorem  
 **Mathematical Layer**: Transcendental Continuation, Radial Foliation, Fourier Geometry, Spectral Rigidity, Arithmetic Bridge  
-**Epistemic Authority**: Proved Geometric & Spectral Invariants (`PROVED / EXACT / FORMALLY_PROVED`); Conditional Reader-Facing Rigidity Theorem; Canonical Open Obligation (`OBL-CT-001`).
+**Epistemic Authority**: Proved Geometric & Spectral Invariants (`PROVED / EXACT / FORMALLY_PROVED`); Conditional Reader-Facing Rigidity Theorem; Canonical Open Obligation (`OBL-CT-001A`).
 
 ---
 
@@ -11,18 +11,18 @@
 
 This document establishes the **Curvature-Transport Framework**, unifying 10 core geometric, spectral, and arithmetic constructions of `reimann_scope` as expressions of a single transported invariant:
 
-1. **Circle Geometry**: Circumference $C_K = \tau^{1-K}$, radius $r_K = \tau^{-K}$, and Euclidean curvature $\kappa_K = \tau^K$;
+1. **Circle Geometry**: Circumference $C_K = \tau^{1-K}$, radius $r_K = \tau^{-K}$, and Euclidean curvature $\kappa_K = \tau^K$ for integer grade checkpoints $K \in \mathbb{Z}$;
 2. **Grade Lattices**: Fundamental angular Fourier frequency lattices $L_K = \tau^K \mathbb{Z}$;
-3. **Transcendental-Continuation Zero Worldlines**: $s_\rho(k) = \tau^k \rho$;
+3. **Transcendental-Continuation Zero Worldlines**: $s_\rho(k) = \tau^k \rho$ for continuous grade $k \in \mathbb{R}$;
 4. **Transported Radial Unit**: $r_K = \tau^{-K}$;
-5. **Grade Character**: $q_\rho^K = \chi_\rho(K) = \tau^{K(\rho - 1/2)}$;
-6. **Reflection-Pair Reciprocal Modes**: $|\chi_{\rho^\#}(K)| = |\chi_\rho(K)|^{-1}$;
-7. **Exact $\cosh$ Grade Curvature**: $B_\rho(K) = 2(\cosh(K\delta\log\tau) - 1) = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right)$;
+5. **Continuous Grade Character**: $\chi_\rho(k) = \tau^{k(\rho - 1/2)}$;
+6. **Reflection-Pair Reciprocal Modes**: $|\chi_{\rho^\#}(k)| = |\chi_\rho(k)|^{-1}$;
+7. **Exact $\cosh$ Grade Curvature**: $B_\rho(k) = 2(\cosh(k\delta\log\tau) - 1) = 4\sinh^2\left(\frac{k\delta\log\tau}{2}\right)$;
 8. **Separated-Signal Curvature**: $\sum \delta_\rho^2$;
 9. **Radial-Defect Quotient Curvature**: $\delta_\rho^2 / \gamma_\rho^2$;
 10. **Half-Density Dilation & Theta–Mellin Scaling Law**: $(U_a f)(x) = a^{1/2}f(ax)$ with Mellin character $a^{1/2-s}$.
 
-### The Proof Architecture & The Remaining Open Arrow
+### The Proof Architecture & The Central Open Question
 
 The overarching deductive skeleton is:
 
@@ -39,7 +39,11 @@ $$\boxed{
 }$$
 
 > [!IMPORTANT]
-> **Status of Arrow $(\star)$**: The first three steps and the final conditional implication are **EXACT, PROVED, AND FORMALLY VERIFIED IN LEAN 4**. Arrow $(\star)$ (the descent of arithmetic grade-flatness to the positive sum of zero orbit curvatures without cross-term cancellation) is **NOT ASSUMED**; it is rigorously audited and isolated as the repository's canonical open obligation: the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`).
+> **Central Mathematical Investigation of Arrow $(\star)$**:
+> $$\boxed{
+> \text{Does any coherent non-scalar arithmetic curvature functional exist?}
+> }$$
+> The first three steps and the final conditional implication are **EXACT, PROVED, AND FORMALLY VERIFIED IN LEAN 4**. Arrow $(\star)$ (the descent of arithmetic grade-flatness to the positive sum of zero orbit curvatures without cross-term cancellation) is **NOT ASSUMED**; it is rigorously audited and isolated as the repository's canonical earliest open obligation: the **Non-Scalar Arithmetic Functional Construction** (`OBL-CT-001A`).
 
 ---
 
@@ -49,19 +53,23 @@ To preserve complete mathematical rigor, the following concepts are separated wi
 
 | Concept | Mathematical Definition | Domain / Space | Role in Program |
 |:---|:---|:---|:---|
-| **Euclidean Circle Curvature** | $\kappa = 1/r$ | Differential geometry of circles in $\mathbb{R}^2$ | Reciprocal of radial radius $r_K = \tau^{-K}$. |
+| **Euclidean Circle Curvature** | $\kappa_K = 1/r_K = \tau^K$ | Discrete circle geometry ($K \in \mathbb{Z}$) | Reciprocal of radial radius $r_K = \tau^{-K}$. |
 | **Fourier Frequency Scaling** | $\Delta\omega_K = \tau / C_K = \tau^K$ | Dual angular frequency space | Determines fundamental grade lattice $L_K = \tau^K\mathbb{Z}$. |
-| **Conformal Coordinate Dilation** | $s_K = \tau^K s$, $z_K = \tau^K(s-1/2)$ | Complex coordinate plane $\mathbb{C}$ | Origin & centered coordinate dilations in TC. |
+| **Continuous Coordinate Dilation** | $s_k = \tau^k s$, $z_k = \tau^k(s-1/2)$ | Complex plane $\mathbb{C}$ ($k \in \mathbb{R}$) | Origin & centered coordinate dilations in TC. |
 | **Half-Density Dilation Character** | $U_a(x^{-s}) = a^{1/2-s}x^{-s}$ | $L^2(\mathbb{R}_{>0}, dx) \to L^2(\mathbb{R}_{>0}, dx)$ | Unitary action whose unitary character axis is $\Re(s)=1/2$. |
-| **Reflection-Pair Grade Curvature** | $B_\rho''(0) = 2\delta^2(\log\tau)^2$ | $C^\infty(\mathbb{R}_K \to \mathbb{R}_{\ge 0})$ | Non-negative second variation of reflection pair modulus sum. |
+| **Continuous Reflection Curvature** | $B_\rho''(0) = \left.\frac{d^2}{dk^2} B_\rho(k)\right|_{k=0} = 2\delta^2(\log\tau)^2$ | $C^\infty(\mathbb{R}_k \to \mathbb{R}_{\ge 0})$ | Non-negative second variation of reflection pair modulus sum. |
 | **Algebraic Spectral Curvatures** | $\mathscr{K}_\tau(\rho) = \delta^2$, $C_\gamma = \sum \delta_{\gamma,a}^2$, $\kappa_1 = \delta^2/\gamma^2$ | Zero divisor $\mathcal{D}_\zeta$ data | Zero-rigidity detectors on candidate zero configurations. |
-| **Arithmetic Curvature Functional** | $\mathscr{A}_\tau(\xi) = 0$ | Pure arithmetic space (primes, archimedean factors) | Divisor-independent arithmetic evaluator (OBL-CT-001). |
+| **Arithmetic Curvature Functional** | $\mathscr{A}_\tau(\xi) = 0$ | Pure arithmetic space (primes, archimedean factors) | Divisor-independent arithmetic evaluator (OBL-CT-001A). |
 
 ---
 
-## 3. Exact Radial Geometry
+## 3. Exact Radial Geometry and Lattice Scaling
 
-Let $\tau = 2\pi$, and for each grade $K \in \mathbb{Z}$, define:
+Let $\tau = 2\pi$. We distinguish:
+- **Continuous grade parameter** $k \in \mathbb{R}$ for continuous scaling, differentiation, and curvature;
+- **Discrete integer grade checkpoints** $K \in \mathbb{Z}$ for bilateral checkpoint lattices and ray sampling.
+
+For each integer grade $K \in \mathbb{Z}$, define:
 - Scale factor: $a_K = \tau^K$;
 - Transported radial unit: $r_K = a_K^{-1} = \tau^{-K}$;
 - Circle circumference: $C_K = \tau r_K = \tau^{1-K}$;
@@ -91,20 +99,20 @@ $$a_{K,b} = b^K, \quad r_{K,b} = b^{-K}, \quad C_{K,b} = \tau b^{-K}, \quad \kap
 
 Let a nontrivial zero of $\zeta(s)$ be parameterized by $\rho = \frac{1}{2} + \delta + i\gamma$, with centered coordinate $z_\rho = \rho - \frac{1}{2} = \delta + i\gamma$.
 
-At grade $K$, the centered grade coordinate is:
-$$z_{\rho,K} = a_K z_\rho = \tau^K(\delta + i\gamma)$$
-The real horizontal displacement at grade $K$ is:
-$$d_{\rho,K} = \Re(z_{\rho,K}) = a_K \delta = \tau^K \delta$$
+At continuous grade $k \in \mathbb{R}$, the centered grade coordinate is:
+$$z_{\rho}(k) = \tau^k z_\rho = \tau^k(\delta + i\gamma)$$
+The real horizontal displacement at grade $k$ is:
+$$d_{\rho}(k) = \Re(z_{\rho}(k)) = \tau^k \delta$$
 
 ### Transport by the Radial Unit
 
-Multiplying by the transported radial unit $r_K = \tau^{-K}$:
-$$r_K z_{\rho,K} = \tau^{-K}(\tau^K z_\rho) = z_\rho$$
-$$r_K d_{\rho,K} = \tau^{-K}(\tau^K \delta) = \delta$$
-$$(r_K d_{\rho,K})^2 = \delta^2$$
+Multiplying by the transported radial unit $r(k) = \tau^{-k}$:
+$$r(k) z_{\rho}(k) = \tau^{-k}(\tau^k z_\rho) = z_\rho$$
+$$r(k) d_{\rho}(k) = \tau^{-k}(\tau^k \delta) = \delta$$
+$$(r(k) d_{\rho}(k))^2 = \delta^2$$
 
 > [!NOTE]
-> The normalized radial coordinate $R_\tau(s, K) = \tau^{-K}\Re(s_K) - 1/2$ is **geometric multiplication by the transported radial unit $r_K$**, not merely an algebraic cancellation. A hypothetical off-line zero ($\delta \ne 0$) satisfies $(r_K d_{\rho,K})^2 = \delta^2$ at every grade.
+> The normalized radial coordinate $R_\tau(s, k) = \tau^{-k}\Re(s_k) - 1/2$ is **geometric multiplication by the transported radial unit $r(k)$**, not merely an algebraic cancellation. A hypothetical off-line zero ($\delta \ne 0$) satisfies $(r(k) d_{\rho}(k))^2 = \delta^2$ at every grade.
 
 ---
 
@@ -136,40 +144,40 @@ $$|\lambda_a(s)| = |a^{1/2-s}| = a^{1/2-\Re(s)} = 1 \iff \frac{1}{2} - \Re(s) = 
 
 ---
 
-## 6. Grade Character and Reflection Curvature
+## 6. Continuous Grade Character and Reflection Curvature
 
-Define the centered grade character for a complex zero $\rho = 1/2 + \delta + i\gamma$:
-$$\chi_\rho(K) = a_K^{\rho - 1/2} = \tau^{K(\rho - 1/2)} = \tau^{K(\delta + i\gamma)} = e^{K\delta\log\tau} e^{iK\gamma\log\tau}$$
+Define the centered grade character for a complex zero $\rho = 1/2 + \delta + i\gamma$ and continuous grade $k \in \mathbb{R}$:
+$$\chi_\rho(k) = \tau^{k(\rho - 1/2)} = \tau^{k(\delta + i\gamma)} = e^{k\delta\log\tau} e^{ik\gamma\log\tau}$$
 Its modulus is:
-$$|\chi_\rho(K)| = e^{K\delta\log\tau}$$
+$$|\chi_\rho(k)| = e^{k\delta\log\tau}$$
 
 ### Reflection-Pair Reciprocal Modulus
 
 Under Schwarz-reflection pairing $\rho^\# = 1 - \bar\rho = 1/2 - \delta + i\gamma$:
-$$|\chi_{\rho^\#}(K)| = e^{K(-\delta)\log\tau} = e^{-K\delta\log\tau} = |\chi_\rho(K)|^{-1}$$
-$$|\chi_\rho(K)| \cdot |\chi_{\rho^\#}(K)| = 1 \quad (\forall K \in \mathbb{R})$$
+$$|\chi_{\rho^\#}(k)| = e^{k(-\delta)\log\tau} = e^{-k\delta\log\tau} = |\chi_\rho(k)|^{-1}$$
+$$|\chi_\rho(k)| \cdot |\chi_{\rho^\#}(k)| = 1 \quad (\forall k \in \mathbb{R})$$
 
 ### Phase-Independent Reflection-Pair Defect
 
-Define the reflection-pair defect functional:
-$$B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = e^{K\delta\log\tau} + e^{-K\delta\log\tau} - 2$$
+Define the reflection-pair defect functional for continuous grade $k \in \mathbb{R}$:
+$$B_\rho(k) = |\chi_\rho(k)| + |\chi_{\rho^\#}(k)| - 2 = e^{k\delta\log\tau} + e^{-k\delta\log\tau} - 2$$
 
 ### Exact $\cosh$ and $\sinh^2$ Representations
 
 1. **Hyperbolic Cosine Form**:
-   $$B_\rho(K) = 2(\cosh(K\delta\log\tau) - 1)$$
+   $$B_\rho(k) = 2(\cosh(k\delta\log\tau) - 1)$$
 2. **Squared Hyperbolic Sine Form**:
-   $$B_\rho(K) = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right)$$
+   $$B_\rho(k) = 4\sinh^2\left(\frac{k\delta\log\tau}{2}\right)$$
 3. **Non-Negativity**:
-   $$B_\rho(K) \ge 0 \quad (\forall K, \delta \in \mathbb{R})$$
+   $$B_\rho(k) \ge 0 \quad (\forall k, \delta \in \mathbb{R})$$
 4. **Zero-Rigidity**:
-   $$\text{For } K \ne 0: \quad B_\rho(K) = 0 \iff \delta = 0$$
+   $$\text{For } k \ne 0: \quad B_\rho(k) = 0 \iff \delta = 0$$
 
-### Native Grade Curvature & The Transported Invariant
+### Continuous Grade Curvature & The Transported Invariant
 
-Differentiating $B_\rho(K)$ with respect to grade $K$ at $K = 0$:
-$$B_\rho'(K) = 2\delta\log\tau \sinh(K\delta\log\tau) \implies B_\rho'(0) = 0$$
-$$B_\rho''(K) = 2\delta^2(\log\tau)^2 \cosh(K\delta\log\tau) \implies B_\rho''(0) = 2\delta^2(\log\tau)^2$$
+Differentiating $B_\rho(k)$ with respect to continuous grade $k$ at $k = 0$:
+$$B_\rho'(k) = \frac{d}{dk} B_\rho(k) = 2\delta\log\tau \sinh(k\delta\log\tau) \implies B_\rho'(0) = 0$$
+$$B_\rho''(k) = \frac{d^2}{dk^2} B_\rho(k) = 2\delta^2(\log\tau)^2 \cosh(k\delta\log\tau) \implies B_\rho''(0) = 2\delta^2(\log\tau)^2$$
 
 Normalizing by the native scale factor $2(\log\tau)^2$:
 $$\boxed{
@@ -200,66 +208,122 @@ $$\mathscr{E} = 0 \iff \forall j \in \{1, \dots, N\}, \; \delta_j = 0$$
 
 ---
 
-## 8. Theta–Mellin Transport Derivation
+## 8. Complete Theta–Mellin Proof and Interchange Justification
 
 For $a > 0$ and $t > 0$, define the scaled partial theta series:
 $$\Theta_a^+(t) = \sum_{n=1}^\infty e^{-\pi (an)^2 t}$$
+Let $s = \sigma + i\eta \in \mathbb{C}$ with $\sigma = \Re(s) > 1$.
 
-### Mellin Transform for $\Re(s) > 1$
+### Step 1: Explicit Absolute Convergence and Fubini/Tonelli Justification
 
-For $\Re(s) > 1$, the integral and sum interchange absolutely:
-$$\int_0^\infty \Theta_a^+(t) t^{s/2 - 1} dt = \sum_{n=1}^\infty \int_0^\infty e^{-\pi(an)^2 t} t^{s/2 - 1} dt$$
-
-Substituting $u = \pi(an)^2 t \implies dt = \frac{du}{\pi(an)^2}$, $t^{s/2-1} = (\pi(an)^2)^{1-s/2} u^{s/2-1}$:
-$$\int_0^\infty e^{-\pi(an)^2 t} t^{s/2-1} dt = (\pi(an)^2)^{-s/2} \int_0^\infty e^{-u} u^{s/2-1} du = a^{-s} \pi^{-s/2} \Gamma(s/2) n^{-s}$$
-
+We evaluate the double integral/sum of absolute values on $\mathbb{R}_{>0} \times \mathbb{N}_{\ge 1}$:
+$$\sum_{n=1}^\infty \int_0^\infty \left| e^{-\pi a^2 n^2 t} t^{s/2 - 1} \right| dt = \sum_{n=1}^\infty \int_0^\infty e^{-\pi a^2 n^2 t} t^{\sigma/2 - 1} dt$$
+Applying the real substitution $u = \pi a^2 n^2 t \implies dt = \frac{du}{\pi a^2 n^2}$:
+$$\int_0^\infty e^{-\pi a^2 n^2 t} t^{\sigma/2 - 1} dt = (\pi a^2 n^2)^{-\sigma/2} \int_0^\infty e^{-u} u^{\sigma/2 - 1} du = a^{-\sigma} \pi^{-\sigma/2} \Gamma(\sigma/2) n^{-\sigma}$$
 Summing over $n \ge 1$:
-$$\int_0^\infty \Theta_a^+(t) t^{s/2-1} dt = a^{-s} \pi^{-s/2} \Gamma(s/2) \zeta(s) = a^{-s} \Lambda(s)$$
+$$\sum_{n=1}^\infty \int_0^\infty \left| e^{-\pi a^2 n^2 t} t^{s/2 - 1} \right| dt = a^{-\sigma} \pi^{-\sigma/2} \Gamma(\sigma/2) \sum_{n=1}^\infty n^{-\sigma} = a^{-\sigma} \pi^{-\sigma/2} \Gamma(\sigma/2) \zeta(\sigma) < \infty$$
+Since $\sigma > 1$, $\zeta(\sigma) < \infty$ and $\Gamma(\sigma/2) < \infty$. By **Tonelli's Theorem**, the integrand is in $L^1(\mathbb{R}_{>0} \times \mathbb{N}, dt \otimes d\mu)$, which rigorously justifies the interchange of summation and integration via **Fubini's Theorem**.
 
-### Half-Density Normalization
+### Step 2: Complex Mellin Transform for $\Re(s) > 1$
+
+By Fubini interchange:
+$$\int_0^\infty \Theta_a^+(t) t^{s/2 - 1} dt = \sum_{n=1}^\infty \int_0^\infty e^{-\pi a^2 n^2 t} t^{s/2 - 1} dt = \sum_{n=1}^\infty a^{-s} \pi^{-s/2} \Gamma(s/2) n^{-s} = a^{-s} \pi^{-s/2} \Gamma(s/2) \zeta(s) = a^{-s} \Lambda(s)$$
+
+### Step 3: Half-Density Dilation Identity
 
 Multiplying by $a^{1/2}$:
-$$a^{1/2} \int_0^\infty \Theta_a^+(t) t^{s/2-1} dt = a^{1/2-s} \pi^{-s/2} \Gamma(s/2) \zeta(s) = a^{1/2-s} \Lambda(s)$$
+$$a^{1/2} \int_0^\infty \Theta_a^+(t) t^{s/2 - 1} dt = a^{1/2-s} \pi^{-s/2} \Gamma(s/2) \zeta(s) = a^{1/2-s} \Lambda(s)$$
+For $a = \tau^k$ ($k \in \mathbb{R}$):
+$$\tau^{k/2} \int_0^\infty \Theta_{\tau^k}^+(t) t^{s/2 - 1} dt = \tau^{-k(s-1/2)} \Lambda(s) = \chi_s(k)^{-1} \Lambda(s)$$
 
-For $a = \tau^K$:
-$$\tau^{K/2} \int_0^\infty \Theta_{\tau^K}^+(t) t^{s/2-1} dt = \tau^{-K(s-1/2)} \Lambda(s) = \chi_s(K)^{-1} \Lambda(s)$$
+### Step 4: Scaled Jacobi Theta and Poisson Summation
 
-### The Commutative Transport Chain
+Let $\theta(t) = \sum_{n\in\mathbb{Z}} e^{-\pi n^2 t} = 1 + 2\Theta_1^+(t)$.
+By Poisson summation on $f_t(x) = e^{-\pi x^2 t}$ with Fourier transform $\hat{f}_t(\xi) = \frac{1}{\sqrt{t}}e^{-\pi \xi^2 / t}$:
+$$\theta(t) = \frac{1}{\sqrt{t}} \theta\left(\frac{1}{t}\right)$$
+For dilation parameter $a > 0$, evaluating along lattice $a\mathbb{Z}$ gives the scaled transformation:
+$$\theta(a^2 t) = \frac{1}{a\sqrt{t}} \theta\left(\frac{1}{a^2 t}\right)$$
+Expressed in terms of the partial series $\Theta_a^+(t) = \frac{\theta(a^2 t) - 1}{2}$:
+$$\Theta_a^+(t) = \frac{1}{a\sqrt{t}} \Theta_1^+\left(\frac{1}{a^2 t}\right) + \frac{1}{2a\sqrt{t}} - \frac{1}{2}$$
 
-$$\begin{CD}
-\text{Circle Radius } r_K = \tau^{-K} @>>> \text{Fourier Lattice } L_K = \tau^K\mathbb{Z} \\
-@VVV @VVV \\
-\text{Theta Scaling } \Theta_{\tau^K}^+(t) @>>> \text{Half-Density Mellin } \tau^{-K(s-1/2)}\Lambda(s) \\
-@. @VVV \\
-@. \text{Grade Character } \chi_s(K) = \tau^{K(s-1/2)}
-\end{CD}$$
+### Domain, Branch, and Tail Bound Specifications
 
----
-
-## 9. Arithmetic Curvature-Descent Audit
-
-We audit four prospective candidate classes for constructing an arithmetic curvature bridge:
-
-### Candidate CT-1: Scalar Theta–Mellin Transport
-$$F_K(s) = \tau^{-K(s-1/2)} \Lambda(s)$$
-At any zero $\rho$ of $\zeta(s)$ ($\Lambda(\rho) = 0$):
-$$F_K(\rho) = \tau^{-K(\rho-1/2)} \cdot 0 = 0 \quad (\forall K \in \mathbb{R})$$
-Differentiating with respect to $K$:
-$$\frac{d^m}{dK^m} F_K(\rho) = (-\log\tau)^m (\rho - 1/2)^m \tau^{-K(\rho-1/2)} \Lambda(\rho) \equiv 0$$
-*Conclusion*: Direct scalar differentiation at zeros vanishes identically ($0 \equiv 0$). It does not detect $\delta \ne 0$. Candidate CT-1 is classified as `GRADE_COORDINATE_REDUNDANT` / `FAIL_ARITHMETIC_FIREWALL`.
-
-### Candidate CT-2: Derivatives Evaluated at Zeros
-Expressions such as $\partial_s F_K(\rho) = \tau^{-K(\rho-1/2)}\Lambda'(\rho)$ expose $\chi_\rho(K)$, but require zero locations $\rho$ as inputs. By the **Strict Arithmetic Input Firewall**, direct zero evaluation is not an arithmetic construction. Classified as `FAIL_ARITHMETIC_FIREWALL`.
-
-### Candidate CT-3: Unitary Plancherel Norm
-The $L^2$ operator norm of $U_a$ is identically $1$ for all $a > 0$. Its spectral representation lives purely on the unitary axis $\Re(s) = 1/2$. Analytically continued zeros off this axis are not $L^2$ spectral data of $U_a$.
-
-### Candidate CT-4: Hadamard / Determinant Curvature Descent
-Evaluates whether a divisor-independent arithmetic functional $\mathscr{A}_\tau(\xi) = 0$ exists whose spectral expansion equals $\sum_\rho W_\rho \mathscr{K}_\tau(\rho)$. This requires proving non-cancellation of cross-terms, exact convergence, and remainder bounds.
+- **Branch Convention**: $t^{s/2-1} = \exp((s/2 - 1)\log t)$ with principal real branch $\log t \in \mathbb{R}$ for $t > 0$.
+- **Boundary Behavior**: At $t \to 0^+$, $\Theta_a^+(t) \sim \frac{1}{2a\sqrt{t}}$, so $\Theta_a^+(t) t^{\sigma/2-1} \sim \frac{1}{2a} t^{\sigma/2 - 3/2}$, integrable at $0$ iff $\sigma/2 - 3/2 > -1 \iff \sigma > 1$. At $t \to \infty$, $\Theta_a^+(t) = \mathcal{O}(e^{-\pi a^2 t})$.
+- **No Analytic Smuggling**: The unregularized Mellin integral is **strictly restricted to $\Re(s) > 1$** and is never evaluated directly inside the critical strip without meromorphic regularization.
+- **Explicit Dirichlet Tail Bounds**:
+  - Unnormalized Tail Bound:
+    $$\text{Tail}_{\text{unnorm}}(\sigma, N) = a^{-\sigma}\pi^{-\sigma/2}|\Gamma(s/2)|\frac{N^{1-\sigma}}{\sigma-1}$$
+  - Half-Density Tail Bound:
+    $$\text{Tail}_{\text{half-density}}(\sigma, N) = a^{1/2-\sigma}\pi^{-\sigma/2}|\Gamma(s/2)|\frac{N^{1-\sigma}}{\sigma-1}$$
 
 ---
 
-## 10. Symmetry-Complete Polynomial Countermodel
+## 9. Scalar-Transport No-Go Theorem
+
+Let $L(s)$ be independent of grade and define the scalar-transported family:
+$$F(k, s) = g(k, s) L(s)$$
+where $g(k, s)$ is sufficiently differentiable in $k \in \mathbb{R}$.
+
+> ### **Theorem (Scalar-Transport No-Go Theorem)**
+> 1. **Derivative Vanishing at Zeros**: If $L(\rho) = 0$, then for every derivative order $m \ge 0$:
+>    $$\left.\frac{\partial^m}{\partial k^m} F(k, \rho)\right|_{k=0} = \left.\frac{\partial^m g(k, \rho)}{\partial k^m}\right|_{k=0} \cdot L(\rho) = 0 \equiv 0$$
+> 2. **Zero-Divisor Preservation**: If $g(k, s) \ne 0$ on domain $\Omega$, then:
+>    $$F(k, s) = 0 \iff L(s) = 0$$
+>    Multiplication by $g$ preserves all root locations and multiplicities without modification.
+> 3. **Logarithmic Derivative Anomaly-Free Decomposition**: On any domain where $g(k, s) L(s) \ne 0$:
+>    $$\partial_s \log F(k, s) = \partial_s \log L(s) + \partial_s \log g(k, s)$$
+>    For $g(k, s) = \tau^{-k(s-1/2)}$, $\partial_s \log g = -k\log\tau$. The grade correction is purely coordinate/archimedean and supplies zero spectral divisor data.
+> 4. **Transported Zero Worldline Pullback**: Along the zero worldline $s(k) = 1/2 + \tau^k(\rho - 1/2)$, the pullback $F_k(s(k)) = L(\rho) = 0$ vanishes identically, and directional derivatives along the worldline vanish identically.
+
+### Candidate Classifications
+
+- **Candidate CT-1 (Scalar Theta–Mellin Transport)**: $F_k(s) = \tau^{-k(s-1/2)}\Lambda(s)$. Evaluates scalar multiplication. Classified as `GRADE_COORDINATE_REDUNDANT`.
+- **Candidate CT-2 (Direct Zero Evaluation / Differentiation)**: Evaluating $\partial_s F_k(\rho) = \tau^{-k(\rho-1/2)}\Lambda'(\rho)$ requires zero locations $\rho$ as inputs, violating the Strict Arithmetic Input Firewall. Classified as `FAIL_ARITHMETIC_FIREWALL`.
+
+---
+
+## 10. Minimum Structure for Curvature Descent
+
+The target quadratic defect
+$$\delta_\rho^2 = \left(\Re\rho - \frac{1}{2}\right)^2$$
+is non-holomorphic as a 1-point function of $\rho$.
+
+> ### **Theorem (Scoped One-Point Holomorphic Obstruction)**
+> No fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set in $\mathbb{C}$.
+> *Proof*:
+> For $z = x + iy$, $(\Re z)^2 = x^2$.
+> Evaluating the Cauchy-Riemann Wirtinger derivative:
+> $$\frac{\partial}{\partial \bar z} (x^2) = \frac{1}{2}\left(\frac{\partial}{\partial x} + i\frac{\partial}{\partial y}\right) x^2 = \frac{1}{2}(2x) = x = \Re z = \delta$$
+> For any off-line point ($\delta \ne 0$), $\frac{\partial}{\partial \bar z} (x^2) \ne 0$, violating the Cauchy-Riemann equations.
+
+*Consequence*: Direct linear 1-point holomorphic explicit formula test functions cannot produce $\delta_\rho^2$. Any valid non-scalar arithmetic curvature functional must employ at least one of:
+1. A two-slot or sesquilinear pairing kernel;
+2. A contour boundary / noncommutation term;
+3. A Hadamard / Fredholm determinant regularization;
+4. A noncommuting completion anomaly.
+
+---
+
+## 11. Curvature Transport versus CMSA Gate G4
+
+| Dimension | Curvature Transport | CMSA Gate G4 |
+|:---|:---|:---|
+| **Primary Mathematical Target** | $\mathscr{K}_\tau(\rho) = B_\rho''(0)/(2(\log\tau)^2) = \delta^2$ | $V_T = \frac{1}{2T}\|\Delta_{H(T)}\|^2 - C_T$ |
+| **Spectral Detector Level** | Native 2nd grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$ | Translation-average mean square on $\mathbb{R}$ |
+| **Fixed Finite Perturbation Status** | Non-zero ($B_\rho''(0) > 0$) for any finite off-line quartet | Invisible ($V_T \to 0$) due to $\Delta \in L^2(\mathbb{R})$ ($o(\sqrt{T})$) |
+| **Arithmetic Input** | Requires non-scalar functional $\mathscr{A}_\tau(\xi)$ | Arithmetic completed log-derivative $A(u)$ |
+| **Diagonal vs Off-Diagonal** | Requires reflection-pair isolation | Bilinear $J_T, K_T$ cross-term kernel integration |
+| **Infinite Limit Barrier** | Summability of $\sum W_\rho \delta_\rho^2$ | Growing perturbation schedule $H(T) = cT$ |
+| **Positivity Target** | Weight positivity $W_\rho > 0$ | Direct energy vs cross-term $E_T - C_T > 0$ |
+| **Current Epistemic Status** | Bypasses detector-level invisibility; arithmetic functional OPEN (`OBL-CT-001A`) | Gate G4 OPEN (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`) |
+
+> [!IMPORTANT]
+> Curvature Transport operates at the orbit/divisor level and **bypasses fixed-finite $L^2$ translation invisibility at the spectral detector level**. However, Curvature Transport **does not solve CMSA Gate G4**. Whether a non-scalar arithmetic curvature functional avoids or reproduces the CMSA pair-isolation/infinite-limit barrier remains an open research problem.
+
+---
+
+## 12. Symmetry-Complete Polynomial Countermodel
 
 To prove that circle geometry, functional reflection symmetry, coordinate covariance, and positive curvature detection alone do **not** force $\delta = 0$, we analyze the centered polynomial:
 $$P_{\delta,\gamma}(z) = \left((z - i\gamma)^2 - \delta^2\right)\left((z + i\gamma)^2 - \delta^2\right) = (z^2 + \gamma^2 - \delta^2)^2 + 4\delta^2\gamma^2$$
@@ -267,18 +331,29 @@ $$P_{\delta,\gamma}(z) = \left((z - i\gamma)^2 - \delta^2\right)\left((z + i\gam
 ### Verified Properties
 
 1. **Even Symmetry**: $P_{\delta,\gamma}(-z) = P_{\delta,\gamma}(z)$ (formally proved in Lean 4: `countermodelPolynomial_even`);
-2. **Schwarz Reflection**: $\overline{P_{\delta,\gamma}(\bar z)} = P_{\delta,\gamma}(z)$;
-3. **Exact Zeros**: $\{\pm\delta \pm i\gamma\}$ (an off-line quartet for $\delta \ne 0$);
-4. **Transported Radial Unit**: $r_K d_{\rho,K} = \tau^{-K}(\tau^K \delta) = \delta$;
-5. **Reciprocal Grade Characters**: $|\chi_\rho(K)| \cdot |\chi_{\rho^\#}(K)| = 1$;
-6. **Strictly Positive Grade Curvature**: $B_\rho''(0) = 2\delta^2(\log\tau)^2 > 0$ whenever $\delta \ne 0$.
-
-> [!IMPORTANT]
-> **Countermodel Significance**: $P_{\delta,\gamma}$ satisfies every geometric, reflection, and curvature-transport property, yet has $\delta \ne 0$. Therefore, **any valid proof of the Riemann Hypothesis via curvature transport must invoke arithmetic structure (the Euler product / prime distribution)** to force total curvature to vanish.
+2. **Schwarz Reflection**: $\overline{P_{\delta,\gamma}(\bar z)} = P_{\delta,\gamma}(z)$ (`PROVED / EXACT / PARTIALLY_FORMALIZED`);
+3. **Exact Zeros**: Four roots $\{\pm\delta \pm i\gamma\}$ (formally proved in Lean 4: `countermodelPolynomial_root_pos_pos`, `countermodelPolynomial_root_neg_pos`, `countermodelPolynomial_root_pos_neg`, `countermodelPolynomial_root_neg_neg`);
+4. **Transported Radial Unit**: $r(k) d_\rho(k) = \tau^{-k}(\tau^k \delta) = \delta$;
+5. **Reciprocal Grade Characters**: $|\chi_\rho(k)| \cdot |\chi_{\rho^\#}(k)| = 1$;
+6. **Strictly Positive Grade Curvature**: $B_\rho''(0) = 2\delta^2(\log\tau)^2 > 0$ for $\delta \ne 0, \tau > 1$ (formally proved in Lean 4: `reflection_grade_curvature_pos`).
 
 ---
 
-## 11. Reader-Facing Transcendental Curvature Rigidity Theorem
+## 13. Candidate Non-Scalar Frameworks and Gate Audits
+
+We audit two candidate families for constructing a non-scalar arithmetic curvature functional:
+
+### Candidate CT-4A: Paired Theta–Mellin Functional
+- **Formulation Schema**: Sesquilinear cross-grade pairing $\mathscr{A}_\tau(\xi) = \iint \mathcal{K}_\tau(t_1, t_2) \Theta^+(t_1) \Theta^+(t_2) dt_1 dt_2 - \mathcal{R}_{\text{diag}}$.
+- **Earliest Open Gate**: Regularization and isolation of involution pairs $(\rho, \rho^\#)$ without unconstrained cross-terms $(\rho_1, \rho_2)$.
+
+### Candidate CT-4B: Determinant / Hadamard Curvature-Descent Anomaly
+- **Formulation Schema**: Second grade variation of regularized Fredholm determinant $\left.\frac{d^2}{dk^2} \log \det(I + \mathcal{R}_k)\right|_{k=0}$.
+- **Earliest Open Gate**: Divisor-independent arithmetic definition without supplying zeta zeros as spectrum.
+
+---
+
+## 14. Reader-Facing Transcendental Curvature Rigidity Theorem
 
 > ### **Theorem (Transcendental Curvature Rigidity — Conditional Schema)**
 > Let the nontrivial zeros of $\zeta(s)$ be enumerated as $\rho_j = 1/2 + \delta_j + i\gamma_j$. Suppose there exists a divisor-independent arithmetic functional $\mathscr{A}_\tau(\xi)$ constructed from prime powers and archimedean factors such that:
@@ -288,7 +363,7 @@ $$P_{\delta,\gamma}(z) = \left((z - i\gamma)^2 - \delta^2\right)\left((z + i\gam
 > 2. **Curvature Spectral Expansion**:
 >    $$\mathscr{A}_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \, \mathscr{K}_\tau(\rho)$$
 >    under an absolutely convergent sum with strictly positive weights $W_\rho > 0$, where
->    $$\mathscr{K}_\tau(\rho) = \frac{1}{2(\log\tau)^2} \left.\frac{d^2}{dK^2} \left(|\tau^{K(\rho-1/2)}| + |\tau^{K(\rho^\#-1/2)}| - 2\right)\right|_{K=0} = \left(\Re\rho - \frac{1}{2}\right)^2 = \delta_\rho^2$$
+>    $$\mathscr{K}_\tau(\rho) = \frac{1}{2(\log\tau)^2} \left.\frac{d^2}{dk^2} \left(|\tau^{k(\rho-1/2)}| + |\tau^{k(\rho^\#-1/2)}| - 2\right)\right|_{k=0} = \left(\Re\rho - \frac{1}{2}\right)^2 = \delta_\rho^2$$
 >
 > **Then** every nontrivial zero satisfies $\Re\rho = 1/2$ ($\delta_\rho = 0$), establishing the Riemann Hypothesis.
 
@@ -298,34 +373,27 @@ $$0 = \mathscr{A}_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \o
 
 ---
 
-## 12. Canonical Open Obligation: Arithmetic Curvature-Descent Theorem
+## 15. Sharpened Proof Obligations: OBL-CT-001A–D
 
-Because no divisor-independent arithmetic functional $\mathscr{A}_\tau(\xi)$ has yet been proved to satisfy both $\mathscr{A}_\tau = 0$ and $\mathscr{A}_\tau = \sum W_\rho \delta_\rho^2$, the program's earliest open barrier is recorded as:
+Because no divisor-independent non-scalar arithmetic functional has yet been constructed, the obligation is sharpened into four sequential gates:
+
+```
+[OBL-CT-001A] Construct zero-independent non-scalar functional A_tau, domains & regularization
+      |
+[OBL-CT-001B] Derive spectral expansion A_tau = sum W_rho delta_rho^2
+      |
+[OBL-CT-001C] Prove absolute convergence, involution-pair isolation & strict positivity W_rho > 0
+      |
+[OBL-CT-001D] Combine arithmetic vanishing A_tau = 0 with curvature rigidity => RH
+```
 
 $$\boxed{
-\textbf{OBL-CT-001: Arithmetic Curvature-Descent Theorem}
+\textbf{OBL-CT-001A: Non-Scalar Arithmetic Functional Construction} \quad (\text{CANONICAL EARLIEST OPEN OBLIGATION})
 }$$
-
-### Exact Quantified Requirements for OBL-CT-001
-
-A valid resolution must construct a functional $\mathscr{A}_\tau$ satisfying:
-1. **Zero-Independent Arithmetic Input**: Evaluated solely from primes $\Lambda(n)$, powers $n^{-\sigma}$, and Gamma factors without referencing zero locations $\rho$;
-2. **Convergence Domain**: Explicit domain of absolute convergence;
-3. **Regularization & Boundary Control**: Certified regularization removing archimedean/pole divergences;
-4. **Spectral Expansion**: Proved meromorphic/contour expansion yielding $\sum_{\rho} W_\rho \delta_\rho^2$;
-5. **Strict Weight Positivity**: $W_\rho > 0$ for all represented zero orbits;
-6. **Involution Pair Isolation**: No unconstrained cross-terms $(\rho_1, \rho_2)$ that fail to cancel;
-7. **Limit Order Independence**: Independence from truncation order;
-8. **Positivity Firewall**: Preservation of strict positivity under all limits.
-
-### Relationship to CMSA Gate G4
-
-- **Gate G4 Status**: CMSA Gate G4 analyzes translation-average mean-square variations $V_T = \frac{1}{2T}\|\Delta_{H(T)}\|^2 - C_T$. For fixed finite off-line zero configurations, $\Delta(t) \in L^2(\mathbb{R})$, so $\|\Delta\|_{L^2(-T,T)} = \mathcal{O}(1) = o(\sqrt{T})$, rendering $V_T \to 0$ invisible.
-- **Curvature Transport Supercedence**: Curvature Transport evaluates the native second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$. Because $B_\rho''(0)$ is non-zero for *any* off-line quartet (including a single finite quartet), Curvature Transport operates at the orbit/divisor level and **supersedes the raw CMSA $1/(2T)$ activation problem**.
 
 ---
 
-## 13. Formalization and Verification Inventory
+## 16. Formalization and Verification Inventory
 
 ### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport`)
 
@@ -340,16 +408,24 @@ A valid resolution must construct a functional $\mathscr{A}_\tau$ satisfying:
 | `centered_radial_unit_transport` | $r_K d_{\rho,K} = \delta$ | FORMALLY_PROVED |
 | `transported_squared_defect_invariance` | $(r_K d_{\rho,K})^2 = \delta^2$ | FORMALLY_PROVED |
 | `generic_scale_radial_unit_transport` | $b^{-K}(b^K \delta) = \delta$ for generic $b > 0$ | FORMALLY_PROVED |
-| `grade_character_complex_product` | $(\delta+i\gamma)\log\tau K = K\delta\log\tau + i K\gamma\log\tau$ | FORMALLY_PROVED |
-| `grade_character_modulus_def` | $\|\chi_\rho(K)\| = \exp(K\delta\log\tau)$ | FORMALLY_PROVED |
-| `reflection_reciprocal_modulus_prod` | $\|\chi_\rho(K)\| \|\chi_{\rho^\#}(K)\| = 1$ | FORMALLY_PROVED |
-| `reflection_pair_defect_cosh` | $B_\rho(K) = 2(\cosh(u)-1)$ | FORMALLY_PROVED |
-| `reflection_pair_defect_nonneg` | $B_\rho(K) \ge 0$ | FORMALLY_PROVED |
-| `reflection_pair_defect_eq_zero_iff` | $B_\rho(K) = 0 \iff \delta = 0$ for $K \ne 0, \tau > 1$ | FORMALLY_PROVED |
-| `native_grade_second_order_taylor_coefficient` | $B''(0)/(2(\log\tau)^2) = \delta^2$ | FORMALLY_PROVED |
+| `grade_character_complex_product` | $(\delta+i\gamma)\log\tau k = k\delta\log\tau + i k\gamma\log\tau$ ($k \in \mathbb{R}$) | FORMALLY_PROVED |
+| `grade_character_modulus_def` | $\|\chi_\rho(k)\| = \exp(k\delta\log\tau)$ | FORMALLY_PROVED |
+| `reflection_reciprocal_modulus_prod` | $\|\chi_\rho(k)\| \|\chi_{\rho^\#}(k)\| = 1$ | FORMALLY_PROVED |
+| `reflection_pair_defect_cosh` | $B_\rho(k) = 2(\cosh(u)-1)$ | FORMALLY_PROVED |
+| `reflection_pair_defect_nonneg` | $B_\rho(k) \ge 0$ | FORMALLY_PROVED |
+| `reflection_pair_defect_eq_zero_iff` | $B_\rho(k) = 0 \iff \delta = 0$ for $k \ne 0, \tau > 1$ | FORMALLY_PROVED |
+| `native_grade_second_order_taylor_coefficient` | Algebraic Taylor normalization $(2\delta^2(\log\tau)^2)/(2(\log\tau)^2) = \delta^2$ | FORMALLY_PROVED (ALGEBRAIC) |
+| `reflection_grade_curvature_pos` | $2\delta^2(\log\tau)^2 > 0$ for $\delta \ne 0, \tau > 1$ | FORMALLY_PROVED |
+| `scalar_multiplier_zero_preservation` | $L = 0 \implies g \cdot L = 0$ | FORMALLY_PROVED |
+| `scalar_multiplier_nonzero_root_iff` | $g \ne 0 \implies (g \cdot L = 0 \iff L = 0)$ | FORMALLY_PROVED |
+| `algebraic_grade_derivative_factor_vanishing` | $(c \cdot g_k) \cdot L = 0$ for $L = 0$ | FORMALLY_PROVED |
 | `finite_positive_weight_curvature_rigidity` | $\sum w_j \delta_j^2 = 0 \iff \forall j, \delta_j = 0$ | FORMALLY_PROVED |
 | `countermodelPolynomial` | Definition of $P_{\delta,\gamma}(z)$ | DEFINITION |
 | `countermodelPolynomial_even` | $P_{\delta,\gamma}(-z) = P_{\delta,\gamma}(z)$ | FORMALLY_PROVED |
+| `countermodelPolynomial_root_pos_pos` | $P_{\delta,\gamma}(\delta + i\gamma) = 0$ | FORMALLY_PROVED |
+| `countermodelPolynomial_root_neg_pos` | $P_{\delta,\gamma}(-\delta + i\gamma) = 0$ | FORMALLY_PROVED |
+| `countermodelPolynomial_root_pos_neg` | $P_{\delta,\gamma}(\delta - i\gamma) = 0$ | FORMALLY_PROVED |
+| `countermodelPolynomial_root_neg_neg` | $P_{\delta,\gamma}(-\delta - i\gamma) = 0$ | FORMALLY_PROVED |
 | `ConditionalCurvatureRigidityBridge.all_defects_zero` | Conditional Curvature Rigidity Theorem | FORMALLY_PROVED |
 
 ### Python Test Suite (`tests/test_curvature_transport.py`)
@@ -357,5 +433,5 @@ A valid resolution must construct a functional $\mathscr{A}_\tau$ satisfying:
 - `TestRadialGeometryAndLattice`: 25 parameter points testing shift laws, $C_1 = 1$, Fourier spacing, and generic scale base $b \in \{1.5, 2.0, 3.14, 10.0\}$.
 - `TestZeroAndRadialUnitTransport`: 24 parameter points testing zero recovery and reciprocal grade character modes.
 - `TestReflectionPairCurvature`: 10 parameter points testing $\cosh/\sinh$ equivalence, zero-rigidity, and numerical second derivative convergence to $2\delta^2(\log\tau)^2$.
-- `TestThetaMellinAndFalsificationControls`: 24 parameter points testing half-density Mellin scaling, scalar zero multiplication vanishing obstruction, and polynomial countermodel symmetries.
-- **Total Suite Result**: 83/83 passed in 2.72s.
+- `TestThetaMellinAndFalsificationControls`: 40 parameter points testing half-density Mellin scaling, numerical quadrature with unnormalized and half-density tail bounds, scalar transport no-go instances, and polynomial countermodel quartet roots/symmetries.
+- **Total Suite Result**: 99/99 passed.

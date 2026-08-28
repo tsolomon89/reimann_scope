@@ -822,7 +822,7 @@ Formalize rational single-zero and functional-reflection pair resolvent identiti
 
 # 28. Phase 19 — Curvature-Transport Unification and Transcendental Rigidity Bridge
 
-Formalized in `formal/RiemannScope/CurvatureTransport.lean` (20 compiled formal declarations):
+Formalized in `formal/RiemannScope/CurvatureTransport.lean` (28 compiled formal declarations, 27 theorems/lemmas + 1 definition):
 
 1. **Exact Radial Reciprocity and Shift Laws**:
    - `radial_unit_curvature_reciprocal`: $r_K \kappa_K = \tau^{-K} \tau^K = 1$.
@@ -836,24 +836,34 @@ Formalized in `formal/RiemannScope/CurvatureTransport.lean` (20 compiled formal 
    - `centered_radial_unit_transport`: $r_K d_{\rho,K} = \tau^{-K}(\tau^K\delta) = \delta$.
    - `transported_squared_defect_invariance`: $(r_K d_{\rho,K})^2 = \delta^2$.
    - `generic_scale_radial_unit_transport`: $b^{-K}(b^K\delta) = \delta$ for generic $b > 0$.
-4. **Grade Character & Reflection Pair Reciprocity**:
-   - `grade_character_complex_product`: $(\delta + i\gamma)\log\tau K = K\delta\log\tau + i K\gamma\log\tau$.
-   - `grade_character_modulus_def`: $|\chi_\rho(K)| = \exp(K\delta\log\tau)$.
-   - `reflection_reciprocal_modulus_prod`: $|\chi_\rho(K)| |\chi_{\rho^\#}(K)| = 1$.
+4. **Grade Character & Reflection Pair Reciprocity (Continuous Grade $k \in \mathbb R$)**:
+   - `grade_character_complex_product`: $(\delta + i\gamma)\log\tau k = k\delta\log\tau + i k\gamma\log\tau$.
+   - `grade_character_modulus_def`: $|\chi_\rho(k)| = \exp(k\delta\log\tau)$.
+   - `reflection_reciprocal_modulus_prod`: $|\chi_\rho(k)| |\chi_{\rho^\#}(k)| = 1$.
 5. **Reflection Pair Defect & Zero Rigidity**:
-   - `reflection_pair_defect_cosh`: $B_\rho(K) = 2(\cosh(u)-1)$.
-   - `reflection_pair_defect_nonneg`: $B_\rho(K) \ge 0$.
-   - `reflection_pair_defect_eq_zero_iff`: $B_\rho(K) = 0 \iff \delta = 0$ for $K \ne 0, \tau > 1$.
-   - `native_grade_second_order_taylor_coefficient`: $B_\rho''(0)/(2(\log\tau)^2) = \delta^2$.
-6. **Finite Positive-Weight Curvature Sum Rigidity**:
+   - `reflection_pair_defect_cosh`: $B_\rho(k) = 2(\cosh(u)-1)$.
+   - `reflection_pair_defect_nonneg`: $B_\rho(k) \ge 0$.
+   - `reflection_pair_defect_eq_zero_iff`: $B_\rho(k) = 0 \iff \delta = 0$ for $k \ne 0, \tau > 1$.
+   - `native_grade_second_order_taylor_coefficient`: $(2\delta^2(\log\tau)^2)/(2(\log\tau)^2) = \delta^2$ (algebraic normalization).
+   - `reflection_grade_curvature_pos`: $2\delta^2(\log\tau)^2 > 0$ for $\delta \ne 0, \tau > 1$.
+6. **Scalar Multiplication No-Go Algebraic Lemmas**:
+   - `scalar_multiplier_zero_preservation`: $L = 0 \implies g \cdot L = 0$.
+   - `scalar_multiplier_nonzero_root_iff`: $g \ne 0 \implies (g \cdot L = 0 \iff L = 0)$.
+   - `algebraic_grade_derivative_factor_vanishing`: $(c \cdot g_k) \cdot L = 0$ for $L = 0$.
+7. **Finite Positive-Weight Curvature Sum Rigidity**:
    - `finite_positive_weight_curvature_rigidity`: $\sum w_j \delta_j^2 = 0 \iff \forall j, \delta_j = 0$ for $w_j > 0, \delta_j^2 \ge 0$.
-7. **Symmetry-Complete Countermodel Polynomial**:
+8. **Symmetry-Complete Countermodel Polynomial & Exact Roots**:
    - `countermodelPolynomial`: definition of $P_{\delta,\gamma}(z) = ((z-i\gamma)^2-\delta^2)((z+i\gamma)^2-\delta^2)$.
    - `countermodelPolynomial_even`: $P_{\delta,\gamma}(-z) = P_{\delta,\gamma}(z)$.
-8. **Conditional Curvature Rigidity Bridge**:
+   - `countermodelPolynomial_root_pos_pos`: $P_{\delta,\gamma}(\delta + i\gamma) = 0$.
+   - `countermodelPolynomial_root_neg_pos`: $P_{\delta,\gamma}(-\delta + i\gamma) = 0$.
+   - `countermodelPolynomial_root_pos_neg`: $P_{\delta,\gamma}(\delta - i\gamma) = 0$.
+   - `countermodelPolynomial_root_neg_neg`: $P_{\delta,\gamma}(-\delta - i\gamma) = 0$.
+9. **Conditional Curvature Rigidity Bridge**:
    - `ConditionalCurvatureRigidityBridge`: conditional bridge structure with vanishing arithmetic functional $\mathscr A_\tau = 0$ and curvature identity $\mathscr A_\tau = \sum w_j \delta_j^2$.
    - `ConditionalCurvatureRigidityBridge.all_defects_zero`: formal theorem proving $\forall j, \delta_j = 0$ (RH).
 
-Total compiled project theorem declarations: **106** (0 `sorry`, 0 `admit`, 0 warnings).
+Total compiled project theorem declarations: **114** (0 `sorry`, 0 `admit`, 0 warnings).
+
 
 

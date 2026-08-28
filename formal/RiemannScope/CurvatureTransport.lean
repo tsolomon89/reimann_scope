@@ -1,7 +1,8 @@
 /-
 RiemannScope.CurvatureTransport
 Curvature-Transport Unification, Fourier Lattice Geometry, Grade Invariants,
-Reflection Pair Curvature Rigidity, and Symmetry-Complete Countermodel.
+Reflection Pair Curvature Rigidity, Scalar No-Go Algebraic Lemmas,
+and Symmetry-Complete Countermodel.
 Reference: docs/CURVATURE_TRANSPORT.md, MATH_CONTRACT.md §43
 -/
 
@@ -20,7 +21,7 @@ namespace RiemannScope
 /-- Fundamental full-turn constant tau = 2 * pi. -/
 noncomputable def tauConst : ℝ := 2 * Real.pi
 
-/-- 1. Radial unit and curvature are reciprocal at every grade K:
+/-- 1. Radial unit and curvature are reciprocal at every integer grade K:
     r_K * kappa_K = tau^(-K) * tau^K = 1. -/
 theorem radial_unit_curvature_reciprocal (K : ℤ) (tau : ℝ) (htau : 0 < tau) :
     (tau ^ (-(K : ℝ))) * (tau ^ (K : ℝ)) = 1 := by
@@ -91,28 +92,28 @@ theorem generic_scale_radial_unit_transport (b : ℝ) (hb : 0 < b) (K : ℤ) (δ
     rw [h_sum, Real.rpow_zero]
   rw [← mul_assoc, h_recip, one_mul]
 
-/-- 10. Grade-character complex product identity:
-    (δ + iγ) * log(tau) * K = (K * δ * log tau) + i * (K * γ * log tau). -/
-theorem grade_character_complex_product (δ γ K tau : ℝ) :
-    (⟨δ, γ⟩ : ℂ) * (Complex.ofReal (Real.log tau)) * (Complex.ofReal K) =
-    ⟨K * δ * Real.log tau, K * γ * Real.log tau⟩ := by
+/-- 10. Grade-character complex product identity for continuous grade k ∈ ℝ:
+    (δ + iγ) * log(tau) * k = (k * δ * log tau) + i * (k * γ * log tau). -/
+theorem grade_character_complex_product (δ γ k tau : ℝ) :
+    (⟨δ, γ⟩ : ℂ) * (Complex.ofReal (Real.log tau)) * (Complex.ofReal k) =
+    ⟨k * δ * Real.log tau, k * γ * Real.log tau⟩ := by
   dsimp [Complex.ofReal]
   apply Complex.ext
   · dsimp; ring
   · dsimp; ring
 
-/-- 11. Grade-character modulus: |chi_rho(K)| = exp(K * delta * log tau). -/
-theorem grade_character_modulus_def (δ γ K tau : ℝ) :
-    Complex.abs (Complex.exp (⟨K * δ * Real.log tau, K * γ * Real.log tau⟩ : ℂ)) =
-    Real.exp (K * δ * Real.log tau) := by
+/-- 11. Continuous grade-character modulus: |chi_rho(k)| = exp(k * delta * log tau). -/
+theorem grade_character_modulus_def (δ γ k tau : ℝ) :
+    Complex.abs (Complex.exp (⟨k * δ * Real.log tau, k * γ * Real.log tau⟩ : ℂ)) =
+    Real.exp (k * δ * Real.log tau) := by
   rw [Complex.abs_exp]
 
-/-- 12. Reflection-pair reciprocal modulus:
-    |chi_rho(K)| * |chi_{rho^#}(K)| = exp(K*delta*log tau) * exp(-K*delta*log tau) = 1. -/
-theorem reflection_reciprocal_modulus_prod (δ K tau : ℝ) :
-    Real.exp (K * δ * Real.log tau) * Real.exp (K * (-δ) * Real.log tau) = 1 := by
+/-- 12. Reflection-pair reciprocal modulus for continuous grade k ∈ ℝ:
+    |chi_rho(k)| * |chi_{rho^#}(k)| = exp(k*delta*log tau) * exp(-k*delta*log tau) = 1. -/
+theorem reflection_reciprocal_modulus_prod (δ k tau : ℝ) :
+    Real.exp (k * δ * Real.log tau) * Real.exp (k * (-δ) * Real.log tau) = 1 := by
   rw [← Real.exp_add]
-  have h_sum : K * δ * Real.log tau + K * (-δ) * Real.log tau = 0 := by ring
+  have h_sum : k * δ * Real.log tau + k * (-δ) * Real.log tau = 0 := by ring
   rw [h_sum, Real.exp_zero]
 
 /-- 13. Reflection-pair defect formula in terms of cosh:
@@ -144,13 +145,13 @@ theorem reflection_pair_defect_nonneg (u : ℝ) :
   rw [← h_expand]
   exact h_sq
 
-/-- 15. Reflection-pair defect zero-rigidity:
-    For K != 0 and tau > 1, B_rho(K) = 0 iff delta = 0. -/
-theorem reflection_pair_defect_eq_zero_iff (δ K tau : ℝ) (hK : K ≠ 0) (htau : 1 < tau) :
-    Real.exp (K * δ * Real.log tau) + Real.exp (- (K * δ * Real.log tau)) - 2 = 0 ↔ δ = 0 := by
+/-- 15. Reflection-pair defect zero-rigidity for continuous grade k ≠ 0:
+    For k != 0 and tau > 1, B_rho(k) = 0 iff delta = 0. -/
+theorem reflection_pair_defect_eq_zero_iff (δ k tau : ℝ) (hk : k ≠ 0) (htau : 1 < tau) :
+    Real.exp (k * δ * Real.log tau) + Real.exp (- (k * δ * Real.log tau)) - 2 = 0 ↔ δ = 0 := by
   have h_log_pos : 0 < Real.log tau := Real.log_pos htau
   have h_log_ne : Real.log tau ≠ 0 := ne_of_gt h_log_pos
-  let u := K * δ * Real.log tau
+  let u := k * δ * Real.log tau
   have h_exp_half : Real.exp (u / 2) * Real.exp (-u / 2) = 1 := by
     rw [← Real.exp_add]
     have h_zero : u / 2 + -u / 2 = 0 := by ring
@@ -174,12 +175,12 @@ theorem reflection_pair_defect_eq_zero_iff (δ K tau : ℝ) (hK : K ≠ 0) (htau
     have h_arg_eq : u / 2 = -u / 2 := Real.exp_eq_exp.mp h_exp_eq
     have h_u_zero : u = 0 := by linarith
     dsimp [u] at h_u_zero
-    have h_k_delta : K * δ = 0 := by
+    have h_k_delta : k * δ = 0 := by
       cases mul_eq_zero.mp h_u_zero with
       | inl hkd => exact hkd
       | inr hlog => contradiction
     cases mul_eq_zero.mp h_k_delta with
-    | inl hk => contradiction
+    | inl hk_z => contradiction
     | inr hd => exact hd
   · intro hd
     dsimp [u]
@@ -187,8 +188,9 @@ theorem reflection_pair_defect_eq_zero_iff (δ K tau : ℝ) (hK : K ≠ 0) (htau
     rw [Real.exp_zero, neg_zero, Real.exp_zero]
     ring
 
-/-- 16. Normalized curvature transport invariant equals delta^2:
-    B''(0) / (2 * (log tau)^2) = 2 * delta^2 * (log tau)^2 / (2 * (log tau)^2) = delta^2. -/
+/-- 16. Normalized curvature transport invariant algebraic normalization:
+    (2 * delta^2 * (log tau)^2) / (2 * (log tau)^2) = delta^2.
+    Proves exact algebraic normalization of the second-order Taylor coefficient. -/
 theorem native_grade_second_order_taylor_coefficient (δ tau : ℝ) (htau : 1 < tau) :
     (2 * δ ^ 2 * (Real.log tau) ^ 2) / (2 * (Real.log tau) ^ 2) = δ ^ 2 := by
   have hlog : Real.log tau ≠ 0 := ne_of_gt (Real.log_pos htau)
@@ -201,7 +203,42 @@ theorem native_grade_second_order_taylor_coefficient (δ tau : ℝ) (htau : 1 < 
     _ = δ ^ 2 * 1 := by rw [div_self hdenom]
     _ = δ ^ 2 := mul_one _
 
-/-- 17. Finite positive-weighted curvature sum zero-rigidity:
+/-- 17. Strictly positive grade curvature for off-line displacement delta ≠ 0:
+    2 * delta^2 * (log tau)^2 > 0 for delta != 0 and tau > 1. -/
+theorem reflection_grade_curvature_pos (δ tau : ℝ) (hδ : δ ≠ 0) (htau : 1 < tau) :
+    0 < 2 * δ ^ 2 * (Real.log tau) ^ 2 := by
+  have h2 : (0 : ℝ) < 2 := by norm_num
+  have hd2 : 0 < δ ^ 2 := sq_pos_of_ne_zero hδ
+  have hlog : 0 < Real.log tau := Real.log_pos htau
+  have hlog2 : 0 < (Real.log tau) ^ 2 := sq_pos_of_ne_zero (ne_of_gt hlog)
+  exact mul_pos (mul_pos h2 hd2) hlog2
+
+/-- 18. Scalar multiplier zero preservation:
+    Multiplying an identically vanishing L-function by any scalar g preserves the root:
+    L = 0 -> g * L = 0. -/
+theorem scalar_multiplier_zero_preservation (g L : ℂ) (hL : L = 0) :
+    g * L = 0 := by
+  rw [hL, mul_zero]
+
+/-- 19. Non-vanishing multiplier preserves zero divisor:
+    For g ≠ 0, g * L = 0 ↔ L = 0. -/
+theorem scalar_multiplier_nonzero_root_iff (g L : ℂ) (hg : g ≠ 0) :
+    g * L = 0 ↔ L = 0 := by
+  constructor
+  · intro h
+    cases mul_eq_zero.mp h with
+    | inl hg0 => contradiction
+    | inr hL0 => exact hL0
+  · intro h
+    rw [h, mul_zero]
+
+/-- 20. Algebraic grade-derivative coefficient vanishing at a zero:
+    For any coefficient c and grade factor g_k, if L = 0 then (c * g_k) * L = 0. -/
+theorem algebraic_grade_derivative_factor_vanishing (c g_k L : ℂ) (hL : L = 0) :
+    (c * g_k) * L = 0 := by
+  rw [hL, mul_zero]
+
+/-- 21. Finite positive-weighted curvature sum zero-rigidity:
     For weights w_j > 0 and squared defects d_j >= 0, sum w_j * d_j = 0 implies every d_j = 0. -/
 theorem finite_positive_weight_curvature_rigidity (w d : List ℝ)
     (hw_pos : ∀ x ∈ w, 0 < x) (hd_nonneg : ∀ x ∈ d, 0 ≤ x)
@@ -210,12 +247,12 @@ theorem finite_positive_weight_curvature_rigidity (w d : List ℝ)
     ∀ x ∈ d, x = 0 := by
   exact (list_weighted_sum_nonneg_eq_zero_iff w d hw_pos hd_nonneg h_len).mp h_sum
 
-/-- 18. Centered countermodel polynomial:
+/-- 22. Centered countermodel polynomial:
     P(z) = ((z - i*gamma)^2 - delta^2) * ((z + i*gamma)^2 - delta^2). -/
 noncomputable def countermodelPolynomial (δ γ : ℝ) (z : ℂ) : ℂ :=
   ((z - ⟨0, γ⟩) ^ 2 - (δ ^ 2 : ℂ)) * ((z + ⟨0, γ⟩) ^ 2 - (δ ^ 2 : ℂ))
 
-/-- 19. Symmetry-complete countermodel polynomial is even:
+/-- 23. Symmetry-complete countermodel polynomial is even:
     P(-z) = P(z). -/
 theorem countermodelPolynomial_even (δ γ : ℝ) (z : ℂ) :
     countermodelPolynomial δ γ (-z) = countermodelPolynomial δ γ z := by
@@ -225,7 +262,51 @@ theorem countermodelPolynomial_even (δ γ : ℝ) (z : ℂ) :
   rw [h1, h2, neg_sq, neg_sq]
   ring
 
-/-- 20. Conditional Curvature Rigidity Bridge:
+/-- 24. Exact root 1 of countermodel: z = delta + i*gamma is a zero. -/
+theorem countermodelPolynomial_root_pos_pos (δ γ : ℝ) :
+    countermodelPolynomial δ γ ⟨δ, γ⟩ = 0 := by
+  dsimp [countermodelPolynomial]
+  have h_sub : (⟨δ, γ⟩ : ℂ) - ⟨0, γ⟩ = (δ : ℂ) := by
+    apply Complex.ext <;> dsimp [Complex.ofReal] <;> ring
+  rw [h_sub]
+  have h_diff : (δ : ℂ) ^ 2 - (δ ^ 2 : ℂ) = 0 := by
+    push_cast; ring
+  rw [h_diff, zero_mul]
+
+/-- 25. Exact root 2 of countermodel: z = -delta + i*gamma is a zero. -/
+theorem countermodelPolynomial_root_neg_pos (δ γ : ℝ) :
+    countermodelPolynomial δ γ ⟨-δ, γ⟩ = 0 := by
+  dsimp [countermodelPolynomial]
+  have h_sub : (⟨-δ, γ⟩ : ℂ) - ⟨0, γ⟩ = (-δ : ℂ) := by
+    apply Complex.ext <;> dsimp [Complex.ofReal] <;> ring
+  rw [h_sub]
+  have h_diff : (-δ : ℂ) ^ 2 - (δ ^ 2 : ℂ) = 0 := by
+    push_cast; ring
+  rw [h_diff, zero_mul]
+
+/-- 26. Exact root 3 of countermodel: z = delta - i*gamma is a zero. -/
+theorem countermodelPolynomial_root_pos_neg (δ γ : ℝ) :
+    countermodelPolynomial δ γ ⟨δ, -γ⟩ = 0 := by
+  dsimp [countermodelPolynomial]
+  have h_add : (⟨δ, -γ⟩ : ℂ) + ⟨0, γ⟩ = (δ : ℂ) := by
+    apply Complex.ext <;> dsimp [Complex.ofReal] <;> ring
+  rw [h_add]
+  have h_diff : (δ : ℂ) ^ 2 - (δ ^ 2 : ℂ) = 0 := by
+    push_cast; ring
+  rw [h_diff, mul_zero]
+
+/-- 27. Exact root 4 of countermodel: z = -delta - i*gamma is a zero. -/
+theorem countermodelPolynomial_root_neg_neg (δ γ : ℝ) :
+    countermodelPolynomial δ γ ⟨-δ, -γ⟩ = 0 := by
+  dsimp [countermodelPolynomial]
+  have h_add : (⟨-δ, -γ⟩ : ℂ) + ⟨0, γ⟩ = (-δ : ℂ) := by
+    apply Complex.ext <;> dsimp [Complex.ofReal] <;> ring
+  rw [h_add]
+  have h_diff : (-δ : ℂ) ^ 2 - (δ ^ 2 : ℂ) = 0 := by
+    push_cast; ring
+  rw [h_diff, mul_zero]
+
+/-- 28. Conditional Curvature Rigidity Bridge:
     Encapsulates the exact reader-facing theorem schema for Transcendental Curvature Rigidity.
     If a divisor-independent arithmetic functional evaluates to 0 and equals the positive-weighted
     sum of orbit curvatures (reconciled with delta_j^2), then every represented defect delta_j is zero. -/
@@ -250,3 +331,4 @@ theorem ConditionalCurvatureRigidityBridge.all_defects_zero
     bridge.lengths_eq h_sum_zero
 
 end RiemannScope
+

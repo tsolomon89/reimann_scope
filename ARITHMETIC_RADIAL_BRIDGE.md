@@ -349,25 +349,31 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
 ### 10.6 Curvature-Transport Invariant and Descent Route
 
 The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) unifies:
-1. Reciprocal circle geometry ($r_K \kappa_K = 1, C_1 = 1$);
+1. Reciprocal circle geometry ($r_K \kappa_K = 1, C_1 = 1$) at integer checkpoints $K \in \mathbb Z$;
 2. Fourier lattices ($L_K = \tau^K\mathbb Z$);
-3. Radial unit recovery ($r_K d_{\rho,K} = \delta$);
-4. Half-density dilation Mellin scaling ($a^{1/2-s}\Lambda(s) = \chi_s(K)^{-1}\Lambda(s)$ for $a = \tau^K$);
-5. Reflection-pair defect $B_\rho(K) = 2(\cosh(K\delta\log\tau)-1) = 4\sinh^2(K\delta\log\tau/2) \ge 0$;
-6. Second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2$.
+3. Radial unit recovery ($r(k) d_{\rho}(k) = \delta$) for continuous grade $k \in \mathbb R$;
+4. Half-density dilation Mellin scaling ($a^{1/2-s}\Lambda(s) = \chi_s(k)^{-1}\Lambda(s)$ for $a = \tau^k$);
+5. Reflection-pair defect $B_\rho(k) = 2(\cosh(k\delta\log\tau)-1) = 4\sinh^2(k\delta\log\tau/2) \ge 0$;
+6. Continuous second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2$.
+
+**Scalar-Transport No-Go Theorem & Holomorphic Obstruction**:
+- For scalar multipliers $F_k = g_k L$, all grade derivatives at zeros vanish identically ($0 \equiv 0$), and logarithmic derivatives on $gL \ne 0$ supply zero divisor data.
+- Scoped One-Point Holomorphic Obstruction proves no fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set ($\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$), requiring non-scalar pairings, contour boundary terms, or regularized determinants.
 
 Under the **Transcendental Curvature Rigidity Theorem**, any divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ with spectral expansion $\mathscr A_\tau(\xi) = \sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) implies RH.
-Constructing such a functional without zero inputs is the program's canonical open obligation: the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`), superseding raw CMSA $1/(2T)$ activation.
+Constructing such a functional without zero inputs is the program's canonical open obligation: the **Non-Scalar Arithmetic Functional Construction** (`OBL-CT-001A`). Curvature transport operates at the orbit level and bypasses fixed-finite $L^2$ translation invisibility at the spectral detector level ($B_\rho''(0) > 0$), but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair-isolation/infinite-limit barrier remains an open research problem.
 
 ---
 
 ## 11. Current Status and Research Protocol
 
-- **`OBL-CT-001` (Arithmetic Curvature-Descent Theorem)**: Canonical **OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §12).
+- **`OBL-CT-001A` (Non-Scalar Arithmetic Functional Construction)**: Canonical **EARLIEST OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §15).
+- **`OBL-CT-001B`–`OBL-CT-001D`**: Sequential open gates for spectral expansion, pair isolation, and conditional rigidity combination.
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in CMSA derivation).
 - **Transcendental Continuation Activation Theorem (`OBL-TC-ACT`)**: Precise earliest open subgate for Gate G4.
 - **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+
 
 
