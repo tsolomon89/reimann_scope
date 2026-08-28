@@ -1043,11 +1043,13 @@ The repository's geometric, spectral, and arithmetic structures are unified unde
 - **Canonical Weil–Hermitian Curvature Bridge & GNS Barrier**:
   - Exact pointwise identity: $\frac{1}{2}(1/|\rho|^2 + 1/|1-\rho|^2) - \Re(1/(\rho(1-\rho))) = \frac{2\delta^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0$.
   - Geometric involution discrepancy: $|J(\rho) - C(\rho)|^2 = 4\delta_\rho^2$ for $J(\rho)=1-\rho, C(\rho)=\bar\rho$.
-  - Exact zeta divisor summation target: $N_\xi - C_\xi = \sum_{\rho\in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0$ ($C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi)$).
-  - Pure local prime distribution weights are strictly negative-definite, and assuming Weil positivity $Q_W(g * g^*) \ge 0$ is circular (equivalent to RH via Weil's 1952 criterion).
+  - Exact zeta divisor summation target: $N_\xi - C_\xi = \sum_{\rho\in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0$ ($C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi)$), with $N_\xi = C_\xi \iff \mathrm{RH}$.
+  - Test function audit: naive $g_0(x) = x^{-1/2}\mathbf 1_{[1, \tau]}(x)$ yields $\widehat g_0(s) \ne 1/s$ (`FAIL_TEST_FUNCTION_IDENTIFICATION`), requiring an admissible smoothing family $\Phi_\varepsilon \to 1/s$ (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`).
+  - Unified additive coordinates $u = \log x \in \mathbb R$ yield Hermitian Weil form $Q_W(f) = \sum \Phi_f(\rho)\overline{\Phi_f(1-\bar\rho)}$. Pure local prime weights are strictly negative-definite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`), and assuming global Weil positivity $Q_W(f * f^*) \ge 0$ is equivalent to RH (Weil's 1952 criterion; `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`).
 - **Transcendental Curvature Rigidity Theorem**:
   $$\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.$$
-- **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ (or $Q_H(g)$) is the program's canonical earliest open obligation. Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair barrier remains an open problem. Reference: `CURVATURE_TRANSPORT.md`.
+- **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ (or $Q_H(f)$) is the program's canonical earliest open obligation. Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair barrier remains an open problem. Reference: `CURVATURE_TRANSPORT.md`.
+
 
 
 

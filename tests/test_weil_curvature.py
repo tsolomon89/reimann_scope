@@ -135,3 +135,56 @@ class TestFinitePrimeWeilGramMatrix:
         assert float(res["max_eigenvalue"]) < 0.0
         assert float(res["min_eigenvalue"]) < 0.0
         assert res["falsification_witness"] == "PRIME_DISTRIBUTION_ALONE_IS_STRICTLY_NEGATIVE_DEFINITE"
+        assert res["classification"] == "FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION"
+        assert res["global_weil_positivity_status"] == "OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION"
+
+
+class TestMellinProbeAnalysis:
+    """Verifies test function Mellin transform vs spectral probe 1/s and regularization."""
+
+    def test_naive_indicator_differs_from_one_over_s(self):
+        # Test at first zero rho = 0.5 + 14.134725 i
+        s_test = "0.5 + 14.1347251417346937904572519835624702707842571156992431756855674601499634298092567649490103931715610127723 * I"
+        res = math_core.evaluate_fourier_mellin_probe_analysis(s_test, dps=50)
+
+        assert res["status"] == "FOURIER_MELLIN_PROBE_ANALYSIS_COMPLETED"
+        assert res["g0_equals_1_over_s"] is False
+        assert float(res["diff_g0_vs_phi0"]) > 0.05
+        assert res["test_function_classification"] == "FAIL_TEST_FUNCTION_IDENTIFICATION"
+        assert res["regularization_obligation"] == "OPEN_ADMISSIBLE_PROBE_REGULARIZATION"
+
+    def test_regularized_smoothing_family_approaches_one_over_s(self):
+        s_test = "0.5 + 14.1347251417346937904572519835624702707842571156992431756855674601499634298092567649490103931715610127723 * I"
+        res = math_core.evaluate_fourier_mellin_probe_analysis(s_test, dps=50)
+
+        # Regularized cutoff error should be very small
+        assert float(res["regularization_error"]) < 1e-3
+
+
+class TestAdditiveCoordinateWeilHermitianForm:
+    """Verifies additive coordinate Hermitian Weil form Q_W(f) and Hermitian companion Q_H(f)."""
+
+    def test_additive_form_equality_on_line(self):
+        zeros_100 = load_first_100_reference_zeros()
+        zeros_data = [("0.0", str(gam), 1) for gam in zeros_100[:20]]
+        res = math_core.evaluate_additive_coordinate_weil_hermitian_form(zeros_data, dps=50)
+
+        assert res["status"] == "ADDITIVE_COORDINATE_WEIL_HERMITIAN_FORM_EVALUATED"
+        assert res["all_on_line"] is True
+        assert res["equality_holds"] is True
+        assert float(res["diff_QH_vs_QW"]) < 1e-40
+
+    def test_additive_form_discrepancy_off_line(self):
+        quartet = [
+            ("0.05", "14.134725", 1),
+            ("0.05", "-14.134725", 1),
+            ("-0.05", "14.134725", 1),
+            ("-0.05", "-14.134725", 1),
+        ]
+        res = math_core.evaluate_additive_coordinate_weil_hermitian_form(quartet, dps=50)
+
+        assert res["status"] == "ADDITIVE_COORDINATE_WEIL_HERMITIAN_FORM_EVALUATED"
+        assert res["all_on_line"] is False
+        assert res["equality_holds"] is False
+        assert float(res["diff_QH_vs_QW"]) > 0.0
+

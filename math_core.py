@@ -5799,7 +5799,139 @@ def evaluate_finite_prime_weil_gram_matrix(
             "min_eigenvalue": mpmath.nstr(min_eigenvalue, n=10),
             "is_locally_positive_definite": False,
             "falsification_witness": "PRIME_DISTRIBUTION_ALONE_IS_STRICTLY_NEGATIVE_DEFINITE",
+            "classification": "FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION",
+            "global_weil_positivity_status": "OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION",
             "status": "FINITE_PRIME_WEIL_GRAM_MATRIX_ANALYZED"
+        }
+
+
+def evaluate_fourier_mellin_probe_analysis(
+    s_val: Union[complex, str, mpmath.mpc],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [WEIL-CURVATURE: MELLIN PROBE REGULARIZATION & TEST FUNCTION AUDIT]
+    Audits the exact Mellin transform of test functions vs the spectral probe 1/s:
+      1. Naive indicator g_0(x) = x^{-1/2} * 1_{[1, tau]}(x):
+         \\widehat g_0(s) = \\int_1^tau x^{s-3/2} dx = (tau^{s-1/2} - 1) / (s - 1/2).
+         Falsifies the naive identification \\widehat g_0(s) == 1/s.
+      2. Spectral Probe \\Phi_0(s) = 1/s:
+         Corresponds to g(x) = 1_{(0,1)}(x) under standard Mellin, or in additive
+         logarithmic coordinates u = log x in (-infty, 0) with f_0(u) = exp(u/2) * 1_{(-infty, 0)}(u).
+      3. Admissible Regularization:
+         Because 1_{(0,1)} is not in C_c^infty, an admissible smoothing family
+         f_eps in C_c^infty(R) is required such that \\Phi_eps(s) -> 1/s with proved
+         interchange of spectral, prime, pole, and Archimedean limits.
+      4. Subgate Classifications:
+         - FAIL_TEST_FUNCTION_IDENTIFICATION: Naive x^{-1/2} 1_{[1, tau]} != 1/s.
+         - OPEN_ADMISSIBLE_PROBE_REGULARIZATION: Explicit smoothing family and limit interchange.
+    """
+    with mpmath.workdps(dps):
+        s_c = to_mpc(s_val, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+
+        # 1. Exact evaluation of \\widehat g_0(s) for g_0(x) = x^{-1/2} 1_{[1, tau]}
+        # \\widehat g_0(s) = (tau^{s - 1/2} - 1) / (s - 1/2)
+        s_minus_half = s_c - mpmath.mpf("0.5")
+        if abs(s_minus_half) < 1e-45:
+            # L'Hopital limit as s -> 1/2
+            ghat_g0 = mpmath.log(tau_mp)
+        else:
+            ghat_g0 = (tau_mp ** s_minus_half - 1) / s_minus_half
+
+        # 2. Target spectral probe \\Phi_0(s) = 1/s
+        phi_0 = 1 / s_c
+
+        diff_g0_vs_phi0 = abs(ghat_g0 - phi_0)
+        is_exact_phi0 = bool(diff_g0_vs_phi0 < 1e-45)
+
+        # 3. Additive coordinate regularization test family:
+        # f_eps(u) = exp(u/2) * smoothed cutoff on [-L, -eps]
+        # For evaluation at s, integral_{-L}^{-eps} exp((s - 1/2 + 1/2)u) du = (exp(-eps*s) - exp(-L*s)) / s -> 1/s as eps->0, L->infty
+        eps = mpmath.mpf("1e-4")
+        L = mpmath.mpf("50.0")
+        phi_regularized = (mpmath.exp(-eps * s_c) - mpmath.exp(-L * s_c)) / s_c
+        reg_diff = abs(phi_regularized - phi_0)
+
+        return {
+            "s": str(s_c),
+            "tau": mpmath.nstr(tau_mp, n=10),
+            "ghat_g0": str(ghat_g0),
+            "phi_0": str(phi_0),
+            "diff_g0_vs_phi0": mpmath.nstr(diff_g0_vs_phi0, n=10),
+            "g0_equals_1_over_s": is_exact_phi0,
+            "phi_regularized": str(phi_regularized),
+            "regularization_error": mpmath.nstr(reg_diff, n=10),
+            "test_function_classification": "FAIL_TEST_FUNCTION_IDENTIFICATION",
+            "regularization_obligation": "OPEN_ADMISSIBLE_PROBE_REGULARIZATION",
+            "status": "FOURIER_MELLIN_PROBE_ANALYSIS_COMPLETED"
+        }
+
+
+def evaluate_additive_coordinate_weil_hermitian_form(
+    zeros_list: List[Tuple[Any, Any, int]],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [WEIL-CURVATURE: UNIFIED ADDITIVE COORDINATE WEIL FORM & HERMITIAN PARSEVAL]
+    In additive logarithmic coordinates u = log x in R:
+      \\Phi_f(s) = \\int_R f(u) exp((s - 1/2) u) du
+      f^*(u) = conj(f(-u))
+      \\Phi_{f * f^*}(s) = \\Phi_f(s) * conj(\\Phi_f(1 - bar{s}))
+    Hermitian Weil functional on f:
+      Q_W(f) = sum_rho \\Phi_f(rho) * conj(\\Phi_f(1 - bar{rho})).
+    Hermitian companion functional:
+      Q_H(f) = sum_rho |\\Phi_f(rho)|^2.
+    Reduction on RH:
+      On RH (1 - bar{rho} = rho), conj(\\Phi_f(1 - bar{rho})) = conj(\\Phi_f(rho)),
+      so Q_W(f) = sum_rho |\\Phi_f(rho)|^2 = Q_H(f).
+    For off-line zeros (rho = 1/2 + delta + i*gamma with delta != 0):
+      Q_W(f) != Q_H(f) in general, with discrepancy governed by the involution difference
+      J(rho) - C(rho) = - 2 * delta.
+    """
+    with mpmath.workdps(dps):
+        sum_Q_W = mpmath.mpc(0)
+        sum_Q_H = mpmath.mpf(0)
+        all_on_line = True
+
+        for (d_val, g_val, mult) in zeros_list:
+            d_f = to_mpf(d_val, dps=dps)
+            g_f = to_mpf(g_val, dps=dps)
+            m_f = mpmath.mpf(mult)
+
+            if abs(d_f) > 1e-45:
+                all_on_line = False
+
+            rho = mpmath.mpc(mpmath.mpf("0.5") + d_f, g_f)
+            # 1 - conj(rho) = 1 - (1/2 + delta - i*gamma) = 1/2 - delta + i*gamma
+            one_minus_conj_rho = mpmath.mpc(mpmath.mpf("0.5") - d_f, g_f)
+
+            # Test probe \\Phi(s) = 1/s
+            phi_rho = 1 / rho
+            phi_one_minus_conj = 1 / one_minus_conj_rho
+
+            # Q_W term: \\Phi(rho) * conj(\\Phi(1 - bar{rho}))
+            term_W = phi_rho * mpmath.conj(phi_one_minus_conj)
+            sum_Q_W += m_f * term_W
+
+            # Q_H term: |\\Phi(rho)|^2
+            term_H = abs(phi_rho) ** 2
+            sum_Q_H += m_f * term_H
+
+        Q_W_re = mpmath.re(sum_Q_W)
+        Q_W_im = mpmath.im(sum_Q_W)
+        diff_QH_vs_QW = abs(sum_Q_H - Q_W_re)
+
+        return {
+            "num_zeros": len(zeros_list),
+            "all_on_line": all_on_line,
+            "Q_W_real": mpmath.nstr(Q_W_re, n=20),
+            "Q_W_imag": mpmath.nstr(Q_W_im, n=6),
+            "Q_H": mpmath.nstr(sum_Q_H, n=20),
+            "diff_QH_vs_QW": mpmath.nstr(diff_QH_vs_QW, n=20),
+            "equality_holds": bool(diff_QH_vs_QW < 1e-40),
+            "status": "ADDITIVE_COORDINATE_WEIL_HERMITIAN_FORM_EVALUATED"
         }
 
 

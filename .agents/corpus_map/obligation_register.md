@@ -60,7 +60,9 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-CT-001B` | Curvature Spectral Expansion Derivation | Derive meromorphic/contour spectral expansion \(\mathscr A_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2\) from the non-scalar functional | Meromorphic/contour expansion derivation | `OPEN` |
 | `OBL-CT-001C` | Absolute Convergence, Pair Isolation & Positivity | Prove absolute convergence of the spectral sum, complete isolation of reflection pairs \((\rho, \rho^\#)\) without uncancelled cross-terms \((\rho_1, \rho_2)\), and strict weight positivity \(W_\rho > 0\) | Asymptotic kernel & pairing analysis | `OPEN` |
 | `OBL-CT-001D` | Arithmetic Vanishing & Curvature Rigidity | Prove independent arithmetic vanishing \(\mathscr A_\tau(\xi) = 0\) and combine with positive-weight rigidity to establish \(\forall \rho, \delta_\rho = 0 \iff \mathrm{RH}\) | Lean 4 `ConditionalCurvatureRigidityBridge.all_defects_zero` | `OPEN (CONDITIONAL RIGIDITY PROVED)` |
-| `OBL-WH-001` | Non-Circular Arithmetic Hermitian Companion Construction | Construct arithmetic Hermitian companion form \(Q_H(g)\) matching \(\sum |\hat g(\rho)|^2\) and evaluate \(Q_H(g_0) = N_\xi\) without assuming \(Q_W(g * g^*) \ge 0\) or supplying zeta zeros | Arithmetic explicit formula & GNS factorization analysis | `OPEN (GNS POSITIVITY BARRIER)` |
+| `OBL-WH-001` | Non-Circular Arithmetic Hermitian Companion Construction | Construct arithmetic Hermitian companion form \(Q_H(f)\) matching \(\sum |\Phi_f(\rho)|^2\) and evaluate \(Q_H(\Phi_0) = N_\xi\) without assuming \(Q_W(f * f^*) \ge 0\) or supplying zeta zeros | Arithmetic explicit formula & GNS factorization analysis | `OPEN (GNS POSITIVITY BARRIER)` |
+| `OBL-WH-002` | Admissible Probe Regularization & Limit Interchange | Construct admissible smoothing family \(f_\varepsilon \in C_c^\infty(\mathbb R)\) approaching spectral probe \(\Phi_0(s) = 1/s\), proving convergence of every zero, prime, pole, and Archimedean term in the explicit formula | Classical analysis & dominated convergence | `OPEN (ACTIVE OBLIGATION)` |
+
 
 
 

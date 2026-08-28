@@ -371,20 +371,27 @@ The **Weil–Hermitian Curvature Bridge** (`CURVATURE_TRANSPORT.md` §14–15) c
    $$\frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) - \Re\left(\frac{1}{\rho(1-\rho)}\right) = \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0.$$
 3. **Discrete Summation & Hadamard Constant**:
    $$N_\xi - C_\xi = \sum_{\rho \in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0, \qquad C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi) \approx 0.0461914179322420...$$
-4. **GNS Positive-Type Barrier**:
-   Pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are strictly negative-definite (all eigenvalues strictly negative). Defining an arithmetic Hilbert space norm via $Q_W(g * g^*) \ge 0$ without zero-independent positive factorization is logically circular, since $Q_W(g * g^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952).
+   with $N_\xi = C_\xi \iff \mathrm{RH}$.
+4. **Test Function Audit & Additive Coordinates**:
+   - Naive indicator $g_0(x) = x^{-1/2}\mathbf 1_{[1, \tau]}(x)$ has transform $\widehat g_0(s) = \frac{\tau^{s-1/2}-1}{s-1/2} \ne 1/s$ (`FAIL_TEST_FUNCTION_IDENTIFICATION`).
+   - Spectral probe $\Phi_0(s) = 1/s$ corresponds to $\mathbf 1_{(0, 1)}$, requiring an admissible smoothing family $f_\varepsilon \in C_c^\infty(\mathbb R)$ with certified limit interchange (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`).
+   - In unified additive coordinates $u = \log x$, $Q_W(f) = \sum \Phi_f(\rho)\overline{\Phi_f(1-\bar\rho)}$, which reduces on RH ($1-\bar\rho=\rho$) to $Q_H(f) = \sum |\Phi_f(\rho)|^2$.
+5. **GNS Positive-Type Barrier**:
+   Pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are strictly negative-definite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`). Complete Weil distribution positivity $Q_W(f * f^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952), remaining `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`.
 
 ---
 
 ## 11. Current Status and Research Protocol
 
 - **`OBL-CT-001A` (Non-Scalar Arithmetic Functional Construction)**: Canonical **EARLIEST OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §15).
+- **`OBL-WH-002` (Admissible Probe Regularization)**: Active analytic obligation for smoothing family $\Phi_\varepsilon \to 1/s$.
 - **`OBL-CT-001B`–`OBL-CT-001D`**: Sequential open gates for spectral expansion, pair isolation, and conditional rigidity combination.
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in CMSA derivation).
 - **Transcendental Continuation Activation Theorem (`OBL-TC-ACT`)**: Precise earliest open subgate for Gate G4.
 - **Candidate Classification**: `EXACT_CURVATURE_IDENTITY_PROVED_ARITHMETIC_NORM_OPEN` (Weil–Hermitian Curvature Bridge) / `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+
 
 
 

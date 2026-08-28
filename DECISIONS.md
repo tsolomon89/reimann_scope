@@ -1470,24 +1470,28 @@ Decision:
    - Reindexed over all nontrivial zeros $Z$ using $\rho \leftrightarrow 1-\rho$ symmetry and absolute convergence of $\sum 1/|\rho|^2 < \infty$.
    - Linked to the classical completed-$\xi$ Hadamard sum constant $C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi) \approx 0.046191417932242...$.
    - Concluded $N_\xi - C_\xi = \sum_{\rho \in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0$, with strict equality iff every $\delta_\rho = 0$ (RH).
-5. **GNS Factorization Barrier & Local Prime Definiteness**:
-   - Evaluated the arithmetic Weil form $Q_W(g_0) = C_\xi$ and Hermitian companion $Q_H(g_0) = N_\xi$.
-   - Proved that pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ produce strictly negative eigenvalues, falsifying local-prime Hilbert space factorization without global Archimedean and pole cancellation.
-   - Identified that assuming $Q_W(g * g^*) \ge 0$ a priori is circular (equivalent to RH via Weil's 1952 criterion).
-6. **Candidate Classification**:
-   - Classified the Weil–Hermitian Curvature Bridge as `EXACT_CURVATURE_IDENTITY_PROVED_ARITHMETIC_NORM_OPEN` (earliest open subgate: non-circular zero-independent construction of $Q_H(g)$ / `FAIL_POSITIVE_TYPE_FACTORIZATION`).
-7. **Lean 4 Formalization Inventory**:
+5. **Test Function Audit & Additive Coordinate Weil Form**:
+   - Audited the test function Mellin transform: naive $g_0(x) = x^{-1/2}\mathbf 1_{[1, \tau]}(x)$ yields $\widehat g_0(s) = \frac{\tau^{s-1/2}-1}{s-1/2} \ne 1/s$ (`FAIL_TEST_FUNCTION_IDENTIFICATION`).
+   - Spectral probe $\Phi_0(s) = 1/s$ corresponds to $\mathbf 1_{(0, 1)}$, which is outside $C_c^\infty$; formulated the admissible probe regularization obligation $\Phi_\varepsilon \to 1/s$ (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`).
+   - Unified coordinates under additive logarithmic variable $u = \log x \in \mathbb R$, with $\Phi_f(s) = \int_{\mathbb R} f(u) e^{(s-1/2)u} du$, $f^*(u) = \overline{f(-u)}$, and Hermitian Weil form $Q_W(f) = \sum \Phi_f(\rho)\overline{\Phi_f(1-\bar\rho)}$.
+6. **Local Factorization Failure vs Global Weil Positivity**:
+   - Pure local prime weights $-\frac{\Lambda(n)}{\sqrt{n}}$ produce strictly negative eigenvalues, establishing `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`.
+   - Complete Weil distribution positivity $Q_W(f * f^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952), remaining `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`.
+7. **Candidate Classification**:
+   - Classified the Weil–Hermitian Curvature Bridge as `EXACT_CURVATURE_IDENTITY_PROVED_ARITHMETIC_NORM_OPEN` (earliest open subgates: `FAIL_TEST_FUNCTION_IDENTIFICATION` -> `OPEN_ADMISSIBLE_PROBE_REGULARIZATION` -> `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`).
+8. **Lean 4 Formalization Inventory**:
    - Added 9 new formal declarations to `RiemannScope.CurvatureTransport`, bringing the project total to **123 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
-8. **Verification Suite**:
-   - Created `tests/test_weil_curvature.py` (13 tests) and updated `tests/test_curvature_transport.py` (99 tests), achieving 112/112 passing tests.
+9. **Verification Suite**:
+   - Updated `tests/test_weil_curvature.py` (17 tests) and `tests/test_curvature_transport.py` (99 tests), achieving 116/116 passing tests.
 
 Reason:
 
-Establish the complete exact algebraic and geometric bridge between continuous grade curvature and the Weil explicit formula, prove the geometric involution discrepancy theorem, resolve the scalar vs coordinate-pulled worldline distinction, and isolate the exact GNS positive-type barrier on the arithmetic side.
+Establish the complete exact algebraic and geometric bridge between continuous grade curvature and the Weil explicit formula, prove the geometric involution discrepancy theorem, resolve the scalar vs coordinate-pulled worldline distinction, audit test function transforms in unified additive coordinates, and isolate the exact subgate hierarchy on the arithmetic side.
 
 Mathematical / operational consequence:
 
 Updated `CURVATURE_TRANSPORT.md`, `formal/RiemannScope/CurvatureTransport.lean`, `math_core.py`, `tests/test_curvature_transport.py`, `tests/test_weil_curvature.py`, `MATH_CONTRACT.md`, `RESEARCH_LEDGER.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `CMSA_GATE_G4.md`, `TRANSCENDENTAL_CONTINUATION.md`, `RESEARCH_HYPOTHESIS.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all three corpus registers.
+
 
 
 

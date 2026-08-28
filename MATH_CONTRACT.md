@@ -2625,16 +2625,26 @@ Summing over all nontrivial zeros $Z$ counting multiplicity:
 \]
 with strict equality $N_\xi - C_\xi = 0$ if and only if every $\delta_\rho = 0$ (the Riemann Hypothesis).
 
-### Arithmetic Weil Functional versus Hermitian Companion
-For multiplicative test functions on $\mathbb R_{>0}$ with Mellin transform $\hat g(s) = \int_0^\infty g(x) x^s \frac{dx}{x}$:
-- Weil quadratic form: $Q_W(g) = \sum_{\rho \in Z} \hat g(\rho)\hat g(1-\rho) = \hat g(0)\hat g(1) + \hat g(1)\hat g(0) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}}[g(n) + g(1/n)] - \mathcal W_{\text{arch}}(g)$.
-- Canonical limit $g_0 = \mathbf 1_{(0,1)}$: $Q_W(g_0) = \sum_\rho \frac{1}{\rho(1-\rho)} = C_\xi$.
-- Hermitian companion functional: $Q_H(g) = \sum_{\rho \in Z} |\hat g(\rho)|^2$, with $Q_H(g_0) = N_\xi$.
+### Arithmetic Weil Functional in Additive Coordinates and Hermitian Companion
+In unified additive logarithmic coordinates $u = \log x \in \mathbb R$:
+- Centered Fourier–Laplace transform: $\Phi_f(s) = \int_{\mathbb R} f(u) e^{(s-1/2)u} \, du$.
+- Involution: $f^*(u) = \overline{f(-u)}$, satisfying $\Phi_{f * f^*}(s) = \Phi_f(s) \overline{\Phi_f(1-\bar s)}$.
+- Hermitian Weil quadratic form: $Q_W(f) = \sum_{\rho \in Z} \Phi_f(\rho) \overline{\Phi_f(1-\bar\rho)} = \Phi_{f * f^*}(1) + \Phi_{f * f^*}(0) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}}[(f * f^*)(\log n) + (f * f^*)(-\log n)] + \mathcal W_{\text{arch}}(f * f^*)$.
+- Hermitian companion functional: $Q_H(f) = \sum_{\rho \in Z} |\Phi_f(\rho)|^2$. On RH ($1-\bar\rho = \rho$), $Q_W(f) = Q_H(f)$.
 
-### GNS Factorization Barrier & Local Prime Definiteness
-1. Involution $g^*(x) = x^{-1}\overline{g(1/x)}$ yields $\widehat{g^*}(s) = \overline{\hat g(1-\bar s)}$ and $Q_W(g * g^*) = \sum_\rho \hat g(\rho)\overline{\hat g(\bar\rho)}$.
-2. Pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are **strictly negative-definite** (all eigenvalues strictly negative, falsifying pure local Hilbert space inner product factorization without global Archimedean and pole distributions).
-3. Positive-definiteness $Q_W(g * g^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952). Defining an arithmetic Hilbert space norm by assuming $Q_W(g * g^*) \ge 0$ without zero-independent positive factorization is circular.
+### Test Function Audit and Probe Regularization
+1. **Falsification of Naive Indicator (`FAIL_TEST_FUNCTION_IDENTIFICATION`)**:
+   The naive function $g_0(x) = x^{-1/2} \mathbf 1_{[1, \tau]}(x)$ has Mellin transform $\widehat g_0(s) = \frac{\tau^{s-1/2}-1}{s-1/2} \ne 1/s$, so it does not evaluate directly to $C_\xi$ or $N_\xi$.
+2. **Spectral Probe $\Phi_0(s) = 1/s$**:
+   The formal probe is $\Phi_0(s) = 1/s$, corresponding to $f_0(u) = e^{u/2}\mathbf 1_{(-\infty, 0)}(u)$.
+3. **Admissible Probe Regularization (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`)**:
+   Because $f_0 \notin C_c^\infty(\mathbb R)$, an admissible smoothing family $f_\varepsilon \in C_c^\infty(\mathbb R)$ is required such that $\Phi_\varepsilon(s) \to 1/s$ with proved interchange of limits across spectral, prime, pole, and Archimedean terms.
+
+### Positive-Type Factorization: Local Failure vs Global Status
+1. **Local Prime Factorization Failure (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`)**:
+   The pure prime distribution diagonal weights $-\frac{\log p}{\sqrt{p}}$ are strictly negative, so naive diagonal prime-local Gram matrices are strictly negative-definite.
+2. **Global Weil Positivity (`OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`)**:
+   Global positivity $Q_W(f * f^*) \ge 0$ requires compensation from Archimedean and pole distributions and is globally equivalent to the Riemann Hypothesis (Weil 1952).
 
 ### Corrected Scalar vs Coordinate-Pulled Zero Worldlines
 - Fixed-zero scalar multiplier: For $F(k,s) = g(k,s)L(s)$, $L(\rho) = 0 \implies F(k,\rho) = 0$ and $\partial_k^m F(k,\rho) = 0$ identically for all $m \ge 0$.
@@ -2642,11 +2652,15 @@ For multiplicative test functions on $\mathbb R_{>0}$ with Mellin transform $\ha
 - Unpulled static function: $L(s_\rho(k)) = (\tau^k - 1)(\rho - 1/2)$, which is generically non-zero for $k \ne 0, \rho \ne 1/2$.
 *(Formally proved in Lean 4: `coordinate_pulled_affine_zero_worldline`, `unpulled_affine_zero_worldline_eval`).*
 
-### Program Classification
+### Program Classification and Subgate Hierarchy
 \[
 \boxed{\textbf{Candidate Classification: } \texttt{EXACT\_CURVATURE\_IDENTITY\_PROVED\_ARITHMETIC\_NORM\_OPEN}}
 \]
-Earliest open subgate: Non-circular zero-independent construction of $Q_H(g)$ (`OBL-CT-001A`).
+- Subgate 1: $\texttt{FAIL\_TEST\_FUNCTION\_IDENTIFICATION}$ (repaired)
+- Subgate 2: $\texttt{OPEN\_ADMISSIBLE\_PROBE\_REGULARIZATION}$ (active obligation)
+- Subgate 3: $\texttt{FAIL\_NAIVE\_PRIME\_LOCAL\_FACTORIZATION}$ (falsified diagonal candidate)
+- Subgate 4: $\texttt{OPEN\_GLOBAL\_POSITIVE\_TYPE\_FACTORIZATION}$ (RH-equivalent barrier)
+
 
 
 

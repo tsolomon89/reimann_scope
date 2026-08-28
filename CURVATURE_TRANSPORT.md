@@ -405,36 +405,40 @@ with **strict equality $N_\xi - C_\xi = 0$ if and only if every $\delta_\rho = 0
 
 ---
 
-## 15. The Arithmetic Weil Functional and the GNS Positivity Barrier
+## 15. The Arithmetic Weil Functional, Coordinate Systems, and Positivity Barriers
 
-### Multiplicative Test Functions and the Weil Form
-For an admissible test function $g(x)$ on $\mathbb{R}_{>0}$ with Mellin transform $\hat g(s) = \int_0^\infty g(x) x^s \frac{dx}{x}$:
-- **Weil Analytic Pairing**:
-  $$Q_W(g) = \sum_{\rho \in Z} \hat g(\rho)\hat g(1-\rho)$$
-  Constructed from the arithmetic explicit formula without using zeros:
-  $$Q_W(g) = \hat g(0)\hat g(1) + \hat g(1)\hat g(0) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}}\left[g(n) + g\left(\frac{1}{n}\right)\right] - \mathcal{W}_{\text{arch}}(g)$$
-- **Canonical Limiting Test Function $g_0 = \mathbf{1}_{(0,1)}$**:
-  $\hat g_0(s) = 1/s$, $\hat g_0(1-s) = 1/(1-s)$, recovering:
-  $$Q_W(g_0) = \sum_{\rho \in Z} \frac{1}{\rho(1-\rho)} = C_\xi$$
-- **Hermitian Companion Functional**:
-  $$Q_H(g) = \sum_{\rho \in Z} |\hat g(\rho)|^2, \qquad Q_H(g_0) = \sum_{\rho \in Z} \frac{1}{|\rho|^2} = N_\xi$$
+### Unified Additive Coordinates and the Hermitian Weil Form
+To avoid conflating multiplicative $\mathbb{R}_{>0}$ variables with additive distribution evaluations at $\log n$, we adopt unified additive logarithmic coordinates $u = \log x \in \mathbb{R}$.
 
-### Attempted GNS / Positive-Type Factorization
-With involution $g^*(x) = x^{-1}\overline{g(1/x)}$, the Mellin transform satisfies $\widehat{g^*}(s) = \overline{\hat g(1 - \bar s)}$.
-Then $Q_W(g * g^*) = \sum_\rho \hat g(\rho) \overline{\hat g(\bar\rho)}$.
-Under conjugation symmetry $\rho \leftrightarrow \bar\rho$, this formally matches $\sum_\rho |\hat g(\rho)|^2 = Q_H(g)$.
+For a test function $f \in C_c^\infty(\mathbb{R})$:
+1. **Centered Fourier–Laplace Transform**:
+   $$\Phi_f(s) = \int_{\mathbb{R}} f(u) e^{(s-1/2)u} \, du$$
+2. **Additive Involution**:
+   $$f^*(u) = \overline{f(-u)}$$
+   The transform of the convolution $f * f^*$ satisfies:
+   $$\Phi_{f * f^*}(s) = \Phi_f(s) \overline{\Phi_f(1 - \bar s)}$$
+3. **Hermitian Weil Form on $f$**:
+   $$Q_W(f) = \sum_{\rho \in Z} \Phi_f(\rho) \overline{\Phi_f(1 - \bar\rho)}$$
+   On the Riemann Hypothesis ($1 - \bar\rho = \rho$), this reduces to the Hermitian companion:
+   $$Q_W(f) = \sum_{\rho \in Z} |\Phi_f(\rho)|^2 =: Q_H(f)$$
+4. **Arithmetic Explicit Formula on $f * f^*$**:
+   $$Q_W(f) = \Phi_{f * f^*}(1) + \Phi_{f * f^*}(0) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}}\left[(f * f^*)(\log n) + (f * f^*)(-\log n)\right] + \mathcal{W}_{\text{arch}}(f * f^*)$$
 
-### The Positive-Type Barrier & Falsification Witness
-Why cannot $Q_H(g)$ be constructed purely from local arithmetic data without assuming RH?
-1. **Local Prime Distribution Indefiniteness**:
-   The prime distribution contribution is $- \sum_{n=2}^\infty \frac{\Lambda(n)}{\sqrt{n}} [g(n) + g(1/n)]$.
-   For localized test functions at prime nodes $u_p = \log p$, the local diagonal weights are $- \frac{\log p}{\sqrt{p}} < 0$.
-   All eigenvalues of the pure local-prime Gram matrix are **strictly negative** (verified in `evaluate_finite_prime_weil_gram_matrix`).
-2. **Global Balance Obligation**:
-   Positivity $Q_W(g * g^*) \ge 0$ is NOT a local property; it requires precise, non-local cancellation between the negative prime distribution, the positive Archimedean distribution ($\log\pi + \psi$), and the pole distribution.
-3. **Circularity of GNS Premise**:
-   Weil's Criterion (Weil 1952, Bombieri 2000) states that $Q_W(g * g^*) \ge 0$ for all admissible $g$ is **strictly equivalent to the Riemann Hypothesis**.
-   Therefore, defining an arithmetic Hilbert space norm $\|Jg\|^2 = Q_W(g * g^*)$ by assuming positivity $Q_W(g * g^*) \ge 0$ without a zero-independent positive factorization is logically circular.
+### Audit of the Test Function and the Probe $1/s$
+1. **Falsification of Naive Indicator $g_0(x) = x^{-1/2} \mathbf{1}_{[1, \tau]}(x)$ (`FAIL_TEST_FUNCTION_IDENTIFICATION`)**:
+   The naive function $g_0(x) = x^{-1/2} \mathbf{1}_{[1, \tau]}(x)$ has Mellin transform:
+   $$\widehat g_0(s) = \int_1^\tau x^{s-3/2} \, dx = \frac{\tau^{s-1/2} - 1}{s - 1/2} \ne \frac{1}{s}$$
+   Consequently, $\widehat g_0(\rho)\widehat g_0(1-\rho) \ne \frac{1}{\rho(1-\rho)}$ and $|\widehat g_0(\rho)|^2 \ne \frac{1}{|\rho|^2}$. The claim that $g_0$ evaluates to $C_\xi$ and $N_\xi$ is mathematically false.
+2. **Formal Spectral Probe $\Phi_0(s) = 1/s$**:
+   The formal probe producing $\Phi_0(\rho)\Phi_0(1-\rho) = \frac{1}{\rho(1-\rho)}$ is $\Phi_0(s) = 1/s$. In multiplicative coordinates, this corresponds to $\mathbf{1}_{(0, 1)}(x)$, or in additive logarithmic coordinates $u \in (-\infty, 0)$, $f_0(u) = e^{u/2} \mathbf{1}_{(-\infty, 0)}(u)$.
+3. **Admissible Probe Regularization Obligation (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`)**:
+   Because $\mathbf{1}_{(0, 1)}$ is not smooth or compactly supported, an admissible smoothing family $f_\varepsilon \in C_c^\infty(\mathbb{R})$ is required such that $\Phi_\varepsilon(s) \to 1/s$ point-wise on the critical strip, with certified convergence of every zero sum, prime sum, pole term, and Archimedean integral.
+
+### Positive-Type Factorization: Local Failure vs Global Status
+1. **Local Prime Factorization Failure (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`)**:
+   The pure prime distribution has coefficients $-\frac{\Lambda(n)}{\sqrt{n}} < 0$. For localized test functions supported at prime nodes $u_p = \log p$, the local diagonal weights $-\frac{\log p}{\sqrt{p}}$ are strictly negative (eigenvalues $< 0$). This rules out naive diagonal prime-local Hilbert space factorizations.
+2. **Global Weil Positivity (`OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`)**:
+   The negative prime terms do not rule out global positivity of the complete distribution $Q_W(f * f^*)$, because positive Archimedean and pole contributions provide global compensation. However, global positivity $Q_W(f * f^*) \ge 0$ for all $f$ is mathematically equivalent to RH (Weil 1952). Thus, deriving a Hilbert space $\mathcal{H}_\zeta$ via GNS from the arithmetic side without assuming RH remains an open equivalent obligation.
 
 ---
 
@@ -458,18 +462,21 @@ To resolve the distinction between scalar multipliers and coordinate dilations:
 
 ---
 
-## 17. Candidate Classification & Status
+## 17. Candidate Classification & Subgate Hierarchy
 
-Based on rigorous auditing of all 8 criteria:
+Based on rigorous auditing:
 - **Pointwise Weil–Curvature Identity**: Proved algebraically & in Lean 4 (`pointwise_weil_curvature_identity_algebraic`);
 - **Involution Discrepancy**: Proved $|J - C|^2 = 4\delta^2$ in Lean 4 (`weil_involution_norm_sq_discrepancy`);
 - **Discrete Zeta Divisor Summation**: Derived exact target $N_\xi - C_\xi = \sum \frac{2\delta^2}{|\rho|^2|1-\rho|^2}$;
-- **Zero-Independent Arithmetic Norm Construction**: **OPEN** (`OBL-CT-001A`);
-- **GNS Arithmetic Factorization**: Falsified at local level due to strictly negative prime eigenvalues (`FAIL_POSITIVE_TYPE_FACTORIZATION` / Weil circularity).
+- **Overall Candidate Classification**:
+  $$\boxed{\textbf{EXACT\_CURVATURE\_IDENTITY\_PROVED\_ARITHMETIC\_NORM\_OPEN}}$$
+- **Subgate Sequence**:
+  1. $\boxed{\texttt{FAIL\_TEST\_FUNCTION\_IDENTIFICATION}}$ (for $x^{-1/2}\mathbf{1}_{[1, \tau]} \ne 1/s$)
+  2. $\boxed{\texttt{OPEN\_ADMISSIBLE\_PROBE\_REGULARIZATION}}$ (for $\Phi_\varepsilon \to 1/s$ limiting interchange)
+  3. $\boxed{\texttt{FAIL\_NAIVE\_PRIME\_LOCAL\_FACTORIZATION}}$ (for diagonal prime-local Gram matrices)
+  4. $\boxed{\texttt{OPEN\_GLOBAL\_POSITIVE\_TYPE\_FACTORIZATION}}$ (for complete Weil distribution positivity)
 
-$$\boxed{
-\textbf{Official Classification: } \texttt{EXACT\_CURVATURE\_IDENTITY\_PROVED\_ARITHMETIC\_NORM\_OPEN}
-}$$
+---
 
 ---
 
