@@ -770,5 +770,27 @@ Formalize Gate G4 windowed expansion identities, complex conjugation algebra, ad
    - Theorem `linear_schedule_grade_covariant`: \(\forall c, \tau\), \(H_c(T) = cT\) is discrete grade-covariant (\(H_c(\tau T) = \tau H_c(T)\)).
    - Theorem `grade_covariant_schedule_nonuniqueness`: Discrete grade covariance alone does not uniquely determine a schedule; for any \(c_1 \ne c_2\), \(H_{c_1}\) and \(H_{c_2}\) are both covariant and distinct for all \(T > 0\).
    - Theorem `periodic_modulated_schedule_covariant`: Any schedule \(H(T) = T \cdot q(\log_\tau T)\) with 1-periodic \(q\) satisfies discrete grade covariance.
-   Bringing the compiled project theorem declarations to 75.
 
+---
+
+# 26. Phase 17 — Exact Remainder Cancellation, Background Dependence, Fixed-Finite Scaling, and Subcritical Norm Bounds
+
+Formalize remainder cancellation, background-dependent squared norm expansions, scalar energy vanishing, and subcritical norm response bounds in Lean 4:
+
+1. **Exact Remainder Cancellation and Candidate Collapse** (`exact_remainder_cancellation`, `functional_decomposition_independence`):
+   - Theorem `exact_remainder_cancellation`: \(R = F - Z \implies Z + R = F\) identically over \(\mathbb C\).
+   - Theorem `functional_decomposition_independence`: \(\forall f, f(Z + R) = f(F)\) whenever \(R = F - Z\).
+2. **Pointwise Complex Background-Dependence Algebra** (`complex_squared_norm_difference_expansion`, `complex_squared_norm_difference_background_subtraction`, `complex_squared_norm_difference_not_background_independent`):
+   - Theorem `complex_squared_norm_difference_expansion`: \(Q(F, \Delta) = \operatorname{normSq}(F+\Delta) - \operatorname{normSq}(F) = \operatorname{normSq}(\Delta) + 2\Re(F\bar\Delta)\).
+   - Theorem `complex_squared_norm_difference_background_subtraction`: \(Q(F, \Delta) - Q(G, \Delta) = 2\Re((F-G)\bar\Delta)\).
+   - Theorem `complex_squared_norm_difference_not_background_independent`: Witness \(F=1, G=-1, \Delta=1 \implies Q(1, 1)=3 \ne -1=Q(-1, 1)\).
+3. **Fixed-Finite Normalized Energy Scaling Limit** (`fixed_finite_energy_scaling_zero`):
+   - Theorem `fixed_finite_energy_scaling_zero`: For any real constant \(E \in \mathbb R\), \(\lim_{T\to\infty} \left|\frac{E}{2T}\right| = 0\).
+4. **Subcritical Cofinal Norm Growth Theorems** (`subcritical_norm_response_bound_vanishes`, `subcritical_norm_response_tendsto_zero`):
+   - Theorem `subcritical_norm_response_bound_vanishes`: Pointwise bound lemma proving that if \(|V| \le x^2/2 + C|x|\) for \(C \ge 0\), then \(|V| < \varepsilon\) whenever \(|x| \le 1\) and \(|x| < \varepsilon / (1/2 + C)\).
+   - Theorem `subcritical_norm_response_tendsto_zero`: Mathlib `Filter.Tendsto` / `Metric.tendsto_atTop` sequence theorem establishing that if \(x_n \to 0\) and \(C \ge 0\), any sequence \(|V_n| \le x_n^2/2 + C|x_n|\) converges to 0:
+     \[
+     \operatorname{Tendsto}\ (n \mapsto x_n)\ \text{atTop}\ (\mathcal N(0)) \implies \operatorname{Tendsto}\ (n \mapsto V_n)\ \text{atTop}\ (\mathcal N(0)).
+     \]
+
+Total compiled project theorem declarations: **83** (0 `sorry`, 0 `admit`, 0 warnings).

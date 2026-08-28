@@ -956,6 +956,11 @@ The theorem `additive_reference_subtraction_invariance` applies only to outer sc
 **Correction**: The claim that Case B automatically reduces to the certified finite Fejér response is withdrawn; the sign of \(Q(F_0, \Delta)\) depends explicitly on the completed-function background \(F_0\).
 
 ### Fixed Finite Perturbation Invisibility Theorem
+**Proof Status**: `PROVED / EXACT / PARTIALLY_FORMALIZED`
+- **Paper Proof**: Complete deductive analytic derivation.
+- **Formalized Lean 4 Component**: `RiemannScope.fixed_finite_energy_scaling_zero` formalizes the scalar sequence limit \(E/(2T) \to 0\) (`FORMALLY_PROVED COMPONENT`).
+- **Python Verification**: `math_core.verify_fixed_finite_perturbation_invisibility` evaluates numerical quadrature of finite prime Dirichlet polynomial truncations across sampled windows (`NUMERICAL_EVIDENCE`).
+
 For any prime Dirichlet polynomial \(P_\sigma\) (\(\sigma > 1\)) and any fixed finite resolvent sum \(\Delta = \sum_{j=1}^N \frac{c_j}{a_j + i(t-\gamma_j)}\) (\(N < \infty, a_j > 0\)):
 \[
 \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left( |P_\sigma(t) - \Delta(t)|^2 - |P_\sigma(t)|^2 \right) dt = 0.
@@ -968,10 +973,39 @@ A fixed finite divisor perturbation cannot produce a nonzero normalized infinite
 - **Case C (Growing / Cofinal Perturbation \(\Delta_{H(T)}\))**: Non-fixed perturbation with \(H(T) \to \infty\). Classification: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 - **Raw Finite Fejér Response**: Retained as `FAIL_RADIAL_POSITIVITY`.
 
-### The Actual Question & Open Obligation
-The noncommutation defect between finite truncation and infinite completion is:
+## 24.7 The Subcritical Cofinal Norm Growth Theorem & Live Growing Perturbation Analysis
+### Subcritical Norm Response Vanishing ($o(\sqrt{T})$ Threshold)
+**Proof Status**: `PROVED / EXACT / PARTIALLY_FORMALIZED`
+- **Paper Proof**: Complete deductive analytic derivation.
+- **Formalized Lean 4 Component**: `RiemannScope.subcritical_norm_response_bound_vanishes` and `RiemannScope.subcritical_norm_response_tendsto_zero` (`FORMALLY_PROVED COMPONENT`).
+- **Python Verification**: `math_core.verify_cofinal_subcritical_norm_bound` (`NUMERICAL_EVIDENCE`).
+
+Let \(T > 0\), and let \(P_T, \Delta_T \in L^2(-T, T)\) with \(\frac{1}{2T} \|P_T\|_{L^2(-T, T)}^2 \le M < \infty\) for all large \(T\).
+Define the normalized mean-square variation:
 \[
-\mathcal D = \mathcal R_{\mathrm{op}}(Z_\infty) - \lim_{H\to\infty} \mathcal R_{\mathrm{op}}(Z_H).
+V_T = \frac{1}{2T} \int_{-T}^T \left( |P_T(t) - \Delta_T(t)|^2 - |P_T(t)|^2 \right) dt = \frac{\|\Delta_T\|^2}{2T} - \frac{1}{T}\Re\langle P_T, \Delta_T\rangle.
 \]
-Constructing a genuinely non-additive cofinal boundary functional that is neither algebraically collapsed nor trivially vanishing is the exact open mathematical obligation for Gate G4 (`OBL-CMSA-003-G4-BOUNDARY`).
+Let \(x_T = \frac{\|\Delta_T\|_{L^2(-T, T)}}{\sqrt{T}}\).
+Then:
+\[
+\boxed{|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.}
+\]
+In particular, if \(\|\Delta_T\|_{L^2(-T, T)} = o(\sqrt{T})\) as \(T \to \infty\) (i.e. \(x_T \to 0\)), then:
+\[
+\lim_{T\to\infty} V_T = 0.
+\]
+
+**Contrapositive (Necessary Condition)**:
+\[
+\boxed{\limsup_{T\to\infty} |V_T| > 0 \implies \|\Delta_T\|_{L^2(-T, T)} \ne o(\sqrt{T}).}
+\]
+Norm growth of order at least \(\sqrt{T}\) (\(\|\Delta_T\| = \Omega(\sqrt{T})\)) is a strict mathematical necessity for any perturbation family to produce a non-vanishing normalized response.
+
+**Necessity vs Sufficiency**:
+Critical or supercritical norm growth (\(\|\Delta_T\| = \Theta(\sqrt{T})\) or \(\omega(\sqrt{T})\)) is **necessary but NOT sufficient** for a positive response: because \(V_T = E_T - C_T\) where \(E_T = \frac{1}{2T}\|\Delta_T\|^2\) and \(C_T = \frac{1}{T}\Re\langle P_T, \Delta_T\rangle\), cross-term cancellation or background dependence can induce sign instability without off-diagonal spectral bounds.
+
+### The Live Open Obligation (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`)
+For the live cofinal object \(\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le H(T)} r_j(t)\) with \(H(T) = cT\), Riemann-von Mangoldt counting yields \(\|\Delta_{H(T)}\|_{L^2(-T, T)} \sim \sqrt{T \log T}\), which is supercritical.
+The live response decomposes as \(V_T = E_T - C_T\).
+Determining whether \(E_T - C_T > 0\) strictly for any non-zero radial defect \(\delta \ne 0\) is the exact open mathematical obligation for Gate G4 (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`).
 Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.

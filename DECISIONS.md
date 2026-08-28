@@ -1297,3 +1297,45 @@ Rigorous audit and mathematical repair of background dependence and finite pertu
 Mathematical / operational consequence:
 
 Updated `formal/RiemannScope/ArithmeticBridge.lean`, `math_core.py`, `tests/test_fixed_finite_perturbation_invisibility.py`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `RESEARCH_LEDGER.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all registers.
+
+---
+
+## 2026-08-28 — Gate G4 Proof-Status Authority Chain Repair, Subcritical Norm Growth Theorem, and Live Growing Perturbation Threshold
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Proof-Status Authority Chain Repair**:
+   - Corrected proof-status classification of the Fixed Finite Perturbation Invisibility Theorem to `PROVED / EXACT / PARTIALLY_FORMALIZED`.
+   - Explicitly distinguished:
+     - The complete deductive paper proof recorded in `CMSA_GATE_G4.md` and `MATH_CONTRACT.md`;
+     - The Lean 4 formalization of the scalar energy scaling component $E/(2T) \to 0$ (`fixed_finite_energy_scaling_zero`, `FORMALLY_PROVED COMPONENT`);
+     - The Python numerical evaluation of finite prime Dirichlet polynomial truncations at finite $T$-samples (`NUMERICAL_EVIDENCE`).
+   - Restored historical ledger entries `G4-018`, `G4-019` and claim `CLM-CMSA-022`.
+2. **Numerical Evaluator Corrections**:
+   - Refactored `verify_fixed_finite_perturbation_invisibility` in `math_core.py` to return calculation type `"FINITE_DIRICHLET_TRUNCATION_NUMERICAL_EVIDENCE"`.
+   - Replaced misleading metric `is_decaying_to_zero` with `endpoint_magnitude_decreased`.
+   - Added rigorous input validation for $\sigma > 1$, `max_prime_n >= 2`, $T > 0$, $a_j > 0$, and handled empty resolvent inputs cleanly.
+3. **The Subcritical Cofinal Norm Growth Theorem**:
+   - Proved analytically that for any $P_T, \Delta_T \in L^2(-T, T)$ with $(1/(2T))\|P_T\|^2 \le M < \infty$ and $x_T = \|\Delta_T\|_{L^2(-T, T)}/\sqrt{T}$:
+     $$|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.$$
+   - Proved that if $\|\Delta_T\| = o(\sqrt{T})$, then $V_T \to 0$ as $T \to \infty$.
+   - Established the contrapositive necessity condition: $\limsup |V_T| > 0 \implies \|\Delta_T\| \ne o(\sqrt{T})$ (i.e. $\|\Delta_T\| = \Omega(\sqrt{T})$ is necessary).
+   - Clarified that critical/supercritical norm growth is **necessary but NOT sufficient** due to potential cross-term cancellation $V_T = E_T - C_T$.
+   - Unconditionally specialized the bound for the prime background $P_\sigma(t)$ with $M = M_\sigma^2 = (-\zeta'/\zeta(\sigma))^2 < \infty$ for $\sigma > 1$.
+4. **Lean 4 Formalization Expansion**:
+   - Formalized `subcritical_norm_response_bound_vanishes` (pointwise bound lemma) and `subcritical_norm_response_tendsto_zero` (`Filter.Tendsto` / `Metric.tendsto_atTop`) in `formal/RiemannScope/ArithmeticBridge.lean`.
+   - Total compiled project theorem declaration count reached **83**.
+5. **Live Growing Perturbation Analysis & Open Obligation**:
+   - Explicitly defined the live growing object $\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le H(T)} r_j(t)$.
+   - Decomposed the live response as $V_T = E_T - C_T$ with direct energy $E_T = \frac{1}{2T}\|\Delta_{H(T)}\|^2$ and arithmetic cross-term $C_T = \frac{1}{T}\Re\langle P_\sigma, \Delta_{H(T)}\rangle$.
+   - Formulated the exact live open obligation `OBL-CMSA-003-G4-COFINAL-ESTIMATE`. Gate G4 remains strictly **OPEN**.
+
+Reason:
+
+Repair authority chains, formalize subcritical norm vanishing in Lean 4, correct numerical evaluator caveats, and establish the exact norm-growth threshold governing live growing cofinal perturbations.
+
+Mathematical / operational consequence:
+
+Updated `math_core.py`, `tests/test_fixed_finite_perturbation_invisibility.py`, `formal/RiemannScope/ArithmeticBridge.lean`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `RESEARCH_LEDGER.md`, `LEAN_FORMALIZATION_PLAN.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, and all three corpus registers.

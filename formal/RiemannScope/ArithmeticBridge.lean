@@ -796,7 +796,7 @@ theorem complex_squared_norm_difference_not_background_independent :
   norm_num at h
 
 /-- Fixed finite energy scaling vanishing theorem:
-    For any fixed finite energy E ≥ 0 and any ε > 0, the normalized energy E / (2 * T)
+    For any fixed finite energy E ∈ ℝ and any ε > 0, the normalized energy |E / (2 * T)|
     satisfies |E / (2 * T)| < ε for all sufficiently large T (T ≥ T₀). -/
 theorem fixed_finite_energy_scaling_zero (E : ℝ) (ε : ℝ) (hε : 0 < ε) :
     ∃ T0 : ℝ, ∀ T : ℝ, T ≥ T0 → T > 0 → |E / (2 * T)| < ε := by
@@ -826,8 +826,53 @@ theorem fixed_finite_energy_scaling_zero (E : ℝ) (ε : ℝ) (hε : 0 < ε) :
   rw [h_abs_eq]
   exact h_div
 
+/-- Subcritical norm response bound vanishing lemma:
+    If a normalized response V satisfies |V| ≤ x^2 / 2 + C * |x| for some C ≥ 0,
+    then for any ε > 0, whenever |x| ≤ 1 and |x| < ε / (1/2 + C), we have |V| < ε. -/
+theorem subcritical_norm_response_bound_vanishes (C : ℝ) (hC : 0 ≤ C) (ε : ℝ)
+    (x V : ℝ) (h_bound : |V| ≤ x^2 / 2 + C * |x|)
+    (hx1 : |x| ≤ 1) (hx_eps : |x| < ε / (1 / 2 + C)) :
+    |V| < ε := by
+  have h_denom_pos : 0 < 1 / 2 + C := by linarith
+  have h_denom_ne : 1 / 2 + C ≠ 0 := ne_of_gt h_denom_pos
+  have h_mul : (1 / 2 + C) * |x| < ε := by
+    have h_step := mul_lt_mul_of_pos_left hx_eps h_denom_pos
+    rw [mul_div_cancel₀ ε h_denom_ne] at h_step
+    exact h_step
+  have h_sq : x^2 ≤ |x| := by
+    have h_abs_nonneg : 0 ≤ |x| := abs_nonneg x
+    have h_abs_sq : |x|^2 ≤ |x| := by
+      calc |x|^2 = |x| * |x| := sq |x|
+      _ ≤ |x| * 1 := mul_le_mul_of_nonneg_left hx1 h_abs_nonneg
+      _ = |x| := mul_one |x|
+    have h_xsq : x^2 = |x|^2 := (sq_abs x).symm
+    rw [h_xsq]
+    exact h_abs_sq
+  linarith
+
+/-- Subcritical cofinal norm response tendsto zero theorem:
+    For any real sequence xₙ → 0 as n → ∞ and constant C ≥ 0, any sequence Vₙ
+    satisfying |Vₙ| ≤ (xₙ)^2 / 2 + C * |xₙ| for all n converges to 0. -/
+theorem subcritical_norm_response_tendsto_zero (C : ℝ) (hC : 0 ≤ C)
+    (x V : ℕ → ℝ) (h_bound : ∀ n, |V n| ≤ (x n)^2 / 2 + C * |x n|)
+    (hx : Filter.Tendsto x Filter.atTop (nhds 0)) :
+    Filter.Tendsto V Filter.atTop (nhds 0) := by
+  rw [Metric.tendsto_atTop] at hx ⊢
+  intro ε hε
+  have h_denom_pos : 0 < 1 / 2 + C := by linarith
+  have h_target_eps : 0 < min 1 (ε / (1 / 2 + C)) := by
+    apply lt_min (by norm_num) (div_pos hε h_denom_pos)
+  rcases hx (min 1 (ε / (1 / 2 + C))) h_target_eps with ⟨N, hN⟩
+  use N
+  intro n hn
+  have h_dist := hN n hn
+  rw [Real.dist_eq, sub_zero] at h_dist ⊢
+  have hx1 : |x n| ≤ 1 := by
+    have h_lt := lt_of_lt_of_le h_dist (min_le_left 1 (ε / (1 / 2 + C)))
+    linarith
+  have hx_eps : |x n| < ε / (1 / 2 + C) := by
+    exact lt_of_lt_of_le h_dist (min_le_right 1 (ε / (1 / 2 + C)))
+  exact subcritical_norm_response_bound_vanishes C hC ε (x n) (V n) (h_bound n) hx1 hx_eps
+
+
 end RiemannScope
-
-
-
-

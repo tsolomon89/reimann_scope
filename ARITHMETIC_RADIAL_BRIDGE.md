@@ -312,13 +312,27 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
    - Dilated Completed Log-Derivative: `GRADE_COORDINATE_REDUNDANT`.
    - Witness WIT-02 Evidence Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 
+### 10.5 Fixed-Finite Invisibility, Subcritical Norm Bounds, and Live Growing Perturbations
+1. **Fixed-Finite Invisibility Theorem** (`PROVED / EXACT / PARTIALLY_FORMALIZED`):
+   For bounded prime background $P_\sigma$ ($\sigma > 1$) and any fixed finite resolvent perturbation $\Delta \in L^2(\mathbb R)$:
+   $$\lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left(|P_\sigma(t) - \Delta(t)|^2 - |P_\sigma(t)|^2\right) dt = 0.$$
+   Lean 4 formalizes scalar energy scaling $E/(2T) \to 0$ (`fixed_finite_energy_scaling_zero`).
+2. **Subcritical Cofinal Norm Growth Theorem** (`PROVED / EXACT / PARTIALLY_FORMALIZED`):
+   For $P_T, \Delta_T \in L^2(-T, T)$ with $(1/(2T))\|P_T\|^2 \le M < \infty$ and $x_T = \|\Delta_T\|_{L^2}/\sqrt{T}$:
+   $$|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.$$
+   If $\|\Delta_T\| = o(\sqrt{T})$, then $V_T \to 0$.
+   Contrapositive necessity: $\limsup |V_T| > 0 \implies \|\Delta_T\| \ne o(\sqrt{T})$.
+   Formalized in Lean 4: `subcritical_norm_response_bound_vanishes` and `subcritical_norm_response_tendsto_zero`.
+3. **Live Growing Perturbation & Open Obligation**:
+   For $\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le cT} r_j(t)$, Riemann-von Mangoldt growth gives $\|\Delta_{H(T)}\|_{L^2} \sim \sqrt{T\log T}$ (supercritical).
+   The response decomposes as $V_T = E_T - C_T$. Evaluating $E_T - C_T > 0$ strictly is the live open obligation `OBL-CMSA-003-G4-COFINAL-ESTIMATE`.
+
 ---
 
 ## 11. Current Status and Research Protocol
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
-- **Earliest Open Subgate**: Prove a negative raw response analytically or with validated outward-rounded interval arithmetic on the general infinite/regularized limit.
+- **`OBL-CMSA-003-G4-COFINAL-ESTIMATE`**: Live open subgate for supercritical cofinal growth.
 - **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
-

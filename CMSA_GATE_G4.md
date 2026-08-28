@@ -193,7 +193,7 @@ To integrate the pointwise expansion $|A - Z_\delta|^2 - |A - Z_0|^2 = -2\delta^
 
 ---
 
-## 8. Formal Lean 4 Theorem Inventory (81 Compiled Declarations)
+## 8. Formal Lean 4 Theorem Inventory (83 Compiled Declarations)
 
 All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `sorry`, 0 `admit`, 0 warnings):
 1. `RiemannScope.complex_finset_sum_mul_star`: $(\sum_{i \in s} b_i) \cdot \overline{(\sum_{j \in s} b_j)} = \sum_{i \in s} \sum_{j \in s} b_i \overline{b_j}$.
@@ -209,22 +209,25 @@ All compiled cleanly in Lean 4 (`formal/RiemannScope/ArithmeticBridge.lean`, 0 `
 11. `RiemannScope.complex_squared_norm_difference_expansion`: $Q(F, \Delta) = \operatorname{normSq}(F+\Delta) - \operatorname{normSq}(F) = \operatorname{normSq}(\Delta) + 2\Re(F\bar\Delta)$ over $\mathbb C$.
 12. `RiemannScope.complex_squared_norm_difference_background_subtraction`: $Q(F, \Delta) - Q(G, \Delta) = 2\Re((F-G)\bar\Delta)$ over $\mathbb C$.
 13. `RiemannScope.complex_squared_norm_difference_not_background_independent`: Counterexample $F=1, G=-1, \Delta=1 \implies Q(1, 1)=3 \ne -1=Q(-1, 1)$.
-14. `RiemannScope.fixed_finite_energy_scaling_zero`: For any fixed finite energy $E \ge 0$, $\lim_{T\to\infty} \frac{E}{2T} = 0$ (normalized energy scaling vanishes).
-15. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
-16. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
-17. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
-18. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
-19. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
-20. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-21. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
-22. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
-23. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
-24. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
-25. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
-26. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
-27. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
+14. `RiemannScope.fixed_finite_energy_scaling_zero`: For any fixed finite energy $E \in \mathbb R$, $\lim_{T\to\infty} \left|\frac{E}{2T}\right| = 0$ (normalized energy scaling vanishes).
+15. `RiemannScope.subcritical_norm_response_bound_vanishes`: Pointwise/bound lemma establishing that if $|V| \le x^2/2 + C|x|$ for $C \ge 0$, then $|V| < \varepsilon$ whenever $|x| \le 1$ and $|x| < \varepsilon / (1/2 + C)$.
+16. `RiemannScope.subcritical_norm_response_tendsto_zero`: Mathlib `Filter.Tendsto` theorem establishing that for sequence $x_n \to 0$ and $C \ge 0$, any sequence $|V_n| \le x_n^2/2 + C|x_n|$ converges to 0.
+17. `RiemannScope.additive_reference_subtraction_invariance`: $(S(Z_\delta) - R) - (S(Z_0) - R) = S(Z_\delta) - S(Z_0)$.
+18. `RiemannScope.complex_radial_defect_difference_numerator`: $(u-d^2)u - ((u-d^2)^2 + 4d^2\gamma^2) = d^2(u - 4\gamma^2 - d^2)$ over $\mathbb C$.
+19. `RiemannScope.complex_radial_second_order_numerator_decomposition`: $4z d^2(z^2-3\gamma^2-d^2) = 4z d^2(z^2-3\gamma^2) - 4z d^4$ over $\mathbb C$.
+20. `RiemannScope.radial_defect_difference_numerator`: real specialization over $\mathbb R$.
+21. `RiemannScope.radial_second_order_numerator_decomposition`: real specialization over $\mathbb R$.
+22. `RiemannScope.tendsto_cofinal_fixed_zero`: `Tendsto (fun (n : ℕ) => H / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+23. `RiemannScope.not_tendsto_cofinal_diagonal_zero`: `¬ Tendsto (fun (n : ℕ) => ((n : ℝ) + 1) / ((n : ℝ) + 1)) atTop (𝓝 0)` (Mathlib Filter.Tendsto).
+24. `RiemannScope.finite_sum_tendsto_interchange`: `Tendsto (fun n => ∑ i in s, f i n) atTop (𝓝 (∑ i in s, g i))` (Mathlib Filter.Tendsto).
+25. `RiemannScope.cofinal_sequence_fixed_limit_zero`: $\forall H \in \mathbb R, \forall \varepsilon > 0, \exists N, \forall n \ge N, |H / (n + 1)| < \varepsilon$ (elementary $\varepsilon$-$N$).
+26. `RiemannScope.cofinal_diagonal_not_tendsto_zero`: $\neg (\forall \varepsilon > 0, \exists N, \forall n \ge N, |(n+1)/(n+1) - 0| < \varepsilon)$ (elementary $\varepsilon$-$N$).
+27. `RiemannScope.cofinal_sequence_diagonal_witness`: $(n+1)/(n+1) = 1$ for all $n \in \mathbb N$.
+28. `RiemannScope.cofinal_schedule_distinct_from_fixed_limit`: $(cT)/T = c \ne 0$ for $T \ne 0$.
+29. `RiemannScope.ConditionalG4RegularizedBridge.all_defects_zero`: Rigidity theorem forcing all represented zero defects $d_j = 0$.
 
-*(Formalization Boundary Note: Lean formalizes abstract finite-sum/kernel algebra, background-dependence expansions, and algebraic identities. The concrete continuous Dirichlet sinc-integral identity $\frac{1}{2T}\int_{-T}^T |P_N|^2 dt = \sum |a_n|^2 + \sum_{m\ne n} a_m \overline{a_n} \frac{\sin(T\log(n/m))}{T\log(n/m)}$ is retained as a rigorous internal paper derivation (§4), with its Mathlib continuous integration interface demarcated as an external formalization boundary).*
+*(Formalization Boundary Note: Lean formalizes abstract finite-sum/kernel algebra, background-dependence expansions, subcritical sequence convergence, and algebraic identities. The concrete continuous Dirichlet sinc-integral identity $\frac{1}{2T}\int_{-T}^T |P_N|^2 dt = \sum |a_n|^2 + \sum_{m\ne n} a_m \overline{a_n} \frac{\sin(T\log(n/m))}{T\log(n/m)}$ is retained as a rigorous internal paper derivation (§4), with its Mathlib continuous integration interface demarcated as an external formalization boundary).*
+
 
 ---
 
@@ -300,6 +303,11 @@ Rigorous Distinction of Cases:
 
 ### 9.5 Fixed Finite Perturbation Invisibility Theorem
 
+**Epistemic & Proof Status**: `PROVED / EXACT / PARTIALLY_FORMALIZED`
+- **Paper Proof**: Complete deductive analytic derivation below.
+- **Formalized Lean 4 Component**: `RiemannScope.fixed_finite_energy_scaling_zero` formalizes the scalar sequence limit $E/(2T) \to 0$ (`FORMALLY_PROVED COMPONENT`).
+- **Python Verification**: `math_core.verify_fixed_finite_perturbation_invisibility` evaluates numerical quadrature of finite prime Dirichlet polynomial truncations across sampled windows (`NUMERICAL_EVIDENCE`).
+
 **Theorem (Invisibility of Fixed Finite Divisor Perturbations)**:
 Let $\sigma > 1$ and let $P_\sigma(t) = \sum_{n=2}^\infty \Lambda(n) n^{-\sigma-it}$ be the prime Dirichlet series.
 Let $\Delta(t) = \sum_{j=1}^N \frac{c_j}{a_j + i(t - \gamma_j)}$ be any fixed finite linear combination of zero resolvents with $N < \infty, a_j > 0, c_j \in \mathbb C$.
@@ -337,18 +345,88 @@ The Invisibility Theorem applies to:
 **Fundamental Conclusion**:
 $$\boxed{\text{A fixed finite divisor perturbation cannot produce a nonzero normalized infinite mean response.}}$$
 
-### 9.6 The Exact Open Growing-Perturbation Obligation
+### 9.6 Epistemic Boundary of Gate G4
 
 Because fixed finite perturbations are invisible under normalized infinite averaging, any non-trivial cofinal response requires an infinite growing perturbation $\Delta_{H(T)}(t)$ along a schedule $H(T) \to \infty$.
 
-**The Live Obligation (`OBL-CMSA-003-G4-BOUNDARY`)**:
-Formulate and evaluate the cofinal limit:
-$$\mathcal D_{\mathrm{cofinal}} = \lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left( \left| P_\sigma(t) - Z_{H(T),\delta}(t) + R_{H(T),0}(t) \right|^2 - \left| P_\sigma(t) - Z_{H(T),0}(t) + R_{H(T),0}(t) \right|^2 \right) dt,$$
-which requires resolving:
-1. **Uniform $L^2$ control on growing zero clusters**: $\sum_{|\gamma_j| \le H(T)} (\dots)$ as $H(T) \to \infty$.
-2. **Unequal-height off-diagonal terms**: Phase cancellation $\sum_{j \ne k} \int_{-T}^T \frac{dt}{(a+i(t-\gamma_j))(a-i(t-\gamma_k))}$.
-3. **Reflection-pair terms**: Exact symmetry preservation between $\gamma$ and $-\gamma$.
-4. **Dependence on schedule $H(T)$**: Stability across grade-covariant schedules $H(T) = cT$ and periodic modulations.
-5. **Arithmetic evaluation**: Exact non-zero coupling with the prime Dirichlet polynomial.
-6. **Grade covariance**: Covariance under origin dilation $s_K = \tau^K s$.
-7. **Global sign**: Determining whether the full infinite limit preserves strict radial positivity ($\Delta \mathcal S > 0 \iff \delta \ne 0$) without collapsing to 0 or reducing to the finite Fejér witness.
+### 9.7 The Subcritical Cofinal Norm Growth Theorem ($o(\sqrt{T})$ Threshold)
+
+**Epistemic & Proof Status**: `PROVED / EXACT / PARTIALLY_FORMALIZED`
+- **Paper Proof**: Complete deductive analytic derivation below.
+- **Formalized Lean 4 Component**: `RiemannScope.subcritical_norm_response_bound_vanishes` and `RiemannScope.subcritical_norm_response_tendsto_zero` formalize sequence convergence under $|V_n| \le x_n^2/2 + C x_n$ (`FORMALLY_PROVED COMPONENT`).
+- **Python Verification**: `math_core.verify_cofinal_subcritical_norm_bound` evaluates the exact algebraic upper bound across parameters (`NUMERICAL_EVIDENCE`).
+
+**Theorem (Subcritical Norm Response Vanishing)**:
+Let $T > 0$, and let $P_T, \Delta_T \in L^2(-T, T)$ with:
+$$\frac{1}{2T} \|P_T\|_{L^2(-T, T)}^2 \le M < \infty \quad \text{for all large } T.$$
+Define the normalized mean-square variation:
+$$V_T = \frac{1}{2T} \int_{-T}^T \left( |P_T(t) - \Delta_T(t)|^2 - |P_T(t)|^2 \right) dt = \frac{\|\Delta_T\|^2}{2T} - \frac{1}{T}\Re\langle P_T, \Delta_T\rangle.$$
+Let $x_T = \frac{\|\Delta_T\|_{L^2(-T, T)}}{\sqrt{T}}$.
+Then:
+$$|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.$$
+In particular, if $\|\Delta_T\|_{L^2(-T, T)} = o(\sqrt{T})$ as $T \to \infty$ (i.e. $x_T \to 0$), then:
+$$\lim_{T\to\infty} V_T = 0.$$
+
+**Proof**:
+1. By Cauchy-Schwarz on $L^2(-T, T)$:
+   $$|\langle P_T, \Delta_T\rangle| \le \|P_T\|_{L^2} \|\Delta_T\|_{L^2} \le \sqrt{2T M} \|\Delta_T\|_{L^2}.$$
+2. Dividing by $T$:
+   $$\left|\frac{1}{T}\Re\langle P_T, \Delta_T\rangle\right| \le \frac{\sqrt{2M} \|\Delta_T\|_{L^2}}{\sqrt{T}} = \sqrt{2M} x_T.$$
+3. For the direct energy term:
+   $$\frac{\|\Delta_T\|_{L^2}^2}{2T} = \frac{1}{2} x_T^2.$$
+4. Combining both terms by triangle inequality:
+   $$|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.$$
+5. If $x_T \to 0$, then since $\sqrt{2M} \ge 0$, Lean 4 `subcritical_norm_response_tendsto_zero` applies with $C = \sqrt{2M}$, proving $V_T \to 0$. $\blacksquare$
+
+**Contrapositive (Necessary Condition for Non-Vanishing Response)**:
+$$\boxed{\limsup_{T\to\infty} |V_T| > 0 \implies \|\Delta_T\|_{L^2(-T, T)} \ne o(\sqrt{T}).}$$
+That is, **norm growth of order at least $\sqrt{T}$ ($\|\Delta_T\| = \Omega(\sqrt{T})$) is a strict mathematical necessity** for any perturbation family to produce a non-vanishing normalized response.
+
+**Crucial Caveat (Necessity $\ne$ Sufficiency)**:
+Critical or supercritical norm growth ($\|\Delta_T\| = \Theta(\sqrt{T})$ or $\omega(\sqrt{T})$) is **necessary but NOT sufficient** for a non-vanishing or strictly positive response:
+- Because $V_T = E_T - C_T$ where $E_T = \frac{1}{2T}\|\Delta_T\|^2$ and $C_T = \frac{1}{T}\Re\langle P_T, \Delta_T\rangle$, the cross-term $C_T$ may cancel or overpower $E_T$.
+- Consequently, establishing $\|\Delta_T\| \ge c\sqrt{T}$ alone does not prove $V_T > 0$ without explicit bounds on the cross-term $C_T$.
+
+**Unconditional Specialization for the Prime Background**:
+For $\sigma > 1$, $P_\sigma(t) = -\sum \Lambda(n) n^{-\sigma-it}$ satisfies $|P_\sigma(t)| \le -\zeta'/\zeta(\sigma) = M_\sigma$.
+Thus $\frac{1}{2T}\|P_\sigma\|_{L^2(-T, T)}^2 \le M_\sigma^2 < \infty$ holds unconditionally with $M = M_\sigma^2$.
+
+---
+
+### 9.8 Application to the Live Cofinal Object $\Delta_{H(T)}$ & The Next Unresolved Obligation
+
+#### 9.8.1 Exact Mathematical Definition of $\Delta_{H(T)}$
+For $\sigma > 1$ and zero cutoff schedule $H(T) > 0$, let $\mathcal Z_{H(T)}$ denote the set of critical-strip zero ordinates with $|\gamma_j| \le H(T)$.
+For each zero $\rho_j = 1/2 + \delta_j + i\gamma_j$, the perturbation resolvent is:
+$$r_j(t) = \frac{1}{\sigma - 1/2 - \delta_j + i(t - \gamma_j)} - \frac{1}{\sigma - 1/2 + i(t - \gamma_j)} = \frac{\delta_j}{(\sigma - 1/2 - \delta_j + i(t - \gamma_j))(\sigma - 1/2 + i(t - \gamma_j))}.$$
+The live cofinal perturbation object is the sum:
+$$\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le H(T)} r_j(t).$$
+
+#### 9.8.2 Symmetry Groupings and Growth Regimes
+1. **Single Zero**: $\Delta_{H(T)}(t) = r_1(t)$ (fixed finite, $\|\Delta\| = O(1) = o(\sqrt{T})$, vanishes by Theorem 9.7).
+2. **Conjugate Pair**: $r(t; \gamma) + r(t; -\gamma)$ (fixed finite, vanishes by Theorem 9.7).
+3. **Same-Height Reflection Pair**: $r(t; \delta, \gamma) + r(t; -\delta, \gamma)$ (fixed finite, vanishes by Theorem 9.7).
+4. **Symmetric Quartet**: $\sum_{\varepsilon, \eta = \pm 1} r(t; \varepsilon\delta, \eta\gamma)$ (fixed finite, vanishes by Theorem 9.7).
+5. **Live Infinite Growing Divisor**: When $H(T) = cT$ ($c > 0$), by Riemann-von Mangoldt counting:
+   $$N(T) = \frac{T}{2\pi}\log\frac{T}{2\pi e} + O(\log T).$$
+   The number of terms in $\Delta_{H(T)}$ grows as $N(cT) \sim \frac{cT}{2\pi}\log T$.
+   - The direct diagonal $L^2$ norm sum scales as:
+     $$\sum_{|\gamma_j| \le cT} \|r_j\|_{L^2}^2 \sim \delta^2 \sum_{|\gamma_j| \le cT} \frac{\pi}{2a^3} \sim \frac{\pi \delta^2}{2a^3} N(cT) = O(T \log T).$$
+   - Thus $\|\Delta_{H(T)}\|_{L^2(-T, T)} \sim \sqrt{T \log T}$, which exceeds the subcritical threshold $o(\sqrt{T})$.
+
+#### 9.8.3 The Live Open Obligation (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`)
+Because $\|\Delta_{H(T)}\| = \Omega(\sqrt{T \log T})$ is supercritical, the Subcritical Norm Theorem does not force $V_T \to 0$.
+The response decomposes into:
+$$V_T = E_T - C_T,$$
+where:
+$$E_T = \frac{1}{2T} \|\Delta_{H(T)}\|_{L^2(-T, T)}^2 = \frac{1}{2T} \int_{-T}^T |\Delta_{H(T)}(t)|^2 dt,$$
+$$C_T = \frac{1}{T} \Re \int_{-T}^T P_\sigma(t) \overline{\Delta_{H(T)}(t)} dt.$$
+
+To determine whether Gate G4 can be closed, the next mathematical theorem must resolve:
+1. **Asymptotic Direct Energy $E_T$**: Evaluate the diagonal and off-diagonal spectral interference:
+   $$\frac{1}{2T} \sum_{j, k} \int_{-T}^T r_j(t) \overline{r_k(t)} dt.$$
+2. **Asymptotic Arithmetic Cross-Term $C_T$**: Evaluate the Dirichlet-resolvent coupling:
+   $$\frac{1}{T} \sum_{n=2}^\infty \frac{\Lambda(n)}{n^\sigma} \sum_{|\gamma_j| \le H(T)} \int_{-T}^T n^{-it} \overline{r_j(t)} dt.$$
+3. **Sign and Positivity**: Determine whether $E_T - C_T > 0$ strictly for any non-zero radial defect $\delta \ne 0$, or whether cross-term cancellation or background dependence induces sign instability.
+
+Until `OBL-CMSA-003-G4-COFINAL-ESTIMATE` is deductively proved, **Gate G4 remains strictly OPEN**.

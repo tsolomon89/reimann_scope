@@ -4644,17 +4644,65 @@ def verify_fixed_finite_perturbation_invisibility(
     dps: int = 40
 ) -> Dict[str, Any]:
     """
-    [FIXED FINITE PERTURBATION INVISIBILITY THEOREM]
-    For prime Dirichlet polynomial P_sigma(t) and fixed finite resolvent sum:
-    Delta(t) = sum_j c_j / (a_j + i*(t - gamma_j)), with a_j > 0,
-    evaluates the normalized mean-square variation:
-    I(T) = (1 / (2*T)) * integral_{-T}^T (|P_sigma(t) - Delta(t)|^2 - |P_sigma(t)|^2) dt,
-    and verifies that I(T) -> 0 as T -> infinity.
+    [FINITE DIRICHLET TRUNCATION NUMERICAL EVIDENCE]
+    Evaluates the normalized mean-square variation of a finite prime Dirichlet polynomial
+    P_{sigma, N}(t) = sum_{p^k <= N} (log p) * n^{-sigma - i*t} against a fixed finite resolvent sum:
+    Delta(t) = sum_{j=1}^M c_j / (a_j + i*(t - gamma_j)), with a_j > 0,
+    across finite sample window half-widths T in T_values:
+    I(T) = (1 / (2*T)) * integral_{-T}^T (|P_{sigma, N}(t) - Delta(t)|^2 - |P_{sigma, N}(t)|^2) dt.
+
+    NOTE: This routine provides numerical quadrature evidence for finite truncations.
+    It does NOT evaluate the infinite prime Dirichlet series nor prove an infinite limit as T -> infinity.
     """
     with mpmath.workdps(dps):
         sig = to_mpf(sigma, dps=dps)
+        if sig <= 1:
+            raise ValueError(f"sigma must be strictly greater than 1, got {sig}")
+        if max_prime_n < 2:
+            raise ValueError(f"max_prime_n must be >= 2, got {max_prime_n}")
+        if not T_values:
+            raise ValueError("T_values list must not be empty")
 
-        # Precompute primes and log(p) for P_sigma
+        for T_raw in T_values:
+            t_check = to_mpf(T_raw, dps=dps)
+            if t_check <= 0:
+                raise ValueError(f"T values must be strictly positive, got {t_check}")
+
+        for c_j, a_j, gam_j in resolvents:
+            a_check = to_mpf(a_j, dps=dps)
+            if a_check <= 0:
+                raise ValueError(f"resolvent width a_j must be strictly positive, got {a_check}")
+
+        # Compute exact analytic L2 norm upper bound of Delta on R
+        # integral_{-inf}^inf |1/(a + i(t-gam))|^2 dt = pi / a
+        l2_sq_bound = mpmath.mpf(0)
+        if resolvents:
+            for c_j, a_j, gam_j in resolvents:
+                c_abs = abs(to_mpc(c_j, dps=dps))
+                a_f = to_mpf(a_j, dps=dps)
+                l2_sq_bound += c_abs * mpmath.sqrt(mpmath.pi / a_f)
+            l2_sq_bound = l2_sq_bound ** 2
+
+        if not resolvents:
+            results_by_T = [{
+                "T": str(to_mpf(T_raw, dps=dps)),
+                "normalized_integral": mpmath.nstr(mpmath.mpf(0), n=12),
+                "energy_bound": mpmath.nstr(mpmath.mpf(0), n=12)
+            } for T_raw in T_values]
+            return {
+                "sigma": str(sig),
+                "n_resolvents": 0,
+                "prime_cutoff": max_prime_n,
+                "tested_T_values": [str(to_mpf(t, dps=dps)) for t in T_values],
+                "analytic_L2_norm_bound_squared": "0.0",
+                "results_by_T": results_by_T,
+                "endpoint_magnitude_decreased": False,
+                "calculation_type": "Non-certified numerical quadrature of finite Dirichlet polynomial",
+                "limit_caveat": "Finite numerical samples across discrete T do not establish mathematical convergence or an infinite limit.",
+                "status": "FINITE_DIRICHLET_TRUNCATION_NUMERICAL_EVIDENCE"
+            }
+
+        # Precompute primes and log(p) for finite prime Dirichlet polynomial
         import importlib
         sp: Any = importlib.import_module("sympy")
         prime_powers = []
@@ -4664,8 +4712,6 @@ def verify_fixed_finite_perturbation_invisibility(
                 p = pfactors[0]
                 lam = mpmath.log(p)
                 prime_powers.append((lam, mpmath.mpf(n)))
-
-
 
         def P_sigma(t_val):
             val = mpmath.mpc(0, 0)
@@ -4682,15 +4728,6 @@ def verify_fixed_finite_perturbation_invisibility(
                 val += c_c / (a_f + mpmath.mpc(0, t_val - gam_f))
             return val
 
-        # Compute exact L2 norm of Delta
-        # integral_{-inf}^inf |1/(a + i(t-gam))|^2 dt = pi / a
-        l2_sq_bound = mpmath.mpf(0)
-        for c_j, a_j, gam_j in resolvents:
-            c_abs = abs(to_mpc(c_j, dps=dps))
-            a_f = to_mpf(a_j, dps=dps)
-            l2_sq_bound += c_abs * mpmath.sqrt(mpmath.pi / a_f)
-        l2_sq_bound = l2_sq_bound ** 2
-
         results_by_T = []
         for T_raw in T_values:
             T_val = to_mpf(T_raw, dps=dps)
@@ -4703,15 +4740,61 @@ def verify_fixed_finite_perturbation_invisibility(
                 "energy_bound": mpmath.nstr(l2_sq_bound / (2 * T_val), n=12)
             })
 
-        # Check monotonic decay
+        # Sample observation: compare first and last sample magnitude
         vals = [abs(mpmath.mpf(r["normalized_integral"])) for r in results_by_T]
-        is_decaying = bool(vals[-1] < vals[0]) if len(vals) > 1 else True
+        endpoint_dec = bool(vals[-1] < vals[0]) if len(vals) > 1 else False
 
         return {
             "sigma": str(sig),
             "n_resolvents": len(resolvents),
-            "L2_norm_bound_squared": mpmath.nstr(l2_sq_bound, n=10),
+            "prime_cutoff": max_prime_n,
+            "tested_T_values": [str(to_mpf(t, dps=dps)) for t in T_values],
+            "analytic_L2_norm_bound_squared": mpmath.nstr(l2_sq_bound, n=10),
             "results_by_T": results_by_T,
-            "is_decaying_to_zero": is_decaying,
-            "status": "FIXED_FINITE_PERTURBATION_INVISIBILITY_VERIFIED"
+            "endpoint_magnitude_decreased": endpoint_dec,
+            "calculation_type": "Non-certified numerical quadrature of finite Dirichlet polynomial",
+            "limit_caveat": "Finite numerical samples across discrete T do not establish mathematical convergence or an infinite limit.",
+            "status": "FINITE_DIRICHLET_TRUNCATION_NUMERICAL_EVIDENCE"
+        }
+
+
+def verify_cofinal_subcritical_norm_bound(
+    M_bound: Union[float, str, mpmath.mpf],
+    delta_L2_norm: Union[float, str, mpmath.mpf],
+    T_val: Union[float, str, mpmath.mpf],
+    dps: int = 40
+) -> Dict[str, Any]:
+    """
+    [COFINAL SUBCRITICAL-NORM THEOREM EVALUATOR]
+    Computes the exact abstract upper bound on the normalized mean-square variation:
+    |V_T| <= ||Delta_T||^2 / (2*T) + sqrt(2*M) * (||Delta_T|| / sqrt(T)) = x_T^2 / 2 + sqrt(2*M) * x_T,
+    where x_T = ||Delta_T|| / sqrt(T) and (1 / 2T) ||P_T||^2 <= M.
+
+    Verifies that as x_T -> 0 (i.e. ||Delta_T|| = o(sqrt(T))), the upper bound tends to zero.
+    """
+    with mpmath.workdps(dps):
+        M_mpf = to_mpf(M_bound, dps=dps)
+        if M_mpf < 0:
+            raise ValueError(f"M_bound must be non-negative, got {M_mpf}")
+        norm_mpf = to_mpf(delta_L2_norm, dps=dps)
+        if norm_mpf < 0:
+            raise ValueError(f"delta_L2_norm must be non-negative, got {norm_mpf}")
+        T_mpf = to_mpf(T_val, dps=dps)
+        if T_mpf <= 0:
+            raise ValueError(f"T_val must be strictly positive, got {T_mpf}")
+
+        x_T = norm_mpf / mpmath.sqrt(T_mpf)
+        direct_bound = (x_T ** 2) / 2
+        cross_bound = mpmath.sqrt(2 * M_mpf) * x_T
+        total_bound = direct_bound + cross_bound
+
+        return {
+            "M_bound": mpmath.nstr(M_mpf, n=10),
+            "delta_L2_norm": mpmath.nstr(norm_mpf, n=10),
+            "T": mpmath.nstr(T_mpf, n=10),
+            "x_T": mpmath.nstr(x_T, n=10),
+            "direct_energy_bound": mpmath.nstr(direct_bound, n=10),
+            "cross_term_bound": mpmath.nstr(cross_bound, n=10),
+            "total_variation_bound": mpmath.nstr(total_bound, n=10),
+            "status": "SUBCRITICAL_NORM_BOUND_EVALUATED"
         }
