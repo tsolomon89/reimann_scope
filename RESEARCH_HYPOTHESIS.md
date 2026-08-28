@@ -1029,3 +1029,17 @@ The normalized mean functional cannot distinguish a finite off-line quartet from
 Requires 8 structural specifications (grade combination operation, non-double-counting proof, grade weights, bilateral convergence over \(K \in \mathbb Z\), height truncation interaction, shift covariance, arithmetic representation, and non-pullback proof).
 Designated as the **earliest open subgate** logically preceding \(E_T - C_T\) asymptotic evaluation.
 
+---
+
+## 24.8 Curvature-Transport Unification and Transcendental Curvature Rigidity
+
+The repository's geometric, spectral, and arithmetic structures are unified under the **Curvature-Transport Framework**:
+- Circle geometry ($C_K = \tau^{1-K}, r_K = \tau^{-K}, \kappa_K = \tau^K$) satisfies $r_K\kappa_K = 1, C_1 = 1$, generating the angular Fourier lattice $L_K = \tau^K\mathbb Z$.
+- Zero displacement $d_{\rho,K} = \tau^K\delta$ under the transported radial unit $r_K$ recovers the invariant: $(r_K d_{\rho,K})^2 = \delta^2$.
+- Half-density dilation $(U_a f)(x) = a^{1/2}f(ax)$ on $L^2(\mathbb R_{>0})$ acts as $a^{1/2-s}x^{-s}$, with the critical line $\Re(s)=1/2$ as its exact unitary-character axis $|a^{1/2-s}|=1$.
+- The reflection-pair defect $B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = 2(\cosh(K\delta\log\tau)-1) \ge 0$ yields native second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$ and normalized invariant $\mathscr K_\tau(\rho) = \delta^2$.
+- The conditional **Transcendental Curvature Rigidity Theorem** establishes:
+  $$\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.$$
+- The program's canonical open obligation is the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`), superseding raw CMSA $1/(2T)$ activation. Reference: `CURVATURE_TRANSPORT.md`.
+
+

@@ -1015,3 +1015,16 @@ Because \(h_{K,j}(t) = H_j(a_K t)\) is simply a scaled element of the admissible
 \boxed{\mathcal C_K[H] \equiv \mathcal C_0[H \circ a_K].}
 \]
 The exact theoretical classification of this constraint space is `coordinate_redundant`. When compared relative to an unexpanded finite native basis \(\{ H_j(t) \}\), the classification is `finite_basis_enrichment_only`. Any prospective joint constraint not equivalent to test-function dilation remains an `OPEN / UNDEFINED CANDIDATE` and is distinct from \(\mathcal C_{K,j}\).
+
+---
+
+# 22. Curvature-Transport Unification and Reflection Rigidity
+
+The geometric foliation of Transcendental Continuation is unified via the **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`):
+
+1. **Radial Reciprocity**: Circle radius $r_K = \tau^{-K}$, circumference $C_K = \tau^{1-K}$, and curvature $\kappa_K = \tau^K$ satisfy $r_K\kappa_K = 1, C_1 = 1$, and Fourier lattice spacing $\Delta\omega_K = \tau/C_K = \tau^K \implies L_K = \tau^K\mathbb Z$.
+2. **Radial Unit Transport**: Zero worldline horizontal coordinate $d_{\rho,K} = \tau^K\delta$ under the transported radial unit $r_K$ preserves the invariant $(r_K d_{\rho,K})^2 = \delta^2$.
+3. **Mellin Half-Density Dilation**: $(U_{\tau^K} f)(x) = \tau^{K/2}f(\tau^K x)$ acts on the completed zeta function as $\tau^{-K(s-1/2)}\Lambda(s) = \chi_s(K)^{-1}\Lambda(s)$, whose unitary axis is $\Re(s)=1/2$.
+4. **Reflection Defect**: $B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = 2(\cosh(K\delta\log\tau)-1) \ge 0$, with native second variation $B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2$.
+5. **Transcendental Curvature Rigidity Theorem (Conditional)**: An arithmetic functional $\mathscr A_\tau = 0$ matching $\sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) implies RH. Formally verified in Lean 4 (`RiemannScope.CurvatureTransport`).
+

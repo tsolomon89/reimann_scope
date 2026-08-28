@@ -476,7 +476,7 @@ Consider a hypothetical configuration where all zeta zeros are on the critical l
    By the Subcritical Norm Growth Theorem (Theorem 9.7):
    $$\lim_{T\to\infty} V_T = 0.$$
 4. **Inability to Distinguish Off-Line Quartet from RH**:
-   The normalized CMSA mean functional produces **identically zero response** in the limit $T \to \infty$ for this configuration. It cannot distinguish a universe with an off-line quartet from a universe where RH is true.
+   The normalized CMSA mean functional produces **a response whose limit is zero** ($V_T \to 0$) as $T \to \infty$ for this configuration. It cannot distinguish a universe with an off-line quartet from a universe where RH is true.
 
 #### Generalization & Limit Order Classification
 - **Fixed and Subcritical Defect Families**: Any perturbation family with $\|\Delta_{H(T)}\| = o(\sqrt{T})$ is classified as:
@@ -512,4 +512,15 @@ To be mathematically well-defined, the transcendental continuation object $\Delt
 *Operational Status*:
 Ordinary grade covariance alone does not prove activation due to the Covariance Countermodel (`CLM-ARB-004`) and Coordinate Redundancy Theorem (`CLM-CMSA-006`).
 Until a coherent, non-redundant $\Delta^{TC}_T$ is defined and proved to satisfy these 8 requirements, the **Transcendental Continuation Activation Theorem is the precise earliest open subgate** in the `reimann_scope` programme, logically preceding any evaluation of the $E_T - C_T$ asymptotic.
+
+---
+
+### 9.11 Curvature-Transport Unification & Supercedence of Raw $1/(2T)$ Averaging
+
+The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) resolves the structural deficiency of raw translation averaging:
+1. **Native Variation at Orbit Level**: Instead of diluting finite perturbations by $1/(2T)$, Curvature Transport evaluates the native second grade variation of the reflection pair modulus sum:
+   $$B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2.$$
+2. **Orbit-Level Zero-Rigidity**: $B_\rho''(0) > 0$ for *any* off-line zero (including a single isolated off-line quartet), overcoming the finite invisibility defect of normalized mean averaging.
+3. **Canonical Open Descent**: The open barrier transfers from translation averaging to the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`): constructing a divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ matching $\sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) without zero inputs.
+
 

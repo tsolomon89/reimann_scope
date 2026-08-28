@@ -1,17 +1,17 @@
 {
   "schema_version": "1.0.0",
   "report_type": "formal_build_report",
-  "status": "passed",
+  "status": "failed",
   "command": "lake build",
-  "exit_code": 0,
-  "producing_git_commit": "7e2f7f016fc706eac6ee4cbef92b776a6cecde48",
-  "timestamp": "2026-08-28T10:02:51.966510+00:00",
+  "exit_code": -1,
+  "producing_git_commit": "838b8c164889dd77719e3610651f21411ac00247",
+  "timestamp": "2026-08-28T12:52:00.624444+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 87,
   "total_theorems": 87,
   "formal_source_hashes": {
-    "formal/RiemannScope.lean": "0eb58146de59fca0e6f55b74200233a3f22a0148c03971b2f814ff3d95055341",
+    "formal/RiemannScope.lean": "564c68a75f7bf334e082f10b30c15cbe0d898b01db6f064710554ff2228e3955",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
     "formal/RiemannScope/Grade.lean": "12e1efe033954c17b14aec4f81e184a757599262758126793c31bf2450d861aa",
     "formal/RiemannScope/RadialDefect.lean": "d3ea82e0fc2baf1dec0fca0b15809537a140fe160c0c995ccaf6f7864a6c9921",
@@ -30,7 +30,7 @@
     "scripts/build_formal.py": "ee4a8622830b8f34c86cab07e2df76df9bea7aeb017747be7899e2ee1901a87c",
     "certification.py": "4e5b983d6d3cfc08575616e6c5679b812bfe238d96793c98d35698c119c7b832"
   },
-  "build_stdout": "Build completed successfully.",
+  "build_stdout": "",
   "build_stderr": "",
-  "report_hash": "fa31a39358b054d38bfbb264d1668e7560efca08775b01a628cc58a9bdc29159"
+  "report_hash": "b109afd4a3934d1487fa9b59207530640bdae90352aab2a5fbc5902912e30b5d"
 }

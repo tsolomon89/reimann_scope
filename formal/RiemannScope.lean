@@ -13,3 +13,5 @@ import RiemannScope.SymmetricDefect
 import RiemannScope.Contradiction
 import RiemannScope.RadialDefect
 import RiemannScope.ArithmeticBridge
+import RiemannScope.CurvatureTransport
+

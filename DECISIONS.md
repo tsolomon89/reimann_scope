@@ -1384,3 +1384,36 @@ Mathematical / operational consequence:
 
 Updated `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `formal/RiemannScope/ArithmeticBridge.lean`, `math_core.py`, `tests/test_fixed_finite_perturbation_invisibility.py`, `.agents/verification/test_harness_integrity.py`, and all corpus registers.
 
+---
+
+## 2026-08-28 — Curvature-Transport Unification and Theta–Mellin Arithmetic Bridge Audit
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Curvature-Transport Framework Unification**:
+   - Unified circle geometry ($C_K, r_K, \kappa_K$), Fourier lattice spacing ($L_K = \tau^K\mathbb Z$), TC zero worldlines ($s_\rho(k) = \tau^k\rho$), transported radial unit ($r_K = \tau^{-K}$), grade character ($q_\rho^K = \tau^{K(\rho-1/2)}$), reflection-pair reciprocal modes ($|\chi_{\rho^\#}(K)| = |\chi_\rho(K)|^{-1}$), exact $\cosh$ defect ($B_\rho(K) = 2(\cosh(K\delta\log\tau)-1)$), separated-signal curvature ($\sum\delta_\rho^2$), radial-defect quotient ($\delta_\rho^2/\gamma_\rho^2$), and half-density dilation Mellin scaling ($a^{1/2-s}$) as expressions of one transported invariant: $\mathscr K_\tau(\rho) = B_\rho''(0)/(2(\log\tau)^2) = (r_K d_{\rho,K})^2 = \delta^2$.
+2. **Theta–Mellin Transport Derivation**:
+   - Derived the exact half-density normalized Mellin transform of scaled theta series $\Theta_{\tau^K}^+(t)$, demonstrating that its scale multiplier $\tau^{-K(s-1/2)}$ matches the reciprocal grade character $\chi_s(K)^{-1}$.
+3. **Audit of Arithmetic Curvature-Descent Candidates**:
+   - Proved that Candidate CT-1 (Scalar Theta–Mellin Transport $F_K(s) = \tau^{-K(s-1/2)}\Lambda(s)$) vanishes identically at all zeros ($\Lambda(\rho)=0 \implies \frac{d^m}{dK^m}F_K(\rho) \equiv 0$), classifying it as `GRADE_COORDINATE_REDUNDANT` / `FAIL_ARITHMETIC_FIREWALL`.
+   - Audited Candidates CT-2, CT-3, and CT-4, formulating the exact 8 requirements for the canonical Arithmetic Curvature-Descent Theorem (`OBL-CT-001`).
+4. **Symmetry-Complete Polynomial Countermodel**:
+   - Analyzed $P_{\delta,\gamma}(z) = ((z-i\gamma)^2-\delta^2)((z+i\gamma)^2-\delta^2)$, proving that geometric and reflection properties with strictly positive grade curvature do not force $\delta = 0$ without arithmetic input.
+5. **Reader-Facing Conditional Rigidity Theorem**:
+   - Established the Transcendental Curvature Rigidity Theorem schema: if a divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ evaluates to the positive sum $\sum W_\rho \delta_\rho^2$ ($W_\rho > 0$), then every zero satisfies $\delta_\rho = 0$ (RH).
+6. **Lean 4 Formalization Inventory**:
+   - Created `RiemannScope.CurvatureTransport` with 20 formal declarations, bringing the repository total to **107 compiled formal declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+7. **Authority Register Subsequential Correction**:
+   - Corrected historical overstatements to emphasize that non-vanishing response implies a subsequential lower bound $\exists \varepsilon > 0, T_j \to \infty \text{ s.t. } \|\Delta_{T_j}\| \ge \varepsilon\sqrt{T_j}$, rather than an eventual $\Omega(\sqrt{T})$ bound.
+
+Reason:
+
+Provide a unified, rigorous, and formally verified geometric-spectral foundation connecting radial circle curvature, Fourier frequency lattices, and grade characters to spectral defect invariants, while maintaining an uncompromising epistemic firewall on the remaining open arithmetic descent obligation.
+
+Mathematical / operational consequence:
+
+Created `CURVATURE_TRANSPORT.md`, `formal/RiemannScope/CurvatureTransport.lean`, and `tests/test_curvature_transport.py`; updated `math_core.py`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `TRANSCENDENTAL_CONTINUATION.md`, `CMSA_GATE_G4.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, `RESEARCH_LEDGER.md`, and all three corpus registers.
+
+

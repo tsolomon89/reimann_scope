@@ -56,6 +56,9 @@ This register details all unresolved proof obligations, mandatory deterministic 
 | `OBL-ARB-STRUCT-NONRED` | Grade Non-Redundancy | Verify that cross-grade arithmetic pairings are not coordinate pullbacks | Single grades coordinate-redundant (PROVED); cross-grade nonredundancy for $2\pi$ OPEN | `SCOPED STATUS` |
 | `OBL-ARB-STRUCT-UNIF` | Grade-Limit Uniformity | Prove limit uniformity and exclude raw coordinate compression | Classical asymptotic analysis | `PROVED` |
 | `OBL-ARB-STRUCT-RH` | Radial Defect to RH Connection | Prove $\forall j, \delta_j = 0 \implies \mathrm{RH}$ predicate | Lean 4 `radial_rigidity_offline_zero_contradiction` | `FORMALLY_PROVED` |
+| `OBL-TC-ACT` | Transcendental Continuation Activation Theorem | Rigorous formulation of discrete grade transport operator acting on arithmetic Dirichlet series without coordinate collapse | Transcendental Continuation framework | `OPEN` |
+| `OBL-CT-001` | Arithmetic Curvature-Descent Theorem | Construct a divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ whose spectral expansion is $\sum_{\rho} W_\rho \delta_\rho^2$ ($W_\rho > 0$) with absolute convergence, cross-term isolation, and no zero inputs | Supersedes raw CMSA $1/(2T)$ activation problem (`CURVATURE_TRANSPORT.md` §12) | `OPEN (CANONICAL OBLIGATION)` |
+
 
 
 ---

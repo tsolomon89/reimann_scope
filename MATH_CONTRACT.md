@@ -2527,3 +2527,52 @@ The normalized mean functional cannot distinguish a finite off-line quartet from
 Requires 8 structural specifications (grade combination operation, non-double-counting proof, grade weights, bilateral convergence over \(K \in \mathbb Z\), height truncation interaction, shift covariance, arithmetic representation, and non-pullback proof).
 Designated as the **earliest open subgate** logically preceding \(E_T - C_T\) asymptotic evaluation.
 
+---
+
+# 43. Curvature-Transport Unification and Theta–Mellin Scaling
+
+### Unified Transported Invariant
+At every grade $K \in \mathbb Z$, the circle radius $r_K = \tau^{-K}$, circle circumference $C_K = \tau^{1-K}$, and circle curvature $\kappa_K = \tau^K$ satisfy:
+\[
+\boxed{r_K \kappa_K = 1, \qquad C_1 = 1, \qquad \Delta\omega_K = \frac{\tau}{C_K} = \tau^K \implies L_K = \tau^K \mathbb Z.}
+\]
+For a nontrivial zero $\rho = 1/2 + \delta + i\gamma$, horizontal displacement scales as $d_{\rho,K} = \tau^K \delta$. Multiplication by the transported radial unit $r_K$ recovers:
+\[
+\boxed{r_K d_{\rho,K} = \delta, \qquad (r_K d_{\rho,K})^2 = \delta^2.}
+\]
+
+### Grade Character and Reflection Curvature
+The centered grade character $\chi_\rho(K) = \tau^{K(\rho-1/2)}$ satisfies $|\chi_{\rho^\#}(K)| = |\chi_\rho(K)|^{-1}$. The reflection-pair defect functional
+\[
+\boxed{B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = 2(\cosh(K\delta\log\tau)-1) = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) \ge 0}
+\]
+has native second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$, yielding the exact normalized curvature transport invariant:
+\[
+\boxed{\mathscr K_\tau(\rho) = \frac{B_\rho''(0)}{2(\log\tau)^2} = (r_K d_{\rho,K})^2 = \delta^2.}
+\]
+
+### Half-Density Dilation & Theta–Mellin Scaling
+The half-density dilation $(U_a f)(x) = a^{1/2}f(ax)$ on $L^2(\mathbb R_{>0})$ acts on power kernels as $U_a(x^{-s}) = a^{1/2-s}x^{-s}$. The critical line $\Re(s)=1/2$ is the exact unitary-character axis $|a^{1/2-s}|=1$.
+The half-density normalized Mellin transform of scaled partial theta series $\Theta_{\tau^K}^+(t) = \sum_{n\ge 1} e^{-\pi(\tau^K n)^2 t}$ is:
+\[
+\boxed{\tau^{K/2} \int_0^\infty \Theta_{\tau^K}^+(t) t^{s/2-1} dt = \tau^{-K(s-1/2)} \pi^{-s/2} \Gamma(s/2) \zeta(s) = \chi_s(K)^{-1} \Lambda(s).}
+\]
+
+### Falsification of Candidate CT-1 (Scalar Transport Obstruction)
+At any zero $\rho$ with $\Lambda(\rho) = 0$, $F_K(\rho) = \tau^{-K(\rho-1/2)}\Lambda(\rho) \equiv 0$ for all $K \in \mathbb R$, so $\left.\frac{d^m}{dK^m}F_K(\rho)\right|_{K=0} \equiv 0$. Direct scalar differentiation at zeros vanishes identically ($0 \equiv 0$) and cannot detect $\delta \ne 0$. Classified as `GRADE_COORDINATE_REDUNDANT` / `FAIL_ARITHMETIC_FIREWALL`.
+
+### Symmetry-Complete Polynomial Countermodel
+\[
+\boxed{P_{\delta,\gamma}(z) = \left((z-i\gamma)^2-\delta^2\right)\left((z+i\gamma)^2-\delta^2\right)}
+\]
+satisfies even symmetry $P(-z)=P(z)$, Schwarz symmetry $\overline{P(\bar z)}=P(z)$, reciprocal characters, and strictly positive grade curvature $B_\rho''(0) > 0$ for $\delta \ne 0$. Proves that geometric and reflection properties alone do not force $\delta = 0$ without arithmetic input.
+
+### Transcendental Curvature Rigidity Theorem (Conditional Schema)
+\[
+\boxed{\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.}
+\]
+
+### Open Obligation: Arithmetic Curvature-Descent Theorem (`OBL-CT-001`)
+Constructing a divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ evaluating to $\sum W_\rho \delta_\rho^2$ without zero inputs is the program's canonical open obligation, superseding raw CMSA $1/(2T)$ activation. Reference: `CURVATURE_TRANSPORT.md`.
+
+

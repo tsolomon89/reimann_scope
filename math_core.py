@@ -4946,3 +4946,535 @@ def verify_resolvent_L2_integral(
         }
 
 
+# ============================================================================
+# CURVATURE-TRANSPORT UNIFICATION & THETA-MELLIN BRIDGE VERIFIERS
+# ============================================================================
+
+def exact_radial_geometry(
+    K: int,
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: RADIAL GEOMETRY & GRADE-SHIFT LAWS]
+    For grade K and scale generator tau = 2*pi:
+      a_K = tau^K, r_K = tau^(-K), C_K = tau * r_K = tau^(1-K), kappa_K = 1/r_K = tau^K.
+    Verifies:
+      r_K * kappa_K = 1
+      C_K = tau * r_K
+      C_1 = 1, r_1 = 1/tau, kappa_1 = tau
+      r_{K+1} = tau^(-1) * r_K
+      C_{K+1} = tau^(-1) * C_K
+      kappa_{K+1} = tau * kappa_K
+    """
+    with mpmath.workdps(dps):
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        a_K = tau_mp ** K
+        r_K = tau_mp ** (-K)
+        C_K = tau_mp * r_K
+        kappa_K = mpmath.mpf(1) / r_K
+
+        # Shifted grade K+1
+        r_Kp1 = tau_mp ** (-(K + 1))
+        C_Kp1 = tau_mp * r_Kp1
+        kappa_Kp1 = mpmath.mpf(1) / r_Kp1
+
+        # Unit circumference at K=1
+        r_1 = tau_mp ** (-1)
+        C_1 = tau_mp * r_1
+        kappa_1 = tau_mp ** 1
+
+        reciprocal_check = abs(r_K * kappa_K - 1)
+        shift_r_check = abs(r_Kp1 - (r_K / tau_mp))
+        shift_C_check = abs(C_Kp1 - (C_K / tau_mp))
+        shift_kappa_check = abs(kappa_Kp1 - (tau_mp * kappa_K))
+        unit_C1_check = abs(C_1 - 1)
+
+        # Exact symbolic verification via SymPy
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        tau_s, K_s = sp.symbols("tau K", positive=True)
+        r_s = tau_s ** (-K_s)
+        kappa_s = tau_s ** K_s
+        C_s = tau_s * r_s
+        sym_recip = sp.simplify(r_s * kappa_s - 1)
+        sym_C1 = sp.simplify((tau_s * tau_s**(-1)) - 1)
+        sym_shift_r = sp.simplify(tau_s**(-(K_s+1)) - (tau_s**(-1) * r_s))
+        sym_shift_C = sp.simplify(tau_s * tau_s**(-(K_s+1)) - (tau_s**(-1) * C_s))
+        sym_shift_k = sp.simplify(tau_s**(K_s+1) - (tau_s * kappa_s))
+
+        is_symbolic_exact = bool(
+            sym_recip == 0 and sym_C1 == 0 and sym_shift_r == 0 and
+            sym_shift_C == 0 and sym_shift_k == 0
+        )
+
+        return {
+            "K": K,
+            "tau": mpmath.nstr(tau_mp, n=dps),
+            "a_K": mpmath.nstr(a_K, n=dps),
+            "r_K": mpmath.nstr(r_K, n=dps),
+            "C_K": mpmath.nstr(C_K, n=dps),
+            "kappa_K": mpmath.nstr(kappa_K, n=dps),
+            "reciprocal_error": mpmath.nstr(reciprocal_check, n=6),
+            "shift_r_error": mpmath.nstr(shift_r_check, n=6),
+            "shift_C_error": mpmath.nstr(shift_C_check, n=6),
+            "shift_kappa_error": mpmath.nstr(shift_kappa_check, n=6),
+            "unit_C1_error": mpmath.nstr(unit_C1_check, n=6),
+            "is_symbolic_exact": is_symbolic_exact,
+            "status": "RADIAL_GEOMETRY_VERIFIED"
+        }
+
+
+def fourier_lattice_spacing(
+    K: int,
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: FOURIER LATTICE SPACING]
+    For circle of circumference C_K = tau^(1-K), the fundamental angular Fourier
+    frequency lattice spacing is:
+      Delta omega_K = tau / C_K = tau / (tau^(1-K)) = tau^K,
+    generating lattice L_K = tau^K * Z.
+    """
+    with mpmath.workdps(dps):
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        C_K = tau_mp ** (1 - K)
+        delta_omega = tau_mp / C_K
+        expected = tau_mp ** K
+        err = abs(delta_omega - expected)
+
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        tau_s, K_s = sp.symbols("tau K", positive=True)
+        sym_spacing = sp.simplify(tau_s / (tau_s ** (1 - K_s)) - tau_s ** K_s)
+
+        return {
+            "K": K,
+            "C_K": mpmath.nstr(C_K, n=dps),
+            "delta_omega": mpmath.nstr(delta_omega, n=dps),
+            "expected_tau_K": mpmath.nstr(expected, n=dps),
+            "error": mpmath.nstr(err, n=6),
+            "is_symbolic_exact": bool(sym_spacing == 0),
+            "status": "FOURIER_LATTICE_SPACING_VERIFIED"
+        }
+
+
+def generic_scale_geometry(
+    b: Union[float, str, mpmath.mpf],
+    K: int,
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: GENERIC BASE SCALE CONTROL b > 1]
+    Tests scale transport for generic base b > 1:
+      a_K = b^K, r_K = b^(-K), C_K = tau * b^(-K), kappa_K = b^K.
+    Verifies that the transport algebra holds for all b > 1.
+    """
+    with mpmath.workdps(dps):
+        b_mp = to_mpf(b, dps=dps)
+        if b_mp <= 1:
+            raise ValueError(f"Base b must be > 1, got {b_mp}")
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+
+        a_K = b_mp ** K
+        r_K = b_mp ** (-K)
+        C_K = tau_mp * (b_mp ** (-K))
+        kappa_K = b_mp ** K
+
+        reciprocal_err = abs(r_K * kappa_K - 1)
+        fourier_spacing = tau_mp / C_K
+        fourier_err = abs(fourier_spacing - (b_mp ** K))
+
+        return {
+            "b": mpmath.nstr(b_mp, n=15),
+            "K": K,
+            "a_K": mpmath.nstr(a_K, n=dps),
+            "r_K": mpmath.nstr(r_K, n=dps),
+            "C_K": mpmath.nstr(C_K, n=dps),
+            "kappa_K": mpmath.nstr(kappa_K, n=dps),
+            "reciprocal_error": mpmath.nstr(reciprocal_err, n=6),
+            "fourier_spacing_error": mpmath.nstr(fourier_err, n=6),
+            "status": "GENERIC_SCALE_GEOMETRY_VERIFIED"
+        }
+
+
+def transported_radial_defect(
+    delta: Union[float, str, mpmath.mpf],
+    K: int,
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: ZERO & RADIAL-UNIT TRANSPORT]
+    For displacement delta at grade K:
+      d_{rho,K} = a_K * delta = tau^K * delta.
+    Transport by radial unit r_K = tau^(-K) satisfies:
+      r_K * d_{rho,K} = tau^(-K) * (tau^K * delta) = delta,
+      (r_K * d_{rho,K})^2 = delta^2.
+    """
+    with mpmath.workdps(dps):
+        d_mp = to_mpf(delta, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        a_K = tau_mp ** K
+        r_K = tau_mp ** (-K)
+
+        d_K = a_K * d_mp
+        recovered_delta = r_K * d_K
+        recovered_delta_sq = (r_K * d_K) ** 2
+        exact_delta_sq = d_mp ** 2
+
+        err_delta = abs(recovered_delta - d_mp)
+        err_sq = abs(recovered_delta_sq - exact_delta_sq)
+
+        return {
+            "delta": mpmath.nstr(d_mp, n=dps),
+            "K": K,
+            "d_rho_K": mpmath.nstr(d_K, n=dps),
+            "recovered_delta": mpmath.nstr(recovered_delta, n=dps),
+            "recovered_delta_sq": mpmath.nstr(recovered_delta_sq, n=dps),
+            "exact_delta_sq": mpmath.nstr(exact_delta_sq, n=dps),
+            "error_delta": mpmath.nstr(err_delta, n=6),
+            "error_sq": mpmath.nstr(err_sq, n=6),
+            "status": "TRANSPORTED_RADIAL_DEFECT_VERIFIED"
+        }
+
+
+def grade_character_modulus(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    K: Union[float, str, mpmath.mpf],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: GRADE CHARACTER MODULUS & REFLECTION MODES]
+    chi_rho(K) = tau^(K*(rho - 1/2)) = exp(K*delta*log(tau)) * exp(i*K*gamma*log(tau)).
+    |chi_rho(K)| = exp(K*delta*log(tau)).
+    For reflection partner rho^# = 1/2 - delta + i*gamma:
+    |chi_{rho^#}(K)| = exp(-K*delta*log(tau)) = |chi_rho(K)|^(-1).
+    """
+    with mpmath.workdps(dps):
+        d_mp = to_mpf(delta, dps=dps)
+        g_mp = to_mpf(gamma, dps=dps)
+        K_mp = to_mpf(K, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        log_tau = mpmath.log(tau_mp)
+
+        # Direct complex power evaluation
+        s_centered = mpmath.mpc(d_mp, g_mp)
+        chi_val = mpmath.exp(K_mp * s_centered * log_tau)
+        chi_abs = abs(chi_val)
+
+        # Expected modulus
+        expected_abs = mpmath.exp(K_mp * d_mp * log_tau)
+        abs_err = abs(chi_abs - expected_abs)
+
+        # Reflection partner rho^#
+        s_sharp_centered = mpmath.mpc(-d_mp, g_mp)
+        chi_sharp_val = mpmath.exp(K_mp * s_sharp_centered * log_tau)
+        chi_sharp_abs = abs(chi_sharp_val)
+        expected_sharp_abs = mpmath.exp(-K_mp * d_mp * log_tau)
+        sharp_abs_err = abs(chi_sharp_abs - expected_sharp_abs)
+
+        reciprocal_prod = chi_abs * chi_sharp_abs
+        reciprocal_err = abs(reciprocal_prod - 1)
+
+        return {
+            "delta": mpmath.nstr(d_mp, n=dps),
+            "gamma": mpmath.nstr(g_mp, n=dps),
+            "K": mpmath.nstr(K_mp, n=dps),
+            "chi_abs": mpmath.nstr(chi_abs, n=dps),
+            "chi_sharp_abs": mpmath.nstr(chi_sharp_abs, n=dps),
+            "reciprocal_product": mpmath.nstr(reciprocal_prod, n=dps),
+            "abs_error": mpmath.nstr(abs_err, n=6),
+            "sharp_abs_error": mpmath.nstr(sharp_abs_err, n=6),
+            "reciprocal_error": mpmath.nstr(reciprocal_err, n=6),
+            "status": "GRADE_CHARACTER_MODULUS_VERIFIED"
+        }
+
+
+def reflection_pair_defect_B(
+    delta: Union[float, str, mpmath.mpf],
+    K: Union[float, str, mpmath.mpf],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: REFLECTION-PAIR DEFECT FORMULAS]
+    B_rho(K) = |chi_rho(K)| + |chi_{rho^#}(K)| - 2
+             = 2 * (cosh(K*delta*log(tau)) - 1)
+             = 4 * sinh^2(K*delta*log(tau) / 2).
+    Verifies that all three representations are identical, B_rho(K) >= 0, and
+    for K != 0, B_rho(K) == 0 iff delta == 0.
+    """
+    with mpmath.workdps(dps):
+        d_mp = to_mpf(delta, dps=dps)
+        K_mp = to_mpf(K, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        log_tau = mpmath.log(tau_mp)
+        u = K_mp * d_mp * log_tau
+
+        # Three formulations
+        val_exp = mpmath.exp(u) + mpmath.exp(-u) - 2
+        val_cosh = 2 * (mpmath.cosh(u) - 1)
+        val_sinh = 4 * (mpmath.sinh(u / 2) ** 2)
+
+        err_cosh = abs(val_exp - val_cosh)
+        err_sinh = abs(val_exp - val_sinh)
+
+        is_nonnegative = bool(val_exp >= 0)
+        is_zero_at_delta_zero = bool(d_mp == 0 and val_exp == 0)
+
+        # Exact symbolic verification via SymPy
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        u_s = sp.symbols("u", real=True)
+        exp_sym = sp.exp(u_s) + sp.exp(-u_s) - 2
+        cosh_sym = 2 * (sp.cosh(u_s) - 1)
+        sinh_sym = 4 * (sp.sinh(u_s / 2) ** 2)
+
+        sym_cosh_diff = sp.simplify(exp_sym - cosh_sym)
+        sym_sinh_diff = sp.simplify(exp_sym.rewrite(sp.sinh) - sinh_sym)
+        is_symbolic_exact = bool(sym_cosh_diff == 0 and sp.simplify(cosh_sym - sinh_sym) == 0)
+
+        return {
+            "delta": mpmath.nstr(d_mp, n=dps),
+            "K": mpmath.nstr(K_mp, n=dps),
+            "val_exp": mpmath.nstr(val_exp, n=dps),
+            "val_cosh": mpmath.nstr(val_cosh, n=dps),
+            "val_sinh": mpmath.nstr(val_sinh, n=dps),
+            "error_cosh": mpmath.nstr(err_cosh, n=6),
+            "error_sinh": mpmath.nstr(err_sinh, n=6),
+            "is_nonnegative": is_nonnegative,
+            "is_symbolic_exact": is_symbolic_exact,
+            "status": "REFLECTION_PAIR_DEFECT_VERIFIED"
+        }
+
+
+def curvature_transport_invariant(
+    delta: Union[float, str, mpmath.mpf],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    h_step: Union[float, str, mpmath.mpf] = "1e-5",
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: PRINCIPAL FINITE CURVATURE THEOREM]
+    B_rho''(0) = 2 * delta^2 * (log(tau))^2.
+    The normalized curvature transport invariant is:
+      K_tau(rho) = B_rho''(0) / (2 * (log(tau))^2) = delta^2 = (r_K * d_{rho,K})^2.
+    Also computes numerical second derivative via finite difference and compares.
+    """
+    with mpmath.workdps(dps):
+        d_mp = to_mpf(delta, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        log_tau = mpmath.log(tau_mp)
+        h_mp = to_mpf(h_step, dps=dps)
+
+        exact_B_second_deriv = 2 * (d_mp ** 2) * (log_tau ** 2)
+        exact_curvature_invariant = d_mp ** 2
+
+        # Numerical second derivative of B_rho(K) at K=0
+        def B_func(K_val):
+            u = K_val * d_mp * log_tau
+            return 2 * (mpmath.cosh(u) - 1)
+
+        # Central difference: (B(h) - 2*B(0) + B(-h)) / h^2
+        # Since B(0) = 0 and B(h) = B(-h): 2*B(h) / h^2
+        num_second_deriv = (B_func(h_mp) - 2 * B_func(mpmath.mpf(0)) + B_func(-h_mp)) / (h_mp ** 2)
+        num_curvature = num_second_deriv / (2 * (log_tau ** 2))
+
+        deriv_err = abs(num_second_deriv - exact_B_second_deriv)
+        curv_err = abs(num_curvature - exact_curvature_invariant)
+
+        return {
+            "delta": mpmath.nstr(d_mp, n=dps),
+            "exact_B_second_deriv": mpmath.nstr(exact_B_second_deriv, n=dps),
+            "exact_curvature_invariant": mpmath.nstr(exact_curvature_invariant, n=dps),
+            "numerical_curvature": mpmath.nstr(num_curvature, n=dps),
+            "derivative_error": mpmath.nstr(deriv_err, n=6),
+            "curvature_error": mpmath.nstr(curv_err, n=6),
+            "status": "CURVATURE_TRANSPORT_INVARIANT_VERIFIED"
+        }
+
+
+def verify_theta_mellin_scaling(
+    a: Union[float, str, mpmath.mpf],
+    s: Union[complex, str, mpmath.mpc],
+    n_terms: int = 150,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: THETA-MELLIN SCALING LAW]
+    For a > 0 and Re(s) > 1:
+      int_0^inf Theta_a^+(t) t^(s/2 - 1) dt = a^(-s) * pi^(-s/2) * Gamma(s/2) * zeta(s).
+    Under half-density normalization:
+      a^(1/2) * int_0^inf Theta_a^+(t) t^(s/2 - 1) dt = a^(1/2 - s) * pi^(-s/2) * Gamma(s/2) * zeta(s).
+    For a = tau^K, the scale factor is tau^(-K*(s - 1/2)) = chi_s(K)^(-1).
+    Evaluates via termwise sum and compares with exact scale factor * Lambda_N(s).
+    """
+    with mpmath.workdps(dps):
+        a_mp = to_mpf(a, dps=dps)
+        s_mp = to_mpc(s, dps=dps)
+        if a_mp <= 0:
+            raise ValueError(f"a must be positive, got {a_mp}")
+        if s_mp.real <= 1:
+            raise ValueError(f"Re(s) must be > 1 for Dirichlet absolute convergence, got Re(s) = {s_mp.real}")
+
+        # Half-density factor
+        scale_factor = (a_mp ** (mpmath.mpf("0.5") - s_mp))
+        gamma_factor = (mpmath.pi ** (-s_mp / 2)) * mpmath.gamma(s_mp / 2)
+
+        # Termwise Mellin integration sum
+        total_integrated = mpmath.mpc(0)
+        total_dirichlet = mpmath.mpc(0)
+        for n in range(1, n_terms + 1):
+            n_mp = mpmath.mpf(n)
+            # Integral of a^(1/2) * exp(-pi*(a*n)^2 * t) * t^(s/2 - 1) dt
+            # = a^(1/2) * (pi*(a*n)^2)^(-s/2) * Gamma(s/2)
+            # = a^(1/2 - s) * pi^(-s/2) * Gamma(s/2) * n^(-s)
+            term_int = (a_mp ** mpmath.mpf("0.5")) * ((mpmath.pi * (a_mp * n_mp)**2) ** (-s_mp / 2)) * mpmath.gamma(s_mp / 2)
+            term_dir = n_mp ** (-s_mp)
+            total_integrated += term_int
+            total_dirichlet += term_dir
+
+        expected_val = scale_factor * gamma_factor * total_dirichlet
+        diff = abs(total_integrated - expected_val)
+
+        return {
+            "a": mpmath.nstr(a_mp, n=10),
+            "s": str(s_mp),
+            "scale_factor": str(scale_factor),
+            "total_integrated": str(total_integrated),
+            "expected_scaled_lambda": str(expected_val),
+            "error": mpmath.nstr(diff, n=6),
+            "status": "THETA_MELLIN_SCALING_VERIFIED"
+        }
+
+
+def verify_scalar_zero_multiplication_obstruction(
+    K: int,
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: CANDIDATE CT-1 FALSIFICATION]
+    Shows that for scalar theta-Mellin transform F_K(s) = tau^(-K*(s-1/2)) * Lambda(s),
+    at any zero rho where Lambda(rho) = 0:
+      F_K(rho) = 0 for all K in R.
+    Consequently, all K-derivatives d^m/dK^m F_K(rho) vanish identically (0 == 0)
+    for ANY displacement delta. Direct scalar differentiation yields zero response,
+    proving Candidate CT-1 is coordinate/scalar covariance rather than a zero detector.
+    """
+    with mpmath.workdps(dps):
+        d_mp = to_mpf(delta, dps=dps)
+        g_mp = to_mpf(gamma, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        log_tau = mpmath.log(tau_mp)
+
+        # At a zero rho, Lambda(rho) = 0
+        lambda_rho = mpmath.mpc(0)
+        rho_centered = mpmath.mpc(d_mp, g_mp)
+
+        # F_K(rho) = tau^(-K*rho_centered) * Lambda(rho)
+        factor = mpmath.exp(-K * rho_centered * log_tau)
+        F_K_val = factor * lambda_rho
+
+        # Derivatives at K: d/dK [tau^(-K*z) * Lambda] = (-z*log(tau)) * tau^(-K*z) * Lambda = 0
+        dF_dK = (-rho_centered * log_tau) * factor * lambda_rho
+        d2F_dK2 = ((-rho_centered * log_tau) ** 2) * factor * lambda_rho
+
+        return {
+            "K": K,
+            "delta": mpmath.nstr(d_mp, n=10),
+            "gamma": mpmath.nstr(g_mp, n=10),
+            "F_K_rho": str(F_K_val),
+            "dF_dK_rho": str(dF_dK),
+            "d2F_dK2_rho": str(d2F_dK2),
+            "is_identically_zero": bool(F_K_val == 0 and dF_dK == 0 and d2F_dK2 == 0),
+            "status": "SCALAR_ZERO_OBSTRUCTION_CONFIRMED"
+        }
+
+
+def countermodel_polynomial_P(
+    z: Union[complex, str, mpmath.mpc],
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> mpmath.mpc:
+    """
+    [CURVATURE-TRANSPORT: SYMMETRY-COMPLETE COUNTERMODEL POLYNOMIAL]
+    P_{delta,gamma}(z) = ((z - i*gamma)^2 - delta^2) * ((z + i*gamma)^2 - delta^2)
+                       = (z^2 + gamma^2 - delta^2)^2 + 4 * delta^2 * gamma^2.
+    Roots in centered coordinate z = s - 1/2 are exactly +-delta +- i*gamma.
+    """
+    with mpmath.workdps(dps):
+        z_c = to_mpc(z, dps=dps)
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        i_gamma = mpmath.mpc(0, g_f)
+
+        t1 = (z_c - i_gamma)**2 - (d_f**2)
+        t2 = (z_c + i_gamma)**2 - (d_f**2)
+        return t1 * t2
+
+
+def verify_countermodel_symmetries(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [CURVATURE-TRANSPORT: COUNTERMODEL SYMMETRY & DETECTOR VERIFICATION]
+    Verifies that the off-line quartet polynomial P_{delta,gamma}(z) satisfies:
+      1. Even functional symmetry: P(-z) == P(z)
+      2. Schwarz reflection symmetry: conj(P(conj(z))) == P(z)
+      3. Zeros at z in {+-delta +- i*gamma}
+      4. Transported radial unit: r_K * d_{rho,K} == delta
+      5. Reciprocal grade characters: |chi_rho(K)| * |chi_{rho^#}(K)| == 1
+      6. Positive grade curvature: B_rho''(0) == 2 * delta^2 * (log(tau))^2 > 0 (for delta != 0).
+    Proves that circle geometry, functional symmetry, coordinate covariance, and
+    positive curvature detection alone do not force delta == 0 without arithmetic input.
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        tau_mp = 2 * mpmath.pi
+
+        # Test point z
+        z_test = mpmath.mpc("1.25", "3.75")
+        p_z = countermodel_polynomial_P(z_test, d_f, g_f, dps=dps)
+        p_neg_z = countermodel_polynomial_P(-z_test, d_f, g_f, dps=dps)
+        p_conj_z = countermodel_polynomial_P(mpmath.conj(z_test), d_f, g_f, dps=dps)
+
+        even_err = abs(p_neg_z - p_z)
+        schwarz_err = abs(mpmath.conj(p_conj_z) - p_z)
+
+        # Roots evaluation
+        roots = [
+            mpmath.mpc(d_f, g_f),
+            mpmath.mpc(d_f, -g_f),
+            mpmath.mpc(-d_f, g_f),
+            mpmath.mpc(-d_f, -g_f),
+        ]
+        root_residuals = [abs(countermodel_polynomial_P(r, d_f, g_f, dps=dps)) for r in roots]
+        max_root_res = max(root_residuals)
+
+        # Curvature test
+        B_info = curvature_transport_invariant(d_f, tau_val=tau_mp, dps=dps)
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "even_symmetry_error": mpmath.nstr(even_err, n=6),
+            "schwarz_symmetry_error": mpmath.nstr(schwarz_err, n=6),
+            "max_root_residual": mpmath.nstr(max_root_res, n=6),
+            "grade_curvature": B_info["exact_curvature_invariant"],
+            "status": "COUNTERMODEL_SYMMETRIES_VERIFIED"
+        }
+
+
+

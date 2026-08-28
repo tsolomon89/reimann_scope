@@ -346,13 +346,28 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
    Requires 8 structural specifications (grade combination operation, non-double-counting proof, grade weights, bilateral convergence over $K \in \mathbb Z$, height truncation interaction, shift covariance, arithmetic representation, and non-pullback proof).
    Designated as the **earliest open subgate** logically preceding $E_T - C_T$ asymptotic evaluation.
 
+### 10.6 Curvature-Transport Invariant and Descent Route
+
+The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) unifies:
+1. Reciprocal circle geometry ($r_K \kappa_K = 1, C_1 = 1$);
+2. Fourier lattices ($L_K = \tau^K\mathbb Z$);
+3. Radial unit recovery ($r_K d_{\rho,K} = \delta$);
+4. Half-density dilation Mellin scaling ($a^{1/2-s}\Lambda(s) = \chi_s(K)^{-1}\Lambda(s)$ for $a = \tau^K$);
+5. Reflection-pair defect $B_\rho(K) = 2(\cosh(K\delta\log\tau)-1) = 4\sinh^2(K\delta\log\tau/2) \ge 0$;
+6. Second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2$.
+
+Under the **Transcendental Curvature Rigidity Theorem**, any divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ with spectral expansion $\mathscr A_\tau(\xi) = \sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) implies RH.
+Constructing such a functional without zero inputs is the program's canonical open obligation: the **Arithmetic Curvature-Descent Theorem** (`OBL-CT-001`), superseding raw CMSA $1/(2T)$ activation.
+
 ---
 
 ## 11. Current Status and Research Protocol
 
+- **`OBL-CT-001` (Arithmetic Curvature-Descent Theorem)**: Canonical **OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §12).
 - **`OBL-RDQ-001`**: Remains **OPEN**.
-- **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
-- **Transcendental Continuation Activation Theorem**: Precise earliest open subgate for Gate G4.
+- **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in CMSA derivation).
+- **Transcendental Continuation Activation Theorem (`OBL-TC-ACT`)**: Precise earliest open subgate for Gate G4.
 - **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+
 

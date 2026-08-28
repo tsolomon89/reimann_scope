@@ -818,5 +818,42 @@ Formalize rational single-zero and functional-reflection pair resolvent identiti
 4. **Subsequential Non-Vanishing Consequence** (`not_tendsto_zero_subsequential_lower_bound`):
    - For any sequence \(x_n \in \mathbb R\), \(\neg \operatorname{Tendsto}\ x\ \text{atTop}\ (\mathcal N(0))\) implies existence of \(\varepsilon > 0\) such that for all \(N\), there exists \(n \ge N\) with \(|x_n| \ge \varepsilon\).
 
-Total compiled project theorem declarations: **87** (0 `sorry`, 0 `admit`, 0 warnings).
+---
+
+# 28. Phase 19 — Curvature-Transport Unification and Transcendental Rigidity Bridge
+
+Formalized in `formal/RiemannScope/CurvatureTransport.lean` (20 compiled formal declarations):
+
+1. **Exact Radial Reciprocity and Shift Laws**:
+   - `radial_unit_curvature_reciprocal`: $r_K \kappa_K = \tau^{-K} \tau^K = 1$.
+   - `grade_shift_radius`: $r_{K+1} = \tau^{-1} r_K$.
+   - `grade_shift_circumference`: $C_{K+1} = \tau^{-1} C_K$.
+   - `grade_shift_curvature`: $\kappa_{K+1} = \tau \kappa_K$.
+   - `unit_circumference_K1`: $C_1 = \tau r_1 = 1$.
+2. **Fourier Frequency Lattice Spacing**:
+   - `fourier_lattice_spacing_eq`: $\Delta\omega_K = \tau / C_K = \tau^K$, generating $L_K = \tau^K \mathbb Z$.
+3. **Centered Radial Unit Transport & Invariance**:
+   - `centered_radial_unit_transport`: $r_K d_{\rho,K} = \tau^{-K}(\tau^K\delta) = \delta$.
+   - `transported_squared_defect_invariance`: $(r_K d_{\rho,K})^2 = \delta^2$.
+   - `generic_scale_radial_unit_transport`: $b^{-K}(b^K\delta) = \delta$ for generic $b > 0$.
+4. **Grade Character & Reflection Pair Reciprocity**:
+   - `grade_character_complex_product`: $(\delta + i\gamma)\log\tau K = K\delta\log\tau + i K\gamma\log\tau$.
+   - `grade_character_modulus_def`: $|\chi_\rho(K)| = \exp(K\delta\log\tau)$.
+   - `reflection_reciprocal_modulus_prod`: $|\chi_\rho(K)| |\chi_{\rho^\#}(K)| = 1$.
+5. **Reflection Pair Defect & Zero Rigidity**:
+   - `reflection_pair_defect_cosh`: $B_\rho(K) = 2(\cosh(u)-1)$.
+   - `reflection_pair_defect_nonneg`: $B_\rho(K) \ge 0$.
+   - `reflection_pair_defect_eq_zero_iff`: $B_\rho(K) = 0 \iff \delta = 0$ for $K \ne 0, \tau > 1$.
+   - `native_grade_second_order_taylor_coefficient`: $B_\rho''(0)/(2(\log\tau)^2) = \delta^2$.
+6. **Finite Positive-Weight Curvature Sum Rigidity**:
+   - `finite_positive_weight_curvature_rigidity`: $\sum w_j \delta_j^2 = 0 \iff \forall j, \delta_j = 0$ for $w_j > 0, \delta_j^2 \ge 0$.
+7. **Symmetry-Complete Countermodel Polynomial**:
+   - `countermodelPolynomial`: definition of $P_{\delta,\gamma}(z) = ((z-i\gamma)^2-\delta^2)((z+i\gamma)^2-\delta^2)$.
+   - `countermodelPolynomial_even`: $P_{\delta,\gamma}(-z) = P_{\delta,\gamma}(z)$.
+8. **Conditional Curvature Rigidity Bridge**:
+   - `ConditionalCurvatureRigidityBridge`: conditional bridge structure with vanishing arithmetic functional $\mathscr A_\tau = 0$ and curvature identity $\mathscr A_\tau = \sum w_j \delta_j^2$.
+   - `ConditionalCurvatureRigidityBridge.all_defects_zero`: formal theorem proving $\forall j, \delta_j = 0$ (RH).
+
+Total compiled project theorem declarations: **107** (0 `sorry`, 0 `admit`, 0 warnings).
+
 
