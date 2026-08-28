@@ -157,7 +157,13 @@ class TestThetaMellinAndFalsificationControls:
         assert res["status"] == "SCALAR_TRANSPORT_NOGO_INSTANCES_VERIFIED"
         assert res["all_derivatives_identically_zero"] is True
         assert res["log_derivative_identity_holds"] is True
-        assert res["pullback_zero_worldline_vanishes"] is True
+        assert res["pulled_worldline_vanishes"] is True
+        assert float(res["pulled_worldline_zero_residual"]) < 1e-45
+        assert float(res["unpulled_formula_diff"]) < 1e-45
+        if k != 0.0:
+            assert res["unpulled_worldline_is_nonzero"] is True
+            assert res["static_scalar_worldline_is_nonzero"] is True
+
 
     @pytest.mark.parametrize("delta,gamma", [
         ("0.005", "14.134725"),

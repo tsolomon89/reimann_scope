@@ -498,4 +498,20 @@ If a simple law survives, broad computation should stop until that law is algebr
 | CT-016 | Scalar-Transport No-Go Theorem: for any grade multiplier $g(k,s)$ and grade-independent $L(s)$, $L(\rho) = 0 \implies \partial_k^m [g(k,\rho)L(\rho)] = 0$ for all $m \ge 0$; non-vanishing $g$ preserves zero divisor; logarithmic derivative on $gL \ne 0$ supplies zero divisor data; zero worldline pullback vanishes identically. | **PROVED / EXACT / PARTIALLY_FORMALIZED** | Lean 4 `scalar_multiplier_zero_preservation`, `scalar_multiplier_nonzero_root_iff`, `algebraic_grade_derivative_factor_vanishing`; verified in `verify_scalar_transport_nogo_instances`. |
 | CT-017 | Scoped One-Point Holomorphic Obstruction: no fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set because $\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$ violates Cauchy-Riemann, requiring non-scalar pairing, contour boundary terms, or regularized determinants. | **PROVED / EXACT** | Proved analytically in `CURVATURE_TRANSPORT.md` §10. |
 
+---
+
+# 27. Weil–Hermitian Curvature Bridge Claims
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| WH-001 | Geometric Involution Difference & Squared Discrepancy: $J(\rho) - C(\rho) = (1-\rho) - \bar\rho = -2\delta_\rho$ and $\|J(\rho) - C(\rho)\|^2 = 4\delta_\rho^2$; $J=C \iff \Re\rho=1/2$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`weil_involution_difference`, `weil_involution_norm_sq_discrepancy`). |
+| WH-002 | Pointwise Rational Weil–Hermitian Identity: $\frac{1}{2}(1/\|\rho\|^2 + 1/\|1-\rho\|^2) - \Re(1/(\rho(1-\rho))) = \frac{2\delta_\rho^2}{\|\rho\|^2\|1-\rho\|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 \|\rho\|^2\|1-\rho\|^2} \ge 0$, with equality iff $\delta_\rho = 0$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`pointwise_weil_curvature_numerator_identity`, `pointwise_weil_curvature_identity_algebraic`, `pointwise_weil_curvature_weight_pos`, `pointwise_weil_curvature_nonneg`, `pointwise_weil_curvature_zero_iff`). |
+| WH-003 | Discrete Zeta Divisor Summation Target: $N_\xi - C_\xi = \sum_{\rho\in Z} \frac{2\delta_\rho^2}{\|\rho\|^2\|1-\rho\|^2} \ge 0$, where $C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi)$ is the completed-$\xi$ Hadamard sum constant. | **PROVED / EXACT** | Proved from Hadamard product evaluated at $s=0,1$ and functional equation zero symmetry; verified in `evaluate_weil_hermitian_spectral_sums`. |
+| WH-004 | Finite Spectral Sum Closure: on-line zeros have exact zero defect ($\Delta_{\text{curv}} = 0$); off-line quartets generate strictly positive defect ($\Delta_{\text{curv}} > 0$). | **PROVED / NUMERICALLY_VERIFIED** | Verified in `tests/test_weil_curvature.py` across reference zeros and synthetic off-line quartets. |
+| WH-005 | Arithmetic Weil Quadratic Form & Companion: $Q_W(g_0) = \sum \frac{1}{\rho(1-\rho)} = C_\xi$ and $Q_H(g_0) = \sum \frac{1}{\|\rho\|^2} = N_\xi$. | **PROVED / EXACT** | Derived from Mellin transform of indicator $g_0 = \mathbf 1_{(0,1)}$ and explicit formula. |
+| WH-006 | Pure Local Prime Distribution Indefiniteness: local prime weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are strictly negative-definite (all eigenvalues strictly negative, falsifying pure local Hilbert space GNS inner product factorization without global Archimedean and pole cancellation). | **PROVED / FALSIFIED LOCAL GNS** | Verified in `evaluate_finite_prime_weil_gram_matrix` and `test_finite_prime_negative_eigenvalues`. |
+| WH-007 | GNS Positivity Equivalence Barrier: positive-definiteness $Q_W(g * g^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952); assuming positivity a priori without zero-independent positive factorization is circular. | **ESTABLISHED ANALYTIC BARRIER** | Documented in `CURVATURE_TRANSPORT.md` §15. |
+| WH-008 | Coordinate-Pulled Zero Worldlines vs Static Evaluation: $L_k(s_\rho(k)) \equiv 0$ identically along moving worldline for pulled family $L_k$, while unpulled static evaluation $L(s_\rho(k)) = (\tau^k - 1)(\rho - 1/2) \ne 0$ generically. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`coordinate_pulled_affine_zero_worldline`, `unpulled_affine_zero_worldline_eval`). |
+
+
 

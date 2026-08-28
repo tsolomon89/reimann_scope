@@ -2593,5 +2593,61 @@ satisfies even symmetry $P(-z)=P(z)$, Schwarz symmetry $\overline{P(\bar z)}=P(z
 ### Canonical Earliest Open Obligation: OBL-CT-001A
 Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ is the program's canonical earliest open obligation (`OBL-CT-001A`). Curvature transport bypasses fixed-finite $L^2$ translation invisibility at the spectral detector level ($B_\rho''(0) > 0$), but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair-isolation/infinite-limit barrier remains an open research problem. Reference: `CURVATURE_TRANSPORT.md`.
 
+---
+
+# 44. Canonical Weil–Hermitian Curvature Bridge and Geometric Discrepancy
+
+### Geometric Involution Discrepancy
+For any nontrivial zero $\rho = \beta + i\gamma = 1/2 + \delta + i\gamma \in Z$, the functional reflection involution $J(\rho) = 1-\rho$ and complex conjugation involution $C(\rho) = \bar\rho$ satisfy:
+\[
+\boxed{J(\rho) - C(\rho) = (1 - \rho) - \bar\rho = 1 - 2\Re(\rho) = - 2\delta_\rho, \qquad |J(\rho) - C(\rho)|^2 = 4\delta_\rho^2.}
+\]
+*(Formally proved in Lean 4: `weil_involution_difference`, `weil_involution_norm_sq_discrepancy`).*
+The second-order continuous grade curvature is proportional to the squared geometric involution discrepancy:
+\[
+\boxed{B_\rho''(0) = 2\delta_\rho^2(\log\tau)^2 = \frac{(\log\tau)^2}{2} |J(\rho) - C(\rho)|^2.}
+\]
+
+### Pointwise Rational Weil–Hermitian Curvature Identity
+For any complex zero $\rho \notin \{0, 1\}$, with $|\rho|^2 = \beta^2+\gamma^2$, $|1-\rho|^2 = (1-\beta)^2+\gamma^2$:
+\[
+\boxed{\frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) - \Re\left(\frac{1}{\rho(1-\rho)}\right) = \frac{(1-2\beta)^2}{2|\rho|^2|1-\rho|^2} = \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0.}
+\]
+*(Formally proved in Lean 4: `pointwise_weil_curvature_identity_algebraic`, `pointwise_weil_curvature_nonneg`, `pointwise_weil_curvature_zero_iff`).*
+
+### Discrete Zeta Divisor Summation and Hadamard Constant
+Summing over all nontrivial zeros $Z$ counting multiplicity:
+1. Symmetrized Hermitian sum: $\sum_{\rho \in Z} \frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) = \sum_{\rho \in Z} \frac{1}{|\rho|^2} =: N_\xi$.
+2. Completed-$\xi$ Hadamard sum: $\sum_{\rho \in Z} \frac{1}{\rho(1-\rho)} = 2 + \gamma_{\text{Euler}} - \log(4\pi) =: C_\xi \approx 0.0461914179322420... \in \mathbb R$.
+3. Exact Spectral Target:
+\[
+\boxed{N_\xi - C_\xi = \sum_{\rho \in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \sum_{\rho \in Z} \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0,}
+\]
+with strict equality $N_\xi - C_\xi = 0$ if and only if every $\delta_\rho = 0$ (the Riemann Hypothesis).
+
+### Arithmetic Weil Functional versus Hermitian Companion
+For multiplicative test functions on $\mathbb R_{>0}$ with Mellin transform $\hat g(s) = \int_0^\infty g(x) x^s \frac{dx}{x}$:
+- Weil quadratic form: $Q_W(g) = \sum_{\rho \in Z} \hat g(\rho)\hat g(1-\rho) = \hat g(0)\hat g(1) + \hat g(1)\hat g(0) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}}[g(n) + g(1/n)] - \mathcal W_{\text{arch}}(g)$.
+- Canonical limit $g_0 = \mathbf 1_{(0,1)}$: $Q_W(g_0) = \sum_\rho \frac{1}{\rho(1-\rho)} = C_\xi$.
+- Hermitian companion functional: $Q_H(g) = \sum_{\rho \in Z} |\hat g(\rho)|^2$, with $Q_H(g_0) = N_\xi$.
+
+### GNS Factorization Barrier & Local Prime Definiteness
+1. Involution $g^*(x) = x^{-1}\overline{g(1/x)}$ yields $\widehat{g^*}(s) = \overline{\hat g(1-\bar s)}$ and $Q_W(g * g^*) = \sum_\rho \hat g(\rho)\overline{\hat g(\bar\rho)}$.
+2. Pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are **strictly negative-definite** (all eigenvalues strictly negative, falsifying pure local Hilbert space inner product factorization without global Archimedean and pole distributions).
+3. Positive-definiteness $Q_W(g * g^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952). Defining an arithmetic Hilbert space norm by assuming $Q_W(g * g^*) \ge 0$ without zero-independent positive factorization is circular.
+
+### Corrected Scalar vs Coordinate-Pulled Zero Worldlines
+- Fixed-zero scalar multiplier: For $F(k,s) = g(k,s)L(s)$, $L(\rho) = 0 \implies F(k,\rho) = 0$ and $\partial_k^m F(k,\rho) = 0$ identically for all $m \ge 0$.
+- Coordinate-pulled family: $L_k(s) = L(1/2 + \tau^{-k}(s-1/2))$ evaluated along the moving zero worldline $s_\rho(k) = 1/2 + \tau^k(\rho-1/2)$ vanishes identically: $L_k(s_\rho(k)) = L(\rho) = 0$.
+- Unpulled static function: $L(s_\rho(k)) = (\tau^k - 1)(\rho - 1/2)$, which is generically non-zero for $k \ne 0, \rho \ne 1/2$.
+*(Formally proved in Lean 4: `coordinate_pulled_affine_zero_worldline`, `unpulled_affine_zero_worldline_eval`).*
+
+### Program Classification
+\[
+\boxed{\textbf{Candidate Classification: } \texttt{EXACT\_CURVATURE\_IDENTITY\_PROVED\_ARITHMETIC\_NORM\_OPEN}}
+\]
+Earliest open subgate: Non-circular zero-independent construction of $Q_H(g)$ (`OBL-CT-001A`).
+
+
 
 

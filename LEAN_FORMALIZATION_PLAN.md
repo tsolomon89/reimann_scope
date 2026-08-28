@@ -863,7 +863,23 @@ Formalized in `formal/RiemannScope/CurvatureTransport.lean` (28 compiled formal 
    - `ConditionalCurvatureRigidityBridge`: conditional bridge structure with vanishing arithmetic functional $\mathscr A_\tau = 0$ and curvature identity $\mathscr A_\tau = \sum w_j \delta_j^2$.
    - `ConditionalCurvatureRigidityBridge.all_defects_zero`: formal theorem proving $\forall j, \delta_j = 0$ (RH).
 
-Total compiled project theorem declarations: **114** (0 `sorry`, 0 `admit`, 0 warnings).
+---
 
+# 29. Phase 20 — Weil–Hermitian Curvature Bridge Formalization
 
+Formalized in `formal/RiemannScope/CurvatureTransport.lean` (37 total declarations in module):
 
+1. **Geometric Involution Difference & Squared Discrepancy**:
+   - `weil_involution_difference`: $J(\rho) - C(\rho) = (1-\rho) - \bar\rho = -2\delta_\rho$.
+   - `weil_involution_norm_sq_discrepancy`: Complex.normSq $(J(\rho) - C(\rho)) = 4\delta_\rho^2$.
+2. **Pointwise Rational Weil–Hermitian Curvature Identity**:
+   - `pointwise_weil_curvature_numerator_identity`: $(N_1 + N_2) - 2(\beta(1-\beta) + \gamma^2) = 4\delta^2$.
+   - `pointwise_weil_curvature_identity_algebraic`: $((N_1 + N_2) - 2(\beta(1-\beta) + \gamma^2)) / (2D) = (2\delta^2) / D$.
+   - `pointwise_weil_curvature_weight_pos`: $2/D > 0$ for $D > 0$.
+   - `pointwise_weil_curvature_nonneg`: $(2\delta^2)/D \ge 0$ for $D > 0$.
+   - `pointwise_weil_curvature_zero_iff`: $(2\delta^2)/D = 0 \iff \delta = 0$ for $D > 0$.
+3. **Corrected Zero Worldline vs Static Evaluation**:
+   - `coordinate_pulled_affine_zero_worldline`: coordinate-pulled family $L_k(s_\rho(k)) = 0$ along moving zero worldlines.
+   - `unpulled_affine_zero_worldline_eval`: static evaluation $L(s_\rho(k)) = (\tau^k - 1) z_0$.
+
+Total compiled project theorem declarations: **123** (0 `sorry`, 0 `admit`, 0 warnings).

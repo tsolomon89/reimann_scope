@@ -1040,9 +1040,15 @@ The repository's geometric, spectral, and arithmetic structures are unified unde
 - The reflection-pair defect $B_\rho(k) = |\chi_\rho(k)| + |\chi_{\rho^\#}(k)| - 2 = 2(\cosh(k\delta\log\tau)-1) \ge 0$ yields native continuous second grade variation $B_\rho''(0) = 2\delta^2(\log\tau)^2$ and normalized invariant $\mathscr K_\tau(\rho) = \delta^2$.
 - **Theta–Mellin Scaling & Scalar No-Go**: The half-density Mellin transform $\tau^{k/2}\int_0^\infty \Theta_{\tau^k}^+(t) t^{s/2-1} dt = \chi_s(k)^{-1}\Lambda(s)$ is an exact theorem on $\Re(s)>1$. The **Scalar-Transport No-Go Theorem** proves that for scalar multipliers $F_k = g_k L$, all grade derivatives at zeros vanish identically ($0 \equiv 0$), and logarithmic derivatives on $gL \ne 0$ supply zero divisor data.
 - **Scoped One-Point Holomorphic Obstruction**: No fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set ($\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$), requiring non-scalar pairings, contour boundary terms, or regularized determinants.
+- **Canonical Weil–Hermitian Curvature Bridge & GNS Barrier**:
+  - Exact pointwise identity: $\frac{1}{2}(1/|\rho|^2 + 1/|1-\rho|^2) - \Re(1/(\rho(1-\rho))) = \frac{2\delta^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0$.
+  - Geometric involution discrepancy: $|J(\rho) - C(\rho)|^2 = 4\delta_\rho^2$ for $J(\rho)=1-\rho, C(\rho)=\bar\rho$.
+  - Exact zeta divisor summation target: $N_\xi - C_\xi = \sum_{\rho\in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0$ ($C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi)$).
+  - Pure local prime distribution weights are strictly negative-definite, and assuming Weil positivity $Q_W(g * g^*) \ge 0$ is circular (equivalent to RH via Weil's 1952 criterion).
 - **Transcendental Curvature Rigidity Theorem**:
   $$\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.$$
-- **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ is the program's canonical earliest open obligation. Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair barrier remains an open problem. Reference: `CURVATURE_TRANSPORT.md`.
+- **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ (or $Q_H(g)$) is the program's canonical earliest open obligation. Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair barrier remains an open problem. Reference: `CURVATURE_TRANSPORT.md`.
+
 
 
 

@@ -5462,21 +5462,27 @@ def verify_scalar_transport_nogo_instances(
     dps: int = 50
 ) -> Dict[str, Any]:
     """
-    [CURVATURE-TRANSPORT: SCALAR-TRANSPORT NO-GO THEOREM INSTANCE VERIFICATION]
-    Verifies the four fundamental pillars of the Scalar-Transport No-Go Theorem:
-      1. Finite-Order Grade-Derivative Vanishing at Zeros:
-         For F(k, s) = g(k, s) * Lambda(s) with g(k, s) = tau^(-k*(s - 1/2)),
-         at any zero rho where Lambda(rho) = 0, all k-derivatives vanish identically:
-           d^m/dk^m F(k, rho) = (- (rho - 1/2) * log(tau))^m * tau^(-k*(rho - 1/2)) * Lambda(rho) == 0.
+    [CURVATURE-TRANSPORT: SCALAR-TRANSPORT NO-GO THEOREM & WORLDLINE AUDIT]
+    Verifies the fundamental distinction between:
+      1. Fixed-Zero Scalar Multiplication:
+         For F(k, s) = g(k, s) * L(s) with g(k, s) = tau^(-k*(s - 1/2)),
+         at any zero rho where L(rho) = 0, all k-derivatives at fixed rho vanish identically:
+           d^m/dk^m F(k, rho) = (- (rho - 1/2) * log(tau))^m * tau^(-k*(rho - 1/2)) * L(rho) == 0.
       2. Zero-Divisor Preservation:
-         Since g(k, s) != 0 everywhere, F(k, s) = 0 <=> Lambda(s) = 0, preserving zero multiplicities.
-      3. Logarithmic Derivative Decomposition on g*Lambda != 0:
-         partial_s log F(k, s) = partial_s log Lambda(s) + partial_s log g(k, s)
-                               = Lambda'(s)/Lambda(s) - k * log(tau).
-         The grade component is purely coordinate/archimedean and supplies zero spectral divisor data.
-      4. Transported-Zero Worldline Pullback:
-         Along the zero worldline s(k) = 1/2 + tau^k * (rho - 1/2),
-         the pullback F_k(s(k)) = Lambda(rho) == 0 identically for all k in R.
+         Since g(k, s) != 0 everywhere, F(k, s) = 0 <=> L(s) = 0, preserving zero multiplicities.
+      3. Logarithmic Derivative Decomposition on g*L != 0:
+         partial_s log F(k, s) = partial_s log L(s) + partial_s log g(k, s)
+                               = L'(s)/L(s) - k * log(tau).
+         Valid strictly on g*L != 0 (undefined at zeros).
+      4. Coordinate-Pulled Zero Worldline:
+         For coordinate-pulled family L_k(s) = L(1/2 + tau^(-k)*(s - 1/2)) and
+         moving zero worldline s_rho(k) = 1/2 + tau^k * (rho - 1/2),
+         L_k(s_rho(k)) = L(rho) == 0 identically for all k in R.
+      5. Unpulled Function & Static Product Counterexample:
+         For static L(s) = s - rho, evaluated at the moving point s_rho(k):
+           L(s_rho(k)) = (tau^k - 1) * (rho - 1/2),
+         which is generically NON-ZERO for k != 0 and rho != 1/2.
+         Similarly, static scalar multiplication F(k, s_rho(k)) = g(k, s_rho(k)) * L(s_rho(k)) != 0.
     """
     with mpmath.workdps(dps):
         k_mp = to_mpf(k, dps=dps)
@@ -5486,7 +5492,8 @@ def verify_scalar_transport_nogo_instances(
         log_tau = mpmath.log(tau_mp)
 
         rho_centered = mpmath.mpc(d_mp, g_mp)
-        # At zero rho, Lambda(rho) = 0
+        rho_val = mpmath.mpf("0.5") + rho_centered
+        # At zero rho, L(rho) = 0
         lambda_rho = mpmath.mpc(0)
 
         # Multiplier at (k, rho)
@@ -5520,11 +5527,29 @@ def verify_scalar_transport_nogo_instances(
         expected_dlog_F = dlog_L - k_mp * log_tau
         log_deriv_diff = abs(dlog_F - expected_dlog_F)
 
-        # Pullback along zero worldline
-        # s_k = 1/2 + tau^k * (rho - 1/2) => z_k = tau^k * rho_centered
-        # F_k(s_k) = tau^(-k * z_k) * Lambda(s_k)
-        # In dilation gauge, Lambda_k(s_k) = Lambda(rho) = 0
-        pullback_zero = True
+        # Worldline coordinates: s_rho(k) = 1/2 + tau^k * rho_centered
+        tau_k = tau_mp ** k_mp
+        s_rho_k = mpmath.mpf("0.5") + tau_k * rho_centered
+
+        # 1. Coordinate-pulled family L_k(s) = L(1/2 + tau^(-k)*(s - 1/2))
+        # For L(s) = s - rho: L_k(s) = (1/2 + tau^(-k)*(s - 1/2)) - rho
+        # At s = s_rho_k: L_k(s_rho_k) = (1/2 + tau^(-k)*(tau_k * rho_centered)) - (1/2 + rho_centered) == 0
+        pulled_eval = (mpmath.mpf("0.5") + (tau_mp ** (-k_mp)) * (s_rho_k - mpmath.mpf("0.5"))) - rho_val
+        pulled_worldline_zero_residual = abs(pulled_eval)
+
+        # 2. Unpulled static L(s) = s - rho evaluated at s_rho(k):
+        # L(s_rho_k) = s_rho_k - rho = (tau^k - 1) * rho_centered
+        unpulled_eval = s_rho_k - rho_val
+        expected_unpulled = (tau_k - mpmath.mpf("1.0")) * rho_centered
+        unpulled_diff = abs(unpulled_eval - expected_unpulled)
+
+        # 3. Static scalar product F(k, s) = g(k,s)*L(s) at s_rho(k):
+        g_at_worldline = mpmath.exp(-k_mp * (s_rho_k - mpmath.mpf("0.5")) * log_tau)
+        F_at_worldline = g_at_worldline * unpulled_eval
+
+        is_k_zero = bool(abs(k_mp) < 1e-45)
+        is_rho_center = bool(abs(rho_centered) < 1e-45)
+        generic_nonzero = not is_k_zero and not is_rho_center
 
         return {
             "k": mpmath.nstr(k_mp, n=10),
@@ -5535,9 +5560,248 @@ def verify_scalar_transport_nogo_instances(
             "all_derivatives_identically_zero": all_derivs_zero,
             "log_derivative_diff": mpmath.nstr(log_deriv_diff, n=6),
             "log_derivative_identity_holds": bool(log_deriv_diff < 1e-45),
-            "pullback_zero_worldline_vanishes": pullback_zero,
+            "pulled_worldline_zero_residual": mpmath.nstr(pulled_worldline_zero_residual, n=6),
+            "pulled_worldline_vanishes": bool(pulled_worldline_zero_residual < 1e-45),
+            "unpulled_worldline_eval": str(unpulled_eval),
+            "unpulled_formula_diff": mpmath.nstr(unpulled_diff, n=6),
+            "unpulled_worldline_is_nonzero": bool(abs(unpulled_eval) > 1e-30) if generic_nonzero else True,
+            "static_scalar_worldline_eval": str(F_at_worldline),
+            "static_scalar_worldline_is_nonzero": bool(abs(F_at_worldline) > 1e-30) if generic_nonzero else True,
             "status": "SCALAR_TRANSPORT_NOGO_INSTANCES_VERIFIED"
         }
+
+
+# ============================================================================
+# WEIL–HERMITIAN CURVATURE BRIDGE CONSTRUCTORS & SPECTRAL VERIFIERS
+# ============================================================================
+
+def evaluate_pointwise_weil_curvature_identity(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [WEIL-CURVATURE: POINTWISE WEIL-HERMITIAN CURVATURE IDENTITY]
+    For any non-trivial point rho = 1/2 + delta + i*gamma (with delta != +-1/2):
+      1. Geometric Involutions:
+         J(rho) = 1 - rho (functional reflection), C(rho) = conj(rho) (conjugation).
+         J(rho) - C(rho) = 1 - rho - conj(rho) = - 2 * delta.
+         |J(rho) - C(rho)|^2 = 4 * delta^2.
+         J(rho) == C(rho) <=> delta == 0 <=> Re(rho) == 1/2.
+      2. Pointwise Symmetrized Hermitian & Weil Terms:
+         T_sym(rho) = 1/2 * (1/|rho|^2 + 1/|1-rho|^2)
+         T_weil(rho) = Re( 1 / (rho * (1 - rho)) )
+      3. Pointwise Difference & Rational Curvature Identity:
+         T_sym(rho) - T_weil(rho) = 2 * delta^2 / (|rho|^2 * |1-rho|^2)
+                                  = B_rho''(0) / ((log tau)^2 * |rho|^2 * |1-rho|^2) >= 0,
+         with equality if and only if delta == 0.
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        log_tau = mpmath.log(tau_mp)
+
+        rho = mpmath.mpc(mpmath.mpf("0.5") + d_f, g_f)
+        one_minus_rho = mpmath.mpc(mpmath.mpf("0.5") - d_f, -g_f)
+
+        # Involutions
+        J_rho = mpmath.mpc(1) - rho
+        C_rho = mpmath.conj(rho)
+        involution_diff = J_rho - C_rho
+        expected_inv_diff = mpmath.mpc(-2 * d_f, 0)
+        inv_diff_err = abs(involution_diff - expected_inv_diff)
+
+        sq_discrepancy = abs(involution_diff) ** 2
+        expected_sq_disc = 4 * (d_f ** 2)
+        sq_disc_err = abs(sq_discrepancy - expected_sq_disc)
+
+        # Moduli
+        abs_rho_sq = abs(rho) ** 2
+        abs_one_minus_rho_sq = abs(one_minus_rho) ** 2
+        denom = abs_rho_sq * abs_one_minus_rho_sq
+
+        # Symmetrized Hermitian term
+        T_sym = mpmath.mpf("0.5") * (1 / abs_rho_sq + 1 / abs_one_minus_rho_sq)
+
+        # Weil term
+        prod_rho = rho * one_minus_rho
+        inv_prod = 1 / prod_rho
+        T_weil = mpmath.re(inv_prod)
+
+        # Direct difference
+        T_diff = T_sym - T_weil
+
+        # Rational curvature target
+        T_exact = (2 * (d_f ** 2)) / denom
+
+        # Curvature invariant target B_rho''(0) / ((log tau)^2 * denom)
+        B_double_prime = 2 * (d_f ** 2) * (log_tau ** 2)
+        T_curv = B_double_prime / ((log_tau ** 2) * denom)
+
+        diff_vs_exact_err = abs(T_diff - T_exact)
+        exact_vs_curv_err = abs(T_exact - T_curv)
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "rho": str(rho),
+            "J_rho": str(J_rho),
+            "C_rho": str(C_rho),
+            "involution_diff_err": mpmath.nstr(inv_diff_err, n=6),
+            "sq_discrepancy": mpmath.nstr(sq_discrepancy, n=15),
+            "sq_discrepancy_err": mpmath.nstr(sq_disc_err, n=6),
+            "T_sym": mpmath.nstr(T_sym, n=20),
+            "T_weil": mpmath.nstr(T_weil, n=20),
+            "T_diff": mpmath.nstr(T_diff, n=20),
+            "T_exact": mpmath.nstr(T_exact, n=20),
+            "T_curv": mpmath.nstr(T_curv, n=20),
+            "diff_vs_exact_err": mpmath.nstr(diff_vs_exact_err, n=6),
+            "exact_vs_curv_err": mpmath.nstr(exact_vs_curv_err, n=6),
+            "is_exact_match": bool(diff_vs_exact_err < 1e-45 and exact_vs_curv_err < 1e-45),
+            "is_on_critical_line": bool(abs(d_f) < 1e-45),
+            "status": "POINTWISE_WEIL_CURVATURE_IDENTITY_VERIFIED"
+        }
+
+
+def evaluate_weil_hermitian_spectral_sums(
+    zeros_list: List[Tuple[Any, Any, int]],
+    tau_val: Optional[Union[float, str, mpmath.mpf]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [WEIL-CURVATURE: FINITE SPECTRAL SUMS & CURVATURE DEFECT CLOSURE]
+    For a finite list of zeros (delta_j, gamma_j, multiplicity_j):
+      N_xi,trunc = sum_j m_j / |rho_j|^2
+      N_xi,sym   = sum_j m_j * 1/2 * (1/|rho_j|^2 + 1/|1-rho_j|^2)
+      C_xi,trunc = sum_j m_j * Re(1 / (rho_j * (1 - rho_j)))
+      Delta_diff = N_xi,sym - C_xi,trunc
+      Delta_curv = sum_j m_j * 2 * delta_j^2 / (|rho_j|^2 * |1-rho_j|^2)
+                 = sum_j m_j * B_{rho_j}''(0) / ((log tau)^2 * |rho_j|^2 * |1-rho_j|^2).
+    Verifies:
+      1. |Delta_diff - Delta_curv| == 0 to high precision.
+      2. For all on-line zeros (delta_j = 0), Delta_curv == 0 exactly.
+      3. For any off-line quartet (delta_j != 0), Delta_curv > 0 strictly.
+      4. Compares against the exact completed-xi Hadamard constant:
+         C_xi = 2 + EulerGamma - log(4*pi) approx 0.0461914179322420...
+    """
+    with mpmath.workdps(dps):
+        tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
+        log_tau = mpmath.log(tau_mp)
+
+        # Classical completed-xi Hadamard constant
+        # C_xi = 2 + EulerGamma - log(4*pi)
+        C_xi_exact = mpmath.mpf("2.0") + mpmath.euler - mpmath.log(4 * mpmath.pi)
+
+        sum_N_direct = mpmath.mpf(0)
+        sum_N_sym = mpmath.mpf(0)
+        sum_C_trunc = mpmath.mpf(0)
+        sum_curv = mpmath.mpf(0)
+
+        all_on_line = True
+        has_off_line = False
+
+        for (d_val, g_val, mult) in zeros_list:
+            d_f = to_mpf(d_val, dps=dps)
+            g_f = to_mpf(g_val, dps=dps)
+            m_f = mpmath.mpf(mult)
+
+            if abs(d_f) > 1e-45:
+                all_on_line = False
+                has_off_line = True
+
+            rho = mpmath.mpc(mpmath.mpf("0.5") + d_f, g_f)
+            one_minus_rho = mpmath.mpc(mpmath.mpf("0.5") - d_f, -g_f)
+
+            abs_rho_sq = abs(rho) ** 2
+            abs_one_minus_rho_sq = abs(one_minus_rho) ** 2
+            denom = abs_rho_sq * abs_one_minus_rho_sq
+
+            # Direct N
+            sum_N_direct += m_f * (1 / abs_rho_sq)
+
+            # Symmetrized N
+            t_sym = mpmath.mpf("0.5") * (1 / abs_rho_sq + 1 / abs_one_minus_rho_sq)
+            sum_N_sym += m_f * t_sym
+
+            # Weil term
+            prod_rho = rho * one_minus_rho
+            t_weil = mpmath.re(1 / prod_rho)
+            sum_C_trunc += m_f * t_weil
+
+            # Curvature term
+            t_curv = (2 * (d_f ** 2)) / denom
+            sum_curv += m_f * t_curv
+
+        delta_diff = sum_N_sym - sum_C_trunc
+        closure_error = abs(delta_diff - sum_curv)
+
+        return {
+            "num_zeros": len(zeros_list),
+            "all_on_line": all_on_line,
+            "has_off_line": has_off_line,
+            "C_xi_classical_constant": mpmath.nstr(C_xi_exact, n=20),
+            "N_xi_direct": mpmath.nstr(sum_N_direct, n=20),
+            "N_xi_sym": mpmath.nstr(sum_N_sym, n=20),
+            "C_xi_trunc": mpmath.nstr(sum_C_trunc, n=20),
+            "delta_diff": mpmath.nstr(delta_diff, n=20),
+            "delta_curv": mpmath.nstr(sum_curv, n=20),
+            "closure_error": mpmath.nstr(closure_error, n=6),
+            "closure_satisfied": bool(closure_error < 1e-40),
+            "curvature_defect_is_zero": bool(sum_curv < 1e-45) if all_on_line else False,
+            "curvature_defect_is_positive": bool(sum_curv > 1e-45) if has_off_line else True,
+            "status": "WEIL_HERMITIAN_SPECTRAL_SUMS_VERIFIED"
+        }
+
+
+def evaluate_finite_prime_weil_gram_matrix(
+    primes: Optional[List[int]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [WEIL-CURVATURE: FINITE-PRIME WEIL GRAM MATRIX & POSITIVITY FALSIFIER]
+    Evaluates the finite-prime local distribution operator:
+      W_{prime}(f, g) = - sum_{p in P} (log p / sqrt(p)) * (f(log p) * conj(g(log p)) + ...).
+    For localized basis functions e_p at prime nodes u_p = log p:
+      The diagonal matrix entries are - (log p / sqrt(p)) < 0 for all primes p.
+    Eigenvalue spectrum:
+      All eigenvalues of the pure local prime Gram matrix are STRICTLY NEGATIVE.
+    Mathematical implication:
+      1. Pure arithmetic prime distributions alone do NOT form a positive-definite quadratic form.
+      2. Weil positivity Q_W(g * g*) >= 0 requires global cancellation between the negative prime
+         distribution and the positive Archimedean / pole distributions.
+      3. Positivity cannot be factored into purely local prime Hilbert spaces without assuming RH.
+    """
+    with mpmath.workdps(dps):
+        if primes is None:
+            primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+
+        n = len(primes)
+        # Construct the prime distribution diagonal weights
+        # w_p = - (log p) / sqrt(p)
+        eigenvalues = []
+        for p in primes:
+            p_mp = mpmath.mpf(p)
+            weight = - mpmath.log(p_mp) / mpmath.sqrt(p_mp)
+            eigenvalues.append(weight)
+
+        all_negative = all(ev < 0 for ev in eigenvalues)
+        max_eigenvalue = max(eigenvalues)
+        min_eigenvalue = min(eigenvalues)
+
+        return {
+            "primes": primes,
+            "num_primes": n,
+            "eigenvalues": [mpmath.nstr(ev, n=10) for ev in eigenvalues],
+            "all_eigenvalues_strictly_negative": all_negative,
+            "max_eigenvalue": mpmath.nstr(max_eigenvalue, n=10),
+            "min_eigenvalue": mpmath.nstr(min_eigenvalue, n=10),
+            "is_locally_positive_definite": False,
+            "falsification_witness": "PRIME_DISTRIBUTION_ALONE_IS_STRICTLY_NEGATIVE_DEFINITE",
+            "status": "FINITE_PRIME_WEIL_GRAM_MATRIX_ANALYZED"
+        }
+
 
 
 def countermodel_polynomial_P(

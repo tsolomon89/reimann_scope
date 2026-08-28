@@ -363,6 +363,17 @@ The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) unifies:
 Under the **Transcendental Curvature Rigidity Theorem**, any divisor-independent arithmetic functional $\mathscr A_\tau(\xi) = 0$ with spectral expansion $\mathscr A_\tau(\xi) = \sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) implies RH.
 Constructing such a functional without zero inputs is the program's canonical open obligation: the **Non-Scalar Arithmetic Functional Construction** (`OBL-CT-001A`). Curvature transport operates at the orbit level and bypasses fixed-finite $L^2$ translation invisibility at the spectral detector level ($B_\rho''(0) > 0$), but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair-isolation/infinite-limit barrier remains an open research problem.
 
+### 10.6 Canonical Weil–Hermitian Curvature Bridge & GNS Barrier
+
+The **Weil–Hermitian Curvature Bridge** (`CURVATURE_TRANSPORT.md` §14–15) connects continuous grade curvature to the arithmetic explicit formula:
+1. **Geometric Discrepancy**: $|J(\rho) - C(\rho)|^2 = 4\delta_\rho^2$ for functional reflection $J(\rho) = 1-\rho$ and complex conjugation $C(\rho) = \bar\rho$.
+2. **Pointwise Rational Identity**:
+   $$\frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) - \Re\left(\frac{1}{\rho(1-\rho)}\right) = \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0.$$
+3. **Discrete Summation & Hadamard Constant**:
+   $$N_\xi - C_\xi = \sum_{\rho \in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0, \qquad C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi) \approx 0.0461914179322420...$$
+4. **GNS Positive-Type Barrier**:
+   Pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are strictly negative-definite (all eigenvalues strictly negative). Defining an arithmetic Hilbert space norm via $Q_W(g * g^*) \ge 0$ without zero-independent positive factorization is logically circular, since $Q_W(g * g^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952).
+
 ---
 
 ## 11. Current Status and Research Protocol
@@ -372,8 +383,9 @@ Constructing such a functional without zero inputs is the program's canonical op
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in CMSA derivation).
 - **Transcendental Continuation Activation Theorem (`OBL-TC-ACT`)**: Precise earliest open subgate for Gate G4.
-- **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+- **Candidate Classification**: `EXACT_CURVATURE_IDENTITY_PROVED_ARITHMETIC_NORM_OPEN` (Weil–Hermitian Curvature Bridge) / `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+
 
 
 

@@ -1,0 +1,137 @@
+"""tests/test_weil_curvature.py — Verification Suite for Weil–Hermitian Curvature Identities
+
+Verifies:
+1. Pointwise Weil–curvature identity:
+   1/2 * (1/|rho|^2 + 1/|1-rho|^2) - Re(1 / (rho*(1-rho))) = 2*delta^2 / (|rho|^2 * |1-rho|^2)
+                                                            = B_rho''(0) / ((log tau)^2 * |rho|^2 * |1-rho|^2).
+2. Geometric involution difference and squared discrepancy:
+   J(rho) - C(rho) = 1 - rho - conj(rho) = - 2 * delta,
+   |J(rho) - C(rho)|^2 = 4 * delta^2.
+3. Truncated spectral sum closure on reference zeros and synthetic quartets:
+   N_xi,sym - C_xi,trunc = sum 2*delta_j^2 / (|rho_j|^2 * |1-rho_j|^2).
+4. On-line zero rigidity: Delta_curv == 0 for all delta_j = 0.
+5. Off-line quartet strict positivity: Delta_curv > 0 for delta_j != 0.
+6. Finite-prime local Gram matrix negative-definiteness (falsification witness for local-prime Hilbert space factorization).
+7. Completed-xi Hadamard constant C_xi = 2 + EulerGamma - log(4*pi).
+"""
+
+import mpmath
+import pytest
+import math_core
+from reference_data import load_first_100_reference_zeros
+
+
+class TestPointwiseWeilCurvatureIdentity:
+    """Verifies the pointwise Weil-Hermitian rational identity and geometric involutions."""
+
+    @pytest.mark.parametrize("delta,gamma", [
+        ("0.0", "14.134725"),
+        ("0.0", "21.022040"),
+        ("0.0", "100.123456"),
+        ("0.001", "14.134725"),
+        ("-0.005", "21.022040"),
+        ("0.025", "30.424876"),
+        ("-0.10", "50.000000"),
+        ("0.25", "10.000000"),
+    ])
+    def test_pointwise_weil_curvature_exact_match(self, delta, gamma):
+        res = math_core.evaluate_pointwise_weil_curvature_identity(delta=delta, gamma=gamma, dps=50)
+        assert res["status"] == "POINTWISE_WEIL_CURVATURE_IDENTITY_VERIFIED"
+        assert res["is_exact_match"] is True
+        assert float(res["involution_diff_err"]) < 1e-45
+        assert float(res["sq_discrepancy_err"]) < 1e-45
+        assert float(res["diff_vs_exact_err"]) < 1e-45
+        assert float(res["exact_vs_curv_err"]) < 1e-45
+
+        # On-line vs off-line checks
+        if delta == "0.0":
+            assert res["is_on_critical_line"] is True
+            assert abs(float(res["T_diff"])) < 1e-45
+            assert abs(float(res["T_exact"])) < 1e-45
+            assert abs(float(res["sq_discrepancy"])) < 1e-45
+        else:
+            assert res["is_on_critical_line"] is False
+            assert float(res["T_diff"]) > 0.0
+            assert float(res["T_exact"]) > 0.0
+            assert float(res["sq_discrepancy"]) > 0.0
+
+
+class TestWeilSpectralSumsAndRigidity:
+    """Verifies finite spectral sums closure, on-line rigidity, and off-line positivity."""
+
+    def test_first_10_reference_zeros_on_line_rigidity(self):
+        zeros_100 = load_first_100_reference_zeros()
+        zeros_10 = [("0.0", str(gam), 1) for gam in zeros_100[:10]]
+        res = math_core.evaluate_weil_hermitian_spectral_sums(zeros_10, dps=50)
+
+        assert res["status"] == "WEIL_HERMITIAN_SPECTRAL_SUMS_VERIFIED"
+        assert res["closure_satisfied"] is True
+        assert float(res["closure_error"]) < 1e-40
+        assert res["all_on_line"] is True
+        assert res["curvature_defect_is_zero"] is True
+        assert float(res["delta_curv"]) == 0.0
+        # N_xi,sym == C_xi,trunc for on-line zeros
+        assert abs(float(res["N_xi_sym"]) - float(res["C_xi_trunc"])) < 1e-40
+
+    def test_first_100_reference_zeros_on_line_rigidity(self):
+        zeros_100 = load_first_100_reference_zeros()
+        zeros_data = [("0.0", str(gam), 1) for gam in zeros_100]
+        res = math_core.evaluate_weil_hermitian_spectral_sums(zeros_data, dps=50)
+
+        assert res["status"] == "WEIL_HERMITIAN_SPECTRAL_SUMS_VERIFIED"
+        assert res["closure_satisfied"] is True
+        assert res["curvature_defect_is_zero"] is True
+        assert float(res["delta_curv"]) == 0.0
+
+        # Verify monotonicity towards C_xi
+        C_xi_exact = float(res["C_xi_classical_constant"])
+        C_xi_trunc_100 = float(res["C_xi_trunc"])
+        assert 0 < C_xi_trunc_100 < C_xi_exact
+
+    def test_synthetic_offline_quartet_strict_positivity(self):
+        """Off-line quartets generate strictly positive curvature defect Delta_curv > 0."""
+        quartet = [
+            ("0.05", "14.134725", 1),
+            ("0.05", "-14.134725", 1),
+            ("-0.05", "14.134725", 1),
+            ("-0.05", "-14.134725", 1),
+        ]
+        res = math_core.evaluate_weil_hermitian_spectral_sums(quartet, dps=50)
+
+        assert res["status"] == "WEIL_HERMITIAN_SPECTRAL_SUMS_VERIFIED"
+        assert res["closure_satisfied"] is True
+        assert res["has_off_line"] is True
+        assert res["curvature_defect_is_positive"] is True
+        assert float(res["delta_curv"]) > 0.0
+        assert abs(float(res["delta_diff"]) - float(res["delta_curv"])) < 1e-40
+
+    def test_mixed_online_and_offline_zeros(self):
+        """Mixed configuration of on-line zeros and off-line quartets."""
+        zeros_100 = load_first_100_reference_zeros()
+        mixed = [("0.0", str(gam), 1) for gam in zeros_100[:5]]
+        mixed.extend([
+            ("0.02", "25.010857", 1),
+            ("-0.02", "25.010857", 1),
+        ])
+        res = math_core.evaluate_weil_hermitian_spectral_sums(mixed, dps=50)
+
+        assert res["status"] == "WEIL_HERMITIAN_SPECTRAL_SUMS_VERIFIED"
+        assert res["closure_satisfied"] is True
+        assert res["has_off_line"] is True
+        assert res["curvature_defect_is_positive"] is True
+        assert float(res["delta_curv"]) > 0.0
+
+
+class TestFinitePrimeWeilGramMatrix:
+    """Verifies that local prime distributions alone produce strictly negative eigenvalues."""
+
+    def test_finite_prime_negative_eigenvalues(self):
+        primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+        res = math_core.evaluate_finite_prime_weil_gram_matrix(primes=primes, dps=50)
+
+        assert res["status"] == "FINITE_PRIME_WEIL_GRAM_MATRIX_ANALYZED"
+        assert res["all_eigenvalues_strictly_negative"] is True
+        assert res["is_locally_positive_definite"] is False
+        assert float(res["max_eigenvalue"]) < 0.0
+        assert float(res["min_eigenvalue"]) < 0.0
+        assert res["falsification_witness"] == "PRIME_DISTRIBUTION_ALONE_IS_STRICTLY_NEGATIVE_DEFINITE"

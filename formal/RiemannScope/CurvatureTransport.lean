@@ -306,10 +306,104 @@ theorem countermodelPolynomial_root_neg_neg (δ γ : ℝ) :
     push_cast; ring
   rw [h_diff, mul_zero]
 
-/-- 28. Conditional Curvature Rigidity Bridge:
-    Encapsulates the exact reader-facing theorem schema for Transcendental Curvature Rigidity.
-    If a divisor-independent arithmetic functional evaluates to 0 and equals the positive-weighted
-    sum of orbit curvatures (reconciled with delta_j^2), then every represented defect delta_j is zero. -/
+/-- 28. Weil involution difference:
+    For rho = ⟨1/2 + delta, gamma⟩, the difference between functional reflection J(rho) = 1 - rho
+    and complex conjugation C(rho) = ⟨rho.re, -rho.im⟩ is J(rho) - C(rho) = - 2 * delta. -/
+theorem weil_involution_difference (δ γ : ℝ) :
+    (1 : ℂ) - ⟨1/2 + δ, γ⟩ - ⟨1/2 + δ, -γ⟩ = ⟨-2 * δ, 0⟩ := by
+  apply Complex.ext <;> dsimp <;> ring
+
+/-- 29. Weil involution squared discrepancy:
+    The squared norm of the involution difference is exactly 4 * delta^2:
+    normSq (J(rho) - C(rho)) = 4 * delta^2. -/
+theorem weil_involution_norm_sq_discrepancy (δ γ : ℝ) :
+    Complex.normSq ((1 : ℂ) - ⟨1/2 + δ, γ⟩ - ⟨1/2 + δ, -γ⟩) = 4 * δ ^ 2 := by
+  rw [weil_involution_difference]
+  dsimp [Complex.normSq]
+  ring
+
+/-- 30. Pointwise numerator identity for the rational Weil-Hermitian curvature difference:
+    (N1 + N2) - 2 * (beta * (1 - beta) + gamma^2) = 4 * delta^2. -/
+theorem pointwise_weil_curvature_numerator_identity (δ γ : ℝ) :
+    let β := 1/2 + δ
+    let N1 := β ^ 2 + γ ^ 2
+    let N2 := (1 - β) ^ 2 + γ ^ 2
+    (N1 + N2) - 2 * (β * (1 - β) + γ ^ 2) = 4 * δ ^ 2 := by
+  intro β N1 N2
+  dsimp [N1, N2, β]
+  ring
+
+/-- 31. Pointwise rational Weil-Hermitian curvature identity:
+    ((N1 + N2) - 2 * (beta * (1 - beta) + gamma^2)) / (2 * D) = (2 * delta^2) / D. -/
+theorem pointwise_weil_curvature_identity_algebraic (δ γ D : ℝ) :
+    let β := 1/2 + δ
+    let N1 := β ^ 2 + γ ^ 2
+    let N2 := (1 - β) ^ 2 + γ ^ 2
+    ((N1 + N2) - 2 * (β * (1 - β) + γ ^ 2)) / (2 * D) = (2 * δ ^ 2) / D := by
+  intro β N1 N2
+  have h_num : (N1 + N2) - 2 * (β * (1 - β) + γ ^ 2) = 4 * δ ^ 2 :=
+    pointwise_weil_curvature_numerator_identity δ γ
+  have h2 : (2 : ℝ) ≠ 0 := by norm_num
+  calc ((N1 + N2) - 2 * (β * (1 - β) + γ ^ 2)) / (2 * D)
+    _ = (4 * δ ^ 2) / (2 * D) := by rw [h_num]
+    _ = (2 * (2 * δ ^ 2)) / (2 * D) := by ring_nf
+    _ = (2 / 2) * ((2 * δ ^ 2) / D) := by rw [mul_div_mul_comm]
+    _ = 1 * ((2 * δ ^ 2) / D) := by rw [div_self h2]
+    _ = (2 * δ ^ 2) / D := one_mul _
+
+/-- 32. Pointwise Weil-curvature weight is strictly positive:
+    For D > 0, the rational curvature weight 2 / D is strictly positive. -/
+theorem pointwise_weil_curvature_weight_pos (D : ℝ) (hD : 0 < D) :
+    0 < 2 / D := by
+  have h2 : (0 : ℝ) < 2 := by norm_num
+  exact div_pos h2 hD
+
+/-- 33. Pointwise Weil-curvature defect is non-negative:
+    For D > 0, (2 * delta^2) / D >= 0. -/
+theorem pointwise_weil_curvature_nonneg (δ D : ℝ) (hD : 0 < D) :
+    0 ≤ (2 * δ ^ 2) / D := by
+  have h_num : 0 ≤ 2 * δ ^ 2 := by
+    have h2 : (0 : ℝ) ≤ 2 := by norm_num
+    have hd2 : 0 ≤ δ ^ 2 := sq_nonneg δ
+    exact mul_nonneg h2 hd2
+  exact div_nonneg h_num (le_of_lt hD)
+
+/-- 34. Pointwise Weil-curvature defect zero-rigidity:
+    For D > 0, (2 * delta^2) / D = 0 iff delta = 0. -/
+theorem pointwise_weil_curvature_zero_iff (δ D : ℝ) (hD : 0 < D) :
+    (2 * δ ^ 2) / D = 0 ↔ δ = 0 := by
+  have hD_ne : D ≠ 0 := ne_of_gt hD
+  have h2 : (2 : ℝ) ≠ 0 := by norm_num
+  constructor
+  · intro h
+    have h_num : 2 * δ ^ 2 = 0 := (div_eq_zero_iff.mp h).resolve_right hD_ne
+    have h_sq : δ ^ 2 = 0 := (mul_eq_zero.mp h_num).resolve_left h2
+    exact sq_eq_zero_iff.mp h_sq
+  · intro hd
+    rw [hd]
+    ring_nf
+
+/-- 35. Coordinate-pulled affine zero worldline vanishing:
+    For affine zero L(s) = (s - 1/2) - z0, pulled family L_k(s) = (tau^(-k) * (s - 1/2)) - z0,
+    evaluated at moving worldline s_rho(k) = 1/2 + tau^k * z0, L_k(s_rho(k)) = 0 identically. -/
+theorem coordinate_pulled_affine_zero_worldline (tau_k tau_inv_k z0 : ℂ)
+    (h_inv : tau_inv_k * tau_k = 1) :
+    (tau_inv_k * ((1/2 + tau_k * z0) - 1/2)) - z0 = 0 := by
+  have h_sub : (1/2 + tau_k * z0 : ℂ) - 1/2 = tau_k * z0 := by ring
+  rw [h_sub, ← mul_assoc, h_inv, one_mul, sub_self]
+
+/-- 36. Unpulled static affine function evaluated at moving worldline:
+    For static L(s) = (s - 1/2) - z0, evaluated at moving worldline s_rho(k) = 1/2 + tau_k * z0,
+    L(s_rho(k)) = (tau_k - 1) * z0, which is generically non-zero for tau_k != 1 and z0 != 0. -/
+theorem unpulled_affine_zero_worldline_eval (tau_k z0 : ℂ) :
+    ((1/2 + tau_k * z0 : ℂ) - 1/2) - z0 = (tau_k - 1) * z0 := by
+  ring
+
+/-- 37. Conditional Weil-Hermitian Curvature Bridge:
+    Encapsulates the exact reader-facing theorem schema for the Weil-Hermitian Curvature Bridge.
+    If the arithmetic Weil-Hermitian defect Q_H(g_0) - Q_W(g_0) evaluates to 0 and equals the
+    positive-weighted sum of zero curvature defects (sum_j w_j * delta_j^2),
+    then every represented zero off-line displacement delta_j is zero. -/
 structure ConditionalCurvatureRigidityBridge where
   arithmetic_functional_value : ℝ
   weights : List ℝ
@@ -331,4 +425,6 @@ theorem ConditionalCurvatureRigidityBridge.all_defects_zero
     bridge.lengths_eq h_sum_zero
 
 end RiemannScope
+
+
 

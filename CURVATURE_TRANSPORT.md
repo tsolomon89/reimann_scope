@@ -339,63 +339,143 @@ $$P_{\delta,\gamma}(z) = \left((z - i\gamma)^2 - \delta^2\right)\left((z + i\gam
 
 ---
 
-## 13. Candidate Non-Scalar Frameworks and Gate Audits
+## 13. Geometric Involution Discrepancy ($J$ versus $C$)
 
-We audit two candidate families for constructing a non-scalar arithmetic curvature functional:
+Let $Z$ denote the multiset of nontrivial zeros of $\zeta(s)$ counted with multiplicity. For any $\rho = \beta + i\gamma = 1/2 + \delta + i\gamma \in Z$:
 
-### Candidate CT-4A: Paired Theta–Mellin Functional
-- **Formulation Schema**: Sesquilinear cross-grade pairing $\mathscr{A}_\tau(\xi) = \iint \mathcal{K}_\tau(t_1, t_2) \Theta^+(t_1) \Theta^+(t_2) dt_1 dt_2 - \mathcal{R}_{\text{diag}}$.
-- **Earliest Open Gate**: Regularization and isolation of involution pairs $(\rho, \rho^\#)$ without unconstrained cross-terms $(\rho_1, \rho_2)$.
+Define the two fundamental zero involutions:
+1. **Functional Reflection Involution**:
+   $$J(\rho) = 1 - \rho = \frac{1}{2} - \delta - i\gamma$$
+2. **Complex Conjugation Involution**:
+   $$C(\rho) = \bar\rho = \frac{1}{2} + \delta - i\gamma$$
 
-### Candidate CT-4B: Determinant / Hadamard Curvature-Descent Anomaly
-- **Formulation Schema**: Second grade variation of regularized Fredholm determinant $\left.\frac{d^2}{dk^2} \log \det(I + \mathcal{R}_k)\right|_{k=0}$.
-- **Earliest Open Gate**: Divisor-independent arithmetic definition without supplying zeta zeros as spectrum.
+### Exact Involution Difference and Squared Discrepancy
+$$\boxed{
+J(\rho) - C(\rho) = (1 - \rho) - \bar\rho = 1 - 2\Re(\rho) = - 2\delta_\rho
+}$$
+$$(Formally proved in Lean 4: `weil_involution_difference`).$$
 
----
+Taking the squared complex modulus yields:
+$$\boxed{
+|J(\rho) - C(\rho)|^2 = |-2\delta_\rho|^2 = 4\delta_\rho^2
+}$$
+$$(Formally proved in Lean 4: `weil_involution_norm_sq_discrepancy`).$$
 
-## 14. Reader-Facing Transcendental Curvature Rigidity Theorem
-
-> ### **Theorem (Transcendental Curvature Rigidity — Conditional Schema)**
-> Let the nontrivial zeros of $\zeta(s)$ be enumerated as $\rho_j = 1/2 + \delta_j + i\gamma_j$. Suppose there exists a divisor-independent arithmetic functional $\mathscr{A}_\tau(\xi)$ constructed from prime powers and archimedean factors such that:
->
-> 1. **Arithmetic Vanishing**:
->    $$\mathscr{A}_\tau(\xi) = 0$$
-> 2. **Curvature Spectral Expansion**:
->    $$\mathscr{A}_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \, \mathscr{K}_\tau(\rho)$$
->    under an absolutely convergent sum with strictly positive weights $W_\rho > 0$, where
->    $$\mathscr{K}_\tau(\rho) = \frac{1}{2(\log\tau)^2} \left.\frac{d^2}{dk^2} \left(|\tau^{k(\rho-1/2)}| + |\tau^{k(\rho^\#-1/2)}| - 2\right)\right|_{k=0} = \left(\Re\rho - \frac{1}{2}\right)^2 = \delta_\rho^2$$
->
-> **Then** every nontrivial zero satisfies $\Re\rho = 1/2$ ($\delta_\rho = 0$), establishing the Riemann Hypothesis.
-
-*Proof Schema*:
-$$0 = \mathscr{A}_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \overset{W_\rho > 0, \, \delta_\rho^2 \ge 0}{\implies} \forall \rho, \; \delta_\rho = 0 \iff \Re\rho = \frac{1}{2}.$$
-*(Formally proved in Lean 4: `ConditionalCurvatureRigidityBridge.all_defects_zero`).*
+### Geometric Characterization
+1. **Coincidence on Critical Line**:
+   $$J(\rho) = C(\rho) \iff \delta_\rho = 0 \iff \Re(\rho) = \frac{1}{2}$$
+2. **Discrepancy Measure**:
+   The second-order continuous grade curvature $B_\rho''(0) = 2\delta_\rho^2(\log\tau)^2$ is directly proportional to the squared geometric discrepancy between functional reflection $J$ and complex conjugation $C$:
+   $$B_\rho''(0) = \frac{(\log\tau)^2}{2} |J(\rho) - C(\rho)|^2$$
 
 ---
 
-## 15. Sharpened Proof Obligations: OBL-CT-001A–D
+## 14. Canonical Weil–Hermitian Curvature Identity
 
-Because no divisor-independent non-scalar arithmetic functional has yet been constructed, the obligation is sharpened into four sequential gates:
+### Pointwise Rational Identity
+For any complex zero $\rho = \beta + i\gamma = 1/2 + \delta + i\gamma$ ($\rho \notin \{0, 1\}$):
+- Moduli: $|\rho|^2 = \beta^2 + \gamma^2$, $|1-\rho|^2 = (1-\beta)^2 + \gamma^2$;
+- Symmetrized Hermitian term: $T_{\text{sym}}(\rho) = \frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) = \frac{\beta^2 - \beta + 1/2 + \gamma^2}{|\rho|^2|1-\rho|^2}$;
+- Weil pairing term: $T_{\text{weil}}(\rho) = \Re\left(\frac{1}{\rho(1-\rho)}\right) = \frac{\beta(1-\beta) + \gamma^2}{|\rho|^2|1-\rho|^2}$.
 
-```
-[OBL-CT-001A] Construct zero-independent non-scalar functional A_tau, domains & regularization
-      |
-[OBL-CT-001B] Derive spectral expansion A_tau = sum W_rho delta_rho^2
-      |
-[OBL-CT-001C] Prove absolute convergence, involution-pair isolation & strict positivity W_rho > 0
-      |
-[OBL-CT-001D] Combine arithmetic vanishing A_tau = 0 with curvature rigidity => RH
-```
+Subtracting the Weil pairing from the symmetrized Hermitian term:
+$$T_{\text{sym}}(\rho) - T_{\text{weil}}(\rho) = \frac{(\beta^2 - \beta + 1/2 + \gamma^2) - (\beta - \beta^2 + \gamma^2)}{|\rho|^2|1-\rho|^2} = \frac{2\beta^2 - 2\beta + 1/2}{|\rho|^2|1-\rho|^2} = \frac{(1-2\beta)^2}{2|\rho|^2|1-\rho|^2}$$
+
+Since $1-2\beta = -2\delta$, $(1-2\beta)^2 = 4\delta^2$, yielding the exact rational identity:
+$$\boxed{
+\frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) - \Re\left(\frac{1}{\rho(1-\rho)}\right) = \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0
+}$$
+$$(Formally proved in Lean 4: `pointwise_weil_curvature_identity_algebraic`, `pointwise_weil_curvature_nonneg`, `pointwise_weil_curvature_zero_iff`).$$
+
+### Summation Over the Discrete Zeta Divisor
+Summing over all nontrivial zeros $Z$ counting multiplicity:
+1. **Multiplicities & Functional Equation Symmetry**: Since $\xi(s) = \xi(1-s)$, the multiset $Z$ is invariant under $\rho \mapsto 1-\rho$. Since $\sum_\rho 1/|\rho|^2 < \infty$ converges absolutely, reindexing yields:
+   $$\sum_{\rho \in Z} \frac{1}{2}\left(\frac{1}{|\rho|^2} + \frac{1}{|1-\rho|^2}\right) = \sum_{\rho \in Z} \frac{1}{|\rho|^2} =: N_\xi$$
+2. **Classical Completed-$\xi$ Hadamard Sum Identity**:
+   From the Hadamard product of $\xi(s) = \xi(0) \prod_\rho (1 - s/\rho) e^{s/\rho}$ evaluated at $s = 0, 1$:
+   $$\sum_{\rho \in Z} \frac{1}{\rho(1-\rho)} = 2 + \gamma_{\text{Euler}} - \log(4\pi) =: C_\xi \approx 0.0461914179322420...$$
+   Since $C_\xi \in \mathbb{R}$, $\sum_\rho \Re\left(\frac{1}{\rho(1-\rho)}\right) = \sum_\rho \frac{1}{\rho(1-\rho)} = C_\xi$.
+
+### Canonical Curvature Spectral Target
+Subtracting the two identities gives the exact global formula:
+$$\boxed{
+N_\xi - C_\xi = \sum_{\rho \in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \sum_{\rho \in Z} \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0
+}$$
+with **strict equality $N_\xi - C_\xi = 0$ if and only if every $\delta_\rho = 0$ (the Riemann Hypothesis)**.
+
+---
+
+## 15. The Arithmetic Weil Functional and the GNS Positivity Barrier
+
+### Multiplicative Test Functions and the Weil Form
+For an admissible test function $g(x)$ on $\mathbb{R}_{>0}$ with Mellin transform $\hat g(s) = \int_0^\infty g(x) x^s \frac{dx}{x}$:
+- **Weil Analytic Pairing**:
+  $$Q_W(g) = \sum_{\rho \in Z} \hat g(\rho)\hat g(1-\rho)$$
+  Constructed from the arithmetic explicit formula without using zeros:
+  $$Q_W(g) = \hat g(0)\hat g(1) + \hat g(1)\hat g(0) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}}\left[g(n) + g\left(\frac{1}{n}\right)\right] - \mathcal{W}_{\text{arch}}(g)$$
+- **Canonical Limiting Test Function $g_0 = \mathbf{1}_{(0,1)}$**:
+  $\hat g_0(s) = 1/s$, $\hat g_0(1-s) = 1/(1-s)$, recovering:
+  $$Q_W(g_0) = \sum_{\rho \in Z} \frac{1}{\rho(1-\rho)} = C_\xi$$
+- **Hermitian Companion Functional**:
+  $$Q_H(g) = \sum_{\rho \in Z} |\hat g(\rho)|^2, \qquad Q_H(g_0) = \sum_{\rho \in Z} \frac{1}{|\rho|^2} = N_\xi$$
+
+### Attempted GNS / Positive-Type Factorization
+With involution $g^*(x) = x^{-1}\overline{g(1/x)}$, the Mellin transform satisfies $\widehat{g^*}(s) = \overline{\hat g(1 - \bar s)}$.
+Then $Q_W(g * g^*) = \sum_\rho \hat g(\rho) \overline{\hat g(\bar\rho)}$.
+Under conjugation symmetry $\rho \leftrightarrow \bar\rho$, this formally matches $\sum_\rho |\hat g(\rho)|^2 = Q_H(g)$.
+
+### The Positive-Type Barrier & Falsification Witness
+Why cannot $Q_H(g)$ be constructed purely from local arithmetic data without assuming RH?
+1. **Local Prime Distribution Indefiniteness**:
+   The prime distribution contribution is $- \sum_{n=2}^\infty \frac{\Lambda(n)}{\sqrt{n}} [g(n) + g(1/n)]$.
+   For localized test functions at prime nodes $u_p = \log p$, the local diagonal weights are $- \frac{\log p}{\sqrt{p}} < 0$.
+   All eigenvalues of the pure local-prime Gram matrix are **strictly negative** (verified in `evaluate_finite_prime_weil_gram_matrix`).
+2. **Global Balance Obligation**:
+   Positivity $Q_W(g * g^*) \ge 0$ is NOT a local property; it requires precise, non-local cancellation between the negative prime distribution, the positive Archimedean distribution ($\log\pi + \psi$), and the pole distribution.
+3. **Circularity of GNS Premise**:
+   Weil's Criterion (Weil 1952, Bombieri 2000) states that $Q_W(g * g^*) \ge 0$ for all admissible $g$ is **strictly equivalent to the Riemann Hypothesis**.
+   Therefore, defining an arithmetic Hilbert space norm $\|Jg\|^2 = Q_W(g * g^*)$ by assuming positivity $Q_W(g * g^*) \ge 0$ without a zero-independent positive factorization is logically circular.
+
+---
+
+## 16. Coordinate-Pulled Zero Worldlines versus Fixed Multipliers
+
+To resolve the distinction between scalar multipliers and coordinate dilations:
+
+1. **Fixed-Zero Scalar Multipliers**:
+   For $F(k, s) = g(k, s) L(s)$ with fixed point $\rho$ ($L(\rho) = 0$):
+   $F(k, \rho) = g(k, \rho) \cdot 0 = 0$ and $\partial_k^m F(k, \rho) \equiv 0$ identically for all $m \ge 0$.
+   *(Formally proved in Lean 4: `scalar_multiplier_zero_preservation`, `algebraic_grade_derivative_factor_vanishing`).*
+2. **Coordinate-Pulled Zero Worldlines**:
+   For the coordinate-pulled family $L_k(s) = L(1/2 + \tau^{-k}(s - 1/2))$ along the moving worldline $s_\rho(k) = 1/2 + \tau^k(\rho - 1/2)$:
+   $$L_k(s_\rho(k)) = L\left(\frac{1}{2} + \tau^{-k}(\tau^k(\rho - 1/2))\right) = L(\rho) = 0 \quad (\forall k \in \mathbb{R})$$
+   *(Formally proved in Lean 4: `coordinate_pulled_affine_zero_worldline`).*
+3. **Unpulled Function Counterexample**:
+   For static $L(s) = s - \rho$, evaluated at the moving worldline $s_\rho(k)$:
+   $$L(s_\rho(k)) = s_\rho(k) - \rho = (\tau^k - 1)(\rho - 1/2) \ne 0 \quad (k \ne 0, \rho \ne 1/2)$$
+   *(Formally proved in Lean 4: `unpulled_affine_zero_worldline_eval`).*
+   Similarly, the static product $F(k, s_\rho(k)) = g(k, s_\rho(k)) (\tau^k - 1)(\rho - 1/2) \ne 0$ generically.
+
+---
+
+## 17. Candidate Classification & Status
+
+Based on rigorous auditing of all 8 criteria:
+- **Pointwise Weil–Curvature Identity**: Proved algebraically & in Lean 4 (`pointwise_weil_curvature_identity_algebraic`);
+- **Involution Discrepancy**: Proved $|J - C|^2 = 4\delta^2$ in Lean 4 (`weil_involution_norm_sq_discrepancy`);
+- **Discrete Zeta Divisor Summation**: Derived exact target $N_\xi - C_\xi = \sum \frac{2\delta^2}{|\rho|^2|1-\rho|^2}$;
+- **Zero-Independent Arithmetic Norm Construction**: **OPEN** (`OBL-CT-001A`);
+- **GNS Arithmetic Factorization**: Falsified at local level due to strictly negative prime eigenvalues (`FAIL_POSITIVE_TYPE_FACTORIZATION` / Weil circularity).
 
 $$\boxed{
-\textbf{OBL-CT-001A: Non-Scalar Arithmetic Functional Construction} \quad (\text{CANONICAL EARLIEST OPEN OBLIGATION})
+\textbf{Official Classification: } \texttt{EXACT\_CURVATURE\_IDENTITY\_PROVED\_ARITHMETIC\_NORM\_OPEN}
 }$$
 
 ---
 
-## 16. Formalization and Verification Inventory
+## 18. Formalization and Verification Inventory
 
-### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport`)
+### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 37 Declarations)
 
 | Declaration | Mathematical Content | Epistemic Status |
 |:---|:---|:---|
@@ -426,12 +506,19 @@ $$\boxed{
 | `countermodelPolynomial_root_neg_pos` | $P_{\delta,\gamma}(-\delta + i\gamma) = 0$ | FORMALLY_PROVED |
 | `countermodelPolynomial_root_pos_neg` | $P_{\delta,\gamma}(\delta - i\gamma) = 0$ | FORMALLY_PROVED |
 | `countermodelPolynomial_root_neg_neg` | $P_{\delta,\gamma}(-\delta - i\gamma) = 0$ | FORMALLY_PROVED |
+| `weil_involution_difference` | $J(\rho) - C(\rho) = - 2\delta$ | FORMALLY_PROVED |
+| `weil_involution_norm_sq_discrepancy` | Complex.normSq $(J(\rho) - C(\rho)) = 4\delta^2$ | FORMALLY_PROVED |
+| `pointwise_weil_curvature_numerator_identity` | $(N_1 + N_2) - 2(\beta(1-\beta) + \gamma^2) = 4\delta^2$ | FORMALLY_PROVED |
+| `pointwise_weil_curvature_identity_algebraic` | Rational Weil-Hermitian curvature identity | FORMALLY_PROVED |
+| `pointwise_weil_curvature_weight_pos` | Weight $2/D > 0$ for $D > 0$ | FORMALLY_PROVED |
+| `pointwise_weil_curvature_nonneg` | Curvature defect $(2\delta^2)/D \ge 0$ for $D > 0$ | FORMALLY_PROVED |
+| `pointwise_weil_curvature_zero_iff` | Curvature defect $(2\delta^2)/D = 0 \iff \delta = 0$ | FORMALLY_PROVED |
+| `coordinate_pulled_affine_zero_worldline` | $L_k(s_\rho(k)) = 0$ identically | FORMALLY_PROVED |
+| `unpulled_affine_zero_worldline_eval` | $L(s_\rho(k)) = (\tau^k - 1) z_0$ | FORMALLY_PROVED |
 | `ConditionalCurvatureRigidityBridge.all_defects_zero` | Conditional Curvature Rigidity Theorem | FORMALLY_PROVED |
 
-### Python Test Suite (`tests/test_curvature_transport.py`)
+### Python Test Suites
+- **`tests/test_curvature_transport.py`**: 99/99 passed.
+- **`tests/test_weil_curvature.py`**: 13/13 passed.
+- **Total Combined Verified Tests**: 112/112 passed.
 
-- `TestRadialGeometryAndLattice`: 25 parameter points testing shift laws, $C_1 = 1$, Fourier spacing, and generic scale base $b \in \{1.5, 2.0, 3.14, 10.0\}$.
-- `TestZeroAndRadialUnitTransport`: 24 parameter points testing zero recovery and reciprocal grade character modes.
-- `TestReflectionPairCurvature`: 10 parameter points testing $\cosh/\sinh$ equivalence, zero-rigidity, and numerical second derivative convergence to $2\delta^2(\log\tau)^2$.
-- `TestThetaMellinAndFalsificationControls`: 40 parameter points testing half-density Mellin scaling, numerical quadrature with unnormalized and half-density tail bounds, scalar transport no-go instances, and polynomial countermodel quartet roots/symmetries.
-- **Total Suite Result**: 99/99 passed.
