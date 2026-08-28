@@ -244,6 +244,7 @@ class TestGateG4RadialResponseCoefficientAndWitnesses:
     @pytest.mark.slow_numerical
     def test_fejer_witness_wit02_arb_ball_certification(self):
         """Rigorous certified outward-rounded Arb ball integration for Witness 2 (Fejer)."""
+        pytest.importorskip("flint")
         from math_core import certify_g4_fejer_witness_arb
         cert = certify_g4_fejer_witness_arb(
             sigma="5.0", gamma="14.0", delta="0.49", T="16.8", n_subdivisions=50000, dps=60

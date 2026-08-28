@@ -105,3 +105,68 @@ def test_root_markdown_files_preserved():
         file_path = WORKSPACE_ROOT / filename
         assert file_path.exists(), f"Root file {filename} must not be deleted or moved"
         assert file_path.stat().st_size > 0, f"Root file {filename} must not be empty"
+
+
+def test_claim_register_no_duplicate_ids():
+    """Verify that every claim ID in claim_register.md is unique."""
+    claim_reg = AGENTS_DIR / "corpus_map" / "claim_register.md"
+    assert claim_reg.exists()
+    import re
+    content = claim_reg.read_text(encoding="utf-8")
+    ids = re.findall(r'`(CLM-[A-Z0-9\-]+)`', content)
+    assert len(ids) > 0, "No claim IDs found"
+    seen = set()
+    duplicates = []
+    for cid in ids:
+        if cid in seen:
+            duplicates.append(cid)
+        seen.add(cid)
+    assert not duplicates, f"Duplicate claim IDs found in claim_register.md: {duplicates}"
+
+
+def test_research_ledger_no_duplicate_headings_or_ids():
+    """Verify that section headings and item IDs in RESEARCH_LEDGER.md are unique."""
+    ledger = WORKSPACE_ROOT / "RESEARCH_LEDGER.md"
+    assert ledger.exists()
+    import re
+    content = ledger.read_text(encoding="utf-8")
+    
+    # Check section headings: '# N. ...'
+    headings = re.findall(r'^#\s+(\d+)\.\s+.*$', content, re.MULTILINE)
+    assert len(headings) > 0, "No section headings found in RESEARCH_LEDGER.md"
+    seen_headings = set()
+    dup_headings = []
+    for h in headings:
+        if h in seen_headings:
+            dup_headings.append(h)
+        seen_headings.add(h)
+    assert not dup_headings, f"Duplicate section numbers found in RESEARCH_LEDGER.md: {dup_headings}"
+    
+    # Check row IDs in tables: | ID | ...
+    # Format: | G4-001 | or | CMSA-001 | etc.
+    row_ids = re.findall(r'\|\s*([A-Z0-9]+-[0-9]+)\s*\|', content)
+    assert len(row_ids) > 0, "No item IDs found in RESEARCH_LEDGER.md"
+    seen_ids = set()
+    dup_ids = []
+    for rid in row_ids:
+        if rid in seen_ids:
+            dup_ids.append(rid)
+        seen_ids.add(rid)
+    assert not dup_ids, f"Duplicate item IDs found in RESEARCH_LEDGER.md: {dup_ids}"
+
+
+def test_contradiction_and_obligation_registers_unique_ids():
+    """Verify unique IDs in contradiction_register.md and obligation_register.md."""
+    import re
+    disc_file = AGENTS_DIR / "corpus_map" / "contradiction_register.md"
+    if disc_file.exists():
+        content = disc_file.read_text(encoding="utf-8")
+        ids = re.findall(r'`(DISC-[0-9]+)`', content)
+        assert len(ids) == len(set(ids)), f"Duplicate DISC IDs: {[x for x in ids if ids.count(x) > 1]}"
+        
+    obl_file = AGENTS_DIR / "corpus_map" / "obligation_register.md"
+    if obl_file.exists():
+        content = obl_file.read_text(encoding="utf-8")
+        ids = re.findall(r'`(OBL-[A-Z0-9\-]+)`', content)
+        assert len(ids) == len(set(ids)), f"Duplicate OBL IDs: {[x for x in ids if ids.count(x) > 1]}"
+

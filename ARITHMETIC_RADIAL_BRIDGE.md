@@ -312,20 +312,39 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
    - Dilated Completed Log-Derivative: `GRADE_COORDINATE_REDUNDANT`.
    - Witness WIT-02 Evidence Status: `CERTIFIED_NEGATIVE_ARB_BALL`.
 
-### 10.5 Fixed-Finite Invisibility, Subcritical Norm Bounds, and Live Growing Perturbations
-1. **Fixed-Finite Invisibility Theorem** (`PROVED / EXACT / PARTIALLY_FORMALIZED`):
+### 10.5 Resolvent Algebra, Subcritical Norm Growth, and the Transcendental Continuation Activation Subgate
+1. **Exact Single-Zero and Reflection Pair Resolvent Algebra**:
+   For $a = \sigma - 1/2 > 0$, $w = a + i(t-\gamma)$, and $a - \delta > 0$:
+   $$\int_{-\infty}^\infty |r_\delta(t)|^2 dt = \frac{\pi \delta^2}{a(a-\delta)(2a-\delta)} = \frac{\pi \delta^2}{2a^3} + \mathcal O(\delta^3),$$
+   $$r_\delta(t) + r_{-\delta}(t) = \frac{2\delta^2}{w(w^2-\delta^2)}.$$
+   Exact first-order cancellation suppresses symmetric functional-reflection pairs to $\mathcal O(\delta^2)$. Formalized in Lean 4 (`resolvent_difference_rational_identity`, `resolvent_reflection_pair_cancellation`).
+2. **Fixed-Finite Invisibility Theorem** (`PROVED / EXACT / PARTIALLY_FORMALIZED`):
    For bounded prime background $P_\sigma$ ($\sigma > 1$) and any fixed finite resolvent perturbation $\Delta \in L^2(\mathbb R)$:
    $$\lim_{T\to\infty} \frac{1}{2T} \int_{-T}^T \left(|P_\sigma(t) - \Delta(t)|^2 - |P_\sigma(t)|^2\right) dt = 0.$$
    Lean 4 formalizes scalar energy scaling $E/(2T) \to 0$ (`fixed_finite_energy_scaling_zero`).
-2. **Subcritical Cofinal Norm Growth Theorem** (`PROVED / EXACT / PARTIALLY_FORMALIZED`):
+3. **Subcritical Cofinal Norm Growth Theorem** (`PROVED / EXACT / PARTIALLY_FORMALIZED`):
    For $P_T, \Delta_T \in L^2(-T, T)$ with $(1/(2T))\|P_T\|^2 \le M < \infty$ and $x_T = \|\Delta_T\|_{L^2}/\sqrt{T}$:
    $$|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.$$
    If $\|\Delta_T\| = o(\sqrt{T})$, then $V_T \to 0$.
-   Contrapositive necessity: $\limsup |V_T| > 0 \implies \|\Delta_T\| \ne o(\sqrt{T})$.
-   Formalized in Lean 4: `subcritical_norm_response_bound_vanishes` and `subcritical_norm_response_tendsto_zero`.
-3. **Live Growing Perturbation & Open Obligation**:
-   For $\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le cT} r_j(t)$, Riemann-von Mangoldt growth gives $\|\Delta_{H(T)}\|_{L^2} \sim \sqrt{T\log T}$ (supercritical).
-   The response decomposes as $V_T = E_T - C_T$. Evaluating $E_T - C_T > 0$ strictly is the live open obligation `OBL-CMSA-003-G4-COFINAL-ESTIMATE`.
+   Contrapositive (subsequential consequence): $\limsup |V_T| > 0 \implies \exists \varepsilon > 0, T_k \to \infty \text{ s.t. } \|\Delta_{T_k}\| \ge \varepsilon \sqrt{T_k}$. (Does NOT imply an eventual $\Omega(\sqrt{T})$ bound; counterexample $x_n = 1$ for even $n$, $1/(n+1)$ for odd $n$).
+   Formalized in Lean 4: `subcritical_norm_response_bound_vanishes`, `subcritical_norm_response_tendsto_zero`, `subcritical_norm_contrapositive`, `not_tendsto_zero_subsequential_lower_bound`.
+4. **Withdrawal of the Riemann–von Mangoldt Norm Asymptotic**:
+   The claim $\|\Delta_{H(T)}\| \sim \sqrt{T\log T}$ is **WITHDRAWN** because:
+   - On-line zeros contribute $r_j = 0$ identically;
+   - Off-line zero count and distribution are unconstrained;
+   - Defect displacements $\delta_j$ can vary or decay;
+   - Off-diagonal inner products can cancel destructively;
+   - Reflection partners cancel to first order ($\mathcal O(\delta^2)$);
+   - Finite interval $[-T, T]$ boundary mode truncation.
+5. **Finite Off-Line Quartet Invisibility & Zero-Rigidity Failure**:
+   For any finite off-line zero configuration (such as a single quartet $\{1/2 \pm \delta \pm i\gamma\}$), $\Delta_{H(T)}(t) = \Delta(t) \in L^2(\mathbb R)$ for $H(T) \ge \gamma$, giving $\|\Delta_{H(T)}\| = \mathcal O(1) = o(\sqrt{T}) \implies V_T \to 0$.
+   The normalized mean functional cannot distinguish a finite off-line quartet from RH.
+   - Fixed / Subcritical Families: `FAIL_LIMIT_ORDER_DEPENDENCE`.
+   - Growing Cofinal Families: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+6. **The Transcendental Continuation Activation Theorem (Earliest Open Subgate)**:
+   $$\exists \rho \text{ with } \delta_\rho \ne 0 \implies \limsup_{T\to\infty} \frac{\|\Delta^{TC}_T\|_{L^2(-T, T)}}{\sqrt{T}} > 0.$$
+   Requires 8 structural specifications (grade combination operation, non-double-counting proof, grade weights, bilateral convergence over $K \in \mathbb Z$, height truncation interaction, shift covariance, arithmetic representation, and non-pullback proof).
+   Designated as the **earliest open subgate** logically preceding $E_T - C_T$ asymptotic evaluation.
 
 ---
 
@@ -333,6 +352,7 @@ Detailed in [`CMSA_GATE_G4.md`](file:///c:/Development/Projects/reimann_scope/CM
 
 - **`OBL-RDQ-001`**: Remains **OPEN**.
 - **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in present CMSA derivation).
-- **`OBL-CMSA-003-G4-COFINAL-ESTIMATE`**: Live open subgate for supercritical cofinal growth.
-- **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+- **Transcendental Continuation Activation Theorem**: Precise earliest open subgate for Gate G4.
+- **Classification**: `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+

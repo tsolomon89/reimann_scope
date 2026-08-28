@@ -1339,3 +1339,48 @@ Repair authority chains, formalize subcritical norm vanishing in Lean 4, correct
 Mathematical / operational consequence:
 
 Updated `math_core.py`, `tests/test_fixed_finite_perturbation_invisibility.py`, `formal/RiemannScope/ArithmeticBridge.lean`, `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `RESEARCH_LEDGER.md`, `LEAN_FORMALIZATION_PLAN.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, and all three corpus registers.
+
+---
+
+## 2026-08-28 — Deduplicated Authority Registers, Exact Resolvent Algebra, Withdrawal of Riemann–von Mangoldt Norm Asymptotic, Finite Quartet Invisibility, and the Transcendental Continuation Activation Subgate
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Deduplicated Authority Registers and Enforced Uniqueness**:
+   - Cleaned `claim_register.md` and `RESEARCH_LEDGER.md`, ensuring every claim ID (`CLM-TC-001` through `CLM-RH-001`), ledger entry (`G4-001` through `G4-023`), contradiction ID, and obligation ID appears exactly once.
+   - Added automated regression checks in `.agents/verification/test_harness_integrity.py` to prevent duplicate IDs or canonical headings.
+2. **Exact Single-Zero and Reflection Pair Resolvent Algebra**:
+   - Proved analytically: for $a = \sigma - 1/2 > 0, w = a + i(t-\gamma)$, and $a - \delta > 0$:
+     $$\int_{-\infty}^\infty |r_\delta(t)|^2 dt = \frac{\pi \delta^2}{a(a-\delta)(2a-\delta)} = \frac{\pi \delta^2}{2a^3} + \mathcal O(\delta^3),$$
+     $$r_\delta(t) + r_{-\delta}(t) = \frac{2\delta^2}{w(w^2-\delta^2)}.$$
+   - Formalized rational identities in Lean 4 (`resolvent_difference_rational_identity`, `resolvent_reflection_pair_cancellation`).
+   - Implemented exact symbolic and high-precision quadrature verifiers in `math_core.py` and test suites.
+3. **Subcritical Contrapositive & Subsequential Non-Vanishing**:
+   - Proved that $\limsup |V_T| > 0 \implies \exists \varepsilon > 0, T_k \to \infty$ such that $\|\Delta_{T_k}\|_{L^2(-T_k, T_k)} \ge \varepsilon\sqrt{T_k}$.
+   - Clarified that this does NOT imply an eventual $\Omega(\sqrt{T})$ bound (counterexample $x_n = 1$ for even $n$, $1/(n+1)$ for odd $n$).
+   - Formalized in Lean 4: `subcritical_norm_contrapositive`, `not_tendsto_zero_subsequential_lower_bound`.
+4. **Withdrawal of Riemann–von Mangoldt Norm Asymptotic**:
+   - Withdrew the historical heuristic $\|\Delta_{H(T)}\| \sim \sqrt{T\log T}$ everywhere.
+   - Detailed the 6 mathematical obstructions preventing total zero counting from implying defect-resolvent norm growth.
+   - Reclassified the cofinal growth problem as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+5. **Finite Off-Line Quartet Invisibility & Zero-Rigidity Failure**:
+   - Proved that for any finite off-line zero configuration, $\Delta_{H(T)}(t) = \Delta(t) \in L^2(\mathbb R)$ for $H(T) \ge \max |\gamma_j|$, yielding $\|\Delta_{H(T)}\| = \mathcal O(1) = o(\sqrt{T}) \implies V_T \to 0$.
+   - Concluded that the current normalized mean functional produces zero response for a finite off-line quartet and cannot distinguish it from RH.
+   - Classified fixed/subcritical defect families as `FAIL_LIMIT_ORDER_DEPENDENCE` and growing cofinal families as `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+6. **Transcendental Continuation Activation Theorem (Earliest Open Subgate)**:
+   - Formulated the Activation Theorem: $\exists \rho \text{ with } \delta_\rho \ne 0 \implies \limsup_{T\to\infty} \|\Delta^{TC}_T\|_{L^2(-T, T)}/\sqrt{T} > 0$.
+   - Specified the 8 structural requirements on $\Delta^{TC}_T$.
+   - Designated this as the precise earliest open subgate logically preceding the $E_T - C_T$ asymptotic evaluation.
+7. **Lean 4 Project Theorem Inventory**:
+   - Reached **87 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+
+Reason:
+
+Completely eliminate unsupported norm asymptotics, deduplicate corpus authority files, establish exact resolvent algebra and reflection cancellation, resolve the finite quartet zero-rigidity question, and isolate the Transcendental Continuation Activation Theorem as the true earliest open subgate.
+
+Mathematical / operational consequence:
+
+Updated `CMSA_GATE_G4.md`, `MATH_CONTRACT.md`, `RESEARCH_HYPOTHESIS.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `formal/RiemannScope/ArithmeticBridge.lean`, `math_core.py`, `tests/test_fixed_finite_perturbation_invisibility.py`, `.agents/verification/test_harness_integrity.py`, and all corpus registers.
+

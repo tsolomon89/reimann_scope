@@ -793,4 +793,30 @@ Formalize remainder cancellation, background-dependent squared norm expansions, 
      \operatorname{Tendsto}\ (n \mapsto x_n)\ \text{atTop}\ (\mathcal N(0)) \implies \operatorname{Tendsto}\ (n \mapsto V_n)\ \text{atTop}\ (\mathcal N(0)).
      \]
 
-Total compiled project theorem declarations: **83** (0 `sorry`, 0 `admit`, 0 warnings).
+---
+
+# 27. Phase 18 — Exact Resolvent Rational Identities, Reflection Pair Cancellation, and Subcritical Contrapositive
+
+Formalize rational single-zero and functional-reflection pair resolvent identities, and subcritical contrapositive logic in Lean 4:
+
+1. **Resolvent Difference Rational Identity** (`resolvent_difference_rational_identity`):
+   - For \(w, \delta \in \mathbb C\) with \(w \ne 0\) and \(w - \delta \ne 0\):
+     \[
+     \frac{1}{w - \delta} - \frac{1}{w} = \frac{\delta}{w(w - \delta)}.
+     \]
+2. **Resolvent Reflection Pair Cancellation Identity** (`resolvent_reflection_pair_cancellation`):
+   - For \(w, \delta \in \mathbb C\) with \(w \ne 0\) and \(w \pm \delta \ne 0\):
+     \[
+     \left( \frac{1}{w - \delta} - \frac{1}{w} \right) + \left( \frac{1}{w + \delta} - \frac{1}{w} \right) = \frac{2\delta^2}{w(w^2 - \delta^2)}.
+     \]
+   - Proves exact first-order cancellation (quadratic defect in \(\delta\)).
+3. **Subcritical Norm Contrapositive Theorem** (`subcritical_norm_contrapositive`):
+   - If sequence \(V_n\) does not tend to 0 under bound \(|V_n| \le x_n^2/2 + C|x_n|\) (\(C \ge 0\)), then \(x_n\) cannot tend to 0:
+     \[
+     \neg \operatorname{Tendsto}\ V\ \text{atTop}\ (\mathcal N(0)) \implies \neg \operatorname{Tendsto}\ x\ \text{atTop}\ (\mathcal N(0)).
+     \]
+4. **Subsequential Non-Vanishing Consequence** (`not_tendsto_zero_subsequential_lower_bound`):
+   - For any sequence \(x_n \in \mathbb R\), \(\neg \operatorname{Tendsto}\ x\ \text{atTop}\ (\mathcal N(0))\) implies existence of \(\varepsilon > 0\) such that for all \(N\), there exists \(n \ge N\) with \(|x_n| \ge \varepsilon\).
+
+Total compiled project theorem declarations: **87** (0 `sorry`, 0 `admit`, 0 warnings).
+

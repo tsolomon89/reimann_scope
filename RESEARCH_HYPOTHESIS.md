@@ -973,39 +973,59 @@ A fixed finite divisor perturbation cannot produce a nonzero normalized infinite
 - **Case C (Growing / Cofinal Perturbation \(\Delta_{H(T)}\))**: Non-fixed perturbation with \(H(T) \to \infty\). Classification: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
 - **Raw Finite Fejér Response**: Retained as `FAIL_RADIAL_POSITIVITY`.
 
-## 24.7 The Subcritical Cofinal Norm Growth Theorem & Live Growing Perturbation Analysis
+## 24.7 Resolvent Algebra, Subcritical Norm Growth, and the Transcendental Continuation Activation Subgate
+### Exact Resolvent Algebra and Reflection Pair Cancellation
+For \(a = \sigma - 1/2 > 0, w = a + i(t-\gamma)\), and \(a - \delta > 0\):
+\[
+\boxed{\int_{-\infty}^\infty |r_\delta(t)|^2 dt = \frac{\pi \delta^2}{a(a-\delta)(2a-\delta)} = \frac{\pi \delta^2}{2a^3} + \mathcal O(\delta^3),}
+\]
+\[
+\boxed{r_\delta(t) + r_{-\delta}(t) = \frac{2\delta^2}{w(w^2-\delta^2)}.}
+\]
+Exact first-order cancellation suppresses symmetric functional-reflection pairs to \(\mathcal O(\delta^2)\).
+
 ### Subcritical Norm Response Vanishing ($o(\sqrt{T})$ Threshold)
 **Proof Status**: `PROVED / EXACT / PARTIALLY_FORMALIZED`
-- **Paper Proof**: Complete deductive analytic derivation.
-- **Formalized Lean 4 Component**: `RiemannScope.subcritical_norm_response_bound_vanishes` and `RiemannScope.subcritical_norm_response_tendsto_zero` (`FORMALLY_PROVED COMPONENT`).
-- **Python Verification**: `math_core.verify_cofinal_subcritical_norm_bound` (`NUMERICAL_EVIDENCE`).
+- **Paper Proof**: Complete deductive analytic derivation via Cauchy-Schwarz.
+- **Formalized Lean 4 Component**: `RiemannScope.subcritical_norm_response_bound_vanishes`, `RiemannScope.subcritical_norm_response_tendsto_zero`, `RiemannScope.subcritical_norm_contrapositive`, `RiemannScope.not_tendsto_zero_subsequential_lower_bound` (`FORMALLY_PROVED COMPONENT`).
+- **Python Evaluator**: `math_core.verify_cofinal_subcritical_norm_bound` evaluates the finite-sample bound (`NUMERICAL_EVIDENCE`).
 
 Let \(T > 0\), and let \(P_T, \Delta_T \in L^2(-T, T)\) with \(\frac{1}{2T} \|P_T\|_{L^2(-T, T)}^2 \le M < \infty\) for all large \(T\).
 Define the normalized mean-square variation:
 \[
 V_T = \frac{1}{2T} \int_{-T}^T \left( |P_T(t) - \Delta_T(t)|^2 - |P_T(t)|^2 \right) dt = \frac{\|\Delta_T\|^2}{2T} - \frac{1}{T}\Re\langle P_T, \Delta_T\rangle.
 \]
-Let \(x_T = \frac{\|\Delta_T\|_{L^2(-T, T)}}{\sqrt{T}}\).
-Then:
+Let \(x_T = \frac{\|\Delta_T\|_{L^2(-T, T)}}{\sqrt{T}}\). Then:
 \[
 \boxed{|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.}
 \]
-In particular, if \(\|\Delta_T\|_{L^2(-T, T)} = o(\sqrt{T})\) as \(T \to \infty\) (i.e. \(x_T \to 0\)), then:
+In particular, if \(\|\Delta_T\|_{L^2(-T, T)} = o(\sqrt{T})\) as \(T \to \infty\) (i.e. \(x_T \to 0\)), then \(\lim_{T\to\infty} V_T = 0\).
+
+**Contrapositive (Subsequential Non-Vanishing Consequence)**:
 \[
-\lim_{T\to\infty} V_T = 0.
+\boxed{\limsup_{T\to\infty} |V_T| > 0 \implies \frac{\|\Delta_T\|_{L^2(-T, T)}}{\sqrt{T}} \not\to 0 \iff \exists \varepsilon > 0, T_k \to \infty \text{ s.t. } \|\Delta_{T_k}\| \ge \varepsilon\sqrt{T_k}.}
 \]
+*Distinction*: Does NOT imply an eventual \(\Omega(\sqrt{T})\) lower bound (Counterexample: \(x_n = 1\) for even \(n\), \(1/(n+1)\) for odd \(n\)).
 
-**Contrapositive (Necessary Condition)**:
+### Withdrawal of the Riemann–von Mangoldt Norm Asymptotic
+The assertion \(\|\Delta_{H(T)}\| \sim \sqrt{T \log T}\) based on Riemann–von Mangoldt counting is **WITHDRAWN** due to:
+1. On-line zeros have \(\delta_j = 0\) and contribute \(r_j = 0\);
+2. Unknown count and distribution of off-line zeros (could be 0, 4, finite, or sparse);
+3. Defect variability across mode ordinates;
+4. Off-diagonal spectral interference;
+5. First-order reflection cancellation (\(r_\delta + r_{-\delta} = \mathcal O(\delta^2)\));
+6. Finite interval boundary mode truncation on \([-T, T]\).
+
+### Finite Off-Line Quartet Invisibility & Zero-Rigidity Failure
+For any finite off-line zero configuration (such as a single off-line quartet \(\{1/2 \pm \delta \pm i\gamma\}\)), \(\Delta_{H(T)}(t) = \Delta(t) \in L^2(\mathbb R)\) for \(H(T) \ge \gamma\), giving \(\|\Delta_{H(T)}\| = \mathcal O(1) = o(\sqrt{T}) \implies V_T \to 0\).
+The normalized mean functional cannot distinguish a finite off-line quartet from RH.
+- Fixed / Subcritical Families: `FAIL_LIMIT_ORDER_DEPENDENCE`.
+- Growing Cofinal Families: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.
+
+### The Transcendental Continuation Activation Theorem (Earliest Open Subgate)
 \[
-\boxed{\limsup_{T\to\infty} |V_T| > 0 \implies \|\Delta_T\|_{L^2(-T, T)} \ne o(\sqrt{T}).}
+\boxed{\exists \rho \text{ with } \delta_\rho \ne 0 \implies \limsup_{T\to\infty} \frac{\|\Delta^{TC}_T\|_{L^2(-T, T)}}{\sqrt{T}} > 0.}
 \]
-Norm growth of order at least \(\sqrt{T}\) (\(\|\Delta_T\| = \Omega(\sqrt{T})\)) is a strict mathematical necessity for any perturbation family to produce a non-vanishing normalized response.
+Requires 8 structural specifications (grade combination operation, non-double-counting proof, grade weights, bilateral convergence over \(K \in \mathbb Z\), height truncation interaction, shift covariance, arithmetic representation, and non-pullback proof).
+Designated as the **earliest open subgate** logically preceding \(E_T - C_T\) asymptotic evaluation.
 
-**Necessity vs Sufficiency**:
-Critical or supercritical norm growth (\(\|\Delta_T\| = \Theta(\sqrt{T})\) or \(\omega(\sqrt{T})\)) is **necessary but NOT sufficient** for a positive response: because \(V_T = E_T - C_T\) where \(E_T = \frac{1}{2T}\|\Delta_T\|^2\) and \(C_T = \frac{1}{T}\Re\langle P_T, \Delta_T\rangle\), cross-term cancellation or background dependence can induce sign instability without off-diagonal spectral bounds.
-
-### The Live Open Obligation (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`)
-For the live cofinal object \(\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le H(T)} r_j(t)\) with \(H(T) = cT\), Riemann-von Mangoldt counting yields \(\|\Delta_{H(T)}\|_{L^2(-T, T)} \sim \sqrt{T \log T}\), which is supercritical.
-The live response decomposes as \(V_T = E_T - C_T\).
-Determining whether \(E_T - C_T > 0\) strictly for any non-zero radial defect \(\delta \ne 0\) is the exact open mathematical obligation for Gate G4 (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`).
-Status: `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`.

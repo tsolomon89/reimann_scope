@@ -874,5 +874,82 @@ theorem subcritical_norm_response_tendsto_zero (C : ℝ) (hC : 0 ≤ C)
     exact lt_of_lt_of_le h_dist (min_le_right 1 (ε / (1 / 2 + C)))
   exact subcritical_norm_response_bound_vanishes C hC ε (x n) (V n) (h_bound n) hx1 hx_eps
 
+/-- Exact single-zero resolvent rational difference identity:
+    1 / (w - δ) - 1 / w = δ / (w * (w - δ)) for w ≠ 0 and w - δ ≠ 0. -/
+theorem resolvent_difference_rational_identity (w δ : ℂ) (hw : w ≠ 0) (hwd : w - δ ≠ 0) :
+    1 / (w - δ) - 1 / w = δ / (w * (w - δ)) := by
+  have h_denom : w * (w - δ) ≠ 0 := mul_ne_zero hw hwd
+  have h_step : (1 / (w - δ) - 1 / w) * (w * (w - δ)) = δ := by
+    calc (1 / (w - δ) - 1 / w) * (w * (w - δ))
+      _ = ((1 / (w - δ)) * (w - δ)) * w - ((1 / w) * w) * (w - δ) := by ring_nf
+      _ = 1 * w - 1 * (w - δ) := by rw [div_mul_cancel₀ 1 hwd, div_mul_cancel₀ 1 hw]
+      _ = δ := by ring
+  calc 1 / (w - δ) - 1 / w
+    _ = ((1 / (w - δ) - 1 / w) * (w * (w - δ))) / (w * (w - δ)) := by
+      rw [mul_div_cancel_right₀ _ h_denom]
+    _ = δ / (w * (w - δ)) := by rw [h_step]
+
+/-- Exact reflection-pair cancellation identity:
+    For a functional-reflection pair at the same height, the sum of defect resolvents
+    cancels to exact second order in δ:
+    (1 / (w - δ) - 1 / w) + (1 / (w + δ) - 1 / w) = (2 * δ^2) / (w * (w^2 - δ^2))
+    for w ≠ 0, w - δ ≠ 0, and w + δ ≠ 0. -/
+theorem resolvent_reflection_pair_cancellation (w δ : ℂ) (hw : w ≠ 0)
+    (hwd : w - δ ≠ 0) (hwp : w + δ ≠ 0) :
+    (1 / (w - δ) - 1 / w) + (1 / (w + δ) - 1 / w) = (2 * δ^2) / (w * (w^2 - δ^2)) := by
+  have h_r1 := resolvent_difference_rational_identity w δ hw hwd
+  have h_neg_d : w - (-δ) = w + δ := by ring
+  have h_neg_d_ne : w - (-δ) ≠ 0 := by rw [h_neg_d]; exact hwp
+  have h_r2_raw := resolvent_difference_rational_identity w (-δ) hw h_neg_d_ne
+  have h_r2 : 1 / (w + δ) - 1 / w = (-δ) / (w * (w + δ)) := by
+    rw [h_neg_d] at h_r2_raw
+    exact h_r2_raw
+  have h_denom : w * (w^2 - δ^2) ≠ 0 := by
+    have h_fac : w^2 - δ^2 = (w - δ) * (w + δ) := by ring
+    rw [h_fac]
+    exact mul_ne_zero hw (mul_ne_zero hwd hwp)
+  have h_step : (δ / (w * (w - δ)) + (-δ) / (w * (w + δ))) * (w * (w^2 - δ^2)) = 2 * δ^2 := by
+    calc (δ / (w * (w - δ)) + (-δ) / (w * (w + δ))) * (w * (w^2 - δ^2))
+      _ = ((δ / (w * (w - δ))) * (w * (w - δ))) * (w + δ) + (((-δ) / (w * (w + δ))) * (w * (w + δ))) * (w - δ) := by ring_nf
+      _ = δ * (w + δ) + (-δ) * (w - δ) := by
+        rw [div_mul_cancel₀ δ (mul_ne_zero hw hwd), div_mul_cancel₀ (-δ) (mul_ne_zero hw hwp)]
+      _ = 2 * δ^2 := by ring
+  calc (1 / (w - δ) - 1 / w) + (1 / (w + δ) - 1 / w)
+    _ = δ / (w * (w - δ)) + (-δ) / (w * (w + δ)) := by rw [h_r1, h_r2]
+    _ = ((δ / (w * (w - δ)) + (-δ) / (w * (w + δ))) * (w * (w^2 - δ^2))) / (w * (w^2 - δ^2)) := by
+      rw [mul_div_cancel_right₀ _ h_denom]
+    _ = (2 * δ^2) / (w * (w^2 - δ^2)) := by rw [h_step]
+
+
+
+
+/-- Subcritical Contrapositive Theorem:
+    If a sequence Vₙ bounded by |Vₙ| ≤ (xₙ)^2 / 2 + C * |xₙ| does NOT tend to zero,
+    then the norm ratio sequence xₙ cannot tend to zero. -/
+theorem subcritical_norm_contrapositive (C : ℝ) (hC : 0 ≤ C)
+    (x V : ℕ → ℝ) (h_bound : ∀ n, |V n| ≤ (x n)^2 / 2 + C * |x n|)
+    (hV : ¬ Filter.Tendsto V Filter.atTop (nhds 0)) :
+    ¬ Filter.Tendsto x Filter.atTop (nhds 0) := by
+  intro hx
+  exact hV (subcritical_norm_response_tendsto_zero C hC x V h_bound hx)
+
+/-- Subsequential Non-Vanishing Lemma:
+    If a sequence xₙ does not tend to 0, then there exists ε > 0 such that for all N,
+    there exists n ≥ N with |x n| ≥ ε. -/
+theorem not_tendsto_zero_subsequential_lower_bound (x : ℕ → ℝ)
+    (hx : ¬ Filter.Tendsto x Filter.atTop (nhds 0)) :
+    ∃ ε > 0, ∀ N : ℕ, ∃ n ≥ N, |x n| ≥ ε := by
+  rw [Metric.tendsto_atTop] at hx
+  push_neg at hx
+  rcases hx with ⟨ε, hε_pos, h_inf⟩
+  use ε, hε_pos
+  intro N
+  rcases h_inf N with ⟨n, hn_ge, hn_dist⟩
+  use n, hn_ge
+  rw [Real.dist_eq, sub_zero] at hn_dist
+  exact hn_dist
+
+
 
 end RiemannScope
+

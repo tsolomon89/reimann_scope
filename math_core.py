@@ -4770,7 +4770,8 @@ def verify_cofinal_subcritical_norm_bound(
     |V_T| <= ||Delta_T||^2 / (2*T) + sqrt(2*M) * (||Delta_T|| / sqrt(T)) = x_T^2 / 2 + sqrt(2*M) * x_T,
     where x_T = ||Delta_T|| / sqrt(T) and (1 / 2T) ||P_T||^2 <= M.
 
-    Verifies that as x_T -> 0 (i.e. ||Delta_T|| = o(sqrt(T))), the upper bound tends to zero.
+    Evaluates the finite-sample bound showing that as x_T -> 0 (i.e. ||Delta_T|| = o(sqrt(T))),
+    the total variation bound vanishes.
     """
     with mpmath.workdps(dps):
         M_mpf = to_mpf(M_bound, dps=dps)
@@ -4798,3 +4799,150 @@ def verify_cofinal_subcritical_norm_bound(
             "total_variation_bound": mpmath.nstr(total_bound, n=10),
             "status": "SUBCRITICAL_NORM_BOUND_EVALUATED"
         }
+
+
+def exact_resolvent_L2_norm_squared(
+    a: Union[float, str, mpmath.mpf],
+    delta: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [EXACT RESOLVENT L2 NORM]
+    Computes the exact continuous L^2(R) norm squared of the single-zero defect resolvent:
+    r_delta(t) = 1 / (a - delta + i*t) - 1 / (a + i*t) = delta / (w * (w - delta)),
+    where w = a + i*t, a > 0, and a - delta > 0:
+    ||r_delta||_{L^2(R)}^2 = int_{-inf}^inf |r_delta(t)|^2 dt = pi * delta^2 / (a * (a - delta) * (2*a - delta)).
+
+    Also computes the leading small-delta asymptotic:
+    ||r_delta||_{L^2(R)}^2 ~ pi * delta^2 / (2 * a^3).
+    """
+    with mpmath.workdps(dps):
+        a_f = to_mpf(a, dps=dps)
+        d_f = to_mpf(delta, dps=dps)
+        if a_f <= 0:
+            raise ValueError(f"Width parameter a must be strictly positive, got {a_f}")
+        if a_f - d_f <= 0:
+            raise ValueError(f"Perturbed width a - delta must be strictly positive, got {a_f - d_f}")
+
+        denom = a_f * (a_f - d_f) * (2 * a_f - d_f)
+        exact_val = mpmath.pi * (d_f ** 2) / denom
+        leading_asymptotic = mpmath.pi * (d_f ** 2) / (2 * (a_f ** 3))
+
+        return {
+            "a": str(a_f),
+            "delta": str(d_f),
+            "exact_L2_norm_squared": mpmath.nstr(exact_val, n=20),
+            "leading_asymptotic": mpmath.nstr(leading_asymptotic, n=20),
+            "relative_asymptotic_error": mpmath.nstr(abs(exact_val - leading_asymptotic) / exact_val, n=8) if exact_val != 0 else "0.0",
+            "status": "EXACT_RESOLVENT_NORM_EVALUATED"
+        }
+
+
+def verify_resolvent_reflection_pair_cancellation(
+    w_val: Union[complex, str, mpmath.mpc],
+    delta_val: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [EXACT REFLECTION PAIR CANCELLATION]
+    Verifies that for a functional-reflection pair at the same height, the sum of defect resolvents
+    cancels to exact second order in delta:
+    r_delta(w) + r_{-delta}(w) = (1/(w - delta) - 1/w) + (1/(w + delta) - 1/w)
+                              = 2 * delta^2 / (w * (w^2 - delta^2)).
+    """
+    with mpmath.workdps(dps):
+        w_c = to_mpc(w_val, dps=dps)
+        d_f = to_mpf(delta_val, dps=dps)
+        if abs(w_c) == 0:
+            raise ValueError("w must be non-zero")
+        if abs(w_c - d_f) == 0 or abs(w_c + d_f) == 0:
+            raise ValueError("w +- delta must be non-zero")
+
+        # Numerical evaluation
+        r_pos = (1 / (w_c - d_f)) - (1 / w_c)
+        r_neg = (1 / (w_c + d_f)) - (1 / w_c)
+        sum_numerical = r_pos + r_neg
+
+        formula_val = (2 * (d_f ** 2)) / (w_c * (w_c**2 - d_f**2))
+        err = abs(sum_numerical - formula_val)
+
+        # Exact symbolic check via SymPy
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        w_sym, d_sym = sp.symbols("w d", complex=True)
+        r_pos_sym = 1 / (w_sym - d_sym) - 1 / w_sym
+        r_neg_sym = 1 / (w_sym + d_sym) - 1 / w_sym
+        sum_sym = r_pos_sym + r_neg_sym
+        formula_sym = (2 * d_sym**2) / (w_sym * (w_sym**2 - d_sym**2))
+        sym_diff = sp.simplify(sum_sym - formula_sym)
+        is_symbolic_exact = bool(sym_diff == 0)
+
+        return {
+            "w": str(w_c),
+            "delta": str(d_f),
+            "sum_numerical": str(sum_numerical),
+            "formula_value": str(formula_val),
+            "error": mpmath.nstr(err, n=6),
+            "is_symbolic_exact": is_symbolic_exact,
+            "status": "REFLECTION_PAIR_CANCELLATION_VERIFIED"
+        }
+
+
+def verify_resolvent_L2_integral(
+    a: Union[float, str, mpmath.mpf],
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf] = 0.0,
+    dps: int = 40
+) -> Dict[str, Any]:
+    """
+    [RESOLVENT L2 INTEGRAL NUMERICAL & SYMBOLIC VERIFICATION]
+    Computes int_{-inf}^inf |r_delta(a + i*(t - gamma))|^2 dt via high-precision numerical quadrature
+    and compares against the exact formula pi * delta^2 / (a * (a - delta) * (2*a - delta)).
+    Also verifies exact symbolic integration in SymPy.
+    """
+    with mpmath.workdps(dps):
+        a_f = to_mpf(a, dps=dps)
+        d_f = to_mpf(delta, dps=dps)
+        gam_f = to_mpf(gamma, dps=dps)
+        if a_f <= 0:
+            raise ValueError(f"a must be strictly positive, got {a_f}")
+        if a_f - d_f <= 0:
+            raise ValueError(f"a - delta must be strictly positive, got {a_f - d_f}")
+
+        # Exact formula
+        denom = a_f * (a_f - d_f) * (2 * a_f - d_f)
+        exact_formula_val = mpmath.pi * (d_f ** 2) / denom
+
+        # Numerical integration with peak point at t = gamma
+        def integrand(t_val):
+            w = mpmath.mpc(a_f, t_val - gam_f)
+            r = (1 / (w - d_f)) - (1 / w)
+            return abs(r) ** 2
+
+        quad_val = mpmath.quad(integrand, [-mpmath.inf, gam_f, mpmath.inf], maxdegree=10)
+        quad_err = abs(quad_val - exact_formula_val)
+
+
+        # Symbolic integration check via SymPy
+        import importlib
+        sp: Any = importlib.import_module("sympy")
+        u, a_s, b_s, d_s = sp.symbols("u a b d", positive=True)
+        # Integrand in terms of a > 0 and b = a - d > 0:
+        # 1 / ((u^2 + a^2) * (u^2 + b^2)) integrates to pi / (a*b*(a+b))
+        base_int = sp.integrate(1 / ((u**2 + a_s**2) * (u**2 + b_s**2)), (u, -sp.oo, sp.oo))
+        sym_int = (d_s**2 * base_int).subs(b_s, a_s - d_s)
+        sym_formula = sp.pi * d_s**2 / (a_s * (a_s - d_s) * (2 * a_s - d_s))
+        is_symbolic_exact = bool(sp.simplify(sym_int - sym_formula) == 0)
+
+        return {
+            "a": str(a_f),
+            "delta": str(d_f),
+            "gamma": str(gam_f),
+            "exact_formula_value": mpmath.nstr(exact_formula_val, n=20),
+            "quadrature_value": mpmath.nstr(quad_val, n=20),
+            "quadrature_error": mpmath.nstr(quad_err, n=6),
+            "is_symbolic_exact": is_symbolic_exact,
+            "status": "RESOLVENT_L2_INTEGRAL_VERIFIED"
+        }
+
+

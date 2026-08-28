@@ -347,14 +347,58 @@ $$\boxed{\text{A fixed finite divisor perturbation cannot produce a nonzero norm
 
 ### 9.6 Epistemic Boundary of Gate G4
 
-Because fixed finite perturbations are invisible under normalized infinite averaging, any non-trivial cofinal response requires an infinite growing perturbation $\Delta_{H(T)}(t)$ along a schedule $H(T) \to \infty$.
+### 9.6 Exact Single-Zero and Pair Resolvent Algebra
+
+Let $a = \sigma - 1/2 > 0$ and $w = a + i(t - \gamma)$. For an off-line displacement $\delta \in (-1/2, 1/2)$ with $a - \delta > 0$, the single-zero perturbation resolvent is:
+$$r_\delta(t) = \frac{1}{w - \delta} - \frac{1}{w} = \frac{\delta}{w(w - \delta)}.$$
+
+#### 9.6.1 Exact Continuous $L^2(\mathbb R)$ Resolvent Integral
+**Theorem (Exact Resolvent $L^2$ Norm)**:
+For $a > 0$ and $a - \delta > 0$:
+$$\boxed{\int_{-\infty}^\infty |r_\delta(t)|^2 dt = \frac{\pi \delta^2}{a(a - \delta)(2a - \delta)}}.$$
+
+**Proof**:
+Substitute $u = t - \gamma \in \mathbb R$ and let $b = a - \delta > 0$. Then:
+$$|r_\delta(t)|^2 = \frac{\delta^2}{|a + iu|^2 |b + iu|^2} = \frac{\delta^2}{(u^2 + a^2)(u^2 + b^2)}.$$
+Assuming $\delta \ne 0$ (hence $a \ne b$), partial fraction decomposition in $u^2$ yields:
+$$\frac{1}{(u^2 + a^2)(u^2 + b^2)} = \frac{1}{a^2 - b^2} \left( \frac{1}{u^2 + b^2} - \frac{1}{u^2 + a^2} \right).$$
+Integrating over $u \in (-\infty, \infty)$ using $\int_{-\infty}^\infty \frac{du}{u^2 + c^2} = \frac{\pi}{c}$ ($c > 0$):
+$$\int_{-\infty}^\infty \frac{du}{(u^2 + a^2)(u^2 + b^2)} = \frac{1}{a^2 - b^2} \left( \frac{\pi}{b} - \frac{\pi}{a} \right) = \frac{\pi (a - b)}{(a^2 - b^2) ab} = \frac{\pi}{(a + b) ab}.$$
+Substituting $b = a - \delta$:
+$$a + b = 2a - \delta, \quad ab = a(a - \delta), \quad \delta^2 = (a - b)^2.$$
+Multiplying by $\delta^2$ gives the exact closed-form integral:
+$$\int_{-\infty}^\infty |r_\delta(t)|^2 dt = \frac{\pi \delta^2}{a(a - \delta)(2a - \delta)}. \quad \blacksquare$$
+
+**Small-$\delta$ Leading Asymptotic**:
+Expanding the denominator around $\delta = 0$:
+$$a(a - \delta)(2a - \delta) = 2a^3 - 3a^2\delta + a\delta^2 = 2a^3 \left( 1 - \frac{3\delta}{2a} + \frac{\delta^2}{2a^2} \right).$$
+Therefore:
+$$\int_{-\infty}^\infty |r_\delta(t)|^2 dt = \frac{\pi \delta^2}{2a^3} + \mathcal O(\delta^3).$$
+The expression $\frac{\pi \delta^2}{2a^3}$ is strictly the leading small-$\delta$ asymptotic, while $\frac{\pi \delta^2}{a(a - \delta)(2a - \delta)}$ is the exact closed form for all admissible $\delta < a$.
+
+#### 9.6.2 Exact First-Order Cancellation of Reflection Pairs
+**Theorem (Reflection Pair Cancellation)**:
+For a functional-reflection pair at the same height $(\delta, \gamma)$ and $(-\delta, \gamma)$:
+$$\boxed{r_\delta(t) + r_{-\delta}(t) = \frac{2\delta^2}{w(w^2 - \delta^2)}}.$$
+
+**Proof**:
+$$r_\delta(t) + r_{-\delta}(t) = \left( \frac{1}{w - \delta} - \frac{1}{w} \right) + \left( \frac{1}{w + \delta} - \frac{1}{w} \right) = \frac{\delta}{w(w - \delta)} - \frac{\delta}{w(w + \delta)}$$
+$$= \frac{\delta}{w} \left[ \frac{(w + \delta) - (w - \delta)}{(w - \delta)(w + \delta)} \right] = \frac{\delta(2\delta)}{w(w^2 - \delta^2)} = \frac{2\delta^2}{w(w^2 - \delta^2)}. \quad \blacksquare$$
+*Epistemic consequence*: The symmetric functional-reflection pairing suppresses the defect resolvent from $\mathcal O(\delta)$ to exact second order $\mathcal O(\delta^2)$ pointwise. This rational identity is formalized in Lean 4 (`RiemannScope.resolvent_reflection_pair_cancellation`).
+
+---
 
 ### 9.7 The Subcritical Cofinal Norm Growth Theorem ($o(\sqrt{T})$ Threshold)
 
 **Epistemic & Proof Status**: `PROVED / EXACT / PARTIALLY_FORMALIZED`
 - **Paper Proof**: Complete deductive analytic derivation below.
-- **Formalized Lean 4 Component**: `RiemannScope.subcritical_norm_response_bound_vanishes` and `RiemannScope.subcritical_norm_response_tendsto_zero` formalize sequence convergence under $|V_n| \le x_n^2/2 + C x_n$ (`FORMALLY_PROVED COMPONENT`).
-- **Python Verification**: `math_core.verify_cofinal_subcritical_norm_bound` evaluates the exact algebraic upper bound across parameters (`NUMERICAL_EVIDENCE`).
+- **Formalized Lean 4 Components**:
+  - `RiemannScope.fixed_finite_energy_scaling_zero`
+  - `RiemannScope.subcritical_norm_response_bound_vanishes`
+  - `RiemannScope.subcritical_norm_response_tendsto_zero`
+  - `RiemannScope.subcritical_norm_contrapositive`
+  - `RiemannScope.not_tendsto_zero_subsequential_lower_bound`
+- **Python Evaluator**: `math_core.verify_cofinal_subcritical_norm_bound` evaluates the finite-sample bound across parameters (`NUMERICAL_EVIDENCE`).
 
 **Theorem (Subcritical Norm Response Vanishing)**:
 Let $T > 0$, and let $P_T, \Delta_T \in L^2(-T, T)$ with:
@@ -378,55 +422,94 @@ $$\lim_{T\to\infty} V_T = 0.$$
    $$|V_T| \le \frac{1}{2} x_T^2 + \sqrt{2M} x_T.$$
 5. If $x_T \to 0$, then since $\sqrt{2M} \ge 0$, Lean 4 `subcritical_norm_response_tendsto_zero` applies with $C = \sqrt{2M}$, proving $V_T \to 0$. $\blacksquare$
 
-**Contrapositive (Necessary Condition for Non-Vanishing Response)**:
-$$\boxed{\limsup_{T\to\infty} |V_T| > 0 \implies \|\Delta_T\|_{L^2(-T, T)} \ne o(\sqrt{T}).}$$
-That is, **norm growth of order at least $\sqrt{T}$ ($\|\Delta_T\| = \Omega(\sqrt{T})$) is a strict mathematical necessity** for any perturbation family to produce a non-vanishing normalized response.
+**Contrapositive (Subsequential Non-Vanishing Consequence)**:
+$$\boxed{\limsup_{T\to\infty} |V_T| > 0 \implies \frac{\|\Delta_T\|_{L^2(-T, T)}}{\sqrt{T}} \not\to 0.}$$
+That is, there exist $\varepsilon > 0$ and an unbounded sequence $T_k \to \infty$ such that:
+$$\|\Delta_{T_k}\|_{L^2(-T_k, T_k)} \ge \varepsilon \sqrt{T_k}.$$
 
-**Crucial Caveat (Necessity $\ne$ Sufficiency)**:
-Critical or supercritical norm growth ($\|\Delta_T\| = \Theta(\sqrt{T})$ or $\omega(\sqrt{T})$) is **necessary but NOT sufficient** for a non-vanishing or strictly positive response:
-- Because $V_T = E_T - C_T$ where $E_T = \frac{1}{2T}\|\Delta_T\|^2$ and $C_T = \frac{1}{T}\Re\langle P_T, \Delta_T\rangle$, the cross-term $C_T$ may cancel or overpower $E_T$.
-- Consequently, establishing $\|\Delta_T\| \ge c\sqrt{T}$ alone does not prove $V_T > 0$ without explicit bounds on the cross-term $C_T$.
+**Distinction from Eventual Lower Bound**:
+The condition $\|\Delta_T\| \ne o(\sqrt{T})$ does **NOT** imply an eventual positive lower bound $\exists c > 0, T_0 > 0$ such that $\forall T \ge T_0, \|\Delta_T\| \ge c\sqrt{T}$.
+*Counterexample*: Consider the sequence $x_n = 1$ for even $n$, and $x_n = 1/(n+1)$ for odd $n$.
+Then $x_n \not\to 0$ (since $\limsup x_n = 1 > 0$), but $\liminf x_n = 0$, so $x_n$ has no positive eventual lower bound ($\forall N, \inf_{n \ge N} x_n = 0$).
 
 **Unconditional Specialization for the Prime Background**:
-For $\sigma > 1$, $P_\sigma(t) = -\sum \Lambda(n) n^{-\sigma-it}$ satisfies $|P_\sigma(t)| \le -\zeta'/\zeta(\sigma) = M_\sigma$.
+For $\sigma > 1$, $P_\sigma(t) = -\frac{\zeta'}{\zeta}(\sigma + it) = \sum_{n=2}^\infty \frac{\Lambda(n)}{n^{\sigma+it}}$ satisfies $|P_\sigma(t)| \le -\frac{\zeta'}{\zeta}(\sigma) = M_\sigma$.
 Thus $\frac{1}{2T}\|P_\sigma\|_{L^2(-T, T)}^2 \le M_\sigma^2 < \infty$ holds unconditionally with $M = M_\sigma^2$.
 
 ---
 
-### 9.8 Application to the Live Cofinal Object $\Delta_{H(T)}$ & The Next Unresolved Obligation
+### 9.8 Withdrawal of the Riemann–von Mangoldt Norm Asymptotic
 
-#### 9.8.1 Exact Mathematical Definition of $\Delta_{H(T)}$
-For $\sigma > 1$ and zero cutoff schedule $H(T) > 0$, let $\mathcal Z_{H(T)}$ denote the set of critical-strip zero ordinates with $|\gamma_j| \le H(T)$.
-For each zero $\rho_j = 1/2 + \delta_j + i\gamma_j$, the perturbation resolvent is:
-$$r_j(t) = \frac{1}{\sigma - 1/2 - \delta_j + i(t - \gamma_j)} - \frac{1}{\sigma - 1/2 + i(t - \gamma_j)} = \frac{\delta_j}{(\sigma - 1/2 - \delta_j + i(t - \gamma_j))(\sigma - 1/2 + i(t - \gamma_j))}.$$
-The live cofinal perturbation object is the sum:
-$$\Delta_{H(T)}(t) = \sum_{|\gamma_j| \le H(T)} r_j(t).$$
+**Status**: `WITHDRAWN / INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE`
 
-#### 9.8.2 Symmetry Groupings and Growth Regimes
-1. **Single Zero**: $\Delta_{H(T)}(t) = r_1(t)$ (fixed finite, $\|\Delta\| = O(1) = o(\sqrt{T})$, vanishes by Theorem 9.7).
-2. **Conjugate Pair**: $r(t; \gamma) + r(t; -\gamma)$ (fixed finite, vanishes by Theorem 9.7).
-3. **Same-Height Reflection Pair**: $r(t; \delta, \gamma) + r(t; -\delta, \gamma)$ (fixed finite, vanishes by Theorem 9.7).
-4. **Symmetric Quartet**: $\sum_{\varepsilon, \eta = \pm 1} r(t; \varepsilon\delta, \eta\gamma)$ (fixed finite, vanishes by Theorem 9.7).
-5. **Live Infinite Growing Divisor**: When $H(T) = cT$ ($c > 0$), by Riemann-von Mangoldt counting:
-   $$N(T) = \frac{T}{2\pi}\log\frac{T}{2\pi e} + O(\log T).$$
-   The number of terms in $\Delta_{H(T)}$ grows as $N(cT) \sim \frac{cT}{2\pi}\log T$.
-   - The direct diagonal $L^2$ norm sum scales as:
-     $$\sum_{|\gamma_j| \le cT} \|r_j\|_{L^2}^2 \sim \delta^2 \sum_{|\gamma_j| \le cT} \frac{\pi}{2a^3} \sim \frac{\pi \delta^2}{2a^3} N(cT) = O(T \log T).$$
-   - Thus $\|\Delta_{H(T)}\|_{L^2(-T, T)} \sim \sqrt{T \log T}$, which exceeds the subcritical threshold $o(\sqrt{T})$.
+The historical assertion that $\|\Delta_{H(T)}\| \sim \sqrt{T \log T}$ and $\|\Delta_{H(T)}\| = \Omega(\sqrt{T \log T})$ along $H(T) = cT$ by total zero counting is **WITHDRAWN**.
 
-#### 9.8.3 The Live Open Obligation (`OBL-CMSA-003-G4-COFINAL-ESTIMATE`)
-Because $\|\Delta_{H(T)}\| = \Omega(\sqrt{T \log T})$ is supercritical, the Subcritical Norm Theorem does not force $V_T \to 0$.
-The response decomposes into:
-$$V_T = E_T - C_T,$$
-where:
-$$E_T = \frac{1}{2T} \|\Delta_{H(T)}\|_{L^2(-T, T)}^2 = \frac{1}{2T} \int_{-T}^T |\Delta_{H(T)}(t)|^2 dt,$$
-$$C_T = \frac{1}{T} \Re \int_{-T}^T P_\sigma(t) \overline{\Delta_{H(T)}(t)} dt.$$
+#### The 6 Reasons Total Zero Counting Fails for Defect Resolvent Norm Growth
+1. **On-Line Zero Cancellation**:
+   Critical-line zeros have $\delta_j = 0$, yielding $r_j(t) = 0$ identically. The Riemann–von Mangoldt formula $N(T) \sim \frac{T}{2\pi}\log T$ counts *all* nontrivial zeros. It provides no information on the count of off-line zeros.
+2. **Unknown Count and Distribution of Off-Line Zeros**:
+   The number of off-line zeros could be 0 (under RH), 4 (a single quartet), finite, or sparse. Total zero counting cannot establish that off-line zeros grow cofinally with $T$.
+3. **Defect Variability**:
+   The defect displacements $\delta_j$ are not constant. If off-line zeros exist, $\delta_j$ could decay rapidly with ordinate $\gamma_j$ (e.g. $\delta_j \sim 1/\gamma_j$), rendering the sum of norms convergent ($\sum \|r_j\|^2 < \infty$).
+4. **Off-Diagonal Inner Product Interference**:
+   The $L^2$ norm $\|\Delta_{H(T)}\|^2 = \sum_{j, k} \langle r_j, r_k \rangle$ contains all off-diagonal cross-terms. Destructive interference between oscillating modes can substantially suppress the total norm below the diagonal sum.
+5. **First-Order Reflection Cancellation**:
+   As proved in Theorem 9.6.2, functional-reflection partners at the same height cancel at first order ($r_\delta + r_{-\delta} = \mathcal O(\delta^2)$), reducing the effective mode amplitudes.
+6. **Boundary Truncation Effects on $[-T, T]$**:
+   The finite interval $[-T, T]$ captures only a fraction of the $L^2(\mathbb R)$ mass of resolvents located near the cutoff $H(T) \approx T$.
 
-To determine whether Gate G4 can be closed, the next mathematical theorem must resolve:
-1. **Asymptotic Direct Energy $E_T$**: Evaluate the diagonal and off-diagonal spectral interference:
-   $$\frac{1}{2T} \sum_{j, k} \int_{-T}^T r_j(t) \overline{r_k(t)} dt.$$
-2. **Asymptotic Arithmetic Cross-Term $C_T$**: Evaluate the Dirichlet-resolvent coupling:
-   $$\frac{1}{T} \sum_{n=2}^\infty \frac{\Lambda(n)}{n^\sigma} \sum_{|\gamma_j| \le H(T)} \int_{-T}^T n^{-it} \overline{r_j(t)} dt.$$
-3. **Sign and Positivity**: Determine whether $E_T - C_T > 0$ strictly for any non-zero radial defect $\delta \ne 0$, or whether cross-term cancellation or background dependence induces sign instability.
+Consequently, the cofinal norm growth rate remains:
+$$\boxed{\text{Classification: } \texttt{INCONCLUSIVE\_WITH\_PRECISE\_EARLIEST\_OPEN\_SUBGATE}}.$$
 
-Until `OBL-CMSA-003-G4-COFINAL-ESTIMATE` is deductively proved, **Gate G4 remains strictly OPEN**.
+---
+
+### 9.9 Zero-Rigidity Failure: Finite Off-Line Quartet Invisibility
+
+Consider a hypothetical configuration where all zeta zeros are on the critical line except for a single off-line quartet $\mathcal Q = \{1/2 \pm \delta \pm i\gamma\}$ ($\delta \ne 0$).
+
+1. **Stabilization to Fixed $L^2(\mathbb R)$ Function**:
+   For all $H(T) \ge \gamma$, the cofinal sum $\Delta_{H(T)}(t)$ is constant in $T$:
+   $$\Delta_{H(T)}(t) = \Delta(t) = \sum_{\rho \in \mathcal Q} r_\rho(t) \in L^2(\mathbb R).$$
+2. **Subcritical Norm Growth**:
+   $$\|\Delta_{H(T)}\|_{L^2(-T, T)} \le \|\Delta\|_{L^2(\mathbb R)} = \mathcal O(1) = o(\sqrt{T}).$$
+3. **Vanishing Normalized Mean Response**:
+   By the Subcritical Norm Growth Theorem (Theorem 9.7):
+   $$\lim_{T\to\infty} V_T = 0.$$
+4. **Inability to Distinguish Off-Line Quartet from RH**:
+   The normalized CMSA mean functional produces **identically zero response** in the limit $T \to \infty$ for this configuration. It cannot distinguish a universe with an off-line quartet from a universe where RH is true.
+
+#### Generalization & Limit Order Classification
+- **Fixed and Subcritical Defect Families**: Any perturbation family with $\|\Delta_{H(T)}\| = o(\sqrt{T})$ is classified as:
+  $$\boxed{\texttt{FAIL\_LIMIT\_ORDER\_DEPENDENCE}}.$$
+  *(The $1/2T$ translation averaging order destroys the finite off-line signal).*
+- **Growing Cofinal Families**: Any perturbation family requiring infinite growth analysis is classified as:
+  $$\boxed{\texttt{INCONCLUSIVE\_WITH\_PRECISE\_EARLIEST\_OPEN\_SUBGATE}}.$$
+
+**Structural Conclusion**:
+The current normalized mean functional alone cannot detect a finite off-line quartet. Therefore, **the current normalized CMSA functional alone is not universal enough to prove RH without an additional activation mechanism**.
+
+---
+
+### 9.10 Transcendental-Continuation Activation Theorem (The Earliest Open Subgate)
+
+The central unresolved mathematical question of the Transcendental Continuation framework is:
+$$\boxed{\text{Does a single nonzero radial defect class } \delta \ne 0 \text{ transport across grades to activate a non-subcritical signal?}}$$
+
+#### Formal Statement of the Activation Theorem
+$$\boxed{\exists \rho \text{ with } \delta_\rho \ne 0 \implies \limsup_{T\to\infty} \frac{\|\Delta^{TC}_T\|_{L^2(-T, T)}}{\sqrt{T}} > 0.}$$
+
+#### The 8 Structural Requirements on $\Delta^{TC}_T$
+To be mathematically well-defined, the transcendental continuation object $\Delta^{TC}_T$ must specify:
+1. **Grade Combination Operation**: Explicitly define whether grade contributions $\Delta_K$ are summed, averaged, integrated against a grade measure, or quotiented.
+2. **Anti-Redundancy & Non-Double-Counting**: Deductively establish why transport-equivalent copies $\tau^K \rho$ are not treated as independent zeros, avoiding coordinate-redundancy collapse (`CLM-CMSA-006`).
+3. **Grade Weight / Measure**: Explicit specification of weights $w(K)$ or measure $d\mu(K)$ over $K \in \mathbb Z$.
+4. **Bilateral Convergence**: Proof of convergence of the grade combination over both $K \to +\infty$ (dilation) and $K \to -\infty$ (contraction).
+5. **Interaction with Height Truncation $H(T)$**: Explicit interaction between grade index $K$, zero ordinates $\tau^K \gamma$, and the window cutoff $H(T)$.
+6. **Covariance under Grade Shift**: Exact behavior under discrete generator shift $K \mapsto K+1$.
+7. **Arithmetic Representation**: Existence of a zero-independent arithmetic evaluator matching $\Delta^{TC}_T$.
+8. **Non-Triviality / Pullback Independence**: Deductive proof that $\Delta^{TC}_T$ is not a grade-zero pullback by coordinate covariance.
+
+*Operational Status*:
+Ordinary grade covariance alone does not prove activation due to the Covariance Countermodel (`CLM-ARB-004`) and Coordinate Redundancy Theorem (`CLM-CMSA-006`).
+Until a coherent, non-redundant $\Delta^{TC}_T$ is defined and proved to satisfy these 8 requirements, the **Transcendental Continuation Activation Theorem is the precise earliest open subgate** in the `reimann_scope` programme, logically preceding any evaluation of the $E_T - C_T$ asymptotic.
+

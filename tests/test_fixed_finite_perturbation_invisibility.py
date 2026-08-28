@@ -19,8 +19,12 @@ from math_core import (
     verify_squared_norm_background_dependence,
     verify_fixed_finite_perturbation_invisibility,
     verify_additive_reference_subtraction_invariance,
-    verify_cofinal_subcritical_norm_bound
+    verify_cofinal_subcritical_norm_bound,
+    exact_resolvent_L2_norm_squared,
+    verify_resolvent_reflection_pair_cancellation,
+    verify_resolvent_L2_integral
 )
+
 
 
 class TestBackgroundDependenceAndInvarianceScope:
@@ -236,3 +240,54 @@ class TestCofinalSubcriticalNormBound:
             verify_cofinal_subcritical_norm_bound(M_bound='1.0', delta_L2_norm='-1.0', T_val='10.0')
         with pytest.raises(ValueError, match="T_val must be strictly positive"):
             verify_cofinal_subcritical_norm_bound(M_bound='1.0', delta_L2_norm='1.0', T_val='0.0')
+
+
+class TestResolventAlgebraAndCancellation:
+    """Tests for exact single-zero defect resolvent algebra, reflection cancellation, and L2 integration."""
+
+    def test_exact_resolvent_L2_norm_and_asymptotic(self):
+        """Verifies exact L2 norm squared pi*delta^2 / [a(a-delta)(2a-delta)] and leading asymptotic."""
+        # a = 1.0, delta = 0.2: denom = 1.0 * 0.8 * 1.8 = 1.44; delta^2 = 0.04; exact = pi * 0.04 / 1.44 = pi / 36
+        res = exact_resolvent_L2_norm_squared(a='1.0', delta='0.2', dps=50)
+        assert res["status"] == "EXACT_RESOLVENT_NORM_EVALUATED"
+        expected = mpmath.pi / 36
+        assert mpmath.almosteq(mpmath.mpf(res["exact_L2_norm_squared"]), expected, abs_eps=1e-45)
+        # Leading small-delta asymptotic: pi * 0.04 / 2 = 0.02 * pi
+        expected_asymp = mpmath.mpf('0.02') * mpmath.pi
+        assert mpmath.almosteq(mpmath.mpf(res["leading_asymptotic"]), expected_asymp, abs_eps=1e-45)
+
+    def test_resolvent_L2_integral_quadrature_vs_exact_and_symbolic(self):
+        """Verifies high-precision quadrature matches exact formula and SymPy symbolic integral is exact."""
+        res = verify_resolvent_L2_integral(a='1.2', delta='0.15', gamma='14.134725', dps=40)
+        assert res["status"] == "RESOLVENT_L2_INTEGRAL_VERIFIED"
+        assert res["is_symbolic_exact"] is True
+        assert mpmath.mpf(res["quadrature_error"]) < mpmath.mpf('1e-35')
+
+    def test_resolvent_reflection_pair_cancellation_algebra_and_symbolic(self):
+        """Verifies r_delta(w) + r_{-delta}(w) = 2*delta^2 / [w(w^2 - delta^2)] numerically and symbolically."""
+        res = verify_resolvent_reflection_pair_cancellation(
+            w_val='1.0 + 14.134725j',
+            delta_val='0.05',
+            dps=50
+        )
+        assert res["status"] == "REFLECTION_PAIR_CANCELLATION_VERIFIED"
+        assert res["is_symbolic_exact"] is True
+        assert mpmath.mpf(res["error"]) < mpmath.mpf('1e-45')
+
+    def test_resolvent_algebra_validation(self):
+        """Verifies strict input validation for resolvent algebra functions."""
+        with pytest.raises(ValueError, match="Width parameter a must be strictly positive"):
+            exact_resolvent_L2_norm_squared(a='0.0', delta='0.1')
+        with pytest.raises(ValueError, match="Perturbed width a - delta must be strictly positive"):
+            exact_resolvent_L2_norm_squared(a='0.5', delta='0.5')
+        with pytest.raises(ValueError, match="Perturbed width a - delta must be strictly positive"):
+            exact_resolvent_L2_norm_squared(a='0.5', delta='0.6')
+
+        with pytest.raises(ValueError, match="w must be non-zero"):
+            verify_resolvent_reflection_pair_cancellation(w_val='0.0', delta_val='0.1')
+        with pytest.raises(ValueError, match=r"w \+- delta must be non-zero"):
+            verify_resolvent_reflection_pair_cancellation(w_val='0.1', delta_val='0.1')
+        with pytest.raises(ValueError, match=r"w \+- delta must be non-zero"):
+            verify_resolvent_reflection_pair_cancellation(w_val='-0.1', delta_val='0.1')
+
+
