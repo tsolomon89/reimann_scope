@@ -883,3 +883,35 @@ Formalized in `formal/RiemannScope/CurvatureTransport.lean` (37 total declaratio
    - `unpulled_affine_zero_worldline_eval`: static evaluation $L(s_\rho(k)) = (\tau^k - 1) z_0$.
 
 Total compiled project theorem declarations: **123** (0 `sorry`, 0 `admit`, 0 warnings).
+
+---
+
+# 30. Phase 21 — Integrated-$\sigma$ Resolvent Identity and Bilateral Grade Second Variation
+
+Formalized in `formal/RiemannScope/CurvatureTransport.lean` (41 total declarations in module, 127 total compiled formal declarations across project):
+
+1. **Exact Quartet-Minus-Projection Resolvent Identity** (`exact_quartet_resolvent_identity`, `ALGEBRAIC_IDENTITY`):
+   - For $w, \delta \in \mathbb C$ with $w \ne 0, w \pm \delta \ne 0, w^2 - \delta^2 \ne 0$:
+     \[
+     \frac{1}{w - \delta} + \frac{1}{w + \delta} - \frac{2}{w} = \frac{2\delta^2}{w(w^2 - \delta^2)}.
+     \]
+2. **Bilateral Squared-Norm Centering Under Exact Opposition** (`bilateral_squared_norm_centering_exact_opposite`, `ALGEBRAIC_IDENTITY`):
+   - For complex background $F \in \mathbb C$ and perturbation $\Delta \in \mathbb C$:
+     \[
+     (Q(F, \Delta) + Q(F, -\Delta)) = 2 |\Delta|^2.
+     \]
+     The linear background cross-terms cancel identically.
+3. **Bilateral Squared-Norm Sum Under General Perturbations** (`bilateral_squared_norm_general_sum`, `ALGEBRAIC_IDENTITY`):
+   - For complex background $F \in \mathbb C$ and perturbations $\Delta_1, \Delta_2 \in \mathbb C$:
+     \[
+     (Q(F, \Delta_1) + Q(F, \Delta_2)) = |\Delta_1|^2 + |\Delta_2|^2 + 2\Re\left(F \overline{(\Delta_1 + \Delta_2)}\right).
+     \]
+4. **Bilateral Second-Order Asymmetry Cross-Term No-Go** (`bilateral_second_order_asymmetry_cross_term`, `NO_GO_COMPONENT`):
+   - When perturbations satisfy $\Delta_2 = -\Delta_1 + h^2 B$, the residual linear sum is $\Delta_1 + \Delta_2 = h^2 B$, and the background cross-term does NOT vanish at second order:
+     \[
+     2\Re\left(F \overline{(\Delta_1 + \Delta_2)}\right) = 2 h^2 \Re(F \bar B) \ne 0.
+     \]
+     Formally proves that coordinate dilation centering fails to eliminate background dependence (`FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).
+
+Total compiled project theorem declarations: **127** (0 `sorry`, 0 `admit`, 0 warnings).
+

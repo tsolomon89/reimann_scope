@@ -379,18 +379,54 @@ The **Weil–Hermitian Curvature Bridge** (`CURVATURE_TRANSPORT.md` §14–15) c
 5. **GNS Positive-Type Barrier**:
    Pure local prime distribution weights $-\frac{\Lambda(n)}{\sqrt{n}}$ are strictly negative-definite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`). Complete Weil distribution positivity $Q_W(f * f^*) \ge 0$ is globally equivalent to the Riemann Hypothesis (Weil 1952), remaining `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`.
 
+### 10.7 Candidate Bilateral Grade Centered Second Difference (ARB-BG / SS-6)
+
+Consider the symmetric bilateral grade second difference functional:
+$$\mathcal C_{h, T} = \mathcal M_{h, T} + \mathcal M_{-h, T} - 2\mathcal M_{0, T}.$$
+
+1. **Exact Opposition Cancellation**:
+   For exact opposite perturbations $\Delta_{-h} = -\Delta_h$, $Q(F, \Delta_h) + Q(F, -\Delta_h) = 2|\Delta_h|^2 \ge 0$.
+   Proved in Lean 4 (`bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).
+2. **Asymmetry Cross-Term Obstruction (No-Go)**:
+   Under coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$, $\Delta_h + \Delta_{-h} = h^2 B(z) + \mathcal O(h^4) \ne 0$.
+   The uncancelled background cross-term is $2h^2\Re(F\overline{B(z)}) \ne 0$.
+   Proved in Lean 4 (`bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**).
+   *Classification*: $\boxed{\texttt{FAIL\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+3. **Scale Specificity**:
+   Algebraic dilation centering is scale-generic ($a > 1$) and does not specifically single out $\tau = 2\pi$.
+   *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
+
 ---
 
-## 11. Current Status and Research Protocol
+## 11. Consolidated Radial-Defect Descent Obligations
 
+The surviving mathematical approaches to extracting an arithmetic radial defect are consolidated under the master obligation:
+
+$$\boxed{\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}}$$
+
+| Route ID | Name | Core Target Identity | Current Gate / Barrier | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Child 1: `OBL-RDQ-001`** | Radial Defect Quotient (RDQ) | $D = -\log L_Q = \sum 2n_j \log(1 + \delta_j^2/\gamma_j^2) \ge 0$ | Divisor-independent arithmetic evaluator without zero data | `OPEN` |
+| **Child 2: `OBL-CT-001`** | Curvature Transport | $\sum W_\rho \mathscr K_\tau(\rho) = \sum W_\rho \delta_\rho^2 \ge 0$ | Non-scalar arithmetic functional construction (`OBL-CT-001A`) | `OPEN` |
+| **Child 3: `OBL-WH-001`** | Weil–Hermitian Bridge | $N_\xi - C_\xi = \sum \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0$ | Admissible probe regularization $\Phi_\varepsilon \to 1/s$ (`OBL-WH-002`) & global positive-type arithmetic factorization (`OBL-WH-003`) | `KNOWN_RH_EQUIVALENCE / OPEN_ARITHMETIC_NORM` |
+| **Child 4: `OBL-CMSA-003`** | Completed Mean-Square Anchor | $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P - Z|^2 dt = \sum \frac{\Lambda(n)^2}{n^{2\sigma}}$ | Transcendental Continuation Activation Subgate (`OBL-TC-ACT`); Integrated-$\sigma$ unnormalized anchor loss (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`) | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
+
+---
+
+## 12. Current Status and Research Protocol
+
+- **`OBL-RADIAL-DEFECT-DESCENT`**: Active master obligation governing the 4 surviving radial-defect extraction routes.
 - **`OBL-CT-001A` (Non-Scalar Arithmetic Functional Construction)**: Canonical **EARLIEST OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §15).
 - **`OBL-WH-002` (Admissible Probe Regularization)**: Active analytic obligation for smoothing family $\Phi_\varepsilon \to 1/s$.
-- **`OBL-CT-001B`–`OBL-CT-001D`**: Sequential open gates for spectral expansion, pair isolation, and conditional rigidity combination.
-- **`OBL-RDQ-001`**: Remains **OPEN**.
-- **`OBL-CMSA-003` (Gate G4)**: Remains **OPEN** (Earliest open gate in CMSA derivation).
-- **Transcendental Continuation Activation Theorem (`OBL-TC-ACT`)**: Precise earliest open subgate for Gate G4.
-- **Candidate Classification**: `EXACT_CURVATURE_IDENTITY_PROVED_ARITHMETIC_NORM_OPEN` (Weil–Hermitian Curvature Bridge) / `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive class) / `FAIL_LIMIT_ORDER_DEPENDENCE` (fixed and subcritical perturbation families) / `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` (infinite cofinal CMSA-1/2) / `CERTIFIED_NEGATIVE_ARB_BALL` (Fejér WIT-02 certificate status) / `FINITE_IDENTITY_PROVED_G4_OPEN` (finite expansion).
+- **`OBL-TC-ACT` (Transcendental Continuation Activation Theorem)**: Active earliest open subgate for CMSA Gate G4.
+- **Closed / Falsified Subgates**:
+  - `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive reference class).
+  - `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION` (two-bump prime Gram matrix indefiniteness $\pm w_p$).
+  - `FAIL_BILATERAL_CROSS_TERM_CANCELLATION` (bilateral grade coordinate dilation second variation).
+  - `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT` (integrated-$\sigma$ unnormalized arithmetic divergence).
+  - `GRADE_COORDINATE_REDUNDANT` / `SCALE_GENERIC_NOT_TAU_SPECIFIC` (dilation pullback redundancy and generic scale).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
+
 
 
 

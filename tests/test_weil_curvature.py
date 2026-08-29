@@ -123,20 +123,30 @@ class TestWeilSpectralSumsAndRigidity:
 
 
 class TestFinitePrimeWeilGramMatrix:
-    """Verifies that local prime distributions alone produce strictly negative eigenvalues."""
+    """Verifies that local prime distributions on genuine two-bump test functions produce indefinite eigenvalues (+- w_p)."""
 
-    def test_finite_prime_negative_eigenvalues(self):
+    def test_finite_prime_indefinite_eigenvalues(self):
         primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
         res = math_core.evaluate_finite_prime_weil_gram_matrix(primes=primes, dps=50)
 
         assert res["status"] == "FINITE_PRIME_WEIL_GRAM_MATRIX_ANALYZED"
-        assert res["all_eigenvalues_strictly_negative"] is True
-        assert res["is_locally_positive_definite"] is False
-        assert float(res["max_eigenvalue"]) < 0.0
-        assert float(res["min_eigenvalue"]) < 0.0
-        assert res["falsification_witness"] == "PRIME_DISTRIBUTION_ALONE_IS_STRICTLY_NEGATIVE_DEFINITE"
+        assert res["is_positive_semidefinite"] is False
+        assert res["is_strictly_negative_definite"] is False
+        assert res["falsification_witness"] == "PRIME_ONLY_AUTOCORRELATION_IS_INDEFINITE_NOT_POSITIVE_SEMIDEFINITE"
         assert res["classification"] == "FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION"
         assert res["global_weil_positivity_status"] == "OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION"
+
+        # Verify each 2x2 two-bump witness has eigenvalues +w_p and -w_p
+        for w in res["two_bump_witnesses"]:
+            assert w["is_indefinite"] is True
+            w_p = float(w["w_p"])
+            assert w_p > 0.0
+            evs = [float(ev) for ev in w["eigenvalues"]]
+            assert len(evs) == 2
+            assert max(evs) > 0.0
+            assert min(evs) < 0.0
+            assert abs(max(evs) + min(evs)) < 1e-10
+
 
 
 class TestMellinProbeAnalysis:

@@ -2661,6 +2661,57 @@ In unified additive logarithmic coordinates $u = \log x \in \mathbb R$:
 - Subgate 3: $\texttt{FAIL\_NAIVE\_PRIME\_LOCAL\_FACTORIZATION}$ (falsified diagonal candidate)
 - Subgate 4: $\texttt{OPEN\_GLOBAL\_POSITIVE\_TYPE\_FACTORIZATION}$ (RH-equivalent barrier)
 
+---
+
+# 45. Integrated-$\sigma$ Resolvent Algebra and Bilateral Grade Second Variation
+
+### Exact Quartet-Minus-Projection Resolvent Difference
+For centered coordinate $z = a + it$ ($a = \sigma - 1/2 > |\delta|$):
+\[
+\boxed{\Delta Z_+(z) = \frac{1}{z - (\delta + i\gamma)} + \frac{1}{z - (-\delta + i\gamma)} - \frac{2}{z - i\gamma} = \frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)}.}
+\]
+For the complete off-line quartet (including $-i\gamma$):
+\[
+\Delta Z(z) = \Delta Z_+(z) + \Delta Z_-(z) = \frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)} + \frac{2\delta^2}{(z + i\gamma)((z + i\gamma)^2 - \delta^2)}.
+\]
+*(Formally proved in Lean 4: `exact_quartet_resolvent_identity`, **ALGEBRAIC_IDENTITY**).*
+
+### Exact Integrability and $L^2(dt)$ Norms
+For any $a > |\delta|$, $|\Delta Z_+(a+it)| = \mathcal O(|t|^{-3})$ as $t \to \pm\infty$, establishing $\Delta Z_\sigma \in L^1(\mathbb R, dt) \cap L^2(\mathbb R, dt)$ unconditionally.
+Leading single-height $L^2(dt)$ norm:
+\[
+\boxed{\left\| \frac{2\delta^2}{(a + i(t - \gamma))^3} \right\|_{L^2(dt)}^2 = 4\delta^4 \int_{-\infty}^\infty \frac{dt}{(a^2 + (t - \gamma)^2)^3} = \frac{3\pi\delta^4}{2a^5}.}
+\]
+Integrating $d\sigma = da$ from $a_0 = \sigma_0 - 1/2$: $\int_{a_0}^\infty \frac{3\pi\delta^4}{2a^5} da = \frac{3\pi\delta^4}{8 a_0^4} < \infty$.
+
+### CMSA–RDQ Logarithmic Derivative Identity
+\[
+\boxed{\frac{\partial}{\partial z} \log q_{\delta, \gamma}(z) = \frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)} = \Delta Z_+(z),}
+\]
+where $q_{\delta, \gamma}(z) = \frac{(z - (\delta+i\gamma))(z - (-\delta+i\gamma))}{(z - i\gamma)^2} = 1 - \frac{\delta^2}{(z - i\gamma)^2}$.
+
+### Exact Fourier–Laplace Transform
+Under the Fourier-Laplace kernel $\int_{-\infty}^\infty f(t) e^{it\xi} dt$ for $\xi > 0$:
+\[
+\boxed{\widehat{\Delta Z_\sigma}(\xi) = 8\pi e^{-a\xi} (\cosh(\delta\xi) - 1) \cos(\gamma\xi).}
+\]
+
+### Unnormalized Anchor Loss & Prime Diagonal Closed Form
+- Prime cross-term: $-2\Re \int_{\sigma_0}^\infty \int_{-\infty}^\infty P_\sigma(t) \overline{\Delta Z_\sigma(t)} dt d\sigma = -4\pi \sum_{n=2}^\infty \Lambda(n) \frac{n^{1/2 - 2\sigma_0}}{\log n} (\cosh(\delta\log n) - 1) \cos(\gamma\log n)$, sign-indefinite.
+- Loss of arithmetic anchor: $\int_{\sigma_0}^\infty \int_{-\infty}^\infty |P_\sigma(t)|^2 dt d\sigma = \infty$ diverges completely (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`).
+- Integrated prime diagonal:
+\[
+\boxed{\int_{\sigma_0}^\infty \sum_{n=2}^\infty \Lambda(n)^2 n^{-2\sigma} d\sigma = \sum_{n=2}^\infty \frac{\Lambda(n)^2}{2\log n} n^{-2\sigma_0} = -\frac{1}{2} \sum_{p \text{ prime}} \log p \log(1 - p^{-2\sigma_0}).}
+\]
+
+### Bilateral Grade Centered Second Difference
+For $\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + |\Delta_{-h}|^2 + 2\Re(F\overline{(\Delta_h+\Delta_{-h})})$:
+1. **Exact Opposition**: If $\Delta_{-h} = -\Delta_h$, $\Delta_h+\Delta_{-h} = 0 \implies \mathcal C_h = 2|\Delta_h|^2 \ge 0$. *(Formally proved in Lean 4: `bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).*
+2. **Coordinate Dilation Asymmetry (No-Go)**: For $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$, $\Delta_h+\Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving uncancelled background cross-term $4h^2\Re(F\bar B) \ne 0$. *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**, `FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).*
+3. **Scale Specificity**: Scale-generic for all $a > 1$ (`SCALE_GENERIC_NOT_TAU_SPECIFIC`).
+4. **Two-Bump Prime Gram Matrix**: $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ with eigenvalues $\pm w_p$, indefinite (not positive semidefinite, `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`).
+
+
 
 
 

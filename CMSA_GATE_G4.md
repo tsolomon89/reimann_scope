@@ -525,6 +525,95 @@ The **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`) resolves the st
 4. **Weil–Hermitian Bridge Connection & GNS Barrier**: The canonical pointwise identity $\frac{1}{2}(1/|\rho|^2 + 1/|1-\rho|^2) - \Re(1/(\rho(1-\rho))) = \frac{2\delta^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2}$ rigorously links continuous grade curvature to the Weil form $Q_W(f)$ and Hermitian sum $Q_H(f) = \sum |\Phi_f(\rho)|^2$. Naive indicator $g_0(x) = x^{-1/2}\mathbf 1_{[1, \tau]}(x)$ yields $\widehat g_0(s) = \frac{\tau^{s-1/2}-1}{s-1/2} \ne 1/s$ (`FAIL_TEST_FUNCTION_IDENTIFICATION`), requiring an admissible smoothing family $\Phi_\varepsilon \to 1/s$ (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`). Pure local prime weights are strictly negative-definite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`), and assuming global positivity $Q_W(f * f^*) \ge 0$ a priori is equivalent to RH (Weil's 1952 criterion; `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`).
 5. **Distinction from Gate G4 Resolution**: Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4. Constructing a zero-independent non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ (or $Q_H(f)$) is the program's canonical earliest open obligation: **Non-Scalar Arithmetic Functional Construction** (`OBL-CT-001A`). Whether a non-scalar arithmetic functional avoids or reproduces the pair-isolation/infinite-limit barrier remains an open research problem.
 
+---
+
+### 9.12 Exact Integrated-$\sigma$ Branch Closure
+
+The integrated-$\sigma$ formulation integrates the mean-square resolvent variation in $d\sigma$ across $\sigma \in [\sigma_0, \infty)$ ($\sigma_0 > 1$) to eliminate the boundary divergence:
+
+1. **Exact Quartet-Minus-Projection Resolvent Difference**:
+   For centered coordinate $z = a + it$ ($a = \sigma - 1/2 > |\delta|$):
+   $$\Delta Z_+(z) = \frac{1}{z - (\delta + i\gamma)} + \frac{1}{z - (-\delta + i\gamma)} - \frac{2}{z - i\gamma} = \boxed{\frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)}}.$$
+   For the complete off-line quartet (adding $-i\gamma$):
+   $$\Delta Z(z) = \Delta Z_+(z) + \Delta Z_-(z) = \frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)} + \frac{2\delta^2}{(z + i\gamma)((z + i\gamma)^2 - \delta^2)}.$$
+   *Formal Status*: Proved algebraically in Lean 4 (`exact_quartet_resolvent_identity`, **ALGEBRAIC_IDENTITY**).
+
+2. **Exact Integrability & $L^2(dt)$ Norms**:
+   For any $a > |\delta|$, $|\Delta Z_+(a+it)| = \mathcal O(|t|^{-3})$ as $t \to \pm\infty$, establishing $\Delta Z_\sigma \in L^1(\mathbb R, dt) \cap L^2(\mathbb R, dt)$ unconditionally.
+   The leading $L^2(dt)$ norm for a single height group is:
+   $$\left\| \frac{2\delta^2}{(a + i(t - \gamma))^3} \right\|_{L^2(dt)}^2 = 4\delta^4 \int_{-\infty}^\infty \frac{dt}{(a^2 + (t - \gamma)^2)^3} = \boxed{\frac{3\pi\delta^4}{2a^5}}.$$
+   Integrating $d\sigma = da$ from $a_0 = \sigma_0 - 1/2$: $\int_{a_0}^\infty \frac{3\pi\delta^4}{2a^5} da = \frac{3\pi\delta^4}{8 a_0^4} < \infty$.
+   The full two-height quartet $L^2$ norm satisfies $\|\Delta Z\|_{L^2(dt)}^2 = \frac{3\pi\delta^4}{a^5} + 2\Re\langle \Delta Z_+, \Delta Z_-\rangle$.
+
+3. **CMSA–RDQ Logarithmic Derivative Connection**:
+   Let $q_{\delta, \gamma}(z) = \frac{(z - (\delta+i\gamma))(z - (-\delta+i\gamma))}{(z - i\gamma)^2} = 1 - \frac{\delta^2}{(z - i\gamma)^2}$. Then:
+   $$\boxed{\frac{\partial}{\partial z} \log q_{\delta, \gamma}(z) = \frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)} = \Delta Z_+(z)}.$$
+   This establishes the exact structural bridge between the CMSA resolvent variation and the Radial Defect Quotient (RDQ).
+
+4. **Exact Fourier–Laplace Transform**:
+   Under the Fourier-Laplace kernel $\int_{-\infty}^\infty f(t) e^{it\xi} dt$ for $\xi > 0$:
+   $$\boxed{\widehat{\Delta Z_\sigma}(\xi) = 8\pi e^{-a\xi} (\cosh(\delta\xi) - 1) \cos(\gamma\xi)}.$$
+
+5. **Exact Prime Cross-Term & Continuum Sign Indefiniteness**:
+   Evaluating the unnormalized prime-resolvent cross-term via Plancherel:
+   $$-2\Re \int_{\sigma_0}^\infty \int_{-\infty}^\infty P_\sigma(t) \overline{\Delta Z_\sigma(t)} dt d\sigma = -4\pi \sum_{n=2}^\infty \Lambda(n) \frac{n^{1/2 - 2\sigma_0}}{\log n} (\cosh(\delta\log n) - 1) \cos(\gamma\log n).$$
+   At leading order in $\delta$:
+   $$I_{\text{cross}}(\gamma) = -2\pi \delta^2 \sum_{n=2}^\infty \Lambda(n) (\log n) n^{1/2 - 2\sigma_0} \cos(\gamma\log n) + \mathcal O(\delta^4).$$
+   Because the cosine frequencies $\log n$ are linearly independent over $\mathbb Q$, $I_{\text{cross}}(\gamma)$ oscillates and is **sign-indefinite** as $\gamma$ varies across $\mathbb R$.
+
+6. **Normalized Finite Invisibility vs Unnormalized Anchor Loss**:
+   - Under normalized translation averaging $(1/2T)\int_{-T}^T dt$, any fixed finite quartet perturbation $\Delta Z \in L^2(\mathbb R \times [\sigma_0, \infty))$ contributes $\mathcal O(1/T) \to 0$, remaining invisible.
+   - Under unnormalized integration $\int_{-\infty}^\infty dt$, the base prime diagonal $\int_{\sigma_0}^\infty \int_{-\infty}^\infty |P_\sigma(t)|^2 dt d\sigma = \infty$ diverges, completely destroying the arithmetic anchor.
+   - Classification: $\boxed{\texttt{FAIL\_ZERO\_ARITHMETIC\_ANCHOR\_UNDER\_UNNORMALIZED\_LIMIT}}$.
+
+7. **Integrated Prime Diagonal Closed Form**:
+   $$\int_{\sigma_0}^\infty \sum_{n=2}^\infty \Lambda(n)^2 n^{-2\sigma} d\sigma = \sum_{n=2}^\infty \frac{\Lambda(n)^2}{2\log n} n^{-2\sigma_0} = \boxed{-\frac{1}{2} \sum_{p \text{ prime}} \log p \log(1 - p^{-2\sigma_0})}.$$
+
+---
+
+### 9.13 Bilateral Grade Radial Centering Second-Variation Analysis
+
+Consider the symmetric bilateral grade second difference functional:
+$$\mathcal C_{h, T} = \mathcal M_{h, T} + \mathcal M_{-h, T} - 2\mathcal M_{0, T},$$
+where $\mathcal M_{h, T} = \frac{1}{2T} \int_{-T}^T |F_0 + \Delta_h|^2 dt - \frac{1}{2T}\int_{-T}^T |F_0|^2 dt = \frac{1}{2T}\int_{-T}^T Q(F_0, \Delta_h) dt$.
+
+1. **Pointwise Bilateral Squared-Norm Expansion**:
+   $$Q(F, \Delta_h) + Q(F, \Delta_{-h}) = |\Delta_h|^2 + |\Delta_{-h}|^2 + 2\Re\left( F \cdot \overline{(\Delta_h + \Delta_{-h})} \right).$$
+   - **Exact Opposition Case**: If $\Delta_{-h} \equiv -\Delta_h$, then $\Delta_h + \Delta_{-h} = 0$, and the background cross-term vanishes identically:
+     $$Q(F, \Delta_h) + Q(F, -\Delta_h) = 2|\Delta_h|^2 \ge 0.$$
+     *Formal Status*: Proved in Lean 4 (`bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).
+   - **Asymmetric Coordinate Dilation Case (No-Go)**:
+     Under coordinate dilation $z_{\pm h} = \tau^{\pm h} z$, the perturbation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$ is nonlinear in $h$:
+     $$\Delta_h(z) = h A(z) + h^2 B(z) + \mathcal O(h^3), \qquad \Delta_{-h}(z) = -h A(z) + h^2 B(z) + \mathcal O(h^3).$$
+     The sum does NOT vanish at second order:
+     $$\Delta_h(z) + \Delta_{-h}(z) = 2 h^2 B(z) + \mathcal O(h^4) \ne 0.$$
+     The residual background cross-term is:
+     $$2\Re\left( F \cdot \overline{(\Delta_h + \Delta_{-h})} \right) = 4 h^2 \Re(F \overline{B(z)}) \ne 0.$$
+     *Formal Status*: Proved in Lean 4 (`bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**).
+     *Classification*: $\boxed{\texttt{FAIL\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+
+2. **Scale Specificity Audit**:
+   For any scale base $a > 1$, the centered dilation $z_k = a^k z$ satisfies $r_k \kappa_k = a^{-k} a^k = 1$ and $B_{\rho, a}''(0) = 2\delta^2(\log a)^2 > 0$.
+   The dilation centering laws are scale-generic and do not specifically select $\tau = 2\pi$.
+   *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
+
+---
+
+### 9.14 Terminology and Interpretation Boundary
+
+To maintain rigorous mathematical neutrality, every retained historical term is assigned an exact mathematical definition:
+
+| Historical / Heuristic Term | Strict Mathematical Translation | Status / Domain Boundary |
+| :--- | :--- | :--- |
+| "Energy" $E(u)$ | Nonnegative quadratic functional $\int W \|f\|^2$ | Pure $L^2$ function space norm; no physical energy or conservation law constructed |
+| "Hamiltonian" | Positive diagonal multiplication / differential operator | Spectral weight operator; no symplectic manifold or phase space constructed |
+| "Worldline" | Parameterized grade orbit $s_\rho(k) = 1/2 + \tau^k(\rho - 1/2)$ | Continuous 1-parameter affine curve in $\mathbb C$; no spacetime geometry |
+| "Activation" | Nonvanishing asymptotic threshold $\limsup_{T\to\infty} \|\Delta_T\|/\sqrt{T} > 0$ | Asymptotic $L^2$ norm lower bound |
+| "Ground State" | Trivial zero-defect configuration $\delta \equiv 0$ (Critical line $\Re(s) = 1/2$) | Exact algebraic zero set of quadratic defect functionals |
+| "Excitation" | Off-line zero displacement $\delta \ne 0$ | Pointwise perturbation of zero coordinates |
+| "Curvature" | Second derivative with respect to grade parameter $\left.\frac{d^2}{dk^2} B(k)\right|_{k=0}$ | Exact second-order variation in 1-parameter family |
+
+
 
 
 

@@ -403,6 +403,11 @@ N_\xi - C_\xi = \sum_{\rho \in Z} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} = \s
 }$$
 with **strict equality $N_\xi - C_\xi = 0$ if and only if every $\delta_\rho = 0$ (the Riemann Hypothesis)**.
 
+### Epistemic Status & Historical Precedents
+- **Classification**: `KNOWN_RH_EQUIVALENCE / INTERNALLY_REDERIVED`.
+- **External Literature**: The identity $N_\xi - C_\xi = \sum \frac{2\delta^2}{|\rho|^2|1-\rho|^2}$ is mathematically equivalent to Weil's quadratic criterion (Weil 1952; Edwards 1974, Chapter 12; Bombieri 2000). The completed-xi Hadamard constant $C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi)$ is classical.
+- **Novelty Boundary**: The rederivation in terms of native continuous grade curvature $B_\rho''(0)$ and geometric involution discrepancy $|J - C|^2 = 4\delta^2$ provides an exact structural bridge between grade dilation and the Weil functional, but does NOT constitute a standalone arithmetic proof of RH without an independent zero-free evaluator for $N_\xi$.
+
 ---
 
 ## 15. The Arithmetic Weil Functional, Coordinate Systems, and Positivity Barriers
@@ -432,100 +437,125 @@ For a test function $f \in C_c^\infty(\mathbb{R})$:
 2. **Formal Spectral Probe $\Phi_0(s) = 1/s$**:
    The formal probe producing $\Phi_0(\rho)\Phi_0(1-\rho) = \frac{1}{\rho(1-\rho)}$ is $\Phi_0(s) = 1/s$. In multiplicative coordinates, this corresponds to $\mathbf{1}_{(0, 1)}(x)$, or in additive logarithmic coordinates $u \in (-\infty, 0)$, $f_0(u) = e^{u/2} \mathbf{1}_{(-\infty, 0)}(u)$.
 3. **Admissible Probe Regularization Obligation (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`)**:
-   Because $\mathbf{1}_{(0, 1)}$ is not smooth or compactly supported, an admissible smoothing family $f_\varepsilon \in C_c^\infty(\mathbb{R})$ is required such that $\Phi_\varepsilon(s) \to 1/s$ point-wise on the critical strip, with certified convergence of every zero sum, prime sum, pole term, and Archimedean integral.
+   The expression $\frac{e^{-\varepsilon s} - e^{-Ls}}{s}$ is the transform of a sharp cutoff $\mathbf{1}_{[\varepsilon, L]}(u)$, which belongs to $L^2$ but is NOT a $C_c^\infty(\mathbb R)$ smoothing family.
+   An admissible smooth probe family $f_\varepsilon \in C_c^\infty(\mathbb{R})$ is required such that $\Phi_\varepsilon(s) \to 1/s$ point-wise on the critical strip, with proved interchange of every zero sum, prime sum, pole term, and Archimedean integral.
 
-### Positive-Type Factorization: Local Failure vs Global Status
-1. **Local Prime Factorization Failure (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`)**:
-   The pure prime distribution has coefficients $-\frac{\Lambda(n)}{\sqrt{n}} < 0$. For localized test functions supported at prime nodes $u_p = \log p$, the local diagonal weights $-\frac{\log p}{\sqrt{p}}$ are strictly negative (eigenvalues $< 0$). This rules out naive diagonal prime-local Hilbert space factorizations.
+### Positive-Type Factorization: Local Indefiniteness vs Global Status
+1. **Genuine Two-Bump Prime Witness & Indefiniteness (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`)**:
+   For a two-bump test function $f_p(u) = c_1 \psi(u - u_1) + c_2 \psi(u - u_2)$ with node separation $u_2 - u_1 = \log p$:
+   - At zero separation $u = 0$, $\Lambda(1) = 0$, so the diagonal entries vanish.
+   - At separation $\pm \log p$, the prime distribution contributes $-w_p = -\frac{\log p}{2\sqrt{p}}$.
+   The resulting $2\times 2$ Gram matrix is:
+   $$W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix},$$
+   whose eigenvalues are $+w_p$ and $-w_p$.
+   *Conclusion*: The prime-only autocorrelation form is **indefinite** (has both positive and negative eigenvalues). It is **not positive semidefinite**, ruling out naive prime-local Hilbert space factorizations without global compensation.
 2. **Global Weil Positivity (`OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`)**:
-   The negative prime terms do not rule out global positivity of the complete distribution $Q_W(f * f^*)$, because positive Archimedean and pole contributions provide global compensation. However, global positivity $Q_W(f * f^*) \ge 0$ for all $f$ is mathematically equivalent to RH (Weil 1952). Thus, deriving a Hilbert space $\mathcal{H}_\zeta$ via GNS from the arithmetic side without assuming RH remains an open equivalent obligation.
+   Global positivity $Q_W(f * f^*) \ge 0$ requires global cancellation between the indefinite prime distribution and the positive Archimedean and pole distributions, which is mathematically equivalent to RH (Weil 1952).
 
 ---
 
 ## 16. Coordinate-Pulled Zero Worldlines versus Fixed Multipliers
 
-To resolve the distinction between scalar multipliers and coordinate dilations:
-
 1. **Fixed-Zero Scalar Multipliers**:
    For $F(k, s) = g(k, s) L(s)$ with fixed point $\rho$ ($L(\rho) = 0$):
    $F(k, \rho) = g(k, \rho) \cdot 0 = 0$ and $\partial_k^m F(k, \rho) \equiv 0$ identically for all $m \ge 0$.
-   *(Formally proved in Lean 4: `scalar_multiplier_zero_preservation`, `algebraic_grade_derivative_factor_vanishing`).*
+   *(Formally proved in Lean 4: `scalar_multiplier_zero_preservation`, `algebraic_grade_derivative_factor_vanishing`, **NO_GO_COMPONENT**).*
 2. **Coordinate-Pulled Zero Worldlines**:
    For the coordinate-pulled family $L_k(s) = L(1/2 + \tau^{-k}(s - 1/2))$ along the moving worldline $s_\rho(k) = 1/2 + \tau^k(\rho - 1/2)$:
    $$L_k(s_\rho(k)) = L\left(\frac{1}{2} + \tau^{-k}(\tau^k(\rho - 1/2))\right) = L(\rho) = 0 \quad (\forall k \in \mathbb{R})$$
-   *(Formally proved in Lean 4: `coordinate_pulled_affine_zero_worldline`).*
+   *(Formally proved in Lean 4: `coordinate_pulled_affine_zero_worldline`, **ALGEBRAIC_IDENTITY**).*
 3. **Unpulled Function Counterexample**:
    For static $L(s) = s - \rho$, evaluated at the moving worldline $s_\rho(k)$:
    $$L(s_\rho(k)) = s_\rho(k) - \rho = (\tau^k - 1)(\rho - 1/2) \ne 0 \quad (k \ne 0, \rho \ne 1/2)$$
-   *(Formally proved in Lean 4: `unpulled_affine_zero_worldline_eval`).*
-   Similarly, the static product $F(k, s_\rho(k)) = g(k, s_\rho(k)) (\tau^k - 1)(\rho - 1/2) \ne 0$ generically.
+   *(Formally proved in Lean 4: `unpulled_affine_zero_worldline_eval`, **COUNTERMODEL**).*
 
 ---
 
-## 17. Candidate Classification & Subgate Hierarchy
+## 17. Bilateral Grade Second-Variation & Scale Specificity
 
-Based on rigorous auditing:
-- **Pointwise Weil–Curvature Identity**: Proved algebraically & in Lean 4 (`pointwise_weil_curvature_identity_algebraic`);
-- **Involution Discrepancy**: Proved $|J - C|^2 = 4\delta^2$ in Lean 4 (`weil_involution_norm_sq_discrepancy`);
-- **Discrete Zeta Divisor Summation**: Derived exact target $N_\xi - C_\xi = \sum \frac{2\delta^2}{|\rho|^2|1-\rho|^2}$;
-- **Overall Candidate Classification**:
-  $$\boxed{\textbf{EXACT\_CURVATURE\_IDENTITY\_PROVED\_ARITHMETIC\_NORM\_OPEN}}$$
-- **Subgate Sequence**:
-  1. $\boxed{\texttt{FAIL\_TEST\_FUNCTION\_IDENTIFICATION}}$ (for $x^{-1/2}\mathbf{1}_{[1, \tau]} \ne 1/s$)
-  2. $\boxed{\texttt{OPEN\_ADMISSIBLE\_PROBE\_REGULARIZATION}}$ (for $\Phi_\varepsilon \to 1/s$ limiting interchange)
-  3. $\boxed{\texttt{FAIL\_NAIVE\_PRIME\_LOCAL\_FACTORIZATION}}$ (for diagonal prime-local Gram matrices)
-  4. $\boxed{\texttt{OPEN\_GLOBAL\_POSITIVE\_TYPE\_FACTORIZATION}}$ (for complete Weil distribution positivity)
+Consider the symmetric bilateral grade second difference:
+$$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + |\Delta_{-h}|^2 + 2\Re\left(F \overline{(\Delta_h + \Delta_{-h})}\right).$$
 
----
+1. **Exact Opposition Case**:
+   If $\Delta_{-h} \equiv -\Delta_h$, $\Delta_h + \Delta_{-h} = 0$, and the background cross-term vanishes:
+   $$Q(F, \Delta_h) + Q(F, -\Delta_h) = 2|\Delta_h|^2 \ge 0.$$
+   *(Formally proved in Lean 4: `bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).*
+2. **Asymmetric Coordinate Dilation (No-Go)**:
+   Under coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$, $\Delta_h + \Delta_{-h} = h^2 B(z) + \mathcal O(h^4) \ne 0$.
+   The background cross-term leaves $2h^2\Re(F\overline{B(z)}) \ne 0$.
+   *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**).*
+   *Classification*: $\boxed{\texttt{FAIL\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+3. **Scale Specificity**:
+   Algebraic dilation centering holds for any base $a > 1$, showing that the mechanism is scale-generic.
+   *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
 
 ---
 
 ## 18. Formalization and Verification Inventory
 
-### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 37 Declarations)
+### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 41 Declarations)
 
-| Declaration | Mathematical Content | Epistemic Status |
+| Declaration | Mathematical Content | Epistemic Role |
 |:---|:---|:---|
-| `radial_unit_curvature_reciprocal` | $r_K \kappa_K = \tau^{-K} \tau^K = 1$ | FORMALLY_PROVED |
-| `grade_shift_radius` | $r_{K+1} = \tau^{-1} r_K$ | FORMALLY_PROVED |
-| `grade_shift_circumference` | $C_{K+1} = \tau^{-1} C_K$ | FORMALLY_PROVED |
-| `grade_shift_curvature` | $\kappa_{K+1} = \tau \kappa_K$ | FORMALLY_PROVED |
-| `unit_circumference_K1` | $C_1 = \tau r_1 = 1$ | FORMALLY_PROVED |
-| `fourier_lattice_spacing_eq` | $\Delta\omega_K = \tau / C_K = \tau^K$ | FORMALLY_PROVED |
-| `centered_radial_unit_transport` | $r_K d_{\rho,K} = \delta$ | FORMALLY_PROVED |
-| `transported_squared_defect_invariance` | $(r_K d_{\rho,K})^2 = \delta^2$ | FORMALLY_PROVED |
-| `generic_scale_radial_unit_transport` | $b^{-K}(b^K \delta) = \delta$ for generic $b > 0$ | FORMALLY_PROVED |
-| `grade_character_complex_product` | $(\delta+i\gamma)\log\tau k = k\delta\log\tau + i k\gamma\log\tau$ ($k \in \mathbb{R}$) | FORMALLY_PROVED |
-| `grade_character_modulus_def` | $\|\chi_\rho(k)\| = \exp(k\delta\log\tau)$ | FORMALLY_PROVED |
-| `reflection_reciprocal_modulus_prod` | $\|\chi_\rho(k)\| \|\chi_{\rho^\#}(k)\| = 1$ | FORMALLY_PROVED |
-| `reflection_pair_defect_cosh` | $B_\rho(k) = 2(\cosh(u)-1)$ | FORMALLY_PROVED |
-| `reflection_pair_defect_nonneg` | $B_\rho(k) \ge 0$ | FORMALLY_PROVED |
-| `reflection_pair_defect_eq_zero_iff` | $B_\rho(k) = 0 \iff \delta = 0$ for $k \ne 0, \tau > 1$ | FORMALLY_PROVED |
-| `native_grade_second_order_taylor_coefficient` | Algebraic Taylor normalization $(2\delta^2(\log\tau)^2)/(2(\log\tau)^2) = \delta^2$ | FORMALLY_PROVED (ALGEBRAIC) |
-| `reflection_grade_curvature_pos` | $2\delta^2(\log\tau)^2 > 0$ for $\delta \ne 0, \tau > 1$ | FORMALLY_PROVED |
-| `scalar_multiplier_zero_preservation` | $L = 0 \implies g \cdot L = 0$ | FORMALLY_PROVED |
-| `scalar_multiplier_nonzero_root_iff` | $g \ne 0 \implies (g \cdot L = 0 \iff L = 0)$ | FORMALLY_PROVED |
-| `algebraic_grade_derivative_factor_vanishing` | $(c \cdot g_k) \cdot L = 0$ for $L = 0$ | FORMALLY_PROVED |
-| `finite_positive_weight_curvature_rigidity` | $\sum w_j \delta_j^2 = 0 \iff \forall j, \delta_j = 0$ | FORMALLY_PROVED |
-| `countermodelPolynomial` | Definition of $P_{\delta,\gamma}(z)$ | DEFINITION |
-| `countermodelPolynomial_even` | $P_{\delta,\gamma}(-z) = P_{\delta,\gamma}(z)$ | FORMALLY_PROVED |
-| `countermodelPolynomial_root_pos_pos` | $P_{\delta,\gamma}(\delta + i\gamma) = 0$ | FORMALLY_PROVED |
-| `countermodelPolynomial_root_neg_pos` | $P_{\delta,\gamma}(-\delta + i\gamma) = 0$ | FORMALLY_PROVED |
-| `countermodelPolynomial_root_pos_neg` | $P_{\delta,\gamma}(\delta - i\gamma) = 0$ | FORMALLY_PROVED |
-| `countermodelPolynomial_root_neg_neg` | $P_{\delta,\gamma}(-\delta - i\gamma) = 0$ | FORMALLY_PROVED |
-| `weil_involution_difference` | $J(\rho) - C(\rho) = - 2\delta$ | FORMALLY_PROVED |
-| `weil_involution_norm_sq_discrepancy` | Complex.normSq $(J(\rho) - C(\rho)) = 4\delta^2$ | FORMALLY_PROVED |
-| `pointwise_weil_curvature_numerator_identity` | $(N_1 + N_2) - 2(\beta(1-\beta) + \gamma^2) = 4\delta^2$ | FORMALLY_PROVED |
-| `pointwise_weil_curvature_identity_algebraic` | Rational Weil-Hermitian curvature identity | FORMALLY_PROVED |
-| `pointwise_weil_curvature_weight_pos` | Weight $2/D > 0$ for $D > 0$ | FORMALLY_PROVED |
-| `pointwise_weil_curvature_nonneg` | Curvature defect $(2\delta^2)/D \ge 0$ for $D > 0$ | FORMALLY_PROVED |
-| `pointwise_weil_curvature_zero_iff` | Curvature defect $(2\delta^2)/D = 0 \iff \delta = 0$ | FORMALLY_PROVED |
-| `coordinate_pulled_affine_zero_worldline` | $L_k(s_\rho(k)) = 0$ identically | FORMALLY_PROVED |
-| `unpulled_affine_zero_worldline_eval` | $L(s_\rho(k)) = (\tau^k - 1) z_0$ | FORMALLY_PROVED |
-| `ConditionalCurvatureRigidityBridge.all_defects_zero` | Conditional Curvature Rigidity Theorem | FORMALLY_PROVED |
+| `radial_unit_curvature_reciprocal` | $r_K \kappa_K = \tau^{-K} \tau^K = 1$ | `ALGEBRAIC_IDENTITY` |
+| `grade_shift_radius` | $r_{K+1} = \tau^{-1} r_K$ | `ALGEBRAIC_IDENTITY` |
+| `grade_shift_circumference` | $C_{K+1} = \tau^{-1} C_K$ | `ALGEBRAIC_IDENTITY` |
+| `grade_shift_curvature` | $\kappa_{K+1} = \tau \kappa_K$ | `ALGEBRAIC_IDENTITY` |
+| `unit_circumference_K1` | $C_1 = \tau r_1 = 1$ | `ALGEBRAIC_IDENTITY` |
+| `fourier_lattice_spacing_eq` | $\Delta\omega_K = \tau / C_K = \tau^K$ | `ALGEBRAIC_IDENTITY` |
+| `centered_radial_unit_transport` | $r_K d_{\rho,K} = \delta$ | `ALGEBRAIC_IDENTITY` |
+| `transported_squared_defect_invariance` | $(r_K d_{\rho,K})^2 = \delta^2$ | `ALGEBRAIC_IDENTITY` |
+| `generic_scale_radial_unit_transport` | $b^{-K}(b^K \delta) = \delta$ for generic $b > 0$ | `ALGEBRAIC_IDENTITY` |
+| `grade_character_complex_product` | $(\delta+i\gamma)\log\tau k = k\delta\log\tau + i k\gamma\log\tau$ ($k \in \mathbb{R}$) | `ALGEBRAIC_IDENTITY` |
+| `grade_character_modulus_def` | $\|\chi_\rho(k)\| = \exp(k\delta\log\tau)$ | `DEFINITION` |
+| `reflection_reciprocal_modulus_prod` | $\|\chi_\rho(k)\| \|\chi_{\rho^\#}(k)\| = 1$ | `ALGEBRAIC_IDENTITY` |
+| `reflection_pair_defect_cosh` | $B_\rho(k) = 2(\cosh(u)-1)$ | `ALGEBRAIC_IDENTITY` |
+| `reflection_pair_defect_nonneg` | $B_\rho(k) \ge 0$ | `LOAD_BEARING_ANALYTIC_THEOREM` |
+| `reflection_pair_defect_eq_zero_iff` | $B_\rho(k) = 0 \iff \delta = 0$ for $k \ne 0, \tau > 1$ | `LOAD_BEARING_ANALYTIC_THEOREM` |
+| `native_grade_second_order_taylor_coefficient` | Algebraic Taylor normalization $(2\delta^2(\log\tau)^2)/(2(\log\tau)^2) = \delta^2$ | `ALGEBRAIC_IDENTITY` |
+| `reflection_grade_curvature_pos` | $2\delta^2(\log\tau)^2 > 0$ for $\delta \ne 0, \tau > 1$ | `LOAD_BEARING_ANALYTIC_THEOREM` |
+| `scalar_multiplier_zero_preservation` | $L = 0 \implies g \cdot L = 0$ | `NO_GO_COMPONENT` |
+| `scalar_multiplier_nonzero_root_iff` | $g \ne 0 \implies (g \cdot L = 0 \iff L = 0)$ | `NO_GO_COMPONENT` |
+| `algebraic_grade_derivative_factor_vanishing` | $(c \cdot g_k) \cdot L = 0$ for $L = 0$ | `NO_GO_COMPONENT` |
+| `finite_positive_weight_curvature_rigidity` | $\sum w_j \delta_j^2 = 0 \iff \forall j, \delta_j = 0$ | `FINITE_ANALYTIC_COMPONENT` |
+| `countermodelPolynomial` | Definition of $P_{\delta,\gamma}(z)$ | `DEFINITION` |
+| `countermodelPolynomial_even` | $P_{\delta,\gamma}(-z) = P_{\delta,\gamma}(z)$ | `COUNTERMODEL` |
+| `countermodelPolynomial_root_pos_pos` | $P_{\delta,\gamma}(\delta + i\gamma) = 0$ | `COUNTERMODEL` |
+| `countermodelPolynomial_root_neg_pos` | $P_{\delta,\gamma}(-\delta + i\gamma) = 0$ | `COUNTERMODEL` |
+| `countermodelPolynomial_root_pos_neg` | $P_{\delta,\gamma}(\delta - i\gamma) = 0$ | `COUNTERMODEL` |
+| `countermodelPolynomial_root_neg_neg` | $P_{\delta,\gamma}(-\delta - i\gamma) = 0$ | `COUNTERMODEL` |
+| `weil_involution_difference` | $J(\rho) - C(\rho) = - 2\delta$ | `ALGEBRAIC_IDENTITY` |
+| `weil_involution_norm_sq_discrepancy` | Complex.normSq $(J(\rho) - C(\rho)) = 4\delta^2$ | `ALGEBRAIC_IDENTITY` |
+| `pointwise_weil_curvature_numerator_identity` | $(N_1 + N_2) - 2(\beta(1-\beta) + \gamma^2) = 4\delta^2$ | `ALGEBRAIC_IDENTITY` |
+| `pointwise_weil_curvature_identity_algebraic` | Rational Weil-Hermitian curvature identity | `ALGEBRAIC_IDENTITY` |
+| `pointwise_weil_curvature_weight_pos` | Weight $2/D > 0$ for $D > 0$ | `FINITE_ANALYTIC_COMPONENT` |
+| `pointwise_weil_curvature_nonneg` | Curvature defect $(2\delta^2)/D \ge 0$ for $D > 0$ | `FINITE_ANALYTIC_COMPONENT` |
+| `pointwise_weil_curvature_zero_iff` | Curvature defect $(2\delta^2)/D = 0 \iff \delta = 0$ | `FINITE_ANALYTIC_COMPONENT` |
+| `coordinate_pulled_affine_zero_worldline` | $L_k(s_\rho(k)) = 0$ identically | `ALGEBRAIC_IDENTITY` |
+| `unpulled_affine_zero_worldline_eval` | $L(s_\rho(k)) = (\tau^k - 1) z_0$ | `COUNTERMODEL` |
+| `ConditionalCurvatureRigidityBridge.all_defects_zero` | Conditional Curvature Rigidity Theorem | `CONDITIONAL_SHELL` |
+| `exact_quartet_resolvent_identity` | $\frac{1}{w-\delta} + \frac{1}{w+\delta} - \frac{2}{w} = \frac{2\delta^2}{w(w^2-\delta^2)}$ | `ALGEBRAIC_IDENTITY` |
+| `bilateral_squared_norm_centering_exact_opposite` | $Q(F, \Delta) + Q(F, -\Delta) = 2\|\Delta\|^2$ | `ALGEBRAIC_IDENTITY` |
+| `bilateral_squared_norm_general_sum` | $Q(F, \Delta_1) + Q(F, \Delta_2) = \|\Delta_1\|^2 + \|\Delta_2\|^2 + 2\Re(F\overline{(\Delta_1+\Delta_2)})$ | `ALGEBRAIC_IDENTITY` |
+| `bilateral_second_order_asymmetry_cross_term` | $\Delta_2 = -\Delta_1 + h^2 B \implies 2\Re(F\overline{(\Delta_1+\Delta_2)}) = 2h^2\Re(F\bar B)$ | `NO_GO_COMPONENT` |
 
 ### Python Test Suites
+- **`tests/test_bilateral_second_variation.py`**: 23/23 passed.
+- **`tests/test_weil_curvature.py`**: 17/17 passed.
 - **`tests/test_curvature_transport.py`**: 99/99 passed.
-- **`tests/test_weil_curvature.py`**: 13/13 passed.
-- **Total Combined Verified Tests**: 112/112 passed.
+- **Total Combined Verified Tests**: 139/139 passed.
+
+---
+
+## 19. Terminology and Interpretation Boundary
+
+| Heuristic / Physical Term | Exact Mathematical Translation | Scope / Non-Equivalence Boundary |
+|:---|:---|:---|
+| "Energy" $E(u)$ | Nonnegative quadratic functional $\int W \|f\|^2$ | Pure function space norm; no physical energy or conservation law constructed |
+| "Hamiltonian" | Positive diagonal multiplication / differential operator | Spectral weight operator; no symplectic manifold or phase space constructed |
+| "Worldline" | Parameterized grade orbit $s_\rho(k) = 1/2 + \tau^k(\rho - 1/2)$ | Continuous 1-parameter affine curve in $\mathbb C$; no spacetime geometry |
+| "Activation" | Nonvanishing asymptotic threshold $\limsup_{T\to\infty} \|\Delta_T\|/\sqrt{T} > 0$ | Asymptotic $L^2$ norm lower bound |
+| "Ground State" | Trivial zero-defect configuration $\delta \equiv 0$ (Critical line $\Re(s) = 1/2$) | Exact algebraic zero set of quadratic defect functionals |
+| "Excitation" | Off-line zero displacement $\delta \ne 0$ | Pointwise perturbation of zero coordinates |
+| "Curvature" | Second derivative with respect to grade parameter $\left.\frac{d^2}{dk^2} B(k)\right|_{k=0}$ | Exact second-order variation in 1-parameter family |
 

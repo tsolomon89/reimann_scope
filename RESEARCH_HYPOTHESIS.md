@@ -1050,6 +1050,24 @@ The repository's geometric, spectral, and arithmetic structures are unified unde
   $$\mathscr A_\tau(\xi) = 0 \quad \text{and} \quad \mathscr A_\tau(\xi) = \sum_{\rho\in\Lambda^+/\#} W_\rho \delta_\rho^2 \quad (W_\rho > 0) \implies \forall \rho, \; \delta_\rho = 0 \iff \mathrm{RH}.$$
 - **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ (or $Q_H(f)$) is the program's canonical earliest open obligation. Curvature transport operates at the orbit level and bypasses detector-level $L^2$ translation invisibility, but does NOT solve CMSA Gate G4; whether a non-scalar arithmetic functional avoids or reproduces the pair barrier remains an open problem. Reference: `CURVATURE_TRANSPORT.md`.
 
+---
+
+## 24.9 Integrated-$\sigma$ Branch Closure & Bilateral Grade Second Variation
+
+1. **Integrated-$\sigma$ Resolvent Algebra & Anchor Loss**:
+   - Exact quartet resolvent difference $\Delta Z_+(z) = \frac{2\delta^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$ (Lean 4 `exact_quartet_resolvent_identity`, **ALGEBRAIC_IDENTITY**).
+   - $\Delta Z_\sigma \in L^1(dt) \cap L^2(dt)$ with leading single-height norm $\frac{3\pi\delta^4}{2a^5}$.
+   - Fourier-Laplace transform is $8\pi e^{-a\xi}(\cosh(\delta\xi)-1)\cos(\gamma\xi)$ on $\xi > 0$.
+   - Unnormalized integration diverges on base prime diagonal ($\int_{\sigma_0}^\infty \int |P_\sigma|^2 = \infty$), losing arithmetic anchor (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`).
+   - Integrated prime diagonal closed form: $\int_{\sigma_0}^\infty \sum \Lambda(n)^2 n^{-2\sigma} d\sigma = -\frac{1}{2}\sum_p \log p \log(1-p^{-2\sigma_0})$.
+2. **Bilateral Grade Radial Centering Second-Variation Analysis**:
+   - Exact opposition $\Delta_{-h} = -\Delta_h$ eliminates background cross-terms ($2|\Delta|^2 \ge 0$, Lean 4 `bilateral_squared_norm_centering_exact_opposite`).
+   - Coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$ is asymmetric at second order ($\Delta_h+\Delta_{-h} = 2h^2 B(z) \ne 0$), leaving uncancelled background cross-term $4h^2\Re(F\bar B) \ne 0$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**, `FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).
+   - Dilation centering is scale-generic ($a > 1$, `SCALE_GENERIC_NOT_TAU_SPECIFIC`).
+3. **Consolidated Master Obligation**:
+   Surviving radial-defect extraction routes are consolidated under $\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}$ across 4 child routes: RDQ (`OBL-RDQ-001`), Curvature Transport (`OBL-CT-001`), Weil-Hermitian (`OBL-WH-001`), and CMSA (`OBL-CMSA-003`).
+
+
 
 
 

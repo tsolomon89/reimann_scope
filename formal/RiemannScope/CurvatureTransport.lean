@@ -424,7 +424,91 @@ theorem ConditionalCurvatureRigidityBridge.all_defects_zero
     bridge.weights_pos bridge.defects_sq_nonneg
     bridge.lengths_eq h_sum_zero
 
+/-- 38. [ALGEBRAIC_IDENTITY] Exact quartet-minus-projection resolvent difference:
+    For any complex w, δ ∈ ℂ with w ≠ 0, w - δ ≠ 0, w + δ ≠ 0, and w^2 - δ^2 ≠ 0:
+    1 / (w - δ) + 1 / (w + δ) - 2 / w = (2 * δ^2) / (w * (w^2 - δ^2)). -/
+theorem exact_quartet_resolvent_identity (w δ : ℂ)
+    (hw : w ≠ 0) (hw_sub : w - δ ≠ 0) (hw_add : w + δ ≠ 0) (hw_sq : w ^ 2 - δ ^ 2 ≠ 0) :
+    1 / (w - δ) + 1 / (w + δ) - 2 / w = (2 * δ ^ 2) / (w * (w ^ 2 - δ ^ 2)) := by
+  have h_prod : (w - δ) * (w + δ) = w ^ 2 - δ ^ 2 := by ring
+  have h_add : 1 / (w - δ) + 1 / (w + δ) = (2 * w) / (w ^ 2 - δ ^ 2) := by
+    rw [div_add_div (1 : ℂ) (1 : ℂ) hw_sub hw_add]
+    have h_num : 1 * (w + δ) + (w - δ) * 1 = 2 * w := by ring
+    rw [h_num, h_prod]
+  rw [h_add]
+  rw [div_sub_div (2 * w) (2 : ℂ) hw_sq hw]
+  have h_num2 : (2 * w) * w - (w ^ 2 - δ ^ 2) * 2 = 2 * δ ^ 2 := by ring
+  have h_den2 : (w ^ 2 - δ ^ 2) * w = w * (w ^ 2 - δ ^ 2) := by ring
+  rw [h_num2, h_den2]
+
+/-- 39. [ALGEBRAIC_IDENTITY] Bilateral squared-norm centering under exact opposite perturbations:
+    For any complex background F ∈ ℂ and perturbation Δ ∈ ℂ:
+    (Q(F, Δ) + Q(F, -Δ)) = 2 * |Δ|², where Q(F, Δ) = |F + Δ|² - |F|².
+    The first-order linear cross-terms exactly cancel. -/
+theorem bilateral_squared_norm_centering_exact_opposite (F Δ : ℂ) :
+    (Complex.normSq (F + Δ) - Complex.normSq F) +
+    (Complex.normSq (F - Δ) - Complex.normSq F) =
+      2 * Complex.normSq Δ := by
+  have h_sub : F - Δ = F + (-Δ) := by ring
+  rw [h_sub]
+  rw [complex_squared_norm_difference_expansion F Δ]
+  rw [complex_squared_norm_difference_expansion F (-Δ)]
+  have h_norm_neg : Complex.normSq (-Δ) = Complex.normSq Δ := by
+    rw [Complex.normSq_apply, Complex.normSq_apply, Complex.neg_re, Complex.neg_im]
+    ring
+  have h_star_neg : starRingEnd ℂ (-Δ) = - (starRingEnd ℂ Δ) := map_neg (starRingEnd ℂ) Δ
+  have h_re_neg : (F * starRingEnd ℂ (-Δ)).re = - (F * starRingEnd ℂ Δ).re := by
+    rw [h_star_neg, mul_neg, Complex.neg_re]
+  rw [h_norm_neg, h_re_neg]
+  ring
+
+/-- 40. [ALGEBRAIC_IDENTITY] Bilateral squared-norm sum under general perturbations:
+    For any complex background F ∈ ℂ and perturbations Δ₁, Δ₂ ∈ ℂ:
+    (Q(F, Δ₁) + Q(F, Δ₂)) = |Δ₁|² + |Δ₂|² + 2 * Re(F * star(Δ₁ + Δ₂)). -/
+theorem bilateral_squared_norm_general_sum (F Δ₁ Δ₂ : ℂ) :
+    (Complex.normSq (F + Δ₁) - Complex.normSq F) +
+    (Complex.normSq (F + Δ₂) - Complex.normSq F) =
+      Complex.normSq Δ₁ + Complex.normSq Δ₂ + 2 * (F * starRingEnd ℂ (Δ₁ + Δ₂)).re := by
+  rw [complex_squared_norm_difference_expansion F Δ₁]
+  rw [complex_squared_norm_difference_expansion F Δ₂]
+  have h_star_add : starRingEnd ℂ (Δ₁ + Δ₂) = starRingEnd ℂ Δ₁ + starRingEnd ℂ Δ₂ := map_add (starRingEnd ℂ) Δ₁ Δ₂
+  have h_mul_add : F * (starRingEnd ℂ Δ₁ + starRingEnd ℂ Δ₂) = F * starRingEnd ℂ Δ₁ + F * starRingEnd ℂ Δ₂ := mul_add F _ _
+  rw [h_star_add, h_mul_add, Complex.add_re]
+  ring
+
+/-- 41. [NO_GO_COMPONENT] Bilateral second-order asymmetry cross-term:
+    When perturbations satisfy Δ₂ = -Δ₁ + h² * B, the residual linear sum is Δ₁ + Δ₂ = h² * B,
+    and the background cross-term does NOT vanish at second order:
+    2 * Re(F * star(Δ₁ + Δ₂)) = 2 * h² * Re(F * star(B)).
+    Consequently, bilateral grade centering fails to eliminate the background dependence. -/
+theorem bilateral_second_order_asymmetry_cross_term (F Δ₁ B : ℂ) (h : ℝ) :
+    let Δ₂ := -Δ₁ + (Complex.ofReal (h ^ 2)) * B
+    2 * (F * starRingEnd ℂ (Δ₁ + Δ₂)).re =
+      2 * (h ^ 2) * (F * starRingEnd ℂ B).re := by
+  intro Δ₂
+  have h_sum : Δ₁ + Δ₂ = (Complex.ofReal (h ^ 2)) * B := by
+    dsimp [Δ₂]
+    ring
+  rw [h_sum]
+  have h_star_mul : starRingEnd ℂ ((Complex.ofReal (h ^ 2)) * B) = (Complex.ofReal (h ^ 2)) * starRingEnd ℂ B := by
+    rw [map_mul]
+    have h_conj : starRingEnd ℂ (Complex.ofReal (h ^ 2)) = Complex.ofReal (h ^ 2) := by
+      exact Complex.conj_ofReal (h ^ 2)
+    rw [h_conj]
+  rw [h_star_mul]
+  have h_assoc : F * ((Complex.ofReal (h ^ 2)) * starRingEnd ℂ B) = (Complex.ofReal (h ^ 2)) * (F * starRingEnd ℂ B) := by ring
+  rw [h_assoc]
+  have h_re : ((Complex.ofReal (h ^ 2)) * (F * starRingEnd ℂ B)).re = (h ^ 2) * (F * starRingEnd ℂ B).re := by
+    rw [Complex.mul_re]
+    dsimp [Complex.ofReal]
+    ring
+  rw [h_re]
+  ring
+
 end RiemannScope
+
+
+
 
 
 

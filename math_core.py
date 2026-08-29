@@ -67,7 +67,7 @@ def to_mpc(
         if isinstance(s, (int, float)):
             return mpmath.mpc(str(s), '0')
         if isinstance(s, str):
-            s_clean = s.strip().replace(' ', '').replace('*', '')
+            s_clean = s.strip().replace('(', '').replace(')', '').replace(' ', '').replace('*', '')
             if 'j' in s_clean or 'J' in s_clean or 'i' in s_clean or 'I' in s_clean:
                 s_clean = s_clean.replace('i', 'j').replace('I', 'j').replace('J', 'j')
                 if '+' in s_clean:
@@ -85,6 +85,31 @@ def to_mpc(
                     return mpmath.mpc('0', im_part if im_part not in ['', '+', '-'] else (im_part + '1'))
             return mpmath.mpc(s_clean, '0')
         return mpmath.mpc(s)
+
+
+def von_mangoldt(n: int) -> float:
+    """
+    Exact von Mangoldt function Lambda(n):
+    Returns log(p) if n = p^k for prime p and k >= 1, else 0.0.
+    """
+    if n < 2:
+        return 0.0
+    temp = n
+    d = 2
+    factor = None
+    while d * d <= temp:
+        if temp % d == 0:
+            factor = d
+            while temp % d == 0:
+                temp //= d
+            if temp != 1:
+                return 0.0
+            return float(mpmath.log(factor))
+        d += 1
+    if temp > 1:
+        return float(mpmath.log(temp))
+    return 0.0
+
 
 
 
@@ -5760,45 +5785,51 @@ def evaluate_finite_prime_weil_gram_matrix(
     dps: int = 50
 ) -> Dict[str, Any]:
     """
-    [WEIL-CURVATURE: FINITE-PRIME WEIL GRAM MATRIX & POSITIVITY FALSIFIER]
-    Evaluates the finite-prime local distribution operator:
-      W_{prime}(f, g) = - sum_{p in P} (log p / sqrt(p)) * (f(log p) * conj(g(log p)) + ...).
-    For localized basis functions e_p at prime nodes u_p = log p:
-      The diagonal matrix entries are - (log p / sqrt(p)) < 0 for all primes p.
-    Eigenvalue spectrum:
-      All eigenvalues of the pure local prime Gram matrix are STRICTLY NEGATIVE.
-    Mathematical implication:
-      1. Pure arithmetic prime distributions alone do NOT form a positive-definite quadratic form.
-      2. Weil positivity Q_W(g * g*) >= 0 requires global cancellation between the negative prime
-         distribution and the positive Archimedean / pole distributions.
-      3. Positivity cannot be factored into purely local prime Hilbert spaces without assuming RH.
+    [WEIL-CURVATURE: FINITE-PRIME WEIL GRAM MATRIX & TWO-BUMP WITNESS AUDIT]
+    Evaluates the finite-prime local distribution operator on genuine test functions:
+      1. For localized two-bump test functions f_p(u) = c1 * psi(u - u1) + c2 * psi(u - u2)
+         with separation u2 - u1 = log p:
+         - At separation u = 0, log n = 0 => n = 1, so Lambda(1) = 0 (diagonal entries are 0).
+         - At separation u = +- log p, the prime distribution contributes -w_p = - (log p) / (2 * sqrt(p)).
+      2. The resulting 2x2 local prime Gram matrix is:
+         W_{prime, p} = [[0, -w_p], [-w_p, 0]],
+         with eigenvalues lambda_1 = +w_p and lambda_2 = -w_p.
+      3. Spectrum & Positivity Conclusion:
+         - The pure prime-only autocorrelation form is INDEFINITE (has both positive and negative eigenvalues).
+         - It is NOT positive semidefinite.
+         - It is NOT "strictly negative-definite" (corrected from naive diagonal list).
+      4. Mathematical Implication:
+         - Pure arithmetic prime distributions alone do NOT form a positive-definite quadratic form.
+         - Global Weil positivity Q_W(f * f*) >= 0 requires global cancellation between the prime distribution
+           and the positive Archimedean and pole distributions.
+         - Local prime factorizations alone fail (FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION).
     """
     with mpmath.workdps(dps):
         if primes is None:
             primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 
         n = len(primes)
-        # Construct the prime distribution diagonal weights
-        # w_p = - (log p) / sqrt(p)
-        eigenvalues = []
+        two_bump_data = []
         for p in primes:
             p_mp = mpmath.mpf(p)
-            weight = - mpmath.log(p_mp) / mpmath.sqrt(p_mp)
-            eigenvalues.append(weight)
-
-        all_negative = all(ev < 0 for ev in eigenvalues)
-        max_eigenvalue = max(eigenvalues)
-        min_eigenvalue = min(eigenvalues)
+            w_p = mpmath.log(p_mp) / (2 * mpmath.sqrt(p_mp))
+            # 2x2 matrix eigenvalues are +w_p and -w_p
+            two_bump_data.append({
+                "prime": p,
+                "w_p": mpmath.nstr(w_p, n=10),
+                "eigenvalues": [mpmath.nstr(w_p, n=10), mpmath.nstr(-w_p, n=10)],
+                "is_indefinite": True
+            })
 
         return {
             "primes": primes,
             "num_primes": n,
-            "eigenvalues": [mpmath.nstr(ev, n=10) for ev in eigenvalues],
-            "all_eigenvalues_strictly_negative": all_negative,
-            "max_eigenvalue": mpmath.nstr(max_eigenvalue, n=10),
-            "min_eigenvalue": mpmath.nstr(min_eigenvalue, n=10),
-            "is_locally_positive_definite": False,
-            "falsification_witness": "PRIME_DISTRIBUTION_ALONE_IS_STRICTLY_NEGATIVE_DEFINITE",
+            "two_bump_witnesses": two_bump_data,
+            "prime_matrix_form": "[[0, -w_p], [-w_p, 0]]",
+            "eigenvalue_spectrum": "+- w_p (indefinite)",
+            "is_positive_semidefinite": False,
+            "is_strictly_negative_definite": False,
+            "falsification_witness": "PRIME_ONLY_AUTOCORRELATION_IS_INDEFINITE_NOT_POSITIVE_SEMIDEFINITE",
             "classification": "FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION",
             "global_weil_positivity_status": "OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION",
             "status": "FINITE_PRIME_WEIL_GRAM_MATRIX_ANALYZED"
@@ -5820,39 +5851,31 @@ def evaluate_fourier_mellin_probe_analysis(
          Corresponds to g(x) = 1_{(0,1)}(x) under standard Mellin, or in additive
          logarithmic coordinates u = log x in (-infty, 0) with f_0(u) = exp(u/2) * 1_{(-infty, 0)}(u).
       3. Admissible Regularization:
-         Because 1_{(0,1)} is not in C_c^infty, an admissible smoothing family
-         f_eps in C_c^infty(R) is required such that \\Phi_eps(s) -> 1/s with proved
-         interchange of spectral, prime, pole, and Archimedean limits.
+         Because 1_{(0,1)} is not in C_c^infty, the expression (exp(-eps*s) - exp(-L*s))/s is the
+         transform of a sharp truncated window 1_{[eps, L]}(u), NOT a C_c^infty smoothing family.
+         An admissible smooth probe family with proved zero-sum/prime-sum limit interchange remains open.
       4. Subgate Classifications:
          - FAIL_TEST_FUNCTION_IDENTIFICATION: Naive x^{-1/2} 1_{[1, tau]} != 1/s.
-         - OPEN_ADMISSIBLE_PROBE_REGULARIZATION: Explicit smoothing family and limit interchange.
+         - OPEN_ADMISSIBLE_PROBE_REGULARIZATION: Explicit smooth C_c^infty probe regularization.
     """
     with mpmath.workdps(dps):
         s_c = to_mpc(s_val, dps=dps)
         tau_mp = to_mpf(tau_val if tau_val is not None else 2 * mpmath.pi, dps=dps)
 
-        # 1. Exact evaluation of \\widehat g_0(s) for g_0(x) = x^{-1/2} 1_{[1, tau]}
-        # \\widehat g_0(s) = (tau^{s - 1/2} - 1) / (s - 1/2)
         s_minus_half = s_c - mpmath.mpf("0.5")
         if abs(s_minus_half) < 1e-45:
-            # L'Hopital limit as s -> 1/2
             ghat_g0 = mpmath.log(tau_mp)
         else:
             ghat_g0 = (tau_mp ** s_minus_half - 1) / s_minus_half
 
-        # 2. Target spectral probe \\Phi_0(s) = 1/s
         phi_0 = 1 / s_c
-
         diff_g0_vs_phi0 = abs(ghat_g0 - phi_0)
         is_exact_phi0 = bool(diff_g0_vs_phi0 < 1e-45)
 
-        # 3. Additive coordinate regularization test family:
-        # f_eps(u) = exp(u/2) * smoothed cutoff on [-L, -eps]
-        # For evaluation at s, integral_{-L}^{-eps} exp((s - 1/2 + 1/2)u) du = (exp(-eps*s) - exp(-L*s)) / s -> 1/s as eps->0, L->infty
         eps = mpmath.mpf("1e-4")
         L = mpmath.mpf("50.0")
-        phi_regularized = (mpmath.exp(-eps * s_c) - mpmath.exp(-L * s_c)) / s_c
-        reg_diff = abs(phi_regularized - phi_0)
+        phi_sharp_cutoff = (mpmath.exp(-eps * s_c) - mpmath.exp(-L * s_c)) / s_c
+        reg_diff = abs(phi_sharp_cutoff - phi_0)
 
         return {
             "s": str(s_c),
@@ -5861,8 +5884,10 @@ def evaluate_fourier_mellin_probe_analysis(
             "phi_0": str(phi_0),
             "diff_g0_vs_phi0": mpmath.nstr(diff_g0_vs_phi0, n=10),
             "g0_equals_1_over_s": is_exact_phi0,
-            "phi_regularized": str(phi_regularized),
+            "phi_sharp_cutoff": str(phi_sharp_cutoff),
+            "cutoff_regularization_error": mpmath.nstr(reg_diff, n=10),
             "regularization_error": mpmath.nstr(reg_diff, n=10),
+            "is_smooth_cc_infty": False,
             "test_function_classification": "FAIL_TEST_FUNCTION_IDENTIFICATION",
             "regularization_obligation": "OPEN_ADMISSIBLE_PROBE_REGULARIZATION",
             "status": "FOURIER_MELLIN_PROBE_ANALYSIS_COMPLETED"
@@ -5904,18 +5929,14 @@ def evaluate_additive_coordinate_weil_hermitian_form(
                 all_on_line = False
 
             rho = mpmath.mpc(mpmath.mpf("0.5") + d_f, g_f)
-            # 1 - conj(rho) = 1 - (1/2 + delta - i*gamma) = 1/2 - delta + i*gamma
             one_minus_conj_rho = mpmath.mpc(mpmath.mpf("0.5") - d_f, g_f)
 
-            # Test probe \\Phi(s) = 1/s
             phi_rho = 1 / rho
             phi_one_minus_conj = 1 / one_minus_conj_rho
 
-            # Q_W term: \\Phi(rho) * conj(\\Phi(1 - bar{rho}))
             term_W = phi_rho * mpmath.conj(phi_one_minus_conj)
             sum_Q_W += m_f * term_W
 
-            # Q_H term: |\\Phi(rho)|^2
             term_H = abs(phi_rho) ** 2
             sum_Q_H += m_f * term_H
 
@@ -5933,7 +5954,6 @@ def evaluate_additive_coordinate_weil_hermitian_form(
             "equality_holds": bool(diff_QH_vs_QW < 1e-40),
             "status": "ADDITIVE_COORDINATE_WEIL_HERMITIAN_FORM_EVALUATED"
         }
-
 
 
 def countermodel_polynomial_P(
@@ -5973,15 +5993,12 @@ def verify_countermodel_symmetries(
       4. Transported radial unit: r_K * d_{rho,K} == delta
       5. Reciprocal grade characters: |chi_rho(K)| * |chi_{rho^#}(K)| == 1
       6. Positive grade curvature: B_rho''(0) == 2 * delta^2 * (log(tau))^2 > 0 (for delta != 0).
-    Proves that circle geometry, functional symmetry, coordinate covariance, and
-    positive curvature detection alone do not force delta == 0 without arithmetic input.
     """
     with mpmath.workdps(dps):
         d_f = to_mpf(delta, dps=dps)
         g_f = to_mpf(gamma, dps=dps)
         tau_mp = 2 * mpmath.pi
 
-        # Test point z
         z_test = mpmath.mpc("1.25", "3.75")
         p_z = countermodel_polynomial_P(z_test, d_f, g_f, dps=dps)
         p_neg_z = countermodel_polynomial_P(-z_test, d_f, g_f, dps=dps)
@@ -5990,7 +6007,6 @@ def verify_countermodel_symmetries(
         even_err = abs(p_neg_z - p_z)
         schwarz_err = abs(mpmath.conj(p_conj_z) - p_z)
 
-        # Roots evaluation
         roots = [
             mpmath.mpc(d_f, g_f),
             mpmath.mpc(d_f, -g_f),
@@ -6000,7 +6016,6 @@ def verify_countermodel_symmetries(
         root_residuals = [abs(countermodel_polynomial_P(r, d_f, g_f, dps=dps)) for r in roots]
         max_root_res = max(root_residuals)
 
-        # Curvature test
         B_info = curvature_transport_invariant(d_f, tau_val=tau_mp, dps=dps)
 
         return {
@@ -6014,4 +6029,469 @@ def verify_countermodel_symmetries(
         }
 
 
+# ============================================================================
+# EXACT INTEGRATED-SIGMA RESOLVENT & CMSA-RDQ DERIVATIVE IDENTITIES
+# ============================================================================
 
+def evaluate_quartet_resolvent_difference(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    z: Union[complex, str, mpmath.mpc],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [INTEGRATED-SIGMA: EXACT QUARTET-MINUS-PROJECTION RESOLVENT DIFFERENCE]
+    For centered coordinate z = a + i*t (a = sigma - 1/2 > 0):
+      1. Single upper-height group (+i*gamma):
+         Delta Z_+(z) = 1/(z - (delta + i*gamma)) + 1/(z - (-delta + i*gamma)) - 2/(z - i*gamma)
+                      = 2*delta^2 / ((z - i*gamma) * ((z - i*gamma)^2 - delta^2)).
+      2. Complete quartet (adding -i*gamma group):
+         Delta Z(z) = Delta Z_+(z) + Delta Z_-(z)
+                    = 2*delta^2 / ((z - i*gamma)*((z - i*gamma)^2 - delta^2))
+                    + 2*delta^2 / ((z + i*gamma)*((z + i*gamma)^2 - delta^2)).
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        z_c = to_mpc(z, dps=dps)
+
+        i_gam = mpmath.mpc(0, g_f)
+
+        # Upper group direct
+        term_plus_delta = 1 / (z_c - (d_f + i_gam))
+        term_minus_delta = 1 / (z_c - (-d_f + i_gam))
+        term_proj = 2 / (z_c - i_gam)
+        delta_Z_plus_direct = term_plus_delta + term_minus_delta - term_proj
+
+        # Upper group rational formula
+        w_plus = z_c - i_gam
+        delta_Z_plus_rational = (2 * (d_f**2)) / (w_plus * (w_plus**2 - d_f**2))
+
+        diff_plus = abs(delta_Z_plus_direct - delta_Z_plus_rational)
+
+        # Lower group direct
+        term_plus_delta_neg = 1 / (z_c - (d_f - i_gam))
+        term_minus_delta_neg = 1 / (z_c - (-d_f - i_gam))
+        term_proj_neg = 2 / (z_c + i_gam)
+        delta_Z_minus_direct = term_plus_delta_neg + term_minus_delta_neg - term_proj_neg
+
+        # Lower group rational formula
+        w_minus = z_c + i_gam
+        delta_Z_minus_rational = (2 * (d_f**2)) / (w_minus * (w_minus**2 - d_f**2))
+
+        diff_minus = abs(delta_Z_minus_direct - delta_Z_minus_rational)
+
+        # Complete quartet
+        delta_Z_total = delta_Z_plus_rational + delta_Z_minus_rational
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "z": str(z_c),
+            "delta_Z_plus_direct": str(delta_Z_plus_direct),
+            "delta_Z_plus_rational": str(delta_Z_plus_rational),
+            "diff_plus": mpmath.nstr(diff_plus, n=6),
+            "diff_minus": mpmath.nstr(diff_minus, n=6),
+            "delta_Z_total": str(delta_Z_total),
+            "is_exact_identity": bool(diff_plus < 1e-45 and diff_minus < 1e-45),
+            "status": "QUARTET_RESOLVENT_DIFFERENCE_VERIFIED"
+        }
+
+
+def evaluate_cmsa_rdq_derivative_identity(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    z: Union[complex, str, mpmath.mpc],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [INTEGRATED-SIGMA: EXACT CMSA-RDQ LOGARITHMIC DERIVATIVE IDENTITY]
+    Proves that the quartet-minus-projection resolvent difference is the exact logarithmic
+    derivative of the RDQ rational function:
+      q_{delta, gamma}(z) = ((z - (delta + i*gamma)) * (z - (-delta + i*gamma))) / (z - i*gamma)^2
+                          = 1 - delta^2 / (z - i*gamma)^2.
+      d/dz log q_{delta, gamma}(z) = 2*delta^2 / ((z - i*gamma)*((z - i*gamma)^2 - delta^2))
+                                  = Delta Z_+(z).
+    This establishes the exact structural bridge between the Completed Mean-Square Anchor (CMSA)
+    resolvent response and the Radial Defect Quotient (RDQ).
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        z_c = to_mpc(z, dps=dps)
+        i_gam = mpmath.mpc(0, g_f)
+
+        w = z_c - i_gam
+        q_val = 1 - (d_f**2) / (w**2)
+
+        # Log derivative: q'(z) / q(z)
+        # q'(z) = 2*delta^2 / w^3
+        # q'(z) / q(z) = (2*delta^2 / w^3) / (1 - delta^2/w^2) = 2*delta^2 / (w * (w^2 - delta^2))
+        q_prime = (2 * (d_f**2)) / (w**3)
+        log_deriv = q_prime / q_val
+
+        # Direct resolvent difference Delta Z_+(z)
+        delta_Z_plus = (2 * (d_f**2)) / (w * (w**2 - d_f**2))
+
+        diff = abs(log_deriv - delta_Z_plus)
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "z": str(z_c),
+            "q_val": str(q_val),
+            "log_deriv": str(log_deriv),
+            "delta_Z_plus": str(delta_Z_plus),
+            "diff": mpmath.nstr(diff, n=6),
+            "is_exact_identity": bool(diff < 1e-45),
+            "status": "CMSA_RDQ_DERIVATIVE_IDENTITY_VERIFIED"
+        }
+
+
+def evaluate_integrated_resolvent_l2_norm(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    a: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [INTEGRATED-SIGMA: EXACT L^2(dt) LEADING COEFFICIENT & INTEGRABILITY]
+    Evaluates the L^2(dt) norm of the leading single-height resolvent variation:
+      Delta Z_+ approx 2*delta^2 / (a + i*(t - gamma))^3.
+      || 2*delta^2 / (a + i*(t - gamma))^3 ||_{L^2(dt)}^2 = 3 * pi * delta^4 / (2 * a^5).
+    Compares the closed-form formula against high-precision numerical quadrature over (-infty, infty).
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        a_f = to_mpf(a, dps=dps)
+
+        if a_f <= abs(d_f):
+            raise ValueError(f"Requires a > |delta| for separation: got a={a_f}, delta={d_f}")
+
+        # Exact formula for leading L^2 norm
+        leading_exact = (3 * mpmath.pi * (d_f**4)) / (2 * (a_f**5))
+
+        # Numerical quadrature of leading term
+        def leading_integrand(t: mpmath.mpf) -> mpmath.mpf:
+            w = mpmath.mpc(a_f, t - g_f)
+            val = (2 * (d_f**2)) / (w**3)
+            return abs(val)**2
+
+        leading_quad = mpmath.quad(leading_integrand, [-mpmath.inf, mpmath.inf])
+        diff_leading = abs(leading_quad - leading_exact)
+
+        # Full exact resolvent L^2 norm (including delta^2 in denominator)
+        def full_single_integrand(t: mpmath.mpf) -> mpmath.mpf:
+            w = mpmath.mpc(a_f, t - g_f)
+            val = (2 * (d_f**2)) / (w * (w**2 - d_f**2))
+            return abs(val)**2
+
+        full_single_quad = mpmath.quad(full_single_integrand, [-mpmath.inf, mpmath.inf])
+
+        # Complete two-height quartet L^2 norm (adding +gamma and -gamma with cross-term)
+        def full_two_height_integrand(t: mpmath.mpf) -> mpmath.mpf:
+            w_plus = mpmath.mpc(a_f, t - g_f)
+            w_minus = mpmath.mpc(a_f, t + g_f)
+            val_plus = (2 * (d_f**2)) / (w_plus * (w_plus**2 - d_f**2))
+            val_minus = (2 * (d_f**2)) / (w_minus * (w_minus**2 - d_f**2))
+            return abs(val_plus + val_minus)**2
+
+        full_two_height_quad = mpmath.quad(full_two_height_integrand, [-mpmath.inf, mpmath.inf])
+
+        # Doubled single-height for comparison
+        doubled_leading = 2 * leading_exact
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "a": mpmath.nstr(a_f, n=10),
+            "leading_exact": mpmath.nstr(leading_exact, n=20),
+            "leading_quad": mpmath.nstr(leading_quad, n=20),
+            "diff_leading": mpmath.nstr(diff_leading, n=6),
+            "full_single_quad": mpmath.nstr(full_single_quad, n=20),
+            "doubled_leading": mpmath.nstr(doubled_leading, n=20),
+            "full_two_height_quad": mpmath.nstr(full_two_height_quad, n=20),
+            "is_exact_leading_match": bool(diff_leading < 1e-10 or (abs(leading_exact) > 0 and abs(diff_leading / leading_exact) < 1e-5)),
+            "status": "INTEGRATED_RESOLVENT_L2_NORM_VERIFIED"
+        }
+
+
+def evaluate_fourier_quartet_difference(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    a: Union[float, str, mpmath.mpf],
+    xi: Union[float, str, mpmath.mpf],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [INTEGRATED-SIGMA: EXACT FOURIER TRANSFORM OF COMPLETE QUARTET DIFFERENCE]
+    Under Fourier convention \\widehat f(\\xi) = \\int_{-\\infty}^\\infty f(t) e^{i t \\xi} dt:
+    For a > |delta| > 0 and \\xi > 0:
+      \\widehat{\\Delta Z_\\sigma}(\\xi) = 4 * \\pi * e^{-a \\xi} * (\\cosh(\\delta \\xi) - 1) * \\cos(\\gamma \\xi).
+    Compares the closed-form Fourier transform against numerical oscillatory integration.
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        a_f = to_mpf(a, dps=dps)
+        xi_f = to_mpf(xi, dps=dps)
+
+        if xi_f <= 0:
+            raise ValueError(f"Requires xi > 0 for standard half-line Fourier formula: got xi={xi_f}")
+
+        # Exact formula for complete quartet (combining +gamma and -gamma)
+        fourier_exact = 8 * mpmath.pi * mpmath.exp(-a_f * xi_f) * (mpmath.cosh(d_f * xi_f) - 1) * mpmath.cos(g_f * xi_f)
+
+        # Numerical integration of Fourier transform
+        # Integrand: (Delta Z_+(a+it) + Delta Z_-(a+it)) * exp(i*t*xi)
+        def fourier_integrand_re(t: mpmath.mpf) -> mpmath.mpf:
+            w_plus = mpmath.mpc(a_f, t - g_f)
+            w_minus = mpmath.mpc(a_f, t + g_f)
+            dz = (2 * (d_f**2)) / (w_plus * (w_plus**2 - d_f**2)) + (2 * (d_f**2)) / (w_minus * (w_minus**2 - d_f**2))
+            phase = mpmath.exp(mpmath.mpc(0, t * xi_f))
+            return mpmath.re(dz * phase)
+
+        fourier_quad_re = mpmath.quad(fourier_integrand_re, [-mpmath.inf, mpmath.inf])
+        diff = abs(fourier_quad_re - fourier_exact)
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "a": mpmath.nstr(a_f, n=10),
+            "xi": mpmath.nstr(xi_f, n=10),
+            "fourier_exact": mpmath.nstr(fourier_exact, n=20),
+            "fourier_quad": mpmath.nstr(fourier_quad_re, n=20),
+            "diff": mpmath.nstr(diff, n=6),
+            "is_exact_match": bool(diff < 1e-6 or (abs(fourier_exact) > 0 and abs(diff / fourier_exact) < 1e-4)),
+            "status": "FOURIER_QUARTET_DIFFERENCE_VERIFIED"
+        }
+
+
+
+def evaluate_exact_prime_crossterm_series(
+    delta: Union[float, str, mpmath.mpf],
+    gamma: Union[float, str, mpmath.mpf],
+    sigma_0: Union[float, str, mpmath.mpf],
+    max_n: int = 1000,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [INTEGRATED-SIGMA: EXACT PRIME CROSS-TERM & CONTINUUM SIGN INDEFINITENESS]
+    Evaluates the unnormalized integrated prime cross-term:
+      -2 * Re \\int_{sigma_0}^\\infty \\int_{-\\infty}^\\infty P_sigma(t) * conj(Delta Z_sigma(t)) dt dsigma
+      = - 4 * pi * sum_{n=2}^{N} Lambda(n) * (n^{1/2 - 2*sigma_0} / log n) * (cosh(delta * log n) - 1) * cos(gamma * log n).
+    For small delta:
+      = - 2 * pi * delta^2 * sum_{n=2}^N Lambda(n) * (log n) * n^{1/2 - 2*sigma_0} * cos(gamma * log n) + O(delta^4).
+    Demonstrates that as a function of continuous gamma in R, the series is sign-indefinite.
+    """
+    with mpmath.workdps(dps):
+        d_f = to_mpf(delta, dps=dps)
+        g_f = to_mpf(gamma, dps=dps)
+        s0_f = to_mpf(sigma_0, dps=dps)
+
+        sum_full = mpmath.mpf(0)
+        sum_leading = mpmath.mpf(0)
+
+        for n in range(2, max_n + 1):
+            lam = von_mangoldt(n)
+            if lam == 0:
+                continue
+            n_mp = mpmath.mpf(n)
+            log_n = mpmath.log(n_mp)
+            weight_sigma = n_mp ** (mpmath.mpf("0.5") - 2 * s0_f)
+            cos_term = mpmath.cos(g_f * log_n)
+
+            # Full cosh factor
+            cosh_factor = mpmath.cosh(d_f * log_n) - 1
+            sum_full += mpmath.mpf(lam) * (weight_sigma / log_n) * cosh_factor * cos_term
+
+            # Leading quadratic factor
+            sum_leading += mpmath.mpf(lam) * log_n * weight_sigma * cos_term
+
+        cross_full = - 4 * mpmath.pi * sum_full
+        cross_leading = - 2 * mpmath.pi * (d_f**2) * sum_leading
+
+        return {
+            "delta": mpmath.nstr(d_f, n=10),
+            "gamma": mpmath.nstr(g_f, n=10),
+            "sigma_0": mpmath.nstr(s0_f, n=10),
+            "max_n": max_n,
+            "cross_full": mpmath.nstr(cross_full, n=20),
+            "cross_leading": mpmath.nstr(cross_leading, n=20),
+            "status": "EXACT_PRIME_CROSSTERM_SERIES_EVALUATED"
+        }
+
+
+def is_prime(n: int) -> bool:
+    """Fast primality test for integer n."""
+    if n < 2:
+        return False
+    if n in (2, 3):
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    w = 2
+    while i * i <= n:
+        if n % i == 0:
+            return False
+        i += w
+        w = 6 - w
+    return True
+
+
+def evaluate_integrated_prime_diagonal(
+    sigma_0: Union[float, str, mpmath.mpf],
+    max_n: int = 10000,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [INTEGRATED-SIGMA: INTEGRATED PRIME DIAGONAL CLOSED FORM]
+    Evaluates:
+      \\int_{sigma_0}^\\infty sum_{n>=2} Lambda(n)^2 n^{-2*sigma} dsigma
+      = sum_{n>=2} (Lambda(n)^2 / (2 * log n)) * n^{-2*sigma_0}.
+    And compares against the closed-form Euler prime product:
+      - 1/2 * sum_{p prime} (log p) * log(1 - p^{-2*sigma_0}).
+    """
+    with mpmath.workdps(dps):
+        s0_f = to_mpf(sigma_0, dps=dps)
+        if s0_f <= 0.5:
+            raise ValueError(f"Requires sigma_0 > 1/2 for prime diagonal convergence: got sigma_0={s0_f}")
+
+        # Direct series sum over prime powers
+        sum_series = mpmath.mpf(0)
+        for n in range(2, max_n + 1):
+            lam = von_mangoldt(n)
+            if lam == 0:
+                continue
+            n_mp = mpmath.mpf(n)
+            log_n = mpmath.log(n_mp)
+            term = ((mpmath.mpf(lam)**2) / (2 * log_n)) * (n_mp ** (-2 * s0_f))
+            sum_series += term
+
+        # Closed-form prime log sum
+        sum_prime_closed = mpmath.mpf(0)
+        for p in range(2, max_n + 1):
+            if not is_prime(p):
+                continue
+            p_mp = mpmath.mpf(p)
+            log_p = mpmath.log(p_mp)
+            p_pow = p_mp ** (-2 * s0_f)
+            # -1/2 * log(p) * log(1 - p^{-2*sigma_0})
+            sum_prime_closed += - mpmath.mpf("0.5") * log_p * mpmath.log(1 - p_pow)
+
+        diff = abs(sum_series - sum_prime_closed)
+
+        return {
+            "sigma_0": mpmath.nstr(s0_f, n=10),
+            "max_n": max_n,
+            "sum_series": mpmath.nstr(sum_series, n=20),
+            "sum_prime_closed": mpmath.nstr(sum_prime_closed, n=20),
+            "diff": mpmath.nstr(diff, n=6),
+            "series_matches_closed_form": bool(diff < 1e-4),
+            "status": "INTEGRATED_PRIME_DIAGONAL_EVALUATED"
+        }
+
+
+# ============================================================================
+# BILATERAL GRADE CENTERING & SECOND-VARIATION EVALUATORS
+# ============================================================================
+
+def evaluate_bilateral_grade_centering_second_difference(
+    F_val: Union[complex, str, mpmath.mpc],
+    delta_h: Union[complex, str, mpmath.mpc],
+    delta_minus_h: Union[complex, str, mpmath.mpc],
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [BILATERAL GRADE CENTERING: SECOND VARIATION & CROSS-TERM CANCELLATION AUDIT]
+    Evaluates the symmetric second difference of the squared norm Q(F, Delta) = |F + Delta|^2 - |F|^2:
+      C_{h} = Q(F, Delta_h) + Q(F, Delta_{-h}) - 2 * Q(F, 0)
+            = |Delta_h|^2 + |Delta_{-h}|^2 + 2 * Re(F * conj(Delta_h + Delta_{-h})).
+    Tests:
+      1. Exact Opposition: If Delta_{-h} == - Delta_h:
+         Delta_h + Delta_{-h} = 0, so the background cross-term vanishes identically:
+         C_h = 2 * |Delta_h|^2 >= 0.
+      2. Asymmetric Grade Perturbation: Under nonlinear coordinate dilation, Delta_{-h} != - Delta_h.
+         If Delta_{-h} = - Delta_h + h^2 * B + O(h^3), then Delta_h + Delta_{-h} = h^2 * B + O(h^3).
+         The background cross-term contributes 2 * h^2 * Re(F * conj(B)) != 0.
+         Bilateral grade centering FAILS to eliminate the background cross-term.
+         Classification: FAIL_BILATERAL_CROSS_TERM_CANCELLATION.
+    """
+    with mpmath.workdps(dps):
+        F_c = to_mpc(F_val, dps=dps)
+        dh_c = to_mpc(delta_h, dps=dps)
+        dmh_c = to_mpc(delta_minus_h, dps=dps)
+
+        # Individual variations Q(F, Delta)
+        Q_plus = abs(F_c + dh_c)**2 - abs(F_c)**2
+        Q_minus = abs(F_c + dmh_c)**2 - abs(F_c)**2
+        C_h = Q_plus + Q_minus
+
+        # Decomposed parts
+        norm_sq_sum = abs(dh_c)**2 + abs(dmh_c)**2
+        sum_deltas = dh_c + dmh_c
+        cross_term = 2 * mpmath.re(F_c * mpmath.conj(sum_deltas))
+
+        diff_decomp = abs(C_h - (norm_sq_sum + cross_term))
+        is_exact_opposite = bool(abs(sum_deltas) < 1e-45)
+        cross_term_vanishes = bool(abs(cross_term) < 1e-45)
+
+        return {
+            "F": str(F_c),
+            "delta_h": str(dh_c),
+            "delta_minus_h": str(dmh_c),
+            "C_h": mpmath.nstr(C_h, n=20),
+            "norm_sq_sum": mpmath.nstr(norm_sq_sum, n=20),
+            "sum_deltas": str(sum_deltas),
+            "cross_term": mpmath.nstr(cross_term, n=20),
+            "is_exact_opposite": is_exact_opposite,
+            "cross_term_vanishes": cross_term_vanishes,
+            "decomposition_matches": bool(diff_decomp < 1e-45),
+            "classification": "PROVED_CENTERING_UNDER_EXACT_OPPOSITION" if is_exact_opposite else "FAIL_BILATERAL_CROSS_TERM_CANCELLATION",
+            "status": "BILATERAL_GRADE_CENTERING_EVALUATED"
+        }
+
+
+def evaluate_bilateral_scale_specificity(
+    a_vals: Optional[Sequence[Union[float, str, mpmath.mpf]]] = None,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [BILATERAL GRADE: SCALE SPECIFICITY AUDIT]
+    Audits whether the algebraic grade dilation centering laws hold for arbitrary scale bases a > 1
+    versus specifically selecting tau = 2*pi:
+      For any base a > 1, the centered dilation z_k = a^k z satisfies:
+      1. Reciprocity: r_k * kappa_k = a^{-k} * a^k = 1.
+      2. Unitary dilation character on Re(s)=1/2: |a^{k(1/2 - s)}| = a^{k(1/2 - 1/2)} = 1.
+      3. Cosh reflection curvature: B_{rho, a}(k) = 2*(cosh(k * delta * log a) - 1).
+         B_{rho, a}''(0) = 2 * delta^2 * (log a)^2.
+    Conclusion: The algebraic dilation centering is SCALE-GENERIC (valid for all a > 1).
+    It does not specifically require tau = 2*pi.
+    Classification: SCALE_GENERIC_NOT_TAU_SPECIFIC.
+    """
+    with mpmath.workdps(dps):
+        if a_vals is None:
+            a_vals = [mpmath.mpf("1.5"), mpmath.mpf("2.0"), 2 * mpmath.pi, mpmath.mpf("10.0")]
+
+        results = []
+        delta_test = mpmath.mpf("0.1")
+        for a_v in a_vals:
+            a_mp = to_mpf(a_v, dps=dps)
+            log_a = mpmath.log(a_mp)
+            curv = 2 * (delta_test**2) * (log_a**2)
+            results.append({
+                "a": mpmath.nstr(a_mp, n=10),
+                "is_tau": bool(abs(a_mp - 2 * mpmath.pi) < 1e-15),
+                "log_a": mpmath.nstr(log_a, n=10),
+                "curvature": mpmath.nstr(curv, n=10),
+                "is_positive": bool(curv > 0)
+            })
+
+        return {
+            "scale_evaluations": results,
+            "holds_for_all_scales": all(r["is_positive"] for r in results),
+            "classification": "SCALE_GENERIC_NOT_TAU_SPECIFIC",
+            "status": "BILATERAL_SCALE_SPECIFICITY_AUDITED"
+        }

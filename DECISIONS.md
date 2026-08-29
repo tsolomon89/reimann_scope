@@ -1492,6 +1492,49 @@ Mathematical / operational consequence:
 
 Updated `CURVATURE_TRANSPORT.md`, `formal/RiemannScope/CurvatureTransport.lean`, `math_core.py`, `tests/test_curvature_transport.py`, `tests/test_weil_curvature.py`, `MATH_CONTRACT.md`, `RESEARCH_LEDGER.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `CMSA_GATE_G4.md`, `TRANSCENDENTAL_CONTINUATION.md`, `RESEARCH_HYPOTHESIS.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all three corpus registers.
 
+---
+
+## 2026-08-29 — Arithmetic Radial-Centering and Bilateral Grade Second-Variation Sprint
+
+Status: ACCEPTED
+
+Decision:
+
+1. **Terminology and Interpretation Boundary**:
+   - Replaced unproved physical and heuristic terms with neutral, standard mathematical definitions across all documents (quadratic functional for "energy", positive diagonal operator for "Hamiltonian", parameterized grade orbit for "worldline", nonvanishing asymptotic threshold for "activation", trivial defect set for "ground state", coordinate displacement for "excitation", and second derivative for "curvature").
+2. **Corrected Existing Overclaims**:
+   - Prime-Only Weil Form: Formulated genuine two-bump witness separated by $\log p$, with $2\times 2$ Gram matrix $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ and eigenvalues $\pm w_p$. Corrected classification from strictly negative-definite to indefinite (not positive semidefinite), maintaining `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`.
+   - Probe Regularization: Clarified that $\frac{e^{-\varepsilon s}-e^{-Ls}}{s}$ is the transform of a sharp cutoff in log coordinates, which belongs to $L^2$ but is not a $C_c^\infty$ smoothing family, maintaining `OPEN_ADMISSIBLE_PROBE_REGULARIZATION`.
+   - Weil-Hermitian Identity: Classified $N_\xi - C_\xi = \sum \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2}$ as `KNOWN_RH_EQUIVALENCE / INTERNALLY_REDERIVED` (Weil 1952, Edwards 1974, Bombieri 2000).
+   - Formal Declaration Roles: Added explicit epistemic-role tagging (`DEFINITION`, `ALGEBRAIC_IDENTITY`, `FINITE_ANALYTIC_COMPONENT`, `COUNTERMODEL`, `NO_GO_COMPONENT`, `CONDITIONAL_SHELL`, `LOAD_BEARING_ANALYTIC_THEOREM`) to Lean declaration inventory.
+3. **Integrated-$\sigma$ Branch Exact Closure**:
+   - Formulated the exact quartet-minus-projection resolvent difference: $\Delta Z_+(z) = \frac{2\delta^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$ (Lean 4 `exact_quartet_resolvent_identity`, `ALGEBRAIC_IDENTITY`).
+   - Proved exact integrability $\Delta Z_\sigma \in L^1(dt) \cap L^2(dt)$, leading $L^2(dt)$ norm $\frac{3\pi\delta^4}{2a^5}$, and integrated norm $\frac{3\pi\delta^4}{8a_0^4}$.
+   - Proved CMSA-RDQ derivative connection $\frac{\partial}{\partial z}\log q_{\delta, \gamma}(z) = \Delta Z_{\delta, \gamma}(z)$.
+   - Proved exact Fourier-Laplace transform $\widehat{\Delta Z_\sigma}(\xi) = 8\pi e^{-a\xi}(\cosh(\delta\xi)-1)\cos(\gamma\xi)$ on $\xi > 0$.
+   - Derived exact prime cross-term $-2\Re\int_{\sigma_0}^\infty \int_{\mathbb R} P_\sigma\overline{\Delta Z_\sigma} dt d\sigma = -4\pi \sum \Lambda(n)\frac{n^{1/2-2\sigma_0}}{\log n}(\cosh(\delta\log n)-1)\cos(\gamma\log n)$, with continuum sign-indefiniteness across $\gamma \in \mathbb R$.
+   - Proved normalized finite invisibility vs unnormalized anchor loss (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`).
+   - Proved integrated prime diagonal closed form $\int_{\sigma_0}^\infty \sum \Lambda(n)^2 n^{-2\sigma} d\sigma = -\frac{1}{2}\sum_p \log p \log(1-p^{-2\sigma_0})$.
+4. **Bilateral Grade Radial Centering Second-Variation Analysis**:
+   - Proved that under exact opposition $\Delta_{-h} = -\Delta_h$, background cross-terms cancel identically ($Q(F, \Delta) + Q(F, -\Delta) = 2|\Delta|^2 \ge 0$, Lean 4 `bilateral_squared_norm_centering_exact_opposite`, `ALGEBRAIC_IDENTITY`).
+   - Proved that under coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$, $\Delta_h + \Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving an uncancelled second-order background cross-term $4h^2\Re(F\bar B) \ne 0$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, `NO_GO_COMPONENT`, `FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).
+   - Proved scale-generic dilation centering ($a > 1$, `SCALE_GENERIC_NOT_TAU_SPECIFIC`).
+5. **Consolidated Radial-Defect Descent Master Obligation**:
+   - Established `OBL-RADIAL-DEFECT-DESCENT` consolidating all 4 surviving radial-defect extraction routes (RDQ, Curvature Transport, Weil-Hermitian, CMSA).
+6. **Lean 4 Formalization Inventory**:
+   - Added 4 new formal declarations (Theorems 38–41) to `RiemannScope.CurvatureTransport`, bringing the project total to **127 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+7. **Verification Suite**:
+   - Added `tests/test_bilateral_second_variation.py` (23 tests), updated `tests/test_weil_curvature.py` (17 tests) and `tests/test_curvature_transport.py` (99 tests), achieving 139/139 passing tests.
+
+Reason:
+
+Rigorous closure of the integrated-sigma and bilateral grade centering branches, elimination of background cross-term cancellation illusions via Lean no-go formalization, correction of prime Weil form indefiniteness, epistemic role categorization, and consolidation of surviving radial defect obligations.
+
+Mathematical / operational consequence:
+
+Updated `CMSA_GATE_G4.md`, `CURVATURE_TRANSPORT.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `formal/RiemannScope/CurvatureTransport.lean`, `math_core.py`, `tests/test_bilateral_second_variation.py`, `tests/test_weil_curvature.py`, `tests/test_curvature_transport.py`, `MATH_CONTRACT.md`, `RESEARCH_LEDGER.md`, `RESEARCH_HYPOTHESIS.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all three corpus registers.
+
+
 
 
 
