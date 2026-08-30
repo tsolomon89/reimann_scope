@@ -4,8 +4,8 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "776bc92b413b87131d3682bf389a95efcb6088ab",
-  "timestamp": "2026-08-30T10:28:11.787300+00:00",
+  "producing_git_commit": "1e2bfb707e1d98a3c9b1dc4b2bb698003d1d36bf",
+  "timestamp": "2026-08-30T10:49:00.201209+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 135,
@@ -22,7 +22,7 @@
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
     "formal/RiemannScope/ArithmeticBridge.lean": "1b042194e43c2033d1a1b0b830631f65455b4f1b29f28583e9f5110240eca71f",
-    "formal/RiemannScope/CurvatureTransport.lean": "f399392432166a8d60f5d4c10253f35f58c4594a82b0fb9040e0069390758ee1"
+    "formal/RiemannScope/CurvatureTransport.lean": "544faeeccc16ef2db7aa4f99383bbc877aaff18ebc19ae88d7ee162ad72f41a9"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
@@ -33,5 +33,5 @@
   },
   "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "0e66bc85db46cd7885cd76a2eb7bf3d861564890a98af46d80f7914549292211"
+  "report_hash": "2c7945987e399226e049f19309de1936f00afbdbee00bee2ea847b84621e0854"
 }
