@@ -4,12 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "8015c955932f0aec06f952d746dfa5e8b42a4300",
-  "timestamp": "2026-08-30T15:34:28.935093+00:00",
+  "producing_git_commit": "e5a0268917c231e7e6edfc87b97132233ed65069",
+  "timestamp": "2026-08-30T23:27:43.385827+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 135,
-  "total_theorems": 135,
+  "project_theorem_declarations_compiled": 140,
+  "total_theorems": 140,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "564c68a75f7bf334e082f10b30c15cbe0d898b01db6f064710554ff2228e3955",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -22,7 +22,7 @@
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
     "formal/RiemannScope/ArithmeticBridge.lean": "1b042194e43c2033d1a1b0b830631f65455b4f1b29f28583e9f5110240eca71f",
-    "formal/RiemannScope/CurvatureTransport.lean": "544faeeccc16ef2db7aa4f99383bbc877aaff18ebc19ae88d7ee162ad72f41a9"
+    "formal/RiemannScope/CurvatureTransport.lean": "c7b516c226155154414b16b34194bd8cecd5efae77c4774ac8bfc56d7243694f"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
@@ -31,7 +31,7 @@
     "scripts/build_formal.py": "365e5867ca847cc7096c475f05c0da8959d2a77533fcfb7bf989a137b545d5e6",
     "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
   },
-  "build_stdout": "Build completed successfully.",
+  "build_stdout": "\u2714 [1499/1501] Built RiemannScope.CurvatureTransport\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "f707fd0f79beb94c54b0893735544d0549e1cb80d1dda25abd522f870dc02cfa"
+  "report_hash": "d8add26f0a69e4931f9e0e1f34dd12e406df681af2cffc4be0296e90e4e067c2"
 }
