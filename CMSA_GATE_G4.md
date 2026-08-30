@@ -582,20 +582,28 @@ where $\mathcal M_{h, T} = \frac{1}{2T} \int_{-T}^T |F_0 + \Delta_h|^2 dt - \fra
    - **Exact Opposition Case**: If $\Delta_{-h} \equiv -\Delta_h$, then $\Delta_h + \Delta_{-h} = 0$, and the background cross-term vanishes identically:
      $$Q(F, \Delta_h) + Q(F, -\Delta_h) = 2|\Delta_h|^2 \ge 0.$$
      *Formal Status*: Proved in Lean 4 (`bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).
-   - **Asymmetric Coordinate Dilation Case (No-Go)**:
-     Under coordinate dilation $z_{\pm h} = \tau^{\pm h} z$, the perturbation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$ is nonlinear in $h$:
-     $$\Delta_h(z) = h A(z) + h^2 B(z) + \mathcal O(h^3), \qquad \Delta_{-h}(z) = -h A(z) + h^2 B(z) + \mathcal O(h^3).$$
-     The sum does NOT vanish at second order:
-     $$\Delta_h(z) + \Delta_{-h}(z) = 2 h^2 B(z) + \mathcal O(h^4) \ne 0.$$
-     The residual background cross-term is:
-     $$2\Re\left( F \cdot \overline{(\Delta_h + \Delta_{-h})} \right) = 4 h^2 \Re(F \overline{B(z)}) \ne 0.$$
-     *Formal Status*: Proved in Lean 4 (`bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**).
-     *Classification*: $\boxed{\texttt{FAIL\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+   - **Generic Coordinate Dilation Asymmetry**:
+     Under coordinate dilation $z_{\pm h} = \tau^{\pm h} z$, the perturbation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$ satisfies:
+     $$\Delta_h(z) + \Delta_{-h}(z) = 2 h^2 B(z) + \mathcal O(h^4) \ne 0,$$
+     leaving cross-term $4 h^2 \Re(F \overline{B(z)})$.
+     *Formal Status*: Proved in Lean 4 (`bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**). Formalized load-bearing arithmetic descent count remains 0.
 
-2. **Scale Specificity Audit**:
+2. **Finite Pullback vs Asymptotic Redundancy**:
+   At finite $T$, $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`). In the limit $T \to \infty$, $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`), so pullback centering introduces no independent asymptotic invariant.
+
+3. **Actual Zeta-Specific Grade Jet Cross-Term (No-Go)**:
+   For Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, grade family $F_h(z) = P(\tau^h z)$ gives:
+   $$\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2 \right] \ne 0.$$
+   Strictly non-zero for all $a > 0$ and $\langle t^2\rangle_W \ge 0$.
+   *Classification*: $\boxed{\texttt{FAIL\_ZETA\_SPECIFIC\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+
+4. **Scale Specificity Audit**:
    For any scale base $a > 1$, the centered dilation $z_k = a^k z$ satisfies $r_k \kappa_k = a^{-k} a^k = 1$ and $B_{\rho, a}''(0) = 2\delta^2(\log a)^2 > 0$.
    The dilation centering laws are scale-generic and do not specifically select $\tau = 2\pi$.
    *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
+
+5. **External Attribution**:
+   Hadamard sum $\sum_{\rho} \frac{1}{|\rho|^2} = 2 + \gamma - \log(4\pi)$ is classical literature attributed to Edwards (1974, pp. 19–21) and Davenport (1980, Ch. 12).
 
 ---
 

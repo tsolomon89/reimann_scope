@@ -480,12 +480,18 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
    If $\Delta_{-h} \equiv -\Delta_h$, $\Delta_h + \Delta_{-h} = 0$, and the background cross-term vanishes:
    $$Q(F, \Delta_h) + Q(F, -\Delta_h) = 2|\Delta_h|^2 \ge 0.$$
    *(Formally proved in Lean 4: `bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).*
-2. **Asymmetric Coordinate Dilation (No-Go)**:
+2. **Generic Coordinate Dilation Cross-Term Expansion**:
    Under coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$, $\Delta_h + \Delta_{-h} = h^2 B(z) + \mathcal O(h^4) \ne 0$.
-   The background cross-term leaves $2h^2\Re(F\overline{B(z)}) \ne 0$.
-   *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**).*
-   *Classification*: $\boxed{\texttt{FAIL\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
-3. **Scale Specificity**:
+   The background cross-term expands as $2h^2\Re(F\overline{B(z)})$.
+   *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**).*
+3. **Finite-T Pullback vs Asymptotic Redundancy**:
+   $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`), but $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
+4. **Actual Zeta-Specific Grade Jet Cross-Term (No-Go)**:
+   For Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, grade family $F_h(z) = P(\tau^h z)$ gives:
+   $$\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2 \right] \ne 0.$$
+   Strictly non-zero for all $a > 0$ and $\langle t^2\rangle_W \ge 0$.
+   *Classification*: $\boxed{\texttt{FAIL\_ZETA\_SPECIFIC\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+5. **Scale Specificity**:
    Algebraic dilation centering holds for any base $a > 1$, showing that the mechanism is scale-generic.
    *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
 
@@ -493,7 +499,7 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 
 ## 18. Formalization and Verification Inventory
 
-### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 41 Declarations)
+### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 44 Declarations)
 
 | Declaration | Mathematical Content | Epistemic Role |
 |:---|:---|:---|
@@ -537,13 +543,16 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 | `exact_quartet_resolvent_identity` | $\frac{1}{w-\delta} + \frac{1}{w+\delta} - \frac{2}{w} = \frac{2\delta^2}{w(w^2-\delta^2)}$ | `ALGEBRAIC_IDENTITY` |
 | `bilateral_squared_norm_centering_exact_opposite` | $Q(F, \Delta) + Q(F, -\Delta) = 2\|\Delta\|^2$ | `ALGEBRAIC_IDENTITY` |
 | `bilateral_squared_norm_general_sum` | $Q(F, \Delta_1) + Q(F, \Delta_2) = \|\Delta_1\|^2 + \|\Delta_2\|^2 + 2\Re(F\overline{(\Delta_1+\Delta_2)})$ | `ALGEBRAIC_IDENTITY` |
-| `bilateral_second_order_asymmetry_cross_term` | $\Delta_2 = -\Delta_1 + h^2 B \implies 2\Re(F\overline{(\Delta_1+\Delta_2)}) = 2h^2\Re(F\bar B)$ | `NO_GO_COMPONENT` |
+| `bilateral_second_order_asymmetry_cross_term` | $\Delta_2 = -\Delta_1 + h^2 B \implies 2\Re(F\overline{(\Delta_1+\Delta_2)}) = 2h^2\Re(F\bar B)$ | `ALGEBRAIC_IDENTITY` |
+| `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero` | $h \ne 0 \wedge \Re(F\bar B) \ne 0 \implies 2h^2\Re(F\bar B) \ne 0$ | `NO_GO_COMPONENT` |
+| `finite_grade_pullback_second_difference_identity` | $M_+ + M_- - 2M = (M_+ - M) + (M_- - M)$ | `ALGEBRAIC_IDENTITY` |
+| `exact_full_quartet_resolvent_sum` | $\sum_{\pm} \Delta Z_\pm(w_\pm, \delta) = \sum_\pm \frac{2\delta^2}{w_\pm(w_\pm^2-\delta^2)}$ | `ALGEBRAIC_IDENTITY` |
 
 ### Python Test Suites
-- **`tests/test_bilateral_second_variation.py`**: 23/23 passed.
+- **`tests/test_bilateral_second_variation.py`**: 30/30 passed.
 - **`tests/test_weil_curvature.py`**: 17/17 passed.
 - **`tests/test_curvature_transport.py`**: 99/99 passed.
-- **Total Combined Verified Tests**: 139/139 passed.
+- **Total Combined Verified Tests**: 146/146 passed.
 
 ---
 

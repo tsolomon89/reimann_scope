@@ -387,12 +387,16 @@ $$\mathcal C_{h, T} = \mathcal M_{h, T} + \mathcal M_{-h, T} - 2\mathcal M_{0, T
 1. **Exact Opposition Cancellation**:
    For exact opposite perturbations $\Delta_{-h} = -\Delta_h$, $Q(F, \Delta_h) + Q(F, -\Delta_h) = 2|\Delta_h|^2 \ge 0$.
    Proved in Lean 4 (`bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).
-2. **Asymmetry Cross-Term Obstruction (No-Go)**:
+2. **Generic Coordinate Dilation Cross-Term Expansion**:
    Under coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$, $\Delta_h + \Delta_{-h} = h^2 B(z) + \mathcal O(h^4) \ne 0$.
-   The uncancelled background cross-term is $2h^2\Re(F\overline{B(z)}) \ne 0$.
-   Proved in Lean 4 (`bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**).
-   *Classification*: $\boxed{\texttt{FAIL\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
-3. **Scale Specificity**:
+   The cross-term is $2h^2\Re(F\overline{B(z)})$.
+   Proved in Lean 4 (`bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**). Formalized load-bearing arithmetic descent count remains 0.
+3. **Finite-T Pullback vs Asymptotic Redundancy**:
+   $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`), but $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
+4. **Actual Zeta-Specific Cross-Term No-Go**:
+   For $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, $\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum \Lambda(n)^2 n^{-1-2a}[-a\log n + (a^2-\langle t^2\rangle_W)(\log n)^2] \ne 0$.
+   *Classification*: $\boxed{\texttt{FAIL\_ZETA\_SPECIFIC\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+5. **Scale Specificity**:
    Algebraic dilation centering is scale-generic ($a > 1$) and does not specifically single out $\tau = 2\pi$.
    *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
 
@@ -409,7 +413,7 @@ $$\boxed{\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}}$$
 | **Child 1: `OBL-RDQ-001`** | Radial Defect Quotient (RDQ) | $D = -\log L_Q = \sum 2n_j \log(1 + \delta_j^2/\gamma_j^2) \ge 0$ | Divisor-independent arithmetic evaluator without zero data | `OPEN` |
 | **Child 2: `OBL-CT-001`** | Curvature Transport | $\sum W_\rho \mathscr K_\tau(\rho) = \sum W_\rho \delta_\rho^2 \ge 0$ | Non-scalar arithmetic functional construction (`OBL-CT-001A`) | `OPEN` |
 | **Child 3: `OBL-WH-001`** | Weil–Hermitian Bridge | $N_\xi - C_\xi = \sum \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2} \ge 0$ | Admissible probe regularization $\Phi_\varepsilon \to 1/s$ (`OBL-WH-002`) & global positive-type arithmetic factorization (`OBL-WH-003`) | `KNOWN_RH_EQUIVALENCE / OPEN_ARITHMETIC_NORM` |
-| **Child 4: `OBL-CMSA-003`** | Completed Mean-Square Anchor | $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P - Z|^2 dt = \sum \frac{\Lambda(n)^2}{n^{2\sigma}}$ | Transcendental Continuation Activation Subgate (`OBL-TC-ACT`); Integrated-$\sigma$ unnormalized anchor loss (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`) | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
+| **Child 4: `OBL-CMSA-003`** | Completed Mean-Square Anchor | $\lim_{T\to\infty} \frac{1}{2T}\int_{-T}^T |P - Z|^2 dt = \sum \frac{\Lambda(n)^2}{n^{2\sigma}}$ | Transcendental Continuation Activation Subgate (`OBL-TC-ACT`); Integrated-$\sigma$ unnormalized anchor loss (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT`) | `INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE` |
 
 ---
 
@@ -422,8 +426,8 @@ $$\boxed{\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}}$$
 - **Closed / Falsified Subgates**:
   - `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive reference class).
   - `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION` (two-bump prime Gram matrix indefiniteness $\pm w_p$).
-  - `FAIL_BILATERAL_CROSS_TERM_CANCELLATION` (bilateral grade coordinate dilation second variation).
-  - `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT` (integrated-$\sigma$ unnormalized arithmetic divergence).
+  - `FAIL_BILATERAL_CROSS_TERM_CANCELLATION` / `FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION` (bilateral grade coordinate dilation second variation).
+  - `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT` (integrated-$\sigma$ unnormalized arithmetic divergence).
   - `GRADE_COORDINATE_REDUNDANT` / `SCALE_GENERIC_NOT_TAU_SPECIFIC` (dilation pullback redundancy and generic scale).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
 

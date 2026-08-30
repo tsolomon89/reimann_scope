@@ -1055,14 +1055,18 @@ The repository's geometric, spectral, and arithmetic structures are unified unde
 ## 24.9 Integrated-$\sigma$ Branch Closure & Bilateral Grade Second Variation
 
 1. **Integrated-$\sigma$ Resolvent Algebra & Anchor Loss**:
-   - Exact quartet resolvent difference $\Delta Z_+(z) = \frac{2\delta^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$ (Lean 4 `exact_quartet_resolvent_identity`, **ALGEBRAIC_IDENTITY**).
+   - Exact quartet resolvent difference $\Delta Z_+(z) = \frac{2\delta^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$ (Lean 4 `exact_quartet_resolvent_identity`, **ALGEBRAIC_IDENTITY**, and `exact_full_quartet_resolvent_sum`).
    - $\Delta Z_\sigma \in L^1(dt) \cap L^2(dt)$ with leading single-height norm $\frac{3\pi\delta^4}{2a^5}$.
-   - Fourier-Laplace transform is $8\pi e^{-a\xi}(\cosh(\delta\xi)-1)\cos(\gamma\xi)$ on $\xi > 0$.
-   - Unnormalized integration diverges on base prime diagonal ($\int_{\sigma_0}^\infty \int |P_\sigma|^2 = \infty$), losing arithmetic anchor (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`).
+   - Fourier transforms: $4\pi e^{-a\xi}(\cosh(\delta\xi)-1)e^{\pm i\gamma\xi}$ single-height, $8\pi e^{-a\xi}(\cosh(\delta\xi)-1)\cos(\gamma\xi)$ complete quartet.
+   - Prime cross-term $-8\pi \sum \Lambda(n)\frac{n^{1/2-2\sigma_0}}{\log n}(\cosh(\delta\log n)-1)\cos(\gamma\log n)$; leading term $-4\pi\delta^2 \sum \Lambda(n)(\log n)n^{1/2-2\sigma_0}\cos(\gamma\log n)$; continuum sign change certified (`CONTINUUM_GAMMA_SIGN_CHANGE_PROVED`, `ACTUAL_ZETA_ZERO_ORDINATE_SIGN_OPEN`).
+   - Unnormalized integration diverges for fixed $\sigma > 1$ ($\int_{\mathbb R} |P_\sigma(t)|^2 dt = \infty$), losing arithmetic anchor (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT`).
    - Integrated prime diagonal closed form: $\int_{\sigma_0}^\infty \sum \Lambda(n)^2 n^{-2\sigma} d\sigma = -\frac{1}{2}\sum_p \log p \log(1-p^{-2\sigma_0})$.
+   - External attribution: Hadamard sum $\sum 1/|\rho|^2 = 2+\gamma-\log(4\pi)$ is classical literature (Edwards 1974, pp. 19–21; Davenport 1980, Ch. 12).
 2. **Bilateral Grade Radial Centering Second-Variation Analysis**:
    - Exact opposition $\Delta_{-h} = -\Delta_h$ eliminates background cross-terms ($2|\Delta|^2 \ge 0$, Lean 4 `bilateral_squared_norm_centering_exact_opposite`).
-   - Coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$ is asymmetric at second order ($\Delta_h+\Delta_{-h} = 2h^2 B(z) \ne 0$), leaving uncancelled background cross-term $4h^2\Re(F\bar B) \ne 0$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**, `FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).
+   - Coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$ expands as $\Delta_h+\Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving $4h^2\Re(F\bar B)$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**). Formalized load-bearing arithmetic descent count remains 0.
+   - Finite pullback $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`) vs asymptotic redundancy $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
+   - Actual Zeta-Specific Cross-Term No-Go: $\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum \Lambda(n)^2 n^{-1-2a}[-a\log n + (a^2-\langle t^2\rangle_W)(\log n)^2] \ne 0$ (`FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION`).
    - Dilation centering is scale-generic ($a > 1$, `SCALE_GENERIC_NOT_TAU_SPECIFIC`).
 3. **Consolidated Master Obligation**:
    Surviving radial-defect extraction routes are consolidated under $\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}$ across 4 child routes: RDQ (`OBL-RDQ-001`), Curvature Transport (`OBL-CT-001`), Weil-Hermitian (`OBL-WH-001`), and CMSA (`OBL-CMSA-003`).

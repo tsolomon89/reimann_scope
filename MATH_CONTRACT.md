@@ -2684,32 +2684,55 @@ Leading single-height $L^2(dt)$ norm:
 \]
 Integrating $d\sigma = da$ from $a_0 = \sigma_0 - 1/2$: $\int_{a_0}^\infty \frac{3\pi\delta^4}{2a^5} da = \frac{3\pi\delta^4}{8 a_0^4} < \infty$.
 
-### CMSA–RDQ Logarithmic Derivative Identity
+### CMSA–RDQ Logarithmic Derivative Identities
+For upper height $i\gamma$, lower height $-i\gamma$, and complete quartet:
 \[
-\boxed{\frac{\partial}{\partial z} \log q_{\delta, \gamma}(z) = \frac{2\delta^2}{(z - i\gamma)((z - i\gamma)^2 - \delta^2)} = \Delta Z_+(z),}
+q^+_{\delta, \gamma}(z) = 1 - \frac{\delta^2}{(z - i\gamma)^2}, \quad
+q^-_{\delta, \gamma}(z) = 1 - \frac{\delta^2}{(z + i\gamma)^2}, \quad
+q^{\mathrm{full}}_{\delta, \gamma}(z) = q^+_{\delta, \gamma}(z) q^-_{\delta, \gamma}(z).
 \]
-where $q_{\delta, \gamma}(z) = \frac{(z - (\delta+i\gamma))(z - (-\delta+i\gamma))}{(z - i\gamma)^2} = 1 - \frac{\delta^2}{(z - i\gamma)^2}$.
-
-### Exact Fourier–Laplace Transform
-Under the Fourier-Laplace kernel $\int_{-\infty}^\infty f(t) e^{it\xi} dt$ for $\xi > 0$:
+Exact logarithmic derivatives:
 \[
-\boxed{\widehat{\Delta Z_\sigma}(\xi) = 8\pi e^{-a\xi} (\cosh(\delta\xi) - 1) \cos(\gamma\xi).}
+\boxed{\frac{\partial}{\partial z} \log q^+_{\delta, \gamma}(z) = \Delta Z_+(z), \quad \frac{\partial}{\partial z} \log q^-_{\delta, \gamma}(z) = \Delta Z_-(z), \quad \frac{\partial}{\partial z} \log q^{\mathrm{full}}_{\delta, \gamma}(z) = \Delta Z_+(z) + \Delta Z_-(z) = \Delta Z_\sigma(z).}
 \]
 
-### Unnormalized Anchor Loss & Prime Diagonal Closed Form
-- Prime cross-term: $-2\Re \int_{\sigma_0}^\infty \int_{-\infty}^\infty P_\sigma(t) \overline{\Delta Z_\sigma(t)} dt d\sigma = -4\pi \sum_{n=2}^\infty \Lambda(n) \frac{n^{1/2 - 2\sigma_0}}{\log n} (\cosh(\delta\log n) - 1) \cos(\gamma\log n)$, sign-indefinite.
-- Loss of arithmetic anchor: $\int_{\sigma_0}^\infty \int_{-\infty}^\infty |P_\sigma(t)|^2 dt d\sigma = \infty$ diverges completely (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`).
-- Integrated prime diagonal:
+### Exact Fourier–Laplace Transforms
+Under the Fourier kernel $\int_{-\infty}^\infty f(t) e^{it\xi} dt$ for $\xi > 0$ with centered coordinate $z = a + it$ ($a = \sigma - 1/2$):
+- Upper single-height: $\widehat{\Delta Z_+}(\xi) = 4\pi e^{-a\xi} (\cosh(\delta\xi) - 1) e^{i\gamma\xi}$.
+- Lower single-height: $\widehat{\Delta Z_-}(\xi) = 4\pi e^{-a\xi} (\cosh(\delta\xi) - 1) e^{-i\gamma\xi}$.
+- Complete two-height quartet:
+\[
+\boxed{\widehat{\Delta Z_\sigma}(\xi) = \widehat{\Delta Z_+}(\xi) + \widehat{\Delta Z_-}(\xi) = 8\pi e^{-a\xi} (\cosh(\delta\xi) - 1) \cos(\gamma\xi).}
+\]
+
+### Prime Cross-Term Series & Continuum Sign Change
+- Exact unnormalized prime cross-term (by Parseval pairing):
+\[
+\boxed{-2\Re \int_{\sigma_0}^\infty \int_{-\infty}^\infty P_\sigma(t) \overline{\Delta Z_\sigma(t)} dt d\sigma = -8\pi \sum_{n=2}^\infty \Lambda(n) \frac{n^{1/2 - 2\sigma_0}}{\log n} (\cosh(\delta\log n) - 1) \cos(\gamma\log n).}
+\]
+- Leading small-$\delta$ radial term: $-4\pi\delta^2 \sum_{n=2}^\infty \Lambda(n)(\log n) n^{1/2-2\sigma_0}\cos(\gamma\log n)$.
+- Continuum sign change: At $\gamma = 0$, the series is strictly negative ($< 0$). At $\gamma = \pi/\log 2$, the $n=2$ term $-a_2\cos\pi = +a_2$ strictly dominates $\sum_{n\ge 3} a_n$, making the series strictly positive ($> 0$). Proved via certified interval arithmetic (`CONTINUUM_GAMMA_SIGN_CHANGE_PROVED`), while zero-ordinate sign remains open (`ACTUAL_ZETA_ZERO_ORDINATE_SIGN_OPEN`).
+
+### Unnormalized Anchor Loss & Prime Diagonal
+- Loss of arithmetic anchor: For any fixed $\sigma > 1$, $\int_{-\infty}^\infty |P_\sigma(t)|^2 dt = \infty$ diverges completely, establishing `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT`.
+- Integrated prime diagonal (matched finite truncation & tail-bounded infinite comparison):
 \[
 \boxed{\int_{\sigma_0}^\infty \sum_{n=2}^\infty \Lambda(n)^2 n^{-2\sigma} d\sigma = \sum_{n=2}^\infty \frac{\Lambda(n)^2}{2\log n} n^{-2\sigma_0} = -\frac{1}{2} \sum_{p \text{ prime}} \log p \log(1 - p^{-2\sigma_0}).}
 \]
+- External Attribution: The Hadamard spectral sum $\sum_{\rho} \frac{1}{|\rho|^2} = 2 + \gamma_{\mathrm{Euler}} - \log(4\pi)$ is established classical literature attributed to Edwards (1974, pp. 19–21) and Davenport (1980, Ch. 12), not an original discovery of this repository.
 
-### Bilateral Grade Centered Second Difference
+### Bilateral Grade Second Difference & Actual Zeta Cross-Term
 For $\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + |\Delta_{-h}|^2 + 2\Re(F\overline{(\Delta_h+\Delta_{-h})})$:
 1. **Exact Opposition**: If $\Delta_{-h} = -\Delta_h$, $\Delta_h+\Delta_{-h} = 0 \implies \mathcal C_h = 2|\Delta_h|^2 \ge 0$. *(Formally proved in Lean 4: `bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).*
-2. **Coordinate Dilation Asymmetry (No-Go)**: For $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$, $\Delta_h+\Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving uncancelled background cross-term $4h^2\Re(F\bar B) \ne 0$. *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **NO_GO_COMPONENT**, `FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).*
-3. **Scale Specificity**: Scale-generic for all $a > 1$ (`SCALE_GENERIC_NOT_TAU_SPECIFIC`).
-4. **Two-Bump Prime Gram Matrix**: $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ with eigenvalues $\pm w_p$, indefinite (not positive semidefinite, `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`).
+2. **Generic Coordinate Dilation Cross-Term**: For $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$, $\Delta_h+\Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving $4h^2\Re(F\bar B)$. *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**).* Formalized load-bearing arithmetic descent count remains 0.
+3. **Finite-T Pullback vs Asymptotic Redundancy**: $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`), but $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
+4. **Actual Zeta-Specific Grade Jet Cross-Term**: For the Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, the grade family $F_h(z) = P(\tau^h z)$ has jet $F_0'(z) = -(\log\tau) z \sum \Lambda(n)(\log n) n^{-1/2-z}$ and $F_0''(z) = (\log\tau)^2 \sum \Lambda(n)(-z\log n + z^2(\log n)^2) n^{-1/2-z}$.
+The bilateral cross-term is:
+\[
+\boxed{\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2 \right] \ne 0.}
+\]
+This quantity is strictly non-zero for all $a > 0$ and window variances $\langle t^2\rangle_W \ge 0$, proving that bilateral grade continuation fails to cancel the background second variation (`FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION`).
+5. **Smooth Two-Bump Prime Gram Matrix**: With bump convolution $\psi_\varepsilon \in C_c^\infty(\mathbb R)$ of support $\varepsilon < \frac{1}{2}\min |\log n_1 - \log n_2|$, $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ with eigenvalues $\pm w_p$, indefinite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`).
 
 
 

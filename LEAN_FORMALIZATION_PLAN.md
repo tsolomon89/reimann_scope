@@ -906,12 +906,18 @@ Formalized in `formal/RiemannScope/CurvatureTransport.lean` (41 total declaratio
      \[
      (Q(F, \Delta_1) + Q(F, \Delta_2)) = |\Delta_1|^2 + |\Delta_2|^2 + 2\Re\left(F \overline{(\Delta_1 + \Delta_2)}\right).
      \]
-4. **Bilateral Second-Order Asymmetry Cross-Term No-Go** (`bilateral_second_order_asymmetry_cross_term`, `NO_GO_COMPONENT`):
-   - When perturbations satisfy $\Delta_2 = -\Delta_1 + h^2 B$, the residual linear sum is $\Delta_1 + \Delta_2 = h^2 B$, and the background cross-term does NOT vanish at second order:
+4. **Bilateral Second-Order Asymmetry Cross-Term Expansion** (`bilateral_second_order_asymmetry_cross_term`, `ALGEBRAIC_IDENTITY`):
+   - When perturbations satisfy $\Delta_2 = -\Delta_1 + h^2 B$, the residual linear sum is $\Delta_1 + \Delta_2 = h^2 B$, yielding:
      \[
-     2\Re\left(F \overline{(\Delta_1 + \Delta_2)}\right) = 2 h^2 \Re(F \bar B) \ne 0.
+     2\Re\left(F \overline{(\Delta_1 + \Delta_2)}\right) = 2 h^2 \Re(F \bar B).
      \]
+5. **Bilateral Asymmetry Cross-Term Non-Vanishing** (`bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, `NO_GO_COMPONENT`):
+   - For $h \ne 0$ and $\Re(F \bar B) \ne 0$, $2 h^2 \Re(F \bar B) \ne 0$.
      Formally proves that coordinate dilation centering fails to eliminate background dependence (`FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).
+6. **Finite Pullback Second Difference Decomposition** (`finite_grade_pullback_second_difference_identity`, `ALGEBRAIC_IDENTITY`):
+   - Decomposes $M_+ + M_- - 2M = (M_+ - M) + (M_- - M)$.
+7. **Complete Quartet Resolvent Sum Decomposition** (`exact_full_quartet_resolvent_sum`, `ALGEBRAIC_IDENTITY`):
+   - Decomposes complete two-height quartet into upper and lower single-height resolvent differences.
 
-Total compiled project theorem declarations: **127** (0 `sorry`, 0 `admit`, 0 warnings).
+Total compiled project theorem declarations: **130** across 12 modules (0 `sorry`, 0 `admit`, 0 warnings). Formalized load-bearing arithmetic descent count remains 0.
 

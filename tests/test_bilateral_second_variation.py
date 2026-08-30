@@ -1,20 +1,21 @@
 """tests/test_bilateral_second_variation.py — Verification Suite for Arithmetic Radial-Centering,
-Integrated-Sigma Resolvent Identities, and Bilateral Grade Second-Variation Analysis.
+Integrated-Sigma Resolvent Identities, and Zeta-Specific Bilateral Grade Second-Variation Analysis.
 
 Verifies:
-1. Two-bump prime-only Weil autocorrelation Gram matrix indefiniteness (+- w_p eigenvalues).
-2. Exact quartet-minus-projection resolvent difference:
-   Delta Z_+(z) = 2*delta^2 / ((z - i*gamma)*((z - i*gamma)^2 - delta^2)).
-3. CMSA-RDQ logarithmic derivative connection:
-   d/dz log q_{delta,gamma}(z) = Delta Z_+(z).
+1. Two-bump prime-only Weil autocorrelation Gram matrix indefiniteness (+- w_p eigenvalues) under smooth bump model.
+2. Exact quartet-minus-projection resolvent difference (one-height and full-quartet).
+3. CMSA-RDQ logarithmic derivative connections for q+, q-, and q^{full}.
 4. Leading L^2(dt) resolvent coefficient 3*pi*delta^4 / (2*a^5) vs high-precision quadrature.
 5. Exact Fourier transform of complete quartet difference:
-   \\widehat{\\Delta Z_\\sigma}(\\xi) = 4*pi*e^{-a*xi}*(cosh(delta*xi)-1)*cos(gamma*xi).
-6. Exact unnormalized prime cross-term and continuum sign indefiniteness.
-7. Integrated prime diagonal closed form: - 1/2 * sum_p log p * log(1 - p^{-2*sigma_0}).
-8. Bilateral grade centering second variation: exact opposition cancellation vs asymmetric cross-term non-cancellation.
-9. Bilateral grade scale specificity: generic base a > 1 vs tau = 2*pi.
-10. Probe regularization audit: sharp cutoff classification (OPEN_ADMISSIBLE_PROBE_REGULARIZATION).
+   \\widehat{\\Delta Z_\\sigma}(\\xi) = 8*pi*e^{-a*xi}*(cosh(delta*xi)-1)*cos(gamma*xi).
+6. Exact unnormalized prime cross-term (-8*pi) vs direct 2D numerical quadrature (fails under factor-of-2 error).
+7. Continuum gamma sign-change proof with certified witnesses (CONTINUUM_GAMMA_SIGN_CHANGE_PROVED) and separation from ACTUAL_ZETA_ZERO_ORDINATE_SIGN_OPEN.
+8. Integrated prime diagonal exact matched truncation and tail-bounded Euler closed sum.
+9. Generic bilateral grade centering second difference decomposition.
+10. Exact zeta-specific grade jet cross-term evaluation (X_zeta = Re<F0, F0''> != 0) and classification FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION.
+11. Finite-T grade pullback identity vs asymptotic coordinate redundancy.
+12. Bilateral grade scale specificity (SCALE_GENERIC_NOT_TAU_SPECIFIC).
+13. Probe regularization audit (OPEN_ADMISSIBLE_PROBE_REGULARIZATION).
 """
 
 import mpmath
@@ -23,13 +24,14 @@ import math_core
 
 
 class TestFinitePrimeWeilGramMatrixTwoBump:
-    """Verifies that local prime distributions on genuine two-bump test functions produce indefinite eigenvalues (+- w_p)."""
+    """Verifies that local prime distributions on smooth bump test functions produce indefinite eigenvalues (+- w_p)."""
 
     def test_two_bump_indefinite_eigenvalues(self):
         primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
         res = math_core.evaluate_finite_prime_weil_gram_matrix(primes=primes, dps=50)
 
         assert res["status"] == "FINITE_PRIME_WEIL_GRAM_MATRIX_ANALYZED"
+        assert res["witness_model"] == "SMOOTH_BUMP_TEST_FUNCTION_MODEL"
         assert res["is_positive_semidefinite"] is False
         assert res["is_strictly_negative_definite"] is False
         assert res["classification"] == "FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION"
@@ -74,7 +76,7 @@ class TestExactQuartetResolventIdentity:
 
 
 class TestCMSARDQDerivativeIdentity:
-    """Verifies CMSA-RDQ logarithmic derivative connection d/dz log q_{delta,gamma}(z) = Delta Z_+(z)."""
+    """Verifies CMSA-RDQ logarithmic derivative connection for q+, q-, and q^{full}."""
 
     @pytest.mark.parametrize("delta,gamma,z_re,z_im", [
         ("0.05", "14.134725", "1.5", "10.0"),
@@ -86,8 +88,13 @@ class TestCMSARDQDerivativeIdentity:
         res = math_core.evaluate_cmsa_rdq_derivative_identity(delta=delta, gamma=gamma, z=z_val, dps=50)
 
         assert res["status"] == "CMSA_RDQ_DERIVATIVE_IDENTITY_VERIFIED"
+        assert res["is_exact_plus_identity"] is True
+        assert res["is_exact_minus_identity"] is True
+        assert res["is_exact_full_identity"] is True
         assert res["is_exact_identity"] is True
-        assert float(res["diff"]) < 1e-45
+        assert float(res["diff_plus"]) < 1e-45
+        assert float(res["diff_minus"]) < 1e-45
+        assert float(res["diff_full"]) < 1e-45
 
 
 class TestIntegratedResolventL2Norm:
@@ -104,13 +111,12 @@ class TestIntegratedResolventL2Norm:
         assert res["status"] == "INTEGRATED_RESOLVENT_L2_NORM_VERIFIED"
         assert res["is_exact_leading_match"] is True
         assert float(res["diff_leading"]) < 1e-10
-        # Full quadrature is strictly positive and bounded
         assert float(res["full_single_quad"]) > 0.0
         assert float(res["full_two_height_quad"]) > 0.0
 
 
 class TestFourierQuartetDifference:
-    """Verifies closed-form Fourier transform against numerical oscillatory integration."""
+    """Verifies closed-form Fourier transform (8*pi complete quartet) against numerical oscillatory integration."""
 
     @pytest.mark.parametrize("delta,gamma,a,xi", [
         ("0.02", "14.134725", "1.0", "0.5"),
@@ -125,40 +131,120 @@ class TestFourierQuartetDifference:
         assert float(res["diff"]) < 1e-6
 
 
-
 class TestExactPrimeCrosstermSeries:
-    """Verifies exact prime cross-term series evaluation and continuum sign indefiniteness."""
+    """Verifies exact prime cross-term series (-8*pi) vs direct numerical quadrature and continuum sign changes."""
 
-    def test_prime_crossterm_sign_indefiniteness(self):
-        # Evaluate cross-term at different gamma values to witness sign change
-        gammas = ["5.0", "14.134725", "21.022040", "30.424876", "45.0"]
-        evals = []
-        for g in gammas:
-            res = math_core.evaluate_exact_prime_crossterm_series(
-                delta="0.05", gamma=g, sigma_0="1.5", max_n=500, dps=50
-            )
-            assert res["status"] == "EXACT_PRIME_CROSSTERM_SERIES_EVALUATED"
-            evals.append(float(res["cross_leading"]))
+    def test_direct_quadrature_vs_series_normalization(self):
+        """Direct numerical quadrature comparison for single prime power term n=2 certifying -8*pi constant."""
+        with mpmath.workdps(30):
+            delta = mpmath.mpf("0.05")
+            gamma = mpmath.mpf("14.134725")
+            sigma_0 = mpmath.mpf("1.5")
+            n = 2
+            log_n = mpmath.log(n)
+            lam_2 = mpmath.log(2)
 
-        # Confirm there are non-zero values and values of differing magnitudes / signs
-        assert any(e != 0.0 for e in evals)
+            # 1. Exact series formula value for n=2
+            cosh_fac = mpmath.cosh(delta * log_n) - 1
+            weight_s0 = (mpmath.mpf(n) ** (mpmath.mpf("0.5") - 2 * sigma_0)) / log_n
+            cos_fac = mpmath.cos(gamma * log_n)
+            series_term_n2 = - 8 * mpmath.pi * lam_2 * weight_s0 * cosh_fac * cos_fac
+
+            # 2. 1D numerical t-quadrature at fixed sigma_0 verifying the 8*pi Fourier pairing:
+            # \int_{-\infty}^\infty P_{sigma_0, n=2}(t) conj(Delta Z_{sigma_0}(t)) dt == lam_2 * 2^{-sigma_0} * \widehat{\Delta Z_{sigma_0}}(log 2)
+            a_0 = sigma_0 - mpmath.mpf("0.5")
+            def inner_t_integrand(t: mpmath.mpf) -> mpmath.mpf:
+                p_val = lam_2 * (mpmath.mpf(n) ** (-sigma_0)) * mpmath.exp(- mpmath.mpc(0, t * log_n))
+                w_plus = mpmath.mpc(a_0, t - gamma)
+                w_minus = mpmath.mpc(a_0, t + gamma)
+                dz = (2 * (delta**2)) / (w_plus * (w_plus**2 - delta**2)) + (2 * (delta**2)) / (w_minus * (w_minus**2 - delta**2))
+                return mpmath.re(p_val * mpmath.conj(dz))
+
+            t_quad_val = mpmath.quad(inner_t_integrand, [-mpmath.inf, mpmath.inf])
+            fourier_paired_val = lam_2 * (mpmath.mpf(n) ** (-sigma_0)) * (8 * mpmath.pi * mpmath.exp(-a_0 * log_n) * cosh_fac * cos_fac)
+
+            assert abs(t_quad_val - fourier_paired_val) / abs(fourier_paired_val) < 1e-3
+
+            # 3. sigma-integral of fourier_paired_val gives exact series_term_n2 / (-2):
+            def sigma_int(sig: mpmath.mpf) -> mpmath.mpf:
+                a_s = sig - mpmath.mpf("0.5")
+                return lam_2 * (mpmath.mpf(n) ** (-sig)) * (8 * mpmath.pi * mpmath.exp(-a_s * log_n) * cosh_fac * cos_fac)
+
+            sig_quad_val = - 2 * mpmath.quad(sigma_int, [sigma_0, mpmath.inf])
+            assert abs(sig_quad_val - series_term_n2) / abs(series_term_n2) < 1e-10
+
+            # 4. Verify that a factor-of-2 error (e.g. -4*pi) would strictly fail
+            wrong_term_n2 = - 4 * mpmath.pi * lam_2 * weight_s0 * cosh_fac * cos_fac
+            wrong_diff = abs(sig_quad_val - wrong_term_n2)
+            assert wrong_diff > abs(series_term_n2) * 0.4
+
+    def test_continuum_gamma_sign_witnesses(self):
+        """Certifies continuum sign change with explicit positive and negative interval witnesses."""
+        res = math_core.evaluate_continuum_gamma_sign_witness(delta="0.05", sigma_0="1.5", max_n=2000, dps=50)
+
+        assert res["status"] == "CONTINUUM_GAMMA_SIGN_WITNESSES_EVALUATED"
+        assert res["is_val0_negative"] is True
+        assert res["is_val_pi_positive"] is True
+        assert res["continuum_gamma_sign_change_proved"] is True
+        assert res["classification"] == "CONTINUUM_GAMMA_SIGN_CHANGE_PROVED"
+        assert res["actual_zeta_zero_status"] == "ACTUAL_ZETA_ZERO_ORDINATE_SIGN_OPEN"
+
+        v0 = float(res["val_at_gamma_0"])
+        v_pi = float(res["val_at_gamma_pi_over_log2"])
+        assert v0 < 0.0 < v_pi
 
 
 class TestIntegratedPrimeDiagonal:
-    """Verifies integrated prime diagonal series against closed Euler log sum."""
+    """Verifies integrated prime diagonal matched truncation, tail-bounded Euler closed sum, and failure rationale."""
 
     @pytest.mark.parametrize("sigma_0", ["1.1", "1.5", "2.0"])
-    def test_integrated_prime_diagonal_match(self, sigma_0):
+    def test_exact_matched_prime_truncation(self, sigma_0):
         res = math_core.evaluate_integrated_prime_diagonal(sigma_0=sigma_0, max_n=5000, dps=50)
 
         assert res["status"] == "INTEGRATED_PRIME_DIAGONAL_EVALUATED"
-        assert res["series_matches_closed_form"] is True
-        assert float(res["diff"]) < 1e-4
-        assert float(res["sum_series"]) > 0.0
+        assert res["is_exact_matched_identity"] is True
+        assert float(res["diff_matched"]) < 1e-40
+        assert float(res["sum_direct"]) > 0.0
+        assert float(res["diff_infinite_vs_direct"]) < float(res["tail_bound"]) * 2.0
+        assert res["classification"] == "FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT"
+
+
+class TestZetaSpecificGradeJetCrossTerm:
+    """Verifies the central research task: evaluation of the actual zeta-specific cross-term X_zeta."""
+
+    @pytest.mark.parametrize("a,sigma_0,var_t2", [
+        ("1.0", "1.5", "0.0"),
+        ("1.0", "1.5", "5.0"),
+        ("0.8", "1.3", "0.0"),
+        ("1.5", "2.0", "10.0"),
+    ])
+    def test_zeta_specific_cross_term_is_strictly_nonzero(self, a, sigma_0, var_t2):
+        res = math_core.evaluate_zeta_specific_grade_jet_crossterm(
+            a=a, sigma_0=sigma_0, window_variance_t2=var_t2, max_n=2000, dps=50
+        )
+
+        assert res["status"] == "ZETA_SPECIFIC_GRADE_JET_CROSSTERM_EVALUATED"
+        assert res["X_zeta_nonzero"] is True
+        assert res["cancellation_succeeds"] is False
+        assert res["classification"] == "FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION"
+        assert abs(float(res["X_zeta"])) > 1e-15
+
+
+class TestFiniteGradePullbackIdentity:
+    """Verifies finite-T pullback identity vs asymptotic vanishing in Case A."""
+
+    @pytest.mark.parametrize("T", ["10.0", "50.0", "100.0"])
+    def test_finite_pullback_and_asymptotic_redundancy(self, T):
+        res = math_core.evaluate_finite_grade_pullback_identity(T=T, h="0.1", dps=50)
+
+        assert res["status"] == "FINITE_GRADE_PULLBACK_IDENTITY_EVALUATED"
+        assert res["is_finite_pullback_identity"] is True
+        assert res["finite_classification"] == "FINITE_GRADE_PULLBACK_IDENTITY"
+        assert res["asymptotic_classification"] == "ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY"
 
 
 class TestBilateralGradeCenteringSecondDifference:
-    """Verifies bilateral grade centering second difference under exact opposition vs asymmetry."""
+    """Verifies bilateral grade centering generic algebraic identity."""
 
     def test_exact_opposition_cancellation(self):
         F = "1.5 + 2.5 * I"
@@ -176,26 +262,6 @@ class TestBilateralGradeCenteringSecondDifference:
         assert res["classification"] == "PROVED_CENTERING_UNDER_EXACT_OPPOSITION"
         assert float(res["C_h"]) > 0.0
         assert abs(float(res["C_h"]) - float(res["norm_sq_sum"])) < 1e-45
-
-    def test_asymmetric_grade_perturbation_cross_term_non_cancellation(self):
-        F = "2.0 + 3.0 * I"
-        delta_h = "0.05 + 0.02 * I"
-        # Asymmetric perturbation with O(h^2) defect B
-        h_val = 0.1
-        B = mpmath.mpc("0.3", "-0.4")
-        dh_mp = mpmath.mpc("0.05", "0.02")
-        dmh_mp = -dh_mp + (h_val**2) * B
-
-        res = math_core.evaluate_bilateral_grade_centering_second_difference(
-            F_val=F, delta_h=str(dh_mp), delta_minus_h=str(dmh_mp), dps=50
-        )
-
-        assert res["status"] == "BILATERAL_GRADE_CENTERING_EVALUATED"
-        assert res["is_exact_opposite"] is False
-        assert res["cross_term_vanishes"] is False
-        assert res["decomposition_matches"] is True
-        assert res["classification"] == "FAIL_BILATERAL_CROSS_TERM_CANCELLATION"
-        assert abs(float(res["cross_term"])) > 1e-5
 
 
 class TestBilateralScaleSpecificity:

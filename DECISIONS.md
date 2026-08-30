@@ -1508,23 +1508,27 @@ Decision:
    - Weil-Hermitian Identity: Classified $N_\xi - C_\xi = \sum \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2}$ as `KNOWN_RH_EQUIVALENCE / INTERNALLY_REDERIVED` (Weil 1952, Edwards 1974, Bombieri 2000).
    - Formal Declaration Roles: Added explicit epistemic-role tagging (`DEFINITION`, `ALGEBRAIC_IDENTITY`, `FINITE_ANALYTIC_COMPONENT`, `COUNTERMODEL`, `NO_GO_COMPONENT`, `CONDITIONAL_SHELL`, `LOAD_BEARING_ANALYTIC_THEOREM`) to Lean declaration inventory.
 3. **Integrated-$\sigma$ Branch Exact Closure**:
-   - Formulated the exact quartet-minus-projection resolvent difference: $\Delta Z_+(z) = \frac{2\delta^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$ (Lean 4 `exact_quartet_resolvent_identity`, `ALGEBRAIC_IDENTITY`).
-   - Proved exact integrability $\Delta Z_\sigma \in L^1(dt) \cap L^2(dt)$, leading $L^2(dt)$ norm $\frac{3\pi\delta^4}{2a^5}$, and integrated norm $\frac{3\pi\delta^4}{8a_0^4}$.
-   - Proved CMSA-RDQ derivative connection $\frac{\partial}{\partial z}\log q_{\delta, \gamma}(z) = \Delta Z_{\delta, \gamma}(z)$.
-   - Proved exact Fourier-Laplace transform $\widehat{\Delta Z_\sigma}(\xi) = 8\pi e^{-a\xi}(\cosh(\delta\xi)-1)\cos(\gamma\xi)$ on $\xi > 0$.
-   - Derived exact prime cross-term $-2\Re\int_{\sigma_0}^\infty \int_{\mathbb R} P_\sigma\overline{\Delta Z_\sigma} dt d\sigma = -4\pi \sum \Lambda(n)\frac{n^{1/2-2\sigma_0}}{\log n}(\cosh(\delta\log n)-1)\cos(\gamma\log n)$, with continuum sign-indefiniteness across $\gamma \in \mathbb R$.
-   - Proved normalized finite invisibility vs unnormalized anchor loss (`FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_LIMIT`).
+   - Formulated the exact quartet-minus-projection resolvent difference: $\Delta Z_+(z) = \frac{2\delta^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$ (Lean 4 `exact_quartet_resolvent_identity`, `ALGEBRAIC_IDENTITY`, and `exact_full_quartet_resolvent_sum`).
+   - Proved exact integrability $\Delta Z_\sigma \in L^1(dt) \cap L^2(dt)$, leading single-height $L^2(dt)$ norm $\frac{3\pi\delta^4}{2a^5}$, and integrated norm $\frac{3\pi\delta^4}{8a_0^4}$.
+   - Proved CMSA-RDQ derivative connection: $\frac{\partial}{\partial z}\log q^+_{\delta, \gamma}(z) = \Delta Z_+(z)$, $\frac{\partial}{\partial z}\log q^-_{\delta, \gamma}(z) = \Delta Z_-(z)$, and $\frac{\partial}{\partial z}\log q^{\mathrm{full}}_{\delta, \gamma}(z) = \Delta Z_\sigma(z)$.
+   - Proved exact Fourier transforms $\widehat{\Delta Z_\pm}(\xi) = 4\pi e^{-a\xi}(\cosh(\delta\xi)-1)e^{\pm i\gamma\xi}$ and $\widehat{\Delta Z_\sigma}(\xi) = 8\pi e^{-a\xi}(\cosh(\delta\xi)-1)\cos(\gamma\xi)$ on $\xi > 0$.
+   - Derived exact prime cross-term $-2\Re\int_{\sigma_0}^\infty \int_{\mathbb R} P_\sigma\overline{\Delta Z_\sigma} dt d\sigma = -8\pi \sum \Lambda(n)\frac{n^{1/2-2\sigma_0}}{\log n}(\cosh(\delta\log n)-1)\cos(\gamma\log n)$, with leading small-$\delta$ radial term $-4\pi\delta^2 \sum \Lambda(n)(\log n)n^{1/2-2\sigma_0}\cos(\gamma\log n)$.
+   - Certified continuum sign change via interval witnesses (`CONTINUUM_GAMMA_SIGN_CHANGE_PROVED`), separating it from `ACTUAL_ZETA_ZERO_ORDINATE_SIGN_OPEN`.
+   - Proved unnormalized anchor loss for fixed $\sigma > 1$ ($\int_{\mathbb R} |P_\sigma(t)|^2 dt = \infty$, `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT`).
    - Proved integrated prime diagonal closed form $\int_{\sigma_0}^\infty \sum \Lambda(n)^2 n^{-2\sigma} d\sigma = -\frac{1}{2}\sum_p \log p \log(1-p^{-2\sigma_0})$.
-4. **Bilateral Grade Radial Centering Second-Variation Analysis**:
-   - Proved that under exact opposition $\Delta_{-h} = -\Delta_h$, background cross-terms cancel identically ($Q(F, \Delta) + Q(F, -\Delta) = 2|\Delta|^2 \ge 0$, Lean 4 `bilateral_squared_norm_centering_exact_opposite`, `ALGEBRAIC_IDENTITY`).
-   - Proved that under coordinate dilation $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h}z)$, $\Delta_h + \Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving an uncancelled second-order background cross-term $4h^2\Re(F\bar B) \ne 0$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, `NO_GO_COMPONENT`, `FAIL_BILATERAL_CROSS_TERM_CANCELLATION`).
+   - External attribution of Hadamard quadratic sum $\sum 1/|\rho|^2 = 2+\gamma-\log(4\pi)$ to Edwards (1974, pp. 19–21) and Davenport (1980, Ch. 12).
+4. **Bilateral Grade Radial Centering Second-Variation Analysis & Actual Zeta Cross-Term**:
+   - Proved exact opposition background cancellation: $Q(F, \Delta) + Q(F, -\Delta) = 2|\Delta|^2 \ge 0$ (Lean 4 `bilateral_squared_norm_centering_exact_opposite`, `ALGEBRAIC_IDENTITY`).
+   - Proved generic coordinate dilation cross-term expansion: $\Delta_h + \Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving $4h^2\Re(F\bar B)$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, `ALGEBRAIC_IDENTITY`, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, `NO_GO_COMPONENT`). Formalized load-bearing arithmetic descent count remains 0.
+   - Proved finite grade pullback identity $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`) and asymptotic coordinate redundancy $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
+   - Proved actual zeta-specific cross-term no-go: for completed-zeta grade family $F_h(z) = P(\tau^h z)$, $\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum \Lambda(n)^2 n^{-1-2a}[-a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2] \ne 0$ for all $a > 0, \langle t^2\rangle_W \ge 0$ (`FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION`).
    - Proved scale-generic dilation centering ($a > 1$, `SCALE_GENERIC_NOT_TAU_SPECIFIC`).
 5. **Consolidated Radial-Defect Descent Master Obligation**:
    - Established `OBL-RADIAL-DEFECT-DESCENT` consolidating all 4 surviving radial-defect extraction routes (RDQ, Curvature Transport, Weil-Hermitian, CMSA).
 6. **Lean 4 Formalization Inventory**:
-   - Added 4 new formal declarations (Theorems 38–41) to `RiemannScope.CurvatureTransport`, bringing the project total to **127 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+   - Added 7 formal declarations (Theorems 38–44) to `RiemannScope.CurvatureTransport`, bringing the project total to **130 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
 7. **Verification Suite**:
-   - Added `tests/test_bilateral_second_variation.py` (23 tests), updated `tests/test_weil_curvature.py` (17 tests) and `tests/test_curvature_transport.py` (99 tests), achieving 139/139 passing tests.
+   - Updated `tests/test_bilateral_second_variation.py` (30 tests), `tests/test_weil_curvature.py` (17 tests) and `tests/test_curvature_transport.py` (99 tests), achieving 146/146 passing tests.
 
 Reason:
 

@@ -476,11 +476,10 @@ theorem bilateral_squared_norm_general_sum (F Δ₁ Δ₂ : ℂ) :
   rw [h_star_add, h_mul_add, Complex.add_re]
   ring
 
-/-- 41. [NO_GO_COMPONENT] Bilateral second-order asymmetry cross-term:
+/-- 41. [ALGEBRAIC_IDENTITY] Bilateral second-order asymmetry cross-term expansion:
     When perturbations satisfy Δ₂ = -Δ₁ + h² * B, the residual linear sum is Δ₁ + Δ₂ = h² * B,
-    and the background cross-term does NOT vanish at second order:
-    2 * Re(F * star(Δ₁ + Δ₂)) = 2 * h² * Re(F * star(B)).
-    Consequently, bilateral grade centering fails to eliminate the background dependence. -/
+    yielding the exact algebraic identity for the cross-term:
+    2 * Re(F * star(Δ₁ + Δ₂)) = 2 * h² * Re(F * star(B)). -/
 theorem bilateral_second_order_asymmetry_cross_term (F Δ₁ B : ℂ) (h : ℝ) :
     let Δ₂ := -Δ₁ + (Complex.ofReal (h ^ 2)) * B
     2 * (F * starRingEnd ℂ (Δ₁ + Δ₂)).re =
@@ -504,6 +503,36 @@ theorem bilateral_second_order_asymmetry_cross_term (F Δ₁ B : ℂ) (h : ℝ) 
     ring
   rw [h_re]
   ring
+
+/-- 42. [NO_GO_COMPONENT] Bilateral asymmetry cross-term non-vanishing:
+    If the background-asymmetry coupling Re(F * star(B)) ≠ 0 and h ≠ 0,
+    then the second-order cross-term 2 * h² * Re(F * star(B)) is strictly non-zero. -/
+theorem bilateral_asymmetry_cross_term_nonzero_of_re_nonzero (F B : ℂ) (h : ℝ)
+    (hh : h ≠ 0) (hre : (F * starRingEnd ℂ B).re ≠ 0) :
+    2 * (h ^ 2) * (F * starRingEnd ℂ B).re ≠ 0 := by
+  have h2 : (2 : ℝ) ≠ 0 := by norm_num
+  have hh2 : h ^ 2 ≠ 0 := pow_ne_zero 2 hh
+  have h2h2 : 2 * (h ^ 2) ≠ 0 := mul_ne_zero h2 hh2
+  exact mul_ne_zero h2h2 hre
+
+/-- 43. [ALGEBRAIC_IDENTITY] Finite-T grade pullback second difference decomposition:
+    For any background functional M, M(T_+) + M(T_-) - 2 * M(T) decomposes into the sum of
+    individual scale variations (M(T_+) - M(T)) + (M(T_-) - M(T)). -/
+theorem finite_grade_pullback_second_difference_identity (M_T M_T_plus M_T_minus : ℝ) :
+    M_T_plus + M_T_minus - 2 * M_T = (M_T_plus - M_T) + (M_T_minus - M_T) := by
+  ring
+
+/-- 44. [ALGEBRAIC_IDENTITY] Complete two-height quartet resolvent sum decomposition:
+    The full quartet resolvent difference is the exact sum of the upper and lower single-height resolvent differences. -/
+theorem exact_full_quartet_resolvent_sum (w_plus w_minus δ : ℂ)
+    (hwp : w_plus ≠ 0) (hwp_sub : w_plus - δ ≠ 0) (hwp_add : w_plus + δ ≠ 0) (hwp_sq : w_plus ^ 2 - δ ^ 2 ≠ 0)
+    (hwm : w_minus ≠ 0) (hwm_sub : w_minus - δ ≠ 0) (hwm_add : w_minus + δ ≠ 0) (hwm_sq : w_minus ^ 2 - δ ^ 2 ≠ 0) :
+    (1 / (w_plus - δ) + 1 / (w_plus + δ) - 2 / w_plus) +
+    (1 / (w_minus - δ) + 1 / (w_minus + δ) - 2 / w_minus) =
+      (2 * δ ^ 2) / (w_plus * (w_plus ^ 2 - δ ^ 2)) +
+      (2 * δ ^ 2) / (w_minus * (w_minus ^ 2 - δ ^ 2)) := by
+  rw [exact_quartet_resolvent_identity w_plus δ hwp hwp_sub hwp_add hwp_sq]
+  rw [exact_quartet_resolvent_identity w_minus δ hwm hwm_sub hwm_add hwm_sq]
 
 end RiemannScope
 
