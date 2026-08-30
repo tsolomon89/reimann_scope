@@ -486,11 +486,12 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
    *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**).*
 3. **Finite-T Pullback vs Asymptotic Redundancy**:
    $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`), but $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
-4. **Actual Zeta-Specific Grade Jet Cross-Term (No-Go)**:
+4. **Diagonal Cross-Term & Exact Cancelling Variances**:
    For Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, grade family $F_h(z) = P(\tau^h z)$ gives:
-   $$\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2 \right] \ne 0.$$
-   Strictly non-zero for all $a > 0$ and $\langle t^2\rangle_W \ge 0$.
-   *Classification*: $\boxed{\texttt{FAIL\_ZETA\_SPECIFIC\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+   $$\mathfrak X_{\zeta,\mathrm{diag}} = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - v)(\log n)^2 \right] = (\log\tau)^2 \left[ (a^2 - v)S_2(a) - aS_1(a) \right].$$
+   - The universal non-vanishing claim is WITHDRAWN (`REPORTED_DIAGONAL_CROSS_TERM_UNIVERSAL_NONVANISHING_WITHDRAWN`).
+   - For any $a > 1/\log 2$, $v_*(a) = a^2 - a \frac{S_1(a)}{S_2(a)} > 0$ cancels $\mathfrak X_{\zeta,\mathrm{diag}}$ identically (`DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES`, Lean 4 `diagonal_crossterm_algebraic_reduction`, `diagonal_crossterm_cancelling_variance_zero`, `cancelling_variance_pos_of_bounds`, `cancelling_variance_pos_of_log2_bound`).
+   - For finite windows, the complete inner product includes non-zero off-diagonal terms $\sum_{m\ne n} c_m \bar d_n \widehat W(\log(m/n))$ (`FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED`, Lean 4 `finite_double_sum_2x2_decomp`).
 5. **Scale Specificity**:
    Algebraic dilation centering holds for any base $a > 1$, showing that the mechanism is scale-generic.
    *Classification*: $\boxed{\texttt{SCALE\_GENERIC\_NOT\_TAU\_SPECIFIC}}$.
@@ -499,7 +500,7 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 
 ## 18. Formalization and Verification Inventory
 
-### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 44 Declarations)
+### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 49 Declarations)
 
 | Declaration | Mathematical Content | Epistemic Role |
 |:---|:---|:---|
@@ -547,12 +548,18 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 | `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero` | $h \ne 0 \wedge \Re(F\bar B) \ne 0 \implies 2h^2\Re(F\bar B) \ne 0$ | `NO_GO_COMPONENT` |
 | `finite_grade_pullback_second_difference_identity` | $M_+ + M_- - 2M = (M_+ - M) + (M_- - M)$ | `ALGEBRAIC_IDENTITY` |
 | `exact_full_quartet_resolvent_sum` | $\sum_{\pm} \Delta Z_\pm(w_\pm, \delta) = \sum_\pm \frac{2\delta^2}{w_\pm(w_\pm^2-\delta^2)}$ | `ALGEBRAIC_IDENTITY` |
+| `diagonal_crossterm_algebraic_reduction` | $(a^2 - v)S_2 - aS_1 = a^2 S_2 - v S_2 - a S_1$ | `ALGEBRAIC_IDENTITY` |
+| `diagonal_crossterm_cancelling_variance_zero` | $(a^2 - v_*)S_2 - a S_1 = 0$ for $v_* = a^2 - a(S_1/S_2)$ | `ALGEBRAIC_IDENTITY` |
+| `cancelling_variance_pos_of_bounds` | $0 < c \le S_2/S_1 \wedge 1/c < a \implies 0 < v_*(a)$ | `FINITE_ANALYTIC_COMPONENT` |
+| `cancelling_variance_pos_of_log2_bound` | $(\log 2)S_1 \le S_2 \wedge 1/\log 2 < a \implies 0 < v_*(a)$ | `FINITE_ANALYTIC_COMPONENT` |
+| `finite_double_sum_2x2_decomp` | $(A_{00}+A_{11}) + (A_{01}+A_{10}) = \sum_{i,j} A_{ij}$ | `ALGEBRAIC_IDENTITY` |
 
 ### Python Test Suites
-- **`tests/test_bilateral_second_variation.py`**: 30/30 passed.
+- **`tests/test_bilateral_second_variation.py`**: 34/34 passed.
 - **`tests/test_weil_curvature.py`**: 17/17 passed.
 - **`tests/test_curvature_transport.py`**: 99/99 passed.
-- **Total Combined Verified Tests**: 146/146 passed.
+- **`tests/test_claim_audit_gates.py`**: 4/4 passed.
+- **Total Combined Verified Tests**: 154/154 passed.
 
 ---
 

@@ -534,6 +534,70 @@ theorem exact_full_quartet_resolvent_sum (w_plus w_minus δ : ℂ)
   rw [exact_quartet_resolvent_identity w_plus δ hwp hwp_sub hwp_add hwp_sq]
   rw [exact_quartet_resolvent_identity w_minus δ hwm hwm_sub hwm_add hwm_sq]
 
+/-- 45. [ALGEBRAIC_IDENTITY] Diagonal cross-term algebraic reduction:
+    (a^2 - v) * S_2 - a * S_1 = a^2 * S_2 - v * S_2 - a * S_1. -/
+theorem diagonal_crossterm_algebraic_reduction (a v S1 S2 : ℝ) :
+    (a ^ 2 - v) * S2 - a * S1 = a ^ 2 * S2 - v * S2 - a * S1 := by
+  ring
+
+/-- 46. [ALGEBRAIC_IDENTITY] Diagonal cross-term exact cancellation at v = v_*(a):
+    For S2 ≠ 0 and v_* = a^2 - a * (S1 / S2), (a^2 - v_*) * S2 - a * S1 = 0. -/
+theorem diagonal_crossterm_cancelling_variance_zero (a S1 S2 : ℝ) (hS2 : S2 ≠ 0) :
+    let v_star := a ^ 2 - a * (S1 / S2)
+    (a ^ 2 - v_star) * S2 - a * S1 = 0 := by
+  intro v_star
+  dsimp [v_star]
+  have h_sub : a ^ 2 - (a ^ 2 - a * (S1 / S2)) = a * (S1 / S2) := by ring
+  rw [h_sub]
+  have h_mul : a * (S1 / S2) * S2 = a * S1 := by
+    calc a * (S1 / S2) * S2
+      _ = a * ((S1 / S2) * S2) := by ring
+      _ = a * S1 := by rw [div_mul_cancel₀ S1 hS2]
+  rw [h_mul, sub_self]
+
+/-- 47. [FINITE_ANALYTIC_COMPONENT] Positivity of cancelling variance:
+    For positive lower bound c > 0, S1 > 0, c * S1 ≤ S2, and a > 1 / c,
+    the cancelling variance v_* = a^2 - a * (S1 / S2) is strictly positive: v_* > 0. -/
+theorem cancelling_variance_pos_of_bounds (a S1 S2 c : ℝ)
+    (hc : 0 < c) (hS1 : 0 < S1) (h_bound : c * S1 ≤ S2) (ha : 1 / c < a) :
+    0 < a ^ 2 - a * (S1 / S2) := by
+  have hS2_pos : 0 < S2 := lt_of_lt_of_le (mul_pos hc hS1) h_bound
+  have h_ac : 1 < a * c := by
+    have h1 : (1 / c) * c < a * c := mul_lt_mul_of_pos_right ha hc
+    have h2 : (1 / c) * c = 1 := one_div_mul_cancel (ne_of_gt hc)
+    linarith
+  have ha_pos : 0 < a := lt_trans (one_div_pos.mpr hc) ha
+  have h_strict : 1 * S1 < (a * c) * S1 := mul_lt_mul_of_pos_right h_ac hS1
+  have h_trans : S1 < a * S2 := by
+    calc S1
+      _ = 1 * S1 := by rw [one_mul]
+      _ < (a * c) * S1 := h_strict
+      _ = a * (c * S1) := by ring
+      _ ≤ a * S2 := mul_le_mul_of_nonneg_left h_bound (le_of_lt ha_pos)
+  have h_diff_pos : 0 < a * S2 - S1 := sub_pos.mpr h_trans
+  have hS2_ne : S2 ≠ 0 := ne_of_gt hS2_pos
+  have h_factor : a ^ 2 - a * (S1 / S2) = (a * (a * S2 - S1)) / S2 := by
+    field_simp
+    ring
+  rw [h_factor]
+  have h_num_pos : 0 < a * (a * S2 - S1) := mul_pos ha_pos h_diff_pos
+  exact div_pos h_num_pos hS2_pos
+
+/-- 48. [FINITE_ANALYTIC_COMPONENT] Positivity of cancelling variance with log 2 bound:
+    For S1 > 0, (Real.log 2) * S1 ≤ S2, and 1 / (Real.log 2) < a,
+    the cancelling variance v_* = a^2 - a * (S1 / S2) is strictly positive: v_* > 0. -/
+theorem cancelling_variance_pos_of_log2_bound (a S1 S2 : ℝ)
+    (hS1 : 0 < S1) (h_bound : (Real.log 2) * S1 ≤ S2) (ha : 1 / (Real.log 2) < a) :
+    0 < a ^ 2 - a * (S1 / S2) := by
+  have h_log2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  exact cancelling_variance_pos_of_bounds a S1 S2 (Real.log 2) h_log2_pos hS1 h_bound ha
+
+/-- 49. [ALGEBRAIC_IDENTITY] Diagonal and off-diagonal decomposition of a 2x2 matrix sum:
+    (A 0 0 + A 1 1) + (A 0 1 + A 1 0) = A 0 0 + A 0 1 + A 1 0 + A 1 1. -/
+theorem finite_double_sum_2x2_decomp (A00 A01 A10 A11 : ℝ) :
+    (A00 + A11) + (A01 + A10) = A00 + A01 + A10 + A11 := by
+  ring
+
 end RiemannScope
 
 

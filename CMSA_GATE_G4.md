@@ -591,11 +591,12 @@ where $\mathcal M_{h, T} = \frac{1}{2T} \int_{-T}^T |F_0 + \Delta_h|^2 dt - \fra
 2. **Finite Pullback vs Asymptotic Redundancy**:
    At finite $T$, $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`). In the limit $T \to \infty$, $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`), so pullback centering introduces no independent asymptotic invariant.
 
-3. **Actual Zeta-Specific Grade Jet Cross-Term (No-Go)**:
-   For Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, grade family $F_h(z) = P(\tau^h z)$ gives:
-   $$\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2 \right] \ne 0.$$
-   Strictly non-zero for all $a > 0$ and $\langle t^2\rangle_W \ge 0$.
-   *Classification*: $\boxed{\texttt{FAIL\_ZETA\_SPECIFIC\_BILATERAL\_CROSS\_TERM\_CANCELLATION}}$.
+3. **Diagonal Cross-Term & Exact Cancelling Variances**:
+   For Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, grade family $F_h(z) = P(\tau^h z)$ gives diagonal cross-term $\mathfrak X_{\zeta,\mathrm{diag}} = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 [(a^2-v)S_2(a) - aS_1(a)]$.
+   - Universal non-vanishing claim is WITHDRAWN (`REPORTED_DIAGONAL_CROSS_TERM_UNIVERSAL_NONVANISHING_WITHDRAWN`).
+   - Exact cancelling variance $v_*(a) = a^2 - a\frac{S_1(a)}{S_2(a)} > 0$ cancels $\mathfrak X_{\zeta,\mathrm{diag}}$ for all $a > 1/\log 2$ (`DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES`, Lean 4 `diagonal_crossterm_algebraic_reduction`, `diagonal_crossterm_cancelling_variance_zero`, `cancelling_variance_pos_of_bounds`, `cancelling_variance_pos_of_log2_bound`).
+   - Complete finite-window Dirichlet inner product contains non-zero off-diagonal terms $\sum_{m\ne n} c_m \bar d_n \widehat W(\log(m/n))$ (`FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED`, Lean 4 `finite_double_sum_2x2_decomp`).
+
 
 4. **Scale Specificity Audit**:
    For any scale base $a > 1$, the centered dilation $z_k = a^k z$ satisfies $r_k \kappa_k = a^{-k} a^k = 1$ and $B_{\rho, a}''(0) = 2\delta^2(\log a)^2 > 0$.

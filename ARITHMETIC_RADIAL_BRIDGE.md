@@ -425,8 +425,8 @@ $$\boxed{\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}}$$
 - **`OBL-TC-ACT` (Transcendental Continuation Activation Theorem)**: Active earliest open subgate for CMSA Gate G4.
 - **Closed / Falsified Subgates**:
   - `FAIL_RADIAL_POSITIVITY` (raw finite Fejér response & additive reference class).
-  - `FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION` (two-bump prime Gram matrix indefiniteness $\pm w_p$).
-  - `FAIL_BILATERAL_CROSS_TERM_CANCELLATION` / `FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION` (bilateral grade coordinate dilation second variation).
+  - `FAIL_BILATERAL_CROSS_TERM_CANCELLATION` / `DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES` (bilateral grade coordinate dilation second variation; universal non-vanishing withdrawn).
+  - `OBL-DERIVE-FULL-WINDOWED-ZETA-CROSS-TERM` (open obligation for complete finite-window off-diagonal and completed-zeta cross-term).
   - `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT` (integrated-$\sigma$ unnormalized arithmetic divergence).
   - `GRADE_COORDINATE_REDUNDANT` / `SCALE_GENERIC_NOT_TAU_SPECIFIC` (dilation pullback redundancy and generic scale).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.

@@ -210,24 +210,69 @@ class TestIntegratedPrimeDiagonal:
 
 
 class TestZetaSpecificGradeJetCrossTerm:
-    """Verifies the central research task: evaluation of the actual zeta-specific cross-term X_zeta."""
+    """Verifies the central research task: evaluation of the actual zeta-specific cross-term X_zeta and cancelling variances."""
 
-    @pytest.mark.parametrize("a,sigma_0,var_t2", [
-        ("1.0", "1.5", "0.0"),
-        ("1.0", "1.5", "5.0"),
-        ("0.8", "1.3", "0.0"),
-        ("1.5", "2.0", "10.0"),
-    ])
-    def test_zeta_specific_cross_term_is_strictly_nonzero(self, a, sigma_0, var_t2):
-        res = math_core.evaluate_zeta_specific_grade_jet_crossterm(
-            a=a, sigma_0=sigma_0, window_variance_t2=var_t2, max_n=2000, dps=50
+    @pytest.mark.parametrize("a", ["1.5", "2.0", "3.0", "5.0"])
+    def test_cancelling_variance_exact_cancellation_and_bounds(self, a):
+        """
+        Verifies that for every a > 1 / log 2 approx 1.442695:
+        1. S_1(a) / S_2(a) <= 1 / log 2.
+        2. v_*(a) = a^2 - a * (S1 / S2) > 0 strictly.
+        3. X_zeta(a, v_*(a)) == 0 to 50 dps exact precision.
+        4. Opposite signs strictly certified above and below v_*(a).
+        """
+        res = math_core.compute_cancelling_variance(a=a, max_n=2000, dps=50)
+
+        assert res["status"] == "CANCELLING_VARIANCE_COMPUTED"
+        assert res["classification"] == "DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES"
+        assert res["ratio_satisfies_bound"] is True
+        assert res["is_v_star_positive"] is True
+        assert res["is_exact_zero"] is True
+        assert res["sign_change_verified"] is True
+        assert float(res["v_star"]) > 0.0
+        assert abs(float(res["X_zeta_at_v_star"])) < 1e-35
+
+    def test_falsification_of_universal_nonvanishing_assertion(self):
+        """
+        Adversarial falsification test:
+        The previous sprint's claim that X_zeta != 0 for all a > 0, v >= 0 is false.
+        This test constructs the exact cancelling variance at a = 2.0 and verifies that X_zeta == 0.
+        """
+        res = math_core.compute_cancelling_variance(a="2.0", max_n=2000, dps=50)
+        v_star = res["v_star"]
+
+        # Evaluate standard evaluator at (a=2.0, v=v_star)
+        eval_res = math_core.evaluate_zeta_specific_grade_jet_crossterm(
+            a="2.0", sigma_0="2.5", window_variance_t2=v_star, max_n=2000, dps=50
         )
 
-        assert res["status"] == "ZETA_SPECIFIC_GRADE_JET_CROSSTERM_EVALUATED"
-        assert res["X_zeta_nonzero"] is True
-        assert res["cancellation_succeeds"] is False
-        assert res["classification"] == "FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION"
-        assert abs(float(res["X_zeta"])) > 1e-15
+        assert eval_res["status"] == "ZETA_SPECIFIC_GRADE_JET_CROSSTERM_EVALUATED"
+        assert eval_res["is_cancelling_variance"] is True
+        assert eval_res["X_zeta_nonzero"] is False
+        assert abs(float(eval_res["X_zeta"])) < 1e-25
+
+    @pytest.mark.parametrize("a,sigma_w", [
+        ("1.5", "1.0"),
+        ("2.0", "0.8"),
+        ("1.2", "1.5"),
+    ])
+    def test_full_windowed_dirichlet_inner_product_matches_quadrature_and_reveals_offdiagonal(self, a, sigma_w):
+        """
+        Verifies that for finite windows:
+        1. Full double sum matches 1D numerical quadrature of int W(t) F_0(t) conj(F_0''(t)) dt to high precision.
+        2. Off-diagonal sum (m != n) is strictly non-zero.
+        3. Diagonal-only formula differs from the true windowed inner product.
+        """
+        res = math_core.evaluate_full_windowed_dirichlet_inner_product(
+            a=a, sigma_w=sigma_w, max_n=15, dps=50
+        )
+
+        assert res["status"] == "FULL_WINDOWED_DIRICHLET_INNER_PRODUCT_EVALUATED"
+        assert res["is_exact_match"] is True
+        assert res["offdiagonal_is_nonzero"] is True
+        assert float(res["diff_quad_vs_exact"]) < 1e-10
+        assert float(res["offdiagonal_norm"]) > 1e-5
+
 
 
 class TestFiniteGradePullbackIdentity:

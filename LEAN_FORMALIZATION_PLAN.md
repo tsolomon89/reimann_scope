@@ -921,3 +921,25 @@ Formalized in `formal/RiemannScope/CurvatureTransport.lean` (41 total declaratio
 
 Total compiled project theorem declarations: **130** across 12 modules (0 `sorry`, 0 `admit`, 0 warnings). Formalized load-bearing arithmetic descent count remains 0.
 
+---
+
+# 31. Phase 22 — Diagonal Cross-Term Exact Cancellation & Double-Sum Decomposition
+
+Formalized in `formal/RiemannScope/CurvatureTransport.lean` (49 total declarations in module, 135 total compiled formal declarations across project):
+
+1. **Diagonal Cross-Term Algebraic Reduction** (`diagonal_crossterm_algebraic_reduction`, `ALGEBRAIC_IDENTITY`):
+   - $(a^2 - v) S_2 - a S_1 = a^2 S_2 - v S_2 - a S_1$.
+2. **Diagonal Cross-Term Exact Cancellation at Cancelling Variance** (`diagonal_crossterm_cancelling_variance_zero`, `ALGEBRAIC_IDENTITY`):
+   - For $S_2 \ne 0$ and $v_* = a^2 - a (S_1 / S_2)$, $(a^2 - v_*) S_2 - a S_1 = 0$.
+3. **Positivity of Cancelling Variance Under General Bounds** (`cancelling_variance_pos_of_bounds`, `FINITE_ANALYTIC_COMPONENT`):
+   - For $c > 0$, $S_1 > 0$, $c S_1 \le S_2$, and $a > 1/c$: $a^2 - a (S_1 / S_2) > 0$.
+4. **Positivity of Cancelling Variance Under $\log 2$ Bound** (`cancelling_variance_pos_of_log2_bound`, `FINITE_ANALYTIC_COMPONENT`):
+   - For $S_1 > 0$, $(\log 2) S_1 \le S_2$, and $a > 1/\log 2$: $a^2 - a (S_1 / S_2) > 0$.
+   - Falsifies the universal non-vanishing claim over all $a > 0, v \ge 0$.
+5. **Finite Double-Sum 2x2 Decomposition** (`finite_double_sum_2x2_decomp`, `ALGEBRAIC_IDENTITY`):
+   - $(A_{00} + A_{11}) + (A_{01} + A_{10}) = A_{00} + A_{01} + A_{10} + A_{11}$.
+   - Decomposes matrix sum into diagonal and off-diagonal components.
+
+Total compiled project theorem declarations: **135** across 12 modules (0 `sorry`, 0 `admit`, 0 warnings). Formalized load-bearing arithmetic descent count remains 0.
+
+

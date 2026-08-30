@@ -1521,7 +1521,7 @@ Decision:
    - Proved exact opposition background cancellation: $Q(F, \Delta) + Q(F, -\Delta) = 2|\Delta|^2 \ge 0$ (Lean 4 `bilateral_squared_norm_centering_exact_opposite`, `ALGEBRAIC_IDENTITY`).
    - Proved generic coordinate dilation cross-term expansion: $\Delta_h + \Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving $4h^2\Re(F\bar B)$ (Lean 4 `bilateral_second_order_asymmetry_cross_term`, `ALGEBRAIC_IDENTITY`, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, `NO_GO_COMPONENT`). Formalized load-bearing arithmetic descent count remains 0.
    - Proved finite grade pullback identity $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`) and asymptotic coordinate redundancy $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
-   - Proved actual zeta-specific cross-term no-go: for completed-zeta grade family $F_h(z) = P(\tau^h z)$, $\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum \Lambda(n)^2 n^{-1-2a}[-a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2] \ne 0$ for all $a > 0, \langle t^2\rangle_W \ge 0$ (`FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION`).
+   - Audited actual zeta-specific diagonal cross-term: for Dirichlet polynomial $P(z) = \sum \Lambda(n) n^{-1/2-z}$, $\mathfrak X_{\zeta,\mathrm{diag}} = (\log\tau)^2 [(a^2-v)S_2(a) - aS_1(a)]$. Falsified and withdrew previous universal non-vanishing claim (`REPORTED_DIAGONAL_CROSS_TERM_UNIVERSAL_NONVANISHING_WITHDRAWN`); proved exact cancelling variances $v_*(a) = a^2 - a\frac{S_1(a)}{S_2(a)} > 0$ for all $a > 1/\log 2$ (`DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES`).
    - Proved scale-generic dilation centering ($a > 1$, `SCALE_GENERIC_NOT_TAU_SPECIFIC`).
 5. **Consolidated Radial-Defect Descent Master Obligation**:
    - Established `OBL-RADIAL-DEFECT-DESCENT` consolidating all 4 surviving radial-defect extraction routes (RDQ, Curvature Transport, Weil-Hermitian, CMSA).
@@ -1537,6 +1537,41 @@ Rigorous closure of the integrated-sigma and bilateral grade centering branches,
 Mathematical / operational consequence:
 
 Updated `CMSA_GATE_G4.md`, `CURVATURE_TRANSPORT.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `formal/RiemannScope/CurvatureTransport.lean`, `math_core.py`, `tests/test_bilateral_second_variation.py`, `tests/test_weil_curvature.py`, `tests/test_curvature_transport.py`, `MATH_CONTRACT.md`, `RESEARCH_LEDGER.md`, `RESEARCH_HYPOTHESIS.md`, `LEAN_FORMALIZATION_PLAN.md`, `README.md`, and all three corpus registers.
+
+---
+
+## 2026-08-30 — Mathematical Claim Audit System & Bilateral Cross-Term Re-Derivation Sprint
+
+Decision:
+
+1. **Established Reusable Mathematical Claim Audit Capability (`zeta-proof-audit`)**:
+   - Created `.agents/skills/zeta-proof-audit/SKILL.md` defining strict 18-field claim specifications and 10 mandatory pre-acceptance gates (Object-identity, Quantifier, Negation-first, Symbolic elimination, Dominance and boundary, Diagonal/off-diagonal, Interchange, Independent derivation, Adversarial falsification, Evidence classification).
+   - Created executable validator `.agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py` and test suite `.agents/verification/test_claim_audit_gates.py`.
+   - Updated research protocol rules `.agents/rules/03-research-protocol.md` and workflow `.agents/workflows/audit-claim.md` mandating 10-gate validation before accepting theorem-level claims.
+2. **Falsification & Withdrawal of Universal Diagonal Non-Vanishing**:
+   - Withdrew previous claim that $\mathfrak X_{\zeta,\mathrm{diag}} \ne 0$ for all $a > 0, v \ge 0$ (`REPORTED_DIAGONAL_CROSS_TERM_UNIVERSAL_NONVANISHING_WITHDRAWN`).
+   - Derived exact cancellation variance $v_*(a) = a^2 - a\frac{S_1(a)}{S_2(a)} > 0$ for $a > 1/\log 2 \approx 1.442695$, where $\mathfrak X_{\zeta,\mathrm{diag}}(a, v_*(a)) = 0$ identically (`DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES`).
+   - Proved positive variance $v_*(a)$ is physically realizable by scaling smooth window functions $W_\lambda(t) = \frac{1}{\lambda} W_0(t/\lambda)$.
+   - Corrected dominance argument: quadratic $a^2$ strictly dominates linear $-a$ as $a \to \infty$ for fixed $v$.
+3. **Re-Derivation of Full Finite-Window Dirichlet Inner Product**:
+   - Re-derived complete finite-window inner product $\langle F_0, \ddot F_0 \rangle_W = \sum_{m,n} c_m \bar d_n \int W(t) e^{-it\log(m/n)} [\dots] dt$, distinguishing diagonal ($m=n$) from off-diagonal ($m\ne n$) terms (`FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED`).
+   - Confirmed via numerical quadrature and double sum that off-diagonal terms are strictly non-zero for finite windows.
+   - Added active proof obligation `OBL-DERIVE-FULL-WINDOWED-ZETA-CROSS-TERM`.
+4. **Lean 4 Formalization Expansion**:
+   - Added 5 formal declarations (Theorems 45–49) to `RiemannScope.CurvatureTransport` (`diagonal_crossterm_algebraic_reduction`, `diagonal_crossterm_cancelling_variance_zero`, `cancelling_variance_pos_of_bounds`, `cancelling_variance_pos_of_log2_bound`, `finite_double_sum_2x2_decomp`), bringing the project total to **135 compiled project theorem declarations** (0 errors, 0 warnings, 0 sorry, 0 admit).
+5. **Verification Suites**:
+   - `tests/test_bilateral_second_variation.py` updated (34/34 passing).
+   - `.agents/verification/test_claim_audit_gates.py` created (4/4 passing).
+   - Full combined test suite passing (154/154 passing).
+
+Reason:
+
+Prevent recurrence of mathematical over-classification errors by instituting an enforceable 10-gate audit system and resolving the bilateral cross-term status from first principles with Lean formalization.
+
+Mathematical / operational consequence:
+
+Updated `MATH_CONTRACT.md`, `CURVATURE_TRANSPORT.md`, `DECISIONS.md`, `RESEARCH_LEDGER.md`, `RESEARCH_HYPOTHESIS.md`, `CMSA_GATE_G4.md`, `ARITHMETIC_RADIAL_BRIDGE.md`, `LEAN_FORMALIZATION_PLAN.md`, `.agents/corpus_map/claim_register.md`, `.agents/corpus_map/contradiction_register.md`, `.agents/corpus_map/obligation_register.md`, `formal/RiemannScope/CurvatureTransport.lean`, `math_core.py`, `tests/test_bilateral_second_variation.py`, `.agents/skills/zeta-proof-audit/`, and `.agents/verification/test_claim_audit_gates.py`.
+
 
 
 

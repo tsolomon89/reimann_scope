@@ -2726,13 +2726,22 @@ For $\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2
 1. **Exact Opposition**: If $\Delta_{-h} = -\Delta_h$, $\Delta_h+\Delta_{-h} = 0 \implies \mathcal C_h = 2|\Delta_h|^2 \ge 0$. *(Formally proved in Lean 4: `bilateral_squared_norm_centering_exact_opposite`, **ALGEBRAIC_IDENTITY**).*
 2. **Generic Coordinate Dilation Cross-Term**: For $\Delta_{\pm h}(z) = \Delta Z(\tau^{\pm h} z)$, $\Delta_h+\Delta_{-h} = 2h^2 B(z) + \mathcal O(h^4) \ne 0$, leaving $4h^2\Re(F\bar B)$. *(Formally proved in Lean 4: `bilateral_second_order_asymmetry_cross_term`, **ALGEBRAIC_IDENTITY**, and `bilateral_asymmetry_cross_term_nonzero_of_re_nonzero`, **NO_GO_COMPONENT**).* Formalized load-bearing arithmetic descent count remains 0.
 3. **Finite-T Pullback vs Asymptotic Redundancy**: $\mathcal C_{h,T} = \mathcal M_{0,\tau^h T} + \mathcal M_{0,\tau^{-h} T} - 2\mathcal M_{0,T}$ (`FINITE_GRADE_PULLBACK_IDENTITY`, Lean 4 `finite_grade_pullback_second_difference_identity`), but $\lim_{T\to\infty} \mathcal C_{h,T} = 0$ (`ASYMPTOTIC_GRADE_COORDINATE_REDUNDANCY`).
-4. **Actual Zeta-Specific Grade Jet Cross-Term**: For the Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, the grade family $F_h(z) = P(\tau^h z)$ has jet $F_0'(z) = -(\log\tau) z \sum \Lambda(n)(\log n) n^{-1/2-z}$ and $F_0''(z) = (\log\tau)^2 \sum \Lambda(n)(-z\log n + z^2(\log n)^2) n^{-1/2-z}$.
-The bilateral cross-term is:
+4. **Diagonal Cross-Term & Exact Cancelling Variances**: For the Dirichlet polynomial $P(z) = \sum_{n\ge 2} \Lambda(n) n^{-1/2-z}$, the grade family $F_h(z) = P(\tau^h z)$ has jet $F_0'(z) = -(\log\tau) z \sum \Lambda(n)(\log n) n^{-1/2-z}$ and $F_0''(z) = (\log\tau)^2 \sum \Lambda(n)(-z\log n + z^2(\log n)^2) n^{-1/2-z}$.
+The reported diagonal cross-term is:
 \[
-\boxed{\mathfrak X_\zeta = \Re\langle F_0, F_0''\rangle = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - \langle t^2\rangle_W)(\log n)^2 \right] \ne 0.}
+\mathfrak X_{\zeta,\mathrm{diag}} = (\log\tau)^2 \sum_{n=2}^\infty \Lambda(n)^2 n^{-1-2a} \left[ -a\log n + (a^2 - v)(\log n)^2 \right] = (\log\tau)^2 \left[ (a^2 - v)S_2(a) - aS_1(a) \right],
 \]
-This quantity is strictly non-zero for all $a > 0$ and window variances $\langle t^2\rangle_W \ge 0$, proving that bilateral grade continuation fails to cancel the background second variation (`FAIL_ZETA_SPECIFIC_BILATERAL_CROSS_TERM_CANCELLATION`).
-5. **Smooth Two-Bump Prime Gram Matrix**: With bump convolution $\psi_\varepsilon \in C_c^\infty(\mathbb R)$ of support $\varepsilon < \frac{1}{2}\min |\log n_1 - \log n_2|$, $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ with eigenvalues $\pm w_p$, indefinite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`).
+where $S_1(a) = \sum_{n\ge 2} \Lambda(n)^2 n^{-1-2a}\log n$ and $S_2(a) = \sum_{n\ge 2} \Lambda(n)^2 n^{-1-2a}(\log n)^2$.
+- **Withdrawal of Universal Non-Vanishing**: The previous claim that $\mathfrak X_{\zeta,\mathrm{diag}} \ne 0$ for all $a > 0, v \ge 0$ is mathematically false and WITHDRAWN (`REPORTED_DIAGONAL_CROSS_TERM_UNIVERSAL_NONVANISHING_WITHDRAWN`).
+- **Exact Cancellation Variance**: For any $a > 1/\log 2 \approx 1.442695$, because $S_2(a) \ge (\log 2) S_1(a)$, the variance $v_*(a) = a^2 - a\frac{S_1(a)}{S_2(a)} \ge a(a - 1/\log 2) > 0$ is strictly positive and cancels the diagonal cross-term identically: $\mathfrak X_{\zeta,\mathrm{diag}}(a, v_*(a)) = 0$ (`DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES`, Lean 4 `diagonal_crossterm_algebraic_reduction`, `diagonal_crossterm_cancelling_variance_zero`, `cancelling_variance_pos_of_bounds`, `cancelling_variance_pos_of_log2_bound`).
+- **Window Realizability**: Any positive variance $v > 0$ is realizable by standard window scaling $W_\lambda(t) = \frac{1}{\lambda} W_0(t/\lambda)$ with $\lambda = \sqrt{v/v_0}$.
+- **Corrected Dominance**: For fixed $n$ and $v$, the quadratic $a^2$ term dominates the linear $-a$ term as $a \to \infty$.
+5. **Full Finite-Window Double Sum & Off-Diagonal Cross-Terms**: For a finite smooth window $W \in C_c^\infty(\mathbb R)$, the complete Dirichlet inner product is:
+\[
+\langle F_0, \ddot F_0 \rangle_W = \sum_{m,n=2}^\infty \Lambda(m)\Lambda(n)(mn)^{-1/2-a} (\log\tau)^2 \int_{-\infty}^\infty W(t) e^{-it\log(m/n)} \left[ -(a-it)\log n + (a-it)^2(\log n)^2 \right] dt.
+\]
+The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the off-diagonal terms ($m\ne n$) are non-zero due to $\widehat W(\log(m/n)) \ne 0$ (`FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED`, Lean 4 `finite_double_sum_2x2_decomp`). Knowing window variance alone does not diagonalize a finite-window inner product.
+6. **Smooth Two-Bump Prime Gram Matrix**: With bump convolution $\psi_\varepsilon \in C_c^\infty(\mathbb R)$ of support $\varepsilon < \frac{1}{2}\min |\log n_1 - \log n_2|$, $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ with eigenvalues $\pm w_p$, indefinite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`).
 
 
 
