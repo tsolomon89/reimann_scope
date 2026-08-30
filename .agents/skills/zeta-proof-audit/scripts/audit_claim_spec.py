@@ -9,6 +9,7 @@ import os
 import glob
 import json
 import hashlib
+import subprocess
 import argparse
 from typing import Dict, Any, List, Set, Tuple
 
@@ -270,20 +271,22 @@ KNOWN_EXEMPT_PATTERNS = [
 ]
 
 
-def cross_check_claim_register(repo_root: str) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
+def cross_check_claim_register(repo_root: str, verify_git_baseline: bool = True) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
     """
     Exhaustively cross-checks the canonical claim_register.md against machine-readable specifications in .agents/claims/
     and hash-pinned grandfathered entries in .agents/corpus_map/legacy_claim_manifest.json.
 
-    Policy B (Grandfathered Migration):
+    Policy B (Grandfathered Migration with Immutable Historical Baseline):
     - New terminal claims always require validated specifications in .agents/claims/.
     - Modified legacy claims or status transitions require validated specifications in .agents/claims/.
     - Unchanged legacy terminal claims matching legacy_claim_manifest.json pass provisionally as LEGACY_UNAUDITED.
+    - Legacy manifest must declare an immutable historical baseline_commit that is an ancestor of HEAD.
+    - Every claim in the legacy manifest must have existed at the baseline commit with matching hash.
     - Open/exempt claims pass as Exempt.
-    - Fails on unknown statuses, missing specifications, or modified legacy claims without specifications.
+    - Fails on unknown statuses, missing specifications, modified legacy claims, or tampered legacy manifest.
     - Strictly enforces:
         terminal_claims == audited_terminal_claims + legacy_unaudited_terminal_claims + missing_specifications
-        total_claims == terminal_claims + open_or_exempt_claims
+        total_claims == terminal_claims + open_or_exempt_claims + unrecognized_statuses
     """
     register_path = os.path.join(repo_root, ".agents", "corpus_map", "claim_register.md")
     legacy_manifest_path = os.path.join(repo_root, ".agents", "corpus_map", "legacy_claim_manifest.json")
@@ -310,6 +313,58 @@ def cross_check_claim_register(repo_root: str) -> Tuple[bool, List[str], List[st
     missing_specifications = 0
     unrecognized_statuses = 0
     status_histogram: Dict[str, int] = {}
+
+    # 1. Immutable Git Baseline Verification
+    baseline_commit = legacy_manifest.get("baseline_commit")
+    has_git = os.path.exists(os.path.join(repo_root, ".git"))
+
+    if not baseline_commit:
+        errors.append("UNAUTHORIZED_LEGACY_MANIFEST_VIOLATION: Legacy manifest is missing required 'baseline_commit'.")
+    elif has_git and verify_git_baseline:
+        try:
+            # Verify baseline commit exists
+            subprocess.run(
+                ["git", "rev-parse", "--verify", f"{baseline_commit}^{{commit}}"],
+                cwd=repo_root, capture_output=True, text=True, check=True
+            )
+            # Verify baseline is an ancestor of HEAD
+            subprocess.run(
+                ["git", "merge-base", "--is-ancestor", baseline_commit, "HEAD"],
+                cwd=repo_root, capture_output=True, text=True, check=True
+            )
+            # Load baseline register text
+            res = subprocess.run(
+                ["git", "show", f"{baseline_commit}:.agents/corpus_map/claim_register.md"],
+                cwd=repo_root, capture_output=True, text=True, encoding="utf-8", check=True
+            )
+            baseline_text = res.stdout
+
+            # Parse baseline claims
+            baseline_claims_map: Dict[str, Tuple[str, str]] = {}
+            for bl_line in baseline_text.splitlines():
+                bl_str = bl_line.strip()
+                if not bl_str.startswith("| `CLM-") and not bl_str.startswith("|`CLM-"):
+                    continue
+                bparts = [p.strip() for p in bl_str.split("|")]
+                if bparts and bparts[0] == "": bparts = bparts[1:]
+                if bparts and bparts[-1] == "": bparts = bparts[:-1]
+                if len(bparts) < 5: continue
+                bcid = bparts[0].strip("`")
+                bstat = bparts[-3].strip() if len(bparts) >= 6 else bparts[-2].strip()
+                bhash = hashlib.sha256(bl_str.encode("utf-8")).hexdigest()
+                baseline_claims_map[bcid] = (bhash, bstat)
+
+            # Audit legacy manifest integrity against baseline
+            for m_cid, m_data in legacy_manifest.get("claims", {}).items():
+                if m_cid not in baseline_claims_map:
+                    errors.append(f"UNAUTHORIZED_LEGACY_MANIFEST_VIOLATION: Claim {m_cid} in legacy manifest did not exist in immutable baseline commit {baseline_commit[:8]}.")
+                elif m_data.get("line_hash") != baseline_claims_map[m_cid][0]:
+                    errors.append(f"UNAUTHORIZED_LEGACY_MANIFEST_VIOLATION: Line hash for {m_cid} in legacy manifest does not match baseline commit row.")
+                elif m_data.get("status") != baseline_claims_map[m_cid][1]:
+                    errors.append(f"UNAUTHORIZED_LEGACY_MANIFEST_VIOLATION: Status for {m_cid} in legacy manifest does not match baseline commit status.")
+
+        except subprocess.CalledProcessError as e:
+            errors.append(f"GIT_BASELINE_VERIFICATION_FAILED: Git baseline verification failed for {baseline_commit}: {e.stderr}")
 
     with open(register_path, "r", encoding="utf-8") as f:
         lines = f.readlines()

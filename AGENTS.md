@@ -20,6 +20,10 @@ Every mathematical claim, theorem proposal, or status classification (`PROVED`, 
 4. **Enforce Dual Status Distinctions**:
    - `SPECIFICATION_SCHEMA_PASSED`: Automated structural validation of fields, types, and domains.
    - `INDEPENDENT_MATHEMATICAL_AUDIT_PASSED`: Fully verified mathematical proof, formal Lean verification, adversarial falsification review, and literature review.
+5. **Grandfathered Legacy Manifest & Exceptional Baseline Migrations**:
+   - Legacy unmigrated claims are anchored to the immutable git baseline commit (`82643cafd605492233c6c1e992b78c2c30d45f13`) in `.agents/corpus_map/legacy_claim_manifest.json`.
+   - Any modification to a legacy claim or new claim proposal strictly requires a validated `.agents/claims/<CLAIM_ID>.json` specification.
+   - Modifying `baseline_commit` or regenerating the legacy manifest is an **exceptional migration requiring explicit user authorization**. Agents must never advance the baseline commit autonomously.
 
 ## 2. Core Operational Rules
 

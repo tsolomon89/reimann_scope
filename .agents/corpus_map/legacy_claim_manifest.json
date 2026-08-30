@@ -1,5 +1,6 @@
 {
   "schema_version": "1.0.0",
+  "baseline_commit": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "description": "Hash-pinned manifest of grandfathered legacy unaudited terminal claims in reimann_scope.",
   "claims": {
     "CLM-TC-001": {

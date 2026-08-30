@@ -10,6 +10,8 @@ rigorous claims and reject flawed claims, specifically including:
 
 import sys
 import os
+import json
+import hashlib
 import pytest
 
 # Ensure skills script is importable
@@ -225,8 +227,6 @@ class TestClaimAuditGates:
 
     def test_unchanged_manifest_listed_legacy_claim_passes_provisionally(self, tmp_path):
         """Test that an unchanged legacy claim matching manifest passes provisionally as LEGACY_UNAUDITED."""
-        import json
-        import hashlib
         from audit_claim_spec import cross_check_claim_register
         mock_agents = tmp_path / ".agents"
         (mock_agents / "corpus_map").mkdir(parents=True)
@@ -234,14 +234,18 @@ class TestClaimAuditGates:
         line = "| `CLM-LEG-001` | Original statement | Layer | PROVED / EXACT | doc | target |"
         line_hash = hashlib.sha256(line.encode("utf-8")).hexdigest()
         (mock_agents / "corpus_map" / "legacy_claim_manifest.json").write_text(
-            json.dumps({"claims": {"CLM-LEG-001": {"line_hash": line_hash, "status": "PROVED / EXACT"}}}),
+            json.dumps({
+                "schema_version": "1.0.0",
+                "baseline_commit": "82643cafd605492233c6c1e992b78c2c30d45f13",
+                "claims": {"CLM-LEG-001": {"line_hash": line_hash, "status": "PROVED / EXACT"}}
+            }),
             encoding="utf-8"
         )
         (mock_agents / "corpus_map" / "claim_register.md").write_text(
             f"# Register\n{line}\n",
             encoding="utf-8"
         )
-        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path))
+        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path), verify_git_baseline=False)
         assert ok is True
         assert coverage["legacy_unaudited_terminal_claims"] == 1
         assert coverage["audited_terminal_claims"] == 0
@@ -278,6 +282,38 @@ class TestClaimAuditGates:
         res = audit_claim_specification(spec)
         assert res["status"] == "FAIL"
         assert any("Gate 9" in v for v in res["violations"])
+
+    def test_tampered_manifest_with_non_baseline_claim_fails(self, tmp_path):
+        """Test that injecting a non-baseline claim into legacy manifest fails baseline verification."""
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        from audit_claim_spec import cross_check_claim_register
+        mock_agents = tmp_path / ".agents"
+        (mock_agents / "corpus_map").mkdir(parents=True)
+        (mock_agents / "claims").mkdir(parents=True)
+        # Point to real repo's git root for git validation, but tampered manifest
+        manifest = {
+            "schema_version": "1.0.0",
+            "baseline_commit": "82643cafd605492233c6c1e992b78c2c30d45f13",
+            "claims": {
+                "CLM-INJECTED-FAKE": {
+                    "line_hash": "deadbeef",
+                    "status": "PROVED / EXACT"
+                }
+            }
+        }
+        (mock_agents / "corpus_map" / "legacy_claim_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+        (mock_agents / "corpus_map" / "claim_register.md").write_text(
+            "# Register\n| `CLM-INJECTED-FAKE` | Fake | Layer | PROVED / EXACT | doc | target |\n",
+            encoding="utf-8"
+        )
+        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path), verify_git_baseline=False)
+        assert ok is False
+        # When git baseline verification runs on real repo:
+        ok_real, errors_real, passed_real, cov_real = cross_check_claim_register(repo_root, verify_git_baseline=True)
+        assert ok_real is True
+        assert cov_real["legacy_unaudited_terminal_claims"] == 78
+        assert cov_real["audited_terminal_claims"] == 2
+
 
 
 

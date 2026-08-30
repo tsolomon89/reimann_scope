@@ -137,3 +137,12 @@ When evaluating high-stakes claims:
 1. **Derivation Role**: Derives the identity from first principles.
 2. **Falsification Role**: Given the exact statement and quantifier domain, actively attempts to find counterexamples, zero-crossings, and boundary violations without reading the derivation's optimistic steps.
 3. **Synthesis**: Reconcile both reports. If a single counterexample or zero-crossing is found, the universal claim must be rejected or restricted.
+
+---
+
+## 6. Policy B: Grandfathered Legacy Manifest & Exceptional Baseline Migrations
+
+The legacy manifest `.agents/corpus_map/legacy_claim_manifest.json` anchors unmigrated claims to an immutable historical git baseline commit (`82643cafd605492233c6c1e992b78c2c30d45f13`).
+- Legacy claims matching their baseline row hash pass provisionally as `LEGACY_UNAUDITED`.
+- Any post-baseline claim or modified legacy claim strictly requires a 19-field JSON specification in `.agents/claims/`.
+- Changing `baseline_commit` or regenerating the legacy manifest is an **exceptional migration requiring explicit user authorization**. AI agents must NEVER advance the baseline commit autonomously.
