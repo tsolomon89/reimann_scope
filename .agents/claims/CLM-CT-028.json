@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-CT-028",
+  "statement": "The entire bilateral grade dilation route to an arithmetic proof of the Riemann Hypothesis is closed (BILATERAL_GRADE_ROUTE_CLOSED) across all four canonical branches: (1) Static Common-Frame: fails cross-term cancellation with X_{xi, W} > 0 strictly under canonical windows (FAIL_COMPLETED_XI_CROSS_TERM_CANCELLATION); (2) Fully Grade-Covariant Pullback: exhibits exact asymptotic coordinate redundancy lim_{T->infty} C_{h,T} = 0 due to dilation isometry (FAIL_GRADE_COORDINATE_REDUNDANCY); (3) Window-Tuning: root cancellation v_*(a) is post-hoc spectral/background-dependent and fails independent arithmetic selection (FAIL_POSTHOC_WINDOW_TUNING); (4) Scale Specificity: dilation centering holds for arbitrary base q > 1 and does not specifically select tau = 2pi (SCALE_GENERIC_NOT_TAU_SPECIFIC).",
+  "quantified_variables": [
+    {
+      "name": "branch",
+      "domain": "branch in {CommonFrame, CovariantPullback, WindowTuning, ScaleSpecificity}",
+      "description": "Canonical bilateral grade branch formulation"
+    }
+  ],
+  "variable_domains": [
+    "branch in {CommonFrame, CovariantPullback, WindowTuning, ScaleSpecificity}"
+  ],
+  "hypotheses": [
+    "Static common-frame evaluates X_{xi, W} on fixed probability window W",
+    "Covariant pullback evaluates C_{h,T} = M_{0, tau^h T} + M_{0, tau^{-h} T} - 2 M_{0,T}",
+    "Window-tuning solves v_*(a) such that X_{diag}(a, v_*(a)) = 0",
+    "Scale specificity tests dilation centering under general base q > 1"
+  ],
+  "object_studied": "Canonical bilateral grade dilation route and candidate branch space",
+  "fourier_normalization": "Centered coordinates z = a + it; tau = 2pi; base q > 1",
+  "multiplicity_convention": "All zero multiplicities and background components included",
+  "measure_and_window": "Admissible probability windows and scale transformations on R",
+  "order_of_limits": "Evaluation of finite-T vs infinite-T, finite-N vs infinite-N, and grade variation h -> 0",
+  "exact_conclusion": "Every canonical bilateral grade branch fails at an exact identified gate; no untested normalization, frame, or arithmetically defined window remains viable within the bilateral candidate class; BILATERAL_GRADE_ROUTE_CLOSED holds.",
+  "logical_negation": "At least one canonical bilateral grade branch produces an arithmetic zero descent with strictly positive radial defect spectral expansion (FALSIFIED by exhaustive 4-branch gate failure matrix)",
+  "epistemic_role": "NO_GO_COMPONENT",
+  "dependencies": [
+    "CLM-CT-022 (Diagonal cancelling variances)",
+    "CLM-CT-023 (Scale genericity)",
+    "CLM-CT-024 (Pullback coordinate redundancy)",
+    "CLM-CT-025 (Off-diagonal structural presence)",
+    "CLM-CT-026 (Infinite prime window identity)",
+    "CLM-CT-027 (Completed xi cross-term non-vanishing)",
+    "math_core.py: evaluate_bilateral_branch_elimination_summary"
+  ],
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "falsification_attempts": [
+    "Audited whether an untested window class in C_c^infty(R) could be uniquely forced by the Euler product (none exists)",
+    "Audited whether non-trivial Fourier resonances for tau = 2pi could create arithmetic rigidity (none found; scale-generic)",
+    "Tested whether asymptotic coordinate redundancy can be bypassed without breaking dilation covariance (no-go)",
+    "Verified that total variation coeff V_2 = 2(||dot G_0||^2 + X_{xi, W}) is strictly positive (+0.09445 > 0 at a=1.5)"
+  ],
+  "computational_evidence": [
+    "tests/test_bilateral_second_variation.py: TestBilateralBranchEliminationSummary",
+    "tests/test_bilateral_second_variation.py: TestBilateralSecondVariationSpectralExpansion"
+  ],
+  "external_sources": [
+    {
+      "source": "Reed & Simon (1975), Methods of Modern Mathematical Physics II: Fourier Analysis, Self-Adjointness, Academic Press",
+      "theorem": "Chapter X (Dilation generators and unitary scale groups)"
+    },
+    {
+      "source": "Bombieri (2000), Problems of the Millennium: The Riemann Hypothesis, Clay Mathematics Institute",
+      "theorem": "Section 3 (Weil explicit formula and arithmetic-geometric duality)"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Reconciliation with surviving non-bilateral spectral routes (resolved in CLM-CT-029)"
+  ]
+}

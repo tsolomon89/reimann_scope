@@ -500,7 +500,7 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 
 ## 18. Formalization and Verification Inventory
 
-### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 49 Declarations)
+### Lean 4 Compiled Declarations (`RiemannScope.CurvatureTransport` — 54 Declarations)
 
 | Declaration | Mathematical Content | Epistemic Role |
 |:---|:---|:---|
@@ -552,14 +552,20 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 | `diagonal_crossterm_cancelling_variance_zero` | $(a^2 - v_*)S_2 - a S_1 = 0$ for $v_* = a^2 - a(S_1/S_2)$ | `ALGEBRAIC_IDENTITY` |
 | `cancelling_variance_pos_of_bounds` | $0 < c \le S_2/S_1 \wedge 1/c < a \implies 0 < v_*(a)$ | `FINITE_ANALYTIC_COMPONENT` |
 | `cancelling_variance_pos_of_log2_bound` | $(\log 2)S_1 \le S_2 \wedge 1/\log 2 < a \implies 0 < v_*(a)$ | `FINITE_ANALYTIC_COMPONENT` |
-| `finite_double_sum_2x2_decomp` | $(A_{00}+A_{11}) + (A_{01}+A_{10}) = \sum_{i,j} A_{ij}$ | `ALGEBRAIC_IDENTITY` |
+| `finset_double_sum_diag_offdiag_decomp` | Finset product diagonal and off-diagonal decomposition | `ALGEBRAIC_IDENTITY` |
+| `grade_second_jet_chain_rule` | $\lambda^2(z g_1 + z^2 g_2) = \lambda^2 z g_1 + \lambda^2 z^2 g_2$ | `ALGEBRAIC_IDENTITY` |
+| `completed_xi_four_block_algebraic_expansion` | $(A_0+P_0)\operatorname{conj}(\ddot A+\ddot P) = P_0\bar{\ddot P} + P_0\bar{\ddot A} + A_0\bar{\ddot P} + A_0\bar{\ddot A}$ | `ALGEBRAIC_IDENTITY` |
+| `completed_xi_four_block_real_expansion` | $\Re((A_0+P_0)\operatorname{conj}(\ddot A+\ddot P)) = \Re(P_0\bar{\ddot P}) + \Re(P_0\bar{\ddot A}) + \Re(A_0\bar{\ddot P}) + \Re(A_0\bar{\ddot A})$ | `ALGEBRAIC_IDENTITY` |
+| `bilateral_second_variation_real_component_identity` | Bilateral second variation Taylor jet expansion | `ALGEBRAIC_IDENTITY` |
+| `master_radial_defect_unification` | Finite positive-weighted defect zero-rigidity $\sum w_j d_j = 0 \iff \forall j, d_j = 0$ | `LOAD_BEARING_ANALYTIC_THEOREM` |
 
 ### Python Test Suites
-- **`tests/test_bilateral_second_variation.py`**: 34/34 passed.
+- **`tests/test_bilateral_second_variation.py`**: 44/44 passed.
 - **`tests/test_weil_curvature.py`**: 17/17 passed.
 - **`tests/test_curvature_transport.py`**: 99/99 passed.
-- **`tests/test_claim_audit_gates.py`**: 4/4 passed.
-- **Total Combined Verified Tests**: 154/154 passed.
+- **`tests/test_claim_audit_gates.py`**: 13/13 passed.
+- **Total Combined Verified Tests**: 173/173 passed.
+
 
 ---
 

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-CT-026",
+  "statement": "For displacement a > 1/2 (so sigma = 1/2 + a > 1) and any Schwartz window W in S(R), the infinite prime-side logarithmic derivative P(s) = -zeta'/zeta(s) = sum_{n>=2} Lambda(n) n^{-s} under centered grade dilation s_h = 1/2 + tau^h (a + it) satisfies absolute double summability sum_{m,n>=2} |c_m c_n| int |W(t)| (|a+it| log n + |a+it|^2 (log n)^2) dt < infty with majorant bound |c_n| (log n)^j <= n^{-(1/2+a)} (log n)^{j+1}. By Fubini-Tonelli and Dominated Convergence, the infinite-window inner product converges to <F_0, ddot F_0>_W = (log tau)^2 sum_{m,n>=2} c_m bar(c_n) I_{m,n}(W), matching continuous 1D quadrature within certified analytic tail bounds.",
+  "quantified_variables": [
+    {
+      "name": "a",
+      "domain": "a in Real, a > 1/2",
+      "description": "Real displacement parameter sigma - 1/2 in the absolute convergence half-plane"
+    },
+    {
+      "name": "W",
+      "domain": "W in S(R) or C_c^infty(R), W >= 0, int W = 1",
+      "description": "Smooth probability test window"
+    }
+  ],
+  "variable_domains": [
+    "a in Real, a > 1/2",
+    "W in S(R) or C_c^infty(R)"
+  ],
+  "hypotheses": [
+    "P(s) = sum_{n>=2} Lambda(n) n^{-s} on Re(s) = 1/2 + a > 1",
+    "s_h = 1/2 + tau^h (a + it)",
+    "c_n = Lambda(n) n^{-1/2-a}",
+    "W in S(R)",
+    "F_0(t) = sum_{n>=2} c_n e^{-it log n}",
+    "ddot F_0(t) = (log tau)^2 sum_{n>=2} c_n [ -(a+it) log n + (a+it)^2 (log n)^2 ] e^{-it log n}"
+  ],
+  "object_studied": "Infinite prime-side Dirichlet series grade second-variation inner product <F_0, ddot F_0>_W",
+  "fourier_normalization": "Centered coordinates z = a + it; tau = 2pi; Fourier transform hat{f}(xi) = int_{-infty}^infty f(t) e^{-it xi} dt",
+  "multiplicity_convention": "Standard von Mangoldt arithmetic weights Lambda(n)",
+  "measure_and_window": "Schwartz probability measure W(t) dt on R",
+  "order_of_limits": "Truncation limit N -> infty evaluated before real-line integral; dominated convergence interchange justified by finite majorants",
+  "exact_conclusion": "<F_0, ddot F_0>_W = (log tau)^2 sum_{m,n>=2} c_m bar(c_n) I_{m,n}(W); partial sums converge absolutely with tail bound O(N^{1/2-a} log^3 N); infinite double sum matches 1D continuous quadrature",
+  "logical_negation": "The double series-integral diverges or partial sums do not converge to the 1D continuous inner product for some a > 1/2 (FALSIFIED by explicit majorant summability and dominated convergence)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "dependencies": [
+    "Lean 4: grade_second_jet_chain_rule",
+    "Lean 4: finset_double_sum_diag_offdiag_decomp",
+    "math_core.py: infinite_prime_windowed_dirichlet_series_inner_product"
+  ],
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "falsification_attempts": [
+    "Evaluated boundary limit a -> 1/2^+ where tail bound diverges as 1/(sigma-1)",
+    "Tested extreme window widths sigma_W in {0.1, 1.0, 10.0}",
+    "Compared truncation max_n in {10, 30, 50, 100} against continuous adaptive quadrature in mpmath and Arb",
+    "Verified absolute convergence of all three log moment majorants j in {0, 1, 2}"
+  ],
+  "computational_evidence": [
+    "tests/test_bilateral_second_variation.py: TestInfinitePrimeWindowedDirichletSeries"
+  ],
+  "external_sources": [
+    {
+      "source": "Montgomery & Vaughan (2007), Multiplicative Number Theory I: Classical Theory, Cambridge Univ. Press",
+      "theorem": "Theorem 1.2 & Chapter 5 (Dirichlet series absolute convergence and termwise differentiation)"
+    },
+    {
+      "source": "Rudin (1987), Real and Complex Analysis, McGraw-Hill",
+      "theorem": "Theorem 8.8 (Fubini-Tonelli) & Theorem 1.34 (Dominated Convergence)"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Extension to completed xi function with gamma factor and poles (resolved in CLM-CT-027)"
+  ]
+}

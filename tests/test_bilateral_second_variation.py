@@ -349,3 +349,85 @@ class TestAdmissibleProbeRegularizationClassification:
         assert res["is_smooth_cc_infty"] is False
         assert res["test_function_classification"] == "FAIL_TEST_FUNCTION_IDENTIFICATION"
         assert res["regularization_obligation"] == "OPEN_ADMISSIBLE_PROBE_REGULARIZATION"
+
+
+class TestInfinitePrimeWindowedDirichletSeries:
+    """Verifies the infinite prime-window Dirichlet series inner product theorem, summability, and tail bounds."""
+
+    @pytest.mark.parametrize("a,max_n", [
+        ("1.2", 30),
+        ("1.5", 30),
+        ("2.0", 30),
+    ])
+    def test_infinite_prime_window_convergence_and_quadrature(self, a, max_n):
+        res = math_core.infinite_prime_windowed_dirichlet_series_inner_product(
+            a=a, sigma_w="1.0", max_n=max_n, dps=50, window_class="schwartz_gaussian"
+        )
+
+        assert res["status"] == "INFINITE_PRIME_WINDOWED_DIRICHLET_SERIES_EVALUATED"
+        assert res["is_convergent"] is True
+        assert res["classification"] == "PROVED_INFINITE_PRIME_WINDOW_IDENTITY"
+        assert float(res["tail_bound_analytic"]) > 0.0
+        assert float(res["diff_trunc_vs_continuous"]) < float(res["tail_bound_analytic"]) * 2.0
+
+
+class TestCompletedXiGradeJetCrossTerm:
+    """Verifies the 4-block decomposition and non-vanishing of the completed-xi cross-term."""
+
+    @pytest.mark.parametrize("a,sigma_w", [
+        ("1.0", "1.0"),
+        ("1.5", "1.0"),
+        ("2.0", "0.8"),
+    ])
+    def test_completed_xi_cross_term_4block_and_positivity(self, a, sigma_w):
+        res = math_core.evaluate_completed_xi_grade_jet_crossterm(
+            a=a, sigma_w=sigma_w, dps=50, window_class="schwartz_gaussian"
+        )
+
+        assert res["status"] == "COMPLETED_XI_GRADE_JET_CROSSTERM_EVALUATED"
+        assert res["is_decomposition_exact"] is True
+        assert res["is_strictly_positive"] is True
+        assert res["arb_certified_positive"] is True
+        assert res["classification"] == "FAIL_COMPLETED_XI_CROSS_TERM_CANCELLATION"
+        assert float(res["diff_direct_vs_sum"]) < 1e-15
+        assert float(res["I_direct"]) > 0.0
+
+
+class TestBilateralSecondVariationSpectralExpansion:
+    """Verifies the complete bilateral second variation and arithmetic firewall compliance."""
+
+    def test_bilateral_second_variation_positive_and_route_closed(self):
+        res = math_core.evaluate_bilateral_second_variation_and_spectral_expansion(a="1.5", sigma_w="1.0", dps=50)
+
+        assert res["status"] == "BILATERAL_SECOND_VARIATION_AUDITED"
+        assert res["is_V2_positive"] is True
+        assert res["is_V2_zero"] is False
+        assert res["arithmetic_firewall_passed"] is True
+        assert res["classification"] == "BILATERAL_GRADE_ROUTE_CLOSED"
+        assert float(res["bilateral_second_variation_coeff_V2"]) > 0.0
+
+
+class TestBilateralBranchEliminationSummary:
+    """Verifies that all 4 canonical bilateral branches are eliminated and classified."""
+
+    def test_branch_elimination_matrix(self):
+        res = math_core.evaluate_bilateral_branch_elimination_summary(dps=50)
+
+        assert res["status"] == "BILATERAL_BRANCH_ELIMINATION_COMPLETE"
+        assert res["all_branches_eliminated"] is True
+        assert res["classification"] == "BILATERAL_GRADE_ROUTE_CLOSED"
+        assert res["terminal_outcome"] == "Outcome B — Bilateral Route Completely Closed"
+        assert len(res["branches"]) == 4
+
+
+class TestMasterRadialDescentRouteReconciliation:
+    """Verifies reconciliation of all 5 zero-rigid spectral routes around OBL-RADIAL-DEFECT-DESCENT."""
+
+    def test_route_reconciliation_and_single_obligation(self):
+        res = math_core.reconcile_surviving_radial_descent_routes(dps=50)
+
+        assert res["status"] == "RADIAL_DESCENT_ROUTES_RECONCILED"
+        assert res["distinct_viable_paths_count"] == 1
+        assert res["shared_master_obligation"] == "OBL-RADIAL-DEFECT-DESCENT"
+        assert res["classification"] == "ONE_VIABLE_RADIAL_DESCENT_BRANCH_REMAINS"
+        assert len(res["routes"]) == 5

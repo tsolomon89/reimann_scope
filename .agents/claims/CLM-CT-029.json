@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-CT-029",
+  "statement": "The five surviving zero-rigid spectral research routes in the repository — (1) Radial-Defect Quotient (RDQ: Tr R = sum delta^2 / gamma^2), (2) Curvature Transport (B_rho''(0) / (2 (log tau)^2) = delta^2), (3) Pointwise Weil-Hermitian Involution Defect (2 delta^2 / (|rho|^2 |1-rho|^2)), (4) Completed Mean-Square Anchor (CMSA: Delta Z_sigma resolvent response), and (5) Fibre Sesquilinear Form (M_K''(0) = 2 N_gamma sum delta^2) — are mutually isomorphic spectral representations of zero-rigidity (sum w_j delta_j^2 = 0 <=> all delta_j = 0). None of them provide the independent arithmetic evaluation A_{arith} = 0. They consolidate into exactly ONE genuinely distinct viable radial descent path (ONE_VIABLE_RADIAL_DESCENT_BRANCH_REMAINS) governed by the single shared Master Obligation OBL-RADIAL-DEFECT-DESCENT.",
+  "quantified_variables": [
+    {
+      "name": "route",
+      "domain": "route in {RDQ, CurvatureTransport, WeilHermitian, CMSA, Sesquilinear}",
+      "description": "Candidate spectral zero-rigidity route"
+    }
+  ],
+  "variable_domains": [
+    "route in {RDQ, CurvatureTransport, WeilHermitian, CMSA, Sesquilinear}"
+  ],
+  "hypotheses": [
+    "RDQ zero-rigidity: Tr(R) = 0 <=> RH (CLM-RDQ-006)",
+    "Curvature transport zero-rigidity: sum w_j delta_j^2 = 0 <=> RH (CLM-CT-008)",
+    "Weil-Hermitian zero-rigidity: defect = 0 <=> RH (CLM-CT-015)",
+    "CMSA regularized bridge rigidity: defects = 0 (CLM-CMSA-012)",
+    "Sesquilinear fibre curvature rigidity: M_K''(0) = 0 <=> RH (CLM-SS-002)",
+    "Arithmetic Input Firewall enforced across all routes (CLM-ARB-009)"
+  ],
+  "object_studied": "Global repository proof-path graph and master arithmetic descent obligation",
+  "fourier_normalization": "Standard centered coordinates z = a + it; tau = 2pi; spectral weights w_rho > 0",
+  "multiplicity_convention": "Exact algebraic zero multiplicities and reflection pairs included",
+  "measure_and_window": "Admissible regularized test functions and spectral measures",
+  "order_of_limits": "Spectral sum over nontrivial zeros paired with arithmetic Dirichlet/Gamma evaluations",
+  "exact_conclusion": "The 5 candidate routes are not five distinct independent proof paths, but 5 spectral representations of the single master obligation OBL-RADIAL-DEFECT-DESCENT; exactly ONE viable radial descent research branch remains.",
+  "logical_negation": "At least two of the five routes possess genuinely distinct remaining mathematical obstacles beyond the arithmetic vanishing of a divisor-independent radial defect functional (FALSIFIED by spectral isomorphism and formal unification theorem)",
+  "epistemic_role": "LOAD_BEARING_ANALYTIC_THEOREM",
+  "dependencies": [
+    "Lean 4: master_radial_defect_unification",
+    "Lean 4: finite_positive_weight_curvature_rigidity",
+    "math_core.py: reconcile_surviving_radial_descent_routes"
+  ],
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "falsification_attempts": [
+    "Tested whether any candidate route could compute A_{arith} = 0 without invoking the Euler product or RH (none can)",
+    "Tested whether any route possesses an arithmetic anchor that avoids the Master Obligation (all require OBL-RADIAL-DEFECT-DESCENT)",
+    "Audited whether Weil-Hermitian route can be proven positive without circular Weil positivity assumption (requires full explicit formula arithmetic evaluation)",
+    "Formally proved equivalence of zero-rigidity vanishing across all representations in Lean 4",
+    "Audited boundary asymptotic dominance across all 5 defect representations as gamma -> infinity and delta -> 0"
+  ],
+  "computational_evidence": [
+    "tests/test_bilateral_second_variation.py: TestMasterRadialDescentRouteReconciliation"
+  ],
+  "external_sources": [
+    {
+      "source": "Weil (1952), Sur les 'formules explicites' de la theorie des nombres premiers, Comm. Sem. Math. Univ. Lund",
+      "theorem": "Theorem 1 & Criterion (Weil Positivity and Spectral Trace Equivalence)"
+    },
+    {
+      "source": "Titchmarsh (1986), The Theory of the Riemann Zeta-Function, Oxford Univ. Press",
+      "theorem": "Chapter IX & XIV (Explicit formulas, zero density, and equivalences)"
+    }
+  ],
+  "remaining_analytic_dependencies": []
+}

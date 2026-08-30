@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-CT-027",
+  "statement": "For the completed function xi(s) = 1/2 s(s-1) pi^{-s/2} Gamma(s/2) zeta(s) with logarithmic derivative G(s) = -xi'/xi(s) = A(s) + P(s), where A(s) = -1/s - 1/(s-1) + 1/2 log pi - 1/2 psi(s/2) and P(s) = -zeta'/zeta(s), the second grade variation cross-term decomposes into four blocks X_{xi, W} = Re <G_0, ddot G_0>_W = I_{PP} + I_{PA} + I_{AP} + I_{AA}, where ddot G_0 = (log tau)^2 [ z G'(s) + z^2 G''(s) ] with z = a + it. Under canonical Gaussian window W in S(R), X_{xi, W} is strictly positive and non-zero across all tested (a, sigma_W) in [1.0, 2.0] x [0.5, 2.0] (e.g. at a=1.5, sigma_W=1.0: X_{xi, W} approx +0.023932 > 0 with block values I_{PP} approx +3.2646, I_{PA} approx -3.2857, I_{AP} approx -3.4233, I_{AA} approx +3.4683; certified strictly positive in Arb ball arithmetic). The cross-term does not vanish for canonical windows.",
+  "quantified_variables": [
+    {
+      "name": "a",
+      "domain": "a in Real, a >= 1.0",
+      "description": "Centered coordinate displacement sigma - 1/2"
+    },
+    {
+      "name": "sigma_w",
+      "domain": "sigma_w in Real, 0.5 <= sigma_w <= 2.0",
+      "description": "Canonical Gaussian window scale parameter"
+    }
+  ],
+  "variable_domains": [
+    "a in Real, a >= 1.0",
+    "sigma_w in Real, 0.5 <= sigma_w <= 2.0"
+  ],
+  "hypotheses": [
+    "xi(s) = 1/2 s (s-1) pi^{-s/2} Gamma(s/2) zeta(s)",
+    "G(s) = -xi'/xi(s) = A(s) + P(s)",
+    "A(s) = -1/s - 1/(s-1) + 1/2 log pi - 1/2 psi(s/2)",
+    "P(s) = -zeta'/zeta(s) = sum_{n>=2} Lambda(n) n^{-s}",
+    "ddot G_0 = (log tau)^2 [ z G'(s) + z^2 G''(s) ]",
+    "W(t) = 1/(sqrt(2pi) sigma_W) exp(- t^2 / (2 sigma_W^2))"
+  ],
+  "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W} = Re <G_0, ddot G_0>_W",
+  "fourier_normalization": "Centered coordinates z = a + it; tau = 2pi; Fourier transform hat{W}(xi) = int W(t) e^{-it xi} dt",
+  "multiplicity_convention": "Standard arithmetic weights Lambda(n) and polygamma derivatives psi^(k)(s/2)",
+  "measure_and_window": "Canonical normalized Gaussian probability window W in S(R)",
+  "order_of_limits": "1D numerical quadrature on R with Arb interval error bounds",
+  "exact_conclusion": "X_{xi, W} = I_{PP} + I_{PA} + I_{AP} + I_{AA}; matches direct G_0 * conj(ddot G_0) integration to 50 dps; certified strictly positive X_{xi, W} > 0 on test grid; exact cancellation X_{xi, W} = 0 does not occur under canonical Gaussian windows",
+  "logical_negation": "X_{xi, W} = 0 identically for canonical Gaussian window W across all a >= 1.0 (FALSIFIED by certified positive witness at a=1.5, sigma_W=1.0 with X_{xi, W} approx +0.023932 > 0)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "dependencies": [
+    "Completion bridge theorem: G(s) = A(s) + P(s) with archimedean gamma factor and pole regularizations",
+    "Lean 4: completed_xi_four_block_algebraic_expansion",
+    "Lean 4: completed_xi_four_block_real_expansion",
+    "Lean 4: grade_second_jet_chain_rule",
+    "math_core.py: evaluate_completed_xi_grade_jet_crossterm"
+  ],
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "falsification_attempts": [
+    "Evaluated 4-block decomposition vs direct evaluation showing agreement to 50 decimal digits (diff < 1e-50)",
+    "Tested parameter grid (a, sigma_W) in {1.0, 1.5, 2.0} x {0.5, 1.0, 2.0}",
+    "Certified strict positivity of X_{xi, W} via Arb ball enclosure [0.02393198..., 0.02393199...]",
+    "Tested whether rational pole terms -1/s - 1/(s-1) cancel gamma and prime cross-terms (they do not cancel to zero)",
+    "Evaluated boundary asymptotic dominance as a -> infinity and sigma_W -> 0"
+  ],
+  "computational_evidence": [
+    "tests/test_bilateral_second_variation.py: TestCompletedXiGradeJetCrossTerm"
+  ],
+  "external_sources": [
+    {
+      "source": "Edwards (1974), Riemann's Zeta Function, Academic Press",
+      "theorem": "Chapter 1 (Hadamard product and completed xi function logarithmic derivative)"
+    },
+    {
+      "source": "Abramowitz & Stegun (1964), Handbook of Mathematical Functions, NBS",
+      "theorem": "Chapter 6 (Psi and Polygamma functions)"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Global branch elimination for non-canonical windows (resolved in CLM-CT-028)"
+  ]
+}
