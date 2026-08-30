@@ -28,21 +28,20 @@ from research.handlers.registry import get_handler, list_registered_handlers
 
 
 def run_check_fast() -> int:
-    """Run fast operational tests, claim spec audits, and experiment spec validations."""
+    """Run fast operational tests, claim spec audits, register cross-checks, and experiment spec validations."""
     print("=== [1/3] Validating Machine-Readable Mathematical Claim Specifications ===")
     claim_files = sorted(glob.glob(os.path.join(REPO_ROOT, ".agents", "claims", "*.json")))
     claim_errors = 0
     audit_claim_spec = None
-    if claim_files:
-        try:
-            import importlib.util
-            spec_script = os.path.join(REPO_ROOT, ".agents", "skills", "zeta-proof-audit", "scripts", "audit_claim_spec.py")
-            if os.path.exists(spec_script):
-                spec_mod = importlib.util.spec_from_file_location("audit_claim_spec", spec_script)
-                audit_claim_spec = importlib.util.module_from_spec(spec_mod)
-                spec_mod.loader.exec_module(audit_claim_spec)
-        except Exception as e:
-            print(f"[WARN] Could not load audit_claim_spec: {e}")
+    try:
+        import importlib.util
+        spec_script = os.path.join(REPO_ROOT, ".agents", "skills", "zeta-proof-audit", "scripts", "audit_claim_spec.py")
+        if os.path.exists(spec_script):
+            spec_mod = importlib.util.spec_from_file_location("audit_claim_spec", spec_script)
+            audit_claim_spec = importlib.util.module_from_spec(spec_mod)
+            spec_mod.loader.exec_module(audit_claim_spec)
+    except Exception as e:
+        print(f"[WARN] Could not load audit_claim_spec: {e}")
 
     if claim_files and audit_claim_spec:
         for cf in claim_files:
@@ -61,11 +60,21 @@ def run_check_fast() -> int:
             except Exception as e:
                 print(f"[FAIL] {cname}: Error reading claim: {e}")
                 claim_errors += 1
+
+        # Cross-check claim_register.md against .agents/claims/
+        ok, reg_errors, reg_passed = audit_claim_spec.cross_check_claim_register(REPO_ROOT)
+        if not ok:
+            print("[FAIL] Claim register cross-check failed:")
+            for re in reg_errors:
+                print(f"  - {re}")
+            claim_errors += len(reg_errors)
+        else:
+            print(f"[PASS] Claim register cross-check verified {len(reg_passed)} claims against audited specifications.")
     elif not claim_files:
         print("[INFO] No machine-readable claim specifications in .agents/claims/ (skipping).")
 
     if claim_errors > 0:
-        print(f"\n[FAIL] {claim_errors} mathematical claim specification(s) failed gate audit.")
+        print(f"\n[FAIL] {claim_errors} mathematical claim specification or register check(s) failed.")
         return 1
 
     print("\n=== [2/3] Validating Experiment Specifications ===")

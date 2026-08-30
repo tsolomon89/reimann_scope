@@ -171,3 +171,12 @@ class TestClaimAuditGates:
         assert res["status"] == "PASS", f"CLM-CT-025 failed: {res['violations']}"
         assert len(res["passed_gates"]) == 10
 
+    def test_cross_check_claim_register_succeeds(self):
+        """Test that cross_check_claim_register verifies the repository claim register."""
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        from audit_claim_spec import cross_check_claim_register
+        ok, errors, passed = cross_check_claim_register(repo_root)
+        assert ok is True, f"Claim register cross-check failed: {errors}"
+        assert len(passed) >= 2
+
+

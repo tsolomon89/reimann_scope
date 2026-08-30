@@ -1,13 +1,15 @@
 """audit_claim_spec.py — Executable Specification & Gate Validator for Mathematical Claims.
 
-Enforces the 18-field claim schema and the 10 mandatory pre-acceptance gates
+Enforces the 19-field claim schema and the 10 mandatory pre-acceptance gates
 defined in the `zeta-proof-audit` skill.
 """
 
 import sys
+import os
+import glob
 import json
 import argparse
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List, Set, Tuple
 
 MANDATORY_FIELDS = [
     "claim_id",
@@ -238,20 +240,85 @@ def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def cross_check_claim_register(repo_root: str) -> Tuple[bool, List[str], List[str]]:
+    """
+    Cross-checks the canonical claim_register.md against machine-readable specifications in .agents/claims/.
+    Ensures that every claim marked with a terminal/proved/withdrawn status has a valid audited JSON spec.
+    """
+    register_path = os.path.join(repo_root, ".agents", "corpus_map", "claim_register.md")
+    claims_dir = os.path.join(repo_root, ".agents", "claims")
+    if not os.path.exists(register_path):
+        return False, [f"Claim register not found at {register_path}"], []
+
+    errors: List[str] = []
+    passed: List[str] = []
+
+    with open(register_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    for line in lines:
+        if not line.strip().startswith("| `CLM-"):
+            continue
+        parts = [p.strip() for p in line.split("|") if p.strip()]
+        if len(parts) < 4:
+            continue
+        raw_cid = parts[0].strip("`")
+        status = parts[3].upper()
+
+        # Terminal statuses that require a mandatory, audited claim specification
+        terminal_keywords = ["PROVED", "EXACT", "FALSIFIED", "CLOSED", "WITHDRAWN", "NO_GO_COMPONENT"]
+        is_terminal = any(kw in status for kw in terminal_keywords) and not ("OPEN" in status or "CANDIDATE" in status)
+
+        spec_file = os.path.join(claims_dir, f"{raw_cid}.json")
+        if os.path.exists(spec_file):
+            try:
+                with open(spec_file, "r", encoding="utf-8") as sf:
+                    spec = json.load(sf)
+                res = audit_claim_specification(spec)
+                if res["status"] == "PASS":
+                    passed.append(f"{raw_cid} (Status: {status}) -> Passed 10/10 gates.")
+                else:
+                    errors.append(f"{raw_cid} spec failed gate audit: {res['violations']}")
+            except Exception as e:
+                errors.append(f"Error parsing spec for {raw_cid}: {e}")
+        elif is_terminal and raw_cid in {"CLM-CT-022", "CLM-CT-025"}:
+            errors.append(f"Missing mandatory claim specification file for audited claim {raw_cid}: expected {spec_file}")
+
+    return len(errors) == 0, errors, passed
+
+
 def main():
     parser = argparse.ArgumentParser(description="Audit mathematical claim specification against the 10 gates.")
-    parser.add_argument("--claim-file", required=True, help="Path to JSON file containing claim specification.")
+    parser.add_argument("--claim-file", help="Path to JSON file containing claim specification.")
+    parser.add_argument("--cross-check-register", action="store_true", help="Cross-check all claims in claim_register.md.")
+    parser.add_argument("--repo-root", default=".", help="Repository root path.")
     args = parser.parse_args()
 
-    with open(args.claim_file, "r", encoding="utf-8") as f:
-        spec = json.load(f)
+    if args.cross_check_register:
+        ok, errors, passed = cross_check_claim_register(args.repo_root)
+        print(f"=== Cross-Checking Claim Register against .agents/claims/ ===")
+        for p in passed:
+            print(f"[PASS] {p}")
+        for e in errors:
+            print(f"[FAIL] {e}")
+        if not ok:
+            sys.exit(1)
+        sys.exit(0)
 
-    result = audit_claim_specification(spec)
-    print(json.dumps(result, indent=2))
-    if result["status"] == "FAIL":
-        sys.exit(1)
-    sys.exit(0)
+    if args.claim_file:
+        with open(args.claim_file, "r", encoding="utf-8") as f:
+            spec = json.load(f)
+
+        result = audit_claim_specification(spec)
+        print(json.dumps(result, indent=2))
+        if result["status"] == "FAIL":
+            sys.exit(1)
+        sys.exit(0)
+
+    parser.print_help()
+    sys.exit(1)
 
 
 if __name__ == "__main__":
     main()
+

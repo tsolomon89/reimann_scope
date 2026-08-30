@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-025",
-  "mathematical_statement": "For any finite Dirichlet polynomial F(t) = sum_{n<=N} c_n e^{-it log n} and smooth window W in C_c^infty(R), the inner product <F_0, ddot F_0>_W decomposes exactly into diagonal m=n and off-diagonal m!=n components: <F_0, ddot F_0>_W = sum_{n<=N} c_n bar d_n int W(t) [ -(a-it) log n + (a-it)^2 (log n)^2 ] dt + sum_{m!=n} c_m bar d_n int W(t) e^{-it log(m/n)} [ -(a-it) log n + (a-it)^2 (log n)^2 ] dt. The off-diagonal terms are strictly non-zero for finite windows, proving that knowledge of window variance <t^2>_W alone does not diagonalize a finite-window inner product.",
+  "statement": "For any finite Dirichlet polynomial F_0(t) = sum_{n<=N} c_n e^{-it log n} with c_n = Lambda(n) n^{-1/2-a} and smooth window W in S(R) or C_c^infty(R), the real grade jet cross-term X_{N,W} = Re <F_0, ddot F_0>_W decomposes into diagonal and off-diagonal sums: X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W), where I_{m,n}(W) = (-a L_n + a^2 L_n^2) hat{W}(xi_{mn}) + i (L_n - 2a L_n^2) hat{tW}(xi_{mn}) - L_n^2 hat{t^2 W}(xi_{mn}), with L_n = log n and xi_{mn} = log(m/n). Finite windows do not force off-diagonal terms to vanish; off-diagonal terms are structurally present and require window-specific certified witnesses.",
   "quantified_variables": [
     {
       "name": "N",
@@ -10,7 +10,7 @@
     },
     {
       "name": "W",
-      "domain": "W in C_c^infty(R), W >= 0, int W = 1",
+      "domain": "W in S(R) or C_c^infty(R), W >= 0, int W = 1",
       "description": "Admissible smooth probability window"
     },
     {
@@ -19,47 +19,49 @@
       "description": "Real displacement parameter sigma - 1/2"
     }
   ],
+  "variable_domains": [
+    "N in Positive Integers, N >= 2",
+    "W in S(R) or C_c^infty(R)",
+    "a in Real, a > 0"
+  ],
   "hypotheses": [
     "F_0(t) = sum_{n<=N} c_n e^{-it log n}",
-    "ddot F_0(t) = sum_{n<=N} d_n(t) e^{-it log n} where d_n(t) = c_n (log tau)^2 [ -(a-it) log n + (a-it)^2 (log n)^2 ]",
-    "W in C_c^infty(R)"
+    "c_n = Lambda(n) n^{-1/2-a}",
+    "ddot F_0(t) = (log tau)^2 sum_{n<=N} c_n [ -(a+it) log n + (a+it)^2 (log n)^2 ] e^{-it log n}",
+    "W in S(R) or C_c^infty(R)"
   ],
-  "object_studied": "Finite-window Dirichlet polynomial grade second-variation inner product",
-  "normalization_and_fourier_convention": "Centered coordinates z = s - 1/2 = a + it; tau = 2pi; Fourier transform hat{W}(xi) = int W(t) e^{-it xi} dt",
+  "object_studied": "Finite-window Dirichlet polynomial grade second-variation real cross-term X_{N,W}",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = a + it; tau = 2pi; Fourier transform hat{f}(xi) = int_{-infty}^infty f(t) e^{-it xi} dt",
   "multiplicity_convention": "Exact coefficient arrays (c_n, log_n)",
   "measure_and_window": "Admissible smooth test window W(t) dt",
-  "order_of_limits": "Finite sum N < infinity; 1D integration over compact support of W",
-  "exact_conclusion": "<F_0, ddot F_0>_W = (Diagonal sum) + (Off-diagonal sum); matches 1D numerical quadrature within certified tolerance; |Off-diagonal| > 0 generically",
-  "logical_negation": "<F_0, ddot F_0>_W = (Diagonal sum) for all admissible finite windows (FALSIFIED by non-vanishing of Fourier transforms hat{W}(log(m/n)) for m!=n)",
+  "order_of_limits": "Finite sum N < infinity; 1D integration over real line",
+  "exact_conclusion": "X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W); matches 1D numerical quadrature within certified tolerance; off-diagonal terms are structurally present and not forced to zero by finite window variance",
+  "logical_negation": "X_{N,W} = (Diagonal sum) for all admissible finite windows W (FALSIFIED: finite windows do not force off-diagonal terms to vanish)",
   "epistemic_role": "ALGEBRAIC_IDENTITY",
   "dependencies": [
-    "Lean 4: finite_double_sum_2x2_decomp",
+    "Lean 4: finset_double_sum_diag_offdiag_decomp",
     "math_core.py: finite_windowed_dirichlet_polynomial_inner_product"
   ],
   "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
   "falsification_attempts": [
-    "Evaluated 2-term and 4-term Dirichlet polynomials under Gaussian and smooth bump windows",
-    "Verified discrepancy |Full - Diag| > 0 against adaptive Gauss-Kronrod quadrature",
+    "Evaluated 2-term and 4-term Dirichlet polynomials under Schwartz Gaussian and C_c^infty bump windows",
+    "Verified discrepancy |Full - Diag| > 0 against adaptive quadrature for concrete parameter witnesses",
     "Tested that off-diagonal terms vanish only in the infinite Cesaro limit T -> infinity, which is decoupled from finite window variance"
   ],
-  "computational_evidence": "tests/test_bilateral_second_variation.py: test_finite_windowed_dirichlet_polynomial_vs_quadrature",
+  "computational_evidence": [
+    "tests/test_bilateral_second_variation.py: test_full_windowed_dirichlet_inner_product_matches_quadrature_and_reveals_offdiagonal"
+  ],
   "external_sources": [
-    "Montgomery & Vaughan (1974), Hilbert's inequality, J. London Math. Soc. (2) 8, 73-82",
-    "Besicovitch (1932), Almost Periodic Functions, Cambridge Univ. Press"
+    {
+      "source": "Montgomery & Vaughan (1974), Hilbert's inequality, J. London Math. Soc. (2) 8, 73-82",
+      "theorem": "Theorem 2 (Mean value theorem for Dirichlet polynomials)"
+    },
+    {
+      "source": "Besicovitch (1932), Almost Periodic Functions, Cambridge Univ. Press",
+      "theorem": "Chapter I, Section 5 (Parseval equality for B^2 space)"
+    }
   ],
   "remaining_analytic_dependencies": [
     "Infinite series extension to completed xi-function (OBL-DERIVE-FULL-WINDOWED-ZETA-CROSS-TERM)"
-  ],
-  "gate_audit_status": {
-    "gate_1_object_identity": "PASS - Strictly identified as finite Dirichlet polynomial, not infinite completed zeta",
-    "gate_2_quantifiers": "PASS - Explicit quantifiers over all finite N >= 2 and all W in C_c^infty",
-    "gate_3_negation_first": "PASS - Exact negation (diagonalization for all finite W) disproved",
-    "gate_4_symbolic_elimination": "PASS - Decomposed into exact Fourier moment integrals",
-    "gate_5_dominance_and_boundary": "PASS - Bounds on off-diagonal terms evaluated via Fourier decay",
-    "gate_6_diagonal_offdiagonal": "PASS - Full double sum explicitly separated into m=n and m!=n",
-    "gate_7_interchange": "PASS - Finite sum and compact integral interchange is exact by linearity",
-    "gate_8_independent_derivation": "PASS - Double sum Fourier moments vs 1D adaptive numerical quadrature",
-    "gate_9_adversarial_falsification": "PASS - Falsified the assumption that finite-window variance determines the full inner product",
-    "gate_10_evidence_classification": "PASS - Finite decomposition proved algebraically in Lean 4; numerical quadrature validates implementation"
-  }
+  ]
 }
