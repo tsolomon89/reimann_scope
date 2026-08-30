@@ -1,0 +1,318 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Hash-pinned manifest of grandfathered legacy unaudited terminal claims in reimann_scope.",
+  "claims": {
+    "CLM-TC-001": {
+      "line_hash": "9ec812211abcdb689d52da92b8d855c1b928e36d9c85a85a2b9dc862737ae56e",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-TC-002": {
+      "line_hash": "cf279b173090b972b331053edb740092357c1bc56837fce6c22ba068dcc4229d",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-TC-003": {
+      "line_hash": "e717913905e4e72460bfca11d961b7a488b4123c89ccc42b743d98a722e1d189",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-TC-004": {
+      "line_hash": "cecc62805b61bf023dbf965bc9c0b3bb7107b90a8b87ad81f6a8e7e264867f23",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-COV-001": {
+      "line_hash": "c48c8a71d00194d35cbda8c5a3dc34114ab0f5c3a06f88358ce06154821f3558",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-IKL-001": {
+      "line_hash": "5464475db42c4fedbc4e0323498d4efec1fdfb4dbeba56e84cc86dc8d438d5cf",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-COH-001": {
+      "line_hash": "4b6a74947ca63b747b51de58bc05cbd977af8c92085d89e29a3c99ed40905c00",
+      "status": "RETAINED (Empirical 80-dps)"
+    },
+    "CLM-EF-001": {
+      "line_hash": "119b24447319f12b0398fc7be3abb0cb7db7ad9c2550db2b17591bd355fff231",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-001": {
+      "line_hash": "314aed4ee4767c7af2eb2e9b5813d2059bd636a1d373739a253de3456ac9840f",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-002": {
+      "line_hash": "033cc7ba40a5c09cbf5a57e988e900c6ca6e9f845b5120c2f618ba88249d2299",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-003": {
+      "line_hash": "23164f8909533df15c0a2ee2c1cd07f7605de479850e74c9bed230da319121a5",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-004": {
+      "line_hash": "9eff014ed6ef50da5123637d34ec6a274fcfb347b414489a4886b021d4d570ab",
+      "status": "PROVED SPECTRAL EQUIVALENCE"
+    },
+    "CLM-RDQ-005": {
+      "line_hash": "24182f4aba5f05e2832ee39217d4080ba2c3b2b41f59852b027307153971d473",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-006": {
+      "line_hash": "663c22c23a2d25c0c7271a12d4af9ddbb9a267e956122f095003630853951a81",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-007": {
+      "line_hash": "12d5b9cfcfb00d61ef50427f80f138cd7f36ec5be878bef0e84a46b8b0e8611b",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-RDQ-008": {
+      "line_hash": "293efce9d176852f9b55209c523e3eb9fe03e0d8bc08d1037e2d1af9eb8950e6",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-ARB-001": {
+      "line_hash": "b3146e79f7a377306a41cf3aa1b2513aa8b2df9d37f3abbf587683674696543e",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-ARB-002": {
+      "line_hash": "b05493ed153eb337dbc2022f783624073fea78094d669f022f83b0de1210c202",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-ARB-003": {
+      "line_hash": "ddb29f0ec01589f246eeba78cf8e1da09631f060b2105e4a624cd97a4c89f626",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-ARB-004": {
+      "line_hash": "f36db0387cf49d14bf82961287c795f20b51b73c512ab8a53a9fa784a92bfc58",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-ARB-005": {
+      "line_hash": "1f351b1ababd56dad0115a31d1f276efb6c57507d1aaaf9d45a399257e21d37f",
+      "status": "PROVED / FALSIFIED"
+    },
+    "CLM-ARB-006": {
+      "line_hash": "0ac4d65ddef724ce960741cabf9c6848dda414f588cd8f75e9b44dc1d26da924",
+      "status": "PROVED / FALSIFIED"
+    },
+    "CLM-ARB-007": {
+      "line_hash": "2db687c45a0ee6124182cc91edfcad40fb69d229b6a55bf4a8b0bd47bdfd7074",
+      "status": "PROVED / FALSIFIED"
+    },
+    "CLM-ARB-008": {
+      "line_hash": "d9f06a8f97b8485f1e8d49c82a02ebdc169ac181674c39632241e994928585e8",
+      "status": "PROVED SPECTRAL EQUIVALENCE"
+    },
+    "CLM-ARB-010": {
+      "line_hash": "5a8a0edb941ee5c33fa8d2d950b364484f6cf19d3d5e589924357ce3ca8657e5",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-SS-001": {
+      "line_hash": "142b3b08a40ffdee58f87b9b661cdeaf9ad13a961a13cc215889b80c8f409eed",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-SS-002": {
+      "line_hash": "e3ce7c60ea3e223e87f0d9119aa0b96364f2c6d322095f901ffcd56089c215f8",
+      "status": "PROVED SPECTRAL EQUIVALENCE"
+    },
+    "CLM-SS-003": {
+      "line_hash": "6b289f4a43f3221908edb00a44ab75a533b1bf1d1c106b8012ffd3e13b1ef6c3",
+      "status": "PROVED / FALSIFIED"
+    },
+    "CLM-SS-005": {
+      "line_hash": "f729bf961e457d01a4637089a5e28e693191cbfd75ecc6e8dd1e398c7d67bd23",
+      "status": "PROVED / FALSIFIED"
+    },
+    "CLM-SS-008": {
+      "line_hash": "cec3d997fb0e84e1f451b485681f8dce65ed572d5822806ba3ac190c4bce42df",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-001": {
+      "line_hash": "e968eb5c33ab996c684b0884cd6bc6231190a01e7c8a29975ac7e4eabecb6425",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-002": {
+      "line_hash": "4bbaa94194e346798f4f225b4b069f82255446b9b992f2bc58df75022f68da57",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-003": {
+      "line_hash": "c6e90625fda5250eaff2f51f484a12c2a59f65be744fb7ce76b2f3eb987d4636",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-004": {
+      "line_hash": "26f1b7155add5777cc8e6aa8d42cbbbd66813a65bd3623fe02f87a73abf773f6",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-005": {
+      "line_hash": "1e4bb8ea08c3881d309a6cb7e0f38856f55104903ab7e5d829a12ac048f66a9e",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-006": {
+      "line_hash": "f7e9d3c96a3ef50b3c5041da1502927d8abe874c0f55c6f0fcc8885b25cef8ba",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-007": {
+      "line_hash": "40c723195f3cfa3ea584d237efe14d55b0eba2506ab2969bccdbc94d279d1355",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-008": {
+      "line_hash": "4f7e966290922a9c5e74d781a740c4f73f858f31e6c8a518fc9f7adec8556855",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-009": {
+      "line_hash": "058b7e630548655602a2bf6889cff3933dbbfe7489a92c29d6d5dea326dfdd36",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-010": {
+      "line_hash": "ed7bf28cc08db5b0147ee95a606cd57e35e2c0904f9ef3b2a5963759f2de768d",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-011": {
+      "line_hash": "edc5b72b767ebae4bc1e1c0dad77206f834cf42f00a3d057d7feaa20e98b1dec",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-012": {
+      "line_hash": "9226998905de7bc47ac69d5c542158f3a177dce8a0ef7de13649cdcdb612ca6e",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-013": {
+      "line_hash": "19813a2f5e0bd7f4e4bfe341187967157f4350c15a8237cf39fdd65d11da7214",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-014": {
+      "line_hash": "d0e423e910296add096ae3b7003d22083267ec22cd2330b8fa341ecc5ec108e7",
+      "status": "FAIL_RADIAL_POSITIVITY / CERTIFIED (WIT-02)"
+    },
+    "CLM-CMSA-015": {
+      "line_hash": "29d748adc88e68c93a57cf622be32b9e7407ab12726060294d817ff519fb18fd",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-016": {
+      "line_hash": "1581977ea2aed6e630ed24d1780d482e929212dcabd9344aee5740bb736c7310",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-017": {
+      "line_hash": "01fe87409870cc8eeea285888b23986843a65b3c8112d1e537e9e1f92f40d95e",
+      "status": "PROVED / CONDITIONAL BOUNDARY"
+    },
+    "CLM-CMSA-018": {
+      "line_hash": "c5d91cfc6b3a9f7eaa651b56f351669438ccda7fd128ad331ce6fed930f2159e",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-019": {
+      "line_hash": "3223fca03b6c629b4442ebfef539916e9a7a4bfd930d9c0c126df0edba5ddb63",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-020": {
+      "line_hash": "a43b273561b44aeb323d52ea195863a015a830a2b9789075f088c8882175dce4",
+      "status": "PROVED / ENFORCED"
+    },
+    "CLM-CMSA-021": {
+      "line_hash": "bb8bbcef41ac57aafd95f4488d0bae2b9c89dc95d38600d548ae7ed5204e9d07",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-022": {
+      "line_hash": "f3bfbcedc4b47b1f2cc075afe0f0f781304786f21b4f9771e80d2ca0fd76b18a",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CMSA-023": {
+      "line_hash": "0df7eba33d8fab22b631480d6d24ff713fd20b7979d2465abc24bc0a055d68ac",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CMSA-024": {
+      "line_hash": "72c20c143a077b387a546aaf2558abbc674376cbbe476f95cbe83c1d1bc570b5",
+      "status": "PROVED / EXACT / PARTIALLY_FORMALIZED"
+    },
+    "CLM-CMSA-025": {
+      "line_hash": "f9173efd4fcacda0ecadfb684b82db83d57628c61b206ace97519c9a38c2044c",
+      "status": "PROVED / EXACT / PARTIALLY_FORMALIZED"
+    },
+    "CLM-CT-001": {
+      "line_hash": "cb212f322cd065befa4f130192f96c310096c23e7e2d0ac6c6588de013020c3f",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-002": {
+      "line_hash": "1b8c3bf95af7f7d10b615c2b45213df592421c2aff2367fecb9c66e02a2676e0",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-003": {
+      "line_hash": "f769d9bea25559bb955876a5db7402a54c99d7a3d989ba5c49bc89155eda6985",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-004": {
+      "line_hash": "7d4c2d9aa5f96de42ae4eabbc0e74047ecc56cf5c8c9437ebbfd74ebfaa72d53",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CT-005": {
+      "line_hash": "ad21edc0f5afff9ecf371ec68492f2693c39313bd56b25b66825666ef558d476",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-006": {
+      "line_hash": "348ffc35abcce71db7168262c18ada37d274ab96c96efa2435d4f29dbbeb0e3e",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-007": {
+      "line_hash": "b805b1302641ef776ff2819048618d346d3f66955c5776344fc3657f71af6ba0",
+      "status": "PROVED / EXACT / PARTIALLY_FORMALIZED"
+    },
+    "CLM-CT-008": {
+      "line_hash": "eafe84293f4a7ab4951712470106ca0d63ba8fe8c8c3b7f401227adbaf9a33b1",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-009": {
+      "line_hash": "64996f6488602cf2b12ec8b7ef0717f20bf4efb3839de5328dddd59d92fe2dd1",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CT-010": {
+      "line_hash": "0e8001563ba1ea4a64ba508cad8662fe11771944ca6a33f3ee85f7ff27b41729",
+      "status": "PROVED / FALSIFIED"
+    },
+    "CLM-CT-011": {
+      "line_hash": "0dd3dd39b06b51c20d22cd0dc853aaabb5649604f0a69416a24306ad986ec7ad",
+      "status": "PROVED / FORMALLY_PROVED COUNTERMODEL"
+    },
+    "CLM-CT-012": {
+      "line_hash": "ca29ede1707a8c059049793d2d2c4d6001f48bf2499200b83447fe91cdd833ed",
+      "status": "PROVED / FORMALLY_PROVED CONDITIONAL"
+    },
+    "CLM-CT-013": {
+      "line_hash": "fcdf603bd1bfa5740dd3ccaff862df5cfbb46d812eeb3cdd53eb1d5b87bf4b0a",
+      "status": "PROVED / EXACT / PARTIALLY_FORMALIZED"
+    },
+    "CLM-CT-014": {
+      "line_hash": "70a8a5d392fdae8de634aec62b9becf4ee56f35a498281286744aa96126efd0e",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CT-015": {
+      "line_hash": "b39eb76e494c12434f85ae7bc95c565d8569957bb36323c5c8274cb94676da5e",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-016": {
+      "line_hash": "741d145e30b4badcb25aafdf81c6c3561b41543b9dc08bf94f0e03d7313e67a7",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-017": {
+      "line_hash": "5744471e16c1b543ddca2b4fd855d3fbc8144d5dd0dc8e27515587cf8df16543",
+      "status": "PROVED / FALSIFIED LOCAL GNS"
+    },
+    "CLM-CT-018": {
+      "line_hash": "41855079c32e7cf50963cb719dfdedb6571392cddec8929bdbfcdc19ab703a85",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-019": {
+      "line_hash": "7831b2355eb620e302f8f52a7dfbbec2c3df3f8e09b039ed35894093b6007d49",
+      "status": "PROVED / FALSIFIED NAIVE PROBE"
+    },
+    "CLM-CMSA-027": {
+      "line_hash": "fd8b701cf22834dcd47a2c8dcf19a95eb66c88d8b105cd3304ddb027a4e7bac0",
+      "status": "PROVED / FORMALLY_PROVED"
+    },
+    "CLM-CT-021": {
+      "line_hash": "51023d4404d540326ff4b9b258fd01d377eaeabf5597e741d61f6b96e113dd1e",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CT-023": {
+      "line_hash": "0d97e2ed1f532321fadc55694592f471b188786a399b0bebef0de7b4178442ae",
+      "status": "PROVED / EXACT"
+    },
+    "CLM-CT-024": {
+      "line_hash": "5996458386589dc490e0ae58640a0d7417949eb382c299b17ea427a2ff31d718",
+      "status": "PROVED / FORMALLY_PROVED"
+    }
+  }
+}

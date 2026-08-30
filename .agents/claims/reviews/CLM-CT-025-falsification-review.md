@@ -16,7 +16,7 @@
 
 Under the documented formulas:
 - **Parameters**: $N = 3$, $a = 1.5$, $\sigma_W = 1.0$, variance $v = 1.0$ under Schwartz Gaussian window $W(t) = \frac{1}{\sqrt{2\pi}}\exp(-t^2/2)$.
-- **Prime Coefficients**: $c_2 = \frac{\log 2}{4} \approx 0.1732867951399863$, $c_3 = \frac{\log 3}{9} \approx 0.1220680371981881$.
+- **Prime Coefficients**: $c_2 = \frac{\log 2}{4} \approx 0.1732867951399863$, $c_3 = \frac{\log 3}{9} \approx 0.1220680320742344$.
 - **Off-Diagonal Frequency**: $\xi_{2,3} = \log(2/3) \approx -0.4054651081081644$.
 
 ### Three Independent Concordant Evaluations (50 dps):

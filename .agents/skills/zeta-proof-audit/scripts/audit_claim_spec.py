@@ -8,6 +8,7 @@ import sys
 import os
 import glob
 import json
+import hashlib
 import argparse
 from typing import Dict, Any, List, Set, Tuple
 
@@ -271,24 +272,43 @@ KNOWN_EXEMPT_PATTERNS = [
 
 def cross_check_claim_register(repo_root: str) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
     """
-    Exhaustively cross-checks the canonical claim_register.md against machine-readable specifications in .agents/claims/.
-    - Fails on every unknown/unregistered non-empty status.
-    - Treats FAIL_* and PROVED_* as terminal statuses.
-    - Audits every JSON specification present against the 10 gates.
-    - Returns coverage totals and status histogram.
+    Exhaustively cross-checks the canonical claim_register.md against machine-readable specifications in .agents/claims/
+    and hash-pinned grandfathered entries in .agents/corpus_map/legacy_claim_manifest.json.
+
+    Policy B (Grandfathered Migration):
+    - New terminal claims always require validated specifications in .agents/claims/.
+    - Modified legacy claims or status transitions require validated specifications in .agents/claims/.
+    - Unchanged legacy terminal claims matching legacy_claim_manifest.json pass provisionally as LEGACY_UNAUDITED.
+    - Open/exempt claims pass as Exempt.
+    - Fails on unknown statuses, missing specifications, or modified legacy claims without specifications.
+    - Strictly enforces:
+        terminal_claims == audited_terminal_claims + legacy_unaudited_terminal_claims + missing_specifications
+        total_claims == terminal_claims + open_or_exempt_claims
     """
     register_path = os.path.join(repo_root, ".agents", "corpus_map", "claim_register.md")
+    legacy_manifest_path = os.path.join(repo_root, ".agents", "corpus_map", "legacy_claim_manifest.json")
     claims_dir = os.path.join(repo_root, ".agents", "claims")
+
+    legacy_manifest = {"claims": {}}
+    if os.path.exists(legacy_manifest_path):
+        try:
+            with open(legacy_manifest_path, "r", encoding="utf-8") as lf:
+                legacy_manifest = json.load(lf)
+        except Exception as e:
+            return False, [f"Error reading legacy claim manifest: {e}"], [], {}
+
     if not os.path.exists(register_path):
-        return False, [f"Claim register not found at {register_path}"], [], {"total_claims": 0, "specifications_found": 0, "open_or_exempt_claims": 0, "terminal_claims_requiring_specs": 0, "status_histogram": {}, "unrecognized_statuses": 0}
+        return False, [f"Claim register not found at {register_path}"], [], {}
 
     errors: List[str] = []
     passed: List[str] = []
-    total_parsed = 0
-    audited_count = 0
-    exempt_count = 0
-    terminal_count = 0
-    unrecognized_count = 0
+    total_claims = 0
+    terminal_claims = 0
+    audited_terminal_claims = 0
+    legacy_unaudited_terminal_claims = 0
+    open_or_exempt_claims = 0
+    missing_specifications = 0
+    unrecognized_statuses = 0
     status_histogram: Dict[str, int] = {}
 
     with open(register_path, "r", encoding="utf-8") as f:
@@ -314,7 +334,7 @@ def cross_check_claim_register(repo_root: str) -> Tuple[bool, List[str], List[st
             status = parts[-2].strip()
 
         status_upper = status.upper()
-        total_parsed += 1
+        total_claims += 1
         status_histogram[status] = status_histogram.get(status, 0) + 1
 
         is_exempt = any(status_upper.startswith(ep) or ep in status_upper for ep in KNOWN_EXEMPT_PATTERNS)
@@ -322,38 +342,62 @@ def cross_check_claim_register(repo_root: str) -> Tuple[bool, List[str], List[st
 
         if not is_exempt and not is_terminal:
             errors.append(f"UNRECOGNIZED_STATUS_VIOLATION: Claim {raw_cid} has unknown status '{status}'. Must be registered in canonical status registry.")
-            unrecognized_count += 1
+            unrecognized_statuses += 1
             continue
 
         if is_exempt:
-            exempt_count += 1
+            open_or_exempt_claims += 1
             passed.append(f"{raw_cid} (Status: {status}) -> Exempt (Open / Diagnostic / Scoped).")
-        elif is_terminal:
-            terminal_count += 1
+            continue
 
+        # Terminal claim processing
+        terminal_claims += 1
         spec_file = os.path.join(claims_dir, f"{raw_cid}.json")
+
         if os.path.exists(spec_file):
             try:
                 with open(spec_file, "r", encoding="utf-8") as sf:
                     spec = json.load(sf)
                 res = audit_claim_specification(spec)
                 if res["status"] == "PASS":
-                    audited_count += 1
+                    audited_terminal_claims += 1
                     passed.append(f"{raw_cid} (Status: {status}) -> SPECIFICATION_SCHEMA_PASSED (10/10 gates).")
                 else:
+                    missing_specifications += 1
                     errors.append(f"{raw_cid} specification failed gate audit: {res['violations']}")
             except Exception as e:
+                missing_specifications += 1
                 errors.append(f"Error parsing specification for {raw_cid}: {e}")
-        elif raw_cid in {"CLM-CT-022", "CLM-CT-025"}:
-            errors.append(f"MISSING_SPECIFICATION_VIOLATION: Audited claim {raw_cid} lacks specification at {spec_file}")
+        else:
+            # Check legacy manifest for grandfathered status
+            legacy_claims = legacy_manifest.get("claims", {})
+            if raw_cid in legacy_claims:
+                expected_hash = legacy_claims[raw_cid].get("line_hash", "")
+                current_hash = hashlib.sha256(line_str.encode("utf-8")).hexdigest()
+                expected_status = legacy_claims[raw_cid].get("status", "")
+                if current_hash == expected_hash and status == expected_status:
+                    legacy_unaudited_terminal_claims += 1
+                    passed.append(f"{raw_cid} (Status: {status}) -> LEGACY_UNAUDITED (Grandfathered manifest).")
+                else:
+                    missing_specifications += 1
+                    errors.append(f"MODIFIED_LEGACY_CLAIM_VIOLATION: Grandfathered claim {raw_cid} was modified (hash/status changed) without providing a validated specification in .agents/claims/.")
+            else:
+                missing_specifications += 1
+                errors.append(f"MISSING_SPECIFICATION_VIOLATION: Terminal claim {raw_cid} (Status: {status}) is not in legacy manifest and lacks specification at {spec_file}.")
+
+    # Enforce arithmetic consistency
+    assert terminal_claims == audited_terminal_claims + legacy_unaudited_terminal_claims + missing_specifications, "Coverage arithmetic mismatch on terminal claims"
+    assert total_claims == terminal_claims + open_or_exempt_claims + unrecognized_statuses, "Coverage arithmetic mismatch on total claims"
 
     coverage = {
-        "total_claims": total_parsed,
-        "terminal_claims_requiring_specs": terminal_count,
-        "open_or_exempt_claims": exempt_count,
-        "specifications_found": audited_count,
-        "status_histogram": status_histogram,
-        "unrecognized_statuses": unrecognized_count
+        "total_claims": total_claims,
+        "terminal_claims": terminal_claims,
+        "audited_terminal_claims": audited_terminal_claims,
+        "legacy_unaudited_terminal_claims": legacy_unaudited_terminal_claims,
+        "open_or_exempt_claims": open_or_exempt_claims,
+        "missing_specifications": missing_specifications,
+        "unrecognized_statuses": unrecognized_statuses,
+        "status_histogram": status_histogram
     }
 
     return len(errors) == 0, errors, passed, coverage
@@ -369,10 +413,12 @@ def main():
     if args.cross_check_register:
         ok, errors, passed, coverage = cross_check_claim_register(args.repo_root)
         print(f"=== Cross-Checking Claim Register against .agents/claims/ ===")
-        print(f"Total claims parsed:               {coverage['total_claims']}")
-        print(f"Terminal claims requiring specs:   {coverage['terminal_claims_requiring_specs']}")
+        print(f"Total claims:                      {coverage['total_claims']}")
+        print(f"Terminal claims:                   {coverage['terminal_claims']}")
+        print(f"  - Audited terminal claims:       {coverage['audited_terminal_claims']}")
+        print(f"  - Legacy unaudited terminal:     {coverage['legacy_unaudited_terminal_claims']}")
+        print(f"  - Missing specifications:        {coverage['missing_specifications']}")
         print(f"Open or exempt claims:             {coverage['open_or_exempt_claims']}")
-        print(f"Specifications found & validated:  {coverage['specifications_found']}")
         print(f"Unrecognized statuses:             {coverage['unrecognized_statuses']}")
         print(f"\nStatus Histogram:")
         for st, count in sorted(coverage['status_histogram'].items()):

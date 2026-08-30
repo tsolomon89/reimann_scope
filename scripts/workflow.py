@@ -69,7 +69,7 @@ def run_check_fast() -> int:
                 print(f"  - {re}")
             claim_errors += len(reg_errors)
         else:
-            print(f"[PASS] Claim register cross-check verified {coverage['total_claims']} register claims ({coverage['specifications_found']} audited specs, {coverage['open_or_exempt_claims']} open/exempt, {coverage['unrecognized_statuses']} unrecognized).")
+            print(f"[PASS] Claim register cross-check verified {coverage['total_claims']} register claims ({coverage['audited_terminal_claims']} audited terminal specs, {coverage['legacy_unaudited_terminal_claims']} legacy unaudited grandfathered, {coverage['open_or_exempt_claims']} open/exempt, {coverage['unrecognized_statuses']} unrecognized).")
     elif not claim_files:
         print("[INFO] No machine-readable claim specifications in .agents/claims/ (skipping).")
 

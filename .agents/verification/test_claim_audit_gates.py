@@ -172,14 +172,80 @@ class TestClaimAuditGates:
         assert len(res["passed_gates"]) == 10
 
     def test_cross_check_claim_register_succeeds(self):
-        """Test that cross_check_claim_register verifies the repository claim register."""
+        """Test that cross_check_claim_register verifies the repository claim register with exact arithmetic."""
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         from audit_claim_spec import cross_check_claim_register
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
-        assert coverage["total_claims"] >= 30
-        assert coverage["specifications_found"] >= 2
+        assert coverage["total_claims"] == 88
+        assert coverage["terminal_claims"] == 80
+        assert coverage["audited_terminal_claims"] == 2
+        assert coverage["legacy_unaudited_terminal_claims"] == 78
+        assert coverage["open_or_exempt_claims"] == 8
+        assert coverage["missing_specifications"] == 0
         assert coverage["unrecognized_statuses"] == 0
+        # Strict coverage arithmetic
+        assert coverage["terminal_claims"] == coverage["audited_terminal_claims"] + coverage["legacy_unaudited_terminal_claims"] + coverage["missing_specifications"]
+        assert coverage["total_claims"] == coverage["terminal_claims"] + coverage["open_or_exempt_claims"]
+
+    def test_new_terminal_claim_without_json_fails(self, tmp_path):
+        """Test that a new terminal claim without JSON specification fails cross-check."""
+        from audit_claim_spec import cross_check_claim_register
+        mock_agents = tmp_path / ".agents"
+        (mock_agents / "corpus_map").mkdir(parents=True)
+        (mock_agents / "claims").mkdir(parents=True)
+        (mock_agents / "corpus_map" / "legacy_claim_manifest.json").write_text('{"claims": {}}', encoding="utf-8")
+        (mock_agents / "corpus_map" / "claim_register.md").write_text(
+            "# Register\n| `CLM-NEW-001` | Statement | Layer | PROVED / EXACT | doc | target |\n",
+            encoding="utf-8"
+        )
+        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path))
+        assert ok is False
+        assert coverage["missing_specifications"] == 1
+        assert any("MISSING_SPECIFICATION_VIOLATION" in e for e in errors)
+
+    def test_modified_legacy_terminal_claim_without_json_fails(self, tmp_path):
+        """Test that a modified legacy terminal claim without JSON fails cross-check due to hash mismatch."""
+        from audit_claim_spec import cross_check_claim_register
+        mock_agents = tmp_path / ".agents"
+        (mock_agents / "corpus_map").mkdir(parents=True)
+        (mock_agents / "claims").mkdir(parents=True)
+        (mock_agents / "corpus_map" / "legacy_claim_manifest.json").write_text(
+            '{"claims": {"CLM-LEG-001": {"line_hash": "deadbeef1234", "status": "PROVED / EXACT"}}}',
+            encoding="utf-8"
+        )
+        (mock_agents / "corpus_map" / "claim_register.md").write_text(
+            "# Register\n| `CLM-LEG-001` | Modified statement | Layer | PROVED / EXACT | doc | target |\n",
+            encoding="utf-8"
+        )
+        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path))
+        assert ok is False
+        assert coverage["missing_specifications"] == 1
+        assert any("MODIFIED_LEGACY_CLAIM_VIOLATION" in e for e in errors)
+
+    def test_unchanged_manifest_listed_legacy_claim_passes_provisionally(self, tmp_path):
+        """Test that an unchanged legacy claim matching manifest passes provisionally as LEGACY_UNAUDITED."""
+        import json
+        import hashlib
+        from audit_claim_spec import cross_check_claim_register
+        mock_agents = tmp_path / ".agents"
+        (mock_agents / "corpus_map").mkdir(parents=True)
+        (mock_agents / "claims").mkdir(parents=True)
+        line = "| `CLM-LEG-001` | Original statement | Layer | PROVED / EXACT | doc | target |"
+        line_hash = hashlib.sha256(line.encode("utf-8")).hexdigest()
+        (mock_agents / "corpus_map" / "legacy_claim_manifest.json").write_text(
+            json.dumps({"claims": {"CLM-LEG-001": {"line_hash": line_hash, "status": "PROVED / EXACT"}}}),
+            encoding="utf-8"
+        )
+        (mock_agents / "corpus_map" / "claim_register.md").write_text(
+            f"# Register\n{line}\n",
+            encoding="utf-8"
+        )
+        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path))
+        assert ok is True
+        assert coverage["legacy_unaudited_terminal_claims"] == 1
+        assert coverage["audited_terminal_claims"] == 0
+        assert any("LEGACY_UNAUDITED" in p for p in passed)
 
     def test_unrecognized_custom_status_fails_cross_check(self, tmp_path):
         """Test that an unrecognized status in claim register is strictly rejected as a bypass attempt."""
@@ -189,6 +255,7 @@ class TestClaimAuditGates:
         mock_corpus.mkdir(parents=True)
         mock_claims = mock_agents_dir / "claims"
         mock_claims.mkdir(parents=True)
+        (mock_corpus / "legacy_claim_manifest.json").write_text('{"claims": {}}', encoding="utf-8")
 
         mock_reg = mock_corpus / "claim_register.md"
         mock_reg.write_text(
