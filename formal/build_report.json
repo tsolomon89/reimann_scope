@@ -4,8 +4,8 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "e5a0268917c231e7e6edfc87b97132233ed65069",
-  "timestamp": "2026-08-30T23:27:43.385827+00:00",
+  "producing_git_commit": "7d894aae54c0d15754da50138fccbe88eb3f5d79",
+  "timestamp": "2026-08-30T23:50:58.684393+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 140,
@@ -31,7 +31,7 @@
     "scripts/build_formal.py": "365e5867ca847cc7096c475f05c0da8959d2a77533fcfb7bf989a137b545d5e6",
     "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
   },
-  "build_stdout": "\u2714 [1499/1501] Built RiemannScope.CurvatureTransport\nBuild completed successfully.",
+  "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "d8add26f0a69e4931f9e0e1f34dd12e406df681af2cffc4be0296e90e4e067c2"
+  "report_hash": "956dae2af3a945c8c7394ac1a71133493ca813e0adbfe8e9ddc9549efb8684d6"
 }
