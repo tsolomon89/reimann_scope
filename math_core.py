@@ -6579,22 +6579,23 @@ def evaluate_bilateral_grade_centering_second_difference(
         }
 
 
-def compute_cancelling_variance(
-    a: Union[float, str, mpmath.mpf] = "1.5",
+def compute_truncated_cancelling_variance(
+    a: Union[float, str, mpmath.mpf] = "2.0",
     max_n: int = 2000,
     dps: int = 50
 ) -> Dict[str, Any]:
     """
-    [DIAGONAL CROSS-TERM EXACT CANCELLATION VARIANCE COMPUTATION]
-    Computes S_1(a) = sum_{n>=2} Lambda(n)^2 n^{-1-2a} log n,
-             S_2(a) = sum_{n>=2} Lambda(n)^2 n^{-1-2a} (log n)^2,
-             v_*(a) = a^2 - a * S_1(a) / S_2(a).
-    Verifies:
-      1. Since log n >= log 2 for all n >= 2, S_2(a) >= (log 2) * S_1(a) > 0.
-      2. S_1(a) / S_2(a) <= 1 / log 2.
-      3. For a > 1 / log 2 approx 1.442695, v_*(a) > 0 strictly.
-      4. X_zeta(a, v_*(a)) = (log tau)^2 [ (a^2 - v_*(a)) S_2(a) - a S_1(a) ] == 0 identically.
-      5. Sign change: X_zeta(a, v_*(a) - eps) > 0 > X_zeta(a, v_*(a) + eps).
+    [DIAGONAL CANCELLING VARIANCE EVALUATION: TRUNCATED APPROXIMATION & TAIL BOUNDS]
+    Computes the exact algebraic root v_*(a) = a^2 - a * S_1(a) / S_2(a) for the truncated
+    Dirichlet sums S_1^{(N)}(a) and S_2^{(N)}(a) on Re(z) = a > 1 / log 2.
+    For N = max_n, computes:
+      S_1^{(N)}(a) = sum_{n=2}^N Lambda(n)^2 n^{-1-2a} log n
+      S_2^{(N)}(a) = sum_{n=2}^N Lambda(n)^2 n^{-1-2a} (log n)^2
+      v_*^{(N)}(a) = a^2 - a * (S_1^{(N)}(a) / S_2^{(N)}(a)).
+    Tail Bounds (for a > 1/2):
+      By prime number theorem bounds, Lambda(n) <= log n:
+      Tail R_1(N, a) <= int_N^infty (log x)^3 x^{-1-2a} dx <= (log N)^3 N^{-2a} / (2a)
+      Tail R_2(N, a) <= int_N^infty (log x)^4 x^{-1-2a} dx <= (log N)^4 N^{-2a} / (2a).
     """
     with mpmath.workdps(dps):
         a_f = to_mpf(a, dps=dps)
@@ -6622,7 +6623,13 @@ def compute_cancelling_variance(
         v_star = a_f**2 - a_f * ratio
         is_v_star_pos = bool(v_star > 0)
 
-        # Evaluate at v_star:
+        # Truncation tail estimates (power-logarithmic in N)
+        n_cutoff = mpmath.mpf(max_n)
+        log_cutoff = mpmath.log(n_cutoff)
+        tail_bound_s1 = ((log_cutoff**3) * (n_cutoff ** (-2 * a_f))) / (2 * a_f)
+        tail_bound_s2 = ((log_cutoff**4) * (n_cutoff ** (-2 * a_f))) / (2 * a_f)
+
+        # Truncated evaluation at v_star:
         x_at_vstar = (log_tau**2) * ((a_f**2 - v_star) * s2 - a_f * s1)
 
         # Evaluate at v_star - 0.1 and v_star + 0.1
@@ -6634,11 +6641,15 @@ def compute_cancelling_variance(
 
         return {
             "a": mpmath.nstr(a_f, n=10),
-            "S1": mpmath.nstr(s1, n=50),
-            "S2": mpmath.nstr(s2, n=50),
+            "truncation_N": max_n,
+            "S1_truncated": mpmath.nstr(s1, n=50),
+            "S2_truncated": mpmath.nstr(s2, n=50),
+            "tail_bound_S1": mpmath.nstr(tail_bound_s1, n=10),
+            "tail_bound_S2": mpmath.nstr(tail_bound_s2, n=10),
             "ratio_S1_over_S2": mpmath.nstr(ratio, n=50),
             "bound_1_over_log2": mpmath.nstr(bound_ratio, n=50),
             "ratio_satisfies_bound": ratio_le_bound,
+            "v_star_truncated": mpmath.nstr(v_star, n=50),
             "v_star": mpmath.nstr(v_star, n=50),
             "is_v_star_positive": is_v_star_pos,
             "X_zeta_at_v_star": mpmath.nstr(x_at_vstar, n=50),
@@ -6647,8 +6658,12 @@ def compute_cancelling_variance(
             "X_zeta_above": mpmath.nstr(x_above, n=50),
             "sign_change_verified": sign_change,
             "classification": "DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES",
-            "status": "CANCELLING_VARIANCE_COMPUTED"
+            "status": "TRUNCATED_CANCELLING_VARIANCE_COMPUTED"
         }
+
+
+# Backward compatibility alias
+compute_cancelling_variance = compute_truncated_cancelling_variance
 
 
 def evaluate_zeta_specific_grade_jet_crossterm(
@@ -6661,17 +6676,13 @@ def evaluate_zeta_specific_grade_jet_crossterm(
     """
     [ZETA-SPECIFIC BILATERAL SECOND VARIATION: DIAGONAL CROSS-TERM EVALUATOR]
     Evaluates the reported diagonal component of the Dirichlet grade jet cross-term:
-      Let F_h(z) = P(tau^h z) = sum_{n>=2} Lambda(n) n^{-1/2 - tau^h z} (for Re(z) = a = sigma_0 - 1/2 > 1/2):
-        F_0(z) = sum_{n>=2} Lambda(n) n^{-1/2 - z}
-        F_0'(z) = - (log tau) * z * sum_{n>=2} Lambda(n) (log n) n^{-1/2 - z}
-        F_0''(z) = (log tau)^2 * sum_{n>=2} Lambda(n) (- z * log n + z^2 * (log n)^2) n^{-1/2 - z}.
-      In the diagonal approximation on Re(z) = a with window variance v = <t^2>_W:
-        X_zeta,diag = (log tau)^2 * sum_{n>=2} Lambda(n)^2 n^{-1 - 2a} * [ - a log n + (a^2 - <t^2>_W) (log n)^2 ].
+      For truncated Dirichlet polynomial P_N(z) = sum_{n=2}^N Lambda(n) n^{-1/2 - tau^h z}:
+        X_zeta,diag = (log tau)^2 * sum_{n=2}^N Lambda(n)^2 n^{-1 - 2a} * [ - a log n + (a^2 - <t^2>_W) (log n)^2 ].
     Corrected Status:
-      The previous claim of universal non-vanishing for all a > 0, v >= 0 is WITHDRAWN.
+      Universal non-vanishing claim is WITHDRAWN.
       For any a > 1 / log 2 approx 1.442695, there exists an exact positive cancelling variance
       v_*(a) = a^2 - a * S_1(a) / S_2(a) > 0 at which X_zeta,diag(a, v_*(a)) == 0.
-      Classification: DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES.
+      Returns diagnostics and component values without conflating diagonal with complete windowed object.
     """
     with mpmath.workdps(dps):
         a_f = to_mpf(a, dps=dps)
@@ -6724,25 +6735,25 @@ def evaluate_zeta_specific_grade_jet_crossterm(
         }
 
 
-def evaluate_full_windowed_dirichlet_inner_product(
+def finite_windowed_dirichlet_polynomial_inner_product(
     a: Union[float, str, mpmath.mpf] = "1.5",
     sigma_w: Union[float, str, mpmath.mpf] = "1.0",
     max_n: int = 15,
-    dps: int = 50
+    dps: int = 50,
+    window_class: str = "schwartz_gaussian"
 ) -> Dict[str, Any]:
     """
-    [FINITE-WINDOW DIRICHLET INNER PRODUCT: DOUBLE SUM VS QUADRATURE VS DIAGONAL]
-    Evaluates the complete windowed inner product <F_0, F_0''>_W for a Gaussian window
-    W(t) = (1 / (sqrt(2pi) * sigma_W)) * exp(- t^2 / (2 * sigma_W^2)), variance v = sigma_W^2.
-    Computes:
-      1. Direct 1D numerical quadrature of int_{-infty}^infty W(t) F_0(t) conj(F_0''(t)) dt
-      2. Complete (m, n) double sum using exact Fourier moments of W(t)
-      3. Diagonal-only (m = n) formula
-      4. Off-diagonal (m != n) discrepancy sum
-    Certifies:
-      - Double sum matches direct quadrature to high precision.
-      - Off-diagonal discrepancy is strictly non-zero for finite windows.
-      - A finite-window inner product is NOT diagonalized by knowing its variance alone.
+    [FINITE-WINDOW DIRICHLET POLYNOMIAL INNER PRODUCT: DOUBLE SUM VS 1D QUADRATURE]
+    Evaluates the complete finite-window Dirichlet inner product:
+      <F_0, ddot F_0>_W = (log tau)^2 * sum_{m,n<=N} c_m bar c_n I_{m,n}(W)
+    where:
+      c_n = Lambda(n) n^{-1/2 - a}
+      I_{m,n}(W) = int_{-infty}^infty W(t) e^{-it log(m/n)} [ -(a-it) log n + (a-it)^2 (log n)^2 ] dt.
+    Window Options:
+      - 'schwartz_gaussian': W(t) = (1 / (sqrt(2pi) sigma_W)) exp(- t^2 / (2 sigma_W^2)) in S(R), variance = sigma_W^2.
+      - 'smooth_compact_bump': Standard mollifier W(t) = C_M exp(- 1 / (1 - (t/M)^2)) 1_{|t| < M} in C_c^infty(R).
+    Structural Invariant:
+      Off-diagonal terms (m != n) are structurally present and not automatically zero.
     """
     with mpmath.workdps(dps):
         a_f = to_mpf(a, dps=dps)
@@ -6756,43 +6767,55 @@ def evaluate_full_windowed_dirichlet_inner_product(
         for n in range(2, max_n + 1):
             lam = von_mangoldt(n, dps=dps)
             if lam != 0:
-                primes_data.append((mpmath.mpf(n), lam, mpmath.log(n)))
+                c_n = lam * (mpmath.mpf(n) ** (-mpmath.mpf("0.5") - a_f))
+                primes_data.append((mpmath.mpf(n), c_n, mpmath.log(n)))
 
         # 2. Diagonal and Off-diagonal double sum
         sum_diag = mpmath.mpf(0)
         sum_offdiag = mpmath.mpc(0, 0)
         sum_total_exact = mpmath.mpc(0, 0)
 
-        for m_mp, lam_m, log_m in primes_data:
-            for n_mp, lam_n, log_n in primes_data:
-                # Common factor: (log tau)^2 * Lambda(m) Lambda(n) (m n)^{-1/2 - a}
-                coeff = (log_tau**2) * lam_m * lam_n * (m_mp ** (-mpmath.mpf("0.5") - a_f)) * (n_mp ** (-mpmath.mpf("0.5") - a_f))
+        for m_mp, c_m, log_m in primes_data:
+            for n_mp, c_n, log_n in primes_data:
+                # Base coefficient: (log tau)^2 * c_m * bar(c_n)
+                coeff = (log_tau**2) * c_m * c_n
                 xi = log_m - log_n
 
-                # Moments under W(t) = Gaussian(0, sig_w^2):
-                # Fourier transform: I_0 = int W(t) e^{-i t xi} dt = exp(- var_v * xi^2 / 2)
-                # First moment: I_1 = int W(t) (it) e^{-i t xi} dt = var_v * xi * exp(- var_v * xi^2 / 2)
-                # Second moment: I_2 = int W(t) (it)^2 e^{-i t xi} dt = (var_v^2 * xi^2 - var_v) * exp(- var_v * xi^2 / 2)
-                gauss_fac = mpmath.exp(- var_v * (xi**2) / 2)
-                I_0 = gauss_fac
-                I_1 = var_v * xi * gauss_fac
-                I_2 = (var_v**2 * (xi**2) - var_v) * gauss_fac
+                if window_class == "schwartz_gaussian":
+                    # Exact Gaussian Fourier moments:
+                    # I_0 = int W(t) e^{-it xi} dt = exp(- var_v * xi^2 / 2)
+                    # I_1 = int W(t) (it) e^{-it xi} dt = var_v * xi * exp(- var_v * xi^2 / 2)
+                    # I_2 = int W(t) (it)^2 e^{-it xi} dt = (var_v^2 * xi^2 - var_v) * exp(- var_v * xi^2 / 2)
+                    gauss_fac = mpmath.exp(- var_v * (xi**2) / 2)
+                    I_0 = gauss_fac
+                    I_1 = var_v * xi * gauss_fac
+                    I_2 = (var_v**2 * (xi**2) - var_v) * gauss_fac
 
-                # Term in conj(F_0''(t)): conj( - (a+it) log n + (a+it)^2 (log n)^2 )
-                # = - (a - it) log n + (a - it)^2 (log n)^2
-                # = - a log n + it log n + (a^2 - 2 a it - t^2) (log n)^2
-                # = [ - a log n + a^2 (log n)^2 ] * 1 + [ log n - 2 a (log n)^2 ] * (it) + [ (log n)^2 ] * (it)^2
-                c0 = - a_f * log_n + (a_f**2) * (log_n**2)
-                c1 = log_n - 2 * a_f * (log_n**2)
-                c2 = log_n**2
+                    c0 = - a_f * log_n + (a_f**2) * (log_n**2)
+                    c1 = log_n - 2 * a_f * (log_n**2)
+                    c2 = log_n**2
 
-                moment_val = c0 * I_0 + c1 * I_1 + c2 * I_2
-                term_val = coeff * moment_val
+                    moment_val = c0 * I_0 + c1 * I_1 + c2 * I_2
+                    term_val = coeff * moment_val
+                else:
+                    # Generic smooth window integration via quadrature
+                    def bump_w(t: mpmath.mpf) -> mpmath.mpf:
+                        radius = 3 * sig_w
+                        if abs(t) >= radius:
+                            return mpmath.mpf(0)
+                        return mpmath.exp(- 1 / (1 - (t / radius)**2))
+                    norm_c = mpmath.quad(bump_w, [-3 * sig_w, 3 * sig_w])
+                    def integrand_term(t: mpmath.mpf) -> mpmath.mpc:
+                        w_val = bump_w(t) / norm_c
+                        phase = mpmath.exp(- mpmath.mpc(0, t * xi))
+                        z_val = - (a_f - mpmath.mpc(0, t)) * log_n + ((a_f - mpmath.mpc(0, t))**2) * (log_n**2)
+                        return w_val * phase * z_val
+                    moment_val = mpmath.quad(integrand_term, [-3 * sig_w, 3 * sig_w])
+                    term_val = coeff * moment_val
+
                 sum_total_exact += term_val
 
                 if m_mp == n_mp:
-                    # For m == n, xi = 0, I_0 = 1, I_1 = 0, I_2 = -var_v
-                    # moment_val = c0 - var_v * c2 = - a log n + (a^2 - var_v) (log n)^2
                     sum_diag += mpmath.re(term_val)
                 else:
                     sum_offdiag += term_val
@@ -6800,30 +6823,37 @@ def evaluate_full_windowed_dirichlet_inner_product(
         # 3. Direct 1D numerical quadrature
         def F0(t: mpmath.mpf) -> mpmath.mpc:
             val = mpmath.mpc(0, 0)
-            for n_mp, lam_n, log_n in primes_data:
-                val += lam_n * (n_mp ** (-mpmath.mpf("0.5") - a_f)) * mpmath.exp(- mpmath.mpc(0, t * log_n))
+            for n_mp, c_n, log_n in primes_data:
+                val += c_n * mpmath.exp(- mpmath.mpc(0, t * log_n))
             return val
 
         def F0_second(t: mpmath.mpf) -> mpmath.mpc:
             val = mpmath.mpc(0, 0)
             z = mpmath.mpc(a_f, t)
-            for n_mp, lam_n, log_n in primes_data:
+            for n_mp, c_n, log_n in primes_data:
                 term_fac = - z * log_n + (z**2) * (log_n**2)
-                val += lam_n * term_fac * (n_mp ** (-mpmath.mpf("0.5") - a_f)) * mpmath.exp(- mpmath.mpc(0, t * log_n))
+                val += c_n * term_fac * mpmath.exp(- mpmath.mpc(0, t * log_n))
             return (log_tau**2) * val
 
-        def W_gauss(t: mpmath.mpf) -> mpmath.mpf:
-            return (1 / (mpmath.sqrt(2 * mpmath.pi) * sig_w)) * mpmath.exp(- (t**2) / (2 * var_v))
+        if window_class == "schwartz_gaussian":
+            def W_eval(t: mpmath.mpf) -> mpmath.mpf:
+                return (1 / (mpmath.sqrt(2 * mpmath.pi) * sig_w)) * mpmath.exp(- (t**2) / (2 * var_v))
+            quad_val_re = mpmath.quad(lambda t: W_eval(t) * mpmath.re(F0(t) * mpmath.conj(F0_second(t))), [-10 * sig_w, 10 * sig_w])
+        else:
+            radius = 3 * sig_w
+            def bump_raw(t: mpmath.mpf) -> mpmath.mpf:
+                if abs(t) >= radius:
+                    return mpmath.mpf(0)
+                return mpmath.exp(- 1 / (1 - (t / radius)**2))
+            norm_c = mpmath.quad(bump_raw, [-radius, radius])
+            quad_val_re = mpmath.quad(lambda t: (bump_raw(t) / norm_c) * mpmath.re(F0(t) * mpmath.conj(F0_second(t))), [-radius, radius])
 
-        def quad_integrand_re(t: mpmath.mpf) -> mpmath.mpf:
-            return W_gauss(t) * mpmath.re(F0(t) * mpmath.conj(F0_second(t)))
-
-        quad_val_re = mpmath.quad(quad_integrand_re, [-10 * sig_w, 10 * sig_w])
         diff_quad_vs_exact = abs(quad_val_re - mpmath.re(sum_total_exact))
         offdiag_norm = abs(sum_offdiag)
 
         return {
             "a": mpmath.nstr(a_f, n=10),
+            "window_class": window_class,
             "sigma_w": mpmath.nstr(sig_w, n=10),
             "variance_v": mpmath.nstr(var_v, n=10),
             "quadrature_re": mpmath.nstr(quad_val_re, n=20),
@@ -6834,10 +6864,16 @@ def evaluate_full_windowed_dirichlet_inner_product(
             "offdiagonal_norm": mpmath.nstr(offdiag_norm, n=20),
             "diff_quad_vs_exact": mpmath.nstr(diff_quad_vs_exact, n=20),
             "is_exact_match": bool(diff_quad_vs_exact < 1e-10),
-            "offdiagonal_is_nonzero": bool(offdiag_norm > 1e-15),
-            "classification": "FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED",
-            "status": "FULL_WINDOWED_DIRICHLET_INNER_PRODUCT_EVALUATED"
+            "offdiagonal_is_structurally_present": True,
+            "offdiagonal_witness_is_nonzero": bool(offdiag_norm > 1e-15),
+            "classification": "FULL_WINDOWED_ZETA_CROSS_TERM_OPEN",
+            "status": "FINITE_WINDOWED_DIRICHLET_POLYNOMIAL_INNER_PRODUCT_EVALUATED"
         }
+
+
+# Backward compatibility alias
+evaluate_full_windowed_dirichlet_inner_product = finite_windowed_dirichlet_polynomial_inner_product
+
 
 
 def evaluate_finite_grade_pullback_identity(

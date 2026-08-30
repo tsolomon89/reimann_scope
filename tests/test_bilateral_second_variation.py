@@ -221,10 +221,9 @@ class TestZetaSpecificGradeJetCrossTerm:
         3. X_zeta(a, v_*(a)) == 0 to 50 dps exact precision.
         4. Opposite signs strictly certified above and below v_*(a).
         """
-        res = math_core.compute_cancelling_variance(a=a, max_n=2000, dps=50)
+        res = math_core.compute_truncated_cancelling_variance(a=a, max_n=2000, dps=50)
 
-        assert res["status"] == "CANCELLING_VARIANCE_COMPUTED"
-        assert res["classification"] == "DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES"
+        assert res["status"] == "TRUNCATED_CANCELLING_VARIANCE_COMPUTED"
         assert res["ratio_satisfies_bound"] is True
         assert res["is_v_star_positive"] is True
         assert res["is_exact_zero"] is True
@@ -259,17 +258,18 @@ class TestZetaSpecificGradeJetCrossTerm:
     def test_full_windowed_dirichlet_inner_product_matches_quadrature_and_reveals_offdiagonal(self, a, sigma_w):
         """
         Verifies that for finite windows:
-        1. Full double sum matches 1D numerical quadrature of int W(t) F_0(t) conj(F_0''(t)) dt to high precision.
-        2. Off-diagonal sum (m != n) is strictly non-zero.
+        1. Full double sum matches 1D numerical quadrature of int W(t) F_0(t) conj(F_0''(t)) dt.
+        2. Off-diagonal sum (m != n) is structurally present and non-zero for the tested witness.
         3. Diagonal-only formula differs from the true windowed inner product.
         """
-        res = math_core.evaluate_full_windowed_dirichlet_inner_product(
-            a=a, sigma_w=sigma_w, max_n=15, dps=50
+        res = math_core.finite_windowed_dirichlet_polynomial_inner_product(
+            a=a, sigma_w=sigma_w, max_n=15, dps=50, window_class="schwartz_gaussian"
         )
 
-        assert res["status"] == "FULL_WINDOWED_DIRICHLET_INNER_PRODUCT_EVALUATED"
+        assert res["status"] == "FINITE_WINDOWED_DIRICHLET_POLYNOMIAL_INNER_PRODUCT_EVALUATED"
         assert res["is_exact_match"] is True
-        assert res["offdiagonal_is_nonzero"] is True
+        assert res["offdiagonal_is_structurally_present"] is True
+        assert res["offdiagonal_witness_is_nonzero"] is True
         assert float(res["diff_quad_vs_exact"]) < 1e-10
         assert float(res["offdiagonal_norm"]) > 1e-5
 

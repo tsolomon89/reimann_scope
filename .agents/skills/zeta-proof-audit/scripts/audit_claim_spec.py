@@ -62,11 +62,34 @@ ALLOWED_EPISTEMIC_ROLES = {
 }
 
 
-def audit_claim_specification(spec: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_spec(spec: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalizes field aliases in claim specification."""
+    normalized = dict(spec)
+    if "statement" not in normalized and "mathematical_statement" in normalized:
+        normalized["statement"] = normalized["mathematical_statement"]
+    if "fourier_normalization" not in normalized and "normalization_and_fourier_convention" in normalized:
+        normalized["fourier_normalization"] = normalized["normalization_and_fourier_convention"]
+    if "variable_domains" not in normalized:
+        if "domains" in normalized:
+            normalized["variable_domains"] = normalized["domains"]
+        elif "quantified_variables" in normalized and isinstance(normalized["quantified_variables"], list):
+            domains = []
+            for qv in normalized["quantified_variables"]:
+                if isinstance(qv, dict) and "domain" in qv:
+                    domains.append(qv["domain"])
+                elif isinstance(qv, str):
+                    domains.append(qv)
+            if domains:
+                normalized["variable_domains"] = domains
+    return normalized
+
+
+def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
     """
     Audits a candidate mathematical claim against all 18 schema fields and 10 pre-acceptance gates.
     Returns a dictionary containing 'status': 'PASS' | 'FAIL', 'passed_gates', 'violations', and 'warnings'.
     """
+    spec = normalize_spec(raw_spec)
     violations: List[str] = []
     warnings: List[str] = []
     passed_gates: List[str] = []

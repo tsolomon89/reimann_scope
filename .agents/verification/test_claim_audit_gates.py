@@ -148,3 +148,26 @@ class TestClaimAuditGates:
         res = audit_claim_specification(spec)
         assert res["status"] == "FAIL"
         assert any("Gate 6" in v for v in res["violations"])
+
+    def test_real_repository_claim_clm_ct_022_passes(self):
+        """Test that the actual repository claim specification CLM-CT-022.json passes all 10 gates."""
+        claim_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-CT-022.json")
+        assert os.path.exists(claim_path), f"Claim file {claim_path} must exist"
+        with open(claim_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-CT-022 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
+    def test_real_repository_claim_clm_ct_025_passes(self):
+        """Test that the actual repository claim specification CLM-CT-025.json passes all 10 gates."""
+        claim_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-CT-025.json")
+        assert os.path.exists(claim_path), f"Claim file {claim_path} must exist"
+        with open(claim_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-CT-025 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+

@@ -592,11 +592,17 @@ theorem cancelling_variance_pos_of_log2_bound (a S1 S2 : ℝ)
   have h_log2_pos : 0 < Real.log 2 := Real.log_pos (by norm_num)
   exact cancelling_variance_pos_of_bounds a S1 S2 (Real.log 2) h_log2_pos hS1 h_bound ha
 
-/-- 49. [ALGEBRAIC_IDENTITY] Diagonal and off-diagonal decomposition of a 2x2 matrix sum:
-    (A 0 0 + A 1 1) + (A 0 1 + A 1 0) = A 0 0 + A 0 1 + A 1 0 + A 1 1. -/
-theorem finite_double_sum_2x2_decomp (A00 A01 A10 A11 : ℝ) :
-    (A00 + A11) + (A01 + A10) = A00 + A01 + A10 + A11 := by
-  ring
+/-- 49. [ALGEBRAIC_IDENTITY] General finite diagonal and off-diagonal decomposition over a Finset product:
+    The sum of any bivariate functional f over s ×ˢ s decomposes into the diagonal sum (where p.1 = p.2)
+    and the off-diagonal sum (where p.1 ≠ p.2). -/
+theorem finset_double_sum_diag_offdiag_decomp {α : Type*} [DecidableEq α] (s : Finset α) (f : α × α → ℝ) :
+    (∑ p ∈ (s ×ˢ s).filter (fun p => p.1 = p.2), f p) + (∑ p ∈ (s ×ˢ s).filter (fun p => p.1 ≠ p.2), f p) =
+      ∑ p ∈ s ×ˢ s, f p := by
+  have h_disj : Disjoint ((s ×ˢ s).filter (fun p => p.1 = p.2)) ((s ×ˢ s).filter (fun p => p.1 ≠ p.2)) := by
+    exact Finset.disjoint_filter.mpr (fun _ _ h1 h2 => h2 h1)
+  have h_union : (s ×ˢ s).filter (fun p => p.1 = p.2) ∪ (s ×ˢ s).filter (fun p => p.1 ≠ p.2) = s ×ˢ s := by
+    exact Finset.filter_union_filter_neg_eq (fun p => p.1 = p.2) (s ×ˢ s)
+  rw [← Finset.sum_union h_disj, h_union]
 
 end RiemannScope
 
