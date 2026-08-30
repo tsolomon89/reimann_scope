@@ -32,3 +32,12 @@ When conducting mathematical audits, running experiments, or evaluating new clai
    4. `research/runs/<run_id>/results.jsonl` (only if point-level inspection is needed)
    5. Experiment YAML spec (`research/experiments/*.yaml`)
    6. Source code only to audit a specific metric or canonical engine implementation.
+
+5. **Mandatory Pre-Acceptance Claim Audit Gates (`zeta-proof-audit`)**:
+   Before any mathematical claim can be registered as `PROVED`, `CLOSED`, or `ACCEPTED`:
+   - It must provide a 18-field claim specification complying with `.agents/skills/zeta-proof-audit/SKILL.md`.
+   - It must pass all 10 pre-acceptance gates validated by `.agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py`.
+   - Never classify a prime-only Dirichlet polynomial as "completed zeta" without an explicit completion bridge.
+   - Never assert universal non-vanishing without symbolic elimination / cancellation-case analysis.
+   - Never claim diagonalization of finite-window inner products without rigorous off-diagonal analysis.
+

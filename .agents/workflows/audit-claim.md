@@ -26,7 +26,14 @@ Use `/audit-claim` to submit a mathematical claim, transformation formula, or ca
 1. Run counterexample controls:
    `python .agents/skills/counterexample-suite/scripts/run_counterexamples.py`
 2. Cross-check against [rh_equivalences.md](../skills/circularity-detector/references/rh_equivalences.md).
-3. Assign canonical status label (`Derived lemma`, `Algebraic identity`, `Circular or potentially circular`, `Falsified`, etc.).
+
+### Stage 5: Zeta Proof Audit 10-Gate Validation
+1. Construct the 18-field claim specification conforming to [zeta-proof-audit SKILL.md](../skills/zeta-proof-audit/SKILL.md).
+2. Run the executable gate validator:
+   `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file <path_to_spec.json>`
+3. Ensure all 10 gates pass without violations.
+4. Assign canonical status label (`Derived lemma`, `Algebraic identity`, `Circular or potentially circular`, `Falsified`, `Withdrawn`, etc.).
 
 ## Output Artifact
-Summary audit report with assigned claim-status label and test evidence.
+Summary audit report with assigned claim-status label, 10-gate validation results, and test evidence.
+
