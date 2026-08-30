@@ -4,12 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "fb12926651b00745be668e7a9fc0e84ee2ec42c1",
-  "timestamp": "2026-08-30T07:27:18.011896+00:00",
+  "producing_git_commit": "776bc92b413b87131d3682bf389a95efcb6088ab",
+  "timestamp": "2026-08-30T10:28:11.787300+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 130,
-  "total_theorems": 130,
+  "project_theorem_declarations_compiled": 135,
+  "total_theorems": 135,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "564c68a75f7bf334e082f10b30c15cbe0d898b01db6f064710554ff2228e3955",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -22,7 +22,7 @@
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
     "formal/RiemannScope/ArithmeticBridge.lean": "1b042194e43c2033d1a1b0b830631f65455b4f1b29f28583e9f5110240eca71f",
-    "formal/RiemannScope/CurvatureTransport.lean": "125da2db3b98a5a712b3716966e9d20ea6aec440699b011753bd14273ed42c14"
+    "formal/RiemannScope/CurvatureTransport.lean": "f399392432166a8d60f5d4c10253f35f58c4594a82b0fb9040e0069390758ee1"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
@@ -33,5 +33,5 @@
   },
   "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "9752b95c103416aae2faa11c16f98ab12fe9ab3c29bd94d1cb3b54e4902e5591"
+  "report_hash": "0e66bc85db46cd7885cd76a2eb7bf3d861564890a98af46d80f7914549292211"
 }
