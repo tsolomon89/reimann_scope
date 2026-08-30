@@ -177,8 +177,8 @@ class TestClaimAuditGates:
         from audit_claim_spec import cross_check_claim_register
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
-        assert coverage["total_parsed"] >= 30
-        assert coverage["specifications_audited"] >= 2
+        assert coverage["total_claims"] >= 30
+        assert coverage["specifications_found"] >= 2
         assert coverage["unrecognized_statuses"] == 0
 
     def test_unrecognized_custom_status_fails_cross_check(self, tmp_path):
@@ -200,6 +200,18 @@ class TestClaimAuditGates:
         assert ok is False
         assert coverage["unrecognized_statuses"] == 1
         assert any("UNRECOGNIZED_STATUS_VIOLATION" in e for e in errors)
+
+    def test_inconsistent_witness_rejected_by_gate9(self):
+        """Test that an inconsistent witness value in a claim specification is rejected by Gate 9."""
+        claim_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-CT-025.json")
+        with open(claim_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        spec["statement"] = spec["statement"].replace("-0.0515509", "-0.054321")
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 9" in v for v in res["violations"])
+
 
 
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-025",
-  "statement": "For any finite Dirichlet polynomial F_0(t) = sum_{n<=N} c_n e^{-it log n} with c_n = Lambda(n) n^{-1/2-a} and smooth window W in S(R) or C_c^infty(R), the real grade jet cross-term X_{N,W} = Re <F_0, ddot F_0>_W decomposes into diagonal and off-diagonal sums: X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W), where I_{m,n}(W) = (-a L_n + a^2 L_n^2) hat{W}(xi_{mn}) + i (L_n - 2a L_n^2) hat{tW}(xi_{mn}) - L_n^2 hat{t^2 W}(xi_{mn}), with L_n = log n and xi_{mn} = log(m/n). Finite windows do not force off-diagonal terms to vanish; off-diagonal terms are structurally present and require window-specific certified witnesses.",
+  "statement": "For any finite Dirichlet polynomial F_0(t) = sum_{n<=N} c_n e^{-it log n} with c_n = Lambda(n) n^{-1/2-a} and smooth window W in S(R) or C_c^infty(R), the real grade jet cross-term X_{N,W} = Re <F_0, ddot F_0>_W decomposes into diagonal and off-diagonal sums: X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W), where I_{m,n}(W) = (-a L_n + a^2 L_n^2) hat{W}(xi_{mn}) + i (L_n - 2a L_n^2) hat{tW}(xi_{mn}) - L_n^2 hat{t^2 W}(xi_{mn}), with L_n = log n and xi_{mn} = log(m/n). Finite windows do not force off-diagonal terms to vanish; off-diagonal terms are structurally present and certified non-zero for concrete witness (N=3, a=1.5, sigma_W=1.0: X_diag approx -0.0515509, X_full approx -0.0240200, X_offdiag approx +0.0275309).",
   "quantified_variables": [
     {
       "name": "N",
@@ -35,7 +35,7 @@
   "multiplicity_convention": "Exact coefficient arrays (c_n, log_n)",
   "measure_and_window": "Admissible smooth test window W(t) dt",
   "order_of_limits": "Finite sum N < infinity; 1D integration over real line",
-  "exact_conclusion": "X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W); matches 1D numerical quadrature within certified tolerance; off-diagonal terms are structurally present and not forced to zero by finite window variance",
+  "exact_conclusion": "X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W); matches 1D numerical quadrature within certified tolerance; off-diagonal terms are structurally present and certified non-zero for concrete parameters",
   "logical_negation": "X_{N,W} = (Diagonal sum) for all admissible finite windows W (FALSIFIED: finite windows do not force off-diagonal terms to vanish)",
   "epistemic_role": "ALGEBRAIC_IDENTITY",
   "dependencies": [
@@ -45,7 +45,7 @@
   "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
   "falsification_attempts": [
     "Evaluated 2-term and 4-term Dirichlet polynomials under Schwartz Gaussian and C_c^infty bump windows",
-    "Verified discrepancy |Full - Diag| > 0 against adaptive quadrature for concrete parameter witnesses",
+    "Verified certified discrepancy |Full - Diag| > 0 in Arb for N=3, a=1.5, sigma_W=1.0",
     "Tested that off-diagonal terms vanish only in the infinite Cesaro limit T -> infinity, which is decoupled from finite window variance"
   ],
   "computational_evidence": [
@@ -54,7 +54,7 @@
   "external_sources": [
     {
       "source": "Montgomery & Vaughan (1974), Hilbert's inequality, J. London Math. Soc. (2) 8, 73-82",
-      "theorem": "Theorem 2 (Mean value theorem for Dirichlet polynomials)"
+      "theorem": "Theorem 2 (Mean value bound for Dirichlet polynomials)"
     },
     {
       "source": "Besicovitch (1932), Almost Periodic Functions, Cambridge Univ. Press",

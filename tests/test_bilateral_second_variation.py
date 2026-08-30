@@ -273,6 +273,22 @@ class TestZetaSpecificGradeJetCrossTerm:
         assert float(res["diff_quad_vs_exact"]) < 1e-10
         assert float(res["offdiagonal_norm"]) > 1e-5
 
+    def test_exact_gaussian_witness_values_n3(self):
+        """
+        Verifies the exact certified witness values for N=3, a=1.5, sigma_w=1.0:
+        X_diag    ≈ -0.0515508953402482
+        X_full    ≈ -0.0240200424303253
+        X_offdiag ≈ +0.0275308529099229
+        """
+        res = math_core.finite_windowed_dirichlet_polynomial_inner_product(
+            a="1.5", sigma_w="1.0", max_n=3, dps=50, window_class="schwartz_gaussian"
+        )
+        assert abs(float(res["diagonal_sum_re"]) - (-0.0515508953402482)) < 1e-12
+        assert abs(float(res["double_sum_re"]) - (-0.0240200424303253)) < 1e-12
+        assert abs(float(res["offdiagonal_sum_re"]) - (0.0275308529099229)) < 1e-12
+        assert abs(float(res["quadrature_re"]) - float(res["double_sum_re"])) < 1e-12
+
+
 
 
 class TestFiniteGradePullbackIdentity:
