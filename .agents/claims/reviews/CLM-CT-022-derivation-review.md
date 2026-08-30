@@ -1,8 +1,15 @@
-# Independent Derivation Review: CLM-CT-022
+# Mathematical Audit Review: CLM-CT-022 (Derivation Facet)
 
 - **Claim ID**: `CLM-CT-022`
 - **Claim Title**: Diagonal Cross-Term Exact Cancelling Variances
-- **Reviewer Role**: Independent Derivation Workstream
+- **Review Facet**: Exact Analytical & Symbolic Derivation
+- **Audit Session Provenance**:
+  - *Session ID*: `8196eb63-c434-4dc2-8180-cfbeb4bf00be`
+  - *Start SHA*: `3306315edaeb6934f57c28e97cf864bbe6cd92d0`
+  - *Target Commit*: `79c1cb849925232d3080ffba0b26cfdf3a67732a`
+  - *Inherited Context*: `MATH_CONTRACT.md`, `CURVATURE_TRANSPORT.md`, `.agents/claims/CLM-CT-022.json`
+  - *Tools Used*: SymPy 1.12, Lean 4.14.0 (Mathlib)
+  - *Cross-Facet Visibility*: Conducted under independent algebraic derivation rules without assuming numerical outputs.
 
 ## 1. Object Derivation from Definitions
 

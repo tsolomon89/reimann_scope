@@ -62,14 +62,14 @@ def run_check_fast() -> int:
                 claim_errors += 1
 
         # Cross-check claim_register.md against .agents/claims/
-        ok, reg_errors, reg_passed = audit_claim_spec.cross_check_claim_register(REPO_ROOT)
+        ok, reg_errors, reg_passed, coverage = audit_claim_spec.cross_check_claim_register(REPO_ROOT)
         if not ok:
             print("[FAIL] Claim register cross-check failed:")
             for re in reg_errors:
                 print(f"  - {re}")
             claim_errors += len(reg_errors)
         else:
-            print(f"[PASS] Claim register cross-check verified {len(reg_passed)} claims against audited specifications.")
+            print(f"[PASS] Claim register cross-check verified {coverage['total_parsed']} register claims ({coverage['specifications_audited']} audited specs, {coverage['open_exempt']} open/exempt, {coverage['unrecognized_statuses']} unrecognized).")
     elif not claim_files:
         print("[INFO] No machine-readable claim specifications in .agents/claims/ (skipping).")
 

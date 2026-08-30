@@ -6623,11 +6623,29 @@ def compute_truncated_cancelling_variance(
         v_star = a_f**2 - a_f * ratio
         is_v_star_pos = bool(v_star > 0)
 
-        # Truncation tail estimates (power-logarithmic in N)
+        # Truncation tail estimates (complete integration by parts for sum_{n > N} Lambda(n)^2 n^{-1-2a} (log n)^k)
+        # Using Lambda(n) <= log n, the summand is bounded by (log x)^{k+2} x^{-1-2a}.
+        # For S_1 (k=1, exponent 3): int_N^infty (log x)^3 x^{-1-b} dx = (N^{-b}/b) * [ (log N)^3 + 3(log N)^2/b + 6(log N)/b^2 + 6/b^3 ]
+        # For S_2 (k=2, exponent 4): int_N^infty (log x)^4 x^{-1-b} dx = (N^{-b}/b) * [ (log N)^4 + 4(log N)^3/b + 12(log N)^2/b^2 + 24(log N)/b^3 + 24/b^4 ]
+        # where b = 2a.
         n_cutoff = mpmath.mpf(max_n)
         log_cutoff = mpmath.log(n_cutoff)
-        tail_bound_s1 = ((log_cutoff**3) * (n_cutoff ** (-2 * a_f))) / (2 * a_f)
-        tail_bound_s2 = ((log_cutoff**4) * (n_cutoff ** (-2 * a_f))) / (2 * a_f)
+        b_val = 2 * a_f
+
+        # S1 tail integral
+        tail_poly_s1 = (log_cutoff**3) + (3 * (log_cutoff**2) / b_val) + (6 * log_cutoff / (b_val**2)) + (6 / (b_val**3))
+        tail_bound_s1 = (n_cutoff ** (-b_val) / b_val) * tail_poly_s1
+
+        # S2 tail integral
+        tail_poly_s2 = (log_cutoff**4) + (4 * (log_cutoff**3) / b_val) + (12 * (log_cutoff**2) / (b_val**2)) + (24 * log_cutoff / (b_val**3)) + (24 / (b_val**4))
+        tail_bound_s2 = (n_cutoff ** (-b_val) / b_val) * tail_poly_s2
+
+        # Discrete monotonicity check: f_k(x) is decreasing for x >= exp(k / (1 + 2a))
+        # For max_n >= 2000 and a >= 0.5, exp(4 / 2) = e^2 ~ 7.39 <= 2000, so integral is a valid upper bound for the tail sum.
+        if n_cutoff < mpmath.exp(4 / (1 + b_val)):
+            # Add first discrete term as conservative bound
+            tail_bound_s1 += ((log_cutoff + 1)**3) * ((n_cutoff + 1) ** (-1 - b_val))
+            tail_bound_s2 += ((log_cutoff + 1)**4) * ((n_cutoff + 1) ** (-1 - b_val))
 
         # Truncated evaluation at v_star:
         x_at_vstar = (log_tau**2) * ((a_f**2 - v_star) * s2 - a_f * s1)

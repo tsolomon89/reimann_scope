@@ -175,8 +175,31 @@ class TestClaimAuditGates:
         """Test that cross_check_claim_register verifies the repository claim register."""
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         from audit_claim_spec import cross_check_claim_register
-        ok, errors, passed = cross_check_claim_register(repo_root)
+        ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
-        assert len(passed) >= 2
+        assert coverage["total_parsed"] >= 30
+        assert coverage["specifications_audited"] >= 2
+        assert coverage["unrecognized_statuses"] == 0
+
+    def test_unrecognized_custom_status_fails_cross_check(self, tmp_path):
+        """Test that an unrecognized status in claim register is strictly rejected as a bypass attempt."""
+        from audit_claim_spec import cross_check_claim_register
+        mock_agents_dir = tmp_path / ".agents"
+        mock_corpus = mock_agents_dir / "corpus_map"
+        mock_corpus.mkdir(parents=True)
+        mock_claims = mock_agents_dir / "claims"
+        mock_claims.mkdir(parents=True)
+
+        mock_reg = mock_corpus / "claim_register.md"
+        mock_reg.write_text(
+            "# Register\n| `CLM-FAKE-001` | Fake claim | Layer | CUSTOM_BYPASS_STATUS | doc | target |\n",
+            encoding="utf-8"
+        )
+
+        ok, errors, passed, coverage = cross_check_claim_register(str(tmp_path))
+        assert ok is False
+        assert coverage["unrecognized_statuses"] == 1
+        assert any("UNRECOGNIZED_STATUS_VIOLATION" in e for e in errors)
+
 
 
