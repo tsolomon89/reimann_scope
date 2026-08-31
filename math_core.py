@@ -7139,7 +7139,7 @@ def certify_fixed_gaussian_completed_xi_crossterm(
     """
     try:
         import flint
-        from flint import arb, acb, ctx
+        from flint import arb, acb, acb_series, arb_series, ctx
         ctx.dps = dps
 
         a_arb = arb(str(a))
