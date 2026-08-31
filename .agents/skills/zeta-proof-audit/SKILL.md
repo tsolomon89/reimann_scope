@@ -9,14 +9,15 @@ This skill provides an audit framework to ensure mathematical claims in the repo
 
 ## 1. Claim Specification Schema
 
-Every consequential mathematical claim proposed in this repository must provide an exact JSON or YAML claim specification containing all 18 mandatory fields:
+Every consequential mathematical claim proposed in this repository must provide an exact JSON claim specification containing all 19 mandatory fields:
 
 ```json
 {
+  "schema_version": "1.0.0",
   "claim_id": "CLM-...",
   "statement": "Exact mathematical proposition in LaTeX",
-  "quantified_variables": ["List of all bound and free variables"],
-  "variable_domains": {"var": "exact mathematical domain"},
+  "quantified_variables": [{"name": "var", "domain": "exact mathematical domain", "description": "text"}],
+  "variable_domains": ["exact mathematical domain"],
   "hypotheses": ["Explicit list of every hypothesis and condition"],
   "object_studied": "Precise mathematical object (e.g., prime-only Dirichlet series P(z), completed xi-function \\xi(s), windowed L^2 inner product)",
   "fourier_normalization": "Fourier transform convention (e.g. \\widehat f(\\xi) = \\int f(t) e^{-it\\xi} dt)",
@@ -26,17 +27,27 @@ Every consequential mathematical claim proposed in this repository must provide 
   "exact_conclusion": "Strict mathematical conclusion",
   "logical_negation": "Exact logical negation \\neg (conclusion)",
   "epistemic_role": "ALGEBRAIC_IDENTITY | FINITE_ANALYTIC_COMPONENT | LOAD_BEARING_ANALYTIC_THEOREM | NO_GO_COMPONENT | COUNTERMODEL | HEURISTIC",
+  "evidence_scope": "FORMAL_LEAN_PROOF | EXTERNAL_ANALYTIC_PROOF | FINITE_EXACT_ALGEBRA | CERTIFIED_POINT_WITNESS | CERTIFIED_GRID_SAMPLING | ASYMPTOTIC_LIMIT_WITNESS | HEURISTIC_APPROXIMATION | NO_GO_FOR_DEFINED_CLASS | OPEN_PROGRAMME_HYPOTHESIS | COUNTEREXAMPLE",
+  "exact_or_truncated": "EXACT | TRUNCATED",
+  "arithmetic_cutoff": "NONE | integer cutoff",
+  "spectral_cutoff": "NONE | real cutoff",
+  "integration_domain": "R | [-T, T] | finite interval",
+  "omitted_tail": "NONE | REAL_LINE_GAUSSIAN_TAIL | DIRICHLET_TAIL",
+  "tail_enclosure": "NONE | description of certified tail bound",
   "dependencies": ["List of upstream claims, lemmas, and external theorems"],
   "proof_artifact": "Path to Lean formalization, SymPy script, or certified derivation",
   "falsification_attempts": ["Summary of adversarial checks, counterexamples, boundary limits, and zero-crossings tested"],
   "computational_evidence": ["Arb ball enclosures, mpmath evaluations, regression test paths"],
-  "external_sources": [{"source": "Citation", "theorem": "Thm number/page", "statement": "Text", "hypotheses_map": "Mapping to repo"}],
+  "external_sources": [{"source": "Citation", "theorem": "Thm number/page"}],
   "remaining_analytic_dependencies": ["List of unproved analytical obligations required for global validity"]
 }
 ```
 
 > [!CRITICAL]
 > **Object-Identity Rule**: The `object_studied` field strictly forbids renaming or substituting mathematical objects without an explicit theorem. For example, a Dirichlet polynomial $P(z) = \sum_{n \le N} \Lambda(n) n^{-1/2-z}$ or prime-only series may **never** be labeled as "the completed Riemann zeta function" $\xi(s)$ without explicitly restoring the gamma factor, pole terms, and proving convergence.
+
+> [!IMPORTANT]
+> **Evidence-Semantic Rule**: Evidence determines classification; classification never determines expected evidence. Point evaluations cannot prove universal non-vanishing across open sets, finite algebra cannot certify infinite convergence, and numerical errors cannot be derived from internal decomposition residuals.
 
 ---
 

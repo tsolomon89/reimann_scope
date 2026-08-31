@@ -357,3 +357,228 @@ class TestClaimAuditGates:
         assert ok_real is True
         assert cov_real["legacy_unaudited_terminal_claims"] == 78
         assert cov_real["audited_terminal_claims"] == 6
+
+
+class TestAdversarialAuditGates:
+    """Mandatory adversarial test suite verifying fail-closed audit rejection of all 15 failure modes."""
+
+    def _base_valid_spec(self):
+        return {
+            "claim_id": "CLM-ADV-TEST",
+            "statement": "Tested mathematical property for fixed instance a = 1.5.",
+            "quantified_variables": ["a = 1.5"],
+            "variable_domains": ["a in Real, a = 1.5"],
+            "hypotheses": ["P(s) = sum Lambda(n) n^{-s}"],
+            "object_studied": "Fixed instance Dirichlet series evaluation",
+            "fourier_normalization": "Centered coordinates z = a + it",
+            "multiplicity_convention": "Standard arithmetic weights",
+            "measure_and_window": "Canonical Gaussian window W(t)",
+            "order_of_limits": "Derivative before summation",
+            "exact_conclusion": "Tested property holds for fixed instance",
+            "logical_negation": "Tested property fails for fixed instance",
+            "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+            "evidence_scope": "CERTIFIED_POINT_WITNESS",
+            "exact_or_truncated": "EXACT",
+            "arithmetic_cutoff": "NONE",
+            "spectral_cutoff": "NONE",
+            "integration_domain": "R",
+            "omitted_tail": "NONE",
+            "tail_enclosure": "NONE",
+            "dependencies": ["Standard analysis"],
+            "proof_artifact": "math_core.py",
+            "falsification_attempts": [
+                "Tested boundary asymptotic limits",
+                "Equality-case root analysis performed"
+            ],
+            "computational_evidence": ["Arb certified interval [0.0239, 0.0240] excluding zero"],
+            "external_sources": [{"source": "Edwards (1974)", "theorem": "Chapter 1"}],
+            "remaining_analytic_dependencies": []
+        }
+
+    def test_adv_1_fake_arb_certificate_with_floats_rejected(self):
+        """1. Fake Arb certificate made from floats is rejected by Gate 8."""
+        spec = self._base_valid_spec()
+        spec["computational_evidence"] = ["fake_arb: float(midpoint)=0.0239, float(radius)=1e-12"]
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 8" in v for v in res["violations"])
+
+    def test_adv_2_finite_prime_truncation_labelled_exact_completed_xi_rejected(self):
+        """2. Finite prime truncation labelled exact completed xi without certified tail is rejected by Gate 1."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "Exact completed xi logarithmic derivative cross term evaluates to 0.0239."
+        spec["exact_or_truncated"] = "TRUNCATED"
+        spec["arithmetic_cutoff"] = "N=500"
+        spec["tail_enclosure"] = "NONE"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 1" in v for v in res["violations"])
+
+    def test_adv_3_integral_over_compact_without_realline_tail_rejected(self):
+        """3. Integral over [-T, T] without a real-line tail enclosure is rejected by Gate 1."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "Real-line integral int_{R} W(t) f(t) dt evaluates to strictly positive interval."
+        spec["integration_domain"] = "[-10.0, 10.0]"
+        spec["omitted_tail"] = "NONE"
+        spec["tail_enclosure"] = "NONE"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 1" in v for v in res["violations"])
+
+    def test_adv_4_nine_grid_positivity_promoted_to_universal_rejected(self):
+        """4. Positivity at 9 grid points promoted to universal 'for all parameters' is rejected by Gate 2."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "For all a >= 1.0 and for all sigma_W in [0.5, 2.0], cross term is strictly positive throughout."
+        spec["quantified_variables"] = ["forall a in [1.0, 2.0]", "forall sigma_W in [0.5, 2.0]"]
+        spec["evidence_scope"] = "FINITE_GRID_NUMERICAL"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 2" in v for v in res["violations"])
+
+    def test_adv_5_point_witness_promoted_to_no_root_exists_rejected(self):
+        """5. Point witness promoted to 'no root exists on interval' is rejected by Gate 2."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "No root exists across the parameter domain [1.0, 2.0] and cross term is always nonzero."
+        spec["evidence_scope"] = "CERTIFIED_POINT_WITNESS"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 2" in v for v in res["violations"])
+
+    def test_adv_6_finite_lean_identity_promoted_to_infinite_analytic_theorem_rejected(self):
+        """6. Finite Lean identity promoted to infinite analytic double sum theorem is rejected by Gate 10."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "The infinite double sum converges to the continuous 1D quadrature on R."
+        spec["evidence_scope"] = "FORMAL_LEAN_PROOF"
+        spec["proof_artifact"] = "formal/RiemannScope/CurvatureTransport.lean (finset_double_sum_diag_offdiag_decomp)"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 10" in v for v in res["violations"])
+
+    def test_adv_7_decomposition_residual_used_as_numerical_error_rejected(self):
+        """7. Decomposition residual (|I_direct - I_sum|) used as numerical quadrature error is rejected by Gate 8."""
+        spec = self._base_valid_spec()
+        spec["computational_evidence"] = ["residual_as_error: radius = abs(I_direct - I_sum)"]
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 8" in v for v in res["violations"])
+
+    def test_adv_8_hardcoded_all_branches_eliminated_rejected(self):
+        """8. Hardcoded evaluator all_branches_eliminated = True is rejected by Gate 9."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "Entire bilateral route closed across all candidate branches."
+        spec["epistemic_role"] = "NO_GO_COMPONENT"
+        spec["evidence_scope"] = "NO_GO_FOR_DEFINED_CLASS"
+        spec["computational_evidence"] = ["evaluate_bilateral_branch_elimination_summary: all_branches_eliminated = True"]
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 9" in v for v in res["violations"])
+
+    def test_adv_9_hardcoded_distinct_viable_paths_count_rejected(self):
+        """9. Hardcoded distinct_viable_paths_count = 1 without structural isomorphism map is rejected by Gate 9."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "All 5 spectral routes are mutually isomorphic proof paths."
+        spec["computational_evidence"] = ["distinct_viable_paths_count = 1"]
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 9" in v for v in res["violations"])
+
+    def test_adv_10_shared_zero_sets_promoted_to_functional_isomorphism_rejected(self):
+        """10. Shared zero sets promoted to functional isomorphism without explicit bijection is rejected by Gate 9."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "Functional isomorphism between RDQ and Curvature Transport based on zero sets."
+        spec["computational_evidence"] = ["distinct_viable_paths_count = 1"]
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 9" in v for v in res["violations"])
+
+    def test_adv_11_no_falsification_attempts_rejected(self):
+        """11. Mere presence of boilerplate review without falsification attempts is rejected by Gate 9."""
+        spec = self._base_valid_spec()
+        spec["falsification_attempts"] = []
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 9" in v for v in res["violations"])
+
+    def test_adv_12_no_go_without_defined_exhaustive_class_rejected(self):
+        """12. No-go claim without a defined exhaustive candidate class is rejected by Gate 10."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "No bilateral grade construction of any form can succeed."
+        spec["exact_conclusion"] = "Bilateral route closed."
+        spec["epistemic_role"] = "NO_GO_COMPONENT"
+        spec["evidence_scope"] = "NO_GO_FOR_DEFINED_CLASS"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 10" in v for v in res["violations"])
+
+    def test_adv_13_omitted_positive_terms_in_tail_bound_rejected(self):
+        """13. Omitted positive terms in asserted integral tail bound is rejected by Gate 7."""
+        spec = self._base_valid_spec()
+        spec["hypotheses"] = ["tail bound: int_N^infty log(x)^2 x^{-sigma} dx"]
+        spec["falsification_attempts"] = ["Audit noted omitted positive integration-by-parts terms in tail bound"]
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 7" in v for v in res["violations"])
+
+    def test_adv_14_finite_algebra_promoted_to_infinite_convergence_rejected(self):
+        """14. Finite exact algebra claiming infinite convergence is rejected by Gate 2."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "Infinite double series convergence theorem."
+        spec["evidence_scope"] = "FINITE_EXACT_ALGEBRA"
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 2" in v for v in res["violations"])
+
+    def test_adv_15_universal_nonvanishing_without_equality_case_rejected(self):
+        """15. Universal nonvanishing claim without equality-case analysis is rejected by Gate 4."""
+        spec = self._base_valid_spec()
+        spec["statement"] = "For all a >= 1.0, cross term is always nonzero (\\ne 0)."
+        spec["evidence_scope"] = "EXTERNAL_ANALYTIC_PROOF"
+        spec["falsification_attempts"] = ["Evaluated boundary limit as a -> infty"]  # No equality/root analysis
+        res = audit_claim_specification(spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 4" in v for v in res["violations"])
+
+    def test_adv_16_reproduced_previous_crossterm_false_certification_rejected(self):
+        """16. Exact reproduction of previous false-certification structure in evaluate_completed_xi_grade_jet_crossterm is rejected."""
+        reproduced_false_spec = {
+            "claim_id": "CLM-CT-027-OLD-FALSE",
+            "statement": "Under canonical Gaussian window W in S(R), X_{xi, W} is strictly positive and non-zero across all tested (a, sigma_W) in [1.0, 2.0] x [0.5, 2.0] and certified strictly positive in Arb ball arithmetic throughout.",
+            "quantified_variables": [
+                {"name": "a", "domain": "a in Real, a >= 1.0"},
+                {"name": "sigma_w", "domain": "sigma_w in Real, 0.5 <= sigma_w <= 2.0"}
+            ],
+            "variable_domains": ["a in Real, a >= 1.0", "sigma_w in Real, 0.5 <= sigma_w <= 2.0"],
+            "hypotheses": [
+                "G(s) = -xi'/xi(s) = A(s) + P(s)",
+                "P(s) truncated at max_n=500 without omitted tail bound",
+                "integration on [-10, 10] without omitted Gaussian tail"
+            ],
+            "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W}",
+            "fourier_normalization": "Centered coordinates z = a + it",
+            "multiplicity_convention": "Standard arithmetic weights",
+            "measure_and_window": "Canonical Gaussian window",
+            "order_of_limits": "1D numerical quadrature on R with Arb interval error bounds",
+            "exact_conclusion": "X_{xi, W} > 0 on entire test grid; exact cancellation does not occur",
+            "logical_negation": "X_{xi, W} = 0 identically for canonical Gaussian window",
+            "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+            "evidence_scope": "FINITE_GRID_NUMERICAL",  # 9-point grid promoted to universal interval non-vanishing
+            "exact_or_truncated": "TRUNCATED",
+            "arithmetic_cutoff": "N=500",
+            "spectral_cutoff": "NONE",
+            "integration_domain": "[-10.0, 10.0]",
+            "omitted_tail": "NONE",
+            "tail_enclosure": "NONE",
+            "dependencies": ["Completion bridge theorem"],
+            "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+            "falsification_attempts": ["Evaluated 4-block decomposition agreement to 50 dps"],
+            "computational_evidence": ["residual_as_error: diff_direct_vs_sum < 1e-50"],
+            "external_sources": [{"source": "Edwards (1974)", "theorem": "Chapter 1"}],
+            "remaining_analytic_dependencies": []
+        }
+
+        res = audit_claim_specification(reproduced_false_spec)
+        assert res["status"] == "FAIL"
+        # Must fail Gate 1 (truncated without tail enclosure), Gate 2 (grid promoted to universal), Gate 8 (residual as error)
+        assert any("Gate 1" in v for v in res["violations"])
+        assert any("Gate 2" in v for v in res["violations"])
+        assert any("Gate 8" in v for v in res["violations"])

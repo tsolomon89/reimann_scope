@@ -1,29 +1,33 @@
 # Derivation Review for Claim CLM-CT-029
 
-**Claim ID**: `CLM-CT-029`  
-**Reviewer Role**: Agent A — Derivation  
-**Date**: August 30, 2026  
+**Claim ID**: `CLM-CT-029`
+**Reviewer Role**: Agent A — Spectral Formulation Mapping & Arithmetic Obligations
+**Status**: `SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS`
+**Date**: August 31, 2026 (Audit Repair Sprint)
 
-## Mathematical Derivation & Route Reconciliation
+> [!NOTE]
+> **Historical Provenance Note**: This review supersedes the August 30, 2026 review. The claim establishes that the five spectral zero-rigidity representations in the repository share the exact critical-line spectral zero set, while maintaining distinct arithmetic representations and unproved arithmetic descent obligations without functional route isomorphism.
 
-1. **Spectral Isomorphism of Zero-Rigid Quantities**:
-   All 5 surviving routes in the repository evaluate quadratic defect quantities of the form:
-   $$\mathcal{E}_{\text{spec}} = \sum_{\rho} w_\rho \Psi(\delta_\rho),$$
-   where $w_\rho > 0$, $\Psi(\delta) \ge 0$, and $\Psi(\delta) = 0 \iff \delta = 0$:
-   - **RDQ**: $\operatorname{Tr}\mathcal{R} = \sum_{\rho} \frac{\delta_\rho^2}{\gamma_\rho^2}$ ($w_\rho = 1/\gamma_\rho^2, \Psi(\delta) = \delta^2$).
-   - **Curvature Transport**: $\mathscr{K}_\tau(\rho) = \sum_{\rho} \delta_\rho^2$ ($w_\rho = 1, \Psi(\delta) = \delta^2$).
-   - **Weil-Hermitian**: $\mathcal{D}_{\text{WH}}(\rho) = \sum_{\rho} \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2}$ ($w_\rho = \frac{2}{|\rho|^2|1-\rho|^2}, \Psi(\delta) = \delta^2$).
-   - **CMSA**: Gate G4 regularized quadratic response $\Delta S_W = \sum_\rho w_\rho \delta_\rho^2$.
-   - **Sesquilinear Form**: Fibre curvature $M_K''(0) = 2 \sum_{\gamma} |a_K|^2 N_\gamma \sum_a \delta_{\gamma,a}^2$.
+## Mathematical Mapping & Master Obligation
 
-2. **Formal Unification in Lean 4**:
-   Formally proved in `formal/RiemannScope/CurvatureTransport.lean` (`master_radial_defect_unification` and `finite_positive_weight_curvature_rigidity`):
-   $$\sum_{j} w_j d_j = 0 \iff \forall j, d_j = 0 \quad (w_j > 0, d_j \ge 0).$$
-   Thus, vanishing of any one of these spectral representations is strictly equivalent to the vanishing of all others and equivalent to $\mathrm{RH}$.
+1. **Five Spectral Zero-Rigidity Formulations**:
+   - **Radial-Defect Quotient (RDQ)**: $\operatorname{Tr}(R) = \sum_\rho \frac{\delta_\rho^2}{\gamma_\rho^2}$.
+   - **Curvature Transport**: $\frac{\mathcal B_\rho''(0)}{2(\log\tau)^2} = \delta_\rho^2$.
+   - **Weil-Hermitian Involution Defect**: $\operatorname{Defect}(\rho) = \frac{2\delta_\rho^2}{|\rho|^2|1-\rho|^2}$.
+   - **CMSA Resolvent Response**: $\Delta Z_\sigma(z) = \frac{2\delta_\rho^2}{(z-i\gamma)((z-i\gamma)^2-\delta^2)}$.
+   - **Fibre Sesquilinear Form**: $\mathcal M_K''(0) = 2N_\gamma \sum_\rho \delta_\rho^2$.
 
-3. **Master Obstruction**:
-   None of these five routes provides an arithmetic calculation that evaluates to 0 without using the zero list.
-   They all share the exact same missing arithmetic obligation:
-   $$\text{OBL-RADIAL-DEFECT-DESCENT}: \quad \text{Prove } \mathcal{A}_{\text{arith}} = 0 \text{ from prime/functional equation data alone}.$$
+2. **Shared Spectral Zero Set**:
+   All 5 formulations satisfy the same zero-rigidity equivalence on the spectral side:
+   $$\sum_j w_j \delta_j^2 = 0 \iff \forall j, \delta_j = 0 \iff \zeta(s) \text{ has no off-line zeros in the critical strip}.$$
+   The spectral zero set $\{ \rho \in \mathbb{C} : \zeta(\rho) = 0 \}$ is identical across all 5 representations.
 
-**Conclusion**: Exactly ONE viable radial descent branch remains (`ONE_VIABLE_RADIAL_DESCENT_BRANCH_REMAINS`).
+3. **Distinct Arithmetic Representations & Unproved Obligations**:
+   While their spectral vanishing conditions are equivalent, their arithmetic representations differ:
+   - RDQ couples to finite-difference prime trace sums.
+   - Curvature Transport couples to windowed grade jet cross-terms $\langle G_0, \ddot G_0\rangle_W$.
+   - Weil-Hermitian defect couples to the global explicit formula distribution $W_{\text{prime}}(f * f^*)$.
+   - CMSA couples to integrated quartet resolvent integrals.
+   None of these five spectral representations autonomously computes $\mathcal A_{\text{arith}} = 0$. All five remain dependent on the single Master Arithmetic Descent Obligation `OBL-RADIAL-DEFECT-DESCENT`.
+
+**Assigned Classification**: `SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS`.

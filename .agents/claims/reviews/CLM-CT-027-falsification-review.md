@@ -1,28 +1,34 @@
 # Falsification Review for Claim CLM-CT-027
 
-**Claim ID**: `CLM-CT-027`  
-**Reviewer Role**: Agent B — Falsification  
-**Date**: August 30, 2026  
+**Claim ID**: `CLM-CT-027`
+**Reviewer Role**: Agent B — Adversarial Falsification & Replay Audit
+**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO`
+**Date**: August 31, 2026 (Audit Repair Sprint)
 
-## Adversarial Stress Testing & Cancellation Analysis
+## Adversarial Audit & Independent Certificate Replay
 
-1. **Attempted Zero-Crossing Search**:
-   Tested whether there exists a canonical parameter point $(a, \sigma_W)$ with $a \ge 1.0, \sigma_W \in [0.5, 2.0]$ where $\mathfrak X_{\xi, W} = 0$:
-   - $(a=1.0, \sigma=0.5): \mathfrak X_{\xi, W} \approx +0.008921 > 0$
-   - $(a=1.0, \sigma=1.0): \mathfrak X_{\xi, W} \approx +0.014657 > 0$
-   - $(a=1.0, \sigma=2.0): \mathfrak X_{\xi, W} \approx +0.042799 > 0$
-   - $(a=1.5, \sigma=0.5): \mathfrak X_{\xi, W} \approx +0.017473 > 0$
-   - $(a=1.5, \sigma=1.0): \mathfrak X_{\xi, W} \approx +0.023932 > 0$
-   - $(a=1.5, \sigma=2.0): \mathfrak X_{\xi, W} \approx +0.050686 > 0$
-   - $(a=2.0, \sigma=0.5): \mathfrak X_{\xi, W} \approx +0.028879 > 0$
-   - $(a=2.0, \sigma=1.0): \mathfrak X_{\xi, W} \approx +0.034510 > 0$
-   - $(a=2.0, \sigma=2.0): \mathfrak X_{\xi, W} \approx +0.061126 > 0$
-   No zero crossings occur in the entire tested canonical parameter region; $\mathfrak X_{\xi, W}$ remains strictly positive.
+1. **Certificate Replay Audit**:
+   Executed standalone replay script:
+   ```bash
+   python scripts/verify_crossterm_certificate.py
+   ```
+   - Path 1 (Direct Cauchy contour on completed $\xi$): Enclosure $[0.023172204, 0.023172227]$, $0 \notin I_1$.
+     - Quadrature error derived from Simpson $M_4 \le 0.05$: $\le 1.14 \times 10^{-8}$.
+     - Real-line tail derived from envelope $38.4 t^2 + 6 t^3$: $\le 7.16 \times 10^{-12}$.
+   - Path 2 (Decomposed $A+P$ via finite Dirichlet sum $N=50000$ with $L^2(W)$ tail bound): Enclosure $[0.0209073, 0.0254375]$, $0 \notin I_2$.
+     - Dirichlet tail independently bounded via $L^2(W)$ majorants $J_4(N, 4)$ and $J_6(N, 4)$: $\le 0.002265$.
+   - Intersection: $[0.023172204, 0.023172227] \ne \emptyset$.
+   - Certificate verified at `.agents/claims/certificates/CLM-CT-027-certificate.json`.
 
-2. **Arb Ball Certification**:
-   Using interval ball enclosures, the sign of $\mathfrak X_{\xi, W}$ at $(a=1.5, \sigma_W=1.0)$ is certified strictly positive with radius $< 10^{-12}$, proving that zero is excluded beyond machine precision.
+2. **Block Cancellation & Root Absence Audit**:
+   - Evaluated 4-block values: $I_{PP} \approx +3.2646$, $I_{PA} \approx -3.2857$, $I_{AP} \approx -3.4233$, $I_{AA} \approx +3.4676$.
+   - The Archimedean components $I_{AA} + I_{PA} + I_{AP}$ do not cancel the prime component $I_{PP}$ to zero.
+   - The net sum $I_{\text{total}} \approx +0.02317 > 0$ is strictly positive.
+   - Verified that no real root of the cross-term integrand or integral exists at $(a = 1.5, \sigma_W = 1.0)$.
 
-3. **Check for Pole Cancellation Artifacts**:
-   The apparent singularities at $s=0, 1$ cancel in $\xi(s)$, and $A(s)$ includes the rational terms $-1/s - 1/(s-1)$ which correctly represent the logarithmic derivative of $\frac{1}{2}s(s-1)$. No surviving poles remain in the right half-plane $\Re(s) > 1$.
+3. **Gaussian Tail Enclosure Audit**:
+   - The compact quadrature is evaluated on $[-8.0, 8.0]$.
+   - For $|t| > 8$, $\frac{1}{\sqrt{2\pi}} \int_{8}^\infty e^{-t^2/2} (38.4 t^2 + 6 t^3) dt \le 7.16 \times 10^{-12}$.
+   - The tail error is accounted for in the certified ball enclosure.
 
-**Conclusion**: The claim that canonical completed-$\xi$ cross-terms fail to cancel ($\mathfrak X_{\xi, W} \ne 0$) is sound, robust, and verified.
+**Falsification Outcome**: Zero is strictly excluded from $\mathfrak X_{\xi, W}$ for this fixed instance. Exact cancellation is falsified.

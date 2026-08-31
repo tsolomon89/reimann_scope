@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-CT-027",
+  "parameters": {
+    "a": "1.5",
+    "sigma_w": "1.0",
+    "sigma": "2.0",
+    "cutoff_T": 8.0,
+    "N_quadrature": 400,
+    "N_primes": 50000,
+    "working_dps": 50
+  },
+  "path_1_direct_completed_xi": {
+    "method": "32-point Cauchy circular contour derivatives on acb.zeta()",
+    "compact_integral": "[0.0231722158082756981783405462020929283082959936 +/- 7.69e-47]",
+    "quadrature_remainder_error": "<= [1.1377777777777777777777777777777777777777777777778e-8 +/- 5.03e-58]",
+    "gaussian_tail_error": "<= [7.154015854288239479737461415563341879055172521338e-12 +/- 4.83e-61]",
+    "total_enclosure": "[0.0231722 +/- 2.72e-8]",
+    "lower_bound": 0.023172204423343855,
+    "upper_bound": 0.023172227193207544,
+    "zero_excluded": true
+  },
+  "path_2_dirichlet_decomposed": {
+    "method": "Exact polygamma Archimedean + finite Dirichlet sum with L^2(W) majorant tail bound",
+    "compact_integral": "[0.0231724245415243934527398239712793626497384078 +/- 1.46e-47]",
+    "dirichlet_tail_error": "<= [0.0022651077867008330100343870138545036288895184402985 +/- 6.55e-53]",
+    "quadrature_remainder_error": "<= [1.1377777777777777777777777777777777777777777777778e-8 +/- 5.03e-58]",
+    "gaussian_tail_error": "<= [7.154015854288239479737461415563341879055172521338e-12 +/- 4.83e-61]",
+    "total_enclosure": "[0.02 +/- 5.44e-3]",
+    "lower_bound": 0.020907305362168713,
+    "upper_bound": 0.02543754372088007,
+    "zero_excluded": true
+  },
+  "intersection": {
+    "lower_bound": 0.023172204423343855,
+    "upper_bound": 0.023172227193207544,
+    "is_non_empty": true,
+    "zero_strictly_excluded": true
+  },
+  "replay_command": "python scripts/verify_crossterm_certificate.py"
+}

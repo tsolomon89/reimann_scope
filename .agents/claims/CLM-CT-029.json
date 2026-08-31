@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-029",
-  "statement": "The five surviving zero-rigid spectral research routes in the repository — (1) Radial-Defect Quotient (RDQ: Tr R = sum delta^2 / gamma^2), (2) Curvature Transport (B_rho''(0) / (2 (log tau)^2) = delta^2), (3) Pointwise Weil-Hermitian Involution Defect (2 delta^2 / (|rho|^2 |1-rho|^2)), (4) Completed Mean-Square Anchor (CMSA: Delta Z_sigma resolvent response), and (5) Fibre Sesquilinear Form (M_K''(0) = 2 N_gamma sum delta^2) — are mutually isomorphic spectral representations of zero-rigidity (sum w_j delta_j^2 = 0 <=> all delta_j = 0). None of them provide the independent arithmetic evaluation A_{arith} = 0. They consolidate into exactly ONE genuinely distinct viable radial descent path (ONE_VIABLE_RADIAL_DESCENT_BRANCH_REMAINS) governed by the single shared Master Obligation OBL-RADIAL-DEFECT-DESCENT.",
+  "statement": "The five zero-rigid spectral research formulations in the repository — (1) Radial-Defect Quotient (RDQ: Tr R = sum delta^2 / gamma^2), (2) Curvature Transport (B_rho''(0) / (2 (log tau)^2) = delta^2), (3) Pointwise Weil-Hermitian Involution Defect (2 delta^2 / (|rho|^2 |1-rho|^2)), (4) Completed Mean-Square Anchor (CMSA: Delta Z_sigma resolvent response), and (5) Fibre Sesquilinear Form (M_K''(0) = 2 N_gamma sum delta^2) — share the exact critical-line spectral zero set {rho in C : zeta(rho) = 0} (SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS), but maintain distinct arithmetic representations and unproved arithmetic descent obligations without functional route isomorphism.",
   "quantified_variables": [
     {
       "name": "route",
       "domain": "route in {RDQ, CurvatureTransport, WeilHermitian, CMSA, Sesquilinear}",
-      "description": "Candidate spectral zero-rigidity route"
+      "description": "Spectral zero-rigidity formulation"
     }
   ],
   "variable_domains": [
@@ -20,26 +20,33 @@
     "Sesquilinear fibre curvature rigidity: M_K''(0) = 0 <=> RH (CLM-SS-002)",
     "Arithmetic Input Firewall enforced across all routes (CLM-ARB-009)"
   ],
-  "object_studied": "Global repository proof-path graph and master arithmetic descent obligation",
+  "object_studied": "Spectral zero-rigidity formulations and remaining arithmetic descent obligations",
   "fourier_normalization": "Standard centered coordinates z = a + it; tau = 2pi; spectral weights w_rho > 0",
   "multiplicity_convention": "Exact algebraic zero multiplicities and reflection pairs included",
   "measure_and_window": "Admissible regularized test functions and spectral measures",
   "order_of_limits": "Spectral sum over nontrivial zeros paired with arithmetic Dirichlet/Gamma evaluations",
-  "exact_conclusion": "The 5 candidate routes are not five distinct independent proof paths, but 5 spectral representations of the single master obligation OBL-RADIAL-DEFECT-DESCENT; exactly ONE viable radial descent research branch remains.",
-  "logical_negation": "At least two of the five routes possess genuinely distinct remaining mathematical obstacles beyond the arithmetic vanishing of a divisor-independent radial defect functional (FALSIFIED by spectral isomorphism and formal unification theorem)",
-  "epistemic_role": "LOAD_BEARING_ANALYTIC_THEOREM",
+  "exact_conclusion": "The 5 formulations share the same spectral zero set but possess distinct arithmetic descent obligations; they map to the shared Master Obligation OBL-RADIAL-DEFECT-DESCENT (SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS).",
+  "logical_negation": "The five routes have different spectral zero sets or represent completely solved arithmetic descent paths (FALSIFIED by explicit spectral zero set equality and open arithmetic descent obligations)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
   "dependencies": [
     "Lean 4: master_radial_defect_unification",
     "Lean 4: finite_positive_weight_curvature_rigidity",
     "math_core.py: reconcile_surviving_radial_descent_routes"
   ],
-  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean (algebra) and math_core.py (mapping)",
   "falsification_attempts": [
     "Tested whether any candidate route could compute A_{arith} = 0 without invoking the Euler product or RH (none can)",
     "Tested whether any route possesses an arithmetic anchor that avoids the Master Obligation (all require OBL-RADIAL-DEFECT-DESCENT)",
     "Audited whether Weil-Hermitian route can be proven positive without circular Weil positivity assumption (requires full explicit formula arithmetic evaluation)",
-    "Formally proved equivalence of zero-rigidity vanishing across all representations in Lean 4",
-    "Audited boundary asymptotic dominance across all 5 defect representations as gamma -> infinity and delta -> 0"
+    "Audited boundary asymptotic dominance across all 5 defect representations as gamma -> infinity and delta -> 0",
+    "Equality-case analysis: all 5 defect invariants vanish simultaneously if and only if all delta_rho = 0"
   ],
   "computational_evidence": [
     "tests/test_bilateral_second_variation.py: TestMasterRadialDescentRouteReconciliation"
@@ -54,5 +61,7 @@
       "theorem": "Chapter IX & XIV (Explicit formulas, zero density, and equivalences)"
     }
   ],
-  "remaining_analytic_dependencies": []
+  "remaining_analytic_dependencies": [
+    "Autonomous arithmetic evaluation of defect functional A_{arith} (OBL-RADIAL-DEFECT-DESCENT)"
+  ]
 }

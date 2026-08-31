@@ -1,50 +1,56 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-028",
-  "statement": "The entire bilateral grade dilation route to an arithmetic proof of the Riemann Hypothesis is closed (BILATERAL_GRADE_ROUTE_CLOSED) across all four canonical branches: (1) Static Common-Frame: fails cross-term cancellation with X_{xi, W} > 0 strictly under canonical windows (FAIL_COMPLETED_XI_CROSS_TERM_CANCELLATION); (2) Fully Grade-Covariant Pullback: exhibits exact asymptotic coordinate redundancy lim_{T->infty} C_{h,T} = 0 due to dilation isometry (FAIL_GRADE_COORDINATE_REDUNDANCY); (3) Window-Tuning: root cancellation v_*(a) is post-hoc spectral/background-dependent and fails independent arithmetic selection (FAIL_POSTHOC_WINDOW_TUNING); (4) Scale Specificity: dilation centering holds for arbitrary base q > 1 and does not specifically select tau = 2pi (SCALE_GENERIC_NOT_TAU_SPECIFIC).",
+  "statement": "For the defined candidate class of bilateral grade dilation constructions, the fixed canonical Gaussian common-frame instance at displacement a = 1.5 is closed (FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED) because its cross-term is certified strictly positive X_{xi, W} in [0.023172204, 0.023172227] > 0 and its quadratic variation coefficient V_2 / (2 (log tau)^2) = 2 a^2 int W(t) |g'(t)|^2 dt - Re int W(t) (1 - t^2 - iat) g(t) conj((t - ia) g'(t)) dt > 0 is strictly positive, failing arithmetic zero descent. Whole-class closure for general non-canonical or untuned window families remains open (BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN).",
   "quantified_variables": [
     {
-      "name": "branch",
-      "domain": "branch in {CommonFrame, CovariantPullback, WindowTuning, ScaleSpecificity}",
-      "description": "Canonical bilateral grade branch formulation"
+      "name": "instance",
+      "domain": "instance = CanonicalGaussianInstance(a=1.5, sigma_W=1.0)",
+      "description": "Fixed candidate instance in the defined bilateral grade class"
     }
   ],
   "variable_domains": [
-    "branch in {CommonFrame, CovariantPullback, WindowTuning, ScaleSpecificity}"
+    "instance in DefinedBilateralCandidateClass"
   ],
   "hypotheses": [
-    "Static common-frame evaluates X_{xi, W} on fixed probability window W",
-    "Covariant pullback evaluates C_{h,T} = M_{0, tau^h T} + M_{0, tau^{-h} T} - 2 M_{0,T}",
-    "Window-tuning solves v_*(a) such that X_{diag}(a, v_*(a)) = 0",
-    "Scale specificity tests dilation centering under general base q > 1"
+    "Fixed canonical Gaussian window W(t) = 1/sqrt(2pi) exp(-t^2/2) at a = 1.5",
+    "G(s) = -xi'/xi(s) = A(s) + P(s)",
+    "Certified non-zero cross-term X_{xi, W} > 0 from CLM-CT-027",
+    "Positive norm term 2 a^2 int W |g'|^2 dt > 0",
+    "Weighted-adjoint identity: ||L_a g||_W^2 + Re<L_{a,W}^* g, L_a g>_W = 2 a^2 int W |g'|^2 dt - Re int W (1 - t^2 - iat) g conj((t - ia) g') dt"
   ],
-  "object_studied": "Canonical bilateral grade dilation route and candidate branch space",
-  "fourier_normalization": "Centered coordinates z = a + it; tau = 2pi; base q > 1",
+  "object_studied": "Fixed canonical Gaussian candidate instance of bilateral grade dilation route",
+  "fourier_normalization": "Centered coordinates z = 1.5 + it; tau = 2pi",
   "multiplicity_convention": "All zero multiplicities and background components included",
-  "measure_and_window": "Admissible probability windows and scale transformations on R",
-  "order_of_limits": "Evaluation of finite-T vs infinite-T, finite-N vs infinite-N, and grade variation h -> 0",
-  "exact_conclusion": "Every canonical bilateral grade branch fails at an exact identified gate; no untested normalization, frame, or arithmetically defined window remains viable within the bilateral candidate class; BILATERAL_GRADE_ROUTE_CLOSED holds.",
-  "logical_negation": "At least one canonical bilateral grade branch produces an arithmetic zero descent with strictly positive radial defect spectral expansion (FALSIFIED by exhaustive 4-branch gate failure matrix)",
+  "measure_and_window": "Canonical standard Gaussian probability window on R",
+  "order_of_limits": "Evaluation of finite parameter instance with certified Arb interval enclosures",
+  "exact_conclusion": "The fixed canonical Gaussian instance fails arithmetic zero descent (V_2 > 0), closing this candidate instance (FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED); whole-class closure for arbitrary Schwartz windows remains an open classification (BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN).",
+  "logical_negation": "The fixed canonical Gaussian instance achieves exact arithmetic zero descent V_2 = 0 (FALSIFIED by certified positive variation V_2 > 0)",
   "epistemic_role": "NO_GO_COMPONENT",
+  "evidence_scope": "NO_GO_FOR_DEFINED_CLASS",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
   "dependencies": [
-    "CLM-CT-022 (Diagonal cancelling variances)",
-    "CLM-CT-023 (Scale genericity)",
-    "CLM-CT-024 (Pullback coordinate redundancy)",
-    "CLM-CT-025 (Off-diagonal structural presence)",
     "CLM-CT-026 (Infinite prime window identity)",
-    "CLM-CT-027 (Completed xi cross-term non-vanishing)",
-    "math_core.py: evaluate_bilateral_branch_elimination_summary"
+    "CLM-CT-027 (Completed xi cross-term certified positive)",
+    "math_core.py: evaluate_bilateral_second_variation_and_spectral_expansion",
+    "math_core.py: evaluate_weighted_adjoint_differential_operator_analysis"
   ],
-  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "proof_artifact": "math_core.py (evaluate_bilateral_branch_elimination_summary and certified enclosures)",
   "falsification_attempts": [
-    "Audited whether an untested window class in C_c^infty(R) could be uniquely forced by the Euler product (none exists)",
-    "Audited whether non-trivial Fourier resonances for tau = 2pi could create arithmetic rigidity (none found; scale-generic)",
-    "Tested whether asymptotic coordinate redundancy can be bypassed without breaking dilation covariance (no-go)",
-    "Verified that total variation coeff V_2 = 2(||dot G_0||^2 + X_{xi, W}) is strictly positive (+0.09445 > 0 at a=1.5)"
+    "Audited whether positive norm term ||dot G_0||^2 could cancel negative cross-term (cross-term is certified positive, eliminating cancellation)",
+    "Derived weighted-adjoint operator L_{a,W}^* = -(t+ia) d/dt + t^2 + iat - 1 proving non-vanishing of coupling integral",
+    "Tested parameter variation over grid (a, sigma_W) confirming persistent positivity",
+    "Evaluated boundary asymptotic dominance and tail limits as a -> infinity and sigma_W -> 0",
+    "Equality-case analysis: V_2 = 0 requires exact eigenfunction alignment which fails for G = -xi'/xi"
   ],
   "computational_evidence": [
     "tests/test_bilateral_second_variation.py: TestBilateralBranchEliminationSummary",
-    "tests/test_bilateral_second_variation.py: TestBilateralSecondVariationSpectralExpansion"
+    "tests/test_bilateral_second_variation.py: TestWeightedAdjointDifferentialOperatorAnalysis"
   ],
   "external_sources": [
     {
@@ -57,6 +63,6 @@
     }
   ],
   "remaining_analytic_dependencies": [
-    "Reconciliation with surviving non-bilateral spectral routes (resolved in CLM-CT-029)"
+    "Exhaustive candidate class classification for arbitrary non-Gaussian Schwartz windows (remains open)"
   ]
 }

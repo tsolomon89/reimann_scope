@@ -352,7 +352,7 @@ class TestAdmissibleProbeRegularizationClassification:
 
 
 class TestInfinitePrimeWindowedDirichletSeries:
-    """Verifies the infinite prime-window Dirichlet series inner product theorem, summability, and tail bounds."""
+    """Verifies the infinite prime-window Dirichlet series inner product theorem, summability, and complete tail bounds."""
 
     @pytest.mark.parametrize("a,max_n", [
         ("1.2", 30),
@@ -366,9 +366,24 @@ class TestInfinitePrimeWindowedDirichletSeries:
 
         assert res["status"] == "INFINITE_PRIME_WINDOWED_DIRICHLET_SERIES_EVALUATED"
         assert res["is_convergent"] is True
-        assert res["classification"] == "PROVED_INFINITE_PRIME_WINDOW_IDENTITY"
         assert float(res["tail_bound_analytic"]) > 0.0
         assert float(res["diff_trunc_vs_continuous"]) < float(res["tail_bound_analytic"]) * 2.0
+
+
+class TestCertifiedFixedGaussianCompletedXiCrossTerm:
+    """Verifies genuine Arb certified interval enclosure for fixed Gaussian instance (a=1.5, sigma_W=1.0)."""
+
+    def test_arb_certified_enclosure_excludes_zero(self):
+        res = math_core.certify_fixed_gaussian_completed_xi_crossterm(
+            a="1.5", sigma_w="1.0", T=8.0, N_quad=400, dps=50
+        )
+
+        assert res["flint_certified"] is True
+        assert res["zero_excluded"] is True
+        assert res["is_strictly_positive"] is True
+        assert float(res["lower_bound"]) > 0.0230
+        assert float(res["upper_bound"]) < 0.0233
+        assert res["compact_domain"] == "[-8.0, 8.0]"
 
 
 class TestCompletedXiGradeJetCrossTerm:
@@ -387,10 +402,25 @@ class TestCompletedXiGradeJetCrossTerm:
         assert res["status"] == "COMPLETED_XI_GRADE_JET_CROSSTERM_EVALUATED"
         assert res["is_decomposition_exact"] is True
         assert res["is_strictly_positive"] is True
-        assert res["arb_certified_positive"] is True
-        assert res["classification"] == "FAIL_COMPLETED_XI_CROSS_TERM_CANCELLATION"
         assert float(res["diff_direct_vs_sum"]) < 1e-15
         assert float(res["I_direct"]) > 0.0
+        if a == "1.5" and sigma_w == "1.0":
+            assert res["arb_certification"]["zero_excluded"] is True
+
+
+class TestWeightedAdjointDifferentialOperatorAnalysis:
+    """Verifies weighted-adjoint differential operator identities for L_a = (t-ia) d/dt."""
+
+    def test_weighted_adjoint_identities(self):
+        res = math_core.evaluate_weighted_adjoint_differential_operator_analysis(
+            a="1.5", sigma_w="1.0", dps=50
+        )
+
+        assert res["status"] == "WEIGHTED_ADJOINT_ANALYSIS_VERIFIED"
+        assert float(res["norm_La_G_sq"]) > 0.0
+        assert "L_{a,W}^* = -(t + ia) d/dt - (1 + (W'/W)(t + ia))" in res["weighted_adjoint_formula"]
+        assert "2 a^2 int W(t) |g'(t)|^2 dt" in res["second_variation_adjoint_identity"]
+        assert float(res["two_a_sq_gprime_integral"]) > 0.0
 
 
 class TestBilateralSecondVariationSpectralExpansion:
@@ -403,31 +433,28 @@ class TestBilateralSecondVariationSpectralExpansion:
         assert res["is_V2_positive"] is True
         assert res["is_V2_zero"] is False
         assert res["arithmetic_firewall_passed"] is True
-        assert res["classification"] == "BILATERAL_GRADE_ROUTE_CLOSED"
         assert float(res["bilateral_second_variation_coeff_V2"]) > 0.0
 
 
 class TestBilateralBranchEliminationSummary:
-    """Verifies that all 4 canonical bilateral branches are eliminated and classified."""
+    """Verifies candidate bilateral branch instances summary."""
 
     def test_branch_elimination_matrix(self):
         res = math_core.evaluate_bilateral_branch_elimination_summary(dps=50)
 
-        assert res["status"] == "BILATERAL_BRANCH_ELIMINATION_COMPLETE"
-        assert res["all_branches_eliminated"] is True
-        assert res["classification"] == "BILATERAL_GRADE_ROUTE_CLOSED"
-        assert res["terminal_outcome"] == "Outcome B — Bilateral Route Completely Closed"
-        assert len(res["branches"]) == 4
+        assert res["status"] == "BILATERAL_BRANCH_SUMMARY_COMPILED"
+        assert res["fixed_gaussian_common_frame_instance_closed"] is True
+        assert res["bilateral_grade_route_class_closure_open"] is True
+        assert len(res["audited_instances"]) == 4
 
 
 class TestMasterRadialDescentRouteReconciliation:
-    """Verifies reconciliation of all 5 zero-rigid spectral routes around OBL-RADIAL-DEFECT-DESCENT."""
+    """Verifies mapping of all 5 zero-rigid spectral routes around OBL-RADIAL-DEFECT-DESCENT."""
 
     def test_route_reconciliation_and_single_obligation(self):
         res = math_core.reconcile_surviving_radial_descent_routes(dps=50)
 
-        assert res["status"] == "RADIAL_DESCENT_ROUTES_RECONCILED"
-        assert res["distinct_viable_paths_count"] == 1
+        assert res["status"] == "RADIAL_DESCENT_ROUTES_MAPPED"
         assert res["shared_master_obligation"] == "OBL-RADIAL-DEFECT-DESCENT"
-        assert res["classification"] == "ONE_VIABLE_RADIAL_DESCENT_BRANCH_REMAINS"
+        assert res["shared_property"] == "SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS"
         assert len(res["routes"]) == 5
