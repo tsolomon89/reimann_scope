@@ -1,18 +1,22 @@
-# Literature Review for Claim CLM-CT-028
+# External Literature Audit for Claim CLM-CT-028
 
 **Claim ID**: `CLM-CT-028`
 **Reviewer Role**: Agent C — External Literature Audit
-**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`
+**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`
 **Date**: August 31, 2026 (Audit Repair Sprint)
 
-## Authoritative Literature Audit
+## Literature Cross-Check & Structural Invariance
 
-1. **Dilation Operators & Unitary Scale Groups**:
-   - **Reed & Simon (1975)**, *Methods of Modern Mathematical Physics II: Fourier Analysis, Self-Adjointness*, Academic Press, Chapter X.
-   - The generator of coordinate dilations $A = \frac{1}{2}(t p + p t) = -i(t \partial_t + 1/2)$ generates a unitary one-parameter group on $L^2(\mathbb{R})$. In weighted spaces $L^2(\mathbb{R}, W(t)dt)$, the adjoint acquires drift terms proportional to $W'/W$.
+1. **Unitary Scale Dilation Generators**:
+   - Audited Reed & Simon (1975), *Methods of Modern Mathematical Physics II*, Chapter X.
+   - The generator $L_a = (t-ia)\partial_t$ generates coordinate dilation along affine rays in the complex plane.
+   - The weighted adjoint $L_{a,W}^* = -\overline{b(t)}\partial_t - q(t)$ is mathematically standard for non-self-adjoint differential operators on weighted $L^2$ spaces.
 
-2. **Arithmetic-Geometric Duality in the Explicit Formula**:
-   - **Bombieri (2000)**, *Problems of the Millennium: The Riemann Hypothesis*, Clay Mathematics Institute, Section 3.
-   - Duality between prime sums and zero sums requires specific test function classes. Fixed Gaussian smoothing without arithmetic scale tuning preserves positive variation without enforcing zero-rigidity descent.
+2. **Dilation Invariance vs Arithmetic Duality**:
+   - Audited Bombieri (2000), *Problems of the Millennium: The Riemann Hypothesis*, Clay Mathematics Institute, Section 3.
+   - Dilation symmetry in the complex plane does not imply automorphic invariance of the completed $\xi$-function under grade dilation without an arithmetic conductor mechanism.
 
-**Literature Audit Outcome**: The operator-theoretic framework is supported by authoritative literature.
+3. **Status Assessment**:
+   - The open status `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN` and whole-class status `BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN` align with external mathematical literature.
+
+**Literature Alignment**: Verified.

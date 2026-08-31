@@ -2,11 +2,11 @@
 
 **Claim ID**: `CLM-CT-028`
 **Reviewer Role**: Agent A — Operator Adjoint & Instance Closure
-**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`
+**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`
 **Date**: August 31, 2026 (Audit Repair Sprint)
 
 > [!NOTE]
-> **Historical Provenance Note**: This review supersedes the August 30, 2026 review. The claim distinguishes the closure of the fixed canonical Gaussian common-frame candidate instance from the open status of whole-class closure across arbitrary Schwartz window families.
+> **Historical Provenance Note**: This review supersedes the previous review. Because `CLM-CT-027` remains `CERTIFIED_POINT_WITNESS_PENDING` without a complete two-sided interval excluding zero, the fixed candidate instance remains open: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN` / `BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN`.
 
 ## Mathematical Derivation & Weighted-Adjoint Operator
 
@@ -29,12 +29,9 @@
    Combining the norm and adjoint terms:
    $$\|L_a g\|_W^2 + \Re\langle L_{a,W}^* g, L_a g\rangle_W = 2a^2 \int_{\mathbb R} W(t) |g'(t)|^2 dt - \Re \int_{\mathbb R} W(t) (1 - t^2 - iat) g(t) \overline{(t - ia) g'(t)} dt.$$
 
-4. **Instance Closure & Scope Distinction**:
-   - At the fixed instance $(a = 1.5, \sigma_W = 1.0)$:
-     - The cross-term is certified strictly positive: $\mathfrak X_{\xi, W} \in [0.023172204, 0.023172227] > 0$.
-     - The norm term is strictly positive: $2a^2 \int W |g'|^2 dt \approx 0.04658 > 0$.
-     - The total second variation coefficient is strictly positive: $\mathcal V_2 \approx 0.09445 > 0$.
-   - Therefore, arithmetic zero descent ($\mathcal V_2 = 0$) fails for this fixed candidate instance, closing it: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`.
+4. **Instance Scope & Open Classification**:
+   - At the fixed instance $(a = 1.5, \sigma_W = 1.0)$, numerical evidence strongly indicates $\mathfrak X_{\xi, W} > 0$ and $\mathcal V_2 > 0$.
+   - However, because formal certification of `CLM-CT-027` remains pending (`CERTIFIED_POINT_WITNESS_PENDING`), terminal closure cannot be certified: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`.
    - General non-canonical or untuned window families are not closed by this single instance witness; whole-class status remains `BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN`.
 
-**Assigned Classification**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`.
+**Assigned Classification**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`.

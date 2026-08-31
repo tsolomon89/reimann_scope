@@ -377,10 +377,20 @@ def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
                 "while open analytic dependencies remain unproved."
             )
 
+    # Check 10D: Dependency Semantic Validity (Pending Premise -> Terminal Claim rejection)
+    is_terminal_role = role in {"NO_GO_COMPONENT", "LOAD_BEARING_ANALYTIC_THEOREM", "ALGEBRAIC_IDENTITY"}
+    is_terminal_assertion = ("closed" in conc.lower() or "proved" in conc.lower() or "falsified" in conc.lower()) and not ("open" in conc.lower() or "pending" in conc.lower())
+    if is_terminal_role or is_terminal_assertion:
+        for dep in spec.get("dependencies", []):
+            dep_str = str(dep).lower()
+            if "pending" in dep_str or "unproved" in dep_str or "open" in dep_str:
+                violations.append(
+                    f"Gate 10 [Dependency Semantic Validity] VIOLATION: Claim asserts terminal closure/proof, "
+                    f"but depends on pending premise '{dep}'."
+                )
+
     if not any("Gate 10" in v for v in violations):
         passed_gates.append("Gate 10: Evidence Classification Audit")
-
-
 
     status = "FAIL" if violations else "PASS"
     return {
@@ -398,10 +408,17 @@ ALLOWED_STATUSES = {
     "PROVED / EXACT",
     "PROVED / FORMALLY_PROVED",
     "PROVED / THEORETICAL_IDENTITY",
-    "PROVED / FALSIFIED LOCAL GNS",
-    "PROVED / FALSIFIED NAIVE PROBE",
-    "PROVED / EMPIRICALLY_CONFIRMED",
-    "NO_GO_COMPONENT / PROVED",
+    "PROVED / ASYMPTOTIC_THEOREM",
+    "PROVED / PROVED_UNDER_HYPOTHESIS",
+    "PROVED / EMPIRICAL_EXACT_MATCH",
+    "RETAINED (EMPIRICAL 80-DPS) / NUMERICAL_VALIDATION",
+    "PROVED / ANALYTIC_APPROXIMATION",
+    "PROVED / ASYMPTOTIC_BOUND",
+    "DIAGONAL_CROSS_TERM_HAS_EXACT_CANCELLING_VARIANCES",
+    "FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED",
+    "KNOWN_RH_EQUIVALENCE",
+    "INTERNALLY_REDERIVED",
+    "PROVED SPECTRAL EQUIVALENCE",
     "OPEN / CONJECTURED (RH)",
     "OPEN / FORMALIZATION_PENDING",
     "DISPROVED / FALSIFIED",
@@ -412,6 +429,7 @@ ALLOWED_STATUSES = {
     "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE",
     "CERTIFIED_POINT_WITNESS_PENDING",
     "BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN",
+    "FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN",
     "FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED",
     "SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS",
     "INCONCLUSIVE_WITH_PRECISE_EARLIEST_OPEN_SUBGATE"
@@ -447,6 +465,7 @@ KNOWN_EXEMPT_PATTERNS = [
     "CANDIDATE",
     "CERTIFIED_POINT_WITNESS_PENDING",
     "BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN",
+    "FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN",
 ]
 
 

@@ -224,10 +224,10 @@ class TestClaimAuditGates:
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
         assert coverage["total_claims"] == 92
-        assert coverage["terminal_claims"] == 84
-        assert coverage["audited_terminal_claims"] == 6
+        assert coverage["terminal_claims"] == 83
+        assert coverage["audited_terminal_claims"] == 5
         assert coverage["legacy_unaudited_terminal_claims"] == 78
-        assert coverage["open_or_exempt_claims"] == 8
+        assert coverage["open_or_exempt_claims"] == 9
         assert coverage["missing_specifications"] == 0
         assert coverage["unrecognized_statuses"] == 0
         # Strict coverage arithmetic
@@ -356,7 +356,7 @@ class TestClaimAuditGates:
         ok_real, errors_real, passed_real, cov_real = cross_check_claim_register(repo_root, verify_git_baseline=True)
         assert ok_real is True
         assert cov_real["legacy_unaudited_terminal_claims"] == 78
-        assert cov_real["audited_terminal_claims"] == 6
+        assert cov_real["audited_terminal_claims"] == 5
 
 
 class TestAdversarialAuditGates:
@@ -582,3 +582,37 @@ class TestAdversarialAuditGates:
         assert any("Gate 1" in v for v in res["violations"])
         assert any("Gate 2" in v for v in res["violations"])
         assert any("Gate 8" in v for v in res["violations"])
+
+    def test_adv_17_pending_premise_for_terminal_dependent_claim_rejected(self):
+        """17. Claim asserting terminal closure or proof based on a pending/open premise is rejected by Gate 10."""
+        premise_pending_spec = {
+            "claim_id": "CLM-CT-FAKE-TERMINAL",
+            "statement": "The entire bilateral candidate class is proved closed based on pending cross-term certification.",
+            "quantified_variables": [
+                {"name": "class", "domain": "DefinedBilateralClass"}
+            ],
+            "variable_domains": ["DefinedBilateralClass"],
+            "hypotheses": ["Candidate class construction"],
+            "object_studied": "Bilateral candidate class closure",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Gaussian",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "The entire candidate class is closed (CLOSED)",
+            "logical_negation": "The candidate class remains viable",
+            "epistemic_role": "NO_GO_COMPONENT",
+            "evidence_scope": "NO_GO_FOR_DEFINED_CLASS",
+            "exact_or_truncated": "EXACT",
+            "integration_domain": "R",
+            "dependencies": [
+                "CLM-CT-027 (Completed xi cross-term positive numerical evidence, certified point witness pending)"
+            ],
+            "proof_artifact": "math_core.py",
+            "falsification_attempts": ["Tested window variation"],
+            "computational_evidence": ["test_runner"],
+            "external_sources": [{"source": "Edwards (1974)", "theorem": "Chapter 1"}]
+        }
+
+        res = audit_claim_specification(premise_pending_spec)
+        assert res["status"] == "FAIL"
+        assert any("Gate 10 [Dependency Semantic Validity]" in v for v in res["violations"])

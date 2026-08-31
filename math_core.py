@@ -7492,7 +7492,7 @@ def evaluate_weighted_adjoint_differential_operator_analysis(
             "weighted_adjoint_formula": "L_{a,W}^* = -(t + ia) d/dt - (1 + (W'/W)(t + ia))",
             "gaussian_adjoint_formula": "L_{a,W}^* = -(t + ia) d/dt + sigma_W^{-2} t^2 + i a sigma_W^{-2} t - 1",
             "second_variation_adjoint_identity": "||L_a g||_W^2 + Re<L_{a,W}^* g, L_a g>_W = 2 a^2 int W(t) |g'(t)|^2 dt - Re int W(t) (1 + (W'/W)(t + ia)) g(t) conj((t - ia) g'(t)) dt",
-            "obstruction": "Identical cancellation requires W'/W = -1 / (t + ia), which has complex poles and cannot be satisfied by any real probability measure.",
+            "weighted_adjoint_structure": "Vanishing of the variation requires balancing 2 a^2 int W |g'|^2 dt against the integrated coupling term Re int W (1 + (W'/W)(t + ia)) g conj((t-ia)g') dt.",
             "status": "WEIGHTED_ADJOINT_ANALYSIS_VERIFIED"
         }
 
@@ -7573,8 +7573,8 @@ def evaluate_bilateral_branch_elimination_summary(dps: int = 50) -> Dict[str, An
         "instance_1_fixed_canonical_gaussian": {
             "name": "Fixed Canonical Gaussian Common-Frame Cross-Term",
             "tested_object": "Re <G_0, ddot G_0>_W with G = -xi'/xi at (a=1.5, sigma_W=1.0)",
-            "outcome": "Certified strictly positive enclosure X_{xi, W} in [0.0230522, 0.0232922], excluding zero",
-            "status": "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO"
+            "outcome": "Positive numerical evidence for X_{xi, W} with certified point witness pending",
+            "status": "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE"
         },
         "instance_2_covariant_pullback": {
             "name": "Fully Grade-Covariant Pullback",
@@ -7598,7 +7598,7 @@ def evaluate_bilateral_branch_elimination_summary(dps: int = 50) -> Dict[str, An
 
     return {
         "audited_instances": instances,
-        "fixed_gaussian_common_frame_instance_closed": True,
+        "fixed_gaussian_common_frame_instance_open": True,
         "bilateral_grade_route_class_closure_open": True,
         "status": "BILATERAL_BRANCH_SUMMARY_COMPILED"
     }
