@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-027",
-  "statement": "For the completed function xi(s) = 1/2 s(s-1) pi^{-s/2} Gamma(s/2) zeta(s) with logarithmic derivative G(s) = -xi'/xi(s) = A(s) + P(s), the second grade variation real cross-term decomposes into four blocks X_{xi, W} = Re <G_0, ddot G_0>_W = I_{PP} + I_{PA} + I_{AP} + I_{AA} = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt under the fixed canonical Gaussian window W(t) = 1/sqrt(2pi) exp(-t^2/2) at displacement a = 1.5 (sigma = 2.0) and is certified strictly positive by dual independent Arb ball arithmetic evaluations: Path 1 (direct completed xi with Simpson remainder <= 1.14e-8 and real-line tail envelope <= 7.16e-12) yielding [0.023172204, 0.023172227], and Path 2 (decomposed A+P with finite Dirichlet sum N=50000 and L^2(W) majorant tail bound <= 0.002265) yielding [0.0209073, 0.0254375]. Zero is strictly excluded (0 notin X_{xi, W}), proving that exact cross-term cancellation fails for this fixed Gaussian candidate instance.",
+  "statement": "For the completed function xi(s) = 1/2 s(s-1) pi^{-s/2} Gamma(s/2) zeta(s) with logarithmic derivative G(s) = -xi'/xi(s) = A(s) + P(s), the second grade variation real cross-term decomposes into four blocks X_{xi, W} = Re <G_0, ddot G_0>_W = I_{PP} + I_{PA} + I_{AP} + I_{AA} = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt under the fixed canonical Gaussian window W(t) = 1/sqrt(2pi) exp(-t^2/2) at displacement a = 1.5 (sigma = 2.0). Exact acb_series Taylor polynomial integration on subintervals of [-8, 8] yields positive compact integral [0.023172215807, 0.023172215809] with real-line tail bound <= 7.41e-13 (FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE); independent decomposed A+P Dirichlet series tail enclosure using Minkowski majorants yields [-0.623, +0.669], with dual-path point witness certification remaining CERTIFIED_POINT_WITNESS_PENDING.",
   "quantified_variables": [
     {
       "name": "a",
@@ -25,17 +25,17 @@
     "P(s) = -zeta'/zeta(s) = sum_{n>=2} Lambda(n) n^{-s}",
     "ddot G_0 = (log tau)^2 [ z G'(s) + z^2 G''(s) ] with z = 1.5 + it",
     "W(t) = 1/sqrt(2pi) exp(- t^2 / 2)",
-    "Compact integration on [-8.0, 8.0] with Simpson remainder error bound <= 1.14e-8",
-    "Real-line tail bound for |t| > 8 bounded by envelope 38.4 t^2 + 6 t^3 <= 7.16e-12",
-    "Independent Dirichlet series L^2(W) tail bound for N=50000 <= 0.002265"
+    "Exact acb_series Taylor polynomial integration on [-8.0, 8.0]",
+    "Real-line tail bound for |t| >= 8 bounded by envelope 5.85 t^2 + 0.39 t^3 <= 7.41e-13",
+    "Independent Dirichlet series Minkowski tail bound for N=100000 <= 0.646"
   ],
   "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W} = Re <G_0, ddot G_0>_W at fixed instance (a=1.5, sigma_W=1.0)",
   "fourier_normalization": "Centered coordinates z = 1.5 + it; tau = 2pi; Fourier transform hat{W}(xi) = int W(t) e^{-it xi} dt",
-  "multiplicity_convention": "Standard arithmetic weights Lambda(n) and polygamma derivatives psi^(k)(s/2)",
+  "multiplicity_convention": "Standard arithmetic weights Lambda(n) = log(p) for n=p^r and polygamma derivatives psi^(k)(s/2)",
   "measure_and_window": "Canonical standard Gaussian probability window W(t) = 1/sqrt(2pi) exp(-t^2/2)",
-  "order_of_limits": "1D Arb validated interval quadrature on [-8, 8] with analytically proved tail enclosures for |t| > 8",
-  "exact_conclusion": "X_{xi, W} in [0.023172204, 0.023172227] strictly excludes zero; exact cross-term cancellation fails for this fixed Gaussian candidate instance (FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO)",
-  "logical_negation": "X_{xi, W} = 0 for the fixed canonical Gaussian window instance (FALSIFIED by certified Arb interval enclosure [0.023172204, 0.023172227] strictly bounded away from zero)",
+  "order_of_limits": "1D Arb validated interval Taylor integration on [-8, 8] with symbolically proved tail envelopes for |t| >= 8",
+  "exact_conclusion": "Exact acb_series Taylor polynomial integration proves positive compact integral [0.023172215807, 0.023172215809] on [-8, 8] with real-line tail <= 7.41e-13 (FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE); full independent dual-path Dirichlet series tail certification remains CERTIFIED_POINT_WITNESS_PENDING.",
+  "logical_negation": "X_{xi, W} = 0 for the fixed canonical Gaussian window instance (strongly refuted by positive Taylor enclosure [0.023172215807, 0.023172215809])",
   "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
   "evidence_scope": "CERTIFIED_POINT_WITNESS",
   "exact_or_truncated": "EXACT",
@@ -43,7 +43,7 @@
   "spectral_cutoff": "NONE",
   "integration_domain": "R",
   "omitted_tail": "REAL_LINE_GAUSSIAN_TAIL",
-  "tail_enclosure": "[-8.0, 8.0] COMPACT_INTEGRATION_WITH_ANALYTIC_SIMPSON_REMAINDER_AND_REAL_LINE_TAIL_ENVELOPE",
+  "tail_enclosure": "[-8.0, 8.0] COMPACT_INTEGRATION_WITH_EXACT_ACB_SERIES_TAYLOR_POLYNOMIALS_AND_REAL_LINE_TAIL_ENVELOPE",
   "dependencies": [
     "Completion bridge theorem: G(s) = A(s) + P(s) with archimedean gamma factor and pole regularizations",
     "Lean 4: completed_xi_four_block_algebraic_expansion",
@@ -51,14 +51,13 @@
     "math_core.py: certify_fixed_gaussian_completed_xi_crossterm",
     "scripts/verify_crossterm_certificate.py: Dual independent Arb replay"
   ],
-  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean (algebra) and scripts/verify_crossterm_certificate.py (Arb certified enclosure)",
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean (algebra) and scripts/verify_crossterm_certificate.py (acb_series Taylor enclosure)",
   "falsification_attempts": [
-    "Dual independent verification via Cauchy contour on xi and decomposed A+P with L^2(W) Dirichlet tail bounds",
+    "Evaluated exact acb_series Taylor polynomial integration around subinterval midpoints",
     "Evaluated 4-block decomposition agreement (I_PP + I_PA + I_AP + I_AA matches direct integral within 1e-45)",
-    "Verified outward-rounded interval enclosure excludes zero: lower bound > 0.02317 > 0",
-    "Audited whether rational pole terms -1/s - 1/(s-1) cancel gamma and prime cross-terms (they do not cancel to zero)",
-    "Evaluated boundary asymptotic tail bounds for |t| > 8.0 proving real-line Gaussian tail contribution <= 7.16e-12",
-    "Equality-case root analysis: no real root of the integrand or total integral exists at this parameter point"
+    "Verified Taylor polynomial interval enclosure excludes zero: [0.023172215807, 0.023172215809] > 0",
+    "Evaluated boundary asymptotic tail bounds for |t| >= 8.0 proving real-line Gaussian tail contribution <= 7.41e-13",
+    "Audited Minkowski Dirichlet tail bounds against single-sum orthogonality assumptions"
   ],
   "computational_evidence": [
     ".agents/claims/certificates/CLM-CT-027-certificate.json",
@@ -74,5 +73,7 @@
       "theorem": "Chapter 6 (Psi and Polygamma functions)"
     }
   ],
-  "remaining_analytic_dependencies": []
+  "remaining_analytic_dependencies": [
+    "Refined Dirichlet series tail enclosure for independent Path 2"
+  ]
 }

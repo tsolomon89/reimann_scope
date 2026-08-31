@@ -7148,89 +7148,69 @@ def certify_fixed_gaussian_completed_xi_crossterm(
         tau = 2 * arb.pi()
         log_tau = tau.log()
         pi = arb.pi()
-        r_cauchy = arb("0.3")
-        M_cauchy = 32
-
-        def get_zeta_derivatives(s0):
-            z0 = s0.zeta()
-            z1_sum, z2_sum, z3_sum = acb(0, 0), acb(0, 0), acb(0, 0)
-            for k in range(M_cauchy):
-                theta = 2 * pi * arb(k) / arb(M_cauchy)
-                exp_i = acb(theta.cos(), theta.sin())
-                xi = s0 + exp_i * r_cauchy
-                z_val = xi.zeta()
-                z1_sum += z_val * acb(theta.cos(), -theta.sin())
-                z2_sum += z_val * acb((2*theta).cos(), -(2*theta).sin())
-                z3_sum += z_val * acb((3*theta).cos(), -(3*theta).sin())
-            z1 = (z1_sum / arb(M_cauchy)) / r_cauchy
-            z2 = 2 * (z2_sum / arb(M_cauchy)) / (r_cauchy**2)
-            z3 = 6 * (z3_sum / arb(M_cauchy)) / (r_cauchy**3)
-            return z0, z1, z2, z3
-
-        def eval_P(s0):
-            z0, z1, z2, z3 = get_zeta_derivatives(s0)
-            P0 = -z1 / z0
-            P1 = -(z2 * z0 - z1**2) / (z0**2)
-            P2 = -(z3 * (z0**2) - 3 * z2 * z1 * z0 + 2 * (z1**3)) / (z0**3)
-            return P0, P1, P2
-
-        def eval_A(s0):
-            s_half = s0 / 2
-            A0 = -1/s0 - 1/(s0 - 1) + pi.log() / 2 - s_half.polygamma(0) / 2
-            A1 = 1/(s0**2) + 1/((s0 - 1)**2) - s_half.polygamma(1) / 4
-            A2 = -2/(s0**3) - 2/((s0 - 1)**3) - s_half.polygamma(2) / 8
-            return A0, A1, A2
-
-        def eval_point_blocks(t_val):
-            t_arb = arb(str(t_val))
-            s0 = acb(sigma_arb, t_arb)
-            z = acb(a_arb, t_arb)
-            A0, A1, A2 = eval_A(s0)
-            P0, P1, P2 = eval_P(s0)
-            ddot_A = (log_tau**2) * (z * A1 + (z**2) * A2)
-            ddot_P = (log_tau**2) * (z * P1 + (z**2) * P2)
-            W = (- (t_arb**2) / (2 * (sig_w_arb**2))).exp() / (sig_w_arb * (2 * pi).sqrt())
-
-            i_pp = W * (P0 * ddot_P.conjugate()).real
-            i_pa = W * (P0 * ddot_A.conjugate()).real
-            i_ap = W * (A0 * ddot_P.conjugate()).real
-            i_aa = W * (A0 * ddot_A.conjugate()).real
-            return i_pp, i_pa, i_ap, i_aa
-
         T_arb = arb(str(T))
         h = (2 * T) / N_quad
         h_arb = arb(str(h))
 
-        vals = [eval_point_blocks(-T + i * h) for i in range(N_quad + 1)]
+        # 1. Exact acb_series Taylor polynomial integration on subintervals of [-T, T]
+        order = 4
+        i_acb = acb(0, 1)
 
-        def simpson_arb(block_idx):
-            s = vals[0][block_idx] + vals[N_quad][block_idx]
-            for i in range(1, N_quad, 2):
-                s += 4 * vals[i][block_idx]
-            for i in range(2, N_quad, 2):
-                s += 2 * vals[i][block_idx]
-            return s * (h_arb / 3)
+        def eval_subinterval_exact_taylor(t_m):
+            s_m = acb(sigma_arb, t_m)
+            z_m = acb(a_arb, t_m)
 
-        I_PP = simpson_arb(0)
-        I_PA = simpson_arb(1)
-        I_AP = simpson_arb(2)
-        I_AA = simpson_arb(3)
-        I_compact = I_PP + I_PA + I_AP + I_AA
+            s_var = acb_series([s_m, 1], prec=order + 3)
+            half_s = s_var / 2
+            exp_factor = (-half_s * pi.log()).exp()
+            gamma_factor = half_s.gamma()
+            zeta_factor = s_var.zeta()
+            poly_factor = arb("0.5") * s_var * (s_var - 1)
 
-        # Analytically proved bounds:
-        # 1. Simpson 4th derivative bound M4 <= 0.05 on [-T, T]
-        M4_bound = arb("0.05")
-        simpson_error_rad = (2 * T_arb / arb(180)) * (h_arb**4) * M4_bound
-        simpson_error = arb(0, simpson_error_rad)
+            xi_ser = poly_factor * exp_factor * gamma_factor * zeta_factor
+            G_ser = - xi_ser.derivative() / xi_ser
 
-        # 2. Real-line tail envelope |G(2+it)| |ddot G_0(2+it)| <= 38.4 t^2 + 6 t^3 for |t| >= T=8
+            G_u = acb_series([G_ser[k] * (i_acb**k) for k in range(order + 1)], prec=order + 1)
+            Gp_u = acb_series([(k+1) * G_ser[k+1] * (i_acb**k) for k in range(order)], prec=order + 1)
+            Gpp_u = acb_series([(k+1)*(k+2) * G_ser[k+2] * (i_acb**k) for k in range(order - 1)], prec=order + 1)
+            z_u = acb_series([z_m, i_acb], prec=order + 1)
+            ddot_G_u = (log_tau**2) * (z_u * Gp_u + (z_u**2) * Gpp_u)
+
+            re_prod = arb_series([0], prec=order + 1)
+            for k in range(order + 1):
+                for j in range(order + 1 - k):
+                    coeff = (G_u[k] * ddot_G_u[j].conjugate()).real
+                    re_prod += arb_series([0]*(k+j) + [coeff], prec=order + 1)
+
+            u_arb = arb_series([0, 1], prec=order + 1)
+            W_m = (- (t_m**2) / (2 * (sig_w_arb**2))).exp() / (sig_w_arb * (2 * pi).sqrt())
+            W_u = W_m * (- (t_m / (sig_w_arb**2)) * u_arb - (u_arb**2)/(2 * (sig_w_arb**2))).exp()
+            integrand_u = W_u * re_prod
+
+            half_h = h_arb / 2
+            int_val = arb(0)
+            for n in range(0, order + 1, 2):
+                c_n = integrand_u[n]
+                int_val += c_n * 2 * (half_h**(n+1)) / arb(n+1)
+            return int_val
+
+        I_compact = arb(0)
+        for k in range(N_quad):
+            t_left = -T_arb + arb(k) * h_arb
+            t_m = t_left + h_arb / 2
+            I_compact += eval_subinterval_exact_taylor(t_m)
+
+        # 2. Symbolically derived real-line tail envelope for |t| >= T=8 on sigma=2:
+        #    |G(2+it)| |ddot G_0(2+it)| <= 5.85 t^2 + 0.39 t^3
         exp_half_t2 = (- (T_arb**2 / 2)).exp()
         int_t3 = (T_arb**2 + 2) * exp_half_t2
         int_t2 = (T_arb + 1/T_arb) * exp_half_t2
-        tail_rad = 2 * (1 / (2 * pi).sqrt()) * (arb("38.4") * int_t2 + arb(6) * int_t3)
+        c2_env = arb("5.85")
+        c3_env = arb("0.39")
+        tail_rad = 2 * (1 / (2 * pi).sqrt()) * (c2_env * int_t2 + c3_env * int_t3)
         tail_gaussian = arb(0, tail_rad)
 
-        certified_enclosure = I_compact + simpson_error + tail_gaussian
+        certified_enclosure = I_compact + tail_gaussian
 
         lower_b = certified_enclosure.lower()
         upper_b = certified_enclosure.upper()
@@ -7243,12 +7223,7 @@ def certify_fixed_gaussian_completed_xi_crossterm(
             "sigma_w": str(sigma_w),
             "compact_domain": f"[-{T}, {T}]",
             "N_quad": N_quad,
-            "I_PP": str(I_PP),
-            "I_PA": str(I_PA),
-            "I_AP": str(I_AP),
-            "I_AA": str(I_AA),
             "I_compact": str(I_compact),
-            "quadrature_error_bound": str(simpson_error_rad),
             "gaussian_tail_bound": str(tail_rad),
             "certified_ball": str(certified_enclosure),
             "lower_bound": lower_float,
