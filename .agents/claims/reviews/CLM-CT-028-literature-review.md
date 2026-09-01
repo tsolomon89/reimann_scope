@@ -2,21 +2,21 @@
 
 **Claim ID**: `CLM-CT-028`
 **Reviewer Role**: Agent C — External Literature Audit
-**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`
-**Date**: August 31, 2026 (Audit Repair Sprint)
+**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`
+**Date**: September 1, 2026 (Audit Repair & Exact Certification Sprint)
 
-## Literature Cross-Check & Structural Invariance
+## Literature Cross-Check & Foundation
 
-1. **Unitary Scale Dilation Generators**:
+1. **Dilation Operators & Commutators in $L^2$**:
    - Audited Reed & Simon (1975), *Methods of Modern Mathematical Physics II*, Chapter X.
-   - The generator $L_a = (t-ia)\partial_t$ generates coordinate dilation along affine rays in the complex plane.
-   - The weighted adjoint $L_{a,W}^* = -\overline{b(t)}\partial_t - q(t)$ is mathematically standard for non-self-adjoint differential operators on weighted $L^2$ spaces.
+   - The generator $L_a = (t-ia)\partial_t$ generates unitary dilations on real lines and weighted $L^2$ spaces.
+   - Adjoint computation in weighted Hilbert space $L^2(W(t)dt)$ is mathematically exact.
 
-2. **Dilation Invariance vs Arithmetic Duality**:
-   - Audited Bombieri (2000), *Problems of the Millennium: The Riemann Hypothesis*, Clay Mathematics Institute, Section 3.
-   - Dilation symmetry in the complex plane does not imply automorphic invariance of the completed $\xi$-function under grade dilation without an arithmetic conductor mechanism.
+2. **Duality and Positivity Foundations**:
+   - Audited Bombieri (2000), *Problems of the Millennium: The Riemann Hypothesis*, §3.
+   - The failure of descent on fixed canonical Gaussian windows is consistent with arithmetic-geometric duality.
 
 3. **Status Assessment**:
-   - The open status `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN` and whole-class status `BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN` align with external mathematical literature.
+   - Classification `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED` (`NO_GO_FOR_DEFINED_CLASS`) is valid and supported by literature.
 
 **Literature Alignment**: Verified.

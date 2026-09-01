@@ -8,10 +8,11 @@ import sys
 import os
 import glob
 import json
+import re
 import hashlib
 import subprocess
 import argparse
-from typing import Dict, Any, List, Set, Tuple
+from typing import Dict, Any, List, Set, Tuple, Optional
 
 MANDATORY_FIELDS = [
     "claim_id",
@@ -144,7 +145,7 @@ def normalize_spec(spec: Dict[str, Any]) -> Dict[str, Any]:
     return normalized
 
 
-def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
+def audit_claim_specification(raw_spec: Dict[str, Any], repo_root: Optional[str] = None) -> Dict[str, Any]:
     """
     Audits a candidate mathematical claim against all schema fields and 10 pre-acceptance gates.
     Returns a dictionary containing 'status': 'PASS' | 'FAIL', 'passed_gates', 'violations', and 'warnings'.
@@ -288,6 +289,7 @@ def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
                            "off-diagonal" in stmt or "diagonal and off-diagonal" in conc or
                            "four blocks" in stmt or "four blocks" in obj or "4-block" in stmt or "4-block" in obj or
                            "four blocks" in conc or "4-block" in conc or "blocks" in stmt or "i_pp" in stmt or "i_pp" in conc or
+                           "four blocks" in fals_str or "4-block" in fals_str or
                            "adjoint" in hyps_str or "adjoint" in deps_str or "adjoint" in fals_str)
 
     if is_inner_prod and has_finite_window and not treats_off_diagonal:
@@ -377,17 +379,9 @@ def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
                 "while open analytic dependencies remain unproved."
             )
 
-    # Check 10D: Dependency Semantic Validity (Pending Premise -> Terminal Claim rejection)
-    is_terminal_role = role in {"NO_GO_COMPONENT", "LOAD_BEARING_ANALYTIC_THEOREM", "ALGEBRAIC_IDENTITY"}
-    is_terminal_assertion = ("closed" in conc.lower() or "proved" in conc.lower() or "falsified" in conc.lower()) and not ("open" in conc.lower() or "pending" in conc.lower())
-    if is_terminal_role or is_terminal_assertion:
-        for dep in spec.get("dependencies", []):
-            dep_str = str(dep).lower()
-            if "pending" in dep_str or "unproved" in dep_str or "open" in dep_str:
-                violations.append(
-                    f"Gate 10 [Dependency Semantic Validity] VIOLATION: Claim asserts terminal closure/proof, "
-                    f"but depends on pending premise '{dep}'."
-                )
+    # Check 10D: Dependency Graph Semantic Validity (Transitive Resolution & Cycle Detection)
+    graph_violations = validate_dependency_graph(spec, repo_root=repo_root)
+    violations.extend(graph_violations)
 
     if not any("Gate 10" in v for v in violations):
         passed_gates.append("Gate 10: Evidence Classification Audit")
@@ -401,6 +395,121 @@ def audit_claim_specification(raw_spec: Dict[str, Any]) -> Dict[str, Any]:
         "warnings": warnings,
         "gate_summary": f"Passed {len(passed_gates)}/10 gates with {len(violations)} violations and {len(warnings)} warnings."
     }
+
+
+def resolve_dependency_claim(dep_id: str, repo_root: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """Resolves a claim ID to its JSON specification dict or register metadata."""
+    if repo_root is None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        repo_root = os.path.abspath(os.path.join(current_dir, "..", "..", "..", ".."))
+
+    claims_dir = os.path.join(repo_root, ".agents", "claims")
+    json_path = os.path.join(claims_dir, f"{dep_id}.json")
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+
+    reg_path = os.path.join(repo_root, ".agents", "corpus_map", "claim_register.md")
+    if os.path.exists(reg_path):
+        try:
+            with open(reg_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            m = re.search(r'\|\s*`' + re.escape(dep_id) + r'`\s*\|([^|]+)\|([^|]+)\|([^|]+)\|', content)
+            if m:
+                status = m.group(3).strip()
+                return {"claim_id": dep_id, "status": status, "is_from_register": True}
+        except Exception:
+            pass
+    return None
+
+
+def is_non_terminal_claim(claim_info: Dict[str, Any]) -> Tuple[bool, str]:
+    """Determines whether a resolved claim info is non-terminal / open / pending."""
+    role = str(claim_info.get("epistemic_role", "")).strip()
+    scope = str(claim_info.get("evidence_scope", "")).strip()
+    status = str(claim_info.get("status", "")).strip()
+    conc = str(claim_info.get("exact_conclusion", "")).strip()
+    stmt = str(claim_info.get("statement", "")).strip()
+
+    if role in {"OPEN_OBLIGATION", "NUMERICAL_OBSERVATION", "CONJECTURE", "HEURISTIC"}:
+        return True, f"epistemic role '{role}'"
+    if scope in {"FINITE_NUMERICAL_SAMPLE", "CONDITIONAL_THEOREM"}:
+        return True, f"evidence scope '{scope}'"
+
+    for pat in ["PENDING", "OPEN", "CONJECTURE", "UNPROVED", "POSITIVE_NUMERICAL_EVIDENCE", "NUMERICAL_OBSERVATION"]:
+        if pat in status.upper():
+            return True, f"status '{status}' contains '{pat}'"
+    return False, "terminal"
+
+
+def validate_dependency_graph(spec: Dict[str, Any], repo_root: Optional[str] = None) -> List[str]:
+    """
+    Traverses dependency claim IDs, resolves them against repository specs/register,
+    detects cycles, and rejects terminal claims depending on non-terminal claims.
+    """
+    violations: List[str] = []
+    root_id = str(spec.get("claim_id", "UNKNOWN")).strip()
+    role = str(spec.get("epistemic_role", "")).strip()
+    conc = str(spec.get("exact_conclusion", "")).lower()
+
+    is_terminal_role = role in {"NO_GO_COMPONENT", "LOAD_BEARING_ANALYTIC_THEOREM", "ALGEBRAIC_IDENTITY"}
+    is_terminal_assertion = ("closed" in conc or "proved" in conc or "falsified" in conc) and not ("open" in conc or "pending" in conc)
+    is_root_terminal = is_terminal_role or is_terminal_assertion
+
+    # 1. Textual dependency check for explicit non-terminal qualifiers
+    if is_root_terminal:
+        for dep in spec.get("dependencies", []):
+            dep_str = str(dep).lower()
+            if "pending" in dep_str or "unproved" in dep_str or "open" in dep_str:
+                violations.append(
+                    f"Gate 10 [Dependency Semantic Validity] VIOLATION: Claim asserts terminal closure/proof, "
+                    f"but depends on pending premise '{dep}'."
+                )
+
+    # 2. Extract dependency IDs from explicit field or dependency text
+    dep_ids: List[str] = list(spec.get("dependency_claim_ids", []))
+    if not dep_ids:
+        for dep in spec.get("dependencies", []):
+            matches = re.findall(r'\b(CLM-[A-Z0-9\-]+)\b', str(dep))
+            for m in matches:
+                if m != root_id and m not in dep_ids:
+                    dep_ids.append(m)
+
+    def dfs(current_id: str, current_spec: Dict[str, Any], path: List[str], visited_in_path: Set[str]):
+        next_deps: List[str] = list(current_spec.get("dependency_claim_ids", []))
+        if not next_deps:
+            for dep in current_spec.get("dependencies", []):
+                matches = re.findall(r'\b(CLM-[A-Z0-9\-]+)\b', str(dep))
+                for m in matches:
+                    if m != current_id and m not in next_deps:
+                        next_deps.append(m)
+
+        for dep_id in next_deps:
+            if dep_id in visited_in_path:
+                cycle_str = " -> ".join(path + [dep_id])
+                violations.append(f"Gate 10 [Dependency Cycle] VIOLATION: Dependency cycle detected in claim graph: {cycle_str}")
+                continue
+
+            dep_info = resolve_dependency_claim(dep_id, repo_root)
+            if dep_info is None:
+                violations.append(f"Gate 10 [Dependency Resolution] VIOLATION: Dependency claim ID '{dep_id}' referenced by '{current_id}' could not be resolved.")
+                continue
+
+            is_non_term, reason = is_non_terminal_claim(dep_info)
+            if is_root_terminal and is_non_term:
+                path_str = " -> ".join(path + [dep_id])
+                violations.append(
+                    f"Gate 10 [Dependency Semantic Validity] VIOLATION: Terminal claim '{root_id}' "
+                    f"depends on non-terminal claim '{dep_id}' ({reason}) via path {path_str}."
+                )
+
+            dfs(dep_id, dep_info, path + [dep_id], visited_in_path | {dep_id})
+
+    dfs(root_id, spec, [root_id], {root_id})
+    return violations
 
 
 # Complete registry of recognized status patterns in the repository

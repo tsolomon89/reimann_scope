@@ -42,6 +42,9 @@
   "integration_domain": "R",
   "omitted_tail": "NONE",
   "tail_enclosure": "NONE",
+  "dependency_claim_ids": [
+    "CLM-CT-025"
+  ],
   "dependencies": [
     "Lean 4: grade_second_jet_chain_rule",
     "Lean 4: finset_double_sum_diag_offdiag_decomp",

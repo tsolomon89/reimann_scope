@@ -224,10 +224,10 @@ class TestClaimAuditGates:
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
         assert coverage["total_claims"] == 92
-        assert coverage["terminal_claims"] == 83
-        assert coverage["audited_terminal_claims"] == 5
+        assert coverage["terminal_claims"] == 84
+        assert coverage["audited_terminal_claims"] == 6
         assert coverage["legacy_unaudited_terminal_claims"] == 78
-        assert coverage["open_or_exempt_claims"] == 9
+        assert coverage["open_or_exempt_claims"] == 8
         assert coverage["missing_specifications"] == 0
         assert coverage["unrecognized_statuses"] == 0
         # Strict coverage arithmetic
@@ -356,7 +356,7 @@ class TestClaimAuditGates:
         ok_real, errors_real, passed_real, cov_real = cross_check_claim_register(repo_root, verify_git_baseline=True)
         assert ok_real is True
         assert cov_real["legacy_unaudited_terminal_claims"] == 78
-        assert cov_real["audited_terminal_claims"] == 5
+        assert cov_real["audited_terminal_claims"] == 6
 
 
 class TestAdversarialAuditGates:
@@ -616,3 +616,151 @@ class TestAdversarialAuditGates:
         res = audit_claim_specification(premise_pending_spec)
         assert res["status"] == "FAIL"
         assert any("Gate 10 [Dependency Semantic Validity]" in v for v in res["violations"])
+
+    def test_adv_18_graph_dependent_claim_rejected_when_dependency_becomes_pending(self, tmp_path):
+        """18. Terminal Claim A depending on Claim B is rejected when Claim B's JSON status changes from proved to pending without modifying Claim A."""
+        mock_agents = tmp_path / ".agents"
+        claims_dir = mock_agents / "claims"
+        claims_dir.mkdir(parents=True)
+
+        # Claim B initially proved
+        claim_b = {
+            "claim_id": "CLM-DEP-B",
+            "statement": "Claim B premise proved.",
+            "quantified_variables": [{"name": "x", "domain": "Real"}],
+            "variable_domains": ["Real"],
+            "hypotheses": ["Hyp B"],
+            "object_studied": "Object B",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Standard",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "Claim B is proved (PROVED)",
+            "logical_negation": "Claim B is false",
+            "epistemic_role": "ALGEBRAIC_IDENTITY",
+            "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+            "exact_or_truncated": "EXACT",
+            "arithmetic_cutoff": "NONE",
+            "spectral_cutoff": "NONE",
+            "integration_domain": "R",
+            "omitted_tail": "NONE",
+            "tail_enclosure": "NONE",
+            "status": "PROVED",
+            "dependency_claim_ids": [],
+            "dependencies": [],
+            "proof_artifact": "proof_b.lean",
+            "falsification_attempts": ["Tested B"],
+            "computational_evidence": ["test_b"],
+            "external_sources": [{"source": "Source B", "theorem": "Theorem 1"}],
+            "remaining_analytic_dependencies": []
+        }
+        (claims_dir / "CLM-DEP-B.json").write_text(json.dumps(claim_b), encoding="utf-8")
+
+        # Claim A depends on CLM-DEP-B
+        claim_a = {
+            "claim_id": "CLM-TERM-A",
+            "statement": "For the candidate class, claim A is proved closed based on CLM-DEP-B.",
+            "quantified_variables": [{"name": "class", "domain": "DefinedClass"}],
+            "variable_domains": ["DefinedClass"],
+            "hypotheses": ["Candidate class"],
+            "object_studied": "Class closure",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Standard",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "Candidate class is closed (CLOSED)",
+            "logical_negation": "Candidate class viable",
+            "epistemic_role": "NO_GO_COMPONENT",
+            "evidence_scope": "NO_GO_FOR_DEFINED_CLASS",
+            "exact_or_truncated": "EXACT",
+            "arithmetic_cutoff": "NONE",
+            "spectral_cutoff": "NONE",
+            "integration_domain": "R",
+            "omitted_tail": "NONE",
+            "tail_enclosure": "NONE",
+            "dependency_claim_ids": ["CLM-DEP-B"],
+            "dependencies": ["CLM-DEP-B"],
+            "proof_artifact": "proof_a.lean",
+            "falsification_attempts": ["Evaluated cancellation analysis confirming absence of zero-crossing"],
+            "computational_evidence": ["test_a"],
+            "external_sources": [{"source": "Source A", "theorem": "Theorem 1"}],
+            "remaining_analytic_dependencies": []
+        }
+
+        # With Claim B proved: Claim A passes
+        res_pass = audit_claim_specification(claim_a, repo_root=str(tmp_path))
+        assert res_pass["status"] == "PASS"
+
+        # Now Claim B transitions to pending WITHOUT changing Claim A's JSON
+        claim_b["status"] = "PENDING_PROOF"
+        claim_b["epistemic_role"] = "OPEN_OBLIGATION"
+        (claims_dir / "CLM-DEP-B.json").write_text(json.dumps(claim_b), encoding="utf-8")
+
+        # Now Claim A MUST fail Gate 10 dependency audit
+        res_fail = audit_claim_specification(claim_a, repo_root=str(tmp_path))
+        assert res_fail["status"] == "FAIL"
+        assert any("Gate 10 [Dependency Semantic Validity]" in v for v in res_fail["violations"])
+        assert any("CLM-DEP-B" in v for v in res_fail["violations"])
+
+    def test_adv_19_dependency_cycle_rejected(self, tmp_path):
+        """19. Dependency cycle in claim graph (A -> B -> A) is rejected by Gate 10."""
+        mock_agents = tmp_path / ".agents"
+        claims_dir = mock_agents / "claims"
+        claims_dir.mkdir(parents=True)
+
+        claim_b = {
+            "claim_id": "CLM-CYCLE-B",
+            "statement": "Claim B in cycle.",
+            "quantified_variables": [{"name": "x", "domain": "Real"}],
+            "variable_domains": ["Real"],
+            "hypotheses": ["Hyp"],
+            "object_studied": "Obj",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Standard",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "Claim B proved",
+            "logical_negation": "Claim B false",
+            "epistemic_role": "ALGEBRAIC_IDENTITY",
+            "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+            "exact_or_truncated": "EXACT",
+            "integration_domain": "R",
+            "status": "PROVED",
+            "dependency_claim_ids": ["CLM-CYCLE-A"],
+            "dependencies": ["CLM-CYCLE-A"],
+            "proof_artifact": "proof.lean",
+            "falsification_attempts": ["Tested"],
+            "computational_evidence": ["test"],
+            "external_sources": [{"source": "Source", "theorem": "Theorem"}]
+        }
+        (claims_dir / "CLM-CYCLE-B.json").write_text(json.dumps(claim_b), encoding="utf-8")
+
+        claim_a = {
+            "claim_id": "CLM-CYCLE-A",
+            "statement": "Claim A in cycle.",
+            "quantified_variables": [{"name": "x", "domain": "Real"}],
+            "variable_domains": ["Real"],
+            "hypotheses": ["Hyp"],
+            "object_studied": "Obj",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Standard",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "Claim A proved",
+            "logical_negation": "Claim A false",
+            "epistemic_role": "ALGEBRAIC_IDENTITY",
+            "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+            "exact_or_truncated": "EXACT",
+            "integration_domain": "R",
+            "status": "PROVED",
+            "dependency_claim_ids": ["CLM-CYCLE-B"],
+            "dependencies": ["CLM-CYCLE-B"],
+            "proof_artifact": "proof.lean",
+            "falsification_attempts": ["Tested"],
+            "computational_evidence": ["test"],
+            "external_sources": [{"source": "Source", "theorem": "Theorem"}]
+        }
+
+        res = audit_claim_specification(claim_a, repo_root=str(tmp_path))
+        assert res["status"] == "FAIL"
+        assert any("Gate 10 [Dependency Cycle]" in v for v in res["violations"])

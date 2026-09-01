@@ -443,7 +443,7 @@ class TestBilateralBranchEliminationSummary:
         res = math_core.evaluate_bilateral_branch_elimination_summary(dps=50)
 
         assert res["status"] == "BILATERAL_BRANCH_SUMMARY_COMPILED"
-        assert res["fixed_gaussian_common_frame_instance_open"] is True
+        assert res["fixed_gaussian_common_frame_instance_closed"] is True
         assert res["bilateral_grade_route_class_closure_open"] is True
         assert len(res["audited_instances"]) == 4
 

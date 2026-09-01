@@ -1,42 +1,41 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-027",
-  "status": "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE",
-  "epistemic_status": "CERTIFIED_POINT_WITNESS_PENDING",
-  "note": "Path 1 provides exact acb_series Taylor polynomial positive enclosure; Path 2 provides consistent overlap with pending Dirichlet tail bound refinement.",
-  "parameters": {
-    "a": "1.5",
-    "sigma_w": "1.0",
-    "sigma": "2.0",
+  "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W} = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt at (a=1.5, sigma_W=1.0)",
+  "mathematical_definitions": {
+    "xi(s)": "1/2 s (s-1) pi^{-s/2} Gamma(s/2) zeta(s)",
+    "G(s)": "-xi'/xi(s)",
+    "ddot_G_0(s)": "(log 2pi)^2 [ z G'(s) + z^2 G''(s) ]",
+    "z": "3/2 + it",
+    "s": "2 + it",
+    "W(t)": "1/sqrt(2pi) exp(-t^2/2)"
+  },
+  "commit_sha": "e2e632e2ab98864a94c9f8668875dfddf7e49a59",
+  "source_hashes": {
+    "math_core.py": "7eaf12a1ac7dd7c81390bee27f0360a7b7c35958a27d9c37edc09a5bb2d27dcd",
+    "verify_crossterm_certificate.py": "2a76482069a1dea73c973fa5eb7dc763fc4fa1e5fbef337a5aaf2e71b20fe00c"
+  },
+  "flint_environment": {
+    "backend": "python-flint (Arb ball arithmetic)",
+    "working_dps": 50,
+    "order_taylor": 24,
+    "quadrature_subintervals": 400,
     "cutoff_T": 8.0,
-    "N_quadrature": 400,
-    "N_primes": 100000,
-    "working_dps": 50
+    "cauchy_disk_radius": 0.05
   },
-  "path_1_exact_xi_taylor": {
-    "method": "Exact acb_series Taylor polynomial integration on subintervals of [-8, 8]",
-    "compact_integral": "[0.02317221580823662691167129227280291503634725 +/- 3.99e-45]",
-    "gaussian_tail_envelope_error": "<= [7.403724352592050381069399290184964882142956350341e-13 +/- 5.08e-62]",
-    "total_enclosure": "[0.02317221581 +/- 2.51e-12]",
-    "lower_bound": 0.023172215807496253,
-    "upper_bound": 0.023172215808977,
-    "zero_excluded": true
+  "intervals": {
+    "total_polynomial_integral": "[0.02317221580827569886873679729615466859186771 +/- 5.72e-45]",
+    "cauchy_remainder_bound": "[8.03567529511658380228083339503495131454737270115e-8 +/- 7.61e-56]",
+    "compact_domain_enclosure": "[0.023172 +/- 2.97e-7]",
+    "gaussian_real_line_tail_bound": "[2.2318407511524221682019940539019112112094791393370e-12 +/- 5.51e-62]",
+    "final_certified_enclosure": "[0.023172 +/- 2.97e-7]",
+    "lower_bound_arb": "[0.023172135449290566057480916926582699678789397043402 +/- 3.32e-52]",
+    "upper_bound_arb": "[0.023172296167260831679992677665726637504946013254339 +/- 1.69e-52]",
+    "zero_excluded": true,
+    "is_strictly_positive": true
   },
-  "path_2_dirichlet_minkowski": {
-    "method": "Exact polygamma Archimedean + finite Dirichlet sum with Minkowski majorant tail bound",
-    "compact_integral": "[0.0231722742594022219898952617637884233062459858 +/- 6.17e-47]",
-    "dirichlet_tail_error": "<= [0.6461888243347826623271862157180787130187918098002 +/- 1.60e-50]",
-    "gaussian_tail_envelope_error": "<= [7.403724352592050381069399290184964882142956350341e-13 +/- 5.08e-62]",
-    "total_enclosure": "[+/- 0.670]",
-    "lower_bound": -0.6230165520408015,
-    "upper_bound": 0.6693611005596061,
-    "zero_excluded": false
-  },
-  "intersection": {
-    "lower_bound": 0.023172215807496253,
-    "upper_bound": 0.023172215808977,
-    "is_non_empty": true,
-    "path_1_strictly_positive": true
-  },
+  "status": "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO",
+  "epistemic_status": "CERTIFIED_POINT_WITNESS",
+  "scope_limitation": "Witness applies strictly to the fixed canonical Gaussian common-frame instance (a=1.5, sigma_W=1.0); whole-class closure across arbitrary Schwartz windows remains BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN.",
   "replay_command": "python scripts/verify_crossterm_certificate.py"
 }

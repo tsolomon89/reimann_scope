@@ -1,34 +1,25 @@
 # Falsification Review for Claim CLM-CT-027
 
 **Claim ID**: `CLM-CT-027`
-**Reviewer Role**: Agent B — Adversarial Falsification & Replay Audit
+**Reviewer Role**: Agent B — Adversarial Falsification & Remainder Audit
 **Status**: `FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO`
-**Date**: August 31, 2026 (Audit Repair Sprint)
+**Date**: September 1, 2026 (Audit Repair & Exact Certification Sprint)
 
-## Adversarial Audit & Independent Certificate Replay
+## Adversarial Audit & Remainder Verification
 
-1. **Certificate Replay Audit**:
-   Executed standalone replay script:
-   ```bash
-   python scripts/verify_crossterm_certificate.py
-   ```
-   - Path 1 (Direct Cauchy contour on completed $\xi$): Enclosure $[0.023172204, 0.023172227]$, $0 \notin I_1$.
-     - Quadrature error derived from Simpson $M_4 \le 0.05$: $\le 1.14 \times 10^{-8}$.
-     - Real-line tail derived from envelope $38.4 t^2 + 6 t^3$: $\le 7.16 \times 10^{-12}$.
-   - Path 2 (Decomposed $A+P$ via finite Dirichlet sum $N=50000$ with $L^2(W)$ tail bound): Enclosure $[0.0209073, 0.0254375]$, $0 \notin I_2$.
-     - Dirichlet tail independently bounded via $L^2(W)$ majorants $J_4(N, 4)$ and $J_6(N, 4)$: $\le 0.002265$.
-   - Intersection: $[0.023172204, 0.023172227] \ne \emptyset$.
-   - Certificate verified at `.agents/claims/certificates/CLM-CT-027-certificate.json`.
+1. **Taylor Remainder Audit**:
+   - Audited the degree $M=24$ Taylor expansion on subintervals of width $h = 0.04$ ($h/2 = 0.02$).
+   - Cauchy disk radius $r = 0.05$ ensures holomorphy of $\xi(s)$ and $G(s)$ in the disk.
+   - Proved majorant bound $M_k \le W_{\max}(t_m) \times 4.60 \times |\ddot G_0|$ guarantees Cauchy remainder enclosure $\le 8.04 \times 10^{-8}$.
+   - Verified that the polynomial integral $+0.0231722$ dominates the total remainder $8.04 \times 10^{-8}$ by more than 5 orders of magnitude.
 
-2. **Block Cancellation & Root Absence Audit**:
-   - Evaluated 4-block values: $I_{PP} \approx +3.2646$, $I_{PA} \approx -3.2857$, $I_{AP} \approx -3.4233$, $I_{AA} \approx +3.4676$.
-   - The Archimedean components $I_{AA} + I_{PA} + I_{AP}$ do not cancel the prime component $I_{PP}$ to zero.
-   - The net sum $I_{\text{total}} \approx +0.02317 > 0$ is strictly positive.
-   - Verified that no real root of the cross-term integrand or integral exists at $(a = 1.5, \sigma_W = 1.0)$.
+2. **Real-Line Tail Audit**:
+   - Audited constants $c_2 = 15.0$ and $c_3 = 1.5$ from rational pole estimates, Binet digamma bounds, and absolute Dirichlet derivative sums.
+   - Proved Gaussian moment integrals $\int_8^\infty t^2 e^{-t^2/2} dt \le 8.125 e^{-32}$ and $\int_8^\infty t^3 e^{-t^2/2} dt = 66 e^{-32}$.
+   - Verified real-line tail error $\le 2.24 \times 10^{-12}$.
 
-3. **Gaussian Tail Enclosure Audit**:
-   - The compact quadrature is evaluated on $[-8.0, 8.0]$.
-   - For $|t| > 8$, $\frac{1}{\sqrt{2\pi}} \int_{8}^\infty e^{-t^2/2} (38.4 t^2 + 6 t^3) dt \le 7.16 \times 10^{-12}$.
-   - The tail error is accounted for in the certified ball enclosure.
+3. **Replay Validation**:
+   - Replayed `scripts/verify_crossterm_certificate.py` and validated certificate `.agents/claims/certificates/CLM-CT-027-certificate.json`.
+   - Verified $0 \notin [0.023172135, 0.023172297]$.
 
-**Falsification Outcome**: Zero is strictly excluded from $\mathfrak X_{\xi, W}$ for this fixed instance. Exact cancellation is falsified.
+**Falsification Outcome**: Zero cancellation is strictly refuted for this fixed candidate instance.

@@ -27,13 +27,16 @@
   "order_of_limits": "Evaluation for fixed positive integer truncation max_n and infinite limit a > 1/2",
   "exact_conclusion": "(a^2 - v_*(a)) S_2(a) - a S_1(a) = 0 and v_*(a) > 0 for all a > 1/log 2; X_{zeta,diag} changes sign across v_*(a)",
   "logical_negation": "For all a > 0 and all v >= 0, (a^2 - v) S_2(a) - a S_1(a) != 0 (FALSIFIED by witness (a, v_*(a)))",
-  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependency_claim_ids": [],
   "dependencies": [
     "Lean 4: diagonal_crossterm_algebraic_reduction",
     "Lean 4: diagonal_crossterm_cancelling_variance_zero",
     "Lean 4: cancelling_variance_pos_of_bounds",
     "Lean 4: cancelling_variance_pos_of_log2_bound"
   ],
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
   "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
   "falsification_attempts": [
     "Constructed exact algebraic root and equality case cancellation analysis v_*(a) = a^2 - a S_1/S_2",

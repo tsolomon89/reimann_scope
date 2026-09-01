@@ -38,6 +38,7 @@
   "exact_conclusion": "X_{N,W} = (log tau)^2 Re sum_{m,n<=N} c_m bar(c_n) I_{m,n}(W); matches 1D numerical quadrature within certified tolerance; off-diagonal terms are structurally present and certified non-zero for concrete parameters",
   "logical_negation": "X_{N,W} = (Diagonal sum) for all admissible finite windows W (FALSIFIED: finite windows do not force off-diagonal terms to vanish)",
   "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "dependency_claim_ids": [],
   "dependencies": [
     "Lean 4: finset_double_sum_diag_offdiag_decomp",
     "math_core.py: finite_windowed_dirichlet_polynomial_inner_product"

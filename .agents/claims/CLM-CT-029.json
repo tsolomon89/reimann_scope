@@ -35,6 +35,7 @@
   "integration_domain": "R",
   "omitted_tail": "NONE",
   "tail_enclosure": "NONE",
+  "dependency_claim_ids": [],
   "dependencies": [
     "Lean 4: master_radial_defect_unification",
     "Lean 4: finite_positive_weight_curvature_rigidity",

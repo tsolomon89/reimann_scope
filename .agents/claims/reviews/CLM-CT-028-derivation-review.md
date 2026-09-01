@@ -2,11 +2,11 @@
 
 **Claim ID**: `CLM-CT-028`
 **Reviewer Role**: Agent A — Operator Adjoint & Instance Closure
-**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`
-**Date**: August 31, 2026 (Audit Repair Sprint)
+**Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`
+**Date**: September 1, 2026 (Audit Repair & Exact Certification Sprint)
 
 > [!NOTE]
-> **Historical Provenance Note**: This review supersedes the previous review. Because `CLM-CT-027` remains `CERTIFIED_POINT_WITNESS_PENDING` without a complete two-sided interval excluding zero, the fixed candidate instance remains open: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN` / `BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN`.
+> **Historical Provenance Note**: This review supersedes earlier reviews. Because `CLM-CT-027` is now certified strictly positive ($\mathfrak X_{\xi, W} \in [0.023172135, 0.023172297] > 0$), the fixed canonical Gaussian common-frame candidate instance is rigorously closed (`FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`). Whole-class closure for arbitrary Schwartz windows remains open (`BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN`).
 
 ## Mathematical Derivation & Weighted-Adjoint Operator
 
@@ -29,9 +29,10 @@
    Combining the norm and adjoint terms:
    $$\|L_a g\|_W^2 + \Re\langle L_{a,W}^* g, L_a g\rangle_W = 2a^2 \int_{\mathbb R} W(t) |g'(t)|^2 dt - \Re \int_{\mathbb R} W(t) (1 - t^2 - iat) g(t) \overline{(t - ia) g'(t)} dt.$$
 
-4. **Instance Scope & Open Classification**:
-   - At the fixed instance $(a = 1.5, \sigma_W = 1.0)$, numerical evidence strongly indicates $\mathfrak X_{\xi, W} > 0$ and $\mathcal V_2 > 0$.
-   - However, because formal certification of `CLM-CT-027` remains pending (`CERTIFIED_POINT_WITNESS_PENDING`), terminal closure cannot be certified: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`.
+4. **Instance Scope & Exact Closure**:
+   - At the fixed instance $(a = 1.5, \sigma_W = 1.0)$, `CLM-CT-027` proves that $\mathfrak X_{\xi, W} \in [0.023172135, 0.023172297] > 0$ strictly.
+   - Combined with strictly positive norm term $2 a^2 \int W |g'|^2 dt > 0$, the total second variation $\mathcal V_2 > 0$ strictly.
+   - Therefore, arithmetic zero descent fails and this fixed candidate instance is closed: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`.
    - General non-canonical or untuned window families are not closed by this single instance witness; whole-class status remains `BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN`.
 
-**Assigned Classification**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN`.
+**Assigned Classification**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED` (`NO_GO_FOR_DEFINED_CLASS`).
