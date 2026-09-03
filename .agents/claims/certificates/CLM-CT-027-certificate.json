@@ -1,40 +1,51 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-027",
-  "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W} = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt at (a=1.5, sigma_W=1.0)",
+  "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W} = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt at fixed canonical Gaussian instance (a=1.5, sigma_W=1.0)",
   "mathematical_definitions": {
     "xi(s)": "1/2 s (s-1) pi^{-s/2} Gamma(s/2) zeta(s)",
     "G(s)": "-xi'/xi(s)",
     "ddot_G_0(s)": "(log 2pi)^2 [ z G'(s) + z^2 G''(s) ]",
     "z": "3/2 + it",
     "s": "2 + it",
-    "W(t)": "1/sqrt(2pi) exp(-t^2/2)"
+    "W(t)": "1/sqrt(2pi) exp(-t^2/2)",
+    "holomorphic_extension": "Phi(w) = 1/2 [ G(2+iw) H(2-iw) + G(2-iw) H(2+iw) ] on strip |Im(w)| < 1"
   },
-  "commit_sha": "e2e632e2ab98864a94c9f8668875dfddf7e49a59",
+  "source_commit": "009ea4d952835d5962ca02d2e634c41241ecdc56",
+  "artifact_commit": "009ea4d952835d5962ca02d2e634c41241ecdc56",
   "source_hashes": {
-    "math_core.py": "7eaf12a1ac7dd7c81390bee27f0360a7b7c35958a27d9c37edc09a5bb2d27dcd",
-    "verify_crossterm_certificate.py": "2a76482069a1dea73c973fa5eb7dc763fc4fa1e5fbef337a5aaf2e71b20fe00c"
+    "math_core.py": "7c938f3c83b0312c245f2fab8b2e8103ff76a8744ac31411beb74b74e113c22f",
+    "verify_crossterm_certificate.py": "5fbe02ad3c7e0e7372ccf80ff9eb7ff5fcc22caef87c06fc4bea07b6f583a120"
+  },
+  "derived_majorants": {
+    "M_G": "[6.4997299354411707991280073397274872688009077623387042880457662818356358215167583 +/- 2.53e-80]",
+    "M_Gp": "[2.7877835806860435231634615185230022016424953283611553097428002043404674673608258 +/- 2.81e-80]",
+    "M_Gpp": "[5.2054888535327867502105632740362300215134315541822119082766391520723245253712929 +/- 1.81e-80]"
+  },
+  "derived_tail": {
+    "envelope": "4.5 t^2 + 7.1 |t|^3",
+    "tail_bound": "[5.1044357824744107008232702716659840282178087412579365732033801548217792573400711e-12 +/- 8.40e-93]"
   },
   "flint_environment": {
     "backend": "python-flint (Arb ball arithmetic)",
-    "working_dps": 50,
+    "working_dps": 80,
     "order_taylor": 24,
     "quadrature_subintervals": 400,
     "cutoff_T": 8.0,
     "cauchy_disk_radius": 0.05
   },
   "intervals": {
-    "total_polynomial_integral": "[0.02317221580827569886873679729615466859186771 +/- 5.72e-45]",
-    "cauchy_remainder_bound": "[8.03567529511658380228083339503495131454737270115e-8 +/- 7.61e-56]",
-    "compact_domain_enclosure": "[0.023172 +/- 2.97e-7]",
-    "gaussian_real_line_tail_bound": "[2.2318407511524221682019940539019112112094791393370e-12 +/- 5.51e-62]",
-    "final_certified_enclosure": "[0.023172 +/- 2.97e-7]",
-    "lower_bound_arb": "[0.023172135449290566057480916926582699678789397043402 +/- 3.32e-52]",
-    "upper_bound_arb": "[0.023172296167260831679992677665726637504946013254339 +/- 1.69e-52]",
+    "total_polynomial_integral": "[0.02317221580827569886873679729615466859186770514887445243861976178819576633 +/- 5.51e-75]",
+    "cauchy_remainder_bound": "[1.008415666552375597815301366267949026868804358336480343448229713729604772232416e-7 +/- 4.86e-86]",
+    "compact_domain_enclosure": "[0.023172 +/- 3.17e-7]",
+    "gaussian_real_line_tail_bound": "[5.1044357824744107008232702716659840282178087412579365732033801548217792573400711e-12 +/- 8.40e-93]",
+    "final_certified_enclosure": "[0.023172 +/- 3.17e-7]",
+    "lower_bound_arb": "[0.023172114961604240825134909529882838986765166086374452438619761788195766334341728 +/- 4.24e-82]",
+    "upper_bound_arb": "[0.023172316654947156912338685062426498196970244211374452438619761788195766334341728 +/- 4.24e-82]",
     "zero_excluded": true,
     "is_strictly_positive": true
   },
-  "status": "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO",
+  "status": "CERTIFIED_POINT_WITNESS",
   "epistemic_status": "CERTIFIED_POINT_WITNESS",
   "scope_limitation": "Witness applies strictly to the fixed canonical Gaussian common-frame instance (a=1.5, sigma_W=1.0); whole-class closure across arbitrary Schwartz windows remains BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN.",
   "replay_command": "python scripts/verify_crossterm_certificate.py"

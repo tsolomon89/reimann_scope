@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-027",
-  "statement": "For the completed function xi(s) = 1/2 s(s-1) pi^{-s/2} Gamma(s/2) zeta(s) with logarithmic derivative G(s) = -xi'/xi(s), the second grade variation real cross-term X_{xi, W} = Re <G_0, ddot G_0>_W = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt under the fixed canonical Gaussian window W(t) = 1/sqrt(2pi) exp(-t^2/2) at displacement a = 1.5 (sigma = 2.0) is certified strictly positive: X_{xi, W} in [0.023172135, 0.023172297], strictly excluding zero (0 notin X_{xi, W}), via degree M=24 Taylor model quadrature with analytic Cauchy disk remainder bound <= 8.04e-8 on [-8, 8] and derived real-line Gaussian tail envelope bound <= 2.24e-12 (FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO, CERTIFIED_POINT_WITNESS).",
+  "statement": "For the completed function xi(s) = 1/2 s(s-1) pi^{-s/2} Gamma(s/2) zeta(s) with logarithmic derivative G(s) = -xi'/xi(s), the second grade variation real cross-term X_{xi, W} = Re <G_0, ddot G_0>_W = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt under the fixed canonical Gaussian window W(t) = 1/sqrt(2pi) exp(-t^2/2) at displacement a = 1.5 (sigma = 2.0) is certified strictly positive: X_{xi, W} in [0.02317211, 0.02317232], strictly excluding zero (0 notin X_{xi, W}), via degree M=24 Taylor model quadrature with proved analytic Cauchy disk remainder bound <= 1.01e-7 on [-8, 8] and derived real-line Gaussian tail envelope bound <= 5.11e-12 (CERTIFIED_POINT_WITNESS).",
   "quantified_variables": [
     {
       "name": "a",
@@ -24,24 +24,24 @@
     "ddot G_0 = (log tau)^2 [ z G'(s) + z^2 G''(s) ] with z = 1.5 + it",
     "W(t) = 1/sqrt(2pi) exp(- t^2 / 2)",
     "Degree M=24 Taylor model polynomial integration on 400 subintervals of [-8.0, 8.0]",
-    "Analytic Cauchy disk remainder enclosure on disk of radius r=0.05 bounded by 8.04e-8",
-    "Real-line tail bound for |t| >= 8 bounded by envelope 15.0 t^2 + 1.5 t^3 <= 2.24e-12"
+    "Proved analytic Cauchy disk remainder enclosure on disk of radius r=0.05 bounded by 1.01e-7 via derived majorants M_G <= 6.50, M_Gp <= 2.80, M_Gpp <= 5.21",
+    "Real-line tail bound for |t| >= 8 bounded by derived envelope 4.5 t^2 + 7.1 t^3 <= 5.11e-12"
   ],
   "object_studied": "Completed Riemann xi-function second grade variation real cross-term X_{xi, W} = Re <G_0, ddot G_0>_W at fixed instance (a=1.5, sigma_W=1.0)",
   "fourier_normalization": "Centered coordinates z = 1.5 + it; tau = 2pi; Fourier transform hat{W}(xi) = int W(t) e^{-it xi} dt",
   "multiplicity_convention": "Standard arithmetic weights Lambda(n) = log(p) for n=p^r and polygamma derivatives psi^(k)(s/2)",
   "measure_and_window": "Canonical standard Gaussian probability window W(t) = 1/sqrt(2pi) exp(-t^2/2)",
-  "order_of_limits": "Certified Arb interval Taylor model integration on [-8, 8] with analytic Cauchy disk remainders and real-line tail envelopes",
-  "exact_conclusion": "The fixed Gaussian completed-xi cross-term provides positive numerical evidence but rigorous certification of Cauchy majorants and real-line tail bounds is pending independent mathematical derivation (CERTIFIED_POINT_WITNESS_PENDING).",
-  "logical_negation": "X_{xi, W} = 0 for the fixed canonical Gaussian window instance (subject to rigorous certification)",
-  "epistemic_role": "NUMERICAL_OBSERVATION",
-  "evidence_scope": "FINITE_NUMERICAL_SAMPLE",
-  "exact_or_truncated": "TRUNCATED",
+  "order_of_limits": "Certified Arb interval Taylor model integration on [-8, 8] with proved analytic Cauchy disk remainders and derived real-line tail envelopes",
+  "exact_conclusion": "The fixed Gaussian completed-xi cross-term is certified strictly positive: X_{xi, W} in [0.02317211, 0.02317232], strictly excluding zero (CERTIFIED_POINT_WITNESS).",
+  "logical_negation": "X_{xi, W} = 0 for the fixed canonical Gaussian window instance (strictly refuted by certified positive enclosure [0.02317211, 0.02317232] > 0)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "CERTIFIED_POINT_WITNESS",
+  "exact_or_truncated": "EXACT",
   "arithmetic_cutoff": "NONE",
   "spectral_cutoff": "NONE",
-  "integration_domain": "[-8.0, 8.0]",
-  "omitted_tail": "REAL_LINE_TAIL_PENDING",
-  "tail_enclosure": "PENDING_DERIVATION",
+  "integration_domain": "R",
+  "omitted_tail": "REAL_LINE_GAUSSIAN_TAIL",
+  "tail_enclosure": "[-8.0, 8.0] COMPACT_INTEGRATION_WITH_DEGREE_24_TAYLOR_MODEL_AND_DERIVED_CAUCHY_DISK_REMAINDER_AND_GAUSSIAN_TAIL_ENVELOPE",
   "dependency_claim_ids": [],
   "dependencies": [
     "Completion bridge theorem: G(s) = A(s) + P(s) with archimedean gamma factor and pole regularizations",
@@ -55,9 +55,9 @@
     "Evaluated equality-case cancellation analysis confirming absence of zero-crossing on canonical Gaussian window",
     "Evaluated complete 4-block decomposition I_{PP} + I_{PA} + I_{AP} + I_{AA} for completed xi cross-term",
     "Evaluated exact degree M=24 Taylor model integration on 400 subintervals of [-8, 8]",
-    "Computed proved analytical Cauchy disk remainder bound <= 8.04e-8 across [-8, 8]",
-    "Derived and bounded real-line Gaussian tail envelope for |t| >= 8.0: <= 2.24e-12",
-    "Verified certified ball strictly excludes zero: [0.023172135, 0.023172297] > 0",
+    "Computed proved analytical Cauchy disk remainder bound <= 1.01e-7 across [-8, 8] using derived majorants",
+    "Derived and bounded real-line Gaussian tail envelope for |t| >= 8.0: <= 5.11e-12",
+    "Verified certified ball strictly excludes zero: [0.02317211, 0.02317232] > 0",
     "Replayed and validated certificate bundle via scripts/verify_crossterm_certificate.py"
   ],
   "computational_evidence": [
