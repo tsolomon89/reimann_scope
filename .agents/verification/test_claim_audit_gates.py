@@ -764,3 +764,67 @@ class TestAdversarialAuditGates:
         res = audit_claim_specification(claim_a, repo_root=str(tmp_path))
         assert res["status"] == "FAIL"
         assert any("Gate 10 [Dependency Cycle]" in v for v in res["violations"])
+
+    def test_adv_20_certified_point_witness_cannot_depend_on_open_claim(self, tmp_path):
+        """20. A claim declaring evidence_scope=CERTIFIED_POINT_WITNESS cannot depend on an open claim."""
+        mock_agents = tmp_path / ".agents"
+        claims_dir = mock_agents / "claims"
+        claims_dir.mkdir(parents=True)
+
+        open_dep = {
+            "claim_id": "CLM-OPEN-DEP",
+            "statement": "Open dependency.",
+            "quantified_variables": [{"name": "x", "domain": "Real"}],
+            "variable_domains": ["Real"],
+            "hypotheses": ["Hyp"],
+            "object_studied": "Obj",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Standard",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "Pending resolution",
+            "logical_negation": "Resolved",
+            "epistemic_role": "OPEN_OBLIGATION",
+            "evidence_scope": "CONDITIONAL_THEOREM",
+            "exact_or_truncated": "TRUNCATED",
+            "integration_domain": "R",
+            "status": "OPEN",
+            "dependency_claim_ids": [],
+            "dependencies": [],
+            "proof_artifact": "None",
+            "falsification_attempts": ["Tested"],
+            "computational_evidence": ["test"],
+            "external_sources": [{"source": "Source", "theorem": "Theorem"}]
+        }
+        (claims_dir / "CLM-OPEN-DEP.json").write_text(json.dumps(open_dep), encoding="utf-8")
+
+        certified_claim = {
+            "claim_id": "CLM-CERT-WITNESS",
+            "statement": "Certified point witness depending on open claim.",
+            "quantified_variables": [{"name": "x", "domain": "Real"}],
+            "variable_domains": ["Real"],
+            "hypotheses": ["Hyp"],
+            "object_studied": "Obj",
+            "fourier_normalization": "Standard",
+            "multiplicity_convention": "Standard",
+            "measure_and_window": "Standard",
+            "order_of_limits": "Standard",
+            "exact_conclusion": "Certified point witness excludes zero",
+            "logical_negation": "Point witness vanishes",
+            "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+            "evidence_scope": "CERTIFIED_POINT_WITNESS",
+            "exact_or_truncated": "EXACT",
+            "integration_domain": "R",
+            "status": "CERTIFIED_POINT_WITNESS",
+            "dependency_claim_ids": ["CLM-OPEN-DEP"],
+            "dependencies": ["CLM-OPEN-DEP"],
+            "proof_artifact": "certificate.json",
+            "falsification_attempts": ["Tested equality-case cancellation"],
+            "computational_evidence": ["test"],
+            "external_sources": [{"source": "Source", "theorem": "Theorem"}]
+        }
+
+        res = audit_claim_specification(certified_claim, repo_root=str(tmp_path))
+        assert res["status"] == "FAIL"
+        assert any("Gate 10 [Dependency Semantic Validity]" in v for v in res["violations"])
+        assert any("CLM-OPEN-DEP" in v for v in res["violations"])

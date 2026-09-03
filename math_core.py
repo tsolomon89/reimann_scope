@@ -7118,27 +7118,297 @@ def infinite_prime_windowed_dirichlet_series_inner_product(
         }
 
 
+def derive_completed_xi_crossterm_complex_disk_majorants(
+    r: Union[float, str] = "0.05",
+    max_t: Union[float, str] = "8.0",
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [PROVED DERIVATION: COMPLEX DISK MAJORANTS FOR COMPLETED-XI JET]
+    Derives rigorous upper bounds M_G, M_Gp, M_Gpp for |G(s)|, |G'(s)|, |G''(s)|
+    throughout every complex disk D(t_m, r) = {s = 2 - Im(u) + i(t_m + Re(u)) : |u| <= r}
+    for |t_m| <= max_t.
+
+    MATHEMATICAL PROOF:
+    1. Holomorphic Strip: For |u| <= r, Re(s) >= sigma_0 = 2 - r. For r = 0.05,
+       Re(s) >= 1.95 > 1. In Re(s) > 1, xi(s) has no zeros and no poles, so
+       G(s) = -xi'/xi(s) and its derivatives are analytic.
+    2. Dirichlet Terms: P(s) = -zeta'/zeta(s) = sum_{n=2}^oo Lambda(n) n^{-s}.
+       For any Re(s) >= sigma_0:
+         |P(s)| <= sum Lambda(n) n^{-sigma_0} = -zeta'/zeta(sigma_0) =: P0_max
+         |P'(s)| <= sum Lambda(n) log(n) n^{-sigma_0} = (-zeta'/zeta)'(sigma_0) =: P1_max
+         |P''(s)| <= sum Lambda(n) (log n)^2 n^{-sigma_0} = (-zeta'/zeta)''(sigma_0) =: P2_max.
+       These are certified by Arb at the real point sigma_0.
+    3. Rational Terms: For s in D(t_m, r), |s| >= sigma_0 and |s-1| >= sigma_0 - 1:
+         |1/s + 1/(s-1)| <= 1/sigma_0 + 1/(sigma_0 - 1) =: rat0_max
+         |-1/s^2 - 1/(s-1)^2| <= 1/sigma_0^2 + 1/(sigma_0 - 1)^2 =: rat1_max
+         |2/s^3 + 2/(s-1)^3| <= 2/sigma_0^3 + 2/(sigma_0 - 1)^3 =: rat2_max.
+    4. Polygamma Terms: w = s/2 has Re(w) >= sigma_0 / 2 =: w0.
+       From the partial fraction series psi_k(w) = (-1)^{k+1} k! sum_{n=0}^oo 1/(n+w)^{k+1}:
+         |psi_1(s/2)| <= sum 1/(n + w0)^2 = psi_1(w0) =: H_zeta2
+         |psi_2(s/2)| <= 2 sum 1/(n + w0)^3 = |psi_2(w0)| =: H_zeta3.
+       For psi(s/2) along vertical segment:
+         |psi(s/2)| <= |psi(w0)| + tau_max * H_zeta2 with tau_max = (max_t + r)/2.
+    5. Resulting Universal Majorants:
+       M_G   = P0_max + rat0_max + (1/2)*log(pi) + (1/2)*psi_max
+       M_Gp  = P1_max + rat1_max + (1/4)*H_zeta2
+       M_Gpp = P2_max + rat2_max + (1/8)*H_zeta3.
+    """
+    try:
+        import flint
+        from flint import arb, acb, acb_series, ctx
+        ctx.dps = dps
+
+        r_arb = arb(str(r))
+        max_t_arb = arb(str(max_t))
+        sig0 = arb("2.0") - r_arb
+        w0 = sig0 / 2
+
+        # 1. Dirichlet terms at real point sig0
+        s_pt = acb(sig0)
+        ser = acb_series([s_pt, 1], prec=dps + 20).zeta().log()
+        P0_max = (-ser[1]).real.abs_upper()
+        P1_max = (2 * ser[2]).real.abs_upper()
+        P2_max = (6 * ser[3]).real.abs_upper()
+
+        # 2. Rational terms
+        rat0_max = 1 / sig0 + 1 / (sig0 - 1)
+        rat1_max = 1 / (sig0 * sig0) + 1 / ((sig0 - 1) * (sig0 - 1))
+        rat2_max = 2 / (sig0 * sig0 * sig0) + 2 / ((sig0 - 1) * (sig0 - 1) * (sig0 - 1))
+
+        # 3. Polygamma bounds via real evaluations at w0
+        w0_acb = acb(w0)
+        H_zeta2 = w0_acb.polygamma(1).real.abs_upper()
+        H_zeta3 = (abs(w0_acb.polygamma(2).real) / 2).abs_upper()
+        psi_w0 = abs(w0_acb.digamma().real).abs_upper()
+        tau_max = (max_t_arb + r_arb) / 2
+        psi_max = psi_w0 + tau_max * H_zeta2
+
+        # 4. Summing components
+        M_G = P0_max + rat0_max + arb.pi().log() / 2 + psi_max / 2
+        M_Gp = P1_max + rat1_max + H_zeta2 / 4
+        M_Gpp = P2_max + rat2_max + (2 * H_zeta3) / 8
+
+        return {
+            "r": str(r),
+            "max_t": str(max_t),
+            "sigma_0": str(sig0),
+            "P0_max": str(P0_max),
+            "P1_max": str(P1_max),
+            "P2_max": str(P2_max),
+            "rat0_max": str(rat0_max),
+            "rat1_max": str(rat1_max),
+            "rat2_max": str(rat2_max),
+            "H_zeta2": str(H_zeta2),
+            "H_zeta3": str(H_zeta3),
+            "psi_max": str(psi_max),
+            "M_G": M_G.abs_upper(),
+            "M_Gp": M_Gp.abs_upper(),
+            "M_Gpp": M_Gpp.abs_upper(),
+            "derived_certified": True
+        }
+    except Exception as e:
+        return {"error": str(e), "derived_certified": False}
+
+
+def derive_completed_xi_crossterm_realline_tail_bound(
+    T: Union[float, str] = "8.0",
+    sigma_w: Union[float, str] = "1.0",
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [PROVED DERIVATION: REAL-LINE GAUSSIAN TAIL ENVELOPE FOR |t| >= T]
+    Derives rigorous polynomial envelope |G(2+it)| |ddot G_0(2+it)| <= C_2 t^2 + C_3 |t|^3
+    for |t| >= T >= 8, and bounds the real-line Gaussian tail integral:
+      R_tail = 2 int_T^oo W(t) |G(2+it)| |ddot G_0(2+it)| dt.
+
+    MATHEMATICAL PROOF:
+    1. Dirichlet Bounds: For Re(s) = 2:
+       |P(2+it)| <= -zeta'/zeta(2) <= 0.57
+       |P'(2+it)| <= (-zeta'/zeta)'(2) <= 0.89
+       |P''(2+it)| <= (-zeta'/zeta)''(2) <= 1.95.
+    2. Rational Bounds: For |t| >= 8:
+       |1/s + 1/(s-1)| <= 2/|t| <= 0.25
+       |-1/s^2 - 1/(s-1)^2| <= 2/t^2 <= 0.0313
+       |2/s^3 + 2/(s-1)^3| <= 4/|t|^3 <= 0.0079.
+    3. Polygamma Bounds: For tau = t/2 >= 4:
+       By integral comparison on partial fractions:
+         |psi_1(1+i tau)| <= 1/(1+tau^2) + pi/(2 tau) <= 4/t^2 + pi/t <= 0.4553
+         |psi_2(1+i tau)| <= 2 [1/(1+tau^2)^{3/2} + 1/tau^2] <= 8/t^2 + 16/t^3 <= 0.1563
+         |psi(1+i tau)| <= gamma_E + pi^2/6 + pi/4 + (pi/2) log(tau) <= 2.0 + 1.58 log|t|.
+    4. Combined Moduli:
+       |G(2+it)| <= 0.57 + 0.25 + 0.58 + 1.0 + 0.79 log|t| <= 2.40 + 0.79 log|t| <= |t|
+       |G'(2+it)| <= 0.89 + 0.0313 + 0.4553/4 <= 1.04 <= 1.10
+       |G''(2+it)| <= 1.95 + 0.0079 + 0.1563/8 <= 1.98 <= 2.00.
+    5. Jet and Product Envelope:
+       |z| = sqrt(9/4 + t^2) <= 1.2 |t|, |z|^2 <= 1.04 t^2 for |t| >= 8.
+       |z G' + z^2 G''| <= 1.2 * 1.1 |t| + 1.04 * 2.0 t^2 <= 1.32 |t| + 2.08 t^2.
+       |ddot G_0| <= (log 2pi)^2 (1.32 |t| + 2.08 t^2) <= 4.47 |t| + 7.04 t^2.
+       |G| |ddot G_0| <= |t| (4.47 |t| + 7.04 t^2) = 4.47 t^2 + 7.04 |t|^3 <= 4.5 t^2 + 7.1 |t|^3.
+    6. Gaussian Moments on [T, oo):
+       int_T^oo t^2 exp(-t^2 / (2 sigma_W^2)) dt <= sigma_W^2 (T + sigma_W^2 / T) exp(-T^2 / (2 sigma_W^2))
+       int_T^oo t^3 exp(-t^2 / (2 sigma_W^2)) dt = sigma_W^2 (T^2 + 2 sigma_W^2) exp(-T^2 / (2 sigma_W^2)).
+    """
+    try:
+        import flint
+        from flint import arb, ctx
+        ctx.dps = dps
+
+        T_arb = arb(str(T))
+        sig_w_arb = arb(str(sigma_w))
+        sqrt_2pi = (2 * arb.pi()).sqrt()
+
+        c2 = arb("4.5")
+        c3 = arb("7.1")
+
+        sig2 = sig_w_arb * sig_w_arb
+        exp_T2 = (- (T_arb * T_arb) / (2 * sig2)).exp()
+        int_t2 = sig2 * (T_arb + sig2 / T_arb) * exp_T2
+        int_t3 = sig2 * (T_arb * T_arb + 2 * sig2) * exp_T2
+
+        tail_integral = 2 * (1 / (sig_w_arb * sqrt_2pi)) * (c2 * int_t2 + c3 * int_t3)
+
+        return {
+            "T": str(T),
+            "sigma_w": str(sigma_w),
+            "envelope_c2": "4.5",
+            "envelope_c3": "7.1",
+            "tail_integral_bound": tail_integral.abs_upper(),
+            "derived_certified": True
+        }
+    except Exception as e:
+        return {"error": str(e), "derived_certified": False}
+
+
+def evaluate_completed_xi_crossterm_interval_box_analysis(
+    a: Union[float, str] = "1.5",
+    sigma_w: Union[float, str] = "1.0",
+    N_primes: int = 10000,
+    N_boxes: int = 10,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    [ANALYTICAL INTERVAL-BOX METHOD & DIRICHLET TAIL SCALE AUDIT]
+    Evaluates the completed xi cross-term on [-T, T] using interval-box arithmetic
+    with explicit Dirichlet polynomial P_N(s) and analytical Dirichlet tail balls T_0, T_1, T_2.
+
+    Demonstrates why the pure interval-box method with prime cutoff N incurs a tail
+    uncertainty of scale O((log N)^3 / N) in the second derivative P''_N(s), which
+    requires N >= 10^8 to narrow below the cross-term magnitude (~0.023).
+    """
+    try:
+        import flint
+        from flint import arb, acb, ctx
+        ctx.dps = dps
+
+        a_arb = arb(str(a))
+        sig_w_arb = arb(str(sigma_w))
+        sigma_arb = arb("0.5") + a_arb
+        tau = 2 * arb.pi()
+        log_tau = tau.log()
+        sqrt_2pi = (2 * arb.pi()).sqrt()
+
+        # Precompute primes up to N_primes
+        min_p = list(range(N_primes + 1))
+        for i in range(2, int(N_primes**0.5) + 1):
+            if min_p[i] == i:
+                for j in range(i*i, N_primes + 1, i):
+                    if min_p[j] == j: min_p[j] = i
+        p_powers = []
+        for n in range(2, N_primes + 1):
+            p = min_p[n]
+            temp = n
+            while temp % p == 0: temp //= p
+            if temp == 1: p_powers.append((acb(n), arb(p).log(), arb(n).log()))
+
+        lN = arb(N_primes).log()
+        tail0 = (lN + 1) / N_primes
+        tail1 = (lN*lN + 2*lN + 2) / N_primes
+        tail2 = (lN*lN*lN + 3*lN*lN + 6*lN + 6) / N_primes
+        T0 = acb(arb(0, tail0), arb(0, tail0))
+        T1 = acb(arb(0, tail1), arb(0, tail1))
+        T2 = acb(arb(0, tail2), arb(0, tail2))
+
+        # Test single small box around t = 0
+        h = arb("0.005")
+        t_box = arb("0.0", h / 2)
+        s = acb(sigma_arb, t_box)
+        z = acb(a_arb, t_box)
+        inv_s = 1 / s
+        inv_sm1 = 1 / (s - 1)
+        A = inv_s + inv_sm1 - arb.pi().log()/2 + (s/2).digamma()/2
+        Ap = -inv_s*inv_s - inv_sm1*inv_sm1 + (s/2).polygamma(1)/4
+        App = 2*inv_s*inv_s*inv_s + 2*inv_sm1*inv_sm1*inv_sm1 + (s/2).polygamma(2)/8
+
+        P0 = acb(0)
+        P1 = acb(0)
+        P2 = acb(0)
+        for acb_n, lp, ln in p_powers:
+            term = lp * (acb_n ** (-s))
+            P0 += term
+            P1 -= term * ln
+            P2 += term * (ln * ln)
+
+        G = P0 + T0 - A
+        Gp = P1 + T1 - Ap
+        Gpp = P2 + T2 - App
+        Gddot0 = (log_tau * log_tau) * (z * Gp + (z * z) * Gpp)
+        W = (-t_box * t_box / (2 * sig_w_arb * sig_w_arb)).exp() / (sig_w_arb * sqrt_2pi)
+        integrand = W * (G * Gddot0.conjugate()).real
+
+        return {
+            "N_primes": N_primes,
+            "tail0_bound": str(tail0),
+            "tail1_bound": str(tail1),
+            "tail2_bound": str(tail2),
+            "box_width": str(h),
+            "box_integrand": str(integrand),
+            "box_integrand_lower": str(integrand.lower()),
+            "box_integrand_upper": str(integrand.upper()),
+            "box_strictly_positive": bool(integrand.lower() > 0),
+            "dirichlet_tail_scale_identified": True
+        }
+    except Exception as e:
+        return {"error": str(e), "dirichlet_tail_scale_identified": False}
+
+
 def certify_fixed_gaussian_completed_xi_crossterm(
     a: Union[float, str] = "1.5",
     sigma_w: Union[float, str] = "1.0",
     T: float = 8.0,
     N_quad: int = 400,
-    dps: int = 50
+    dps: int = 80,
+    source_commit: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     [CERTIFIED FIXED GAUSSIAN COMPLETED-XI CROSS-TERM CERTIFICATION]
     Computes a certified Arb interval enclosure for the exact completed xi cross-term:
       X_{xi, W} = int_{R} W(t) Re( G(2+it) conj(ddot G_0(2+it)) ) dt
     at fixed instance (a = 1.5, sigma_W = 1.0) using python-flint (Arb ball arithmetic):
-      1. Compact domain [-T, T] = [-8, 8] with N_quad = 400 subintervals of width h = 0.04.
-      2. Degree M = 20 Taylor polynomial expansion of exact completed xi logarithmic derivative G(s) and jet ddot G_0.
-      3. Proved analytic Cauchy remainder enclosure on disk of radius r = 0.05 around each subinterval midpoint:
-         R_k <= h * max_{|u|<=r} |f(t_m + u)| * (r / (r - h/2)) * ( (h/2) / r )^{M+1}.
-         Total compact Cauchy remainder bound <= 3.99e-6.
-      4. Rigorously derived real-line Gaussian tail envelope for |t| >= 8 on sigma=2:
-         |G(2+it)| |ddot G_0(2+it)| <= 15.0 t^2 + 1.5 |t|^3, yielding tail bound <= 2.24e-12.
-      5. Total certified enclosure: I_total = I_compact + [-2.24e-12, 2.24e-12] = [0.023168, 0.023176] > 0.
-    Proves that 0 is strictly excluded from X_{xi, W}.
+
+    PROVED THEORETICAL COMPONENTS:
+      1. Formal Holomorphic Complexification:
+         Via Schwarz reflection on the real line, Re(G(2+it) conj(ddot G_0(2+it)))
+         is the exact boundary value of the holomorphic function
+           Phi(w) = (1/2) [ G(2+iw) H(2-iw) + G(2-iw) H(2+iw) ]
+         with H(s) = (log 2pi)^2 [ (s - 1/2) G'(s) + (s - 1/2)^2 G''(s) ].
+         F(w) = W(w) Phi(w) is complex analytic on the strip |Im(w)| < 1.
+      2. Compact Taylor Model Integration on [-8, 8]:
+         N_quad = 400 subintervals of width h = 0.04, degree M = 24 Taylor polynomials.
+      3. Proved Cauchy Disk Remainder Bounds:
+         On disk D(t_m, r) with r = 0.05, using derived majorants from
+         derive_completed_xi_crossterm_complex_disk_majorants:
+           M_G <= 6.50, M_Gp <= 2.80, M_Gpp <= 5.21.
+         Corrected disk geometry bounds:
+           Z_max = sqrt((3/2 + r)^2 + (|t_m| + r)^2)
+           W_max = (exp(r^2 / (2 sigma_W^2)) / (sigma_W sqrt(2pi))) * exp(-max(0, |t_m|-r)^2 / (2 sigma_W^2)).
+         Total compact Cauchy remainder bound <= 1.01e-7.
+      4. Rigorously Derived Real-Line Gaussian Tail Bound:
+         From derive_completed_xi_crossterm_realline_tail_bound,
+         |G(2+it)| |ddot G_0(2+it)| <= 4.5 t^2 + 7.1 |t|^3, yielding R_tail <= 5.11e-12.
+      5. Total Certified Enclosure:
+         I_total in [0.02317211, 0.02317232] > 0.
+         Proves that 0 is strictly excluded from X_{xi, W}.
     """
     try:
         import flint
@@ -7157,10 +7427,27 @@ def certify_fixed_gaussian_completed_xi_crossterm(
         h_arb = arb(str(h))
         half_h = h_arb / 2
 
-        # 1. Certified Taylor model expansion with degree M=20 and Cauchy disk radius r=0.05
-        order = 20
+        # 1. Proved complex disk majorants
+        disk_maj = derive_completed_xi_crossterm_complex_disk_majorants(r="0.05", max_t=str(T), dps=dps)
+        if not disk_maj.get("derived_certified", False):
+            return {"error": "Failed to derive complex disk majorants", "flint_certified": False, "zero_excluded": False}
+        M_G_arb = disk_maj["M_G"]
+        M_Gp_arb = disk_maj["M_Gp"]
+        M_Gpp_arb = disk_maj["M_Gpp"]
+
+        # 2. Proved real-line tail bound
+        tail_maj = derive_completed_xi_crossterm_realline_tail_bound(T=str(T), sigma_w=str(sigma_w), dps=dps)
+        if not tail_maj.get("derived_certified", False):
+            return {"error": "Failed to derive real-line tail bound", "flint_certified": False, "zero_excluded": False}
+        tail_rad = tail_maj["tail_integral_bound"]
+
+        # 3. Certified Taylor model expansion with degree M=24 and Cauchy disk radius r=0.05
+        order = 24
         r = arb("0.05")
         i_acb = acb(0, 1)
+        ratio = half_h / r
+        geom_factor = ratio**(order + 1) / (1 - ratio)
+        exp_r2_half = (r * r / (2 * (sig_w_arb * sig_w_arb))).exp()
 
         def eval_subinterval_certified_taylor(t_m):
             s_m = acb(sigma_arb, t_m)
@@ -7202,22 +7489,18 @@ def certify_fixed_gaussian_completed_xi_crossterm(
                 c_n = integrand_u[n]
                 int_poly += c_n * 2 * (half_h**(n+1)) / arb(n+1)
 
-            # 2. Proved analytical Cauchy remainder bound on disk |u| <= r=0.05
-            # On Re(s) >= 1.95: |G(s)| <= 4.60, |G'(s)| <= 3.0, |G''(s)| <= 6.25
-            t_abs = abs(t_m) + arb("0.05")
-            z_mag = (arb("2.25") + t_abs**2).sqrt()
-            ddot_G_mag = (log_tau**2) * (z_mag * arb("3.0") + (z_mag**2) * arb("6.25"))
-            t_min = arb(0).max(abs(t_m) - arb("0.05"))
-            W_max = (- (t_min**2) / (2 * (sig_w_arb**2))).exp() / (sig_w_arb * sqrt_2pi)
-            M_disk = W_max * arb("4.60") * ddot_G_mag
+            # Proved analytical Cauchy remainder bound with corrected complex-disk geometry
+            abs_tm = abs(t_m)
+            Z_max = ((a_arb + r)**2 + (abs_tm + r)**2).sqrt()
+            ddot_G_mag = (log_tau**2) * (Z_max * M_Gp_arb + (Z_max**2) * M_Gpp_arb)
+            t_dist = arb(0).max(abs_tm - r)
+            W_max = (exp_r2_half / (sig_w_arb * sqrt_2pi)) * (- (t_dist**2) / (2 * (sig_w_arb**2))).exp()
+            M_disk = W_max * M_G_arb * ddot_G_mag
 
-            geom_factor = r / (r - half_h)
-            ratio = half_h / r
-            rem_bound = h_arb * M_disk * geom_factor * (ratio**(order + 1))
+            rem_bound = h_arb * M_disk * geom_factor
 
             return int_poly, rem_bound
 
-        order = 24
         total_poly_integral = arb(0)
         total_cauchy_remainder = arb(0)
         for k in range(N_quad):
@@ -7228,17 +7511,7 @@ def certify_fixed_gaussian_completed_xi_crossterm(
             total_cauchy_remainder += rb
 
         I_compact_interval = total_poly_integral + arb(0, total_cauchy_remainder)
-
-        # 2. Derived real-line tail envelope for |t| >= T=8 on sigma=2:
-        #    |G(2+it)| |ddot G_0(2+it)| <= 15.0 t^2 + 1.5 t^3
-        exp_half_t2 = (- (T_arb**2 / 2)).exp()
-        int_t3 = (T_arb**2 + 2) * exp_half_t2
-        int_t2 = (T_arb + 1/T_arb) * exp_half_t2
-        c2_env = arb("15.0")
-        c3_env = arb("1.5")
-        tail_rad = 2 * (1 / sqrt_2pi) * (c2_env * int_t2 + c3_env * int_t3)
         tail_gaussian = arb(0, tail_rad)
-
         certified_enclosure = I_compact_interval + tail_gaussian
 
         lower_b = certified_enclosure.lower()
@@ -7264,7 +7537,17 @@ def certify_fixed_gaussian_completed_xi_crossterm(
             "upper_bound_arb": str(upper_b),
             "zero_excluded": zero_excluded,
             "is_strictly_positive": zero_excluded,
-            "flint_certified": True
+            "flint_certified": True,
+            "source_commit": source_commit,
+            "derived_majorants": {
+                "M_G": str(M_G_arb),
+                "M_Gp": str(M_Gp_arb),
+                "M_Gpp": str(M_Gpp_arb)
+            },
+            "derived_tail": {
+                "envelope": "4.5 t^2 + 7.1 |t|^3",
+                "tail_bound": str(tail_rad)
+            }
         }
     except Exception as e:
         return {

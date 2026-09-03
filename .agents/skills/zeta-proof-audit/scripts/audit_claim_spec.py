@@ -456,8 +456,10 @@ def validate_dependency_graph(spec: Dict[str, Any], repo_root: Optional[str] = N
     conc = str(spec.get("exact_conclusion", "")).lower()
 
     is_terminal_role = role in {"NO_GO_COMPONENT", "LOAD_BEARING_ANALYTIC_THEOREM", "ALGEBRAIC_IDENTITY"}
+    ev_scope = str(spec.get("evidence_scope", "")).strip()
+    is_terminal_scope = ev_scope in {"CERTIFIED_POINT_WITNESS", "CERTIFIED_COMPACT_DOMAIN"}
     is_terminal_assertion = ("closed" in conc or "proved" in conc or "falsified" in conc) and not ("open" in conc or "pending" in conc)
-    is_root_terminal = is_terminal_role or is_terminal_assertion
+    is_root_terminal = is_terminal_role or is_terminal_scope or is_terminal_assertion
 
     # 1. Textual dependency check for explicit non-terminal qualifiers
     if is_root_terminal:
@@ -537,6 +539,8 @@ ALLOWED_STATUSES = {
     "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO",
     "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE",
     "CERTIFIED_POINT_WITNESS_PENDING",
+    "CERTIFIED_POINT_WITNESS",
+    "CERTIFIED_COMPACT_DOMAIN",
     "BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN",
     "FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN",
     "FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED",
@@ -558,6 +562,8 @@ KNOWN_TERMINAL_PATTERNS = [
     "KNOWN_RH_EQUIVALENCE",
     "INTERNALLY_REDERIVED",
     "EXTERNAL_ANALYTIC_PROOF",
+    "CERTIFIED_POINT_WITNESS",
+    "CERTIFIED_COMPACT_DOMAIN",
     "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO",
     "FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_POSITIVE_NUMERICAL_EVIDENCE",
     "FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED",

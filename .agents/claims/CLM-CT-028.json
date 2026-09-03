@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-028",
-  "statement": "For the defined candidate class of bilateral grade dilation constructions, the fixed canonical Gaussian common-frame instance at displacement a = 1.5 (sigma = 2.0) fails arithmetic zero descent with certified strictly positive cross-term X_{xi, W} in [0.023172135, 0.023172297] and positive second variation V_2 > 0 strictly, closing this fixed candidate instance (FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED). Whole-class closure for general non-canonical or untuned window families remains an open classification (BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN).",
+  "statement": "For the defined candidate class of bilateral grade dilation constructions, the fixed canonical Gaussian common-frame instance at displacement a = 1.5 (sigma = 2.0) is under evaluation; certification of the cross-term witness CLM-CT-027 is pending, leaving this candidate instance open (FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN). Whole-class closure for general non-canonical or untuned window families remains an open classification (BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN).",
   "quantified_variables": [
     {
       "name": "instance",
@@ -15,7 +15,7 @@
   "hypotheses": [
     "Fixed canonical Gaussian window W(t) = 1/sqrt(2pi) exp(-t^2/2) at a = 1.5",
     "G(s) = -xi'/xi(s) = A(s) + P(s)",
-    "Certified positivity of cross-term X_{xi, W} in [0.023172135, 0.023172297] from CLM-CT-027",
+    "Pending certification of cross-term X_{xi, W} from CLM-CT-027",
     "Strictly positive norm term 2 a^2 int W |g'|^2 dt > 0",
     "Weighted-adjoint second variation identity: ||L_a g||_W^2 + Re<L_{a,W}^* g, L_a g>_W = 2 a^2 int W |g'|^2 dt - Re int W (1 + (W'/W)(t + ia)) g conj((t - ia) g') dt"
   ],
@@ -24,10 +24,10 @@
   "multiplicity_convention": "All zero multiplicities and background components included",
   "measure_and_window": "Canonical standard Gaussian probability window on R",
   "order_of_limits": "Evaluation of finite parameter instance with certified point witness",
-  "exact_conclusion": "The fixed canonical Gaussian candidate instance is closed: arithmetic zero descent fails with V_2 > 0 strictly (FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED); whole-class status for arbitrary Schwartz windows remains an open classification (BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN).",
-  "logical_negation": "The fixed canonical Gaussian instance achieves exact arithmetic zero descent V_2 = 0 (strictly refuted by certified positivity of V_2)",
-  "epistemic_role": "NO_GO_COMPONENT",
-  "evidence_scope": "NO_GO_FOR_DEFINED_CLASS",
+  "exact_conclusion": "The fixed canonical Gaussian candidate instance remains open pending rigorous certification of cross-term witness CLM-CT-027 (FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_OPEN); whole-class status for arbitrary Schwartz windows remains an open classification (BILATERAL_GRADE_ROUTE_CLASS_CLOSURE_OPEN).",
+  "logical_negation": "The fixed canonical Gaussian instance achieves exact arithmetic zero descent V_2 = 0",
+  "epistemic_role": "OPEN_OBLIGATION",
+  "evidence_scope": "CONDITIONAL_THEOREM",
   "exact_or_truncated": "EXACT",
   "arithmetic_cutoff": "NONE",
   "spectral_cutoff": "NONE",
