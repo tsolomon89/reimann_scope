@@ -1071,6 +1071,410 @@ The repository's geometric, spectral, and arithmetic structures are unified unde
 3. **Consolidated Master Obligation**:
    Surviving radial-defect extraction routes are consolidated under $\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}$ across 4 child routes: RDQ (`OBL-RDQ-001`), Curvature Transport (`OBL-CT-001`), Weil-Hermitian (`OBL-WH-001`), and CMSA (`OBL-CMSA-003`).
 
+---
+
+## 25. Transcendental Continuation Mechanism Discovery: Arithmetic Separation vs Off-Line Zeros
+
+### 25.1 Reset of the Active TC Question
+The active research question governing transcendental continuation mechanism discovery is reset to:
+> **Which exact prime–zeta relationship, after complete TC transport, forces an off-line zero to violate arithmetic separation, and why does it not force that violation for an on-line zero?**
+
+The target contradiction endpoint is:
+\[
+m \tau^K = n \tau^J \quad (m, n \in \mathbb Z \setminus \{0\}, \; K \ne J \in \mathbb Z) \iff \tau^{K-J} = \frac{n}{m} \in \mathbb Q \setminus \{0\},
+\]
+which is strictly forbidden by the transcendence of $\tau = 2\pi$ (Lindemann 1882).
+
+### 25.2 Cycle 1 Candidate Evaluation Matrix
+
+| Candidate ID | Exact Object & Claim | Arithmetic Premise & Role of $\rho$ | Intermediate Bridge & Intended Consequence | Earliest Unproved Inference & Dependencies | Discriminating Test & Result | Scoped Finding & Next Justified Action |
+|---|---|---|---|---|---|---|
+| **TC-DISC-01** (Gap A) | Station lattice $L_K = \tau^K\mathbb Z$ vs Dirichlet frequencies $\{\tau^{-K}\log n\}$. Claim: transported prime sum forces $L_K$ collision if $\delta \ne 0$. | Euler product $\sum \Lambda(n) n^{-s}$, with $\rho$ entering via explicit formula. | Projecting prime frequencies onto integer station scaffolds $a_K \mathbb Z$ forces $m \tau^K = n \tau^J$. | Inference: prime-power Dirac delta or exponential frequencies lie in discrete lattice $a_K \mathbb Z$. | Falsified: $-F_K'/F_K + F_J'/F_J \equiv (K-J)\log\tau$ identically on $\mathbb C$. Frequencies are continuous Fourier arguments. | **FALSIFIED / REDUCED TO SCALAR PULLBACK**. Lattices are disjoint, but frequency differences reduce to a scalar constant containing zero data from $\delta$ or primes. |
+| **TC-DISC-02** (Gap B) | Grade character $q_\rho^K = \tau^{K(\rho-1/2)}$ and symmetric defect $D_K(\rho) = 4\sinh^2(K\delta\log\tau/2)$. Claim: arithmetic consistency forces $\delta \in \mathbb Q$ or $K\delta \in \mathbb Z$. | Hypothetical off-line zero $\rho = 1/2 + \delta + i\gamma$ ($\delta \ne 0$). | Off-line zero forces character modulus $\tau^{K\delta} \in \mathbb Q$, creating an arithmetic layer collision. | Inference: that integer grades $K \in \mathbb Z$ discretize or quantize the continuous zero displacement $\delta$. | Falsified: $|q_\rho^K| = \tau^{K\delta}$ and $D_K$ are smooth real-analytic for all $\delta \in \mathbb R$. Tested on $\delta \in \{0, 1/10, \sqrt{2}/10, \log_\tau(1.5)\}$. | **FALSIFIED / NO DISCRETE RESTRICTION ON $\delta$**. No algebraic or analytic law quantizes $\delta$. Irrational displacements yield valid non-quantized characters without contradiction. |
+| **TC-DISC-03** (Gap C) | Completed logarithmic derivative difference $\Delta G_{K,J}(s) = -\xi_K'/\xi_K - (-\xi_J'/\xi_J)$. Claim: off-line divisor fails cross-grade compatibility. | Complete zero divisor $Z = \{\rho\}$ entering via Hadamard product $\xi(s) = \xi(0)\prod (1-s/\rho)$. | Zero sums $\sum_\rho (s-\rho)^{-1}$ in $\xi_K$ and $\xi_J$ fail to cancel unless $\delta_\rho = 0$. | Inference: that twisted logarithmic derivatives retain a differential signature of $\delta$ across grades. | Falsified: $\Delta G_{K,J}(s) \equiv (K-J)\log\tau$ identically. The zero-pole singular parts cancel identically for every zero set. | **REDUCED TO SCALAR IDENTITIES / OBSTRUCTION CONFIRMED**. Cross-grade completed log-derivative differences cancel the entire zero divisor unconditionally, providing no exclusion mechanism. |
+| **TC-DISC-004** (Candidate D / Cycle 2 Sprint) | Transported explicit formula test function differences $h_{K,J}(r) = \phi(\tau^{-K}r) - \phi(\tau^{-J}r)$. Claim: off-line zero forces isolated two-prime frequency collision $\tau^K \log(\ell^q) = \tau^J \log(\ell^p)$ for prime base $\ell$ and positive integers $p, q$, requiring $\tau^{K-J} = p/q \in \mathbb{Q}$. | Explicit formula $\sum_\rho h(r_\rho) = \int h \Phi - \sum \frac{\Lambda(n)}{\sqrt{n}} g(\log n) + \dots$; hypothetical off-line zero $\rho = 1/2 + \delta + i\gamma$. | Test function differences isolate off-line zero response against prime-power Dirac comb, forcing an isolated balance $(\ell^q)^{\delta \tau^K} = (\ell^p)^{\delta \tau^J}$. | Scope of Negative Result: Equality of the two complete linear explicit-formula evaluations does not imply equality of any selected pair of prime-power summands. Pairwise collision requires an additional isolation or independence theorem. | Linearity proves $h_{K,J}$ is another native test (coordinate redundant). Multiplicative collision $\tau^{K-J} = p/q$ is strictly impossible by Lindemann's theorem, but whole-sum compensation does not force pair isolation. | **REJECTED AS A MECHANISM FROM EXPLICIT-FORMULA LINEARITY ALONE**. Linear explicit-formula evaluations collapse by linearity to native evaluations; arithmetic separation holds for isolated prime pairs but fails to exclude off-line zeros due to infinite-sum compensation. |
+
+---
+
+# 26. Transcendental Continuation: The Common-Referent Bridge (Cycle 3)
+
+## 26.1 The Common-Referent Collision Contract
+
+The simplest formulation of the transcendental continuation hypothesis posits an observable $A$ evaluated on nontrivial zeros $\rho = 1/2 + \delta + i\gamma$ satisfying three simultaneous conditions across distinct integer grades $K \ne J \in \mathbb{Z}$:
+
+1. **(CR1) Common Referent**: $A_K(\rho_K) = A_J(\rho_J) = A(\rho)$ as an exact external mathematical value in a common ambient space ($\mathbb{R}$ or $\mathbb{C}$).
+2. **(CR2) Arithmetic Location**: $A_K(\rho_K) \in L_K = \tau^K \mathbb{Z}$ and $A_J(\rho_J) \in L_J = \tau^J \mathbb{Z}$.
+3. **(CR3) Off-Line Non-Zero**: $\delta \ne 0 \implies A(\rho) \ne 0$.
+
+### The Common-Referent Collision Theorem
+\[
+\boxed{
+(CR1) + (CR2) + (CR3) \quad \text{and} \quad L_K \cap L_J = \{0\} \; (K \ne J) \implies \delta = 0.
+}
+\]
+
+*Proof*:
+From (CR1) and (CR2), the common value $A(\rho)$ lies in $L_K \cap L_J$. Since $K \ne J$, $L_K \cap L_J = \{0\}$ by the transcendence of $\tau = 2\pi$ (Lindemann 1882; Lean 4 `lattice_intersection_transcendental_char`). Thus $A(\rho) = 0$. By the contrapositive of (CR3), $\delta = 0$. Formalized in Lean 4 as `RiemannScope.common_referent_collision_theorem`.
+
+### Invariant/Covariant Observable Vanishing Form
+Equivalently, if an observable $A(X)$ in the same codomain is simultaneously:
+- Representation-invariant: $A(T_K X) = A(X)$, and
+- Homogeneous of real non-zero grade weight $w \ne 0$: $A(T_K X) = \tau^{wK} A(X)$,
+then $(1 - \tau^{wK}) A(X) = 0$. Since $\tau^{wK} \ne 1$ for $wK \ne 0$, $A(X) = 0$. Formalized in Lean 4 as `RiemannScope.invariant_covariant_observable_vanishing`.
+
+---
+
+## 26.2 Naturality Diagram: The Coordinate Conversion vs Raw Equality Boundary
+
+Coordinate redundancy establishes that internal geometric relationships agree **after conversion of units**. It does **not** assert that raw coordinates across different representations are equal.
+
+```text
+               Intrinsic Zero Object: ρ = 1/2 + δ + iγ
+                       /                    \
+              T_K     /                      \     T_J
+                     v                        v
+Grade K Representative: s_ρ(K) = τ^K ρ       Grade J Representative: s_ρ(J) = τ^J ρ
+                     |                        |
+             A_K     |                        |     A_J
+                     v                        v
+Raw Observable:      τ^K δ                    τ^J δ
+Codomain & Units:    Scale τ^K units          Scale τ^J units
+                     |                        |
+             C_K     | (× τ^-K)               | (× τ^-J)   C_J
+                     v                        v
+Converted Value:     δ           ===          δ  (Identical real number)
+```
+
+**The Central Distinction**:
+- **Converted observables** satisfy (CR1): $C_K(A_K) = \delta = C_J(A_J)$.
+- **Raw observables** fail (CR1): $\tau^K \delta \ne \tau^J \delta$ when $K \ne J$ and $\delta \ne 0$.
+- **Layer membership** (CR2) applies to raw station coordinates $x \in L_K = \tau^K \mathbb{Z}$. Demanding that the *converted* (dimensionless) displacement $\delta$ belong to $L_K$ and $L_J$ forces $\delta \in \tau^K \mathbb{Z} \cap \tau^J \mathbb{Z} = \{0\}$, which assumes $\delta = 0$ at the outset.
+
+---
+
+---
+
+## 26.3 The Observable Inventory Matrix (Ten Listed Existing Observables)
+
+To systematically test the common-referent hypothesis, we audit the ten listed existing mathematical quantities developed across the project:
+
+| Candidate Quantity | Exact Definition & Codomain | Grade Transformation Law | Common External Value? (CR1) | Proven Layer Membership? (CR2) | Nonzero iff Off-Line? (CR3) | Earliest Failed / Unproved Condition |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. Normalized Radial Displacement** | $R_\tau(s_\rho(k), k) = \tau^{-k}\Re(s_\rho(k)) - 1/2 \in \mathbb{R}$ | Grade-invariant: $R_\tau(s, k) = \delta$ | **YES** (Identical value $\delta$) | **NO** (No law proves $\delta \in \tau^K \mathbb{Z}$) | **YES** ($\delta \ne 0 \iff \Re\rho \ne 1/2$) | **(CR2) Layer membership**. Unproved; requiring $\delta \in L_K$ assumes discrete quantization. |
+| **2. Raw Centered Displacement** | $d_\rho(K) = \Re(z_K(\rho)) = \tau^K \delta \in \mathbb{R}$ | Covariant of weight 1: $d_\rho(K) = \tau^K d_\rho(0)$ | **NO** ($\tau^K \delta \ne \tau^J \delta$ for $K \ne J$) | **NO** ($\tau^K \delta \in L_K \iff \delta \in \mathbb{Z}$, unproved) | **YES** ($\tau^K \delta \ne 0 \iff \delta \ne 0$) | **(CR1) Common external value** and **(CR2) Layer membership**. |
+| **3. Curvature / Quartet Defect** | $\mathscr{K}_\tau(\rho) = B_\rho''(0)/(2(\log\tau)^2) = \delta^2 \in \mathbb{R}_{\ge 0}$ | Invariant under transported unit: $(r_K d_{\rho,K})^2 = \delta^2$ | **YES** (Identical value $\delta^2$) | **NO** (No law proves $\delta^2 \in \tau^K \mathbb{Z}$) | **YES** ($\delta^2 > 0 \iff \delta \ne 0$) | **(CR2) Layer membership**. Detects off-line position but is continuous real-valued. |
+| **4. Grade Character & Defect** | $\chi_\rho(K) = \tau^{K(\rho-1/2)} = \exp(K(\delta+i\gamma)\log\tau) \in \mathbb{C}^\times$; $|\chi_\rho(K)| = \tau^{K\delta}$; $D_K(\rho) = 4\sinh^2(K\delta\log\tau/2)$ | Group character: $\chi_\rho(K+J) = \chi_\rho(K)\chi_\rho(J)$ | **NO** (Values scale as powers $q^K$ with modulus $\tau^{K\delta}$) | **NO** (Character values lie on complex spirals, not $L_K$) | **YES for $D_K$** ($D_K > 0 \iff \delta \ne 0$) | **(CR1) Common external value** and **(CR2) Layer membership**. |
+| **5. Station Scaffold Locations** | $x_{n,K} = n\tau^K \in L_K$ ($n \in \mathbb{Z}$) | Dilation: $x_{n,K} = \tau^{K-J} x_{n,J}$ | **NO** ($n\tau^K \ne n\tau^J$ for $K \ne J, n \ne 0$) | **YES** ($x_{n,K} \in L_K$ by definition) | **NO** (Independent of zeros $\rho$; exists for all $n$) | **(CR1) Common value** and **(CR3) Off-line sensitivity**. |
+| **6. Logarithmic Prime Frequencies** | Dilated: $\tau^{-K}\log n$; Translated: $\log n + K\log\tau$ | Dilated: $\tau^{-K}\omega_0$; Translated: $\nu_0 + K\log\tau$ | **NO** (Shifts under grade change) | **NO** ($\log n \notin \tau^K \mathbb{Z}$; frequencies lie in Fourier dual) | **NO** (Prime frequencies are independent of zero position $\delta$) | **(CR1), (CR2), and (CR3) all fail**. |
+| **7. Zero-Counting / Winding Integers** | $N(T, \mathcal{C}_K) = \frac{1}{2\pi}\Delta_{\mathcal C_K} \arg\xi(s) \in \mathbb{Z}$ under transported contour $\mathcal C_K = \tau^K \mathcal C_0$ and height $T_K = \tau^K T$ | Invariant under transported contour $\mathcal C_K$ | **YES** ($N(T_K, \mathcal C_K) = N(T, \mathcal C_0) \in \mathbb{Z}$) | **NO** ($N \in \mathbb{Z} = L_0$, but $N \notin L_K = \tau^K \mathbb{Z}$ for $K \ne 0$) | **NO** ($N(T)$ counts all zeros, invariant under horizontal shift) | **(CR2) Layer membership** and **(CR3) Off-line sensitivity**. |
+| **8. Logarithmic Derivative Residues** | Residue at zero: $\operatorname{Res}_{s=\rho}(-\xi_K'/\xi_K) = m_\rho \in \mathbb{Z}_{>0}$ | Multiplier adds constant shift; residue is invariant | **YES** (Multiplicity $m_\rho$ is identical) | **NO** ($m_\rho \in \mathbb{Z} = L_0$, but $m_\rho \notin L_K = \tau^K \mathbb{Z}$ for $K \ne 0$) | **NO** ($m_\rho \ge 1$ for all zeros, whether $\delta = 0$ or $\delta \ne 0$) | **(CR2) Layer membership** and **(CR3) Off-line sensitivity**. |
+| **9. Linear Explicit-Formula Tests** | $\mathcal C_{K,j}[\phi] = \sum_\rho \phi(\tau^{-K}\gamma_\rho) - \dots$ | Pullback identity: $\mathcal C_{K,j}[\phi] \equiv \mathcal C_0[\phi \circ a_K]$ | **NO for raw evaluations** (Agrees only after converting test functions and units) | **NO** (Distributional evaluations, not lattice points) | **NO** (Vanishes identically for the complete zero distribution) | **(CR1) Raw Common Value**, **(CR2)**, and **(CR3)**. |
+| **10. Completed-ξ Cross-Terms (Fixed Gaussian Instance)** | $\mathfrak X_{\xi, W} = \Re\langle G_0, \ddot G_0\rangle_W \in \mathbb{R}$ (Certified for $a=1.5, \sigma_W=1.0$) | Evaluated in base frame under dilation jet | **YES** (Invariant functional evaluated in fixed Gaussian frame) | **NO** (Continuous integral: $\mathfrak X_{\xi, W} \approx 0.02317 \notin \tau^K \mathbb{Z}$) | **NO** (Strictly positive on critical line; not a per-zero detector) | **(CR2) Layer membership** and **(CR3) Off-line sensitivity**. |
+
+---
+
+## 26.4 Research Mini-Sprint: Investigation of Candidate CR-1
+
+### Ranking and Selection
+Of the ten listed candidates, **Candidate CR-1 (Normalized Radial Displacement $\delta$)** is the closest to completing the bridge:
+- **(CR1) Proved**: $R_\tau(s_\rho(k), k) = \delta$ identically across all grades (grade-invariant).
+- **(CR3) Proved**: $\delta \ne 0 \iff \Re\rho \ne 1/2$ (strictly detects off-line zeros).
+- **Missing Condition**: **(CR2) Layer Membership** ($\delta \in L_K = \tau^K \mathbb{Z}$ and $\delta \in L_J = \tau^J \mathbb{Z}$ for $K \ne J$).
+
+### The Strong Unresolved Bridge Condition
+We analyze the implication required to establish (CR2):
+$$\mathbf{IMP\text{-}CR2}: \quad \text{The complete prime–zeta relationship forces } \delta \in L_K \cap L_J \quad (K \ne J).$$
+
+1. **Exact Symbolic Reduction**:
+   By Lindemann's theorem (1882), $\tau = 2\pi$ is transcendental, which implies $L_K \cap L_J = \{0\}$ for $K \ne J \in \mathbb{Z}$. Therefore:
+   $$\delta \in L_K \cap L_J \iff \delta = 0.$$
+2. **The Nature of the Obstacle**:
+   For the normalized displacement candidate, (CR2) together with layer separation and (CR3) is sufficient to imply $\delta = 0$. Because $L_K \cap L_J = \{0\}$ for distinct integer grades, any candidate satisfying (CR1) and (CR2) forces $\delta = 0$ directly. This establishes layer membership as a **strong unresolved bridge condition** whose independent derivation without assuming the Riemann Hypothesis remains the core open obstacle.
+3. **Euler Product Verification**:
+   The Euler product $\zeta(s) = \prod_p (1 - p^{-s})^{-1}$ produces prime-power Dirac combs with frequencies $\{\log p^m\}$. These frequencies are dense on $\mathbb{R}$ and belong to the continuous Fourier dual, not to the discrete station lattices $\tau^K \mathbb{Z}$. No algebraic or analytic law forces zero ordinates or displacements into station lattices without an unproved quantization premise.
+
+**Conclusion of Cycle 3 Mini-Sprint**:
+None of the ten listed existing quantities in the transcendental continuation inventory simultaneously satisfies (CR1), (CR2), and (CR3).
+- Status: `COMMON-REFERENT BRIDGE NOT FOUND IN EXISTING TC OBSERVABLES`.
+
+---
+
+# 27. Cycle 4: Bounded Grade-Character Bridge & Canonical Norm Audit
+
+## 27.1 Foundations: The Canonical Grade Character and Modulus Law
+
+For a nontrivial zero $\rho = 1/2 + \delta + i\gamma$, the canonical transcendental continuation grade character is defined by:
+\[
+\chi_\rho(K) = \tau^{K(\rho - 1/2)} = \exp\big(K(\delta + i\gamma)\log\tau\big), \quad \tau = 2\pi, \quad K \in \mathbb{Z}.
+\]
+Let $q_\rho = \exp\big((\delta + i\gamma)\log\tau\big) = \tau^{\delta + i\gamma}$. Then $\chi_\rho(K) = q_\rho^K$.
+
+### Elementary Group Properties
+1. **Group Homomorphism on $(\mathbb{Z}, +)$**:
+   \[
+   \chi_\rho(K + J) = q_\rho^{K+J} = q_\rho^K q_\rho^J = \chi_\rho(K)\chi_\rho(J), \quad \chi_\rho(0) = 1, \quad \chi_\rho(-K) = \frac{1}{\chi_\rho(K)}.
+   \]
+2. **Exact Modulus Law**:
+   Since $\tau = 2\pi > 1$ and $\gamma \in \mathbb{R}$, $|\tau^{i K \gamma}| = 1$. Thus:
+   \[
+   |\chi_\rho(K)| = |\tau^{K\delta} \tau^{i K \gamma}| = \tau^{K\delta} = \exp(K\delta\log\tau).
+   \]
+3. **Modulus Defect**:
+   The reflection-pair symmetric defect is given by:
+   \[
+   D_K(\rho) = |\chi_\rho(K)| + |\chi_\rho(-K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) \ge 0,
+   \]
+   which vanishes for fixed nonzero $K \in \mathbb{Z} \setminus \{0\}$ if and only if $\delta = 0$.
+
+---
+
+## 27.2 Theorems A and B: Character Criteria
+
+### Theorem A (Unitary Grade-Character Criterion)
+> **Theorem A**: Let $\tau > 1$. The grade character $\chi_\rho$ takes values in the unit circle $S^1 = \{z \in \mathbb{C} : |z| = 1\}$ for every $K \in \mathbb{Z}$ if and only if $\delta = 0$.
+> Furthermore, unit modulus at any single non-zero grade $K_0 \in \mathbb{Z} \setminus \{0\}$ is necessary and sufficient:
+> \[
+> |\chi_\rho(K_0)| = 1 \iff \delta = 0.
+> \]
+
+*Proof*:
+$|\chi_\rho(K_0)| = \tau^{K_0\delta}$. Since $\tau > 1$, $\log\tau > 0$.
+Thus $\tau^{K_0\delta} = 1 \iff K_0\delta\log\tau = 0$.
+Since $K_0 \ne 0$ and $\log\tau > 0$, this holds if and only if $\delta = 0$. $\blacksquare$
+
+### Theorem B (Bilateral Boundedness Criterion)
+> **Theorem B**: Let $\tau > 1$. The grade character sequence $\{\chi_\rho(K)\}_{K \in \mathbb{Z}}$ is bounded over the full bilateral group $\mathbb{Z}$:
+> \[
+> \sup_{K \in \mathbb{Z}} |\chi_\rho(K)| < \infty \iff \delta = 0.
+> \]
+
+*Proof*:
+1. If $\delta = 0$, then $|\chi_\rho(K)| = \tau^0 = 1$ for all $K \in \mathbb{Z}$, so $\sup_{K \in \mathbb{Z}} |\chi_\rho(K)| = 1 < \infty$.
+2. Conversely, suppose $M = \sup_{K \in \mathbb{Z}} |\chi_\rho(K)| < \infty$.
+   - **Forward Grade Branch ($K \ge 0$)**:
+     If $\delta > 0$, then $\tau^\delta > 1$. For $K \in \mathbb{Z}_{\ge 0}$, $|\chi_\rho(K)| = (\tau^\delta)^K \to +\infty$ as $K \to +\infty$, which contradicts boundedness by $M$. Hence boundedness on $K \ge 0$ forces $\delta \le 0$.
+   - **Backward Grade Branch ($K \le 0$)**:
+     If $\delta < 0$, then $-\delta > 0$, so $\tau^{-\delta} > 1$. Setting $K = -m$ with $m \in \mathbb{Z}_{\ge 0}$, $|\chi_\rho(-m)| = (\tau^{-\delta})^m \to +\infty$ as $m \to +\infty$, which contradicts boundedness by $M$. Hence boundedness on $K \le 0$ forces $\delta \ge 0$.
+   - **Bilateral Intersection**:
+     Combining the forward and backward branches:
+     \[
+     (\delta \le 0) \wedge (\delta \ge 0) \implies \delta = 0.
+     \]
+This proves that bilateral boundedness over $\mathbb{Z}$ forces $\delta = 0$. $\blacksquare$
+
+---
+
+## 27.3 Separation of the Three Core Claims
+
+To maintain mathematical rigor, we strictly distinguish three logical layers:
+
+1. **Abstract Character Fact (Proved)**:
+   Any character of the form $\chi(K) = \tau^{K(\delta+i\gamma)}$ is unitary and bilaterally bounded on $\mathbb{Z}$ if and only if $\delta = 0$. This is an elementary property of exponential sequences in $\mathbb{C}$ that holds independently of primes, zeta functions, and arithmetic.
+2. **Unitary Dilation Model (Proved Geometric Action)**:
+   The dilation operator $U_a f(x) = a^{1/2}f(ax)$ is an exact unitary isometry on $L^2(\mathbb{R}^+, dx)$. Its generalized continuous spectrum corresponds to the unitary axis $\Re(s) = 1/2$. However, generalized eigencharacters $x^{-s}$ are not $L^2$ vectors, and standard dilation invariance holds for all functions regardless of whether their zeros lie on the critical line.
+3. **Prime–Zero Membership Bridge (The Open Obligation)**:
+   Does the complete prime–zeta relationship (Euler product, completed function $\xi$, explicit formula, or TC transport) force the character $\chi_\rho$ belonging to a non-trivial zeta zero to be unitary or bilaterally bounded?
+   This is the substantive mathematical question. If derived independently, Theorems A and B yield an exclusion mechanism. If not derived, boundedness is merely an assumed premise equivalent to RH.
+
+---
+
+## 27.4 Audit of Five Canonical Norm and Space Models
+
+We systematically audit five candidate mathematical frameworks to determine whether TC supplies an independent proof that $\chi_\rho$ must be unitary or bounded:
+
+### Model A: Intrinsic Scalar Norm
+- **Ambient Space**: $\mathbb{C}$ with standard modulus $|\cdot|$.
+- **Analysis**: The raw modulus $|\chi_\rho(K)| = \tau^{K\delta}$ depends exponentially on $K$ whenever $\delta \ne 0$. Converting back to grade zero via the inverse coordinate map $C_K(|\chi|) = \tau^{-K\delta}|\chi|$ yields 1 identically, but this conversion explicitly multiplies by $\tau^{-K\delta}$, using the unknown displacement $\delta$ and tautologically producing 1 without constraining $\delta$.
+- **Finding**: Coordinate redundancy guarantees that relations agree *after* conversion of units, but does not constrain the raw scalar exponent $\delta$.
+
+### Model B: Multiplicative Haar Dilation on $L^2(\mathbb{R}^+, dx/x)$
+- **Ambient Space**: $L^2(\mathbb{R}^+, dx/x)$ with dilation operator $U_\tau f(x) = f(\tau x)$ (or half-density dilation $V_\tau f(x) = \tau^{1/2}f(\tau x)$ on $L^2(\mathbb{R}^+, dx)$).
+- **Analysis**: $U_\tau$ is an exact unitary operator because the Haar measure $dx/x$ is dilation-invariant. The Mellin transform diagonalizes $U_\tau$ with generalized eigencharacters $\phi_s(x) = x^{-s}$, where $U_\tau \phi_s = \tau^{-s}\phi_s$. Unimodularity of the multiplier $|\tau^{-s}| = 1$ requires $\Re(s) = 0$ (or $\Re(s) = 1/2$ for half-density).
+- **The Gap**: The power functions $x^{-s}$ are not in $L^2(\mathbb{R}^+, dx/x)$; they are tempered distributions. Furthermore, non-trivial zeta zeros $\rho$ are zeros of $\xi(s)$, not eigenvalues of the dilation group $U_\tau$. No proved operator identity identifies the discrete zero set $\{\rho\}$ with the point spectrum or spectral projection of $U_\tau$.
+
+### Model C: Group $C^*$-Algebra Characters of $\mathbb{Z}$
+- **Ambient Space**: $C^*(\mathbb{Z}) \cong C(S^1)$.
+- **Analysis**: By Gelfand's representation theorem and Bochner-Herglotz, all bounded multiplicative linear functionals (characters) on the group $C^*$-algebra $C^*(\mathbb{Z})$ correspond to points on the unit circle $S^1$.
+- **The Gap**: An off-line zero with $\delta \ne 0$ produces a character $\chi_\rho(K) = q_\rho^K$ that is exponentially unbounded on $\mathbb{Z}$. It does **not** define a bounded linear functional on $\ell^1(\mathbb{Z})$ or $C^*(\mathbb{Z})$. Declaring that $\chi_\rho$ must belong to the spectrum of $C^*(\mathbb{Z})$ is an a priori restriction to unitary characters, which assumes $\delta = 0$ rather than proving it.
+
+### Model D: Explicit Formula and Weil Positivity
+- **Ambient Space**: Schwartz space $\mathcal{S}(\mathbb{R})$ and its dual $\mathcal{S}'(\mathbb{R})$.
+- **Analysis**: Weil's explicit formula expresses the spectral sum $\sum_\rho \widehat{h}(\rho)$ in terms of prime-power distributions and Archimedean integrals.
+- **The Equivalence Barrier**: Weil (1952) proved that the quadratic form $Q_W(f * f^*) \ge 0$ for all admissible test functions is **strictly equivalent to the Riemann Hypothesis**. Deriving that the zero characters enter a positive-definite distribution without assuming Weil positivity is an open problem identical to RH itself.
+
+### Model E: Alternative Weighted Norms and Non-Euler Countermodels
+- **Ambient Space**: Weighted sequence space $\ell^\infty_w(\mathbb{Z})$ with weight $w(K) = \tau^{-K\delta_0}$.
+- **Analysis**: Under this weighted norm, an off-line zero with displacement $\delta = \delta_0$ satisfies $\sup_{K \in \mathbb{Z}} w(K)|\chi_\rho(K)| = 1 < \infty$.
+- **Countermodel Exclusion**: The Davenport–Heilbronn zeta function:
+  \[
+  f(s) = \frac{1 - i\kappa}{2} L(s, \chi) + \frac{1 + i\kappa}{2} L(s, \bar\chi)
+  \]
+  satisfies the exact functional equation $\xi(s) = \xi(1-s)$ and dilation symmetry under TC, but possesses infinitely many zeros off the critical line ($\delta \ne 0$). Under TC, its zero characters $\chi_\rho(K) = \tau^{K(\delta+i\gamma)}$ are non-unitary and bilaterally unbounded. This rigorously proves that **functional equation symmetry and coordinate dilation together cannot force character unitarity or boundedness**. The Euler product is an indispensable premise, but the Euler product converges only in $\Re(s) > 1$ and does not directly bound zero characters in the critical strip.
+
+---
+
+## 27.5 Synthesis: Status of the Bounded Grade-Character Bridge
+
+| Candidate ID | Name | Mathematical Content | Proved Status | Missing Bridge Implication | Final Epistemic Classification |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+---
+
+## 28. Cycle 5: Log-Haar Temperedness Bridge & Prime Error Distribution Audit
+
+### 28.1 Logarithmic Coordinates and Additive Grade Translation
+
+Under the logarithmic coordinate change:
+\[
+u = \log x, \quad x = e^u \in (0, \infty), \quad \frac{dx}{x} = du
+\]
+multiplicative dilation by grade scale $\tau^K$ ($x \mapsto \tau^K x$) becomes pure additive translation on the real log-line:
+\[
+u \mapsto u + K\log\tau, \quad \tau = 2\pi, \quad K \in \mathbb{Z}.
+\]
+For a non-trivial zero $\rho = 1/2 + \delta + i\gamma$, the centered spectral coordinate is $\lambda = \rho - 1/2 = \delta + i\gamma$. The centered zero mode in log coordinates is:
+\[
+\phi_\lambda(u) = e^{\lambda u} = e^{(\delta + i\gamma)u} = e^{\delta u} e^{i\gamma u}.
+\]
+Under grade translation by $t_K = K\log\tau$:
+\[
+\phi_\lambda(u + K\log\tau) = e^{(\delta + i\gamma)(u + K\log\tau)} = e^{K(\delta + i\gamma)\log\tau} \phi_\lambda(u) = \chi_\rho(K) \phi_\lambda(u),
+\]
+where $\chi_\rho(K) = \tau^{K(\delta + i\gamma)}$ is the canonical TC grade character.
+
+Its modulus is strictly exponential:
+\[
+|\phi_\lambda(u)| = e^{\delta u}.
+\]
+
+---
+
+### 28.2 Theorem C: Regular Tempered Distribution Classification
+
+#### Statement
+> Let $\lambda = \delta + i\gamma \in \mathbb{C}$ and $\phi_\lambda(u) = e^{\lambda u}$ for $u \in \mathbb{R}$. As a locally integrable function on $\mathbb{R}$, $\phi_\lambda$ defines a regular tempered distribution $T_{\phi_\lambda} \in \mathcal{S}'(\mathbb{R})$ via:
+> \[
+> \langle T_{\phi_\lambda}, \psi \rangle = \int_{-\infty}^\infty \phi_\lambda(u) \psi(u) \, du, \quad \psi \in \mathcal{S}(\mathbb{R})
+> \]
+> if and only if $\delta = 0$.
+
+#### Proof
+1. **Sufficiency ($\delta = 0$)**: When $\delta = 0$, $|\phi_\lambda(u)| = |e^{i\gamma u}| = 1$ for all $u \in \mathbb{R}$. A bounded continuous function satisfies $|f(u)| \le 1 \cdot (1 + |u|)^0$. By Schwartz's theorem (1950, *Théorie des distributions*, Tome II, Ch. VII), any locally integrable function bounded by a polynomial defines a continuous linear functional on $\mathcal{S}(\mathbb{R})$.
+2. **Necessity ($\delta \ne 0$)**: Suppose $\delta \ne 0$. Without loss of generality assume $\delta > 0$ (the case $\delta < 0$ is identical under $u \to -u$). Then as $u \to +\infty$, $|\phi_\lambda(u)| = e^{\delta u}$ grows exponentially.
+   Let $\psi_0 \in C_c^\infty(\mathbb{R})$ be non-negative with $\int \psi_0 = 1$, supported in $[0, 1]$. Define the test sequence $\psi_k(u) = e^{-\delta k / 2} \psi_0(u - k) \in \mathcal{S}(\mathbb{R})$ for $k \in \mathbb{N}$.
+   For any Schwartz seminorm $p_{\alpha, \beta}(\psi) = \sup_u |u^\alpha \psi^{(\beta)}(u)|$:
+   \[
+   p_{\alpha, \beta}(\psi_k) \le C_{\alpha, \beta} (k + 1)^\alpha e^{-\delta k / 2} \to 0 \quad \text{as } k \to \infty.
+   \]
+   Thus $\psi_k \to 0$ in the Fréchet topology of $\mathcal{S}(\mathbb{R})$.
+   However, the distributional action evaluates to:
+   \[
+   \langle \phi_\lambda, \psi_k \rangle = \int_k^{k+1} e^{(\delta + i\gamma)u} e^{-\delta k / 2} \psi_0(u - k) \, du = e^{\delta k / 2} e^{i\gamma k} \int_0^1 e^{(\delta + i\gamma)v} \psi_0(v) \, dv.
+   \]
+   Taking absolute values:
+   \[
+   |\langle \phi_\lambda, \psi_k \rangle| = e^{\delta k / 2} \left|\int_0^1 e^{(\delta + i\gamma)v} \psi_0(v) \, dv\right| \to \infty \quad \text{as } k \to \infty.
+   \]
+   This directly contradicts continuity of the functional on $\mathcal{S}(\mathbb{R})$. Therefore, $\phi_\lambda$ does not extend to a regular tempered distribution in $\mathcal{S}'(\mathbb{R})$ when $\delta \ne 0$.
+
+#### Distinction of Distributional Categories
+- **$L^2(\mathbb{R}, du)$ Vector**: $\int_\mathbb{R} |\phi_\lambda(u)|^2 du = \int_\mathbb{R} e^{2\delta u} du = \infty$ for all $\delta \in \mathbb{R}$ (including $\delta = 0$). Zero modes are **never in $L^2(\mathbb{R}, du)$**.
+- **Bounded Character $C_b(\mathbb{R})$**: Bounded on all of $\mathbb{R}$ iff $\delta = 0$.
+- **Regular Tempered Distribution $\mathcal{S}'(\mathbb{R})$**: Extends to unweighted Schwartz space iff $\delta = 0$.
+- **Compactly Supported Distribution $\mathcal{D}'(\mathbb{R})$**: Locally integrable, so $\phi_\lambda \in \mathcal{D}'(\mathbb{R})$ for *every* $\delta \in \mathbb{R}$. Mere existence in $\mathcal{D}'(\mathbb{R})$ does not exclude off-line zeros.
+
+---
+
+### 28.3 The Prime-Side Distribution and the Riemann-Weil Explicit Formula
+
+The Riemann-Weil explicit formula connects the prime-power sum to the zeros:
+\[
+\sum_\rho \widehat{h}(\rho - 1/2) = \widehat{h}(1/2) + \widehat{h}(-1/2) - \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}} [h(\log n) + h(-\log n)] + \text{Archimedean terms}.
+\]
+In log coordinates $u = \log x$, the raw prime-power distribution is:
+\[
+d\Pi(u) = \sum_{n=1}^\infty \frac{\Lambda(n)}{\sqrt{n}} \delta(u - \log n).
+\]
+Its cumulative mass on $[0, U]$ is:
+\[
+\int_0^U d\Pi(u) = \sum_{n \le e^U} \frac{\Lambda(n)}{\sqrt{n}} \sim \int_2^{e^U} \frac{dx}{\sqrt{x}} = 2\sqrt{e^U} = 2 e^{U/2}.
+\]
+The cumulative mass grows exponentially as $2e^{U/2}$. Therefore, the uncompleted prime measure is **not tempered** on $\mathbb{R}$. Centering by $1/2$ (the factor $n^{-1/2}$) does not cancel the leading density. The pole contribution $-e^{u/2} du$ must be subtracted to center the prime distribution:
+\[
+d\Pi_{\text{sub}}(u) = \sum_{n \ge 1} \frac{\Lambda(n)}{\sqrt{n}} \delta(u - \log n) - e^{u/2} du.
+\]
+
+---
+
+### 28.4 Normalized Chebyshev Prime Error and Equivalence to RH
+
+Define the Chebyshev prime-counting error:
+\[
+\Delta(x) = \psi(x) - x = \sum_{n \le x} \Lambda(n) - x.
+\]
+In logarithmic coordinate $u = \log x$, the normalized prime error is:
+\[
+E(u) = e^{-u/2}(\psi(e^u) - e^u) = \frac{\psi(x) - x}{\sqrt{x}}.
+\]
+
+1. **Unconditional Growth (Vinogradov-Korobov 1958)**:
+   The best known unconditional bound is:
+   \[
+   \psi(x) - x = O\left(x \exp\left(-c \frac{(\log x)^{3/5}}{(\log\log x)^{1/5}}\right)\right).
+   \]
+   Dividing by $\sqrt{x} = e^{u/2}$:
+   \[
+   E(u) = O\left(e^{u/2} \exp\left(-c \frac{u^{3/5}}{(\log u)^{1/5}}\right)\right).
+   \]
+   Because the sub-exponential decay cannot cancel $e^{u/2}$, **$E(u)$ has exponential growth unconditionally**, growing as $e^{u/2 - o(u)}$ as $u \to +\infty$. It is unconditionally non-tempered in $\mathcal{S}'(\mathbb{R})$.
+2. **Conditional Growth (von Koch 1901 under RH)**:
+   If RH holds ($\delta = 0$ for all non-trivial zeros), then:
+   \[
+   \psi(x) - x = O(\sqrt{x} \log^2 x) \iff E(u) = O(u^2).
+   \]
+   Polynomial growth $O(u^2)$ guarantees that $E(u)$ defines a regular tempered distribution in $\mathcal{S}'(\mathbb{R})$.
+3. **Cramér-Ingham Equivalence (1919, 1932)**:
+   Cramér and Ingham proved:
+   \[
+   \Theta = \sup_\rho \Re(\rho) = \frac{1}{2} + \sup_\rho \delta = \limsup_{u \to \infty} \frac{\log |E(u)|}{u}.
+   \]
+   Consequently:
+   \[
+   E(u) \in \mathcal{S}'(\mathbb{R}) \iff \forall \epsilon > 0, E(u) = O(e^{\epsilon u}) \iff \Theta \le \frac{1}{2} \iff \text{RH holds}.
+   \]
+   **Finding**: The proposition that the normalized prime error $E(u)$ belongs to the tempered distribution space $\mathcal{S}'(\mathbb{R})$ is **strictly logically equivalent to the Riemann Hypothesis**. It cannot be proved unconditionally from arithmetic to serve as an exclusion bridge.
+
+---
+
+### 28.5 Pointwise Transport vs Bilateral Orbit Uniformity
+
+Transcendental continuation acts by translation: $u \mapsto u + K\log\tau$.
+We distinguish three distinct propositions:
+- **(P1) Pointwise Transport**: For each fixed $K \in \mathbb{Z}$, the translate $T_K f(u) = f(u + K\log\tau)$ is well-defined.
+- **(P2) Uniform Bilateral Orbit Bound**: There exists a single constant $M < \infty$ such that $\sup_{K \in \mathbb{Z}} \|T_K f\| \le M$.
+- **(P3) Common Invariant Tempered Space**: The entire orbit $\{T_K f\}_{K \in \mathbb{Z}}$ belongs to a single translation-invariant tempered space $\mathcal{S}'(\mathbb{R})$ with uniform polynomial bounds.
+
+#### Countermodel
+Consider $f(u) = e^{\delta u}$ with $\delta \ne 0$.
+- For every finite integer grade $K \in \mathbb{Z}$, $T_K f(u) = e^{\delta(u + K\log\tau)} = \tau^{K\delta} f(u)$. This is an exact, invertible, linear coordinate relation. Thus **(P1) holds unconditionally**.
+- However, as $K \to \text{sgn}(\delta)\infty$, $\tau^{K\delta} \to +\infty$. The orbit is **exponentially unbounded** over $\mathbb{Z}$; **(P2) fails**.
+- The function $f(u)$ is not a tempered distribution on $\mathbb{R}$; **(P3) fails**.
+
+**Rigorous Conclusion**: Invertible coordinate transport (P1) is a consequence of coordinate redundancy at every finite grade. It does **not** imply bilateral orbit boundedness (P2) or common tempered space membership (P3) for an off-line zero.
+
+---
+
+### 28.6 Synthesis of the Log-Haar Temperedness Candidate
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-010** | **CLM-TC-010** | Log-Haar Temperedness Bridge & Prime Error Equivalence | Proved Theorem C ($\phi_\lambda \in \mathcal{S}' \iff \delta = 0$); proved prime error temperedness $E(u) \in \mathcal{S}' \iff \text{RH}$; proved (P1) $\not\Rightarrow$ (P2), (P3). | **CONDITIONAL ONLY** (Temperedness is an exact exclusion criterion, but its prime-side validity is strictly equivalent to RH) |
+
+---
+
+
+
+
+
 
 
 

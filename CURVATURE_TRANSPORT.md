@@ -274,7 +274,7 @@ where $g(k, s)$ is sufficiently differentiable in $k \in \mathbb{R}$.
 > 3. **Logarithmic Derivative Anomaly-Free Decomposition**: On any domain where $g(k, s) L(s) \ne 0$:
 >    $$\partial_s \log F(k, s) = \partial_s \log L(s) + \partial_s \log g(k, s)$$
 >    For $g(k, s) = \tau^{-k(s-1/2)}$, $\partial_s \log g = -k\log\tau$. The grade correction is purely coordinate/archimedean and supplies zero spectral divisor data.
-> 4. **Transported Zero Worldline Pullback**: Along the zero worldline $s(k) = 1/2 + \tau^k(\rho - 1/2)$, the pullback $F_k(s(k)) = L(\rho) = 0$ vanishes identically, and directional derivatives along the worldline vanish identically.
+> 4. **Transported Zero Worldline Pullback vs Static Evaluation**: Along the moving zero worldline $s(k) = 1/2 + \tau^k(\rho - 1/2)$, the static unpulled family $F(k, s(k)) = g(k, s(k)) L(s(k))$ does not generally vanish for $k \ne 0$ (for affine $L(s) = (s-1/2)-z_0$, $L(s(k)) = (\tau^k-1)z_0 \ne 0$, Lean 4 `unpulled_affine_zero_worldline_eval`). Vanishing along the moving zero worldline requires an explicit argument pullback $L_k(s) = L(1/2 + \tau^{-k}(s-1/2))$ so that $L_k(s(k)) = L(\rho) = 0$ identically (Lean 4 `coordinate_pulled_affine_zero_worldline`). Furthermore, pointwise algebraic zero equivalence ($g \cdot L = 0 \iff L = 0$ for $g \ne 0$, Lean 4 `scalar_multiplier_nonzero_root_iff`) is a field property, not by itself a formal theorem establishing preservation of analytic divisor multiplicities without meromorphic Hadamard/Weierstrass theory.
 
 ### Candidate Classifications
 

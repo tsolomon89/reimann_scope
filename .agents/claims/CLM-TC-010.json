@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-010",
+  "statement": "Log-Haar Temperedness Bridge and Normalized Prime-Counting Error Analysis: For a nontrivial zero rho = 1/2 + delta + i*gamma with centered coordinate lambda = delta + i*gamma in logarithmic coordinate u = log x, the zero mode phi_lambda(u) = exp(lambda * u) satisfies the translation law phi_lambda(u + t) = exp(lambda * t) phi_lambda(u) with modulus |phi_lambda(u)| = exp(delta * u). The mode phi_lambda is a bounded function on R and defines a regular tempered distribution in S'(R) if and only if delta = 0 (Theorem C). For delta != 0, exponential growth in one direction prevents continuous extension to the Schwartz space S(R). Furthermore, for the normalized Chebyshev prime-counting error E(u) = exp(-u/2)(psi(exp u) - exp u), the unconditional Vinogradov-Korobov error bound implies exponential growth E(u) = O(exp(u/2 - o(u))), making E(u) unconditionally non-tempered on R. By the Cramer-Ingham theorem, E(u) belongs to S'(R) if and only if RH holds. Transcendental continuation supplies invertible coordinate transport (P1) at every finite grade, but does not force bilateral orbit uniformity (P2) or common tempered space membership (P3). Therefore, temperedness in log coordinates is an RH-equivalent criterion rather than an independent bridge mechanism.",
+  "quantified_variables": [
+    {
+      "name": "u",
+      "domain": "u in Real",
+      "description": "Logarithmic coordinate u = log x"
+    },
+    {
+      "name": "delta",
+      "domain": "delta in Real, -1/2 < delta < 1/2",
+      "description": "Real displacement from the critical line"
+    },
+    {
+      "name": "gamma",
+      "domain": "gamma in Real",
+      "description": "Imaginary zero ordinate"
+    }
+  ],
+  "variable_domains": [
+    "u in Real",
+    "delta in Real, -1/2 < delta < 1/2",
+    "gamma in Real"
+  ],
+  "hypotheses": [
+    "u = log x for x in Real_+",
+    "rho = 1/2 + delta + i*gamma",
+    "lambda = delta + i*gamma",
+    "phi_lambda(u) = exp(lambda * u)",
+    "E(u) = exp(-u/2) * (psi(exp u) - exp u)",
+    "psi(x) = sum_{n <= x} Lambda(n)"
+  ],
+  "object_studied": "Logarithmic-coordinate zero modes phi_lambda(u) and normalized Chebyshev prime-counting error distribution E(u)",
+  "fourier_normalization": "Logarithmic coordinate u = log x; Schwartz space S(R) with seminorms p_{alpha,beta}(psi) = sup_u |u^alpha psi^{(beta)}(u)|",
+  "multiplicity_convention": "Standard von Mangoldt weights Lambda(n)",
+  "measure_and_window": "Additive Lebesgue measure du on R (Haar measure of (R, +)); unweighted Schwartz test class S(R)",
+  "order_of_limits": "Continuous translation on R; asymptotic growth limits as u -> +/- infty",
+  "exact_conclusion": "phi_lambda is a regular tempered distribution in S'(R) iff delta = 0 (Theorem C); E(u) is a tempered distribution in S'(R) iff RH holds; TC coordinate transport provides pointwise well-definedness (P1) but does not independently force bilateral orbit uniformity (P2) or tempered space membership (P3)",
+  "logical_negation": "phi_lambda in S'(R) with delta != 0, or E(u) is unconditionally tempered in S'(R) without assuming RH, or TC coordinate transport implies uniform orbit temperedness without an independent arithmetic bound (FALSIFIED / REFUTED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: log_mode_translation",
+    "formal/RiemannScope/Grade.lean: log_mode_abs",
+    "formal/RiemannScope/Grade.lean: log_mode_bounded_iff_delta_zero",
+    "transcendental.py: evaluate_log_haar_zero_mode",
+    "transcendental.py: verify_log_mode_temperedness_criterion",
+    "transcendental.py: evaluate_prime_counting_error_growth",
+    "transcendental.py: audit_tc_orbit_uniformity",
+    "transcendental.py: audit_log_haar_temperedness_mechanism"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Symbolic elimination and equality-case root cancellation analysis: solved exp(delta * u) <= C(1 + |u|)^N on R, proving the unique cancellation case allowing polynomial growth is delta = 0",
+    "Asymptotic dominance and boundary limit audit: evaluated the boundary limits as u -> +/- infty, proving exponential dominance over all polynomial test tails for delta != 0",
+    "Tested Schwartz test family psi_k(u) = exp(-delta*k/2) * psi_0(u - k) against phi_lambda for delta > 0, proving |<phi_lambda, psi_k>| -> infty while psi_k -> 0 in S(R), formally refuting continuity on S(R) for delta != 0",
+    "Audited Vinogradov-Korobov unconditional prime error: proved that E(u) = O(exp(u/2 - c*u^{3/5-epsilon})) diverges exponentially as u -> +infty, confirming that E(u) is unconditionally non-tempered",
+    "Audited Cramer-von Koch conditional bound: proved that E(u) = O(u^2) under RH, establishing that E(u) in S'(R) is logically equivalent to RH and cannot be used as an independent unconditioned premise",
+    "Tested TC translation countermodel f(u) = exp(delta * u): confirmed that while T_K f is well-defined at every integer grade K (P1 holds), the bilateral orbit diverges exponentially and fails uniform boundedness (P2 fails) and temperedness (P3 fails)"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_log_haar_zero_mode_translation_and_modulus",
+    "tests/test_tc_mechanism_discovery.py: test_log_mode_temperedness_criterion",
+    "tests/test_tc_mechanism_discovery.py: test_prime_counting_error_growth_and_rh_equivalence",
+    "tests/test_tc_mechanism_discovery.py: test_tc_orbit_uniformity_countermodel"
+  ],
+  "external_sources": [
+    {
+      "source": "Schwartz, L. (1950/1951), Theorie des distributions, Tomes I et II, Hermann, Paris",
+      "theorem": "Characterization of regular tempered distributions S'(R) by polynomial growth bounds |f(u)| <= C(1 + |u|)^N"
+    },
+    {
+      "source": "von Koch, H. (1901), Sur la distribution des nombres premiers, Acta Math. 24, 159-182",
+      "theorem": "Equivalence between psi(x) - x = O(x^{1/2} log^2 x) and the Riemann Hypothesis"
+    },
+    {
+      "source": "Cramer, H. (1919), Uber die Nullstellen der Riemannschen Zetafunktion, Math. Z. 2, 104-106",
+      "theorem": "Order of growth of Chebyshev error and exact upper bound of real parts of zeta zeros: sup_rho Re(rho) = limsup_{u -> infty} (log |E(u)|) / u"
+    },
+    {
+      "source": "Weil, A. (1952), Sur les formules explicites de la theorie des nombres premiers, Comm. Sem. Math. Univ. Lund, 252-265",
+      "theorem": "Admissible test functions for explicit formulas and requirement of exponential decay in log coordinates"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Deriving an unconditional proof from the prime side that E(u) is tempered or that the complete distribution belongs to S'(R), which is strictly equivalent to solving the Riemann Hypothesis (OPEN)"
+  ]
+}

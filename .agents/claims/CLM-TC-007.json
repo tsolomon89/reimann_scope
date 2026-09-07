@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-007",
+  "statement": "For canonical integer grades K != J, the completed logarithmic derivative cross-grade difference Delta G_{K,J}(s) = -xi_K'(s)/xi_K(s) - (-xi_J'(s)/xi_J(s)) is identically equal to the scalar constant (K-J) log tau on all of Complex plane. In the Hadamard product expansion xi(s) = xi(0) prod_rho (1 - s/rho), the singular zero-pole parts sum_rho 1/(s - rho) cancel unconditionally between grades K and J for every zero configuration. This identity is an exact theorem of scalar coordinate preservation and supplies zero residual information from the zero displacement delta, establishing that scalar logarithmic-derivative differences provide no off-line exclusion mechanism.",
+  "quantified_variables": [
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "First integer grade index"
+    },
+    {
+      "name": "J",
+      "domain": "J in Integer, J != K",
+      "description": "Second distinct integer grade index"
+    },
+    {
+      "name": "s",
+      "domain": "s in Complex, xi(s) != 0",
+      "description": "Complex evaluation coordinate outside zero divisor"
+    }
+  ],
+  "variable_domains": [
+    "K in Integer",
+    "J in Integer, J != K",
+    "s in Complex, xi(s) != 0"
+  ],
+  "hypotheses": [
+    "tau = 2pi",
+    "xi_K(s) = tau^(-K(s-1/2)) xi(s)",
+    "xi_J(s) = tau^(-J(s-1/2)) xi(s)",
+    "xi(s) != 0"
+  ],
+  "object_studied": "Completed logarithmic derivative cross-grade difference Delta G_{K,J}(s)",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = a + it; tau = 2pi",
+  "multiplicity_convention": "Zero multiplicities preserved under scalar twist",
+  "measure_and_window": "Pointwise complex meromorphic evaluation",
+  "order_of_limits": "Single-point algebraic evaluation on C",
+  "exact_conclusion": "Delta G_{K,J}(s) = (K-J) log tau identically everywhere on C; zero singularities cancel unconditionally, providing zero residual information regarding delta",
+  "logical_negation": "Delta G_{K,J}(s) retains non-zero dependence on the zero parameter delta or individual zero locations (FALSIFIED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "NONE",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: log_derivative_scalar_difference_cancellation",
+    "transcendental.py: audit_candidate_C_log_derivative_compatibility"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Evaluated Delta G_{K,J} across on-line and off-line points in the critical strip",
+    "Verified that numerical differentiation reproduces (K-J)*log(tau) with residual error < 1e-15 across all test points",
+    "Boundary dominance audit: holds uniformly across all s in C without boundary divergence",
+    "Tested on synthetic off-line quartets and Davenport-Heilbronn controls confirming universal cancellation"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_audit_gap_C_log_derivative_compatibility"
+  ],
+  "external_sources": [
+    {
+      "source": "Titchmarsh, E.C. (1986), The Theory of the Riemann Zeta-Function, Oxford Univ. Press",
+      "theorem": "Chapter 2 (Properties of xi)"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "None for the scalar identity; non-scalar arithmetic functional required for off-line exclusion (OBL-CT-001A)"
+  ]
+}

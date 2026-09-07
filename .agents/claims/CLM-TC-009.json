@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-009",
+  "statement": "Unitary and Bilateral Boundedness Grade-Character Criteria (Theorems A and B) and Canonical Norm Audit: For a nontrivial zero rho = 1/2 + delta + i*gamma and canonical grade character chi_rho(K) = tau^(K*(rho-1/2)) = exp(K*(delta+i*gamma)*log tau) with modulus |chi_rho(K)| = tau^(K*delta) (tau = 2pi > 1), chi_rho takes values in the unit circle for all K in Integer (or at any single nonzero grade K != 0) if and only if delta = 0 (Theorem A). Furthermore, the character sequence is bounded over the full bilateral group Integer (sup_{K in Integer} |chi_rho(K)| < infinity) if and only if delta = 0 (Theorem B), where forward grades K >= 0 force delta <= 0 and backward grades K <= 0 force delta >= 0. In an audit across five canonical norm and space models (Intrinsic scalar norm, Multiplicative Haar dilation on L^2(R^+, dx/x), Group C*-algebra C*(Z), Explicit formula and Weil positivity, Alternative weighted norms and Davenport-Heilbronn countermodel), TC does not supply an independent proof that the zeta zero character must belong to the unitary or bounded class, leaving the prime-zero membership bridge as an open conditional premise.",
+  "quantified_variables": [
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "Integer grade index"
+    },
+    {
+      "name": "delta",
+      "domain": "delta in Real, -1/2 < delta < 1/2",
+      "description": "Real displacement from the critical line"
+    },
+    {
+      "name": "gamma",
+      "domain": "gamma in Real",
+      "description": "Imaginary zero ordinate"
+    }
+  ],
+  "variable_domains": [
+    "K in Integer",
+    "delta in Real, -1/2 < delta < 1/2",
+    "gamma in Real"
+  ],
+  "hypotheses": [
+    "tau = 2pi > 1",
+    "rho = 1/2 + delta + i*gamma",
+    "q_rho = exp((delta + i*gamma)*log tau)",
+    "chi_rho(K) = q_rho^K = tau^(K*(rho - 1/2)) = exp(K*(delta + i*gamma)*log tau)"
+  ],
+  "object_studied": "Canonical TC grade characters chi_rho(K) = q_rho^K and candidate normed Hilbert and Banach spaces",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = delta + it; tau = 2pi",
+  "multiplicity_convention": "Standard zero multiplicities m_rho in Integer_{>=1}",
+  "measure_and_window": "Haar counting measure on Integer; Haar multiplicative measure dx/x on R^+",
+  "order_of_limits": "Supremum over integer grades K in Integer; pointwise complex evaluation",
+  "exact_conclusion": "Theorem A (|chi_rho(K)| = 1 iff delta = 0) and Theorem B (sup_{K in Integer} |chi_rho(K)| < infinity iff delta = 0) are exact proved criteria; the prime-zero membership bridge is conditional only as none of the five canonical models independently forces character boundedness without assuming RH",
+  "logical_negation": "There exists delta != 0 with |chi_rho(K)| = 1 for K != 0, or sup_{K in Integer} |chi_rho(K)| < infinity with delta != 0, or TC independently forces character boundedness on zeta zeros without assuming RH (FALSIFIED / REFUTED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "NONE",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "Lean 4: unitary_grade_character_iff_delta_zero",
+    "Lean 4: bilateral_boundedness_exclusion_theorem",
+    "transcendental.py: evaluate_grade_character",
+    "transcendental.py: verify_theorem_A_unitary_criterion",
+    "transcendental.py: verify_theorem_B_bilateral_boundedness_criterion",
+    "transcendental.py: audit_canonical_norm_candidates"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Symbolic elimination and equality-case cancellation analysis: solved |tau^(K*delta)| = 1 in SymPy, proving the unique cancellation root is delta = 0 for any non-zero grade K != 0 and tau > 1",
+    "Asymptotic dominance and boundary limit audit: evaluated bilateral divergence in the asymptotic limits K -> +infinity for delta > 0 and K -> -infinity for delta < 0, proving bilateral Integer is strictly necessary to force delta = 0",
+    "Audited Davenport-Heilbronn zeta function: verified that off-line zeros satisfy functional equation and dilation symmetry but have non-unitary, unbounded grade characters, excluding functional equation symmetry as an independent source of unitarity",
+    "Audited Weil positivity equivalence: confirmed that assuming explicit formula character positivity is circularly equivalent to assuming RH (Weil 1952)",
+    "Audited C*(Z) group algebra: confirmed that restricting chi_rho to C*(Z) characters circularly assumes delta = 0 a priori"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_theorem_A_unitary_criterion",
+    "tests/test_tc_mechanism_discovery.py: test_theorem_B_bilateral_boundedness_criterion",
+    "tests/test_tc_mechanism_discovery.py: test_canonical_norm_models_audit",
+    "tests/test_tc_mechanism_discovery.py: test_davenport_heilbronn_control"
+  ],
+  "external_sources": [
+    {
+      "source": "Weil, A. (1952), Sur les formules explicites de la theorie des nombres premiers, Comm. Sem. Math. Univ. Lund, 252-265",
+      "theorem": "Equivalence of explicit formula quadratic form positivity Q_W(f * f^*) >= 0 to the Riemann Hypothesis"
+    },
+    {
+      "source": "Davenport, H. and Heilbronn, H. (1936), On the zeros of certain Dirichlet series, J. London Math. Soc. 11, 181-185",
+      "theorem": "Existence of off-line zeros for zeta functions satisfying functional equation without Euler product"
+    },
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Math. Ann. 20, 213-225",
+      "theorem": "Transcendence of pi and irrationality of powers tau^M for integer M != 0"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Proving that the Euler product or completed zeta function canonically forces zero characters into the unitary or bilaterally bounded class without assuming RH or Weil positivity (OPEN)"
+  ]
+}

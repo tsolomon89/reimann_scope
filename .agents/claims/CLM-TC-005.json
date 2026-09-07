@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-005",
+  "statement": "For canonical grades K != J in Integer, the station lattices L_K = tau^K Z and L_J = tau^J Z satisfy L_K cap L_J = {0} by the transcendence of tau = 2pi (Lindemann 1882). For the scaled Dirichlet series F_K(s) = tau^(-Ks) zeta(s), the logarithmic derivative difference -F_K'/F_K + F_J'/F_J = (K-J) log tau is an exact constant everywhere on C, identically independent of all zeros and primes. The dilated logarithmic frequencies {tau^(-K) log n} in origin argument dilation Z_K(s) = zeta(tau^(-K) s) and translated Dirichlet frequencies {log n + K log tau} in F_K(s) are distinct constructions; scalar series preservation does not falsify every proposed non-scalar coupling involving L_K or argument dilation Z_K.",
+  "quantified_variables": [
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "First integer grade index"
+    },
+    {
+      "name": "J",
+      "domain": "J in Integer, J != K",
+      "description": "Second distinct integer grade index"
+    },
+    {
+      "name": "s",
+      "domain": "s in Complex",
+      "description": "Complex evaluation coordinate"
+    }
+  ],
+  "variable_domains": [
+    "K in Integer",
+    "J in Integer, J != K",
+    "s in Complex"
+  ],
+  "hypotheses": [
+    "tau = 2pi",
+    "L_K = tau^K Z",
+    "F_K(s) = tau^(-Ks) zeta(s)",
+    "Z_K(s) = zeta(tau^(-K) s)"
+  ],
+  "object_studied": "Integer-grade station lattices L_K and transported Dirichlet series F_K(s)",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = a + it; tau = 2pi",
+  "multiplicity_convention": "Standard integer primes and multiplicities",
+  "measure_and_window": "Pointwise complex meromorphic evaluation",
+  "order_of_limits": "Single-point algebraic evaluation on C",
+  "exact_conclusion": "L_K cap L_J = {0} for K != J in Integer; -F_K'/F_K + F_J'/F_J == (K-J) log tau identically on C; frequency dilation and Dirichlet series translation are distinct operations",
+  "logical_negation": "There exist non-zero integers m, n and distinct integer grades K != J such that m tau^K = n tau^J, or -F_K'/F_K + F_J'/F_J depends on zeros or primes (FALSIFIED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "NONE",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "Lean 4: transported_mult_scale_law",
+    "Lean 4: lattice_intersection_transcendental_char",
+    "Lindemann (1882) transcendence of pi",
+    "transcendental.py: audit_candidate_A_lattice_vs_frequency"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Tested symbolic lattice non-coincidence in SymPy",
+    "Evaluated counterexample k = log_tau(2) showing real grades can collide (L_k cap L_0 = 2Z != {0})",
+    "Verified -F_K'/F_K + F_J'/F_J == (K-J)*log(tau) to 80 dps across complex points",
+    "Boundary dominance audit: as Re(s) -> infinity, F_K(s) -> tau^(-Ks) and -F_K'/F_K -> K*log(tau), exactly matching the scalar constant difference"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_integer_lattice_noncoincidence_symbolic",
+    "tests/test_tc_mechanism_discovery.py: test_real_grade_coincidence_counterexample",
+    "tests/test_tc_mechanism_discovery.py: test_audit_gap_A_lattice_vs_frequency"
+  ],
+  "external_sources": [
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Math. Ann. 20, 213-225",
+      "theorem": "Transcendence of pi"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Non-scalar coupling of station lattices L_K to argument-dilated zero divisor Z_K (OPEN)"
+  ]
+}

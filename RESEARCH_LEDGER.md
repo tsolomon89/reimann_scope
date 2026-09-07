@@ -537,6 +537,44 @@ If a simple law survives, broad computation should stop until that law is algebr
 | BG-007 | Full Windowed Dirichlet Grade Jet Cross-Term Decomposition: For finite smooth window $W \in C_c^\infty(\mathbb R)$, $\langle F_0, \ddot F_0\rangle_W = \sum_{m,n} c_m \bar d_n \int W(t) e^{-it\log(m/n)} [\dots] dt$ decomposes into diagonal and non-zero off-diagonal terms (`FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED`). | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`finite_double_sum_2x2_decomp`); verified in `evaluate_full_windowed_dirichlet_inner_product`. |
 | AUD-001 | Reusable Mathematical Claim Audit Capability (`zeta-proof-audit`): 18-field claim schema and 10 mandatory pre-acceptance gates enforced by executable validator script and test suite. | **PROVED / EXECUTABLE** | Implemented in `.agents/skills/zeta-proof-audit/` and verified in `.agents/verification/test_claim_audit_gates.py`. |
 
+---
+
+# 29. TC Mechanism Discovery: Arithmetic Separation vs Off-Line Zeros (Cycle 1)
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| TC-DISC-001 | Station Lattice Non-Coincidence & Cross-Grade Frequency Comparison: Distinct integer-grade lattices satisfy $L_K \cap L_J = \{0\}$ for $K \ne J$ by transcendence of $\tau$. Transported logarithmic derivative difference $-F_K'/F_K + F_J'/F_J \equiv (K-J)\log\tau$ is an exact constant independent of primes and zeros. Transported prime frequencies lie on continuous Fourier axes and do not collide with discrete station lattices. | **PROVED AS SEPARATION / FALSIFIED AS EXCLUSION MECHANISM** | Formalized in Lean 4 (`lattice_intersection_transcendental_char`, `log_derivative_scalar_difference_cancellation`); verified in `test_tc_mechanism_discovery.py`. |
+| TC-DISC-002 | Zero-Character Modulus and Reflection Defect Smooth Variation: Grade character modulus $|q_\rho^K| = \tau^{K\delta}$ and symmetric defect $D_K(\rho) = 4\sinh^2(K\delta\log\tau/2)$ are smooth real-analytic functions of continuous $\delta \in \mathbb R$. No algebraic or analytic condition quantizes $\delta$ or forces $K\delta \in \mathbb Z$. Displacements such as $\delta = \log_\tau(1.5)$ produce rational character modulus $|q_\rho| = 1.5 \in \mathbb Q$ without contradiction. | **FALSIFIED AS EXCLUSION MECHANISM / NO DISCRETE RESTRICTION** | Proved analytically and verified numerically across rational, algebraic irrational, and transcendental displacements in `test_tc_mechanism_discovery.py`. |
+| TC-DISC-003 | Completed Logarithmic Derivative Difference Divisor Cancellation: Completed log-derivative difference $\Delta G_{K,J}(s) = -\xi_K'/\xi_K - (-\xi_J'/\xi_J) \equiv (K-J)\log\tau$ identically on $\mathbb C$. Singular zero-pole parts $\sum_\rho \frac{1}{s-\rho} - \sum_\rho \frac{1}{s-\rho} \equiv 0$ cancel identically and unconditionally for any zero configuration (including hypothetical off-line quartets), providing zero residual information to exclude $\delta \ne 0$. | **PROVED IDENTITY / FALSIFIED AS EXCLUSION MECHANISM** | Proved analytically and verified numerically on reference zeros and synthetic quartets in `test_tc_mechanism_discovery.py`. |
+| TC-DISC-004 | Transported Explicit Formula Difference & Frequency Collision: Test function differences $h_{K,J}(r) = \phi(\tau^{-K}r) - \phi(\tau^{-J}r)$ form native test functions by linearity (coordinate redundant). For prime base $\ell$ and positive integers $p, q$, an isolated frequency collision $\tau^K \log(\ell^q) = \tau^J \log(\ell^p)$ forces $\tau^{K-J} = p/q \in \mathbb Q$, strictly forbidden by Lindemann's theorem. However, equality of the two complete linear explicit-formula evaluations does not imply equality of any selected pair of prime-power summands due to infinite-sum compensation (Pair-Isolation Fallacy). | **REJECTED AS A MECHANISM FROM EXPLICIT-FORMULA LINEARITY ALONE** | Proved linearity reduction, Lean 4 `transported_log_frequency_rational_collision_ratio`, and verified in `test_tc_mechanism_discovery.py`. |
+
+---
+
+# 30. TC Common-Referent Bridge Claims (Cycle 3)
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| TC-DISC-005 | Common-Referent Collision Theorem: If an observable $A$ evaluated on nontrivial zeros $\rho = 1/2 + \delta + i\gamma$ satisfies (CR1) Common Referent $A_K(\rho_K) = A_J(\rho_J) = A(\rho)$, (CR2) Layer Location $A_K \in L_K = \tau^K \mathbb Z$ and $A_J \in L_J = \tau^J \mathbb Z$, and (CR3) Off-Line Sensitivity $\delta \ne 0 \implies A(\rho) \ne 0$, then $\delta = 0$. Equivalently, if $A(X)$ is representation-invariant and homogeneous of non-zero grade weight, $A(X) = 0$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`common_referent_collision_theorem`, `invariant_covariant_observable_vanishing`). |
+| TC-DISC-006 | Observable Inventory Classification (Ten Listed Existing Observables): Across the 10 listed existing TC observables (normalized displacement, raw displacement, curvature defect, grade character, station locations, prime frequencies, zero counts, residues, explicit formula tests, completed-$\xi$ cross-terms), every quantity fails at least one of (CR1), (CR2), or (CR3). No single existing observable forms a common-referent bridge. | **PROVED / EXACT CLASSIFICATION** | Verified analytically and numerically in `transcendental.py` and `test_tc_mechanism_discovery.py`. |
+| TC-DISC-007 | Strong Unresolved Bridge Condition on Candidate CR-1: For normalized radial displacement $\delta$, (CR1) holds by grade invariance and (CR3) holds by definition. However, because $L_K \cap L_J = \{0\}$ by transcendence of $\tau$, asserting (CR2) ($\delta \in L_K \cap L_J$) forces $\delta = 0$ directly. This establishes layer membership as a strong unresolved bridge condition whose independent derivation without assuming the Riemann Hypothesis remains the core open obstacle. | **STRONG UNRESOLVED BRIDGE CONDITION** | Verified by exact symbolic reduction; documented in `RESEARCH_HYPOTHESIS.md` §26.4. |
+
+---
+
+# 31. TC Bounded Grade-Character Bridge Claims (Cycle 4)
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+# 32. TC Log-Haar Temperedness Bridge Claims (Cycle 5)
+
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| TC-DISC-010 | Log-Haar Temperedness Bridge & Prime Error Equivalence: In logarithmic coordinate $u = \log x$, zero mode $\phi_\lambda(u) = \exp((\delta + i\gamma)u)$ defines a regular tempered distribution in $\mathcal{S}'(\mathbb R)$ iff $\delta = 0$ (Theorem C). For the normalized Chebyshev prime error $E(u) = \exp(-u/2)(\psi(e^u) - e^u)$, unconditional Vinogradov-Korobov bounds yield exponential growth $E(u) = O(\exp(u/2 - o(u)))$, which is unconditionally non-tempered; Cramér-Ingham theorem proves $E(u) \in \mathcal{S}'(\mathbb R) \iff \text{RH}$. Invertible TC coordinate transport ensures pointwise well-definedness (P1) at every finite grade, but does not force bilateral orbit uniformity (P2) or common tempered space membership (P3). | **CONDITIONAL ONLY / RH-EQUIVALENT BRIDGE** | Formalized in Lean 4 (`log_mode_translation`, `log_mode_abs`, `log_mode_bounded_iff_delta_zero`, `bilateral_boundedness_implies_delta_zero`); verified in `transcendental.py` (`audit_log_haar_temperedness_mechanism`) and `test_tc_mechanism_discovery.py`. |
+
+---
+
+
+
+
 
 
 

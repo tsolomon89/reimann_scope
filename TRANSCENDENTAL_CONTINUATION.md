@@ -955,14 +955,19 @@ induces the exact tautological coordinate covariance identity:
 \]
 This gauge transformation preserves the radial coordinate $R_\tau(W_\rho(K), K) = \delta$ for **any** zero $\rho = 1/2 + \delta + i\gamma$, whether on the critical line ($\delta = 0$) or off the critical line ($\delta \ne 0$). Because $\mathcal{G}_K$ holds tautologically for every dilation and every complex root, $\mathcal{G}_K$ alone imposes **zero restriction** on the location of $\rho$ and cannot prove radial rigidity.
 
-### 19.2 Positive-Grade Arithmetic Constraints ($\mathcal{A}_K$)
-For integer $K \ge 1$, evaluating the dilated function $\zeta(\tau^K s)$ relates dilated values to the native Euler product, Dirichlet series, and explicit formula constraints:
+### 19.2 Positive-Grade Arithmetic Candidate Sets ($\mathcal{A}_K$)
+In earlier working formulations, the notation $\mathcal{A}_K$ was introduced as a verbal placeholder:
 \[
 \mathcal{A}_K = \left\{ \text{Dirichlet series / spectra admissible under grade } K \text{ arithmetic functional equations} \right\}.
 \]
+*Rigorous Epistemic Clarification*: The set $\mathcal{A}_K$ is currently an **undefined candidate placeholder**, not an established constraint theorem. To be mathematically well-defined, $\mathcal{A}_K$ requires:
+1. An exact ambient function space (e.g. meromorphic functions of finite order on $\mathbb{C}$);
+2. A formal membership predicate (e.g. satisfying the degree 1 Selberg class axioms or explicit Euler product continuation);
+3. An exact compatibility relation connecting grade $K$ values to native $K=0$ arithmetic.
+Until such an explicit predicate and theorem are proved, $\mathcal{A}_K$ must not be reasoned from as if a proved restriction exists.
 
 ### 19.3 The Infinite Spectrum Intersection Open Problem
-The actual zero spectrum must satisfy every positive grade simultaneously:
+If an arithmetic coupling exists across grades, the actual zero spectrum would satisfy:
 \[
 \boxed{
 \text{Spectrum} \in \bigcap_{K \ge 1} \mathcal{A}_K.

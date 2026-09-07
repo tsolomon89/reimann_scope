@@ -209,9 +209,18 @@ def completed_xi(
     Evaluate the completed Riemann xi function:
     xi(s) = 1/2 * s * (s - 1) * pi^(-s/2) * Gamma(s/2) * zeta(s).
     Satisfies the functional equation xi(s) = xi(1-s).
+    Treats removable values correctly: xi(0) = xi(1) = 1/2,
+    and reflection xi(s) = xi(1-s) for non-positive even integers (trivial zeros).
     """
     with mpmath.workdps(dps + 15):
         s_mpc = to_mpc(s, dps=dps)
+        # Removable singularities at s = 0 and s = 1
+        if s_mpc == 0 or s_mpc == 1:
+            return mpmath.mpc(mpmath.mpf('0.5'), mpmath.mpf('0.0'))
+        # Trivial zeros: s is a negative even integer, where Gamma(s/2) has a pole
+        # and zeta(s) has a simple zero with finite non-zero product.
+        if s_mpc.imag == 0 and s_mpc.real < 0 and int(s_mpc.real) == s_mpc.real and int(s_mpc.real) % 2 == 0:
+            return completed_xi(1 - s_mpc, dps=dps)
         pi = mpmath.pi
         term1 = mpmath.mpf('0.5') * s_mpc * (s_mpc - 1)
         term2 = mpmath.power(pi, -s_mpc / 2)
@@ -3320,9 +3329,18 @@ def completed_xi(
     [COMPLETED RIEMANN XI FUNCTION]
     Evaluates the completed Riemann xi function:
     xi(s) = 1/2 * s * (s - 1) * pi^(-s/2) * Gamma(s/2) * zeta(s).
+    Treats removable values correctly: xi(0) = xi(1) = 1/2,
+    and reflection xi(s) = xi(1-s) for non-positive even integers (trivial zeros).
     """
     with mpmath.workdps(dps + 25):
         s_mpc = to_mpc(s, dps=dps + 25)
+        # Removable singularities at s = 0 and s = 1
+        if s_mpc == 0 or s_mpc == 1:
+            return mpmath.mpc(mpmath.mpf('0.5'), mpmath.mpf('0.0'))
+        # Trivial zeros: s is a negative even integer, where Gamma(s/2) has a pole
+        # and zeta(s) has a simple zero with finite non-zero product.
+        if s_mpc.imag == 0 and s_mpc.real < 0 and int(s_mpc.real) == s_mpc.real and int(s_mpc.real) % 2 == 0:
+            return completed_xi(1 - s_mpc, dps=dps)
         # Factor 1: 1/2 * s * (s - 1)
         poly = mpmath.mpf('0.5') * s_mpc * (s_mpc - 1)
         # Factor 2: pi^(-s/2)

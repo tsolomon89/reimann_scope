@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-008",
+  "statement": "Common-Referent Collision Theorem and Observable Inventory Classification: For any observable A evaluated on nontrivial zeros rho = 1/2 + delta + i*gamma satisfying (CR1) Common referent A_K(rho_K) = A_J(rho_J) = A(rho), (CR2) Arithmetic layer location A_K in L_K = tau^K Z and A_J in L_J = tau^J Z (K != J in Integer), and (CR3) Off-line sensitivity delta != 0 implies A(rho) != 0, arithmetic layer separation L_K cap L_J = {0} forces delta = 0. In an audit across the ten listed existing observables in the corpus, every quantity fails at least one of (CR1), (CR2), or (CR3). For the normalized displacement candidate, CR2 together with layer separation and CR3 is sufficient to imply delta = 0. Because L_K cap L_J = {0}, any candidate satisfying (CR1) and (CR2) forces delta = 0 directly, establishing layer membership as a strong unresolved bridge condition whose independent derivation without assuming RH remains open.",
+  "quantified_variables": [
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "First integer grade index"
+    },
+    {
+      "name": "J",
+      "domain": "J in Integer, J != K",
+      "description": "Second distinct integer grade index"
+    },
+    {
+      "name": "delta",
+      "domain": "delta in Real, -1/2 < delta < 1/2",
+      "description": "Real displacement from the critical line"
+    }
+  ],
+  "variable_domains": [
+    "K in Integer",
+    "J in Integer, J != K",
+    "delta in Real, -1/2 < delta < 1/2"
+  ],
+  "hypotheses": [
+    "tau = 2pi",
+    "L_K = tau^K Z",
+    "L_K cap L_J = {0} for K != J in Integer",
+    "Observable A satisfies (CR1): A_K(rho_K) = A_J(rho_J) = A(rho)",
+    "Observable A satisfies (CR2): A_K in L_K and A_J in L_J",
+    "Observable A satisfies (CR3): delta != 0 implies A(rho) != 0"
+  ],
+  "object_studied": "Abstract common-referent observables A on transported zeros rho_K and the ten listed existing TC quantities",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = delta + it; tau = 2pi",
+  "multiplicity_convention": "Standard zero multiplicities m_rho in Integer_{>=1}",
+  "measure_and_window": "Pointwise real/complex observable evaluations across integer grades",
+  "order_of_limits": "Single-point algebraic and geometric evaluations",
+  "exact_conclusion": "(CR1) + (CR2) + (CR3) implies delta = 0; none of the ten listed existing TC observables simultaneously satisfies (CR1)-(CR3); Candidate CR-1 satisfies (CR1) and (CR3), while (CR2) remains a strong unresolved bridge condition",
+  "logical_negation": "There exists an observable satisfying (CR1), (CR2), and (CR3) with delta != 0, or Candidate CR-1 satisfies (CR2) without assuming delta = 0 (FALSIFIED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "NONE",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "Lean 4: common_referent_collision_theorem",
+    "Lean 4: invariant_covariant_observable_vanishing",
+    "Lean 4: lattice_intersection_transcendental_char",
+    "transcendental.py: audit_candidate_common_referent_bridge",
+    "transcendental.py: evaluate_observable_inventory"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Symbolic elimination and equality-case cancellation analysis: solved m * tau^K = n * tau^J in SymPy, proving the unique cancellation root is m = 0, n = 0 for transcendental tau",
+    "Evaluated all ten listed existing observables against (CR1), (CR2), (CR3), confirming every quantity fails at least one condition",
+    "Proved that for Candidate CR-1 (normalized displacement delta), (CR1) holds to < 1e-70 and (CR3) holds, while (CR2) fails",
+    "Verified algebraically that L_K cap L_J = {0} forces delta in L_K cap L_J to equal 0, confirming that layer membership (CR2) directly implies delta = 0 under layer separation",
+    "Dominance and boundary audit: tested delta = 0, delta = 0.1, delta = sqrt(2)/10, and delta = log_tau(1.5), confirming no discrete quantization"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_common_referent_bridge_cr1_cr3_proved_cr2_fails",
+    "tests/test_tc_mechanism_discovery.py: test_observable_inventory_classification",
+    "tests/test_tc_mechanism_discovery.py: test_disguised_premise_obstruction_symbolic"
+  ],
+  "external_sources": [
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Math. Ann. 20, 213-225",
+      "theorem": "Transcendence of pi implies tau^M not in Q for integer M != 0"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Constructing an independently arithmetic observable that is non-scalar and detects off-line zeros without assuming discrete quantization (OPEN)"
+  ]
+}

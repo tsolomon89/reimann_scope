@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-006",
+  "statement": "For every real displacement delta in (-1/2, 1/2) and ordinate gamma in Real, the grade zero-character q = exp((delta + i*gamma)*log tau) is non-zero, and chi(K) = q^K is a character of the integer grade group (Z, +). The character group laws chi(K+J) = chi(K)chi(J), reflection defect B_rho(k) = 4 sinh^2(k delta log(tau)/2), and symmetric defect D_K(rho) = 4 sinh^2(K delta log(tau)/2) are smooth real-analytic functions of continuous delta, and conjugation/reflection symmetries admit arbitrary off-line displacements delta != 0. The symmetric quartet polynomial countermodel P_{delta,gamma}(z) = ((z-i*gamma)^2 - delta^2)((z+i*gamma)^2 - delta^2) satisfies all listed symmetries with delta != 0. Those listed symmetry and character premises alone therefore do not imply delta = 0 or force discrete quantization on delta.",
+  "quantified_variables": [
+    {
+      "name": "delta",
+      "domain": "delta in Real, -1/2 < delta < 1/2",
+      "description": "Real displacement from the critical line"
+    },
+    {
+      "name": "gamma",
+      "domain": "gamma in Real",
+      "description": "Zero ordinate coordinate"
+    },
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "Integer grade index"
+    }
+  ],
+  "variable_domains": [
+    "delta in Real, -1/2 < delta < 1/2",
+    "gamma in Real",
+    "K in Integer"
+  ],
+  "hypotheses": [
+    "tau = 2pi",
+    "rho = 1/2 + delta + i*gamma",
+    "q = exp((delta + i*gamma)*log tau)",
+    "chi(K) = q^K",
+    "D_K(rho) = 4 sinh^2(K delta log(tau)/2)"
+  ],
+  "object_studied": "Grade zero-character chi(K) = q^K and symmetric defect D_K(rho)",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = delta + it; tau = 2pi",
+  "multiplicity_convention": "Multiplicities preserved under grade transport",
+  "measure_and_window": "Discrete character on (Z, +)",
+  "order_of_limits": "Evaluation for fixed K in Integer and continuous delta in (-1/2, 1/2)",
+  "exact_conclusion": "Grade character and reflection symmetries hold for all real delta in (-1/2, 1/2); listed premises alone do not imply delta = 0 or quantize delta",
+  "logical_negation": "The listed character laws and reflection symmetries mathematically force delta = 0 without additional arithmetic premises (FALSIFIED by smooth real-analytic family and polynomial countermodel P)",
+  "epistemic_role": "COUNTERMODEL",
+  "evidence_scope": "COUNTEREXAMPLE",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "NONE",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/CurvatureTransport.lean: countermodelPolynomial_even",
+    "formal/RiemannScope/CurvatureTransport.lean: reflection_grade_curvature_pos",
+    "transcendental.py: audit_candidate_B_zero_restriction"
+  ],
+  "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
+  "falsification_attempts": [
+    "Evaluated D_K across delta in {0, 0.1, sqrt(2)/10, -sqrt(2)/10, log_tau(1.5)}",
+    "Verified that irrational delta = log_tau(1.5) yields rational modulus |q| = 1.5 in Q without arithmetic contradiction",
+    "Boundary dominance audit: as delta -> 0, D_K ~ (K*delta*log tau)^2; as delta -> 1/2, D_K remains finite and smooth",
+    "Verified exact root cancellation of quartet countermodel P at all 4 roots +/-delta +/- i*gamma to 80 dps"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_audit_gap_B_displacement_restriction"
+  ],
+  "external_sources": [
+    {
+      "source": "Edwards, H.M. (1974), Riemann's Zeta Function, Academic Press",
+      "theorem": "Chapter 1 (Symmetries of xi)"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Derivation of an arithmetic prime-zeta law that forces D_K(rho) = 0 (OPEN)"
+  ]
+}
