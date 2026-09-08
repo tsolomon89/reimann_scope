@@ -1423,9 +1423,9 @@ E(u) = e^{-u/2}(\psi(e^u) - e^u) = \frac{\psi(x) - x}{\sqrt{x}}.
    \]
    Dividing by $\sqrt{x} = e^{u/2}$:
    \[
-   E(u) = O\left(e^{u/2} \exp\left(-c \frac{u^{3/5}}{(\log u)^{1/5}}\right)\right).
+   E(u) = O\left(e^{u/2} \exp\left(-c \frac{u^{3/5}}{(\log u)^{1/5}}\right)\right) = O\left(e^{u/2 - o(u)}\right).
    \]
-   Because the sub-exponential decay cannot cancel $e^{u/2}$, **$E(u)$ has exponential growth unconditionally**, growing as $e^{u/2 - o(u)}$ as $u \to +\infty$. It is unconditionally non-tempered in $\mathcal{S}'(\mathbb{R})$.
+   Because the sub-exponential decay cannot cancel $e^{u/2}$, the Vinogradov-Korobov bound establishes only an upper bound $O(e^{u/2 - o(u)})$, which is too weak to prove polynomial growth or temperedness. However, an upper bound cannot establish a lower-growth obstruction or prove non-temperedness. The true unconditional status of $E(u)$ is **UNKNOWN FROM THIS BOUND** (prior unconditional non-temperedness claim withdrawn in Cycle 6).
 2. **Conditional Growth (von Koch 1901 under RH)**:
    If RH holds ($\delta = 0$ for all non-trivial zeros), then:
    \[
@@ -1468,6 +1468,46 @@ Consider $f(u) = e^{\delta u}$ with $\delta \ne 0$.
 | Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **TC-DISC-010** | **CLM-TC-010** | Log-Haar Temperedness Bridge & Prime Error Equivalence | Proved Theorem C ($\phi_\lambda \in \mathcal{S}' \iff \delta = 0$); proved prime error temperedness $E(u) \in \mathcal{S}' \iff \text{RH}$; proved (P1) $\not\Rightarrow$ (P2), (P3). | **CONDITIONAL ONLY** (Temperedness is an exact exclusion criterion, but its prime-side validity is strictly equivalent to RH) |
+
+---
+
+# 29. Cycle 6: Prime-Error Temperedness Equivalence Audit (Route I vs Route II)
+
+In Cycle 6, the repository audited whether the continuous extension of the regular distribution $T_E$ to $\mathcal{S}'(\mathbb{R})$ genuinely forces the Riemann Hypothesis (RH) for this specific arithmetic error $E(u) = e^{-u/2}(\psi(e^u) - e^u)$.
+
+### 29.1 Three Distinct Propositions
+- **(A) The Riemann Hypothesis**: All nontrivial zeros of $\zeta(s)$ satisfy $\Re(\rho) = 1/2$.
+- **(B) Pointwise Polynomial Bound**: $E(u) = O((1+u)^N)$ for some fixed $N \ge 0$ as $u \to +\infty$.
+- **(C) Distributional Temperedness**: The distribution $T_E \in \mathcal{D}'(\mathbb{R})$ extends continuously to a tempered distribution $T \in \mathcal{S}'(\mathbb{R})$.
+
+### 29.2 Equivalence Theorem: (A) $\iff$ (B) $\iff$ (C)
+1. **$(A) \implies (B)$**: Proved by von Koch (1901) and Cramér (1919). Under RH, $\psi(x) - x = O(\sqrt{x}\log^2 x) \implies E(u) = O(u^2)$ ($N = 2$).
+2. **$(B) \implies (C)$**: Standard Schwartz regular distribution theorem (1950). Any locally integrable function with polynomial growth $|f(u)| \le C(1+|u|)^N$ defines a regular tempered distribution $T_f \in \mathcal{S}'(\mathbb{R})$.
+3. **$(B) \implies (A)$**: Proved by Ingham (1932, Theorem 30).
+4. **$(C) \implies (A)$ (Proved in Cycle 6 via Route II)**:
+   - For $u < \log 2$, $\psi(e^u) = 0$, so $E(u) = -e^{u/2}$ is smooth and analytic.
+   - For a smooth cutoff $\chi \in C^\infty(\mathbb{R})$ with $\chi(u) = 0$ for $u \le 0.1$ and $\chi(u) = 1$ for $u \ge 0.5$, the truncated error $E_\chi(u) = \chi(u)E(u)$ is supported on $[0.1, \infty) \subset [0, \infty)$.
+   - The tail $(1-\chi)E \in \mathcal{S}(\mathbb{R})$ is smooth and exponentially decaying as $u \to -\infty$. Thus $T_E \in \mathcal{S}'(\mathbb{R}) \iff T_{E_\chi} \in \mathcal{S}'(\mathbb{R})$.
+   - By Hörmander Theorem 7.4.2 / Schwartz Chap. VIII, the Laplace transform of any tempered distribution supported on a half-line $[0, \infty)$ is **holomorphic on the entire open right half-plane $\Re(z) > 0$**.
+   - For $\Re(z) > 1/2$, $\mathcal{L}[T_{E_\chi}](z) = G(z) - H(z)$, where $H(z)$ is entire and $G(z) = -\frac{1}{z+1/2}\frac{\zeta'(z+1/2)}{\zeta(z+1/2)} - \frac{1}{z-1/2}$.
+   - At $z = 1/2$, the pole of $\zeta'/\zeta$ at $s = 1$ cancels identically with $-1/(z-1/2)$ (removable singularity).
+   - If $\zeta(s)$ has any off-critical zero $\rho = 1/2 + \delta + i\gamma$ with $\delta > 0$, $G(z)$ has an isolated pole at $z_\rho = \delta + i\gamma \in \Re(z) > 0$ with residue $\text{Res}(G, z_\rho) = -m_\rho/\rho \ne 0$.
+   - By the identity theorem for meromorphic functions, this pole contradicts the holomorphy of $\mathcal{L}[T_{E_\chi}]$ on $\Re(z) > 0$.
+   - Hence no zero can have $\Re(\rho) > 1/2$, which by the functional equation forces all zeros to have $\Re(\rho) = 1/2$ (RH holds).
+   - Thus **$(C) \implies (A)$ is rigorously proved**.
+
+### 29.3 Route I: Why Real-Axis Tauberian Deconvolution Fails Unconditionally
+Route I investigates recovering pointwise bounds $(B)$ from smoothed averages $(E * \varphi)(U) = O((1+|U|)^N)$.
+- In distribution theory, generic functions in $\mathcal{S}' \cap L^1_{\text{loc}}$ can oscillate wildly without pointwise polynomial bounds (e.g. $f(u) = e^u \cos(e^{2u}) = \frac{d}{du}\frac{\sin(e^{2u})}{2e^u} + \dots$).
+- For $E(u)$, between prime powers $E'(u) = -\frac{1}{2}e^{-u/2}(\psi(e^u) + e^u) \approx -e^{u/2}$.
+- The downward slope diverges exponentially as $-e^{u/2}$, violating the classical Tauberian condition of polynomial slow decrease without an a priori prime bound.
+- Route I therefore stalls unconditionally, whereas Route II completely succeeds via half-line Laplace holomorphy.
+
+### 29.4 Synthesis of Candidate TC-DISC-011 / CLM-TC-011
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-011** | **CLM-TC-011** | Prime-Error Distributional Temperedness Equivalence Theorem | Rigorously proved $(A) \iff (B) \iff (C)$ via Route II Schwartz-Laplace theorem and Hörmander Theorem 7.4.2; demonstrated Route I Tauberian slow-decrease obstruction. | **EQUIVALENCE PROVED** (Distributional temperedness genuinely implies RH, but is strictly equivalent to RH, providing no independent arithmetic shortcut) |
 
 ---
 

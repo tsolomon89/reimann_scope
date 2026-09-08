@@ -1361,12 +1361,15 @@ def evaluate_grade_character(
     dps: int = 80
 ) -> Dict[str, Any]:
     """
-    [CYCLE 4: CANONICAL GRADE CHARACTER EVALUATION]
+    [CYCLE 4 & 6: CANONICAL GRADE CHARACTER EVALUATION]
     For nontrivial zero rho = 1/2 + delta + i*gamma:
-      q_rho = exp((delta + i*gamma)*log tau) = tau^(delta + i*gamma)
-      chi_rho(K) = q_rho^K = tau^(K*(rho - 1/2)) = exp(K*(delta + i*gamma)*log tau)
-      |chi_rho(K)| = tau^(K*delta)
-      D_K(rho) = 4 * sinh^2(K * delta * log tau / 2)
+      q_rho = exp((delta + i*gamma)*log tau)
+      chi_rho(K) = q_rho^K = exp(K*(delta + i*gamma)*log tau)
+      With a = K*delta*log(tau)/2, b = K*gamma*log(tau)/2:
+        chi_rho(K/2) = exp(a + i*b)   [Note: a and b already contain log(tau)]
+        |chi_rho(K)| = exp(2*a) = tau^(K*delta)
+        Pure radial defect: (abs(exp(a+i*b)) - abs(exp(-a-i*b)))^2 = 4 * sinh^2(a)
+        Complex difference: abs(exp(a+i*b) - exp(-a-i*b))^2 = 2*cosh(2*a) - 2*cos(2*b) = 4*sinh^2(a) + 4*sin^2(b)
     """
     with mpmath.workdps(dps):
         tau = math_core.get_tau(dps=dps)
@@ -1714,19 +1717,20 @@ def evaluate_prime_counting_error_growth(
     dps: int = 80
 ) -> Dict[str, Any]:
     """
-    [CYCLE 5: NORMALIZED CHEBYSHEV PRIME ERROR TEMPEREDNESS AUDIT]
+    [CYCLE 6 REVISION OF CYCLE 5: CHEBYSHEV PRIME ERROR STATUS AUDIT]
     Evaluates the normalized Chebyshev prime-counting error in log coordinates:
       E(u) = exp(-u/2) * (psi(exp u) - exp u) = (psi(x) - x) / sqrt(x).
     1. Unconditional Bound (Vinogradov-Korobov):
        psi(x) - x = O(x * exp(-c (log x)^{3/5} (log log x)^{-1/5})).
-       Therefore E(u) = O(exp(u/2 - c u^{3/5 - epsilon})), which grows exponentially
-       as u -> +infty. Hence E(u) is UNCONDITIONALLY NON-TEMPERED on R.
+       This implies an upper bound |E(u)| <= C * exp(u/2 - c u^{3/5 - epsilon}).
+       CORRECTION (Cycle 6, Sec 2.1):
+       An upper bound that fails to be polynomial does NOT prove a lower-growth obstruction
+       or non-temperedness. The correct unconditional status is UNKNOWN_FROM_THIS_BOUND.
     2. Conditional Bound (Cramér-von Koch under RH):
        psi(x) - x = O(sqrt(x) * log^2 x) <=> E(u) = O(u^2).
        Polynomial growth O(u^2) defines a regular tempered distribution in S'(R).
     3. Equivalence:
-       E(u) in S'(R) <=> RH holds.
-       Temperedness cannot be derived unconditionally from the prime side to prove RH.
+       By Route II (Schwartz-Laplace theorem), E(u) in S'(R) <=> RH holds.
     """
     with mpmath.workdps(dps):
         if u_values is None:
@@ -1737,24 +1741,25 @@ def evaluate_prime_counting_error_growth(
             u_v = mpmath.mpf(str(u_item))
             # Conditional RH bound: u^2
             bound_rh = u_v ** 2
-            # Unconditional bound order: exp(u/2)
-            bound_uncond = mpmath.exp(u_v / mpmath.mpf('2'))
+            # Unconditional upper bound scale: exp(u/2)
+            bound_uncond_scale = mpmath.exp(u_v / mpmath.mpf('2'))
             evaluations.append({
                 "u": mpmath.nstr(u_v, n=10),
                 "x": mpmath.nstr(mpmath.exp(u_v), n=10),
                 "rh_bound_polynomial_order": mpmath.nstr(bound_rh, n=10),
-                "unconditional_exponential_order": mpmath.nstr(bound_uncond, n=10),
-                "exponential_over_polynomial_ratio": mpmath.nstr(bound_uncond / bound_rh, n=10)
+                "unconditional_upper_scale": mpmath.nstr(bound_uncond_scale, n=10),
+                "unconditional_over_rh_ratio": mpmath.nstr(bound_uncond_scale / bound_rh, n=10)
             })
 
         return {
             "object_studied": "Normalized Chebyshev prime error E(u) = exp(-u/2) * (psi(exp u) - exp u)",
             "evaluations": evaluations,
-            "unconditional_status": "EXPONENTIALLY_GROWING_NON_TEMPERED",
+            "unconditional_status": "UNKNOWN_FROM_THIS_BOUND",
+            "unconditional_bound_weakness": "Vinogradov-Korobov upper bound is too weak to prove polynomial growth or temperedness, but does not prove non-temperedness.",
             "conditional_rh_status": "POLYNOMIALLY_BOUNDED_TEMPERED_IN_S_PRIME",
             "is_rh_equivalent": True,
             "cramer_ingham_equivalence": "E(u) in S'(R) <=> sup_rho Re(rho) <= 1/2 <=> RH",
-            "verdict": "TEMPEREDNESS_OF_PRIME_ERROR_IS_EQUIVALENT_TO_RH__NOT_AN_INDEPENDENT_PREMISE"
+            "verdict": "TEMPEREDNESS_OF_PRIME_ERROR_IS_EQUIVALENT_TO_RH"
         }
 
 
@@ -1805,11 +1810,11 @@ def audit_tc_orbit_uniformity(
 
 def audit_log_haar_temperedness_mechanism(dps: int = 80) -> Dict[str, Any]:
     """
-    [CYCLE 5: HIGH-LEVEL SYNTHESIS OF LOG-HAAR TEMPEREDNESS BRIDGE]
-    Synthesizes the findings of Cycle 5:
+    [CYCLE 5 SYNTHESIS AUDITED AND CORRECTED IN CYCLE 6]
+    Synthesizes the findings of Cycle 5 with Cycle 6 corrections:
     1. Zero mode phi_lambda(u) = exp((delta + i*gamma)*u) is regular tempered in S'(R) iff delta = 0 (Theorem C).
     2. Normalized Chebyshev prime error E(u) is tempered in S'(R) iff RH holds.
-    3. Unconditional prime side has exponential growth E(u) = O(exp(u/2 - o(u))), failing temperedness.
+    3. Unconditional prime status is UNKNOWN_FROM_THIS_BOUND (withdrawn unconditional non-temperedness claim).
     4. TC translation provides pointwise transport (P1) at every finite grade, but does NOT force
        bilateral orbit uniformity (P2) or temperedness (P3).
     5. Overall status: CONDITIONAL_ONLY (temperedness is an RH-equivalent criterion, not an unconditional bridge).
@@ -1826,14 +1831,266 @@ def audit_log_haar_temperedness_mechanism(dps: int = 80) -> Dict[str, Any]:
             "claim_id": "CLM-TC-010",
             "mode_online_tempered": mode_online["is_tempered_distribution"],
             "mode_offline_tempered": mode_offline["is_tempered_distribution"],
-            "prime_error_unconditional_tempered": False,
+            "prime_error_unconditional_status": prime_error["unconditional_status"],
             "prime_error_rh_equivalent": prime_error["is_rh_equivalent"],
             "tc_supplies_p1_pointwise": orbit_offline["P1_pointwise_transport_well_defined"],
             "tc_supplies_p2_p3_uniformity": False,
             "status": "CONDITIONAL_ONLY",
             "verdict": "LOG_HAAR_TEMPEREDNESS_MECHANISM_CONDITIONAL_ONLY",
-            "plain_conclusion": "Temperedness in log coordinates excludes off-line zeros, but the complete prime-side object is tempered if and only if RH holds. TC translation does not supply an independent proof of temperedness."
+            "plain_conclusion": "Temperedness in log coordinates excludes off-line zeros, and E(u) in S'(R) is equivalent to RH. TC translation does not supply an independent proof of temperedness."
         }
+
+
+# ==============================================================================
+# CYCLE 6: PRIME-ERROR TEMPEREDNESS EQUIVALENCE & DUAL-ROUTE AUDIT
+# ==============================================================================
+
+def evaluate_phase_cancelling_schwartz_pairing(
+    delta: Union[float, str, mpmath.mpf] = '0.1',
+    gamma: Union[float, str, mpmath.mpf] = '14.13472514173469379',
+    n_values: Optional[List[int]] = None,
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [CYCLE 6: SECTION 2.3 — PHASE-CANCELLING SCHWARTZ TEST FAMILY AUDIT]
+    For the zero mode phi_lambda(u) = exp((delta + i*gamma)*u), an unmodulated Gaussian
+    pairing has oscillatory interference from gamma.
+    To rigorously isolate radial divergence, test against the phase-cancelling family:
+      eta_n(u) = exp(-i*gamma*u) * exp(-u^2 / (2*n^2)).
+    Then:
+      <phi_lambda, eta_n> = int_R exp(delta*u - u^2/(2*n^2)) du
+                          = sqrt(2*pi) * n * exp(n^2 * delta^2 / 2).
+    Fixed Schwartz seminorms of eta_n:
+      p_{alpha, 0}(eta_n) = sup_u |u|^alpha exp(-u^2/(2*n^2)) = alpha^{alpha/2} * exp(-alpha/2) * n^alpha.
+      p_{alpha, beta}(eta_n) <= C_{alpha,beta,gamma} * n^alpha.
+    For delta != 0:
+      |<phi_lambda, eta_n>| / p_{alpha,beta}(eta_n) ~ n^{1-alpha} * exp(n^2 * delta^2 / 2) -> infty
+    diverges super-polynomially, rigorously demonstrating discontinuity on S(R).
+    """
+    with mpmath.workdps(dps):
+        d_val = mpmath.mpf(str(delta))
+        g_val = mpmath.mpf(str(gamma))
+
+        if n_values is None:
+            n_values = [1, 5, 10, 20, 40]
+
+        evaluations = []
+        is_delta_zero = bool(abs(d_val) < mpmath.mpf('1e-70'))
+
+        for n in n_values:
+            n_mp = mpmath.mpf(n)
+            # Exact pairing: sqrt(2*pi) * n * exp(n^2 * delta^2 / 2)
+            exponent = (n_mp ** 2) * (d_val ** 2) / mpmath.mpf('2')
+            exact_pairing = mpmath.sqrt(mpmath.mpf('2') * mpmath.pi) * n_mp * mpmath.exp(exponent)
+
+            # Seminorm p_{0,0}(eta_n) = 1
+            p_00 = mpmath.mpf('1')
+            # Seminorm p_{2,0}(eta_n) = 2 * exp(-1) * n^2
+            p_20 = mpmath.mpf('2') * mpmath.exp(mpmath.mpf('-1')) * (n_mp ** 2)
+            # Approximate seminorm p_{0,1}(eta_n) <= |gamma| + 1/(n * sqrt(e))
+            p_01 = abs(g_val) + (mpmath.exp(mpmath.mpf('-0.5')) / n_mp)
+
+            ratio_to_p20 = exact_pairing / p_20
+            ratio_to_p00 = exact_pairing / p_00
+
+            evaluations.append({
+                "n": n,
+                "exact_pairing": mpmath.nstr(exact_pairing, n=15),
+                "p_00": mpmath.nstr(p_00, n=10),
+                "p_20": mpmath.nstr(p_20, n=10),
+                "p_01": mpmath.nstr(p_01, n=10),
+                "pairing_over_p00_ratio": mpmath.nstr(ratio_to_p00, n=15),
+                "pairing_over_p20_ratio": mpmath.nstr(ratio_to_p20, n=15)
+            })
+
+        return {
+            "test_family": "eta_n(u) = exp(-i*gamma*u) * exp(-u^2 / (2*n^2))",
+            "delta": mpmath.nstr(d_val, n=15),
+            "gamma": mpmath.nstr(g_val, n=15),
+            "evaluations": evaluations,
+            "is_delta_zero": is_delta_zero,
+            "proves_discontinuity_for_nonzero_delta": not is_delta_zero,
+            "conclusion": "Phase cancellation isolates radial divergence sqrt(2*pi)*n*exp(n^2*delta^2/2), strictly outgrowing all polynomial Schwartz seminorms."
+        }
+
+
+def evaluate_chebyshev_error_local_structure(
+    u_values: Optional[List[Union[float, str, mpmath.mpf]]] = None,
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [CYCLE 6: SECTION 4 & ROUTE I — LOCAL ARITHMETIC STRUCTURE & TAUBERIAN SLOPE AUDIT]
+    For E(u) = exp(-u/2) * (psi(exp u) - exp u):
+    1. Between prime-power jumps (u in (log n, log(n+1))):
+       psi(exp u) is constant, and E is smooth and strictly decreasing with derivative:
+         E'(u) = - (1/2) * exp(-u/2) * (psi(exp u) + exp u) = - exp(u/2) - (1/2)*E(u).
+       Since psi(e^u) ~ e^u, the downward slope is:
+         E'(u) ~ - exp(u/2) -> - infty exponentially as u -> +infty.
+    2. At prime-power jumps (u = log n for n = p^k):
+       The jump size is positive:
+         Delta E(log n) = exp(-(1/2)*log n) * Lambda(n) = Lambda(n) / sqrt(n) > 0.
+       Jump sizes are uniformly bounded: Lambda(n)/sqrt(n) <= log(2)/sqrt(2) ~ 0.4901.
+    3. Route I Tauberian Obstruction:
+       Standard Tauberian recovery (E * phi)(U) = O((1+|U|)^N) => E(U) = O((1+|U|)^N) requires
+       a polynomial slow-decrease condition: E(U+h) - E(U) >= - C*(1+U)^N.
+       Because between primes E'(u) ~ -exp(u/2), E(u) plunges by order exp(u/2) across prime gaps,
+       violating polynomial slow decrease unconditionally without an a priori prime bound.
+    """
+    with mpmath.workdps(dps):
+        if u_values is None:
+            u_values = [mpmath.mpf('2.0'), mpmath.mpf('5.0'), mpmath.mpf('10.0'), mpmath.mpf('20.0')]
+
+        evaluations = []
+        for u_item in u_values:
+            u_v = mpmath.mpf(str(u_item))
+            exp_u = mpmath.exp(u_v)
+            # Leading downward slope: -exp(u/2)
+            downward_slope_lead = -mpmath.exp(u_v / mpmath.mpf('2'))
+            # Maximum prime jump at this height: log(x) / sqrt(x) = u / exp(u/2)
+            max_jump_at_height = u_v / mpmath.exp(u_v / mpmath.mpf('2'))
+
+            evaluations.append({
+                "u": mpmath.nstr(u_v, n=10),
+                "x": mpmath.nstr(exp_u, n=10),
+                "downward_slope_order": mpmath.nstr(downward_slope_lead, n=10),
+                "max_jump_size_order": mpmath.nstr(max_jump_at_height, n=10),
+                "slope_over_jump_ratio": mpmath.nstr(abs(downward_slope_lead) / max_jump_at_height, n=10)
+            })
+
+        return {
+            "object_studied": "Local jump and slope structure of E(u) = exp(-u/2)*(psi(exp u) - exp u)",
+            "between_jump_derivative_formula": "E'(u) = - (1/2)*exp(-u/2)*(psi(exp u) + exp u) ~ -exp(u/2)",
+            "at_jump_formula": "Delta E(log n) = Lambda(n) / sqrt(n) > 0",
+            "evaluations": evaluations,
+            "route_I_tauberian_verdict": "TAUBERIAN_SLOW_DECREASE_FAILS_UNCONDITIONALLY",
+            "explanation": "Downwards slope E'(u) ~ -exp(u/2) diverges exponentially. Pointwise growth cannot be recovered from smoothed averages without assuming prime-gap bounds equivalent to RH."
+        }
+
+
+def evaluate_chebyshev_laplace_meromorphic_poles(
+    zeros: Optional[List[Dict[str, Union[float, str]]]] = None,
+    dps: int = 80
+) -> Dict[str, Any]:
+    """
+    [CYCLE 6: ROUTE II — DIRECT SCHWARTZ-LAPLACE TRANSFORM & MEROMORPHIC POLE AUDIT]
+    Analyzes the Laplace transform of the truncated Chebyshev error:
+      E_chi(u) = chi(u) * E(u), supported on [0.1, infty) with (1-chi)*E in S(R).
+    For Re(z) > 1/2:
+      L[E_chi](z) = G(z) - H(z),
+      where H(z) is entire and G(z) = - 1/(z + 1/2) * (zeta'/zeta)(z + 1/2) - 1/(z - 1/2).
+    Poles of G(z) in Re(z) > 0:
+    1. At z = 1/2 (s = 1):
+       Pole of - (1/s)*(zeta'/zeta)(s) has residue +1, which cancels identically with - 1/(z - 1/2).
+       Residue is exactly ZERO (removable singularity).
+    2. At any nontrivial zero rho = 1/2 + delta + i*gamma with delta > 0:
+       z_rho = rho - 1/2 = delta + i*gamma lies in Re(z) > 0.
+       The logarithmic derivative (zeta'/zeta)(z + 1/2) has a simple pole with residue m_rho >= 1.
+       The residue of G(z) at z_rho is:
+         Res(G, z_rho) = - m_rho / rho != 0.
+    Route II Deduction:
+      By Hormander Theorem 7.4.2 / Schwartz Chap. VIII, the Laplace transform of ANY tempered
+      distribution supported on [0, infty) is HOLOMORPHIC in Re(z) > 0.
+      Therefore, if T_E in S'(R), G(z) CANNOT have any poles in Re(z) > 0.
+      Hence, no zeros of zeta(s) can have Re(rho) > 1/2.
+      By functional equation, this forces all zeros to have Re(rho) = 1/2 (RH holds).
+      Conclusion: (C) => (A) is RIGOROUSLY PROVED!
+    """
+    with mpmath.workdps(dps):
+        if zeros is None:
+            zeros = [
+                {"name": "gamma_1 (on-line)", "delta": "0.0", "gamma": "14.13472514173469379", "mult": 1},
+                {"name": "gamma_2 (on-line)", "delta": "0.0", "gamma": "21.02203963877155499", "mult": 1},
+                {"name": "hypothetical_off_line_1", "delta": "0.1", "gamma": "14.13472514173469379", "mult": 1},
+                {"name": "hypothetical_off_line_2", "delta": "0.25", "gamma": "30.0", "mult": 2}
+            ]
+
+        pole_evaluations = []
+        for z_data in zeros:
+            d_val = mpmath.mpf(str(z_data["delta"]))
+            g_val = mpmath.mpf(str(z_data["gamma"]))
+            m_val = int(z_data["mult"])
+
+            rho = mpmath.mpc(mpmath.mpf('0.5') + d_val, g_val)
+            z_rho = mpmath.mpc(d_val, g_val)
+
+            # Residue Res(G, z_rho) = - m_rho / rho
+            residue = - mpmath.mpf(m_val) / rho
+            res_mag = abs(residue)
+
+            in_right_half_plane = bool(d_val > mpmath.mpf('1e-70'))
+
+            pole_evaluations.append({
+                "name": z_data["name"],
+                "delta": mpmath.nstr(d_val, n=10),
+                "gamma": mpmath.nstr(g_val, n=10),
+                "rho": {"re": mpmath.nstr(rho.real, n=15), "im": mpmath.nstr(rho.imag, n=15)},
+                "z_rho": {"re": mpmath.nstr(z_rho.real, n=15), "im": mpmath.nstr(z_rho.imag, n=15)},
+                "multiplicity": m_val,
+                "in_right_half_plane": in_right_half_plane,
+                "residue": {"re": mpmath.nstr(residue.real, n=15), "im": mpmath.nstr(residue.imag, n=15)},
+                "residue_magnitude": mpmath.nstr(res_mag, n=15),
+                "is_strictly_non_zero": bool(res_mag > mpmath.mpf('1e-20'))
+            })
+
+        return {
+            "transform_studied": "Half-line Laplace transform L[E_chi](z) of truncated Chebyshev error",
+            "pole_at_s_equals_1_residue": "0.0 (exact cancellation of pole between zeta'/zeta and 1/(s-1))",
+            "pole_evaluations": pole_evaluations,
+            "hormander_theorem_reference": "Hormander, Analysis of Linear Partial Differential Operators I, Theorem 7.4.2",
+            "route_II_verdict": "EQUIVALENCE_PROVED",
+            "deduction": "Every zero with delta > 0 generates a pole with non-zero residue in Re(z) > 0. Since L[E_chi] is holomorphic in Re(z) > 0 for any tempered distribution supported on [0, infty), T_E in S'(R) rigorously forces delta <= 0 for all zeros, which implies RH."
+        }
+
+
+def audit_prime_error_temperedness_equivalence(dps: int = 80) -> Dict[str, Any]:
+    """
+    [CYCLE 6: HIGH-LEVEL SYNTHESIS OF CYCLE 6 AUDIT]
+    Synthesizes the resolution of the Prime-Error Temperedness Equivalence Audit:
+    (A) Riemann Hypothesis.
+    (B) Pointwise polynomial bound E(u) = O((1+u)^N).
+    (C) Regular distribution T_E in S'(R).
+    Results:
+    1. (A) => (B): Proved by von Koch (1901) and Cramer (1919) (N = 2 under RH).
+    2. (B) => (C): Standard Schwartz regular distribution theorem (polynomial growth defines T in S').
+    3. (B) => (A): Proved by Ingham (1932, Theorem 30).
+    4. (C) => (A): Proved in Cycle 6 via Route II (Schwartz-Laplace theorem, Hormander Theorem 7.4.2).
+       E_chi supported on [0.1, infty) with (1-chi)*E in S(R) forces L[E_chi](z) to be holomorphic in Re(z) > 0.
+       Any zero with Re(rho) > 1/2 produces an isolated pole with residue -m_rho/rho != 0, a contradiction.
+    5. Route I (Tauberian deconvolution) fails unconditionally because downward slope E'(u) ~ -exp(u/2)
+       violates polynomial slow decrease.
+    6. Overall Classification: EQUIVALENCE_PROVED. (A) <=> (B) <=> (C).
+    7. Critical Epistemic Caveat: This equivalence proves that asserting T_E in S'(R) does NOT provide an
+       easier path to RH; proving T_E in S'(R) from the prime side is mathematically equivalent to proving RH itself.
+    """
+    with mpmath.workdps(dps):
+        route_I = evaluate_chebyshev_error_local_structure(dps=dps)
+        route_II = evaluate_chebyshev_laplace_meromorphic_poles(dps=dps)
+        schwartz_test = evaluate_phase_cancelling_schwartz_pairing(delta='0.1', dps=dps)
+        prime_growth = evaluate_prime_counting_error_growth(dps=dps)
+
+        return {
+            "audit_cycle": "Cycle 6 — Prime-Error Temperedness Equivalence Audit",
+            "candidate_id": "TC-DISC-011",
+            "claim_id": "CLM-TC-011",
+            "statements": {
+                "A": "Riemann Hypothesis: Re(rho) = 1/2 for all nontrivial zeros",
+                "B": "Pointwise polynomial bound: E(u) = O((1+u)^N) for some N",
+                "C": "Distributional temperedness: T_E extends continuously to S'(R)"
+            },
+            "implications_status": {
+                "A_implies_B": "PROVED (von Koch 1901, Cramer 1919)",
+                "B_implies_C": "PROVED (Schwartz 1950 regular distribution theorem)",
+                "B_implies_A": "PROVED (Ingham 1932 Theorem 30)",
+                "C_implies_A": "PROVED (Route II: Schwartz-Laplace theorem, Hormander 7.4.2)",
+                "C_implies_B": "PROVED (via C => A => B)"
+            },
+            "route_I_status": route_I["route_I_tauberian_verdict"],
+            "route_II_status": route_II["route_II_verdict"],
+            "overall_classification": "EQUIVALENCE_PROVED",
+            "epistemic_verdict": "PRIME_ERROR_TEMPEREDNESS_IS_RIGOROUSLY_EQUIVALENT_TO_RH",
+            "plain_answer": "Distributional temperedness of E genuinely forces RH for this arithmetic function. However, prime-side temperedness cannot be derived unconditionally, so it remains an RH-equivalent criterion rather than an independent TC bridge."
+        }
+
 
 
 

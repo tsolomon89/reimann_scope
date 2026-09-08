@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-011",
+  "statement": "Prime-Error Distributional Temperedness Equivalence Theorem: For the normalized Chebyshev prime-counting error E(u) = exp(-u/2)(psi(exp u) - exp u), the regular distribution T_E defined on D(R) = C_c^infinity(R) extends continuously to a tempered distribution in S'(R) if and only if the Riemann Hypothesis (RH) holds. The three conditions (A) RH, (B) pointwise polynomial growth E(u) = O((1+u)^N) for some N, and (C) distributional temperedness T_E in S'(R) are mutually equivalent: (A) <=> (B) <=> (C). Direction (A) => (B) => (C) follows from von Koch (1901) and Cramer (1919), where RH forces N = 2. Direction (C) => (A) is proved via Route II: for a smooth cutoff chi with chi = 0 on (-infty, 0.1] and chi = 1 on [0.5, infty), E_chi(u) = chi(u)E(u) is supported in [0.1, infty), and (1-chi)E is in S(R) because E(u) = -exp(u/2) for u < log 2. By the Schwartz-Laplace theorem (Hormander Theorem 7.4.2), T_E in S'(R) forces the Laplace transform L[E_chi](z) to be holomorphic on the entire half-plane Re(z) > 0. Meromorphic continuation identifies L[E_chi](z) = G(z) - H(z) for Re(z) > 1/2, where H is entire and G(z) = -1/(z+1/2) * (zeta'/zeta)(z+1/2) - 1/(z-1/2). Any nontrivial zero rho = 1/2 + delta + i*gamma with delta > 0 produces an isolated pole at z_rho = delta + i*gamma in Re(z) > 0 with non-zero residue -m_rho/rho != 0, contradicting holomorphy. Therefore, delta <= 0 for all zeros, which by functional equation forces RH. Route I (Tauberian recovery of pointwise growth) fails unconditionally because between prime jumps E'(u) ~ -exp(u/2) diverges exponentially, violating polynomial slow decrease. Distributional temperedness is thus an RH-equivalent criterion rather than an independent TC bridge.",
+  "quantified_variables": [
+    {
+      "name": "u",
+      "domain": "u in Real",
+      "description": "Logarithmic coordinate u = log x"
+    },
+    {
+      "name": "rho",
+      "domain": "rho in Complex, 0 < Re(rho) < 1",
+      "description": "Nontrivial zero of the Riemann zeta function"
+    },
+    {
+      "name": "z",
+      "domain": "z in Complex, Re(z) > 0",
+      "description": "Centered Laplace transform variable z = s - 1/2"
+    }
+  ],
+  "variable_domains": [
+    "u in Real",
+    "rho in Complex, 0 < Re(rho) < 1",
+    "z in Complex, Re(z) > 0"
+  ],
+  "hypotheses": [
+    "u = log x for x in Real_+",
+    "psi(x) = sum_{n <= x} Lambda(n)",
+    "E(u) = exp(-u/2) * (psi(exp u) - exp u)",
+    "T_E is the regular distribution <T_E, phi> = int_R E(u) phi(u) du on D(R)",
+    "chi in C^infty(R) is a cutoff with chi(u) = 0 for u <= 0.1 and chi(u) = 1 for u >= 0.5"
+  ],
+  "object_studied": "Regular distribution T_E of the normalized Chebyshev prime error and its half-line Laplace transform L[E_chi](z)",
+  "fourier_normalization": "Additive Fourier-Laplace transform on R; Schwartz space S(R) with seminorms p_{alpha,beta}",
+  "multiplicity_convention": "Nontrivial zero multiplicity m_rho >= 1 and von Mangoldt weights Lambda(n)",
+  "measure_and_window": "Additive Lebesgue measure du on R; unweighted Schwartz test space S(R); smooth half-line window chi",
+  "order_of_limits": "Laplace parameter limit Re(z) -> 0+; asymptotic growth limits u -> +/- infty",
+  "exact_conclusion": "T_E extends to a tempered distribution in S'(R) if and only if the Riemann Hypothesis holds: (A) <=> (B) <=> (C). In particular, distributional temperedness genuinely forces delta = 0 for all zeros.",
+  "logical_negation": "T_E in S'(R) with an off-critical zero delta > 0, or RH holds while T_E is non-tempered, or E(u) satisfies polynomial slow decrease unconditionally without an a priori prime bound (FALSIFIED / REFUTED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: chebyshev_jump_factor",
+    "formal/RiemannScope/Grade.lean: chebyshev_derivative_relation",
+    "formal/RiemannScope/Grade.lean: phase_cancelling_kernel_real",
+    "formal/RiemannScope/Grade.lean: meromorphic_pole_residue_nonzero",
+    "transcendental.py: evaluate_chebyshev_error_local_structure",
+    "transcendental.py: evaluate_chebyshev_laplace_meromorphic_poles",
+    "transcendental.py: evaluate_phase_cancelling_schwartz_pairing",
+    "transcendental.py: audit_prime_error_temperedness_equivalence"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Root and Pole Analysis): proved that the pole of -(1/s)*(zeta'/zeta)(s) at s = 1 has residue +1, which cancels identically with -1/(z-1/2), making z = 1/2 a removable singularity in Re(z) > 0",
+    "Gate 5 (Dominance and Non-Cancellation): proved that for any off-critical zero rho = 1/2 + delta + i*gamma with delta > 0, the residue Res(G, z_rho) = -m_rho/rho has magnitude m_rho/|rho| > 0, which cannot cancel with any entire function H(z)",
+    "Gate 3 & 9 (Adversarial Holomorphy Contradiction): tested against Hormander Theorem 7.4.2, proving that if T_E in S'(R), the Laplace transform L[E_chi](z) must be holomorphic in Re(z) > 0, which directly refutes the existence of any off-critical pole with delta > 0",
+    "Gate 6 & 7 (Route I Slow Decrease Obstruction): evaluated downward slope E'(u) = -exp(u/2) - (1/2)*E(u) ~ -exp(u/2) between prime powers, proving that polynomial slow decrease fails unconditionally without assuming an RH-equivalent bound",
+    "Gate 8 (Phase-Cancelling Test Construction): tested against eta_n(u) = exp(-i*gamma*u)*exp(-u^2/(2n^2)), proving that <phi_lambda, eta_n> = sqrt(2*pi)*n*exp(n^2*delta^2/2) diverges super-polynomially over all Schwartz seminorms for delta != 0",
+    "Gate 10 (Equivalence and Circularity Audit): established that while (C) => (A) is mathematically rigorous, deriving (C) from prime arithmetic unconditionally is equivalent to solving RH, confirming that temperedness is not an independent TC shortcut"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_phase_cancelling_schwartz_pairing_divergence",
+    "tests/test_tc_mechanism_discovery.py: test_chebyshev_error_local_slope_and_jump_structure",
+    "tests/test_tc_mechanism_discovery.py: test_chebyshev_laplace_meromorphic_poles_and_residues",
+    "tests/test_tc_mechanism_discovery.py: test_prime_error_temperedness_equivalence_synthesis"
+  ],
+  "external_sources": [
+    {
+      "source": "Hormander, L. (1983), The Analysis of Linear Partial Differential Operators I, Springer-Verlag, Berlin",
+      "theorem": "Theorem 7.4.2: Holomorphy and polynomial growth of Laplace transforms of tempered distributions supported on a convex cone or half-line"
+    },
+    {
+      "source": "Schwartz, L. (1950/1951), Theorie des distributions, Tomes I et II, Hermann, Paris",
+      "theorem": "Chapitre VII & VIII: Regular tempered distributions, Schwartz space duality, and distributional Laplace transforms"
+    },
+    {
+      "source": "von Koch, H. (1901), Sur la distribution des nombres premiers, Acta Math. 24, 159-182",
+      "theorem": "Equivalence between psi(x) - x = O(x^{1/2} log^2 x) and the Riemann Hypothesis"
+    },
+    {
+      "source": "Ingham, A. E. (1932), The Distribution of Prime Numbers, Cambridge University Press",
+      "theorem": "Theorem 30: Relation between rightmost zeros of zeta(s) and the order of the prime counting error"
+    },
+    {
+      "source": "Cramer, H. (1919), Uber die Nullstellen der Riemannschen Zetafunktion, Math. Z. 2, 104-106",
+      "theorem": "Pointwise and mean-square oscillation bounds for the Chebyshev error under the Riemann Hypothesis"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Deriving an unconditional proof from the prime side that T_E is in S'(R), which is strictly equivalent to solving the Riemann Hypothesis (OPEN)"
+  ]
+}

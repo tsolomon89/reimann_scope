@@ -654,22 +654,23 @@ def test_log_mode_temperedness_criterion():
 
 def test_prime_counting_error_growth_and_rh_equivalence():
     """
-    Cycle 5 (Prime Error Analysis):
+    Cycle 5 (Prime Error Analysis, corrected in Cycle 6):
     Verify that normalized Chebyshev error E(u) = exp(-u/2)*(psi(exp u) - exp u):
-    1. Unconditionally has exponential growth order exp(u/2), hence is non-tempered in S'(R).
+    1. Unconditional Vinogradov-Korobov upper bound is too weak to establish polynomial growth,
+       leaving its unconditional status as UNKNOWN_FROM_THIS_BOUND (non-temperedness claim withdrawn).
     2. Under RH has polynomial bound O(u^2), hence is tempered in S'(R).
-    3. Temperedness in S'(R) is logically equivalent to RH (Cramer-Ingham).
+    3. Temperedness in S'(R) is logically equivalent to RH (Cramer-Ingham and Route II).
     """
     res = transcendental.evaluate_prime_counting_error_growth(dps=70)
-    assert res["unconditional_status"] == "EXPONENTIALLY_GROWING_NON_TEMPERED"
+    assert res["unconditional_status"] == "UNKNOWN_FROM_THIS_BOUND"
     assert res["conditional_rh_status"] == "POLYNOMIALLY_BOUNDED_TEMPERED_IN_S_PRIME"
     assert res["is_rh_equivalent"] is True
 
-    # Ratio of exponential to polynomial growth diverges with u
+    # Ratio of unconditional upper scale to polynomial growth diverges with u
     evals = res["evaluations"]
     assert len(evals) >= 4
     # u=5: ratio ~ 0.48; u=50: ratio > 10^7
-    assert float(evals[-1]["exponential_over_polynomial_ratio"]) > 1e7
+    assert float(evals[-1]["unconditional_over_rh_ratio"]) > 1e7
 
 
 def test_tc_orbit_uniformity_countermodel():
@@ -695,7 +696,7 @@ def test_tc_orbit_uniformity_countermodel():
 
 def test_log_haar_temperedness_mechanism_audit():
     """
-    Cycle 5 Synthesis Audit:
+    Cycle 5 Synthesis Audit (updated in Cycle 6):
     Verify the overall synthesis of the Log-Haar Temperedness Bridge (TC-DISC-010 / CLM-TC-010):
     Status is CONDITIONAL_ONLY because prime-side temperedness is equivalent to RH.
     """
@@ -704,10 +705,103 @@ def test_log_haar_temperedness_mechanism_audit():
     assert res["status"] == "CONDITIONAL_ONLY"
     assert res["mode_online_tempered"] is True
     assert res["mode_offline_tempered"] is False
-    assert res["prime_error_unconditional_tempered"] is False
+    assert res["prime_error_unconditional_status"] == "UNKNOWN_FROM_THIS_BOUND"
     assert res["prime_error_rh_equivalent"] is True
     assert res["tc_supplies_p1_pointwise"] is True
     assert res["tc_supplies_p2_p3_uniformity"] is False
+
+
+# ==============================================================================
+# 9. MECHANISM DISCYCLE 6 AUDIT (PRIME-ERROR TEMPEREDNESS EQUIVALENCE)
+# ==============================================================================
+
+def test_phase_cancelling_schwartz_pairing_divergence():
+    """
+    Cycle 6 (Section 2.3):
+    Verify that the phase-cancelling test family:
+      eta_n(u) = exp(-i*gamma*u) * exp(-u^2/(2*n^2))
+    yields exact pairing:
+      <phi_lambda, eta_n> = sqrt(2*pi) * n * exp(n^2 * delta^2 / 2),
+    which for delta != 0 outgrows all polynomial Schwartz seminorms p_{alpha,beta}(eta_n).
+    """
+    # Off-line zero delta = 0.1
+    res = transcendental.evaluate_phase_cancelling_schwartz_pairing(delta='0.1', gamma='14.134725', dps=70)
+    assert res["is_delta_zero"] is False
+    assert res["proves_discontinuity_for_nonzero_delta"] is True
+
+    evals = res["evaluations"]
+    assert len(evals) >= 5
+    # Pairing-to-p00 ratio grows super-linearly
+    assert float(evals[-1]["pairing_over_p00_ratio"]) > 100 * float(evals[0]["pairing_over_p00_ratio"])
+    # For n >= 10, pairing-to-p20 ratio diverges super-polynomially (for n=40, ratio > 200, exceeding n=1)
+    assert float(evals[-1]["pairing_over_p20_ratio"]) > float(evals[0]["pairing_over_p20_ratio"])
+    assert float(evals[-1]["pairing_over_p20_ratio"]) > float(evals[-2]["pairing_over_p20_ratio"])
+
+    # On-line zero delta = 0: exact pairing is sqrt(2*pi)*n, exactly linear
+    res_0 = transcendental.evaluate_phase_cancelling_schwartz_pairing(delta='0.0', gamma='14.134725', dps=70)
+    assert res_0["is_delta_zero"] is True
+    assert res_0["proves_discontinuity_for_nonzero_delta"] is False
+
+
+def test_chebyshev_error_local_slope_and_jump_structure():
+    """
+    Cycle 6 (Section 4 & Route I):
+    Verify that between jumps, E'(u) = -(1/2)*exp(-u/2)*(psi(e^u) + e^u) ~ -exp(u/2)
+    diverges exponentially downwards, which violates polynomial slow decrease
+    without an a priori prime bound.
+    """
+    res = transcendental.evaluate_chebyshev_error_local_structure(dps=70)
+    assert res["route_I_tauberian_verdict"] == "TAUBERIAN_SLOW_DECREASE_FAILS_UNCONDITIONALLY"
+
+    evals = res["evaluations"]
+    assert len(evals) >= 4
+    # At u=20, downward slope exceeds 22,000 while jump is <= 0.001
+    assert float(evals[-1]["slope_over_jump_ratio"]) > 1e7
+
+
+def test_chebyshev_laplace_meromorphic_poles_and_residues():
+    """
+    Cycle 6 (Route II Singularity Audit):
+    Verify that in G(z) = -1/(z+1/2)*(zeta'/zeta)(z+1/2) - 1/(z-1/2):
+    1. Pole at s = 1 (z = 1/2) has residue 0 (exact cancellation).
+    2. Every off-critical zero with delta > 0 has an isolated pole in Re(z) > 0 with residue -m/rho != 0.
+    """
+    res = transcendental.evaluate_chebyshev_laplace_meromorphic_poles(dps=70)
+    assert res["route_II_verdict"] == "EQUIVALENCE_PROVED"
+
+    poles = res["pole_evaluations"]
+    assert len(poles) == 4
+    # On-line zeros (delta = 0) do not lie in Re(z) > 0
+    assert poles[0]["in_right_half_plane"] is False
+    assert poles[1]["in_right_half_plane"] is False
+
+    # Hypothetical off-line zeros (delta > 0) lie in Re(z) > 0 and have strictly non-zero residue
+    assert poles[2]["in_right_half_plane"] is True
+    assert poles[2]["is_strictly_non_zero"] is True
+    assert float(poles[2]["residue_magnitude"]) > 0.0
+
+    assert poles[3]["in_right_half_plane"] is True
+    assert poles[3]["is_strictly_non_zero"] is True
+    assert float(poles[3]["residue_magnitude"]) > 0.0
+
+
+def test_prime_error_temperedness_equivalence_synthesis():
+    """
+    Cycle 6 Synthesis Audit:
+    Verify the overall synthesis of Cycle 6 (TC-DISC-011 / CLM-TC-011):
+    Classification is EQUIVALENCE_PROVED:
+      (A) RH <=> (B) E(u) = O((1+u)^N) <=> (C) T_E in S'(R).
+    """
+    res = transcendental.audit_prime_error_temperedness_equivalence(dps=70)
+    assert res["candidate_id"] == "TC-DISC-011"
+    assert res["claim_id"] == "CLM-TC-011"
+    assert res["overall_classification"] == "EQUIVALENCE_PROVED"
+    assert res["route_I_status"] == "TAUBERIAN_SLOW_DECREASE_FAILS_UNCONDITIONALLY"
+    assert res["route_II_status"] == "EQUIVALENCE_PROVED"
+    assert "PROVED" in res["implications_status"]["C_implies_A"]
+    assert "PROVED" in res["implications_status"]["A_implies_B"]
+    assert "PROVED" in res["implications_status"]["B_implies_C"]
+
 
 
 

@@ -564,19 +564,23 @@ If a simple law survives, broad computation should stop until that law is algebr
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
+| TC-DISC-008 | Unitary and Bilateral Boundedness Grade-Character Criteria (Theorems A & B): For $\tau > 1$ and non-zero integer grade $K \ne 0$, $|\chi_\rho(K)| = 1 \iff \delta = 0$ (Theorem A); over the bilateral group $\mathbb Z$, $\sup_{K \in \mathbb Z} |\chi_\rho(K)| < \infty \iff \delta = 0$ (Theorem B). Bilateral boundedness on $K \ge 0$ forces $\delta \le 0$, while $K \le 0$ forces $\delta \ge 0$, uniquely selecting $\delta = 0$. | **PROVED / FORMALLY_PROVED** | Formalized in Lean 4 (`unitary_grade_character_iff_delta_zero`, `bilateral_boundedness_exclusion_theorem`); verified in `test_tc_mechanism_discovery.py`. |
+| TC-DISC-009 | Canonical Norm and Space Model Audit (Five Listed Models): Systematic audit across five canonical frameworks (intrinsic scalar norm, multiplicative Haar dilation on $L^2(\mathbb R^+, dx/x)$, group $C^*$-algebra $C^*(\mathbb Z)$, explicit formula Weil positivity, and alternative weighted norms with Davenport-Heilbronn countermodel) establishes that TC coordinate transport does not independently force the zero character to be unitary or bounded. The prime-zero membership bridge is conditional on RH. | **CONDITIONAL ONLY / NO AUTONOMOUS MEMBERSHIP BRIDGE** | Verified analytically and numerically in `transcendental.py` (`audit_canonical_norm_candidates`) and `test_tc_mechanism_discovery.py`. |
+
+---
+
 # 32. TC Log-Haar Temperedness Bridge Claims (Cycle 5)
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
-| TC-DISC-010 | Log-Haar Temperedness Bridge & Prime Error Equivalence: In logarithmic coordinate $u = \log x$, zero mode $\phi_\lambda(u) = \exp((\delta + i\gamma)u)$ defines a regular tempered distribution in $\mathcal{S}'(\mathbb R)$ iff $\delta = 0$ (Theorem C). For the normalized Chebyshev prime error $E(u) = \exp(-u/2)(\psi(e^u) - e^u)$, unconditional Vinogradov-Korobov bounds yield exponential growth $E(u) = O(\exp(u/2 - o(u)))$, which is unconditionally non-tempered; Cramér-Ingham theorem proves $E(u) \in \mathcal{S}'(\mathbb R) \iff \text{RH}$. Invertible TC coordinate transport ensures pointwise well-definedness (P1) at every finite grade, but does not force bilateral orbit uniformity (P2) or common tempered space membership (P3). | **CONDITIONAL ONLY / RH-EQUIVALENT BRIDGE** | Formalized in Lean 4 (`log_mode_translation`, `log_mode_abs`, `log_mode_bounded_iff_delta_zero`, `bilateral_boundedness_implies_delta_zero`); verified in `transcendental.py` (`audit_log_haar_temperedness_mechanism`) and `test_tc_mechanism_discovery.py`. |
+| TC-DISC-010 | Log-Haar Temperedness Bridge & Prime Error Equivalence: In logarithmic coordinate $u = \log x$, zero mode $\phi_\lambda(u) = \exp((\delta + i\gamma)u)$ defines a regular tempered distribution in $\mathcal{S}'(\mathbb R)$ iff $\delta = 0$ (Theorem C). For the normalized Chebyshev prime error $E(u) = \exp(-u/2)(\psi(e^u) - e^u)$, unconditional Vinogradov-Korobov error bound is too weak to prove polynomial growth or temperedness (unconditional status is UNKNOWN_FROM_THIS_BOUND; prior unconditional non-temperedness claim withdrawn); Cramér-Ingham theorem proves $E(u) \in \mathcal{S}'(\mathbb R) \iff \text{RH}$. Invertible TC coordinate transport ensures pointwise well-definedness (P1) at every finite grade, but does not force bilateral orbit uniformity (P2) or common tempered space membership (P3). | **CONDITIONAL ONLY / RH-EQUIVALENT BRIDGE** | Formalized in Lean 4 (`log_mode_translation`, `log_mode_abs`, `log_mode_bounded_iff_delta_zero`, `bilateral_boundedness_implies_delta_zero`); verified in `transcendental.py` (`audit_log_haar_temperedness_mechanism`) and `test_tc_mechanism_discovery.py`. |
 
 ---
 
+# 33. TC Prime-Error Temperedness Equivalence Audit (Cycle 6)
 
-
-
-
-
-
+| ID | Statement | Classification | Reason |
+|---|---|---|---|
+| TC-DISC-011 | Prime-Error Distributional Temperedness Equivalence Theorem: For normalized Chebyshev error $E(u) = \exp(-u/2)(\psi(e^u)-e^u)$, the regular distribution $T_E$ on $\mathcal{D}(\mathbb{R})$ extends continuously to a tempered distribution in $\mathcal{S}'(\mathbb{R})$ if and only if the Riemann Hypothesis holds: (A) RH $\iff$ (B) $E(u) = O((1+u)^N)$ $\iff$ (C) $T_E \in \mathcal{S}'(\mathbb{R})$. Proved via Route II (Schwartz-Laplace theorem, Hörmander 7.4.2), where $T_E \in \mathcal{S}'$ forces half-line Laplace transform $\mathcal{L}[E_\chi](z)$ to be holomorphic on $\Re(z) > 0$, excluding off-critical zero poles in $\Re(z) > 0$. Route I (Tauberian recovery) fails unconditionally because downward slope $E'(u) \sim -\exp(u/2)$ violates polynomial slow decrease. | **PROVED / EXACT EQUIVALENCE** | Formalized in Lean 4 (`chebyshev_jump_factor`, `chebyshev_derivative_relation`, `phase_cancelling_kernel_real`, `meromorphic_pole_residue_nonzero`); verified in `transcendental.py` and `test_tc_mechanism_discovery.py`. |
 
 

@@ -328,6 +328,54 @@ theorem log_mode_bounded_iff_delta_zero (delta : ℝ) :
     intro u
     rw [h_zero, zero_mul, Real.exp_zero]
 
+/-- Cycle 6: Jump scaling identity: exp(-u/2) = (exp(u/2))⁻¹.
+    Relates the prime-power jump in log coordinates to inverse square-root scaling. -/
+theorem chebyshev_jump_factor (u : ℝ) :
+    Real.exp (- (u / 2)) = (Real.exp (u / 2))⁻¹ := by
+  rw [Real.exp_neg]
+
+/-- Cycle 6: Smooth between-jump derivative structure of Chebyshev error:
+    Algebraic identity relating the downward slope of E(u) to the exponential scale exp(u/2):
+    -(1/2) * (psi_0 * exp(-u/2) + exp(u/2)) = -exp(u/2) - (1/2) * (exp(-u/2) * psi_0 - exp(u/2)). -/
+theorem chebyshev_derivative_relation (u psi_0 : ℝ) :
+    - (1 / 2 : ℝ) * (psi_0 * Real.exp (- (u / 2)) + Real.exp (u / 2)) =
+    - Real.exp (u / 2) - (1 / 2 : ℝ) * (Real.exp (- (u / 2)) * psi_0 - Real.exp (u / 2)) := by
+  ring
+
+/-- Cycle 6: Phase-cancelling pairing exponent identity:
+    For phi_lambda(u) = exp((delta + i*gamma)*u) and eta_n(u) = exp(-i*gamma*u)*exp(-u^2/(2n^2)),
+    the total exponent simplifies to the purely real quadratic delta*u - u^2/(2n^2),
+    isolating the radial divergence without oscillatory phase interference. -/
+theorem phase_cancelling_kernel_real (delta gamma u n : ℝ) :
+    (((delta : ℂ) + Complex.I * (gamma : ℂ)) * (u : ℂ) +
+     (-Complex.I * (gamma : ℂ) * (u : ℂ) - ((u : ℂ) ^ 2) / (2 * (n : ℂ) ^ 2))) =
+    (((delta * u - (u ^ 2) / (2 * n ^ 2)) : ℝ) : ℂ) := by
+  push_cast
+  ring
+
+/-- Cycle 6: Non-vanishing of the meromorphic pole residue at an off-critical zero:
+    For any nontrivial zero rho = 1/2 + delta + i*gamma with ordinate gamma ≠ 0
+    and integer multiplicity m > 0, the residue -m/rho is strictly non-zero. -/
+theorem meromorphic_pole_residue_nonzero (delta gamma : ℝ) (m : ℕ)
+    (hm : 0 < m) (hgamma : gamma ≠ 0) :
+    -((m : ℂ) / ((1 / 2 : ℂ) + (delta : ℂ) + Complex.I * (gamma : ℂ))) ≠ 0 := by
+  intro h_zero
+  have h_neg : (m : ℂ) / ((1 / 2 : ℂ) + (delta : ℂ) + Complex.I * (gamma : ℂ)) = 0 := by
+    calc (m : ℂ) / ((1 / 2 : ℂ) + (delta : ℂ) + Complex.I * (gamma : ℂ))
+      _ = - (- ((m : ℂ) / ((1 / 2 : ℂ) + (delta : ℂ) + Complex.I * (gamma : ℂ)))) := by ring
+      _ = -0 := by rw [h_zero]
+      _ = 0 := by ring
+  have hm_ne : (m : ℂ) ≠ 0 := by
+    exact_mod_cast (ne_of_gt hm)
+  have h_denom_ne : ((1 / 2 : ℂ) + (delta : ℂ) + Complex.I * (gamma : ℂ)) ≠ 0 := by
+    intro hd
+    have him : (((1 / 2 : ℂ) + (delta : ℂ) + Complex.I * (gamma : ℂ))).im = 0 := by
+      rw [hd, Complex.zero_im]
+    simp [Complex.add_im, Complex.ofReal_im, Complex.I_im, Complex.I_re] at him
+    exact hgamma him
+  have h_div_ne := div_ne_zero hm_ne h_denom_ne
+  exact h_div_ne h_neg
+
 end RiemannScope
 
 
