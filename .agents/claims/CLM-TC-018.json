@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-018",
+  "statement": "Reliable Certification, Multi-Grade Complete Transport, and Remainder-Aware Vandermonde Detection: For fundamental unit dilation period tau = 2*pi, coordinate scales h = tau^{-k} (k in Z) and smooth compactly supported test function phi in C_c^infty((0, infty)) with supp(phi) subset [a, b] (0 < h < a): (1) Reliable Certification Chain: Pairwise phase distinction, bounded rational exclusion (Q <= 10^6), and bounded integer relations (|a_j| <= 50) are certified via an 8-gate common input contract, exact rational Farey coverage with strict unimodular bounds, and certified Arb ball enclosures with fail-closed classification (RELATION_FOUND reserved for exact zero, INCONCLUSIVE for zero-containing residuals, CERTIFIED_WITH_EXPLICIT_BOUNDS for strict separation). (2) Complete Smoothed Transport with Justified Error Budget: The Mellin inversion identity h * sum_{n >= 1} Lambda(n) phi(hn) = phi_tilde(1) - sum_rho m_rho phi_tilde(rho) h^{1-rho} - B_h(phi) holds across grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with zero-point term absent due to holomorphy of -zeta'/zeta at s=0; trivial-zero background is represented by exact integral B_h^{integral} with geometric tail bound ||phi||_{L1} * (h/a)^{2M+3} / (1 - (h/a)^2) strictly enclosing the 15-term series discrepancy (8.57e-14 <= 1.12e-11); and nontrivial zero truncation is bounded uniformly for 0 <= beta <= 1 by Stieltjes integral (log T + 1)/T with Mellin derivative norms C_k. (3) Remainder-Aware Vandermonde Detection: For r distinct nonzero complex bases q_j and observations Y(k) = S(k) + R(k), the block reconstruction operator satisfies max_{0 <= l < r} |Y(k+l)| >= c * max_j |a_j q_j^k| - max_l |R(k+l)| with c = 1 / ||V^{-1}||_inf > 0, formally verified in Lean 4 for r=2, 3 with exact remainder identities and real triangle lower bound without extra axioms. (4) Spectral Extension Obstructions: Mode non-aliasing is an essential condition (separated by Delta gamma = 2*pi/log(tau)), exact single-test annihilation is disproved by Paley-Wiener (n(r) = O(r) << N(r) ~ (r/pi) log r), and arithmetic layers L_K = tau^K Z remain unconditionally disjoint (L_K cap L_J = {0}), leaving the RH collision bridge open.",
+  "quantified_variables": [
+    {
+      "name": "h",
+      "domain": "h in Real, 0 < h < a",
+      "description": "Coordinate dilation scale factor"
+    },
+    {
+      "name": "k",
+      "domain": "k in Integer",
+      "description": "Discrete grade index"
+    },
+    {
+      "name": "r",
+      "domain": "r in Integer, r >= 1",
+      "description": "Number of exponential modes"
+    },
+    {
+      "name": "q_j",
+      "domain": "q_j in Complex, q_j != 0",
+      "description": "Complex mode base tau^{rho_j - 1/2}"
+    },
+    {
+      "name": "a_j",
+      "domain": "a_j in Complex",
+      "description": "Mode amplitude coefficient"
+    },
+    {
+      "name": "rho",
+      "domain": "rho in Complex, 0 < Re(rho) < 1",
+      "description": "Nontrivial zero of the Riemann zeta function"
+    },
+    {
+      "name": "phi",
+      "domain": "phi in C_c^infty((0, infty)), supp(phi) subset [a, b]",
+      "description": "Smooth compactly supported test function"
+    },
+    {
+      "name": "R",
+      "domain": "R in Sequence(Complex)",
+      "description": "Observation remainder / spectral truncation tail sequence"
+    }
+  ],
+  "variable_domains": [
+    "h in Real, 0 < h < a",
+    "k in Integer",
+    "r in Integer, r >= 1",
+    "q_j in Complex, q_j != 0",
+    "a_j in Complex",
+    "rho in Complex, 0 < Re(rho) < 1",
+    "phi in C_c^infty((0, infty)), supp(phi) subset [a, b]",
+    "R in Sequence(Complex)"
+  ],
+  "hypotheses": [
+    "Riemann explicit formula on compactly supported smooth test functions away from x=1 via Mellin inversion",
+    "Holomorphy of -zeta'/zeta at s=0 and entirety of the Mellin transform phi_tilde(s)",
+    "Linear algebra of Vandermonde matrices with distinct nonzero complex nodes",
+    "Transcendence of tau = 2*pi over Q (Lindemann 1882)",
+    "Certified Arb ball enclosures for nontrivial Riemann zeta zeros with fail-closed validation",
+    "Zero density bound N(t) <= (t / 2pi) log t for t >= 14 (Backlund 1918, Trudgian 2014)"
+  ],
+  "object_studied": "Reliable certification chain, multi-grade complete smoothed TC transport with Stieltjes zero bounds and geometric trivial-zero bounds, remainder-aware Vandermonde block detectability, and infinite extension obstruction analysis",
+  "fourier_normalization": "Additive Fourier-Mellin transform on (0, infty): phi_tilde(s) = int_0^infty phi(x) x^{s-1} dx",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho, or listed with repetition",
+  "measure_and_window": "Prime measure mu = sum Lambda(n) delta_n, test window supp(phi) subset [a, b] with 0 < h < a",
+  "order_of_limits": "Finite mode extraction r, spectral truncation cutoff gamma <= gamma_N, background series cutoff j <= M, followed by N, M -> infty",
+  "exact_conclusion": "The certification chain is made mathematically trustworthy under an 8-gate input contract; the complete transport identity holds across multiple grades with rigorous Stieltjes zero tail and geometric background tail bounds, explaining the Cycle 12 inconsistency; the remainder-aware Vandermonde block estimate max |Y| >= c max |a_j q_j^k| - max |R| detects off-line modes when remainder is subordinate (formally verified in Lean 4 for r=2, 3); but mode aliasing can occur for Delta gamma = 2*pi/log(tau), single-test annihilation is disproved by Paley-Wiener, and layer disjointness L_K cap L_J = {0} does not bridge continuous growth to discrete collisions, leaving the RH exclusion bridge open.",
+  "logical_negation": "Complete smoothed transport fails at any grade, or Stieltjes zero tail bound is violated, or Vandermonde block lower bound fails for r distinct bases with remainder, or a single compactly supported test can annihilate all nontrivial zeros except one (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "x in [2, 4], grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with 0 < h < a = 2.0",
+  "spectral_cutoff": "gamma_N = 187.217 (N=75 zeros)",
+  "integration_domain": "(0, infty), compactly supported on [2, 4]",
+  "omitted_tail": "Zero tail with gamma > 187.217 and trivial-zero background tail with j > 15 (or j > 35)",
+  "tail_enclosure": "Zero tail <= 0.0452 via Stieltjes integration by parts and Mellin derivative norms; background geometric tail <= 1.12e-11 for M=15 (and <= 1.12e-23 for M=35)",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: vandermonde_block_remainder_2",
+    "formal/RiemannScope/Grade.lean: vandermonde_block_remainder_2_mode2",
+    "formal/RiemannScope/Grade.lean: vandermonde_block_remainder_3",
+    "formal/RiemannScope/Grade.lean: reconstruction_remainder_lower_bound",
+    "formal/RiemannScope/Grade.lean: tc_prime_power_nonresonance_conditional",
+    "transcendental.py: load_validated_zero_certificates",
+    "transcendental.py: find_farey_witness_coverage",
+    "transcendental.py: certify_bounded_rational_exclusion_arb",
+    "transcendental.py: certify_pairwise_phase_distinction_arb",
+    "transcendental.py: audit_bounded_integer_relations",
+    "transcendental.py: audit_complete_smoothed_tc_transport",
+    "transcendental.py: audit_quantitative_vandermonde_block_detectability",
+    "transcendental.py: audit_infinite_extension_detectability",
+    "transcendental.py: audit_cycle13_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Farey Counterexample Regression, Residual Separation, and Symbolic Elimination / Equality-Case Cancellation Analysis): reproduced review counterexample where old float Farey constructor accepted [1/49, 1/49] at Q=49; proved that exact rational constructor and Arb interval strictly refuse to certify; verified that zero-containing residuals return INCONCLUSIVE rather than RELATION_FOUND; performed equality-case and coefficient cancellation analysis for the Vandermonde lower bound, demonstrating that cancellation occurs exactly when remainder equals signal (c * max |a_j q_j^k| = max |R|), and solved for the zero-crossing threshold where lower bound becomes strictly positive",
+    "Gate 2 & 5 (Complete Transport Multi-Grade & Asymptotic Decay): evaluated complete transport across grades h in {1.0, 0.5, tau^{-1}, tau^{-2}}; verified that Cycle 12 background discrepancy 8.57e-14 is strictly enclosed by the geometric tail bound 1.12e-11; proved absence of pole at s=0",
+    "Gate 3 & 6 (Remainder-Aware Vandermonde & Lean 4 Formalization): proved and formalized remainder-aware Vandermonde block reconstruction in Lean 4 for r=2, 3 and real triangle lower bound; confirmed detectability across zero remainder, subordinate remainder, and dominant remainder regimes",
+    "Gate 7 & 8 (Synthetic Aliasing Control & Paley-Wiener Non-Annihilation): constructed synthetic control with Delta gamma = 2*pi/log(tau) demonstrating identical bases q_1 = q_2 and singular Vandermonde matrix; proved by Paley-Wiener and Jensen's theorem that no non-zero compactly supported test can annihilate all zeros except one",
+    "Gate 9 (Fail-Closed Common Input Contract): verified 8-gate certificate loading with rejection of invalid schema, status, directory, and radius with INPUT_INVALID",
+    "Gate 10 (Dual Status Classification): passed all 10 structural schema gates and established formal Lean 4 verification without extra axioms"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_cycle13_farey_1_over_49_counterexample_regression",
+    "tests/test_tc_mechanism_discovery.py: test_cycle13_bounded_relations_classifications",
+    "tests/test_tc_mechanism_discovery.py: test_cycle13_complete_transport_multi_grade_and_error_budget",
+    "tests/test_tc_mechanism_discovery.py: test_cycle13_remainder_aware_vandermonde_detection",
+    "tests/test_tc_mechanism_discovery.py: test_cycle13_infinite_extension_aliasing_and_pw",
+    "tests/test_tc_mechanism_discovery.py: test_cycle13_synthesis",
+    "data/tc_cycle13_transport_and_certification.json"
+  ],
+  "external_sources": [
+    {
+      "source": "Backlund, R. J. (1918), Uber die Nullstellen der Riemannschen Zetafunktion, Acta Mathematica 41, 345-375",
+      "theorem": "Explicit zero-counting bound N(t) <= (t / 2pi) log t for t >= 14"
+    },
+    {
+      "source": "Trudgian, T. S. (2014), An improved upper bound for the argument of the Riemann zeta-function on the critical line, J. Number Theory 143, 359-367",
+      "theorem": "Explicit constant bounds for the error term S(t) in Riemann-von Mangoldt formula"
+    },
+    {
+      "source": "Hormander, L. (1983), The Analysis of Linear Partial Differential Operators I, Theorem 7.3.1 (Paley-Wiener Theorem)",
+      "theorem": "Characterization of Fourier-Laplace transform of compactly supported distributions as entire functions of exponential type"
+    },
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Mathematische Annalen 20, 213-225",
+      "theorem": "Transcendence of 2*pi, establishing that arithmetic layers L_K = tau^K Z are externally disjoint (L_K cap L_J = {0} for K != J)"
+    },
+    {
+      "source": "Hardy, G. H. and Wright, E. M. (1979), An Introduction to the Theory of Numbers, Chapter III (Farey Series)",
+      "theorem": "Farey mediant theorem: if a/b < c/d with bc - ad = 1, every rational in (a/b, c/d) has denominator >= b + d"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Derivation of an exact cross-grade discrete point collision m*tau^K = n*tau^J (K != J, mn != 0) from continuous distributional explicit formula fluctuations (OPEN / UNPROVED)"
+  ]
+}

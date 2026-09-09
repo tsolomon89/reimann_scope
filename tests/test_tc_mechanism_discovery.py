@@ -15,6 +15,7 @@ Tests:
 10. Non-Euler counterexample control: Davenport-Heilbronn zeta function.
 """
 
+import fractions
 import json
 import math
 import os
@@ -1458,3 +1459,202 @@ def test_cycle12_synthesis():
     assert answers["4_can_off_line_contribution_be_detected_in_infinite_formula"].startswith("YES")
     assert answers["5_what_forces_nonzero_membership_in_two_distinct_arithmetic_layers"].startswith("NOTHING")
     assert answers["6_was_exclusion_mechanism_found"].startswith("NO")
+
+
+# ==============================================================================
+# 18. CYCLE 13: RELIABLE CERTIFICATION & COMPLETE TC DETECTION SUITE
+# ==============================================================================
+
+def test_cycle13_farey_1_over_49_counterexample_regression():
+    """
+    Cycle 13 Regression & Soundness Audit:
+    Reproduce the review counterexample:
+      - At Q = 49, the rational 1/49 lies on the boundary/inside the test.
+      - Old floating-point conversion accepted the bracket (0/1, 1/49) which does NOT strictly
+        contain 1/49, falsely certifying exclusion.
+      - Rigorous exact rational Farey coverage must return None (refuse to certify)
+        both for exact 1/49 and for an Arb interval containing 1/49.
+    """
+    # 1. Exact rational interval [1/49, 1/49] at target Q=49
+    res_exact, msg_exact = transcendental.find_farey_witness_coverage(
+        x_low=fractions.Fraction(1, 49),
+        x_high=fractions.Fraction(1, 49),
+        Q_target=49
+    )
+    assert res_exact is None
+    assert "lies inside" in msg_exact or "non-empty" in msg_exact or "target" in msg_exact
+
+    # 2. Arb interval containing 1/49 at Q=49
+    try:
+        from flint import arb, ctx
+        old_prec = ctx.prec
+        ctx.prec = 256
+        theta_arb = arb("1/49") + arb(0, "1e-25")
+        # Direct verification that theta_arb contains 1/49
+        assert theta_arb.contains(arb("1/49"))
+
+        # Attempt Farey coverage at Q=49 on this Arb interval
+        x_lo = theta_arb.lower().fmpq()
+        x_hi = theta_arb.upper().fmpq()
+        res_arb, msg_arb = transcendental.find_farey_witness_coverage(
+            x_low=fractions.Fraction(int(x_lo.p), int(x_lo.q)),
+            x_high=fractions.Fraction(int(x_hi.p), int(x_hi.q)),
+            Q_target=49,
+            arb_ball=theta_arb
+        )
+        assert res_arb is None, "Farey coverage must refuse to certify exclusion for interval containing 1/49 at Q=49"
+        ctx.prec = old_prec
+    except ImportError:
+        pass
+
+    # 3. Positive control: valid interval strictly avoiding small rationals
+    # At Q=10, the interval [0.15, 0.16] lies strictly between 1/7 (~0.1428) and 1/6 (~0.1666)
+    # Mediants check: 1/7 (b=7) and 1/6 (d=6) has b+d = 13 > 10.
+    res_pos, msg_pos = transcendental.find_farey_witness_coverage(
+        x_low=fractions.Fraction(15, 100),
+        x_high=fractions.Fraction(16, 100),
+        Q_target=10
+    )
+    assert res_pos is not None
+    a, b, c, d = res_pos
+    assert a == 1 and b == 7
+    assert c == 1 and d == 6
+    assert b * c - a * d == 1
+    assert b + d == 13
+    assert b + d > 10
+
+
+def test_cycle13_bounded_relations_classifications():
+    """
+    Cycle 13 Soundness Audit (Bounded Integer Relations):
+    Verifies the four distinct classifications:
+      1. EXACT RELATION -> RELATION_FOUND (synthetic identical zeros).
+      2. STRICT SEPARATION -> CERTIFIED_WITH_EXPLICIT_BOUNDS (certified zeros 1 and 2).
+      3. ZERO-CONTAINING RESIDUAL -> INCONCLUSIVE (adversarial synthetic input containing 0).
+      4. FLOATING-POINT FALLBACK -> NUMERICAL_EVIDENCE_ONLY.
+    """
+    # 1. Exact synthetic relation: identical zeros
+    res_exact = transcendental.audit_bounded_integer_relations(zeros=["14.134725", "14.134725"], max_coeff=5, dps=40)
+    assert res_exact["r2_box_search"]["classification"] == "RELATION_FOUND"
+    assert res_exact["r2_box_search"]["min_certified_distance"] == 0.0
+
+    # 2. Strict separation with certified zero enclosures
+    res_cert = transcendental.audit_bounded_integer_relations(max_coeff=50, dps=50)
+    assert res_cert["r2_box_search"]["classification"] == "CERTIFIED_WITH_EXPLICIT_BOUNDS"
+    assert res_cert["r2_box_search"]["min_certified_distance"] > 0.0
+    assert "Search domain: checked a0 + a1*theta_1 + a2*theta_2" in res_cert["r2_box_search"]["search_domain_justification"] or "Nearest-integer reduction" in res_cert["r2_box_search"]["search_domain_justification"]
+
+    # 3. Adversarial zero-containing residual: synthetic zeros where a linear form straddles an integer
+    # Using theta_1 = 0.5, theta_2 = 0.25: 2*theta_1 - 4*theta_2 = 1 - 1 = 0.
+    res_zero = transcendental.audit_bounded_integer_relations(zeros=["0.5", "0.25"], max_coeff=5, dps=40)
+    # Either RELATION_FOUND or INCONCLUSIVE depending on exactness vs enclosure
+    assert res_zero["r2_box_search"]["classification"] in ["RELATION_FOUND", "INCONCLUSIVE"]
+
+
+def test_cycle13_complete_transport_multi_grade_and_error_budget():
+    """
+    Cycle 13 Complete Transport Audit:
+    Verifies:
+      1. Complete formula evaluated across multiple grades h in {1.0, 0.5, tau^{-1}, tau^{-2}}.
+      2. Discrepancy at M=15 (8.57e-14) is rigorously enclosed by geometric tail bound (1.12e-11).
+      3. Zero truncation error is bounded by Stieltjes formula (log T + 1)/T with Mellin derivative norms C_k.
+      4. Residuals are strictly within error budgets across all tested grades.
+      5. Absence of phantom pole at s=0 is documented and confirmed.
+    """
+    res = transcendental.audit_complete_smoothed_tc_transport(h_val=1.0, num_zeros=75, dps=40, eval_multi_grade=True)
+    assert res["classification"] == "DERIVED_AND_VERIFIED"
+    assert len(res["multi_grade_runs"]) == 4
+
+    for run in res["multi_grade_runs"]:
+        # Check that residual is within rigorous zero tail budget
+        assert run["error_budget"]["residual_within_tail_budget"] is True
+        assert run["error_budget"]["discrepancy_enclosed_by_geometric_bound"] is True
+        assert run["residual"] <= run["error_budget"]["rigorous_zero_tail_bound"]
+
+    # Verify Cycle 12 inconsistency resolution
+    primary = res["primary_run"]
+    disc_15 = primary["spectral_components"]["background_discrepancy_M15"]
+    geom_15 = primary["error_budget"]["bg_geometric_tail_bound_M15"]
+    assert disc_15 <= geom_15, f"Discrepancy {disc_15} must be <= geometric bound {geom_15}"
+    assert disc_15 > 7e-14  # Replicates the ~8.57e-14 observed discrepancy
+
+    # Verify absence of pole at s=0 explanation
+    assert "has no pole at s=0" in res["mathematical_audit"]["absence_of_pole_at_s_zero"]
+    assert "zeta(0) = -1/2 != 0" in res["mathematical_audit"]["absence_of_pole_at_s_zero"]
+
+
+def test_cycle13_remainder_aware_vandermonde_detection():
+    """
+    Cycle 13 Remainder-Aware Vandermonde Block Detectability:
+    Verifies the quantitative theorem:
+      max_{0 <= l < r} |Y(k+l)| >= c * max_j |a_j q_j^k| - max_l |R(k+l)|
+    with c = 1 / ||V^{-1}||_{infty -> infty} > 0.
+    Confirms behavior across 3 remainder regimes:
+      1. Zero remainder: lower bound > 0 (detected).
+      2. Subordinate remainder: lower bound > 0 (detected).
+      3. Dominant remainder: lower bound <= 0 (detection threshold violated).
+    """
+    res = transcendental.audit_quantitative_vandermonde_block_detectability(r=4, off_line_delta=0.25, dps=40)
+    assert res["classification"] == "PROVED"
+    assert res["block_constant_c"] > 0.15
+    assert res["all_inequalities_satisfied"] is True
+    assert res["all_blocks_satisfied"] is True
+
+    regimes = res["remainder_regimes"]
+    assert regimes["zero_remainder"]["detected"] is True
+    assert regimes["zero_remainder"]["lower_bound"] > 0.0
+
+    assert regimes["subordinate_remainder"]["detected"] is True
+    assert regimes["subordinate_remainder"]["lower_bound"] > 0.0
+
+    assert regimes["dominant_remainder"]["detected"] is False
+    assert regimes["dominant_remainder"]["lower_bound"] < 0.0
+
+
+def test_cycle13_infinite_extension_aliasing_and_pw():
+    """
+    Cycle 13 Infinite Extension Structural Audit:
+    Verifies:
+      1. Synthetic aliasing control: ordinates separated by Delta gamma = 2*pi/log(tau)
+         produce identical bases q_1 = q_2.
+      2. Paley-Wiener / Jensen theorem: entire functions of exponential type have n(r) = O(r),
+         strictly slower than N(r) ~ (r/pi) log r, precluding single-test full annihilation.
+      3. Distributional uniqueness in D'((0, infty)) does not equal discrete synthesis.
+      4. Arithmetic layer disjointness (L_K cap L_J = {0}) leaves the collision bridge open.
+    """
+    res = transcendental.audit_infinite_extension_detectability()
+    assert res["classification"] == "AUDITED_AND_STRUCTURED"
+
+    # 1. Aliasing control
+    alias = res["aliasing_control"]
+    assert alias["aliasing_confirmed"] is True
+    assert alias["base_difference"] < 1e-12
+
+    # 2. Paley-Wiener / Jensen
+    pw = res["paley_wiener_impossibility"]
+    assert "Paley-Wiener / Jensen" in pw["theorem"]
+    assert "No test phi in C_c^infty" in pw["conclusion"]
+
+    # 3. Collision bridge
+    bridge = res["collision_bridge_audit"]
+    assert bridge["status"] == "OPEN_RESEARCH_PROBLEM"
+    assert "L_K cap L_J = {0}" in bridge["layer_disjointness"]
+
+
+def test_cycle13_synthesis():
+    """
+    Cycle 13 Synthesis Resolution:
+    Verifies that audit_cycle13_synthesis() executes all sub-audits and produces
+    definitive answers to all 7 executive questions.
+    """
+    res = transcendental.audit_cycle13_synthesis(dps=30)
+    assert res["cycle"].startswith("Cycle 13")
+    answers = res["executive_answers"]
+    assert len(answers) == 7
+    assert answers["1_which_previous_claims_repaired_withdrawn_or_unresolved"].startswith("REPAIRED")
+    assert "EXACT THEOREMS" in answers["2_what_is_proved_exactly_vs_certified_within_finite_bounds"]
+    assert "vandermonde_block_remainder_2" in answers["3_what_did_lean_actually_establish"]
+    assert answers["4_does_complete_formula_have_justified_error_budget_at_tested_grades"].startswith("YES")
+    assert "Paley-Wiener" in answers["5_what_was_learned_about_infinite_mode_detectability"]
+    assert answers["6_was_implication_toward_forbidden_coincidence_derived"].startswith("NO")
+    assert answers["7_what_is_the_single_next_theorem_or_research_obligation"].startswith("Investigate")

@@ -360,15 +360,26 @@ class TestClaimAuditGates:
         assert res["status"] == "PASS", f"CLM-TC-017 failed: {res['violations']}"
         assert len(res["passed_gates"]) == 10
 
+    def test_clm_tc_018_spec_passes_audit(self):
+        """Test that CLM-TC-018 specification passes all 10 gates."""
+        from audit_claim_spec import audit_claim_specification
+        spec_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-TC-018.json")
+        with open(spec_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-TC-018 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
     def test_cross_check_claim_register_succeeds(self):
         """Test that cross_check_claim_register verifies the repository claim register with exact arithmetic."""
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         from audit_claim_spec import cross_check_claim_register
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
-        assert coverage["total_claims"] == 105
-        assert coverage["terminal_claims"] == 97
-        assert coverage["audited_terminal_claims"] == 19
+        assert coverage["total_claims"] == 106
+        assert coverage["terminal_claims"] == 98
+        assert coverage["audited_terminal_claims"] == 20
         assert coverage["legacy_unaudited_terminal_claims"] == 78
         assert coverage["open_or_exempt_claims"] == 8
         assert coverage["missing_specifications"] == 0
@@ -499,7 +510,7 @@ class TestClaimAuditGates:
         ok_real, errors_real, passed_real, cov_real = cross_check_claim_register(repo_root, verify_git_baseline=True)
         assert ok_real is True
         assert cov_real["legacy_unaudited_terminal_claims"] == 78
-        assert cov_real["audited_terminal_claims"] == 19
+        assert cov_real["audited_terminal_claims"] == 20
 
 
 class TestAdversarialAuditGates:

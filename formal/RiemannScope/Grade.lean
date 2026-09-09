@@ -803,4 +803,78 @@ theorem vandermonde_block_reconstruction_3 (q₁ q₂ q₃ a₁ a₂ a₃ : ℂ)
   rw [h_alg]
   exact (mul_div_cancel_right₀ (a₁ * q₁^k) h_denom).symm
 
+/-- Cycle 13 Theorem: Remainder-Aware Vandermonde Block Reconstruction for 2 modes over ℂ.
+    For distinct bases q₁ ≠ q₂, when observations Y_k = S_k + R_k are perturbed by remainder terms R_k,
+    the exact mode a₁ * q₁^k satisfies:
+    a₁ * q₁^k = (Y_k * q₂ - Y_{k+1}) / (q₂ - q₁) - (R_k * q₂ - R_{k+1}) / (q₂ - q₁).
+    Scope note: Applies to r = 2 modes. Arbitrary r requires the full matrix inverse W = V⁻¹. -/
+theorem vandermonde_block_remainder_2 (q₁ q₂ a₁ a₂ : ℂ) (hq : q₂ - q₁ ≠ 0) (k : ℕ)
+    (Y_k Y_k1 R_k R_k1 : ℂ)
+    (hY_k : Y_k = (a₁ * q₁^k + a₂ * q₂^k) + R_k)
+    (hY_k1 : Y_k1 = (a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) + R_k1) :
+    a₁ * q₁^k = (Y_k * q₂ - Y_k1) / (q₂ - q₁) - (R_k * q₂ - R_k1) / (q₂ - q₁) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := by ring
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := by ring
+  rw [hY_k, hY_k1, h_step1, h_step2]
+  have h_alg : ((a₁ * q₁^k + a₂ * q₂^k + R_k) * q₂ - (a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂) + R_k1)) -
+      (R_k * q₂ - R_k1) = (a₁ * q₁^k) * (q₂ - q₁) := by ring
+  rw [← sub_div, h_alg]
+  exact (mul_div_cancel_right₀ (a₁ * q₁^k) hq).symm
+
+/-- Cycle 13 Theorem: Remainder-Aware Vandermonde Block Reconstruction for 2 modes (second mode).
+    Identity: a₂ * q₂^k = (Y_{k+1} - Y_k * q₁) / (q₂ - q₁) - (R_{k+1} - R_k * q₁) / (q₂ - q₁). -/
+theorem vandermonde_block_remainder_2_mode2 (q₁ q₂ a₁ a₂ : ℂ) (hq : q₂ - q₁ ≠ 0) (k : ℕ)
+    (Y_k Y_k1 R_k R_k1 : ℂ)
+    (hY_k : Y_k = (a₁ * q₁^k + a₂ * q₂^k) + R_k)
+    (hY_k1 : Y_k1 = (a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) + R_k1) :
+    a₂ * q₂^k = (Y_k1 - Y_k * q₁) / (q₂ - q₁) - (R_k1 - R_k * q₁) / (q₂ - q₁) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := by ring
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := by ring
+  rw [hY_k, hY_k1, h_step1, h_step2]
+  have h_alg : (((a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂) + R_k1) - (a₁ * q₁^k + a₂ * q₂^k + R_k) * q₁) -
+      (R_k1 - R_k * q₁)) = (a₂ * q₂^k) * (q₂ - q₁) := by ring
+  rw [← sub_div, h_alg]
+  exact (mul_div_cancel_right₀ (a₂ * q₂^k) hq).symm
+
+/-- Cycle 13 Theorem: Remainder-Aware Vandermonde Block Reconstruction for 3 modes over ℂ.
+    For pairwise distinct bases q₁, q₂, q₃ and grade k : ℕ, with observations Y_k = S_k + R_k:
+    a₁ * q₁^k = (Y_{k+2} - (q₂ + q₃)*Y_{k+1} + (q₂*q₃)*Y_k) / ((q₁ - q₂)*(q₁ - q₃)) -
+                (R_{k+2} - (q₂ + q₃)*R_{k+1} + (q₂*q₃)*R_k) / ((q₁ - q₂)*(q₁ - q₃)). -/
+theorem vandermonde_block_remainder_3 (q₁ q₂ q₃ a₁ a₂ a₃ : ℂ)
+    (h_denom : (q₁ - q₂) * (q₁ - q₃) ≠ 0) (k : ℕ)
+    (Y_k Y_k1 Y_k2 R_k R_k1 R_k2 : ℂ)
+    (hY_k : Y_k = (a₁ * q₁^k + a₂ * q₂^k + a₃ * q₃^k) + R_k)
+    (hY_k1 : Y_k1 = (a₁ * q₁^(k+1) + a₂ * q₂^(k+1) + a₃ * q₃^(k+1)) + R_k1)
+    (hY_k2 : Y_k2 = (a₁ * q₁^(k+2) + a₂ * q₂^(k+2) + a₃ * q₃^(k+2)) + R_k2) :
+    a₁ * q₁^k = (Y_k2 - (q₂ + q₃) * Y_k1 + (q₂ * q₃) * Y_k) / ((q₁ - q₂) * (q₁ - q₃)) -
+                (R_k2 - (q₂ + q₃) * R_k1 + (q₂ * q₃) * R_k) / ((q₁ - q₂) * (q₁ - q₃)) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := by ring
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := by ring
+  have h_step3 : q₃^(k+1) = q₃^k * q₃ := by ring
+  have h_step4 : q₁^(k+2) = q₁^k * q₁^2 := by ring
+  have h_step5 : q₂^(k+2) = q₂^k * q₂^2 := by ring
+  have h_step6 : q₃^(k+2) = q₃^k * q₃^2 := by ring
+  rw [hY_k, hY_k1, hY_k2, h_step1, h_step2, h_step3, h_step4, h_step5, h_step6]
+  have h_alg : (((a₁ * (q₁^k * q₁^2) + a₂ * (q₂^k * q₂^2) + a₃ * (q₃^k * q₃^2) + R_k2) -
+      (q₂ + q₃) * (a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂) + a₃ * (q₃^k * q₃) + R_k1) +
+      (q₂ * q₃) * (a₁ * q₁^k + a₂ * q₂^k + a₃ * q₃^k + R_k)) -
+      (R_k2 - (q₂ + q₃) * R_k1 + (q₂ * q₃) * R_k)) =
+      (a₁ * q₁^k) * ((q₁ - q₂) * (q₁ - q₃)) := by ring
+  rw [← sub_div, h_alg]
+  exact (mul_div_cancel_right₀ (a₁ * q₁^k) h_denom).symm
+
+/-- Cycle 13 Theorem: Triangle inequality remainder lower bound for real linear reconstruction.
+    If reconstructed mode M, observation estimator Y_est, and remainder estimator R_est satisfy
+    M = Y_est - R_est, then |Y_est| ≥ |M| - |R_est|. -/
+theorem reconstruction_remainder_lower_bound (M Y_est R_est : ℝ)
+    (h_id : M = Y_est - R_est) :
+    |M| - |R_est| ≤ |Y_est| := by
+  have h_m : M = Y_est + (-R_est) := by linarith
+  have h_tri : |M| ≤ |Y_est| + |R_est| := by
+    calc |M|
+      _ = |Y_est + (-R_est)| := by rw [h_m]
+      _ ≤ |Y_est| + |-R_est| := abs_add Y_est (-R_est)
+      _ = |Y_est| + |R_est| := by rw [abs_neg]
+  linarith
+
 end RiemannScope

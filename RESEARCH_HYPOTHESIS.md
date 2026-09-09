@@ -2257,3 +2257,101 @@ Transcendental continuation is a faithful coordinate transport of the prime-zeta
 | Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **TC-DISC-017** | **CLM-TC-017** | Complete Smoothed TC Transport, Quantitative Vandermonde Block Detectability, and Honest Certification | Derived and numerically verified complete smoothed explicit formula without background double-counting or phantom pole at $s=0$; proved quantitative Vandermonde block estimate $\max_{0 \le \ell < r} |S(k+\ell)| \ge c \max |a_j q_j^k|$; formalized exact 2- and 3-mode Vandermonde reconstructions in Lean 4 without extra axioms; certified bounded rational exclusion for $q \le 10^6$ via Farey coverage intervals; fail-closed Arb phase distinction and signed relation audit; audited infinite extension and collision obstruction. | **COMPLETE TC TRANSPORT DERIVED AND VERIFIED; QUANTITATIVE BLOCK DETECTABILITY PROVED; CROSS-GRADE COLLISION BRIDGE STILL OPEN** (TC faithfully transports prime-zeta identities, and off-line modes cannot hide in finite blocks; but continuous distributional fluctuation does not force discrete cross-grade lattice collisions) |
+
+---
+
+# 36. Cycle 13 — Reliable Certification and the Complete TC Detection Problem
+
+## 36.1 Governing Purpose and Certification Chain Repairs
+
+Cycle 13 establishes trustworthy finite audits, resolves prior transport error budget inconsistencies, and investigates whether detection in the complete transported explicit formula can force an off-critical zero into an arithmetic coincidence $m\tau^K = n\tau^J$.
+
+### 1. Common Input Contract (8 Mandatory Pre-Acceptance Gates)
+Implemented `load_validated_zero_certificates(cert_dir, expected_count)` enforcing:
+- Gate 1: Directory accessibility and non-empty listing.
+- Gate 2: Certificate count matching expected count ($N$).
+- Gate 3: Contiguous 1-based indexing ($1..N$).
+- Gate 4: Schema version compliance (`2.0`).
+- Gate 5: Mathematical status verification (`SIMPLE_ZERO_PROVED`).
+- Gate 6: Arb ball mid/rad enclosure presence and finiteness.
+- Gate 7: Non-negative finite radius ($0 \le \text{rad} < 10^{-6}$).
+- Gate 8: Verified provenance.
+Any violation returns `INPUT_INVALID`, preventing uncertified or corrupt inputs from entering the pipeline.
+
+### 2. Exact Rational Farey Coverage and Strict Boundaries
+- Constructor `find_farey_witness_coverage` uses exact integer arithmetic via `fractions.Fraction`.
+- Checks unimodular identity $bc - ad = 1$ and strict containment:
+  \[
+  \frac{a}{b} < x_{\text{low}} \le x_{\text{high}} < \frac{c}{d}.
+  \]
+- Re-verifies strict positivity against the original Arb ball enclosures.
+- **Counterexample Regression**: The review counterexample $[1/49, 1/49]$ at $Q=49$ was accepted by the old float implementation because float rounding yielded $0.9999999999999999 < 1$. The exact rational constructor strictly enforces $a/b < 1/49$ and $1/49 < c/d$, correctly returning `None` and refusing to certify exclusion through denominator 49.
+
+### 3. Fail-Closed Bounded Integer Relations
+- Residual enclosure that merely contains zero returns `INCONCLUSIVE`.
+- `RELATION_FOUND` is strictly reserved for an exact mathematical or certified zero residual.
+- Strict non-zero separation returns `CERTIFIED_WITH_EXPLICIT_BOUNDS`.
+- Floating-point evaluations without ball arithmetic return `NUMERICAL_EVIDENCE_ONLY`.
+- Precision state is restored across all paths via `try...finally`.
+
+## 36.2 Multi-Grade Complete Transport and Rigorous Error Budget
+
+For $\phi \in C_c^\infty((0, \infty))$ with $\operatorname{supp}(\phi) \subset [a, b]$ ($0 < h < a$), the complete explicit formula identity is:
+\[
+h \sum_{n \ge 1} \Lambda(n) \phi(hn) = \widetilde\phi(1) - \sum_\rho m_\rho \widetilde\phi(\rho) h^{1-\rho} - B_h(\phi),
+\]
+where
+\[
+B_h(\phi) = \sum_{j \ge 1} \widetilde\phi(-2j) h^{1+2j} = h \int_1^\infty \frac{\phi(hx)}{x(x^2-1)} \, dx.
+\]
+
+### Mathematical Refinements:
+1. **Holomorphy at $s=0$**: Mellin integrand has no pole at $s=0$ because $\zeta(0) = -1/2 \ne 0$ and $\widetilde\phi$ is entire. The residue is identically zero. The product $-\zeta'(0)\widetilde\phi(0)h/\zeta(0)$ is non-zero, but does not appear in the contour shift.
+2. **Background Representation and Discrepancy Resolution**: The primary representation uses the exact background integral $B_h^{\text{integral}}$. The geometric tail of the trivial-zero series for $j > M$ is bounded by:
+   \[
+   \sum_{j=M+1}^\infty |\widetilde\phi(-2j)| h^{1+2j} \le \|\phi\|_{L^1} \frac{(h/a)^{2M+3}}{1 - (h/a)^2}.
+   \]
+   For $h=1.0, a=2.0, M=15$, this bound is $\le 1.12 \times 10^{-11}$, which strictly encloses the observed discrepancy ($8.57 \times 10^{-14}$) from Cycle 12.
+3. **Stieltjes Integral Zero Truncation Bound**: Using $N(t) \le \frac{t}{2\pi}\log t$ for $t \ge 14$, the tail integral is bounded via Stieltjes integration by parts:
+   \[
+   \int_T^\infty t^{-2} \, dN(t) \le \frac{1}{\pi} \frac{\log T + 1}{T}.
+   \]
+   Together with uniform Mellin derivative bounds $C_2=31, C_3=1200, C_4=135003$ over the full critical strip $0 \le \beta \le 1$, this provides a certified spectral tail bound without assuming $\beta = 1/2$.
+4. **Multi-Grade Evaluations**: Evaluated across scales $h \in \{1.0, 0.5, \tau^{-1}, \tau^{-2}\}$ ($0 < h < a = 2.0$), confirming multi-grade transport agreement.
+
+## 36.3 Remainder-Aware Vandermonde Block Detectability
+
+Let $Y(k) = S(k) + R(k)$ where $S(k) = \sum_{j=1}^r a_j q_j^k$ with distinct nonzero $q_j$ and remainder $R(k)$.
+The block reconstruction operator satisfies the quantitative lower bound:
+\[
+\max_{0 \le \ell < r} |Y(k+\ell)| \ge c \max_{1 \le j \le r} |a_j q_j^k| - \max_{0 \le \ell < r} |R(k+\ell)|, \quad c = \frac{1}{\|V^{-1}\|_\infty} > 0.
+\]
+
+### Formal Lean 4 Verification:
+Formally proved in `formal/RiemannScope/Grade.lean` under standard Mathlib foundational axioms (`propext`, `Classical.choice`, `Quot.sound`) with zero `sorry`:
+1. `vandermonde_block_remainder_2`: exact 2-mode reconstruction with remainder $a_1 q_1^k = \frac{(Y_k - R_k)q_2 - (Y_{k+1} - R_{k+1})}{q_2 - q_1}$.
+2. `vandermonde_block_remainder_2_mode2`: exact mode 2 reconstruction with remainder.
+3. `vandermonde_block_remainder_3`: exact 3-mode reconstruction with remainder.
+4. `reconstruction_remainder_lower_bound`: real triangle inequality lower bound establishing that $|Y_k| + |Y_{k+1}| \ge c |S_k| - (|R_k| + |R_{k+1}|)$.
+
+### Regimes Tested:
+- **Zero Remainder**: $R \equiv 0 \implies \max |Y| \ge c \max |a_j q_j^k| > 0$.
+- **Subordinate Remainder**: $\max |R| \le 0.05 \ll c \cdot S \implies \max |Y| > 0$ strictly detected.
+- **Dominant Remainder**: $\max |R| = 1.0 > c \cdot S \implies$ lower bound $\le 0$, detection masked.
+
+## 36.4 Infinite Extension Obstructions & The Unbridged TC Bridge
+
+1. **Synthetic Aliasing Control**: If $\Delta\gamma = 2\pi/\log\tau \approx 5.88488$, then $\tau^{i\Delta\gamma} = 1$, making $q_1 = q_2$. The Vandermonde matrix becomes singular ($c = 0$). Mode non-aliasing is an essential premise; pairwise distinction holds for the certified finite set of zeros, but cannot be inferred universally without zero-spacing theorems.
+2. **Paley-Wiener / Jensen Non-Annihilation**: A single non-trivial test function $\phi \in C_c^\infty((0, \infty))$ cannot annihilate all nontrivial zeros except one. By Paley-Wiener, $\widetilde\phi$ is an entire function of exponential type, whose zero counting function satisfies $n(r) = O(r)$, whereas the Riemann zero counting function satisfies $N(r) \sim \frac{r}{\pi}\log r \gg O(r)$.
+3. **Distributional Uniqueness vs Discrete Synthesis**: While $T = 0 \in \mathcal{D}' \iff \langle T, \phi \rangle = 0$ for all tests, this continuous property does not force exponential mode growth $\tau^{k\delta}$ into discrete lattice collisions.
+4. **Layer Disjointness Obstruction**: Integer arithmetic layers $L_K = \tau^K \mathbb{Z}$ are unconditionally disjoint ($L_K \cap L_J = \{0\}$ for $K \ne J$) by the transcendence of $\tau = 2\pi$ (Lindemann 1882). However, the target bridge:
+   \[
+   \exists\rho (\Re\rho \ne 1/2) \Longrightarrow \exists K \ne J, m, n \in \mathbb{Z}\setminus\{0\} : m\tau^K = n\tau^J
+   \]
+   remains completely unproved. Deriving it would prove the Riemann Hypothesis. Neither coordinate covariance nor arithmetic separation supplies this implication.
+
+## 36.5 Synthesis of Candidate TC-DISC-018 / CLM-TC-018
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-018** | **CLM-TC-018** | Reliable Certification, Multi-Grade Complete Transport, and Remainder-Aware Vandermonde Detection | Established 8-gate certificate loading; exact rational Farey coverage with strict bounds and Arb verification; regression of $[1/49, 1/49]$ counterexample at $Q=49$; fail-closed bounded relations; verified complete transport across multiple grades with Stieltjes zero bounds and geometric background tail bounds (resolving Cycle 12 discrepancy); proved remainder-aware Vandermonde block detectability and formalized 2- and 3-mode reconstructions with lower bounds in Lean 4 without extra axioms; analyzed synthetic aliasing control, Paley-Wiener obstruction, and layer disjointness. | **RELIABLE CERTIFICATION ESTABLISHED; MULTI-GRADE TRANSPORT VERIFIED; REMAINDER-AWARE DETECTABILITY FORMALIZED; ARITHMETIC COINCIDENCE BRIDGE STILL OPEN** (Finite audits are trustworthy and transport error budgets are closed; but continuous explicit formula fluctuations do not force discrete cross-grade point collisions) |

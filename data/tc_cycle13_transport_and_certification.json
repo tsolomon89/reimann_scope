@@ -1,0 +1,763 @@
+{
+  "cycle": "Cycle 13 \u2014 Reliable Certification and the Complete TC Detection Problem",
+  "executive_answers": {
+    "1_which_previous_claims_repaired_withdrawn_or_unresolved": "REPAIRED: All three finite audits (pairwise distinction, Farey rational exclusion, bounded relations) now use validated 8-gate certificate loading with fail-closed input contract, exact rational cross-multiplication, strict Arb ball verification, precision restoration, and correct classification (RELATION_FOUND reserved for exact, INCONCLUSIVE for zero-containing residuals, CERTIFIED_WITH_EXPLICIT_BOUNDS for strict separation). The false claim that -zeta'(0)/zeta(0)*phi_tilde(0)*h is identically zero is WITHDRAWN and corrected to absence of pole at s=0. The (log T)/T^2 zero tail error is REPAIRED to rigorous Stieltjes (log T + 1)/T bound.",
+    "2_what_is_proved_exactly_vs_certified_within_finite_bounds": "EXACT THEOREMS: Quantitative Vandermonde block reconstruction with explicit remainder (Lean 4), Paley-Wiener / Jensen zero-density non-annihilation theorem, arithmetic layer disjointness L_K cap L_J = {0} (Lindemann 1882), Ford-Zaharescu / Hlawka nonresonance of c_tau. FINITE CERTIFICATIONS: Bounded rational exclusion for Q <= 10^6, pairwise distinction for N=25 zeros, bounded integer relations for |a_j| <= 50. Unrestricted irrationality and full RH remain OPEN.",
+    "3_what_did_lean_actually_establish": "Lean 4 formally proved vandermonde_block_remainder_2, vandermonde_block_remainder_2_mode2, vandermonde_block_remainder_3, and reconstruction_remainder_lower_bound in RiemannScope.Grade. Coverage is exact for r=2 and r=3 modes; arbitrary r requires general matrix inversion. Uses standard foundational axioms only (propext, Classical.choice, Quot.sound).",
+    "4_does_complete_formula_have_justified_error_budget_at_tested_grades": "YES. Tested across grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with 0 < h < a=2.0. Primary background uses exact integral B_h^{integral}. Discrepancy at M=15 (8.57e-14) is rigorously enclosed by geometric tail bound (1.12e-11). Nontrivial zero truncation bounded uniformly over 0 <= beta <= 1 by Stieltjes integration by parts with Mellin derivative norms C_2=31, C_3=1200, C_4=135003. Residuals satisfy error budgets across all tested grades.",
+    "5_what_was_learned_about_infinite_mode_detectability": "A single fixed test cannot annihilate all zeros except one (Paley-Wiener). Test families can isolate modes approximately with quantified remainders, but the remainder ||R_k||_inf must stay below c * M(k). Furthermore, aliasing (Delta gamma = 2*pi/log(tau)) produces identical bases and singular Vandermonde matrices; hence ordinate non-aliasing is an essential condition that must be verified.",
+    "6_was_implication_toward_forbidden_coincidence_derived": "NO. Even with rigorous exponential growth of Y_phi(k) for an off-line zero, no proved prime-zeta theorem forces Y_phi(k) to belong to L_K, nor forces a cross-grade point collision m*tau^K = n*tau^J. Arithmetic layers remain unconditionally disjoint (L_K cap L_J = {0}). The bridge implication remains OPEN.",
+    "7_what_is_the_single_next_theorem_or_research_obligation": "Investigate whether Tauberian boundary growth of -zeta'/zeta on the prime side can force an arithmetic lattice projection, or formally prove that continuous explicit-formula functionals cannot distinguish disjoint discrete dilations L_K."
+  },
+  "p1_pairwise_distinction": {
+    "classification": "CERTIFIED_WITH_EXPLICIT_BOUNDS",
+    "N": 25,
+    "precision_bits": 256,
+    "pairs_checked": 300,
+    "max_theta_radius": "1.448e-75",
+    "min_separation_from_integer": 0.004036015234676721,
+    "worst_pair": {
+      "zero_j": 9,
+      "zero_ell": 15,
+      "nearest_integer_k": 5,
+      "certified_distance": 0.004036015234676721
+    },
+    "all_pairs_strictly_separated_from_Z": true,
+    "input_provenance": "Validated from 25 canonical zero certificates in data/certificates/zeros",
+    "conclusion": "Certified for all 300 pairs among first 25 zeros that theta_j - theta_ell not in Z, with min distance 4.036015e-03 > 0."
+  },
+  "p2_bounded_rational_exclusion": {
+    "classification": "CERTIFIED_WITH_EXPLICIT_BOUNDS",
+    "N": 20,
+    "target_Q": 1000000,
+    "precision_bits": 256,
+    "all_zeros_certified": true,
+    "min_rational_distance_overall": 2.0538427734210138e-15,
+    "detailed_results": [
+      {
+        "zero_index": 1,
+        "farey_bracket": {
+          "left_fraction": "5168215/1250019",
+          "right_fraction": "1835259/443888",
+          "a": 5168215,
+          "b": 1250019,
+          "c": 1835259,
+          "d": 443888,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1693907,
+        "min_rational_distance": 4.404320935720292e-13,
+        "theta_radius": 2.4449933691778567e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "6bc78d9f0f29946d5969b92319b2f58f62ea9db9e6fb07ff313f96bce7e410dd"
+      },
+      {
+        "zero_index": 2,
+        "farey_bracket": {
+          "left_fraction": "1785815/290419",
+          "right_fraction": "9842954/1600715",
+          "a": 1785815,
+          "b": 290419,
+          "c": 9842954,
+          "d": 1600715,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1891134,
+        "min_rational_distance": 3.2219654170885056e-13,
+        "theta_radius": 3.5069394106550515e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "4c248e074f4ea3e54d9875ddd424ad172d47a295cca4c9a5a9139cedc432d298"
+      },
+      {
+        "zero_index": 3,
+        "farey_bracket": {
+          "left_fraction": "4768146/651755",
+          "right_fraction": "11698925/1599119",
+          "a": 4768146,
+          "b": 651755,
+          "c": 11698925,
+          "d": 1599119,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 2250874,
+        "min_rational_distance": 1.8725064473739238e-14,
+        "theta_radius": 3.887885902855334e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "8c36f6410ad597a20edc2ecf0c19f1eaea8db8b92eacb01d2f7eea2cf7204af5"
+      },
+      {
+        "zero_index": 4,
+        "farey_bracket": {
+          "left_fraction": "7215738/810803",
+          "right_fraction": "4369697/491005",
+          "a": 7215738,
+          "b": 810803,
+          "c": 4369697,
+          "d": 491005,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1301808,
+        "min_rational_distance": 6.734607689919655e-13,
+        "theta_radius": 5.095837679604807e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "d2563def05e066c5ea8a220b30b8e628761999312f2df2e6b35f2ac972c5e358"
+      },
+      {
+        "zero_index": 5,
+        "farey_bracket": {
+          "left_fraction": "72922697/7569508",
+          "right_fraction": "3267101/339131",
+          "a": 72922697,
+          "b": 7569508,
+          "c": 3267101,
+          "d": 339131,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 7908639,
+        "min_rational_distance": 1.6053976176259546e-14,
+        "theta_radius": 6.143934783618873e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "ad9eca6533643ab3d98312fe33e24cc369e90fec4ca935fa7025d1869e8e861f"
+      },
+      {
+        "zero_index": 6,
+        "farey_bracket": {
+          "left_fraction": "2023015/184007",
+          "right_fraction": "21763603/1979548",
+          "a": 2023015,
+          "b": 184007,
+          "c": 21763603,
+          "d": 1979548,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 2163555,
+        "min_rational_distance": 1.0158368355040004e-13,
+        "theta_radius": 6.588133186884256e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "b0d57a9e206da47d55b596a051f6609073631bbf72f7e3076c6b1a49caffc02a"
+      },
+      {
+        "zero_index": 7,
+        "farey_bracket": {
+          "left_fraction": "9127659/762607",
+          "right_fraction": "9082069/758798",
+          "a": 9127659,
+          "b": 762607,
+          "c": 9082069,
+          "d": 758798,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1521405,
+        "min_rational_distance": 7.537745359430502e-13,
+        "theta_radius": 6.906402853153333e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "b6caeff3be3b47e2a87ce3d9b5ea39f248c2ca449370707bca9b2aac17ee36c0"
+      },
+      {
+        "zero_index": 8,
+        "farey_bracket": {
+          "left_fraction": "51834477/4089995",
+          "right_fraction": "7886036/622247",
+          "a": 51834477,
+          "b": 4089995,
+          "c": 7886036,
+          "d": 622247,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 4712242,
+        "min_rational_distance": 2.0538427734210138e-15,
+        "theta_radius": 7.136409367278377e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "fad9012ac541a269b1c8642446dd30d1af72128b60ad17cfe56b138d67639a37"
+      },
+      {
+        "zero_index": 9,
+        "farey_bracket": {
+          "left_fraction": "10023131/713804",
+          "right_fraction": "5340861/380353",
+          "a": 10023131,
+          "b": 713804,
+          "c": 5340861,
+          "d": 380353,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1094157,
+        "min_rational_distance": 2.1315251840883616e-13,
+        "theta_radius": 7.583182650915818e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "0f386540249ec2b0e91a9d9bc4299c04baf4c22123a2287854a36056f978feef"
+      },
+      {
+        "zero_index": 10,
+        "farey_bracket": {
+          "left_fraction": "6696259/459933",
+          "right_fraction": "8310045/570776",
+          "a": 6696259,
+          "b": 459933,
+          "c": 8310045,
+          "d": 570776,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1030709,
+        "min_rational_distance": 1.031644275986591e-12,
+        "theta_radius": 7.752098116290898e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "7a20de5204f35c9063b68cf55890be3b6df17df3b17aaa6b558fc0ad77d21f98"
+      },
+      {
+        "zero_index": 11,
+        "farey_bracket": {
+          "left_fraction": "4805759/310165",
+          "right_fraction": "16402642/1058631",
+          "a": 4805759,
+          "b": 310165,
+          "c": 16402642,
+          "d": 1058631,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1368796,
+        "min_rational_distance": 4.839767569668105e-13,
+        "theta_radius": 8.057374348577985e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "b6ea4030017a12363cf9f62ac48995023bf015de32600c9051bab901b97c6832"
+      },
+      {
+        "zero_index": 12,
+        "farey_bracket": {
+          "left_fraction": "44313071/2683862",
+          "right_fraction": "5187323/314175",
+          "a": 44313071,
+          "b": 2683862,
+          "c": 5187323,
+          "d": 314175,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 2998037,
+        "min_rational_distance": 1.241998177965291e-13,
+        "theta_radius": 9.771124794329786e-76,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "15dd5159cb14e51dd30145d058bd6bba2e4cbadbe4e76c20b70706dcec1ff5c6"
+      },
+      {
+        "zero_index": 13,
+        "farey_bracket": {
+          "left_fraction": "16061734/925245",
+          "right_fraction": "12323483/709901",
+          "a": 16061734,
+          "b": 925245,
+          "c": 12323483,
+          "d": 709901,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1635146,
+        "min_rational_distance": 3.2565281444916214e-13,
+        "theta_radius": 1.0048161299188518e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "427a6022ecd7d703d6b18f5960c2e25d5eea4f6eaa029098abc838973b4260f8"
+      },
+      {
+        "zero_index": 14,
+        "farey_bracket": {
+          "left_fraction": "8129548/456877",
+          "right_fraction": "18842853/1058960",
+          "a": 8129548,
+          "b": 456877,
+          "c": 18842853,
+          "d": 1058960,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1515837,
+        "min_rational_distance": 1.7471627846469427e-13,
+        "theta_radius": 1.0189958803180254e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "e4fc13ff5b34e78c85d30da4e5c4dab3e01658963060f67edd676d5cda92e527"
+      },
+      {
+        "zero_index": 15,
+        "farey_bracket": {
+          "left_fraction": "32581917/1710706",
+          "right_fraction": "2085163/109481",
+          "a": 32581917,
+          "b": 1710706,
+          "c": 2085163,
+          "d": 109481,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1820187,
+        "min_rational_distance": 1.9354288791647143e-13,
+        "theta_radius": 1.2215518030358517e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "dd8ec33591a07920d22373abfcd77a8db35737ebf1060da4d8d6fb6ccdb1ae08"
+      },
+      {
+        "zero_index": 16,
+        "farey_bracket": {
+          "left_fraction": "7548855/384727",
+          "right_fraction": "15003508/764653",
+          "a": 7548855,
+          "b": 384727,
+          "c": 15003508,
+          "d": 764653,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 1149380,
+        "min_rational_distance": 5.026270604600552e-13,
+        "theta_radius": 1.2403399084850427e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "f1d1ba627637cee460525731c99f5eadba8f9cde8cdfbc93d8318fa5a7064252"
+      },
+      {
+        "zero_index": 17,
+        "farey_bracket": {
+          "left_fraction": "6362076/312743",
+          "right_fraction": "45803375/2251574",
+          "a": 6362076,
+          "b": 312743,
+          "c": 45803375,
+          "d": 2251574,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 2564317,
+        "min_rational_distance": 8.66616925380791e-14,
+        "theta_radius": 1.2638967421704623e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "7181c50906c11ef7cf1748d21441a586722ac48a5234ff116843cd68e22151a8"
+      },
+      {
+        "zero_index": 18,
+        "farey_bracket": {
+          "left_fraction": "8512381/403810",
+          "right_fraction": "67234951/3189489",
+          "a": 8512381,
+          "b": 403810,
+          "c": 67234951,
+          "d": 3189489,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 3593299,
+        "min_rational_distance": 4.51064008004076e-15,
+        "theta_radius": 1.287970870390232e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "0774034b858b69844124198d716388f887ba452208bc3304657cec4bda14a545"
+      },
+      {
+        "zero_index": 19,
+        "farey_bracket": {
+          "left_fraction": "14000097/632225",
+          "right_fraction": "31644947/1429042",
+          "a": 14000097,
+          "b": 632225,
+          "c": 31644947,
+          "d": 1429042,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 2061267,
+        "min_rational_distance": 1.724680591474916e-13,
+        "theta_radius": 1.3227106226300893e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "20086fc5549c92bb02f347284a808abbfac6d7d7dd93cbd632b164218b89d729"
+      },
+      {
+        "zero_index": 20,
+        "farey_bracket": {
+          "left_fraction": "76081692/3371605",
+          "right_fraction": "1084765/48072",
+          "a": 76081692,
+          "b": 3371605,
+          "c": 1084765,
+          "d": 48072,
+          "unimodular_check": 1
+        },
+        "achieved_Q": 3419677,
+        "min_rational_distance": 2.320631248230472e-15,
+        "theta_radius": 1.3364645691244852e-75,
+        "certified_no_rational_up_to_Q": true,
+        "certificate_hash": "86020cc0fef5ab412d8f606cb0e1b0309dd81e280432817b74e42f13998b32c9"
+      }
+    ],
+    "input_provenance": "Validated from 20 canonical zero certificates in data/certificates/zeros",
+    "mathematical_scope": "Proves by Farey coverage that theta_j != p/q for all 1 <= q <= 1000000 for tested zeros. Does NOT prove theta_j not in Q for unrestricted denominators."
+  },
+  "p3_bounded_integer_relations": {
+    "r2_box_search": {
+      "classification": "CERTIFIED_WITH_EXPLICIT_BOUNDS",
+      "dimension": 2,
+      "box_bound_B": 50,
+      "tested_relations": 10200,
+      "min_certified_distance": 7.904695680798136e-05,
+      "is_synthetic": false,
+      "closest_relation": {
+        "a0": 37,
+        "a1": -3,
+        "a2": -4,
+        "distance": 7.904695680798136e-05
+      },
+      "status": "Certified: No integer relation exists in box |a1|, |a2| <= 50 (min distance 7.904696e-05 > 0).",
+      "search_domain_justification": "Checked a0 + a1*theta_1 + a2*theta_2 for (a1, a2) in [-B, B]^2 \\ {(0, 0)}. Nearest-integer reduction a0 = -round(L.mid()) exhaustively covers all a0 in Z because any other a0' satisfies |a0' + L| >= 1 - |a0 + L| > dist(L, Z)."
+    },
+    "pslq_search": {
+      "classification": "NUMERICAL_EVIDENCE_ONLY",
+      "dimension": 4,
+      "vector": [
+        "1",
+        "theta_1",
+        "theta_2",
+        "theta_3",
+        "theta_4"
+      ],
+      "pslq_result": null,
+      "status": "PSLQ found no relation (NUMERICAL_EVIDENCE_ONLY, not proof of linear independence)."
+    }
+  },
+  "transport_audit": {
+    "classification": "DERIVED_AND_VERIFIED",
+    "primary_run": {
+      "h": 1.0,
+      "prime_side": 0.40415687481930346,
+      "prime_side_details": {
+        "n_min": 3,
+        "n_max": 3,
+        "primes_in_support": 1,
+        "prime_powers_in_support": 0
+      },
+      "spectral_side": 0.40424922384774087,
+      "spectral_components": {
+        "phi_tilde_1": 0.4439938161680794,
+        "nontrivial_zero_sum": 0.018585440879361894,
+        "background_integral": 0.021159151440976652,
+        "background_series_15": 0.021159151440890957,
+        "background_series_35": 0.021159151440976652,
+        "background_discrepancy_M15": 8.569749571991239e-14,
+        "background_discrepancy_M35": 2.5541991071254624e-27,
+        "constant_zeta_prime_term": 0.0
+      },
+      "residual": 9.23490284374205e-05,
+      "error_budget": {
+        "zero_tail_bound_k2": 0.6431177095516725,
+        "zero_tail_bound_k3": 0.08946304209953174,
+        "zero_tail_bound_k4": 0.04524126020355759,
+        "rigorous_zero_tail_bound": 0.04524126020355759,
+        "bg_geometric_tail_bound_M15": 6.89169106645012e-11,
+        "bg_geometric_tail_bound_M35": 6.267956511192206e-23,
+        "discrepancy_enclosed_by_geometric_bound": true,
+        "residual_within_tail_budget": true
+      }
+    },
+    "multi_grade_runs": [
+      {
+        "h": 1.0,
+        "prime_side": 0.40415687481930346,
+        "prime_side_details": {
+          "n_min": 3,
+          "n_max": 3,
+          "primes_in_support": 1,
+          "prime_powers_in_support": 0
+        },
+        "spectral_side": 0.40424922384774087,
+        "spectral_components": {
+          "phi_tilde_1": 0.4439938161680794,
+          "nontrivial_zero_sum": 0.018585440879361894,
+          "background_integral": 0.021159151440976652,
+          "background_series_15": 0.021159151440890957,
+          "background_series_35": 0.021159151440976652,
+          "background_discrepancy_M15": 8.569749571991239e-14,
+          "background_discrepancy_M35": 2.5541991071254624e-27,
+          "constant_zeta_prime_term": 0.0
+        },
+        "residual": 9.23490284374205e-05,
+        "error_budget": {
+          "zero_tail_bound_k2": 0.6431177095516725,
+          "zero_tail_bound_k3": 0.08946304209953174,
+          "zero_tail_bound_k4": 0.04524126020355759,
+          "rigorous_zero_tail_bound": 0.04524126020355759,
+          "bg_geometric_tail_bound_M15": 6.89169106645012e-11,
+          "bg_geometric_tail_bound_M35": 6.267956511192206e-23,
+          "discrepancy_enclosed_by_geometric_bound": true,
+          "residual_within_tail_budget": true
+        }
+      },
+      {
+        "h": 0.5,
+        "prime_side": 0.4685897870069532,
+        "prime_side_details": {
+          "n_min": 5,
+          "n_max": 7,
+          "primes_in_support": 2,
+          "prime_powers_in_support": 0
+        },
+        "spectral_side": 0.46858652149276064,
+        "spectral_components": {
+          "phi_tilde_1": 0.4439938161680794,
+          "nontrivial_zero_sum": -0.02696500927233586,
+          "background_integral": 0.002372303947654666,
+          "background_series_15": 0.002372303947654666,
+          "background_series_35": 0.002372303947654666,
+          "background_discrepancy_M15": 8.391491521209937e-24,
+          "background_discrepancy_M35": 0.0,
+          "constant_zeta_prime_term": 0.0
+        },
+        "residual": 3.265514192573614e-06,
+        "error_budget": {
+          "zero_tail_bound_k2": 0.6431177095516725,
+          "zero_tail_bound_k3": 0.08946304209953174,
+          "zero_tail_bound_k4": 0.04524126020355759,
+          "rigorous_zero_tail_bound": 0.04524126020355759,
+          "bg_geometric_tail_bound_M15": 6.418387467460819e-21,
+          "bg_geometric_tail_bound_M35": 5.309165676936916e-45,
+          "discrepancy_enclosed_by_geometric_bound": true,
+          "residual_within_tail_budget": true
+        }
+      },
+      {
+        "h": 0.15915494309189535,
+        "prime_side": 0.4393681761613797,
+        "prime_side_details": {
+          "n_min": 13,
+          "n_max": 25,
+          "primes_in_support": 4,
+          "prime_powers_in_support": 2
+        },
+        "spectral_side": 0.4393715059636942,
+        "spectral_components": {
+          "phi_tilde_1": 0.4439938161680794,
+          "nontrivial_zero_sum": 0.004548066790185211,
+          "background_integral": 7.424341420007372e-05,
+          "background_series_15": 7.424341420007372e-05,
+          "background_series_35": 7.424341420007372e-05,
+          "background_discrepancy_M15": 0.0,
+          "background_discrepancy_M35": 0.0,
+          "constant_zeta_prime_term": 0.0
+        },
+        "residual": 3.3298023144584197e-06,
+        "error_budget": {
+          "zero_tail_bound_k2": 0.6431177095516725,
+          "zero_tail_bound_k3": 0.08946304209953174,
+          "zero_tail_bound_k4": 0.04524126020355759,
+          "rigorous_zero_tail_bound": 0.04524126020355759,
+          "bg_geometric_tail_bound_M15": 2.377991815188034e-37,
+          "bg_geometric_tail_bound_M35": 2.5575008963947895e-81,
+          "discrepancy_enclosed_by_geometric_bound": true,
+          "residual_within_tail_budget": true
+        }
+      },
+      {
+        "h": 0.025330295910584444,
+        "prime_side": 0.44322937927471007,
+        "prime_side_details": {
+          "n_min": 79,
+          "n_max": 157,
+          "primes_in_support": 16,
+          "prime_powers_in_support": 4
+        },
+        "spectral_side": 0.4432505475215781,
+        "spectral_components": {
+          "phi_tilde_1": 0.4439938161680794,
+          "nontrivial_zero_sum": 0.0007429703075454349,
+          "background_integral": 2.983389559093644e-07,
+          "background_series_15": 2.983389559093644e-07,
+          "background_series_35": 2.983389559093644e-07,
+          "background_discrepancy_M15": 0.0,
+          "background_discrepancy_M35": 0.0,
+          "constant_zeta_prime_term": 0.0
+        },
+        "residual": 2.1168246868030438e-05,
+        "error_budget": {
+          "zero_tail_bound_k2": 0.6431177095516725,
+          "zero_tail_bound_k3": 0.08946304209953174,
+          "zero_tail_bound_k4": 0.04524126020355759,
+          "rigorous_zero_tail_bound": 0.04524126020355759,
+          "bg_geometric_tail_bound_M15": 1.0804021055249306e-63,
+          "bg_geometric_tail_bound_M35": 1.3740297204561569e-139,
+          "discrepancy_enclosed_by_geometric_bound": true,
+          "residual_within_tail_budget": true
+        }
+      }
+    ],
+    "test_function": "exp(-1/((x-2)(4-x))) on [2, 4], C_c^infty((0, infty))",
+    "support": [
+      2.0,
+      4.0
+    ],
+    "num_zeros": 75,
+    "max_zero_ordinate": 192.0266563607138,
+    "mathematical_audit": {
+      "contour_shift_derivation": "Derived via Mellin inversion of -zeta'/zeta(s) * phi_tilde(s) * h^{1-s}. Contour shifted from Re(s)=c>1 to Re(s)-> -infty.",
+      "absence_of_pole_at_s_zero": "The Mellin integrand has no pole at s=0 because zeta(0) = -1/2 != 0 (making -zeta'/zeta holomorphic at s=0) and phi_tilde is entire. Therefore no residue is picked up at s=0. The product -zeta'(0)*phi_tilde(0)*h/zeta(0) is NOT identically zero for general bump functions; rather, it does not appear in the contour shift.",
+      "trivial_zero_integral_identity": "Proved identically B_h(phi) = sum_{j>=1} phi_tilde(-2j) h^{1+2j} == h int_1^infty phi(hx)/(x(x^2-1)) dx by expanding (x^2-1)^{-1} = sum x^{-2j} for x >= a/h > 1.",
+      "cycle12_inconsistency_resolved": "The Cycle 12 discrepancy of 8.57e-14 at h=1.0, M=15 is rigorously enclosed by the geometric tail bound ||phi||_L1 * (h/a)^33 / (1-(h/a)^2) <= 1.12e-11. For M=35, discrepancy is < 1e-25.",
+      "stieltjes_zero_tail_justification": "Derivation using Backlund/Trudgian bound N(t) <= (t/2pi) log t for t >= 14 and Stieltjes integration by parts: int_T^infty t^{-k} dN(t) <= (k/2pi) ((k-1)log T + 1) / ((k-1)^2 T^{k-1}). Bounded uniformly for all 0 <= beta <= 1 by Mellin derivative norms C_2=31, C_3=1200, C_4=135003."
+    }
+  },
+  "block_detectability_audit": {
+    "classification": "PROVED",
+    "theorem": "Quantitative Vandermonde Block Detectability with Explicit Remainder",
+    "r_modes": 4,
+    "off_line_delta": 0.25,
+    "off_line_gamma": 14.134725,
+    "norm_V_inv_inf": 5.442140275711227,
+    "block_constant_c": 0.1837512356054275,
+    "remainder_scale_tested": 0.0,
+    "grades_tested": 10,
+    "all_inequalities_satisfied": true,
+    "blocks": [
+      {
+        "grade_k": 0,
+        "max_block_S": 6.937281806048029,
+        "max_block_Y": 6.937281806048029,
+        "max_mode_amplitude": 1.0,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 0.1837512356054275,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 1,
+        "max_block_S": 12.518466119907647,
+        "max_block_Y": 12.518466119907647,
+        "max_mode_amplitude": 1.5832334870861595,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 0.2909211095039715,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 2,
+        "max_block_S": 12.518466119907647,
+        "max_block_Y": 12.518466119907647,
+        "max_mode_amplitude": 2.5066282746310007,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 0.4605960426669472,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 3,
+        "max_block_S": 12.518466119907647,
+        "max_block_Y": 12.518466119907647,
+        "max_mode_amplitude": 3.9685778240728027,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 0.7292310787696764,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 4,
+        "max_block_S": 46.6215348729074,
+        "max_block_Y": 46.6215348729074,
+        "max_mode_amplitude": 6.283185307179586,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 1.1545430637321166,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 5,
+        "max_block_S": 70.15279494269357,
+        "max_block_Y": 70.15279494269357,
+        "max_mode_amplitude": 9.94774938389446,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 1.827911240783737,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 6,
+        "max_block_S": 70.15279494269357,
+        "max_block_Y": 70.15279494269357,
+        "max_mode_amplitude": 15.749609945722419,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 2.8940102878300245,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 7,
+        "max_block_S": 111.35006615296916,
+        "max_block_Y": 111.35006615296916,
+        "max_mode_amplitude": 24.935309874612965,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 4.58189399966435,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 8,
+        "max_block_S": 310.7885555712513,
+        "max_block_Y": 310.7885555712513,
+        "max_mode_amplitude": 39.47841760435743,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 7.25420801454774,
+        "bound_positive": true,
+        "bound_satisfied": true
+      },
+      {
+        "grade_k": 9,
+        "max_block_S": 373.9665847136158,
+        "max_block_Y": 373.9665847136158,
+        "max_mode_amplitude": 62.50355276839045,
+        "max_remainder": 0.0,
+        "theoretical_lower_bound": 11.485105050920785,
+        "bound_positive": true,
+        "bound_satisfied": true
+      }
+    ],
+    "remainder_regimes": {
+      "zero_remainder": {
+        "remainder_norm": 0.0,
+        "lower_bound": 0.4605960426669472,
+        "detected": true
+      },
+      "subordinate_remainder": {
+        "remainder_norm": 0.09211920853338945,
+        "lower_bound": 0.3684768341335578,
+        "detected": true
+      },
+      "dominant_remainder": {
+        "remainder_norm": 0.6908940640004209,
+        "lower_bound": -0.2302980213334736,
+        "detected": false,
+        "note": "When remainder dominates, lower bound is negative and cannot certify mode presence."
+      }
+    },
+    "formal_basis": "formal/RiemannScope/Grade.lean (vandermonde_block_remainder_2, vandermonde_block_remainder_2_mode2, vandermonde_block_remainder_3, reconstruction_remainder_lower_bound)"
+  },
+  "infinite_extension_audit": {
+    "classification": "AUDITED_AND_STRUCTURED",
+    "aliasing_control": {
+      "fundamental_alias_frequency": 3.418719032962866,
+      "gamma_base": 14.134725141734693,
+      "gamma_aliased": 17.55344417469756,
+      "q_base": [
+        0.6636221095762818,
+        0.7480679753080769
+      ],
+      "q_aliased": [
+        0.6636221095762792,
+        0.7480679753080791
+      ],
+      "base_difference": 3.3839044131518772e-15,
+      "aliasing_confirmed": true,
+      "epistemic_warning": "Base non-aliasing is a mandatory condition for Vandermonde invertibility; verified for finite certified sets, but requires zero-specific separation theorem for infinite spectrum."
+    },
+    "paley_wiener_impossibility": {
+      "theorem": "Paley-Wiener / Jensen Zero-Density Non-Annihilation Theorem",
+      "entire_type_zero_bound": "n(r) <= (2 * B / log 2) * r = O(r) for test support in [a, b], B = max(|log a|, |log b|)",
+      "riemann_zero_counting": "N(r) ~ (r / pi) * log(r / (2*pi*e)) (Riemann-von Mangoldt formula)",
+      "growth_comparison": "lim_{r -> infty} N(r) / n(r) = infty",
+      "conclusion": "No test phi in C_c^infty((0, infty)) can annihilate all nontrivial zeros except a finite set without vanishing identically. Exact isolation via a single fixed test is strictly impossible."
+    },
+    "distributional_uniqueness_audit": {
+      "test_space": "C_c^infty((0, infty)) with standard LF inductive limit topology",
+      "distribution_space": "D'((0, infty)) (continuous linear functionals on C_c^infty((0, infty)))",
+      "uniqueness_of_distribution": "If <T, phi> = 0 for all phi in C_c^infty((0, infty)), then T = 0 in D'((0, infty)).",
+      "discrete_synthesis_gap": "Uniqueness of T as a distribution does NOT automatically establish unconditional convergence or uniqueness of an infinite exponential mode expansion T = sum_rho c_rho h^{1-rho} without a proved spectral synthesis theorem."
+    },
+    "collision_bridge_audit": {
+      "arithmetic_layers": "L_K = tau^K * Z for K in Z, tau = 2*pi",
+      "layer_disjointness": "L_K cap L_J = {0} for all K != J in Z, because tau is transcendental (Lindemann 1882)",
+      "continuous_observable": "Y_phi(k) is a continuous integral functional of the prime distribution at dilation h_k = tau^{-k}",
+      "missing_bridge_obligation": "Even if an off-line zero (beta != 1/2) produces an exponentially growing observable Y_phi(k), there is no proved prime-zeta theorem establishing that Y_phi(k) must belong to L_K, nor that Y_phi(k) = Y_phi(j) forces a non-zero lattice point collision m * tau^K = n * tau^J. Deriving this implication would prove the Riemann Hypothesis. Neither coordinate preservation nor arithmetic layer separation provides this implication by itself.",
+      "status": "OPEN_RESEARCH_PROBLEM"
+    }
+  }
+}
