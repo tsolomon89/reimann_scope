@@ -3494,10 +3494,10 @@ def find_farey_witness_coverage(
             return fractions.Fraction(val, 1)
         if isinstance(val, str):
             return fractions.Fraction(val)
-        if FLINT_AVAILABLE and arb is not None:
-            if isinstance(val, flint.fmpq):
+        if FLINT_AVAILABLE and flint is not None and arb is not None:
+            if hasattr(flint, "fmpq") and isinstance(val, flint.fmpq):
                 return fractions.Fraction(int(val.p), int(val.q))
-            if isinstance(val, flint.arb):
+            if isinstance(val, arb):
                 if is_upper:
                     q = val.upper().fmpq()
                 else:
@@ -3570,8 +3570,8 @@ def find_farey_witness_coverage(
     # If an Arb ball is explicitly provided, verify strict positivity directly on the ball
     if arb_ball is not None and FLINT_AVAILABLE and arb is not None:
         try:
-            diff_left = arb_ball - (flint.arb(a) / flint.arb(b))
-            diff_right = (flint.arb(c) / flint.arb(d)) - arb_ball
+            diff_left = arb_ball - (arb(a) / arb(b))
+            diff_right = (arb(c) / arb(d)) - arb_ball
             if not (diff_left.lower().fmpq().p > 0 and diff_right.lower().fmpq().p > 0):
                 return None, f"Arb ball enclosure strict separation check failed against ({a}/{b}, {c}/{d})"
         except Exception as e:
@@ -3683,8 +3683,12 @@ def certify_bounded_rational_exclusion_arb(
     Constructs an explicit, replayable Farey neighbor witness (a/b, c/d) with bc - ad = 1 and b + d > Q
     such that a/b < lower(theta_j) <= upper(theta_j) < c/d in certified exact rational arithmetic.
     """
-    if not FLINT_AVAILABLE or ctx is None or arb is None:
+    if not FLINT_AVAILABLE or flint is None or ctx is None or arb is None:
         return {"status": "FLINT_UNAVAILABLE", "classification": "INCONCLUSIVE"}
+
+    assert ctx is not None
+    assert arb is not None
+    assert flint is not None
 
     old_prec = ctx.prec
     try:
@@ -3725,8 +3729,8 @@ def certify_bounded_rational_exclusion_arb(
 
             a, b, c, d = witness
             achieved_q = b + d
-            diff_left = theta - (flint.arb(a) / flint.arb(b))
-            diff_right = (flint.arb(c) / flint.arb(d)) - theta
+            diff_left = theta - (arb(a) / arb(b))
+            diff_right = (arb(c) / arb(d)) - theta
             dist_left = float(diff_left.lower())
             dist_right = float(diff_right.lower())
             min_dist = min(dist_left, dist_right)
