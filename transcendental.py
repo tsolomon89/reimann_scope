@@ -3704,7 +3704,7 @@ def certify_bounded_rational_exclusion_arb(
         tau_val = 2 * pi_val
         c_tau = tau_val.log() / tau_val
 
-        results = []
+        results: List[Dict[str, Any]] = []
         all_certified = True
         min_overall_err = 1.0
 
