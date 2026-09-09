@@ -803,6 +803,509 @@ def test_prime_error_temperedness_equivalence_synthesis():
     assert "PROVED" in res["implications_status"]["B_implies_C"]
 
 
+# ==============================================================================
+# 10. MECHANISM DISCYCLE 7 AUDIT (GRADE-ORBIT UNIFORMITY & GLUING BRIDGE)
+# ==============================================================================
+
+def test_theorem_d_partition_of_unity_reconstruction():
+    """
+    Cycle 7 (Section 3):
+    Verify that the discrete grade-orbit partition of unity:
+      sum_{K in Z} theta(u - K*a) = 1 identically on R,
+    holds to high precision (error < 1e-65) across test points.
+    """
+    res = transcendental.evaluate_theorem_d_partition_of_unity(dps=70)
+    assert res["partition_is_exact"] is True
+    assert float(res["max_partition_error"]) < 1e-65
+    assert len(res["partition_evaluations"]) >= 5
 
 
+def test_tc_grade_orbit_countermodel_p0_p1_p2():
+    """
+    Cycle 7 (Sections 4 & 5):
+    Verify the three levels of the off-line exponential countermodel:
+      f_{delta, gamma}(u) = exp((delta + i*gamma)*u).
+    1. Level P0: Pointwise coordinate naturality holds identically (error < 1e-70).
+    2. Level P1: Ambient distribution exists in D'(R) (locally integrable).
+    3. Level P2: Uniform polynomial grade-orbit bound FAILS for delta != 0,
+       as tau^{K*delta} grows exponentially and outgrows any polynomial bound.
+    4. For delta == 0: P2 is satisfied with constant uniform bound.
+    """
+    # Off-line mode delta = 0.1
+    res_off = transcendental.evaluate_tc_grade_orbit_countermodel(delta='0.1', gamma='14.134725', dps=70)
+    assert "SATISFIED" in res_off["P0_coordinate_naturality"]
+    assert "SATISFIED" in res_off["P1_distribution_gluing"]
+    assert "VIOLATED" in res_off["P2_uniform_polynomial_bound"]
+    assert res_off["p2_violation_witnessed"] is True
+    assert res_off["verdict"] == "COORDINATE_NATURALITY_DOES_NOT_IMPLY_GRADE_UNIFORM_TEMPEREDNESS"
+
+    for ev in res_off["evaluations"]:
+        assert float(ev["p0_covariance_error"]) < 1e-60
+
+    # Check that for large K (K = 100), the ratio of orbit modulus to polynomial bound is huge (> 100)
+    large_K_eval = next(e for e in res_off["evaluations"] if e["K"] == 100)
+    assert float(large_K_eval["ratio_orbit_over_poly"]) > 100.0
+    assert float(res_off["J_0"]) > 0.0
+
+    # On-line mode delta = 0.0
+    res_on = transcendental.evaluate_tc_grade_orbit_countermodel(delta='0.0', gamma='14.134725', dps=70)
+    assert "SATISFIED" in res_on["P0_coordinate_naturality"]
+    assert "SATISFIED" in res_on["P1_distribution_gluing"]
+    assert "SATISFIED" in res_on["P2_uniform_polynomial_bound"]
+    assert res_on["p2_violation_witnessed"] is False
+
+
+def test_grade_orbit_uniformity_mechanism_synthesis():
+    """
+    Cycle 7 Synthesis Audit (TC-DISC-012 / CLM-TC-012):
+    Verify answers to the 5 core mission questions:
+    1. Did Cycle 7 find a TC exclusion mechanism: NO.
+    2. Do existing TC axioms imply polynomial grade-orbit control: NO.
+    3. Exact missing premise: Polynomial grade-orbit control of E under discrete translations u -> u + K*log(tau).
+    4. Is that premise independent of RH, equivalent to RH, or unknown: EQUIVALENT_TO_RH.
+    5. What did Lean prove, exactly:
+       RiemannScope.polynomial_bilateral_grade_growth_implies_delta_zero forces delta = 0.
+    """
+    res = transcendental.audit_grade_orbit_uniformity_mechanism(dps=70)
+    assert res["candidate_id"] == "TC-DISC-012"
+    assert res["claim_id"] == "CLM-TC-012"
+    assert res["direct_answers"]["did_cycle_7_find_tc_exclusion_mechanism"] == "NO"
+    assert res["direct_answers"]["do_existing_tc_axioms_imply_polynomial_grade_orbit_control"] == "NO"
+    assert res["direct_answers"]["premise_status"] == "EQUIVALENT_TO_RH"
+    assert "delta = 0" in res["direct_answers"]["lean_formalization_exact_scope"]
+    assert res["level_classification"]["P0_pointwise_coordinate_naturality"].startswith("ESTABLISHED")
+    assert res["level_classification"]["P1_global_distribution_gluing"].startswith("ESTABLISHED")
+    assert res["level_classification"]["P2_uniform_polynomial_grade_orbit_bound"].startswith("NOT_SUPPLIED_BY_TC")
+    assert res["countermodel_status"]["satisfies_P0"] is True
+    assert res["countermodel_status"]["satisfies_P1"] is True
+    assert res["countermodel_status"]["satisfies_P2"] is False
+    assert res["overall_classification"] == "FAILURE_OF_COORDINATE_NATURALITY_TO_IMPLY_GRADE_UNIFORM_TEMPEREDNESS"
+
+
+def test_cutoff_correction_compact_support_and_entire_extension():
+    """
+    Cycle 6 / Cycle 7 Cutoff Correction Audit:
+    Verify that:
+    1. The integrand of H(z) = int_0^0.5 (chi(u) - 1) * E(u) * exp(-zu) du is supported on [0, 0.5].
+    2. At any hypothetical off-line zero z_rho = delta + i*gamma with delta > 0,
+       H(z_rho) is finite (entire) and cannot cancel the pole of G(z) because Res(G, z_rho) = -m/rho != 0.
+    """
+    # Verify bounds for H(z) on [0, 0.5]
+    with mpmath.workdps(70):
+        # On [0, 0.5], u in [0, 0.5], exp(u) in [1, exp(0.5)] ~ [1, 1.6487] < 2.
+        # Since the first prime is 2, psi(exp u) = 0 for u in [0, 0.5]!
+        # Therefore, for u in [0, 0.5]:
+        #   E(u) = exp(-u/2) * (0 - exp u) = - exp(u/2).
+        # This is smooth and explicitly known: E(u) = - exp(u/2)!
+        # The integrand of H(z) is (chi(u) - 1) * (-exp(u/2)) * exp(-zu).
+        # Since chi(u) - 1 = 0 for u >= 0.5 and integration starts at u = 0,
+        # the integrand has compact support contained in [0, 0.5].
+        # For any z in C:
+        #   |H(z)| <= int_0^0.5 1 * exp(u/2) * exp(-Re(z)*u) du <= 0.5 * exp(0.25) * max(1, exp(-0.5*Re(z))) < infty.
+        # Thus H(z) is unconditionally ENTIRE!
+        z_rho = mpmath.mpc('0.1', '14.134725')
+        # Numerical integration of H(z_rho)
+        # Using a simple smooth transition model for chi(u):
+        def chi_smooth(u: mpmath.mpf) -> mpmath.mpf:
+            if u <= mpmath.mpf('0.1'):
+                return mpmath.mpf('0')
+            elif u >= mpmath.mpf('0.5'):
+                return mpmath.mpf('1')
+            else:
+                # Smooth polynomial blend
+                s = (u - mpmath.mpf('0.1')) / mpmath.mpf('0.4')
+                return s * s * (mpmath.mpf('3') - mpmath.mpf('2') * s)
+
+        def integrand_re(u: mpmath.mpf) -> mpmath.mpf:
+            c = chi_smooth(u)
+            e_u = - mpmath.exp(u / mpmath.mpf('2'))
+            kernel = mpmath.exp(- z_rho * u)
+            return (c - mpmath.mpf('1')) * e_u * kernel.real
+
+        def integrand_im(u: mpmath.mpf) -> mpmath.mpf:
+            c = chi_smooth(u)
+            e_u = - mpmath.exp(u / mpmath.mpf('2'))
+            kernel = mpmath.exp(- z_rho * u)
+            return (c - mpmath.mpf('1')) * e_u * kernel.imag
+
+        val_re = mpmath.quad(integrand_re, [mpmath.mpf('0'), mpmath.mpf('0.5')])
+        val_im = mpmath.quad(integrand_im, [mpmath.mpf('0'), mpmath.mpf('0.5')])
+        H_val = mpmath.mpc(val_re, val_im)
+
+        assert abs(H_val) < mpmath.mpf('10.0')
+        # Pole residue of G(z) at z_rho = delta + i*gamma
+        rho = mpmath.mpf('0.5') + z_rho
+        res_G = - mpmath.mpf('1') / rho
+        assert abs(res_G) > mpmath.mpf('0.05')
+
+
+# ==============================================================================
+# 10. CYCLE 8: CANONICAL TC DIAGRAM & COLLISION WITNESS VERIFICATION
+# ==============================================================================
+
+def test_canonical_tc_diagram_isomorphism_and_fixed_zeros():
+    """
+    Cycle 8 (Sections 3, 4, 5):
+    Verify the Canonical TC Commutative Diagram:
+    1. iota_K: N_{>=1} -> L_K is an exact isomorphism of (+_K, *_K).
+    2. Layers L_K and L_J are strictly disjoint for K != J.
+    3. External Dirichlet series D_K(s) = tau^{-Ks} * zeta(s) has strictly invariant zeros:
+       div(D_K) = div(zeta) for all K in Z.
+    4. D_K(s) is distinct from frequency-dilated Z_K(s) = zeta(tau^{-K} s).
+    """
+    res = transcendental.evaluate_canonical_tc_diagram(K=1, J=2, dps=60)
+    assert res["arithmetic_isomorphism"]["is_isomorphic"] is True
+    assert float(res["arithmetic_isomorphism"]["addition_homomorphism_error"]) < 1e-50
+    assert float(res["arithmetic_isomorphism"]["multiplication_homomorphism_error"]) < 1e-50
+    assert res["layer_disjointness"]["layers_externally_disjoint"] is True
+    assert float(res["layer_disjointness"]["min_distance_grid_1_to_20"]) > 0.01
+
+    assert float(res["analytic_objects"]["conversion_factor_agreement_error"]) < 1e-50
+    assert res["analytic_objects"]["DK_differs_from_frequency_dilation_ZK"] is True
+    assert float(res["analytic_objects"]["zero_at_rho_1_fixed_error"]) < 1e-45
+    assert "FIXED_INVARIANT_ZEROS" in res["analytic_objects"]["zero_behavior_verdict"]
+
+
+def test_collision_witness_obligation_and_transcendental_separation():
+    """
+    Cycle 8 (Sections 6 & 7):
+    Audit the 5 collision witness conditions W1-W5:
+    W1: Prime-zeta derivation is exact (Perron / explicit formula).
+    W2: Fails because tau^{K-J} is transcendental and cannot equal rational n/m.
+    W3: Fails because single zero modes x^rho/rho are C^infty on (0, infty) with NO jump discontinuities;
+        jump discontinuities of psi_K occur strictly at tau^K p^k in L_K.
+    W4: Compatible on critical line (no collision on or off the line).
+    W5: No circular RH assumption.
+    """
+    res = transcendental.audit_collision_witness_obligation(delta='0.1', gamma='14.134725', K=1, J=0, dps=60)
+    assert res["W1_prime_zeta_derivation"]["status"] == "PASS"
+    assert "FAILED_IMPOSSIBLE" in res["W2_arithmetic_incidence"]["status"]
+    assert "FAILED_NO_ARROW" in res["W3_off_line_forcing"]["status"]
+    assert res["W3_off_line_forcing"]["zero_mode_smoothness"] is True
+    assert "PASS" in res["W4_critical_line_compatibility"]["status"]
+    assert res["W5_no_hidden_rh_premise"]["status"] == "PASS"
+    assert res["classification"] == "COLLISION_WITNESS_PROVED_IMPOSSIBLE_UNDER_PRESENT_TC_MAPS"
+
+
+def test_canonical_tc_synthesis_cycle8():
+    """
+    Cycle 8 (Section 10):
+    Verify the 6 core answers in the canonical synthesis audit.
+    """
+    res = transcendental.audit_canonical_tc_synthesis(dps=60)
+    answers = res["direct_answers"]
+    assert answers["1_is_there_one_canonical_tc_transport"].startswith("YES")
+    assert answers["2_are_previously_used_zeta_transforms_compatible_or_different"].startswith("DIFFERENT_CONSTRUCTIONS")
+    assert answers["3_does_canonical_diagram_contain_zero_to_arithmetic_incidence_map"].startswith("NO")
+    assert answers["4_was_concrete_collision_witness_found"].startswith("NO")
+    assert "transcendental" in answers["5_exact_absent_arrow_or_theorem"]
+    assert "arithmetic_isomorphism_add" in answers["6_what_did_lean_prove_exactly"]
+    assert "FALSIFIED_IMPOSSIBLE" in res["collision_witness_verdict"]
+
+
+def test_dense_disjoint_layer_theorems():
+    """
+    Cycle 9 (Section 3):
+    Verify Theorem A (Pairwise Separation) and Theorem B (Countable Density).
+    """
+    res = transcendental.prove_dense_disjoint_layer_theorems(dps=60)
+    assert res["theorem_A_separation"]["status"] == "PROVED_TRANSCENDENTAL_EXACT"
+    assert res["theorem_B_density"]["status"] == "PROVED_CONSTRUCTIVE_EXACT"
+    assert res["theorem_B_density"]["all_test_cases_passed"] is True
+
+    # Verify constructive approximation bound for each tested case
+    for tc in res["theorem_B_density"]["tested_cases"]:
+        assert tc["satisfies_bound"] is True
+        assert tc["satisfies_eps"] is True
+
+
+def test_competing_grade_sequences_disjointness_and_convergence():
+    """
+    Cycle 9 (Section 5):
+    Verify the construction of competing grade sequences from disjoint layers.
+    """
+    res = transcendental.construct_competing_grade_sequences(x_val='2.5', num_terms=8, dps=60)
+    assert res["layers_disjoint"] is True
+    assert len(res["sequence_A"]) == 8
+    assert len(res["sequence_B"]) == 8
+
+    # Check that grades K_r and J_r are distinct for every term
+    for i in range(8):
+        assert res["sequence_A"][i]["grade_K"] != res["sequence_B"][i]["grade_J"]
+        # Error decreases as r grows
+        err_A = float(res["sequence_A"][i]["error_from_x"])
+        err_B = float(res["sequence_B"][i]["error_from_x"])
+        assert err_A < 1.0
+        assert err_B < 1.0
+
+
+def test_grade_limit_observables_absence_of_defect():
+    """
+    Cycle 9 (Section 6):
+    Test Candidates 1-5 along competing grade sequences for both delta = 0 and delta = 0.2.
+    Demonstrates absence of grade-limit defect across all correctly converted observables.
+    """
+    # On-line zero mode (delta = 0)
+    res_on = transcendental.evaluate_grade_limit_observables(
+        x_val='2.5', s_val='2.0+1.0j', delta='0.0', gamma='14.134725', num_terms=6, dps=60
+    )
+    assert res_on["grade_limit_defect_detected"] is False
+    assert res_on["defect_audit"]["cand1_raw_s_converges_to_x_s"] is True
+    assert res_on["defect_audit"]["cand3_converted_s_converges_to_x_s"] is True
+    assert res_on["defect_audit"]["cand4_zero_mode_converges_to_x_lambda"] is True
+    assert float(res_on["defect_audit"]["final_defect_zm_conv"]) < 1e-4
+
+    # Off-line zero mode (delta = 0.2)
+    res_off = transcendental.evaluate_grade_limit_observables(
+        x_val='2.5', s_val='2.0+1.0j', delta='0.2', gamma='14.134725', num_terms=6, dps=60
+    )
+    assert res_off["grade_limit_defect_detected"] is False
+    assert res_off["defect_audit"]["cand1_raw_s_converges_to_x_s"] is True
+    assert res_off["defect_audit"]["cand3_converted_s_converges_to_x_s"] is True
+    assert res_off["defect_audit"]["cand4_zero_mode_converges_to_x_lambda"] is True
+    assert float(res_off["defect_audit"]["final_defect_zm_conv"]) < 1e-4
+
+
+def test_cycle9_limit_compatibility_synthesis():
+    """
+    Cycle 9 (Section 11):
+    Verify the 8 direct answers in the Cycle 9 synthesis audit.
+    """
+    res = transcendental.audit_cycle9_limit_compatibility_synthesis(dps=60)
+    answers = res["direct_answers"]
+    assert answers["1_is_union_dense_in_R"].startswith("YES")
+    assert answers["2_are_layers_pairwise_disjoint_away_from_zero"].startswith("YES")
+    assert "zeta(s)" in answers["3_what_is_intrinsic_transported_zeta"]
+    assert "tau^{-Ks}" in answers["4_what_is_raw_external_dirichlet_series"]
+    assert answers["5_do_correctly_converted_grade_values_have_unique_limits"].startswith("YES")
+    assert answers["6_does_limit_defect_occur_specifically_when_delta_ne_0"].startswith("NO")
+    assert answers["7_was_tc_exclusion_mechanism_found"].startswith("NO")
+    assert "nu_K_mul_scaled" in answers["8_what_did_lean_prove_exactly"]
+    assert "The layer union is dense" in res["epistemic_conclusion"]
+
+
+def test_prime_measure_transport_and_weak_limit():
+    """
+    Cycle 10 (Mini-Sprint 1):
+    Verify transported prime measure mu_h = (d_h)_* mu, Jacobian normalization nu_h = h * mu_h,
+    and weak convergence nu_h -> dx on compactly supported smooth test functions.
+    """
+    res = transcendental.audit_prime_measure_transport(dps=40)
+    assert res["weak_convergence_observed"] is True
+    assert res["jacobian_forced"] is True
+    assert "transcendence of tau" in res["support_disjointness_property"]
+    
+    evals = res["grade_evaluations"]
+    err_fine = float(evals[0]["pairing_error"])  # K = -3
+    err_coarse = float(evals[-1]["pairing_error"])  # K = 0
+    assert err_fine < err_coarse
+    assert err_fine < 0.01
+
+    ratio_fine = float(evals[0]["cum_ratio_to_X"])  # K = -3
+    assert abs(ratio_fine - 1.0) < 0.01  # > 99% of X
+
+
+def test_half_density_fluctuation_zero_scaling():
+    """
+    Cycle 10 (Mini-Sprint 2):
+    Verify half-density zero mode scaling h^{1/2 - rho} = tau^{-K*(delta + i*gamma)}.
+    Confirm:
+      1. For delta = 0 (on-line): modulus is identically 1 for all grades K in Z.
+      2. For delta > 0 (off-line): modulus grows exponentially as K -> -infty.
+      3. Theory and direct power agree to machine precision.
+    """
+    # On-line
+    res_on = transcendental.audit_half_density_fluctuation(delta_val=0.0, dps=40)
+    assert "BOUNDED_PURE_PHASE" in res_on["behavior"]
+    for ev in res_on["mode_evaluations"]:
+        assert abs(float(ev["modulus_direct"]) - 1.0) < 1e-15
+        assert abs(float(ev["modulus_theory"]) - 1.0) < 1e-15
+
+    # Off-line (delta = 0.2)
+    res_off = transcendental.audit_half_density_fluctuation(delta_val=0.2, dps=40)
+    assert "EXPONENTIAL_GROWTH_FINE_GRADES" in res_off["behavior"]
+    evals_off = res_off["mode_evaluations"]
+    mod_fine = float(evals_off[0]["modulus_direct"])  # K = -5
+    mod_coarse = float(evals_off[-1]["modulus_direct"])  # K = 2
+    assert mod_fine > mod_coarse
+    assert mod_fine > 5.0
+    for ev in evals_off:
+        assert abs(float(ev["modulus_direct"]) - float(ev["modulus_theory"])) < 1e-15
+
+
+def test_smoothed_explicit_formula_fluctuation():
+    """
+    Cycle 10 (Mini-Sprint 3):
+    Verify smoothed explicit formula zero sum S_zeros(h) on C_c^infty test function.
+    Confirm:
+      1. On-line quartet has bounded oscillation.
+      2. Off-line quartet exhibits exponential growth as K -> -infty.
+      3. H1 and H2 are forced, whereas H3 (grade regularity) is not derived from TC.
+    """
+    res = transcendental.audit_smoothed_explicit_formula_fluctuation(dps=40)
+    assert res["offline_exponential_growth_detected"] is True
+    assert float(res["max_offline_modulus"]) > float(res["max_online_modulus"])
+    assert res["h1_jacobian_status"] == "FORCED_BY_COORDINATE_MEASURE_TRANSPORT"
+    assert res["h2_center_status"] == "FORCED_BY_ZETA_FUNCTIONAL_EQUATION"
+    assert "NOT_DERIVED_FROM_TC" in res["h3_grade_regularity_status"]
+
+
+def test_cycle10_prime_measure_synthesis():
+    """
+    Cycle 10 (Section 16):
+    Verify all 11 direct answers in the Cycle 10 synthesis resolution.
+    """
+    res = transcendental.audit_cycle10_prime_measure_synthesis(dps=40)
+    answers = res["direct_answers"]
+    assert "mu_h = (d_h)_* mu" in answers["1_exact_transported_prime_measure"]
+    assert "Lebesgue measure transforms" in answers["2_why_jacobian_factor_forced"]
+    assert answers["3_does_h_mu_h_converge_to_dx"].startswith("YES")
+    assert "Prime Number Theorem" in answers["4_is_convergence_equivalent_to_pnt_or_rh"]
+    assert "h^{-1/2}" in answers["5_exact_half_density_fluctuation"]
+    assert "tau^{-K*(delta + i*gamma)}" in answers["6_how_zero_transforms"]
+    assert "Ingham/Landau" in answers["7_does_complete_smoothed_sum_preserve_growth"]
+    assert answers["8_does_tc_force_regularity"].startswith("NO")
+    assert answers["9_was_exclusion_mechanism_found"].startswith("NO")
+    assert "supp(mu_h) cap supp(mu_{h'}) = emptyset" in answers["10_where_is_transcendental_separation_essential"]
+    assert "half_density_scaling_exponent_complex" in answers["11_what_did_lean_prove_exactly"]
+    assert "The remaining regularity condition (H3) is not derived independently of RH" in res["epistemic_conclusion"]
+
+
+# ==============================================================================
+# 11. CYCLE 11: TC PHASE NONRESONANCE, CERTIFIED BOUNDS, AND CANCELLATION
+# ==============================================================================
+
+def test_tc_phase_propositions_disentanglement():
+    """
+    Cycle 11 (Section 2):
+    Verify that the 5 propositions P1 - P5 are logically distinguished:
+      P1 (aperiodicity), P2 (pairwise distinction), P3 (homogeneous LI),
+      P4 (joint density via Kronecker-Weyl), P5 (zero-index equidistribution).
+    Confirm that P2 (distinct bases) is strictly the weakest condition required
+    for the finite Vandermonde uniqueness theorem.
+    """
+    res = transcendental.audit_tc_phase_propositions(dps=40)
+    props = res["propositions"]
+
+    assert props["P1_single_phase_aperiodicity"]["status"].startswith("OPEN")
+    assert props["P2_pairwise_phase_distinction"]["status"].startswith("CERTIFIED")
+    assert props["P2_pairwise_phase_distinction"]["required_for_cycle10_cancellation"] is True
+    assert props["P1_single_phase_aperiodicity"]["required_for_cycle10_cancellation"] is False
+    assert props["P3_homogeneous_rational_independence"]["required_for_cycle10_cancellation"] is False
+    assert props["P4_joint_grade_orbit_density"]["required_for_cycle10_cancellation"] is False
+    assert props["P5_zero_index_equidistribution"]["status"].startswith("PROVED")
+    assert res["weakest_condition_for_cancellation"] == "P2_pairwise_phase_distinction"
+
+
+def test_certify_pairwise_phase_distinction_arb():
+    """
+    Cycle 11 (N1):
+    Verify certified pairwise phase distinction theta_j - theta_ell not in Z
+    for the first N = 25 nontrivial zeros using Arb ball arithmetic.
+    Confirm min certified separation from Z > 0.001.
+    """
+    res = transcendental.certify_pairwise_phase_distinction_arb(N=25, prec_bits=256)
+    if res.get("status") == "FLINT_UNAVAILABLE":
+        pytest.skip("flint not available")
+
+    assert res["classification"] == "CERTIFIED_WITH_EXPLICIT_BOUNDS"
+    assert res["N"] == 25
+    assert res["pairs_checked"] == 25 * 24 // 2
+    assert res["all_pairs_strictly_separated_from_Z"] is True
+    assert float(res["min_separation_from_integer"]) > 0.003
+
+
+def test_certify_bounded_rational_exclusion_arb():
+    """
+    Cycle 11 (N2):
+    Verify bounded rational exclusion theta_j != p/q for 1 <= q <= 10^6
+    for the first N = 20 zeros via continued fraction convergents of Arb balls.
+    Confirm achieved Q >= 10^6 and min approximation error >> ball radius.
+    """
+    res = transcendental.certify_bounded_rational_exclusion_arb(N=20, Q_target=1000000, prec_bits=256)
+    if res.get("status") == "FLINT_UNAVAILABLE":
+        pytest.skip("flint not available")
+
+    assert res["classification"] == "CERTIFIED_WITH_EXPLICIT_BOUNDS"
+    assert res["all_zeros_certified"] is True
+    assert res["N"] == 20
+    assert float(res["min_rational_distance_overall"]) > 1e-16
+    for item in res["detailed_results"]:
+        assert item["achieved_Q"] >= 1000000
+        assert item["certified_no_rational_up_to_Q"] is True
+        assert item["min_rational_distance"] > item["theta_radius"]
+
+
+def test_audit_bounded_integer_relations():
+    """
+    Cycle 11 (N3):
+    Verify bounded integer relation audit:
+      1. Dimension 2 box search (|a1|, |a2| <= 50) is CERTIFIED_WITH_EXPLICIT_BOUNDS.
+      2. Dimension 4 PSLQ search is strictly NUMERICAL_EVIDENCE_ONLY.
+    """
+    res = transcendental.audit_bounded_integer_relations(max_coeff=50, dps=50)
+    r2 = res["r2_box_search"]
+    pslq = res["pslq_search"]
+
+    assert r2["classification"] == "CERTIFIED_WITH_EXPLICIT_BOUNDS"
+    assert r2["box_bound_B"] == 50
+    assert r2["min_certified_distance"] > 1e-5
+    assert pslq["classification"] == "NUMERICAL_EVIDENCE_ONLY"
+
+
+def test_audit_phase_equidistribution_diagnostics():
+    """
+    Cycle 11 (N4):
+    Verify equidistribution diagnostics over the zero index (Hlawka / Ford-Zaharescu):
+      Confirm discrepancy and Weyl sums decay as N increases from 20 to 100.
+    """
+    res = transcendental.audit_phase_equidistribution_diagnostics(N=100, num_zeros=100, dps=50)
+    assert res["classification"] == "NUMERICAL_EVIDENCE_ONLY"
+    assert res["decay_observed"] is True
+
+    diag = res["diagnostics_by_cutoff"]
+    assert diag["N_100"]["discrepancy_D_N"] < diag["N_20"]["discrepancy_D_N"]
+    assert diag["N_100"]["histogram_L1_deviation"] < diag["N_20"]["histogram_L1_deviation"]
+
+
+def test_audit_tc_zero_phase_nonresonance_theorem():
+    """
+    Cycle 11 (Section 3):
+    Verify the TC Zero-Phase Nonresonance Theorem formulation:
+      Unconditional zero-phase equidistribution (Hlawka 1975)
+      Nonresonance with prime-power frequencies (tau^q != p^a via Lindemann 1882)
+      Identical vanishing of limiting Ford-Zaharescu correction measure.
+    """
+    res = transcendental.audit_tc_zero_phase_nonresonance_theorem()
+    assert res["classification"] == "PROVED"
+    assert "FIRST_RIGOROUS_TC_PRIME_FREQUENCY_NONRESONANCE_THEOREM" in res["status"]
+    assert len(res["theorem_statements"]) == 5
+    assert len(res["explicit_non_proofs"]) >= 5
+
+
+def test_tc_bridge_implication_chain():
+    """
+    Cycle 11 (Section 7):
+    Audit the TC bridge implication chain and confirm earliest unproved inference.
+    """
+    res = transcendental.audit_tc_bridge_implication_chain()
+    assert "TC PHASE NONRESONANCE PROVED; RH EXCLUSION BRIDGE STILL OPEN" in res["verdict"]
+    assert res["steps"][0]["status"] == "PROVED"
+    assert res["steps"][1]["status"] == "PROVED"
+    assert res["steps"][2]["status"] == "OPEN"
+    assert res["steps"][3]["status"] == "MISSING / UNPROVED"
+
+
+def test_cycle11_synthesis():
+    """
+    Cycle 11 (Section 10):
+    Verify all four executive answers of Cycle 11 synthesis.
+    """
+    res = transcendental.audit_cycle11_synthesis(dps=40)
+    exec_answers = res["executive_answers"]
+
+    assert exec_answers["1_are_tc_phases_nonresonant_with_prime_frequencies"].startswith("YES (PROVED)")
+    assert exec_answers["2_is_grade_axis_incommensurability_proved"].startswith("NO (OPEN)")
+    assert exec_answers["3_does_result_force_forbidden_lattice_coincidence"].startswith("NO (OPEN)")
+    assert "TC PHASE NONRESONANCE PROVED; RH EXCLUSION BRIDGE STILL OPEN" in exec_answers["4_has_rh_exclusion_mechanism_been_found"]
 

@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-012",
+  "statement": "Theorem D (Discrete Grade-Orbit Temperedness Criterion) and Failure of Coordinate Naturality to Imply Grade-Uniform Temperedness: Let a = log(tau) > 0 with tau = 2*pi. For any distribution T in D'(R), T extends continuously to S'(R) if and only if there exist constants C > 0, integers N, m >= 0, and a compact neighborhood I such that for all K in Z and all phi in C_c^infty(I), |<T, phi(.-Ka)>| <= C (1 + |K|)^N ||phi||_{C^m(I)}. The proof is analytical (Schwartz 1951, Chap. VII; Hormander 1983, Thm 7.1.14) via a smooth partition of unity sum_{K in Z} theta(u - Ka) = 1 subordinate to aZ. For the normalized Chebyshev prime error E(u) = exp(-u/2)(psi(exp u) - exp u), this yields the conditional equivalence chain: GradeOrbitBound(E) <=> T_E in S'(R) <=> RH. In the transcendental continuation (TC) axiom hierarchy: Level P0 (Pointwise Coordinate Naturality: exact invertible grade translation u' = u + Ka) and Level P1 (Global Distribution Gluing: grade slices embed as pullbacks of an ambient distribution in D'(R)) are satisfied by existing TC for all modes, including off-critical modes f_{delta,gamma}(u) = exp((delta + i*gamma)u) with delta != 0. Choosing a certified test function phi in C_c^infty(I) with support radius epsilon <= 1/(2*(1+|gamma|)) guarantees Re int_I exp((delta+i*gamma)v) phi(v) dv > 0, precluding phase cancellation. Level P2 (Uniform Finite-Order Polynomial Grade-Orbit Bound) is strictly violated by the off-line mode, whose grade orbit |<T_f, phi(.-Ka)>| = tau^{K*delta}|J_0| grows exponentially in whichever direction sgn(K) = sgn(delta), outgrowing any polynomial in K. Thus, P0 + P1 does not imply P2. This countermodel scopes strictly to coordinate naturality and ambient gluing; it does not automatically disprove a bridge from the complete Euler product or explicit formula. Lean formalizes the priority bilateral theorem: polynomial_bilateral_grade_growth_implies_delta_zero (any bilateral polynomial bound on exp(K*delta*log tau) forces delta = 0 for tau > 1). Therefore, existing TC axioms do not imply the uniform grade-orbit control needed for temperedness; for prime arithmetic, polynomial grade-orbit control is strictly equivalent to RH.",
+  "quantified_variables": [
+    {
+      "name": "u",
+      "domain": "u in Real",
+      "description": "Logarithmic translation coordinate u = log x"
+    },
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "Discrete grade index in Z"
+    },
+    {
+      "name": "delta",
+      "domain": "delta in Real",
+      "description": "Real off-critical displacement delta = Re(rho) - 1/2"
+    },
+    {
+      "name": "phi",
+      "domain": "phi in C_c^infty(I)",
+      "description": "Smooth compactly supported test function on fundamental neighborhood I"
+    }
+  ],
+  "variable_domains": [
+    "u in Real",
+    "K in Integer",
+    "delta in Real",
+    "phi in C_c^infty(I)"
+  ],
+  "hypotheses": [
+    "tau = 2 * pi > 1 and a = log(tau) > 0",
+    "eta in C_c^infty(R) satisfies sum_{K in Z} eta(u - K*a) = 1 identically on R",
+    "T is a distribution in D'(R)",
+    "f_{delta, gamma}(u) = exp((delta + i*gamma)*u) for delta, gamma in Real",
+    "E(u) = exp(-u/2) * (psi(exp u) - exp u) for u in Real"
+  ],
+  "object_studied": "Discrete grade orbit of distributions under translations u -> u + K*log(tau) and the P0/P1/P2 axiom hierarchy of Transcendental Continuation",
+  "fourier_normalization": "Additive Fourier-Laplace transform on R; Schwartz space S(R) with C^m compact seminorms",
+  "multiplicity_convention": "Nontrivial zero multiplicity m_rho >= 1 and integer grade indexing K in Z",
+  "measure_and_window": "Additive Lebesgue measure du on R; smooth partition of unity eta supported in (-a, a)",
+  "order_of_limits": "Bilateral grade translation limit |K| -> infty; test function derivative order m >= 0",
+  "exact_conclusion": "Theorem D establishes GradeOrbitBound(E) <=> T_E in S'(R) <=> RH. Existing TC coordinate naturality (P0) and ambient distribution gluing (P1) do not imply uniform polynomial grade-orbit bounds (P2), as witnessed by the exponential countermodel. Lean proves that bilateral polynomial grade-orbit growth forces delta = 0.",
+  "logical_negation": "Existing TC axioms force P2 for all covariant modes, or off-line modes with delta != 0 satisfy bilateral polynomial grade growth, or Theorem D fails to characterize temperedness (FALSIFIED / REFUTED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: exp_outgrows_pow",
+    "formal/RiemannScope/Grade.lean: polynomial_bilateral_grade_growth_implies_delta_zero",
+    "transcendental.py: evaluate_theorem_d_partition_of_unity",
+    "transcendental.py: evaluate_tc_grade_orbit_countermodel",
+    "transcendental.py: audit_grade_orbit_uniformity_mechanism"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Theorem D Analytical Proof & Equivalence Audit): derived the exact analytical equivalence 1 <=> 2 via a smooth partition of unity theta subordinate to aZ (Schwartz 1951, Tome II Chap. VII; Hormander 1983, Thm 7.1.14), where absolute convergence of local pairings sum_K (1+|K|)^{N-(N+2)} < infty establishes tempered continuity on S(R); numerical tests verified partition-of-unity identity to < 1e-65 error",
+    "Gate 2 & 5 (Axiom Hierarchy Separation & Boundary Dominance): proved that Level P0 (exact coordinate covariance) and Level P1 (ambient distribution gluing) hold identically for off-line mode f_{delta,gamma}(u) = exp((delta+i*gamma)u), while boundary dominance in the asymptotic limit |K| -> infty is dominated by exponential divergence",
+    "Gate 3 & 9 (Exponential Countermodel Falsification with Certified Bump): constructed a certified test function phi in C_c^infty(I) with radius epsilon <= 1/(2*(1+|gamma|)) such that Re int_I exp((delta+i*gamma)v) phi(v) dv > 0, ruling out phase cancellation and proving that |<T_f, phi(.-Ka)>| = tau^{K*delta}|J_0| grows exponentially, proving P0 + P1 does not imply P2",
+    "Gate 6 & 7 (Lean Formalization of Priority Bilateral Theorem): formalized polynomial_bilateral_grade_growth_implies_delta_zero in Lean 4 without axioms beyond standard mathlib, proving that bilateral polynomial grade growth forces delta = 0",
+    "Gate 8 (Independence and Premise Audit): proved that asserting P2 for prime error E(u) is mathematically equivalent to assuming RH, isolating the exact missing premise of Transcendental Continuation",
+    "Gate 10 (Dual Status Classification): marked SPECIFICATION_SCHEMA_PASSED for structural gates while rigorously documenting that P2 is not supplied by existing TC axioms and remains an RH-equivalent condition"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_theorem_d_partition_of_unity_reconstruction",
+    "tests/test_tc_mechanism_discovery.py: test_tc_grade_orbit_countermodel_p0_p1_p2",
+    "tests/test_tc_mechanism_discovery.py: test_grade_orbit_uniformity_mechanism_synthesis"
+  ],
+  "external_sources": [
+    {
+      "source": "Hormander, L. (1983), The Analysis of Linear Partial Differential Operators I, Springer-Verlag, Berlin, Theorem 7.1.14 & Theorem 7.4.2",
+      "theorem": "Theorem 7.1.14: Characterization of tempered distributions by seminorms and local finite-order bounds"
+    },
+    {
+      "source": "Schwartz, L. (1950/1951), Theorie des distributions, Tomes I et II, Hermann, Paris",
+      "theorem": "Tome II, Chapitre VII: Partitions of unity, translation covariance, and tempered distribution topologies"
+    },
+    {
+      "source": "Beffa, M. (2024), Weakly Nonlinear Systems, Springer Cham, Chapter 5, pp. 75-85, DOI: 10.1007/978-3-031-40681-2_5",
+      "theorem": "Theorem 5.2 & 5.3: Tempered distributions and their Fourier-Laplace representations"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Deriving an unconditional proof that E(u) satisfies the uniform polynomial grade-orbit bound under translations u -> u + K*log(tau), which is strictly equivalent to the Riemann Hypothesis (OPEN)"
+  ]
+}

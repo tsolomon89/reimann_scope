@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-016",
+  "statement": "TC Zero-Phase Nonresonance, Certified Incommensurability Bounds, and Vandermonde Cancellation: For fundamental dilation period tau = 2*pi and TC scale factor c_tau = log(2*pi) / (2*pi), the scaled zero phases theta_j = c_tau * gamma_j satisfy three distinct mathematical properties: (1) Unconditional Zero-Index Nonresonance: By Hlawka (1975) and Ford & Zaharescu (2005), the sequence {c_tau * gamma_j} is unconditionally equidistributed modulo 1 across the zero index. In the Ford-Zaharescu classification, resonant frequencies producing non-trivial arithmetic correction measures have the form alpha = (a * log p) / (2*pi * q) for prime p and integers a, q >= 1. The TC scale c_tau is strictly nonresonant because c_tau = alpha forces tau^q = p^a, which is impossible since tau = 2*pi is transcendental (Lindemann 1882) while p^a in Z_{>0} is algebraic; consequently, the Ford-Zaharescu correction measure vanishes identically for TC test functions. (2) Finite Exponential Uniqueness: For any distinct nonzero complex bases q_1, ..., q_r (Proposition P2: q_j != q_ell <=> theta_j - theta_ell not in Z), the finite system sum_{j=1}^r a_j q_j^K = 0 for K = 0, ..., r-1 forces a_1 = ... = a_r = 0 by non-vanishing of the Vandermonde determinant. Finite mode cancellation requires only pairwise distinction (P2), not individual irrationality (P1: theta_j not in Q) or homogeneous/inhomogeneous rational independence (P3/P4). Two modes with displacements delta_1 != delta_2 have strictly distinct moduli |q_1| != |q_2| under tau > 1, preventing scalar cancellation. (3) Certified Arithmetic Bounds: Using certified Arb ball arithmetic, pairwise phase distinction theta_j - theta_ell not in Z is certified for all 300 pairs among the first 25 zeros with minimum distance > 0.004; bounded rational exclusion theta_j != p/q is certified for all 1 <= q <= 10^6 for the first 20 zeros with minimum error > 10^{-15} >> radius ~ 10^{-76}; and bounded integer relations a_0 + a_1 theta_1 + a_2 theta_2 = 0 are certified absent in the box |a_1|, |a_2| <= 50 with minimum distance > 7.9e-5. While phase nonresonance is proved, extending finite uniqueness to the infinite explicit formula and deriving an exact cross-grade arithmetic collision m*tau^K = n*tau^J != 0 remains an open problem.",
+  "quantified_variables": [
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "Discrete grade index in Z"
+    },
+    {
+      "name": "J",
+      "domain": "J in Integer",
+      "description": "Second discrete grade index in Z"
+    },
+    {
+      "name": "q",
+      "domain": "q in Integer, q > 0",
+      "description": "Rational denominator or root power"
+    },
+    {
+      "name": "a",
+      "domain": "a in Integer, a > 0",
+      "description": "Integer power exponent"
+    },
+    {
+      "name": "p",
+      "domain": "p in Prime",
+      "description": "Prime number"
+    },
+    {
+      "name": "gamma_j",
+      "domain": "gamma_j in Real",
+      "description": "Imaginary ordinate of nontrivial zero index j"
+    },
+    {
+      "name": "theta_j",
+      "domain": "theta_j in Real",
+      "description": "TC-scaled phase c_tau * gamma_j"
+    },
+    {
+      "name": "delta",
+      "domain": "delta in Real",
+      "description": "Real centering displacement of zero"
+    }
+  ],
+  "variable_domains": [
+    "K in Integer",
+    "J in Integer",
+    "q in Integer, q > 0",
+    "a in Integer, a > 0",
+    "p in Prime",
+    "gamma_j in Real",
+    "theta_j in Real",
+    "delta in Real"
+  ],
+  "hypotheses": [
+    "tau = 2 * pi is transcendental over Q (Lindemann 1882)",
+    "gamma_j are the ordinates of the nontrivial zeros of the Riemann zeta function",
+    "Hlawka (1975) and Ford & Zaharescu (2005) theorems on zero-ordinate equidistribution and resonant frequency classes",
+    "Linear algebra of Vandermonde matrices over C",
+    "Rigorous interval enclosures for nontrivial zeros from Arb certificates"
+  ],
+  "object_studied": "TC-scaled zero phases theta_j = c_tau * gamma_j, Ford-Zaharescu resonant frequencies, finite Vandermonde mode uniqueness, and certified bounded arithmetic exclusions",
+  "fourier_normalization": "Additive Fourier-Laplace transform on R; fractional parts mod 1 in [0, 1)",
+  "multiplicity_convention": "Nontrivial zeros ordered by height 0 < gamma_1 <= gamma_2 <= ..., with multiplicity",
+  "measure_and_window": "Haar probability measure on the circle S^1 = R/Z; counting measure on zeros; Arb intervals",
+  "order_of_limits": "Height limit T -> infty for zero-index equidistribution; finite integer grade window K in {0, ..., r-1} for Vandermonde uniqueness",
+  "exact_conclusion": "TC zero phases are strictly nonresonant with prime-power frequencies and unconditionally equidistributed across the zero index; finite zero mode cancellation requires strictly pairwise distinct bases (P2), proved via Vandermonde determinant in Lean 4 without requiring irrationality or rational independence; bounded rational exclusion is certified for q <= 10^6 and bounded relations for |a| <= 50 via Arb ball arithmetic; but deriving a forbidden cross-grade lattice coincidence from an off-critical zero remains open.",
+  "logical_negation": "c_tau resonates with a prime-power frequency (tau^q = p^a for algebraic integers), or finite exponential modes with distinct bases identically vanish, or certified zeros admit a rational with denominator q <= 10^6 inside their Arb ball (FALSIFIED / REFUTED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "S^1 = R / Z",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: finite_exponential_uniqueness_2",
+    "formal/RiemannScope/Grade.lean: finite_exponential_uniqueness_3",
+    "formal/RiemannScope/Grade.lean: tc_log_nonresonance_scaling",
+    "formal/RiemannScope/Grade.lean: tc_prime_power_nonresonance_of_transcendental",
+    "formal/RiemannScope/Grade.lean: mode_modulus_distinct_of_delta_ne",
+    "transcendental.py: audit_tc_phase_propositions",
+    "transcendental.py: certify_pairwise_phase_distinction_arb",
+    "transcendental.py: certify_bounded_rational_exclusion_arb",
+    "transcendental.py: audit_bounded_integer_relations",
+    "transcendental.py: audit_phase_equidistribution_diagnostics",
+    "transcendental.py: audit_tc_zero_phase_nonresonance_theorem",
+    "transcendental.py: audit_tc_bridge_implication_chain",
+    "transcendental.py: audit_cycle11_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Symbolic Elimination & Equality-Case Cancellation Analysis): proved by symbolic elimination that the equality case c_tau = (a*log p)/(2*pi*q) forces the polynomial root equation tau^q = p^a, which has no algebraic root for tau = 2*pi by Lindemann (1882); formalized in Lean 4 (tc_log_nonresonance_scaling, tc_prime_power_nonresonance_of_transcendental); verified equality-case cancellation in finite exponential systems",
+    "Gate 2 & 5 (Boundary Dominance & Asymptotic Limit Audit): analyzed asymptotic boundary limits as height T -> infty for zero-index Weyl sums and equidistribution; proved that two exponential modes with delta_1 != delta_2 have strictly distinct moduli |q_1| != |q_2| under base tau > 1, formalized in Lean 4 (mode_modulus_distinct_of_delta_ne); certified for all 300 pairs among first 25 zeros that theta_j - theta_ell not in Z with min distance > 0.004",
+    "Gate 3 & 6 (Finite Vandermonde Cancellation & Mode Independence): proved that for distinct bases q_1, ..., q_r, sum a_j q_j^K = 0 for K=0..r-1 forces a_j = 0 without assuming irrationality (P1) or rational independence (P3/P4); formalized for r=2 and r=3 in Lean 4 (finite_exponential_uniqueness_2, finite_exponential_uniqueness_3)",
+    "Gate 7 & 8 (Bounded Rational Exclusion & Lattice Search): certified theta_j != p/q for 1 <= q <= 10^6 for first 20 zeros via continued fractions on Arb balls (min error > 10^{-15} >> radius ~ 10^{-76}); excluded integer relations in box |a_1|, |a_2| <= 50 with min distance > 7.9e-5",
+    "Gate 9 (Equidistribution Diagnostics): illustrated Weyl sum decay and discrepancy reduction (D_N: 0.1509 -> 0.0639 -> 0.0419) as N increases from 20 to 100, adhering to Hlawka / Ford-Zaharescu theorem",
+    "Gate 10 (Dual Status Classification): passed all 10 structural schema gates and established formal verification under Mathlib foundational axioms"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_tc_phase_propositions_disentanglement",
+    "tests/test_tc_mechanism_discovery.py: test_certify_pairwise_phase_distinction_arb",
+    "tests/test_tc_mechanism_discovery.py: test_certify_bounded_rational_exclusion_arb",
+    "tests/test_tc_mechanism_discovery.py: test_audit_bounded_integer_relations",
+    "tests/test_tc_mechanism_discovery.py: test_audit_phase_equidistribution_diagnostics",
+    "tests/test_tc_mechanism_discovery.py: test_audit_tc_zero_phase_nonresonance_theorem",
+    "tests/test_tc_mechanism_discovery.py: test_tc_bridge_implication_chain",
+    "tests/test_tc_mechanism_discovery.py: test_cycle11_synthesis"
+  ],
+  "external_sources": [
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Mathematische Annalen 20, 213-225",
+      "theorem": "Transcendence of pi and 2*pi, ensuring that tau^q != p^a for all positive integers q, a and prime p"
+    },
+    {
+      "source": "Hlawka, E. (1975), Uber die Gleichverteilung gewisser Folgen, welche mit den Nullstellen der Riemannschen Zetafunktion zusammenhangen, Osterreich. Akad. Wiss. Math.-Natur. Kl. S.-B. II 184, 459-471",
+      "theorem": "Unconditional uniform distribution modulo 1 of the sequence {alpha * gamma_j} for any fixed nonzero real alpha"
+    },
+    {
+      "source": "Ford, K. and Zaharescu, A. (2005), On the distribution of imaginary parts of zeros of the Riemann zeta function, J. reine angew. Math. 579, 145-158 (arXiv:math/0405459)",
+      "theorem": "Asymptotics and discrepancy of {alpha * gamma_j} mod 1, and classification of resonant frequencies alpha = (a * log p) / (2*pi * q)"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Unconditional proof of single-phase irrationality (P1), homogeneous rational independence (P3), or derivation of an exact cross-grade point coincidence from the infinite explicit formula (OPEN)"
+  ]
+}

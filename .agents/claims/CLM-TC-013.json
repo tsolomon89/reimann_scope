@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-013",
+  "statement": "Canonical Transcendental Continuation Diagram, Arithmetic Preservation, and Impossibility of Concrete Collision Witness: For intrinsic arithmetic A = (N_{>=1}, +, *, <=), each integer grade representation iota_K(n) = tau^K * n (tau = 2*pi, K in Z) embeds into an externally disjoint layer L_K = tau^K N_{>=1} with transported operations +_K and *_K. The canonical commutative diagram establishes: (1) Preservation: iota_K is an exact isomorphism of ordered semirings, and the induced raw external Dirichlet series D_K(s) = sum_{x in L_K} x^{-s} = tau^{-Ks} * zeta(s) has identical zero divisor div(D_K) = div(zeta) = sum_rho m_rho [rho]. The zero coordinates are strictly fixed and invariant across all grades (distinct from frequency-dilated Z_K(s) = zeta(tau^{-K}s) or centered coordinate dilation). (2) Layer Disjointness: By the transcendence of tau = 2*pi (Lindemann 1882), tau^{K-J} is transcendental for K != J, forcing L_K \\cap L_J = \\emptyset for all distinct integer grades. (3) Impossibility of Concrete Collision Witness: Any candidate collision witness W(rho, K, J, m, n) requires an arithmetic incidence m * tau^K = n * tau^J (W2), which is impossible for non-zero integers m, n. Furthermore, the canonical inverse map (Perron inversion / explicit formula) introduces zeros rho only as smooth continuous spectral modulations x^rho/rho on (0, infty) with no jump discontinuities. Jump discontinuities of psi_K occur strictly at intrinsic prime powers tau^K p^k in L_K. An off-critical zero (delta != 0) alters the amplitude envelope between jumps but cannot alter jump locations or create discrete arithmetic events in L_K \\cap L_J. Lean formalizes the exact algebraic isomorphism of (L_K, +_K, *_K) and the injectivity of grade exponential dilation under Mathlib foundational axioms. Therefore, no concrete collision witness exists under presently defined TC maps: arithmetic preservation and external layer separation remain disconnected.",
+  "quantified_variables": [
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "Discrete grade index in Z"
+    },
+    {
+      "name": "J",
+      "domain": "J in Integer",
+      "description": "Second discrete grade index in Z"
+    },
+    {
+      "name": "n",
+      "domain": "n in N_{>=1}",
+      "description": "Intrinsic positive integer"
+    },
+    {
+      "name": "s",
+      "domain": "s in Complex, Re(s) > 1",
+      "description": "Complex Dirichlet frequency coordinate"
+    }
+  ],
+  "variable_domains": [
+    "K in Integer",
+    "J in Integer",
+    "n in N_{>=1}",
+    "s in Complex, Re(s) > 1"
+  ],
+  "hypotheses": [
+    "tau = 2 * pi is transcendental (Lindemann 1882)",
+    "A = (N_{>=1}, +, *, <=) is the intrinsic ordered semiring of positive integers",
+    "iota_K(n) = tau^K * n defines layer L_K = tau^K N_{>=1}",
+    "add_K(x, y) = x + y and mul_K(x, y) = tau^{-K} * x * y on L_K",
+    "D_K(s) = sum_{x in L_K} x^{-s} = tau^{-Ks} * zeta(s) for Re(s) > 1"
+  ],
+  "object_studied": "Canonical TC commutative diagram, grade isomorphism iota_K, layer disjointness L_K \\cap L_J = \\emptyset, and candidate collision witnesses W(rho, K, J, m, n)",
+  "fourier_normalization": "Additive Fourier-Laplace transform on R; Mellin transform on R_+",
+  "multiplicity_convention": "Nontrivial zero multiplicity m_rho >= 1 and discrete grade indexing K, J in Z",
+  "measure_and_window": "Counting measure on discrete layers L_K; Lebesgue measure dx on R_+",
+  "order_of_limits": "Dirichlet series sum limit N -> infty; discrete grade index difference |K - J| >= 1",
+  "exact_conclusion": "Preservation holds identically: iota_K is an exact arithmetic isomorphism and div(D_K) = div(zeta) has fixed zero coordinates for all K. However, no concrete collision witness W exists under present TC maps because L_K \\cap L_J = \\emptyset by the transcendence of 2*pi, and explicit formula zero modes x^rho/rho are continuous with no discrete jump incidence.",
+  "logical_negation": "iota_K fails to be an isomorphism, or D_K has scaled zeros differing from zeta, or non-zero integers satisfy m*tau^K = n*tau^J for K != J, or an off-critical zero forces a discrete jump collision across layers (FALSIFIED / REFUTED)",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R_+",
+  "omitted_tail": "NONE",
+  "tail_enclosure": "NONE",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: arithmetic_isomorphism_add",
+    "formal/RiemannScope/Grade.lean: arithmetic_isomorphism_mul",
+    "formal/RiemannScope/Grade.lean: grade_exp_injective",
+    "formal/RiemannScope/Grade.lean: grade_layer_scale_distinct",
+    "transcendental.py: evaluate_canonical_tc_diagram",
+    "transcendental.py: audit_collision_witness_obligation",
+    "transcendental.py: audit_canonical_tc_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Arithmetic Isomorphism & Equality-Case Audit): proved that iota_K(m + n) = add_K(iota_K m, iota_K n) and iota_K(m * n) = mul_K(iota_K m, iota_K n) hold identically with 0 error, establishing exact semiring isomorphism",
+    "Gate 2 & 5 (Zero Divisor Rigidity & Boundary Dominance): proved that D_K(s) = tau^{-Ks} * zeta(s) has identical zeros to zeta(s) because tau^{-Ks} is everywhere non-vanishing on C, with boundary dominance in the asymptotic limit Re(s) -> infty governed by tau^{-Ks}; confirmed that zero coordinates are strictly fixed, disproving the misconception that arithmetic scaling induces scaled zeros {tau^K rho}",
+    "Gate 3 & 9 (Transcendental Layer Disjointness & Collision Impossibility): tested candidate incidence m*tau^K = n*tau^J against Lindemann (1882); proved that tau^{K-J} is transcendental for K != J and can never equal rational n/m, proving L_K \\cap L_J = \\emptyset and refuting condition W2",
+    "Gate 6 & 7 (Canonical Inverse Map & Jump Support Separation): evaluated explicit formula zero modes x^rho/rho; proved they are C^infty on (0, infty) with NO jump discontinuities, while jumps of psi_K occur strictly at tau^K p^k in L_K, refuting condition W3",
+    "Gate 8 (Independence & Non-Circularity Audit): proved the negative result without assuming RH, temperedness, or polynomial bounds, demonstrating that lack of collision is an unconditional consequence of transcendence and jump support",
+    "Gate 10 (Dual Status Classification): marked SPECIFICATION_SCHEMA_PASSED for structural schema gates and validated clean separation between preservation and exclusion"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_canonical_tc_diagram_isomorphism_and_fixed_zeros",
+    "tests/test_tc_mechanism_discovery.py: test_collision_witness_obligation_and_transcendental_separation",
+    "tests/test_tc_mechanism_discovery.py: test_canonical_tc_synthesis_cycle8"
+  ],
+  "external_sources": [
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Mathematische Annalen 20, 213-225",
+      "theorem": "Transcendence of pi and 2*pi, establishing that no non-zero rational power tau^m is rational for integer m != 0"
+    },
+    {
+      "source": "Ingham, A. E. (1932), The Distribution of Prime Numbers, Cambridge University Press",
+      "theorem": "Explicit formula and distribution of jump discontinuities of Chebyshev's psi function strictly at prime powers"
+    },
+    {
+      "source": "Titchmarsh, E. C. (1986), The Theory of the Riemann Zeta-Function, 2nd ed., Oxford University Press",
+      "theorem": "Chapter II & III: Dirichlet series representations, non-vanishing exponential factors, and zero divisor invariance"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Proving whether any alternative mathematical mapping outside of presently defined TC transport can bridge analytic off-line zeros to discrete arithmetic referents without circularity (OPEN)"
+  ]
+}

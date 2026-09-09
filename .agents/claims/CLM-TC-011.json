@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-TC-011",
-  "statement": "Prime-Error Distributional Temperedness Equivalence Theorem: For the normalized Chebyshev prime-counting error E(u) = exp(-u/2)(psi(exp u) - exp u), the regular distribution T_E defined on D(R) = C_c^infinity(R) extends continuously to a tempered distribution in S'(R) if and only if the Riemann Hypothesis (RH) holds. The three conditions (A) RH, (B) pointwise polynomial growth E(u) = O((1+u)^N) for some N, and (C) distributional temperedness T_E in S'(R) are mutually equivalent: (A) <=> (B) <=> (C). Direction (A) => (B) => (C) follows from von Koch (1901) and Cramer (1919), where RH forces N = 2. Direction (C) => (A) is proved via Route II: for a smooth cutoff chi with chi = 0 on (-infty, 0.1] and chi = 1 on [0.5, infty), E_chi(u) = chi(u)E(u) is supported in [0.1, infty), and (1-chi)E is in S(R) because E(u) = -exp(u/2) for u < log 2. By the Schwartz-Laplace theorem (Hormander Theorem 7.4.2), T_E in S'(R) forces the Laplace transform L[E_chi](z) to be holomorphic on the entire half-plane Re(z) > 0. Meromorphic continuation identifies L[E_chi](z) = G(z) - H(z) for Re(z) > 1/2, where H is entire and G(z) = -1/(z+1/2) * (zeta'/zeta)(z+1/2) - 1/(z-1/2). Any nontrivial zero rho = 1/2 + delta + i*gamma with delta > 0 produces an isolated pole at z_rho = delta + i*gamma in Re(z) > 0 with non-zero residue -m_rho/rho != 0, contradicting holomorphy. Therefore, delta <= 0 for all zeros, which by functional equation forces RH. Route I (Tauberian recovery of pointwise growth) fails unconditionally because between prime jumps E'(u) ~ -exp(u/2) diverges exponentially, violating polynomial slow decrease. Distributional temperedness is thus an RH-equivalent criterion rather than an independent TC bridge.",
+  "statement": "Prime-Error Distributional Temperedness Equivalence Theorem: For the normalized Chebyshev prime-counting error E(u) = exp(-u/2)(psi(exp u) - exp u), the regular distribution T_E defined on D(R) = C_c^infinity(R) extends continuously to a tempered distribution in S'(R) if and only if the Riemann Hypothesis (RH) holds. The three conditions (A) RH, (B) pointwise polynomial growth E(u) = O((1+u)^N) for some N, and (C) distributional temperedness T_E in S'(R) are mutually equivalent: (A) <=> (B) <=> (C). Direction (A) => (B) => (C) follows from von Koch (1901) and Cramer (1919), where RH forces N = 2. Direction (C) => (A) is proved via Route II: for a smooth cutoff chi with chi = 0 on (-infty, 0.1] and chi = 1 on [0.5, infty), E_chi(u) = chi(u)E(u) is supported in [0.1, infty). For u <= 0, psi(exp u) = 0 so E(u) = -exp(u/2) != 0; the tail (1-chi)E is in S(R) (smooth and exponentially decaying as u -> -infty, with support unbounded toward -infty). The pairing <T_{E_chi}, exp(-zu)> is defined rigorously for Re(z) > 0 via <T_{E_chi}, rho(u)exp(-zu)> for any smooth extension rho identically 1 on [0, infty) and vanishing on (-infty, -0.5], independent of rho. By the Schwartz-Laplace theorem (Schwartz 1951, Tome II Chap. VIII Thm I; Hormander 1983, Vol. I Thm 7.4.2), T_E in S'(R) forces L[E_chi](z) to be holomorphic on the entire half-plane Re(z) > 0. For Re(z) > 1/2, L[E_chi](z) = G(z) - H(z), where G(z) = -1/(z+1/2) * (zeta'/zeta)(z+1/2) - 1/(z-1/2) and H(z) = int_0^0.5 (chi(u) - 1_{[0,infty)}(u)) E(u) exp(-zu) du is an entire function whose integrand (chi - 1_{[0,infty)})E is supported strictly in the compact interval [0, 0.5]. Any nontrivial zero rho = 1/2 + delta + i*gamma with delta > 0 produces an isolated pole at z_rho = delta + i*gamma in Re(z) > 0 with non-zero residue -m_rho/rho != 0, contradicting holomorphy. Therefore, delta <= 0 for all zeros, forcing RH. Route I does not derive the required polynomial slow-decrease hypothesis unconditionally. Lean formalizes exact local algebraic identities and pole residues, while the Schwartz-Laplace theorem and prime-error asymptotics are cited external theorems. Distributional temperedness is thus an RH-equivalent criterion rather than an independent TC bridge.",
   "quantified_variables": [
     {
       "name": "u",
@@ -29,7 +29,8 @@
     "psi(x) = sum_{n <= x} Lambda(n)",
     "E(u) = exp(-u/2) * (psi(exp u) - exp u)",
     "T_E is the regular distribution <T_E, phi> = int_R E(u) phi(u) du on D(R)",
-    "chi in C^infty(R) is a cutoff with chi(u) = 0 for u <= 0.1 and chi(u) = 1 for u >= 0.5"
+    "chi in C^infty(R) is a cutoff with chi(u) = 0 for u <= 0.1 and chi(u) = 1 for u >= 0.5",
+    "H(z) = int_0^0.5 (chi(u) - 1_{[0,infty)}(u)) E(u) exp(-zu) du is entire on C with compact integrand support [0, 0.5]"
   ],
   "object_studied": "Regular distribution T_E of the normalized Chebyshev prime error and its half-line Laplace transform L[E_chi](z)",
   "fourier_normalization": "Additive Fourier-Laplace transform on R; Schwartz space S(R) with seminorms p_{alpha,beta}",
@@ -59,10 +60,10 @@
   "proof_artifact": "formal/RiemannScope/Grade.lean",
   "falsification_attempts": [
     "Gate 1 & 4 (Root and Pole Analysis): proved that the pole of -(1/s)*(zeta'/zeta)(s) at s = 1 has residue +1, which cancels identically with -1/(z-1/2), making z = 1/2 a removable singularity in Re(z) > 0",
-    "Gate 5 (Dominance and Non-Cancellation): proved that for any off-critical zero rho = 1/2 + delta + i*gamma with delta > 0, the residue Res(G, z_rho) = -m_rho/rho has magnitude m_rho/|rho| > 0, which cannot cancel with any entire function H(z)",
-    "Gate 3 & 9 (Adversarial Holomorphy Contradiction): tested against Hormander Theorem 7.4.2, proving that if T_E in S'(R), the Laplace transform L[E_chi](z) must be holomorphic in Re(z) > 0, which directly refutes the existence of any off-critical pole with delta > 0",
-    "Gate 6 & 7 (Route I Slow Decrease Obstruction): evaluated downward slope E'(u) = -exp(u/2) - (1/2)*E(u) ~ -exp(u/2) between prime powers, proving that polynomial slow decrease fails unconditionally without assuming an RH-equivalent bound",
-    "Gate 8 (Phase-Cancelling Test Construction): tested against eta_n(u) = exp(-i*gamma*u)*exp(-u^2/(2n^2)), proving that <phi_lambda, eta_n> = sqrt(2*pi)*n*exp(n^2*delta^2/2) diverges super-polynomially over all Schwartz seminorms for delta != 0",
+    "Gate 5 (Dominance and Non-Cancellation): proved that for any off-critical zero rho = 1/2 + delta + i*gamma with delta > 0, the residue Res(G, z_rho) = -m_rho/rho has magnitude m_rho/|rho| > 0, which cannot cancel with any entire function H(z) supported on [0, 0.5]",
+    "Gate 3 & 9 (Adversarial Holomorphy Contradiction): tested against Schwartz (1951, Tome II Chap. VIII Thm I) and Hormander (1983, Vol I Thm 7.4.2), proving that if T_E in S'(R), the Laplace transform L[E_chi](z) must be holomorphic in Re(z) > 0, which directly refutes the existence of any off-critical pole with delta > 0",
+    "Gate 6 & 7 (Route I Slow Decrease Obstruction): evaluated downward slope E'(u) = -exp(u/2) - (1/2)*E(u) ~ -exp(u/2) between prime powers, proving that Route I does not derive polynomial slow decrease unconditionally without assuming an RH-equivalent bound",
+    "Gate 8 (Phase-Cancelling Test Construction): tested against eta_n(u) = exp(-i*gamma*u)*exp(-u^2/(2n^2)), proving that <phi_lambda, eta_n> = sqrt(2*pi)*n*exp(n^2*delta^2/2) diverges super-polynomially over all Schwartz seminorms p_{alpha,beta}(eta_n) <= C(alpha,beta,gamma)*n^alpha for delta != 0",
     "Gate 10 (Equivalence and Circularity Audit): established that while (C) => (A) is mathematically rigorous, deriving (C) from prime arithmetic unconditionally is equivalent to solving RH, confirming that temperedness is not an independent TC shortcut"
   ],
   "computational_evidence": [
@@ -73,12 +74,16 @@
   ],
   "external_sources": [
     {
-      "source": "Hormander, L. (1983), The Analysis of Linear Partial Differential Operators I, Springer-Verlag, Berlin",
-      "theorem": "Theorem 7.4.2: Holomorphy and polynomial growth of Laplace transforms of tempered distributions supported on a convex cone or half-line"
+      "source": "Hormander, L. (1983), The Analysis of Linear Partial Differential Operators I, Springer-Verlag, Berlin, Theorem 7.4.2 & 7.4.3 (p. 235)",
+      "theorem": "Theorem 7.4.2: Holomorphy and polynomial growth of Laplace transforms of tempered distributions supported on a half-line"
     },
     {
-      "source": "Schwartz, L. (1950/1951), Theorie des distributions, Tomes I et II, Hermann, Paris",
-      "theorem": "Chapitre VII & VIII: Regular tempered distributions, Schwartz space duality, and distributional Laplace transforms"
+      "source": "Schwartz, L. (1951), Theorie des distributions, Tome II, Hermann, Paris, Chapitre VIII 'Transformation de Laplace'",
+      "theorem": "Theoreme I & II (pp. 95-98): Holomorphy of distributional Laplace transforms on tube domains and growth bounds"
+    },
+    {
+      "source": "Beffa, M. (2024), Weakly Nonlinear Systems, Springer Cham, Chapter 5 'Laplace and Fourier Transforms of Distributions', pp. 75-85, DOI: 10.1007/978-3-031-40681-2_5",
+      "theorem": "Theorem 5.3: Half-line tempered distribution Laplace representation and domain of holomorphy"
     },
     {
       "source": "von Koch, H. (1901), Sur la distribution des nombres premiers, Acta Math. 24, 159-182",

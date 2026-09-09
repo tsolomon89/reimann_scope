@@ -294,15 +294,70 @@ class TestClaimAuditGates:
         assert res["status"] == "PASS", f"CLM-TC-011 failed: {res['violations']}"
         assert len(res["passed_gates"]) == 10
 
+    def test_clm_tc_012_spec_passes_audit(self):
+        """Test that CLM-TC-012 specification passes all 10 gates."""
+        from audit_claim_spec import audit_claim_specification
+        spec_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-TC-012.json")
+        with open(spec_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-TC-012 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
+    def test_clm_tc_013_spec_passes_audit(self):
+        """Test that CLM-TC-013 specification passes all 10 gates."""
+        from audit_claim_spec import audit_claim_specification
+        spec_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-TC-013.json")
+        with open(spec_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-TC-013 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
+    def test_clm_tc_014_spec_passes_audit(self):
+        """Test that CLM-TC-014 specification passes all 10 gates."""
+        from audit_claim_spec import audit_claim_specification
+        spec_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-TC-014.json")
+        with open(spec_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-TC-014 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
+    def test_clm_tc_015_spec_passes_audit(self):
+        """Test that CLM-TC-015 specification passes all 10 gates."""
+        from audit_claim_spec import audit_claim_specification
+        spec_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-TC-015.json")
+        with open(spec_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-TC-015 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
+    def test_clm_tc_016_spec_passes_audit(self):
+        """Test that CLM-TC-016 specification passes all 10 gates."""
+        from audit_claim_spec import audit_claim_specification
+        spec_path = os.path.join(os.path.dirname(__file__), "..", "claims", "CLM-TC-016.json")
+        with open(spec_path, "r", encoding="utf-8") as f:
+            import json
+            spec = json.load(f)
+        res = audit_claim_specification(spec)
+        assert res["status"] == "PASS", f"CLM-TC-016 failed: {res['violations']}"
+        assert len(res["passed_gates"]) == 10
+
     def test_cross_check_claim_register_succeeds(self):
         """Test that cross_check_claim_register verifies the repository claim register with exact arithmetic."""
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         from audit_claim_spec import cross_check_claim_register
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
-        assert coverage["total_claims"] == 99
-        assert coverage["terminal_claims"] == 91
-        assert coverage["audited_terminal_claims"] == 13
+        assert coverage["total_claims"] == 104
+        assert coverage["terminal_claims"] == 96
+        assert coverage["audited_terminal_claims"] == 18
         assert coverage["legacy_unaudited_terminal_claims"] == 78
         assert coverage["open_or_exempt_claims"] == 8
         assert coverage["missing_specifications"] == 0
@@ -433,7 +488,7 @@ class TestClaimAuditGates:
         ok_real, errors_real, passed_real, cov_real = cross_check_claim_register(repo_root, verify_git_baseline=True)
         assert ok_real is True
         assert cov_real["legacy_unaudited_terminal_claims"] == 78
-        assert cov_real["audited_terminal_claims"] == 13
+        assert cov_real["audited_terminal_claims"] == 18
 
 
 class TestAdversarialAuditGates:

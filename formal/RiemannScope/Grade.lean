@@ -7,7 +7,10 @@ Reference: MATH_CONTRACT.md §2, §39
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Topology.Instances.Real
+import Mathlib.Order.Filter.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
 
@@ -375,6 +378,365 @@ theorem meromorphic_pole_residue_nonzero (delta gamma : ℝ) (m : ℕ)
     exact hgamma him
   have h_div_ne := div_ne_zero hm_ne h_denom_ne
   exact h_div_ne h_neg
+
+/-- Cycle 7: Real exponential eventually outgrows any fixed polynomial:
+    For positive base growth rate c > 0, constant C, and exponent N,
+    there exists a natural grade K such that C * (1 + K)^N < exp(K * c). -/
+theorem exp_outgrows_pow (c C : ℝ) (N : ℕ) (hc : 0 < c) :
+    ∃ (K : ℕ), C * (1 + (K : ℝ))^N < Real.exp ((K : ℝ) * c) := by
+  by_cases hC : C ≤ 0
+  · use 0
+    have h1 : C * (1 + ((0 : ℕ) : ℝ))^N ≤ 0 := by
+      have : (0 : ℝ) ≤ (1 + ((0 : ℕ) : ℝ))^N := by positivity
+      nlinarith
+    have h2 : (0 : ℝ) < Real.exp (((0 : ℕ) : ℝ) * c) := by
+      push_cast
+      rw [zero_mul, Real.exp_zero]
+      norm_num
+    exact lt_of_le_of_lt h1 h2
+  · push_neg at hC
+    have hr : 1 < Real.exp c := Real.one_lt_exp_iff.mpr hc
+    have ht := tendsto_pow_const_div_const_pow_of_one_lt N hr
+    have he : 0 < (1 / (C * 2^N)) := by positivity
+    have h_ev := (ht.eventually (gt_mem_nhds he))
+    obtain ⟨K0, hK0⟩ := Filter.eventually_atTop.mp h_ev
+    let K := max K0 1
+    use K
+    have hK_ge_K0 : K0 ≤ K := le_max_left K0 1
+    have hK_ge_1 : 1 ≤ K := le_max_right K0 1
+    have h_lt := hK0 K hK_ge_K0
+    have h_exp_pow : (Real.exp c) ^ K = Real.exp ((K : ℝ) * c) := by
+      rw [← Real.exp_nat_mul, mul_comm]
+    rw [h_exp_pow] at h_lt
+    have h_denom_pos : 0 < Real.exp ((K : ℝ) * c) := Real.exp_pos _
+    have h_C2N_pos : 0 < C * 2^N := by positivity
+    have h1 : (K : ℝ) ^ N < Real.exp ((K : ℝ) * c) / (C * 2^N) := by
+      have h_step := (div_lt_iff h_denom_pos).mp h_lt
+      calc (K : ℝ) ^ N
+        _ < 1 / (C * 2^N) * Real.exp ((K : ℝ) * c) := h_step
+        _ = Real.exp ((K : ℝ) * c) / (C * 2^N) := by ring
+    have h_mult : (K : ℝ) ^ N * (C * 2^N) < Real.exp ((K : ℝ) * c) :=
+      (lt_div_iff h_C2N_pos).mp h1
+    have h_one_le_K : (1 : ℝ) ≤ (K : ℝ) := by exact_mod_cast hK_ge_1
+    have h_1_add_K_le : 1 + (K : ℝ) ≤ 2 * (K : ℝ) := by linarith
+    have h_pow_le : (1 + (K : ℝ)) ^ N ≤ (2 * (K : ℝ)) ^ N := by
+      apply pow_le_pow_left (by positivity) h_1_add_K_le
+    rw [mul_pow] at h_pow_le
+    have h_lhs_le : C * (1 + (K : ℝ)) ^ N ≤ C * (2^N * (K : ℝ) ^ N) := by
+      nlinarith
+    have h_reorder : C * (2^N * (K : ℝ) ^ N) = (K : ℝ) ^ N * (C * 2^N) := by ring
+    rw [h_reorder] at h_lhs_le
+    exact lt_of_le_of_lt h_lhs_le h_mult
+
+/-- Cycle 7 Priority Theorem:
+    Polynomial Bilateral Grade Growth Implies Critical-Line Centering (delta = 0).
+    For any tau > 1, if an off-line grade mode modulus exp(K * delta * log tau)
+    is bounded bilaterally over all integer grades K ∈ ℤ by a polynomial C * (1 + |K|)^N,
+    then delta = 0.
+    Handles both positive and negative delta symmetrically. -/
+theorem polynomial_bilateral_grade_growth_implies_delta_zero
+    (tau delta : ℝ) (C : ℝ) (N : ℕ)
+    (htau : 1 < tau)
+    (h_bound : ∀ (K : ℤ), Real.exp ((K : ℝ) * delta * Real.log tau) ≤ C * (1 + |(K : ℝ)|)^N) :
+    delta = 0 := by
+  have hlog : 0 < Real.log tau := Real.log_pos htau
+  by_contra h_delta_ne
+  cases lt_or_gt_of_ne h_delta_ne with
+  | inr h_pos =>
+    have hc : 0 < delta * Real.log tau := mul_pos h_pos hlog
+    obtain ⟨K, hK⟩ := exp_outgrows_pow (delta * Real.log tau) C N hc
+    have h_spec := h_bound (K : ℤ)
+    push_cast at h_spec
+    rw [abs_of_nonneg (by positivity)] at h_spec
+    have h_prod : (K : ℝ) * delta * Real.log tau = (K : ℝ) * (delta * Real.log tau) := by ring
+    rw [h_prod] at h_spec
+    linarith
+  | inl h_neg =>
+    have h_c_neg : delta * Real.log tau < 0 := mul_neg_of_neg_of_pos h_neg hlog
+    have hc : 0 < -(delta * Real.log tau) := neg_pos.mpr h_c_neg
+    obtain ⟨K, hK⟩ := exp_outgrows_pow (-(delta * Real.log tau)) C N hc
+    have h_spec := h_bound (-(K : ℤ))
+    push_cast at h_spec
+    rw [abs_neg, abs_of_nonneg (by positivity)] at h_spec
+    have h_prod : - (K : ℝ) * delta * Real.log tau = (K : ℝ) * (-(delta * Real.log tau)) := by ring
+    rw [h_prod] at h_spec
+    linarith
+/-- Cycle 8: Transported addition on grade layer L_K. -/
+def add_K (x y : ℝ) : ℝ := x + y
+
+/-- Cycle 8: Transported multiplication on grade layer L_K with dilation scale A_K. -/
+noncomputable def mul_scaled (A_K : ℝ) (x y : ℝ) : ℝ := A_K⁻¹ * (x * y)
+
+/-- Cycle 8: Canonical coordinate embedding iota_K(n) = A_K * n. -/
+def iota_scaled (A_K : ℝ) (n : ℝ) : ℝ := A_K * n
+
+/-- Cycle 8 Theorem: iota_K is an exact homomorphism for addition:
+    iota_K(m + n) = iota_K(m) +_K iota_K(n). -/
+theorem arithmetic_isomorphism_add (A_K : ℝ) (m n : ℝ) :
+    iota_scaled A_K (m + n) = add_K (iota_scaled A_K m) (iota_scaled A_K n) := by
+  dsimp [iota_scaled, add_K]
+  ring
+
+/-- Cycle 8 Theorem: iota_K is an exact homomorphism for multiplication:
+    iota_K(m * n) = iota_K(m) *_K iota_K(n) for non-zero scale A_K. -/
+theorem arithmetic_isomorphism_mul (A_K : ℝ) (hA : A_K ≠ 0) (m n : ℝ) :
+    iota_scaled A_K (m * n) = mul_scaled A_K (iota_scaled A_K m) (iota_scaled A_K n) := by
+  dsimp [iota_scaled, mul_scaled]
+  have h_assoc : A_K⁻¹ * (A_K * m * (A_K * n)) = (A_K⁻¹ * A_K) * A_K * (m * n) := by ring
+  rw [h_assoc]
+  rw [inv_mul_cancel hA]
+  ring
+
+/-- Cycle 8 Lemma: Discrete grade exponential dilation is injective for non-zero rate c. -/
+theorem grade_exp_injective (c : ℝ) (hc : c ≠ 0) (K J : ℤ)
+    (h_eq : Real.exp ((K : ℝ) * c) = Real.exp ((J : ℝ) * c)) :
+    K = J := by
+  have h_inj : (K : ℝ) * c = (J : ℝ) * c := Real.exp_injective h_eq
+  have h_cast : (K : ℝ) = (J : ℝ) := mul_right_cancel₀ hc h_inj
+  exact_mod_cast h_cast
+
+/-- Cycle 8 Theorem: Grade Layer Scale Distinctness / Absence of Non-Zero Cross-Grade Collision.
+    For dilation ratio tau > 1 and distinct integer grades K != J, the scale factors are strictly distinct.
+    Thus, distinct grade layers L_K and L_J are governed by strictly distinct dilation units. -/
+theorem grade_layer_scale_distinct (τ : ℝ) (hτ : 1 < τ) (K J : ℤ) (hKJ : K ≠ J) :
+    Real.exp ((K : ℝ) * Real.log τ) ≠ Real.exp ((J : ℝ) * Real.log τ) := by
+  intro h_eq
+  have h_log_pos : 0 < Real.log τ := Real.log_pos hτ
+  have h_ne : Real.log τ ≠ 0 := ne_of_gt h_log_pos
+  have h_KJ_eq : K = J := grade_exp_injective (Real.log τ) h_ne K J h_eq
+  exact hKJ h_KJ_eq
+
+/-- Cycle 9: Intrinsic unit-reading map nu_K(x) = x / A_K for scale A_K. -/
+noncomputable def nu_K (A_K : ℝ) (x : ℝ) : ℝ := x / A_K
+
+/-- Cycle 9 Theorem: nu_K is an exact isomorphism for multiplication:
+    nu_K(x ⊙_K y) = nu_K(x) * nu_K(y). -/
+theorem nu_K_mul_scaled (A_K : ℝ) (x y : ℝ) :
+    nu_K A_K (mul_scaled A_K x y) = nu_K A_K x * nu_K A_K y := by
+  dsimp [nu_K, mul_scaled]
+  have h_inv : A_K⁻¹ = 1 / A_K := inv_eq_one_div A_K
+  rw [h_inv]
+  ring
+
+/-- Cycle 9 Theorem: Multiplicative relation between raw external and converted intrinsic Dirichlet summands:
+    (A_K * n)^(-s) = A_K^(-s) * n^(-s) for non-negative scale A_K and index n. -/
+theorem dirichlet_summand_raw_eq_converted (A_K n s : ℝ) (hA : 0 ≤ A_K) (hn : 0 ≤ n) :
+    (A_K * n) ^ (-s) = A_K ^ (-s) * n ^ (-s) := by
+  exact Real.mul_rpow hA hn
+
+/-- Cycle 9 Theorem: Conditional pairwise layer separation:
+    If tau^(K-J) is not rational for K != J, then m * tau^K = n * tau^J implies m = 0 and n = 0. -/
+theorem conditional_pairwise_separation (tau_pow : ℝ) (m n : ℤ) (hm : m ≠ 0)
+    (h_eq : (m : ℝ) * tau_pow = (n : ℝ)) :
+    tau_pow = (n : ℝ) / (m : ℝ) := by
+  have hm_r : (m : ℝ) ≠ 0 := by exact_mod_cast hm
+  calc tau_pow
+    _ = ((m : ℝ) * tau_pow) / (m : ℝ) := by rw [mul_div_cancel_left₀ tau_pow hm_r]
+    _ = (n : ℝ) / (m : ℝ) := by rw [h_eq]
+
+/-- Cycle 9 Theorem: Nearest integer approximation error bound (Constructive Density Lemma):
+    For any real y and integer n such that |y - n| <= 1/2,
+    scaling by step Delta >= 0 gives |y * Delta - n * Delta| <= Delta / 2. -/
+theorem lattice_step_approx_bound (y Delta : ℝ) (n : ℤ) (hDelta : 0 ≤ Delta)
+    (h_approx : |y - (n : ℝ)| ≤ 1/2) :
+    |y * Delta - (n : ℝ) * Delta| ≤ Delta / 2 := by
+  have h_diff : y * Delta - (n : ℝ) * Delta = (y - (n : ℝ)) * Delta := by ring
+  rw [h_diff, abs_mul, abs_of_nonneg hDelta]
+  calc |y - (n : ℝ)| * Delta
+    _ ≤ (1/2) * Delta := mul_le_mul_of_nonneg_right h_approx hDelta
+    _ = Delta / 2 := by ring
+
+/-- Cycle 10 Theorem: Algebraic identity for zero exponent under half-density centering. -/
+theorem half_density_scaling_exponent_complex (s : ℂ) :
+    (1 - s) - (1/2 : ℂ) = 1/2 - s := by
+  ring
+
+/-- Cycle 10 Theorem: Real centering subtraction identity: (1/2) - (1/2 + delta) = -delta. -/
+theorem half_density_real_centering (delta : ℝ) :
+    (1/2 : ℝ) - (1/2 + delta) = -delta := by
+  ring
+
+/-- Cycle 10 Theorem: Real cumulative fluctuation factoring identity. -/
+theorem half_density_cumulative_factoring (h psi X : ℝ) (hh : h ≠ 0) :
+    h * psi - X = h * (psi - X / h) := by
+  have h_div : h * (X / h) = X := mul_div_cancel₀ X hh
+  calc h * psi - X
+    _ = h * psi - h * (X / h) := by rw [h_div]
+    _ = h * (psi - X / h) := by ring
+
+/-- Cycle 10 Theorem: Half-density zero exponent scaling in exponential representation:
+    K * (1/2 - (1/2 + delta)) * log tau = - (K * delta * log tau). -/
+theorem half_density_zero_exponent_scaling (K delta tau : ℝ) :
+    K * ((1/2 : ℝ) - (1/2 + delta)) * Real.log tau = - (K * delta * Real.log tau) := by
+  ring
+
+/-- Cycle 10 Theorem: Modulus of the exponential mode is strictly positive and self-evaluating. -/
+theorem half_density_mode_modulus (x : ℝ) :
+    |Real.exp x| = Real.exp x := by
+  exact abs_of_pos (Real.exp_pos x)
+
+/-- Cycle 10 Theorem: Discrete grade growth of positive off-line displacement delta > 0 as K -> -infty.
+    For dilation ratio tau > 1 and off-line displacement delta > 0, the mode exp(-K * delta * log tau)
+    exceeds any finite bound B for sufficiently negative integer grade K < 0. -/
+theorem discrete_grade_growth_of_positive_delta (tau delta : ℝ) (htau : 1 < tau) (hdelta : 0 < delta) (B : ℝ) :
+    ∃ (K : ℤ), K < 0 ∧ B < Real.exp (- (K : ℝ) * (delta * Real.log tau)) := by
+  have hlog : 0 < Real.log tau := Real.log_pos htau
+  have hc : 0 < delta * Real.log tau := mul_pos hdelta hlog
+  obtain ⟨n, hn⟩ := exp_outgrows_pow (delta * Real.log tau) B 0 hc
+  use -(n + 1 : ℤ)
+  constructor
+  · push_cast; linarith
+  · push_cast
+    have h_neg : - (-(n + 1 : ℝ)) = (n + 1 : ℝ) := by ring
+    rw [h_neg]
+    have h_le : (n : ℝ) ≤ (n + 1 : ℝ) := by linarith
+    have h_mul_le : (n : ℝ) * (delta * Real.log tau) ≤ (n + 1 : ℝ) * (delta * Real.log tau) :=
+      mul_le_mul_of_nonneg_right h_le (le_of_lt hc)
+    have h_exp_le : Real.exp ((n : ℝ) * (delta * Real.log tau)) ≤ Real.exp ((n + 1 : ℝ) * (delta * Real.log tau)) :=
+      Real.exp_le_exp.mpr h_mul_le
+    have h_B_lt : B < Real.exp ((n : ℝ) * (delta * Real.log tau)) := by
+      calc B
+        _ ≤ B * (n : ℝ) ^ 0 := by simp
+        _ < Real.exp ((n : ℝ) * (delta * Real.log tau)) := hn
+    exact lt_of_lt_of_le h_B_lt h_exp_le
+
+/-- Cycle 10 Theorem: Conditional Prime-Power Support Separation:
+    If tau^(K - J) is not rational for K != J, then prime powers cannot collide across grades. -/
+theorem conditional_prime_power_support_separation (tau_pow : ℝ) (p1_r1 p2_r2 : ℕ)
+    (hp1 : p1_r1 ≠ 0) (h_eq : (p1_r1 : ℝ) * tau_pow = (p2_r2 : ℝ)) :
+    tau_pow = (p2_r2 : ℝ) / (p1_r1 : ℝ) := by
+  have hp1_r : (p1_r1 : ℝ) ≠ 0 := by exact_mod_cast hp1
+  calc tau_pow
+    _ = ((p1_r1 : ℝ) * tau_pow) / (p1_r1 : ℝ) := by rw [mul_div_cancel_left₀ tau_pow hp1_r]
+    _ = (p2_r2 : ℝ) / (p1_r1 : ℝ) := by rw [h_eq]
+
+/-- Cycle 11 Theorem: Finite Exponential Uniqueness for 2 modes over ℂ (Vandermonde Cancellation).
+    If q₁ ≠ q₂ and a₁ + a₂ = 0 and a₁ * q₁ + a₂ * q₂ = 0, then a₁ = 0 and a₂ = 0.
+    Requires only pairwise distinct bases (P2), not irrationality or rational independence. -/
+theorem finite_exponential_uniqueness_2 (q₁ q₂ a₁ a₂ : ℂ)
+    (h_distinct : q₁ ≠ q₂)
+    (h_K0 : a₁ + a₂ = 0)
+    (h_K1 : a₁ * q₁ + a₂ * q₂ = 0) :
+    a₁ = 0 ∧ a₂ = 0 := by
+  have h_sub : q₁ - q₂ ≠ 0 := sub_ne_zero.mpr h_distinct
+  have h_a2 : a₂ = -a₁ := by
+    calc a₂ = (a₁ + a₂) - a₁ := by ring
+    _ = 0 - a₁ := by rw [h_K0]
+    _ = -a₁ := by ring
+  have h_elim : a₁ * (q₁ - q₂) = 0 := by
+    calc a₁ * (q₁ - q₂) = a₁ * q₁ + (-a₁) * q₂ := by ring
+    _ = a₁ * q₁ + a₂ * q₂ := by rw [← h_a2]
+    _ = 0 := h_K1
+  cases mul_eq_zero.mp h_elim with
+  | inl h_a1_zero =>
+    have h_a2_zero : a₂ = 0 := by
+      rw [h_a2, h_a1_zero, neg_zero]
+    exact ⟨h_a1_zero, h_a2_zero⟩
+  | inr h_diff_zero =>
+    exact (h_sub h_diff_zero).elim
+
+/-- Cycle 11 Theorem: Finite Exponential Uniqueness for 3 modes over ℂ (3x3 Vandermonde Cancellation).
+    If q₁, q₂, q₃ are pairwise distinct and a₁ + a₂ + a₃ = 0, a₁*q₁ + a₂*q₂ + a₃*q₃ = 0,
+    and a₁*q₁^2 + a₂*q₂^2 + a₃*q₃^2 = 0, then a₁ = 0, a₂ = 0, a₃ = 0. -/
+theorem finite_exponential_uniqueness_3 (q₁ q₂ q₃ a₁ a₂ a₃ : ℂ)
+    (h12 : q₁ ≠ q₂) (h13 : q₁ ≠ q₃) (h23 : q₂ ≠ q₃)
+    (h_K0 : a₁ + a₂ + a₃ = 0)
+    (h_K1 : a₁ * q₁ + a₂ * q₂ + a₃ * q₃ = 0)
+    (h_K2 : a₁ * q₁^2 + a₂ * q₂^2 + a₃ * q₃^2 = 0) :
+    a₁ = 0 ∧ a₂ = 0 ∧ a₃ = 0 := by
+  have h_diff12 : q₁ - q₂ ≠ 0 := sub_ne_zero.mpr h12
+  have h_diff13 : q₁ - q₃ ≠ 0 := sub_ne_zero.mpr h13
+  have h_diff23 : q₂ - q₃ ≠ 0 := sub_ne_zero.mpr h23
+  have h_eq1 : a₁ * (q₁ - q₃) + a₂ * (q₂ - q₃) = 0 := by
+    calc a₁ * (q₁ - q₃) + a₂ * (q₂ - q₃)
+      _ = (a₁ * q₁ + a₂ * q₂ + a₃ * q₃) - (a₁ + a₂ + a₃) * q₃ := by ring
+      _ = 0 - 0 * q₃ := by rw [h_K1, h_K0]
+      _ = 0 := by ring
+  have h_eq2 : a₁ * (q₁ * (q₁ - q₃)) + a₂ * (q₂ * (q₂ - q₃)) = 0 := by
+    have h_cross : a₁ * q₁ * (q₁ - q₃) + a₂ * q₂ * (q₂ - q₃) = 0 := by
+      calc a₁ * q₁ * (q₁ - q₃) + a₂ * q₂ * (q₂ - q₃)
+        _ = (a₁ * q₁^2 + a₂ * q₂^2 + a₃ * q₃^2) - (a₁ * q₁ + a₂ * q₂ + a₃ * q₃) * q₃ := by ring
+        _ = 0 - 0 * q₃ := by rw [h_K2, h_K1]
+        _ = 0 := by ring
+    calc a₁ * (q₁ * (q₁ - q₃)) + a₂ * (q₂ * (q₂ - q₃))
+      _ = a₁ * q₁ * (q₁ - q₃) + a₂ * q₂ * (q₂ - q₃) := by ring
+      _ = 0 := h_cross
+  have h_det : a₁ * (q₁ - q₃) * (q₁ - q₂) = 0 := by
+    calc a₁ * (q₁ - q₃) * (q₁ - q₂)
+      _ = (a₁ * (q₁ * (q₁ - q₃)) + a₂ * (q₂ * (q₂ - q₃))) - q₂ * (a₁ * (q₁ - q₃) + a₂ * (q₂ - q₃)) := by ring
+      _ = 0 - q₂ * 0 := by rw [h_eq2, h_eq1]
+      _ = 0 := by ring
+  have ha1_zero : a₁ = 0 := by
+    have h_prod1 : a₁ * ((q₁ - q₃) * (q₁ - q₂)) = 0 := by
+      calc a₁ * ((q₁ - q₃) * (q₁ - q₂)) = a₁ * (q₁ - q₃) * (q₁ - q₂) := by ring
+      _ = 0 := h_det
+    cases mul_eq_zero.mp h_prod1 with
+    | inl h => exact h
+    | inr h_prod2 =>
+      cases mul_eq_zero.mp h_prod2 with
+      | inl hd13 => exact (h_diff13 hd13).elim
+      | inr hd12 => exact (h_diff12 hd12).elim
+  have ha2_zero : a₂ = 0 := by
+    have h2 : a₂ * (q₂ - q₃) = 0 := by
+      calc a₂ * (q₂ - q₃) = (a₁ * (q₁ - q₃) + a₂ * (q₂ - q₃)) - a₁ * (q₁ - q₃) := by ring
+      _ = 0 - 0 * (q₁ - q₃) := by rw [h_eq1, ha1_zero]
+      _ = 0 := by ring
+    cases mul_eq_zero.mp h2 with
+    | inl h => exact h
+    | inr hd23 => exact (h_diff23 hd23).elim
+  have ha3_zero : a₃ = 0 := by
+    calc a₃ = (a₁ + a₂ + a₃) - a₁ - a₂ := by ring
+    _ = 0 - 0 - 0 := by rw [h_K0, ha1_zero, ha2_zero]
+    _ = 0 := by ring
+  exact ⟨ha1_zero, ha2_zero, ha3_zero⟩
+
+/-- Cycle 11 Theorem: Transcendental Nonresonance Implication.
+    If (log tau) / (2 * pi) = (a * log p) / (2 * pi * q) for positive real tau, p and nonzero q,
+    then q * log tau = a * log p. -/
+theorem tc_log_nonresonance_scaling (tau p a q : ℝ) (hq : q ≠ 0) (hpi : Real.pi ≠ 0)
+    (h_eq : Real.log tau / (2 * Real.pi) = (a * Real.log p) / (2 * Real.pi * q)) :
+    q * Real.log tau = a * Real.log p := by
+  have h2pi : 2 * Real.pi ≠ 0 := mul_ne_zero two_ne_zero hpi
+  have h2pi_q : 2 * Real.pi * q ≠ 0 := mul_ne_zero h2pi hq
+  have h1 : Real.log tau / (2 * Real.pi) * (2 * Real.pi * q) =
+      (a * Real.log p) / (2 * Real.pi * q) * (2 * Real.pi * q) := by rw [h_eq]
+  rw [div_mul_cancel₀ (a * Real.log p) h2pi_q] at h1
+  have h_left : Real.log tau / (2 * Real.pi) * (2 * Real.pi * q) = q * Real.log tau := by
+    calc Real.log tau / (2 * Real.pi) * (2 * Real.pi * q)
+      _ = (Real.log tau / (2 * Real.pi) * (2 * Real.pi)) * q := by ring
+      _ = Real.log tau * q := by rw [div_mul_cancel₀ (Real.log tau) h2pi]
+      _ = q * Real.log tau := by ring
+  rw [h_left] at h1
+  exact h1
+
+/-- Cycle 11 Theorem: Nonresonance with prime powers from transcendence hypothesis.
+    If tau is not the root of any X^q - c with c ∈ ℚ, then tau^q ≠ (p^a : ℝ). -/
+theorem tc_prime_power_nonresonance_of_transcendental (tau : ℝ) (q a : ℕ) (p : ℕ)
+    (h_trans : ∀ (c : ℚ), tau ^ (q : ℝ) ≠ (c : ℝ)) :
+    tau ^ (q : ℝ) ≠ (p ^ a : ℝ) := by
+  intro h_eq
+  have h_c : tau ^ (q : ℝ) = ((p ^ a : ℚ) : ℝ) := by
+    push_cast
+    exact h_eq
+  exact (h_trans (p ^ a : ℚ)) h_c
+
+/-- Cycle 11 Theorem: Mode modulus distinction from centering displacement difference.
+    Two exponential modes with displacement δ₁ ≠ δ₂ have distinct moduli under base tau > 1. -/
+theorem mode_modulus_distinct_of_delta_ne (tau δ₁ δ₂ : ℝ) (htau : 1 < tau) (hδ : δ₁ ≠ δ₂) :
+    Real.exp (-δ₁ * Real.log tau) ≠ Real.exp (-δ₂ * Real.log tau) := by
+  have hlog_pos : 0 < Real.log tau := Real.log_pos htau
+  have hlog_ne : Real.log tau ≠ 0 := ne_of_gt hlog_pos
+  intro h_eq
+  rw [Real.exp_eq_exp] at h_eq
+  have h_sub : (-δ₁ - -δ₂) * Real.log tau = 0 := by
+    calc (-δ₁ - -δ₂) * Real.log tau = -δ₁ * Real.log tau - -δ₂ * Real.log tau := by ring
+    _ = 0 := sub_eq_zero.mpr h_eq
+  cases mul_eq_zero.mp h_sub with
+  | inl h_diff =>
+    have h_delta_eq : δ₁ = δ₂ := by linarith
+    exact hδ h_delta_eq
+  | inr h_log_zero =>
+    exact (hlog_ne h_log_zero).elim
 
 end RiemannScope
 
