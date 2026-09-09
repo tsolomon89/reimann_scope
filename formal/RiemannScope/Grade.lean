@@ -709,9 +709,11 @@ theorem tc_log_nonresonance_scaling (tau p a q : ℝ) (hq : q ≠ 0) (hpi : Real
   rw [h_left] at h1
   exact h1
 
-/-- Cycle 11 Theorem: Nonresonance with prime powers from transcendence hypothesis.
-    If tau is not the root of any X^q - c with c ∈ ℚ, then tau^q ≠ (p^a : ℝ). -/
-theorem tc_prime_power_nonresonance_of_transcendental (tau : ℝ) (q a : ℕ) (p : ℕ)
+/-- Cycle 11 Theorem (Conditional): Nonresonance with prime powers from assumed power irrationality.
+    Specializes an assumed irrationality hypothesis for tau^q over ℚ to the algebraic prime power p^a.
+    Lindemann's theorem (1882) that tau = 2*pi is transcendental is an external theorem from
+    transcendental number theory, not proved within this Lean module. -/
+theorem tc_prime_power_nonresonance_conditional (tau : ℝ) (q a : ℕ) (p : ℕ)
     (h_trans : ∀ (c : ℚ), tau ^ (q : ℝ) ≠ (c : ℝ)) :
     tau ^ (q : ℝ) ≠ (p ^ a : ℝ) := by
   intro h_eq
@@ -719,6 +721,12 @@ theorem tc_prime_power_nonresonance_of_transcendental (tau : ℝ) (q a : ℕ) (p
     push_cast
     exact h_eq
   exact (h_trans (p ^ a : ℚ)) h_c
+
+/-- Compatibility alias for Cycle 11 claim spec -/
+theorem tc_prime_power_nonresonance_of_transcendental (tau : ℝ) (q a : ℕ) (p : ℕ)
+    (h_trans : ∀ (c : ℚ), tau ^ (q : ℝ) ≠ (c : ℝ)) :
+    tau ^ (q : ℝ) ≠ (p ^ a : ℝ) :=
+  tc_prime_power_nonresonance_conditional tau q a p h_trans
 
 /-- Cycle 11 Theorem: Mode modulus distinction from centering displacement difference.
     Two exponential modes with displacement δ₁ ≠ δ₂ have distinct moduli under base tau > 1. -/
@@ -738,6 +746,61 @@ theorem mode_modulus_distinct_of_delta_ne (tau δ₁ δ₂ : ℝ) (htau : 1 < ta
   | inr h_log_zero =>
     exact (hlog_ne h_log_zero).elim
 
+/-- Cycle 12 Theorem: Quantitative Vandermonde Block Reconstruction for 2 modes over ℂ.
+    For distinct bases q₁ ≠ q₂ and grade k : ℕ, the individual mode a₁ * q₁^k is uniquely
+    reconstructed from the 2-block sum values S_k = a₁*q₁^k + a₂*q₂^k and S_{k+1} = a₁*q₁^{k+1} + a₂*q₂^{k+1}.
+    Identity: a₁ * q₁^k = (S_k * q₂ - S_{k+1}) / (q₂ - q₁). -/
+theorem vandermonde_block_reconstruction_2 (q₁ q₂ a₁ a₂ : ℂ) (hq : q₂ - q₁ ≠ 0) (k : ℕ)
+    (S_k : ℂ) (S_k1 : ℂ)
+    (hS_k : S_k = a₁ * q₁^k + a₂ * q₂^k)
+    (hS_k1 : S_k1 = a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) :
+    a₁ * q₁^k = (S_k * q₂ - S_k1) / (q₂ - q₁) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := by ring
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := by ring
+  rw [hS_k, hS_k1, h_step1, h_step2]
+  have h_alg : (a₁ * q₁^k + a₂ * q₂^k) * q₂ - (a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂)) =
+      (a₁ * q₁^k) * (q₂ - q₁) := by ring
+  rw [h_alg]
+  exact (mul_div_cancel_right₀ (a₁ * q₁^k) hq).symm
+
+/-- Cycle 12 Theorem: Quantitative Vandermonde Block Reconstruction for 2 modes (second mode).
+    Identity: a₂ * q₂^k = (S_{k+1} - S_k * q₁) / (q₂ - q₁). -/
+theorem vandermonde_block_reconstruction_2_mode2 (q₁ q₂ a₁ a₂ : ℂ) (hq : q₂ - q₁ ≠ 0) (k : ℕ)
+    (S_k : ℂ) (S_k1 : ℂ)
+    (hS_k : S_k = a₁ * q₁^k + a₂ * q₂^k)
+    (hS_k1 : S_k1 = a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) :
+    a₂ * q₂^k = (S_k1 - S_k * q₁) / (q₂ - q₁) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := by ring
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := by ring
+  rw [hS_k, hS_k1, h_step1, h_step2]
+  have h_alg : (a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂)) - (a₁ * q₁^k + a₂ * q₂^k) * q₁ =
+      (a₂ * q₂^k) * (q₂ - q₁) := by ring
+  rw [h_alg]
+  exact (mul_div_cancel_right₀ (a₂ * q₂^k) hq).symm
+
+/-- Cycle 12 Theorem: Quantitative Vandermonde Block Reconstruction for 3 modes over ℂ.
+    For pairwise distinct bases q₁, q₂, q₃ and grade k : ℕ, the individual mode a₁ * q₁^k
+    is uniquely reconstructed from the 3-block sum values S_k, S_{k+1}, S_{k+2}.
+    Identity: a₁ * q₁^k = (S_{k+2} - (q₂ + q₃)*S_{k+1} + (q₂*q₃)*S_k) / ((q₁ - q₂)*(q₁ - q₃)). -/
+theorem vandermonde_block_reconstruction_3 (q₁ q₂ q₃ a₁ a₂ a₃ : ℂ)
+    (h_denom : (q₁ - q₂) * (q₁ - q₃) ≠ 0) (k : ℕ)
+    (S_k : ℂ) (S_k1 : ℂ) (S_k2 : ℂ)
+    (hS_k : S_k = a₁ * q₁^k + a₂ * q₂^k + a₃ * q₃^k)
+    (hS_k1 : S_k1 = a₁ * q₁^(k+1) + a₂ * q₂^(k+1) + a₃ * q₃^(k+1))
+    (hS_k2 : S_k2 = a₁ * q₁^(k+2) + a₂ * q₂^(k+2) + a₃ * q₃^(k+2)) :
+    a₁ * q₁^k = (S_k2 - (q₂ + q₃) * S_k1 + (q₂ * q₃) * S_k) / ((q₁ - q₂) * (q₁ - q₃)) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := by ring
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := by ring
+  have h_step3 : q₃^(k+1) = q₃^k * q₃ := by ring
+  have h_step4 : q₁^(k+2) = q₁^k * q₁^2 := by ring
+  have h_step5 : q₂^(k+2) = q₂^k * q₂^2 := by ring
+  have h_step6 : q₃^(k+2) = q₃^k * q₃^2 := by ring
+  rw [hS_k, hS_k1, hS_k2, h_step1, h_step2, h_step3, h_step4, h_step5, h_step6]
+  have h_alg : (a₁ * (q₁^k * q₁^2) + a₂ * (q₂^k * q₂^2) + a₃ * (q₃^k * q₃^2)) -
+      (q₂ + q₃) * (a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂) + a₃ * (q₃^k * q₃)) +
+      (q₂ * q₃) * (a₁ * q₁^k + a₂ * q₂^k + a₃ * q₃^k) =
+      (a₁ * q₁^k) * ((q₁ - q₂) * (q₁ - q₃)) := by ring
+  rw [h_alg]
+  exact (mul_div_cancel_right₀ (a₁ * q₁^k) h_denom).symm
+
 end RiemannScope
-
-

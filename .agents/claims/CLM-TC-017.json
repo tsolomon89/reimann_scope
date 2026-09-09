@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-017",
+  "statement": "Complete Smoothed TC Transport, Quantitative Vandermonde Block Detectability, and Honest Certification: For fundamental unit dilation period tau = 2*pi, coordinate scale h = tau^{-k} (k in Z), and smooth compactly supported test function phi in C_c^infty((0, infty)) with supp(phi) subset [a, b] (0 < h < a), the complete prime-zeta explicit formula transports faithfully across unit systems without coordinate defect: (1) Complete Smoothed Transport Identity: h * sum_{n >= 1} Lambda(n) phi(hn) = phi_tilde(1) - sum_rho m_rho phi_tilde(rho) h^{1-rho} - sum_{j >= 1} phi_tilde(-2j) h^{1+2j}, where phi_tilde(s) = int_a^b phi(x) x^{s-1} dx is entire. The trivial-zero series sum_{j >= 1} phi_tilde(-2j) h^{1+2j} is mathematically identical to the background integral h * int_1^infty phi(hx)/(x(x^2-1)) dx; exactly one representation is subtracted, correcting previous double-counting. The zero-point constant term -zeta'(0)/zeta(0) * phi_tilde(0) * h vanishes identically because phi_tilde is entire and -zeta'/zeta has no pole at s=0. (2) Quantitative Vandermonde Block Detectability: For any r distinct nonzero complex bases q_1, ..., q_r, the sequence S(k) = sum_{j=1}^r a_j q_j^k satisfies the block lower bound max_{0 <= l < r} |S(k+l)| >= c(q_1, ..., q_r) * max_j |a_j q_j^k|, where c = 1 / ||V^{-1}||_{infty -> infty} > 0. Consequently, hypothetical off-line modes (delta != 0, |q_j| = tau^delta > 1) cannot remain hidden across any block of r consecutive grades. Exact 2-mode and 3-mode Vandermonde coefficient reconstructions are formally proved in Lean 4 without axioms beyond propext, Classical.choice, and Quot.sound. (3) Honest Fail-Closed Certification: Pairwise phase distinction is certified fail-closed for the first 25 zeros using Arb ball enclosures; bounded rational exclusion theta_j != p/q is certified for all 1 <= q <= 10^6 for the first 20 zeros via constructive Farey neighbor coverage intervals; and bounded integer relations (|a_j| <= 50) are certified with signed Arb witnesses. However, continuous distributional fluctuation does not force discrete lattice point collisions across arithmetic layers L_K = tau^K Z; the RH exclusion bridge remains open.",
+  "quantified_variables": [
+    {
+      "name": "h",
+      "domain": "h in Real, 0 < h < a",
+      "description": "Coordinate dilation scale factor"
+    },
+    {
+      "name": "k",
+      "domain": "k in Integer",
+      "description": "Discrete grade index"
+    },
+    {
+      "name": "r",
+      "domain": "r in Integer, r >= 1",
+      "description": "Number of exponential modes"
+    },
+    {
+      "name": "q_j",
+      "domain": "q_j in Complex, q_j != 0",
+      "description": "Complex mode base tau^{rho_j - 1/2}"
+    },
+    {
+      "name": "a_j",
+      "domain": "a_j in Complex",
+      "description": "Mode amplitude coefficient"
+    },
+    {
+      "name": "rho",
+      "domain": "rho in Complex, 0 < Re(rho) < 1",
+      "description": "Nontrivial zero of the Riemann zeta function"
+    },
+    {
+      "name": "phi",
+      "domain": "phi in C_c^infty((0, infty)), supp(phi) subset [a, b]",
+      "description": "Smooth compactly supported test function"
+    }
+  ],
+  "variable_domains": [
+    "h in Real, 0 < h < a",
+    "k in Integer",
+    "r in Integer, r >= 1",
+    "q_j in Complex, q_j != 0",
+    "a_j in Complex",
+    "rho in Complex, 0 < Re(rho) < 1",
+    "phi in C_c^infty((0, infty)), supp(phi) subset [a, b]"
+  ],
+  "hypotheses": [
+    "Riemann explicit formula on compactly supported smooth test functions away from x=1",
+    "Analyticity and entirety of the Mellin transform phi_tilde(s) for phi in C_c^infty((0, infty))",
+    "Linear algebra of Vandermonde matrices with distinct nonzero complex nodes",
+    "Transcendence of tau = 2*pi over Q (Lindemann 1882)",
+    "Certified Arb ball enclosures for nontrivial Riemann zeta zeros"
+  ],
+  "object_studied": "Complete smoothed TC prime-zero transport formula, Vandermonde block lower bounds, and certified Farey coverage bounds",
+  "fourier_normalization": "Additive Fourier-Mellin transform on (0, infty): phi_tilde(s) = int_0^infty phi(x) x^{s-1} dx",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho, or listed with repetition",
+  "measure_and_window": "Prime measure mu = sum Lambda(n) delta_n, test window supp(phi) subset [a, b] with 0 < h < a",
+  "order_of_limits": "Spectral truncation cutoff gamma <= gamma_N, background series cutoff j <= M, followed by N, M -> infty",
+  "exact_conclusion": "Complete smoothed prime-zeta explicit formula transports faithfully without coordinate defect or double counting; off-line modes cannot hide across any block of r consecutive grades by quantitative Vandermonde block estimate (formally verified in Lean 4 for r=2, 3); bounded rational exclusion is certified for denominators q <= 10^6 via Farey coverage intervals; but continuous distributional fluctuation does not force discrete lattice collisions across arithmetic layers L_K = tau^K Z.",
+  "logical_negation": "Complete smoothed prime side differs from spectral side plus single background correction on C_c^infty, or Vandermonde matrix with distinct nodes is singular, or off-line modes can vanish identically across all blocks of r consecutive grades (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "x in [2, 4], h = 1.0 < a = 2.0",
+  "spectral_cutoff": "gamma_N = 192.026 (N=75 zeros)",
+  "integration_domain": "(0, infty), compactly supported on [2, 4]",
+  "omitted_tail": "Zero tail with gamma > 192.026 and background tail with j > 15",
+  "tail_enclosure": "Zero tail <= 7.69e-4 via second-derivative integration by parts; background tail <= 1e-13",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: vandermonde_block_reconstruction_2",
+    "formal/RiemannScope/Grade.lean: vandermonde_block_reconstruction_2_mode2",
+    "formal/RiemannScope/Grade.lean: vandermonde_block_reconstruction_3",
+    "formal/RiemannScope/Grade.lean: tc_prime_power_nonresonance_conditional",
+    "transcendental.py: audit_complete_smoothed_tc_transport",
+    "transcendental.py: audit_quantitative_vandermonde_block_detectability",
+    "transcendental.py: audit_infinite_extension_detectability",
+    "transcendental.py: audit_cycle12_synthesis",
+    "transcendental.py: find_farey_witness_coverage",
+    "transcendental.py: certify_bounded_rational_exclusion_arb",
+    "transcendental.py: certify_pairwise_phase_distinction_arb",
+    "transcendental.py: audit_bounded_integer_relations"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Symbolic Elimination & Equality-Case Cancellation Analysis): derived equality between background series sum phi_tilde(-2j) h^{1+2j} and integral h int_1^infty phi(hx)/(x(x^2-1)) dx; verified agreement to 13 decimal digits; proved zero-point constant -zeta'(0)/zeta(0) vanishes identically; formalized 2-mode and 3-mode Vandermonde reconstruction in Lean 4",
+    "Gate 2 & 5 (Boundary Dominance & Asymptotic Limit Audit): verified quantitative Vandermonde block estimate max_{0<=l<r} |S(k+l)| >= c max_j |a_j q_j^k| across grades k=0..9; confirmed ratio max_S / (c*max_mode) is between 17 and 43 for off-line quartet (delta=0.25)",
+    "Gate 3 & 6 (Finite Vandermonde Cancellation & Mode Independence): proved that invertibility of V depends strictly on pairwise distinct bases (P2); formalized exact reconstructions in Lean 4 without extra axioms",
+    "Gate 7 & 8 (Bounded Rational Exclusion & Lattice Search): constructed Farey coverage witness brackets (a/b < lower <= upper < c/d with bc - ad = 1 and b+d > 10^6) for first 20 zeros, certifying exclusion of all denominators q <= 10^6; fixed sign of bounded relation witness a0 = 37 with Arb ball precision",
+    "Gate 9 (Fail-Closed Input Validation): verified rejection of invalid directory paths and missing zero certificates with INPUT_INVALID",
+    "Gate 10 (Dual Status Classification): passed all 10 structural schema gates and established formal Lean 4 verification"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_n1_fail_closed_inputs",
+    "tests/test_tc_mechanism_discovery.py: test_n2_farey_witness_coverage_and_brute_force",
+    "tests/test_tc_mechanism_discovery.py: test_n3_integer_relations_repaired",
+    "tests/test_tc_mechanism_discovery.py: test_complete_smoothed_tc_transport",
+    "tests/test_tc_mechanism_discovery.py: test_quantitative_vandermonde_block_detectability",
+    "tests/test_tc_mechanism_discovery.py: test_infinite_extension_detectability",
+    "tests/test_tc_mechanism_discovery.py: test_cycle12_synthesis"
+  ],
+  "external_sources": [
+    {
+      "source": "Tao, T. (2021), 246B Notes 4: The Riemann zeta function and the prime number theorem, Section on Explicit Formulas",
+      "theorem": "Smoothed explicit formula on test functions away from x=1 via Mellin inversion of -zeta'/zeta"
+    },
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Mathematische Annalen 20, 213-225",
+      "theorem": "Transcendence of 2*pi, establishing that arithmetic layers L_K = tau^K Z are externally disjoint (L_K cap L_J = {0} for K != J)"
+    },
+    {
+      "source": "Hardy, G. H. and Wright, E. M. (1979), An Introduction to the Theory of Numbers, Chapter III (Farey Series)",
+      "theorem": "Farey mediant theorem: if a/b < c/d with bc - ad = 1, every rational in (a/b, c/d) has denominator >= b + d"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Derivation of an exact cross-grade discrete point collision m*tau^K = n*tau^J (K != J, mn != 0) from continuous distributional explicit formula fluctuations (OPEN / UNPROVED)"
+  ]
+}

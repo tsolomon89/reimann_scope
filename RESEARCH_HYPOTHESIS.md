@@ -2003,13 +2003,19 @@ Furthermore, by Littlewood's theorem (1914), $E(u)$ changes sign infinitely ofte
 
 ### 33.6 Smoothed Explicit Formula and Spectral Isolation
 
-For an admissible test function $\phi \in C_c^\infty((0, \infty))$ with entire Mellin transform $\widetilde{\phi}(s) = \int_0^\infty \phi(x) x^{s-1} dx$, the complete smoothed explicit formula evaluates to:
+For an admissible test function $\phi \in C_c^\infty((0, \infty))$ with $\operatorname{supp}(\phi) \subset [a, b]$ ($0 < h < a$) and entire Mellin transform $\widetilde{\phi}(s) = \int_0^\infty \phi(x) x^{s-1} dx$, the complete smoothed explicit formula evaluates to:
 \[
-\langle h\mu_h, \phi \rangle = h \sum_{n \ge 1} \Lambda(n) \phi(hn) = \widetilde{\phi}(1) - \lim_{T \to \infty} \sum_{|\Im(\rho)| \le T} \widetilde{\phi}(\rho) h^{1 - \rho} - \sum_{k=1}^\infty \widetilde{\phi}(-2k) h^{1 + 2k} - \frac{\zeta'(0)}{\zeta(0)} \widetilde{\phi}(0) h - \int_0^\infty \phi(hx) \frac{dx}{x(x^2 - 1)}.
+\langle h\mu_h, \phi \rangle = h \sum_{n \ge 1} \Lambda(n) \phi(hn) = \widetilde{\phi}(1) - \lim_{T \to \infty} \sum_{|\Im(\rho)| \le T} m_\rho \widetilde{\phi}(\rho) h^{1 - \rho} - \sum_{j=1}^\infty \widetilde{\phi}(-2j) h^{1 + 2j}.
+\]
+*(Correction Note: The previous display in §33.6 contained two defects: (1) double-counting the background trivial-zero contribution by subtracting both the series $\sum_{j \ge 1} \widetilde{\phi}(-2j) h^{1+2j}$ and the background integral $h \int_1^\infty \frac{\phi(hx)}{x(x^2-1)} dx$, which are mathematically identical by geometric expansion of $\frac{1}{x(x^2-1)}$; exactly one representation must be used; (2) including the constant $-\frac{\zeta'(0)}{\zeta(0)} \widetilde{\phi}(0) h$, which is identically zero because $\widetilde{\phi}(s)$ is entire and $-\zeta'/\zeta$ has no pole at $s=0$. Both defects are corrected here and in Cycle 12).*
+
+Equivalently, using the integral background representation:
+\[
+\sum_{j=1}^\infty \widetilde{\phi}(-2j) h^{1+2j} = h \int_1^\infty \frac{\phi(hx)}{x(x^2-1)} dx.
 \]
 Subtracting the Lebesgue main term $\langle dx, \phi \rangle = \int_0^\infty \phi(x) dx = \widetilde{\phi}(1)$, the half-density fluctuation pairing is:
 \[
-\langle F_h, \phi \rangle = h^{-1/2} (\langle h\mu_h, \phi \rangle - \langle dx, \phi \rangle) = -\lim_{T \to \infty} \sum_{|\Im(\rho)| \le T} \widetilde{\phi}(\rho) h^{1/2 - \rho} - \sum_{k=1}^\infty \widetilde{\phi}(-2k) h^{1/2 + 2k} - \frac{\zeta'(0)}{\zeta(0)} \widetilde{\phi}(0) h^{1/2} - h^{-1/2} \int_0^\infty \phi(hx) \frac{dx}{x(x^2 - 1)}.
+\langle F_h, \phi \rangle = h^{-1/2} (\langle h\mu_h, \phi \rangle - \langle dx, \phi \rangle) = -\lim_{T \to \infty} \sum_{|\Im(\rho)| \le T} m_\rho \widetilde{\phi}(\rho) h^{1/2 - \rho} - \sum_{j=1}^\infty \widetilde{\phi}(-2j) h^{1/2 + 2j}.
 \]
 Cancellation and uniqueness analysis:
 - Individual off-line modes grow as $\tau^{-K\delta}$ as $K \to -\infty$.
@@ -2168,4 +2174,86 @@ Four new theorems formalized in `formal/RiemannScope/Grade.lean` under standard 
 | :--- | :--- | :--- | :--- | :--- |
 | **TC-DISC-016** | **CLM-TC-016** | TC Zero-Phase Nonresonance, Certified Incommensurability Bounds, and Vandermonde Cancellation | Proved zero-index phase equidistribution and prime-power nonresonance via Hlawka (1975), Ford-Zaharescu (2005), and Lindemann (1882); proved and Lean-formalized finite Vandermonde uniqueness requiring only distinct bases (P2); certified pairwise distinction for first 25 zeros, rational exclusion for $q \le 10^6$ on first 20 zeros, and box integer relation exclusion for $|a| \le 50$ via Arb; audited TC bridge implication chain. | **TC PHASE NONRESONANCE PROVED; RH EXCLUSION BRIDGE STILL OPEN** (Zero phases are strictly nonresonant with prime powers, but grade-axis incommensurability remains open, and the infinite distributional explicit formula does not force an exact cross-grade lattice collision) |
 
+---
 
+# 35. Cycle 12 — Complete TC Transport, Honest Certification, and Spectral Detectability
+
+## 35.1 Governing Mission and Soundness Repairs
+
+Cycle 12 addresses three ordered mathematical outcomes:
+1. **Soundness Repairs**:
+   - **Fail-Closed Inputs (N1)**: Replaced permissive empty certificate list acceptance with strict fail-closed input verification (requiring exact zero sequences $1..N$ and valid Arb enclosures; returning `INPUT_INVALID` on missing inputs).
+   - **Farey Coverage Proof (N2)**: Continued fractions midpoint heuristics lacked a coverage proof across intervals. Replaced with constructive Farey neighbor brackets: constructing $a/b < \text{lower} \le \text{upper} < c/d$ with $bc - ad = 1$ and mediant denominator $b+d > 10^6$. By the Farey mediant coverage theorem (Hardy & Wright 1979, Ch. III), every rational in $(a/b, c/d)$ has denominator at least $b+d > 10^6$, rigorously proving exclusion of all denominators $q \le 10^6$ for tested zeros.
+   - **Integer Relation Witness Sign Correction (N3)**: Fixed the sign of $a_0$ in the closest integer relation output ($a_0 = 37$ with $37 - 3\theta_1 - 4\theta_2 \approx 7.904 \times 10^{-5}$, resolving the previous sign bug where residual evaluated to $\approx 74$). Added synthetic relation detection (`RELATION_FOUND`).
+   - **Explicit Formula Soundness (§33.6)**: Proved that the trivial-zero series $\sum_{j \ge 1} \widetilde{\phi}(-2j) h^{1+2j}$ and background integral $h \int_1^\infty \frac{\phi(hx)}{x(x^2-1)} dx$ represent the identical contour integral (verified to $10^{-13}$). Eliminated double-counting and proved that $-\zeta'(0)/\zeta(0)$ vanishes identically on $C_c^\infty((0, \infty))$.
+
+## 35.2 Primary Mathematical Task: Complete Smoothed TC Transport
+
+Let:
+\[
+\mu = \sum_{n \ge 1} \Lambda(n) \delta_n, \quad \mu_h = (x \mapsto hx)_* \mu, \quad \nu_h = h\mu_h, \quad F_h = h^{-1/2}(\nu_h - dx).
+\]
+For $\phi \in C_c^\infty((0, \infty))$ with $\operatorname{supp}(\phi) \subset [a, b]$ ($0 < h < a$), the entire Mellin transform is:
+\[
+\widetilde{\phi}(s) = \int_0^\infty \phi(x) x^{s-1} dx.
+\]
+The independently derived and numerically verified smoothed transport theorem is:
+\[
+h \sum_{n \ge 1} \Lambda(n) \phi(hn) = \widetilde{\phi}(1) - \sum_\rho m_\rho \widetilde{\phi}(\rho) h^{1-\rho} - \sum_{j \ge 1} \widetilde{\phi}(-2j) h^{1+2j}.
+\]
+Subtracting the Lebesgue main term $\widetilde{\phi}(1)$ and multiplying by $h^{-1/2}$:
+\[
+\langle F_h, \phi \rangle = -\sum_\rho m_\rho \widetilde{\phi}(\rho) h^{1/2-\rho} - \sum_{j \ge 1} \widetilde{\phi}(-2j) h^{1/2+2j}.
+\]
+When $h = \tau^{-k}$ ($k \in \mathbb{Z}$), the zero mode base is $q_\rho = \exp((\rho - 1/2)\log\tau)$.
+- On-line zeros ($\rho = 1/2 + i\gamma$): $|q_\rho| = |\tau^{i\gamma}| = 1$ (bounded unitary phase).
+- Off-line zeros ($\rho = 1/2 + \delta + i\gamma$, $\delta \ne 0$): $|q_\rho| = \tau^\delta \ne 1$ (exponential growth $\tau^{k\delta}$ in grade $k$).
+
+### Numerical Verification and Error Budget:
+Tested on standard bump $\phi(x) = \exp(-1/((x-2)(4-x)))$ on $[2, 4]$ with $h = 1.0 < 2.0$:
+- Prime side (sieved $\Lambda(n)$): $0.40415687...$
+- Spectral side ($N=75$ zeros): $0.40424922...$
+- Observed residual: $9.2349 \times 10^{-5}$.
+- Theoretical zero truncation tail bound (via second-derivative integration by parts): $\le 7.69 \times 10^{-4}$.
+- Background discrepancy between series and integral: $8.57 \times 10^{-14}$.
+- Residual lies strictly within the certified tail budget.
+
+## 35.3 Next Theorem: Quantitative Vandermonde Block Detectability
+
+Let $q_1, \dots, q_r$ be $r$ distinct nonzero complex bases, and $S(k) = \sum_{j=1}^r a_j q_j^k$.
+Let $V$ be the $r \times r$ Vandermonde matrix with $V_{\ell j} = q_j^\ell$ ($0 \le \ell < r, 1 \le j \le r$).
+Since $q_j$ are distinct, $\det V = \prod_{i < j} (q_j - q_i) \ne 0$, so $V$ is invertible.
+In vector form:
+\[
+\mathbf{S}_r(k) = \begin{pmatrix} S(k) \\ \vdots \\ S(k+r-1) \end{pmatrix} = V \begin{pmatrix} a_1 q_1^k \\ \vdots \\ a_r q_r^k \end{pmatrix}.
+\]
+Inverting $V$ and taking the matrix $\infty \to \infty$ norm gives the **Quantitative Vandermonde Block Lower Bound**:
+\[
+\max_{0 \le \ell < r} |S(k+\ell)| \ge c(q_1, \dots, q_r) \max_{1 \le j \le r} |a_j q_j^k|, \quad \text{where } c = \frac{1}{\|V^{-1}\|_\infty} > 0.
+\]
+This proves that exponential growth cannot remain hidden across any block of $r$ consecutive grades.
+If at least one active mode has $|q_j| = \tau^\delta > 1$, then $\max_{0 \le \ell < r} |S(k+\ell)| \to \infty$ as $k \to \infty$.
+
+### Formal Lean 4 Verification:
+Formally proved in `formal/RiemannScope/Grade.lean` under standard Mathlib axioms (`propext`, `Classical.choice`, `Quot.sound`) with zero `sorry`:
+1. `vandermonde_block_reconstruction_2`: exact 2-mode reconstruction $a_1 q_1^k = (S_k q_2 - S_{k+1}) / (q_2 - q_1)$.
+2. `vandermonde_block_reconstruction_2_mode2`: exact 2-mode reconstruction for mode 2.
+3. `vandermonde_block_reconstruction_3`: exact 3-mode reconstruction $a_1 q_1^k = (S_{k+2} - (q_2 + q_3) S_{k+1} + q_2 q_3 S_k) / ((q_1 - q_2)(q_1 - q_3))$.
+
+## 35.4 Infinite-Extension Detectability and Collision Analysis
+
+We separated three propositions for infinite extension:
+1. **Single Fixed Annihilating Test**: A single test $\phi \in C_c^\infty((0, \infty))$ annihilating all zeros except one is **IMPOSSIBLE** (disproved by the Paley-Wiener theorem: the Mellin transform is an entire function of exponential type; an entire function vanishing at all Riemann zeros except one violates exponential type bounds or vanishes identically).
+2. **Approximate Isolation Family**: A parameterized family of test functions (Beurling-Selberg / Fejér kernels) can approximate mode isolation with quantified tail remainders (**FEASIBLE**).
+3. **Distributional Uniqueness**: If $\langle F_h, \phi \rangle = 0$ for all $\phi \in C_c^\infty((0, \infty))$, then $F_h = 0$ as a Schwartz distribution, uniquely determining all spectral coefficients (**PROVED**).
+
+### Analysis of the Collision Mechanism:
+Does off-line mode growth force an arithmetic coincidence $m\tau^K = n\tau^J \ne 0$?
+**NO. THE RH EXCLUSION BRIDGE REMAINS OPEN.**
+Transcendental continuation is a faithful coordinate transport of the prime-zeta explicit formula across unit systems. The explicit formula holds in each unit system $L_K$. Continuous distributional fluctuations under dilation do not force the support or value of any observable to collide on discrete lattice points. The arithmetic layers $L_K = \tau^K \mathbb{Z}$ remain unconditionally disjoint ($L_K \cap L_J = \{0\}$ for $K \ne J$) by the transcendence of $\tau = 2\pi$ (Lindemann 1882).
+
+## 35.5 Synthesis of Candidate TC-DISC-017 / CLM-TC-017
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-017** | **CLM-TC-017** | Complete Smoothed TC Transport, Quantitative Vandermonde Block Detectability, and Honest Certification | Derived and numerically verified complete smoothed explicit formula without background double-counting or phantom pole at $s=0$; proved quantitative Vandermonde block estimate $\max_{0 \le \ell < r} |S(k+\ell)| \ge c \max |a_j q_j^k|$; formalized exact 2- and 3-mode Vandermonde reconstructions in Lean 4 without extra axioms; certified bounded rational exclusion for $q \le 10^6$ via Farey coverage intervals; fail-closed Arb phase distinction and signed relation audit; audited infinite extension and collision obstruction. | **COMPLETE TC TRANSPORT DERIVED AND VERIFIED; QUANTITATIVE BLOCK DETECTABILITY PROVED; CROSS-GRADE COLLISION BRIDGE STILL OPEN** (TC faithfully transports prime-zeta identities, and off-line modes cannot hide in finite blocks; but continuous distributional fluctuation does not force discrete cross-grade lattice collisions) |

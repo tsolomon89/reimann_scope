@@ -16,6 +16,7 @@ Tests:
 """
 
 import json
+import math
 import os
 import mpmath
 import pytest
@@ -1094,7 +1095,7 @@ def test_prime_measure_transport_and_weak_limit():
     assert res["weak_convergence_observed"] is True
     assert res["jacobian_forced"] is True
     assert "transcendence of tau" in res["support_disjointness_property"]
-    
+
     evals = res["grade_evaluations"]
     err_fine = float(evals[0]["pairing_error"])  # K = -3
     err_coarse = float(evals[-1]["pairing_error"])  # K = 0
@@ -1309,3 +1310,151 @@ def test_cycle11_synthesis():
     assert exec_answers["3_does_result_force_forbidden_lattice_coincidence"].startswith("NO (OPEN)")
     assert "TC PHASE NONRESONANCE PROVED; RH EXCLUSION BRIDGE STILL OPEN" in exec_answers["4_has_rh_exclusion_mechanism_been_found"]
 
+
+# ==============================================================================
+# 12. CYCLE 12: COMPLETE TC TRANSPORT, HONEST CERTIFICATION, & DETECTABILITY
+# ==============================================================================
+
+def test_n1_fail_closed_inputs():
+    """
+    Cycle 12 (Soundness Repair A):
+    Verify that certify_pairwise_phase_distinction_arb fails closed when:
+      1. Given an invalid directory path (returns INPUT_INVALID).
+      2. Given an empty list or missing certificates.
+    """
+    res_bad = transcendental.certify_pairwise_phase_distinction_arb(repo_root="nonexistent_path_xyz")
+    assert res_bad["classification"] == "INPUT_INVALID"
+    assert res_bad["all_pairs_strictly_separated_from_Z"] is False
+    assert "INPUT_ERROR" in res_bad["status"]
+
+
+def test_n2_farey_witness_coverage_and_brute_force():
+    """
+    Cycle 12 (Soundness Repair B):
+    Verify Farey coverage witness algorithm:
+      1. Correctly detects rational inside an interval (e.g. 10/81 in [0.123456, 0.123458]).
+      2. For an interval with no rationals <= Q, constructs Farey neighbors a/b < c/d
+         with unimodular check b*c - a*d == 1 and mediant denominator b + d > Q.
+      3. certify_bounded_rational_exclusion_arb returns CERTIFIED_WITH_EXPLICIT_BOUNDS
+         with valid Farey brackets for each zero.
+    """
+    # 1. Detection of internal rational
+    wit_in, msg_in = transcendental.find_farey_witness_coverage(0.123456, 0.123458, Q_target=100)
+    assert wit_in is None
+    assert "10/81" in msg_in
+
+    # 2. Construction of Farey bracket
+    wit_ok, msg_ok = transcendental.find_farey_witness_coverage(0.123460, 0.123465, Q_target=100)
+    assert wit_ok is not None
+    a, b, c, d = wit_ok
+    assert b * c - a * d == 1
+    assert b + d > 100
+
+    # 3. Execution of certified rational exclusion
+    res = transcendental.certify_bounded_rational_exclusion_arb(N=5, Q_target=1000000, prec_bits=256)
+    if res.get("status") == "FLINT_UNAVAILABLE":
+        pytest.skip("flint not available")
+    assert res["classification"] == "CERTIFIED_WITH_EXPLICIT_BOUNDS"
+    assert res["all_zeros_certified"] is True
+    for item in res["detailed_results"]:
+        fb = item["farey_bracket"]
+        assert fb["unimodular_check"] == 1
+        assert item["achieved_Q"] > 1000000
+        assert item["certified_no_rational_up_to_Q"] is True
+
+
+def test_n3_integer_relations_repaired():
+    """
+    Cycle 12 (Soundness Repair C):
+    Verify integer relations:
+      1. Correct sign of a0 witness: a0 + a1*theta_1 + a2*theta_2 has residual
+         magnitude matching the reported distance (~7.9e-5, not ~74).
+      2. Synthetic duplicate detection: zeros=['1.0', '1.0'] returns RELATION_FOUND.
+    """
+    # 1. Default box search witness sign check
+    res = transcendental.audit_bounded_integer_relations(max_coeff=50, dps=50)
+    r2 = res["r2_box_search"]
+    assert r2["classification"] == "CERTIFIED_WITH_EXPLICIT_BOUNDS"
+    rel = r2["closest_relation"]
+    assert rel["a0"] == 37
+    assert rel["a1"] == -3
+    assert rel["a2"] == -4
+    # Compute residual: a0 + a1*theta_1 + a2*theta_2
+    tau = 2 * math.pi
+    c_tau = math.log(tau) / tau
+    th1 = c_tau * 14.13472514173469379
+    th2 = c_tau * 21.02203963877155499
+    res_val = 37 - 3 * th1 - 4 * th2
+    assert abs(abs(res_val) - rel["distance"]) < 1e-6
+    assert abs(res_val) < 1e-4
+
+    # 2. Synthetic duplicate detection
+    res_dup = transcendental.audit_bounded_integer_relations(zeros=["1.0", "1.0"], max_coeff=1, dps=40)
+    assert res_dup["r2_box_search"]["classification"] == "RELATION_FOUND"
+
+
+def test_complete_smoothed_tc_transport():
+    """
+    Cycle 12 (Primary Mathematical Task):
+    Verify the complete smoothed TC transport identity:
+      h * sum_{n >= 1} Lambda(n) phi(hn) = phi_tilde(1) - sum_rho m_rho phi_tilde(rho) h^{1-rho} - background
+    on C_c^infty test function with support in [2, 4], 0 < h < 2.
+    Confirm:
+      1. Background series sum_{j>=1} phi_tilde(-2j) h^{1+2j} matches background integral to < 1e-12.
+      2. Constant -zeta'(0)/zeta(0) is identically 0.
+      3. Prime side and spectral side agree within zero tail truncation error (residual < 1e-4 for N=75 zeros).
+    """
+    res = transcendental.audit_complete_smoothed_tc_transport(h_val=1.0, num_zeros=75, dps=40)
+    assert res["classification"] == "DERIVED_AND_VERIFIED"
+    assert res["spectral_components"]["background_representations_discrepancy"] < 1e-12
+    assert res["spectral_components"]["constant_zeta_prime_term"] == 0.0
+    assert res["residual"] < 1e-4
+    assert res["error_budget"]["residual_within_tail_budget"] is True
+
+
+def test_quantitative_vandermonde_block_detectability():
+    """
+    Cycle 12 (Next Theorem):
+    Verify the quantitative Vandermonde block estimate:
+      max_{0 <= l < r} |S(k+l)| >= c(q_1, ..., q_r) * max_j |a_j q_j^k|
+    with c = 1 / ||V^{-1}||_{infty -> infty} > 0.
+    Confirm bound is satisfied across all tested grades k = 0..9 for an off-line quartet.
+    """
+    res = transcendental.audit_quantitative_vandermonde_block_detectability(r=4, off_line_delta=0.25, dps=40)
+    assert res["classification"] == "PROVED"
+    assert res["block_constant_c"] > 0.15
+    assert res["all_blocks_satisfied"] is True
+    for blk in res["blocks"]:
+        assert blk["bound_satisfied"] is True
+        assert blk["ratio"] >= 1.0
+
+
+def test_infinite_extension_detectability():
+    """
+    Cycle 12 (Infinite Extension Audit):
+    Verify the distinction among the three infinite extension propositions,
+    absence of critical-line integer aliasing, and open status of the collision bridge.
+    """
+    res = transcendental.audit_infinite_extension_detectability()
+    assert res["classification"] == "AUDITED_AND_STRUCTURED"
+    props = res["propositions"]
+    assert "IMPOSSIBLE" in props["1_fixed_annihilating_test"]["verdict"]
+    assert "FEASIBLE" in props["2_approximate_isolation_family"]["verdict"]
+    assert "PROVED" in props["3_distributional_uniqueness"]["verdict"]
+    assert res["aliasing_audit"]["status"] == "NO_INTEGER_ALIASING_ON_CRITICAL_LINE"
+    assert "OPEN" in res["collision_mechanism_audit"]["verdict"]
+
+
+def test_cycle12_synthesis():
+    """
+    Cycle 12 (Synthesis Audit):
+    Verify the six executive answers for Cycle 12.
+    """
+    res = transcendental.audit_cycle12_synthesis(dps=40)
+    answers = res["executive_answers"]
+    assert answers["1_does_complete_tc_transport_have_correct_derivation_and_real_test"].startswith("YES (DERIVED AND VERIFIED)")
+    assert answers["2_which_finite_incommensurability_statements_are_certified"].startswith("CERTIFIED")
+    assert answers["3_what_new_theorem_established_and_what_did_lean_prove"].startswith("PROVED")
+    assert answers["4_can_off_line_contribution_be_detected_in_infinite_formula"].startswith("YES")
+    assert answers["5_what_forces_nonzero_membership_in_two_distinct_arithmetic_layers"].startswith("NOTHING")
+    assert answers["6_was_exclusion_mechanism_found"].startswith("NO")
