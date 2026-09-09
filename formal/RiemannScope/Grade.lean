@@ -877,4 +877,37 @@ theorem reconstruction_remainder_lower_bound (M Y_est R_est : ℝ)
       _ = |Y_est| + |R_est| := by rw [abs_neg]
   linarith
 
+/-- Cycle 14 Theorem: Complex triangle inequality remainder lower bound for linear mode reconstruction.
+    If reconstructed complex mode M, observation estimator Y_est, and remainder estimator R_est satisfy
+    M = Y_est - R_est in ℂ, then Complex.abs M - Complex.abs R_est ≤ Complex.abs Y_est. -/
+theorem complex_reconstruction_remainder_lower_bound (M Y_est R_est : ℂ)
+    (h_id : M = Y_est - R_est) :
+    Complex.abs M - Complex.abs R_est ≤ Complex.abs Y_est := by
+  have h_m : M = Y_est + (-R_est) := by
+    calc M
+      _ = Y_est - R_est := h_id
+      _ = Y_est + (-R_est) := by ring
+  have h_tri : Complex.abs M ≤ Complex.abs Y_est + Complex.abs R_est := by
+    calc Complex.abs M
+      _ = Complex.abs (Y_est + (-R_est)) := by rw [h_m]
+      _ ≤ Complex.abs Y_est + Complex.abs (-R_est) := Complex.abs.add_le Y_est (-R_est)
+      _ = Complex.abs Y_est + Complex.abs R_est := by rw [Complex.abs.map_neg]
+  linarith
+
+/-- Cycle 14 Theorem: Remainder-aware 2-mode Vandermonde reconstruction bound in ℂ.
+    For observations Y_k, Y_{k+1} and remainders R_k, R_{k+1} satisfying the perturbed 2-mode
+    Vandermonde equations with distinct bases q₁ ≠ q₂, the reconstructed mode M = a₁ * q₁^k
+    satisfies:
+    Complex.abs ((Y_k * q₂ - Y_k1) / (q₂ - q₁)) ≥
+      Complex.abs (a₁ * q₁^k) - Complex.abs ((R_k * q₂ - R_k1) / (q₂ - q₁)). -/
+theorem vandermonde_2_reconstruction_bound (q₁ q₂ a₁ a₂ : ℂ) (hq : q₂ - q₁ ≠ 0) (k : ℕ)
+    (Y_k Y_k1 R_k R_k1 : ℂ)
+    (hY_k : Y_k = (a₁ * q₁^k + a₂ * q₂^k) + R_k)
+    (hY_k1 : Y_k1 = (a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) + R_k1) :
+    Complex.abs (a₁ * q₁^k) - Complex.abs ((R_k * q₂ - R_k1) / (q₂ - q₁)) ≤
+      Complex.abs ((Y_k * q₂ - Y_k1) / (q₂ - q₁)) := by
+  have h_id := vandermonde_block_remainder_2 q₁ q₂ a₁ a₂ hq k Y_k Y_k1 R_k R_k1 hY_k hY_k1
+  exact complex_reconstruction_remainder_lower_bound (a₁ * q₁^k)
+    ((Y_k * q₂ - Y_k1) / (q₂ - q₁)) ((R_k * q₂ - R_k1) / (q₂ - q₁)) h_id
+
 end RiemannScope

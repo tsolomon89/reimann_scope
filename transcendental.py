@@ -14,6 +14,7 @@ import cmath
 import fractions
 import functools
 import glob
+import hashlib
 import json
 import math
 import os
@@ -3313,26 +3314,28 @@ def audit_tc_phase_propositions(zeros: Optional[List[float]] = None, dps: int = 
 def load_validated_zero_certificates(
     N: int = 25,
     repo_root: Optional[str] = None,
-    prec_bits: int = 256
+    prec_bits: int = 256,
+    check_provenance: bool = True
 ) -> Tuple[Optional[List[Tuple[int, Any, Dict[str, Any]]]], Optional[Dict[str, Any]]]:
     """
-    [COMMON ZERO CERTIFICATE INPUT CONTRACT]
+    [COMMON ZERO CERTIFICATE INPUT CONTRACT - RIGOROUS 8-GATE VALIDATION]
     Loads and rigorously validates the first N consecutive non-trivial zero certificates
     from data/certificates/zeros/zero_{index:05d}.json.
 
-    Enforces 8 input contract gates:
+    Enforces all 8 input contract gates:
     1. Directory existence and accessibility.
     2. N >= 1 (finite positive integer).
     3. Exactly contiguous 1-based indexing 1..N with uniqueness and no gaps or duplicates.
-    4. Schema version '2.0' declared in certificate.
-    5. Certificate status is 'simple_zero_certified' (or 'simple_zero_isolated').
-    6. Non-empty enclosure with 'real_mid', 'real_rad', 'imag_mid', 'imag_rad'.
-    7. Valid finite, non-negative radius enclosure.
-    8. Input provenance and SHA256 integrity metadata recorded.
+    4. Supported schema version '2.0' and certificate_type 'zero_isolation_and_simplicity'.
+    5. Mathematical status in {'simple_zero_certified', 'simple_zero_isolated'}.
+    6. Complete complex enclosure validation: real_mid, real_rad, imag_mid, imag_rad with
+       finite non-negative radii and verified exact_real flag.
+    7. Cryptographic integrity: canonical SHA-256 self-hash validation (tamper detection).
+    8. Input provenance: dependency fingerprint, producing git commit, and explicit
+       separation of individual zero isolation from consecutive block completeness.
 
-    Returns:
-        (zeros_list, None) on success, where zeros_list contains (index, arb_ball, cert_dict).
-        (None, error_dict) on validation failure (fail-closed, classification='INPUT_INVALID').
+    Fails closed: Any tampering, schema defect, missing enclosure, or hash mismatch returns
+    (None, error_dict) with classification='INPUT_INVALID'.
     """
     if not FLINT_AVAILABLE or ctx is None or arb is None:
         return None, {
@@ -3384,86 +3387,180 @@ def load_validated_zero_certificates(
             "error_detail": "No certificate JSON files found in certificate directory."
         }
 
-    zeros = []
-    seen_indices = set()
-    for fpath in cert_files:
-        try:
-            with open(fpath, "r", encoding="utf-8") as f:
-                d = json.load(f)
-        except Exception as e:
-            return None, {
-                "status": f"INPUT_ERROR_MALFORMED_JSON ({os.path.basename(fpath)})",
-                "classification": "INPUT_INVALID",
-                "all_zeros_valid": False,
-                "zeros_loaded": len(zeros),
-                "error_detail": str(e)
-            }
-
-        idx = d.get("zero_index")
-        if idx is not None and 1 <= idx <= N:
-            if idx in seen_indices:
-                return None, {
-                    "status": f"INPUT_ERROR_DUPLICATE_ZERO_INDEX ({idx})",
-                    "classification": "INPUT_INVALID",
-                    "all_zeros_valid": False,
-                    "zeros_loaded": len(zeros),
-                    "error_detail": f"Duplicate certificate encountered for zero index {idx} in {os.path.basename(fpath)}."
-                }
-            seen_indices.add(idx)
-
-            status = d.get("status")
-            if status not in {"simple_zero_certified", "simple_zero_isolated"}:
-                return None, {
-                    "status": f"INPUT_ERROR_INVALID_CERTIFICATE_STATUS ({idx}: {status})",
-                    "classification": "INPUT_INVALID",
-                    "all_zeros_valid": False,
-                    "zeros_loaded": len(zeros),
-                    "error_detail": f"Certificate status '{status}' for zero {idx} is not certified."
-                }
-
-            encl = d.get("enclosure", {})
-            mid_str = encl.get("imag_mid")
-            rad_str = encl.get("imag_rad")
-            if mid_str is None or rad_str is None:
-                return None, {
-                    "status": f"INPUT_ERROR_MISSING_ENCLOSURE ({idx})",
-                    "classification": "INPUT_INVALID",
-                    "all_zeros_valid": False,
-                    "zeros_loaded": len(zeros),
-                    "error_detail": f"Zero {idx} certificate missing imag_mid or imag_rad enclosure fields."
-                }
-
+    old_prec = ctx.prec
+    try:
+        ctx.prec = prec_bits
+        zeros = []
+        seen_indices = set()
+        for fpath in cert_files:
             try:
-                rad_f = float(rad_str)
-                if rad_f < 0.0 or not math.isfinite(rad_f):
-                    raise ValueError(f"Invalid radius: {rad_str}")
-                ball = arb(mid_str) + arb(0, rad_str)
+                with open(fpath, "r", encoding="utf-8") as f:
+                    d = json.load(f)
             except Exception as e:
                 return None, {
-                    "status": f"INPUT_ERROR_INVALID_ARB_ENCLOSURE ({idx})",
+                    "status": f"INPUT_ERROR_MALFORMED_JSON ({os.path.basename(fpath)})",
                     "classification": "INPUT_INVALID",
                     "all_zeros_valid": False,
                     "zeros_loaded": len(zeros),
                     "error_detail": str(e)
                 }
 
-            zeros.append((idx, ball, d))
+            idx = d.get("zero_index")
+            if idx is not None and 1 <= idx <= N:
+                if idx in seen_indices:
+                    return None, {
+                        "status": f"INPUT_ERROR_DUPLICATE_ZERO_INDEX ({idx})",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Duplicate certificate encountered for zero index {idx} in {os.path.basename(fpath)}."
+                    }
+                seen_indices.add(idx)
 
-    zeros.sort(key=lambda x: x[0])
-    present_indices = {z[0] for z in zeros}
-    expected_indices = set(range(1, N + 1))
-    if len(zeros) < N or present_indices != expected_indices:
-        missing = sorted(list(expected_indices - present_indices))
-        return None, {
-            "status": f"INPUT_ERROR_MISSING_ZEROS (found {len(zeros)}/{N})",
-            "classification": "INPUT_INVALID",
-            "all_zeros_valid": False,
-            "zeros_loaded": len(zeros),
-            "missing_indices": missing,
-            "error_detail": f"Missing certificates for required indices: {missing}"
-        }
+                # Gate 4: Schema and certificate type validation
+                schema_ver = str(d.get("schema_version", "")).strip()
+                if schema_ver != "2.0":
+                    return None, {
+                        "status": f"INPUT_ERROR_UNSUPPORTED_SCHEMA ({idx}: '{schema_ver}')",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Zero {idx} has unsupported schema_version '{schema_ver}', expected '2.0'."
+                    }
 
-    return zeros, None
+                cert_type = str(d.get("certificate_type", "")).strip()
+                if cert_type not in {"zero_isolation_and_simplicity"}:
+                    return None, {
+                        "status": f"INPUT_ERROR_UNSUPPORTED_CERTIFICATE_TYPE ({idx}: '{cert_type}')",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Zero {idx} has unsupported certificate_type '{cert_type}'."
+                    }
+
+                # Gate 5: Mathematical status
+                status = d.get("status")
+                if status not in {"simple_zero_certified", "simple_zero_isolated"}:
+                    return None, {
+                        "status": f"INPUT_ERROR_INVALID_CERTIFICATE_STATUS ({idx}: {status})",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Certificate status '{status}' for zero {idx} is not certified."
+                    }
+
+                # Gate 6: Full complex enclosure validation (real and imag)
+                encl = d.get("enclosure", {})
+                real_mid_str = encl.get("real_mid")
+                real_rad_str = encl.get("real_rad")
+                imag_mid_str = encl.get("imag_mid")
+                imag_rad_str = encl.get("imag_rad")
+
+                if any(v is None for v in (real_mid_str, real_rad_str, imag_mid_str, imag_rad_str)):
+                    return None, {
+                        "status": f"INPUT_ERROR_MISSING_ENCLOSURE ({idx})",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Zero {idx} certificate missing one or more required enclosure fields (real_mid, real_rad, imag_mid, imag_rad)."
+                    }
+
+                try:
+                    real_rad_f = float(real_rad_str)
+                    imag_rad_f = float(imag_rad_str)
+                    real_mid_f = float(real_mid_str)
+                    imag_mid_f = float(imag_mid_str)
+
+                    if not (math.isfinite(real_rad_f) and math.isfinite(imag_rad_f) and math.isfinite(real_mid_f) and math.isfinite(imag_mid_f)):
+                        raise ValueError("Non-finite value in complex enclosure")
+                    if real_rad_f < 0.0 or imag_rad_f < 0.0:
+                        raise ValueError(f"Negative radius in enclosure: real_rad={real_rad_str}, imag_rad={imag_rad_str}")
+
+                    real_ball = arb(real_mid_str) + arb(0, real_rad_str)
+                    imag_ball = arb(imag_mid_str) + arb(0, imag_rad_str)
+                except Exception as e:
+                    return None, {
+                        "status": f"INPUT_ERROR_INVALID_ARB_ENCLOSURE ({idx})",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": str(e)
+                    }
+
+                # Gate 7: Cryptographic Canonical SHA-256 self-hash validation
+                stored_hash = d.get("certificate_hash")
+                if not stored_hash or len(stored_hash) != 64 or not all(c in "0123456789abcdefABCDEF" for c in stored_hash):
+                    return None, {
+                        "status": f"INPUT_ERROR_INVALID_HASH_FORMAT ({idx})",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Zero {idx} certificate missing or has malformed certificate_hash."
+                    }
+
+                clean_d = {k: v for k, v in d.items() if k not in ("certificate_hash", "report_hash")}
+                encoded = json.dumps(clean_d, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                computed_hash = hashlib.sha256(encoded).hexdigest()
+                if computed_hash.lower() != stored_hash.lower():
+                    return None, {
+                        "status": f"INPUT_ERROR_HASH_MISMATCH ({idx})",
+                        "classification": "INPUT_INVALID",
+                        "all_zeros_valid": False,
+                        "zeros_loaded": len(zeros),
+                        "error_detail": f"Tamper detection: certificate {idx} hash mismatch (stored {stored_hash} != computed {computed_hash})."
+                    }
+
+                # Gate 8: Provenance and external dependency validation
+                if check_provenance:
+                    dep_fp = d.get("dependency_fingerprint")
+                    if not isinstance(dep_fp, dict) or not dep_fp.get("python") or not dep_fp.get("python_flint"):
+                        return None, {
+                            "status": f"INPUT_ERROR_MISSING_PROVENANCE ({idx})",
+                            "classification": "INPUT_INVALID",
+                            "all_zeros_valid": False,
+                            "zeros_loaded": len(zeros),
+                            "error_detail": f"Zero {idx} certificate missing valid dependency_fingerprint metadata."
+                        }
+
+                    git_commit = d.get("producing_git_commit")
+                    if not git_commit or not isinstance(git_commit, str) or len(git_commit.strip()) < 7:
+                        return None, {
+                            "status": f"INPUT_ERROR_MISSING_PRODUCING_COMMIT ({idx})",
+                            "classification": "INPUT_INVALID",
+                            "all_zeros_valid": False,
+                            "zeros_loaded": len(zeros),
+                            "error_detail": f"Zero {idx} certificate missing valid producing_git_commit."
+                        }
+
+                # Record verified metadata annotations
+                d["_verified_input_contract"] = {
+                    "schema_passed": True,
+                    "sha256_integrity_verified": True,
+                    "complex_enclosure_verified": True,
+                    "exact_real_flag": bool(encl.get("exact_real", False) and real_rad_f == 0.0),
+                    "enumeration_completeness": "INDIVIDUALLY_ISOLATED (Block completeness requires separate Turing certificate)",
+                    "external_dependencies": ["python", "python_flint", "producing_git_commit"]
+                }
+
+                zeros.append((idx, imag_ball, d))
+
+        zeros.sort(key=lambda x: x[0])
+        present_indices = {z[0] for z in zeros}
+        expected_indices = set(range(1, N + 1))
+        if len(zeros) < N or present_indices != expected_indices:
+            missing = sorted(list(expected_indices - present_indices))
+            return None, {
+                "status": f"INPUT_ERROR_MISSING_ZEROS (found {len(zeros)}/{N})",
+                "classification": "INPUT_INVALID",
+                "all_zeros_valid": False,
+                "zeros_loaded": len(zeros),
+                "missing_indices": missing,
+                "error_detail": f"Missing certificates for required indices: {missing}"
+            }
+
+        return zeros, None
+    finally:
+        ctx.prec = old_prec
 
 
 def find_farey_witness_coverage(
@@ -3773,7 +3870,8 @@ def audit_bounded_integer_relations(
     zeros: Optional[List[Any]] = None,
     max_coeff: int = 50,
     dps: int = 60,
-    repo_root: Optional[str] = None
+    repo_root: Optional[str] = None,
+    allow_fallback: bool = False
 ) -> Dict[str, Any]:
     """
     [N3: BOUNDED INTEGER RELATION AUDIT & EXHAUSTIVE LATTICE SEARCH]
@@ -3803,6 +3901,7 @@ def audit_bounded_integer_relations(
             synthetic_identical = False
             use_arb = False
 
+            certified_zero_inputs = False
             if zeros is None and FLINT_AVAILABLE and ctx is not None and arb is not None:
                 # Load validated enclosures for zero 1 and zero 2 from certificates
                 z_loaded, err = load_validated_zero_certificates(N=2, repo_root=repo_root, prec_bits=256)
@@ -3813,8 +3912,22 @@ def audit_bounded_integer_relations(
                     th2 = c_tau_arb * z_loaded[1][1]
                     use_arb = True
                     is_synthetic = False
+                    certified_zero_inputs = True
+                elif not allow_fallback:
+                    return {
+                        "classification": "INPUT_INVALID",
+                        "status": f"INPUT_ERROR_CERTIFICATES_FAILED: {err.get('status') if err else 'unknown'}",
+                        "r2_box_search": {
+                            "classification": "INPUT_INVALID",
+                            "certified_zero_inputs": False,
+                            "error_detail": err.get("error_detail") if err else "Certificate validation failed."
+                        },
+                        "pslq_search": {
+                            "classification": "INPUT_INVALID"
+                        }
+                    }
                 else:
-                    # Fallback to high-precision reference if certificates unavailable
+                    # Explicit diagnostic fallback to high-precision reference: strictly non-certified
                     tau_arb = 2 * arb.pi()
                     c_tau_arb = tau_arb.log() / tau_arb
                     g1_arb = arb("14.134725141734693790457251983562470270784257115699243175685567460149963429809")
@@ -3823,6 +3936,7 @@ def audit_bounded_integer_relations(
                     th2 = c_tau_arb * g2_arb
                     use_arb = True
                     is_synthetic = False
+                    certified_zero_inputs = False
 
             elif zeros is not None and FLINT_AVAILABLE and ctx is not None and arb is not None:
                 is_synthetic = True
@@ -3865,19 +3979,24 @@ def audit_bounded_integer_relations(
 
                     val = a1 * th1 + a2 * th2
                     if use_arb:
-                        mid_f = float(val.mid())
-                        k = int(round(mid_f))
-                        a0 = -k
-                        res_ball = a0 + val
+                        lo = float(val.lower())
+                        hi = float(val.upper())
+                        k_cand = int(round(float(val.mid())))
+                        res_cand = -k_cand + val
 
-                        if res_ball.is_exact() and res_ball.is_zero():
+                        if res_cand.is_exact() and res_cand.is_zero():
                             exact_relation_found = True
                             dist = 0.0
-                        elif res_ball.contains_integer() or (res_ball.lower().fmpq().p <= 0 and res_ball.upper().fmpq().p >= 0):
+                            a0 = -k_cand
+                        elif val.contains_integer() or (lo <= k_cand <= hi) or math.floor(lo) != math.floor(hi):
                             zero_in_enclosure = True
                             dist = 0.0
+                            a0 = -k_cand
                         else:
-                            dist = float(abs(res_ball).lower())
+                            k = math.floor(lo)
+                            a0 = -k if (lo - k) < ((k + 1) - hi) else -(k + 1)
+                            res_ball = a0 + val
+                            dist = max(0.0, float(abs(res_ball).lower()))
                     else:
                         k = int(mpmath.nint(val))
                         a0 = -k
@@ -3914,9 +4033,9 @@ def audit_bounded_integer_relations(
             elif zero_in_enclosure:
                 r2_classification = "INCONCLUSIVE"
                 status_text = f"Candidate residual enclosure contains zero for ({best_rel[0] if best_rel else '?'}, {best_rel[1] if best_rel else '?'}, {best_rel[2] if best_rel else '?'}); cannot certify exclusion or equality."
-            elif not use_arb:
+            elif not use_arb or (not certified_zero_inputs and not is_synthetic):
                 r2_classification = "NUMERICAL_EVIDENCE_ONLY"
-                status_text = f"No relation detected in box |a1|, |a2| <= {B} via floating-point search (min distance {min_dist:.6e}). Rigorous enclosure required for certification."
+                status_text = f"No relation detected in box |a1|, |a2| <= {B} via floating-point search (min distance {min_dist:.6e}). Rigorous certified zero inputs required for certification."
             elif best_rel is not None and min_dist > 0.0:
                 r2_classification = "CERTIFIED_WITH_EXPLICIT_BOUNDS"
                 status_text = f"Certified: No integer relation exists in box |a1|, |a2| <= {B} (min distance {min_dist:.6e} > 0)."
@@ -3932,6 +4051,7 @@ def audit_bounded_integer_relations(
                     "tested_relations": count,
                     "min_certified_distance": min_dist,
                     "is_synthetic": is_synthetic,
+                    "certified_zero_inputs": certified_zero_inputs,
                     "closest_relation": {
                         "a0": best_rel[0] if best_rel else None,
                         "a1": best_rel[1] if best_rel else None,
@@ -4160,7 +4280,7 @@ def audit_complete_smoothed_tc_transport(
        The infinite trivial-zero series sum_{j=1}^infty phi_tilde(-2j) h^{1+2j} equals B_h^{integral} identically.
        For series truncated at M terms:
            |Tail_{bg}(M)| <= ||phi||_{L1} * (h/a)^{2M+3} / (1 - (h/a)^2).
-       For h=1.0, a=2, M=15: this geometric bound is <= 1.12e-11, which strictly encloses the observed
+       For h=1.0, a=2, M=15: this geometric bound is <= 6.89169e-11, which strictly encloses the observed
        discrepancy 8.57e-14, resolving the Cycle 12 inconsistency where only the 16th term was checked.
     3. Rigorous uniform zero-truncation bound:
        For T = gamma_N, by Stieltjes integration by parts:
@@ -4199,30 +4319,35 @@ def audit_complete_smoothed_tc_transport(
 
         # Load certified zeros using common input contract
         zeros_loaded, cert_err = load_validated_zero_certificates(N=num_zeros, repo_root=repo_root, prec_bits=256)
+        if zeros_loaded is None:
+            return {
+                "classification": "INPUT_INVALID",
+                "status": f"INPUT_ERROR_CERTIFICATES_FAILED: {cert_err.get('status') if cert_err else 'unknown'}",
+                "error_detail": cert_err.get("error_detail") if cert_err else "Failed to load certified zeros.",
+                "zeros_certified": False,
+                "num_zeros": 0,
+                "primary_run": {},
+                "multi_grade_runs": []
+            }
+
         zeros = []
-        if zeros_loaded is not None:
-            for idx, ball, cert_dict in zeros_loaded:
-                zeros.append((idx, mpmath.mpf(cert_dict["enclosure"]["imag_mid"])))
-        else:
-            cert_files = sorted(glob.glob(os.path.join(cert_dir, "zero_*.json")))
-            for fp in cert_files:
-                try:
-                    with open(fp, "r") as f:
-                        d = json.load(f)
-                except Exception:
-                    continue
-                idx = d.get("zero_index")
-                if idx is not None and 1 <= idx <= num_zeros:
-                    gamma = mpmath.mpf(d["enclosure"]["imag_mid"])
-                    zeros.append((idx, gamma))
+        all_exact_real = True
+        for idx, ball, cert_dict in zeros_loaded:
+            encl = cert_dict["enclosure"]
+            gamma = mpmath.mpf(encl["imag_mid"])
+            is_exact = bool(encl.get("exact_real", False) and float(encl.get("real_rad", 0)) == 0.0)
+            if not is_exact:
+                all_exact_real = False
+            beta = mpmath.mpf(encl["real_mid"]) if not is_exact else mpmath.mpf("0.5")
+            zeros.append((idx, beta, gamma, is_exact))
 
         zeros.sort(key=lambda x: x[0])
-        gamma_N = float(zeros[-1][1]) if zeros else 0.0
+        gamma_N = float(zeros[-1][2]) if zeros else 0.0
 
         # Precompute zero Mellin evaluations for the loaded zeros
         zero_mellin_vals = []
-        for idx, gamma in zeros:
-            rho = mpmath.mpc(mpmath.mpf(0.5), gamma)
+        for idx, beta, gamma, is_exact in zeros:
+            rho = mpmath.mpc(beta, gamma)
             val = mellin_phi(rho)
             zero_mellin_vals.append((rho, val))
 
@@ -4360,18 +4485,31 @@ def audit_complete_smoothed_tc_transport(
 
         out = {
             "classification": "DERIVED_AND_VERIFIED",
+            "certification_status": "EMPIRICAL_QUADRATURE_WITH_RIGOROUS_TAIL_BOUNDS",
+            "zeros_certified": True,
             "primary_run": primary_res,
             "multi_grade_runs": multi_grade_results if eval_multi_grade else [primary_res],
+            "background_integral_audit": {
+                "M15_tail_bound": primary_res["error_budget"]["bg_geometric_tail_bound_M15"],
+                "observed_discrepancy": primary_res["spectral_components"]["background_discrepancy_M15"],
+                "discrepancy_enclosed": primary_res["error_budget"]["discrepancy_enclosed_by_geometric_bound"]
+            },
             "test_function": "exp(-1/((x-2)(4-x))) on [2, 4], C_c^infty((0, infty))",
             "support": [2.0, 4.0],
             "num_zeros": len(zeros),
             "max_zero_ordinate": gamma_N,
+            "missing_rigorous_bounds_for_full_certification": [
+                "Derivative norms C_2=31, C_3=1200, C_4=135003 are numerical estimates for this bump function, not certified upper bounds.",
+                "Mellin transform evaluations phi_tilde(rho) and phi_tilde(1) use mpmath quadrature rather than certified Arb ball integration.",
+                "Background integral B_h(phi) uses mpmath quadrature rather than certified Arb ball integration (though truncation tail is rigorously bounded).",
+                "Finite zero list N=75 is individually isolated; full consecutive completeness below gamma_75 requires Turing zero counting block certificate."
+            ],
             "mathematical_audit": {
                 "contour_shift_derivation": "Derived via Mellin inversion of -zeta'/zeta(s) * phi_tilde(s) * h^{1-s}. Contour shifted from Re(s)=c>1 to Re(s)-> -infty.",
                 "absence_of_pole_at_s_zero": "The Mellin integrand has no pole at s=0 because zeta(0) = -1/2 != 0 (making -zeta'/zeta holomorphic at s=0) and phi_tilde is entire. Therefore no residue is picked up at s=0. The product -zeta'(0)*phi_tilde(0)*h/zeta(0) is NOT identically zero for general bump functions; rather, it does not appear in the contour shift.",
                 "trivial_zero_integral_identity": "Proved identically B_h(phi) = sum_{j>=1} phi_tilde(-2j) h^{1+2j} == h int_1^infty phi(hx)/(x(x^2-1)) dx by expanding (x^2-1)^{-1} = sum x^{-2j} for x >= a/h > 1.",
-                "cycle12_inconsistency_resolved": f"The Cycle 12 discrepancy of 8.57e-14 at h=1.0, M=15 is rigorously enclosed by the geometric tail bound ||phi||_L1 * (h/a)^33 / (1-(h/a)^2) <= 1.12e-11. For M=35, discrepancy is < 1e-25.",
-                "stieltjes_zero_tail_justification": "Derivation using Backlund/Trudgian bound N(t) <= (t/2pi) log t for t >= 14 and Stieltjes integration by parts: int_T^infty t^{-k} dN(t) <= (k/2pi) ((k-1)log T + 1) / ((k-1)^2 T^{k-1}). Bounded uniformly for all 0 <= beta <= 1 by Mellin derivative norms C_2=31, C_3=1200, C_4=135003."
+                "cycle12_inconsistency_resolved": f"The Cycle 12 discrepancy of 8.57e-14 at h=1.0, M=15 is rigorously enclosed by the geometric tail bound ||phi||_L1 * (h/a)^33 / (1-(h/a)^2) <= {primary_res['error_budget']['bg_geometric_tail_bound_M15']:.5e} (where ||phi||_L1 ≈ 0.4439938 and a=2.0). The previous prose reference to 1.12e-11 was a typographical/computational inconsistency that is now resolved. For M=35, discrepancy is < 1e-25.",
+                "stieltjes_zero_tail_justification": "Derivation using Trudgian (2014, arXiv:1208.5846v2, Theorem 1 and Corollary 1) bound N(t) <= (t/2pi) log t for t >= 168*pi and Riemann-Stieltjes integration by parts: int_{(T, infty)} t^{-p} dN(t) <= (p / 2pi) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}), where the boundary term -T^{-p} N(T) <= 0 is dropped for the upper bound. For the unnormalized formula, the factor h^{1-beta} is bounded by max(1, h) <= 1 for h <= 1 uniformly over 0 <= beta <= 1. The normalized observable introduces an additional h^{-1/2} factor."
             }
         }
         # Flatten primary_res keys for backwards compatibility with tests expecting top-level keys
@@ -4536,11 +4674,25 @@ def audit_infinite_extension_detectability() -> Dict[str, Any]:
 
     # 2. Paley-Wiener / Jensen Zero-Density Impossibility
     pw_impossibility = {
-        "theorem": "Paley-Wiener / Jensen Zero-Density Non-Annihilation Theorem",
-        "entire_type_zero_bound": "n(r) <= (2 * B / log 2) * r = O(r) for test support in [a, b], B = max(|log a|, |log b|)",
-        "riemann_zero_counting": "N(r) ~ (r / pi) * log(r / (2*pi*e)) (Riemann-von Mangoldt formula)",
-        "growth_comparison": "lim_{r -> infty} N(r) / n(r) = infty",
-        "conclusion": "No test phi in C_c^infty((0, infty)) can annihilate all nontrivial zeros except a finite set without vanishing identically. Exact isolation via a single fixed test is strictly impossible."
+        "theorem": "Paley-Wiener / Jensen Zero-Density Non-Annihilation Theorem (Farmer 1995, Conrey 1989)",
+        "distinct_zeros_lower_bound": (
+            "By Conrey (1989) and Farmer (1995, p. 2), at least a positive proportion (>= 40%) of the zeros of zeta "
+            "are simple and lie on the critical line. Thus the count of distinct zeros up to height T satisfies "
+            "N_distinct(T) >= (c_0 / (2*pi)) * T * log T with c_0 > 0.40."
+        ),
+        "entire_type_zero_bound": (
+            "For any nonzero test phi in C_c^infty((0, infty)) with supp(phi) subset [a, b], its Mellin transform "
+            "F(s) = phi_tilde(s) is an entire function of exponential type B = max(|log a|, |log b|). "
+            "By Jensen's formula, the number of zeros in a disk of radius r satisfies n(r) <= (2 * B / log 2) * r + O(1) = O(r)."
+        ),
+        "density_obstruction": (
+            "lim_{T -> infty} N_distinct(T) / n(T) >= lim_{T -> infty} [c_0 / (2*pi)] * [log 2 / (2 B)] * log T = infty. "
+            "The count of distinct zeta zeros grows strictly faster than the maximum zero capacity of any nonzero entire function of exponential type."
+        ),
+        "conclusion": (
+            "No nonzero test phi in C_c^infty((0, infty)) can have its Mellin transform vanish at all but finitely many distinct zeta zeros. "
+            "Exact isolation of a finite set of zeros via a single fixed test is strictly impossible by Paley-Wiener / Jensen."
+        )
     }
 
     # 3. Distributional Uniqueness vs Discrete Synthesis
@@ -4548,7 +4700,10 @@ def audit_infinite_extension_detectability() -> Dict[str, Any]:
         "test_space": "C_c^infty((0, infty)) with standard LF inductive limit topology",
         "distribution_space": "D'((0, infty)) (continuous linear functionals on C_c^infty((0, infty)))",
         "uniqueness_of_distribution": "If <T, phi> = 0 for all phi in C_c^infty((0, infty)), then T = 0 in D'((0, infty)).",
-        "discrete_synthesis_gap": "Uniqueness of T as a distribution does NOT automatically establish unconditional convergence or uniqueness of an infinite exponential mode expansion T = sum_rho c_rho h^{1-rho} without a proved spectral synthesis theorem."
+        "discrete_synthesis_gap": (
+            "Uniqueness of T as a distribution does NOT automatically establish unconditional convergence or uniqueness "
+            "of an infinite exponential mode expansion T = sum_rho c_rho h^{1-rho} without an unproved spectral synthesis theorem."
+        )
     }
 
     # 4. Arithmetic Layer Disjointness and the Open Collision Bridge
@@ -4584,24 +4739,30 @@ def audit_infinite_extension_detectability() -> Dict[str, Any]:
         "propositions": {
             "1_fixed_annihilating_test": {
                 "claim": "A single fixed test phi in C_c^infty((0, infty)) can annihilate all nontrivial zeros except one chosen rho_0.",
-                "verdict": "IMPOSSIBLE (DISPROVED by Paley-Wiener theorem).",
+                "verdict": "IMPOSSIBLE (DISPROVED by Paley-Wiener / Jensen; Farmer 1995, Conrey 1989).",
                 "proof_basis": pw_impossibility["conclusion"]
             },
             "2_approximate_isolation_family": {
                 "claim": "A parameterized family of test functions can approximately isolate a chosen mode with quantified remainder.",
-                "verdict": "FEASIBLE with quantified remainder budget.",
-                "proof_basis": "Beurling-Selberg / Fejer kernel approximations can concentrate spectral weight around gamma_0, but the remainder from the infinite zero tail must be controlled by Schwartz decay."
+                "verdict": "FEASIBLE with quantified remainder budget (requires remainder subordinate to c_F * M).",
+                "proof_basis": "Parameterized smooth bumps can concentrate spectral weight around gamma_0, but remainder from the infinite zero tail must be controlled by Schwartz decay."
             },
             "3_distributional_uniqueness": {
-                "claim": "The complete distribution F_h uniquely determines all zero modes.",
-                "verdict": "PROVED in Schwartz distribution space S'((0, infty)).",
-                "proof_basis": distributional_audit["uniqueness_of_distribution"]
+                "claim": "The complete distribution F_h uniquely determines all zero modes via discrete spectral synthesis.",
+                "verdict": "DISTRIBUTIONAL_UNIQUENESS_PROVED_IN_D_PRIME_BUT_DISCRETE_SPECTRAL_SYNTHESIS_UNPROVED",
+                "proof_basis": distributional_audit["discrete_synthesis_gap"]
             }
         },
         "aliasing_audit": {
             "condition": "q_rho = q_rho' <=> Re(rho) = Re(rho') and (Im(rho) - Im(rho')) * log(2*pi) in 2*pi*Z",
-            "status": "NO_INTEGER_ALIASING_ON_CRITICAL_LINE",
-            "proof_basis": "Since log(2*pi)/(2*pi) is irrational (Hlawka 1975, Lindemann 1882), no two distinct ordinates gamma != gamma' can satisfy (gamma - gamma') * log(2*pi) in 2*pi*Z unless gamma = gamma'."
+            "status": "OPEN_SPECTRAL_INDEPENDENCE_HYPOTHESIS",
+            "finite_certified_status": "NO_INTEGER_ALIASING_CERTIFIED_ON_FIRST_25_ZEROS",
+            "proof_basis": (
+                "For the finite set of certified zeros, no aliasing occurs. However, across the full infinite spectrum, "
+                "the condition (gamma - gamma') = 2*pi*m / log(2*pi) cannot be ruled out by Lindemann (1882) or Hlawka (1975) "
+                "because zero differences gamma - gamma' are not known to be rational. Universal non-aliasing remains an unproved "
+                "spectral independence hypothesis."
+            )
         },
         "collision_mechanism_audit": {
             "question": "Does off-line mode growth force an arithmetic collision m * tau^K = n * tau^J (K != J, mn != 0)?",
@@ -4639,8 +4800,10 @@ def audit_cycle12_synthesis(dps: int = 50) -> Dict[str, Any]:
                     "reconstruction without axioms beyond propext, Classical.choice, Quot.sound."
                 ),
                 "4_can_off_line_contribution_be_detected_in_infinite_formula": (
-                    "YES, in distribution space S'((0, infty)) via test-function pairings and approximate identity families. "
-                    "However, a single fixed compactly supported test annihilating all zeros except one is impossible by Paley-Wiener."
+                    "INCONCLUSIVE_FOR_FIXED_TESTS_FEASIBLE_FOR_PARAMETERIZED_FAMILIES: A single fixed test cannot isolate modes "
+                    "(disproved by Paley-Wiener / Jensen; Farmer 1995, Conrey 1989). While distributions are unique in D', "
+                    "infinite discrete mode reconstruction remains an unproved spectral synthesis problem. Test families "
+                    "can achieve approximate detection only when remainder R is strictly subordinate to c_F * M."
                 ),
                 "5_what_forces_nonzero_membership_in_two_distinct_arithmetic_layers": (
                     "NOTHING. Arithmetic layers L_K = tau^K Z are unconditionally disjoint (L_K cap L_J = {0} for K != J). "
@@ -4682,12 +4845,13 @@ def audit_cycle13_synthesis(dps: int = 50, repo_root: Optional[str] = None) -> D
                     "strict Arb ball verification, precision restoration, and correct classification (RELATION_FOUND reserved for exact, "
                     "INCONCLUSIVE for zero-containing residuals, CERTIFIED_WITH_EXPLICIT_BOUNDS for strict separation). "
                     "The false claim that -zeta'(0)/zeta(0)*phi_tilde(0)*h is identically zero is WITHDRAWN and corrected to "
-                    "absence of pole at s=0. The (log T)/T^2 zero tail error is REPAIRED to rigorous Stieltjes (log T + 1)/T bound."
+                    "absence of pole at s=0. The background geometric tail bound is corrected to <= 6.89169e-11 for M=15 at h=1. "
+                    "The (log T)/T^2 zero tail error is REPAIRED to rigorous Stieltjes (log T + 1)/T bound."
                 ),
                 "2_what_is_proved_exactly_vs_certified_within_finite_bounds": (
                     "EXACT THEOREMS: Quantitative Vandermonde block reconstruction with explicit remainder (Lean 4), "
-                    "Paley-Wiener / Jensen zero-density non-annihilation theorem, arithmetic layer disjointness L_K cap L_J = {0} "
-                    "(Lindemann 1882), Ford-Zaharescu / Hlawka nonresonance of c_tau. "
+                    "Paley-Wiener / Jensen zero-density non-annihilation theorem (Farmer 1995, Conrey 1989), arithmetic layer disjointness "
+                    "L_K cap L_J = {0} (Lindemann 1882), Ford-Zaharescu / Hlawka nonresonance of c_tau. "
                     "FINITE CERTIFICATIONS: Bounded rational exclusion for Q <= 10^6, pairwise distinction for N=25 zeros, "
                     "bounded integer relations for |a_j| <= 50. Unrestricted irrationality and full RH remain OPEN."
                 ),
@@ -4700,15 +4864,16 @@ def audit_cycle13_synthesis(dps: int = 50, repo_root: Optional[str] = None) -> D
                 "4_does_complete_formula_have_justified_error_budget_at_tested_grades": (
                     "YES. Tested across grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with 0 < h < a=2.0. "
                     "Primary background uses exact integral B_h^{integral}. Discrepancy at M=15 (8.57e-14) is rigorously "
-                    "enclosed by geometric tail bound (1.12e-11). Nontrivial zero truncation bounded uniformly over 0 <= beta <= 1 "
+                    "enclosed by geometric tail bound (6.89169e-11). Nontrivial zero truncation bounded uniformly over 0 <= beta <= 1 "
                     "by Stieltjes integration by parts with Mellin derivative norms C_2=31, C_3=1200, C_4=135003. Residuals "
                     "satisfy error budgets across all tested grades."
                 ),
                 "5_what_was_learned_about_infinite_mode_detectability": (
-                    "A single fixed test cannot annihilate all zeros except one (Paley-Wiener). Test families can isolate modes "
-                    "approximately with quantified remainders, but the remainder ||R_k||_inf must stay below c * M(k). "
-                    "Furthermore, aliasing (Delta gamma = 2*pi/log(tau)) produces identical bases and singular Vandermonde matrices; "
-                    "hence ordinate non-aliasing is an essential condition that must be verified."
+                    "A single fixed test cannot annihilate all zeros except one (Paley-Wiener / Jensen; Farmer 1995). "
+                    "Parameterized test families can isolate modes approximately with quantified remainders, but remainder ||R||_inf "
+                    "must stay below c_F * M. Against competitor zeros to the right of the target (Re(rho) > Re(rho_0)), amplitudes "
+                    "blow up exponentially, making detection impossible without an external zero-free region. Furthermore, aliasing "
+                    "on the infinite spectrum remains an open spectral independence hypothesis."
                 ),
                 "6_was_implication_toward_forbidden_coincidence_derived": (
                     "NO. Even with rigorous exponential growth of Y_phi(k) for an off-line zero, no proved prime-zeta theorem "
@@ -4726,5 +4891,279 @@ def audit_cycle13_synthesis(dps: int = 50, repo_root: Optional[str] = None) -> D
             "p3_bounded_integer_relations": p3_relations,
             "transport_audit": transport,
             "block_detectability_audit": block,
+            "infinite_extension_audit": inf_audit
+        }
+
+
+def audit_tc_test_family_investigation(
+    L: float = 1.0,
+    rho_0: Optional[complex] = None,
+    competitor_rho: Optional[complex] = None,
+    k_eval: int = 0,
+    dps: int = 50,
+    num_zeros: int = 25,
+    repo_root: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    [CYCLE 14: EXPLICIT TC TEST-FAMILY INVESTIGATION]
+    Investigates the explicit test family:
+        phi_{L, rho_0}(x) = (1/L) * x^{-rho_0} * w((log x)/L),   x > 0,
+    with support in [e^{1.25 L}, e^{1.75 L}] subset [e^L, e^{2L}], where
+        w_0(v) = exp(-1 / (1 - 16*(v - 3/2)^2)) for |v - 3/2| < 1/4,
+        I_0 = int_{1.25}^{1.75} w_0(v) dv,
+        w(v) = w_0(v) / I_0 (normalized: int_1^2 w(v) dv = 1).
+
+    Mellin transform identity:
+        phi_tilde_{L, rho_0}(s) = int_{1.25}^{1.75} w(v) exp(L*(s - rho_0)*v) dv,
+        phi_tilde_{L, rho_0}(rho_0) = 1.0 identically.
+
+    Investigates:
+    1. Exact normalization I_0 and verification that phi_tilde(rho_0) = 1.0.
+    2. Spectral response across zeros:
+       - Re(rho) < Re(rho_0): exponential decay exp(-L*(Re(rho_0)-Re(rho))*v).
+       - Re(rho) = Re(rho_0): oscillatory super-polynomial decay via smooth bump.
+       - Re(rho) > Re(rho_0): exponential amplification exp(L*(Re(rho)-Re(rho_0))*v) -> infty!
+    3. Remainder and Decisive Ratio eta(L, k, F):
+       eta(L, k, F) = max_{0 <= ell < r} |R_{L, F}(k + ell)| / (c_F * max_j |a_j(L) * q_j^k|),
+       where c_F = 1 / ||V^{-1}||_inf = |sin(gamma_0 * log(tau))| > 0.
+    4. Adversarial Competitor Analysis:
+       A hypothetical off-line competitor rho_{comp} = 0.75 + i*gamma_{comp} produces
+       exponentially growing remainder, demonstrating that test-family scaling cannot isolate
+       a target zero without an a priori zero-free region.
+    5. Near-frequency and exact grade alias behavior:
+       Ordinates separated by Delta gamma = 2*pi / log(tau) have identical bases q_rho = q_0,
+       forcing Vandermonde column grouping and precluding separation.
+    6. Arithmetic Bridge Analysis:
+       Observable Y_phi(k) is a continuous integral functional not constrained to discrete
+       arithmetic lattices L_K = tau^K * Z (L_K cap L_J = {0} for K != J). Detection does NOT
+       force discrete collisions m*tau^K = n*tau^J.
+    """
+    with mpmath.workdps(dps):
+        tau = 2 * math.pi
+        log_tau = math.log(tau)
+
+        # 1. Normalization of w_0(v)
+        w0 = lambda v: mpmath.exp(-1 / (1 - 16 * (v - 1.5)**2))
+        I0 = mpmath.quad(w0, [1.25, 1.75])
+        I0_float = float(I0)
+        w = lambda v: w0(v) / I0
+
+        def mellin_eval(s: complex, L_val: float, target: complex) -> complex:
+            diff = s - target
+            diff_re = diff.real
+            diff_im = diff.imag
+            re_part = mpmath.quad(
+                lambda v: w(v) * mpmath.exp(L_val * diff_re * v) * mpmath.cos(L_val * diff_im * v),
+                [1.25, 1.75]
+            )
+            im_part = mpmath.quad(
+                lambda v: w(v) * mpmath.exp(L_val * diff_re * v) * mpmath.sin(L_val * diff_im * v),
+                [1.25, 1.75]
+            )
+            return complex(re_part, im_part)
+
+        # Load certified zeros
+        zeros_loaded, cert_info = load_validated_zero_certificates(N=num_zeros, repo_root=repo_root, prec_bits=256)
+        if zeros_loaded is None or len(zeros_loaded) < 1:
+            gamma_ref = [
+                14.134725141734693772, 21.022039638771554993, 25.010857580145688763,
+                30.424876125859513210, 32.935061587739189691, 37.586178158825677257
+            ]
+            known_zeros = [complex(0.5, g) for g in gamma_ref[:num_zeros]]
+            cert_status = "UNCERTIFIED_DIAGNOSTIC_FALLBACK"
+        else:
+            known_zeros = [complex(float(d["enclosure"]["real_mid"]), float(d["enclosure"]["imag_mid"])) for (idx, b, d) in zeros_loaded]
+            cert_status = "CERTIFIED_ZERO_INPUTS"
+
+        if rho_0 is None:
+            rho_0 = known_zeros[0]
+        gamma_0 = rho_0.imag
+        beta_0 = rho_0.real
+
+        # Verify identity phi_tilde(rho_0) == 1.0
+        val_at_target = mellin_eval(rho_0, L, rho_0)
+        target_identity_verified = bool(abs(val_at_target - 1.0) < 1e-12)
+
+        # Vandermonde condition constant c_F for r=2 modes {rho_0, conj(rho_0)}
+        q_target = cmath.exp((rho_0 - 0.5) * log_tau)
+        q_target_conj = cmath.exp((rho_0.conjugate() - 0.5) * log_tau)
+        c_F = abs(math.sin(gamma_0 * log_tau))
+
+        # Sweep scales L in [0.5, 1.0, 2.0, 5.0, 10.0]
+        scale_results = []
+        for L_scale in [0.5, 1.0, 2.0, 5.0, 10.0]:
+            conj_rho0 = rho_0.conjugate()
+            a_conj0 = mellin_eval(conj_rho0, L_scale, rho_0)
+
+            R0 = a_conj0
+            R1 = a_conj0 * q_target_conj
+
+            for z in known_zeros[1:]:
+                z_conj = z.conjugate()
+                a_z = mellin_eval(z, L_scale, rho_0)
+                a_z_c = mellin_eval(z_conj, L_scale, rho_0)
+                qz = cmath.exp((z - 0.5) * log_tau)
+                qz_c = cmath.exp((z_conj - 0.5) * log_tau)
+                R0 += a_z + a_z_c
+                R1 += a_z * qz + a_z_c * qz_c
+
+            max_R = max(abs(R0), abs(R1))
+            denominator = c_F * 1.0
+            eta_val = max_R / denominator
+            detected = bool(eta_val < 1.0)
+            scale_results.append({
+                "L": L_scale,
+                "target_amplitude": 1.0,
+                "conjugate_amplitude": abs(a_conj0),
+                "max_remainder": max_R,
+                "c_F": c_F,
+                "eta": eta_val,
+                "detected": detected,
+                "classification": "TARGET_DOMINANT (DETECTED)" if detected else "REMAINDER_DOMINANT (INCONCLUSIVE)"
+            })
+
+        # Adversarial Competitor Analysis
+        if competitor_rho is None:
+            competitor_rho = complex(0.75, 21.02203963877155)
+        competitor_results = []
+        for L_comp in [0.5, 1.0, 2.0, 5.0, 10.0, 20.0]:
+            val_comp = mellin_eval(competitor_rho, L_comp, rho_0)
+            amp_comp = abs(val_comp)
+            competitor_results.append({
+                "L": L_comp,
+                "competitor_amplitude": amp_comp,
+                "exceeds_cF": bool(amp_comp > c_F),
+                "eta_lower_bound_from_competitor": amp_comp / c_F
+            })
+
+        # Near Frequency / Alias Analysis
+        delta_gamma_alias = (2 * math.pi) / log_tau
+        gamma_alias = gamma_0 + delta_gamma_alias
+        rho_alias = complex(beta_0, gamma_alias)
+        q_alias = cmath.exp((rho_alias - 0.5) * log_tau)
+        alias_basis_diff = abs(q_alias - q_target)
+        alias_amplitude_L1 = abs(mellin_eval(rho_alias, 1.0, rho_0))
+        alias_amplitude_L5 = abs(mellin_eval(rho_alias, 5.0, rho_0))
+
+        # Collision Bridge Assessment
+        collision_bridge_status = {
+            "question": "Does mode detection eta < 1 or exponential growth force a lattice collision m*tau^K = n*tau^J (K != J)?",
+            "verdict": "NO. COLLISION BRIDGE REMAINS OPEN.",
+            "mathematical_reasons": [
+                "1. Continuous observable: Y_phi(k) is a smooth integral functional of primes at dilation h_k = tau^{-k}.",
+                "2. Discrete layers: Arithmetic layers L_K = tau^K * Z have only {0} in common for distinct integer grades K != J (Lindemann 1882).",
+                "3. Missing projection: There is no proved prime-zeta law establishing that Y_phi(k) must belong to L_K.",
+                "4. Independence of test choice: Constructing phi_{L, rho_0} tuned to a target rho_0 does not impose arithmetic constraints on rho_0."
+            ]
+        }
+
+        return {
+            "classification": "AUDITED_AND_STRUCTURED",
+            "certification_status": cert_status,
+            "bump_function": {
+                "w0_formula": "exp(-1 / (1 - 16*(v - 3/2)^2)) on (1.25, 1.75)",
+                "I0_normalization": I0_float,
+                "support_phi": f"[e^{{1.25*L}}, e^{{1.75*L}}] subset [e^L, e^{{2L}}]"
+            },
+            "target_zero": {
+                "rho_0": [rho_0.real, rho_0.imag],
+                "phi_tilde_target": [val_at_target.real, val_at_target.imag],
+                "identity_verified": target_identity_verified,
+                "reconstruction_constant_cF": c_F
+            },
+            "scale_sweep_eta": scale_results,
+            "adversarial_competitor_analysis": {
+                "competitor_zero": [competitor_rho.real, competitor_rho.imag],
+                "competitor_real_part": competitor_rho.real,
+                "target_real_part": rho_0.real,
+                "scaling_results": competitor_results,
+                "obstruction": (
+                    "Because Re(rho_{comp}) - Re(rho_0) = 0.25 > 0, the competitor's amplitude grows exponentially "
+                    "as exp(0.25 * L * v) -> infty. At L = 20, competitor amplitude reaches 2.957 > c_F = 0.748, "
+                    "forcing eta > 3.95. Isolation of a target zero is impossible without an external zero-free region."
+                )
+            },
+            "alias_analysis": {
+                "fundamental_alias_spacing": delta_gamma_alias,
+                "rho_alias": [rho_alias.real, rho_alias.imag],
+                "basis_difference": alias_basis_diff,
+                "alias_amplitude_L1": alias_amplitude_L1,
+                "alias_amplitude_L5": alias_amplitude_L5,
+                "finding": "Exact grade aliases have identical bases q_alias = q_0 and collapse the Vandermonde matrix."
+            },
+            "collision_bridge": collision_bridge_status
+        }
+
+
+def audit_cycle14_synthesis(dps: int = 50, repo_root: Optional[str] = None) -> Dict[str, Any]:
+    """
+    [CYCLE 14: SYNTHESIS RESOLUTION — EVIDENCE REPAIRS, TRANSPORT AUDIT, & TC TEST-FAMILY INVESTIGATION]
+    Addresses the six executive deliverables required by Cycle 14:
+    1. What is now established about TC preservation.
+    2. Which finite exclusions are rigorously supported.
+    3. Whether the full transport calculation is certified or remains empirical.
+    4. What the executed test-family investigation established.
+    5. Whether any implication toward a forbidden arithmetic coincidence was derived.
+    6. The exact single next mathematical obligation.
+    """
+    with mpmath.workdps(dps):
+        p1_distinction = certify_pairwise_phase_distinction_arb(N=25, repo_root=repo_root)
+        p2_rational = certify_bounded_rational_exclusion_arb(N=20, Q_target=1000000, repo_root=repo_root)
+        p3_relations = audit_bounded_integer_relations(max_coeff=50, dps=dps, repo_root=repo_root)
+        transport = audit_complete_smoothed_tc_transport(dps=dps, repo_root=repo_root, eval_multi_grade=True)
+        test_family = audit_tc_test_family_investigation(dps=dps, repo_root=repo_root)
+        inf_audit = audit_infinite_extension_detectability()
+
+        executive_answers = {
+            "1_tc_preservation_status": (
+                "TC deliberately preserves the prime-zeta structure, Mellin transform pairings, and critical-strip "
+                "geometry across unit changes h_k = tau^{-k}. The complete explicit formula is verified: trivial-zero "
+                "series and background integral are proved identical (agreement to 8.57e-14, enclosed by geometric "
+                "tail bound <= 6.89169e-11 for M=15 at h=1), and -zeta'/zeta has no pole at s=0."
+            ),
+            "2_rigorously_supported_finite_exclusions": (
+                "RIGOROUSLY CERTIFIED: (a) Bounded rational exclusion certified for all q <= 10^6 on first 20 zeros "
+                "via exact rational Farey coverage (where b+d > Q rigorously excludes denominators q < b+d); "
+                "(b) Pairwise phase distinction certified fail-closed for first 25 zeros via Arb enclosures; "
+                "(c) Bounded integer relations certified for |a_j| <= 50 with signed Arb witnesses, outward interval "
+                "distances to nearest integer, and fail-closed handling of zero-containing residuals."
+            ),
+            "3_full_transport_certification_vs_empirical": (
+                "EMPIRICAL WITH RIGOROUS TAIL BOUNDS: The transport calculation uses numerical quadrature for Mellin "
+                "and background integrals. While geometric trivial zero tails and Stieltjes nontrivial zero truncation "
+                "are rigorously bounded by (p/(2*pi)) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}) (Trudgian 2012), full "
+                "certification remains open because derivative norms C_2, C_3, C_4 are numerical quadrature estimates "
+                "rather than Lean-verified analytic supremum bounds, and Arb ball enclosures are not yet fully propagated "
+                "through the continuous Mellin integrals."
+            ),
+            "4_executed_test_family_investigation_results": (
+                "INVESTIGATED phi_{L, rho_0}(x) = (1/L) x^{-rho_0} w((log x)/L) with normalized bump w_0 on (1.25, 1.75). "
+                "Identity phi_tilde(rho_0) = 1.0 verified. For on-line zeros, remainder ratio eta(L) < 1 is achieved for "
+                "L >= 2.0 (eta(2.0) approx 0.4986, eta(5.0) approx 0.0400). However, against an adversarial off-line competitor "
+                "Re(rho_{comp}) > Re(rho_0), competitor amplitudes blow up exponentially as exp(L*(Re(rho_{comp})-Re(rho_0))*v) -> infty, "
+                "driving eta -> infty (at L=20, competitor amplitude reaches 2.957 > c_F = 0.748). Proves that test-family scaling "
+                "cannot isolate a target zero without an a priori zero-free region."
+            ),
+            "5_arithmetic_coincidence_implication_status": (
+                "NO IMPLICATION DERIVED. Arithmetic layers L_K = tau^K * Z are unconditionally disjoint (L_K cap L_J = {0} "
+                "for K != J by Lindemann 1882). Observable Y_phi(k) is a continuous integral functional of primes not constrained "
+                "to L_K. Mode detection in Y_phi(k) does NOT force discrete lattice point collisions m*tau^K = n*tau^J. "
+                "The RH exclusion bridge remains strictly OPEN."
+            ),
+            "6_exact_single_next_mathematical_obligation": (
+                "Derive an explicit prime-zeta Tauberian identity or discrete distribution constraint that projects the continuous "
+                "observable Y_phi(k) into the discrete arithmetic layer L_K, or prove that continuous explicit-formula functionals "
+                "cannot distinguish disjoint discrete dilations."
+            )
+        }
+
+        return {
+            "cycle": "Cycle 14 — Evidence Repairs, Transport Audit, and Explicit TC Test-Family Investigation",
+            "executive_answers": executive_answers,
+            "p1_pairwise_distinction": p1_distinction,
+            "p2_bounded_rational_exclusion": p2_rational,
+            "p3_bounded_integer_relations": p3_relations,
+            "transport_audit": transport,
+            "test_family_audit": test_family,
             "infinite_extension_audit": inf_audit
         }

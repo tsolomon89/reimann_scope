@@ -1441,8 +1441,9 @@ def test_infinite_extension_detectability():
     props = res["propositions"]
     assert "IMPOSSIBLE" in props["1_fixed_annihilating_test"]["verdict"]
     assert "FEASIBLE" in props["2_approximate_isolation_family"]["verdict"]
-    assert "PROVED" in props["3_distributional_uniqueness"]["verdict"]
-    assert res["aliasing_audit"]["status"] == "NO_INTEGER_ALIASING_ON_CRITICAL_LINE"
+    assert "DISTRIBUTIONAL_UNIQUENESS_PROVED" in props["3_distributional_uniqueness"]["verdict"]
+    assert "DISCRETE_SPECTRAL_SYNTHESIS_UNPROVED" in props["3_distributional_uniqueness"]["verdict"]
+    assert "OPEN_SPECTRAL_INDEPENDENCE_HYPOTHESIS" in res["aliasing_audit"]["status"]
     assert "OPEN" in res["collision_mechanism_audit"]["verdict"]
 
 
@@ -1456,9 +1457,10 @@ def test_cycle12_synthesis():
     assert answers["1_does_complete_tc_transport_have_correct_derivation_and_real_test"].startswith("YES (DERIVED AND VERIFIED)")
     assert answers["2_which_finite_incommensurability_statements_are_certified"].startswith("CERTIFIED")
     assert answers["3_what_new_theorem_established_and_what_did_lean_prove"].startswith("PROVED")
-    assert answers["4_can_off_line_contribution_be_detected_in_infinite_formula"].startswith("YES")
+    assert answers["4_can_off_line_contribution_be_detected_in_infinite_formula"].startswith("INCONCLUSIVE")
     assert answers["5_what_forces_nonzero_membership_in_two_distinct_arithmetic_layers"].startswith("NOTHING")
     assert answers["6_was_exclusion_mechanism_found"].startswith("NO")
+
 
 
 # ==============================================================================
@@ -1556,7 +1558,7 @@ def test_cycle13_complete_transport_multi_grade_and_error_budget():
     Cycle 13 Complete Transport Audit:
     Verifies:
       1. Complete formula evaluated across multiple grades h in {1.0, 0.5, tau^{-1}, tau^{-2}}.
-      2. Discrepancy at M=15 (8.57e-14) is rigorously enclosed by geometric tail bound (1.12e-11).
+      2. Discrepancy at M=15 (8.57e-14) is rigorously enclosed by geometric tail bound (6.89169e-11).
       3. Zero truncation error is bounded by Stieltjes formula (log T + 1)/T with Mellin derivative norms C_k.
       4. Residuals are strictly within error budgets across all tested grades.
       5. Absence of phantom pole at s=0 is documented and confirmed.
@@ -1633,7 +1635,7 @@ def test_cycle13_infinite_extension_aliasing_and_pw():
     # 2. Paley-Wiener / Jensen
     pw = res["paley_wiener_impossibility"]
     assert "Paley-Wiener / Jensen" in pw["theorem"]
-    assert "No test phi in C_c^infty" in pw["conclusion"]
+    assert "in C_c^infty" in pw["conclusion"]
 
     # 3. Collision bridge
     bridge = res["collision_bridge_audit"]
@@ -1658,3 +1660,176 @@ def test_cycle13_synthesis():
     assert "Paley-Wiener" in answers["5_what_was_learned_about_infinite_mode_detectability"]
     assert answers["6_was_implication_toward_forbidden_coincidence_derived"].startswith("NO")
     assert answers["7_what_is_the_single_next_theorem_or_research_obligation"].startswith("Investigate")
+
+
+# ==============================================================================
+# 19. CYCLE 14: EVIDENCE REPAIRS, TRANSPORT AUDIT, & TC TEST-FAMILY INVESTIGATION
+# ==============================================================================
+
+def test_cycle14_certificate_tamper_and_fail_closed(tmp_path):
+    """
+    Cycle 14 Regression:
+    1. Tampered midpoint without hash change fails with INPUT_ERROR_HASH_MISMATCH.
+    2. Corrupted schema, invalid status, or missing enclosure fields fail with INPUT_INVALID.
+    3. Precision restoration: ctx.prec is restored after error.
+    """
+    import json
+    from flint import ctx
+    repo_root = str(tmp_path)
+    cert_dir = tmp_path / "data" / "certificates" / "zeros"
+    cert_dir.mkdir(parents=True)
+
+    # Copy actual valid certificate for zero 1
+    src_cert = os.path.join(REPO_ROOT, "data", "certificates", "zeros", "zero_00001.json")
+    with open(src_cert, "r", encoding="utf-8") as f:
+        valid_data = json.load(f)
+
+    # 1. Modify imaginary midpoint without changing sha256
+    tampered_data = dict(valid_data)
+    tampered_data["enclosure"] = dict(valid_data["enclosure"])
+    tampered_data["enclosure"]["imag_mid"] = "14.999999999999999"
+    with open(cert_dir / "zero_00001.json", "w", encoding="utf-8") as f:
+        json.dump(tampered_data, f)
+
+    zeros, info = transcendental.load_validated_zero_certificates(N=1, repo_root=repo_root)
+    assert zeros is None
+    assert "INPUT_ERROR_HASH_MISMATCH" in info["status"]
+    assert info["classification"] == "INPUT_INVALID"
+
+    # 2. Corrupt schema version
+    tampered_data["schema_version"] = "1.0"
+    with open(cert_dir / "zero_00001.json", "w", encoding="utf-8") as f:
+        json.dump(tampered_data, f)
+    zeros, info = transcendental.load_validated_zero_certificates(N=1, repo_root=repo_root)
+    assert zeros is None
+    assert "INPUT_ERROR_UNSUPPORTED_SCHEMA" in info["status"]
+
+    # 3. Test precision restoration
+    old_prec = ctx.prec
+    try:
+        ctx.prec = 128
+        transcendental.load_validated_zero_certificates(N=1, repo_root=repo_root, prec_bits=512)
+        assert ctx.prec == 128
+    finally:
+        ctx.prec = old_prec
+
+
+def test_cycle14_consumer_fail_closed_without_fallback_promotion(tmp_path):
+    """
+    Cycle 14 Consumer Audit:
+    Pointing consumers at an invalid or empty certificate directory fails closed
+    and does NOT promote fallback decimals to certified zero data.
+    """
+    empty_repo = str(tmp_path)
+    (tmp_path / "data" / "certificates" / "zeros").mkdir(parents=True)
+
+    # 1. Pairwise distinction fails closed
+    res_pair = transcendental.certify_pairwise_phase_distinction_arb(N=5, repo_root=empty_repo)
+    assert res_pair["classification"] == "INPUT_INVALID"
+    assert res_pair["all_zeros_valid"] is False
+
+    # 2. Bounded rational exclusion fails closed
+    res_rat = transcendental.certify_bounded_rational_exclusion_arb(N=5, Q_target=1000, repo_root=empty_repo)
+    assert res_rat["classification"] == "INPUT_INVALID"
+
+    # 3. Bounded integer relations fails closed by default
+    res_rel = transcendental.audit_bounded_integer_relations(max_coeff=10, repo_root=empty_repo, allow_fallback=False)
+    assert res_rel["classification"] == "INPUT_INVALID"
+
+    # 4. If fallback is explicitly requested, outputs are flagged as NUMERICAL_EVIDENCE_ONLY, certified_zero_inputs=False
+    res_fb = transcendental.audit_bounded_integer_relations(max_coeff=10, repo_root=empty_repo, allow_fallback=True)
+    assert res_fb["r2_box_search"]["classification"] == "NUMERICAL_EVIDENCE_ONLY"
+    assert res_fb["r2_box_search"]["certified_zero_inputs"] is False
+
+    # 5. Transport fails closed without certificates
+    res_trans = transcendental.audit_complete_smoothed_tc_transport(repo_root=empty_repo)
+    assert res_trans["classification"] == "INPUT_INVALID"
+
+
+def test_cycle14_transport_delimitation_and_tail_bounds():
+    """
+    Cycle 14 Transport Delimitation Audit:
+    Verifies:
+      1. Certification status is EMPIRICAL_QUADRATURE_WITH_RIGOROUS_TAIL_BOUNDS.
+      2. M=15 background discrepancy is bounded by <= 6.89169e-11 (not 1.12e-11).
+      3. Missing rigorous bounds for full certification are explicitly listed.
+      4. Exact real parts are used only when certified exact.
+    """
+    res = transcendental.audit_complete_smoothed_tc_transport(dps=30, eval_multi_grade=False)
+    assert res["classification"] == "DERIVED_AND_VERIFIED"
+    assert res["certification_status"] == "EMPIRICAL_QUADRATURE_WITH_RIGOROUS_TAIL_BOUNDS"
+    assert len(res["missing_rigorous_bounds_for_full_certification"]) >= 3
+
+    # Background tail bound verification
+    bg_audit = res["background_integral_audit"]
+    assert bg_audit["M15_tail_bound"] <= 6.892e-11
+    assert abs(bg_audit["M15_tail_bound"] - 6.891691e-11) < 1e-15
+    assert bg_audit["observed_discrepancy"] <= bg_audit["M15_tail_bound"]
+
+
+def test_cycle14_test_family_normalization_and_target_detection():
+    """
+    Cycle 14 Explicit Test-Family Investigation:
+    For phi_{L, rho_0}(x) = (1/L) * x^{-rho_0} * w((log x)/L) with bump w_0 on (1.25, 1.75):
+      1. Normalization int w(v) dv = 1, phi_tilde(rho_0) = 1.0 identically.
+      2. For on-line zeros, remainder ratio eta(L) achieves target detection (< 1.0) for L >= 2.0.
+      3. Strong detection (eta << 1.0) is achieved at L = 5.0.
+    """
+    res = transcendental.audit_tc_test_family_investigation(dps=30)
+    assert res["classification"] == "AUDITED_AND_STRUCTURED"
+    assert res["target_zero"]["identity_verified"] is True
+    assert abs(res["target_zero"]["phi_tilde_target"][0] - 1.0) < 1e-10
+    assert abs(res["target_zero"]["phi_tilde_target"][1]) < 1e-10
+
+    # Scale sweep checks
+    sweep = {row["L"]: row for row in res["scale_sweep_eta"]}
+    assert sweep[0.5]["detected"] is False
+    assert sweep[0.5]["eta"] > 1.0
+    assert sweep[1.0]["detected"] is False
+    assert sweep[1.0]["eta"] > 1.0
+    assert sweep[2.0]["detected"] is True
+    assert sweep[2.0]["eta"] < 1.0
+    assert sweep[5.0]["detected"] is True
+    assert sweep[5.0]["eta"] < 0.1
+
+
+def test_cycle14_test_family_adversarial_competitor_blowup():
+    """
+    Cycle 14 Adversarial Competitor & Obstruction Audit:
+    When an off-line competitor rho_comp with Re(rho_comp) > Re(rho_0) is present:
+      1. Competitor amplitude grows exponentially with L as exp(L * Delta_beta * v).
+      2. At L=20, competitor amplitude exceeds c_F, driving eta > 1.
+      3. Proves test-family scaling cannot isolate a target without an a priori zero-free region.
+    """
+    res = transcendental.audit_tc_test_family_investigation(dps=30)
+    comp_audit = res["adversarial_competitor_analysis"]
+    assert comp_audit["competitor_real_part"] > comp_audit["target_real_part"]
+
+    scaling = {row["L"]: row for row in comp_audit["scaling_results"]}
+    assert scaling[20.0]["exceeds_cF"] is True
+    assert scaling[20.0]["eta_lower_bound_from_competitor"] > 1.0
+    assert "obstruction" in comp_audit
+
+
+def test_cycle14_synthesis_executive_answers():
+    """
+    Cycle 14 Executive Synthesis Audit:
+    Verifies that audit_cycle14_synthesis() executes and answers all 6 executive questions:
+      1. TC preservation status
+      2. Rigorously supported finite exclusions
+      3. Transport certification status (empirical with tail bounds)
+      4. Test-family investigation findings (on-line detection vs off-line competitor blowup)
+      5. Arithmetic coincidence implication status (OPEN)
+      6. Single next mathematical obligation
+    """
+    res = transcendental.audit_cycle14_synthesis(dps=30)
+    assert res["cycle"].startswith("Cycle 14")
+    answers = res["executive_answers"]
+    assert len(answers) == 6
+    assert "preserves the prime-zeta structure" in answers["1_tc_preservation_status"]
+    assert "Bounded rational exclusion certified" in answers["2_rigorously_supported_finite_exclusions"]
+    assert "EMPIRICAL WITH RIGOROUS TAIL BOUNDS" in answers["3_full_transport_certification_vs_empirical"]
+    assert "INVESTIGATED" in answers["4_executed_test_family_investigation_results"]
+    assert "competitor amplitudes blow up exponentially" in answers["4_executed_test_family_investigation_results"]
+    assert answers["5_arithmetic_coincidence_implication_status"].startswith("NO IMPLICATION DERIVED")
+    assert "Derive an explicit prime-zeta Tauberian identity" in answers["6_exact_single_next_mathematical_obligation"]

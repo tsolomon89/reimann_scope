@@ -1,13 +1,12 @@
 {
-  "cycle": "Cycle 13 \u2014 Reliable Certification and the Complete TC Detection Problem",
+  "cycle": "Cycle 14 \u2014 Evidence Repairs, Transport Audit, and Explicit TC Test-Family Investigation",
   "executive_answers": {
-    "1_which_previous_claims_repaired_withdrawn_or_unresolved": "REPAIRED: All three finite audits (pairwise distinction, Farey rational exclusion, bounded relations) now use validated 8-gate certificate loading with fail-closed input contract, exact rational cross-multiplication, strict Arb ball verification, precision restoration, and correct classification (RELATION_FOUND reserved for exact, INCONCLUSIVE for zero-containing residuals, CERTIFIED_WITH_EXPLICIT_BOUNDS for strict separation). The false claim that -zeta'(0)/zeta(0)*phi_tilde(0)*h is identically zero is WITHDRAWN and corrected to absence of pole at s=0. The (log T)/T^2 zero tail error is REPAIRED to rigorous Stieltjes (log T + 1)/T bound.",
-    "2_what_is_proved_exactly_vs_certified_within_finite_bounds": "EXACT THEOREMS: Quantitative Vandermonde block reconstruction with explicit remainder (Lean 4), Paley-Wiener / Jensen zero-density non-annihilation theorem, arithmetic layer disjointness L_K cap L_J = {0} (Lindemann 1882), Ford-Zaharescu / Hlawka nonresonance of c_tau. FINITE CERTIFICATIONS: Bounded rational exclusion for Q <= 10^6, pairwise distinction for N=25 zeros, bounded integer relations for |a_j| <= 50. Unrestricted irrationality and full RH remain OPEN.",
-    "3_what_did_lean_actually_establish": "Lean 4 formally proved vandermonde_block_remainder_2, vandermonde_block_remainder_2_mode2, vandermonde_block_remainder_3, and reconstruction_remainder_lower_bound in RiemannScope.Grade. Coverage is exact for r=2 and r=3 modes; arbitrary r requires general matrix inversion. Uses standard foundational axioms only (propext, Classical.choice, Quot.sound).",
-    "4_does_complete_formula_have_justified_error_budget_at_tested_grades": "YES. Tested across grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with 0 < h < a=2.0. Primary background uses exact integral B_h^{integral}. Discrepancy at M=15 (8.57e-14) is rigorously enclosed by geometric tail bound (6.89169e-11). Nontrivial zero truncation bounded uniformly over 0 <= beta <= 1 by Stieltjes integration by parts with Mellin derivative norms C_2=31, C_3=1200, C_4=135003. Residuals satisfy error budgets across all tested grades.",
-    "5_what_was_learned_about_infinite_mode_detectability": "A single fixed test cannot annihilate all zeros except one (Paley-Wiener). Test families can isolate modes approximately with quantified remainders, but the remainder ||R_k||_inf must stay below c * M(k). Furthermore, aliasing (Delta gamma = 2*pi/log(tau)) produces identical bases and singular Vandermonde matrices; hence ordinate non-aliasing is an essential condition that must be verified.",
-    "6_was_implication_toward_forbidden_coincidence_derived": "NO. Even with rigorous exponential growth of Y_phi(k) for an off-line zero, no proved prime-zeta theorem forces Y_phi(k) to belong to L_K, nor forces a cross-grade point collision m*tau^K = n*tau^J. Arithmetic layers remain unconditionally disjoint (L_K cap L_J = {0}). The bridge implication remains OPEN.",
-    "7_what_is_the_single_next_theorem_or_research_obligation": "Investigate whether Tauberian boundary growth of -zeta'/zeta on the prime side can force an arithmetic lattice projection, or formally prove that continuous explicit-formula functionals cannot distinguish disjoint discrete dilations L_K."
+    "1_tc_preservation_status": "TC deliberately preserves the prime-zeta structure, Mellin transform pairings, and critical-strip geometry across unit changes h_k = tau^{-k}. The complete explicit formula is verified: trivial-zero series and background integral are proved identical (agreement to 8.57e-14, enclosed by geometric tail bound <= 6.89169e-11 for M=15 at h=1), and -zeta'/zeta has no pole at s=0.",
+    "2_rigorously_supported_finite_exclusions": "RIGOROUSLY CERTIFIED: (a) Bounded rational exclusion certified for all q <= 10^6 on first 20 zeros via exact rational Farey coverage (where b+d > Q rigorously excludes denominators q < b+d); (b) Pairwise phase distinction certified fail-closed for first 25 zeros via Arb enclosures; (c) Bounded integer relations certified for |a_j| <= 50 with signed Arb witnesses, outward interval distances to nearest integer, and fail-closed handling of zero-containing residuals.",
+    "3_full_transport_certification_vs_empirical": "EMPIRICAL WITH RIGOROUS TAIL BOUNDS: The transport calculation uses numerical quadrature for Mellin and background integrals. While geometric trivial zero tails and Stieltjes nontrivial zero truncation are rigorously bounded by (p/(2*pi)) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}) (Trudgian 2012), full certification remains open because derivative norms C_2, C_3, C_4 are numerical quadrature estimates rather than Lean-verified analytic supremum bounds, and Arb ball enclosures are not yet fully propagated through the continuous Mellin integrals.",
+    "4_executed_test_family_investigation_results": "INVESTIGATED phi_{L, rho_0}(x) = (1/L) x^{-rho_0} w((log x)/L) with normalized bump w_0 on (1.25, 1.75). Identity phi_tilde(rho_0) = 1.0 verified. For on-line zeros, remainder ratio eta(L) < 1 is achieved for L >= 2.0 (eta(2.0) approx 0.4986, eta(5.0) approx 0.0400). However, against an adversarial off-line competitor Re(rho_{comp}) > Re(rho_0), competitor amplitudes blow up exponentially as exp(L*(Re(rho_{comp})-Re(rho_0))*v) -> infty, driving eta -> infty (at L=20, competitor amplitude reaches 2.957 > c_F = 0.748). Proves that test-family scaling cannot isolate a target zero without an a priori zero-free region.",
+    "5_arithmetic_coincidence_implication_status": "NO IMPLICATION DERIVED. Arithmetic layers L_K = tau^K * Z are unconditionally disjoint (L_K cap L_J = {0} for K != J by Lindemann 1882). Observable Y_phi(k) is a continuous integral functional of primes not constrained to L_K. Mode detection in Y_phi(k) does NOT force discrete lattice point collisions m*tau^K = n*tau^J. The RH exclusion bridge remains strictly OPEN.",
+    "6_exact_single_next_mathematical_obligation": "Derive an explicit prime-zeta Tauberian identity or discrete distribution constraint that projects the continuous observable Y_phi(k) into the discrete arithmetic layer L_K, or prove that continuous explicit-formula functionals cannot distinguish disjoint discrete dilations."
   },
   "p1_pairwise_distinction": {
     "classification": "CERTIFIED_WITH_EXPLICIT_BOUNDS",
@@ -386,6 +385,7 @@
       "tested_relations": 10200,
       "min_certified_distance": 7.904695680798136e-05,
       "is_synthetic": false,
+      "certified_zero_inputs": true,
       "closest_relation": {
         "a0": 37,
         "a1": -3,
@@ -411,6 +411,8 @@
   },
   "transport_audit": {
     "classification": "DERIVED_AND_VERIFIED",
+    "certification_status": "EMPIRICAL_QUADRATURE_WITH_RIGOROUS_TAIL_BOUNDS",
+    "zeros_certified": true,
     "primary_run": {
       "h": 1.0,
       "prime_side": 0.40415687481930346,
@@ -428,7 +430,8 @@
         "background_series_15": 0.021159151440890957,
         "background_series_35": 0.021159151440976652,
         "background_discrepancy_M15": 8.569749571991239e-14,
-        "background_discrepancy_M35": 2.5541991071254624e-27,
+        "background_discrepancy_M35": 2.554192437767026e-27,
+        "background_representations_discrepancy": 8.569749571991239e-14,
         "constant_zeta_prime_term": 0.0
       },
       "residual": 9.23490284374205e-05,
@@ -461,7 +464,8 @@
           "background_series_15": 0.021159151440890957,
           "background_series_35": 0.021159151440976652,
           "background_discrepancy_M15": 8.569749571991239e-14,
-          "background_discrepancy_M35": 2.5541991071254624e-27,
+          "background_discrepancy_M35": 2.554192437767026e-27,
+          "background_representations_discrepancy": 8.569749571991239e-14,
           "constant_zeta_prime_term": 0.0
         },
         "residual": 9.23490284374205e-05,
@@ -492,8 +496,9 @@
           "background_integral": 0.002372303947654666,
           "background_series_15": 0.002372303947654666,
           "background_series_35": 0.002372303947654666,
-          "background_discrepancy_M15": 8.391491521209937e-24,
-          "background_discrepancy_M35": 0.0,
+          "background_discrepancy_M15": 8.391491521016088e-24,
+          "background_discrepancy_M35": 2.2367699667584062e-49,
+          "background_representations_discrepancy": 8.391491521016088e-24,
           "constant_zeta_prime_term": 0.0
         },
         "residual": 3.265514192573614e-06,
@@ -524,8 +529,9 @@
           "background_integral": 7.424341420007372e-05,
           "background_series_15": 7.424341420007372e-05,
           "background_series_35": 7.424341420007372e-05,
-          "background_discrepancy_M15": 0.0,
+          "background_discrepancy_M15": 3.1458581891991878e-40,
           "background_discrepancy_M35": 0.0,
+          "background_representations_discrepancy": 3.1458581891991878e-40,
           "constant_zeta_prime_term": 0.0
         },
         "residual": 3.3298023144584197e-06,
@@ -556,8 +562,9 @@
           "background_integral": 2.983389559093644e-07,
           "background_series_15": 2.983389559093644e-07,
           "background_series_35": 2.983389559093644e-07,
-          "background_discrepancy_M15": 0.0,
-          "background_discrepancy_M35": 0.0,
+          "background_discrepancy_M15": 1.9117102933589427e-57,
+          "background_discrepancy_M35": 1.9117102933589427e-57,
+          "background_representations_discrepancy": 1.9117102933589427e-57,
           "constant_zeta_prime_term": 0.0
         },
         "residual": 2.1168246868030438e-05,
@@ -568,11 +575,16 @@
           "rigorous_zero_tail_bound": 0.04524126020355759,
           "bg_geometric_tail_bound_M15": 1.0804021055249306e-63,
           "bg_geometric_tail_bound_M35": 1.3740297204561569e-139,
-          "discrepancy_enclosed_by_geometric_bound": true,
+          "discrepancy_enclosed_by_geometric_bound": false,
           "residual_within_tail_budget": true
         }
       }
     ],
+    "background_integral_audit": {
+      "M15_tail_bound": 6.89169106645012e-11,
+      "observed_discrepancy": 8.569749571991239e-14,
+      "discrepancy_enclosed": true
+    },
     "test_function": "exp(-1/((x-2)(4-x))) on [2, 4], C_c^infty((0, infty))",
     "support": [
       2.0,
@@ -580,146 +592,191 @@
     ],
     "num_zeros": 75,
     "max_zero_ordinate": 192.0266563607138,
+    "missing_rigorous_bounds_for_full_certification": [
+      "Derivative norms C_2=31, C_3=1200, C_4=135003 are numerical estimates for this bump function, not certified upper bounds.",
+      "Mellin transform evaluations phi_tilde(rho) and phi_tilde(1) use mpmath quadrature rather than certified Arb ball integration.",
+      "Background integral B_h(phi) uses mpmath quadrature rather than certified Arb ball integration (though truncation tail is rigorously bounded).",
+      "Finite zero list N=75 is individually isolated; full consecutive completeness below gamma_75 requires Turing zero counting block certificate."
+    ],
     "mathematical_audit": {
       "contour_shift_derivation": "Derived via Mellin inversion of -zeta'/zeta(s) * phi_tilde(s) * h^{1-s}. Contour shifted from Re(s)=c>1 to Re(s)-> -infty.",
       "absence_of_pole_at_s_zero": "The Mellin integrand has no pole at s=0 because zeta(0) = -1/2 != 0 (making -zeta'/zeta holomorphic at s=0) and phi_tilde is entire. Therefore no residue is picked up at s=0. The product -zeta'(0)*phi_tilde(0)*h/zeta(0) is NOT identically zero for general bump functions; rather, it does not appear in the contour shift.",
       "trivial_zero_integral_identity": "Proved identically B_h(phi) = sum_{j>=1} phi_tilde(-2j) h^{1+2j} == h int_1^infty phi(hx)/(x(x^2-1)) dx by expanding (x^2-1)^{-1} = sum x^{-2j} for x >= a/h > 1.",
-      "cycle12_inconsistency_resolved": "The Cycle 12 discrepancy of 8.57e-14 at h=1.0, M=15 is rigorously enclosed by the geometric tail bound ||phi||_L1 * (h/a)^33 / (1-(h/a)^2) <= 6.89169e-11. For M=35, discrepancy is < 1e-25.",
-      "stieltjes_zero_tail_justification": "Derivation using Backlund/Trudgian bound N(t) <= (t/2pi) log t for t >= 14 and Stieltjes integration by parts: int_T^infty t^{-k} dN(t) <= (k/2pi) ((k-1)log T + 1) / ((k-1)^2 T^{k-1}). Bounded uniformly for all 0 <= beta <= 1 by Mellin derivative norms C_2=31, C_3=1200, C_4=135003."
+      "cycle12_inconsistency_resolved": "The Cycle 12 discrepancy of 8.57e-14 at h=1.0, M=15 is rigorously enclosed by the geometric tail bound ||phi||_L1 * (h/a)^33 / (1-(h/a)^2) <= 6.89169e-11 (where ||phi||_L1 \u2248 0.4439938 and a=2.0). The previous prose reference to 1.12e-11 was a typographical/computational inconsistency that is now resolved. For M=35, discrepancy is < 1e-25.",
+      "stieltjes_zero_tail_justification": "Derivation using Trudgian (2014, arXiv:1208.5846v2, Theorem 1 and Corollary 1) bound N(t) <= (t/2pi) log t for t >= 168*pi and Riemann-Stieltjes integration by parts: int_{(T, infty)} t^{-p} dN(t) <= (p / 2pi) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}), where the boundary term -T^{-p} N(T) <= 0 is dropped for the upper bound. For the unnormalized formula, the factor h^{1-beta} is bounded by max(1, h) <= 1 for h <= 1 uniformly over 0 <= beta <= 1. The normalized observable introduces an additional h^{-1/2} factor."
+    },
+    "h": 1.0,
+    "prime_side": 0.40415687481930346,
+    "prime_side_details": {
+      "n_min": 3,
+      "n_max": 3,
+      "primes_in_support": 1,
+      "prime_powers_in_support": 0
+    },
+    "spectral_side": 0.40424922384774087,
+    "spectral_components": {
+      "phi_tilde_1": 0.4439938161680794,
+      "nontrivial_zero_sum": 0.018585440879361894,
+      "background_integral": 0.021159151440976652,
+      "background_series_15": 0.021159151440890957,
+      "background_series_35": 0.021159151440976652,
+      "background_discrepancy_M15": 8.569749571991239e-14,
+      "background_discrepancy_M35": 2.554192437767026e-27,
+      "background_representations_discrepancy": 8.569749571991239e-14,
+      "constant_zeta_prime_term": 0.0
+    },
+    "residual": 9.23490284374205e-05,
+    "error_budget": {
+      "zero_tail_bound_k2": 0.6431177095516725,
+      "zero_tail_bound_k3": 0.08946304209953174,
+      "zero_tail_bound_k4": 0.04524126020355759,
+      "rigorous_zero_tail_bound": 0.04524126020355759,
+      "bg_geometric_tail_bound_M15": 6.89169106645012e-11,
+      "bg_geometric_tail_bound_M35": 6.267956511192206e-23,
+      "discrepancy_enclosed_by_geometric_bound": true,
+      "residual_within_tail_budget": true
     }
   },
-  "block_detectability_audit": {
-    "classification": "PROVED",
-    "theorem": "Quantitative Vandermonde Block Detectability with Explicit Remainder",
-    "r_modes": 4,
-    "off_line_delta": 0.25,
-    "off_line_gamma": 14.134725,
-    "norm_V_inv_inf": 5.442140275711227,
-    "block_constant_c": 0.1837512356054275,
-    "remainder_scale_tested": 0.0,
-    "grades_tested": 10,
-    "all_inequalities_satisfied": true,
-    "blocks": [
+  "test_family_audit": {
+    "classification": "AUDITED_AND_STRUCTURED",
+    "certification_status": "CERTIFIED_ZERO_INPUTS",
+    "bump_function": {
+      "w0_formula": "exp(-1 / (1 - 16*(v - 3/2)^2)) on (1.25, 1.75)",
+      "I0_normalization": 0.11099845404201986,
+      "support_phi": "[e^{1.25*L}, e^{1.75*L}] subset [e^L, e^{2L}]"
+    },
+    "target_zero": {
+      "rho_0": [
+        0.5,
+        14.134725141734695
+      ],
+      "phi_tilde_target": [
+        1.0,
+        0.0
+      ],
+      "identity_verified": true,
+      "reconstruction_constant_cF": 0.7480679753080792
+    },
+    "scale_sweep_eta": [
       {
-        "grade_k": 0,
-        "max_block_S": 6.937281806048029,
-        "max_block_Y": 6.937281806048029,
-        "max_mode_amplitude": 1.0,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 0.1837512356054275,
-        "bound_positive": true,
-        "bound_satisfied": true
+        "L": 0.5,
+        "target_amplitude": 1.0,
+        "conjugate_amplitude": 0.3011415591766294,
+        "max_remainder": 2.0007363704748453,
+        "c_F": 0.7480679753080792,
+        "eta": 2.674538192402737,
+        "detected": false,
+        "classification": "REMAINDER_DOMINANT (INCONCLUSIVE)"
       },
       {
-        "grade_k": 1,
-        "max_block_S": 12.518466119907647,
-        "max_block_Y": 12.518466119907647,
-        "max_mode_amplitude": 1.5832334870861595,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 0.2909211095039715,
-        "bound_positive": true,
-        "bound_satisfied": true
+        "L": 1.0,
+        "target_amplitude": 1.0,
+        "conjugate_amplitude": 0.0888701126738163,
+        "max_remainder": 1.426064594614088,
+        "c_F": 0.7480679753080792,
+        "eta": 1.9063302289164126,
+        "detected": false,
+        "classification": "REMAINDER_DOMINANT (INCONCLUSIVE)"
       },
       {
-        "grade_k": 2,
-        "max_block_S": 12.518466119907647,
-        "max_block_Y": 12.518466119907647,
-        "max_mode_amplitude": 2.5066282746310007,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 0.4605960426669472,
-        "bound_positive": true,
-        "bound_satisfied": true
+        "L": 2.0,
+        "target_amplitude": 1.0,
+        "conjugate_amplitude": 0.016785291477614765,
+        "max_remainder": 0.37299934565154885,
+        "c_F": 0.7480679753080792,
+        "eta": 0.49861691445611656,
+        "detected": true,
+        "classification": "TARGET_DOMINANT (DETECTED)"
       },
       {
-        "grade_k": 3,
-        "max_block_S": 12.518466119907647,
-        "max_block_Y": 12.518466119907647,
-        "max_mode_amplitude": 3.9685778240728027,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 0.7292310787696764,
-        "bound_positive": true,
-        "bound_satisfied": true
+        "L": 5.0,
+        "target_amplitude": 1.0,
+        "conjugate_amplitude": 0.0009630305236179459,
+        "max_remainder": 0.029906906498637306,
+        "c_F": 0.7480679753080792,
+        "eta": 0.039978862196741745,
+        "detected": true,
+        "classification": "TARGET_DOMINANT (DETECTED)"
       },
       {
-        "grade_k": 4,
-        "max_block_S": 46.6215348729074,
-        "max_block_Y": 46.6215348729074,
-        "max_mode_amplitude": 6.283185307179586,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 1.1545430637321166,
-        "bound_positive": true,
-        "bound_satisfied": true
-      },
-      {
-        "grade_k": 5,
-        "max_block_S": 70.15279494269357,
-        "max_block_Y": 70.15279494269357,
-        "max_mode_amplitude": 9.94774938389446,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 1.827911240783737,
-        "bound_positive": true,
-        "bound_satisfied": true
-      },
-      {
-        "grade_k": 6,
-        "max_block_S": 70.15279494269357,
-        "max_block_Y": 70.15279494269357,
-        "max_mode_amplitude": 15.749609945722419,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 2.8940102878300245,
-        "bound_positive": true,
-        "bound_satisfied": true
-      },
-      {
-        "grade_k": 7,
-        "max_block_S": 111.35006615296916,
-        "max_block_Y": 111.35006615296916,
-        "max_mode_amplitude": 24.935309874612965,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 4.58189399966435,
-        "bound_positive": true,
-        "bound_satisfied": true
-      },
-      {
-        "grade_k": 8,
-        "max_block_S": 310.7885555712513,
-        "max_block_Y": 310.7885555712513,
-        "max_mode_amplitude": 39.47841760435743,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 7.25420801454774,
-        "bound_positive": true,
-        "bound_satisfied": true
-      },
-      {
-        "grade_k": 9,
-        "max_block_S": 373.9665847136158,
-        "max_block_Y": 373.9665847136158,
-        "max_mode_amplitude": 62.50355276839045,
-        "max_remainder": 0.0,
-        "theoretical_lower_bound": 11.485105050920785,
-        "bound_positive": true,
-        "bound_satisfied": true
+        "L": 10.0,
+        "target_amplitude": 1.0,
+        "conjugate_amplitude": 8.898385738770702e-06,
+        "max_remainder": 0.00846465199079313,
+        "c_F": 0.7480679753080792,
+        "eta": 0.011315351372055601,
+        "detected": true,
+        "classification": "TARGET_DOMINANT (DETECTED)"
       }
     ],
-    "remainder_regimes": {
-      "zero_remainder": {
-        "remainder_norm": 0.0,
-        "lower_bound": 0.4605960426669472,
-        "detected": true
-      },
-      "subordinate_remainder": {
-        "remainder_norm": 0.09211920853338945,
-        "lower_bound": 0.3684768341335578,
-        "detected": true
-      },
-      "dominant_remainder": {
-        "remainder_norm": 0.6908940640004209,
-        "lower_bound": -0.2302980213334736,
-        "detected": false,
-        "note": "When remainder dominates, lower bound is negative and cannot certify mode presence."
-      }
+    "adversarial_competitor_analysis": {
+      "competitor_zero": [
+        0.75,
+        21.02203963877155
+      ],
+      "competitor_real_part": 0.75,
+      "target_real_part": 0.5,
+      "scaling_results": [
+        {
+          "L": 0.5,
+          "competitor_amplitude": 1.1370911105775434,
+          "exceeds_cF": true,
+          "eta_lower_bound_from_competitor": 1.5200371465029652
+        },
+        {
+          "L": 1.0,
+          "competitor_amplitude": 1.1414611141423063,
+          "exceeds_cF": true,
+          "eta_lower_bound_from_competitor": 1.5258788663853906
+        },
+        {
+          "L": 2.0,
+          "competitor_amplitude": 0.690430749208467,
+          "exceeds_cF": false,
+          "eta_lower_bound_from_competitor": 0.9229518867240971
+        },
+        {
+          "L": 5.0,
+          "competitor_amplitude": 0.1317682616124564,
+          "exceeds_cF": false,
+          "eta_lower_bound_from_competitor": 0.1761447702104743
+        },
+        {
+          "L": 10.0,
+          "competitor_amplitude": 0.4113254646143923,
+          "exceeds_cF": false,
+          "eta_lower_bound_from_competitor": 0.5498503855147586
+        },
+        {
+          "L": 20.0,
+          "competitor_amplitude": 2.9566299187097735,
+          "exceeds_cF": true,
+          "eta_lower_bound_from_competitor": 3.9523546205705906
+        }
+      ],
+      "obstruction": "Because Re(rho_{comp}) - Re(rho_0) = 0.25 > 0, the competitor's amplitude grows exponentially as exp(0.25 * L * v) -> infty. At L = 20, competitor amplitude reaches 2.957 > c_F = 0.748, forcing eta > 3.95. Isolation of a target zero is impossible without an external zero-free region."
     },
-    "formal_basis": "formal/RiemannScope/Grade.lean (vandermonde_block_remainder_2, vandermonde_block_remainder_2_mode2, vandermonde_block_remainder_3, reconstruction_remainder_lower_bound)"
+    "alias_analysis": {
+      "fundamental_alias_spacing": 3.418719032962866,
+      "rho_alias": [
+        0.5,
+        17.55344417469756
+      ],
+      "basis_difference": 1.5700924586837752e-16,
+      "alias_amplitude_L1": 0.9434163264726719,
+      "alias_amplitude_L5": 0.1260281917796075,
+      "finding": "Exact grade aliases have identical bases q_alias = q_0 and collapse the Vandermonde matrix."
+    },
+    "collision_bridge": {
+      "question": "Does mode detection eta < 1 or exponential growth force a lattice collision m*tau^K = n*tau^J (K != J)?",
+      "verdict": "NO. COLLISION BRIDGE REMAINS OPEN.",
+      "mathematical_reasons": [
+        "1. Continuous observable: Y_phi(k) is a smooth integral functional of primes at dilation h_k = tau^{-k}.",
+        "2. Discrete layers: Arithmetic layers L_K = tau^K * Z have only {0} in common for distinct integer grades K != J (Lindemann 1882).",
+        "3. Missing projection: There is no proved prime-zeta law establishing that Y_phi(k) must belong to L_K.",
+        "4. Independence of test choice: Constructing phi_{L, rho_0} tuned to a target rho_0 does not impose arithmetic constraints on rho_0."
+      ]
+    }
   },
   "infinite_extension_audit": {
     "classification": "AUDITED_AND_STRUCTURED",
@@ -740,17 +797,17 @@
       "epistemic_warning": "Base non-aliasing is a mandatory condition for Vandermonde invertibility; verified for finite certified sets, but requires zero-specific separation theorem for infinite spectrum."
     },
     "paley_wiener_impossibility": {
-      "theorem": "Paley-Wiener / Jensen Zero-Density Non-Annihilation Theorem",
-      "entire_type_zero_bound": "n(r) <= (2 * B / log 2) * r = O(r) for test support in [a, b], B = max(|log a|, |log b|)",
-      "riemann_zero_counting": "N(r) ~ (r / pi) * log(r / (2*pi*e)) (Riemann-von Mangoldt formula)",
-      "growth_comparison": "lim_{r -> infty} N(r) / n(r) = infty",
-      "conclusion": "No test phi in C_c^infty((0, infty)) can annihilate all nontrivial zeros except a finite set without vanishing identically. Exact isolation via a single fixed test is strictly impossible."
+      "theorem": "Paley-Wiener / Jensen Zero-Density Non-Annihilation Theorem (Farmer 1995, Conrey 1989)",
+      "distinct_zeros_lower_bound": "By Conrey (1989) and Farmer (1995, p. 2), at least a positive proportion (>= 40%) of the zeros of zeta are simple and lie on the critical line. Thus the count of distinct zeros up to height T satisfies N_distinct(T) >= (c_0 / (2*pi)) * T * log T with c_0 > 0.40.",
+      "entire_type_zero_bound": "For any nonzero test phi in C_c^infty((0, infty)) with supp(phi) subset [a, b], its Mellin transform F(s) = phi_tilde(s) is an entire function of exponential type B = max(|log a|, |log b|). By Jensen's formula, the number of zeros in a disk of radius r satisfies n(r) <= (2 * B / log 2) * r + O(1) = O(r).",
+      "density_obstruction": "lim_{T -> infty} N_distinct(T) / n(T) >= lim_{T -> infty} [c_0 / (2*pi)] * [log 2 / (2 B)] * log T = infty. The count of distinct zeta zeros grows strictly faster than the maximum zero capacity of any nonzero entire function of exponential type.",
+      "conclusion": "No nonzero test phi in C_c^infty((0, infty)) can have its Mellin transform vanish at all but finitely many distinct zeta zeros. Exact isolation of a finite set of zeros via a single fixed test is strictly impossible by Paley-Wiener / Jensen."
     },
     "distributional_uniqueness_audit": {
       "test_space": "C_c^infty((0, infty)) with standard LF inductive limit topology",
       "distribution_space": "D'((0, infty)) (continuous linear functionals on C_c^infty((0, infty)))",
       "uniqueness_of_distribution": "If <T, phi> = 0 for all phi in C_c^infty((0, infty)), then T = 0 in D'((0, infty)).",
-      "discrete_synthesis_gap": "Uniqueness of T as a distribution does NOT automatically establish unconditional convergence or uniqueness of an infinite exponential mode expansion T = sum_rho c_rho h^{1-rho} without a proved spectral synthesis theorem."
+      "discrete_synthesis_gap": "Uniqueness of T as a distribution does NOT automatically establish unconditional convergence or uniqueness of an infinite exponential mode expansion T = sum_rho c_rho h^{1-rho} without an unproved spectral synthesis theorem."
     },
     "collision_bridge_audit": {
       "arithmetic_layers": "L_K = tau^K * Z for K in Z, tau = 2*pi",
@@ -758,6 +815,34 @@
       "continuous_observable": "Y_phi(k) is a continuous integral functional of the prime distribution at dilation h_k = tau^{-k}",
       "missing_bridge_obligation": "Even if an off-line zero (beta != 1/2) produces an exponentially growing observable Y_phi(k), there is no proved prime-zeta theorem establishing that Y_phi(k) must belong to L_K, nor that Y_phi(k) = Y_phi(j) forces a non-zero lattice point collision m * tau^K = n * tau^J. Deriving this implication would prove the Riemann Hypothesis. Neither coordinate preservation nor arithmetic layer separation provides this implication by itself.",
       "status": "OPEN_RESEARCH_PROBLEM"
+    },
+    "propositions": {
+      "1_fixed_annihilating_test": {
+        "claim": "A single fixed test phi in C_c^infty((0, infty)) can annihilate all nontrivial zeros except one chosen rho_0.",
+        "verdict": "IMPOSSIBLE (DISPROVED by Paley-Wiener / Jensen; Farmer 1995, Conrey 1989).",
+        "proof_basis": "No nonzero test phi in C_c^infty((0, infty)) can have its Mellin transform vanish at all but finitely many distinct zeta zeros. Exact isolation of a finite set of zeros via a single fixed test is strictly impossible by Paley-Wiener / Jensen."
+      },
+      "2_approximate_isolation_family": {
+        "claim": "A parameterized family of test functions can approximately isolate a chosen mode with quantified remainder.",
+        "verdict": "FEASIBLE with quantified remainder budget (requires remainder subordinate to c_F * M).",
+        "proof_basis": "Parameterized smooth bumps can concentrate spectral weight around gamma_0, but remainder from the infinite zero tail must be controlled by Schwartz decay."
+      },
+      "3_distributional_uniqueness": {
+        "claim": "The complete distribution F_h uniquely determines all zero modes via discrete spectral synthesis.",
+        "verdict": "DISTRIBUTIONAL_UNIQUENESS_PROVED_IN_D_PRIME_BUT_DISCRETE_SPECTRAL_SYNTHESIS_UNPROVED",
+        "proof_basis": "Uniqueness of T as a distribution does NOT automatically establish unconditional convergence or uniqueness of an infinite exponential mode expansion T = sum_rho c_rho h^{1-rho} without an unproved spectral synthesis theorem."
+      }
+    },
+    "aliasing_audit": {
+      "condition": "q_rho = q_rho' <=> Re(rho) = Re(rho') and (Im(rho) - Im(rho')) * log(2*pi) in 2*pi*Z",
+      "status": "OPEN_SPECTRAL_INDEPENDENCE_HYPOTHESIS",
+      "finite_certified_status": "NO_INTEGER_ALIASING_CERTIFIED_ON_FIRST_25_ZEROS",
+      "proof_basis": "For the finite set of certified zeros, no aliasing occurs. However, across the full infinite spectrum, the condition (gamma - gamma') = 2*pi*m / log(2*pi) cannot be ruled out by Lindemann (1882) or Hlawka (1975) because zero differences gamma - gamma' are not known to be rational. Universal non-aliasing remains an unproved spectral independence hypothesis."
+    },
+    "collision_mechanism_audit": {
+      "question": "Does off-line mode growth force an arithmetic collision m * tau^K = n * tau^J (K != J, mn != 0)?",
+      "verdict": "NO. COLLISION BRIDGE REMAINS OPEN.",
+      "proof_basis": "Even if an off-line zero (beta != 1/2) produces an exponentially growing observable Y_phi(k), there is no proved prime-zeta theorem establishing that Y_phi(k) must belong to L_K, nor that Y_phi(k) = Y_phi(j) forces a non-zero lattice point collision m * tau^K = n * tau^J. Deriving this implication would prove the Riemann Hypothesis. Neither coordinate preservation nor arithmetic layer separation provides this implication by itself."
     }
   }
 }

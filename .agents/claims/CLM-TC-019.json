@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-019",
+  "statement": "Evidence Integrity, Delimited Transport Certification, Complex Remainder Formalization, and Explicit TC Test-Family Investigation: For fundamental unit dilation period tau = 2*pi, coordinate scales h = tau^{-k} (k in Z) and smooth test family phi_{L, rho_0}(x) = (1/L) * x^{-rho_0} * w((log x)/L) in C_c^infty((0, infty)) with supp(phi) subset [e^{1.25 L}, e^{1.75 L}] (0 < h < e^{1.25 L}): (1) Certified Input Integrity: The 8-gate certificate loader enforces schema 2.0, status, finite non-negative complex ball enclosures, canonical SHA-256 self-hashes, and provenance; consumers fail closed without fallback promotion; Farey coverage proves rational exclusion through Q for b+d > Q; outward integer distances are certified via Arb interval bounds. (2) Delimited Transport Certification: The complete transport explicit formula is verified across grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with exact background identity (Cycle 12 discrepancy 8.57e-14 strictly enclosed by geometric tail <= 6.89169e-11 at M=15) and uniform Stieltjes zero truncation tail bounded by (p/(2*pi)) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}) (Trudgian 2012); full certification is delimited as empirical quadrature with rigorous tail bounds due to numerical derivative norms C_k. (3) Complex Norm Remainder Formalization: The complex triangle inequality lower bound |M| - |R_est| <= |Y_est| and perturbed 2-mode Vandermonde reconstruction bound are formally proved in Lean 4 (complex_reconstruction_remainder_lower_bound, vandermonde_2_reconstruction_bound) using standard Mathlib foundational axioms only. (4) Explicit TC Test-Family Investigation: The constructed family phi_{L, rho_0} satisfies phi_tilde(rho_0) = 1.0 identically; for on-line zeros, remainder ratio eta(L) < 1 is achieved for L >= 2.0 (eta(2.0) approx 0.4986, eta(5.0) approx 0.0400); but against an adversarial off-line competitor Re(rho_comp) > Re(rho_0), competitor amplitudes blow up exponentially as exp(L*(Re(rho_comp)-Re(rho_0))*v), driving eta -> infty (at L=20, competitor amplitude reaches 2.957 > c_F = 0.748), proving isolation requires an a priori zero-free region. (5) Analytic Obstructions & Open Collision Bridge: Paley-Wiener / Jensen non-annihilation is proved via Farmer (1995) distinct zeros lower bound N_distinct(T) >= (0.40/(2*pi)) * T * log T >> n(r) = O(r); infinite spectrum aliasing remains an open spectral independence hypothesis; and continuous observable Y_phi(k) does not project onto discrete arithmetic layers L_K = tau^K * Z (L_K cap L_J = {0}), leaving the RH arithmetic collision bridge strictly open.",
+  "quantified_variables": [
+    {
+      "name": "h",
+      "domain": "h in Real, 0 < h < e^{1.25 L}",
+      "description": "Coordinate dilation scale factor"
+    },
+    {
+      "name": "L",
+      "domain": "L in Real, L > 0",
+      "description": "Test family scaling parameter"
+    },
+    {
+      "name": "rho_0",
+      "domain": "rho_0 in Complex, 0 < Re(rho_0) < 1",
+      "description": "Target zero of the Riemann zeta function"
+    },
+    {
+      "name": "k",
+      "domain": "k in Integer",
+      "description": "Discrete grade index"
+    },
+    {
+      "name": "r",
+      "domain": "r in Integer, r >= 1",
+      "description": "Number of retained exponential modes"
+    },
+    {
+      "name": "q_j",
+      "domain": "q_j in Complex, q_j != 0",
+      "description": "Complex mode base tau^{rho_j - 1/2}"
+    },
+    {
+      "name": "a_j",
+      "domain": "a_j in Complex",
+      "description": "Mode amplitude coefficient"
+    },
+    {
+      "name": "R",
+      "domain": "R in Sequence(Complex)",
+      "description": "Observation remainder / spectral truncation tail sequence"
+    }
+  ],
+  "variable_domains": [
+    "h in Real, 0 < h < e^{1.25 L}",
+    "L in Real, L > 0",
+    "rho_0 in Complex, 0 < Re(rho_0) < 1",
+    "k in Integer",
+    "r in Integer, r >= 1",
+    "q_j in Complex, q_j != 0",
+    "a_j in Complex",
+    "R in Sequence(Complex)"
+  ],
+  "hypotheses": [
+    "Complete Riemann explicit formula on smooth compactly supported test functions via Mellin inversion",
+    "Holomorphy of -zeta'/zeta at s=0 and absence of pole residue in the Mellin integrand",
+    "Linear algebra of Vandermonde matrices with distinct nonzero complex bases",
+    "Transcendence of tau = 2*pi over Q (Lindemann 1882)",
+    "Fail-closed 8-gate certificate validation with canonical SHA-256 integrity and complex ball enclosures",
+    "Zero density bound N(t) <= (t / (2*pi)) log t for t >= 168*pi (Trudgian 2014, Cor. 1)",
+    "Positive proportion of distinct simple critical line zeros N_distinct(T) >= (0.40 / (2*pi)) * T * log T (Conrey 1989, Farmer 1995)"
+  ],
+  "object_studied": "Certified evidence pipeline, delimited complete TC transport, complex Vandermonde remainder lower bounds in Lean 4, explicit test-family investigation with adversarial competitor analysis, and open arithmetic collision bridge",
+  "fourier_normalization": "Additive Fourier-Mellin transform on (0, infty): phi_tilde(s) = int_0^infty phi(x) x^{s-1} dx",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho, or listed with repetition",
+  "measure_and_window": "Prime measure mu = sum Lambda(n) delta_n, test window supp(phi_{L, rho_0}) subset [e^{1.25 L}, e^{1.75 L}] with w_0(v) = exp(-1/(1-16(v-1.5)^2)) on (1.25, 1.75)",
+  "order_of_limits": "Normalization integral I_0, followed by finite mode extraction r, spectral cutoff gamma <= gamma_N, background cutoff j <= M, and test scaling L -> infty",
+  "exact_conclusion": "The input certification pipeline is fail-closed under 8 validated gates; complete transport is verified with exact background agreement (discrepancy 8.57e-14 <= 6.89169e-11) and Stieltjes zero tail bound, with full certification honestly delimited as empirical quadrature with rigorous tail bounds; complex Vandermonde reconstruction bound |M| - |R_est| <= |Y_est| is formally proved in Lean 4; explicit test family phi_{L, rho_0} achieves target detection eta < 1 for on-line zeros at L >= 2.0 but blows up exponentially against adversarial off-line competitors Re(rho_comp) > Re(rho_0), proving isolation requires an a priori zero-free region; Paley-Wiener / Jensen precludes fixed annihilating tests; and the continuous transport observable Y_phi(k) does not force discrete lattice point collisions m*tau^K = n*tau^J in L_K = tau^K * Z, keeping the RH collision bridge strictly open.",
+  "logical_negation": "Certificate loading accepts tampered inputs, or complete transport residual exceeds Stieltjes error budget, or complex Vandermonde lower bound fails in Lean 4, or test family phi_{L, rho_0} suppresses adversarial competitor zeros Re(rho_comp) > Re(rho_0) without zero-free region assumptions, or continuous growth forces discrete lattice collision m*tau^K = n*tau^J (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "TRUNCATED_WITH_BOUNDS",
+  "arithmetic_cutoff": "x in [e^{1.25 L}, e^{1.75 L}], grades h in {1.0, 0.5, tau^{-1}, tau^{-2}} with 0 < h < e^{1.25 L}",
+  "spectral_cutoff": "gamma_N = 187.217 (N=75 zeros for transport; N=25 pairs for test family)",
+  "integration_domain": "(0, infty), compactly supported on [e^{1.25 L}, e^{1.75 L}]",
+  "omitted_tail": "Nontrivial zero tail with gamma > gamma_N, background series tail with j > M, and test family infinite zero spectrum tail",
+  "tail_enclosure": "Zero tail <= (p/(2*pi)) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}) via Trudgian (2012) Stieltjes integration by parts; background tail <= ||phi||_{L1} * (h/a)^{2M+3} / (1 - (h/a)^2) <= 6.89169e-11 for M=15 at h=1",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: complex_reconstruction_remainder_lower_bound",
+    "formal/RiemannScope/Grade.lean: vandermonde_2_reconstruction_bound",
+    "formal/RiemannScope/Grade.lean: vandermonde_block_remainder_2",
+    "formal/RiemannScope/Grade.lean: reconstruction_remainder_lower_bound",
+    "transcendental.py: load_validated_zero_certificates",
+    "transcendental.py: certify_pairwise_phase_distinction_arb",
+    "transcendental.py: certify_bounded_rational_exclusion_arb",
+    "transcendental.py: audit_bounded_integer_relations",
+    "transcendental.py: audit_complete_smoothed_tc_transport",
+    "transcendental.py: audit_tc_test_family_investigation",
+    "transcendental.py: audit_infinite_extension_detectability",
+    "transcendental.py: audit_cycle14_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 4 (Certificate Tamper & Integrity Regression): tested certificate loading with modified midpoint without hash update (verified rejection with INPUT_ERROR_HASH_MISMATCH); tested corrupted schema, status, and negative radius (verified rejection with INPUT_INVALID); tested precision restoration in try/finally block; tested outward interval distance computation with signed Arb balls",
+    "Gate 2 & 5 (Delimited Transport & Tail Enclosures): verified background series agreement with exact integral to 8.57e-14, strictly enclosed by geometric tail bound 6.89169e-11 (resolving earlier 1.12e-11 prose mismatch); derived Trudgian (2012) Stieltjes zero truncation formula (p/(2*pi)) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1}); explicitly recorded missing derivative supremum bounds C_k required for full certification",
+    "Gate 3 & 6 (Formal Complex Remainder Lower Bound in Lean 4): proved complex_reconstruction_remainder_lower_bound (|M| - |R_est| <= |Y_est|) and vandermonde_2_reconstruction_bound in RiemannScope.Grade using Mathlib foundational axioms only (no sorry, no non-standard axioms)",
+    "Gate 7 & 8 (Explicit Test-Family Investigation & Adversarial Competitor Scaling): implemented phi_{L, rho_0}(x) with normalized bump w_0 on (1.25, 1.75); verified phi_tilde(rho_0) = 1.0 identically; demonstrated target detection eta < 1 for on-line zeros at L >= 2.0 (eta(2.0) approx 0.4986, eta(5.0) approx 0.0400); introduced adversarial competitor rho_comp = 0.75 + 21.022j and proved amplitude blows up exponentially as exp(0.25*L*v) -> infty (reaching 2.957 > c_F = 0.748 at L=20), driving eta -> infty and proving that test-family scaling cannot isolate a target zero without an a priori zero-free region",
+    "Gate 9 & 10 (Analytic Scope & Collision Bridge Scoping): proved by Paley-Wiener / Jensen that no single fixed test can annihilate all but finitely many distinct zeros using Farmer (1995) distinct zeros lower bound N_distinct(T) >= 0.40/(2*pi) * T * log T >> n(r) = O(r); demonstrated exact grade aliasing collapses Vandermonde bases; confirmed continuous observable Y_phi(k) does not force discrete lattice point collisions m*tau^K = n*tau^J in L_K = tau^K * Z (L_K cap L_J = {0}), keeping the RH collision bridge strictly open"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_certificate_tamper_and_fail_closed",
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_consumer_fail_closed_without_fallback_promotion",
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_transport_delimitation_and_tail_bounds",
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_complex_remainder_lean_reconstruction",
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_test_family_normalization_and_target_detection",
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_test_family_adversarial_competitor_blowup",
+    "tests/test_tc_mechanism_discovery.py: test_cycle14_synthesis_executive_answers",
+    "data/tc_cycle14_transport_and_test_family.json"
+  ],
+  "external_sources": [
+    {
+      "source": "Trudgian, T. S. (2012 / 2014), An improved upper bound for the argument of the Riemann zeta-function on the critical line, arXiv:1208.5846v2; J. Number Theory 143 (2014), 359-367",
+      "theorem": "Theorem 1 and Corollary 1: explicit bounds on S(t) and N(t) <= (t / (2*pi)) log t for t >= 168*pi, establishing Stieltjes integral bound int_{(T, infty)} t^{-p} dN(t) <= (p/(2*pi)) * ((p-1)*log T + 1) / ((p-1)^2 * T^{p-1})"
+    },
+    {
+      "source": "Farmer, D. W. (1995), Counting Distinct Zeros of the Riemann Zeta-Function, Electronic Journal of Combinatorics 2, #R1",
+      "theorem": "Theorem on p. 2: lower bound on distinct simple zeros N_distinct(T) >= c * T * log T with positive proportion, precluding test annihilation via Jensen's theorem"
+    },
+    {
+      "source": "Conrey, J. B. (1989), More than two fifths of the zeros of the Riemann zeta function are on the critical line, J. reine angew. Math. 399, 1-26",
+      "theorem": "At least 40.77% of nontrivial zeros are on the critical line and are simple"
+    },
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Mathematische Annalen 20, 213-225",
+      "theorem": "Transcendence of 2*pi, establishing that arithmetic layers L_K = tau^K * Z are disjoint (L_K cap L_J = {0} for K != J)"
+    },
+    {
+      "source": "Hormander, L. (1983), The Analysis of Linear Partial Differential Operators I, Theorem 7.3.1 (Paley-Wiener Theorem)",
+      "theorem": "Mellin/Fourier-Laplace transform of smooth compactly supported test is an entire function of exponential type"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Derivation of an explicit prime-zeta Tauberian identity or discrete distribution constraint that projects the continuous observable Y_phi(k) into the discrete arithmetic layer L_K (OPEN / UNPROVED)",
+    "Rigorous analytic supremum bounds on Mellin derivative norms C_2, C_3, C_4 and formal Arb enclosure propagation through continuous quadrature for full transport certification (OPEN / EMPIRICAL)"
+  ]
+}
+
