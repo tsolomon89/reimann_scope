@@ -3372,7 +3372,7 @@ def certify_pairwise_phase_distinction_arb(
     Certifies that theta_j - theta_ell not in Z for all 1 <= j < ell <= N.
     Fail-closed: Rejects missing files, empty inputs, or unseparated intervals.
     """
-    if not FLINT_AVAILABLE:
+    if not FLINT_AVAILABLE or ctx is None or arb is None:
         return {"status": "FLINT_UNAVAILABLE", "classification": "INCONCLUSIVE"}
 
     if repo_root is not None and not os.path.isdir(repo_root):
@@ -3404,6 +3404,7 @@ def certify_pairwise_phase_distinction_arb(
             "pairs_checked": 0
         }
 
+    assert ctx is not None and arb is not None
     old_prec = ctx.prec
     try:
         ctx.prec = prec_bits
@@ -3508,7 +3509,7 @@ def certify_bounded_rational_exclusion_arb(
     Constructs an explicit, replayable Farey neighbor witness (a/b, c/d) with bc - ad = 1 and b + d > Q
     such that a/b < lower(theta_j) <= upper(theta_j) < c/d.
     """
-    if not FLINT_AVAILABLE:
+    if not FLINT_AVAILABLE or ctx is None or arb is None:
         return {"status": "FLINT_UNAVAILABLE", "classification": "INCONCLUSIVE"}
 
     if repo_root is not None and not os.path.isdir(repo_root):
@@ -3540,6 +3541,7 @@ def certify_bounded_rational_exclusion_arb(
             "N": 0
         }
 
+    assert ctx is not None and arb is not None
     old_prec = ctx.prec
     try:
         ctx.prec = prec_bits
@@ -3647,7 +3649,7 @@ def audit_bounded_integer_relations(
         tau_mp = 2 * mpmath.pi
         c_tau_mp = mpmath.log(tau_mp) / tau_mp
 
-        if zeros is None and FLINT_AVAILABLE:
+        if zeros is None and FLINT_AVAILABLE and ctx is not None and arb is not None:
             ctx.prec = 256
             tau_arb = 2 * arb.pi()
             c_tau_arb = tau_arb.log() / tau_arb
@@ -3656,7 +3658,7 @@ def audit_bounded_integer_relations(
             th1 = c_tau_arb * g1_arb
             th2 = c_tau_arb * g2_arb
             use_arb = True
-        elif zeros is not None and FLINT_AVAILABLE:
+        elif zeros is not None and FLINT_AVAILABLE and ctx is not None and arb is not None:
             ctx.prec = 256
             tau_arb = 2 * arb.pi()
             c_tau_arb = tau_arb.log() / tau_arb
