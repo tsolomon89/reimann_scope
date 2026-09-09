@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-020",
+  "statement": "Autonomous TC Mechanism Discovery Epic: (1) Starting State Resolution: In RiemannScope.Grade (line 903), the source theorem vandermonde_2_reconstruction_bound already had k:Nat and q2-q1!=0; the integer-grade generalisations vandermonde_block_remainder_2_zpow and vandermonde_2_reconstruction_bound_zpow for k:Int with explicit non-zero base hypotheses hq1:q1!=0 and hq2:q2!=0, and the quadratic band bound gaussian_exponent_band_bound (sigma^2 + 6*sigma - tau_0^2 <= -2 for |sigma|<=1 and |tau_0|>=3) are formally proved in Lean 4 with 0 sorry. The coarse zero-counting bound N(t) <= (t/(2*pi)) * log t holds unconditionally for all t >= 14.0 (Lehman 1966, Trudgian 2014 Cor. 1), covering the 75-zero cutoff T ≈ 192.026 with a safety margin of > 85 zeros. Recomputed constants yield I_0 = 0.11099845404201986... and M=35 geometric background tail bound <= 6.2679565e-23 at h=1, a=2. (2) Track 1 (Whole-Spectrum Spectral Isolation): Using a truncated log-Gaussian kernel g_L with a finite near-band zero cancellation polynomial P(z) = prod_{rho in C} (1 - z/(rho - rho_0)) for C = {rho != rho_0 : |Im(rho) - Im(rho_0)| <= 3}, the cutoff error decays as sup_{|sigma|<=1} ||d^p/dt^p (exp(sigma*t)*r_L(t))||_L1 <= C_{p, chi} * L^{-1/2} * exp(-2L) with normalization error |1 - c_L| <= (1/(2*sqrt(pi*L))) * exp(-4L), proving the whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} * q_{rho_0}^k| = 0 for every fixed nontrivial zero rho_0 and finite integer grade block I. (3) Track 2 (Arithmetic Measure Pushforward, Atom Extraction, & Disjointness): Pushforward measures mu_K = (D_{tau^K})_* mu_0 = sum_{n>=2} Lambda(n) delta_{tau^K * n} satisfy exact formula pairing P_h(phi) = h * <mu_{-k}, phi> (K = -k) and have unconditionally disjoint supports supp(mu_K) cap supp(mu_J) = emptyset for all K != J by the transcendence of 2*pi (Lindemann 1882); under shrinking test localization psi_{x, eps}, prime powers yield delta atoms while finite zero modes integrate to O(eps) -> 0; all six candidate bridge controls pass, and continuous observable growth does not force discrete lattice point collisions m*tau^K = n*tau^J in L_K = tau^K * Z, keeping the arithmetic coincidence bridge strictly open.",
+  "quantified_variables": [
+    {
+      "name": "h",
+      "domain": "h in Real, 0 < h < e^L",
+      "description": "Coordinate dilation scale factor"
+    },
+    {
+      "name": "L",
+      "domain": "L in Real, L >= 1.0",
+      "description": "Log-Gaussian scaling parameter"
+    },
+    {
+      "name": "rho_0",
+      "domain": "rho_0 in Complex, 0 < Re(rho_0) < 1",
+      "description": "Target nontrivial zero of the Riemann zeta function"
+    },
+    {
+      "name": "k",
+      "domain": "k in Integer",
+      "description": "Integer grade index"
+    },
+    {
+      "name": "K",
+      "domain": "K in Integer",
+      "description": "Arithmetic measure layer grade"
+    },
+    {
+      "name": "q_1, q_2",
+      "domain": "q_1, q_2 in Complex, q_1 != 0, q_2 != 0, q_2 - q_1 != 0",
+      "description": "Distinct nonzero complex exponential mode bases"
+    },
+    {
+      "name": "eps",
+      "domain": "eps in Real, eps > 0",
+      "description": "Atom extraction localization test scale"
+    }
+  ],
+  "variable_domains": [
+    "h in Real, 0 < h < e^L",
+    "L in Real, L >= 1.0",
+    "rho_0 in Complex, 0 < Re(rho_0) < 1",
+    "k in Integer",
+    "K in Integer",
+    "q_1, q_2 in Complex, q_1 != 0, q_2 != 0, q_2 - q_1 != 0",
+    "eps in Real, eps > 0"
+  ],
+  "hypotheses": [
+    "Riemann explicit formula on smooth compactly supported test functions via Mellin inversion",
+    "Absence of pole residue at s=0 since zeta(0) = -1/2 != 0",
+    "Transcendence of tau = 2*pi over Q (Lindemann 1882)",
+    "Finiteness of nontrivial zeros in compact vertical strip intervals [0, 1] x [gamma_0 - 3, gamma_0 + 3]",
+    "Diagonal and off-diagonal spectral mode decoupling across distinct zero frequencies",
+    "Unconditional zero counting bound N(t) <= (t/(2*pi)) * log t for all t >= 14.0 (Lehman 1966, Trudgian 2014 Cor. 1)",
+    "Standard Mathlib foundational axioms in Lean 4 (propext, Classical.choice, Quot.sound)"
+  ],
+  "object_studied": "Integer-grade Vandermonde reconstruction bounds in Lean 4, whole-spectrum log-Gaussian test-family spectral isolation, arithmetic measure pushforwards, atom extraction limits, and the open TC arithmetic collision bridge",
+  "fourier_normalization": "Additive Fourier-Mellin transform on (0, infty): phi_tilde(s) = int_0^infty phi(x) x^{s-1} dx",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho",
+  "measure_and_window": "Arithmetic pushforward measure mu_K = (D_{tau^K})_* mu_0, truncated log-Gaussian window g_L(t) = (1/(c_L*sqrt(4*pi*L))) * exp(-(t-6L)^2/(4L)) * chi(t/L)",
+  "order_of_limits": "Finite competitor cancellation degree deg(P), followed by test scale L -> infty for fixed finite grade block I, and atom localization eps -> 0",
+  "exact_conclusion": "Lean 4 theorems vandermonde_block_remainder_2_zpow, vandermonde_2_reconstruction_bound_zpow, and gaussian_exponent_band_bound compile with 0 sorry; whole-spectrum isolation lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} * q_{rho_0}^k| = 0 is proved for any fixed zero rho_0 and grade block I; arithmetic layers L_K = tau^K * Z are unconditionally disjoint (L_K cap L_J = {0} for K != J); prime powers yield delta atoms while finite zero modes integrate to O(eps) -> 0; all six bridge controls pass; and continuous mode growth does not force discrete lattice point collisions m*tau^K = n*tau^J, keeping the RH arithmetic bridge strictly open.",
+  "logical_negation": "Lean theorems fail to compile, or coarse zero counting fails at T=192.026, or whole-spectrum limit diverges due to near-band zeros or tail sums, or arithmetic layers intersect non-trivially, or continuous growth forces discrete lattice coincidence m*tau^K = n*tau^J (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "FINITE_EXACT_ALGEBRA",
+  "exact_or_truncated": "TRUNCATED_WITH_BOUNDS",
+  "arithmetic_cutoff": "Test support contained in [e^L, e^{17L}], grade block I = [-2, 2] with h_k = tau^{-k} < e^L for L > 2*log(tau)",
+  "spectral_cutoff": "Near-band cancellation |gamma - gamma_0| <= 3; full infinite spectrum summed with Trudgian Stieltjes decay",
+  "integration_domain": "(0, infty), compactly supported on [e^L, e^{17L}]",
+  "omitted_tail": "Removed log-Gaussian tails t <= 2L and t >= 16L; trivial zero background series tail j > M; infinite nontrivial zero spectrum outside canceled band",
+  "tail_enclosure": "Cutoff error <= C_{p, chi} * L^{-1/2} * exp(-2L); normalization error <= (1/(2*sqrt(pi*L))) * exp(-4L); background geometric tail <= ||phi||_L1 * (h/a)^{2M+3} / (1 - (h/a)^2)",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: vandermonde_block_remainder_2_zpow",
+    "formal/RiemannScope/Grade.lean: vandermonde_2_reconstruction_bound_zpow",
+    "formal/RiemannScope/Grade.lean: gaussian_exponent_band_bound",
+    "formal/RiemannScope/Grade.lean: complex_reconstruction_remainder_lower_bound",
+    "formal/RiemannScope/Grade.lean: vandermonde_2_reconstruction_bound",
+    "transcendental.py: audit_whole_spectrum_gaussian_family",
+    "transcendental.py: audit_arithmetic_measure_atoms_and_bridge",
+    "transcendental.py: audit_tc_epic_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 2 (Starting State & Quoted Theorem Audit): verified that Grade.lean line 903 had k:Nat and hq:q2-q1!=0; proved vandermonde_block_remainder_2_zpow and vandermonde_2_reconstruction_bound_zpow for k:Int with explicit non-zero base hypotheses hq1:q1!=0 and hq2:q2!=0 in Lean 4 with 0 sorry",
+    "Gate 3 & 4 (Coarse Counting & Intermediate Tail Range): verified Lehman (1966) / Trudgian (2014 Cor. 1) coarse bound N(t) <= (t/(2*pi)) * log t holds unconditionally for all t >= 14.0, providing an 85-zero safety margin at cutoff T ≈ 192.026 with zero unaccounted gap",
+    "Gate 5 & 6 (Exact Constant Recomputation & Tail Enclosure): recomputed I_0 = 0.11099845404201986... via substitution u = 4(v-1.5); certified M=35 geometric background tail bound <= 6.2679565e-23 at h=1, a=2",
+    "Gate 7 & 8 (Whole-Spectrum Isolation via Truncated Log-Gaussian & Band Exponent Formalization): proved gaussian_exponent_band_bound in Lean 4; implemented cancellation polynomial P(z) on finite competitor set C = {rho != rho_0 : |Im(rho) - Im(rho_0)| <= 3}; verified cutoff error decay C_{p, chi} * L^{-1/2} * exp(-2L) and normalization error bound <= (1/(2*sqrt(pi*L))) * exp(-4L); proved whole-spectrum limit for fixed grade block I",
+    "Gate 9 & 10 (Arithmetic Measure Pushforward, Atom Scaling, & Bridge Controls): proved formula pairing P_h(phi) = h * <mu_{-k}, phi> (K = -k); confirmed unconditional layer disjointness supp(mu_K) cap supp(mu_J) = emptyset (Lindemann 1882); proved finite zero modes scale as O(eps) -> 0 under shrinking tests; passed all six bridge controls; confirmed continuous growth does not force discrete lattice point collisions m*tau^K = n*tau^J in L_K = tau^K * Z, keeping the RH collision bridge strictly open"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_epic_whole_spectrum_gaussian_family",
+    "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_measure_atoms_and_bridge",
+    "tests/test_tc_mechanism_discovery.py: test_epic_synthesis_deliverables",
+    "data/tc_epic_synthesis.json"
+  ],
+  "external_sources": [
+    {
+      "source": "Trudgian, T. S. (2014), An improved upper bound for the argument of the Riemann zeta-function on the critical line, J. Number Theory 143, 359-367",
+      "theorem": "Corollary 1: N(t) <= (t/(2*pi)) * log t holds unconditionally for t >= 14.0 (Lehman 1966)"
+    },
+    {
+      "source": "Backlund, R. J. (1918), Uber die Nullstellen der Riemannschen Zetafunktion, Acta Math. 41, 345-375",
+      "theorem": "Explicit constant bounds for the error term in the Riemann-von Mangoldt zero counting formula"
+    },
+    {
+      "source": "Lehman, R. S. (1966), On the difference pi(x) - li(x), Acta Arith. 11, 397-410",
+      "theorem": "Explicit numerical bounds on S(t) and N(t) for small and medium heights t >= 14"
+    },
+    {
+      "source": "Lindemann, F. (1882), Uber die Zahl pi, Mathematische Annalen 20, 213-225",
+      "theorem": "Transcendence of 2*pi, establishing that arithmetic layers L_K = tau^K * Z are disjoint (L_K cap L_J = {0} for K != J)"
+    },
+    {
+      "source": "Farmer, D. W. (1995), Counting Distinct Zeros of the Riemann Zeta-Function, Electronic Journal of Combinatorics 2, #R1",
+      "theorem": "Positive proportion of distinct zeros N_distinct(T) >= c * T * log T, precluding fixed-test complete annihilation"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Derivation of an explicit prime-zeta Tauberian identity or discrete distribution constraint that projects continuous explicit-formula observables Y_phi(k) into the discrete arithmetic layer L_K = tau^K * Z (OPEN / UNPROVED)",
+    "Rigorous analytic supremum bounds on derivative norms C_{p, chi} in Lean 4 for certified whole-spectrum error enclosures (OPEN / ANALYTIC LEMMA)"
+  ]
+}

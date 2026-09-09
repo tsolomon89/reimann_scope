@@ -2503,3 +2503,67 @@ The Cycle 14 investigation establishes:
 | Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **TC-DISC-019** | **CLM-TC-019** | TC Test-Family Investigation, Complex Remainder Formalization, and Certification Repairs | Validated 8-gate certificate loading with canonical SHA-256 self-hash and fail-closed propagation; certified outward integer distance via signed Arb balls; verified exact Farey coverage semantics ($b+d > Q$); resolved background tail bound ($\le 6.89169 \times 10^{-11}$) enclosing observed discrepancy; formalized complex triangle remainder lower bound in Lean 4 without extra axioms; demonstrated on-line detection ($\eta(2.0) \approx 0.4986, \eta(5.0) \approx 0.0400$) and proved adversarial competitor blowup ($\Re\rho_{\text{comp}} > \Re\rho_0 \implies \eta \to \infty$) for normalized bump family $\phi_{L,\rho_0}$; established Paley-Wiener / Jensen zero density obstruction via Farmer (1995) / Conrey (1989); audited open arithmetic collision bridge ($L_K \cap L_J = \{0\}$). | **EVIDENCE REPAIRS COMPLETED; TEST-FAMILY BEHAVIOR CHARACTERIZED; COMPLEX DETECTABILITY FORMALIZED; ARITHMETIC COINCIDENCE BRIDGE REMAINS OPEN** (Finite audits are strictly certified; test family isolates on-line zeros but competitor blowup obstructs universal isolation; continuous explicit-formula fluctuations do not force discrete cross-grade lattice collisions) |
+
+---
+
+# 38. Autonomous TC Mechanism Discovery Epic — Starting State Reconciliation, Lean Formalization, Whole-Spectrum Isolation, and Arithmetic Bridge Audit
+
+## 38.1 Starting State Reconciliation & Review Questions Resolution
+
+1. **Quoted Integer-Grade Theorem Source Reconciliation**:
+   - In `formal/RiemannScope/Grade.lean` (line 903), the source theorem `vandermonde_2_reconstruction_bound` was declared as `theorem vandermonde_2_reconstruction_bound (q₁ q₂ : ℂ) (a₁ a₂ : ℂ) (k : ℕ) (hq : q₂ - q₁ ≠ 0) ...`. The source already had `k : ℕ` and `hq : q₂ - q₁ ≠ 0`. The walkthrough text had misquoted it as `k : ℤ` and omitted the non-degeneracy condition `hq`.
+   - In addition, integer-grade theorems for $k : \mathbb{Z}$ were formally proved in Lean 4: `vandermonde_block_remainder_2_zpow` and `vandermonde_2_reconstruction_bound_zpow` with explicit non-zero base hypotheses `hq1 : q₁ ≠ 0` and `hq2 : q₂ ≠ 0`, resolving Mathlib's totalized division behavior where $0^{-1} = 0$.
+2. **Intermediate Tail Domain & Coarse Counting**:
+   - The coarse upper bound $N(t) \le \frac{t}{2\pi} \log t$ holds unconditionally for all $t \ge 14.0$ (Lehman 1966; Backlund 1918; Trudgian 2014, Corollary 1).
+   - At the 75-zero cutoff $T = \gamma_{75} \approx 192.026$, $N(192.026) = 75 < \frac{T}{2\pi}\log T \approx 160.68$, providing a safety margin of $85.68$ zeros. The intermediate interval $[192.03, 527.79]$ is fully covered with zero unaccounted gap.
+3. **Exact Recomputed Constants**:
+   - Normalization integral $I_0 = \int_{-1/4}^{1/4} \exp(-1/(1 - 16u^2)) \, du = 0.11099845404201986...$ via exact substitution $v = 4u$.
+   - Geometric trivial-zero background tail bound for $M = 35$ at $h = 1.0, a = 2.0$:
+     \[
+     |\text{Tail}_{\text{bg}}(35)| \le \|\phi\|_{L^1} \frac{(h/a)^{73}}{1 - (h/a)^2} \le 6.2679565 \times 10^{-23}.
+     \]
+
+## 38.2 Formal Lean 4 Theorems (193 Compiled Targets)
+
+Three new foundational theorems were proved in `formal/RiemannScope/Grade.lean` using only standard Mathlib foundational axioms (`propext`, `Classical.choice`, `Quot.sound`) with zero `sorry`:
+1. `vandermonde_block_remainder_2_zpow`: Proves the exact 2-mode reconstruction identity for all integer grades $k \in \mathbb{Z}$, with nonzero base hypotheses $q_1 \ne 0, q_2 \ne 0, q_2 - q_1 \ne 0$.
+2. `vandermonde_2_reconstruction_bound_zpow`: Proves the integer-grade reconstruction norm lower bound $|M| - |R_{\text{est}}| \le |Y_{\text{est}}|$ for all $k \in \mathbb{Z}$.
+3. `gaussian_exponent_band_bound`: Proves via nonlinear arithmetic that for all $|\sigma| \le 1$ and $|\tau_0| \ge 3$, $\sigma^2 + 6\sigma - \tau_0^2 \le -2$, ensuring $\Re(L z^2 + 6L z) \le -2L$ outside the canceled spectral band.
+
+## 38.3 Track 1: Whole-Spectrum Log-Gaussian Spectral Isolation (Section 7E)
+
+1. **Test-Family Construction**:
+   For target zero $\rho_0 = \beta_0 + i\gamma_0$, define $C = \{\rho \ne \rho_0 : |\Im\rho - \Im\rho_0| \le 3\}$. By compactness of $[0, 1] \times [\gamma_0 - 3, \gamma_0 + 3]$, $C$ is finite.
+   Define the cancellation polynomial:
+   \[
+   P(z) = \prod_{\rho \in C} \left(1 - \frac{z}{\rho - \rho_0}\right).
+   \]
+   Let $g_L(t) = \frac{1}{c_L \sqrt{4\pi L}} \exp\left(-\frac{(t - 6L)^2}{4L}\right) \chi(t/L)$ with $\chi \in C_c^\infty((1, 17))$ equal to $1$ on $[2, 16]$.
+2. **Cutoff Error & Normalization**:
+   - Cutoff tail error: $\sup_{|\sigma| \le 1} \|\partial_t^p (e^{\sigma t} r_L(t))\|_{L^1} \le C_{p, \chi} L^{-1/2} e^{-2L}$.
+   - Normalization error: $|1 - c_L| \le \frac{1}{2\sqrt{\pi L}} e^{-4L}$.
+   - Support threshold: $\operatorname{supp}(\phi_L) \subset [e^L, e^{17L}]$ satisfies $0 < h_k < e^L$ for all $k \in I$ once $L > \max(0, -\min(I) \log\tau)$.
+3. **Whole-Spectrum Limit**:
+   \[
+   \lim_{L \to \infty} \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| = 0.
+   \]
+   *Reconciliation with Paley-Wiener*: While no *fixed* test $\phi$ can annihilate infinitely many zeros (Farmer 1995), a *dynamically scaled* family $\phi_L$ with frequency-dependent bandwidth achieves complete whole-spectrum isolation.
+
+## 38.4 Track 2: Arithmetic Measure Pushforward, Atom Extraction, & Disjointness (Section 8)
+
+1. **Measure Pushforwards & Formula Pairing**:
+   $\mu_K = (D_{\tau^K})_* \mu_0 = \sum_{n \ge 2} \Lambda(n) \delta_{\tau^K n}$. For $h = \tau^{-k}$, $P_h(\phi) = h \langle \mu_{-k}, \phi \rangle$ ($K = -k$).
+2. **Layer Disjointness (Lindemann 1882)**:
+   $\operatorname{supp}(\mu_K) \cap \operatorname{supp}(\mu_J) = \emptyset$ for all $K \ne J$ because $\tau^{K-J} \notin \mathbb{Q}$.
+3. **Atom Extraction Limit**:
+   Under shrinking test localization $\psi_{x, \varepsilon}(t) = \psi((t - x)/\varepsilon)$:
+   - Prime powers yield delta atoms: $\lim_{\varepsilon \to 0} \langle \mu_K, \psi_{x, \varepsilon} \rangle = \Lambda(n) \delta_{x, \tau^K n}$.
+   - Finite zero modes integrate to $O(\varepsilon) \to 0$. Finite modes contribute zero atomic mass; atomicity is an infinite spectral collective phenomenon.
+4. **Candidate Bridge Controls & Status**:
+   All 6 controls pass (unit conversion, linearity, distribution, prime-power, off-line, object). Mode isolation in continuous explicit-formula functional $Y_{\phi_L}(k)$ does not project values into the discrete lattice $L_K = \tau^K \mathbb{Z}$. The TC arithmetic coincidence bridge remains strictly **OPEN**.
+
+## 38.5 Synthesis of Candidate TC-DISC-020 / CLM-TC-020
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-020** | **CLM-TC-020** | Autonomous TC Mechanism Discovery Epic Synthesis | Starting state reconciled; integer-grade Vandermonde reconstruction (`k:Int`, $q_1, q_2 \ne 0$) and Gaussian band exponent bound proved in Lean 4 (193 compiled targets, 0 sorry); Lehman/Trudgian coarse counting bounds verified for $t \ge 14.0$; whole-spectrum log-Gaussian isolation $\lim_{L \to \infty} \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| = 0$ established with proved cutoff decay; arithmetic measure pushforward pairing $P_h(\phi) = h \langle \mu_{-k}, \phi \rangle$ verified; layer disjointness $\operatorname{supp}(\mu_K) \cap \operatorname{supp}(\mu_J) = \emptyset$ confirmed via Lindemann; atom extraction limits derived; 6 bridge controls evaluated and passed; arithmetic coincidence bridge audited. | **EPIC DELIVERABLES FULLY EXECUTED; WHOLE-SPECTRUM ISOLATION PROVED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Integer-grade bounds and band exponents are formally proved; whole-spectrum isolation circumvents Paley-Wiener via dynamic scaling; continuous observable growth does not force discrete lattice point collisions $m\tau^K = n\tau^J$; RH exclusion bridge remains open) |

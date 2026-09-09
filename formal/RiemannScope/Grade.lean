@@ -910,4 +910,42 @@ theorem vandermonde_2_reconstruction_bound (q₁ q₂ a₁ a₂ : ℂ) (hq : q�
   exact complex_reconstruction_remainder_lower_bound (a₁ * q₁^k)
     ((Y_k * q₂ - Y_k1) / (q₂ - q₁)) ((R_k * q₂ - R_k1) / (q₂ - q₁)) h_id
 
+/-- Epic Theorem: Remainder-aware 2-mode Vandermonde reconstruction identity for integer grades (k : ℤ)
+    with non-zero bases q₁ ≠ 0, q₂ ≠ 0. -/
+theorem vandermonde_block_remainder_2_zpow (q₁ q₂ a₁ a₂ : ℂ)
+    (hq1 : q₁ ≠ 0) (hq2 : q₂ ≠ 0) (hq : q₂ - q₁ ≠ 0) (k : ℤ)
+    (Y_k Y_k1 R_k R_k1 : ℂ)
+    (hY_k : Y_k = (a₁ * q₁^k + a₂ * q₂^k) + R_k)
+    (hY_k1 : Y_k1 = (a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) + R_k1) :
+    a₁ * q₁^k = (Y_k * q₂ - Y_k1) / (q₂ - q₁) - (R_k * q₂ - R_k1) / (q₂ - q₁) := by
+  have h_step1 : q₁^(k+1) = q₁^k * q₁ := zpow_add_one₀ hq1 k
+  have h_step2 : q₂^(k+1) = q₂^k * q₂ := zpow_add_one₀ hq2 k
+  rw [hY_k, hY_k1, h_step1, h_step2]
+  have h_alg : ((a₁ * q₁^k + a₂ * q₂^k + R_k) * q₂ - (a₁ * (q₁^k * q₁) + a₂ * (q₂^k * q₂) + R_k1)) -
+      (R_k * q₂ - R_k1) = (a₁ * q₁^k) * (q₂ - q₁) := by ring
+  rw [← sub_div, h_alg]
+  exact (mul_div_cancel_right₀ (a₁ * q₁^k) hq).symm
+
+/-- Epic Theorem: Remainder-aware 2-mode Vandermonde reconstruction bound in ℂ for integer grades (k : ℤ)
+    with non-zero bases q₁ ≠ 0, q₂ ≠ 0. -/
+theorem vandermonde_2_reconstruction_bound_zpow (q₁ q₂ a₁ a₂ : ℂ)
+    (hq1 : q₁ ≠ 0) (hq2 : q₂ ≠ 0) (hq : q₂ - q₁ ≠ 0) (k : ℤ)
+    (Y_k Y_k1 R_k R_k1 : ℂ)
+    (hY_k : Y_k = (a₁ * q₁^k + a₂ * q₂^k) + R_k)
+    (hY_k1 : Y_k1 = (a₁ * q₁^(k+1) + a₂ * q₂^(k+1)) + R_k1) :
+    Complex.abs (a₁ * q₁^k) - Complex.abs ((R_k * q₂ - R_k1) / (q₂ - q₁)) ≤
+      Complex.abs ((Y_k * q₂ - Y_k1) / (q₂ - q₁)) := by
+  have h_id := vandermonde_block_remainder_2_zpow q₁ q₂ a₁ a₂ hq1 hq2 hq k Y_k Y_k1 R_k R_k1 hY_k hY_k1
+  exact complex_reconstruction_remainder_lower_bound (a₁ * q₁^k)
+    ((Y_k * q₂ - Y_k1) / (q₂ - q₁)) ((R_k * q₂ - R_k1) / (q₂ - q₁)) h_id
+
+/-- Epic Theorem: Quadratic Exponent Decay Outside Near-Band for Gaussian Mellin Transform.
+    For critical strip real coordinate displacement |σ| ≤ 1 and imaginary displacement |τ_0| ≥ 3,
+    the quadratic exponent in the untruncated Gaussian transform satisfies:
+    σ^2 + 6*σ - τ_0^2 ≤ -2. -/
+theorem gaussian_exponent_band_bound (σ τ_0 : ℝ)
+    (hσ_low : -1 ≤ σ) (hσ_high : σ ≤ 1) (hτ : 9 ≤ τ_0^2) :
+    σ^2 + 6 * σ - τ_0^2 ≤ -2 := by
+  nlinarith
+
 end RiemannScope

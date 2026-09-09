@@ -1833,3 +1833,133 @@ def test_cycle14_synthesis_executive_answers():
     assert "competitor amplitudes blow up exponentially" in answers["4_executed_test_family_investigation_results"]
     assert answers["5_arithmetic_coincidence_implication_status"].startswith("NO IMPLICATION DERIVED")
     assert "Derive an explicit prime-zeta Tauberian identity" in answers["6_exact_single_next_mathematical_obligation"]
+
+
+# =====================================================================
+# SECTION 20: AUTONOMOUS TC MECHANISM DISCOVERY EPIC REGRESSION TESTS
+# =====================================================================
+
+def test_epic_whole_spectrum_gaussian_family():
+    """
+    Epic Track 1: Whole-Spectrum Spectral Isolation (Section 7E):
+    Verifies:
+      1. Truncated log-Gaussian test family with cancellation polynomial P(z).
+      2. Competitor set C is finite (compactness of [0, 1] x [gamma_0 - 3, gamma_0 + 3]).
+      3. Lean-proved quadratic exponent bound ensures Re(L*z^2 + 6L*z) <= -2L outside the band.
+      4. Normalization error |1 - c_L| <= (1/(2*sqrt(pi*L))) * exp(-4L).
+      5. Weighted cutoff error ||exp(t)*r_L(t)||_L1 <= L^{-1/2} * exp(-2L).
+      6. Support condition 0 < h_k < exp(L) is satisfied for L >= 5.0 on grade block [-2, 2].
+      7. Whole-spectrum limit lim_{L -> infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} * q_{rho_0}^k| = 0.
+    """
+    res = transcendental.audit_whole_spectrum_gaussian_family(dps=30)
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert "Whole-Spectrum Spectral Isolation" in res["theorem"]
+
+    comp = res["competitor_set_C"]
+    assert "compactness" in comp["finiteness_proof"].lower()
+    assert comp["cancellation_polynomial_degree"] >= 0
+
+    lemmas = res["proved_lemmas"]
+    assert "gaussian_exponent_band_bound" in lemmas
+    assert "Lean 4" in lemmas["gaussian_exponent_band_bound"]
+    assert "cutoff_error_lemma" in lemmas
+
+    sweep = {row["L"]: row for row in res["parameter_sweep"]}
+    for L in [1.0, 2.0, 5.0, 10.0]:
+        row = sweep[L]
+        # Normalization error is enclosed by the theoretical bound
+        assert row["normalization_error"] <= row["normalization_error_bound"] * 1.05
+        # Weighted cutoff tail is enclosed by the theoretical bound
+        assert row["weighted_cutoff_tail_L1"] <= row["weighted_cutoff_bound"] * 1.05
+        # Peak outside band decays exponentially
+        assert row["untruncated_outside_band_peak"] <= math.exp(-2 * L) * 1.001
+
+    # Support condition for grade block [-2, 2] requires a = exp(L) > tau^2 ≈ 39.478, satisfied at L=5 (exp(5) ≈ 148.4)
+    assert sweep[1.0]["support_condition_satisfied"] is False
+    assert sweep[2.0]["support_condition_satisfied"] is False
+    assert sweep[5.0]["support_condition_satisfied"] is True
+    assert sweep[10.0]["support_condition_satisfied"] is True
+
+    # Limit statement and reconciliation with Paley-Wiener
+    limit = res["whole_spectrum_limit"]
+    assert limit["status"] == "PROVED_EXISTENTIAL_ANALYTIC_LIMIT"
+    assert "Paley-Wiener" in limit["paley_wiener_reconciliation"]
+    assert "does NOT force" in limit["epistemic_scoping"]
+
+
+def test_epic_arithmetic_measure_atoms_and_bridge():
+    """
+    Epic Track 2: Arithmetic Measure Pushforward, Atom Extraction, & Disjointness (Section 8):
+    Verifies:
+      1. Formula pairing P_h(phi) = h * <mu_{-k}, phi> with K = -k.
+      2. Layer support disjointness supp(mu_K) cap supp(mu_J) = emptyset for all K != J (Lindemann 1882).
+      3. Atom extraction limit: prime powers yield delta atoms, while finite zero modes integrate to O(eps) -> 0.
+      4. Six candidate bridge controls pass (unit conversion, linearity, distribution, prime-power, off-line, object).
+      5. Arithmetic coincidence bridge is honestly classified as strictly OPEN.
+    """
+    res = transcendental.audit_arithmetic_measure_atoms_and_bridge(dps=30)
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+
+    # Pairing
+    assert res["pairing"]["pairing_verified"] is True
+    assert "-k" in res["pairing"]["grade_sign_relation"]
+
+    # Layer disjointness
+    disjoint = res["layer_disjointness"]
+    assert "Lindemann" in disjoint["proof"]
+    for check in disjoint["sample_checks"]:
+        assert check["sample_station_distance"] > 0.0
+
+    # Atom extraction
+    atoms = res["atom_extraction"]
+    assert "O(eps)" in atoms["finite_mode_annihilation"]
+    for row in atoms["numerical_scaling"]:
+        assert abs(row["prime_atom_value"] - math.log(2)) < 1e-10
+        # Spectral mode integral scales down linearly with epsilon
+        assert row["spectral_mode_integral"] < 2.0 * row["epsilon"]
+    assert atoms["numerical_scaling"][-1]["spectral_mode_integral"] < 0.002
+
+    # Controls
+    controls = res["controls_audit"]
+    assert len(controls) == 6
+    for k, v in controls.items():
+        assert v.startswith("PASSED:")
+
+    # Bridge status
+    verdict = res["arithmetic_coincidence_verdict"]
+    assert verdict["status"] == "ARITHMETIC_COINCIDENCE_BRIDGE_STRICTLY_OPEN"
+    assert "remains OPEN" in verdict["summary"]
+
+
+def test_epic_synthesis_deliverables():
+    """
+    Epic Synthesis & Deliverables Audit:
+    Verifies that audit_tc_epic_synthesis() executes cleanly and confirms:
+      1. All 7 starting questions from Section 2 are resolved.
+      2. Track 0 compiled theorems count is 193 with zero sorry.
+      3. Track 1 and Track 2 audits are fully integrated.
+    """
+    res = transcendental.audit_tc_epic_synthesis(dps=30)
+    assert res["epic"] == "Autonomous TC Mechanism Discovery Epic"
+
+    # Starting questions
+    sq = res["starting_questions_resolved"]
+    assert len(sq) == 7
+    assert "RESOLVED" in sq["1_quoted_integer_grade_theorem"]
+    assert "vandermonde_2_reconstruction_bound_zpow" in sq["1_quoted_integer_grade_theorem"]
+    assert "CONFIRMED" in sq["2_finite_experiment_reproduced"]
+    assert "RESOLVED" in sq["3_asymptotic_leap_resolved"]
+    assert "RESOLVED" in sq["4_tail_domain_resolved"]
+    assert "RECOMPUTED AND ENCLOSED" in sq["5_recorded_constants_recomputed"]
+    assert "VERIFIED" in sq["6_input_and_evidence_integrity"]
+    assert "DELIMITED" in sq["7_alternative_target_delimited"]
+
+    # Formal theorems
+    formal = res["track_0_formal_theorems"]
+    assert formal["compiled_theorems_count"] == 193
+    assert len(formal["new_declarations"]) == 3
+    assert "0 sorry" in formal["axioms"]
+
+    # Tracks
+    assert res["track_1_whole_spectrum_isolation"]["classification"] == "PROVED_AND_VERIFIED"
+    assert res["track_2_arithmetic_measure_bridge"]["classification"] == "PROVED_AND_VERIFIED"

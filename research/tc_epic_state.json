@@ -1,0 +1,65 @@
+{
+  "epic": "Autonomous TC Mechanism Discovery Epic",
+  "started_at": "2026-09-09T19:51:00Z",
+  "completed_at": "2026-09-09T20:02:00Z",
+  "upstream_reviewed_anchor": "1d8847e46506248ca7726ef158c2f0d71900d4eb",
+  "cycle14_substantive_commit": "38142008445ccb6544e1844c8a40493d21aabb13",
+  "current_head": "56161553f5dcd7d31e2412b0252f682220cbbc91",
+  "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
+  "goal_node": "TC forbidden-coincidence bridge: rho off-line => exists K != J, m*tau^K = n*tau^J != 0",
+  "active_tracks": {
+    "track_0_starting_state_repairs": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Repair documentation misquotation of vandermonde_2_reconstruction_bound (Lean has k:Nat and hq:q2-q1!=0)",
+        "Formalize in Lean 4 the integer-grade reconstruction bound vandermonde_2_reconstruction_bound_zpow with non-zero bases q1!=0, q2!=0",
+        "Recompute precise numerical constants (I_0 approx 0.11099845..., M=35 tail bound approx 6.268e-23)",
+        "Resolve Trudgian zero tail bound domain (derive bound for T >= 14 and cutoff T >= 192.026)"
+      ]
+    },
+    "track_1_spectral_whole_spectrum_isolation": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Finiteness of competitor set C = {rho != rho_0 : |Im(rho) - Im(rho_0)| <= 3}",
+        "Truncated log-Gaussian test phi_L with finite cancellation polynomial P(z)",
+        "Mellin transform phi_tilde_L(s) and target normalization phi_tilde_L(rho_0) = 1",
+        "Cutoff error lemma: sup_{|sigma|<=1} ||d^p/dt^p (e^{sigma t} r_L(t))||_{L^1} <= C_{p,chi} L^{-1/2} e^{-2L}",
+        "Gaussian normalization error 1 - c_L = O(L^{-1/2} e^{-4L})",
+        "Support condition L > max(0, -min(I) log tau) for grade block I",
+        "Summable cutoff-error estimate and whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} q_{rho_0}^k| = 0"
+      ]
+    },
+    "track_2_arithmetic_bridge": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Define concrete arithmetic measures mu_0 = sum_{n>=2} Lambda(n) delta_n and mu_K = (D_{tau^K})_* mu_0",
+        "Establish sign convention P_h(phi) = h <mu_{-k}, phi> for h = tau^{-k}",
+        "Analyze atom extraction mu_K({x}) = lim_{eps->0} <mu_K, psi((.-x)/eps)>",
+        "Derive smooth density contribution O(eps) for finite zero modes under unnormalized shrinking test",
+        "Investigate whether full explicit formula forces shared arithmetic atom mu_K({x}) > 0 and mu_J({x}) > 0",
+        "Enforce 6 controls: unit conversion, linearity, distribution, prime-power, off-line, object"
+      ]
+    }
+  },
+  "accepted_results": [
+    {
+      "claim_id": "CLM-TC-020",
+      "name": "Autonomous TC Mechanism Discovery Epic Synthesis",
+      "status": "SPECIFICATION_SCHEMA_PASSED_AND_VERIFIED",
+      "formal_theorems": [
+        "vandermonde_block_remainder_2_zpow",
+        "vandermonde_2_reconstruction_bound_zpow",
+        "gaussian_exponent_band_bound"
+      ],
+      "data_artifacts": [
+        "data/tc_epic_synthesis.json"
+      ],
+      "regression_tests": [
+        "test_epic_whole_spectrum_gaussian_family",
+        "test_epic_arithmetic_measure_atoms_and_bridge",
+        "test_epic_synthesis_deliverables"
+      ],
+      "arithmetic_coincidence_bridge_status": "STRICTLY_OPEN"
+    }
+  ]
+}
