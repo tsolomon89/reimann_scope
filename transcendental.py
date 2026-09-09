@@ -3671,8 +3671,8 @@ def audit_bounded_integer_relations(
             use_arb = False
 
         B = max_coeff
-        min_dist = 1.0
-        best_rel = None
+        min_dist = float("inf")
+        best_rel: Optional[Tuple[int, int, int]] = None
         count = 0
         relation_detected = False
 
@@ -3720,10 +3720,16 @@ def audit_bounded_integer_relations(
 
         if relation_detected or min_dist == 0.0:
             r2_classification = "RELATION_FOUND"
-            status_text = f"Integer relation detected: {best_rel[0]} + ({best_rel[1]})*theta_1 + ({best_rel[2]})*theta_2 = 0"
-        else:
+            if best_rel is not None:
+                status_text = f"Integer relation detected: {best_rel[0]} + ({best_rel[1]})*theta_1 + ({best_rel[2]})*theta_2 = 0"
+            else:
+                status_text = "Integer relation detected (residual ball meets 0)."
+        elif best_rel is not None:
             r2_classification = "CERTIFIED_WITH_EXPLICIT_BOUNDS"
             status_text = f"No integer relation exists in box |a1|, |a2| <= {B} (min distance {min_dist:.6e} > 0)."
+        else:
+            r2_classification = "INCONCLUSIVE"
+            status_text = f"No candidate relations evaluated in box |a1|, |a2| <= {B}."
 
         return {
             "r2_box_search": {
@@ -3780,7 +3786,8 @@ def audit_phase_equidistribution_diagnostics(
     c_tau = math.log(tau) / tau
     thetas = [c_tau * z[1] for z in zeros]
 
-    subsets_results = {}
+    subsets_results: Dict[str, Any] = {}
+    discrepancies: Dict[int, float] = {}
     test_cutoffs = [n for n in [20, 50, len(thetas)] if n <= len(thetas)]
 
     for cutoff in test_cutoffs:
@@ -3805,17 +3812,23 @@ def audit_phase_equidistribution_diagnostics(
         expected = cutoff / 10.0
         l1_dev = sum(abs(cnt - expected) for cnt in bins) / cutoff
 
+        D_N_val = round(D_N, 5)
+        discrepancies[cutoff] = D_N_val
         subsets_results[f"N_{cutoff}"] = {
-            "discrepancy_D_N": round(D_N, 5),
+            "discrepancy_D_N": D_N_val,
             "weyl_sums": weyl_sums,
             "histogram_L1_deviation": round(l1_dev, 5)
         }
+
+    decay_observed = False
+    if len(test_cutoffs) >= 2:
+        decay_observed = bool(discrepancies[test_cutoffs[-1]] < discrepancies[test_cutoffs[0]])
 
     return {
         "classification": "NUMERICAL_EVIDENCE_ONLY",
         "purpose": "Illustrate unconditional zero-index equidistribution theorem (Hlawka 1975, Ford-Zaharescu 2005)",
         "diagnostics_by_cutoff": subsets_results,
-        "decay_observed": subsets_results[f"N_{test_cutoffs[-1]}"]["discrepancy_D_N"] < subsets_results[f"N_{test_cutoffs[0]}"]["discrepancy_D_N"],
+        "decay_observed": decay_observed,
         "epistemic_warning": "Equidistribution across zero index j is a horizontal population property. It does NOT prove individual irrationality or joint grade-axis density as K varies."
     }
 
