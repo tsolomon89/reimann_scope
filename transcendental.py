@@ -1475,7 +1475,7 @@ def verify_theorem_A_unitary_criterion(
             "discrepancy_from_1": mpmath.nstr(discrepancy_from_1, n=6),
             "is_unitary": is_unitary,
             "delta_is_zero": delta_is_zero,
-            "criterion_holds": bool(is_unitary == delta_is_zero),
+            "criterion_holds": is_unitary == delta_is_zero,
             "epistemic_status": "EXACT_ALGEBRAIC_THEOREM"
         }
 
@@ -1533,7 +1533,7 @@ def verify_theorem_B_bilateral_boundedness_criterion(
             "divergence_branch": divergence_branch,
             "is_bilaterally_bounded": is_bilaterally_bounded,
             "delta_is_zero": delta_is_zero,
-            "criterion_holds": bool(is_bilaterally_bounded == delta_is_zero),
+            "criterion_holds": is_bilaterally_bounded == delta_is_zero,
             "bilateral_necessity": "Forward branch K>=0 bounds delta<=0; backward branch K<=0 bounds delta>=0; intersection forces delta=0."
         }
 
@@ -1722,7 +1722,7 @@ def verify_log_mode_temperedness_criterion(
             "growth_type": growth_type,
             "growth_at_u_50": mpmath.nstr(growth_val, n=20),
             "poly_deg10_at_u_50": mpmath.nstr(poly_bound, n=20),
-            "criterion_holds": bool(is_tempered == is_zero_delta),
+            "criterion_holds": is_tempered == is_zero_delta,
             "epistemic_status": "EXACT_DISTRIBUTIONAL_ANALYSIS_THEOREM"
         }
 
@@ -2457,7 +2457,7 @@ def evaluate_canonical_tc_diagram(
                 "is_isomorphic": bool(add_iso_error < mpmath.mpf('1e-50') and mul_iso_error < mpmath.mpf('1e-50'))
             },
             "layer_disjointness": {
-                "layers_externally_disjoint": bool(K != J),
+                "layers_externally_disjoint": K != J,
                 "min_distance_grid_1_to_20": mpmath.nstr(min_layer_dist, n=12),
                 "closest_pair_m_n": closest_pair,
                 "transcendental_separation": "tau^{K-J} is transcendental, whereas n/m is rational, so m*tau^K != n*tau^J for all non-zero integers"
@@ -2521,7 +2521,7 @@ def audit_collision_witness_obligation(
         t_vals = [mpmath.power(x, rho_c) / rho_c for x in x_pts]
         # Differences are smooth:
         t_diffs = [abs(t_vals[i+1] - t_vals[i]) for i in range(len(t_vals)-1)]
-        is_smooth_continuous = bool(all(d < mpmath.mpf('10.0') for d in t_diffs))
+        is_smooth_continuous = all(d < mpmath.mpf('10.0') for d in t_diffs)
 
         # 3. W1-W5 Gate Audit
         w1_passed = True  # Explicit formula is exact
@@ -3182,7 +3182,7 @@ def audit_smoothed_explicit_formula_fluctuation(
             "off_line_evaluations": evals_offline,
             "max_online_modulus": mpmath.nstr(max_online, n=6),
             "max_offline_modulus": mpmath.nstr(max_offline, n=6),
-            "offline_exponential_growth_detected": bool(offline_grows),
+            "offline_exponential_growth_detected": offline_grows,
             "h1_jacobian_status": "FORCED_BY_COORDINATE_MEASURE_TRANSPORT",
             "h2_center_status": "FORCED_BY_ZETA_FUNCTIONAL_EQUATION",
             "h3_grade_regularity_status": "NOT_DERIVED_FROM_TC (Asserting boundedness/precompactness of {F_h} is equivalent to RH)"
@@ -3905,9 +3905,12 @@ def audit_bounded_integer_relations(
 
             pslq_res = mpmath.pslq(v_pslq, maxcoeff=1000)
 
-            if exact_relation_found:
+            if exact_relation_found and best_rel is not None:
                 r2_classification = "RELATION_FOUND"
                 status_text = f"Exact integer relation verified: {best_rel[0]} + ({best_rel[1]})*theta_1 + ({best_rel[2]})*theta_2 = 0"
+            elif exact_relation_found:
+                r2_classification = "RELATION_FOUND"
+                status_text = "Exact integer relation verified."
             elif zero_in_enclosure:
                 r2_classification = "INCONCLUSIVE"
                 status_text = f"Candidate residual enclosure contains zero for ({best_rel[0] if best_rel else '?'}, {best_rel[1] if best_rel else '?'}, {best_rel[2] if best_rel else '?'}); cannot certify exclusion or equality."
