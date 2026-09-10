@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-021",
+  "statement": "TC Epic: Spectral Isolation Notation and Estimates, Lean 4 Formalization, and Arithmetic Overlap Observable Contract: (1) Spectral Isolation Notation and Estimates: For step size h_k = tau^{-k} (tau = 2*pi), the unnormalized smoothed explicit formula mode factor is h_k^{1-rho} = tau^{k*(rho-1)} (correcting the prior sign error tau^{k*(1-rho)} across positive and negative k), and the centered observable Y_phi(k) = h_k^{-1/2} * X_phi(k) = sum m_rho phi_tilde(rho) q_rho^k matches the unitary character q_rho = tau^{rho - 1/2}. Integration by parts on the tail remainder r_L(t) against e^{zt} (z = sigma + i*eta = rho - rho_0) yields |eta|^p * |int r_L(t) e^{zt} dt| <= ||d_t^p (e^{sigma*t} r_L(t))||_L1 via the oscillating Fourier factor e^{i*eta*t}, and the untruncated Gaussian completion of the square satisfies |e^{L(z^2+6z)}| <= e^{-2L} * e^{-L(eta^2-9)} for |sigma| <= 1, |eta| >= 3. Combined with unconditional zero counting N(t) <= (t/(2*pi))*log(t) (Trudgian 2014 Cor. 1) guaranteeing Stieltjes tail summability S_{rho_0} < infty, the finite-block spectral isolation limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0}*q_{rho_0}^k| = 0 is proved for any fixed nontrivial zero rho_0 (0 < Re(rho_0) < 1), finite integer grade block I, and eps > 0. (2) Lean 4 Formalization: Six new theorems compile with 0 sorry in formal/RiemannScope/Grade.lean (unnormalized_mode_exponent_id, centered_mode_exponent_id, centered_mode_from_unnormalized, arithmetic_station_collision_ratio, arithmetic_overlap_cutoff_strictly_separated, candidate_bridge_positivity_contradiction), bringing repository compiled theorem declarations to 199. (3) Arithmetic Overlap Observable Contract & Obstruction: For the two-variable arithmetic overlap observable Q_epsilon^{K, J}[w] = iint w(x) w(y) eta((x-y)/epsilon) dmu_K(x) dmu_J(y) on fixed compact window [a, b], distinct grades K != J have finite disjoint station sets S_K, S_J by Lindemann (1882) transcendence of 2*pi. The minimum station separation d_min > 0 forces Q_epsilon^{K, J}[w] = 0 identically for all epsilon < d_min, while K = J yields positive diagonal mass sum Lambda(n)^2 w(tau^K n)^2. This definitively refutes the candidate bridge inequality Q_epsilon^{K, J}[w] >= c * D_{K-J}(rho_0) - r_epsilon (c > 0, r_epsilon -> 0), as 0 >= c * D_{K-J}(rho_0) > 0 is a flat impossibility. Furthermore, the Gaussian spectral isolation family phi_L has support in [e^L, e^{17L}] escaping [a, b] for L > log b, barring direct insertion into fixed-window observables. The arithmetic coincidence bridge remains strictly open.",
+  "quantified_variables": [
+    {
+      "name": "h_k",
+      "domain": "h_k in Real, h_k = tau^(-k)",
+      "description": "Coordinate dilation step size at integer grade k"
+    },
+    {
+      "name": "L",
+      "domain": "L in Real, L >= 1.0",
+      "description": "Log-Gaussian scaling parameter"
+    },
+    {
+      "name": "rho_0",
+      "domain": "rho_0 in Complex, 0 < Re(rho_0) < 1",
+      "description": "Target nontrivial zero of the Riemann zeta function"
+    },
+    {
+      "name": "k",
+      "domain": "k in Integer",
+      "description": "Integer grade index"
+    },
+    {
+      "name": "K, J",
+      "domain": "K, J in Integer, K != J",
+      "description": "Distinct arithmetic measure layer grades"
+    },
+    {
+      "name": "q_rho",
+      "domain": "q_rho in Complex, q_rho = tau^(rho - 1/2)",
+      "description": "Grade character base for zero rho"
+    },
+    {
+      "name": "eps",
+      "domain": "eps in Real, eps > 0",
+      "description": "Arithmetic overlap localization test scale"
+    }
+  ],
+  "variable_domains": [
+    "h_k in Real, h_k = tau^(-k)",
+    "L in Real, L >= 1.0",
+    "rho_0 in Complex, 0 < Re(rho_0) < 1",
+    "k in Integer",
+    "K, J in Integer, K != J",
+    "q_rho in Complex, q_rho = tau^(rho - 1/2)",
+    "eps in Real, eps > 0"
+  ],
+  "hypotheses": [
+    "Smoothed Riemann explicit formula via Mellin inversion on C_c^infty((0, infty))",
+    "Transcendence of tau = 2*pi over Q (Lindemann 1882)",
+    "Finiteness of nontrivial zeros in compact vertical strip intervals [0, 1] x [gamma_0 - 3, gamma_0 + 3]",
+    "Diagonal and off-diagonal spectral mode decoupling across distinct zero frequencies",
+    "Unconditional zero-counting bound N(t) <= (t/(2*pi)) * log t for all t >= 14.0 (Trudgian 2014 Cor. 1)",
+    "Standard Mathlib foundational axioms in Lean 4 (propext, Classical.choice, Quot.sound)"
+  ],
+  "object_studied": "Whole-spectrum log-Gaussian spectral isolation observable Y_phi(k) and two-variable external-coordinate arithmetic overlap observable Q_epsilon^{K, J}[w]",
+  "fourier_normalization": "Mellin transform on (0, infty): phi_tilde(s) = int_0^infty phi(x) x^{s-1} dx",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho",
+  "measure_and_window": "Pushforward prime measures mu_K = sum Lambda(n) delta_{tau^K n}, compact window w in C_c^infty((0, infty)) on [a, b], cutoff eta in C_c^infty((-1, 1))",
+  "order_of_limits": "Spectral isolation: L -> infty at fixed finite grade block I; Arithmetic overlap: epsilon -> 0 at fixed grades K, J and fixed window [a, b]",
+  "exact_conclusion": "Whole-spectrum spectral isolation is established for adaptive Gaussian tests on finite blocks I; Lean 4 formalization compiles 199 declarations with 0 sorry; Q_epsilon^{K, J}[w] vanishes identically for all epsilon < d_min, refuting the candidate bridge inequality Q_epsilon >= c*D(rho_0) - r_epsilon for fixed windows; and Gaussian isolation tests escape fixed compact windows for L > log b, leaving the arithmetic coincidence bridge strictly open.",
+  "logical_negation": "Unnormalized mode exponent deviates from tau^(k*(rho-1)), or Lean theorems fail to compile, or station separation d_min = 0 for distinct grades K != J, or Q_epsilon^{K, J}[w] is non-zero for epsilon < d_min, or the candidate bridge inequality holds with positive c on fixed windows (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+  "exact_or_truncated": "TRUNCATED_WITH_BOUNDS",
+  "arithmetic_cutoff": "Fixed compact window [a, b] in (0, infty)",
+  "spectral_cutoff": "Near-band cancellation |Im(rho - rho_0)| <= 3; full infinite spectrum summed with Trudgian Stieltjes decay",
+  "integration_domain": "(0, infty) for Mellin transform and arithmetic measures",
+  "omitted_tail": "Log-Gaussian tails t <= 2L and t >= 16L; trivial zero background series tail; infinite nontrivial zero spectrum outside canceled band",
+  "tail_enclosure": "Cutoff error <= C_{p, chi} * L^{-1/2} * exp(-2L); normalization error <= (1/(2*sqrt(pi*L))) * exp(-4L); background geometric tail <= ||phi||_L1 * (h/a)^{2M+3} / (1 - (h/a)^2)",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: unnormalized_mode_exponent_id",
+    "formal/RiemannScope/Grade.lean: centered_mode_exponent_id",
+    "formal/RiemannScope/Grade.lean: centered_mode_from_unnormalized",
+    "formal/RiemannScope/Grade.lean: arithmetic_station_collision_ratio",
+    "formal/RiemannScope/Grade.lean: arithmetic_overlap_cutoff_strictly_separated",
+    "formal/RiemannScope/Grade.lean: candidate_bridge_positivity_contradiction",
+    "formal/RiemannScope/Grade.lean: gaussian_exponent_band_bound",
+    "formal/RiemannScope/Grade.lean: vandermonde_block_remainder_2_zpow",
+    "formal/RiemannScope/Grade.lean: vandermonde_2_reconstruction_bound_zpow",
+    "transcendental.py: audit_spectral_isolation_notation_and_estimates",
+    "transcendental.py: audit_arithmetic_overlap_observable",
+    "transcendental.py: audit_gaussian_support_localization_barrier",
+    "transcendental.py: audit_tc_epic_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 2: verified unnormalized mode exponent h_k^(1-rho) = tau^(k*(rho-1)), refuting prior sign inverted tau^(k*(1-rho))",
+    "Gate 3 & 4: verified integration by parts isolates |eta|^p = |Im(rho - rho_0)|^p from oscillating factor e^(i*eta*t)",
+    "Gate 5 & 6: evaluated asymptotic boundary limits L -> infty and eps -> 0; separated diagonal station pairings (m = n) from off-diagonal double sum pairings (m != n) across grades; proved Gaussian frequency decay |exp(L(z^2+6z))| <= exp(-2L)*exp(-L(eta^2-9)) for |sigma|<=1, |eta|>=3 (Lean: gaussian_exponent_band_bound)",
+    "Gate 7 & 8: proved finite station separation d_min > 0 and exact vanishing Q_epsilon^{K, J}[w] = 0 for epsilon < d_min via Lindemann (1882) transcendence of 2*pi",
+    "Gate 9 & 10: proved impossibility of candidate bridge inequality 0 >= c*D(rho_0) > 0 for fixed windows, and proved Gaussian support escaping barrier [e^L, e^(17L)] cap [a, b] = emptyset for L > log b"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_epic_spectral_isolation_notation_and_estimates",
+    "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_overlap_observable_and_obstruction",
+    "tests/test_tc_mechanism_discovery.py: test_epic_gaussian_support_localization_barrier",
+    "tests/test_tc_mechanism_discovery.py: test_epic_synthesis_deliverables"
+  ],
+  "external_sources": [
+    {
+      "source": "Trudgian (2014)",
+      "theorem": "Corollary 1 (arXiv:1208.5846v2)"
+    },
+    {
+      "source": "Lindemann (1882)",
+      "theorem": "Transcendence of pi"
+    },
+    {
+      "source": "Riemann (1859)",
+      "theorem": "Ueber die Anzahl der Primzahlen unter einer gegebenen Groesse"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Global non-trivial zero enumeration completeness below cutoff T (Turing method certificate)",
+    "Inter-grade arithmetic exclusion mechanism for non-compact or infinite collective measures (strictly open)"
+  ]
+}

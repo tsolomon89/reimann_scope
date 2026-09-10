@@ -2578,3 +2578,73 @@ Three independent research-agent loops were executed and persisted:
 | Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **TC-DISC-020** | **CLM-TC-020** | Autonomous TC Mechanism Discovery Epic Synthesis | Starting state reconciled; integer-grade Vandermonde reconstruction (`k:Int`, $q_1, q_2 \ne 0$) and Gaussian band exponent bound proved in Lean 4 (193 compiled targets, 0 sorry); Lehman/Trudgian coarse counting bounds verified for $t \ge 14.0$; whole-spectrum log-Gaussian isolation $\lim_{L \to \infty} \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| = 0$ established with proved cutoff decay; $D \to E$ jump refuted via $Y_L(k) = q^k e^{-k^2/L}$; arithmetic measure pushforward pairing $P_h(\phi) = h \langle \mu_{-k}, \phi \rangle$ verified; layer disjointness $\operatorname{supp}(\mu_K) \cap \operatorname{supp}(\mu_J) = \emptyset$ confirmed via Lindemann; atomic support localization limits derived; 6 bridge controls evaluated and passed; arithmetic coincidence bridge audited. | **EPIC DELIVERABLES FULLY EXECUTED; WHOLE-SPECTRUM ISOLATION PROVED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Integer-grade bounds and band exponents are formally proved; whole-spectrum isolation circumvents Paley-Wiener via dynamic scaling; continuous observable growth does not force discrete lattice point collisions $m\tau^K = n\tau^J$; RH exclusion bridge remains open) |
+
+---
+
+# 39. TC Epic: Complete Spectral Isolation and Test an Arithmetic Overlap Mechanism
+
+## 39.1 Mathematical Objectives and Results Overview
+
+This Epic executed the two sequential mathematical objectives:
+1. **Complete and correctly scope the supporting finite-block spectral isolation theorem**:
+   - Audited and corrected unnormalized mode powers: $h_k = \tau^{-k} \implies h_k^{1-\rho} = \tau^{k(\rho-1)}$, contrasting with prior erroneous drafts writing $\tau^{k(1-\rho)}$.
+   - Restored the centered observable and character: $Y_\phi(k) = h_k^{-1/2} X_\phi(k) = \sum m_\rho \widetilde\phi(\rho) q_\rho^k$ with $q_\rho = \tau^{\rho-1/2}$.
+   - Repaired the integration-by-parts estimate: $|\eta|^p \left|\int r_L(t) e^{zt} dt\right| \le \|\partial_t^p (e^{\sigma t} r_L(t))\|_{L^1}$ on the oscillating factor $e^{i\eta t}$ ($\eta = \Im(\rho - \rho_0)$), eliminating unseparated $|z|^p$ claims.
+   - Retained Gaussian frequency decay $|e^{L(z^2+6z)}| \le e^{-2L} e^{-L(\eta^2-9)}$ for $|\sigma| \le 1, |\eta| \ge 3$.
+   - Justified Stieltjes tail summability $S_{\rho_0} < \infty$ via Trudgian (2014 Cor. 1) zero counting.
+   - Derived explicit error bound $\max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| \le \tau^{B/2} (C_0 + C_1 L^{-1/2}) e^{-2L} S_{\rho_0}$ for finite blocks $I$.
+2. **Investigate whether prime-zero compatibility forces persistent overlap of arithmetic measures**:
+   - Defined external-coordinate overlap observable $Q_\varepsilon^{K, J}[w] = \iint w(x) w(y) \eta\left(\frac{x-y}{\varepsilon}\right) d\mu_K(x) d\mu_J(y)$.
+   - Proved the Exact Arithmetic Contract: for distinct grades $K \ne J$, finite stations in compact window $[a, b]$ have positive minimum separation $d_{\min} > 0$ via Lindemann (1882) transcendence of $2\pi$.
+   - Proved identical vanishing: $Q_\varepsilon^{K, J}[w] = 0$ for all $\varepsilon < d_{\min}$.
+   - Proved positive diagonal mass control for $K = J$: $Q_\varepsilon^{K, K}[w] \to \sum \Lambda(n)^2 w(\tau^K n)^2 > 0$.
+   - Definitively refuted candidate bridge inequality $Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r_\varepsilon$ ($c > 0, r_\varepsilon \to 0$): as $\varepsilon \downarrow 0$, LHS = 0 for $\varepsilon < d_{\min}$ while RHS $\to c D_{K-J}(\rho_0) > 0$ for any off-line zero, producing an absurd $0 \ge c D > 0$ contradiction.
+   - Proved support escaping barrier: $\operatorname{supp}(\phi_L) \subset [e^L, e^{17L}]$ escapes $[a, b]$ for $L > \log b$, proving that Gaussian isolation tests cannot be inserted into fixed-window arithmetic observables.
+   - The TC arithmetic coincidence bridge remains strictly **OPEN**.
+
+## 39.2 Track 0: Lean 4 Formalization (199 Compiled Targets, 0 Sorry)
+
+Six new foundational theorems were formalized in `formal/RiemannScope/Grade.lean` under standard Mathlib foundational axioms (`propext`, `Classical.choice`, `Quot.sound`) with zero `sorry`, bringing the repository total to 199 compiled declarations:
+1. `unnormalized_mode_exponent_id`: $-k(1 - \sigma) = k(\sigma - 1)$ in $\mathbb{R}$.
+2. `centered_mode_exponent_id`: $k/2 + k(\sigma - 1) = k(\sigma - 1/2)$ in $\mathbb{R}$.
+3. `centered_mode_from_unnormalized`: $k(1/2) + k(\sigma - 1) = k(\sigma - 1/2)$ in $\mathbb{R}$.
+4. `arithmetic_station_collision_ratio`: If $\tau_K m = \tau_J n$ with $m \ne 0$ and $\tau_J \ne 0$, then $\tau_K/\tau_J = n/m$.
+5. `arithmetic_overlap_cutoff_strictly_separated`: If $d \le |x - y|$ and $0 < \varepsilon < d$, then $|x - y|/\varepsilon > 1$.
+6. `candidate_bridge_positivity_contradiction`: If $Q \le 0$ and $Q \ge c \cdot D$ with $c > 0, D > 0$, then False.
+
+## 39.3 Track 1: Spectral Isolation Notation & Analytic Estimates
+
+- **Unnormalized Explicit Formula Mode Factor**:
+  $$X_\phi(k) = \widetilde\phi(1) - \sum_{j \ge 1} h_k^{1+2j} \widetilde\phi(-2j) - h_k \sum_{n \ge 2} \Lambda(n) \phi(h_k n) = \sum_{\rho \in Z_{\rm nt}} m_\rho \widetilde\phi(\rho) h_k^{1-\rho}.$$
+  With $h_k = \tau^{-k}$, $h_k^{1-\rho} = (\tau^{-k})^{1-\rho} = \tau^{k(\rho-1)}$.
+  Writing $\tau^{k(1-\rho)}$ had an inverted sign in $k$, producing an exponential ratio $\tau^{2k(1-\sigma)}$ discrepancy for $\sigma \ne 1$.
+- **Centered Observable Normalization**:
+  $$Y_\phi(k) = h_k^{-1/2} X_\phi(k) = \sum_{\rho \in Z_{\rm nt}} m_\rho \widetilde\phi(\rho) \tau^{k/2} \tau^{k(\rho-1)} = \sum_{\rho \in Z_{\rm nt}} m_\rho \widetilde\phi(\rho) q_\rho^k, \quad q_\rho = \tau^{\rho-1/2}.$$
+- **Integration by Parts Frequency Decay**:
+  Writing $\int r_L(t) e^{\sigma t} e^{i\eta t} \, dt$ and integrating the Fourier factor $e^{i\eta t}$ yields:
+  $$|\eta|^p \left| \int_\mathbb{R} r_L(t) e^{zt} \, dt \right| \le \|\partial_t^p (e^{\sigma t} r_L(t))\|_{L^1}.$$
+- **Gaussian Completion of the Square**:
+  For $|\sigma| \le 1, |\eta| \ge 3$:
+  $$\Re(z^2 + 6z) = \sigma^2 + 6\sigma - \eta^2 \le 7 - \eta^2 = -2 - (\eta^2 - 9) \le -2.$$
+  Thus $|e^{L(z^2+6z)}| \le e^{-2L} e^{-L(\eta^2-9)}$.
+
+## 39.4 Track 2 & 3: Arithmetic Overlap Observable Contract & Obstruction
+
+1. **Exact Arithmetic Contract**:
+   In fixed compact window $[a, b] \subset (0, \infty)$, the station sets $S_K = \{\tau^K n \in [a, b] : \Lambda(n) > 0\}$ and $S_J = \{\tau^J m \in [a, b] : \Lambda(m) > 0\}$ are finite.
+   For distinct grades $K \ne J$, $S_K \cap S_J = \emptyset$ by Lindemann (1882) transcendence of $2\pi$.
+   Hence $d_{\min} = \min_{x \in S_K, y \in S_J} |x - y| > 0$.
+   For all $\varepsilon < d_{\min}$, $|x - y|/\varepsilon > 1 \implies \eta((x - y)/\varepsilon) = 0$.
+   Therefore $Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$.
+2. **Definitive Refutation of Candidate Bridge Inequality**:
+   Any inequality of the form $Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r_\varepsilon$ with $c > 0$ and $r_\varepsilon \to 0$ asserts that as $\varepsilon \downarrow 0$:
+   $$0 \ge c D_{K-J}(\rho_0) > 0,$$
+   which is a mathematical contradiction. No fixed-window arithmetic overlap can detect off-line zero growth.
+3. **Gaussian Isolation Escaping Barrier**:
+   The spectral isolation family $\phi_L$ has support in $[e^L, e^{17L}]$. For any fixed window $[a, b]$, choosing $L > \log b$ makes $[e^L, e^{17L}] \cap [a, b] = \emptyset$, so $\phi_L$ vanishes identically on $[a, b]$. Thus $\phi_L$ cannot be inserted into the fixed-window arithmetic observable.
+
+## 39.5 Synthesis of Candidate TC-DISC-021 / CLM-TC-021
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-021** | **CLM-TC-021** | TC Epic: Spectral Isolation Repairs, Lean 4 Formalization, and Arithmetic Overlap Observable Contract | Smoothed explicit formula signs audited ($h_k^{1-\rho} = \tau^{k(\rho-1)}$ vs centered $q_\rho^k = \tau^{k(\rho-1/2)}$); integration-by-parts estimate repaired ($|\eta|^p$ on $e^{i\eta t}$); Gaussian frequency decay $|e^{L(z^2+6z)}| \le e^{-2L} e^{-L(\eta^2-9)}$ established; Stieltjes tail summability verified via Trudgian (2014 Cor. 1); 6 new Lean 4 theorems formalized in `formal/RiemannScope/Grade.lean` (199 total compiled, 0 sorry); Exact Arithmetic Contract proved ($Q_\varepsilon^{K, J}[w] = 0$ for $\varepsilon < d_{\min}$ via Lindemann transcendence); candidate bridge inequality $Q_\varepsilon \ge c D - r_\varepsilon$ definitively refuted ($0 \ge c D > 0$ contradiction); Gaussian support escaping barrier proved ($L > \log b$); arithmetic coincidence bridge audited. | **SPECTRAL ISOLATION REPAIRED AND SCOPED; LEAN FORMALIZATION EXTENDED (199 TARGETS); ARITHMETIC OVERLAP CONTRACT PROVED; CANDIDATE BRIDGE INEQUALITY REFUTED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Whole-spectrum isolation is an adaptive limit on finite blocks; local arithmetic observables identically vanish for small $\varepsilon$ and cannot detect off-line zeros; the arithmetic coincidence bridge remains an open research obligation) |

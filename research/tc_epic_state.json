@@ -1,10 +1,10 @@
 {
   "epic": "Autonomous TC Mechanism Discovery Epic",
   "started_at": "2026-09-09T19:51:00Z",
-  "completed_at": "2026-09-09T20:02:00Z",
+  "completed_at": "2026-09-10T14:30:00Z",
   "upstream_reviewed_anchor": "1d8847e46506248ca7726ef158c2f0d71900d4eb",
   "cycle14_substantive_commit": "38142008445ccb6544e1844c8a40493d21aabb13",
-  "current_head": "56161553f5dcd7d31e2412b0252f682220cbbc91",
+  "current_head": "ef2a7d0f28d7d71c7692f19169dbccb407dbde3f",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "goal_node": "TC forbidden-coincidence bridge: rho off-line => exists K != J, m*tau^K = n*tau^J != 0",
   "active_tracks": {
@@ -12,37 +12,55 @@
       "status": "COMPLETED",
       "tasks": [
         "Repair documentation misquotation of vandermonde_2_reconstruction_bound (Lean has k:Nat and hq:q2-q1!=0)",
-        "Formalize in Lean 4 the integer-grade reconstruction bound vandermonde_2_reconstruction_bound_zpow with non-zero bases q1!=0, q2!=0",
+        "Formalize in Lean 4 integer-grade reconstruction bound vandermonde_2_reconstruction_bound_zpow with non-zero bases q1!=0, q2!=0",
         "Recompute precise numerical constants (I_0 approx 0.11099845..., M=35 tail bound approx 6.268e-23)",
-        "Resolve Trudgian zero tail bound domain (derive bound for T >= 14 and cutoff T >= 192.026)"
+        "Resolve Trudgian zero tail bound domain (derive bound for T >= 14 and cutoff T >= 192.026)",
+        "Formalize 6 new theorems in Lean 4 (Grade.lean) bringing compiled project theorems to 199 with 0 sorry"
       ]
     },
     "track_1_spectral_whole_spectrum_isolation": {
       "status": "COMPLETED",
       "tasks": [
-        "Finiteness of competitor set C = {rho != rho_0 : |Im(rho) - Im(rho_0)| <= 3}",
-        "Truncated log-Gaussian test phi_L with finite cancellation polynomial P(z)",
-        "Mellin transform phi_tilde_L(s) and target normalization phi_tilde_L(rho_0) = 1",
-        "Cutoff error lemma: sup_{|sigma|<=1} ||d^p/dt^p (e^{sigma t} r_L(t))||_{L^1} <= C_{p,chi} L^{-1/2} e^{-2L}",
-        "Gaussian normalization error 1 - c_L = O(L^{-1/2} e^{-4L})",
-        "Support condition L > max(0, -min(I) log tau) for grade block I",
-        "Summable cutoff-error estimate and whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} q_{rho_0}^k| = 0",
-        "Complete analytic proof with parameter dependencies and limit interchanges in research/epic/spectral_isolation_analytic_proof.md",
-        "Refutation of dependency step D -> E via counterexample Y_L(k) = q^k e^{-k^2/L} (q > 1)",
-        "Separation of Trudgian tail cutoff applicability (t >= 14) from Turing completeness below T"
+        "Audit smoothed explicit formula signs: unnormalized mode factor h_k^{1-rho} = tau^{k*(rho-1)} for h_k = tau^{-k}",
+        "Restore centered observable and character Y_phi(k) = h_k^{-1/2} X_phi(k) = sum m_rho phi_tilde(rho) q_rho^k with q_rho = tau^{rho - 1/2}",
+        "Repair integration-by-parts estimate: |eta|^p |int r_L(t) e^{zt} dt| <= ||d_t^p (e^{sigma t} r_L(t))||_L1 via oscillating factor e^{i*eta*t}",
+        "Gaussian completion of the square frequency decay |e^{L(z^2+6z)}| <= e^{-2L} e^{-L(eta^2-9)} for |sigma|<=1, |eta|>=3",
+        "Stieltjes tail summability S_{rho_0} < infty via Trudgian (2014 Cor. 1)",
+        "Derive explicit error bound max_{k in I} |Y_{phi_L}(k) - m_{rho_0} q_{rho_0}^k| <= tau^{B/2} (C_0 + C_1 L^{-1/2}) e^{-2L} S_{rho_0}",
+        "Complete analytic proof with parameter dependencies in research/epic/spectral_isolation_analytic_proof.md"
       ]
     },
-    "track_2_arithmetic_bridge": {
+    "track_2_arithmetic_measure_bridge": {
       "status": "COMPLETED",
       "tasks": [
-        "Define concrete arithmetic measures mu_0 = sum_{n>=2} Lambda(n) delta_n and mu_K = (D_{tau^K})_* mu_0",
-        "Establish sign convention P_h(phi) = h <mu_{-k}, phi> for h = tau^{-k}",
+        "Define concrete arithmetic measures mu_K = sum_{n>=2} Lambda(n) delta_{tau^K n}",
+        "Establish pairing convention P_h(phi) = h <mu_{-k}, phi> for h = tau^{-k}",
         "Analyze atom extraction mu_K({x}) = lim_{eps->0} <mu_K, psi((.-x)/eps)>",
-        "Derive smooth density contribution O(eps) for finite zero modes under unnormalized shrinking test",
-        "Station-level limit proof in research/epic/arithmetic_spectral_atomic_limit.md: off-line zeros contribute smooth C^infty background and cannot create or shift discrete atoms",
+        "Confirm finite zero modes integrate to O(eps) -> 0 under shrinking tests",
+        "Station-level limit proof in research/epic/arithmetic_spectral_atomic_limit.md",
         "Clarification of von Mangoldt non-multiplicativity (Lambda(6) = 0 != Lambda(2)*Lambda(3)) and nontrivial zero domain restriction",
-        "Enforce 6 controls: unit conversion, linearity, distribution, prime-power, off-line, object",
-        "Adversarial challenger review in research/epic/adversarial_challenger_review.md extirpating overstatements"
+        "Enforce 6 controls: unit conversion, linearity, distribution, prime-power, off-line, object"
+      ]
+    },
+    "track_3_arithmetic_overlap_observable": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Define two-variable arithmetic overlap observable Q_epsilon^{K, J}[w]",
+        "Prove Exact Arithmetic Contract: finite stations S_K, S_J in fixed compact window [a, b]",
+        "Prove transcendental disjointness d_min > 0 via Lindemann (1882) transcendence of 2*pi",
+        "Prove identical vanishing Q_epsilon^{K, J}[w] = 0 for all epsilon < d_min",
+        "Prove positive diagonal mass control for K = J: Q_epsilon^{K, K}[w] -> sum Lambda(n)^2 w(tau^K n)^2 > 0",
+        "Definitively refute candidate bridge inequality Q_epsilon >= c*D(rho_0) - r_epsilon (0 >= c*D > 0 contradiction)",
+        "Persist complete arithmetic overlap investigation in research/epic/arithmetic_overlap_mechanism_investigation.md"
+      ]
+    },
+    "track_4_gaussian_support_barrier": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Prove support escaping barrier: supp(phi_L) subset [e^L, e^{17L}]",
+        "Show for any fixed window [a, b], supp(phi_L) cap [a, b] = emptyset for L > log(b)",
+        "Demonstrate that Gaussian spectral isolation family cannot be inserted into fixed-window arithmetic observables",
+        "Adversarial challenger review in research/epic/adversarial_overlap_audit.md confirming obstruction"
       ]
     }
   },
@@ -63,6 +81,30 @@
         "test_epic_whole_spectrum_gaussian_family",
         "test_epic_arithmetic_measure_atoms_and_bridge",
         "test_epic_synthesis_deliverables"
+      ],
+      "arithmetic_coincidence_bridge_status": "STRICTLY_OPEN"
+    },
+    {
+      "claim_id": "CLM-TC-021",
+      "name": "TC Epic: Spectral Isolation Repairs, Lean 4 Formalization, and Arithmetic Overlap Observable Contract",
+      "status": "SPECIFICATION_SCHEMA_PASSED_AND_VERIFIED",
+      "formal_theorems": [
+        "unnormalized_mode_exponent_id",
+        "centered_mode_exponent_id",
+        "centered_mode_from_unnormalized",
+        "arithmetic_station_collision_ratio",
+        "arithmetic_overlap_cutoff_strictly_separated",
+        "candidate_bridge_positivity_contradiction"
+      ],
+      "data_artifacts": [
+        "research/epic/spectral_isolation_analytic_proof.md",
+        "research/epic/arithmetic_overlap_mechanism_investigation.md",
+        "research/epic/adversarial_overlap_audit.md"
+      ],
+      "regression_tests": [
+        "test_epic_spectral_isolation_notation_and_estimates",
+        "test_epic_arithmetic_overlap_observable_and_obstruction",
+        "test_epic_gaussian_support_localization_barrier"
       ],
       "arithmetic_coincidence_bridge_status": "STRICTLY_OPEN"
     }

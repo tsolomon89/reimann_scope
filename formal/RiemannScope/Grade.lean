@@ -948,4 +948,59 @@ theorem gaussian_exponent_band_bound (σ τ_0 : ℝ)
     σ^2 + 6 * σ - τ_0^2 ≤ -2 := by
   nlinarith
 
+/-- Epic Theorem: Unnormalized Smoothed Explicit Formula Mode Exponent.
+    For step size h_k = tau^(-k), the Mellin residue scaling h_k^(1 - σ) has exponent
+    -k * (1 - σ) = k * (σ - 1). -/
+theorem unnormalized_mode_exponent_id (k σ : ℝ) :
+    -k * (1 - σ) = k * (σ - 1) := by
+  ring
+
+/-- Epic Theorem: Centered Mode Exponent Identity.
+    Normalizing the unnormalized observable by h_k^(-1/2) = tau^(k/2) shifts the exponent
+    from k * (σ - 1) to k * (σ - 1/2), matching the unitary character q_rho = tau^(rho - 1/2). -/
+theorem centered_mode_exponent_id (k σ : ℝ) :
+    k / 2 + k * (σ - 1) = k * (σ - 1 / 2) := by
+  ring
+
+/-- Epic Theorem: Centered Mode Exponent from Unnormalized Mode Exponent. -/
+theorem centered_mode_from_unnormalized (k σ : ℝ) :
+    k * (1 / 2) + k * (σ - 1) = k * (σ - 1 / 2) := by
+  ring
+
+/-- Epic Theorem: Arithmetic Station Rational Collision Ratio.
+    If distinct arithmetic stations collide across grades tau_K * m = tau_J * n with m ≠ 0,
+    then the inter-grade ratio tau_K / tau_J is rational: tau_K / tau_J = n / m. -/
+theorem arithmetic_station_collision_ratio (tau_K tau_J m n : ℝ)
+    (hm : m ≠ 0) (htau_J : tau_J ≠ 0)
+    (h_eq : tau_K * m = tau_J * n) :
+    tau_K / tau_J = n / m := by
+  have h1 : tau_K = (tau_J * n) / m := by
+    calc tau_K
+      _ = (tau_K * m) / m := by rw [mul_div_cancel_right₀ tau_K hm]
+      _ = (tau_J * n) / m := by rw [h_eq]
+  rw [h1]
+  calc ((tau_J * n) / m) / tau_J
+    _ = (tau_J * (n / m)) / tau_J := by rw [mul_div_assoc]
+    _ = n / m := by rw [mul_div_cancel_left₀ (n / m) htau_J]
+
+/-- Epic Theorem: Arithmetic Overlap Cutoff Strictly Separated.
+    If minimum station separation d > 0 satisfies d ≤ |x - y|, and 0 < ε < d,
+    then |x - y| / ε > 1, so test functions supported in [-1, 1] vanish identically. -/
+theorem arithmetic_overlap_cutoff_strictly_separated (x y d ε : ℝ)
+    (h_dist : d ≤ |x - y|) (hε_pos : 0 < ε) (hε_lt : ε < d) :
+    1 < |x - y| / ε := by
+  have hd_lt : ε < |x - y| := lt_of_lt_of_le hε_lt h_dist
+  exact (one_lt_div hε_pos).mpr hd_lt
+
+/-- Epic Theorem: Candidate Bridge Positivity Contradiction.
+    If the arithmetic observable Q satisfies Q ≤ 0 (e.g. Q = 0 for ε < d_min)
+    and the candidate bridge inequality asserts Q ≥ c * D with c > 0 and D > 0,
+    then a logical contradiction (False) is derived. -/
+theorem candidate_bridge_positivity_contradiction (Q c D : ℝ)
+    (hQ_zero : Q ≤ 0) (hc : 0 < c) (hD : 0 < D)
+    (h_bridge : c * D ≤ Q) :
+    False := by
+  have h_pos : 0 < c * D := mul_pos hc hD
+  linarith
+
 end RiemannScope

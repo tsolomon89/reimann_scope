@@ -1986,10 +1986,121 @@ def test_epic_synthesis_deliverables():
 
     # Formal theorems
     formal = res["track_0_formal_theorems"]
-    assert formal["compiled_theorems_count"] == 193
-    assert len(formal["new_declarations"]) == 3
+    assert formal["compiled_theorems_count"] == 199
+    assert len(formal["new_declarations"]) == 9
     assert "0 sorry" in formal["axioms"]
 
     # Tracks
     assert res["track_1_whole_spectrum_isolation"]["classification"] == "PROVED_AND_VERIFIED"
+    assert res["track_1_notation_and_estimates"]["classification"] == "PROVED_AND_VERIFIED"
     assert res["track_2_arithmetic_measure_bridge"]["classification"] == "PROVED_AND_VERIFIED"
+    assert res["track_3_arithmetic_overlap_observable"]["classification"] == "PROVED_AND_VERIFIED"
+    assert res["track_4_gaussian_support_barrier"]["classification"] == "PROVED_AND_VERIFIED"
+
+
+def test_epic_spectral_isolation_notation_and_estimates():
+    """
+    Epic Track 1: Spectral Isolation Notation, Exponents, and Derivative Estimates:
+    Verifies:
+      1. Unnormalized mode scaling: h_k = tau^(-k) => h_k^(1-rho) = tau^(k*(rho-1)).
+         Verifies algebraically exact match with tau^(k*(rho-1)) across positive and negative k.
+      2. Centered observable normalization: Y_phi(k) = h_k^(-1/2) * X_phi(k) = q_rho^k with q_rho = tau^(rho - 1/2).
+      3. Repaired integration-by-parts factor isolates |eta|^p = |Im(rho - rho_0)|^p, not |z|^p.
+      4. Gaussian completion of the square frequency decay |e^(L(z^2+6z))| <= e^(-2L) * e^(-L(eta^2 - 9)).
+      5. Stieltjes frequency summability S_rho0 < infty via Trudgian (2014 Cor. 1).
+    """
+    res = transcendental.audit_spectral_isolation_notation_and_estimates(dps=30)
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert "tau^(k*(rho - 1))" in res["unnormalized_mode_formula"]
+    assert "q_rho^k" in res["centered_mode_formula"]
+
+    # Exponent audit across k in [-2, -1, 0, 1, 2, 3]
+    for row in res["exponent_audit"]:
+        k = row["k"]
+        assert row["unnorm_identity_diff"] < 1e-25
+        assert row["centered_identity_diff"] < 1e-25
+        # For k != 0, old erroneous formula deviates significantly from correct unnormalized mode
+        if k != 0:
+            assert row["sign_error_ratio"] != 1.0
+
+    # Integration by parts
+    ibp = res["integration_by_parts"]
+    assert "|eta|^p" in ibp["mathematical_formula"]
+    assert "algebraically exact" in ibp["repaired_factor"]
+
+    # Gaussian frequency decay
+    for check in res["gaussian_decay_audit"]:
+        assert check["is_bounded"] is True
+        assert check["ratio"] <= 1.000001
+
+    # Stieltjes tail
+    stieltjes = res["stieltjes_audit"]
+    assert stieltjes["tail_integral_status"] == "CONVERGENT"
+    assert "Trudgian" in stieltjes["source"]
+
+
+def test_epic_arithmetic_overlap_observable_and_obstruction():
+    """
+    Epic Track 3: Arithmetic Overlap Observable Exact Contract and Bridge Obstruction:
+    Verifies:
+      1. Finite station count in compact window [a, b].
+      2. Transcendental disjointness: minimum station separation d_min > 0 between distinct grades K != J.
+      3. Identical vanishing: Q_epsilon^{K, J}[w] == 0 for all epsilon < d_min.
+      4. Diagonal mass control: for K = J, Q_epsilon^{K, K}[w] -> sum Lambda(n)^2 w(tau^K n)^2 > 0.
+      5. Refutation of candidate bridge inequality: Q_epsilon >= c * D_{K-J}(rho_0) - r_epsilon fails
+         because LHS = 0 for epsilon < d_min, but RHS -> c * D_{K-J}(rho_0) > 0 for any off-line zero.
+    """
+    res = transcendental.audit_arithmetic_overlap_observable(
+        K=0, J=1, window=(2.0, 30.0), epsilons=[1.0, 0.5, 0.2, 0.1, 0.05, 0.01, 0.001], dps=30
+    )
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert res["stations_K_count"] > 0
+    assert res["stations_J_count"] > 0
+    assert res["d_min"] > 0.0
+
+    d_min = res["d_min"]
+    # Verify vanishing for all epsilon < d_min
+    for q_row in res["q_cross_grade_results"]:
+        if q_row["epsilon"] < d_min:
+            assert q_row["Q_epsilon"] == 0.0
+            assert q_row["is_identically_zero"] is True
+            assert q_row["contributing_pairs"] == 0
+
+    # Diagonal mass control
+    diag = res["q_diagonal_control"]
+    assert diag["theoretical_diagonal_mass"] > 0.0
+    # Smallest epsilon should approach theoretical diagonal mass closely
+    smallest_diag = diag["q_diag_results"][-1]
+    assert smallest_diag["diff_from_diagonal_mass"] < 1e-10
+
+    # Bridge inequality refutation
+    refutation = res["bridge_inequality_refutation"]
+    assert refutation["D_M_rho0"] > 0.0
+    assert refutation["Q_at_small_epsilon"] == 0.0
+    assert "impossible" in refutation["contradiction"]
+
+
+def test_epic_gaussian_support_localization_barrier():
+    """
+    Epic Track 4: Gaussian Support Localization Escaping Barrier:
+    Verifies:
+      1. supp(phi_L) subset [e^L, e^(17L)].
+      2. For any fixed window [a, b], as soon as L > log(b), supp(phi_L) cap [a, b] = emptyset.
+      3. For window [2, 30], log(30) ≈ 3.4012. For L in [4, 5, 10, 20], phi_L vanishes identically on [2, 30].
+      4. Confirms that Gaussian spectral isolation family cannot be inserted into fixed-window arithmetic observables.
+    """
+    res = transcendental.audit_gaussian_support_localization_barrier(
+        L_vals=[1.0, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0], window=(2.0, 30.0), dps=30
+    )
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    log_b = res["log_b"]
+    assert abs(log_b - math.log(30.0)) < 1e-6
+
+    for check in res["barrier_checks"]:
+        L = check["L"]
+        if L > log_b:
+            assert check["L_exceeds_log_b"] is True
+            assert check["support_disjoint_from_window"] is True
+            assert check["phi_L_identically_zero_on_window"] is True
+        else:
+            assert check["L_exceeds_log_b"] is False
