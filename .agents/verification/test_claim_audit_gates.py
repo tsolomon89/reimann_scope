@@ -410,9 +410,9 @@ class TestClaimAuditGates:
         from audit_claim_spec import cross_check_claim_register
         ok, errors, passed, coverage = cross_check_claim_register(repo_root)
         assert ok is True, f"Claim register cross-check failed: {errors}"
-        assert coverage["total_claims"] == 109
-        assert coverage["terminal_claims"] == 101
-        assert coverage["audited_terminal_claims"] == 23
+        assert coverage["total_claims"] == 110
+        assert coverage["terminal_claims"] == 102
+        assert coverage["audited_terminal_claims"] == 24
         assert coverage["legacy_unaudited_terminal_claims"] == 78
         assert coverage["open_or_exempt_claims"] == 8
         assert coverage["missing_specifications"] == 0
@@ -543,7 +543,7 @@ class TestClaimAuditGates:
         ok_real, errors_real, passed_real, cov_real = cross_check_claim_register(repo_root, verify_git_baseline=True)
         assert ok_real is True
         assert cov_real["legacy_unaudited_terminal_claims"] == 78
-        assert cov_real["audited_terminal_claims"] == 23
+        assert cov_real["audited_terminal_claims"] == 24
 
 
 class TestAdversarialAuditGates:
