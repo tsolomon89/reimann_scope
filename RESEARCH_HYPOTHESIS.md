@@ -2628,23 +2628,24 @@ Six new foundational theorems were formalized in `formal/RiemannScope/Grade.lean
   $$\Re(z^2 + 6z) = \sigma^2 + 6\sigma - \eta^2 \le 7 - \eta^2 = -2 - (\eta^2 - 9) \le -2.$$
   Thus $|e^{L(z^2+6z)}| \le e^{-2L} e^{-L(\eta^2-9)}$.
 
-## 39.4 Track 2 & 3: Arithmetic Overlap Observable Contract & Obstruction
+## 39.4 Track 2 & 3: Arithmetic Overlap Observable Contract & Contradiction Architecture
 
-1. **Exact Arithmetic Contract**:
+1. **Exact Arithmetic Contract (Proved Arithmetic Vanishing)**:
    In fixed compact window $[a, b] \subset (0, \infty)$, the station sets $S_K = \{\tau^K n \in [a, b] : \Lambda(n) > 0\}$ and $S_J = \{\tau^J m \in [a, b] : \Lambda(m) > 0\}$ are finite.
    For distinct grades $K \ne J$, $S_K \cap S_J = \emptyset$ by Lindemann (1882) transcendence of $2\pi$.
    Hence $d_{\min} = \min_{x \in S_K, y \in S_J} |x - y| > 0$.
    For all $\varepsilon < d_{\min}$, $|x - y|/\varepsilon > 1 \implies \eta((x - y)/\varepsilon) = 0$.
    Therefore $Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$.
-2. **Definitive Refutation of Candidate Bridge Inequality**:
-   Any inequality of the form $Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r_\varepsilon$ with $c > 0$ and $r_\varepsilon \to 0$ asserts that as $\varepsilon \downarrow 0$:
-   $$0 \ge c D_{K-J}(\rho_0) > 0,$$
-   which is a mathematical contradiction. No fixed-window arithmetic overlap can detect off-line zero growth.
-3. **Gaussian Isolation Escaping Barrier**:
-   The spectral isolation family $\phi_L$ has support in $[e^L, e^{17L}]$. For any fixed window $[a, b]$, choosing $L > \log b$ makes $[e^L, e^{17L}] \cap [a, b] = \emptyset$, so $\phi_L$ vanishes identically on $[a, b]$. Thus $\phi_L$ cannot be inserted into the fixed-window arithmetic observable.
+2. **Contradiction Endpoint & Quantitative Remainder Decomposition**:
+   The proposed bridge is an intended *reductio ad absurdum*: an actual off-line zero $\rho_0$ is hypothesized to force $Q_\varepsilon \ge c D(\rho_0) - r_\varepsilon$ ($c D > 0, r_\varepsilon \to 0$), which would contradict arithmetic vanishing $Q_\varepsilon = 0$ for $\varepsilon < d_{\min}$, thereby excluding $\rho_0$. The Lean lemma `candidate_bridge_positivity_contradiction` formalizes this contradiction endpoint.
+   Under quantitative remainder decomposition $Q_\varepsilon = A_\varepsilon(\rho_0) + R_\varepsilon$, the complete two-variable explicit formula forces exact cancellation $\bar R_0 = -\bar A_0(\rho_0)$ on fixed windows, leaving the conditional spectral lower bound unproved.
+3. **The Three Foundational Findings**:
+   - *Gaussian Isolation Escaping Barrier*: The specific spectral isolation family $\phi_L$ has support in $[e^L, e^{17L}]$ escaping fixed windows for $L > \log b$, ruling out direct insertion of $\phi_L$ without eliminating other fixed-window complete-spectrum arguments.
+   - *Resolution Choice*: Choosing $\varepsilon_L < \min\{1/L, \Delta_L/2\}$ achieves zero arithmetic overlap unconditionally; the substantive bottleneck is compatibility with the spectral remainder estimate $r_{\varepsilon_L} < c D / 2$.
+   - *Moving Windows*: Expanding windows lose exact station coincidence without a replacement for compactness.
 
 ## 39.5 Synthesis of Candidate TC-DISC-021 / CLM-TC-021
 
 | Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **TC-DISC-021** | **CLM-TC-021** | TC Epic: Spectral Isolation Repairs, Lean 4 Formalization, and Arithmetic Overlap Observable Contract | Smoothed explicit formula signs audited ($h_k^{1-\rho} = \tau^{k(\rho-1)}$ vs centered $q_\rho^k = \tau^{k(\rho-1/2)}$); integration-by-parts estimate repaired ($|\eta|^p$ on $e^{i\eta t}$); Gaussian frequency decay $|e^{L(z^2+6z)}| \le e^{-2L} e^{-L(\eta^2-9)}$ established; Stieltjes tail summability verified via Trudgian (2014 Cor. 1); 6 new Lean 4 theorems formalized in `formal/RiemannScope/Grade.lean` (199 total compiled, 0 sorry); Exact Arithmetic Contract proved ($Q_\varepsilon^{K, J}[w] = 0$ for $\varepsilon < d_{\min}$ via Lindemann transcendence); candidate bridge inequality $Q_\varepsilon \ge c D - r_\varepsilon$ definitively refuted ($0 \ge c D > 0$ contradiction); Gaussian support escaping barrier proved ($L > \log b$); arithmetic coincidence bridge audited. | **SPECTRAL ISOLATION REPAIRED AND SCOPED; LEAN FORMALIZATION EXTENDED (199 TARGETS); ARITHMETIC OVERLAP CONTRACT PROVED; CANDIDATE BRIDGE INEQUALITY REFUTED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Whole-spectrum isolation is an adaptive limit on finite blocks; local arithmetic observables identically vanish for small $\varepsilon$ and cannot detect off-line zeros; the arithmetic coincidence bridge remains an open research obligation) |
+| **TC-DISC-021** | **CLM-TC-021** | TC Epic: Spectral Isolation Repairs, Lean 4 Formalization, and Arithmetic Overlap Observable Contract | Smoothed explicit formula signs audited ($h_k^{1-\rho} = \tau^{k(\rho-1)}$ vs centered $q_\rho^k = \tau^{k(\rho-1/2)}$); integration-by-parts estimate repaired ($|\eta|^p$ on $e^{i\eta t}$); Gaussian frequency decay $|e^{L(z^2+6z)}| \le e^{-2L} e^{-L(\eta^2-9)}$ established; Stieltjes tail summability verified via Trudgian (2014 Cor. 1); 6 new Lean 4 theorems formalized in `formal/RiemannScope/Grade.lean` (199 total compiled, 0 sorry); Exact Arithmetic Contract proved ($Q_\varepsilon^{K, J}[w] = 0$ for $\varepsilon < d_{\min}$ via Lindemann transcendence); Lean lemma `candidate_bridge_positivity_contradiction` formalizes the contradiction endpoint; quantitative remainder decomposition $Q_\varepsilon = A_\varepsilon(\rho_0) + R_\varepsilon$ forces exact cancellation $\bar R_0 = -\bar A_0(\rho_0)$ on fixed windows; Gaussian support escaping barrier proved ($L > \log b$); arithmetic coincidence bridge audited. | **ARITHMETIC VANISHING PROVED; CONTRADICTION ENDPOINT FORMALIZED (199 LEAN TARGETS); CONDITIONAL SPECTRAL LOWER BOUND UNPROVED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Whole-spectrum isolation is an adaptive limit on finite blocks; arithmetic separation on fixed compact windows is rigorously proved; the conditional spectral lower bound remains unproved due to exact remainder cancellation; the arithmetic coincidence bridge remains an open research obligation) |

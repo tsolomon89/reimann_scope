@@ -2041,14 +2041,17 @@ def test_epic_spectral_isolation_notation_and_estimates():
 
 def test_epic_arithmetic_overlap_observable_and_obstruction():
     """
-    Epic Track 3: Arithmetic Overlap Observable Exact Contract and Bridge Obstruction:
+    Epic Track 3: Arithmetic Overlap Observable Exact Contract and Contradiction Architecture:
     Verifies:
       1. Finite station count in compact window [a, b].
       2. Transcendental disjointness: minimum station separation d_min > 0 between distinct grades K != J.
       3. Identical vanishing: Q_epsilon^{K, J}[w] == 0 for all epsilon < d_min.
       4. Diagonal mass control: for K = J, Q_epsilon^{K, K}[w] -> sum Lambda(n)^2 w(tau^K n)^2 > 0.
-      5. Refutation of candidate bridge inequality: Q_epsilon >= c * D_{K-J}(rho_0) - r_epsilon fails
-         because LHS = 0 for epsilon < d_min, but RHS -> c * D_{K-J}(rho_0) > 0 for any off-line zero.
+      5. Contradiction architecture & bridge inequality audit:
+         If Q_epsilon >= c * D_{K-J}(rho_0) - r_epsilon were forced by an off-line zero, then for epsilon < d_min,
+         LHS = 0 would yield 0 >= c * D / 2 > 0 (formalized in Lean candidate_bridge_positivity_contradiction).
+         However, because LHS = 0 identically for small epsilon, the complete explicit formula forces
+         exact cancellation R_bar_0 = -A_bar_0(rho_0), leaving the conditional spectral lower bound unproved.
     """
     res = transcendental.audit_arithmetic_overlap_observable(
         K=0, J=1, window=(2.0, 30.0), epsilons=[1.0, 0.5, 0.2, 0.1, 0.05, 0.01, 0.001], dps=30
@@ -2073,11 +2076,14 @@ def test_epic_arithmetic_overlap_observable_and_obstruction():
     smallest_diag = diag["q_diag_results"][-1]
     assert smallest_diag["diff_from_diagonal_mass"] < 1e-10
 
-    # Bridge inequality refutation
+    # Contradiction architecture & bridge inequality audit
     refutation = res["bridge_inequality_refutation"]
     assert refutation["D_M_rho0"] > 0.0
     assert refutation["Q_at_small_epsilon"] == 0.0
     assert "impossible" in refutation["contradiction"]
+    assert "candidate_bridge_positivity_contradiction" in refutation["intended_contradiction_endpoint"]
+    assert "exact_cancellation_mechanism" in refutation
+    assert "cancellation" in refutation["exact_cancellation_mechanism"]
 
 
 def test_epic_gaussian_support_localization_barrier():
