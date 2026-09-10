@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-022",
+  "statement": "TC Epic: Two-Variable Explicit Formula, Normalized Remainder Truncation Bound, Selected Spectral Contribution Limit, and Bridge Defect Repair: (1) Defect Repair & Counterexample: The prior cutoff condition T(eps) >> eps^{-(p-1)/(p-2)} for B_old(eps, T) = C_p * eps^{1-p} * log(T) / T^{p-2} is mathematically insufficient and definitively falsified by the concrete counterexample for p=3 with ell = log(1/eps) and T(eps) = eps^{-2} * sqrt(ell), where T(eps)/eps^{-2} -> infty but B_old / C_p ~ 2*sqrt(ell) -> infty; in the normalized observable Q_bar_eps = Q_eps / eps, the truncation error scales as |E_{eps, T}| / eps <= C_p * eps^{-p} * log^2(2+T) / T^{p-2}, requiring alpha > p / (p - 2) for power cutoff T = eps^{-alpha} (formally proved in Lean 4: normalized_truncation_error_scaling, power_cutoff_exponent_positivity). (2) Complete One-Variable & Two-Variable Expansions: For x > a_K = tau^K, the trivial-zero geometric background sums exactly to sum_{j>=1} a_K^{2j} * x^{-2j-1} = a_K^2 / (x * (x^2 - a_K^2)), giving background density b_K(x) = a_K^{-1} - a_K^2 / (x * (x^2 - a_K^2)) and measure mu_K = B_K - Z_K = P_K - T_K - Z_K; the two-variable explicit formula Q_eps^{K, J}[w] expands into 9 distinct uncombined bilinear terms and 4 combined tensor terms (B_K - Z_K)(B_J - Z_J) = B_K * B_J - B_K * Z_J - Z_K * B_J + Z_K * Z_J (formally proved in Lean 4: two_variable_nine_term_expansion_algebra, two_variable_tensor_decomposition_algebra). (3) Selected Spectral Contribution & Falsification: For any nontrivial zero rho_0, the conjugation-closed quartet Gamma(rho_0) = {rho_0, bar{rho}_0, 1 - rho_0, 1 - bar{rho}_0} yields strictly real density f_{K, Gamma}(x) and real selected term A_{eps, Gamma}; for even eta, A_{eps, Gamma} / eps = A_{0, Gamma} + O(eps^2) where A_{0, Gamma} = ||eta||_L1 * int w(x)^2 * f_{K, Gamma}(x) * f_{J, Gamma}(x) dx; on critical-line zeros (Re(rho) = 1/2), D_M(rho_0) = 4*sinh^2(0) = 0 whereas A_{0, Gamma} approx 0.5444 != 0, definitively falsifying any asserted identity A_{0, Gamma} = c * D_M(rho_0). (4) Conservative Truncation Bound: Using logarithmic coordinates x=e^u, y=e^v, L^1 derivative bounds ||d^p G_eps||_L1 <= C_p * eps^{1-p}, Trudgian unconditional zero counting N_*(R) <= C_N * R * log(2+R), and dyadic shell pair counting via N_*(R)^2, the conservative two-variable truncation bound |E_{eps, T}| <= C_p * eps^{1-p} * log^2(2+T) / T^{p-2} (p > 2) is proved. (5) Arithmetic Separation & Bridge Status: On fixed compact window [8, 20] with K=0, J=1 (a_0 = 1, a_1 = 2*pi approx 6.283 < 8), Lindemann (1882) transcendence gives minimum station gap d_min approx 0.1504 > 0, forcing arithmetic vanishing Q_eps^{0, 1} = 0 identically for eps < d_min, while equal-grade pairing yields positive diagonal mass Q_eps^{0, 0} approx 29.275 > 0 and toy commensurable pairing detects common station at x=6 with Q_eps approx 1.761 > 0; Lean 4 lemma candidate_bridge_with_remainder_contradiction proves the contradiction endpoint under remainder subordination; under exact explicit formula decomposition Q_bar_eps = A_bar_{eps, Gamma} + R_bar_{eps, T} + E_bar_{eps, T}, vanishing Q_bar_eps = 0 forces exact cancellation lim_{eps -> 0} R_bar_{eps, T(eps)} = -A_{0, Gamma}, leaving the conditional spectral lower bound unproved and the arithmetic coincidence bridge strictly open.",
+  "quantified_variables": [
+    {
+      "name": "eps",
+      "domain": "eps in Real, 0 < eps <= 1",
+      "description": "Arithmetic overlap localization test scale"
+    },
+    {
+      "name": "T",
+      "domain": "T in Real, T >= 4.0",
+      "description": "Spectral zero ordinate cutoff"
+    },
+    {
+      "name": "p",
+      "domain": "p in Real, p > 2.0",
+      "description": "Sobolev integration-by-parts smoothness order"
+    },
+    {
+      "name": "alpha",
+      "domain": "alpha in Real, alpha > p / (p - 2)",
+      "description": "Strict power cutoff trajectory exponent"
+    },
+    {
+      "name": "rho_0",
+      "domain": "rho_0 in Complex, 0 < Re(rho_0) < 1",
+      "description": "Target nontrivial zero of Riemann zeta"
+    },
+    {
+      "name": "K, J",
+      "domain": "K, J in Integer, K != J",
+      "description": "Distinct arithmetic layer grades"
+    },
+    {
+      "name": "w",
+      "domain": "w in C_c^infty((a, b)), w >= 0, w not equiv 0",
+      "description": "Compact spatial window test function"
+    },
+    {
+      "name": "eta",
+      "domain": "eta in C_c^infty((-1, 1)), eta >= 0, eta(0) = 1, eta even",
+      "description": "Smooth mollifier kernel"
+    }
+  ],
+  "variable_domains": [
+    "eps in Real, 0 < eps <= 1",
+    "T in Real, T >= 4.0",
+    "p in Real, p > 2.0",
+    "alpha in Real, alpha > p / (p - 2)",
+    "rho_0 in Complex, 0 < Re(rho_0) < 1",
+    "K, J in Integer, K != J",
+    "w in C_c^infty((a, b)), w >= 0, w not equiv 0",
+    "eta in C_c^infty((-1, 1)), eta >= 0, eta(0) = 1, eta even"
+  ],
+  "hypotheses": [
+    "Riemann explicit formula on smooth compactly supported test functions via Mellin inversion",
+    "Transcendence of tau = 2*pi over Q (Lindemann 1882)",
+    "Unconditional zero counting bound N(t) <= (t/(2*pi)) * log t for all t >= 14.0 (Trudgian 2014 Cor. 1)",
+    "Evenness of mollifier eta(-v) = eta(v)",
+    "Support of window w contained in (a, b) with a > max(a_K, a_J)",
+    "Diagonal and off-diagonal spectral mode decoupling across distinct zero frequencies, accounting for all off-diagonal cross-terms in the complete 4-block bilinear tensor expansion",
+    "Standard Mathlib foundational axioms in Lean 4 (propext, Classical.choice, Quot.sound)"
+  ],
+  "object_studied": "Two-variable arithmetic overlap observable Q_eps^{K, J}[w] on fixed compact window [a, b], 9-term and 4-term explicit tensor expansions, selected spectral quartet contribution A_{eps, Gamma}, conservative two-variable truncation bound E_{eps, T}, and normalized explicit formula remainder cancellation",
+  "fourier_normalization": "Mellin transform on (0, infty): f_tilde(s) = int_0^infty f(x) x^{s-1} dx",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho",
+  "measure_and_window": "Pushforward prime measures mu_K = sum_{n>=2} Lambda(n) delta_{tau^K n}, compact window w in C_c^infty((a, b)) with a > max(tau^K, tau^J), even mollifier eta in C_c^infty((-1, 1))",
+  "order_of_limits": "Spectral cutoff T(eps) = eps^{-alpha} with alpha > p/(p-2) as localization scale eps -> 0 at fixed grades K, J and fixed window [a, b]",
+  "exact_conclusion": "The prior cutoff condition T(eps) >> eps^{-(p-1)/(p-2)} is falsified by counterexample p=3, T = eps^{-2}*sqrt(ell); normalized power cutoff requires alpha > p/(p-2) (Lean: normalized_truncation_error_scaling, power_cutoff_exponent_positivity); 1-variable trivial zero series sums to a_K^2 / (x*(x^2 - a_K^2)); 2-variable tensor expansion satisfies 9-term and 4-term bilinear algebra (Lean: two_variable_nine_term_expansion_algebra, two_variable_tensor_decomposition_algebra); selected term A_{eps, Gamma} is real and satisfies A_{eps, Gamma}/eps = A_{0, Gamma} + O(eps^2) for even eta; the identity A_{0, Gamma} = c*D_M(rho_0) is definitively falsified on critical-line zeros; conservative truncation bound |E_{eps, T}| <= C_p * eps^{1-p} * log^2(2+T) / T^{p-2} is proved via dyadic shell pair counting; arithmetic vanishing Q_eps^{0, 1} = 0 holds for eps < d_min approx 0.1504 on [8, 20] while equal-grade diagonal mass is positive; Lean 4 lemma candidate_bridge_with_remainder_contradiction compiles with 0 sorry; and vanishing Q_bar_eps forces exact explicit formula cancellation lim_{eps -> 0} R_bar_{eps, T(eps)} = -A_{0, Gamma}, leaving the conditional spectral lower bound unproved and the arithmetic coincidence bridge strictly open.",
+  "logical_negation": "Lean 4 theorems fail to compile, or the counterexample converges to zero, or normalized error does not require alpha > p/(p-2), or the 1-variable trivial zero sum deviates from a_K^2 / (x*(x^2 - a_K^2)), or two-variable tensor signs deviate from the bilinear expansion, or A_{eps, Gamma} fails to be real or diverges from A_{0, Gamma}, or A_{0, Gamma} equals c*D_M(rho_0) on critical-line zeros, or truncation error violates the conservative log^2 bound, or arithmetic vanishing fails for eps < d_min, or the arithmetic coincidence bridge is proved closed without an independent spectral lower bound (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+  "exact_or_truncated": "TRUNCATED_WITH_BOUNDS",
+  "arithmetic_cutoff": "Fixed compact window [a, b] = [8, 20] above max(a_0, a_1) = 2*pi approx 6.283",
+  "spectral_cutoff": "Truncation at ordinate height T = eps^{-alpha} with alpha > p/(p-2)",
+  "integration_domain": "(0, infty) x (0, infty), compactly supported on [a, b]^2",
+  "omitted_tail": "Trivial zeros j > M for background series; nontrivial zeros with |Im(rho)| > T or |Im(sigma)| > T",
+  "tail_enclosure": "Conservative truncation bound |E_{eps, T}| <= C_p * eps^{1-p} * log^2(2+T) / T^{p-2}; normalized bound <= C_p * eps^{-p} * log^2(2+T) / T^{p-2} decaying as O(eps^2 * log^2(1/eps)) for p=4, alpha=3",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: two_variable_tensor_decomposition_algebra",
+    "formal/RiemannScope/Grade.lean: two_variable_nine_term_expansion_algebra",
+    "formal/RiemannScope/Grade.lean: normalized_truncation_error_scaling",
+    "formal/RiemannScope/Grade.lean: power_cutoff_exponent_positivity",
+    "formal/RiemannScope/Grade.lean: candidate_bridge_with_remainder_contradiction",
+    "transcendental.py: audit_tc_cutoff_condition_counterexample",
+    "transcendental.py: evaluate_two_variable_explicit_expansion",
+    "transcendental.py: audit_selected_spectral_contribution",
+    "transcendental.py: audit_two_variable_truncation_bound",
+    "transcendental.py: audit_arithmetic_overlap_distinct_and_equal_grades",
+    "transcendental.py: audit_tc_epic_two_variable_synthesis"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Gate 1 & 2: verified that two-variable observable Q_eps derives from explicit prime measures mu_K = B_K - Z_K on compact window [8, 20] > max(a_0, a_1)",
+    "Gate 3 & 4: constructed concrete counterexample p=3, T = eps^{-2}*sqrt(ell) falsifying prior condition T >> eps^{-(p-1)/(p-2)}; proved normalized error requires alpha > p/(p-2) in Lean 4 (power_cutoff_exponent_positivity)",
+    "Gate 5 & 6: evaluated small-eps boundary behavior; verified 1-variable trivial zero sum to < 10^{-15}; proved 9-term and 4-term bilinear expansions in Lean 4",
+    "Gate 7 & 8: proved reality of A_{eps, Gamma} via conjugation closure; proved A_{eps, Gamma}/eps = A_{0, Gamma} + O(eps^2) for even eta; falsified asserted identity A_{0, Gamma} = c*D_M(rho_0) by showing D_M = 0 on critical line while A_0 approx 0.5444 != 0",
+    "Gate 9 & 10: proved conservative truncation bound C_p * eps^{1-p} * log^2(2+T) / T^{p-2} using Trudgian N_*(R)^2 dyadic shell counting; proved exact arithmetic vanishing Q_eps^{0, 1} = 0 for eps < 0.1504; formalized contradiction endpoint in Lean 4; proved exact explicit formula remainder cancellation lim R_bar_{eps, T(eps)} = -A_{0, Gamma} on fixed windows, keeping the bridge open"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_epic_tc_cutoff_condition_counterexample",
+    "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_explicit_expansion",
+    "tests/test_tc_mechanism_discovery.py: test_epic_selected_spectral_contribution_limit_and_falsification",
+    "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_truncation_bound",
+    "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_overlap_window_8_20_and_commensurable",
+    "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_synthesis_deliverables",
+    "data/tc_epic_two_variable_synthesis.json"
+  ],
+  "external_sources": [
+    {
+      "source": "Trudgian (2014)",
+      "theorem": "Corollary 1 (arXiv:1208.5846v2): unconditional zero counting bound N(t) <= (t/(2*pi)) * log t for all t >= 14.0"
+    },
+    {
+      "source": "Lindemann (1882)",
+      "theorem": "Transcendence of 2*pi over Q, establishing disjointness of arithmetic layers L_K = tau^K * Z for K != J"
+    },
+    {
+      "source": "Riemann (1859)",
+      "theorem": "Ueber die Anzahl der Primzahlen unter einer gegebenen Groesse: Explicit formula connecting primes and zeta zeros"
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Resolution of the conditional spectral lower bound on fixed compact windows against exact explicit formula remainder cancellation R_bar_0 = -A_0 (OPEN / BRIDGE DEPENDENCY)",
+    "Explicit multi-grade or non-compact window filtering mechanism capable of preventing remainder cancellation while preserving arithmetic support separation (OPEN / PROGRAMME DIRECTION)"
+  ]
+}

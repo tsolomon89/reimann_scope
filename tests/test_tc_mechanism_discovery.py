@@ -2110,3 +2110,150 @@ def test_epic_gaussian_support_localization_barrier():
             assert check["phi_L_identically_zero_on_window"] is True
         else:
             assert check["L_exceeds_log_b"] is False
+
+
+# ==============================================================================
+# TC EPIC: TWO-VARIABLE EXPANSION, TRUNCATION BOUNDS & BRIDGE TESTING
+# ==============================================================================
+
+def test_epic_tc_cutoff_condition_counterexample():
+    """
+    Epic Section 3.1 & 3.2:
+    Verifies that the old cutoff condition T(eps) >> eps^(-(p-1)/(p-2)) is falsified
+    by the exact counterexample p=3, ell = log(1/eps), T = eps^(-2) * sqrt(ell),
+    and verifies the normalized power cutoff condition alpha > p/(p-2).
+    """
+    res = transcendental.audit_tc_cutoff_condition_counterexample(dps=30)
+    assert res["classification"] == "DEFECT_REPAIRED_AND_VERIFIED"
+    assert res["old_claim_verdict"] == "FALSIFIED_BY_EXACT_COUNTEREXAMPLE"
+
+    for row in res["counterexample_rows"]:
+        assert row["ratio_T_to_power"] > 1.0
+        assert row["diverges"] is True
+        assert row["symbolic_match_error"] < 1e-12
+
+    # Power trajectory
+    norm = res["normalization_analysis"]
+    assert norm["p4_critical_alpha"] == 2.0
+    assert norm["p4_justified_alpha"] == 3.0
+    rows = norm["power_trajectory_rows"]
+    # For alpha = 3, normalized bound decreases toward 0
+    assert rows[-1]["norm_bound_alpha_3"] < rows[0]["norm_bound_alpha_3"] * 1e-3
+    # For alpha = 2, critical normalized bound grows as log^2(1/eps)
+    assert rows[-1]["norm_bound_alpha_2"] > rows[0]["norm_bound_alpha_2"]
+
+
+def test_epic_two_variable_explicit_expansion():
+    """
+    Epic Section 5:
+    Verifies the complete one-variable background geometric series identity,
+    all 9 uncombined terms of the two-variable tensor product, and the 4 combined terms.
+    """
+    res = transcendental.evaluate_two_variable_explicit_expansion(
+        K=0, J=1, window=(8.0, 20.0), dps=30
+    )
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert res["window_satisfies_hypotheses"] is True
+
+    # One-variable background geometric identity
+    bg = res["one_variable_background_identity"]
+    for row in bg["numerical_checks"]:
+        assert row["absolute_diff"] < 1e-15
+
+    # 9 Uncombined terms
+    nine = res["uncombined_nine_terms"]
+    assert len(nine) == 9
+    signs = [t["sign"] for t in nine]
+    assert signs.count("+") == 5
+    assert signs.count("-") == 4
+
+    # 4 Combined terms
+    four = res["combined_four_terms"]
+    assert len(four) == 4
+
+
+def test_epic_selected_spectral_contribution_limit_and_falsification():
+    """
+    Epic Section 6:
+    Verifies:
+      1. Reality of f_{K, Gamma}(x) and A_{eps, Gamma}.
+      2. Convergence A_{eps, Gamma} / eps -> A_{0, Gamma} with O(eps^2) error rate for even eta.
+      3. Falsification of asserted identity A_{0, Gamma} = c * D_M on critical line zeros
+         (where D_M = 0 while A_0 != 0).
+    """
+    res = transcendental.audit_selected_spectral_contribution(
+        K=0, J=1, window=(8.0, 20.0), epsilons=[0.5, 0.2, 0.1, 0.05], dps=30
+    )
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert res["is_on_critical_line"] is True
+    assert res["D_M_rho0"] == 0.0
+    assert abs(res["A_0_Gamma"]) > 0.1
+    assert res["asserted_identity_A0_eq_cD_falsified"] is True
+    assert res["even_mollifier_second_order_rate_confirmed"] is True
+
+    # Check that diff / eps^2 is bounded
+    for row in res["quadrature_convergence"]:
+        assert row["diff_over_eps2"] < 1.0
+
+
+def test_epic_two_variable_truncation_bound():
+    """
+    Epic Section 7:
+    Verifies the conservative truncation bound C_p * eps^(1-p) * log^2(2+T) / T^(p-2),
+    normalized scaling, and monotonic convergence along T = eps^(-3) for p=4.
+    """
+    res = transcendental.audit_two_variable_truncation_bound(
+        K=0, J=1, p=4, window=(8.0, 20.0), dps=30
+    )
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert res["critical_alpha"] == 2.0
+    assert res["justified_alpha"] == 3.0
+    assert res["convergence_verified"] is True
+
+
+def test_epic_arithmetic_overlap_window_8_20_and_commensurable():
+    """
+    Epic Section 9:
+    Verifies arithmetic overlap observable on window (8, 20) with K=0, J=1:
+      1. Station disjointness: d_min > 0.
+      2. Arithmetic vanishing: Q_eps^{0, 1} == 0 for all eps < d_min.
+      3. Positive equal-grade diagonal mass Q_eps^{0, 0} > 0.
+      4. Toy commensurable control detects genuine common station collision.
+    """
+    res = transcendental.audit_arithmetic_overlap_distinct_and_equal_grades(
+        window=(8.0, 20.0), K=0, J=1, epsilons=[0.5, 0.2, 0.1, 0.05, 0.01], dps=30
+    )
+    assert res["classification"] == "PROVED_AND_VERIFIED"
+    assert res["d_min"] > 0.1
+    assert res["stations_0_count"] == 7
+    assert res["stations_1_count"] == 2
+    assert res["vanishing_verified_below_d_min"] is True
+    assert res["equal_grade_is_positive"] is True
+    assert res["toy_commensurable_control"]["detection_successful"] is True
+
+
+def test_epic_two_variable_synthesis_deliverables():
+    """
+    Epic Master Deliverable Audit:
+    Verifies that audit_tc_epic_two_variable_synthesis() executes cleanly and confirms:
+      1. Total compiled formal theorems is 204 with 0 sorry.
+      2. All 5 milestones are fully integrated and classified.
+      3. Epistemic status separates proved arithmetic vanishing from unproved spectral lower bound.
+    """
+    res = transcendental.audit_tc_epic_two_variable_synthesis(dps=30)
+    assert "Two-Variable Formula" in res["epic"]
+    assert res["formal_lean_theorems"]["total_compiled_theorems"] == 204
+    assert len(res["formal_lean_theorems"]["new_theorems"]) == 5
+    assert "0 sorry" in res["formal_lean_theorems"]["axioms"]
+
+    epistemic = res["epistemic_classification"]
+    assert "PROVED" in epistemic["arithmetic_vanishing"]
+    assert "PROVED" in epistemic["two_variable_expansion"]
+    assert "PROVED" in epistemic["conservative_truncation_bound"]
+    assert "PROVED" in epistemic["normalized_cutoff_convergence"]
+    assert "PROVED" in epistemic["selected_term_limit"]
+    assert "FALSIFIED" in epistemic["assertion_A0_eq_cD_falsified"]
+    assert "EXACT CANCELLATION" in epistemic["remainder_behavior"]
+    assert "UNPROVED" in epistemic["conditional_spectral_lower_bound"]
+    assert "STRICTLY OPEN" in epistemic["transcendental_continuation_bridge"]
+

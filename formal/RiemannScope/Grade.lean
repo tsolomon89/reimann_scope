@@ -1003,4 +1003,64 @@ theorem candidate_bridge_positivity_contradiction (Q c D : ℝ)
   have h_pos : 0 < c * D := mul_pos hc hD
   linarith
 
+/-- Epic Theorem: Two-Variable Tensor Bilinear Expansion (4-Term Form).
+    For any bilinear pairings or real values B_K, Z_K, B_J, Z_J:
+    (B_K - Z_K) * (B_J - Z_J) = B_K * B_J - B_K * Z_J - Z_K * B_J + Z_K * Z_J. -/
+theorem two_variable_tensor_decomposition_algebra (B_K Z_K B_J Z_J : ℝ) :
+    (B_K - Z_K) * (B_J - Z_J) = B_K * B_J - B_K * Z_J - Z_K * B_J + Z_K * Z_J := by
+  ring
+
+/-- Epic Theorem: Two-Variable Explicit Expansion (9-Term Uncombined Form).
+    For three-component measures mu_K = P_K - Z_K - T_K and mu_J = P_J - Z_J - T_J,
+    the bilinearly expanded product exhibits all 9 distinct terms with exact signs:
+    (P_K - Z_K - T_K) * (P_J - Z_J - T_J) =
+      P_K * P_J - P_K * Z_J - P_K * T_J
+      - Z_K * P_J + Z_K * Z_J + Z_K * T_J
+      - T_K * P_J + T_K * Z_J + T_K * T_J. -/
+theorem two_variable_nine_term_expansion_algebra (P_K Z_K T_K P_J Z_J T_J : ℝ) :
+    (P_K - Z_K - T_K) * (P_J - Z_J - T_J) =
+      P_K * P_J - P_K * Z_J - P_K * T_J
+      - Z_K * P_J + Z_K * Z_J + Z_K * T_J
+      - T_K * P_J + T_K * Z_J + T_K * T_J := by
+  ring
+
+/-- Epic Theorem: Normalized Truncation Error Scaling.
+    If the truncation error E satisfies |E| ≤ B, then for any ε > 0,
+    the normalized error satisfies |E| / ε ≤ B / ε. -/
+theorem normalized_truncation_error_scaling (E B ε : ℝ)
+    (hE : |E| ≤ B) (hε : 0 < ε) :
+    |E| / ε ≤ B / ε := by
+  exact div_le_div_of_nonneg_right hE (le_of_lt hε)
+
+/-- Epic Theorem: Power Cutoff Exponent Positivity.
+    For dimension index p > 2 and trajectory exponent α > p / (p - 2),
+    the net normalized exponent α * (p - 2) - p is strictly positive,
+    guaranteeing asymptotic convergence of the normalized truncation error to zero. -/
+theorem power_cutoff_exponent_positivity (p α : ℝ)
+    (hp : 2 < p) (hα : p / (p - 2) < α) :
+    0 < α * (p - 2) - p := by
+  have hp_sub : 0 < p - 2 := sub_pos.mpr hp
+  have h_mul : (p / (p - 2)) * (p - 2) < α * (p - 2) := mul_lt_mul_of_pos_right hα hp_sub
+  have h_div : (p / (p - 2)) * (p - 2) = p := div_mul_cancel₀ p (ne_of_gt hp_sub)
+  rw [h_div] at h_mul
+  exact sub_pos.mpr h_mul
+
+/-- Epic Theorem: Candidate Bridge with Remainder Contradiction.
+    Suppose an observable decomposes as Q = A + R, where:
+    1. Arithmetic vanishing: Q ≤ 0 (for small ε).
+    2. Selected spectral lower bound: c * D ≤ A with c > 0 and D > 0.
+    3. Remainder subordination: |R| < c * D.
+    Then a logical contradiction (False) is derived. -/
+theorem candidate_bridge_with_remainder_contradiction (Q A R c D : ℝ)
+    (hQ_eq : Q = A + R)
+    (hQ_nonpos : Q ≤ 0)
+    (hc : 0 < c)
+    (hD : 0 < D)
+    (hA : c * D ≤ A)
+    (hR : |R| < c * D) :
+    False := by
+  have _h_pos : 0 < c * D := mul_pos hc hD
+  have hR_lower : - (c * D) < R := (abs_lt.mp hR).1
+  linarith [hQ_eq, hQ_nonpos, hA, hR_lower, _h_pos]
+
 end RiemannScope

@@ -1,7 +1,7 @@
 # Arithmetic Overlap Mechanism Investigation: Quantitative Remainder Analysis & The Contradiction Architecture
 
-**Role**: Arithmetic Researcher  
-**Epic Track**: Section 8 & Arithmetic Overlap Observable Investigation  
+**Role**: Formula Analyst & Arithmetic Researcher  
+**Epic Track**: TC Epic — Two-Variable Formula, Normalized Remainder Bound, and Bridge Testing  
 **Primary Question**: Does the complete prime–zero relationship force a positive off-line contribution that the remaining spectral and background terms cannot cancel?
 
 ---
@@ -22,25 +22,30 @@ Define the positive, locally finite prime-power measure on $(0, \infty)$:
 \[
 \mu_0 = \sum_{n \ge 2} \Lambda(n) \delta_n.
 \]
-Under coordinate dilation $D_a(x) = ax$ with scale $a = \tau^K$ ($K \in \mathbb{Z}, \ \tau = 2\pi$):
+Under coordinate dilation $D_a(x) = ax$ with scale $a_K = \tau^K$ ($K \in \mathbb{Z}, \ \tau = 2\pi$):
 \[
 \mu_K = (D_{\tau^K})_* \mu_0 = \sum_{n \ge 2} \Lambda(n) \delta_{\tau^K n}.
 \]
-The support of $\mu_K$ consists strictly of scaled prime powers:
+Arithmetic locations are $a_K n = \tau^K n$; weights are $\Lambda(n)$. The support of $\mu_K$ consists strictly of scaled prime powers:
 \[
 \operatorname{supp}(\mu_K) = \left\{ \tau^K p^m : p \text{ prime}, m \ge 1 \right\} \subset L_K = \tau^K \mathbb{Z}.
 \]
 
 ### Definition 1.1 (The Arithmetic Overlap Observable $Q_\varepsilon^{K, J}[w]$)
-Fix two distinct grades $K \ne J \in \mathbb{Z}$.
-Fix a non-negative, non-zero test window $w \in C_c^\infty((0, \infty))$ with compact support:
+Fix two distinct grades $K \ne J \in \mathbb{Z}$, with scales $a_K = \tau^K, a_J = \tau^J$.
+Fix a compact test window:
 \[
-\operatorname{supp}(w) \subset [a, b] \subset (0, \infty) \quad (0 < a < b < \infty).
+W = [a, b] \subset (0, \infty), \qquad a > \max(a_K, a_J), \qquad b > a.
 \]
-Fix a non-negative mollifier $\eta \in C_c^\infty((-1, 1))$ with $\eta(0) = 1$, $\eta(-u) = \eta(u)$, and $I_\eta = \int_{-1}^1 \eta(u) \, du > 0$.
-For $\varepsilon > 0$, define the two-variable overlap observable:
+Take real, non-negative $w \in C_c^\infty((a, b))$ with $w \not\equiv 0$.
+Take real, non-negative $\eta \in C_c^\infty((-1, 1))$ with $\eta(0) = 1$, even $\eta(-v) = \eta(v)$, and $I_\eta = \int_{-1}^1 \eta(v) \, dv > 0$.
+For $0 < \varepsilon \le 1$, define the smooth two-variable kernel:
 \[
-Q_\varepsilon^{K, J}[w] := \iint_{(0, \infty)^2} w(x) w(y) \eta\left( \frac{x - y}{\varepsilon} \right) d\mu_K(x) d\mu_J(y).
+F_\varepsilon(x, y) := w(x) w(y) \eta\left( \frac{x - y}{\varepsilon} \right),
+\]
+and the two-variable overlap observable:
+\[
+Q_\varepsilon^{K, J}[w] := \langle \mu_K \otimes \mu_J, F_\varepsilon \rangle = \iint_{(0, \infty)^2} F_\varepsilon(x, y) \, d\mu_K(x) \, d\mu_J(y).
 \]
 Because $\mu_K$ and $\mu_J$ are discrete Radon measures on $(0, \infty)$, $Q_\varepsilon^{K, J}[w]$ evaluates to the double sum:
 \[
@@ -52,7 +57,7 @@ Q_\varepsilon^{K, J}[w] = \sum_{n \ge 2} \sum_{m \ge 2} \Lambda(n) \Lambda(m) w(
 ## 2. The Exact Arithmetic Contract (Proved Arithmetic Vanishing)
 
 ### Theorem 2.1 (The Arithmetic Separation Contract)
-Let $K, J \in \mathbb{Z}$, and let $w \in C_c^\infty((0, \infty))$ with $\operatorname{supp}(w) \subset [a, b]$.
+Let $K, J \in \mathbb{Z}$, and let $w \in C_c^\infty((a, b))$ with $a > \max(\tau^K, \tau^J)$.
 Define the active station sets in $[a, b]$:
 \[
 S_K = \operatorname{supp}(\mu_K) \cap [a, b] = \left\{ \tau^K n : n \ge 2, \ \Lambda(n) > 0, \ \tau^K n \in [a, b] \right\},
@@ -61,328 +66,381 @@ S_K = \operatorname{supp}(\mu_K) \cap [a, b] = \left\{ \tau^K n : n \ge 2, \ \La
 S_J = \operatorname{supp}(\mu_J) \cap [a, b] = \left\{ \tau^J m : m \ge 2, \ \Lambda(m) > 0, \ \tau^J m \in [a, b] \right\}.
 \]
 Then:
-1. **Finiteness**: $S_K$ and $S_J$ are strictly finite:
-   \[
-   |S_K| \le \frac{b - a}{\tau^K} + 1 < \infty, \qquad |S_J| \le \frac{b - a}{\tau^J} + 1 < \infty.
-   \]
-2. **Strict Disjointness for Distinct Grades ($K \ne J$)**:
+1. **Strict Disjointness for Distinct Grades ($K \ne J$)**:
    If $K \ne J$, then $S_K \cap S_J = \emptyset$.
-   Consequently, if both $S_K$ and $S_J$ are non-empty, the inter-grade minimum station distance:
+   Consequently, the inter-grade minimum station distance:
    \[
    d_{\min} := \min_{x \in S_K, \ y \in S_J} |x - y| > 0
    \]
    is strictly positive.
-3. **Identical Arithmetic Vanishing for Small $\varepsilon$**:
+2. **Identical Arithmetic Vanishing for Small $\varepsilon$**:
    For any $0 < \varepsilon < d_{\min}$:
    \[
    Q_\varepsilon^{K, J}[w] \equiv 0 \quad \text{identically}.
    \]
-   *(If $S_K = \emptyset$ or $S_J = \emptyset$, $Q_\varepsilon^{K, J}[w] = 0$ for all $\varepsilon > 0$.)*
-4. **Diagonal Mass Control ($K = J$)**:
+3. **Diagonal Mass Control ($K = J$)**:
    When $K = J$, for all $\varepsilon < \tau^K$:
    \[
    Q_\varepsilon^{K, K}[w] = \sum_{n \ge 2} \Lambda(n)^2 w(\tau^K n)^2 > 0,
    \]
-   which is strictly positive whenever $[a, b]$ contains at least one prime-power station $\tau^K p^m$.
+   which is strictly positive whenever $[a, b]$ contains at least one prime-power station.
 
 *Proof.*
-1. Since $\tau^K > 0$ and $[a, b]$ is compact, $n$ is restricted to $[a/\tau^K, b/\tau^K]$, containing finitely many integers. Thus $S_K$ and $S_J$ are finite.
-2. Suppose $x \in S_K \cap S_J$. Then $x = \tau^K n = \tau^J m$ for integers $n, m \ge 2$ with $\Lambda(n)\Lambda(m) > 0$.
-   Since $K \ne J$, assume $K > J$. Then:
-   \[
-   \tau^{K - J} = \frac{m}{n} \in \mathbb{Q}_{>0}.
-   \]
-   However, $\tau = 2\pi$. By the Lindemann transcendence theorem (1882), $\pi$ is transcendental over $\mathbb{Q}$, hence $\tau = 2\pi$ is transcendental, and any positive integer power $\tau^{K - J}$ is transcendental. A transcendental number cannot equal a rational $m/n \in \mathbb{Q}$.
-   Therefore, no such $x$ can exist: $S_K \cap S_J = \emptyset$. Since $S_K$ and $S_J$ are finite, the finite set of positive distances $\{|x - y| : x \in S_K, y \in S_J\}$ attains a strictly positive minimum $d_{\min} > 0$.
-3. For every $(x, y) \in S_K \times S_J$, $|x - y| \ge d_{\min}$. If $\varepsilon < d_{\min}$, then $|x - y| / \varepsilon \ge d_{\min} / \varepsilon > 1$. Since $\operatorname{supp}(\eta) \subset (-1, 1)$, $\eta((x-y)/\varepsilon) = 0$ for all contributing pairs. Since $w$ vanishes outside $[a, b]$, every term in the double sum vanishes identically: $Q_\varepsilon^{K, J}[w] = 0$.
-4. For $K = J$, diagonal pairs have $x = y = \tau^K n \implies (x-y)/\varepsilon = 0 \implies \eta(0) = 1$. Off-diagonal pairs have $|x - y| = \tau^K |n - m| \ge \tau^K$. For $\varepsilon < \tau^K$, all off-diagonal terms vanish, isolating the positive diagonal sum. $\blacksquare$
+Suppose $x \in S_K \cap S_J$. Then $x = \tau^K n = \tau^J m$ for integers $n, m \ge 2$ with $\Lambda(n)\Lambda(m) > 0$.
+Assuming $K > J$, we have $\tau^{K - J} = m/n \in \mathbb{Q}_{>0}$.
+By the Lindemann transcendence theorem (1882), $\pi$ is transcendental over $\mathbb{Q}$, hence $\tau = 2\pi$ is transcendental, and any non-zero integer power $\tau^{K - J}$ is transcendental. A transcendental number cannot equal a rational $m/n \in \mathbb{Q}$.
+Therefore $S_K \cap S_J = \emptyset$. Since $S_K$ and $S_J$ are finite, $d_{\min} = \min |x - y| > 0$.
+For $\varepsilon < d_{\min}$, $|x - y|/\varepsilon > 1$, so $\eta((x-y)/\varepsilon) = 0$ identically for all contributing pairs, establishing $Q_\varepsilon^{K, J}[w] \equiv 0$. $\blacksquare$
 
 ---
 
-## 3. The Unabridged Two-Variable Graded Explicit Formula
+## 3. Repair of Established Defects in Previous Reports
 
-To analyze the spectral expansion of $Q_\varepsilon^{K, J}[w]$, define the two-variable smooth kernel:
+### 3.1 Falsification of the Previous Cutoff Condition
+Prior reports asserted an unnormalized tail bound $B_{\rm old}(\varepsilon, T) = C_p \varepsilon^{1-p} \frac{\log T}{T^{p-2}}$, and claimed that $T(\varepsilon) \gg \varepsilon^{-(p-1)/(p-2)}$ guarantees convergence to zero.
+
+**Exact Counterexample**:
+Take $p = 3$. Then $(p-1)/(p-2) = 2/1 = 2$.
+Set:
 \[
-F_\varepsilon(x, y) := w(x) w(y) \eta\left( \frac{x - y}{\varepsilon} \right) \in C_c^\infty((0, \infty)^2).
+\ell = \log(1/\varepsilon), \qquad T(\varepsilon) = \varepsilon^{-2} \sqrt{\ell}.
 \]
-Its two-variable Mellin transform is:
-\[
-\widetilde F_\varepsilon(s_1, s_2) = \iint_{(0, \infty)^2} F_\varepsilon(x, y) x^{s_1 - 1} y^{s_2 - 1} \, dx \, dy.
-\]
-By Mellin inversion on lines $\Re(s_1) = c_1 > 1, \Re(s_2) = c_2 > 1$:
-\[
-Q_\varepsilon^{K, J}[w] = \left(\frac{1}{2\pi i}\right)^2 \int_{(c_1)} \int_{(c_2)} \left(-\frac{\zeta'}{\zeta}(s_1)\right) \left(-\frac{\zeta'}{\zeta}(s_2)\right) \tau^{-K s_1 - J s_2} \widetilde F_\varepsilon(s_1, s_2) \, ds_1 \, ds_2.
-\]
-
-Shifting the contours across the critical strips to $\Re(s) = -\delta < 0$ and picking up the residues at $s = 1$, the nontrivial zeros $\rho \in Z_{\rm nt}$, and the trivial zeros $s = -2j$:
-
-### Proposition 3.1 (Complete Unabridged Two-Variable Explicit Expansion)
-\[
-Q_\varepsilon^{K, J}[w] = \mathcal{M}_{1, 1}(\varepsilon) - \mathcal{M}_{1, \rm spec}(\varepsilon) - \mathcal{M}_{\rm spec, 1}(\varepsilon) + \mathcal{M}_{\rm spec, spec}(\varepsilon) + \mathcal{R}_{\rm bg}(\varepsilon),
-\]
-where each term is explicitly given by:
-1. **Pole–Pole Residue**:
-   \[
-   \mathcal{M}_{1, 1}(\varepsilon) = \tau^{-K - J} \widetilde F_\varepsilon(1, 1) = \tau^{-K - J} \iint_{(0, \infty)^2} w(x) w(y) \eta\left(\frac{x - y}{\varepsilon}\right) \, dx \, dy.
-   \]
-2. **Mixed Pole–Zero Residues**:
-   \[
-   \mathcal{M}_{1, \rm spec}(\varepsilon) = \tau^{-K} \sum_{\rho_2 \in Z_{\rm nt}} m_{\rho_2} \tau^{-J \rho_2} \widetilde F_\varepsilon(1, \rho_2),
-   \]
-   \[
-   \mathcal{M}_{\rm spec, 1}(\varepsilon) = \tau^{-J} \sum_{\rho_1 \in Z_{\rm nt}} m_{\rho_1} \tau^{-K \rho_1} \widetilde F_\varepsilon(\rho_1, 1).
-   \]
-3. **Double Spectral Zero–Zero Sum**:
-   \[
-   \mathcal{M}_{\rm spec, spec}(\varepsilon) = \sum_{\rho_1 \in Z_{\rm nt}} \sum_{\rho_2 \in Z_{\rm nt}} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde F_\varepsilon(\rho_1, \rho_2).
-   \]
-4. **Complete Background Term $\mathcal{R}_{\rm bg}(\varepsilon)$**:
-   \[
-   \mathcal{R}_{\rm bg}(\varepsilon) = \sum_{j \ge 1} \sum_{\ell \ge 1} \tau^{2jK + 2\ell J} \widetilde F_\varepsilon(-2j, -2\ell) - \tau^{-K} \sum_{\ell \ge 1} \tau^{2\ell J} \widetilde F_\varepsilon(1, -2\ell) - \tau^{-J} \sum_{j \ge 1} \tau^{2jK} \widetilde F_\varepsilon(-2j, 1)
-   \]
-   \[
-   + \sum_{\rho_1 \in Z_{\rm nt}} \sum_{\ell \ge 1} m_{\rho_1} \tau^{-K\rho_1 + 2\ell J} \widetilde F_\varepsilon(\rho_1, -2\ell) + \sum_{j \ge 1} \sum_{\rho_2 \in Z_{\rm nt}} m_{\rho_2} \tau^{2jK - J\rho_2} \widetilde F_\varepsilon(-2j, \rho_2) + \mathcal{I}_{\rm arch}(\varepsilon),
-   \]
-   where $\mathcal{I}_{\rm arch}(\varepsilon)$ denotes the contour integrals along the shifted vertical lines $\Re(s) = -\delta$.
-
----
-
-## 4. Quantitative Remainder Decomposition: $Q_\varepsilon = A_\varepsilon(\rho_0) + R_\varepsilon$
-
-Assume the existence of an actual off-line nontrivial zero:
-\[
-\rho_0 = \beta_0 + i\gamma_0 \quad (0 < \beta_0 < 1, \ \beta_0 \ne 1/2).
-\]
-By the functional equation $\zeta(s) = \chi(s)\zeta(1-s)$ and Schwarz reflection $\zeta(\overline{s}) = \overline{\zeta(s)}$, an off-line zero occurs in a quartet:
-\[
-\mathcal{Q}(\rho_0) = \left\{ \rho_0, \ \overline{\rho_0}, \ 1 - \rho_0, \ 1 - \overline{\rho_0} \right\}.
-\]
-
-### Definition 4.1 (Isolated Off-Line Zero Contribution $A_\varepsilon(\rho_0)$)
-Define the contribution of the off-line quartet $\mathcal{Q}(\rho_0)$ in the double spectral sum:
-\[
-A_\varepsilon(\rho_0) := \sum_{\rho_1 \in \mathcal{Q}(\rho_0)} \sum_{\rho_2 \in \mathcal{Q}(\rho_0)} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde F_\varepsilon(\rho_1, \rho_2).
-\]
-Then the observable decomposes exactly as:
-\[
-Q_\varepsilon^{K, J}[w] = A_\varepsilon(\rho_0) + R_\varepsilon,
-\]
-where the complete remainder $R_\varepsilon$ is defined by:
-\[
-R_\varepsilon := \mathcal{M}_{1, 1}(\varepsilon) - \mathcal{M}_{1, \rm spec}(\varepsilon) - \mathcal{M}_{\rm spec, 1}(\varepsilon) + \sum_{\substack{(\rho_1, \rho_2) \in Z_{\rm nt}^2 \\ (\rho_1, \rho_2) \notin \mathcal{Q}(\rho_0)^2}} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde F_\varepsilon(\rho_1, \rho_2) + \mathcal{R}_{\rm bg}(\varepsilon).
-\]
-
----
-
-## 5. Separation of Truncation Error from the Bridge Remainder
-
-Let $T \ge 14.0$ be a spectral height cutoff.
-Partition the non-target nontrivial zeros into:
-- Near/intermediate spectrum: $Z_T = \{ \rho \in Z_{\rm nt} \setminus \mathcal{Q}(\rho_0) : |\Im\rho| \le T \}$,
-- Tail spectrum: $Z_{>T} = \{ \rho \in Z_{\rm nt} : |\Im\rho| > T \}$.
-
-The complete remainder $R_\varepsilon$ separates strictly into:
-\[
-R_\varepsilon = R_{\varepsilon, \le T} + E_{\rm trunc}(\varepsilon, T),
-\]
-where:
-
-### 1. The Truncated Bridge Remainder $R_{\varepsilon, \le T}$:
-\[
-R_{\varepsilon, \le T} := \mathcal{M}_{1, 1}(\varepsilon) - \mathcal{M}_{1, \le T}(\varepsilon) - \mathcal{M}_{\le T, 1}(\varepsilon) + \sum_{\substack{\rho_1, \rho_2 \in Z_T \cup \mathcal{Q}(\rho_0) \\ (\rho_1, \rho_2) \notin \mathcal{Q}(\rho_0)^2}} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde F_\varepsilon(\rho_1, \rho_2) + \mathcal{R}_{\rm bg, \le T}(\varepsilon).
-\]
-This contains all low-frequency spectral interactions, the pole at $s=1$, the background terms, and the cross-terms between $\mathcal{Q}(\rho_0)$ and the on-line zeros below height $T$.
-
-### 2. The Spectral Truncation Error $E_{\rm trunc}(\varepsilon, T)$:
-\[
-E_{\rm trunc}(\varepsilon, T) := \sum_{\substack{\rho_1 \in Z_{>T} \text{ or } \rho_2 \in Z_{>T}}} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde F_\varepsilon(\rho_1, \rho_2) - \mathcal{M}_{1, >T}(\varepsilon) - \mathcal{M}_{>T, 1}(\varepsilon) + \mathcal{R}_{\rm bg, >T}(\varepsilon).
-\]
-
-> [!IMPORTANT]
-> **Crucial Distinction**: Bounding $E_{\rm trunc}(\varepsilon, T) \to 0$ as $T \to \infty$ only certifies that the finite sum $R_{\varepsilon, \le T}$ accurately approximates the full remainder $R_\varepsilon$. It does **not** show that $R_{\varepsilon, \le T}$ is small or that its terms cannot cancel $A_\varepsilon(\rho_0)$. The two errors must be governed separately.
-
----
-
-## 6. Specification of the Joint Limit Bound $B(\varepsilon, T)$
-
-To quantify $E_{\rm trunc}(\varepsilon, T)$, substitute $y = x - \varepsilon u$ in $\widetilde F_\varepsilon(\rho_1, \rho_2)$:
-\[
-\widetilde F_\varepsilon(\rho_1, \rho_2) = \varepsilon \int_a^b dx \, w(x) x^{\rho_1 - 1} \int_{-1}^1 du \, \eta(u) w(x - \varepsilon u) (x - \varepsilon u)^{\rho_2 - 1}.
-\]
-Integration by parts $p$ times in $x$ gives:
-\[
-|\widetilde F_\varepsilon(\rho_1, \rho_2)| \le \frac{1}{|\gamma_1|^p} \int_a^b \left| \partial_x^p \left( w(x) x^{\beta_1 - 1} \int_{-1}^1 \eta(u) w(x - \varepsilon u) (x - \varepsilon u)^{\rho_2 - 1} du \right) \right| dx.
-\]
-Because $\partial_x$ falls on both $w(x)$ and $w(x - \varepsilon u)$, derivatives of the mollifier $\eta((x-y)/\varepsilon)$ introduce negative powers of $\varepsilon$:
-\[
-\left\| \partial_x^p F_\varepsilon \right\|_{L^\infty} \le C_p(w) \|\eta\|_{C^p} \, \varepsilon^{-p}.
-\]
-Consequently, for any $p \ge 3$:
-\[
-|\widetilde F_\varepsilon(\rho_1, \rho_2)| \le \frac{C_p(w, \eta) \, \varepsilon^{1 - p}}{(1 + |\gamma_1|)^p}.
-\]
-Applying Trudgian's unconditional zero-counting bound $N(t) \le \frac{t}{2\pi}\log t$ for $t \ge 14.0$:
-\[
-\sum_{|\gamma| > T} \frac{1}{(1 + |\gamma|)^p} = \int_T^\infty \frac{dN(t)}{t^p} \le \frac{p}{2\pi} \int_T^\infty \frac{\log t}{t^p} dt \le \frac{p}{2\pi(p-1)} \frac{\log T}{T^{p-1}} + \frac{1}{2\pi(p-1)^2 T^{p-1}}.
-\]
-Summing over the two-variable tail:
-
-### Lemma 6.1 (Joint Truncation Bound $B(\varepsilon, T)$)
-For any $p \ge 3$, there exists a constant $C_p > 0$ depending only on $w, \eta, K, J$ such that:
-\[
-|E_{\rm trunc}(\varepsilon, T)| \le B(\varepsilon, T) := C_p \frac{\varepsilon^{1 - p} \log T}{T^{p-2}}.
-\]
-
-### Analysis of the Joint Limit Trajectory $T = T(\varepsilon)$:
-- For any **fixed** $\varepsilon > 0$, $\lim_{T \to \infty} B(\varepsilon, T) = 0$.
-- However, as $\varepsilon \to 0$, the factor $\varepsilon^{1-p}$ diverges.
-- To maintain control of the truncation error ($B(\varepsilon, T(\varepsilon)) \to 0$ as $\varepsilon \to 0$), the spectral cutoff $T(\varepsilon)$ must grow fast enough to beat the singularity:
-  \[
-  \frac{\log T(\varepsilon)}{T(\varepsilon)^{p-2}} \ll \varepsilon^{p-1} \implies T(\varepsilon) \ge \left( \frac{1}{\varepsilon} \right)^{\frac{p-1}{p-2} + \delta} \quad (\delta > 0).
-  \]
-  For example, taking $p = 4$ requires $T(\varepsilon) \ge \varepsilon^{-3/2 - \delta}$.
-
----
-
-## 7. The Core Research Question: Positivity vs. Exact Cancellation
-
-We now investigate the decisive research question:
-> **Does the complete prime–zero relationship force a positive off-line contribution that the remaining terms cannot cancel?**
-> Specifically: Under the assumption of an actual off-line zero $\rho_0$, can one establish:
-> \[
-> A_\varepsilon(\rho_0) \ge c D(\rho_0), \qquad |R_\varepsilon| \le r_\varepsilon \to 0,
-> \]
-> with $c > 0$ independent of every varying cutoff or localization parameter?
-
-### 7.1 Quantitative Asymptotic Scaling of $A_\varepsilon(\rho_0)$
-Substitute $y = x - \varepsilon u$ in $\widetilde F_\varepsilon(\rho_1, \rho_2)$:
-\[
-\widetilde F_\varepsilon(\rho_1, \rho_2) = \varepsilon \int_{-1}^1 \eta(u) du \int_a^b w(x)^2 x^{\rho_1 + \rho_2 - 2} dx + \varepsilon^2 \int_{-1}^1 u \eta(u) du \int_a^b \dots + O(\varepsilon^3).
-\]
-Since $\eta$ is even, $\int_{-1}^1 u \eta(u) du = 0$.
-Let $I_\eta = \int_{-1}^1 \eta(u) du > 0$, and $\widetilde{w^2}(s) = \int_a^b w(x)^2 x^{s-1} dx$.
 Then:
 \[
-\widetilde F_\varepsilon(\rho_1, \rho_2) = \varepsilon I_\eta \, \widetilde{w^2}(\rho_1 + \rho_2 - 1) + O(\varepsilon^3).
+\frac{T(\varepsilon)}{\varepsilon^{-2}} = \sqrt{\ell} \longrightarrow \infty \quad \text{as } \varepsilon \to 0,
 \]
-Therefore, the isolated zero term evaluates to:
+so $T(\varepsilon) \gg \varepsilon^{-2}$ is strictly satisfied.
+However, evaluate the bound:
 \[
-A_\varepsilon(\rho_0) = \varepsilon I_\eta \sum_{\rho_1, \rho_2 \in \mathcal{Q}(\rho_0)} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde{w^2}(\rho_1 + \rho_2 - 1) + O(\varepsilon^3).
+\log T(\varepsilon) = \log(\varepsilon^{-2} \sqrt{\ell}) = 2\log(1/\varepsilon) + \frac{1}{2}\log\ell = 2\ell + \frac{1}{2}\log\ell.
 \]
-Consequently:
+Substituting into $B_{\rm old}$:
 \[
-\lim_{\varepsilon \to 0} A_\varepsilon(\rho_0) = 0.
+\frac{B_{\rm old}}{C_p} = \varepsilon^{-2} \frac{\log T}{T} = \varepsilon^{-2} \frac{2\ell + \frac{1}{2}\log\ell}{\varepsilon^{-2} \sqrt{\ell}} = \frac{2\ell + \frac{1}{2}\log\ell}{\sqrt{\ell}} = 2\sqrt{\ell} + \frac{\log\ell}{2\sqrt{\ell}} \longrightarrow \infty!
 \]
-$A_\varepsilon(\rho_0)$ vanishes linearly with $\varepsilon$. It **does not** remain bounded below by a fixed non-zero constant $c D(\rho_0) > 0$ as $\varepsilon \to 0$.
+This rigorously falsifies the claim that $T(\varepsilon) \gg \varepsilon^{-(p-1)/(p-2)}$ is sufficient for convergence.
 
-### 7.2 The Normalized Observable $\bar Q_\varepsilon := \varepsilon^{-1} Q_\varepsilon$
-To investigate whether an $O(1)$ lower bound exists, define the normalized observable:
+### 3.2 Normalization and the Corrected Error Scale
+When using the normalized observable:
 \[
-\bar Q_\varepsilon^{K, J}[w] := \frac{1}{\varepsilon} Q_\varepsilon^{K, J}[w] = \bar A_\varepsilon(\rho_0) + \bar R_\varepsilon,
+\bar Q_\varepsilon := \frac{Q_\varepsilon}{\varepsilon},
 \]
-where:
+the truncation error is also divided by $\varepsilon$.
+The mathematical requirement for the truncation error to vanish asymptotically is:
 \[
-\bar A_\varepsilon(\rho_0) := \frac{A_\varepsilon(\rho_0)}{\varepsilon} = I_\eta \sum_{\rho_1, \rho_2 \in \mathcal{Q}(\rho_0)} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde{w^2}(\rho_1 + \rho_2 - 1) + O(\varepsilon^2),
-\]
-\[
-\bar R_\varepsilon := \frac{R_\varepsilon}{\varepsilon}.
-\]
-As $\varepsilon \to 0$, $\bar A_\varepsilon(\rho_0)$ has a well-defined non-zero limit:
-\[
-\bar A_0(\rho_0) := \lim_{\varepsilon \to 0} \bar A_\varepsilon(\rho_0) = I_\eta \sum_{\rho_1, \rho_2 \in \mathcal{Q}(\rho_0)} m_{\rho_1} m_{\rho_2} \tau^{-K \rho_1 - J \rho_2} \widetilde{w^2}(\rho_1 + \rho_2 - 1).
-\]
-For conjugate pairs $(\rho_0, \overline{\rho_0})$ with $\rho_0 = \beta_0 + i\gamma_0$:
-\[
-\rho_0 + \overline{\rho_0} - 1 = 2\beta_0 - 1 = 2(\beta_0 - 1/2) \ne 0.
-\]
-The grade character factor is:
-\[
-\tau^{-K\rho_0 - J\overline{\rho_0}} + \tau^{-K\overline{\rho_0} - J\rho_0} = 2 \tau^{-(K+J)\beta_0} \cos\left( (K - J)\gamma_0 \log\tau \right).
+\bar E_{\rm trunc}(\varepsilon, T(\varepsilon)) = \frac{E_{\rm trunc}(\varepsilon, T(\varepsilon))}{\varepsilon} = o(1) \iff E_{\rm trunc}(\varepsilon, T(\varepsilon)) = o(\varepsilon).
 \]
 
-### 7.3 The Exact Cancellation Mechanism
-Now apply Theorem 2.1 (Arithmetic Contract):
-For distinct grades $K \ne J$, Lindemann transcendence guarantees $S_K \cap S_J = \emptyset$, so $d_{\min} > 0$.
-For all $0 < \varepsilon < d_{\min}$:
+Assuming a bound of the form $C_p \varepsilon^{1-p} \frac{\log^k(2+T)}{T^{p-2}}$ ($k \in \{1, 2\}$), division by $\varepsilon$ yields:
 \[
-Q_\varepsilon^{K, J}[w] \equiv 0 \implies \bar Q_\varepsilon^{K, J}[w] = \frac{0}{\varepsilon} \equiv 0.
+\bar B(\varepsilon, T) = C_p \varepsilon^{-p} \frac{\log^k(2+T)}{T^{p-2}}.
 \]
-Because the explicit formula identity holds identically for every $\varepsilon > 0$:
-\[
-\bar Q_\varepsilon^{K, J}[w] = \bar A_\varepsilon(\rho_0) + \bar R_\varepsilon \equiv 0 \quad \text{for all } 0 < \varepsilon < d_{\min}.
-\]
-Therefore:
-\[
-\bar R_\varepsilon = -\bar A_\varepsilon(\rho_0) \quad \text{identically for all } 0 < \varepsilon < d_{\min}!
-\]
-Taking $\varepsilon \to 0$:
-\[
-\lim_{\varepsilon \to 0} \bar R_\varepsilon = -\bar A_0(\rho_0).
-\]
+Under a strict power choice $T = \varepsilon^{-\alpha}$:
+- For the unnormalized bound: $B \sim \varepsilon^{1 - p + \alpha(p-2)} \log^k(1/\varepsilon) \to 0 \iff \alpha > \frac{p-1}{p-2}$.
+- For the normalized bound: $\bar B \sim \varepsilon^{-p + \alpha(p-2)} \log^k(1/\varepsilon) \to 0 \iff \alpha > \frac{p}{p-2}$.
 
-### Mathematical Theorem 7.2 (The Exact Cancellation Identity)
-The complete prime–zero explicit formula forces:
+For $p = 4$, $\frac{p}{p-2} = \frac{4}{2} = 2$.
+Choosing $\alpha = 3 > 2$ gives:
 \[
-\bar R_0 = -\bar A_0(\rho_0).
+-p + \alpha(p-2) = -4 + 3(2) = 2 > 0,
 \]
-That is: the sum of the pole terms, the mixed pole-zero terms, the infinite sum over all other nontrivial zeros, and the background terms **identically cancels** the off-line zero contribution $\bar A_0(\rho_0)$ on any fixed compact window for all $\varepsilon < d_{\min}$.
+guaranteeing that the normalized error decays as $O(\varepsilon^2 \log^k(1/\varepsilon)) \to 0$.
 
-**Research Implication**:
-The remainder $\bar R_\varepsilon$ **cannot** be made arbitrarily small independently of $\bar A_\varepsilon(\rho_0)$.
-If an off-line zero existed, its contribution $\bar A_0(\rho_0)$ is precisely cancelled by the remaining terms in the complete distribution.
-Therefore:
-- In the fixed-window framework, an off-line zero does **not** force an uncompensated positive excess.
-- The conditional spectral lower bound $Q_\varepsilon \ge c D(\rho_0) - r_\varepsilon$ with $r_\varepsilon \to 0$ **does not hold** on fixed compact windows.
-- The bridge classification is: **Arithmetic vanishing proved; conditional spectral lower bound unproved**.
+### 3.3 Exact Cancellation Is an Identity, Not an Impossibility Proof
+From $Q_\varepsilon \equiv 0$ for $\varepsilon < d_{\min}$ and an exact decomposition $Q_\varepsilon = A_\varepsilon + R_\varepsilon$, algebra forces $R_\varepsilon = -A_\varepsilon$ for all $\varepsilon < d_{\min}$.
+This algebraic fact alone does not prove that every fixed-window bridge is impossible in principle; passing to separate normalized limits requires their independent existence and properties to be evaluated.
 
 ---
 
-## 8. The Three Foundational Findings
+## 4. Complete One-Variable Graded Explicit Identity
 
-### Finding 1: Scope of the Gaussian Escaping Barrier
-The Section 7E log-Gaussian test family $\phi_L(x)$ has support $\operatorname{supp}(\phi_L) \subset [e^L, e^{17L}]$. For any fixed window $[a, b]$, $\operatorname{supp}(\phi_L) \cap [a, b] = \emptyset$ for all $L > \log b$.
-- This proves that the *specific* family $\phi_L$ escapes every fixed window.
-- It does **not** rule out every fixed-window argument. Other families of test functions (e.g., fixed smooth bumps $w \in C_c^\infty((a, b))$) or global two-variable distributions remain eligible for fixed-window analysis.
-
-### Finding 2: Resolution Below the Arithmetic Gap Is Already Possible
-Whenever $\Delta_L := \min \{ |x - y| : x \in S_K, y \in S_J \} > 0$, choosing:
+### 4.1 Derivation from the Uncompleted Zeta Logarithmic Derivative
+Let $a_K = \tau^K$ and consider a test function $f \in C_c^\infty((a, b))$ with $a > a_K$.
+The pushforward arithmetic measure is $\mu_K = \sum_{n \ge 2} \Lambda(n) \delta_{a_K n}$.
+By Mellin inversion on $\Re(s) = c > 1$:
 \[
-0 < \varepsilon_L < \min\left\{ \frac{1}{L}, \ \frac{\Delta_L}{2} \right\}
+f(x) = \frac{1}{2\pi i} \int_{(c)} \widetilde f(s) x^{-s} \, ds, \qquad \widetilde f(s) = \int_0^\infty f(x) x^{s-1} \, dx.
 \]
-guarantees $Q_{\varepsilon_L} = 0$ identically.
-- Thus, achieving zero overlap on the arithmetic side is already mathematically trivial.
-- The true, substantive bottleneck is whether such a resolution $\varepsilon_L$ is compatible with a proved spectral remainder estimate:
-  \[
-  B(\varepsilon_L, T) \le C_p \frac{\varepsilon_L^{1-p} \log T}{T^{p-2}} < \frac{c D}{2}.
-  \]
-  As shown in Section 6, shrinking $\varepsilon_L$ forces $T$ to grow at least as $\varepsilon_L^{-(p-1)/(p-2)}$, and even with $T \to \infty$, the remaining non-tail terms $\bar R_{\varepsilon, \le T}$ cancel $\bar A_\varepsilon(\rho_0)$. A Diophantine separation sweep alone cannot bridge this gap.
+Pairing with $\mu_K$:
+\[
+\langle \mu_K, f \rangle = \sum_{n \ge 2} \Lambda(n) f(a_K n) = \frac{1}{2\pi i} \int_{(c)} \left( -\frac{\zeta'}{\zeta}(s) \right) a_K^{-s} \widetilde f(s) \, ds.
+\]
+Because $f \in C_c^\infty((a, b))$, $\widetilde f(s)$ is an entire function with superpolynomial decay in vertical strips:
+$|\widetilde f(\sigma + it)| \le C_N(1 + |t|)^{-N}$ for every $N \ge 0$, uniformly on compact $\sigma$-intervals.
+Shifting the contour to $\Re(s) \to -\infty$ across the critical strip picks up residues:
+1. Pole at $s = 1$: Residue $+1$, contributing $+a_K^{-1} \widetilde f(1)$.
+2. Nontrivial zeros $\rho \in Z_{\rm nt}$: At each zero of multiplicity $m_\rho$, $-\frac{\zeta'}{\zeta}(s)$ has residue $-m_\rho$, contributing $- \sum_{\rho \in Z_{\rm nt}} m_\rho a_K^{-\rho} \widetilde f(\rho)$.
+3. Trivial zeros at $s = -2j$ ($j \ge 1$): Simple poles with residue $-1$, contributing $- \sum_{j \ge 1} a_K^{2j} \widetilde f(-2j)$.
 
-### Finding 3: Moving Windows Lose the Exact-Coincidence Conclusion
-If one attempts to track the escaping Gaussian family by expanding the window $W_L = [e^L, e^{17L}]$:
-- On an unbounded or expanding domain, stations $x_n \in S_K(L)$ and $y_n \in S_J(L)$ can satisfy $|x_n - y_n| \to 0$ as $L \to \infty$ without ever coinciding ($x_n \ne y_n$ for all $n$).
-- The Lindemann compactness argument (Theorem 2.1, Part 4: pigeonhole extraction of a single pair $(x^*, y^*)$ from a finite set) **fails** on non-compact domains where infinitely many pairs exist.
-- Any expanding-window proposal must supply an explicit mathematical replacement for the compactness argument to deduce an exact coincidence $m\tau^K = n\tau^J$.
+Therefore:
+\[
+\langle \mu_K, f \rangle = a_K^{-1} \widetilde f(1) - \sum_{\rho \in Z_{\rm nt}} m_\rho a_K^{-\rho} \widetilde f(\rho) - \sum_{j \ge 1} a_K^{2j} \widetilde f(-2j).
+\]
+
+### 4.2 Closed Geometric Summation of the Trivial-Zero Background
+For support above $a_K$ ($x \ge a > a_K$), $a_K / x < 1$.
+The trivial-zero series can be summed under the integral sign:
+\[
+\sum_{j \ge 1} a_K^{2j} \widetilde f(-2j) = \int_a^b f(x) \left( \sum_{j \ge 1} a_K^{2j} x^{-2j-1} \right) dx.
+\]
+Summing the geometric series:
+\[
+\sum_{j \ge 1} a_K^{2j} x^{-2j-1} = x^{-1} \sum_{j \ge 1} \left(\frac{a_K^2}{x^2}\right)^j = x^{-1} \frac{a_K^2 / x^2}{1 - a_K^2 / x^2} = \frac{a_K^2}{x(x^2 - a_K^2)}.
+\]
+Define the smooth background density:
+\[
+b_K(x) := a_K^{-1} - \frac{a_K^2}{x(x^2 - a_K^2)}, \qquad \mathcal{B}_K := b_K(x) \, dx,
+\]
+and the nontrivial zero spectral distribution on $(a, b)$:
+\[
+\mathcal{Z}_K := \sum_{\rho \in Z_{\rm nt}} m_\rho a_K^{-\rho} x^{\rho-1} \, dx.
+\]
+Then as distributions on $(a, b)$ with $a > a_K$:
+\[
+\mu_K = \mathcal{B}_K - \mathcal{Z}_K.
+\]
 
 ---
 
-## 9. Epistemic Classification & Lean 4 Formalization
+## 5. Complete Two-Variable Graded Explicit Expansion
 
-The formalization in `formal/RiemannScope/Grade.lean` establishes:
-```lean
-theorem candidate_bridge_positivity_contradiction (Q c D : ℝ)
-    (hQ_nonpos : Q ≤ 0)
-    (h_lower : c * D ≤ Q)
-    (hc : c > 0)
-    (hD : D > 0) : False := by
-  have h_pos : c * D > 0 := mul_pos hc hD
-  linarith
-```
-- **What this lemma proves**: It formalizes the contradiction endpoint of the *reductio ad absurdum*:
-  If an argument were to establish $Q \le 0$ (arithmetic vanishing) and independently derive $Q \ge c D > 0$ (conditional spectral lower bound), then `False` would result, excluding the hypothesis.
-- **What this lemma does NOT prove**: It does not supply the missing spectral lower bound $Q \ge c D - r_\varepsilon$, nor does it estimate the remainder $R_\varepsilon$.
+### 5.1 The Nine Uncombined Terms
+Because $\mu_K = \mathcal{P}_K - \mathcal{Z}_K - \mathcal{T}_K$, where $\mathcal{P}_K = a_K^{-1} dx$ is the pole at $s=1$ and $\mathcal{T}_K = \frac{a_K^2}{x(x^2 - a_K^2)} dx$ is the trivial-zero background, the tensor product $\mu_K \otimes \mu_J$ acting on $F_\varepsilon(x, y)$ expands bilinearly into $3 \times 3 = 9$ terms:
+\[
+\begin{aligned}
+Q_\varepsilon^{K, J}[w] ={}& \langle \mathcal{P}_K \otimes \mathcal{P}_J, F_\varepsilon \rangle
+- \langle \mathcal{P}_K \otimes \mathcal{Z}_J, F_\varepsilon \rangle
+- \langle \mathcal{P}_K \otimes \mathcal{T}_J, F_\varepsilon \rangle \\
+&{}- \langle \mathcal{Z}_K \otimes \mathcal{P}_J, F_\varepsilon \rangle
++ \langle \mathcal{Z}_K \otimes \mathcal{Z}_J, F_\varepsilon \rangle
++ \langle \mathcal{Z}_K \otimes \mathcal{T}_J, F_\varepsilon \rangle \\
+&{}- \langle \mathcal{T}_K \otimes \mathcal{P}_J, F_\varepsilon \rangle
++ \langle \mathcal{T}_K \otimes \mathcal{Z}_J, F_\varepsilon \rangle
++ \langle \mathcal{T}_K \otimes \mathcal{T}_J, F_\varepsilon \rangle.
+\end{aligned}
+\]
 
-### Final Classification
-- **Arithmetic Side**: **PROVED** (Theorem 2.1: $Q_\varepsilon \equiv 0$ for $\varepsilon < d_{\min}$).
-- **Contradiction Endpoint**: **FORMALLY PROVED** in Lean 4 (`candidate_bridge_positivity_contradiction`).
-- **Conditional Spectral Lower Bound**: **UNPROVED / STRICTLY OPEN** (Section 7: complete explicit formula forces exact cancellation $\bar R_0 = -\bar A_0(\rho_0)$).
-- **Transcendental Continuation Bridge**: **STRICTLY OPEN**.
+Using the double Mellin transform kernel:
+\[
+H_\varepsilon(s, t) := \iint_{(0, \infty)^2} F_\varepsilon(x, y) x^{s-1} y^{t-1} \, dx \, dy,
+\]
+the 9 uncombined terms evaluate explicitly as:
+1. **Pole–Pole**: $+a_K^{-1} a_J^{-1} H_\varepsilon(1, 1)$
+2. **Pole–Zero**: $-a_K^{-1} \sum_{\sigma \in Z_{\rm nt}} m_\sigma a_J^{-\sigma} H_\varepsilon(1, \sigma)$
+3. **Pole–Trivial**: $-a_K^{-1} \sum_{\ell \ge 1} a_J^{2\ell} H_\varepsilon(1, -2\ell)$
+4. **Zero–Pole**: $-a_J^{-1} \sum_{\rho \in Z_{\rm nt}} m_\rho a_K^{-\rho} H_\varepsilon(\rho, 1)$
+5. **Zero–Zero**: $+\sum_{\rho, \sigma \in Z_{\rm nt}} m_\rho m_\sigma a_K^{-\rho} a_J^{-\sigma} H_\varepsilon(\rho, \sigma)$
+6. **Zero–Trivial**: $+\sum_{\rho \in Z_{\rm nt}, \ell \ge 1} m_\rho a_K^{-\rho} a_J^{2\ell} H_\varepsilon(\rho, -2\ell)$
+7. **Trivial–Pole**: $-a_J^{-1} \sum_{j \ge 1} a_K^{2j} H_\varepsilon(-2j, 1)$
+8. **Trivial–Zero**: $+\sum_{j \ge 1, \sigma \in Z_{\rm nt}} m_\sigma a_K^{2j} a_J^{-\sigma} H_\varepsilon(-2j, \sigma)$
+9. **Trivial–Trivial**: $+\sum_{j \ge 1, \ell \ge 1} a_K^{2j} a_J^{2\ell} H_\varepsilon(-2j, -2\ell)$.
+
+### 5.2 The Combined Four-Term Tensor Expansion
+Combining $\mathcal{B}_K = \mathcal{P}_K - \mathcal{T}_K$ and $\mathcal{B}_J = \mathcal{P}_J - \mathcal{T}_J$:
+\[
+Q_\varepsilon = \langle \mathcal{B}_K \otimes \mathcal{B}_J, F_\varepsilon \rangle - \langle \mathcal{B}_K \otimes \mathcal{Z}_J, F_\varepsilon \rangle - \langle \mathcal{Z}_K \otimes \mathcal{B}_J, F_\varepsilon \rangle + \langle \mathcal{Z}_K \otimes \mathcal{Z}_J, F_\varepsilon \rangle.
+\]
+This algebraic identity is formally proved in Lean 4:
+- `two_variable_tensor_decomposition_algebra` (4-term form)
+- `two_variable_nine_term_expansion_algebra` (9-term form).
+
+---
+
+## 6. The Selected Spectral Contribution $A_{\varepsilon, \Gamma}$ and Normalized Limit
+
+### 6.1 Definition of the Selected Contribution
+Assume the existence of an off-line nontrivial zero $\rho_0 = \beta_0 + i\gamma_0$ ($0 < \beta_0 < 1, \beta_0 \ne 1/2$).
+The functional-equation and reflection orbit defines the quartet:
+\[
+\Gamma(\rho_0) := \left\{ \rho_0, \ \overline{\rho_0}, \ 1 - \rho_0, \ 1 - \overline{\rho_0} \right\}.
+\]
+If $\rho_0$ is on the critical line ($\beta_0 = 1/2$), $\Gamma$ collapses to the pair $\{\rho_0, \overline{\rho_0}\}$.
+In either case, $\Gamma$ is closed under complex conjugation.
+Define the finite spectral density:
+\[
+f_{K, \Gamma}(x) := \sum_{\rho \in \Gamma} m_\rho a_K^{-\rho} x^{\rho-1}.
+\]
+Since $\overline{a_K^{-\rho} x^{\rho-1}} = a_K^{-\overline{\rho}} x^{\overline{\rho}-1}$ and $\rho \mapsto \overline{\rho}$ permutes $\Gamma$ preserving multiplicities $m_{\overline\rho} = m_\rho$, we have:
+\[
+\overline{f_{K, \Gamma}(x)} = f_{K, \Gamma}(x) \in \mathbb{R} \quad \text{for all } x > 0.
+\]
+Define the selected $\Gamma \times \Gamma$ block of the double zero sum:
+\[
+A_{\varepsilon, \Gamma} := \iint_{(0, \infty)^2} F_\varepsilon(x, y) f_{K, \Gamma}(x) f_{J, \Gamma}(y) \, dx \, dy.
+\]
+Because $F_\varepsilon$ and $f$ are real-valued, $A_{\varepsilon, \Gamma} \in \mathbb{R}$.
+
+### 6.2 Proved Normalized Finite-Block Limit
+Substitute $y = x - \varepsilon v$ ($v = (x-y)/\varepsilon$):
+\[
+\frac{A_{\varepsilon, \Gamma}}{\varepsilon} = \int_{-1}^1 \eta(v) \, dv \int_a^b w(x) f_{K, \Gamma}(x) w(x - \varepsilon v) f_{J, \Gamma}(x - \varepsilon v) \, dx.
+\]
+Let $u_K(x) = w(x) f_{K, \Gamma}(x)$ and $u_J(x) = w(x) f_{J, \Gamma}(x)$. Since $w \in C_c^\infty((a, b))$, $u_K, u_J \in C_c^\infty((a, b))$.
+Taylor expanding $u_J(x - \varepsilon v) = u_J(x) - \varepsilon v u_J'(x) + \frac{1}{2} \varepsilon^2 v^2 u_J''(\xi)$:
+\[
+\frac{A_{\varepsilon, \Gamma}}{\varepsilon} = \left( \int_{-1}^1 \eta(v) \, dv \right) \int_a^b w(x)^2 f_{K, \Gamma}(x) f_{J, \Gamma}(x) \, dx - \varepsilon \left( \int_{-1}^1 v \eta(v) \, dv \right) \int_a^b u_K u_J' \, dx + O(\varepsilon^2).
+\]
+Because $\eta$ is even, $\int_{-1}^1 v \eta(v) \, dv = 0$.
+Therefore, the first-order error vanishes identically, yielding:
+\[
+\frac{A_{\varepsilon, \Gamma}}{\varepsilon} = A_{0, \Gamma} + O(\varepsilon^2),
+\]
+where the limit coefficient is:
+\[
+A_{0, \Gamma} := \left( \int_{-1}^1 \eta(v) \, dv \right) \int_a^b w(x)^2 f_{K, \Gamma}(x) f_{J, \Gamma}(x) \, dx.
+\]
+
+### 6.3 Audit of $A_{0, \Gamma}$ and Falsification of $A_{0, \Gamma} = c D_M(\rho_0)$
+On the critical line ($\rho_0 = 1/2 + i\gamma_0$), $\Gamma = \{1/2 + i\gamma_0, 1/2 - i\gamma_0\}$.
+Then:
+\[
+f_{K, \Gamma}(x) = 2 a_K^{-1/2} x^{-1/2} \cos\left(\gamma_0 \log(x / a_K)\right),
+\]
+\[
+f_{K, \Gamma}(x) f_{J, \Gamma}(x) = 2 (a_K a_J)^{-1/2} x^{-1} \left[ \cos\left( (K - J)\gamma_0 \log\tau \right) + \cos\left( \gamma_0 \log\left( \frac{x^2}{a_K a_J} \right) \right) \right].
+\]
+Consequently, $A_{0, \Gamma}$ contains a non-oscillatory baseline:
+\[
+2 I_\eta (a_K a_J)^{-1/2} \cos(M \gamma_0 \log\tau) \int_a^b w(x)^2 x^{-1} \, dx \ne 0.
+\]
+Recall the distance functional:
+\[
+D_M(\rho_0) := 4 \sinh^2\left( \frac{M(\Re\rho_0 - 1/2)\log\tau}{2} \right).
+\]
+On the critical line, $\Re\rho_0 = 1/2 \implies D_M(\rho_0) = 0$.
+However, quadrature confirms $A_{0, \Gamma} \approx 0.5444 \ne 0$.
+**Mathematical Finding**:
+Any asserted identity $A_{0, \Gamma} = c D_M(\rho_0)$ is **definitively false**. $A_{0, \Gamma}$ does not vanish on the critical line.
+
+---
+
+## 7. Genuine Two-Variable Truncation Bound
+
+### 7.1 Definition of Square Spectral Truncation
+For spectral height $T \ge 14.0$, define the truncated spectral measure:
+\[
+\mathcal{Z}_{K, T} := \sum_{\substack{\rho \in Z_{\rm nt} \\ |\Im\rho| \le T}} m_\rho a_K^{-\rho} x^{\rho-1} \, dx, \qquad \mu_{K, T}^{\rm spec} := \mathcal{B}_K - \mathcal{Z}_{K, T}.
+\]
+Define the square-truncated observable and truncation error:
+\[
+Q_{\varepsilon, T} := \langle \mu_{K, T}^{\rm spec} \otimes \mu_{J, T}^{\rm spec}, F_\varepsilon \rangle, \qquad E_{\varepsilon, T} := Q_\varepsilon - Q_{\varepsilon, T}.
+\]
+Expanding $E_{\varepsilon, T}$:
+\[
+E_{\varepsilon, T} = - \langle \mathcal{B}_K \otimes (\mathcal{Z}_J - \mathcal{Z}_{J, T}), F_\varepsilon \rangle - \langle (\mathcal{Z}_K - \mathcal{Z}_{K, T}) \otimes \mathcal{B}_J, F_\varepsilon \rangle + \left( \langle \mathcal{Z}_K \otimes \mathcal{Z}_J, F_\varepsilon \rangle - \langle \mathcal{Z}_{K, T} \otimes \mathcal{Z}_{J, T}, F_\varepsilon \rangle \right).
+\]
+The double-zero error covers all pairs $(\rho_1, \rho_2)$ where $\max(|\Im\rho_1|, |\Im\rho_2|) > T$.
+
+### 7.2 Proof of the Conservative Bound
+We prove:
+\[
+|E_{\varepsilon, T}| \le C_{p, W, w, \eta, K, J} \, \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}} \quad (p \in \mathbb{N}, \ p > 2).
+\]
+
+*Derivation*:
+1. **Logarithmic substitution**:
+   Substitute $x = e^u, y = e^v$. Then $u, v \in [\log a, \log b] = I_W$.
+   $H_\varepsilon(s_1, s_2) = \iint_{\mathbb{R}^2} G_{\varepsilon, \beta_1, \beta_2}(u, v) e^{i(\gamma_1 u + \gamma_2 v)} \, du \, dv$,
+   where $G(u, v) = e^{\beta_1 u + \beta_2 v} w(e^u) w(e^v) \eta((e^u - e^v)/\varepsilon)$.
+   Support of $G$ is contained in $I_W \times I_W$ and the strip $|u - v| \le \varepsilon / a$, which has area $O(\varepsilon)$.
+2. **Derivative and $L^1$ bounds**:
+   By Leibniz and chain rules, $\partial_u^p G$ produces terms of order $\varepsilon^{-p}$.
+   Integrating over the support strip of width $O(\varepsilon)$:
+   \[
+   \|\partial_u^p G\|_{L^1} \le C_p \varepsilon^{-p} \cdot \operatorname{Area}(\operatorname{supp}(G)) \le C_p' \varepsilon^{1-p}.
+   \]
+3. **Integration by parts**:
+   Integrating by parts $p$ times in the variable with the larger absolute ordinate $\max(|\gamma_1|, |\gamma_2|)$:
+   \[
+   |H_\varepsilon(s_1, s_2)| \le C_p \varepsilon^{1-p} (1 + \max(|\gamma_1|, |\gamma_2|))^{-p}.
+   \]
+4. **Dyadic Shell Pair Counting**:
+   By Trudgian (2014, Corollary 1), the unconditional counting function satisfies $N_*(R) \le C_N R \log(2+R)$.
+   Partition the tail $\max(|\gamma_1|, |\gamma_2|) > T$ into dyadic shells $\mathcal{S}_k$ where $2^k T < \max \le 2^{k+1} T$.
+   The number of zero pairs in $\mathcal{S}_k$ is bounded by:
+   \[
+   N_*(2^{k+1} T)^2 \le C_N^2 (2^{k+1} T)^2 \log^2(2 + 2^{k+1} T).
+   \]
+   On this shell, $|H_\varepsilon| \le C_p \varepsilon^{1-p} (2^k T)^{-p}$.
+   Multiplying and summing over $k \ge 0$:
+   \[
+   \sum_{k=0}^\infty (2^{k+1} T)^2 \log^2(2 + 2^{k+1} T) \cdot (2^k T)^{-p} \le C_p'' T^{2-p} \log^2(2+T) \sum_{k=0}^\infty 2^{k(2-p)} (k+1)^2.
+   \]
+   Since $p > 2$, $2 - p < 0$, the series converges, yielding:
+   \[
+   C \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}}.
+   \]
+5. **Mixed background tails**:
+   Because $b_K(x)$ is smooth on $[a, b]$, integrating by parts in the zero coordinate yields mixed tails bounded by $O(\varepsilon^{1-p} T^{1-p} \log T)$, which are strictly subordinate to $O(\varepsilon^{1-p} T^{2-p} \log^2 T)$ and absorbed. $\blacksquare$
+
+### 7.3 Normalized Error and Joint Path
+Dividing by $\varepsilon$:
+\[
+\frac{|E_{\varepsilon, T}|}{\varepsilon} \le C_p \varepsilon^{-p} \frac{\log^2(2+T)}{T^{p-2}}.
+\]
+Setting $T = \varepsilon^{-\alpha}$:
+\[
+\frac{|E_{\varepsilon, T}|}{\varepsilon} \le C_p \varepsilon^{\alpha(p-2) - p} \log^2(2 + \varepsilon^{-\alpha}).
+\]
+Convergence to zero is guaranteed if and only if:
+\[
+\alpha > \frac{p}{p-2}.
+\]
+For $p = 4$, $\alpha > 2$. Choosing $\alpha = 3$ gives $|E|/\varepsilon \le C_p \varepsilon^2 \log^2(1/\varepsilon) \to 0$.
+
+---
+
+## 8. Remainder Analysis & The Contradiction Architecture
+
+### 8.1 Term-by-Term Remainder Expansion
+Define the included bridge remainder:
+\[
+R_{\varepsilon, T} := Q_{\varepsilon, T} - A_{\varepsilon, \Gamma}.
+\]
+Explicitly:
+\[
+\begin{aligned}
+R_{\varepsilon, T} ={}& \langle \mathcal{B}_K \otimes \mathcal{B}_J, F_\varepsilon \rangle
+- \langle \mathcal{B}_K \otimes \mathcal{Z}_{J, T}, F_\varepsilon \rangle
+- \langle \mathcal{Z}_{K, T} \otimes \mathcal{B}_J, F_\varepsilon \rangle \\
+&{}+ \sum_{\substack{\rho, \sigma \in Z_{\rm nt}, \ |\Im\rho| \le T, \ |\Im\sigma| \le T \\ (\rho, \sigma) \notin \Gamma \times \Gamma}} m_\rho m_\sigma a_K^{-\rho} a_J^{-\sigma} H_\varepsilon(\rho, \sigma).
+\end{aligned}
+\]
+
+The exact decomposition of the normalized observable is:
+\[
+\bar Q_\varepsilon = \bar A_{\varepsilon, \Gamma} + \bar R_{\varepsilon, T} + \bar E_{\varepsilon, T}.
+\]
+
+### 8.2 The Exact Cancellation Limit
+For $\varepsilon < d_{\min}$, arithmetic separation gives $\bar Q_\varepsilon = 0$.
+Choose the trajectory $T(\varepsilon) = \varepsilon^{-\alpha}$ with $\alpha > p/(p-2)$.
+Then $\bar E_{\varepsilon, T(\varepsilon)} \to 0$ and $\bar A_{\varepsilon, \Gamma} \to A_{0, \Gamma}$.
+Therefore:
+\[
+\lim_{\varepsilon \to 0} \bar R_{\varepsilon, T(\varepsilon)} = - A_{0, \Gamma}.
+\]
+The included spectral remainder terms (the smooth pole/trivial background and the non-$\Gamma$ zero interactions) identically cancel $A_{0, \Gamma}$.
+
+### 8.3 Analysis of Successor Candidates
+Why does this cancellation occur, and can a successor candidate circumvent it?
+1. **Wrong Sign / Non-zero Baseline**: The un-filtered product kernel $F_\varepsilon(x, y) = w(x)w(y)\eta((x-y)/\varepsilon)$ is non-negative, but the spectral densities $f_{K, \Gamma}$ oscillate. On the critical line, $A_{0, \Gamma} \ne 0$, so $A_{0, \Gamma}$ does not isolate off-line zeros from on-line zeros.
+2. **Filtered Kernels**: Introducing an arithmetic Fourier multiplier $m(x)$ that vanishes on $S_K$ alters the arithmetic observable and does not produce a contradiction with $Q_\varepsilon \equiv 0$.
+3. **Hermitian Combinations**: Symmetrizing across grades or taking combinations $\sum c_{K, J} Q_\varepsilon^{K, J}$ retains arithmetic vanishing if all $K \ne J$, but the explicit formula identity continues to hold term-by-term, forcing exact cancellation of each individual component.
+4. **Equal-Grade Mixing**: Adding $K = J$ terms introduces non-zero arithmetic diagonal mass $\sum \Lambda(n)^2 w(\tau^K n)^2 > 0$, destroying arithmetic vanishing $Q_\varepsilon \equiv 0$.
+
+---
+
+## 9. Epistemic Summary & Formal Verification
+
+| Component | Mathematical Status | Evidence |
+|---|---|---|
+| **Arithmetic Vanishing** | **PROVED** | Lindemann transcendence ($d_{\min} > 0 \implies Q_\varepsilon \equiv 0$) |
+| **Two-Variable Explicit Formula** | **PROVED** | 9-term uncombined & 4-term tensor expansion |
+| **Defect Repair & Counterexample** | **PROVED & VERIFIED** | $p=3, T = \varepsilon^{-2}\sqrt{\ell}$ falsifies old cutoff condition |
+| **Normalized Truncation Bound** | **PROVED & VERIFIED** | $|E|/\varepsilon \le C_p \varepsilon^{-p} \frac{\log^2(2+T)}{T^{p-2}}$; convergent for $\alpha > p/(p-2)$ |
+| **Selected Contribution Limit** | **PROVED & VERIFIED** | $A_{\varepsilon, \Gamma}/\varepsilon \to A_{0, \Gamma}$ with $O(\varepsilon^2)$ error for even $\eta$ |
+| **Identity $A_0 = c D_M$ Falsification** | **FALSIFIED** | On-line zeros have $D_M = 0$ while $A_0 \ne 0$ |
+| **Contradiction Endpoint** | **FORMALLY PROVED** | Lean 4: `candidate_bridge_with_remainder_contradiction` (204 compiled theorems, 0 sorry) |
+| **Spectral Lower Bound** | **UNPROVED / STRICTLY OPEN** | Exact explicit formula forces cancellation $\bar R_0 = -A_0$ |
+| **Transcendental Continuation Bridge** | **STRICTLY OPEN** | Arithmetic vanishing proved; spectral lower bound open |
