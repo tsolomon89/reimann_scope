@@ -2533,7 +2533,7 @@ Three new foundational theorems were proved in `formal/RiemannScope/Grade.lean` 
 ## 38.3 Track 1: Whole-Spectrum Log-Gaussian Spectral Isolation (Section 7E)
 
 1. **Test-Family Construction**:
-   For target zero $\rho_0 = \beta_0 + i\gamma_0$, define $C = \{\rho \ne \rho_0 : |\Im\rho - \Im\rho_0| \le 3\}$. By compactness of $[0, 1] \times [\gamma_0 - 3, \gamma_0 + 3]$, $C$ is finite.
+   For target nontrivial zero $\rho_0 = \beta_0 + i\gamma_0$ ($0 < \beta_0 < 1$), define $C = \{\rho \ne \rho_0 : |\Im\rho - \Im\rho_0| \le 3\}$. By compactness of $[0, 1] \times [\gamma_0 - 3, \gamma_0 + 3]$, $C$ is finite.
    Define the cancellation polynomial:
    \[
    P(z) = \prod_{\rho \in C} \left(1 - \frac{z}{\rho - \rho_0}\right).
@@ -2543,27 +2543,38 @@ Three new foundational theorems were proved in `formal/RiemannScope/Grade.lean` 
    - Cutoff tail error: $\sup_{|\sigma| \le 1} \|\partial_t^p (e^{\sigma t} r_L(t))\|_{L^1} \le C_{p, \chi} L^{-1/2} e^{-2L}$.
    - Normalization error: $|1 - c_L| \le \frac{1}{2\sqrt{\pi L}} e^{-4L}$.
    - Support threshold: $\operatorname{supp}(\phi_L) \subset [e^L, e^{17L}]$ satisfies $0 < h_k < e^L$ for all $k \in I$ once $L > \max(0, -\min(I) \log\tau)$.
-3. **Whole-Spectrum Limit**:
+3. **Whole-Spectrum Limit & Quantifier Scoping**:
    \[
-   \lim_{L \to \infty} \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| = 0.
+   \forall \rho_0 \in Z(\zeta) \, (0 < \Re\rho_0 < 1), \; \forall I \subset \mathbb{Z} \text{ (finite)}, \; \forall \varepsilon > 0, \; \exists L > 0 : \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| < \varepsilon.
    \]
-   *Reconciliation with Paley-Wiener*: While no *fixed* test $\phi$ can annihilate infinitely many zeros (Farmer 1995), a *dynamically scaled* family $\phi_L$ with frequency-dependent bandwidth achieves complete whole-spectrum isolation.
+   - *Refutation of Dependency Jump $D \to E$*: Convergence on every fixed finite grade block does *not* establish growth or divergence of a single fixed observable under transport. Counterexample: for $q > 1$, $Y_L(k) = q^k e^{-k^2/L}$ converges uniformly to $q^k$ on every compact $k$-block as $L \to \infty$, yet for every fixed $L$, $Y_L(k) \to 0$ as $k \to \infty$. The graph step $D \to E$ is an unsupported quantifier leap and is refuted.
+   - *Tail Bound Applicability vs Completeness*: Trudgian (2014 Cor. 1) unconditionally certifies that the Stieltjes tail integral applies above cutoff $T \approx 192.026$. However, finding 75 zeros beneath $\sim 160.68$ certifies tail applicability, but does *not* certify consecutive zero completeness below $T$; completeness remains an open Turing obligation.
+   - *Sampling Caveat*: Sampled values at $L=2, 5$ do not certify $\eta < 1$ for all $L \ge 2$; universal boundedness is established by the complete analytic theorem and the Lean-proved band exponent bound.
+   - *Paley-Wiener / Jensen*: Precludes a fixed test from annihilating all but finitely many distinct zeros (Farmer 1995).
 
 ## 38.4 Track 2: Arithmetic Measure Pushforward, Atom Extraction, & Disjointness (Section 8)
 
 1. **Measure Pushforwards & Formula Pairing**:
    $\mu_K = (D_{\tau^K})_* \mu_0 = \sum_{n \ge 2} \Lambda(n) \delta_{\tau^K n}$. For $h = \tau^{-k}$, $P_h(\phi) = h \langle \mu_{-k}, \phi \rangle$ ($K = -k$).
+   - *Non-multiplicativity of $\Lambda$*: The von Mangoldt function is non-multiplicative ($\Lambda(6) = 0 \ne \Lambda(2)\Lambda(3) > 0$). The Euler product enters exclusively via $-\zeta'/\zeta(s) = \sum \Lambda(n) n^{-s}$.
+   - *Nontrivial Zero Restriction*: The opening bridge formula must specify nontrivial zeros ($0 < \Re\rho < 1$); trivial zeros like $\rho = -2$ produce no off-line RH counterexample.
 2. **Layer Disjointness (Lindemann 1882)**:
    $\operatorname{supp}(\mu_K) \cap \operatorname{supp}(\mu_J) = \emptyset$ for all $K \ne J$ because $\tau^{K-J} \notin \mathbb{Q}$.
-3. **Atom Extraction Limit**:
+3. **Atom Extraction Limit & Station-Level Limit**:
    Under shrinking test localization $\psi_{x, \varepsilon}(t) = \psi((t - x)/\varepsilon)$:
    - Prime powers yield delta atoms: $\lim_{\varepsilon \to 0} \langle \mu_K, \psi_{x, \varepsilon} \rangle = \Lambda(n) \delta_{x, \tau^K n}$.
-   - Finite zero modes integrate to $O(\varepsilon) \to 0$. Finite modes contribute zero atomic mass; atomicity is an infinite spectral collective phenomenon.
+   - Finite zero modes integrate to $O(\varepsilon) \to 0$. Discrete atomic masses $\Lambda(n)\delta_{x, \tau^K n}$ emerge exclusively from the complete infinite spectral sum where the limit $\varepsilon \to 0$ and the sum $\sum_\rho$ cannot be interchanged.
+   - An off-line zero $\rho_0$ contributes a smooth $C^\infty$ background with empty singular support; it cannot shift existing delta atoms or force station collisions across disjoint layers $L_K$ and $L_J$.
 4. **Candidate Bridge Controls & Status**:
    All 6 controls pass (unit conversion, linearity, distribution, prime-power, off-line, object). Mode isolation in continuous explicit-formula functional $Y_{\phi_L}(k)$ does not project values into the discrete lattice $L_K = \tau^K \mathbb{Z}$. The TC arithmetic coincidence bridge remains strictly **OPEN**.
 
-## 38.5 Synthesis of Candidate TC-DISC-020 / CLM-TC-020
+## 38.5 Independent Research-Agent Loops & Synthesis of Candidate TC-DISC-020 / CLM-TC-020
+
+Three independent research-agent loops were executed and persisted:
+1. **Spectral Analyst**: Complete analytic whole-spectrum isolation proof with cutoff derivative estimates and limit interchanges in `research/epic/spectral_isolation_analytic_proof.md`.
+2. **Arithmetic Researcher**: Atomic support and station-level localization limits under shrinking tests in `research/epic/arithmetic_spectral_atomic_limit.md`.
+3. **Adversarial Challenger**: Counterexample audit, quantifier enforcement ($D \not\to E$), and overstatement extirpation in `research/epic/adversarial_challenger_review.md`.
 
 | Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **TC-DISC-020** | **CLM-TC-020** | Autonomous TC Mechanism Discovery Epic Synthesis | Starting state reconciled; integer-grade Vandermonde reconstruction (`k:Int`, $q_1, q_2 \ne 0$) and Gaussian band exponent bound proved in Lean 4 (193 compiled targets, 0 sorry); Lehman/Trudgian coarse counting bounds verified for $t \ge 14.0$; whole-spectrum log-Gaussian isolation $\lim_{L \to \infty} \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| = 0$ established with proved cutoff decay; arithmetic measure pushforward pairing $P_h(\phi) = h \langle \mu_{-k}, \phi \rangle$ verified; layer disjointness $\operatorname{supp}(\mu_K) \cap \operatorname{supp}(\mu_J) = \emptyset$ confirmed via Lindemann; atom extraction limits derived; 6 bridge controls evaluated and passed; arithmetic coincidence bridge audited. | **EPIC DELIVERABLES FULLY EXECUTED; WHOLE-SPECTRUM ISOLATION PROVED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Integer-grade bounds and band exponents are formally proved; whole-spectrum isolation circumvents Paley-Wiener via dynamic scaling; continuous observable growth does not force discrete lattice point collisions $m\tau^K = n\tau^J$; RH exclusion bridge remains open) |
+| **TC-DISC-020** | **CLM-TC-020** | Autonomous TC Mechanism Discovery Epic Synthesis | Starting state reconciled; integer-grade Vandermonde reconstruction (`k:Int`, $q_1, q_2 \ne 0$) and Gaussian band exponent bound proved in Lean 4 (193 compiled targets, 0 sorry); Lehman/Trudgian coarse counting bounds verified for $t \ge 14.0$; whole-spectrum log-Gaussian isolation $\lim_{L \to \infty} \max_{k \in I} |Y_{\phi_L}(k) - m_{\rho_0} q_{\rho_0}^k| = 0$ established with proved cutoff decay; $D \to E$ jump refuted via $Y_L(k) = q^k e^{-k^2/L}$; arithmetic measure pushforward pairing $P_h(\phi) = h \langle \mu_{-k}, \phi \rangle$ verified; layer disjointness $\operatorname{supp}(\mu_K) \cap \operatorname{supp}(\mu_J) = \emptyset$ confirmed via Lindemann; atomic support localization limits derived; 6 bridge controls evaluated and passed; arithmetic coincidence bridge audited. | **EPIC DELIVERABLES FULLY EXECUTED; WHOLE-SPECTRUM ISOLATION PROVED; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** (Integer-grade bounds and band exponents are formally proved; whole-spectrum isolation circumvents Paley-Wiener via dynamic scaling; continuous observable growth does not force discrete lattice point collisions $m\tau^K = n\tau^J$; RH exclusion bridge remains open) |

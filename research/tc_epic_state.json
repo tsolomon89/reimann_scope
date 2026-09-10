@@ -26,7 +26,10 @@
         "Cutoff error lemma: sup_{|sigma|<=1} ||d^p/dt^p (e^{sigma t} r_L(t))||_{L^1} <= C_{p,chi} L^{-1/2} e^{-2L}",
         "Gaussian normalization error 1 - c_L = O(L^{-1/2} e^{-4L})",
         "Support condition L > max(0, -min(I) log tau) for grade block I",
-        "Summable cutoff-error estimate and whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} q_{rho_0}^k| = 0"
+        "Summable cutoff-error estimate and whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} q_{rho_0}^k| = 0",
+        "Complete analytic proof with parameter dependencies and limit interchanges in research/epic/spectral_isolation_analytic_proof.md",
+        "Refutation of dependency step D -> E via counterexample Y_L(k) = q^k e^{-k^2/L} (q > 1)",
+        "Separation of Trudgian tail cutoff applicability (t >= 14) from Turing completeness below T"
       ]
     },
     "track_2_arithmetic_bridge": {
@@ -36,8 +39,10 @@
         "Establish sign convention P_h(phi) = h <mu_{-k}, phi> for h = tau^{-k}",
         "Analyze atom extraction mu_K({x}) = lim_{eps->0} <mu_K, psi((.-x)/eps)>",
         "Derive smooth density contribution O(eps) for finite zero modes under unnormalized shrinking test",
-        "Investigate whether full explicit formula forces shared arithmetic atom mu_K({x}) > 0 and mu_J({x}) > 0",
-        "Enforce 6 controls: unit conversion, linearity, distribution, prime-power, off-line, object"
+        "Station-level limit proof in research/epic/arithmetic_spectral_atomic_limit.md: off-line zeros contribute smooth C^infty background and cannot create or shift discrete atoms",
+        "Clarification of von Mangoldt non-multiplicativity (Lambda(6) = 0 != Lambda(2)*Lambda(3)) and nontrivial zero domain restriction",
+        "Enforce 6 controls: unit conversion, linearity, distribution, prime-power, off-line, object",
+        "Adversarial challenger review in research/epic/adversarial_challenger_review.md extirpating overstatements"
       ]
     }
   },

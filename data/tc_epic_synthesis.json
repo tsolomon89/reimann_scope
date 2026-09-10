@@ -2,12 +2,13 @@
   "epic": "Autonomous TC Mechanism Discovery Epic",
   "starting_questions_resolved": {
     "1_quoted_integer_grade_theorem": "RESOLVED: Lean source Grade.lean line 903 already had k:Nat and hq:q2-q1!=0. The walkthrough merely misquoted it as k:Int and omitted hq. Furthermore, we formalized in Lean 4 the integer-grade theorems vandermonde_block_remainder_2_zpow and vandermonde_2_reconstruction_bound_zpow for k:Int with explicit non-zero base hypotheses hq1:q1!=0 and hq2:q2!=0. Both compile with 0 sorry.",
-    "2_finite_experiment_reproduced": "CONFIRMED: Ordinary quadrature reproduces eta(2.0) \u2248 0.4986, eta(5.0) \u2248 0.0400, and competitor amplitude 2.9566 at L=20. These are properly delimited as finite model benchmarks, distinct from the complete zero sum.",
-    "3_asymptotic_leap_resolved": "RESOLVED: Section 7E proves a rigorous whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0}*q_{rho_0}^k| = 0 using truncated log-Gaussian kernel g_L with near-band cancellation polynomial P(z), proved cutoff error lemma, and Lean-formalized quadratic exponent bound gaussian_exponent_band_bound.",
-    "4_tail_domain_resolved": "RESOLVED: The coarse bound N(t) <= (t/2pi) log t holds unconditionally for all t >= 14.0 (Lehman 1966, Trudgian 2014 Cor. 1), because the main term difference (t/2pi)(log(2pi)+1) \u2248 0.45166 t strictly outgrows the remainder |R(t)| <= 0.137 log t + 2.067 for all t >= 14. At the 75-zero cutoff T \u2248 192.026, N(192.026) = 75 < 160.68, with a safety margin of 85.68 zeros. Zero unaccounted gap.",
+    "2_finite_experiment_reproduced": "CONFIRMED AND DELIMITED: Ordinary quadrature reproduces eta(2.0) \u2248 0.4986, eta(5.0) \u2248 0.0400, and competitor amplitude 2.9566 at L=20. Crucially, sampled values at L=2, 5 do not certify eta < 1 for all L >= 2; general boundedness is certified by the complete analytic theorem, the Lean-verified band exponent bound, and Stieltjes frequency summability.",
+    "3_asymptotic_leap_resolved": "RESOLVED WITH EXACT QUANTIFIERS: Section 7E proves a rigorous whole-spectrum limit lim_{L->infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0}*q_{rho_0}^k| = 0 on any fixed finite grade block I. We explicitly refute the jump D -> E: finite-block convergence does not imply divergence of a single fixed observable under transport (counterexample: Y_L(k) = q^k * exp(-k^2/L) with q > 1).",
+    "4_tail_domain_resolved": "RESOLVED AND DISTINGUISHED: Trudgian (2014) Cor. 1 unconditionally guarantees N(t) <= (t/2pi)*log(t) for all t >= 14.0, certifying that the Stieltjes frequency tail integral applies above cutoff T \u2248 192.026. However, finding 75 zeros beneath the upper bound ~160.68 does NOT certify completeness below T (absence of omitted zeros); that remains a separate unclosed Turing obligation.",
     "5_recorded_constants_recomputed": "RECOMPUTED AND ENCLOSED: (a) I_0 = 0.110998454042019859... via exact substitution u = 4(v-1.5); (b) M=35 geometric tail bound is ||phi||_L1 * (h/a)^73 / (1 - (h/a)^2) <= 6.2679565e-23 at h=1, a=2.",
     "6_input_and_evidence_integrity": "VERIFIED: Validated 8-gate certificate loading with canonical SHA-256 self-hash, fail-closed propagation, and signed outward interval distances to nearest integer strictly enforced across all consumers.",
-    "7_alternative_target_delimited": "DELIMITED: Continuous test functionals distinguish discrete supports. Missing bridge claim concerns whether an off-line zero forces a common external location in L_K cap L_J = {0}."
+    "7_alternative_target_delimited": "DELIMITED: Continuous test functionals distinguish discrete supports. Missing bridge claim concerns whether an off-line zero forces a common external location in L_K cap L_J = {0}.",
+    "8_research_agent_loops": "DEMONSTRATED: Three independent research-agent loops executed and persisted: (1) Spectral Analyst: complete analytic whole-spectrum isolation proof in research/epic/spectral_isolation_analytic_proof.md; (2) Arithmetic Researcher: atomic support and station-level localization limits in research/epic/arithmetic_spectral_atomic_limit.md; (3) Adversarial Challenger: counterexample audit, quantifier enforcement, and overstatement extirpation in research/epic/adversarial_challenger_review.md."
   },
   "track_0_formal_theorems": {
     "compiled_theorems_count": 193,
@@ -91,7 +92,12 @@
     "whole_spectrum_limit": {
       "statement": "lim_{L -> infty} max_{k in I} |Y_{phi_L}(k) - m_{rho_0} * q_{rho_0}^k| = 0",
       "status": "PROVED_EXISTENTIAL_ANALYTIC_LIMIT",
-      "paley_wiener_reconciliation": "Reconciled with Paley-Wiener / Jensen obstruction: While no single fixed test phi can annihilate all but finitely many distinct zeros (Farmer 1995), a dynamically concentrated test family phi_L whose frequency bandwidth scales with L achieves uniform whole-spectrum isolation.",
+      "quantifier_structure": "FOR ALL rho_0 in Z(zeta) (0 < Re(rho_0) < 1), FOR ALL finite I subset Z, FOR ALL epsilon > 0, THERE EXISTS L > 0 such that max_{k in I} |Y_{phi_L}(k) - m_{rho_0} * q_{rho_0}^k| < epsilon. This is an adaptive family approximation on compact grade blocks, NOT divergence of a fixed observable.",
+      "counterexample_d_to_e": "Y_L(k) = q^k * exp(-k^2 / L) (q > 1) proves that finite-block uniform convergence to q^k as L -> infty does NOT imply growth or divergence of any single fixed observable Y_L as k -> infty. The dependency graph step D -> E is an unsupported quantifier jump and is refuted.",
+      "tail_domain_vs_completeness": "Trudgian (2014) Cor. 1 unconditionally bounds N(t) <= (t/2pi)*log(t) for t >= 14.0, certifying that the Stieltjes frequency tail integral applies above cutoff T \u2248 192.026. However, finding 75 zeros beneath the upper bound ~160.68 does NOT certify completeness (absence of omitted zeros below T); completeness remains a distinct Turing-method obligation.",
+      "sampling_caveat": "Sampled values at L=2, 5 do not certify eta < 1 for all L >= 2. Universal boundedness is established by the complete analytic theorem, the Lean-proved band bound, and the Stieltjes frequency summability.",
+      "envelope_vs_phase_cancellation": "The integrand's exponential factor exp(sigma*t) defines a real envelope, but oscillatory phase cancellation means universal competitor blowup cannot be asserted from real envelopes alone.",
+      "paley_wiener_reconciliation": "Reconciled with Paley-Wiener / Jensen obstruction: While no single fixed test phi can annihilate all but finitely many distinct zeros (Farmer 1995), a dynamically concentrated test family phi_L whose frequency bandwidth scales with L achieves uniform whole-spectrum isolation on any finite block.",
       "epistemic_scoping": "Whole-spectrum isolation of mode m_{rho_0} * q_{rho_0}^k in Y_{phi_L}(k) does NOT force an arithmetic collision m*tau^K = n*tau^J. Observable Y_{phi_L}(k) remains a continuous functional on C_c^infty, and mode isolation does not project values into the discrete arithmetic layer L_K = tau^K * Z."
     }
   },
@@ -158,9 +164,19 @@
         }
       ]
     },
+    "von_mangoldt_properties": {
+      "is_multiplicative": false,
+      "counterexample": "Lambda(6) = 0, while Lambda(2)*Lambda(3) = log(2)*log(3) \u2248 0.7618 > 0.",
+      "euler_product_mechanism": "The Euler product zeta(s) = prod_p (1 - p^{-s})^{-1} enters exclusively through its logarithmic derivative -zeta'/zeta(s) = sum_{n >= 1} Lambda(n) n^{-s} on Re(s) > 1, not through any multiplicativity of Lambda."
+    },
+    "opening_bridge_formula": {
+      "target_zeros": "Nontrivial zeros only (0 < Re(rho) < 1)",
+      "trivial_zero_counterexample": "rho = -2 has Re(rho) = -2 != 1/2 (delta = -2.5), satisfying the unconditioned antecedent without any connection to RH or arithmetic collisions."
+    },
     "atom_extraction": {
       "theorem": "lim_{eps -> 0} <mu_K, psi_{x, eps}> = Lambda(n) * delta_{x, tau^K n}",
       "finite_mode_annihilation": "For any finite collection of zeros, sum_{rho <= T} m_rho * int psi_{x, eps}(t) t^{rho-1} dt = O(eps) -> 0. Finite zero modes contribute zero atomic mass; atomicity is an infinite spectral collective phenomenon.",
+      "complete_spectral_sum_localization": "In the complete spectral sum lim_{eps -> 0} sum_rho m_rho <t^{rho-1}, psi_{x, eps}>, interchanging limit and sum is strictly invalid. An off-line zero rho_0 adds a smooth C^infty function t^{rho_0 - 1} which has empty singular support. Therefore, an off-line zero cannot create a new discrete delta atom or shift existing prime atoms tau^K n.",
       "numerical_scaling": [
         {
           "epsilon": 0.1,

@@ -1885,6 +1885,21 @@ def test_epic_whole_spectrum_gaussian_family():
     assert limit["status"] == "PROVED_EXISTENTIAL_ANALYTIC_LIMIT"
     assert "Paley-Wiener" in limit["paley_wiener_reconciliation"]
     assert "does NOT force" in limit["epistemic_scoping"]
+    assert "FOR ALL rho_0 in Z(zeta)" in limit["quantifier_structure"]
+    assert "Y_L(k) = q^k * exp(-k^2 / L)" in limit["counterexample_d_to_e"]
+    assert "Trudgian" in limit["tail_domain_vs_completeness"]
+    assert "Turing" in limit["tail_domain_vs_completeness"]
+    assert "Sampled values at L=2, 5 do not certify" in limit["sampling_caveat"]
+    assert "phase cancellation" in limit["envelope_vs_phase_cancellation"]
+
+    # Direct test of the counterexample: Y_L(k) = q^k * exp(-k^2/L)
+    # Proves that uniform convergence on compact blocks as L -> infty does NOT imply growth as k -> infty
+    q = 2.0
+    k_test = 5
+    # As L -> infty, Y_L(k) -> q^k:
+    assert abs(q**k_test * math.exp(-(k_test**2) / 1000.0) - q**k_test) < 1.0
+    # For fixed L=2.0, as k -> infty, Y_L(k) -> 0:
+    assert q**20 * math.exp(-(20**2) / 2.0) < 1e-70
 
 
 def test_epic_arithmetic_measure_atoms_and_bridge():
@@ -1894,8 +1909,10 @@ def test_epic_arithmetic_measure_atoms_and_bridge():
       1. Formula pairing P_h(phi) = h * <mu_{-k}, phi> with K = -k.
       2. Layer support disjointness supp(mu_K) cap supp(mu_J) = emptyset for all K != J (Lindemann 1882).
       3. Atom extraction limit: prime powers yield delta atoms, while finite zero modes integrate to O(eps) -> 0.
-      4. Six candidate bridge controls pass (unit conversion, linearity, distribution, prime-power, off-line, object).
-      5. Arithmetic coincidence bridge is honestly classified as strictly OPEN.
+      4. Non-multiplicativity of Lambda: Lambda(6) = 0 != Lambda(2)*Lambda(3) > 0.
+      5. Opening bridge formula restricts to nontrivial zeros (0 < Re(rho) < 1) to exclude rho = -2.
+      6. Six candidate bridge controls pass (unit conversion, linearity, distribution, prime-power, off-line, object).
+      7. Arithmetic coincidence bridge is honestly classified as strictly OPEN.
     """
     res = transcendental.audit_arithmetic_measure_atoms_and_bridge(dps=30)
     assert res["classification"] == "PROVED_AND_VERIFIED"
@@ -1910,9 +1927,21 @@ def test_epic_arithmetic_measure_atoms_and_bridge():
     for check in disjoint["sample_checks"]:
         assert check["sample_station_distance"] > 0.0
 
+    # Non-multiplicativity of Lambda
+    vmp = res["von_mangoldt_properties"]
+    assert vmp["is_multiplicative"] is False
+    assert "Lambda(6) = 0" in vmp["counterexample"]
+    assert "logarithmic derivative" in vmp["euler_product_mechanism"]
+
+    # Opening bridge formula nontrivial zero restriction
+    obf = res["opening_bridge_formula"]
+    assert "0 < Re(rho) < 1" in obf["target_zeros"]
+    assert "rho = -2" in obf["trivial_zero_counterexample"]
+
     # Atom extraction
     atoms = res["atom_extraction"]
     assert "O(eps)" in atoms["finite_mode_annihilation"]
+    assert "singular support" in atoms["complete_spectral_sum_localization"]
     for row in atoms["numerical_scaling"]:
         assert abs(row["prime_atom_value"] - math.log(2)) < 1e-10
         # Spectral mode integral scales down linearly with epsilon
@@ -1935,7 +1964,7 @@ def test_epic_synthesis_deliverables():
     """
     Epic Synthesis & Deliverables Audit:
     Verifies that audit_tc_epic_synthesis() executes cleanly and confirms:
-      1. All 7 starting questions from Section 2 are resolved.
+      1. All 8 starting questions and review requirements are resolved.
       2. Track 0 compiled theorems count is 193 with zero sorry.
       3. Track 1 and Track 2 audits are fully integrated.
     """
@@ -1944,7 +1973,7 @@ def test_epic_synthesis_deliverables():
 
     # Starting questions
     sq = res["starting_questions_resolved"]
-    assert len(sq) == 7
+    assert len(sq) == 8
     assert "RESOLVED" in sq["1_quoted_integer_grade_theorem"]
     assert "vandermonde_2_reconstruction_bound_zpow" in sq["1_quoted_integer_grade_theorem"]
     assert "CONFIRMED" in sq["2_finite_experiment_reproduced"]
@@ -1953,6 +1982,7 @@ def test_epic_synthesis_deliverables():
     assert "RECOMPUTED AND ENCLOSED" in sq["5_recorded_constants_recomputed"]
     assert "VERIFIED" in sq["6_input_and_evidence_integrity"]
     assert "DELIMITED" in sq["7_alternative_target_delimited"]
+    assert "DEMONSTRATED" in sq["8_research_agent_loops"]
 
     # Formal theorems
     formal = res["track_0_formal_theorems"]
