@@ -78,8 +78,14 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
 
 ### Question 4: How was the numerical discrepancy resolved?
 * The reconciled finite benchmark is $Q_{\varepsilon, T} \approx 0.26928881653228$ on $[8, 20]$ ($K=0, J=1, \varepsilon=0.1, T=30$):
-  - **Resolution Mechanism**: The smooth bump $w(x)$ has all derivatives vanishing at its boundary endpoints, so its zero extension is everywhere smooth; translating $w(x)$ does not produce derivative discontinuities. The earlier discrepancy ($0.269459$ vs $0.26928881653228$) was caused by insufficient numerical quadrature resolution in the earlier evaluation of the 2D product integrand across $[8, 20]$.
-  - **Corrected Method**: Rewrote the pairing with substitution $y = x - \varepsilon v$ ($v \in [-1, 1]$) with Jacobian $\varepsilon$, and integrated $x$ over its exact common support $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$. On this domain, the integrand vanishes smoothly to infinite order at both endpoints. Evaluated with 512-node Gauss-Legendre quadrature, the sum stabilizes to 14 decimal digits:
+  - **Kernel Distinction & Reproducibility**:
+    Two distinct even kernels with peak value 1 on $[-1, 1]$ are supported and reproduced from definitions:
+    | Kernel | Definition | Smoothness | Integral over $[-1, 1]$ | 256-node result | 512-node result |
+    |---|---|---|---:|---:|---:|
+    | **Exponential smooth bump** ($\eta_{\mathrm{smooth}}$) | $\exp(1 - 1/(1-v^2))\mathbf{1}_{\|v\|<1}$ | $C_c^\infty(\mathbb{R})$ | $\approx 1.2069003224$ | 0.2692888165323234 | 0.2692888165322876 |
+    | **Polynomial kernel** ($\eta_{\mathrm{poly}}$) | $(1 - v^2)^4 \mathbf{1}_{\|v\|\le 1}$ | $C^3(\mathbb{R})$ (4th deriv. jump) | $256/315 \approx 0.8126984127$ | 0.1813269198736548 | 0.1813269198736497 |
+  - **Resolution Mechanism**: The test bump $w(x) = \exp(1/36 - 1/((x-8)(20-x))) \mathbf{1}_{(8, 20)}(x)$ belongs to $C_c^\infty(\mathbb{R})$ with support $[8, 20]$; all derivatives vanish at its boundary endpoints, so its zero extension is everywhere smooth. Translating $w(x)$ creates no derivative discontinuities. The earlier discrepancy ($0.269459$ vs $0.26928881653228$) was caused solely by insufficient numerical quadrature resolution in the earlier evaluation of the 2D product integrand across $[8, 20]$.
+  - **Corrected Method**: Rewrote the pairing with substitution $y = x - \varepsilon v$ ($v \in [-1, 1]$) with Jacobian $\varepsilon$, and integrated $x$ over its exact common support $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$. On this domain, the integrand vanishes smoothly to infinite order at both endpoints. Evaluated with 512-node Gauss-Legendre quadrature, the canonical smooth bump sum stabilizes to 14 decimal digits:
     - $Q_{BB} = 0.16895668569466$
     - $Q_{BZ} = -0.01895209192459$
     - $Q_{ZB} = -0.01558992503441$
@@ -99,27 +105,32 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
 ### Question 6: What did the arithmetic-compatibility investigation add?
 * Audited 4 candidate chains connecting arithmetic structure to spectral restrictions:
   1. *Weil Positivity*: The full positivity criterion $W(g * \tilde g) \ge 0$ over the class of admissible compactly supported test functions is equivalent to RH (Weil 1952, Bombieri 2000; cf. arXiv:2006.13771); it is not an unconditional source of the desired sign. Moreover, a single fixed window is not a quantified test family, and the cross-grade bilinear pairing $\mathcal{P}_\varepsilon(f, g)$ is not of positive-definite convolution type.
-  2. *TC Radial Defect*: Defines $D_M(\rho_0) = 4\sinh^2(M\delta_0\log\tau/2) > 0$ for $\delta_0 \ne 0$, but $A_{0, \Gamma} \ne c D_M(\rho_0)$ on the critical line ($A_0 > 0.54$ while $D_M = 0$).
+  2. *TC Radial Defect & Positivity Scope*: Defines $D_M(\rho_0) = 4\sinh^2(M\delta_0\log\tau/2) > 0$ for $\delta_0 \ne 0$, but $A_{0, \Gamma} \ne c D_M(\rho_0)$ on the critical line ($A_0 > 0.54$ while $D_M = 0$). Furthermore, $A_{0, \Gamma} = (\int\eta)\int w(x)^2 f_K(x) f_J(x) dx$ is instance-positive for $(K=0, J=1, [8, 20], \rho_1)$, but for distinct grades $K \ne J$, $f_K * f_J$ is not a square. By product-to-sum (Lean: `cos_mul_cos_product_to_sum`), $\cos(a)\cos(b) = \frac{1}{2}[\cos(a-b) + \cos(a+b)]$ introduces the constant phase $\cos((J - K)\gamma\log\tau)$, which can be negative (e.g. for $K=0, J=2, [45, 65], \rho_1$, $A_{0, \Gamma} \approx -0.00708 < 0$), falsifying universal positivity across all grades.
   3. *Theta Modular Inversion*: Generates the completed zeta functional equation $\xi(s) = \xi(1-s)$, but this generic reflection symmetry is shared by non-Euler counterexamples such as Davenport-Heilbronn zeta functions which possess off-line zeros. The actual Euler product is essential and not invoked by reflection symmetry alone.
   4. *Vinogradov-Korobov Zero-Free Region*: The classical zero-free region $\sigma > 1 - c/(\log |t|)^{2/3}(\log \log |t|)^{1/3}$ rules out zeros near the 1-line at large $t$, but cannot exclude low-lying or moderate-height individual off-line zeros, nor does it force zeros onto the critical line.
-* **Key Finding**: Refuted the claim of arbitrary spectral compensation via the Finite Spectral Perturbation Rigidity Theorem.
+* **Key Finding**: Refuted arbitrary spectral compensation via the Finite Spectral Perturbation Rigidity Theorem (Lean: `finite_spectral_perturbation_rigidity_vandermonde_general`).
 
 ### Question 7: Was the forbidden-coincidence bridge derived?
 **No.** The implication:
 $$\exists \rho_0 \ (\Re\rho_0 \ne 1/2) \Longrightarrow \exists K \ne J, m, n \in \mathbb Z \setminus \{0\}: m\tau^K = n\tau^J$$
-was **not** derived. Arithmetic separation proves that $Q_\varepsilon^{K, J}[w] \equiv 0$ for $\varepsilon < d_{\min}$ on any fixed compact window. However, the explicit formula identity forces the remaining spectral and background terms to cancel the target zero ($\bar R_\varepsilon \to -A_0$), preventing the derivation of a strictly positive lower bound $\bar Q_\varepsilon \ge c D_M > 0$.
+was **not** derived.
+
+**Logical Clarification of the Intended Reductio**:
+Let $\mathsf{A}$ denote established arithmetic and analytic premises, and let $H(\rho_0)$ be the off-line zero hypothesis:
+$$\mathsf{A} \vdash Q_\varepsilon = 0, \qquad \mathsf{A}, H(\rho_0) \vdash Q_\varepsilon > 0, \qquad \therefore \mathsf{A} \vdash \neg H(\rho_0).$$
+The first implication is proved by Lindemann transcendence. The second is the unproved research obligation.
+Crucially, establishing $\mathsf{A} \vdash Q_\varepsilon = 0$ does **not** prove that a contradiction cannot be derived under the additional hypothesis $H(\rho_0)$.
+The narrower, mathematically justified result is:
+> *Shrinking the omitted truncation tail does not make the included remainder small. The explicit-formula identity requires full cancellation; a new restriction derived under the off-line-zero hypothesis would be needed to make that requirement contradictory.*
+
+Growing windows and global formulations remain optional research candidates, but do not evade the exact explicit-formula identity.
 
 ### Question 8: What is the single remaining arithmetic compatibility obligation?
 **Governing Arithmetic Compatibility Obligation**:
 > *Under the explicit formula for the completed Riemann zeta function $\xi(s)$ and the Lindemann transcendence of $\tau = 2\pi$, derive a non-vanishing lower bound for a cross-grade spectral observable $\mathcal{Q}_\varepsilon$ that does not reduce to fixed-window scalar cancellation.*
 
-- **Specification of Proposed Property**:
-  Non-cancellation of off-line radial defect against critical-line spectral projection across an admissible multi-scale or global test family: under the completed explicit formula, the individual scaling component $a_K^{-\rho_0} x^{\rho_0 - 1}$ generated by an off-line zero $\rho_0$ ($\Re\rho_0 \ne 1/2$) cannot be asymptotically annihilated by the linear span of critical-line modes $\{x^{i\gamma - 1/2}\}$.
-- **Quantifiers**:
-  For all candidate off-line zeros $\rho_0$ with $0 < \Re\rho_0 < 1$ and $\Re\rho_0 \ne 1/2$, there exists an admissible family of test functions $\{w_\lambda\}_{\lambda > 0}$ (or mollified multi-scale kernels) such that:
-  $$\liminf_{\lambda \to \infty} \left| \langle w_\lambda, x^{\rho_0 - 1} \rangle - \sum_{\gamma \in \mathcal{R}} c_{\lambda, \gamma} \langle w_\lambda, x^{i\gamma - 1/2} \rangle \right| > 0.$$
 - **Where the Actual Zero Condition Enters**:
-  The condition $\zeta(\rho_0) = 0$ enters via the residue at the pole of $-\frac{\zeta'}{\zeta}(s)$ at $s = \rho_0$ in the explicit formula contour integration, providing the exact coefficient and phase for the mode $x^{\rho_0 - 1}$. Without $\zeta(\rho_0) = 0$, no such mode appears in the spectral expansion.
+  The condition $\zeta(\rho_0) = 0$ enters via the residue at the pole of $-\frac{\zeta'}{\zeta}(s)$ at $s = \rho_0$ in the explicit formula contour integration, providing the exact coefficient and phase for the mode $x^{\rho_0 - 1}$.
 - **First Unproved Implication**:
   The inference that the non-unitary radial scaling of $x^{\rho_0 - 1}$ forces an incompatible lower bound on the cross-grade observable $\mathcal{Q}_\varepsilon$ across the test family, precluding the exact collective cancellation $\bar R_\varepsilon \to -A_{0, \Gamma}$.
 - **Epistemic Status**: **STRICTLY OPEN**.
@@ -130,9 +141,9 @@ was **not** derived. Arithmetic separation proves that $Q_\varepsilon^{K, J}[w] 
 
 | Gate / Command | Result | Notes |
 |---|---|---|
-| `python -m pytest tests/test_tc_mechanism_discovery.py` | **PASS** (92/92 passed) | Full discovery & regression suite |
-| `python -m pytest .agents/verification/test_claim_audit_gates.py` | **PASS** (54/54 passed in 0.37s) | All 10 pre-acceptance gates verified |
+| `python -m pytest tests/test_tc_mechanism_discovery.py` | **PASS** (95/95 passed in 2m 12s) | Full discovery & dual-kernel regression suite |
+| `python -m pytest .agents/verification/test_claim_audit_gates.py` | **PASS** (54/54 passed in 0.49s) | All 10 pre-acceptance gates verified |
 | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file .agents/claims/CLM-TC-022.json` | **PASS** (10/10 gates passed) | 0 schema violations, 0 warnings |
 | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --cross-check-register --repo-root .` | **PASS** (110 claims verified) | 24 terminal, 78 legacy grandfathered, 8 open/exempt |
-| `lake build` (in `formal/`) | **PASS** (218 compiled project declarations) | 0 sorry, 0 admit, 0 warnings |
+| `lake build` (in `formal/`) | **PASS** (225 compiled project declarations) | 0 sorry, 0 admit, 0 warnings, standard axioms only |
 | `python scripts/workflow.py plan-canonical` | **PASS** (17 canonical experiment runs planned) | Integrity validated |

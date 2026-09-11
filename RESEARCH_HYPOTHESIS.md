@@ -2767,5 +2767,60 @@ Four candidate relations audited:
 > *Under the explicit formula for the completed Riemann zeta function $\xi(s)$ and the Lindemann transcendence of $\tau = 2\pi$, derive a non-vanishing lower bound for a cross-grade spectral observable $\mathcal{Q}_\varepsilon$ that does not reduce to fixed-window scalar cancellation.*
 This obligation remains strictly **OPEN**.
 
+---
 
+# 42. TC Corrective Epic: Logical Impossibility Scope Correction, Dual-Kernel Diagnostics, Remainder Separation, Positivity Scope, and Research Attempt (TC-DISC-024 / CLM-TC-022 Updated)
 
+## 42.1 Reductio Logical Structure and Impossibility Scope Clarification
+The stated arithmetic cancellation on a fixed compact window $W \subset (\max(a_K, a_J), \infty)$ ($Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$) does **not** prove a universal impossibility theorem for a contradiction approach.
+Let $\mathsf A$ denote the established arithmetic and analytic premises, and let
+$$H(\rho_0): \quad \zeta(\rho_0) = 0, \quad 0 < \Re\rho_0 < 1, \quad \delta_0 = \Re\rho_0 - \tfrac{1}{2} \ne 0.$$
+The intended reductio ad absurdum is:
+$$\mathsf A \vdash Q_\varepsilon = 0, \qquad \mathsf A, H(\rho_0) \vdash Q_\varepsilon > 0, \qquad \therefore \mathsf A \vdash \neg H(\rho_0).$$
+The first implication is established. The second is the research obligation. The first does not show that the second cannot be derived under the additional hypothesis. Nor does this logical clarification establish that the missing implication is available.
+
+The narrower, mathematically justified result is:
+> *Shrinking the omitted truncation tail does not make the included remainder small. The explicit-formula identity requires full cancellation ($\bar R_{\varepsilon, T} \to -A_{0, \Gamma}$); a new restriction derived under the off-line-zero hypothesis would be needed to make that requirement contradictory.*
+
+Growing windows and global formulations remain optional research candidates, but do not evade the exact explicit-formula identity.
+
+## 42.2 Dual-Kernel Diagnostics and Benchmark Decoupling
+Definitions are frozen and decoupled:
+1. **Exponential Smooth Bump** $\eta_{\rm smooth}(v) = \exp(1 - 1/(1-v^2)) \mathbf{1}_{|v|<1}$:
+   Belongs to $C_c^\infty(\mathbb R)$, peak 1, integral $\approx 1.20690032244195$.
+   For $K=0, J=1, \varepsilon=0.1, T=30$ on test bump $w \in C_c^\infty(\mathbb R)$ with support $[8, 20]$:
+   - 256-node Gauss-Legendre quadrature: $0.2692888165323234$
+   - 512-node Gauss-Legendre quadrature: $0.2692888165322876$
+   - Discrepancy: $3.58 \times 10^{-14}$.
+2. **Polynomial Kernel** $\eta_{\rm poly}(v) = (1 - v^2)^4 \mathbf{1}_{|v|\le 1}$:
+   Belongs to $C^3(\mathbb R)$ with 4th derivative jumps at endpoints $v = \pm 1$, peak 1, integral $256/315 \approx 0.81269841269841$.
+   - 256-node Gauss-Legendre quadrature: $0.1813269198736548$
+   - 512-node Gauss-Legendre quadrature: $0.1813269198736497$
+   - Discrepancy: $5.10 \times 10^{-15}$.
+
+Zero extension and translation of the smooth bump $w(x - \varepsilon v)$ introduce no derivative discontinuities on $\mathbb R$. The earlier numerical discrepancy was caused solely by 2D product quadrature grid resolution across $[8, 20]$.
+
+## 42.3 Separation of Complete from Truncated Remainder
+1. **Complete Untruncated Remainder**:
+   $$\bar Q_\varepsilon = \bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon = 0 \quad (\varepsilon < d_{\min}) \implies \bar R^{\rm full}_\varepsilon = -\bar A_{\varepsilon, \Gamma}.$$
+   Formally proved in Lean 4: `explicit_formula_full_remainder_cancellation`.
+2. **Truncated Remainder with Cutoff $T$**:
+   $$\bar Q_\varepsilon = \bar A_{\varepsilon, \Gamma} + \bar R_{\varepsilon, T} + \bar E_{\varepsilon, T} = 0 \quad (\varepsilon < d_{\min}) \implies |\bar R_{\varepsilon, T} - (-A_{0, \Gamma})| \le |\bar A_{\varepsilon, \Gamma} - A_{0, \Gamma}| + |\bar E_{\varepsilon, T}|.$$
+   Formally proved in Lean 4: `explicit_formula_truncated_remainder_zero_Q_bound`.
+   Along $T(\varepsilon) = \varepsilon^{-\alpha}$ ($\alpha > p/(p-2)$), the tail satisfies $|\bar E_{\varepsilon, T(\varepsilon)}| \to 0$ (proved in Lean 4: `power_log_tail_limit_tendsto`), establishing that $\bar R_{\varepsilon, T(\varepsilon)} \to -A_{0, \Gamma}$.
+
+## 42.4 Positivity Scope and Cross-Grade Product Sign
+The FLINT certified interval enclosure $A_{0, \Gamma} \in [0.543269, 0.545611] > 0$ applies only to the specific instance $(K=0, J=1, [8, 20], \rho_1)$.
+Universal positivity across all grades is **falsified**:
+By the product-to-sum identity (formally proved in Lean 4: `cos_mul_cos_product_to_sum`):
+$$\cos\left(\gamma \log\frac{x}{a_K}\right) \cos\left(\gamma \log\frac{x}{a_J}\right) = \frac{1}{2}\left[\cos((J-K)\gamma\log\tau) + \cos(2\gamma\log x - (K+J)\gamma\log\tau)\right].$$
+For $K \ne J$, the constant phase $\cos((J-K)\gamma\log\tau)$ can be negative.
+On $[45, 65]$ for $K=0, J=2, \rho_1$, $A_{0, \Gamma} \approx -0.00708 < 0$.
+
+## 42.5 Research Attempt on the Missing Arithmetic Implication
+Under the off-line zero hypothesis $H(\rho_0)$, the explicit formula operates as an exact Fourier-Mellin transform identity.
+Because the prime-power measures $\mu_K$ and $\mu_J$ have disjoint supports, their product measure has no support on the diagonal $x = y$, forcing $Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$.
+The explicit formula identity decomposes this identically zero distribution into $\bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon \equiv 0$, forcing $\bar R^{\rm full}_\varepsilon \equiv -\bar A_{\varepsilon, \Gamma}$.
+No independently justified property of the prime-zeta relationship prevents this exact cancellation.
+Therefore, no new implication toward forbidden coincidence $m\tau^K = n\tau^J$ was established.
+The Transcendental Continuation bridge remains strictly **OPEN**. Total compiled Lean 4 theorems: **225**.

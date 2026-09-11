@@ -100,6 +100,9 @@
     "formal/RiemannScope/Grade.lean: power_log_decay_subordination",
     "formal/RiemannScope/Grade.lean: finite_spectral_perturbation_rigidity_vandermonde_2point",
     "formal/RiemannScope/Grade.lean: finite_spectral_perturbation_rigidity_vandermonde_general",
+    "formal/RiemannScope/Grade.lean: explicit_formula_truncated_remainder_zero_Q_bound",
+    "formal/RiemannScope/Grade.lean: explicit_formula_full_remainder_cancellation",
+    "formal/RiemannScope/Grade.lean: cos_mul_cos_product_to_sum",
     "formal/RiemannScope/Grade.lean: mode_extraction_eventual_lower_bound",
     "formal/RiemannScope/Grade.lean: mode_extraction_coefficient_divergence_half",
     "transcendental.py: audit_tc_cutoff_condition_counterexample",
@@ -135,6 +138,9 @@
     "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_quadratic_form_mode_extraction_obstruction",
     "tests/test_tc_mechanism_discovery.py: test_epic_finite_spectral_perturbation_rigidity",
     "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_compatibility_investigation",
+    "tests/test_tc_mechanism_discovery.py: test_epic_kernel_comparison_and_benchmark_diagnostics",
+    "tests/test_tc_mechanism_discovery.py: test_epic_selected_spectral_block_positivity_scope",
+    "tests/test_tc_mechanism_discovery.py: test_epic_reductio_logical_structure_audit",
     "data/tc_epic_two_variable_synthesis.json"
   ],
   "external_sources": [

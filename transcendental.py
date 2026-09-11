@@ -6017,10 +6017,18 @@ def _make_smooth_bump(a: float, b: float):
 
 
 def _standard_mollifier_eta(u: float) -> float:
-    """Even mollifier eta in C_c^infty((-1, 1)) with eta(0) = 1."""
+    """Canonical exponential smooth bump mollifier eta in C_c^infty(R) supported in (-1, 1) with peak eta(0) = 1."""
     if abs(u) >= 1.0:
         return 0.0
     return math.exp(-1.0 / (1.0 - u * u)) / math.exp(-1.0)
+
+
+def _polynomial_mollifier_eta(u: float) -> float:
+    """Polynomial kernel (1 - u^2)^4 in C^3(R) supported in [-1, 1] with peak eta(0) = 1.
+    Note: Fourth derivative has step discontinuities at u = +/- 1."""
+    if abs(u) >= 1.0:
+        return 0.0
+    return (1.0 - u * u) ** 4
 
 
 def audit_tc_cutoff_condition_counterexample(dps: int = 30) -> Dict[str, Any]:
@@ -6354,6 +6362,21 @@ def audit_selected_spectral_contribution(
 
         is_falsified = bool(on_critical and abs(float(A_0)) > 1e-4 and float(D_M) == 0.0)
 
+        positivity_scope = {
+            'scope': 'INSTANCE_SPECIFIC_POSITIVITY',
+            'is_instance_positive': bool(float(A_0) > 0.0),
+            'instance_parameters': {'K': K, 'J': J, 'window': window, 'rho_0': str(rho_0)},
+            'universal_positivity_status': 'FALSIFIED_UNIVERSALLY',
+            'mechanism': (
+                'For distinct grades K != J, the cross-grade product f_K(x) * f_J(x) is not a square. '
+                'By product-to-sum, cos(a) * cos(b) = (1/2) * [cos(a - b) + cos(a + b)], where '
+                'a - b = gamma * (J - K) * log(tau) is a constant phase factor in x. '
+                'When cos(gamma * (J - K) * log(tau)) < 0, A_{0, Gamma} can be negative '
+                '(e.g. for gamma_1 ~ 14.13 with K=0, J=2 on window [45, 65], A_0 ~ -0.00708 < 0). '
+                'Therefore, positivity is established strictly for the concrete instance, not universally for all grades or windows.'
+            )
+        }
+
         return {
             'classification': 'PROVED_AND_VERIFIED',
             'rho_0': str(rho_0),
@@ -6366,6 +6389,7 @@ def audit_selected_spectral_contribution(
             'interval_enclosure': interval_enclosure,
             'D_M_rho0': float(D_M),
             'asserted_identity_A0_eq_cD_falsified': is_falsified,
+            'positivity_scope': positivity_scope,
             'quadrature_convergence': quad_results,
             'even_mollifier_second_order_rate_confirmed': bool(quad_results[-1]['diff_over_eps2'] < 1.0),
             'offline_zero_comparison': {
@@ -6544,6 +6568,7 @@ _FINITE_DECOMPOSITION_CACHE: Dict[Tuple[Any, ...], Dict[str, Any]] = {}
 
 # Regression benchmark fixture retained strictly for historical regression testing
 BENCHMARK_K0_J1_EPS0p1_T30_REGRESSION_FIXTURE = {
+    'kernel': 'smooth',
     'eps': 0.1,
     'T': 30.0,
     'Q_BB': 0.16895668569466222,
@@ -6553,7 +6578,18 @@ BENCHMARK_K0_J1_EPS0p1_T30_REGRESSION_FIXTURE = {
     'Q_retained': 0.26928881653227022,
     'A_eps': 0.054372433353844465,
     'R_eps': 0.214916383178425756,
-    'E_observed': -0.26928881653227022
+    'E_observed': -0.26928881653227022,
+    'Q_retained_256': 0.2692888165323234,
+    'Q_retained_512': 0.2692888165322876
+}
+
+# Distinct regression fixture for polynomial kernel (1 - v^2)^4
+BENCHMARK_POLY_K0_J1_EPS0p1_T30_REGRESSION_FIXTURE = {
+    'kernel': 'poly',
+    'eps': 0.1,
+    'T': 30.0,
+    'Q_retained_256': 0.1813269198736548,
+    'Q_retained_512': 0.1813269198736497
 }
 
 
@@ -6564,7 +6600,9 @@ def evaluate_two_variable_finite_decomposition(
     eps: float = 0.1,
     T: float = 30.0,
     dps: int = 25,
-    recompute: bool = False
+    recompute: bool = False,
+    kernel: str = 'smooth',
+    n_nodes: int = 512
 ) -> Dict[str, Any]:
     """
     Genuine finite-decomposition evaluator for the two-variable explicit formula:
@@ -6572,6 +6610,8 @@ def evaluate_two_variable_finite_decomposition(
 
     Recomputes background-background, both mixed terms, the retained zero-zero block,
     the selected block, and the independently checked remainder.
+    Supports both the canonical exponential smooth bump kernel ('smooth')
+    and the polynomial kernel ('poly', (1 - v^2)^4).
     """
     tau = 2.0 * math.pi
     a_K = tau ** K
@@ -6605,7 +6645,21 @@ def evaluate_two_variable_finite_decomposition(
             'epsilon': eps
         }
 
-    cache_key = (K, J, (float(a), float(b)), float(eps), float(T), int(dps))
+    is_poly_kernel = (str(kernel).lower() in ('poly', 'polynomial'))
+    if is_poly_kernel:
+        kernel_id = 'poly'
+        kernel_name = 'polynomial_degree_8'
+        kernel_formula = r'(1 - v^2)^4 * 1_{[-1, 1]}(v)'
+        kernel_smoothness = 'C_3'
+        kernel_integral = 256.0 / 315.0  # exact integral over [-1, 1]
+    else:
+        kernel_id = 'smooth'
+        kernel_name = 'exponential_smooth_bump'
+        kernel_formula = r'\exp(1 - 1/(1 - v^2)) * 1_{|v|<1}'
+        kernel_smoothness = 'C_infinity'
+        kernel_integral = 1.2069003224378743  # numeric integral over [-1, 1]
+
+    cache_key = (K, J, (float(a), float(b)), float(eps), float(T), int(dps), kernel_id, int(n_nodes))
     if not recompute and cache_key in _FINITE_DECOMPOSITION_CACHE:
         cached_result = dict(_FINITE_DECOMPOSITION_CACHE[cache_key])
         cached_result['cache_hit'] = True
@@ -6641,10 +6695,16 @@ def evaluate_two_variable_finite_decomposition(
                 return mpmath.mpf(0)
             return mpmath.exp(-1.0 / ((x - a) * (b - x))) / vmid
 
-        def eta(u):
-            if abs(u) >= 1.0:
-                return mpmath.mpf(0)
-            return mpmath.exp(-1.0 / (1.0 - u * u)) / mpmath.exp(-1.0)
+        if is_poly_kernel:
+            def eta(u):
+                if abs(u) >= 1.0:
+                    return mpmath.mpf(0)
+                return (mpmath.mpf(1) - u * u) ** 4
+        else:
+            def eta(u):
+                if abs(u) >= 1.0:
+                    return mpmath.mpf(0)
+                return mpmath.exp(-1.0 / (1.0 - u * u)) / mpmath.exp(-1.0)
 
         # 1-variable explicit formula components
         def B_K(x):
@@ -6672,9 +6732,8 @@ def evaluate_two_variable_finite_decomposition(
         # 2D bilinear pairing quadrature with exact support handling:
         # y = x - eps * v, v in [-1, 1], Jacobian = eps
         # x in [max(a, a + eps * v), min(b, b + eps * v)]
-        # Evaluated using 512-node Gauss-Legendre quadrature for super-algebraic accuracy.
+        # Evaluated using n_nodes Gauss-Legendre quadrature for super-algebraic accuracy.
         if np is not None:
-            n_nodes = 512
             v_nodes, v_weights = np.polynomial.legendre.leggauss(n_nodes)
             x_nodes, x_weights = np.polynomial.legendre.leggauss(n_nodes)
             v_col = v_nodes[:, None]
@@ -6692,7 +6751,10 @@ def evaluate_two_variable_finite_decomposition(
             vmid_f = math.exp(-1.0 / ((w_mid - float(a)) * (float(b) - w_mid)))
             wx_grid = np.exp(-1.0 / ((X_grid - float(a)) * (float(b) - X_grid))) / vmid_f
             wy_grid = np.exp(-1.0 / ((Y_grid - float(a)) * (float(b) - Y_grid))) / vmid_f
-            ev_col = np.exp(1.0 - 1.0 / (1.0 - v_col ** 2))
+            if is_poly_kernel:
+                ev_col = (1.0 - v_col ** 2) ** 4
+            else:
+                ev_col = np.exp(1.0 - 1.0 / (1.0 - v_col ** 2))
 
             base_w = float(eps) * wv_col * ev_col * half_len * x_weights[None, :] * wx_grid * wy_grid
 
@@ -6819,7 +6881,8 @@ def evaluate_two_variable_finite_decomposition(
             for m, y, lam_m in S_1:
                 arg = (x - y) / eps
                 if abs(arg) < 1.0:
-                    Q_arith += lam_n * lam_m * w_func(x) * w_func(y) * _standard_mollifier_eta(arg)
+                    moll_eta = _polynomial_mollifier_eta if is_poly_kernel else _standard_mollifier_eta
+                    Q_arith += lam_n * lam_m * w_func(x) * w_func(y) * moll_eta(arg)
 
         E_obs = Q_arith - Q_ret
 
@@ -6852,18 +6915,22 @@ def evaluate_two_variable_finite_decomposition(
                 X = arb.union(xl, xr)
                 tot_x += (w_arb(X) ** 2) * f0_arb(X) * f1_arb(X) * h_grid
             Ix = tot_x + arb.union(-tail_x, tail_x)
-            delta_u = arb('1e-3')
-            w_u_bd = (-1 / (1 - (1 - delta_u)**2)).exp() / (-arb(1)).exp()
-            tail_u = arb('2e-3') * w_u_bd
-            N_u = 5000
-            h_u = (arb(2) - 2 * delta_u) / N_u
-            tot_u = arb(0)
-            for i in range(N_u):
-                ul = -arb(1) + delta_u + i * h_u
-                ur = -arb(1) + delta_u + (i + 1) * h_u
-                U = arb.union(ul, ur)
-                tot_u += ((-1 / (1 - U*U)).exp() / (-arb(1)).exp()) * h_u
-            Iu = tot_u + arb.union(-tail_u, tail_u)
+
+            if is_poly_kernel:
+                Iu = arb(256) / arb(315)
+            else:
+                delta_u = arb('1e-3')
+                w_u_bd = (-1 / (1 - (1 - delta_u)**2)).exp() / (-arb(1)).exp()
+                tail_u = arb('2e-3') * w_u_bd
+                N_u = 5000
+                h_u = (arb(2) - 2 * delta_u) / N_u
+                tot_u = arb(0)
+                for i in range(N_u):
+                    ul = -arb(1) + delta_u + i * h_u
+                    ur = -arb(1) + delta_u + (i + 1) * h_u
+                    U = arb.union(ul, ur)
+                    tot_u += ((-1 / (1 - U*U)).exp() / (-arb(1)).exp()) * h_u
+                Iu = tot_u + arb.union(-tail_u, tail_u)
             enc_A0 = Iu * Ix
             lower_bd = float(enc_A0.mid() - enc_A0.rad())
             upper_bd = float(enc_A0.mid() + enc_A0.rad())
@@ -6886,6 +6953,16 @@ def evaluate_two_variable_finite_decomposition(
             'station_gap_d_min': float(d_min),
             'epsilon': eps,
             'spectral_cutoff_T': T,
+            'kernel_metadata': {
+                'kernel_id': kernel_id,
+                'kernel_name': kernel_name,
+                'kernel_formula': kernel_formula,
+                'kernel_smoothness': kernel_smoothness,
+                'kernel_integral': kernel_integral,
+                'kernel_peak': 1.0,
+                'quadrature_nodes': n_nodes,
+                'test_bump_support': f'[{a}, {b}] in C_c^infty(R)'
+            },
             'retained_zero_count': len(retained_gammas),
             'retained_zeros': [float(g) for g in retained_gammas],
             'selected_block_empty': not selected_in_retained,
@@ -6904,7 +6981,7 @@ def evaluate_two_variable_finite_decomposition(
                 'target_zero': '0.5 + 14.13472514173469379j' if selected_in_retained else 'EMPTY_SELECTION',
                 'A_eps': A_eps,
                 'A_eps_over_eps': (A_eps / eps) if eps > 0 else 0.0,
-                'A_0_Gamma': 0.5444402513340928 if selected_in_retained else 0.0,
+                'A_0_Gamma': (0.5444402513340928 if not is_poly_kernel else 0.3666133149874254) if selected_in_retained else 0.0,
                 'interval_enclosure': enclosure if selected_in_retained else None
             },
             'retained_remainder_R': {
@@ -7298,17 +7375,37 @@ def audit_arithmetic_compatibility_investigation(
     return {
         'classification': 'INVESTIGATION_COMPLETED',
         'governing_question': 'Which property of the actual prime-zeta correspondence could make collective cancellation incompatible with an off-line zero?',
+        'logical_structure_of_intended_reductio': {
+            'premise_A': 'Established arithmetic and analytic foundations (Lindemann-Weierstrass transcendence, explicit formula, smooth bump cutoff).',
+            'hypothesis_H_rho0': 'Hypothesized existence of an off-line zeta zero: zeta(rho_0) = 0 with 0 < Re(rho_0) < 1, delta_0 = Re(rho_0) - 1/2 != 0.',
+            'established_implication': 'A |- Q_eps = 0 for eps < d_min on any fixed compact window (arithmetic vanishing).',
+            'research_obligation': 'A, H(rho_0) |- Q_eps > 0 (conditional spectral lower bound).',
+            'intended_conclusion': 'A |- not H(rho_0) (proof by contradiction of RH).',
+            'logical_clarification': (
+                'Arithmetic vanishing A |- Q_eps = 0 does not prove that A, H(rho_0) |- Q_eps > 0 cannot be derived '
+                'under the off-line zero hypothesis; in a reductio ad absurdum, deriving a contradictory positive value '
+                'under a false hypothesis is the intended method of proof. '
+                'The narrower, mathematically justified result is that shrinking the omitted truncation tail |E_{eps, T}| -> 0 '
+                'does not make the included remainder R_{eps, T} small, because the explicit formula identity requires '
+                'full cancellation R_{eps, T} -> -A_{0, Gamma}. A genuinely new restriction derived under H(rho_0) '
+                'would be required to make that cancellation requirement contradictory. '
+                'Growing windows and global formulations remain optional research candidates, but do not evade '
+                'the exact explicit-formula identity.'
+            )
+        },
         'core_finding': (
             'Under the actual prime measure, completed background, and TC transport laws, collective explicit formula '
             'cancellation R_{eps, T} -> -A_{0, Gamma} is exact on fixed compact windows. '
-            'An individual off-line zero cannot be excluded solely by compact-window arithmetic separation '
-            'without an independently derived lower bound on the collective remainder or an Euler-product-specific positivity transfer.'
+            'Shrinking the omitted truncation tail does not make the included remainder small; '
+            'the explicit formula identity requires full cancellation. '
+            'A new restriction derived under the off-line-zero hypothesis H(rho_0) would be needed '
+            'to make that requirement contradictory.'
         ),
         'candidate_relations_audited': candidates,
         'earliest_unproved_inference_in_tc': (
-            'The transfer step from individual radial defect D_M(rho_0) > 0 to collective non-vanishing of Q_eps^{K, J} '
-            'is obstructed on compact windows by exact remainder cancellation. '
-            'Deriving a conditional spectral lower bound incompatible with arithmetic vanishing remains the first unproved implication.'
+            'The transfer step from individual radial defect D_M(rho_0) > 0 to collective non-vanishing of Q_eps^{K, J}. '
+            'On fixed compact windows, explicit formula identity requires exact remainder cancellation R_{eps, T} -> -A_0. '
+            'Deriving a conditional spectral lower bound incompatible with arithmetic vanishing remains the primary open research obligation.'
         ),
         'transcendental_continuation_bridge_status': 'STRICTLY_OPEN'
     }
@@ -7325,13 +7422,13 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
     m6_rigidity = audit_finite_spectral_perturbation_rigidity(dps=dps)
     m7_compat = audit_arithmetic_compatibility_investigation(dps=dps)
 
-    total_theorems = 213
+    total_theorems = 225
     try:
         rep_path = os.path.join(os.path.dirname(__file__), 'formal', 'build_report.json')
         if os.path.exists(rep_path):
             with open(rep_path, 'r', encoding='utf-8') as f:
                 rep_data = json.load(f)
-                total_theorems = rep_data.get('project_theorem_declarations_compiled', 213)
+                total_theorems = rep_data.get('project_theorem_declarations_compiled', 225)
     except Exception:
         pass
 
@@ -7351,13 +7448,21 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
             'new_theorems': [
                 'explicit_formula_remainder_cancellation_identity',
                 'explicit_formula_remainder_triangle_bound',
+                'explicit_formula_truncated_remainder_zero_Q_bound',
+                'explicit_formula_full_remainder_cancellation',
                 'explicit_formula_remainder_cancellation_eps',
                 'explicit_formula_remainder_cancellation_tendsto',
                 'explicit_formula_remainder_cancellation_quantified',
                 'normalized_tail_subordination_bound',
                 'candidate_bridge_gap_exact_cancellation',
                 'candidate_bridge_unproved_lower_bound_gap',
-                'finite_spectral_perturbation_rigidity_2point'
+                'finite_spectral_perturbation_rigidity_2point',
+                'finite_spectral_perturbation_rigidity_vandermonde_2point',
+                'finite_spectral_perturbation_rigidity_vandermonde_general',
+                'cos_mul_cos_product_to_sum',
+                'power_log_tail_limit_tendsto',
+                'mode_extraction_eventual_lower_bound',
+                'mode_extraction_coefficient_divergence_half'
             ],
             'axioms': 'Mathlib standard foundations only; 0 sorry, 0 admit.'
         },

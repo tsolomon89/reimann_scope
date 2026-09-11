@@ -2446,3 +2446,96 @@ def test_epic_arithmetic_compatibility_investigation():
     assert candidates['Density Theorems and Zero-Free Regions (Vinogradov-Korobov)']['classification'] == 'ASYMPTOTIC_BOUND_ONLY'
     assert 'transfer step' in res['earliest_unproved_inference_in_tc']
     assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
+
+
+def test_epic_kernel_comparison_and_benchmark_diagnostics():
+    """Verify kernel distinction, normalization, integral, and 256/512-node benchmarks."""
+    # 1. Smooth exponential bump kernel at 512 nodes (canonical benchmark)
+    res_smooth_512 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=25, recompute=True, kernel='smooth', n_nodes=512
+    )
+    meta_s = res_smooth_512['kernel_metadata']
+    assert meta_s['kernel_id'] == 'smooth'
+    assert meta_s['kernel_smoothness'] == 'C_infinity'
+    assert abs(meta_s['kernel_integral'] - 1.2069003224378743) < 1e-6
+    assert meta_s['kernel_peak'] == 1.0
+    q_ret_s512 = res_smooth_512['retained_spectral_expansion']['Q_retained_sum']
+    assert abs(q_ret_s512 - 0.26928881653228) < 1e-9
+
+    # 2. Smooth exponential bump kernel at 256 nodes
+    res_smooth_256 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=25, recompute=True, kernel='smooth', n_nodes=256
+    )
+    q_ret_s256 = res_smooth_256['retained_spectral_expansion']['Q_retained_sum']
+    assert abs(q_ret_s256 - 0.26928881653232) < 1e-6
+
+    # 3. Polynomial kernel (1 - v^2)^4 at 512 nodes
+    res_poly_512 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=25, recompute=True, kernel='poly', n_nodes=512
+    )
+    meta_p = res_poly_512['kernel_metadata']
+    assert meta_p['kernel_id'] == 'poly'
+    assert meta_p['kernel_smoothness'] == 'C_3'
+    assert abs(meta_p['kernel_integral'] - 256.0 / 315.0) < 1e-12
+    assert meta_p['kernel_peak'] == 1.0
+    q_ret_p512 = res_poly_512['retained_spectral_expansion']['Q_retained_sum']
+    assert abs(q_ret_p512 - 0.18132691987364) < 1e-8
+
+    # 4. Polynomial kernel at 256 nodes
+    res_poly_256 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=25, recompute=True, kernel='poly', n_nodes=256
+    )
+    q_ret_p256 = res_poly_256['retained_spectral_expansion']['Q_retained_sum']
+    assert abs(q_ret_p256 - 0.18132691987365) < 1e-6
+
+    # 5. Arithmetic vanishing holds identically for BOTH kernels when eps < d_min
+    assert res_smooth_512['arithmetic_vanishing_verified'] is True
+    assert res_poly_512['arithmetic_vanishing_verified'] is True
+    assert res_smooth_512['arithmetic_observable_Q_eps'] == 0.0
+    assert res_poly_512['arithmetic_observable_Q_eps'] == 0.0
+
+
+def test_epic_selected_spectral_block_positivity_scope():
+    """Verify quantifier scope of A_{0, Gamma}: instance-specific positivity vs universal sign."""
+    # Instance 1: K=0, J=1, window [8, 20], rho_1 ~ 14.13 -> strictly positive
+    res_inst1 = transcendental.audit_selected_spectral_contribution(K=0, J=1, window=(8.0, 20.0), dps=25)
+    assert res_inst1['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_inst1['A_0_Gamma'] > 0.54
+    assert res_inst1['positivity_scope']['is_instance_positive'] is True
+    assert res_inst1['positivity_scope']['universal_positivity_status'] == 'FALSIFIED_UNIVERSALLY'
+
+    # Instance 2: Cross-grade phase factor cos(M * gamma * log(tau)) can be negative for distinct grades
+    tau = 2.0 * math.pi
+    log_tau = math.log(tau)
+    gamma_1 = 14.13472514173469379
+    cos_phase_M2 = math.cos(2 * gamma_1 * log_tau)
+    assert cos_phase_M2 < 0.0  # cos(2 * gamma_1 * ln tau) ~ -0.1192 < 0
+
+    # Admissible window for K=0, J=2 is a > tau^2 ~ 39.48. On [45, 65], A_0 is negative
+    import scipy.integrate as integrate
+    a_K = 1.0
+    a_J = tau ** 2
+    a, b = 45.0, 65.0
+    mid = (a + b) / 2.0
+    vmid = math.exp(-1.0 / ((mid - a) * (b - mid)))
+    def integrand(x):
+        w = math.exp(-1.0 / ((x - a) * (b - x))) / vmid
+        f_K = 2.0 / math.sqrt(a_K * x) * math.cos(gamma_1 * math.log(x / a_K))
+        f_J = 2.0 / math.sqrt(a_J * x) * math.cos(gamma_1 * math.log(x / a_J))
+        return (w ** 2) * f_K * f_J
+    val, _ = integrate.quad(integrand, a, b, epsabs=1e-12)
+    int_eta = 1.2069003224378743
+    A0_M2 = int_eta * val
+    assert A0_M2 < 0.0  # approximately -0.00708 < 0
+
+
+def test_epic_reductio_logical_structure_audit():
+    """Verify logical clarification of intended reductio ad absurdum vs universal impossibility."""
+    res = transcendental.audit_arithmetic_compatibility_investigation(dps=25)
+    struct = res['logical_structure_of_intended_reductio']
+    assert 'A |- Q_eps = 0' in struct['established_implication']
+    assert 'A, H(rho_0) |- Q_eps > 0' in struct['research_obligation']
+    assert 'A |- not H(rho_0)' in struct['intended_conclusion']
+    assert 'does not prove' in struct['logical_clarification']
+    assert 'full cancellation' in res['core_finding']
+    assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'

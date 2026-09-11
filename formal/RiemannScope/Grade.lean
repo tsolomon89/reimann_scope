@@ -11,6 +11,7 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Topology.Instances.Real
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.MetricSpace.PseudoMetric
@@ -360,6 +361,20 @@ theorem phase_cancelling_kernel_real (delta gamma u n : ℝ) :
     (((delta * u - (u ^ 2) / (2 * n ^ 2)) : ℝ) : ℂ) := by
   push_cast
   ring
+
+/-- Product-to-sum identity for cosine oscillations:
+    cos(a) * cos(b) = (1/2) * (cos(a - b) + cos(a + b)).
+    For cross-grade modes, a - b = gamma * (J - K) * log(tau) is constant in x.
+    When K = J, the difference is 0 and cos(0) = 1.
+    When K ≠ J, the constant phase cos(gamma * (J - K) * log(tau)) can be negative,
+    demonstrating that cross-grade products f_K * f_J are not universally positive squares. -/
+theorem cos_mul_cos_product_to_sum (a b : ℝ) :
+    Real.cos a * Real.cos b = (1 / 2 : ℝ) * (Real.cos (a - b) + Real.cos (a + b)) := by
+  have h := Real.cos_add_cos (a + b) (a - b)
+  have h1 : ((a + b) + (a - b)) / 2 = a := by ring
+  have h2 : ((a + b) - (a - b)) / 2 = b := by ring
+  rw [h1, h2] at h
+  linarith
 
 /-- Cycle 6: Non-vanishing of the meromorphic pole residue at an off-critical zero:
     For any nontrivial zero rho = 1/2 + delta + i*gamma with ordinate gamma ≠ 0
@@ -1084,6 +1099,25 @@ theorem explicit_formula_remainder_triangle_bound (Q A R E A₀ : ℝ)
   rw [h_id]
   have h1 : |Q - (A - A₀) - E| ≤ |Q - (A - A₀)| + |E| := abs_sub (Q - (A - A₀)) E
   have h2 : |Q - (A - A₀)| ≤ |Q| + |A - A₀| := abs_sub Q (A - A₀)
+  linarith
+
+/-- Remainder error bound under exact arithmetic vanishing Q = 0:
+    When the arithmetic overlap vanishes identically (Q = 0), the deviation of the
+    truncated remainder R from the negative asymptotic selected mode -A₀ satisfies
+    |R - (-A₀)| ≤ |A - A₀| + |E|. -/
+theorem explicit_formula_truncated_remainder_zero_Q_bound (A R E A₀ : ℝ)
+    (h_decomp : 0 = A + R + E) :
+    |R - (-A₀)| ≤ |A - A₀| + |E| := by
+  have h_tri := explicit_formula_remainder_triangle_bound 0 A R E A₀ h_decomp
+  rw [abs_zero, zero_add] at h_tri
+  exact h_tri
+
+/-- Full (untruncated) remainder identity under exact arithmetic vanishing Q = 0:
+    When the complete explicit formula has no omitted tail (Q = A + R_full),
+    vanishing Q = 0 forces the complete remainder to be the exact negative: R_full = -A. -/
+theorem explicit_formula_full_remainder_cancellation (A R_full : ℝ)
+    (h_decomp : 0 = A + R_full) :
+    R_full = -A := by
   linarith
 
 /-- Quantitative epsilon-delta remainder cancellation limit theorem:

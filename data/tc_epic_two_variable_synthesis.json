@@ -267,6 +267,21 @@
     },
     "D_M_rho0": 0.0,
     "asserted_identity_A0_eq_cD_falsified": true,
+    "positivity_scope": {
+      "scope": "INSTANCE_SPECIFIC_POSITIVITY",
+      "is_instance_positive": true,
+      "instance_parameters": {
+        "K": 0,
+        "J": 1,
+        "window": [
+          8.0,
+          20.0
+        ],
+        "rho_0": "(0.5 + 14.13472514173469379045725j)"
+      },
+      "universal_positivity_status": "FALSIFIED_UNIVERSALLY",
+      "mechanism": "For distinct grades K != J, the cross-grade product f_K(x) * f_J(x) is not a square. By product-to-sum, cos(a) * cos(b) = (1/2) * [cos(a - b) + cos(a + b)], where a - b = gamma * (J - K) * log(tau) is a constant phase factor in x. When cos(gamma * (J - K) * log(tau)) < 0, A_{0, Gamma} can be negative (e.g. for gamma_1 ~ 14.13 with K=0, J=2 on window [45, 65], A_0 ~ -0.00708 < 0). Therefore, positivity is established strictly for the concrete instance, not universally for all grades or windows."
+    },
     "quadrature_convergence": [
       {
         "epsilon": 0.5,
@@ -441,6 +456,16 @@
     "station_gap_d_min": 0.1504440784612413,
     "epsilon": 0.1,
     "spectral_cutoff_T": 30.0,
+    "kernel_metadata": {
+      "kernel_id": "smooth",
+      "kernel_name": "exponential_smooth_bump",
+      "kernel_formula": "\\exp(1 - 1/(1 - v^2)) * 1_{|v|<1}",
+      "kernel_smoothness": "C_infinity",
+      "kernel_integral": 1.2069003224378743,
+      "kernel_peak": 1.0,
+      "quadrature_nodes": 512,
+      "test_bump_support": "[8.0, 20.0] in C_c^infty(R)"
+    },
     "retained_zero_count": 3,
     "retained_zeros": [
       14.134725141734695,
@@ -590,7 +615,15 @@
   "milestone_7_arithmetic_compatibility": {
     "classification": "INVESTIGATION_COMPLETED",
     "governing_question": "Which property of the actual prime-zeta correspondence could make collective cancellation incompatible with an off-line zero?",
-    "core_finding": "Under the actual prime measure, completed background, and TC transport laws, collective explicit formula cancellation R_{eps, T} -> -A_{0, Gamma} is exact on fixed compact windows. An individual off-line zero cannot be excluded solely by compact-window arithmetic separation without an independently derived lower bound on the collective remainder or an Euler-product-specific positivity transfer.",
+    "logical_structure_of_intended_reductio": {
+      "premise_A": "Established arithmetic and analytic foundations (Lindemann-Weierstrass transcendence, explicit formula, smooth bump cutoff).",
+      "hypothesis_H_rho0": "Hypothesized existence of an off-line zeta zero: zeta(rho_0) = 0 with 0 < Re(rho_0) < 1, delta_0 = Re(rho_0) - 1/2 != 0.",
+      "established_implication": "A |- Q_eps = 0 for eps < d_min on any fixed compact window (arithmetic vanishing).",
+      "research_obligation": "A, H(rho_0) |- Q_eps > 0 (conditional spectral lower bound).",
+      "intended_conclusion": "A |- not H(rho_0) (proof by contradiction of RH).",
+      "logical_clarification": "Arithmetic vanishing A |- Q_eps = 0 does not prove that A, H(rho_0) |- Q_eps > 0 cannot be derived under the off-line zero hypothesis; in a reductio ad absurdum, deriving a contradictory positive value under a false hypothesis is the intended method of proof. The narrower, mathematically justified result is that shrinking the omitted truncation tail |E_{eps, T}| -> 0 does not make the included remainder R_{eps, T} small, because the explicit formula identity requires full cancellation R_{eps, T} -> -A_{0, Gamma}. A genuinely new restriction derived under H(rho_0) would be required to make that cancellation requirement contradictory. Growing windows and global formulations remain optional research candidates, but do not evade the exact explicit-formula identity."
+    },
+    "core_finding": "Under the actual prime measure, completed background, and TC transport laws, collective explicit formula cancellation R_{eps, T} -> -A_{0, Gamma} is exact on fixed compact windows. Shrinking the omitted truncation tail does not make the included remainder small; the explicit formula identity requires full cancellation. A new restriction derived under the off-line-zero hypothesis H(rho_0) would be needed to make that requirement contradictory.",
     "candidate_relations_audited": [
       {
         "name": "Euler Product / Weil Positivity",
@@ -625,21 +658,29 @@
         "classification": "ASYMPTOTIC_BOUND_ONLY"
       }
     ],
-    "earliest_unproved_inference_in_tc": "The transfer step from individual radial defect D_M(rho_0) > 0 to collective non-vanishing of Q_eps^{K, J} is obstructed on compact windows by exact remainder cancellation. Deriving a conditional spectral lower bound incompatible with arithmetic vanishing remains the first unproved implication.",
+    "earliest_unproved_inference_in_tc": "The transfer step from individual radial defect D_M(rho_0) > 0 to collective non-vanishing of Q_eps^{K, J}. On fixed compact windows, explicit formula identity requires exact remainder cancellation R_{eps, T} -> -A_0. Deriving a conditional spectral lower bound incompatible with arithmetic vanishing remains the primary open research obligation.",
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 222,
+    "total_compiled_theorems": 225,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
+      "explicit_formula_truncated_remainder_zero_Q_bound",
+      "explicit_formula_full_remainder_cancellation",
       "explicit_formula_remainder_cancellation_eps",
       "explicit_formula_remainder_cancellation_tendsto",
       "explicit_formula_remainder_cancellation_quantified",
       "normalized_tail_subordination_bound",
       "candidate_bridge_gap_exact_cancellation",
       "candidate_bridge_unproved_lower_bound_gap",
-      "finite_spectral_perturbation_rigidity_2point"
+      "finite_spectral_perturbation_rigidity_2point",
+      "finite_spectral_perturbation_rigidity_vandermonde_2point",
+      "finite_spectral_perturbation_rigidity_vandermonde_general",
+      "cos_mul_cos_product_to_sum",
+      "power_log_tail_limit_tendsto",
+      "mode_extraction_eventual_lower_bound",
+      "mode_extraction_coefficient_divergence_half"
     ],
     "axioms": "Mathlib standard foundations only; 0 sorry, 0 admit."
   },
