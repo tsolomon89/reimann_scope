@@ -25,10 +25,15 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
    - `explicit_formula_remainder_cancellation_quantified`: Formalizes quantified $\varepsilon$-$\delta$ remainder cancellation.
    - `mode_extraction_uniform_bound_vanishes`: Formalizes the vanishing of uniformly bounded extraction functionals.
    - `mode_extraction_coefficient_divergence`: Formalizes the divergence of extraction constants $C(\varepsilon) \ge |c_0|/N(\varepsilon) \to \infty$.
-   - `power_log_tail_subordination_exponent_positive`: Formalizes exponent positivity $r = \alpha(p-2) - p > 0$.
-   - `power_log_decay_subordination`: Formalizes majorant subordination for the power-log remainder limit.
+   - `power_log_tail_subordination_exponent_positive`: Proves $\alpha(p-2) - p > 0$ for $p>2, \alpha > p/(p-2)$.
+   - `power_log_tail_limit_tendsto`: Proves the actual topological limit $\lim_{\varepsilon \to 0^+} \varepsilon^r \log^2(2+\varepsilon^{-\alpha}) = 0$ on the positive-side filter $\mathcal{N}[>] 0$ for $r > 0, \alpha > 0$.
+   - `power_log_decay_subordination`: Proves majorant subordination for the power-log remainder limit.
+   - `mode_extraction_uniform_bound_vanishes`: Proves that uniformly bounded extraction functionals vanish as $\varepsilon \to 0^+$.
+   - `mode_extraction_eventual_lower_bound`: Proves that $\lim_{\varepsilon \to 0^+} P(\varepsilon) = c_0 \ne 0$ forces an eventual half-lower bound $|P(\varepsilon)| \ge |c_0|/2$ on $\mathcal{N}[>] 0$.
+   - `mode_extraction_coefficient_divergence_half`: Proves that recovering a non-zero mode forces extraction constant divergence $C(\varepsilon) \ge |c_0| / (2 N(\varepsilon))$.
    - `finite_spectral_perturbation_rigidity_2point`: Formalizes 2-point non-singular linear independence of distinct complex exponentials.
-   - `finite_spectral_perturbation_rigidity_vandermonde_2point`: Formalizes single-point confluent Vandermonde rigidity eliminating point-sampling periodicity degeneracies.
+   - `finite_spectral_perturbation_rigidity_vandermonde_2point`: Formalizes single-point confluent Vandermonde rigidity for 2 modes.
+   - `finite_spectral_perturbation_rigidity_vandermonde_general`: Formalizes general $n$-mode confluent Vandermonde rigidity for an arbitrary finite family of distinct exponents at a single interior point.
 5. **Scoped Mode Extraction Obstruction**: With the smooth mollifier correctly normalized to $\int j = 1$, the finite-epsilon convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2$ is proved to scale as $O(\sqrt{\varepsilon}) \to 0$ (matching the asymptotic leading term within $0.11\%$ at $\varepsilon=0.2$ and $0.0003\%$ at $\varepsilon=0.01$). Any linear functional family satisfying $|P_\varepsilon(g)| \le C N_\varepsilon(g)$ with uniform $C$ forces $P_\varepsilon(f) \to 0$ on fixed modes, requiring divergent $C_\varepsilon = \Omega(\varepsilon^{-1/2}) \to \infty$ to isolate a fixed mode.
 6. **Refutation of Arbitrary Compensation via Finite Spectral Perturbation Rigidity**: The previous report's unsupported claim that arbitrary perturbations of a zero can be absorbed by the remaining spectrum and background was refuted. By the **Finite Spectral Perturbation Rigidity Theorem**, the family $\{x^{\rho-1} : \rho \in S\}$ for distinct exponents $S$ is linearly independent on any open interval $I \subset (a_K, \infty)$. With the arithmetic measure and background fixed, a non-trivial finite spectral perturbation cannot vanish identically or be absorbed.
 7. **Arithmetic Compatibility Investigation**: Four candidate arithmetic-compatibility relations were audited:
@@ -72,9 +77,9 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
   - Complete zero enumeration: In `evaluate_two_variable_finite_decomposition`, zero ordinates below $T$ are drawn from verified reference tables; no standalone Turing-method zero-counting certificate is evaluated inside the module itself.
 
 ### Question 4: How was the numerical discrepancy resolved?
-* The discrepancy between $Q_{\varepsilon, T} \approx 0.269459$ and $0.26928881653228$ on $[8, 20]$ ($K=0, J=1, \varepsilon=0.1, T=30$) was resolved as a quadrature boundary and sampling artifact:
-  - **Prior Method**: Integrated $x \in [8, 20]$ and $u \in [-1, 1]$ directly with low-degree polynomial rules. Because $y = x - \varepsilon u$, the window cutoff $w(y)$ introduced internal derivative discontinuities at $x = 8 + \varepsilon u$ and $x = 20 + \varepsilon u$. Furthermore, the product $Z_K(x)Z_J(y)$ has oscillatory frequencies up to $\gamma_3 + \gamma_3 \approx 50$, which were severely undersampled, causing a $+1.70 \times 10^{-4}$ shift.
-  - **Corrected Method**: Rewrote the pairing with substitution $y = x - \varepsilon v$ ($v \in [-1, 1]$) with Jacobian $\varepsilon$, and integrated $x$ over its exact non-zero support $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$. On this domain, the integrand vanishes smoothly to infinite order at both endpoints. Evaluated with 512-node Gauss-Legendre quadrature, the sum stabilizes to 14 decimal digits:
+* The reconciled finite benchmark is $Q_{\varepsilon, T} \approx 0.26928881653228$ on $[8, 20]$ ($K=0, J=1, \varepsilon=0.1, T=30$):
+  - **Resolution Mechanism**: The smooth bump $w(x)$ has all derivatives vanishing at its boundary endpoints, so its zero extension is everywhere smooth; translating $w(x)$ does not produce derivative discontinuities. The earlier discrepancy ($0.269459$ vs $0.26928881653228$) was caused by insufficient numerical quadrature resolution in the earlier evaluation of the 2D product integrand across $[8, 20]$.
+  - **Corrected Method**: Rewrote the pairing with substitution $y = x - \varepsilon v$ ($v \in [-1, 1]$) with Jacobian $\varepsilon$, and integrated $x$ over its exact common support $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$. On this domain, the integrand vanishes smoothly to infinite order at both endpoints. Evaluated with 512-node Gauss-Legendre quadrature, the sum stabilizes to 14 decimal digits:
     - $Q_{BB} = 0.16895668569466$
     - $Q_{BZ} = -0.01895209192459$
     - $Q_{ZB} = -0.01558992503441$
@@ -82,7 +87,7 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
     - $Q_{\rm ret} = 0.26928881653228$
     - $A_\varepsilon = 0.05437243335385$
     - $R_{\varepsilon, T} = 0.21491638317843$
-  - Cross-validated via independent adaptive quadrature (`scipy.integrate.quad` with tolerance $10^{-12}$), which yields identical values to within $10^{-14}$.
+  - **Cross-Validation**: Independently cross-validated via adaptive quadrature (`scipy.integrate.quad` with absolute tolerance $10^{-12}$), which yields identical values to within $10^{-14}$ ($Q_{\rm adaptive} \approx 0.26928881653227$).
 
 ### Question 5: What is the exact scope of the mode extraction obstruction?
 * For any fixed smooth compactly supported mode $f$ and mollifier $j$ with $\int j = 1$:

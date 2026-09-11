@@ -9,7 +9,12 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
+import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 import Mathlib.Topology.Instances.Real
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.MetricSpace.PseudoMetric
+import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Order.Filter.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
@@ -1326,5 +1331,157 @@ theorem finite_spectral_perturbation_rigidity_vandermonde_2point
     | inl h => exact h
     | inr h => exact False.elim (he2_ne h)
   exact ⟨hc₁, hc₂⟩
+
+/-- Eventual lower bound for mode extraction:
+    If an extraction functional converges to a non-zero mode coefficient c₀ ≠ 0 as ε → 0⁺,
+    then eventually |c₀| / 2 ≤ |P(ε)| on the positive-side neighborhood 𝓝[>] 0. -/
+theorem mode_extraction_eventual_lower_bound
+    (P : ℝ → ℝ) (c₀ : ℝ) (hc₀ : c₀ ≠ 0)
+    (h_lim : Filter.Tendsto P (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds c₀)) :
+    ∀ᶠ ε in nhdsWithin 0 (Set.Ioi (0 : ℝ)), |c₀| / 2 ≤ |P ε| := by
+  have hc₀_abs_pos : 0 < |c₀| := abs_pos.mpr hc₀
+  have h_half_pos : 0 < |c₀| / 2 := half_pos hc₀_abs_pos
+  have h_nhds : Metric.ball c₀ (|c₀| / 2) ∈ nhds c₀ := Metric.ball_mem_nhds c₀ h_half_pos
+  have h_ev := h_lim h_nhds
+  filter_upwards [h_ev] with ε hε
+  rw [Set.mem_preimage, Metric.mem_ball, Real.dist_eq] at hε
+  have h_tri : |c₀| - |P ε| ≤ |c₀ - P ε| := abs_sub_abs_le_abs_sub c₀ (P ε)
+  rw [abs_sub_comm] at hε
+  linarith
+
+/-- Mode extraction coefficient divergence from eventual half-lower bound:
+    If an extraction functional satisfies |P(ε)| ≥ |c₀| / 2 > 0 and is bounded by C(ε) * N(ε)
+    where N(ε) > 0, then the extraction constant C(ε) must satisfy C(ε) ≥ |c₀| / (2 * N(ε)).
+    This relaxes the pointwise assumption |P(ε)| ≥ |c₀| to the eventual neighborhood bound. -/
+theorem mode_extraction_coefficient_divergence_half
+    (P_val N_val C_val c₀ : ℝ)
+    (hN_pos : 0 < N_val)
+    (hP_lower : |c₀| / 2 ≤ |P_val|)
+    (hP_upper : |P_val| ≤ C_val * N_val) :
+    |c₀| / (2 * N_val) ≤ C_val := by
+  have h_trans : |c₀| / 2 ≤ C_val * N_val := le_trans hP_lower hP_upper
+  have h_div : (|c₀| / 2) / N_val ≤ C_val := (div_le_iff hN_pos).mpr h_trans
+  have h_alg : (|c₀| / 2) / N_val = |c₀| / (2 * N_val) := by ring
+  rw [h_alg] at h_div
+  exact h_div
+
+lemma tendsto_rpow_mul_log_sq (r : ℝ) (hr : 0 < r) :
+    Filter.Tendsto (fun x => x ^ r * (Real.log x) ^ 2) (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) := by
+  have hs : -r < 0 := neg_lt_zero.mpr hr
+  have ho := isLittleO_abs_log_rpow_rpow_nhds_zero (2 : ℝ) hs
+  have hdiv := ho.tendsto_div_nhds_zero
+  refine hdiv.congr' ?_
+  filter_upwards [self_mem_nhdsWithin] with x hx
+  simp only [Set.mem_Ioi] at hx
+  rw [Real.rpow_neg hx.le, div_inv_eq_mul, mul_comm]
+  rw [Real.rpow_two, sq_abs]
+
+lemma tendsto_rpow_zero_nhdsWithin (r : ℝ) (hr : 0 < r) :
+    Filter.Tendsto (fun x => x ^ r) (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) := by
+  have h_id : Filter.Tendsto id (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) :=
+    tendsto_nhdsWithin_of_tendsto_nhds Filter.tendsto_id
+  have h := Filter.Tendsto.rpow_const h_id (Or.inr (le_of_lt hr))
+  simpa only [Real.zero_rpow (ne_of_gt hr)] using h
+
+lemma log_sq_le_of_mem_Ioo {ε α : ℝ} (hε : ε ∈ Set.Ioo (0 : ℝ) 1) (hα : 0 < α) :
+    (Real.log (2 + ε ^ (-α))) ^ 2 ≤ 2 * (Real.log 3)^2 + 2 * α^2 * (Real.log ε)^2 := by
+  have hε_pos : 0 < ε := hε.1
+  have hε_lt : ε < 1 := hε.2
+  have h1 : 1 ≤ ε ^ (-α) :=
+    Real.one_le_rpow_of_pos_of_le_one_of_nonpos hε_pos hε_lt.le (neg_nonpos.mpr hα.le)
+  have h_sum_le : 2 + ε ^ (-α) ≤ 3 * ε ^ (-α) := by
+    calc 2 + ε ^ (-α) ≤ 2 * ε ^ (-α) + ε ^ (-α) := by linarith
+    _ = 3 * ε ^ (-α) := by ring
+  have h_rpow_pos : 0 < ε ^ (-α) := Real.rpow_pos_of_pos hε_pos _
+  have h_arg_pos : 0 < 2 + ε ^ (-α) := by linarith
+  have h_log_le : Real.log (2 + ε ^ (-α)) ≤ Real.log (3 * ε ^ (-α)) :=
+    Real.log_le_log h_arg_pos h_sum_le
+  have h_log_split : Real.log (3 * ε ^ (-α)) = Real.log 3 + (-α) * Real.log ε := by
+    rw [Real.log_mul (by norm_num) (ne_of_gt h_rpow_pos), Real.log_rpow hε_pos]
+  rw [h_log_split] at h_log_le
+  have h_arg_ge_one : 1 ≤ 2 + ε ^ (-α) := by linarith
+  have h_log_nonneg : 0 ≤ Real.log (2 + ε ^ (-α)) := Real.log_nonneg h_arg_ge_one
+  have h_sq_le : (Real.log (2 + ε ^ (-α))) ^ 2 ≤ (Real.log 3 + (-α) * Real.log ε) ^ 2 := by
+    nlinarith [h_log_le, h_log_nonneg]
+  have h_alg : (Real.log 3 + (-α) * Real.log ε) ^ 2 ≤ 2 * (Real.log 3)^2 + 2 * α^2 * (Real.log ε)^2 := by
+    have h_sq : 0 ≤ (Real.log 3 - (-α) * Real.log ε)^2 := sq_nonneg _
+    linarith
+  exact le_trans h_sq_le h_alg
+
+/-- Complete Power-Log Limit Theorem:
+    lim_{ε → 0⁺} ε^r * log²(2 + ε^(-α)) = 0 for any r > 0, α > 0.
+    Proved via majorant squeeze against 2*(log 3)² * ε^r + 2*α² * (ε^r * log² ε)
+    using Mathlib's rpow-log little-o asymptotics.
+    This supplies the actual topological limit on the positive-side filter 𝓝[>] 0. -/
+theorem power_log_tail_limit_tendsto (r α : ℝ) (hr : 0 < r) (hα : 0 < α) :
+    Filter.Tendsto (fun ε => ε ^ r * (Real.log (2 + ε ^ (-α))) ^ 2)
+      (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) := by
+  have h_majorant : Filter.Tendsto (fun ε => 2 * (Real.log 3)^2 * ε ^ r + 2 * α^2 * (ε ^ r * (Real.log ε)^2))
+      (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) := by
+    have h1 : Filter.Tendsto (fun ε => 2 * (Real.log 3)^2 * ε ^ r)
+        (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) := by
+      have ht := (tendsto_rpow_zero_nhdsWithin r hr).const_mul (2 * (Real.log 3)^2)
+      simpa only [mul_zero] using ht
+    have h2 : Filter.Tendsto (fun ε => 2 * α^2 * (ε ^ r * (Real.log ε)^2))
+        (nhdsWithin 0 (Set.Ioi (0 : ℝ))) (nhds 0) := by
+      have ht := (tendsto_rpow_mul_log_sq r hr).const_mul (2 * α^2)
+      simpa only [mul_zero] using ht
+    have h_sum := h1.add h2
+    simpa only [add_zero] using h_sum
+  have h_nonneg : ∀ᶠ ε in nhdsWithin 0 (Set.Ioi (0 : ℝ)),
+      0 ≤ ε ^ r * (Real.log (2 + ε ^ (-α))) ^ 2 := by
+    filter_upwards [self_mem_nhdsWithin] with ε hε
+    simp only [Set.mem_Ioi] at hε
+    have hrpos : 0 ≤ ε ^ r := (Real.rpow_pos_of_pos hε r).le
+    have hsq : 0 ≤ (Real.log (2 + ε ^ (-α))) ^ 2 := sq_nonneg _
+    exact mul_nonneg hrpos hsq
+  have h_le : ∀ᶠ ε in nhdsWithin 0 (Set.Ioi (0 : ℝ)),
+      ε ^ r * (Real.log (2 + ε ^ (-α))) ^ 2 ≤
+      2 * (Real.log 3)^2 * ε ^ r + 2 * α^2 * (ε ^ r * (Real.log ε)^2) := by
+    have h_mem : Set.Ioo (0 : ℝ) 1 ∈ nhdsWithin 0 (Set.Ioi (0 : ℝ)) :=
+      Ioo_mem_nhdsWithin_Ioi ⟨le_rfl, zero_lt_one⟩
+    filter_upwards [h_mem] with ε hε
+    have h_sq := log_sq_le_of_mem_Ioo hε hα
+    have hrpos : 0 ≤ ε ^ r := (Real.rpow_pos_of_pos hε.1 r).le
+    have h_mul := mul_le_mul_of_nonneg_left h_sq hrpos
+    calc ε ^ r * (Real.log (2 + ε ^ (-α))) ^ 2
+      _ ≤ ε ^ r * (2 * (Real.log 3)^2 + 2 * α^2 * (Real.log ε)^2) := h_mul
+      _ = 2 * (Real.log 3)^2 * ε ^ r + 2 * α^2 * (ε ^ r * (Real.log ε)^2) := by ring
+  exact squeeze_zero' h_nonneg h_le h_majorant
+
+open Matrix
+
+/-- General Finite Spectral Perturbation Rigidity Theorem (Confluent Vandermonde System):
+    For any finite family of n distinct real exponents l : Fin n → ℝ (injective)
+    and complex/real coefficients c : Fin n → ℝ, if the function f(u) = ∑_{j=0}^{n-1} c_j exp(l_j * u)
+    and its derivatives of orders k = 0, ..., n-1 all vanish at a single interior point u₀:
+        ∑_{j=0}^{n-1} l_j^k * c_j * exp(l_j * u₀) = 0   for all k ∈ Fin n,
+    then every coefficient c_j = 0 identically.
+    Proof: The system is a transposed Vandermonde system V^T * v = 0 where v_j = c_j * exp(l_j * u₀).
+    By det(V^T) = det(V) = ∏_{i < j} (l_j - l_i) ≠ 0, the matrix is invertible, forcing v = 0.
+    Since exp(l_j * u₀) > 0, every c_j = 0.
+    This eliminates sample-point periodicity degeneracies across an arbitrary finite number of modes. -/
+theorem finite_spectral_perturbation_rigidity_vandermonde_general
+    {n : ℕ} (c : Fin n → ℝ) (l : Fin n → ℝ) (u₀ : ℝ)
+    (hl_inj : Function.Injective l)
+    (h_deriv : ∀ (k : Fin n), (∑ j : Fin n, (l j) ^ (k : ℕ) * (c j * Real.exp (l j * u₀))) = 0) :
+    ∀ (j : Fin n), c j = 0 := by
+  let v : Fin n → ℝ := fun j => c j * Real.exp (l j * u₀)
+  have h_det : Matrix.det (Matrix.vandermonde l)ᵀ ≠ 0 := by
+    rw [Matrix.det_transpose]
+    exact Matrix.det_vandermonde_ne_zero_iff.mpr hl_inj
+  have h_mulVec : Matrix.mulVec (Matrix.vandermonde l)ᵀ v = 0 := by
+    ext k
+    simp only [Matrix.mulVec, Matrix.dotProduct, Matrix.transpose_apply, Matrix.vandermonde_apply, Pi.zero_apply]
+    exact h_deriv k
+  have hv_zero : v = 0 := Matrix.eq_zero_of_mulVec_eq_zero h_det h_mulVec
+  intro j
+  have hj : v j = 0 := by rw [hv_zero]; rfl
+  dsimp [v] at hj
+  have he_pos : 0 < Real.exp (l j * u₀) := Real.exp_pos _
+  have he_ne : Real.exp (l j * u₀) ≠ 0 := ne_of_gt he_pos
+  cases mul_eq_zero.mp hj with
+  | inl h => exact h
+  | inr h => exact False.elim (he_ne h)
 
 end RiemannScope

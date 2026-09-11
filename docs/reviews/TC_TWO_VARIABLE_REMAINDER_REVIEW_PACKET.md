@@ -61,6 +61,16 @@ Fourteen Lean 4 theorems (213 total compiled project theorems) are formally prov
     Quantified $\varepsilon$-$\delta$ convergence for remainder cancellation.
 14. `finite_spectral_perturbation_rigidity_2point`:
     Linear independence of two distinct exponentials at 2 points ($x_1 \ne x_2 \wedge \beta_1 \ne \beta_2 \implies x_1^{\beta_1} x_2^{\beta_2} - x_1^{\beta_2} x_2^{\beta_1} \ne 0$).
+15. `finite_spectral_perturbation_rigidity_vandermonde_2point`:
+    Single-point confluent Vandermonde rigidity for 2 modes.
+16. `finite_spectral_perturbation_rigidity_vandermonde_general`:
+    General $n$-mode confluent Vandermonde rigidity for an arbitrary finite family of distinct exponents at a single interior point $u_0$.
+17. `power_log_tail_limit_tendsto`:
+    Complete topological limit $\lim_{\varepsilon \to 0^+} \varepsilon^r \log^2(2+\varepsilon^{-\alpha}) = 0$ on $\mathcal{N}[>] 0$ for $r > 0, \alpha > 0$.
+18. `mode_extraction_eventual_lower_bound`:
+    Eventual half-lower bound $|P(\varepsilon)| \ge |c_0|/2$ on $\mathcal{N}[>] 0$ for $P(\varepsilon) \to c_0 \ne 0$.
+19. `mode_extraction_coefficient_divergence_half`:
+    Divergence of extraction constant $C(\varepsilon) \ge |c_0| / (2 N(\varepsilon))$.
 
 Analytically, the conservative two-variable truncation bound was proved:
 $$|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}},$$
