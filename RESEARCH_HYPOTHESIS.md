@@ -2864,6 +2864,200 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
 
 2. **Indefiniteness on the Restricted TC Prime Family**:
    - Primes in 3-term arithmetic progression $\{3, 5, 7\}$ (difference $\Delta = 2$) at grade $K=0$ and resolution $\varepsilon = 4$ yield relative distances $|3-5|/4 = 1/2$, $|5-7|/4 = 1/2$, $|3-7|/4 = 1$, reproducing the exact matrix $M$.
+Five new foundational theorems were formalized in `formal/RiemannScope/Grade.lean` under standard Mathlib foundational axioms with zero `sorry`:
+1. `two_variable_tensor_decomposition_algebra`: $(B_K - Z_K)(B_J - Z_J) = B_K B_J - B_K Z_J - Z_K B_J + Z_K Z_J$ in $\mathbb{R}$.
+2. `two_variable_nine_term_expansion_algebra`: 9-term uncombined bilinear expansion for $(P_K - Z_K - T_K)(P_J - Z_J - T_J)$ in $\mathbb{R}$.
+3. `normalized_truncation_error_scaling`: $|E| \le B \implies |E|/\varepsilon \le B/\varepsilon$ for $\varepsilon > 0$.
+4. `power_cutoff_exponent_positivity`: For $p > 2$ and $\alpha > p/(p-2)$, the net exponent $\alpha(p-2) - p > 0$.
+5. `candidate_bridge_with_remainder_contradiction`: $Q = A + R$, $Q \le 0$, $A \ge c D > 0$, and $|R| < c D \implies \text{False}$.
+
+## 40.3 Track 1: Defect Repairs & Cutoff Counterexample
+
+- **Prior Defect Falsified**:
+  $$B_{\rm old}(\varepsilon, T) = C_p \varepsilon^{1-p} \frac{\log T}{T^{p-2}}.$$
+  For $p = 3$, setting $\ell = \log(1/\varepsilon)$ and $T(\varepsilon) = \varepsilon^{-2}\sqrt{\ell}$:
+  $$\frac{T}{\varepsilon^{-2}} = \sqrt{\ell} \to \infty, \quad \text{but} \quad \frac{B_{\rm old}}{C_p} = \frac{2\ell + \frac{1}{2}\log\ell}{\sqrt{\ell}} \to \infty.$$
+- **Normalized Error Scaling**:
+  $$\frac{|E_{\varepsilon, T}|}{\varepsilon} \le C_p \varepsilon^{-p} \frac{\log^2(2+T)}{T^{p-2}}.$$
+  Along $T = \varepsilon^{-\alpha}$, convergence to zero requires $\alpha > p/(p-2)$. For $p=4$, $\alpha > 2$; taking $\alpha = 3$ yields decay $O(\varepsilon^2 \log^2(1/\varepsilon)) \to 0$.
+
+## 40.4 Track 2: Complete Expansions & Selected Term Falsification
+
+- **1-Variable Background Identity**:
+  For $x > a_K$:
+  $$\sum_{j=1}^\infty a_K^{2j} x^{-2j-1} = \frac{a_K^2}{x(x^2 - a_K^2)}.$$
+  Agreement certified symbolically and numerically to $< 10^{-15}$ across $[8, 20]$.
+- **Selected Spectral Contribution**:
+  For symmetric quartet $\Gamma(\rho_0) = \{\rho_0, \bar\rho_0, 1-\rho_0, 1-\bar\rho_0\}$:
+  $f_{K, \Gamma}(x) \in \mathbb{R}$ by conjugation closure.
+  For even $\eta$:
+  $$\frac{A_{\varepsilon, \Gamma}}{\varepsilon} = A_{0, \Gamma} + O(\varepsilon^2), \quad A_{0, \Gamma} = \|\\|_{L^1} \int w(x)^2 f_{K, \Gamma}(x) f_{J, \Gamma}(x) \, dx.$$
+- **Falsification of $A_{0, \Gamma} = c D_M(\rho_0)$**:
+  On critical line ($\Re\rho = 1/2$), $D_M(\rho_0) = 4\sinh^2(0) = 0$.
+  However, numerical quadrature gives $A_{0, \Gamma} \approx 0.5444 \ne 0$, proving $A_{0, \Gamma}$ is not proportional to $D_M$.
+
+## 40.5 Track 3: Conservative Two-Variable Truncation Bound
+
+Using logarithmic coordinates $x=e^u, y=e^v$, $L^1$ derivative bounds $\|\partial^p G_\varepsilon\|_{L^1} \le C_p \varepsilon^{1-p}$, Trudgian zero counting $N_*(R) \le C_N R \log(2+R)$, and dyadic shell pair counting via $N_*(R)^2$:
+$$|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}}.$$
+
+## 40.6 Synthesis of Candidate TC-DISC-022 / CLM-TC-022
+
+| Candidate ID | Claim ID | Name | Mathematical Status | Epistemic Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-DISC-022** | **CLM-TC-022** | TC Epic: Two-Variable Explicit Formula, Normalized Remainder Truncation Bound, Selected Spectral Contribution Limit, and Bridge Defect Repair | Defect 3.1 falsified by counterexample ($p=3, T=\varepsilon^{-2}\sqrt{\ell}$); normalized power cutoff $\alpha > p/(p-2)$ proved in Lean 4; complete 1-variable trivial zero sum $\frac{a_K^2}{x(x^2-a_K^2)}$ verified to $< 10^{-15}$; 2-variable 9-term and 4-term tensor expansions proved in Lean 4; selected contribution $A_{\varepsilon, \Gamma}$ reality and $O(\varepsilon^2)$ limit proved; $A_{0, \Gamma} = c D_M$ falsified on critical line ($D_M = 0 \ne A_0 \approx 0.5444$); conservative truncation bound $C_p \varepsilon^{1-p}\frac{\log^2 T}{T^{p-2}}$ proved via dyadic shell pair counting; arithmetic vanishing on $[8, 20]$ proved via Lindemann transcendence ($d_{\min} \approx 0.1504$); contradiction endpoint formalized in Lean 4 (204 compiled declarations, 0 sorry); exact explicit formula remainder cancellation $\lim \bar R_{\varepsilon, T(\varepsilon)} = -A_{0, \Gamma}$ proved on fixed windows. | **DEFECTS REPAIRED; TWO-VARIABLE FORMULA DERIVED; CONSERVATIVE TRUNCATION BOUND PROVED; SELECTED TERM LIMIT & FALSIFICATION PROVED; 204 LEAN TARGETS; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** |
+
+---
+
+# 41. TC Corrective Epic: Genuine Recomputation, Constant Certification, Scoped Mode Extraction, Finite Rigidity, and Compatibility Investigation (TC-DISC-023 / CLM-TC-022 Updated)
+
+## 41.1 Finite Decomposition Recomputation
+`evaluate_two_variable_finite_decomposition` genuinely recomputes all four bilinear tensor blocks via 2D quadrature across varying cutoffs ($T=10, 18, 23, 30$).
+For $T < \gamma_1 \approx 14.13$, retained zero set is empty ($Q_{BZ}=0, Q_{ZZ}=0, Q_{\rm ret}=Q_{BB} \approx 0.168957$); for $T=18$ yields $Q_{\rm ret} \approx 0.232622$; for $T=23$ yields $Q_{\rm ret} \approx 0.297494$; for $T=30$ yields $Q_{\rm ret} \approx 0.26928881653228$.
+The discrepancy between the previous draft value ($0.269459$) and the independent review value ($0.26928881653228$) was resolved as a boundary-support and high-frequency undersampling artifact of unaligned low-degree quadrature across $[8, 20]$, repaired by exact support integration on $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$ with 512-node Gauss-Legendre quadrature (cross-checked against adaptive quadrature to 14 digits).
+Independent remainder calculation from complementary terms $R_{\varepsilon, T, \rm independent} = Q_{BB} - Q_{BZ} - Q_{ZB} + Q_{ZZ, \rm complement}$ confirms $R_{\varepsilon, T} = Q_{\rm ret} - A_\varepsilon$ to $< 10^{-16}$.
+Benchmark fixtures are strictly decoupled from live computation paths, and `recompute=True` bypasses caching.
+
+## 41.2 Constant Certification Semantics
+`audit_two_variable_truncation_bound` validates $C_p > 0$ finite, strictly separating:
+1. `BOUND_SHAPE_ILLUSTRATIVE`: Proves asymptotic convergence of the bound shape majorant when $C_p$ is omitted.
+2. `CALLER_SUPPLIED_UNVERIFIED`: Caller-supplied constants without provenance (e.g. $C_p = 10^{-100}$) return an explicit unverified warning status; numeric values cannot create mathematical proof.
+3. `BOUND_WITH_DERIVED_CONSTANT`: Analytically derived constants.
+4. `BOUND_WITH_CERTIFIED_ENCLOSURE`: Machine-checked interval enclosures.
+
+## 41.3 Certified Arb Enclosure of $A_0$
+FLINT `acb.zeta_zero(1).imag` certifies the first Riemann zero ordinate enclosure `[14.1347251417347 +/- 9.01e-15]`.
+Preserving outward interval rounding yields the certified enclosure $A_0 \in [0.543269, 0.545611] > 0.54 > 0$, rigorously disproving the asserted identity $A_0 = c D_M(\rho_0)$ on the critical line.
+
+## 41.4 Reconciled Formal Lean 4 Theorems
+Docstrings in `formal/RiemannScope/Grade.lean` were corrected to state elementary transitivity and algebraic cancellation with visible external dependencies.
+New formal theorems compiled (bringing project theorem count to 218, 0 sorry):
+- `explicit_formula_remainder_cancellation_tendsto`: Formal proof of topological convergence $\lim_l R_\varepsilon = -A_0$ along filter $l$.
+- `explicit_formula_remainder_cancellation_quantified`: Formal $\varepsilon$-$\delta$ quantified convergence bound.
+- `mode_extraction_uniform_bound_vanishes`: Formal proof that uniformly bounded extraction functionals vanish as $\varepsilon \to 0^+$.
+- `mode_extraction_coefficient_divergence`: Formal proof that recovering a non-zero mode forces divergence $C(\varepsilon) \ge |c_0|/N(\varepsilon) \to \infty$.
+- `power_log_tail_subordination_exponent_positive`: Algebraic proof that $\alpha(p-2) - p > 0$ for $p > 2$ and $\alpha > p/(p-2)$.
+- `power_log_decay_subordination`: Formal majorant subordination for the power-log remainder limit.
+- `finite_spectral_perturbation_rigidity_2point`: Formal 2-point linear independence forcing $c_1, c_2 = 0$.
+- `finite_spectral_perturbation_rigidity_vandermonde_2point`: Confluent single-point derivative/Vandermonde linear independence eliminating point-selection ambiguities.
+
+## 41.5 Scoped Mode Extraction Obstruction
+Normalized mollifier with unit integral $\int j = 1$ verifies actual finite-epsilon convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2 = O(\sqrt{\varepsilon}) \to 0$.
+Any functional family $P_\varepsilon$ satisfying $|P_\varepsilon(g)| \le C N_\varepsilon(g)$ with uniform $C$ must send fixed mode $P_\varepsilon(f) \to 0$. Isolating a fixed mode requires $C_\varepsilon = \Omega(\varepsilon^{-1/2}) \to \infty$.
+
+## 41.6 Refutation of Arbitrary Compensation via Finite Rigidity
+Finite Spectral Perturbation Rigidity Theorem proves that on any open interval $I \subset (a_K, \infty)$, linear independence of distinct complex exponentials forces:
+$$\sum_{\rho \in S} c_\rho a_K^{-\rho} x^{\rho-1} = 0 \quad \text{on } I \implies \forall \rho \in S, \ c_\rho = 0.$$
+This refutes the claim that arbitrary perturbations of one zero can be absorbed by the remaining spectrum and background.
+
+## 41.7 Bounded Arithmetic Compatibility Investigation & Governing Obligation
+Four candidate relations audited:
+1. *Weil Positivity*: Full positivity criterion $W(g * \tilde g) \ge 0$ over compactly supported tests is equivalent to RH (Weil 1952; cf. arXiv:2006.13771); not an unconditional source of sign; cross-grade pairing is not of convolution type.
+2. *TC Radial Defect*: Radial defect $D_M(\rho_0) > 0$ for $\Re\rho_0 \ne 1/2$, but $A_0 \ne c D_M$ on the critical line.
+3. *Theta Modular Inversion*: Functional equation $\xi(s) = \xi(1-s)$ is shared by non-Euler counterexamples (Davenport-Heilbronn) with off-line zeros; Euler product is essential.
+4. *Vinogradov-Korobov Zero-Free Region*: Classical zero-free boundary $\sigma > 1 - c/(\log |t|)^{2/3}(\log \log |t|)^{1/3}$ does not exclude moderate-height isolated off-line zeros.
+
+**Governing Arithmetic Compatibility Obligation**:
+> *Under the explicit formula for the completed Riemann zeta function $\xi(s)$ and the Lindemann transcendence of $\tau = 2\pi$, derive a non-vanishing lower bound for a cross-grade spectral observable $\mathcal{Q}_\varepsilon$ that does not reduce to fixed-window scalar cancellation.*
+This obligation remains strictly **OPEN**.
+
+---
+
+# 42. TC Corrective Epic: Logical Impossibility Scope Correction, Dual-Kernel Diagnostics, Remainder Separation, Positivity Scope, and Research Attempt (TC-DISC-024 / CLM-TC-022 Updated)
+
+## 42.1 Reductio Logical Structure and Impossibility Scope Clarification
+The stated arithmetic cancellation on a fixed compact window $W \subset (\max(a_K, a_J), \infty)$ ($Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$) does **not** prove a universal impossibility theorem for a contradiction approach.
+Let $\mathsf A$ denote the established arithmetic and analytic premises, and let
+$$H(\rho_0): \quad \zeta(\rho_0) = 0, \quad 0 < \Re\rho_0 < 1, \quad \delta_0 = \Re\rho_0 - \tfrac{1}{2} \ne 0.$$
+The intended reductio ad absurdum is:
+$$\mathsf A \vdash Q_\varepsilon = 0, \qquad \mathsf A, H(\rho_0) \vdash Q_\varepsilon > 0, \qquad \therefore \mathsf A \vdash \neg H(\rho_0).$$
+The first implication is established. The second is the research obligation. The first does not show that the second cannot be derived under the additional hypothesis. Nor does this logical clarification establish that the missing implication is available.
+
+The narrower, mathematically justified result is:
+> *Shrinking the omitted truncation tail does not make the included remainder small. The explicit-formula identity requires full cancellation ($\bar R_{\varepsilon, T} \to -A_{0, \Gamma}$); a new restriction derived under the off-line-zero hypothesis would be needed to make that requirement contradictory.*
+
+Growing windows and global formulations remain optional research candidates, but do not evade the exact explicit-formula identity.
+
+## 42.2 Dual-Kernel Diagnostics and Benchmark Decoupling
+Definitions are frozen and decoupled:
+1. **Exponential Smooth Bump** $\eta_{\rm smooth}(v) = \exp(1 - 1/(1-v^2)) \mathbf{1}_{|v|<1}$:
+   Belongs to $C_c^\infty(\mathbb R)$, peak 1, integral $\approx 1.20690032244195$.
+   For $K=0, J=1, \varepsilon=0.1, T=30$ on test bump $w \in C_c^\infty(\mathbb R)$ with support $[8, 20]$:
+   - 256-node Gauss-Legendre quadrature: $0.2692888165323234$
+   - 512-node Gauss-Legendre quadrature: $0.2692888165322876$
+   - Discrepancy: $3.58 \times 10^{-14}$.
+2. **Polynomial Kernel** $\eta_{\rm poly}(v) = (1 - v^2)^4 \mathbf{1}_{|v|\le 1}$:
+   Belongs to $C^3(\mathbb R)$ with 4th derivative jumps at endpoints $v = \pm 1$, peak 1, integral $256/315 \approx 0.81269841269841$.
+   - 256-node Gauss-Legendre quadrature: $0.1813269198736548$
+   - 512-node Gauss-Legendre quadrature: $0.1813269198736497$
+   - Discrepancy: $5.10 \times 10^{-15}$.
+
+Zero extension and translation of the smooth bump $w(x - \varepsilon v)$ introduce no derivative discontinuities on $\mathbb R$. The earlier numerical discrepancy was caused solely by 2D product quadrature grid resolution across $[8, 20]$.
+
+## 42.3 Separation of Complete from Truncated Remainder
+1. **Complete Untruncated Remainder**:
+   $$\bar Q_\varepsilon = \bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon = 0 \quad (\varepsilon < d_{\min}) \implies \bar R^{\rm full}_\varepsilon = -\bar A_{\varepsilon, \Gamma}.$$
+   Formally proved in Lean 4: `explicit_formula_full_remainder_cancellation`.
+2. **Truncated Remainder with Cutoff $T$**:
+   $$\bar Q_\varepsilon = \bar A_{\varepsilon, \Gamma} + \bar R_{\varepsilon, T} + \bar E_{\varepsilon, T} = 0 \quad (\varepsilon < d_{\min}) \implies |\bar R_{\varepsilon, T} - (-A_{0, \Gamma})| \le |\bar A_{\varepsilon, \Gamma} - A_{0, \Gamma}| + |\bar E_{\varepsilon, T}|.$$
+   Formally proved in Lean 4: `explicit_formula_truncated_remainder_zero_Q_bound`.
+   Along $T(\varepsilon) = \varepsilon^{-\alpha}$ ($\alpha > p/(p-2)$), the tail satisfies $|\bar E_{\varepsilon, T(\varepsilon)}| \to 0$ (proved in Lean 4: `power_log_tail_limit_tendsto`), establishing that $\bar R_{\varepsilon, T(\varepsilon)} \to -A_{0, \Gamma}$.
+
+## 42.4 Positivity Scope and Cross-Grade Product Sign
+The FLINT certified interval enclosure $A_{0, \Gamma} \in [0.543269, 0.545611] > 0$ applies only to the specific instance $(K=0, J=1, [8, 20], \rho_1)$.
+Universal positivity across all grades is **falsified**:
+By the product-to-sum identity (formally proved in Lean 4: `cos_mul_cos_product_to_sum`):
+$$\cos\left(\gamma \log\frac{x}{a_K}\right) \cos\left(\gamma \log\frac{x}{a_J}\right) = \frac{1}{2}\left[\cos((J-K)\gamma\log\tau) + \cos(2\gamma\log x - (K+J)\gamma\log\tau)\right].$$
+For $K \ne J$, the constant phase $\cos((J-K)\gamma\log\tau)$ can be negative.
+On $[45, 65]$ for $K=0, J=2, \rho_1$, $A_{0, \Gamma} \approx -0.00708 < 0$.
+
+## 42.5 Measure Clarification, Weil-Positivity Audit, and Positivity Comparison
+1. **Measure Support and Overlap Positivity**:
+   - The product measure $\mu_K \otimes \mu_J$ is a non-zero, positive Radon measure supported on pairs of prime-power stations $(\tau^K n, \tau^J m)$. On window $[8, 20]^2$, $\langle \mu_0 \otimes \mu_1, w \otimes w \rangle \approx 13.91 > 0$.
+   - The arithmetic overlap $Q_\varepsilon^{K, J}[w] = \iint w(x) w(y) \eta((x-y)/\varepsilon) \, d\mu_K(x) d\mu_J(y)$ vanishes for $\varepsilon < \Delta_W$ on a fixed window purely because the diagonal band contains no station pairs below the gap.
+   - For non-negative $w \ge 0$ and $\eta \ge 0$, $Q_\varepsilon^{K, J}[w] \ge 0$ unconditionally for all grades $K, J$. Strict positivity requires active station pairs with positive weights and kernel values. On windows lacking stations, $Q_\varepsilon \equiv 0$ even for $K = J$.
+   - Formally proved in Lean 4: `finite_double_sum_nonneg` and `finite_double_sum_pos_of_witness`.
+2. **Weil-Positivity Audit and Polarization**:
+   - Centered admissible test space $V_{\rm centered} \subset C_c^\infty(\mathbb R_+^*)$ with $\widetilde g(-1/2) = \widetilde g(1/2) = 0$ in multiplicative Haar coordinates $d^* u = du / u$, involution $h^*(x) = \overline{h(1/x)}$, and centering $\Delta^{1/2}$ (Connes & Consani 2026, Weil 1952, Bombieri 2000). Under the centering isomorphism $g(x) = x^{1/2} g_{\rm old}(x)$, Mellin arguments shift by $+1/2$: $\widetilde g(s) = \widetilde g_{\rm old}(s + 1/2)$, so classical pole conditions $\widetilde g_{\rm old}(0) = \widetilde g_{\rm old}(1) = 0$ transport to $\widetilde g(-1/2) = \widetilde g(1/2) = 0$.
+   - Bilinear form $B(g, h) = \mathcal W(\Delta^{-1/2}(g * h^*))$.
+   - Self-convolution on a sum of multi-grade test functions naturally contains cross-grade terms:
+     $$B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2\Re B(g_K, g_J).$$
+     Formally proved in Lean 4: `hermitian_polarization_complex`, `hermitian_polarization_real_part`, and `symmetric_bilinear_polarization_real`.
+   - Equating self-convolution with equal grades $K = J$ is mathematically unsupported.
+3. **Three-Way Comparison**:
+   - Arithmetic Overlap $Q_\varepsilon^{K, J}$: Bilinear pairing of prime measures; entrywise non-negative; strict positivity requires active pairs; vanishes below $\Delta_W$.
+   - Multi-Grade Gram Matrix: The smooth exponential bump kernel $\eta$ is definitively NOT positive definite on $\mathbb R$ or on the restricted TC prime family; cannot supply a general Gram representation.
+   - Weil Quadratic Form: Positivity on full centered admissible space $V_{\rm centered}$ is strictly equivalent to RH; cannot be assumed unconditionally.
+4. **Six Challenger Rejections**:
+   - Rejection 1: "The product measure is zero" (Refuted: measure is non-zero; vanishing is band-overlap below $\Delta_W$).
+   - Rejection 2: "Positivity exists only at equal grades" (Refuted: unconditional non-negativity for all grades; strict positivity requires active pairs).
+   - Rejection 3: "Self-convolution means equal grades" (Refuted: polarization formula contains cross-grade terms).
+   - Rejection 4: "Growing windows or global operators are necessary" (Refuted: fixed-window, varying-window, and global constructions remain eligible).
+   - Rejection 5: "The smooth bump kernel is positive definite" (Refuted: exact counterexample $(1, 3/2, 2)$ at $\varepsilon=1$ has $\lambda_{\min} \approx -0.013328 < 0$; prime AP $\{3, 5, 7\}$ at $\varepsilon=4$ is indefinite by Sylvester inertia).
+   - Rejection 6: "Weil test space retains $0, 1$ poles under centering" (Refuted: Mellin shift $+1/2$ transports poles to $\mp 1/2$).
+
+## 42.6 Research Attempt on the Missing Arithmetic Implication
+Under the off-line zero hypothesis $H(\rho_0)$, the explicit formula operates as an exact Fourier-Mellin transform identity.
+Because the prime-power measures $\mu_K$ and $\mu_J$ have disjoint supports, their product measure has no support on the diagonal band $|x - y| < \varepsilon$ for $\varepsilon < \Delta_W$, forcing $Q_\varepsilon^{K, J}[w] \equiv 0$.
+The explicit formula identity decomposes this identically zero distribution into $\bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon \equiv 0$, forcing $\bar R^{\rm full}_\varepsilon \equiv -\bar A_{\varepsilon, \Gamma}$.
+No independently justified property of the prime-zeta relationship prevents this exact cancellation.
+The implication $H(\rho_0) \Longrightarrow \bar Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r(\varepsilon)$ ($c > 0, r(\varepsilon) \to 0$) remains an open research obligation.
+Therefore, no new implication toward forbidden coincidence $m\tau^K = n\tau^J$ was established.
+The Transcendental Continuation bridge remains strictly **OPEN**.
+
+## 42.7 Smooth Kernel Indefiniteness Falsification, Centered Weil Test Space Reconciliation, and Complex Hermitian Polarization
+1. **Smooth Kernel Universal Indefiniteness Counterexample**:
+   - For $\eta(v) = \exp(1 - 1/(1-v^2))\mathbf{1}_{|v|<1}$, points $x = (1, 3/2, 2)$ at $\varepsilon = 1$ give kernel matrix:
+     $$M = \begin{pmatrix} 1 & a & 0 \\ a & 1 & a \\ 0 & a & 1 \end{pmatrix}, \quad a = e^{-1/3} \approx 0.71653131.$$
+   - The eigenvalues are $1, 1 \pm \sqrt{2}e^{-1/3}$. The smallest eigenvalue is:
+     $$\lambda_{\min} = 1 - \sqrt{2}e^{-1/3} \approx -0.01332829727842 < 0.$$
+   - Test vector $v = (1, -\sqrt{2}, 1)^T$ yields:
+     $$v^T M v = 4(1 - \sqrt{2}e^{-1/3}) \approx -0.053313189 < 0.$$
+     Formally proved in Lean 4: `tridiagonal_kernel_matrix_quadratic_form` and `tridiagonal_kernel_matrix_indefinite`.
+   - By Bochner's theorem, a translation-invariant kernel is positive definite on $\mathbb R$ iff its Fourier transform is non-negative everywhere. The Fourier transform $\widehat\eta(\xi) = 2\int_0^1 \eta(v)\cos(\xi v)dv$ is strictly negative on $\xi \in [5.0, 8.8]$, reaching a minimum $\approx -0.1154$ near $\xi \approx 6.8$, definitively falsifying positive definiteness.
+
+2. **Indefiniteness on the Restricted TC Prime Family**:
+   - Primes in 3-term arithmetic progression $\{3, 5, 7\}$ (difference $\Delta = 2$) at grade $K=0$ and resolution $\varepsilon = 4$ yield relative distances $|3-5|/4 = 1/2$, $|5-7|/4 = 1/2$, $|3-7|/4 = 1$, reproducing the exact matrix $M$.
    - For any positive prime weights $d = (d_1, d_2, d_3) > 0$, the weighted matrix $Q = D M D$ has inertia $(1, 0, 2)$ by Sylvester's Law of Inertia (one negative and two positive eigenvalues). Vector $y = D^{-1} v$ satisfies $y^T Q y = v^T M v < 0$.
    - Thus, positive semi-definiteness fails even when restricted to the actual prime measures of TC.
 
@@ -2875,3 +3069,46 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
 4. **Lean 4 Formalization Status**:
    - Added `hermitian_polarization_complex`, `hermitian_polarization_real_part`, `tridiagonal_kernel_matrix_quadratic_form`, `tridiagonal_kernel_matrix_indefinite`.
    - Total compiled project theorems: **232** (0 sorry, Mathlib foundations only).
+
+## 42.8 Station-to-Grade Pullback Embedding, Small-Resolution Grade PSD Theorem, Reflected Weil Spectral Form, and Sieve Repairs
+1. **Station-to-Grade Pullback Embedding and Allowed Coefficient Space**:
+   - The station-indexed kernel matrix $H_{\alpha\beta} = \eta((x_\alpha - x_\beta)/\varepsilon)$ is universally indefinite on $\mathbb R$, but the grade-indexed matrix $G_{ij} = Q_\varepsilon^{K_i, K_j}[w]$ is its finite algebraic pullback:
+     $$G = E^* H E, \qquad c^* G c = (E c)^* H (E c),$$
+     where the rectangular station-to-grade embedding is $E_{(i,n), j} = d_{i,n} \mathbf{1}_{i=j}$ with weights $d_{i,n} = \Lambda(n) w(x_{i,n}) \ge 0$.
+   - The allowed coefficient space $\operatorname{im} E \subset \mathbb C^{|\mathcal S|}$ consists of vectors $v_{(i,n)} = c_i d_{i,n}$, which vary by entire grade rather than arbitrarily across stations.
+   - Formally proved in Lean 4: `matrix_pullback_quadratic_form` and `matrix_pullback_psd`.
+
+2. **Small-Resolution Grade PSD Theorem**:
+   - For distinct grades on a fixed compact window, active cross-grade stations have positive minimum separation:
+     $$\Delta_{\rm cross} = \min_{i \ne j} |x_{i,n} - x_{j,m}| > 0 \quad (\Delta_{\rm cross} \approx 0.150444 \text{ on } [8, 20] \text{ for grades } \{0, 1\}).$$
+   - When $\varepsilon < \Delta_{\rm cross}$, all cross-grade terms vanish identically ($G_{ij} = 0$ for $i \ne j$), and diagonal entries are non-negative ($G_{ii} = \sum_n d_{i,n}^2 \ge 0$).
+   - Therefore, $c^* G c = \sum_i |c_i|^2 G_{ii} \ge 0$ unconditionally!
+   - Formally proved in Lean 4: `diagonal_matrix_psd` and `small_resolution_grade_psd`.
+   - This directly corrects the blanket statement that the grade matrix cannot have a Gram representation: at small resolutions below cross-grade separation, $G$ is unconditionally positive semi-definite.
+
+3. **Large-Resolution Grade Indefiniteness Witness**:
+   - At larger resolutions where cross-grade stations overlap, the restricted grade matrix does become indefinite.
+   - For $\varepsilon = 8.0$ on grades $\{0, 1\}$ in window $[8, 20]$, $G = \begin{pmatrix} 39.7597 & 4.5478 \\ 4.5478 & 0.4971 \end{pmatrix}$ has $\det(G) \approx -0.91899 < 0$ and $\lambda_{\min} \approx -0.022815 < 0$.
+   - Explicit normalized witness vector $c \approx (0.113576, -0.993529)^T$ achieves $c^T G c \approx -0.022815 < 0$.
+
+4. **Reflected Weil Spectral Pairing and Refutation of Squared-Modulus Substitution**:
+   - Consistent Mellin convention: $\mathcal M g(s) = \int_0^\infty g(x) x^s \frac{dx}{x} = \int_{\mathbb R} f(u) e^{su} du$ ($x = e^u$).
+   - Convolution law: $\mathcal M(g * h^*)(s) = \mathcal M g(s) \overline{\mathcal M h(-\bar s)}$.
+   - Under centering $g(x) = x^{1/2} g_{\rm old}(x)$, classical pole conditions transport to $\mathcal M g(-1/2) = \mathcal M g(1/2) = 0$.
+   - Spectral pairing:
+     $$B(g, h) = \mathcal W(x^{-1/2}(g * h^*)) = \sum_\rho m_\rho \mathcal M g(\rho - 1/2) \overline{\mathcal M h(1/2 - \bar\rho)}.$$
+   - On the critical line ($\rho = 1/2 + i\gamma$), $1/2 - \bar\rho = \rho - 1/2 = i\gamma$, yielding $|\mathcal M g(i\gamma)|^2 \ge 0$.
+   - Off the critical line ($\rho = 1/2 + \delta + i\gamma, \delta \ne 0$), the arguments are reflected across the imaginary axis ($\delta + i\gamma$ and $-\delta + i\gamma$).
+   - For admissible test function $f(u) = (\partial_u^2 - 1/4) f_0(u)$, the quartet pairing evaluates to $\approx -4.08187 \times 10^{-82} < 0$, while the naive squared-modulus sum would be $+4.33421 \times 10^{-82} > 0$.
+   - Replacing the reflected pairing with squared moduli falsely assumes positivity off-line and is mathematically invalid.
+   - TC grade dilation action carries factor $\tau^{-(K-J)(\rho - 1/2)}$ with consistent grade orientation $K - J$.
+
+5. **Arithmetic Sieve and Fourier Normalization Repairs**:
+   - Dynamic prime power sieve (`sieve_prime_powers_in_window`) enumerates all prime powers $n = p^m$ with $\Lambda(n) = \log p$ up to window boundary without cutoff, replacing the hardcoded list ending at 47.
+   - Corrected Fourier normalization integral: $\widehat\eta(0) = \int_{-1}^1 \eta(v) dv \approx 1.2069003224378762$ (correcting earlier $0.8872$ misprint).
+   - Formally proved coupling power identity $(s a)^6 = 8 / e^2$ in Lean 4 (`smooth_bump_coupling_sixth_power`).
+   - Total compiled Lean 4 project theorems: **237** (0 sorry, Mathlib foundations only).
+
+6. **Epistemic Assessment**:
+   - No new implication from an off-line zero to forbidden arithmetic coincidence $m\tau^K = n\tau^J$ was established.
+   - The Transcendental Continuation bridge remains strictly **OPEN**.

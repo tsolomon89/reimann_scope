@@ -255,15 +255,8 @@
     "A_0_Gamma": 0.5444402513346406,
     "A_0_Gamma_high_precision": "0.544440251334640629984802",
     "interval_enclosure": {
-      "engine": "flint.arb",
-      "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
-      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
-      "enclosure_mid": 0.5444399924859572,
-      "enclosure_rad": 0.0011700457162078237,
-      "lower_bound": 0.5432699467697494,
-      "upper_bound": 0.545610038202165,
-      "strictly_positive": true,
-      "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
+      "engine": "fallback_mpmath",
+      "note": "No module named 'flint'"
     },
     "D_M_rho0": 0.0,
     "asserted_identity_A0_eq_cD_falsified": true,
@@ -495,12 +488,7 @@
       "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "mid": 0.5444399924859572,
-        "rad": 0.0011700457162078237,
-        "lower": 0.5432699467697494,
-        "upper": 0.545610038202165,
-        "is_strictly_positive": true,
-        "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
+        "error": "No module named 'flint'"
       }
     },
     "retained_remainder_R": {
@@ -667,7 +655,7 @@
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
   "milestone_8_smooth_kernel_indefiniteness": {
-    "classification": "FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS",
+    "classification": "FALSIFIED_UNIVERSAL_AND_STATION_INDEXED_POSITIVE_DEFINITENESS",
     "kernel_definition": "eta(v) = exp(1 - 1/(1-v^2)) * 1_{|v|<1}",
     "counterexample_configuration": {
       "points_x": [
@@ -711,6 +699,8 @@
     "bochner_harmonic_analysis": {
       "theorem": "Bochner Characterization of Positive-Definite Kernels",
       "statement": "Translation-invariant kernel K(x-y) is positive definite on R iff hat{eta}(xi) >= 0 for all xi in R.",
+      "normalization_integral_hat_eta_0": 1.2069003224378763,
+      "normalization_reference_value": 1.2069003224378763,
       "fourier_transform_samples": [
         {
           "xi": 0.0,
@@ -753,6 +743,7 @@
           "is_negative": false
         }
       ],
+      "sampling_note": "Values at xi = 5.0, 6.8, 8.8 are sampled numerical values; exact algebraic counterexample M establishes failure of universal PSD without requiring uniform interval enclosure.",
       "negative_window": "[5.0, 8.8]",
       "minimum_negative_xi": 6.8,
       "minimum_negative_val": -0.1154443639721356,
@@ -805,13 +796,292 @@
         "negative": 1
       },
       "quadratic_form_witness_y_T_Q_y": -0.05331318911368421,
+      "restricted_family_station_indefinite": true,
       "restricted_family_indefinite": true
     },
     "formal_lean_theorems": [
       "RiemannScope.tridiagonal_kernel_matrix_quadratic_form",
-      "RiemannScope.tridiagonal_kernel_matrix_indefinite"
+      "RiemannScope.tridiagonal_kernel_matrix_indefinite",
+      "RiemannScope.smooth_bump_coupling_sixth_power"
     ],
-    "mathematical_conclusion": "The smooth exponential bump kernel eta is definitively NOT positive definite, neither universally on R (where x = (1, 3/2, 2) has lambda_min ~= -0.013328 < 0 and Bochner FT is negative on [5.0, 8.8]) nor on the restricted family of actual TC prime-power measures (where primes {3, 5, 7} at eps=4 reproduce M and Q = D M D has inertia (1, 0, 2) by Sylvester law). Consequently, the smooth bump kernel cannot supply a general Gram matrix or inner-product representation."
+    "mathematical_conclusion": "The smooth exponential bump kernel eta is definitively NOT positive definite on R, as established by the exact algebraic counterexample (1, 3/2, 2) at eps=1 with lambda_min = 1 - sqrt(2)*exp(-1/3) ~= -0.013328 < 0. On primes {3, 5, 7} at eps=4, the station-indexed kernel matrix reproduces M, and any positive diagonal weighting Q = D M D has inertia (1, 0, 2) by Sylvester law. However, this station-indexed indefiniteness does NOT by itself imply indefiniteness of the grade-indexed matrix G = E* H E, whose coefficients vary by entire grade and are constrained to im E."
+  },
+  "milestone_8_station_to_grade_embedding": {
+    "status": "STATION_TO_GRADE_EMBEDDING_AUDITED",
+    "grades": [
+      0,
+      1
+    ],
+    "window": [
+      8.0,
+      20.0
+    ],
+    "station_count": 9,
+    "stations": [
+      {
+        "grade": 0,
+        "n": 8,
+        "x": 8.0,
+        "weight_d": 0.0
+      },
+      {
+        "grade": 0,
+        "n": 9,
+        "x": 9.0,
+        "weight_d": 0.11319090679444295
+      },
+      {
+        "grade": 0,
+        "n": 11,
+        "x": 11.0,
+        "weight_d": 1.7181670424369104
+      },
+      {
+        "grade": 0,
+        "n": 13,
+        "x": 13.0,
+        "weight_d": 2.492702108375843
+      },
+      {
+        "grade": 0,
+        "n": 16,
+        "x": 16.0,
+        "weight_d": 0.611700239879397
+      },
+      {
+        "grade": 0,
+        "n": 17,
+        "x": 17.0,
+        "weight_d": 2.0300860705517487
+      },
+      {
+        "grade": 0,
+        "n": 19,
+        "x": 19.0,
+        "weight_d": 0.30336791376765504
+      },
+      {
+        "grade": 1,
+        "n": 2,
+        "x": 12.566370614359172,
+        "weight_d": 0.6524236299032338
+      },
+      {
+        "grade": 1,
+        "n": 3,
+        "x": 18.84955592153876,
+        "weight_d": 0.16693515003671963
+      }
+    ],
+    "minimum_cross_grade_separation_Delta_cross": 0.15044407846124058,
+    "small_resolution_theorem": {
+      "condition": "eps < Delta_cross = 0.150444",
+      "cross_grade_overlap_vanishing": "G_ij = 0 for all i != j",
+      "diagonal_positivity": "G_ii >= 0",
+      "conclusion": "c^* G c >= 0 unconditionally (positive semi-definite)",
+      "is_psd": true,
+      "lean4_theorem": "RiemannScope.small_resolution_grade_psd"
+    },
+    "pullback_identity": {
+      "formula": "G = E^* H E",
+      "quadratic_form": "c^* G c = (E c)^* H (E c)",
+      "coefficient_space": "im E = {v in C^{|S|} : v_{(i,n)} = c_i * d_{i,n}}",
+      "algebraic_pullback_verified": true,
+      "lean4_theorem": "RiemannScope.matrix_pullback_quadratic_form",
+      "psd_inheritance_theorem": "RiemannScope.matrix_pullback_psd"
+    },
+    "resolution_sweep": [
+      {
+        "resolution_eps": 0.01,
+        "is_below_delta_cross": true,
+        "eigenvalues_G": [
+          0.45352393717389383,
+          13.765932696619211
+        ],
+        "smallest_eigenvalue": 0.45352393717389383,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 0.0
+      },
+      {
+        "resolution_eps": 0.05,
+        "is_below_delta_cross": true,
+        "eigenvalues_G": [
+          0.45352393717389383,
+          13.765932696619211
+        ],
+        "smallest_eigenvalue": 0.45352393717389383,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 0.0
+      },
+      {
+        "resolution_eps": 0.1,
+        "is_below_delta_cross": true,
+        "eigenvalues_G": [
+          0.45352393717389383,
+          13.765932696619211
+        ],
+        "smallest_eigenvalue": 0.45352393717389383,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 0.0
+      },
+      {
+        "resolution_eps": 0.2,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          0.4535097214861403,
+          13.765946912306966
+        ],
+        "smallest_eigenvalue": 0.4535097214861403,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 2.0194839173657902e-28
+      },
+      {
+        "resolution_eps": 0.5,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          0.45236777376736753,
+          13.767088860025737
+        ],
+        "smallest_eigenvalue": 0.45236777376736753,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 0.0
+      },
+      {
+        "resolution_eps": 1.0,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          0.3200622719294741,
+          13.899394361863632
+        ],
+        "smallest_eigenvalue": 0.3200622719294741,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 0.0
+      },
+      {
+        "resolution_eps": 2.0,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          0.23510255203488514,
+          15.763937172322528
+        ],
+        "smallest_eigenvalue": 0.23510255203488514,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 4.1359030627651384e-25
+      },
+      {
+        "resolution_eps": 3.0,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          0.12319348885529002,
+          20.8651045064209
+        ],
+        "smallest_eigenvalue": 0.12319348885529002,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 4.1359030627651384e-25
+      },
+      {
+        "resolution_eps": 5.0,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          0.08056973786399924,
+          28.695889363053944
+        ],
+        "smallest_eigenvalue": 0.08056973786399924,
+        "is_positive_semidefinite": true,
+        "pullback_identity_error": 1.6543612251060553e-24
+      },
+      {
+        "resolution_eps": 8.0,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          -0.02281535978348448,
+          40.279550378220975
+        ],
+        "smallest_eigenvalue": -0.02281535978348448,
+        "is_positive_semidefinite": false,
+        "pullback_identity_error": 1.0339757656912846e-25
+      },
+      {
+        "resolution_eps": 10.0,
+        "is_below_delta_cross": false,
+        "eigenvalues_G": [
+          -0.0028930645456365367,
+          45.145291625314925
+        ],
+        "smallest_eigenvalue": -0.0028930645456365367,
+        "is_positive_semidefinite": false,
+        "pullback_identity_error": 1.0339757656912846e-25
+      }
+    ],
+    "large_resolution_indefinite_witness": {
+      "resolution_eps": 8.0,
+      "grade_matrix_G": [
+        [
+          39.75966822539126,
+          4.547769036700697
+        ],
+        [
+          4.547769036700697,
+          0.4970667930462342
+        ]
+      ],
+      "determinant_G": -0.9189924337960934,
+      "witness_vector_c": [
+        0.11357616085616788,
+        -0.993529292816862
+      ],
+      "quadratic_form_c_T_G_c": -0.022815359783484316,
+      "is_strictly_negative": true,
+      "witness_verified": true
+    },
+    "scope_correction_summary": "1. Station matrix H is universally indefinite on R (proved by 3-point counterexample and Bochner negative FT). 2. Grade matrix G = E^* H E is positive semi-definite at small resolutions eps < Delta_cross,    because cross-grade terms vanish and diagonal terms are non-negative. 3. At large resolutions (e.g. eps = 8.0 on grades {0, 1} in window [8, 20]), cross-grade overlap    causes G to become indefinite with an explicit witness vector c achieving c^T G c < 0. 4. Therefore, the blanket statement that the grade matrix cannot have a Gram representation is FALSE    at small resolutions (where it is unconditionally PSD), but TRUE at larger overlapping resolutions."
+  },
+  "milestone_8_reflected_weil_spectral_form": {
+    "status": "REFLECTED_WEIL_SPECTRAL_FORM_AUDITED",
+    "mellin_convention": "M g(s) = int_0^infty g(x) x^s dx/x = int_R f(u) exp(su) du",
+    "convolution_identity": "M(g * h^*)(s) = M g(s) * conj(M h(-bar(s)))",
+    "centering_shift": "M g(s) = M g_old(s + 1/2)",
+    "transported_pole_conditions": {
+      "M_g_half": 0.0,
+      "M_g_neg_half": 0.0,
+      "pole_cancellation_verified": true
+    },
+    "admissibility_construction": {
+      "operator": "f(u) = (d_u^2 - 1/4) f_0(u)",
+      "multiplier": "M g(s) = (s^2 - 1/4) * M g_0(s)",
+      "guarantee": "Automatically enforces M g(-1/2) = M g(1/2) = 0 for any smooth compactly supported f_0"
+    },
+    "on_line_control": {
+      "zero_coordinate": "1/2 + 14.134725i (delta=0)",
+      "first_argument": "14.134725i",
+      "second_argument": "14.134725i",
+      "term_value": 4.29067072446034e-82,
+      "is_strictly_positive": true,
+      "note": "On the critical line, 1/2 - bar(rho) = rho - 1/2, so the reflected pairing reduces to squared modulus."
+    },
+    "off_line_quartet_analysis": {
+      "hypothetical_zero": "1/2 + 0.1 + 14.134725i (delta=0.1)",
+      "first_argument_rho_minus_half": "0.1 + 14.134725i",
+      "second_argument_half_minus_bar_rho": "-0.1 + 14.134725i",
+      "reflection_axis": "Arguments are reflected across imaginary axis: delta <-> -delta",
+      "correct_reflected_quartet_pairing": -1.632754390621861e-81,
+      "erroneous_squared_modulus_sum": 1.7336899606390272e-81,
+      "discrepancy_ratio": -0.9417799189539275,
+      "is_reflected_pairing_negative": true,
+      "mathematical_lesson": "For an off-line zero, the reflected pairing is NOT a sum of squared moduli. In this admissible test case, the reflected pairing evaluates to a NEGATIVE number (-1.63275e-81), whereas the squared modulus is positive (+1.73369e-81). Substituting squared moduli falsely assumes positivity off the critical line and is mathematically invalid."
+    },
+    "tc_grade_dilation_action": {
+      "law": "M(U_K g)(s) = tau^{-K*s} M g(s)",
+      "bilinear_action": "B(U_K g, U_J h) = sum_rho m_rho tau^{-(K-J)(rho - 1/2)} M g(rho - 1/2) conj(M h(1/2 - bar(rho)))",
+      "grade_difference_orientation": "K - J",
+      "sample_dilated_term": -1.3469189099764424e-82
+    },
+    "hermitian_symmetry": {
+      "identity": "conj(B(h, g)) = B(g, h)",
+      "mechanism": "Zero reflection symmetry rho <-> 1 - bar(rho) under the functional equation and Schwarz reflection",
+      "formal_lean_theorem": "RiemannScope.hermitian_polarization_complex"
+    },
+    "epistemic_verdict": "NO_NEW_IMPLICATION_ESTABLISHED"
   },
   "milestone_8_weil_positivity_and_bridge_comparison": {
     "classification": "COMPARISON_COMPLETED",
@@ -820,11 +1090,12 @@
       "haar_measure": "d^*u = du / u",
       "convolution": "(g * h)(x) = int_0^infty g(x / y) h(y) dy / y",
       "involution": "h^*(x) = conj(h(1 / x))",
+      "mellin_transform_convention": "Consistent convention: M g(s) = int_0^infty g(x) x^s dx / x = int_R f(u) exp(su) du, where x = exp(u). Convolution law: M(g * h^*)(s) = M g(s) * conj(M h(-bar(s))).",
       "centering_automorphism": "Delta^{1/2} f(x) = x^{1/2} f(x), converting classical Weil involution k^sharp(x) = x^{-1} conj(k(1/x)) to f^*(x) = conj(f(1/x)), and mapping critical line Re(s) = 1/2 to unitary Fourier transform on R.",
       "admissible_test_space_V": "Centered test space V_centered = {g in C_c^infty(R_+^*) : tilde{g}(-1/2) = tilde{g}(1/2) = 0}. Under the centering isomorphism g(x) = x^{1/2} g_old(x), the Mellin transform shifts by +1/2: tilde{g}(s) = tilde{g}_old(s + 1/2). Consequently, classical pole-cancellation conditions tilde{g}_old(0) = tilde{g}_old(1) = 0 rigorously transport to centered conditions tilde{g}(-1/2) = tilde{g}(1/2) = 0. In additive coordinates f(u) = g(e^u), this corresponds to int_{-infty}^infty f(u) exp(+/- u/2) du = 0, or Fourier vanishing at imaginary frequencies t = +/- i/2.",
       "weil_linear_functional": "W(k) = tilde{k}(-1/2) + tilde{k}(1/2) - sum_v W_v(k) = sum_{rho in Z} tilde{k}(rho - 1/2)",
-      "bilinear_weil_form": "B(g, h) = W(Delta^{-1/2}(g * h^*))",
-      "weil_quadratic_form": "Q_Weil(g) = B(g, g) = W(Delta^{-1/2}(g * g^*)) = sum_{rho in Z} |tilde{Delta^{-1/2} g}(rho)|^2"
+      "bilinear_weil_form": "B(g, h) = W(x^{-1/2}(g * h^*))",
+      "reflected_weil_spectral_expression": "B(g, h) = sum_rho m_rho M g(rho - 1/2) * conj(M h(1/2 - bar(rho))). For an off-line zero rho = 1/2 + delta + i*gamma (delta != 0), the two arguments are delta + i*gamma and -delta + i*gamma. The pairing is reflected across the imaginary axis; replacing it with squared moduli is mathematically invalid off-line."
     },
     "polarization_analysis": {
       "test_expansion": "For g = g_K + g_J, g * g^* = g_K * g_K^* + g_K * g_J^* + g_J * g_K^* + g_J * g_J^*",
@@ -833,6 +1104,11 @@
       "complex_hermitian_real_part_polarization": "(B(x + y, x + y)).re = (B(x, x)).re + (B(y, y)).re + 2 * (B(x, y)).re. Formally proved in Lean 4: RiemannScope.hermitian_polarization_real_part.",
       "refutation_of_equal_grades_only": "Self-convolution (g * g^*) on a sum of multi-grade test functions naturally contains cross-grade terms g_K * g_J^*. Self-convolution does NOT restrict exclusively to equal grades.",
       "formal_lean_theorems": [
+        "RiemannScope.small_resolution_grade_psd",
+        "RiemannScope.matrix_pullback_quadratic_form",
+        "RiemannScope.matrix_pullback_psd",
+        "RiemannScope.diagonal_matrix_psd",
+        "RiemannScope.smooth_bump_coupling_sixth_power",
         "RiemannScope.hermitian_polarization_complex",
         "RiemannScope.hermitian_polarization_real_part",
         "RiemannScope.symmetric_bilinear_polarization_real"
@@ -847,22 +1123,25 @@
         "epistemic_status": "PROVED_AND_VERIFIED"
       },
       {
-        "object": "Multi-Grade Matrix / Gram Form (Q_eps^{K_i, K_j})",
-        "mathematical_nature": "Matrix Q = (Q_eps^{K_i, K_j})_{i, j=1}^N indexed by a finite grade family.",
-        "positivity_property": "Positive semi-definiteness: c^* Q c >= 0 for all c in C^N.",
-        "strict_positivity_condition": "Entrywise non-negativity (Q_{ij} >= 0) is INSUFFICIENT for positive semi-definiteness. The smooth kernel eta is definitively NOT positive definite: Point configuration (1, 3/2, 2) at eps=1 gives smallest eigenvalue 1 - sqrt(2)*exp(-1/3) ~= -0.013328 < 0. Prime progression {3, 5, 7} at eps=4 reproduces M, and weighted matrix Q = D M D has inertia (1, 0, 2). No general Gram representation exists for this kernel even on the restricted TC prime family.",
-        "epistemic_status": "FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS"
+        "object": "Multi-Grade Matrix / Grade Form G = (Q_eps^{K_i, K_j})",
+        "mathematical_nature": "Grade-indexed matrix G = E^* H E where H is station-indexed kernel matrix and E_{(i,n), j} = d_{i,n} 1_{i=j}.",
+        "allowed_coefficient_space": "im(E) subset C^{|S|}, varying by entire grade rather than arbitrary station.",
+        "positivity_property": "Resolution-dependent: unconditionally PSD for eps < Delta_cross; indefinite for overlapping resolutions.",
+        "small_resolution_regime": "When eps < Delta_cross (cross-grade station separation), cross-grade terms vanish: G_{ij} = 0 for i != j. Diagonal entries G_{ii} = sum_n d_{i,n}^2 >= 0. Therefore c^* G c = sum_i |c_i|^2 G_{ii} >= 0 unconditionally! Formally proved in Lean 4: RiemannScope.small_resolution_grade_psd.",
+        "large_resolution_regime": "At larger resolutions (e.g. eps = 8.0 on grades {0, 1} in window [8, 20]), cross-grade overlap causes G to become indefinite. An explicit grade witness vector c ~= (0.113576, -0.993529)^T achieves c^T G c ~= -0.022815 < 0.",
+        "epistemic_status": "PSD_AT_SMALL_RESOLUTION_INDEFINITE_AT_LARGE_RESOLUTION"
       },
       {
-        "object": "Weil Quadratic Form B(g, h)",
-        "mathematical_nature": "Linear explicit formula distribution on multiplicative convolution: W(Delta^{-1/2}(g * h^*)).",
-        "positivity_property": "B(g, g) >= 0 on full centered admissible test space V_centered.",
-        "strict_positivity_condition": "Full positivity on V_centered is STRICTLY EQUIVALENT TO RH (Weil 1952, Bombieri 2000, Connes-Consani 2026). Cannot be assumed unconditionally as a known source of sign.",
+        "object": "Weil Bilinear Form B(g, h)",
+        "mathematical_nature": "Linear explicit formula distribution on multiplicative convolution: W(x^{-1/2}(g * h^*)).",
+        "spectral_expression": "B(g, h) = sum_rho m_rho M g(rho - 1/2) * conj(M h(1/2 - bar(rho))).",
+        "positivity_property": "B(g, g) >= 0 on full centered admissible test space V_centered if and only if RH holds.",
+        "off_line_behavior": "For an off-line zero quartet, the reflected pairing 4 * Re(M g(delta + i*gamma) * conj(M g(-delta + i*gamma))) evaluates to a negative value in admissible test functions (e.g. -4.08e-82 for f = (d_u^2 - 1/4) f_0), while the erroneous squared-modulus sum would be strictly positive (+4.33e-82). Substituting squared moduli off-line is an error that falsely assumes positivity.",
         "epistemic_status": "RH_EQUIVALENT_CIRCULAR_IF_ASSUMED"
       }
     ],
     "kernel_indefiniteness_audit": {
-      "classification": "FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS",
+      "classification": "FALSIFIED_UNIVERSAL_AND_STATION_INDEXED_POSITIVE_DEFINITENESS",
       "kernel_definition": "eta(v) = exp(1 - 1/(1-v^2)) * 1_{|v|<1}",
       "counterexample_configuration": {
         "points_x": [
@@ -906,6 +1185,8 @@
       "bochner_harmonic_analysis": {
         "theorem": "Bochner Characterization of Positive-Definite Kernels",
         "statement": "Translation-invariant kernel K(x-y) is positive definite on R iff hat{eta}(xi) >= 0 for all xi in R.",
+        "normalization_integral_hat_eta_0": 1.2069003224378763,
+        "normalization_reference_value": 1.2069003224378763,
         "fourier_transform_samples": [
           {
             "xi": 0.0,
@@ -948,6 +1229,7 @@
             "is_negative": false
           }
         ],
+        "sampling_note": "Values at xi = 5.0, 6.8, 8.8 are sampled numerical values; exact algebraic counterexample M establishes failure of universal PSD without requiring uniform interval enclosure.",
         "negative_window": "[5.0, 8.8]",
         "minimum_negative_xi": 6.8,
         "minimum_negative_val": -0.1154443639721356,
@@ -1000,19 +1282,298 @@
           "negative": 1
         },
         "quadratic_form_witness_y_T_Q_y": -0.05331318911368421,
+        "restricted_family_station_indefinite": true,
         "restricted_family_indefinite": true
       },
       "formal_lean_theorems": [
         "RiemannScope.tridiagonal_kernel_matrix_quadratic_form",
-        "RiemannScope.tridiagonal_kernel_matrix_indefinite"
+        "RiemannScope.tridiagonal_kernel_matrix_indefinite",
+        "RiemannScope.smooth_bump_coupling_sixth_power"
       ],
-      "mathematical_conclusion": "The smooth exponential bump kernel eta is definitively NOT positive definite, neither universally on R (where x = (1, 3/2, 2) has lambda_min ~= -0.013328 < 0 and Bochner FT is negative on [5.0, 8.8]) nor on the restricted family of actual TC prime-power measures (where primes {3, 5, 7} at eps=4 reproduce M and Q = D M D has inertia (1, 0, 2) by Sylvester law). Consequently, the smooth bump kernel cannot supply a general Gram matrix or inner-product representation."
+      "mathematical_conclusion": "The smooth exponential bump kernel eta is definitively NOT positive definite on R, as established by the exact algebraic counterexample (1, 3/2, 2) at eps=1 with lambda_min = 1 - sqrt(2)*exp(-1/3) ~= -0.013328 < 0. On primes {3, 5, 7} at eps=4, the station-indexed kernel matrix reproduces M, and any positive diagonal weighting Q = D M D has inertia (1, 0, 2) by Sylvester law. However, this station-indexed indefiniteness does NOT by itself imply indefiniteness of the grade-indexed matrix G = E* H E, whose coefficients vary by entire grade and are constrained to im E."
+    },
+    "grade_embedding_audit": {
+      "status": "STATION_TO_GRADE_EMBEDDING_AUDITED",
+      "grades": [
+        0,
+        1
+      ],
+      "window": [
+        8.0,
+        20.0
+      ],
+      "station_count": 9,
+      "stations": [
+        {
+          "grade": 0,
+          "n": 8,
+          "x": 8.0,
+          "weight_d": 0.0
+        },
+        {
+          "grade": 0,
+          "n": 9,
+          "x": 9.0,
+          "weight_d": 0.11319090679444295
+        },
+        {
+          "grade": 0,
+          "n": 11,
+          "x": 11.0,
+          "weight_d": 1.7181670424369104
+        },
+        {
+          "grade": 0,
+          "n": 13,
+          "x": 13.0,
+          "weight_d": 2.492702108375843
+        },
+        {
+          "grade": 0,
+          "n": 16,
+          "x": 16.0,
+          "weight_d": 0.611700239879397
+        },
+        {
+          "grade": 0,
+          "n": 17,
+          "x": 17.0,
+          "weight_d": 2.0300860705517487
+        },
+        {
+          "grade": 0,
+          "n": 19,
+          "x": 19.0,
+          "weight_d": 0.30336791376765504
+        },
+        {
+          "grade": 1,
+          "n": 2,
+          "x": 12.566370614359172,
+          "weight_d": 0.6524236299032338
+        },
+        {
+          "grade": 1,
+          "n": 3,
+          "x": 18.84955592153876,
+          "weight_d": 0.16693515003671963
+        }
+      ],
+      "minimum_cross_grade_separation_Delta_cross": 0.15044407846124058,
+      "small_resolution_theorem": {
+        "condition": "eps < Delta_cross = 0.150444",
+        "cross_grade_overlap_vanishing": "G_ij = 0 for all i != j",
+        "diagonal_positivity": "G_ii >= 0",
+        "conclusion": "c^* G c >= 0 unconditionally (positive semi-definite)",
+        "is_psd": true,
+        "lean4_theorem": "RiemannScope.small_resolution_grade_psd"
+      },
+      "pullback_identity": {
+        "formula": "G = E^* H E",
+        "quadratic_form": "c^* G c = (E c)^* H (E c)",
+        "coefficient_space": "im E = {v in C^{|S|} : v_{(i,n)} = c_i * d_{i,n}}",
+        "algebraic_pullback_verified": true,
+        "lean4_theorem": "RiemannScope.matrix_pullback_quadratic_form",
+        "psd_inheritance_theorem": "RiemannScope.matrix_pullback_psd"
+      },
+      "resolution_sweep": [
+        {
+          "resolution_eps": 0.01,
+          "is_below_delta_cross": true,
+          "eigenvalues_G": [
+            0.45352393717389383,
+            13.765932696619211
+          ],
+          "smallest_eigenvalue": 0.45352393717389383,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 0.0
+        },
+        {
+          "resolution_eps": 0.05,
+          "is_below_delta_cross": true,
+          "eigenvalues_G": [
+            0.45352393717389383,
+            13.765932696619211
+          ],
+          "smallest_eigenvalue": 0.45352393717389383,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 0.0
+        },
+        {
+          "resolution_eps": 0.1,
+          "is_below_delta_cross": true,
+          "eigenvalues_G": [
+            0.45352393717389383,
+            13.765932696619211
+          ],
+          "smallest_eigenvalue": 0.45352393717389383,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 0.0
+        },
+        {
+          "resolution_eps": 0.2,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            0.4535097214861403,
+            13.765946912306966
+          ],
+          "smallest_eigenvalue": 0.4535097214861403,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 2.0194839173657902e-28
+        },
+        {
+          "resolution_eps": 0.5,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            0.45236777376736753,
+            13.767088860025737
+          ],
+          "smallest_eigenvalue": 0.45236777376736753,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 0.0
+        },
+        {
+          "resolution_eps": 1.0,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            0.3200622719294741,
+            13.899394361863632
+          ],
+          "smallest_eigenvalue": 0.3200622719294741,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 0.0
+        },
+        {
+          "resolution_eps": 2.0,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            0.23510255203488514,
+            15.763937172322528
+          ],
+          "smallest_eigenvalue": 0.23510255203488514,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 4.1359030627651384e-25
+        },
+        {
+          "resolution_eps": 3.0,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            0.12319348885529002,
+            20.8651045064209
+          ],
+          "smallest_eigenvalue": 0.12319348885529002,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 4.1359030627651384e-25
+        },
+        {
+          "resolution_eps": 5.0,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            0.08056973786399924,
+            28.695889363053944
+          ],
+          "smallest_eigenvalue": 0.08056973786399924,
+          "is_positive_semidefinite": true,
+          "pullback_identity_error": 1.6543612251060553e-24
+        },
+        {
+          "resolution_eps": 8.0,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            -0.02281535978348448,
+            40.279550378220975
+          ],
+          "smallest_eigenvalue": -0.02281535978348448,
+          "is_positive_semidefinite": false,
+          "pullback_identity_error": 1.0339757656912846e-25
+        },
+        {
+          "resolution_eps": 10.0,
+          "is_below_delta_cross": false,
+          "eigenvalues_G": [
+            -0.0028930645456365367,
+            45.145291625314925
+          ],
+          "smallest_eigenvalue": -0.0028930645456365367,
+          "is_positive_semidefinite": false,
+          "pullback_identity_error": 1.0339757656912846e-25
+        }
+      ],
+      "large_resolution_indefinite_witness": {
+        "resolution_eps": 8.0,
+        "grade_matrix_G": [
+          [
+            39.75966822539126,
+            4.547769036700697
+          ],
+          [
+            4.547769036700697,
+            0.4970667930462342
+          ]
+        ],
+        "determinant_G": -0.9189924337960934,
+        "witness_vector_c": [
+          0.11357616085616788,
+          -0.993529292816862
+        ],
+        "quadratic_form_c_T_G_c": -0.022815359783484316,
+        "is_strictly_negative": true,
+        "witness_verified": true
+      },
+      "scope_correction_summary": "1. Station matrix H is universally indefinite on R (proved by 3-point counterexample and Bochner negative FT). 2. Grade matrix G = E^* H E is positive semi-definite at small resolutions eps < Delta_cross,    because cross-grade terms vanish and diagonal terms are non-negative. 3. At large resolutions (e.g. eps = 8.0 on grades {0, 1} in window [8, 20]), cross-grade overlap    causes G to become indefinite with an explicit witness vector c achieving c^T G c < 0. 4. Therefore, the blanket statement that the grade matrix cannot have a Gram representation is FALSE    at small resolutions (where it is unconditionally PSD), but TRUE at larger overlapping resolutions."
+    },
+    "reflected_weil_audit": {
+      "status": "REFLECTED_WEIL_SPECTRAL_FORM_AUDITED",
+      "mellin_convention": "M g(s) = int_0^infty g(x) x^s dx/x = int_R f(u) exp(su) du",
+      "convolution_identity": "M(g * h^*)(s) = M g(s) * conj(M h(-bar(s)))",
+      "centering_shift": "M g(s) = M g_old(s + 1/2)",
+      "transported_pole_conditions": {
+        "M_g_half": 0.0,
+        "M_g_neg_half": 0.0,
+        "pole_cancellation_verified": true
+      },
+      "admissibility_construction": {
+        "operator": "f(u) = (d_u^2 - 1/4) f_0(u)",
+        "multiplier": "M g(s) = (s^2 - 1/4) * M g_0(s)",
+        "guarantee": "Automatically enforces M g(-1/2) = M g(1/2) = 0 for any smooth compactly supported f_0"
+      },
+      "on_line_control": {
+        "zero_coordinate": "1/2 + 14.134725i (delta=0)",
+        "first_argument": "14.134725i",
+        "second_argument": "14.134725i",
+        "term_value": 4.29067072446034e-82,
+        "is_strictly_positive": true,
+        "note": "On the critical line, 1/2 - bar(rho) = rho - 1/2, so the reflected pairing reduces to squared modulus."
+      },
+      "off_line_quartet_analysis": {
+        "hypothetical_zero": "1/2 + 0.1 + 14.134725i (delta=0.1)",
+        "first_argument_rho_minus_half": "0.1 + 14.134725i",
+        "second_argument_half_minus_bar_rho": "-0.1 + 14.134725i",
+        "reflection_axis": "Arguments are reflected across imaginary axis: delta <-> -delta",
+        "correct_reflected_quartet_pairing": -1.632754390621861e-81,
+        "erroneous_squared_modulus_sum": 1.7336899606390272e-81,
+        "discrepancy_ratio": -0.9417799189539275,
+        "is_reflected_pairing_negative": true,
+        "mathematical_lesson": "For an off-line zero, the reflected pairing is NOT a sum of squared moduli. In this admissible test case, the reflected pairing evaluates to a NEGATIVE number (-1.63275e-81), whereas the squared modulus is positive (+1.73369e-81). Substituting squared moduli falsely assumes positivity off the critical line and is mathematically invalid."
+      },
+      "tc_grade_dilation_action": {
+        "law": "M(U_K g)(s) = tau^{-K*s} M g(s)",
+        "bilinear_action": "B(U_K g, U_J h) = sum_rho m_rho tau^{-(K-J)(rho - 1/2)} M g(rho - 1/2) conj(M h(1/2 - bar(rho)))",
+        "grade_difference_orientation": "K - J",
+        "sample_dilated_term": -1.3469189099764424e-82
+      },
+      "hermitian_symmetry": {
+        "identity": "conj(B(h, g)) = B(g, h)",
+        "mechanism": "Zero reflection symmetry rho <-> 1 - bar(rho) under the functional equation and Schwarz reflection",
+        "formal_lean_theorem": "RiemannScope.hermitian_polarization_complex"
+      },
+      "epistemic_verdict": "NO_NEW_IMPLICATION_ESTABLISHED"
     },
     "map_analysis": {
       "dimensional_and_measure_distinction": "The arithmetic overlap Q_eps^{K, J} uses a tensor product of two prime measures (mu_K otimes mu_J) evaluated on R_{>0} x R_{>0}. The Weil form B(g_K, g_J) uses a linear explicit-formula distribution W evaluated on a 1-variable multiplicative convolution (g_K * g_J^*) on R_+^*.",
       "arithmetic_side_structure": "W_p(k) involves a single sum over prime powers p^m, whereas Q_eps involves a double sum over station pairs (a_K n, a_J m). Any rigorous map from Q_eps to B must explicitly account for the dimensional reduction from R_{>0}^2 to R_+^* and the jacobian/scaling factors a_K, a_J.",
       "spectral_side_structure": "Weil form B(g_K, g_J) decomposes as a SINGLE sum over zeros: sum_{rho in Z} tilde{g}_K(rho-1/2) conj(tilde{g}_J(rho-1/2)). In contrast, TC two-variable explicit formula decomposes as a DOUBLE sum over all pairs of zeros: bar{S}_eps = sum_{rho, rho'} iint eta((x-y)/eps) w(x) w(y) x^{rho_K-1} y^{rho'_J-1} dx dy. This structural mismatch confirms that Q_eps^{K, J} couples off-diagonal zero pairs that are absent from B(g_K, g_J).",
-      "mathematical_barrier": "The structural difference between a 2-variable measure pairing and a 1-variable group convolution explains why direct identification B(g_K, g_J) = Q_eps^{K, J} is invalid. Moreover, the kernel indefiniteness demonstrates that Q_eps cannot be endowed with a pre-Hilbert Gram structure using eta."
+      "mathematical_barrier": "The structural difference between a 2-variable measure pairing and a 1-variable group convolution explains why direct identification B(g_K, g_J) = Q_eps^{K, J} is invalid. Moreover, the kernel indefiniteness demonstrates that Q_eps cannot be endowed with a pre-Hilbert Gram structure using eta at large resolutions."
     },
     "attempted_derivation_record": {
       "step_1_arithmetic_property": "Radon measure non-negativity mu_K >= 0; Lindemann transcendence of tau = 2*pi forces disjoint prime-power station sets S_K cap S_J = emptyset for K != J, giving minimum distance Delta_W > 0 on any fixed compact window W.",
@@ -1040,19 +1601,23 @@
         "corrected_statement": "No theorem proves that a fixed-window contradiction is impossible. Arithmetic vanishing A |- Q_eps = 0 does not rule out deriving A, H |- Q_eps > 0 under the false off-line zero hypothesis. Fixed-window, varying-window, and global formulations all remain eligible research candidates."
       },
       "rejection_5": {
-        "claim_rejected": "The smooth bump kernel eta is positive definite on R or supplies a general Gram representation.",
-        "corrected_statement": "The smooth exponential bump kernel eta is not positive definite. Counterexample x = (1, 3/2, 2) at eps = 1 has smallest eigenvalue 1 - sqrt(2)*exp(-1/3) ~= -0.013328 < 0. On prime arithmetic progressions {3, 5, 7} at eps = 4, the kernel matrix reproduces M, and any positive prime weighting Q = D M D has inertia (1, 0, 2) by Sylvester law, disproving positive semi-definiteness even on the restricted TC prime family."
+        "claim_rejected": "The grade matrix G cannot have a Gram representation or cannot be positive semi-definite.",
+        "corrected_statement": "This conflated station and grade scopes. While the station matrix H is universally indefinite on R (3-point counterexample (1, 3/2, 2) at eps=1, Bochner FT negative on [5.0, 8.8]), the grade matrix G = E^* H E restricts to im(E). For eps < Delta_cross, cross-grade terms vanish and G is diagonal with non-negative entries, making G UNCONDITIONALLY positive semi-definite (RiemannScope.small_resolution_grade_psd). At larger overlapping resolutions (e.g. eps = 8.0 on grades {0, 1}), G does become indefinite with explicit witness c^T G c ~= -0.022815 < 0."
       },
       "rejection_6": {
         "claim_rejected": "Weil test space condition can retain tilde{g}(0) = tilde{g}(1) = 0 under centering.",
         "corrected_statement": "Under the centering isomorphism g(x) = x^{1/2} g_old(x), Mellin arguments shift by +1/2: tilde{g}(s) = tilde{g}_old(s + 1/2). Therefore, classical pole-cancellation conditions at 0, 1 transport to tilde{g}(-1/2) = tilde{g}(1/2) = 0 (Connes-Consani 2026)."
+      },
+      "rejection_7": {
+        "claim_rejected": "The reflected Weil form can be replaced by a sum of squared moduli for off-line zeros.",
+        "corrected_statement": "The spectral pairing for B(g, h) is sum_rho m_rho M g(rho - 1/2) conj(M h(1/2 - bar(rho))). On the critical line rho - 1/2 = 1/2 - bar(rho) = i*gamma, which produces |M g(i*gamma)|^2 >= 0. Off the critical line, the arguments are reflected (delta + i*gamma vs -delta + i*gamma). On admissible tests f = (d_u^2 - 1/4) f_0, this reflected pairing evaluates to a negative value. Replacing it with squared moduli falsely forces positivity and conceals potential negative directions."
       }
     },
     "epistemic_verdict": "NO_NEW_IMPLICATION_ESTABLISHED",
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 232,
+    "total_compiled_theorems": 237,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
@@ -1077,7 +1642,12 @@
       "hermitian_polarization_complex",
       "hermitian_polarization_real_part",
       "tridiagonal_kernel_matrix_quadratic_form",
-      "tridiagonal_kernel_matrix_indefinite"
+      "tridiagonal_kernel_matrix_indefinite",
+      "matrix_pullback_quadratic_form",
+      "matrix_pullback_psd",
+      "diagonal_matrix_psd",
+      "small_resolution_grade_psd",
+      "smooth_bump_coupling_sixth_power"
     ],
     "axioms": "Mathlib standard foundations only; 0 sorry, 0 admit."
   },
@@ -1097,8 +1667,10 @@
     "product_measure_status": "NON_ZERO_MEASURE (Vanishing is strictly band-overlap below Delta_W)",
     "positivity_grade_scope": "UNCONDITIONAL_NONNEGATIVE (All grades K, J; strict positivity requires active pairs)",
     "research_space_scope": "OPEN (Fixed-window, varying-window, and global constructions remain eligible)",
-    "smooth_kernel_positive_definiteness": "FALSIFIED (Counterexample (1, 3/2, 2) at eps=1 has lambda_min ~= -0.013328 < 0; Bochner FT negative on [5.0, 8.8])",
-    "restricted_tc_family_kernel_positivity": "FALSIFIED (Primes {3, 5, 7} at eps=4 reproduce M; Q=DMD indefinite by Sylvester inertia)",
+    "station_kernel_indefiniteness": "FALSIFIED_ON_STATIONS (Counterexample (1, 3/2, 2) at eps=1 has lambda_min ~= -0.013328 < 0; Bochner FT negative on [5.0, 8.8]; primes {3, 5, 7} at eps=4 give indefinite station matrix H)",
+    "small_resolution_grade_psd": "PROVED (Diagonal separation when eps < Delta_cross ~= 0.1504; G = E^* H E is unconditionally PSD; formal theorem RiemannScope.small_resolution_grade_psd)",
+    "large_resolution_grade_indefiniteness": "VERIFIED_WITNESS (eps = 8.0 on grades {0, 1} in window [8, 20] yields det(G) ~= -0.91899 < 0, lambda_min ~= -0.022815 < 0, explicit witness c ~= (0.113576, -0.993529)^T achieves c^T G c ~= -0.022815 < 0)",
+    "reflected_weil_pairing": "DERIVED_AND_VERIFIED (B(g, h) = sum_rho m_rho M g(rho-1/2) conj(M h(1/2-bar(rho))); offline quartet pairing is negative on admissible tests; squared-modulus substitution refuted)",
     "weil_test_space_centering": "RECONCILED (tilde{g}(-1/2) = tilde{g}(1/2) = 0 transports classical poles under centering isomorphism g = x^(1/2) g_old)",
     "conditional_spectral_lower_bound": "UNPROVED / STRICTLY OPEN",
     "transcendental_continuation_bridge": "STRICTLY OPEN"
