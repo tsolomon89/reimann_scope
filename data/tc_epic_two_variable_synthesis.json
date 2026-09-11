@@ -629,7 +629,7 @@
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 218,
+    "total_compiled_theorems": 222,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
