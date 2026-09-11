@@ -105,6 +105,9 @@
     "formal/RiemannScope/Grade.lean: cos_mul_cos_product_to_sum",
     "formal/RiemannScope/Grade.lean: mode_extraction_eventual_lower_bound",
     "formal/RiemannScope/Grade.lean: mode_extraction_coefficient_divergence_half",
+    "formal/RiemannScope/Grade.lean: symmetric_bilinear_polarization_real",
+    "formal/RiemannScope/Grade.lean: finite_double_sum_nonneg",
+    "formal/RiemannScope/Grade.lean: finite_double_sum_pos_of_witness",
     "transcendental.py: audit_tc_cutoff_condition_counterexample",
     "transcendental.py: evaluate_two_variable_explicit_expansion",
     "transcendental.py: audit_selected_spectral_contribution",
@@ -114,15 +117,16 @@
     "transcendental.py: audit_arithmetic_quadratic_form_mode_extraction",
     "transcendental.py: audit_finite_spectral_perturbation_rigidity",
     "transcendental.py: audit_arithmetic_compatibility_investigation",
+    "transcendental.py: audit_weil_positivity_and_tc_bridge_comparison",
     "transcendental.py: audit_tc_epic_two_variable_synthesis"
   ],
   "proof_artifact": "formal/RiemannScope/Grade.lean",
   "falsification_attempts": [
-    "Gate 1 & 2: verified that two-variable observable Q_eps derives from explicit prime measures mu_K = B_K - Z_K on compact window [8, 20] > max(a_0, a_1)",
+    "Gate 1 & 2: verified that two-variable observable Q_eps derives from explicit prime measures mu_K = B_K - Z_K on compact window [8, 20] > max(a_0, a_1); proved that product measure mu_K otimes mu_J is non-zero and positive with pairing <mu_0 otimes mu_1, w otimes w> approx 13.91 > 0",
     "Gate 3 & 4: constructed concrete counterexample p=3, T = eps^{-2}*sqrt(ell) falsifying prior condition T >> eps^{-(p-1)/(p-2)}; proved normalized error requires alpha > p/(p-2) in Lean 4 (power_cutoff_exponent_positivity)",
     "Gate 5 & 6: evaluated small-eps boundary behavior; verified 1-variable trivial zero sum to < 10^{-15}; proved 9-term and 4-term bilinear expansions in Lean 4",
     "Gate 7 & 8: proved reality of A_{eps, Gamma} via conjugation closure; proved A_{eps, Gamma}/eps = A_{0, Gamma} + O(eps^2) for even eta; falsified asserted identity A_{0, Gamma} = c*D_M(rho_0) by showing D_M = 0 on critical line while A_0 approx 0.5444 != 0",
-    "Gate 9 & 10: proved conservative truncation bound C_p * eps^{1-p} * log^2(2+T) / T^{p-2} using Trudgian N_*(R)^2 dyadic shell counting; proved exact arithmetic vanishing Q_eps^{0, 1} = 0 for eps < 0.1504; formalized contradiction endpoint and topological convergence in Lean 4; proved exact explicit formula remainder cancellation lim R_bar_{eps, T(eps)} = -A_{0, Gamma} on fixed windows; refuted arbitrary-compensation claim via finite spectral perturbation rigidity; and evaluated 4 arithmetic compatibility chains identifying the transfer step as the earliest unproved inference, keeping the bridge open"
+    "Gate 9 & 10: proved conservative truncation bound C_p * eps^{1-p} * log^2(2+T) / T^{p-2} using Trudgian N_*(R)^2 dyadic shell counting; proved exact arithmetic vanishing Q_eps^{0, 1} = 0 for eps < 0.1504; formalized contradiction endpoint and topological convergence in Lean 4; proved exact explicit formula remainder cancellation lim R_bar_{eps, T(eps)} = -A_{0, Gamma} on fixed windows; refuted arbitrary-compensation claim via finite spectral perturbation rigidity; audited Weil positivity and proved Hermitian polarization formula B(g_K+g_J, g_K+g_J) = B(g_K, g_K) + B(g_J, g_J) + 2*Re B(g_K, g_J) in Lean 4, refuting equal-grades-only restriction; rejected all 4 overbroad claims (product measure zero, positivity only at equal grades, self-convolution means equal grades, growing windows necessary); and evaluated 4 arithmetic compatibility chains identifying the transfer step as the earliest unproved inference, keeping the bridge open"
   ],
   "computational_evidence": [
     "tests/test_tc_mechanism_discovery.py: test_epic_tc_cutoff_condition_counterexample",
@@ -141,6 +145,8 @@
     "tests/test_tc_mechanism_discovery.py: test_epic_kernel_comparison_and_benchmark_diagnostics",
     "tests/test_tc_mechanism_discovery.py: test_epic_selected_spectral_block_positivity_scope",
     "tests/test_tc_mechanism_discovery.py: test_epic_reductio_logical_structure_audit",
+    "tests/test_tc_mechanism_discovery.py: test_epic_product_measure_nonzero_and_positivity_conditions",
+    "tests/test_tc_mechanism_discovery.py: test_epic_weil_positivity_and_cross_grade_polarization",
     "data/tc_epic_two_variable_synthesis.json"
   ],
   "external_sources": [
@@ -155,6 +161,18 @@
     {
       "source": "Riemann (1859)",
       "theorem": "Ueber die Anzahl der Primzahlen unter einer gegebenen Groesse: Explicit formula connecting primes and zeta zeros"
+    },
+    {
+      "source": "Connes & Consani (2026)",
+      "theorem": "Weil positivity and Trace formula, the archimedean place (arXiv:2006.13771): Multiplicative Haar coordinates, involution h^*(x) = conj(h(1/x)), centering automorphism Delta^{1/2}, and Weil quadratic functional B(g, h) = W(Delta^{-1/2}(g * h^*)) on admissible test space V."
+    },
+    {
+      "source": "Bombieri (2000)",
+      "theorem": "Remarks on Weil's quadratic functional in the theory of prime numbers. I (Atti Accad. Naz. Lincei Cl. Sci. Fis. Mat. Natur. Rend. Lincei (9) Mat. Appl. 11): Formulation of Weil's criterion and equivalence to the Riemann Hypothesis."
+    },
+    {
+      "source": "Weil (1952)",
+      "theorem": "Sur les formules explicites de la theorie des nombres premiers (Medd. Lunds Univ. Mat. Sem.): Exact explicit formula and distribution-theoretic foundation for prime-zeta duality."
     }
   ],
   "remaining_analytic_dependencies": [

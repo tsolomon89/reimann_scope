@@ -1518,4 +1518,62 @@ theorem finite_spectral_perturbation_rigidity_vandermonde_general
   | inl h => exact h
   | inr h => exact False.elim (he_ne h)
 
+/-- Polarization identity for symmetric bilinear forms:
+    B(x + y, x + y) = B(x, x) + B(y, y) + 2 * B(x, y).
+    For test functions g = g_K + g_J across distinct grades, the self-convolution
+    and Weil quadratic form evaluation B(g, g) expands into equal-grade diagonal terms
+    B(g_K, g_K) + B(g_J, g_J) and cross-grade terms 2 * B(g_K, g_J).
+    This refutes the misconception that self-convolution restricts exclusively to equal grades. -/
+theorem symmetric_bilinear_polarization_real {E : Type*} [Add E]
+    (B : E → E → ℝ)
+    (h_add_left : ∀ u v w, B (u + v) w = B u w + B v w)
+    (h_add_right : ∀ u v w, B u (v + w) = B u v + B u w)
+    (h_symm : ∀ u v, B u v = B v u)
+    (x y : E) :
+    B (x + y) (x + y) = B x x + B y y + 2 * B x y := by
+  rw [h_add_left, h_add_right, h_add_right, h_symm y x]
+  ring
+
+/-- Non-negativity of finite double-sum pairings with non-negative components:
+    If weights c_i ≥ 0, d_j ≥ 0, and kernel values K_{i,j} ≥ 0 for all i, j,
+    then the double sum ∑_i ∑_j c_i * d_j * K_{i,j} ≥ 0.
+    In particular, for non-negative test bump w ≥ 0 and mollifier η ≥ 0,
+    the arithmetic overlap Q_ε^{K, J}[w] is unconditionally non-negative for all grades K, J. -/
+theorem finite_double_sum_nonneg
+    {m n : ℕ} (c : Fin m → ℝ) (d : Fin n → ℝ) (K : Fin m → Fin n → ℝ)
+    (hc : ∀ i, 0 ≤ c i) (hd : ∀ j, 0 ≤ d j) (hK : ∀ i j, 0 ≤ K i j) :
+    0 ≤ ∑ i : Fin m, ∑ j : Fin n, c i * d j * K i j := by
+  apply Finset.sum_nonneg
+  intro i _
+  apply Finset.sum_nonneg
+  intro j _
+  have hcd : 0 ≤ c i * d j := mul_nonneg (hc i) (hd j)
+  exact mul_nonneg hcd (hK i j)
+
+/-- Strict positivity of finite double-sum pairing from a contributing witness:
+    If all terms are non-negative and there exists at least one pair of indices (i₀, j₀)
+    with strictly positive weights c i₀ > 0, d j₀ > 0, and K i₀ j₀ > 0,
+    then the double sum is strictly positive.
+    This formalizes that arithmetic overlap positivity requires an active station pair. -/
+theorem finite_double_sum_pos_of_witness
+    {m n : ℕ} (c : Fin m → ℝ) (d : Fin n → ℝ) (K : Fin m → Fin n → ℝ)
+    (hc : ∀ i, 0 ≤ c i) (hd : ∀ j, 0 ≤ d j) (hK : ∀ i j, 0 ≤ K i j)
+    (i₀ : Fin m) (j₀ : Fin n)
+    (hci : 0 < c i₀) (hdj : 0 < d j₀) (hKij : 0 < K i₀ j₀) :
+    0 < ∑ i : Fin m, ∑ j : Fin n, c i * d j * K i j := by
+  have h_term_pos : 0 < c i₀ * d j₀ * K i₀ j₀ := by
+    have hcd : 0 < c i₀ * d j₀ := mul_pos hci hdj
+    exact mul_pos hcd hKij
+  have h_inner_le : c i₀ * d j₀ * K i₀ j₀ ≤ ∑ j : Fin n, c i₀ * d j * K i₀ j :=
+    Finset.single_le_sum (f := fun j => c i₀ * d j * K i₀ j)
+      (fun j _ => mul_nonneg (mul_nonneg (hc i₀) (hd j)) (hK i₀ j)) (Finset.mem_univ j₀)
+  have h_inner_pos : 0 < ∑ j : Fin n, c i₀ * d j * K i₀ j :=
+    lt_of_lt_of_le h_term_pos h_inner_le
+  have h_outer_le : (∑ j : Fin n, c i₀ * d j * K i₀ j) ≤ ∑ i : Fin m, ∑ j : Fin n, c i * d j * K i j :=
+    Finset.single_le_sum (f := fun i => ∑ j : Fin n, c i * d j * K i j)
+      (fun i _ => Finset.sum_nonneg (fun j _ => mul_nonneg (mul_nonneg (hc i) (hd j)) (hK i j)))
+      (Finset.mem_univ i₀)
+  exact lt_of_lt_of_le h_inner_pos h_outer_le
+
+
 end RiemannScope

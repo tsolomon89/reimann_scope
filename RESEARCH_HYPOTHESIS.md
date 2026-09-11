@@ -2817,10 +2817,34 @@ $$\cos\left(\gamma \log\frac{x}{a_K}\right) \cos\left(\gamma \log\frac{x}{a_J}\r
 For $K \ne J$, the constant phase $\cos((J-K)\gamma\log\tau)$ can be negative.
 On $[45, 65]$ for $K=0, J=2, \rho_1$, $A_{0, \Gamma} \approx -0.00708 < 0$.
 
-## 42.5 Research Attempt on the Missing Arithmetic Implication
+## 42.5 Measure Clarification, Weil-Positivity Audit, and Positivity Comparison
+1. **Measure Support and Overlap Positivity**:
+   - The product measure $\mu_K \otimes \mu_J$ is a non-zero, positive Radon measure supported on pairs of prime-power stations $(\tau^K n, \tau^J m)$. On window $[8, 20]^2$, $\langle \mu_0 \otimes \mu_1, w \otimes w \rangle \approx 13.91 > 0$.
+   - The arithmetic overlap $Q_\varepsilon^{K, J}[w] = \iint w(x) w(y) \eta((x-y)/\varepsilon) \, d\mu_K(x) d\mu_J(y)$ vanishes for $\varepsilon < \Delta_W$ on a fixed window purely because the diagonal band contains no station pairs below the gap.
+   - For non-negative $w \ge 0$ and $\eta \ge 0$, $Q_\varepsilon^{K, J}[w] \ge 0$ unconditionally for all grades $K, J$. Strict positivity requires active station pairs with positive weights and kernel values. On windows lacking stations, $Q_\varepsilon \equiv 0$ even for $K = J$.
+   - Formally proved in Lean 4: `finite_double_sum_nonneg` and `finite_double_sum_pos_of_witness`.
+2. **Weil-Positivity Audit and Polarization**:
+   - Admissible test space $V \subset C_c^\infty(\mathbb R_+^*)$ with $\tilde g(0) = \tilde g(1) = 0$ in multiplicative Haar coordinates $d^* u = du / u$, involution $h^*(x) = \overline{h(1/x)}$, and centering $\Delta^{1/2}$ (Connes & Consani 2026, Weil 1952, Bombieri 2000).
+   - Bilinear form $B(g, h) = \mathcal W(\Delta^{-1/2}(g * h^*))$.
+   - Self-convolution on a sum of multi-grade test functions naturally contains cross-grade terms:
+     $$B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2\Re B(g_K, g_J).$$
+     Formally proved in Lean 4: `symmetric_bilinear_polarization_real`.
+   - Equating self-convolution with equal grades $K = J$ is mathematically unsupported.
+3. **Three-Way Comparison**:
+   - Arithmetic Overlap $Q_\varepsilon^{K, J}$: Bilinear pairing of prime measures; entrywise non-negative; strict positivity requires active station pairs; vanishes below $\Delta_W$.
+   - Multi-Grade Gram Matrix: Requires positive-definiteness of kernel or autocorrelation factorization; entrywise non-negativity is insufficient.
+   - Weil Quadratic Form: Positivity on full admissible space $V$ is strictly equivalent to RH; cannot be assumed unconditionally.
+4. **Four Challenger Rejections**:
+   - Rejection 1: "The product measure is zero" (Refuted: measure is non-zero; vanishing is band-overlap below $\Delta_W$).
+   - Rejection 2: "Positivity exists only at equal grades" (Refuted: unconditional non-negativity for all grades; strict positivity requires active pairs).
+   - Rejection 3: "Self-convolution means equal grades" (Refuted: polarization formula contains cross-grade terms).
+   - Rejection 4: "Growing windows or global operators are necessary" (Refuted: fixed-window, varying-window, and global constructions remain eligible).
+
+## 42.6 Research Attempt on the Missing Arithmetic Implication
 Under the off-line zero hypothesis $H(\rho_0)$, the explicit formula operates as an exact Fourier-Mellin transform identity.
-Because the prime-power measures $\mu_K$ and $\mu_J$ have disjoint supports, their product measure has no support on the diagonal $x = y$, forcing $Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$.
+Because the prime-power measures $\mu_K$ and $\mu_J$ have disjoint supports, their product measure has no support on the diagonal band $|x - y| < \varepsilon$ for $\varepsilon < \Delta_W$, forcing $Q_\varepsilon^{K, J}[w] \equiv 0$.
 The explicit formula identity decomposes this identically zero distribution into $\bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon \equiv 0$, forcing $\bar R^{\rm full}_\varepsilon \equiv -\bar A_{\varepsilon, \Gamma}$.
 No independently justified property of the prime-zeta relationship prevents this exact cancellation.
+The implication $H(\rho_0) \Longrightarrow \bar Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r(\varepsilon)$ ($c > 0, r(\varepsilon) \to 0$) remains an open research obligation.
 Therefore, no new implication toward forbidden coincidence $m\tau^K = n\tau^J$ was established.
-The Transcendental Continuation bridge remains strictly **OPEN**. Total compiled Lean 4 theorems: **225**.
+The Transcendental Continuation bridge remains strictly **OPEN**. Total compiled Lean 4 theorems: **228**.

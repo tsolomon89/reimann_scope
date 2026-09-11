@@ -2539,3 +2539,122 @@ def test_epic_reductio_logical_structure_audit():
     assert 'does not prove' in struct['logical_clarification']
     assert 'full cancellation' in res['core_finding']
     assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
+
+
+def test_epic_product_measure_nonzero_and_positivity_conditions():
+    """
+    Verify:
+    1. Product measure mu_K otimes mu_J is non-zero on W x W:
+       Total pairing <mu_0 otimes mu_1, w otimes w> > 0 (approximately 13.91 on [8, 20]).
+    2. Overlap Q_eps^{0, 1}[w] vanishes below the station gap d_min ~ 0.1504 (e.g. at eps = 0.05, 0.1).
+    3. Overlap Q_eps^{0, 1}[w] is strictly positive when contributing station pairs are present
+       (e.g. at eps = 0.2 and 0.5).
+    4. Unconditional non-negativity: Q_eps^{K, J}[w] >= 0 for all grades and epsilons.
+    5. Empty station window: Q_eps = 0 on (14.5, 15.5) even for K = J because Lambda(15) = 0
+       and no prime-power stations fall in this interval.
+    """
+    # 1. Standard window [8, 20] with K=0, J=1
+    res_cross = transcendental.audit_arithmetic_overlap_distinct_and_equal_grades(
+        window=(8.0, 20.0), K=0, J=1, epsilons=[0.5, 0.2, 0.1, 0.05, 0.01], dps=25
+    )
+    assert res_cross['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_cross['product_measure_nonzero_on_window'] is True
+    assert res_cross['product_measure_total_pairing_on_window'] > 10.0
+    assert res_cross['unconditional_nonnegativity_verified'] is True
+    assert res_cross['strict_positivity_when_pairs_present'] is True
+    assert res_cross['vanishing_verified_below_d_min'] is True
+    assert res_cross['d_min'] > 0.15
+
+    rows = {r['epsilon']: r for r in res_cross['cross_grade_overlap_evaluations']}
+    # Vanishing below d_min
+    assert rows[0.05]['is_zero'] is True
+    assert rows[0.05]['Q_epsilon'] == 0.0
+    assert rows[0.1]['is_zero'] is True
+    assert rows[0.1]['Q_epsilon'] == 0.0
+    # Strict positivity above d_min
+    assert rows[0.2]['is_zero'] is False
+    assert rows[0.2]['Q_epsilon'] > 0.0
+    assert rows[0.2]['contributing_pairs'] > 0
+    assert rows[0.5]['is_zero'] is False
+    assert rows[0.5]['Q_epsilon'] > 0.0
+    assert rows[0.5]['contributing_pairs'] > 0
+
+    # 2. Empty station window (14.5, 15.5): 15 is composite (Lambda(15) = 0)
+    # Even for equal grades K = J = 0, Q_eps vanishes identically when test window has no stations
+    res_empty = transcendental.audit_arithmetic_overlap_distinct_and_equal_grades(
+        window=(14.5, 15.5), K=0, J=0, epsilons=[0.1, 0.2], dps=25
+    )
+    assert res_empty['is_empty_station_set'] is True
+    assert res_empty['stations_0_count'] == 0
+    assert res_empty['stations_1_count'] == 0
+    assert res_empty['product_measure_total_pairing_on_window'] == 0.0
+    for r in res_empty['cross_grade_overlap_evaluations']:
+        assert r['is_zero'] is True
+        assert r['Q_epsilon'] == 0.0
+
+
+def test_epic_weil_positivity_and_cross_grade_polarization():
+    """
+    Verify:
+    1. Connes-Consani (2026), Weil (1952), Bombieri (2000) conventions:
+       multiplicative Haar convolution, involution h^*(x) = conj(h(1/x)),
+       centering Delta^{-1/2}, admissible space V.
+    2. Polarization formula: B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2*Re B(g_K, g_J),
+       refuting the unsupported identification of self-convolution with equal grades K = J.
+    3. Three-form comparison table distinguishing Arithmetic overlap Q_eps,
+       Multi-grade Gram matrix, and Weil form B(g, h) (RH-equivalent).
+    4. Map analysis: dimensional reduction from 2-variable measure pairing to 1-variable group convolution.
+    5. Attempted derivation 5-step record stopping at exact remainder cancellation R = -A.
+    6. Challenger rejections of all 4 overbroad claims.
+    """
+    res = transcendental.audit_weil_positivity_and_tc_bridge_comparison(dps=25)
+    assert res['classification'] == 'COMPARISON_COMPLETED'
+    assert res['epistemic_verdict'] == 'NO_NEW_IMPLICATION_ESTABLISHED'
+    assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
+
+    conv = res['conventions']
+    assert 'R_+^*' in conv['group']
+    assert 'du / u' in conv['haar_measure']
+    assert 'Delta^{1/2}' in conv['centering_automorphism']
+    assert 'B(g, h) = W(Delta^{-1/2}(g * h^*))' in conv['bilinear_weil_form']
+
+    pol = res['polarization_analysis']
+    assert '2 * Re B(g_K, g_J)' in pol['hermitian_polarization_formula']
+    assert pol['formal_lean_theorem'] == 'RiemannScope.symmetric_bilinear_polarization_real'
+
+    table = res['three_form_comparison_table']
+    assert len(table) == 3
+    objects = [item['object'] for item in table]
+    assert any('Arithmetic Overlap' in o for o in objects)
+    assert any('Multi-Grade Matrix' in o for o in objects)
+    assert any('Weil Quadratic Form' in o for o in objects)
+
+    # Positivity property checks
+    arith_item = next(item for item in table if 'Arithmetic Overlap' in item['object'])
+    assert 'Entrywise non-negative' in arith_item['positivity_property']
+    gram_item = next(item for item in table if 'Multi-Grade Matrix' in item['object'])
+    assert 'Positive semi-definiteness' in gram_item['positivity_property']
+    weil_item = next(item for item in table if 'Weil Quadratic Form' in item['object'])
+    assert 'EQUIVALENT TO RH' in weil_item['strict_positivity_condition']
+
+    # Map analysis checks
+    m_analysis = res['map_analysis']
+    assert 'tensor product' in m_analysis['dimensional_and_measure_distinction']
+    assert '1-variable multiplicative convolution' in m_analysis['dimensional_and_measure_distinction']
+
+    # Attempted derivation record
+    rec = res['attempted_derivation_record']
+    assert 'step_1_arithmetic_property' in rec
+    assert 'step_2_offline_zero_entry' in rec
+    assert 'step_3_spectral_and_background_terms_retained' in rec
+    assert 'step_4_proposed_implication' in rec
+    assert 'step_5_earliest_unsupported_inference' in rec
+    assert 'bar{R}^{full}_eps = -bar{A}_{eps, Gamma}' in rec['step_5_earliest_unsupported_inference']
+
+    # Challenger rejections: 4 items
+    rej = res['challenger_rejections']
+    assert len(rej) == 4
+    assert 'product measure' in rej['rejection_1']['claim_rejected'].lower()
+    assert 'equal grades' in rej['rejection_2']['claim_rejected'].lower()
+    assert 'self-convolution' in rej['rejection_3']['claim_rejected'].lower()
+    assert 'growing windows' in rej['rejection_4']['claim_rejected'].lower()
