@@ -255,8 +255,15 @@
     "A_0_Gamma": 0.5444402513346406,
     "A_0_Gamma_high_precision": "0.544440251334640629984802",
     "interval_enclosure": {
-      "engine": "fallback_mpmath",
-      "note": "No module named 'flint'"
+      "engine": "flint.arb",
+      "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
+      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
+      "enclosure_mid": 0.5444399924859572,
+      "enclosure_rad": 0.0011700457162078237,
+      "lower_bound": 0.5432699467697494,
+      "upper_bound": 0.545610038202165,
+      "strictly_positive": true,
+      "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
     },
     "D_M_rho0": 0.0,
     "asserted_identity_A0_eq_cD_falsified": true,
@@ -488,7 +495,12 @@
       "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "error": "No module named 'flint'"
+        "mid": 0.5444399924859572,
+        "rad": 0.0011700457162078237,
+        "lower": 0.5432699467697494,
+        "upper": 0.545610038202165,
+        "is_strictly_positive": true,
+        "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
       }
     },
     "retained_remainder_R": {
