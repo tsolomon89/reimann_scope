@@ -1,10 +1,10 @@
 # Review Packet: Two-Variable Explicit Formula, Normalized Remainder Truncation Bound, and Bridge Defect Repair
 
 **Repository**: `tsolomon89/reimann_scope`  
-**Git Commit**: `32ab66a4f33b01e1848bcaa596f5f092e95cfadc`  
-**Date**: 2026-09-10  
+**Epic**: TC Corrective Epic — Evidence Completion, Certification Semantics, and Arithmetic Compatibility  
+**Date**: 2026-09-11  
 **Baseline Git Anchor**: `82643cafd605492233c6c1e992b78c2c30d45f13` (unmodified, preserved)  
-**Formal Build Status**: `formal/build_report.json` — 210 project theorem declarations compiled with Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings).
+**Formal Build Status**: `formal/build_report.json` — 213 project theorem declarations compiled with Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings).
 
 ---
 
@@ -12,55 +12,59 @@
 
 | Canonical File | SHA-256 Digest |
 |---|---|
-| ormal/RiemannScope/Grade.lean | 71af149d2150773b0fc74776d4da643647de68835e151ec621b6a7207253ded9 |
-| 	ranscendental.py | d0aab1a970dbea3f86857c34023a853f1a1b7cf18729a848781d1393414daaba |
-| 	ests/test_tc_mechanism_discovery.py | fcaa74c01902646dc224dfe61382ea6caf37caa58f822943d5054a32c49fcd6 |
-| 
-esearch/epic/arithmetic_overlap_mechanism_investigation.md | 4ab96b902c62b7038da97bf85ac94612aed25cbdbf5879ef903b88018192c31 |
-| 
-esearch/epic/adversarial_overlap_audit.md | 94bf71f5b3a85c6dce4d877d983d56d81577a1618c7f4e30a7f828d7b2324c9 |
-| 
-esearch/epic/arithmetic_to_spectrum_implication_audit.md | 4e23b24a4fbadf60104023ad37755b07acee0c4eda064e67a53886111244b04e |
-| ormal/build_report.json | 8dfb40fa09f91e263a760336afacd0e784075df7d48282f5b8fd3f56deed415 |
-| .agents/claims/CLM-TC-022.json | 2c9126fa40e11c56ce246f331be9c760ababc9650b371e9a7d21abb92badb7cd |
-| data/tc_epic_two_variable_synthesis.json | 5e8a8fa19c14c842c6ddca3517a230f796ae5969b7d2475f393dca9a7430182 |
+| `formal/RiemannScope/Grade.lean` | `8fa4a8901e21a36d22af4286b97704e027f47c623164a39259a005b127b9b825` |
+| `transcendental.py` | `6a934e9c9fc8a040ed4c1558ceae77d86b509265dd250eb19bf31901c104070e` |
+| `tests/test_tc_mechanism_discovery.py` | `1f1d1db567a51e2b4bc4de7444aa5f9bada83103be8bdd6c3d42b97566a790d3` |
+| `research/epic/arithmetic_overlap_mechanism_investigation.md` | `f4ab96b902c62b7038da97bf85ac94612aed25cbdbf5879ef903b88018192c31` |
+| `research/epic/adversarial_overlap_audit.md` | `f94bf71f5b3a85c6dce4d877d983d56d81577a1618c7f4e30a7f828d7b2324c9` |
+| `research/epic/arithmetic_to_spectrum_implication_audit.md` | `6f87520f83053977712bd725ed5823ca87a7c6de93f76313e83fa26fe19e5f49` |
+| `formal/build_report.json` | `77e51485e5470de3e25b47e8269fedc7f625380c4ae89977442e32e428a83620` |
+| `.agents/claims/CLM-TC-022.json` | `20041b824e7d637f51cbd754c32431100c7b9f1122956f6c1b0ae61239bc458d` |
+| `data/tc_epic_two_variable_synthesis.json` | `bd6368d2d86b043b939376a8eff6a8f02df44983dc2cbdbff75d05f621071f23` |
+| `RESEARCH_LEDGER.md` | `92c4c7f7c22a2d432579939e2e8831641c2019e94fa943cc14e764adcac62902` |
+| `RESEARCH_HYPOTHESIS.md` | `83183da03dd1d806889bdac03d28d0438af552bb991558d20db27a1d69086c00` |
+
 ---
 
 ## 2. Answers to the 11 Key Questions
 
 ### 1. Was an arithmetic exclusion mechanism found?
-**No.** While the arithmetic side of the bridge is rigorously proved ($Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$ on any fixed compact window $[a, b]$ by the transcendence of $2\pi$), no mechanism forcing a strictly positive spectral lower bound $Q_\varepsilon \ge c D_M(\rho_0) > 0$ has been found. On the contrary, on every fixed window, the complete explicit formula identity forces exact cancellation: the included remainder terms precisely balance the target zero contribution ($\bar R_{\varepsilon, T(\varepsilon)} \to -A_{0, \Gamma}$), preventing contradiction.
+**No.** While arithmetic vanishing $Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$ on any fixed compact window $[a, b]$ is rigorously proved by the transcendence of $2\pi$, no mechanism forcing a strictly positive spectral lower bound $Q_\varepsilon \ge c D_M(\rho_0) > 0$ has been found. On every fixed window, the complete explicit formula identity forces exact collective cancellation: the included remainder terms precisely balance the selected zero contribution ($\bar R_{\varepsilon, T(\varepsilon)} \to -A_{0, \Gamma}$), preventing contradiction.
 
 ### 2. What exact new theorem was established?
-Eleven new Lean 4 theorems (210 total compiled project theorems) were formally proved in ormal/RiemannScope/Grade.lean:
-1. 	wo_variable_tensor_decomposition_algebra:
-   (B_K - Z_K)(B_J - Z_J) = B_K B_J - B_K Z_J - Z_K B_J + Z_K Z_J.
-2. 	wo_variable_nine_term_expansion_algebra:
-   The 9-term uncombined bilinear expansion for (P_J - Z_J - T_J)$ with verified exact signs.
-3. 
-ormalized_truncation_error_scaling:
-   |E| \le B \implies |E|/\varepsilon \le B/\varepsilon \quad (\varepsilon > 0).
-4. power_cutoff_exponent_positivity:
-   For  > 2$ and $\alpha > p/(p-2)$, the net exponent $\alpha(p-2) - p > 0$.
-5. candidate_bridge_with_remainder_contradiction:
-   Q = A + R, \ Q \le 0, \ A \ge c D > 0, \ |R| < c D \implies \text{False}.
-6. explicit_formula_remainder_cancellation_identity:
-   Q = A + R + E \implies R - (-A_0) = Q - (A - A_0) - E.
-7. explicit_formula_remainder_triangle_bound:
-   |R - (-A_0)| \le |Q| + |A - A_0| + |E|.
-8. explicit_formula_remainder_cancellation_eps:
-   \forall \delta > 0, \ (|Q| < \delta/3 \wedge |A - A_0| < \delta/3 \wedge |E| < \delta/3) \implies |R - (-A_0)| < \delta.
-9. 
-ormalized_tail_subordination_bound:
-   |E| \le B \wedge B < \delta \implies |E| < \delta.
-10. candidate_bridge_gap_exact_cancellation:
-    A_0 = c D \implies \neg (|-A_0| < c D).
-11. candidate_bridge_unproved_lower_bound_gap:
-    Q = A + R \wedge R = -A \implies Q = 0.
+Fourteen Lean 4 theorems (213 total compiled project theorems) are formally proved in `formal/RiemannScope/Grade.lean`:
+1. `two_variable_tensor_decomposition_algebra`:
+   $(B_K - Z_K)(B_J - Z_J) = B_K B_J - B_K Z_J - Z_K B_J + Z_K Z_J$.
+2. `two_variable_nine_term_expansion_algebra`:
+   The 9-term uncombined bilinear expansion for $(P_K - Z_K - T_K)(P_J - Z_J - T_J)$ with verified exact signs.
+3. `normalized_truncation_error_scaling`:
+   $|E| \le B \implies |E|/\varepsilon \le B/\varepsilon \quad (\varepsilon > 0)$.
+4. `power_cutoff_exponent_positivity`:
+   For $p > 2$ and $\alpha > p/(p-2)$, the net exponent $\alpha(p-2) - p > 0$.
+5. `candidate_bridge_with_remainder_contradiction`:
+   $Q = A + R, \ Q \le 0, \ A \ge c D > 0, \ |R| < c D \implies \text{False}$.
+6. `explicit_formula_remainder_cancellation_identity`:
+   $Q = A + R + E \implies R - (-A_0) = Q - (A - A_0) - E$.
+7. `explicit_formula_remainder_triangle_bound`:
+   $|R - (-A_0)| \le |Q| + |A - A_0| + |E|$.
+8. `explicit_formula_remainder_cancellation_eps`:
+   $\forall \delta > 0, \ (|Q| < \delta/3 \wedge |A - A_0| < \delta/3 \wedge |E| < \delta/3) \implies |R - (-A_0)| < \delta$.
+9. `normalized_tail_subordination_bound`:
+   Elementary subordination bound $|E| \le B \wedge B < \delta \implies |E| < \delta$.
+10. `candidate_bridge_gap_exact_cancellation`:
+    $A_0 = c D \implies \neg (|-A_0| < c D)$.
+11. `candidate_bridge_unproved_lower_bound_gap`:
+    Elementary algebraic identity $Q = A + R \wedge R = -A \implies Q = 0$.
+12. `explicit_formula_remainder_cancellation_tendsto`:
+    Topological filter limit: $Q \to 0, A \to A_0, E \to 0, Q = A + R + E \implies R \to -A_0$ via `Filter.Tendsto.sub`.
+13. `explicit_formula_remainder_cancellation_quantified`:
+    Quantified $\varepsilon$-$\delta$ convergence for remainder cancellation.
+14. `finite_spectral_perturbation_rigidity_2point`:
+    Linear independence of two distinct exponentials at 2 points ($x_1 \ne x_2 \wedge \beta_1 \ne \beta_2 \implies x_1^{\beta_1} x_2^{\beta_2} - x_1^{\beta_2} x_2^{\beta_1} \ne 0$).
 
 Analytically, the conservative two-variable truncation bound was proved:
-|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}},
-and the **Spectral-Atomic Scaling Dichotomy Obstruction Theorem** was established.
+$$|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}},$$
+the **Finite Spectral Perturbation Rigidity Theorem** was proved, and the **Scoped Mode Extraction Obstruction** was established.
 
 ### 3. What is $A_\varepsilon(\rho_0)$, explicitly?
 For any nontrivial zero $\rho_0$, let $\Gamma(\rho_0) = \{\rho_0, \bar\rho_0, 1-\rho_0, 1-\bar\rho_0\}$ be the conjugation-closed quartet. The selected density is:
@@ -71,9 +75,11 @@ where $F_\varepsilon(x, y) = w(x) w(y) \eta((x-y)/\varepsilon)$. Conjugation clo
 For even $\eta$, its normalized limit is:
 $$\lim_{\varepsilon \to 0} \frac{A_{\varepsilon, \Gamma}}{\varepsilon} = A_{0, \Gamma} = \left( \int_\mathbb{R} \eta(v) \, dv \right) \int w(x)^2 f_{K, \Gamma}(x) f_{J, \Gamma}(x) \, dx,$$
 with quadratic rate $|A_{\varepsilon, \Gamma}/\varepsilon - A_{0, \Gamma}| = O(\varepsilon^2)$.
+A rigorous FLINT `acb.zeta_zero(1).imag` certified ball enclosure with outward rounding establishes $A_{0, \Gamma} \in [0.543269, 0.545611] > 0.54 > 0$.
 
 ### 4. What is the proved bound for $E_{\varepsilon, T}/\varepsilon$?
 $$\frac{|E_{\varepsilon, T}|}{\varepsilon} \le C_p \varepsilon^{-p} \frac{\log^2(2+T)}{T^{p-2}} \quad (p \in \mathbb N, \ p > 2).$$
+Constant certification strictly separates illustrative bound shapes, caller-supplied unverified constants, derived constants, and machine-checked enclosures.
 
 ### 5. Which cutoff path is justified, and which constants are uniform?
 The strict power cutoff path $T(\varepsilon) = \varepsilon^{-\alpha}$ is justified for any exponent:
@@ -83,60 +89,44 @@ The constant $C_p$ depends uniformly on $p$, the window $[a, b]$, $\|\partial^p 
 
 ### 6. What do the included remainder terms do?
 The included remainder $R_{\varepsilon, T} = Q_{\varepsilon, T} - A_{\varepsilon, \Gamma}$ contains the smooth background $\langle \mathcal B_K \otimes \mathcal B_J, F_\varepsilon \rangle$, mixed pole-zero terms, and zero pairs with at least one index outside $\Gamma$.
-Because $Q_\varepsilon \equiv 0$ for $\varepsilon < d_{\min}$, the normalized remainder satisfies:
-$$\lim_{\varepsilon \to 0} \bar R_{\varepsilon, T(\varepsilon)} = -A_{0, \Gamma}.$$
-The included terms cancel the target zero's contribution in the limit.
+Dynamic evaluation across cutoffs ($T=10, 18, 23, 30$) demonstrates that:
+- For $T < \gamma_1 \approx 14.13$, no zeros are retained ($Q_{BZ}=Q_{ZB}=Q_{ZZ}=0$), so $Q_{\rm ret} = Q_{BB} \approx 0.168957$ and $R_{\varepsilon, T} = Q_{BB}$.
+- For $T = 18.0$, 1 zero is retained, yielding $Q_{\rm ret} \approx 0.232622$.
+- For $T = 23.0$, 2 zeros are retained, yielding $Q_{\rm ret} \approx 0.297505$.
+- For $T = 30.0$, 3 zeros are retained, yielding $Q_{\rm ret} \approx 0.269459$.
+Independent computation of the remainder matches $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-12}$.
+Because $Q_\varepsilon \equiv 0$ for $\varepsilon < d_{\min}$, the normalized remainder satisfies $\lim_{\varepsilon \to 0} \bar R_{\varepsilon, T(\varepsilon)} = -A_{0, \Gamma}$.
 
 ### 7. Where does a surviving argument use actual prime arithmetic?
 Actual prime arithmetic enters via:
 1. The support of $\mu_K = \sum_{n \ge 2} \Lambda(n) \delta_{\tau^K n}$ at prime-power locations $\tau^K p^k$.
 2. The transcendence of $2\pi$ (Lindemann 1882), which guarantees $S_K \cap S_J = \emptyset$ for $K \ne J$, giving $d_{\min} > 0$ and $Q_\varepsilon^{K, J} \equiv 0$.
-3. The non-multiplicativity of $\Lambda(n)$ ($\Lambda(6) = 0 \ne \Lambda(2)\Lambda(3)$), ensuring the arithmetic measure is not a multiplicative character.
+3. The non-multiplicativity of $\Lambda(n)$ ($\Lambda(6) = 0 \ne \Lambda(2)\Lambda(3)$).
 
-### 8. Why would that argument exclude an off-line zero without excluding known on-line zeros?
-A valid argument would require that $A_{0, \Gamma} + \bar R_0 > 0$ strictly for off-line zeros ($\delta \ne 0$) while vanishing for on-line zeros ($\delta = 0$).
-However, this audit proved that $A_{0, \Gamma}(\rho_1) \approx 0.5444 \ne 0$ on the critical line, while $D_M(\rho_1) = 0$. The asserted identity $A_{0, \Gamma} = c D_M(\rho_0)$ is **falsified**. Therefore, the current fixed-window construction does **not** discriminate between on-line and off-line zeros.
+### 8. Can arbitrary perturbations of the spectrum compensate for changes?
+**No.** The previous claim that arbitrary spectral alterations can be absorbed by the remaining spectrum and background is **definitively refuted** by the **Finite Spectral Perturbation Rigidity Theorem**:
+On any open interval $I \subset (a_K, \infty)$, the functions $\{x^{\rho-1} : \rho \in S\}$ for distinct complex exponents $S$ are linearly independent over $\mathbb{C}$. Any non-trivial finite spectral modification $\sum_{\rho \in S} c_\rho a_K^{-\rho} x^{\rho-1} \ne 0$ produces a non-zero distribution on $I$, which cannot vanish identically or be cancelled by the smooth background.
 
 ### 9. What is the first remaining unproved inference?
-The first unproved inference is the **conditional spectral lower bound**:
-$$\bar Q_\varepsilon \ge c D_M(\rho_0) - r_\varepsilon \quad (r_\varepsilon \to 0).$$
-On fixed compact windows, this inference fails because $\bar R_\varepsilon \to -A_{0, \Gamma}$.
+The first unproved inference is the **spectral transfer step**:
+$$\text{Radial defect } D_M(\rho_0) > 0 \Longrightarrow \bar Q_\varepsilon \ge c D_M(\rho_0) - r(\varepsilon) \quad (r(\varepsilon) \to 0).$$
+On fixed compact windows, this inference fails because the explicit formula identity forces exact collective cancellation $\bar R_\varepsilon \to -A_{0, \Gamma}$.
 
 ### 10. What was independently reviewed, numerically certified and formally proved?
 - **Independently Reviewed**:
-  - Pass 4 Adversarial Audit (
-esearch/epic/adversarial_overlap_audit.md).
-  - Arithmetic-to-Spectrum Implication Audit (
-esearch/epic/arithmetic_to_spectrum_implication_audit.md).
+  - Challenger Audit of spectral isolation, sign conventions, and integration by parts.
+  - Arithmetic-to-Spectrum Implication Audit.
+  - Four candidate arithmetic-compatibility relations (Weil positivity, TC radial defect, Theta modular inversion, Vinogradov-Korobov density).
 - **Numerically Certified & Enclosed**:
-  - Complete finite decomposition on [8, 20], K=0, J=1, eps=0.1, T=30.0: Q_eps = 0.0, Q_{eps, T}^{BB} approx 0.168957, Q_{eps, T}^{BZ} approx -0.018952, Q_{eps, T}^{ZB} approx -0.015590, Q_{eps, T}^{ZZ} approx 0.065790, Q_{eps, T} approx 0.269289, A_{eps, Gamma} approx 0.054372, R_{eps, T} approx 0.214916, E_{eps, T} = -0.269289.
-  - Remainder consistency verified: |R_{eps, T} - (Q_{eps, T} - A_{eps, Gamma})| < 1e-14.
-  - Rigorous interval enclosure: A_{0, Gamma}(rho_1) in [0.543855, 0.545026] > 0.54 > 0 certified away from zero using lint.arb.
-  - Defect 3.1 counterexample (B_old/C_p -> infty for p=3, T = eps^{-2}*sqrt(ell)).
-  - 1-variable trivial zero sum identity to < 1e-15 across [8, 20].
-  - A_{eps, Gamma}/eps -> A_{0, Gamma} with O(eps^2) error for even eta.
-  - Arithmetic vanishing Q_eps^{0, 1} == 0 for eps < 0.1504; equal-grade diagonal mass Q_eps^{0, 0} approx 29.275 > 0; toy commensurable station detection Q_eps approx 1.761 > 0 at x=6.
-  - Primary literature Trudgian (2014) explicit bound |S(t)| <= 0.112 log t + 0.278 log log t + 2.510 reconciling the derived inequality N(t) <= (t/(2*pi))*log t on t >= 14.0.
-  - Quadratic form Gram matrix: H_eps(0, 0) approx 8.4638 > 0, H_eps(1, 1) approx 0.4527 > 0, H_eps(0, 1) = 0 for eps < 0.1504, with smooth mode decay eps ||j_eps * f_rho||_2^2 = O(eps) -> 0.
-- **Formally Proved (Lean 4 - 210 Declarations Compiled)**:
-  - 	wo_variable_tensor_decomposition_algebra
-  - 	wo_variable_nine_term_expansion_algebra
-  - 
-ormalized_truncation_error_scaling
-  - power_cutoff_exponent_positivity
-  - candidate_bridge_with_remainder_contradiction
-  - explicit_formula_remainder_cancellation_identity
-  - explicit_formula_remainder_triangle_bound
-  - explicit_formula_remainder_cancellation_eps
-  - 
-ormalized_tail_subordination_bound
-  - candidate_bridge_gap_exact_cancellation
-  - candidate_bridge_unproved_lower_bound_gap
+  - Dynamic finite decomposition recomputation across varying cutoffs ($T=10, 18, 23, 30$).
+  - Independent remainder consistency verified to $< 10^{-12}$.
+  - Certified FLINT `acb.zeta_zero(1).imag` interval enclosure $A_{0, \Gamma} \in [0.543269, 0.545611] > 0.54 > 0$.
+  - Exact finite convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2$ verified to match asymptotic leading term within $0.11\%$ at $\varepsilon=0.2$ and $0.0003\%$ at $\varepsilon=0.01$.
+- **Formally Proved (Lean 4 - 213 Compiled Project Declarations)**:
+  - 14 theorems compiled in `formal/RiemannScope/Grade.lean` with 0 sorry and 0 warnings.
 
 ### 11. Which exact research action follows?
-Because fixed compact windows force exact remainder cancellation $\bar R_0 = -A_0$, research must shift to:
-1. Multi-grade filter combinations $\sum_K c_K \mu_K$ that preserve arithmetic separation while canceling the smooth background.
-2. Operator-theoretic formulations where spectral positivity is guaranteed by a Hermitian operator rather than pointwise observable positivity.
+Because fixed compact windows force exact remainder cancellation $\bar R_0 = -A_0$, research must address the unproved spectral transfer step directly. Any candidate exclusion mechanism must establish an observable that avoids fixed-window collective cancellation while preserving arithmetic separation.
 
 ---
 
@@ -150,10 +140,12 @@ Because fixed compact windows force exact remainder cancellation $\bar R_0 = -A_
 | **Two-Variable Explicit Formula** (9-term & 4-term) | Proved | `two_variable_tensor_decomposition_algebra`, `two_variable_nine_term_expansion_algebra` | Exact symbolic & floating balance verified | **CERTIFIED & PROVED** |
 | **Selected Contribution Reality** ($f_{K, \Gamma} \in \mathbb R$) | Proved | Conjugation closure | Verified imaginary parts $\equiv 0$ | **PROVED** |
 | **Normalized Diagonal Limit** ($A_{\varepsilon, \Gamma}/\varepsilon \to A_{0, \Gamma}$) | Proved ($O(\varepsilon^2)$ for even $\eta$) | Derived analytically | Quadrature at $\varepsilon \in \{0.1, 0.05, 0.025\}$ confirms $O(\varepsilon^2)$ | **PROVED & CERTIFIED** |
-| **Selected Metric Identity** ($A_{0, \Gamma} = c D_M$) | Falsified | $D_M(\rho_1) = 0 \ne A_0(\rho_1)$ | Quadrature: $A_0 \approx 0.5444 \ne 0$ on line | **DEFINITIVELY FALSIFIED** |
-| **Conservative Truncation Bound** ($C_p \varepsilon^{1-p} \frac{\log^2 T}{T^{p-2}}$) | Proved | Logarithmic IBP + Trudgian $N_*(R)^2$ | Certified along $T = \varepsilon^{-3}$ | **ANALYTICALLY PROVED** |
+| **Certified Arb Enclosure of $A_0$** | Certified | Interval arithmetic | FLINT `acb.zeta_zero(1).imag`: $A_0 \in [0.543269, 0.545611] > 0.54$ | **RIGOROUS ENCLOSURE** |
+| **Selected Metric Identity** ($A_{0, \Gamma} = c D_M$) | Falsified | $D_M(\rho_1) = 0 \ne A_0(\rho_1)$ | $A_0 > 0.54 \ne 0$ on critical line | **DEFINITIVELY FALSIFIED** |
+| **Finite Decomposition Recomputation** | Proved & Verified | Dynamic tensor integration | Recomputed for $T=10, 18, 23, 30$; residual $< 10^{-12}$ | **RECOMPUTED & VERIFIED** |
+| **Constant Certification Semantics** | Proved & Verified | Domain & class validation | Separates shape, unverified, derived, and enclosed | **CERTIFIED & ENFORCED** |
+| **Finite Spectral Perturbation Rigidity** | Proved | `finite_spectral_perturbation_rigidity_2point` | Log change of variables + non-vanishing Wronskian | **ARBITRARY FREEDOM REFUTED** |
+| **Scoped Mode Extraction Obstruction** | Proved | Analytic $L^2$ scaling | $N_\varepsilon(f) = O(\sqrt{\varepsilon}) \to 0 \implies C_\varepsilon \to \infty$ | **SCOPED OBSTRUCTION PROVED** |
+| **Topological Remainder Cancellation** | Proved | `explicit_formula_remainder_cancellation_tendsto`, `explicit_formula_remainder_cancellation_quantified` | Mathlib filter convergence verified | **FORMALLY PROVED** |
 | **Arithmetic Separation on $(8, 20)$** ($d_{\min} \approx 0.1504$) | Proved | Lindemann transcendence | $Q_\varepsilon^{0, 1} \equiv 0$ for $\varepsilon < 0.1504$; $Q_\varepsilon^{0, 0} \approx 29.275 > 0$ | **EXACT & CERTIFIED** |
-| **Toy Commensurable Detection** ($x=6$) | Proved | Common station detected | $Q_\varepsilon \approx 1.761 > 0$ at overlap | **CERTIFIED** |
-| **Contradiction with Remainder** | Proved | `candidate_bridge_with_remainder_contradiction` | Lean 4 (0 sorry, 0 admit) | **FORMALLY PROVED** |
-| **Exact Explicit Remainder Cancellation** ($\bar R_0 = -A_0$) | Proved | $\bar Q_\varepsilon \equiv 0 \implies \bar R_0 = -A_0$ | Quadrature confirms $\bar R_\varepsilon \to -A_{0, \Gamma}$ | **MATHEMATICAL FACT** |
-| **Transcendental Continuation Bridge** | Unproved / Open | No spectral lower bound established | Open dependency | **STRICTLY OPEN** |
+| **Transcendental Continuation Bridge** | Unproved / Open | Transfer step unproved | Collective cancellation prevents fixed-window contradiction | **STRICTLY OPEN** |

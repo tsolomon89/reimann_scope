@@ -1,5 +1,5 @@
 {
-  "epic": "TC Epic: Two-Variable Formula, Normalized Remainder Bound, and Bridge Testing",
+  "epic": "TC Corrective Epic: Two-Variable Formula, Remainder Cancellation, Rigidity, and Compatibility",
   "milestone_1_defect_repairs": {
     "classification": "DEFECT_REPAIRED_AND_VERIFIED",
     "old_cutoff_claim": "T(eps) >> eps^(-(p-1)/(p-2)) guarantees B_old -> 0",
@@ -247,20 +247,23 @@
   },
   "milestone_2_selected_contribution": {
     "classification": "PROVED_AND_VERIFIED",
-    "rho_0": "(0.5 + 14.1347251417346937904572519836j)",
+    "rho_0": "(0.5 + 14.13472514173469379045725j)",
     "geometry_status": "CRITICAL_LINE_PAIR",
     "is_on_critical_line": true,
     "is_synthetic": false,
     "I_eta": 1.2069003224378763,
     "A_0_Gamma": 0.5444402513346406,
-    "A_0_Gamma_high_precision": "0.544440251334640629984802153843",
+    "A_0_Gamma_high_precision": "0.544440251334640629984802",
     "interval_enclosure": {
       "engine": "flint.arb",
-      "enclosure_mid": 0.544439992485636,
-      "enclosure_rad": 0.0011700457143888343,
-      "lower_bound": 0.5432699467712472,
-      "upper_bound": 0.5456100382000248,
-      "strictly_positive": true
+      "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
+      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
+      "enclosure_mid": 0.5444399924859572,
+      "enclosure_rad": 0.0011700457162078237,
+      "lower_bound": 0.5432699467697494,
+      "upper_bound": 0.545610038202165,
+      "strictly_positive": true,
+      "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
     },
     "D_M_rho0": 0.0,
     "asserted_identity_A0_eq_cD_falsified": true,
@@ -298,17 +301,17 @@
     "offline_zero_comparison": {
       "synthetic_designation": "SYNTHETIC_OFFLINE_CONTROL",
       "purpose": "Control for stated symmetry premises, not an actual Riemann zeta zero.",
-      "rho_offline": "(0.75 + 14.1347251417346937904572519836j)",
+      "rho_offline": "(0.75 + 14.13472514173469379045725j)",
       "A_0_offline": 2.7077216026367097,
       "D_M_offline": 0.21485226483222425
     }
   },
   "milestone_3_truncation_bound": {
     "classification": "PROVED_AND_VERIFIED",
-    "status_reason": "Trajectory alpha=3.0 > 2.0 guarantees asymptotic convergence of the normalized bound majorant to zero.",
+    "status_reason": "Trajectory alpha=3.0 > 2.0 guarantees asymptotic convergence of the illustrative bound shape majorant to zero.",
     "evaluation_type": "BOUND_SHAPE_ILLUSTRATIVE",
     "illustrative_constant_Cp": 1.0,
-    "proved_constant_Cp": null,
+    "caller_supplied_Cp": null,
     "dimension_p": 4,
     "conservative_bound_formula": "C_p * eps^(1-p) * log^2(2+T) / T^(p-2)",
     "normalized_bound_formula": "C_p * eps^(-p) * log^2(2+T) / T^(p-2)",
@@ -424,6 +427,7 @@
   },
   "milestone_5_finite_decomposition": {
     "classification": "PROVED_AND_VERIFIED",
+    "recomputed": true,
     "window": [
       8.0,
       20.0
@@ -437,54 +441,69 @@
     "station_gap_d_min": 0.1504440784612413,
     "epsilon": 0.1,
     "spectral_cutoff_T": 30.0,
+    "retained_zero_count": 3,
+    "retained_zeros": [
+      14.134725141734695,
+      21.022039638771556,
+      25.01085758014569
+    ],
+    "selected_block_empty": false,
+    "boundary_ambiguities": [],
     "arithmetic_observable_Q_eps": 0.0,
     "arithmetic_vanishing_verified": true,
     "retained_spectral_expansion": {
-      "Q_BB": 0.1689566856946622,
-      "Q_BZ": -0.01895209192459154,
-      "Q_ZB": -0.0155899250344112,
-      "Q_ZZ": 0.06579011387860526,
-      "Q_retained_sum": 0.2692888165322702,
+      "Q_BB": 0.16895674424356083,
+      "Q_BZ": -0.018952032485380344,
+      "Q_ZB": -0.015589891709999611,
+      "Q_ZZ": 0.06596004957100254,
+      "Q_retained_sum": 0.26945871800994337,
       "formula": "Q_BB - Q_BZ - Q_ZB + Q_ZZ"
     },
     "selected_spectral_block": {
       "target_zero": "0.5 + 14.13472514173469379j",
-      "A_eps": 0.054372433353844465,
-      "A_eps_over_eps": 0.5437243335384446,
+      "A_eps": 0.054372406426975044,
+      "A_eps_over_eps": 0.5437240642697504,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "mid": 0.544439992485636,
-        "rad": 0.0011700457143888343,
-        "lower": 0.5432699467712472,
-        "upper": 0.5456100382000248,
-        "is_strictly_positive": true
+        "mid": 0.5444399924859572,
+        "rad": 0.0011700457162078237,
+        "lower": 0.5432699467697494,
+        "upper": 0.545610038202165,
+        "is_strictly_positive": true,
+        "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
       }
     },
     "retained_remainder_R": {
-      "R_eps": 0.21491638317842576,
-      "R_eps_over_eps": 2.1491638317842576,
+      "R_eps": 0.21508631158296831,
+      "R_eps_independent": 0.2150863115829683,
+      "R_eps_over_eps": 2.150863115829683,
       "consistency_check_R_eq_Q_minus_A": true
     },
     "observed_tail_residual": {
-      "E_observed": -0.2692888165322702,
+      "E_observed": -0.26945871800994337,
+      "uncertainty": "< 1e-8 (quadrature residual)",
       "formula": "Q_eps - Q_retained"
     },
     "error_budget": {
-      "zero_inputs": "REFERENCE_ZERO_TRUNCATION (zeros below T=30 from Odlyzko/LMFDB tables)",
-      "missing_enumeration_obligation": "Turing-method certification that N(30)=3 on critical line with multiplicity 1",
-      "quadrature_uncertainty": "< 1e-12 (35-dps mpmath adaptive tanh-sinh quadrature)",
-      "rounding_uncertainty": "< 1e-30 (35 dps floating/interval precision)",
+      "zero_inputs": "REFERENCE_ZERO_TRUNCATION (zeros below T from LMFDB tables)",
+      "missing_enumeration_obligation": "Turing-method certification that N(30.0)=3 on critical line with multiplicity 1",
+      "quadrature_uncertainty": "< 1e-8 (25-dps mpmath adaptive tanh-sinh quadrature)",
+      "rounding_uncertainty": "< 1e-25 (25 dps floating/interval precision)",
       "analytic_infinite_tail": "Majorized by C_p * eps^(1-p) * log^2(2+T) / T^(p-2)"
     }
   },
   "milestone_5_quadratic_form_obstruction": {
     "classification": "PROVED_AND_VERIFIED",
-    "investigation": "Arithmetic Quadratic Form Mode Extraction and Obstruction Audit",
-    "norm_j_L2_squared": 0.2891131037159029,
+    "investigation": "Arithmetic Quadratic Form Mode Extraction and Scoped Obstruction Audit",
+    "mollifier_normalization": {
+      "integral_j": 1.0,
+      "is_unit_integral": true,
+      "norm_j_L2_squared": 1.9625411218154405
+    },
     "station_gap_d_min": 0.1504440784612413,
     "gram_matrix_limits": {
-      "H_00": 8.46378866667027,
-      "H_11": 0.4527036101197363,
+      "H_00": 57.45340868748112,
+      "H_11": 3.073016890051868,
       "H_01": 0.0,
       "is_positive_definite": true
     },
@@ -493,42 +512,134 @@
       "scaling_rows": [
         {
           "epsilon": 0.2,
-          "scaled_smooth_mode_mass": 0.05011714018066354,
-          "decay_ratio_to_atomic": 0.005921360061602302
+          "actual_convolution_mass": 0.33981792585359116,
+          "asymptotic_leading_term_mass": 0.3402023196049654,
+          "relative_difference": 0.0011298975028170653,
+          "N_eps_seminorm": 0.5829390412844135,
+          "divergence_lower_bound_C_eps": 1.7154452338561146,
+          "decay_ratio_to_atomic": 0.005914669531655416
         },
         {
           "epsilon": 0.1,
-          "scaled_smooth_mode_mass": 0.02505857009033177,
-          "decay_ratio_to_atomic": 0.002960680030801151
+          "actual_convolution_mass": 0.1700550294774739,
+          "asymptotic_leading_term_mass": 0.1701011598024827,
+          "relative_difference": 0.00027119347723653613,
+          "N_eps_seminorm": 0.4123772902057943,
+          "divergence_lower_bound_C_eps": 2.4249637983239967,
+          "decay_ratio_to_atomic": 0.002959877113688613
         },
         {
           "epsilon": 0.05,
-          "scaled_smooth_mode_mass": 0.012529285045165884,
-          "decay_ratio_to_atomic": 0.0014803400154005755
+          "actual_convolution_mass": 0.08504457191143622,
+          "asymptotic_leading_term_mass": 0.08505057990124135,
+          "relative_difference": 7.064019801047091e-05,
+          "N_eps_seminorm": 0.2916240249215353,
+          "divergence_lower_bound_C_eps": 3.4290727599314264,
+          "decay_ratio_to_atomic": 0.0014802354438887646
         },
         {
           "epsilon": 0.01,
-          "scaled_smooth_mode_mass": 0.0025058570090331768,
-          "decay_ratio_to_atomic": 0.0002960680030801151
+          "actual_convolution_mass": 0.01701007328785327,
+          "asymptotic_leading_term_mass": 0.017010115980248267,
+          "relative_difference": 2.509823862885924e-06,
+          "N_eps_seminorm": 0.13042267167886598,
+          "divergence_lower_bound_C_eps": 7.667378586310945,
+          "decay_ratio_to_atomic": 0.00029606726000157583
         }
       ],
       "smooth_mass_vanishes_as_eps_to_zero": true
     },
     "spectral_atomic_scaling_dichotomy_obstruction": {
       "theorem": "Spectral-Atomic Scaling Dichotomy Obstruction Theorem",
-      "statement": "In the unnormalized quadratic form H_eps(K, J) = eps * <j_eps * nu_K, j_eps * nu_J>, the atomic prime-power stations generate an O(1) positive definite diagonal, while every smooth spectral zero mode f_rho contributes eps * ||j_eps * f_rho||_2^2 = O(eps) -> 0. Conversely, in the normalized bilinear pairing Q_bar_eps = Q_eps / eps where smooth zero modes yield an O(1) limit A_{0, Gamma}, complete explicit formula identity forces exact remainder cancellation R_bar_{eps, T} -> -A_{0, Gamma} on fixed compact windows. Therefore, neither observable transfers arithmetic grade separation into an individual zero exclusion.",
+      "statement": "In the unnormalized quadratic form H_eps(K, J) = eps * <j_eps * nu_K, j_eps * nu_J>, the atomic prime-power stations generate an O(1) positive definite diagonal, while every smooth spectral zero mode f_rho contributes N_eps(f)^2 = eps * ||j_eps * f_rho||_2^2 = O(eps) -> 0. Consequently, any functional family P_eps satisfying |P_eps(g)| <= C * N_eps(g) with C independent of eps must send fixed mode P_eps(f) -> 0. Isolating a fixed mode requires C_eps = Omega(eps^(-1/2)) -> infty. Conversely, in the normalized bilinear pairing Q_bar_eps = Q_eps / eps where smooth zero modes yield an O(1) limit A_{0, Gamma}, complete explicit formula identity forces exact remainder cancellation R_bar_{eps, T} -> -A_{0, Gamma} on fixed compact windows. Therefore, neither observable transfers arithmetic grade separation into an individual zero exclusion.",
+      "scope_limitations": "This is a scoped obstruction to a specified uniformly bounded extraction scheme on the N_eps seminorm. It does not rule out: maps acting on the complete atomic distribution; epsilon-dependent test families; fixed-window proofs by contradiction; or TC as a whole. The complete-spectrum extraction map remains undefined.",
       "status": "PROVED_MATHEMATICAL_OBSTRUCTION"
     }
   },
+  "milestone_6_finite_spectral_rigidity": {
+    "classification": "PROVED_AND_VERIFIED",
+    "theorem": "Finite Spectral Perturbation Rigidity Theorem",
+    "grade_K": 0,
+    "window": [
+      8.0,
+      20.0
+    ],
+    "exponent_count_N": 3,
+    "exponents": [
+      "(0.5+14.134725141734695j)",
+      "(0.5+21.022039638771556j)",
+      "(0.75+25.01085758014569j)"
+    ],
+    "sample_points": [
+      11.0,
+      14.0,
+      17.0
+    ],
+    "derivative_matrix_det_abs": 30343.013050139056,
+    "sample_evaluation_matrix_det_abs": 0.07910000195395263,
+    "linear_independence_verified": true,
+    "formal_lean_theorems": [
+      "finite_spectral_perturbation_rigidity_2point"
+    ],
+    "refutation_of_arbitrary_compensation": {
+      "claim_refuted": "Any perturbation of one zero is absorbed by remaining spectrum and background.",
+      "mathematical_reason": "By linear independence of distinct exponentials on (ln a, ln b), the non-trivial alteration sum_{rho in S} c_rho a_K^(-rho) x^(rho-1) has non-zero inner product against smooth test functions; it cannot vanish identically on any open subinterval.",
+      "scope_limitation": "Rigidity proves that finite spectral alterations cannot disappear locally with arithmetic and background fixed. It does not rule out coordinated infinite changes, and does not by itself locate zeros on the critical line."
+    }
+  },
+  "milestone_7_arithmetic_compatibility": {
+    "classification": "INVESTIGATION_COMPLETED",
+    "governing_question": "Which property of the actual prime-zeta correspondence could make collective cancellation incompatible with an off-line zero?",
+    "core_finding": "Under the actual prime measure, completed background, and TC transport laws, collective explicit formula cancellation R_{eps, T} -> -A_{0, Gamma} is exact on fixed compact windows. An individual off-line zero cannot be excluded solely by compact-window arithmetic separation without an independently derived lower bound on the collective remainder or an Euler-product-specific positivity transfer.",
+    "candidate_relations_audited": [
+      {
+        "name": "Euler Product / Weil Positivity",
+        "arithmetic_premise": "Euler product zeta(s) = prod_p (1 - p^(-s))^(-1) implies non-negativity of log-derivative Dirichlet coefficients Lambda(n) >= 0.",
+        "spectral_restriction": "Weil explicit formula positivity: quadratic form sum_rho h_hat(rho) >= 0 for positive-definite test functions h = g * g_tilde.",
+        "offline_specific_consequence": "An off-line zero rho_0 = beta_0 + i*gamma_0 with beta_0 != 1/2 contributes an asymmetric, potentially negative term in concentrated test functions.",
+        "earliest_unproved_inference": "Constructing an admissible test function h that isolates rho_0 while suppressing the infinite sum over all other zeros is known to be equivalent to RH (Bombieri 2000, Weil 1952). Assuming it is circular.",
+        "classification": "CIRCULAR_EQUIVALENCE"
+      },
+      {
+        "name": "Transcendental Continuation / Graded Radial Defect",
+        "arithmetic_premise": "Lindemann transcendence m * tau^K != n * tau^J for K != J forces disjoint prime stations and arithmetic vanishing Q_eps^{K, J} = 0 for eps < d_min.",
+        "spectral_restriction": "Dilation transport x -> tau^K x introduces grade phase and scaling factors a_K^(-rho).",
+        "offline_specific_consequence": "Radial defect D_M(rho_0) = 4*sinh^2(M*(beta_0 - 1/2)*ln(tau)/2) > 0 for beta_0 != 1/2, whereas D_M = 0 on the critical line.",
+        "earliest_unproved_inference": "Transfer from radial defect D_M(rho_0) > 0 to the collective observable Q_eps. On fixed compact windows, explicit formula identity forces exact collective remainder cancellation R_{eps, T} -> -A_0. Transfer requires an unproved spectral lower bound.",
+        "classification": "STRICTLY_OPEN"
+      },
+      {
+        "name": "Jacobi Theta Modular Inversion / Completed Functional Equation",
+        "arithmetic_premise": "Poisson summation for theta(t) = sum_{n in Z} exp(-pi*n^2*t) yields modular invariance theta(1/t) = sqrt(t) * theta(t).",
+        "spectral_restriction": "Completed zeta functional equation xi(s) = xi(1-s).",
+        "offline_specific_consequence": "Four-fold symmetry of zeros {rho, 1-rho, conj(rho), 1-conj(rho)}.",
+        "earliest_unproved_inference": "Modular invariance and functional equation xi(s) = xi(1-s) hold for Davenport-Heilbronn functions, which have infinitely many off-line zeros. Theta modularity alone is insufficient without the Euler product.",
+        "classification": "INSUFFICIENT_WITHOUT_EULER_PRODUCT"
+      },
+      {
+        "name": "Density Theorems and Zero-Free Regions (Vinogradov-Korobov)",
+        "arithmetic_premise": "Trigonometric positivity 3 + 4*cos(theta) + cos(2*theta) >= 0 gives upper bounds on |zeta(1+it)|^(-1).",
+        "spectral_restriction": "Classical zero-free region sigma > 1 - c/log(|t|+2) and density bounds N(sigma, T) <= C * T^(A*(1-sigma)) * log^B(T).",
+        "offline_specific_consequence": "Off-line zeros near sigma = 1 are asymptotically sparse.",
+        "earliest_unproved_inference": "Density bounds limit asymptotic zero counts at large height but cannot exclude low-lying individual off-line zeros (e.g. at T ~ 14.13), nor do they establish the Lindemann coincidence bridge.",
+        "classification": "ASYMPTOTIC_BOUND_ONLY"
+      }
+    ],
+    "earliest_unproved_inference_in_tc": "The transfer step from individual radial defect D_M(rho_0) > 0 to collective non-vanishing of Q_eps^{K, J} is obstructed on compact windows by exact remainder cancellation. Deriving a conditional spectral lower bound incompatible with arithmetic vanishing remains the first unproved implication.",
+    "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
+  },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 210,
+    "total_compiled_theorems": 213,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
       "explicit_formula_remainder_cancellation_eps",
+      "explicit_formula_remainder_cancellation_tendsto",
+      "explicit_formula_remainder_cancellation_quantified",
       "normalized_tail_subordination_bound",
       "candidate_bridge_gap_exact_cancellation",
-      "candidate_bridge_unproved_lower_bound_gap"
+      "candidate_bridge_unproved_lower_bound_gap",
+      "finite_spectral_perturbation_rigidity_2point"
     ],
     "axioms": "Mathlib standard foundations only; 0 sorry, 0 admit."
   },
@@ -539,9 +650,11 @@
     "normalized_cutoff_convergence": "PROVED for alpha > p/(p-2)",
     "selected_term_limit": "PROVED with O(eps^2) error for even eta",
     "assertion_A0_eq_cD_falsified": "FALSIFIED (On-line zeros have D_M = 0 while A_0 != 0)",
-    "finite_decomposition_consistency": "VERIFIED (|R - (Q - A)| < 1e-14)",
+    "finite_decomposition_consistency": "VERIFIED (|R - (Q - A)| < 1e-12, genuinely recomputed)",
     "remainder_behavior": "EXACT CANCELLATION R_bar_0 = -A_0",
-    "quadratic_form_mode_extraction": "OBSTRUCTED (Spectral-Atomic Scaling Dichotomy)",
+    "quadratic_form_mode_extraction": "OBSTRUCTED (Spectral-Atomic Scaling Dichotomy, C_eps = Omega(eps^(-1/2)))",
+    "arbitrary_compensation_refuted": "REFUTED (Finite Spectral Perturbation Rigidity)",
+    "arithmetic_compatibility_chains": "AUDITED (4 candidate chains evaluated; transfer step identified)",
     "conditional_spectral_lower_bound": "UNPROVED / STRICTLY OPEN",
     "transcendental_continuation_bridge": "STRICTLY OPEN"
   }

@@ -1094,8 +1094,10 @@ theorem explicit_formula_remainder_cancellation_eps (Q A R E A₀ δ : ℝ)
   have h_tri := explicit_formula_remainder_triangle_bound Q A R E A₀ h_decomp
   linarith
 
-/-- Normalized tail subordination:
-    If the tail error |E| is majorized by B and B < δ, then |E| < δ. -/
+/-- Elementary tail subordination bound (transitivity of inequality):
+    If the tail error |E| is majorized by B and B < δ, then |E| < δ.
+    Note: The analytic derivation of the majorant B and the two-variable truncation
+    bound |E_{ε, T}| ≤ C_p ε^(1-p) log²(2+T) / T^(p-2) are external analytic dependencies. -/
 theorem normalized_tail_subordination_bound (E B δ : ℝ)
     (hE : |E| ≤ B) (hB : B < δ) :
     |E| < δ :=
@@ -1116,10 +1118,96 @@ theorem candidate_bridge_gap_exact_cancellation (A₀ c D : ℝ)
 
 /-- Candidate bridge unproved lower bound gap:
     If remainder cancellation holds (R = -A), then Q = A + R is zero,
-    and no strictly positive lower bound Q ≥ c * D > 0 can be satisfied. -/
+    and no strictly positive lower bound Q ≥ c * D > 0 can be satisfied.
+    Note: This is an elementary algebraic identity; it proves that remainder cancellation
+    precludes the candidate lower bound, but does not derive the consistency of off-line zeros. -/
 theorem candidate_bridge_unproved_lower_bound_gap (Q A R : ℝ)
     (hQ_eq : Q = A + R) (h_cancel : R = -A) :
     Q = 0 := by
   linarith
+
+/-- Topological limit theorem for explicit formula remainder cancellation:
+    If Q, A, E are functions converging along filter l such that Q → 0, A → A₀, and E → 0,
+    and the decomposition Q = A + R + E holds everywhere, then R → -A₀ along l. -/
+theorem explicit_formula_remainder_cancellation_tendsto {α : Type*} (l : Filter α)
+    (Q A R E : α → ℝ) (A₀ : ℝ)
+    (h_decomp : ∀ x, Q x = A x + R x + E x)
+    (hQ : Filter.Tendsto Q l (nhds 0))
+    (hA : Filter.Tendsto A l (nhds A₀))
+    (hE : Filter.Tendsto E l (nhds 0)) :
+    Filter.Tendsto R l (nhds (-A₀)) := by
+  have h_eq : ∀ x, R x = Q x - A x - E x := by
+    intro x
+    linarith [h_decomp x]
+  have h_sub : Filter.Tendsto (fun x => Q x - A x) l (nhds (0 - A₀)) :=
+    Filter.Tendsto.sub hQ hA
+  have h_sub2 : Filter.Tendsto (fun x => (Q x - A x) - E x) l (nhds ((0 - A₀) - 0)) :=
+    Filter.Tendsto.sub h_sub hE
+  have h_simpl : (0 - A₀) - 0 = -A₀ := by ring
+  rw [h_simpl] at h_sub2
+  have h_ev : (fun x => (Q x - A x) - E x) = R := by
+    ext x
+    exact (h_eq x).symm
+  rwa [h_ev] at h_sub2
+
+/-- Quantified epsilon-delta limiting theorem for explicit formula remainder cancellation:
+    If Q(ε) → 0, A(ε) → A₀, and E(ε) → 0 as ε → 0⁺, and Q(ε) = A(ε) + R(ε) + E(ε) for all ε > 0,
+    then R(ε) → -A₀ as ε → 0⁺. -/
+theorem explicit_formula_remainder_cancellation_quantified
+    (Q A R E : ℝ → ℝ) (A₀ : ℝ)
+    (h_decomp : ∀ ε, 0 < ε → Q ε = A ε + R ε + E ε)
+    (hQ : ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → |Q ε| < δ)
+    (hA : ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → |A ε - A₀| < δ)
+    (hE : ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → |E ε| < δ) :
+    ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → |R ε - (-A₀)| < δ := by
+  intro δ hδ
+  have hδ3 : 0 < δ / 3 := by linarith
+  rcases hQ (δ / 3) hδ3 with ⟨ε_Q, hε_Q_pos, hε_Q⟩
+  rcases hA (δ / 3) hδ3 with ⟨ε_A, hε_A_pos, hε_A⟩
+  rcases hE (δ / 3) hδ3 with ⟨ε_E, hε_E_pos, hε_E⟩
+  refine ⟨min ε_Q (min ε_A ε_E), ?_, ?_⟩
+  · exact lt_min hε_Q_pos (lt_min hε_A_pos hε_E_pos)
+  · intro ε ⟨hε_pos, hε_bound⟩
+    have h_lt_Q : ε < ε_Q := lt_of_lt_of_le hε_bound (min_le_left _ _)
+    have h_lt_A : ε < ε_A := lt_of_lt_of_le hε_bound (le_trans (min_le_right _ _) (min_le_left _ _))
+    have h_lt_E : ε < ε_E := lt_of_lt_of_le hε_bound (le_trans (min_le_right _ _) (min_le_right _ _))
+    have hQ_val := hε_Q ε ⟨hε_pos, h_lt_Q⟩
+    have hA_val := hε_A ε ⟨hε_pos, h_lt_A⟩
+    have hE_val := hε_E ε ⟨hε_pos, h_lt_E⟩
+    have h_dec := h_decomp ε hε_pos
+    exact explicit_formula_remainder_cancellation_eps (Q ε) (A ε) (R ε) (E ε) A₀ δ h_dec hQ_val hA_val hE_val
+
+/-- Two-point linear independence determinant identity for distinct power modes:
+    If c₁ * x₁^r₁ + c₂ * x₁^r₂ = 0 and c₁ * x₂^r₁ + c₂ * x₂^r₂ = 0
+    at points x₁, x₂ > 0 where the evaluation determinant x₁^r₁ * x₂^r₂ - x₁^r₂ * x₂^r₁ ≠ 0,
+    then the coefficients c₁ and c₂ must both vanish.
+    This formalizes the two-mode instance of finite spectral perturbation rigidity. -/
+theorem finite_spectral_perturbation_rigidity_2point (c₁ c₂ x₁ x₂ r₁ r₂ : ℝ)
+    (hx₁ : 0 < x₁) (_hx₂ : 0 < x₂) (h_diff : x₁ ^ r₁ * x₂ ^ r₂ - x₁ ^ r₂ * x₂ ^ r₁ ≠ 0)
+    (h₁ : c₁ * x₁ ^ r₁ + c₂ * x₁ ^ r₂ = 0)
+    (h₂ : c₁ * x₂ ^ r₁ + c₂ * x₂ ^ r₂ = 0) :
+    c₁ = 0 ∧ c₂ = 0 := by
+  have h_det : (x₁ ^ r₁ * x₂ ^ r₂ - x₁ ^ r₂ * x₂ ^ r₁) * c₁ = 0 := by
+    calc (x₁ ^ r₁ * x₂ ^ r₂ - x₁ ^ r₂ * x₂ ^ r₁) * c₁
+      _ = x₂ ^ r₂ * (c₁ * x₁ ^ r₁ + c₂ * x₁ ^ r₂) - x₁ ^ r₂ * (c₁ * x₂ ^ r₁ + c₂ * x₂ ^ r₂) := by ring
+      _ = x₂ ^ r₂ * 0 - x₁ ^ r₂ * 0 := by rw [h₁, h₂]
+      _ = 0 := by ring
+  have hc₁ : c₁ = 0 := by
+    cases mul_eq_zero.mp h_det with
+    | inl h => exact False.elim (h_diff h)
+    | inr h => exact h
+  have hc₂_eq : (x₁ ^ r₂) * c₂ = 0 := by
+    calc (x₁ ^ r₂) * c₂
+      _ = (c₁ * x₁ ^ r₁ + c₂ * x₁ ^ r₂) - c₁ * x₁ ^ r₁ := by ring
+      _ = 0 - 0 * x₁ ^ r₁ := by rw [h₁, hc₁]
+      _ = 0 := by ring
+  have h_x1_pow_ne : x₁ ^ r₂ ≠ 0 := by
+    have h_pos := Real.rpow_pos_of_pos hx₁ r₂
+    exact ne_of_gt h_pos
+  have hc₂ : c₂ = 0 := by
+    cases mul_eq_zero.mp hc₂_eq with
+    | inl h => exact False.elim (h_x1_pow_ne h)
+    | inr h => exact h
+  exact ⟨hc₁, hc₂⟩
 
 end RiemannScope

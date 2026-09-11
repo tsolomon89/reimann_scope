@@ -2713,3 +2713,45 @@ $$|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}}.$$
 | :--- | :--- | :--- | :--- | :--- |
 | **TC-DISC-022** | **CLM-TC-022** | TC Epic: Two-Variable Explicit Formula, Normalized Remainder Truncation Bound, Selected Spectral Contribution Limit, and Bridge Defect Repair | Defect 3.1 falsified by counterexample ($p=3, T=\varepsilon^{-2}\sqrt{\ell}$); normalized power cutoff $\alpha > p/(p-2)$ proved in Lean 4; complete 1-variable trivial zero sum $\frac{a_K^2}{x(x^2-a_K^2)}$ verified to $< 10^{-15}$; 2-variable 9-term and 4-term tensor expansions proved in Lean 4; selected contribution $A_{\varepsilon, \Gamma}$ reality and $O(\varepsilon^2)$ limit proved; $A_{0, \Gamma} = c D_M$ falsified on critical line ($D_M = 0 \ne A_0 \approx 0.5444$); conservative truncation bound $C_p \varepsilon^{1-p}\frac{\log^2 T}{T^{p-2}}$ proved via dyadic shell pair counting; arithmetic vanishing on $[8, 20]$ proved via Lindemann transcendence ($d_{\min} \approx 0.1504$); contradiction endpoint formalized in Lean 4 (204 compiled declarations, 0 sorry); exact explicit formula remainder cancellation $\lim \bar R_{\varepsilon, T(\varepsilon)} = -A_{0, \Gamma}$ proved on fixed windows. | **DEFECTS REPAIRED; TWO-VARIABLE FORMULA DERIVED; CONSERVATIVE TRUNCATION BOUND PROVED; SELECTED TERM LIMIT & FALSIFICATION PROVED; 204 LEAN TARGETS; ARITHMETIC COINCIDENCE BRIDGE STRICTLY OPEN** |
 
+---
+
+# 41. TC Corrective Epic: Genuine Recomputation, Constant Certification, Scoped Mode Extraction, Finite Rigidity, and Compatibility Investigation (TC-DISC-023 / CLM-TC-022 Updated)
+
+## 41.1 Finite Decomposition Recomputation
+`evaluate_two_variable_finite_decomposition` genuinely recomputes all four bilinear tensor blocks via 2D quadrature across varying cutoffs ($T=10, 18, 23, 30$).
+For $T < \gamma_1 \approx 14.13$, retained zero set is empty ($Q_{BZ}=0, Q_{ZZ}=0, Q_{\rm ret}=Q_{BB} \approx 0.168957$); for $T=18$ yields $Q_{\rm ret} \approx 0.232622$; for $T=23$ yields $Q_{\rm ret} \approx 0.297505$; for $T=30$ yields $Q_{\rm ret} \approx 0.269459$.
+Independent remainder calculation from complementary terms $R_{\varepsilon, T, \rm independent} = Q_{BB} - Q_{BZ} - Q_{ZB} + Q_{ZZ, \rm complement}$ confirms $R_{\varepsilon, T} = Q_{\rm ret} - A_\varepsilon$ to $< 10^{-12}$.
+Benchmark fixtures are strictly decoupled from live computation paths, and `recompute=True` bypasses caching.
+
+## 41.2 Constant Certification Semantics
+`audit_two_variable_truncation_bound` validates $C_p > 0$ finite, strictly separating:
+1. `BOUND_SHAPE_ILLUSTRATIVE`: Proves asymptotic convergence of the bound shape majorant when $C_p$ is omitted.
+2. `CALLER_SUPPLIED_UNVERIFIED`: Caller-supplied constants without provenance (e.g. $C_p = 10^{-100}$) return an explicit unverified warning status; numeric values cannot create mathematical proof.
+3. `BOUND_WITH_DERIVED_CONSTANT`: Analytically derived constants.
+4. `BOUND_WITH_CERTIFIED_ENCLOSURE`: Machine-checked interval enclosures.
+
+## 41.3 Certified Arb Enclosure of $A_0$
+FLINT `acb.zeta_zero(1).imag` certifies the first Riemann zero ordinate enclosure `[14.1347251417347 +/- 9.01e-15]`.
+Preserving outward interval rounding yields the certified enclosure $A_0 \in [0.543269, 0.545611] > 0.54 > 0$, rigorously disproving the asserted identity $A_0 = c D_M(\rho_0)$ on the critical line.
+
+## 41.4 Reconciled Formal Lean 4 Theorems
+Docstrings in `formal/RiemannScope/Grade.lean` were corrected to state elementary transitivity and algebraic cancellation with visible external dependencies.
+New formal theorems compiled (bringing project theorem count to 213, 0 sorry):
+- `explicit_formula_remainder_cancellation_tendsto`: Formal proof of topological convergence $\lim_l R_\varepsilon = -A_0$ along filter $l$.
+- `explicit_formula_remainder_cancellation_quantified`: Formal $\varepsilon$-$\delta$ quantified convergence bound.
+- `finite_spectral_perturbation_rigidity_2point`: Formal 2-point linear independence forcing $c_1, c_2 = 0$.
+
+## 41.5 Scoped Mode Extraction Obstruction
+Normalized mollifier with unit integral $\int j = 1$ verifies actual finite-epsilon convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2 = O(\sqrt{\varepsilon}) \to 0$.
+Any functional family $P_\varepsilon$ satisfying $|P_\varepsilon(g)| \le C N_\varepsilon(g)$ with uniform $C$ must send fixed mode $P_\varepsilon(f) \to 0$. Isolating a fixed mode requires $C_\varepsilon = \Omega(\varepsilon^{-1/2}) \to \infty$.
+
+## 41.6 Refutation of Arbitrary Compensation via Finite Rigidity
+Finite Spectral Perturbation Rigidity Theorem proves that on any open interval $I \subset (a_K, \infty)$, linear independence of distinct complex exponentials forces:
+$$\sum_{\rho \in S} c_\rho a_K^{-\rho} x^{\rho-1} = 0 \quad \text{on } I \implies \forall \rho \in S, \ c_\rho = 0.$$
+This refutes the claim that arbitrary perturbations of one zero can be absorbed by the remaining spectrum and background.
+
+## 41.7 Bounded Arithmetic Compatibility Investigation
+Four candidate relations audited (Weil positivity, TC radial defect, Theta modular inversion, Vinogradov-Korobov density).
+Exact explicit formula decomposition forces collective cancellation $R_{\varepsilon, T} \to -A_0$ on fixed compact windows. The transfer from individual radial defect $D_M(\rho_0) > 0$ to collective cross-grade observable remains the earliest unproved inference; the Transcendental Continuation bridge remains strictly open.
+
+

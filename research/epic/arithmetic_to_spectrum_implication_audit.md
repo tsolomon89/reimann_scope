@@ -51,19 +51,26 @@ Therefore, mode extraction from H_eps cannot isolate an individual zero mode wit
 | Critical-Line Zero (rho_1) | A_{0, Gamma} approx 0.5444 != 0, D_M(rho_1) = 0 | Falsifies A_0 = c D_M(rho_0) on critical line | Definitively Falsified |
 | Synthetic Off-Line Zero (beta=0.75) | A_0^{off} approx 0.5694, D_M^{off} > 0 | Tests finite algebra & radial discrimination | Finite algebra verified |
 
-## 6. Proved Lean 4 Theorems (210 Total Compiled)
+## 6. Proved Lean 4 Theorems (213 Total Compiled)
 
 Formalized in formal/RiemannScope/Grade.lean with 0 sorry / 0 admit:
 1. explicit_formula_remainder_cancellation_identity: Q = A + R + E implies R - (-A_0) = Q - (A - A_0) - E.
 2. explicit_formula_remainder_triangle_bound: |R - (-A_0)| <= |Q| + |A - A_0| + |E|.
 3. explicit_formula_remainder_cancellation_eps: quantitative epsilon-delta limit theorem for R -> -A_0.
-4. normalized_tail_subordination_bound: tail error subordination |E| <= B and B < delta implies |E| < delta.
+4. normalized_tail_subordination_bound: elementary tail error subordination |E| <= B and B < delta implies |E| < delta.
 5. candidate_bridge_gap_exact_cancellation: A_0 = c D implies not (|-A_0| < c D).
-6. candidate_bridge_unproved_lower_bound_gap: Q = A + R and R = -A implies Q = 0.
+6. candidate_bridge_unproved_lower_bound_gap: elementary algebraic identity Q = A + R and R = -A implies Q = 0.
+7. explicit_formula_remainder_cancellation_tendsto: topological filter limit: Q -> 0, A -> A_0, E -> 0, Q = A + R + E implies R -> -A_0 via Mathlib Filter.Tendsto.sub.
+8. explicit_formula_remainder_cancellation_quantified: quantified epsilon-delta limit theorem for remainder cancellation.
+9. finite_spectral_perturbation_rigidity_2point: linear independence of two distinct complex exponentials at 2 points.
 
-## 7. Decisive Epistemic Verdict
+## 7. Refutation of Arbitrary Compensation via Finite Spectral Perturbation Rigidity
+
+The Finite Spectral Perturbation Rigidity Theorem proves that on any open interval I in (a_K, infty), the functions {x^{rho-1} : rho in S} for distinct exponents S are linearly independent over C. Any non-trivial finite spectral perturbation cannot vanish identically or be absorbed by the remaining spectrum and smooth background with the arithmetic measure fixed.
+
+## 8. Decisive Epistemic Verdict
 
 1. Was an arithmetic exclusion mechanism derived? No. Arithmetic vanishing is proved, but no spectral lower bound for an off-critical zero exists on fixed compact windows.
-2. What exact implication was established? The Spectral-Atomic Scaling Dichotomy Obstruction Theorem was derived and proved.
-3. What is the earliest remaining unproved inference? The conditional spectral lower bound Q_bar_eps >= c D_M(rho_0) - r(eps).
-4. Which one next research task follows? Research must shift to non-compact window filtering or multi-grade operator kernels.
+2. What exact implication was established? The Spectral-Atomic Scaling Dichotomy Obstruction Theorem and Finite Spectral Perturbation Rigidity Theorem were derived and proved.
+3. What is the earliest remaining unproved inference? The spectral transfer step: radial defect D_M(rho_0) > 0 implies Q_bar_eps >= c D_M(rho_0) - r(eps).
+4. Which one next research task follows? Research must address the unproved spectral transfer step directly or construct multi-grade operator kernels that avoid fixed-window collective cancellation.

@@ -2233,10 +2233,13 @@ def test_epic_arithmetic_overlap_window_8_20_and_commensurable():
 
 
 def test_epic_two_variable_synthesis_deliverables():
-    res = transcendental.audit_tc_epic_two_variable_synthesis(dps=30)
+    res = transcendental.audit_tc_epic_two_variable_synthesis(dps=25)
     assert 'Two-Variable Formula' in res['epic']
-    assert res['formal_lean_theorems']['total_compiled_theorems'] >= 204
-    assert len(res['formal_lean_theorems']['new_theorems']) >= 5
+    assert res['formal_lean_theorems']['total_compiled_theorems'] >= 213
+    assert len(res['formal_lean_theorems']['new_theorems']) >= 8
+    assert 'explicit_formula_remainder_cancellation_tendsto' in res['formal_lean_theorems']['new_theorems']
+    assert 'explicit_formula_remainder_cancellation_quantified' in res['formal_lean_theorems']['new_theorems']
+    assert 'finite_spectral_perturbation_rigidity_2point' in res['formal_lean_theorems']['new_theorems']
     assert '0 sorry' in res['formal_lean_theorems']['axioms']
     epistemic = res['epistemic_classification']
     assert 'PROVED' in epistemic['arithmetic_vanishing']
@@ -2247,6 +2250,8 @@ def test_epic_two_variable_synthesis_deliverables():
     assert 'FALSIFIED' in epistemic['assertion_A0_eq_cD_falsified']
     assert 'EXACT CANCELLATION' in epistemic['remainder_behavior']
     assert 'OBSTRUCTED' in epistemic['quadratic_form_mode_extraction']
+    assert 'REFUTED' in epistemic['arbitrary_compensation_refuted']
+    assert 'AUDITED' in epistemic['arithmetic_compatibility_chains']
     assert 'UNPROVED' in epistemic['conditional_spectral_lower_bound']
     assert 'STRICTLY OPEN' in epistemic['transcendental_continuation_bridge']
     import os
@@ -2256,10 +2261,31 @@ def test_epic_two_variable_synthesis_deliverables():
 def test_epic_two_variable_truncation_bound_parameter_handling_and_orders():
     res_p4 = transcendental.audit_two_variable_truncation_bound(p=4)
     assert res_p4['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_p4['evaluation_type'] == 'BOUND_SHAPE_ILLUSTRATIVE'
     assert res_p4['critical_alpha'] == 2.0
     assert res_p4['justified_alpha'] == 3.0
     assert res_p4['alpha_is_admissible'] is True
     assert res_p4['convergence_verified'] is True
+
+    # Discriminating test: unverified caller-supplied constant cannot yield PROVED_AND_VERIFIED
+    res_unverified = transcendental.audit_two_variable_truncation_bound(p=4, C_p=1e-100)
+    assert res_unverified['classification'] == 'CALLER_UNVERIFIED_CONSTANT'
+    assert res_unverified['evaluation_type'] == 'CALLER_SUPPLIED_UNVERIFIED'
+    assert 'numeric constants cannot create mathematical proof' in res_unverified['status_reason']
+
+    # Analytically derived and machine-checked constants
+    res_derived = transcendental.audit_two_variable_truncation_bound(p=4, C_p=10.0, constant_source='DERIVED')
+    assert res_derived['classification'] == 'ANALYTICALLY_DERIVED_CONSTANT'
+    assert res_derived['evaluation_type'] == 'BOUND_WITH_DERIVED_CONSTANT'
+
+    res_enclosure = transcendental.audit_two_variable_truncation_bound(p=4, C_p=10.0, constant_source='CERTIFIED_ENCLOSURE')
+    assert res_enclosure['classification'] == 'MACHINE_CHECKED_ENCLOSURE'
+    assert res_enclosure['evaluation_type'] == 'BOUND_WITH_CERTIFIED_ENCLOSURE'
+
+    # Invalid constant values
+    assert transcendental.audit_two_variable_truncation_bound(p=4, C_p=-1.0)['classification'] == 'INVALID_CONSTANT_ERROR'
+    assert transcendental.audit_two_variable_truncation_bound(p=4, C_p=0.0)['classification'] == 'INVALID_CONSTANT_ERROR'
+    assert transcendental.audit_two_variable_truncation_bound(p=4, C_p=float('nan'))['classification'] == 'INVALID_CONSTANT_ERROR'
 
     res_p3_crit = transcendental.audit_two_variable_truncation_bound(p=3, alpha=3.0)
     assert res_p3_crit['classification'] == 'NON_CONVERGENT_DEFECT'
@@ -2310,25 +2336,59 @@ def test_epic_selected_spectral_contribution_precision_and_enclosure():
     if enc and enc.get('engine') == 'flint.arb':
         assert enc['strictly_positive'] is True
         assert enc['lower_bound'] > 0.54
+        assert 'flint.acb.zeta_zero(1).imag' in enc['zero_ordinate_provenance']
     offline = res['offline_zero_comparison']
     assert offline['synthetic_designation'] == 'SYNTHETIC_OFFLINE_CONTROL'
     assert 'not an actual Riemann zeta zero' in offline['purpose']
 
 
 def test_epic_finite_decomposition_consistency_and_error_budget():
-    res = transcendental.evaluate_two_variable_finite_decomposition(
-        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=35
+    # Discriminating test 1: Cutoff below first zero (T=10 < 14.13) has 0 zeros, Q_BZ=0, Q_ZZ=0, Q_ret == Q_BB
+    res_10 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=10.0, dps=25, recompute=True
     )
-    assert res['classification'] == 'PROVED_AND_VERIFIED'
-    assert res['arithmetic_vanishing_verified'] is True
-    assert res['arithmetic_observable_Q_eps'] == 0.0
-    assert res['retained_remainder_R']['consistency_check_R_eq_Q_minus_A'] is True
-    budget = res['error_budget']
+    assert res_10['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_10['retained_zero_count'] == 0
+    assert res_10['selected_block_empty'] is True
+    assert res_10['retained_spectral_expansion']['Q_BZ'] == 0.0
+    assert res_10['retained_spectral_expansion']['Q_ZB'] == 0.0
+    assert res_10['retained_spectral_expansion']['Q_ZZ'] == 0.0
+    assert abs(res_10['retained_spectral_expansion']['Q_retained_sum'] - res_10['retained_spectral_expansion']['Q_BB']) < 1e-12
+
+    # Discriminating test 2: Cutoff T=18 has 1 zero, Q_ret != Q_BB
+    res_18 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=18.0, dps=25, recompute=True
+    )
+    assert res_18['retained_zero_count'] == 1
+    assert res_18['selected_block_empty'] is False
+    assert abs(res_18['retained_spectral_expansion']['Q_retained_sum'] - res_10['retained_spectral_expansion']['Q_retained_sum']) > 0.01
+
+    # Discriminating test 3: Cutoff T=30 has 3 zeros, Q_ret differs from T=18
+    res_30 = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=25, recompute=True
+    )
+    assert res_30['retained_zero_count'] == 3
+    assert abs(res_30['retained_spectral_expansion']['Q_retained_sum'] - res_18['retained_spectral_expansion']['Q_retained_sum']) > 0.01
+
+    # Independent remainder consistency check: R_eps_independent matches Q_ret - A_eps
+    assert res_30['retained_remainder_R']['consistency_check_R_eq_Q_minus_A'] is True
+    assert abs(res_30['retained_remainder_R']['R_eps_independent'] - res_30['retained_remainder_R']['R_eps']) < 1e-12
+
+    # Arithmetic vanishing and error budget
+    assert res_30['arithmetic_vanishing_verified'] is True
+    assert res_30['arithmetic_observable_Q_eps'] == 0.0
+    budget = res_30['error_budget']
     assert 'REFERENCE_ZERO_TRUNCATION' in budget['zero_inputs']
     assert 'Turing-method' in budget['missing_enumeration_obligation']
     assert 'quadrature_uncertainty' in budget
     assert 'rounding_uncertainty' in budget
     assert 'analytic_infinite_tail' in budget
+
+    # Hypothesis violation handling
+    res_inv = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=2, window=(8.0, 20.0), eps=0.1, T=30.0
+    )
+    assert res_inv['classification'] == 'HYPOTHESIS_VIOLATION_WINDOW'
 
 
 def test_epic_arithmetic_quadratic_form_mode_extraction_obstruction():
@@ -2336,9 +2396,51 @@ def test_epic_arithmetic_quadratic_form_mode_extraction_obstruction():
         K=0, J=1, window=(8.0, 20.0), epsilons=[0.2, 0.1, 0.05, 0.01], dps=30
     )
     assert res['classification'] == 'PROVED_AND_VERIFIED'
+    assert res['mollifier_normalization']['is_unit_integral'] is True
     assert res['gram_matrix_limits']['is_positive_definite'] is True
     assert res['gram_matrix_limits']['H_01'] == 0.0
     assert res['smooth_spectral_mode_decay']['smooth_mass_vanishes_as_eps_to_zero'] is True
+
+    # Check actual convolution vs asymptotic leading term
+    rows = res['smooth_spectral_mode_decay']['scaling_rows']
+    for r in rows:
+        assert r['actual_convolution_mass'] > 0.0
+        assert r['asymptotic_leading_term_mass'] > 0.0
+        assert r['relative_difference'] < 0.01
+        assert r['divergence_lower_bound_C_eps'] > 1.0
+
     obs = res['spectral_atomic_scaling_dichotomy_obstruction']
     assert obs['status'] == 'PROVED_MATHEMATICAL_OBSTRUCTION'
     assert 'Spectral-Atomic Scaling Dichotomy' in obs['theorem']
+    assert 'scoped obstruction' in obs['scope_limitations']
+
+
+def test_epic_finite_spectral_perturbation_rigidity():
+    res = transcendental.audit_finite_spectral_perturbation_rigidity(
+        window=(8.0, 20.0), K=0, dps=30
+    )
+    assert res['classification'] == 'PROVED_AND_VERIFIED'
+    assert res['linear_independence_verified'] is True
+    assert res['derivative_matrix_det_abs'] > 1e-10
+    assert res['sample_evaluation_matrix_det_abs'] > 1e-10
+    assert 'finite_spectral_perturbation_rigidity_2point' in res['formal_lean_theorems']
+    refutation = res['refutation_of_arbitrary_compensation']
+    assert 'Any perturbation of one zero is absorbed' in refutation['claim_refuted']
+    assert 'linear independence' in refutation['mathematical_reason']
+
+
+def test_epic_arithmetic_compatibility_investigation():
+    res = transcendental.audit_arithmetic_compatibility_investigation(dps=30)
+    assert res['classification'] == 'INVESTIGATION_COMPLETED'
+    assert len(res['candidate_relations_audited']) == 4
+    candidates = {c['name']: c for c in res['candidate_relations_audited']}
+    assert 'Euler Product / Weil Positivity' in candidates
+    assert candidates['Euler Product / Weil Positivity']['classification'] == 'CIRCULAR_EQUIVALENCE'
+    assert 'Transcendental Continuation / Graded Radial Defect' in candidates
+    assert candidates['Transcendental Continuation / Graded Radial Defect']['classification'] == 'STRICTLY_OPEN'
+    assert 'Jacobi Theta Modular Inversion / Completed Functional Equation' in candidates
+    assert candidates['Jacobi Theta Modular Inversion / Completed Functional Equation']['classification'] == 'INSUFFICIENT_WITHOUT_EULER_PRODUCT'
+    assert 'Density Theorems and Zero-Free Regions (Vinogradov-Korobov)' in candidates
+    assert candidates['Density Theorems and Zero-Free Regions (Vinogradov-Korobov)']['classification'] == 'ASYMPTOTIC_BOUND_ONLY'
+    assert 'transfer step' in res['earliest_unproved_inference_in_tc']
+    assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'

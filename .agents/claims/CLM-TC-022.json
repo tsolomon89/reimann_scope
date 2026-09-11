@@ -90,6 +90,9 @@
     "formal/RiemannScope/Grade.lean: normalized_tail_subordination_bound",
     "formal/RiemannScope/Grade.lean: candidate_bridge_gap_exact_cancellation",
     "formal/RiemannScope/Grade.lean: candidate_bridge_unproved_lower_bound_gap",
+    "formal/RiemannScope/Grade.lean: explicit_formula_remainder_cancellation_tendsto",
+    "formal/RiemannScope/Grade.lean: explicit_formula_remainder_cancellation_quantified",
+    "formal/RiemannScope/Grade.lean: finite_spectral_perturbation_rigidity_2point",
     "transcendental.py: audit_tc_cutoff_condition_counterexample",
     "transcendental.py: evaluate_two_variable_explicit_expansion",
     "transcendental.py: audit_selected_spectral_contribution",
@@ -97,6 +100,8 @@
     "transcendental.py: evaluate_two_variable_finite_decomposition",
     "transcendental.py: audit_arithmetic_overlap_distinct_and_equal_grades",
     "transcendental.py: audit_arithmetic_quadratic_form_mode_extraction",
+    "transcendental.py: audit_finite_spectral_perturbation_rigidity",
+    "transcendental.py: audit_arithmetic_compatibility_investigation",
     "transcendental.py: audit_tc_epic_two_variable_synthesis"
   ],
   "proof_artifact": "formal/RiemannScope/Grade.lean",
@@ -105,7 +110,7 @@
     "Gate 3 & 4: constructed concrete counterexample p=3, T = eps^{-2}*sqrt(ell) falsifying prior condition T >> eps^{-(p-1)/(p-2)}; proved normalized error requires alpha > p/(p-2) in Lean 4 (power_cutoff_exponent_positivity)",
     "Gate 5 & 6: evaluated small-eps boundary behavior; verified 1-variable trivial zero sum to < 10^{-15}; proved 9-term and 4-term bilinear expansions in Lean 4",
     "Gate 7 & 8: proved reality of A_{eps, Gamma} via conjugation closure; proved A_{eps, Gamma}/eps = A_{0, Gamma} + O(eps^2) for even eta; falsified asserted identity A_{0, Gamma} = c*D_M(rho_0) by showing D_M = 0 on critical line while A_0 approx 0.5444 != 0",
-    "Gate 9 & 10: proved conservative truncation bound C_p * eps^{1-p} * log^2(2+T) / T^{p-2} using Trudgian N_*(R)^2 dyadic shell counting; proved exact arithmetic vanishing Q_eps^{0, 1} = 0 for eps < 0.1504; formalized contradiction endpoint in Lean 4; proved exact explicit formula remainder cancellation lim R_bar_{eps, T(eps)} = -A_{0, Gamma} on fixed windows, keeping the bridge open"
+    "Gate 9 & 10: proved conservative truncation bound C_p * eps^{1-p} * log^2(2+T) / T^{p-2} using Trudgian N_*(R)^2 dyadic shell counting; proved exact arithmetic vanishing Q_eps^{0, 1} = 0 for eps < 0.1504; formalized contradiction endpoint and topological convergence in Lean 4; proved exact explicit formula remainder cancellation lim R_bar_{eps, T(eps)} = -A_{0, Gamma} on fixed windows; refuted arbitrary-compensation claim via finite spectral perturbation rigidity; and evaluated 4 arithmetic compatibility chains identifying the transfer step as the earliest unproved inference, keeping the bridge open"
   ],
   "computational_evidence": [
     "tests/test_tc_mechanism_discovery.py: test_epic_tc_cutoff_condition_counterexample",
@@ -119,6 +124,8 @@
     "tests/test_tc_mechanism_discovery.py: test_epic_selected_spectral_contribution_precision_and_enclosure",
     "tests/test_tc_mechanism_discovery.py: test_epic_finite_decomposition_consistency_and_error_budget",
     "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_quadratic_form_mode_extraction_obstruction",
+    "tests/test_tc_mechanism_discovery.py: test_epic_finite_spectral_perturbation_rigidity",
+    "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_compatibility_investigation",
     "data/tc_epic_two_variable_synthesis.json"
   ],
   "external_sources": [
