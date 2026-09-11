@@ -312,7 +312,7 @@ def test_disguised_premise_obstruction_symbolic():
     Therefore, requiring delta in L_K and delta in L_J forces delta = 0 directly.
     Demanding layer membership for an off-line zero is logically equivalent to assuming RH.
     """
-    import sympy
+    import sympy  # type: ignore
     tau = sympy.Symbol("tau", positive=True)
     m, n = sympy.symbols("m n", integer=True)
     K, J = 1, 0
@@ -1693,6 +1693,7 @@ def test_cycle14_certificate_tamper_and_fail_closed(tmp_path):
 
     zeros, info = transcendental.load_validated_zero_certificates(N=1, repo_root=repo_root)
     assert zeros is None
+    assert info is not None
     assert "INPUT_ERROR_HASH_MISMATCH" in info["status"]
     assert info["classification"] == "INPUT_INVALID"
 
@@ -1702,6 +1703,7 @@ def test_cycle14_certificate_tamper_and_fail_closed(tmp_path):
         json.dump(tampered_data, f)
     zeros, info = transcendental.load_validated_zero_certificates(N=1, repo_root=repo_root)
     assert zeros is None
+    assert info is not None
     assert "INPUT_ERROR_UNSUPPORTED_SCHEMA" in info["status"]
 
     # 3. Test precision restoration

@@ -6217,12 +6217,12 @@ def audit_selected_spectral_contribution(
         beta_val = mpmath.re(rho_0)
         gamma_val = mpmath.im(rho_0)
 
-        if is_critical_line is True or beta_val == mpmath.mpf('0.5'):
+        if is_critical_line is True or (is_critical_line is None and beta_val == mpmath.mpf('0.5')):
             on_critical = True
             geometry_status = 'CRITICAL_LINE_PAIR'
             def get_density(scale):
                 return lambda x: mpmath.mpf('2.0') * mpmath.power(scale, -mpmath.mpf('0.5')) * mpmath.power(x, -mpmath.mpf('0.5')) * mpmath.cos(gamma_val * mpmath.log(x / scale))
-        elif is_critical_line is False or beta_val != mpmath.mpf('0.5'):
+        else:
             on_critical = False
             geometry_status = 'OFFLINE_SYMMETRIC_QUARTET'
             def get_density(scale):
@@ -6233,10 +6233,6 @@ def audit_selected_spectral_contribution(
                     term4 = mpmath.power(scale, -(mpmath.mpf('1.0') - mpmath.conj(rho_0))) * mpmath.power(x, (mpmath.mpf('1.0') - mpmath.conj(rho_0)) - mpmath.mpf('1.0'))
                     return mpmath.re(term1 + term2 + term3 + term4)
                 return f
-        else:
-            on_critical = None
-            geometry_status = 'UNRESOLVED_GEOMETRY'
-            get_density = None
 
         f_K = get_density(a_K)
         f_J = get_density(a_J)
