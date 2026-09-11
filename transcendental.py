@@ -7185,6 +7185,12 @@ def audit_smooth_kernel_indefiniteness_counterexample(
         if NUMPY_AVAILABLE and np is not None:
             q_arr = np.array(Q_primes, dtype=float)
             q_eigs = [float(e) for e in np.linalg.eigvalsh(q_arr)]
+        else:
+            try:
+                eigs_mp = mpmath.eigsy(mpmath.matrix(Q_primes), eigvals_only=True)
+                q_eigs = [float(e) for e in sorted(eigs_mp)]
+            except Exception:
+                q_eigs = []
 
         return {
             'classification': 'FALSIFIED_UNIVERSAL_AND_STATION_INDEXED_POSITIVE_DEFINITENESS',
@@ -7417,8 +7423,20 @@ def audit_station_to_grade_embedding_and_restricted_family(
 
             discrepancy = max(abs(G_mat[i, j] - G_direct[i, j]) for i in range(r) for j in range(r))
 
-            g_arr = np.array([[float(G_mat[i, j]) for j in range(r)] for i in range(r)], dtype=float)
-            eigs = [float(e) for e in np.linalg.eigvalsh(g_arr)]
+            if NUMPY_AVAILABLE and np is not None:
+                g_arr = np.array([[float(G_mat[i, j]) for j in range(r)] for i in range(r)], dtype=float)
+                eigs = [float(e) for e in np.linalg.eigvalsh(g_arr)]
+            else:
+                if r == 2:
+                    tr = G_mat[0, 0] + G_mat[1, 1]
+                    diff = G_mat[0, 0] - G_mat[1, 1]
+                    disc = mpmath.sqrt(diff * diff + 4 * G_mat[0, 1] * G_mat[1, 0])
+                    lam_min = (tr - disc) / 2
+                    lam_max = (tr + disc) / 2
+                    eigs = [float(lam_min), float(lam_max)]
+                else:
+                    eigs_mp = mpmath.eigsy(G_mat, eigvals_only=True)
+                    eigs = [float(e) for e in sorted(eigs_mp)]
             is_psd = bool(eigs[0] >= -1e-12)
 
             sweep_item = {
