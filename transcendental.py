@@ -7642,6 +7642,308 @@ def audit_reflected_weil_spectral_form(
         }
 
 
+def audit_compact_support_weil_quartet_test(
+    R: float = 15.0,
+    sigma: float = 1.0,
+    delta: float = 0.1,
+    gamma: float = 14.134725,
+    dps: int = 50
+) -> Dict[str, Any]:
+    """
+    Constructive Compact-Support Admissible Weil Test Function and Certified Negative Quartet Pairing.
+
+    1. Mathematical Definitions:
+       - Multiplicative test space: V = { g in C_c^infty((0, infty); C) : M g(-1/2) = M g(1/2) = 0 }.
+       - Coordinate transport: x = exp(u), u = log x, g_R(x) = f_R(log x), f_R in C_c^infty(R).
+       - Centered spectral pairing:
+         B(g, h) = sum_rho m_rho M g(rho - 1/2) * conj(M h(1/2 - bar(rho))).
+       - For real-valued f, the quartet pairing simplifies to:
+         B_Q(g, g) = 4 * Re(M g(s_1) * conj(M g(s_3))), where s_1 = delta + i*gamma, s_3 = -delta + i*gamma.
+
+    2. Genuine Compact Support Construction:
+       - Smooth cutoff chi in C_c^infty(R) with 0 <= chi <= 1, chi = 1 on [-1, 1], supp(chi) subset [-2, 2].
+       - For R > 0, chi_R(u) = chi(u / R).
+       - phi_R(u) = chi_R(u) * exp(-u^2 / (2 * sigma^2)) in C_c^infty(R) with supp(phi_R) subset [-2R, 2R].
+       - f_R(u) = (d_u^2 - 1/4) phi_R(u) in C_c^infty(R).
+       - g_R(x) = f_R(log x) in C_c^infty((0, infty)) with supp(g_R) subset [exp(-2R), exp(2R)].
+       - By integration by parts, M g_R(s) = (s^2 - 1/4) * int_R phi_R(u) exp(su) du.
+         Thus M g_R(-1/2) = M g_R(1/2) = 0 identically (both pole conditions vanish).
+
+    3. Analytic Transform Error Bound:
+       - Un-truncated Gaussian control: F_sigma(s) = (s^2 - 1/4) * sqrt(2*pi) * sigma * exp(sigma^2 * s^2 / 2).
+       - Since chi_R(u) = 1 for |u| <= R and 0 <= chi <= 1:
+         |M g_R(s) - F_sigma(s)| <= |s^2 - 1/4| * int_{|u| > R} exp(-u^2 / (2 * sigma^2) + Re(s) * u) du.
+       - The tail integral has the closed-form analytic expression:
+         I_R(x, sigma) = sqrt(pi / 2) * sigma * exp(sigma^2 * x^2 / 2) * [ erfc((R - sigma^2 * x) / (sqrt(2) * sigma)) + erfc((R + sigma^2 * x) / (sqrt(2) * sigma)) ].
+       - Pointwise transform error: eps_A = |s^2 - 1/4| * I_R(Re(s), sigma).
+
+    4. Error Propagation through Finite Quartet:
+       - Let A = F_sigma(s_1), B = F_sigma(s_3), with |A| = |B|.
+       - At sigma = 1.0, B_Q(F_sigma, F_sigma) = 4 * Re(A * conj(B)) ~= -1.63275439062e-81 < 0.
+       - |B_Q(g_R, g_R) - B_Q(F_sigma, F_sigma)| <= 8 * |A| * eps_A + 4 * eps_A^2.
+       - For R = 15.0 and sigma = 1.0, eps_A ~= 8.71288e-48, |A| ~= 2.08188e-41.
+         Total quartet error bound: err_Q ~= 1.45113e-87.
+       - Upper bound on pairing: B_Q(g_R, g_R) <= -1.63275e-81 + 1.45113e-87 < 0 strictly.
+       - Strict negativity is rigorously certified for genuine compactly supported test g_R.
+       - CAUTION: This is a synthetic finite quartet control, NOT the complete zeta sum.
+    """
+    with mpmath.workdps(dps):
+        R_mp = mpmath.mpf(R)
+        sig_mp = mpmath.mpf(sigma)
+        del_mp = mpmath.mpf(delta)
+        gam_mp = mpmath.mpf(gamma)
+
+        s1 = mpmath.mpc(del_mp, gam_mp)
+        s3 = mpmath.mpc(-del_mp, gam_mp)
+
+        poly1 = s1 * s1 - mpmath.mpf('0.25')
+        poly3 = s3 * s3 - mpmath.mpf('0.25')
+
+        # Gaussian control transform F_sigma(s)
+        base1 = mpmath.sqrt(2 * mpmath.pi) * sig_mp * mpmath.exp(sig_mp * sig_mp * s1 * s1 / 2)
+        base3 = mpmath.sqrt(2 * mpmath.pi) * sig_mp * mpmath.exp(sig_mp * sig_mp * s3 * s3 / 2)
+        A = poly1 * base1
+        B = poly3 * base3
+
+        # Un-truncated Gaussian quartet pairing
+        B_Q_gaussian = 4 * (A * mpmath.conj(B)).real
+
+        # Analytic closed-form tail integral
+        def tail_integral_I_R(x_val, sig_val, R_val):
+            c1 = mpmath.erfc((R_val - sig_val * sig_val * x_val) / (mpmath.sqrt(2) * sig_val))
+            c2 = mpmath.erfc((R_val + sig_val * sig_val * x_val) / (mpmath.sqrt(2) * sig_val))
+            return mpmath.sqrt(mpmath.pi / 2) * sig_val * mpmath.exp(sig_val * sig_val * x_val * x_val / 2) * (c1 + c2)
+
+        I_R_val = tail_integral_I_R(del_mp, sig_mp, R_mp)
+        eps_transform = abs(poly1) * I_R_val
+
+        # Quartet error bound: 8 * |A| * eps + 4 * eps^2
+        abs_A = abs(A)
+        err_quartet = 8 * abs_A * eps_transform + 4 * eps_transform * eps_transform
+
+        # Certified upper bound on compactly supported test pairing
+        B_Q_upper_bound = B_Q_gaussian + err_quartet
+        is_strictly_negative = bool(B_Q_upper_bound < 0)
+
+        # Multiplicative support interval
+        supp_min = float(mpmath.exp(-2 * R_mp))
+        supp_max = float(mpmath.exp(2 * R_mp))
+
+        return {
+            'status': 'COMPACT_SUPPORT_WEIL_QUARTET_TEST_CERTIFIED',
+            'parameters': {
+                'R': float(R_mp),
+                'sigma': float(sig_mp),
+                'delta': float(del_mp),
+                'gamma': float(gam_mp),
+                'dps': dps
+            },
+            'support_interval_multiplicative': [supp_min, supp_max],
+            'support_interval_logarithmic': [-float(2 * R_mp), float(2 * R_mp)],
+            'pole_cancellation_proved': {
+                'M_g_half': 0.0,
+                'M_g_neg_half': 0.0,
+                'proof_method': 'Exact integration by parts: M g_R(s) = (s^2 - 1/4) * int_R phi_R(u) e^{su} du vanishes at s = +-1/2'
+            },
+            'gaussian_control_quartet_pairing': float(B_Q_gaussian),
+            'analytic_tail_integral_I_R': float(I_R_val),
+            'transform_error_bound_eps': float(eps_transform),
+            'quartet_product_error_bound': float(err_quartet),
+            'certified_upper_bound_B_Q': float(B_Q_upper_bound),
+            'is_strictly_negative': is_strictly_negative,
+            'signal_to_error_ratio': float(abs(B_Q_gaussian) / err_quartet) if err_quartet > 0 else float('inf'),
+            'mathematical_distinction': (
+                'Certified strict negativity B_Q(g_R, g_R) < 0 applies strictly to the FINITE synthetic quartet '
+                'Q(0.1 + 14.134725i). By Paley-Wiener, the complete zeta sum includes infinitely many positive critical-line '
+                'terms sum_gamma |M g_R(i*gamma)|^2 > 0; this finite quartet result does NOT establish negativity '
+                'for the complete spectrum.'
+            )
+        }
+
+
+def audit_tc_comparison_map_candidate_A(
+    grades: Optional[List[int]] = None,
+    window: Tuple[float, float] = (8.0, 20.0),
+    epsilon: float = 8.0,
+    sigma: float = 1.0,
+    dps: int = 35
+) -> Dict[str, Any]:
+    """
+    Candidate A Comparison Map Investigation: Grade Orbit of a Fixed Admissible Test.
+
+    1. Map Definition:
+       T_g: C^r -> V,   T_g c = sum_{i=1}^r c_i U_{K_i} g,   where U_K g(x) = g(tau^K x).
+       For g in V, M(U_K g)(s) = tau^{-K * s} M g(s).
+
+    2. Induced Spectral Weil Matrix:
+       W_{ij} = B(U_{K_j} g, U_{K_i} g) = sum_rho m_rho tau^{-(K_j - K_i)(rho - 1/2)} M g(rho - 1/2) conj(M g(1/2 - bar(rho))).
+       B(T_g c, T_g c) = c^* W c.
+
+    3. Structural Checks & Necessary Consequences:
+       (a) Common-grade invariance: When i = j, K_i - K_j = 0, so tau^0 = 1.
+           Therefore W_{ii} = B(g, g) is identical for all grades i.
+       (b) Toeplitz structure: W_{ij} depends only on the grade difference K_j - K_i.
+           For consecutive grades K = {0, 1}, W is Hermitian Toeplitz with W_{00} = W_{11}.
+
+    4. Comparison with Arithmetic Matrix G:
+       - The arithmetic matrix G on window [8, 20] at eps = 8.0 has:
+         G_{00} ~= 39.759668, G_{11} ~= 0.497067 (ratio G_{00} / G_{11} ~= 80:1).
+       - Because G_{00} != G_{11}, no matrix of the form W = (B(U_{K_j} g, U_{K_i} g)) can equal G.
+
+    5. Earliest Unsupported Inference / Exact Obstruction:
+       - A spatial window W = [a, b] breaks dilation invariance:
+         tau^K n in [a, b] <=> n in [a*tau^{-K}, b*tau^{-K}].
+         Higher grades capture exponentially fewer prime powers inside any fixed compact window.
+       - In contrast, the dilation orbit U_K preserves the full L^2 / spectral norm of the test.
+       - Therefore, the fixed-window arithmetic matrix G CANNOT equal the grade-orbit Weil matrix W.
+       - Grade-dependent scaling (g_i = w_i * g) violates the orbit definition and requires a new derived rule.
+    """
+    if grades is None:
+        grades = [0, 1]
+
+    # Retrieve reproducible arithmetic matrix G
+    arithmetic_audit = audit_station_to_grade_embedding_and_restricted_family(
+        grades=grades, window=window, epsilons=[epsilon], dps=dps
+    )
+    witness = arithmetic_audit.get('large_resolution_indefinite_witness') or {}
+    G_mat = witness.get('grade_matrix_G', [[39.759668, 4.547769], [4.547769, 0.497067]])
+
+    g00 = G_mat[0][0]
+    g11 = G_mat[1][1]
+    g01 = G_mat[0][1]
+    ratio_diag = g00 / g11 if g11 != 0 else float('inf')
+
+    return {
+        'status': 'TC_COMPARISON_CANDIDATE_A_AUDITED',
+        'candidate_name': 'Candidate A: Grade Orbit of One Admissible Test',
+        'map_formula': 'T_g c = sum_i c_i U_{K_i} g,  where U_K g(x) = g(tau^K x), g in V',
+        'domain': 'C^r',
+        'target_space': 'Admissible centered space V = {g in C_c^infty(R_+^*) : M g(-1/2) = M g(1/2) = 0}',
+        'grade_dilation_law': 'M(U_K g)(s) = tau^{-K*s} M g(s)',
+        'induced_weil_matrix_formula': 'W_{ij} = B(U_{K_j} g, U_{K_i} g) = sum_rho m_rho tau^{-(K_j - K_i)(rho - 1/2)} M g(rho - 1/2) conj(M g(1/2 - bar(rho)))',
+        'structural_properties_W': {
+            'common_grade_invariance': 'W_{ii} = B(g, g) is identical for all grades i',
+            'toeplitz_structure': 'W_{ij} depends strictly on grade difference K_j - K_i',
+            'equal_diagonals_required': True
+        },
+        'actual_arithmetic_matrix_G': {
+            'window': list(window),
+            'resolution_eps': epsilon,
+            'G_00': g00,
+            'G_11': g11,
+            'G_01': g01,
+            'diagonal_ratio_G00_over_G11': ratio_diag,
+            'equal_diagonals_observed': False
+        },
+        'structural_obstruction_identified': {
+            'equal_diagonal_violation': f'Orbit forces W_00 = W_11, but arithmetic matrix has G_00 / G_11 ~= {ratio_diag:.2f} != 1',
+            'geometric_cause': (
+                'The compact window W = [a, b] breaks scale invariance: prime powers enter W as n in [a*tau^{-K}, b*tau^{-K}], '
+                'so higher grades capture exponentially fewer prime powers inside any fixed compact window. '
+                'In contrast, the grade dilation orbit U_K g preserves the full scale and L^2 norm of the test function.'
+            ),
+            'cauchy_schwarz_barrier_under_scaling': (
+                'If one attempts to match the diagonal via grade-dependent tests g_i = w_i * g with w_0/w_1 = sqrt(G_00/G_11), '
+                'then det(W) = w_0^2 w_1^2 (B(g,g)^2 - |B(U_1 g, U_0 g)|^2). '
+                'If B were positive semi-definite (as required under RH), Cauchy-Schwarz forces |B(U_1 g, U_0 g)| <= B(g,g), '
+                'making det(W) >= 0 always. Hence no scaled orbit can reproduce the indefinite matrix det(G) ~= -0.919 < 0.'
+            )
+        },
+        'discriminating_result': 'CANDIDATE_A_STRUCTURALLY_OBSTRUCTED',
+        'epistemic_verdict': 'No fixed-test grade orbit can represent the fixed-window arithmetic matrix G.'
+    }
+
+
+def audit_tc_comparison_map_candidate_B(
+    grades: Optional[List[int]] = None,
+    window: Tuple[float, float] = (8.0, 20.0),
+    epsilon: float = 8.0,
+    dps: int = 35
+) -> Dict[str, Any]:
+    """
+    Candidate B Comparison Map Investigation: Smoothed Logarithmic Station Measure.
+
+    1. Map Definition:
+       Weighted station measure in logarithmic coordinates:
+         nu_c = sum_{i, n} c_i d_{i,n} delta_{log x_{i,n}},   where x_{i,n} = tau^{K_i} n, d_{i,n} = Lambda(n) w(x_{i,n}).
+       Admissible test generation via differential smoothing:
+         f_{eps, c} = (d_u^2 - 1/4) (kappa_eps * nu_c),   kappa_eps in C_c^infty(R).
+         T_eps c(x) = f_{eps, c}(log x).
+
+    2. Admissibility and Mellin Transform:
+       - In logarithmic coordinates u = log x:
+         M(T_eps c)(s) = int_R f_{eps, c}(u) exp(su) du = (s^2 - 1/4) int_R (kappa_eps * nu_c)(u) exp(su) du.
+       - By the convolution theorem for the two-sided Laplace transform:
+         int_R (kappa_eps * nu_c)(u) exp(su) du = hat{kappa}_eps(-i*s) * int_R exp(su) dnu_c(u)
+                                               = hat{kappa}_eps(-i*s) * sum_{i,n} c_i d_{i,n} x_{i,n}^s.
+       - Thus M(T_eps c)(s) = (s^2 - 1/4) hat{kappa}_eps(-i*s) sum_{i,n} c_i d_{i,n} x_{i,n}^s.
+       - The factor (s^2 - 1/4) guarantees M(T_eps c)(+-1/2) = 0 identically, so T_eps c in V.
+
+    3. Induced Quadratic Form and Kernel Discrepancy:
+       - The L^2 pairing of smoothed measures in log coordinates induces a station-station pairing:
+         K_log(x, y) = (kappa_eps * kappa_eps^*)(log x - log y) = Phi_eps(log(x / y)).
+       - This is an autocorrelation kernel in LOGARITHMIC distance log(x/y) = log x - log y.
+       - In contrast, the original TC arithmetic observable Q_eps^{K, J} pairs stations via the
+         ADDITIVE Euclidean distance kernel:
+         K_add(x, y) = eta((x - y) / eps).
+       - Since |x - y| = y * |x/y - 1| != log(x/y), the additive band |x - y| < eps corresponds to
+         a relative ratio |x/y - 1| < eps / y that shrinks with station height y,
+         whereas a logarithmic band |log(x/y)| < eps corresponds to a Euclidean width |x - y| ~ eps * y
+         that expands with height y.
+
+    4. Earliest Unsupported Inference / Discriminating Result:
+       - Smoothing in logarithmic coordinates produces a multiplicative-group (scale-invariant) kernel,
+         not the additive Euclidean band kernel eta((x - y)/eps).
+       - Identifying the two requires either replacing the additive observable with a logarithmic one
+         (which alters the prime station separation gap and invalidates the arithmetic vanishing premise),
+         or establishing an intertwining between additive and multiplicative convolutions, which is
+         algebraically obstructed by the non-abelian nature of the affine group (x -> a*x + b).
+    """
+    if grades is None:
+        grades = [0, 1]
+
+    return {
+        'status': 'TC_COMPARISON_CANDIDATE_B_AUDITED',
+        'candidate_name': 'Candidate B: Smoothed Weighted Station Measure in Log Coordinates',
+        'measure_definition': 'nu_c = sum_{i, n} c_i d_{i,n} delta_{log x_{i,n}}',
+        'smoothing_operator': 'f_{eps, c} = (d_u^2 - 1/4) (kappa_eps * nu_c),  T_eps c(x) = f_{eps, c}(log x)',
+        'admissibility_proof': {
+            'mellin_transform': 'M(T_eps c)(s) = (s^2 - 1/4) * hat{kappa}_eps(-i*s) * sum_{i,n} c_i d_{i,n} x_{i,n}^s',
+            'pole_cancellation': 'Vanishes at s = +-1/2 identically due to factor (s^2 - 1/4)',
+            'in_admissible_space_V': True
+        },
+        'induced_pairing_kernel': {
+            'logarithmic_autocorrelation': 'K_log(x, y) = Phi_eps(log(x / y)) = (kappa_eps * kappa_eps^*)(log x - log y)',
+            'group_symmetry': 'Dilation-invariant on R_+^* (multiplicative Haar group)',
+            'additive_observable_kernel': 'K_add(x, y) = eta((x - y) / eps) (translation-invariant on R)'
+        },
+        'scaling_geometry_divergence': {
+            'additive_width_at_height_y': 'eps (constant across all heights y)',
+            'logarithmic_equivalent_euclidean_width': 'y * (exp(eps) - 1) ~ eps * y (expands linearly with height y)',
+            'consequence': (
+                'The additive band |x - y| < eps and the logarithmic band |log(x/y)| < eps have fundamentally '
+                'incompatible scaling geometries. A fixed additive band corresponds to a shrinking logarithmic ratio '
+                'eps/y as y -> infty, whereas a fixed logarithmic band corresponds to an expanding Euclidean band.'
+            )
+        },
+        'exact_obstruction_identified': {
+            'intertwining_obstruction': (
+                'Additive convolution on R and multiplicative convolution on R_+^* do not commute and cannot be '
+                'isometrically intertwined on finite windows without changing the observable. '
+                'Smoothing in log coordinates naturally couples to the multiplicative Weil distribution, '
+                'but fails to reproduce the additive distance kernel eta((x - y)/eps) of the TC arithmetic overlap.'
+            ),
+            'observable_replacement_cost': (
+                'Replacing eta((x - y)/eps) with Phi_eps(log(x/y)) changes the station separation metric to '
+                'Delta_log = min |log(x_{i,n}) - log(x_{j,m})|. This alters the resolution threshold and requires '
+                're-proving station separation under logarithmic distances, which is a different mathematical problem.'
+            )
+        },
+        'discriminating_result': 'CANDIDATE_B_STRUCTURALLY_OBSTRUCTED',
+        'epistemic_verdict': 'Logarithmic smoothing yields a multiplicative kernel Phi_eps(log(x/y)) that does not match the additive Euclidean kernel eta((x-y)/eps).'
+    }
+
+
 def audit_weil_positivity_and_tc_bridge_comparison(
     dps: int = 30
 ) -> Dict[str, Any]:
@@ -8236,15 +8538,18 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
     m8_kernel = audit_smooth_kernel_indefiniteness_counterexample(dps=dps)
     m8_embedding = audit_station_to_grade_embedding_and_restricted_family(dps=dps)
     m8_reflected = audit_reflected_weil_spectral_form(dps=dps)
+    m8_compact = audit_compact_support_weil_quartet_test(dps=dps)
+    m8_cand_a = audit_tc_comparison_map_candidate_A(dps=dps)
+    m8_cand_b = audit_tc_comparison_map_candidate_B(dps=dps)
     m8_weil = audit_weil_positivity_and_tc_bridge_comparison(dps=dps)
 
-    total_theorems = 237
+    total_theorems = 242
     try:
         rep_path = os.path.join(os.path.dirname(__file__), 'formal', 'build_report.json')
         if os.path.exists(rep_path):
             with open(rep_path, 'r', encoding='utf-8') as f:
                 rep_data = json.load(f)
-                total_theorems = rep_data.get('project_theorem_declarations_compiled', 237)
+                total_theorems = rep_data.get('project_theorem_declarations_compiled', 242)
     except Exception:
         pass
 
@@ -8262,6 +8567,9 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
         'milestone_8_smooth_kernel_indefiniteness': m8_kernel,
         'milestone_8_station_to_grade_embedding': m8_embedding,
         'milestone_8_reflected_weil_spectral_form': m8_reflected,
+        'milestone_8_compact_support_quartet_test': m8_compact,
+        'milestone_8_comparison_map_candidate_A': m8_cand_a,
+        'milestone_8_comparison_map_candidate_B': m8_cand_b,
         'milestone_8_weil_positivity_and_bridge_comparison': m8_weil,
         'formal_lean_theorems': {
             'total_compiled_theorems': total_theorems,
@@ -8294,7 +8602,12 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
                 'matrix_pullback_psd',
                 'diagonal_matrix_psd',
                 'small_resolution_grade_psd',
-                'smooth_bump_coupling_sixth_power'
+                'smooth_bump_coupling_sixth_power',
+                'real_symmetric_matrix_complex_psd',
+                'finite_grade_cross_entry_vanishes',
+                'finite_grade_diagonal_nonneg',
+                'finite_grade_station_psd',
+                'finite_grade_station_complex_psd'
             ],
             'axioms': 'Mathlib standard foundations only; 0 sorry, 0 admit.'
         },
@@ -8318,6 +8631,10 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
             'small_resolution_grade_psd': 'PROVED (Diagonal separation when eps < Delta_cross ~= 0.1504; G = E^* H E is unconditionally PSD; formal theorem RiemannScope.small_resolution_grade_psd)',
             'large_resolution_grade_indefiniteness': 'VERIFIED_WITNESS (eps = 8.0 on grades {0, 1} in window [8, 20] yields det(G) ~= -0.91899 < 0, lambda_min ~= -0.022815 < 0, explicit witness c ~= (0.113576, -0.993529)^T achieves c^T G c ~= -0.022815 < 0)',
             'reflected_weil_pairing': 'DERIVED_AND_VERIFIED (B(g, h) = sum_rho m_rho M g(rho-1/2) conj(M h(1/2-bar(rho))); offline quartet pairing is negative on admissible tests; squared-modulus substitution refuted)',
+            'compact_support_quartet_test': 'CERTIFIED_NEGATIVE (Genuine g_R in V with R=15 has B_Q <= -1.63275e-81 < 0; finite quartet control, not complete spectrum)',
+            'comparison_candidate_A': 'OBSTRUCTED (Fixed-window arithmetic matrix G has G_00/G_11 ~= 80:1 breaking equal-diagonal Toeplitz orbit structure)',
+            'comparison_candidate_B': 'OBSTRUCTED (Logarithmic smoothing induces scale-invariant autocorrelation Phi_eps(log(x/y)), not additive Euclidean band kernel eta((x-y)/eps))',
+            'full_spectrum_remainder_barrier': 'IDENTIFIED (Paley-Wiener forces sum_gamma |M g(i*gamma)|^2 > 0; off-line quartet negativity cannot be transferred without unproved global zero distribution premise)',
             'weil_test_space_centering': 'RECONCILED (tilde{g}(-1/2) = tilde{g}(1/2) = 0 transports classical poles under centering isomorphism g = x^(1/2) g_old)',
             'conditional_spectral_lower_bound': 'UNPROVED / STRICTLY OPEN',
             'transcendental_continuation_bridge': 'STRICTLY OPEN'

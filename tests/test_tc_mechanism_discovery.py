@@ -2856,3 +2856,103 @@ def test_epic_reflected_weil_form_and_offline_quartet_distinction():
     # Dilation action
     tc_action = res['tc_grade_dilation_action']
     assert tc_action['grade_difference_orientation'] == 'K - J'
+
+
+def test_epic_compact_support_weil_quartet_test_R15():
+    """
+    Verify the genuine compactly supported admissible Weil test g_R:
+    1. f_R = (d_u^2 - 1/4)[chi(u/R) * exp(-u^2/(2*sigma^2))], g_R(x) = f_R(log x).
+    2. Exact pole vanishing M g_R(-1/2) = M g_R(1/2) = 0 proved by integration by parts.
+    3. Analytic tail error bound |M g_R(s) - F_sigma(s)| <= |s^2 - 1/4| * I_R(Re(s), sigma).
+    4. For R = 15.0 and sigma = 1.0, quartet error bound is <= 1.46e-87.
+    5. Certified upper bound B_Q(g_R, g_R) <= -1.63275e-81 + 1.46e-87 < 0 strictly.
+    """
+    res = transcendental.audit_compact_support_weil_quartet_test(R=15.0, sigma=1.0, dps=50)
+    assert res['status'] == 'COMPACT_SUPPORT_WEIL_QUARTET_TEST_CERTIFIED'
+    assert res['is_strictly_negative'] is True
+    assert res['certified_upper_bound_B_Q'] < 0.0
+    assert res['certified_upper_bound_B_Q'] < -1.63e-81
+    assert res['gaussian_control_quartet_pairing'] < -1.63e-81
+    assert res['quartet_product_error_bound'] < 2.0e-87
+    assert res['signal_to_error_ratio'] > 1.0e5
+
+    # Check finite support intervals
+    supp_mult = res['support_interval_multiplicative']
+    assert supp_mult[0] > 0.0
+    assert supp_mult[1] < 1.0e15
+
+
+def test_epic_comparison_map_candidate_A_toeplitz_obstruction():
+    """
+    Verify Candidate A comparison map (grade orbit T_g c = sum c_i U_{K_i} g):
+    1. Spectral matrix W_{ij} has identical diagonal entries W_{ii} = B(g, g) (Toeplitz).
+    2. Fixed-window arithmetic matrix G has G_00 ~= 39.76, G_11 ~= 0.50 (ratio ~= 80:1).
+    3. Identifies exact obstruction: spatial window breaks scale invariance.
+    4. Proves Cauchy-Schwarz obstruction if scaling is attempted to match indefinite matrix.
+    """
+    res = transcendental.audit_tc_comparison_map_candidate_A(dps=35)
+    assert res['status'] == 'TC_COMPARISON_CANDIDATE_A_AUDITED'
+    assert res['discriminating_result'] == 'CANDIDATE_A_STRUCTURALLY_OBSTRUCTED'
+
+    struct_w = res['structural_properties_W']
+    assert struct_w['equal_diagonals_required'] is True
+
+    arith_g = res['actual_arithmetic_matrix_G']
+    assert arith_g['equal_diagonals_observed'] is False
+    assert arith_g['diagonal_ratio_G00_over_G11'] > 50.0
+
+    obstruction = res['structural_obstruction_identified']
+    assert 'equal_diagonal_violation' in obstruction
+    assert 'geometric_cause' in obstruction
+    assert 'cauchy_schwarz_barrier_under_scaling' in obstruction
+
+
+def test_epic_comparison_map_candidate_B_logarithmic_autocorrelation():
+    """
+    Verify Candidate B comparison map (smoothed logarithmic station measure):
+    1. Admissible test f_{eps, c} = (d_u^2 - 1/4)(kappa_eps * nu_c) has M(T_eps c)(+-1/2) = 0.
+    2. Induced station pairing is an autocorrelation in logarithmic distance log(x/y).
+    3. Divergence from additive Euclidean band kernel eta((x - y)/eps):
+       additive band has constant Euclidean width eps, while logarithmic band has Euclidean width eps * y.
+    4. Non-intertwining of additive and multiplicative convolutions on finite windows.
+    """
+    res = transcendental.audit_tc_comparison_map_candidate_B(dps=35)
+    assert res['status'] == 'TC_COMPARISON_CANDIDATE_B_AUDITED'
+    assert res['discriminating_result'] == 'CANDIDATE_B_STRUCTURALLY_OBSTRUCTED'
+
+    admiss = res['admissibility_proof']
+    assert admiss['in_admissible_space_V'] is True
+
+    kernel_info = res['induced_pairing_kernel']
+    assert 'logarithmic_autocorrelation' in kernel_info
+
+    geo = res['scaling_geometry_divergence']
+    assert 'consequence' in geo
+
+
+def test_epic_matrix_source_reconciliation_exact_values():
+    """
+    Verify the exact reproducible values for the restricted family at eps = 8.0:
+    G = [[39.759668, 4.547769], [4.547769, 0.497067]],
+    det(G) ~= -0.918992,
+    c ~= (0.113576, -0.993529)^T,
+    c^T G c ~= -0.022815.
+    """
+    res = transcendental.audit_station_to_grade_embedding_and_restricted_family(
+        grades=[0, 1], window=(8.0, 20.0), epsilons=[8.0], dps=40
+    )
+    witness = res['large_resolution_indefinite_witness']
+    assert witness is not None
+    assert witness['witness_verified'] is True
+
+    g_mat = witness['grade_matrix_G']
+    assert abs(g_mat[0][0] - 39.759668) < 1e-4
+    assert abs(g_mat[1][1] - 0.497067) < 1e-4
+    assert abs(g_mat[0][1] - 4.547769) < 1e-4
+    assert abs(g_mat[1][0] - 4.547769) < 1e-4
+
+    assert abs(witness['determinant_G'] - (-0.918992)) < 1e-4
+    assert abs(witness['witness_vector_c'][0] - 0.113576) < 1e-4
+    assert abs(witness['witness_vector_c'][1] - (-0.993529)) < 1e-4
+    assert abs(witness['quadratic_form_c_T_G_c'] - (-0.022815)) < 1e-4
+

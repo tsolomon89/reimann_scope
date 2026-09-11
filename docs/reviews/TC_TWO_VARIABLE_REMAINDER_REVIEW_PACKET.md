@@ -22,10 +22,10 @@ The Transcendental Continuation (TC) bridge remains **strictly OPEN**.
 
 ### Summary of Accomplishments & Clarifications:
 1. **Station vs. Grade Scope Disambiguation**:
-   - The station-indexed kernel matrix $H_{\alpha\beta} = \eta((x_\alpha - x_\beta)/\varepsilon)$ is universally indefinite on $\mathbb R$ (3-point counterexample on $\{1, 3/2, 2\}$ at $\varepsilon = 1$ with $\lambda_{\min} \approx -0.013328 < 0$; Bochner Fourier transform negative on $[5.0, 8.8]$).
+   - The station-indexed kernel matrix $H_{\alpha\beta} = \eta((x_\alpha - x_\beta)/\varepsilon)$ is not positive definite on all configurations on $\mathbb R$ (3-point counterexample on $\{1, 3/2, 2\}$ at $\varepsilon = 1$ with $\lambda_{\min} \approx -0.013328 < 0$; Bochner Fourier transform negative on $[5.0, 8.8]$).
    - The grade-indexed matrix $G = (Q_\varepsilon^{K_i, K_j}) = E^* H E$ restricts $H$ to the subspace $\operatorname{im} E \subset \mathbb C^{|\mathcal S|}$ spanned by grade-grouped prime-power weights.
    - At small resolutions ($\varepsilon < \Delta_{\rm cross} \approx 0.150444$), cross-grade terms vanish ($G_{ij} = 0$ for $i \ne j$) and diagonal entries are non-negative ($G_{ii} \ge 0$), making $G$ **unconditionally positive semi-definite** ($c^* G c \ge 0$). This refutes the blanket statement that $G$ cannot have a Gram representation.
-   - At larger overlapping resolutions (e.g. $\varepsilon = 8.0$ on grades $\{0, 1\}$ in $[8, 20]$), $G$ becomes indefinite with $\det(G) \approx -0.91899 < 0$, $\lambda_{\min} \approx -0.022815 < 0$, and verified grade witness $c \approx (0.113576, -0.993529)^T$ yielding $c^T G c \approx -0.022815 < 0$.
+   - At larger overlapping resolutions (e.g. $\varepsilon = 8.0$ on grades $\{0, 1\}$ in $[8, 20]$), $G$ becomes indefinite with $\det(G) \approx -0.9189924337960934 < 0$, $\lambda_{\min} \approx -0.022815359783484316 < 0$, and verified grade witness $c \approx (0.11357616085616788, -0.993529292816862)^T$ yielding $c^T G c \approx -0.022815359783484316 < 0$.
 2. **Reflected Weil Spectral Form**:
    - Reconciled consistent Mellin convention $\mathcal M g(s) = \int_0^\infty g(x) x^s \frac{dx}{x} = \int_{\mathbb R} f(u) e^{su} du$ ($x = e^u$).
    - Derived convolution rule $\mathcal M(g * h^*)(s) = \mathcal M g(s) \overline{\mathcal M h(-\bar s)}$.
@@ -33,8 +33,8 @@ The Transcendental Continuation (TC) bridge remains **strictly OPEN**.
    - Derived reflected spectral pairing:
      $$B(g, h) = \sum_\rho m_\rho \mathcal M g(\rho - \tfrac{1}{2}) \overline{\mathcal M h(\tfrac{1}{2} - \bar\rho)}.$$
    - On the critical line, $1/2 - \bar\rho = \rho - 1/2 = i\gamma$, collapsing to squared moduli $|\mathcal M g(i\gamma)|^2 \ge 0$.
-   - Off the critical line ($\rho = 1/2 + \delta + i\gamma$), arguments are reflected across the imaginary axis ($\delta + i\gamma$ vs $-\delta + i\gamma$). On admissible test $f = (\partial_u^2 - 1/4) f_0$, the off-line quartet pairing evaluates to a **negative** value ($\approx -4.08187 \times 10^{-82} < 0$). Substituting squared moduli off-line is an error that falsely forces positivity.
-   - Under grade dilation $U_K g(x) = g(x / \tau^K)$, the pairing scales by $\tau^{-(K - J)(\rho - 1/2)}$, exhibiting precise grade difference $K - J$ orientation.
+   - Off the critical line ($\rho = 1/2 + \delta + i\gamma$), arguments are reflected across the imaginary axis ($\delta + i\gamma$ vs $-\delta + i\gamma$). On admissible test $f = (\partial_u^2 - 1/4) f_0$ with Gaussian control width $\sigma = 1.0$, the off-line quartet pairing evaluates to a **negative** value ($\approx -1.632754391 \times 10^{-81} < 0$). Substituting squared moduli off-line is an error that falsely forces positivity.
+   - Under grade dilation $U_K g(x) = g(\tau^K x)$, the pairing scales by $\tau^{-(K - J)(\rho - 1/2)}$, exhibiting precise grade difference $K - J$ orientation.
 3. **Arithmetic and Fourier Normalization Repairs**:
    - Corrected Fourier transform normalization: $\widehat\eta(0) = \int_{-1}^1 \eta(v) dv \approx 1.2069003224378762$ (correcting earlier $0.8872$ misprint).
    - Replaced hardcoded prime list ending at 47 with complete dynamic sieve up to window boundary without cutoff.
@@ -107,16 +107,35 @@ When $\varepsilon < \Delta_{\rm cross} = \min_{i \ne j, n, m} |x_{K_i, n} - x_{K
 This theorem rigorously refutes any blanket claim that the grade matrix $G$ cannot be positive semi-definite or cannot have a Gram representation.
 
 ### 4.3 Large-Resolution Indefinite Witness on Restricted TC Family
-At larger overlapping resolutions, cross-grade terms become non-zero, and the indefiniteness of the kernel $\eta$ can penetrate into the grade pullback $G = E^* H E$.
-On grades $\{0, 1\}$ in window $[8, 20]$ at $\varepsilon = 8.0$:
-- Grade matrix:
-  $$G \approx \begin{pmatrix} 7.15185 & 3.23724 \\ 3.23724 & 1.33400 \end{pmatrix}$$
-- Determinant: $\det(G) \approx 7.15185 \times 1.33400 - 3.23724^2 \approx 9.54057 - 10.47974 \approx -0.91899 < 0$.
-- Minimum eigenvalue: $\lambda_{\min} \approx -0.022815 < 0$.
-- Grade witness vector: $c \approx (0.113576, -0.993529)^T$.
-- Quadratic form value:
-  $$c^T G c \approx -0.022815 < 0.$$
-This establishes that while $G$ is unconditionally PSD for $\varepsilon < \Delta_{\rm cross}$, it becomes indefinite at sufficiently large overlapping resolutions.
+At larger overlapping resolutions, cross-grade terms become non-zero, and the fact that the kernel $\eta$ is not positive definite on all configurations can penetrate into the grade pullback $G = E^* H E$.
+
+We present the single reproducible calculation unifying the window, station data, resolution, matrix, and indefinite witness:
+1. **Window and Bump Functions**:
+   $$\eta(v) = \begin{cases} e^{1 - 1/(1-v^2)}, & |v| < 1 \\ 0, & |v| \ge 1 \end{cases}, \qquad w(x) = \eta\left(\frac{x - 14}{6}\right) \quad \text{for } x \in [8, 20].$$
+2. **Grades and Active Prime Stations** ($\tau = 2\pi$):
+   - **Grade $K_0 = 0$** ($x_{0, n} = n$):
+     - $n = 8$: $x = 8.0$, $\Lambda(8) = \log 2$, $w(8.0) = 0.0$, $d_{0, 8} = 0.0$
+     - $n = 9 = 3^2$: $x = 9.0$, $\Lambda(9) = \log 3$, $w(9.0) \approx 0.10303$, $d_{0, 9} \approx 0.113190906794$
+     - $n = 11$: $x = 11.0$, $\Lambda(11) = \log 11$, $w(11.0) \approx 0.71653$, $d_{0, 11} \approx 1.718167042437$
+     - $n = 13$: $x = 13.0$, $\Lambda(13) = \log 13$, $w(13.0) \approx 0.97184$, $d_{0, 13} \approx 2.492702108376$
+     - $n = 16 = 2^4$: $x = 16.0$, $\Lambda(16) = \log 2$, $w(16.0) \approx 0.88250$, $d_{0, 16} \approx 0.611700239879$
+     - $n = 17$: $x = 17.0$, $\Lambda(17) = \log 17$, $w(17.0) \approx 0.71653$, $d_{0, 17} \approx 2.030086070552$
+     - $n = 19$: $x = 19.0$, $\Lambda(19) = \log 19$, $w(19.0) \approx 0.10303$, $d_{0, 19} \approx 0.303367913768$
+   - **Grade $K_1 = 1$** ($x_{1, n} = \tau n$):
+     - $n = 2$: $x = 2\tau \approx 12.566370614359$, $\Lambda(2) = \log 2$, $w(x) \approx 0.94124$, $d_{1, 2} \approx 0.652423629903$
+     - $n = 3$: $x = 3\tau \approx 18.849555921539$, $\Lambda(3) = \log 3$, $w(x) \approx 0.15195$, $d_{1, 3} \approx 0.166935150037$
+   - Minimum cross-grade separation: $\Delta_{\rm cross} = \min_{i \ne j} |x_{i, n} - x_{j, m}| \approx 0.150444$ (achieved between $x_{1, 3} \approx 18.849556$ and $x_{0, 19} = 19.0$).
+3. **Resolution**: $\varepsilon = 8.0$.
+4. **Reproducible Grade Matrix**:
+   $$G = \begin{pmatrix} G_{00} & G_{01} \\ G_{10} & G_{11} \end{pmatrix} \approx \begin{pmatrix} 39.75966822539126 & 4.547769036700697 \\ 4.547769036700697 & 0.4970667930462342 \end{pmatrix}.$$
+5. **Determinant and Indefinite Witness**:
+   - $\det G = G_{00} G_{11} - G_{01}^2 \approx 39.759668 \times 0.497067 - 4.547769^2 \approx 19.763214 - 20.682206 \approx -0.9189924337960934 < 0$.
+   - Eigenvalues: $\lambda_1 \approx -0.022815359783484316$, $\lambda_2 \approx 40.27955037822098$.
+   - Normalized eigenvector witness: $c \approx (0.11357616085616788, -0.993529292816862)^T$.
+   - Quadratic form value:
+     $$c^T G c \approx -0.022815359783484316 < 0.$$
+
+This confirms that while $G$ is unconditionally PSD for $\varepsilon < \Delta_{\rm cross}$, the kernel is not positive definite on all configurations, and at $\varepsilon = 8.0$ it produces an indefinite grade pullback. Note: indefiniteness at $\varepsilon = 8.0$ does not imply indefiniteness at every larger resolution; each resolution depends on the specific station overlap geometry.
 
 ---
 
@@ -164,18 +183,22 @@ $$B(g, g) = \sum_\rho m_\rho \mathcal M g(\rho - \tfrac{1}{2}) \overline{\mathca
    Because $\delta \ne -\delta$, this is **NOT** a squared modulus.
 
 ### 5.5 Refutation of Squared-Modulus Substitution
-On the admissible test function $f(u) = (\partial_u^2 - 1/4) e^{-u^2 / (2\sigma^2)}$ with $\sigma = 0.5$ and an off-line zero quartet at $\rho = 0.6 + 14.134725 i$ ($\delta = 0.1$):
-- Correct reflected pairing for the quartet:
-  $$\sum_{\rho \in \mathcal Q} \mathcal M g(\rho - \tfrac{1}{2}) \overline{\mathcal M g(\tfrac{1}{2} - \bar\rho)} \approx -1.63275 \times 10^{-81} < 0.$$
-- Erroneous squared-modulus substitution:
+On the admissible test function $f(u) = (\partial_u^2 - 1/4) e^{-u^2 / (2\sigma^2)}$ with default Gaussian control width $\sigma = 1.0$ and an off-line zero quartet generated by $\lambda = 0.1 + 14.134725 i$ ($\delta = 0.1$, $\gamma = 14.134725$):
+- Unit multiplicities give:
+  - At $\sigma = 0.5$: $+3.988856785 \times 10^{-17} > 0$.
+  - At $\sigma = 1.0$: $-1.63275439062 \times 10^{-81} < 0$.
+- Correct reflected pairing for the quartet at $\sigma = 1.0$:
+  $$\sum_{\rho \in \mathcal Q} \mathcal M g(\rho - \tfrac{1}{2}) \overline{\mathcal M g(\tfrac{1}{2} - \bar\rho)} \approx -1.632754391 \times 10^{-81} < 0.$$
+- Erroneous squared-modulus substitution at $\sigma = 1.0$:
   $$\sum_{\rho \in \mathcal Q} |\mathcal M g(\rho - \tfrac{1}{2})|^2 \approx +1.73369 \times 10^{-81} > 0.$$
 - Discrepancy ratio:
   $$\frac{\text{Reflected Pairing}}{\text{Squared-Modulus Sum}} \approx -0.94178 < 0.$$
 **Conclusion**: Substituting squared moduli off the critical line is an algebraic error that falsely forces positivity and conceals negative directions.
 
 ### 5.6 Grade Dilation Action under TC
-Under the grade dilation operator $U_K g(x) = g(x / \tau^K)$:
-$$\mathcal M(U_K g)(s) = \int_0^\infty g(x / \tau^K) x^s \frac{dx}{x} = \tau^{-K s} \mathcal M g(s).$$
+Under the grade dilation operator $U_K g(x) = g(\tau^K x)$:
+$$\mathcal M(U_K g)(s) = \int_0^\infty g(\tau^K x) x^s \frac{dx}{x} = \tau^{-K s} \mathcal M g(s),$$
+via substitution $y = \tau^K x, x = \tau^{-K} y, dx/x = dy/y, x^s = \tau^{-Ks} y^s$.
 Applying this to the reflected spectral pairing:
 $$B(U_K g, U_J h) = \sum_\rho m_\rho \tau^{-K(\rho - 1/2)} \mathcal M g(\rho - \tfrac{1}{2}) \overline{\tau^{-J(1/2 - \bar\rho)} \mathcal M h(\tfrac{1}{2} - \bar\rho)}.$$
 Since $\overline{\tau^{-J(1/2 - \bar\rho)}} = \tau^{-J(1/2 - \rho)} = \tau^{J(\rho - 1/2)}$, the grade scaling combines to:
@@ -189,7 +212,7 @@ The dilation action depends strictly on the grade difference $K - J$.
 | Object | Mathematical Nature | Positivity Property | Strict Positivity Condition | Proof Obligation / Epistemic Status |
 |---|---|---|---|---|
 | **Arithmetic Overlap** $Q_\varepsilon^{K, J}[w]$ | Bilinear pairing of prime measures $\mu_K \otimes \mu_J$ against band kernel $\eta((x-y)/\varepsilon)$ | Entrywise non-negative: $Q_\varepsilon^{K, J}[w] \ge 0$ for all $K, J$ when $w, \eta \ge 0$. | Strict positivity requires at least one active station pair $(a_K n, a_J m)$ with $w(a_K n)w(a_J m) > 0$ and $|a_K n - a_J m| < \varepsilon$. | **PROVED & VERIFIED**: Vanishes identically for $\varepsilon < \Delta_W$ on compact window $W$ with $K \ne J$. Non-zero pairing away from diagonal. |
-| **Station Kernel Matrix** $H \in \mathbb R^{|\mathcal S| \times |\mathcal S|}$ | Matrix $H_{\alpha\beta} = \eta((x_\alpha - x_\beta)/\varepsilon)$ indexed by all stations $\alpha \in \mathcal S$ | Universal positive semi-definiteness on $\mathbb R^{|\mathcal S|}$. | Requires Bochner Fourier transform $\widehat\eta \ge 0$ everywhere on $\mathbb R$. | **FALSIFIED UNIVERSALLY**: $\eta$ is indefinite on $\mathbb R$ (counterexample $(1, 3/2, 2)$ at $\varepsilon = 1$ has $\lambda_{\min} \approx -0.013328 < 0$; $\widehat\eta(k) < 0$ on $[5.0, 8.8]$). |
+| **Station Kernel Matrix** $H \in \mathbb R^{|\mathcal S| \times |\mathcal S|}$ | Matrix $H_{\alpha\beta} = \eta((x_\alpha - x_\beta)/\varepsilon)$ indexed by all stations $\alpha \in \mathcal S$ | Positive semi-definiteness across arbitrary station configurations on $\mathbb R$. | Requires Bochner Fourier transform $\widehat\eta \ge 0$ everywhere on $\mathbb R$. | **NOT POSITIVE DEFINITE ON ALL CONFIGURATIONS**: $\eta$ is not positive definite on all configurations on $\mathbb R$ (counterexample $(1, 3/2, 2)$ at $\varepsilon = 1$ has $\lambda_{\min} \approx -0.013328 < 0$; $\widehat\eta(k) < 0$ on $[5.0, 8.8]$). |
 | **Grade Pullback Matrix** $G = E^* H E \in \mathbb R^{r \times r}$ | Matrix $G_{ij} = Q_\varepsilon^{K_i, K_j}[w]$ indexed by grades $\{K_1, \dots, K_r\}$ | Positive semi-definiteness on allowed subspace $\operatorname{im} E$. | **Small resolutions ($\varepsilon < \Delta_{\rm cross}$)**: Unconditionally PSD ($c^* G c \ge 0$). **Large resolutions**: Indefinite ($\lambda_{\min} \approx -0.022815 < 0$ at $\varepsilon=8.0$). | **RESOLUTION-DEPENDENT**: Proved unconditionally PSD for $\varepsilon < \Delta_{\rm cross}$ (`small_resolution_grade_psd`); indefinite witness verified at $\varepsilon=8.0$. |
 | **Weil Quadratic Form** $B(g, h)$ | Linear explicit formula distribution $\mathcal W$ on 1-variable group convolution $\Delta^{-1/2}(g * h^*)$ on $\mathbb R_+^*$ | Positivity on full centered test space: $B(g, g) \ge 0$ for all $g \in V_{\rm centered}$. | Positivity on the full space $V_{\rm centered}$ is **STRICTLY EQUIVALENT TO RH** (Weil 1952, Bombieri 2000, Connes–Consani 2026). | **CIRCULAR IF ASSUMED**: Cannot be assumed as an unconditional source of sign in a proof of RH without circularity. Off-line spectral pairing is NOT a sum of squared moduli. |
 
@@ -213,7 +236,7 @@ The challenger audited the revised definitions, code, and mathematical arguments
    *Resolution*: Rejected. Arithmetic vanishing $\mathsf A \vdash Q_\varepsilon = 0$ does not prove that deriving $\mathsf A, H \vdash Q_\varepsilon > 0$ is impossible. Fixed-window, varying-window, and global constructions all remain eligible research candidates.
 5. **Rejection 5 (Kernel Positive Definiteness on Stations vs Grades)**:
    *Overbroad claim*: "The grade matrix $G = (Q_\varepsilon^{K_i, K_j})$ cannot have a Gram representation or cannot be positive semi-definite."
-   *Resolution*: Rejected. This conflated station and grade scopes. While the station matrix $H$ is universally indefinite on $\mathbb R$, the grade matrix $G = E^* H E$ restricts to $\operatorname{im} E$. For $\varepsilon < \Delta_{\rm cross}$, cross-grade terms vanish and $G$ is diagonal with non-negative entries, making $G$ **unconditionally positive semi-definite** (`small_resolution_grade_psd`). At larger overlapping resolutions (e.g. $\varepsilon = 8.0$ on grades $\{0, 1\}$), $G$ becomes indefinite with explicit witness $c^T G c \approx -0.022815 < 0$.
+   *Resolution*: Rejected. This conflated station and grade scopes. While the station matrix $H$ is not positive definite on all configurations on $\mathbb R$, the grade matrix $G = E^* H E$ restricts to $\operatorname{im} E$. For $\varepsilon < \Delta_{\rm cross}$, cross-grade terms vanish and $G$ is diagonal with non-negative entries, making $G$ **unconditionally positive semi-definite** (`small_resolution_grade_psd`). At larger overlapping resolutions (e.g. $\varepsilon = 8.0$ on grades $\{0, 1\}$), $G$ becomes indefinite with explicit witness $c^T G c \approx -0.022815 < 0$. Indefiniteness at $\varepsilon = 8.0$ does not establish indefiniteness at every larger resolution.
 6. **Rejection 6 (Weil Test Space Centering Pole Conditions)**:
    *Overbroad claim*: "The centered Weil test space retains pole vanishing conditions at $0, 1$."
    *Resolution*: Rejected. Under the centering isomorphism $g(x) = x^{1/2} g_{\rm old}(x)$, Mellin arguments shift $\mathcal M g(s) = \mathcal M g_{\rm old}(s + 1/2)$, transporting pole conditions to $\mathcal M g(-1/2) = \mathcal M g(1/2) = 0$.
@@ -223,11 +246,11 @@ The challenger audited the revised definitions, code, and mathematical arguments
 
 ---
 
-## 8. Lean 4 Formalization (237 Declarations)
+## 8. Lean 4 Formalization (242 Declarations)
 
-The formal repository in `formal/RiemannScope/Grade.lean` contains **237 compiled declarations** under Lean 4.8.0 / Lake 5.0.0 with 0 sorry, 0 admit, 0 warnings, and standard Mathlib foundational axioms only (`[propext, Classical.choice, Quot.sound]`).
+The formal repository in `formal/RiemannScope/Grade.lean` contains **242 compiled declarations** under Lean 4.8.0 / Lake 5.0.0 with 0 sorry, 0 admit, 0 warnings, and standard Mathlib foundational axioms only (`[propext, Classical.choice, Quot.sound]`).
 
-### Newly Formalized Theorems
+### 8.1 Formalized Matrix & Station Theorems
 
 ```lean
 /-- Finite pullback quadratic form identity:
@@ -273,15 +296,130 @@ theorem small_resolution_grade_psd {r : Type*} [Fintype r] [DecidableEq r]
     (c : r → ℝ) :
     0 ≤ Matrix.dotProduct c (Matrix.mulVec G c)
 
-/-- Algebraic reduction of the smooth bump coupling condition s * a > 1:
-    For s^2 = 2 and a^3 = E_inv where E_inv = exp(-1),
-    the 6th power (s * a)^6 equals 8 * E_inv^2 = 8 / e^2.
-    Therefore, the condition s * a > 1 is strictly equivalent to 8 > e^2,
-    which holds for Euler's constant e since e < 2.72 and 2.72^2 = 7.3984 < 8. -/
-theorem smooth_bump_coupling_sixth_power (s a E_inv : ℝ)
-    (hs : s ^ 2 = 2) (ha : a ^ 3 = E_inv) :
-    (s * a) ^ 6 = 8 * E_inv ^ 2
+/-- Extension of real symmetric positive semi-definiteness to complex vectors:
+    For any real matrix G that is positive semi-definite on real vectors (v^T G v >= 0 for all v),
+    and any complex coefficient vector c, the sum of quadratic forms on its real and imaginary
+    parts is non-negative: (Re c)^T G (Re c) + (Im c)^T G (Im c) >= 0. -/
+theorem real_symmetric_matrix_complex_psd {r : Type*} [Fintype r]
+    (G : Matrix r r ℝ)
+    (h_psd : ∀ v : r → ℝ, 0 ≤ Matrix.dotProduct v (Matrix.mulVec G v))
+    (c : r → ℂ) :
+    let a : r → ℝ := fun i => (c i).re
+    let b : r → ℝ := fun i => (c i).im
+    0 ≤ Matrix.dotProduct a (Matrix.mulVec G a) + Matrix.dotProduct b (Matrix.mulVec G b)
+
+/-- Cross-grade entries vanish when station separation Δ exceeds resolution ε:
+    For any distinct grades i ≠ j, if all pairwise station distances |x i n - x j m| >= Δ > ε,
+    and η is supported in (-1, 1), then G i j = 0. -/
+theorem finite_grade_cross_entry_vanishes {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (i j : r) (hij : i ≠ j) :
+    stationGradeMatrix x d η ε i j = 0
+
+/-- Diagonal grade entries are non-negative from non-negative weights and kernel:
+    For any grade i, G i i = ∑ n, ∑ m, d i n * d i m * η(...) >= 0.
+    Handles empty station families unconditionally (empty sum is 0 >= 0). -/
+theorem finite_grade_diagonal_nonneg {r : Type*} [Fintype r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε : ℝ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (i : r) :
+    0 ≤ stationGradeMatrix x d η ε i i
+
+/-- Full finite-grade positive semi-definiteness theorem from station separation:
+    When cross-grade stations are separated by Δ > ε, and η has compact support in (-1, 1),
+    the grade matrix G = stationGradeMatrix x d η ε is positive semi-definite:
+    c^T G c >= 0 for every real grade coefficient vector c. -/
+theorem finite_grade_station_psd {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (c : r → ℝ) :
+    0 ≤ Matrix.dotProduct c (Matrix.mulVec (stationGradeMatrix x d η ε) c)
+
+/-- Complex positive semi-definiteness for separated grade stations:
+    For any complex grade coefficient vector c, the quadratic form on the real and imaginary parts
+    is non-negative: (Re c)^T G (Re c) + (Im c)^T G (Im c) >= 0. -/
+theorem finite_grade_station_complex_psd {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (c : r → ℂ) :
+    let G := stationGradeMatrix x d η ε
+    let a : r → ℝ := fun i => (c i).re
+    let b : r → ℝ := fun i => (c i).im
+    0 ≤ Matrix.dotProduct a (Matrix.mulVec G a) + Matrix.dotProduct b (Matrix.mulVec G b)
 ```
+
+### 8.2 Constructive Compact-Support Admissible Weil Test Function
+
+1. **Test Function Definition**:
+   Let $\chi \in C_c^\infty(\mathbb R)$ be a smooth cutoff with $0 \le \chi \le 1$, $\chi = 1$ on $[-1, 1]$, and $\operatorname{supp}(\chi) \subseteq [-2, 2]$.
+   For $R > 0$ and $\sigma = 1.0$:
+   $$f_R(u) = \left(\partial_u^2 - \frac{1}{4}\right)\left[\chi\left(\frac{u}{R}\right) e^{-u^2/(2\sigma^2)}\right], \qquad g_R(x) = f_R(\log x).$$
+   - **Compact Support**: $g_R \in C_c^\infty((0, \infty))$ with $\operatorname{supp}(g_R) \subseteq [e^{-2R}, e^{2R}] \subset (0, \infty)$.
+   - **Pole Cancellation**: By integration by parts, $\mathcal M g_R(s) = (s^2 - 1/4)\int_{\mathbb R} \chi(u/R) e^{-u^2/(2\sigma^2) + su} du$, which vanishes identically at $s = \pm 1/2$. Hence $g_R \in \mathcal V$ unconditionally.
+
+2. **Analytic Tail Error Bound**:
+   $$|\mathcal M g_R(s) - F_\sigma(s)| \le |s^2 - 1/4| \int_{|u| > R} e^{-u^2/(2\sigma^2) + \Re(s) u} du = |s^2 - 1/4| I_R(\Re(s), \sigma),$$
+   where the closed-form analytic expression is:
+   $$I_R(x, \sigma) = \sqrt{\frac{\pi}{2}}\sigma e^{\sigma^2 x^2 / 2} \left[\operatorname{erfc}\left(\frac{R - \sigma^2 x}{\sqrt{2}\sigma}\right) + \operatorname{erfc}\left(\frac{R + \sigma^2 x}{\sqrt{2}\sigma}\right)\right].$$
+
+3. **Quartet Propagation & Certified Negativity**:
+   On the synthetic off-line zero quartet generated by $\lambda = 0.1 + 14.134725i$:
+   - Gaussian control value ($\sigma = 1.0$): $B_{\mathcal Q}(F_\sigma, F_\sigma) \approx -1.63275439062 \times 10^{-81} < 0$.
+   - For $R = 15.0$: $\varepsilon_A \approx 8.71288 \times 10^{-48}$, $|A| \approx 2.08188 \times 10^{-41}$.
+   - Total quartet error bound: $\mathcal E_{\mathcal Q} = 8 |A| \varepsilon_A + 4 \varepsilon_A^2 \approx 1.45113 \times 10^{-87}$.
+   - Certified upper bound:
+     $$B_{\mathcal Q}(g_{15}, g_{15}) \le -1.63275439062 \times 10^{-81} + 1.45113 \times 10^{-87} \le -1.632752939 \times 10^{-81} < 0.$$
+   - **Epistemic Limitation**: This certifies strict negativity for the *finite synthetic quartet*, NOT the complete spectrum.
+
+### 8.3 Comparison Map Investigations & Structural Obstructions
+
+1. **Candidate A: Grade Orbit of One Admissible Test ($T_g c = \sum c_i U_{K_i} g$)**:
+   - Dilation law: $\mathcal M(U_K g)(s) = \tau^{-Ks} \mathcal M g(s)$.
+   - Spectral matrix: $W_{ij} = B(U_{K_j} g, U_{K_i} g) = \sum_\rho m_\rho \tau^{-(K_j - K_i)(\rho - 1/2)} \mathcal M g(\rho - 1/2) \overline{\mathcal M g(1/2 - \bar\rho)}$.
+   - **Equal Diagonal Obstruction**: $W_{ii} = B(g, g)$ is identical for all grades $i$. In contrast, the arithmetic matrix $G$ on window $[8, 20]$ has $G_{00} \approx 39.76$ and $G_{11} \approx 0.50$ (ratio $\approx 80:1$). The compact window breaks scale invariance by expelling stations at higher grades, whereas the dilation orbit preserves $L^2$ test mass.
+   - **Cauchy-Schwarz Barrier**: Under any rescaling $g_i = w_i g$, $\det W = w_0^2 w_1^2 (B(g, g)^2 - |B(U_1 g, U_0 g)|^2) \ge 0$ whenever $B$ is PSD. Hence no scaled orbit can reproduce the indefinite arithmetic matrix $\det G \approx -0.919 < 0$.
+
+2. **Candidate B: Smoothed Logarithmic Station Measure ($f_{\varepsilon, c} = (\partial_u^2 - 1/4)(\kappa_\varepsilon * \nu_c)$)**:
+   - Mellin transform: $\mathcal M(T_\varepsilon c)(s) = (s^2 - 1/4) \widehat\kappa_\varepsilon(-is) \sum_{i, n} c_i d_{i, n} x_{i, n}^s$. Pole vanishing $\mathcal M(T_\varepsilon c)(\pm 1/2) = 0$ holds identically.
+   - **Kernel Scaling Divergence**: The induced station-station pairing is an autocorrelation in logarithmic distance:
+     $$K_{\rm log}(x, y) = \Phi_\varepsilon(\log(x/y)) = (\kappa_\varepsilon * \kappa_\varepsilon^*)(\log x - \log y).$$
+     In contrast, the TC arithmetic observable $Q_\varepsilon^{K, J}$ pairs stations via the additive Euclidean band kernel $K_{\rm add}(x, y) = \eta((x - y)/\varepsilon)$.
+     The additive band has constant Euclidean width $\varepsilon$, while the logarithmic equivalent Euclidean width $\approx \varepsilon y$ expands linearly with height $y$.
+   - **Non-Intertwining**: Additive convolution on $\mathbb R$ and multiplicative convolution on $\mathbb R_+^*$ do not commute and cannot be isometrically intertwined on finite windows without altering the observable and the station gap $\Delta$.
+
+### 8.4 Full-Spectrum Remainder Control & Global Zero Barrier
+
+Decomposing the complete Weil quadratic form:
+$$B(Tc, Tc) = B_{\mathcal Q}(Tc, Tc) + R_{\mathcal Q}(Tc, Tc).$$
+1. **Critical-Line Positivity**: By the Paley-Wiener theorem, $\mathcal M(Tc)(i\gamma)$ cannot vanish at all critical-line zeros. Therefore:
+   $$\sum_{\rho \in \mathcal Z, \Re\rho = 1/2} |\mathcal M(Tc)(i\gamma_\rho)|^2 > 0 \quad \text{strictly positive}.$$
+2. **Remainder Non-Vanishing**: The positive critical-line sum enters the included remainder $R_{\mathcal Q}$.
+3. **Barrier**: Even though the finite quartet pairing $B_{\mathcal Q} \approx -1.63 \times 10^{-81} < 0$ is strictly negative on admissible test $g_{15}$, this negative contribution is overwhelmed by the infinite positive critical-line sum unless an independent, unproved premise on global zero cancellations is assumed.
+4. **Epistemic Conclusion**: Arithmetic separation constrains the arithmetic matrix $G$ to be PSD at small resolutions $\varepsilon < \Delta_{\rm cross}$, but does not bridge to the complete-spectrum Weil form $B$. The Transcendental Continuation bridge remains strictly **OPEN**.
 
 ---
 
@@ -289,12 +427,12 @@ theorem smooth_bump_coupling_sixth_power (s a E_inv : ℝ)
 
 | Verification Stage | Command Executed | Outcome | Details |
 |---|---|---|---|
-| **Mechanism Discovery Tests** | `python -m pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 32 passed in 15.2s; covers dynamic sieve, station pullback, small-resolution PSD, large-resolution witness, reflected Weil form. |
-| **Claim Pre-Acceptance Gates** | `python -m pytest .agents/verification/test_claim_audit_gates.py` | **PASSED** | 54 passed in 0.49s; 10 structural gates validated. |
+| **Mechanism Discovery Tests** | `pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 36 passed in 15.6s; covers compact support test, Candidates A & B, exact matrix reconciliation, dynamic sieve, station pullback, small-resolution PSD, large-resolution witness, reflected Weil form. |
+| **Claim Pre-Acceptance Gates** | `pytest .agents/verification/test_claim_audit_gates.py` | **PASSED** | 54 passed in 0.49s; 10 structural gates validated. |
 | **Claim Spec Audit** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file .agents/claims/CLM-TC-022.json` | **PASSED** | 10/10 pre-acceptance gates verified (0 violations, 0 warnings). |
 | **Claim Register Cross-Check** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --cross-check-register --repo-root .` | **PASSED** | All 110 claims in register verified (24 audited terminal, 78 grandfathered, 8 exempt). |
-| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | 1559 targets compiled cleanly; 237 project theorems. |
-| **Formal Build Certification** | `python scripts/build_formal.py --allow-dirty` | **PASSED** | Generated `formal/build_report.json` with 237 declarations (0 sorry, 0 admit). |
+| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | All targets compiled cleanly; 242 project theorems. |
+| **Formal Build Certification** | `python scripts/build_formal.py --allow-dirty` | **PASSED** | Generated `formal/build_report.json` with 242 declarations (0 sorry, 0 admit). |
 | **Check-Fast Tier** | `python scripts/workflow.py check-fast` | **PASSED** | Full fast-tier test suite passed. |
 | **Artifact Validation** | `python scripts/workflow.py validate-artifacts` | **PASSED** | Baseline certificates hash-pinned to immutable commit `82643cafd605492233c6c1e992b78c2c30d45f13`. |
 | **Canonical Plan Audit** | `python scripts/workflow.py plan-canonical` | **PASSED** | Canonical execution plan audited. |

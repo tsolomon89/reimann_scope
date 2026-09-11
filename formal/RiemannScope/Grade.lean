@@ -1735,4 +1735,130 @@ theorem smooth_bump_coupling_sixth_power (s a E_inv : ℝ)
   rw [h1, hs, ha]
   ring
 
+/-- Extension of real symmetric positive semi-definiteness to complex vectors:
+    For any real matrix G that is positive semi-definite on real vectors (v^T G v >= 0 for all v),
+    and any complex coefficient vector c, the sum of quadratic forms on its real and imaginary
+    parts is non-negative: (Re c)^T G (Re c) + (Im c)^T G (Im c) >= 0. -/
+theorem real_symmetric_matrix_complex_psd {r : Type*} [Fintype r]
+    (G : Matrix r r ℝ)
+    (h_psd : ∀ v : r → ℝ, 0 ≤ Matrix.dotProduct v (Matrix.mulVec G v))
+    (c : r → ℂ) :
+    let a : r → ℝ := fun i => (c i).re
+    let b : r → ℝ := fun i => (c i).im
+    0 ≤ Matrix.dotProduct a (Matrix.mulVec G a) + Matrix.dotProduct b (Matrix.mulVec G b) := by
+  intro a b
+  have ha := h_psd a
+  have hb := h_psd b
+  linarith
+
+/-- Grade matrix defined from finite station data and kernel convolution:
+    G_ij = ∑_{n in S_i} ∑_{m in S_j} d_{i,n} d_{j,m} η((x_{i,n} - x_{j,m}) / ε). -/
+noncomputable def stationGradeMatrix {r : Type*} [Fintype r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε : ℝ) : Matrix r r ℝ :=
+  fun i j => ∑ n : S i, ∑ m : S j, d i n * d j m * η ((x i n - x j m) / ε)
+
+/-- Cross-grade entries vanish when station separation Δ exceeds resolution ε:
+    For any distinct grades i ≠ j, if all pairwise station distances |x i n - x j m| >= Δ > ε,
+    and η is supported in (-1, 1), then G i j = 0. -/
+theorem finite_grade_cross_entry_vanishes {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (i j : r) (hij : i ≠ j) :
+    stationGradeMatrix x d η ε i j = 0 := by
+  dsimp [stationGradeMatrix]
+  have h_zero : ∀ (n : S i) (m : S j), d i n * d j m * η ((x i n - x j m) / ε) = 0 := by
+    intro n m
+    have hdist := h_sep i j hij n m
+    have hdiv : 1 ≤ |(x i n - x j m) / ε| := by
+      rw [abs_div, abs_of_pos hε_pos]
+      have h_le : ε ≤ |x i n - x j m| := le_trans (le_of_lt hε_lt_Δ) hdist
+      exact (one_le_div hε_pos).mpr h_le
+    have h_eta := hη_supp ((x i n - x j m) / ε) hdiv
+    rw [h_eta, mul_zero]
+  have h_inner : ∀ (n : S i), (∑ m : S j, d i n * d j m * η ((x i n - x j m) / ε)) = 0 := by
+    intro n
+    rw [Finset.sum_eq_zero]
+    intro m _
+    exact h_zero n m
+  rw [Finset.sum_eq_zero]
+  intro n _
+  exact h_inner n
+
+/-- Diagonal grade entries are non-negative from non-negative weights and kernel:
+    For any grade i, G i i = ∑ n, ∑ m, d i n * d i m * η(...) >= 0.
+    Handles empty station families unconditionally (empty sum is 0 >= 0). -/
+theorem finite_grade_diagonal_nonneg {r : Type*} [Fintype r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε : ℝ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (i : r) :
+    0 ≤ stationGradeMatrix x d η ε i i := by
+  dsimp [stationGradeMatrix]
+  apply Finset.sum_nonneg
+  intro n _
+  apply Finset.sum_nonneg
+  intro m _
+  have hdn : 0 ≤ d i n := hd i n
+  have hdm : 0 ≤ d i m := hd i m
+  have hη : 0 ≤ η ((x i n - x i m) / ε) := hη_nonneg ((x i n - x i m) / ε)
+  exact mul_nonneg (mul_nonneg hdn hdm) hη
+
+/-- Full finite-grade positive semi-definiteness theorem from station separation:
+    When cross-grade stations are separated by Δ > ε, and η has compact support in (-1, 1),
+    the grade matrix G = stationGradeMatrix x d η ε is positive semi-definite:
+    c^T G c >= 0 for every real grade coefficient vector c. -/
+theorem finite_grade_station_psd {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (c : r → ℝ) :
+    0 ≤ Matrix.dotProduct c (Matrix.mulVec (stationGradeMatrix x d η ε) c) := by
+  let G := stationGradeMatrix x d η ε
+  have h_cross : ∀ i j, i ≠ j → G i j = 0 := by
+    intro i j hij
+    exact finite_grade_cross_entry_vanishes x d η ε Δ hε_pos hε_lt_Δ hη_supp h_sep i j hij
+  have h_self : ∀ i, 0 ≤ G i i := by
+    intro i
+    exact finite_grade_diagonal_nonneg x d η ε hd hη_nonneg i
+  exact small_resolution_grade_psd G h_cross h_self c
+
+/-- Complex positive semi-definiteness for separated grade stations:
+    For any complex grade coefficient vector c, the quadratic form on the real and imaginary parts
+    is non-negative: (Re c)^T G (Re c) + (Im c)^T G (Im c) >= 0. -/
+theorem finite_grade_station_complex_psd {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (c : r → ℂ) :
+    let G := stationGradeMatrix x d η ε
+    let a : r → ℝ := fun i => (c i).re
+    let b : r → ℝ := fun i => (c i).im
+    0 ≤ Matrix.dotProduct a (Matrix.mulVec G a) + Matrix.dotProduct b (Matrix.mulVec G b) := by
+  intro G a b
+  have h_real_psd := finite_grade_station_psd x d η ε Δ hε_pos hε_lt_Δ hd hη_supp hη_nonneg h_sep
+  exact real_symmetric_matrix_complex_psd G h_real_psd c
+
 end RiemannScope

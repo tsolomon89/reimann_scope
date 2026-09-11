@@ -3099,7 +3099,7 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
      $$B(g, h) = \mathcal W(x^{-1/2}(g * h^*)) = \sum_\rho m_\rho \mathcal M g(\rho - 1/2) \overline{\mathcal M h(1/2 - \bar\rho)}.$$
    - On the critical line ($\rho = 1/2 + i\gamma$), $1/2 - \bar\rho = \rho - 1/2 = i\gamma$, yielding $|\mathcal M g(i\gamma)|^2 \ge 0$.
    - Off the critical line ($\rho = 1/2 + \delta + i\gamma, \delta \ne 0$), the arguments are reflected across the imaginary axis ($\delta + i\gamma$ and $-\delta + i\gamma$).
-   - For admissible test function $f(u) = (\partial_u^2 - 1/4) f_0(u)$, the quartet pairing evaluates to $\approx -4.08187 \times 10^{-82} < 0$, while the naive squared-modulus sum would be $+4.33421 \times 10^{-82} > 0$.
+   - For admissible test function $f(u) = (\partial_u^2 - 1/4) f_0(u)$ with $\sigma = 1.0$, the quartet pairing evaluates to $\approx -1.63275 \times 10^{-81} < 0$, while the naive squared-modulus sum would be $+1.73369 \times 10^{-81} > 0$.
    - Replacing the reflected pairing with squared moduli falsely assumes positivity off-line and is mathematically invalid.
    - TC grade dilation action carries factor $\tau^{-(K-J)(\rho - 1/2)}$ with consistent grade orientation $K - J$.
 
@@ -3112,3 +3112,44 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
 6. **Epistemic Assessment**:
    - No new implication from an off-line zero to forbidden arithmetic coincidence $m\tau^K = n\tau^J$ was established.
    - The Transcendental Continuation bridge remains strictly **OPEN**.
+
+## 42.9 Constructive Compact-Support Weil Test, Formal Arithmetic-to-PSD Chain (242 Lean Theorems), and Comparison Map Obstructions (Candidates A and B)
+
+1. **Constructive Compact-Support Admissible Weil Test Function**:
+   - Constructed $f_R(u) = (\partial_u^2 - 1/4)[\chi(u/R)e^{-u^2/(2\sigma^2)}]$, $g_R(x) = f_R(\log x) \in C_c^\infty((0, \infty))$ supported on $[e^{-2R}, e^{2R}]$.
+   - Compact support in $[e^{-2R}, e^{2R}] \subset (0, \infty)$ and pole cancellation $\mathcal M g_R(\pm 1/2) = 0$ proved by integration by parts.
+   - Closed-form analytic tail integral:
+     $$I_R(x, \sigma) = \sqrt{\frac{\pi}{2}}\sigma e^{\sigma^2 x^2 / 2} \left[\operatorname{erfc}\left(\frac{R - \sigma^2 x}{\sqrt{2}\sigma}\right) + \operatorname{erfc}\left(\frac{R + \sigma^2 x}{\sqrt{2}\sigma}\right)\right].$$
+   - Pointwise transform bound: $|\mathcal M g_R(s) - F_\sigma(s)| \le |s^2 - 1/4| I_R(\Re(s), \sigma)$.
+   - For $R = 15.0$ and $\sigma = 1.0$, quartet product error is $\le 1.46 \times 10^{-87}$.
+   - Certified upper bound: $B_{\mathcal Q}(g_{15}, g_{15}) \le -1.63275 \times 10^{-81} + 1.46 \times 10^{-87} < 0$ strictly negative!
+   - Rigorously noted: This is a synthetic finite quartet control, NOT a complete-spectrum result.
+
+2. **Formal Arithmetic-to-PSD Chain in Lean 4**:
+   - Formalized 5 new theorems in `formal/RiemannScope/Grade.lean`:
+     - `real_symmetric_matrix_complex_psd`: For real symmetric PSD $G$, $(\Re c)^T G (\Re c) + (\Im c)^T G (\Im c) \ge 0$ for all $c \in \mathbb C^r$.
+     - `stationGradeMatrix`: $G_{ij} = \sum_{n \in S_i, m \in S_j} d_{i, n} d_{j, m} \eta((x_{i, n} - x_{j, m})/\varepsilon)$.
+     - `finite_grade_cross_entry_vanishes`: For $i \ne j$, when $\varepsilon < \Delta \le |x_{i, n} - x_{j, m}|$ and $\operatorname{supp}(\eta) \subseteq (-1, 1)$, $G_{ij} = 0$.
+     - `finite_grade_diagonal_nonneg`: For non-negative weights $d \ge 0$ and $\eta \ge 0$, $G_{ii} \ge 0$ unconditionally (handles empty stations).
+     - `finite_grade_station_psd`: $c^T G c \ge 0$ for all real $c$.
+     - `finite_grade_station_complex_psd`: Complex extension for separated station data.
+   - Total compiled Lean 4 project theorems: **242** (0 sorry, standard Mathlib axioms).
+
+3. **Candidate A Comparison Map (Grade Orbit) Structural Obstruction**:
+   - $T_g c = \sum c_i U_{K_i} g$ with $U_K g(x) = g(\tau^K x)$.
+   - Induced spectral matrix $W_{ij} = B(U_{K_j} g, U_{K_i} g)$ forces $W_{ii} = B(g, g)$ identical for all grades (Toeplitz).
+   - In contrast, fixed-window arithmetic matrix $G$ has $G_{00} \approx 39.76$, $G_{11} \approx 0.50$ (ratio $\approx 80:1$).
+   - Obstruction: Spatial window $[a, b]$ breaks scale invariance, whereas the dilation orbit preserves full $L^2$ norm.
+   - Cauchy-Schwarz barrier: Under any rescaling $g_i = w_i g$, $\det W \ge 0$ whenever $B$ is PSD, so no scaled orbit can reproduce the indefinite arithmetic matrix $\det G \approx -0.919 < 0$.
+
+4. **Candidate B Comparison Map (Smoothed Logarithmic Measure) Structural Obstruction**:
+   - Smoothing $\nu_c = \sum c_i d_{i, n} \delta_{\log x_{i, n}}$ via $f_{\varepsilon, c} = (\partial_u^2 - 1/4)(\kappa_\varepsilon * \nu_c)$ yields Mellin transform $\mathcal M(T_\varepsilon c)(s) = (s^2 - 1/4)\widehat\kappa_\varepsilon(-is)\sum c_i d_{i, n} x_{i, n}^s$.
+   - Induced pairing is an autocorrelation in logarithmic distance $K_{\rm log}(x, y) = \Phi_\varepsilon(\log(x/y))$.
+   - Divergence from additive Euclidean band kernel $\eta((x - y)/\varepsilon)$: additive width is constant $\varepsilon$, whereas logarithmic equivalent Euclidean width $\approx \varepsilon y$ expands linearly with height $y$.
+   - Non-intertwining: Additive convolution on $\mathbb R$ and multiplicative convolution on $\mathbb R_+^*$ do not commute.
+
+5. **Full-Spectrum Remainder Barrier**:
+   - Decomposition $B(Tc, Tc) = B_{\mathcal Q} + R_{\mathcal Q}$.
+   - By Paley-Wiener, $\mathcal M g(i\gamma)$ cannot vanish at all critical-line zeros; the critical-line sum $\sum_\gamma |\mathcal M g(i\gamma)|^2 > 0$ is strictly positive.
+   - Finite quartet negativity cannot be transferred to the complete sum without an unproved global zero distribution premise.
+   - TC bridge remains strictly **OPEN**.
