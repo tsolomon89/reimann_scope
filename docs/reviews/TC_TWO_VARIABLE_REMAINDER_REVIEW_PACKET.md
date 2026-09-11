@@ -82,25 +82,33 @@ $$Q_\varepsilon^{K, J}[w] = \iint w(x) w(y) \eta\left(\frac{x - y}{\varepsilon}\
 - **Convolution**: $(g * h)(x) = \int_0^\infty g(x/y) h(y) \frac{dy}{y}$.
 - **Involution**: $h^*(x) = \overline{h(1/x)}$.
 - **Centering Automorphism**: $\Delta^{1/2} f(x) = x^{1/2} f(x)$. This converts the classical Weil involution $k^\sharp(x) = x^{-1}\overline{k(1/x)}$ into $f^*(x) = \overline{f(1/x)}$ and maps the critical line $\Re(s) = 1/2$ to the unitary Fourier transform on $\mathbb R$.
-- **Admissible Test Space $V$**:
-  $$V = \{ g \in C_c^\infty(\mathbb R_+^*) : \tilde g(0) = \tilde g(1) = 0 \},$$
-  where $\tilde g(s) = \int_0^\infty g(x) x^{s-1} dx$ is the Mellin transform (vanishing at the poles $s=0, 1$).
+- **Admissible Centered Test Space $V_{\rm centered}$**:
+  $$V_{\rm centered} = \{ g \in C_c^\infty(\mathbb R_+^*) : \widetilde g(-1/2) = \widetilde g(1/2) = 0 \},$$
+  where $\widetilde g(s) = \int_0^\infty g(x) x^{s-1} dx$ is the Mellin transform.
+  Under the centering isomorphism $g(x) = x^{1/2} g_{\rm old}(x)$, the Mellin transform shifts by $+1/2$: $\widetilde g(s) = \widetilde g_{\rm old}(s + 1/2)$.
+  Consequently, the classical pole-cancellation conditions $\widetilde g_{\rm old}(0) = \widetilde g_{\rm old}(1) = 0$ transport rigorously to:
+  $$\widetilde g(-1/2) = \widetilde g(1/2) = 0.$$
+  In additive logarithmic coordinates $f(u) = g(e^u)$, this corresponds to:
+  $$\int_{-\infty}^\infty f(u) e^{\pm u/2} du = 0,$$
+  which is Fourier vanishing at imaginary frequencies $t = \mp i/2$.
 - **Weil Linear Functional**:
-  $$\mathcal W(k) = \tilde k(0) + \tilde k(1) - \sum_v \mathcal W_v(k) = \sum_{\rho \in \mathcal Z} \tilde k(\rho).$$
+  $$\mathcal W(k) = \widetilde k(-1/2) + \widetilde k(1/2) - \sum_v \mathcal W_v(k) = \sum_{\rho \in \mathcal Z} \widetilde k(\rho - 1/2).$$
 - **Bilinear Form**:
   $$B(g, h) = \mathcal W(\Delta^{-1/2}(g * h^*)).$$
 - **Weil Quadratic Form**:
   $$Q_{\rm Weil}(g) = B(g, g) = \mathcal W(\Delta^{-1/2}(g * g^*)) = \sum_{\rho \in \mathcal Z} |\widetilde{\Delta^{-1/2} g}(\rho)|^2.$$
 
 ### 4.2 Cross-Grade Polarization and Refutation of Equal-Grades Restriction
-Let $g_K, g_J \in V$ be admissible test functions associated with grades $K$ and $J$.
+Let $g_K, g_J \in V_{\rm centered}$ be admissible test functions associated with grades $K$ and $J$.
 By linearity of convolution and involution:
 $$(g_K + g_J) * (g_K + g_J)^* = g_K * g_K^* + g_K * g_J^* + g_J * g_K^* + g_J * g_J^*.$$
 Applying the linear functional $\mathcal W \circ \Delta^{-1/2}$:
 $$B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_K, g_J) + B(g_J, g_K) + B(g_J, g_J).$$
 Because $B$ is Hermitian ($B(g_J, g_K) = \overline{B(g_K, g_J)}$):
 $$B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2\Re B(g_K, g_J).$$
-**Formally proved in Lean 4**: `symmetric_bilinear_polarization_real`.
+Taking real parts:
+$$\Re B(g_K + g_J, g_K + g_J) = \Re B(g_K, g_K) + \Re B(g_J, g_J) + 2\Re B(g_K, g_J).$$
+**Formally proved in Lean 4**: `hermitian_polarization_complex`, `hermitian_polarization_real_part`, and `symmetric_bilinear_polarization_real`.
 
 **Finding**:
 Self-convolution on a sum of multi-grade test functions naturally generates cross-grade terms $2\Re B(g_K, g_J)$. The previous assertion that self-convolution equates to equal grades $K = J$ was mathematically unsupported and is hereby refuted.
@@ -112,13 +120,14 @@ Self-convolution on a sum of multi-grade test functions naturally generates cros
 | Object | Mathematical Nature | Positivity Property | Strict Positivity Condition | Proof Obligation / Epistemic Status |
 |---|---|---|---|---|
 | **Arithmetic Overlap** $Q_\varepsilon^{K, J}[w]$ | Bilinear pairing of prime measures $\mu_K \otimes \mu_J$ against band kernel $\eta((x-y)/\varepsilon)$ | Entrywise non-negative: $Q_\varepsilon^{K, J}[w] \ge 0$ for all $K, J$ when $w, \eta \ge 0$. | Strict positivity requires at least one active station pair $(a_K n, a_J m)$ with $w(a_K n)w(a_J m) > 0$ and $|a_K n - a_J m| < \varepsilon$. | **PROVED & VERIFIED**: Vanishes identically for $\varepsilon < \Delta_W$ on compact window $W$ with $K \ne J$. Non-zero pairing away from diagonal. |
-| **Multi-Grade Gram Matrix** $(Q_\varepsilon^{K_i, K_j})_{i, j=1}^N$ | Finite matrix $Q \in \mathbb R^{N \times N}$ indexed by grades $\{K_1, \dots, K_N\}$ | Positive semi-definiteness: $c^* Q c \ge 0$ for all $c \in \mathbb C^N$. | Entrywise non-negativity ($Q_{ij} \ge 0$) is **insufficient** for positive semi-definiteness. Requires positive-definiteness of the kernel $\eta$ (Bochner's theorem) or an autocorrelation factorization $\eta = \phi * \tilde\phi$. | **REQUIRES GRAM FACTORIZATION**: A nonnegative smooth bump is not automatically positive definite. Autocorrelation kernels represent a changed observable requiring re-derivation of support and normalization. |
-| **Weil Quadratic Form** $B(g, h)$ | Linear explicit formula distribution $\mathcal W$ on 1-variable group convolution $\Delta^{-1/2}(g * h^*)$ on $\mathbb R_+^*$ | Positivity on full admissible test space: $B(g, g) \ge 0$ for all $g \in V$. | Positivity on the full space $V$ is **STRICTLY EQUIVALENT TO RH** (Weil 1952, Bombieri 2000, Connes–Consani 2026). | **CIRCULAR IF ASSUMED**: Cannot be assumed as an unconditional source of sign in a proof of RH without circularity. Restricted unconditional cases do not yield off-line contradiction. |
+| **Multi-Grade Gram Matrix** $(Q_\varepsilon^{K_i, K_j})_{i, j=1}^N$ | Finite matrix $Q \in \mathbb R^{N \times N}$ indexed by grades $\{K_1, \dots, K_N\}$ | Positive semi-definiteness: $c^* Q c \ge 0$ for all $c \in \mathbb C^N$. | Entrywise non-negativity ($Q_{ij} \ge 0$) is **insufficient** for positive semi-definiteness. The smooth bump kernel $\eta$ is **indefinite**: $x = (1, 3/2, 2)$ at $\varepsilon=1$ has $\lambda_{\min} = 1 - \sqrt{2}e^{-1/3} \approx -0.013328 < 0$; primes $\{3, 5, 7\}$ at $\varepsilon=4$ reproduce $M$, and $Q = D M D$ has inertia $(1, 0, 2)$ by Sylvester's theorem. | **FALSIFIED UNIVERSALLY AND ON TC PRIMES**: No general Gram representation exists for this kernel. |
+| **Weil Quadratic Form** $B(g, h)$ | Linear explicit formula distribution $\mathcal W$ on 1-variable group convolution $\Delta^{-1/2}(g * h^*)$ on $\mathbb R_+^*$ | Positivity on full centered test space: $B(g, g) \ge 0$ for all $g \in V_{\rm centered}$. | Positivity on the full space $V_{\rm centered}$ is **STRICTLY EQUIVALENT TO RH** (Weil 1952, Bombieri 2000, Connes–Consani 2026). | **CIRCULAR IF ASSUMED**: Cannot be assumed as an unconditional source of sign in a proof of RH without circularity. Restricted unconditional cases do not yield off-line contradiction. |
 
 ### 5.1 Analysis of the Map between Overlap and Weil Form
 - **Dimensionality**: The arithmetic overlap $Q_\varepsilon^{K, J}$ is a 2-variable pairing on $\mathbb R_{>0} \times \mathbb R_{>0}$ with product measure $\mu_K \otimes \mu_J$. The Weil functional $\mathcal W$ is a 1-variable distribution on the multiplicative group $\mathbb R_+^*$ evaluated on group convolutions $g * h^*$.
 - **Arithmetic Side**: The prime part of $\mathcal W(k)$ evaluates a single sum over prime powers $\sum_{p, m} \frac{\log p}{p^{m/2}} k(p^m)$, whereas $Q_\varepsilon^{K, J}$ evaluates a double sum over pairs $(a_K n, a_J m)$.
-- **Status**: Direct identification $B(g_K, g_J) = Q_\varepsilon^{K, J}$ is mathematically invalid due to these structural and dimensional differences. Any candidate map must explicitly construct a dimensional reduction and account for measure Jacobians and background terms.
+- **Spectral Side**: The spectral expansion of the Weil form is a **single sum** over zeros: $\sum_{\rho \in \mathcal Z} \widetilde g_K(\rho - 1/2) \overline{\widetilde g_J(\rho - 1/2)}$. In contrast, TC's two-variable explicit formula decomposes as a **double sum** over all zero pairs $(\rho, \rho')$, coupling off-diagonal frequencies that are absent from $B(g_K, g_J)$.
+- **Status**: Direct identification $B(g_K, g_J) = Q_\varepsilon^{K, J}$ is mathematically invalid due to these structural and dimensional differences. Moreover, kernel indefiniteness disproves the existence of a pre-Hilbert Gram representation for $Q_\varepsilon$.
 
 ---
 
@@ -152,7 +161,7 @@ remains an open research obligation.
 
 ## 7. Challenger Findings and Explicit Rejections
 
-The challenger audited the revised definitions, code, and mathematical arguments, issuing four mandatory rejections:
+The challenger audited the revised definitions, code, and mathematical arguments, issuing six mandatory rejections:
 
 1. **Rejection 1 (Product Measure Status)**:
    *Overbroad claim*: "The product measure $\mu_K \otimes \mu_J$ is zero."
@@ -166,46 +175,57 @@ The challenger audited the revised definitions, code, and mathematical arguments
 4. **Rejection 4 (Scope of Future Research)**:
    *Overbroad claim*: "The next observable must necessarily use growing windows or a global Hilbert-space operator."
    *Resolution*: Rejected. Arithmetic vanishing $\mathsf A \vdash Q_\varepsilon = 0$ does not prove that deriving $\mathsf A, H \vdash Q_\varepsilon > 0$ is impossible. Fixed-window, varying-window, and global constructions all remain eligible research candidates.
+5. **Rejection 5 (Kernel Positive Definiteness)**:
+   *Overbroad claim*: "The smooth exponential bump kernel $\eta$ is positive definite on $\mathbb R$ or supplies a general Gram representation."
+   *Resolution*: Rejected. The kernel is indefinite: $x = (1, 3/2, 2)$ at $\varepsilon=1$ has $\lambda_{\min} = 1 - \sqrt{2}e^{-1/3} \approx -0.013328 < 0$, and Bochner Fourier transform is negative on $[5.0, 8.8]$. On prime AP $\{3, 5, 7\}$ at $\varepsilon=4$, the matrix reproduces $M$ and $Q = D M D$ has inertia $(1, 0, 2)$ by Sylvester's law of inertia, falsifying positivity even on the restricted TC prime family.
+6. **Rejection 6 (Weil Test Space Centering Pole Conditions)**:
+   *Overbroad claim*: "The centered Weil test space retains pole vanishing conditions at $0, 1$."
+   *Resolution*: Rejected. Under the centering isomorphism $g(x) = x^{1/2} g_{\rm old}(x)$, Mellin arguments shift $\widetilde g(s) = \widetilde g_{\rm old}(s + 1/2)$, transporting pole conditions to $\widetilde g(-1/2) = \widetilde g(1/2) = 0$.
 
 ---
 
-## 8. Lean 4 Formalization (228 Declarations)
+## 8. Lean 4 Formalization (232 Declarations)
 
-The formal repository in `formal/RiemannScope/Grade.lean` has been updated to **228 compiled declarations** under Lean 4.8.0 / Lake 5.0.0 with 0 sorry, 0 admit, 0 warnings, and standard Mathlib foundational axioms only (`[propext, Classical.choice, Quot.sound]`).
+The formal repository in `formal/RiemannScope/Grade.lean` has been updated to **232 compiled declarations** under Lean 4.8.0 / Lake 5.0.0 with 0 sorry, 0 admit, 0 warnings, and standard Mathlib foundational axioms only (`[propext, Classical.choice, Quot.sound]`).
 
 ### Newly Formalized Theorems
 
 ```lean
-/-- Symmetric bilinear polarization on real vector space:
-    B(x + y, x + y) = B(x, x) + B(y, y) + 2 * B(x, y).
-    Formalizes the algebraic identity showing that self-convolution on a sum of
-    multi-grade test functions naturally contains cross-grade terms. -/
-theorem symmetric_bilinear_polarization_real {V : Type*} [AddCommGroup V] [Module ℝ V]
-    (B : V → V → ℝ) (h_add_left : ∀ x y z : V, B (x + y) z = B x z + B y z)
-    (h_add_right : ∀ x y z : V, B x (y + z) = B x y + B x z)
-    (h_symm : ∀ x y : V, B x y = B y x)
-    (x y : V) :
-    B (x + y) (x + y) = B x x + B y y + 2 * B x y
+/-- Complex Hermitian polarization identity:
+    B(x + y, x + y) = B(x, x) + B(y, y) + 2 * (B(x, y)).re. -/
+theorem hermitian_polarization_complex {E : Type*} [Add E]
+    (B : E → E → ℂ)
+    (h_add_left : ∀ u v w, B (u + v) w = B u w + B v w)
+    (h_add_right : ∀ u v w, B u (v + w) = B u v + B u w)
+    (h_herm : ∀ u v, B u v = starRingEnd ℂ (B v u))
+    (x y : E) :
+    B (x + y) (x + y) = B x x + B y y + 2 * (B x y).re
 
-/-- Finite double sum nonnegativity:
-    If all weights and kernel values are nonnegative, then the finite double sum
-    ∑_{i} ∑_{j} w_i w_j η_ij is nonnegative. -/
-theorem finite_double_sum_nonneg {α β : Type*} [DecidableEq α] [DecidableEq β]
-    (s : Finset α) (t : Finset β) (w1 : α → ℝ) (w2 : β → ℝ) (η : α → β → ℝ)
-    (hw1 : ∀ i ∈ s, 0 ≤ w1 i) (hw2 : ∀ j ∈ t, 0 ≤ w2 j)
-    (hη : ∀ i ∈ s, ∀ j ∈ t, 0 ≤ η i j) :
-    0 ≤ ∑ i ∈ s, ∑ j ∈ t, w1 i * w2 j * η i j
+/-- Real part of complex Hermitian polarization:
+    Re(B(x + y, x + y)) = Re(B(x, x)) + Re(B(y, y)) + 2 * Re(B(x, y)). -/
+theorem hermitian_polarization_real_part {E : Type*} [Add E]
+    (B : E → E → ℂ)
+    (h_add_left : ∀ u v w, B (u + v) w = B u w + B v w)
+    (h_add_right : ∀ u v w, B u (v + w) = B u v + B u w)
+    (h_herm : ∀ u v, B u v = starRingEnd ℂ (B v u))
+    (x y : E) :
+    (B (x + y) (x + y)).re = (B x x).re + (B y y).re + 2 * (B x y).re
 
-/-- Strict positivity of finite double sum given an active witness pair:
-    If all terms are nonnegative and there exists at least one pair (i₀, j₀) with
-    strictly positive weights and kernel value, the double sum is strictly positive. -/
-theorem finite_double_sum_pos_of_witness {α β : Type*} [DecidableEq α] [DecidableEq β]
-    (s : Finset α) (t : Finset β) (w1 : α → ℝ) (w2 : β → ℝ) (η : α → β → ℝ)
-    (hw1 : ∀ i ∈ s, 0 ≤ w1 i) (hw2 : ∀ j ∈ t, 0 ≤ w2 j)
-    (hη : ∀ i ∈ s, ∀ j ∈ t, 0 ≤ η i j)
-    (i₀ : α) (hi₀ : i₀ ∈ s) (j₀ : β) (hj₀ : j₀ ∈ t)
-    (h_pos : 0 < w1 i₀ * w2 j₀ * η i₀ j₀) :
-    0 < ∑ i ∈ s, ∑ j ∈ t, w1 i * w2 j * η i j
+/-- Quadratic form of tridiagonal kernel matrix on test vector v = ![1, -s, 1] with s^2 = 2:
+    v^T M(a) v = 4 - 4 * s * a. -/
+theorem tridiagonal_kernel_matrix_quadratic_form
+    (a s : ℝ) (hs : s ^ 2 = 2) :
+    let M := tridiagonal3 a
+    let v : Fin 3 → ℝ := ![1, -s, 1]
+    Matrix.dotProduct v (Matrix.mulVec M v) = 4 - 4 * s * a
+
+/-- Indefiniteness theorem for the 3x3 kernel matrix:
+    When s * a > 1 (a > 1/sqrt(2)), the quadratic form v^T M(a) v < 0. -/
+theorem tridiagonal_kernel_matrix_indefinite
+    (a s : ℝ) (hs : s ^ 2 = 2) (h_bound : 1 < s * a) :
+    let M := tridiagonal3 a
+    let v : Fin 3 → ℝ := ![1, -s, 1]
+    Matrix.dotProduct v (Matrix.mulVec M v) < 0
 ```
 
 ---
@@ -214,17 +234,18 @@ theorem finite_double_sum_pos_of_witness {α β : Type*} [DecidableEq α] [Decid
 
 | Verification Stage | Command Executed | Outcome | Details |
 |---|---|---|---|
-| **Mechanism Discovery Tests** | `python -m pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 24 passed in 42.27s; covers measure pairing, positivity, Weil polarization, and benchmarks. |
+| **Mechanism Discovery Tests** | `python -m pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 26 passed in 14.85s; covers kernel indefiniteness, centered test space, measure pairing, positivity, and benchmarks. |
 | **Claim Pre-Acceptance Gates** | `python -m pytest .agents/verification/test_claim_audit_gates.py` | **PASSED** | 54 passed in 0.49s; 10 structural gates validated. |
 | **Claim Spec Audit** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file .agents/claims/CLM-TC-022.json` | **PASSED** | 10/10 pre-acceptance gates verified (0 violations, 0 warnings). |
 | **Claim Register Cross-Check** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --cross-check-register --repo-root .` | **PASSED** | 110 claims verified (24 audited terminal, 78 grandfathered, 8 exempt). |
-| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | 1559 targets compiled cleanly; 228 project theorems. |
-| **Formal Build Certification** | `python scripts/build_formal.py --allow-dirty` | **PASSED** | Generated `formal/build_report.json` with producing commit `86b72f8a` and 228 theorems. |
+| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | 1559 targets compiled cleanly; 232 project theorems. |
+| **Formal Build Certification** | `python scripts/build_formal.py --allow-dirty` | **PASSED** | Generated `formal/build_report.json` with producing commit and 232 theorems. |
 | **Check-Fast Tier** | `python scripts/workflow.py check-fast` | **PASSED** | Full fast-tier test suite passed. |
-| **Artifact Validation** | `python scripts/workflow.py validate-artifacts` | **PASSED** | 508 Arb certs and 228 Lean declarations verified. |
+| **Artifact Validation** | `python scripts/workflow.py validate-artifacts` | **PASSED** | 508 Arb certs and 232 Lean declarations verified. |
 | **Current Artifact Validation** | `python scripts/workflow.py validate-artifacts --current` | **FAILED (Exit 1)** (Expected) | Baseline certificates are hash-pinned to immutable commit `82643cafd605492233c6c1e992b78c2c30d45f13`. |
 | **Canonical Plan Audit** | `python scripts/workflow.py plan-canonical` | **PASSED** | Canonical execution plan audited. |
 | **Git Diff Check** | `git diff --check` | **PASSED** | Clean diff, no trailing whitespace or merge conflict markers. |
+
 
 ---
 

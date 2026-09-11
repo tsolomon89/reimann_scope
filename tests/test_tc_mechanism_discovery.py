@@ -2598,14 +2598,14 @@ def test_epic_weil_positivity_and_cross_grade_polarization():
     Verify:
     1. Connes-Consani (2026), Weil (1952), Bombieri (2000) conventions:
        multiplicative Haar convolution, involution h^*(x) = conj(h(1/x)),
-       centering Delta^{-1/2}, admissible space V.
+       centering Delta^{-1/2}, centered admissible space V_centered.
     2. Polarization formula: B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2*Re B(g_K, g_J),
        refuting the unsupported identification of self-convolution with equal grades K = J.
     3. Three-form comparison table distinguishing Arithmetic overlap Q_eps,
-       Multi-grade Gram matrix, and Weil form B(g, h) (RH-equivalent).
+       Multi-Grade matrix (falsified positive-definiteness for smooth bump), and Weil form B(g, h) (RH-equivalent).
     4. Map analysis: dimensional reduction from 2-variable measure pairing to 1-variable group convolution.
     5. Attempted derivation 5-step record stopping at exact remainder cancellation R = -A.
-    6. Challenger rejections of all 4 overbroad claims.
+    6. Challenger rejections of overbroad claims (including kernel indefiniteness and centering).
     """
     res = transcendental.audit_weil_positivity_and_tc_bridge_comparison(dps=25)
     assert res['classification'] == 'COMPARISON_COMPLETED'
@@ -2617,10 +2617,13 @@ def test_epic_weil_positivity_and_cross_grade_polarization():
     assert 'du / u' in conv['haar_measure']
     assert 'Delta^{1/2}' in conv['centering_automorphism']
     assert 'B(g, h) = W(Delta^{-1/2}(g * h^*))' in conv['bilinear_weil_form']
+    assert 'tilde{g}(-1/2) = tilde{g}(1/2) = 0' in conv['admissible_test_space_V']
 
     pol = res['polarization_analysis']
     assert '2 * Re B(g_K, g_J)' in pol['hermitian_polarization_formula']
-    assert pol['formal_lean_theorem'] == 'RiemannScope.symmetric_bilinear_polarization_real'
+    assert 'hermitian_polarization_complex' in pol['complex_hermitian_polarization']
+    assert 'hermitian_polarization_real_part' in pol['complex_hermitian_real_part_polarization']
+    assert 'RiemannScope.hermitian_polarization_complex' in pol['formal_lean_theorems']
 
     table = res['three_form_comparison_table']
     assert len(table) == 3
@@ -2633,7 +2636,7 @@ def test_epic_weil_positivity_and_cross_grade_polarization():
     arith_item = next(item for item in table if 'Arithmetic Overlap' in item['object'])
     assert 'Entrywise non-negative' in arith_item['positivity_property']
     gram_item = next(item for item in table if 'Multi-Grade Matrix' in item['object'])
-    assert 'Positive semi-definiteness' in gram_item['positivity_property']
+    assert 'FALSIFIED' in gram_item['epistemic_status']
     weil_item = next(item for item in table if 'Weil Quadratic Form' in item['object'])
     assert 'EQUIVALENT TO RH' in weil_item['strict_positivity_condition']
 
@@ -2641,6 +2644,7 @@ def test_epic_weil_positivity_and_cross_grade_polarization():
     m_analysis = res['map_analysis']
     assert 'tensor product' in m_analysis['dimensional_and_measure_distinction']
     assert '1-variable multiplicative convolution' in m_analysis['dimensional_and_measure_distinction']
+    assert 'spectral_side_structure' in m_analysis
 
     # Attempted derivation record
     rec = res['attempted_derivation_record']
@@ -2651,10 +2655,75 @@ def test_epic_weil_positivity_and_cross_grade_polarization():
     assert 'step_5_earliest_unsupported_inference' in rec
     assert 'bar{R}^{full}_eps = -bar{A}_{eps, Gamma}' in rec['step_5_earliest_unsupported_inference']
 
-    # Challenger rejections: 4 items
+    # Challenger rejections: 6 items
     rej = res['challenger_rejections']
-    assert len(rej) == 4
+    assert len(rej) == 6
     assert 'product measure' in rej['rejection_1']['claim_rejected'].lower()
     assert 'equal grades' in rej['rejection_2']['claim_rejected'].lower()
     assert 'self-convolution' in rej['rejection_3']['claim_rejected'].lower()
     assert 'growing windows' in rej['rejection_4']['claim_rejected'].lower()
+    assert 'positive definite' in rej['rejection_5']['claim_rejected'].lower()
+    assert 'centering' in rej['rejection_6']['claim_rejected'].lower()
+
+
+def test_epic_smooth_kernel_indefiniteness_counterexample():
+    """
+    Verify:
+    1. Smooth exponential bump kernel eta(v) = exp(1 - 1/(1-v^2)) * 1_{|v|<1} is NOT positive definite.
+    2. Exact counterexample on x = (1, 3/2, 2) at eps = 1 yields M = [[1, a, 0], [a, 1, a], [0, a, 1]]
+       with a = exp(-1/3) ~= 0.71653131.
+    3. Smallest eigenvalue lambda_min = 1 - sqrt(2)*exp(-1/3) ~= -0.01332829727842 < 0.
+    4. Quadratic form on v = (1, -sqrt(2), 1)^T: v^T M v = 4*(1 - sqrt(2)*exp(-1/3)) ~= -0.053313189 < 0.
+    5. Bochner harmonic analysis: Fourier transform hat{eta}(xi) is strictly negative on [5.0, 8.8],
+       reaching a minimum ~= -0.1154 near xi ~= 6.8.
+    6. Restricted TC prime-power family: primes {3, 5, 7} at eps = 4 reproduce M exactly;
+       by Sylvester's law of inertia, weighted matrix Q = D M D has inertia (1, 0, 2) and
+       is strictly indefinite, proving that positivity fails on TC prime measures too.
+    """
+    res = transcendental.audit_smooth_kernel_indefiniteness_counterexample(dps=25)
+    assert res['classification'] == 'FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS'
+
+    cfg = res['counterexample_configuration']
+    assert abs(cfg['coupling_a'] - math.exp(-1.0 / 3.0)) < 1e-12
+    assert cfg['is_indefinite'] is True
+    assert cfg['smallest_eigenvalue'] < -0.013
+    assert abs(cfg['smallest_eigenvalue'] - (1.0 - math.sqrt(2.0) * math.exp(-1.0 / 3.0))) < 1e-10
+    assert cfg['quadratic_form_v_T_M_v'] < -0.05
+
+    bochner = res['bochner_harmonic_analysis']
+    assert bochner['bochner_positivity_falsified'] is True
+    assert any(s['is_negative'] for s in bochner['fourier_transform_samples'])
+    assert bochner['minimum_negative_val'] < -0.1
+
+    tc_fam = res['restricted_tc_prime_family_investigation']
+    assert tc_fam['restricted_family_indefinite'] is True
+    assert tc_fam['sylvester_inertia']['negative'] == 1
+    assert tc_fam['sylvester_inertia']['positive'] == 2
+    assert tc_fam['quadratic_form_witness_y_T_Q_y'] < 0.0
+
+    theorems = res['formal_lean_theorems']
+    assert 'RiemannScope.tridiagonal_kernel_matrix_quadratic_form' in theorems
+    assert 'RiemannScope.tridiagonal_kernel_matrix_indefinite' in theorems
+
+
+def test_epic_weil_centered_test_space_reconciliation():
+    """
+    Verify:
+    1. Reconciliation of centered test space pole conditions:
+       Under g(x) = x^{1/2} g_old(x), Mellin transform shifts tilde{g}(s) = tilde{g}_old(s + 1/2).
+       The classical pole conditions tilde{g}_old(0) = tilde{g}_old(1) = 0 transport to
+       tilde{g}(-1/2) = tilde{g}(1/2) = 0 (Connes & Consani 2026).
+    2. In additive coordinates f(u) = g(e^u), this corresponds to
+       int_{-infty}^infty f(u) exp(+/- u/2) du = 0.
+    3. Complex Hermitian polarization identity B(x+y, x+y) = B(x, x) + B(y, y) + 2*Re B(x, y)
+       and real-part polarization Re B(x+y, x+y) = Re B(x, x) + Re B(y, y) + 2*Re B(x, y).
+    """
+    res = transcendental.audit_weil_positivity_and_tc_bridge_comparison(dps=25)
+    space_desc = res['conventions']['admissible_test_space_V']
+    assert 'tilde{g}(-1/2) = tilde{g}(1/2) = 0' in space_desc
+    assert 'tilde{g}_old(s + 1/2)' in space_desc
+    assert '+/- i/2' in space_desc
+
+    pol = res['polarization_analysis']
+    assert 'hermitian_polarization_complex' in pol['complex_hermitian_polarization']
+    assert 'hermitian_polarization_real_part' in pol['complex_hermitian_real_part_polarization']

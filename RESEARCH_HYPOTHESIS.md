@@ -2824,21 +2824,23 @@ On $[45, 65]$ for $K=0, J=2, \rho_1$, $A_{0, \Gamma} \approx -0.00708 < 0$.
    - For non-negative $w \ge 0$ and $\eta \ge 0$, $Q_\varepsilon^{K, J}[w] \ge 0$ unconditionally for all grades $K, J$. Strict positivity requires active station pairs with positive weights and kernel values. On windows lacking stations, $Q_\varepsilon \equiv 0$ even for $K = J$.
    - Formally proved in Lean 4: `finite_double_sum_nonneg` and `finite_double_sum_pos_of_witness`.
 2. **Weil-Positivity Audit and Polarization**:
-   - Admissible test space $V \subset C_c^\infty(\mathbb R_+^*)$ with $\tilde g(0) = \tilde g(1) = 0$ in multiplicative Haar coordinates $d^* u = du / u$, involution $h^*(x) = \overline{h(1/x)}$, and centering $\Delta^{1/2}$ (Connes & Consani 2026, Weil 1952, Bombieri 2000).
+   - Centered admissible test space $V_{\rm centered} \subset C_c^\infty(\mathbb R_+^*)$ with $\widetilde g(-1/2) = \widetilde g(1/2) = 0$ in multiplicative Haar coordinates $d^* u = du / u$, involution $h^*(x) = \overline{h(1/x)}$, and centering $\Delta^{1/2}$ (Connes & Consani 2026, Weil 1952, Bombieri 2000). Under the centering isomorphism $g(x) = x^{1/2} g_{\rm old}(x)$, Mellin arguments shift by $+1/2$: $\widetilde g(s) = \widetilde g_{\rm old}(s + 1/2)$, so classical pole conditions $\widetilde g_{\rm old}(0) = \widetilde g_{\rm old}(1) = 0$ transport to $\widetilde g(-1/2) = \widetilde g(1/2) = 0$.
    - Bilinear form $B(g, h) = \mathcal W(\Delta^{-1/2}(g * h^*))$.
    - Self-convolution on a sum of multi-grade test functions naturally contains cross-grade terms:
      $$B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2\Re B(g_K, g_J).$$
-     Formally proved in Lean 4: `symmetric_bilinear_polarization_real`.
+     Formally proved in Lean 4: `hermitian_polarization_complex`, `hermitian_polarization_real_part`, and `symmetric_bilinear_polarization_real`.
    - Equating self-convolution with equal grades $K = J$ is mathematically unsupported.
 3. **Three-Way Comparison**:
    - Arithmetic Overlap $Q_\varepsilon^{K, J}$: Bilinear pairing of prime measures; entrywise non-negative; strict positivity requires active station pairs; vanishes below $\Delta_W$.
-   - Multi-Grade Gram Matrix: Requires positive-definiteness of kernel or autocorrelation factorization; entrywise non-negativity is insufficient.
-   - Weil Quadratic Form: Positivity on full admissible space $V$ is strictly equivalent to RH; cannot be assumed unconditionally.
-4. **Four Challenger Rejections**:
+   - Multi-Grade Gram Matrix: The smooth exponential bump kernel $\eta$ is definitively NOT positive definite on $\mathbb R$ or on the restricted TC prime family; cannot supply a general Gram representation.
+   - Weil Quadratic Form: Positivity on full centered admissible space $V_{\rm centered}$ is strictly equivalent to RH; cannot be assumed unconditionally.
+4. **Six Challenger Rejections**:
    - Rejection 1: "The product measure is zero" (Refuted: measure is non-zero; vanishing is band-overlap below $\Delta_W$).
    - Rejection 2: "Positivity exists only at equal grades" (Refuted: unconditional non-negativity for all grades; strict positivity requires active pairs).
    - Rejection 3: "Self-convolution means equal grades" (Refuted: polarization formula contains cross-grade terms).
    - Rejection 4: "Growing windows or global operators are necessary" (Refuted: fixed-window, varying-window, and global constructions remain eligible).
+   - Rejection 5: "The smooth bump kernel is positive definite" (Refuted: exact counterexample $(1, 3/2, 2)$ at $\varepsilon=1$ has $\lambda_{\min} \approx -0.013328 < 0$; prime AP $\{3, 5, 7\}$ at $\varepsilon=4$ is indefinite by Sylvester inertia).
+   - Rejection 6: "Weil test space retains $0, 1$ poles under centering" (Refuted: Mellin shift $+1/2$ transports poles to $\mp 1/2$).
 
 ## 42.6 Research Attempt on the Missing Arithmetic Implication
 Under the off-line zero hypothesis $H(\rho_0)$, the explicit formula operates as an exact Fourier-Mellin transform identity.
@@ -2847,4 +2849,29 @@ The explicit formula identity decomposes this identically zero distribution into
 No independently justified property of the prime-zeta relationship prevents this exact cancellation.
 The implication $H(\rho_0) \Longrightarrow \bar Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r(\varepsilon)$ ($c > 0, r(\varepsilon) \to 0$) remains an open research obligation.
 Therefore, no new implication toward forbidden coincidence $m\tau^K = n\tau^J$ was established.
-The Transcendental Continuation bridge remains strictly **OPEN**. Total compiled Lean 4 theorems: **228**.
+The Transcendental Continuation bridge remains strictly **OPEN**.
+
+## 42.7 Smooth Kernel Indefiniteness Falsification, Centered Weil Test Space Reconciliation, and Complex Hermitian Polarization
+1. **Smooth Kernel Universal Indefiniteness Counterexample**:
+   - For $\eta(v) = \exp(1 - 1/(1-v^2))\mathbf{1}_{|v|<1}$, points $x = (1, 3/2, 2)$ at $\varepsilon = 1$ give kernel matrix:
+     $$M = \begin{pmatrix} 1 & a & 0 \\ a & 1 & a \\ 0 & a & 1 \end{pmatrix}, \quad a = e^{-1/3} \approx 0.71653131.$$
+   - The eigenvalues are $1, 1 \pm \sqrt{2}e^{-1/3}$. The smallest eigenvalue is:
+     $$\lambda_{\min} = 1 - \sqrt{2}e^{-1/3} \approx -0.01332829727842 < 0.$$
+   - Test vector $v = (1, -\sqrt{2}, 1)^T$ yields:
+     $$v^T M v = 4(1 - \sqrt{2}e^{-1/3}) \approx -0.053313189 < 0.$$
+     Formally proved in Lean 4: `tridiagonal_kernel_matrix_quadratic_form` and `tridiagonal_kernel_matrix_indefinite`.
+   - By Bochner's theorem, a translation-invariant kernel is positive definite on $\mathbb R$ iff its Fourier transform is non-negative everywhere. The Fourier transform $\widehat\eta(\xi) = 2\int_0^1 \eta(v)\cos(\xi v)dv$ is strictly negative on $\xi \in [5.0, 8.8]$, reaching a minimum $\approx -0.1154$ near $\xi \approx 6.8$, definitively falsifying positive definiteness.
+
+2. **Indefiniteness on the Restricted TC Prime Family**:
+   - Primes in 3-term arithmetic progression $\{3, 5, 7\}$ (difference $\Delta = 2$) at grade $K=0$ and resolution $\varepsilon = 4$ yield relative distances $|3-5|/4 = 1/2$, $|5-7|/4 = 1/2$, $|3-7|/4 = 1$, reproducing the exact matrix $M$.
+   - For any positive prime weights $d = (d_1, d_2, d_3) > 0$, the weighted matrix $Q = D M D$ has inertia $(1, 0, 2)$ by Sylvester's Law of Inertia (one negative and two positive eigenvalues). Vector $y = D^{-1} v$ satisfies $y^T Q y = v^T M v < 0$.
+   - Thus, positive semi-definiteness fails even when restricted to the actual prime measures of TC.
+
+3. **Reconciliation of Centered Weil Test Space**:
+   - Centering isomorphism $g(x) = x^{1/2} g_{\rm old}(x)$ shifts Mellin arguments: $\widetilde g(s) = \widetilde g_{\rm old}(s + 1/2)$.
+   - Classical pole conditions $\widetilde g_{\rm old}(0) = \widetilde g_{\rm old}(1) = 0$ transport to $\widetilde g(-1/2) = \widetilde g(1/2) = 0$.
+   - In additive coordinates $f(u) = g(e^u)$, this corresponds to $\int_{-\infty}^\infty f(u) e^{\pm u/2} du = 0$ (Fourier vanishing at $t = \mp i/2$).
+
+4. **Lean 4 Formalization Status**:
+   - Added `hermitian_polarization_complex`, `hermitian_polarization_real_part`, `tridiagonal_kernel_matrix_quadratic_form`, `tridiagonal_kernel_matrix_indefinite`.
+   - Total compiled project theorems: **232** (0 sorry, Mathlib foundations only).

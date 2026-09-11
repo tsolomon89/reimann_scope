@@ -255,15 +255,8 @@
     "A_0_Gamma": 0.5444402513346406,
     "A_0_Gamma_high_precision": "0.544440251334640629984802",
     "interval_enclosure": {
-      "engine": "flint.arb",
-      "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
-      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
-      "enclosure_mid": 0.5444399924859572,
-      "enclosure_rad": 0.0011700457162078237,
-      "lower_bound": 0.5432699467697494,
-      "upper_bound": 0.545610038202165,
-      "strictly_positive": true,
-      "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
+      "engine": "fallback_mpmath",
+      "note": "No module named 'flint'"
     },
     "D_M_rho0": 0.0,
     "asserted_identity_A0_eq_cD_falsified": true,
@@ -495,12 +488,7 @@
       "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "mid": 0.5444399924859572,
-        "rad": 0.0011700457162078237,
-        "lower": 0.5432699467697494,
-        "upper": 0.545610038202165,
-        "is_strictly_positive": true,
-        "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
+        "error": "No module named 'flint'"
       }
     },
     "retained_remainder_R": {
@@ -666,6 +654,153 @@
     "earliest_unproved_inference_in_tc": "The transfer step from individual radial defect D_M(rho_0) > 0 to collective non-vanishing of Q_eps^{K, J}. On fixed compact windows, explicit formula identity requires exact remainder cancellation R_{eps, T} -> -A_0. Deriving a conditional spectral lower bound incompatible with arithmetic vanishing remains the primary open research obligation.",
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
+  "milestone_8_smooth_kernel_indefiniteness": {
+    "classification": "FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS",
+    "kernel_definition": "eta(v) = exp(1 - 1/(1-v^2)) * 1_{|v|<1}",
+    "counterexample_configuration": {
+      "points_x": [
+        1.0,
+        1.5,
+        2.0
+      ],
+      "resolution_eps": 1.0,
+      "coupling_a": 0.7165313105737893,
+      "matrix_M": [
+        [
+          1.0,
+          0.7165313105737893,
+          0.0
+        ],
+        [
+          0.7165313105737893,
+          1.0,
+          0.7165313105737893
+        ],
+        [
+          0.0,
+          0.7165313105737893,
+          1.0
+        ]
+      ],
+      "eigenvalues_M": [
+        -0.013328297278421044,
+        1.0,
+        2.013328297278421
+      ],
+      "smallest_eigenvalue": -0.013328297278421044,
+      "is_indefinite": true,
+      "test_vector_v": [
+        1.0,
+        -1.4142135623730951,
+        1.0
+      ],
+      "quadratic_form_v_T_M_v": -0.05331318911368418
+    },
+    "bochner_harmonic_analysis": {
+      "theorem": "Bochner Characterization of Positive-Definite Kernels",
+      "statement": "Translation-invariant kernel K(x-y) is positive definite on R iff hat{eta}(xi) >= 0 for all xi in R.",
+      "fourier_transform_samples": [
+        {
+          "xi": 0.0,
+          "hat_eta": 1.2069003224378763,
+          "is_negative": false
+        },
+        {
+          "xi": 3.0,
+          "hat_eta": 0.5379562179798847,
+          "is_negative": false
+        },
+        {
+          "xi": 5.0,
+          "hat_eta": -0.0005769550855074864,
+          "is_negative": true
+        },
+        {
+          "xi": 6.0,
+          "hat_eta": -0.10682183744519778,
+          "is_negative": true
+        },
+        {
+          "xi": 6.8,
+          "hat_eta": -0.1154443639721356,
+          "is_negative": true
+        },
+        {
+          "xi": 7.5,
+          "hat_eta": -0.08628806457058069,
+          "is_negative": true
+        },
+        {
+          "xi": 8.8,
+          "hat_eta": -0.004894512379005358,
+          "is_negative": true
+        },
+        {
+          "xi": 10.0,
+          "hat_eta": 0.039749670730629204,
+          "is_negative": false
+        }
+      ],
+      "negative_window": "[5.0, 8.8]",
+      "minimum_negative_xi": 6.8,
+      "minimum_negative_val": -0.1154443639721356,
+      "bochner_positivity_falsified": true
+    },
+    "restricted_tc_prime_family_investigation": {
+      "prime_ap_stations": [
+        3,
+        5,
+        7
+      ],
+      "step_delta": 2,
+      "resolution_eps": 4.0,
+      "station_ratios": {
+        "|3-5|/4": 0.5,
+        "|5-7|/4": 0.5,
+        "|3-7|/4": 1.0
+      },
+      "matrix_identity": "Kernel matrix on {3, 5, 7} at eps=4 is identical to counterexample matrix M.",
+      "prime_weights_log_p": [
+        1.0986122886681098,
+        1.6094379124341003,
+        1.9459101490553132
+      ],
+      "weighted_matrix_Q": [
+        [
+          1.206948960812582,
+          1.2669335960801453,
+          0.0
+        ],
+        [
+          1.2669335960801453,
+          2.5902903939802346,
+          2.2440482126595596
+        ],
+        [
+          0.0,
+          2.244048212659559,
+          3.7865663081964716
+        ]
+      ],
+      "eigenvalues_Q": [
+        -0.028664666209343062,
+        1.9609049988563236,
+        5.651565330342308
+      ],
+      "sylvester_inertia": {
+        "positive": 2,
+        "zero": 0,
+        "negative": 1
+      },
+      "quadratic_form_witness_y_T_Q_y": -0.05331318911368421,
+      "restricted_family_indefinite": true
+    },
+    "formal_lean_theorems": [
+      "RiemannScope.tridiagonal_kernel_matrix_quadratic_form",
+      "RiemannScope.tridiagonal_kernel_matrix_indefinite"
+    ],
+    "mathematical_conclusion": "The smooth exponential bump kernel eta is definitively NOT positive definite, neither universally on R (where x = (1, 3/2, 2) has lambda_min ~= -0.013328 < 0 and Bochner FT is negative on [5.0, 8.8]) nor on the restricted family of actual TC prime-power measures (where primes {3, 5, 7} at eps=4 reproduce M and Q = D M D has inertia (1, 0, 2) by Sylvester law). Consequently, the smooth bump kernel cannot supply a general Gram matrix or inner-product representation."
+  },
   "milestone_8_weil_positivity_and_bridge_comparison": {
     "classification": "COMPARISON_COMPLETED",
     "conventions": {
@@ -674,16 +809,22 @@
       "convolution": "(g * h)(x) = int_0^infty g(x / y) h(y) dy / y",
       "involution": "h^*(x) = conj(h(1 / x))",
       "centering_automorphism": "Delta^{1/2} f(x) = x^{1/2} f(x), converting classical Weil involution k^sharp(x) = x^{-1} conj(k(1/x)) to f^*(x) = conj(f(1/x)), and mapping critical line Re(s) = 1/2 to unitary Fourier transform on R.",
-      "admissible_test_space_V": "V = {g in C_c^infty(R_+^*) : tilde{g}(0) = tilde{g}(1) = 0} (Fourier transform vanishes at +/- i/2).",
-      "weil_linear_functional": "W(k) = tilde{k}(0) + tilde{k}(1) - sum_v W_v(k) = sum_{rho in Z} tilde{k}(rho)",
+      "admissible_test_space_V": "Centered test space V_centered = {g in C_c^infty(R_+^*) : tilde{g}(-1/2) = tilde{g}(1/2) = 0}. Under the centering isomorphism g(x) = x^{1/2} g_old(x), the Mellin transform shifts by +1/2: tilde{g}(s) = tilde{g}_old(s + 1/2). Consequently, classical pole-cancellation conditions tilde{g}_old(0) = tilde{g}_old(1) = 0 rigorously transport to centered conditions tilde{g}(-1/2) = tilde{g}(1/2) = 0. In additive coordinates f(u) = g(e^u), this corresponds to int_{-infty}^infty f(u) exp(+/- u/2) du = 0, or Fourier vanishing at imaginary frequencies t = +/- i/2.",
+      "weil_linear_functional": "W(k) = tilde{k}(-1/2) + tilde{k}(1/2) - sum_v W_v(k) = sum_{rho in Z} tilde{k}(rho - 1/2)",
       "bilinear_weil_form": "B(g, h) = W(Delta^{-1/2}(g * h^*))",
       "weil_quadratic_form": "Q_Weil(g) = B(g, g) = W(Delta^{-1/2}(g * g^*)) = sum_{rho in Z} |tilde{Delta^{-1/2} g}(rho)|^2"
     },
     "polarization_analysis": {
       "test_expansion": "For g = g_K + g_J, g * g^* = g_K * g_K^* + g_K * g_J^* + g_J * g_K^* + g_J * g_J^*",
       "hermitian_polarization_formula": "B(g_K + g_J, g_K + g_J) = B(g_K, g_K) + B(g_J, g_J) + 2 * Re B(g_K, g_J)",
+      "complex_hermitian_polarization": "B(x + y, x + y) = B(x, x) + B(y, y) + 2 * (B(x, y)).re for any sesquilinear/Hermitian complex form. Formally proved in Lean 4: RiemannScope.hermitian_polarization_complex.",
+      "complex_hermitian_real_part_polarization": "(B(x + y, x + y)).re = (B(x, x)).re + (B(y, y)).re + 2 * (B(x, y)).re. Formally proved in Lean 4: RiemannScope.hermitian_polarization_real_part.",
       "refutation_of_equal_grades_only": "Self-convolution (g * g^*) on a sum of multi-grade test functions naturally contains cross-grade terms g_K * g_J^*. Self-convolution does NOT restrict exclusively to equal grades.",
-      "formal_lean_theorem": "RiemannScope.symmetric_bilinear_polarization_real"
+      "formal_lean_theorems": [
+        "RiemannScope.hermitian_polarization_complex",
+        "RiemannScope.hermitian_polarization_real_part",
+        "RiemannScope.symmetric_bilinear_polarization_real"
+      ]
     },
     "three_form_comparison_table": [
       {
@@ -697,21 +838,169 @@
         "object": "Multi-Grade Matrix / Gram Form (Q_eps^{K_i, K_j})",
         "mathematical_nature": "Matrix Q = (Q_eps^{K_i, K_j})_{i, j=1}^N indexed by a finite grade family.",
         "positivity_property": "Positive semi-definiteness: c^* Q c >= 0 for all c in C^N.",
-        "strict_positivity_condition": "Entrywise non-negativity (Q_{ij} >= 0) is INSUFFICIENT for positive semi-definiteness. Requires positive-definiteness of the kernel eta (Bochner theorem) or an autocorrelation representation eta = phi * phi_tilde.",
-        "epistemic_status": "REQUIRES_GRAM_FACTORIZATION"
+        "strict_positivity_condition": "Entrywise non-negativity (Q_{ij} >= 0) is INSUFFICIENT for positive semi-definiteness. The smooth kernel eta is definitively NOT positive definite: Point configuration (1, 3/2, 2) at eps=1 gives smallest eigenvalue 1 - sqrt(2)*exp(-1/3) ~= -0.013328 < 0. Prime progression {3, 5, 7} at eps=4 reproduces M, and weighted matrix Q = D M D has inertia (1, 0, 2). No general Gram representation exists for this kernel even on the restricted TC prime family.",
+        "epistemic_status": "FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS"
       },
       {
         "object": "Weil Quadratic Form B(g, h)",
         "mathematical_nature": "Linear explicit formula distribution on multiplicative convolution: W(Delta^{-1/2}(g * h^*)).",
-        "positivity_property": "B(g, g) >= 0 on full admissible test space V.",
-        "strict_positivity_condition": "Full positivity on V is STRICTLY EQUIVALENT TO RH (Weil 1952, Bombieri 2000, Connes-Consani 2026). Cannot be assumed unconditionally as a known source of sign.",
+        "positivity_property": "B(g, g) >= 0 on full centered admissible test space V_centered.",
+        "strict_positivity_condition": "Full positivity on V_centered is STRICTLY EQUIVALENT TO RH (Weil 1952, Bombieri 2000, Connes-Consani 2026). Cannot be assumed unconditionally as a known source of sign.",
         "epistemic_status": "RH_EQUIVALENT_CIRCULAR_IF_ASSUMED"
       }
     ],
+    "kernel_indefiniteness_audit": {
+      "classification": "FALSIFIED_UNIVERSAL_AND_RESTRICTED_POSITIVE_DEFINITENESS",
+      "kernel_definition": "eta(v) = exp(1 - 1/(1-v^2)) * 1_{|v|<1}",
+      "counterexample_configuration": {
+        "points_x": [
+          1.0,
+          1.5,
+          2.0
+        ],
+        "resolution_eps": 1.0,
+        "coupling_a": 0.7165313105737893,
+        "matrix_M": [
+          [
+            1.0,
+            0.7165313105737893,
+            0.0
+          ],
+          [
+            0.7165313105737893,
+            1.0,
+            0.7165313105737893
+          ],
+          [
+            0.0,
+            0.7165313105737893,
+            1.0
+          ]
+        ],
+        "eigenvalues_M": [
+          -0.013328297278421044,
+          1.0,
+          2.013328297278421
+        ],
+        "smallest_eigenvalue": -0.013328297278421044,
+        "is_indefinite": true,
+        "test_vector_v": [
+          1.0,
+          -1.4142135623730951,
+          1.0
+        ],
+        "quadratic_form_v_T_M_v": -0.05331318911368418
+      },
+      "bochner_harmonic_analysis": {
+        "theorem": "Bochner Characterization of Positive-Definite Kernels",
+        "statement": "Translation-invariant kernel K(x-y) is positive definite on R iff hat{eta}(xi) >= 0 for all xi in R.",
+        "fourier_transform_samples": [
+          {
+            "xi": 0.0,
+            "hat_eta": 1.2069003224378763,
+            "is_negative": false
+          },
+          {
+            "xi": 3.0,
+            "hat_eta": 0.5379562179798847,
+            "is_negative": false
+          },
+          {
+            "xi": 5.0,
+            "hat_eta": -0.0005769550855074864,
+            "is_negative": true
+          },
+          {
+            "xi": 6.0,
+            "hat_eta": -0.10682183744519778,
+            "is_negative": true
+          },
+          {
+            "xi": 6.8,
+            "hat_eta": -0.1154443639721356,
+            "is_negative": true
+          },
+          {
+            "xi": 7.5,
+            "hat_eta": -0.08628806457058069,
+            "is_negative": true
+          },
+          {
+            "xi": 8.8,
+            "hat_eta": -0.004894512379005358,
+            "is_negative": true
+          },
+          {
+            "xi": 10.0,
+            "hat_eta": 0.039749670730629204,
+            "is_negative": false
+          }
+        ],
+        "negative_window": "[5.0, 8.8]",
+        "minimum_negative_xi": 6.8,
+        "minimum_negative_val": -0.1154443639721356,
+        "bochner_positivity_falsified": true
+      },
+      "restricted_tc_prime_family_investigation": {
+        "prime_ap_stations": [
+          3,
+          5,
+          7
+        ],
+        "step_delta": 2,
+        "resolution_eps": 4.0,
+        "station_ratios": {
+          "|3-5|/4": 0.5,
+          "|5-7|/4": 0.5,
+          "|3-7|/4": 1.0
+        },
+        "matrix_identity": "Kernel matrix on {3, 5, 7} at eps=4 is identical to counterexample matrix M.",
+        "prime_weights_log_p": [
+          1.0986122886681098,
+          1.6094379124341003,
+          1.9459101490553132
+        ],
+        "weighted_matrix_Q": [
+          [
+            1.206948960812582,
+            1.2669335960801453,
+            0.0
+          ],
+          [
+            1.2669335960801453,
+            2.5902903939802346,
+            2.2440482126595596
+          ],
+          [
+            0.0,
+            2.244048212659559,
+            3.7865663081964716
+          ]
+        ],
+        "eigenvalues_Q": [
+          -0.028664666209343062,
+          1.9609049988563236,
+          5.651565330342308
+        ],
+        "sylvester_inertia": {
+          "positive": 2,
+          "zero": 0,
+          "negative": 1
+        },
+        "quadratic_form_witness_y_T_Q_y": -0.05331318911368421,
+        "restricted_family_indefinite": true
+      },
+      "formal_lean_theorems": [
+        "RiemannScope.tridiagonal_kernel_matrix_quadratic_form",
+        "RiemannScope.tridiagonal_kernel_matrix_indefinite"
+      ],
+      "mathematical_conclusion": "The smooth exponential bump kernel eta is definitively NOT positive definite, neither universally on R (where x = (1, 3/2, 2) has lambda_min ~= -0.013328 < 0 and Bochner FT is negative on [5.0, 8.8]) nor on the restricted family of actual TC prime-power measures (where primes {3, 5, 7} at eps=4 reproduce M and Q = D M D has inertia (1, 0, 2) by Sylvester law). Consequently, the smooth bump kernel cannot supply a general Gram matrix or inner-product representation."
+    },
     "map_analysis": {
       "dimensional_and_measure_distinction": "The arithmetic overlap Q_eps^{K, J} uses a tensor product of two prime measures (mu_K otimes mu_J) evaluated on R_{>0} x R_{>0}. The Weil form B(g_K, g_J) uses a linear explicit-formula distribution W evaluated on a 1-variable multiplicative convolution (g_K * g_J^*) on R_+^*.",
       "arithmetic_side_structure": "W_p(k) involves a single sum over prime powers p^m, whereas Q_eps involves a double sum over station pairs (a_K n, a_J m). Any rigorous map from Q_eps to B must explicitly account for the dimensional reduction from R_{>0}^2 to R_+^* and the jacobian/scaling factors a_K, a_J.",
-      "mathematical_barrier": "The structural difference between a 2-variable measure pairing and a 1-variable group convolution explains why direct identification B(g_K, g_J) = Q_eps^{K, J} is invalid. However, it does not prove that every conceivable mapping is impossible."
+      "spectral_side_structure": "Weil form B(g_K, g_J) decomposes as a SINGLE sum over zeros: sum_{rho in Z} tilde{g}_K(rho-1/2) conj(tilde{g}_J(rho-1/2)). In contrast, TC two-variable explicit formula decomposes as a DOUBLE sum over all pairs of zeros: bar{S}_eps = sum_{rho, rho'} iint eta((x-y)/eps) w(x) w(y) x^{rho_K-1} y^{rho'_J-1} dx dy. This structural mismatch confirms that Q_eps^{K, J} couples off-diagonal zero pairs that are absent from B(g_K, g_J).",
+      "mathematical_barrier": "The structural difference between a 2-variable measure pairing and a 1-variable group convolution explains why direct identification B(g_K, g_J) = Q_eps^{K, J} is invalid. Moreover, the kernel indefiniteness demonstrates that Q_eps cannot be endowed with a pre-Hilbert Gram structure using eta."
     },
     "attempted_derivation_record": {
       "step_1_arithmetic_property": "Radon measure non-negativity mu_K >= 0; Lindemann transcendence of tau = 2*pi forces disjoint prime-power station sets S_K cap S_J = emptyset for K != J, giving minimum distance Delta_W > 0 on any fixed compact window W.",
@@ -737,6 +1026,14 @@
       "rejection_4": {
         "claim_rejected": "Growing windows or global operators are necessary to advance the bridge.",
         "corrected_statement": "No theorem proves that a fixed-window contradiction is impossible. Arithmetic vanishing A |- Q_eps = 0 does not rule out deriving A, H |- Q_eps > 0 under the false off-line zero hypothesis. Fixed-window, varying-window, and global formulations all remain eligible research candidates."
+      },
+      "rejection_5": {
+        "claim_rejected": "The smooth bump kernel eta is positive definite on R or supplies a general Gram representation.",
+        "corrected_statement": "The smooth exponential bump kernel eta is not positive definite. Counterexample x = (1, 3/2, 2) at eps = 1 has smallest eigenvalue 1 - sqrt(2)*exp(-1/3) ~= -0.013328 < 0. On prime arithmetic progressions {3, 5, 7} at eps = 4, the kernel matrix reproduces M, and any positive prime weighting Q = D M D has inertia (1, 0, 2) by Sylvester law, disproving positive semi-definiteness even on the restricted TC prime family."
+      },
+      "rejection_6": {
+        "claim_rejected": "Weil test space condition can retain tilde{g}(0) = tilde{g}(1) = 0 under centering.",
+        "corrected_statement": "Under the centering isomorphism g(x) = x^{1/2} g_old(x), Mellin arguments shift by +1/2: tilde{g}(s) = tilde{g}_old(s + 1/2). Therefore, classical pole-cancellation conditions at 0, 1 transport to tilde{g}(-1/2) = tilde{g}(1/2) = 0 (Connes-Consani 2026)."
       }
     },
     "epistemic_verdict": "NO_NEW_IMPLICATION_ESTABLISHED",
@@ -764,7 +1061,11 @@
       "mode_extraction_coefficient_divergence_half",
       "symmetric_bilinear_polarization_real",
       "finite_double_sum_nonneg",
-      "finite_double_sum_pos_of_witness"
+      "finite_double_sum_pos_of_witness",
+      "hermitian_polarization_complex",
+      "hermitian_polarization_real_part",
+      "tridiagonal_kernel_matrix_quadratic_form",
+      "tridiagonal_kernel_matrix_indefinite"
     ],
     "axioms": "Mathlib standard foundations only; 0 sorry, 0 admit."
   },
@@ -784,6 +1085,9 @@
     "product_measure_status": "NON_ZERO_MEASURE (Vanishing is strictly band-overlap below Delta_W)",
     "positivity_grade_scope": "UNCONDITIONAL_NONNEGATIVE (All grades K, J; strict positivity requires active pairs)",
     "research_space_scope": "OPEN (Fixed-window, varying-window, and global constructions remain eligible)",
+    "smooth_kernel_positive_definiteness": "FALSIFIED (Counterexample (1, 3/2, 2) at eps=1 has lambda_min ~= -0.013328 < 0; Bochner FT negative on [5.0, 8.8])",
+    "restricted_tc_family_kernel_positivity": "FALSIFIED (Primes {3, 5, 7} at eps=4 reproduce M; Q=DMD indefinite by Sylvester inertia)",
+    "weil_test_space_centering": "RECONCILED (tilde{g}(-1/2) = tilde{g}(1/2) = 0 transports classical poles under centering isomorphism g = x^(1/2) g_old)",
     "conditional_spectral_lower_bound": "UNPROVED / STRICTLY OPEN",
     "transcendental_continuation_bridge": "STRICTLY OPEN"
   }

@@ -16,6 +16,7 @@ import Mathlib.Topology.Instances.Real
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.MetricSpace.PseudoMetric
 import Mathlib.LinearAlgebra.Vandermonde
+import Mathlib.Data.Matrix.Basic
 import Mathlib.Order.Filter.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
@@ -1575,5 +1576,83 @@ theorem finite_double_sum_pos_of_witness
       (Finset.mem_univ i₀)
   exact lt_of_lt_of_le h_inner_pos h_outer_le
 
+/-- Complex Hermitian polarization identity:
+    For a sesquilinear / Hermitian form B on complex space E satisfying
+    additivity and conjugate symmetry B(y, x) = starRingEnd ℂ (B(x, y)),
+    B(x + y, x + y) = B(x, x) + B(y, y) + 2 * (B(x, y)).re.
+    This establishes the exact polarization for the complex Hermitian Weil form,
+    showing how cross-grade components 2 * Re(B(x, y)) emerge. -/
+theorem hermitian_polarization_complex {E : Type*} [Add E]
+    (B : E → E → ℂ)
+    (h_add_left : ∀ u v w, B (u + v) w = B u w + B v w)
+    (h_add_right : ∀ u v w, B u (v + w) = B u v + B u w)
+    (h_herm : ∀ u v, B u v = starRingEnd ℂ (B v u))
+    (x y : E) :
+    B (x + y) (x + y) = B x x + B y y + 2 * (B x y).re := by
+  rw [h_add_left, h_add_right, h_add_right]
+  have h_yx : B y x = starRingEnd ℂ (B x y) := h_herm y x
+  have h_sum : B x y + starRingEnd ℂ (B x y) = 2 * (B x y).re := by
+    rw [Complex.add_conj]
+    push_cast
+    ring
+  calc B x x + B x y + (B y x + B y y)
+    _ = B x x + B y y + (B x y + B y x) := by ring
+    _ = B x x + B y y + (B x y + starRingEnd ℂ (B x y)) := by rw [h_yx]
+    _ = B x x + B y y + 2 * (B x y).re := by rw [h_sum]
+
+/-- Real part of complex Hermitian polarization:
+    Re(B(x + y, x + y)) = Re(B(x, x)) + Re(B(y, y)) + 2 * Re(B(x, y)).
+    This guarantees that the real part of the Weil quadratic form inherits
+    exact cross-grade additive decomposition. -/
+theorem hermitian_polarization_real_part {E : Type*} [Add E]
+    (B : E → E → ℂ)
+    (h_add_left : ∀ u v w, B (u + v) w = B u w + B v w)
+    (h_add_right : ∀ u v w, B u (v + w) = B u v + B u w)
+    (h_herm : ∀ u v, B u v = starRingEnd ℂ (B v u))
+    (x y : E) :
+    (B (x + y) (x + y)).re = (B x x).re + (B y y).re + 2 * (B x y).re := by
+  have h := hermitian_polarization_complex B h_add_left h_add_right h_herm x y
+  apply_fun Complex.re at h
+  simp only [Complex.add_re, Complex.ofReal_re, Complex.mul_re, Complex.ofReal_im, mul_zero,
+    sub_zero] at h
+  exact h
+
+/-- Tridiagonal 3x3 symmetric matrix with unit diagonal and off-diagonal coupling a -/
+def tridiagonal3 (a : ℝ) : Matrix (Fin 3) (Fin 3) ℝ :=
+  ![![1, a, 0],
+    ![a, 1, a],
+    ![0, a, 1]]
+
+/-- Quadratic form of tridiagonal matrix on test vector v = ![1, -s, 1] with s^2 = 2:
+    v^T M(a) v = 4 - 4 * s * a.
+    For s = sqrt(2), this equals 4 * (1 - sqrt(2) * a). -/
+theorem tridiagonal_kernel_matrix_quadratic_form
+    (a s : ℝ) (hs : s ^ 2 = 2) :
+    let M := tridiagonal3 a
+    let v : Fin 3 → ℝ := ![1, -s, 1]
+    Matrix.dotProduct v (Matrix.mulVec M v) = 4 - 4 * s * a := by
+  intro M v
+  dsimp [M, v, tridiagonal3, Matrix.dotProduct, Matrix.mulVec]
+  simp only [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two,
+    Matrix.head_cons, Matrix.tail_cons]
+  nlinarith [hs]
+
+
+
+/-- Indefiniteness theorem for the 3x3 kernel matrix:
+    When s * a > 1 (i.e. a > 1 / sqrt(2) ≈ 0.7071), the quadratic form v^T M(a) v < 0.
+    For the smooth exponential bump kernel η(v) = exp(1 - 1/(1-v^2)) evaluated at points
+    (1, 3/2, 2) with ε = 1, the adjacent coupling is a = exp(-1/3) ≈ 0.71653 > 1/sqrt(2).
+    This establishes that the smooth bump kernel matrix is indefinite (not positive semi-definite). -/
+theorem tridiagonal_kernel_matrix_indefinite
+    (a s : ℝ) (hs : s ^ 2 = 2) (h_bound : 1 < s * a) :
+    let M := tridiagonal3 a
+    let v : Fin 3 → ℝ := ![1, -s, 1]
+    Matrix.dotProduct v (Matrix.mulVec M v) < 0 := by
+  intro M v
+  have h_eq := tridiagonal_kernel_matrix_quadratic_form a s hs
+  dsimp [M, v] at h_eq
+  rw [h_eq]
+  linarith
 
 end RiemannScope
