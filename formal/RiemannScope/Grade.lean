@@ -1210,4 +1210,121 @@ theorem finite_spectral_perturbation_rigidity_2point (c₁ c₂ x₁ x₂ r₁ r
     | inr h => exact h
   exact ⟨hc₁, hc₂⟩
 
+/-- Scoped mode extraction obstruction:
+    For any functional P(ε) bounded by C * N(ε) where C is independent of ε
+    and N(ε) → 0 as ε → 0⁺, P(ε) necessarily vanishes as ε → 0⁺.
+    This establishes that a uniformly bounded extraction scheme cannot isolate a non-zero fixed mode. -/
+theorem mode_extraction_uniform_bound_vanishes
+    (P N : ℝ → ℝ) (C : ℝ) (hC : 0 ≤ C)
+    (h_bd : ∀ ε, 0 < ε → |P ε| ≤ C * N ε)
+    (hN : ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → N ε < δ) :
+    ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → |P ε| < δ := by
+  intro δ hδ
+  by_cases hC_zero : C = 0
+  · obtain ⟨ε₀, hε₀_pos, _⟩ := hN 1 zero_lt_one
+    refine ⟨ε₀, hε₀_pos, ?_⟩
+    intro ε ⟨hε_pos, _⟩
+    have h1 := h_bd ε hε_pos
+    rw [hC_zero, zero_mul] at h1
+    have h_abs_nonneg : 0 ≤ |P ε| := abs_nonneg (P ε)
+    have h_abs_zero : |P ε| = 0 := le_antisymm h1 h_abs_nonneg
+    rw [h_abs_zero]
+    exact hδ
+  · have hC_pos : 0 < C := lt_of_le_of_ne hC (Ne.symm hC_zero)
+    have hδ_div : 0 < δ / C := div_pos hδ hC_pos
+    obtain ⟨ε₀, hε₀_pos, hε₀⟩ := hN (δ / C) hδ_div
+    refine ⟨ε₀, hε₀_pos, ?_⟩
+    intro ε ⟨hε_pos, hε_lt⟩
+    have h1 := h_bd ε hε_pos
+    have h2 := hε₀ ε ⟨hε_pos, hε_lt⟩
+    have h3 : C * N ε < C * (δ / C) := mul_lt_mul_of_pos_left h2 hC_pos
+    rw [mul_div_cancel₀ δ (ne_of_gt hC_pos)] at h3
+    exact lt_of_le_of_lt h1 h3
+
+/-- Mode extraction coefficient divergence:
+    If an extraction functional recovers a non-zero mode coefficient c₀ ≠ 0
+    satisfying |P(ε)| ≥ |c₀| > 0, but is bounded by C(ε) * N(ε) where N(ε) > 0,
+    then the extraction constant C(ε) must satisfy C(ε) ≥ |c₀| / N(ε).
+    In particular, when N(ε) = O(ε^(1/2)) → 0 as ε → 0⁺, C(ε) must diverge as Ω(ε^(-1/2)). -/
+theorem mode_extraction_coefficient_divergence
+    (P_val N_val C_val c₀ : ℝ)
+    (hN_pos : 0 < N_val)
+    (hP_lower : |c₀| ≤ |P_val|)
+    (hP_upper : |P_val| ≤ C_val * N_val) :
+    |c₀| / N_val ≤ C_val := by
+  have h_trans : |c₀| ≤ C_val * N_val := le_trans hP_lower hP_upper
+  exact (div_le_iff hN_pos).mpr h_trans
+
+/-- Algebraic exponent positivity for explicit formula power-log cutoff:
+    For order p > 2 and cutoff scaling parameter α > p / (p - 2),
+    the net epsilon power exponent r = α * (p - 2) - p is strictly positive. -/
+theorem power_log_tail_subordination_exponent_positive
+    (p : ℝ) (α : ℝ) (hp : 2 < p) (hα : p / (p - 2) < α) :
+    0 < α * (p - 2) - p := by
+  have hp2 : 0 < p - 2 := by linarith
+  have h_mul := (div_lt_iff hp2).mp hα
+  linarith
+
+/-- Power-log tail error subordination limit:
+    If |E(ε)| / ε ≤ C_p * ε^r * L(ε) for all ε > 0, where C_p > 0,
+    and the majorant bound M(ε) = C_p * ε^r * L(ε) converges to 0 as ε → 0⁺,
+    then |E(ε)| / ε converges to 0 as ε → 0⁺.
+    Note: The analytic majorant bound |E(ε, T)| / ε ≤ C_p ε^(-p) T^(2-p) log²(2+T)
+    is an external analytic dependency (Rademacher / Trudgian contour integration). -/
+theorem power_log_decay_subordination
+    (E L : ℝ → ℝ) (C_p r : ℝ)
+    (hE_bd : ∀ ε, 0 < ε → |E ε| / ε ≤ C_p * ε ^ r * L ε)
+    (h_lim : ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → C_p * ε ^ r * L ε < δ) :
+    ∀ δ > 0, ∃ ε₀ > 0, ∀ ε, 0 < ε ∧ ε < ε₀ → |E ε| / ε < δ := by
+  intro δ hδ
+  obtain ⟨ε₀, hε₀_pos, hε₀⟩ := h_lim δ hδ
+  refine ⟨ε₀, hε₀_pos, ?_⟩
+  intro ε ⟨hε_pos, hε_lt⟩
+  have h1 := hE_bd ε hε_pos
+  have h2 := hε₀ ε ⟨hε_pos, hε_lt⟩
+  exact lt_of_le_of_lt h1 h2
+
+/-- Finite spectral perturbation rigidity (single-point derivative/Vandermonde identity):
+    On any open interval I ⊂ (a_K, ∞), evaluating the two-mode sum and its derivative
+    at a single interior point u₀ = log(x₀ / a_K) yields a 2x2 Vandermonde system
+    in d_j = c_j * exp(l_j * u₀).
+    For distinct exponents l₁ ≠ l₂, the determinant is l₂ - l₁ ≠ 0,
+    forcing both coefficients c₁ and c₂ to vanish identically.
+    This eliminates sample-point periodicity ambiguities (such as x = 2 and x = 4 for i*tau/log 2)
+    by evaluating all derivatives at a single point. -/
+theorem finite_spectral_perturbation_rigidity_vandermonde_2point
+    (c₁ c₂ : ℝ) (l₁ l₂ u₀ : ℝ) (h_diff : l₁ ≠ l₂)
+    (h_eval : c₁ * Real.exp (l₁ * u₀) + c₂ * Real.exp (l₂ * u₀) = 0)
+    (h_deriv : c₁ * l₁ * Real.exp (l₁ * u₀) + c₂ * l₂ * Real.exp (l₂ * u₀) = 0) :
+    c₁ = 0 ∧ c₂ = 0 := by
+  have he1_pos : 0 < Real.exp (l₁ * u₀) := Real.exp_pos _
+  have he2_pos : 0 < Real.exp (l₂ * u₀) := Real.exp_pos _
+  have he1_ne : Real.exp (l₁ * u₀) ≠ 0 := ne_of_gt he1_pos
+  have he2_ne : Real.exp (l₂ * u₀) ≠ 0 := ne_of_gt he2_pos
+  have h_det : (l₂ - l₁) * (c₁ * Real.exp (l₁ * u₀)) = 0 := by
+    calc (l₂ - l₁) * (c₁ * Real.exp (l₁ * u₀))
+      _ = l₂ * (c₁ * Real.exp (l₁ * u₀) + c₂ * Real.exp (l₂ * u₀)) -
+          (c₁ * l₁ * Real.exp (l₁ * u₀) + c₂ * l₂ * Real.exp (l₂ * u₀)) := by ring
+      _ = l₂ * 0 - 0 := by rw [h_eval, h_deriv]
+      _ = 0 := by ring
+  have h_sub_ne : l₂ - l₁ ≠ 0 := sub_ne_zero.mpr (Ne.symm h_diff)
+  have hd1_zero : c₁ * Real.exp (l₁ * u₀) = 0 := by
+    cases mul_eq_zero.mp h_det with
+    | inl h => exact False.elim (h_sub_ne h)
+    | inr h => exact h
+  have hc₁ : c₁ = 0 := by
+    cases mul_eq_zero.mp hd1_zero with
+    | inl h => exact h
+    | inr h => exact False.elim (he1_ne h)
+  have hd2_zero : c₂ * Real.exp (l₂ * u₀) = 0 := by
+    calc c₂ * Real.exp (l₂ * u₀)
+      _ = (c₁ * Real.exp (l₁ * u₀) + c₂ * Real.exp (l₂ * u₀)) - c₁ * Real.exp (l₁ * u₀) := by ring
+      _ = 0 - 0 := by rw [h_eval, hd1_zero]
+      _ = 0 := by ring
+  have hc₂ : c₂ = 0 := by
+    cases mul_eq_zero.mp hd2_zero with
+    | inl h => exact h
+    | inr h => exact False.elim (he2_ne h)
+  exact ⟨hc₁, hc₂⟩
+
 end RiemannScope

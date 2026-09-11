@@ -34,6 +34,13 @@ except ImportError:
     ctx = None
     FLINT_AVAILABLE = False
 
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    np = None
+    NUMPY_AVAILABLE = False
+
 import math_core
 
 
@@ -6662,57 +6669,128 @@ def evaluate_two_variable_finite_decomposition(
                 return mpmath.mpf(0)
             return sum(f_J_single(y, g) for g in retained_gammas)
 
-        # 2D bilinear pairing quadrature:
-        # Q_eps(g1, g2) = eps * iint eta(u) w(x) g1(x) w(x - eps*u) g2(x - eps*u) dx du
-        def pair(g1, g2):
-            def inner_u(u):
-                eu = eta(u)
-                if eu == 0:
-                    return mpmath.mpf(0)
-                def inner_x(x):
-                    y = x - eps_mp * u
-                    return w_func(x) * g1(x) * w_func(y) * g2(y)
-                return eu * mpmath.quad(inner_x, [a, b], maxdegree=3)
-            return eps_mp * mpmath.quad(inner_u, [-1.0, 1.0], maxdegree=3)
+        # 2D bilinear pairing quadrature with exact support handling:
+        # y = x - eps * v, v in [-1, 1], Jacobian = eps
+        # x in [max(a, a + eps * v), min(b, b + eps * v)]
+        # Evaluated using 512-node Gauss-Legendre quadrature for super-algebraic accuracy.
+        if np is not None:
+            n_nodes = 512
+            v_nodes, v_weights = np.polynomial.legendre.leggauss(n_nodes)
+            x_nodes, x_weights = np.polynomial.legendre.leggauss(n_nodes)
+            v_col = v_nodes[:, None]
+            wv_col = v_weights[:, None]
 
-        # Recompute all four tensor blocks
-        Q_BB = float(pair(B_K, B_J))
+            x_min = np.maximum(float(a), float(a) + float(eps) * v_col)
+            x_max = np.minimum(float(b), float(b) + float(eps) * v_col)
+            half_len = 0.5 * (x_max - x_min)
+            mid_x = 0.5 * (x_max + x_min)
 
-        if retained_gammas:
-            Q_BZ = float(pair(B_K, Z_J))
-            Q_ZB = float(pair(Z_K, B_J))
-            Q_ZZ = float(pair(Z_K, Z_J))
-        else:
-            Q_BZ = 0.0
-            Q_ZB = 0.0
-            Q_ZZ = 0.0
+            X_grid = mid_x + half_len * x_nodes[None, :]
+            Y_grid = X_grid - float(eps) * v_col
 
-        Q_ret = Q_BB - Q_BZ - Q_ZB + Q_ZZ
+            w_mid = (float(a) + float(b)) / 2.0
+            vmid_f = math.exp(-1.0 / ((w_mid - float(a)) * (float(b) - w_mid)))
+            wx_grid = np.exp(-1.0 / ((X_grid - float(a)) * (float(b) - X_grid))) / vmid_f
+            wy_grid = np.exp(-1.0 / ((Y_grid - float(a)) * (float(b) - Y_grid))) / vmid_f
+            ev_col = np.exp(1.0 - 1.0 / (1.0 - v_col ** 2))
 
-        # Selected spectral block A_eps
-        if selected_in_retained:
-            def Z_K_sel(x):
-                return f_K_single(x, selected_gamma)
-            def Z_J_sel(y):
-                return f_J_single(y, selected_gamma)
-            A_eps = float(pair(Z_K_sel, Z_J_sel))
+            base_w = float(eps) * wv_col * ev_col * half_len * x_weights[None, :] * wx_grid * wy_grid
 
-            # Complementary zero terms:
-            other_gammas = [g for g in retained_gammas if g != selected_gamma]
-            if other_gammas:
-                def Z_K_other(x):
-                    return sum(f_K_single(x, g) for g in other_gammas)
-                def Z_J_other(y):
-                    return sum(f_J_single(y, g) for g in other_gammas)
-                Q_ZZ_other = float(pair(Z_K_other, Z_J_other))
-                Q_ZZ_cross1 = float(pair(Z_K_sel, Z_J_other))
-                Q_ZZ_cross2 = float(pair(Z_K_other, Z_J_sel))
-                Q_ZZ_complement = Q_ZZ_other + Q_ZZ_cross1 + Q_ZZ_cross2
+            def pair_grid(f1_grid, f2_grid):
+                return float(np.sum(base_w * f1_grid * f2_grid))
+
+            a_0_f = float(a_0_mp)
+            a_1_f = float(a_1_mp)
+            def b_K_arr(x):
+                return 1.0 / a_0_f - (a_0_f ** 2) / (x * (x * x - a_0_f ** 2))
+            def b_J_arr(y):
+                return 1.0 / a_1_f - (a_1_f ** 2) / (y * (y * y - a_1_f ** 2))
+            def f_K_arr(x, g):
+                return 2.0 / np.sqrt(a_0_f * x) * np.cos(float(g) * np.log(x / a_0_f))
+            def f_J_arr(y, g):
+                return 2.0 / np.sqrt(a_1_f * y) * np.cos(float(g) * np.log(y / a_1_f))
+
+            bk_grid = b_K_arr(X_grid)
+            bj_grid = b_J_arr(Y_grid)
+
+            Q_BB = pair_grid(bk_grid, bj_grid)
+
+            if retained_gammas:
+                zk_grid = sum(f_K_arr(X_grid, g) for g in retained_gammas)
+                zj_grid = sum(f_J_arr(Y_grid, g) for g in retained_gammas)
+                Q_BZ = pair_grid(bk_grid, zj_grid)
+                Q_ZB = pair_grid(zk_grid, bj_grid)
+                Q_ZZ = pair_grid(zk_grid, zj_grid)
             else:
-                Q_ZZ_complement = 0.0
+                Q_BZ = 0.0
+                Q_ZB = 0.0
+                Q_ZZ = 0.0
+
+            Q_ret = Q_BB - Q_BZ - Q_ZB + Q_ZZ
+
+            if selected_in_retained:
+                zk_sel = f_K_arr(X_grid, selected_gamma)
+                zj_sel = f_J_arr(Y_grid, selected_gamma)
+                A_eps = pair_grid(zk_sel, zj_sel)
+
+                other_gammas = [g for g in retained_gammas if g != selected_gamma]
+                if other_gammas:
+                    zk_oth = sum(f_K_arr(X_grid, g) for g in other_gammas)
+                    zj_oth = sum(f_J_arr(Y_grid, g) for g in other_gammas)
+                    Q_ZZ_other = pair_grid(zk_oth, zj_oth)
+                    Q_ZZ_cross1 = pair_grid(zk_sel, zj_oth)
+                    Q_ZZ_cross2 = pair_grid(zk_oth, zj_sel)
+                    Q_ZZ_complement = Q_ZZ_other + Q_ZZ_cross1 + Q_ZZ_cross2
+                else:
+                    Q_ZZ_complement = 0.0
+            else:
+                A_eps = 0.0
+                Q_ZZ_complement = Q_ZZ
         else:
-            A_eps = 0.0
-            Q_ZZ_complement = Q_ZZ
+            # Fallback with exact support limits
+            def pair(g1, g2):
+                def inner_u(u):
+                    eu = eta(u)
+                    if eu == 0:
+                        return mpmath.mpf(0)
+                    x_l = max(a, a + float(eps) * float(u))
+                    x_r = min(b, b + float(eps) * float(u))
+                    if x_l >= x_r:
+                        return mpmath.mpf(0)
+                    def inner_x(x):
+                        y = x - eps_mp * u
+                        return w_func(x) * g1(x) * w_func(y) * g2(y)
+                    return eu * mpmath.quad(inner_x, [x_l, x_r], maxdegree=6)
+                return eps_mp * mpmath.quad(inner_u, [-1.0, 1.0], maxdegree=6)
+
+            Q_BB = float(pair(B_K, B_J))
+            if retained_gammas:
+                Q_BZ = float(pair(B_K, Z_J))
+                Q_ZB = float(pair(Z_K, B_J))
+                Q_ZZ = float(pair(Z_K, Z_J))
+            else:
+                Q_BZ = 0.0
+                Q_ZB = 0.0
+                Q_ZZ = 0.0
+            Q_ret = Q_BB - Q_BZ - Q_ZB + Q_ZZ
+
+            if selected_in_retained:
+                def Z_K_sel(x): return f_K_single(x, selected_gamma)
+                def Z_J_sel(y): return f_J_single(y, selected_gamma)
+                A_eps = float(pair(Z_K_sel, Z_J_sel))
+                other_gammas = [g for g in retained_gammas if g != selected_gamma]
+                if other_gammas:
+                    def Z_K_other(x): return sum(f_K_single(x, g) for g in other_gammas)
+                    def Z_J_other(y): return sum(f_J_single(y, g) for g in other_gammas)
+                    Q_ZZ_other = float(pair(Z_K_other, Z_J_other))
+                    Q_ZZ_cross1 = float(pair(Z_K_sel, Z_J_other))
+                    Q_ZZ_cross2 = float(pair(Z_K_other, Z_J_sel))
+                    Q_ZZ_complement = Q_ZZ_other + Q_ZZ_cross1 + Q_ZZ_cross2
+                else:
+                    Q_ZZ_complement = 0.0
+            else:
+                A_eps = 0.0
+                Q_ZZ_complement = Q_ZZ
 
         # Independent remainder computation from complementary terms:
         # R_{eps, T} = Q_BB - Q_BZ - Q_ZB + Q_{ZZ, complement}

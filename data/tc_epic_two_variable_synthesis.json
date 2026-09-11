@@ -452,17 +452,17 @@
     "arithmetic_observable_Q_eps": 0.0,
     "arithmetic_vanishing_verified": true,
     "retained_spectral_expansion": {
-      "Q_BB": 0.16895674424356083,
-      "Q_BZ": -0.018952032485380344,
-      "Q_ZB": -0.015589891709999611,
-      "Q_ZZ": 0.06596004957100254,
-      "Q_retained_sum": 0.26945871800994337,
+      "Q_BB": 0.16895668569466069,
+      "Q_BZ": -0.01895209192459118,
+      "Q_ZB": -0.015589925034411192,
+      "Q_ZZ": 0.06579011387860469,
+      "Q_retained_sum": 0.26928881653226777,
       "formula": "Q_BB - Q_BZ - Q_ZB + Q_ZZ"
     },
     "selected_spectral_block": {
       "target_zero": "0.5 + 14.13472514173469379j",
-      "A_eps": 0.054372406426975044,
-      "A_eps_over_eps": 0.5437240642697504,
+      "A_eps": 0.05437243335384386,
+      "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
         "mid": 0.5444399924859572,
@@ -474,13 +474,13 @@
       }
     },
     "retained_remainder_R": {
-      "R_eps": 0.21508631158296831,
-      "R_eps_independent": 0.2150863115829683,
-      "R_eps_over_eps": 2.150863115829683,
+      "R_eps": 0.2149163831784239,
+      "R_eps_independent": 0.2149163831784239,
+      "R_eps_over_eps": 2.149163831784239,
       "consistency_check_R_eq_Q_minus_A": true
     },
     "observed_tail_residual": {
-      "E_observed": -0.26945871800994337,
+      "E_observed": -0.26928881653226777,
       "uncertainty": "< 1e-8 (quadrature residual)",
       "formula": "Q_eps - Q_retained"
     },
@@ -629,7 +629,7 @@
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 213,
+    "total_compiled_theorems": 218,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",

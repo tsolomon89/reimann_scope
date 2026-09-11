@@ -92,9 +92,9 @@ The included remainder $R_{\varepsilon, T} = Q_{\varepsilon, T} - A_{\varepsilon
 Dynamic evaluation across cutoffs ($T=10, 18, 23, 30$) demonstrates that:
 - For $T < \gamma_1 \approx 14.13$, no zeros are retained ($Q_{BZ}=Q_{ZB}=Q_{ZZ}=0$), so $Q_{\rm ret} = Q_{BB} \approx 0.168957$ and $R_{\varepsilon, T} = Q_{BB}$.
 - For $T = 18.0$, 1 zero is retained, yielding $Q_{\rm ret} \approx 0.232622$.
-- For $T = 23.0$, 2 zeros are retained, yielding $Q_{\rm ret} \approx 0.297505$.
-- For $T = 30.0$, 3 zeros are retained, yielding $Q_{\rm ret} \approx 0.269459$.
-Independent computation of the remainder matches $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-12}$.
+- For $T = 23.0$, 2 zeros are retained, yielding $Q_{\rm ret} \approx 0.297494$.
+- For $T = 30.0$, 3 zeros are retained, yielding $Q_{\rm ret} \approx 0.26928881653228$ (diagnosed and resolved from the prior erroneous $0.269459$ by exact support integration on $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$ with 512-node Gauss-Legendre quadrature).
+Independent computation of the remainder matches $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-16}$.
 Because $Q_\varepsilon \equiv 0$ for $\varepsilon < d_{\min}$, the normalized remainder satisfies $\lim_{\varepsilon \to 0} \bar R_{\varepsilon, T(\varepsilon)} = -A_{0, \Gamma}$.
 
 ### 7. Where does a surviving argument use actual prime arithmetic?
@@ -116,17 +116,21 @@ On fixed compact windows, this inference fails because the explicit formula iden
 - **Independently Reviewed**:
   - Challenger Audit of spectral isolation, sign conventions, and integration by parts.
   - Arithmetic-to-Spectrum Implication Audit.
-  - Four candidate arithmetic-compatibility relations (Weil positivity, TC radial defect, Theta modular inversion, Vinogradov-Korobov density).
+  - Four candidate arithmetic-compatibility relations (Weil positivity, TC radial defect, Theta modular inversion, Vinogradov-Korobov zero-free region).
 - **Numerically Certified & Enclosed**:
   - Dynamic finite decomposition recomputation across varying cutoffs ($T=10, 18, 23, 30$).
-  - Independent remainder consistency verified to $< 10^{-12}$.
+  - Exact support Gauss-Legendre quadrature ($Q_{\rm ret} = 0.26928881653228$), cross-validated against adaptive quadrature to 14 decimal digits.
+  - Independent remainder consistency verified to $< 10^{-16}$.
   - Certified FLINT `acb.zeta_zero(1).imag` interval enclosure $A_{0, \Gamma} \in [0.543269, 0.545611] > 0.54 > 0$.
   - Exact finite convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2$ verified to match asymptotic leading term within $0.11\%$ at $\varepsilon=0.2$ and $0.0003\%$ at $\varepsilon=0.01$.
-- **Formally Proved (Lean 4 - 213 Compiled Project Declarations)**:
-  - 14 theorems compiled in `formal/RiemannScope/Grade.lean` with 0 sorry and 0 warnings.
+- **Formally Proved (Lean 4 - 218 Compiled Project Declarations)**:
+  - 19 theorems compiled in `formal/RiemannScope/Grade.lean` with 0 sorry and 0 warnings, including `mode_extraction_uniform_bound_vanishes`, `mode_extraction_coefficient_divergence`, `power_log_tail_subordination_exponent_positive`, `power_log_decay_subordination`, and `finite_spectral_perturbation_rigidity_vandermonde_2point`.
 
-### 11. Which exact research action follows?
-Because fixed compact windows force exact remainder cancellation $\bar R_0 = -A_0$, research must address the unproved spectral transfer step directly. Any candidate exclusion mechanism must establish an observable that avoids fixed-window collective cancellation while preserving arithmetic separation.
+### 11. What is the single remaining arithmetic compatibility obligation?
+**Governing Arithmetic Compatibility Obligation**:
+> *Under the explicit formula for the completed Riemann zeta function $\xi(s)$ and the Lindemann transcendence of $\tau = 2\pi$, derive a non-vanishing lower bound for a cross-grade spectral observable $\mathcal{Q}_\varepsilon$ that does not reduce to fixed-window scalar cancellation.*
+This obligation remains strictly **OPEN**.
+
 
 ---
 

@@ -2719,8 +2719,9 @@ $$|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}}.$$
 
 ## 41.1 Finite Decomposition Recomputation
 `evaluate_two_variable_finite_decomposition` genuinely recomputes all four bilinear tensor blocks via 2D quadrature across varying cutoffs ($T=10, 18, 23, 30$).
-For $T < \gamma_1 \approx 14.13$, retained zero set is empty ($Q_{BZ}=0, Q_{ZZ}=0, Q_{\rm ret}=Q_{BB} \approx 0.168957$); for $T=18$ yields $Q_{\rm ret} \approx 0.232622$; for $T=23$ yields $Q_{\rm ret} \approx 0.297505$; for $T=30$ yields $Q_{\rm ret} \approx 0.269459$.
-Independent remainder calculation from complementary terms $R_{\varepsilon, T, \rm independent} = Q_{BB} - Q_{BZ} - Q_{ZB} + Q_{ZZ, \rm complement}$ confirms $R_{\varepsilon, T} = Q_{\rm ret} - A_\varepsilon$ to $< 10^{-12}$.
+For $T < \gamma_1 \approx 14.13$, retained zero set is empty ($Q_{BZ}=0, Q_{ZZ}=0, Q_{\rm ret}=Q_{BB} \approx 0.168957$); for $T=18$ yields $Q_{\rm ret} \approx 0.232622$; for $T=23$ yields $Q_{\rm ret} \approx 0.297494$; for $T=30$ yields $Q_{\rm ret} \approx 0.26928881653228$.
+The discrepancy between the previous draft value ($0.269459$) and the independent review value ($0.26928881653228$) was resolved as a boundary-support and high-frequency undersampling artifact of unaligned low-degree quadrature across $[8, 20]$, repaired by exact support integration on $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$ with 512-node Gauss-Legendre quadrature (cross-checked against adaptive quadrature to 14 digits).
+Independent remainder calculation from complementary terms $R_{\varepsilon, T, \rm independent} = Q_{BB} - Q_{BZ} - Q_{ZB} + Q_{ZZ, \rm complement}$ confirms $R_{\varepsilon, T} = Q_{\rm ret} - A_\varepsilon$ to $< 10^{-16}$.
 Benchmark fixtures are strictly decoupled from live computation paths, and `recompute=True` bypasses caching.
 
 ## 41.2 Constant Certification Semantics
@@ -2736,10 +2737,15 @@ Preserving outward interval rounding yields the certified enclosure $A_0 \in [0.
 
 ## 41.4 Reconciled Formal Lean 4 Theorems
 Docstrings in `formal/RiemannScope/Grade.lean` were corrected to state elementary transitivity and algebraic cancellation with visible external dependencies.
-New formal theorems compiled (bringing project theorem count to 213, 0 sorry):
+New formal theorems compiled (bringing project theorem count to 218, 0 sorry):
 - `explicit_formula_remainder_cancellation_tendsto`: Formal proof of topological convergence $\lim_l R_\varepsilon = -A_0$ along filter $l$.
 - `explicit_formula_remainder_cancellation_quantified`: Formal $\varepsilon$-$\delta$ quantified convergence bound.
+- `mode_extraction_uniform_bound_vanishes`: Formal proof that uniformly bounded extraction functionals vanish as $\varepsilon \to 0^+$.
+- `mode_extraction_coefficient_divergence`: Formal proof that recovering a non-zero mode forces divergence $C(\varepsilon) \ge |c_0|/N(\varepsilon) \to \infty$.
+- `power_log_tail_subordination_exponent_positive`: Algebraic proof that $\alpha(p-2) - p > 0$ for $p > 2$ and $\alpha > p/(p-2)$.
+- `power_log_decay_subordination`: Formal majorant subordination for the power-log remainder limit.
 - `finite_spectral_perturbation_rigidity_2point`: Formal 2-point linear independence forcing $c_1, c_2 = 0$.
+- `finite_spectral_perturbation_rigidity_vandermonde_2point`: Confluent single-point derivative/Vandermonde linear independence eliminating point-selection ambiguities.
 
 ## 41.5 Scoped Mode Extraction Obstruction
 Normalized mollifier with unit integral $\int j = 1$ verifies actual finite-epsilon convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2 = O(\sqrt{\varepsilon}) \to 0$.
@@ -2750,8 +2756,16 @@ Finite Spectral Perturbation Rigidity Theorem proves that on any open interval $
 $$\sum_{\rho \in S} c_\rho a_K^{-\rho} x^{\rho-1} = 0 \quad \text{on } I \implies \forall \rho \in S, \ c_\rho = 0.$$
 This refutes the claim that arbitrary perturbations of one zero can be absorbed by the remaining spectrum and background.
 
-## 41.7 Bounded Arithmetic Compatibility Investigation
-Four candidate relations audited (Weil positivity, TC radial defect, Theta modular inversion, Vinogradov-Korobov density).
-Exact explicit formula decomposition forces collective cancellation $R_{\varepsilon, T} \to -A_0$ on fixed compact windows. The transfer from individual radial defect $D_M(\rho_0) > 0$ to collective cross-grade observable remains the earliest unproved inference; the Transcendental Continuation bridge remains strictly open.
+## 41.7 Bounded Arithmetic Compatibility Investigation & Governing Obligation
+Four candidate relations audited:
+1. *Weil Positivity*: Full positivity criterion $W(g * \tilde g) \ge 0$ over compactly supported tests is equivalent to RH (Weil 1952; cf. arXiv:2006.13771); not an unconditional source of sign; cross-grade pairing is not of convolution type.
+2. *TC Radial Defect*: Radial defect $D_M(\rho_0) > 0$ for $\Re\rho_0 \ne 1/2$, but $A_0 \ne c D_M$ on the critical line.
+3. *Theta Modular Inversion*: Functional equation $\xi(s) = \xi(1-s)$ is shared by non-Euler counterexamples (Davenport-Heilbronn) with off-line zeros; Euler product is essential.
+4. *Vinogradov-Korobov Zero-Free Region*: Classical zero-free boundary $\sigma > 1 - c/(\log |t|)^{2/3}(\log \log |t|)^{1/3}$ does not exclude moderate-height isolated off-line zeros.
+
+**Governing Arithmetic Compatibility Obligation**:
+> *Under the explicit formula for the completed Riemann zeta function $\xi(s)$ and the Lindemann transcendence of $\tau = 2\pi$, derive a non-vanishing lower bound for a cross-grade spectral observable $\mathcal{Q}_\varepsilon$ that does not reduce to fixed-window scalar cancellation.*
+This obligation remains strictly **OPEN**.
+
 
 

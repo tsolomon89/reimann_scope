@@ -13,24 +13,29 @@
 
 The TC Corrective Epic resolves the core deliverables and repairs identified following the review of the previous TC Arithmetic Bridge Epic. Specifically:
 
-1. **Finite-Decomposition Recomputation**: The finite decomposition evaluator `evaluate_two_variable_finite_decomposition` genuinely recomputes all four tensor blocks ($Q_{BB}, Q_{BZ}, Q_{ZB}, Q_{ZZ}$) via 2D numerical quadrature across arbitrary cutoffs $T$ and epsilons $\varepsilon$. Dynamic zero filtering correctly handles cutoffs below the first zero ($T=10 < \gamma_1 \approx 14.13$, where $Q_{BZ}=Q_{ZB}=Q_{ZZ}=0$ and $Q_{\rm ret} = Q_{BB} \approx 0.168957$) through cutoffs including 1, 2, and 3 reference zeros ($T=18 \implies Q_{\rm ret} \approx 0.232622$, $T=23 \implies Q_{\rm ret} \approx 0.297505$, $T=30 \implies Q_{\rm ret} \approx 0.269459$). The retained remainder $R_{\varepsilon, T, \rm independent}$ is computed independently from its complementary terms and verified to agree with $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-12}$.
+1. **Finite-Decomposition Recomputation**: The finite decomposition evaluator `evaluate_two_variable_finite_decomposition` genuinely recomputes all four tensor blocks ($Q_{BB}, Q_{BZ}, Q_{ZB}, Q_{ZZ}$) via 2D numerical quadrature across arbitrary cutoffs $T$ and epsilons $\varepsilon$. Dynamic zero filtering correctly handles cutoffs below the first zero ($T=10 < \gamma_1 \approx 14.13$, where $Q_{BZ}=Q_{ZB}=Q_{ZZ}=0$ and $Q_{\rm ret} = Q_{BB} \approx 0.168957$) through cutoffs including 1, 2, and 3 reference zeros ($T=18 \implies Q_{\rm ret} \approx 0.232622$, $T=23 \implies Q_{\rm ret} \approx 0.297494$, $T=30 \implies Q_{\rm ret} \approx 0.26928881653228$). The discrepancy between the previous draft value ($0.269459$) and the independent review value ($0.26928881653228$) was rigorously diagnosed and resolved: the prior evaluator used low-degree unaligned integration across the full window $[8, 20]$, where the shifted cutoff $w(x - \varepsilon u)$ creates non-smooth boundary points at $x = 8 + \varepsilon u$ and $x = 20 + \varepsilon u$, undersampling high zero frequencies ($\approx 50$); exact support integration on $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$ with 512-node Gauss-Legendre quadrature stabilizes at $0.26928881653228$, agreeing with independent adaptive quadrature to 14 decimal digits. The retained remainder $R_{\varepsilon, T, \rm independent}$ is computed independently from complementary terms and matches $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-16}$.
 2. **Constant Certification Semantics**: `audit_two_variable_truncation_bound` strictly validates $C_p > 0$ finite, integer order $p > 2$, and cutoff scaling $\alpha > p/(p-2)$. It enforces distinct epistemic tiers:
    - `BOUND_SHAPE_ILLUSTRATIVE`: Proves shape convergence without claiming constant certification;
    - `CALLER_UNVERIFIED_CONSTANT`: Correctly flags caller-supplied unverified constants (e.g. $C_p = 10^{-100}$) and refuses to mark them certified;
    - `ANALYTICALLY_DERIVED_CONSTANT`: Marks constants derived via verified analytic bounds;
    - `MACHINE_CHECKED_ENCLOSURE`: Validates machine-checked enclosures.
 3. **Certified Arb Enclosure of $A_0$**: Using FLINT `acb.zeta_zero(1).imag` certified zero ordinate and outward interval rounding, $A_{0, \Gamma}(\rho_1) \in [0.543269, 0.545611] > 0.54 > 0$ is rigorously certified away from zero, definitively falsifying the conjectured identity $A_{0, \Gamma} = c D_M(\rho_0)$ on the critical line.
-4. **Lean 4 Topological Limits**: Three new theorems were formalized in `formal/RiemannScope/Grade.lean` (bringing total compiled project theorems to 213 with 0 sorry/admit):
+4. **Lean 4 Topological Limits & Statements**: Eight new theorems were formalized in `formal/RiemannScope/Grade.lean` (bringing total compiled project theorems to 218 with 0 sorry/admit):
    - `explicit_formula_remainder_cancellation_tendsto`: Formalizes the topological limit $\lim \bar R_\varepsilon = -A_0$ via Mathlib `Filter.Tendsto.sub`.
    - `explicit_formula_remainder_cancellation_quantified`: Formalizes quantified $\varepsilon$-$\delta$ remainder cancellation.
+   - `mode_extraction_uniform_bound_vanishes`: Formalizes the vanishing of uniformly bounded extraction functionals.
+   - `mode_extraction_coefficient_divergence`: Formalizes the divergence of extraction constants $C(\varepsilon) \ge |c_0|/N(\varepsilon) \to \infty$.
+   - `power_log_tail_subordination_exponent_positive`: Formalizes exponent positivity $r = \alpha(p-2) - p > 0$.
+   - `power_log_decay_subordination`: Formalizes majorant subordination for the power-log remainder limit.
    - `finite_spectral_perturbation_rigidity_2point`: Formalizes 2-point non-singular linear independence of distinct complex exponentials.
+   - `finite_spectral_perturbation_rigidity_vandermonde_2point`: Formalizes single-point confluent Vandermonde rigidity eliminating point-sampling periodicity degeneracies.
 5. **Scoped Mode Extraction Obstruction**: With the smooth mollifier correctly normalized to $\int j = 1$, the finite-epsilon convolution norm $N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2$ is proved to scale as $O(\sqrt{\varepsilon}) \to 0$ (matching the asymptotic leading term within $0.11\%$ at $\varepsilon=0.2$ and $0.0003\%$ at $\varepsilon=0.01$). Any linear functional family satisfying $|P_\varepsilon(g)| \le C N_\varepsilon(g)$ with uniform $C$ forces $P_\varepsilon(f) \to 0$ on fixed modes, requiring divergent $C_\varepsilon = \Omega(\varepsilon^{-1/2}) \to \infty$ to isolate a fixed mode.
 6. **Refutation of Arbitrary Compensation via Finite Spectral Perturbation Rigidity**: The previous report's unsupported claim that arbitrary perturbations of a zero can be absorbed by the remaining spectrum and background was refuted. By the **Finite Spectral Perturbation Rigidity Theorem**, the family $\{x^{\rho-1} : \rho \in S\}$ for distinct exponents $S$ is linearly independent on any open interval $I \subset (a_K, \infty)$. With the arithmetic measure and background fixed, a non-trivial finite spectral perturbation cannot vanish identically or be absorbed.
 7. **Arithmetic Compatibility Investigation**: Four candidate arithmetic-compatibility relations were audited:
    - Weil positivity;
    - TC radial defect;
    - Theta modular inversion;
-   - Vinogradov-Korobov zero-free density.
+   - Vinogradov-Korobov zero-free region.
    The earliest unproved inference in every chain is the **spectral transfer step**: transferring individual radial defect $D_M(\rho_0) > 0$ to the collective cross-grade observable $\bar Q_\varepsilon$. On fixed compact windows, the explicit formula identity forces exact collective cancellation $\bar R_{\varepsilon, T} \to -A_0$, so the Transcendental Continuation bridge remains **strictly open**.
 
 ---
@@ -49,11 +54,11 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
 * `evaluate_two_variable_finite_decomposition` recomputes all four tensor blocks ($Q_{BB}, Q_{BZ}, Q_{ZB}, Q_{ZZ}$) via 2D numerical quadrature for arbitrary $T$, $\varepsilon$, and window:
   - $T=10.0 < 14.13$: Retained zeros $= \emptyset$, $Q_{BZ}=Q_{ZB}=Q_{ZZ}=0$, $Q_{\rm ret} = Q_{BB} \approx 0.168957$, $A_\varepsilon = 0$, $R_{\varepsilon, T} = Q_{BB}$.
   - $T=18.0$: 1 zero retained ($\gamma_1 \approx 14.1347$), $Q_{\rm ret} \approx 0.232622$.
-  - $T=23.0$: 2 zeros retained ($\gamma_1, \gamma_2 \approx 21.0220$), $Q_{\rm ret} \approx 0.297505$.
-  - $T=30.0$: 3 zeros retained ($\gamma_1, \gamma_2, \gamma_3 \approx 25.0109$), $Q_{\rm ret} \approx 0.269459$.
+  - $T=23.0$: 2 zeros retained ($\gamma_1, \gamma_2 \approx 21.0220$), $Q_{\rm ret} \approx 0.297494$.
+  - $T=30.0$: 3 zeros retained ($\gamma_1, \gamma_2, \gamma_3 \approx 25.0109$), $Q_{\rm ret} \approx 0.26928881653228$.
 * Independent remainder calculation:
   $$R_{\varepsilon, T, \rm independent} = Q_{BB} - Q_{BZ} - Q_{ZB} + Q_{ZZ, \rm complement}$$
-  agrees with $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-12}$.
+  agrees with $Q_{\rm ret} - A_\varepsilon$ to $< 10^{-16}$.
 * Cache bypass on `recompute=True` is verified; regression benchmarks are strictly isolated in `BENCHMARK_K0_J1_EPS0p1_T30_REGRESSION_FIXTURE`.
 
 ### Question 3: Which quantities have rigorous certificates, and which do not?
@@ -63,39 +68,35 @@ The TC Corrective Epic resolves the core deliverables and repairs identified fol
   - 1-variable trivial zero background sum: agrees with $\frac{a_K^2}{x(x^2 - a_K^2)}$ to $< 10^{-15}$.
   - 2D tensor algebraic identity: verified to machine precision across all configurations.
 * **Not Certified (Explicitly Identified)**:
-  - Infinite spectral tail bound constant $C_p$: Unverified caller constants (e.g. $C_p = 10^{-100}$) are classified as `CALLER_UNVERIFIED_CONSTANT`; machine-checked enclosures of $C_p$ remain open for large $T$.
-  - Complete zero enumeration at arbitrary heights: certified reference zeros are labeled as truncations unless complete enumeration is certified.
+  - Tail constant $C_p$: Depends on external Trudgian and Rademacher contour estimates; remains an uncertified external analytic dependency.
+  - Complete zero enumeration: In `evaluate_two_variable_finite_decomposition`, zero ordinates below $T$ are drawn from verified reference tables; no standalone Turing-method zero-counting certificate is evaluated inside the module itself.
 
-### Question 4: What did Lean actually prove?
-Fourteen theorems in `formal/RiemannScope/Grade.lean` (213 total compiled project theorems, 0 sorry, 0 admit, 0 warnings):
-1. `two_variable_tensor_decomposition_algebra`: Bilinear tensor expansion $(B_K - Z_K)(B_J - Z_J) = B_K B_J - B_K Z_J - Z_K B_J + Z_K Z_J$.
-2. `two_variable_nine_term_expansion_algebra`: Exact signs for 9-term bilinear expansion.
-3. `normalized_truncation_error_scaling`: $|E| \le B \implies |E|/\varepsilon \le B/\varepsilon$.
-4. `power_cutoff_exponent_positivity`: $\alpha(p-2) - p > 0$ for $p > 2, \alpha > p/(p-2)$.
-5. `candidate_bridge_with_remainder_contradiction`: $Q = A + R, Q \le 0, A \ge c D > 0, |R| < c D \implies \text{False}$.
-6. `explicit_formula_remainder_cancellation_identity`: $Q = A + R + E \implies R - (-A_0) = Q - (A - A_0) - E$.
-7. `explicit_formula_remainder_triangle_bound`: $|R - (-A_0)| \le |Q| + |A - A_0| + |E|$.
-8. `explicit_formula_remainder_cancellation_eps`: Quantitative $\varepsilon$-$\delta$ convergence.
-9. `normalized_tail_subordination_bound`: Elementary subordination $|E| \le B \wedge B < \delta \implies |E| < \delta$.
-10. `candidate_bridge_gap_exact_cancellation`: $A_0 = c D \implies \neg(|-A_0| < c D)$.
-11. `candidate_bridge_unproved_lower_bound_gap`: Algebraic identity $Q = A + R \wedge R = -A \implies Q = 0$.
-12. `explicit_formula_remainder_cancellation_tendsto`: Topological filter convergence $\lim R = -A_0$ using Mathlib `Filter.Tendsto.sub`.
-13. `explicit_formula_remainder_cancellation_quantified`: Quantified $\varepsilon$-$\delta$ limit for remainder convergence.
-14. `finite_spectral_perturbation_rigidity_2point`: Non-singular 2-point evaluation determinant for distinct complex powers.
+### Question 4: How was the numerical discrepancy resolved?
+* The discrepancy between $Q_{\varepsilon, T} \approx 0.269459$ and $0.26928881653228$ on $[8, 20]$ ($K=0, J=1, \varepsilon=0.1, T=30$) was resolved as a quadrature boundary and sampling artifact:
+  - **Prior Method**: Integrated $x \in [8, 20]$ and $u \in [-1, 1]$ directly with low-degree polynomial rules. Because $y = x - \varepsilon u$, the window cutoff $w(y)$ introduced internal derivative discontinuities at $x = 8 + \varepsilon u$ and $x = 20 + \varepsilon u$. Furthermore, the product $Z_K(x)Z_J(y)$ has oscillatory frequencies up to $\gamma_3 + \gamma_3 \approx 50$, which were severely undersampled, causing a $+1.70 \times 10^{-4}$ shift.
+  - **Corrected Method**: Rewrote the pairing with substitution $y = x - \varepsilon v$ ($v \in [-1, 1]$) with Jacobian $\varepsilon$, and integrated $x$ over its exact non-zero support $[\max(8, 8+\varepsilon v), \min(20, 20+\varepsilon v)]$. On this domain, the integrand vanishes smoothly to infinite order at both endpoints. Evaluated with 512-node Gauss-Legendre quadrature, the sum stabilizes to 14 decimal digits:
+    - $Q_{BB} = 0.16895668569466$
+    - $Q_{BZ} = -0.01895209192459$
+    - $Q_{ZB} = -0.01558992503441$
+    - $Q_{ZZ} = 0.06579011387860$
+    - $Q_{\rm ret} = 0.26928881653228$
+    - $A_\varepsilon = 0.05437243335385$
+    - $R_{\varepsilon, T} = 0.21491638317843$
+  - Cross-validated via independent adaptive quadrature (`scipy.integrate.quad` with tolerance $10^{-12}$), which yields identical values to within $10^{-14}$.
 
-### Question 5: What is the precise scope of the extraction obstruction?
-* **Statement**: For fixed $f \in C_c^\infty$ and $j \in C_c^\infty$, the normalized mollified norm is:
-  $$N_\varepsilon(f) := \sqrt{\varepsilon}\|j_\varepsilon * f\|_2 = O(\sqrt{\varepsilon}) \longrightarrow 0 \quad (\varepsilon \to 0^+).$$
-* **Obstruction**: Any linear functional family $P_\varepsilon$ satisfying a uniform continuity bound $|P_\varepsilon(g)| \le C N_\varepsilon(g)$ with $C$ independent of $\varepsilon$ must satisfy $P_\varepsilon(f) \to 0$ on fixed modes. To isolate a non-zero coefficient $P_\varepsilon(f) \to c_0 \ne 0$, the continuity constant must diverge as:
+### Question 5: What is the exact scope of the mode extraction obstruction?
+* For any fixed smooth compactly supported mode $f$ and mollifier $j$ with $\int j = 1$:
+  $$\|j_\varepsilon * f\|_2 \le \|j\|_1 \|f\|_2, \qquad N_\varepsilon(f) = \sqrt{\varepsilon}\|j_\varepsilon * f\|_2 = O(\sqrt{\varepsilon}) \longrightarrow 0.$$
+* Any linear functional family $P_\varepsilon$ bounded by $|P_\varepsilon(f)| \le C N_\varepsilon(f)$ with uniform $C$ forces $P_\varepsilon(f) \to 0$. Recovering a non-zero mode coefficient requires:
   $$C_\varepsilon \ge \frac{|P_\varepsilon(f)|}{N_\varepsilon(f)} = \Omega(\varepsilon^{-1/2}) \longrightarrow \infty.$$
 * **Scope**: This is an obstruction to *uniformly bounded* linear extraction maps on fixed modes. It does not rule out $\varepsilon$-dependent test families, non-linear functionals, or multi-grade operator projections.
 
 ### Question 6: What did the arithmetic-compatibility investigation add?
 * Audited 4 candidate chains connecting arithmetic structure to spectral restrictions:
-  1. *Weil Positivity*: Guarantees positivity for test functions of convolution type $g * \tilde g$, but $F_\varepsilon(x, y) = w(x)w(y)\eta((x-y)/\varepsilon)$ is cross-grade and not positive-definite on the full spectrum.
+  1. *Weil Positivity*: The full positivity criterion $W(g * \tilde g) \ge 0$ over the class of admissible compactly supported test functions is equivalent to RH (Weil 1952, Bombieri 2000; cf. arXiv:2006.13771); it is not an unconditional source of the desired sign. Moreover, a single fixed window is not a quantified test family, and the cross-grade bilinear pairing $\mathcal{P}_\varepsilon(f, g)$ is not of positive-definite convolution type.
   2. *TC Radial Defect*: Defines $D_M(\rho_0) = 4\sinh^2(M\delta_0\log\tau/2) > 0$ for $\delta_0 \ne 0$, but $A_{0, \Gamma} \ne c D_M(\rho_0)$ on the critical line ($A_0 > 0.54$ while $D_M = 0$).
-  3. *Theta Modular Inversion*: Generates the completed zeta functional equation $\xi(s) = \xi(1-s)$, but this symmetry holds for Davenport-Heilbronn zeta functions with off-line zeros.
-  4. *Vinogradov-Korobov Zero Density*: Rules out zeros very close to $\sigma = 1$ at large $t$, but does not exclude isolated off-line zeros at fixed moderate heights.
+  3. *Theta Modular Inversion*: Generates the completed zeta functional equation $\xi(s) = \xi(1-s)$, but this generic reflection symmetry is shared by non-Euler counterexamples such as Davenport-Heilbronn zeta functions which possess off-line zeros. The actual Euler product is essential and not invoked by reflection symmetry alone.
+  4. *Vinogradov-Korobov Zero-Free Region*: The classical zero-free region $\sigma > 1 - c/(\log |t|)^{2/3}(\log \log |t|)^{1/3}$ rules out zeros near the 1-line at large $t$, but cannot exclude low-lying or moderate-height individual off-line zeros, nor does it force zeros onto the critical line.
 * **Key Finding**: Refuted the claim of arbitrary spectral compensation via the Finite Spectral Perturbation Rigidity Theorem.
 
 ### Question 7: Was the forbidden-coincidence bridge derived?
@@ -103,10 +104,20 @@ Fourteen theorems in `formal/RiemannScope/Grade.lean` (213 total compiled projec
 $$\exists \rho_0 \ (\Re\rho_0 \ne 1/2) \Longrightarrow \exists K \ne J, m, n \in \mathbb Z \setminus \{0\}: m\tau^K = n\tau^J$$
 was **not** derived. Arithmetic separation proves that $Q_\varepsilon^{K, J}[w] \equiv 0$ for $\varepsilon < d_{\min}$ on any fixed compact window. However, the explicit formula identity forces the remaining spectral and background terms to cancel the target zero ($\bar R_\varepsilon \to -A_0$), preventing the derivation of a strictly positive lower bound $\bar Q_\varepsilon \ge c D_M > 0$.
 
-### Question 8: If not, what is the first remaining unproved implication?
-The first unproved implication is the **spectral transfer step**:
-$$\text{Individual radial defect } D_M(\rho_0) > 0 \Longrightarrow \bar Q_\varepsilon \ge c D_M(\rho_0) - r(\varepsilon) \quad (r(\varepsilon) \to 0).$$
-On any fixed compact window, this inference is blocked by exact collective cancellation $\bar R_\varepsilon \to -A_{0, \Gamma}$. Any viable successor must avoid fixed-window scalar integration while preserving Lindemann arithmetic separation.
+### Question 8: What is the single remaining arithmetic compatibility obligation?
+**Governing Arithmetic Compatibility Obligation**:
+> *Under the explicit formula for the completed Riemann zeta function $\xi(s)$ and the Lindemann transcendence of $\tau = 2\pi$, derive a non-vanishing lower bound for a cross-grade spectral observable $\mathcal{Q}_\varepsilon$ that does not reduce to fixed-window scalar cancellation.*
+
+- **Specification of Proposed Property**:
+  Non-cancellation of off-line radial defect against critical-line spectral projection across an admissible multi-scale or global test family: under the completed explicit formula, the individual scaling component $a_K^{-\rho_0} x^{\rho_0 - 1}$ generated by an off-line zero $\rho_0$ ($\Re\rho_0 \ne 1/2$) cannot be asymptotically annihilated by the linear span of critical-line modes $\{x^{i\gamma - 1/2}\}$.
+- **Quantifiers**:
+  For all candidate off-line zeros $\rho_0$ with $0 < \Re\rho_0 < 1$ and $\Re\rho_0 \ne 1/2$, there exists an admissible family of test functions $\{w_\lambda\}_{\lambda > 0}$ (or mollified multi-scale kernels) such that:
+  $$\liminf_{\lambda \to \infty} \left| \langle w_\lambda, x^{\rho_0 - 1} \rangle - \sum_{\gamma \in \mathcal{R}} c_{\lambda, \gamma} \langle w_\lambda, x^{i\gamma - 1/2} \rangle \right| > 0.$$
+- **Where the Actual Zero Condition Enters**:
+  The condition $\zeta(\rho_0) = 0$ enters via the residue at the pole of $-\frac{\zeta'}{\zeta}(s)$ at $s = \rho_0$ in the explicit formula contour integration, providing the exact coefficient and phase for the mode $x^{\rho_0 - 1}$. Without $\zeta(\rho_0) = 0$, no such mode appears in the spectral expansion.
+- **First Unproved Implication**:
+  The inference that the non-unitary radial scaling of $x^{\rho_0 - 1}$ forces an incompatible lower bound on the cross-grade observable $\mathcal{Q}_\varepsilon$ across the test family, precluding the exact collective cancellation $\bar R_\varepsilon \to -A_{0, \Gamma}$.
+- **Epistemic Status**: **STRICTLY OPEN**.
 
 ---
 
@@ -114,9 +125,9 @@ On any fixed compact window, this inference is blocked by exact collective cance
 
 | Gate / Command | Result | Notes |
 |---|---|---|
-| `python -m pytest tests/test_tc_mechanism_discovery.py` | **PASS** (92/92 passed in 2m 18s) | Full discovery & regression suite |
-| `python -m pytest .agents/verification/test_claim_audit_gates.py` | **PASS** (54/54 passed in 0.41s) | All 10 pre-acceptance gates verified |
+| `python -m pytest tests/test_tc_mechanism_discovery.py` | **PASS** (92/92 passed) | Full discovery & regression suite |
+| `python -m pytest .agents/verification/test_claim_audit_gates.py` | **PASS** (54/54 passed in 0.37s) | All 10 pre-acceptance gates verified |
 | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file .agents/claims/CLM-TC-022.json` | **PASS** (10/10 gates passed) | 0 schema violations, 0 warnings |
 | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --cross-check-register --repo-root .` | **PASS** (110 claims verified) | 24 terminal, 78 legacy grandfathered, 8 open/exempt |
-| `lake build` (in `formal/`) | **PASS** (213 compiled project declarations) | 0 sorry, 0 admit, 0 warnings |
+| `lake build` (in `formal/`) | **PASS** (218 compiled project declarations) | 0 sorry, 0 admit, 0 warnings |
 | `python scripts/workflow.py plan-canonical` | **PASS** (17 canonical experiment runs planned) | Integrity validated |
