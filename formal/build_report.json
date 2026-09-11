@@ -4,16 +4,16 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "b7ce3a74ec768e247daf20e5b6c02544cff9f10d",
-  "timestamp": "2026-09-11T18:28:56.292357+00:00",
+  "producing_git_commit": "2b50a98d9c8ca07813088ca15cce098328a66988",
+  "timestamp": "2026-09-11T20:24:52.932929+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 228,
-  "total_theorems": 228,
+  "project_theorem_declarations_compiled": 232,
+  "total_theorems": 232,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "564c68a75f7bf334e082f10b30c15cbe0d898b01db6f064710554ff2228e3955",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
-    "formal/RiemannScope/Grade.lean": "f1e3998d44e16edc47a886c636a40a7d4765ce85b64f05bdc7b4f86232017c9c",
+    "formal/RiemannScope/Grade.lean": "dfceaa4e04f2143ba76d1a44994d0725764c0bbfea18ff7f9614afe11d57c33e",
     "formal/RiemannScope/RadialDefect.lean": "d3ea82e0fc2baf1dec0fca0b15809537a140fe160c0c995ccaf6f7864a6c9921",
     "formal/RiemannScope/TranscendentalContinuation.lean": "3d1482a1a5846c2383fac46a367e7068d7256619fba1996c7b405639e91c9e98",
     "formal/RiemannScope/ZeroWorldline.lean": "d87674c0ba57bd0899ff0b2bd39c0f9da5ff7e2e96a92dae5f16ad13725afcbf",
@@ -31,7 +31,7 @@
     "scripts/build_formal.py": "365e5867ca847cc7096c475f05c0da8959d2a77533fcfb7bf989a137b545d5e6",
     "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
   },
-  "build_stdout": "Build completed successfully.",
+  "build_stdout": "\u2714 [1552/1559] Built RiemannScope.Grade\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "07fb62da4f8c3550862f201f0e3fc7aa31f31b9fbb583ad3f336162dd84e24dc"
+  "report_hash": "48e28c8a95b4d3c93646a3f63b2a4fe68d2c0fcc472ab788cd371a5a6222b56f"
 }
