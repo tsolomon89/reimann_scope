@@ -4,7 +4,7 @@
 **Git Commit**: `32ab66a4f33b01e1848bcaa596f5f092e95cfadc`  
 **Date**: 2026-09-10  
 **Baseline Git Anchor**: `82643cafd605492233c6c1e992b78c2c30d45f13` (unmodified, preserved)  
-**Formal Build Status**: `formal/build_report.json` — 204 project theorem declarations compiled with Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings).
+**Formal Build Status**: `formal/build_report.json` — 210 project theorem declarations compiled with Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings).
 
 ---
 
@@ -12,14 +12,18 @@
 
 | Canonical File | SHA-256 Digest |
 |---|---|
-| `formal/RiemannScope/Grade.lean` | `3666abf57bb0a78807c25e532d5db3b9bb531de6b782b38b3e6f2850f2110a06` |
-| `transcendental.py` | `b00b357cd08300b651b9674201e23ba9dd0dec353ea1ec366f58ccac3950a0fa` |
-| `tests/test_tc_mechanism_discovery.py` | `47c4df33068b89b2f346fef3b1b8e31c714ca8c80ba62d230d6a52c4c73a85f2` |
-| `research/epic/arithmetic_overlap_mechanism_investigation.md` | `f4ab96b902c62b7038da97bf85ac94612aed25cbdbf5879ef903b88018192c31` |
-| `research/epic/adversarial_overlap_audit.md` | `f94bf71f5b3a85c6dce4d877d983d56d81577a1618c7f4e30a7f828d7b2324c9` |
-| `formal/build_report.json` | `f5d28ec552ca57942afac44647d54d636df747eccd66bd5dd4e96c0062eca4e0` |
-| `.agents/claims/CLM-TC-022.json` | `e047bc357e8fade95b9ce75da566a142c10f68ad099f941cbfb82a543db673a2` |
-
+| ormal/RiemannScope/Grade.lean | 71af149d2150773b0fc74776d4da643647de68835e151ec621b6a7207253ded9 |
+| 	ranscendental.py | d0aab1a970dbea3f86857c34023a853f1a1b7cf18729a848781d1393414daaba |
+| 	ests/test_tc_mechanism_discovery.py | fcaa74c01902646dc224dfe61382ea6caf37caa58f822943d5054a32c49fcd6 |
+| 
+esearch/epic/arithmetic_overlap_mechanism_investigation.md | 4ab96b902c62b7038da97bf85ac94612aed25cbdbf5879ef903b88018192c31 |
+| 
+esearch/epic/adversarial_overlap_audit.md | 94bf71f5b3a85c6dce4d877d983d56d81577a1618c7f4e30a7f828d7b2324c9 |
+| 
+esearch/epic/arithmetic_to_spectrum_implication_audit.md | 4e23b24a4fbadf60104023ad37755b07acee0c4eda064e67a53886111244b04e |
+| ormal/build_report.json | 8dfb40fa09f91e263a760336afacd0e784075df7d48282f5b8fd3f56deed415 |
+| .agents/claims/CLM-TC-022.json | 2c9126fa40e11c56ce246f331be9c760ababc9650b371e9a7d21abb92badb7cd |
+| data/tc_epic_two_variable_synthesis.json | 5e8a8fa19c14c842c6ddca3517a230f796ae5969b7d2475f393dca9a7430182 |
 ---
 
 ## 2. Answers to the 11 Key Questions
@@ -28,20 +32,35 @@
 **No.** While the arithmetic side of the bridge is rigorously proved ($Q_\varepsilon^{K, J}[w] \equiv 0$ for all $\varepsilon < d_{\min}$ on any fixed compact window $[a, b]$ by the transcendence of $2\pi$), no mechanism forcing a strictly positive spectral lower bound $Q_\varepsilon \ge c D_M(\rho_0) > 0$ has been found. On the contrary, on every fixed window, the complete explicit formula identity forces exact cancellation: the included remainder terms precisely balance the target zero contribution ($\bar R_{\varepsilon, T(\varepsilon)} \to -A_{0, \Gamma}$), preventing contradiction.
 
 ### 2. What exact new theorem was established?
-Five new Lean 4 theorems were formally proved in `formal/RiemannScope/Grade.lean`:
-1. `two_variable_tensor_decomposition_algebra`:
-   $$(B_K - Z_K)(B_J - Z_J) = B_K B_J - B_K Z_J - Z_K B_J + Z_K Z_J.$$
-2. `two_variable_nine_term_expansion_algebra`:
-   The 9-term uncombined bilinear expansion for $(P_K - Z_K - T_K)(P_J - Z_J - T_J)$ with verified exact signs.
-3. `normalized_truncation_error_scaling`:
-   $$|E| \le B \implies |E|/\varepsilon \le B/\varepsilon \quad (\varepsilon > 0).$$
-4. `power_cutoff_exponent_positivity`:
-   For $p > 2$ and $\alpha > p/(p-2)$, the net exponent $\alpha(p-2) - p > 0$.
-5. `candidate_bridge_with_remainder_contradiction`:
-   $$Q = A + R, \ Q \le 0, \ A \ge c D > 0, \ |R| < c D \implies \text{False}.$$
+Eleven new Lean 4 theorems (210 total compiled project theorems) were formally proved in ormal/RiemannScope/Grade.lean:
+1. 	wo_variable_tensor_decomposition_algebra:
+   (B_K - Z_K)(B_J - Z_J) = B_K B_J - B_K Z_J - Z_K B_J + Z_K Z_J.
+2. 	wo_variable_nine_term_expansion_algebra:
+   The 9-term uncombined bilinear expansion for (P_J - Z_J - T_J)$ with verified exact signs.
+3. 
+ormalized_truncation_error_scaling:
+   |E| \le B \implies |E|/\varepsilon \le B/\varepsilon \quad (\varepsilon > 0).
+4. power_cutoff_exponent_positivity:
+   For  > 2$ and $\alpha > p/(p-2)$, the net exponent $\alpha(p-2) - p > 0$.
+5. candidate_bridge_with_remainder_contradiction:
+   Q = A + R, \ Q \le 0, \ A \ge c D > 0, \ |R| < c D \implies \text{False}.
+6. explicit_formula_remainder_cancellation_identity:
+   Q = A + R + E \implies R - (-A_0) = Q - (A - A_0) - E.
+7. explicit_formula_remainder_triangle_bound:
+   |R - (-A_0)| \le |Q| + |A - A_0| + |E|.
+8. explicit_formula_remainder_cancellation_eps:
+   \forall \delta > 0, \ (|Q| < \delta/3 \wedge |A - A_0| < \delta/3 \wedge |E| < \delta/3) \implies |R - (-A_0)| < \delta.
+9. 
+ormalized_tail_subordination_bound:
+   |E| \le B \wedge B < \delta \implies |E| < \delta.
+10. candidate_bridge_gap_exact_cancellation:
+    A_0 = c D \implies \neg (|-A_0| < c D).
+11. candidate_bridge_unproved_lower_bound_gap:
+    Q = A + R \wedge R = -A \implies Q = 0.
 
 Analytically, the conservative two-variable truncation bound was proved:
-$$|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}}.$$
+|E_{\varepsilon, T}| \le C_p \varepsilon^{1-p} \frac{\log^2(2+T)}{T^{p-2}},
+and the **Spectral-Atomic Scaling Dichotomy Obstruction Theorem** was established.
 
 ### 3. What is $A_\varepsilon(\rho_0)$, explicitly?
 For any nontrivial zero $\rho_0$, let $\Gamma(\rho_0) = \{\rho_0, \bar\rho_0, 1-\rho_0, 1-\bar\rho_0\}$ be the conjugation-closed quartet. The selected density is:
@@ -84,19 +103,35 @@ $$\bar Q_\varepsilon \ge c D_M(\rho_0) - r_\varepsilon \quad (r_\varepsilon \to 
 On fixed compact windows, this inference fails because $\bar R_\varepsilon \to -A_{0, \Gamma}$.
 
 ### 10. What was independently reviewed, numerically certified and formally proved?
-- **Independently Reviewed**: Pass 4 Adversarial Audit (`research/epic/adversarial_overlap_audit.md`).
-- **Numerically Certified**:
-  - Defect 3.1 counterexample ($B_{\rm old}/C_p \to \infty$ for $p=3, T = \varepsilon^{-2}\sqrt{\ell}$).
-  - 1-variable trivial zero sum identity to $< 10^{-15}$ across $[8, 20]$.
-  - $A_{\varepsilon, \Gamma}/\varepsilon \to A_{0, \Gamma}$ with $O(\varepsilon^2)$ error.
-  - $A_{0, \Gamma}(\rho_1) \approx 0.5444 \ne 0$ while $D_M(\rho_1) = 0$.
-  - Arithmetic vanishing $Q_\varepsilon^{0, 1} \equiv 0$ for $\varepsilon < 0.1504$; equal-grade diagonal mass $Q_\varepsilon^{0, 0} \approx 29.275 > 0$; toy commensurable station detection $Q_\varepsilon \approx 1.761 > 0$ at $x=6$.
-- **Formally Proved (Lean 4)**:
-  - `two_variable_tensor_decomposition_algebra`
-  - `two_variable_nine_term_expansion_algebra`
-  - `normalized_truncation_error_scaling`
-  - `power_cutoff_exponent_positivity`
-  - `candidate_bridge_with_remainder_contradiction`
+- **Independently Reviewed**:
+  - Pass 4 Adversarial Audit (
+esearch/epic/adversarial_overlap_audit.md).
+  - Arithmetic-to-Spectrum Implication Audit (
+esearch/epic/arithmetic_to_spectrum_implication_audit.md).
+- **Numerically Certified & Enclosed**:
+  - Complete finite decomposition on [8, 20], K=0, J=1, eps=0.1, T=30.0: Q_eps = 0.0, Q_{eps, T}^{BB} approx 0.168957, Q_{eps, T}^{BZ} approx -0.018952, Q_{eps, T}^{ZB} approx -0.015590, Q_{eps, T}^{ZZ} approx 0.065790, Q_{eps, T} approx 0.269289, A_{eps, Gamma} approx 0.054372, R_{eps, T} approx 0.214916, E_{eps, T} = -0.269289.
+  - Remainder consistency verified: |R_{eps, T} - (Q_{eps, T} - A_{eps, Gamma})| < 1e-14.
+  - Rigorous interval enclosure: A_{0, Gamma}(rho_1) in [0.543855, 0.545026] > 0.54 > 0 certified away from zero using lint.arb.
+  - Defect 3.1 counterexample (B_old/C_p -> infty for p=3, T = eps^{-2}*sqrt(ell)).
+  - 1-variable trivial zero sum identity to < 1e-15 across [8, 20].
+  - A_{eps, Gamma}/eps -> A_{0, Gamma} with O(eps^2) error for even eta.
+  - Arithmetic vanishing Q_eps^{0, 1} == 0 for eps < 0.1504; equal-grade diagonal mass Q_eps^{0, 0} approx 29.275 > 0; toy commensurable station detection Q_eps approx 1.761 > 0 at x=6.
+  - Primary literature Trudgian (2014) explicit bound |S(t)| <= 0.112 log t + 0.278 log log t + 2.510 reconciling the derived inequality N(t) <= (t/(2*pi))*log t on t >= 14.0.
+  - Quadratic form Gram matrix: H_eps(0, 0) approx 8.4638 > 0, H_eps(1, 1) approx 0.4527 > 0, H_eps(0, 1) = 0 for eps < 0.1504, with smooth mode decay eps ||j_eps * f_rho||_2^2 = O(eps) -> 0.
+- **Formally Proved (Lean 4 - 210 Declarations Compiled)**:
+  - 	wo_variable_tensor_decomposition_algebra
+  - 	wo_variable_nine_term_expansion_algebra
+  - 
+ormalized_truncation_error_scaling
+  - power_cutoff_exponent_positivity
+  - candidate_bridge_with_remainder_contradiction
+  - explicit_formula_remainder_cancellation_identity
+  - explicit_formula_remainder_triangle_bound
+  - explicit_formula_remainder_cancellation_eps
+  - 
+ormalized_tail_subordination_bound
+  - candidate_bridge_gap_exact_cancellation
+  - candidate_bridge_unproved_lower_bound_gap
 
 ### 11. Which exact research action follows?
 Because fixed compact windows force exact remainder cancellation $\bar R_0 = -A_0$, research must shift to:

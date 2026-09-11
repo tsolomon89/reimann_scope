@@ -69,7 +69,7 @@
   "measure_and_window": "Pushforward prime measures mu_K = sum_{n>=2} Lambda(n) delta_{tau^K n}, compact window w in C_c^infty((a, b)) with a > max(tau^K, tau^J), even mollifier eta in C_c^infty((-1, 1))",
   "order_of_limits": "Spectral cutoff T(eps) = eps^{-alpha} with alpha > p/(p-2) as localization scale eps -> 0 at fixed grades K, J and fixed window [a, b]",
   "exact_conclusion": "The prior cutoff condition T(eps) >> eps^{-(p-1)/(p-2)} is falsified by counterexample p=3, T = eps^{-2}*sqrt(ell); normalized power cutoff requires alpha > p/(p-2) (Lean: normalized_truncation_error_scaling, power_cutoff_exponent_positivity); 1-variable trivial zero series sums to a_K^2 / (x*(x^2 - a_K^2)); 2-variable tensor expansion satisfies 9-term and 4-term bilinear algebra (Lean: two_variable_nine_term_expansion_algebra, two_variable_tensor_decomposition_algebra); selected term A_{eps, Gamma} is real and satisfies A_{eps, Gamma}/eps = A_{0, Gamma} + O(eps^2) for even eta; the identity A_{0, Gamma} = c*D_M(rho_0) is definitively falsified on critical-line zeros; conservative truncation bound |E_{eps, T}| <= C_p * eps^{1-p} * log^2(2+T) / T^{p-2} is proved via dyadic shell pair counting; arithmetic vanishing Q_eps^{0, 1} = 0 holds for eps < d_min approx 0.1504 on [8, 20] while equal-grade diagonal mass is positive; Lean 4 lemma candidate_bridge_with_remainder_contradiction compiles with 0 sorry; and vanishing Q_bar_eps forces exact explicit formula cancellation lim_{eps -> 0} R_bar_{eps, T(eps)} = -A_{0, Gamma}, leaving the conditional spectral lower bound unproved and the arithmetic coincidence bridge strictly open.",
-  "logical_negation": "Lean 4 theorems fail to compile, or the counterexample converges to zero, or normalized error does not require alpha > p/(p-2), or the 1-variable trivial zero sum deviates from a_K^2 / (x*(x^2 - a_K^2)), or two-variable tensor signs deviate from the bilinear expansion, or A_{eps, Gamma} fails to be real or diverges from A_{0, Gamma}, or A_{0, Gamma} equals c*D_M(rho_0) on critical-line zeros, or truncation error violates the conservative log^2 bound, or arithmetic vanishing fails for eps < d_min, or the arithmetic coincidence bridge is proved closed without an independent spectral lower bound (FALSIFIED / REFUTED)",
+  "logical_negation": "The normalized truncation error under T(eps) = eps^{-alpha} vanishes for some alpha <= p/(p-2), or the one-variable trivial zero sum deviates from a_K^2 / (x*(x^2 - a_K^2)) on (a_K, infty), or the two-variable tensor product deviates from the bilinear expansion, or A_{eps, Gamma} has nonzero imaginary part or deviates from A_{0, Gamma} at O(eps^2) rate for even mollifier, or A_{0, Gamma} equals c*D_M(rho_0) on critical-line zeros, or the two-variable truncation error violates the conservative C_p * eps^{1-p} * log^2(2+T) / T^{p-2} bound, or arithmetic vanishing fails for eps < d_min, or the arithmetic coincidence bridge is proved closed without an independent spectral lower bound on fixed compact windows (FALSIFIED / REFUTED)",
   "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
   "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
   "exact_or_truncated": "TRUNCATED_WITH_BOUNDS",
@@ -84,11 +84,19 @@
     "formal/RiemannScope/Grade.lean: normalized_truncation_error_scaling",
     "formal/RiemannScope/Grade.lean: power_cutoff_exponent_positivity",
     "formal/RiemannScope/Grade.lean: candidate_bridge_with_remainder_contradiction",
+    "formal/RiemannScope/Grade.lean: explicit_formula_remainder_cancellation_identity",
+    "formal/RiemannScope/Grade.lean: explicit_formula_remainder_triangle_bound",
+    "formal/RiemannScope/Grade.lean: explicit_formula_remainder_cancellation_eps",
+    "formal/RiemannScope/Grade.lean: normalized_tail_subordination_bound",
+    "formal/RiemannScope/Grade.lean: candidate_bridge_gap_exact_cancellation",
+    "formal/RiemannScope/Grade.lean: candidate_bridge_unproved_lower_bound_gap",
     "transcendental.py: audit_tc_cutoff_condition_counterexample",
     "transcendental.py: evaluate_two_variable_explicit_expansion",
     "transcendental.py: audit_selected_spectral_contribution",
     "transcendental.py: audit_two_variable_truncation_bound",
+    "transcendental.py: evaluate_two_variable_finite_decomposition",
     "transcendental.py: audit_arithmetic_overlap_distinct_and_equal_grades",
+    "transcendental.py: audit_arithmetic_quadratic_form_mode_extraction",
     "transcendental.py: audit_tc_epic_two_variable_synthesis"
   ],
   "proof_artifact": "formal/RiemannScope/Grade.lean",
@@ -106,12 +114,17 @@
     "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_truncation_bound",
     "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_overlap_window_8_20_and_commensurable",
     "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_synthesis_deliverables",
+    "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_truncation_bound_parameter_handling_and_orders",
+    "tests/test_tc_mechanism_discovery.py: test_epic_two_variable_explicit_expansion_window_hypothesis_enforcement",
+    "tests/test_tc_mechanism_discovery.py: test_epic_selected_spectral_contribution_precision_and_enclosure",
+    "tests/test_tc_mechanism_discovery.py: test_epic_finite_decomposition_consistency_and_error_budget",
+    "tests/test_tc_mechanism_discovery.py: test_epic_arithmetic_quadratic_form_mode_extraction_obstruction",
     "data/tc_epic_two_variable_synthesis.json"
   ],
   "external_sources": [
     {
       "source": "Trudgian (2014)",
-      "theorem": "Corollary 1 (arXiv:1208.5846v2): unconditional zero counting bound N(t) <= (t/(2*pi)) * log t for all t >= 14.0"
+      "theorem": "Theorem 1 and Corollary 1 (arXiv:1208.5846v2, J. Number Theory 136): explicit bound |S(t)| <= 0.112 log t + 0.278 log log t + 2.510 for t >= e. Combined with Backlund-Riemann-von Mangoldt formula N(t) = (t/(2*pi))*log(t/(2*pi*e)) + 7/8 + S(t) + O(1/t) and absence of nontrivial zeros below gamma_1 approx 14.1347, this yields the derived consequence N(t) <= (t/(2*pi))*log t for all t >= 14.0."
     },
     {
       "source": "Lindemann (1882)",

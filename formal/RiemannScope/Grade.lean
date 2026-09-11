@@ -1063,4 +1063,63 @@ theorem candidate_bridge_with_remainder_contradiction (Q A R c D : ℝ)
   have hR_lower : - (c * D) < R := (abs_lt.mp hR).1
   linarith [hQ_eq, hQ_nonpos, hA, hR_lower, _h_pos]
 
+/-- Remainder cancellation identity for complete two-variable explicit formula:
+    Q = A + R + E implies R - (-A₀) = Q - (A - A₀) - E. -/
+theorem explicit_formula_remainder_cancellation_identity (Q A R E A₀ : ℝ)
+    (h_decomp : Q = A + R + E) :
+    R - (-A₀) = Q - (A - A₀) - E := by
+  linarith
+
+/-- Triangle bound on remainder cancellation defect:
+    |R - (-A₀)| ≤ |Q| + |A - A₀| + |E|. -/
+theorem explicit_formula_remainder_triangle_bound (Q A R E A₀ : ℝ)
+    (h_decomp : Q = A + R + E) :
+    |R - (-A₀)| ≤ |Q| + |A - A₀| + |E| := by
+  have h_id : R - (-A₀) = Q - (A - A₀) - E := by linarith
+  rw [h_id]
+  have h1 : |Q - (A - A₀) - E| ≤ |Q - (A - A₀)| + |E| := abs_sub (Q - (A - A₀)) E
+  have h2 : |Q - (A - A₀)| ≤ |Q| + |A - A₀| := abs_sub Q (A - A₀)
+  linarith
+
+/-- Quantitative epsilon-delta remainder cancellation limit theorem:
+    If the arithmetic observable Q, the selected spectral deviation A - A₀,
+    and the omitted tail E are each bounded by δ / 3, then the retained remainder
+    is within δ of the exact negative selected contribution -A₀. -/
+theorem explicit_formula_remainder_cancellation_eps (Q A R E A₀ δ : ℝ)
+    (h_decomp : Q = A + R + E)
+    (hQ : |Q| < δ / 3)
+    (hA : |A - A₀| < δ / 3)
+    (hE : |E| < δ / 3) :
+    |R - (-A₀)| < δ := by
+  have h_tri := explicit_formula_remainder_triangle_bound Q A R E A₀ h_decomp
+  linarith
+
+/-- Normalized tail subordination:
+    If the tail error |E| is majorized by B and B < δ, then |E| < δ. -/
+theorem normalized_tail_subordination_bound (E B δ : ℝ)
+    (hE : |E| ≤ B) (hB : B < δ) :
+    |E| < δ :=
+  lt_of_le_of_lt hE hB
+
+/-- Remainder cancellation obstruction to the candidate bridge:
+    When exact explicit formula remainder cancellation occurs (R = -A),
+    the observable Q = A + R vanishes identically (Q = 0) without triggering
+    the candidate bridge contradiction hypothesis |R| < c * D. -/
+theorem candidate_bridge_gap_exact_cancellation (A₀ c D : ℝ)
+    (hc : 0 < c) (hD : 0 < D)
+    (hA₀ : A₀ = c * D) :
+    ¬ (|-A₀| < c * D) := by
+  have h_pos : 0 < c * D := mul_pos hc hD
+  rw [abs_neg, hA₀]
+  rw [abs_of_pos h_pos]
+  exact lt_irrefl (c * D)
+
+/-- Candidate bridge unproved lower bound gap:
+    If remainder cancellation holds (R = -A), then Q = A + R is zero,
+    and no strictly positive lower bound Q ≥ c * D > 0 can be satisfied. -/
+theorem candidate_bridge_unproved_lower_bound_gap (Q A R : ℝ)
+    (hQ_eq : Q = A + R) (h_cancel : R = -A) :
+    Q = 0 := by
+  linarith
+
 end RiemannScope

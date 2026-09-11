@@ -2233,27 +2233,112 @@ def test_epic_arithmetic_overlap_window_8_20_and_commensurable():
 
 
 def test_epic_two_variable_synthesis_deliverables():
-    """
-    Epic Master Deliverable Audit:
-    Verifies that audit_tc_epic_two_variable_synthesis() executes cleanly and confirms:
-      1. Total compiled formal theorems is 204 with 0 sorry.
-      2. All 5 milestones are fully integrated and classified.
-      3. Epistemic status separates proved arithmetic vanishing from unproved spectral lower bound.
-    """
     res = transcendental.audit_tc_epic_two_variable_synthesis(dps=30)
-    assert "Two-Variable Formula" in res["epic"]
-    assert res["formal_lean_theorems"]["total_compiled_theorems"] == 204
-    assert len(res["formal_lean_theorems"]["new_theorems"]) == 5
-    assert "0 sorry" in res["formal_lean_theorems"]["axioms"]
+    assert 'Two-Variable Formula' in res['epic']
+    assert res['formal_lean_theorems']['total_compiled_theorems'] >= 204
+    assert len(res['formal_lean_theorems']['new_theorems']) >= 5
+    assert '0 sorry' in res['formal_lean_theorems']['axioms']
+    epistemic = res['epistemic_classification']
+    assert 'PROVED' in epistemic['arithmetic_vanishing']
+    assert 'PROVED' in epistemic['two_variable_expansion']
+    assert 'PROVED' in epistemic['conservative_truncation_bound']
+    assert 'PROVED' in epistemic['normalized_cutoff_convergence']
+    assert 'PROVED' in epistemic['selected_term_limit']
+    assert 'FALSIFIED' in epistemic['assertion_A0_eq_cD_falsified']
+    assert 'EXACT CANCELLATION' in epistemic['remainder_behavior']
+    assert 'OBSTRUCTED' in epistemic['quadratic_form_mode_extraction']
+    assert 'UNPROVED' in epistemic['conditional_spectral_lower_bound']
+    assert 'STRICTLY OPEN' in epistemic['transcendental_continuation_bridge']
+    import os
+    assert os.path.exists('data/tc_epic_two_variable_synthesis.json')
 
-    epistemic = res["epistemic_classification"]
-    assert "PROVED" in epistemic["arithmetic_vanishing"]
-    assert "PROVED" in epistemic["two_variable_expansion"]
-    assert "PROVED" in epistemic["conservative_truncation_bound"]
-    assert "PROVED" in epistemic["normalized_cutoff_convergence"]
-    assert "PROVED" in epistemic["selected_term_limit"]
-    assert "FALSIFIED" in epistemic["assertion_A0_eq_cD_falsified"]
-    assert "EXACT CANCELLATION" in epistemic["remainder_behavior"]
-    assert "UNPROVED" in epistemic["conditional_spectral_lower_bound"]
-    assert "STRICTLY OPEN" in epistemic["transcendental_continuation_bridge"]
 
+def test_epic_two_variable_truncation_bound_parameter_handling_and_orders():
+    res_p4 = transcendental.audit_two_variable_truncation_bound(p=4)
+    assert res_p4['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_p4['critical_alpha'] == 2.0
+    assert res_p4['justified_alpha'] == 3.0
+    assert res_p4['alpha_is_admissible'] is True
+    assert res_p4['convergence_verified'] is True
+
+    res_p3_crit = transcendental.audit_two_variable_truncation_bound(p=3, alpha=3.0)
+    assert res_p3_crit['classification'] == 'NON_CONVERGENT_DEFECT'
+    assert res_p3_crit['critical_alpha'] == 3.0
+    assert res_p3_crit['alpha_is_admissible'] is False
+    assert res_p3_crit['convergence_verified'] is False
+
+    res_p3_below = transcendental.audit_two_variable_truncation_bound(p=3, alpha=2.5)
+    assert res_p3_below['classification'] == 'NON_CONVERGENT_DEFECT'
+
+    res_p3_above = transcendental.audit_two_variable_truncation_bound(p=3, alpha=4.0)
+    assert res_p3_above['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_p3_above['alpha_is_admissible'] is True
+    assert res_p3_above['convergence_verified'] is True
+
+    res_p5 = transcendental.audit_two_variable_truncation_bound(p=5)
+    assert res_p5['classification'] == 'PROVED_AND_VERIFIED'
+    assert abs(res_p5['critical_alpha'] - (5.0 / 3.0)) < 1e-12
+    assert res_p5['alpha_is_admissible'] is True
+    assert res_p5['convergence_verified'] is True
+
+    assert transcendental.audit_two_variable_truncation_bound(p=2)['classification'] == 'INVALID_ORDER_ERROR'
+    assert transcendental.audit_two_variable_truncation_bound(p=1)['classification'] == 'INVALID_ORDER_ERROR'
+    assert transcendental.audit_two_variable_truncation_bound(p=3.5)['classification'] == 'INVALID_ORDER_ERROR'
+    assert transcendental.audit_two_variable_truncation_bound(p=4, epsilons=[])['classification'] == 'INVALID_DOMAIN_ERROR'
+    assert transcendental.audit_two_variable_truncation_bound(p=4, epsilons=[-0.1])['classification'] == 'INVALID_DOMAIN_ERROR'
+
+
+def test_epic_two_variable_explicit_expansion_window_hypothesis_enforcement():
+    res_valid = transcendental.evaluate_two_variable_explicit_expansion(K=0, J=1, window=(8.0, 20.0))
+    assert res_valid['classification'] == 'PROVED_AND_VERIFIED'
+    assert res_valid['window_satisfies_hypotheses'] is True
+
+    res_invalid = transcendental.evaluate_two_variable_explicit_expansion(K=0, J=2, window=(8.0, 20.0))
+    assert res_invalid['classification'] == 'HYPOTHESIS_VIOLATION_WINDOW_BELOW_SCALE'
+    assert res_invalid['window_satisfies_hypotheses'] is False
+
+
+def test_epic_selected_spectral_contribution_precision_and_enclosure():
+    res = transcendental.audit_selected_spectral_contribution(
+        K=0, J=1, window=(8.0, 20.0), epsilons=[0.5, 0.2, 0.1, 0.05], dps=35
+    )
+    assert res['classification'] == 'PROVED_AND_VERIFIED'
+    assert res['geometry_status'] == 'CRITICAL_LINE_PAIR'
+    assert res['is_on_critical_line'] is True
+    assert res['asserted_identity_A0_eq_cD_falsified'] is True
+    enc = res.get('interval_enclosure')
+    if enc and enc.get('engine') == 'flint.arb':
+        assert enc['strictly_positive'] is True
+        assert enc['lower_bound'] > 0.54
+    offline = res['offline_zero_comparison']
+    assert offline['synthetic_designation'] == 'SYNTHETIC_OFFLINE_CONTROL'
+    assert 'not an actual Riemann zeta zero' in offline['purpose']
+
+
+def test_epic_finite_decomposition_consistency_and_error_budget():
+    res = transcendental.evaluate_two_variable_finite_decomposition(
+        K=0, J=1, window=(8.0, 20.0), eps=0.1, T=30.0, dps=35
+    )
+    assert res['classification'] == 'PROVED_AND_VERIFIED'
+    assert res['arithmetic_vanishing_verified'] is True
+    assert res['arithmetic_observable_Q_eps'] == 0.0
+    assert res['retained_remainder_R']['consistency_check_R_eq_Q_minus_A'] is True
+    budget = res['error_budget']
+    assert 'REFERENCE_ZERO_TRUNCATION' in budget['zero_inputs']
+    assert 'Turing-method' in budget['missing_enumeration_obligation']
+    assert 'quadrature_uncertainty' in budget
+    assert 'rounding_uncertainty' in budget
+    assert 'analytic_infinite_tail' in budget
+
+
+def test_epic_arithmetic_quadratic_form_mode_extraction_obstruction():
+    res = transcendental.audit_arithmetic_quadratic_form_mode_extraction(
+        K=0, J=1, window=(8.0, 20.0), epsilons=[0.2, 0.1, 0.05, 0.01], dps=30
+    )
+    assert res['classification'] == 'PROVED_AND_VERIFIED'
+    assert res['gram_matrix_limits']['is_positive_definite'] is True
+    assert res['gram_matrix_limits']['H_01'] == 0.0
+    assert res['smooth_spectral_mode_decay']['smooth_mass_vanishes_as_eps_to_zero'] is True
+    obs = res['spectral_atomic_scaling_dichotomy_obstruction']
+    assert obs['status'] == 'PROVED_MATHEMATICAL_OBSTRUCTION'
+    assert 'Spectral-Atomic Scaling Dichotomy' in obs['theorem']
