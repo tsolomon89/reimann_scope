@@ -4,8 +4,8 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "05da5f0de706e4af637a4da011185c21926a54f7",
-  "timestamp": "2026-09-12T20:57:05.354599+00:00",
+  "producing_git_commit": "e1224daaa7491e864887b1598108cd99c63d988e",
+  "timestamp": "2026-09-12T21:30:20.376186+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 257,
@@ -33,5 +33,5 @@
   },
   "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "85d8d4c4f953a8f10135824e006c84a2e4e76cac59c83d0473031daf9f94b9db"
+  "report_hash": "028e5d44aa3d0ad3b862223de3cf4cd0cab2535b6298b1187ad4fd4a9a8cead7"
 }
