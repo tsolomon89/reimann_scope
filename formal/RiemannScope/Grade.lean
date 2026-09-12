@@ -1861,4 +1861,173 @@ theorem finite_grade_station_complex_psd {r : Type*} [Fintype r] [DecidableEq r]
   have h_real_psd := finite_grade_station_psd x d η ε Δ hε_pos hε_lt_Δ hd hη_supp hη_nonneg h_sep
   exact real_symmetric_matrix_complex_psd G h_real_psd c
 
+/-- Ratio of integer grade scales: tau^K / tau^J = tau^(K - J). -/
+theorem integerGradeScale_sub (K J : ℤ) (htau : 0 < tau) :
+    integerGradeScale K / integerGradeScale J = integerGradeScale (K - J) := by
+  dsimp [integerGradeScale]
+  rw [← Real.rpow_sub htau]
+  push_cast
+  rfl
+
+/-- Transcendence reduction: for integer grade scales A_K = tau^K and A_J = tau^J,
+    if tau satisfies the transcendence hypothesis that no non-zero integer power is rational,
+    then for distinct grades K ≠ J and positive integers n, m,
+    the ratio (A_K * n) / (A_J * m) cannot equal any rational number q. -/
+theorem tc_cross_grade_rational_ratio_excluded
+    (htau : 0 < tau)
+    (h_trans : ∀ (k : ℤ), k ≠ 0 → ∀ (r : ℚ), integerGradeScale k ≠ (r : ℝ))
+    (K J : ℤ) (h_diff : K ≠ J)
+    (n m : ℕ) (hn : 0 < n) (hm : 0 < m)
+    (q : ℚ)
+    (h_ratio : (integerGradeScale K * (n : ℝ)) / (integerGradeScale J * (m : ℝ)) = (q : ℝ)) :
+    False := by
+  have h_nm : (n : ℝ) ≠ 0 := by positivity
+  have h_mm : (m : ℝ) ≠ 0 := by positivity
+  have h_J_pos : 0 < integerGradeScale J := by
+    dsimp [integerGradeScale]
+    exact Real.rpow_pos_of_pos htau (J : ℝ)
+  have h_J_ne : integerGradeScale J ≠ 0 := ne_of_gt h_J_pos
+  have h_alg : integerGradeScale K / integerGradeScale J = (q * (m : ℚ) / (n : ℚ) : ℚ) := by
+    push_cast
+    have h_div : (integerGradeScale K * (n : ℝ)) / (integerGradeScale J * (m : ℝ)) =
+                 (integerGradeScale K / integerGradeScale J) * ((n : ℝ) / (m : ℝ)) := by ring
+    rw [h_div] at h_ratio
+    have h_step : (integerGradeScale K / integerGradeScale J) * ((n : ℝ) / (m : ℝ)) * ((m : ℝ) / (n : ℝ)) =
+                  (q : ℝ) * ((m : ℝ) / (n : ℝ)) := by rw [h_ratio]
+    have h_cancel : ((n : ℝ) / (m : ℝ)) * ((m : ℝ) / (n : ℝ)) = 1 := by
+      rw [div_mul_div_comm, mul_comm (n : ℝ), div_self]
+      positivity
+    rw [mul_assoc, h_cancel, mul_one] at h_step
+    rw [h_step]
+    ring
+  rw [integerGradeScale_sub K J htau] at h_alg
+  have h_k_ne : K - J ≠ 0 := sub_ne_zero.mpr h_diff
+  have h_not_rat := h_trans (K - J) h_k_ne (q * (m : ℚ) / (n : ℚ))
+  exact h_not_rat h_alg
+
+/-- Finite logarithmic station separation consequence:
+    If stations in a compact window [a, b] with b > 0 satisfy a minimum Euclidean gap Δx > 0,
+    and logarithmic distances scale as |log x - log y| >= |x - y| / b,
+    then the logarithmic separation gap is bounded below by Δx / b > 0. -/
+theorem finite_log_station_separation (Δx b : ℝ) (hb : 0 < b)
+    (h_dist : ∀ x y : ℝ, x ≠ y → Δx ≤ |x - y|)
+    (h_log_scale : ∀ x y : ℝ, |x - y| / b ≤ |Real.log x - Real.log y|)
+    (x y : ℝ) (hxy : x ≠ y) :
+    Δx / b ≤ |Real.log x - Real.log y| := by
+  have h1 := h_dist x y hxy
+  have h2 := h_log_scale x y
+  have h_div : Δx / b ≤ |x - y| / b := div_le_div_of_nonneg_right h1 (le_of_lt hb)
+  exact le_trans h_div h2
+
+/-- Positivity of the logarithmic separation bound Δx / b > 0 when Δx > 0 and b > 0. -/
+theorem finite_log_separation_pos (Δx b : ℝ) (hΔ : 0 < Δx) (hb : 0 < b) :
+    0 < Δx / b := by
+  positivity
+
+/-- Symmetry of the station grade matrix for an even mollifier:
+    If η(-u) = η(u), then G_ij = G_ji. -/
+theorem stationGradeMatrix_symmetric {r : Type*} [Fintype r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε : ℝ)
+    (hη_even : ∀ u : ℝ, η (-u) = η u)
+    (i j : r) :
+    stationGradeMatrix x d η ε i j = stationGradeMatrix x d η ε j i := by
+  dsimp [stationGradeMatrix]
+  rw [Finset.sum_comm]
+  apply Finset.sum_congr rfl
+  intro m _
+  apply Finset.sum_congr rfl
+  intro n _
+  have h_arg : (x j m - x i n) / ε = - ((x i n - x j m) / ε) := by ring
+  rw [h_arg, hη_even]
+  ring
+
+/-- Real quadratic form of a matrix on a vector: v^T G v. -/
+def realQuadraticForm {r : Type*} [Fintype r] (G : Matrix r r ℝ) (v : r → ℝ) : ℝ :=
+  Matrix.dotProduct v (Matrix.mulVec G v)
+
+/-- Real part of the complex quadratic form for a real matrix G:
+    q_re(c) = (Re c)^T G (Re c) + (Im c)^T G (Im c). -/
+def realPartComplexQuadraticForm {r : Type*} [Fintype r]
+    (G : Matrix r r ℝ) (c : r → ℂ) : ℝ :=
+  let a : r → ℝ := fun i => (c i).re
+  let b : r → ℝ := fun i => (c i).im
+  realQuadraticForm G a + realQuadraticForm G b
+
+/-- Imaginary part of the complex quadratic form for a real matrix G:
+    q_im(c) = (Re c)^T G (Im c) - (Im c)^T G (Re c).
+    When G is symmetric (G = G^T), q_im(c) = 0 identically. -/
+def imagPartComplexQuadraticForm {r : Type*} [Fintype r]
+    (G : Matrix r r ℝ) (c : r → ℂ) : ℝ :=
+  let a : r → ℝ := fun i => (c i).re
+  let b : r → ℝ := fun i => (c i).im
+  Matrix.dotProduct a (Matrix.mulVec G b) - Matrix.dotProduct b (Matrix.mulVec G a)
+
+/-- For any symmetric real matrix G, the imaginary quadratic form vanishes: q_im(c) = 0. -/
+theorem real_symmetric_matrix_imag_part_zero {r : Type*} [Fintype r]
+    (G : Matrix r r ℝ) (h_symm : ∀ i j, G i j = G j i) (c : r → ℂ) :
+    imagPartComplexQuadraticForm G c = 0 := by
+  dsimp [imagPartComplexQuadraticForm, Matrix.dotProduct, Matrix.mulVec]
+  let a : r → ℝ := fun i => (c i).re
+  let b : r → ℝ := fun i => (c i).im
+  have h_swap : (∑ i : r, b i * ∑ j : r, G i j * a j) = (∑ i : r, a i * ∑ j : r, G i j * b j) := by
+    have h1 : (∑ i : r, b i * ∑ j : r, G i j * a j) = ∑ i : r, ∑ j : r, b i * (G i j * a j) := by
+      simp_rw [Finset.mul_sum]
+    have h2 : (∑ i : r, a i * ∑ j : r, G i j * b j) = ∑ i : r, ∑ j : r, a i * (G i j * b j) := by
+      simp_rw [Finset.mul_sum]
+    rw [h1, h2, Finset.sum_comm]
+    apply Finset.sum_congr rfl
+    intro j _
+    apply Finset.sum_congr rfl
+    intro i _
+    rw [h_symm i j]
+    ring
+  rw [h_swap, sub_self]
+
+/-- Full Hermitian PSD theorem for real symmetric matrices:
+    For any symmetric matrix G that is positive semi-definite on real vectors,
+    the complex quadratic form has vanishing imaginary part (q_im = 0)
+    and non-negative real part (0 ≤ q_re). -/
+theorem real_symmetric_matrix_hermitian_psd {r : Type*} [Fintype r]
+    (G : Matrix r r ℝ)
+    (h_symm : ∀ i j, G i j = G j i)
+    (h_psd : ∀ v : r → ℝ, 0 ≤ realQuadraticForm G v)
+    (c : r → ℂ) :
+    imagPartComplexQuadraticForm G c = 0 ∧ 0 ≤ realPartComplexQuadraticForm G c := by
+  constructor
+  · exact real_symmetric_matrix_imag_part_zero G h_symm c
+  · dsimp [realPartComplexQuadraticForm]
+    have ha := h_psd (fun i => (c i).re)
+    have hb := h_psd (fun i => (c i).im)
+    linarith
+
+/-- Instantiation of the Hermitian PSD theorem for the separated station grade matrix:
+    For any even mollifier η, when cross-grade stations are separated by Δ > ε,
+    the station grade matrix G is symmetric, its complex imaginary quadratic form vanishes,
+    and its complex real quadratic form is non-negative. -/
+theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq r]
+    {S : r → Type*} [∀ i, Fintype (S i)]
+    (x : (i : r) → S i → ℝ)
+    (d : (i : r) → S i → ℝ)
+    (η : ℝ → ℝ) (ε Δ : ℝ)
+    (hε_pos : 0 < ε) (hε_lt_Δ : ε < Δ)
+    (hd : ∀ i (n : S i), 0 ≤ d i n)
+    (hη_supp : ∀ u : ℝ, 1 ≤ |u| → η u = 0)
+    (hη_nonneg : ∀ u : ℝ, 0 ≤ η u)
+    (hη_even : ∀ u : ℝ, η (-u) = η u)
+    (h_sep : ∀ (i j : r), i ≠ j → ∀ (n : S i) (m : S j), Δ ≤ |x i n - x j m|)
+    (c : r → ℂ) :
+    let G := stationGradeMatrix x d η ε
+    imagPartComplexQuadraticForm G c = 0 ∧ 0 ≤ realPartComplexQuadraticForm G c := by
+  intro G
+  have h_symm : ∀ i j, G i j = G j i := by
+    intro i j
+    exact stationGradeMatrix_symmetric x d η ε hη_even i j
+  have h_psd : ∀ v : r → ℝ, 0 ≤ realQuadraticForm G v := by
+    intro v
+    exact finite_grade_station_psd x d η ε Δ hε_pos hε_lt_Δ hd hη_supp hη_nonneg h_sep v
+  exact real_symmetric_matrix_hermitian_psd G h_symm h_psd c
+
 end RiemannScope

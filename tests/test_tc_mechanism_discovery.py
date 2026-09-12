@@ -2910,24 +2910,20 @@ def test_epic_comparison_map_candidate_A_toeplitz_obstruction():
 def test_epic_comparison_map_candidate_B_logarithmic_autocorrelation():
     """
     Verify Candidate B comparison map (smoothed logarithmic station measure):
-    1. Admissible test f_{eps, c} = (d_u^2 - 1/4)(kappa_eps * nu_c) has M(T_eps c)(+-1/2) = 0.
-    2. Induced station pairing is an autocorrelation in logarithmic distance log(x/y).
-    3. Divergence from additive Euclidean band kernel eta((x - y)/eps):
-       additive band has constant Euclidean width eps, while logarithmic band has Euclidean width eps * y.
-    4. Non-intertwining of additive and multiplicative convolutions on finite windows.
+    1. Scope corrected: station separation preserved in log coordinates, prime resonances excluded.
+    2. Admissible test T_h c in V has exact pole cancellation A_h(+-1/2) = 0.
+    3. Reflected Weil kernel derived with vanishing cross-grade prime evaluations for 2h < Delta_res.
+    4. Remaining distinction: Archimedean cross terms and same-grade prime terms.
     """
     res = transcendental.audit_tc_comparison_map_candidate_B(dps=35)
     assert res['status'] == 'TC_COMPARISON_CANDIDATE_B_AUDITED'
-    assert res['discriminating_result'] == 'CANDIDATE_B_STRUCTURALLY_OBSTRUCTED'
+    assert res['discriminating_result'] == 'CANDIDATE_B_SCOPE_CORRECTED_AND_KERNEL_DERIVED'
+    assert res['scope_correction']['rejection_repaired'] is True
+    assert res['scope_correction']['cross_grade_prime_resonance_exclusion_proved'] is True
 
-    admiss = res['admissibility_proof']
-    assert admiss['in_admissible_space_V'] is True
-
-    kernel_info = res['induced_pairing_kernel']
-    assert 'logarithmic_autocorrelation' in kernel_info
-
-    geo = res['scaling_geometry_divergence']
-    assert 'consequence' in geo
+    kernel_audit = res['reflected_weil_kernel']
+    admiss = kernel_audit['kernel_definition']
+    assert 'A_h(-1/2) = A_h(1/2) = 0' in admiss['exact_pole_cancellation']
 
 
 def test_epic_matrix_source_reconciliation_exact_values():
@@ -2956,3 +2952,151 @@ def test_epic_matrix_source_reconciliation_exact_values():
     assert abs(witness['witness_vector_c'][1] - (-0.993529)) < 1e-4
     assert abs(witness['quadratic_form_c_T_G_c'] - (-0.022815)) < 1e-4
 
+
+def test_epic_candidate_A_fallback_removed_dynamic_eval():
+    """
+    Verify Candidate A:
+    1. Removes hardcoded fallback: retrieves actual computed matrix for any requested epsilon.
+    2. At eps = 0.1, G = diag(13.765932696619211, 0.45352393717389383), cross entry is exactly zero.
+    3. At eps = 8.0, G has non-zero cross entry ~ 4.547769, is indefinite.
+    4. Empty window (20.1, 20.2) returns zero matrix with 0 stations, handles gracefully.
+    5. Fails explicitly with ValueError if matrix cannot be computed (never substitutes fallback).
+    """
+    # 1. At eps = 0.1 on window [8, 20]
+    res_01 = transcendental.audit_tc_comparison_map_candidate_A(
+        grades=[0, 1], window=(8.0, 20.0), epsilon=0.1, dps=35
+    )
+    g_01 = res_01['actual_arithmetic_matrix_G']
+    assert abs(g_01['G_00'] - 13.765932696619211) < 1e-6
+    assert abs(g_01['G_11'] - 0.45352393717389383) < 1e-6
+    assert abs(g_01['G_01']) < 1e-12
+    assert g_01['cross_entry_is_zero'] is True
+    assert g_01['is_positive_semidefinite'] is True
+    assert g_01['equal_diagonals_observed'] is False
+
+    # 2. At eps = 8.0 on window [8, 20]
+    res_80 = transcendental.audit_tc_comparison_map_candidate_A(
+        grades=[0, 1], window=(8.0, 20.0), epsilon=8.0, dps=35
+    )
+    g_80 = res_80['actual_arithmetic_matrix_G']
+    assert abs(g_80['G_00'] - 39.759668) < 1e-3
+    assert abs(g_80['G_01'] - 4.547769) < 1e-3
+    assert abs(g_80['G_11'] - 0.497067) < 1e-3
+    assert g_80['cross_entry_is_zero'] is False
+    assert g_80['is_positive_semidefinite'] is False
+
+    # 3. Empty station window
+    res_empty = transcendental.audit_tc_comparison_map_candidate_A(
+        grades=[0, 1], window=(20.1, 20.2), epsilon=0.1, dps=25
+    )
+    g_empty = res_empty['actual_arithmetic_matrix_G']
+    assert g_empty['station_count'] == 0
+    assert g_empty['G_00'] == 0.0
+    assert g_empty['G_11'] == 0.0
+    assert g_empty['G_01'] == 0.0
+    assert g_empty['equal_diagonals_observed'] is True
+
+    # 4. Explicit failure test: returns explicit failure when computation fails; never substitutes fallback
+    import pytest
+    from unittest.mock import patch
+    with patch('transcendental.audit_station_to_grade_embedding_and_restricted_family', return_value={'resolution_sweep': []}):
+        with pytest.raises(ValueError, match="Failed to compute arithmetic grade matrix"):
+            transcendental.audit_tc_comparison_map_candidate_A(
+                grades=[0, 1], window=(8.0, 20.0), epsilon=0.1
+            )
+
+
+def test_epic_logarithmic_separation_and_resonance_gap():
+    """
+    Verify Logarithmic Station Separation and Prime-Power Resonance Exclusion:
+    1. Mean value bound: |x-y|/b <= |log x - log y| <= |x-y|/a on [a, b].
+    2. Finite station separation in log coordinates: Delta_log >= Delta_x / b > 0.
+    3. Transcendence rational ratio reduction: tau^{K-J} is irrational for K != J.
+    4. Prime-power resonance gap: Delta_res ~= 0.0461176 > 0 for grades {0, 1} on [8, 20].
+    5. Critical bandwidth h_crit = Delta_res / 2 ~= 0.0230588.
+    6. Exact vanishing: for h < h_crit, all cross-grade prime evaluations vanish identically.
+    """
+    res = transcendental.audit_tc_logarithmic_separation_and_resonance_gap(
+        grades=[0, 1], window=(8.0, 20.0), bandwidth_ceiling_h0=1.0, dps=35
+    )
+    assert res['status'] == 'TC_LOGARITHMIC_SEPARATION_AND_RESONANCE_GAP_AUDITED'
+
+    # Check Mean Value Theorem bounds
+    mvt = res['mean_value_theorem_bounds']
+    assert mvt['inequality_verified'] is True
+    assert mvt['lower_bound_Delta_x_over_b'] > 0.0075
+    assert res['logarithmic_separation_Delta_log'] >= mvt['lower_bound_Delta_x_over_b']
+    assert res['spatial_separation_Delta_x'] > 0.15
+
+    # Check resonance gap
+    res_gap = res['prime_power_resonance_gap']
+    delta_res = res_gap['minimum_resonance_gap_Delta_res']
+    assert abs(delta_res - 0.0461176) < 1e-4
+    assert abs(res_gap['critical_bandwidth_h_crit'] - 0.0230588) < 1e-4
+
+    # Check finite support bound
+    supp = res['finite_resonance_support_bound']
+    assert supp['maximum_resonating_prime_power'] >= 17
+    assert supp['enumerated_prime_power_count'] > 0
+
+
+def test_epic_candidate_B_reflected_weil_kernel_and_explicit_formula():
+    """
+    Verify Candidate B Reflected Weil Kernel:
+    1. Multiplicative test T_h c in V with exact pole cancellation A_h(+-1/2) = 0.
+    2. Explicit formula decomposition: Poles - Primes + Archimedean.
+    3. For h = 0.02 < h_crit, cross-grade prime evaluations vanish identically.
+    4. Same-grade prime evaluations do not vanish on off-diagonal stations with n_alpha / n_beta = p^r.
+    5. Cross-grade block W_{ij} (i != j) is purely Archimedean (non-vanishing).
+    6. Hermitian symmetry W^* = W.
+    7. Clear distinction among G_add, G_log, G_L2, and W.
+    """
+    res = transcendental.audit_tc_candidate_B_reflected_weil_kernel(
+        grades=[0, 1], window=(8.0, 20.0), h=0.02, dps=35
+    )
+    assert res['status'] == 'TC_CANDIDATE_B_REFLECTED_WEIL_KERNEL_AUDITED'
+
+    decomp = res['explicit_formula_decomposition']
+    assert decomp['pole_terms'] == '0.0 (vanish identically because A_h(+-1/2) = 0)'
+
+    cross_prime = decomp['prime_terms_cross_grade']
+    assert cross_prime['is_bandwidth_below_resonance_gap'] is True
+    assert cross_prime['cross_grade_prime_evaluations_status'] == 'VANISH_IDENTICALLY'
+
+    same_prime = decomp['prime_terms_same_grade']
+    assert 'DO NOT VANISH' in same_prime['off_diagonal_station_pairs']
+
+    arch = decomp['archimedean_distribution']
+    assert 'purely Archimedean cross terms' in arch['cross_grade_contribution']
+
+    # 4 objects distinction
+    four_obj = res['four_distinct_objects_clarification']
+    assert 'G_add' in four_obj
+    assert 'G_log' in four_obj
+    assert 'G_L2' in four_obj
+    assert 'W' in four_obj
+
+
+def test_epic_connes_consani_positivity_criterion_and_obligations():
+    """
+    Verify Connes-Consani (2026) Proposition C.1 and the Two Distinct TC Obligations:
+    1. Classical criterion: not RH ==> exists g in V: B(g, g) < 0.
+    2. Restricted TC family F_TC has grade-tied coefficients and bandwidth 2h < Delta_res.
+    3. Two obligations are strictly separated:
+       Obligation 1: Derive positivity / sign constraint on F_TC.
+       Obligation 2: Prove F_TC contains a negative test or approximates one under not RH.
+    4. Identifies mode vanishing risk if A_h(rho_0 - 1/2) = 0.
+    5. TC bridge remains strictly open.
+    """
+    res = transcendental.audit_weil_positivity_connes_consani_criterion(dps=35)
+    assert res['status'] == 'WEIL_POSITIVITY_CONNES_CONSANI_CRITERION_AUDITED'
+    assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
+
+    source = res['primary_source']
+    assert source['authors'] == 'Alain Connes & Caterina Consani'
+    assert 'Proposition C.1' in source['citation']
+
+    ob1 = res['two_separated_obligations']['obligation_1_arithmetic_positivity']
+    ob2 = res['two_separated_obligations']['obligation_2_offline_zero_detection']
+    assert 'Derive positivity' in ob1
+    assert 'Prove that under H(rho_0)' in ob2

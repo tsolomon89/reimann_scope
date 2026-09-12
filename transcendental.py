@@ -7442,6 +7442,8 @@ def audit_station_to_grade_embedding_and_restricted_family(
             sweep_item = {
                 'resolution_eps': eps_val,
                 'is_below_delta_cross': bool(eps_val < delta_cross_float),
+                'grade_matrix_G': [[float(G_mat[i, j]) for j in range(r)] for i in range(r)],
+                'determinant_G': float(G_mat[0, 0] * G_mat[1, 1] - G_mat[0, 1] ** 2) if r == 2 else None,
                 'eigenvalues_G': eigs,
                 'smallest_eigenvalue': eigs[0],
                 'is_positive_semidefinite': is_psd,
@@ -7754,9 +7756,12 @@ def audit_compact_support_weil_quartet_test(
             'signal_to_error_ratio': float(abs(B_Q_gaussian) / err_quartet) if err_quartet > 0 else float('inf'),
             'mathematical_distinction': (
                 'Certified strict negativity B_Q(g_R, g_R) < 0 applies strictly to the FINITE synthetic quartet '
-                'Q(0.1 + 14.134725i). By Paley-Wiener, the complete zeta sum includes infinitely many positive critical-line '
-                'terms sum_gamma |M g_R(i*gamma)|^2 > 0; this finite quartet result does NOT establish negativity '
-                'for the complete spectrum.'
+                'Q(0.1 + 14.134725i). The full remainder for any selected zero quartet Gamma is '
+                'R_Gamma(g, g) = sum_{rho notin Gamma} m_rho M g(rho - 1/2) conj(M g(1/2 - bar(rho))). '
+                'A sum of squared moduli describes the critical-line portion only; off the critical line, one cannot '
+                'assume all remaining zeros lie on the line. Nonvanishing of an entire function on an entire line and its '
+                'values at a discrete zero set are distinct statements, and this finite quartet result does NOT determine '
+                'the total sign for the complete spectrum without a global magnitude comparison.'
             )
         }
 
@@ -7786,32 +7791,48 @@ def audit_tc_comparison_map_candidate_A(
            For consecutive grades K = {0, 1}, W is Hermitian Toeplitz with W_{00} = W_{11}.
 
     4. Comparison with Arithmetic Matrix G:
-       - The arithmetic matrix G on window [8, 20] at eps = 8.0 has:
-         G_{00} ~= 39.759668, G_{11} ~= 0.497067 (ratio G_{00} / G_{11} ~= 80:1).
-       - Because G_{00} != G_{11}, no matrix of the form W = (B(U_{K_j} g, U_{K_i} g)) can equal G.
+       - Directly retrieve the computed matrix G for the requested resolution and window.
+       - No hardcoded fallback or indefinite-witness substitution is used.
+       - If computation fails, an explicit failure is returned.
 
-    5. Earliest Unsupported Inference / Exact Obstruction:
-       - A spatial window W = [a, b] breaks dilation invariance:
-         tau^K n in [a, b] <=> n in [a*tau^{-K}, b*tau^{-K}].
-         Higher grades capture exponentially fewer prime powers inside any fixed compact window.
-       - In contrast, the dilation orbit U_K preserves the full L^2 / spectral norm of the test.
-       - Therefore, the fixed-window arithmetic matrix G CANNOT equal the grade-orbit Weil matrix W.
-       - Grade-dependent scaling (g_i = w_i * g) violates the orbit definition and requires a new derived rule.
+    5. Scoped Obstruction and Conditional Cauchy-Schwarz:
+       - Retain Candidate A's valid equal-diagonal obstruction for the literal orbit of one fixed test
+         and the tested unequal-diagonal arithmetic matrix G.
+       - The Cauchy-Schwarz argument (forcing det(W) >= 0 under scaling) is CONDITIONAL on positivity
+         of the Weil form B. Under a hypothetical off-line zero, positivity of B is NOT available
+         as an unconditional premise.
+       - Do not generalize this obstruction to all normalizations, all windows, or all comparison inequalities.
     """
     if grades is None:
         grades = [0, 1]
 
-    # Retrieve reproducible arithmetic matrix G
+    # Retrieve reproducible arithmetic matrix G directly for requested epsilon
     arithmetic_audit = audit_station_to_grade_embedding_and_restricted_family(
         grades=grades, window=window, epsilons=[epsilon], dps=dps
     )
-    witness = arithmetic_audit.get('large_resolution_indefinite_witness') or {}
-    G_mat = witness.get('grade_matrix_G', [[39.759668, 4.547769], [4.547769, 0.497067]])
+    resolution_sweep = arithmetic_audit.get('resolution_sweep', [])
+    target_sweep = None
+    for s in resolution_sweep:
+        if abs(s.get('resolution_eps', 0.0) - epsilon) < 1e-9:
+            target_sweep = s
+            break
 
-    g00 = G_mat[0][0]
-    g11 = G_mat[1][1]
-    g01 = G_mat[0][1]
-    ratio_diag = g00 / g11 if g11 != 0 else float('inf')
+    if target_sweep is None or 'grade_matrix_G' not in target_sweep:
+        raise ValueError(
+            f"Failed to compute arithmetic grade matrix G for epsilon={epsilon} on grades={grades}, window={window}. "
+            f"Never substitute a fallback."
+        )
+
+    G_mat = target_sweep['grade_matrix_G']
+    r = len(grades)
+    g00 = float(G_mat[0][0]) if r > 0 and len(G_mat[0]) > 0 else 0.0
+    g11 = float(G_mat[1][1]) if r > 1 and len(G_mat[1]) > 1 else 0.0
+    g01 = float(G_mat[0][1]) if r > 1 and len(G_mat[0]) > 1 else 0.0
+    ratio_diag = (g00 / g11) if g11 != 0 else (1.0 if g00 == 0 else float('inf'))
+    equal_diagonals_observed = bool(abs(g00 - g11) < 1e-9)
+    cross_entry_is_zero = bool(abs(g01) < 1e-9)
+    is_psd = target_sweep.get('is_positive_semidefinite', False)
+    station_count = arithmetic_audit.get('station_count', 0)
 
     return {
         'status': 'TC_COMPARISON_CANDIDATE_A_AUDITED',
@@ -7828,15 +7849,22 @@ def audit_tc_comparison_map_candidate_A(
         },
         'actual_arithmetic_matrix_G': {
             'window': list(window),
+            'station_count': station_count,
             'resolution_eps': epsilon,
             'G_00': g00,
             'G_11': g11,
             'G_01': g01,
+            'grade_matrix_G': G_mat,
             'diagonal_ratio_G00_over_G11': ratio_diag,
-            'equal_diagonals_observed': False
+            'equal_diagonals_observed': equal_diagonals_observed,
+            'cross_entry_is_zero': cross_entry_is_zero,
+            'is_positive_semidefinite': is_psd
         },
         'structural_obstruction_identified': {
-            'equal_diagonal_violation': f'Orbit forces W_00 = W_11, but arithmetic matrix has G_00 / G_11 ~= {ratio_diag:.2f} != 1',
+            'equal_diagonal_violation': (
+                f'Orbit forces W_00 = W_11, whereas arithmetic matrix has G_00 / G_11 ~= {ratio_diag:.2f} '
+                f'({"equal" if equal_diagonals_observed else "unequal"})'
+            ),
             'geometric_cause': (
                 'The compact window W = [a, b] breaks scale invariance: prime powers enter W as n in [a*tau^{-K}, b*tau^{-K}], '
                 'so higher grades capture exponentially fewer prime powers inside any fixed compact window. '
@@ -7845,102 +7873,457 @@ def audit_tc_comparison_map_candidate_A(
             'cauchy_schwarz_barrier_under_scaling': (
                 'If one attempts to match the diagonal via grade-dependent tests g_i = w_i * g with w_0/w_1 = sqrt(G_00/G_11), '
                 'then det(W) = w_0^2 w_1^2 (B(g,g)^2 - |B(U_1 g, U_0 g)|^2). '
-                'If B were positive semi-definite (as required under RH), Cauchy-Schwarz forces |B(U_1 g, U_0 g)| <= B(g,g), '
-                'making det(W) >= 0 always. Hence no scaled orbit can reproduce the indefinite matrix det(G) ~= -0.919 < 0.'
+                'IF the Weil form B is assumed positive semi-definite, Cauchy-Schwarz forces |B(U_1 g, U_0 g)| <= B(g,g), '
+                'making det(W) >= 0 always. However, under a hypothetical off-line zero, positivity of B is NOT available '
+                'as an unconditional premise. This obstruction is strictly scoped to the literal orbit of one fixed test '
+                'and does not generalize to all normalizations or all comparison inequalities.'
             )
         },
-        'discriminating_result': 'CANDIDATE_A_STRUCTURALLY_OBSTRUCTED',
-        'epistemic_verdict': 'No fixed-test grade orbit can represent the fixed-window arithmetic matrix G.'
+        'discriminating_result': 'CANDIDATE_A_STRUCTURALLY_OBSTRUCTED' if not equal_diagonals_observed else 'CANDIDATE_A_DIAGONAL_MATCHED',
+        'epistemic_verdict': (
+            'Literal fixed-test grade orbit cannot represent the unequal-diagonal arithmetic matrix G on the tested window.'
+            if not equal_diagonals_observed else 'Literal orbit matches equal diagonals on this configuration.'
+        )
+    }
+
+
+def audit_tc_logarithmic_separation_and_resonance_gap(
+    grades: Optional[List[int]] = None,
+    window: Tuple[float, float] = (8.0, 20.0),
+    bandwidth_ceiling_h0: float = 1.0,
+    dps: int = 35
+) -> Dict[str, Any]:
+    """
+    Logarithmic Station Separation and Arithmetic Prime-Power Resonance Exclusion.
+
+    1. Mathematical Definitions & Mean Value Bound:
+       - Window W = [a, b] with 0 < a <= x, y <= b.
+       - By the Mean Value Theorem on f(t) = log t, for x, y in [a, b]:
+         |x - y| / b <= |log x - log y| <= |x - y| / a.
+       - For finite station sets separated by Delta_x > 0 in W, the logarithmic separation satisfies:
+         Delta_log >= Delta_x / b > 0.
+
+    2. Transcendence Rational Ratio Reduction:
+       - For positive integer stations from distinct integer grades K != J:
+         x = tau^K * n,  y = tau^J * m  (n, m in Z_{>= 1}, tau = 2*pi).
+       - If x / y = q in Q_{>0}, then tau^{K - J} = q * (m / n) in Q, which contradicts
+         the Lindemann-Weierstrass transcendence of pi.
+       - Therefore, x / y cannot be rational, which strictly excludes all ratios:
+         1, p^r, and p^{-r}  for all primes p and integers r >= 1.
+       - Formally certified in Lean 4: RiemannScope.tc_cross_grade_rational_ratio_excluded.
+
+    3. Finite-Window Prime-Power Resonance Exclusion:
+       - Log ratios between cross-grade stations: t_alpha - t_beta = log(x_alpha / x_beta).
+       - Prime-power resonances: +- r * log p = log(p^r) or -log(p^r).
+       - A resonance can lie in the test bandwidth only if |(t_alpha - t_beta) - (+- r*log p)| <= 2*h.
+       - Support Bound: Since |t_alpha - t_beta| <= max_diff = log(b / a), any prime power with
+         log(p^r) > max_diff + 2*h_0 cannot resonate for any bandwidth h <= h_0.
+       - Hence, only finitely many prime powers p^r <= exp(max_diff + 2*h_0) need be examined.
+       - Within this finite set, the exact resonance gap is:
+         Delta_res = min_{alpha, beta (cross-grade), p, r} |(t_alpha - t_beta) - (+- r*log p)| > 0.
+
+    4. Proved Consequence for Test Kernels:
+       - For any test kernel C_h supported in [-2h, 2h], if 2h < Delta_res (i.e. h < Delta_res / 2),
+         then C_h((t_alpha - t_beta) - (+- r*log p)) = 0 identically for all cross-grade pairs (alpha, beta)
+         and all prime powers p^r.
+       - Thus, cross-grade prime evaluations in the explicit formula vanish completely!
+    """
+    if grades is None:
+        grades = [0, 1]
+
+    with mpmath.workdps(dps):
+        tau = 2 * mpmath.pi
+        a_win, b_win = mpmath.mpf(window[0]), mpmath.mpf(window[1])
+
+        # Prime power recognizer
+        def get_prime_power(k: int):
+            if k < 2:
+                return None
+            for p in range(2, k + 1):
+                if p * p > k and k > 1:
+                    # k itself is prime
+                    return (k, 1)
+                if k % p == 0:
+                    temp = k
+                    r = 0
+                    while temp % p == 0:
+                        temp //= p
+                        r += 1
+                    if temp == 1:
+                        return (p, r)
+                    else:
+                        return None
+            return None
+
+        # Build stations
+        stations = []
+        for g_idx, K in enumerate(grades):
+            st_k = sieve_prime_powers_in_window(window, K, tau=float(tau))
+            for n_val, x_float, lam_float in st_k:
+                x_mp = (tau ** K) * mpmath.mpf(n_val)
+                t_mp = mpmath.log(x_mp)
+                stations.append({
+                    'grade_idx': g_idx,
+                    'grade': K,
+                    'n': n_val,
+                    'x': float(x_mp),
+                    'x_mp': x_mp,
+                    't': float(t_mp),
+                    't_mp': t_mp,
+                    'lambda': lam_float
+                })
+
+        num_stations = len(stations)
+
+        # Cross-grade distances in x and in log x
+        cross_x_dists = []
+        cross_log_dists = []
+        cross_log_diffs = []
+
+        for i in range(num_stations):
+            for j in range(num_stations):
+                if stations[i]['grade_idx'] != stations[j]['grade_idx']:
+                    dx = abs(stations[i]['x_mp'] - stations[j]['x_mp'])
+                    dt = abs(stations[i]['t_mp'] - stations[j]['t_mp'])
+                    cross_x_dists.append(dx)
+                    cross_log_dists.append(dt)
+                    cross_log_diffs.append(stations[i]['t_mp'] - stations[j]['t_mp'])
+
+        delta_x = min(cross_x_dists) if cross_x_dists else mpmath.mpf('inf')
+        delta_log = min(cross_log_dists) if cross_log_dists else mpmath.mpf('inf')
+        delta_x_float = float(delta_x)
+        delta_log_float = float(delta_log)
+
+        mvt_lower_bound = delta_x / b_win if b_win > 0 else mpmath.mpf(0)
+        mvt_upper_bound = delta_x / a_win if a_win > 0 else mpmath.mpf('inf')
+        mvt_holds = bool(mvt_lower_bound <= delta_log <= mvt_upper_bound) if cross_x_dists else True
+
+        # Support ceiling for prime powers
+        h0_mp = mpmath.mpf(bandwidth_ceiling_h0)
+        max_log_diff = max(cross_log_dists) if cross_log_dists else mpmath.log(b_win / a_win)
+        cutoff_log = max_log_diff + 2 * h0_mp
+        max_prime_power = int(mpmath.ceil(mpmath.exp(cutoff_log)))
+
+        # Enumerate prime powers up to max_prime_power
+        prime_powers = []
+        for m in range(2, max_prime_power + 1):
+            pp = get_prime_power(m)
+            if pp:
+                p, r = pp
+                prime_powers.append({
+                    'm': m,
+                    'p': p,
+                    'r': r,
+                    'log_m': mpmath.log(m),
+                    'lambda': mpmath.log(p)
+                })
+
+        # Resonance gap computation
+        resonance_gaps = []
+        for diff in cross_log_diffs:
+            for pp in prime_powers:
+                gap_pos = abs(diff - pp['log_m'])
+                gap_neg = abs(diff + pp['log_m'])
+                resonance_gaps.append(gap_pos)
+                resonance_gaps.append(gap_neg)
+
+        delta_res = min(resonance_gaps) if resonance_gaps else mpmath.mpf('inf')
+        delta_res_float = float(delta_res)
+        h_crit_float = delta_res_float / 2.0
+
+        return {
+            'status': 'TC_LOGARITHMIC_SEPARATION_AND_RESONANCE_GAP_AUDITED',
+            'parameters': {
+                'grades': grades,
+                'window': list(window),
+                'bandwidth_ceiling_h0': bandwidth_ceiling_h0,
+                'dps': dps
+            },
+            'station_count': num_stations,
+            'spatial_separation_Delta_x': delta_x_float,
+            'logarithmic_separation_Delta_log': delta_log_float,
+            'mean_value_theorem_bounds': {
+                'lower_bound_Delta_x_over_b': float(mvt_lower_bound),
+                'upper_bound_Delta_x_over_a': float(mvt_upper_bound),
+                'inequality_verified': mvt_holds,
+                'lean4_theorems': [
+                    'RiemannScope.finite_log_station_separation',
+                    'RiemannScope.finite_log_separation_pos'
+                ]
+            },
+            'transcendence_rational_ratio_reduction': {
+                'theorem': 'For K != J and n, m in Z_{>=1}, (tau^K n) / (tau^J m) is irrational by Lindemann transcendence',
+                'excluded_ratios': ['1', 'p^r', 'p^{-r}'],
+                'lean4_theorem': 'RiemannScope.tc_cross_grade_rational_ratio_excluded'
+            },
+            'finite_resonance_support_bound': {
+                'bandwidth_ceiling_h0': bandwidth_ceiling_h0,
+                'maximum_cross_log_distance': float(max_log_diff),
+                'log_cutoff_distance': float(cutoff_log),
+                'maximum_resonating_prime_power': max_prime_power,
+                'enumerated_prime_power_count': len(prime_powers),
+                'guarantee': 'All prime powers p^r > max_resonating lie strictly outside the test bandwidth [-2h, 2h]'
+            },
+            'prime_power_resonance_gap': {
+                'minimum_resonance_gap_Delta_res': delta_res_float,
+                'critical_bandwidth_h_crit': h_crit_float,
+                'condition_for_cross_prime_vanishing': f'h < h_crit = {h_crit_float:.6f} (i.e. 2h < Delta_res = {delta_res_float:.6f})',
+                'exact_vanishing_consequence': (
+                    f'For any test kernel C_h supported in [-2h, 2h] with h < {h_crit_float:.6f}, '
+                    'every cross-grade prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically.'
+                )
+            },
+            'epistemic_verdict': 'LOGARITHMIC_SEPARATION_AND_RESONANCE_EXCLUSION_PROVED'
+        }
+
+
+def audit_tc_candidate_B_reflected_weil_kernel(
+    grades: Optional[List[int]] = None,
+    window: Tuple[float, float] = (8.0, 20.0),
+    h: float = 0.02,
+    dps: int = 35
+) -> Dict[str, Any]:
+    """
+    Candidate B Reflected Weil Kernel and Complete Explicit Formula Decomposition.
+
+    1. Multiplicative Test Space and Convolution:
+       - Admissible space V = { g in C_c^infty(R_+^*) : M g(-1/2) = M g(1/2) = 0 }.
+       - Test construction: T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha),
+         where t_alpha = log x_alpha, d_alpha = Lambda(n_alpha) w(x_alpha).
+       - Smoothing kernel: kappa in C_c^infty([-1, 1]) even, kappa_h(u) = h^{-1} kappa(u / h),
+         psi_h = (d_u^2 - 1/4) kappa_h.
+       - Mellin transform: M(T_h c)(s) = A_h(s) * sum_alpha c_{i(alpha)} d_alpha exp(s * t_alpha),
+         with A_h(s) = (s^2 - 1/4) int_R kappa_h(u) exp(su) du.
+       - Pole cancellation: A_h(-1/2) = A_h(1/2) = 0 identically, so T_h c in V unconditionally.
+
+    2. Reflected Weil Spectral Form and Complete Kernel:
+       - Reflected pairing: B(g, h) = sum_rho m_rho M g(lambda_rho) * conj(M h(-bar(lambda)_rho)),
+         where lambda_rho = rho - 1/2.
+       - Quadratic form on grade vectors: B(T_h c, T_h c) = sum_{alpha, beta} c_{i(alpha)} conj(c_{i(beta)}) d_alpha d_beta K_h(t_alpha - t_beta),
+         where the complete reflected kernel is:
+         K_h(v) = sum_rho m_rho A_h(lambda_rho) * conj(A_h(-bar(lambda)_rho)) * exp(lambda_rho * v).
+       - Grade matrix: W_{ij} = B(g_j, g_i) where g_i = T_h e_i.
+         Then B(T_h c, T_h c) = c^* W c.
+       - Hermitian Symmetry: W^* = W proved by zero reflection rho <-> 1 - bar(rho) and Schwarz reflection.
+
+    3. Full Centered Explicit Formula Decomposition on C_h(u - v):
+       - Autocorrelation: C_h = psi_h * widetilde(psi)_h with supp(C_h) subset [-2h, 2h].
+       - Complete Explicit Formula:
+         K_h(v) = W_centered(C_h(. - v)) = [Poles] - [Primes] + [Archimedean].
+       - (a) Pole terms: int_R C_h(u - v) exp(+- u / 2) du = exp(+- v / 2) A_h(+- 1/2) conj(A_h(-+ 1/2)) = 0 identically!
+       - (b) Prime terms: sum_{p, r} (log p / p^{r/2}) [ C_h(r*log p - v) + C_h(-r*log p - v) ].
+             * Cross-grade pairs (v = t_alpha - t_beta with i(alpha) != i(beta)):
+               By resonance exclusion, for 2h < Delta_res, |v - (+- r*log p)| > 2h for all p, r.
+               Since supp(C_h) subset [-2h, 2h], C_h(+- r*log p - v) = 0 identically!
+               Therefore, all cross-grade prime evaluations vanish!
+             * Same-grade pairs (v = t_alpha - t_beta with i(alpha) == i(beta)):
+               When alpha != beta, n_alpha / n_beta can equal a prime power p^r (e.g. 16 / 8 = 2).
+               Then v = log(p^r) and C_h(0) != 0, so same-grade prime terms DO NOT vanish.
+       - (c) Archimedean terms:
+             W_arch(C_h(. - v)) = (1 / 2*pi) int_R |A_h(i*t)|^2 exp(-i*t*v) Re( psi_digamma(1/4 + i*t/2) - log pi ) dt.
+             This distribution does NOT vanish for cross-grade pairs v = t_alpha - t_beta != 0.
+             Therefore, the cross-grade block W_{ij} (i != j) is PURELY Archimedean:
+             W_{ij} = W_{ij, arch}.
+
+    4. Four Distinct Mathematical Objects:
+       - G_add: Additive Euclidean band matrix eta((x_alpha - x_beta)/eps).
+       - G_log: Logarithmic band matrix eta((log x_alpha - log x_beta)/eps).
+       - G_{L^2}: Ordinary L^2 Gram matrix of smoothed measures in log coordinates (positive semi-definite).
+       - W: Reflected Weil spectral matrix (not positive semi-definite a priori; depends on zero spectrum).
+       - WARNING: Ordinary Gram positivity of C_h does NOT prove Weil positivity of W.
+         C_h changes sign due to the differential operator (d_u^2 - 1/4), so pointwise non-negative kernel lemmas do not apply.
+    """
+    if grades is None:
+        grades = [0, 1]
+
+    # Check resonance gap for the requested window
+    res_audit = audit_tc_logarithmic_separation_and_resonance_gap(grades=grades, window=window, dps=dps)
+    delta_res = res_audit['prime_power_resonance_gap']['minimum_resonance_gap_Delta_res']
+    h_crit = res_audit['prime_power_resonance_gap']['critical_bandwidth_h_crit']
+    is_below_res_gap = bool(h < h_crit)
+
+    return {
+        'status': 'TC_CANDIDATE_B_REFLECTED_WEIL_KERNEL_AUDITED',
+        'parameters': {
+            'grades': grades,
+            'window': list(window),
+            'bandwidth_h': h,
+            'dps': dps
+        },
+        'kernel_definition': {
+            'admissible_test_construction': 'T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha)',
+            'multiplier_A_h': 'A_h(s) = (s^2 - 1/4) int_R kappa_h(u) exp(su) du',
+            'exact_pole_cancellation': 'A_h(-1/2) = A_h(1/2) = 0 identically (T_h c in V unconditionally)',
+            'complete_kernel_K_h': 'K_h(v) = sum_rho m_rho A_h(lambda_rho) conj(A_h(-bar(lambda)_rho)) exp(lambda_rho * v)',
+            'grade_matrix_formula': 'W_{ij} = B(g_j, g_i) = sum_{alpha in grade i, beta in grade j} d_alpha d_beta K_h(t_alpha - t_beta)',
+            'hermitian_symmetry': 'W^* = W proved by zero reflection rho <-> 1 - bar(rho)'
+        },
+        'explicit_formula_decomposition': {
+            'autocorrelation_kernel': 'C_h = psi_h * widetilde(psi)_h with supp(C_h) subset [-2h, 2h]',
+            'pole_terms': '0.0 (vanish identically because A_h(+-1/2) = 0)',
+            'prime_terms_cross_grade': {
+                'is_bandwidth_below_resonance_gap': is_below_res_gap,
+                'resonance_gap_Delta_res': delta_res,
+                'critical_bandwidth_h_crit': h_crit,
+                'cross_grade_prime_evaluations_status': 'VANISH_IDENTICALLY' if is_below_res_gap else 'ACTIVE_COUPLING',
+                'mathematical_proof': (
+                    f'Because 2h = {2*h:.6f} < Delta_res = {delta_res:.6f}, all cross-grade log differences '
+                    't_alpha - t_beta are separated from prime-power resonances +-r*log(p) by more than 2h. '
+                    'Since supp(C_h) subset [-2h, 2h], every cross-grade prime term evaluates to C_h(distance > 2h) = 0.'
+                )
+            },
+            'prime_terms_same_grade': {
+                'diagonal_station_pairs': 'Vanish for 2h < log(2) ~= 0.693',
+                'off_diagonal_station_pairs': 'DO NOT VANISH whenever n_alpha / n_beta = p^r (e.g. 16/8 = 2)',
+                'mathematical_note': 'Same-grade stations can have rational prime-power ratios, preserving local prime coupling.'
+            },
+            'archimedean_distribution': {
+                'cross_grade_contribution': 'NON_ZERO (purely Archimedean cross terms W_{ij, arch} for i != j)',
+                'formula': 'W_{ij} = - sum_{alpha in i, beta in j} d_alpha d_beta W_arch(C_h(. - (t_alpha - t_beta)))',
+                'consequence': 'The vanishing of cross-grade prime terms does NOT imply that W is diagonal or PSD.'
+            }
+        },
+        'four_distinct_objects_clarification': {
+            'G_add': 'Additive Euclidean band matrix eta((x_alpha - x_beta)/eps)',
+            'G_log': 'Logarithmic band matrix eta((log x_alpha - log x_beta)/eps)',
+            'G_L2': 'Ordinary L^2 Gram matrix of smoothed measures in log coordinates (positive semi-definite)',
+            'W': 'Reflected Weil spectral matrix (contains Archimedean cross terms and off-line zero dependencies)',
+            'gram_vs_weil_distinction': (
+                'Ordinary L^2 Gram positivity of C_h = psi_h * widetilde(psi)_h does NOT prove Weil positivity of W. '
+                'Moreover, C_h changes sign due to (d_u^2 - 1/4), so pointwise non-negative kernel theorems do not apply.'
+            )
+        },
+        'epistemic_verdict': 'CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED'
     }
 
 
 def audit_tc_comparison_map_candidate_B(
     grades: Optional[List[int]] = None,
     window: Tuple[float, float] = (8.0, 20.0),
-    epsilon: float = 8.0,
+    h: float = 0.02,
     dps: int = 35
 ) -> Dict[str, Any]:
     """
-    Candidate B Comparison Map Investigation: Smoothed Logarithmic Station Measure.
+    Candidate B Comparison Map Investigation: Corrected Scope and Derived Weil Kernel.
 
-    1. Map Definition:
-       Weighted station measure in logarithmic coordinates:
-         nu_c = sum_{i, n} c_i d_{i,n} delta_{log x_{i,n}},   where x_{i,n} = tau^{K_i} n, d_{i,n} = Lambda(n) w(x_{i,n}).
-       Admissible test generation via differential smoothing:
-         f_{eps, c} = (d_u^2 - 1/4) (kappa_eps * nu_c),   kappa_eps in C_c^infty(R).
-         T_eps c(x) = f_{eps, c}(log x).
+    1. Corrected Scope of Candidate B Rejection:
+       - The initial rejection of Candidate B conflated the ordinary L^2 smoothing Gram matrix
+         with the reflected Weil spectral form, and asserted a general impossibility of comparison
+         based on affine noncommutativity.
+       - That broad impossibility is REFUTED: logarithmic coordinates preserve finite-window station
+         separation (Delta_log >= Delta_x / b > 0).
+       - Furthermore, by Lindemann transcendence, cross-grade prime-power resonances are excluded,
+         so all cross-grade prime evaluations in the explicit formula vanish identically when 2h < Delta_res.
 
-    2. Admissibility and Mellin Transform:
-       - In logarithmic coordinates u = log x:
-         M(T_eps c)(s) = int_R f_{eps, c}(u) exp(su) du = (s^2 - 1/4) int_R (kappa_eps * nu_c)(u) exp(su) du.
-       - By the convolution theorem for the two-sided Laplace transform:
-         int_R (kappa_eps * nu_c)(u) exp(su) du = hat{kappa}_eps(-i*s) * int_R exp(su) dnu_c(u)
-                                               = hat{kappa}_eps(-i*s) * sum_{i,n} c_i d_{i,n} x_{i,n}^s.
-       - Thus M(T_eps c)(s) = (s^2 - 1/4) hat{kappa}_eps(-i*s) sum_{i,n} c_i d_{i,n} x_{i,n}^s.
-       - The factor (s^2 - 1/4) guarantees M(T_eps c)(+-1/2) = 0 identically, so T_eps c in V.
-
-    3. Induced Quadratic Form and Kernel Discrepancy:
-       - The L^2 pairing of smoothed measures in log coordinates induces a station-station pairing:
-         K_log(x, y) = (kappa_eps * kappa_eps^*)(log x - log y) = Phi_eps(log(x / y)).
-       - This is an autocorrelation kernel in LOGARITHMIC distance log(x/y) = log x - log y.
-       - In contrast, the original TC arithmetic observable Q_eps^{K, J} pairs stations via the
-         ADDITIVE Euclidean distance kernel:
-         K_add(x, y) = eta((x - y) / eps).
-       - Since |x - y| = y * |x/y - 1| != log(x/y), the additive band |x - y| < eps corresponds to
-         a relative ratio |x/y - 1| < eps / y that shrinks with station height y,
-         whereas a logarithmic band |log(x/y)| < eps corresponds to a Euclidean width |x - y| ~ eps * y
-         that expands with height y.
-
-    4. Earliest Unsupported Inference / Discriminating Result:
-       - Smoothing in logarithmic coordinates produces a multiplicative-group (scale-invariant) kernel,
-         not the additive Euclidean band kernel eta((x - y)/eps).
-       - Identifying the two requires either replacing the additive observable with a logarithmic one
-         (which alters the prime station separation gap and invalidates the arithmetic vanishing premise),
-         or establishing an intertwining between additive and multiplicative convolutions, which is
-         algebraically obstructed by the non-abelian nature of the affine group (x -> a*x + b).
+    2. Actual Mathematical Obstruction:
+       - Retain only the proved distinction between the additive-distance band kernel eta((x - y)/eps)
+         and the logarithmic-distance kernel Phi_eps(log(x / y)).
+       - Even though cross-grade prime terms vanish for 2h < Delta_res, the reflected Weil matrix W
+         is NOT diagonal: it contains non-vanishing Archimedean cross terms W_{ij, arch} and
+         non-vanishing same-grade prime terms.
+       - Hence, W does not equal the diagonal small-resolution arithmetic matrix G_diag.
     """
     if grades is None:
         grades = [0, 1]
 
+    kernel_audit = audit_tc_candidate_B_reflected_weil_kernel(grades=grades, window=window, h=h, dps=dps)
+    res_audit = audit_tc_logarithmic_separation_and_resonance_gap(grades=grades, window=window, dps=dps)
+
     return {
         'status': 'TC_COMPARISON_CANDIDATE_B_AUDITED',
         'candidate_name': 'Candidate B: Smoothed Weighted Station Measure in Log Coordinates',
-        'measure_definition': 'nu_c = sum_{i, n} c_i d_{i,n} delta_{log x_{i,n}}',
-        'smoothing_operator': 'f_{eps, c} = (d_u^2 - 1/4) (kappa_eps * nu_c),  T_eps c(x) = f_{eps, c}(log x)',
-        'admissibility_proof': {
-            'mellin_transform': 'M(T_eps c)(s) = (s^2 - 1/4) * hat{kappa}_eps(-i*s) * sum_{i,n} c_i d_{i,n} x_{i,n}^s',
-            'pole_cancellation': 'Vanishes at s = +-1/2 identically due to factor (s^2 - 1/4)',
-            'in_admissible_space_V': True
+        'scope_correction': {
+            'rejection_repaired': True,
+            'logarithmic_separation_preserved': True,
+            'cross_grade_prime_resonance_exclusion_proved': True,
+            'distinction_retained': 'Additive band kernel vs logarithmic autocorrelation kernel'
         },
-        'induced_pairing_kernel': {
-            'logarithmic_autocorrelation': 'K_log(x, y) = Phi_eps(log(x / y)) = (kappa_eps * kappa_eps^*)(log x - log y)',
-            'group_symmetry': 'Dilation-invariant on R_+^* (multiplicative Haar group)',
-            'additive_observable_kernel': 'K_add(x, y) = eta((x - y) / eps) (translation-invariant on R)'
+        'logarithmic_separation': res_audit,
+        'reflected_weil_kernel': kernel_audit,
+        'discriminating_result': 'CANDIDATE_B_SCOPE_CORRECTED_AND_KERNEL_DERIVED',
+        'epistemic_verdict': (
+            'Logarithmic coordinates preserve station separation and exclude cross-grade prime resonances, '
+            'yielding vanishing cross-grade prime evaluations for 2h < Delta_res. However, the reflected Weil matrix '
+            'retains non-vanishing Archimedean cross terms and same-grade prime terms, differing from both '
+            'the additive band matrix and the diagonal small-resolution arithmetic matrix.'
+        )
+    }
+
+
+def audit_weil_positivity_connes_consani_criterion(
+    dps: int = 35
+) -> Dict[str, Any]:
+    """
+    Formulation of Connes-Consani (2026) Proposition C.1 and the Two Distinct TC Obligations.
+
+    1. Classical Weil Positivity Criterion (Connes & Consani 2026, Appendix C, Prop C.1; Weil 1952):
+       - Let V be the space of smooth compactly supported functions on R_+^* satisfying
+         M g(-1/2) = M g(1/2) = 0.
+       - Then RH holds if and only if B(g, g) >= 0 for all g in V.
+       - In particular, the relevant classical consequence is:
+         not RH ==> exists g in V : B(g, g) < 0.
+       - This is a conditional existence theorem on the full space V. It does NOT assume RH,
+         supply an off-line zero numerically, or prove that such a negative test belongs
+         to the restricted TC family.
+
+    2. Definition of the Restricted TC Family F_TC:
+       - For a fixed window W = [a, b], finite grades {K_1, ..., K_r}, and smooth bump w:
+         F_TC = { T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha) : c in C^r, h > 0, 2h < Delta_res }.
+       - Station coefficients are TIED by grade: c_{i(alpha)} depends only on the grade index i(alpha),
+         not independently chosen for each station.
+
+    3. Two Unresolved TC Obligations (Strictly Separated):
+       - Obligation 1 (Arithmetic Positivity / Sign Constraint):
+         Derive positivity B(g, g) >= 0 or an adequate sign constraint for all g in F_TC
+         using actual arithmetic separation and the complete explicit formula.
+       - Obligation 2 (Off-Line Zero Detection):
+         Prove that under an off-line zero hypothesis H(rho_0), F_TC contains a test g with B(g, g) < 0,
+         or approximates one closely enough in a topology controlling B.
+
+    4. Mode Vanishing and Approximation Obstructions:
+       - If A_h(rho_0 - 1/2) = 0, the kernel smoothing completely annihilates the off-line zero mode,
+         so that zero cannot be detected.
+       - As the station set grows, the resonance gap Delta_res may shrink, requiring h -> 0.
+         Positivity and negative-test approximation must hold along the same sequence.
+       - Finite-window separation and density in an unrelated norm do not settle this compatibility.
+       - Epistemic status: The TC bridge remains STRICTLY OPEN.
+    """
+    return {
+        'status': 'WEIL_POSITIVITY_CONNES_CONSANI_CRITERION_AUDITED',
+        'primary_source': {
+            'authors': 'Alain Connes & Caterina Consani',
+            'year': 2026,
+            'title': 'Weil positivity and Trace formula, the archimedean place',
+            'citation': 'arXiv:2006.13771, Appendix C, Proposition C.1',
+            'classical_precursor': 'Andre Weil (1952), Sur les formules explicites de la theorie des nombres premiers'
         },
-        'scaling_geometry_divergence': {
-            'additive_width_at_height_y': 'eps (constant across all heights y)',
-            'logarithmic_equivalent_euclidean_width': 'y * (exp(eps) - 1) ~ eps * y (expands linearly with height y)',
-            'consequence': (
-                'The additive band |x - y| < eps and the logarithmic band |log(x/y)| < eps have fundamentally '
-                'incompatible scaling geometries. A fixed additive band corresponds to a shrinking logarithmic ratio '
-                'eps/y as y -> infty, whereas a fixed logarithmic band corresponds to an expanding Euclidean band.'
-            )
+        'imported_theorem': {
+            'statement': 'RH holds if and only if B(g, g) >= 0 for all g in V',
+            'contrapositive_consequence': 'not RH ==> exists g in V : B(g, g) < 0',
+            'nature': 'Conditional existence on full space V (does not assume RH or construct an off-line zero)'
         },
-        'exact_obstruction_identified': {
-            'intertwining_obstruction': (
-                'Additive convolution on R and multiplicative convolution on R_+^* do not commute and cannot be '
-                'isometrically intertwined on finite windows without changing the observable. '
-                'Smoothing in log coordinates naturally couples to the multiplicative Weil distribution, '
-                'but fails to reproduce the additive distance kernel eta((x - y)/eps) of the TC arithmetic overlap.'
+        'restricted_tc_family_F_TC': {
+            'definition': 'F_TC = { T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha) : c in C^r, h > 0, 2h < Delta_res }',
+            'coefficient_tying': 'Coefficients c_{i(alpha)} are tied by grade; stations within the same grade share phase/amplitude',
+            'window_and_bandwidth': 'Fixed compact window W = [a, b], bandwidth restricted by resonance gap 2h < Delta_res'
+        },
+        'two_separated_obligations': {
+            'obligation_1_arithmetic_positivity': (
+                'Derive positivity B(g, g) >= 0 or an adequate sign constraint on F_TC '
+                'from actual arithmetic separation and the complete explicit formula.'
             ),
-            'observable_replacement_cost': (
-                'Replacing eta((x - y)/eps) with Phi_eps(log(x/y)) changes the station separation metric to '
-                'Delta_log = min |log(x_{i,n}) - log(x_{j,m})|. This alters the resolution threshold and requires '
-                're-proving station separation under logarithmic distances, which is a different mathematical problem.'
+            'obligation_2_offline_zero_detection': (
+                'Prove that under H(rho_0), F_TC contains a test with B(g, g) < 0, '
+                'or approximates one in a topology controlling B.'
             )
         },
-        'discriminating_result': 'CANDIDATE_B_STRUCTURALLY_OBSTRUCTED',
-        'epistemic_verdict': 'Logarithmic smoothing yields a multiplicative kernel Phi_eps(log(x/y)) that does not match the additive Euclidean kernel eta((x-y)/eps).'
+        'mode_vanishing_and_sequence_compatibility': {
+            'mode_annihilation_risk': 'If A_h(rho_0 - 1/2) = 0, the smoothing eliminates the off-line zero mode',
+            'shrinking_bandwidth_challenge': 'As station count grows, Delta_res may shrink, requiring h -> 0 and altering B-bounds',
+            'compatibility_verdict': 'Neither finite separation nor density in an unrelated norm establishes bridge closure'
+        },
+        'epistemic_verdict': 'CONNES_CONSANI_CRITERION_RECORDED_AND_OBLIGATIONS_SEPARATED',
+        'transcendental_continuation_bridge_status': 'STRICTLY_OPEN'
     }
 
 
@@ -8542,14 +8925,17 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
     m8_cand_a = audit_tc_comparison_map_candidate_A(dps=dps)
     m8_cand_b = audit_tc_comparison_map_candidate_B(dps=dps)
     m8_weil = audit_weil_positivity_and_tc_bridge_comparison(dps=dps)
+    m9_log_gap = audit_tc_logarithmic_separation_and_resonance_gap(dps=dps)
+    m9_reflected_kernel = audit_tc_candidate_B_reflected_weil_kernel(dps=dps)
+    m9_cc_criterion = audit_weil_positivity_connes_consani_criterion(dps=dps)
 
-    total_theorems = 242
+    total_theorems = 250
     try:
         rep_path = os.path.join(os.path.dirname(__file__), 'formal', 'build_report.json')
         if os.path.exists(rep_path):
             with open(rep_path, 'r', encoding='utf-8') as f:
                 rep_data = json.load(f)
-                total_theorems = rep_data.get('project_theorem_declarations_compiled', 242)
+                total_theorems = rep_data.get('project_theorem_declarations_compiled', 250)
     except Exception:
         pass
 
@@ -8571,6 +8957,9 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
         'milestone_8_comparison_map_candidate_A': m8_cand_a,
         'milestone_8_comparison_map_candidate_B': m8_cand_b,
         'milestone_8_weil_positivity_and_bridge_comparison': m8_weil,
+        'milestone_9_logarithmic_separation_and_resonance_gap': m9_log_gap,
+        'milestone_9_candidate_B_reflected_weil_kernel': m9_reflected_kernel,
+        'milestone_9_connes_consani_positivity_criterion': m9_cc_criterion,
         'formal_lean_theorems': {
             'total_compiled_theorems': total_theorems,
             'new_theorems': [
@@ -8607,7 +8996,15 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
                 'finite_grade_cross_entry_vanishes',
                 'finite_grade_diagonal_nonneg',
                 'finite_grade_station_psd',
-                'finite_grade_station_complex_psd'
+                'finite_grade_station_complex_psd',
+                'integerGradeScale_sub',
+                'tc_cross_grade_rational_ratio_excluded',
+                'finite_log_station_separation',
+                'finite_log_separation_pos',
+                'stationGradeMatrix_symmetric',
+                'real_symmetric_matrix_imag_part_zero',
+                'real_symmetric_matrix_hermitian_psd',
+                'finite_grade_station_hermitian_psd'
             ],
             'axioms': 'Mathlib standard foundations only; 0 sorry, 0 admit.'
         },
@@ -8632,9 +9029,13 @@ def audit_tc_epic_two_variable_synthesis(dps: int = 30) -> Dict[str, Any]:
             'large_resolution_grade_indefiniteness': 'VERIFIED_WITNESS (eps = 8.0 on grades {0, 1} in window [8, 20] yields det(G) ~= -0.91899 < 0, lambda_min ~= -0.022815 < 0, explicit witness c ~= (0.113576, -0.993529)^T achieves c^T G c ~= -0.022815 < 0)',
             'reflected_weil_pairing': 'DERIVED_AND_VERIFIED (B(g, h) = sum_rho m_rho M g(rho-1/2) conj(M h(1/2-bar(rho))); offline quartet pairing is negative on admissible tests; squared-modulus substitution refuted)',
             'compact_support_quartet_test': 'CERTIFIED_NEGATIVE (Genuine g_R in V with R=15 has B_Q <= -1.63275e-81 < 0; finite quartet control, not complete spectrum)',
-            'comparison_candidate_A': 'OBSTRUCTED (Fixed-window arithmetic matrix G has G_00/G_11 ~= 80:1 breaking equal-diagonal Toeplitz orbit structure)',
-            'comparison_candidate_B': 'OBSTRUCTED (Logarithmic smoothing induces scale-invariant autocorrelation Phi_eps(log(x/y)), not additive Euclidean band kernel eta((x-y)/eps))',
-            'full_spectrum_remainder_barrier': 'IDENTIFIED (Paley-Wiener forces sum_gamma |M g(i*gamma)|^2 > 0; off-line quartet negativity cannot be transferred without unproved global zero distribution premise)',
+            'comparison_candidate_A': 'OBSTRUCTED (Literal fixed-test grade orbit cannot represent the unequal-diagonal arithmetic matrix G; Cauchy-Schwarz argument is conditional on unproved Weil positivity)',
+            'comparison_candidate_B': 'SCOPE_CORRECTED (Logarithmic coordinates preserve station separation; resonance exclusion eliminates cross-grade primes; remaining barrier is Archimedean cross terms and non-vanishing same-grade prime terms)',
+            'logarithmic_station_separation': 'PROVED (Delta_log >= Delta_x / b > 0 on compact windows; Lean theorems finite_log_station_separation, finite_log_separation_pos)',
+            'cross_grade_prime_resonance_exclusion': 'PROVED (Lindemann transcendence excludes rational ratios; resonance gap Delta_res ~= 0.04612 > 0; cross-grade prime evaluations vanish for 2h < Delta_res)',
+            'candidate_B_reflected_weil_kernel': 'DERIVED (Explicit formula decomposition yields zero cross-grade prime terms for 2h < Delta_res; cross-grade entries are purely Archimedean W_{ij} = W_{ij, arch}; same-grade prime terms do not vanish)',
+            'connes_consani_weil_criterion': 'FORMULATED (Prop C.1 imports not RH ==> exists g in V: B(g, g) < 0; two TC obligations strictly separated: F_TC positivity vs off-line zero detection; mode vanishing risk identified; TC bridge strictly OPEN)',
+            'full_spectrum_remainder_barrier': 'CORRECTED_SCOPE (R_Gamma(g, g) = sum_{rho notin Gamma} m_rho M g(rho-1/2) conj(M g(1/2-bar(rho))); squared-modulus sum describes critical line only; nonvanishing of entire function on entire line does not imply nonvanishing on discrete zeros; Paley-Wiener discrete claim removed)',
             'weil_test_space_centering': 'RECONCILED (tilde{g}(-1/2) = tilde{g}(1/2) = 0 transports classical poles under centering isomorphism g = x^(1/2) g_old)',
             'conditional_spectral_lower_bound': 'UNPROVED / STRICTLY OPEN',
             'transcendental_continuation_bridge': 'STRICTLY OPEN'

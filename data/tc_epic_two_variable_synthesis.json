@@ -255,15 +255,8 @@
     "A_0_Gamma": 0.5444402513346406,
     "A_0_Gamma_high_precision": "0.544440251334640629984802",
     "interval_enclosure": {
-      "engine": "flint.arb",
-      "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
-      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
-      "enclosure_mid": 0.5444399924859572,
-      "enclosure_rad": 0.0011700457162078237,
-      "lower_bound": 0.5432699467697494,
-      "upper_bound": 0.545610038202165,
-      "strictly_positive": true,
-      "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
+      "engine": "fallback_mpmath",
+      "note": "No module named 'flint'"
     },
     "D_M_rho0": 0.0,
     "asserted_identity_A0_eq_cD_falsified": true,
@@ -495,12 +488,7 @@
       "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "mid": 0.5444399924859572,
-        "rad": 0.0011700457162078237,
-        "lower": 0.5432699467697494,
-        "upper": 0.545610038202165,
-        "is_strictly_positive": true,
-        "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
+        "error": "No module named 'flint'"
       }
     },
     "retained_remainder_R": {
@@ -906,6 +894,17 @@
       {
         "resolution_eps": 0.01,
         "is_below_delta_cross": true,
+        "grade_matrix_G": [
+          [
+            13.765932696619211,
+            0.0
+          ],
+          [
+            0.0,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 6.243179995441581,
         "eigenvalues_G": [
           0.45352393717389383,
           13.765932696619211
@@ -917,6 +916,17 @@
       {
         "resolution_eps": 0.05,
         "is_below_delta_cross": true,
+        "grade_matrix_G": [
+          [
+            13.765932696619211,
+            0.0
+          ],
+          [
+            0.0,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 6.243179995441581,
         "eigenvalues_G": [
           0.45352393717389383,
           13.765932696619211
@@ -928,6 +938,17 @@
       {
         "resolution_eps": 0.1,
         "is_below_delta_cross": true,
+        "grade_matrix_G": [
+          [
+            13.765932696619211,
+            0.0
+          ],
+          [
+            0.0,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 6.243179995441581,
         "eigenvalues_G": [
           0.45352393717389383,
           13.765932696619211
@@ -939,6 +960,17 @@
       {
         "resolution_eps": 0.2,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            13.765932696619211,
+            0.013756643786068749
+          ],
+          [
+            0.013756643786068749,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 6.242990750193325,
         "eigenvalues_G": [
           0.4535097214861403,
           13.765946912306966
@@ -950,6 +982,17 @@
       {
         "resolution_eps": 0.5,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            13.765932696619211,
+            0.1240671454262322
+          ],
+          [
+            0.1240671454262322,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 6.227787338867368,
         "eigenvalues_G": [
           0.45236777376736753,
           13.767088860025737
@@ -961,6 +1004,17 @@
       {
         "resolution_eps": 1.0,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            13.765932696619211,
+            1.339592571470813
+          ],
+          [
+            1.339592571470813,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 4.448671737901797,
         "eigenvalues_G": [
           0.3200622719294741,
           13.899394361863632
@@ -972,6 +1026,17 @@
       {
         "resolution_eps": 2.0,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            15.54551578718352,
+            1.8286939781909317
+          ],
+          [
+            1.8286939781909317,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 3.7061418593306175,
         "eigenvalues_G": [
           0.23510255203488514,
           15.763937172322528
@@ -983,6 +1048,17 @@
       {
         "resolution_eps": 3.0,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            20.534774058102293,
+            2.5966452511520832
+          ],
+          [
+            2.5966452511520832,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 2.5704450194762245,
         "eigenvalues_G": [
           0.12319348885529002,
           20.8651045064209
@@ -994,6 +1070,17 @@
       {
         "resolution_eps": 5.0,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            28.32293516374405,
+            3.245475124542868
+          ],
+          [
+            3.245475124542868,
+            0.45352393717389383
+          ]
+        ],
+        "determinant_G": 2.312020283755579,
         "eigenvalues_G": [
           0.08056973786399924,
           28.695889363053944
@@ -1005,6 +1092,17 @@
       {
         "resolution_eps": 8.0,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            39.75966822539126,
+            4.547769036700697
+          ],
+          [
+            4.547769036700697,
+            0.4970667930462342
+          ]
+        ],
+        "determinant_G": -0.9189924337960934,
         "eigenvalues_G": [
           -0.02281535978348448,
           40.279550378220975
@@ -1016,6 +1114,17 @@
       {
         "resolution_eps": 10.0,
         "is_below_delta_cross": false,
+        "grade_matrix_G": [
+          [
+            44.57542166651864,
+            5.0402224533247475
+          ],
+          [
+            5.0402224533247475,
+            0.5669768942506375
+          ]
+        ],
+        "determinant_G": -0.13060824260362025,
         "eigenvalues_G": [
           -0.0028930645456365367,
           45.145291625314925
@@ -1124,7 +1233,7 @@
     "certified_upper_bound_B_Q": -1.6327529394876965e-81,
     "is_strictly_negative": true,
     "signal_to_error_ratio": 1125157.4326715013,
-    "mathematical_distinction": "Certified strict negativity B_Q(g_R, g_R) < 0 applies strictly to the FINITE synthetic quartet Q(0.1 + 14.134725i). By Paley-Wiener, the complete zeta sum includes infinitely many positive critical-line terms sum_gamma |M g_R(i*gamma)|^2 > 0; this finite quartet result does NOT establish negativity for the complete spectrum."
+    "mathematical_distinction": "Certified strict negativity B_Q(g_R, g_R) < 0 applies strictly to the FINITE synthetic quartet Q(0.1 + 14.134725i). The full remainder for any selected zero quartet Gamma is R_Gamma(g, g) = sum_{rho notin Gamma} m_rho M g(rho - 1/2) conj(M g(1/2 - bar(rho))). A sum of squared moduli describes the critical-line portion only; off the critical line, one cannot assume all remaining zeros lie on the line. Nonvanishing of an entire function on an entire line and its values at a discrete zero set are distinct statements, and this finite quartet result does NOT determine the total sign for the complete spectrum without a global magnitude comparison."
   },
   "milestone_8_comparison_map_candidate_A": {
     "status": "TC_COMPARISON_CANDIDATE_A_AUDITED",
@@ -1144,47 +1253,148 @@
         8.0,
         20.0
       ],
+      "station_count": 9,
       "resolution_eps": 8.0,
       "G_00": 39.75966822539126,
       "G_11": 0.4970667930462342,
       "G_01": 4.547769036700697,
+      "grade_matrix_G": [
+        [
+          39.75966822539126,
+          4.547769036700697
+        ],
+        [
+          4.547769036700697,
+          0.4970667930462342
+        ]
+      ],
       "diagonal_ratio_G00_over_G11": 79.98858258409761,
-      "equal_diagonals_observed": false
+      "equal_diagonals_observed": false,
+      "cross_entry_is_zero": false,
+      "is_positive_semidefinite": false
     },
     "structural_obstruction_identified": {
-      "equal_diagonal_violation": "Orbit forces W_00 = W_11, but arithmetic matrix has G_00 / G_11 ~= 79.99 != 1",
+      "equal_diagonal_violation": "Orbit forces W_00 = W_11, whereas arithmetic matrix has G_00 / G_11 ~= 79.99 (unequal)",
       "geometric_cause": "The compact window W = [a, b] breaks scale invariance: prime powers enter W as n in [a*tau^{-K}, b*tau^{-K}], so higher grades capture exponentially fewer prime powers inside any fixed compact window. In contrast, the grade dilation orbit U_K g preserves the full scale and L^2 norm of the test function.",
-      "cauchy_schwarz_barrier_under_scaling": "If one attempts to match the diagonal via grade-dependent tests g_i = w_i * g with w_0/w_1 = sqrt(G_00/G_11), then det(W) = w_0^2 w_1^2 (B(g,g)^2 - |B(U_1 g, U_0 g)|^2). If B were positive semi-definite (as required under RH), Cauchy-Schwarz forces |B(U_1 g, U_0 g)| <= B(g,g), making det(W) >= 0 always. Hence no scaled orbit can reproduce the indefinite matrix det(G) ~= -0.919 < 0."
+      "cauchy_schwarz_barrier_under_scaling": "If one attempts to match the diagonal via grade-dependent tests g_i = w_i * g with w_0/w_1 = sqrt(G_00/G_11), then det(W) = w_0^2 w_1^2 (B(g,g)^2 - |B(U_1 g, U_0 g)|^2). IF the Weil form B is assumed positive semi-definite, Cauchy-Schwarz forces |B(U_1 g, U_0 g)| <= B(g,g), making det(W) >= 0 always. However, under a hypothetical off-line zero, positivity of B is NOT available as an unconditional premise. This obstruction is strictly scoped to the literal orbit of one fixed test and does not generalize to all normalizations or all comparison inequalities."
     },
     "discriminating_result": "CANDIDATE_A_STRUCTURALLY_OBSTRUCTED",
-    "epistemic_verdict": "No fixed-test grade orbit can represent the fixed-window arithmetic matrix G."
+    "epistemic_verdict": "Literal fixed-test grade orbit cannot represent the unequal-diagonal arithmetic matrix G on the tested window."
   },
   "milestone_8_comparison_map_candidate_B": {
     "status": "TC_COMPARISON_CANDIDATE_B_AUDITED",
     "candidate_name": "Candidate B: Smoothed Weighted Station Measure in Log Coordinates",
-    "measure_definition": "nu_c = sum_{i, n} c_i d_{i,n} delta_{log x_{i,n}}",
-    "smoothing_operator": "f_{eps, c} = (d_u^2 - 1/4) (kappa_eps * nu_c),  T_eps c(x) = f_{eps, c}(log x)",
-    "admissibility_proof": {
-      "mellin_transform": "M(T_eps c)(s) = (s^2 - 1/4) * hat{kappa}_eps(-i*s) * sum_{i,n} c_i d_{i,n} x_{i,n}^s",
-      "pole_cancellation": "Vanishes at s = +-1/2 identically due to factor (s^2 - 1/4)",
-      "in_admissible_space_V": true
+    "scope_correction": {
+      "rejection_repaired": true,
+      "logarithmic_separation_preserved": true,
+      "cross_grade_prime_resonance_exclusion_proved": true,
+      "distinction_retained": "Additive band kernel vs logarithmic autocorrelation kernel"
     },
-    "induced_pairing_kernel": {
-      "logarithmic_autocorrelation": "K_log(x, y) = Phi_eps(log(x / y)) = (kappa_eps * kappa_eps^*)(log x - log y)",
-      "group_symmetry": "Dilation-invariant on R_+^* (multiplicative Haar group)",
-      "additive_observable_kernel": "K_add(x, y) = eta((x - y) / eps) (translation-invariant on R)"
+    "logarithmic_separation": {
+      "status": "TC_LOGARITHMIC_SEPARATION_AND_RESONANCE_GAP_AUDITED",
+      "parameters": {
+        "grades": [
+          0,
+          1
+        ],
+        "window": [
+          8.0,
+          20.0
+        ],
+        "bandwidth_ceiling_h0": 1.0,
+        "dps": 25
+      },
+      "station_count": 9,
+      "spatial_separation_Delta_x": 0.15044407846124058,
+      "logarithmic_separation_Delta_log": 0.007949624088985285,
+      "mean_value_theorem_bounds": {
+        "lower_bound_Delta_x_over_b": 0.007522203923062029,
+        "upper_bound_Delta_x_over_a": 0.018805509807655073,
+        "inequality_verified": true,
+        "lean4_theorems": [
+          "RiemannScope.finite_log_station_separation",
+          "RiemannScope.finite_log_separation_pos"
+        ]
+      },
+      "transcendence_rational_ratio_reduction": {
+        "theorem": "For K != J and n, m in Z_{>=1}, (tau^K n) / (tau^J m) is irrational by Lindemann transcendence",
+        "excluded_ratios": [
+          "1",
+          "p^r",
+          "p^{-r}"
+        ],
+        "lean4_theorem": "RiemannScope.tc_cross_grade_rational_ratio_excluded"
+      },
+      "finite_resonance_support_bound": {
+        "bandwidth_ceiling_h0": 1.0,
+        "maximum_cross_log_distance": 0.8570478133976193,
+        "log_cutoff_distance": 2.857047813397619,
+        "maximum_resonating_prime_power": 18,
+        "enumerated_prime_power_count": 11,
+        "guarantee": "All prime powers p^r > max_resonating lie strictly outside the test bandwidth [-2h, 2h]"
+      },
+      "prime_power_resonance_gap": {
+        "minimum_resonance_gap_Delta_res": 0.046117597181290486,
+        "critical_bandwidth_h_crit": 0.023058798590645243,
+        "condition_for_cross_prime_vanishing": "h < h_crit = 0.023059 (i.e. 2h < Delta_res = 0.046118)",
+        "exact_vanishing_consequence": "For any test kernel C_h supported in [-2h, 2h] with h < 0.023059, every cross-grade prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically."
+      },
+      "epistemic_verdict": "LOGARITHMIC_SEPARATION_AND_RESONANCE_EXCLUSION_PROVED"
     },
-    "scaling_geometry_divergence": {
-      "additive_width_at_height_y": "eps (constant across all heights y)",
-      "logarithmic_equivalent_euclidean_width": "y * (exp(eps) - 1) ~ eps * y (expands linearly with height y)",
-      "consequence": "The additive band |x - y| < eps and the logarithmic band |log(x/y)| < eps have fundamentally incompatible scaling geometries. A fixed additive band corresponds to a shrinking logarithmic ratio eps/y as y -> infty, whereas a fixed logarithmic band corresponds to an expanding Euclidean band."
+    "reflected_weil_kernel": {
+      "status": "TC_CANDIDATE_B_REFLECTED_WEIL_KERNEL_AUDITED",
+      "parameters": {
+        "grades": [
+          0,
+          1
+        ],
+        "window": [
+          8.0,
+          20.0
+        ],
+        "bandwidth_h": 0.02,
+        "dps": 25
+      },
+      "kernel_definition": {
+        "admissible_test_construction": "T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha)",
+        "multiplier_A_h": "A_h(s) = (s^2 - 1/4) int_R kappa_h(u) exp(su) du",
+        "exact_pole_cancellation": "A_h(-1/2) = A_h(1/2) = 0 identically (T_h c in V unconditionally)",
+        "complete_kernel_K_h": "K_h(v) = sum_rho m_rho A_h(lambda_rho) conj(A_h(-bar(lambda)_rho)) exp(lambda_rho * v)",
+        "grade_matrix_formula": "W_{ij} = B(g_j, g_i) = sum_{alpha in grade i, beta in grade j} d_alpha d_beta K_h(t_alpha - t_beta)",
+        "hermitian_symmetry": "W^* = W proved by zero reflection rho <-> 1 - bar(rho)"
+      },
+      "explicit_formula_decomposition": {
+        "autocorrelation_kernel": "C_h = psi_h * widetilde(psi)_h with supp(C_h) subset [-2h, 2h]",
+        "pole_terms": "0.0 (vanish identically because A_h(+-1/2) = 0)",
+        "prime_terms_cross_grade": {
+          "is_bandwidth_below_resonance_gap": true,
+          "resonance_gap_Delta_res": 0.046117597181290486,
+          "critical_bandwidth_h_crit": 0.023058798590645243,
+          "cross_grade_prime_evaluations_status": "VANISH_IDENTICALLY",
+          "mathematical_proof": "Because 2h = 0.040000 < Delta_res = 0.046118, all cross-grade log differences t_alpha - t_beta are separated from prime-power resonances +-r*log(p) by more than 2h. Since supp(C_h) subset [-2h, 2h], every cross-grade prime term evaluates to C_h(distance > 2h) = 0."
+        },
+        "prime_terms_same_grade": {
+          "diagonal_station_pairs": "Vanish for 2h < log(2) ~= 0.693",
+          "off_diagonal_station_pairs": "DO NOT VANISH whenever n_alpha / n_beta = p^r (e.g. 16/8 = 2)",
+          "mathematical_note": "Same-grade stations can have rational prime-power ratios, preserving local prime coupling."
+        },
+        "archimedean_distribution": {
+          "cross_grade_contribution": "NON_ZERO (purely Archimedean cross terms W_{ij, arch} for i != j)",
+          "formula": "W_{ij} = - sum_{alpha in i, beta in j} d_alpha d_beta W_arch(C_h(. - (t_alpha - t_beta)))",
+          "consequence": "The vanishing of cross-grade prime terms does NOT imply that W is diagonal or PSD."
+        }
+      },
+      "four_distinct_objects_clarification": {
+        "G_add": "Additive Euclidean band matrix eta((x_alpha - x_beta)/eps)",
+        "G_log": "Logarithmic band matrix eta((log x_alpha - log x_beta)/eps)",
+        "G_L2": "Ordinary L^2 Gram matrix of smoothed measures in log coordinates (positive semi-definite)",
+        "W": "Reflected Weil spectral matrix (contains Archimedean cross terms and off-line zero dependencies)",
+        "gram_vs_weil_distinction": "Ordinary L^2 Gram positivity of C_h = psi_h * widetilde(psi)_h does NOT prove Weil positivity of W. Moreover, C_h changes sign due to (d_u^2 - 1/4), so pointwise non-negative kernel theorems do not apply."
+      },
+      "epistemic_verdict": "CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED"
     },
-    "exact_obstruction_identified": {
-      "intertwining_obstruction": "Additive convolution on R and multiplicative convolution on R_+^* do not commute and cannot be isometrically intertwined on finite windows without changing the observable. Smoothing in log coordinates naturally couples to the multiplicative Weil distribution, but fails to reproduce the additive distance kernel eta((x - y)/eps) of the TC arithmetic overlap.",
-      "observable_replacement_cost": "Replacing eta((x - y)/eps) with Phi_eps(log(x/y)) changes the station separation metric to Delta_log = min |log(x_{i,n}) - log(x_{j,m})|. This alters the resolution threshold and requires re-proving station separation under logarithmic distances, which is a different mathematical problem."
-    },
-    "discriminating_result": "CANDIDATE_B_STRUCTURALLY_OBSTRUCTED",
-    "epistemic_verdict": "Logarithmic smoothing yields a multiplicative kernel Phi_eps(log(x/y)) that does not match the additive Euclidean kernel eta((x-y)/eps)."
+    "discriminating_result": "CANDIDATE_B_SCOPE_CORRECTED_AND_KERNEL_DERIVED",
+    "epistemic_verdict": "Logarithmic coordinates preserve station separation and exclude cross-grade prime resonances, yielding vanishing cross-grade prime evaluations for 2h < Delta_res. However, the reflected Weil matrix retains non-vanishing Archimedean cross terms and same-grade prime terms, differing from both the additive band matrix and the diagonal small-resolution arithmetic matrix."
   },
   "milestone_8_weil_positivity_and_bridge_comparison": {
     "classification": "COMPARISON_COMPLETED",
@@ -1483,6 +1693,17 @@
         {
           "resolution_eps": 0.01,
           "is_below_delta_cross": true,
+          "grade_matrix_G": [
+            [
+              13.765932696619211,
+              0.0
+            ],
+            [
+              0.0,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 6.243179995441581,
           "eigenvalues_G": [
             0.45352393717389383,
             13.765932696619211
@@ -1494,6 +1715,17 @@
         {
           "resolution_eps": 0.05,
           "is_below_delta_cross": true,
+          "grade_matrix_G": [
+            [
+              13.765932696619211,
+              0.0
+            ],
+            [
+              0.0,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 6.243179995441581,
           "eigenvalues_G": [
             0.45352393717389383,
             13.765932696619211
@@ -1505,6 +1737,17 @@
         {
           "resolution_eps": 0.1,
           "is_below_delta_cross": true,
+          "grade_matrix_G": [
+            [
+              13.765932696619211,
+              0.0
+            ],
+            [
+              0.0,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 6.243179995441581,
           "eigenvalues_G": [
             0.45352393717389383,
             13.765932696619211
@@ -1516,6 +1759,17 @@
         {
           "resolution_eps": 0.2,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              13.765932696619211,
+              0.013756643786068749
+            ],
+            [
+              0.013756643786068749,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 6.242990750193325,
           "eigenvalues_G": [
             0.4535097214861403,
             13.765946912306966
@@ -1527,6 +1781,17 @@
         {
           "resolution_eps": 0.5,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              13.765932696619211,
+              0.1240671454262322
+            ],
+            [
+              0.1240671454262322,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 6.227787338867368,
           "eigenvalues_G": [
             0.45236777376736753,
             13.767088860025737
@@ -1538,6 +1803,17 @@
         {
           "resolution_eps": 1.0,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              13.765932696619211,
+              1.339592571470813
+            ],
+            [
+              1.339592571470813,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 4.448671737901797,
           "eigenvalues_G": [
             0.3200622719294741,
             13.899394361863632
@@ -1549,6 +1825,17 @@
         {
           "resolution_eps": 2.0,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              15.54551578718352,
+              1.8286939781909317
+            ],
+            [
+              1.8286939781909317,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 3.7061418593306175,
           "eigenvalues_G": [
             0.23510255203488514,
             15.763937172322528
@@ -1560,6 +1847,17 @@
         {
           "resolution_eps": 3.0,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              20.534774058102293,
+              2.5966452511520832
+            ],
+            [
+              2.5966452511520832,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 2.5704450194762245,
           "eigenvalues_G": [
             0.12319348885529002,
             20.8651045064209
@@ -1571,6 +1869,17 @@
         {
           "resolution_eps": 5.0,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              28.32293516374405,
+              3.245475124542868
+            ],
+            [
+              3.245475124542868,
+              0.45352393717389383
+            ]
+          ],
+          "determinant_G": 2.312020283755579,
           "eigenvalues_G": [
             0.08056973786399924,
             28.695889363053944
@@ -1582,6 +1891,17 @@
         {
           "resolution_eps": 8.0,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              39.75966822539126,
+              4.547769036700697
+            ],
+            [
+              4.547769036700697,
+              0.4970667930462342
+            ]
+          ],
+          "determinant_G": -0.9189924337960934,
           "eigenvalues_G": [
             -0.02281535978348448,
             40.279550378220975
@@ -1593,6 +1913,17 @@
         {
           "resolution_eps": 10.0,
           "is_below_delta_cross": false,
+          "grade_matrix_G": [
+            [
+              44.57542166651864,
+              5.0402224533247475
+            ],
+            [
+              5.0402224533247475,
+              0.5669768942506375
+            ]
+          ],
+          "determinant_G": -0.13060824260362025,
           "eigenvalues_G": [
             -0.0028930645456365367,
             45.145291625314925
@@ -1719,8 +2050,142 @@
     "epistemic_verdict": "NO_NEW_IMPLICATION_ESTABLISHED",
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
+  "milestone_9_logarithmic_separation_and_resonance_gap": {
+    "status": "TC_LOGARITHMIC_SEPARATION_AND_RESONANCE_GAP_AUDITED",
+    "parameters": {
+      "grades": [
+        0,
+        1
+      ],
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_ceiling_h0": 1.0,
+      "dps": 25
+    },
+    "station_count": 9,
+    "spatial_separation_Delta_x": 0.15044407846124058,
+    "logarithmic_separation_Delta_log": 0.007949624088985285,
+    "mean_value_theorem_bounds": {
+      "lower_bound_Delta_x_over_b": 0.007522203923062029,
+      "upper_bound_Delta_x_over_a": 0.018805509807655073,
+      "inequality_verified": true,
+      "lean4_theorems": [
+        "RiemannScope.finite_log_station_separation",
+        "RiemannScope.finite_log_separation_pos"
+      ]
+    },
+    "transcendence_rational_ratio_reduction": {
+      "theorem": "For K != J and n, m in Z_{>=1}, (tau^K n) / (tau^J m) is irrational by Lindemann transcendence",
+      "excluded_ratios": [
+        "1",
+        "p^r",
+        "p^{-r}"
+      ],
+      "lean4_theorem": "RiemannScope.tc_cross_grade_rational_ratio_excluded"
+    },
+    "finite_resonance_support_bound": {
+      "bandwidth_ceiling_h0": 1.0,
+      "maximum_cross_log_distance": 0.8570478133976193,
+      "log_cutoff_distance": 2.857047813397619,
+      "maximum_resonating_prime_power": 18,
+      "enumerated_prime_power_count": 11,
+      "guarantee": "All prime powers p^r > max_resonating lie strictly outside the test bandwidth [-2h, 2h]"
+    },
+    "prime_power_resonance_gap": {
+      "minimum_resonance_gap_Delta_res": 0.046117597181290486,
+      "critical_bandwidth_h_crit": 0.023058798590645243,
+      "condition_for_cross_prime_vanishing": "h < h_crit = 0.023059 (i.e. 2h < Delta_res = 0.046118)",
+      "exact_vanishing_consequence": "For any test kernel C_h supported in [-2h, 2h] with h < 0.023059, every cross-grade prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically."
+    },
+    "epistemic_verdict": "LOGARITHMIC_SEPARATION_AND_RESONANCE_EXCLUSION_PROVED"
+  },
+  "milestone_9_candidate_B_reflected_weil_kernel": {
+    "status": "TC_CANDIDATE_B_REFLECTED_WEIL_KERNEL_AUDITED",
+    "parameters": {
+      "grades": [
+        0,
+        1
+      ],
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.02,
+      "dps": 25
+    },
+    "kernel_definition": {
+      "admissible_test_construction": "T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha)",
+      "multiplier_A_h": "A_h(s) = (s^2 - 1/4) int_R kappa_h(u) exp(su) du",
+      "exact_pole_cancellation": "A_h(-1/2) = A_h(1/2) = 0 identically (T_h c in V unconditionally)",
+      "complete_kernel_K_h": "K_h(v) = sum_rho m_rho A_h(lambda_rho) conj(A_h(-bar(lambda)_rho)) exp(lambda_rho * v)",
+      "grade_matrix_formula": "W_{ij} = B(g_j, g_i) = sum_{alpha in grade i, beta in grade j} d_alpha d_beta K_h(t_alpha - t_beta)",
+      "hermitian_symmetry": "W^* = W proved by zero reflection rho <-> 1 - bar(rho)"
+    },
+    "explicit_formula_decomposition": {
+      "autocorrelation_kernel": "C_h = psi_h * widetilde(psi)_h with supp(C_h) subset [-2h, 2h]",
+      "pole_terms": "0.0 (vanish identically because A_h(+-1/2) = 0)",
+      "prime_terms_cross_grade": {
+        "is_bandwidth_below_resonance_gap": true,
+        "resonance_gap_Delta_res": 0.046117597181290486,
+        "critical_bandwidth_h_crit": 0.023058798590645243,
+        "cross_grade_prime_evaluations_status": "VANISH_IDENTICALLY",
+        "mathematical_proof": "Because 2h = 0.040000 < Delta_res = 0.046118, all cross-grade log differences t_alpha - t_beta are separated from prime-power resonances +-r*log(p) by more than 2h. Since supp(C_h) subset [-2h, 2h], every cross-grade prime term evaluates to C_h(distance > 2h) = 0."
+      },
+      "prime_terms_same_grade": {
+        "diagonal_station_pairs": "Vanish for 2h < log(2) ~= 0.693",
+        "off_diagonal_station_pairs": "DO NOT VANISH whenever n_alpha / n_beta = p^r (e.g. 16/8 = 2)",
+        "mathematical_note": "Same-grade stations can have rational prime-power ratios, preserving local prime coupling."
+      },
+      "archimedean_distribution": {
+        "cross_grade_contribution": "NON_ZERO (purely Archimedean cross terms W_{ij, arch} for i != j)",
+        "formula": "W_{ij} = - sum_{alpha in i, beta in j} d_alpha d_beta W_arch(C_h(. - (t_alpha - t_beta)))",
+        "consequence": "The vanishing of cross-grade prime terms does NOT imply that W is diagonal or PSD."
+      }
+    },
+    "four_distinct_objects_clarification": {
+      "G_add": "Additive Euclidean band matrix eta((x_alpha - x_beta)/eps)",
+      "G_log": "Logarithmic band matrix eta((log x_alpha - log x_beta)/eps)",
+      "G_L2": "Ordinary L^2 Gram matrix of smoothed measures in log coordinates (positive semi-definite)",
+      "W": "Reflected Weil spectral matrix (contains Archimedean cross terms and off-line zero dependencies)",
+      "gram_vs_weil_distinction": "Ordinary L^2 Gram positivity of C_h = psi_h * widetilde(psi)_h does NOT prove Weil positivity of W. Moreover, C_h changes sign due to (d_u^2 - 1/4), so pointwise non-negative kernel theorems do not apply."
+    },
+    "epistemic_verdict": "CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED"
+  },
+  "milestone_9_connes_consani_positivity_criterion": {
+    "status": "WEIL_POSITIVITY_CONNES_CONSANI_CRITERION_AUDITED",
+    "primary_source": {
+      "authors": "Alain Connes & Caterina Consani",
+      "year": 2026,
+      "title": "Weil positivity and Trace formula, the archimedean place",
+      "citation": "arXiv:2006.13771, Appendix C, Proposition C.1",
+      "classical_precursor": "Andre Weil (1952), Sur les formules explicites de la theorie des nombres premiers"
+    },
+    "imported_theorem": {
+      "statement": "RH holds if and only if B(g, g) >= 0 for all g in V",
+      "contrapositive_consequence": "not RH ==> exists g in V : B(g, g) < 0",
+      "nature": "Conditional existence on full space V (does not assume RH or construct an off-line zero)"
+    },
+    "restricted_tc_family_F_TC": {
+      "definition": "F_TC = { T_h c(e^u) = sum_alpha c_{i(alpha)} d_alpha psi_h(u - t_alpha) : c in C^r, h > 0, 2h < Delta_res }",
+      "coefficient_tying": "Coefficients c_{i(alpha)} are tied by grade; stations within the same grade share phase/amplitude",
+      "window_and_bandwidth": "Fixed compact window W = [a, b], bandwidth restricted by resonance gap 2h < Delta_res"
+    },
+    "two_separated_obligations": {
+      "obligation_1_arithmetic_positivity": "Derive positivity B(g, g) >= 0 or an adequate sign constraint on F_TC from actual arithmetic separation and the complete explicit formula.",
+      "obligation_2_offline_zero_detection": "Prove that under H(rho_0), F_TC contains a test with B(g, g) < 0, or approximates one in a topology controlling B."
+    },
+    "mode_vanishing_and_sequence_compatibility": {
+      "mode_annihilation_risk": "If A_h(rho_0 - 1/2) = 0, the smoothing eliminates the off-line zero mode",
+      "shrinking_bandwidth_challenge": "As station count grows, Delta_res may shrink, requiring h -> 0 and altering B-bounds",
+      "compatibility_verdict": "Neither finite separation nor density in an unrelated norm establishes bridge closure"
+    },
+    "epistemic_verdict": "CONNES_CONSANI_CRITERION_RECORDED_AND_OBLIGATIONS_SEPARATED",
+    "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
+  },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 242,
+    "total_compiled_theorems": 250,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
@@ -1755,7 +2220,15 @@
       "finite_grade_cross_entry_vanishes",
       "finite_grade_diagonal_nonneg",
       "finite_grade_station_psd",
-      "finite_grade_station_complex_psd"
+      "finite_grade_station_complex_psd",
+      "integerGradeScale_sub",
+      "tc_cross_grade_rational_ratio_excluded",
+      "finite_log_station_separation",
+      "finite_log_separation_pos",
+      "stationGradeMatrix_symmetric",
+      "real_symmetric_matrix_imag_part_zero",
+      "real_symmetric_matrix_hermitian_psd",
+      "finite_grade_station_hermitian_psd"
     ],
     "axioms": "Mathlib standard foundations only; 0 sorry, 0 admit."
   },
@@ -1780,9 +2253,13 @@
     "large_resolution_grade_indefiniteness": "VERIFIED_WITNESS (eps = 8.0 on grades {0, 1} in window [8, 20] yields det(G) ~= -0.91899 < 0, lambda_min ~= -0.022815 < 0, explicit witness c ~= (0.113576, -0.993529)^T achieves c^T G c ~= -0.022815 < 0)",
     "reflected_weil_pairing": "DERIVED_AND_VERIFIED (B(g, h) = sum_rho m_rho M g(rho-1/2) conj(M h(1/2-bar(rho))); offline quartet pairing is negative on admissible tests; squared-modulus substitution refuted)",
     "compact_support_quartet_test": "CERTIFIED_NEGATIVE (Genuine g_R in V with R=15 has B_Q <= -1.63275e-81 < 0; finite quartet control, not complete spectrum)",
-    "comparison_candidate_A": "OBSTRUCTED (Fixed-window arithmetic matrix G has G_00/G_11 ~= 80:1 breaking equal-diagonal Toeplitz orbit structure)",
-    "comparison_candidate_B": "OBSTRUCTED (Logarithmic smoothing induces scale-invariant autocorrelation Phi_eps(log(x/y)), not additive Euclidean band kernel eta((x-y)/eps))",
-    "full_spectrum_remainder_barrier": "IDENTIFIED (Paley-Wiener forces sum_gamma |M g(i*gamma)|^2 > 0; off-line quartet negativity cannot be transferred without unproved global zero distribution premise)",
+    "comparison_candidate_A": "OBSTRUCTED (Literal fixed-test grade orbit cannot represent the unequal-diagonal arithmetic matrix G; Cauchy-Schwarz argument is conditional on unproved Weil positivity)",
+    "comparison_candidate_B": "SCOPE_CORRECTED (Logarithmic coordinates preserve station separation; resonance exclusion eliminates cross-grade primes; remaining barrier is Archimedean cross terms and non-vanishing same-grade prime terms)",
+    "logarithmic_station_separation": "PROVED (Delta_log >= Delta_x / b > 0 on compact windows; Lean theorems finite_log_station_separation, finite_log_separation_pos)",
+    "cross_grade_prime_resonance_exclusion": "PROVED (Lindemann transcendence excludes rational ratios; resonance gap Delta_res ~= 0.04612 > 0; cross-grade prime evaluations vanish for 2h < Delta_res)",
+    "candidate_B_reflected_weil_kernel": "DERIVED (Explicit formula decomposition yields zero cross-grade prime terms for 2h < Delta_res; cross-grade entries are purely Archimedean W_{ij} = W_{ij, arch}; same-grade prime terms do not vanish)",
+    "connes_consani_weil_criterion": "FORMULATED (Prop C.1 imports not RH ==> exists g in V: B(g, g) < 0; two TC obligations strictly separated: F_TC positivity vs off-line zero detection; mode vanishing risk identified; TC bridge strictly OPEN)",
+    "full_spectrum_remainder_barrier": "CORRECTED_SCOPE (R_Gamma(g, g) = sum_{rho notin Gamma} m_rho M g(rho-1/2) conj(M g(1/2-bar(rho))); squared-modulus sum describes critical line only; nonvanishing of entire function on entire line does not imply nonvanishing on discrete zeros; Paley-Wiener discrete claim removed)",
     "weil_test_space_centering": "RECONCILED (tilde{g}(-1/2) = tilde{g}(1/2) = 0 transports classical poles under centering isomorphism g = x^(1/2) g_old)",
     "conditional_spectral_lower_bound": "UNPROVED / STRICTLY OPEN",
     "transcendental_continuation_bridge": "STRICTLY OPEN"

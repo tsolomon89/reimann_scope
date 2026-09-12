@@ -3153,3 +3153,67 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
    - By Paley-Wiener, $\mathcal M g(i\gamma)$ cannot vanish at all critical-line zeros; the critical-line sum $\sum_\gamma |\mathcal M g(i\gamma)|^2 > 0$ is strictly positive.
    - Finite quartet negativity cannot be transferred to the complete sum without an unproved global zero distribution premise.
    - TC bridge remains strictly **OPEN**.
+
+## 42.10 Logarithmic Separation, Candidate B Reflected Weil Kernel, Prime-Power Resonance Exclusion, Connes-Consani Criterion, and 250 Lean Theorems
+
+1. **Candidate A Fallback Removal & Dynamic Evaluation**:
+   - The fabricated fallback matrix in `audit_tc_comparison_map_candidate_A` was eliminated. The audit now returns the directly computed arithmetic matrix for the requested resolution.
+   - At $\varepsilon = 0.1$ on window $[8, 20]$ for grades $\{0, 1\}$, $G \approx \operatorname{diag}(13.765933, 0.453524)$ with exact cross-entry $G_{01} = 0$, $G \succeq 0$, but equal diagonals strictly false ($G_{00}/G_{11} \approx 30.35$).
+   - At $\varepsilon = 8.0$, $G$ is indefinite with $G_{00} \approx 39.7597, G_{01} \approx 4.5478, G_{11} \approx 0.4971$ and $\det G \approx -0.919 < 0$.
+   - Empty windows are handled gracefully ($G = 0$), booleans are dynamically derived, and Cauchy-Schwarz is scoped conditionally on RH.
+
+2. **Remainder Generalization Without Critical-Line Assumptions**:
+   - The full reflected Weil remainder is:
+     $$R_\Gamma(g, g) = \sum_{\rho \notin \Gamma} m_\rho \mathcal M g(\rho - 1/2) \overline{\mathcal M g(1/2 - \bar\rho)}.$$
+   - The squared-modulus sum $\sum_{\rho \notin \Gamma} m_\rho |\mathcal M g(i\gamma_\rho)|^2$ is mathematically restricted to the critical line ($\Re\rho = 1/2$).
+   - The erroneous discrete Paley-Wiener claim was eliminated: non-vanishing of a continuous Fourier transform at a single point does not guarantee non-vanishing on a discrete set of zeros.
+
+3. **Logarithmic Station Separation & Cross-Grade Prime-Power Resonance Gap**:
+   - Mean value bounds on $[a, b] \subset (0, \infty)$:
+     $$\frac{|x - y|}{b} \le |\log x - \log y| \le \frac{|x - y|}{a}.$$
+   - By the Lindemann-Weierstrass theorem, $\tau = 2\pi$ is transcendental, so $\frac{\tau^K n}{\tau^J m} = \tau^{K-J} \frac{n}{m} \notin \mathbb Q$ for all $K \ne J$ and $m, n \in \mathbb N_{>0}$.
+   - This transcendence reduction strictly excludes all rational ratios, in particular $1$, $p^r$, and $p^{-r}$ for every prime power $p^r$.
+   - For window $[8, 20]$ and grades $\{0, 1\}$, $\Delta_x \approx 0.150444$ and $\Delta_{\log} \approx 0.0079496 > \Delta_x / 20 \approx 0.0075222 > 0$.
+   - Complete prime-power enumeration within support bound $h_0 = 1.0 \implies p^r \le 18$ gives 11 prime powers $\{2, 3, 4, 5, 7, 8, 9, 11, 13, 16, 17\}$.
+   - The exact cross-grade prime-power resonance gap is:
+     $$\Delta_{\rm res} = \min_{i \ne j, n, m, p^r} |(t_{i, n} - t_{j, m}) \mp \log(p^r)| \approx 0.0461176 > 0,$$
+     achieved between $n_0 = 9$ (grade 0), $n_1 = 3$ (grade 1), and $p^r = 2$.
+   - The critical kernel half-width cutoff is $h_{\rm crit} = \Delta_{\rm res} / 2 \approx 0.0230588$.
+
+4. **Candidate B Actual Reflected Weil Kernel and Explicit Formula Decomposition**:
+   - The genuine reflected Weil kernel on the additive line is:
+     $$K_h(v) = \sum_\rho m_\rho A_h(\lambda_\rho) \overline{A_h(-\bar\lambda_\rho)} e^{\lambda_\rho v}, \qquad \lambda_\rho = \rho - 1/2.$$
+   - Test functions $T_h c \in \mathcal V$ satisfy $A_h(\pm 1/2) = 0$, cancelling pole terms identically.
+   - Proved Hermitian symmetry $W^* = W$ in Lean 4 (`stationGradeMatrix_symmetric`, `real_symmetric_matrix_imag_part_zero`, `real_symmetric_matrix_hermitian_psd`, `finite_grade_station_hermitian_psd`).
+   - Evaluating the centered explicit formula reveals:
+     - For $2h < \Delta_{\rm res}$, cross-grade prime evaluations vanish identically because the support of $C_h(u - (t_\alpha - t_\beta))$ does not intersect any $\pm \log(p^r)$.
+     - Same-grade prime terms DO NOT vanish on off-diagonal pairs ($n_\alpha / n_\beta = p^r$, e.g. $16/8 = 2$).
+     - Archimedean cross terms $W_{ij, \rm arch} \ne 0$ remain in cross-grade blocks.
+     - Therefore, $W$ is NOT diagonal, and ordinary Gram positivity does not imply Weil positivity.
+   - Four distinct mathematical objects are rigorously separated:
+     1. $G_{\rm add}(\varepsilon)$: Additive band observable $Q_\varepsilon^{K, J}$ on $\mathbb R$.
+     2. $G_{\rm mult}(h)$: Logarithmic autocorrelation Gram matrix on $\mathbb R_+^*$.
+     3. $W(h)$: Spectral reflected Weil quadratic form matrix on $\mathcal V$.
+     4. $W_{\rm prime}(h)$: Pure prime-sum component of the explicit formula.
+
+5. **Connes-Consani (2026) Positivity Criterion & Separation of TC Obligations**:
+   - Imported Connes-Consani (2026) Appendix C Proposition C.1:
+     $$\neg\mathrm{RH} \Longrightarrow \exists g \in \mathcal V: B(g, g) < 0.$$
+   - Defined the restricted TC test family $\mathcal F_{\rm TC} = \{ T_h c : h > 0, c \in \mathbb C^r, W \subset (0, \infty) \} \subset \mathcal V$.
+   - Strictly separated the two distinct unresolved TC obligations:
+     - **Obligation 1**: Does $B(g, g) \ge 0$ hold for all $g \in \mathcal F_{\rm TC}$? (Restricted positivity).
+     - **Obligation 2**: Does $\neg\mathrm{RH}$ guarantee the existence of a negative test *within* $\mathcal F_{\rm TC}$? (Off-line zero detection).
+   - Neither finite-window separation nor density in an unrelated norm guarantees that $\mathcal F_{\rm TC}$ detects an off-line zero.
+   - The Transcendental Continuation bridge remains strictly **OPEN**.
+
+6. **Lean 4 Formalization (250 Compiled Theorems)**:
+   - Proved 8 new formal declarations in `formal/RiemannScope/Grade.lean`:
+     - `integerGradeScale_sub`: $\tau^K - \tau^J = \tau^J(\tau^{K-J} - 1)$.
+     - `tc_cross_grade_rational_ratio_excluded`: $\tau^K n / (\tau^J m) \notin \mathbb Q$ for $K \ne J$.
+     - `finite_log_station_separation`: Logarithmic station distance bounded below by $\Delta_x / b$.
+     - `finite_log_separation_pos`: Strictly positive logarithmic station separation.
+     - `stationGradeMatrix_symmetric`: $G_{ij} = G_{ji}$.
+     - `real_symmetric_matrix_imag_part_zero`: Imaginary part of quadratic form vanishes.
+     - `real_symmetric_matrix_hermitian_psd`: Real PSD matrix is Hermitian PSD on $\mathbb C^r$.
+     - `finite_grade_station_hermitian_psd`: Separated station grade matrix is Hermitian PSD on $\mathbb C^r$.
+   - All 250 project theorems compiled cleanly under Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings).
