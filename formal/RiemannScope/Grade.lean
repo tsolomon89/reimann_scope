@@ -1905,19 +1905,95 @@ theorem tc_cross_grade_rational_ratio_excluded
   have h_not_rat := h_trans (K - J) h_k_ne (q * (m : ℚ) / (n : ℚ))
   exact h_not_rat h_alg
 
-/-- Finite logarithmic station separation consequence:
-    If stations in a compact window [a, b] with b > 0 satisfy a minimum Euclidean gap Δx > 0,
-    and logarithmic distances scale as |log x - log y| >= |x - y| / b,
-    then the logarithmic separation gap is bounded below by Δx / b > 0. -/
-theorem finite_log_station_separation (Δx b : ℝ) (hb : 0 < b)
-    (h_dist : ∀ x y : ℝ, x ≠ y → Δx ≤ |x - y|)
-    (h_log_scale : ∀ x y : ℝ, |x - y| / b ≤ |Real.log x - Real.log y|)
-    (x y : ℝ) (hxy : x ≠ y) :
-    Δx / b ≤ |Real.log x - Real.log y| := by
-  have h1 := h_dist x y hxy
-  have h2 := h_log_scale x y
-  have h_div : Δx / b ≤ |x - y| / b := div_le_div_of_nonneg_right h1 (le_of_lt hb)
+/-- Fundamental logarithmic sub-linearity inequality on a positive interval:
+    For 0 < v ≤ u ≤ b, (u - v) / b ≤ log u - log v.
+    Derived via the elementary inequality log(v/u) ≤ v/u - 1 for positive arguments. -/
+theorem log_sub_le_of_le {u v b : ℝ} (hv : 0 < v) (hvu : v ≤ u) (hub : u ≤ b) :
+    (u - v) / b ≤ Real.log u - Real.log v := by
+  have hu : 0 < u := lt_of_lt_of_le hv hvu
+  have h_div_pos : 0 < v / u := div_pos hv hu
+  have h_log_le := Real.log_le_sub_one_of_pos h_div_pos
+  rw [Real.log_div (ne_of_gt hv) (ne_of_gt hu)] at h_log_le
+  have h_alg : v / u - 1 = (v - u) / u := by
+    rw [div_sub_one (ne_of_gt hu)]
+  rw [h_alg] at h_log_le
+  have h_opp : (v - u) / u = - ((u - v) / u) := by ring
+  rw [h_opp] at h_log_le
+  have h_step : (u - v) / u ≤ Real.log u - Real.log v := by
+    linarith
+  have h_scale : (u - v) / b ≤ (u - v) / u := by
+    have h_sub_nonneg : 0 ≤ u - v := sub_nonneg.mpr hvu
+    exact div_le_div_of_nonneg_left h_sub_nonneg hu hub
+  exact le_trans h_scale h_step
+
+/-- Logarithmic distance lower bound on a compact positive interval [a, b] with 0 < a ≤ b:
+    For any u, v ∈ [a, b], |u - v| / b ≤ |log u - log v|. -/
+theorem log_dist_ge_of_interval {u v a b : ℝ}
+    (ha : 0 < a) (hua : a ≤ u) (hub : u ≤ b)
+    (hva : a ≤ v) (hvb : v ≤ b) :
+    |u - v| / b ≤ |Real.log u - Real.log v| := by
+  rcases le_total v u with hvu | huv
+  · have hv : 0 < v := lt_of_lt_of_le ha hva
+    have h := log_sub_le_of_le hv hvu hub
+    have h1 : |u - v| = u - v := abs_of_nonneg (sub_nonneg.mpr hvu)
+    have hlog_nonneg : 0 ≤ Real.log u - Real.log v := by
+      rw [sub_nonneg]
+      exact Real.log_le_log hv hvu
+    have h2 : |Real.log u - Real.log v| = Real.log u - Real.log v := abs_of_nonneg hlog_nonneg
+    rw [h1, h2]
+    exact h
+  · have hu : 0 < u := lt_of_lt_of_le ha hua
+    have h := log_sub_le_of_le hu huv hvb
+    have h1 : |u - v| = |v - u| := abs_sub_comm u v
+    have h2 : |Real.log u - Real.log v| = |Real.log v - Real.log u| := abs_sub_comm (Real.log u) (Real.log v)
+    have h3 : |v - u| = v - u := abs_of_nonneg (sub_nonneg.mpr huv)
+    have hlog_nonneg : 0 ≤ Real.log v - Real.log u := by
+      rw [sub_nonneg]
+      exact Real.log_le_log hu huv
+    have h4 : |Real.log v - Real.log u| = Real.log v - Real.log u := abs_of_nonneg hlog_nonneg
+    rw [h1, h2, h3, h4]
+    exact h
+
+/-- Finite indexed station logarithmic separation theorem:
+    For any family of stations x : ι → ℝ situated in [a, b] (0 < a ≤ b)
+    satisfying a minimum Euclidean gap Δx between distinct stations,
+    the logarithmic separation between distinct stations is bounded below by Δx / b > 0. -/
+theorem indexed_station_log_separation {ι : Type*}
+    (x : ι → ℝ) (a b Δx : ℝ) (ha : 0 < a) (hab : a ≤ b)
+    (h_range : ∀ i, a ≤ x i ∧ x i ≤ b)
+    (h_dist : ∀ i j, i ≠ j → Δx ≤ |x i - x j|)
+    (i j : ι) (hij : i ≠ j) :
+    Δx / b ≤ |Real.log (x i) - Real.log (x j)| := by
+  have hb : 0 < b := lt_of_lt_of_le ha hab
+  have h1 := h_dist i j hij
+  have h2 := log_dist_ge_of_interval ha (h_range i).1 (h_range i).2 (h_range j).1 (h_range j).2
+  have h_div : Δx / b ≤ |x i - x j| / b := div_le_div_of_nonneg_right h1 (le_of_lt hb)
   exact le_trans h_div h2
+
+/-- Concrete satisfiable instantiation of the indexed station logarithmic separation theorem
+    on the canonical interval [8, 20] with two active stations 9 and 11:
+    The separation bound 2 / 20 = 1 / 10 is strictly positive and bounds |log 9 - log 11|. -/
+theorem concrete_station_log_separation_canonical :
+    (2 : ℝ) / 20 ≤ |Real.log (9 : ℝ) - Real.log (11 : ℝ)| := by
+  let x : Fin 2 → ℝ := fun i => if i = 0 then 9 else 11
+  have ha : (0 : ℝ) < 8 := by norm_num
+  have hab : (8 : ℝ) ≤ 20 := by norm_num
+  have h_range : ∀ i : Fin 2, (8 : ℝ) ≤ x i ∧ x i ≤ 20 := by
+    intro i
+    fin_cases i <;> simp [x] <;> norm_num
+  have h_dist : ∀ i j : Fin 2, i ≠ j → (2 : ℝ) ≤ |x i - x j| := by
+    intro i j hij
+    fin_cases i <;> fin_cases j
+    · contradiction
+    · simp [x]; norm_num
+    · simp [x]; norm_num
+    · contradiction
+  have h_sep := indexed_station_log_separation x 8 20 2 ha hab h_range h_dist 0 1 (by decide)
+  have hx0 : x 0 = 9 := by simp [x]
+  have hx1 : x 1 = 11 := by simp [x]
+  rw [hx0, hx1] at h_sep
+  exact h_sep
+
 
 /-- Positivity of the logarithmic separation bound Δx / b > 0 when Δx > 0 and b > 0. -/
 theorem finite_log_separation_pos (Δx b : ℝ) (hΔ : 0 < Δx) (hb : 0 < b) :
@@ -2029,5 +2105,114 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
     intro v
     exact finite_grade_station_psd x d η ε Δ hε_pos hε_lt_Δ hd hη_supp hη_nonneg h_sep v
   exact real_symmetric_matrix_hermitian_psd G h_symm h_psd c
+
+/-!
+### Reflected Weil Spectral Matrix Formalization (MATH_CONTRACT §39)
+
+Strict distinction between five mathematical objects:
+1. G_add: Additive Euclidean station overlap matrix `stationGradeMatrix x d η ε`
+2. G_log: Logarithmic band matrix η((log x - log y)/ε)
+3. G_L2: Multiplicative L^2 Gram matrix of smoothed measures (unconditionally PSD)
+4. W_prime: Prime-power evaluation matrix on C_h(± r*log p - (t_β - t_α))
+5. W_arch: Archimedean distribution matrix on ω(t) |A_h(it)|^2
+6. W = W_arch - W_prime: Complete reflected Weil spectral matrix satisfying
+   c^* W c = B(T_{C,h} c, T_{C,h} c).
+-/
+
+/-- Reflected Weil quadratic form 2x2 expansion:
+    q(v) = W_00 * v_0^2 + 2 * W_01 * v_0 * v_1 + W_11 * v_1^2. -/
+theorem realQuadraticForm_two_expand (W : Matrix (Fin 2) (Fin 2) ℝ)
+    (h_symm : W 1 0 = W 0 1) (v : Fin 2 → ℝ) :
+    realQuadraticForm W v = W 0 0 * (v 0)^2 + 2 * W 0 1 * v 0 * v 1 + W 1 1 * (v 1)^2 := by
+  dsimp [realQuadraticForm, Matrix.dotProduct, Matrix.mulVec]
+  rw [Fin.sum_univ_two]
+  rw [Fin.sum_univ_two, Fin.sum_univ_two]
+  rw [h_symm]
+  ring
+
+/-- A positive-definite 2x2 quadratic form is strictly positive on non-zero vectors.
+    Exact polynomial completion of the square without division:
+    W_00 * q(v) = (W_00 * v 0 + W_01 * v 1)^2 + (W_00 * W_11 - W_01^2) * (v 1)^2. -/
+theorem realQuadraticForm_two_pos (W : Matrix (Fin 2) (Fin 2) ℝ)
+    (h_symm : W 1 0 = W 0 1)
+    (h00 : 0 < W 0 0)
+    (h_det : (W 0 1)^2 < W 0 0 * W 1 1)
+    (v : Fin 2 → ℝ) (hv : v 0 ≠ 0 ∨ v 1 ≠ 0) :
+    0 < realQuadraticForm W v := by
+  rw [realQuadraticForm_two_expand W h_symm v]
+  have h_det_pos : 0 < W 0 0 * W 1 1 - (W 0 1)^2 := by linarith
+  have h_poly : W 0 0 * (W 0 0 * (v 0)^2 + 2 * W 0 1 * v 0 * v 1 + W 1 1 * (v 1)^2) =
+      (W 0 0 * v 0 + W 0 1 * v 1)^2 + (W 0 0 * W 1 1 - (W 0 1)^2) * (v 1)^2 := by ring
+  have h_sq1 : 0 ≤ (W 0 0 * v 0 + W 0 1 * v 1)^2 := sq_nonneg _
+  have h_sq2 : 0 ≤ (v 1)^2 := sq_nonneg _
+  have h_sum_pos : 0 < (W 0 0 * v 0 + W 0 1 * v 1)^2 + (W 0 0 * W 1 1 - (W 0 1)^2) * (v 1)^2 := by
+    by_cases hv1 : v 1 = 0
+    · have hv0_ne : v 0 ≠ 0 := by
+        cases hv with
+        | inl h0 => exact h0
+        | inr h1 => exact False.elim (h1 hv1)
+      have h_prod_ne : W 0 0 * v 0 ≠ 0 := mul_ne_zero (ne_of_gt h00) hv0_ne
+      have h_term1_pos : 0 < (W 0 0 * v 0 + W 0 1 * v 1)^2 := by
+        rw [hv1, mul_zero, add_zero]
+        exact sq_pos_of_ne_zero h_prod_ne
+      have h_term2_nonneg : 0 ≤ (W 0 0 * W 1 1 - (W 0 1)^2) * (v 1)^2 := mul_nonneg (le_of_lt h_det_pos) h_sq2
+      linarith
+    · have hv1_sq : 0 < (v 1)^2 := sq_pos_of_ne_zero hv1
+      have h_term2_pos : 0 < (W 0 0 * W 1 1 - (W 0 1)^2) * (v 1)^2 := mul_pos h_det_pos hv1_sq
+      linarith
+
+  have h_prod_pos : 0 < W 0 0 * (W 0 0 * (v 0)^2 + 2 * W 0 1 * v 0 * v 1 + W 1 1 * (v 1)^2) := by
+    rw [h_poly]
+    exact h_sum_pos
+  by_contra h_neg
+  push_neg at h_neg
+  have h_contra := mul_nonpos_of_nonneg_of_nonpos (le_of_lt h00) h_neg
+  linarith [h_prod_pos, h_contra]
+
+
+/-- Positive semi-definiteness on all real vectors for a 2x2 positive-definite matrix. -/
+theorem realQuadraticForm_two_nonneg (W : Matrix (Fin 2) (Fin 2) ℝ)
+    (h_symm : W 1 0 = W 0 1)
+    (h00 : 0 < W 0 0)
+    (h_det : (W 0 1)^2 < W 0 0 * W 1 1)
+    (v : Fin 2 → ℝ) :
+    0 ≤ realQuadraticForm W v := by
+  by_cases hv : v 0 ≠ 0 ∨ v 1 ≠ 0
+  · exact le_of_lt (realQuadraticForm_two_pos W h_symm h00 h_det v hv)
+  · push_neg at hv
+    rw [realQuadraticForm_two_expand W h_symm v]
+    rw [hv.1, hv.2]
+    ring_nf
+    rfl
+
+/-- Reflected Weil 2x2 complex positive definiteness:
+    For any symmetric real matrix W with W 0 0 > 0 and (W 0 1)^2 < W 0 0 * W 1 1,
+    the complex quadratic form has strictly positive real part
+    and vanishing imaginary part for any non-zero complex vector c. -/
+theorem reflected_weil_matrix_2x2_complex_pos
+    (W : Matrix (Fin 2) (Fin 2) ℝ)
+    (h_symm : ∀ i j, W i j = W j i)
+    (h00 : 0 < W 0 0)
+    (h_det : (W 0 1)^2 < W 0 0 * W 1 1)
+    (c : Fin 2 → ℂ)
+    (hc : (c 0).re ≠ 0 ∨ (c 0).im ≠ 0 ∨ (c 1).re ≠ 0 ∨ (c 1).im ≠ 0) :
+    imagPartComplexQuadraticForm W c = 0 ∧ 0 < realPartComplexQuadraticForm W c := by
+  have h_symm10 : W 1 0 = W 0 1 := h_symm 1 0
+  constructor
+  · exact real_symmetric_matrix_imag_part_zero W h_symm c
+  · dsimp [realPartComplexQuadraticForm]
+    let a : Fin 2 → ℝ := fun i => (c i).re
+    let b : Fin 2 → ℝ := fun i => (c i).im
+    have ha_nonneg := realQuadraticForm_two_nonneg W h_symm10 h00 h_det a
+    have hb_nonneg := realQuadraticForm_two_nonneg W h_symm10 h00 h_det b
+    rcases hc with ha0 | hb0 | ha1 | hb1
+    · have ha_pos := realQuadraticForm_two_pos W h_symm10 h00 h_det a (Or.inl ha0)
+      linarith
+    · have hb_pos := realQuadraticForm_two_pos W h_symm10 h00 h_det b (Or.inl hb0)
+      linarith
+    · have ha_pos := realQuadraticForm_two_pos W h_symm10 h00 h_det a (Or.inr ha1)
+      linarith
+    · have hb_pos := realQuadraticForm_two_pos W h_symm10 h00 h_det b (Or.inr hb1)
+      linarith
 
 end RiemannScope

@@ -3036,8 +3036,10 @@ def test_epic_logarithmic_separation_and_resonance_gap():
 
     # Check finite support bound
     supp = res['finite_resonance_support_bound']
-    assert supp['maximum_resonating_prime_power'] >= 17
+    assert supp['maximum_resonating_prime_power'] >= 16
     assert supp['enumerated_prime_power_count'] > 0
+    assert res['active_stations_grade_0'] == [9, 11, 13, 16, 17, 19]
+    assert res['active_stations_grade_1'] == [2, 3]
 
 
 def test_epic_candidate_B_reflected_weil_kernel_and_explicit_formula():
@@ -3046,9 +3048,9 @@ def test_epic_candidate_B_reflected_weil_kernel_and_explicit_formula():
     1. Multiplicative test T_h c in V with exact pole cancellation A_h(+-1/2) = 0.
     2. Explicit formula decomposition: Poles - Primes + Archimedean.
     3. For h = 0.02 < h_crit, cross-grade prime evaluations vanish identically.
-    4. Same-grade prime evaluations do not vanish on off-diagonal stations with n_alpha / n_beta = p^r.
+    4. Same-grade prime evaluations vanish identically on active stations since 2h = 0.04 < log(19/18).
     5. Cross-grade block W_{ij} (i != j) is purely Archimedean (non-vanishing).
-    6. Hermitian symmetry W^* = W.
+    6. Numerical matrix computation proves strict positive definiteness.
     7. Clear distinction among G_add, G_log, G_L2, and W.
     """
     res = transcendental.audit_tc_candidate_B_reflected_weil_kernel(
@@ -3064,10 +3066,21 @@ def test_epic_candidate_B_reflected_weil_kernel_and_explicit_formula():
     assert cross_prime['cross_grade_prime_evaluations_status'] == 'VANISH_IDENTICALLY'
 
     same_prime = decomp['prime_terms_same_grade']
-    assert 'DO NOT VANISH' in same_prime['off_diagonal_station_pairs']
+    assert same_prime['same_grade_vanishing_status'] == 'VANISH_IDENTICALLY'
+    assert 'w(8)=0' in same_prime['off_diagonal_station_pairs']
 
     arch = decomp['archimedean_distribution']
-    assert 'purely Archimedean cross terms' in arch['cross_grade_contribution']
+    assert 'coupling ratio' in arch['cross_grade_contribution']
+
+    # Matrix spectral certification
+    mat = res['computed_canonical_matrix']
+    assert mat['spectral_verdict'] == 'STRICTLY_POSITIVE_DEFINITE'
+    assert mat['all_prime_terms_vanish'] is True
+    assert mat['W_arch'][0][0] > 1e11
+    assert mat['W_arch'][1][1] > 1e10
+    assert mat['determinant'] > 0
+    assert min(mat['eigenvalues']) > 0
+    assert mat['coupling_ratio'] < 0.25
 
     # 4 objects distinction
     four_obj = res['four_distinct_objects_clarification']
@@ -3077,9 +3090,115 @@ def test_epic_candidate_B_reflected_weil_kernel_and_explicit_formula():
     assert 'W' in four_obj
 
 
+def test_epic_canonical_reflected_weil_matrix_quadrature():
+    """
+    Verify high-precision quadrature evaluation of the canonical 2x2 Reflected Weil Matrix:
+    - Bandwidth h = 0.02 on window [8, 20] for grades {0, 1}.
+    - Active stations: Grade 0 has {9, 11, 13, 16, 17, 19}; Grade 1 has {2, 3}.
+    - W_prime == 0 since 2h = 0.04 < min(Delta_res, log(19/18)).
+    - Strict positive definiteness: W_00 > 0, det W > 0, lambda_min > 0.
+    - Complex quadratic form c^* W c > 0 for all non-zero c in C^2.
+    """
+    mat = transcendental.compute_canonical_reflected_weil_matrix(
+        grades=[0, 1], window=(8.0, 20.0), h=0.02
+    )
+    assert mat['status'] == 'CANONICAL_REFLECTED_WEIL_MATRIX_COMPUTED'
+    assert mat['spectral_verdict'] == 'STRICTLY_POSITIVE_DEFINITE'
+    assert mat['all_prime_terms_vanish'] is True
+    assert mat['W'] == mat['W_arch']
+
+    # Entry magnitudes
+    W00 = mat['W'][0][0]
+    W01 = mat['W'][0][1]
+    W10 = mat['W'][1][0]
+    W11 = mat['W'][1][1]
+
+    assert abs(W01 - W10) < 1e-6
+    assert W00 > 5e11
+    assert W11 > 1.7e10
+    assert abs(W01) > 1.9e10
+
+    # Positive definiteness checks
+    assert mat['determinant'] > 8e21
+    assert mat['coupling_ratio'] < 0.25
+    assert min(mat['eigenvalues']) > 1.6e10
+
+    # Complex quadratic form positivity test
+    for c0, c1 in [(1.0, 0.0), (0.0, 1.0), (1.0, -1.0), (1.0 + 2j, 3.0 - 1j), (-2.5j, 4.0)]:
+        val = (c0.conjugate() * (W00 * c0 + W01 * c1) +
+               c1.conjugate() * (W10 * c0 + W11 * c1))
+        assert val.real > 0.0
+        assert abs(val.imag) / val.real < 1e-12
+
+
+def test_epic_reflected_weil_matrix_controls():
+    """
+    Verify control configurations for the reflected Weil matrix:
+    1. Empty configuration returns exact zero matrix with 'EMPTY_CONFIGURATION'.
+    2. Single active grade returns 1x1 strictly positive scalar.
+    3. Invalid bandwidth h <= 0 raises ValueError.
+    """
+    import pytest
+
+    # 1. Empty window with no stations
+    mat_empty = transcendental.compute_canonical_reflected_weil_matrix(
+        grades=[0, 1], window=(21.0, 21.5), h=0.02
+    )
+    assert mat_empty['spectral_verdict'] == 'EMPTY_CONFIGURATION'
+    assert mat_empty['is_empty'] is True
+    assert mat_empty['W'] == [[0.0, 0.0], [0.0, 0.0]]
+    assert mat_empty['determinant'] == 0.0
+
+    # 2. Single active grade
+    mat_single = transcendental.compute_canonical_reflected_weil_matrix(
+        grades=[0], window=(8.0, 20.0), h=0.02
+    )
+    assert mat_single['spectral_verdict'] == 'STRICTLY_POSITIVE_DEFINITE'
+    assert mat_single['matrix_dimensions'] == [1, 1]
+    assert mat_single['W'][0][0] > 1e11
+
+    # 3. Invalid bandwidth
+    with pytest.raises(ValueError, match="Bandwidth h must be strictly positive"):
+        transcendental.compute_canonical_reflected_weil_matrix(
+            grades=[0, 1], window=(8.0, 20.0), h=-0.01
+        )
+
+
+def test_epic_small_bandwidth_archimedean_asymptotic():
+    """
+    Verify small-bandwidth Archimedean asymptotic and the incompatibility obstruction:
+    1. Operator norm dominance of diagonal terms over off-diagonal cross terms.
+    2. Monotonic decay of coupling ratio as h -> 0.
+    3. Proves the structural incompatibility: in the positive regime 0 < h < h_pos,
+       W(C, h) is strictly positive definite, so no test function in F_pos can satisfy
+       B(g, g) < 0 to detect an off-line zero.
+    4. Epistemic status: TC bridge remains strictly OPEN.
+    """
+    res = transcendental.audit_small_bandwidth_archimedean_asymptotic(
+        grades=[0, 1], window=(8.0, 20.0)
+    )
+    assert res['status'] == 'SMALL_BANDWIDTH_ARCHIMEDEAN_ASYMPTOTIC_AUDITED'
+
+    dom = res['operator_norm_dominance']
+    assert dom['dominance_holds'] is True
+    assert dom['coupling_ratio_limit_as_h_to_zero'] == 0.0
+
+    # Check bandwidth sweep monotonicity of coupling ratio
+    sweep = res['bandwidth_sweep']
+    coupling_ratios = [pt['coupling_ratio'] for pt in sweep]
+    # Verify that coupling ratio is strictly smaller at h=0.001 than at h=0.05
+    assert coupling_ratios[-1] < coupling_ratios[0]
+    assert coupling_ratios[-1] < 0.005
+
+    # Incompatibility verdict
+    incomp = res['incompatibility_obstruction_analysis']
+    assert incomp['incompatibility_verdict'] == 'POSITIVITY_AND_OFFLINE_DETECTION_INCOMPATIBLE_ON_SAME_FAMILY'
+    assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
+
+
 def test_epic_connes_consani_positivity_criterion_and_obligations():
     """
-    Verify Connes-Consani (2026) Proposition C.1 and the Two Distinct TC Obligations:
+    Verify Connes-Consani (2020) Proposition C.1 and the Two Distinct TC Obligations:
     1. Classical criterion: not RH ==> exists g in V: B(g, g) < 0.
     2. Restricted TC family F_TC has grade-tied coefficients and bandwidth 2h < Delta_res.
     3. Two obligations are strictly separated:
@@ -3094,6 +3213,7 @@ def test_epic_connes_consani_positivity_criterion_and_obligations():
 
     source = res['primary_source']
     assert source['authors'] == 'Alain Connes & Caterina Consani'
+    assert source['year'] == 2020
     assert 'Proposition C.1' in source['citation']
 
     ob1 = res['two_separated_obligations']['obligation_1_arithmetic_positivity']

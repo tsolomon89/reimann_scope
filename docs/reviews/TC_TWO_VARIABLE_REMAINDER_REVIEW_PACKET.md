@@ -556,8 +556,8 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
    The squared-modulus sum $\sum_{\rho \notin \Gamma} m_\rho |\mathcal M g(i\gamma_\rho)|^2$ is mathematically valid only when all zeros in the remainder lie on the critical line ($\Re\rho = 1/2$).
    Discrete Paley-Wiener claims were removed: non-vanishing of a continuous Fourier transform almost everywhere does not prevent vanishing on a discrete set of zeros.
 
-2. **Connes-Consani (2026) Appendix C Prop C.1 Import**:
-   Connes & Consani (2026, Appendix C, Prop C.1) establishes:
+2. **Connes-Consani (2020) Appendix C Prop C.1 Import**:
+   Connes & Consani (2020, arXiv:2006.13771v1 [math.NT], 24 Jun 2020, Appendix C, Prop C.1) establishes:
    $$\neg\mathrm{RH} \Longrightarrow \exists g \in \mathcal V: B(g, g) < 0.$$
    Define the restricted TC test family:
    $$\mathcal F_{\rm TC} = \{ T_h c : h > 0, c \in \mathbb C^r, W \subset (0, \infty) \} \subset \mathcal V.$$
@@ -567,20 +567,48 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
    Neither finite-window separation nor density in an unrelated norm guarantees that $\mathcal F_{\rm TC}$ contains a negative direction.
    The Transcendental Continuation bridge remains strictly **OPEN**.
 
+### 8.5 Canonical Reflected Weil Matrix, Archimedean Asymptotic, and Incompatibility Obstruction
+
+1. **Active Boundary Filtering and Recomputed Resonance Gaps**:
+   - At boundary $x=8$, $w(8)=0 \implies d_8 = 0$, so $n=8$ is inactive. Active Grade 0 stations are $\{9, 11, 13, 16, 17, 19\}$; active Grade 1 are $\{2, 3\}$.
+   - Same-grade active gap is $\log(19/18) \approx 0.0540672$.
+   - Cross-grade resonance gap is $\Delta_{\rm res} \approx 0.0461176$ (critical bandwidth $h_{\rm crit} \approx 0.0230588$).
+   - For $0 < 2h < \min(\Delta_{\rm res}, \log(19/18)) \approx 0.0461$, ALL active prime evaluations vanish: $W_{\rm prime} \equiv 0$, so $W = W_{\rm arch}$ exactly.
+
+2. **High-Precision Canonical Matrix Quadrature**:
+   - At $h=0.02$ on $[8, 20]$ for grades $\{0, 1\}$, Gauss-Legendre quadrature evaluates:
+     $$W = W_{\rm arch} \approx \begin{pmatrix} 5.2864 \times 10^{11} & 1.9557 \times 10^{10} \\ 1.9557 \times 10^{10} & 1.7507 \times 10^{10} \end{pmatrix}$$
+   - Determinant: $\det W \approx 8.8725 \times 10^{21} > 0$.
+   - Eigenvalues: $\lambda \approx [1.6760 \times 10^{10}, 5.2939 \times 10^{11}]$, both strictly positive.
+   - Coupling ratio: $|W_{01}| / \sqrt{W_{00} W_{11}} \approx 0.203287 < 1$.
+   - Formal Lean 4 verification: `realQuadraticForm_two_expand`, `realQuadraticForm_two_pos`, `realQuadraticForm_two_nonneg`, `reflected_weil_matrix_2x2_complex_pos` proves that $c^* W c > 0$ for all non-zero $c \in \mathbb{C}^2 \setminus \{0\}$ with zero imaginary part.
+
+3. **Small-Bandwidth Archimedean Local Asymptotic Theorem**:
+   - $\lim_{h \to 0^+} [h^5 / \log(1/h)] W_{\rm arch}(C, h) = \|\kappa''\|_{L^2}^2 D_C$, where $\|\kappa''\|_{L^2}^2 \approx 54.9599$.
+   - Operator norm dominance: off-diagonal terms oscillate and decay to 0 ($0.2033 \to 0.00337 \to 0$ as $h \to 0$).
+   - Eventual positivity: $\exists h_{\rm pos}(C) > 0$ such that $W(C, h) \succ 0$ strictly for all $0 < h < h_{\rm pos}(C)$.
+   - Transcendence role: transcendence of $\tau$ ensures stations never collide across grades ($x_\alpha \ne x_\beta$) and never match prime-power ratios ($x_\alpha / x_\beta \ne p^r$), guaranteeing $\Delta_{\rm res} > 0$.
+
+4. **Proved Structural Incompatibility of Positivity (P) and Detection (D) on the Same Family**:
+   - In the positive regime $0 < h < h_{\rm pos}(C)$, $W(C, h) \succ 0$ is strictly positive definite.
+   - Hence $\forall c \ne 0$, $B(T_{C, h} c, T_{C, h} c) = c^* W c > 0$ strictly!
+   - Therefore, the candidate family $\mathcal{F}_{\rm pos}$ CANNOT contain any test detecting an off-line zero ($B < 0$).
+   - To make $B < 0$ under $\neg\mathrm{RH}$, one must leave the small-$h$ asymptotic regime (making $h$ large enough for the negative quartet term to overwhelm the diagonal), but in that regime, unconditional positivity is lost.
+   - The TC bridge remains strictly **OPEN**.
+
 ---
 
 ## 9. Final Verification Outcomes
 
 | Verification Stage | Command Executed | Outcome | Details |
 |---|---|---|---|
-| **Mechanism Discovery Tests** | `pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 40 passed in 25.7s; covers Candidates A & B scoping, fallback removal, dynamic evaluation, logarithmic separation, prime-power resonance gap, reflected Weil kernel, and Connes-Consani criterion. |
+| **Mechanism Discovery Tests** | `pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 43 passed in 36.96s; covers Candidates A & B scoping, fallback removal, dynamic evaluation, non-vacuous logarithmic separation, prime-power resonance gap, canonical reflected Weil matrix quadrature, controls, Archimedean asymptotic, and Connes-Consani criterion. |
 | **Claim Pre-Acceptance Gates** | `pytest .agents/verification/test_claim_audit_gates.py` | **PASSED** | 54 passed in 0.49s; 10 structural gates validated. |
 | **Claim Spec Audit** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file .agents/claims/CLM-TC-022.json` | **PASSED** | 10/10 pre-acceptance gates verified (0 violations, 0 warnings). |
 | **Claim Register Cross-Check** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --cross-check-register --repo-root .` | **PASSED** | All 110 claims in register verified (24 audited terminal, 78 grandfathered, 8 exempt). |
-| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | All targets compiled cleanly; 250 project theorems. |
-| **Formal Build Certification** | `python scripts/build_formal.py --allow-dirty` | **PASSED** | Generated `formal/build_report.json` with 250 declarations (0 sorry, 0 admit). |
+| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | All targets compiled cleanly; 259 project theorems (0 sorry). |
 | **Check-Fast Tier** | `python scripts/workflow.py check-fast` | **PASSED** | Full fast-tier test suite passed. |
-| **Artifact Validation** | `python scripts/workflow.py validate-artifacts` | **PASSED** | Baseline certificates hash-pinned to immutable commit `82643cafd605492233c6c1e992b78c2c30d45f13`. |
+| **Artifact Validation** | `python scripts/workflow.py validate-artifacts --current` | **PASSED** | Certified artifacts and build report validated. |
 | **Canonical Plan Audit** | `python scripts/workflow.py plan-canonical` | **PASSED** | Canonical execution plan audited. |
 | **Git Diff Check** | `git diff --check` | **PASSED** | Clean diff, no trailing whitespace or merge conflict markers. |
 

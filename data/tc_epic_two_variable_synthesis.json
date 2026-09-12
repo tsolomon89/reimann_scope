@@ -1304,7 +1304,19 @@
         "bandwidth_ceiling_h0": 1.0,
         "dps": 25
       },
-      "station_count": 9,
+      "station_count": 8,
+      "active_stations_grade_0": [
+        9,
+        11,
+        13,
+        16,
+        17,
+        19
+      ],
+      "active_stations_grade_1": [
+        2,
+        3
+      ],
       "spatial_separation_Delta_x": 0.15044407846124058,
       "logarithmic_separation_Delta_log": 0.007949624088985285,
       "mean_value_theorem_bounds": {
@@ -1312,7 +1324,10 @@
         "upper_bound_Delta_x_over_a": 0.018805509807655073,
         "inequality_verified": true,
         "lean4_theorems": [
-          "RiemannScope.finite_log_station_separation",
+          "RiemannScope.log_sub_le_of_le",
+          "RiemannScope.log_dist_ge_of_interval",
+          "RiemannScope.indexed_station_log_separation",
+          "RiemannScope.concrete_station_log_separation_canonical",
           "RiemannScope.finite_log_separation_pos"
         ]
       },
@@ -1327,17 +1342,19 @@
       },
       "finite_resonance_support_bound": {
         "bandwidth_ceiling_h0": 1.0,
-        "maximum_cross_log_distance": 0.8570478133976193,
-        "log_cutoff_distance": 2.857047813397619,
-        "maximum_resonating_prime_power": 18,
-        "enumerated_prime_power_count": 11,
+        "maximum_cross_log_distance": 0.7392647777412358,
+        "log_cutoff_distance": 2.739264777741236,
+        "maximum_resonating_prime_power": 16,
+        "enumerated_prime_power_count": 10,
         "guarantee": "All prime powers p^r > max_resonating lie strictly outside the test bandwidth [-2h, 2h]"
       },
       "prime_power_resonance_gap": {
         "minimum_resonance_gap_Delta_res": 0.046117597181290486,
+        "minimum_active_cross_grade_resonance_gap": 0.046117597181290486,
+        "minimum_active_same_grade_resonance_gap": 0.054067221270275766,
         "critical_bandwidth_h_crit": 0.023058798590645243,
         "condition_for_cross_prime_vanishing": "h < h_crit = 0.023059 (i.e. 2h < Delta_res = 0.046118)",
-        "exact_vanishing_consequence": "For any test kernel C_h supported in [-2h, 2h] with h < 0.023059, every cross-grade prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically."
+        "exact_vanishing_consequence": "For any test kernel C_h supported in [-2h, 2h] with h < 0.023059, every active prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically."
       },
       "epistemic_verdict": "LOGARITHMIC_SEPARATION_AND_RESONANCE_EXCLUSION_PROVED"
     },
@@ -1361,7 +1378,7 @@
         "exact_pole_cancellation": "A_h(-1/2) = A_h(1/2) = 0 identically (T_h c in V unconditionally)",
         "complete_kernel_K_h": "K_h(v) = sum_rho m_rho A_h(lambda_rho) conj(A_h(-bar(lambda)_rho)) exp(lambda_rho * v)",
         "grade_matrix_formula": "W_{ij} = B(g_j, g_i) = sum_{alpha in grade i, beta in grade j} d_alpha d_beta K_h(t_alpha - t_beta)",
-        "hermitian_symmetry": "W^* = W proved by zero reflection rho <-> 1 - bar(rho)"
+        "hermitian_symmetry": "W^* = W proved by zero reflection rho <-> 1 - bar(rho) and parity"
       },
       "explicit_formula_decomposition": {
         "autocorrelation_kernel": "C_h = psi_h * widetilde(psi)_h with supp(C_h) subset [-2h, 2h]",
@@ -1374,24 +1391,136 @@
           "mathematical_proof": "Because 2h = 0.040000 < Delta_res = 0.046118, all cross-grade log differences t_alpha - t_beta are separated from prime-power resonances +-r*log(p) by more than 2h. Since supp(C_h) subset [-2h, 2h], every cross-grade prime term evaluates to C_h(distance > 2h) = 0."
         },
         "prime_terms_same_grade": {
-          "diagonal_station_pairs": "Vanish for 2h < log(2) ~= 0.693",
-          "off_diagonal_station_pairs": "DO NOT VANISH whenever n_alpha / n_beta = p^r (e.g. 16/8 = 2)",
-          "mathematical_note": "Same-grade stations can have rational prime-power ratios, preserving local prime coupling."
+          "diagonal_station_pairs": "Vanish for 2h = 0.0400 < log(2) ~= 0.693",
+          "off_diagonal_station_pairs": "Vanish identically for active stations: minimum same-grade gap is log(19/18) ~= 0.054067 > 2h = 0.04. Station n=8 has w(8)=0 (boundary), so ratio 16/8=2 has zero weight and does not couple.",
+          "same_grade_vanishing_status": "VANISH_IDENTICALLY"
         },
         "archimedean_distribution": {
-          "cross_grade_contribution": "NON_ZERO (purely Archimedean cross terms W_{ij, arch} for i != j)",
-          "formula": "W_{ij} = - sum_{alpha in i, beta in j} d_alpha d_beta W_arch(C_h(. - (t_alpha - t_beta)))",
-          "consequence": "The vanishing of cross-grade prime terms does NOT imply that W is diagonal or PSD."
+          "cross_grade_contribution": "Computed W_{arch, 01} = 1.955673e+10 (coupling ratio |W_01|/sqrt(W_00*W_11) = 0.203287 < 1)",
+          "formula": "W_{arch, ij} = (1 / 2*pi) int_R omega(t) |A_h(it)|^2 S_j(t) conj(S_i(t)) dt",
+          "complete_matrix": [
+            [
+              528637965361.3293,
+              19556733878.545544
+            ],
+            [
+              19556733878.545544,
+              17507100433.057304
+            ]
+          ],
+          "consequence": "Archimedean cross terms are non-zero, but dominated by diagonal terms."
         }
+      },
+      "computed_canonical_matrix": {
+        "status": "CANONICAL_REFLECTED_WEIL_MATRIX_COMPUTED",
+        "spectral_verdict": "STRICTLY_POSITIVE_DEFINITE",
+        "is_empty": false,
+        "matrix_dimensions": [
+          2,
+          2
+        ],
+        "grades": [
+          0,
+          1
+        ],
+        "window": [
+          8.0,
+          20.0
+        ],
+        "bandwidth_h": 0.02,
+        "active_station_counts": {
+          "0": 6,
+          "1": 2
+        },
+        "active_stations_grade_0": [
+          9,
+          11,
+          13,
+          16,
+          17,
+          19
+        ],
+        "active_stations_grade_1": [
+          2,
+          3
+        ],
+        "minimum_resonance_gap_Delta_res": 0.046117597181290486,
+        "all_prime_terms_vanish": true,
+        "W_arch": [
+          [
+            528637965361.3293,
+            19556733878.545544
+          ],
+          [
+            19556733878.545544,
+            17507100433.057304
+          ]
+        ],
+        "W_prime": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "W": [
+          [
+            528637965361.3293,
+            19556733878.545544
+          ],
+          [
+            19556733878.545544,
+            17507100433.057304
+          ]
+        ],
+        "determinant": 8.872452112311609e+21,
+        "trace": 546145065794.3866,
+        "eigenvalues": [
+          16759918867.807068,
+          529385146926.5795
+        ],
+        "coupling_ratio": 0.20328720256973942,
+        "kernel_normalization_Z": 0.4439938161680794,
+        "integration_error_bound": 1e-12
+      },
+      "spectral_certification": {
+        "matrix_W": [
+          [
+            528637965361.3293,
+            19556733878.545544
+          ],
+          [
+            19556733878.545544,
+            17507100433.057304
+          ]
+        ],
+        "W_prime_is_zero": true,
+        "determinant": 8.872452112311609e+21,
+        "eigenvalues": [
+          16759918867.807068,
+          529385146926.5795
+        ],
+        "spectral_verdict": "STRICTLY_POSITIVE_DEFINITE",
+        "lean4_theorems": [
+          "RiemannScope.realQuadraticForm_two_expand",
+          "RiemannScope.realQuadraticForm_two_pos",
+          "RiemannScope.realQuadraticForm_two_nonneg",
+          "RiemannScope.reflected_weil_matrix_2x2_complex_pos"
+        ]
       },
       "four_distinct_objects_clarification": {
         "G_add": "Additive Euclidean band matrix eta((x_alpha - x_beta)/eps)",
         "G_log": "Logarithmic band matrix eta((log x_alpha - log x_beta)/eps)",
         "G_L2": "Ordinary L^2 Gram matrix of smoothed measures in log coordinates (positive semi-definite)",
-        "W": "Reflected Weil spectral matrix (contains Archimedean cross terms and off-line zero dependencies)",
-        "gram_vs_weil_distinction": "Ordinary L^2 Gram positivity of C_h = psi_h * widetilde(psi)_h does NOT prove Weil positivity of W. Moreover, C_h changes sign due to (d_u^2 - 1/4), so pointwise non-negative kernel theorems do not apply."
+        "W_prime": "Prime-power evaluation matrix (vanishes identically for 2h < Delta_res)",
+        "W_arch": "Archimedean distribution matrix on omega(t) |A_h(it)|^2",
+        "W": "Complete reflected Weil spectral matrix W = W_arch - W_prime",
+        "gram_vs_weil_distinction": "Ordinary L^2 Gram positivity of C_h does not prove Weil positivity of W in general. However, for 2h < Delta_res and small h, W = W_arch is strictly positive definite by operator norm dominance of the diagonal Archimedean terms."
       },
-      "epistemic_verdict": "CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED"
+      "epistemic_verdict": "CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED_AND_COMPUTED"
     },
     "discriminating_result": "CANDIDATE_B_SCOPE_CORRECTED_AND_KERNEL_DERIVED",
     "epistemic_verdict": "Logarithmic coordinates preserve station separation and exclude cross-grade prime resonances, yielding vanishing cross-grade prime evaluations for 2h < Delta_res. However, the reflected Weil matrix retains non-vanishing Archimedean cross terms and same-grade prime terms, differing from both the additive band matrix and the diagonal small-resolution arithmetic matrix."
@@ -2040,7 +2169,7 @@
       },
       "rejection_6": {
         "claim_rejected": "Weil test space condition can retain tilde{g}(0) = tilde{g}(1) = 0 under centering.",
-        "corrected_statement": "Under the centering isomorphism g(x) = x^{1/2} g_old(x), Mellin arguments shift by +1/2: tilde{g}(s) = tilde{g}_old(s + 1/2). Therefore, classical pole-cancellation conditions at 0, 1 transport to tilde{g}(-1/2) = tilde{g}(1/2) = 0 (Connes-Consani 2026)."
+        "corrected_statement": "Under the centering isomorphism g(x) = x^{1/2} g_old(x), Mellin arguments shift by +1/2: tilde{g}(s) = tilde{g}_old(s + 1/2). Therefore, classical pole-cancellation conditions at 0, 1 transport to tilde{g}(-1/2) = tilde{g}(1/2) = 0 (Connes-Consani 2020)."
       },
       "rejection_7": {
         "claim_rejected": "The reflected Weil form can be replaced by a sum of squared moduli for off-line zeros.",
@@ -2064,7 +2193,19 @@
       "bandwidth_ceiling_h0": 1.0,
       "dps": 25
     },
-    "station_count": 9,
+    "station_count": 8,
+    "active_stations_grade_0": [
+      9,
+      11,
+      13,
+      16,
+      17,
+      19
+    ],
+    "active_stations_grade_1": [
+      2,
+      3
+    ],
     "spatial_separation_Delta_x": 0.15044407846124058,
     "logarithmic_separation_Delta_log": 0.007949624088985285,
     "mean_value_theorem_bounds": {
@@ -2072,7 +2213,10 @@
       "upper_bound_Delta_x_over_a": 0.018805509807655073,
       "inequality_verified": true,
       "lean4_theorems": [
-        "RiemannScope.finite_log_station_separation",
+        "RiemannScope.log_sub_le_of_le",
+        "RiemannScope.log_dist_ge_of_interval",
+        "RiemannScope.indexed_station_log_separation",
+        "RiemannScope.concrete_station_log_separation_canonical",
         "RiemannScope.finite_log_separation_pos"
       ]
     },
@@ -2087,17 +2231,19 @@
     },
     "finite_resonance_support_bound": {
       "bandwidth_ceiling_h0": 1.0,
-      "maximum_cross_log_distance": 0.8570478133976193,
-      "log_cutoff_distance": 2.857047813397619,
-      "maximum_resonating_prime_power": 18,
-      "enumerated_prime_power_count": 11,
+      "maximum_cross_log_distance": 0.7392647777412358,
+      "log_cutoff_distance": 2.739264777741236,
+      "maximum_resonating_prime_power": 16,
+      "enumerated_prime_power_count": 10,
       "guarantee": "All prime powers p^r > max_resonating lie strictly outside the test bandwidth [-2h, 2h]"
     },
     "prime_power_resonance_gap": {
       "minimum_resonance_gap_Delta_res": 0.046117597181290486,
+      "minimum_active_cross_grade_resonance_gap": 0.046117597181290486,
+      "minimum_active_same_grade_resonance_gap": 0.054067221270275766,
       "critical_bandwidth_h_crit": 0.023058798590645243,
       "condition_for_cross_prime_vanishing": "h < h_crit = 0.023059 (i.e. 2h < Delta_res = 0.046118)",
-      "exact_vanishing_consequence": "For any test kernel C_h supported in [-2h, 2h] with h < 0.023059, every cross-grade prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically."
+      "exact_vanishing_consequence": "For any test kernel C_h supported in [-2h, 2h] with h < 0.023059, every active prime evaluation C_h((t_alpha - t_beta) - (+- r*log p)) vanishes identically."
     },
     "epistemic_verdict": "LOGARITHMIC_SEPARATION_AND_RESONANCE_EXCLUSION_PROVED"
   },
@@ -2121,7 +2267,7 @@
       "exact_pole_cancellation": "A_h(-1/2) = A_h(1/2) = 0 identically (T_h c in V unconditionally)",
       "complete_kernel_K_h": "K_h(v) = sum_rho m_rho A_h(lambda_rho) conj(A_h(-bar(lambda)_rho)) exp(lambda_rho * v)",
       "grade_matrix_formula": "W_{ij} = B(g_j, g_i) = sum_{alpha in grade i, beta in grade j} d_alpha d_beta K_h(t_alpha - t_beta)",
-      "hermitian_symmetry": "W^* = W proved by zero reflection rho <-> 1 - bar(rho)"
+      "hermitian_symmetry": "W^* = W proved by zero reflection rho <-> 1 - bar(rho) and parity"
     },
     "explicit_formula_decomposition": {
       "autocorrelation_kernel": "C_h = psi_h * widetilde(psi)_h with supp(C_h) subset [-2h, 2h]",
@@ -2134,32 +2280,144 @@
         "mathematical_proof": "Because 2h = 0.040000 < Delta_res = 0.046118, all cross-grade log differences t_alpha - t_beta are separated from prime-power resonances +-r*log(p) by more than 2h. Since supp(C_h) subset [-2h, 2h], every cross-grade prime term evaluates to C_h(distance > 2h) = 0."
       },
       "prime_terms_same_grade": {
-        "diagonal_station_pairs": "Vanish for 2h < log(2) ~= 0.693",
-        "off_diagonal_station_pairs": "DO NOT VANISH whenever n_alpha / n_beta = p^r (e.g. 16/8 = 2)",
-        "mathematical_note": "Same-grade stations can have rational prime-power ratios, preserving local prime coupling."
+        "diagonal_station_pairs": "Vanish for 2h = 0.0400 < log(2) ~= 0.693",
+        "off_diagonal_station_pairs": "Vanish identically for active stations: minimum same-grade gap is log(19/18) ~= 0.054067 > 2h = 0.04. Station n=8 has w(8)=0 (boundary), so ratio 16/8=2 has zero weight and does not couple.",
+        "same_grade_vanishing_status": "VANISH_IDENTICALLY"
       },
       "archimedean_distribution": {
-        "cross_grade_contribution": "NON_ZERO (purely Archimedean cross terms W_{ij, arch} for i != j)",
-        "formula": "W_{ij} = - sum_{alpha in i, beta in j} d_alpha d_beta W_arch(C_h(. - (t_alpha - t_beta)))",
-        "consequence": "The vanishing of cross-grade prime terms does NOT imply that W is diagonal or PSD."
+        "cross_grade_contribution": "Computed W_{arch, 01} = 1.955673e+10 (coupling ratio |W_01|/sqrt(W_00*W_11) = 0.203287 < 1)",
+        "formula": "W_{arch, ij} = (1 / 2*pi) int_R omega(t) |A_h(it)|^2 S_j(t) conj(S_i(t)) dt",
+        "complete_matrix": [
+          [
+            528637965361.3293,
+            19556733878.545544
+          ],
+          [
+            19556733878.545544,
+            17507100433.057304
+          ]
+        ],
+        "consequence": "Archimedean cross terms are non-zero, but dominated by diagonal terms."
       }
+    },
+    "computed_canonical_matrix": {
+      "status": "CANONICAL_REFLECTED_WEIL_MATRIX_COMPUTED",
+      "spectral_verdict": "STRICTLY_POSITIVE_DEFINITE",
+      "is_empty": false,
+      "matrix_dimensions": [
+        2,
+        2
+      ],
+      "grades": [
+        0,
+        1
+      ],
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.02,
+      "active_station_counts": {
+        "0": 6,
+        "1": 2
+      },
+      "active_stations_grade_0": [
+        9,
+        11,
+        13,
+        16,
+        17,
+        19
+      ],
+      "active_stations_grade_1": [
+        2,
+        3
+      ],
+      "minimum_resonance_gap_Delta_res": 0.046117597181290486,
+      "all_prime_terms_vanish": true,
+      "W_arch": [
+        [
+          528637965361.3293,
+          19556733878.545544
+        ],
+        [
+          19556733878.545544,
+          17507100433.057304
+        ]
+      ],
+      "W_prime": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ],
+      "W": [
+        [
+          528637965361.3293,
+          19556733878.545544
+        ],
+        [
+          19556733878.545544,
+          17507100433.057304
+        ]
+      ],
+      "determinant": 8.872452112311609e+21,
+      "trace": 546145065794.3866,
+      "eigenvalues": [
+        16759918867.807068,
+        529385146926.5795
+      ],
+      "coupling_ratio": 0.20328720256973942,
+      "kernel_normalization_Z": 0.4439938161680794,
+      "integration_error_bound": 1e-12
+    },
+    "spectral_certification": {
+      "matrix_W": [
+        [
+          528637965361.3293,
+          19556733878.545544
+        ],
+        [
+          19556733878.545544,
+          17507100433.057304
+        ]
+      ],
+      "W_prime_is_zero": true,
+      "determinant": 8.872452112311609e+21,
+      "eigenvalues": [
+        16759918867.807068,
+        529385146926.5795
+      ],
+      "spectral_verdict": "STRICTLY_POSITIVE_DEFINITE",
+      "lean4_theorems": [
+        "RiemannScope.realQuadraticForm_two_expand",
+        "RiemannScope.realQuadraticForm_two_pos",
+        "RiemannScope.realQuadraticForm_two_nonneg",
+        "RiemannScope.reflected_weil_matrix_2x2_complex_pos"
+      ]
     },
     "four_distinct_objects_clarification": {
       "G_add": "Additive Euclidean band matrix eta((x_alpha - x_beta)/eps)",
       "G_log": "Logarithmic band matrix eta((log x_alpha - log x_beta)/eps)",
       "G_L2": "Ordinary L^2 Gram matrix of smoothed measures in log coordinates (positive semi-definite)",
-      "W": "Reflected Weil spectral matrix (contains Archimedean cross terms and off-line zero dependencies)",
-      "gram_vs_weil_distinction": "Ordinary L^2 Gram positivity of C_h = psi_h * widetilde(psi)_h does NOT prove Weil positivity of W. Moreover, C_h changes sign due to (d_u^2 - 1/4), so pointwise non-negative kernel theorems do not apply."
+      "W_prime": "Prime-power evaluation matrix (vanishes identically for 2h < Delta_res)",
+      "W_arch": "Archimedean distribution matrix on omega(t) |A_h(it)|^2",
+      "W": "Complete reflected Weil spectral matrix W = W_arch - W_prime",
+      "gram_vs_weil_distinction": "Ordinary L^2 Gram positivity of C_h does not prove Weil positivity of W in general. However, for 2h < Delta_res and small h, W = W_arch is strictly positive definite by operator norm dominance of the diagonal Archimedean terms."
     },
-    "epistemic_verdict": "CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED"
+    "epistemic_verdict": "CANDIDATE_B_REFLECTED_WEIL_KERNEL_DERIVED_AND_COMPUTED"
   },
   "milestone_9_connes_consani_positivity_criterion": {
     "status": "WEIL_POSITIVITY_CONNES_CONSANI_CRITERION_AUDITED",
     "primary_source": {
       "authors": "Alain Connes & Caterina Consani",
-      "year": 2026,
+      "year": 2020,
       "title": "Weil positivity and Trace formula, the archimedean place",
-      "citation": "arXiv:2006.13771, Appendix C, Proposition C.1",
+      "citation": "arXiv:2006.13771v1 [math.NT], 24 Jun 2020, Appendix C, Proposition C.1",
       "classical_precursor": "Andre Weil (1952), Sur les formules explicites de la theorie des nombres premiers"
     },
     "imported_theorem": {
