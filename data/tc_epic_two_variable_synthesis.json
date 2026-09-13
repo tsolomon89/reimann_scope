@@ -257,11 +257,11 @@
     "interval_enclosure": {
       "engine": "flint.arb",
       "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
-      "zero_ordinate_enclosure": "[14.1347251417347 +/- 9.01e-15]",
-      "enclosure_mid": 0.544439992485636,
-      "enclosure_rad": 0.0011700457143888343,
-      "lower_bound": 0.5432699467712472,
-      "upper_bound": 0.5456100382000248,
+      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
+      "enclosure_mid": 0.5444399924859572,
+      "enclosure_rad": 0.0011700457162078237,
+      "lower_bound": 0.5432699467697494,
+      "upper_bound": 0.545610038202165,
       "strictly_positive": true,
       "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
     },
@@ -495,10 +495,10 @@
       "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "mid": 0.544439992485636,
-        "rad": 0.0011700457143888343,
-        "lower": 0.5432699467712472,
-        "upper": 0.5456100382000248,
+        "mid": 0.5444399924859572,
+        "rad": 0.0011700457162078237,
+        "lower": 0.5432699467697494,
+        "upper": 0.545610038202165,
         "is_strictly_positive": true,
         "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
       }
