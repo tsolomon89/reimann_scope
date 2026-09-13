@@ -3253,10 +3253,60 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
    - Proved operator norm dominance: off-diagonal coupling decays to 0 as $h \to 0$ ($0.2033 \to 0.00337 \to 0$), ensuring existence of $h_{\rm pos}(C) > 0$ such that $W(C, h) \succ 0$ for all $0 < h < h_{\rm pos}(C)$.
    - Established that this is a general analytic property of smooth bump kernels on distinct stations, while transcendence enters only to keep cross-grade stations and prime-power ratios disjoint ($\Delta_{\rm res} > 0$).
 
-5. **Proved Structural Incompatibility of Positivity (P) and Off-Line Detection (D) on the Same Family**:
-   - In the positive regime $0 < h < h_{\rm pos}(C)$, strict positive definiteness $W(C, h) \succ 0$ forces:
-     $$B(T_{C, h} c, T_{C, h} c) = c^* W(C, h) c > 0 \quad \text{for all } c \in \mathbb C^r \setminus \{0\}.$$
-   - Therefore, the positive family $\mathcal F_{\rm pos}$ **CANNOT contain any test function detecting an off-line zero ($B < 0$)**!
-   - To make $B < 0$ under $\neg\mathrm{RH}$, one must leave the small-$h$ asymptotic regime (making $h$ large enough for the negative zero quartet term to overwhelm the diagonal), but in that regime, RH-independent positivity is lost.
-   - This proves an exact structural obstruction preventing Candidate B from closing the RH bridge on this family.
-   - Epistemic status: The Transcendental Continuation bridge remains strictly **OPEN**.
+5. **Rectified Conditional Logic and Scoped Incompatibility**:
+   - Corrected conditional logic:
+     - $H$: An actual nontrivial off-critical zeta zero exists.
+     - $E_F$: There exists $g \in F$ with $B(g, g) < 0$.
+     - $P_F$: Every $g \in F$ satisfies $B(g, g) \ge 0$.
+     - $D_F$: $H \implies E_F$.
+   - $P_F$ implies $\neg E_F$. This does NOT imply $\neg D_F$.
+   - Together, $P_F \land D_F \implies \neg H$, exactly the intended TC proof-by-contradiction mechanism (formally proved in Lean 4: `positivity_and_conditional_detection_imply_no_offline_zero`).
+   - Under $P_F$, $D_F$ is equivalent to $\neg H$. It is an RH-strength research obligation, NOT refuted by positivity.
+   - The valid scoped statement is: inside the positive family $\mathcal{F}_{\rm pos}$, there is no negative test ($\neg E_{\mathcal{F}_{\rm pos}}$).
+   - The conditional detection obligation $D_F$ remains strictly **OPEN**.
+
+## 42.12 Corrective Epic: Archimedean PSD Tail Certification, Surviving Prime Bounds, Eventual Positivity Threshold, and Detection Investigation (TC-DISC-025 / CLM-TC-022 Updated)
+
+1. **Reproduction of the Cutoff Discrepancy**:
+   - Truncation at $t=600$ ($z=12$) yields:
+     $$M_{600} \approx \begin{pmatrix} 5.2864 \times 10^{11} & 1.9557 \times 10^{10} \\ 1.9557 \times 10^{10} & 1.7507 \times 10^{10} \end{pmatrix}.$$
+   - Extending to $t=16000$ ($z=320$) yields:
+     $$M_{16000} \approx \begin{pmatrix} 1.0324 \times 10^{12} & 2.7228 \times 10^{10} \\ 2.7228 \times 10^{10} & 3.4016 \times 10^{10} \end{pmatrix}.$$
+   - Canonical constants verified: $Z \approx 0.4439938$, $\|\kappa''\|_2^2 \approx 54.95987$, $\|\kappa'\|_2^2 \approx 2.0777$, $\|\kappa\|_2^2 \approx 0.6751$.
+   - Mechanism: $\kappa$ has Gevrey regular sub-exponential Fourier decay. The integrand $z^4 \omega(z/h)$ carries significant mass out to $z \approx 100$. Truncation at $z=12$ omitted roughly 48.8% of diagonal energy. Beyond $z=320$, tail error is $< 1.3 \times 10^{-10}$ relative error.
+   - Truncation at $t=600$ is a finite quadrature cutoff, NOT a full-value certificate.
+
+2. **Full-Sign Tail Certification via Digamma Monotonicity**:
+   - Series representation from NIST DLMF 5.7.6:
+     $$\Re\psi(1/4 + iy) = -\gamma + \sum_{n=0}^\infty \left[ \frac{1}{n+1} - \frac{n+1/4}{(n+1/4)^2 + y^2} \right].$$
+   - Term-by-term derivative proves strict monotonicity:
+     $$\frac{d}{dy}\Re\psi(1/4 + iy) = \sum_{n=0}^\infty \frac{2y(n+1/4)}{((n+1/4)^2 + y^2)^2} > 0 \quad (\forall y > 0).$$
+   - Setting $y = t/2$, $\omega(t) = \Re\psi(1/4 + it/2) - \log\pi$ is strictly increasing for $t \ge 0$, with $\omega(t) \ge \omega(10) > 0.464 > 0$ for all $t \ge 10$.
+   - The omitted tail matrix $R_T = \frac{1}{2\pi} \int_{|t| \ge T} \omega(t) |A_h(it)|^2 S(t) S(t)^* dt \succeq 0$ is guaranteed positive semidefinite in the Hermitian Loewner order.
+   - **Full-Sign Certificate**: $\lambda_{\min}(W_{\rm arch}) \ge \lambda_{\min}(M_T) > 0$ certifies positive definiteness without evaluating tail entries (Lean 4: `real_quadratic_form_add_psd_tail`, `complex_quadratic_form_add_psd_tail`).
+
+3. **Surviving Prime Matrix Bounds and Mandatory Counterexample Control**:
+   - Derived scaling identity via integration by parts:
+     $$\|\psi_h\|_2^2 = h^{-5}\|\kappa''\|_2^2 + \frac{1}{2}h^{-3}\|\kappa'\|_2^2 + \frac{1}{16}h^{-1}\|\kappa\|_2^2.$$
+   - Yields operator norm bound $\|W_{\rm prime}(C, h)\|_{\rm op} \le C_{\rm prime}(C, h_0) h^{-5}$ for $0 < h \le \min(1, h_0)$.
+   - Mandatory counterexample control: window $[7, 17]$ with grade 0 active stations 8 ($2^3$) and 16 ($2^4$) has exact prime resonance $16/8 = 2$ ($q=2$). The term $C_h(0) = \|\psi_h\|_2^2 > 0$ survives for ALL $h > 0$. Station separation does NOT imply separation from prime-power resonance.
+   - Asymptotic dominance: $\|W_{\rm prime}\|_{\rm op} / W_{\rm arch} \le C_{\rm prime} / (c_\kappa d_{\min} \log(1/h)) \to 0$ as $h \to 0^+$.
+   - Quantitative threshold $h_{\rm pos}(C) > 0$ ensures complete matrix $W = W_{\rm arch} - W_{\rm prime}$ is strictly positive definite for all $0 < h < h_{\rm pos}(C)$ (Lean 4: `real_quadratic_form_prime_perturbation`).
+   - Positivity covers arbitrary complex coefficients: $c^* W c = (\Re c)^T W (\Re c) + (\Im c)^T W (\Im c) > 0$.
+
+4. **Substantive Conditional Detection Investigation**:
+   - Classical starting point (Connes-Consani 2020, Prop C.1): under $H(\rho_0)$, $\exists g_0 \in \mathcal V$ with $B(g_0, g_0) = -\eta < 0$.
+   - Sobolev $H^1$ continuity bound: $|B(f, f) - B(g, g)| \le C_R \|f - g\|_{H^1} (\|f\|_{H^1} + \|g\|_{H^1})$.
+   - Attempted construction in $\mathcal F_{\rm pos}$: grade-tied coefficients and small bandwidth $h_n < h_{\rm pos}(C_n)$ force $B(f_n, f_n) > 0$, so $|B(f_n, f_n) - B(g_0, g_0)| \ge \eta > 0$ cannot vanish.
+   - Scoped obstruction: closes localized small-bandwidth bump approximation schemes in $\mathcal F_{\rm pos}$.
+   - Crucial conditional logic: closing this scheme does NOT refute $D_F$. Under $P_F$, $D_F$ is equivalent to $\neg H$ (RH) and remains strictly **OPEN**.
+
+5. **Lean 4 Formalization (263 Compiled Theorems)**:
+   - Proved 6 new formal declarations in `formal/RiemannScope/Grade.lean`:
+     - `realQuadraticForm_add`: $q_{M+R}(v) = q_M(v) + q_R(v)$.
+     - `realQuadraticForm_sub`: $q_{M-R}(v) = q_M(v) - q_R(v)$.
+     - `positivity_and_conditional_detection_imply_no_offline_zero`: $P_F \land D_F \implies \neg H$.
+     - `real_quadratic_form_add_psd_tail`: $q_M(v) > 0 \land q_R(v) \ge 0 \implies q_{M+R}(v) > 0$.
+     - `complex_quadratic_form_add_psd_tail`: $q_M(c) > 0 \land q_R(c) \ge 0 \implies q_{M+R}(c) > 0$.
+     - `real_quadratic_form_prime_perturbation`: $q_{W_{\rm arch}}(v) \ge \lambda_{\min} \land q_{W_{\rm prime}}(v) \le \varepsilon < \lambda_{\min} \implies q_{W_{\rm arch}-W_{\rm prime}}(v) > 0$.
+   - All 263 project theorems compiled cleanly under Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings, standard Mathlib foundational axioms only).

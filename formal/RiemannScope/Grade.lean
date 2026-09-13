@@ -2215,4 +2215,82 @@ theorem reflected_weil_matrix_2x2_complex_pos
     · have hb_pos := realQuadraticForm_two_pos W h_symm10 h00 h_det b (Or.inr hb1)
       linarith
 
+/-- Additivity of the real quadratic form under matrix addition. -/
+theorem realQuadraticForm_add {r : Type*} [Fintype r]
+    (M R : Matrix r r ℝ) (v : r → ℝ) :
+    realQuadraticForm (M + R) v = realQuadraticForm M v + realQuadraticForm R v := by
+  dsimp [realQuadraticForm]
+  rw [Matrix.add_mulVec, Matrix.dotProduct_add]
+
+/-- Linearity of the real quadratic form under matrix subtraction. -/
+theorem realQuadraticForm_sub {r : Type*} [Fintype r]
+    (M R : Matrix r r ℝ) (v : r → ℝ) :
+    realQuadraticForm (M - R) v = realQuadraticForm M v - realQuadraticForm R v := by
+  dsimp [realQuadraticForm]
+  rw [Matrix.sub_mulVec, Matrix.dotProduct_sub]
+
+/-- Abstract Predicate Logic: Positivity (P_F) and Conditional Detection (D_F) imply not H (RH).
+    H : An off-critical zero exists.
+    E_F : There exists a negative test function in F.
+    P_F : All test functions in F have non-negative Weil quadratic form.
+    D_F : If an off-critical zero exists, there is a negative test in F (H → E_F).
+    Then P_F and D_F together imply ¬H. -/
+theorem positivity_and_conditional_detection_imply_no_offline_zero
+    {TestFn : Type*} (B : TestFn → ℝ) (F : Set TestFn)
+    (H : Prop)
+    (P_F : ∀ g ∈ F, 0 ≤ B g)
+    (D_F : H → ∃ g ∈ F, B g < 0) :
+    ¬ H := by
+  intro hH
+  obtain ⟨g, hg_in_F, hB_neg⟩ := D_F hH
+  have hB_nonneg := P_F g hg_in_F
+  linarith
+
+/-- Additive preservation of real quadratic positivity under a PSD tail:
+    If M has strictly positive quadratic form on non-zero v, and R is positive semidefinite,
+    then M + R has strictly positive quadratic form on non-zero v. -/
+theorem real_quadratic_form_add_psd_tail {r : Type*} [Fintype r]
+    (M R : Matrix r r ℝ) (v : r → ℝ)
+    (hM : 0 < realQuadraticForm M v)
+    (hR : 0 ≤ realQuadraticForm R v) :
+    0 < realQuadraticForm (M + R) v := by
+  rw [realQuadraticForm_add]
+  linarith
+
+/-- Complex quadratic form of M + R is strictly positive when M is strictly positive and R is PSD. -/
+theorem complex_quadratic_form_add_psd_tail {r : Type*} [Fintype r]
+    (M R : Matrix r r ℝ)
+    (hM_symm : ∀ i j, M i j = M j i)
+    (hR_symm : ∀ i j, R i j = R j i)
+    (c : r → ℂ)
+    (hM_re : 0 < realPartComplexQuadraticForm M c)
+    (hR_re : 0 ≤ realPartComplexQuadraticForm R c) :
+    imagPartComplexQuadraticForm (M + R) c = 0 ∧
+    0 < realPartComplexQuadraticForm (M + R) c := by
+  have hMR_symm : ∀ i j, (M + R) i j = (M + R) j i := by
+    intro i j
+    simp_rw [Matrix.add_apply, hM_symm i j, hR_symm i j]
+  constructor
+  · exact real_symmetric_matrix_imag_part_zero (M + R) hMR_symm c
+  · dsimp [realPartComplexQuadraticForm] at hM_re hR_re ⊢
+    rw [realQuadraticForm_add, realQuadraticForm_add]
+    linarith
+
+
+/-- Complete matrix positivity under prime perturbation:
+    For W = W_arch - W_prime, if W_arch has quadratic form bounded below by lambda_min > 0,
+    and W_prime has quadratic form bounded above by eps < lambda_min,
+    then W has strictly positive quadratic form. -/
+theorem real_quadratic_form_prime_perturbation {r : Type*} [Fintype r]
+    (W_arch W_prime : Matrix r r ℝ) (v : r → ℝ)
+    (lambda_min eps : ℝ)
+    (h_arch : lambda_min ≤ realQuadraticForm W_arch v)
+    (h_prime : realQuadraticForm W_prime v ≤ eps)
+    (h_gap : eps < lambda_min) :
+    0 < realQuadraticForm (W_arch - W_prime) v := by
+  rw [realQuadraticForm_sub]
+  linarith
+
 end RiemannScope
+
+

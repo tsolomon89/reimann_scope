@@ -3190,9 +3190,15 @@ def test_epic_small_bandwidth_archimedean_asymptotic():
     assert coupling_ratios[-1] < coupling_ratios[0]
     assert coupling_ratios[-1] < 0.005
 
-    # Incompatibility verdict
+    # Incompatibility verdict & rectified conditional logic
     incomp = res['incompatibility_obstruction_analysis']
     assert incomp['incompatibility_verdict'] == 'POSITIVITY_AND_OFFLINE_DETECTION_INCOMPATIBLE_ON_SAME_FAMILY'
+
+    cond_logic = res['conditional_detection_logic']
+    assert 'Every g in F satisfies B(g, g) >= 0' in cond_logic['definitions']['P_F']
+    assert 'Together P_F and D_F imply not H' in cond_logic['logical_relations']['intended_rh_contradiction']
+    assert 'does NOT imply not D_F' in cond_logic['logical_relations']['no_refutation_of_conditional_detection']
+    assert cond_logic['detection_implication_status'].startswith('STRICTLY_OPEN')
     assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
 
 
@@ -3220,3 +3226,182 @@ def test_epic_connes_consani_positivity_criterion_and_obligations():
     ob2 = res['two_separated_obligations']['obligation_2_offline_zero_detection']
     assert 'Derive positivity' in ob1
     assert 'Prove that under H(rho_0)' in ob2
+
+
+def test_epic_reproduce_cutoff_discrepancy():
+    """
+    Verify reproduction of the cutoff discrepancy between t <= 600 and t <= 16000:
+    1. Truncating at t = 600 (z = 12) yields W00 ~= 5.286e11, W01 ~= 1.956e10, W11 ~= 1.751e10.
+    2. Extending to t = 16000 (z = 320) yields W00 ~= 1.032e12, W01 ~= 2.723e10, W11 ~= 3.402e10.
+    3. Canonical constants match high-precision values: Z ~= 0.44399, ||kappa''||^2 ~= 54.95987.
+    4. Confirms diagnostic: bump kernel has Gevrey-regular slow sub-exponential decay;
+       stopping at z = 12 omits roughly 48.8% of diagonal Archimedean energy.
+    """
+    res = transcendental.reproduce_cutoff_discrepancy(h=0.02, grades=[0, 1], window=(8.0, 20.0))
+    assert res['status'] == 'CUTOFF_DISCREPANCY_REPRODUCED'
+
+    consts = res['canonical_constants']
+    assert abs(consts['Z_canonical'] - 0.443993816) < 1e-6
+    assert abs(consts['norm_kappa_pp_sq'] - 54.959873) < 1e-4
+    assert abs(consts['norm_kappa_p_sq'] - 2.077745) < 1e-4
+    assert abs(consts['norm_kappa_sq'] - 0.675116) < 1e-4
+
+    r600 = res['quadrature_ranges']['cutoff_t_600']
+    assert abs(r600['W00'] - 5.286380e11) / 5.286380e11 < 1e-3
+    assert abs(r600['W01'] - 1.955673e10) / 1.955673e10 < 1e-3
+    assert abs(r600['W11'] - 1.750710e10) / 1.750710e10 < 1e-3
+
+    r16000 = res['quadrature_ranges']['cutoff_t_16000']
+    assert abs(r16000['W00'] - 1.032430e12) / 1.032430e12 < 1e-3
+    assert abs(r16000['W01'] - 2.722763e10) / 2.722763e10 < 1e-3
+    assert abs(r16000['W11'] - 3.401611e10) / 3.401611e10 < 1e-3
+
+
+def test_epic_certify_archimedean_tail_psd():
+    """
+    Verify Archimedean PSD Tail Certification (Full-Sign vs Full-Value):
+    1. NIST DLMF 5.7.6 digamma monotonicity: d/dy Re digamma(1/4 + iy) > 0 for y > 0.
+    2. Lower bound at cutoff: omega(t) >= omega(10) > 0.464 > 0 for all t >= 10.
+    3. Integrand is PSD rank-1 at every t, so tail matrix R_T is guaranteed PSD (R_T >= 0).
+    4. Full-sign certified: lambda_min(W_arch) >= lambda_min(M_T) > 0.
+    5. Full-value status: unenclosed at t = 600, certified on extended range z >= 320.
+    """
+    res = transcendental.certify_archimedean_tail_psd(t_cutoff=600.0, h=0.02)
+    assert res['status'] == 'ARCHIMEDEAN_TAIL_PSD_CERTIFIED'
+
+    dlmf = res['digamma_series_nist_dlmf_5_7_6']
+    assert dlmf['monotonicity_proved'] is True
+    assert dlmf['omega_positive_for_all_t_ge_T'] is True
+    assert dlmf['omega_lower_bound_at_T'] > 4.5
+
+    tail = res['tail_matrix_psd']
+    assert tail['integrand_is_psd'] is True
+    assert tail['R_T_is_psd'] is True
+
+    sign_cert = res['full_sign_certificate']
+    assert sign_cert['certified'] is True
+    assert sign_cert['lambda_min_lower_bound'] > 1.6e10
+    assert sign_cert['complete_W_positive_definite'] is True
+
+    val_cert = res['full_value_certificate']
+    assert val_cert['certified'] is False
+    assert val_cert['status'] == 'UNENCLOSED_TAIL_AT_CUTOFF'
+
+
+def test_epic_surviving_prime_bound_and_counterexample():
+    """
+    Verify Surviving Prime Terms and Mandatory Counterexample Control:
+    1. Scaling identity: ||psi_h||_2^2 = h^-5 ||kappa''||^2 + (1/2)h^-3 ||kappa'||^2 + (1/16)h^-1 ||kappa||^2.
+    2. Bound: ||W_prime(C, h)||_op <= C_prime(C, h0) * h^-5.
+    3. Mandatory counterexample control: window [7, 17] has active stations 8 and 16 in grade 0;
+       their ratio is 16/8 = 2, an exact prime power (q = 2).
+       The term C_h(0) = ||psi_h||_2^2 > 0 survives for ALL h > 0!
+    4. Asymptotic dominance: W_prime / W_arch -> 0 as h -> 0 due to log(1/h) divergence.
+    """
+    res = transcendental.compute_surviving_prime_bound(grades=[0, 1], window=(7.0, 17.0), h=0.02)
+    assert res['status'] == 'SURVIVING_PRIME_BOUND_COMPUTED'
+
+    assert 'h^-5' in res['scaling_identity']
+    assert res['c_psi_h0'] > 56.0
+    assert res['C_prime_bound'] > 0.0
+
+    ce = res['mandatory_counterexample_control']
+    assert ce['resonant_stations'] == [8, 16]
+    assert ce['prime_power_q'] == 2
+    assert ce['evaluates_C_h_at_zero'] is True
+    assert ce['survives_for_all_h'] is True
+
+    assert len(res['exact_resonances_found']) >= 1
+    exact_q2 = [r for r in res['exact_resonances_found'] if r['q'] == 2]
+    assert len(exact_q2) >= 1
+
+    dom = res['asymptotic_dominance']
+    assert dom['limit_as_h_to_zero'] == 0.0
+    assert dom['archimedean_dominance_holds'] is True
+
+
+def test_epic_local_positivity_threshold_and_complex_form():
+    """
+    Verify Eventual Positivity Threshold and Complex Coefficient Positivity:
+    1. Computes genuine positive threshold h_pos(C) > 0 for active configurations.
+    2. Positivity holds for arbitrary complex vectors:
+       c^* W c = (Re c)^T W (Re c) + (Im c)^T W (Im c) >= lambda_min(W) ||c||^2 > 0.
+    3. Empty configurations handled with zero rows/cols.
+    """
+    res = transcendental.compute_local_positivity_threshold(grades=[0, 1], window=(8.0, 20.0))
+    assert res['status'] == 'LOCAL_POSITIVITY_THRESHOLD_COMPUTED'
+    assert res['h_pos_threshold'] > 0.0
+    assert res['d_min_active'] > 0.0
+
+    thm = res['eventual_positivity_theorem']
+    assert thm['complex_coefficients_covered'] is True
+    assert 'c^* W c = (Re c)^T W (Re c) + (Im c)^T W (Im c)' in thm['complex_identity']
+
+
+def test_epic_conditional_detection_investigation():
+    """
+    Verify Substantive Conditional Detection Investigation (D_F Obligation):
+    1. Classical Connes-Consani (2020) Prop C.1 import: not RH ==> exists g_0 in V with B(g_0, g_0) < 0.
+    2. Sobolev H^1 continuity bound controls quadratic form error on compact support.
+    3. Scoped obstruction: small-bandwidth bump combinations in F_pos cannot approximate g_0
+       within eta-tolerance because B(f_n, f_n) > 0 while B(g_0, g_0) = -eta < 0.
+    4. Crucial conditional logic: failure of this approximation scheme closes the scheme,
+       NOT the conditional proposition D_F: H ==> E_F.
+    5. Epistemic status: D_F is strictly OPEN (RH-strength obligation under P_F).
+    """
+    res = transcendental.investigate_conditional_detection_implication(grades=[0, 1], window=(8.0, 20.0))
+    assert res['status'] == 'CONDITIONAL_DETECTION_IMPLICATION_INVESTIGATED'
+
+    classic = res['classical_consequence_under_H']
+    assert 'Connes & Consani' in classic['citation']
+    assert 'Proposition C.1' in classic['citation']
+
+    approx = res['attempted_tc_approximation_analysis']
+    assert approx['scoped_result'] == 'CLOSES_LOCALIZED_SMALL_BANDWIDTH_APPROXIMATION_SCHEME'
+    assert len(approx['structural_constraints']) >= 3
+
+    clarif = res['conditional_logic_clarification']
+    assert 'Together P_F and D_F imply not H' in clarif['intended_contradiction']
+    assert 'does NOT refute D_F' in clarif['non_refutation']
+    assert clarif['status_of_D_F'] == 'STRICTLY_OPEN'
+    assert res['transcendental_continuation_bridge_status'] == 'STRICTLY_OPEN'
+
+
+def test_epic_two_variable_synthesis_milestone_10():
+    """
+    Verify full epic synthesis with Milestone 10 integration:
+    1. All 10 milestones present.
+    2. Total Lean 4 compiled theorems >= 263.
+    3. Six new Lean 4 theorems included in new_theorems.
+    4. Epistemic classifications reflect corrected conditional logic, full-sign PSD tail certificate,
+       cutoff reproduction, surviving prime bound, and open conditional detection.
+    """
+    res = transcendental.audit_tc_epic_two_variable_synthesis()
+    assert 'milestone_10_cutoff_reproduction' in res
+    assert 'milestone_10_tail_psd_certification' in res
+    assert 'milestone_10_surviving_prime_bound' in res
+    assert 'milestone_10_local_positivity_threshold' in res
+    assert 'milestone_10_conditional_detection_investigation' in res
+
+    formal = res['formal_lean_theorems']
+    assert formal['total_compiled_theorems'] >= 263
+    for thm in [
+        'realQuadraticForm_add',
+        'realQuadraticForm_sub',
+        'positivity_and_conditional_detection_imply_no_offline_zero',
+        'real_quadratic_form_add_psd_tail',
+        'complex_quadratic_form_add_psd_tail',
+        'real_quadratic_form_prime_perturbation'
+    ]:
+        assert thm in formal['new_theorems']
+
+    ep = res['epistemic_classification']
+    assert 'PROVED' in ep['conditional_logic_rectification']
+    assert 'REPRODUCED' in ep['cutoff_discrepancy']
+    assert 'CERTIFIED' in ep['archimedean_tail_psd']
+    assert 'CERTIFIED' in ep['full_sign_certificate']
+    assert 'BOUNDED' in ep['surviving_prime_bound']
+    assert 'PROVED' in ep['local_positivity_theorem']
+    assert 'OPEN' in ep['conditional_detection_implication']
+    assert ep['transcendental_continuation_bridge'] == 'STRICTLY OPEN'
+

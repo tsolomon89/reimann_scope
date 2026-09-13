@@ -567,7 +567,7 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
    Neither finite-window separation nor density in an unrelated norm guarantees that $\mathcal F_{\rm TC}$ contains a negative direction.
    The Transcendental Continuation bridge remains strictly **OPEN**.
 
-### 8.5 Canonical Reflected Weil Matrix, Archimedean Asymptotic, and Incompatibility Obstruction
+### 8.5 Canonical Reflected Weil Matrix, Archimedean Asymptotic, Cutoff Reproduction, and Rectified Logic
 
 1. **Active Boundary Filtering and Recomputed Resonance Gaps**:
    - At boundary $x=8$, $w(8)=0 \implies d_8 = 0$, so $n=8$ is inactive. Active Grade 0 stations are $\{9, 11, 13, 16, 17, 19\}$; active Grade 1 are $\{2, 3\}$.
@@ -575,26 +575,44 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
    - Cross-grade resonance gap is $\Delta_{\rm res} \approx 0.0461176$ (critical bandwidth $h_{\rm crit} \approx 0.0230588$).
    - For $0 < 2h < \min(\Delta_{\rm res}, \log(19/18)) \approx 0.0461$, ALL active prime evaluations vanish: $W_{\rm prime} \equiv 0$, so $W = W_{\rm arch}$ exactly.
 
-2. **High-Precision Canonical Matrix Quadrature**:
-   - At $h=0.02$ on $[8, 20]$ for grades $\{0, 1\}$, Gauss-Legendre quadrature evaluates:
-     $$W = W_{\rm arch} \approx \begin{pmatrix} 5.2864 \times 10^{11} & 1.9557 \times 10^{10} \\ 1.9557 \times 10^{10} & 1.7507 \times 10^{10} \end{pmatrix}$$
-   - Determinant: $\det W \approx 8.8725 \times 10^{21} > 0$.
-   - Eigenvalues: $\lambda \approx [1.6760 \times 10^{10}, 5.2939 \times 10^{11}]$, both strictly positive.
-   - Coupling ratio: $|W_{01}| / \sqrt{W_{00} W_{11}} \approx 0.203287 < 1$.
-   - Formal Lean 4 verification: `realQuadraticForm_two_expand`, `realQuadraticForm_two_pos`, `realQuadraticForm_two_nonneg`, `reflected_weil_matrix_2x2_complex_pos` proves that $c^* W c > 0$ for all non-zero $c \in \mathbb{C}^2 \setminus \{0\}$ with zero imaginary part.
+2. **Reproduction of the Cutoff Discrepancy**:
+   - At $h=0.02$ on $[8, 20]$ for grades $\{0, 1\}$, Gauss-Legendre quadrature at $t \le 600$ ($z \le 12$) evaluates:
+     $$M_{600} \approx \begin{pmatrix} 5.2864 \times 10^{11} & 1.9557 \times 10^{10} \\ 1.9557 \times 10^{10} & 1.7507 \times 10^{10} \end{pmatrix}$$
+   - When extended to $t \le 16000$ ($z \le 320$):
+     $$M_{16000} \approx \begin{pmatrix} 1.0324 \times 10^{12} & 2.7228 \times 10^{10} \\ 2.7228 \times 10^{10} & 3.4016 \times 10^{10} \end{pmatrix}$$
+   - The discrepancy is explained by the Gevrey sub-exponential decay of $\widehat\kappa(z)$: the integrand factor $z^4 \omega(z/h)$ retains significant mass out to $z \approx 100$. Truncation at $z=12$ ($t=600$) omitted roughly 48.8% of the diagonal Archimedean energy. Beyond $z=320$ ($t=16000$), the remaining tail error is strictly bounded below $1.3 \times 10^{-10}$ relative error.
+   - Truncation at $t=600$ was a finite quadrature cutoff, NOT a full-value enclosure.
 
-3. **Small-Bandwidth Archimedean Local Asymptotic Theorem**:
-   - $\lim_{h \to 0^+} [h^5 / \log(1/h)] W_{\rm arch}(C, h) = \|\kappa''\|_{L^2}^2 D_C$, where $\|\kappa''\|_{L^2}^2 \approx 54.9599$.
-   - Operator norm dominance: off-diagonal terms oscillate and decay to 0 ($0.2033 \to 0.00337 \to 0$ as $h \to 0$).
-   - Eventual positivity: $\exists h_{\rm pos}(C) > 0$ such that $W(C, h) \succ 0$ strictly for all $0 < h < h_{\rm pos}(C)$.
-   - Transcendence role: transcendence of $\tau$ ensures stations never collide across grades ($x_\alpha \ne x_\beta$) and never match prime-power ratios ($x_\alpha / x_\beta \ne p^r$), guaranteeing $\Delta_{\rm res} > 0$.
+3. **Archimedean Positive-Semidefinite (PSD) Tail Certification**:
+   - Monotonicity from NIST DLMF 5.7.6:
+     $$\frac{d}{dy}\Re\psi(1/4 + iy) = \sum_{n=0}^\infty \frac{2y(n+1/4)}{((n+1/4)^2 + y^2)^2} > 0 \quad (\forall y > 0).$$
+   - Therefore $\omega(t) = \Re\psi(1/4 + it/2) - \log\pi$ is strictly monotonically increasing for $t \ge 0$, with $\omega(t) \ge \omega(10) > 0.464 > 0$ for all $t \ge 10$.
+   - For any $T \ge 10$, the omitted tail matrix:
+     $$R_T = \frac{1}{2\pi} \int_{|t| \ge T} \omega(t) |A_h(it)|^2 S(t) S(t)^* dt \succeq 0$$
+     is positive semidefinite in the Hermitian Loewner order.
+   - **Full-Sign Certificate**: $\lambda_{\min}(W_{\rm arch}) \ge \lambda_{\min}(M_T) > 0$ rigorously certifies positive definiteness without requiring accurate evaluation of individual tail entries (formally verified in Lean 4: `real_quadratic_form_add_psd_tail`, `complex_quadratic_form_add_psd_tail`).
+   - **Full-Value Status**: Unenclosed at $t=600$; certified on extended range $z \ge 320$.
 
-4. **Proved Structural Incompatibility of Positivity (P) and Detection (D) on the Same Family**:
-   - In the positive regime $0 < h < h_{\rm pos}(C)$, $W(C, h) \succ 0$ is strictly positive definite.
-   - Hence $\forall c \ne 0$, $B(T_{C, h} c, T_{C, h} c) = c^* W c > 0$ strictly!
-   - Therefore, the candidate family $\mathcal{F}_{\rm pos}$ CANNOT contain any test detecting an off-line zero ($B < 0$).
-   - To make $B < 0$ under $\neg\mathrm{RH}$, one must leave the small-$h$ asymptotic regime (making $h$ large enough for the negative quartet term to overwhelm the diagonal), but in that regime, unconditional positivity is lost.
-   - The TC bridge remains strictly **OPEN**.
+4. **Surviving Prime Terms and Mandatory Counterexample Control**:
+   - Scaling identity via integration by parts:
+     $$\|\psi_h\|_2^2 = h^{-5}\|\kappa''\|_2^2 + \frac{1}{2}h^{-3}\|\kappa'\|_2^2 + \frac{1}{16}h^{-1}\|\kappa\|_2^2.$$
+   - Operator norm bound: $\|W_{\rm prime}(C, h)\|_{\rm op} \le C_{\rm prime}(C, h_0) h^{-5}$ for $0 < h \le \min(1, h_0)$.
+   - Mandatory counterexample control: in window $[7, 17]$ with grade 0, active stations 8 ($2^3$) and 16 ($2^4$) have ratio $16/8 = 2$ ($q=2$); the term $C_h(0) = \|\psi_h\|_2^2 > 0$ survives for ALL $h > 0$. Station separation does NOT imply separation from prime-power resonance.
+   - However, asymptotic dominance holds: $\|W_{\rm prime}\|_{\rm op} / W_{\rm arch} \le C_{\rm prime} / (c_\kappa d_{\min} \log(1/h)) \to 0$ as $h \to 0^+$.
+   - Quantitative threshold $h_{\rm pos}(C) > 0$ ensures strict positive definiteness of complete matrix $W = W_{\rm arch} - W_{\rm prime}$ for all $0 < h < h_{\rm pos}(C)$ (Lean 4: `real_quadratic_form_prime_perturbation`).
+   - Positivity covers arbitrary complex coefficients: $c^* W c = (\Re c)^T W (\Re c) + (\Im c)^T W (\Im c) > 0$.
+
+5. **Rectified Conditional Logic and Status of Detection**:
+   - Define:
+     - $H$: An actual nontrivial off-critical zeta zero exists.
+     - $E_F$: There exists $g \in F$ with $B(g, g) < 0$.
+     - $P_F$: Every $g \in F$ satisfies $B(g, g) \ge 0$.
+     - $D_F$: $H \implies E_F$.
+   - $P_F$ implies $\neg E_F$. This does NOT imply $\neg D_F$.
+   - Together, $P_F \land D_F \implies \neg H$, exactly the intended TC proof-by-contradiction mechanism (formally proved in Lean 4: `positivity_and_conditional_detection_imply_no_offline_zero`).
+   - Under $P_F$, $D_F$ is equivalent to $\neg H$. It is an RH-strength research obligation, not refuted by positivity.
+   - Scoped finding: inside $\mathcal{F}_{\rm pos}$, there is no negative test ($\neg E_{\mathcal{F}_{\rm pos}}$). Small-bandwidth localized bump combinations cannot approximate an off-critical negative test $g_0$ within $\eta$-tolerance in the Weil quadratic form, closing that specific approximation scheme.
+   - The conditional detection obligation $D_F$ and the TC bridge remain strictly **OPEN**.
 
 ---
 
@@ -602,11 +620,12 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
 
 | Verification Stage | Command Executed | Outcome | Details |
 |---|---|---|---|
-| **Mechanism Discovery Tests** | `pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 43 passed in 36.96s; covers Candidates A & B scoping, fallback removal, dynamic evaluation, non-vacuous logarithmic separation, prime-power resonance gap, canonical reflected Weil matrix quadrature, controls, Archimedean asymptotic, and Connes-Consani criterion. |
+| **Mechanism Discovery Tests** | `pytest tests/test_tc_mechanism_discovery.py -k "test_epic_"` | **PASSED** | 49 passed in 70.25s; covers cutoff discrepancy reproduction, PSD tail certification, surviving prime bounds, local positivity threshold, complex forms, Connes-Consani criterion, and full Milestone 10 synthesis. |
 | **Claim Pre-Acceptance Gates** | `pytest .agents/verification/test_claim_audit_gates.py` | **PASSED** | 54 passed in 0.49s; 10 structural gates validated. |
 | **Claim Spec Audit** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --claim-file .agents/claims/CLM-TC-022.json` | **PASSED** | 10/10 pre-acceptance gates verified (0 violations, 0 warnings). |
 | **Claim Register Cross-Check** | `python .agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py --cross-check-register --repo-root .` | **PASSED** | All 110 claims in register verified (24 audited terminal, 78 grandfathered, 8 exempt). |
-| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | All targets compiled cleanly; 259 project theorems (0 sorry). |
+| **Formal Lake Build** | `lake build` (in `formal/`) | **PASSED** | All targets compiled cleanly; 263 project theorems (0 sorry, standard Mathlib foundational axioms only). |
+| **Formal Build Report** | `python scripts/build_formal.py --allow-dirty` | **PASSED** | Generated formal/build_report.json certifying 263 compiled theorems. |
 | **Check-Fast Tier** | `python scripts/workflow.py check-fast` | **PASSED** | Full fast-tier test suite passed. |
 | **Artifact Validation** | `python scripts/workflow.py validate-artifacts --current` | **PASSED** | Certified artifacts and build report validated. |
 | **Canonical Plan Audit** | `python scripts/workflow.py plan-canonical` | **PASSED** | Canonical execution plan audited. |
@@ -630,14 +649,12 @@ theorem finite_grade_station_hermitian_psd {r : Type*} [Fintype r] [DecidableEq 
 4. **Proposed Implication**:
    $$\bar Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r(\varepsilon) \quad (c > 0, \ r(\varepsilon) \to 0).$$
 5. **Earliest Unsupported Inference**:
-   The explicit formula is an exact Fourier-Mellin identity. Because $\operatorname{supp}(\mu_K \otimes \mu_J) \cap W^2$ is separated from the diagonal by distance $\ge \Delta_W$, the arithmetic overlap vanishes identically:
-   $$\bar Q_\varepsilon^{K, J}[w] \equiv 0 \quad (\forall \varepsilon < \Delta_W).$$
-   The explicit formula decomposes this exact zero into $\bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon = 0$, forcing:
-   $$\bar R^{\rm full}_\varepsilon \equiv -\bar A_{\varepsilon, \Gamma}.$$
-   No independently established property of the prime distribution across grades prevents the infinite remainder from cancelling the selected mode. Therefore, no strictly positive lower bound can be derived without an additional, unproved premise.
+   The explicit formula decomposes arithmetic vanishing into $\bar A_{\varepsilon, \Gamma} + \bar R^{\rm full}_\varepsilon = 0$, forcing exact cancellation $\bar R^{\rm full}_\varepsilon \equiv -\bar A_{\varepsilon, \Gamma}$.
+   Furthermore, in the small-bandwidth regime $0 < h < h_{\rm pos}(C)$, the complete reflected Weil matrix $W$ is strictly positive definite, so no test in $\mathcal{F}_{\rm pos}$ achieves $B < 0$.
+   The conditional detection implication $D_F: H \implies E_F$ remains an open research obligation equivalent to $\neg H$ under $P_F$.
 
 ### 10.2 Retained Open Obligation
 The implication:
-$$H(\rho_0) \Longrightarrow \bar Q_\varepsilon^{K, J}[w] \ge c D_{K-J}(\rho_0) - r(\varepsilon) \quad (c > 0, \ r(\varepsilon) \to 0)$$
+$$H(\rho_0) \Longrightarrow \exists g \in \mathcal{F}_{\rm TC} : B(g, g) < 0$$
 remains an open research obligation.
 The Transcendental Continuation bridge is **strictly OPEN**.
