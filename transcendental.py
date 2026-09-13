@@ -8130,8 +8130,8 @@ Z_CANONICAL_KERNEL = 0.4439938161680794378  # int_{-1}^1 exp(-1 / (1 - u^2)) du
 
 # Gauss-Legendre quadrature weights and nodes for Fourier transform of bump kernel
 _N_GL_KAPPA = 64
-_y_gl_raw, _w_gl_raw = np.polynomial.legendre.leggauss(_N_GL_KAPPA) if NUMPY_AVAILABLE else (None, None)
-if NUMPY_AVAILABLE:
+if NUMPY_AVAILABLE and np is not None:
+    _y_gl_raw, _w_gl_raw = np.polynomial.legendre.leggauss(_N_GL_KAPPA)
     _y_gl = 0.5 * (_y_gl_raw + 1.0)
     _w_gl = 0.5 * _w_gl_raw
     _f_gl = np.zeros(_N_GL_KAPPA)
@@ -8140,6 +8140,8 @@ if NUMPY_AVAILABLE:
         if _yk < 1.0:
             _f_gl[_i] = math.exp(-1.0 / (1.0 - _yk**2)) / Z_CANONICAL_KERNEL * _w_gl[_i]
 else:
+    _y_gl_raw = None
+    _w_gl_raw = None
     _y_gl = None
     _w_gl = None
     _f_gl = None
@@ -8148,12 +8150,12 @@ else:
 def kappa_hat_fast(xi: float) -> float:
     """Evaluate Fourier transform of canonical bump kappa(u) at frequency xi."""
     abs_xi = abs(float(xi))
-    if not NUMPY_AVAILABLE:
+    if not NUMPY_AVAILABLE or np is None:
         return float(2.0 * mpmath.quad(
             lambda y: mpmath.exp(-1.0 / (1.0 - y**2)) / Z_CANONICAL_KERNEL * mpmath.cos(xi * y),
             [0, 1]
         ))
-    if abs_xi <= 15.0 and _f_gl is not None:
+    if abs_xi <= 15.0 and _f_gl is not None and _y_gl is not None:
         return float(2.0 * np.sum(_f_gl * np.cos(xi * _y_gl)))
     # For higher frequencies, scale quadrature nodes proportionally with oscillation frequency
     n_nodes = max(64, min(1024, int(4 * abs_xi)))
@@ -8195,7 +8197,7 @@ class ArchimedeanKernelEvaluator:
             self.N_t = max(600, int(50 * self.z_max))
         else:
             self.N_t = int(N_t)
-        if NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE and np is not None:
             nodes_t, weights_t = np.polynomial.legendre.leggauss(self.N_t)
             self.nodes_t = 0.5 * self.t_max * (nodes_t + 1.0)
             self.weights_t = 0.5 * self.t_max * weights_t
@@ -8354,10 +8356,15 @@ def compute_canonical_reflected_weil_matrix(
         else:
             verdict = 'INCONCLUSIVE'
     else:
-        eigs_np = np.linalg.eigvalsh(np.array(W)) if NUMPY_AVAILABLE else [0.0] * r
-        eigs = [float(e) for e in eigs_np]
-        detW = float(np.prod(eigs_np)) if NUMPY_AVAILABLE else 0.0
-        trW = float(np.sum(eigs_np)) if NUMPY_AVAILABLE else 0.0
+        if NUMPY_AVAILABLE and np is not None:
+            eigs_np = np.linalg.eigvalsh(np.array(W))
+            eigs = [float(e) for e in eigs_np]
+            detW = float(np.prod(eigs_np))
+            trW = float(np.sum(eigs_np))
+        else:
+            eigs = [0.0] * r
+            detW = 0.0
+            trW = 0.0
         coupling_ratio = 0.0
         verdict = 'STRICTLY_POSITIVE_DEFINITE' if eigs[0] > 1e-6 else 'INCONCLUSIVE'
 
@@ -9409,7 +9416,7 @@ def reproduce_cutoff_discrepancy(
                 active.append({'n': n_val, 'x': x_val, 't': math.log(x_val), 'd': d_val})
         stations_by_grade[K] = active
 
-    if not NUMPY_AVAILABLE:
+    if not NUMPY_AVAILABLE or np is None:
         return {
             'status': 'CUTOFF_DISCREPANCY_REPRODUCED',
             'classification': 'NUMERICAL_EVIDENCE_ONLY',
