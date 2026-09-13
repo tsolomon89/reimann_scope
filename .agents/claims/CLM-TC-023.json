@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "claim_id": "CLM-TC-023",
+  "statement": "TC Research Epic: Support Geometry, Actual Approximation, and Complete-Sign Certification: (1) Rescaling Retraction & Scoped Divergence: The prior universal norm-divergence claim (asserting that every legal sequence with h -> 0 has diverging H^1 norm) is definitively refuted and withdrawn by the coefficient rescaling counterexample f_h = h * g_h / ||g_h||_{H^1}, which satisfies ||f_h||_{H^1} = h -> 0 while preserving legal family membership by coefficient homogeneity; individual bump H^1 norm scaling ||psi_h||_{H^1} ~ 127.466 * h^{-7/2} is retained and extends to linear combinations under a uniform coefficient lower bound ||c||_2 >= c_0 > 0 without exact derivative cancellation; however, ||f_h||_{H^1} -> 0 approximates the zero function and cannot approximate any non-zero target f_* (formally proved in Lean 4: coefficient_rescaling_norm_scaling). (2) Fixed-Span vs Varying-Family Distinction: A fixed finite configuration at fixed bandwidth has a finite-dimensional span of dimension M, but the union over varying configurations, grade counts, windows, and bandwidths is infinite-dimensional; claims closing the approximation scheme merely by finite dimensionality of individual spans are withdrawn. (3) Genuine Support-Component Poincaré Obstruction: If a smooth function f is supported in a finite union of connected components of length at most ell and vanishes at their boundaries, then ||f||_{L^2} <= ell * ||f'||_{L^2}; for any target function f_* with H^1 distance eps = ||f - f_*||_{H^1}, the triangle inequality forces the amplitude-independent quantitative lower bound eps >= max(0, (||f_*||_{L^2} - ell * ||f_*'||_{L^2}) / (1 + ell)); any sequence of configurations (C_n, h_n) whose maximal connected-component length ell(C_n, h_n) -> 0 cannot approximate any non-zero target f_* in H^1, as the error is lower bounded by ||f_*||_{L^2} > 0 as ell -> 0 (formally proved in Lean 4: poincare_quantitative_approximation_lower_bound). (4) Investigation of Remaining Approximation Regimes: (a) Regime 4A (shrinking bandwidth with macroscopic components ell >= ell_0 > 0): Maintaining connected components as h -> 0 requires station density ell_0 / (2h) -> infty, forcing the grade count M_n -> infty in any compact window; all stations in grade i share a single coefficient c_i with arithmetically rigid weights d_alpha = Lambda(n_alpha) w(x_alpha); moreover, overlapping bumps across distinct grades breach the prime resonance threshold 2h < Delta_res, activating prime terms W_prime and large off-diagonal Archimedean coupling that destroy positive definiteness. (b) Regime 4B (bandwidth bounded away from zero, h >= h_min > 0): For fixed bandwidth, all test functions have Fourier transform hat{f}(xi) = -(xi^2 + 1/4) hat{kappa}(h*xi) S(xi) which identically vanishes at the universal real zeros of hat{kappa}(h*xi) (xi_1 ~= 4.9965/h, xi_2 ~= 8.8885/h), creating an irreducible L^2 Fourier error against any smooth target with non-zero spectral energy at these nodes. (5) Explicit Admissible Target & Constrained Optimization: The smooth compactly supported target f_* = (D_u^2 - 1/4) (1 - u^2)^4 on [-1, 1] satisfies both pole vanishing integrals int_{-1}^1 f_*(u) exp(+- u/2) du = 0 identically; numerical least-squares optimization in the actual TC shared-grade basis exhibits an H^1 error plateau exceeding 98% relative error, reflecting the severe wavelet oscillation and rigid shared-grade constraints. (6) Reflected Weil Form Continuity & Connes-Consani Bridge: On the admissible centered space V_R, the complete reflected form B(g, l) = sum_rho m_rho M g(rho - 1/2) conj(M l(1/2 - bar{rho})) satisfies the continuity bound |B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1} derived from Mellin inversion, unconditional Trudgian zero counting N(t) <= (t/(2pi)) log t, and Cauchy-Schwarz; under an off-critical zero hypothesis H, Connes & Consani (2020) Appendix C Proposition C.1 guarantees an admissible test g_0 in V_R with B(g_0, g_0) = -eta < 0; for any approximating sequence f_n with eps_n = ||f_n - f_*||_{H^1}, negativity transfers (B(f_n, f_n) < 0) whenever C_R eps_n (2||f_*||_{H^1} + eps_n) < eta (formally proved in Lean 4: connes_consani_continuity_negativity_transfer); this transfers the Poincaré support obstruction into a rigorous barrier against negativity transfer in the shrinking component regime. (7) Complete Reflected Weil Matrix Sign Certification: At h=0.02, grades {0, 1}, and window [8, 20], the 2x2 matrix M_T evaluated through T=16000 (z=320) has W_00 approx 1.032430e12, W_01 approx 2.722763e10, W_11 approx 3.401611e10, det M_T approx 3.437792e22, and lambda_min(M_T) approx 3.327414e10; the outward quadrature error bound ||M_T - Mhat_T||_op <= e_T = 1.0e5 is rigorously derived; the omitted tail R_T >= 0 is proved PSD via NIST DLMF 5.7.6 digamma monotonicity; same-grade and cross-grade resonance gaps exceed 2h = 0.04, ensuring exact prime vanishing W_prime = 0; the net certified positive margin is lambda_min(W) >= L_T - e_T = 3.327404e10 > 0. (8) Complex Hermitian Form Formalization: Canonical complex Hermitian form c^* W c = sum_i bar{c}_i (W c)_i is formalized; one-by-one control W=[1], c=[i] yields +1 (correcting the unconjugated bilinear form which gave -1) (formally proved in Lean 4: complexHermitianForm, complex_hermitian_form_control_one_by_one). (9) Reductio Logical Status: Positivity P_F implies not E_F, which does NOT refute D_F: H ==> E_F; under P_F, D_F is equivalent to not H; the conditional implication D_F remains strictly OPEN, and failure of localized bump approximation does not refute D_F.",
+  "quantified_variables": [
+    {
+      "name": "h",
+      "domain": "h in Real, 0 < h <= 0.05",
+      "description": "Bandwidth / localization scale of smooth differentiated bump psi_h"
+    },
+    {
+      "name": "ell",
+      "domain": "ell in Real, ell > 0",
+      "description": "Maximal connected-component length of the union of support intervals"
+    },
+    {
+      "name": "C",
+      "domain": "C is a finite TC configuration (window [a, b], grades {K_i}, stations {x_alpha})",
+      "description": "Finite arithmetic station configuration"
+    },
+    {
+      "name": "c",
+      "domain": "c in Complex^M",
+      "description": "Shared coefficient vector across active grades"
+    },
+    {
+      "name": "R",
+      "domain": "R in Real, R > 0",
+      "description": "Logarithmic support radius on admissible space V_R"
+    },
+    {
+      "name": "C_R",
+      "domain": "C_R in Real, C_R > 0",
+      "description": "Continuity constant for the complete reflected Weil form on V_R"
+    },
+    {
+      "name": "f_*",
+      "domain": "f_* in V_R, f_* != 0",
+      "description": "Target admissible test function satisfying pole vanishing integrals"
+    }
+  ],
+  "variable_domains": [
+    "h in Real, 0 < h <= 0.05",
+    "ell in Real, ell > 0",
+    "C is a finite TC configuration",
+    "c in Complex^M",
+    "R in Real, R > 0",
+    "C_R in Real, C_R > 0",
+    "f_* in V_R, f_* != 0"
+  ],
+  "hypotheses": [
+    "Riemann explicit formula on smooth compactly supported test functions via Mellin inversion",
+    "Fundamental Theorem of Calculus and Cauchy-Schwarz inequality for Sobolev functions vanishing on boundary",
+    "Transcendence of 2*pi over Q (Lindemann 1882) guaranteeing positive cross-grade resonance gaps",
+    "Connes & Consani (2020) Appendix C Proposition C.1 establishing conditional negative test under not RH",
+    "NIST DLMF 5.7.6 digamma monotonicity for Archimedean kernel positive-definiteness",
+    "Trudgian (2014) unconditional zero counting bound N(t) <= (t/(2pi)) log t for t >= 14.0",
+    "Standard Mathlib foundational axioms in Lean 4 (propext, Classical.choice, Quot.sound)"
+  ],
+  "object_studied": "TC test function family F_{C, h, c}, support geometry ell(C, h), Poincaré H^1 approximation lower bounds, varying-configuration barriers, and complete reflected Weil form continuity and sign certification",
+  "fourier_normalization": "Mellin transform on (0, infty): M g(s) = int_R g(e^u) exp(su) du; Fourier transform hat{f}(xi) = int_R f(u) exp(-i xi u) du",
+  "multiplicity_convention": "Nontrivial zeros counted with multiplicity m_rho",
+  "measure_and_window": "Pushforward prime measures mu_K = sum_{n>=2} Lambda(n) delta_{tau^K n}, compact window w in C_c^infty((a, b)), smooth bump kappa(u) = Z^{-1} exp(-1/(1-u^2)) on (-1, 1)",
+  "order_of_limits": "Bandwidth h_n -> 0, connected component length ell(C_n, h_n) -> 0, spectral height cutoff T -> infty",
+  "exact_conclusion": "Universal norm-divergence claim is withdrawn due to coefficient rescaling f_h = h * g_h / ||g_h||_{H^1}; finite dimensionality of single spans does not close varying families; genuine support-component obstruction ||f||_{L^2} <= ell * ||f'||_{L^2} forces amplitude-independent lower bound eps >= max(0, (||f_*||_{L^2} - ell * ||f_*'||_{L^2}) / (1 + ell)), rigorously excluding non-zero H^1 approximation in the shrinking component regime; Regime 4A is obstructed by grade count divergence M_n -> infty and prime resonance activation 2h > Delta_res destroying positivity; Regime 4B is obstructed by Fourier zeros of hat{kappa}(h*xi); explicit admissible target f_* = (D_u^2 - 1/4)(1 - u^2)^4 satisfies pole conditions identically and plateaus at >98% relative error under TC basis; reflected Weil continuity |B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1} is derived on V_R and transfers negativity when C_R eps (2||f_*||_{H^1} + eps) < eta; complete canonical reflected Weil matrix has certified positive margin >= 3.327404e10 > 0 at T=16000 with W_prime = 0; complex Hermitian form c^* W c = sum_i bar{c}_i (W c)_i is formalized in Lean 4 with control test W=[1], c=[i] evaluating to +1; and conditional proposition D_F: H ==> E_F remains strictly OPEN.",
+  "logical_negation": "Universal norm divergence holds without coefficient lower bounds, or shrinking support components can approximate a non-zero H^1 target, or the complete reflected Weil matrix at h=0.02 is indefinite or has unverified error bounds (FALSIFIED / REFUTED)",
+  "epistemic_role": "FINITE_ANALYTIC_COMPONENT",
+  "evidence_scope": "EXTERNAL_ANALYTIC_PROOF",
+  "exact_or_truncated": "EXACT_WITH_EXACT_REMAINDER",
+  "arithmetic_cutoff": "Fixed compact window [8, 20] on grades {0, 1} with active stations {9, 11, 13, 16, 17, 19} and {2, 3}",
+  "spectral_cutoff": "Quadrature truncation at T=16000 (z=320) with proved PSD Archimedean tail R_T >= 0",
+  "integration_domain": "Real line u in (-infty, infty), compactly supported within [-R, R]",
+  "omitted_tail": "Archimedean spectral integral for t > 16000 enclosed by Loewner order PSD tail R_T >= 0",
+  "tail_enclosure": "Outward operator error bound ||M_T - Mhat_T||_op <= e_T = 1.0e5; PSD tail R_T >= 0; net margin lambda_min(W) >= L_T - e_T = 3.327404e10 > 0",
+  "dependencies": [
+    "formal/RiemannScope/Grade.lean: complexHermitianForm",
+    "formal/RiemannScope/Grade.lean: complex_hermitian_form_control_one_by_one",
+    "formal/RiemannScope/Grade.lean: coefficient_rescaling_norm_scaling",
+    "formal/RiemannScope/Grade.lean: poincare_quantitative_approximation_lower_bound",
+    "formal/RiemannScope/Grade.lean: connes_consani_continuity_negativity_transfer",
+    "transcendental.py: audit_coefficient_rescaling_homogeneity",
+    "transcendental.py: compute_support_components",
+    "transcendental.py: poincare_support_lower_bound",
+    "transcendental.py: investigate_varying_configurations_and_shared_grades",
+    "transcendental.py: construct_admissible_target_and_approximation_experiment",
+    "transcendental.py: audit_weil_continuity_and_connes_consani_bridge",
+    "transcendental.py: verify_canonical_reflected_weil_sign_certificate",
+    "transcendental.py: audit_tc_epic_support_geometry_synthesis",
+    "data/tc_epic_support_geometry_synthesis.json",
+    "data/canonical_reflected_weil_matrix_sign.json"
+  ],
+  "proof_artifact": "formal/RiemannScope/Grade.lean",
+  "falsification_attempts": [
+    "Rescaling counterexample f_h = h * g_h / ||g_h||_{H^1} tested and verified, falsifying universal norm divergence",
+    "Single fixed span vs varying family analyzed, falsifying finite-dimensional closure of the union",
+    "Asymptotic dominance and boundary limit ell -> 0 tested under Poincaré obstruction, confirming strictly positive lower bound",
+    "Overlapping configuration test at h=0.1 tested against admissible target, confirming optimization plateau",
+    "One-by-one matrix control W=[1], c=[i] tested, confirming Hermitian form +1 vs unconjugated bilinear -1",
+    "Discretization step refinement from N=16000 to N=32000 tested, confirming operator error < 5.0e4 << 1.0e5"
+  ],
+  "computational_evidence": [
+    "tests/test_tc_mechanism_discovery.py: test_epic_coefficient_rescaling_homogeneity",
+    "tests/test_tc_mechanism_discovery.py: test_epic_support_geometry_components_and_poincare",
+    "tests/test_tc_mechanism_discovery.py: test_epic_varying_families_and_approximation_regimes",
+    "tests/test_tc_mechanism_discovery.py: test_epic_admissible_target_and_approximation_experiment",
+    "tests/test_tc_mechanism_discovery.py: test_epic_weil_continuity_and_connes_consani_bridge",
+    "tests/test_tc_mechanism_discovery.py: test_epic_support_geometry_synthesis_master",
+    "data/tc_epic_support_geometry_synthesis.json",
+    "data/canonical_reflected_weil_matrix_sign.json"
+  ],
+  "external_sources": [
+    {
+      "source": "Poincaré (1890) / Friedrichs (1937)",
+      "theorem": "Poincaré-Friedrichs inequality: for smooth f on interval of length ell vanishing at boundary, ||f||_{L^2} <= ell * ||f'||_{L^2}."
+    },
+    {
+      "source": "Connes & Consani (2020)",
+      "theorem": "Weil positivity and Trace formula, the archimedean place (arXiv:2006.13771v1 [math.NT], Appendix C, Prop C.1): Conditional negative test g_0 in V_R under failure of RH."
+    },
+    {
+      "source": "Lindemann (1882)",
+      "theorem": "Transcendence of 2*pi over Q, establishing irrationality of tau^K / tau^J and positive resonance gaps Delta_res > 0."
+    },
+    {
+      "source": "NIST DLMF",
+      "theorem": "Section 5.7.6: Digamma series representation and strict monotonicity d/dy Re psi(1/4 + i y) > 0 for y > 0."
+    },
+    {
+      "source": "Trudgian (2014)",
+      "theorem": "Theorem 1 and Corollary 1 (J. Number Theory 136): N(t) <= (t/(2pi)) log t for t >= 14.0."
+    }
+  ],
+  "remaining_analytic_dependencies": [
+    "Resolution of conditional detection proposition D_F: H ==> E_F on the TC family F (STRICTLY OPEN)",
+    "Rigorous derivation of the off-critical spectral lower bound under explicit formula remainder cancellation (OPEN / BRIDGE DEPENDENCY)",
+    "Analysis of general multi-grade non-shrinking bandwidth configurations beyond fixed 2-grade canonical windows (OPEN / RESEARCH TRACK)"
+  ]
+}

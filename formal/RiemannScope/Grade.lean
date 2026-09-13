@@ -2360,6 +2360,88 @@ theorem sobolev_reverse_triangle_lower_bound
   · linarith
   · linarith
 
+/-- Canonical Complex Hermitian Form for a complex matrix W and vector c:
+    c^* W c = ∑ i, starRingEnd ℂ (c i) * (Matrix.mulVec W c i). -/
+noncomputable def complexHermitianForm {r : Type*} [Fintype r]
+    (W : Matrix r r ℂ) (c : r → ℂ) : ℂ :=
+  ∑ i : r, starRingEnd ℂ (c i) * (Matrix.mulVec W c i)
+
+/-- Control Test: One-by-one matrix W = [1] with c = [I].
+    The Hermitian form evaluates to +1, whereas the unconjugated bilinear form evaluates to -1. -/
+theorem complex_hermitian_form_control_one_by_one :
+    let W : Matrix (Fin 1) (Fin 1) ℂ := fun _ _ => 1
+    let c : Fin 1 → ℂ := fun _ => Complex.I
+    complexHermitianForm W c = 1 ∧
+    (∑ i : Fin 1, c i * (Matrix.mulVec W c i)) = -1 := by
+  intro W c
+  have h_star : starRingEnd ℂ Complex.I = -Complex.I := Complex.conj_I
+  have h_I2 : Complex.I * Complex.I = -1 := Complex.I_mul_I
+  constructor
+  · dsimp [complexHermitianForm, Matrix.mulVec, Matrix.dotProduct, W, c]
+    simp only [Finset.sum_singleton]
+    rw [one_mul, h_star]
+    calc -Complex.I * Complex.I
+      _ = -(Complex.I * Complex.I) := by ring
+      _ = -(-1) := by rw [h_I2]
+      _ = 1 := by ring
+  · dsimp [Matrix.mulVec, Matrix.dotProduct, W, c]
+    simp only [Finset.sum_singleton]
+    rw [one_mul, h_I2]
+
+/-- Rescaling Homogeneity:
+    For any test function combination with norm scaling ||lambda * g|| = |lambda| * ||g||,
+    choosing lambda = h / ||g|| yields a test function with norm exactly h. -/
+theorem coefficient_rescaling_norm_scaling
+    (norm_g h : ℝ)
+    (h_pos : 0 < norm_g)
+    (h_h : 0 < h) :
+    let lambda := h / norm_g
+    |lambda| * norm_g = h := by
+  intro lambda
+  dsimp [lambda]
+  have h_lam_pos : 0 < h / norm_g := div_pos h_h h_pos
+  rw [abs_of_pos h_lam_pos]
+  exact div_mul_cancel₀ h (ne_of_gt h_pos)
+
+/-- Quantitative Poincaré Support Lower Bound:
+    If a smooth function f supported on connected components of length at most ell satisfies
+    ||f||_{L^2} <= ell * ||f'||_{L^2}, then for any target function f_* with H^1 distance
+    eps = ||f - f_*||_{H^1}, the triangle inequalities
+      ||f_*||_{L^2} <= ||f||_{L^2} + eps
+      ||f'||_{L^2} <= ||f_*'||_{L^2} + eps
+    force the amplitude-independent error lower bound:
+      (1 + ell) * eps >= ||f_*||_{L^2} - ell * ||f_*'||_{L^2}. -/
+theorem poincare_quantitative_approximation_lower_bound
+    (norm_f_L2 norm_f_deriv_L2 norm_fstar_L2 norm_fstar_deriv_L2 ell eps : ℝ)
+    (hell : 0 ≤ ell)
+    (h_poincare : norm_f_L2 ≤ ell * norm_f_deriv_L2)
+    (h_err_L2 : norm_fstar_L2 ≤ norm_f_L2 + eps)
+    (h_err_deriv : norm_f_deriv_L2 ≤ norm_fstar_deriv_L2 + eps) :
+    norm_fstar_L2 - ell * norm_fstar_deriv_L2 ≤ (1 + ell) * eps := by
+  have h_step : ell * norm_f_deriv_L2 ≤ ell * (norm_fstar_deriv_L2 + eps) :=
+    mul_le_mul_of_nonneg_left h_err_deriv hell
+  calc norm_fstar_L2 - ell * norm_fstar_deriv_L2
+    _ ≤ (norm_f_L2 + eps) - ell * norm_fstar_deriv_L2 := by linarith
+    _ ≤ (ell * norm_f_deriv_L2 + eps) - ell * norm_fstar_deriv_L2 := by linarith
+    _ ≤ (ell * (norm_fstar_deriv_L2 + eps) + eps) - ell * norm_fstar_deriv_L2 := by linarith
+    _ = (1 + ell) * eps := by ring
+
+/-- Negativity transfer under Connes-Consani (2020) continuity estimate:
+    If target f_* satisfies B(f_*, f_*) <= -eta < 0, and the quadratic form error
+    |B(f, f) - B(f_*, f_*)| is bounded by C_R * eps * (2 * norm_fstar + eps) < eta,
+    then the approximating test f is strictly negative: B(f, f) < 0. -/
+theorem connes_consani_continuity_negativity_transfer
+    (B_approx B_target eta C_R eps norm_fstar : ℝ)
+    (h_target : B_target ≤ -eta)
+    (_h_eta : 0 < eta)
+    (h_continuity : |B_approx - B_target| ≤ C_R * eps * (2 * norm_fstar + eps))
+    (h_transfer : C_R * eps * (2 * norm_fstar + eps) < eta) :
+    B_approx < 0 := by
+  have h_bound : B_approx - B_target ≤ C_R * eps * (2 * norm_fstar + eps) :=
+    le_trans (le_abs_self _) h_continuity
+  linarith
+
 end RiemannScope
+
 
 

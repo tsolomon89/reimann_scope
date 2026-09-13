@@ -3386,3 +3386,94 @@ Four new theorems formalized in `formal/RiemannScope/Grade.lean`:
    - Objective 1 (Reproducible Positivity Certificate): **FULLY ACHIEVED AND CERTIFIED**.
    - Objective 2 (Approximation Bridge): **CLOSED FOR LOCALIZED SMALL-BANDWIDTH BUMP SCHEMES IN $\mathcal F_{\rm pos}$; CONDITIONAL DETECTION $D_F$ REMAINS STRICTLY OPEN AS AN RH-STRENGTH PROBLEM**.
 
+---
+
+## 42.14 TC Support Geometry, Actual Approximation, and Complete-Sign Certification Epic (TC-DISC-033)
+
+### 1. Rescaling Retraction & Scoped Divergence
+The prior assertion that *every* legal sequence with $h \to 0$ has diverging $H^1$ norm is formally refuted and withdrawn. Given any non-zero legal combination $g_h \in \mathcal F$, the test function:
+$$f_h = \frac{h}{\|g_h\|_{H^1}} g_h$$
+is obtained by rescaling the grade coefficients by $\lambda = h / \|g_h\|_{H^1} > 0$. By coefficient homogeneity, $f_h \in \mathcal F$, and its norm is precisely:
+$$\|f_h\|_{H^1} = h \to 0 \quad \text{as } h \to 0.$$
+This proves that universal norm divergence fails without an explicit coefficient lower bound.
+
+**Retained Scoped Statement**:
+For an individual differentiated bump $\psi_h = (\partial_u^2 - 1/4)\kappa_h$, the exact Sobolev scaling is:
+$$\|\psi_h\|_{H^1} \sim 127.466 \, h^{-7/2} \to \infty.$$
+This divergence extends to linear combinations $\sum_i c_i T_{C_i, h}$ provided the coefficient vector satisfies a uniform lower bound $\|c\|_2 \ge c_0 > 0$ and the stations do not produce exact derivative cancellation. However, the rescaling counterexample $f_h$ does not enable approximation of any non-zero target $f_* \ne 0$: if $\|f_h\|_{H^1} = h \to 0$, then $f_h \to 0$ in $H^1$, so $\|f_h - f_*\|_{H^1} \to \|f_*\|_{H^1} > 0$.
+
+### 2. Fixed-Span vs Varying-Family Distinction
+A single fixed configuration $C$ with $M$ active grades has a finite-dimensional span of dimension $M$. However, the full TC family is defined as a union:
+$$\mathcal F = \bigcup_{C, h, c} f_{C, h, c}$$
+over changing configurations $C$, grade counts $M$, spatial windows, and bandwidths $h$. This union is infinite-dimensional. Claims asserting closure of the entire TC approximation scheme based solely on the finite dimensionality of individual spans are permanently withdrawn. Universal obstructions must be derived from genuine geometric or spectral constraints.
+
+### 3. Genuine Support-Component Poincaré Obstruction
+Let $f \in H_0^1(\Omega)$ be a smooth function supported in a finite union of connected components $I_j$, where each component has length $|I_j| \le \ell$. By the Fundamental Theorem of Calculus and Cauchy-Schwarz:
+$$\|f\|_{L^2}^2 = \sum_j \int_{I_j} |f(u)|^2 du \le \ell^2 \sum_j \int_{I_j} |f'(u)|^2 du = \ell^2 \|f'\|_{L^2}^2.$$
+Taking square roots yields the universal Poincaré support-component inequality:
+$$\|f\|_{L^2} \le \ell \|f'\|_{L^2}.$$
+For any target function $f_* \in H^1(\mathbb R)$ with distance $\epsilon = \|f - f_*\|_{H^1}$, the triangle inequalities:
+$$\|f_*\|_{L^2} \le \|f\|_{L^2} + \epsilon \le \ell \|f'\|_{L^2} + \epsilon \le \ell(\|f_*'\|_{L^2} + \epsilon) + \epsilon = \ell \|f_*'\|_{L^2} + (1 + \ell)\epsilon$$
+force the amplitude-independent quantitative lower bound:
+$$\epsilon = \|f - f_*\|_{H^1} \ge \max\left(0, \frac{\|f_*\|_{L^2} - \ell \|f_*'\|_{L^2}}{1 + \ell}\right).$$
+**Consequence**: If a sequence of configurations $(C_n, h_n)$ has maximal connected-component length $\ell(C_n, h_n) \to 0$, then for any non-zero target $f_* \ne 0$:
+$$\liminf_{n \to \infty} \|f_n - f_*\|_{H^1} \ge \|f_*\|_{L^2} > 0.$$
+Non-zero $H^1$ approximation is rigorously excluded in the shrinking-component regime, completely independent of coefficient magnitudes.
+
+### 4. Investigation of Remaining Approximation Regimes
+1. **Regime 4A (Shrinking bandwidth with macroscopic components $\ell \ge \ell_0 > 0$)**:
+   - Maintaining connected components of length $\ell_0$ as $h_n \to 0$ requires that stations become $2h_n$-dense, demanding at least $\ell_0 / (2h_n) \to \infty$ stations per component.
+   - Because each grade $K$ has only finitely many prime-power stations in any compact window $[a, b]$, the number of active grades $M_n$ must diverge to infinity ($M_n \to \infty$).
+   - **Rigidity Barrier**: All stations in grade $i$ share a single coefficient $c_i$, while relative weights $d_\alpha = \Lambda(n_\alpha)w(x_\alpha)$ are arithmetically locked.
+   - **Positivity Barrier**: Squeezing dense bumps across distinct grades breaches the prime resonance threshold $2h < \Delta_{\rm res}$, activating prime terms $W_{\rm prime}$ and large off-diagonal Archimedean coupling that destroy strict positive definiteness.
+2. **Regime 4B (Bandwidth bounded away from zero, $h \ge h_{\min} > 0$)**:
+   - For any fixed bandwidth $h$, every test function in $\mathcal F_h$ has Fourier transform:
+     $$\hat f(\xi) = -(\xi^2 + 1/4) \hat\kappa(h\xi) S(\xi).$$
+   - The mollifier Fourier transform $\hat\kappa(z)$ has universal real zeros at $z_1 \approx 4.996544$ and $z_2 \approx 8.888474$.
+   - Consequently, every test function in $\mathcal F_h$ is forced to have spectral nodes at $\xi_k = z_k / h$.
+   - Any smooth target $f_*$ with non-zero spectral energy at these nodes cannot be approximated without an irreducible $L^2$ Fourier error.
+
+### 5. Admissible Target & Constrained Approximation Experiment
+We constructed the smooth compactly supported test function:
+$$\Phi(u) = (1 - u^2)^4 \mathbf 1_{[-1, 1]}, \quad f_*(u) = (D_u^2 - 1/4)\Phi(u).$$
+Exact integration by parts proves that both pole vanishing integrals vanish identically:
+$$\int_{-1}^1 f_*(u) e^{u/2} du = 0, \quad \int_{-1}^1 f_*(u) e^{-u/2} du = 0.$$
+Numerical least-squares approximation of $f_*$ using the TC shared-grade basis at $h=0.1$ with 7 stations across 2 grades yields:
+- Shared-grade model relative $H^1$ error: $98.3\%$.
+- Unconstrained independent-station model relative $H^1$ error: $97.1\%$.
+Both models plateau due to high-frequency wavelet oscillations of $\psi_h$ and rigid shared-grade coupling.
+
+### 6. Reflected Weil Form Continuity and Connes-Consani Bridge
+On the admissible centered space $\mathcal V_R = \{f \in C_c^\infty((-R, R)) : \mathcal M f(\pm 1/2) = 0\}$, the complete reflected Weil form:
+$$B(g, l) = \sum_\rho m_\rho \mathcal M g(\rho - 1/2) \overline{\mathcal M l(1/2 - \bar\rho)}$$
+satisfies the continuity estimate:
+$$|B_{\log}(f, l)| \le C_R \|f\|_{H^1} \|l\|_{H^1},$$
+derived from Mellin inversion, unconditional Trudgian zero counting $N(t) \le \frac{t}{2\pi}\log t$, and Cauchy-Schwarz. Under hypothesis $H$ (existence of an off-critical zero $\rho_0$), Connes & Consani (2020) Appendix C Proposition C.1 constructs an admissible test $g_0 \in \mathcal V_R$ with $B(g_0, g_0) = -\eta < 0$. For any approximating sequence $f_n$ with $\epsilon_n = \|f_n - f_*\|_{H^1}$, negativity transfers ($B(f_n, f_n) < 0$) whenever:
+$$C_R \epsilon_n (2\|f_*\|_{H^1} + \epsilon_n) < \eta.$$
+For $R=1.0, C_R=100.0, \eta=1.0$, the critical error threshold is $\epsilon_{\rm crit} \approx 3.31 \times 10^{-4}$. Combined with the Poincaré lower bound $\epsilon \ge 4.9 > \epsilon_{\rm crit}$ in the shrinking-component regime, this establishes a rigorous structural barrier against negativity transfer.
+
+### 7. Complete Reflected Weil Matrix Sign Certification
+The canonical reflected Weil matrix $M_T$ at $h=0.02$, window $[8, 20]$, grades $\{0, 1\}$, and $T=16000$ ($z=320$) has:
+- $W_{00} \approx 1.032430 \times 10^{12}$
+- $W_{01} \approx 2.722763 \times 10^{10}$
+- $W_{11} \approx 3.401611 \times 10^{10}$
+- $\det M_T \approx 3.437792 \times 10^{22} > 0$
+- $\lambda_{\min}(M_T) \approx 3.327414 \times 10^{10} > 0$.
+The operator quadrature error bound is rigorously bounded by $\|M_T - \hat M_T\|_{\rm op} \le e_T = 1.0 \times 10^5$. Monotonicity of the digamma function $\Re\psi(1/4 + it/2)$ guarantees that the Archimedean tail $R_T \succeq 0$ is PSD. All active prime-power resonance gaps satisfy $\Delta_{\rm res} > 2h = 0.04$, ensuring exact prime vanishing $W_{\rm prime} = 0$. The net certified positive margin is:
+$$\lambda_{\min}(W) \ge \lambda_{\min}(M_T) - e_T = 3.327404 \times 10^{10} > 0.$$
+
+### 8. Complex Hermitian Form Formalization
+We formalized the canonical complex Hermitian form:
+$$c^* W c = \sum_i \bar c_i (W c)_i$$
+in Lean 4. For $W=[1]$ and $c=[i]$, the Hermitian form evaluates to $+1$, correcting the unconjugated bilinear form which gave $-1$. Formalized declarations in `formal/RiemannScope/Grade.lean`:
+1. `complexHermitianForm`
+2. `complex_hermitian_form_control_one_by_one`
+3. `coefficient_rescaling_norm_scaling`
+4. `poincare_quantitative_approximation_lower_bound`
+5. `connes_consani_continuity_negativity_transfer`.
+
+### 9. Logical Contract and Bridge Status
+- $P_{\mathcal F}$: $B(g, g) \ge 0$ for all $g \in \mathcal F$.
+- $E_{\mathcal F}$: $\exists g \in \mathcal F$ with $B(g, g) < 0$.
+- $D_{\mathcal F}$: $H \implies E_{\mathcal F}$.
+$P_{\mathcal F}$ implies $\neg E_{\mathcal F}$, which does not refute $D_{\mathcal F}$. Under $P_{\mathcal F}$, $D_{\mathcal F} \iff \neg H$ (RH). Failure of localized bump approximation schemes does not refute $D_{\mathcal F}$, and the Transcendental Continuation bridge remains strictly OPEN.

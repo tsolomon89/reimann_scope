@@ -3533,3 +3533,93 @@ def test_epic_milestone_11_synthesis_and_lean_theorems():
     assert 'STRICTLY_OPEN' in ep['tc_bridge_conditional_status']
 
 
+def test_epic_coefficient_rescaling_homogeneity():
+    """
+    Verify Milestone 1: Coefficient Rescaling Homogeneity:
+      1. Retraction of universal norm divergence.
+      2. Refutation counterexample f_h = h * g_h / ||g_h||_{H^1}.
+      3. Precise requirements for uniform divergence.
+    """
+    res = transcendental.audit_coefficient_rescaling_homogeneity()
+    assert res['status'] == 'COEFFICIENT_RESCALING_HOMOGENEITY_AUDITED'
+    ret = res['retraction_record']
+    assert ret['homogeneity_holds'] is True
+    assert 'f_h = h * g_h / ||g_h||_{H^1}' in ret['refutation_counterexample']
+    assert len(res['divergence_requirements']) == 2
+
+
+def test_epic_support_geometry_components_and_poincare():
+    """
+    Verify Milestone 2 & 3: Support Geometry Components & Poincare Obstruction:
+      1. Merging of overlapping intervals.
+      2. Computation of ell(C, h) and min station separation.
+      3. Amplitude-independent Poincare lower bound.
+    """
+    stations = [math.log(9.0), math.log(11.0), math.log(13.0), math.log(16.0), math.log(17.0), math.log(19.0)]
+    geom = transcendental.compute_support_components(stations, h=0.02)
+    assert geom['num_stations'] == 6
+    assert geom['is_disjoint'] is True
+    assert geom['max_component_length_ell'] == pytest.approx(0.04)
+
+    poincare = transcendental.poincare_support_lower_bound(f_star_L2=6.385504, f_star_deriv_L2=29.511691, ell=geom['max_component_length_ell'])
+    assert poincare['poincare_error_lower_bound'] > 4.9
+    assert poincare['strictly_positive_lower_bound'] is True
+
+
+def test_epic_varying_families_and_approximation_regimes():
+    """
+    Verify Milestone 4: Varying Configurations and Approximation Regimes:
+      1. Distinction between fixed-span and varying families.
+      2. Regime 4A prime resonance activation barrier.
+      3. Regime 4B Fourier zeros barrier.
+    """
+    res = transcendental.investigate_varying_configurations_and_shared_grades(h_test=0.02)
+    assert res['status'] == 'VARYING_FAMILIES_AND_APPROXIMATION_REGIMES_AUDITED'
+    assert 'positivity_consequence' in res['regime_4A_shrinking_bandwidth_macroscopic_components']
+    assert 'fourier_common_factor' in res['regime_4B_bounded_bandwidth']
+
+
+def test_epic_admissible_target_and_approximation_experiment():
+    """
+    Verify Milestone 5: Explicit Admissible Target & Constrained Approximation:
+      1. Pole vanishing integrals vanish identically for (D_u^2 - 1/4)Phi.
+      2. Least-squares approximation plateau under TC basis.
+    """
+    res = transcendental.construct_admissible_target_and_approximation_experiment(h=0.1, N_stations=7)
+    assert res['status'] == 'APPROXIMATION_EXPERIMENT_COMPLETED'
+    poles = res['target_function']['pole_integrals']
+    assert poles['int_f_exp_pos_half'] == pytest.approx(0.0, abs=1e-7)
+    assert poles['int_f_exp_neg_half'] == pytest.approx(0.0, abs=1e-7)
+    assert res['shared_grade_model']['relative_error'] > 0.95
+
+
+def test_epic_weil_continuity_and_connes_consani_bridge():
+    """
+    Verify Milestone 6: Complete Reflected Form Continuity & Connes-Consani Bridge:
+      1. Continuity bound |B(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1}.
+      2. Critical H^1 error threshold for negativity transfer.
+    """
+    res = transcendental.audit_weil_continuity_and_connes_consani_bridge(R=1.0, C_R=100.0, eta=1.0)
+    assert res['status'] == 'WEIL_CONTINUITY_AND_CONNES_CONSANI_BRIDGE_AUDITED'
+    assert res['negativity_transfer_threshold']['eps_critical'] > 0
+    assert res['negativity_transfer_threshold']['eps_critical'] < 0.001
+
+
+def test_epic_support_geometry_synthesis_master():
+    """
+    Verify Master Synthesis for TC Research Epic:
+      1. All 7 milestones present and validated.
+      2. All 8 required final questions answered accurately.
+      3. Output file exists.
+    """
+    res = transcendental.audit_tc_epic_support_geometry_synthesis()
+    assert res['epic'] == 'TC Research Epic: Support Geometry, Actual Approximation, and Complete-Sign Certification'
+    answers = res['answers_to_required_questions']
+    assert len(answers) == 8
+    for i in range(1, 9):
+        key = f'q{i}_'
+        assert any(k.startswith(key) for k in answers.keys())
+    assert os.path.exists('data/tc_epic_support_geometry_synthesis.json')
+
+
+
