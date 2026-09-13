@@ -2291,6 +2291,75 @@ theorem real_quadratic_form_prime_perturbation {r : Type*} [Fintype r]
   rw [realQuadraticForm_sub]
   linarith
 
+/-- Theorem: Matrix lower bound surviving certified perturbation and PSD tail.
+    For W = M + R - P, where M has quadratic form lower bounded by L,
+    R is positive semidefinite (quadratic form >= 0),
+    and P has quadratic form bounded by beta < L,
+    the complete quadratic form is bounded below by L - beta > 0. -/
+theorem matrix_lower_bound_psd_tail_perturbation {r : Type*} [Fintype r]
+    (M R P : Matrix r r ℝ) (v : r → ℝ)
+    (L beta : ℝ)
+    (hM : L ≤ realQuadraticForm M v)
+    (hR : 0 ≤ realQuadraticForm R v)
+    (hP : realQuadraticForm P v ≤ beta)
+    (h_gap : beta < L) :
+    0 < L - beta ∧ L - beta ≤ realQuadraticForm (M + R - P) v := by
+  have h_add : realQuadraticForm (M + R) v = realQuadraticForm M v + realQuadraticForm R v :=
+    realQuadraticForm_add M R v
+  have h_sub : realQuadraticForm (M + R - P) v = realQuadraticForm (M + R) v - realQuadraticForm P v :=
+    realQuadraticForm_sub (M + R) P v
+  constructor
+  · linarith
+  · rw [h_sub, h_add]
+    linarith
+
+/-- Theorem: Full real-to-complex Hermitian positivity from real positive definiteness.
+    For a real symmetric matrix W, the complex quadratic form c^* W c has zero imaginary part,
+    and its real part is strictly positive whenever the real or imaginary part of c has strictly
+    positive quadratic form and the other is non-negative. -/
+theorem real_symmetric_matrix_complex_pos_of_real_pos {r : Type*} [Fintype r]
+    (W : Matrix r r ℝ)
+    (h_symm : ∀ i j, W i j = W j i)
+    (c : r → ℂ)
+    (ha_nonneg : 0 ≤ realQuadraticForm W (fun i => (c i).re))
+    (hb_nonneg : 0 ≤ realQuadraticForm W (fun i => (c i).im))
+    (h_pos : 0 < realQuadraticForm W (fun i => (c i).re) ∨ 0 < realQuadraticForm W (fun i => (c i).im)) :
+    imagPartComplexQuadraticForm W c = 0 ∧
+    0 < realPartComplexQuadraticForm W c := by
+  constructor
+  · exact real_symmetric_matrix_imag_part_zero W h_symm c
+  · dsimp [realPartComplexQuadraticForm]
+    cases h_pos with
+    | inl ha => linarith
+    | inr hb => linarith
+
+/-- Theorem: Quantitative Negativity Transfer via Quadratic Form Continuity.
+    If a target test function f_* has negative quadratic form B(f_*, f_*) <= -eta < 0,
+    and the quadratic form deviation |B(f, f) - B(f_*, f_*)| is bounded by Delta < eta,
+    then the approximating test function f preserves negativity: B(f, f) < 0. -/
+theorem negativity_transfer_continuity
+    (B_target B_approx eta Delta : ℝ)
+    (h_target : B_target ≤ -eta)
+    (_h_eta_pos : 0 < eta)
+    (h_err : |B_approx - B_target| ≤ Delta)
+    (h_gap : Delta < eta) :
+    B_approx < 0 := by
+  have h_bound : B_approx - B_target ≤ Delta := le_trans (le_abs_self _) h_err
+  linarith
+
+/-- Theorem: Reverse Triangle Inequality Lower Bound on Sobolev Deviation.
+    If ||f|| - ||f_*|| <= ||f - f_*||, and ||f|| >= ||f_*|| + K with K > 0,
+    then the approximation error ||f - f_*|| is strictly bounded away from zero: K <= ||f - f_*||. -/
+theorem sobolev_reverse_triangle_lower_bound
+    (norm_f norm_target dist K : ℝ)
+    (h_rev : norm_f - norm_target ≤ dist)
+    (h_diverge : norm_target + K ≤ norm_f)
+    (hK : 0 < K) :
+    K ≤ dist ∧ 0 < dist := by
+  constructor
+  · linarith
+  · linarith
+
 end RiemannScope
 
 

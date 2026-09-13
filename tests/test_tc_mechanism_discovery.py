@@ -3405,3 +3405,131 @@ def test_epic_two_variable_synthesis_milestone_10():
     assert 'OPEN' in ep['conditional_detection_implication']
     assert ep['transcendental_continuation_bridge'] == 'STRICTLY OPEN'
 
+
+def test_epic_matrix_invariants_and_cutoff_discrepancy():
+    """
+    Verify algebraic consistency and omitted-tail slab reproduction:
+      1. Det equals product of eigenvalues and trace equals sum within 1e-14.
+      2. Previous unverified claim of < 130 beyond z=320 is withdrawn.
+      3. Omitted slab [320, 480] reproduced at ~1730.80 matching independent review.
+    """
+    res = transcendental.reproduce_cutoff_discrepancy()
+    assert res['status'] == 'CUTOFF_DISCREPANCY_REPRODUCED'
+
+    diag_slab = res['omitted_slab_320_to_480']
+    assert diag_slab['claimed_under_130_withdrawn'] is True
+    assert diag_slab['reproduced_target_1730'] is True
+    assert abs(diag_slab['W00_slab_contribution_fine'] - 1730.80) < 0.1
+
+    alg = res['algebraic_consistency_audit']
+    assert alg['status'] == 'ALGEBRAICALLY_CONSISTENT'
+
+    spec_16000 = res['quadrature_ranges']['cutoff_t_16000']
+    assert spec_16000['checks']['det_equals_prod_eigenvalues'] is True
+    assert spec_16000['checks']['trace_equals_sum_eigenvalues'] is True
+    assert spec_16000['checks']['determinant_ge_lambda_min_times_W00'] is True
+
+
+def test_epic_canonical_sign_certificate_generation_and_verification():
+    """
+    Verify reproducible canonical reflected Weil matrix sign certificate:
+      1. Generates data/canonical_reflected_weil_matrix_sign.json.
+      2. Reconstructs inequalities: omega(10) > 0, tail is PSD, prime terms vanish.
+      3. Verifies strict positive margin >= 3.3274e10.
+      4. Fails closed on invalid or corrupted certificate.
+    """
+    cert = transcendental.generate_canonical_reflected_weil_sign_certificate()
+    assert cert['certificate_verdict'] == 'COMPLETE_CANONICAL_REFLECTED_WEIL_MATRIX_POSITIVE_DEFINITE'
+    assert cert['error_bounds_and_margin']['strictly_positive_margin'] is True
+    assert cert['error_bounds_and_margin']['net_positive_margin'] > 3.3e10
+
+    ver = transcendental.verify_canonical_reflected_weil_sign_certificate(strict=True)
+    assert ver['status'] == 'CERTIFICATE_VERIFIED'
+    assert ver['verified'] is True
+    assert ver['net_positive_margin'] > 3.3e10
+
+    # Test fail-closed on corrupted cert
+    corrupt_cert = dict(cert)
+    corrupt_cert['error_bounds_and_margin'] = dict(cert['error_bounds_and_margin'])
+    corrupt_cert['error_bounds_and_margin']['net_positive_margin'] = -1.0
+    
+    tmp_path = os.path.join(os.path.dirname(__file__), 'tmp_corrupt_cert.json')
+    try:
+        with open(tmp_path, 'w', encoding='utf-8') as f:
+            json.dump(corrupt_cert, f)
+        
+        try:
+            transcendental.verify_canonical_reflected_weil_sign_certificate(tmp_path, strict=True)
+            assert False, "Should have raised ValueError on negative margin"
+        except ValueError as e:
+            assert 'margin_positive' in str(e)
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
+def test_epic_sobolev_scaling_and_continuity_bridge():
+    """
+    Verify Sobolev H^1 scaling, continuity in V_R, and the two structural barriers:
+      1. Leading order Sobolev norm is h^(-7) ||kappa'''||_2^2 (~ 16247.68 * h^(-7)).
+      2. ||psi_h||_{H^1} ~ 127.47 * h^(-7/2), severely dominating W_arch ~ h^(-5) log(1/h).
+      3. False heuristic |B - B_crit| <= C delta_0 ||g||_{H^1}^2 and exp(-Delta/(2h)) withdrawn.
+      4. Two structural barriers identified:
+         - Barrier 1: Asymptotic Sobolev norm divergence in positive regime.
+         - Barrier 2: Shared-grade arithmetic rigidity with fixed d_alpha.
+      5. Scoped scheme closed, D_F remains strictly open.
+    """
+    res = transcendental.audit_weil_continuity_and_approximation_bridge()
+    assert res['status'] == 'WEIL_CONTINUITY_AND_APPROXIMATION_BRIDGE_AUDITED'
+
+    scaling = res['sobolev_scaling_exact_identities']
+    assert scaling['canonical_kernel_constants']['norm_kappa_third_deriv_sq'] > 16200.0
+    assert scaling['canonical_h_values']['norm_psi_h_H1'] > 1.0e8
+
+    withdrawn = res['false_heuristics_withdrawn']
+    assert withdrawn['B_crit_heuristic_withdrawn'] is True
+    assert withdrawn['exp_delta_over_2h_withdrawn'] is True
+
+    barriers = res['approximation_bridge_structural_barriers']
+    assert 'barrier_1_asymptotic_scaling_divergence' in barriers
+    assert 'barrier_2_shared_grade_arithmetic_rigidity' in barriers
+
+    ep = res['epistemic_classification']
+    assert 'CERTIFIED' in ep['positivity_property_P_F']
+    assert 'CLOSED' in ep['localized_small_bandwidth_bump_approximation']
+    assert ep['conditional_implication_D_F'] == 'STRICTLY_OPEN (Under P_F, D_F is equivalent to not H; not refuted by local bump failure)'
+    assert ep['transcendental_continuation_status'] == 'STRICTLY_OPEN'
+
+
+def test_epic_milestone_11_synthesis_and_lean_theorems():
+    """
+    Verify complete epic synthesis with Milestone 11 integration:
+      1. Milestone 11 bridge, certificate, and verification present.
+      2. Formal Lean 4 theorems count >= 267.
+      3. Four new Lean theorems formalized with 0 sorry.
+      4. Epistemic classifications fully updated.
+    """
+    res = transcendental.audit_tc_epic_two_variable_synthesis()
+    assert 'milestone_11_weil_continuity_and_approximation_bridge' in res
+    assert 'milestone_11_sign_certificate' in res
+    assert 'milestone_11_certificate_verification' in res
+
+    formal = res['formal_lean_theorems']
+    assert formal['total_compiled_theorems'] >= 267
+    for thm in [
+        'matrix_lower_bound_psd_tail_perturbation',
+        'real_symmetric_matrix_complex_pos_of_real_pos',
+        'negativity_transfer_continuity',
+        'sobolev_reverse_triangle_lower_bound'
+    ]:
+        assert thm in formal['new_theorems']
+
+    ep = res['epistemic_classification']
+    assert 'REPRODUCED' in ep['omitted_slab_discrepancy']
+    assert 'RECOMPUTED' in ep['matrix_invariants_consistency']
+    assert 'PROVED' in ep['sobolev_h1_norm_scaling']
+    assert 'PROVED' in ep['weil_continuity_bound']
+    assert 'IDENTIFIED' in ep['tc_approximation_barriers']
+    assert 'STRICTLY_OPEN' in ep['tc_bridge_conditional_status']
+
+

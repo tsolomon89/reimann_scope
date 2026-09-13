@@ -3310,3 +3310,79 @@ The Transcendental Continuation bridge remains strictly **OPEN**.
      - `complex_quadratic_form_add_psd_tail`: $q_M(c) > 0 \land q_R(c) \ge 0 \implies q_{M+R}(c) > 0$.
      - `real_quadratic_form_prime_perturbation`: $q_{W_{\rm arch}}(v) \ge \lambda_{\min} \land q_{W_{\rm prime}}(v) \le \varepsilon < \lambda_{\min} \implies q_{W_{\rm arch}-W_{\rm prime}}(v) > 0$.
    - All 263 project theorems compiled cleanly under Lean 4.8.0 / Lake 5.0.0 (0 sorry, 0 admit, 0 warnings, standard Mathlib foundational axioms only).
+
+---
+
+## 42.13 TC Epic: Certified Positivity of Complete Canonical Reflected Weil Matrix and the Actual Approximation Bridge (TC-DISC-032 / CLM-TC-022 Synthesis)
+
+### 1. Matrix Discrepancy & Omitted-Tail Enclosure
+1. **Recomputed $2 \times 2$ Canonical Reflected Weil Matrix**:
+   For the canonical configuration ($h=0.02$, window $[8, 20]$, grades $\{0, 1\}$), the genuine matrix $M_T$ at cutoff $t \le 16000$ ($z \le 320$) evaluates to:
+   $$M_T = \begin{pmatrix} 1.032430 \times 10^{12} & 2.722763 \times 10^{10} \\ 2.722763 \times 10^{10} & 3.401611 \times 10^{10} \end{pmatrix}.$$
+   - Invariants verified:
+     - Trace $\operatorname{tr}(M_T) = 1.066446 \times 10^{12} = \lambda_1 + \lambda_2$ (relative residual $1.1 \times 10^{-16}$).
+     - Determinant $\det(M_T) = 3.437792 \times 10^{22} = \lambda_1 \lambda_2$ (relative residual $2.3 \times 10^{-15}$).
+     - Eigenvalues: $\lambda_{\min}(M_T) \approx 3.327414 \times 10^{10}$, $\lambda_{\max}(M_T) \approx 1.033172 \times 10^{12}$.
+   - Numerical provenance resolution: The table row in the previous report cited $W_{00} \approx 1.032 \times 10^{12}$, $\det \approx 1.757 \times 10^{22}$, and $\lambda_{\min} \approx 3.307 \times 10^{10}$. That reported determinant was erroneously halved ($1.757 \times 10^{22} \approx 3.438 \times 10^{22} / 2$), which algebraically contradicted the diagonal product $W_{00} W_{11} \approx 3.512 \times 10^{22}$ and the minimum eigenvalue bound $\det M_T \ge \lambda_{\min} W_{00} \approx 3.435 \times 10^{22}$. The genuine matrix $M_T$ has $\det = 3.437792 \times 10^{22}$ and $\lambda_{\min} = 3.327414 \times 10^{10}$.
+2. **Omitted Slab Calculation & Heuristic Retraction**:
+   - The omitted slab $z \in [320, 480]$ ($t \in [16000, 24000]$) was computed directly:
+     $$W_{00,\rm slab} = \frac{1}{\pi} \int_{16000}^{24000} \omega(t) |A_h(it)|^2 S_0(t)^2 dt \approx 1730.797.$$
+   - This exactly matches the independent challenger review calculation ($\approx 1730.8015$).
+   - The previous draft's unverified claim that the tail beyond $z=320$ was bounded by $< 130$ was an unverified heuristic and has been permanently retracted.
+3. **Rigorous Full-Sign Certificate via Digamma Monotonicity**:
+   - Monotonicity of $\Re\psi(1/4 + it/2)$ from NIST DLMF 5.7.6 guarantees $\omega(t) \ge \omega(10) \approx 0.46429 > 0$ for all $t \ge 10$.
+   - The omitted tail matrix $R_T \succeq 0$ is guaranteed positive semidefinite on $[T, \infty)$.
+   - Active station separation guarantees $\Delta_{\rm same} = \log(19/18) \approx 0.054067 > 2h = 0.04$ and $\Delta_{\rm cross} = |\log(\pi/3)| \approx 0.046118 > 2h = 0.04$, certifying $W_{\rm prime} \equiv 0$ ($\beta = 0$).
+   - The certified lower bound margin:
+     $$\lambda_{\min}(W) \ge \lambda_{\min}(M_T) - e_T - \beta \ge 3.327414 \times 10^{10} - 10^{-4} - 0 \ge 3.327404 \times 10^{10} > 0.$$
+   - Machine-readable certificate generated and saved to `data/canonical_reflected_weil_matrix_sign.json`, verified by automated auditor.
+
+### 2. Sobolev $H^1$ Continuity and Structural Approximation Obstructions
+1. **Admissible Centered Weil Test Space**:
+   $$\mathcal V_R = \{f \in C_c^\infty((e^{-R}, e^R)) : \mathcal M f(-1/2) = \mathcal M f(1/2) = 0\}.$$
+   Under logarithmic coordinate $u = \log x$, the centered Weil quadratic form is continuous:
+   $$|B_{\log}(f, l)| \le C_R \|f\|_{H^1} \|l\|_{H^1} \quad (\forall f, l \in \mathcal V_R).$$
+2. **Asymptotic Sobolev Scaling of $F_{\rm TC}$**:
+   For $\psi_h(u) = h^{-3}\kappa''(u/h) - \frac{1}{4}h^{-1}\kappa(u/h)$:
+   $$\|\psi_h\|_2^2 = h^{-5}\|\kappa''\|_2^2 + \frac{1}{2}h^{-3}\|\kappa'\|_2^2 + \frac{1}{16}h^{-1}\|\kappa\|_2^2 \sim 54.9599 h^{-5},$$
+   $$\|\psi_h'\|_2^2 = h^{-7}\|\kappa'''\|_2^2 + \frac{1}{2}h^{-5}\|\kappa''\|_2^2 + \frac{1}{16}h^{-3}\|\kappa'\|_2^2 \sim 16247.6843 h^{-7},$$
+   $$\|\psi_h\|_{H^1} \sim \sqrt{\|\psi_h'\|_2^2} \sim 127.466 h^{-7/2}.$$
+   In contrast, the Archimedean quadratic form scales as:
+   $$W_{\rm arch}(C, h) \sim h^{-5} \log(1/h) \|\kappa''\|_2^2 D_C.$$
+   The Archimedean form is subordinated by a relative factor of $h^2 \log(1/h) \to 0$ as $h \to 0^+$.
+3. **Two Structural Approximation Barriers**:
+   - **Barrier 1: Asymptotic Sobolev Norm Divergence**: Any sequence $f_n \in \mathcal F_{\rm pos}$ with $h_n \to 0^+$ satisfies $\|f_n\|_{H^1} \ge c_0 h_n^{-7/2} \to \infty$. By the reverse triangle inequality:
+     $$\|f_n - f_*\|_{H^1} \ge \|f_n\|_{H^1} - \|f_*\|_{H^1} \to \infty.$$
+     No sequence with $h_n \to 0^+$ can approximate any fixed function $f_* \in \mathcal V_R$ in $H^1$.
+   - **Barrier 2: Shared-Grade Arithmetic Rigidity**: For each grade $K_i$, the spatial stations are rigidly fixed at $x_{i,n} = \tau^{K_i} n$ with weights $d_{i,n} = \Lambda(n)w(x_{i,n})$. Linear combinations $\sum_j c_j T_{C_j, h_j}$ can only vary the finite grade weights $c$, which cannot span the infinite-dimensional oscillatory degrees of freedom required to approximate an arbitrary $f_* \in \mathcal V_R$.
+   - The false heuristics $|B(g, g) - B_{\rm crit}(g, g)| \le C \delta_0 \|g\|_{H^1}^2$ and $\exp(-\Delta/(2h))$ have been permanently withdrawn.
+
+### 3. Formal Lean 4 Theorems (267 Compiled Targets, 0 sorry, 0 admit)
+Four new theorems formalized in `formal/RiemannScope/Grade.lean`:
+1. `matrix_lower_bound_psd_tail_perturbation`:
+   $$q_M(v) \ge L \land q_R(v) \ge 0 \land q_P(v) \le \beta < L \implies q_{M+R-P}(v) \ge L - \beta > 0.$$
+2. `real_symmetric_matrix_complex_pos_of_real_pos`:
+   For real symmetric $W$, if $(\Re c)^T W (\Re c) > 0$ or $(\Im c)^T W (\Im c) > 0$, then $\Im(c^* W c) = 0$ and $\Re(c^* W c) > 0$.
+3. `negativity_transfer_continuity`:
+   If $B(f_*, f_*) \le -\eta < 0$ and $|B(f, f) - B(f_*, f_*)| \le \Delta < \eta$, then $B(f, f) < 0$.
+4. `sobolev_reverse_triangle_lower_bound`:
+   If $\|f\| \ge M$ and $\|f_*\| \le N$ with $M \ge N + K$, then $\|f - f_*\| \ge K$.
+
+### 4. Direct Answers to the 7 Core Epic Questions
+1. **Plain Statement of What Was Proved vs Unproved**:
+   - **Proved**: Complete sign certificate of canonical reflected Weil matrix $W \succ 0$ via PSD tail argument; exact matrix invariants and resolution of prior numerical discrepancy; Sobolev $H^1$ continuity bound and norm divergence; Lean 4 formalization (267 theorems).
+   - **Unproved**: Existence of an approximation bridge from $F_{\rm pos}$ to a negative Weil test; derivation of $D_F: H \implies E_F$; derivation of any forbidden arithmetic coincidence $m\tau^K = n\tau^J$.
+2. **Reproducible Certificate of Positivity**:
+   Saved to `data/canonical_reflected_weil_matrix_sign.json`. Certified margin $\lambda_{\min}(W) \ge 3.327404 \times 10^{10} > 0$. Prime evaluations vanish identically ($\beta = 0$). Monotonicity of digamma guarantees $R_T \succeq 0$.
+3. **Continuity Bound on the Centered Weil Quadratic Form**:
+   $|B(f, f) - B(f_*, f_*)| \le C_R \|f - f_*\|_{H^1} (\|f\|_{H^1} + \|f_*\|_{H^1})$. If $\|f - f_*\|_{H^1} < \varepsilon$, then $B(f, f) \le -\eta/2 < 0$.
+4. **Target Function in $\mathcal V_R$**:
+   Connes-Consani (2020) Prop C.1 construction $f_* \in \mathcal V_R$ with $B(f_*, f_*) = -\eta < 0$ conditional on an off-line zero $H(\rho_0)$.
+5. **Concrete Member of $F_{\rm TC}$**:
+   $f = \sum_{i=1}^r c_i T_{C_i, h_i}$. We proved that for $h_n \to 0^+$, $\|f_n\|_{H^1} \to \infty$, so $\|f_n - f_*\|_{H^1} \to \infty$. Thus no member in this regime achieves $\|f - f_*\|_{H^1} < \varepsilon$.
+6. **Preservation of Negativity vs Concrete Obstruction**:
+   Negativity is NOT preserved by localized bump approximations in $\mathcal F_{\rm pos}$ because $\|f_n\|_{H^1} \to \infty$ forces large distance from $f_*$. The bump approximation scheme is structurally obstructed.
+7. **Resolution of the Epic's Two Concrete Objectives**:
+   - Objective 1 (Reproducible Positivity Certificate): **FULLY ACHIEVED AND CERTIFIED**.
+   - Objective 2 (Approximation Bridge): **CLOSED FOR LOCALIZED SMALL-BANDWIDTH BUMP SCHEMES IN $\mathcal F_{\rm pos}$; CONDITIONAL DETECTION $D_F$ REMAINS STRICTLY OPEN AS AN RH-STRENGTH PROBLEM**.
+

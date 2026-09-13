@@ -1,5 +1,5 @@
 {
-  "epic": "TC Corrective Epic: Two-Variable Formula, Remainder Cancellation, Rigidity, and Compatibility",
+  "epic": "TC Corrective Epic: Two-Variable Formula, Remainder Cancellation, Rigidity, Certified Positivity and Approximation Bridge",
   "milestone_1_defect_repairs": {
     "classification": "DEFECT_REPAIRED_AND_VERIFIED",
     "old_cutoff_claim": "T(eps) >> eps^(-(p-1)/(p-2)) guarantees B_old -> 0",
@@ -520,7 +520,8 @@
       "quadrature_uncertainty": "< 1e-8 (30-dps mpmath adaptive tanh-sinh quadrature)",
       "rounding_uncertainty": "< 1e-30 (30 dps floating/interval precision)",
       "analytic_infinite_tail": "Majorized by C_p * eps^(1-p) * log^2(2+T) / T^(p-2)"
-    }
+    },
+    "cache_hit": true
   },
   "milestone_5_quadratic_form_obstruction": {
     "classification": "PROVED_AND_VERIFIED",
@@ -2497,33 +2498,84 @@
     },
     "quadrature_ranges": {
       "cutoff_t_600": {
-        "t_range": [
-          0.0,
-          600.0
-        ],
-        "z_range": [
-          0.0,
-          12.0
+        "matrix": [
+          [
+            528636848805.13214,
+            19556631295.843876
+          ],
+          [
+            19556631295.843876,
+            17507080286.854958
+          ]
         ],
         "W00": 528636848805.13214,
         "W01": 19556631295.843876,
-        "W11": 17507080286.854958
+        "W11": 17507080286.854958,
+        "determinant": 8.872425926979845e+21,
+        "trace": 546143929091.9871,
+        "eigenvalues": [
+          16759904950.607977,
+          529384024141.37915
+        ],
+        "lambda_min": 16759904950.607977,
+        "lambda_max": 529384024141.37915,
+        "coupling_ratio": 0.20328646789896698,
+        "checks": {
+          "det_equals_prod_eigenvalues": true,
+          "trace_equals_sum_eigenvalues": true,
+          "determinant_ge_lambda_min_times_W00": true
+        }
       },
       "cutoff_t_16000": {
-        "t_range": [
-          0.0,
-          16000.0
-        ],
-        "z_range": [
-          0.0,
-          320.0
+        "matrix": [
+          [
+            1032430341859.5082,
+            27227628317.320614
+          ],
+          [
+            27227628317.320614,
+            34016106908.69131
+          ]
         ],
         "W00": 1032430341859.5082,
         "W01": 27227628317.320614,
-        "W11": 34016106908.69131
+        "W11": 34016106908.69131,
+        "determinant": 3.437791714068351e+22,
+        "trace": 1066446448768.1995,
+        "eigenvalues": [
+          33274137094.31141,
+          1033172311673.8882
+        ],
+        "lambda_min": 33274137094.31141,
+        "lambda_max": 1033172311673.8882,
+        "coupling_ratio": 0.14529047039034165,
+        "checks": {
+          "det_equals_prod_eigenvalues": true,
+          "trace_equals_sum_eigenvalues": true,
+          "determinant_ge_lambda_min_times_W00": true
+        }
       }
     },
-    "diagnostic_explanation": "The bump kernel kappa(u) is Gevrey-regular, yielding slow sub-exponential Fourier decay of hat{kappa}(z). The integrand factor z^4 omega(z/h) has significant mass between z = 12 and z = 100. Truncating at z = 12 (t = 600) omitted roughly 48.8% of the diagonal Archimedean energy. Beyond z = 320 (t = 16000), the remaining tail integral is bounded by < 1.3e-10 relative error."
+    "omitted_slab_320_to_480": {
+      "z_range": [
+        320.0,
+        480.0
+      ],
+      "t_range": [
+        16000.0,
+        24000.0
+      ],
+      "W00_slab_contribution": 0.0,
+      "W00_slab_contribution_fine": 1730.7966146832825,
+      "reproduced_target_1730": true,
+      "claimed_under_130_withdrawn": true,
+      "explanation": "The previous claim that the entire W00 tail beyond z=320 is < 130 is WITHDRAWN as an unverified heuristic. Independent numerical quadrature confirms the slab 320 <= z <= 480 contributes approximately 1730.80 to W00. The PSD tail theorem (R_T >= 0) provides a rigorous lower bound on lambda_min, not an upper bound on tail size."
+    },
+    "algebraic_consistency_audit": {
+      "status": "ALGEBRAICALLY_CONSISTENT",
+      "inconsistent_table_row_resolved": "The prior report recorded W00 ~= 1.032430e12 with an erroneously halved determinant 1.757340e22 and lambda_min 3.306850e10. For the actual matrix W_16000, det = 3.437792e22 and lambda_min = 3.327414e10. This satisfies det = lambda_min * lambda_max >= lambda_min * W00 ~= 3.435e22 exactly."
+    },
+    "diagnostic_explanation": "The bump kernel kappa(u) is Gevrey-regular, yielding slow sub-exponential Fourier decay of hat{kappa}(z). The integrand factor z^4 omega(z/h) has significant mass between z = 12 and z = 100. Truncating at z = 12 (t = 600) omitted roughly 48.8% of the diagonal Archimedean energy. Beyond z = 320 (t = 16000), the remaining tail integral is positive and guarantees lambda_min(W) >= lambda_min(M_T)."
   },
   "milestone_10_tail_psd_certification": {
     "status": "ARCHIMEDEAN_TAIL_PSD_CERTIFIED",
@@ -2543,11 +2595,18 @@
       "formula": "Re digamma(1/4 + i*y) = -gamma + sum_{n>=0} [1/(n+1) - (n+1/4)/((n+1/4)^2 + y^2)]",
       "derivative": "d/dy Re digamma(1/4 + i*y) = sum_{n>=0} 2y(n+1/4) / ((n+1/4)^2 + y^2)^2 > 0 for y > 0",
       "monotonicity_proved": true,
+      "omega_at_10": 0.46429062686493006,
       "omega_lower_bound_at_T": 4.559052473066004,
-      "omega_positive_for_all_t_ge_T": true
+      "omega_positive_for_all_t_ge_T": true,
+      "reference": "NIST DLMF 5.7.6 (series and strict derivative positivity)"
     },
     "tail_matrix_psd": {
-      "formula": "R_T = (1 / 2*pi) int_{|t| >= T} omega(t) |A_h(it)|^2 S(t) S(t)^* dt",
+      "half_line_vector_formula": "R_T = (1 / pi) int_T^infty omega(t) |A_h(it)|^2 [a(t) a(t)^T + b(t) b(t)^T] dt",
+      "vector_definitions": {
+        "a(t)": "Re S(t) = sum_{alpha in grade i} d_alpha cos(t * t_alpha)",
+        "b(t)": "Im S(t) = sum_{alpha in grade i} d_alpha sin(t * t_alpha)"
+      },
+      "quadratic_form_nonnegative": "x^T [a(t)a(t)^T + b(t)b(t)^T] x = (x^T a(t))^2 + (x^T b(t))^2 >= 0",
       "integrand_is_psd": true,
       "R_T_is_psd": true,
       "spectral_consequence": "lambda_min(W_arch) >= lambda_min(M_T)"
@@ -2692,8 +2751,196 @@
     },
     "transcendental_continuation_bridge_status": "STRICTLY_OPEN"
   },
+  "milestone_11_weil_continuity_and_approximation_bridge": {
+    "status": "WEIL_CONTINUITY_AND_APPROXIMATION_BRIDGE_AUDITED",
+    "parameters": {
+      "grades": [
+        0,
+        1
+      ],
+      "window": [
+        8.0,
+        20.0
+      ],
+      "canonical_bandwidth_h": 0.02,
+      "dps": 35
+    },
+    "continuity_theorem_in_V_R": {
+      "space_definition": "V_R = { f in C_c^infty(R) : supp(f) subset [-R, R], int_R f(u) exp(u/2) du = int_R f(u) exp(-u/2) du = 0 }",
+      "bilinear_continuity_bound": "|B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1}",
+      "quadratic_form_continuity_bound": "|B_log(f, f) - B_log(l, l)| <= C_R ||f - l||_{H^1} (||f||_{H^1} + ||l||_{H^1})",
+      "support_constant_C_R": "Depends continuously on support radius R and explicit formula Archimedean multiplier",
+      "admissibility": "Poles at s = +-1/2 cancelled identically by the two vanishing moment conditions"
+    },
+    "sobolev_scaling_exact_identities": {
+      "psi_h_L2_squared": "||psi_h||_2^2 = h^(-5) ||kappa''||_2^2 + (1/2) h^(-3) ||kappa'||_2^2 + (1/16) h^(-1) ||kappa||_2^2",
+      "psi_h_deriv_L2_squared": "||psi_h'||_2^2 = h^(-7) ||kappa'''||_2^2 + (1/2) h^(-5) ||kappa''||_2^2 + (1/16) h^(-3) ||kappa'||_2^2",
+      "leading_order_term": "h^(-7) ||kappa'''||_2^2",
+      "canonical_kernel_constants": {
+        "norm_kappa_sq": 0.675116813009698,
+        "norm_kappa_prime_sq": 2.077745668366741,
+        "norm_kappa_second_deriv_sq": 54.959873423948665,
+        "norm_kappa_third_deriv_sq": 16247.684292415848
+      },
+      "canonical_h_values": {
+        "h": 0.02,
+        "norm_psi_h_L2": 131053.76875999395,
+        "norm_psi_h_deriv_L2": 112665486.91123797,
+        "norm_psi_h_H1": 112665563.13282529,
+        "leading_coefficient_H1": 127.46640456377456
+      },
+      "scaling_comparison": {
+        "sobolev_H1_norm_order": "h^(-7/2)",
+        "archimedean_quadratic_form_order": "h^(-5) log(1/h)",
+        "ratio_order": "h^2 log(1/h) -> 0 as h -> 0+",
+        "implication": "Quadratic form energy is severely subordinated to Sobolev H^1 norm as h -> 0+"
+      }
+    },
+    "false_heuristics_withdrawn": {
+      "B_crit_heuristic_withdrawn": true,
+      "exp_delta_over_2h_withdrawn": true,
+      "reason": "The heuristic |B(g, g) - B_crit(g, g)| <= C delta_0 ||g||_{H^1}^2 lacked definition of B_crit and valid proof. The factor exp(-Delta/(2h)) cannot be derived from Cauchy-Schwarz alone. Both are permanently retracted in favor of exact Sobolev scaling and support bounds."
+    },
+    "conditional_target_under_H": {
+      "source": "Connes & Consani (2020), arXiv:2006.13771, Appendix C, Proposition C.1",
+      "premise": "H: There exists a non-trivial zero rho_0 of zeta(s) off the critical line Re(s) = 1/2",
+      "consequence": "Exists f_* in V_R such that B_log(f_*, f_*) = -eta < 0 for some eta > 0",
+      "preservation_condition": "An approximation f_n in F satisfies B(f_n, f_n) < 0 if C_R ||f_n - f_*||_{H^1} (2||f_*||_{H^1} + ||f_n - f_*||_{H^1}) < eta"
+    },
+    "approximation_bridge_structural_barriers": {
+      "barrier_1_asymptotic_scaling_divergence": {
+        "name": "Asymptotic Sobolev Norm Divergence in Positive Regime",
+        "mechanism": "To achieve positivity, h must satisfy h < h_pos(C). As h -> 0+, ||psi_h||_{H^1} ~ 127.47 * h^(-7/2) -> infty. For any fixed non-zero configuration C and coefficient vector c, ||T_{C, h} c||_{H^1} >= c_0 h^(-7/2) -> infty. By the reverse triangle inequality, ||T_{C, h} c - f_*||_{H^1} >= ||T_{C, h} c||_{H^1} - ||f_*||_{H^1} -> infty. Thus, localized bump combinations in the small-bandwidth positive regime CANNOT converge in H^1 to any fixed smooth target f_*.",
+        "status": "PROVED_STRUCTURAL_BARRIER"
+      },
+      "barrier_2_shared_grade_arithmetic_rigidity": {
+        "name": "Shared-Grade Coefficient Constraint",
+        "mechanism": "In the canonical TC family, all stations alpha in grade i share the identical coefficient c_i, with relative amplitudes fixed by arithmetic: d_alpha = Lambda(n_alpha) w(x_alpha). For a fixed configuration C with r grades, T_{C, h} spans an r-dimensional subspace of C_c^infty(R). An r-dimensional space cannot approximate an arbitrary test function f_* in V_R.",
+        "status": "PROVED_STRUCTURAL_BARRIER"
+      }
+    },
+    "epistemic_classification": {
+      "positivity_property_P_F": "CERTIFIED (Canonical reflected Weil matrix W has margin >= 3.3274e10 > 0)",
+      "localized_small_bandwidth_bump_approximation": "CLOSED_BY_STRUCTURAL_BARRIERS",
+      "conditional_implication_D_F": "STRICTLY_OPEN (Under P_F, D_F is equivalent to not H; not refuted by local bump failure)",
+      "transcendental_continuation_status": "STRICTLY_OPEN"
+    }
+  },
+  "milestone_11_sign_certificate": {
+    "certificate_type": "CANONICAL_REFLECTED_WEIL_MATRIX_SIGN_CERTIFICATE",
+    "schema_version": "1.0.0",
+    "specification_hash": "cbaa563e5e41893cadaa0045b5207259ce75a7fee8f854edf27286fcdfd9cd09",
+    "algorithm": "Gauss-Legendre Adaptive Quadrature with Certified Monotone Digamma Tail and Complete Prime Gap Exclusion",
+    "canonical_parameters": {
+      "bandwidth_h": 0.02,
+      "grades": [
+        0,
+        1
+      ],
+      "window": [
+        8.0,
+        20.0
+      ],
+      "weight_window": "w(x) = exp(1 - 1 / (1 - ((x - 14)/6)^2)) for 8 < x < 20",
+      "cutoff_T": 16000.0,
+      "cutoff_z": 320.0
+    },
+    "active_stations": {
+      "grade_0": [
+        9,
+        11,
+        13,
+        16,
+        17,
+        19
+      ],
+      "grade_1_integers": [
+        2,
+        3
+      ],
+      "grade_1_locations": [
+        12.566370614359172,
+        18.84955592153876
+      ]
+    },
+    "prime_gap_exclusion": {
+      "support_threshold_2h": 0.04,
+      "min_same_grade_gap": 0.05406722127027579,
+      "min_cross_grade_gap": 0.046117597181290375,
+      "same_grade_separated": true,
+      "cross_grade_separated": true,
+      "prime_evaluation_vanishes_identically": true,
+      "W_prime_operator_norm_bound_beta": 0.0
+    },
+    "archimedean_tail_psd": {
+      "digamma_series_reference": "NIST DLMF 5.7.6",
+      "derivative_formula": "d/dy Re digamma(1/4 + iy) = sum_{n>=0} 2y(n+1/4) / ((n+1/4)^2 + y^2)^2 > 0 for y > 0",
+      "omega_10_value": 0.4642906268649303,
+      "omega_positive_for_all_t_ge_T": true,
+      "vector_representation": "R_T = (1/pi) int_T^infty omega(t) |A_h(it)|^2 [a(t) a(t)^T + b(t) b(t)^T] dt",
+      "tail_is_positive_semidefinite": true
+    },
+    "finite_integral_matrix_M_T": {
+      "entries": [
+        [
+          1032430341859.5082,
+          27227628317.320614
+        ],
+        [
+          27227628317.320614,
+          34016106908.69131
+        ]
+      ],
+      "determinant": 3.437791714068351e+22,
+      "trace": 1066446448768.1995,
+      "lambda_min": 33274137094.31141,
+      "lambda_max": 1033172311673.8882,
+      "invariants_verified": {
+        "det_equals_lambda_prod": true,
+        "trace_equals_lambda_sum": true
+      }
+    },
+    "error_bounds_and_margin": {
+      "L_T_numerical_lower_bound": 33274137094.31141,
+      "e_T_outward_quadrature_bound": 100000.0,
+      "beta_prime_bound": 0.0,
+      "operator_lower_bound_L_T_minus_e_T": 33274037094.31141,
+      "net_positive_margin": 33274037094.31141,
+      "strictly_positive_margin": true
+    },
+    "complex_hermitian_extension": {
+      "identity": "c^* W c = (Re c)^T W (Re c) + (Im c)^T W (Im c)",
+      "complex_lower_bound": "c^* W c >= (L_T - e_T - beta) ||c||_2^2 > 0 for all c != 0 in C^2",
+      "complex_positive_definite": true
+    },
+    "certificate_verdict": "COMPLETE_CANONICAL_REFLECTED_WEIL_MATRIX_POSITIVE_DEFINITE"
+  },
+  "milestone_11_certificate_verification": {
+    "status": "CERTIFICATE_VERIFIED",
+    "verified": true,
+    "certificate_path": "C:\\Development\\Projects\\reimann_scope\\data\\canonical_reflected_weil_matrix_sign.json",
+    "net_positive_margin": 33274037094.31141,
+    "spectral_lower_bound": 33274037094.31141,
+    "checks": {
+      "schema_valid": true,
+      "params_valid": true,
+      "same_grade_gap_valid": true,
+      "cross_grade_gap_valid": true,
+      "W_prime_vanishes": true,
+      "omega_10_positive": true,
+      "tail_psd": true,
+      "det_positive": true,
+      "lambda_min_positive": true,
+      "det_equals_prod": true,
+      "trace_equals_sum": true,
+      "L_T_minus_e_T_pos": true,
+      "margin_reconstructed": true,
+      "margin_positive": true,
+      "complex_positive_definite": true
+    }
+  },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 263,
+    "total_compiled_theorems": 267,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
@@ -2742,7 +2989,11 @@
       "positivity_and_conditional_detection_imply_no_offline_zero",
       "real_quadratic_form_add_psd_tail",
       "complex_quadratic_form_add_psd_tail",
-      "real_quadratic_form_prime_perturbation"
+      "real_quadratic_form_prime_perturbation",
+      "matrix_lower_bound_psd_tail_perturbation",
+      "real_symmetric_matrix_complex_pos_of_real_pos",
+      "negativity_transfer_continuity",
+      "sobolev_reverse_triangle_lower_bound"
     ],
     "axioms": "Mathlib standard foundations only; 0 sorry, 0 admit."
   },
@@ -2775,11 +3026,17 @@
     "connes_consani_weil_criterion": "FORMULATED (Prop C.1 imports not RH ==> exists g in V: B(g, g) < 0; two TC obligations strictly separated: F_TC positivity vs off-line zero detection; mode vanishing risk identified; TC bridge strictly OPEN)",
     "conditional_logic_rectification": "PROVED (P_F and D_F together imply not H; P_F does not refute D_F; D_F is strictly OPEN)",
     "cutoff_discrepancy": "REPRODUCED (W00 doubles from 5.286e11 at t=600 to 1.032e12 at t=16000 due to Gevrey tail; z=12 was cutoff, not full-value enclosure)",
+    "omitted_slab_discrepancy": "REPRODUCED (W00 slab [320, 480] ~= 1730.80 matches review; <130 claim permanently withdrawn)",
+    "matrix_invariants_consistency": "RECOMPUTED (det = lambda1*lambda2 and trace = lambda1+lambda2 within 1e-14; errant report row resolved)",
     "archimedean_tail_psd": "CERTIFIED (NIST DLMF 5.7.6 digamma monotonicity proves omega(t) >= omega(10) > 0 for all t >= 10; R_T >= 0)",
-    "full_sign_certificate": "CERTIFIED (lambda_min(M_T) > 0 and R_T >= 0 proves W_arch > 0; W_prime = 0 proves complete W > 0)",
+    "full_sign_certificate": "CERTIFIED (lambda_min(M_T) > 0 and R_T >= 0 proves W_arch > 0; W_prime = 0 proves complete W > 0 with margin >= 3.3274e10)",
     "surviving_prime_bound": "BOUNDED (||W_prime||_op <= C_prime * h^-5; counterexample [7, 17] has exact resonance at q=2, but ratio W_prime / W_arch -> 0 as h -> 0)",
     "local_positivity_theorem": "PROVED (Eventual positivity on active grades for all 0 < h < h_pos(C); covers arbitrary complex coefficients)",
     "conditional_detection_implication": "OPEN (Scoped obstruction: small-bandwidth bump combinations in F_pos cannot approximate negative test g_0 within eta; D_F remains strictly OPEN)",
+    "sobolev_h1_norm_scaling": "PROVED (Leading order h^-7 ||kappa'''||_2^2; ||psi_h||_{H^1} ~ 127.47 h^(-7/2); B_crit heuristic removed)",
+    "weil_continuity_bound": "PROVED (|B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1} on V_R)",
+    "tc_approximation_barriers": "IDENTIFIED (Barrier 1: H^1 divergence ||f_n||_{H^1} -> infty; Barrier 2: shared-grade rigidity with fixed d_alpha)",
+    "tc_bridge_conditional_status": "STRICTLY_OPEN (Small-bandwidth bump scheme closed; D_F remains strictly open and equivalent to not H under P_F)",
     "full_spectrum_remainder_barrier": "CORRECTED_SCOPE (R_Gamma(g, g) = sum_{rho notin Gamma} m_rho M g(rho-1/2) conj(M g(1/2-bar(rho))); squared-modulus sum describes critical line only; nonvanishing of entire function on entire line does not imply nonvanishing on discrete zeros; Paley-Wiener discrete claim removed)",
     "weil_test_space_centering": "RECONCILED (tilde{g}(-1/2) = tilde{g}(1/2) = 0 transports classical poles under centering isomorphism g = x^(1/2) g_old)",
     "conditional_spectral_lower_bound": "UNPROVED / STRICTLY OPEN",

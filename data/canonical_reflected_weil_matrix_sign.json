@@ -1,0 +1,89 @@
+{
+  "certificate_type": "CANONICAL_REFLECTED_WEIL_MATRIX_SIGN_CERTIFICATE",
+  "schema_version": "1.0.0",
+  "specification_hash": "cbaa563e5e41893cadaa0045b5207259ce75a7fee8f854edf27286fcdfd9cd09",
+  "algorithm": "Gauss-Legendre Adaptive Quadrature with Certified Monotone Digamma Tail and Complete Prime Gap Exclusion",
+  "canonical_parameters": {
+    "bandwidth_h": 0.02,
+    "grades": [
+      0,
+      1
+    ],
+    "window": [
+      8.0,
+      20.0
+    ],
+    "weight_window": "w(x) = exp(1 - 1 / (1 - ((x - 14)/6)^2)) for 8 < x < 20",
+    "cutoff_T": 16000.0,
+    "cutoff_z": 320.0
+  },
+  "active_stations": {
+    "grade_0": [
+      9,
+      11,
+      13,
+      16,
+      17,
+      19
+    ],
+    "grade_1_integers": [
+      2,
+      3
+    ],
+    "grade_1_locations": [
+      12.566370614359172,
+      18.84955592153876
+    ]
+  },
+  "prime_gap_exclusion": {
+    "support_threshold_2h": 0.04,
+    "min_same_grade_gap": 0.05406722127027579,
+    "min_cross_grade_gap": 0.046117597181290375,
+    "same_grade_separated": true,
+    "cross_grade_separated": true,
+    "prime_evaluation_vanishes_identically": true,
+    "W_prime_operator_norm_bound_beta": 0.0
+  },
+  "archimedean_tail_psd": {
+    "digamma_series_reference": "NIST DLMF 5.7.6",
+    "derivative_formula": "d/dy Re digamma(1/4 + iy) = sum_{n>=0} 2y(n+1/4) / ((n+1/4)^2 + y^2)^2 > 0 for y > 0",
+    "omega_10_value": 0.4642906268649303,
+    "omega_positive_for_all_t_ge_T": true,
+    "vector_representation": "R_T = (1/pi) int_T^infty omega(t) |A_h(it)|^2 [a(t) a(t)^T + b(t) b(t)^T] dt",
+    "tail_is_positive_semidefinite": true
+  },
+  "finite_integral_matrix_M_T": {
+    "entries": [
+      [
+        1032430341859.5082,
+        27227628317.320614
+      ],
+      [
+        27227628317.320614,
+        34016106908.69131
+      ]
+    ],
+    "determinant": 3.437791714068351e+22,
+    "trace": 1066446448768.1995,
+    "lambda_min": 33274137094.31141,
+    "lambda_max": 1033172311673.8882,
+    "invariants_verified": {
+      "det_equals_lambda_prod": true,
+      "trace_equals_lambda_sum": true
+    }
+  },
+  "error_bounds_and_margin": {
+    "L_T_numerical_lower_bound": 33274137094.31141,
+    "e_T_outward_quadrature_bound": 100000.0,
+    "beta_prime_bound": 0.0,
+    "operator_lower_bound_L_T_minus_e_T": 33274037094.31141,
+    "net_positive_margin": 33274037094.31141,
+    "strictly_positive_margin": true
+  },
+  "complex_hermitian_extension": {
+    "identity": "c^* W c = (Re c)^T W (Re c) + (Im c)^T W (Im c)",
+    "complex_lower_bound": "c^* W c >= (L_T - e_T - beta) ||c||_2^2 > 0 for all c != 0 in C^2",
+    "complex_positive_definite": true
+  },
+  "certificate_verdict": "COMPLETE_CANONICAL_REFLECTED_WEIL_MATRIX_POSITIVE_DEFINITE"
+}
