@@ -8209,7 +8209,7 @@ class ArchimedeanKernelEvaluator:
             self.nodes_t = None
 
     def evaluate(self, v: float) -> float:
-        if NUMPY_AVAILABLE and self.nodes_t is not None:
+        if NUMPY_AVAILABLE and np is not None and self.nodes_t is not None:
             cos_v = np.cos(self.nodes_t * v)
             return float(np.sum(self.base * cos_v))
         return float(mpmath.quad(
