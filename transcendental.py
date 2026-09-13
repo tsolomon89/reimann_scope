@@ -8171,8 +8171,17 @@ def archimedean_digamma_weight(t: float) -> float:
     Archimedean weight omega(t) = Re digamma(1/4 + i*t/2) - log(pi).
     Governs the spectral density of the Archimedean place in the explicit formula.
     """
-    s = mpmath.mpc(0.25, t / 2.0)
-    return float(mpmath.re(mpmath.digamma(s)) - mpmath.log(mpmath.pi))
+    try:
+        import scipy.special
+        val = scipy.special.digamma(complex(0.25, 0.5 * t))
+        return float(val.real - math.log(math.pi))
+    except Exception:
+        pass
+    if FLINT_AVAILABLE and acb is not None and arb is not None:
+        _acb, _arb = acb, arb
+        s = _acb(_arb(0.25), _arb(0.5 * t))
+        return float(s.digamma().real) - math.log(math.pi)
+    return float(mpmath.re(mpmath.digamma(mpmath.mpc(0.25, 0.5 * t))) - mpmath.log(mpmath.pi))
 
 
 NORM_KAPPA_THIRD_DERIVATIVE_SQ = 16247.684292415849
@@ -9368,11 +9377,13 @@ def archimedean_digamma_weight(t: float) -> float:
     """Evaluate Archimedean digamma weight omega(t) = Re digamma(1/4 + i*t/2) - log(pi)."""
     try:
         import scipy.special
-        return float(np.real(scipy.special.digamma(0.25 + 0.5j * t)) - math.log(math.pi))
+        val = scipy.special.digamma(complex(0.25, 0.5 * t))
+        return float(val.real - math.log(math.pi))
     except Exception:
         pass
-    if FLINT_AVAILABLE:
-        s = acb(arb(0.25), arb(0.5 * t))
+    if FLINT_AVAILABLE and acb is not None and arb is not None:
+        _acb, _arb = acb, arb
+        s = _acb(_arb(0.25), _arb(0.5 * t))
         return float(s.digamma().real) - math.log(math.pi)
     return float(mpmath.re(mpmath.digamma(mpmath.mpc(0.25, 0.5 * t))) - mpmath.log(mpmath.pi))
 
