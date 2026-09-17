@@ -2940,7 +2940,7 @@
     }
   },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 271,
+    "total_compiled_theorems": 275,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",

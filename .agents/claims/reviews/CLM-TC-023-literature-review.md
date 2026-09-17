@@ -29,16 +29,14 @@
 - **Statement**: The digamma function series representation:
   $$\psi(z) = -\gamma + \sum_{n=0}^\infty \left(\frac{1}{n+1} - \frac{1}{n+z}\right).$$
   For $z = 1/4 + i y$ with $y > 0$:
-  $$\frac{d}{dy} \operatorname{Re}\psi(1/4 + iy) = \sum_{n=0}^\infty \frac{2y(n+1/4)}{((n+1/4)^2 + y^2)^2} > 0.$$
-  This strictly proves the monotonicity and positive-definiteness of the Archimedean kernel weight $\omega(t)$ for all $t > 0$.
+  $$0 \le \operatorname{Re}\psi(1/4 + iy) - \psi(1/4) = \sum_{n=0}^\infty \frac{y^2}{(n+1/4)((n+1/4)^2 + y^2)} \le 72 y^2.$$
+  With $y = t/2$, this yields $\operatorname{Re}\psi(1/4 + it/2) - \psi(1/4) \le 18 t^2$.
+  With $|\omega(0)| = |\psi(1/4) - \log\pi| \approx 5.3722 \le 18$, this proves:
+  $$|\omega(t)| \le 18(1 + t^2) \quad \forall t \in \mathbb R.$$
+  This strictly proves the Sobolev continuity envelope for the Archimedean kernel weight.
+  Furthermore, $\frac{d}{dy} \operatorname{Re}\psi(1/4 + iy) = \sum_{n=0}^\infty \frac{2y(n+1/4)}{((n+1/4)^2 + y^2)^2} > 0$ strictly proves monotonicity and positive-definiteness of the Archimedean kernel tail $R_T \ge 0$.
 
-### 1.4 Trudgian (2014)
-- **Reference**: Trudgian, T. S. (2014), *An improved upper bound for the argument of the Riemann zeta-function on the critical line II*, Journal of Number Theory, 136: 272–289.
-- **Statement**: Unconditional explicit counting bound for the zeros of $\zeta(s)$:
-  $$N(t) \le \frac{t}{2\pi} \log t \quad \text{for } t \ge 14.0.$$
-  Used directly in deriving the Sobolev continuity constant $C_R$ for the complete reflected Weil form on $\mathcal V_R$.
-
-### 1.5 Lindemann (1882)
+### 1.4 Lindemann (1882)
 - **Reference**: Lindemann, F. (1882), *Über die Zahl $\pi$*, Mathematische Annalen, 20(2): 213–225.
 - **Statement**: The number $\pi$ is transcendental over $\mathbb Q$. Consequently, $\tau = 2\pi$ is transcendental, which guarantees that for distinct integer grades $K \ne J$ and non-zero integers $m, n$:
   $$\frac{\tau^K}{\tau^J} = \tau^{K-J} \notin \mathbb Q \implies m \tau^K \ne n \tau^J.$$

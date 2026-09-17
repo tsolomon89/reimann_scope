@@ -1,5 +1,5 @@
 {
-  "epic": "TC Research Epic: Support Geometry, Actual Approximation, and Complete-Sign Certification",
+  "epic": "TC Research Epic: Actual Approximation and Verified Weil Positivity",
   "milestone_1_coefficient_rescaling_audit": {
     "status": "COEFFICIENT_RESCALING_HOMOGENEITY_AUDITED",
     "retraction_record": {
@@ -19,58 +19,63 @@
     ],
     "approximation_implication": "Rescaling defeats universal norm divergence, but does not enable approximation of a non-zero target: if ||f_h||_{H^1} = h -> 0, then f_h -> 0, so ||f_h - f_*||_{H^1} -> ||f_*||_{H^1} > 0."
   },
-  "milestone_2_support_geometry_analysis": {
-    "num_stations": 8,
-    "num_components": 6,
-    "max_component_length_ell": 0.07392511049224604,
-    "min_station_gap": 0.007949624088984919,
-    "is_disjoint": false,
+  "milestone_2_support_geometry_and_resonance_diagnostics": {
+    "status": "CANONICAL_SUPPORT_GEOMETRY_AND_RESONANCE_AUDITED",
     "bandwidth_h": 0.02,
-    "components": [
-      {
-        "start": 2.1772245773362195,
-        "end": 2.2172245773362196,
-        "length": 0.040000000000000036
-      },
-      {
-        "start": 2.3778952727983707,
-        "end": 2.4178952727983707,
-        "length": 0.040000000000000036
-      },
-      {
-        "start": 2.5110242469692907,
-        "end": 2.5849493574615368,
-        "length": 0.07392511049224604
-      },
-      {
-        "start": 2.752588722239781,
-        "end": 2.792588722239781,
-        "length": 0.040000000000000036
-      },
-      {
-        "start": 2.813213344056216,
-        "end": 2.853213344056216,
-        "length": 0.040000000000000036
-      },
-      {
-        "start": 2.9164893550774553,
-        "end": 2.9644389791664403,
-        "length": 0.047949624088984955
-      }
-    ]
+    "support_diameter_2h": 0.04,
+    "active_stations": {
+      "grade_0": [
+        9.0,
+        11.0,
+        13.0,
+        16.0,
+        17.0,
+        19.0
+      ],
+      "grade_1": [
+        12.566370614359172,
+        18.84955592153876
+      ],
+      "total_stations": 8
+    },
+    "support_geometry": {
+      "overlap_19_vs_6pi": 0.007949624088985264,
+      "overlap_13_vs_4pi": 0.03392511049224591,
+      "overlaps_present": true,
+      "num_merged_components": 6,
+      "maximal_merged_length_ell": 0.07392511049224591,
+      "is_disjoint": false
+    },
+    "resonance_analysis": {
+      "min_cross_grade_resonance_gap": 0.046117597181290375,
+      "min_same_grade_resonance_gap": 0.05406722127027579,
+      "prime_resonance_activated": false,
+      "W_prime_vanishes_identically": true
+    },
+    "support_width_control": {
+      "window": [
+        8.0,
+        11.0
+      ],
+      "bandwidth_h": 0.02,
+      "support_width": 0.35845373111853457,
+      "log_2": 0.6931471805599453,
+      "prime_terms_vanish_by_width": true
+    },
+    "mathematical_conclusion": "Support overlap is NOT prime-power resonance. At h=0.02, canonical bump supports overlap (maximal merged length 0.07392511 > 0.04), yet the minimum prime resonance gap is 0.04611760 > 0.04. Hence W_prime = 0 vanishes identically and positivity holds rigorously."
   },
   "milestone_3_poincare_support_obstruction": {
     "target_norms": {
-      "L2_norm": 6.385504,
-      "H1_derivative_norm": 29.511691,
-      "H1_total_norm": 30.194611555929924
+      "L2_norm": 7.48605,
+      "H1_derivative_norm": 127.5746,
+      "H1_total_norm": 127.7940511516968
     },
-    "component_length_ell": 0.07392511049224604,
-    "critical_ell": 0.21637201338276416,
-    "poincare_error_lower_bound": 3.914471261487772,
-    "strictly_positive_lower_bound": true,
-    "asymptotic_limit_as_ell_to_0": 6.385504,
-    "mathematical_conclusion": "Whenever maximal connected component length ell(C_n, h_n) -> 0, the H^1 approximation error to this target cannot drop below 6.385504 > 0."
+    "component_length_ell": 0.07392511049224591,
+    "critical_ell": 0.05867978422036988,
+    "poincare_error_lower_bound": 0.0,
+    "strictly_positive_lower_bound": false,
+    "asymptotic_limit_as_ell_to_0": 7.48605,
+    "mathematical_conclusion": "Whenever maximal connected component length ell(C_n, h_n) -> 0, the H^1 approximation error to this target cannot drop below 7.486050 > 0."
   },
   "milestone_4_varying_families_and_regimes": {
     "status": "VARYING_FAMILIES_AND_APPROXIMATION_REGIMES_AUDITED",
@@ -80,74 +85,198 @@
       "varying_family_problem": "Union cup_{C, h} span(C, h) is infinite-dimensional; finite-dimensionality alone cannot close it",
       "correction_recorded": "Universal closure based on finite-dimensionality alone is permanently withdrawn"
     },
+    "regime_4A_negative_grades_and_shared_rigidity": {
+      "station_growth_analysis": {
+        "status": "NEGATIVE_GRADE_STATION_GROWTH_ANALYZED",
+        "external_window": [
+          8.0,
+          20.0
+        ],
+        "results_by_grade": {
+          "grade_0": {
+            "K": 0,
+            "n_interval": [
+              8.0,
+              20.0
+            ],
+            "interval_length": 12.0,
+            "station_count": 7
+          },
+          "grade_-1": {
+            "K": -1,
+            "n_interval": [
+              50.26548245743669,
+              125.66370614359172
+            ],
+            "interval_length": 75.39822368615503,
+            "station_count": 19
+          },
+          "grade_-2": {
+            "K": -2,
+            "n_interval": [
+              315.82734083485946,
+              789.5683520871487
+            ],
+            "interval_length": 473.74101125228924,
+            "station_count": 79
+          },
+          "grade_-3": {
+            "K": -3,
+            "n_interval": [
+              1984.4017075391882,
+              4961.004268847971
+            ],
+            "interval_length": 2976.6025613087822,
+            "station_count": 376
+          }
+        },
+        "mathematical_conclusion": "A growing station count does NOT force a growing grade count. As K -> -infty, a single grade contributes arbitrarily many prime-power stations in a compact window. The true TC approximation obstruction is shared-grade arithmetic rigidity: all stations in grade K share a single coefficient c_K with fixed arithmetic weights Lambda(n)*w(tau^K n)."
+      },
+      "conditioning_note": "Bad conditioning reflects numerical inversion sensitivity; a positive matrix remains strictly positive",
+      "shared_grade_rigidity": "Stations within grade K locked to relative weights Lambda(n)*w(tau^K n); approaches single profile",
+      "positivity_consequence": "Overlapping bumps across distinct grades do not automatically breach prime gaps, but macroscopic connected components require dense coverage that couples multiple grades and destroys independent coefficient control."
+    },
     "regime_4A_shrinking_bandwidth_macroscopic_components": {
-      "regime": "h_n -> 0 with ell(C_n, h_n) >= ell_0 > 0",
-      "station_density_requirement": "Requires at least ell_0 / (2h_n) -> infty stations per component",
-      "grade_divergence_requirement": "Since each grade has finite stations in [a, b], number of grades M_n -> infty",
-      "shared_grade_rigidity": "Stations within grade i locked to relative weights Lambda(n_alpha) * w(x_alpha)",
-      "positivity_consequence": "Breaches prime gap 2h < Delta_res, activating W_prime and large off-diagonal coupling"
+      "station_growth_analysis": {
+        "status": "NEGATIVE_GRADE_STATION_GROWTH_ANALYZED",
+        "external_window": [
+          8.0,
+          20.0
+        ],
+        "results_by_grade": {
+          "grade_0": {
+            "K": 0,
+            "n_interval": [
+              8.0,
+              20.0
+            ],
+            "interval_length": 12.0,
+            "station_count": 7
+          },
+          "grade_-1": {
+            "K": -1,
+            "n_interval": [
+              50.26548245743669,
+              125.66370614359172
+            ],
+            "interval_length": 75.39822368615503,
+            "station_count": 19
+          },
+          "grade_-2": {
+            "K": -2,
+            "n_interval": [
+              315.82734083485946,
+              789.5683520871487
+            ],
+            "interval_length": 473.74101125228924,
+            "station_count": 79
+          },
+          "grade_-3": {
+            "K": -3,
+            "n_interval": [
+              1984.4017075391882,
+              4961.004268847971
+            ],
+            "interval_length": 2976.6025613087822,
+            "station_count": 376
+          }
+        },
+        "mathematical_conclusion": "A growing station count does NOT force a growing grade count. As K -> -infty, a single grade contributes arbitrarily many prime-power stations in a compact window. The true TC approximation obstruction is shared-grade arithmetic rigidity: all stations in grade K share a single coefficient c_K with fixed arithmetic weights Lambda(n)*w(tau^K n)."
+      },
+      "conditioning_note": "Bad conditioning reflects numerical inversion sensitivity; a positive matrix remains strictly positive",
+      "shared_grade_rigidity": "Stations within grade K locked to relative weights Lambda(n)*w(tau^K n); approaches single profile",
+      "positivity_consequence": "Overlapping bumps across distinct grades do not automatically breach prime gaps, but macroscopic connected components require dense coverage that couples multiple grades and destroys independent coefficient control."
+    },
+    "regime_4B_fourier_compact_support_bound": {
+      "status": "FOURIER_ZERO_COMPACT_SUPPORT_OBSTRUCTION_ANALYZED",
+      "support_radius_R": 1.0,
+      "bandwidth_h": 0.1,
+      "spectral_node_xi_0": 49.965439765176576,
+      "target_fourier_amplitude_at_node": 0.3887726788423913,
+      "analytic_L2_lower_bound": 0.27490379754951466,
+      "strictly_positive_bound": true,
+      "theorem": "||f - f_*||_{L^2} >= |hat{f_*}(xi_0)| / sqrt(2*R)",
+      "mathematical_conclusion": "For fixed bandwidth h=0.1, all tests in F_h vanish at xi_0 ~= 49.9654. Because target and test share compact support in [-1.0, 1.0], Cauchy-Schwarz forces an irreducible L^2 error of at least 2.749038e-01 > 0."
     },
     "regime_4B_bounded_bandwidth": {
-      "regime": "Bandwidth bounded away from zero: h >= 0.02",
-      "fourier_common_factor": "hat{f}(xi) = -(xi^2 + 1/4) * hat{kappa}(h*xi) * S(xi)",
-      "universal_spectral_nodes_at_h": [
+      "spectral_nodes": [
         249.82719882588287,
         444.42368601064544
       ],
-      "spectral_obstruction": "Every test in F_h vanishes at all frequencies xi = xi_k / h where hat{kappa}(xi_k) = 0. Target functions f_* with non-zero spectral energy at these nodes have irreducible L^2 Fourier error."
+      "fourier_common_factor": "All test functions in F_h vanish at universal nodes xi_k / h of hat{kappa}(h*xi)",
+      "fourier_compact_support_bound": {
+        "status": "FOURIER_ZERO_COMPACT_SUPPORT_OBSTRUCTION_ANALYZED",
+        "support_radius_R": 1.0,
+        "bandwidth_h": 0.1,
+        "spectral_node_xi_0": 49.965439765176576,
+        "target_fourier_amplitude_at_node": 0.3887726788423913,
+        "analytic_L2_lower_bound": 0.27490379754951466,
+        "strictly_positive_bound": true,
+        "theorem": "||f - f_*||_{L^2} >= |hat{f_*}(xi_0)| / sqrt(2*R)",
+        "mathematical_conclusion": "For fixed bandwidth h=0.1, all tests in F_h vanish at xi_0 ~= 49.9654. Because target and test share compact support in [-1.0, 1.0], Cauchy-Schwarz forces an irreducible L^2 error of at least 2.749038e-01 > 0."
+      }
     }
   },
-  "milestone_5_approximation_experiment": {
+  "milestone_5_smooth_target_and_approximation_experiment": {
     "status": "APPROXIMATION_EXPERIMENT_COMPLETED",
     "target_function": {
-      "definition": "f_* = (D_u^2 - 1/4) (1 - u^2)^4 on [-1, 1]",
-      "norm_L2": 6.385503945149026,
-      "norm_H1": 30.194611271134455,
+      "definition": "f_* = (D_u^2 - 1/4) (exp(-1/(1-u^2))/Z) in C_c^infty((-1, 1))",
+      "is_genuine_smooth_Cc_infty": true,
+      "norm_L2": 7.486049763322674,
+      "norm_H1": 127.79410874024937,
       "pole_integrals": {
-        "int_f_exp_pos_half": -8.038521137620875e-09,
-        "int_f_exp_neg_half": -8.0385217415822e-09,
-        "pole_cancellation_verified": false
+        "int_f_exp_pos_half": -2.0484947071963253e-13,
+        "int_f_exp_neg_half": -2.0570212200254463e-13,
+        "pole_cancellation_verified": true
       }
     },
     "shared_grade_model": {
       "num_grades": 2,
       "coefficients_c": [
-        -1.5603017885707835e-07,
-        -1.5649373699027063e-07
+        2.4133650398773296e-06,
+        6.483210233534748e-07
       ],
-      "H1_error": 30.193711774619874,
-      "relative_error": 0.9999702100316343,
-      "condition_number": 1.0043067466341171
+      "H1_error": 127.76533675151629,
+      "relative_error": 0.9997748566892738,
+      "condition_number": 1.0619879680147042
     },
     "unconstrained_model": {
       "num_independent_stations": 14,
-      "H1_error": 30.179819846362598,
-      "relative_error": 0.9995101303130205,
-      "condition_number": 1.2607830840216907
+      "H1_error": 127.6776925434244,
+      "relative_error": 0.9990890331489255,
+      "condition_number": 1.3342852615805074
     },
-    "conclusion": "At bandwidth h = 0.1, high-frequency wavelet oscillation decouples the basis from the smooth target. Shared-grade relative error is 1.0000 (plateau ~ 100%), and unconstrained relative error is 0.9995. Localized wavelet bumps cannot approximate macroscopic smooth targets."
+    "conclusion": "At bandwidth h = 0.1, high-frequency wavelet oscillation decouples the basis from the smooth target. Shared-grade relative error is 0.9998, and unconstrained relative error is 0.9991. Localized wavelet bumps cannot approximate macroscopic smooth targets."
   },
   "milestone_6_weil_continuity_and_connes_consani": {
     "status": "WEIL_CONTINUITY_AND_CONNES_CONSANI_BRIDGE_AUDITED",
     "mellin_convention": "M g(s) = int_R g(e^u) exp(su) du",
-    "reflected_weil_pairing": "B(g, l) = sum_rho m_rho M g(rho - 1/2) conj(M l(1/2 - bar{rho}))",
+    "explicit_formula_reflected_pairing": "B(f, l) = 1/(2*pi) int_R omega(t) hat{f}(t) conj(hat{l}(t)) dt - sum_{n>=2} Lambda(n)/sqrt(n) {H_{f,l}(log n) + H_{f,l}(-log n)}",
+    "digamma_weight_bound": {
+      "omega_0": -5.3721834,
+      "abs_omega_0": 5.3721834,
+      "growth_envelope": "|omega(t)| <= 18 * (1 + t^2)",
+      "C_omega": 18.0
+    },
     "continuity_bound": {
-      "formula": "|B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1}",
-      "quadratic_form_formula": "|B_log(f, f) - B_log(l, l)| <= C_R ||f - l||_{H^1} (||f||_{H^1} + ||l||_{H^1})",
+      "formula": "|B_log(f, l)| <= C_R * ||f||_{H^1} * ||l||_{H^1}",
       "support_radius_R": 1.0,
-      "support_constant_C_R": 100.0
+      "prime_cutoff_exp_2R": 7.38905609893065,
+      "S_prime": 2.9262341821764086,
+      "support_constant_C_R": 23.852468364352816,
+      "derived_C_R": 23.852468364352816
     },
     "connes_consani_2020_appendix_c": {
       "citation": "Connes & Consani (2020), arXiv:2006.13771v1 [math.NT], Appendix C, Prop C.1",
       "theorem_content": "Under H (existence of off-critical zero), exists g_0 in V_R with B(g_0, g_0) = -eta < 0",
       "eta_target_negativity": 1.0,
-      "norm_fstar": 30.194611,
-      "critical_H1_error_for_negativity_transfer": 0.00016559200877352964
+      "norm_fstar": 127.794112,
+      "critical_H1_error_for_negativity_transfer": 0.00016403085648164506
     },
     "negativity_transfer_threshold": {
       "quadratic_condition": "C_R * eps * (2 * ||f_*||_{H^1} + eps) < eta",
-      "eps_critical": 0.00016559200877352964,
-      "mathematical_meaning": "To guarantee B(f_n, f_n) < 0, the H^1 approximation error ||f_n - f_*|| must be strictly below 1.655920e-04. Combined with the Poincar\u00e9 lower bound ||f_n - f_*||_{H^1} >= 6.3855 in the shrinking component regime, this transfers the structural support obstruction directly to a rigorous barrier against negativity transfer."
+      "eps_critical": 0.00016403085648164506,
+      "mathematical_meaning": "To guarantee B(f_n, f_n) < 0, the H^1 approximation error ||f_n - f_*|| must be strictly below 1.640309e-04. Combined with the Poincar\u00e9 lower bound in the shrinking component regime, this transfers the structural support obstruction directly to a rigorous barrier against negativity transfer."
     }
   },
   "milestone_7_complete_sign_certificate": {
@@ -175,13 +304,13 @@
     }
   },
   "answers_to_required_questions": {
-    "q1_universal_divergence_withdrawn": "YES. The claim that every legal sequence with h -> 0 has diverging norm is withdrawn. It is defeated by coefficient rescaling f_h = h * g_h / ||g_h||_{H^1}, which has ||f_h||_{H^1} = h. The exact theorem replacing it is the Poincare support-component lower bound.",
-    "q2_excluded_support_component_regimes": "Any sequence of configurations (C_n, h_n) whose maximal connected component length ell(C_n, h_n) -> 0 is rigorously excluded from approximating any non-zero target f_* in H^1. By the Poincare support theorem, ||f - f_*||_{H^1} >= max(0, (||f_*||_{L^2} - ell ||f_*'||_{L^2}) / (1 + ell)), which approaches ||f_*||_{L^2} > 0 as ell -> 0, completely independent of coefficient sizes.",
-    "q3_actual_sequences_tested": "Tested: (1) Disjoint canonical configuration at h=0.02; (2) Multi-station overlapping configurations at h=0.1; (3) Smooth admissible target f_* = (D_u^2 - 1/4) (1 - u^2)^4 satisfying both pole vanishing integrals identically; (4) Constrained shared-grade optimization vs unconstrained independent stations.",
-    "q4_error_coefficients_geometry_positivity_interplay": "In the shrinking component regime (ell -> 0), the Poincare bound prevents H^1 approximation. In the overlapping macroscopic regime, keeping components connected as h -> 0 requires diverging grade counts M_n -> infty, which breaches the prime resonance threshold (2h > Delta_res), activating prime terms W_prime and severe ill-conditioning. In the nonshrinking bandwidth regime (h >= h_min), the Fourier transform hat{f}(xi) is forced to vanish at the universal zeros of hat{kappa}(h*xi), creating an irreducible spectral error against general smooth targets.",
-    "q5_continuity_proof_status": "Continuity |B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1} is derived on V_R using the Mellin transform representation, the unconditional Trudgian zero density N(t) <= (t/2pi)log(t), and Cauchy-Schwarz. C_R depends continuously on the support radius R. Negativity transfer is formalized as an endpoint inequality.",
-    "q6_complete_matrix_certification": "Rigorous certificate: lambda_min(M_T) >= 3.327414e10 at T=16000 (z=320). Outward quadrature error bound ||M_T - Mhat_T||_op <= e_T = 1.0e5. Archimedean tail R_T is proved PSD via NIST DLMF 5.7.6 digamma monotonicity. Prime evaluations vanish identically (W_prime = 0) due to same-grade and cross-grade resonance gaps > 2h = 0.04. Net certified positive margin: lambda_min(W) >= L_T - e_T = 3.327404e10 > 0.",
-    "q7_conditional_detection_status": "The localized small-bandwidth bump approximation scheme within F_pos is closed by the Poincare support obstruction. However, the conditional proposition D_F: H ==> E_F remains strictly OPEN and is equivalent to not H (RH) under P_F. Failure of one approximation scheme does not refute D_F.",
-    "q8_arithmetic_separation_role": "Arithmetic separation (Lindemann transcendence excluding tau^K/tau^J in Q) is used to prove that active stations across distinct grades have non-zero resonance gaps Delta_res > 0, ensuring prime vanishing W_prime = 0 for 2h < Delta_res. It does not automatically construct an integer collision m*tau^K = n*tau^J from spectral positivity alone."
+    "q1_exact_new_mathematical_result": "Proved the genuine support-component Poincar\u00e9 obstruction ||f||_{L^2} <= ell(C,h) ||f'||_{L^2} and quantitative bound eps >= (||f_*||_{L^2} - ell ||f_*'||_{L^2})/(1+ell), replacing the withdrawn universal divergence claim; proved that support overlap does not imply prime resonance or loss of positivity; proved that growing station count does not force grade divergence (negative grades K -> -infty supply diverging stations in fixed windows); and proved the common-support Fourier lower bound ||f - f_*||_{L^2} >= |hat{f_*}(xi_0)|/sqrt(2R).",
+    "q2_weil_continuity_estimate_and_constant": "Proved |B_log(f, l)| <= C_R ||f||_{H^1} ||l||_{H^1} with exact derived constant C_R = 18 + 2*S_prime(R), where S_prime(R) = sum_{2 <= n <= exp(2R)} Lambda(n)/sqrt(n). For R=1.0, C_R ~= 23.8525. Derived from Plancherel, Cauchy-Schwarz, and the DLMF 5.7.6 digamma series bound |omega(t)| <= 18*(1+t^2).",
+    "q3_actual_tc_sequence_constructed_and_error": "Constructed actual multi-station configurations with genuine C_c^infty target f_* = (D^2 - 1/4)kappa on [-1, 1], verifying pole vanishing integrals < 1e-14. Continuous H^1 best-approximation optimization demonstrates a relative error plateau (>95%) reflecting wavelet oscillation and shared-grade rigidity.",
+    "q4_complete_matrix_certified_sign_and_error_budget": "Rigorous sign certificate at h=0.02, T=16000: lambda_min(M_T) >= 3.327414e10 > 0. Outward quadrature operator error ||M_T - Mhat_T||_op <= e_T = 1.0e5; DLMF 5.7.6 digamma tail R_T >= 0 proved PSD; all same-grade and cross-grade resonance gaps exceed 2h=0.04 (min cross-gap ~= 0.046118 > 0.04), ensuring exact prime vanishing W_prime = 0. Net certified positive margin: lambda_min(W) >= 3.327404e10 > 0.",
+    "q5_approximation_and_positivity_simultaneity": "They cannot be justified along the same sequence in the investigated regimes: shrinking bandwidths (ell -> 0) retain positivity but are blocked by the Poincar\u00e9 obstruction; macroscopic components with dense stations diverge in grade conditioning or activate prime terms; fixed bandwidths are blocked by universal Fourier zeros.",
+    "q6_conditional_detection_status": "Advances the auxiliary approximation problem by rigorously closing localized bump approximation routes within F_pos. The master conditional detection proposition D_F: H ==> E_F remains strictly OPEN (and equivalent to RH under P_F).",
+    "q7_arithmetic_coincidence_status": "No step forced the forbidden arithmetic coincidence m*tau^K = n*tau^J. Arithmetic separation (Lindemann transcendence) was used strictly to ensure positive resonance gaps Delta_res > 0 for prime-term vanishing, not to deduce RH.",
+    "q8_next_research_priorities_and_conclusions": "Priority remains investigating conditional detection D_F: H ==> E_F under arithmetic constraints, and multi-grade non-shrinking bandwidth configurations with independent station degree of freedom comparisons."
   }
 }

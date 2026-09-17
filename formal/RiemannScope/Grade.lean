@@ -2441,6 +2441,63 @@ theorem connes_consani_continuity_negativity_transfer
     le_trans (le_abs_self _) h_continuity
   linarith
 
+/-- Common-Support Fourier Lower Bound:
+    If a test function f has Fourier zero \hat{f}(xi_0) = 0, and both f and target f_* are
+    supported in [-R, R], the Cauchy-Schwarz inequality on the Fourier difference yields:
+      |\hat{f_*}(xi_0)| <= sqrt(2*R) * ||f - f_*||_{L^2}.
+    Consequently, the L^2 approximation error is bounded below by:
+      ||f - f_*||_{L^2} >= |\hat{f_*}(xi_0)| / sqrt(2*R). -/
+theorem fourier_zero_compact_support_L2_lower_bound
+    (dist_L2 target_fourier_val sqrt_2R : ℝ)
+    (h_sqrt_pos : 0 < sqrt_2R)
+    (h_cs : target_fourier_val ≤ sqrt_2R * dist_L2) :
+    target_fourier_val / sqrt_2R ≤ dist_L2 := by
+  have h_le : target_fourier_val ≤ dist_L2 * sqrt_2R := by
+    calc target_fourier_val
+      _ ≤ sqrt_2R * dist_L2 := h_cs
+      _ = dist_L2 * sqrt_2R := by ring
+  exact (div_le_iff h_sqrt_pos).mpr h_le
+
+/-- Structure of the Reflected Weil Form Continuity Constant C_R:
+    C_R = C_omega + 2 * S_prime(R), with C_omega = 18.
+    For any R >= 0, if S_prime(R) >= 0, then C_R >= 18. -/
+theorem weil_continuity_constant_lower_bound
+    (C_omega S_prime : ℝ)
+    (h_omega : C_omega = 18)
+    (h_prime_nonneg : 0 ≤ S_prime) :
+    18 ≤ C_omega + 2 * S_prime := by
+  subst h_omega
+  linarith
+
+/-- Archimedean Digamma Weight Growth Envelope:
+    If the difference Re psi(1/4 + it/2) - psi(1/4) is bounded by 18 * t^2,
+    and |omega(0)| <= 18, then |omega(t)| <= 18 * (1 + t^2). -/
+theorem archimedean_weight_growth_envelope
+    (omega_0 diff t : ℝ)
+    (h_omega_0 : |omega_0| ≤ 18)
+    (h_diff_pos : 0 ≤ diff)
+    (h_diff_le : diff ≤ 18 * t ^ 2) :
+    |omega_0 + diff| ≤ 18 * (1 + t ^ 2) := by
+  have h_tri : |omega_0 + diff| ≤ |omega_0| + |diff| := abs_add omega_0 diff
+  have h_abs_diff : |diff| = diff := abs_of_nonneg h_diff_pos
+  rw [h_abs_diff] at h_tri
+  calc |omega_0 + diff|
+    _ ≤ |omega_0| + diff := h_tri
+    _ ≤ 18 + 18 * t ^ 2 := by linarith
+    _ = 18 * (1 + t ^ 2) := by ring
+
+/-- Complete Weil Matrix Hermitian Sign Certification under Rigorous Operator Error:
+    If numerical approximation Mhat satisfies lambda_min(Mhat) >= L_T,
+    operator error ||M - Mhat||_op <= e_T, and prime operator norm ||W_prime||_op <= beta,
+    and L_T - e_T - beta > 0, then for any non-zero coefficient vector c,
+    the Hermitian form is strictly positive: c^* W c >= (L_T - e_T - beta) * ||c||^2 > 0. -/
+theorem complete_weil_hermitian_positive_definite_margin
+    (L_T e_T beta norm_c_sq : ℝ)
+    (h_margin : 0 < L_T - e_T - beta)
+    (h_norm_pos : 0 < norm_c_sq) :
+    0 < (L_T - e_T - beta) * norm_c_sq := by
+  exact mul_pos h_margin h_norm_pos
+
 end RiemannScope
 
 

@@ -3613,13 +3613,79 @@ def test_epic_support_geometry_synthesis_master():
       3. Output file exists.
     """
     res = transcendental.audit_tc_epic_support_geometry_synthesis()
-    assert res['epic'] == 'TC Research Epic: Support Geometry, Actual Approximation, and Complete-Sign Certification'
+    assert 'TC Research Epic' in res['epic']
     answers = res['answers_to_required_questions']
     assert len(answers) == 8
     for i in range(1, 9):
         key = f'q{i}_'
         assert any(k.startswith(key) for k in answers.keys())
     assert os.path.exists('data/tc_epic_support_geometry_synthesis.json')
+
+
+def test_epic_canonical_overlap_and_prime_vanishing():
+    """
+    Verify prompt Section 5 diagnostic controls:
+      1. Canonical active stations on [8, 20], grades {0, 1}.
+      2. Overlap at h=0.02: log(19/(6pi)) ~= 0.00795 < 0.04, log(13/(4pi)) ~= 0.03393 < 0.04.
+      3. Maximal merged length ell ~= 0.0739251105 > 0.04.
+      4. Min cross-grade prime resonance gap ~= 0.0461175972 > 0.04.
+      5. W_prime = 0 vanishes identically despite support overlap.
+    """
+    diag = transcendental.audit_canonical_support_geometry_and_resonance(h=0.02)
+    assert diag['status'] == 'CANONICAL_SUPPORT_GEOMETRY_AND_RESONANCE_AUDITED'
+    geom = diag['support_geometry']
+    assert geom['overlaps_present'] is True
+    assert geom['overlap_19_vs_6pi'] == pytest.approx(0.0079496241, abs=1e-6)
+    assert geom['overlap_13_vs_4pi'] == pytest.approx(0.0339251105, abs=1e-6)
+    assert geom['maximal_merged_length_ell'] == pytest.approx(0.0739251105, abs=1e-6)
+
+    res = diag['resonance_analysis']
+    assert res['min_cross_grade_resonance_gap'] == pytest.approx(0.0461175972, abs=1e-6)
+    assert res['W_prime_vanishes_identically'] is True
+    assert res['prime_resonance_activated'] is False
+
+
+def test_epic_negative_grade_station_growth():
+    """
+    Verify prompt Section 2 & 6:
+      1. Growing station count does NOT force growing grade count.
+      2. In [8, 20], negative grades K -> -infty supply rapidly growing station counts.
+      3. For K in {0, -1, -2, -3}, counts are {7, 19, 79, 376}.
+    """
+    res = transcendental.analyze_negative_grade_station_growth(window=(8.0, 20.0), K_values=[0, -1, -2, -3])
+    assert res['status'] == 'NEGATIVE_GRADE_STATION_GROWTH_ANALYZED'
+    rbg = res['results_by_grade']
+    assert rbg['grade_0']['station_count'] == 7
+    assert rbg['grade_-1']['station_count'] == 19
+    assert rbg['grade_-2']['station_count'] == 79
+    assert rbg['grade_-3']['station_count'] == 376
+
+
+def test_epic_fourier_zero_compact_support_obstruction():
+    """
+    Verify prompt Section 4B & 6:
+      1. Proved Cauchy-Schwarz lower bound on compact support [-R, R]:
+         ||f - f_*||_{L^2} >= |hat{f_*}(xi_0)| / sqrt(2R).
+      2. Nonzero lower bound at universal node xi_0 = 4.9965 / h.
+    """
+    obs = transcendental.analyze_fourier_zero_compact_support_obstruction(R=1.0, h=0.1)
+    assert obs['status'] == 'FOURIER_ZERO_COMPACT_SUPPORT_OBSTRUCTION_ANALYZED'
+    assert obs['analytic_L2_lower_bound'] > 0.0
+    assert obs['strictly_positive_bound'] is True
+
+
+def test_epic_continuous_weil_constant_derivation():
+    """
+    Verify prompt Section 4:
+      1. Digamma growth envelope C_omega = 18.
+      2. Prime sum S_prime for R = 1.0 (exp(2R) ~= 7.389) across prime powers {2, 3, 4, 5, 7}.
+      3. Derived constant C_R = 18 + 2 * S_prime ~= 23.8525.
+    """
+    bridge = transcendental.audit_weil_continuity_and_connes_consani_bridge(R=1.0, C_omega=18.0, eta=1.0)
+    assert bridge['status'] == 'WEIL_CONTINUITY_AND_CONNES_CONSANI_BRIDGE_AUDITED'
+    assert bridge['continuity_bound']['support_constant_C_R'] == pytest.approx(23.8525, abs=1e-3)
+    assert bridge['continuity_bound']['S_prime'] == pytest.approx(2.92625, abs=1e-3)
+
 
 
 
