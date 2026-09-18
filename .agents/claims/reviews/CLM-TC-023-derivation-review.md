@@ -49,10 +49,13 @@ However, the minimal cross-grade prime resonance gap is:
 $$\min_{\alpha \in G_0, \beta \in G_1, q} |t_\alpha - t_\beta \pm \log q| \approx 0.046118 > 0.04 = 2h.$$
 Because the resonance gap strictly exceeds $2h$, the prime form vanishes identically ($W_{\rm prime} = 0$), preserving strict positive definiteness.
 
-### 1.5 Negative Grade Station Growth and Shared-Grade Rigidity
+### 1.5 Negative Grade Continuum Limit and Shared-Grade Rigidity
 In a fixed compact window $[a, b]$, stations at grade $K$ have $x_\alpha = \tau^K n_\alpha \in [a, b]$, meaning $n_\alpha \in [\tau^{-K} a, \tau^{-K} b]$.
-As $K \to -\infty$, the interval length $(b - a)\tau^{-K} \to \infty$. A single negative grade supplies diverging station counts (for $K \in \{0, -1, -2, -3\}$, station counts in $[8, 20]$ are $\{7, 19, 79, 376\}$). Thus, a growing station count does not force grade divergence.
-The true approximation barrier is shared-grade arithmetic rigidity: all stations in grade $K$ share a single scalar coefficient $c_K$ and arithmetic weights $\Lambda(n_\alpha)w(x_\alpha)$, locking the linear combination to a single smooth profile as station density increases.
+As $K \to -\infty$, the interval length $(b - a)\tau^{-K} \to \infty$. A single negative grade supplies diverging station counts (for $K \in \{0, -1, -2, -3, -4\}$, station counts in $[8, 20]$ are $\{7, 19, 79, 376, 1889\}$). Thus, a growing station count does not force grade divergence.
+Under the normalized basis $F_{K,h,w} = a_K T_{K,h,w}$, weak PNT convergence with logarithmic coordinate Jacobian $e^u$ forces:
+$$F_{K,h,w} \xrightarrow{K \to -\infty} F_{\infty,h,w} := (D_u^2 - 1/4)(\kappa_h * v_w), \quad v_w(u) = e^u w(e^u),$$
+and $F_{\infty,h,w} \to F_{\infty,0,w} = (D_u^2 - 1/4) v_w$ as $h \to 0$. The arithmetic discrepancy $E_{\rm arith}(K, h) = \|F_{K,h,w} - F_{\infty,h,w}\|_{H^1}$ decreases monotonically ($1.24 \times 10^6 \to 6.43 \times 10^5 \to 2.34 \times 10^5 \to 1.05 \times 10^5 \to 4.19 \times 10^4$ at $h=0.10$).
+The true approximation barrier is shared-grade arithmetic rigidity: all stations in grade $K$ share a single scalar coefficient $c_K$ and arithmetic weights $\Lambda(n_\alpha)w(x_\alpha)$, collapsing the infinite collection of stations within a single grade to a 1-dimensional subspace spanned by $F_{\infty,0,w}$. Independent smooth targets $f_* \ne \lambda F_{\infty,0,w}$ cannot be approximated by this rank-1 limit.
 
 ### 1.6 Common-Support Fourier Zero Lower Bound
 If a test function $f$ has a Fourier zero $\hat f(\xi_0) = 0$, and both $f$ and $f_*$ are compactly supported within $[-R, R]$, the Cauchy-Schwarz inequality on the Fourier difference yields:

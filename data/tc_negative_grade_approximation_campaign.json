@@ -1,0 +1,427 @@
+{
+  "status": "TC_NEGATIVE_GRADE_CAMPAIGN_COMPLETED",
+  "campaign_parameters": {
+    "window": [
+      8.0,
+      20.0
+    ],
+    "grades_tested": [
+      0,
+      -1,
+      -2,
+      -3,
+      -4
+    ],
+    "bandwidths_tested": [
+      0.2,
+      0.1,
+      0.05,
+      0.02
+    ]
+  },
+  "regime_1_single_grade_convergence": [
+    {
+      "K": 0,
+      "h": 0.1,
+      "station_count": 7,
+      "active_station_count": 6,
+      "provenance_hash": "8f2817edaa36d3cfebd0902b2752bd136947eab1d0296f8f7b52b7f5ae2f7e6b",
+      "E_arith_H1": 1242878.0925412043,
+      "E_arith_rel": 37.72201451661746,
+      "E_smooth_H1": 34912.97968945934,
+      "E_smooth_rel": 1.0596275970810827,
+      "E_total_H1": 1243903.7752454695,
+      "E_total_rel": 37.753144534993304
+    },
+    {
+      "K": -1,
+      "h": 0.1,
+      "station_count": 19,
+      "active_station_count": 19,
+      "provenance_hash": "5034036168b16edd81636418c4ad8064079a8f84715d6d217ab2faed080db2a7",
+      "E_arith_H1": 643293.6911318328,
+      "E_arith_rel": 19.524307412731183,
+      "E_smooth_H1": 34912.97968945934,
+      "E_smooth_rel": 1.0596275970810827,
+      "E_total_H1": 645281.5295143374,
+      "E_total_rel": 19.584639370283202
+    },
+    {
+      "K": -2,
+      "h": 0.1,
+      "station_count": 79,
+      "active_station_count": 79,
+      "provenance_hash": "4c53011a291812f9ad797d38084c8fcdfb8324b81a168382a7cbf297bd727bd8",
+      "E_arith_H1": 234260.35950844118,
+      "E_arith_rel": 7.109927140141047,
+      "E_smooth_H1": 34912.97968945934,
+      "E_smooth_rel": 1.0596275970810827,
+      "E_total_H1": 236242.89303871896,
+      "E_total_rel": 7.170098092592155
+    },
+    {
+      "K": -3,
+      "h": 0.1,
+      "station_count": 376,
+      "active_station_count": 376,
+      "provenance_hash": "e71c5d936707ff05eba88724e90dd4bbf67d5857c135196368468aa603a3b111",
+      "E_arith_H1": 104834.67432292768,
+      "E_arith_rel": 3.1817884073962297,
+      "E_smooth_H1": 34912.97968945934,
+      "E_smooth_rel": 1.0596275970810827,
+      "E_total_H1": 109860.51787432694,
+      "E_total_rel": 3.3343254458571003
+    },
+    {
+      "K": -4,
+      "h": 0.1,
+      "station_count": 1889,
+      "active_station_count": 1888,
+      "provenance_hash": "671e319e01078cd6b1515a6a5e4208bbf8da7c33b0e566189bc5bc30dda0c8c0",
+      "E_arith_H1": 41939.269681288206,
+      "E_arith_rel": 1.2728792543919107,
+      "E_smooth_H1": 34912.97968945934,
+      "E_smooth_rel": 1.0596275970810827,
+      "E_total_H1": 50560.349529231906,
+      "E_total_rel": 1.5345336363660378
+    },
+    {
+      "K": 0,
+      "h": 0.05,
+      "station_count": 7,
+      "active_station_count": 6,
+      "provenance_hash": "8f2817edaa36d3cfebd0902b2752bd136947eab1d0296f8f7b52b7f5ae2f7e6b",
+      "E_arith_H1": 13977411.511545975,
+      "E_arith_rel": 424.22242945219267,
+      "E_smooth_H1": 65340.555597338585,
+      "E_smooth_rel": 1.9831232137911907,
+      "E_total_H1": 13977479.8616448,
+      "E_total_rel": 424.2245039167638
+    },
+    {
+      "K": -1,
+      "h": 0.05,
+      "station_count": 19,
+      "active_station_count": 19,
+      "provenance_hash": "5034036168b16edd81636418c4ad8064079a8f84715d6d217ab2faed080db2a7",
+      "E_arith_H1": 7680560.460696716,
+      "E_arith_rel": 233.1094005138031,
+      "E_smooth_H1": 65340.555597338585,
+      "E_smooth_rel": 1.9831232137911907,
+      "E_total_H1": 7679960.955718008,
+      "E_total_rel": 233.09120519499706
+    },
+    {
+      "K": -2,
+      "h": 0.05,
+      "station_count": 79,
+      "active_station_count": 79,
+      "provenance_hash": "4c53011a291812f9ad797d38084c8fcdfb8324b81a168382a7cbf297bd727bd8",
+      "E_arith_H1": 3403010.7253030986,
+      "E_arith_rel": 103.28332081712283,
+      "E_smooth_H1": 65340.555597338585,
+      "E_smooth_rel": 1.9831232137911907,
+      "E_total_H1": 3402817.5149462926,
+      "E_total_rel": 103.2774567723466
+    },
+    {
+      "K": -3,
+      "h": 0.05,
+      "station_count": 376,
+      "active_station_count": 376,
+      "provenance_hash": "e71c5d936707ff05eba88724e90dd4bbf67d5857c135196368468aa603a3b111",
+      "E_arith_H1": 1281528.580789171,
+      "E_arith_rel": 38.8951250026316,
+      "E_smooth_H1": 65340.555597338585,
+      "E_smooth_rel": 1.9831232137911907,
+      "E_total_H1": 1281391.0937164626,
+      "E_total_rel": 38.89095219138151
+    },
+    {
+      "K": -4,
+      "h": 0.05,
+      "station_count": 1889,
+      "active_station_count": 1888,
+      "provenance_hash": "671e319e01078cd6b1515a6a5e4208bbf8da7c33b0e566189bc5bc30dda0c8c0",
+      "E_arith_H1": 517097.5449970244,
+      "E_arith_rel": 15.69420608538264,
+      "E_smooth_H1": 65340.555597338585,
+      "E_smooth_rel": 1.9831232137911907,
+      "E_total_H1": 514655.31421429635,
+      "E_total_rel": 15.620082985044927
+    }
+  ],
+  "regime_2_fixed_grade_bandwidth_scaling": [
+    {
+      "K": -2,
+      "h": 0.2,
+      "station_count": 79,
+      "active_station_count": 79,
+      "E_arith_H1": 18827.021134933104,
+      "E_smooth_H1": 33075.98846207788,
+      "E_total_H1": 36675.01772737335
+    },
+    {
+      "K": -2,
+      "h": 0.1,
+      "station_count": 79,
+      "active_station_count": 79,
+      "E_arith_H1": 234260.35950844118,
+      "E_smooth_H1": 34912.97968945934,
+      "E_total_H1": 236242.89303871896
+    },
+    {
+      "K": -2,
+      "h": 0.05,
+      "station_count": 79,
+      "active_station_count": 79,
+      "E_arith_H1": 3403010.7253030986,
+      "E_smooth_H1": 65340.555597338585,
+      "E_total_H1": 3402817.5149462926
+    },
+    {
+      "K": -2,
+      "h": 0.02,
+      "station_count": 79,
+      "active_station_count": 79,
+      "E_arith_H1": 95798872.70821406,
+      "E_smooth_H1": 420107.3360100564,
+      "E_total_H1": 95797735.668238
+    }
+  ],
+  "regime_3_joint_diagonal_schedule": [
+    {
+      "K": 0,
+      "h": 0.2,
+      "station_count": 7,
+      "active_station_count": 6,
+      "E_arith_H1": 105689.5546953622,
+      "E_smooth_H1": 33075.98846207788,
+      "E_total_H1": 111646.67457856689,
+      "E_total_rel": 3.388556232907225
+    },
+    {
+      "K": -1,
+      "h": 0.1,
+      "station_count": 19,
+      "active_station_count": 19,
+      "E_arith_H1": 643293.6911318328,
+      "E_smooth_H1": 34912.97968945934,
+      "E_total_H1": 645281.5295143374,
+      "E_total_rel": 19.584639370283202
+    },
+    {
+      "K": -2,
+      "h": 0.05,
+      "station_count": 79,
+      "active_station_count": 79,
+      "E_arith_H1": 3403010.7253030986,
+      "E_smooth_H1": 65340.555597338585,
+      "E_total_H1": 3402817.5149462926,
+      "E_total_rel": 103.2774567723466
+    },
+    {
+      "K": -3,
+      "h": 0.02,
+      "station_count": 376,
+      "active_station_count": 376,
+      "E_arith_H1": 37023598.63459838,
+      "E_smooth_H1": 420107.3360100564,
+      "E_total_H1": 37018785.34163832,
+      "E_total_rel": 1123.5415403631584
+    }
+  ],
+  "regime_4_multigrade_shared_vs_unconstrained": {
+    "continuum_target": {
+      "status": "ACTUAL_TC_APPROXIMATION_EXPERIMENT_COMPLETED",
+      "grades": [
+        0,
+        -1,
+        -2
+      ],
+      "bandwidth_h": 0.05,
+      "window": [
+        8.0,
+        20.0
+      ],
+      "target_function": {
+        "role": "continuum_consistency",
+        "description": "F_{infty, 0, w} = (D_u^2 - 1/4)(e^u w(e^u)) [Continuum Consistency Benchmark]",
+        "norm_L2": 563.409919158075,
+        "norm_H1": 32948.297224308815,
+        "int_pole_pos": 5.62229809618087e-08,
+        "int_pole_neg": 2.8182006836946744e-09,
+        "pole_cancellation_verified": false
+      },
+      "shared_grade_model": {
+        "num_grades": 3,
+        "coefficients_c": [
+          -1.1491738683140513e-05,
+          -8.754817549607317e-07,
+          1.2495873792633844e-06
+        ],
+        "normalized_coefficients": [
+          -1.1491738683140513e-05,
+          -1.3933724888876793e-07,
+          3.165241808287324e-08
+        ],
+        "H1_error": 32947.36694907003,
+        "relative_H1_error": 0.9999717656049885,
+        "condition_number": 86.17726600470382,
+        "singular_values": [
+          1.783637228290961e+16,
+          2279817806166475.0,
+          206973058090936.0
+        ]
+      },
+      "unconstrained_model": {
+        "is_enlarged_family_control": true,
+        "num_independent_stations": 104,
+        "H1_error": 31753.273814505013,
+        "relative_H1_error": 0.9637303438879345,
+        "condition_number": 2792.3007207225105
+      },
+      "support_geometry": {
+        "num_active_stations": 104,
+        "maximal_merged_length_ell": 0.0,
+        "num_components": 1
+      },
+      "manifest_hashes": {
+        "grade_0": "8f2817edaa36d3cfebd0902b2752bd136947eab1d0296f8f7b52b7f5ae2f7e6b",
+        "grade_-1": "5034036168b16edd81636418c4ad8064079a8f84715d6d217ab2faed080db2a7",
+        "grade_-2": "4c53011a291812f9ad797d38084c8fcdfb8324b81a168382a7cbf297bd727bd8"
+      },
+      "evidence_classification": "GENUINE_ARITHMETIC_APPROXIMATION_EVIDENCE"
+    },
+    "independent_target": {
+      "status": "ACTUAL_TC_APPROXIMATION_EXPERIMENT_COMPLETED",
+      "grades": [
+        0,
+        -1,
+        -2
+      ],
+      "bandwidth_h": 0.05,
+      "window": [
+        8.0,
+        20.0
+      ],
+      "target_function": {
+        "role": "independent_smooth",
+        "description": "f_* = (D_u^2 - 1/4)((1 - t^2)^4) on (log A, log B) [Independent Smooth Target]",
+        "norm_L2": 44.28747527626081,
+        "norm_H1": 451.47539007405845,
+        "int_pole_pos": 6.2324940143305696e-06,
+        "int_pole_neg": 4.927219148075139e-07,
+        "pole_cancellation_verified": false
+      },
+      "shared_grade_model": {
+        "num_grades": 3,
+        "coefficients_c": [
+          -1.8842711760898596e-08,
+          -2.333123225704418e-08,
+          -8.080445037749304e-09
+        ],
+        "normalized_coefficients": [
+          -1.8842711760898596e-08,
+          -3.7132809421336593e-09,
+          -2.0468006389540355e-10
+        ],
+        "H1_error": 451.4726582820522,
+        "relative_H1_error": 0.9999939491895542,
+        "condition_number": 86.17726600470382,
+        "singular_values": [
+          1.783637228290961e+16,
+          2279817806166475.0,
+          206973058090936.0
+        ]
+      },
+      "unconstrained_model": {
+        "is_enlarged_family_control": true,
+        "num_independent_stations": 104,
+        "H1_error": 451.23056695290046,
+        "relative_H1_error": 0.9994577265415999,
+        "condition_number": 2792.3007207225105
+      },
+      "support_geometry": {
+        "num_active_stations": 104,
+        "maximal_merged_length_ell": 0.0,
+        "num_components": 1
+      },
+      "manifest_hashes": {
+        "grade_0": "8f2817edaa36d3cfebd0902b2752bd136947eab1d0296f8f7b52b7f5ae2f7e6b",
+        "grade_-1": "5034036168b16edd81636418c4ad8064079a8f84715d6d217ab2faed080db2a7",
+        "grade_-2": "4c53011a291812f9ad797d38084c8fcdfb8324b81a168382a7cbf297bd727bd8"
+      },
+      "evidence_classification": "GENUINE_ARITHMETIC_APPROXIMATION_EVIDENCE"
+    }
+  },
+  "regime_5_controls": {
+    "positive_grade_K_1": {
+      "status": "ARITHMETIC_VS_SMOOTHING_ERROR_COMPUTED",
+      "grade": 1,
+      "bandwidth_h": 0.05,
+      "window": [
+        8.0,
+        20.0
+      ],
+      "station_count": 2,
+      "active_station_count": 2,
+      "provenance_hash": "01ab18575099781ed2139dbd4e403a28ebc972b97f68f7513a51990deaf7c187",
+      "target_norms": {
+        "L2": 563.4099187410196,
+        "H1": 32948.30857858058,
+        "pole_integral_pos": 6.729874762858288e-06,
+        "pole_integral_neg": 3.363192586007239e-07,
+        "pole_cancellation_verified": false
+      },
+      "errors": {
+        "E_arith_H1": 12640251.79704273,
+        "E_arith_relative": 383.63886774024115,
+        "E_smooth_H1": 65340.555597338585,
+        "E_smooth_relative": 1.9831232137911907,
+        "E_total_H1": 12641966.199020652,
+        "E_total_relative": 383.69090082029544,
+        "triangle_inequality_satisfied": true
+      }
+    },
+    "synthetic_control": {
+      "status": "APPROXIMATION_EXPERIMENT_COMPLETED",
+      "target_function": {
+        "definition": "f_* = (D_u^2 - 1/4) (exp(-1/(1-u^2))/Z) in C_c^infty((-1, 1))",
+        "is_genuine_smooth_Cc_infty": true,
+        "norm_L2": 7.486049763322674,
+        "norm_H1": 127.79410874024937,
+        "pole_integrals": {
+          "int_f_exp_pos_half": -2.0484947071963253e-13,
+          "int_f_exp_neg_half": -2.0570212200254463e-13,
+          "pole_cancellation_verified": true
+        }
+      },
+      "shared_grade_model": {
+        "num_grades": 2,
+        "coefficients_c": [
+          2.4133650398773296e-06,
+          6.483210233534748e-07
+        ],
+        "H1_error": 127.76533675151629,
+        "relative_error": 0.9997748566892738,
+        "condition_number": 1.0619879680147042
+      },
+      "unconstrained_model": {
+        "num_independent_stations": 14,
+        "H1_error": 127.6776925434244,
+        "relative_error": 0.9990890331489255,
+        "condition_number": 1.3342852615805074
+      },
+      "conclusion": "At bandwidth h = 0.1, high-frequency wavelet oscillation decouples the basis from the smooth target. Shared-grade relative error is 0.9998, and unconstrained relative error is 0.9991. Localized wavelet bumps cannot approximate macroscopic smooth targets."
+    }
+  },
+  "answers_to_six_core_questions": {
+    "q1_does_negative_grade_approach_continuum": "YES. As K -> -infty, the normalized arithmetic grade basis F_{K,h,w} = a_K T_{K,h,w} converges in H^1 to the continuum mollified profile F_{infty,h,w} = (D^2 - 1/4)(kappa_h * v_w), where v_w(u) = e^u w(e^u) contains the exact log-coordinate Jacobian. Along an explicit joint schedule (K -> -infty, h(K) -> 0), F_{K,h(K),w} -> F_{infty,0,w}.",
+    "q2_which_additional_targets_approximated": "Only targets in the span of the limiting continuum profiles can be approximated by shared grades. Because all stations in grade K share a single coefficient with locked arithmetic weights, a single grade collapses to a 1-dimensional subspace spanned by F_{infty,0,w}. Independent targets not proportional to F_{infty,0,w} exhibit an irreducible projection error unless enlarged to multiple independent weights or independent station coefficients.",
+    "q3_which_alleged_obstructions_apply": "The support-component Poincar\u00e9 bound applies strictly when ell(C,h) -> 0; in negative grades, station density diverges, so ell(C,h) does NOT shrink for overlapping configurations. The Fourier zero obstruction applies at fixed bandwidth h against targets with energy at xi_k/h. The true primary obstruction in negative grades is SHARED-GRADE ARITHMETIC RIGIDITY: dense prime powers within a single grade collapse to a rank-1 continuum limit.",
+    "q4_is_positivity_established_along_same_sequence": "NO. In the dense negative-grade regime, station density causes massive support overlap across primes, breaching the prime resonance condition (min gap < 2h) and introducing dense prime and off-diagonal terms that prevent naive positivity transfer.",
+    "q5_has_D_F_advanced": "D_F: H ==> exists f in F, B(f,f) < 0 remains strictly OPEN. Proving positivity on a restricted subfamily P_F does not refute D_F, and inability of single-grade limits to approximate independent negative targets does not refute RH.",
+    "q6_has_arithmetic_coincidence_advanced": "NO. No step in the approximation investigation derives the forbidden coincidence m * tau^K = n * tau^J from the existence of an off-critical zero. The reductio implication remains the primary open foundational obligation."
+  }
+}

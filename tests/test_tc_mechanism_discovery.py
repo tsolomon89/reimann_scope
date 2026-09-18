@@ -3687,5 +3687,125 @@ def test_epic_continuous_weil_constant_derivation():
     assert bridge['continuity_bound']['S_prime'] == pytest.approx(2.92625, abs=1e-3)
 
 
+# ==============================================================================
+# TC ARITHMETIC FIDELITY & NEGATIVE-GRADE INVESTIGATION ADVERSARIAL REGRESSIONS
+# ==============================================================================
 
+def test_adversarial_1_reject_synthetic_stations_as_actual_tc():
+    """Adversarial Regression 1: Ensure synthetic equally-spaced stations fail TC provenance check."""
+    fake_stations = [
+        {'grade': 0, 'prime': 0, 'exponent': 1, 'n': 10, 'x': -0.8, 'u': -0.8,
+         'Lambda_n': 1.0, 'w_val': 1.0, 'd_val': 1.0, 'is_active': True}
+    ]
+    man = transcendental.generate_actual_tc_stations(K=0, window=(8.0, 20.0))
+    assert man['is_actual_tc'] is True
+    assert man['provenance_hash'] is not None
+    import hashlib, json
+    tampered_bytes = json.dumps(fake_stations).encode('utf-8')
+    assert hashlib.sha256(tampered_bytes).hexdigest() != man['provenance_hash']
+
+
+def test_adversarial_2_reject_log_n_in_place_of_log_p():
+    """Adversarial Regression 2: Ensure Lambda(p^r) is strictly log(p), rejecting log(n)."""
+    man = transcendental.generate_actual_tc_stations(K=0, window=(8.0, 20.0))
+    station_9 = next(s for s in man['stations'] if s['n'] == 9)
+    assert station_9['prime'] == 3
+    assert station_9['exponent'] == 2
+    assert station_9['Lambda_n'] == pytest.approx(math.log(3.0), abs=1e-12)
+    assert station_9['Lambda_n'] != pytest.approx(math.log(9.0), abs=1e-3)
+
+    station_16 = next(s for s in man['stations'] if s['n'] == 16)
+    assert station_16['prime'] == 2
+    assert station_16['exponent'] == 4
+    assert station_16['Lambda_n'] == pytest.approx(math.log(2.0), abs=1e-12)
+    assert station_16['Lambda_n'] != pytest.approx(math.log(16.0), abs=1e-3)
+
+
+def test_adversarial_3_log_coordinate_jacobian_verification():
+    """Adversarial Regression 3: Ensure log-coordinate continuum density includes the exact e^u Jacobian."""
+    u_test = math.log(14.0)
+    v_val = transcendental.evaluate_v_w_profile(u_test, window=(8.0, 20.0))
+    w_val = transcendental.canonical_window_weight(14.0, window=(8.0, 20.0))
+    # v_w(u) = e^u * w(e^u) = 14.0 * w(14.0)
+    assert v_val == pytest.approx(14.0 * w_val, rel=1e-10)
+    # Reject density missing the e^u Jacobian
+    assert v_val != pytest.approx(w_val, rel=1e-2)
+
+
+def test_adversarial_4_boundary_zero_weight_stations_not_counted_as_active():
+    """Adversarial Regression 4: Ensure boundary stations with w(x)=0 are not reported as active."""
+    man = transcendental.generate_actual_tc_stations(K=0, window=(8.0, 20.0))
+    st_8 = next(s for s in man['stations'] if s['n'] == 8)
+    assert st_8['x'] == 8.0
+    assert st_8['w_val'] == 0.0
+    assert st_8['d_val'] == 0.0
+    assert st_8['is_active'] is False
+    assert man['enumerated_station_count'] == 7
+    assert man['active_station_count'] == 6
+    assert 8 not in [s['n'] for s in man['active_stations']]
+
+
+def test_adversarial_5_reject_independent_coefficients_in_shared_grade_model():
+    """Adversarial Regression 5: Ensure shared-grade model strictly uses 1 coefficient per grade."""
+    exp = transcendental.construct_actual_tc_approximation_experiment(
+        grades=[0, -1, -2], h=0.05, window=(8.0, 20.0), target_role="continuum_consistency"
+    )
+    shared = exp['shared_grade_model']
+    uncon = exp['unconstrained_model']
+    assert shared['num_grades'] == 3
+    assert len(shared['coefficients_c']) == 3
+    assert uncon['num_independent_stations'] > 3
+    assert uncon['is_enlarged_family_control'] is True
+
+
+def test_adversarial_6_raw_norm_growth_does_not_exclude_normalized_convergence():
+    """Adversarial Regression 6: Raw bump norm divergence does not prevent normalized F_{K,h,w} convergence."""
+    res_k0 = transcendental.compute_arithmetic_vs_smoothing_error(K=0, h=0.1, window=(8.0, 20.0))
+    res_k4 = transcendental.compute_arithmetic_vs_smoothing_error(K=-4, h=0.1, window=(8.0, 20.0))
+    assert res_k4['errors']['E_arith_H1'] < res_k0['errors']['E_arith_H1']
+    assert res_k4['errors']['E_arith_relative'] < res_k0['errors']['E_arith_relative']
+
+
+def test_adversarial_7_reject_incompatible_disjoint_support_comparison():
+    """Adversarial Regression 7: Ensure target and basis supports are strictly compatible."""
+    log_8 = math.log(8.0)
+    log_20 = math.log(20.0)
+    val_outside, _ = transcendental.evaluate_continuum_limit_profile_F_infty_0(0.0, window=(8.0, 20.0))
+    assert val_outside == 0.0
+    val_inside, _ = transcendental.evaluate_continuum_limit_profile_F_infty_0(0.5 * (log_8 + log_20), window=(8.0, 20.0))
+    assert abs(val_inside) > 0.0
+
+
+def test_adversarial_8_reject_generic_target_as_negative_weil_witness():
+    """Adversarial Regression 8: Generic smooth target is not relabeled as negative witness without proof."""
+    exp = transcendental.construct_actual_tc_approximation_experiment(
+        grades=[0, -1], h=0.1, window=(8.0, 20.0), target_role="continuum_consistency"
+    )
+    assert exp['target_function']['role'] == "continuum_consistency"
+    assert "Weil witness" not in exp['target_function']['description']
+
+
+def test_adversarial_9_quadrature_resolution_and_hash_stability():
+    """Adversarial Regression 9: Quadrature and station generation are deterministic with verified hashes."""
+    man1 = transcendental.generate_actual_tc_stations(K=-2, window=(8.0, 20.0))
+    man2 = transcendental.generate_actual_tc_stations(K=-2, window=(8.0, 20.0))
+    assert man1['provenance_hash'] == man2['provenance_hash']
+    assert man1['enumerated_station_count'] == 79
+    assert man1['active_station_count'] == 79
+
+
+def test_adversarial_10_negative_grade_campaign_artifact_verification():
+    """Adversarial Regression 10: Campaign artifact exists, contains required regimes, and validates status."""
+    campaign = transcendental.run_tc_negative_grade_approximation_campaign()
+    assert campaign['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_COMPLETED'
+    assert len(campaign['regime_1_single_grade_convergence']) == 10
+    assert len(campaign['regime_2_fixed_grade_bandwidth_scaling']) == 4
+    assert len(campaign['regime_3_joint_diagonal_schedule']) == 4
+    answers = campaign['answers_to_six_core_questions']
+    assert len(answers) == 6
+    assert "YES" in answers['q1_does_negative_grade_approach_continuum']
+    assert "NO" in answers['q4_is_positivity_established_along_same_sequence']
+    assert "OPEN" in answers['q5_has_D_F_advanced']
+    assert "NO" in answers['q6_has_arithmetic_coincidence_advanced']
+    assert os.path.exists("data/tc_negative_grade_approximation_campaign.json")
 

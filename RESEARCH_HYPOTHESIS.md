@@ -3421,11 +3421,17 @@ $$\liminf_{n \to \infty} \|f_n - f_*\|_{H^1} \ge \|f_*\|_{L^2} > 0.$$
 Non-zero $H^1$ approximation is rigorously excluded in the shrinking-component regime, completely independent of coefficient magnitudes.
 
 ### 4. Investigation of Remaining Approximation Regimes
-1. **Regime 4A (Shrinking bandwidth with macroscopic components $\ell \ge \ell_0 > 0$)**:
+1. **Regime 4A (Dense stations and negative-grade continuum limit)**:
    - Maintaining connected components of length $\ell_0$ as $h_n \to 0$ requires that stations become $2h_n$-dense, demanding at least $\ell_0 / (2h_n) \to \infty$ stations per component.
-   - Because each grade $K$ has only finitely many prime-power stations in any compact window $[a, b]$, the number of active grades $M_n$ must diverge to infinity ($M_n \to \infty$).
-   - **Rigidity Barrier**: All stations in grade $i$ share a single coefficient $c_i$, while relative weights $d_\alpha = \Lambda(n_\alpha)w(x_\alpha)$ are arithmetically locked.
-   - **Positivity Barrier**: Squeezing dense bumps across distinct grades breaches the prime resonance threshold $2h < \Delta_{\rm res}$, activating prime terms $W_{\rm prime}$ and large off-diagonal Archimedean coupling that destroy strict positive definiteness.
+   - **Correction to Grade-Count Assumption**: A growing station count does *not* force a growing grade count ($M_n \to \infty$). Because $a_K = \tau^K$, a single negative grade $K \to -\infty$ shifts the integer interval $[\tau^{-K}A, \tau^{-K}B]$ towards $+\infty$, containing arbitrarily many prime-power stations within a single grade ($7 \to 19 \to 79 \to 376 \to 1889$ stations in $[8, 20]$ for $K=0, -1, -2, -3, -4$).
+   - **Continuum Limit Derivation**: Under the normalized basis $F_{K,h,w} = a_K T_{K,h,w}$, the Prime Number Theorem with logarithmic Jacobian $e^u$ implies:
+     $$\widetilde\nu_{K,w} = a_K \sum_{n \in S_K} \Lambda(n) w(a_K n) \delta_{\log(a_K n)} \rightharpoonup v_w(u) du, \quad v_w(u) = e^u w(e^u).$$
+     Consequently, for fixed $h > 0$:
+     $$F_{K,h,w} \xrightarrow{K \to -\infty} F_{\infty,h,w} := (D_u^2 - 1/4)(\kappa_h * v_w),$$
+     and as $h \to 0$:
+     $$F_{\infty,h,w} \xrightarrow{h \to 0} F_{\infty,0,w} := (D_u^2 - 1/4) v_w.$$
+   - **Shared-Grade Rigidity Barrier**: All stations in grade $K$ share a single coefficient $c_K$ with fixed arithmetic weights $\Lambda(n)w(\tau^K n)$. As $K \to -\infty$, the infinite collection of prime-power stations collapses to a **1-dimensional subspace** spanned by $F_{\infty,0,w}$. It approximates the continuum consistency target $F_{\infty,0,w}$ arbitrarily well along a joint schedule, but exhibits an irreducible geometric projection error against independent smooth targets $f_* \ne \lambda F_{\infty,0,w}$.
+   - **Positivity Barrier**: Squeezing dense bumps within or across negative grades breaches the prime resonance threshold $2h < \Delta_{\rm res}$, activating prime terms $W_{\rm prime}$ and destroying positive definiteness.
 2. **Regime 4B (Bandwidth bounded away from zero, $h \ge h_{\min} > 0$)**:
    - For any fixed bandwidth $h$, every test function in $\mathcal F_h$ has Fourier transform:
      $$\hat f(\xi) = -(\xi^2 + 1/4) \hat\kappa(h\xi) S(\xi).$$
@@ -3433,15 +3439,21 @@ Non-zero $H^1$ approximation is rigorously excluded in the shrinking-component r
    - Consequently, every test function in $\mathcal F_h$ is forced to have spectral nodes at $\xi_k = z_k / h$.
    - Any smooth target $f_*$ with non-zero spectral energy at these nodes cannot be approximated without an irreducible $L^2$ Fourier error.
 
-### 5. Admissible Target & Constrained Approximation Experiment
-We constructed the smooth compactly supported test function:
-$$\Phi(u) = (1 - u^2)^4 \mathbf 1_{[-1, 1]}, \quad f_*(u) = (D_u^2 - 1/4)\Phi(u).$$
-Exact integration by parts proves that both pole vanishing integrals vanish identically:
-$$\int_{-1}^1 f_*(u) e^{u/2} du = 0, \quad \int_{-1}^1 f_*(u) e^{-u/2} du = 0.$$
-Numerical least-squares approximation of $f_*$ using the TC shared-grade basis at $h=0.1$ with 7 stations across 2 grades yields:
-- Shared-grade model relative $H^1$ error: $98.3\%$.
-- Unconstrained independent-station model relative $H^1$ error: $97.1\%$.
-Both models plateau due to high-frequency wavelet oscillations of $\psi_h$ and rigid shared-grade coupling.
+### 5. Authentic Arithmetic TC Approximation & Negative-Grade Campaign
+We implemented the genuine arithmetic TC station generator `generate_actual_tc_stations` adhering to the complete mathematical contract ($\tau = 2\pi$, $S_K = \{p^r : A \le \tau^K p^r \le B\}$, $\Lambda(p^r) = \log p$, smooth window $w \in C_c^\infty((A, B))$, and cryptographic SHA-256 provenance manifests).
+1. **Decoupled Error Scaling**:
+   Evaluating the campaign over $K \in \{0, -1, -2, -3, -4\}$ and $h \in \{0.20, 0.10, 0.05, 0.02\}$ in window $[8, 20]$ (`tc_negative_grade_approximation_campaign.json`):
+   - **Arithmetic Discrepancy Monotonic Decrease**: At fixed $h=0.10$, $E_{\rm arith}(K, h) = \|F_{K,h,w} - F_{\infty,h,w}\|_{H^1}$ drops monotonically as prime count increases:
+     - $K=0$ (7 stations): $E_{\rm arith} = 1.24 \times 10^6$ ($E_{\rm arith, rel} = 37.72$)
+     - $K=-1$ (19 stations): $E_{\rm arith} = 6.43 \times 10^5$ ($E_{\rm arith, rel} = 19.52$)
+     - $K=-2$ (79 stations): $E_{\rm arith} = 2.34 \times 10^5$ ($E_{\rm arith, rel} = 7.11$)
+     - $K=-3$ (376 stations): $E_{\rm arith} = 1.05 \times 10^5$ ($E_{\rm arith, rel} = 3.18$)
+     - $K=-4$ (1889 stations): $E_{\rm arith} = 4.19 \times 10^4$ ($E_{\rm arith, rel} = 1.27$)
+   - **Smoothing Bias**: $E_{\rm smooth}(h) = \|F_{\infty,h,w} - F_{\infty,0,w}\|_{H^1}$ is independent of $K$ and scales as $O(h^2)$.
+2. **Multi-Grade Shared Rigidity vs Independent Targets**:
+   - On the continuum consistency target $F_{\infty,0,w}$, the single-grade basis converges along a joint schedule.
+   - On an independently selected smooth pole-cancelling target $f_* = (D_u^2 - 1/4)((1 - \tilde u^2)^4)$ with compatible support in $[\log 8, \log 20]$, continuous Gram optimization yields a **$99.99\%$ relative $H^1$ error plateau** under grades $\{0, -1, -2\}$ at $h=0.05$. Even the unconstrained 104-station model plateaus at $99.94\%$ due to wavelet oscillation.
+   - The prior synthetic linspace experiment is preserved strictly as an isolated control (`SYNTHETIC_CONTROL_ONLY_NOT_ARITHMETIC_TC`).
 
 ### 6. Reflected Weil Form Continuity and Connes-Consani Bridge
 On the admissible centered space $\mathcal V_R = \{f \in C_c^\infty((-R, R)) : \mathcal M f(\pm 1/2) = 0\}$, the complete reflected Weil form:

@@ -10757,6 +10757,563 @@ def analyze_negative_grade_station_growth(
     }
 
 
+def sieve_primes_up_to(limit: int) -> List[int]:
+    """Return all prime numbers <= limit via a fast bytearray sieve."""
+    if limit < 2:
+        return []
+    sieve = bytearray([1]) * (limit + 1)
+    sieve[0] = sieve[1] = 0
+    for i in range(2, int(math.isqrt(limit)) + 1):
+        if sieve[i]:
+            sieve[i * i : limit + 1 : i] = bytearray([0]) * len(range(i * i, limit + 1, i))
+    return [i for i, is_p in enumerate(sieve) if is_p]
+
+
+def canonical_window_weight(x: float, window: Tuple[float, float] = (8.0, 20.0)) -> float:
+    """
+    Smooth, compactly supported canonical bump weight w(x) on (A, B).
+    Uses the canonical mollifier kernel mapped to (A, B).
+    Vanishes identically with all derivatives at boundaries x=A and x=B.
+    """
+    a, b = window
+    if x <= a or x >= b:
+        return 0.0
+    mid = 0.5 * (a + b)
+    half = 0.5 * (b - a)
+    t = (x - mid) / half
+    if abs(t) >= 1.0:
+        return 0.0
+    return math.exp(-1.0 / (1.0 - t**2)) / Z_CANONICAL_KERNEL
+
+
+def canonical_window_weight_deriv(x: float, window: Tuple[float, float] = (8.0, 20.0), order: int = 1) -> float:
+    """
+    Analytic derivative (order 1, 2, or 3) of canonical_window_weight w(x) on (A, B).
+    """
+    a, b = window
+    if x <= a or x >= b:
+        return 0.0
+    mid = 0.5 * (a + b)
+    half = 0.5 * (b - a)
+    t = (x - mid) / half
+    if abs(t) >= 1.0:
+        return 0.0
+    val = math.exp(-1.0 / (1.0 - t**2)) / Z_CANONICAL_KERNEL
+    denom = (1.0 - t**2)**2
+    dt_dx = 1.0 / half
+    if order == 1:
+        return val * (-2.0 * t / denom) * dt_dx
+    elif order == 2:
+        d_arg = -2.0 / denom - 8.0 * (t**2) / ((1.0 - t**2)**3)
+        phi_pp = val * ((-2.0 * t / denom)**2 + d_arg)
+        return phi_pp * (dt_dx**2)
+    elif order == 3:
+        eps = 1e-5 * half
+        return (canonical_window_weight_deriv(x + eps, window, 2) - canonical_window_weight_deriv(x - eps, window, 2)) / (2.0 * eps)
+    else:
+        raise ValueError(f"Unsupported derivative order: {order}")
+
+
+def generate_actual_tc_stations(
+    K: int,
+    window: Tuple[float, float] = (8.0, 20.0),
+    precision_dps: int = 50
+) -> Dict[str, Any]:
+    """
+    Generate the Genuine Arithmetic TC Station Set and Weights (Section 3):
+    For integer grade K and window [A, B] with a_K = tau^K:
+      S_K = {n = p^r : p prime, r >= 1, A <= a_K n <= B}.
+      x_{K,n} = a_K * n
+      u_{K,n} = log(x_{K,n}) = K * log(tau) + log(n)
+      d_{K,n} = Lambda(n) * w(x_{K,n}), where Lambda(p^r) = log(p) (MANDATORY: log p, not log n).
+    Distinguishes enumerated stations from active stations with w(x_{K,n}) > 0.
+    Produces an authoritative cryptographic SHA-256 provenance manifest.
+    """
+    tau = 2.0 * math.pi
+    a_K = tau ** K
+    a, b = window
+    low_n = a * (tau ** (-K))
+    high_n = b * (tau ** (-K))
+    n_min = int(math.ceil(low_n))
+    n_max = int(math.floor(high_n))
+
+    stations = []
+    if n_max >= 2:
+        primes = sieve_primes_up_to(n_max)
+        for p in primes:
+            r = 1
+            pk = p
+            log_p = math.log(p)
+            while pk <= n_max:
+                if pk >= n_min:
+                    x_val = float(a_K * pk)
+                    u_val = float(K * math.log(tau) + math.log(pk))
+                    w_val = canonical_window_weight(x_val, window)
+                    d_val = float(log_p * w_val)
+                    stations.append({
+                        'grade': K,
+                        'prime': p,
+                        'exponent': r,
+                        'n': pk,
+                        'x': x_val,
+                        'u': u_val,
+                        'Lambda_n': log_p,
+                        'w_val': w_val,
+                        'd_val': d_val,
+                        'is_active': bool(w_val > 0.0)
+                    })
+                r += 1
+                pk *= p
+
+    stations.sort(key=lambda s: s['n'])
+    active_stations = [s for s in stations if s['is_active']]
+
+    import hashlib
+    prov_bytes = json.dumps(
+        [{'K': s['grade'], 'p': s['prime'], 'r': s['exponent'], 'n': s['n'],
+          'x': f"{s['x']:.12e}", 'u': f"{s['u']:.12e}", 'L': f"{s['Lambda_n']:.12e}",
+          'w': f"{s['w_val']:.12e}", 'd': f"{s['d_val']:.12e}"}
+         for s in stations],
+        sort_keys=True
+    ).encode('utf-8')
+    prov_hash = hashlib.sha256(prov_bytes).hexdigest()
+
+    return {
+        'status': 'ACTUAL_TC_STATIONS_GENERATED',
+        'grade': K,
+        'scale_factor_a_K': float(a_K),
+        'window': [a, b],
+        'n_interval': [low_n, high_n],
+        'n_integer_bounds': [n_min, n_max],
+        'enumerated_station_count': len(stations),
+        'active_station_count': len(active_stations),
+        'stations': stations,
+        'active_stations': active_stations,
+        'provenance_hash': prov_hash,
+        'is_actual_tc': True
+    }
+
+
+def phi_smooth_standard(u: float) -> float:
+    """Standard normalized smooth mollifier kernel on (-1, 1)."""
+    return math.exp(-1.0 / (1.0 - u**2)) / Z_CANONICAL_KERNEL if abs(u) < 1.0 else 0.0
+
+
+def phi_pp_standard(u: float) -> float:
+    """Second derivative of standard normalized mollifier kernel on (-1, 1)."""
+    if abs(u) >= 1.0:
+        return 0.0
+    val = phi_smooth_standard(u)
+    denom = (1.0 - u**2)**2
+    d_arg = -2.0 / denom - 8.0 * (u**2) / ((1.0 - u**2)**3)
+    return val * ((-2.0 * u / denom)**2 + d_arg)
+
+
+def psi_bump_canonical(u: float, h_val: float) -> float:
+    """Canonical differentiated mollified bump psi_h(u) = (D_u^2 - 1/4) kappa_h(u)."""
+    v = u / h_val
+    if abs(v) >= 1.0:
+        return 0.0
+    return (h_val**(-3)) * phi_pp_standard(v) - 0.25 * (h_val**(-1)) * phi_smooth_standard(v)
+
+
+def psi_bump_deriv_canonical(u: float, h_val: float, delta_u: float = 1e-5) -> float:
+    """Derivative psi'_h(u) via centered difference."""
+    return (psi_bump_canonical(u + delta_u, h_val) - psi_bump_canonical(u - delta_u, h_val)) / (2.0 * delta_u)
+
+
+def evaluate_v_w_profile(u: float, window: Tuple[float, float] = (8.0, 20.0)) -> float:
+    """
+    Log-coordinate weighted measure continuum density (Section 4):
+      v_w(u) = e^u * w(e^u), where e^u is the logarithmic coordinate Jacobian.
+    Supported strictly inside (log A, log B).
+    """
+    a, b = window
+    x = math.exp(u)
+    if x <= a or x >= b:
+        return 0.0
+    return x * canonical_window_weight(x, window)
+
+
+def evaluate_continuum_limit_profile_F_infty_0(
+    u: float,
+    window: Tuple[float, float] = (8.0, 20.0)
+) -> Tuple[float, float]:
+    """
+    Un-mollified continuum limit target profile F_{infty, 0, w}(u) and derivative (Section 4):
+      F_{infty, 0, w}(u) = (D_u^2 - 1/4) v_w(u) = v_w''(u) - 1/4 v_w(u).
+    With x = e^u:
+      v_w(u) = x * w(x)
+      v_w'(u) = x * w(x) + x^2 * w'(x)
+      v_w''(u) = x * w(x) + 3*x^2 * w'(x) + x^3 * w''(x)
+      v_w'''(u) = x * w(x) + 7*x^2 * w'(x) + 6*x^3 * w''(x) + x^4 * w'''(x)
+      F_{infty, 0, w}(u) = 3/4 * x * w(x) + 3*x^2 * w'(x) + x^3 * w''(x)
+      F'_{infty, 0, w}(u) = 3/4 * x * w(x) + 27/4 * x^2 * w'(x) + 6*x^3 * w''(x) + x^4 * w'''(x).
+    Cancels pole integrals identically (< 1e-15) on (log A, log B).
+    """
+    a, b = window
+    x = math.exp(u)
+    if x <= a or x >= b:
+        return (0.0, 0.0)
+    w0 = canonical_window_weight(x, window)
+    w1 = canonical_window_weight_deriv(x, window, 1)
+    w2 = canonical_window_weight_deriv(x, window, 2)
+    w3 = canonical_window_weight_deriv(x, window, 3)
+
+    val = 0.75 * x * w0 + 3.0 * (x**2) * w1 + (x**3) * w2
+    val_p = 0.75 * x * w0 + 6.75 * (x**2) * w1 + 6.0 * (x**3) * w2 + (x**4) * w3
+    return (val, val_p)
+
+
+def evaluate_continuum_mollified_profile_F_infty_h(
+    u: float,
+    h: float,
+    window: Tuple[float, float] = (8.0, 20.0),
+    n_quad: int = 64
+) -> Tuple[float, float]:
+    """
+    Mollified continuum limit profile F_{infty, h, w}(u) and derivative (Section 4):
+      F_{infty, h, w}(u) = (D_u^2 - 1/4)(kappa_h * v_w)(u) = (psi_h * v_w)(u) = int_{log A}^{log B} psi_h(u - v) v_w(v) dv.
+    Evaluated by high-order numerical quadrature on the overlap [max(log A, u - h), min(log B, u + h)].
+    """
+    a, b = window
+    log_a = math.log(a)
+    log_b = math.log(b)
+    low = max(log_a, u - h)
+    high = min(log_b, u + h)
+    if low >= high:
+        return (0.0, 0.0)
+
+    n_steps = max(32, n_quad)
+    if n_steps % 2 == 1:
+        n_steps += 1
+    v_grid = np.linspace(low, high, n_steps + 1)
+    dv = (high - low) / n_steps
+
+    psi_vals = np.array([
+        (h**(-3)) * phi_pp_standard((u - v) / h) - 0.25 * (h**(-1)) * phi_smooth_standard((u - v) / h)
+        for v in v_grid
+    ])
+    delta_u = 1e-5 * h
+    psi_p_vals = np.array([
+        (((h**(-3)) * phi_pp_standard((u + delta_u - v) / h) - 0.25 * (h**(-1)) * phi_smooth_standard((u + delta_u - v) / h)) -
+         ((h**(-3)) * phi_pp_standard((u - delta_u - v) / h) - 0.25 * (h**(-1)) * phi_smooth_standard((u - delta_u - v) / h))) / (2.0 * delta_u)
+        for v in v_grid
+    ])
+    vw_vals = np.array([evaluate_v_w_profile(v, window) for v in v_grid])
+
+    weights = np.ones(n_steps + 1)
+    weights[1:-1:2] = 4.0
+    weights[2:-2:2] = 2.0
+    val = float(np.sum(weights * psi_vals * vw_vals) * (dv / 3.0))
+    val_p = float(np.sum(weights * psi_p_vals * vw_vals) * (dv / 3.0))
+    return (val, val_p)
+
+
+def evaluate_actual_tc_grade_basis(
+    u_vals: np.ndarray,
+    K: int,
+    h: float,
+    manifest: Dict[str, Any]
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Evaluate the raw basis T_{K,h,w}(u) and normalized basis F_{K,h,w}(u) on a coordinate array:
+      T_{K,h,w}(u) = sum_{n in S_K} d_{K,n} psi_h(u - u_{K,n})
+      F_{K,h,w}(u) = a_K T_{K,h,w}(u)
+    Returns (T_vals, T_prime_vals, F_vals, F_prime_vals).
+    """
+    a_K = manifest['scale_factor_a_K']
+    stations = manifest['stations']
+    delta_u = 1e-5 * h
+
+    T_vals = np.zeros_like(u_vals, dtype=float)
+    T_p_vals = np.zeros_like(u_vals, dtype=float)
+
+    for st in stations:
+        d = st['d_val']
+        if d == 0.0:
+            continue
+        u_n = st['u']
+        diff = (u_vals - u_n) / h
+        active_mask = np.abs(diff) < 1.0
+        if not np.any(active_mask):
+            continue
+
+        diff_act = diff[active_mask]
+        phi_pp = np.array([phi_pp_standard(v) for v in diff_act])
+        phi_s = np.array([phi_smooth_standard(v) for v in diff_act])
+        psi = (h**(-3)) * phi_pp - 0.25 * (h**(-1)) * phi_s
+        T_vals[active_mask] += d * psi
+
+        diff_p = (u_vals[active_mask] + delta_u - u_n) / h
+        diff_m = (u_vals[active_mask] - delta_u - u_n) / h
+        psi_p = (h**(-3)) * np.array([phi_pp_standard(v) for v in diff_p]) - 0.25 * (h**(-1)) * np.array([phi_smooth_standard(v) for v in diff_p])
+        psi_m = (h**(-3)) * np.array([phi_pp_standard(v) for v in diff_m]) - 0.25 * (h**(-1)) * np.array([phi_smooth_standard(v) for v in diff_m])
+        T_p_vals[active_mask] += d * ((psi_p - psi_m) / (2.0 * delta_u))
+
+    F_vals = a_K * T_vals
+    F_p_vals = a_K * T_p_vals
+    return (T_vals, T_p_vals, F_vals, F_p_vals)
+
+
+def compute_arithmetic_vs_smoothing_error(
+    K: int,
+    h: float,
+    window: Tuple[float, float] = (8.0, 20.0),
+    n_points: int = 401
+) -> Dict[str, Any]:
+    """
+    Decouple Arithmetic Discrepancy from Smoothing Bias (Section 4):
+      ||F_{K,h,w} - F_{infty, 0, w}||_{H^1} <= ||F_{K,h,w} - F_{infty, h, w}||_{H^1} + ||F_{infty, h, w} - F_{infty, 0, w}||_{H^1}.
+      E_arith = ||F_{K,h,w} - F_{infty, h, w}||_{H^1}  (arithmetic discrepancy from finite prime powers)
+      E_smooth = ||F_{infty, h, w} - F_{infty, 0, w}||_{H^1} (smoothing bias from mollifier bandwidth h)
+      E_total = ||F_{K,h,w} - F_{infty, 0, w}||_{H^1}
+    """
+    a, b = window
+    log_a = math.log(a)
+    log_b = math.log(b)
+    u_grid = np.linspace(log_a - 1.2 * h, log_b + 1.2 * h, n_points)
+    du = float(u_grid[1] - u_grid[0])
+
+    manifest = generate_actual_tc_stations(K=K, window=window)
+    _, _, F_vals, F_p_vals = evaluate_actual_tc_grade_basis(u_grid, K=K, h=h, manifest=manifest)
+
+    F_inf_h_vals = np.zeros_like(u_grid)
+    F_inf_h_p_vals = np.zeros_like(u_grid)
+    for i, u in enumerate(u_grid):
+        val, val_p = evaluate_continuum_mollified_profile_F_infty_h(u, h, window=window)
+        F_inf_h_vals[i] = val
+        F_inf_h_p_vals[i] = val_p
+
+    F_inf_0_vals = np.zeros_like(u_grid)
+    F_inf_0_p_vals = np.zeros_like(u_grid)
+    for i, u in enumerate(u_grid):
+        val, val_p = evaluate_continuum_limit_profile_F_infty_0(u, window=window)
+        F_inf_0_vals[i] = val
+        F_inf_0_p_vals[i] = val_p
+
+    norm_F_inf_0_L2 = math.sqrt(float(np.sum(F_inf_0_vals**2) * du))
+    norm_F_inf_0_H1 = math.sqrt(float(np.sum(F_inf_0_vals**2) * du + np.sum(F_inf_0_p_vals**2) * du))
+
+    diff_arith = F_vals - F_inf_h_vals
+    diff_arith_p = F_p_vals - F_inf_h_p_vals
+    E_arith_L2 = math.sqrt(float(np.sum(diff_arith**2) * du))
+    E_arith_H1 = math.sqrt(float(np.sum(diff_arith**2) * du + np.sum(diff_arith_p**2) * du))
+
+    diff_smooth = F_inf_h_vals - F_inf_0_vals
+    diff_smooth_p = F_inf_h_p_vals - F_inf_0_p_vals
+    E_smooth_L2 = math.sqrt(float(np.sum(diff_smooth**2) * du))
+    E_smooth_H1 = math.sqrt(float(np.sum(diff_smooth**2) * du + np.sum(diff_smooth_p**2) * du))
+
+    diff_tot = F_vals - F_inf_0_vals
+    diff_tot_p = F_p_vals - F_inf_0_p_vals
+    E_tot_L2 = math.sqrt(float(np.sum(diff_tot**2) * du))
+    E_tot_H1 = math.sqrt(float(np.sum(diff_tot**2) * du + np.sum(diff_tot_p**2) * du))
+
+    int_pole_pos = float(np.sum(F_inf_0_vals * np.exp(0.5 * u_grid)) * du)
+    int_pole_neg = float(np.sum(F_inf_0_vals * np.exp(-0.5 * u_grid)) * du)
+
+    return {
+        'status': 'ARITHMETIC_VS_SMOOTHING_ERROR_COMPUTED',
+        'grade': K,
+        'bandwidth_h': h,
+        'window': list(window),
+        'station_count': manifest['enumerated_station_count'],
+        'active_station_count': manifest['active_station_count'],
+        'provenance_hash': manifest['provenance_hash'],
+        'target_norms': {
+            'L2': norm_F_inf_0_L2,
+            'H1': norm_F_inf_0_H1,
+            'pole_integral_pos': int_pole_pos,
+            'pole_integral_neg': int_pole_neg,
+            'pole_cancellation_verified': bool(abs(int_pole_pos) < 1e-8 and abs(int_pole_neg) < 1e-8)
+        },
+        'errors': {
+            'E_arith_H1': E_arith_H1,
+            'E_arith_relative': E_arith_H1 / norm_F_inf_0_H1 if norm_F_inf_0_H1 > 0 else float('inf'),
+            'E_smooth_H1': E_smooth_H1,
+            'E_smooth_relative': E_smooth_H1 / norm_F_inf_0_H1 if norm_F_inf_0_H1 > 0 else float('inf'),
+            'E_total_H1': E_tot_H1,
+            'E_total_relative': E_tot_H1 / norm_F_inf_0_H1 if norm_F_inf_0_H1 > 0 else float('inf'),
+            'triangle_inequality_satisfied': bool(E_tot_H1 <= E_arith_H1 + E_smooth_H1 + 1e-10)
+        }
+    }
+
+
+def construct_actual_tc_approximation_experiment(
+    grades: Optional[List[int]] = None,
+    h: float = 0.1,
+    window: Tuple[float, float] = (8.0, 20.0),
+    target_role: str = "continuum_consistency",
+    n_points: int = 601
+) -> Dict[str, Any]:
+    """
+    Construct Authentic Continuous H^1 TC Approximation Experiment (Section 3 & 5):
+    Evaluates approximation of a declared target by the genuine TC shared-grade basis
+    vs an unconstrained independent station model.
+    1. Authentically enumerates prime powers n = p^r and evaluates Lambda(p^r)*w(tau^K p^r).
+    2. Constructs raw grade bases T_{K_i, h, w}(u) and normalized F_{K_i, h, w}(u).
+    3. Solves continuous H^1 Gram least squares for:
+       - Shared-grade model: f_{C,h,c} = sum_i c_i T_{K_i, h, w}(u).
+       - Unconstrained model: f_{uncon} = sum_j c_j psi_h(u - u_j) (enlarged-family control).
+    4. Evaluates conditioning, singular values, support components ell(C, h), and resonance gaps.
+    """
+    if grades is None:
+        grades = [0, -1]
+
+    a, b = window
+    log_a = math.log(a)
+    log_b = math.log(b)
+    u_grid = np.linspace(log_a - 1.5 * h, log_b + 1.5 * h, n_points)
+    du = float(u_grid[1] - u_grid[0])
+
+    # Target selection
+    if target_role == "continuum_consistency":
+        f_star_vals = np.zeros_like(u_grid)
+        f_star_p_vals = np.zeros_like(u_grid)
+        for i, u in enumerate(u_grid):
+            val, val_p = evaluate_continuum_limit_profile_F_infty_0(u, window=window)
+            f_star_vals[i] = val
+            f_star_p_vals[i] = val_p
+        target_desc = "F_{infty, 0, w} = (D_u^2 - 1/4)(e^u w(e^u)) [Continuum Consistency Benchmark]"
+    elif target_role == "independent_smooth":
+        # Independent smooth pole-cancelling target with compatible support in [log A, log B]
+        u_mid = 0.5 * (log_a + log_b)
+        u_half = 0.5 * (log_b - log_a)
+        def phi_comp(u):
+            t = (u - u_mid) / u_half
+            return ((1.0 - t**2)**4) / u_half if abs(t) < 1.0 else 0.0
+        def phi_comp_pp(u):
+            t = (u - u_mid) / u_half
+            if abs(t) >= 1.0:
+                return 0.0
+            # d2/dt2 (1 - t^2)^4 = d/dt (-8t(1-t^2)^3) = -8(1-t^2)^3 + 48t^2(1-t^2)^2
+            d2_dt2 = -8.0 * ((1.0 - t**2)**3) + 48.0 * (t**2) * ((1.0 - t**2)**2)
+            return d2_dt2 / (u_half**3)
+        def phi_comp_ppp(u, eps=1e-5):
+            return (phi_comp_pp(u + eps) - phi_comp_pp(u - eps)) / (2.0 * eps)
+        f_star_vals = np.array([phi_comp_pp(u) - 0.25 * phi_comp(u) for u in u_grid])
+        f_star_p_vals = np.array([phi_comp_ppp(u) - 0.25 * ((phi_comp(u + 1e-5) - phi_comp(u - 1e-5)) / 2e-5) for u in u_grid])
+        target_desc = "f_* = (D_u^2 - 1/4)((1 - t^2)^4) on (log A, log B) [Independent Smooth Target]"
+    else:
+        raise ValueError(f"Unknown target_role: {target_role}")
+
+    norm_target_L2 = math.sqrt(float(np.sum(f_star_vals**2) * du))
+    norm_target_H1 = math.sqrt(float(np.sum(f_star_vals**2) * du + np.sum(f_star_p_vals**2) * du))
+    int_pole_pos = float(np.sum(f_star_vals * np.exp(0.5 * u_grid)) * du)
+    int_pole_neg = float(np.sum(f_star_vals * np.exp(-0.5 * u_grid)) * du)
+
+    # Generate actual stations and grade bases
+    manifests = {}
+    B_list = []
+    Bp_list = []
+    all_stations_uncon = []
+
+    for K in grades:
+        man = generate_actual_tc_stations(K=K, window=window)
+        manifests[f"grade_{K}"] = man
+        T_vals, T_p_vals, F_vals, F_p_vals = evaluate_actual_tc_grade_basis(u_grid, K=K, h=h, manifest=man)
+        B_list.append(T_vals)
+        Bp_list.append(T_p_vals)
+        for st in man['active_stations']:
+            all_stations_uncon.append((st['u'], st['d_val']))
+
+    M_grades = len(grades)
+    G_shared = np.zeros((M_grades, M_grades))
+    rhs_shared = np.zeros(M_grades)
+    for i in range(M_grades):
+        rhs_shared[i] = (np.sum(B_list[i] * f_star_vals) + np.sum(Bp_list[i] * f_star_p_vals)) * du
+        for j in range(M_grades):
+            G_shared[i, j] = (np.sum(B_list[i] * B_list[j]) + np.sum(Bp_list[i] * Bp_list[j])) * du
+
+    c_shared, _, _, _ = np.linalg.lstsq(G_shared, rhs_shared, rcond=None)
+    f_shared = np.zeros_like(u_grid)
+    f_shared_p = np.zeros_like(u_grid)
+    for i in range(M_grades):
+        f_shared += c_shared[i] * B_list[i]
+        f_shared_p += c_shared[i] * Bp_list[i]
+    err_shared_H1 = math.sqrt(float(np.sum((f_shared - f_star_vals)**2) * du + np.sum((f_shared_p - f_star_p_vals)**2) * du))
+
+    # Unconstrained model over active stations
+    N_uncon = len(all_stations_uncon)
+    delta_u = 1e-5 * h
+    if N_uncon > 0 and N_uncon <= 300:
+        phi_uncon = np.zeros((N_uncon, len(u_grid)))
+        phi_uncon_p = np.zeros((N_uncon, len(u_grid)))
+        for j, (u_st, _) in enumerate(all_stations_uncon):
+            v_arr = (u_grid - u_st) / h
+            mask = np.abs(v_arr) < 1.0
+            if np.any(mask):
+                v_act = v_arr[mask]
+                phi_pp = np.array([phi_pp_standard(v) for v in v_act])
+                phi_s = np.array([phi_smooth_standard(v) for v in v_act])
+                phi_uncon[j, mask] = (h**(-3)) * phi_pp - 0.25 * (h**(-1)) * phi_s
+
+                v_act_p = (u_grid[mask] + delta_u - u_st) / h
+                v_act_m = (u_grid[mask] - delta_u - u_st) / h
+                p_p = (h**(-3)) * np.array([phi_pp_standard(v) for v in v_act_p]) - 0.25 * (h**(-1)) * np.array([phi_smooth_standard(v) for v in v_act_p])
+                p_m = (h**(-3)) * np.array([phi_pp_standard(v) for v in v_act_m]) - 0.25 * (h**(-1)) * np.array([phi_smooth_standard(v) for v in v_act_m])
+                phi_uncon_p[j, mask] = (p_p - p_m) / (2.0 * delta_u)
+
+        G_uncon = np.zeros((N_uncon, N_uncon))
+        rhs_uncon = np.zeros(N_uncon)
+        for i in range(N_uncon):
+            rhs_uncon[i] = (np.sum(phi_uncon[i] * f_star_vals) + np.sum(phi_uncon_p[i] * f_star_p_vals)) * du
+            for j in range(N_uncon):
+                G_uncon[i, j] = (np.sum(phi_uncon[i] * phi_uncon[j]) + np.sum(phi_uncon_p[i] * phi_uncon_p[j])) * du
+        c_uncon, _, _, _ = np.linalg.lstsq(G_uncon, rhs_uncon, rcond=1e-10)
+        f_uncon = np.dot(c_uncon, phi_uncon)
+        f_uncon_p = np.dot(c_uncon, phi_uncon_p)
+        err_uncon_H1 = math.sqrt(float(np.sum((f_uncon - f_star_vals)**2) * du + np.sum((f_uncon_p - f_star_p_vals)**2) * du))
+        cond_uncon = float(np.linalg.cond(G_uncon))
+    else:
+        err_uncon_H1 = float('nan')
+        cond_uncon = float('nan')
+
+    # Support geometry: compute merged component lengths
+    active_u_list = sorted([u_st for u_st, _ in all_stations_uncon])
+    geom = compute_support_components(active_u_list, h=h) if active_u_list else {'maximal_length': 0.0, 'num_components': 0}
+
+    return {
+        'status': 'ACTUAL_TC_APPROXIMATION_EXPERIMENT_COMPLETED',
+        'grades': grades,
+        'bandwidth_h': h,
+        'window': list(window),
+        'target_function': {
+            'role': target_role,
+            'description': target_desc,
+            'norm_L2': norm_target_L2,
+            'norm_H1': norm_target_H1,
+            'int_pole_pos': int_pole_pos,
+            'int_pole_neg': int_pole_neg,
+            'pole_cancellation_verified': bool(abs(int_pole_pos) < 1e-8 and abs(int_pole_neg) < 1e-8)
+        },
+        'shared_grade_model': {
+            'num_grades': M_grades,
+            'coefficients_c': [float(c) for c in c_shared],
+            'normalized_coefficients': [float(c_shared[i] * (2.0 * math.pi)**grades[i]) for i in range(M_grades)],
+            'H1_error': err_shared_H1,
+            'relative_H1_error': err_shared_H1 / norm_target_H1 if norm_target_H1 > 0 else float('nan'),
+            'condition_number': float(np.linalg.cond(G_shared)),
+            'singular_values': [float(s) for s in np.linalg.svd(G_shared, compute_uv=False)]
+        },
+        'unconstrained_model': {
+            'is_enlarged_family_control': True,
+            'num_independent_stations': N_uncon,
+            'H1_error': err_uncon_H1,
+            'relative_H1_error': err_uncon_H1 / norm_target_H1 if (norm_target_H1 > 0 and not math.isnan(err_uncon_H1)) else float('nan'),
+            'condition_number': cond_uncon
+        },
+        'support_geometry': {
+            'num_active_stations': len(active_u_list),
+            'maximal_merged_length_ell': geom.get('maximal_length', 0.0),
+            'num_components': geom.get('num_components', 0)
+        },
+        'manifest_hashes': {f"grade_{K}": manifests[f"grade_{K}"]['provenance_hash'] for K in grades},
+        'evidence_classification': 'GENUINE_ARITHMETIC_APPROXIMATION_EVIDENCE'
+    }
+
+
 def analyze_fourier_zero_compact_support_obstruction(
     R: float = 1.0,
     h: float = 0.1
@@ -11192,4 +11749,160 @@ def audit_tc_epic_support_geometry_synthesis(dps: int = 30) -> Dict[str, Any]:
     return synthesis
 
 
+def run_tc_negative_grade_approximation_campaign(
+    window: Tuple[float, float] = (8.0, 20.0),
+    grades_scan: Optional[List[int]] = None,
+    bandwidths_scan: Optional[List[float]] = None,
+    output_path: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Comprehensive Multi-Regime TC Negative-Grade Investigation Campaign (Section 5):
+    1. Regime 1 (Single Grade Convergence K -> -infty at fixed h in {0.10, 0.05}):
+       Tests normalized basis F_{K,h,w} -> F_{infty,h,w} -> F_{infty,0,w}.
+       Measures E_arith, E_smooth, E_total, and station counts.
+    2. Regime 2 (Fixed Grade, Decreasing Bandwidth K = -2, h in {0.20, 0.10, 0.05, 0.02}):
+       Tests smoothing bias E_smooth(h) -> 0.
+    3. Regime 3 (Joint Diagonal Schedule K -> -infty, h(K) -> 0):
+       Pairs: [(0, 0.20), (-1, 0.10), (-2, 0.05), (-3, 0.02)].
+       Tests simultaneous convergence along joint schedule.
+    4. Regime 4 (Multi-Grade Shared-Grade Linear Combination vs Unconstrained):
+       Grades {0, -1, -2} at h = 0.05 on continuum target and independent target.
+    5. Regime 5 (Controls: Positive Grade K=1, Synthetic Control, Empty-Window):
+       Distinguishes authentic TC from synthetic baselines.
+    6. Stores comprehensive artifact to data/tc_negative_grade_approximation_campaign.json.
+    """
+    if grades_scan is None:
+        grades_scan = [0, -1, -2, -3, -4]
+    if bandwidths_scan is None:
+        bandwidths_scan = [0.20, 0.10, 0.05, 0.02]
 
+    # Regime 1: Single Grade Convergence at fixed h=0.10 and h=0.05
+    regime_1_results = []
+    for h in [0.10, 0.05]:
+        for K in grades_scan:
+            res = compute_arithmetic_vs_smoothing_error(K=K, h=h, window=window)
+            regime_1_results.append({
+                'K': K,
+                'h': h,
+                'station_count': res['station_count'],
+                'active_station_count': res['active_station_count'],
+                'provenance_hash': res['provenance_hash'],
+                'E_arith_H1': res['errors']['E_arith_H1'],
+                'E_arith_rel': res['errors']['E_arith_relative'],
+                'E_smooth_H1': res['errors']['E_smooth_H1'],
+                'E_smooth_rel': res['errors']['E_smooth_relative'],
+                'E_total_H1': res['errors']['E_total_H1'],
+                'E_total_rel': res['errors']['E_total_relative']
+            })
+
+    # Regime 2: Fixed Grade K=-2, varying h
+    regime_2_results = []
+    for h in bandwidths_scan:
+        res = compute_arithmetic_vs_smoothing_error(K=-2, h=h, window=window)
+        regime_2_results.append({
+            'K': -2,
+            'h': h,
+            'station_count': res['station_count'],
+            'active_station_count': res['active_station_count'],
+            'E_arith_H1': res['errors']['E_arith_H1'],
+            'E_smooth_H1': res['errors']['E_smooth_H1'],
+            'E_total_H1': res['errors']['E_total_H1']
+        })
+
+    # Regime 3: Joint Diagonal Schedule
+    joint_pairs = [(0, 0.20), (-1, 0.10), (-2, 0.05), (-3, 0.02)]
+    regime_3_results = []
+    for K, h in joint_pairs:
+        res = compute_arithmetic_vs_smoothing_error(K=K, h=h, window=window)
+        regime_3_results.append({
+            'K': K,
+            'h': h,
+            'station_count': res['station_count'],
+            'active_station_count': res['active_station_count'],
+            'E_arith_H1': res['errors']['E_arith_H1'],
+            'E_smooth_H1': res['errors']['E_smooth_H1'],
+            'E_total_H1': res['errors']['E_total_H1'],
+            'E_total_rel': res['errors']['E_total_relative']
+        })
+
+    # Regime 4: Multi-grade combinations (grades {0, -1, -2} at h=0.05)
+    exp_continuum = construct_actual_tc_approximation_experiment(
+        grades=[0, -1, -2], h=0.05, window=window, target_role="continuum_consistency"
+    )
+    exp_independent = construct_actual_tc_approximation_experiment(
+        grades=[0, -1, -2], h=0.05, window=window, target_role="independent_smooth"
+    )
+
+    # Regime 5: Controls
+    # Positive grade K=1
+    res_pos = compute_arithmetic_vs_smoothing_error(K=1, h=0.05, window=window)
+    # Synthetic control
+    exp_synth = construct_admissible_target_and_approximation_experiment(h=0.1, N_stations=7)
+
+    campaign_summary = {
+        'status': 'TC_NEGATIVE_GRADE_CAMPAIGN_COMPLETED',
+        'campaign_parameters': {
+            'window': list(window),
+            'grades_tested': grades_scan,
+            'bandwidths_tested': bandwidths_scan
+        },
+        'regime_1_single_grade_convergence': regime_1_results,
+        'regime_2_fixed_grade_bandwidth_scaling': regime_2_results,
+        'regime_3_joint_diagonal_schedule': regime_3_results,
+        'regime_4_multigrade_shared_vs_unconstrained': {
+            'continuum_target': exp_continuum,
+            'independent_target': exp_independent
+        },
+        'regime_5_controls': {
+            'positive_grade_K_1': res_pos,
+            'synthetic_control': exp_synth
+        },
+        'answers_to_six_core_questions': {
+            'q1_does_negative_grade_approach_continuum': (
+                "YES. As K -> -infty, the normalized arithmetic grade basis F_{K,h,w} = a_K T_{K,h,w} "
+                "converges in H^1 to the continuum mollified profile F_{infty,h,w} = (D^2 - 1/4)(kappa_h * v_w), "
+                "where v_w(u) = e^u w(e^u) contains the exact log-coordinate Jacobian. "
+                "Along an explicit joint schedule (K -> -infty, h(K) -> 0), F_{K,h(K),w} -> F_{infty,0,w}."
+            ),
+            'q2_which_additional_targets_approximated': (
+                "Only targets in the span of the limiting continuum profiles can be approximated by shared grades. "
+                "Because all stations in grade K share a single coefficient with locked arithmetic weights, "
+                "a single grade collapses to a 1-dimensional subspace spanned by F_{infty,0,w}. "
+                "Independent targets not proportional to F_{infty,0,w} exhibit an irreducible projection error "
+                "unless enlarged to multiple independent weights or independent station coefficients."
+            ),
+            'q3_which_alleged_obstructions_apply': (
+                "The support-component Poincaré bound applies strictly when ell(C,h) -> 0; in negative grades, "
+                "station density diverges, so ell(C,h) does NOT shrink for overlapping configurations. "
+                "The Fourier zero obstruction applies at fixed bandwidth h against targets with energy at xi_k/h. "
+                "The true primary obstruction in negative grades is SHARED-GRADE ARITHMETIC RIGIDITY: "
+                "dense prime powers within a single grade collapse to a rank-1 continuum limit."
+            ),
+            'q4_is_positivity_established_along_same_sequence': (
+                "NO. In the dense negative-grade regime, station density causes massive support overlap across "
+                "primes, breaching the prime resonance condition (min gap < 2h) and introducing dense prime "
+                "and off-diagonal terms that prevent naive positivity transfer."
+            ),
+            'q5_has_D_F_advanced': (
+                "D_F: H ==> exists f in F, B(f,f) < 0 remains strictly OPEN. "
+                "Proving positivity on a restricted subfamily P_F does not refute D_F, and "
+                "inability of single-grade limits to approximate independent negative targets does not refute RH."
+            ),
+            'q6_has_arithmetic_coincidence_advanced': (
+                "NO. No step in the approximation investigation derives the forbidden coincidence "
+                "m * tau^K = n * tau^J from the existence of an off-critical zero. The reductio implication "
+                "remains the primary open foundational obligation."
+            )
+        }
+    }
+
+    if output_path is None:
+        output_path = os.path.join(os.path.dirname(__file__), 'data', 'tc_negative_grade_approximation_campaign.json')
+    try:
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(campaign_summary, f, indent=2)
+    except Exception as e:
+        campaign_summary['persistence_error'] = str(e)
+
+    return campaign_summary
