@@ -4123,3 +4123,175 @@ def test_toy_family_varying_spans_counterexample():
     assert rank == 2
 
 
+def test_acceptance_matrix_trend_classification():
+    """
+    Test all rows of the required acceptance matrix in classify_finite_series_trend:
+    - Finite strictly decreasing errors -> Observed decrease on the tested points. No inferred zero limit.
+    - Finite strictly increasing errors -> Observed increase on the tested points. No inferred asymptotic divergence.
+    - Constant or numerically unresolved changes -> Constant within declared tolerance.
+    - Mixed sequence, including [10, 5, 6, 4] -> Mixed finite trend; separately report net improvement from 10 to 4.
+    - Empty or singleton series -> Insufficient evidence for a trend. A valid single measurement remains a measurement.
+    - Negative norm errors, NaN, infinity, malformed data -> Invalid or incomplete evidence; no scientific validation.
+    """
+    # 1. Strictly decreasing
+    t_dec = transcendental.classify_finite_series_trend([10.0, 8.0, 5.0, 2.0])
+    assert t_dec['status'] == 'STRICTLY_DECREASING'
+    assert t_dec['is_valid'] is True
+    assert t_dec['is_decreasing'] is True
+    assert "No inferred zero limit" in t_dec['detail']
+
+    # 2. Strictly increasing
+    t_inc = transcendental.classify_finite_series_trend([1.0, 3.0, 7.0, 15.0])
+    assert t_inc['status'] == 'STRICTLY_INCREASING'
+    assert t_inc['is_valid'] is True
+    assert t_inc['is_increasing'] is True
+    assert "No inferred asymptotic divergence" in t_inc['detail']
+
+    # 3. Constant within tolerance
+    t_const = transcendental.classify_finite_series_trend([1.0, 1.0, 1.0, 1.0])
+    assert t_const['status'] == 'CONSTANT_WITHIN_TOLERANCE'
+    assert t_const['is_valid'] is True
+    assert t_const['is_constant'] is True
+
+    # 4. Mixed sequence [10, 5, 6, 4]
+    t_mix = transcendental.classify_finite_series_trend([10.0, 5.0, 6.0, 4.0])
+    assert t_mix['status'] == 'MIXED_FINITE_TREND'
+    assert t_mix['is_valid'] is True
+    assert t_mix['is_mixed'] is True
+    assert "net improvement from 10.00 to 4.00" in t_mix['detail']
+    assert t_mix['net_change'] == -6.0
+
+    # 5. Empty and Singleton series
+    t_empty = transcendental.classify_finite_series_trend([])
+    assert t_empty['status'] == 'INSUFFICIENT_EVIDENCE_EMPTY'
+    assert t_empty['is_valid'] is False
+
+    t_single = transcendental.classify_finite_series_trend([42.0])
+    assert t_single['status'] == 'INSUFFICIENT_EVIDENCE_SINGLETON'
+    assert t_single['is_valid'] is True
+    assert t_single['single_value'] == 42.0
+
+    # 6. Negative, NaN, Inf, and Malformed data
+    t_neg = transcendental.classify_finite_series_trend([10.0, 5.0, -1.0])
+    assert t_neg['status'] == 'INVALID_OR_INCOMPLETE_EVIDENCE'
+    assert t_neg['is_valid'] is False
+    assert "negative" in t_neg['detail'].lower()
+
+    t_nan = transcendental.classify_finite_series_trend([10.0, 9.0, float('nan')])
+    assert t_nan['status'] == 'INVALID_OR_INCOMPLETE_EVIDENCE'
+    assert t_nan['is_valid'] is False
+
+    t_inf = transcendental.classify_finite_series_trend([10.0, float('inf')])
+    assert t_inf['status'] == 'INVALID_OR_INCOMPLETE_EVIDENCE'
+    assert t_inf['is_valid'] is False
+
+    t_bad = transcendental.classify_finite_series_trend([10.0, "bad_data"])
+    assert t_bad['status'] == 'INVALID_OR_INCOMPLETE_EVIDENCE'
+    assert t_bad['is_valid'] is False
+
+
+def test_mutation_missing_flag_rejected():
+    """
+    Mutation/Regression: Missing boolean flags in Regime 2 must not default to True.
+    """
+    tampered_r2 = [
+        {'K': -2, 'h': 0.1, 'E_arith_H1': 100.0, 'E_smooth_H1': 50.0, 'E_total_H1': 120.0}
+        # Notice: contraction_satisfied and smoothing_error_bound_satisfied are MISSING!
+    ]
+    camp = transcendental.run_tc_negative_grade_approximation_campaign(
+        override_regime_2_results=tampered_r2,
+        output_path=""
+    )
+    assert camp['invariants_verified'] is False
+    assert camp['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_INVARIANTS_FAILED'
+    assert any("Regime 2" in f and ("missing" in f or "violated" in f) for f in camp['audit_invariant_failures'])
+
+
+def test_mutation_contradictory_flags_rejected():
+    """
+    Mutation/Regression: If an invariant flag is set to True but numerical quantities contradict it,
+    the contradictory flag is actively rejected and the invariant audit fails.
+    """
+    exp_bad_pole = transcendental.construct_actual_tc_approximation_experiment(
+        grades=[0, -1], h=0.05, target_role="non_cancelling_control"
+    )
+    # Tamper flag to claim True even though integrals do not vanish
+    exp_bad_pole['target_function']['pole_cancellation_verified'] = True
+    assert abs(exp_bad_pole['target_function']['int_pole_pos']) > 1e-4
+
+    camp = transcendental.run_tc_negative_grade_approximation_campaign(
+        override_exp_independent=exp_bad_pole,
+        output_path=""
+    )
+    assert camp['invariants_verified'] is False
+    assert camp['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_INVARIANTS_FAILED'
+    assert any("contradicts" in f.lower() or "pole cancellation" in f.lower() for f in camp['audit_invariant_failures'])
+
+
+def test_mutation_nondecreasing_not_labeled_divergent():
+    """
+    Mutation/Regression: A constant sequence [1, 1, 1, 1] must report CONSTANT_WITHIN_TOLERANCE,
+    not EMPIRICAL_DIVERGENCE.
+    """
+    camp_const = transcendental.run_tc_negative_grade_approximation_campaign(
+        override_joint_relative_errors=[1.0, 1.0, 1.0, 1.0],
+        output_path=""
+    )
+    r3 = camp_const['regime_3_joint_diagonal_schedule']
+    assert r3['empirical_schedule_verdict'] == 'CONSTANT_WITHIN_TOLERANCE'
+    q1 = camp_const['answers_to_six_core_questions']['q1_does_negative_grade_approach_continuum']
+    assert "CONSTANT_WITHIN_TOLERANCE" in q1
+    assert "EMPIRICAL_DIVERGENCE" not in q1
+
+
+def test_mutation_dynamic_ratios_recomputed():
+    """
+    Mutation/Regression: Altering grades_scan dynamically recomputes ratio text and endpoints
+    without mentioning stale hardcoded strings.
+    """
+    camp_custom = transcendental.run_tc_negative_grade_approximation_campaign(
+        grades_scan=[0, -1, -2],
+        output_path=""
+    )
+    q1 = camp_custom['answers_to_six_core_questions']['q1_does_negative_grade_approach_continuum']
+    assert "K=-4" not in q1
+    assert "factor of 30" not in q1
+    assert "K=0 to K=-2" in q1
+
+
+def test_actual_tc_grade_cancellation_research():
+    """
+    Research Test: Investigate surviving arithmetic directions via legal grade cancellation G_i = F_{K_i} - F_{K_0}.
+    Verifies:
+    1. sum_K b_K == 0 exactly cancels the continuum profile F_{infty, h, w}.
+    2. Surviving difference directions have full numerical rank.
+    3. Singular values are stable under mesh refinement.
+    4. Residuals exhibit an orthogonal plateau against smooth independent targets.
+    """
+    res = transcendental.investigate_actual_tc_grade_cancellation(
+        grades=[-1, -2], anchor_grade=0, h=0.05, n_points=101
+    )
+    assert res['status'] == 'ACTUAL_TC_GRADE_CANCELLATION_INVESTIGATED'
+    assert res['continuum_cancellation']['is_exact_zero_sum'] is True
+    assert abs(res['continuum_cancellation']['sum_normalized_b']) < 1e-12
+    assert res['gram_matrix_spectrum']['numerical_rank_at_1e6'] == 2
+    assert res['mesh_stability']['directions_stable_under_refinement'] is True
+    assert res['independent_target_fit']['relative_error'] > 0.95
+
+
+def test_adaptive_diagonal_schedule_search():
+    """
+    Research Test: Budgeted adaptive diagonal schedule search across (K, h) grid.
+    Verifies exploration of negative grades and bandwidths, identification of optimal
+    computable path, and trade-off analysis between smoothing and bump norm scaling.
+    """
+    res = transcendental.search_adaptive_diagonal_schedule(
+        grades_budget=[0, -1, -2], bandwidths_budget=[0.20, 0.10, 0.05], n_points=101
+    )
+    assert res['status'] == 'ADAPTIVE_DIAGONAL_SCHEDULE_SEARCH_COMPLETED'
+    assert len(res['grid_evaluations']) == 9
+    assert len(res['adaptive_best_path']) == 3
+    assert 'bottleneck_analysis' in res['conclusions']
+
+
+

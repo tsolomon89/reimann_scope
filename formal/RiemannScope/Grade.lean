@@ -2498,6 +2498,39 @@ theorem complete_weil_hermitian_positive_definite_margin
     0 < (L_T - e_T - beta) * norm_c_sq := by
   exact mul_pos h_margin h_norm_pos
 
+/-- Bounded-Coefficient Subspace Distance Bound:
+    In any normed vector space, for any finite linear combination ∑_{K ∈ C} b_K F_K,
+    limiting vector v, coefficient sum bound B, and uniform distance eps,
+    if dist(∑ b_K F_K, span{v}) ≤ ∑ |b_K| * ||F_K - v||,
+    and ∑ |b_K| ≤ B and ∀ K, ||F_K - v|| ≤ eps,
+    then the distance to span{v} is bounded by B * eps. -/
+theorem bounded_coefficient_subspace_distance_bound
+    (dist_to_span sum_abs_b eps B : ℝ)
+    (h_triangle : dist_to_span ≤ sum_abs_b * eps)
+    (h_coeff_bound : sum_abs_b ≤ B)
+    (h_eps_nonneg : 0 ≤ eps) :
+    dist_to_span ≤ B * eps := by
+  have h_mul : sum_abs_b * eps ≤ B * eps :=
+    mul_le_mul_of_nonneg_right h_coeff_bound h_eps_nonneg
+  exact le_trans h_triangle h_mul
+
+/-- Triangle inequality for existential diagonal schedule convergence:
+    For test function error E_total = ||F_{K,h} - v||, arithmetic discrepancy E_arith,
+    and smoothing bias E_smooth, if E_total <= E_arith + E_smooth,
+    and E_arith < 1/(2*j) and E_smooth < 1/(2*j),
+    then E_total < 1/j. -/
+theorem existential_diagonal_convergence_triangle
+    (E_total E_arith E_smooth j : ℝ)
+    (h_tri : E_total ≤ E_arith + E_smooth)
+    (h_arith : E_arith < 1 / (2 * j))
+    (h_smooth : E_smooth < 1 / (2 * j)) :
+    E_total < 1 / j := by
+  have h_sum : E_arith + E_smooth < 1 / (2 * j) + 1 / (2 * j) := add_lt_add h_arith h_smooth
+  have h_half : 1 / (2 * j) + 1 / (2 * j) = 1 / j := by
+    ring
+  rw [h_half] at h_sum
+  exact lt_of_le_of_lt h_tri h_sum
+
 end RiemannScope
 
 

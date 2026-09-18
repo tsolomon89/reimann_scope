@@ -81,10 +81,15 @@
     "formal/RiemannScope/Grade.lean: weil_continuity_constant_lower_bound",
     "formal/RiemannScope/Grade.lean: archimedean_weight_growth_envelope",
     "formal/RiemannScope/Grade.lean: complete_weil_hermitian_positive_definite_margin",
+    "formal/RiemannScope/Grade.lean: bounded_coefficient_subspace_distance_bound",
+    "formal/RiemannScope/Grade.lean: existential_diagonal_convergence_triangle",
     "transcendental.py: generate_actual_tc_stations",
     "transcendental.py: compute_arithmetic_vs_smoothing_error",
     "transcendental.py: construct_actual_tc_approximation_experiment",
     "transcendental.py: run_tc_negative_grade_approximation_campaign",
+    "transcendental.py: classify_finite_series_trend",
+    "transcendental.py: search_adaptive_diagonal_schedule",
+    "transcendental.py: investigate_actual_tc_grade_cancellation",
     "transcendental.py: audit_coefficient_rescaling_homogeneity",
     "transcendental.py: compute_support_components",
     "transcendental.py: poincare_support_lower_bound",
@@ -98,7 +103,8 @@
     "transcendental.py: audit_tc_epic_support_geometry_synthesis",
     "data/tc_epic_support_geometry_synthesis.json",
     "data/canonical_reflected_weil_matrix_sign.json",
-    "data/tc_negative_grade_approximation_campaign.json"
+    "data/tc_negative_grade_approximation_campaign.json",
+    "data/tc_arithmetic_residual_research.json"
   ],
   "proof_artifact": "formal/RiemannScope/Grade.lean",
   "falsification_attempts": [
@@ -110,7 +116,9 @@
     "Fourier zero lower bound tested under common compact support [-1, 1], proving positive L^2 lower bound",
     "Continuous Gram optimization tested against genuine C_c^infty target, confirming relative error plateau > 95%",
     "One-by-one matrix control W=[1], c=[i] tested, confirming Hermitian form +1 vs unconjugated bilinear -1",
-    "Discretization step refinement from N=16000 to N=32000 tested, confirming operator error < 5.0e4 << 1.0e5"
+    "Discretization step refinement from N=16000 to N=32000 tested, confirming operator error < 5.0e4 << 1.0e5",
+    "Adaptive diagonal schedule tested across (K, h) grid for K in {0, -1, -2, -3, -4} and h in {0.20, 0.10, 0.05, 0.02}: confirmed that finite computable paths within budget exhibit increasing total relative error due to O(h^(-7/2)) bump scaling, despite E_arith decreasing monotonically",
+    "Actual TC grade cancellation tested with sum_K b_K = 0 across grades {-1, -2, -3, -4} at h=0.05 and {-1, -2, -3} at h=0.02: confirmed 4 and 3 surviving non-trivial arithmetic directions respectively, with relative error against smooth target f_* remaining at 99.99%, falsifying arbitrary smooth approximation by arithmetic residuals"
   ],
   "computational_evidence": [
     "tests/test_tc_mechanism_discovery.py: test_epic_coefficient_rescaling_homogeneity",
@@ -123,8 +131,14 @@
     "tests/test_tc_mechanism_discovery.py: test_epic_admissible_target_and_approximation_experiment",
     "tests/test_tc_mechanism_discovery.py: test_epic_weil_continuity_and_connes_consani_bridge",
     "tests/test_tc_mechanism_discovery.py: test_epic_support_geometry_synthesis_master",
+    "tests/test_tc_mechanism_discovery.py: test_acceptance_matrix_trend_classification",
+    "tests/test_tc_mechanism_discovery.py: test_mutation_missing_flag_rejected",
+    "tests/test_tc_mechanism_discovery.py: test_actual_tc_grade_cancellation_research",
+    "tests/test_tc_mechanism_discovery.py: test_adaptive_diagonal_schedule_search",
     "data/tc_epic_support_geometry_synthesis.json",
-    "data/canonical_reflected_weil_matrix_sign.json"
+    "data/canonical_reflected_weil_matrix_sign.json",
+    "data/tc_negative_grade_approximation_campaign.json",
+    "data/tc_arithmetic_residual_research.json"
   ],
   "external_sources": [
     {
