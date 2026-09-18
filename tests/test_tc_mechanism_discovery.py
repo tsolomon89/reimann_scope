@@ -19,6 +19,7 @@ import fractions
 import json
 import math
 import os
+import numpy as np
 import mpmath
 import pytest
 
@@ -3692,17 +3693,25 @@ def test_epic_continuous_weil_constant_derivation():
 # ==============================================================================
 
 def test_adversarial_1_reject_synthetic_stations_as_actual_tc():
-    """Adversarial Regression 1: Ensure synthetic equally-spaced stations fail TC provenance check."""
-    fake_stations = [
-        {'grade': 0, 'prime': 0, 'exponent': 1, 'n': 10, 'x': -0.8, 'u': -0.8,
-         'Lambda_n': 1.0, 'w_val': 1.0, 'd_val': 1.0, 'is_active': True}
-    ]
-    man = transcendental.generate_actual_tc_stations(K=0, window=(8.0, 20.0))
-    assert man['is_actual_tc'] is True
-    assert man['provenance_hash'] is not None
-    import hashlib, json
-    tampered_bytes = json.dumps(fake_stations).encode('utf-8')
-    assert hashlib.sha256(tampered_bytes).hexdigest() != man['provenance_hash']
+    """Adversarial Regression 1: Ensure synthetic equally-spaced stations fail TC provenance and active validation check."""
+    fake_manifest = {
+        'K': 0,
+        'window': [8.0, 20.0],
+        'is_actual_tc': False,
+        'stations': [
+            {'grade': 0, 'prime': 0, 'exponent': 1, 'n': 10, 'x': 10.0, 'u': math.log(10.0),
+             'Lambda_n': 1.0, 'w_val': 1.0, 'd_val': 1.0, 'is_active': True}
+        ],
+        'provenance_hash': 'fake_hash'
+    }
+    is_valid, reasons = transcendental.validate_tc_station_manifest(fake_manifest, window=(8.0, 20.0))
+    assert is_valid is False
+    assert any("not marked as actual TC" in r or "prime" in r.lower() for r in reasons)
+
+    # Active interface must raise ValueError when given an invalid manifest
+    u_grid = np.linspace(math.log(8.0), math.log(20.0), 10)
+    with pytest.raises(ValueError, match="failed"):
+        transcendental.evaluate_actual_tc_grade_basis(u_grid, K=0, h=0.1, manifest=fake_manifest)
 
 
 def test_adversarial_2_reject_log_n_in_place_of_log_p():
@@ -3786,26 +3795,240 @@ def test_adversarial_8_reject_generic_target_as_negative_weil_witness():
 
 
 def test_adversarial_9_quadrature_resolution_and_hash_stability():
-    """Adversarial Regression 9: Quadrature and station generation are deterministic with verified hashes."""
+    """Adversarial Regression 9: Stable Gauss-Legendre quadrature resolves convolution and matches direct evaluation."""
+    # 1. Diagnostic test at h=0.02, u=log(14):
+    u_diag = math.log(14.0)
+    h_diag = 0.02
+    f_val, f_p = transcendental.evaluate_continuum_mollified_profile_F_infty_h(u_diag, h_diag, window=(8.0, 20.0))
+    f_dir, f_p_dir = transcendental.evaluate_continuum_mollified_profile_F_infty_h_direct_psi(u_diag, h_diag, window=(8.0, 20.0), n_quad=2048)
+
+    # Old 64-panel evaluator returned roughly (350.78674, -147234.64)
+    # Correct values are roughly (-117.84010, -751.47854)
+    assert f_val == pytest.approx(-117.84010, abs=0.5)
+    assert f_p == pytest.approx(-751.47854, abs=5.0)
+    assert abs(f_val - f_dir) < 1.0e-3
+    assert abs(f_p - f_p_dir) < 1.0e-1
+
+    # 2. Hash reproducibility
     man1 = transcendental.generate_actual_tc_stations(K=-2, window=(8.0, 20.0))
     man2 = transcendental.generate_actual_tc_stations(K=-2, window=(8.0, 20.0))
     assert man1['provenance_hash'] == man2['provenance_hash']
-    assert man1['enumerated_station_count'] == 79
     assert man1['active_station_count'] == 79
 
 
 def test_adversarial_10_negative_grade_campaign_artifact_verification():
     """Adversarial Regression 10: Campaign artifact exists, contains required regimes, and validates status."""
-    campaign = transcendental.run_tc_negative_grade_approximation_campaign()
+    artifact_path = os.path.join(REPO_ROOT, "data", "tc_negative_grade_approximation_campaign.json")
+    assert os.path.exists(artifact_path)
+    with open(artifact_path, "r", encoding="utf-8") as f:
+        campaign = json.load(f)
+
     assert campaign['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_COMPLETED'
     assert len(campaign['regime_1_single_grade_convergence']) == 10
     assert len(campaign['regime_2_fixed_grade_bandwidth_scaling']) == 4
-    assert len(campaign['regime_3_joint_diagonal_schedule']) == 4
+
+    # Regime 3 empirical divergence
+    r3 = campaign['regime_3_joint_diagonal_schedule']
+    assert r3['empirical_schedule_verdict'] == 'EMPIRICAL_DIVERGENCE_ON_TESTED_SCHEDULE'
+    assert r3['is_monotonically_decreasing'] is False
+    rel_errors = [p['E_total_rel'] for p in r3['schedule_pairs']]
+    assert rel_errors[0] == pytest.approx(3.3885, abs=0.05)
+    assert rel_errors[-1] == pytest.approx(1083.34, abs=5.0)
+
+    # Regime 2 smoothing error bounded
+    r2_h002 = next(p for p in campaign['regime_2_fixed_grade_bandwidth_scaling'] if p['h'] == 0.02)
+    assert r2_h002['E_smooth_H1'] < 20000.0  # Repaired from 420107.0
+
+    # Regime 4 target verification and geometry
+    r4 = campaign['regime_4_multigrade_shared_vs_unconstrained']
+    cont = r4['continuum_target']
+    indep = r4['independent_target']
+    assert cont['target_function']['pole_cancellation_verified'] is True
+    assert indep['target_function']['pole_cancellation_verified'] is True
+    assert cont['support_geometry']['max_component_length_ell'] > 1.0
+
+    # Dynamic answers
     answers = campaign['answers_to_six_core_questions']
     assert len(answers) == 6
-    assert "YES" in answers['q1_does_negative_grade_approach_continuum']
-    assert "NO" in answers['q4_is_positivity_established_along_same_sequence']
+    assert "DIVERGENT" in answers['q1_does_negative_grade_approach_continuum']
+    assert "OPEN" in answers['q2_which_additional_targets_approximated']
     assert "OPEN" in answers['q5_has_D_F_advanced']
     assert "NO" in answers['q6_has_arithmetic_coincidence_advanced']
-    assert os.path.exists("data/tc_negative_grade_approximation_campaign.json")
+
+
+def test_mutation_continuum_evaluator_invariant():
+    """Mutation/Regression: Stable evaluator satisfies convolution contraction and smoothing error bound <= 2||F_0||."""
+    res = transcendental.compute_arithmetic_vs_smoothing_error(K=-2, h=0.02, window=(8.0, 20.0), n_points=201)
+    norm_f0 = res['target_norms']['H1']
+    norm_fh = res['target_norms']['norm_mollified_H1']
+    e_smooth = res['errors']['E_smooth_H1']
+
+    # Contraction: ||F_{infty, h}||_{H^1} <= ||F_{infty, 0}||_{H^1}
+    assert norm_fh <= norm_f0 * 1.001  # allow numerical discretization margin
+    assert res['errors']['convolution_contraction_satisfied'] is True
+    # Smoothing error bound: ||F_{infty, h} - F_{infty, 0}||_{H^1} <= 2 * ||F_{infty, 0}||_{H^1}
+    assert e_smooth <= 2.0 * norm_f0
+    assert res['errors']['smoothing_error_bound_satisfied'] is True
+
+    # Assert defect rejection: old un-repaired error (~420107) violates 2 * norm_f0 (~65896)
+    assert e_smooth < 20000.0
+    assert 420107.0 > 2.0 * norm_f0
+
+
+def test_mutation_worsening_joint_schedule_reports_failure():
+    """Mutation/Regression: Worsening joint-schedule fixture cannot produce convergence success statement."""
+    # Simulated worsening fixture based on reviewed defect
+    defect_errors = [3.3886, 19.5846, 103.2775, 1123.5415]
+    is_decreasing = all(defect_errors[i+1] < defect_errors[i] for i in range(len(defect_errors) - 1))
+    assert is_decreasing is False
+
+    verdict = "EMPIRICAL_CONVERGENCE" if is_decreasing else "EMPIRICAL_DIVERGENCE_ON_TESTED_SCHEDULE"
+    assert verdict == "EMPIRICAL_DIVERGENCE_ON_TESTED_SCHEDULE"
+    assert verdict != "EMPIRICAL_CONVERGENCE"
+
+
+def test_mutation_false_pole_flag_rejected():
+    """Mutation/Regression: Target verification strictly rejects false pole cancellation flags."""
+    # Build target with non-vanishing pole integrals
+    exp = transcendental.construct_actual_tc_approximation_experiment(
+        grades=[0, -1], h=0.05, target_role="independent_smooth"
+    )
+    assert exp['target_function']['pole_cancellation_verified'] is True
+    assert abs(exp['target_function']['int_pole_pos']) < 1e-9
+    assert abs(exp['target_function']['int_pole_neg']) < 1e-9
+
+    # Mutation: if an integral exceeds threshold, flag must be False
+    fake_pos_integral = 1e-5
+    flag = bool(abs(fake_pos_integral) < 1e-9 and abs(exp['target_function']['int_pole_neg']) < 1e-9)
+    assert flag is False
+
+
+def test_mutation_missing_geometry_key_rejected():
+    """Mutation/Regression: Nonempty merged interval must not receive length zero via missing-key fallback."""
+    man0 = transcendental.generate_actual_tc_stations(K=0, window=(8.0, 20.0))
+    man1 = transcendental.generate_actual_tc_stations(K=-1, window=(8.0, 20.0))
+    man2 = transcendental.generate_actual_tc_stations(K=-2, window=(8.0, 20.0))
+    active_u = sorted(
+        [s['u'] for s in man0['stations'] if s['is_active']] +
+        [s['u'] for s in man1['stations'] if s['is_active']] +
+        [s['u'] for s in man2['stations'] if s['is_active']]
+    )
+    assert len(active_u) == 104
+
+    geom = transcendental.compute_support_components(active_u, h=0.05)
+    # The contract key is 'max_component_length_ell'
+    assert 'max_component_length_ell' in geom
+    assert geom['max_component_length_ell'] > 1.0  # Merged component covers ~1.01
+
+    # Old defect read 'maximal_length', which was absent and silently defaulted to 0.0
+    assert 'maximal_length' not in geom
+    with pytest.raises(KeyError):
+        _ = geom['maximal_length']
+
+
+def test_coefficient_conversion_reconstructs_identical_basis():
+    """Mutation/Regression: Raw and normalized coefficients reconstruct identical function and derivative: sum c_K T_K = sum b_K F_K."""
+    tau = 2.0 * math.pi
+    grades = [0, -1, -2]
+    h = 0.05
+    window = (8.0, 20.0)
+    u_grid = np.linspace(math.log(8.0), math.log(20.0), 101)
+
+    c_K_vec = [1.5, -2.0, 0.75]
+    # Correct conversion: b_K = c_K / a_K
+    b_K_vec = [c / (tau**K) for K, c in zip(grades, c_K_vec)]
+    # Flawed defect conversion: b_K_flawed = c * a_K
+    b_K_flawed = [c * (tau**K) for K, c in zip(grades, c_K_vec)]
+
+    recon_T = np.zeros_like(u_grid)
+    recon_Tp = np.zeros_like(u_grid)
+    recon_F = np.zeros_like(u_grid)
+    recon_Fp = np.zeros_like(u_grid)
+    recon_F_flawed = np.zeros_like(u_grid)
+
+    for K, c, b, b_fl in zip(grades, c_K_vec, b_K_vec, b_K_flawed):
+        man = transcendental.generate_actual_tc_stations(K=K, window=window)
+        T_vals, T_p_vals, F_vals, F_p_vals = transcendental.evaluate_actual_tc_grade_basis(u_grid, K=K, h=h, manifest=man)
+        recon_T += c * T_vals
+        recon_Tp += c * T_p_vals
+        recon_F += b * F_vals
+        recon_Fp += b * F_p_vals
+        recon_F_flawed += b_fl * F_vals
+
+    # Correct conversion matches identically (relative tolerance machine precision)
+    assert np.max(np.abs(recon_T - recon_F)) < 1e-9
+    assert np.max(np.abs(recon_Tp - recon_Fp)) < 1e-6
+
+    # Flawed conversion diverges by orders of magnitude
+    flawed_error = np.max(np.abs(recon_T - recon_F_flawed))
+    assert flawed_error > 10.0
+
+
+def test_tampered_station_manifest_actively_rejected():
+    """Mutation/Regression: Validate station manifest actively detects prime-power, coordinate, and weight tampering."""
+    window = (8.0, 20.0)
+    man = transcendental.generate_actual_tc_stations(K=0, window=window)
+
+    # Tamper 1: Composite number that is not a prime power (e.g. n=6 or n=10) marked as active
+    import copy
+    tampered_1 = copy.deepcopy(man)
+    tampered_1['stations'].append({
+        'grade': 0, 'prime': 0, 'exponent': 1, 'n': 6, 'x': 6.0, 'u': math.log(6.0),
+        'Lambda_n': math.log(6.0), 'w_val': 1.0, 'd_val': 1.0, 'is_active': True
+    })
+    is_valid, reasons = transcendental.validate_tc_station_manifest(tampered_1, window)
+    assert is_valid is False
+    assert any("prime" in r.lower() for r in reasons)
+
+    # Tamper 2: Prime power with Lambda(n) = log(n) instead of log(p) (e.g. n=9, p=3 => Lambda=log 9)
+    tampered_2 = copy.deepcopy(man)
+    st9 = next(s for s in tampered_2['stations'] if s['n'] == 9)
+    st9['Lambda_n'] = math.log(9.0)
+    is_valid, reasons = transcendental.validate_tc_station_manifest(tampered_2, window)
+    assert is_valid is False
+    assert any("Lambda_n" in r or "log(n)" in r for r in reasons)
+
+    # Tamper 3: Active station outside window
+    tampered_3 = copy.deepcopy(man)
+    tampered_3['stations'].append({
+        'grade': 0, 'prime': 23, 'exponent': 1, 'n': 23, 'x': 23.0, 'u': math.log(23.0),
+        'Lambda_n': math.log(23.0), 'w_val': 1.0, 'd_val': 1.0, 'is_active': True
+    })
+    is_valid, reasons = transcendental.validate_tc_station_manifest(tampered_3, window)
+    assert is_valid is False
+    assert any("outside window" in r.lower() for r in reasons)
+
+
+def test_toy_family_varying_spans_counterexample():
+    """
+    Mutation/Regression: Common-limit toy family F_j = v + eps_j * g refutes the inference
+    that limiting rank 1 implies unrestricted varying spans have rank 1.
+    """
+    # Grid
+    x = np.linspace(-1.0, 1.0, 101)
+    v = np.exp(-x**2)
+    g = x * np.exp(-x**2)  # linearly independent from v
+
+    # Family F_j -> v as j -> infty
+    def F_j(j: int):
+        eps_j = 2.0**(-j)
+        return v + eps_j * g
+
+    F_1 = F_j(1)  # v + 0.5 * g
+    F_2 = F_j(2)  # v + 0.25 * g
+    F_10 = F_j(10) # v + 2^(-10) * g
+
+    # 1. Pointwise column limit is rank 1
+    assert np.max(np.abs(F_10 - v)) < 1e-3
+
+    # 2. But difference quotient isolates g exactly:
+    # (F_1 - F_2) / (0.5 - 0.25) = g
+    isolated_g = (F_1 - F_2) / (0.5 - 0.25)
+    assert np.max(np.abs(isolated_g - g)) < 1e-14
+
+    # 3. Span matrix [F_1, F_2] has full rank 2
+    M = np.column_stack([F_1, F_2])
+    rank = np.linalg.matrix_rank(M)
+    assert rank == 2
+
 

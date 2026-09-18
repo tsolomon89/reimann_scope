@@ -26,12 +26,12 @@
       "station_count": 7,
       "active_station_count": 6,
       "provenance_hash": "8f2817edaa36d3cfebd0902b2752bd136947eab1d0296f8f7b52b7f5ae2f7e6b",
-      "E_arith_H1": 1242878.0925412043,
-      "E_arith_rel": 37.72201451661746,
-      "E_smooth_H1": 34912.97968945934,
-      "E_smooth_rel": 1.0596275970810827,
-      "E_total_H1": 1243903.7752454695,
-      "E_total_rel": 37.753144534993304
+      "E_arith_H1": 1227466.5166857876,
+      "E_arith_rel": 37.25432359589705,
+      "E_smooth_H1": 32232.636623832295,
+      "E_smooth_rel": 0.9782792921923739,
+      "E_total_H1": 1228430.193365886,
+      "E_total_rel": 37.28357174433465
     },
     {
       "K": -1,
@@ -39,12 +39,12 @@
       "station_count": 19,
       "active_station_count": 19,
       "provenance_hash": "5034036168b16edd81636418c4ad8064079a8f84715d6d217ab2faed080db2a7",
-      "E_arith_H1": 643293.6911318328,
-      "E_arith_rel": 19.524307412731183,
-      "E_smooth_H1": 34912.97968945934,
-      "E_smooth_rel": 1.0596275970810827,
-      "E_total_H1": 645281.5295143374,
-      "E_total_rel": 19.584639370283202
+      "E_arith_H1": 650023.4619019644,
+      "E_arith_rel": 19.72859060954736,
+      "E_smooth_H1": 32232.636623832295,
+      "E_smooth_rel": 0.9782792921923739,
+      "E_total_H1": 652041.1989230029,
+      "E_total_rel": 19.78983010316398
     },
     {
       "K": -2,
@@ -52,12 +52,12 @@
       "station_count": 79,
       "active_station_count": 79,
       "provenance_hash": "4c53011a291812f9ad797d38084c8fcdfb8324b81a168382a7cbf297bd727bd8",
-      "E_arith_H1": 234260.35950844118,
-      "E_arith_rel": 7.109927140141047,
-      "E_smooth_H1": 34912.97968945934,
-      "E_smooth_rel": 1.0596275970810827,
-      "E_total_H1": 236242.89303871896,
-      "E_total_rel": 7.170098092592155
+      "E_arith_H1": 233974.96112482907,
+      "E_arith_rel": 7.101276325334684,
+      "E_smooth_H1": 32232.636623832295,
+      "E_smooth_rel": 0.9782792921923739,
+      "E_total_H1": 236193.44185412253,
+      "E_total_rel": 7.168608507399832
     },
     {
       "K": -3,
@@ -65,12 +65,12 @@
       "station_count": 376,
       "active_station_count": 376,
       "provenance_hash": "e71c5d936707ff05eba88724e90dd4bbf67d5857c135196368468aa603a3b111",
-      "E_arith_H1": 104834.67432292768,
-      "E_arith_rel": 3.1817884073962297,
-      "E_smooth_H1": 34912.97968945934,
-      "E_smooth_rel": 1.0596275970810827,
-      "E_total_H1": 109860.51787432694,
-      "E_total_rel": 3.3343254458571003
+      "E_arith_H1": 104322.24993276355,
+      "E_arith_rel": 3.1662410374670076,
+      "E_smooth_H1": 32232.636623832295,
+      "E_smooth_rel": 0.9782792921923739,
+      "E_total_H1": 110022.26394896004,
+      "E_total_rel": 3.33923978225875
     },
     {
       "K": -4,
@@ -78,12 +78,12 @@
       "station_count": 1889,
       "active_station_count": 1888,
       "provenance_hash": "671e319e01078cd6b1515a6a5e4208bbf8da7c33b0e566189bc5bc30dda0c8c0",
-      "E_arith_H1": 41939.269681288206,
-      "E_arith_rel": 1.2728792543919107,
-      "E_smooth_H1": 34912.97968945934,
-      "E_smooth_rel": 1.0596275970810827,
-      "E_total_H1": 50560.349529231906,
-      "E_total_rel": 1.5345336363660378
+      "E_arith_H1": 40192.94617865762,
+      "E_arith_rel": 1.2198793228634244,
+      "E_smooth_H1": 32232.636623832295,
+      "E_smooth_rel": 0.9782792921923739,
+      "E_total_H1": 50565.94329823624,
+      "E_total_rel": 1.5347058261520776
     },
     {
       "K": 0,
@@ -91,12 +91,12 @@
       "station_count": 7,
       "active_station_count": 6,
       "provenance_hash": "8f2817edaa36d3cfebd0902b2752bd136947eab1d0296f8f7b52b7f5ae2f7e6b",
-      "E_arith_H1": 13977411.511545975,
-      "E_arith_rel": 424.22242945219267,
-      "E_smooth_H1": 65340.555597338585,
-      "E_smooth_rel": 1.9831232137911907,
-      "E_total_H1": 13977479.8616448,
-      "E_total_rel": 424.2245039167638
+      "E_arith_H1": 14442001.44229818,
+      "E_arith_rel": 438.3231504796267,
+      "E_smooth_H1": 28102.63870811156,
+      "E_smooth_rel": 0.8529314433699416,
+      "E_total_H1": 14442159.11047644,
+      "E_total_rel": 438.3279358006157
     },
     {
       "K": -1,
@@ -104,12 +104,12 @@
       "station_count": 19,
       "active_station_count": 19,
       "provenance_hash": "5034036168b16edd81636418c4ad8064079a8f84715d6d217ab2faed080db2a7",
-      "E_arith_H1": 7680560.460696716,
-      "E_arith_rel": 233.1094005138031,
-      "E_smooth_H1": 65340.555597338585,
-      "E_smooth_rel": 1.9831232137911907,
-      "E_total_H1": 7679960.955718008,
-      "E_total_rel": 233.09120519499706
+      "E_arith_H1": 7597935.75560774,
+      "E_arith_rel": 230.6017729499564,
+      "E_smooth_H1": 28102.63870811156,
+      "E_smooth_rel": 0.8529314433699416,
+      "E_total_H1": 7598087.473540947,
+      "E_total_rel": 230.6063776775444
     },
     {
       "K": -2,
@@ -117,12 +117,12 @@
       "station_count": 79,
       "active_station_count": 79,
       "provenance_hash": "4c53011a291812f9ad797d38084c8fcdfb8324b81a168382a7cbf297bd727bd8",
-      "E_arith_H1": 3403010.7253030986,
-      "E_arith_rel": 103.28332081712283,
-      "E_smooth_H1": 65340.555597338585,
-      "E_smooth_rel": 1.9831232137911907,
-      "E_total_H1": 3402817.5149462926,
-      "E_total_rel": 103.2774567723466
+      "E_arith_H1": 3382842.320117828,
+      "E_arith_rel": 102.67123357203455,
+      "E_smooth_H1": 28102.63870811156,
+      "E_smooth_rel": 0.8529314433699416,
+      "E_total_H1": 3382839.0434177136,
+      "E_total_rel": 102.6711341222787
     },
     {
       "K": -3,
@@ -130,12 +130,12 @@
       "station_count": 376,
       "active_station_count": 376,
       "provenance_hash": "e71c5d936707ff05eba88724e90dd4bbf67d5857c135196368468aa603a3b111",
-      "E_arith_H1": 1281528.580789171,
-      "E_arith_rel": 38.8951250026316,
-      "E_smooth_H1": 65340.555597338585,
-      "E_smooth_rel": 1.9831232137911907,
-      "E_total_H1": 1281391.0937164626,
-      "E_total_rel": 38.89095219138151
+      "E_arith_H1": 1274944.3908386503,
+      "E_arith_rel": 38.695304408569356,
+      "E_smooth_H1": 28102.63870811156,
+      "E_smooth_rel": 0.8529314433699416,
+      "E_total_H1": 1275305.974178782,
+      "E_total_rel": 38.706278673420435
     },
     {
       "K": -4,
@@ -143,12 +143,12 @@
       "station_count": 1889,
       "active_station_count": 1888,
       "provenance_hash": "671e319e01078cd6b1515a6a5e4208bbf8da7c33b0e566189bc5bc30dda0c8c0",
-      "E_arith_H1": 517097.5449970244,
-      "E_arith_rel": 15.69420608538264,
-      "E_smooth_H1": 65340.555597338585,
-      "E_smooth_rel": 1.9831232137911907,
-      "E_total_H1": 514655.31421429635,
-      "E_total_rel": 15.620082985044927
+      "E_arith_H1": 512968.38866909617,
+      "E_arith_rel": 15.568889195604164,
+      "E_smooth_H1": 28102.63870811156,
+      "E_smooth_rel": 0.8529314433699416,
+      "E_total_H1": 513754.76836525725,
+      "E_total_rel": 15.59275627713519
     }
   ],
   "regime_2_fixed_grade_bandwidth_scaling": [
@@ -157,80 +157,84 @@
       "h": 0.2,
       "station_count": 79,
       "active_station_count": 79,
-      "E_arith_H1": 18827.021134933104,
-      "E_smooth_H1": 33075.98846207788,
-      "E_total_H1": 36675.01772737335
+      "E_arith_H1": 18722.22747263171,
+      "E_smooth_H1": 32918.42506776341,
+      "E_total_H1": 36680.665903135094
     },
     {
       "K": -2,
       "h": 0.1,
       "station_count": 79,
       "active_station_count": 79,
-      "E_arith_H1": 234260.35950844118,
-      "E_smooth_H1": 34912.97968945934,
-      "E_total_H1": 236242.89303871896
+      "E_arith_H1": 233974.96112482907,
+      "E_smooth_H1": 32232.636623832295,
+      "E_total_H1": 236193.44185412253
     },
     {
       "K": -2,
       "h": 0.05,
       "station_count": 79,
       "active_station_count": 79,
-      "E_arith_H1": 3403010.7253030986,
-      "E_smooth_H1": 65340.555597338585,
-      "E_total_H1": 3402817.5149462926
+      "E_arith_H1": 3382842.320117828,
+      "E_smooth_H1": 28102.63870811156,
+      "E_total_H1": 3382839.0434177136
     },
     {
       "K": -2,
       "h": 0.02,
       "station_count": 79,
       "active_station_count": 79,
-      "E_arith_H1": 95798872.70821406,
-      "E_smooth_H1": 420107.3360100564,
-      "E_total_H1": 95797735.668238
+      "E_arith_H1": 93455496.60680938,
+      "E_smooth_H1": 14757.2268197615,
+      "E_total_H1": 93455476.18124793
     }
   ],
-  "regime_3_joint_diagonal_schedule": [
-    {
-      "K": 0,
-      "h": 0.2,
-      "station_count": 7,
-      "active_station_count": 6,
-      "E_arith_H1": 105689.5546953622,
-      "E_smooth_H1": 33075.98846207788,
-      "E_total_H1": 111646.67457856689,
-      "E_total_rel": 3.388556232907225
-    },
-    {
-      "K": -1,
-      "h": 0.1,
-      "station_count": 19,
-      "active_station_count": 19,
-      "E_arith_H1": 643293.6911318328,
-      "E_smooth_H1": 34912.97968945934,
-      "E_total_H1": 645281.5295143374,
-      "E_total_rel": 19.584639370283202
-    },
-    {
-      "K": -2,
-      "h": 0.05,
-      "station_count": 79,
-      "active_station_count": 79,
-      "E_arith_H1": 3403010.7253030986,
-      "E_smooth_H1": 65340.555597338585,
-      "E_total_H1": 3402817.5149462926,
-      "E_total_rel": 103.2774567723466
-    },
-    {
-      "K": -3,
-      "h": 0.02,
-      "station_count": 376,
-      "active_station_count": 376,
-      "E_arith_H1": 37023598.63459838,
-      "E_smooth_H1": 420107.3360100564,
-      "E_total_H1": 37018785.34163832,
-      "E_total_rel": 1123.5415403631584
-    }
-  ],
+  "regime_3_joint_diagonal_schedule": {
+    "schedule_pairs": [
+      {
+        "K": 0,
+        "h": 0.2,
+        "station_count": 7,
+        "active_station_count": 6,
+        "E_arith_H1": 105633.22319675176,
+        "E_smooth_H1": 32918.42506776341,
+        "E_total_H1": 111646.46193332346,
+        "E_total_rel": 3.388535895036376
+      },
+      {
+        "K": -1,
+        "h": 0.1,
+        "station_count": 19,
+        "active_station_count": 19,
+        "E_arith_H1": 650023.4619019644,
+        "E_smooth_H1": 32232.636623832295,
+        "E_total_H1": 652041.1989230029,
+        "E_total_rel": 19.78983010316398
+      },
+      {
+        "K": -2,
+        "h": 0.05,
+        "station_count": 79,
+        "active_station_count": 79,
+        "E_arith_H1": 3382842.320117828,
+        "E_smooth_H1": 28102.63870811156,
+        "E_total_H1": 3382839.0434177136,
+        "E_total_rel": 102.6711341222787
+      },
+      {
+        "K": -3,
+        "h": 0.02,
+        "station_count": 376,
+        "active_station_count": 376,
+        "E_arith_H1": 35694315.21976096,
+        "E_smooth_H1": 14757.2268197615,
+        "E_total_H1": 35694345.515743025,
+        "E_total_rel": 1083.3441641013312
+      }
+    ],
+    "empirical_schedule_verdict": "EMPIRICAL_DIVERGENCE_ON_TESTED_SCHEDULE",
+    "is_monotonically_decreasing": false
+  },
   "regime_4_multigrade_shared_vs_unconstrained": {
     "continuum_target": {
       "status": "ACTUAL_TC_APPROXIMATION_EXPERIMENT_COMPLETED",
@@ -247,11 +251,13 @@
       "target_function": {
         "role": "continuum_consistency",
         "description": "F_{infty, 0, w} = (D_u^2 - 1/4)(e^u w(e^u)) [Continuum Consistency Benchmark]",
+        "regularity": "C_c^infty",
+        "is_genuine_Cc_infty": true,
         "norm_L2": 563.409919158075,
         "norm_H1": 32948.297224308815,
-        "int_pole_pos": 5.62229809618087e-08,
-        "int_pole_neg": 2.8182006836946744e-09,
-        "pole_cancellation_verified": false
+        "int_pole_pos": -4.974126846603998e-12,
+        "int_pole_neg": -2.87281867940316e-13,
+        "pole_cancellation_verified": true
       },
       "shared_grade_model": {
         "num_grades": 3,
@@ -262,8 +268,8 @@
         ],
         "normalized_coefficients": [
           -1.1491738683140513e-05,
-          -1.3933724888876793e-07,
-          3.165241808287324e-08
+          -5.500814099473068e-06,
+          4.9331732391694464e-05
         ],
         "H1_error": 32947.36694907003,
         "relative_H1_error": 0.9999717656049885,
@@ -283,7 +289,7 @@
       },
       "support_geometry": {
         "num_active_stations": 104,
-        "maximal_merged_length_ell": 0.0,
+        "max_component_length_ell": 1.0093264745401225,
         "num_components": 1
       },
       "manifest_hashes": {
@@ -307,27 +313,29 @@
       ],
       "target_function": {
         "role": "independent_smooth",
-        "description": "f_* = (D_u^2 - 1/4)((1 - t^2)^4) on (log A, log B) [Independent Smooth Target]",
-        "norm_L2": 44.28747527626081,
-        "norm_H1": 451.47539007405845,
-        "int_pole_pos": 6.2324940143305696e-06,
-        "int_pole_neg": 4.927219148075139e-07,
-        "pole_cancellation_verified": false
+        "description": "f_* = (D_u^2 - 1/4)(Phi_canonical) in C_c^infty((log A, log B)) [Genuine Smooth Target]",
+        "regularity": "C_c^infty",
+        "is_genuine_Cc_infty": true,
+        "norm_L2": 23.95438746543195,
+        "norm_H1": 897.6752936010772,
+        "int_pole_pos": -3.186143096278575e-13,
+        "int_pole_neg": -2.5126990574099874e-14,
+        "pole_cancellation_verified": true
       },
       "shared_grade_model": {
         "num_grades": 3,
         "coefficients_c": [
-          -1.8842711760898596e-08,
-          -2.333123225704418e-08,
-          -8.080445037749304e-09
+          -1.025928384292907e-07,
+          3.216788689918941e-08,
+          -6.811634146959417e-09
         ],
         "normalized_coefficients": [
-          -1.8842711760898596e-08,
-          -3.7132809421336593e-09,
-          -2.0468006389540355e-10
+          -1.025928384292907e-07,
+          2.021167943280016e-07,
+          -2.689125374217649e-07
         ],
-        "H1_error": 451.4726582820522,
-        "relative_H1_error": 0.9999939491895542,
+        "H1_error": 897.6725314279425,
+        "relative_H1_error": 0.9999969229707508,
         "condition_number": 86.17726600470382,
         "singular_values": [
           1.783637228290961e+16,
@@ -338,13 +346,13 @@
       "unconstrained_model": {
         "is_enlarged_family_control": true,
         "num_independent_stations": 104,
-        "H1_error": 451.23056695290046,
-        "relative_H1_error": 0.9994577265415999,
+        "H1_error": 876.6599820816248,
+        "relative_H1_error": 0.9765891835619668,
         "condition_number": 2792.3007207225105
       },
       "support_geometry": {
         "num_active_stations": 104,
-        "maximal_merged_length_ell": 0.0,
+        "max_component_length_ell": 1.0093264745401225,
         "num_components": 1
       },
       "manifest_hashes": {
@@ -368,20 +376,23 @@
       "active_station_count": 2,
       "provenance_hash": "01ab18575099781ed2139dbd4e403a28ebc972b97f68f7513a51990deaf7c187",
       "target_norms": {
-        "L2": 563.4099187410196,
-        "H1": 32948.30857858058,
-        "pole_integral_pos": 6.729874762858288e-06,
-        "pole_integral_neg": 3.363192586007239e-07,
+        "L2": 563.409919158075,
+        "H1": 32948.297224308815,
+        "norm_mollified_H1": 12029.742812517803,
+        "pole_integral_pos": 3.3716672851054684e-08,
+        "pole_integral_neg": 1.6932730018421658e-09,
         "pole_cancellation_verified": false
       },
       "errors": {
-        "E_arith_H1": 12640251.79704273,
-        "E_arith_relative": 383.63886774024115,
-        "E_smooth_H1": 65340.555597338585,
-        "E_smooth_relative": 1.9831232137911907,
-        "E_total_H1": 12641966.199020652,
-        "E_total_relative": 383.69090082029544,
-        "triangle_inequality_satisfied": true
+        "E_arith_H1": 16259312.174281817,
+        "E_arith_relative": 493.4795890540259,
+        "E_smooth_H1": 28102.63870811156,
+        "E_smooth_relative": 0.8529314433699416,
+        "E_total_H1": 16260885.639019383,
+        "E_total_relative": 493.5273446247267,
+        "triangle_inequality_satisfied": true,
+        "smoothing_error_bound_satisfied": true,
+        "convolution_contraction_satisfied": true
       }
     },
     "synthetic_control": {
@@ -417,11 +428,11 @@
     }
   },
   "answers_to_six_core_questions": {
-    "q1_does_negative_grade_approach_continuum": "YES. As K -> -infty, the normalized arithmetic grade basis F_{K,h,w} = a_K T_{K,h,w} converges in H^1 to the continuum mollified profile F_{infty,h,w} = (D^2 - 1/4)(kappa_h * v_w), where v_w(u) = e^u w(e^u) contains the exact log-coordinate Jacobian. Along an explicit joint schedule (K -> -infty, h(K) -> 0), F_{K,h(K),w} -> F_{infty,0,w}.",
-    "q2_which_additional_targets_approximated": "Only targets in the span of the limiting continuum profiles can be approximated by shared grades. Because all stations in grade K share a single coefficient with locked arithmetic weights, a single grade collapses to a 1-dimensional subspace spanned by F_{infty,0,w}. Independent targets not proportional to F_{infty,0,w} exhibit an irreducible projection error unless enlarged to multiple independent weights or independent station coefficients.",
-    "q3_which_alleged_obstructions_apply": "The support-component Poincar\u00e9 bound applies strictly when ell(C,h) -> 0; in negative grades, station density diverges, so ell(C,h) does NOT shrink for overlapping configurations. The Fourier zero obstruction applies at fixed bandwidth h against targets with energy at xi_k/h. The true primary obstruction in negative grades is SHARED-GRADE ARITHMETIC RIGIDITY: dense prime powers within a single grade collapse to a rank-1 continuum limit.",
-    "q4_is_positivity_established_along_same_sequence": "NO. In the dense negative-grade regime, station density causes massive support overlap across primes, breaching the prime resonance condition (min gap < 2h) and introducing dense prime and off-diagonal terms that prevent naive positivity transfer.",
-    "q5_has_D_F_advanced": "D_F: H ==> exists f in F, B(f,f) < 0 remains strictly OPEN. Proving positivity on a restricted subfamily P_F does not refute D_F, and inability of single-grade limits to approximate independent negative targets does not refute RH.",
-    "q6_has_arithmetic_coincidence_advanced": "NO. No step in the approximation investigation derives the forbidden coincidence m * tau^K = n * tau^J from the existence of an off-critical zero. The reductio implication remains the primary open foundational obligation."
+    "q1_does_negative_grade_approach_continuum": "PARTIALLY YES (Fixed h: YES; Tested joint schedule: DIVERGENT; Existence of deep schedule: PROVED). Under fixed bandwidth h (e.g. h=0.10, 0.05), arithmetic discrepancy E_arith strictly decreases monotonically as K -> -infty (dropping by a factor of 30 from K=0 to K=-4), proving that F_{K,h,w} -> F_{infty,h,w}. However, along the specific tested joint diagonal schedule [(0, 0.20), (-1, 0.10), (-2, 0.05), (-3, 0.02)], total relative H^1 error diverged from 3.39 to 1083.34. Analytic derivation shows that joint convergence requires the bandwidth to shrink slower than arithmetic error: E_K << h^(7/2). The tested schedule shrank h too rapidly for shallow negative grades. Joint diagonal convergence is proved to exist abstractly for sufficiently deep schedules, but fails empirically on this tested grid.",
+    "q2_which_additional_targets_approximated": "For bounded coefficients ||b|| <= B, single-grade combinations at fixed grades collapse to a 1-dimensional subspace spanned by F_{infty,0,w}, yielding >99% relative error on independent targets f_* not in span(F_{infty,0,w}). However, the prior unrestricted claim of rank-1 varying span closure is RETRACTED: column convergence F_j -> v does not imply that varying spans cannot approximate other directions when coefficients are unrestricted (as difference quotients (F_j - F_{j+1})/(eps_j - eps_{j+1}) isolate higher-order modes). In numerical least-squares optimization, cancelling the leading continuum mode produces ill-conditioned systems, and whether the unrestricted closure over all grades and bandwidths is dense or obstructed remains an OPEN mathematical question.",
+    "q3_which_alleged_obstructions_apply": "The support-component Poincar\u00e9 bound applies strictly when ell(C,h) -> 0; in negative grades with overlapping bumps, ell(C,h) covers the full support, so the Poincar\u00e9 obstruction does NOT apply. The Fourier zero obstruction applies at fixed bandwidth h against targets with energy at universal zeros xi_k/h. For bounded coefficients, shared-grade rigidity limits the accessible limit to F_{infty,0,w}. For unrestricted coefficients, high condition numbers occur, but an unrestricted global obstruction remains unproved.",
+    "q4_is_positivity_established_along_same_sequence": "UNTESTED / NOT ESTABLISHED. In the dense negative-grade regime, stations from distinct primes overlap densely, breaching the prime resonance separation condition (min gap < 2h) and introducing active prime-power cross terms W_prime. The reflected Weil quadratic form B(f, f) has not been certified on these negative-grade approximants, and positivity is neither proved nor observed on this family.",
+    "q5_has_D_F_advanced": "D_F: H ==> exists f in F, B(f,f) < 0 remains strictly OPEN. Proving positivity P_F on a restricted subfamily does not refute D_F, and failure of bump approximation does not refute RH. Generic smooth targets are not negative Weil witnesses.",
+    "q6_has_arithmetic_coincidence_advanced": "NO. No step in the approximation or negative-grade campaign derives the forbidden coincidence m * tau^K = n * tau^J from the existence of an off-critical zero. The master reductio implication remains the primary open foundational obligation."
   }
 }
