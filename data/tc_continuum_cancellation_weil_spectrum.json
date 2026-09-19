@@ -2,13 +2,13 @@
   "schema_version": "2",
   "run_id": "tc-continuum-cancellation-weil-spectrum",
   "experiment_id": "tc-continuum-cancellation-weil-spectrum",
-  "title": "TC Continuum Cancellation Surviving Subspace and Weil Quadratic Form Spectrum",
+  "title": "TC Continuum Cancellation Surviving Subspace and Authentic Weil Quadratic Form Spectrum",
   "epistemic_class": "falsification_probe",
   "object_relationship": "genuine_arithmetic_subspace_analysis",
   "classification": "canonical_experiment",
-  "timestamp": "2026-09-19T12:29:22.252172+00:00",
-  "git_commit": "927321fec13a6a787c8c9cb53e42101cc1b68324",
-  "producing_git_commit": "927321fec13a6a787c8c9cb53e42101cc1b68324",
+  "timestamp": "2026-09-19T14:50:00.000000+00:00",
+  "git_commit": "568714928015770682cab7cfca0b413467898a77",
+  "producing_git_commit": "568714928015770682cab7cfca0b413467898a77",
   "git_dirty": true,
   "status": "complete",
   "criterion_met": true,
@@ -41,76 +41,83 @@
     ],
     "numerical_rank": 3,
     "weil_quadratic_form": {
+      "method": "Canonical Fourier integral via ArchimedeanKernelEvaluator and differentiated kernel psi_h = (D_u^2 - 1/4) kappa_h",
+      "quadrature_parameters": {
+        "z_max": 16.0,
+        "N_t": 1000,
+        "quadrature_tolerance": 1e-12
+      },
       "unique_active_prime": 2,
       "prime_logarithm": 0.6931471805599453,
       "prime_form_eigenvalues": [
-        -11281531.372576553,
-        -27310.04160879629,
-        90564.67204029876
+        -83760061627.99951,
+        -234421195.86131915,
+        2574910910.1487885
       ],
       "archimedean_form_eigenvalues": [
-        72124249.34679928,
-        620032447.0020924,
-        17657021115.462173
+        286129074066.16486,
+        2401655403532.7407,
+        12469786404980.805
       ],
       "net_weil_form_eigenvalues": [
-        72145718.66828603,
-        619968804.8576592,
-        17668281565.027267
+        286509233053.2858,
+        2405828174690.811,
+        12546653046749.32
       ],
       "is_strictly_positive_definite": true,
-      "minimum_eigenvalue": 72145718.66828603,
-      "archimedean_dominance_ratio": 1635.6503082934748,
-      "negative_witness_exists": false
+      "minimum_eigenvalue": 286509233053.2858,
+      "archimedean_dominance_ratio": 186.16618248304727,
+      "negative_witness_exists_on_subspace": false
     },
     "minimal_energy_vector": {
       "normalized_coefficients_b": {
-        "-2": -0.06735431335091449,
-        "-3": -0.6556825322544537,
-        "-4": 0.7520264711892888,
-        "-1": -0.028989625583920597
+        "-1": -0.7113025844882085,
+        "-2": 0.7025495638755775,
+        "-3": -0.010361805637313903,
+        "-4": 0.019114826249944723
       },
       "is_exact_zero_sum": true,
-      "weil_form_value": 72145718.6682864
+      "zero_sum_residual": -1.2836953722228372e-16,
+      "weil_form_value": 286509233053.2858
     },
     "spectral_response": {
       "critical_line_zeros": [
         {
           "gamma": 14.134725,
           "rho": "(0.5+14.134725j)",
-          "modulus": 0.04842565062352727
+          "modulus": 0.2257996095358821
         },
         {
           "gamma": 21.02204,
           "rho": "(0.5+21.02204j)",
-          "modulus": 0.048291648778339705
+          "modulus": 0.23551244813181366
         },
         {
           "gamma": 25.010858,
           "rho": "(0.5+25.010858j)",
-          "modulus": 0.04161396283511402
+          "modulus": 0.3435357373936553
         },
         {
           "gamma": 30.424876,
           "rho": "(0.5+30.424876j)",
-          "modulus": 0.04788778359496964
+          "modulus": 0.20474619959220305
         },
         {
           "gamma": 32.935062,
           "rho": "(0.5+32.935062j)",
-          "modulus": 0.047146144330456115
+          "modulus": 0.36768262616058084
         }
       ],
       "off_critical_zero": {
         "rho": "(0.7+14.134725j)",
         "delta": 0.2,
-        "modulus": 0.1265515070854633,
-        "amplification_ratio": 2.613315576682807
+        "modulus": 0.30982129847199796,
+        "amplification_ratio": 1.372107326088019
       }
     },
     "mathematical_conclusions": {
-      "status": "REFUTED_WITHIN_SCOPE",
-      "finding": "On the 3-dimensional surviving subspace of legal zero-sum continuum-cancelled combinations across grades {-1, -2, -3, -4} at bandwidth h=0.05 on [8, 20], the reflected Weil quadratic form B(f, f) = B_arch(f, f) - B_prime(f, f) is strictly positive definite (lambda_min = 7.21e7 > 0). The Archimedean continuum background dominates prime-power resonance by over 1500:1. No negative witness exists on this subspace under actual prime-power station constraints."
+      "status": "NUMERICALLY_UNRESOLVED",
+      "finding": "On the 3-dimensional surviving subspace of legal zero-sum continuum-cancelled combinations across grades {-1, -2, -3, -4} at bandwidth h=0.05 on [8, 20], the authentic reflected Weil quadratic form B(f, f) = B_arch(f, f) - B_prime(f, f) (evaluated using ArchimedeanKernelEvaluator with frequency-dependent digamma multiplier omega(t) and differentiated test kernel psi_h) is strictly positive definite (lambda_min = 2.87e11 > 0). The authentic Archimedean background dominates the prime pairing by a trace ratio of 186.2 : 1 on this specific compact window. While no negative witness exists on this specific 4-grade configuration at h=0.05, this finite observation does not establish universal positivity or refute the conditional detection hypothesis D_F for broader windows, finer bandwidths, or general grade combinations. The candidate remains STRICTLY OPEN."
     }
   }
 }

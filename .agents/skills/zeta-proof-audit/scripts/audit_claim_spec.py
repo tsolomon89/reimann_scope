@@ -458,9 +458,25 @@ def verify_independent_review(
     Verifies that a claim has an independent mathematical review artifact in .agents/claims/reviews/.
     Enforces that:
     1. The review artifact exists at .agents/claims/reviews/<claim_id>-derivation-review.md.
-    2. The review is revision-bound (contains commit SHA, session ID, or claim ID).
-    3. The review contains required substantive sections (derivation/proof, objections/adversarial challenges, resolution).
-    4. The review is independent: rejects author self-review.
+    2. The review is independent: rejects author self-review (author matching reviewer,
+       review declaring itself as author self-review, or self-certification).
+    3. The review contains required substantive sections:
+       - Derivation / proof evaluation with substantive analytical content.
+       - Objections / adversarial challenges / falsification attempts.
+       - Clear resolution / verdict.
+    4. The review verdict MUST be evaluated:
+       - Explicitly rejects negative verdicts (REJECTED, FAILED, DISAPPROVED, INVALID,
+         UNSOUND, FATAL CIRCULARITY, INCORRECT, UNRESOLVED, CONTRADICTED).
+       - Requires an explicit positive approval verdict (PASSED, APPROVED, ACCEPTED,
+         VERIFIED, CONFIRMED, PROVED, FORMALIZED, VALID).
+    5. Revision binding and consistency:
+       - Must declare valid revision binding: commit SHA, claim file hash, session ID UUID,
+         or explicitly bound claim ID. Generic words like 'date' or 'commit' without a hash are rejected.
+       - If a commit SHA is declared in the review:
+         * If the claim spec specifies a git_commit, they must match (prefix or full SHA).
+           Mismatch indicates a stale review.
+       - If a claim hash is declared in the review, it must match the actual SHA256 of the claim file
+         or a declared artifact hash.
     """
     if not claim_id or claim_id == "UNKNOWN":
         return False, "No claim ID specified", {}
@@ -485,15 +501,42 @@ def verify_independent_review(
 
     # 1. Author self-review / self-certification detection
     author = str(spec.get("author", "")).strip().lower()
-    if author and author in content_lower and ("self-review" in content_lower or "author review" in content_lower):
-        return False, "Self-review detected: author cannot approve their own claim", {}
-    if "self-review" in content_lower or "self-certification" in content_lower:
+    producer = str(spec.get("producer", "")).strip().lower()
+    owner = str(spec.get("owner", "")).strip().lower()
+
+    rev_m = re.search(r'(?:reviewer|auditor|reviewed by|evaluator)\s*(?:role)?\s*[:*`]+\s*([^\n\r*`]+)', content, re.IGNORECASE)
+    reviewer_text = rev_m.group(1).strip().lower() if rev_m else ""
+    auth_m = re.search(r'(?:claim author|author|producer|owner)\s*[:*`]+\s*([^\n\r*`]+)', content, re.IGNORECASE)
+    author_text = auth_m.group(1).strip().lower() if auth_m else ""
+
+    if reviewer_text:
+        if author and (author in reviewer_text or reviewer_text in author):
+            return False, f"Self-review detected: claim author '{spec.get('author')}' matches reviewer '{rev_m.group(1).strip()}'", {}
+        if producer and (producer in reviewer_text or reviewer_text in producer):
+            return False, f"Self-review detected: claim producer '{spec.get('producer')}' matches reviewer '{rev_m.group(1).strip()}'", {}
+        if owner and (owner in reviewer_text or reviewer_text in owner):
+            return False, f"Self-review detected: claim owner '{spec.get('owner')}' matches reviewer '{rev_m.group(1).strip()}'", {}
+        if author_text and (author_text in reviewer_text or reviewer_text in author_text):
+            return False, f"Self-review detected: review author '{auth_m.group(1).strip()}' matches reviewer '{rev_m.group(1).strip()}'", {}
+
+    if any(k in content_lower for k in ["self-review", "self review", "self-certification", "self certification", "author review"]):
         return False, "Self-certification detected: review must be independent", {}
 
-    # 2. Check for required substantive sections
+    # 2. Explicit negative verdict / fatal circularity / rejection detection
+    negative_patterns = [
+        r'\b(?:resolution|verdict|status|conclusion|assigned classification)\s*[:*`]+\s*(?:`?(?:REJECTED|FAILED|DISAPPROVED|INVALID|UNRESOLVED|CONTRADICTED|FATAL|UNSOUND)\b)',
+        r'\bderivation\s*[:*`]+\s*(?:`?(?:INCORRECT|FALSE|UNSOUND|INVALID|FATAL|INCOMPLETE)\b)',
+        r'\bobjections?\s*[:*`]+\s*(?:`?(?:FATAL|UNRESOLVED|UNANSWERED|BLOCKING|FATAL CIRCULARITY)\b)'
+    ]
+    for pat in negative_patterns:
+        neg_m = re.search(pat, content, re.IGNORECASE)
+        if neg_m:
+            return False, f"Review artifact recorded negative verdict or fatal objection: '{neg_m.group(0).strip()}'", {}
+
+    # 3. Check for required substantive sections
     has_derivation = any(k in content_lower for k in ["derivation", "proof", "analytical", "symbolic", "mathematical"])
     has_objections = any(k in content_lower for k in ["objection", "adversarial", "challenge", "falsification", "counterexample", "zero-crossing", "barrier", "obstruction", "rigidity"])
-    has_resolution = any(k in content_lower for k in ["resolution", "conclusion", "verified", "status", "proved", "confirmed", "formalized"])
+    has_resolution = any(k in content_lower for k in ["resolution", "conclusion", "verified", "status", "proved", "confirmed", "formalized", "verdict", "assigned classification"])
 
     if not has_derivation:
         return False, "Review artifact lacks derivation / proof evaluation section", {}
@@ -502,24 +545,73 @@ def verify_independent_review(
     if not has_resolution:
         return False, "Review artifact lacks clear resolution / conclusion section", {}
 
-    # 3. Revision binding check
+    # 4. Require explicit positive approval verdict
+    positive_patterns = [
+        r'\b(?:resolution|verdict|conclusion)\s*[:*`]+\s*[^\n\r]*\b(passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
+        r'\b(?:status|assigned classification)\s*[:*`]+\s*`?[A-Z0-9_]{3,}',
+        r'##\s*[^#\n\r]*\b(?:verdict|resolution|formalization)\b',
+        r'\bthe claim is verified\b',
+        r'\bformally proved in lean\b',
+        r'\bformalized\b',
+        r'\bverified successfully\b',
+        r'\b\*\*PASSED\*\*\b'
+    ]
+    if not any(re.search(p, content, re.IGNORECASE) for p in positive_patterns):
+        return False, "Review artifact lacks explicit positive approval verdict (e.g. PASSED, APPROVED, ACCEPTED, VERIFIED)", {}
+
+    # 5. Revision binding check and verification
+    m_commit = re.search(r'(?:target commit|commit sha|commit|sha|start sha)\s*[:*`]+\s*([0-9a-fA-F]{7,40})', content, re.IGNORECASE)
+    m_hash = re.search(r'(?:claim hash|spec hash|claim_hash|spec_hash|input digest|artifact hash)\s*[:*`]+\s*(?:sha256:)?([0-9a-fA-F]{16,64})', content, re.IGNORECASE)
+    m_sess = re.search(r'session id\s*[:*`]+\s*([0-9a-fA-F-]{36})', content, re.IGNORECASE)
+    has_claim_id_ref = claim_id.lower() in content_lower
+
     has_revision_binding = bool(
-        re.search(r'[0-9a-f]{7,40}', content) or
-        "session id" in content_lower or
-        "commit" in content_lower or
-        "sha" in content_lower or
-        "date" in content_lower or
-        claim_id.lower() in content_lower
+        m_commit or
+        m_hash or
+        m_sess or
+        (has_claim_id_ref and re.search(r'\b[0-9a-fA-F]{7,40}\b', content)) or
+        has_claim_id_ref
     )
     if not has_revision_binding:
-        return False, "Review artifact is not revision-bound (missing commit SHA, session ID, or claim hash)", {}
+        return False, "Review artifact is not revision-bound (requires valid commit SHA, claim file hash, or session UUID)", {}
+
+    # 6. Verify declared commit matches spec git_commit (reject stale reviews)
+    spec_commit = str(spec.get("git_commit", "")).strip().lower()
+    if m_commit and spec_commit and spec_commit != "unknown":
+        rev_commit = m_commit.group(1).lower()
+        if not (rev_commit.startswith(spec_commit) or spec_commit.startswith(rev_commit)):
+            return False, f"Stale review detected: review commit '{rev_commit}' does not match claim specification commit '{spec_commit}'", {}
+
+    # 7. Verify declared claim hash matches actual claim file SHA256 (reject wrong claim hash)
+    if m_hash:
+        declared_hash = m_hash.group(1).lower()
+        claim_json_path = os.path.join(repo_root, ".agents", "claims", f"{claim_id}.json")
+        actual_hash = None
+        if os.path.exists(claim_json_path):
+            import hashlib
+            with open(claim_json_path, "rb") as cf:
+                actual_hash = hashlib.sha256(cf.read()).hexdigest().lower()
+        elif spec:
+            import hashlib
+            actual_hash = hashlib.sha256(json.dumps(spec, sort_keys=True).encode("utf-8")).hexdigest().lower()
+
+        spec_art_hashes = [str(h).lower() for h in spec.get("artifact_hashes", [])]
+        clean_spec_art_hashes = [h.replace("sha256:", "").strip() for h in spec_art_hashes]
+        matches_spec = (
+            (actual_hash is not None and declared_hash == actual_hash) or
+            any(declared_hash == h or declared_hash in h or h in declared_hash for h in clean_spec_art_hashes)
+        )
+        if not matches_spec:
+            return False, f"Wrong claim hash detected: review specifies '{declared_hash}' but actual claim spec SHA256 is '{actual_hash}'", {}
 
     details = {
         "review_file": review_file,
         "is_revision_bound": has_revision_binding,
         "has_objections": has_objections,
         "has_derivation": has_derivation,
-        "has_resolution": has_resolution
+        "has_resolution": has_resolution,
+        "reviewer_text": reviewer_text,
+        "author_text": author_text
     }
     return True, "Independent review verified successfully", details
 

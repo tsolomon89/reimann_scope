@@ -225,6 +225,7 @@ from tc.approximation import (
     search_adaptive_diagonal_schedule,
     sieve_primes_up_to,
     validate_tc_station_manifest,
+    verify_research_milestone_completion,
 )
 
 __all__ = [
@@ -413,5 +414,6 @@ __all__ = [
     "verify_scalar_twist_identities",
     "verify_theorem_A_unitary_criterion",
     "verify_theorem_B_bilateral_boundedness_criterion",
+    "verify_research_milestone_completion",
     "zero_worldline_point",
 ]

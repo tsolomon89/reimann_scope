@@ -41,6 +41,8 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 from tc.weil_forms import (
     verify_canonical_reflected_weil_sign_certificate,
+    ArchimedeanKernelEvaluator,
+    kappa_hat_fast,
     Z_CANONICAL_KERNEL,
     NORM_KAPPA_SQ,
     NORM_KAPPA_FIRST_DERIVATIVE_SQ,
@@ -1889,6 +1891,7 @@ def run_tc_negative_grade_approximation_campaign(
     override_exp_independent: Optional[Dict[str, Any]] = None,
     override_regime_1_results: Optional[List[Dict[str, Any]]] = None,
     override_regime_2_results: Optional[List[Dict[str, Any]]] = None,
+    override_regime_3_results: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """
     Comprehensive Multi-Regime TC Negative-Grade Investigation Campaign (Section 5):
@@ -1953,33 +1956,36 @@ def run_tc_negative_grade_approximation_campaign(
             })
 
     # Regime 3: Joint Diagonal Schedule
-    joint_pairs = [(0, 0.20), (-1, 0.10), (-2, 0.05), (-3, 0.02)]
-    regime_3_results = []
-    for idx, (K, h) in enumerate(joint_pairs):
-        if override_joint_relative_errors is not None and idx < len(override_joint_relative_errors):
-            rel_err = float(override_joint_relative_errors[idx])
-            regime_3_results.append({
-                'K': K,
-                'h': h,
-                'station_count': 0,
-                'active_station_count': 0,
-                'E_arith_H1': 0.0,
-                'E_smooth_H1': 0.0,
-                'E_total_H1': 0.0,
-                'E_total_rel': rel_err
-            })
-        else:
-            res = compute_arithmetic_vs_smoothing_error(K=K, h=h, window=window)
-            regime_3_results.append({
-                'K': K,
-                'h': h,
-                'station_count': res['station_count'],
-                'active_station_count': res['active_station_count'],
-                'E_arith_H1': res['errors']['E_arith_H1'],
-                'E_smooth_H1': res['errors']['E_smooth_H1'],
-                'E_total_H1': res['errors']['E_total_H1'],
-                'E_total_rel': res['errors']['E_total_relative']
-            })
+    if override_regime_3_results is not None:
+        regime_3_results = override_regime_3_results
+    else:
+        joint_pairs = [(0, 0.20), (-1, 0.10), (-2, 0.05), (-3, 0.02)]
+        regime_3_results = []
+        for idx, (K, h) in enumerate(joint_pairs):
+            if override_joint_relative_errors is not None and idx < len(override_joint_relative_errors):
+                rel_err = float(override_joint_relative_errors[idx])
+                regime_3_results.append({
+                    'K': K,
+                    'h': h,
+                    'station_count': 0,
+                    'active_station_count': 0,
+                    'E_arith_H1': 0.0,
+                    'E_smooth_H1': 0.0,
+                    'E_total_H1': 0.0,
+                    'E_total_rel': rel_err
+                })
+            else:
+                res = compute_arithmetic_vs_smoothing_error(K=K, h=h, window=window)
+                regime_3_results.append({
+                    'K': K,
+                    'h': h,
+                    'station_count': res['station_count'],
+                    'active_station_count': res['active_station_count'],
+                    'E_arith_H1': res['errors']['E_arith_H1'],
+                    'E_smooth_H1': res['errors']['E_smooth_H1'],
+                    'E_total_H1': res['errors']['E_total_H1'],
+                    'E_total_rel': res['errors']['E_total_relative']
+                })
 
     # Regime 4: Multi-grade combinations (grades {0, -1, -2} at h=0.05)
     if override_exp_continuum is not None:
@@ -2004,6 +2010,18 @@ def run_tc_negative_grade_approximation_campaign(
     # Dynamic Audits across Regimes:
     # Dynamic Audits across Regimes:
     audit_failures: List[str] = []
+
+    # Mandatory non-empty regime checks: empty sections cannot pass invariants
+    if not regime_1_results or len(regime_1_results) == 0:
+        audit_failures.append("Regime 1: Required single-grade convergence results are empty")
+    if not regime_2_results or len(regime_2_results) == 0:
+        audit_failures.append("Regime 2: Required fixed-grade bandwidth scaling results are empty")
+    if not regime_3_results or len(regime_3_results) == 0:
+        audit_failures.append("Regime 3: Required joint diagonal schedule results are empty")
+    if not exp_continuum or not isinstance(exp_continuum, dict) or len(exp_continuum) == 0:
+        audit_failures.append("Regime 4: Continuum target experiment data is empty or missing")
+    if not exp_independent or not isinstance(exp_independent, dict) or len(exp_independent) == 0:
+        audit_failures.append("Regime 4: Independent target experiment data is empty or missing")
 
     # 1. Regime 1 Monotonicity and Finiteness:
     r1_by_h: Dict[float, List[Dict[str, Any]]] = {}
@@ -2448,35 +2466,55 @@ def execute_adaptive_diagonal_search(
             e_arith_rel = res_eval['errors']['E_arith_relative']
             e_tot_rel = res_eval['errors']['E_total_relative']
             e_tot_H1 = res_eval['errors']['E_total_H1']
+            e_smooth_rel = res_eval['errors']['E_smooth_relative']
 
             # Numerical uncertainty check via medium mesh
             n_med = max(31, int(round(current_n * 0.67)))
             res_med = compute_arithmetic_vs_smoothing_error(K=K_cand, h=h_accepted, window=window, n_points=n_med)
-            uncertainty_H1 = abs(e_tot_H1 - res_med['errors']['E_total_H1'])
-            rel_uncertainty = uncertainty_H1 / e_tot_H1 if e_tot_H1 > 0 else 0.0
+            e_med_H1 = res_med['errors']['E_total_H1']
+
+            # Robust validation of numerical errors: reject non-finite, zero, or negative errors
+            is_valid_numerics = (
+                isinstance(e_tot_H1, (int, float)) and not isinstance(e_tot_H1, bool) and math.isfinite(e_tot_H1) and e_tot_H1 > 0 and
+                isinstance(e_med_H1, (int, float)) and not isinstance(e_med_H1, bool) and math.isfinite(e_med_H1) and e_med_H1 > 0 and
+                isinstance(e_tot_rel, (int, float)) and not isinstance(e_tot_rel, bool) and math.isfinite(e_tot_rel) and e_tot_rel > 0 and
+                isinstance(e_smooth_rel, (int, float)) and not isinstance(e_smooth_rel, bool) and math.isfinite(e_smooth_rel) and e_smooth_rel > 0
+            )
+
+            if not is_valid_numerics:
+                uncertainty_H1 = float('inf')
+                rel_uncertainty = 1.0  # Invalid / overwhelming numerical uncertainty
+            else:
+                uncertainty_H1 = abs(e_tot_H1 - e_med_H1)
+                rel_uncertainty = uncertainty_H1 / min(e_tot_H1, e_med_H1)
 
             # If uncertainty is high (>= 0.20), trigger mesh refinement n -> 2n and recompute
-            if rel_uncertainty >= 0.20 and current_n < 500:
+            if is_valid_numerics and rel_uncertainty >= 0.20 and current_n < 500:
                 refined_n = current_n * 2
                 res_eval_ref = compute_arithmetic_vs_smoothing_error(K=K_cand, h=h_accepted, window=window, n_points=refined_n)
                 total_stations_evaluated += res_eval_ref['station_count']
                 res_med_ref = compute_arithmetic_vs_smoothing_error(K=K_cand, h=h_accepted, window=window, n_points=current_n)
-                unc_ref = abs(res_eval_ref['errors']['E_total_H1'] - res_med_ref['errors']['E_total_H1'])
-                rel_unc_ref = unc_ref / res_eval_ref['errors']['E_total_H1'] if res_eval_ref['errors']['E_total_H1'] > 0 else 0.0
-                current_n = refined_n
-                res_eval = res_eval_ref
-                e_arith_rel = res_eval['errors']['E_arith_relative']
-                e_tot_rel = res_eval['errors']['E_total_relative']
-                e_tot_H1 = res_eval['errors']['E_total_H1']
-                uncertainty_H1 = unc_ref
-                rel_uncertainty = rel_unc_ref
+                e_tot_H1_ref = res_eval_ref['errors']['E_total_H1']
+                e_med_H1_ref = res_med_ref['errors']['E_total_H1']
+                if (isinstance(e_tot_H1_ref, (int, float)) and math.isfinite(e_tot_H1_ref) and e_tot_H1_ref > 0 and
+                    isinstance(e_med_H1_ref, (int, float)) and math.isfinite(e_med_H1_ref) and e_med_H1_ref > 0):
+                    unc_ref = abs(e_tot_H1_ref - e_med_H1_ref)
+                    rel_unc_ref = unc_ref / min(e_tot_H1_ref, e_med_H1_ref)
+                    current_n = refined_n
+                    res_eval = res_eval_ref
+                    e_arith_rel = res_eval['errors']['E_arith_relative']
+                    e_tot_rel = res_eval['errors']['E_total_relative']
+                    e_tot_H1 = e_tot_H1_ref
+                    e_smooth_rel = res_eval['errors']['E_smooth_relative']
+                    uncertainty_H1 = unc_ref
+                    rel_uncertainty = rel_unc_ref
 
             eval_record = {
                 'K': K_cand,
                 'h': h_accepted,
                 'station_count': res_eval['station_count'],
                 'E_arith_relative': e_arith_rel,
-                'E_smooth_relative': res_eval['errors']['E_smooth_relative'],
+                'E_smooth_relative': e_smooth_rel,
                 'E_total_relative': e_tot_rel,
                 'discretization_uncertainty_H1': uncertainty_H1,
                 'uncertainty_relative': rel_uncertainty,
@@ -2484,14 +2522,13 @@ def execute_adaptive_diagonal_search(
             }
             all_evaluations.append(eval_record)
 
-            if e_tot_rel < min_err_in_step:
+            if is_valid_numerics and e_tot_rel < min_err_in_step:
                 min_err_in_step = e_tot_rel
                 best_pair_in_step = eval_record
 
-            # Section 4C repair: Candidate accepted iff E_total_rel < target_eps
+            # Section 4C repair: Candidate accepted iff numerics valid AND E_total_rel < target_eps
             # AND E_smooth_rel < half_target AND rel_uncertainty < 0.20.
-            e_smooth_rel = res_eval['errors']['E_smooth_relative']
-            if e_tot_rel < target_eps and e_smooth_rel < half_target and rel_uncertainty < 0.20:
+            if is_valid_numerics and e_tot_rel < target_eps and e_smooth_rel < half_target and rel_uncertainty < 0.20:
                 K_accepted = K_cand
                 current_K = K_cand
                 step_decisions.append(
@@ -2501,12 +2538,14 @@ def execute_adaptive_diagonal_search(
                 break
             else:
                 rejection_reasons = []
-                if e_tot_rel >= target_eps:
-                    rejection_reasons.append(f"E_total_rel={e_tot_rel:.4f} >= target {target_eps:.4f}")
-                if e_smooth_rel >= half_target:
-                    rejection_reasons.append(f"E_smooth_rel={e_smooth_rel:.4f} >= half-target {half_target:.4f}")
-                if rel_uncertainty >= 0.20:
-                    rejection_reasons.append(f"discretization uncertainty={rel_uncertainty:.4f} >= 0.20")
+                if not is_valid_numerics:
+                    rejection_reasons.append(f"invalid/non-positive/NaN errors (E_tot={e_tot_H1!r}, E_med={e_med_H1!r})")
+                if not isinstance(e_tot_rel, (int, float)) or not math.isfinite(e_tot_rel) or e_tot_rel >= target_eps:
+                    rejection_reasons.append(f"E_total_rel={e_tot_rel!r} >= target {target_eps:.4f}")
+                if not isinstance(e_smooth_rel, (int, float)) or not math.isfinite(e_smooth_rel) or e_smooth_rel >= half_target:
+                    rejection_reasons.append(f"E_smooth_rel={e_smooth_rel!r} >= half-target {half_target:.4f}")
+                if not isinstance(rel_uncertainty, (int, float)) or not math.isfinite(rel_uncertainty) or rel_uncertainty >= 0.20:
+                    rejection_reasons.append(f"discretization uncertainty={rel_uncertainty!r} >= 0.20")
                 rejected_attempts.append({
                     'reason': "; ".join(rejection_reasons),
                     'K': K_cand,
@@ -2746,16 +2785,19 @@ def investigate_actual_tc_grade_cancellation(
     gram_norm_fine = float(np.linalg.norm(Gram_G))
     gram_rel_err = float(np.linalg.norm(gram_entry_diff) / gram_norm_fine) if gram_norm_fine > 0 else 0.0
 
-    # Subspace projection stability for clustered / leading singular directions
-    k_sub = min(m, max(1, numerical_rank))
-    subspace_dim = k_sub if k_sub < m else (m - 1 if m > 1 else 1)
-    V_sub_fine = evecs[:, :subspace_dim]
-    V_sub_med = evecs_med[:, :subspace_dim]
-    P_fine = V_sub_fine @ V_sub_fine.T
-    P_med = V_sub_med @ V_sub_med.T
-    subspace_proj_diff_frobenius = float(np.linalg.norm(P_fine - P_med, 'fro'))
+    # Section 4D: Direct function-space H^1 subspace stability across all m dimensions
+    # For any function in the m-dimensional subspace span(G_1, ..., G_m),
+    # the relative norm perturbation between fine and medium mesh is bounded by
+    # max_{c != 0} |c^T (Gram_med - Gram_G) c| / (c^T Gram_G c) = max_i |lambda_i(Gram_med, Gram_G) - 1|.
+    try:
+        import scipy.linalg
+        gen_eig = scipy.linalg.eigh(Gram_med, Gram_G, eigvals_only=True)
+        function_subspace_distance = float(np.max(np.abs(gen_eig - 1.0)))
+    except Exception:
+        function_subspace_distance = gram_rel_err
 
-    directions_stable = bool(all(d < 0.05 for d in rel_diffs) and gram_rel_err < 0.10)
+    subspace_proj_diff_frobenius = function_subspace_distance
+    directions_stable = bool(all(d < 0.05 for d in rel_diffs) and gram_rel_err < 0.10 and function_subspace_distance < 0.10)
 
     # Section 4D: Derive per-column uncertainty delta_K from genuine common-grid H^1 difference
     column_uncertainty_estimates: Dict[int, float] = {}
@@ -2832,8 +2874,9 @@ def investigate_actual_tc_grade_cancellation(
                 'relative_frobenius_difference': gram_rel_err
             },
             'subspace_projection_stability': {
-                'subspace_dimension': subspace_dim,
-                'projection_difference_frobenius': subspace_proj_diff_frobenius
+                'subspace_dimension': m,
+                'projection_difference_frobenius': subspace_proj_diff_frobenius,
+                'function_subspace_distance_H1': function_subspace_distance
             },
             'directions_stable_under_refinement': directions_stable
         },
@@ -2922,26 +2965,29 @@ def audit_same_grade_resonance_K_neg3(
     d1 = math.log(2.0) * w1
     d2 = math.log(2.0) * w2
 
-    # Genuine evaluation of reflected Weil quadratic form B(f, f) = B_arch(f, f) - B_prime(f, f)
-    # 1. Bump L^2 norm squared: ||psi_h||^2 = (1/h) * int_{-1}^1 exp(-2/(1-t^2)) dt
-    c_bump_int = 0.44399381616807943782
-    bump_L2_sq = c_bump_int / h
+    # Authentic evaluation of reflected Weil quadratic form B(f, f) = B_arch(f, f) - B_prime(f, f)
+    # Using the canonical differentiated test kernel psi_h(u) = (D_u^2 - 1/4) kappa_h(u)
+    # with exact Fourier transform A_h(it) = (t^2 + 1/4) hat{kappa}(ht) and frequency-dependent
+    # Archimedean multiplier omega(t) = Re digamma(1/4 + it/2) - log(pi).
+    arch_eval = ArchimedeanKernelEvaluator(h=h, z_max=16.0, N_t=1000)
+    nodes_t = arch_eval.nodes_t
+    weights_t = arch_eval.weights_t
+    k_vals = np.array([kappa_hat_fast(t * h) for t in nodes_t])
+    Ah_sq = ((nodes_t**2 + 0.25) * k_vals)**2
 
-    # 2. Resonant prime form evaluation at q=2:
-    # B_prime(f, f) = 2 * (Lambda(2)/sqrt(2)) * d1 * d2 * int psi_h(u) psi_h(u - Delta u + log 2) du
-    # Since Delta u = log 2 identically, the overlap is exactly ||psi_h||_{L^2}^2
-    b_prime_eval = math.sqrt(2.0) * math.log(2.0) * d1 * d2 * bump_L2_sq
+    # Prime convolution kernel C_h(v) = (1/pi) int_0^infty |A_h(it)|^2 cos(tv) dt
+    prime_base = (weights_t * Ah_sq) / math.pi
+    c_h_0 = float(np.sum(prime_base))  # C_h(0) = ||psi_h||_{L^2}^2
 
-    # 3. Archimedean form evaluation:
-    # B_arch(f, f) = (1 / 2pi) int |f_hat(xi)|^2 kappa_hat(xi) dxi
-    # For bump with bandwidth h=0.02, diagonal Archimedean self-energy density:
-    # I_arch = (1 / 2pi) int |psi_h_hat(xi)|^2 kappa_hat(xi) dxi ~= 12.9343
-    # Cross Archimedean interaction bounded by Cauchy-Schwarz |I_arch,cross| <= I_arch
-    i_arch_self = 12.9343058
-    b_arch_diag = (d1**2 + d2**2) * i_arch_self
-    # Lower bound on Archimedean form via self-energy minus cross-interaction
-    b_arch_cross_bound = 2.0 * d1 * d2 * i_arch_self
-    b_arch_eval = max(0.0, b_arch_diag - b_arch_cross_bound)
+    # 1. Resonant prime form evaluation at q=2:
+    # B_prime(f, f) = 2 * (Lambda(2)/sqrt(2)) * d1 * d2 * C_h(0)
+    b_prime_eval = math.sqrt(2.0) * math.log(2.0) * d1 * d2 * c_h_0
+
+    # 2. Authentic Archimedean form evaluation:
+    # B_arch(f, f) = (d1^2 + d2^2) k_arch(0; h) + 2 d1 d2 k_arch(log 2; h)
+    k_arch_0 = arch_eval.evaluate(0.0)
+    k_arch_log2 = arch_eval.evaluate(math.log(2.0))
+    b_arch_eval = (d1**2 + d2**2) * k_arch_0 + 2.0 * d1 * d2 * k_arch_log2
     net_weil_form_margin = b_arch_eval - b_prime_eval
     archimedean_dominates = bool(b_arch_eval > b_prime_eval and net_weil_form_margin > 0.0)
 
@@ -2967,6 +3013,10 @@ def audit_same_grade_resonance_K_neg3(
             'is_exact_log2_resonance': bool(abs(resonance_shift) < 1e-14),
             'bumps_overlap_in_space': bumps_overlap_in_space,
             'prime_cross_weight_magnitude': 2.0 * (math.log(2.0) / math.sqrt(2.0)) * d1 * d2,
+            'c_h_0_norm_psi_h_sq': c_h_0,
+            'k_arch_0': k_arch_0,
+            'k_arch_log2': k_arch_log2,
+            'quadrature_tolerance': 1e-12,
             'B_prime_form_evaluated': b_prime_eval,
             'B_arch_form_lower_bound': b_arch_eval,
             'net_weil_form_margin': net_weil_form_margin
@@ -2983,9 +3033,10 @@ def audit_same_grade_resonance_K_neg3(
             ),
             'reason': (
                 f"At K=-3, active prime powers 2048 and 4096 in [8, 20] produce an exact log(2) resonance at q=2 "
-                f"with B_prime = {b_prime_eval:.6e}. The evaluated Archimedean contribution B_arch >= {b_arch_eval:.6e} "
-                f"strictly exceeds B_prime by margin {net_weil_form_margin:.6e} > 0. "
-                "The arbitrary constant-50 comparison has been removed; genuine quadratic form evaluation confirms B(f, f) > 0 on this vector."
+                f"under differentiated kernel psi_h with B_prime = {b_prime_eval:.6e}. "
+                f"The authentic Archimedean integral with frequency-dependent multiplier omega(t) evaluates to "
+                f"B_arch = {b_arch_eval:.6e}, strictly exceeding B_prime by margin {net_weil_form_margin:.6e} > 0. "
+                "Evaluated as a two-station vector check; the constant-50 comparison has been removed."
             )
         }
     }
@@ -3275,5 +3326,81 @@ def run_tc_grade_cancellation_research_campaign(
             campaign_data['persistence_error'] = str(e)
 
     return campaign_data
+
+
+def verify_research_milestone_completion(
+    queue_path: Optional[str] = None,
+    state_path: Optional[str] = None,
+    repo_root: Optional[str] = None
+) -> Tuple[bool, str, Dict[str, Any]]:
+    """
+    Authoritative production gate enforcing the Root Rule from AGENTS.md:
+    An unresolved or active mathematical check creates a research obligation.
+    It does not authorize a success claim, a universal obstruction claim,
+    or termination of the mission.
+
+    Rejects milestone or mission completion if:
+    1. active_task_id is set (an obligation is currently active).
+    2. Any task in queue.json has status in ['IN_PROGRESS', 'QUEUED', 'BLOCKED', 'NUMERICALLY_UNRESOLVED', 'OPEN', 'PARTIALLY_EVALUATED_OPEN'].
+    3. Any track in state.json is marked ACTIVE or contains unfulfilled tasks.
+    """
+    if repo_root is None:
+        repo_root = REPO_ROOT
+    if queue_path is None:
+        queue_path = os.path.join(repo_root, ".agents", "research", "queue.json")
+    if state_path is None:
+        state_path = os.path.join(repo_root, ".agents", "research", "state.json")
+
+    if not os.path.exists(queue_path):
+        return False, f"Missing research queue at '{queue_path}'", {}
+    if not os.path.exists(state_path):
+        return False, f"Missing research state at '{state_path}'", {}
+
+    try:
+        with open(queue_path, "r", encoding="utf-8") as f:
+            queue_data = json.load(f)
+    except Exception as e:
+        return False, f"Could not read research queue: {e}", {}
+
+    try:
+        with open(state_path, "r", encoding="utf-8") as f:
+            state_data = json.load(f)
+    except Exception as e:
+        return False, f"Could not read research state: {e}", {}
+
+    active_task_id = queue_data.get("active_task_id")
+    tasks = queue_data.get("tasks", [])
+
+    # Check for active task
+    if active_task_id is not None:
+        return False, f"Milestone completion blocked: active task '{active_task_id}' is currently in progress", {
+            "active_task_id": active_task_id,
+            "queue_file": queue_path
+        }
+
+    # Check for unresolved tasks in queue
+    blocking_statuses = {"IN_PROGRESS", "QUEUED", "BLOCKED", "NUMERICALLY_UNRESOLVED", "OPEN", "PARTIALLY_EVALUATED_OPEN"}
+    unresolved_tasks = [t for t in tasks if t.get("status") in blocking_statuses]
+    if unresolved_tasks:
+        task_ids = [t.get("task_id", "UNKNOWN") for t in unresolved_tasks]
+        return False, f"Milestone completion blocked: {len(unresolved_tasks)} task(s) unresolved in queue: {', '.join(task_ids)}", {
+            "unresolved_tasks": unresolved_tasks,
+            "queue_file": queue_path
+        }
+
+    # Check active tracks in state
+    active_tracks = state_data.get("active_tracks", {})
+    active_track_names = [name for name, track in active_tracks.items() if track.get("status") == "ACTIVE"]
+    if active_track_names:
+        return False, f"Milestone completion blocked: active research track(s) remain in state.json: {', '.join(active_track_names)}", {
+            "active_tracks": active_track_names,
+            "state_file": state_path
+        }
+
+    return True, "All persistent research obligations and tracks resolved", {
+        "total_tasks": len(tasks),
+        "queue_file": queue_path,
+        "state_file": state_path
+    }
 
 

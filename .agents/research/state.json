@@ -1,9 +1,9 @@
 {
   "mission": "Transcendental Continuation (TC) Autonomous Research Mission",
-  "active_commit": "927321fec13a6a787c8c9cb53e42101cc1b68324",
+  "active_commit": "568714928015770682cab7cfca0b413467898a77",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "POST_REPAIR_RESEARCH_CONTINUATION",
+  "current_phase": "AUTONOMOUS_RESEARCH_CONTINUATION",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -23,26 +23,28 @@
         "Replace column norm differences with common-grid H^1 function differences and SVD subspace projection stability",
         "Regenerate research campaign artifacts and correct production reporting"
       ],
-      "completion_note": "Repairs 4A-4E completed in tc/approximation.py; data/tc_arithmetic_residual_research.json regenerated and verified."
+      "completion_note": "Repairs 4A-4E completed in tc/approximation.py using authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h; verified error targets, uncertainty triggers, function-space H^1 metrics, and campaign invariants."
     },
     "track_2_continuum_cancellation_and_weil_witness": {
-      "status": "COMPLETED",
+      "status": "ACTIVE",
       "tasks": [
         "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4}",
-        "Evaluate the full reflected Weil quadratic form B(f, f) on the surviving subspace",
-        "Determine whether negative grades can produce a conditional negative witness while satisfying arithmetic constraints"
+        "Evaluate the authentic reflected Weil quadratic form B(f, f) on the surviving subspace using ArchimedeanKernelEvaluator",
+        "Determine whether negative grades can produce a conditional negative witness while satisfying arithmetic constraints",
+        "Multi-prime activation across wider windows [5, 25] and [6, 24]"
       ],
-      "completion_note": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with stability verified. Full reflected Weil quadratic form W is strictly positive definite (lambda_min = 7.21e7 > 0). Archimedean background dominates prime pairing (> 1500:1). Negative witness hypothesis REFUTED_WITHIN_SCOPE for this candidate class."
+      "completion_note": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W has positive eigenvalues [2.87e11, 2.41e12, 1.25e13] > 0 on window [8, 20]. Research remains ACTIVE on wider windows and general candidate families."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
       "data/tc_arithmetic_residual_research.json",
       "data/tc_negative_grade_approximation_campaign.json",
+      "data/tc_continuum_cancellation_weil_spectrum.json",
       "data/tc_epic_synthesis.json"
     ],
     "research_runs": [
-      "research/runs/tc-continuum-cancellation-weil-spectrum/summary.json"
+      "data/tc_continuum_cancellation_weil_spectrum.json"
     ],
     "research_runs_index": "research/index.json"
   }

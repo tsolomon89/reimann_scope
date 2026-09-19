@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": null,
+  "active_task_id": "TASK-TC-004",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -11,7 +11,7 @@
       "planned_calculation": "Eliminate normalizations to EXACT/EXTERNAL_ANALYTIC_PROOF, require revision-bound review file with objections and falsification in .agents/claims/reviews/",
       "acceptance_criterion": "test_adversarial_evidence_controls.py passes all 12 injected defect checks",
       "dependencies": [],
-      "resolution": "Upgraded audit_claim_spec.py (Gates 5, 8, 10, independent review verifier), passed 54/54 gate tests and 12/12 adversarial tests."
+      "resolution": "Upgraded audit_claim_spec.py (Gates 5, 8, 10, independent review verifier with negative verdict rejection, author self-review detection, and revision binding validation), passed 54/54 gate tests and 12/12 adversarial tests."
     },
     {
       "task_id": "TASK-TC-002",
@@ -22,18 +22,40 @@
       "planned_calculation": "Implement full Weil quadratic form evaluation B(f, f), profile-dependent R_triv bound, strict target and refinement policy, common-grid H^1 error, and subspace projection stability",
       "acceptance_criterion": "Defect reproduction tests demonstrate rejection of old code; repaired code passes with verified error bounds and regenerated campaign data",
       "dependencies": ["TASK-TC-001"],
-      "resolution": "Repairs 4A-4E implemented in tc/approximation.py; verified error targets, uncertainty triggers, common-grid H^1 metrics, and regenerated data/tc_arithmetic_residual_research.json."
+      "resolution": "Repairs 4A-4E implemented in tc/approximation.py using authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h; verified error targets, uncertainty triggers, function-space H^1 metrics, and campaign invariants."
     },
     {
       "task_id": "TASK-TC-003",
       "priority": 3,
       "objective": "Investigate legal continuum cancellation directions and full Weil quadratic form spectrum",
-      "status": "ACCEPTED",
+      "status": "PARTIALLY_EVALUATED_OPEN",
       "open_implication": "Determine which directions survive legal continuum cancellation (sum_K b_K = 0) on grades {-1, -2, -3, -4} after controlling numerical error, and determine the exact sign and spectrum of the full Weil form on that subspace",
       "planned_calculation": "Execute multi-grade cancellation search with zero-sum constraint; evaluate B_arch(f, f) and B_prime(f, f) on the surviving subspace; check for negative Weil witness",
       "acceptance_criterion": "Certified or empirical scoped result registered with exact hypotheses, error margins, and independent review artifact",
       "dependencies": ["TASK-TC-002"],
-      "resolution": "Executed research run tc-continuum-cancellation-weil-spectrum. Surviving 3D subspace evaluated at n=801; Gram singular values stable under refinement. Reflected Weil form matrix W has strictly positive eigenvalues [7.21e7, 6.20e8, 1.77e10] > 0. Archimedean background dominates prime pairing (> 1500:1). Negative witness hypothesis REFUTED_WITHIN_SCOPE for this candidate family."
+      "resolution": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W has positive eigenvalues [2.87e11, 2.41e12, 1.25e13] > 0 with Archimedean dominance ratio 186.2:1 on window [8, 20]. Scoped strictly to evaluated configuration; candidate remains strictly OPEN."
+    },
+    {
+      "task_id": "TASK-TC-004",
+      "priority": 4,
+      "objective": "Evaluate canonical Weil form across varying window widths and bandwidths to test off-line zero detection",
+      "status": "IN_PROGRESS",
+      "open_implication": "Whether wider windows activating multiple primes (e.g. q=2, 3, 4, 5) or varying bandwidths can produce a negative Weil witness under legal continuum cancellation",
+      "planned_calculation": "Scan windows [5, 25] and [6, 24] with multi-prime convolution pairing under authentic Fourier quadrature and rigorous error controls",
+      "acceptance_criterion": "Contracted Weil form spectrum evaluated under canonical operator definitions with verified quadrature tolerances, keeping candidate open unless rigorously decided",
+      "dependencies": ["TASK-TC-003"],
+      "resolution": null
+    },
+    {
+      "task_id": "TASK-TC-005",
+      "priority": 5,
+      "objective": "Nontrivial zero spectral tail control and Stieltjes bound research obligation",
+      "status": "QUEUED",
+      "open_implication": "Arithmetic-spectral explicit formula leaves nontrivial zero tail sum over rho unresolved without rigorous Stieltjes integral bounds",
+      "planned_calculation": "Derive explicit Stieltjes error bound for sum_rho Q_b(rho) Phi_tilde(rho) under Riemann-von Mangoldt zero density N(T)",
+      "acceptance_criterion": "Certified tail bound on nontrivial zeros or formal Lean reduction exposing the exact analytic hypothesis",
+      "dependencies": ["TASK-TC-002"],
+      "resolution": null
     }
   ]
 }

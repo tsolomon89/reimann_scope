@@ -91,7 +91,10 @@ class TestAdversarialEvidenceControls:
     def test_03_reject_candidate_error_exceeding_target_or_high_uncertainty(self):
         """Mode 3: Reject candidate acceptance when total error >= target or uncertainty >= 0.20.
 
-        Verifies that unachievable targets terminate with GRADE_BUDGET_EXHAUSTED and target_satisfied=False.
+        Verifies that:
+        1. Unachievable targets terminate with GRADE_BUDGET_EXHAUSTED and target_satisfied=False.
+        2. Production calculation rejects fine error zero with medium-grid error 100 (uncertainty set to 1.0, not zero).
+        3. Production calculation rejects NaN absolute error (uncertainty set to 1.0, not accepted).
         """
         # Target epsilon 0.001 cannot be satisfied within K >= -1 budget
         res = app.execute_adaptive_diagonal_search(
@@ -107,6 +110,42 @@ class TestAdversarialEvidenceControls:
         assert len(grade_rejections) > 0
         for rej in grade_rejections:
             assert rej['E_total_relative'] >= 0.001 or rej.get('rel_uncertainty', 0.0) >= 0.20
+
+        # Adversarial Check A: Fine error zero with medium-grid error 100
+        def mock_zero_fine_100_med(K, h, window, n_points):
+            if n_points >= 41:
+                return {'station_count': 5, 'active_station_count': 5, 'errors': {'E_arith_H1': 0.0, 'E_arith_relative': 0.0, 'E_smooth_H1': 0.001, 'E_smooth_relative': 0.001, 'E_total_H1': 0.0, 'E_total_relative': 0.0}}
+            else:
+                return {'station_count': 5, 'active_station_count': 5, 'errors': {'E_arith_H1': 100.0, 'E_arith_relative': 100.0, 'E_smooth_H1': 0.001, 'E_smooth_relative': 0.001, 'E_total_H1': 100.0, 'E_total_relative': 100.0}}
+
+        orig_compute = app.compute_arithmetic_vs_smoothing_error
+        app.compute_arithmetic_vs_smoothing_error = mock_zero_fine_100_med
+        try:
+            res_adv_a = app.execute_adaptive_diagonal_search(target_fractions=[0.05], max_negative_grade=0, n_points=41)
+            step_a = res_adv_a['steps'][0]
+            assert step_a['target_satisfied'] is False, "Fine error zero with medium 100 must be rejected"
+            assert step_a['accepted_grade_K'] is None
+            assert len(res_adv_a['rejected_attempts']) > 0
+            assert any(r.get('rel_uncertainty', 0.0) >= 0.20 for r in res_adv_a['rejected_attempts'])
+            assert any("invalid/non-positive/NaN errors" in r.get('reason', '') for r in res_adv_a['rejected_attempts'])
+        finally:
+            app.compute_arithmetic_vs_smoothing_error = orig_compute
+
+        # Adversarial Check B: Absolute error NaN with finite relative error
+        def mock_nan_absolute(K, h, window, n_points):
+            return {'station_count': 5, 'active_station_count': 5, 'errors': {'E_arith_H1': 0.01, 'E_arith_relative': 0.01, 'E_smooth_H1': 0.001, 'E_smooth_relative': 0.001, 'E_total_H1': float('nan'), 'E_total_relative': 0.01}}
+
+        app.compute_arithmetic_vs_smoothing_error = mock_nan_absolute
+        try:
+            res_adv_b = app.execute_adaptive_diagonal_search(target_fractions=[0.05], max_negative_grade=0, n_points=41)
+            step_b = res_adv_b['steps'][0]
+            assert step_b['target_satisfied'] is False, "NaN absolute error must be rejected"
+            assert step_b['accepted_grade_K'] is None
+            assert len(res_adv_b['rejected_attempts']) > 0
+            assert any(r.get('rel_uncertainty', 0.0) >= 0.20 for r in res_adv_b['rejected_attempts'])
+            assert any("invalid/non-positive/NaN errors" in r.get('reason', '') for r in res_adv_b['rejected_attempts'])
+        finally:
+            app.compute_arithmetic_vs_smoothing_error = orig_compute
 
     def test_04_reject_column_error_from_scalar_norm_difference_or_identical_grids(self):
         """Mode 4: Reject column uncertainty estimated by scalar norm differences |norm(f) - norm(g)|.
@@ -133,10 +172,17 @@ class TestAdversarialEvidenceControls:
         assert 'gram_entry_differences' in ms
         assert 'subspace_projection_stability' in ms
         assert ms['gram_entry_differences']['relative_frobenius_difference'] >= 0.0
-        assert ms['subspace_projection_stability']['projection_difference_frobenius'] >= 0.0
+        assert ms['subspace_projection_stability']['subspace_dimension'] == 2
+        assert 'function_subspace_distance_H1' in ms['subspace_projection_stability']
+        assert ms['subspace_projection_stability']['function_subspace_distance_H1'] >= 0.0
+        assert 'directions_stable_under_refinement' in ms
 
     def test_05_reject_empty_campaign_missing_regimes_or_nan_inf(self):
-        """Mode 5: Reject empty campaigns, missing regime checks, or NaN/Inf values."""
+        """Mode 5: Reject empty campaigns, missing regime checks, or NaN/Inf values.
+
+        Directly submits defective and empty evidence through the production pipeline
+        run_tc_negative_grade_approximation_campaign and asserts invariants fail.
+        """
         # 1. Check data/tc_arithmetic_residual_research.json
         residual_path = os.path.join(REPO_ROOT, "data", "tc_arithmetic_residual_research.json")
         assert os.path.exists(residual_path), f"Missing artifact at {residual_path}"
@@ -181,6 +227,38 @@ class TestAdversarialEvidenceControls:
 
         check_no_nan_inf(data)
         check_no_nan_inf(camp)
+
+        # 3. Direct adversarial submission: Submit empty required campaign sections through production pipeline
+        camp_empty = app.run_tc_negative_grade_approximation_campaign(
+            output_path="",
+            override_regime_1_results=[],
+            override_regime_2_results=[],
+            override_regime_3_results=[],
+            override_exp_continuum={},
+            override_exp_independent={}
+        )
+        assert camp_empty['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_INVARIANTS_FAILED'
+        assert camp_empty['invariants_verified'] is False
+        assert len(camp_empty['audit_invariant_failures']) >= 5
+        assert any("Regime 1: Required single-grade convergence results are empty" in f for f in camp_empty['audit_invariant_failures'])
+        assert any("Regime 2: Required fixed-grade bandwidth scaling results are empty" in f for f in camp_empty['audit_invariant_failures'])
+
+        # 4. Direct adversarial submission: Submit NaN value in regime 1 through production pipeline
+        bad_regime_1 = [{
+            'K': 0, 'h': 0.10, 'station_count': 10, 'active_station_count': 10,
+            'provenance_hash': 'test', 'E_arith_H1': float('nan'), 'E_arith_rel': 0.1,
+            'E_smooth_H1': 0.1, 'E_smooth_rel': 0.1, 'E_total_H1': 0.2, 'E_total_rel': 0.2
+        }]
+        camp_nan = app.run_tc_negative_grade_approximation_campaign(
+            output_path="",
+            override_regime_1_results=bad_regime_1,
+            override_regime_2_results=[],
+            override_regime_3_results=[],
+            override_exp_continuum={},
+            override_exp_independent={}
+        )
+        assert camp_nan['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_INVARIANTS_FAILED'
+        assert any("Invalid, non-finite, or negative arithmetic error" in f for f in camp_nan['audit_invariant_failures'])
 
     def test_06_reject_mixed_or_increasing_trend_labeled_monotonic(self):
         """Mode 6: Reject mixed or increasing error trends falsely labeled as monotonic convergence."""
@@ -287,73 +365,146 @@ class TestAdversarialEvidenceControls:
         assert res['mathematical_review_status'] != 'INDEPENDENT_MATHEMATICAL_AUDIT_PASSED'
 
     def test_11_reject_author_self_review_and_stale_reviews(self):
-        """Mode 11: Reject review artifacts created by the claim author or lacking required adversarial sections."""
+        """Mode 11: Reject review artifacts created by the claim author, explicitly rejected reviews, or stale/wrong hashes."""
         spec = {
             "claim_id": "CLM-TEST-REVIEW-AUDIT",
-            "author": "Alice Researcher"
+            "author": "Alice Researcher",
+            "git_commit": "82643cafd605492233c6c1e992b78c2c30d45f13"
         }
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            reviews_dir = os.path.join(temp_dir, ".agents", "claims", "reviews")
+            claims_dir = os.path.join(temp_dir, ".agents", "claims")
+            reviews_dir = os.path.join(claims_dir, "reviews")
             os.makedirs(reviews_dir, exist_ok=True)
+            claim_file = os.path.join(claims_dir, "CLM-TEST-REVIEW-AUDIT.json")
+            with open(claim_file, "w", encoding="utf-8") as f:
+                json.dump(spec, f)
+
             review_file = os.path.join(reviews_dir, "CLM-TEST-REVIEW-AUDIT-derivation-review.md")
 
-            # Case A: Self-review by same author
+            # Case A: Explicitly rejected review (user reproduction: "Derivation: Incorrect. Objections: Fatal circularity. Resolution: REJECTED.")
+            with open(review_file, "w", encoding="utf-8") as f:
+                f.write("Derivation: Incorrect. Objections: Fatal circularity. Resolution: REJECTED. Date: yesterday.\n")
+            passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
+            assert passed is False, "Explicitly rejected review must not pass audit"
+            assert "negative verdict" in reason.lower() or "fatal objection" in reason.lower()
+
+            # Case B: Author self-review (author reviewing their own work without explicit self-review keyword)
             with open(review_file, "w", encoding="utf-8") as f:
                 f.write(
-                    "# Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
+                    "# Independent Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
                     "Reviewer: Alice Researcher\n"
-                    "Self-Review: I have checked my own proof.\n"
-                    "Derivation: Step 1 holds. Step 2 holds.\n"
-                    "Objections: No objections found.\n"
-                    "Resolution: Verified.\n"
+                    "Derivation: Rigorous proof verified.\n"
+                    "Objections: Adversarial checks attempted; no contradictions found.\n"
+                    "Resolution: PASSED.\n"
                     "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
                 )
             passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
-            assert passed is False
-            assert "Self-review" in reason or "Self-certification" in reason
+            assert passed is False, "Author reviewing own work must be rejected"
+            assert "Self-review" in reason
 
-            # Case B: Missing objections / adversarial challenge section
+            # Case C: Stale commit SHA
             with open(review_file, "w", encoding="utf-8") as f:
                 f.write(
                     "# Independent Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
                     "Reviewer: Bob Redteam\n"
                     "Derivation: Rigorous mathematical deduction verified.\n"
-                    "Resolution: Proved and confirmed.\n"
+                    "Objections: Adversarial checks attempted; no contradictions found.\n"
+                    "Resolution: PASSED.\n"
+                    "Commit: deadbeef1234567890abcdef1234567890abcdef\n"
+                )
+            passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
+            assert passed is False, "Stale commit must be rejected"
+            assert "Stale review" in reason
+
+            # Case D: Wrong claim hash
+            with open(review_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Independent Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
+                    "Reviewer: Bob Redteam\n"
+                    "Derivation: Rigorous mathematical deduction verified.\n"
+                    "Objections: Adversarial checks attempted; no contradictions found.\n"
+                    "Resolution: PASSED.\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                    "Claim Hash: sha256:0000000000000000000000000000000000000000000000000000000000000000\n"
+                )
+            passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
+            assert passed is False, "Wrong claim hash must be rejected"
+            assert "Wrong claim hash" in reason
+
+            # Case E: Missing objections / adversarial challenge section
+            with open(review_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Independent Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
+                    "Reviewer: Bob Redteam\n"
+                    "Derivation: Rigorous mathematical deduction verified.\n"
+                    "Resolution: PASSED.\n"
                     "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
                 )
             passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
             assert passed is False
-            assert "adversarial challenge" in reason.lower() or "objections" in reason.lower()
+            assert "objections" in reason.lower() or "adversarial" in reason.lower()
+
+            # Case F: Valid independent review passes cleanly
+            with open(review_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Independent Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
+                    "Reviewer: Bob Redteam\n"
+                    "Derivation: Rigorous mathematical deduction verified step by step.\n"
+                    "Objections: Adversarial stress test on zero-crossings performed; resolved without circularity.\n"
+                    "Resolution: PASSED and confirmed.\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
+            assert passed is True, f"Valid independent review failed: {reason}"
 
     def test_12_reject_completion_without_accepted_milestone(self):
-        """Mode 12: Enforce that active open research obligations in queue prevent claiming completion."""
-        state_file = os.path.join(REPO_ROOT, ".agents", "research", "state.json")
-        queue_file = os.path.join(REPO_ROOT, ".agents", "research", "queue.json")
+        """Mode 12: Enforce that active open research obligations in queue prevent claiming completion.
 
-        assert os.path.exists(state_file), f"Missing research state file at {state_file}"
-        assert os.path.exists(queue_file), f"Missing research queue file at {queue_file}"
+        Directly invokes the production completion gate app.verify_research_milestone_completion()
+        rather than testing a local helper.
+        """
+        # 1. Directly invoke production completion gate on repository state
+        can_complete, msg, details = app.verify_research_milestone_completion(repo_root=REPO_ROOT)
+        # Because TASK-TC-004 is active and Track 2 is active, milestone completion must be blocked!
+        assert can_complete is False, "Production completion gate must reject completion when active research obligations remain"
+        assert "Milestone completion blocked" in msg
+        assert "TASK-TC-004" in msg or "active_task_id" in details or "active_tracks" in details
 
-        with open(state_file, "r", encoding="utf-8") as f:
-            state = json.load(f)
-        with open(queue_file, "r", encoding="utf-8") as f:
-            queue = json.load(f)
+        # 2. Test isolated temporary queue configurations through production gate
+        with tempfile.TemporaryDirectory() as td:
+            q_file = os.path.join(td, "queue.json")
+            s_file = os.path.join(td, "state.json")
 
-        assert 'active_tracks' in state
-        assert 'tasks' in queue
-        assert len(queue['tasks']) > 0
+            # Case A: Active task in progress
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": "TASK-UNRESOLVED", "tasks": [{"task_id": "TASK-UNRESOLVED", "status": "IN_PROGRESS"}]}, f)
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {}}, f)
 
-        # The root rule mandates that unresolved tasks prevent claiming completion
-        def check_can_complete(task_list):
-            return not any(t.get('status') in ['IN_PROGRESS', 'QUEUED', 'BLOCKED'] for t in task_list)
+            can_comp_a, msg_a, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert can_comp_a is False
+            assert "active task" in msg_a
 
-        # A queue with unfulfilled tasks must reject completion
-        unresolved_queue = [{"task_id": "TASK-UNRESOLVED", "status": "IN_PROGRESS"}]
-        assert check_can_complete(unresolved_queue) is False
+            # Case B: Unresolved tasks in queue
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "TASK-QUEUED", "status": "QUEUED"}]}, f)
+            can_comp_b, msg_b, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert can_comp_b is False
+            assert "unresolved in queue" in msg_b
 
-        queued_task_queue = [{"task_id": "TASK-QUEUED", "status": "QUEUED"}]
-        assert check_can_complete(queued_task_queue) is False
+            # Case C: Active research track in state
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "TASK-RESOLVED", "status": "ACCEPTED"}]}, f)
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {"track_1": {"status": "ACTIVE"}}}, f)
+            can_comp_c, msg_c, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert can_comp_c is False
+            assert "active research track(s) remain" in msg_c
 
-        # Only a fully accepted/completed queue permits milestone completion
-        resolved_queue = [{"task_id": "TASK-RESOLVED", "status": "ACCEPTED"}]
-        assert check_can_complete(resolved_queue) is True
+            # Case D: Fully resolved queue and completed tracks
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {"track_1": {"status": "RESOLVED"}}}, f)
+            can_comp_d, msg_d, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert can_comp_d is True
+            assert "All persistent research obligations and tracks resolved" in msg_d
