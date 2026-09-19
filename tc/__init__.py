@@ -1,22 +1,6 @@
 """
-Transcendental Continuation Master Module for Riemann Scope.
-
-This module serves as the canonical backward-compatible facade for the
-Transcendental Continuation (TC) suite. The underlying mathematical
-theories, operators, and campaign suites have been modularized into
-the `tc` package:
-
-- `tc.core`: Scale grades, worldlines, critical surface, and arithmetic separation.
-- `tc.transforms`: Geometric dilation transforms, scalar twists, and candidate audits.
-- `tc.spectral_orbits`: Spectral unitary criteria, log-Haar modes, and layer theorems.
-- `tc.phases`: Phase nonresonance, zero certificates, and Diophantine exclusions.
-- `tc.mellin_isolation`: Smoothed transport, test families, and spectral isolation.
-- `tc.two_variable`: Two-variable Mellin kernel, mollifiers, and truncation bounds.
-- `tc.weil_forms`: Reflected Weil forms, Archimedean kernel, and positivity.
-- `tc.approximation`: Arithmetic stations, continuum profiles, and approximation campaigns.
+Transcendental Continuation (TC) Package.
 """
-
-from __future__ import annotations
 
 from tc.core import (
     Any,
