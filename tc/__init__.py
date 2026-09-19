@@ -186,6 +186,7 @@ from tc.weil_forms import (
     reproduce_cutoff_discrepancy,
     sieve_prime_powers_in_window,
     verify_canonical_reflected_weil_sign_certificate,
+    evaluate_tc_canonical_weil_spectrum_sweep,
 )
 
 from tc.approximation import (
@@ -193,6 +194,7 @@ from tc.approximation import (
     analyze_fourier_zero_compact_support_obstruction,
     analyze_negative_grade_station_growth,
     audit_arithmetic_spectral_exact_formula,
+    derive_explicit_stieltjes_nontrivial_zero_tail_bound,
     audit_canonical_support_geometry_and_resonance,
     audit_coefficient_rescaling_homogeneity,
     audit_same_grade_resonance_K_neg3,
@@ -206,6 +208,7 @@ from tc.approximation import (
     construct_actual_tc_approximation_experiment,
     construct_admissible_target_and_approximation_experiment,
     evaluate_actual_tc_grade_basis,
+    compute_function_subspace_principal_angles,
     evaluate_continuum_limit_profile_F_infty_0,
     evaluate_continuum_mollified_profile_F_infty_h,
     evaluate_continuum_mollified_profile_F_infty_h_direct_psi,
@@ -330,6 +333,7 @@ __all__ = [
     "compute_arithmetic_vs_smoothing_error",
     "compute_canonical_reflected_weil_matrix",
     "compute_cross_height_path_distance",
+    "compute_function_subspace_principal_angles",
     "compute_local_positivity_threshold",
     "compute_support_components",
     "compute_surviving_prime_bound",
@@ -340,6 +344,7 @@ __all__ = [
     "ctx",
     "dataclass",
     "derive_compression_grade",
+    "derive_explicit_stieltjes_nontrivial_zero_tail_bound",
     "evaluate_actual_tc_grade_basis",
     "evaluate_canonical_tc_diagram",
     "evaluate_centered_dilation_zeta",
@@ -361,6 +366,7 @@ __all__ = [
     "evaluate_prime_counting_error_growth",
     "evaluate_scaled_dirichlet_series",
     "evaluate_smooth_independent_target",
+    "evaluate_tc_canonical_weil_spectrum_sweep",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

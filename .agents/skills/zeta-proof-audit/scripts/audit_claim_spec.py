@@ -499,7 +499,32 @@ def verify_independent_review(
 
     content_lower = content.lower()
 
-    # 1. Author self-review / self-certification detection
+    # 1. Explicit negative verdict / fatal circularity / rejection detection
+    negative_patterns = [
+        r'\b(?:resolution|verdict|status|conclusion|assigned classification)\s*[:*`]+\s*(?:`?(?:REJECTED|FAILED|DISAPPROVED|INVALID|UNRESOLVED|CONTRADICTED|FATAL|UNSOUND|PENDING|NOT APPROVED|NOT PASSED|UNAPPROVED|INCONCLUSIVE|OPEN)\b)',
+        r'\b(?:verdict|resolution|status)\s*[:*`]+\s*[^\n\r]*\b(?:not approved|not passed|unapproved|rejected|failed|pending|inconclusive|unresolved)\b',
+        r'\bderivation\s*[:*`]+\s*(?:`?(?:INCORRECT|FALSE|UNSOUND|INVALID|FATAL|INCOMPLETE|PENDING)\b)',
+        r'\bobjections?\s*[:*`]+\s*(?:`?(?:FATAL|UNRESOLVED|UNANSWERED|BLOCKING|FATAL CIRCULARITY|NOT EVALUATED)\b)'
+    ]
+    for pat in negative_patterns:
+        neg_m = re.search(pat, content, re.IGNORECASE)
+        if neg_m:
+            return False, f"Review artifact recorded negative verdict or fatal objection: '{neg_m.group(0).strip()}'", {}
+
+    # Check for substantive sections (reject placeholder / pending content)
+    m_deriv = re.search(r'(?:##\s*[^#\n\r]*derivation[^\n\r]*|\bderivation\s*[:*`]+)\s*([^\n\r]+)', content, re.IGNORECASE)
+    if m_deriv:
+        d_val = m_deriv.group(1).strip().lower()
+        if d_val in ["pending.", "pending", "none.", "none", "not evaluated.", "not evaluated", "tbd", "unverified"]:
+            return False, f"Review derivation section is non-substantive: '{m_deriv.group(1).strip()}'", {}
+
+    m_obj = re.search(r'(?:##\s*[^#\n\r]*objection[^\n\r]*|\bobjections?\s*[:*`]+)\s*([^\n\r]+)', content, re.IGNORECASE)
+    if m_obj:
+        o_val = m_obj.group(1).strip().lower()
+        if o_val in ["not evaluated.", "not evaluated", "none.", "none", "pending.", "pending", "tbd"]:
+            return False, f"Review objections section is non-substantive: '{m_obj.group(1).strip()}'", {}
+
+    # 2. Author self-review / self-certification detection
     author = str(spec.get("author", "")).strip().lower()
     producer = str(spec.get("producer", "")).strip().lower()
     owner = str(spec.get("owner", "")).strip().lower()
@@ -508,6 +533,9 @@ def verify_independent_review(
     reviewer_text = rev_m.group(1).strip().lower() if rev_m else ""
     auth_m = re.search(r'(?:claim author|author|producer|owner)\s*[:*`]+\s*([^\n\r*`]+)', content, re.IGNORECASE)
     author_text = auth_m.group(1).strip().lower() if auth_m else ""
+
+    if not reviewer_text or reviewer_text in ["none", "pending", "not evaluated", "unknown", "n/a", "tbd"]:
+        return False, "Review artifact lacks explicit reviewer identity / role", {}
 
     if reviewer_text:
         if author and (author in reviewer_text or reviewer_text in author):
@@ -521,17 +549,6 @@ def verify_independent_review(
 
     if any(k in content_lower for k in ["self-review", "self review", "self-certification", "self certification", "author review"]):
         return False, "Self-certification detected: review must be independent", {}
-
-    # 2. Explicit negative verdict / fatal circularity / rejection detection
-    negative_patterns = [
-        r'\b(?:resolution|verdict|status|conclusion|assigned classification)\s*[:*`]+\s*(?:`?(?:REJECTED|FAILED|DISAPPROVED|INVALID|UNRESOLVED|CONTRADICTED|FATAL|UNSOUND)\b)',
-        r'\bderivation\s*[:*`]+\s*(?:`?(?:INCORRECT|FALSE|UNSOUND|INVALID|FATAL|INCOMPLETE)\b)',
-        r'\bobjections?\s*[:*`]+\s*(?:`?(?:FATAL|UNRESOLVED|UNANSWERED|BLOCKING|FATAL CIRCULARITY)\b)'
-    ]
-    for pat in negative_patterns:
-        neg_m = re.search(pat, content, re.IGNORECASE)
-        if neg_m:
-            return False, f"Review artifact recorded negative verdict or fatal objection: '{neg_m.group(0).strip()}'", {}
 
     # 3. Check for required substantive sections
     has_derivation = any(k in content_lower for k in ["derivation", "proof", "analytical", "symbolic", "mathematical"])
@@ -547,9 +564,8 @@ def verify_independent_review(
 
     # 4. Require explicit positive approval verdict
     positive_patterns = [
-        r'\b(?:resolution|verdict|conclusion)\s*[:*`]+\s*[^\n\r]*\b(passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
-        r'\b(?:status|assigned classification)\s*[:*`]+\s*`?[A-Z0-9_]{3,}',
-        r'##\s*[^#\n\r]*\b(?:verdict|resolution|formalization)\b',
+        r'\b(?:resolution|verdict|conclusion)\s*[:*`]+\s*[^\n\r]*\b(?<!not\s)(?<!un)(?:passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
+        r'##\s*[^#\n\r]*\b(?:verdict|resolution|formalization)\b[^\n\r]*\n+[^\n\r]*\b(?<!not\s)(?<!un)(?:passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
         r'\bthe claim is verified\b',
         r'\bformally proved in lean\b',
         r'\bformalized\b',
@@ -569,8 +585,7 @@ def verify_independent_review(
         m_commit or
         m_hash or
         m_sess or
-        (has_claim_id_ref and re.search(r'\b[0-9a-fA-F]{7,40}\b', content)) or
-        has_claim_id_ref
+        (has_claim_id_ref and re.search(r'\b[0-9a-fA-F]{7,40}\b', content))
     )
     if not has_revision_binding:
         return False, "Review artifact is not revision-bound (requires valid commit SHA, claim file hash, or session UUID)", {}

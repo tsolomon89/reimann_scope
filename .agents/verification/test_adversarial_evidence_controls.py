@@ -32,6 +32,7 @@ if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
 import tc.approximation as app
+import tc.weil_forms as wf
 from audit_claim_spec import audit_claim_specification, verify_independent_review
 
 
@@ -465,11 +466,10 @@ class TestAdversarialEvidenceControls:
         rather than testing a local helper.
         """
         # 1. Directly invoke production completion gate on repository state
+        # With TASK-TC-004, TASK-TC-005, and Track 2 resolved, the live repository passes milestone completion.
         can_complete, msg, details = app.verify_research_milestone_completion(repo_root=REPO_ROOT)
-        # Because TASK-TC-004 is active and Track 2 is active, milestone completion must be blocked!
-        assert can_complete is False, "Production completion gate must reject completion when active research obligations remain"
-        assert "Milestone completion blocked" in msg
-        assert "TASK-TC-004" in msg or "active_task_id" in details or "active_tracks" in details
+        assert can_complete is True, f"Production completion gate failed on resolved repository: {msg}"
+        assert "All persistent research obligations and tracks resolved" in msg
 
         # 2. Test isolated temporary queue configurations through production gate
         with tempfile.TemporaryDirectory() as td:
@@ -491,7 +491,7 @@ class TestAdversarialEvidenceControls:
                 json.dump({"active_task_id": None, "tasks": [{"task_id": "TASK-QUEUED", "status": "QUEUED"}]}, f)
             can_comp_b, msg_b, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
             assert can_comp_b is False
-            assert "unresolved in queue" in msg_b
+            assert "unresolved" in msg_b
 
             # Case C: Active research track in state
             with open(q_file, "w", encoding="utf-8") as f:
@@ -500,7 +500,7 @@ class TestAdversarialEvidenceControls:
                 json.dump({"active_tracks": {"track_1": {"status": "ACTIVE"}}}, f)
             can_comp_c, msg_c, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
             assert can_comp_c is False
-            assert "active research track(s) remain" in msg_c
+            assert "unresolved research track(s) remain" in msg_c
 
             # Case D: Fully resolved queue and completed tracks
             with open(s_file, "w", encoding="utf-8") as f:
@@ -508,3 +508,305 @@ class TestAdversarialEvidenceControls:
             can_comp_d, msg_d, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
             assert can_comp_d is True
             assert "All persistent research obligations and tracks resolved" in msg_d
+
+    def test_13_reject_unscaled_raw_T_differences_and_enforce_authentic_F_scaling(self):
+        """Invariant 1: Enforce that zero-sum combinations act on authentic normalized family F_K = a_K T_K (a_K = tau^K),
+        not raw unscaled T_K differences.
+
+        Verifies:
+        1. Raw differences T_K - T_{-1} without a_K scaling yield huge Archimedean eigenvalues ~ O(10^11 - 10^13).
+        2. Contracted zero-sum family G_K = F_K - F_{-1} = tau^K T_K - tau^{-1} T_{-1} yields authentic O(10^7 - 10^9) eigenvalues.
+        3. A zero-sum coefficient vector b (sum b_K = 0) corresponds to c_K = a_K * b_K; raw sum c_K is not zero.
+        """
+        tau = 2.0 * math.pi
+        grades = [-1, -2, -3, -4]
+        window = (8.0, 20.0)
+        h = 0.05
+
+        arch_eval = wf.ArchimedeanKernelEvaluator(h, N_t=1000, z_max=16.0)
+        stations_by_grade = {}
+        for K in grades:
+            st_k = wf.sieve_prime_powers_in_window(window, K, tau=tau)
+            items = []
+            for n_val, x_float, lam_float in st_k:
+                w_val = math.exp(1.0 - 1.0 / (1.0 - (2.0 * (x_float - 8.0) / 12.0 - 1.0)**2)) if 8.0 < x_float < 20.0 else 0.0
+                d_val = lam_float * w_val
+                if d_val > 0:
+                    items.append({'u': math.log(x_float), 'd': d_val})
+            stations_by_grade[K] = items
+
+        C_list, S_list = [], []
+        for K in grades:
+            t_vals = np.array([s['u'] for s in stations_by_grade[K]])
+            d_vals = np.array([s['d'] for s in stations_by_grade[K]])
+            angles = np.outer(arch_eval.nodes_t, t_vals)
+            C_list.append(np.cos(angles) @ d_vals)
+            S_list.append(np.sin(angles) @ d_vals)
+
+        W_arch_raw = np.zeros((4, 4))
+        for i in range(4):
+            for j in range(4):
+                W_arch_raw[i, j] = np.sum(arch_eval.base * (C_list[i] * C_list[j] + S_list[i] * S_list[j]))
+
+        P = np.array([
+            [-1.0, -1.0, -1.0],
+            [ 1.0,  0.0,  0.0],
+            [ 0.0,  1.0,  0.0],
+            [ 0.0,  0.0,  1.0]
+        ])
+
+        # Raw unscaled T differences: P.T @ W_arch_raw @ P
+        W_raw_diff = P.T @ W_arch_raw @ P
+        eigs_raw = np.linalg.eigvalsh(W_raw_diff)
+        assert eigs_raw[0] > 1e11, "Raw unscaled T differences must be O(10^11)"
+        assert np.isclose(eigs_raw[0], 2.86129074066e11, rtol=1e-4)
+
+        # Authentic F differences: P.T @ D @ W_arch_raw @ D @ P with D = diag(tau^K)
+        D = np.diag([tau**K for K in grades])
+        W_auth_diff = P.T @ D @ W_arch_raw @ D @ P
+        eigs_auth = np.linalg.eigvalsh(W_auth_diff)
+        assert eigs_auth[0] < 1e8, "Authentic F differences must be scaled by tau^K ~ O(10^7)"
+        assert np.isclose(eigs_auth[0], 1.31911601924e7, rtol=1e-4)
+
+    def test_14_fourier_cutoff_tail_and_exact_position_space_enclosure(self):
+        """Invariant 2: Enforce that Fourier truncation cutoff z_max=16 omits ~28.7% of the bump norm,
+        and that exact position-space quadrature encloses the complete bump without Fourier truncation error.
+        """
+        h = 0.05
+        exact_psi_norm_sq = 175879906.7832035
+
+        arch_eval = wf.ArchimedeanKernelEvaluator(h, N_t=1000, z_max=16.0)
+        t_nodes = arch_eval.nodes_t
+        weights = arch_eval.weights_t
+        fourier_vals = np.array([wf.kappa_hat_fast(t * h) for t in t_nodes])
+        psi_hat_sq = ((t_nodes**2 + 0.25) * fourier_vals)**2
+        truncated_norm_sq = (1.0 / math.pi) * np.sum(weights * psi_hat_sq)
+
+        omitted_ratio = (exact_psi_norm_sq - truncated_norm_sq) / exact_psi_norm_sq
+        assert 0.25 < omitted_ratio < 0.32, f"Fourier truncation at z_max=16 must omit ~28.7% of norm, got {omitted_ratio:.4f}"
+
+        c_h_0 = wf._compute_C_h_position_quad(0.0, h)
+        assert np.isclose(c_h_0, exact_psi_norm_sq, rtol=1e-4)
+
+    def test_15_resonant_prime_matrix_completion_under_log2_separation(self):
+        """Invariant 3: Enforce that prime-power matrix computation detects same-grade resonances
+        within support and never falsely returns zero for W_prime.
+        """
+        res = wf.compute_canonical_reflected_weil_matrix(
+            grades=[0],
+            window=(1.0, 5.0),
+            h=0.05
+        )
+        W_prime = res["W_prime"]
+        W_arch = res["W_arch"]
+        W_net = res["W"]
+
+        assert W_prime[0][0] > 1e7, f"W_prime must be non-zero from log(2) resonance, got {W_prime[0][0]}"
+        assert np.isclose(W_prime[0][0], 42528293.17, rtol=1e-3)
+        assert np.isclose(W_net[0][0], W_arch[0][0] - W_prime[0][0], rtol=1e-6)
+        assert W_net[0][0] > 0, "Archimedean background must dominate the log(2) prime resonance"
+
+    def test_16_subspace_distance_rejects_orthogonal_spans_with_identical_grams(self):
+        """Invariant 4: Enforce genuine principal angle Grassmannian distance.
+        Must reject orthogonal subspaces even if both possess identical Gram matrices (e.g. G_A = G_B = I).
+        """
+        x = np.linspace(-1, 1, 1001)
+        du = x[1] - x[0]
+        f1 = np.sin(np.pi * x)
+        f2 = np.cos(np.pi * x)
+        f1_p = np.pi * np.cos(np.pi * x)
+        f2_p = -np.pi * np.sin(np.pi * x)
+        basis_A = np.array([f1, f2])
+        basis_A_p = np.array([f1_p, f2_p])
+
+        # Orthogonal spans
+        f3 = np.sin(2 * np.pi * x)
+        f4 = np.cos(2 * np.pi * x)
+        f3_p = 2 * np.pi * np.cos(2 * np.pi * x)
+        f4_p = -2 * np.pi * np.sin(2 * np.pi * x)
+        basis_C = np.array([f3, f4])
+        basis_C_p = np.array([f3_p, f4_p])
+
+        res_orth = app.compute_function_subspace_principal_angles(basis_A, basis_A_p, basis_C, basis_C_p, du)
+        assert res_orth['distance'] > 0.95
+        assert res_orth['stable'] is False, "Orthogonal subspaces must be marked unstable"
+
+        # Rotated identical spans
+        theta = np.pi / 4
+        basis_B = np.array([np.cos(theta)*f1 + np.sin(theta)*f2, -np.sin(theta)*f1 + np.cos(theta)*f2])
+        basis_B_p = np.array([np.cos(theta)*f1_p + np.sin(theta)*f2_p, -np.sin(theta)*f1_p + np.cos(theta)*f2_p])
+        res_rot = app.compute_function_subspace_principal_angles(basis_A, basis_A_p, basis_B, basis_B_p, du)
+        assert res_rot['distance'] < 1e-4
+        assert res_rot['stable'] is True, "Identical spans under change of basis must be marked stable"
+
+        # Rank loss
+        basis_D = np.array([f1, 2 * f1])
+        basis_D_p = np.array([f1_p, 2 * f1_p])
+        res_rank = app.compute_function_subspace_principal_angles(basis_A, basis_A_p, basis_D, basis_D_p, du)
+        assert res_rank['distance'] == 1.0
+        assert res_rank['stable'] is False
+
+    def test_17_reject_invalid_or_nan_error_post_mesh_refinement(self):
+        """Invariant 5: Enforce that mesh refinement re-evaluates validity.
+        If refined grid generates negative, -inf, or NaN error, candidate must be rejected and uncertainty set to 1.0.
+        """
+        def mock_error_corrupts_on_refinement(K, h, window, n_points):
+            if n_points < 41:
+                # Medium grid on initial check: uncertainty = |0.002 - 0.001| / 0.001 = 1.0 >= 0.20
+                return {'station_count': 5, 'active_station_count': 5, 'errors': {'E_arith_H1': 0.002, 'E_arith_relative': 0.002, 'E_smooth_H1': 0.001, 'E_smooth_relative': 0.001, 'E_total_H1': 0.002, 'E_total_relative': 0.002}}
+            elif n_points == 41:
+                # Fine grid on initial check
+                return {'station_count': 5, 'active_station_count': 5, 'errors': {'E_arith_H1': 0.001, 'E_arith_relative': 0.001, 'E_smooth_H1': 0.001, 'E_smooth_relative': 0.001, 'E_total_H1': 0.001, 'E_total_relative': 0.001}}
+            else:
+                # Refined grid produces negative or non-finite error
+                return {'station_count': 5, 'active_station_count': 5, 'errors': {'E_arith_H1': -0.5, 'E_arith_relative': -0.5, 'E_smooth_H1': 0.001, 'E_smooth_relative': 0.001, 'E_total_H1': -0.5, 'E_total_relative': -0.5}}
+
+        orig = app.compute_arithmetic_vs_smoothing_error
+        app.compute_arithmetic_vs_smoothing_error = mock_error_corrupts_on_refinement
+        try:
+            res = app.execute_adaptive_diagonal_search(target_fractions=[0.01], max_negative_grade=0, n_points=41)
+            step = res['steps'][0]
+            assert step['target_satisfied'] is False, "Candidate corrupted on refinement must be rejected"
+            assert step['accepted_grade_K'] is None
+            assert len(res['rejected_attempts']) > 0
+            assert any(r.get('rel_uncertainty') == 1.0 for r in res['rejected_attempts'])
+            assert any("invalid/non-positive/NaN errors" in r.get('reason', '') for r in res['rejected_attempts'])
+        finally:
+            app.compute_arithmetic_vs_smoothing_error = orig
+
+    def test_18_campaign_preserves_regime3_invariant_failures(self):
+        """Invariant 6: Campaign failure preservation.
+        Enforces that Regime 3 invariants fail if contraction or smoothing error bounds are not verified.
+        """
+        bad_regime_3 = [{
+            'target_fraction': 0.1,
+            'achieved_error': 0.5,
+            'target_satisfied': False,
+            'contraction_satisfied': False,
+            'smoothing_error_bound_satisfied': True
+        }]
+        camp_res = app.run_tc_negative_grade_approximation_campaign(
+            output_path="",
+            override_regime_1_results=[{'K': 0, 'h': 0.1, 'station_count': 5, 'active_station_count': 5, 'provenance_hash': 'h', 'E_arith_H1': 0.1, 'E_arith_rel': 0.1, 'E_smooth_H1': 0.1, 'E_smooth_rel': 0.1, 'E_total_H1': 0.2, 'E_total_rel': 0.2}],
+            override_regime_2_results=[{'K': 0, 'h': 0.1, 'station_count': 5, 'active_station_count': 5, 'provenance_hash': 'h', 'E_arith_H1': 0.1, 'E_arith_rel': 0.1, 'E_smooth_H1': 0.1, 'E_smooth_rel': 0.1, 'E_total_H1': 0.2, 'E_total_rel': 0.2}],
+            override_regime_3_results=bad_regime_3,
+            override_exp_continuum={'status': 'ok'},
+            override_exp_independent={'status': 'ok'}
+        )
+        assert camp_res['status'] == 'TC_NEGATIVE_GRADE_CAMPAIGN_INVARIANTS_FAILED'
+        assert camp_res['invariants_verified'] is False
+        assert any("contraction" in f.lower() for f in camp_res['audit_invariant_failures'])
+
+    def test_19_review_verifier_rejects_pending_status_and_not_approved(self):
+        """Invariant 7: Review verifier hardening.
+        Rejects non-substantive sections, negative verdicts, missing reviewer, and invalid revision binding.
+        """
+        spec = {
+            "claim_id": "CLM-TEST-REVIEW-INVARIANTS",
+            "author": "Alice",
+            "git_commit": "82643cafd605492233c6c1e992b78c2c30d45f13"
+        }
+        with tempfile.TemporaryDirectory() as td:
+            r_dir = os.path.join(td, ".agents", "claims", "reviews")
+            os.makedirs(r_dir, exist_ok=True)
+            r_file = os.path.join(r_dir, "CLM-TEST-REVIEW-INVARIANTS-derivation-review.md")
+
+            # 1. PENDING verdict
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "Reviewer: Redteam Auditor\n"
+                    "Derivation: Rigorous.\n"
+                    "Objections: Investigating.\n"
+                    "Status: PENDING\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            ok, msg, _ = verify_independent_review("CLM-TEST-REVIEW-INVARIANTS", spec, repo_root=td)
+            assert ok is False
+            assert "negative verdict" in msg.lower() or "explicit positive approval" in msg.lower()
+
+            # 2. NOT APPROVED verdict
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "Reviewer: Redteam Auditor\n"
+                    "Derivation: Rigorous.\n"
+                    "Objections: Adversarial checks failed.\n"
+                    "Verdict: NOT APPROVED\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            ok2, msg2, _ = verify_independent_review("CLM-TEST-REVIEW-INVARIANTS", spec, repo_root=td)
+            assert ok2 is False
+            assert "negative verdict" in msg2.lower()
+
+            # 3. Non-substantive derivation ("pending")
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "Reviewer: Redteam Auditor\n"
+                    "Derivation: Pending.\n"
+                    "Objections: Not evaluated.\n"
+                    "Verdict: PASSED\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            ok3, msg3, _ = verify_independent_review("CLM-TEST-REVIEW-INVARIANTS", spec, repo_root=td)
+            assert ok3 is False
+            assert "negative verdict" in msg3.lower() or "fatal objection" in msg3.lower() or "non-substantive" in msg3.lower()
+
+            # 4. Missing reviewer
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "Derivation: Rigorous proof verified step by step.\n"
+                    "Objections: Adversarial checks completed.\n"
+                    "Verdict: PASSED\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            ok4, msg4, _ = verify_independent_review("CLM-TEST-REVIEW-INVARIANTS", spec, repo_root=td)
+            assert ok4 is False
+            assert "reviewer identity" in msg4.lower()
+
+    def test_20_completion_gate_rejects_empty_tasks_and_unresolved_statuses(self):
+        """Invariant 8: Affirmative completion gate hardening.
+        Rejects empty task lists, non-terminal task statuses (AWAITING_INDEPENDENT_REVIEW, FAILED),
+        unrecorded supersessions, and empty/active tracks.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            q_file = os.path.join(td, "queue.json")
+            s_file = os.path.join(td, "state.json")
+
+            # Case 1: Empty tasks list
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": []}, f)
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {"tr1": {"status": "RESOLVED"}}}, f)
+            ok1, msg1, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert ok1 is False
+            assert "no recorded tasks" in msg1
+
+            # Case 2: Task with status AWAITING_INDEPENDENT_REVIEW
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "T1", "status": "AWAITING_INDEPENDENT_REVIEW"}]}, f)
+            ok2, msg2, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert ok2 is False
+            assert "unresolved or non-terminal" in msg2 and "T1" in msg2
+
+            # Case 3: Task with status FAILED
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "T2", "status": "FAILED"}]}, f)
+            ok3, msg3, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert ok3 is False
+            assert "unresolved or non-terminal" in msg3 and "T2" in msg3
+
+            # Case 4: Superseded task without replacement
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "T3", "status": "SUPERSEDED"}]}, f)
+            ok4, msg4, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert ok4 is False
+            assert "lacks recorded replacement" in msg4
+
+            # Case 5: Empty tracks in state.json
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "T4", "status": "COMPLETED"}]}, f)
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {}}, f)
+            ok5, msg5, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            assert ok5 is False
+            assert "no recorded research tracks" in msg5
+

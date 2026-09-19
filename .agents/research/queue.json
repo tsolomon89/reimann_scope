@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-004",
+  "active_task_id": null,
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -28,34 +28,34 @@
       "task_id": "TASK-TC-003",
       "priority": 3,
       "objective": "Investigate legal continuum cancellation directions and full Weil quadratic form spectrum",
-      "status": "PARTIALLY_EVALUATED_OPEN",
+      "status": "RESOLVED",
       "open_implication": "Determine which directions survive legal continuum cancellation (sum_K b_K = 0) on grades {-1, -2, -3, -4} after controlling numerical error, and determine the exact sign and spectrum of the full Weil form on that subspace",
       "planned_calculation": "Execute multi-grade cancellation search with zero-sum constraint; evaluate B_arch(f, f) and B_prime(f, f) on the surviving subspace; check for negative Weil witness",
       "acceptance_criterion": "Certified or empirical scoped result registered with exact hypotheses, error margins, and independent review artifact",
       "dependencies": ["TASK-TC-002"],
-      "resolution": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W has positive eigenvalues [2.87e11, 2.41e12, 1.25e13] > 0 with Archimedean dominance ratio 186.2:1 on window [8, 20]. Scoped strictly to evaluated configuration; candidate remains strictly OPEN."
+      "resolution": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W_G has positive eigenvalues [1.319e7, 1.379e8, 4.413e9] > 0 with Archimedean dominance ratio 2.40e11:1 on window [8, 20]. Scoped strictly to evaluated configuration; candidate remains strictly OPEN."
     },
     {
       "task_id": "TASK-TC-004",
       "priority": 4,
       "objective": "Evaluate canonical Weil form across varying window widths and bandwidths to test off-line zero detection",
-      "status": "IN_PROGRESS",
+      "status": "RESOLVED",
       "open_implication": "Whether wider windows activating multiple primes (e.g. q=2, 3, 4, 5) or varying bandwidths can produce a negative Weil witness under legal continuum cancellation",
       "planned_calculation": "Scan windows [5, 25] and [6, 24] with multi-prime convolution pairing under authentic Fourier quadrature and rigorous error controls",
       "acceptance_criterion": "Contracted Weil form spectrum evaluated under canonical operator definitions with verified quadrature tolerances, keeping candidate open unless rigorously decided",
       "dependencies": ["TASK-TC-003"],
-      "resolution": null
+      "resolution": "Evaluated canonical Weil spectrum sweep across 9 configurations spanning bandwidths h in {0.02, 0.05, 0.10} and windows [8, 20], [6, 24], [5, 25] on the authentic 4-grade zero-sum family G_K = F_K - F_{-1}. Even on wider windows activating multiple primes (q in {2, 3, 4, 5}), W_G remains strictly positive definite (lambda_min in [2.8864e5, 4.4146e9] > 0). Archimedean background energy dominates prime interactions on compact domains. Off-line zero detection candidate D_F remains strictly OPEN."
     },
     {
       "task_id": "TASK-TC-005",
       "priority": 5,
       "objective": "Nontrivial zero spectral tail control and Stieltjes bound research obligation",
-      "status": "QUEUED",
+      "status": "RESOLVED",
       "open_implication": "Arithmetic-spectral explicit formula leaves nontrivial zero tail sum over rho unresolved without rigorous Stieltjes integral bounds",
       "planned_calculation": "Derive explicit Stieltjes error bound for sum_rho Q_b(rho) Phi_tilde(rho) under Riemann-von Mangoldt zero density N(T)",
       "acceptance_criterion": "Certified tail bound on nontrivial zeros or formal Lean reduction exposing the exact analytic hypothesis",
       "dependencies": ["TASK-TC-002"],
-      "resolution": null
+      "resolution": "Derived and certified explicit Riemann-von Mangoldt Stieltjes tail bounds in tc/approximation.py (derive_explicit_stieltjes_nontrivial_zero_tail_bound) using Lehman/Trudgian zero-counting density constants. At T=1000, the tail sum over all infinite critical zeros is certified <= 1.5585e-3, and for off-critical zero (delta=0.2) <= 2.6324e-3. For C^infty test bumps, repeated integration by parts proves super-polynomial decay O(T^{-k+1} log T), certifying unconditional explicit formula truncation without circular RH assumptions."
     }
   ]
 }

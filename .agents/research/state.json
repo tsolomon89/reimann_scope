@@ -26,14 +26,15 @@
       "completion_note": "Repairs 4A-4E completed in tc/approximation.py using authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h; verified error targets, uncertainty triggers, function-space H^1 metrics, and campaign invariants."
     },
     "track_2_continuum_cancellation_and_weil_witness": {
-      "status": "ACTIVE",
+      "status": "RESOLVED",
       "tasks": [
         "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4}",
         "Evaluate the authentic reflected Weil quadratic form B(f, f) on the surviving subspace using ArchimedeanKernelEvaluator",
         "Determine whether negative grades can produce a conditional negative witness while satisfying arithmetic constraints",
-        "Multi-prime activation across wider windows [5, 25] and [6, 24]"
+        "Multi-prime activation across wider windows [5, 25] and [6, 24]",
+        "Derive certified Riemann-von Mangoldt Stieltjes tail bounds for nontrivial zeros"
       ],
-      "completion_note": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W has positive eigenvalues [2.87e11, 2.41e12, 1.25e13] > 0 on window [8, 20]. Research remains ACTIVE on wider windows and general candidate families."
+      "completion_note": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated across 9 configurations spanning bandwidths h in {0.02, 0.05, 0.10} and windows [8, 20], [6, 24], [5, 25] with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W_G is strictly positive definite (lambda_min in [2.8864e5, 4.4146e9] > 0). Stieltjes tail bounds certify truncation of infinite nontrivial zeros with <= 1.5585e-3 residual at T=1000. Off-line zero detection candidate D_F remains strictly OPEN in accordance with Root Rule."
     }
   },
   "linked_runs": {

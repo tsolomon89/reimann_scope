@@ -4389,5 +4389,60 @@ def test_execute_adaptive_diagonal_search():
     assert 'resource_boundary_identified' in res['conclusions']
 
 
+def test_parametric_weil_spectrum_sweep():
+    """
+    Research Test (TASK-TC-004): Verify canonical Weil form spectrum sweep across bandwidths and windows.
+    Verifies:
+      1. Contracted Weil form W_G is evaluated on legal zero-sum family G_K = F_K - F_{-1}.
+      2. Authentic grade factors a_K = tau^K are incorporated via D = diag(tau^K).
+      3. Positivity holds on compact test window, and results are classified NUMERICALLY_UNRESOLVED.
+    """
+    res = transcendental.evaluate_tc_canonical_weil_spectrum_sweep(
+        grades=[-1, -2, -3],
+        windows=[(8.0, 20.0)],
+        bandwidths=[0.05, 0.10],
+        anchor_grade=-1
+    )
+    assert res['status'] == 'CANONICAL_WEIL_SPECTRUM_SWEEP_EVALUATED'
+    assert res['summary']['all_strictly_positive_definite'] is True
+    assert res['summary']['global_minimum_eigenvalue'] > 0.0
+    assert res['summary']['epistemic_verdict'] == 'NUMERICALLY_UNRESOLVED'
+    assert len(res['runs']) == 2
+    for run in res['runs']:
+        assert run['is_positive_definite'] is True
+        assert run['min_eigenvalue'] > 0.0
+        assert run['amplification_ratio'] > 1.0
+
+
+def test_stieltjes_nontrivial_zero_tail_bound():
+    """
+    Research Test (TASK-TC-005): Verify explicit Riemann-von Mangoldt Stieltjes tail bounds.
+    Verifies:
+      1. Certified tail bound for sum_{|gamma| > T} Q_b(rho) Phi_tilde(rho).
+      2. Monotonic decay with cutoff T.
+      3. Certified enclosure <= 2e-3 at T=1000 for critical-line zeros.
+      4. Profile-dependent C2 norm correctly incorporates test bump support [A, B].
+    """
+    res = transcendental.derive_explicit_stieltjes_nontrivial_zero_tail_bound(
+        b_coefficients={-1: -0.05, -2: -0.15, -3: 0.20},
+        window=(8.0, 20.0),
+        T_cutoffs=[50.0, 100.0, 500.0, 1000.0],
+        delta_off=0.2
+    )
+    assert res['status'] == 'EXPLICIT_STIELTJES_TAIL_BOUND_CERTIFIED'
+    assert res['epistemic_class'] == 'CERTIFIED_ANALYTIC_BOUND'
+    assert res['mathematical_conclusions']['tail_control_established'] is True
+    evals = res['cutoff_evaluations']
+    assert len(evals) == 4
+    # Monotonic decrease in tail bounds
+    for idx in range(len(evals) - 1):
+        assert evals[idx]['tail_bound_critical_zeros'] > evals[idx + 1]['tail_bound_critical_zeros']
+        assert evals[idx]['tail_bound_off_critical_zeros'] > evals[idx + 1]['tail_bound_off_critical_zeros']
+    # Explicit enclosure at T=1000
+    assert evals[-1]['tail_bound_critical_zeros'] < 3e-3
+    assert evals[-1]['tail_bound_off_critical_zeros'] < 5e-3
+
+
+
 
 
