@@ -4528,7 +4528,47 @@ def test_enlarged_grade_space_rayleigh_spectrum():
         assert c['gram_H1_condition_number'] < 5000.0
 
 
+def test_explicit_formula_off_critical_sensitivity(tmp_path):
+    """
+    Verify arithmetic-spectral explicit formula integration and off-critical sensitivity certificate (TASK-TC-005B):
+    1. Status is EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED.
+    2. Epistemic class is CERTIFIED_FINITE_PARAMETER_SENSITIVITY.
+    3. Arithmetic lower margin M_arith > 1.3e7 > 0.
+    4. Certified Stieltjes tail bound < 0.02 and R_triv < 1e-4.
+    5. Overturn ratio R_overturn < 0.005 (less than 0.5% of arithmetic margin).
+    6. Minimum multiplicity to overturn > 300.
+    7. Positivity is unconditionally preserved for any single off-critical zero in the domain.
+    """
+    out_file = str(tmp_path / "test_sensitivity_cert.json")
+    res = transcendental.certify_explicit_formula_off_critical_sensitivity(output_path=out_file)
 
+    assert res['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
+    assert res['epistemic_class'] == 'CERTIFIED_FINITE_PARAMETER_SENSITIVITY'
 
+    # Arithmetic baseline
+    ab = res['arithmetic_baseline']
+    assert ab['is_strictly_positive'] is True
+    assert ab['certified_arithmetic_margin'] > 1.3e7
 
+    # Spectral remainders
+    sr = res['spectral_remainders']
+    assert sr['stieltjes_nontrivial_zero_tail_bound'] < 0.02
+    assert sr['trivial_zero_remainder_bound'] < 1e-4
+    assert sr['cumulative_critical_zeros_sum'] > 2e5
+
+    # Sensitivity summary
+    summary = res['off_critical_sensitivity_summary']
+    assert summary['total_points_evaluated'] == 975
+    assert summary['max_overturn_ratio'] < 0.005
+    assert summary['min_multiplicity_to_overturn'] > 300.0
+    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is True
+    assert summary['preserved_lower_margin_with_worst_case_zero'] > 1.3e7
+
+    # Check serialized artifact
+    import os, json
+    assert os.path.exists(out_file)
+    with open(out_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    assert data['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
+    assert data['off_critical_sensitivity_summary']['is_positivity_unconditionally_preserved_for_single_zero'] is True
 

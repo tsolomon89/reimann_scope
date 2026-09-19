@@ -33,9 +33,10 @@
         "Certify baseline canonical Weil error budget: prime discrepancy, Bochner PSD tail R_U >= 0, ||Delta W_G||_2 <= 1591.14, margin ratio 8312x [COMPLETED]",
         "Evaluate enlarged grade spaces (dim 4 with K=-5, mixed positive/negative) and H^1 function-norm Rayleigh spectrum [COMPLETED]",
         "Derive certified Riemann-von Mangoldt Stieltjes tail bounds with honest parameter dependence and Trudgian envelope [COMPLETED]",
-        "Arithmetic-spectral explicit formula integration and off-critical witness sensitivity [ACTIVE]"
+        "Arithmetic-spectral explicit formula integration and off-critical witness sensitivity [COMPLETED]",
+        "Asymptotic bandwidth and window scaling of Archimedean dominance vs prime/zero coupling [ACTIVE]"
       ],
-      "active_note": "Baseline error budget certified (lambda_min >= 1.3224e7 > 0); enlarged space H^1 Rayleigh quotients verified strictly positive (inf R(G) in [1.86e4, 2.71e4]); explicit formula integration queued."
+      "active_note": "Explicit formula sensitivity certified (overturn ratio < 0.3%, m_min >= 380, single off-critical zero preserves positivity); asymptotic bandwidth and window scaling queued."
     }
   },
   "linked_runs": {
@@ -44,11 +45,13 @@
       "data/tc_negative_grade_approximation_campaign.json",
       "data/tc_continuum_cancellation_weil_spectrum.json",
       "data/tc_baseline_canonical_weil_error_budget.json",
+      "data/tc_explicit_formula_sensitivity_certificate.json",
       "data/tc_epic_synthesis.json"
     ],
     "research_runs": [
       "data/tc_continuum_cancellation_weil_spectrum.json",
-      "data/tc_baseline_canonical_weil_error_budget.json"
+      "data/tc_baseline_canonical_weil_error_budget.json",
+      "data/tc_explicit_formula_sensitivity_certificate.json"
     ],
     "research_runs_index": "research/index.json"
   }
