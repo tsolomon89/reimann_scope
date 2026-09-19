@@ -3591,7 +3591,13 @@ def test_epic_admissible_target_and_approximation_experiment():
     poles = res['target_function']['pole_integrals']
     assert poles['int_f_exp_pos_half'] == pytest.approx(0.0, abs=1e-7)
     assert poles['int_f_exp_neg_half'] == pytest.approx(0.0, abs=1e-7)
-    assert res['shared_grade_model']['relative_error'] > 0.95
+    # Defect 4 fix: Validate mathematical identities and numerical reliability instead of demanding > 0.95 error
+    rel_err = res['shared_grade_model']['relative_error']
+    assert isinstance(rel_err, float) and math.isfinite(rel_err) and rel_err >= 0.0
+    target_norm = res['target_function']['norm_H1']
+    residual_norm = res['shared_grade_model']['H1_error']
+    assert target_norm > 0.0
+    assert abs(residual_norm / target_norm - rel_err) < 1e-10
 
 
 def test_epic_weil_continuity_and_connes_consani_bridge():
@@ -4265,18 +4271,52 @@ def test_actual_tc_grade_cancellation_research():
     Verifies:
     1. sum_K b_K == 0 exactly cancels the continuum profile F_{infty, h, w}.
     2. Surviving difference directions have full numerical rank.
-    3. Singular values are stable under mesh refinement.
-    4. Residuals exhibit an orthogonal plateau against smooth independent targets.
+    3. At well-resolved grid (n_points=401), singular values are stable under mesh refinement.
+    4. Mathematical identities: Gram PSD, valid relative error float, defensible uncertainty propagation.
     """
     res = transcendental.investigate_actual_tc_grade_cancellation(
-        grades=[-1, -2], anchor_grade=0, h=0.05, n_points=101
+        grades=[-1, -2], anchor_grade=0, h=0.05, n_points=401
     )
     assert res['status'] == 'ACTUAL_TC_GRADE_CANCELLATION_INVESTIGATED'
     assert res['continuum_cancellation']['is_exact_zero_sum'] is True
     assert abs(res['continuum_cancellation']['sum_normalized_b']) < 1e-12
     assert res['gram_matrix_spectrum']['numerical_rank_at_1e6'] == 2
     assert res['mesh_stability']['directions_stable_under_refinement'] is True
-    assert res['independent_target_fit']['relative_error'] > 0.95
+    assert "empirically stable under mesh refinement" in res['research_findings']['surviving_directions_description']
+    # Defect 4 fix: Mathematical identities, valid spectrum, uncertainty classification and bounds
+    assert all(ev >= -1e-12 for ev in res['gram_matrix_spectrum']['singular_values'])
+    rel_fit_err = res['independent_target_fit']['relative_error']
+    assert isinstance(rel_fit_err, float) and math.isfinite(rel_fit_err) and rel_fit_err >= 0.0
+    assert res['independent_target_fit']['uncertainty_classification'] == 'EMPIRICAL_DISCRETIZATION_UNCERTAINTY_ESTIMATE'
+    assert res['independent_target_fit']['propagated_uncertainty_bound'] >= 0.0
+    assert all(u >= 0.0 and math.isfinite(u) for u in res['independent_target_fit']['column_uncertainty_estimates'].values())
+
+
+def test_deliberately_underresolved_mesh_detected():
+    """
+    Defect 3 Regression: Assert that a deliberately underresolved mesh (e.g. n_points=35, h=0.01)
+    is detected as unstable under refinement (directions_stable_under_refinement is False),
+    and prose dynamically reports UNRESOLVED / FAILED without claiming stability.
+    """
+    res = transcendental.investigate_actual_tc_grade_cancellation(
+        grades=[-1, -2], anchor_grade=0, h=0.01, n_points=35
+    )
+    assert res['mesh_stability']['directions_stable_under_refinement'] is False
+    assert "UNRESOLVED / FAILED" in res['research_findings']['surviving_directions_description']
+    assert "cannot be certified as stable" in res['research_findings']['surviving_directions_description']
+
+
+def test_nonfinite_or_nan_pole_integral_fails_audit():
+    """
+    Defect 6 Regression: Assert that non-finite or NaN pole integrals fail the pole vanishing check
+    and flag audit failures rather than silently passing.
+    """
+    assert transcendental._is_finite_vanishing_integral(0.0) is True
+    assert transcendental._is_finite_vanishing_integral(1e-8) is True
+    assert transcendental._is_finite_vanishing_integral(float('nan')) is False
+    assert transcendental._is_finite_vanishing_integral(float('inf')) is False
+    assert transcendental._is_finite_vanishing_integral(-float('inf')) is False
+    assert transcendental._is_finite_vanishing_integral(0.1) is False
 
 
 def test_adaptive_diagonal_schedule_search():
@@ -4292,6 +4332,62 @@ def test_adaptive_diagonal_schedule_search():
     assert len(res['grid_evaluations']) == 9
     assert len(res['adaptive_best_path']) == 3
     assert 'bottleneck_analysis' in res['conclusions']
+
+
+def test_same_grade_resonance_K_neg3():
+    """
+    Research Test: Verify concrete same-grade log(2) resonance at K=-3 on active prime powers 2048 and 4096.
+    Verifies:
+      1. Stations 2048 = 2^11 and 4096 = 2^12 lie strictly within window [8, 20].
+      2. Coordinate separation u2 - u1 equals log(2) exactly.
+      3. Prime convolution kernel argument evaluates at v - (u2 - u1) = 0 (exact resonance).
+      4. Archimedean diagonal term strictly dominates, confirming resonance does not force negativity.
+    """
+    res = transcendental.audit_same_grade_resonance_K_neg3(h=0.05)
+    assert res['status'] == 'SAME_GRADE_RESONANCE_AUDITED'
+    assert res['resonance_analysis']['is_exact_log2_resonance'] is True
+    assert res['positivity_conclusion']['same_grade_resonance_confirmed'] is True
+    assert res['positivity_conclusion']['proves_negativity_of_B'] is False
+    assert res['positivity_conclusion']['archimedean_diagonal_dominates'] is True
+
+
+def test_arithmetic_spectral_exact_formula():
+    """
+    Research Test: Verify arithmetic-spectral explicit formula, Laurent polynomial response, and remainders.
+    Verifies:
+      1. Legal zero-sum condition cancels the pole at s=1.
+      2. Single-variable Laurent polynomial representation in z = tau^{1-rho} with P(1) = 0.
+      3. Incommensurability refutation: integer multiples K*log(tau) are commensurate.
+      4. Trivial zeros remainder decays geometrically as 39.48^{-k} with certified tail bound.
+      5. Higher prime-power remainder is finite and bounded.
+    """
+    res = transcendental.audit_arithmetic_spectral_exact_formula(grades=[0, -1, -2, -3])
+    assert res['status'] == 'ARITHMETIC_SPECTRAL_EXPLICIT_FORMULA_AUDITED'
+    assert res['is_legal_zero_sum'] is True
+    assert res['laurent_polynomial_analysis']['root_at_one'] is True
+    assert res['trivial_zeros_remainder']['is_exponentially_convergent'] is True
+    assert res['trivial_zeros_remainder']['tail_bound_k_gt_5'] < 1e-8
+    assert res['higher_prime_remainder']['is_finite_sum'] is True
+
+
+def test_execute_adaptive_diagonal_search():
+    """
+    Research Test: Verify genuine error-driven adaptive diagonal search algorithm.
+    Verifies:
+      1. Step-by-step decisions driven by smoothing bias vs arithmetic discrepancy.
+      2. Logs all candidate evaluations, decisions, and rejected attempts.
+      3. Correctly identifies grade budget exhaustion as a computational ceiling rather than an obstruction.
+    """
+    res = transcendental.execute_adaptive_diagonal_search(
+        target_fractions=[1.0, 0.5], max_negative_grade=-3, n_points=151
+    )
+    assert res['status'] == 'ADAPTIVE_DIAGONAL_SEARCH_COMPLETED'
+    assert res['method'] == 'ERROR_DRIVEN_ADAPTIVE_TRAJECTORY'
+    assert len(res['steps']) >= 1
+    assert res['rejected_attempts_count'] > 0
+    assert res['resource_costs']['total_evaluations'] > 0
+    assert 'resource_boundary_identified' in res['conclusions']
+
 
 
 

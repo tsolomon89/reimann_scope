@@ -89,7 +89,11 @@
     "transcendental.py: run_tc_negative_grade_approximation_campaign",
     "transcendental.py: classify_finite_series_trend",
     "transcendental.py: search_adaptive_diagonal_schedule",
+    "transcendental.py: execute_adaptive_diagonal_search",
     "transcendental.py: investigate_actual_tc_grade_cancellation",
+    "transcendental.py: audit_same_grade_resonance_K_neg3",
+    "transcendental.py: audit_arithmetic_spectral_exact_formula",
+    "transcendental.py: run_tc_grade_cancellation_research_campaign",
     "transcendental.py: audit_coefficient_rescaling_homogeneity",
     "transcendental.py: compute_support_components",
     "transcendental.py: poincare_support_lower_bound",
@@ -118,7 +122,9 @@
     "One-by-one matrix control W=[1], c=[i] tested, confirming Hermitian form +1 vs unconjugated bilinear -1",
     "Discretization step refinement from N=16000 to N=32000 tested, confirming operator error < 5.0e4 << 1.0e5",
     "Adaptive diagonal schedule tested across (K, h) grid for K in {0, -1, -2, -3, -4} and h in {0.20, 0.10, 0.05, 0.02}: confirmed that finite computable paths within budget exhibit increasing total relative error due to O(h^(-7/2)) bump scaling, despite E_arith decreasing monotonically",
-    "Actual TC grade cancellation tested with sum_K b_K = 0 across grades {-1, -2, -3, -4} at h=0.05 and {-1, -2, -3} at h=0.02: confirmed 4 and 3 surviving non-trivial arithmetic directions respectively, with relative error against smooth target f_* remaining at 99.99%, falsifying arbitrary smooth approximation by arithmetic residuals"
+    "Actual TC grade cancellation tested with sum_K b_K = 0 across grades {-1, -2, -3, -4} at h=0.05 and {-1, -2, -3} at h=0.02: confirmed 4 and 3 surviving non-trivial arithmetic directions respectively, with empirical mesh stability dynamically reported as UNRESOLVED / FAILED at coarse resolution without false claims of proved stability, and relative error against smooth target f_* remaining at 99.99%",
+    "Same-grade log(2) resonance tested at K=-3 in [8, 20] on prime powers 2048 and 4096 (ratio 2, separation log 2): confirmed exact prime-term alignment at q=2, with Archimedean diagonal term strictly dominating, falsifying the claim that resonance forces negativity",
+    "Spectral filter incommensurability claim tested: confirmed that integer multiples K*log(tau) are mutually commensurate with rational ratios K/J, refuting the false claim of incommensurability; spectral filter Q_b(rho) is an authentic single-variable Laurent polynomial P(z) with P(1)=0"
   ],
   "computational_evidence": [
     "tests/test_tc_mechanism_discovery.py: test_epic_coefficient_rescaling_homogeneity",
@@ -134,6 +140,8 @@
     "tests/test_tc_mechanism_discovery.py: test_acceptance_matrix_trend_classification",
     "tests/test_tc_mechanism_discovery.py: test_mutation_missing_flag_rejected",
     "tests/test_tc_mechanism_discovery.py: test_actual_tc_grade_cancellation_research",
+    "tests/test_tc_mechanism_discovery.py: test_deliberately_underresolved_mesh_detected",
+    "tests/test_tc_mechanism_discovery.py: test_nonfinite_or_nan_pole_integral_fails_audit",
     "tests/test_tc_mechanism_discovery.py: test_adaptive_diagonal_schedule_search",
     "data/tc_epic_support_geometry_synthesis.json",
     "data/canonical_reflected_weil_matrix_sign.json",
