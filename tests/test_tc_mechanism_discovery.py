@@ -4438,9 +4438,26 @@ def test_stieltjes_nontrivial_zero_tail_bound():
     for idx in range(len(evals) - 1):
         assert evals[idx]['tail_bound_critical_zeros'] > evals[idx + 1]['tail_bound_critical_zeros']
         assert evals[idx]['tail_bound_off_critical_zeros'] > evals[idx + 1]['tail_bound_off_critical_zeros']
-    # Explicit enclosure at T=1000
-    assert evals[-1]['tail_bound_critical_zeros'] < 3e-3
-    assert evals[-1]['tail_bound_off_critical_zeros'] < 5e-3
+        assert evals[idx]['tail_bound_strip_uniform'] > evals[idx + 1]['tail_bound_strip_uniform']
+    # Explicit enclosure at T=1000 for k=2
+    assert evals[-1]['tail_bound_critical_zeros'] < 0.01
+    assert evals[-1]['tail_bound_off_critical_zeros'] < 0.05
+    # Verify pointwise bounds at t=50 strictly exceed direct numerical Mellin transform
+    pts = res['mellin_point_evaluations_t50']
+    assert pts['beta_0p5']['certified_upper_bound'] >= 0.0104008751
+    assert pts['beta_0p7']['certified_upper_bound'] >= 0.0189061684
+
+    # Test higher order k=3 super-polynomial decay
+    res_k3 = transcendental.derive_explicit_stieltjes_nontrivial_zero_tail_bound(
+        b_coefficients={-1: -0.05, -2: -0.15, -3: 0.20},
+        window=(8.0, 20.0),
+        T_cutoffs=[50.0, 100.0, 500.0, 1000.0],
+        delta_off=0.2,
+        k_deriv=3
+    )
+    evals_k3 = res_k3['cutoff_evaluations']
+    assert evals_k3[-1]['tail_bound_critical_zeros'] < 1e-3
+    assert evals_k3[-1]['tail_bound_off_critical_zeros'] < 2e-3
 
 
 

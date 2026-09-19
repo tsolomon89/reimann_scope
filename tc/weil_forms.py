@@ -3409,7 +3409,8 @@ def evaluate_tc_canonical_weil_spectrum_sweep(
     anchor_grade: int = -1,
     z_max: float = 16.0,
     N_t: int = 1000,
-    output_path: Optional[str] = None
+    output_path: Optional[str] = None,
+    q_max: Optional[int] = None
 ) -> Dict[str, Any]:
     """
     Parametric multi-bandwidth and multi-window canonical Weil spectrum sweep (TASK-TC-004).
@@ -3437,11 +3438,14 @@ def evaluate_tc_canonical_weil_spectrum_sweep(
     anchor_idx = grades.index(anchor_grade)
 
     # Projection matrix P mapping m_dim difference coefficients to r grade coefficients with sum = 0
-    P = np.zeros((r, m_dim))
-    for col_idx, g in enumerate(diff_grades):
-        g_idx = grades.index(g)
-        P[g_idx, col_idx] = 1.0
-        P[anchor_idx, col_idx] = -1.0
+    if m_dim > 0:
+        P = np.zeros((r, m_dim))
+        for col_idx, g in enumerate(diff_grades):
+            g_idx = grades.index(g)
+            P[g_idx, col_idx] = 1.0
+            P[anchor_idx, col_idx] = -1.0
+    else:
+        P = np.eye(r)
 
     D = np.diag([tau ** K for K in grades])
     crit_gammas = [14.134725, 21.022040, 25.010858, 30.424876, 32.935062]
@@ -3474,6 +3478,8 @@ def evaluate_tc_canonical_weil_spectrum_sweep(
             st_by_g[K] = items
 
         max_q = int(math.floor((b_win / a_win) * math.exp(2.0 * max(bandwidths))))
+        if q_max is not None:
+            max_q = max(max_q, int(q_max))
         cand_pps = []
         for q in range(2, max_q + 1):
             is_pp, p_b, _ = _is_prime_power_exact(q)
@@ -3504,36 +3510,31 @@ def evaluate_tc_canonical_weil_spectrum_sweep(
                     sts_i = st_by_g[Ki]
                     sts_j = st_by_g[Kj]
 
-                    if Ki == Kj:
-                        n_dict = {s['n']: s for s in sts_i}
-                        for s_a in sts_i:
+                    if sts_i and sts_j:
+                        t_i_arr = np.array([s['t'] for s in sts_i])
+                        d_i_arr = np.array([s['weight_d'] for s in sts_i])
+                        t_j_arr = np.array([s['t'] for s in sts_j])
+                        d_j_arr = np.array([s['weight_d'] for s in sts_j])
+                        for a_idx, s_a in enumerate(sts_i):
+                            t_a = t_i_arr[a_idx]
+                            d_a = d_i_arr[a_idx]
                             for q, p_b, log_q, lam_p in cand_pps:
-                                n_b = q * s_a['n']
-                                if n_b in n_dict:
-                                    s_b = n_dict[n_b]
-                                    entry += 2.0 * s_a['weight_d'] * s_b['weight_d'] * (lam_p / math.sqrt(q)) * C_tab[0]
-                    else:
-                        if sts_i and sts_j:
-                            t_j_arr = np.array([s['t'] for s in sts_j])
-                            d_j_arr = np.array([s['weight_d'] for s in sts_j])
-                            for s_a in sts_i:
-                                t_a = s_a['t']
-                                d_a = s_a['weight_d']
-                                for q, p_b, log_q, lam_p in cand_pps:
-                                    lam_term = lam_p / math.sqrt(q)
-                                    target = t_a + log_q
-                                    l = np.searchsorted(t_j_arr, target - 2.0 * h, side='left')
-                                    r_idx = np.searchsorted(t_j_arr, target + 2.0 * h, side='right')
-                                    for b_idx in range(l, r_idx):
-                                        diff_v = abs(log_q - (t_j_arr[b_idx] - t_a))
-                                        entry += d_a * d_j_arr[b_idx] * lam_term * fast_C_h(diff_v)
+                                lam_term = lam_p / math.sqrt(q)
+                                # target: t_b = t_a + log_q
+                                target = t_a + log_q
+                                l = np.searchsorted(t_j_arr, target - 2.0 * h, side='left')
+                                r_idx = np.searchsorted(t_j_arr, target + 2.0 * h, side='right')
+                                for b_idx in range(l, r_idx):
+                                    diff_v = abs(log_q - (t_j_arr[b_idx] - t_a))
+                                    entry += d_a * d_j_arr[b_idx] * lam_term * fast_C_h(diff_v)
 
-                                    target_inv = t_a - log_q
-                                    l_inv = np.searchsorted(t_j_arr, target_inv - 2.0 * h, side='left')
-                                    r_inv = np.searchsorted(t_j_arr, target_inv + 2.0 * h, side='right')
-                                    for b_idx in range(l_inv, r_inv):
-                                        diff_v = abs(-log_q - (t_j_arr[b_idx] - t_a))
-                                        entry += d_a * d_j_arr[b_idx] * lam_term * fast_C_h(diff_v)
+                                # target_inv: t_b = t_a - log_q
+                                target_inv = t_a - log_q
+                                l_inv = np.searchsorted(t_j_arr, target_inv - 2.0 * h, side='left')
+                                r_inv = np.searchsorted(t_j_arr, target_inv + 2.0 * h, side='right')
+                                for b_idx in range(l_inv, r_inv):
+                                    diff_v = abs(-log_q - (t_j_arr[b_idx] - t_a))
+                                    entry += d_a * d_j_arr[b_idx] * lam_term * fast_C_h(diff_v)
                     W_prime_raw[i, j] = entry
                     if i != j:
                         W_prime_raw[j, i] = entry
@@ -3575,6 +3576,15 @@ def evaluate_tc_canonical_weil_spectrum_sweep(
                 'W_arch_G': W_arch_G.tolist(),
                 'W_prime_G': W_prime_G.tolist(),
                 'W_net_G': W_net_G.tolist(),
+                'W_arch_raw': W_arch_raw.tolist(),
+                'W_prime_raw': W_prime_raw.tolist(),
+                'contracted_weil_matrix_W_G': {
+                    'matrix': W_net_G.tolist(),
+                    'prime_form_matrix': W_prime_raw.tolist(),
+                    'contracted_prime_matrix': W_prime_G.tolist(),
+                    'archimedean_matrix': W_arch_raw.tolist(),
+                    'contracted_archimedean_matrix': W_arch_G.tolist()
+                },
                 'eigs_arch': eigs_arch.tolist(),
                 'eigs_prime': eigs_prime.tolist(),
                 'eigs_net': eigs_net.tolist(),

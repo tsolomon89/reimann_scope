@@ -466,15 +466,18 @@ class TestAdversarialEvidenceControls:
         rather than testing a local helper.
         """
         # 1. Directly invoke production completion gate on repository state
-        # With TASK-TC-004, TASK-TC-005, and Track 2 resolved, the live repository passes milestone completion.
+        # With active open research obligations, live repository blocks milestone completion.
         can_complete, msg, details = app.verify_research_milestone_completion(repo_root=REPO_ROOT)
-        assert can_complete is True, f"Production completion gate failed on resolved repository: {msg}"
-        assert "All persistent research obligations and tracks resolved" in msg
+        assert can_complete is False, "Active research obligations (TASK-TC-004) must block milestone completion"
+        assert "active task" in msg.lower() or "TASK-TC-004" in msg
 
         # 2. Test isolated temporary queue configurations through production gate
         with tempfile.TemporaryDirectory() as td:
             q_file = os.path.join(td, "queue.json")
             s_file = os.path.join(td, "state.json")
+            real_art = os.path.join(td, "real_artifact.json")
+            with open(real_art, "w", encoding="utf-8") as rf:
+                rf.write('{"status": "OK"}')
 
             # Case A: Active task in progress
             with open(q_file, "w", encoding="utf-8") as f:
@@ -495,17 +498,27 @@ class TestAdversarialEvidenceControls:
 
             # Case C: Active research track in state
             with open(q_file, "w", encoding="utf-8") as f:
-                json.dump({"active_task_id": None, "tasks": [{"task_id": "TASK-RESOLVED", "status": "ACCEPTED"}]}, f)
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "TASK-RESOLVED", "status": "ACCEPTED", "evidence": [real_art], "review_status": "ACCEPTED"}]}, f)
             with open(s_file, "w", encoding="utf-8") as f:
                 json.dump({"active_tracks": {"track_1": {"status": "ACTIVE"}}}, f)
-            can_comp_c, msg_c, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            can_comp_c, msg_c, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
             assert can_comp_c is False
             assert "unresolved research track(s) remain" in msg_c
 
             # Case D: Fully resolved queue and completed tracks
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{
+                        "task_id": "TASK-RESOLVED",
+                        "status": "ACCEPTED",
+                        "evidence": [real_art],
+                        "review_status": "ACCEPTED"
+                    }]
+                }, f)
             with open(s_file, "w", encoding="utf-8") as f:
                 json.dump({"active_tracks": {"track_1": {"status": "RESOLVED"}}}, f)
-            can_comp_d, msg_d, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            can_comp_d, msg_d, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
             assert can_comp_d is True
             assert "All persistent research obligations and tracks resolved" in msg_d
 
@@ -802,11 +815,283 @@ class TestAdversarialEvidenceControls:
             assert "lacks recorded replacement" in msg4
 
             # Case 5: Empty tracks in state.json
+            real_art = os.path.join(td, "real_artifact.json")
+            with open(real_art, "w", encoding="utf-8") as rf:
+                rf.write('{"status": "OK"}')
             with open(q_file, "w", encoding="utf-8") as f:
-                json.dump({"active_task_id": None, "tasks": [{"task_id": "T4", "status": "COMPLETED"}]}, f)
+                json.dump({"active_task_id": None, "tasks": [{"task_id": "T4", "status": "COMPLETED", "evidence": [real_art], "review_status": "ACCEPTED"}]}, f)
             with open(s_file, "w", encoding="utf-8") as f:
                 json.dump({"active_tracks": {}}, f)
-            ok5, msg5, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file)
+            ok5, msg5, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
             assert ok5 is False
             assert "no recorded research tracks" in msg5
+
+    def test_21_mellin_tail_bound_repaired_weight_and_uniform_strip_control(self):
+        r"""Invariant 9: Repaired Mellin tail bound weight and uniform critical strip control.
+        For repository convention \widetilde\Phi(s) = \int_A^B \Phi(x) x^{s-1} dx,
+        two integrations by parts give (1 / s(s+1)) \int_A^B \Phi''(x) x^{s+1} dx.
+        Numerator requires weight x^{\beta+1}. Old code used x^{1-\beta}, underestimating by 4.8x - 15x.
+        Repaired code strictly encloses direct transform at t=50 and incorporates full Trudgian (2014) envelope.
+        """
+        bound_res = app.derive_stieltjes_nontrivial_zero_tail_bound(window=(8.0, 20.0), k_deriv=2)
+        assert bound_res['status'] == 'EXPLICIT_STIELTJES_TAIL_BOUND_CERTIFIED'
+
+        # Check pointwise evaluations at t=50
+        pts = bound_res['mellin_point_evaluations_t50']
+        # beta = 0.5
+        eval_05 = pts['beta_0.5']
+        assert eval_05['computed_direct_mellin'] == pytest.approx(0.0104008751, rel=1e-3)
+        assert eval_05['repaired_upper_bound'] > eval_05['computed_direct_mellin']
+        assert eval_05['enclosure_holds'] is True
+        # Ratio of repaired bound to direct transform must be > 1.0 (strict upper bound)
+        assert eval_05['repaired_upper_bound'] / eval_05['computed_direct_mellin'] > 2.0
+
+        # beta = 0.7
+        eval_07 = pts['beta_0.7']
+        assert eval_07['computed_direct_mellin'] == pytest.approx(0.0189061684, rel=1e-3)
+        assert eval_07['repaired_upper_bound'] > eval_07['computed_direct_mellin']
+        assert eval_07['enclosure_holds'] is True
+        assert eval_07['repaired_upper_bound'] / eval_07['computed_direct_mellin'] > 2.0
+
+        # Contrast with flawed old weight bound (underestimated by factors of 4.86 and 14.95)
+        assert eval_05['flawed_weight_bound'] < eval_05['computed_direct_mellin']
+        assert eval_07['flawed_weight_bound'] < eval_07['computed_direct_mellin']
+
+        # Check full published Trudgian term 0.278 log log T is recorded
+        assert bound_res['riemann_von_mangoldt_constants']['c2'] == 0.278
+
+        # Check higher derivative order k=3 produces super-polynomial decay
+        bound_k3 = app.derive_stieltjes_nontrivial_zero_tail_bound(window=(8.0, 20.0), k_deriv=3)
+        assert 'x^(beta + 3 - 1)' in bound_k3['profile_sobolev_norms']['weight_formula'] or bound_k3['profile_sobolev_norms']['weight_formula'] == 'x^(beta + 2)'
+        # At T=1000, tail bound for k=3 drops significantly below 0.001
+        tail_1000_k3 = [c for c in bound_k3['cutoff_evaluations'] if c['T_cutoff'] == 1000.0][0]
+        assert tail_1000_k3['tail_bound_critical_zeros'] < 0.001
+
+    def test_22_complete_form_prime_evaluation_captures_all_supported_same_grade_pairs(self):
+        r"""Invariant 10: Complete same-grade and cross-grade prime pairings.
+        For test bump psi_h, prime coupling condition is |\Delta t \mp \log q| < 2h.
+        At window [8, 20], h=0.05, grade K=-1:
+        There are 17 supported same-grade pairs, none exactly multiplicative (n_b != q * n_a).
+        The sweep must not assign zero to this diagonal prime contribution.
+        """
+        window = (8.0, 20.0)
+        h = 0.05
+        tau = 2.0 * math.pi
+        K = -1
+
+        st = wf.sieve_prime_powers_in_window(window, K, tau=tau)
+        items = []
+        for n_val, x_float, lam_float in st:
+            w_val = math.exp(1.0 - 1.0 / (1.0 - (2.0 * (x_float - 8.0) / 12.0 - 1.0)**2)) if 8.0 < x_float < 20.0 else 0.0
+            d_val = lam_float * w_val
+            if d_val > 0:
+                items.append({'u': math.log(x_float), 'd': d_val, 'n': n_val})
+
+        q_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23]
+        two_h = 2.0 * h
+        detected_pairs = []
+        for i, a in enumerate(items):
+            for j, b in enumerate(items):
+                if a['n'] < b['n']:
+                    diff = b['u'] - a['u']
+                    for q in q_primes:
+                        log_q = math.log(q)
+                        if abs(diff - log_q) < two_h:
+                            detected_pairs.append((a['n'], b['n'], q))
+
+        # Exactly 17 pairs exist in this canonical configuration
+        assert len(detected_pairs) == 17
+        # None of them are exact integer multiples n_b = q * n_a
+        assert not any(b_n == q * a_n for a_n, b_n, q in detected_pairs)
+
+        # In the sweep, evaluate K=-1 diagonal prime contribution
+        sweep_res = wf.evaluate_tc_canonical_weil_spectrum_sweep(
+            windows=[(8.0, 20.0)],
+            bandwidths=[0.05],
+            grades=[-1],
+            anchor_grade=-1,
+            q_max=20
+        )
+        run_data = sweep_res['runs'][0]
+        # The diagonal prime entry is non-zero and negative in position space (~ -1.848e8)
+        diag_prime = run_data['contracted_weil_matrix_W_G']['prime_form_matrix'][0][0]
+        assert diag_prime < -1.0e8, f"Expected large negative prime diagonal contribution, got {diag_prime}"
+        assert abs(diag_prime - (-184787530.24)) < 1.0e5
+
+    def test_23_production_cancellation_rejects_orthogonal_subspaces_with_identical_grams(self):
+        """Invariant 11: Production Grassmannian principal-angle stability decision.
+        For two orthogonal subspaces with identical singular values / internal Grams:
+        Separate Gram comparison yields distance = 0, stable = True (FALSE).
+        Grassmannian principal angles yield distance = 1.0, stable = False (TRUE).
+        Production directions_stable MUST incorporate Grassmannian principal angles.
+        """
+        # Create two 2D subspaces on common grid that are mutually orthogonal
+        grid = np.linspace(0, 1, 101)
+        du = float(grid[1] - grid[0])
+
+        # Subspace A: span of {sin(2 pi x), sin(4 pi x)}
+        u1 = np.sin(2.0 * math.pi * grid)
+        u1_p = 2.0 * math.pi * np.cos(2.0 * math.pi * grid)
+        u2 = np.sin(4.0 * math.pi * grid)
+        u2_p = 4.0 * math.pi * np.cos(4.0 * math.pi * grid)
+        basis_A = np.array([u1, u2])
+        basis_p_A = np.array([u1_p, u2_p])
+
+        # Subspace B: span of {sin(6 pi x), sin(8 pi x)} (orthogonal in H^1 on [0, 1])
+        v1 = np.sin(6.0 * math.pi * grid)
+        v1_p = 6.0 * math.pi * np.cos(6.0 * math.pi * grid)
+        v2 = np.sin(8.0 * math.pi * grid)
+        v2_p = 8.0 * math.pi * np.cos(8.0 * math.pi * grid)
+        basis_B = np.array([v1, v2])
+        basis_p_B = np.array([v1_p, v2_p])
+
+        subspace_res = app.compute_function_subspace_principal_angles(
+            basis_A, basis_p_A, basis_B, basis_p_B, du
+        )
+        assert subspace_res['distance'] == pytest.approx(1.0, abs=1e-3)
+        assert subspace_res['stable'] is False
+
+        # Now test investigate_actual_tc_grade_cancellation with production mesh refinement
+        res = app.investigate_actual_tc_grade_cancellation(grades=[-1, -2], n_points=301)
+        proj_stab = res['mesh_stability']['subspace_projection_stability']
+        # Distance must be properly reported from function subspace principal angles
+        assert 'function_subspace_distance_H1' in proj_stab
+        assert 'min_principal_cosine' in proj_stab
+        # Refinement stability must be False when distance exceeds 0.10
+        if proj_stab['function_subspace_distance_H1'] >= 0.10:
+            assert res['mesh_stability']['directions_stable_under_refinement'] is False
+
+    def test_24_review_verifier_rejects_refusal_verdict_and_nonexistent_commit(self):
+        """Invariant 12: Review verifier hardening.
+        1. Reject explicit refusal verdict: 'Verdict: DO NOT ACCEPT. The prior version was approved.'
+        2. Reject nonexistent git commit SHA, even if it matches the spec string.
+        3. Accept valid approval with existing commit SHA.
+        """
+        spec = {
+            "claim_id": "CLM-TEST-REFUSAL-AUDIT",
+            "author": "Alice",
+            "git_commit": "82643cafd605492233c6c1e992b78c2c30d45f13"
+        }
+        with tempfile.TemporaryDirectory() as td:
+            r_dir = os.path.join(td, ".agents", "claims", "reviews")
+            os.makedirs(r_dir, exist_ok=True)
+            r_file = os.path.join(r_dir, "CLM-TEST-REFUSAL-AUDIT-derivation-review.md")
+
+            # Case 1: DO NOT ACCEPT verdict followed by 'approved' prose
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Independent Derivation Review for CLM-TEST-REFUSAL-AUDIT\n"
+                    "Reviewer: Independent Auditor\n"
+                    "Derivation: Rigorous mathematical deduction evaluated.\n"
+                    "Objections: Adversarial checks attempted.\n"
+                    "Verdict: DO NOT ACCEPT. The prior version was approved.\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            ok1, msg1, _ = verify_independent_review("CLM-TEST-REFUSAL-AUDIT", spec, repo_root=td)
+            assert ok1 is False, "Explicit refusal verdict 'DO NOT ACCEPT' must be rejected"
+            assert "negative verdict" in msg1.lower() or "refusal" in msg1.lower()
+
+            # Case 2: Matching but nonexistent commit SHA
+            spec_nonexistent = {
+                "claim_id": "CLM-TEST-REFUSAL-AUDIT",
+                "author": "Alice",
+                "git_commit": "deadbeef1234567890abcdef1234567890abcdef"
+            }
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Independent Derivation Review for CLM-TEST-REFUSAL-AUDIT\n"
+                    "Reviewer: Independent Auditor\n"
+                    "Derivation: Rigorous mathematical deduction evaluated.\n"
+                    "Objections: Adversarial checks attempted.\n"
+                    "Verdict: PASSED. Verified completely.\n"
+                    "Commit: deadbeef1234567890abcdef1234567890abcdef\n"
+                )
+            ok2, msg2, _ = verify_independent_review("CLM-TEST-REFUSAL-AUDIT", spec_nonexistent, repo_root=td)
+            assert ok2 is False, "Matching nonexistent commit SHA must be rejected by git verification"
+            assert "nonexistent commit" in msg2.lower()
+
+            # Case 3: Valid approval with real git commit SHA
+            with open(r_file, "w", encoding="utf-8") as f:
+                f.write(
+                    "# Independent Derivation Review for CLM-TEST-REFUSAL-AUDIT\n"
+                    "Reviewer: Independent Auditor\n"
+                    "Derivation: Rigorous mathematical deduction evaluated.\n"
+                    "Objections: Adversarial checks attempted.\n"
+                    "Verdict: PASSED. Verified completely.\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                )
+            ok3, msg3, _ = verify_independent_review("CLM-TEST-REFUSAL-AUDIT", spec, repo_root=td)
+            assert ok3 is True, f"Valid review with existing commit must pass, got: {msg3}"
+
+    def test_25_completion_gate_enforces_evidence_paths_and_rejects_refusals(self):
+        """Invariant 13: Milestone completion gate enforces evidence and non-rejected review status.
+        Rejects:
+        1. Task marked RESOLVED with no declared evidence.
+        2. Task marked RESOLVED with missing evidence file.
+        3. Task marked RESOLVED with review_status: REJECTED.
+        4. Accepts only when all terminal tasks have existing evidence files and non-rejected reviews.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            q_file = os.path.join(td, "queue.json")
+            s_file = os.path.join(td, "state.json")
+            real_evidence_file = os.path.join(td, "real_artifact.json")
+            with open(real_evidence_file, "w", encoding="utf-8") as ef:
+                ef.write('{"status": "OK"}')
+
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {"tr1": {"status": "RESOLVED"}}}, f)
+
+            # Case 1: Task RESOLVED with no evidence
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{"task_id": "T1", "status": "RESOLVED"}]
+                }, f)
+            ok1, msg1, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok1 is False, "Task with no evidence must block completion"
+            assert "no declared evidence" in msg1
+
+            # Case 2: Task RESOLVED with missing evidence file
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{
+                        "task_id": "T2",
+                        "status": "RESOLVED",
+                        "evidence": ["nonexistent_artifact.json"]
+                    }]
+                }, f)
+            ok2, msg2, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok2 is False, "Task with missing evidence file must block completion"
+            assert "missing evidence file" in msg2
+
+            # Case 3: Task RESOLVED but review_status is REJECTED
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{
+                        "task_id": "T3",
+                        "status": "RESOLVED",
+                        "review_status": "REJECTED",
+                        "evidence": [real_evidence_file]
+                    }]
+                }, f)
+            ok3, msg3, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok3 is False, "Task with review_status REJECTED must block completion"
+            assert "rejected/unapproved review status" in msg3
+
+            # Case 4: Fully valid task with existing evidence and accepted review status
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{
+                        "task_id": "T4",
+                        "status": "RESOLVED",
+                        "review_status": "ACCEPTED",
+                        "evidence": [real_evidence_file]
+                    }]
+                }, f)
+            ok4, msg4, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok4 is True, f"Valid task with real evidence must allow completion, got: {msg4}"
+
 

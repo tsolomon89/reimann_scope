@@ -1,16 +1,21 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": null,
+  "active_task_id": "TASK-TC-004",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
       "priority": 1,
       "objective": "Enforce evidence requirements in audit_claim_spec.py and implement adversarial test suite",
       "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
       "open_implication": "Validation tooling allows promotion without rigorous independent derivation artifacts and accepts keyword matches",
       "planned_calculation": "Eliminate normalizations to EXACT/EXTERNAL_ANALYTIC_PROOF, require revision-bound review file with objections and falsification in .agents/claims/reviews/",
       "acceptance_criterion": "test_adversarial_evidence_controls.py passes all 12 injected defect checks",
       "dependencies": [],
+      "evidence": [
+        ".agents/verification/test_adversarial_evidence_controls.py",
+        ".agents/skills/zeta-proof-audit/scripts/audit_claim_spec.py"
+      ],
       "resolution": "Upgraded audit_claim_spec.py (Gates 5, 8, 10, independent review verifier with negative verdict rejection, author self-review detection, and revision binding validation), passed 54/54 gate tests and 12/12 adversarial tests."
     },
     {
@@ -18,44 +23,52 @@
       "priority": 2,
       "objective": "Repair Archimedean dominance, trivial-zero remainder, adaptive acceptance, and column difference calculations in tc/approximation.py",
       "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
       "open_implication": "Defects 4A, 4B, 4C, 4D compromise reported approximation and Weil form evidence",
       "planned_calculation": "Implement full Weil quadratic form evaluation B(f, f), profile-dependent R_triv bound, strict target and refinement policy, common-grid H^1 error, and subspace projection stability",
       "acceptance_criterion": "Defect reproduction tests demonstrate rejection of old code; repaired code passes with verified error bounds and regenerated campaign data",
       "dependencies": ["TASK-TC-001"],
+      "evidence": [
+        "tc/approximation.py",
+        "tests/test_tc_mechanism_discovery.py"
+      ],
       "resolution": "Repairs 4A-4E implemented in tc/approximation.py using authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h; verified error targets, uncertainty triggers, function-space H^1 metrics, and campaign invariants."
     },
     {
       "task_id": "TASK-TC-003",
       "priority": 3,
       "objective": "Investigate legal continuum cancellation directions and full Weil quadratic form spectrum",
-      "status": "RESOLVED",
+      "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
       "open_implication": "Determine which directions survive legal continuum cancellation (sum_K b_K = 0) on grades {-1, -2, -3, -4} after controlling numerical error, and determine the exact sign and spectrum of the full Weil form on that subspace",
       "planned_calculation": "Execute multi-grade cancellation search with zero-sum constraint; evaluate B_arch(f, f) and B_prime(f, f) on the surviving subspace; check for negative Weil witness",
       "acceptance_criterion": "Certified or empirical scoped result registered with exact hypotheses, error margins, and independent review artifact",
       "dependencies": ["TASK-TC-002"],
+      "evidence": [
+        "data/tc_continuum_cancellation_weil_spectrum.json",
+        "tc/approximation.py"
+      ],
       "resolution": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h. Contracted Weil form matrix W_G has positive eigenvalues [1.319e7, 1.379e8, 4.413e9] > 0 with Archimedean dominance ratio 2.40e11:1 on window [8, 20]. Scoped strictly to evaluated configuration; candidate remains strictly OPEN."
     },
     {
       "task_id": "TASK-TC-004",
       "priority": 4,
-      "objective": "Evaluate canonical Weil form across varying window widths and bandwidths to test off-line zero detection",
-      "status": "RESOLVED",
-      "open_implication": "Whether wider windows activating multiple primes (e.g. q=2, 3, 4, 5) or varying bandwidths can produce a negative Weil witness under legal continuum cancellation",
-      "planned_calculation": "Scan windows [5, 25] and [6, 24] with multi-prime convolution pairing under authentic Fourier quadrature and rigorous error controls",
-      "acceptance_criterion": "Contracted Weil form spectrum evaluated under canonical operator definitions with verified quadrature tolerances, keeping candidate open unless rigorously decided",
-      "dependencies": ["TASK-TC-003"],
-      "resolution": "Evaluated canonical Weil spectrum sweep across 9 configurations spanning bandwidths h in {0.02, 0.05, 0.10} and windows [8, 20], [6, 24], [5, 25] on the authentic 4-grade zero-sum family G_K = F_K - F_{-1}. Even on wider windows activating multiple primes (q in {2, 3, 4, 5}), W_G remains strictly positive definite (lambda_min in [2.8864e5, 4.4146e9] > 0). Archimedean background energy dominates prime interactions on compact domains. Off-line zero detection candidate D_F remains strictly OPEN."
+      "objective": "Evaluate canonical Weil form across varying window widths and bandwidths with complete-form prime pairing to test off-line zero detection",
+      "status": "IN_PROGRESS",
+      "open_implication": "Sweep omitted legitimate same-grade prime pairings |log q - log(n_b / n_a)| < 2h by requiring exact integer multiples n_b = q n_a. Complete-form evaluation with all supported pairs must be computed across parameter sweep and evaluated for positivity/witness detection.",
+      "planned_calculation": "Scan windows [5, 25] and [6, 24] with multi-prime convolution pairing under authentic Fourier quadrature including all supported same-grade and cross-grade pairs |Delta t - log q| < 2h",
+      "acceptance_criterion": "Complete prime form evaluated without omitting supported pairs; spectrum artifact regenerated with empirical status, noting that quadrature and interpolation error budgets remain open",
+      "dependencies": ["TASK-TC-003"]
     },
     {
       "task_id": "TASK-TC-005",
       "priority": 5,
-      "objective": "Nontrivial zero spectral tail control and Stieltjes bound research obligation",
-      "status": "RESOLVED",
-      "open_implication": "Arithmetic-spectral explicit formula leaves nontrivial zero tail sum over rho unresolved without rigorous Stieltjes integral bounds",
-      "planned_calculation": "Derive explicit Stieltjes error bound for sum_rho Q_b(rho) Phi_tilde(rho) under Riemann-von Mangoldt zero density N(T)",
-      "acceptance_criterion": "Certified tail bound on nontrivial zeros or formal Lean reduction exposing the exact analytic hypothesis",
-      "dependencies": ["TASK-TC-002"],
-      "resolution": "Derived and certified explicit Riemann-von Mangoldt Stieltjes tail bounds in tc/approximation.py (derive_explicit_stieltjes_nontrivial_zero_tail_bound) using Lehman/Trudgian zero-counting density constants. At T=1000, the tail sum over all infinite critical zeros is certified <= 1.5585e-3, and for off-critical zero (delta=0.2) <= 2.6324e-3. For C^infty test bumps, repeated integration by parts proves super-polynomial decay O(T^{-k+1} log T), certifying unconditional explicit formula truncation without circular RH assumptions."
+      "objective": "Nontrivial zero spectral tail control and repaired Stieltjes bound research obligation",
+      "status": "QUEUED",
+      "open_implication": "Arithmetic-spectral explicit formula requires rigorous Stieltjes integral bounds. Previous derivation used invalid x^{1-beta} weight instead of x^{beta+1}, omitted 0.278 log log T in Trudgian bound, and lacked uniform control over 0 < beta < 1.",
+      "planned_calculation": "Derive corrected Stieltjes tail bound using exact x^{beta+1} weight, full Trudgian (2014) counting envelope, uniform strip supremum over beta in [0, 1], and order-dependent k-th derivative evaluation",
+      "acceptance_criterion": "Certified tail bound on nontrivial zeros strictly exceeding computed direct Mellin evaluations at t=50 (beta=0.5, 0.7) and providing uniform envelope across 0 < beta < 1",
+      "dependencies": ["TASK-TC-002"]
     }
   ]
 }

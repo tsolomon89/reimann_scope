@@ -449,6 +449,33 @@ def audit_claim_specification(raw_spec: Dict[str, Any], repo_root: Optional[str]
     }
 
 
+DEFAULT_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".."))
+
+
+def _git_commit_exists(commit_sha: str, root_dir: Optional[str] = None) -> bool:
+    """Verifies whether a commit SHA actually exists in the git repository."""
+    if not commit_sha or str(commit_sha).lower() == "unknown":
+        return False
+    candidate_roots = [d for d in [root_dir, DEFAULT_REPO_ROOT] if d and os.path.exists(d)]
+    for candidate in candidate_roots:
+        try:
+            res = subprocess.run(
+                ["git", "rev-parse", "--verify", "--quiet", f"{commit_sha}^{{commit}}"],
+                cwd=candidate,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False
+            )
+            if res.returncode == 0:
+                return True
+            if "not a git repository" not in res.stderr.lower():
+                return False
+        except Exception:
+            continue
+    return False
+
+
 def verify_independent_review(
     claim_id: str,
     spec: Dict[str, Any],
@@ -465,25 +492,21 @@ def verify_independent_review(
        - Objections / adversarial challenges / falsification attempts.
        - Clear resolution / verdict.
     4. The review verdict MUST be evaluated:
-       - Explicitly rejects negative verdicts (REJECTED, FAILED, DISAPPROVED, INVALID,
-         UNSOUND, FATAL CIRCULARITY, INCORRECT, UNRESOLVED, CONTRADICTED).
-       - Requires an explicit positive approval verdict (PASSED, APPROVED, ACCEPTED,
-         VERIFIED, CONFIRMED, PROVED, FORMALIZED, VALID).
-    5. Revision binding and consistency:
-       - Must declare valid revision binding: commit SHA, claim file hash, session ID UUID,
-         or explicitly bound claim ID. Generic words like 'date' or 'commit' without a hash are rejected.
-       - If a commit SHA is declared in the review:
-         * If the claim spec specifies a git_commit, they must match (prefix or full SHA).
-           Mismatch indicates a stale review.
-       - If a claim hash is declared in the review, it must match the actual SHA256 of the claim file
-         or a declared artifact hash.
+       - Explicitly rejects negative verdicts and refusals (REJECTED, FAILED, DISAPPROVED, INVALID,
+         UNSOUND, FATAL CIRCULARITY, INCORRECT, UNRESOLVED, CONTRADICTED, DO NOT ACCEPT, NOT ACCEPTED).
+       - Requires a structured positive approval verdict (PASSED, APPROVED, ACCEPTED,
+         VERIFIED, CONFIRMED, PROVED, FORMALIZED, VALID, CERTIFIED).
+    5. Revision and evidence binding:
+       - Declared commit SHAs (in review or spec) MUST actually exist in the git repository.
+       - Stale reviews where review commit does not match spec git_commit are rejected.
+       - Declared claim spec hashes must match actual SHA256.
+       - Reviews must be bound to a valid existing commit, claim hash, session UUID, or actual declared evidence.
     """
     if not claim_id or claim_id == "UNKNOWN":
         return False, "No claim ID specified", {}
 
     if repo_root is None:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        repo_root = os.path.abspath(os.path.join(current_dir, "..", "..", "..", ".."))
+        repo_root = DEFAULT_REPO_ROOT
 
     reviews_dir = os.path.join(repo_root, ".agents", "claims", "reviews")
     review_file = os.path.join(reviews_dir, f"{claim_id}-derivation-review.md")
@@ -499,17 +522,42 @@ def verify_independent_review(
 
     content_lower = content.lower()
 
-    # 1. Explicit negative verdict / fatal circularity / rejection detection
+    # 1. Explicit negative verdict / fatal circularity / refusal detection
     negative_patterns = [
-        r'\b(?:resolution|verdict|status|conclusion|assigned classification)\s*[:*`]+\s*(?:`?(?:REJECTED|FAILED|DISAPPROVED|INVALID|UNRESOLVED|CONTRADICTED|FATAL|UNSOUND|PENDING|NOT APPROVED|NOT PASSED|UNAPPROVED|INCONCLUSIVE|OPEN)\b)',
-        r'\b(?:verdict|resolution|status)\s*[:*`]+\s*[^\n\r]*\b(?:not approved|not passed|unapproved|rejected|failed|pending|inconclusive|unresolved)\b',
+        r'\b(?:resolution|verdict|status|conclusion|assigned classification)\s*[:*`]+\s*(?:`?(?:REJECTED|FAILED|DISAPPROVED|INVALID|UNRESOLVED|CONTRADICTED|FATAL|UNSOUND|PENDING|NOT APPROVED|NOT PASSED|UNAPPROVED|INCONCLUSIVE|OPEN|DO NOT ACCEPT|NOT ACCEPTED|REFUSED)\b)',
+        r'\b(?:verdict|resolution|status)\s*[:*`]+\s*[^\n\r]*\b(?:not approved|not passed|unapproved|rejected|failed|pending|inconclusive|unresolved|do not accept|not accepted|refused)\b',
         r'\bderivation\s*[:*`]+\s*(?:`?(?:INCORRECT|FALSE|UNSOUND|INVALID|FATAL|INCOMPLETE|PENDING)\b)',
-        r'\bobjections?\s*[:*`]+\s*(?:`?(?:FATAL|UNRESOLVED|UNANSWERED|BLOCKING|FATAL CIRCULARITY|NOT EVALUATED)\b)'
+        r'\bobjections?\s*[:*`]+\s*(?:`?(?:FATAL|UNRESOLVED|UNANSWERED|BLOCKING|FATAL CIRCULARITY|NOT EVALUATED)\b)',
+        r'\bdo not accept\b',
+        r'\bnot accepted\b',
+        r'\bdo not approve\b'
     ]
     for pat in negative_patterns:
         neg_m = re.search(pat, content, re.IGNORECASE)
         if neg_m:
             return False, f"Review artifact recorded negative verdict or fatal objection: '{neg_m.group(0).strip()}'", {}
+
+    # Check explicit structured verdict/resolution line for refusal phrases
+    m_verdict = re.search(r'(?:##\s*[^#\n\r]*\b(?:verdict|resolution)\b[^\n\r]*\n+|\b(?:verdict|resolution|conclusion)\s*[:*`]+\s*)([^\n\r]+)', content, re.IGNORECASE)
+    if m_verdict:
+        v_clause = m_verdict.group(1).strip()
+        verdict_refusal_patterns = [
+            r'\bdo\s+not\s+accept\b',
+            r'\bnot\s+accepted\b',
+            r'\bcannot\s+accept\b',
+            r'\bdo\s+not\s+approve\b',
+            r'\bnot\s+approved\b',
+            r'\bdisapproved?\b',
+            r'\brejected?\b',
+            r'\brefused?\b',
+            r'\brefusal\b',
+            r'\bfailed\b',
+            r'\bdo\s+not\s+pass\b',
+            r'\bnot\s+passed\b',
+            r'\bunapproved\b'
+        ]
+        if any(re.search(pat, v_clause, re.IGNORECASE) for pat in verdict_refusal_patterns):
+            return False, f"Review artifact recorded explicit refusal or negative verdict: '{m_verdict.group(0).strip()}'", {}
 
     # Check for substantive sections (reject placeholder / pending content)
     m_deriv = re.search(r'(?:##\s*[^#\n\r]*derivation[^\n\r]*|\bderivation\s*[:*`]+)\s*([^\n\r]+)', content, re.IGNORECASE)
@@ -563,17 +611,23 @@ def verify_independent_review(
         return False, "Review artifact lacks clear resolution / conclusion section", {}
 
     # 4. Require explicit positive approval verdict
-    positive_patterns = [
-        r'\b(?:resolution|verdict|conclusion)\s*[:*`]+\s*[^\n\r]*\b(?<!not\s)(?<!un)(?:passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
-        r'##\s*[^#\n\r]*\b(?:verdict|resolution|formalization)\b[^\n\r]*\n+[^\n\r]*\b(?<!not\s)(?<!un)(?:passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
-        r'\bthe claim is verified\b',
-        r'\bformally proved in lean\b',
-        r'\bformalized\b',
-        r'\bverified successfully\b',
-        r'\b\*\*PASSED\*\*\b'
-    ]
-    if not any(re.search(p, content, re.IGNORECASE) for p in positive_patterns):
-        return False, "Review artifact lacks explicit positive approval verdict (e.g. PASSED, APPROVED, ACCEPTED, VERIFIED)", {}
+    if m_verdict:
+        v_clause = m_verdict.group(1).strip().lower()
+        has_approval_word = any(w in v_clause for w in ["passed", "approved", "accepted", "verified", "confirmed", "formally proved", "proved", "formalized", "valid", "certified"])
+        if not has_approval_word:
+            return False, f"Review artifact verdict line lacks explicit positive approval: '{m_verdict.group(0).strip()}'", {}
+    else:
+        positive_patterns = [
+            r'\b(?:resolution|verdict|conclusion)\s*[:*`]+\s*[^\n\r]*\b(?<!not\s)(?<!un)(?:passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
+            r'##\s*[^#\n\r]*\b(?:verdict|resolution|formalization)\b[^\n\r]*\n+[^\n\r]*\b(?<!not\s)(?<!un)(?:passed|approved|accepted|verified|confirmed|formally proved|proved|formalized|valid)\b',
+            r'\bthe claim is verified\b',
+            r'\bformally proved in lean\b',
+            r'\bformalized\b',
+            r'\bverified successfully\b',
+            r'\b\*\*PASSED\*\*\b'
+        ]
+        if not any(re.search(p, content, re.IGNORECASE) for p in positive_patterns):
+            return False, "Review artifact lacks explicit positive approval verdict (e.g. PASSED, APPROVED, ACCEPTED, VERIFIED)", {}
 
     # 5. Revision binding check and verification
     m_commit = re.search(r'(?:target commit|commit sha|commit|sha|start sha)\s*[:*`]+\s*([0-9a-fA-F]{7,40})', content, re.IGNORECASE)
@@ -581,19 +635,51 @@ def verify_independent_review(
     m_sess = re.search(r'session id\s*[:*`]+\s*([0-9a-fA-F-]{36})', content, re.IGNORECASE)
     has_claim_id_ref = claim_id.lower() in content_lower
 
+    # Commit verification: reject stale reviews and nonexistent commits in git repository
+    rev_commit = m_commit.group(1).lower() if m_commit else ""
+    spec_commit = str(spec.get("git_commit", "")).strip().lower() if spec else ""
+
+    # Stale review check: review commit must match declared spec commit
+    if rev_commit and spec_commit and spec_commit != "unknown":
+        if not (rev_commit.startswith(spec_commit) or spec_commit.startswith(rev_commit)):
+            return False, f"Stale review detected: review commit '{rev_commit}' does not match claim specification commit '{spec_commit}'", {}
+
+    commit_is_valid = False
+    if rev_commit:
+        if not _git_commit_exists(rev_commit, repo_root):
+            return False, f"Nonexistent commit '{rev_commit}': declared review commit does not exist in git repository", {}
+        commit_is_valid = True
+
+    if spec_commit and spec_commit != "unknown":
+        if not _git_commit_exists(spec_commit, repo_root):
+            return False, f"Nonexistent commit '{spec_commit}': declared claim specification git_commit does not exist in git repository", {}
+
+    # Evidence binding: check for reference to declared evidence artifacts
+    proof_art = str(spec.get("proof_artifact", "")).strip() if spec else ""
+    clean_proof_art = os.path.basename(proof_art.split()[0]) if proof_art and proof_art.lower() != "none" else ""
+    comp_ev = spec.get("computational_evidence", []) if spec else []
+    clean_comp_files = []
+    if isinstance(comp_ev, list):
+        for item in comp_ev:
+            if isinstance(item, str) and item.strip():
+                clean_comp_files.append(os.path.basename(item.split(":")[0].strip()))
+
+    has_evidence_ref = bool(
+        (clean_proof_art and clean_proof_art.lower() in content_lower) or
+        any(f.lower() in content_lower for f in clean_comp_files if f)
+    )
+
     has_revision_binding = bool(
-        m_commit or
+        commit_is_valid or
         m_hash or
         m_sess or
-        (has_claim_id_ref and re.search(r'\b[0-9a-fA-F]{7,40}\b', content))
+        (has_claim_id_ref and (has_evidence_ref or re.search(r'\b[0-9a-fA-F]{7,40}\b', content)))
     )
     if not has_revision_binding:
-        return False, "Review artifact is not revision-bound (requires valid commit SHA, claim file hash, or session UUID)", {}
+        return False, "Review artifact is not revision-bound or evidence-bound (requires valid commit SHA, claim file hash, session UUID, or reference to declared proof artifact/evidence)", {}
 
     # 6. Verify declared commit matches spec git_commit (reject stale reviews)
-    spec_commit = str(spec.get("git_commit", "")).strip().lower()
-    if m_commit and spec_commit and spec_commit != "unknown":
-        rev_commit = m_commit.group(1).lower()
+    if rev_commit and spec_commit and spec_commit != "unknown":
         if not (rev_commit.startswith(spec_commit) or spec_commit.startswith(rev_commit)):
             return False, f"Stale review detected: review commit '{rev_commit}' does not match claim specification commit '{spec_commit}'", {}
 
