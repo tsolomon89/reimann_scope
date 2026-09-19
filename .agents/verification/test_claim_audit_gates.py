@@ -40,6 +40,13 @@ class TestClaimAuditGates:
             "exact_conclusion": "Q(F, \\Delta) + Q(F, -\\Delta) = 2|\\Delta|^2",
             "logical_negation": "\\exists F, \\Delta \\in \\mathbb{C} \\text{ s.t. } Q(F, \\Delta) + Q(F, -\\Delta) \\ne 2|\\Delta|^2",
             "epistemic_role": "ALGEBRAIC_IDENTITY",
+            "evidence_scope": "FORMAL_LEAN_PROOF",
+            "exact_or_truncated": "EXACT",
+            "arithmetic_cutoff": "NONE",
+            "spectral_cutoff": "NONE",
+            "integration_domain": "R",
+            "omitted_tail": "NONE",
+            "tail_enclosure": "NONE",
             "dependencies": ["Complex norm squared algebraic expansion"],
             "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean (bilateral_squared_norm_centering_exact_opposite)",
             "falsification_attempts": [

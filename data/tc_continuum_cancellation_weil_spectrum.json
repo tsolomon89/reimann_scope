@@ -1,0 +1,116 @@
+{
+  "schema_version": "2",
+  "run_id": "tc-continuum-cancellation-weil-spectrum",
+  "experiment_id": "tc-continuum-cancellation-weil-spectrum",
+  "title": "TC Continuum Cancellation Surviving Subspace and Weil Quadratic Form Spectrum",
+  "epistemic_class": "falsification_probe",
+  "object_relationship": "genuine_arithmetic_subspace_analysis",
+  "classification": "canonical_experiment",
+  "timestamp": "2026-09-19T12:29:22.252172+00:00",
+  "git_commit": "927321fec13a6a787c8c9cb53e42101cc1b68324",
+  "producing_git_commit": "927321fec13a6a787c8c9cb53e42101cc1b68324",
+  "git_dirty": true,
+  "status": "complete",
+  "criterion_met": true,
+  "summary": {
+    "parameters": {
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "anchor_grade": -1,
+      "difference_grades": [
+        -2,
+        -3,
+        -4
+      ],
+      "bandwidth_h": 0.05,
+      "window": [
+        8.0,
+        20.0
+      ],
+      "grid_points": 801
+    },
+    "subspace_dimension": 3,
+    "gram_H1_singular_values": [
+      13405743.574788336,
+      2883457.9099222855,
+      958811.0120619533
+    ],
+    "numerical_rank": 3,
+    "weil_quadratic_form": {
+      "unique_active_prime": 2,
+      "prime_logarithm": 0.6931471805599453,
+      "prime_form_eigenvalues": [
+        -11281531.372576553,
+        -27310.04160879629,
+        90564.67204029876
+      ],
+      "archimedean_form_eigenvalues": [
+        72124249.34679928,
+        620032447.0020924,
+        17657021115.462173
+      ],
+      "net_weil_form_eigenvalues": [
+        72145718.66828603,
+        619968804.8576592,
+        17668281565.027267
+      ],
+      "is_strictly_positive_definite": true,
+      "minimum_eigenvalue": 72145718.66828603,
+      "archimedean_dominance_ratio": 1635.6503082934748,
+      "negative_witness_exists": false
+    },
+    "minimal_energy_vector": {
+      "normalized_coefficients_b": {
+        "-2": -0.06735431335091449,
+        "-3": -0.6556825322544537,
+        "-4": 0.7520264711892888,
+        "-1": -0.028989625583920597
+      },
+      "is_exact_zero_sum": true,
+      "weil_form_value": 72145718.6682864
+    },
+    "spectral_response": {
+      "critical_line_zeros": [
+        {
+          "gamma": 14.134725,
+          "rho": "(0.5+14.134725j)",
+          "modulus": 0.04842565062352727
+        },
+        {
+          "gamma": 21.02204,
+          "rho": "(0.5+21.02204j)",
+          "modulus": 0.048291648778339705
+        },
+        {
+          "gamma": 25.010858,
+          "rho": "(0.5+25.010858j)",
+          "modulus": 0.04161396283511402
+        },
+        {
+          "gamma": 30.424876,
+          "rho": "(0.5+30.424876j)",
+          "modulus": 0.04788778359496964
+        },
+        {
+          "gamma": 32.935062,
+          "rho": "(0.5+32.935062j)",
+          "modulus": 0.047146144330456115
+        }
+      ],
+      "off_critical_zero": {
+        "rho": "(0.7+14.134725j)",
+        "delta": 0.2,
+        "modulus": 0.1265515070854633,
+        "amplification_ratio": 2.613315576682807
+      }
+    },
+    "mathematical_conclusions": {
+      "status": "REFUTED_WITHIN_SCOPE",
+      "finding": "On the 3-dimensional surviving subspace of legal zero-sum continuum-cancelled combinations across grades {-1, -2, -3, -4} at bandwidth h=0.05 on [8, 20], the reflected Weil quadratic form B(f, f) = B_arch(f, f) - B_prime(f, f) is strictly positive definite (lambda_min = 7.21e7 > 0). The Archimedean continuum background dominates prime-power resonance by over 1500:1. No negative witness exists on this subspace under actual prime-power station constraints."
+    }
+  }
+}

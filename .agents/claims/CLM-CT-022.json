@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-CT-022",
-  "mathematical_statement": "The reported diagonal grade second-variation cross-term X_{zeta,diag}(a, v) = (log tau)^2 [(a^2 - v)S_2(a) - a S_1(a)] has an exact cancellation variance v_*(a) = a^2 - a S_1(a)/S_2(a) such that X_{zeta,diag}(a, v_*(a)) = 0 identically. Because S_2(a) >= (log 2) S_1(a) > 0 for all a > 0, the cancellation variance v_*(a) is strictly positive for all a > 1/log 2. Universal non-vanishing over all a > 0, v >= 0 is false and withdrawn.",
+  "statement": "The reported diagonal grade second-variation cross-term X_{zeta,diag}(a, v) = (log tau)^2 [(a^2 - v)S_2(a) - a S_1(a)] has an exact cancellation variance v_*(a) = a^2 - a S_1(a)/S_2(a) such that X_{zeta,diag}(a, v_*(a)) = 0 identically. Because S_2(a) >= (log 2) S_1(a) > 0 for all a > 0, the cancellation variance v_*(a) is strictly positive for all a > 1/log 2. Universal non-vanishing over all a > 0, v >= 0 is false and withdrawn.",
   "quantified_variables": [
     {
       "name": "a",
@@ -14,6 +14,10 @@
       "description": "Window second moment variance <t^2>_W"
     }
   ],
+  "variable_domains": [
+    "a in Real, a > 1 / log 2",
+    "v in Real, v >= 0"
+  ],
   "hypotheses": [
     "S_1(a) = sum_{n>=2} Lambda(n)^2 n^{-1-2a} log n > 0",
     "S_2(a) = sum_{n>=2} Lambda(n)^2 n^{-1-2a} (log n)^2 > 0",
@@ -21,12 +25,18 @@
     "v_*(a) = a^2 - a (S_1(a) / S_2(a))"
   ],
   "object_studied": "Reported diagonal fragment of the grade-dilated Dirichlet polynomial second variation cross-term",
-  "normalization_and_fourier_convention": "Centered coordinates z = s - 1/2 = a + it; tau = 2pi; Fourier transform hat{W}(xi) = int W(t) e^{-it xi} dt",
+  "fourier_normalization": "Centered coordinates z = s - 1/2 = a + it; tau = 2pi; Fourier transform hat{W}(xi) = int W(t) e^{-it xi} dt",
   "multiplicity_convention": "Standard arithmetic weights Lambda(n)^2",
   "measure_and_window": "Centered normalized probability window W in C_c^infty(R) with variance v = int t^2 W(t) dt",
   "order_of_limits": "Evaluation for fixed positive integer truncation max_n and infinite limit a > 1/2",
   "exact_conclusion": "(a^2 - v_*(a)) S_2(a) - a S_1(a) = 0 and v_*(a) > 0 for all a > 1/log 2; X_{zeta,diag} changes sign across v_*(a)",
   "logical_negation": "For all a > 0 and all v >= 0, (a^2 - v) S_2(a) - a S_1(a) != 0 (FALSIFIED by witness (a, v_*(a)))",
+  "epistemic_role": "ALGEBRAIC_IDENTITY",
+  "evidence_scope": "FORMAL_LEAN_PROOF",
+  "exact_or_truncated": "EXACT",
+  "arithmetic_cutoff": "NONE",
+  "spectral_cutoff": "NONE",
+  "integration_domain": "R",
   "omitted_tail": "NONE",
   "tail_enclosure": "NONE",
   "dependency_claim_ids": [],
@@ -36,7 +46,6 @@
     "Lean 4: cancelling_variance_pos_of_bounds",
     "Lean 4: cancelling_variance_pos_of_log2_bound"
   ],
-  "epistemic_role": "ALGEBRAIC_IDENTITY",
   "proof_artifact": "formal/RiemannScope/CurvatureTransport.lean",
   "falsification_attempts": [
     "Constructed exact algebraic root and equality case cancellation analysis v_*(a) = a^2 - a S_1/S_2",
@@ -46,25 +55,21 @@
     "Proved positive variance realizability via smooth dilation W_lambda(t) = (1/lambda) W_0(t/lambda)",
     "Separated diagonal fragment from complete finite-window off-diagonal terms"
   ],
-  "computational_evidence": "tests/test_bilateral_second_variation.py: TestZetaSpecificGradeJetCrossTerm",
+  "computational_evidence": [
+    "tests/test_bilateral_second_variation.py: TestZetaSpecificGradeJetCrossTerm"
+  ],
   "external_sources": [
-    "Montgomery & Vaughan (1974), Hilbert's inequality, J. London Math. Soc. (2) 8, 73-82",
-    "Titchmarsh (1986), The Theory of the Riemann Zeta-Function, Ch. VII"
+    {
+      "source": "Montgomery & Vaughan (1974), Hilbert's inequality, J. London Math. Soc. (2) 8, 73-82",
+      "theorem": "Theorem 1"
+    },
+    {
+      "source": "Titchmarsh (1986), The Theory of the Riemann Zeta-Function, Ch. VII",
+      "theorem": "Section 7.2"
+    }
   ],
   "remaining_analytic_dependencies": [
     "Full finite-window off-diagonal sum evaluation (OBL-DERIVE-FULL-WINDOWED-ZETA-CROSS-TERM)",
     "Completed xi-function pole and gamma factor jet contributions"
-  ],
-  "gate_audit_status": {
-    "gate_1_object_identity": "PASS - Strictly identified as diagonal fragment of Dirichlet polynomial, not completed zeta",
-    "gate_2_quantifiers": "PASS - Explicit quantifiers: exists v_* > 0 for each a > 1/log 2",
-    "gate_3_negation_first": "PASS - Exact negation falsified by constructive counterexample",
-    "gate_4_symbolic_elimination": "PASS - Affine equation in v solved algebraically with root v_*(a)",
-    "gate_5_dominance_and_boundary": "PASS - Corrected dominance: a^2 strictly dominates -a as a -> infinity",
-    "gate_6_diagonal_offdiagonal": "PASS - Explicitly classified as diagonal-only fragment",
-    "gate_7_interchange": "PASS - Finite algebra; no unjustified analytic limit interchange claimed",
-    "gate_8_independent_derivation": "PASS - SymPy exact rational derivation + independent mpmath evaluation",
-    "gate_9_adversarial_falsification": "PASS - Successfully disproved universal non-vanishing assertion",
-    "gate_10_evidence_classification": "PASS - Exact algebraic reduction proved in Lean 4; numerical tests labelled as regressions"
-  }
+  ]
 }

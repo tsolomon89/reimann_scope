@@ -50,13 +50,13 @@
         "0": 2.2007740827194757e-07
       },
       "column_uncertainty_estimates": {
-        "0": 168789.05244634114,
-        "-1": 174196.7459238004,
-        "-2": 246787.03328958713,
-        "-3": 76190.21565958229,
-        "-4": 9353.122086038638
+        "0": 10115446.984240131,
+        "-1": 4950799.488667023,
+        "-2": 2294598.1255724565,
+        "-3": 837717.3515768771,
+        "-4": 359304.81553163787
       },
-      "propagated_uncertainty_bound": 0.95001990352417,
+      "propagated_uncertainty_bound": 12.899277764755663,
       "uncertainty_classification": "EMPIRICAL_DISCRETIZATION_UNCERTAINTY_ESTIMATE"
     },
     "mesh_stability": {
@@ -64,10 +64,10 @@
       "medium_grid_points": 269,
       "coarse_grid_points": 132,
       "singular_value_discrepancies_fine_vs_med": [
-        458381.19336874783,
-        204250.3538862113,
-        214100.70183247048,
-        25606.240127230412
+        458381.1933687441,
+        204250.35388621595,
+        214100.70183247095,
+        25606.240127229947
       ],
       "singular_value_discrepancies_fine_vs_coarse": [
         2572066.4301579893,
@@ -76,11 +76,19 @@
         41400.078009260586
       ],
       "relative_discrepancies_fine_vs_med": [
-        0.016349413753942565,
-        0.02963106661804183,
-        0.0772168261504232,
-        0.026862133487946832
+        0.016349413753942433,
+        0.029631066618042507,
+        0.07721682615042337,
+        0.026862133487946346
       ],
+      "gram_entry_differences": {
+        "max_abs_difference": 9817211258614.406,
+        "relative_frobenius_difference": 0.03383907568590276
+      },
+      "subspace_projection_stability": {
+        "subspace_dimension": 3,
+        "projection_difference_frobenius": 0.0066162155230661025
+      },
       "directions_stable_under_refinement": false
     },
     "research_findings": {
@@ -133,12 +141,12 @@
         "0": 1.1908920624632577e-08
       },
       "column_uncertainty_estimates": {
-        "0": 23067298.729779243,
-        "-1": 5303811.908931345,
-        "-2": 14360322.604076535,
-        "-3": 1651026.7955967188
+        "0": 393850224.0901378,
+        "-1": 225196653.51172954,
+        "-2": 100290441.29657812,
+        "-3": 41518789.411362536
       },
-      "propagated_uncertainty_bound": 1.120506986420655,
+      "propagated_uncertainty_bound": 15.485287728873292,
       "uncertainty_classification": "EMPIRICAL_DISCRETIZATION_UNCERTAINTY_ESTIMATE"
     },
     "mesh_stability": {
@@ -160,6 +168,14 @@
         0.024716515374732913,
         0.20230487318045398
       ],
+      "gram_entry_differences": {
+        "max_abs_difference": 1.8328190720345536e+16,
+        "relative_frobenius_difference": 0.13881841368686856
+      },
+      "subspace_projection_stability": {
+        "subspace_dimension": 2,
+        "projection_difference_frobenius": 0.00731622853580113
+      },
       "directions_stable_under_refinement": false
     },
     "research_findings": {
@@ -212,12 +228,12 @@
         "-1": -1.7745609690089356e-08
       },
       "column_uncertainty_estimates": {
-        "-1": 174196.74592380133,
-        "-2": 246787.03328958713,
-        "-3": 76190.21565958229,
-        "-4": 9353.122086038755
+        "-1": 4950799.488667023,
+        "-2": 2294598.125572456,
+        "-3": 837717.3515768771,
+        "-4": 359304.81553163787
       },
-      "propagated_uncertainty_bound": 0.8957411612330722,
+      "propagated_uncertainty_bound": 10.385382667531823,
       "uncertainty_classification": "EMPIRICAL_DISCRETIZATION_UNCERTAINTY_ESTIMATE"
     },
     "mesh_stability": {
@@ -226,7 +242,7 @@
       "coarse_grid_points": 132,
       "singular_value_discrepancies_fine_vs_med": [
         399695.64387884736,
-        224641.85544086527,
+        224641.8554408648,
         24844.13102730713
       ],
       "singular_value_discrepancies_fine_vs_coarse": [
@@ -236,9 +252,17 @@
       ],
       "relative_discrepancies_fine_vs_med": [
         0.028988035979832634,
-        0.08050621057563356,
+        0.0805062105756334,
         0.026034687003070937
       ],
+      "gram_entry_differences": {
+        "max_abs_difference": 4843670457278.328,
+        "relative_frobenius_difference": 0.059313955748994264
+      },
+      "subspace_projection_stability": {
+        "subspace_dimension": 2,
+        "projection_difference_frobenius": 0.006001889206813094
+      },
       "directions_stable_under_refinement": false
     },
     "research_findings": {
@@ -269,13 +293,18 @@
       "resonance_peak_shift": 1.1102230246251565e-16,
       "is_exact_log2_resonance": true,
       "bumps_overlap_in_space": false,
-      "prime_cross_weight_magnitude": 8.990602261920954e-07
+      "prime_cross_weight_magnitude": 8.990602261920954e-07,
+      "B_prime_form_evaluated": 7.983543615839302e-06,
+      "B_arch_form_lower_bound": 0.5495920225921638,
+      "net_weil_form_margin": 0.5495840390485479
     },
     "positivity_conclusion": {
       "same_grade_resonance_confirmed": true,
       "proves_negativity_of_B": false,
       "archimedean_diagonal_dominates": true,
-      "reason": "At K=-3, active prime powers 2048 and 4096 in [8, 20] have exact ratio 2 and separation log(2), producing a genuine same-grade prime resonance at q=2 in the reflected Weil prime form. However, the Archimedean diagonal term strictly dominates the negative prime contribution. Thus, the existence of this resonance does not prove negativity of B(f, f)."
+      "evidence_scope": "EMPIRICAL_TWO_STATION_VECTOR_SIGN",
+      "subspace_positivity_scope": "SCOPED_TO_EVALUATED_TWO_BUMP_VECTOR: Positivity of B(f, f) at this specific test vector does NOT prove positive definiteness of the full subspace or infinite family. An analytical lower bound across the full legal space remains an open investigation.",
+      "reason": "At K=-3, active prime powers 2048 and 4096 in [8, 20] produce an exact log(2) resonance at q=2 with B_prime = 7.983544e-06. The evaluated Archimedean contribution B_arch >= 5.495920e-01 strictly exceeds B_prime by margin 5.495840e-01 > 0. The arbitrary constant-50 comparison has been removed; genuine quadratic form evaluation confirms B(f, f) > 0 on this vector."
     }
   },
   "arithmetic_spectral_explicit_formula": {
@@ -293,6 +322,14 @@
       "-1": -0.5,
       "-2": -0.3,
       "-3": -0.2
+    },
+    "test_profile": {
+      "name": "canonical_bump_profile",
+      "support": [
+        2.0,
+        5.0
+      ],
+      "amplitude_norm": 1.0
     },
     "online_zero_responses": [
       {
@@ -378,46 +415,64 @@
           "k": 1,
           "pole_s": -2,
           "Q_b_value": 0.9979793902367988,
-          "geometric_decay_factor": 0.025330295910584444
+          "Phi_tilde_bound": 0.375,
+          "summand_bound": 0.37575772866120044
         },
         {
           "k": 2,
           "pole_s": -4,
           "Q_b_value": 0.9999489380644623,
-          "geometric_decay_factor": 0.000641623890917771
+          "Phi_tilde_bound": 0.09375,
+          "summand_bound": 0.09375478705645668
         },
         {
           "k": 3,
           "pole_s": -6,
           "Q_b_value": 0.9999987066633045,
-          "geometric_decay_factor": 1.6252523020247696e-05
+          "Phi_tilde_bound": 0.0234375,
+          "summand_bound": 0.0234375303125788
         },
         {
           "k": 4,
           "pole_s": -8,
           "Q_b_value": 0.9999999672394483,
-          "geometric_decay_factor": 4.1168121739645977e-07
+          "Phi_tilde_bound": 0.005859375,
+          "summand_bound": 0.005859375191956358
         },
         {
           "k": 5,
           "pole_s": -10,
           "Q_b_value": 0.9999999991701656,
-          "geometric_decay_factor": 1.042800705748197e-08
+          "Phi_tilde_bound": 0.00146484375,
+          "summand_bound": 0.0014648437512155778
         }
       ],
-      "tail_bound_k_gt_5": 5.420184979904716e-10,
+      "tail_bound_k_gt_5": 0.0004882812500077468,
+      "full_R_triv_upper_bound": 0.5007625462234156,
+      "tail_bound_components_by_grade": {
+        "0": 0.00048828125,
+        "-1": 7.746793394488544e-15,
+        "-2": 1.9419840450616696e-25,
+        "-3": 5.441870533932078e-36
+      },
       "is_exponentially_convergent": true,
-      "convergence_rate": "Geometric decay ~ (4*pi^2)^{-k} ~= 39.48^{-k}"
+      "geometric_decay_mechanism": "Decay is governed by (a_K / A)^{2k} where A = 2.0 > 1. For K=0, a_0=1, ratio is 1/A = 0.5000 < 1, guaranteeing geometric convergence. For K < 0, a_K = tau^K, decay is strictly faster.",
+      "reproduced_K0_geometric_failure": {
+        "Q_b_limit_as_k_to_infty": 1.0,
+        "Q_b_decays_alone_without_profile": false,
+        "note": "When K=0 and b_0 != 0, Q_b(-2k) tends to b_0 and does NOT decay geometrically by itself. Geometric convergence of the trivial-zero remainder requires the profile transform Phi_tilde(-2k)."
+      }
     },
-    "higher_prime_remainder": {
-      "formula": "R_higher(a_K, w) = sum_{p} sum_{r >= 2} log(p) * w(a_K * p^r). Because w is supported in [A, B], only prime powers with p^r in [a_K^{-1} A, a_K^{-1} B] contribute. For any integer grade K, this sum is strictly finite, bounded by O(tau^{-K/2} log(tau^{-K})).",
-      "is_finite_sum": true,
-      "order_of_magnitude": "O(tau^{-min(grades)/2})"
+    "prime_power_measure_identity": {
+      "formula": "mu_K = sum_{n >= 2} Lambda(n) delta_{a_K n}",
+      "note": "All prime powers p^r (r >= 1) carry von Mangoldt weights Lambda(p^r) = log(p) and already belong to the canonical sum. No separate higher-prime-power remainder is omitted from the completed explicit formula."
     },
     "spectral_research_conclusions": {
       "finite_spectral_interpolation_status": "POSSIBLE_VIA_VANDERMONDE",
       "infinite_spectrum_isolation_status": "OPEN_RESEARCH_PROBLEM",
-      "can_off_critical_zero_dominate_compensation": "While Q_b(rho) amplifies an off-critical zero by tau^{|K|*delta} relative to individual on-line zeros, the sum over all zeros sum_rho Q_b(rho) Phi_tilde(rho) includes an infinite sequence of critical zeros. Neither compact support nor the uncertainty principle proves an obstruction to legal cancellation. The question of whether legal TC coefficients can dominate all compensating terms remains strictly OPEN."
+      "nontrivial_zero_tail_status": "UNRESOLVED_REQUIRES_STIELTJES_BOUND",
+      "missing_estimate": "The nontrivial zero tail -sum_{|gamma| > T} Q_b(rho) Phi_tilde(rho) is bounded by O((log T)/T) via Stieltjes counting, but requires explicit uniform constants across grades before asserting complete spectral compensation.",
+      "can_off_critical_zero_dominate_compensation": "While Q_b(rho) amplifies an off-critical zero by tau^{|K|*delta} relative to individual on-line zeros, the sum over all zeros sum_rho Q_b(rho) Phi_tilde(rho) includes an infinite sequence of critical zeros. Controlling the trivial-zero remainder alone does not complete spectral compensation."
     }
   },
   "adaptive_diagonal_search": {
@@ -446,10 +501,10 @@
         "target_satisfied": false,
         "decisions": [
           "Accepted bandwidth h=0.0200 with E_smooth_relative=0.4479 < 0.5000",
-          "Rejected grade K=0 (E_arith_rel=9761.94 >= 0.50); deepening K",
-          "Rejected grade K=-1 (E_arith_rel=5831.76 >= 0.50); deepening K",
-          "Rejected grade K=-2 (E_arith_rel=2400.65 >= 0.50); deepening K",
-          "Rejected grade K=-3 (E_arith_rel=1048.92 >= 0.50); deepening K"
+          "Rejected grade K=0 (E_total_rel=9761.9423 >= target 1.0000); deepening K",
+          "Rejected grade K=-1 (E_total_rel=5831.7582 >= target 1.0000); deepening K",
+          "Rejected grade K=-2 (E_total_rel=2400.6503 >= target 1.0000); deepening K",
+          "Rejected grade K=-3 (E_total_rel=1048.9257 >= target 1.0000); deepening K"
         ],
         "best_evaluation": {
           "K": -3,
@@ -505,32 +560,40 @@
         "E_smooth_relative": 0.6464625563098423
       },
       {
-        "reason": "Arithmetic discrepancy E_arith_rel=9761.9441 >= half-target 0.5000",
+        "reason": "E_total_rel=9761.9423 >= target 1.0000",
         "K": 0,
         "h": 0.02,
         "E_arith_relative": 9761.944104847154,
-        "E_total_relative": 9761.942328484614
+        "E_smooth_relative": 0.4478904485797069,
+        "E_total_relative": 9761.942328484614,
+        "rel_uncertainty": 0.07171966640628186
       },
       {
-        "reason": "Arithmetic discrepancy E_arith_rel=5831.7588 >= half-target 0.5000",
+        "reason": "E_total_rel=5831.7582 >= target 1.0000",
         "K": -1,
         "h": 0.02,
         "E_arith_relative": 5831.758773095078,
-        "E_total_relative": 5831.758154399315
+        "E_smooth_relative": 0.4478904485797069,
+        "E_total_relative": 5831.758154399315,
+        "rel_uncertainty": 0.027603121632448078
       },
       {
-        "reason": "Arithmetic discrepancy E_arith_rel=2400.6518 >= half-target 0.5000",
+        "reason": "E_total_rel=2400.6503 >= target 1.0000",
         "K": -2,
         "h": 0.02,
         "E_arith_relative": 2400.6517738961984,
-        "E_total_relative": 2400.650292713409
+        "E_smooth_relative": 0.4478904485797069,
+        "E_total_relative": 2400.650292713409,
+        "rel_uncertainty": 0.18155127709675004
       },
       {
-        "reason": "Arithmetic discrepancy E_arith_rel=1048.9248 >= half-target 0.5000",
+        "reason": "E_total_rel=1048.9257 >= target 1.0000",
         "K": -3,
         "h": 0.02,
         "E_arith_relative": 1048.9247906026526,
-        "E_total_relative": 1048.9256732798262
+        "E_smooth_relative": 0.4478904485797069,
+        "E_total_relative": 1048.9256732798262,
+        "rel_uncertainty": 0.04777144736056304
       }
     ],
     "resource_costs": {
@@ -557,7 +620,7 @@
       "h_002_directions_stable": false,
       "moving_anchor_neg1_directions_stable": false
     },
-    "resonance_finding": "At K=-3, active prime powers 2048 and 4096 in [8, 20] have exact ratio 2 and separation log(2), producing a genuine same-grade prime resonance at q=2 in the reflected Weil prime form. However, the Archimedean diagonal term strictly dominates the negative prime contribution. Thus, the existence of this resonance does not prove negativity of B(f, f).",
+    "resonance_finding": "At K=-3, active prime powers 2048 and 4096 in [8, 20] produce an exact log(2) resonance at q=2 with B_prime = 7.983544e-06. The evaluated Archimedean contribution B_arch >= 5.495920e-01 strictly exceeds B_prime by margin 5.495840e-01 > 0. The arbitrary constant-50 comparison has been removed; genuine quadratic form evaluation confirms B(f, f) > 0 on this vector.",
     "spectral_finding": "Integer multiples K * log(tau) are mutually commensurate with rational ratios K/J. Transcendence of tau guarantees that tau^K is irrational for K != 0, but does not make K * log(tau) incommensurate. The spectral filter Q_b(rho) is an authentic single-variable Laurent polynomial P(z) with P(1) = 0.",
     "adaptive_diagonal_finding": "Step-by-step adaptive decisions successfully isolate smoothing bias from arithmetic discrepancy. While smoothing bias contracts monotonically with h, bump derivative scaling ||psi_h|| ~ h^(-7/2) amplifies atomic differences, requiring K to advance substantially faster than h. Existential diagonal convergence is analytically guaranteed, while finite bounded scans encounter a resource ceiling that is computational rather than theoretical."
   }

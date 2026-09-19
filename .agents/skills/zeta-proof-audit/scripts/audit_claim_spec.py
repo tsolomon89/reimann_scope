@@ -120,28 +120,21 @@ def normalize_spec(spec: Dict[str, Any]) -> Dict[str, Any]:
                 normalized["variable_domains"] = domains
     if "primary_evidence_scope" in normalized and "evidence_scope" not in normalized:
         normalized["evidence_scope"] = normalized["primary_evidence_scope"]
-    # Defaults for older specs to maintain schema validity if omitted
+    # Set missing evidence fields explicitly to UNKNOWN so missing information is exposed, never manufactured
     if "evidence_scope" not in normalized:
-        # Infer scope based on epistemic role / proof artifact
-        role = normalized.get("epistemic_role", "")
-        if "lean" in str(normalized.get("proof_artifact", "")).lower():
-            normalized["evidence_scope"] = "FORMAL_LEAN_PROOF" if role == "ALGEBRAIC_IDENTITY" else "FINITE_EXACT_ALGEBRA"
-        elif role == "NO_GO_COMPONENT":
-            normalized["evidence_scope"] = "COUNTEREXAMPLE"
-        else:
-            normalized["evidence_scope"] = "EXTERNAL_ANALYTIC_PROOF"
+        normalized["evidence_scope"] = "UNKNOWN"
     if "exact_or_truncated" not in normalized:
-        normalized["exact_or_truncated"] = "EXACT"
+        normalized["exact_or_truncated"] = "UNKNOWN"
     if "arithmetic_cutoff" not in normalized:
-        normalized["arithmetic_cutoff"] = "NONE"
+        normalized["arithmetic_cutoff"] = "UNKNOWN"
     if "spectral_cutoff" not in normalized:
-        normalized["spectral_cutoff"] = "NONE"
+        normalized["spectral_cutoff"] = "UNKNOWN"
     if "integration_domain" not in normalized:
-        normalized["integration_domain"] = "R"
+        normalized["integration_domain"] = "UNKNOWN"
     if "omitted_tail" not in normalized:
-        normalized["omitted_tail"] = "NONE"
+        normalized["omitted_tail"] = "UNKNOWN"
     if "tail_enclosure" not in normalized:
-        normalized["tail_enclosure"] = "NONE"
+        normalized["tail_enclosure"] = "UNKNOWN"
     return normalized
 
 
@@ -157,10 +150,13 @@ def audit_claim_specification(raw_spec: Dict[str, Any], repo_root: Optional[str]
 
     # --- Schema Validation ---
     for field in MANDATORY_FIELDS:
-        if field not in spec or spec[field] is None:
+        val = spec.get(field)
+        if field not in spec or val is None:
             violations.append(f"Missing mandatory field: '{field}'")
+        elif val == "UNKNOWN":
+            violations.append(f"Gate 10 [Evidence Classification] VIOLATION: Mandatory field '{field}' has unspecified value 'UNKNOWN'. Missing evidence cannot be manufactured.")
         elif field in STRICT_NON_EMPTY_FIELDS:
-            if isinstance(spec[field], (str, list, dict)) and len(spec[field]) == 0:
+            if isinstance(val, (str, list, dict)) and len(val) == 0:
                 violations.append(f"Empty mandatory field: '{field}'")
 
     # Normalize text fields for case-insensitive keyword inspection
@@ -274,9 +270,30 @@ def audit_claim_specification(raw_spec: Dict[str, Any], repo_root: Optional[str]
         passed_gates.append("Gate 4: Symbolic Elimination & Equality-Case Audit")
 
     # --- Gate 5: Dominance and Boundary Audit ---
-    has_boundary_check = ("boundary" in fals_str or "asymptotic" in fals_str or "limit" in fals_str or "dominance" in fals_str or "extreme" in fals_str or "tail" in fals_str)
-    if not has_boundary_check:
-        warnings.append("Gate 5 [Dominance & Boundary] WARNING: No explicit boundary/asymptotic dominance audit recorded.")
+    fake_boundary_phrases = [
+        "no boundary", "boundary not checked", "boundary omitted",
+        "without boundary check", "without boundary audit", "without boundary analysis",
+        "not investigated", "none (only sampled", "boundary audit pending", "no asymptotic",
+        "boundary check not"
+    ]
+    is_fake_boundary = any(fp in fals_str for fp in fake_boundary_phrases)
+
+    boundary_substance_terms = [
+        "->", "\\to", "asymptotic", "dominance", "dominates", "limit",
+        "expansion", "growth", "o(", "o(1)", "infinity", "\\infty",
+        "boundary asymptotic", "extreme aspect", "power", "decay", "residue",
+        "boundary limit", "endpoint", "tail", "envelope", ">=", "<=", "divergence"
+    ]
+    has_substantive_boundary = (not is_fake_boundary) and any(bt in fals_str for bt in boundary_substance_terms) and any(k in fals_str for k in ["boundary", "asymptotic", "limit", "dominance", "tail", "extreme"])
+
+    needs_boundary = ("\\to" in stmt or "\\infty" in stmt or "limit" in stmt or "asymptotic" in stmt or
+                      "domain" in stmt or "r" in int_domain.lower() or "[0," in str(spec.get("variable_domains", "")).lower() or
+                      "\\forall" in stmt or "for all" in stmt or "order_of_limits" in spec)
+
+    if is_fake_boundary:
+        violations.append("Gate 5 [Dominance & Boundary] VIOLATION: Explicitly disclaimed or fake boundary check recorded.")
+    elif not has_substantive_boundary:
+        warnings.append("Gate 5 [Dominance & Boundary] WARNING: No explicit substantive boundary/asymptotic dominance audit recorded.")
     else:
         passed_gates.append("Gate 5: Dominance and Boundary Audit")
 
@@ -325,8 +342,27 @@ def audit_claim_specification(raw_spec: Dict[str, Any], repo_root: Optional[str]
     if "residual_as_error" in comp_ev_str or ("diff_direct_vs_sum" in comp_ev_str and "radius" in comp_ev_str) or "abs(i_direct - i_sum)" in comp_ev_str:
         violations.append("Gate 8 [Certification] VIOLATION: Algebraic decomposition residual (|I_direct - I_sum|) used as numerical quadrature/tail error estimate.")
 
-    if len(spec.get("dependencies", [])) < 1 and not spec.get("external_sources"):
-        warnings.append("Gate 8 [Independent Derivation] WARNING: No independent external verification source or dual derivation path cited.")
+    # Check 8C: Require substantive independent derivation or external literature verification
+    has_external_literature = bool(spec.get("external_sources")) and any(
+        (isinstance(s, dict) and s.get("source") and (s.get("theorem") or s.get("chapter") or s.get("page") or s.get("section"))) or
+        (isinstance(s, str) and len(s) > 10 and any(k in s.lower() for k in ["theorem", "1859", "1914", "1936", "1974", "1986", "edwards", "titchmarsh", "hardy", "riemann"]))
+        for s in spec.get("external_sources", [])
+    )
+    has_dual_derivation = (
+        bool(proof_art and not proof_art.lower().startswith("none")) and
+        bool(spec.get("computational_evidence")) and
+        any(k in proof_art.lower() for k in ["sympy", "lean", "exact", "mathlib", "curvaturetransport.lean", "grade.lean"])
+    )
+    cid = str(spec.get("claim_id", "")).strip()
+    review_path = os.path.join(repo_root or ".", ".agents", "claims", "reviews", f"{cid}-derivation-review.md")
+    has_review_artifact = os.path.exists(review_path)
+
+    if not (has_external_literature or has_dual_derivation or has_review_artifact):
+        violations.append(
+            "Gate 8 [Independent Derivation] VIOLATION: Claim lacks independent external verification "
+            "(external peer-reviewed literature with citation/theorem), dual derivation paths (symbolic + verified computation), "
+            "or an independent derivation review artifact in .agents/claims/reviews/."
+        )
     else:
         passed_gates.append("Gate 8: Independent Derivation Audit")
 
@@ -387,14 +423,105 @@ def audit_claim_specification(raw_spec: Dict[str, Any], repo_root: Optional[str]
         passed_gates.append("Gate 10: Evidence Classification Audit")
 
     status = "FAIL" if violations else "PASS"
+    schema_status = "FAIL" if any("Missing mandatory field" in v or "Empty mandatory field" in v or "UNKNOWN" in v for v in violations) else "PASS"
+
+    cid = str(spec.get("claim_id", "")).strip()
+    review_ok, review_msg, review_details = verify_independent_review(cid, spec, repo_root=repo_root)
+
+    if status == "PASS" and review_ok:
+        math_review_status = "INDEPENDENT_MATHEMATICAL_AUDIT_PASSED"
+    elif status == "PASS":
+        math_review_status = "AWAITING_INDEPENDENT_REVIEW"
+    else:
+        math_review_status = "FAIL"
+
     return {
         "status": status,
+        "schema_validation": schema_status,
+        "mathematical_review_status": math_review_status,
         "claim_id": spec.get("claim_id"),
         "passed_gates": passed_gates,
         "violations": violations,
         "warnings": warnings,
+        "independent_review": review_details,
+        "review_message": review_msg,
         "gate_summary": f"Passed {len(passed_gates)}/10 gates with {len(violations)} violations and {len(warnings)} warnings."
     }
+
+
+def verify_independent_review(
+    claim_id: str,
+    spec: Dict[str, Any],
+    repo_root: Optional[str] = None
+) -> Tuple[bool, str, Dict[str, Any]]:
+    """
+    Verifies that a claim has an independent mathematical review artifact in .agents/claims/reviews/.
+    Enforces that:
+    1. The review artifact exists at .agents/claims/reviews/<claim_id>-derivation-review.md.
+    2. The review is revision-bound (contains commit SHA, session ID, or claim ID).
+    3. The review contains required substantive sections (derivation/proof, objections/adversarial challenges, resolution).
+    4. The review is independent: rejects author self-review.
+    """
+    if not claim_id or claim_id == "UNKNOWN":
+        return False, "No claim ID specified", {}
+
+    if repo_root is None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        repo_root = os.path.abspath(os.path.join(current_dir, "..", "..", "..", ".."))
+
+    reviews_dir = os.path.join(repo_root, ".agents", "claims", "reviews")
+    review_file = os.path.join(reviews_dir, f"{claim_id}-derivation-review.md")
+
+    if not os.path.exists(review_file):
+        return False, f"Missing independent review artifact at '{review_file}'", {}
+
+    try:
+        with open(review_file, "r", encoding="utf-8") as f:
+            content = f.read()
+    except Exception as e:
+        return False, f"Could not read review artifact: {e}", {}
+
+    content_lower = content.lower()
+
+    # 1. Author self-review / self-certification detection
+    author = str(spec.get("author", "")).strip().lower()
+    if author and author in content_lower and ("self-review" in content_lower or "author review" in content_lower):
+        return False, "Self-review detected: author cannot approve their own claim", {}
+    if "self-review" in content_lower or "self-certification" in content_lower:
+        return False, "Self-certification detected: review must be independent", {}
+
+    # 2. Check for required substantive sections
+    has_derivation = any(k in content_lower for k in ["derivation", "proof", "analytical", "symbolic", "mathematical"])
+    has_objections = any(k in content_lower for k in ["objection", "adversarial", "challenge", "falsification", "counterexample", "zero-crossing", "barrier", "obstruction", "rigidity"])
+    has_resolution = any(k in content_lower for k in ["resolution", "conclusion", "verified", "status", "proved", "confirmed", "formalized"])
+
+    if not has_derivation:
+        return False, "Review artifact lacks derivation / proof evaluation section", {}
+    if not has_objections:
+        return False, "Review artifact lacks objections / adversarial challenge / falsification section", {}
+    if not has_resolution:
+        return False, "Review artifact lacks clear resolution / conclusion section", {}
+
+    # 3. Revision binding check
+    has_revision_binding = bool(
+        re.search(r'[0-9a-f]{7,40}', content) or
+        "session id" in content_lower or
+        "commit" in content_lower or
+        "sha" in content_lower or
+        "date" in content_lower or
+        claim_id.lower() in content_lower
+    )
+    if not has_revision_binding:
+        return False, "Review artifact is not revision-bound (missing commit SHA, session ID, or claim hash)", {}
+
+    details = {
+        "review_file": review_file,
+        "is_revision_bound": has_revision_binding,
+        "has_objections": has_objections,
+        "has_derivation": has_derivation,
+        "has_resolution": has_resolution
+    }
+    return True, "Independent review verified successfully", details
 
 
 def resolve_dependency_claim(dep_id: str, repo_root: Optional[str] = None) -> Optional[Dict[str, Any]]:
@@ -726,10 +853,12 @@ def cross_check_claim_register(repo_root: str, verify_git_baseline: bool = True)
             try:
                 with open(spec_file, "r", encoding="utf-8") as sf:
                     spec = json.load(sf)
-                res = audit_claim_specification(spec)
+                res = audit_claim_specification(spec, repo_root=repo_root)
                 if res["status"] == "PASS":
                     audited_terminal_claims += 1
                     passed.append(f"{raw_cid} (Status: {status}) -> SPECIFICATION_SCHEMA_PASSED (10/10 gates).")
+                    if "INDEPENDENT_MATHEMATICAL_AUDIT_PASSED" in status_upper and res["mathematical_review_status"] != "INDEPENDENT_MATHEMATICAL_AUDIT_PASSED":
+                        errors.append(f"UNVERIFIED_MATHEMATICAL_AUDIT_VIOLATION: Claim {raw_cid} asserts INDEPENDENT_MATHEMATICAL_AUDIT_PASSED, but independent review failed: {res.get('review_message')}")
                 else:
                     missing_specifications += 1
                     errors.append(f"{raw_cid} specification failed gate audit: {res['violations']}")

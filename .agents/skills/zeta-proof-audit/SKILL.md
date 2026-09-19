@@ -82,9 +82,10 @@ If the target expression is algebraic or affine in any parameter (e.g. affine in
 
 ### Gate 5: Dominance and Boundary Audit
 Audit all parameter boundaries ($a \to 0^+$, $a \to \infty$, $v \to 0$, $v \to \infty$):
-* Compute small-parameter and large-parameter asymptotic expansions.
+* Compute small-parameter and large-parameter asymptotic expansions or tail enclosures.
 * Identify which power actually dominates (e.g. quadratic $a^2$ vs linear $a$).
 * Ensure endpoint behaviors are not fallaciously assumed to hold across the entire interior.
+* **Failure mode**: Mentioning the word "boundary" or claiming "no boundary divergence" without an explicit limit, asymptotic expansion, or verified tail bound.
 
 ### Gate 6: Diagonal / Off-Diagonal Audit
 For every inner product, mean square, or quadratic functional of Dirichlet series:
@@ -98,7 +99,8 @@ $$\frac{d}{dh} \int W(t) |F_h(t)|^2 dt, \quad \int \sum \leftrightarrow \sum \in
 Record the dominating function, uniform convergence theorem, or Sobolev bound justifying the interchange.
 
 ### Gate 8: Independent Derivation Audit
-Derive the decisive expression by two independent routes (e.g., frequency-domain Fourier transform vs time-domain differential operator, or algebraic expansion vs contour integration). Tests must not calculate expected values by calling the same code under test.
+Derive the decisive expression by two independent routes (e.g., frequency-domain Fourier transform vs time-domain differential operator, or algebraic expansion vs contour integration) or cite external peer-reviewed literature with theorem number. Tests must not calculate expected values by calling the same code under test.
+* **Failure mode**: Satisfying Gate 8 merely by listing internal dependencies without external literature, dual derivation, or an independent review artifact.
 
 ### Gate 9: Adversarial Falsification Audit
 Construct adversarial test cases:
@@ -107,10 +109,11 @@ Construct adversarial test cases:
 * Non-Euler Dirichlet series (Davenport-Heilbronn) to test if Euler product is truly load-bearing.
 * Off-line synthetic zeros ($\delta \ne 0$).
 
-### Gate 10: Evidence Classification Audit
-Strictly distinguish proof from computation:
-* Floating-point checks, high-precision Arb evaluations, and passing test grids are **numerical evidence**, never mathematical proofs.
-* Proof requires formal symbolic reduction or certified Lean 4 deduction.
+### Gate 10: Evidence Classification & Promotion Audit
+Strictly distinguish proof from computation and enforce the dual status pipeline:
+* `SPECIFICATION_SCHEMA_PASSED`: Automated structural validation confirming the 19 mandatory fields, data types, domains, and basic consistency.
+* `INDEPENDENT_MATHEMATICAL_AUDIT_PASSED`: Full verification requiring an independent review artifact in `.agents/claims/reviews/<CLAIM_ID>-derivation-review.md` bound to revision digests, explicit objections, attempted falsification, and formal Lean 4 verification (0 sorry) or certified interval arithmetic.
+* Missing evidence fields normalized to `UNKNOWN` strictly prevent promotion. Self-certification or author-written approval flags are rejected.
 
 ---
 

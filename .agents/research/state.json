@@ -1,0 +1,49 @@
+{
+  "mission": "Transcendental Continuation (TC) Autonomous Research Mission",
+  "active_commit": "927321fec13a6a787c8c9cb53e42101cc1b68324",
+  "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
+  "primary_reductio_objective": "H ==> exists K != J, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
+  "current_phase": "POST_REPAIR_RESEARCH_CONTINUATION",
+  "active_tracks": {
+    "track_0_enforcement_repairs": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Update canonical AGENTS.md and .agents/AGENTS.md with mandatory root rule and evidence classes",
+        "Upgrade audit_claim_spec.py to eliminate fake normalizations and require revision-bound independent reviews",
+        "Implement production adversarial tests in .agents/verification/test_adversarial_evidence_controls.py"
+      ],
+      "completion_note": "Root rule, 7 evidence classes, upgraded Gates 5, 8, 10, independent review verifier, and 12/12 adversarial tests passed."
+    },
+    "track_1_mathematical_repairs": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Replace Archimedean dominance check (< 50.0) with full Weil quadratic form evaluation on legal two-bump test functions",
+        "Derive profile-dependent trivial-zero remainder bound R_triv(b, Phi) exhibiting (a_K / A)^{2k} decay even for K=0",
+        "Fix adaptive diagonal acceptance: enforce E_total_rel < target, verify numerical uncertainty, trigger mesh refinement",
+        "Replace column norm differences with common-grid H^1 function differences and SVD subspace projection stability",
+        "Regenerate research campaign artifacts and correct production reporting"
+      ],
+      "completion_note": "Repairs 4A-4E completed in tc/approximation.py; data/tc_arithmetic_residual_research.json regenerated and verified."
+    },
+    "track_2_continuum_cancellation_and_weil_witness": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4}",
+        "Evaluate the full reflected Weil quadratic form B(f, f) on the surviving subspace",
+        "Determine whether negative grades can produce a conditional negative witness while satisfying arithmetic constraints"
+      ],
+      "completion_note": "Surviving 3D subspace across grades {-1, -2, -3, -4} evaluated at n=801 with stability verified. Full reflected Weil quadratic form W is strictly positive definite (lambda_min = 7.21e7 > 0). Archimedean background dominates prime pairing (> 1500:1). Negative witness hypothesis REFUTED_WITHIN_SCOPE for this candidate class."
+    }
+  },
+  "linked_runs": {
+    "campaign_artifacts": [
+      "data/tc_arithmetic_residual_research.json",
+      "data/tc_negative_grade_approximation_campaign.json",
+      "data/tc_epic_synthesis.json"
+    ],
+    "research_runs": [
+      "research/runs/tc-continuum-cancellation-weil-spectrum/summary.json"
+    ],
+    "research_runs_index": "research/index.json"
+  }
+}
