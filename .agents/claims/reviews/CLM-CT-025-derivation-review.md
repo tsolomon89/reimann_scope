@@ -1,6 +1,7 @@
 # Mathematical Audit Review: CLM-CT-025 (Derivation Facet)
 
 - **Claim ID**: `CLM-CT-025`
+- **Reviewed-Manifest-SHA256**: 6df0f240e3f832a6233b1cc3df4c88963212537de1cea6f10b6073741ff84476
 - **Claim Title**: Finite Dirichlet Polynomial Inner Product Double-Sum Decomposition
 - **Review Facet**: Exact Analytical & Symbolic Derivation
 - **Audit Session Provenance**:

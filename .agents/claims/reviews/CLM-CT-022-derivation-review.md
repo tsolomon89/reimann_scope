@@ -1,6 +1,7 @@
 # Mathematical Audit Review: CLM-CT-022 (Derivation Facet)
 
 - **Claim ID**: `CLM-CT-022`
+- **Reviewed-Manifest-SHA256**: 5137a2c703497c6d663922e1b6e5d5fe1f2fadcc0969e8eb528ad260ed5ce477
 - **Claim Title**: Diagonal Cross-Term Exact Cancelling Variances
 - **Review Facet**: Exact Analytical & Symbolic Derivation
 - **Audit Session Provenance**:

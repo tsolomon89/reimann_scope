@@ -1,6 +1,7 @@
 # Derivation Review for Claim CLM-CT-028
 
 **Claim ID**: `CLM-CT-028`
+- **Reviewed-Manifest-SHA256**: 9371dc219f1b58b6f9bac74ab904c10d331f735717e903b6df29602fb7871d9c
 **Reviewer Role**: Agent A — Operator Adjoint & Instance Closure
 **Status**: `FIXED_GAUSSIAN_COMMON_FRAME_INSTANCE_CLOSED`
 **Date**: September 1, 2026 (Audit Repair & Exact Certification Sprint)

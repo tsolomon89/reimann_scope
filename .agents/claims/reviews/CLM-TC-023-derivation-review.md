@@ -1,6 +1,7 @@
 # Derivation Review for Claim CLM-TC-023
 
 **Claim ID**: `CLM-TC-023`  
+- **Reviewed-Manifest-SHA256**: 0fb031815599b67e0a20ce5d15aa66deddabe536107cd64c764bf724db4a2551
 **Reviewer Role**: Analysis Agent — Support Geometry, Poincaré Obstruction, and Reflected Form Continuity  
 **Status**: `FINITE_ANALYTIC_COMPONENT` / `RESCALING_RETRACTION_SCOPED_POINCARE_SUPPORT_OBSTRUCTION_PROVED`  
 **Date**: September 17, 2026  

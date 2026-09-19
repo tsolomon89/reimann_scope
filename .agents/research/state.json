@@ -28,13 +28,14 @@
     "track_2_continuum_cancellation_and_weil_witness": {
       "status": "ACTIVE",
       "tasks": [
-        "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4}",
-        "Evaluate the authentic reflected Weil quadratic form B(f, f) on the surviving subspace using ArchimedeanKernelEvaluator",
-        "Complete-form prime evaluation with all supported same-grade and cross-grade pairs (|Delta t - log q| < 2h)",
-        "Multi-prime activation across wider windows [5, 25] and [6, 24]",
-        "Derive certified Riemann-von Mangoldt Stieltjes tail bounds for nontrivial zeros with corrected x^{beta+1} weight and full Trudgian envelope"
+        "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4} [COMPLETED]",
+        "Evaluate authentic reflected Weil quadratic form B(f, f) on surviving subspace using ArchimedeanKernelEvaluator [COMPLETED]",
+        "Certify baseline canonical Weil error budget: prime discrepancy, Bochner PSD tail R_U >= 0, ||Delta W_G||_2 <= 1591.14, margin ratio 8312x [COMPLETED]",
+        "Evaluate enlarged grade spaces (dim 4 with K=-5, mixed positive/negative) and H^1 function-norm Rayleigh spectrum [COMPLETED]",
+        "Derive certified Riemann-von Mangoldt Stieltjes tail bounds with honest parameter dependence and Trudgian envelope [COMPLETED]",
+        "Arithmetic-spectral explicit formula integration and off-critical witness sensitivity [ACTIVE]"
       ],
-      "active_note": "Reopened: executing complete-form prime evaluation with all supported pairs and deriving repaired Mellin Stieltjes tail certificate."
+      "active_note": "Baseline error budget certified (lambda_min >= 1.3224e7 > 0); enlarged space H^1 Rayleigh quotients verified strictly positive (inf R(G) in [1.86e4, 2.71e4]); explicit formula integration queued."
     }
   },
   "linked_runs": {
@@ -42,10 +43,12 @@
       "data/tc_arithmetic_residual_research.json",
       "data/tc_negative_grade_approximation_campaign.json",
       "data/tc_continuum_cancellation_weil_spectrum.json",
+      "data/tc_baseline_canonical_weil_error_budget.json",
       "data/tc_epic_synthesis.json"
     ],
     "research_runs": [
-      "data/tc_continuum_cancellation_weil_spectrum.json"
+      "data/tc_continuum_cancellation_weil_spectrum.json",
+      "data/tc_baseline_canonical_weil_error_budget.json"
     ],
     "research_runs_index": "research/index.json"
   }

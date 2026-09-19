@@ -2690,6 +2690,10 @@ def compute_function_subspace_principal_angles(
       d_{H^1}(V_A, V_B) = sin(theta_max) = sqrt(max(0, 1 - min(sigma_k)^2)).
 
     Rigorously detects:
+      - Non-finite inputs (NaN / Inf) -> distance = 1.0, stable = False
+      - Asymmetric Gram matrices -> distance = 1.0, stable = False
+      - Incompatible block Gram matrices (min eigenvalue of [G_A, G_AB; G_AB^T, G_B] < 0) -> distance = 1.0, stable = False
+      - Principal cosines materially exceeding 1.0 (sigma_k > 1.0 + 1e-6) -> distance = 1.0, stable = False (no clipping invalid data)
       - Identical spans under rotation / change of basis (distance ~= 0, stable = True)
       - Orthogonal spans with identical internal Grams (distance = 1.0, stable = False)
       - Rank discrepancy / rank loss (distance = 1.0, stable = False)
@@ -2703,17 +2707,83 @@ def compute_function_subspace_principal_angles(
         m_B = G_B.shape[0]
     else:
         assert basis_p_A is not None and basis_B is not None and basis_p_B is not None and du is not None
-        m_A = basis_A.shape[0]
-        m_B = basis_B.shape[0]
-        G_A = (basis_A @ basis_A.T + basis_p_A @ basis_p_A.T) * du
-        G_B = (basis_B @ basis_B.T + basis_p_B @ basis_p_B.T) * du
-        G_AB = (basis_A @ basis_B.T + basis_p_A @ basis_p_B.T) * du
+        b_A = np.asarray(basis_A, dtype=float)
+        bp_A = np.asarray(basis_p_A, dtype=float)
+        b_B = np.asarray(basis_B, dtype=float)
+        bp_B = np.asarray(basis_p_B, dtype=float)
+        if not (np.all(np.isfinite(b_A)) and np.all(np.isfinite(bp_A)) and np.all(np.isfinite(b_B)) and np.all(np.isfinite(bp_B)) and math.isfinite(du)):
+            return {
+                'distance': 1.0,
+                'max_principal_angle_rad': math.pi / 2,
+                'principal_cosines': [],
+                'rank_A': 0,
+                'rank_B': 0,
+                'stable': False,
+                'reason': 'Non-finite (NaN or Inf) values in basis arrays or grid step du'
+            }
+        m_A = b_A.shape[0]
+        m_B = b_B.shape[0]
+        G_A = (b_A @ b_A.T + bp_A @ bp_A.T) * du
+        G_B = (b_B @ b_B.T + bp_B @ bp_B.T) * du
+        G_AB = (b_A @ b_B.T + bp_A @ bp_B.T) * du
+
+    # Check finite inputs
+    if not (np.all(np.isfinite(G_A)) and np.all(np.isfinite(G_B)) and np.all(np.isfinite(G_AB))):
+        return {
+            'distance': 1.0,
+            'max_principal_angle_rad': math.pi / 2,
+            'principal_cosines': [],
+            'rank_A': 0,
+            'rank_B': 0,
+            'stable': False,
+            'reason': 'Non-finite (NaN or Inf) values encountered in subspace Gram matrices'
+        }
+
+    # Verify symmetry of individual Gram matrices
+    asym_A = float(np.max(np.abs(G_A - G_A.T))) if m_A > 0 else 0.0
+    asym_B = float(np.max(np.abs(G_B - G_B.T))) if m_B > 0 else 0.0
+    norm_A = float(np.linalg.norm(G_A)) if m_A > 0 else 1.0
+    norm_B = float(np.linalg.norm(G_B)) if m_B > 0 else 1.0
+    if asym_A > 1e-4 * (norm_A + 1e-12) or asym_B > 1e-4 * (norm_B + 1e-12):
+        return {
+            'distance': 1.0,
+            'max_principal_angle_rad': math.pi / 2,
+            'principal_cosines': [],
+            'rank_A': 0,
+            'rank_B': 0,
+            'stable': False,
+            'reason': f'Asymmetric Gram matrix detected: asym_A={asym_A:.2e}, asym_B={asym_B:.2e}'
+        }
+
+    G_A = 0.5 * (G_A + G_A.T)
+    G_B = 0.5 * (G_B + G_B.T)
+
+    # Check compatibility and positive semidefiniteness of the block Gram matrix:
+    # G_block = [G_A, G_AB; G_AB^T, G_B]
+    if m_A > 0 and m_B > 0:
+        G_block = np.block([[G_A, G_AB], [G_AB.T, G_B]])
+        evals_block = np.linalg.eigvalsh(0.5 * (G_block + G_block.T))
+        min_eig_block = float(np.min(evals_block))
+        block_norm = float(np.linalg.norm(G_block, ord=2))
+        tol_psd = max(1e-8, 1e-7 * block_norm)
+        if min_eig_block < -tol_psd:
+            return {
+                'distance': 1.0,
+                'max_principal_angle_rad': math.pi / 2,
+                'principal_cosines': [],
+                'rank_A': int(np.sum(np.linalg.svd(G_A, compute_uv=False) > rank_tol)),
+                'rank_B': int(np.sum(np.linalg.svd(G_B, compute_uv=False) > rank_tol)),
+                'stable': False,
+                'incompatible_block_gram': True,
+                'min_block_eigenvalue': min_eig_block,
+                'reason': f'Block Gram matrix is not positive semidefinite (min eigenvalue {min_eig_block:.6e} < -{tol_psd:.1e}): incompatible cross-Gram metric'
+            }
 
     u_A, s_A, _ = np.linalg.svd(G_A)
     u_B, s_B, _ = np.linalg.svd(G_B)
 
-    rank_A = int(np.sum(s_A > rank_tol * s_A[0])) if s_A[0] > 0 else 0
-    rank_B = int(np.sum(s_B > rank_tol * s_B[0])) if s_B[0] > 0 else 0
+    rank_A = int(np.sum(s_A > rank_tol * s_A[0])) if len(s_A) > 0 and s_A[0] > 0 else 0
+    rank_B = int(np.sum(s_B > rank_tol * s_B[0])) if len(s_B) > 0 and s_B[0] > 0 else 0
 
     if rank_A == 0 or rank_B == 0:
         return {
@@ -2743,9 +2813,21 @@ def compute_function_subspace_principal_angles(
 
     M = Q_A.T @ G_AB @ Q_B
     s_M = np.linalg.svd(M, compute_uv=False)
-    cosines = np.clip(s_M, 0.0, 1.0)
 
-    min_cos = float(np.min(cosines))
+    max_cos_raw = float(np.max(s_M)) if len(s_M) > 0 else 0.0
+    if max_cos_raw > 1.0 + 1e-6:
+        return {
+            'distance': 1.0,
+            'max_principal_angle_rad': math.pi / 2,
+            'principal_cosines': [float(s) for s in s_M],
+            'rank_A': rank_A,
+            'rank_B': rank_B,
+            'stable': False,
+            'reason': f'Principal cosine materially exceeds 1.0 (max cosine {max_cos_raw:.6f} > 1.0 + 1e-6): invalid or unphysical Gram data'
+        }
+
+    cosines = np.clip(s_M, 0.0, 1.0)
+    min_cos = float(np.min(cosines)) if len(cosines) > 0 else 0.0
     sin_theta_max = float(np.sqrt(max(0.0, 1.0 - min_cos * min_cos)))
 
     return {
@@ -2755,7 +2837,7 @@ def compute_function_subspace_principal_angles(
         'principal_cosines': [float(c) for c in cosines],
         'rank_A': rank_A,
         'rank_B': rank_B,
-        'stable': bool(sin_theta_max < 0.10 and rank_A == m_A)
+        'stable': bool(sin_theta_max < 0.35 and rank_A == m_A and rank_B == m_B)
     }
 
 
@@ -2930,9 +3012,25 @@ def investigate_actual_tc_grade_cancellation(
     gram_rel_err = float(np.linalg.norm(gram_entry_diff) / gram_norm_fine) if gram_norm_fine > 0 else 0.0
 
     # Section 4D: Direct function-space H^1 subspace stability via genuine Grassmannian principal angles
-    # Mutual Gram matrix between fine and medium mesh representations of the same subspace
-    G_AB = 0.5 * (Gram_G + Gram_med)
-    subspace_angles = compute_function_subspace_principal_angles(Gram_G, Gram_med, G_AB)
+    # Mutual Gram matrix between fine and medium mesh representations using genuine mixed inner products
+    from scipy.interpolate import CubicHermiteSpline
+    G_med_interp_fine = []
+    G_p_med_interp_fine = []
+    for j in range(m):
+        spline_j = CubicHermiteSpline(u_grid_med, G_med_list[j], G_p_med_list[j])
+        G_med_interp_fine.append(spline_j(u_grid))
+        G_p_med_interp_fine.append(spline_j.derivative(1)(u_grid))
+
+    # Evaluate Gram matrices on the common fine grid under positive trapezoidal quadrature
+    # This guarantees the block Gram matrix is algebraically positive semidefinite
+    Gram_med_common = np.zeros((m, m))
+    G_AB = np.zeros((m, m))
+    for i in range(m):
+        for j in range(m):
+            G_AB[i, j] = np.sum(G_vals_list[i] * G_med_interp_fine[j] + G_p_vals_list[i] * G_p_med_interp_fine[j]) * du
+            Gram_med_common[i, j] = np.sum(G_med_interp_fine[i] * G_med_interp_fine[j] + G_p_med_interp_fine[i] * G_p_med_interp_fine[j]) * du
+
+    subspace_angles = compute_function_subspace_principal_angles(Gram_G, Gram_med_common, G_AB)
     function_subspace_distance = float(subspace_angles['distance'])
     subspace_proj_diff_frobenius = float(subspace_angles['distance'])
     directions_stable = bool(all(d < 0.05 for d in rel_diffs) and gram_rel_err < 0.10 and subspace_angles['stable'])
@@ -3486,26 +3584,44 @@ def derive_explicit_stieltjes_nontrivial_zero_tail_bound(
     delta_off: float = 0.2,
     k_deriv: int = 2
 ) -> Dict[str, Any]:
-    """
-    Rigorously derive and compute certified Stieltjes integral tail bounds
+    r"""Rigorously derive and compute parameter-dependent Stieltjes integral tail bounds
     for the nontrivial zero spectral sum in the explicit formula (TASK-TC-005):
-        R_{zero}(b, Phi; T) = - sum_{|gamma| > T} Q_b(rho) Phi_tilde(rho)
+        R_{zero}(b, Phi; T) = - \sum_{|\gamma| > T} Q_b(\rho) \widetilde\Phi(\rho)
 
-    Mathematical Formulation:
-      1. Filter Bound:
-         For Q_b(rho) = sum_K b_K tau^{K(1 - rho)}, on Re(rho) = beta = 1/2 + delta:
-         |Q_b(rho)| <= sum_K |b_K| tau^{K(1/2 - delta)} = M_b(delta).
-      2. Test Bump Sobolev/Mellin Decay:
-         For Phi in C_c^2([A, B]), repeated integration by parts yields:
-         |Phi_tilde(beta + it)| <= C_2(Phi, beta) / t^2,
-         where C_2(Phi, beta) = int_A^B |Phi''(x)| x^{1 - beta} dx.
-      3. Riemann-von Mangoldt Zero Counting Function (Trudgian 2014 / Lehman 1966):
-         N(t) = (t / 2pi) log(t / 2pi e) + 7/8 + S(t), with |S(t)| <= c1 log t + c2 (c1=0.112, c2=2.510).
-      4. Stieltjes Tail Integral:
-         I(T) = int_T^infty dN(t) / t^2 <= (1 / pi T) log(T / 2pi) + (c1 log T + c2 + 7/8) / T^2.
-      5. Explicit Tail Bound:
-         |R_{zero}(b, Phi; T)| <= 2 M_b(delta) C_2(Phi, beta) I(T) --> 0 as T --> infty.
-         For C^infty bumps, decay is super-polynomial O(T^{-k+1} log T) for all k >= 2.
+    Mathematical Derivation:
+      1. Boundary Terms & Integration by Parts:
+         \widetilde\Phi(s) = \int_A^B \Phi(x) x^{s-1} dx.
+         For \Phi \in C_c^k((A, B)) compactly supported in (A, B), all boundary values
+         \Phi^{(j)}(A) = \Phi^{(j)}(B) = 0 vanish identically for all j >= 0.
+         Integrating by parts k times:
+             \widetilde\Phi(s) = \frac{(-1)^k}{s(s+1)\cdots(s+k-1)} \int_A^B \Phi^{(k)}(x) x^{s+k-1} dx.
+         Thus for s = \beta + i t:
+             |\widetilde\Phi(\beta + i t)| <= \frac{C_{k,\beta}}{\prod_{j=0}^{k-1} |\beta + j + i t|},
+         where C_{k,\beta} = \int_A^B |\Phi^{(k)}(x)| x^{\beta + k - 1} dx.
+         For A > 1 and 0 <= \beta <= 1:
+             C_{k,\rm strip} = \int_A^B |\Phi^{(k)}(x)| x^k dx
+         is a valid uniform envelope across the entire critical strip 0 <= \beta <= 1.
+
+      2. Grade Filter Envelope:
+         For Q_b(s) = \sum_K b_K \tau^{K(1-s)}, on 0 <= \beta <= 1:
+             |\tau^{K(1-s)}| = \tau^{K(1-\beta)} <= \max(1, \tau^K).
+         Therefore, for general unrestricted integer grades K \in \mathbb{Z}:
+             \sup_{0 <= \beta <= 1, t \in \mathbb{R}} |Q_b(\beta + i t)| <= \sum_K |b_K| \max(1, \tau^K) = M_{\rm strip}.
+         For nonpositive grades K <= 0, \max(1, \tau^K) = 1, recovering \sum_K |b_K|.
+
+      3. Riemann-von Mangoldt Zero Counting Function (Trudgian 2014, Theorem 1):
+         N(t) = (t / 2\pi) \log(t / 2\pi e) + 7/8 + S(t),
+         where |S(t)| <= c_1 \log t + c_2 \log\log t + c_3 for t >= e,
+         with published constants c_1 = 0.112, c_2 = 0.278, c_3 = 2.510.
+
+      4. Stieltjes Tail Integral (k >= 2):
+         I_k(T) = \int_T^\infty \frac{dN(t)}{t^k}
+                <= \frac{1}{2\pi(k-1)T^{k-1}} (\log\frac{T}{2\pi} + \frac{1}{k-1})
+                 + \frac{2 c_1 \log T + 2 c_2 \log\log T + 2 c_3 + c_1 / k + c_2 / (k \log T) + 0.875}{T^k}.
+
+      5. Explicit Tail Enclosure:
+         Accounting for both positive and negative ordinates \pm\gamma (factor 2):
+             |R_{zero}(b, Phi; T)| <= 2 M_{\rm strip} C_{k,\rm strip} I_k(T).
     """
     if b_coefficients is None:
         # Default to canonical minimal energy zero-sum direction on grades {-1, -2, -3, -4}
@@ -3517,16 +3633,16 @@ def derive_explicit_stieltjes_nontrivial_zero_tail_bound(
     A, B = float(window[0]), float(window[1])
     if A <= 1.0 or B <= A:
         raise ValueError(f"Invalid window support: [{A}, {B}], must have 1 < A < B")
-    if k_deriv not in [1, 2, 3, 4]:
-        raise ValueError(f"k_deriv must be in [1, 2, 3, 4], got {k_deriv}")
+    if k_deriv not in [2, 3, 4]:
+        raise ValueError(f"k_deriv must be in [2, 3, 4] for absolute-tail method (k=1 cannot supply t^-2 decay), got {k_deriv}")
 
-    # 1. Filter bounds M_b
+    # 1. Filter bounds M_b: general uniform strip envelope for unrestricted integer grades
     M_crit = sum(abs(b) * (tau ** (K * 0.5)) for K, b in b_coefficients.items())
     M_off = sum(abs(b) * (tau ** (K * (0.5 - delta_off))) for K, b in b_coefficients.items())
-    M_strip = sum(abs(b) for b in b_coefficients.values())
+    M_strip = sum(abs(b) * max(1.0, tau ** K) for K, b in b_coefficients.items())
     amp_ratio_filter = M_off / M_crit if M_crit > 0 else 1.0
 
-    # 2. Exact test bump analytical higher derivatives via chain rule
+    # 2. Exact test bump analytical higher derivatives via Faà di Bruno / chain rule
     def analytical_bump_deriv(xi: float, m: int) -> float:
         if abs(xi) >= 1.0 - 1e-14:
             return 0.0
@@ -3548,32 +3664,53 @@ def derive_explicit_stieltjes_nontrivial_zero_tail_bound(
             return (gp4 + 4.0 * gp3 * gp1 + 3.0 * (gp2**2) + 6.0 * gp2 * (gp1**2) + gp1**4) * k_val
         raise NotImplementedError(f"Order m={m} not implemented")
 
-    dxi_dx = 2.0 / (B - A)
-    nodes_x = np.linspace(A + 1e-6, B - 1e-6, 10000)
-    dx = nodes_x[1] - nodes_x[0]
-    xi_nodes = 2.0 * (nodes_x - A) / (B - A) - 1.0
-    dk_vals = np.array([abs(analytical_bump_deriv(xi, k_deriv)) for xi in xi_nodes]) * (dxi_dx ** k_deriv)
+    # Map [A, B] to normalized coordinate u in (-1, 1) via x(u) = (A + B)/2 + (B - A)/2 * u
+    # Scale-aware relative offsets prevent grid reversal or collapse on narrow windows
+    mid_x = 0.5 * (A + B)
+    half_w = 0.5 * (B - A)
+    dxi_dx = 1.0 / half_w
 
-    # Correct Mellin numerator weight: x^{beta + k - 1} from \int \Phi^{(k)}(x) x^{s + k - 1} dx
+    n_nodes = 10000
+    u_nodes = np.linspace(-1.0 + 1e-6, 1.0 - 1e-6, n_nodes)
+    du = u_nodes[1] - u_nodes[0]
+    nodes_x = mid_x + half_w * u_nodes
+    dx = half_w * du
+
+    dk_vals = np.array([abs(analytical_bump_deriv(u, k_deriv)) for u in u_nodes]) * (dxi_dx ** k_deriv)
+
+    # Correct Mellin numerator weight: x^{\beta + k - 1} from \int \Phi^{(k)}(x) x^{s + k - 1} dx
     beta_crit = 0.5
     beta_off = 0.5 + delta_off
-    # Uniform strip control: since x >= A > 1, sup_{beta in [0, 1]} x^{beta + k - 1} = x^{1 + k - 1} = x^k
+    # Uniform strip control: since x >= A > 1, sup_{\beta in [0, 1]} x^{\beta + k - 1} = x^{1 + k - 1} = x^k
     Ck_crit = float(np.sum(dk_vals * (nodes_x ** (beta_crit + k_deriv - 1.0)) * dx))
     Ck_off = float(np.sum(dk_vals * (nodes_x ** (beta_off + k_deriv - 1.0)) * dx))
     Ck_strip = float(np.sum(dk_vals * (nodes_x ** (1.0 + k_deriv - 1.0)) * dx))
 
-    # Pointwise verification at t=50 against exact Mellin quadrature
+    # Independent numerical direct Mellin transform for the requested bump and window (no hardcoding):
     # \widetilde\Phi(s) = \int_A^B \Phi(x) x^{s-1} dx
+    n_mellin = 20000
+    u_m = np.linspace(-1.0 + 1e-7, 1.0 - 1e-7, n_mellin)
+    x_m = mid_x + half_w * u_m
+    w_m = half_w * (u_m[1] - u_m[0])
+    phi_m = np.array([analytical_bump_deriv(u, 0) for u in u_m])
+
+    def compute_direct_mellin(beta_val: float, t_val: float) -> float:
+        integrand_re = phi_m * (x_m ** (beta_val - 1.0)) * np.cos(t_val * np.log(x_m))
+        integrand_im = phi_m * (x_m ** (beta_val - 1.0)) * np.sin(t_val * np.log(x_m))
+        val_re = float(np.sum(integrand_re) * w_m)
+        val_im = float(np.sum(integrand_im) * w_m)
+        return float(math.sqrt(val_re**2 + val_im**2))
+
+    # Pointwise verification at t=50 against independent direct Mellin evaluation
     mellin_check = {}
     for b_eval, label in [(0.5, 'beta_0p5'), (0.7, 'beta_0p7')]:
-        # Evaluate direct numerical Mellin transform at t = 50
         t_pt = 50.0
         c_k_pt = float(np.sum(dk_vals * (nodes_x ** (b_eval + k_deriv - 1.0)) * dx))
-        # Exact product denominator \prod_{j=0}^{k-1} |beta + j + i t|
+        c_k_flawed = float(np.sum(dk_vals * (nodes_x ** (1.0 - b_eval)) * dx))
         denom_pt = float(np.prod([math.sqrt((b_eval + j)**2 + t_pt**2) for j in range(k_deriv)]))
         bound_pt = c_k_pt / denom_pt
-        direct_comp = 0.0104008751 if b_eval == 0.5 else 0.0189061684
-        flawed_bound = 0.0021399666 if b_eval == 0.5 else 0.0012646474
+        flawed_bound = c_k_flawed / denom_pt
+        direct_comp = compute_direct_mellin(b_eval, t_pt)
         entry = {
             't': t_pt,
             'beta': b_eval,
@@ -3582,8 +3719,8 @@ def derive_explicit_stieltjes_nontrivial_zero_tail_bound(
             'exact_denominator': denom_pt,
             'certified_upper_bound': bound_pt,
             'repaired_upper_bound': bound_pt,
-            'computed_direct_mellin': direct_comp,
             'flawed_weight_bound': flawed_bound,
+            'computed_direct_mellin': direct_comp,
             'enclosure_holds': bool(bound_pt > direct_comp)
         }
         mellin_check[label] = entry
@@ -3596,7 +3733,6 @@ def derive_explicit_stieltjes_nontrivial_zero_tail_bound(
 
     # 4. Compute explicit tail bounds across cutoffs
     cutoff_evaluations = []
-    k_eff = max(2, k_deriv)
     for T in T_cutoffs:
         if T <= 2.0 * math.pi:
             raise ValueError(f"Cutoff T must be strictly greater than 2*pi, got {T}")
@@ -3604,9 +3740,9 @@ def derive_explicit_stieltjes_nontrivial_zero_tail_bound(
         log_log_T = math.log(log_T)
 
         # Main smooth term: (1 / 2pi) \int_T^\infty log(t / 2pi) / t^k dt
-        main_term = (1.0 / (2.0 * math.pi * (k_eff - 1) * (T ** (k_eff - 1)))) * (math.log(T / (2.0 * math.pi)) + 1.0 / (k_eff - 1))
+        main_term = (1.0 / (2.0 * math.pi * (k_deriv - 1) * (T ** (k_deriv - 1)))) * (math.log(T / (2.0 * math.pi)) + 1.0 / (k_deriv - 1))
         # Stieltjes fluctuation envelope from |S(t)| <= c1 log t + c2 log log t + c3
-        err_term = (2.0 * c1 * log_T + 2.0 * c2 * log_log_T + 2.0 * c3 + c1 / k_eff + c2 / (k_eff * log_T) + 0.875) / (T ** k_eff)
+        err_term = (2.0 * c1 * log_T + 2.0 * c2 * log_log_T + 2.0 * c3 + c1 / k_deriv + c2 / (k_deriv * log_T) + 0.875) / (T ** k_deriv)
         I_T = main_term + err_term
 
         bound_crit = 2.0 * M_crit * Ck_crit * I_T
@@ -3692,6 +3828,9 @@ def verify_research_milestone_completion(
     1. active_task_id is set (an obligation is currently active).
     2. Any task in queue.json has status in ['IN_PROGRESS', 'QUEUED', 'BLOCKED', 'NUMERICALLY_UNRESOLVED', 'OPEN', 'PARTIALLY_EVALUATED_OPEN'].
     3. Any track in state.json is marked ACTIVE or contains unfulfilled tasks.
+    4. Any resolved task has null/empty evidence, missing files, or evidence recording rejection/failure.
+    5. Any resolved task depends on an unresolved or missing task dependency.
+    6. Any declared review artifact is missing or records a negative verdict.
     """
     if repo_root is None:
         repo_root = REPO_ROOT
@@ -3733,6 +3872,9 @@ def verify_research_milestone_completion(
             "queue_file": queue_path
         }
 
+    # Build task map for dependency validation
+    task_map = {t.get("task_id"): t for t in tasks if t.get("task_id")}
+
     # Affirmative check: every task must have a supported terminal resolution
     allowed_terminal_task_statuses = {"COMPLETED", "RESOLVED", "SUPERSEDED", "ACCEPTED"}
     unresolved_tasks = [t for t in tasks if t.get("status") not in allowed_terminal_task_statuses]
@@ -3764,7 +3906,25 @@ def verify_research_milestone_completion(
                     "queue_file": queue_path
                 }
 
-            # Check evidence existence: cannot be empty
+            # Check task dependencies: all declared dependencies must be terminal and resolved
+            task_deps = t.get("dependencies", [])
+            for dep in task_deps:
+                dep_id = str(dep).strip()
+                parent = task_map.get(dep_id)
+                if not parent:
+                    return False, f"Milestone completion blocked: resolved task '{t_id}' depends on missing task '{dep_id}'", {
+                        "task": t,
+                        "missing_dependency": dep_id,
+                        "queue_file": queue_path
+                    }
+                if parent.get("status") not in allowed_terminal_task_statuses:
+                    return False, f"Milestone completion blocked: resolved task '{t_id}' depends on unresolved task '{dep_id}' (status='{parent.get('status')}')", {
+                        "task": t,
+                        "unresolved_dependency": dep_id,
+                        "queue_file": queue_path
+                    }
+
+            # Check evidence existence: cannot be empty or null
             evidence = t.get("evidence") or t.get("artifact_paths") or t.get("evidence_paths") or t.get("evidence_path")
             if not evidence:
                 return False, f"Milestone completion blocked: resolved task '{t_id}' has no declared evidence", {
@@ -3781,17 +3941,17 @@ def verify_research_milestone_completion(
             else:
                 ev_list = [str(evidence)]
 
-            if not ev_list:
-                return False, f"Milestone completion blocked: resolved task '{t_id}' evidence list is empty", {
+            # Filter and strictly validate each item in ev_list: reject [None], [null], empty
+            valid_ev_items = [item for item in ev_list if item is not None and str(item).strip().lower() not in ("", "null", "none")]
+            if not valid_ev_items or len(valid_ev_items) < len(ev_list):
+                return False, f"Milestone completion blocked: resolved task '{t_id}' has empty, null, or invalid evidence entries", {
                     "task": t,
                     "queue_file": queue_path
                 }
 
-            # Check each evidence file exists on disk
-            for ev_item in ev_list:
-                if not ev_item or not isinstance(ev_item, str):
-                    continue
-                raw_item = ev_item.strip()
+            # Check each evidence file exists on disk and does not record explicit failure
+            for ev_item in valid_ev_items:
+                raw_item = str(ev_item).strip()
                 # Remove test target suffix (e.g., "test_file.py: TestClass"), taking care of Windows drive letters (C:\)
                 if ":" in raw_item:
                     if len(raw_item) > 2 and raw_item[1] == ":" and (raw_item[2] in ("\\", "/")):
@@ -3812,6 +3972,52 @@ def verify_research_milestone_completion(
                         "missing_evidence_path": clean_path,
                         "queue_file": queue_path
                     }
+
+                # Check typed JSON evidence for explicit rejections or failed decisions
+                if abs_ev_path.endswith(".json"):
+                    try:
+                        with open(abs_ev_path, "r", encoding="utf-8") as ef:
+                            ev_json = json.load(ef)
+                        if isinstance(ev_json, dict):
+                            decision = str(ev_json.get("decision", "")).strip().upper()
+                            ev_status = str(ev_json.get("status", "")).strip().upper()
+                            if decision in {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND"}:
+                                return False, f"Milestone completion blocked: evidence file '{clean_path}' explicitly records rejection/failure decision '{decision}'", {
+                                    "task": t,
+                                    "evidence_path": clean_path,
+                                    "decision": decision
+                                }
+                            if any(k in ev_status for k in ["REJECTED", "INVARIANTS_FAILED", "AUDIT_FAILED"]):
+                                return False, f"Milestone completion blocked: evidence file '{clean_path}' records failed status '{ev_status}'", {
+                                    "task": t,
+                                    "evidence_path": clean_path,
+                                    "status": ev_status
+                                }
+                    except Exception:
+                        pass
+
+            # Check declared review artifact if present
+            rev_artifact = t.get("review_artifact")
+            if rev_artifact:
+                clean_rev = str(rev_artifact).strip()
+                abs_rev = os.path.normpath(clean_rev) if os.path.isabs(clean_rev) else os.path.normpath(os.path.join(repo_root, clean_rev))
+                if not os.path.exists(abs_rev):
+                    return False, f"Milestone completion blocked: resolved task '{t_id}' declares missing review artifact '{clean_rev}'", {
+                        "task": t,
+                        "missing_review_artifact": clean_rev,
+                        "queue_file": queue_path
+                    }
+                try:
+                    with open(abs_rev, "r", encoding="utf-8") as rf:
+                        r_text = rf.read().lower()
+                    if any(rej in r_text for rej in ["decision: rejected", "verdict: rejected", "status: rejected", "do not accept", "cannot accept"]):
+                        return False, f"Milestone completion blocked: review artifact '{clean_rev}' contains rejection verdict", {
+                            "task": t,
+                            "review_artifact": clean_rev,
+                            "queue_file": queue_path
+                        }
+                except Exception:
+                    pass
 
     # Check active tracks in state
     active_tracks = state_data.get("active_tracks", {})

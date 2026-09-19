@@ -1,6 +1,7 @@
 # Derivation Review for Claim CLM-CT-026
 
 **Claim ID**: `CLM-CT-026`
+- **Reviewed-Manifest-SHA256**: b87337e662c3ac6a80c6799c57ac4ae3839ddccd5e09a04a7fa63313f619af54
 **Reviewer Role**: Agent A — Derivation & Analytic Bounds
 **Status**: `EXTERNAL_ANALYTIC_PROOF`
 **Date**: August 31, 2026 (Audit Repair Sprint)

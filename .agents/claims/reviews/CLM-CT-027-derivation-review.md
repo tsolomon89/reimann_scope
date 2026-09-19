@@ -1,6 +1,7 @@
 # Derivation Review for Claim CLM-CT-027
 
 **Claim ID**: `CLM-CT-027`
+- **Reviewed-Manifest-SHA256**: 24e8ec79189df0aa9775b63cf203a3b5ffe1240566213139952c54c344d0b72a
 **Reviewer Role**: Agent A — Certified Enclosure & Independent Replay
 **Status**: `FIXED_GAUSSIAN_COMMON_FRAME_CROSS_TERM_NONZERO`
 **Date**: September 1, 2026 (Audit Repair & Exact Certification Sprint)

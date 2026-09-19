@@ -1,6 +1,7 @@
 # Derivation Review for Claim CLM-CT-029
 
 **Claim ID**: `CLM-CT-029`
+- **Reviewed-Manifest-SHA256**: 648172449a05c4574e4bab442893f39c2e63edfa1bd1c53234482bd8fa71376d
 **Reviewer Role**: Agent A — Spectral Formulation Mapping & Arithmetic Obligations
 **Status**: `SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS`
 **Date**: August 31, 2026 (Audit Repair Sprint)

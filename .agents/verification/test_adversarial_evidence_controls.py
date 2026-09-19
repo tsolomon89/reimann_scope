@@ -33,7 +33,7 @@ if REPO_ROOT not in sys.path:
 
 import tc.approximation as app
 import tc.weil_forms as wf
-from audit_claim_spec import audit_claim_specification, verify_independent_review
+from audit_claim_spec import audit_claim_specification, verify_independent_review, compute_claim_substantive_manifest
 
 
 class TestAdversarialEvidenceControls:
@@ -447,6 +447,7 @@ class TestAdversarialEvidenceControls:
             assert "objections" in reason.lower() or "adversarial" in reason.lower()
 
             # Case F: Valid independent review passes cleanly
+            _, m_sha = compute_claim_substantive_manifest(spec, temp_dir)
             with open(review_file, "w", encoding="utf-8") as f:
                 f.write(
                     "# Independent Derivation Review for CLM-TEST-REVIEW-AUDIT\n"
@@ -455,6 +456,7 @@ class TestAdversarialEvidenceControls:
                     "Objections: Adversarial stress test on zero-crossings performed; resolved without circularity.\n"
                     "Resolution: PASSED and confirmed.\n"
                     "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                    f"Reviewed-Manifest-SHA256: {m_sha}\n"
                 )
             passed, reason, _ = verify_independent_review("CLM-TEST-REVIEW-AUDIT", spec, repo_root=temp_dir)
             assert passed is True, f"Valid independent review failed: {reason}"
@@ -1011,6 +1013,7 @@ class TestAdversarialEvidenceControls:
             assert "nonexistent commit" in msg2.lower()
 
             # Case 3: Valid approval with real git commit SHA
+            _, m_sha = compute_claim_substantive_manifest(spec, td)
             with open(r_file, "w", encoding="utf-8") as f:
                 f.write(
                     "# Independent Derivation Review for CLM-TEST-REFUSAL-AUDIT\n"
@@ -1019,6 +1022,7 @@ class TestAdversarialEvidenceControls:
                     "Objections: Adversarial checks attempted.\n"
                     "Verdict: PASSED. Verified completely.\n"
                     "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                    f"Reviewed-Manifest-SHA256: {m_sha}\n"
                 )
             ok3, msg3, _ = verify_independent_review("CLM-TEST-REFUSAL-AUDIT", spec, repo_root=td)
             assert ok3 is True, f"Valid review with existing commit must pass, got: {msg3}"
@@ -1093,5 +1097,237 @@ class TestAdversarialEvidenceControls:
                 }, f)
             ok4, msg4, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
             assert ok4 is True, f"Valid task with real evidence must allow completion, got: {msg4}"
+
+    def test_26_subspace_principal_angle_invariants_and_block_gram_psd(self):
+        """Invariant 14: Subspace principal-angle invariants, PSD block Gram validation, and basis changes.
+        1. Incompatible Gram matrix (G_A=[[1]], G_B=[[4]], G_AB=[[2.5]]) produces impossible cosine 1.25.
+           Block Gram is non-PSD. Must fail closed with stable=False, distance=1.0 without clipping.
+        2. Identical subspaces under well-conditioned invertible basis change return distance ~ 0, stable=True.
+        3. Rank mismatch returns distance=1.0, stable=False.
+        4. Non-finite inputs (NaN / Inf) return distance=1.0, stable=False.
+        """
+        # Case 1: Incompatible block Gram matrix
+        G_A = np.array([[1.0]])
+        G_B = np.array([[4.0]])
+        G_AB = np.array([[2.5]])
+        res1 = app.compute_function_subspace_principal_angles(G_A, G_B, G_AB)
+        assert res1['stable'] is False
+        assert res1['distance'] == pytest.approx(1.0, abs=1e-5)
+        assert res1.get('incompatible_block_gram') is True or "not positive semidefinite" in res1.get('reason', '')
+
+        # Case 2: Identical subspaces under invertible change of basis
+        grid = np.linspace(0, 1, 201)
+        du = float(grid[1] - grid[0])
+        u1 = np.sin(2.0 * math.pi * grid)
+        u1_p = 2.0 * math.pi * np.cos(2.0 * math.pi * grid)
+        u2 = np.sin(4.0 * math.pi * grid)
+        u2_p = 4.0 * math.pi * np.cos(4.0 * math.pi * grid)
+        basis_A = np.array([u1, u2])
+        basis_p_A = np.array([u1_p, u2_p])
+
+        # Basis B is span of {u1 + 2*u2, u2}
+        T = np.array([[1.0, 2.0], [0.0, 1.0]])
+        basis_B = T @ basis_A
+        basis_p_B = T @ basis_p_A
+
+        res2 = app.compute_function_subspace_principal_angles(basis_A, basis_p_A, basis_B, basis_p_B, du)
+        assert res2['distance'] < 1e-4
+        assert res2['stable'] is True
+        for cos_val in res2['principal_cosines']:
+            assert cos_val == pytest.approx(1.0, abs=1e-4)
+
+        # Case 3: Rank mismatch (Subspace A dim 2, Subspace B dim 1)
+        basis_B_1d = np.array([u1])
+        basis_p_B_1d = np.array([u1_p])
+        res3 = app.compute_function_subspace_principal_angles(basis_A, basis_p_A, basis_B_1d, basis_p_B_1d, du)
+        assert res3['stable'] is False
+        assert res3['distance'] == pytest.approx(1.0, abs=1e-5)
+        assert "Rank mismatch" in res3.get('reason', '') or res3['rank_A'] != res3['rank_B']
+
+        # Case 4: Non-finite inputs (NaN / Inf)
+        basis_nan = np.array([[np.nan, 1.0], [1.0, 2.0]])
+        basis_p_nan = np.array([[0.0, 0.0], [0.0, 0.0]])
+        res4 = app.compute_function_subspace_principal_angles(basis_nan, basis_p_nan, basis_A, basis_p_A, du)
+        assert res4['stable'] is False
+        assert res4['distance'] == pytest.approx(1.0, abs=1e-5)
+
+    def test_27_stieltjes_narrow_window_dynamic_parameters_and_mixed_grade_envelope(self):
+        """Invariant 15: Parameter-dependent Stieltjes derivation, scale-aware window bounds, and mixed-grade envelope.
+        1. Narrow window (8.0, 8.000001) does not produce negative bounds or crash.
+        2. Direct Mellin evaluations are computed dynamically (differ across windows [8, 20] and [6, 24]).
+        3. Derivative order k=1 raises ValueError.
+        4. Mixed grade filter envelope {1: 1.0, -1: -1.0} correctly uses max(1, tau^K).
+        """
+        # Case 1: Narrow window support
+        res_narrow = app.derive_explicit_stieltjes_nontrivial_zero_tail_bound(window=(8.0, 8.000001), k_deriv=2)
+        assert res_narrow['status'] == 'EXPLICIT_STIELTJES_TAIL_BOUND_CERTIFIED'
+        for cut in res_narrow['cutoff_evaluations']:
+            assert cut['stieltjes_integral_bound_I_T'] > 0.0
+            assert cut['tail_bound_strip_uniform'] > 0.0
+            assert cut['tail_bound_critical_zeros'] > 0.0
+
+        # Case 2: Dynamic parameter dependence across windows
+        res_w1 = app.derive_explicit_stieltjes_nontrivial_zero_tail_bound(window=(8.0, 20.0), k_deriv=2)
+        res_w2 = app.derive_explicit_stieltjes_nontrivial_zero_tail_bound(window=(6.0, 24.0), k_deriv=2)
+        m1 = res_w1['mellin_point_evaluations_t50']['beta_0.5']['computed_direct_mellin']
+        m2 = res_w2['mellin_point_evaluations_t50']['beta_0.5']['computed_direct_mellin']
+        assert m1 > 0.0
+        assert m2 > 0.0
+        assert abs(m1 - m2) > 1e-4
+
+        # Case 3: Derivative order constraint: k=1 rejected
+        with pytest.raises(ValueError, match="k_deriv must be in"):
+            app.derive_explicit_stieltjes_nontrivial_zero_tail_bound(window=(8.0, 20.0), k_deriv=1)
+
+        # Case 4: Grade filter envelope for mixed positive and negative grades
+        b_mixed = {1: 1.0, -1: -1.0}
+        res_mixed = app.derive_explicit_stieltjes_nontrivial_zero_tail_bound(b_coefficients=b_mixed, window=(8.0, 20.0), k_deriv=2)
+        tau = 2.0 * math.pi
+        expected_M_strip = 1.0 * tau + 1.0 * 1.0  # 2*pi + 1 ~ 7.283185
+        assert res_mixed['filter_bounds']['M_strip_uniform'] == pytest.approx(expected_M_strip, rel=1e-5)
+        assert res_mixed['filter_bounds']['M_strip_uniform'] > res_mixed['filter_bounds']['M_critical_line']
+
+    def test_28_manifest_cryptographic_review_binding_and_tamper_detection(self):
+        """Invariant 16: Cryptographic review binding to canonical substantive content manifest.
+        1. Valid claim and matching manifest binding passes review.
+        2. Mutating claim statement (1+1=3) without review re-certification fails audit.
+        3. Missing or deleted declared evidence file fails review audit.
+        4. Session UUID, arbitrary commit SHA, or substitute hex fails review audit.
+        """
+        spec = {
+            "claim_id": "CLM-TEST-MANIFEST-AUDIT",
+            "author": "Alice Researcher",
+            "git_commit": "82643cafd605492233c6c1e992b78c2c30d45f13",
+            "statement": "Authentic rigorous mathematical claim statement.",
+            "hypotheses": ["H_authentic: non-trivial zeros lie in critical strip"],
+            "parameters": {"bandwidth": 0.05, "window": [8.0, 20.0]},
+            "proof_artifact": "data/authentic_proof.json"
+        }
+        with tempfile.TemporaryDirectory() as td:
+            r_dir = os.path.join(td, ".agents", "claims", "reviews")
+            os.makedirs(r_dir, exist_ok=True)
+            r_file = os.path.join(r_dir, "CLM-TEST-MANIFEST-AUDIT-derivation-review.md")
+
+            data_dir = os.path.join(td, "data")
+            os.makedirs(data_dir, exist_ok=True)
+            proof_file = os.path.join(data_dir, "authentic_proof.json")
+            with open(proof_file, "w", encoding="utf-8") as pf:
+                pf.write('{"proof": "step_by_step_valid"}')
+
+            # Baseline: legitimate manifest SHA256
+            _, actual_sha = compute_claim_substantive_manifest(spec, td)
+            with open(r_file, "w", encoding="utf-8") as rf:
+                rf.write(
+                    "# Independent Derivation Review for CLM-TEST-MANIFEST-AUDIT\n"
+                    "Reviewer: Independent Auditor\n"
+                    "Derivation: Rigorous analysis evaluated.\n"
+                    "Objections: Adversarial checks attempted; none fatal.\n"
+                    "Verdict: PASSED. Verified completely.\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                    f"Reviewed-Manifest-SHA256: {actual_sha}\n"
+                )
+            ok_base, msg_base, _ = verify_independent_review("CLM-TEST-MANIFEST-AUDIT", spec, repo_root=td)
+            assert ok_base is True, f"Legitimate review should pass, got: {msg_base}"
+
+            # Tamper 1: Mutate claim statement to 1+1=3
+            spec_tampered = dict(spec)
+            spec_tampered["statement"] = "1 + 1 = 3 (unauthorized tampering)"
+            ok_t1, msg_t1, _ = verify_independent_review("CLM-TEST-MANIFEST-AUDIT", spec_tampered, repo_root=td)
+            assert ok_t1 is False, "Mutated statement must invalidate review"
+            assert "mismatch" in msg_t1.lower() or "wrong claim hash" in msg_t1.lower()
+
+            # Tamper 2: Delete evidence file on disk
+            os.remove(proof_file)
+            ok_t2, msg_t2, _ = verify_independent_review("CLM-TEST-MANIFEST-AUDIT", spec, repo_root=td)
+            assert ok_t2 is False, "Deleted evidence file must invalidate review"
+            assert "missing on disk" in msg_t2.lower()
+
+            # Restore evidence file for Tamper 3
+            with open(proof_file, "w", encoding="utf-8") as pf:
+                pf.write('{"proof": "step_by_step_valid"}')
+
+            # Tamper 3: Supply session UUID or arbitrary hex instead of actual manifest SHA
+            with open(r_file, "w", encoding="utf-8") as rf:
+                rf.write(
+                    "# Independent Derivation Review for CLM-TEST-MANIFEST-AUDIT\n"
+                    "Reviewer: Independent Auditor\n"
+                    "Derivation: Rigorous analysis evaluated.\n"
+                    "Objections: Adversarial checks attempted; none fatal.\n"
+                    "Verdict: PASSED. Verified completely.\n"
+                    "Commit: 82643cafd605492233c6c1e992b78c2c30d45f13\n"
+                    "Reviewed-Manifest-SHA256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n"
+                )
+            ok_t3, msg_t3, _ = verify_independent_review("CLM-TEST-MANIFEST-AUDIT", spec, repo_root=td)
+            assert ok_t3 is False, "Arbitrary hex digest must be rejected"
+            assert "mismatch" in msg_t3.lower() or "wrong claim hash" in msg_t3.lower()
+
+    def test_29_milestone_completion_evidence_schema_and_dependency_verification(self):
+        """Invariant 17: Strict milestone completion gate checks.
+        1. Rejects resolved task with evidence: [None] or evidence: [null].
+        2. Rejects evidence JSON file containing explicit rejection decision {"decision": "REJECTED"}.
+        3. Rejects resolved task declaring missing review artifact.
+        4. Rejects resolved task with unresolved or missing dependencies.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            q_file = os.path.join(td, "queue.json")
+            s_file = os.path.join(td, "state.json")
+            with open(s_file, "w", encoding="utf-8") as f:
+                json.dump({"active_tracks": {"tr1": {"status": "RESOLVED"}}}, f)
+
+            real_ev = os.path.join(td, "evidence.json")
+            with open(real_ev, "w", encoding="utf-8") as f:
+                f.write('{"status": "OK", "decision": "ACCEPTED"}')
+
+            # Case 1: evidence contains [None] or null
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{"task_id": "T1", "status": "RESOLVED", "evidence": [None], "review_status": "ACCEPTED"}]
+                }, f)
+            ok1, msg1, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok1 is False, "Evidence with [None] must be rejected"
+            assert "empty, null, or invalid evidence" in msg1
+
+            # Case 2: Evidence JSON file has {"decision": "REJECTED"}
+            rejected_ev = os.path.join(td, "rejected_evidence.json")
+            with open(rejected_ev, "w", encoding="utf-8") as f:
+                f.write('{"status": "COMPUTED", "decision": "REJECTED"}')
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{"task_id": "T2", "status": "RESOLVED", "evidence": [rejected_ev], "review_status": "ACCEPTED"}]
+                }, f)
+            ok2, msg2, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok2 is False, "Evidence file with rejection decision must be rejected"
+            assert "rejection/failure decision" in msg2
+
+            # Case 3: Missing declared review artifact
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [{
+                        "task_id": "T3",
+                        "status": "RESOLVED",
+                        "evidence": [real_ev],
+                        "review_status": "ACCEPTED",
+                        "review_artifact": os.path.join(td, "nonexistent_review.md")
+                    }]
+                }, f)
+            ok3, msg3, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok3 is False, "Missing review artifact must block completion"
+            assert "missing review artifact" in msg3
+
+            # Case 4: Unresolved task dependency
+            with open(q_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "active_task_id": None,
+                    "tasks": [
+                        {"task_id": "DEP1", "status": "IN_PROGRESS"},
+                        {"task_id": "T4", "status": "RESOLVED", "dependencies": ["DEP1"], "evidence": [real_ev], "review_status": "ACCEPTED"}
+                    ]
+                }, f)
+            ok4, msg4, _ = app.verify_research_milestone_completion(queue_path=q_file, state_path=s_file, repo_root=td)
+            assert ok4 is False, "Task with unresolved dependency must block completion"
+            assert "unresolved or non-terminal" in msg4 or "unresolved task 'DEP1'" in msg4
 
 

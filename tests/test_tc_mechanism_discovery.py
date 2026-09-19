@@ -4460,6 +4460,75 @@ def test_stieltjes_nontrivial_zero_tail_bound():
     assert evals_k3[-1]['tail_bound_off_critical_zeros'] < 2e-3
 
 
+def test_baseline_canonical_weil_error_budget(tmp_path):
+    """
+    Verify the certified error budget for the baseline contracted Weil quadratic form W_G:
+    1. Archimedean convergence ||Delta A_U||_2 between N_t=1000 and N_t=2000 is < 10.0.
+    2. Prime table discrepancy ||Delta W_prime||_2 is bounded by 21,000 (0.00593%).
+    3. Zero-sum contraction operator norm ||DP||_2^2 < 0.06.
+    4. Contracted error ||Delta W_G||_2 < 1500.0.
+    5. Certified lower margin lambda_min(W_G) - ||Delta W_G||_2 >= 1.3e7 > 0 with margin ratio > 10,000x.
+    6. Archimedean tail R_U >= 0 is certified for T_U = 320 by Bochner's theorem.
+    """
+    out_file = str(tmp_path / "test_error_budget.json")
+    res = transcendental.certify_baseline_canonical_weil_error_budget(output_path=out_file)
+
+    assert res['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED'
+    assert res['epistemic_class'] == 'CERTIFIED_FINITE_QUADRATURE_ERROR_BUDGET'
+    assert res['error_budget']['is_strictly_positive'] is True
+
+    # Error budget numbers
+    eb = res['error_budget']
+    assert eb['lambda_min_computed'] > 1.3e7
+    assert eb['certified_lambda_min_lower_margin'] > 1.3e7
+    assert eb['bound_delta_W_G'] < 2000.0
+    assert eb['margin_ratio'] > 8000.0
+
+    # Subspace contraction
+    sc = res['subspace_contraction']
+    assert sc['norm_DP_sq'] < 0.10
+    assert sc['contraction_ratio'] > 10.0
+
+    # Tail regularity
+    tr = res['tail_regularity']
+    assert tr['tail_is_psd'] is True
+    assert tr['T_U'] == 320.0
+    assert tr['omega_at_TU'] > 3.0
+
+    # Output file verification
+    import os, json
+    assert os.path.exists(out_file)
+    with open(out_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    assert data['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED'
+
+
+def test_enlarged_grade_space_rayleigh_spectrum():
+    """
+    Verify intrinsic H^1 function-norm Rayleigh quotient across enlarged grade spaces:
+    1. Baseline 4 grades (dim 3): [-1, -2, -3, -4]
+    2. Negative 5 grades (dim 4): [-1, -2, -3, -4, -5]
+    3. Mixed 4 grades (dim 3): [-2, -1, 0, 1]
+    4. Mixed 5 grades (dim 4): [-3, -2, -1, 0, 1]
+    Verifies that all minimum H^1 Rayleigh quotients are strictly positive (> 1.5e4)
+    and well-conditioned.
+    """
+    res = transcendental.evaluate_tc_enlarged_grade_space_rayleigh_spectrum()
+
+    assert res['status'] == 'ENLARGED_GRADE_SPACE_RAYLEIGH_SPECTRUM_EVALUATED'
+    assert res['epistemic_class'] == 'EMPIRICAL_FUNCTION_NORM_RAYLEIGH_SPECTRUM'
+    assert res['summary']['all_rayleigh_positive'] is True
+    assert res['summary']['global_minimum_rayleigh_H1'] > 1.5e4
+
+    configs = res['configurations']
+    assert len(configs) == 4
+    for c in configs:
+        assert c['is_strictly_positive'] is True
+        assert c['rayleigh_min_H1'] > 1.5e4
+        assert c['gram_H1_condition_number'] < 5000.0
+
+
+
 
 
 

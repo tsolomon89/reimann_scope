@@ -187,6 +187,8 @@ from tc.weil_forms import (
     sieve_prime_powers_in_window,
     verify_canonical_reflected_weil_sign_certificate,
     evaluate_tc_canonical_weil_spectrum_sweep,
+    certify_baseline_canonical_weil_error_budget,
+    evaluate_tc_enlarged_grade_space_rayleigh_spectrum,
 )
 
 from tc.approximation import (
@@ -326,6 +328,7 @@ __all__ = [
     "canonical_window_weight",
     "canonical_window_weight_deriv",
     "certify_archimedean_tail_psd",
+    "certify_baseline_canonical_weil_error_budget",
     "certify_bounded_rational_exclusion_arb",
     "certify_pairwise_phase_distinction_arb",
     "classify_finite_series_trend",
@@ -367,6 +370,7 @@ __all__ = [
     "evaluate_scaled_dirichlet_series",
     "evaluate_smooth_independent_target",
     "evaluate_tc_canonical_weil_spectrum_sweep",
+    "evaluate_tc_enlarged_grade_space_rayleigh_spectrum",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

@@ -475,6 +475,111 @@ def _git_commit_exists(commit_sha: str, root_dir: Optional[str] = None) -> bool:
             continue
     return False
 
+SUBSTANTIVE_SPEC_KEYS = [
+    "claim_id",
+    "statement",
+    "mathematical_statement",
+    "quantified_variables",
+    "quantifiers",
+    "variable_domains",
+    "hypotheses",
+    "object_studied",
+    "mathematical_object",
+    "fourier_normalization",
+    "multiplicity_convention",
+    "measure_and_window",
+    "order_of_limits",
+    "exact_conclusion",
+    "logical_negation",
+    "epistemic_role",
+    "evidence_scope",
+    "claimed_scope",
+    "evidence_class",
+    "exact_or_truncated",
+    "arithmetic_cutoff",
+    "spectral_cutoff",
+    "integration_domain",
+    "omitted_tail",
+    "tail_enclosure",
+    "dependencies",
+    "external_sources",
+    "external_references",
+    "falsification_attempts",
+    "falsification_tests",
+    "tolerances",
+    "parameters",
+    "boundary_cases_analyzed",
+    "acceptance_criteria",
+]
+
+
+def compute_claim_substantive_manifest(
+    spec: Dict[str, Any],
+    repo_root: Optional[str] = None
+) -> Tuple[Dict[str, Any], str]:
+    """
+    Computes a canonical substantive content manifest for a mathematical claim,
+    covering the mathematical payload, hypotheses, scope, parameters,
+    and cryptographic SHA256 digests of all declared evidence files on disk.
+
+    Separates mutable review/status metadata (status, review_status, git_commit,
+    reviewer, author, review_message, etc.) to prevent circular hashing.
+    """
+    if repo_root is None:
+        repo_root = DEFAULT_REPO_ROOT
+
+    substantive_payload: Dict[str, Any] = {}
+    for key in SUBSTANTIVE_SPEC_KEYS:
+        if key in spec and spec[key] is not None:
+            substantive_payload[key] = spec[key]
+
+    evidence_digests: Dict[str, str] = {}
+
+    # Proof artifact
+    proof_art = str(spec.get("proof_artifact", "")).strip()
+    if proof_art and proof_art.lower() != "none":
+        raw_path = proof_art.split()[0].strip()
+        abs_proof = os.path.normpath(raw_path) if os.path.isabs(raw_path) else os.path.normpath(os.path.join(repo_root, raw_path))
+        if os.path.exists(abs_proof) and os.path.isfile(abs_proof):
+            with open(abs_proof, "rb") as pf:
+                evidence_digests[raw_path] = hashlib.sha256(pf.read()).hexdigest()
+        else:
+            evidence_digests[raw_path] = "FILE_MISSING"
+
+    # Computational evidence
+    comp_ev = spec.get("computational_evidence", [])
+    if isinstance(comp_ev, list):
+        for item in comp_ev:
+            if isinstance(item, str) and item.strip():
+                raw_item = item.strip()
+                if ":" in raw_item:
+                    if len(raw_item) > 2 and raw_item[1] == ":" and (raw_item[2] in ("\\", "/")):
+                        drive = raw_item[:2]
+                        rest = raw_item[2:]
+                        clean_path = drive + (rest.split(":", 1)[0].strip() if ":" in rest else rest)
+                    else:
+                        clean_path = raw_item.split(":", 1)[0].strip()
+                else:
+                    clean_path = raw_item
+
+                if clean_path:
+                    abs_ev = os.path.normpath(clean_path) if os.path.isabs(clean_path) else os.path.normpath(os.path.join(repo_root, clean_path))
+                    if os.path.exists(abs_ev) and os.path.isfile(abs_ev):
+                        with open(abs_ev, "rb") as ef:
+                            evidence_digests[clean_path] = hashlib.sha256(ef.read()).hexdigest()
+                    else:
+                        evidence_digests[clean_path] = "FILE_MISSING"
+
+    manifest = {
+        "claim_id": str(spec.get("claim_id", "")).strip(),
+        "substantive_payload": substantive_payload,
+        "evidence_digests": evidence_digests
+    }
+
+    canonical_json = json.dumps(manifest, sort_keys=True, indent=2)
+    manifest_sha256 = hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
+    return manifest, manifest_sha256
+
 
 def verify_independent_review(
     claim_id: str,
@@ -496,11 +601,11 @@ def verify_independent_review(
          UNSOUND, FATAL CIRCULARITY, INCORRECT, UNRESOLVED, CONTRADICTED, DO NOT ACCEPT, NOT ACCEPTED).
        - Requires a structured positive approval verdict (PASSED, APPROVED, ACCEPTED,
          VERIFIED, CONFIRMED, PROVED, FORMALIZED, VALID, CERTIFIED).
-    5. Revision and evidence binding:
-       - Declared commit SHAs (in review or spec) MUST actually exist in the git repository.
-       - Stale reviews where review commit does not match spec git_commit are rejected.
-       - Declared claim spec hashes must match actual SHA256.
-       - Reviews must be bound to a valid existing commit, claim hash, session UUID, or actual declared evidence.
+    5. Content-Manifest Binding:
+       - Review MUST be explicitly bound to the recomputed SHA256 of the substantive content manifest.
+       - Any change in claim statement, hypotheses, parameters, or evidence invalidates the review.
+       - Missing evidence files on disk strictly fail validation.
+       - Declared commit SHAs must exist in git; stale review commits are rejected.
     """
     if not claim_id or claim_id == "UNKNOWN":
         return False, "No claim ID specified", {}
@@ -629,85 +734,56 @@ def verify_independent_review(
         if not any(re.search(p, content, re.IGNORECASE) for p in positive_patterns):
             return False, "Review artifact lacks explicit positive approval verdict (e.g. PASSED, APPROVED, ACCEPTED, VERIFIED)", {}
 
-    # 5. Revision binding check and verification
+    # 5. Commit verification: verify commits exist if declared
     m_commit = re.search(r'(?:target commit|commit sha|commit|sha|start sha)\s*[:*`]+\s*([0-9a-fA-F]{7,40})', content, re.IGNORECASE)
-    m_hash = re.search(r'(?:claim hash|spec hash|claim_hash|spec_hash|input digest|artifact hash)\s*[:*`]+\s*(?:sha256:)?([0-9a-fA-F]{16,64})', content, re.IGNORECASE)
-    m_sess = re.search(r'session id\s*[:*`]+\s*([0-9a-fA-F-]{36})', content, re.IGNORECASE)
-    has_claim_id_ref = claim_id.lower() in content_lower
-
-    # Commit verification: reject stale reviews and nonexistent commits in git repository
     rev_commit = m_commit.group(1).lower() if m_commit else ""
     spec_commit = str(spec.get("git_commit", "")).strip().lower() if spec else ""
 
-    # Stale review check: review commit must match declared spec commit
     if rev_commit and spec_commit and spec_commit != "unknown":
         if not (rev_commit.startswith(spec_commit) or spec_commit.startswith(rev_commit)):
             return False, f"Stale review detected: review commit '{rev_commit}' does not match claim specification commit '{spec_commit}'", {}
 
-    commit_is_valid = False
     if rev_commit:
         if not _git_commit_exists(rev_commit, repo_root):
             return False, f"Nonexistent commit '{rev_commit}': declared review commit does not exist in git repository", {}
-        commit_is_valid = True
 
     if spec_commit and spec_commit != "unknown":
         if not _git_commit_exists(spec_commit, repo_root):
             return False, f"Nonexistent commit '{spec_commit}': declared claim specification git_commit does not exist in git repository", {}
 
-    # Evidence binding: check for reference to declared evidence artifacts
-    proof_art = str(spec.get("proof_artifact", "")).strip() if spec else ""
-    clean_proof_art = os.path.basename(proof_art.split()[0]) if proof_art and proof_art.lower() != "none" else ""
-    comp_ev = spec.get("computational_evidence", []) if spec else []
-    clean_comp_files = []
-    if isinstance(comp_ev, list):
-        for item in comp_ev:
-            if isinstance(item, str) and item.strip():
-                clean_comp_files.append(os.path.basename(item.split(":")[0].strip()))
+    # 6. Canonical Content Manifest Binding
+    manifest, actual_manifest_sha = compute_claim_substantive_manifest(spec, repo_root)
 
-    has_evidence_ref = bool(
-        (clean_proof_art and clean_proof_art.lower() in content_lower) or
-        any(f.lower() in content_lower for f in clean_comp_files if f)
+    # Check for missing evidence files on disk
+    missing_ev = [f for f, h in manifest.get("evidence_digests", {}).items() if h == "FILE_MISSING"]
+    if missing_ev:
+        return False, f"Declared evidence file(s) missing on disk: {', '.join(missing_ev)}", {}
+
+    # Extract declared reviewed manifest SHA256 from the review artifact
+    m_manifest = re.search(
+        r'(?:reviewed-manifest-sha256|reviewed manifest digest|manifest sha256|substantive manifest digest|manifest digest|claim hash|spec hash)\s*[:*`]+\s*(?:sha256:)?([0-9a-fA-F]{64})',
+        content,
+        re.IGNORECASE
     )
 
-    has_revision_binding = bool(
-        commit_is_valid or
-        m_hash or
-        m_sess or
-        (has_claim_id_ref and (has_evidence_ref or re.search(r'\b[0-9a-fA-F]{7,40}\b', content)))
-    )
-    if not has_revision_binding:
-        return False, "Review artifact is not revision-bound or evidence-bound (requires valid commit SHA, claim file hash, session UUID, or reference to declared proof artifact/evidence)", {}
+    if not m_manifest:
+        return False, (
+            "Review artifact is not bound to canonical substantive content manifest. "
+            "Requires explicit 'Reviewed-Manifest-SHA256: <64-hex>' binding matching recomputed substantive manifest."
+        ), {}
 
-    # 6. Verify declared commit matches spec git_commit (reject stale reviews)
-    if rev_commit and spec_commit and spec_commit != "unknown":
-        if not (rev_commit.startswith(spec_commit) or spec_commit.startswith(rev_commit)):
-            return False, f"Stale review detected: review commit '{rev_commit}' does not match claim specification commit '{spec_commit}'", {}
-
-    # 7. Verify declared claim hash matches actual claim file SHA256 (reject wrong claim hash)
-    if m_hash:
-        declared_hash = m_hash.group(1).lower()
-        claim_json_path = os.path.join(repo_root, ".agents", "claims", f"{claim_id}.json")
-        actual_hash = None
-        if os.path.exists(claim_json_path):
-            import hashlib
-            with open(claim_json_path, "rb") as cf:
-                actual_hash = hashlib.sha256(cf.read()).hexdigest().lower()
-        elif spec:
-            import hashlib
-            actual_hash = hashlib.sha256(json.dumps(spec, sort_keys=True).encode("utf-8")).hexdigest().lower()
-
-        spec_art_hashes = [str(h).lower() for h in spec.get("artifact_hashes", [])]
-        clean_spec_art_hashes = [h.replace("sha256:", "").strip() for h in spec_art_hashes]
-        matches_spec = (
-            (actual_hash is not None and declared_hash == actual_hash) or
-            any(declared_hash == h or declared_hash in h or h in declared_hash for h in clean_spec_art_hashes)
-        )
-        if not matches_spec:
-            return False, f"Wrong claim hash detected: review specifies '{declared_hash}' but actual claim spec SHA256 is '{actual_hash}'", {}
+    declared_manifest_sha = m_manifest.group(1).lower()
+    if declared_manifest_sha != actual_manifest_sha.lower():
+        return False, (
+            f"Wrong claim hash / substantive manifest digest mismatch: review specifies '{declared_manifest_sha}' "
+            f"but current recomputed substantive manifest digest is '{actual_manifest_sha}' "
+            f"(substantive claim fields or declared evidence files have been modified or deleted)."
+        ), {}
 
     details = {
         "review_file": review_file,
-        "is_revision_bound": has_revision_binding,
+        "manifest_sha256": actual_manifest_sha,
+        "is_manifest_bound": True,
         "has_objections": has_objections,
         "has_derivation": has_derivation,
         "has_resolution": has_resolution,
