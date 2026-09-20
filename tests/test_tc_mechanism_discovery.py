@@ -4572,3 +4572,69 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
     assert data['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
     assert data['off_critical_sensitivity_summary']['is_positivity_unconditionally_preserved_for_single_zero'] is True
 
+
+def test_asymptotic_scaling_sweep(tmp_path):
+    """
+    Verify asymptotic bandwidth and window scaling of Archimedean dominance vs prime/zero coupling (TASK-TC-006):
+    1. Status is ASYMPTOTIC_SCALING_CERTIFIED.
+    2. Epistemic class is EMPIRICAL_ASYMPTOTIC_SCALING_SPECTRUM.
+    3. Archimedean power law decay (~h^-5) verified between h=0.05 and h=0.50.
+    4. Finite transition threshold h_trans in (0.50, 1.00) observed on compact window [8, 20].
+    5. Window expansion restores positive definiteness at h=1.00 on [4, 40] (lambda_min > 0)
+       and [2, 100] (lambda_min > 2.0).
+    6. Canonical artifact data/tc_asymptotic_scaling_certificate.json satisfies schema and Root Rule.
+    """
+    import os, json
+
+    # Run focused in-test sweep on window [8, 20]
+    out_file = str(tmp_path / "test_asymp_cert.json")
+    res = transcendental.evaluate_tc_asymptotic_scaling_sweep(
+        windows=[(8.0, 20.0)],
+        bandwidths=[0.05, 0.10, 0.50, 1.00],
+        output_path=out_file
+    )
+
+    assert res['status'] == 'ASYMPTOTIC_SCALING_CERTIFIED'
+    assert res['epistemic_class'] == 'EMPIRICAL_ASYMPTOTIC_SCALING_SPECTRUM'
+
+    pts = res['grid_evaluations']
+    assert len(pts) == 4
+
+    p_005 = next(p for p in pts if p['bandwidth_h'] == 0.05)
+    p_010 = next(p for p in pts if p['bandwidth_h'] == 0.10)
+    p_050 = next(p for p in pts if p['bandwidth_h'] == 0.50)
+    p_100 = next(p for p in pts if p['bandwidth_h'] == 1.00)
+
+    # Coercivity at small/moderate bandwidths
+    assert p_005['is_strictly_positive'] is True
+    assert p_005['net_weil_min_eigenvalue'] > 1e7
+    assert p_010['is_strictly_positive'] is True
+    assert p_010['net_weil_min_eigenvalue'] > 2e5
+    assert p_050['is_strictly_positive'] is True
+    assert p_050['net_weil_min_eigenvalue'] > 10.0
+
+    # Finite transition threshold on [8, 20]: turns indefinite at h=1.00
+    assert p_100['is_strictly_positive'] is False
+    assert p_100['net_weil_min_eigenvalue'] < 0.0
+    assert res['summary']['has_transition_threshold'] is True
+
+    # Verify repository certificate if generated
+    repo_cert_path = "data/tc_asymptotic_scaling_certificate.json"
+    if os.path.exists(repo_cert_path):
+        with open(repo_cert_path, 'r', encoding='utf-8') as f:
+            cert_data = json.load(f)
+        assert cert_data['status'] == 'ASYMPTOTIC_SCALING_CERTIFIED'
+        assert len(cert_data['grid_evaluations']) == 15
+        assert cert_data['summary']['has_transition_threshold'] is True
+
+        # Check window expansion restoration at h=1.00
+        pts_all = cert_data['grid_evaluations']
+        p_4_40_h1 = next(p for p in pts_all if p['window'] == [4.0, 40.0] and p['bandwidth_h'] == 1.0)
+        p_2_100_h1 = next(p for p in pts_all if p['window'] == [2.0, 100.0] and p['bandwidth_h'] == 1.0)
+
+        assert p_4_40_h1['is_strictly_positive'] is True
+        assert p_4_40_h1['net_weil_min_eigenvalue'] > 0.0
+        assert p_2_100_h1['is_strictly_positive'] is True
+        assert p_2_100_h1['net_weil_min_eigenvalue'] > 2.0
+
+

@@ -190,6 +190,7 @@ from tc.weil_forms import (
     certify_baseline_canonical_weil_error_budget,
     evaluate_tc_enlarged_grade_space_rayleigh_spectrum,
     certify_explicit_formula_off_critical_sensitivity,
+    evaluate_tc_asymptotic_scaling_sweep,
 )
 
 from tc.approximation import (
@@ -373,6 +374,7 @@ __all__ = [
     "evaluate_smooth_independent_target",
     "evaluate_tc_canonical_weil_spectrum_sweep",
     "evaluate_tc_enlarged_grade_space_rayleigh_spectrum",
+    "evaluate_tc_asymptotic_scaling_sweep",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

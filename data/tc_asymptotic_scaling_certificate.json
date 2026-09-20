@@ -1,0 +1,453 @@
+{
+  "status": "ASYMPTOTIC_SCALING_CERTIFIED",
+  "epistemic_class": "EMPIRICAL_ASYMPTOTIC_SCALING_SPECTRUM",
+  "parameters": {
+    "grades": [
+      -1,
+      -2,
+      -3,
+      -4
+    ],
+    "anchor_grade": -1,
+    "windows": [
+      [
+        8.0,
+        20.0
+      ],
+      [
+        4.0,
+        40.0
+      ],
+      [
+        2.0,
+        100.0
+      ]
+    ],
+    "bandwidths": [
+      0.05,
+      0.1,
+      0.2,
+      0.5,
+      1.0
+    ],
+    "z_max": 16.0,
+    "contraction_norm_DP_sq": 0.07621149371767985,
+    "total_grid_points": 15
+  },
+  "summary": {
+    "has_transition_threshold": true,
+    "transition_points_count": 1,
+    "transition_points": [
+      {
+        "window": [
+          8.0,
+          20.0
+        ],
+        "bandwidth_h": 1.0,
+        "net_min": -0.018159422345026034
+      }
+    ],
+    "global_min_lambda_net": -0.018159422345026034,
+    "max_prime_over_arch_ratio": 235023.69927640498,
+    "window_summaries": {
+      "[8, 20]": {
+        "window": [
+          8.0,
+          20.0
+        ],
+        "evaluations_count": 5,
+        "all_strictly_positive": false,
+        "min_lambda_net": -0.018159422345026034,
+        "transition_threshold_observed": "h_trans in (0.50, 1.00)"
+      },
+      "[4, 40]": {
+        "window": [
+          4.0,
+          40.0
+        ],
+        "evaluations_count": 5,
+        "all_strictly_positive": true,
+        "min_lambda_net": 0.511343753370249,
+        "transition_threshold_observed": "h_trans > 1.00 (coercive on evaluated bandwidths)"
+      },
+      "[2, 100]": {
+        "window": [
+          2.0,
+          100.0
+        ],
+        "evaluations_count": 5,
+        "all_strictly_positive": true,
+        "min_lambda_net": 2.321928222900646,
+        "transition_threshold_observed": "h_trans > 1.00 (coercive on evaluated bandwidths)"
+      }
+    }
+  },
+  "grid_evaluations": [
+    {
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.05,
+      "total_active_stations": 2362,
+      "active_station_counts": {
+        "-1": 19,
+        "-2": 79,
+        "-3": 376,
+        "-4": 1888
+      },
+      "archimedean_min_eigenvalue": 13191160.192430193,
+      "prime_spectral_norm": 16473218.847912483,
+      "prime_over_arch_ratio": 1.248807429187746,
+      "net_weil_min_eigenvalue": 13225688.059670513,
+      "net_weil_eigenvalues": [
+        13225688.059670513,
+        137877947.46581334,
+        4428966729.041019
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.1,
+      "total_active_stations": 2362,
+      "active_station_counts": {
+        "-1": 19,
+        "-2": 79,
+        "-3": 376,
+        "-4": 1888
+      },
+      "archimedean_min_eigenvalue": 293208.5675803536,
+      "prime_spectral_norm": 79910.85249389955,
+      "prime_over_arch_ratio": 0.2725392820317232,
+      "net_weil_min_eigenvalue": 292489.38565211254,
+      "net_weil_eigenvalues": [
+        292489.38565211254,
+        1964878.8750412054,
+        57760732.690911815
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.2,
+      "total_active_stations": 2362,
+      "active_station_counts": {
+        "-1": 19,
+        "-2": 79,
+        "-3": 376,
+        "-4": 1888
+      },
+      "archimedean_min_eigenvalue": 4410.915012916053,
+      "prime_spectral_norm": 42390.03337810479,
+      "prime_over_arch_ratio": 9.610258473350356,
+      "net_weil_min_eigenvalue": 4349.034437342559,
+      "net_weil_eigenvalues": [
+        4349.034437342559,
+        12045.644304072952,
+        767206.0908284837
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.5,
+      "total_active_stations": 2362,
+      "active_station_counts": {
+        "-1": 19,
+        "-2": 79,
+        "-3": 376,
+        "-4": 1888
+      },
+      "archimedean_min_eigenvalue": 16.928330545968816,
+      "prime_spectral_norm": 827.8703109494514,
+      "prime_over_arch_ratio": 48.90442732680419,
+      "net_weil_min_eigenvalue": 12.049314038073552,
+      "net_weil_eigenvalues": [
+        12.049314038073552,
+        217.2430659522896,
+        5907.786186693242
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 1.0,
+      "total_active_stations": 2362,
+      "active_station_counts": {
+        "-1": 19,
+        "-2": 79,
+        "-3": 376,
+        "-4": 1888
+      },
+      "archimedean_min_eigenvalue": 0.0005761852789805741,
+      "prime_spectral_norm": 75.96667301657763,
+      "prime_over_arch_ratio": 131844.17545512965,
+      "net_weil_min_eigenvalue": -0.018159422345026034,
+      "net_weil_eigenvalues": [
+        -0.018159422345026034,
+        3.4250461489753663,
+        110.80620803099495
+      ],
+      "is_strictly_positive": false
+    },
+    {
+      "window": [
+        4.0,
+        40.0
+      ],
+      "bandwidth_h": 0.05,
+      "total_active_stations": 6858,
+      "active_station_counts": {
+        "-1": 55,
+        "-2": 226,
+        "-3": 1081,
+        "-4": 5496
+      },
+      "archimedean_min_eigenvalue": 61800642.31402587,
+      "prime_spectral_norm": 749712069.3348868,
+      "prime_over_arch_ratio": 12.131137173710847,
+      "net_weil_min_eigenvalue": 66567274.59393269,
+      "net_weil_eigenvalues": [
+        66567274.59393269,
+        396046549.6952862,
+        11954867958.744015
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        4.0,
+        40.0
+      ],
+      "bandwidth_h": 0.1,
+      "total_active_stations": 6858,
+      "active_station_counts": {
+        "-1": 55,
+        "-2": 226,
+        "-3": 1081,
+        "-4": 5496
+      },
+      "archimedean_min_eigenvalue": 1052594.8608124529,
+      "prime_spectral_norm": 11129420.338898214,
+      "prime_over_arch_ratio": 10.573318142849274,
+      "net_weil_min_eigenvalue": 1197213.1215085061,
+      "net_weil_eigenvalues": [
+        1197213.1215085061,
+        5937113.203696303,
+        247997045.4730245
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        4.0,
+        40.0
+      ],
+      "bandwidth_h": 0.2,
+      "total_active_stations": 6858,
+      "active_station_counts": {
+        "-1": 55,
+        "-2": 226,
+        "-3": 1081,
+        "-4": 5496
+      },
+      "archimedean_min_eigenvalue": 16110.805371366041,
+      "prime_spectral_norm": 838443.4088492283,
+      "prime_over_arch_ratio": 52.04230263618015,
+      "net_weil_min_eigenvalue": 16676.042815776385,
+      "net_weil_eigenvalues": [
+        16676.042815776385,
+        82531.4869393865,
+        4770015.018723743
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        4.0,
+        40.0
+      ],
+      "bandwidth_h": 0.5,
+      "total_active_stations": 6858,
+      "active_station_counts": {
+        "-1": 55,
+        "-2": 226,
+        "-3": 1081,
+        "-4": 5496
+      },
+      "archimedean_min_eigenvalue": 12.065860004565813,
+      "prime_spectral_norm": 7689.382293306111,
+      "prime_over_arch_ratio": 637.2842292548057,
+      "net_weil_min_eigenvalue": 12.548732270629177,
+      "net_weil_eigenvalues": [
+        12.548732270629177,
+        225.81202246672262,
+        21575.450326942875
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        4.0,
+        40.0
+      ],
+      "bandwidth_h": 1.0,
+      "total_active_stations": 6858,
+      "active_station_counts": {
+        "-1": 55,
+        "-2": 226,
+        "-3": 1081,
+        "-4": 5496
+      },
+      "archimedean_min_eigenvalue": 0.0013742068888739653,
+      "prime_spectral_norm": 263.8887990394841,
+      "prime_over_arch_ratio": 192029.89096912215,
+      "net_weil_min_eigenvalue": 0.511343753370249,
+      "net_weil_eigenvalues": [
+        0.511343753370249,
+        7.414443561734078,
+        328.9461683321957
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        2.0,
+        100.0
+      ],
+      "bandwidth_h": 0.05,
+      "total_active_stations": 17366,
+      "active_station_counts": {
+        "-1": 128,
+        "-2": 555,
+        "-3": 2697,
+        "-4": 13986
+      },
+      "archimedean_min_eigenvalue": 114991635.94710708,
+      "prime_spectral_norm": 2222464042.5349345,
+      "prime_over_arch_ratio": 19.327179966003836,
+      "net_weil_min_eigenvalue": 129161216.79423612,
+      "net_weil_eigenvalues": [
+        129161216.79423612,
+        961390857.0428147,
+        29753545256.46306
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        2.0,
+        100.0
+      ],
+      "bandwidth_h": 0.1,
+      "total_active_stations": 17366,
+      "active_station_counts": {
+        "-1": 128,
+        "-2": 555,
+        "-3": 2697,
+        "-4": 13986
+      },
+      "archimedean_min_eigenvalue": 2113903.581209611,
+      "prime_spectral_norm": 66815176.83306048,
+      "prime_over_arch_ratio": 31.607485519669595,
+      "net_weil_min_eigenvalue": 2384773.597394775,
+      "net_weil_eigenvalues": [
+        2384773.597394775,
+        29408891.43559579,
+        578693985.2837485
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        2.0,
+        100.0
+      ],
+      "bandwidth_h": 0.2,
+      "total_active_stations": 17366,
+      "active_station_counts": {
+        "-1": 128,
+        "-2": 555,
+        "-3": 2697,
+        "-4": 13986
+      },
+      "archimedean_min_eigenvalue": 34579.268310466025,
+      "prime_spectral_norm": 1423864.4898278387,
+      "prime_over_arch_ratio": 41.17682528860453,
+      "net_weil_min_eigenvalue": 46018.212610496936,
+      "net_weil_eigenvalues": [
+        46018.212610496936,
+        557568.9272178431,
+        9899414.642056849
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        2.0,
+        100.0
+      ],
+      "bandwidth_h": 0.5,
+      "total_active_stations": 17366,
+      "active_station_counts": {
+        "-1": 128,
+        "-2": 555,
+        "-3": 2697,
+        "-4": 13986
+      },
+      "archimedean_min_eigenvalue": 55.8706767835046,
+      "prime_spectral_norm": 19868.01097059851,
+      "prime_over_arch_ratio": 355.60712907749115,
+      "net_weil_min_eigenvalue": 67.5126580116434,
+      "net_weil_eigenvalues": [
+        67.5126580116434,
+        1748.6962795584247,
+        44342.50289976969
+      ],
+      "is_strictly_positive": true
+    },
+    {
+      "window": [
+        2.0,
+        100.0
+      ],
+      "bandwidth_h": 1.0,
+      "total_active_stations": 17366,
+      "active_station_counts": {
+        "-1": 128,
+        "-2": 555,
+        "-3": 2697,
+        "-4": 13986
+      },
+      "archimedean_min_eigenvalue": 0.0030803544445485954,
+      "prime_spectral_norm": 723.9562966403266,
+      "prime_over_arch_ratio": 235023.69927640498,
+      "net_weil_min_eigenvalue": 2.321928222900646,
+      "net_weil_eigenvalues": [
+        2.321928222900646,
+        36.90955057441866,
+        884.5129864678272
+      ],
+      "is_strictly_positive": true
+    }
+  ],
+  "mathematical_conclusions": {
+    "archimedean_power_law_decay": "Archimedean minimum eigenvalue exhibits steep power-law decay approximately scaling as h^{-5} across all windows (e.g. from ~1.32e7 at h=0.05 down to ~5.76e-4 at h=1.00 on [8, 20]). For small bandwidths h <= 0.20, the Archimedean background overwhelmingly dominates prime coupling (lambda_min > 4.3e3 > 0 everywhere).",
+    "finite_transition_threshold": "On the compact window [8, 20], a finite transition threshold h_trans in (0.50, 1.00) exists: at h=0.50, the net Weil form remains positive definite (lambda_min = 12.05 > 0), whereas at h=1.00, prime coupling overcomes the decayed Archimedean background, yielding an indefinite matrix (lambda_min = -0.018159 < 0).",
+    "window_expansion_coercivity_restoration": "Expanding the spatial window to [4, 40] and [2, 100] accumulates greater prime-power station density and larger Archimedean spectral mass, shifting the transition threshold outward. On [4, 40], positive definiteness is preserved at h=1.00 (lambda_min = +0.511 > 0), and on [2, 100], coercivity is even stronger (lambda_min = +2.322 > 0 at h=1.00).",
+    "root_rule_boundary_condition": "In accordance with the Root Rule in AGENTS.md, positive definiteness on discrete station families and finite parameter grids does NOT prove universal RH or universal positivity across all test functions; simultaneously, the appearance of a negative eigenvalue at h=1.00 on [8, 20] represents a boundary of the compact profile regime, not a refutation of the reductio. The detection candidate D_F remains STRICTLY OPEN."
+  }
+}

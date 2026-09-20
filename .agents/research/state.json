@@ -26,7 +26,7 @@
       "completion_note": "Repairs 4A-4E completed in tc/approximation.py using authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h; verified error targets, uncertainty triggers, function-space H^1 metrics, and campaign invariants."
     },
     "track_2_continuum_cancellation_and_weil_witness": {
-      "status": "ACTIVE",
+      "status": "COMPLETED",
       "tasks": [
         "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4} [COMPLETED]",
         "Evaluate authentic reflected Weil quadratic form B(f, f) on surviving subspace using ArchimedeanKernelEvaluator [COMPLETED]",
@@ -34,9 +34,9 @@
         "Evaluate enlarged grade spaces (dim 4 with K=-5, mixed positive/negative) and H^1 function-norm Rayleigh spectrum [COMPLETED]",
         "Derive certified Riemann-von Mangoldt Stieltjes tail bounds with honest parameter dependence and Trudgian envelope [COMPLETED]",
         "Arithmetic-spectral explicit formula integration and off-critical witness sensitivity [COMPLETED]",
-        "Asymptotic bandwidth and window scaling of Archimedean dominance vs prime/zero coupling [ACTIVE]"
+        "Asymptotic bandwidth and window scaling of Archimedean dominance vs prime/zero coupling [COMPLETED]"
       ],
-      "active_note": "Explicit formula sensitivity certified (overturn ratio < 0.3%, m_min >= 380, single off-critical zero preserves positivity); asymptotic bandwidth and window scaling queued."
+      "completion_note": "All 7 track tasks completed. Certified baseline error margin (ratio > 8000x), enlarged space Rayleigh coercivity, parameter-dependent Stieltjes tail bound, explicit formula off-critical zero stability (overturn ratio < 0.3%, m_min >= 380), and global asymptotic scaling sweep discovering finite transition threshold h_trans in (0.50, 1.00) on restricted window [8, 20] and coercivity restoration on expanding windows."
     }
   },
   "linked_runs": {
@@ -46,12 +46,14 @@
       "data/tc_continuum_cancellation_weil_spectrum.json",
       "data/tc_baseline_canonical_weil_error_budget.json",
       "data/tc_explicit_formula_sensitivity_certificate.json",
+      "data/tc_asymptotic_scaling_certificate.json",
       "data/tc_epic_synthesis.json"
     ],
     "research_runs": [
       "data/tc_continuum_cancellation_weil_spectrum.json",
       "data/tc_baseline_canonical_weil_error_budget.json",
-      "data/tc_explicit_formula_sensitivity_certificate.json"
+      "data/tc_explicit_formula_sensitivity_certificate.json",
+      "data/tc_asymptotic_scaling_certificate.json"
     ],
     "research_runs_index": "research/index.json"
   }
