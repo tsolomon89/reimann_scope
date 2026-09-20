@@ -502,6 +502,14 @@ SUBSTANTIVE_SPEC_KEYS = [
     "omitted_tail",
     "tail_enclosure",
     "dependencies",
+    "dependency_claim_ids",
+    "remaining_analytic_dependencies",
+    "open_obligations",
+    "external_analytic_obligations",
+    "source_file",
+    "source_reference",
+    "verification_commands",
+    "verification_command",
     "external_sources",
     "external_references",
     "falsification_attempts",
@@ -659,10 +667,29 @@ def verify_independent_review(
             r'\bfailed\b',
             r'\bdo\s+not\s+pass\b',
             r'\bnot\s+passed\b',
-            r'\bunapproved\b'
+            r'\bunapproved\b',
+            r'\bnot\s+verified\b',
+            r'\bunverified\b',
+            r'\bnot\s+proved\b',
+            r'\bunproved\b',
+            r'\bnot\s+confirmed\b',
+            r'\bunconfirmed\b',
+            r'\bnot\s+formalized\b',
+            r'\bunformalized\b',
+            r'\bnot\s+certified\b',
+            r'\buncertified\b',
+            r'\binvalid\b',
+            r'\bunsound\b'
         ]
         if any(re.search(pat, v_clause, re.IGNORECASE) for pat in verdict_refusal_patterns):
             return False, f"Review artifact recorded explicit refusal or negative verdict: '{m_verdict.group(0).strip()}'", {}
+
+        # Detect negated approval in the verdict clause (e.g. 'not verified', 'fails to be proved')
+        neg_m = re.search(r'\b(?:not|never|fails?\s+to\s+be|cannot\s+be|non)\s+([a-z]+)', v_clause, re.IGNORECASE)
+        if neg_m:
+            w_after = neg_m.group(1).lower()
+            if any(w in w_after for w in ["passed", "approved", "accepted", "verified", "confirmed", "proved", "formalized", "valid", "certified"]):
+                return False, f"Review artifact recorded negated approval: '{m_verdict.group(0).strip()}'", {}
 
     # Check for substantive sections (reject placeholder / pending content)
     m_deriv = re.search(r'(?:##\s*[^#\n\r]*derivation[^\n\r]*|\bderivation\s*[:*`]+)\s*([^\n\r]+)', content, re.IGNORECASE)

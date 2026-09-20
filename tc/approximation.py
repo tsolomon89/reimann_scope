@@ -3973,28 +3973,39 @@ def verify_research_milestone_completion(
                         "queue_file": queue_path
                     }
 
-                # Check typed JSON evidence for explicit rejections or failed decisions
+                # Check typed JSON evidence for explicit rejections or failed decisions (strictly fail closed)
                 if abs_ev_path.endswith(".json"):
+                    if not os.path.exists(abs_ev_path) or os.path.getsize(abs_ev_path) == 0:
+                        return False, f"Milestone completion blocked: evidence file '{clean_path}' is missing or empty", {
+                            "task": t,
+                            "evidence_path": clean_path,
+                            "queue_file": queue_path
+                        }
                     try:
                         with open(abs_ev_path, "r", encoding="utf-8") as ef:
                             ev_json = json.load(ef)
-                        if isinstance(ev_json, dict):
-                            decision = str(ev_json.get("decision", "")).strip().upper()
-                            ev_status = str(ev_json.get("status", "")).strip().upper()
-                            if decision in {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND"}:
-                                return False, f"Milestone completion blocked: evidence file '{clean_path}' explicitly records rejection/failure decision '{decision}'", {
-                                    "task": t,
-                                    "evidence_path": clean_path,
-                                    "decision": decision
-                                }
-                            if any(k in ev_status for k in ["REJECTED", "INVARIANTS_FAILED", "AUDIT_FAILED"]):
-                                return False, f"Milestone completion blocked: evidence file '{clean_path}' records failed status '{ev_status}'", {
-                                    "task": t,
-                                    "evidence_path": clean_path,
-                                    "status": ev_status
-                                }
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        return False, f"Milestone completion blocked: evidence file '{clean_path}' is malformed JSON: {e}", {
+                            "task": t,
+                            "evidence_path": clean_path,
+                            "queue_file": queue_path
+                        }
+
+                    if isinstance(ev_json, dict):
+                        decision = str(ev_json.get("decision", "")).strip().upper()
+                        ev_status = str(ev_json.get("status", "")).strip().upper()
+                        if decision in {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND"}:
+                            return False, f"Milestone completion blocked: evidence file '{clean_path}' explicitly records rejection/failure decision '{decision}'", {
+                                "task": t,
+                                "evidence_path": clean_path,
+                                "decision": decision
+                            }
+                        if any(k in ev_status for k in ["REJECTED", "INVARIANTS_FAILED", "AUDIT_FAILED", "FALSIFIED"]):
+                            return False, f"Milestone completion blocked: evidence file '{clean_path}' records failed status '{ev_status}'", {
+                                "task": t,
+                                "evidence_path": clean_path,
+                                "status": ev_status
+                            }
 
             # Check declared review artifact if present
             rev_artifact = t.get("review_artifact")
@@ -4007,17 +4018,43 @@ def verify_research_milestone_completion(
                         "missing_review_artifact": clean_rev,
                         "queue_file": queue_path
                     }
+                if os.path.getsize(abs_rev) == 0:
+                    return False, f"Milestone completion blocked: review artifact '{clean_rev}' is empty", {
+                        "task": t,
+                        "review_artifact": clean_rev,
+                        "queue_file": queue_path
+                    }
                 try:
                     with open(abs_rev, "r", encoding="utf-8") as rf:
-                        r_text = rf.read().lower()
-                    if any(rej in r_text for rej in ["decision: rejected", "verdict: rejected", "status: rejected", "do not accept", "cannot accept"]):
+                        r_text = rf.read()
+                    if clean_rev.endswith(".json"):
+                        r_json = json.loads(r_text)
+                        if isinstance(r_json, dict):
+                            r_verdict = str(r_json.get("verdict") or r_json.get("decision") or r_json.get("status") or "").strip().upper()
+                            if r_verdict in {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND", "NOT ACCEPTED", "DO NOT ACCEPT"}:
+                                return False, f"Milestone completion blocked: review artifact '{clean_rev}' records rejection verdict '{r_verdict}'", {
+                                    "task": t,
+                                    "review_artifact": clean_rev,
+                                    "verdict": r_verdict
+                                }
+                    r_text_lower = r_text.lower()
+                    rejection_phrases = [
+                        "decision: rejected", "verdict: rejected", "status: rejected",
+                        '"verdict": "rejected"', '"status": "rejected"', '"decision": "rejected"',
+                        "do not accept", "cannot accept", "not accepted", "not approved", "disapproved"
+                    ]
+                    if any(rej in r_text_lower for rej in rejection_phrases):
                         return False, f"Milestone completion blocked: review artifact '{clean_rev}' contains rejection verdict", {
                             "task": t,
                             "review_artifact": clean_rev,
                             "queue_file": queue_path
                         }
-                except Exception:
-                    pass
+                except Exception as e:
+                    return False, f"Milestone completion blocked: review artifact '{clean_rev}' failed to read or parse: {e}", {
+                        "task": t,
+                        "review_artifact": clean_rev,
+                        "queue_file": queue_path
+                    }
 
     # Check active tracks in state
     active_tracks = state_data.get("active_tracks", {})
