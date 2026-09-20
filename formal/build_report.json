@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
   "report_type": "formal_build_report",
-  "status": "failed",
+  "status": "passed",
   "command": "lake build",
-  "exit_code": -1,
-  "producing_git_commit": "581c20540b193f624cfb57ba5ea23beba055e4b7",
-  "timestamp": "2026-09-20T11:17:39.372994+00:00",
+  "exit_code": 0,
+  "producing_git_commit": "71eda833347504bfe01c897411dee9eebb3a779a",
+  "timestamp": "2026-09-20T11:18:02.912361+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 277,
@@ -31,7 +31,7 @@
     "scripts/build_formal.py": "365e5867ca847cc7096c475f05c0da8959d2a77533fcfb7bf989a137b545d5e6",
     "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
   },
-  "build_stdout": "",
+  "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "797797ba0808fab83142e8f139d2ab2b58a840aad06549a497168136cd38abb5"
+  "report_hash": "35f1943886adade99f10d916d6cdf5c1946b7f154028ca0ccdd7af88eef37a9e"
 }
