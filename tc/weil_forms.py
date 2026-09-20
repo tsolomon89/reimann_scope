@@ -4808,7 +4808,7 @@ def audit_tc_h1_cutoff_sensitivity_and_enclosure(
         eigs_net, evecs_net = np.linalg.eigh(W_net_G)
         lambda_min_net = float(eigs_net[0])
 
-        if frozen_vec is None and U_val == 16.0 and N_t_val == 1000:
+        if frozen_vec is None:
             frozen_vec = evecs_net[:, 0].copy()
             norm_fv = np.linalg.norm(frozen_vec)
             if norm_fv > 0:
@@ -4816,13 +4816,6 @@ def audit_tc_h1_cutoff_sensitivity_and_enclosure(
 
         val_frozen = float(frozen_vec.T @ W_net_G @ frozen_vec) if frozen_vec is not None else lambda_min_net
         A_frozen = float(frozen_vec.T @ W_arch_G @ frozen_vec) if frozen_vec is not None else 0.0
-
-        if U_val == 16.0 and N_t_val == 1000:
-            A_frozen_U16 = A_frozen
-            val_frozen_U16 = val_frozen
-        elif U_val == 64.0 and N_t_val == 4000:
-            A_frozen_U64 = A_frozen
-            val_frozen_U64 = val_frozen
 
         omega_at_U = archimedean_digamma_weight(U_val)
         evaluations.append({
@@ -4837,35 +4830,100 @@ def audit_tc_h1_cutoff_sensitivity_and_enclosure(
             'is_frozen_vector_positive': bool(val_frozen > 0.0)
         })
 
-    added_arch_energy = A_frozen_U64 - A_frozen_U16
+    # Dynamically derive report conclusions based strictly on what was evaluated
+    has_truncated = any(ev['cutoff_U'] <= 16.0 for ev in evaluations)
+    has_resolved = any(ev['cutoff_U'] >= 64.0 for ev in evaluations)
+
+    ev_trunc = min((ev for ev in evaluations if ev['cutoff_U'] <= 16.0), key=lambda ev: ev['cutoff_U']) if has_truncated else None
+    ev_res = max((ev for ev in evaluations if ev['cutoff_U'] >= 64.0), key=lambda ev: ev['cutoff_U']) if has_resolved else None
+
+    val_frozen_low = ev_trunc['frozen_vector_quadratic_value'] if ev_trunc else None
+    val_frozen_high = ev_res['frozen_vector_quadratic_value'] if ev_res else None
+    A_frozen_low = ev_trunc['frozen_vector_archimedean_energy'] if ev_trunc else None
+    A_frozen_high = ev_res['frozen_vector_archimedean_energy'] if ev_res else None
+
+    if (
+        has_truncated
+        and has_resolved
+        and ev_trunc is not None
+        and ev_res is not None
+        and val_frozen_low is not None
+        and val_frozen_high is not None
+        and A_frozen_high is not None
+        and A_frozen_low is not None
+    ):
+        added_arch_energy = float(A_frozen_high - A_frozen_low)
+        if val_frozen_low < 0.0 and val_frozen_high > 0.0:
+            status = 'TC_H1_CUTOFF_SENSITIVITY_RESOLVED'
+            epistemic_class = 'CERTIFIED_SPECTRAL_ENCLOSURE'
+            decision = 'NEGATIVE_WITNESS_WITHDRAWN_TRUNCATION_ARTIFACT'
+            conclusion = (
+                f"Frozen candidate vector selected at U={ev_trunc['cutoff_U']:.0f} (value {val_frozen_low:+.6f}) "
+                f"turns strictly positive ({val_frozen_high:+.6f} > 0) when Archimedean frequency domain is resolved "
+                f"at U={ev_res['cutoff_U']:.0f} (+{added_arch_energy:.6f} added tail energy)."
+            )
+        else:
+            status = 'TC_H1_CUTOFF_SENSITIVITY_EVALUATED'
+            epistemic_class = 'CERTIFIED_SPECTRAL_ENCLOSURE'
+            decision = 'CUTOFF_SWEEP_COMPLETED'
+            conclusion = f"Sweep from U={ev_trunc['cutoff_U']:.0f} to U={ev_res['cutoff_U']:.0f} evaluated (values {val_frozen_low:+.6f} to {val_frozen_high:+.6f})."
+        witness_text = (
+            f"Without an analytic upper bound on R_U, truncation alone cannot certify a negative witness. "
+            f"Along the frozen candidate, added Archimedean tail energy (+{added_arch_energy:.6f}) overcomes the {val_frozen_low:+.6f} deficit."
+        )
+    elif has_truncated and not has_resolved and ev_trunc is not None:
+        added_arch_energy = None
+        status = 'TC_H1_CUTOFF_SENSITIVITY_TRUNCATED_ONLY'
+        epistemic_class = 'EMPIRICAL_TRUNCATED_QUADRATURE'
+        decision = 'TRUNCATED_EVALUATION_RESOLUTION_PENDING'
+        val_str = f"{val_frozen_low:+.6f}" if val_frozen_low is not None else "uncomputed"
+        conclusion = (
+            f"Only truncated frequency cutoffs U <= {ev_trunc['cutoff_U']:.0f} evaluated (value {val_str}). "
+            f"Resolution at higher frequency cutoffs U >= 64 was not evaluated in this call; frequency domain remains unresolved."
+        )
+        witness_text = (
+            f"Without an analytic upper bound on R_U, truncation alone cannot certify a negative witness. "
+            f"Cutoff U={ev_trunc['cutoff_U']:.0f} gives truncated value {val_str}, but positive tail R_{ev_trunc['cutoff_U']:.0f} >= 0 remains uncomputed."
+        )
+    else:
+        added_arch_energy = None
+        status = 'TC_H1_CUTOFF_SENSITIVITY_EVALUATED'
+        epistemic_class = 'EMPIRICAL_QUADRATURE_EVALUATION'
+        decision = 'CUSTOM_CONFIGS_EVALUATED'
+        conclusion = f"Evaluated {len(evaluations)} custom cutoff configurations dynamically."
+        witness_text = "Truncation B_{<= U} with positive tail R_U >= 0 requires evaluating resolved cutoffs or computing an analytic upper bound."
 
     report = {
-        'status': 'TC_H1_CUTOFF_SENSITIVITY_RESOLVED',
-        'epistemic_class': 'CERTIFIED_SPECTRAL_ENCLOSURE',
-        'decision': 'NEGATIVE_WITNESS_WITHDRAWN_TRUNCATION_ARTIFACT',
+        'status': status,
+        'epistemic_class': epistemic_class,
+        'decision': decision,
         'parameters': {
             'grades': grades,
             'anchor_grade': anchor_grade,
             'window': list(window),
             'bandwidth_h': h,
             'contracted_prime_norm_W_prime_G': norm_W_prime_G,
+            'frozen_eigenvector': frozen_vec.tolist() if frozen_vec is not None else [],
             'frozen_eigenvector_U16': frozen_vec.tolist() if frozen_vec is not None else []
         },
         'evaluations': evaluations,
         'frozen_vector_comparison': {
-            'value_at_U16_Nt1000': val_frozen_U16,
-            'value_at_U64_Nt4000': val_frozen_U64,
-            'archimedean_energy_at_U16': A_frozen_U16,
-            'archimedean_energy_at_U64': A_frozen_U64,
+            'value_at_truncated_cutoff': val_frozen_low,
+            'value_at_resolved_cutoff': val_frozen_high,
+            'value_at_U16_Nt1000': val_frozen_low,
+            'value_at_U64_Nt4000': val_frozen_high,
+            'archimedean_energy_at_truncated_cutoff': A_frozen_low,
+            'archimedean_energy_at_resolved_cutoff': A_frozen_high,
+            'archimedean_energy_at_U16': A_frozen_low,
+            'archimedean_energy_at_U64': A_frozen_high,
             'added_archimedean_tail_energy': added_arch_energy,
-            'conclusion': "Frozen candidate vector turns strictly positive (+0.543874 > 0) when Archimedean frequency domain is resolved."
+            'conclusion': conclusion
         },
         'mathematical_enclosure_analysis': {
             'decomposition': "B(G, G) = B_{<= U}(G, G) + R_U(G, G)",
             'tail_positivity': "By DLMF 5.7.6, omega(t) > 0 for all t >= 10. Thus R_U >= 0 is strictly positive semidefinite by Bochner's theorem.",
             'lower_bound_property': "B_{<= U}(G, G) <= B(G, G) is a rigorous lower bound. A negative truncated value B_{<= 16} < 0 does not imply B(G, G) < 0.",
-            'witness_invalidity': "Without an analytic upper bound on R_U, truncation alone cannot certify a negative witness. Along the frozen candidate, R_16 >= +0.562033 overcomes the -0.018159 deficit.",
-            'reoptimized_eigenvalues': "For all U >= 24, re-optimized lambda_min > 0 (+0.00585 at U=24, +0.29944 at U=32, +0.43905 at U=64).",
+            'witness_invalidity': witness_text,
             'epistemic_verdict': "NEGATIVE_WITNESS_WITHDRAWN; TRANSITION_THRESHOLD_WITHDRAWN; D_F remains STRICTLY OPEN."
         }
     }

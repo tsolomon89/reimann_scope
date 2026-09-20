@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import sys
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, TYPE_CHECKING
@@ -3992,15 +3993,20 @@ def verify_research_milestone_completion(
                         }
 
                     if isinstance(ev_json, dict):
-                        decision = str(ev_json.get("decision", "")).strip().upper()
+                        ev_decision = str(ev_json.get("decision", "")).strip().upper()
                         ev_status = str(ev_json.get("status", "")).strip().upper()
-                        if decision in {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND"}:
-                            return False, f"Milestone completion blocked: evidence file '{clean_path}' explicitly records rejection/failure decision '{decision}'", {
-                                "task": t,
-                                "evidence_path": clean_path,
-                                "decision": decision
-                            }
-                        if any(k in ev_status for k in ["REJECTED", "INVARIANTS_FAILED", "AUDIT_FAILED", "FALSIFIED"]):
+                        ev_verdict = str(ev_json.get("verdict", "")).strip().upper()
+                        ev_result = str(ev_json.get("result", "")).strip().upper()
+
+                        failure_terms = {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND", "FAIL", "FALSIFIED"}
+                        for fval in [ev_decision, ev_status, ev_verdict, ev_result]:
+                            if fval in failure_terms or any(ft in fval for ft in ["REJECTED", "FAILED", "INVALID", "FALSIFIED"]):
+                                return False, f"Milestone completion blocked: evidence file '{clean_path}' records rejection/failure decision or status '{fval}'", {
+                                    "task": t,
+                                    "evidence_path": clean_path,
+                                    "status": fval
+                                }
+                        if any(k in ev_status for k in ["REJECTED", "FAILED", "INVARIANTS_FAILED", "AUDIT_FAILED", "FALSIFIED"]):
                             return False, f"Milestone completion blocked: evidence file '{clean_path}' records failed status '{ev_status}'", {
                                 "task": t,
                                 "evidence_path": clean_path,
@@ -4029,26 +4035,85 @@ def verify_research_milestone_completion(
                         r_text = rf.read()
                     if clean_rev.endswith(".json"):
                         r_json = json.loads(r_text)
-                        if isinstance(r_json, dict):
-                            r_verdict = str(r_json.get("verdict") or r_json.get("decision") or r_json.get("status") or "").strip().upper()
-                            if r_verdict in {"REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND", "NOT ACCEPTED", "DO NOT ACCEPT"}:
-                                return False, f"Milestone completion blocked: review artifact '{clean_rev}' records rejection verdict '{r_verdict}'", {
-                                    "task": t,
-                                    "review_artifact": clean_rev,
-                                    "verdict": r_verdict
-                                }
+                        if not isinstance(r_json, dict) or len(r_json) == 0:
+                            return False, f"Milestone completion blocked: review artifact '{clean_rev}' is empty or not a non-empty dict", {
+                                "task": t,
+                                "review_artifact": clean_rev,
+                                "queue_file": queue_path
+                            }
+
+                        r_verdict = str(r_json.get("verdict", "")).strip().upper()
+                        r_decision = str(r_json.get("decision", "")).strip().upper()
+                        r_status = str(r_json.get("status", "")).strip().upper()
+                        r_resolution = str(r_json.get("resolution", "")).strip().upper()
+
+                        checked_fields = {
+                            "verdict": r_verdict,
+                            "decision": r_decision,
+                            "status": r_status,
+                            "resolution": r_resolution
+                        }
+                        rejection_set = {
+                            "REJECTED", "FAILED", "DISAPPROVED", "INVALID", "UNSOUND",
+                            "NOT ACCEPTED", "DO NOT ACCEPT", "NOT VERIFIED", "UNVERIFIED",
+                            "PENDING", "OPEN", "UNRESOLVED", "FAIL"
+                        }
+                        for fname, fval in checked_fields.items():
+                            if fval:
+                                if fval in rejection_set or any(rej in fval for rej in rejection_set) or fval.startswith("NOT "):
+                                    return False, f"Milestone completion blocked: review artifact '{clean_rev}' records failure/rejection/pending in '{fname}': '{fval}'", {
+                                        "task": t,
+                                        "review_artifact": clean_rev,
+                                        "field": fname,
+                                        "verdict": fval
+                                    }
+
+                        approved_set = {"APPROVED", "ACCEPTED", "PASSED", "VERIFIED", "CONFIRMED", "PROVED", "RESOLVED"}
+                        has_approval = any(fval in approved_set for fval in [r_verdict, r_decision, r_status] if fval)
+                        if not has_approval:
+                            return False, f"Milestone completion blocked: review artifact '{clean_rev}' lacks explicit approval verdict", {
+                                "task": t,
+                                "review_artifact": clean_rev,
+                                "queue_file": queue_path
+                            }
+
+                    # Check markdown text review
                     r_text_lower = r_text.lower()
                     rejection_phrases = [
                         "decision: rejected", "verdict: rejected", "status: rejected",
+                        "decision: failed", "verdict: failed", "status: failed",
+                        "decision: pending", "verdict: pending", "status: pending",
+                        "decision: not verified", "verdict: not verified", "status: not verified",
+                        "decision: unverified", "verdict: unverified", "status: unverified",
+                        "decision: unresolved", "verdict: unresolved", "status: unresolved",
                         '"verdict": "rejected"', '"status": "rejected"', '"decision": "rejected"',
+                        '"verdict": "failed"', '"status": "failed"', '"decision": "failed"',
+                        '"verdict": "pending"', '"status": "pending"', '"decision": "pending"',
+                        '"verdict": "not verified"', '"status": "not verified"', '"decision": "not verified"',
                         "do not accept", "cannot accept", "not accepted", "not approved", "disapproved"
                     ]
                     if any(rej in r_text_lower for rej in rejection_phrases):
-                        return False, f"Milestone completion blocked: review artifact '{clean_rev}' contains rejection verdict", {
+                        return False, f"Milestone completion blocked: review artifact '{clean_rev}' contains rejection or pending verdict", {
                             "task": t,
                             "review_artifact": clean_rev,
                             "queue_file": queue_path
                         }
+
+                    # Check for unresolved or blocking objections in text
+                    objection_patterns = [
+                        r'\b(?:blocking\s+objection|unresolved\s+objection)\b',
+                        r'\b(?:objections?|challenges?)\s*[:*`]+\s*[^\n\r]*\b(?:unresolved|blocking|open|fatal)\b',
+                        r'\[\s*unresolved\s*\]',
+                        r'\[\s*blocking\s*\]'
+                    ]
+                    for pat in objection_patterns:
+                        m_obj = re.search(pat, r_text, re.IGNORECASE)
+                        if m_obj:
+                            return False, f"Milestone completion blocked: review artifact '{clean_rev}' contains unresolved/blocking objection: '{m_obj.group(0).strip()}'", {
+                                "task": t,
+                                "review_artifact": clean_rev,
+                                "objection": m_obj.group(0).strip()
+                            }
                 except Exception as e:
                     return False, f"Milestone completion blocked: review artifact '{clean_rev}' failed to read or parse: {e}", {
                         "task": t,

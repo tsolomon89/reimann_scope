@@ -578,10 +578,27 @@ def compute_claim_substantive_manifest(
                     else:
                         evidence_digests[clean_path] = "FILE_MISSING"
 
+    # Declared source dependencies (from "dependencies", "source_code_dependencies", "source_dependencies")
+    src_deps = spec.get("dependencies", []) + spec.get("source_code_dependencies", []) + spec.get("source_dependencies", [])
+    source_dependency_digests: Dict[str, str] = {}
+    if isinstance(src_deps, list):
+        for item in src_deps:
+            if isinstance(item, str) and item.strip():
+                raw_item = item.strip()
+                clean_path = raw_item.split(":", 1)[0].strip()
+                if clean_path and not clean_path.startswith("CLM-") and ("." in os.path.basename(clean_path)):
+                    abs_dep = os.path.normpath(clean_path) if os.path.isabs(clean_path) else os.path.normpath(os.path.join(repo_root, clean_path))
+                    if os.path.exists(abs_dep) and os.path.isfile(abs_dep):
+                        with open(abs_dep, "rb") as df:
+                            source_dependency_digests[clean_path] = hashlib.sha256(df.read()).hexdigest()
+                    else:
+                        source_dependency_digests[clean_path] = "FILE_MISSING"
+
     manifest = {
         "claim_id": str(spec.get("claim_id", "")).strip(),
         "substantive_payload": substantive_payload,
-        "evidence_digests": evidence_digests
+        "evidence_digests": evidence_digests,
+        "source_dependency_digests": source_dependency_digests
     }
 
     canonical_json = json.dumps(manifest, sort_keys=True, indent=2)
@@ -611,7 +628,7 @@ def verify_independent_review(
          VERIFIED, CONFIRMED, PROVED, FORMALIZED, VALID, CERTIFIED).
     5. Content-Manifest Binding:
        - Review MUST be explicitly bound to the recomputed SHA256 of the substantive content manifest.
-       - Any change in claim statement, hypotheses, parameters, or evidence invalidates the review.
+       - Any change in claim statement, hypotheses, parameters, evidence, or declared source dependencies invalidates the review.
        - Missing evidence files on disk strictly fail validation.
        - Declared commit SHAs must exist in git; stale review commits are rejected.
     """
@@ -635,12 +652,16 @@ def verify_independent_review(
 
     content_lower = content.lower()
 
-    # 1. Explicit negative verdict / fatal circularity / refusal detection
+    # 1. Explicit negative verdict / fatal circularity / refusal / unresolved objection detection
     negative_patterns = [
         r'\b(?:resolution|verdict|status|conclusion|assigned classification)\s*[:*`]+\s*(?:`?(?:REJECTED|FAILED|DISAPPROVED|INVALID|UNRESOLVED|CONTRADICTED|FATAL|UNSOUND|PENDING|NOT APPROVED|NOT PASSED|UNAPPROVED|INCONCLUSIVE|OPEN|DO NOT ACCEPT|NOT ACCEPTED|REFUSED)\b)',
         r'\b(?:verdict|resolution|status)\s*[:*`]+\s*[^\n\r]*\b(?:not approved|not passed|unapproved|rejected|failed|pending|inconclusive|unresolved|do not accept|not accepted|refused)\b',
         r'\bderivation\s*[:*`]+\s*(?:`?(?:INCORRECT|FALSE|UNSOUND|INVALID|FATAL|INCOMPLETE|PENDING)\b)',
         r'\bobjections?\s*[:*`]+\s*(?:`?(?:FATAL|UNRESOLVED|UNANSWERED|BLOCKING|FATAL CIRCULARITY|NOT EVALUATED)\b)',
+        r'\b(?:blocking\s+objection|unresolved\s+objection)\b',
+        r'\b(?:objections?|challenges?)\s*[:*`]+\s*(?:(?!\b(?:no|none|not|zero|without)\b)[^\n\r])*\b(?:unresolved|blocking|open|fatal)\b',
+        r'\[\s*unresolved\s*\]',
+        r'\[\s*blocking\s*\]',
         r'\bdo not accept\b',
         r'\bnot accepted\b',
         r'\bdo not approve\b'
