@@ -4094,6 +4094,8 @@ def evaluate_tc_enlarged_grade_space_rayleigh_spectrum(
         return val, deriv
 
     results_by_config = []
+    rayleigh_mins: List[float] = []
+    rayleigh_maxs: List[float] = []
     all_rayleigh_positive = True
 
     for name, gr in configurations:
@@ -4191,6 +4193,8 @@ def evaluate_tc_enlarged_grade_space_rayleigh_spectrum(
         r_max = float(rayleigh_spectrum[-1])
         if r_min <= 0:
             all_rayleigh_positive = False
+        rayleigh_mins.append(r_min)
+        rayleigh_maxs.append(r_max)
 
         results_by_config.append({
             'configuration_name': name,
@@ -4221,15 +4225,15 @@ def evaluate_tc_enlarged_grade_space_rayleigh_spectrum(
         'summary': {
             'total_configurations': len(configurations),
             'all_rayleigh_positive': all_rayleigh_positive,
-            'global_minimum_rayleigh_H1': float(min(c['rayleigh_min_H1'] for c in results_by_config)),
-            'global_maximum_rayleigh_H1': float(max(c['rayleigh_max_H1'] for c in results_by_config)),
+            'global_minimum_rayleigh_H1': min(rayleigh_mins),
+            'global_maximum_rayleigh_H1': max(rayleigh_maxs),
         },
         'configurations': results_by_config,
         'mathematical_conclusion': (
             f"Across all {len(configurations)} grade configurations (including 4D grade spaces with K=-5 "
             f"and mixed positive/negative grades), the intrinsic H^1 function-norm Rayleigh quotient "
             f"R(G) = B(G, G) / ||G||_{{H^1}}^2 remains strictly positive everywhere (inf R(G) in "
-            f"[{min(c['rayleigh_min_H1'] for c in results_by_config):.2e}, {max(c['rayleigh_min_H1'] for c in results_by_config):.2e}] > 0). "
+            f"[{min(rayleigh_mins):.2e}, {max(rayleigh_maxs):.2e}] > 0). "
             f"This confirms coordinate-invariant coercivity of the canonical Weil quadratic form on this family. "
             f"In accordance with the Root Rule, D_F remains strictly open for un-evaluated profiles or unbounded domains."
         )
