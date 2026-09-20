@@ -191,6 +191,7 @@ from tc.weil_forms import (
     evaluate_tc_enlarged_grade_space_rayleigh_spectrum,
     certify_explicit_formula_off_critical_sensitivity,
     evaluate_tc_asymptotic_scaling_sweep,
+    audit_tc_h1_cutoff_sensitivity_and_enclosure,
 )
 
 from tc.approximation import (
@@ -316,6 +317,7 @@ __all__ = [
     "audit_tc_epic_support_geometry_synthesis",
     "audit_tc_epic_synthesis",
     "audit_tc_epic_two_variable_synthesis",
+    "audit_tc_h1_cutoff_sensitivity_and_enclosure",
     "audit_tc_logarithmic_separation_and_resonance_gap",
     "audit_tc_orbit_uniformity",
     "audit_tc_phase_propositions",

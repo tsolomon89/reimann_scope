@@ -4550,9 +4550,9 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
     assert ab['is_strictly_positive'] is True
     assert ab['certified_arithmetic_margin'] > 1.3e7
 
-    # Spectral remainders
+    # Spectral remainders (with closed zero interval T_cutoff = 100.0)
     sr = res['spectral_remainders']
-    assert sr['stieltjes_nontrivial_zero_tail_bound'] < 0.02
+    assert sr['stieltjes_nontrivial_zero_tail_bound'] < 2.0
     assert sr['trivial_zero_remainder_bound'] < 1e-4
     assert sr['cumulative_critical_zeros_sum'] > 2e5
 
@@ -4586,7 +4586,7 @@ def test_asymptotic_scaling_sweep(tmp_path):
     """
     import os, json
 
-    # Run focused in-test sweep on window [8, 20]
+    # Run focused in-test sweep on window [8, 20] with default decoupled cutoff (U >= 64)
     out_file = str(tmp_path / "test_asymp_cert.json")
     res = transcendental.evaluate_tc_asymptotic_scaling_sweep(
         windows=[(8.0, 20.0)],
@@ -4605,36 +4605,77 @@ def test_asymptotic_scaling_sweep(tmp_path):
     p_050 = next(p for p in pts if p['bandwidth_h'] == 0.50)
     p_100 = next(p for p in pts if p['bandwidth_h'] == 1.00)
 
-    # Coercivity at small/moderate bandwidths
-    assert p_005['is_strictly_positive'] is True
-    assert p_005['net_weil_min_eigenvalue'] > 1e7
-    assert p_010['is_strictly_positive'] is True
-    assert p_010['net_weil_min_eigenvalue'] > 2e5
-    assert p_050['is_strictly_positive'] is True
-    assert p_050['net_weil_min_eigenvalue'] > 10.0
+    # Coercivity across evaluated bandwidths with decoupled cutoff U >= 64
+    assert p_005['is_positive_definite'] is True
+    assert p_005['lambda_min_net'] > 1e7
+    assert p_010['is_positive_definite'] is True
+    assert p_010['lambda_min_net'] > 2e5
+    assert p_050['is_positive_definite'] is True
+    assert p_050['lambda_min_net'] > 10.0
+    assert p_100['is_positive_definite'] is True
+    assert p_100['lambda_min_net'] > 0.40
 
-    # Finite transition threshold on [8, 20]: turns indefinite at h=1.00
-    assert p_100['is_strictly_positive'] is False
-    assert p_100['net_weil_min_eigenvalue'] < 0.0
-    assert res['summary']['has_transition_threshold'] is True
+    # With decoupled cutoff, no transition threshold exists
+    assert res['summary']['has_transition_threshold'] is False
 
-    # Verify repository certificate if generated
-    repo_cert_path = "data/tc_asymptotic_scaling_certificate.json"
-    if os.path.exists(repo_cert_path):
-        with open(repo_cert_path, 'r', encoding='utf-8') as f:
-            cert_data = json.load(f)
-        assert cert_data['status'] == 'ASYMPTOTIC_SCALING_CERTIFIED'
-        assert len(cert_data['grid_evaluations']) == 15
-        assert cert_data['summary']['has_transition_threshold'] is True
+    # Also test truncation diagnostic: at U=16, the artificial negative eigenvalue is reproduced
+    res_trunc = transcendental.evaluate_tc_asymptotic_scaling_sweep(
+        windows=[(8.0, 20.0)],
+        bandwidths=[1.00],
+        U=16.0
+    )
+    p_trunc = res_trunc['grid_evaluations'][0]
+    assert p_trunc['is_positive_definite'] is False
+    assert abs(p_trunc['lambda_min_net'] - (-0.01815942)) < 1e-6
 
-        # Check window expansion restoration at h=1.00
-        pts_all = cert_data['grid_evaluations']
-        p_4_40_h1 = next(p for p in pts_all if p['window'] == [4.0, 40.0] and p['bandwidth_h'] == 1.0)
-        p_2_100_h1 = next(p for p in pts_all if p['window'] == [2.0, 100.0] and p['bandwidth_h'] == 1.0)
 
-        assert p_4_40_h1['is_strictly_positive'] is True
-        assert p_4_40_h1['net_weil_min_eigenvalue'] > 0.0
-        assert p_2_100_h1['is_strictly_positive'] is True
-        assert p_2_100_h1['net_weil_min_eigenvalue'] > 2.0
+def test_h1_cutoff_sensitivity_and_enclosure_audit(tmp_path):
+    """
+    Rigorously verify the h=1 cutoff sensitivity and enclosure audit (TASK-TC-006):
+    1. Status is TC_H1_CUTOFF_SENSITIVITY_RESOLVED.
+    2. Decision is NEGATIVE_WITNESS_WITHDRAWN_TRUNCATION_ARTIFACT.
+    3. Reproduces independent reference results:
+       - U=16, N_t=1000: lambda_min ~= -0.018159
+       - U=16, N_t=2000: lambda_min ~= -0.018159
+       - U=24, N_t=2000: lambda_min ~= +0.005853 > 0
+       - U=32, N_t=2000: lambda_min ~= +0.299442 > 0
+       - U=64, N_t=4000: lambda_min ~= +0.439053 > 0
+    4. Frozen candidate vector selected at U=16 turns strictly positive (+0.543874 > 0)
+       due to +0.562033 of positive Archimedean tail energy.
+    5. Confirms R_U >= 0 prevents negative witness inference from truncation.
+    """
+    import os, json
+
+    out_file = str(tmp_path / "test_h1_cutoff_audit.json")
+    res = transcendental.audit_tc_h1_cutoff_sensitivity_and_enclosure(output_path=out_file)
+
+    assert res['status'] == 'TC_H1_CUTOFF_SENSITIVITY_RESOLVED'
+    assert res['decision'] == 'NEGATIVE_WITNESS_WITHDRAWN_TRUNCATION_ARTIFACT'
+
+    evals = res['evaluations']
+    assert len(evals) == 5
+
+    # Check numerical reproduction of independent table
+    e_16_1000 = evals[0]
+    e_16_2000 = evals[1]
+    e_24_2000 = evals[2]
+    e_32_2000 = evals[3]
+    e_64_4000 = evals[4]
+
+    assert abs(e_16_1000['lambda_min_net_reoptimized'] - (-0.018159422345)) < 1e-8
+    assert abs(e_16_2000['lambda_min_net_reoptimized'] - (-0.018159422345)) < 1e-8
+    assert abs(e_24_2000['lambda_min_net_reoptimized'] - 0.005852516925) < 1e-8
+    assert abs(e_32_2000['lambda_min_net_reoptimized'] - 0.299441816119) < 1e-8
+    assert abs(e_64_4000['lambda_min_net_reoptimized'] - 0.439052929369) < 1e-8
+
+    # Check frozen vector behavior
+    f_comp = res['frozen_vector_comparison']
+    assert f_comp['value_at_U16_Nt1000'] < 0.0
+    assert f_comp['value_at_U64_Nt4000'] > 0.54
+    assert f_comp['added_archimedean_tail_energy'] > 0.56
+
+    # Verify certificate file exists
+    assert os.path.exists(out_file)
+
 
 

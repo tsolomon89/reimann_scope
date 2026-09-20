@@ -1,0 +1,98 @@
+{
+  "status": "TC_H1_CUTOFF_SENSITIVITY_RESOLVED",
+  "epistemic_class": "CERTIFIED_SPECTRAL_ENCLOSURE",
+  "decision": "NEGATIVE_WITNESS_WITHDRAWN_TRUNCATION_ARTIFACT",
+  "parameters": {
+    "grades": [
+      -1,
+      -2,
+      -3,
+      -4
+    ],
+    "anchor_grade": -1,
+    "window": [
+      8.0,
+      20.0
+    ],
+    "bandwidth_h": 1.0,
+    "contracted_prime_norm_W_prime_G": 75.96667301657763,
+    "frozen_eigenvector_U16": [
+      0.22564312829840946,
+      -0.7555960372076947,
+      0.6149469954457341
+    ]
+  },
+  "evaluations": [
+    {
+      "cutoff_U": 16.0,
+      "quadrature_nodes_N_t": 1000,
+      "lambda_min_net_reoptimized": -0.01815942234502728,
+      "frozen_vector_quadratic_value": -0.01815942234502447,
+      "frozen_vector_archimedean_energy": 0.02702114144853489,
+      "omega_at_U": 0.9345487839216611,
+      "tail_is_psd": true,
+      "is_reoptimized_positive": false,
+      "is_frozen_vector_positive": false
+    },
+    {
+      "cutoff_U": 16.0,
+      "quadrature_nodes_N_t": 2000,
+      "lambda_min_net_reoptimized": -0.018159422344941695,
+      "frozen_vector_quadratic_value": -0.01815942234496692,
+      "frozen_vector_archimedean_energy": 0.027021141448593668,
+      "omega_at_U": 0.9345487839216611,
+      "tail_is_psd": true,
+      "is_reoptimized_positive": false,
+      "is_frozen_vector_positive": false
+    },
+    {
+      "cutoff_U": 24.0,
+      "quadrature_nodes_N_t": 2000,
+      "lambda_min_net_reoptimized": 0.005852516925447983,
+      "frozen_vector_quadratic_value": 0.007679379133878682,
+      "frozen_vector_archimedean_energy": 0.05285994292743144,
+      "omega_at_U": 1.3401044039778032,
+      "tail_is_psd": true,
+      "is_reoptimized_positive": true,
+      "is_frozen_vector_positive": true
+    },
+    {
+      "cutoff_U": 32.0,
+      "quadrature_nodes_N_t": 2000,
+      "lambda_min_net_reoptimized": 0.29944181611919385,
+      "frozen_vector_quadratic_value": 0.3687432351053423,
+      "frozen_vector_archimedean_energy": 0.41392379889890224,
+      "omega_at_U": 1.627818139328754,
+      "tail_is_psd": true,
+      "is_reoptimized_positive": true,
+      "is_frozen_vector_positive": true
+    },
+    {
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 4000,
+      "lambda_min_net_reoptimized": 0.4390529293686819,
+      "frozen_vector_quadratic_value": 0.5438739439996393,
+      "frozen_vector_archimedean_energy": 0.5890545077931966,
+      "omega_at_U": 2.3209958439896115,
+      "tail_is_psd": true,
+      "is_reoptimized_positive": true,
+      "is_frozen_vector_positive": true
+    }
+  ],
+  "frozen_vector_comparison": {
+    "value_at_U16_Nt1000": -0.01815942234502447,
+    "value_at_U64_Nt4000": 0.5438739439996393,
+    "archimedean_energy_at_U16": 0.02702114144853489,
+    "archimedean_energy_at_U64": 0.5890545077931966,
+    "added_archimedean_tail_energy": 0.5620333663446617,
+    "conclusion": "Frozen candidate vector turns strictly positive (+0.543874 > 0) when Archimedean frequency domain is resolved."
+  },
+  "mathematical_enclosure_analysis": {
+    "decomposition": "B(G, G) = B_{<= U}(G, G) + R_U(G, G)",
+    "tail_positivity": "By DLMF 5.7.6, omega(t) > 0 for all t >= 10. Thus R_U >= 0 is strictly positive semidefinite by Bochner's theorem.",
+    "lower_bound_property": "B_{<= U}(G, G) <= B(G, G) is a rigorous lower bound. A negative truncated value B_{<= 16} < 0 does not imply B(G, G) < 0.",
+    "witness_invalidity": "Without an analytic upper bound on R_U, truncation alone cannot certify a negative witness. Along the frozen candidate, R_16 >= +0.562033 overcomes the -0.018159 deficit.",
+    "reoptimized_eigenvalues": "For all U >= 24, re-optimized lambda_min > 0 (+0.00585 at U=24, +0.29944 at U=32, +0.43905 at U=64).",
+    "epistemic_verdict": "NEGATIVE_WITNESS_WITHDRAWN; TRANSITION_THRESHOLD_WITHDRAWN; D_F remains STRICTLY OPEN."
+  }
+}

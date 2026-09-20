@@ -26,17 +26,17 @@
       "completion_note": "Repairs 4A-4E completed in tc/approximation.py using authentic ArchimedeanKernelEvaluator and differentiated kernel psi_h; verified error targets, uncertainty triggers, function-space H^1 metrics, and campaign invariants."
     },
     "track_2_continuum_cancellation_and_weil_witness": {
-      "status": "COMPLETED",
+      "status": "ACTIVE",
       "tasks": [
         "Investigate surviving directions of legal zero-sum combinations (sum_K b_K = 0) on grades {-1, -2, -3, -4} [COMPLETED]",
         "Evaluate authentic reflected Weil quadratic form B(f, f) on surviving subspace using ArchimedeanKernelEvaluator [COMPLETED]",
-        "Certify baseline canonical Weil error budget: prime discrepancy, Bochner PSD tail R_U >= 0, ||Delta W_G||_2 <= 1591.14, margin ratio 8312x [COMPLETED]",
-        "Evaluate enlarged grade spaces (dim 4 with K=-5, mixed positive/negative) and H^1 function-norm Rayleigh spectrum [COMPLETED]",
-        "Derive certified Riemann-von Mangoldt Stieltjes tail bounds with honest parameter dependence and Trudgian envelope [COMPLETED]",
-        "Arithmetic-spectral explicit formula integration and off-critical witness sensitivity [COMPLETED]",
-        "Asymptotic bandwidth and window scaling of Archimedean dominance vs prime/zero coupling [COMPLETED]"
+        "Certify baseline canonical Weil error budget with theorem-backed enclosures replacing heuristic differences [REOPENED_PENDING_RIGOROUS_ERROR_ENCLOSURE]",
+        "Evaluate enlarged grade spaces and Rayleigh spectrum with complete-form enclosures [REOPENED_PENDING_COMPLETE_FORM_EVALUATION]",
+        "Derive certified Riemann-von Mangoldt Stieltjes tail bounds with quadratic functional connection [REOPENED_PENDING_QUADRATIC_FUNCTIONAL_DERIVATION]",
+        "Arithmetic-spectral explicit formula integration closing intermediate gap (100, 1000] and correcting pole cancellation [REOPENED_PENDING_SPECTRAL_GAP_CLOSURE]",
+        "Resolve cutoff-sensitive h=1 candidate, withdraw unsupported negative witness, and decouple physical cutoffs [COMPLETED]"
       ],
-      "completion_note": "All 7 track tasks completed. Certified baseline error margin (ratio > 8000x), enlarged space Rayleigh coercivity, parameter-dependent Stieltjes tail bound, explicit formula off-critical zero stability (overturn ratio < 0.3%, m_min >= 380), and global asymptotic scaling sweep discovering finite transition threshold h_trans in (0.50, 1.00) on restricted window [8, 20] and coercivity restoration on expanding windows."
+      "active_note": "TASK-TC-006 completed: reproduced cutoff sensitivity at h=1 on [8, 20] matching independent reference table to 12 decimal places; proved that R_U >= 0 prevents negative witness inference from truncation; showed candidate frozen vector turns positive (+0.544 > 0) at U=64 due to +0.562 of Archimedean tail energy; formally withdrew negative witness and transition threshold claims in data/tc_h1_cutoff_sensitivity_certificate.json; verified global coercivity with decoupled cutoff U >= 64 across 15 configurations in data/tc_asymptotic_scaling_certificate.json. Remaining open obligations: 4A, 4B, 5A, 5B."
     }
   },
   "linked_runs": {
@@ -47,13 +47,15 @@
       "data/tc_baseline_canonical_weil_error_budget.json",
       "data/tc_explicit_formula_sensitivity_certificate.json",
       "data/tc_asymptotic_scaling_certificate.json",
+      "data/tc_h1_cutoff_sensitivity_certificate.json",
       "data/tc_epic_synthesis.json"
     ],
     "research_runs": [
       "data/tc_continuum_cancellation_weil_spectrum.json",
       "data/tc_baseline_canonical_weil_error_budget.json",
       "data/tc_explicit_formula_sensitivity_certificate.json",
-      "data/tc_asymptotic_scaling_certificate.json"
+      "data/tc_asymptotic_scaling_certificate.json",
+      "data/tc_h1_cutoff_sensitivity_certificate.json"
     ],
     "research_runs_index": "research/index.json"
   }

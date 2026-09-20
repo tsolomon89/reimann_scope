@@ -92,3 +92,21 @@ Always verify repository health using the standard command tiers:
 - **Artifact Validation**: `python scripts/workflow.py validate-artifacts --current`
 - **Formal Verification**: `python scripts/build_formal.py` (or `lake build` in `formal/`)
 - **Canonical Plan Audit**: `python scripts/workflow.py plan-canonical`
+
+---
+
+## 6. Complete-Form Spectral Enclosures & Numerical Control Rigor
+
+1. **Decoupled Numerical Controls**:
+   Physical integration cutoffs ($U$) and discretization resolutions ($N_t$) must be controlled as independent variables. When using $U = z_{\max} / h$, increasing bandwidth $h$ while holding $z_{\max}$ fixed truncates the physical frequency domain.
+2. **Complete Enclosures for Negative Witnesses vs. Positive Margins**:
+   For any truncated quadratic form decomposition $B(G, G) = B_{\le U}(G, G) + R_U(G, G)$:
+   - If $R_U \succeq 0$, zero provides a rigorous lower bound for the tail, but claiming a negative witness strictly requires an analytic upper bound on the omitted tail: $B(G, G) \le B_{\le U}(G, G) + \text{TailUpperBound} < 0$. Truncation alone never authorizes a negative witness.
+   - For positive margins, lower bounds on $B_{\le U}$ combined with $R_U \ge 0$ establish positivity, provided discretization and interpolation errors are bounded by an analytic theorem rather than observed mesh differences.
+3. **Absolute Remainder Theorems over Heuristic Differences**:
+   Differences between refined meshes ($\Delta N_t$) or empirical interpolation discrepancies do not bound distance from the exact continuous functional. Analytic remainder bounds or certified ball arithmetic are strictly required.
+4. **Quadratic Functional Consistency**:
+   All explicit formula tail estimates, arithmetic margins, and zero contributions must compute the identical quadratic functional and obey homogeneity $B(\lambda G, \lambda G) = |\lambda|^2 B(G, G)$. Linear explicit formula bounds cannot be transferred without explicit quadratic profile derivation.
+5. **No Intermediate Spectral Gaps**:
+   Spectral zero accounting must not omit intermediate intervals (e.g. $[100, 1000]$). Every zero up to the tail cutoff must be explicitly accounted for, with completeness bounds and conjugate pairs.
+

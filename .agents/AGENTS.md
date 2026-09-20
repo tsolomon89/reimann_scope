@@ -23,3 +23,12 @@ Before proposing or transitioning any theorem-level mathematical claim:
    Establish an independent review artifact in `.agents/claims/reviews/<CLAIM_ID>-derivation-review.md`. The review must record the exact proposition, input digests, adversarial challenges, attempted zero-crossings, resolution, and remaining obligations. Self-review or automated producer flags are strictly invalid.
 5. **Grandfathered Legacy Policy (Policy B)**:
    Unmigrated legacy claims are hash-pinned to baseline commit `82643cafd605492233c6c1e992b78c2c30d45f13` in `.agents/corpus_map/legacy_claim_manifest.json`. Baseline migrations require explicit user authorization. Grandfathering never counts as independent verification.
+
+## Complete-Form Spectral Enclosures & Numerical Control Rigor
+
+1. **Decoupled Numerical Controls**: Physical cutoff $U$ and discretization $N_t$ must be independently controlled; $U = z_{\max}/h$ conflates bandwidth with frequency domain truncation.
+2. **Complete Enclosures for Negative Witnesses**: Truncation $B_{\le U}$ with positive tail $R_U \succeq 0$ can never authorize a negative witness without an analytic upper bound on the omitted positive tail.
+3. **Absolute Remainder Theorems**: Observed differences across mesh refinements or interpolation do not constitute error bounds without explicit analytic theorems.
+4. **Quadratic Functional Consistency**: Explicit formula tail estimates and arithmetic margins must compute the identical quadratic functional and satisfy homogeneity $B(\lambda G, \lambda G) = |\lambda|^2 B(G, G)$.
+5. **No Intermediate Spectral Gaps**: Zero accounting must not leave uncounted intermediate intervals (such as $(100, 1000]$). Every zero up to the tail cutoff must be rigorously accounted for.
+

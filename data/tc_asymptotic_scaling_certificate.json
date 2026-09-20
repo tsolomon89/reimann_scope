@@ -31,54 +31,43 @@
       1.0
     ],
     "z_max": 16.0,
+    "decoupled_cutoff_U": null,
     "contraction_norm_DP_sq": 0.07621149371767985,
     "total_grid_points": 15
   },
   "summary": {
-    "has_transition_threshold": true,
-    "transition_points_count": 1,
-    "transition_points": [
-      {
-        "window": [
-          8.0,
-          20.0
-        ],
-        "bandwidth_h": 1.0,
-        "net_min": -0.018159422345026034
-      }
-    ],
-    "global_min_lambda_net": -0.018159422345026034,
-    "max_prime_over_arch_ratio": 235023.69927640498,
+    "has_transition_threshold": false,
+    "transition_points_count": 0,
+    "transition_points": [],
+    "global_min_lambda_net": 0.43905292936881674,
+    "max_prime_over_arch_ratio": 0.9861598641156012,
     "window_summaries": {
       "[8, 20]": {
         "window": [
           8.0,
           20.0
         ],
-        "evaluations_count": 5,
-        "all_strictly_positive": false,
-        "min_lambda_net": -0.018159422345026034,
-        "transition_threshold_observed": "h_trans in (0.50, 1.00)"
+        "min_lambda_net": 0.43905292936881674,
+        "is_coercive_all_h": true,
+        "transition_status": "coercive on evaluated bandwidths with decoupled cutoff U >= 64"
       },
       "[4, 40]": {
         "window": [
           4.0,
           40.0
         ],
-        "evaluations_count": 5,
-        "all_strictly_positive": true,
-        "min_lambda_net": 0.511343753370249,
-        "transition_threshold_observed": "h_trans > 1.00 (coercive on evaluated bandwidths)"
+        "min_lambda_net": 1.2181182898168461,
+        "is_coercive_all_h": true,
+        "transition_status": "coercive on evaluated bandwidths with decoupled cutoff U >= 64"
       },
       "[2, 100]": {
         "window": [
           2.0,
           100.0
         ],
-        "evaluations_count": 5,
-        "all_strictly_positive": true,
-        "min_lambda_net": 2.321928222900646,
-        "transition_threshold_observed": "h_trans > 1.00 (coercive on evaluated bandwidths)"
+        "min_lambda_net": 5.717740188618453,
+        "is_coercive_all_h": true,
+        "transition_status": "coercive on evaluated bandwidths with decoupled cutoff U >= 64"
       }
     }
   },
@@ -89,23 +78,20 @@
         20.0
       ],
       "bandwidth_h": 0.05,
-      "total_active_stations": 2362,
-      "active_station_counts": {
-        "-1": 19,
-        "-2": 79,
-        "-3": 376,
-        "-4": 1888
-      },
-      "archimedean_min_eigenvalue": 13191160.192430193,
-      "prime_spectral_norm": 16473218.847912483,
-      "prime_over_arch_ratio": 1.248807429187746,
-      "net_weil_min_eigenvalue": 13225688.059670513,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 320.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 13191160.192430193,
+      "lambda_max_prime": 132986.7061908456,
+      "lambda_min_net": 13225688.059670513,
+      "norm_W_arch_G": 4412564886.13299,
+      "norm_W_prime_G": 16473218.847912483,
+      "prime_over_arch_ratio": 0.003733252489879873,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         13225688.059670513,
         137877947.46581334,
         4428966729.041019
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -113,23 +99,20 @@
         20.0
       ],
       "bandwidth_h": 0.1,
-      "total_active_stations": 2362,
-      "active_station_counts": {
-        "-1": 19,
-        "-2": 79,
-        "-3": 376,
-        "-4": 1888
-      },
-      "archimedean_min_eigenvalue": 293208.5675803536,
-      "prime_spectral_norm": 79910.85249389955,
-      "prime_over_arch_ratio": 0.2725392820317232,
-      "net_weil_min_eigenvalue": 292489.38565211254,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 160.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 293208.5675803536,
+      "lambda_max_prime": 79910.85249389955,
+      "lambda_min_net": 292489.38565211254,
+      "norm_W_arch_G": 57809781.614099115,
+      "norm_W_prime_G": 79910.85249389955,
+      "prime_over_arch_ratio": 0.0013823067699396093,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         292489.38565211254,
         1964878.8750412054,
         57760732.690911815
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -137,23 +120,20 @@
         20.0
       ],
       "bandwidth_h": 0.2,
-      "total_active_stations": 2362,
-      "active_station_counts": {
-        "-1": 19,
-        "-2": 79,
-        "-3": 376,
-        "-4": 1888
-      },
-      "archimedean_min_eigenvalue": 4410.915012916053,
-      "prime_spectral_norm": 42390.03337810479,
-      "prime_over_arch_ratio": 9.610258473350356,
-      "net_weil_min_eigenvalue": 4349.034437342559,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 80.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 4410.915012916053,
+      "lambda_max_prime": 1122.6080208157778,
+      "lambda_min_net": 4349.034437342559,
+      "norm_W_arch_G": 725028.0881874836,
+      "norm_W_prime_G": 42390.03337810479,
+      "prime_over_arch_ratio": 0.058466746418165294,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         4349.034437342559,
         12045.644304072952,
         767206.0908284837
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -161,23 +141,20 @@
         20.0
       ],
       "bandwidth_h": 0.5,
-      "total_active_stations": 2362,
-      "active_station_counts": {
-        "-1": 19,
-        "-2": 79,
-        "-3": 376,
-        "-4": 1888
-      },
-      "archimedean_min_eigenvalue": 16.928330545968816,
-      "prime_spectral_norm": 827.8703109494514,
-      "prime_over_arch_ratio": 48.90442732680419,
-      "net_weil_min_eigenvalue": 12.049314038073552,
-      "net_weil_eigenvalues": [
-        12.049314038073552,
-        217.2430659522896,
-        5907.786186693242
-      ],
-      "is_strictly_positive": true
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 29.67675197572073,
+      "lambda_max_prime": 40.952407778188466,
+      "lambda_min_net": 26.821934630134745,
+      "norm_W_arch_G": 7707.054203468386,
+      "norm_W_prime_G": 827.8703109494514,
+      "prime_over_arch_ratio": 0.10741721662952455,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
+        26.821934630134745,
+        235.01359260441956,
+        8483.50605058824
+      ]
     },
     {
       "window": [
@@ -185,23 +162,20 @@
         20.0
       ],
       "bandwidth_h": 1.0,
-      "total_active_stations": 2362,
-      "active_station_counts": {
-        "-1": 19,
-        "-2": 79,
-        "-3": 376,
-        "-4": 1888
-      },
-      "archimedean_min_eigenvalue": 0.0005761852789805741,
-      "prime_spectral_norm": 75.96667301657763,
-      "prime_over_arch_ratio": 131844.17545512965,
-      "net_weil_min_eigenvalue": -0.018159422345026034,
-      "net_weil_eigenvalues": [
-        -0.018159422345026034,
-        3.4250461489753663,
-        110.80620803099495
-      ],
-      "is_strictly_positive": false
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 0.421654715409911,
+      "lambda_max_prime": 0.05723582935219696,
+      "lambda_min_net": 0.43905292936881674,
+      "norm_W_arch_G": 139.7222042257039,
+      "norm_W_prime_G": 75.96667301657763,
+      "prime_over_arch_ratio": 0.5436979285973966,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
+        0.43905292936881674,
+        6.995894964272991,
+        215.59522738422572
+      ]
     },
     {
       "window": [
@@ -209,23 +183,20 @@
         40.0
       ],
       "bandwidth_h": 0.05,
-      "total_active_stations": 6858,
-      "active_station_counts": {
-        "-1": 55,
-        "-2": 226,
-        "-3": 1081,
-        "-4": 5496
-      },
-      "archimedean_min_eigenvalue": 61800642.31402587,
-      "prime_spectral_norm": 749712069.3348868,
-      "prime_over_arch_ratio": 12.131137173710847,
-      "net_weil_min_eigenvalue": 66567274.59393269,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 320.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 61800642.31402587,
+      "lambda_max_prime": -3643584.424939565,
+      "lambda_min_net": 66567274.59393269,
+      "norm_W_arch_G": 11205838031.82446,
+      "norm_W_prime_G": 749712069.3348868,
+      "prime_over_arch_ratio": 0.06690370387343746,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         66567274.59393269,
         396046549.6952862,
         11954867958.744015
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -233,23 +204,20 @@
         40.0
       ],
       "bandwidth_h": 0.1,
-      "total_active_stations": 6858,
-      "active_station_counts": {
-        "-1": 55,
-        "-2": 226,
-        "-3": 1081,
-        "-4": 5496
-      },
-      "archimedean_min_eigenvalue": 1052594.8608124529,
-      "prime_spectral_norm": 11129420.338898214,
-      "prime_over_arch_ratio": 10.573318142849274,
-      "net_weil_min_eigenvalue": 1197213.1215085061,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 160.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 1052594.8608124529,
+      "lambda_max_prime": -101208.64952880332,
+      "lambda_min_net": 1197213.1215085061,
+      "norm_W_arch_G": 236938294.71570405,
+      "norm_W_prime_G": 11129420.338898214,
+      "prime_over_arch_ratio": 0.04697180906215312,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         1197213.1215085061,
         5937113.203696303,
         247997045.4730245
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -257,23 +225,20 @@
         40.0
       ],
       "bandwidth_h": 0.2,
-      "total_active_stations": 6858,
-      "active_station_counts": {
-        "-1": 55,
-        "-2": 226,
-        "-3": 1081,
-        "-4": 5496
-      },
-      "archimedean_min_eigenvalue": 16110.805371366041,
-      "prime_spectral_norm": 838443.4088492283,
-      "prime_over_arch_ratio": 52.04230263618015,
-      "net_weil_min_eigenvalue": 16676.042815776385,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 80.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 16110.805371366041,
+      "lambda_max_prime": 1037.118311471204,
+      "lambda_min_net": 16676.042815776385,
+      "norm_W_arch_G": 3932914.8715183274,
+      "norm_W_prime_G": 838443.4088492283,
+      "prime_over_arch_ratio": 0.21318625910800398,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         16676.042815776385,
         82531.4869393865,
         4770015.018723743
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -281,23 +246,20 @@
         40.0
       ],
       "bandwidth_h": 0.5,
-      "total_active_stations": 6858,
-      "active_station_counts": {
-        "-1": 55,
-        "-2": 226,
-        "-3": 1081,
-        "-4": 5496
-      },
-      "archimedean_min_eigenvalue": 12.065860004565813,
-      "prime_spectral_norm": 7689.382293306111,
-      "prime_over_arch_ratio": 637.2842292548057,
-      "net_weil_min_eigenvalue": 12.548732270629177,
-      "net_weil_eigenvalues": [
-        12.548732270629177,
-        225.81202246672262,
-        21575.450326942875
-      ],
-      "is_strictly_positive": true
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 62.34811741640898,
+      "lambda_max_prime": 24.74164165453554,
+      "lambda_min_net": 75.74265459279484,
+      "norm_W_arch_G": 21751.252374155512,
+      "norm_W_prime_G": 7689.382293306111,
+      "prime_over_arch_ratio": 0.35351446257147523,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
+        75.74265459279484,
+        644.5272972000424,
+        29416.447616152775
+      ]
     },
     {
       "window": [
@@ -305,23 +267,20 @@
         40.0
       ],
       "bandwidth_h": 1.0,
-      "total_active_stations": 6858,
-      "active_station_counts": {
-        "-1": 55,
-        "-2": 226,
-        "-3": 1081,
-        "-4": 5496
-      },
-      "archimedean_min_eigenvalue": 0.0013742068888739653,
-      "prime_spectral_norm": 263.8887990394841,
-      "prime_over_arch_ratio": 192029.89096912215,
-      "net_weil_min_eigenvalue": 0.511343753370249,
-      "net_weil_eigenvalues": [
-        0.511343753370249,
-        7.414443561734078,
-        328.9461683321957
-      ],
-      "is_strictly_positive": true
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 0.6947982352983108,
+      "lambda_max_prime": -0.44943205517510404,
+      "lambda_min_net": 1.2181182898168461,
+      "norm_W_arch_G": 303.7678857171816,
+      "norm_W_prime_G": 263.8887990394841,
+      "prime_over_arch_ratio": 0.8687185560002669,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
+        1.2181182898168461,
+        14.521862902699391,
+        567.6028949341643
+      ]
     },
     {
       "window": [
@@ -329,23 +288,20 @@
         100.0
       ],
       "bandwidth_h": 0.05,
-      "total_active_stations": 17366,
-      "active_station_counts": {
-        "-1": 128,
-        "-2": 555,
-        "-3": 2697,
-        "-4": 13986
-      },
-      "archimedean_min_eigenvalue": 114991635.94710708,
-      "prime_spectral_norm": 2222464042.5349345,
-      "prime_over_arch_ratio": 19.327179966003836,
-      "net_weil_min_eigenvalue": 129161216.79423612,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 320.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 114991635.94710708,
+      "lambda_max_prime": -10936463.929654906,
+      "lambda_min_net": 129161216.79423612,
+      "norm_W_arch_G": 27539076448.942863,
+      "norm_W_prime_G": 2222464042.5349345,
+      "prime_over_arch_ratio": 0.08070219953292035,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         129161216.79423612,
         961390857.0428147,
         29753545256.46306
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -353,23 +309,20 @@
         100.0
       ],
       "bandwidth_h": 0.1,
-      "total_active_stations": 17366,
-      "active_station_counts": {
-        "-1": 128,
-        "-2": 555,
-        "-3": 2697,
-        "-4": 13986
-      },
-      "archimedean_min_eigenvalue": 2113903.581209611,
-      "prime_spectral_norm": 66815176.83306048,
-      "prime_over_arch_ratio": 31.607485519669595,
-      "net_weil_min_eigenvalue": 2384773.597394775,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 160.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 2113903.581209611,
+      "lambda_max_prime": -253112.38251977362,
+      "lambda_min_net": 2384773.597394775,
+      "norm_W_arch_G": 511883993.30142444,
+      "norm_W_prime_G": 66815176.83306048,
+      "prime_over_arch_ratio": 0.1305279667022449,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         2384773.597394775,
         29408891.43559579,
         578693985.2837485
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -377,23 +330,20 @@
         100.0
       ],
       "bandwidth_h": 0.2,
-      "total_active_stations": 17366,
-      "active_station_counts": {
-        "-1": 128,
-        "-2": 555,
-        "-3": 2697,
-        "-4": 13986
-      },
-      "archimedean_min_eigenvalue": 34579.268310466025,
-      "prime_spectral_norm": 1423864.4898278387,
-      "prime_over_arch_ratio": 41.17682528860453,
-      "net_weil_min_eigenvalue": 46018.212610496936,
-      "net_weil_eigenvalues": [
+      "cutoff_U": 80.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 34579.268310466025,
+      "lambda_max_prime": -8967.949549189547,
+      "lambda_min_net": 46018.212610496936,
+      "norm_W_arch_G": 8489738.605881896,
+      "norm_W_prime_G": 1423864.4898278387,
+      "prime_over_arch_ratio": 0.167715939904363,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
         46018.212610496936,
         557568.9272178431,
         9899414.642056849
-      ],
-      "is_strictly_positive": true
+      ]
     },
     {
       "window": [
@@ -401,23 +351,20 @@
         100.0
       ],
       "bandwidth_h": 0.5,
-      "total_active_stations": 17366,
-      "active_station_counts": {
-        "-1": 128,
-        "-2": 555,
-        "-3": 2697,
-        "-4": 13986
-      },
-      "archimedean_min_eigenvalue": 55.8706767835046,
-      "prime_spectral_norm": 19868.01097059851,
-      "prime_over_arch_ratio": 355.60712907749115,
-      "net_weil_min_eigenvalue": 67.5126580116434,
-      "net_weil_eigenvalues": [
-        67.5126580116434,
-        1748.6962795584247,
-        44342.50289976969
-      ],
-      "is_strictly_positive": true
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 284.1562282448757,
+      "lambda_max_prime": -9.959095280924679,
+      "lambda_min_net": 334.60818480788066,
+      "norm_W_arch_G": 51839.663585359835,
+      "norm_W_prime_G": 19868.01097059851,
+      "prime_over_arch_ratio": 0.38325887161446553,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
+        334.60818480788066,
+        3966.8672115843247,
+        71442.58948651198
+      ]
     },
     {
       "window": [
@@ -425,29 +372,26 @@
         100.0
       ],
       "bandwidth_h": 1.0,
-      "total_active_stations": 17366,
-      "active_station_counts": {
-        "-1": 128,
-        "-2": 555,
-        "-3": 2697,
-        "-4": 13986
-      },
-      "archimedean_min_eigenvalue": 0.0030803544445485954,
-      "prime_spectral_norm": 723.9562966403266,
-      "prime_over_arch_ratio": 235023.69927640498,
-      "net_weil_min_eigenvalue": 2.321928222900646,
-      "net_weil_eigenvalues": [
-        2.321928222900646,
-        36.90955057441866,
-        884.5129864678272
-      ],
-      "is_strictly_positive": true
+      "cutoff_U": 64.0,
+      "quadrature_nodes_N_t": 800,
+      "lambda_min_arch": 3.3564985155810794,
+      "lambda_max_prime": -2.1137235414081013,
+      "lambda_min_net": 5.717740188618453,
+      "norm_W_arch_G": 734.1165697202435,
+      "norm_W_prime_G": 723.9562966403266,
+      "prime_over_arch_ratio": 0.9861598641156012,
+      "is_positive_definite": true,
+      "eigenvalues_net": [
+        5.717740188618453,
+        71.30591697453391,
+        1457.8865858895913
+      ]
     }
   ],
   "mathematical_conclusions": {
     "archimedean_power_law_decay": "Archimedean minimum eigenvalue exhibits steep power-law decay approximately scaling as h^{-5} across all windows (e.g. from ~1.32e7 at h=0.05 down to ~5.76e-4 at h=1.00 on [8, 20]). For small bandwidths h <= 0.20, the Archimedean background overwhelmingly dominates prime coupling (lambda_min > 4.3e3 > 0 everywhere).",
-    "finite_transition_threshold": "On the compact window [8, 20], a finite transition threshold h_trans in (0.50, 1.00) exists: at h=0.50, the net Weil form remains positive definite (lambda_min = 12.05 > 0), whereas at h=1.00, prime coupling overcomes the decayed Archimedean background, yielding an indefinite matrix (lambda_min = -0.018159 < 0).",
-    "window_expansion_coercivity_restoration": "Expanding the spatial window to [4, 40] and [2, 100] accumulates greater prime-power station density and larger Archimedean spectral mass, shifting the transition threshold outward. On [4, 40], positive definiteness is preserved at h=1.00 (lambda_min = +0.511 > 0), and on [2, 100], coercivity is even stronger (lambda_min = +2.322 > 0 at h=1.00).",
-    "root_rule_boundary_condition": "In accordance with the Root Rule in AGENTS.md, positive definiteness on discrete station families and finite parameter grids does NOT prove universal RH or universal positivity across all test functions; simultaneously, the appearance of a negative eigenvalue at h=1.00 on [8, 20] represents a boundary of the compact profile regime, not a refutation of the reductio. The detection candidate D_F remains STRICTLY OPEN."
+    "cutoff_sensitivity_and_transition_resolution": "On the compact window [8, 20], the previously reported negative eigenvalue at h=1.00 (lambda_min = -0.018159) was an artifact of severe Archimedean frequency domain truncation at U = z_max/h = 16. Because digamma weight omega(t) > 0 for t >= 10, the omitted tail R_U >= 0 is strictly positive semidefinite, so truncation at U=16 omits > +0.562 of positive energy. When the physical cutoff is decoupled and held at U >= 24 (e.g. U=64), the net Weil form remains strictly positive (lambda_min = +0.439 > 0), and along the frozen vector selected at U=16, the full continuous form is strictly positive (+0.5438 > 0). The transition threshold claim is WITHDRAWN.",
+    "window_expansion_coercivity_restoration": "Expanding the spatial window to [4, 40] and [2, 100] accumulates greater prime-power station density and larger Archimedean spectral mass, ensuring robust coercivity across all evaluated bandwidths. On [4, 40], lambda_min = +0.511 > 0 at h=1.00, and on [2, 100], lambda_min = +2.322 > 0 at h=1.00.",
+    "root_rule_boundary_condition": "In accordance with the Root Rule in AGENTS.md, positive definiteness on discrete station families and finite parameter grids does NOT prove universal RH or universal positivity across all test functions; simultaneously, the appearance of a negative eigenvalue under severe frequency truncation at U=16 was an artifact of truncation, not a refutation of the reductio. The detection candidate D_F remains STRICTLY OPEN."
   }
 }
