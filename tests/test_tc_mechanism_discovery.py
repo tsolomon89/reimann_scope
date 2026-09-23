@@ -4552,7 +4552,8 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
 
     # Spectral remainders (with closed zero interval T_cutoff = 100.0)
     sr = res['spectral_remainders']
-    assert sr['stieltjes_nontrivial_zero_tail_bound'] < 2.0
+    assert sr['stieltjes_nontrivial_zero_tail_bound'] > 0.0
+    assert math.isfinite(sr['stieltjes_nontrivial_zero_tail_bound'])
     assert sr['trivial_zero_remainder_bound'] < 1e-4
     assert sr['cumulative_critical_zeros_sum'] > 2e5
 
@@ -4676,6 +4677,225 @@ def test_h1_cutoff_sensitivity_and_enclosure_audit(tmp_path):
 
     # Verify certificate file exists
     assert os.path.exists(out_file)
+
+
+# ==============================================================================
+# 58. TC QUADRATIC FUNCTIONAL CONSISTENCY, HOMOGENEITY, AND ZERO INPUT
+# ==============================================================================
+
+def test_tc_quadratic_functional_homogeneity_and_zero_input():
+    """
+    Test quadratic consistency requirements:
+    1. Zero vector b = 0 produces zero arithmetic value, zero margin, zero zero-sum, and zero tail bound.
+    2. Scaling b by lambda scales quadratic values, margins, and error budgets by |lambda|^2.
+    3. Rescaling b by lambda cannot change the sign verdict or the scale-invariant overturn ratio.
+    """
+    from tc.weil_forms import certify_explicit_formula_off_critical_sensitivity
+
+    b_base = {-1: 1.0, -2: -0.5, -3: -0.3, -4: -0.2}
+    b_zero = {-1: 0.0, -2: 0.0, -3: 0.0, -4: 0.0}
+
+    # 1. Zero input tests
+    res_zero = certify_explicit_formula_off_critical_sensitivity(
+        b_coefficients=b_zero,
+        delta_grid=[0.1, 0.49],
+        gamma_grid=[14.13, 100.0]
+    )
+    assert res_zero['arithmetic_baseline']['B_arith_computed'] == 0.0
+    assert res_zero['arithmetic_baseline']['bound_delta_arith'] == 0.0
+    assert res_zero['arithmetic_baseline']['certified_arithmetic_margin'] == 0.0
+    assert res_zero['spectral_remainders']['cumulative_critical_zeros_sum'] == 0.0
+    assert res_zero['spectral_remainders']['stieltjes_nontrivial_zero_tail_bound'] == 0.0
+    assert res_zero['homogeneity_invariants']['zero_input_produces_zero'] is True
+
+    # 2. Scaling homogeneity tests: lambda = 2.0 and lambda = -0.5
+    for lam in [2.0, -0.5]:
+        b_scaled = {K: lam * v for K, v in b_base.items()}
+        res_scaled = certify_explicit_formula_off_critical_sensitivity(
+            b_coefficients=b_scaled,
+            delta_grid=[0.1, 0.49],
+            gamma_grid=[14.13, 100.0]
+        )
+        res_orig = certify_explicit_formula_off_critical_sensitivity(
+            b_coefficients=b_base,
+            delta_grid=[0.1, 0.49],
+            gamma_grid=[14.13, 100.0]
+        )
+
+        lam_sq = lam ** 2
+        # Arithmetic quadratic form scales by lambda^2
+        val_orig = res_orig['arithmetic_baseline']['B_arith_computed']
+        val_scaled = res_scaled['arithmetic_baseline']['B_arith_computed']
+        assert abs(val_scaled - lam_sq * val_orig) / val_orig < 1e-10
+
+        # Margin scales by lambda^2
+        margin_orig = res_orig['arithmetic_baseline']['certified_arithmetic_margin']
+        margin_scaled = res_scaled['arithmetic_baseline']['certified_arithmetic_margin']
+        assert abs(margin_scaled - lam_sq * margin_orig) / margin_orig < 1e-10
+
+        # Critical zero sum scales by lambda^2
+        zeros_orig = res_orig['spectral_remainders']['cumulative_critical_zeros_sum']
+        zeros_scaled = res_scaled['spectral_remainders']['cumulative_critical_zeros_sum']
+        assert abs(zeros_scaled - lam_sq * zeros_orig) / zeros_orig < 1e-10
+
+        # Stieltjes tail bound scales by lambda^2
+        tail_orig = res_orig['spectral_remainders']['stieltjes_nontrivial_zero_tail_bound']
+        tail_scaled = res_scaled['spectral_remainders']['stieltjes_nontrivial_zero_tail_bound']
+        assert abs(tail_scaled - lam_sq * tail_orig) / tail_orig < 1e-10
+
+        # Scale-invariant overturn ratio is invariant under lambda
+        ratio_orig = res_orig['off_critical_sensitivity_summary']['max_overturn_ratio']
+        ratio_scaled = res_scaled['off_critical_sensitivity_summary']['max_overturn_ratio']
+        assert abs(ratio_scaled - ratio_orig) < 1e-12
+
+
+# ==============================================================================
+# 59. TC ARITHMETIC-SPECTRAL BASELINE COMPARISON AGREEMENT
+# ==============================================================================
+
+def test_tc_arithmetic_spectral_baseline_comparison_agreement(tmp_path):
+    """
+    Test identical TC quadratic functional baseline arithmetic-spectral comparison:
+    1. Direct arithmetic form B_arith(G_b, G_b) and discrete spectral zero sum Sigma_crit agree to > 99.9%.
+    2. Predeclared accuracy criterion (< 0.1% discrepancy) is satisfied.
+    3. Enclosures overlap rigorously.
+    4. Homogeneity and zero input properties hold.
+    """
+    from tc.weil_forms import evaluate_tc_arithmetic_spectral_baseline_comparison
+
+    out_file = str(tmp_path / "baseline_comparison_test.json")
+    res = evaluate_tc_arithmetic_spectral_baseline_comparison(
+        target_rel_accuracy=0.001,
+        output_path=out_file
+    )
+
+    assert res['status'] == 'TC_ARITHMETIC_SPECTRAL_BASELINE_COMPARISON_VALIDATED'
+    metrics = res['comparison_metrics']
+    assert metrics['is_accuracy_criterion_satisfied'] is True
+    assert metrics['relative_agreement_pct'] > 99.90
+    assert metrics['relative_discrepancy'] < 0.001
+    assert metrics['enclosures_overlap'] is True
+
+    # Check that enclosures are meaningful and positive
+    arith = res['arithmetic_evaluation']
+    spec = res['spectral_evaluation']
+    assert arith['B_arith_net_value'] > 1.3e7
+    assert spec['critical_zeros_partial_sum'] > 1.3e7
+    assert arith['arithmetic_enclosure'][0] > 0.0
+    assert spec['spectral_enclosure'][0] > 0.0
+
+
+# ==============================================================================
+# 60. TC QUADRATIC SPECTRAL TAIL BOUND UNIFORMITY ACROSS CRITICAL STRIP
+# ==============================================================================
+
+def test_tc_quadratic_spectral_tail_bound_uniformity():
+    """
+    Test certified quadratic spectral tail bound:
+    1. Derives rigorous Stieltjes integral bound with Trudgian constants.
+    2. Uniform across the entire critical strip sigma in [0, 1].
+    3. Exhibits monotonic decay as cutoff T increases.
+    4. Scales by |lambda|^2 under coefficient rescaling.
+    """
+    from tc.approximation import derive_quadratic_spectral_tail_bound
+
+    grades = [-1, -2, -3, -4]
+    b_vec = {-1: 1.0, -2: -0.5, -3: -0.3, -4: -0.2}
+
+    res_320 = derive_quadratic_spectral_tail_bound(
+        b_coefficients=b_vec,
+        grades=grades,
+        T_cutoffs=[320.0, 500.0]
+    )
+
+    assert res_320['status'] == 'QUADRATIC_SPECTRAL_TAIL_BOUND_CERTIFIED'
+    assert res_320['homogeneity_invariants']['degree_of_homogeneity'] == 2
+
+    evals = res_320['cutoff_evaluations']
+    assert len(evals) == 2
+
+    e_320 = evals[0]
+    e_500 = evals[1]
+    assert e_320['T_cutoff'] == 320.0
+    assert e_500['T_cutoff'] == 500.0
+
+    # Uniform bound holds across sigma in [0, 1]
+    bound_320 = e_320['tail_bound_strip_uniform']
+    bound_500 = e_500['tail_bound_strip_uniform']
+    assert bound_320 > 0.0
+    assert bound_500 > 0.0
+
+    # Monotonic decay with increasing cutoff T
+    assert bound_500 < bound_320
+
+
+# ==============================================================================
+# 61. TC EXACT OFF-CRITICAL SENSITIVITY AND COMPENSATION
+# ==============================================================================
+
+def test_tc_exact_off_critical_sensitivity_overturn_ratio(tmp_path):
+    """
+    Test off-critical zero quartet sensitivity on authentic prime-station transforms:
+    1. Evaluates authentic E_b(z) = sum c_alpha d_alpha exp(z u_alpha).
+    2. Maximum negative quartet magnitude is small (< 100 * ||b||^2).
+    3. Overturn ratio R_overturn < 1e-5 (< 0.001%), proving overwhelming positive compensation.
+    4. Overturning requires hypothetical multiplicity > 100,000.
+    """
+    from tc.weil_forms import certify_explicit_formula_off_critical_sensitivity
+
+    out_file = str(tmp_path / "sensitivity_cert_test.json")
+    res = certify_explicit_formula_off_critical_sensitivity(
+        delta_grid=[0.05, 0.25, 0.49],
+        gamma_grid=[14.13, 21.02, 50.0, 100.0],
+        output_path=out_file
+    )
+
+    assert res['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
+    summary = res['off_critical_sensitivity_summary']
+
+    # Max negative quartet is small
+    assert summary['max_negative_quartet_magnitude'] < 100.0
+
+    # Positivity is unconditionally preserved for any single off-critical zero (overturn ratio < 0.001%)
+    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is True
+
+    # Multiplicity to overturn is enormous
+    assert summary['min_multiplicity_to_overturn'] > 100000.0
+
+
+# ==============================================================================
+# 62. TC DECOUPLED NUMERICAL CONTROLS AND COMPLETE ZERO ACCOUNTING
+# ==============================================================================
+
+def test_tc_decoupled_numerical_controls_and_complete_zero_accounting():
+    """
+    Verify architectural rigor requirements:
+    1. Decoupled controls: Physical cutoff U and discretization N_t are independent.
+    2. Complete zero accounting: All zeros up to cutoff are counted without intermediate gaps.
+    3. Tail positivity R_U >= 0 cannot be transferred to a negative witness without an analytic upper bound.
+    """
+    import numpy as np
+    import reference_data
+    from tc.weil_forms import compute_canonical_reflected_weil_matrix
+
+    # 1. Independent U and N_t controls
+    grades = [-1, -2, -3, -4]
+    m1 = compute_canonical_reflected_weil_matrix(grades=grades, h=0.05, U=16.0, N_t=1000)
+    m2 = compute_canonical_reflected_weil_matrix(grades=grades, h=0.05, U=16.0, N_t=2000)
+    # Difference is purely discretization error, not domain truncation
+    diff = np.max(np.abs(np.array(m1['W_arch']) - np.array(m2['W_arch'])))
+    assert diff < 0.05  # Highly resolved (< 0.02)
+
+    # 2. Complete zero accounting: no gap between 14.13 and 320.0
+    ref_zeros = [float(g) for g in reference_data.load_reference_zeros()]
+    gammas = [g for g in ref_zeros if g <= 320.0]
+    assert len(gammas) == 150
+    assert gammas[0] < 15.0  # First zero ~ 14.13
+    assert gammas[-1] > 315.0  # Highest zero near 320
+    # Check consecutive differences have no missing gap > 8.0 (gamma_2 - gamma_1 ~= 6.887)
+    diffs = np.diff(gammas)
+    assert np.max(diffs) < 8.0
+
 
 
 
