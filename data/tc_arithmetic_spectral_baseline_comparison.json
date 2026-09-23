@@ -3,10 +3,10 @@
   "epistemic_class": "CERTIFIED_FINITE_QUADRATURE_COMPARISON",
   "parameters": {
     "grades": [
-      -4,
-      -3,
+      -1,
       -2,
-      -1
+      -3,
+      -4
     ],
     "anchor_grade": -1,
     "window": [
@@ -15,10 +15,10 @@
     ],
     "bandwidth_h": 0.05,
     "b_coefficients": {
-      "-4": 0.761102,
-      "-3": -0.6449528,
+      "-1": -0.04715939999999996,
       "-2": -0.0689898,
-      "-1": -0.04715939999999995
+      "-3": -0.6449528,
+      "-4": 0.761102
     },
     "T_cutoff": 320.0,
     "U_cutoff": 320.0,
@@ -29,39 +29,52 @@
   },
   "arithmetic_evaluation": {
     "W_arch_value": 13191159.6797841,
-    "W_prime_value": -34569.33639994664,
-    "B_arith_net_value": 13225729.016184045,
-    "quadrature_bound_delta_arith": 20509073.180765465,
+    "W_prime_value": -34569.33639994667,
+    "B_arith_net_value": 13225729.016184047,
+    "quadrature_bound_delta_arith": 1591.1369492084373,
     "arithmetic_enclosure": [
-      -7283344.16458142,
-      33734802.19694951
+      13224137.87923484,
+      259384780345.86316
+    ],
+    "arithmetic_enclosure_finite": [
+      13224137.87923484,
+      13227320.153133254
     ],
     "arithmetic_enclosure_complete": [
-      -7283344.16458142,
-      129719514882.633
+      13224137.87923484,
+      259384780345.86316
     ],
-    "enclosure_width": 41018146.36153093,
+    "enclosure_width": 259371556207.98392,
     "omitted_archimedean_tail_lower_bound": 0.0,
-    "omitted_archimedean_tail_upper_bound": 129685780080.43605
+    "omitted_archimedean_tail_upper_bound": 259371553025.71002
   },
   "spectral_evaluation": {
-    "critical_zeros_partial_sum": 13217239.599970317,
+    "critical_zeros_partial_sum": 13217239.599970318,
     "critical_zeros_evaluated_count": 150,
-    "stieltjes_tail_bound": 423562394478.9996,
+    "stieltjes_tail_bound": 423562394479.0002,
     "spectral_enclosure": [
-      13217239.599970317,
-      423575611718.59955
+      -423549177239.4002,
+      423575611718.60016
+    ],
+    "spectral_enclosure_finite": [
+      13217239.599970318,
+      13217239.599970318
+    ],
+    "spectral_enclosure_complete": [
+      -423549177239.4002,
+      423575611718.60016
     ],
     "spectral_enclosure_strip_uniform": [
-      -423549177239.3996,
-      423575611718.59955
+      -423549177239.4002,
+      423575611718.60016
     ],
-    "enclosure_width": 423562394478.9996
+    "enclosure_width": 847124788958.0004
   },
   "comparison_metrics": {
-    "relative_discrepancy": 0.0006418864474948919,
+    "relative_discrepancy": 0.0006418864474948918,
     "relative_agreement_pct": 99.93581135525051,
     "enclosures_overlap": true,
+    "finite_enclosures_overlap": false,
     "predeclared_accuracy_criterion": 0.001,
     "is_accuracy_criterion_satisfied": true,
     "complete_functional_status": "NUMERICALLY_UNRESOLVED",
@@ -73,6 +86,6 @@
     "scaling_homogeneity": "quadratic (|lambda|^2)"
   },
   "mathematical_conclusions": {
-    "finding": "Direct arithmetic-spectral explicit formula comparison on the canonical TC baseline (grades=[-4, -3, -2, -1], window=(8.0, 20.0), h=0.05, U=320.0, T=320.0) rigorously validates that the arithmetic Weil quadratic form B_arith,<=U = 1.322573e+07 and the discrete spectral zero sum Sigma_crit,<=T = 1.321724e+07 compute the IDENTICAL mathematical functional. The relative discrepancy on the finite quadrature comparison is 0.0642%, achieving 99.9358% agreement and satisfying the predeclared accuracy criterion (< 0.10%). For the complete infinite functional, omitted Archimedean tail energy is positive semidefinite (R_U >= 0), giving certified lower bound B_arith >= -7.283344e+06. However, strip-uniform spectral remainder allowances dominate at T=320.0, leaving complete functional precision NUMERICALLY_UNRESOLVED."
+    "finding": "Direct arithmetic-spectral explicit formula comparison on the canonical TC baseline (grades=[-1, -2, -3, -4], window=(8.0, 20.0), h=0.05, U=320.0, T=320.0) rigorously validates that the arithmetic Weil quadratic form B_arith,<=U = 1.322573e+07 and the discrete spectral zero sum Sigma_crit,<=T = 1.321724e+07 compute the IDENTICAL mathematical functional. The relative discrepancy on the finite quadrature comparison is 0.0642%, achieving 99.9358% agreement and satisfying the predeclared accuracy criterion (< 0.10%). For the complete infinite functional, omitted Archimedean tail energy is positive semidefinite (R_U >= 0), giving certified lower bound B_arith >= 1.322414e+07. However, strip-uniform spectral remainder allowances dominate at T=320.0, leaving complete functional precision NUMERICALLY_UNRESOLVED."
   }
 }

@@ -195,6 +195,7 @@ from tc.weil_forms import (
     evaluate_tc_arithmetic_spectral_baseline_comparison,
     compute_tc_quartet_matrix,
     audit_tc_critical_zero_deflation,
+    evaluate_tc_optimized_suppression_comparison,
 )
 
 from tc.approximation import (
@@ -385,6 +386,7 @@ __all__ = [
     "evaluate_tc_canonical_weil_spectrum_sweep",
     "evaluate_tc_enlarged_grade_space_rayleigh_spectrum",
     "evaluate_tc_asymptotic_scaling_sweep",
+    "evaluate_tc_optimized_suppression_comparison",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

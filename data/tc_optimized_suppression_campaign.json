@@ -1,0 +1,1660 @@
+{
+  "status": "OPTIMIZED_SUPPRESSION_CAMPAIGN_EVALUATED",
+  "epistemic_class": "EMPIRICAL_SUBSPACE_COMPARISON",
+  "parameters": {
+    "grades_list": [
+      [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ]
+    ],
+    "targets": [
+      [
+        0.49,
+        100.0
+      ],
+      [
+        0.49,
+        50.0
+      ]
+    ],
+    "window": [
+      8.0,
+      20.0
+    ],
+    "bandwidth_h": 0.05,
+    "T_cutoff": 100.0,
+    "tau": 6.283185307179586
+  },
+  "summary_findings": {
+    "unsuppressed_optimizer_verdict": "Yields large negative quartet response (q ~ -10,268 to -13,384), but activates massive positive critical-zero background (S_T ~ 9.4e+07 to 1.17e+08), resulting in large positive net spectral response (q + S_T >> 0).",
+    "exact_deflation_verdict": "Cancelling the lowest critical zeros reduces finite zero background by orders of magnitude (from 9.4e+07 -> 3.28e+06 -> 1.88e+05 -> 1.04e+04), but simultaneously severely constrains the Dirichlet polynomial, shrinking q from -10,268 -> -157.6 -> -5.38 -> -0.0638. Net response q + S_T remains strictly positive at every deflation stage.",
+    "soft_suppression_verdict": "Penalizing S_T with parameter mu reduces finite background, but forces proportional contraction in |q|, leaving q + S_T > 0 in all tested directions.",
+    "tail_dominance": "The strip-uniform Stieltjes tail allowance B_tail(T=100) ~ 1.1e+12 - 1.8e+12 dominates all finite contributions by 5 orders of magnitude. Truncated cancellation does not overcome the tail bound without a sharper coefficient-dependent remainder theorem."
+  },
+  "candidates_count": 36,
+  "candidates": [
+    {
+      "label": "UNSUPPRESSED_OPTIMIZER",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.8558863975384142,
+        -0.16088230239130355,
+        -0.3420242218022353,
+        -0.3529798733448754
+      ],
+      "norm_beta": 0.5171638758737077,
+      "target_quartet_q": -10268.142817628166,
+      "finite_zero_sum_S": 94639160.29381256,
+      "net_spectral_response_q_plus_S": 94628892.15099493,
+      "tail_allowance_T": 1480170250061.0918,
+      "station_norm_D_stat": 12.614038661803358,
+      "val_arith": 98688081.34273449,
+      "complete_spectral_interval": [
+        -1480075621168.941,
+        1480264878953.2427
+      ],
+      "complete_arithmetic_interval": [
+        98687655.77885735,
+        827721088277.0099
+      ],
+      "details": {
+        "lambda_min_Q": -10268.142817628166,
+        "lambda_max_Q": 2.6685618855575988
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_1_ZEROS",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        -0.06818783561208652,
+        0.31393866960714384,
+        -0.7811292413674303,
+        0.535378407372373
+      ],
+      "norm_beta": 0.9976725009112659,
+      "target_quartet_q": -157.64693522327232,
+      "finite_zero_sum_S": 3279353.7078082897,
+      "net_spectral_response_q_plus_S": 3279196.0608730665,
+      "tail_allowance_T": 1415768876901.3696,
+      "station_norm_D_stat": 12.336572139994477,
+      "val_arith": 3331521.794989186,
+      "complete_spectral_interval": [
+        -1415765597705.3088,
+        1415772156097.4304
+      ],
+      "complete_arithmetic_interval": [
+        3329938.0531233796,
+        791616348819.489
+      ],
+      "details": {
+        "num_deflated": 1,
+        "deflated_zeros": [
+          14.134725141734695
+        ],
+        "rank_cp": 2,
+        "surviving_dimension": 1,
+        "condition_number_cp": 7.530903910217076,
+        "constraint_residual_norm": 8.636762218745498e-17
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_0.1",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.023475029572251775,
+        -0.34503901109642926,
+        -0.48291642724953704,
+        0.8044804087737144
+      ],
+      "norm_beta": 0.9997244235220936,
+      "target_quartet_q": -16.61199852765261,
+      "finite_zero_sum_S": 1780385.8449917443,
+      "net_spectral_response_q_plus_S": 1780369.2329932167,
+      "tail_allowance_T": 1343148750109.3887,
+      "station_norm_D_stat": 12.016012691370124,
+      "val_arith": 1797354.6483199454,
+      "complete_spectral_interval": [
+        -1343146969740.1558,
+        1343150530478.6216
+      ],
+      "complete_arithmetic_interval": [
+        1795764.3851606245,
+        751009996662.6177
+      ],
+      "details": {
+        "mu": 0.1,
+        "min_objective_val": 178021.9725006464
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_1.0",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.02351001303590227,
+        -0.3450319422036657,
+        -0.4829439610918265,
+        0.8044658902595898
+      ],
+      "norm_beta": 0.9997236014454453,
+      "target_quartet_q": -16.573777846165136,
+      "finite_zero_sum_S": 1780385.6346908917,
+      "net_spectral_response_q_plus_S": 1780369.0609130457,
+      "tail_allowance_T": 1343216886243.9668,
+      "station_norm_D_stat": 12.01631746560858,
+      "val_arith": 1797377.945071164,
+      "complete_spectral_interval": [
+        -1343215105874.906,
+        1343218666613.0276
+      ],
+      "complete_arithmetic_interval": [
+        1795787.6845271992,
+        751048094324.483
+      ],
+      "details": {
+        "mu": 1.0,
+        "min_objective_val": 1780369.06091303
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_10.0",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.023513507879613815,
+        -0.34503123893479887,
+        -0.48294670902294534,
+        0.8044644400781304
+      ],
+      "norm_beta": 0.9997235192527962,
+      "target_quartet_q": -16.569962160589984,
+      "finite_zero_sum_S": 1780385.6325921877,
+      "net_spectral_response_q_plus_S": 1780369.062630027,
+      "tail_allowance_T": 1343223693855.483,
+      "station_norm_D_stat": 12.016347915760878,
+      "val_arith": 1797380.2915457913,
+      "complete_spectral_interval": [
+        -1343221913486.4202,
+        1343225474224.5457
+      ],
+      "complete_arithmetic_interval": [
+        1795790.0312633142,
+        751051900734.7606
+      ],
+      "details": {
+        "mu": 10.0,
+        "min_objective_val": 17803839.755959578
+      }
+    },
+    {
+      "label": "UNSUPPRESSED_OPTIMIZER",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.166914223280708,
+        -0.3236825109788358,
+        -0.5754817163008342,
+        0.7322500039989621
+      ],
+      "norm_beta": 0.9859714205120746,
+      "target_quartet_q": -4375.646559547647,
+      "finite_zero_sum_S": 4615682.184311921,
+      "net_spectral_response_q_plus_S": 4611306.537752373,
+      "tail_allowance_T": 1592002727951.5605,
+      "station_norm_D_stat": 13.081881957404779,
+      "val_arith": 4835306.622951053,
+      "complete_spectral_interval": [
+        -1591998116645.0227,
+        1592007339258.0984
+      ],
+      "complete_arithmetic_interval": [
+        4833759.8126809755,
+        890157248775.9404
+      ],
+      "details": {
+        "lambda_min_Q": -4375.646559547464,
+        "lambda_max_Q": 1706299.7520341778
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_1_ZEROS",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.06818783561208652,
+        0.31393866960714384,
+        -0.7811292413674303,
+        0.535378407372373
+      ],
+      "norm_beta": 0.9976725009112659,
+      "target_quartet_q": 303587.2259176622,
+      "finite_zero_sum_S": 3279353.7078082897,
+      "net_spectral_response_q_plus_S": 3582940.9337259517,
+      "tail_allowance_T": 1415768876901.3696,
+      "station_norm_D_stat": 12.336572139994477,
+      "val_arith": 3331521.794989186,
+      "complete_spectral_interval": [
+        -1415765293960.4358,
+        1415772459842.3035
+      ],
+      "complete_arithmetic_interval": [
+        3329938.0531233796,
+        791616348819.489
+      ],
+      "details": {
+        "num_deflated": 1,
+        "deflated_zeros": [
+          14.134725141734695
+        ],
+        "rank_cp": 2,
+        "surviving_dimension": 1,
+        "condition_number_cp": 7.530903910217076,
+        "constraint_residual_norm": 8.636762218745498e-17
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_0.1",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.03798651668117525,
+        -0.2860912833799874,
+        -0.5415040810077087,
+        0.7896088477065208
+      ],
+      "norm_beta": 0.9992782518149945,
+      "target_quartet_q": 31370.62113126536,
+      "finite_zero_sum_S": 1861397.0128971399,
+      "net_spectral_response_q_plus_S": 1892767.6340284052,
+      "tail_allowance_T": 1342277236381.5435,
+      "station_norm_D_stat": 12.012113711716353,
+      "val_arith": 1896983.018259424,
+      "complete_spectral_interval": [
+        -1342275343613.9094,
+        1342279129149.1775
+      ],
+      "complete_arithmetic_interval": [
+        1895394.174235381,
+        750522798100.1595
+      ],
+      "details": {
+        "mu": 0.1,
+        "min_objective_val": 217510.32242097653
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_1.0",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.02398281906724775,
+        -0.32755711255074255,
+        -0.49861752981547364,
+        0.8021918232989684
+      ],
+      "norm_beta": 0.9997123708295245,
+      "target_quartet_q": 48644.61214130317,
+      "finite_zero_sum_S": 1782840.386844225,
+      "net_spectral_response_q_plus_S": 1831484.9989855282,
+      "tail_allowance_T": 1337267769733.433,
+      "station_norm_D_stat": 11.989677761086046,
+      "val_arith": 1802924.099822888,
+      "complete_spectral_interval": [
+        -1337265938248.434,
+        1337269601218.4321
+      ],
+      "complete_arithmetic_interval": [
+        1801333.8750078087,
+        747721710840.1802
+      ],
+      "details": {
+        "mu": 1.0,
+        "min_objective_val": 1831484.9989855397
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_10.0",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.02352371108679429,
+        -0.3429199376568085,
+        -0.4848348868788998,
+        0.804231113448914
+      ],
+      "norm_beta": 0.9997232792211579,
+      "target_quartet_q": 53302.345977058634,
+      "finite_zero_sum_S": 1780417.8738025825,
+      "net_spectral_response_q_plus_S": 1833720.2197796411,
+      "tail_allowance_T": 1342483875739.168,
+      "station_norm_D_stat": 12.013038289691156,
+      "val_arith": 1797764.3304895011,
+      "complete_spectral_interval": [
+        -1342482042018.9482,
+        1342485709459.3877
+      ],
+      "complete_arithmetic_interval": [
+        1796174.0709706605,
+        750638239214.168
+      ],
+      "details": {
+        "mu": 10.0,
+        "min_objective_val": 17857481.084002923
+      }
+    },
+    {
+      "label": "UNSUPPRESSED_OPTIMIZER",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.8991826345357316,
+        -0.028908757012445163,
+        -0.19540723360921636,
+        -0.204856870445293,
+        -0.2311347689167571,
+        -0.23887500455201996
+      ],
+      "norm_beta": 0.43757352496395546,
+      "target_quartet_q": -12307.769849765551,
+      "finite_zero_sum_S": 108965700.13428582,
+      "net_spectral_response_q_plus_S": 108953392.36443606,
+      "tail_allowance_T": 1631536458381.0017,
+      "station_norm_D_stat": 13.243315140295367,
+      "val_arith": 112953795.78817339,
+      "complete_spectral_interval": [
+        -1631427504988.6372,
+        1631645411773.3662
+      ],
+      "complete_arithmetic_interval": [
+        112953491.13165922,
+        912370256219.5547
+      ],
+      "details": {
+        "lambda_min_Q": -12307.769849765546,
+        "lambda_max_Q": 4.64810209366099
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_1_ZEROS",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.10464764168933739,
+        -0.379017315945998,
+        0.8270683890151788,
+        0.003107741805897152,
+        -0.21924081034997958,
+        -0.3365656462144357
+      ],
+      "norm_beta": 0.9945093619915599,
+      "target_quartet_q": -240.52772092374454,
+      "finite_zero_sum_S": 2757639.30754485,
+      "net_spectral_response_q_plus_S": 2757398.7798239263,
+      "tail_allowance_T": 1716788201983.5847,
+      "station_norm_D_stat": 13.584907394687475,
+      "val_arith": 2787307.380515141,
+      "complete_spectral_interval": [
+        -1716785444584.805,
+        1716790959382.3645
+      ],
+      "complete_arithmetic_interval": [
+        2785733.6652943967,
+        959927751272.4231
+      ],
+      "details": {
+        "num_deflated": 1,
+        "deflated_zeros": [
+          14.134725141734695
+        ],
+        "rank_cp": 2,
+        "surviving_dimension": 3,
+        "condition_number_cp": 8.006670778695527,
+        "constraint_residual_norm": 2.958106029350326e-16
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_2_ZEROS",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        -0.014043931160743978,
+        0.03575838910926863,
+        -0.12270986591185404,
+        0.2608827479451469,
+        -0.7517414838810387,
+        0.5918541438992213
+      ],
+      "norm_beta": 0.9999013791357383,
+      "target_quartet_q": -5.37682967813091,
+      "finite_zero_sum_S": 188019.79106687475,
+      "net_spectral_response_q_plus_S": 188014.41423719662,
+      "tail_allowance_T": 1540757405191.9849,
+      "station_norm_D_stat": 12.869612009644047,
+      "val_arith": 196153.47497212276,
+      "complete_spectral_interval": [
+        -1540757217177.5706,
+        1540757593206.3992
+      ],
+      "complete_arithmetic_interval": [
+        194562.64879585113,
+        861499299686.0658
+      ],
+      "details": {
+        "num_deflated": 2,
+        "deflated_zeros": [
+          14.134725141734695,
+          21.022039638771556
+        ],
+        "rank_cp": 4,
+        "surviving_dimension": 1,
+        "condition_number_cp": 191.6562444171632,
+        "constraint_residual_norm": 2.354819336371712e-16
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_0.1",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        -0.001720173509893508,
+        0.041908484254960035,
+        -0.09515788599360714,
+        -0.14760986341208457,
+        -0.5867792490235925,
+        0.7893586876842176
+      ],
+      "norm_beta": 0.9999985205004535,
+      "target_quartet_q": -2.7874771821714495,
+      "finite_zero_sum_S": 40397.399811394855,
+      "net_spectral_response_q_plus_S": 40394.61233421268,
+      "tail_allowance_T": 1348124681149.4011,
+      "station_norm_D_stat": 12.038249832427256,
+      "val_arith": 41208.69951343156,
+      "complete_spectral_interval": [
+        -1348124640754.7888,
+        1348124721544.0134
+      ],
+      "complete_arithmetic_interval": [
+        39617.56422160989,
+        753790482619.9313
+      ],
+      "details": {
+        "mu": 0.1,
+        "min_objective_val": 4036.9525039596942
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_1.0",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        -0.0017061389272378102,
+        0.04181876272933501,
+        -0.09500790348160279,
+        -0.14733220844721706,
+        -0.5870239675637602,
+        0.7892514556904828
+      ],
+      "norm_beta": 0.999998544543921,
+      "target_quartet_q": -2.778247332684614,
+      "finite_zero_sum_S": 40397.349015649925,
+      "net_spectral_response_q_plus_S": 40394.57076831724,
+      "tail_allowance_T": 1347483726383.8132,
+      "station_norm_D_stat": 12.035387748879113,
+      "val_arith": 41210.02630136949,
+      "complete_spectral_interval": [
+        -1347483685989.2424,
+        1347483766778.384
+      ],
+      "complete_arithmetic_interval": [
+        39618.89093303489,
+        753432099170.9637
+      ],
+      "details": {
+        "mu": 1.0,
+        "min_objective_val": 40394.57076832585
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_10.0",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        -0.0017047378665949744,
+        0.041809804769312356,
+        -0.09499292924027296,
+        -0.14730448539163965,
+        -0.587048394279224,
+        0.7892407420084191
+      ],
+      "norm_beta": 0.9999985469333471,
+      "target_quartet_q": -2.7773266608948566,
+      "finite_zero_sum_S": 40397.34850924359,
+      "net_spectral_response_q_plus_S": 40394.571182582695,
+      "tail_allowance_T": 1347419716539.0322,
+      "station_norm_D_stat": 12.035101885519229,
+      "val_arith": 41210.16263629947,
+      "complete_spectral_interval": [
+        -1347419676144.461,
+        1347419756933.6035
+      ],
+      "complete_arithmetic_interval": [
+        39619.02726036106,
+        753396308706.2233
+      ],
+      "details": {
+        "mu": 10.0,
+        "min_objective_val": 403970.7077659633
+      }
+    },
+    {
+      "label": "UNSUPPRESSED_OPTIMIZER",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.20758732659196094,
+        0.23965275166103742,
+        0.8115871571148231,
+        -0.3277411619733276,
+        -0.2702800937106358,
+        -0.2456313264999362
+      ],
+      "norm_beta": 0.9782164902711477,
+      "target_quartet_q": -6494.713810059429,
+      "finite_zero_sum_S": 7003343.133283453,
+      "net_spectral_response_q_plus_S": 6996848.419473394,
+      "tail_allowance_T": 2174814506335.664,
+      "station_norm_D_stat": 15.2900685608946,
+      "val_arith": 7456767.118707244,
+      "complete_spectral_interval": [
+        -2174807509487.2446,
+        2174821503184.0835
+      ],
+      "complete_arithmetic_interval": [
+        7455244.544904769,
+        1216033250399.8
+      ],
+      "details": {
+        "lambda_min_Q": -6494.713810059298,
+        "lambda_max_Q": 2588745.2488822667
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_1_ZEROS",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.016065344042548557,
+        -0.013864951985759683,
+        0.06938056959162392,
+        -0.20833006262486156,
+        -0.6000578767659474,
+        0.7689376658274932
+      ],
+      "norm_beta": 0.9998709440326757,
+      "target_quartet_q": -85.96900983520355,
+      "finite_zero_sum_S": 218949.22729282014,
+      "net_spectral_response_q_plus_S": 218863.25828298493,
+      "tail_allowance_T": 1371575379324.1294,
+      "station_norm_D_stat": 12.142501409192109,
+      "val_arith": 218780.01899074882,
+      "complete_spectral_interval": [
+        -1371575160460.871,
+        1371575598187.3877
+      ],
+      "complete_arithmetic_interval": [
+        217189.28965647137,
+        766902883665.7131
+      ],
+      "details": {
+        "num_deflated": 1,
+        "deflated_zeros": [
+          14.134725141734695
+        ],
+        "rank_cp": 2,
+        "surviving_dimension": 3,
+        "condition_number_cp": 8.006670778695527,
+        "constraint_residual_norm": 8.452646872160895e-17
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_2_ZEROS",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.014043931160743978,
+        0.03575838910926863,
+        -0.12270986591185404,
+        0.2608827479451469,
+        -0.7517414838810387,
+        0.5918541438992213
+      ],
+      "norm_beta": 0.9999013791357383,
+      "target_quartet_q": 47435.90515606965,
+      "finite_zero_sum_S": 188019.79106687475,
+      "net_spectral_response_q_plus_S": 235455.69622294442,
+      "tail_allowance_T": 1540757405191.9849,
+      "station_norm_D_stat": 12.869612009644047,
+      "val_arith": 196153.47497212276,
+      "complete_spectral_interval": [
+        -1540757169736.2886,
+        1540757640647.6812
+      ],
+      "complete_arithmetic_interval": [
+        194562.64879585113,
+        861499299686.0658
+      ],
+      "details": {
+        "num_deflated": 2,
+        "deflated_zeros": [
+          14.134725141734695,
+          21.022039638771556
+        ],
+        "rank_cp": 4,
+        "surviving_dimension": 1,
+        "condition_number_cp": 191.6562444171632,
+        "constraint_residual_norm": 2.354819336371712e-16
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_0.1",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.003492754491568495,
+        0.013543119434217774,
+        -0.09814999855338191,
+        -0.24605021614170047,
+        -0.498275820640293,
+        0.8254401614095891
+      ],
+      "norm_beta": 0.9999939003144275,
+      "target_quartet_q": 1303.1712172883567,
+      "finite_zero_sum_S": 61897.60298428711,
+      "net_spectral_response_q_plus_S": 63200.77420157546,
+      "tail_allowance_T": 1384656329841.4832,
+      "station_norm_D_stat": 12.20026657012193,
+      "val_arith": 63448.14972557561,
+      "complete_spectral_interval": [
+        -1384656266640.709,
+        1384656393042.2573
+      ],
+      "complete_arithmetic_interval": [
+        61857.029136423815,
+        774216811060.8673
+      ],
+      "details": {
+        "mu": 0.1,
+        "min_objective_val": 7492.931515717675
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_1.0",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.0007845658980311088,
+        0.03570594813993779,
+        -0.10040030456433036,
+        -0.1762325295437144,
+        -0.560457025714871,
+        0.8021684775810091
+      ],
+      "norm_beta": 0.9999996922281282,
+      "target_quartet_q": 6926.523608928105,
+      "finite_zero_sum_S": 41785.24983985786,
+      "net_spectral_response_q_plus_S": 48711.77344878596,
+      "tail_allowance_T": 1369567994298.5203,
+      "station_norm_D_stat": 12.133612506379407,
+      "val_arith": 42620.939261010855,
+      "complete_spectral_interval": [
+        -1369567945586.7468,
+        1369568043010.2937
+      ],
+      "complete_arithmetic_interval": [
+        41029.80024042698,
+        765780298235.4824
+      ],
+      "details": {
+        "mu": 1.0,
+        "min_objective_val": 48711.7734487879
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_10.0",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.0016022727979565499,
+        0.0410886492145402,
+        -0.09570446496427157,
+        -0.15074408217210244,
+        -0.5839086740375935,
+        0.7908708447573838
+      ],
+      "norm_beta": 0.9999987163601165,
+      "target_quartet_q": 9602.684544479862,
+      "finite_zero_sum_S": 40416.92792302563,
+      "net_spectral_response_q_plus_S": 50019.61246750549,
+      "tail_allowance_T": 1350360957907.049,
+      "station_norm_D_stat": 12.048230253308088,
+      "val_arith": 41227.19949236674,
+      "complete_spectral_interval": [
+        -1350360907887.4365,
+        1350361007926.6616
+      ],
+      "complete_arithmetic_interval": [
+        39636.063577265646,
+        755040874433.9962
+      ],
+      "details": {
+        "mu": 10.0,
+        "min_objective_val": 413771.9637748495
+      }
+    },
+    {
+      "label": "UNSUPPRESSED_OPTIMIZER",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.9201431556092732,
+        0.030263928322620943,
+        -0.12965792282991026,
+        -0.13856060979446697,
+        -0.16377269832199282,
+        -0.17118644052831872,
+        -0.1735105078590548,
+        -0.17371890459815056
+      ],
+      "norm_beta": 0.3915821410450289,
+      "target_quartet_q": -13383.608937561696,
+      "finite_zero_sum_S": 116683297.98361064,
+      "net_spectral_response_q_plus_S": 116669914.37467308,
+      "tail_allowance_T": 1820796936412.0493,
+      "station_norm_D_stat": 13.990366098709641,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1820680266497.6746,
+        1820913606326.424
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "lambda_min_Q": -13383.608937561685,
+        "lambda_max_Q": 5.8596210382296965
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_1_ZEROS",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.11717955987577244,
+        -0.3778858630438632,
+        0.8170602401843022,
+        0.1671891943195734,
+        -0.07022091188345139,
+        -0.19901957899686337,
+        -0.2370596152228155,
+        -0.21724302523265457
+      ],
+      "norm_beta": 0.993110744452662,
+      "target_quartet_q": -283.22242804087546,
+      "finite_zero_sum_S": 2594019.889475793,
+      "net_spectral_response_q_plus_S": 2593736.667047752,
+      "tail_allowance_T": 2382043852047.8,
+      "station_norm_D_stat": 16.00196066024335,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -2382041258311.133,
+        2382046445784.467
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "num_deflated": 1,
+        "deflated_zeros": [
+          14.134725141734695
+        ],
+        "rank_cp": 2,
+        "surviving_dimension": 5,
+        "condition_number_cp": 8.990080096049727,
+        "constraint_residual_norm": 2.482534153247273e-16
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_2_ZEROS",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.020214226634046602,
+        -0.02714958463329599,
+        0.13218492047304645,
+        -0.2082043158112111,
+        0.7998898615074688,
+        0.051381473804974154,
+        -0.3985347180687164,
+        -0.3697818639063126
+      ],
+      "norm_beta": 0.9997956716457557,
+      "target_quartet_q": -11.207874467216634,
+      "finite_zero_sum_S": 170590.40432582868,
+      "net_spectral_response_q_plus_S": 170579.19645136147,
+      "tail_allowance_T": 1966550152936.146,
+      "station_norm_D_stat": 14.539545657394447,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1966549982356.9495,
+        1966550323515.3425
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "num_deflated": 2,
+        "deflated_zeros": [
+          14.134725141734695,
+          21.022039638771556
+        ],
+        "rank_cp": 4,
+        "surviving_dimension": 3,
+        "condition_number_cp": 205.33783051657886,
+        "constraint_residual_norm": 1.5700924586837752e-16
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_3_ZEROS",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        -0.0014680204120820666,
+        0.005233480141902175,
+        -0.02916673756800685,
+        0.06340540349396676,
+        -0.18971537849691758,
+        0.3289557323003806,
+        -0.7348373395331556,
+        0.5575928600739125
+      ],
+      "norm_beta": 0.9999989224574543,
+      "target_quartet_q": -0.0637592248900694,
+      "finite_zero_sum_S": 10420.758122849216,
+      "net_spectral_response_q_plus_S": 10420.694363624327,
+      "tail_allowance_T": 1780236136329.7366,
+      "station_norm_D_stat": 13.833660984548684,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1780236125909.0422,
+        1780236146750.431
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "num_deflated": 3,
+        "deflated_zeros": [
+          14.134725141734695,
+          21.022039638771556,
+          25.01085758014569
+        ],
+        "rank_cp": 6,
+        "surviving_dimension": 1,
+        "condition_number_cp": 1997.6805384657255,
+        "constraint_residual_norm": 1.8041124150158794e-16
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_0.1",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.0014135442467350897,
+        -0.0022754905271042706,
+        -0.011265978823934169,
+        0.018482753192356045,
+        0.025737259956637955,
+        -0.029365735175782268,
+        -0.7077610176466922,
+        0.7050346647777838
+      ],
+      "norm_beta": 0.9999990009458323,
+      "target_quartet_q": -0.032313852353964626,
+      "finite_zero_sum_S": 505.0938323185113,
+      "net_spectral_response_q_plus_S": 505.06151846615734,
+      "tail_allowance_T": 1099677796595.2783,
+      "station_norm_D_stat": 10.87254090896265,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1099677796090.2168,
+        1099677797100.3398
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "mu": 0.1,
+        "min_objective_val": 50.47706937860459
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_1.0",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.0014118727381918423,
+        -0.002266239815863056,
+        -0.011284314631327591,
+        0.018454760929697174,
+        0.025704820543437316,
+        -0.02936290360268799,
+        -0.7077277899949828,
+        0.7050697938335351
+      ],
+      "norm_beta": 0.9999990033071888,
+      "target_quartet_q": -0.0321801999774617,
+      "finite_zero_sum_S": 505.0930965686213,
+      "net_spectral_response_q_plus_S": 505.06091636864386,
+      "tail_allowance_T": 1099598656253.5425,
+      "station_norm_D_stat": 10.872149670689321,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1099598655748.4814,
+        1099598656758.6035
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "mu": 1.0,
+        "min_objective_val": 505.0609163734429
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_10.0",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.0014117059376629743,
+        -0.0022653174082637425,
+        -0.011286143337012186,
+        0.018451969228343423,
+        0.02570158556477266,
+        -0.029362617878714657,
+        -0.7077244776645786,
+        0.7050732955577901
+      ],
+      "norm_beta": 0.9999990035426762,
+      "target_quartet_q": -0.03216688242686165,
+      "finite_zero_sum_S": 505.0930892484779,
+      "net_spectral_response_q_plus_S": 505.06092236605105,
+      "tail_allowance_T": 1099590758976.107,
+      "station_norm_D_stat": 10.872110628928064,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1099590758471.046,
+        1099590759481.168
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "mu": 10.0,
+        "min_objective_val": 5050.898725826295
+      }
+    },
+    {
+      "label": "UNSUPPRESSED_OPTIMIZER",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.22678083759836826,
+        0.23739678468962774,
+        0.8576840033593541,
+        -0.22732683220857244,
+        -0.14459556031093115,
+        -0.13268383681195972,
+        -0.19334560077696786,
+        -0.17034812034218244
+      ],
+      "norm_beta": 0.9739458155863614,
+      "target_quartet_q": -7253.124941780361,
+      "finite_zero_sum_S": 7952810.590081031,
+      "net_spectral_response_q_plus_S": 7945557.465139251,
+      "tail_allowance_T": 2360854988077.6772,
+      "station_norm_D_stat": 15.930631000912879,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -2360847042520.212,
+        2360862933635.1426
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "lambda_min_Q": -7253.124941780523,
+        "lambda_max_Q": 3054289.0733298487
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_1_ZEROS",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.01456563981530589,
+        0.024740983629269183,
+        -0.08256526744936289,
+        0.18911293176717717,
+        0.6771696489072317,
+        -0.697344142107757,
+        -0.018966726654899308,
+        -0.10671306790696494
+      ],
+      "norm_beta": 0.9998939154414188,
+      "target_quartet_q": -87.94364646906001,
+      "finite_zero_sum_S": 243016.62816615516,
+      "net_spectral_response_q_plus_S": 242928.6845196861,
+      "tail_allowance_T": 1600490652947.6067,
+      "station_norm_D_stat": 13.116709292025412,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1600490410018.922,
+        1600490895876.2913
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "num_deflated": 1,
+        "deflated_zeros": [
+          14.134725141734695
+        ],
+        "rank_cp": 2,
+        "surviving_dimension": 5,
+        "condition_number_cp": 8.990080096049727,
+        "constraint_residual_norm": 1.5700924586837752e-16
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_2_ZEROS",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.0004998512241089492,
+        -0.005839997611894975,
+        -0.006324644070012937,
+        -0.011239219493468997,
+        -0.04730971210255874,
+        -0.010632262541114679,
+        -0.6640944297737129,
+        0.7459401168168722
+      ],
+      "norm_beta": 0.9999998750743692,
+      "target_quartet_q": -1.0753201530058356,
+      "finite_zero_sum_S": 4481.761258231222,
+      "net_spectral_response_q_plus_S": 4480.685938078216,
+      "tail_allowance_T": 1085830667216.6678,
+      "station_norm_D_stat": 10.803870599062225,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1085830662735.9819,
+        1085830671697.3538
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "num_deflated": 2,
+        "deflated_zeros": [
+          14.134725141734695,
+          21.022039638771556
+        ],
+        "rank_cp": 4,
+        "surviving_dimension": 3,
+        "condition_number_cp": 205.33783051657886,
+        "constraint_residual_norm": 3.3551543220757213e-16
+      }
+    },
+    {
+      "label": "EXACT_DEFLATION_3_ZEROS",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        -0.0014680204120820666,
+        0.005233480141902175,
+        -0.02916673756800685,
+        0.06340540349396676,
+        -0.18971537849691758,
+        0.3289557323003806,
+        -0.7348373395331556,
+        0.5575928600739125
+      ],
+      "norm_beta": 0.9999989224574543,
+      "target_quartet_q": 4105.364588884897,
+      "finite_zero_sum_S": 10420.758122849216,
+      "net_spectral_response_q_plus_S": 14526.122711734113,
+      "tail_allowance_T": 1780236136329.7366,
+      "station_norm_D_stat": 13.833660984548684,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1780236121803.6138,
+        1780236150855.8594
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "num_deflated": 3,
+        "deflated_zeros": [
+          14.134725141734695,
+          21.022039638771556,
+          25.01085758014569
+        ],
+        "rank_cp": 6,
+        "surviving_dimension": 1,
+        "condition_number_cp": 1997.6805384657255,
+        "constraint_residual_norm": 1.8041124150158794e-16
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_0.1",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.001444856729311328,
+        -0.0024439783730022613,
+        -0.013951806621429686,
+        0.013739468928627381,
+        0.03522238820368005,
+        -0.09494396256675754,
+        -0.6722059258600938,
+        0.7331389595596645
+      ],
+      "norm_beta": 0.9999989561939713,
+      "target_quartet_q": 3.5033774385910452,
+      "finite_zero_sum_S": 630.7646833028791,
+      "net_spectral_response_q_plus_S": 634.2680607414702,
+      "tail_allowance_T": 1198081321312.84,
+      "station_norm_D_stat": 11.348578625799044,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1198081320678.572,
+        1198081321947.1082
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "mu": 0.1,
+        "min_objective_val": 66.57984576744975
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_1.0",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.001430204996719281,
+        -0.0025022904135057005,
+        -0.01188893198531962,
+        0.017173367742883094,
+        0.03027927891861836,
+        -0.04922907966110201,
+        -0.6983601492809438,
+        0.7130975996826504
+      ],
+      "norm_beta": 0.9999989772563107,
+      "target_quartet_q": 39.48178511618998,
+      "finite_zero_sum_S": 518.7377351262265,
+      "net_spectral_response_q_plus_S": 558.2195202424165,
+      "tail_allowance_T": 1133061206012.7537,
+      "station_norm_D_stat": 11.036338371938397,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1133061205454.5342,
+        1133061206570.9731
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "mu": 1.0,
+        "min_objective_val": 558.2195202378034
+      }
+    },
+    {
+      "label": "SOFT_SUPPRESSION_MU_10.0",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.0014146778872508733,
+        -0.0023079189089277017,
+        -0.011348228134417939,
+        0.018300790985614747,
+        0.026393813264012116,
+        -0.03183540065894886,
+        -0.7066440051131236,
+        0.7060262706785404
+      ],
+      "norm_beta": 0.9999989993427368,
+      "target_quartet_q": 66.88655821042161,
+      "finite_zero_sum_S": 505.3289008226881,
+      "net_spectral_response_q_plus_S": 572.2154590331097,
+      "tail_allowance_T": 1103979795164.9578,
+      "station_norm_D_stat": 10.89378713198447,
+      "val_arith": null,
+      "complete_spectral_interval": [
+        -1103979794592.7422,
+        1103979795737.1733
+      ],
+      "complete_arithmetic_interval": null,
+      "details": {
+        "mu": 10.0,
+        "min_objective_val": 5120.175566614395
+      }
+    }
+  ]
+}

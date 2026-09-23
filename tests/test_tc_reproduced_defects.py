@@ -177,3 +177,86 @@ def test_contract_legal_b_validation_and_norms():
     # Distinguishes ||b||^2 from ||beta||^2
     assert norm_b_sq > norm_beta_sq
     assert abs(norm_b_sq - (0.9**2 + (-0.5)**2 + (-0.3)**2 + (-0.1)**2)) < 1e-14
+
+
+def test_small_vector_quadratic_scaling_no_clamping():
+    """
+    Test that b = 10^-16 (1, -0.5, -0.3, -0.2)/sqrt(1.38) is NOT clamped to zero,
+    retaining non-zero arithmetic energy, non-zero spectral energy, and quadratic scaling.
+    """
+    from tc.weil_forms import evaluate_tc_arithmetic_spectral_baseline_comparison
+    norm_c = math.sqrt(1.38)
+    b_unit = {-1: 1.0 / norm_c, -2: -0.5 / norm_c, -3: -0.3 / norm_c, -4: -0.2 / norm_c}
+    scale = 1e-16
+    b_small = {K: v * scale for K, v in b_unit.items()}
+
+    res_unit = evaluate_tc_arithmetic_spectral_baseline_comparison(
+        b_coefficients=b_unit, T_cutoff=100.0
+    )
+    res_small = evaluate_tc_arithmetic_spectral_baseline_comparison(
+        b_coefficients=b_small, T_cutoff=100.0
+    )
+
+    # Values must not be clamped to zero
+    val_arith_unit = res_unit['arithmetic_evaluation']['B_arith_net_value']
+    val_arith_small = res_small['arithmetic_evaluation']['B_arith_net_value']
+    val_spec_unit = res_unit['spectral_evaluation']['critical_zeros_partial_sum']
+    val_spec_small = res_small['spectral_evaluation']['critical_zeros_partial_sum']
+
+    assert val_arith_small > 0.0
+    assert val_spec_small > 0.0
+
+    # Quadratic scaling: f(scale * b) / f(b) == scale^2
+    assert abs(val_arith_small / val_arith_unit - scale**2) / (scale**2) < 1e-8
+    assert abs(val_spec_small / val_spec_unit - scale**2) / (scale**2) < 1e-8
+
+
+def test_archimedean_tail_normalization_and_cutoff_validation():
+    """
+    Verify that Archimedean tail bound in evaluate_tc_arithmetic_spectral_baseline_comparison
+    uses 1/pi factor (not 1/2pi) and enforces U >= 10.0 for positive digamma weight.
+    """
+    # U < 10.0 raises ValueError
+    with pytest.raises(ValueError, match="cutoff U must be >= 10.0"):
+        evaluate_tc_arithmetic_spectral_baseline_comparison(U_cutoff=5.0)
+
+    # Valid U >= 10.0 succeeds with positive Archimedean tail
+    res = evaluate_tc_arithmetic_spectral_baseline_comparison(U_cutoff=100.0, T_cutoff=100.0)
+    R_arch_upper = res['arithmetic_evaluation']['omitted_archimedean_tail_upper_bound']
+    assert R_arch_upper > 0.0
+
+
+def test_no_contradictory_positivity_decisions():
+    """
+    Verify that certify_explicit_formula_off_critical_sensitivity eliminates contradictory
+    legacy decisions, correctly distinguishing finite margin from complete functional.
+    """
+    res = certify_explicit_formula_off_critical_sensitivity(
+        delta_grid=[0.49], gamma_grid=[100.0]
+    )
+    summary = res['off_critical_sensitivity_summary']
+
+    # Must NOT claim unconditional preservation when complete spectral status is NUMERICALLY_UNRESOLVED
+    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is False
+    assert summary['is_finite_quadrature_margin_positive_against_worst_quartet'] is True
+    assert summary['is_complete_spectral_positivity_preserved'] is False
+    assert summary['complete_spectral_decision_status'] == 'NUMERICALLY_UNRESOLVED'
+
+
+def test_optimized_suppression_production_campaign():
+    """
+    Verify evaluate_tc_optimized_suppression_comparison runs cleanly and reproduces
+    the deflation trade-off across 4 and 6 grades.
+    """
+    from tc.weil_forms import evaluate_tc_optimized_suppression_comparison
+    res = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4], [-1, -2, -3, -4, -5, -6]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=100.0
+    )
+    assert res['status'] == 'OPTIMIZED_SUPPRESSION_CAMPAIGN_EVALUATED'
+    assert res['candidates_count'] > 0
+    # In every candidate, net spectral response q + S_T is strictly positive
+    for cand in res['candidates']:
+        assert cand['net_spectral_response_q_plus_S'] > 0.0
+

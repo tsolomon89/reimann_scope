@@ -4562,7 +4562,8 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
     assert summary['total_points_evaluated'] == 975
     assert summary['max_overturn_ratio'] < 0.005
     assert summary['min_multiplicity_to_overturn'] > 300.0
-    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is True
+    assert summary['is_finite_quadrature_margin_positive_against_worst_quartet'] is True
+    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is False
     assert summary['preserved_lower_margin_with_worst_case_zero'] > 1.3e7
 
     # Check serialized artifact
@@ -4571,7 +4572,8 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
     with open(out_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
     assert data['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
-    assert data['off_critical_sensitivity_summary']['is_positivity_unconditionally_preserved_for_single_zero'] is True
+    assert data['off_critical_sensitivity_summary']['is_finite_quadrature_margin_positive_against_worst_quartet'] is True
+    assert data['off_critical_sensitivity_summary']['is_positivity_unconditionally_preserved_for_single_zero'] is False
 
 
 def test_asymptotic_scaling_sweep(tmp_path):
@@ -4782,7 +4784,8 @@ def test_tc_arithmetic_spectral_baseline_comparison_agreement(tmp_path):
     assert arith['B_arith_net_value'] > 1.3e7
     assert spec['critical_zeros_partial_sum'] > 1.3e7
     assert arith['arithmetic_enclosure'][0] > 0.0
-    assert spec['spectral_enclosure'][0] > 0.0
+    assert spec['spectral_enclosure_finite'][0] > 0.0
+    assert spec['spectral_enclosure_complete'][0] < 0.0  # complete functional includes two-sided tail allowance
 
 
 # ==============================================================================
@@ -4856,8 +4859,10 @@ def test_tc_exact_off_critical_sensitivity_overturn_ratio(tmp_path):
     # Max negative quartet is small
     assert summary['max_negative_quartet_magnitude'] < 100.0
 
-    # Positivity is unconditionally preserved for any single off-critical zero (overturn ratio < 0.001%)
-    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is True
+    # Finite quadrature margin remains positive against single zero (overturn ratio < 0.001%)
+    assert summary['is_finite_quadrature_margin_positive_against_worst_quartet'] is True
+    # But complete spectral positivity is not unconditionally preserved due to Stieltjes tail
+    assert summary['is_positivity_unconditionally_preserved_for_single_zero'] is False
 
     # Multiplicity to overturn is enormous
     assert summary['min_multiplicity_to_overturn'] > 100000.0
