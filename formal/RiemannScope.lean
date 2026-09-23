@@ -14,4 +14,5 @@ import RiemannScope.Contradiction
 import RiemannScope.RadialDefect
 import RiemannScope.ArithmeticBridge
 import RiemannScope.CurvatureTransport
+import RiemannScope.ExtremalCorrelation
 

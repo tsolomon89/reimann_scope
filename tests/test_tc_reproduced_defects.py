@@ -260,3 +260,120 @@ def test_optimized_suppression_production_campaign():
     for cand in res['candidates']:
         assert cand['net_spectral_response_q_plus_S'] > 0.0
 
+
+def test_analytic_interpolation_error_formula_and_derivative_norm():
+    r"""
+    Verify the analytic autocorrelation interpolation bound:
+        ||C_h - \Pi C_h||_\infty <= (\Delta v^2 / 8) ||\psi_h'||_2^2
+    with ||\psi_h'||_2^2 \approx 2.0797e13 at h=0.05, replacing heuristic fallbacks.
+    """
+    from tc.weil_forms import (
+        NORM_KAPPA_THIRD_DERIVATIVE_SQ,
+        NORM_KAPPA_SECOND_DERIVATIVE_SQ,
+        NORM_KAPPA_FIRST_DERIVATIVE_SQ,
+        certify_baseline_canonical_weil_error_budget
+    )
+    h = 0.05
+    norm_psi_prime_sq = (
+        h**(-7) * NORM_KAPPA_THIRD_DERIVATIVE_SQ +
+        0.5 * h**(-5) * NORM_KAPPA_SECOND_DERIVATIVE_SQ +
+        0.0625 * h**(-3) * NORM_KAPPA_FIRST_DERIVATIVE_SQ
+    )
+    # Check derivative norm magnitude
+    assert 2.07e13 < norm_psi_prime_sq < 2.09e13
+
+    # Check error budget output on baseline
+    budget = certify_baseline_canonical_weil_error_budget(
+        grades=[-1, -2, -3, -4],
+        anchor_grade=-1,
+        window=(8.0, 20.0),
+        h=0.05,
+        U=320.0,
+        N_tab_prime=10000
+    )
+    assert budget['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED'
+    pq = budget['prime_quadrature']
+    assert abs(pq['norm_psi_prime_sq'] - norm_psi_prime_sq) < 1.0
+    assert pq['eps_interp'] < 300.0  # \approx 260.0, tightly bounded
+    # Verify literal 20875.06 is completely gone
+    assert pq['norm_delta_W_prime'] < 1000.0
+    assert budget['error_budget']['certified_lambda_min_lower_margin'] > 1.32e7 > 0.0
+
+
+def test_decoupled_cutoff_and_direction_specific_budget():
+    """
+    Verify that physical cutoff U and zero cutoff T are decoupled, and
+    error allowances are computed direction-specifically without hardcoded 1591.14.
+    """
+    from tc.weil_forms import evaluate_tc_optimized_suppression_comparison
+    res = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=100.0,
+        U_cutoff=320.0
+    )
+    assert res['parameters']['U_cutoff'] == 320.0
+    assert res['parameters']['T_cutoff'] == 100.0
+    assert res['parameters']['cutoffs_are_decoupled'] is True
+
+    # Candidate 0 must have direction-specific delta_arith_est
+    cand0 = res['candidates'][0]
+    assert cand0['delta_arith_est'] is not None
+    # Hardcoded 1591.14 * ||beta||^2 would give ~1591.14 for unit norm;
+    # analytic direction-specific error is strictly smaller (~197.64)
+    assert cand0['delta_arith_est'] < 1000.0
+    assert cand0['delta_arch_vec'] is not None
+    assert cand0['delta_prime_vec'] is not None
+
+
+def test_zero_data_completeness_verification():
+    """
+    Verify that incomplete zero lists produce an explicit unresolved flag
+    and do not silently authorize a complete interval.
+    """
+    from tc.weil_forms import evaluate_tc_optimized_suppression_comparison
+    # Test with standard T=100 where reference data is complete (29 zeros)
+    res_complete = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=100.0
+    )
+    assert res_complete['zero_accounting']['is_complete'] is True
+    assert res_complete['zero_accounting']['zeros_evaluated_count'] == 29
+    assert res_complete['zero_accounting']['unresolved_zero_range'] is None
+
+    # Test with T=500 where reference data only goes to ~396.38
+    res_incomplete = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=500.0
+    )
+    assert res_incomplete['zero_accounting']['is_complete'] is False
+    assert res_incomplete['zero_accounting']['unresolved_zero_range'] is not None
+
+
+def test_campaign_minima_and_3525_fold_reduction():
+    """
+    Verify dynamic campaign summary matches underlying rows and accurately reproduces
+    the ~3,525-fold reduction in finite synthetic objective q + S_T from 4 to 8 grades.
+    """
+    import json
+    with open('data/tc_optimized_suppression_campaign.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    tbl = data['finite_objective_minima_mu1_target100']['table']
+    dims = {row['family_dimension']: row['min_finite_q_plus_S'] for row in tbl}
+    assert 4 in dims and 6 in dims and 8 in dims
+
+    # Verify exact reproduction of benchmark table
+    assert abs(dims[4] - 1780369.060913) < 1.0
+    assert abs(dims[6] - 40394.570768) < 1.0
+    assert abs(dims[8] - 505.060916) < 1.0
+
+    fold_red = data['finite_objective_minima_mu1_target100']['fold_reduction_4_to_8_grades']
+    assert 3520.0 < fold_red < 3530.0
+
+    # Summary findings must record NUMERICALLY_UNRESOLVED for complete functional
+    assert data['summary_findings']['epistemic_decision'] == 'NUMERICALLY_UNRESOLVED'
+
+

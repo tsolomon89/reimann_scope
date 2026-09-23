@@ -40,6 +40,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/Contradiction.lean",
     "formal/RiemannScope/ArithmeticBridge.lean",
     "formal/RiemannScope/CurvatureTransport.lean",
+    "formal/RiemannScope/ExtremalCorrelation.lean",
 ]
 
 

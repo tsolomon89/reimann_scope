@@ -815,6 +815,9 @@ def test_adversarial_report_path_traversal_and_duplicates(tmp_path):
 
 def test_report_loader_rejects_rehashed_invalid_certificate(tmp_path, monkeypatch):
     """Test that load_verification_report fails if a certificate on disk fails mathematical or dependency validation even if rehashed."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
     monkeypatch.setattr(certification, "REPO_ROOT", str(tmp_path))
     monkeypatch.setattr(certification, "CERT_DIR", str(tmp_path / "data" / "certificates"))
 

@@ -44,13 +44,95 @@
     ],
     "bandwidth_h": 0.05,
     "T_cutoff": 100.0,
+    "U_cutoff": 320.0,
+    "cutoffs_are_decoupled": true,
     "tau": 6.283185307179586
   },
+  "zero_accounting": {
+    "is_complete": true,
+    "source": "authoritative_reference_data",
+    "zeros_evaluated_count": 29,
+    "unresolved_zero_range": null
+  },
+  "finite_objective_minima_mu1_target100": {
+    "description": "Minimum finite synthetic objective q + S_T at (delta, gamma) = (0.49, 100), T = 100, mu = 1.0",
+    "table": [
+      {
+        "family_dimension": 4,
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4
+        ],
+        "b_unit": [
+          0.02351001303590227,
+          -0.3450319422036657,
+          -0.4829439610918265,
+          0.8044658902595898
+        ],
+        "min_finite_q_plus_S": 1780369.0609130457,
+        "target_quartet_q": -16.573777846165136,
+        "finite_zero_sum_S": 1780385.6346908917
+      },
+      {
+        "family_dimension": 6,
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6
+        ],
+        "b_unit": [
+          -0.0017061389272378102,
+          0.04181876272933501,
+          -0.09500790348160279,
+          -0.14733220844721706,
+          -0.5870239675637602,
+          0.7892514556904828
+        ],
+        "min_finite_q_plus_S": 40394.57076831724,
+        "target_quartet_q": -2.778247332684614,
+        "finite_zero_sum_S": 40397.349015649925
+      },
+      {
+        "family_dimension": 8,
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8
+        ],
+        "b_unit": [
+          0.0014118727381918423,
+          -0.002266239815863056,
+          -0.011284314631327591,
+          0.018454760929697174,
+          0.025704820543437316,
+          -0.02936290360268799,
+          -0.7077277899949828,
+          0.7050697938335351
+        ],
+        "min_finite_q_plus_S": 505.06091636864386,
+        "target_quartet_q": -0.0321801999774617,
+        "finite_zero_sum_S": 505.0930965686213
+      }
+    ],
+    "fold_reduction_4_to_8_grades": 3525.058073615727,
+    "evaluation_verdict": "Enlarging the legal TC grade space from 4 to 8 grades achieves an approximately 3525.1-fold reduction in the finite synthetic objective q + S_T (from 1780369.060913 to 505.060916). This demonstrates genuine numerical capability of legal zero-sum combinations to suppress the finite critical-zero background. However, all evaluated finite minima remain strictly positive (inf(q + S_T) > 0), and the complete functional remains NUMERICALLY_UNRESOLVED because the strip-uniform Stieltjes tail allowance B_tail(T=100) in [1.09e+12, 2.38e+12] dominates finite terms by 5 orders of magnitude."
+  },
   "summary_findings": {
-    "unsuppressed_optimizer_verdict": "Yields large negative quartet response (q ~ -10,268 to -13,384), but activates massive positive critical-zero background (S_T ~ 9.4e+07 to 1.17e+08), resulting in large positive net spectral response (q + S_T >> 0).",
-    "exact_deflation_verdict": "Cancelling the lowest critical zeros reduces finite zero background by orders of magnitude (from 9.4e+07 -> 3.28e+06 -> 1.88e+05 -> 1.04e+04), but simultaneously severely constrains the Dirichlet polynomial, shrinking q from -10,268 -> -157.6 -> -5.38 -> -0.0638. Net response q + S_T remains strictly positive at every deflation stage.",
-    "soft_suppression_verdict": "Penalizing S_T with parameter mu reduces finite background, but forces proportional contraction in |q|, leaving q + S_T > 0 in all tested directions.",
-    "tail_dominance": "The strip-uniform Stieltjes tail allowance B_tail(T=100) ~ 1.1e+12 - 1.8e+12 dominates all finite contributions by 5 orders of magnitude. Truncated cancellation does not overcome the tail bound without a sharper coefficient-dependent remainder theorem."
+    "unsuppressed_optimizer_verdict": "Yields large negative quartet response (q in [-13383.6, -4375.6]), but activates massive positive critical-zero background (S_T in [4.62e+06, 1.17e+08]), resulting in large positive net spectral response (q + S_T >> 0).",
+    "exact_deflation_verdict": "Cancelling the lowest critical zeros reduces finite zero background by orders of magnitude, but simultaneously constrains the Dirichlet polynomial, shrinking q. Net response q + S_T remains strictly positive at every deflation stage.",
+    "soft_suppression_verdict": "Penalizing S_T with parameter mu smoothly trades off background suppression against target response, achieving a 3525-fold reduction in q + S_T from 4 to 8 grades at mu=1, but leaves q + S_T > 0 in all tested directions.",
+    "tail_dominance": "The strip-uniform Stieltjes tail allowance B_tail(T=100) in [1.09e+12, 2.38e+12] dominates all finite contributions by 5 orders of magnitude. Complete functional precision remains NUMERICALLY_UNRESOLVED.",
+    "epistemic_decision": "NUMERICALLY_UNRESOLVED"
   },
   "candidates_count": 36,
   "candidates": [
@@ -79,14 +161,17 @@
       "net_spectral_response_q_plus_S": 94628892.15099493,
       "tail_allowance_T": 1480170250061.0918,
       "station_norm_D_stat": 12.614038661803358,
-      "val_arith": 98688081.34273449,
+      "val_arith": 1095852216.347643,
+      "delta_arith_est": 197.63854394479048,
+      "delta_arch_vec": 0.10602040278360844,
+      "delta_prime_vec": 197.53252354200689,
       "complete_spectral_interval": [
         -1480075621168.941,
         1480264878953.2427
       ],
       "complete_arithmetic_interval": [
-        98687655.77885735,
-        827721088277.0099
+        1095852018.709099,
+        339580417727.80084
       ],
       "details": {
         "lambda_min_Q": -10268.142817628166,
@@ -118,14 +203,17 @@
       "net_spectral_response_q_plus_S": 3279196.0608730665,
       "tail_allowance_T": 1415768876901.3696,
       "station_norm_D_stat": 12.336572139994477,
-      "val_arith": 3331521.794989186,
+      "val_arith": 38712274.18358671,
+      "delta_arith_est": 184.8287168934857,
+      "delta_arch_vec": 0.0010904920354781022,
+      "delta_prime_vec": 184.82762640145023,
       "complete_spectral_interval": [
         -1415765597705.3088,
         1415772156097.4304
       ],
       "complete_arithmetic_interval": [
-        3329938.0531233796,
-        791616348819.489
+        38712089.35486981,
+        323796005150.85547
       ],
       "details": {
         "num_deflated": 1,
@@ -163,14 +251,17 @@
       "net_spectral_response_q_plus_S": 1780369.2329932167,
       "tail_allowance_T": 1343148750109.3887,
       "station_norm_D_stat": 12.016012691370124,
-      "val_arith": 1797354.6483199454,
+      "val_arith": 30153217.21860782,
+      "delta_arith_est": 175.99873841074083,
+      "delta_arch_vec": 0.0005388460232909688,
+      "delta_prime_vec": 175.99819956471754,
       "complete_spectral_interval": [
         -1343146969740.1558,
         1343150530478.6216
       ],
       "complete_arithmetic_interval": [
-        1795764.3851606245,
-        751009996662.6177
+        30153041.21986941,
+        307180713143.8983
       ],
       "details": {
         "mu": 0.1,
@@ -202,14 +293,17 @@
       "net_spectral_response_q_plus_S": 1780369.0609130457,
       "tail_allowance_T": 1343216886243.9668,
       "station_norm_D_stat": 12.01631746560858,
-      "val_arith": 1797377.945071164,
+      "val_arith": 30157218.21557773,
+      "delta_arith_est": 176.0075163503486,
+      "delta_arch_vec": 0.0005390682244441308,
+      "delta_prime_vec": 176.00697728212415,
       "complete_spectral_interval": [
         -1343215105874.906,
         1343218666613.0276
       ],
       "complete_arithmetic_interval": [
-        1795787.6845271992,
-        751048094324.483
+        30157042.20806138,
+        307196298480.83075
       ],
       "details": {
         "mu": 1.0,
@@ -241,14 +335,17 @@
       "net_spectral_response_q_plus_S": 1780369.062630027,
       "tail_allowance_T": 1343223693855.483,
       "station_norm_D_stat": 12.016347915760878,
-      "val_arith": 1797380.2915457913,
+      "val_arith": 30157618.391871925,
+      "delta_arith_est": 176.00839337264875,
+      "delta_arch_vec": 0.0005390904489032867,
+      "delta_prime_vec": 176.00785428219984,
       "complete_spectral_interval": [
         -1343221913486.4202,
         1343225474224.5457
       ],
       "complete_arithmetic_interval": [
-        1795790.0312633142,
-        751051900734.7606
+        30157442.383478552,
+        307197855642.07965
       ],
       "details": {
         "mu": 10.0,
@@ -280,14 +377,17 @@
       "net_spectral_response_q_plus_S": 4611306.537752373,
       "tail_allowance_T": 1592002727951.5605,
       "station_norm_D_stat": 13.081881957404779,
-      "val_arith": 4835306.622951053,
+      "val_arith": 79713776.72176386,
+      "delta_arith_est": 208.1530305003717,
+      "delta_arch_vec": 0.004443879843839713,
+      "delta_prime_vec": 208.14858662052785,
       "complete_spectral_interval": [
         -1591998116645.0227,
         1592007339258.0984
       ],
       "complete_arithmetic_interval": [
-        4833759.8126809755,
-        890157248775.9404
+        79713568.56873336,
+        364138072357.3999
       ],
       "details": {
         "lambda_min_Q": -4375.646559547464,
@@ -319,14 +419,17 @@
       "net_spectral_response_q_plus_S": 3582940.9337259517,
       "tail_allowance_T": 1415768876901.3696,
       "station_norm_D_stat": 12.336572139994477,
-      "val_arith": 3331521.794989186,
+      "val_arith": 38712274.18358671,
+      "delta_arith_est": 184.8287168934857,
+      "delta_arch_vec": 0.0010904920354781022,
+      "delta_prime_vec": 184.82762640145023,
       "complete_spectral_interval": [
         -1415765293960.4358,
         1415772459842.3035
       ],
       "complete_arithmetic_interval": [
-        3329938.0531233796,
-        791616348819.489
+        38712089.35486981,
+        323796005150.85547
       ],
       "details": {
         "num_deflated": 1,
@@ -364,14 +467,17 @@
       "net_spectral_response_q_plus_S": 1892767.6340284052,
       "tail_allowance_T": 1342277236381.5435,
       "station_norm_D_stat": 12.012113711716353,
-      "val_arith": 1896983.018259424,
+      "val_arith": 28170698.349209487,
+      "delta_arith_est": 175.8570238964407,
+      "delta_arch_vec": 0.000537059203991371,
+      "delta_prime_vec": 175.8564868372367,
       "complete_spectral_interval": [
         -1342275343613.9094,
         1342279129149.1775
       ],
       "complete_arithmetic_interval": [
-        1895394.174235381,
-        750522798100.1595
+        28170522.492185593,
+        306979433317.48456
       ],
       "details": {
         "mu": 0.1,
@@ -403,14 +509,17 @@
       "net_spectral_response_q_plus_S": 1831484.9989855282,
       "tail_allowance_T": 1337267769733.433,
       "station_norm_D_stat": 11.989677761086046,
-      "val_arith": 1802924.099822888,
+      "val_arith": 28734458.762062557,
+      "delta_arith_est": 175.2341199456276,
+      "delta_arch_vec": 0.0005006881628644519,
+      "delta_prime_vec": 175.23361925746474,
       "complete_spectral_interval": [
         -1337265938248.434,
         1337269601218.4321
       ],
       "complete_arithmetic_interval": [
-        1801333.8750078087,
-        747721710840.1802
+        28734283.527942613,
+        305834434841.5994
       ],
       "details": {
         "mu": 1.0,
@@ -442,14 +551,17 @@
       "net_spectral_response_q_plus_S": 1833720.2197796411,
       "tail_allowance_T": 1342483875739.168,
       "station_norm_D_stat": 12.013038289691156,
-      "val_arith": 1797764.3304895011,
+      "val_arith": 29972330.54053908,
+      "delta_arith_est": 175.91238746129937,
+      "delta_arch_vec": 0.0005340089750021278,
+      "delta_prime_vec": 175.91185345232438,
       "complete_spectral_interval": [
         -1342482042018.9482,
         1342485709459.3877
       ],
       "complete_arithmetic_interval": [
-        1796174.0709706605,
-        750638239214.168
+        29972154.628151618,
+        307028489130.8901
       ],
       "details": {
         "mu": 10.0,
@@ -485,14 +597,17 @@
       "net_spectral_response_q_plus_S": 108953392.36443606,
       "tail_allowance_T": 1631536458381.0017,
       "station_norm_D_stat": 13.243315140295367,
-      "val_arith": 112953795.78817339,
+      "val_arith": 1197643046.6212583,
+      "delta_arith_est": 231.57097518760472,
+      "delta_arch_vec": 13.02708922814062,
+      "delta_prime_vec": 218.5438859594641,
       "complete_spectral_interval": [
         -1631427504988.6372,
         1631645411773.3662
       ],
       "complete_arithmetic_interval": [
-        112953491.13165922,
-        912370256219.5547
+        1197642815.050283,
+        374296554627.03253
       ],
       "details": {
         "lambda_min_Q": -12307.769849765546,
@@ -528,14 +643,17 @@
       "net_spectral_response_q_plus_S": 2757398.7798239263,
       "tail_allowance_T": 1716788201983.5847,
       "station_norm_D_stat": 13.584907394687475,
-      "val_arith": 2787307.380515141,
+      "val_arith": 53936129.140739165,
+      "delta_arith_est": 223.78086571479915,
+      "delta_arch_vec": 0.24213211061681644,
+      "delta_prime_vec": 223.53873360418234,
       "complete_spectral_interval": [
         -1716785444584.805,
         1716790959382.3645
       ],
       "complete_arithmetic_interval": [
-        2785733.6652943967,
-        959927751272.4231
+        53935905.35987345,
+        392648172225.6631
       ],
       "details": {
         "num_deflated": 1,
@@ -577,14 +695,17 @@
       "net_spectral_response_q_plus_S": 188014.41423719662,
       "tail_allowance_T": 1540757405191.9849,
       "station_norm_D_stat": 12.869612009644047,
-      "val_arith": 196153.47497212276,
+      "val_arith": 1028459.3044827648,
+      "delta_arith_est": 202.53828235038432,
+      "delta_arch_vec": 0.003876742161542252,
+      "delta_prime_vec": 202.53440560822278,
       "complete_spectral_interval": [
         -1540757217177.5706,
         1540757593206.3992
       ],
       "complete_arithmetic_interval": [
-        194562.64879585113,
-        861499299686.0658
+        1028256.7662004144,
+        352340633196.473
       ],
       "details": {
         "num_deflated": 2,
@@ -627,14 +748,17 @@
       "net_spectral_response_q_plus_S": 40394.61233421268,
       "tail_allowance_T": 1348124681149.4011,
       "station_norm_D_stat": 12.038249832427256,
-      "val_arith": 41208.69951343156,
+      "val_arith": 898782.3453786806,
+      "delta_arith_est": 177.1064430777938,
+      "delta_arch_vec": 0.0008661261908900402,
+      "delta_prime_vec": 177.10557695160293,
       "complete_spectral_interval": [
         -1348124640754.7888,
         1348124721544.0134
       ],
       "complete_arithmetic_interval": [
-        39617.56422160989,
-        753790482619.9313
+        898605.2389356028,
+        308289352040.3363
       ],
       "details": {
         "mu": 0.1,
@@ -670,14 +794,17 @@
       "net_spectral_response_q_plus_S": 40394.57076831724,
       "tail_allowance_T": 1347483726383.8132,
       "station_norm_D_stat": 12.035387748879113,
-      "val_arith": 41210.02630136949,
+      "val_arith": 896185.293037939,
+      "delta_arith_est": 177.02237115523522,
+      "delta_arch_vec": 0.0008619713486576778,
+      "delta_prime_vec": 177.02150918388656,
       "complete_spectral_interval": [
         -1347483685989.2424,
         1347483766778.384
       ],
       "complete_arithmetic_interval": [
-        39618.89093303489,
-        753432099170.9637
+        896008.2706667838,
+        308142776239.74115
       ],
       "details": {
         "mu": 1.0,
@@ -713,14 +840,17 @@
       "net_spectral_response_q_plus_S": 40394.571182582695,
       "tail_allowance_T": 1347419716539.0322,
       "station_norm_D_stat": 12.035101885519229,
-      "val_arith": 41210.16263629947,
+      "val_arith": 895926.3524780927,
+      "delta_arith_est": 177.01397518492675,
+      "delta_arch_vec": 0.0008615572688277812,
+      "delta_prime_vec": 177.01311362765793,
       "complete_spectral_interval": [
         -1347419676144.461,
         1347419756933.6035
       ],
       "complete_arithmetic_interval": [
-        39619.02726036106,
-        753396308706.2233
+        895749.3385029078,
+        308128138242.6768
       ],
       "details": {
         "mu": 10.0,
@@ -756,14 +886,17 @@
       "net_spectral_response_q_plus_S": 6996848.419473394,
       "tail_allowance_T": 2174814506335.664,
       "station_norm_D_stat": 15.2900685608946,
-      "val_arith": 7456767.118707244,
+      "val_arith": 113562372.95924173,
+      "delta_arith_est": 284.8843940308399,
+      "delta_arch_vec": 0.7245460224331529,
+      "delta_prime_vec": 284.15984800840675,
       "complete_spectral_interval": [
         -2174807509487.2446,
         2174821503184.0835
       ],
       "complete_arithmetic_interval": [
-        7455244.544904769,
-        1216033250399.8
+        113562088.0748477,
+        497449016322.5977
       ],
       "details": {
         "lambda_min_Q": -6494.713810059298,
@@ -799,14 +932,17 @@
       "net_spectral_response_q_plus_S": 218863.25828298493,
       "tail_allowance_T": 1371575379324.1294,
       "station_norm_D_stat": 12.142501409192109,
-      "val_arith": 218780.01899074882,
+      "val_arith": 1489290.8960814094,
+      "delta_arith_est": 180.24421740338778,
+      "delta_arch_vec": 0.004300277179029198,
+      "delta_prime_vec": 180.23991712620875,
       "complete_spectral_interval": [
         -1371575160460.871,
         1371575598187.3877
       ],
       "complete_arithmetic_interval": [
-        217189.28965647137,
-        766902883665.7131
+        1489110.651864006,
+        313652636051.4048
       ],
       "details": {
         "num_deflated": 1,
@@ -848,14 +984,17 @@
       "net_spectral_response_q_plus_S": 235455.69622294442,
       "tail_allowance_T": 1540757405191.9849,
       "station_norm_D_stat": 12.869612009644047,
-      "val_arith": 196153.47497212276,
+      "val_arith": 1028459.3044827648,
+      "delta_arith_est": 202.53828235038432,
+      "delta_arch_vec": 0.003876742161542252,
+      "delta_prime_vec": 202.53440560822278,
       "complete_spectral_interval": [
         -1540757169736.2886,
         1540757640647.6812
       ],
       "complete_arithmetic_interval": [
-        194562.64879585113,
-        861499299686.0658
+        1028256.7662004144,
+        352340633196.473
       ],
       "details": {
         "num_deflated": 2,
@@ -898,14 +1037,17 @@
       "net_spectral_response_q_plus_S": 63200.77420157546,
       "tail_allowance_T": 1384656329841.4832,
       "station_norm_D_stat": 12.20026657012193,
-      "val_arith": 63448.14972557561,
+      "val_arith": 853102.3522110003,
+      "delta_arith_est": 181.96101256136788,
+      "delta_arch_vec": 0.00038859471990720473,
+      "delta_prime_vec": 181.96062396664797,
       "complete_spectral_interval": [
         -1384656266640.709,
         1384656393042.2573
       ],
       "complete_arithmetic_interval": [
-        61857.029136423815,
-        774216811060.8673
+        852920.3911984389,
+        316643344846.3968
       ],
       "details": {
         "mu": 0.1,
@@ -941,14 +1083,17 @@
       "net_spectral_response_q_plus_S": 48711.77344878596,
       "tail_allowance_T": 1369567994298.5203,
       "station_norm_D_stat": 12.133612506379407,
-      "val_arith": 42620.939261010855,
+      "val_arith": 898947.0234269707,
+      "delta_arith_est": 179.9382994174296,
+      "delta_arch_vec": 0.0006447364201855636,
+      "delta_prime_vec": 179.9376546810094,
       "complete_spectral_interval": [
         -1369567945586.7468,
         1369568043010.2937
       ],
       "complete_arithmetic_interval": [
-        41029.80024042698,
-        765780298235.4824
+        898767.0851275533,
+        313192997940.4017
       ],
       "details": {
         "mu": 1.0,
@@ -984,14 +1129,17 @@
       "net_spectral_response_q_plus_S": 50019.61246750549,
       "tail_allowance_T": 1350360957907.049,
       "station_norm_D_stat": 12.048230253308088,
-      "val_arith": 41227.19949236674,
+      "val_arith": 895679.5364785371,
+      "delta_arith_est": 177.4020272575308,
+      "delta_arch_vec": 0.0008333477569474052,
+      "delta_prime_vec": 177.40119390977384,
       "complete_spectral_interval": [
         -1350360907887.4365,
         1350361007926.6616
       ],
       "complete_arithmetic_interval": [
-        39636.063577265646,
-        755040874433.9962
+        895502.1344512796,
+        308800739547.2495
       ],
       "details": {
         "mu": 10.0,
@@ -1032,6 +1180,9 @@
       "tail_allowance_T": 1820796936412.0493,
       "station_norm_D_stat": 13.990366098709641,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1820680266497.6746,
         1820913606326.424
@@ -1076,6 +1227,9 @@
       "tail_allowance_T": 2382043852047.8,
       "station_norm_D_stat": 16.00196066024335,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -2382041258311.133,
         2382046445784.467
@@ -1126,6 +1280,9 @@
       "tail_allowance_T": 1966550152936.146,
       "station_norm_D_stat": 14.539545657394447,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1966549982356.9495,
         1966550323515.3425
@@ -1177,6 +1334,9 @@
       "tail_allowance_T": 1780236136329.7366,
       "station_norm_D_stat": 13.833660984548684,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1780236125909.0422,
         1780236146750.431
@@ -1229,6 +1389,9 @@
       "tail_allowance_T": 1099677796595.2783,
       "station_norm_D_stat": 10.87254090896265,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1099677796090.2168,
         1099677797100.3398
@@ -1273,6 +1436,9 @@
       "tail_allowance_T": 1099598656253.5425,
       "station_norm_D_stat": 10.872149670689321,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1099598655748.4814,
         1099598656758.6035
@@ -1317,6 +1483,9 @@
       "tail_allowance_T": 1099590758976.107,
       "station_norm_D_stat": 10.872110628928064,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1099590758471.046,
         1099590759481.168
@@ -1361,6 +1530,9 @@
       "tail_allowance_T": 2360854988077.6772,
       "station_norm_D_stat": 15.930631000912879,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -2360847042520.212,
         2360862933635.1426
@@ -1405,6 +1577,9 @@
       "tail_allowance_T": 1600490652947.6067,
       "station_norm_D_stat": 13.116709292025412,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1600490410018.922,
         1600490895876.2913
@@ -1455,6 +1630,9 @@
       "tail_allowance_T": 1085830667216.6678,
       "station_norm_D_stat": 10.803870599062225,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1085830662735.9819,
         1085830671697.3538
@@ -1506,6 +1684,9 @@
       "tail_allowance_T": 1780236136329.7366,
       "station_norm_D_stat": 13.833660984548684,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1780236121803.6138,
         1780236150855.8594
@@ -1558,6 +1739,9 @@
       "tail_allowance_T": 1198081321312.84,
       "station_norm_D_stat": 11.348578625799044,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1198081320678.572,
         1198081321947.1082
@@ -1602,6 +1786,9 @@
       "tail_allowance_T": 1133061206012.7537,
       "station_norm_D_stat": 11.036338371938397,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1133061205454.5342,
         1133061206570.9731
@@ -1646,6 +1833,9 @@
       "tail_allowance_T": 1103979795164.9578,
       "station_norm_D_stat": 10.89378713198447,
       "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
       "complete_spectral_interval": [
         -1103979794592.7422,
         1103979795737.1733
