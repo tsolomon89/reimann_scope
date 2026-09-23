@@ -4,14 +4,14 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "624eb708720701ba56e3b5efbd53182a45afd745",
-  "timestamp": "2026-09-20T23:50:05.900309+00:00",
+  "producing_git_commit": "a5b9eb5bd8b0b0e50e786be7d5804afe19b85a0b",
+  "timestamp": "2026-09-23T22:01:56.806385+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 277,
-  "total_theorems": 277,
+  "project_theorem_declarations_compiled": 282,
+  "total_theorems": 282,
   "formal_source_hashes": {
-    "formal/RiemannScope.lean": "564c68a75f7bf334e082f10b30c15cbe0d898b01db6f064710554ff2228e3955",
+    "formal/RiemannScope.lean": "862ae6dd267120a2acd3fed27acdfe2c1970891f317b72e5a4c118a548e1bedc",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
     "formal/RiemannScope/Grade.lean": "3a1991eec4b098557663af2122410a07275fe49a38ba088f58c7b903c2f3375b",
     "formal/RiemannScope/RadialDefect.lean": "d3ea82e0fc2baf1dec0fca0b15809537a140fe160c0c995ccaf6f7864a6c9921",
@@ -22,16 +22,17 @@
     "formal/RiemannScope/SymmetricDefect.lean": "a1dfeeceb026024027e094426715478af9460d98782d0ccfcfce2514b69773ea",
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
     "formal/RiemannScope/ArithmeticBridge.lean": "1b042194e43c2033d1a1b0b830631f65455b4f1b29f28583e9f5110240eca71f",
-    "formal/RiemannScope/CurvatureTransport.lean": "c7b516c226155154414b16b34194bd8cecd5efae77c4774ac8bfc56d7243694f"
+    "formal/RiemannScope/CurvatureTransport.lean": "c7b516c226155154414b16b34194bd8cecd5efae77c4774ac8bfc56d7243694f",
+    "formal/RiemannScope/ExtremalCorrelation.lean": "b291c13a07ae8048ce4174eed27cd7ad326c915715d4db8a36b5d0632e764e0d"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
-    "scripts/build_formal.py": "365e5867ca847cc7096c475f05c0da8959d2a77533fcfb7bf989a137b545d5e6",
-    "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
+    "scripts/build_formal.py": "648f57e759aef651b8ed64bad178efd01e8f2682c2a5cdbd827288b919f9247d",
+    "certification.py": "ef0db9f9611d2c31730f84cd25c4bcf6a808ee4dbbf798d0d7e00e8102250ebc"
   },
   "build_stdout": "Build completed successfully.",
   "build_stderr": "",
-  "report_hash": "b47aa6c9a9d5ba131b3864165b4ed79c5b1c05744dcc2019498b233e8a7b1fcd"
+  "report_hash": "7fd8cfbae2c7c4ceb843fd0b5fd272055b780a86c4cfe4bf548e832bd727759c"
 }
