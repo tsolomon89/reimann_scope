@@ -209,6 +209,8 @@ from tc.weil_forms import (
     evaluate_tc_asymptotic_scaling_sweep,
     audit_tc_h1_cutoff_sensitivity_and_enclosure,
     evaluate_tc_arithmetic_spectral_baseline_comparison,
+    compute_tc_quartet_matrix,
+    audit_tc_critical_zero_deflation,
 )
 
 from tc.approximation import (
@@ -358,6 +360,8 @@ __all__ = [
     "cmath",
     "compute_arithmetic_vs_smoothing_error",
     "compute_canonical_reflected_weil_matrix",
+    "compute_tc_quartet_matrix",
+    "audit_tc_critical_zero_deflation",
     "compute_cross_height_path_distance",
     "compute_function_subspace_principal_angles",
     "compute_local_positivity_threshold",

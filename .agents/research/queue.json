@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-006",
+  "active_task_id": "TASK-TC-007",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -54,10 +54,10 @@
       "task_id": "TASK-TC-004A",
       "priority": 4,
       "objective": "Baseline canonical Weil quadratic form error budget certification",
-      "status": "ACCEPTED",
-      "review_status": "ACCEPTED",
-      "open_implication": "Mesh differences (Nt=1000 vs 2000) and observed interpolation discrepancies do not bound distance from the exact mathematical functional. Must implement theorem-backed remainder bounds, analytic quadrature enclosures, C_h'' interpolation error bounds, and certified tail R_U enclosures before retaining certified status.",
-      "planned_calculation": "Replace heuristic differences with validated analytic error bounds on Archimedean quadrature, prime convolution interpolation via second derivative bounds ||C_h''||_inf (Delta v)^2 / 8, station weight accuracy, and Bochner positive-semidefinite tail enclosure R_U >= 0; propagate through DP contraction.",
+      "status": "NUMERICALLY_UNRESOLVED",
+      "review_status": "REOPENED_FOR_COMPLETE_TAIL_ENCLOSURE",
+      "open_implication": "Mesh differences and observed interpolation discrepancies do not bound distance from the exact mathematical functional. Finite quadrature achieves 0.064% agreement, but the complete infinite functional requires two-sided spectral tail bounds and upper Archimedean tail bounds. Complete relative error target < 0.1% remains numerically unresolved because the spectral tail bound (~4.45e9) dominates baseline value (1.32e7).",
+      "planned_calculation": "Replace heuristic differences with validated analytic error bounds on Archimedean quadrature, prime convolution interpolation via second derivative bounds ||C_h''||_inf (Delta v)^2 / 8, station weight accuracy, and Bochner positive-semidefinite tail enclosure R_U >= 0; propagate through DP contraction. Derive sharper tail bounds to close complete functional enclosure.",
       "acceptance_criterion": "Theoretically justified error enclosure ||Delta W_G||_2 <= Bound rigorously bounding the distance from the exact continuous Weil functional, with margin lambda_min(W_G) - Bound > 0 verified.",
       "dependencies": ["TASK-TC-003"],
       "evidence": [
@@ -66,7 +66,7 @@
         "tc/weil_forms.py",
         "tests/test_tc_mechanism_discovery.py"
       ],
-      "resolution": "Baseline canonical Weil quadratic form error budget certified. Discovered that the contracted Weil form W_G at baseline has lambda_min(W_G) ~= 1.32e7 > 0. Derived and implemented direct arithmetic vs spectral zero-sum baseline comparison with authentic prime-station transforms E_b(z) = sum c_alpha d_alpha exp(z u_alpha) and A_h(z), proving 99.9358% relative agreement (discrepancy 0.0642% < 0.1%). Enclosures overlap with certified error bounds. Verified in test_tc_arithmetic_spectral_baseline_comparison_agreement."
+      "resolution": "Repaired and audited arithmetic vs spectral zero-sum baseline comparison. Finite quadrature comparison on [0, U] with U=320, T=320 achieves 99.9358% agreement (0.0642% discrepancy < 0.1%). However, complete functional enclosure [L_A, U_A] vs [L_S, U_S] remains NUMERICALLY_UNRESOLVED because repaired spectral tail allowance (~4.45e9) exceeds the baseline value. Evaluator faithfully reports NUMERICALLY_UNRESOLVED for complete functional status."
     },
     {
       "task_id": "TASK-TC-004B",
@@ -87,34 +87,34 @@
       "task_id": "TASK-TC-005A",
       "priority": 6,
       "objective": "Parameter-dependent Riemann-von Mangoldt Stieltjes tail bound derivation",
-      "status": "ACCEPTED",
-      "review_status": "ACCEPTED",
-      "open_implication": "Linear tail bound sum_rho Q_b(rho) Phi_tilde(rho) must be rigorously connected to the quadratic functional B(G, G); homogeneity and quadratic profile constants must be derived.",
-      "planned_calculation": "Derive explicit transformation from quadratic test function G to its spectral explicit formula representation (via autocorrelation or direct Fourier-Laplace transform); verify quadratic homogeneity B(lambda G, lambda G) = |lambda|^2 B(G, G).",
-      "acceptance_criterion": "Mathematically derived quadratic profile tail bound with verified homogeneity and uniform critical-strip envelope.",
+      "status": "NUMERICALLY_UNRESOLVED",
+      "review_status": "REOPENED_PENDING_SHARPER_TAIL_BOUND",
+      "open_implication": "Pointwise kernel bound had h^(2m-2) defect (factor of 400 at h=0.05). Repaired to h^(2m) = h^6, yielding mathematically sound pointwise majorant C_m(h, T)/t^2 >= |A_h(it)|^2 for t >= T. However, the repaired scalar tail allowance (~4.45e9) is an order of magnitude larger than the functional value (1.32e7). A sharper matrix or direction-dependent tail enclosure is needed to establish complete functional sign.",
+      "planned_calculation": "Derive explicit transformation from quadratic test function G to its spectral explicit formula representation; verify quadratic homogeneity B(lambda G, lambda G) = |lambda|^2 B(G, G); investigate sharper coefficient-dependent or matrix majorant tail bounds.",
+      "acceptance_criterion": "Mathematically derived quadratic profile tail bound with verified homogeneity and uniform critical-strip envelope; sharper tail allowing complete sign determination.",
       "dependencies": ["TASK-TC-002"],
       "evidence": [
         "tc/approximation.py",
         "tests/test_tc_mechanism_discovery.py"
       ],
-      "resolution": "Derived parameter-dependent quadratic spectral tail bound B_{>= T}(G_b, G_b) for the authentic product of transforms T(z; G_b) = A_h(z)^2 E_b(z) E_b(-z) via Stieltjes integration with Trudgian (2014) explicit counting constants. Proved exact degree-2 scaling homogeneity B(lambda G_b, lambda G_b) = |lambda|^2 B(G_b, G_b) and zero input property B(0) = 0. Enclosed uniformly across the entire critical strip sigma in [0, 1]. Implemented in tc/approximation.py:derive_quadratic_spectral_tail_bound and verified in test_tc_quadratic_spectral_tail_bound_uniformity."
+      "resolution": "Repaired integration-by-parts estimate in tc/approximation.py:derive_quadratic_spectral_tail_bound from h^(2m-2) to h^(2m) = h^6. Verified pointwise majorant C_m(h, T)/t^2 >= |A_h(it)|^2 at t=360, T=320, h=0.05, m=3 (majorant 1.67e6 >= 1.32e6). Proved exact degree-2 scaling homogeneity and zero input property. Enclosure across entire critical strip sigma in [0, 1] verified. Resulting tail bound ~4.45e9 is mathematically sound but conservative; complete functional sign remains NUMERICALLY_UNRESOLVED."
     },
     {
       "task_id": "TASK-TC-005B",
       "priority": 7,
       "objective": "Arithmetic-spectral explicit formula integration and off-critical witness sensitivity",
-      "status": "ACCEPTED",
-      "review_status": "ACCEPTED",
-      "open_implication": "Intermediate zero range (100, 1000] was omitted between finite sum and tail cutoff; zero list completeness must be certified; pole cancellation must be correctly derived via kernel boundary conditions (noting Q_b(0) != 0); off-critical sensitivity must be scoped as sampled parameter evidence.",
-      "planned_calculation": "Close intermediate spectral gap (100, 1000] using verified zero enumeration or certified counting bounds; derive exact pole cancellation A_h(+/- 1/2) = 0 for differentiated kernel psi_h; recompute sensitivity bounds and remove unsupported unphysical multiplicity claims.",
-      "acceptance_criterion": "Complete spectral accounting without uncounted intervals; correct pole cancellation proof; rigorous sampled-evidence sensitivity classification.",
+      "status": "NUMERICALLY_UNRESOLVED",
+      "review_status": "REOPENED_PENDING_COMPLETE_SIGN_ENCLOSURE",
+      "open_implication": "Previous sensitivity artifact omitted the spectral tail allowance (~3.59e9) from final preservation decision and claimed 92.08 was a global upper bound on negative quartets. quartet optimization proves lambda_min(Q, P^T P) ~= -10,268.14 on legal unit sphere, refuting 92.08. When tail allowance is included, tail-adjusted margin is negative (-1.13e12 at T=100), so complete spectral positivity is NUMERICALLY_UNRESOLVED.",
+      "planned_calculation": "Trace omitted tail allowance in decision logic; implement quartet matrix optimization Q(delta, gamma) over legal space b=P*beta; evaluate critical zero deflation; update sensitivity certificate to report NUMERICALLY_UNRESOLVED for complete spectral positivity.",
+      "acceptance_criterion": "Complete spectral accounting without uncounted intervals; explicit reporting of tail allowance in sensitivity decision; legal quartet optimization across parameter space.",
       "dependencies": ["TASK-TC-004B", "TASK-TC-005A"],
       "evidence": [
         "data/tc_explicit_formula_sensitivity_certificate.json",
         "tc/weil_forms.py",
         "tests/test_tc_mechanism_discovery.py"
       ],
-      "resolution": "Closed spectral gap up to T=320 using all 150 known critical zeros without intermediate omissions. Proved exact pole cancellation A_h(+/- 1/2) = 0 for differentiated kernel psi_h and established that trivial zeros are accounted for through the digamma weight omega(t) in Guinand-Weil without double counting. Evaluated authentic transform E_b(z) across 975 parameter grid points (delta_0, gamma_0), proving that negative quartets produce at most 92.08 * ||b||^2 against arithmetic margin 1.32e7 * ||b||^2 (overturn ratio < 7e-6 or 0.0007%). Multiplicity required to overturn is >= 143,636. Scoped strictly as finite sampled parameter evidence; primary TC detection candidate D_F remains open. Implemented in tc/weil_forms.py:certify_explicit_formula_off_critical_sensitivity and verified in test_tc_exact_off_critical_sensitivity_overturn_ratio."
+      "resolution": "Repaired decision logic in certify_explicit_formula_off_critical_sensitivity to explicitly trace tail_allowance_omitted_in_finite_decision (~3.59e9) and report is_complete_spectral_positivity_preserved: False, complete_spectral_decision_status: NUMERICALLY_UNRESOLVED. Proved quartet matrix optimization over legal space yields lambda_min ~= -10,268.14 at (0.49, 100), disproving 92.08 as a family-wide bound. Regenerated full 975-point campaign data/tc_explicit_formula_sensitivity_certificate.json."
     },
     {
       "task_id": "TASK-TC-006",
@@ -133,6 +133,25 @@
         "tests/test_tc_mechanism_discovery.py"
       ],
       "resolution": "Implemented audit_tc_h1_cutoff_sensitivity_and_enclosure and evaluate_tc_asymptotic_scaling_sweep with decoupled frequency domain cutoff U >= max(64, z_max/h). Exactly reproduced the independent reference table across 5 configurations (matching lambda_min to 12 decimal places). Proved that truncating at U=16 with positive semidefinite tail R_U >= 0 cannot authorize a negative witness claim. Showed that the candidate frozen vector turns strictly positive (+0.543874 > 0) at U=64 due to +0.562033 of positive Archimedean tail energy. Formally withdrew negative witness and transition threshold claims in data/tc_h1_cutoff_sensitivity_certificate.json. Verified global coercivity across all 15 grid points in data/tc_asymptotic_scaling_certificate.json (global min lambda_min = 0.43905 > 0, has_transition_threshold = false). Verified in test_h1_cutoff_sensitivity_and_enclosure_audit and test_asymptotic_scaling_sweep."
+    },
+    {
+      "task_id": "TASK-TC-007",
+      "priority": 9,
+      "objective": "Legal space quartet optimization, critical-zero deflation audit, and reductio bridge lemma formulation",
+      "status": "COMPLETED_EXPLORATORY",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Establish whether legal TC combinations can isolate an off-critical zero strongly enough to force an integer collision m*tau^K = n*tau^J. Requires optimizing quartet matrix Q(delta, gamma) over legal subspace b=P*beta, evaluating critical zero deflation rank and conditioning, and formulating the exact bridge lemma.",
+      "planned_calculation": "1) Implement generalized eigensolver for Q(delta, gamma) over P^T P; 2) Audit critical zero deflation E_b(i gamma_j)=0 on 4, 6, 8 grades; 3) Author derivation and bridge lemma document connecting off-critical zero to integer collision; 4) Generate consolidated data artifact data/tc_quartet_optimization_and_deflation.json.",
+      "acceptance_criterion": "Reproduction of review defects, quantitative quartet extrema over legal unit sphere, critical zero deflation conditioning audit, and rigorous mathematical bridge lemma analysis.",
+      "dependencies": ["TASK-TC-005B", "TASK-TC-006"],
+      "evidence": [
+        "data/tc_quartet_optimization_and_deflation.json",
+        "docs/reviews/TC_REDUCTIO_BRIDGE_LEMMA_ANALYSIS.md",
+        "docs/reviews/TC_REVIEW_DEFECTS_REPRODUCTION_REPORT.md",
+        "tc/weil_forms.py",
+        "tests/test_tc_reproduced_defects.py"
+      ],
+      "resolution": "Formulated exact bridge lemma and dependency chain. Solved generalized eigenvalue problem Q beta = lambda (P^T P) beta, finding lambda_min ~= -10,268.14 on 4-grade legal unit sphere (refuting 92.08 bound). Audited critical zero deflation: 4-grade deflates 1 zero (cond 15.6), 6-grade deflates 2 zeros (cond 188.7), 8-grade deflates 3 zeros (cond 1556.3); surviving directions exhibit growing derivative and station norms while Stieltjes tail (~4.45e9) dominates. Discovered that discrete zero cancellation does not force support collisions m*tau^K = n*tau^J due to non-trivial linear combinations of distinct exponentials vanishing at isolated points without exponent coincidence."
     }
   ]
 }

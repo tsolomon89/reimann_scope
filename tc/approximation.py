@@ -3844,7 +3844,7 @@ def derive_quadratic_spectral_tail_bound(
       4. Differentiated Kernel Frequency Decay:
          Integrating by parts m times against \exp(z h v) gives uniform decay for |\gamma| = t >= T:
              |A_h(\delta + it)|^2 <= C_m(h, T) / t^{2m - 4},
-         where C_m(h, T) = (1 + 1/(2 T^2))^2 \exp(h) (I_m(\kappa)^2) / h^{2m - 2}
+         where C_m(h, T) = (1 + 1/(2 T^2))^2 \exp(h) (I_m(\kappa)^2) / h^{2m}
          and I_m(\kappa) = \int_{-1}^1 |\kappa^{(m)}(v)| dv.
       5. Riemann-von Mangoldt Zero Counting Stieltjes Tail (Trudgian 2014, Theorem 1):
          N(t) = (t / 2\pi) \log(t / 2\pi e) + 7/8 + S(t),
@@ -3942,7 +3942,7 @@ def derive_quadratic_spectral_tail_bound(
         log_log_T = math.log(log_T)
 
         # Kernel constant C_m(h, T)
-        C_m_h = float((1.0 + 0.5 / (T**2))**2 * math.exp(h) * (I_m**2) / (h**(2 * m_order - 2)))
+        C_m_h = float((1.0 + 0.5 / (T**2))**2 * math.exp(h) * (I_m**2) / (h**(2 * m_order)))
 
         # Main smooth Stieltjes term
         main_term = (1.0 / (2.0 * math.pi * (p_decay - 1) * (T ** (p_decay - 1)))) * (math.log(T / (2.0 * math.pi)) + 1.0 / (p_decay - 1))

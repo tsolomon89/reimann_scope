@@ -1,0 +1,317 @@
+{
+  "status": "TC_QUARTET_OPTIMIZATION_AND_DEFLATION_CERTIFIED",
+  "epistemic_class": "CERTIFIED_FINITE_SUBSPACE_OPTIMIZATION",
+  "quartet_optimization_over_legal_space": [
+    {
+      "delta": 0.49,
+      "gamma": 100.0,
+      "lambda_min_unit_b": -10268.14281763092,
+      "lambda_max_unit_b": 2.66856188555545,
+      "extremizing_b_unit_min": [
+        -0.3529798733448846,
+        -0.34202422180223446,
+        -0.16088230239129359,
+        0.8558863975384126
+      ],
+      "counterexample_b_diag_quartet": -10268.142817630922
+    },
+    {
+      "delta": 0.1,
+      "gamma": 100.0,
+      "lambda_min_unit_b": -229.0140206381442,
+      "lambda_max_unit_b": 0.017913862558359035,
+      "extremizing_b_unit_min": [
+        -0.34976450853199575,
+        -0.34150705431715234,
+        -0.16529940703920817,
+        0.8565709698883563
+      ],
+      "counterexample_b_diag_quartet": -229.01402063814427
+    },
+    {
+      "delta": 0.49,
+      "gamma": 14.1347,
+      "lambda_min_unit_b": -2.3775016088099874,
+      "lambda_max_unit_b": 158370.6726066803,
+      "extremizing_b_unit_min": [
+        -0.5337293153716915,
+        0.7815609839856581,
+        -0.315729778325978,
+        0.06789810971201143
+      ],
+      "counterexample_b_diag_quartet": -2.3775016087864076
+    },
+    {
+      "delta": 0.49,
+      "gamma": 50.0,
+      "lambda_min_unit_b": -4375.646559548263,
+      "lambda_max_unit_b": 1706299.7520345137,
+      "extremizing_b_unit_min": [
+        -0.7322500039989622,
+        0.5754817163008347,
+        0.32368251097883516,
+        -0.16691422328070762
+      ],
+      "counterexample_b_diag_quartet": -4375.646559548341
+    }
+  ],
+  "critical_zero_deflation_study": {
+    "status": "TC_CRITICAL_ZERO_DEFLATION_AUDITED",
+    "epistemic_class": "EMPIRICAL_SUBSPACE_DEFLATION_STUDY",
+    "parameters": {
+      "target_delta": 0.49,
+      "target_gamma": 100.0,
+      "window": [
+        8.0,
+        20.0
+      ],
+      "bandwidth_h": 0.05
+    },
+    "families": [
+      {
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4
+        ],
+        "family_dimension": 4,
+        "deflation_cases": [
+          {
+            "num_zeros_deflated": 1,
+            "zeros_deflated": [
+              14.134725141734695
+            ],
+            "constraint_matrix_shape": [
+              3,
+              4
+            ],
+            "rank": 3,
+            "surviving_null_dimension": 1,
+            "singular_values": [
+              3.1516490297336284,
+              0.8802435851302215,
+              0.20154435623150094
+            ],
+            "condition_number": 15.63749582803268,
+            "candidate_in_nullspace": {
+              "candidate_unit_b": [
+                -0.06818783561208626,
+                0.3139386696071428,
+                -0.7811292413674302,
+                0.5353784073723737
+              ],
+              "residual_norm_constraint": 1.6711069443220838e-16,
+              "target_quartet_response": -157.64693522333857,
+              "tail_bound_T100": 1415768876901.361
+            }
+          }
+        ]
+      },
+      {
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6
+        ],
+        "family_dimension": 6,
+        "deflation_cases": [
+          {
+            "num_zeros_deflated": 1,
+            "zeros_deflated": [
+              14.134725141734695
+            ],
+            "constraint_matrix_shape": [
+              3,
+              6
+            ],
+            "rank": 3,
+            "surviving_null_dimension": 3,
+            "singular_values": [
+              3.6276664362358995,
+              0.9498051854666649,
+              0.2612445596869653
+            ],
+            "condition_number": 13.886093706918638,
+            "candidate_in_nullspace": {
+              "candidate_unit_b": [
+                -0.01651340130039361,
+                0.15592593658152462,
+                -0.4830263811783895,
+                0.7989977741742648,
+                -0.2304506560792213,
+                -0.22493327219778497
+              ],
+              "residual_norm_constraint": 1.5716250041522723e-16,
+              "target_quartet_response": -57.78300319809461,
+              "tail_bound_T100": 1782759979581.2585
+            }
+          },
+          {
+            "num_zeros_deflated": 2,
+            "zeros_deflated": [
+              14.134725141734695,
+              21.022039638771556
+            ],
+            "constraint_matrix_shape": [
+              5,
+              6
+            ],
+            "rank": 5,
+            "surviving_null_dimension": 1,
+            "singular_values": [
+              3.906600494480112,
+              1.403026043880092,
+              0.6513293653285026,
+              0.09172489450915,
+              0.02070200556654356
+            ],
+            "condition_number": 188.70637832276287,
+            "candidate_in_nullspace": {
+              "candidate_unit_b": [
+                -0.014043931160738116,
+                0.03575838910925856,
+                -0.12270986591183618,
+                0.2608827479450956,
+                -0.7517414838810341,
+                0.5918541438992543
+              ],
+              "residual_norm_constraint": 2.223324096070627e-16,
+              "target_quartet_response": -5.37682967813023,
+              "tail_bound_T100": 1540757405191.8994
+            }
+          }
+        ]
+      },
+      {
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8
+        ],
+        "family_dimension": 8,
+        "deflation_cases": [
+          {
+            "num_zeros_deflated": 1,
+            "zeros_deflated": [
+              14.134725141734695
+            ],
+            "constraint_matrix_shape": [
+              3,
+              8
+            ],
+            "rank": 3,
+            "surviving_null_dimension": 5,
+            "singular_values": [
+              4.06485087474027,
+              0.9853761147686472,
+              0.28153197630142773
+            ],
+            "condition_number": 14.438327497080325,
+            "candidate_in_nullspace": {
+              "candidate_unit_b": [
+                0.0021538748885520207,
+                0.11247912969139458,
+                -0.38633133880542453,
+                0.8658348714473774,
+                -0.15706944396937722,
+                -0.15237453853788446,
+                -0.14436403240769805,
+                -0.1403285223069398
+              ],
+              "residual_norm_constraint": 2.0816681711721685e-17,
+              "target_quartet_response": -51.412954163508495,
+              "tail_bound_T100": 1877879561697.6133
+            }
+          },
+          {
+            "num_zeros_deflated": 2,
+            "zeros_deflated": [
+              14.134725141734695,
+              21.022039638771556
+            ],
+            "constraint_matrix_shape": [
+              5,
+              8
+            ],
+            "rank": 5,
+            "surviving_null_dimension": 3,
+            "singular_values": [
+              4.325223617141735,
+              1.459080097072547,
+              0.68721695727145,
+              0.09641328875310833,
+              0.022853837653998545
+            ],
+            "condition_number": 189.25590015228744,
+            "candidate_in_nullspace": {
+              "candidate_unit_b": [
+                -0.007744618248218753,
+                0.031274067212325125,
+                -0.08885419806472822,
+                0.22348905794231902,
+                -0.5490929591587295,
+                0.7566568703722432,
+                -0.19306860224753508,
+                -0.17265961780767564
+              ],
+              "residual_norm_constraint": 4.0460356557118357e-16,
+              "target_quartet_response": -2.2794280070392534,
+              "tail_bound_T100": 1996198768534.7893
+            }
+          },
+          {
+            "num_zeros_deflated": 3,
+            "zeros_deflated": [
+              14.134725141734695,
+              21.022039638771556,
+              25.01085758014569
+            ],
+            "constraint_matrix_shape": [
+              7,
+              8
+            ],
+            "rank": 7,
+            "surviving_null_dimension": 1,
+            "singular_values": [
+              4.468567263297576,
+              1.7101338801273456,
+              0.8613945066149966,
+              0.2034726883847628,
+              0.02545825741757229,
+              0.004567109684171059,
+              0.002871210218688176
+            ],
+            "condition_number": 1556.3358037013447,
+            "candidate_in_nullspace": {
+              "candidate_unit_b": [
+                -0.0014680204120394265,
+                0.005233480141907354,
+                -0.02916673756782699,
+                0.06340540349348235,
+                -0.18971537849519593,
+                0.3289557323023543,
+                -0.7348373395344174,
+                0.5575928600717357
+              ],
+              "residual_norm_constraint": 1.7826341206873999e-16,
+              "target_quartet_response": -0.06375922488781485,
+              "tail_bound_T100": 1780236136327.2063
+            }
+          }
+        ]
+      }
+    ],
+    "conclusions": {
+      "feasibility": "Each deflated critical zero imposes 2 real linear constraints Re(E_b) = 0 and Im(E_b) = 0. Together with 1^T b = 0, deflating k zeros requires 2k + 1 independent constraints. In the 4-grade family (dim 4), at most 1 zero can be deflated (leaving dim 1). In 6 grades, at most 2 zeros can be deflated (leaving dim 1). In 8 grades, at most 3 zeros can be deflated (leaving dim 1). As the number of deflated zeros increases, the constraint condition number deteriorates rapidly (cond ~1556 for 3 zeros in 8 grades), causing oscillatory coefficients in higher grades and preventing unconstrained localization without inflation of the remaining spectral tail."
+    }
+  }
+}
