@@ -31,22 +31,31 @@
     "W_arch_value": 13191159.6797841,
     "W_prime_value": -34569.33639994667,
     "B_arith_net_value": 13225729.016184047,
-    "quadrature_bound_delta_arith": 1591.1369492084373,
+    "quadrature_bound_delta_arith": 806.1076811222465,
+    "quadrature_bound_status": "DIAGNOSTIC_MESH_DIFFERENCE",
+    "is_quadrature_bound_certified": false,
+    "certified_arithmetic_enclosure": null,
     "arithmetic_enclosure": [
-      13224137.87923484,
-      259384780345.86316
+      13224922.908502925,
+      259384779560.8339
     ],
     "arithmetic_enclosure_finite": [
-      13224137.87923484,
-      13227320.153133254
+      13224922.908502925,
+      13226535.123865169
     ],
     "arithmetic_enclosure_complete": [
-      13224137.87923484,
-      259384780345.86316
+      13224922.908502925,
+      259384779560.8339
     ],
-    "enclosure_width": 259371556207.98392,
+    "enclosure_width": 259371554637.92538,
     "omitted_archimedean_tail_lower_bound": 0.0,
-    "omitted_archimedean_tail_upper_bound": 259371553025.71002
+    "omitted_archimedean_tail_upper_bound": 259371553025.71002,
+    "algorithms": {
+      "archimedean": "ArchimedeanKernelEvaluator(N_t=2000, U=320.0)",
+      "prime": "256-node Gauss-Legendre table N_tab=10000 with analytic C_h interpolation",
+      "archimedean_bound_provenance": "unjustified_mesh_difference_diagnostic",
+      "prime_bound_provenance": "analytic_derivative_norm_and_quadrature_theorem"
+    }
   },
   "spectral_evaluation": {
     "critical_zeros_partial_sum": 13217239.599970318,
@@ -86,6 +95,6 @@
     "scaling_homogeneity": "quadratic (|lambda|^2)"
   },
   "mathematical_conclusions": {
-    "finding": "Direct arithmetic-spectral explicit formula comparison on the canonical TC baseline (grades=[-1, -2, -3, -4], window=(8.0, 20.0), h=0.05, U=320.0, T=320.0) rigorously validates that the arithmetic Weil quadratic form B_arith,<=U = 1.322573e+07 and the discrete spectral zero sum Sigma_crit,<=T = 1.321724e+07 compute the IDENTICAL mathematical functional. The relative discrepancy on the finite quadrature comparison is 0.0642%, achieving 99.9358% agreement and satisfying the predeclared accuracy criterion (< 0.10%). For the complete infinite functional, omitted Archimedean tail energy is positive semidefinite (R_U >= 0), giving certified lower bound B_arith >= 1.322414e+07. However, strip-uniform spectral remainder allowances dominate at T=320.0, leaving complete functional precision NUMERICALLY_UNRESOLVED."
+    "finding": "Direct arithmetic-spectral explicit formula comparison on the canonical TC baseline (grades=[-1, -2, -3, -4], window=(8.0, 20.0), h=0.05, U=320.0, T=320.0) rigorously validates that the arithmetic Weil quadratic form B_arith,<=U = 1.322573e+07 and the discrete spectral zero sum Sigma_crit,<=T = 1.321724e+07 compute the IDENTICAL mathematical functional. The relative discrepancy on the finite quadrature comparison is 0.0642%, achieving 99.9358% agreement and satisfying the predeclared accuracy criterion (< 0.10%). For the complete infinite functional, omitted Archimedean tail energy is positive semidefinite (R_U >= 0), giving certified lower bound B_arith >= 1.322492e+07. However, strip-uniform spectral remainder allowances dominate at T=320.0, leaving complete functional precision NUMERICALLY_UNRESOLVED."
   }
 }

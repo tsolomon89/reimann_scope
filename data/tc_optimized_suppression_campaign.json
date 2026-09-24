@@ -125,7 +125,7 @@
       }
     ],
     "fold_reduction_4_to_8_grades": 3525.058073615727,
-    "evaluation_verdict": "Enlarging the legal TC grade space from 4 to 8 grades achieves an approximately 3525.1-fold reduction in the finite synthetic objective q + S_T (from 1780369.060913 to 505.060916). This demonstrates genuine numerical capability of legal zero-sum combinations to suppress the finite critical-zero background. However, all evaluated finite minima remain strictly positive (inf(q + S_T) > 0), and the complete functional remains NUMERICALLY_UNRESOLVED because the strip-uniform Stieltjes tail allowance B_tail(T=100) in [1.01e+12, 2.38e+12] dominates finite terms by 5 orders of magnitude."
+    "evaluation_verdict": "Enlarging the legal TC grade space from 4 to 8 grades achieves an approximately 3525.1-fold reduction in the finite synthetic objective q + S_T (from 1780369.060913 to 505.060916). This demonstrates genuine numerical capability of legal zero-sum combinations to suppress the finite critical-zero background. However, all evaluated finite minima remain strictly positive (inf(q + S_T) > 0), and the complete functional remains NUMERICALLY_UNRESOLVED because the strip-uniform Stieltjes tail allowance B_tail(T=100) in [9.75e+11, 2.38e+12] dominates finite terms by 5 orders of magnitude."
   },
   "remainder_optimized_complete_comparison": {
     "description": "Optimization of complete upper objective F_+(beta) = q(P beta) + S_T(P beta) + B_T(P beta) + eps with remainder participating directly in coefficient selection.",
@@ -143,17 +143,17 @@
           100.0
         ],
         "b_unit": [
-          -0.7071067811865474,
+          0.0,
+          0.0,
           0.7071067811865476,
-          -8.687418420397766e-17,
-          -8.907283571919061e-17
+          -0.7071067811865476
         ],
-        "complete_upper_estimate_F_plus": 1014826654378.6224,
-        "target_quartet_q": -5416.646717941899,
-        "finite_zero_sum_S": 54922935.294458844,
-        "tail_allowance_B_T": 1014771736859.9747,
-        "station_norm_D_stat": 10.44437613284666,
-        "lower_control_F_minus": -1014716819341.327,
+        "complete_upper_estimate_F_plus": 976642212980.2515,
+        "target_quartet_q": -50.490304798487195,
+        "finite_zero_sum_S": 2305664.3002468757,
+        "tail_allowance_B_T": 976639907366.4415,
+        "station_norm_D_stat": 10.246264328805642,
+        "lower_control_F_minus": -976637601752.6316,
         "is_negative_witness_certified": false
       },
       {
@@ -169,111 +169,111 @@
           50.0
         ],
         "b_unit": [
-          -3.601785536488933e-12,
-          -0.6512652870513493,
-          0.7521184515097222,
-          -0.1008531644547711
-        ],
-        "complete_upper_estimate_F_plus": 1110601056509.3972,
-        "target_quartet_q": 665439.9404765827,
-        "finite_zero_sum_S": 5394021.095305964,
-        "tail_allowance_B_T": 1110594997048.3613,
-        "station_norm_D_stat": 10.926376934987312,
-        "lower_control_F_minus": -1110588937587.3254,
-        "is_negative_witness_certified": false
-      },
-      {
-        "family_dimension": 6,
-        "grades": [
-          -1,
-          -2,
-          -3,
-          -4,
-          -5,
-          -6
-        ],
-        "target": [
-          0.49,
-          100.0
-        ],
-        "b_unit": [
-          -0.7071067811865476,
-          0.7071067811865475,
-          2.7246302904381143e-16,
-          1.5796377700169993e-16,
-          -1.1439687104711221e-16,
-          -7.880598288124334e-17
-        ],
-        "complete_upper_estimate_F_plus": 1014826654378.623,
-        "target_quartet_q": -5416.646717941905,
-        "finite_zero_sum_S": 54922935.29445891,
-        "tail_allowance_B_T": 1014771736859.9753,
-        "station_norm_D_stat": 10.444376132846664,
-        "lower_control_F_minus": -1014716819341.3276,
-        "is_negative_witness_certified": false
-      },
-      {
-        "family_dimension": 6,
-        "grades": [
-          -1,
-          -2,
-          -3,
-          -4,
-          -5,
-          -6
-        ],
-        "target": [
-          0.49,
-          50.0
-        ],
-        "b_unit": [
-          -0.7071067811865404,
-          0.7071067811865546,
-          -4.602539205628439e-18,
-          -1.1760726906273257e-14,
-          3.890509164587487e-15,
-          -6.330523904560631e-15
-        ],
-        "complete_upper_estimate_F_plus": 1014827542440.5383,
-        "target_quartet_q": 882645.2385182056,
-        "finite_zero_sum_S": 54922935.294457644,
-        "tail_allowance_B_T": 1014771736860.0054,
-        "station_norm_D_stat": 10.444376132846818,
-        "lower_control_F_minus": -1014715931279.4724,
-        "is_negative_witness_certified": false
-      },
-      {
-        "family_dimension": 8,
-        "grades": [
-          -1,
-          -2,
-          -3,
-          -4,
-          -5,
-          -6,
-          -7,
-          -8
-        ],
-        "target": [
-          0.49,
-          100.0
-        ],
-        "b_unit": [
-          -0.7071067811865475,
+          0.0,
+          0.0,
           0.7071067811865476,
-          1.9402905521610383e-16,
-          -4.991333849424178e-17,
-          -8.409184792488783e-17,
-          1.5105979989773207e-16,
-          -1.989827522754786e-16,
-          -1.371994714831762e-16
+          -0.7071067811865476
         ],
-        "complete_upper_estimate_F_plus": 1014826654378.6234,
-        "target_quartet_q": -5416.646717941909,
-        "finite_zero_sum_S": 54922935.29445895,
-        "tail_allowance_B_T": 1014771736859.9757,
-        "station_norm_D_stat": 10.444376132846665,
-        "lower_control_F_minus": -1014716819341.328,
+        "complete_upper_estimate_F_plus": 976642307721.6855,
+        "target_quartet_q": 94690.94376352069,
+        "finite_zero_sum_S": 2305664.3002468757,
+        "tail_allowance_B_T": 976639907366.4415,
+        "station_norm_D_stat": 10.246264328805642,
+        "lower_control_F_minus": -976637507011.1975,
+        "is_negative_witness_certified": false
+      },
+      {
+        "family_dimension": 6,
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6
+        ],
+        "target": [
+          0.49,
+          100.0
+        ],
+        "b_unit": [
+          1.1102230246251565e-16,
+          3.499571066023685e-18,
+          4.513293448946706e-17,
+          -9.714451465470121e-17,
+          0.7071067811865476,
+          -0.7071067811865476
+        ],
+        "complete_upper_estimate_F_plus": 974792273879.3682,
+        "target_quartet_q": -0.35587506977317807,
+        "finite_zero_sum_S": 52643.40974507281,
+        "tail_allowance_B_T": 974792221236.3143,
+        "station_norm_D_stat": 10.236567385726726,
+        "lower_control_F_minus": -974792168593.2605,
+        "is_negative_witness_certified": false
+      },
+      {
+        "family_dimension": 6,
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6
+        ],
+        "target": [
+          0.49,
+          50.0
+        ],
+        "b_unit": [
+          1.1102230246251565e-16,
+          3.499571066023685e-18,
+          4.513293448946706e-17,
+          -9.714451465470121e-17,
+          0.7071067811865476,
+          -0.7071067811865476
+        ],
+        "complete_upper_estimate_F_plus": 974792284836.2563,
+        "target_quartet_q": 10956.5323154347,
+        "finite_zero_sum_S": 52643.40974507281,
+        "tail_allowance_B_T": 974792221236.3143,
+        "station_norm_D_stat": 10.236567385726726,
+        "lower_control_F_minus": -974792157636.3723,
+        "is_negative_witness_certified": false
+      },
+      {
+        "family_dimension": 8,
+        "grades": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8
+        ],
+        "target": [
+          0.49,
+          100.0
+        ],
+        "b_unit": [
+          0.0,
+          0.0,
+          3.280426249249396e-18,
+          -6.843795019902355e-17,
+          0.7071067811865476,
+          -0.7071067811865476,
+          2.880552341674888e-17,
+          6.080365720501032e-17
+        ],
+        "complete_upper_estimate_F_plus": 974792273879.3678,
+        "target_quartet_q": -0.3558750697732737,
+        "finite_zero_sum_S": 52643.40974507363,
+        "tail_allowance_B_T": 974792221236.314,
+        "station_norm_D_stat": 10.236567385726724,
+        "lower_control_F_minus": -974792168593.2601,
         "is_negative_witness_certified": false
       },
       {
@@ -293,34 +293,34 @@
           50.0
         ],
         "b_unit": [
-          -0.7071067811865522,
-          0.7071067811865429,
-          1.6385316276326193e-16,
-          7.184286620356693e-15,
-          2.438247358362881e-15,
-          -7.24641811345935e-15,
-          1.712888341113672e-15,
-          5.125681584893686e-15
+          0.0,
+          0.0,
+          3.280426249249396e-18,
+          -6.843795019902355e-17,
+          0.7071067811865476,
+          -0.7071067811865476,
+          2.880552341674888e-17,
+          6.080365720501032e-17
         ],
-        "complete_upper_estimate_F_plus": 1014827542440.5411,
-        "target_quartet_q": 882645.238518239,
-        "finite_zero_sum_S": 54922935.29445981,
-        "tail_allowance_B_T": 1014771736860.0085,
-        "station_norm_D_stat": 10.444376132846834,
-        "lower_control_F_minus": -1014715931279.4752,
+        "complete_upper_estimate_F_plus": 974792284836.256,
+        "target_quartet_q": 10956.532315434733,
+        "finite_zero_sum_S": 52643.40974507363,
+        "tail_allowance_B_T": 974792221236.314,
+        "station_norm_D_stat": 10.236567385726724,
+        "lower_control_F_minus": -974792157636.372,
         "is_negative_witness_certified": false
       }
     ],
-    "obstruction_analysis": "Including the remainder B_T directly in the objective reduces F_+(beta) substantially (e.g. 1.38-fold reduction from 1.34e12 to 9.77e11 in 4 grades), but F_+(beta) remains strictly positive. Mathematical obstruction: under Dirichlet/Kronecker approximation on the infinite vertical line, the station phases sum k_p log p + K log(2*pi) can align arbitrarily closely mod 2*pi as t -> infty, so sup_t |E_b(it)| = D_stat(b) cannot be reduced below the L^1 station norm on the continuous frequency domain. Certifying a negative witness strictly requires a non-scalar frequency-localized kernel majorant."
+    "obstruction_analysis": "Including the remainder B_T directly in the objective reduces F_+(beta) substantially (e.g. 1.38-fold reduction from 1.343218666613e12 to 9.766422129803e11 in 4 grades, matching the exact legal boundary pair b = (0,0,1,-1)/sqrt(2)), but F_+(beta) remains strictly positive. Mathematical Analysis & Theoretical Floor: For any legal coefficient vector 1^T b = 0, ||b||_2 = 1, the station norm satisfies the exact minimum min D_stat(b) = (D_(1) + D_(2)) / sqrt(2) attained on the two grades with smallest contracted masses. In 4 grades, D_(1) + D_(2) = D_(-4) + D_(-3) ~ 7.2425 + 7.2479, giving D_stat >= 10.2462643288. Consequently, the complete upper objective proxy has a strict theoretical lower bound floor: F_+(beta) >= lambda_min(Q + S_T, P^T P) + (c_T / 2) * (D_(1) + D_(2))^2 + eps_finite ~ 9.766416877355e11. This floor establishes a definite limitation of the scalar uniform upper-bound proxy at these parameters, NOT an obstruction to the true continuous functional or TC. Note: Prior universal phase-alignment explanations were mathematically flawed. Primitive generator independence does not imply compatible triangle-equality phases for every legal vector. For example, with grades [-1, -2, -3, -4] and b = (-1, 1, 1, -1)/2, the active stations (-1, 64), (-2, 512), (-3, 4096) satisfy u_1 - 2*u_2 + u_3 = 0, and their alternating coefficient signs forbid simultaneous phase alignment. Moreover, continuous phase alignment on R would not bound discrete sums sampled at Riemann zeta zeros. Advancing the bridge requires frequency-localized kernels or higher zero cutoff T, not further scalar proxy optimization."
   },
   "summary_findings": {
     "unsuppressed_optimizer_verdict": "Yields large negative quartet response (q in [-13383.6, -4375.6]), but activates massive positive critical-zero background (S_T in [4.62e+06, 1.17e+08]), resulting in large positive net spectral response (q + S_T >> 0).",
     "exact_deflation_verdict": "Cancelling the lowest critical zeros reduces finite zero background by orders of magnitude, but simultaneously constrains the Dirichlet polynomial, shrinking q. Net response q + S_T remains strictly positive at every deflation stage.",
     "soft_suppression_verdict": "Penalizing S_T with parameter mu smoothly trades off background suppression against target response, achieving a 3525-fold reduction in q + S_T from 4 to 8 grades at mu=1, but leaves q + S_T > 0 in all tested directions.",
-    "tail_dominance": "The strip-uniform Stieltjes tail allowance B_tail(T=100) in [1.01e+12, 2.38e+12] dominates all finite contributions by 5 orders of magnitude. Complete functional precision remains NUMERICALLY_UNRESOLVED.",
+    "tail_dominance": "The strip-uniform Stieltjes tail allowance B_tail(T=100) in [9.75e+11, 2.38e+12] dominates all finite contributions by 5 orders of magnitude. Complete functional precision remains NUMERICALLY_UNRESOLVED.",
     "epistemic_decision": "NUMERICALLY_UNRESOLVED"
   },
-  "candidates_count": 42,
+  "candidates_count": 48,
   "candidates": [
     {
       "label": "UNSUPPRESSED_OPTIMIZER",
@@ -348,18 +348,21 @@
       "tail_allowance_T": 1480170250061.0918,
       "station_norm_D_stat": 12.614038661803358,
       "val_arith": 1095852216.4601214,
-      "delta_arith_est": 197.58629343690578,
+      "delta_arith_est": 197.58553982087136,
       "delta_arch_vec": 0.05301020139179494,
-      "delta_prime_vec": 197.53328323551398,
+      "delta_prime_vec": 197.53252961947956,
       "complete_spectral_interval": [
         -1480075621168.941,
         1480264878953.2427
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        1095852018.873828,
-        339580417727.861
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        1095852018.8745816,
+        339580417727.8603
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "lambda_min_Q": -10268.142817628166,
         "lambda_max_Q": 2.6685618855575988
@@ -391,18 +394,21 @@
       "tail_allowance_T": 1415768876901.3696,
       "station_norm_D_stat": 12.336572139994477,
       "val_arith": 38712274.181436285,
-      "delta_arith_est": 184.82888247900695,
+      "delta_arith_est": 184.82817733404977,
       "delta_arch_vec": 0.0005452460177389556,
-      "delta_prime_vec": 184.8283372329892,
+      "delta_prime_vec": 184.82763208803203,
       "complete_spectral_interval": [
         -1415765597705.3088,
         1415772156097.4304
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        38712089.35255381,
-        323796005150.85345
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        38712089.35325895,
+        323796005150.8528
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 1,
         "deflated_zeros": [
@@ -440,18 +446,21 @@
       "tail_allowance_T": 1343148750109.3887,
       "station_norm_D_stat": 12.016012691370124,
       "val_arith": 30153217.230410326,
-      "delta_arith_est": 175.9991458620336,
+      "delta_arith_est": 175.99847440265646,
       "delta_arch_vec": 0.0002694230116454372,
-      "delta_prime_vec": 175.99887643902196,
+      "delta_prime_vec": 175.9982049796448,
       "complete_spectral_interval": [
         -1343146969740.1558,
         1343150530478.6216
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        30153041.231264465,
-        307180713143.9105
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        30153041.231935922,
+        307180713143.90985
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 0.1,
         "min_objective_val": 178021.9725006464
@@ -483,18 +492,21 @@
       "tail_allowance_T": 1343216886243.9668,
       "station_norm_D_stat": 12.01631746560858,
       "val_arith": 30157218.227382455,
-      "delta_arith_est": 176.00792372429913,
+      "delta_arith_est": 176.0072522314337,
       "delta_arch_vec": 0.0002695341122220182,
-      "delta_prime_vec": 176.0076541901869,
+      "delta_prime_vec": 176.0069826973215,
       "complete_spectral_interval": [
         -1343215105874.906,
         1343218666613.0276
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        30157042.21945873,
-        307196298480.84296
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        30157042.220130224,
+        307196298480.8423
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 1.0,
         "min_objective_val": 1780369.06091303
@@ -526,18 +538,21 @@
       "tail_allowance_T": 1343223693855.483,
       "station_norm_D_stat": 12.016347915760878,
       "val_arith": 30157618.40367687,
-      "delta_arith_est": 176.00880073885995,
+      "delta_arith_est": 176.00812924264864,
       "delta_arch_vec": 0.00026954522445159614,
-      "delta_prime_vec": 176.0085311936355,
+      "delta_prime_vec": 176.00785969742418,
       "complete_spectral_interval": [
         -1343221913486.4202,
         1343225474224.5457
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        30157442.394876134,
-        307197855642.09186
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        30157442.39554763,
+        307197855642.0912
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 10.0,
         "min_objective_val": 17803839.755959578
@@ -557,55 +572,112 @@
         100.0
       ],
       "b_unit": [
-        -0.7071067811865474,
+        0.0,
+        0.0,
         0.7071067811865476,
-        -8.687418420397766e-17,
-        -8.907283571919061e-17
+        -0.7071067811865476
       ],
-      "norm_beta": 0.7071067811865474,
-      "target_quartet_q": -5416.646717941899,
-      "finite_zero_sum_S": 54922935.294458844,
-      "net_spectral_response_q_plus_S": 54917518.6477409,
-      "tail_allowance_T": 1014771736859.9747,
-      "station_norm_D_stat": 10.44437613284666,
-      "val_arith": 740763392.3766085,
-      "delta_arith_est": 131.96601401171256,
-      "delta_arch_vec": 0.037061826863345346,
-      "delta_prime_vec": 131.9289521848492,
+      "norm_beta": 1.0000000000000002,
+      "target_quartet_q": -50.490304798487195,
+      "finite_zero_sum_S": 2305664.3002468757,
+      "net_spectral_response_q_plus_S": 2305613.8099420774,
+      "tail_allowance_T": 976639907366.4415,
+      "station_norm_D_stat": 10.246264328805642,
+      "val_arith": 18409181.130666465,
+      "delta_arith_est": 128.17601396645736,
+      "delta_arch_vec": 2.3779753556580427e-05,
+      "delta_prime_vec": 128.1759901867038,
       "complete_spectral_interval": [
-        -1014716819341.327,
-        1014826654378.6224
+        -976637601752.6316,
+        976642212980.2515
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        740763260.4105945,
-        232798238149.04636
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        18409052.9546525,
+        223355916936.83127
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "status": "REMAINDER_OPTIMIZATION_CONVERGED",
         "is_feasible": true,
-        "unit_norm_error": 2.220446049250313e-16,
+        "unit_norm_error": 0.0,
         "beta": [
-          0.7071067811865475,
-          -8.687418420397764e-17,
-          -8.907283571919059e-17
+          0.0,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
         "b_unit": [
-          -0.7071067811865472,
-          0.7071067811865475,
-          -8.687418420397764e-17,
-          -8.907283571919059e-17
+          0.0,
+          0.0,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
-        "complete_upper_objective_F_plus": 1014826654378.6224,
-        "lower_control_F_minus": -1014716819341.327,
-        "target_quartet_q": -5416.646717941907,
-        "finite_zero_sum_S": 54922935.29445891,
-        "tail_allowance_B_T": 1014771736859.9747,
+        "complete_upper_objective_F_plus": 976642212980.2515,
+        "lower_control_F_minus": -976637601752.6316,
+        "target_quartet_q": -50.490304798488445,
+        "finite_zero_sum_S": 2305664.300246886,
+        "tail_allowance_B_T": 976639907366.4415,
         "finite_numerical_error_eps": 1e-06,
-        "station_norm_D_stat": 10.44437613284666,
+        "is_certified_finite_error": false,
+        "station_norm_D_stat": 10.246264328805642,
+        "theoretical_lower_bound_floor_F_plus": 976641687735.502,
+        "theoretical_station_norm_minimum_D_stat": 10.24626432880564,
+        "theoretical_tail_floor_B_T": 976639907366.441,
         "is_negative_witness_certified": false,
-        "optimum_classification": "LOCALLY_OPTIMIZED_ON_SPHERE",
-        "interpretation": "Optimized complete upper estimate F_+(beta) = 1.0148e+12 (target q = -5416.65, S_T = 54922935.29, B_T = 1.0148e+12, eps = 1.0e-06). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+        "optimum_classification": "LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE",
+        "interpretation": "Optimized complete upper estimate F_+(beta) = 9.7664e+11 (target q = -50.49, S_T = 2305664.30, B_T = 9.7664e+11, eps = 1.0e-06, theoretical floor = 9.7664e+11). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+      }
+    },
+    {
+      "label": "DIRECT_LEGAL_BOUNDARY_PAIR",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.0,
+        0.0,
+        -0.7071067811865476,
+        0.7071067811865476
+      ],
+      "norm_beta": 1.0000000000000002,
+      "target_quartet_q": -50.490304798487195,
+      "finite_zero_sum_S": 2305664.3002468757,
+      "net_spectral_response_q_plus_S": 2305613.8099420774,
+      "tail_allowance_T": 976639907366.4415,
+      "station_norm_D_stat": 10.246264328805642,
+      "val_arith": 18409181.130666465,
+      "delta_arith_est": 128.17601396645736,
+      "delta_arch_vec": 2.3779753556580427e-05,
+      "delta_prime_vec": 128.1759901867038,
+      "complete_spectral_interval": [
+        -976637601752.6316,
+        976642212980.2515
+      ],
+      "spectral_interval_status": "COMPLETE_INTERVAL",
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        18409052.9546525,
+        223355916936.83127
+      ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
+      "details": {
+        "grades_pair": [
+          -4,
+          -3
+        ],
+        "station_norm_min": 10.24626432880564,
+        "complete_upper_objective_F_plus": 976642212980.251
       }
     },
     {
@@ -634,18 +706,21 @@
       "tail_allowance_T": 1592002727951.5605,
       "station_norm_D_stat": 13.081881957404779,
       "val_arith": 79713776.74673197,
-      "delta_arith_est": 208.1516090824445,
+      "delta_arith_est": 208.15081496454633,
       "delta_arch_vec": 0.0022219399219194674,
-      "delta_prime_vec": 208.14938714252258,
+      "delta_prime_vec": 208.1485930246244,
       "complete_spectral_interval": [
         -1591998116645.0227,
         1592007339258.0984
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        79713568.59512289,
-        364138072357.4234
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        79713568.595917,
+        364138072357.4226
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "lambda_min_Q": -4375.646559547464,
         "lambda_max_Q": 1706299.7520341778
@@ -677,18 +752,21 @@
       "tail_allowance_T": 1415768876901.3696,
       "station_norm_D_stat": 12.336572139994477,
       "val_arith": 38712274.181436285,
-      "delta_arith_est": 184.82888247900695,
+      "delta_arith_est": 184.82817733404977,
       "delta_arch_vec": 0.0005452460177389556,
-      "delta_prime_vec": 184.8283372329892,
+      "delta_prime_vec": 184.82763208803203,
       "complete_spectral_interval": [
         -1415765293960.4358,
         1415772459842.3035
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        38712089.35255381,
-        323796005150.85345
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        38712089.35325895,
+        323796005150.8528
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 1,
         "deflated_zeros": [
@@ -726,18 +804,21 @@
       "tail_allowance_T": 1342277236381.5435,
       "station_norm_D_stat": 12.012113711716353,
       "val_arith": 28170698.35872452,
-      "delta_arith_est": 175.85743169612786,
+      "delta_arith_est": 175.85676077740592,
       "delta_arch_vec": 0.00026852960199563844,
-      "delta_prime_vec": 175.85716316652588,
+      "delta_prime_vec": 175.85649224780394,
       "complete_spectral_interval": [
         -1342275343613.9094,
         1342279129149.1775
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        28170522.501292825,
-        306979433317.4945
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        28170522.501963742,
+        306979433317.49384
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 0.1,
         "min_objective_val": 217510.32242097653
@@ -769,18 +850,21 @@
       "tail_allowance_T": 1337267769733.433,
       "station_norm_D_stat": 11.989677761086046,
       "val_arith": 28734458.772811275,
-      "delta_arith_est": 175.2345435353389,
+      "delta_arith_est": 175.23387499294967,
       "delta_arch_vec": 0.00025034408143218207,
-      "delta_prime_vec": 175.23429319125748,
+      "delta_prime_vec": 175.23362464886824,
       "complete_spectral_interval": [
         -1337265938248.434,
         1337269601218.4321
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        28734283.53826774,
-        305834434841.61066
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        28734283.538936283,
+        305834434841.61
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 1.0,
         "min_objective_val": 1831484.9989855397
@@ -812,18 +896,21 @@
       "tail_allowance_T": 1342483875739.168,
       "station_norm_D_stat": 12.013038289691156,
       "val_arith": 29972330.552210256,
-      "delta_arith_est": 175.9127969990364,
+      "delta_arith_est": 175.91212586908256,
       "delta_arch_vec": 0.00026700448750101714,
-      "delta_prime_vec": 175.9125299945489,
+      "delta_prime_vec": 175.91185886459505,
       "complete_spectral_interval": [
         -1342482042018.9482,
         1342485709459.3877
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        29972154.639413256,
-        307028489130.90216
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        29972154.640084386,
+        307028489130.9015
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 10.0,
         "min_objective_val": 17857481.084002923
@@ -843,55 +930,112 @@
         50.0
       ],
       "b_unit": [
-        -3.601785536488933e-12,
-        -0.6512652870513493,
-        0.7521184515097222,
-        -0.1008531644547711
+        0.0,
+        0.0,
+        0.7071067811865476,
+        -0.7071067811865476
       ],
-      "norm_beta": 0.9999999999999998,
-      "target_quartet_q": 665439.9404765827,
-      "finite_zero_sum_S": 5394021.095305964,
-      "net_spectral_response_q_plus_S": 6059461.035782547,
-      "tail_allowance_T": 1110594997048.3613,
-      "station_norm_D_stat": 10.926376934987312,
-      "val_arith": 109779787.82625598,
-      "delta_arith_est": 144.0122991832773,
-      "delta_arch_vec": 0.00080294345030593,
-      "delta_prime_vec": 144.01149623982698,
+      "norm_beta": 1.0000000000000002,
+      "target_quartet_q": 94690.94376352069,
+      "finite_zero_sum_S": 2305664.3002468757,
+      "net_spectral_response_q_plus_S": 2400355.2440103963,
+      "tail_allowance_T": 976639907366.4415,
+      "station_norm_D_stat": 10.246264328805642,
+      "val_arith": 18409181.130666465,
+      "delta_arith_est": 128.17601396645736,
+      "delta_arch_vec": 2.3779753556580427e-05,
+      "delta_prime_vec": 128.1759901867038,
       "complete_spectral_interval": [
-        -1110588937587.3254,
-        1110601056509.3972
+        -976637507011.1975,
+        976642307721.6855
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        109779643.8139568,
-        254080068011.94037
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        18409052.9546525,
+        223355916936.83127
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "status": "REMAINDER_OPTIMIZATION_CONVERGED",
         "is_feasible": true,
         "unit_norm_error": 0.0,
         "beta": [
-          -0.6512652870513493,
-          0.7521184515097222,
-          -0.1008531644547711
+          0.0,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
         "b_unit": [
-          -3.601785536488933e-12,
-          -0.6512652870513493,
-          0.7521184515097222,
-          -0.1008531644547711
+          0.0,
+          0.0,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
-        "complete_upper_objective_F_plus": 1110601056509.3972,
-        "lower_control_F_minus": -1110588937587.3254,
-        "target_quartet_q": 665439.9404765831,
-        "finite_zero_sum_S": 5394021.095305966,
-        "tail_allowance_B_T": 1110594997048.3613,
+        "complete_upper_objective_F_plus": 976642307721.6855,
+        "lower_control_F_minus": -976637507011.1975,
+        "target_quartet_q": 94690.94376352047,
+        "finite_zero_sum_S": 2305664.300246886,
+        "tail_allowance_B_T": 976639907366.4415,
         "finite_numerical_error_eps": 1e-06,
-        "station_norm_D_stat": 10.926376934987312,
+        "is_certified_finite_error": false,
+        "station_norm_D_stat": 10.246264328805642,
+        "theoretical_lower_bound_floor_F_plus": 976641738851.4401,
+        "theoretical_station_norm_minimum_D_stat": 10.24626432880564,
+        "theoretical_tail_floor_B_T": 976639907366.441,
         "is_negative_witness_certified": false,
-        "optimum_classification": "LOCALLY_OPTIMIZED_ON_SPHERE",
-        "interpretation": "Optimized complete upper estimate F_+(beta) = 1.1106e+12 (target q = 665439.94, S_T = 5394021.10, B_T = 1.1106e+12, eps = 1.0e-06). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+        "optimum_classification": "LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE",
+        "interpretation": "Optimized complete upper estimate F_+(beta) = 9.7664e+11 (target q = 94690.94, S_T = 2305664.30, B_T = 9.7664e+11, eps = 1.0e-06, theoretical floor = 9.7664e+11). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+      }
+    },
+    {
+      "label": "DIRECT_LEGAL_BOUNDARY_PAIR",
+      "family_dimension": 4,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.0,
+        0.0,
+        -0.7071067811865476,
+        0.7071067811865476
+      ],
+      "norm_beta": 1.0000000000000002,
+      "target_quartet_q": 94690.94376352069,
+      "finite_zero_sum_S": 2305664.3002468757,
+      "net_spectral_response_q_plus_S": 2400355.2440103963,
+      "tail_allowance_T": 976639907366.4415,
+      "station_norm_D_stat": 10.246264328805642,
+      "val_arith": 18409181.130666465,
+      "delta_arith_est": 128.17601396645736,
+      "delta_arch_vec": 2.3779753556580427e-05,
+      "delta_prime_vec": 128.1759901867038,
+      "complete_spectral_interval": [
+        -976637507011.1975,
+        976642307721.6855
+      ],
+      "spectral_interval_status": "COMPLETE_INTERVAL",
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        18409052.9546525,
+        223355916936.83127
+      ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
+      "details": {
+        "grades_pair": [
+          -4,
+          -3
+        ],
+        "station_norm_min": 10.24626432880564,
+        "complete_upper_objective_F_plus": 976642307721.685
       }
     },
     {
@@ -924,18 +1068,21 @@
       "tail_allowance_T": 1631536458381.0017,
       "station_norm_D_stat": 13.243315140295367,
       "val_arith": 1197643046.7267485,
-      "delta_arith_est": 225.0582710749779,
+      "delta_arith_est": 225.05743729746254,
       "delta_arch_vec": 6.513544614070299,
-      "delta_prime_vec": 218.5447264609076,
+      "delta_prime_vec": 218.54389268339224,
       "complete_spectral_interval": [
         -1631427504988.6372,
         1631645411773.3662
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        1197642821.6684773,
-        374296554620.6253
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        1197642821.6693113,
+        374296554620.62445
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "lambda_min_Q": -12307.769849765546,
         "lambda_max_Q": 4.64810209366099
@@ -971,18 +1118,21 @@
       "tail_allowance_T": 1716788201983.5847,
       "station_norm_D_stat": 13.584907394687475,
       "val_arith": 53936129.13817176,
-      "delta_arith_est": 223.6606593706991,
+      "delta_arith_est": 223.65980653709514,
       "delta_arch_vec": 0.12106605530840803,
-      "delta_prime_vec": 223.5395933153907,
+      "delta_prime_vec": 223.53874048178673,
       "complete_spectral_interval": [
         -1716785444584.805,
         1716790959382.3645
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        53935905.47751239,
-        392648172225.5403
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        53935905.47836523,
+        392648172225.5394
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 1,
         "deflated_zeros": [
@@ -1024,18 +1174,21 @@
       "tail_allowance_T": 1540757405191.9849,
       "station_norm_D_stat": 12.869612009644047,
       "val_arith": 1028459.3047677671,
-      "delta_arith_est": 202.5371229096293,
+      "delta_arith_est": 202.5363502106689,
       "delta_arch_vec": 0.0019383710807711228,
-      "delta_prime_vec": 202.53518453854852,
+      "delta_prime_vec": 202.53441183958813,
       "complete_spectral_interval": [
         -1540757217177.5706,
         1540757593206.3992
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        1028256.7676448574,
-        352340633196.47217
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        1028256.7684175564,
+        352340633196.4714
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 2,
         "deflated_zeros": [
@@ -1078,18 +1231,21 @@
       "tail_allowance_T": 1348124681149.4011,
       "station_norm_D_stat": 12.038249832427256,
       "val_arith": 898782.3454565177,
-      "delta_arith_est": 177.10669114788325,
+      "delta_arith_est": 177.10601546369628,
       "delta_arch_vec": 0.00043306309544501937,
-      "delta_prime_vec": 177.1062580847878,
+      "delta_prime_vec": 177.10558240060084,
       "complete_spectral_interval": [
         -1348124640754.7888,
         1348124721544.0134
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        898605.2387653698,
-        308289352040.3366
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        898605.239441054,
+        308289352040.33594
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 0.1,
         "min_objective_val": 4036.9525039596942
@@ -1125,18 +1281,21 @@
       "tail_allowance_T": 1347483726383.8132,
       "station_norm_D_stat": 12.035387748879113,
       "val_arith": 896185.2931152073,
-      "delta_arith_est": 177.0226209794282,
+      "delta_arith_est": 177.0219456159723,
       "delta_arch_vec": 0.0004309856743288382,
-      "delta_prime_vec": 177.02218999375387,
+      "delta_prime_vec": 177.02151463029796,
       "complete_spectral_interval": [
         -1347483685989.2424,
         1347483766778.384
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        896008.2704942279,
-        308142776239.74146
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        896008.2711695913,
+        308142776239.7408
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 1.0,
         "min_objective_val": 40394.57076832585
@@ -1172,18 +1331,21 @@
       "tail_allowance_T": 1347419716539.0322,
       "station_norm_D_stat": 12.035101885519229,
       "val_arith": 895926.3525553045,
-      "delta_arith_est": 177.01422518387105,
+      "delta_arith_est": 177.01354985244544,
       "delta_arch_vec": 0.0004307786344138899,
-      "delta_prime_vec": 177.01379440523664,
+      "delta_prime_vec": 177.01311907381103,
       "complete_spectral_interval": [
         -1347419676144.461,
         1347419756933.6035
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        895749.3383301207,
-        308128138242.6771
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        895749.3390054521,
+        308128138242.67645
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 10.0,
         "min_objective_val": 403970.7077659633
@@ -1205,61 +1367,122 @@
         100.0
       ],
       "b_unit": [
-        -0.7071067811865476,
-        0.7071067811865475,
-        2.7246302904381143e-16,
-        1.5796377700169993e-16,
-        -1.1439687104711221e-16,
-        -7.880598288124334e-17
+        1.1102230246251565e-16,
+        3.499571066023685e-18,
+        4.513293448946706e-17,
+        -9.714451465470121e-17,
+        0.7071067811865476,
+        -0.7071067811865476
       ],
-      "norm_beta": 0.7071067811865471,
-      "target_quartet_q": -5416.646717941905,
-      "finite_zero_sum_S": 54922935.29445891,
-      "net_spectral_response_q_plus_S": 54917518.64774097,
-      "tail_allowance_T": 1014771736859.9753,
-      "station_norm_D_stat": 10.444376132846664,
-      "val_arith": 740763392.3766086,
-      "delta_arith_est": 136.0587658411977,
-      "delta_arch_vec": 4.1298136563483885,
-      "delta_prime_vec": 131.92895218484932,
+      "norm_beta": 0.9999999999999999,
+      "target_quartet_q": -0.35587506977317807,
+      "finite_zero_sum_S": 52643.40974507281,
+      "net_spectral_response_q_plus_S": 52643.05387000304,
+      "tail_allowance_T": 974792221236.3143,
+      "station_norm_D_stat": 10.236567385726726,
+      "val_arith": 371700.04473340395,
+      "delta_arith_est": 128.10634038825398,
+      "delta_arch_vec": 1.7001667136660293e-06,
+      "delta_prime_vec": 128.10633868808728,
       "complete_spectral_interval": [
-        -1014716819341.3276,
-        1014826654378.623
+        -974792168593.2605,
+        974792273879.3682
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        740763256.3178427,
-        232798238153.13925
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        371571.9383930157,
+        222915351549.4658
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "status": "REMAINDER_OPTIMIZATION_CONVERGED",
         "is_feasible": true,
-        "unit_norm_error": 3.3306690738754696e-16,
+        "unit_norm_error": 0.0,
         "beta": [
-          0.7071067811865472,
-          2.7246302904381133e-16,
-          1.5796377700169988e-16,
-          -1.1439687104711217e-16,
-          -7.880598288124331e-17
+          3.499571066023685e-18,
+          4.513293448946706e-17,
+          -9.714451465470121e-17,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
         "b_unit": [
-          -0.7071067811865474,
-          0.7071067811865472,
-          2.7246302904381133e-16,
-          1.5796377700169988e-16,
-          -1.1439687104711217e-16,
-          -7.880598288124331e-17
+          1.1102230246251565e-16,
+          3.499571066023685e-18,
+          4.513293448946706e-17,
+          -9.714451465470121e-17,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
-        "complete_upper_objective_F_plus": 1014826654378.623,
-        "lower_control_F_minus": -1014716819341.3276,
-        "target_quartet_q": -5416.646717941912,
-        "finite_zero_sum_S": 54922935.29445897,
-        "tail_allowance_B_T": 1014771736859.9753,
+        "complete_upper_objective_F_plus": 974792273879.3682,
+        "lower_control_F_minus": -974792168593.2605,
+        "target_quartet_q": -0.3558750697731493,
+        "finite_zero_sum_S": 52643.40974507306,
+        "tail_allowance_B_T": 974792221236.3143,
         "finite_numerical_error_eps": 1e-06,
-        "station_norm_D_stat": 10.444376132846664,
+        "is_certified_finite_error": false,
+        "station_norm_D_stat": 10.236567385726726,
+        "theoretical_lower_bound_floor_F_plus": 974792261630.8848,
+        "theoretical_station_norm_minimum_D_stat": 10.236567385726724,
+        "theoretical_tail_floor_B_T": 974792221236.314,
         "is_negative_witness_certified": false,
-        "optimum_classification": "LOCALLY_OPTIMIZED_ON_SPHERE",
-        "interpretation": "Optimized complete upper estimate F_+(beta) = 1.0148e+12 (target q = -5416.65, S_T = 54922935.29, B_T = 1.0148e+12, eps = 1.0e-06). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+        "optimum_classification": "LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE",
+        "interpretation": "Optimized complete upper estimate F_+(beta) = 9.7479e+11 (target q = -0.36, S_T = 52643.41, B_T = 9.7479e+11, eps = 1.0e-06, theoretical floor = 9.7479e+11). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+      }
+    },
+    {
+      "label": "DIRECT_LEGAL_BOUNDARY_PAIR",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        1.1102230246251568e-16,
+        3.499571066023685e-18,
+        4.513293448946706e-17,
+        -9.714451465470121e-17,
+        0.7071067811865476,
+        -0.7071067811865476
+      ],
+      "norm_beta": 0.9999999999999999,
+      "target_quartet_q": -0.35587506977317807,
+      "finite_zero_sum_S": 52643.40974507281,
+      "net_spectral_response_q_plus_S": 52643.05387000304,
+      "tail_allowance_T": 974792221236.3143,
+      "station_norm_D_stat": 10.236567385726726,
+      "val_arith": 371700.04473340395,
+      "delta_arith_est": 128.10634038825398,
+      "delta_arch_vec": 1.7001667136660293e-06,
+      "delta_prime_vec": 128.10633868808728,
+      "complete_spectral_interval": [
+        -974792168593.2605,
+        974792273879.3682
+      ],
+      "spectral_interval_status": "COMPLETE_INTERVAL",
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        371571.9383930157,
+        222915351549.4658
+      ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
+      "details": {
+        "grades_pair": [
+          -5,
+          -6
+        ],
+        "station_norm_min": 10.236567385726724,
+        "complete_upper_objective_F_plus": 974792273879.3678
       }
     },
     {
@@ -1292,18 +1515,21 @@
       "tail_allowance_T": 2174814506335.664,
       "station_norm_D_stat": 15.2900685608946,
       "val_arith": 113562372.98302601,
-      "delta_arith_est": 284.5232138745499,
+      "delta_arith_est": 284.5221297623543,
       "delta_arch_vec": 0.3622730112165759,
-      "delta_prime_vec": 284.16094086333334,
+      "delta_prime_vec": 284.15985675113774,
       "complete_spectral_interval": [
         -2174807509487.2446,
         2174821503184.0835
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        113562088.45981213,
-        497449016322.2603
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        113562088.46089625,
+        497449016322.2592
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "lambda_min_Q": -6494.713810059298,
         "lambda_max_Q": 2588745.2488822667
@@ -1339,18 +1565,21 @@
       "tail_allowance_T": 1371575379324.1294,
       "station_norm_D_stat": 12.142501409192109,
       "val_arith": 1489290.8963101502,
-      "delta_arith_est": 180.24276045239242,
+      "delta_arith_est": 180.24207281023024,
       "delta_arch_vec": 0.0021501385895145953,
-      "delta_prime_vec": 180.2406103138029,
+      "delta_prime_vec": 180.23992267164073,
       "complete_spectral_interval": [
         -1371575160460.871,
         1371575598187.3877
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        1489110.6535496977,
-        313652636051.40356
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        1489110.65423734,
+        313652636051.40283
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 1,
         "deflated_zeros": [
@@ -1392,18 +1621,21 @@
       "tail_allowance_T": 1540757405191.9849,
       "station_norm_D_stat": 12.869612009644047,
       "val_arith": 1028459.3047677671,
-      "delta_arith_est": 202.5371229096293,
+      "delta_arith_est": 202.5363502106689,
       "delta_arch_vec": 0.0019383710807711228,
-      "delta_prime_vec": 202.53518453854852,
+      "delta_prime_vec": 202.53441183958813,
       "complete_spectral_interval": [
         -1540757169736.2886,
         1540757640647.6812
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        1028256.7676448574,
-        352340633196.47217
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        1028256.7684175564,
+        352340633196.4714
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 2,
         "deflated_zeros": [
@@ -1446,18 +1678,21 @@
       "tail_allowance_T": 1384656329841.4832,
       "station_norm_D_stat": 12.20026657012193,
       "val_arith": 853102.3520028541,
-      "delta_arith_est": 181.96151806929615,
+      "delta_arith_est": 181.96082386238078,
       "delta_arch_vec": 0.00019429735995360204,
-      "delta_prime_vec": 181.9613237719362,
+      "delta_prime_vec": 181.96062956502084,
       "complete_spectral_interval": [
         -1384656266640.709,
         1384656393042.2573
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        852920.3904847848,
-        316643344846.3971
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        852920.3911789918,
+        316643344846.39636
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 0.1,
         "min_objective_val": 7492.931515717675
@@ -1493,18 +1728,21 @@
       "tail_allowance_T": 1369567994298.5203,
       "station_norm_D_stat": 12.133612506379407,
       "val_arith": 898947.0234163099,
-      "delta_arith_est": 179.93866907433767,
+      "delta_arith_est": 179.93798258535182,
       "delta_arch_vec": 0.00032236821009278124,
-      "delta_prime_vec": 179.93834670612756,
+      "delta_prime_vec": 179.9376602171417,
       "complete_spectral_interval": [
         -1369567945586.7468,
         1369568043010.2937
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        898767.0847472355,
-        313192997940.40204
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        898767.0854337245,
+        313192997940.40137
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 1.0,
         "min_objective_val": 48711.7734487879
@@ -1540,18 +1778,21 @@
       "tail_allowance_T": 1350360957907.049,
       "station_norm_D_stat": 12.048230253308088,
       "val_arith": 895679.5365448853,
-      "delta_arith_est": 177.40229285375523,
+      "delta_arith_est": 177.40161604174546,
       "delta_arch_vec": 0.00041667387847370193,
-      "delta_prime_vec": 177.40187617987675,
+      "delta_prime_vec": 177.40119936786698,
       "complete_spectral_interval": [
         -1350360907887.4365,
         1350361007926.6616
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        895502.1342520315,
-        308800739547.2499
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        895502.1349288435,
+        308800739547.2492
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 10.0,
         "min_objective_val": 413771.9637748495
@@ -1573,61 +1814,122 @@
         50.0
       ],
       "b_unit": [
-        -0.7071067811865404,
-        0.7071067811865546,
-        -4.602539205628439e-18,
-        -1.1760726906273257e-14,
-        3.890509164587487e-15,
-        -6.330523904560631e-15
+        1.1102230246251565e-16,
+        3.499571066023685e-18,
+        4.513293448946706e-17,
+        -9.714451465470121e-17,
+        0.7071067811865476,
+        -0.7071067811865476
       ],
-      "norm_beta": 0.7071067811865545,
-      "target_quartet_q": 882645.2385182056,
-      "finite_zero_sum_S": 54922935.294457644,
-      "net_spectral_response_q_plus_S": 55805580.53297585,
-      "tail_allowance_T": 1014771736860.0054,
-      "station_norm_D_stat": 10.444376132846818,
-      "val_arith": 740763392.376596,
-      "delta_arith_est": 136.05876584120145,
-      "delta_arch_vec": 4.1298136563483085,
-      "delta_prime_vec": 131.92895218485313,
+      "norm_beta": 0.9999999999999999,
+      "target_quartet_q": 10956.5323154347,
+      "finite_zero_sum_S": 52643.40974507281,
+      "net_spectral_response_q_plus_S": 63599.94206050751,
+      "tail_allowance_T": 974792221236.3143,
+      "station_norm_D_stat": 10.236567385726726,
+      "val_arith": 371700.04473340395,
+      "delta_arith_est": 128.10634038825398,
+      "delta_arch_vec": 1.7001667136660293e-06,
+      "delta_prime_vec": 128.10633868808728,
       "complete_spectral_interval": [
-        -1014715931279.4724,
-        1014827542440.5383
+        -974792157636.3723,
+        974792284836.2563
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
-      "complete_arithmetic_interval": [
-        740763256.3178301,
-        232798238153.14612
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        371571.9383930157,
+        222915351549.4658
       ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "status": "REMAINDER_OPTIMIZATION_CONVERGED",
         "is_feasible": true,
-        "unit_norm_error": 2.220446049250313e-16,
+        "unit_norm_error": 0.0,
         "beta": [
-          0.7071067811865545,
-          -4.602539205628438e-18,
-          -1.1760726906273254e-14,
-          3.890509164587486e-15,
-          -6.330523904560629e-15
+          3.499571066023685e-18,
+          4.513293448946706e-17,
+          -9.714451465470121e-17,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
         "b_unit": [
-          -0.7071067811865402,
-          0.7071067811865545,
-          -4.602539205628438e-18,
-          -1.1760726906273254e-14,
-          3.890509164587486e-15,
-          -6.330523904560629e-15
+          1.1102230246251565e-16,
+          3.499571066023685e-18,
+          4.513293448946706e-17,
+          -9.714451465470121e-17,
+          0.7071067811865476,
+          -0.7071067811865476
         ],
-        "complete_upper_objective_F_plus": 1014827542440.5383,
-        "lower_control_F_minus": -1014715931279.4724,
-        "target_quartet_q": 882645.2385182059,
-        "finite_zero_sum_S": 54922935.294457674,
-        "tail_allowance_B_T": 1014771736860.0054,
+        "complete_upper_objective_F_plus": 974792284836.2563,
+        "lower_control_F_minus": -974792157636.3723,
+        "target_quartet_q": 10956.53231543463,
+        "finite_zero_sum_S": 52643.40974507306,
+        "tail_allowance_B_T": 974792221236.3143,
         "finite_numerical_error_eps": 1e-06,
-        "station_norm_D_stat": 10.444376132846818,
+        "is_certified_finite_error": false,
+        "station_norm_D_stat": 10.236567385726726,
+        "theoretical_lower_bound_floor_F_plus": 974792269948.0874,
+        "theoretical_station_norm_minimum_D_stat": 10.236567385726724,
+        "theoretical_tail_floor_B_T": 974792221236.314,
         "is_negative_witness_certified": false,
-        "optimum_classification": "LOCALLY_OPTIMIZED_ON_SPHERE",
-        "interpretation": "Optimized complete upper estimate F_+(beta) = 1.0148e+12 (target q = 882645.24, S_T = 54922935.29, B_T = 1.0148e+12, eps = 1.0e-06). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+        "optimum_classification": "LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE",
+        "interpretation": "Optimized complete upper estimate F_+(beta) = 9.7479e+11 (target q = 10956.53, S_T = 52643.41, B_T = 9.7479e+11, eps = 1.0e-06, theoretical floor = 9.7479e+11). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+      }
+    },
+    {
+      "label": "DIRECT_LEGAL_BOUNDARY_PAIR",
+      "family_dimension": 6,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        1.1102230246251568e-16,
+        3.499571066023685e-18,
+        4.513293448946706e-17,
+        -9.714451465470121e-17,
+        0.7071067811865476,
+        -0.7071067811865476
+      ],
+      "norm_beta": 0.9999999999999999,
+      "target_quartet_q": 10956.5323154347,
+      "finite_zero_sum_S": 52643.40974507281,
+      "net_spectral_response_q_plus_S": 63599.94206050751,
+      "tail_allowance_T": 974792221236.3143,
+      "station_norm_D_stat": 10.236567385726726,
+      "val_arith": 371700.04473340395,
+      "delta_arith_est": 128.10634038825398,
+      "delta_arch_vec": 1.7001667136660293e-06,
+      "delta_prime_vec": 128.10633868808728,
+      "complete_spectral_interval": [
+        -974792157636.3723,
+        974792284836.2563
+      ],
+      "spectral_interval_status": "COMPLETE_INTERVAL",
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": [
+        371571.9383930157,
+        222915351549.4658
+      ],
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
+      "details": {
+        "grades_pair": [
+          -5,
+          -6
+        ],
+        "station_norm_min": 10.236567385726724,
+        "complete_upper_objective_F_plus": 974792284836.256
       }
     },
     {
@@ -1673,6 +1975,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "lambda_min_Q": -13383.608937561685,
         "lambda_max_Q": 5.8596210382296965
@@ -1721,6 +2026,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 1,
         "deflated_zeros": [
@@ -1775,6 +2083,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 2,
         "deflated_zeros": [
@@ -1830,6 +2141,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 3,
         "deflated_zeros": [
@@ -1886,6 +2200,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 0.1,
         "min_objective_val": 50.47706937860459
@@ -1934,6 +2251,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 1.0,
         "min_objective_val": 505.0609163734429
@@ -1982,6 +2302,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 10.0,
         "min_objective_val": 5050.898725826295
@@ -2005,64 +2328,126 @@
         100.0
       ],
       "b_unit": [
-        -0.7071067811865475,
+        0.0,
+        0.0,
+        3.280426249249396e-18,
+        -6.843795019902355e-17,
         0.7071067811865476,
-        1.9402905521610383e-16,
-        -4.991333849424178e-17,
-        -8.409184792488783e-17,
-        1.5105979989773207e-16,
-        -1.989827522754786e-16,
-        -1.371994714831762e-16
+        -0.7071067811865476,
+        2.880552341674888e-17,
+        6.080365720501032e-17
       ],
-      "norm_beta": 0.7071067811865476,
-      "target_quartet_q": -5416.646717941909,
-      "finite_zero_sum_S": 54922935.29445895,
-      "net_spectral_response_q_plus_S": 54917518.647741005,
-      "tail_allowance_T": 1014771736859.9757,
-      "station_norm_D_stat": 10.444376132846665,
+      "norm_beta": 1.0,
+      "target_quartet_q": -0.3558750697732737,
+      "finite_zero_sum_S": 52643.40974507363,
+      "net_spectral_response_q_plus_S": 52643.05387000386,
+      "tail_allowance_T": 974792221236.314,
+      "station_norm_D_stat": 10.236567385726724,
       "val_arith": null,
       "delta_arith_est": null,
       "delta_arch_vec": null,
       "delta_prime_vec": null,
       "complete_spectral_interval": [
-        -1014716819341.328,
-        1014826654378.6234
+        -974792168593.2601,
+        974792273879.3678
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "status": "REMAINDER_OPTIMIZATION_CONVERGED",
         "is_feasible": true,
-        "unit_norm_error": 3.3306690738754696e-16,
+        "unit_norm_error": 0.0,
         "beta": [
-          0.7071067811865474,
-          1.9402905521610375e-16,
-          -4.9913338494241763e-17,
-          -8.409184792488781e-17,
-          1.5105979989773202e-16,
-          -1.9898275227547853e-16,
-          -1.3719947148317615e-16
+          0.0,
+          3.280426249249396e-18,
+          -6.843795019902355e-17,
+          0.7071067811865476,
+          -0.7071067811865476,
+          2.880552341674888e-17,
+          6.080365720501032e-17
         ],
         "b_unit": [
-          -0.7071067811865472,
-          0.7071067811865474,
-          1.9402905521610375e-16,
-          -4.9913338494241763e-17,
-          -8.409184792488781e-17,
-          1.5105979989773202e-16,
-          -1.9898275227547853e-16,
-          -1.3719947148317615e-16
+          0.0,
+          0.0,
+          3.280426249249396e-18,
+          -6.843795019902355e-17,
+          0.7071067811865476,
+          -0.7071067811865476,
+          2.880552341674888e-17,
+          6.080365720501032e-17
         ],
-        "complete_upper_objective_F_plus": 1014826654378.6234,
-        "lower_control_F_minus": -1014716819341.328,
-        "target_quartet_q": -5416.646717941908,
-        "finite_zero_sum_S": 54922935.29445893,
-        "tail_allowance_B_T": 1014771736859.9757,
+        "complete_upper_objective_F_plus": 974792273879.3678,
+        "lower_control_F_minus": -974792168593.2601,
+        "target_quartet_q": -0.3558750697741058,
+        "finite_zero_sum_S": 52643.40974507024,
+        "tail_allowance_B_T": 974792221236.314,
         "finite_numerical_error_eps": 1e-06,
-        "station_norm_D_stat": 10.444376132846665,
+        "is_certified_finite_error": false,
+        "station_norm_D_stat": 10.236567385726724,
+        "theoretical_lower_bound_floor_F_plus": 974792221741.3749,
+        "theoretical_station_norm_minimum_D_stat": 10.236567385726724,
+        "theoretical_tail_floor_B_T": 974792221236.314,
         "is_negative_witness_certified": false,
-        "optimum_classification": "LOCALLY_OPTIMIZED_ON_SPHERE",
-        "interpretation": "Optimized complete upper estimate F_+(beta) = 1.0148e+12 (target q = -5416.65, S_T = 54922935.29, B_T = 1.0148e+12, eps = 1.0e-06). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+        "optimum_classification": "LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE",
+        "interpretation": "Optimized complete upper estimate F_+(beta) = 9.7479e+11 (target q = -0.36, S_T = 52643.41, B_T = 9.7479e+11, eps = 1.0e-06, theoretical floor = 9.7479e+11). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+      }
+    },
+    {
+      "label": "DIRECT_LEGAL_BOUNDARY_PAIR",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        100.0
+      ],
+      "b_unit": [
+        0.0,
+        0.0,
+        3.280426249249396e-18,
+        -6.843795019902355e-17,
+        0.7071067811865476,
+        -0.7071067811865476,
+        2.880552341674888e-17,
+        6.080365720501032e-17
+      ],
+      "norm_beta": 1.0,
+      "target_quartet_q": -0.3558750697732737,
+      "finite_zero_sum_S": 52643.40974507363,
+      "net_spectral_response_q_plus_S": 52643.05387000386,
+      "tail_allowance_T": 974792221236.314,
+      "station_norm_D_stat": 10.236567385726724,
+      "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
+      "complete_spectral_interval": [
+        -974792168593.2601,
+        974792273879.3678
+      ],
+      "spectral_interval_status": "COMPLETE_INTERVAL",
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
+      "details": {
+        "grades_pair": [
+          -5,
+          -6
+        ],
+        "station_norm_min": 10.236567385726724,
+        "complete_upper_objective_F_plus": 974792273879.3678
       }
     },
     {
@@ -2108,6 +2493,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "lambda_min_Q": -7253.124941780523,
         "lambda_max_Q": 3054289.0733298487
@@ -2156,6 +2544,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 1,
         "deflated_zeros": [
@@ -2210,6 +2601,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 2,
         "deflated_zeros": [
@@ -2265,6 +2659,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "num_deflated": 3,
         "deflated_zeros": [
@@ -2321,6 +2718,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 0.1,
         "min_objective_val": 66.57984576744975
@@ -2369,6 +2769,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 1.0,
         "min_objective_val": 558.2195202378034
@@ -2417,6 +2820,9 @@
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "mu": 10.0,
         "min_objective_val": 5120.175566614395
@@ -2440,64 +2846,126 @@
         50.0
       ],
       "b_unit": [
-        -0.7071067811865522,
-        0.7071067811865429,
-        1.6385316276326193e-16,
-        7.184286620356693e-15,
-        2.438247358362881e-15,
-        -7.24641811345935e-15,
-        1.712888341113672e-15,
-        5.125681584893686e-15
+        0.0,
+        0.0,
+        3.280426249249396e-18,
+        -6.843795019902355e-17,
+        0.7071067811865476,
+        -0.7071067811865476,
+        2.880552341674888e-17,
+        6.080365720501032e-17
       ],
-      "norm_beta": 0.7071067811865428,
-      "target_quartet_q": 882645.238518239,
-      "finite_zero_sum_S": 54922935.29445981,
-      "net_spectral_response_q_plus_S": 55805580.53297805,
-      "tail_allowance_T": 1014771736860.0085,
-      "station_norm_D_stat": 10.444376132846834,
+      "norm_beta": 1.0,
+      "target_quartet_q": 10956.532315434733,
+      "finite_zero_sum_S": 52643.40974507363,
+      "net_spectral_response_q_plus_S": 63599.942060508365,
+      "tail_allowance_T": 974792221236.314,
+      "station_norm_D_stat": 10.236567385726724,
       "val_arith": null,
       "delta_arith_est": null,
       "delta_arch_vec": null,
       "delta_prime_vec": null,
       "complete_spectral_interval": [
-        -1014715931279.4756,
-        1014827542440.5415
+        -974792157636.372,
+        974792284836.256
       ],
       "spectral_interval_status": "COMPLETE_INTERVAL",
       "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
       "details": {
         "status": "REMAINDER_OPTIMIZATION_CONVERGED",
         "is_feasible": true,
-        "unit_norm_error": 1.1102230246251565e-16,
+        "unit_norm_error": 0.0,
         "beta": [
-          0.7071067811865428,
-          1.638531627632619e-16,
-          7.184286620356692e-15,
-          2.4382473583628807e-15,
-          -7.246418113459348e-15,
-          1.7128883411136718e-15,
-          5.125681584893685e-15
+          0.0,
+          3.280426249249396e-18,
+          -6.843795019902355e-17,
+          0.7071067811865476,
+          -0.7071067811865476,
+          2.880552341674888e-17,
+          6.080365720501032e-17
         ],
         "b_unit": [
-          -0.7071067811865521,
-          0.7071067811865428,
-          1.638531627632619e-16,
-          7.184286620356692e-15,
-          2.4382473583628807e-15,
-          -7.246418113459348e-15,
-          1.7128883411136718e-15,
-          5.125681584893685e-15
+          0.0,
+          0.0,
+          3.280426249249396e-18,
+          -6.843795019902355e-17,
+          0.7071067811865476,
+          -0.7071067811865476,
+          2.880552341674888e-17,
+          6.080365720501032e-17
         ],
-        "complete_upper_objective_F_plus": 1014827542440.5411,
-        "lower_control_F_minus": -1014715931279.4752,
-        "target_quartet_q": 882645.2385182385,
-        "finite_zero_sum_S": 54922935.29445976,
-        "tail_allowance_B_T": 1014771736860.0082,
+        "complete_upper_objective_F_plus": 974792284836.256,
+        "lower_control_F_minus": -974792157636.372,
+        "target_quartet_q": 10956.532315434904,
+        "finite_zero_sum_S": 52643.40974507024,
+        "tail_allowance_B_T": 974792221236.314,
         "finite_numerical_error_eps": 1e-06,
-        "station_norm_D_stat": 10.444376132846832,
+        "is_certified_finite_error": false,
+        "station_norm_D_stat": 10.236567385726724,
+        "theoretical_lower_bound_floor_F_plus": 974792221794.5334,
+        "theoretical_station_norm_minimum_D_stat": 10.236567385726724,
+        "theoretical_tail_floor_B_T": 974792221236.314,
         "is_negative_witness_certified": false,
-        "optimum_classification": "LOCALLY_OPTIMIZED_ON_SPHERE",
-        "interpretation": "Optimized complete upper estimate F_+(beta) = 1.0148e+12 (target q = 882645.24, S_T = 54922935.29, B_T = 1.0148e+12, eps = 1.0e-06). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+        "optimum_classification": "LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE",
+        "interpretation": "Optimized complete upper estimate F_+(beta) = 9.7479e+11 (target q = 10956.53, S_T = 52643.41, B_T = 9.7479e+11, eps = 1.0e-06, theoretical floor = 9.7479e+11). UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)."
+      }
+    },
+    {
+      "label": "DIRECT_LEGAL_BOUNDARY_PAIR",
+      "family_dimension": 8,
+      "grades": [
+        -1,
+        -2,
+        -3,
+        -4,
+        -5,
+        -6,
+        -7,
+        -8
+      ],
+      "target": [
+        0.49,
+        50.0
+      ],
+      "b_unit": [
+        0.0,
+        0.0,
+        3.280426249249396e-18,
+        -6.843795019902355e-17,
+        0.7071067811865476,
+        -0.7071067811865476,
+        2.880552341674888e-17,
+        6.080365720501032e-17
+      ],
+      "norm_beta": 1.0,
+      "target_quartet_q": 10956.532315434733,
+      "finite_zero_sum_S": 52643.40974507363,
+      "net_spectral_response_q_plus_S": 63599.942060508365,
+      "tail_allowance_T": 974792221236.314,
+      "station_norm_D_stat": 10.236567385726724,
+      "val_arith": null,
+      "delta_arith_est": null,
+      "delta_arch_vec": null,
+      "delta_prime_vec": null,
+      "complete_spectral_interval": [
+        -974792157636.372,
+        974792284836.256
+      ],
+      "spectral_interval_status": "COMPLETE_INTERVAL",
+      "complete_arithmetic_interval": null,
+      "complete_arithmetic_interval_diagnostic": null,
+      "arithmetic_interval_status": "DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN",
+      "is_arithmetic_certified": false,
+      "details": {
+        "grades_pair": [
+          -5,
+          -6
+        ],
+        "station_norm_min": 10.236567385726724,
+        "complete_upper_objective_F_plus": 974792284836.256
       }
     }
   ]

@@ -1,3 +1,4 @@
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 /-
 RiemannScope.ExtremalCorrelation
 Abstract finite extremal-grade correlation lemma and collision deduction.
@@ -344,7 +345,241 @@ theorem full_finite_correlation_transcendence_contradiction
   have h_contra := h_trans (a_diff - c_diff) h_k_ne ((N : ℚ) / (M : ℚ))
   exact h_contra h_tau_pow_div
 
+/-- Logarithmic lag of an atom under scale factor tau > 0:
+    atom_log_lag tau (K, J, n, m) = log (tau^(K - J) * (n / m)). -/
+noncomputable def atom_log_lag (tau : ℝ) (K J : ℤ) (n m : ℕ) : ℝ :=
+  Real.log (atom_spatial_ratio tau K J n m)
+
+/-- Strict positivity of atom spatial ratio:
+    For tau > 0 and positive natural indices n, m > 0,
+    the spatial ratio tau^(K - J) * (n / m) is strictly positive. -/
+theorem atom_spatial_ratio_pos (tau : ℝ) (htau : 0 < tau) (K J : ℤ) (n m : ℕ)
+    (hn : 0 < n) (hm : 0 < m) :
+    0 < atom_spatial_ratio tau K J n m := by
+  dsimp [atom_spatial_ratio]
+  have h_pow : 0 < tau ^ (K - J) := zpow_pos_of_pos htau (K - J)
+  have hn_real : 0 < (n : ℝ) := Nat.cast_pos.mpr hn
+  have hm_real : 0 < (m : ℝ) := Nat.cast_pos.mpr hm
+  have h_div : 0 < (n : ℝ) / (m : ℝ) := div_pos hn_real hm_real
+  exact mul_pos h_pow h_div
+
+/-- Equivalence between spatial ratio equality and logarithmic lag equality:
+    By injectivity of Real.log on (0, ∞), two atoms have equal spatial ratios
+    if and only if their logarithmic lags are equal.
+    This connects the spatial ratio representation of the formal theorem to
+    the intended signed correlation at logarithmic lags:
+        u - v = log(x / y) = log(tau^(K-J) * n / m). -/
+theorem atom_spatial_ratio_eq_iff_log_lag_eq
+    (tau : ℝ) (htau : 0 < tau)
+    (K1 J1 K2 J2 : ℤ) (n1 m1 n2 m2 : ℕ)
+    (hn1 : 0 < n1) (hm1 : 0 < m1)
+    (hn2 : 0 < n2) (hm2 : 0 < m2) :
+    atom_spatial_ratio tau K1 J1 n1 m1 = atom_spatial_ratio tau K2 J2 n2 m2 ↔
+    atom_log_lag tau K1 J1 n1 m1 = atom_log_lag tau K2 J2 n2 m2 := by
+  have h1 : 0 < atom_spatial_ratio tau K1 J1 n1 m1 := atom_spatial_ratio_pos tau htau K1 J1 n1 m1 hn1 hm1
+  have h2 : 0 < atom_spatial_ratio tau K2 J2 n2 m2 := atom_spatial_ratio_pos tau htau K2 J2 n2 m2 hn2 hm2
+  dsimp [atom_log_lag]
+  constructor
+  · intro h
+    rw [h]
+  · intro h
+    have h_inj : Set.InjOn Real.log (Set.Ioi (0 : ℝ)) := Real.log_injOn_pos
+    have h1_mem : atom_spatial_ratio tau K1 J1 n1 m1 ∈ Set.Ioi (0 : ℝ) := h1
+    have h2_mem : atom_spatial_ratio tau K2 J2 n2 m2 ∈ Set.Ioi (0 : ℝ) := h2
+    exact h_inj h1_mem h2_mem h
+
+/-- Canonical strictly positive extension of authentic station weights:
+    Given authentic TC weights a K n that are strictly positive on the finite active stations
+    actually occurring in atoms, positive_weight_extension extends them to all of ℤ × ℕ
+    by setting unobserved or inactive stations to 1. -/
+noncomputable def positive_weight_extension
+    (a : ℤ → ℕ → ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (K : ℤ) (n : ℕ) : ℝ :=
+  if (∃ p ∈ atoms, (p.1 = K ∧ p.2.2.1 = n) ∨ (p.2.1 = K ∧ p.2.2.2 = n)) then a K n else 1
+
+/-- Agreement on active stations: on all pairs appearing in atoms,
+    the positive weight extension identically matches the original weights a. -/
+theorem positive_weight_extension_eq_on_atoms
+    (a : ℤ → ℕ → ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (p : ℤ × ℤ × ℕ × ℕ) (hp : p ∈ atoms) :
+    positive_weight_extension a atoms p.1 p.2.2.1 = a p.1 p.2.2.1 ∧
+    positive_weight_extension a atoms p.2.1 p.2.2.2 = a p.2.1 p.2.2.2 := by
+  dsimp [positive_weight_extension]
+  have h1 : ∃ q ∈ atoms, (q.1 = p.1 ∧ q.2.2.1 = p.2.2.1) ∨ (q.2.1 = p.1 ∧ q.2.2.2 = p.2.2.1) := by
+    refine ⟨p, hp, Or.inl ⟨rfl, rfl⟩⟩
+  have h2 : ∃ q ∈ atoms, (q.1 = p.2.1 ∧ q.2.2.1 = p.2.2.2) ∨ (q.2.1 = p.2.1 ∧ q.2.2.2 = p.2.2.2) := by
+    refine ⟨p, hp, Or.inr ⟨rfl, rfl⟩⟩
+  simp [h1, h2]
+
+/-- Strict positivity everywhere: if the authentic weights a are strictly positive
+    on the active stations occurring in atoms, the extension is strictly positive everywhere. -/
+theorem positive_weight_extension_pos
+    (a : ℤ → ℕ → ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (h_supp : ∀ (p : ℤ × ℤ × ℕ × ℕ), p ∈ atoms → 0 < a p.1 p.2.2.1 ∧ 0 < a p.2.1 p.2.2.2) :
+    ∀ K n, 0 < positive_weight_extension a atoms K n := by
+  intro K n
+  dsimp [positive_weight_extension]
+  split_ifs with h_mem
+  · rcases h_mem with ⟨p, hp, h_or⟩
+    have ⟨ha1, ha2⟩ := h_supp p hp
+    rcases h_or with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+    · exact ha1
+    · exact ha2
+  · exact zero_lt_one
+
+/-- Invariance of atom pair mass under positive weight extension:
+    For any atom p in atoms, atom_pair_mass using the extension equals
+    atom_pair_mass using the original authentic weights. -/
+theorem atom_pair_mass_extension_eq
+    (a : ℤ → ℕ → ℝ)
+    (b : ℤ → ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (p : ℤ × ℤ × ℕ × ℕ) (hp : p ∈ atoms) :
+    atom_pair_mass (positive_weight_extension a atoms) b p.1 p.2.1 p.2.2.1 p.2.2.2 =
+    atom_pair_mass a b p.1 p.2.1 p.2.2.1 p.2.2.2 := by
+  have ⟨h1, h2⟩ := positive_weight_extension_eq_on_atoms a atoms p hp
+  dsimp [atom_pair_mass]
+  rw [h1, h2]
+
+/-- Invariance of nu_b discrete measure under positive weight extension -/
+theorem nu_b_mass_at_extension_eq
+    (a : ℤ → ℕ → ℝ)
+    (b : ℤ → ℝ)
+    (tau : ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (y : ℝ) :
+    nu_b_mass_at atoms (positive_weight_extension a atoms) b tau y =
+    nu_b_mass_at atoms a b tau y := by
+  dsimp [nu_b_mass_at]
+  congr 1
+  apply List.map_congr
+  intro p hp
+  have hp_atoms : p ∈ atoms := List.mem_filter.mp hp |>.1
+  exact atom_pair_mass_extension_eq a b atoms p hp_atoms
+
+/-- Construct the finite list of cross-grade atoms from authentic active station lists for each grade:
+    For distinct grades K ≠ J in G, and active stations n ∈ N_stations K, m ∈ N_stations J,
+    the atom (K, J, n, m) is included in the list. -/
+def make_cross_grade_atoms (G : List ℤ) (N_stations : ℤ → List ℕ) : List (ℤ × ℤ × ℕ × ℕ) :=
+  G.bind (fun K =>
+    (G.filter (fun J => decide (J ≠ K))).bind (fun J =>
+      (N_stations K).bind (fun n =>
+        (N_stations J).map (fun m => (K, J, n, m)))))
+
+/-- Membership of the extremal atom in the authentic cross-grade atom list:
+    Given active station lists with n0 ∈ N_stations K_plus and m0 ∈ N_stations K_minus,
+    with distinct extremal grades K_plus ≠ K_minus in G,
+    the extremal atom (K_plus, K_minus, n0, m0) belongs to make_cross_grade_atoms. -/
+theorem extremal_atom_mem_make_cross_grade_atoms
+    (G : List ℤ) (N_stations : ℤ → List ℕ)
+    (K_plus K_minus : ℤ) (n0 m0 : ℕ)
+    (h_Kp : K_plus ∈ G)
+    (h_Km : K_minus ∈ G)
+    (h_ne : K_minus ≠ K_plus)
+    (hn0 : n0 ∈ N_stations K_plus) (hm0 : m0 ∈ N_stations K_minus) :
+    (K_plus, K_minus, n0, m0) ∈ make_cross_grade_atoms G N_stations := by
+  dsimp [make_cross_grade_atoms]
+  rw [List.mem_bind]
+  refine ⟨K_plus, h_Kp, ?_⟩
+  rw [List.mem_bind]
+  have h_filter : K_minus ∈ G.filter (fun J => decide (J ≠ K_plus)) := by
+    rw [List.mem_filter]
+    exact ⟨h_Km, by simpa using h_ne⟩
+  refine ⟨K_minus, h_filter, ?_⟩
+  rw [List.mem_bind]
+  refine ⟨n0, hn0, ?_⟩
+  rw [List.mem_map]
+  refine ⟨m0, hm0, rfl⟩
+
+/-- Full Finite Extremal-Grade Correlation Theorem (Support-Restricted Formulation):
+    Discharges the global-positivity requirement by applying the canonical extension.
+    Requires strictly positive weights ONLY on the active stations occurring in atoms. -/
+theorem full_finite_extremal_grade_correlation_theorem_support
+    (tau : ℝ) (htau : 0 < tau)
+    (G : Finset ℤ)
+    (K_plus K_minus : ℤ)
+    (hK_plus : K_plus ∈ G) (hK_minus : K_minus ∈ G)
+    (h_max : ∀ x ∈ G, x ≤ K_plus)
+    (h_min : ∀ x ∈ G, K_minus ≤ x)
+    (h_diff_grades : K_minus < K_plus)
+    (b : ℤ → ℝ)
+    (hb_plus : b K_plus ≠ 0)
+    (hb_minus : b K_minus ≠ 0)
+    (a : ℤ → ℕ → ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (h_a_supp : ∀ (p : ℤ × ℤ × ℕ × ℕ), p ∈ atoms → 0 < a p.1 p.2.2.1 ∧ 0 < a p.2.1 p.2.2.2)
+    (h_atoms_in_G : ∀ p ∈ atoms, p.1 ∈ G ∧ p.2.1 ∈ G)
+    (h_atoms_pos : ∀ p ∈ atoms, 0 < p.2.2.1 ∧ 0 < p.2.2.2)
+    (n0 m0 : ℕ) (hn0 : 0 < n0) (hm0 : 0 < m0)
+    (h_p0_in : (K_plus, K_minus, n0, m0) ∈ atoms)
+    (h_nu_zero : ∀ y : ℝ, nu_b_mass_at atoms a b tau y = 0) :
+    ∃ (K' J' : ℤ) (n1 m1 : ℕ),
+      (K', J', n1, m1) ∈ atoms ∧
+      (K' - J' ≠ K_plus - K_minus) ∧
+      (∃ (M N : ℕ), 0 < M ∧ 0 < N ∧
+        (M : ℝ) * tau ^ (K_plus - K_minus) = (N : ℝ) * tau ^ (K' - J')) := by
+  let a_ext := positive_weight_extension a atoms
+  have h_a_ext_pos : ∀ K n, 0 < a_ext K n := positive_weight_extension_pos a atoms h_a_supp
+  have h_nu_ext_zero : ∀ y : ℝ, nu_b_mass_at atoms a_ext b tau y = 0 := by
+    intro y
+    rw [nu_b_mass_at_extension_eq]
+    exact h_nu_zero y
+  exact full_finite_extremal_grade_correlation_theorem
+    tau htau G K_plus K_minus hK_plus hK_minus h_max h_min h_diff_grades
+    b hb_plus hb_minus a_ext h_a_ext_pos atoms h_atoms_in_G h_atoms_pos
+    n0 m0 hn0 hm0 h_p0_in h_nu_ext_zero
+
+/-- Transcendence hypothesis: no non-zero integer power of tau is rational.
+    For tau = 2*pi, this is a consequence of the Lindemann-Weierstrass theorem. -/
+def tau_transcendence (tau : ℝ) : Prop :=
+  ∀ (k : ℤ), k ≠ 0 → ∀ (r : ℚ), tau ^ k ≠ (r : ℝ)
+
+/-- TC Specialized Extremal Correlation Non-Vanishing Corollary:
+    For any scale factor tau > 0 satisfying tau_transcendence tau (specifically tau = 2*pi),
+    and any finite set of integer grades G with at least two effective active grades
+    (achieving extremal grades K_minus < K_plus with non-zero coefficients b K_plus, b K_minus ≠ 0
+    and non-empty active station sets containing n0, m0 > 0 with strictly positive weights on the active support),
+    the discrete correlation measure nu_b CANNOT vanish identically:
+        (∀ y : ℝ, nu_b_mass_at atoms a b tau y = 0) → False.
+    This discharges the measure-to-collision bridge of the TC reductio. -/
+theorem tc_extremal_correlation_nonvanishing_corollary
+    (tau : ℝ) (htau : 0 < tau)
+    (h_trans : tau_transcendence tau)
+    (G : Finset ℤ)
+    (K_plus K_minus : ℤ)
+    (hK_plus : K_plus ∈ G) (hK_minus : K_minus ∈ G)
+    (h_max : ∀ x ∈ G, x ≤ K_plus)
+    (h_min : ∀ x ∈ G, K_minus ≤ x)
+    (h_diff_grades : K_minus < K_plus)
+    (b : ℤ → ℝ)
+    (hb_plus : b K_plus ≠ 0)
+    (hb_minus : b K_minus ≠ 0)
+    (a : ℤ → ℕ → ℝ)
+    (atoms : List (ℤ × ℤ × ℕ × ℕ))
+    (h_a_supp : ∀ (p : ℤ × ℤ × ℕ × ℕ), p ∈ atoms → 0 < a p.1 p.2.2.1 ∧ 0 < a p.2.1 p.2.2.2)
+    (h_atoms_in_G : ∀ p ∈ atoms, p.1 ∈ G ∧ p.2.1 ∈ G)
+    (h_atoms_pos : ∀ p ∈ atoms, 0 < p.2.2.1 ∧ 0 < p.2.2.2)
+    (n0 m0 : ℕ) (hn0 : 0 < n0) (hm0 : 0 < m0)
+    (h_p0_in : (K_plus, K_minus, n0, m0) ∈ atoms)
+    (h_nu_zero : ∀ y : ℝ, nu_b_mass_at atoms a b tau y = 0) :
+    False := by
+  let a_ext := positive_weight_extension a atoms
+  have h_a_ext_pos : ∀ K n, 0 < a_ext K n := positive_weight_extension_pos a atoms h_a_supp
+  have h_nu_ext_zero : ∀ y : ℝ, nu_b_mass_at atoms a_ext b tau y = 0 := by
+    intro y
+    rw [nu_b_mass_at_extension_eq]
+    exact h_nu_zero y
+  exact full_finite_correlation_transcendence_contradiction
+    tau htau h_trans G K_plus K_minus hK_plus hK_minus h_max h_min h_diff_grades
+    b hb_plus hb_minus a_ext h_a_ext_pos atoms h_atoms_in_G h_atoms_pos
+    n0 m0 hn0 hm0 h_p0_in h_nu_ext_zero
+
 #print axioms full_finite_extremal_grade_correlation_theorem
 #print axioms full_finite_correlation_transcendence_contradiction
+#print axioms full_finite_extremal_grade_correlation_theorem_support
+#print axioms tc_extremal_correlation_nonvanishing_corollary
 
 end RiemannScope

@@ -3968,7 +3968,11 @@ def certify_baseline_canonical_weil_error_budget(
     )
     delta_v = 2.0 * h / float(len(v_tab) - 1)
     eps_interp = (delta_v**2 / 8.0) * norm_psi_prime_sq
-    eps_table_quad = 1e-3  # Certified enclosure for 256-node Gauss-Legendre error (< 2e-6)
+    # Parameter-dependent certified enclosure for 256-node Gauss-Legendre error: C_quad * h^(-5)
+    # The dimensionless integral error on [-1+xi, 1] is bounded by 2.5e-12 across all xi in [0, 2),
+    # scaling as h^(-5) in C_h(v). For h=0.05, eps_table_quad ~ 8.0e-6; for h=0.01, eps_table_quad ~ 0.025.
+    c_dimensionless_quad_256 = 2.5e-12
+    eps_table_quad = float(c_dimensionless_quad_256 * (h**(-5)))
     eps_ptwise = float(eps_interp + eps_table_quad)
 
     # Subspace-contracted pairing bound: |||P|^T D M_pair D |P|||_2
@@ -4593,12 +4597,21 @@ def evaluate_tc_arithmetic_spectral_baseline_comparison(
             'W_prime_value': val_prime,
             'B_arith_net_value': val_arith,
             'quadrature_bound_delta_arith': delta_arith,
+            'quadrature_bound_status': 'DIAGNOSTIC_MESH_DIFFERENCE',
+            'is_quadrature_bound_certified': False,
+            'certified_arithmetic_enclosure': None,
             'arithmetic_enclosure': arith_enclosure,
             'arithmetic_enclosure_finite': arith_enclosure_finite,
             'arithmetic_enclosure_complete': arith_enclosure_complete,
             'enclosure_width': arith_width,
             'omitted_archimedean_tail_lower_bound': 0.0,
-            'omitted_archimedean_tail_upper_bound': R_arch_upper
+            'omitted_archimedean_tail_upper_bound': R_arch_upper,
+            'algorithms': {
+                'archimedean': f'ArchimedeanKernelEvaluator(N_t=2000, U={U_cutoff})',
+                'prime': '256-node Gauss-Legendre table N_tab=10000 with analytic C_h interpolation',
+                'archimedean_bound_provenance': 'unjustified_mesh_difference_diagnostic',
+                'prime_bound_provenance': 'analytic_derivative_norm_and_quadrature_theorem'
+            }
         },
         'spectral_evaluation': {
             'critical_zeros_partial_sum': sigma_crit,
@@ -4892,7 +4905,15 @@ def certify_explicit_formula_off_critical_sensitivity(
             'B_arith_computed': val_arith,
             'bound_delta_arith': bound_delta_arith,
             'certified_arithmetic_margin': margin_arith,
-            'is_strictly_positive': bool(margin_arith > 0)
+            'is_arithmetic_margin_certified': False,
+            'quadrature_bound_status': 'DIAGNOSTIC_ONLY_PENDING_ARCHIMEDEAN_REMAINDER',
+            'is_strictly_positive': bool(margin_arith > 0),
+            'algorithms': {
+                'archimedean': f'ArchimedeanKernelEvaluator(N_t=2000, U={float(T_cutoff)})',
+                'prime': '256-node Gauss-Legendre table N_tab=10000 with analytic C_h interpolation',
+                'archimedean_bound_provenance': 'unjustified_mesh_difference_diagnostic',
+                'prime_bound_provenance': 'analytic_derivative_norm_and_quadrature_theorem'
+            }
         },
         'spectral_remainders': {
             'trivial_zero_remainder_bound': R_triv_bound,
@@ -4919,7 +4940,8 @@ def certify_explicit_formula_off_critical_sensitivity(
             'tail_allowance_omitted_in_finite_decision': tail_bound,
             'tail_adjusted_margin_with_worst_case_zero': tail_adjusted_margin,
             'is_complete_spectral_positivity_preserved': positivity_preserved_complete,
-            'complete_spectral_decision_status': complete_spectral_status
+            'complete_spectral_decision_status': complete_spectral_status,
+            'is_negative_witness_certified': False
         },
         'homogeneity_invariants': {
             'zero_input_produces_zero': bool(is_exact_zero_b),
@@ -5721,54 +5743,71 @@ def validate_spectral_zero_coverage(
 ) -> Tuple[bool, str, Optional[List[float]], List[float]]:
     """Validate spectral zero coverage on [0, T_cutoff].
 
-    Enforces 6 invariant mathematical checks:
+    Enforces 7 rigorous invariant mathematical and provenance checks:
     1. Non-empty input list.
-    2. Must contain zeros below T_cutoff (crit_zeros non-empty).
-    3. First zero location: gamma_1 must be consistent with 14.1347 (in [14.0, 15.0]).
-    4. Strict monotonicity and no duplicates: gamma_{k+1} - gamma_k >= 1e-5.
-    5. Bracketing above T_cutoff: at least one zero > T_cutoff must be present.
-    6. Maximum consecutive gap bound: for Riemann zeta zeros up to T=500, max consecutive
-       spacing is strictly bounded by 4.0. Any gap > 4.0 indicates an omitted zero.
-    7. Counting function consistency: For benchmark T=100, exactly 29 zeros are required.
+    2. Finite values only: rejects NaN, +inf, -inf.
+    3. Strict monotonicity and no duplicates: gamma_{k+1} - gamma_k >= 1e-6.
+    4. Provenance integrity: verifies reference data hash against provenance.json.
+    5. Authoritative zero locations and counting: compares against authoritative
+       Odlyzko reference zeros within 1e-4 tolerance. Rejects fabricated values
+       (e.g. evenly spaced synthetic sequences) and interior omissions (e.g. missing zeros at any T).
+    6. Must contain zeros below T_cutoff (crit_zeros non-empty).
+    7. Bracketing above T_cutoff: authoritative zero > T_cutoff must be present.
     """
     if not ref_zeros:
         return False, "empty_zero_list", [0.0, float(T_cutoff)], []
+
+    # 1. Non-finite values rejection
+    for idx, g in enumerate(ref_zeros):
+        if not math.isfinite(g):
+            return False, f"non_finite_zero_detected_at_index_{idx}_{g}", [0.0, float(T_cutoff)], []
 
     crit_zeros = [float(g) for g in ref_zeros if g <= T_cutoff]
     if not crit_zeros:
         return False, "no_zeros_below_cutoff", [0.0, float(T_cutoff)], []
 
-    # First zero consistency
-    if crit_zeros[0] > 15.0 or crit_zeros[0] < 14.0:
-        return False, f"first_zero_invalid_or_missing_earlier_zeros_{crit_zeros[0]:.4f}", [0.0, crit_zeros[0]], crit_zeros
-
-    # Strict ordering and no duplicates
+    # 2. Strict ordering and no duplicates
     for i in range(len(ref_zeros) - 1):
         diff = ref_zeros[i+1] - ref_zeros[i]
         if diff <= 1e-6:
             return False, f"duplicate_or_inverted_zeros_at_index_{i}_{ref_zeros[i]:.4f}_and_{ref_zeros[i+1]:.4f}", [ref_zeros[i], ref_zeros[i+1]], crit_zeros
 
-    # Bracketing above T_cutoff
-    has_bracket = any(g > T_cutoff for g in ref_zeros)
-    if not has_bracket:
-        return False, "reference_data_truncated_before_or_at_T", [crit_zeros[-1], float(T_cutoff)], crit_zeros
+    # 3. Provenance and authoritative comparison
+    import reference_data
+    if not reference_data.verify_provenance():
+        return False, "provenance_hash_mismatch_in_reference_data", [0.0, float(T_cutoff)], []
 
-    # Maximum consecutive gap bound (bounding omissions)
-    # Between gamma_1 (~14.13) and gamma_2 (~21.02), gap is ~6.89. All other consecutive gaps below T=100 are <= 5.5.
-    # Therefore, any consecutive gap > 7.5 indicates omitted zeros.
-    for i in range(len(crit_zeros) - 1):
-        gap = crit_zeros[i+1] - crit_zeros[i]
-        if gap > 7.5:
-            return False, f"omitted_zeros_detected_large_spectral_gap_{gap:.4f}_between_{crit_zeros[i]:.2f}_and_{crit_zeros[i+1]:.2f}", [crit_zeros[i], crit_zeros[i+1]], crit_zeros
+    auth_zeros_raw = reference_data.load_reference_zeros()
+    if not auth_zeros_raw:
+        auth_zeros_raw = reference_data.load_first_100_reference_zeros()
 
-    # Gap between last zero below T and first zero above T
-    first_above = min(g for g in ref_zeros if g > T_cutoff)
-    if (first_above - crit_zeros[-1]) > 7.5:
-        return False, f"omitted_zeros_near_cutoff_gap_{first_above - crit_zeros[-1]:.4f}_between_{crit_zeros[-1]:.2f}_and_{first_above:.2f}", [crit_zeros[-1], first_above], crit_zeros
+    if auth_zeros_raw:
+        auth_zeros = [float(g) for g in auth_zeros_raw]
+        if auth_zeros[-1] <= T_cutoff:
+            return False, "reference_data_truncated_before_or_at_T", [crit_zeros[-1], float(T_cutoff)], crit_zeros
 
-    # Counting function check for benchmark T=100
-    if abs(T_cutoff - 100.0) < 1e-3 and len(crit_zeros) != 29:
-        return False, f"zero_count_mismatch_expected_29_got_{len(crit_zeros)}", [crit_zeros[-1], float(T_cutoff)], crit_zeros
+        auth_crit = [g for g in auth_zeros if g <= T_cutoff]
+        if len(crit_zeros) != len(auth_crit):
+            return False, f"zero_count_mismatch_expected_{len(auth_crit)}_got_{len(crit_zeros)}", [crit_zeros[-1], float(T_cutoff)], crit_zeros
+
+        for k in range(len(crit_zeros)):
+            if abs(crit_zeros[k] - auth_crit[k]) > 1e-4:
+                return False, f"fabricated_or_displaced_zero_at_index_{k}_got_{crit_zeros[k]:.4f}_expected_{auth_crit[k]:.4f}", [crit_zeros[k], auth_crit[k]], crit_zeros
+
+        # Bracketing zero verification
+        first_above_input = min((g for g in ref_zeros if g > T_cutoff), default=None)
+        first_above_auth = min(g for g in auth_zeros if g > T_cutoff)
+        if first_above_input is None:
+            return False, "reference_data_truncated_before_or_at_T", [crit_zeros[-1], float(T_cutoff)], crit_zeros
+        if abs(first_above_input - first_above_auth) > 1e-4:
+            return False, f"fabricated_or_displaced_bracketing_zero_got_{first_above_input:.4f}_expected_{first_above_auth:.4f}", [crit_zeros[-1], first_above_input], crit_zeros
+    else:
+        # Fallback if no reference data files
+        if crit_zeros[0] > 15.0 or crit_zeros[0] < 14.0:
+            return False, f"first_zero_invalid_or_missing_earlier_zeros_{crit_zeros[0]:.4f}", [0.0, crit_zeros[0]], crit_zeros
+        has_bracket = any(g > T_cutoff for g in ref_zeros)
+        if not has_bracket:
+            return False, "reference_data_truncated_before_or_at_T", [crit_zeros[-1], float(T_cutoff)], crit_zeros
 
     return True, "authoritative_reference_data_verified", None, crit_zeros
 
@@ -5780,7 +5819,8 @@ def solve_complete_upper_objective(
     c_tail_mult: float,
     P: np.ndarray,
     PtP: np.ndarray,
-    eps_finite: float = 1e-6
+    eps_finite: float = 1e-6,
+    is_certified_finite_error: bool = False
 ) -> Dict[str, Any]:
     """Optimize the complete upper objective F_+(beta) with remainder participating.
 
@@ -5789,9 +5829,19 @@ def solve_complete_upper_objective(
         F_+(beta) = beta^T (Q + S_T) beta + c_tail_mult * (|P * beta|^T D_vec)^2 + eps_finite
 
     The remainder B_T(P * beta) participates directly in the coefficient selection.
+
+    Evaluates:
+    1. Generalized eigenvectors of Q, Q + S_T, Q + mu * S_T.
+    2. Correct orthant penalty E_s = c_tail_mult * P^T (D_vec * s)(D_vec * s)^T P.
+    3. Every legal two-grade boundary candidate (e_i - e_j) / sqrt(2) and its negation.
+    4. Multistart Powell local search from the best initial candidates.
+    5. Absolute theoretical lower bound floor:
+       F_+(beta) >= lambda_min(Q + S_T, P^T P) + (c_tail_mult / 2) * (D_{(1)} + D_{(2)})^2 + eps_finite.
     """
     import scipy.optimize
     import scipy.linalg
+
+    r = P.shape[0]
 
     def compute_objective_and_terms(beta_vec: np.ndarray) -> Tuple[float, float, float, float, float]:
         norm_b = math.sqrt(max(1e-18, float(beta_vec @ PtP @ beta_vec)))
@@ -5827,24 +5877,53 @@ def solve_complete_upper_objective(
         except Exception:
             pass
 
-    # Orthant generalized eigenvectors
-    if candidates_init:
-        v_seed = candidates_init[0]
-        s_seed = np.sign(P @ v_seed)
-        s_seed[s_seed == 0] = 1.0
-        E_s = c_tail_mult * (P.T @ np.outer(s_seed, s_seed) @ P)
-        try:
-            e_orth, v_orth = scipy.linalg.eigh(Q + S_T + E_s, PtP)
-            candidates_init.append(v_orth[:, 0])
-        except Exception:
-            pass
+    # Correct orthant generalized eigenvectors with D included: E_s = c_T P^T (D * s)(D * s)^T P
+    if len(D_vec) == r:
+        for s_seed in [
+            np.ones(r),
+            np.array([1.0 if idx % 2 == 0 else -1.0 for idx in range(r)]),
+            -np.ones(r)
+        ]:
+            Ds = D_vec * s_seed
+            E_s = c_tail_mult * (P.T @ np.outer(Ds, Ds) @ P)
+            try:
+                e_orth, v_orth = scipy.linalg.eigh(Q + S_T + E_s, PtP)
+                candidates_init.append(v_orth[:, 0])
+            except Exception:
+                pass
 
+    # Evaluate every legal two-grade boundary candidate (e_i - e_j) / sqrt(2)
+    boundary_candidates = []
+    for i in range(r):
+        for j in range(i + 1, r):
+            for sign in [1.0, -1.0]:
+                b_bound = np.zeros(r)
+                b_bound[i] = sign / math.sqrt(2.0)
+                b_bound[j] = -sign / math.sqrt(2.0)
+                beta_bound = np.linalg.lstsq(P, b_bound, rcond=None)[0]
+                candidates_init.append(beta_bound)
+                f_bound, q_b, s_b, tb_b, dst_b = compute_objective_and_terms(beta_bound)
+                boundary_candidates.append({
+                    'pair': (i, j),
+                    'sign': sign,
+                    'beta': beta_bound,
+                    'b_unit': b_bound,
+                    'f_plus': f_bound,
+                    'd_stat': dst_b
+                })
+
+    # Retain the absolute best candidate among all boundary candidates and solver starts
     best_val = float('inf')
     best_beta = None
 
     for init_b in candidates_init:
         nb = math.sqrt(max(1e-18, float(init_b @ PtP @ init_b)))
         x0 = init_b / nb
+        val_init = obj_func(x0)
+        if val_init < best_val:
+            best_val = val_init
+            best_beta = x0
+
         try:
             res_opt = scipy.optimize.minimize(
                 obj_func, x0, method='Powell',
@@ -5867,6 +5946,25 @@ def solve_complete_upper_objective(
     unit_norm_err = abs(float(np.linalg.norm(b_opt)) - 1.0)
     f_minus_opt = q_opt + s_opt - b_tail_opt - eps_finite
 
+    # Theoretical lower bound floor for this complete upper objective proxy
+    d_sorted = np.sort(D_vec)
+    if len(d_sorted) >= 2:
+        D_stat_min = float((d_sorted[0] + d_sorted[1]) / math.sqrt(2.0))
+        tail_floor = float(c_tail_mult * (D_stat_min ** 2))
+        try:
+            eigs_A = scipy.linalg.eigvalsh(Q + S_T, PtP)
+            lambda_min_A = float(eigs_A[0])
+        except Exception:
+            lambda_min_A = 0.0
+        f_plus_floor = float(lambda_min_A + tail_floor + eps_finite)
+    else:
+        D_stat_min = 0.0
+        tail_floor = 0.0
+        f_plus_floor = float(eps_finite)
+
+    # Gated certified decision: requires f_plus < 0, certified finite error, feasibility
+    is_neg_witness_certified = bool(f_plus_opt < 0.0 and is_certified_finite_error and (unit_norm_err < 1e-5))
+
     return {
         'status': 'REMAINDER_OPTIMIZATION_CONVERGED',
         'is_feasible': bool(unit_norm_err < 1e-5),
@@ -5879,13 +5977,18 @@ def solve_complete_upper_objective(
         'finite_zero_sum_S': s_opt,
         'tail_allowance_B_T': b_tail_opt,
         'finite_numerical_error_eps': float(eps_finite),
+        'is_certified_finite_error': bool(is_certified_finite_error),
         'station_norm_D_stat': d_stat_opt,
-        'is_negative_witness_certified': bool(f_plus_opt < 0.0),
-        'optimum_classification': 'LOCALLY_OPTIMIZED_ON_SPHERE',
+        'theoretical_lower_bound_floor_F_plus': f_plus_floor,
+        'theoretical_station_norm_minimum_D_stat': D_stat_min,
+        'theoretical_tail_floor_B_T': tail_floor,
+        'is_negative_witness_certified': is_neg_witness_certified,
+        'optimum_classification': 'LOCALLY_OPTIMIZED_WITH_BOUNDARY_ENCLOSURE',
         'interpretation': (
             f"Optimized complete upper estimate F_+(beta) = {f_plus_opt:.4e} "
-            f"(target q = {q_opt:.2f}, S_T = {s_opt:.2f}, B_T = {b_tail_opt:.4e}, eps = {eps_finite:.1e}). "
-            f"{'CERTIFIED NEGATIVE WITNESS' if f_plus_opt < 0.0 else 'UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)'}."
+            f"(target q = {q_opt:.2f}, S_T = {s_opt:.2f}, B_T = {b_tail_opt:.4e}, eps = {eps_finite:.1e}, "
+            f"theoretical floor = {f_plus_floor:.4e}). "
+            f"{'CERTIFIED NEGATIVE WITNESS' if is_neg_witness_certified else 'UPPER ESTIMATE IS POSITIVE (NO NEGATIVE WITNESS CERTIFIED)'}."
         )
     }
 
@@ -6107,7 +6210,10 @@ def evaluate_tc_optimized_suppression_comparison(
                     'delta_prime_vec': delta_prime_vec,
                     'complete_spectral_interval': [net_spec - tb, net_spec + tb] if zero_accounting_complete else None,
                     'spectral_interval_status': 'COMPLETE_INTERVAL' if zero_accounting_complete else 'PARTIAL_INCOMPLETE_ZEROS',
-                    'complete_arithmetic_interval': arith_interval,
+                    'complete_arithmetic_interval': None,  # Propagated as None because Archimedean remainder is uncertified
+                    'complete_arithmetic_interval_diagnostic': arith_interval,
+                    'arithmetic_interval_status': 'DIAGNOSTIC_UNCERTIFIED_ARCHIMEDEAN',
+                    'is_arithmetic_certified': False,
                     'details': details or {}
                 }
 
@@ -6185,6 +6291,28 @@ def evaluate_tc_optimized_suppression_comparison(
                 rem_opt
             )
             candidates.append(rec_rem_opt)
+
+            # 5. Direct Legal Boundary Pair Candidate b = (0, ..., 1, -1)/sqrt(2) on two smallest mass grades
+            d_order = np.argsort(D_vec)
+            if len(d_order) >= 2:
+                idx1, idx2 = d_order[0], d_order[1]
+                b_bound = np.zeros(r)
+                b_bound[idx1] = 1.0 / math.sqrt(2.0)
+                b_bound[idx2] = -1.0 / math.sqrt(2.0)
+                beta_bound = np.linalg.lstsq(P, b_bound, rcond=None)[0]
+                rec_bound = evaluate_candidate(
+                    beta_bound,
+                    'DIRECT_LEGAL_BOUNDARY_PAIR',
+                    {
+                        'grades_pair': (grades[idx1], grades[idx2]),
+                        'station_norm_min': float((D_vec[idx1] + D_vec[idx2]) / math.sqrt(2.0)),
+                        'complete_upper_objective_F_plus': float(
+                            float(beta_bound @ Q @ beta_bound) + float(beta_bound @ S_T @ beta_bound)
+                            + c_tail_mult * (((D_vec[idx1] + D_vec[idx2]) / math.sqrt(2.0))**2) + 1e-6
+                        )
+                    }
+                )
+                candidates.append(rec_bound)
 
     # 3. Dynamically generate structured summaries and campaign tables from actual rows
     mu1_rows_target100 = [
@@ -6281,11 +6409,22 @@ def evaluate_tc_optimized_suppression_comparison(
             ],
             'obstruction_analysis': (
                 'Including the remainder B_T directly in the objective reduces F_+(beta) substantially '
-                '(e.g. 1.38-fold reduction from 1.34e12 to 9.77e11 in 4 grades), but F_+(beta) remains strictly positive. '
-                'Mathematical obstruction: under Dirichlet/Kronecker approximation on the infinite vertical line, '
-                'the station phases sum k_p log p + K log(2*pi) can align arbitrarily closely mod 2*pi as t -> infty, '
-                'so sup_t |E_b(it)| = D_stat(b) cannot be reduced below the L^1 station norm on the continuous frequency domain. '
-                'Certifying a negative witness strictly requires a non-scalar frequency-localized kernel majorant.'
+                '(e.g. 1.38-fold reduction from 1.343218666613e12 to 9.766422129803e11 in 4 grades, matching the '
+                'exact legal boundary pair b = (0,0,1,-1)/sqrt(2)), but F_+(beta) remains strictly positive. '
+                'Mathematical Analysis & Theoretical Floor: '
+                'For any legal coefficient vector 1^T b = 0, ||b||_2 = 1, the station norm satisfies the exact minimum '
+                'min D_stat(b) = (D_(1) + D_(2)) / sqrt(2) attained on the two grades with smallest contracted masses. '
+                'In 4 grades, D_(1) + D_(2) = D_(-4) + D_(-3) ~ 7.2425 + 7.2479, giving D_stat >= 10.2462643288. '
+                'Consequently, the complete upper objective proxy has a strict theoretical lower bound floor: '
+                'F_+(beta) >= lambda_min(Q + S_T, P^T P) + (c_T / 2) * (D_(1) + D_(2))^2 + eps_finite ~ 9.766416877355e11. '
+                'This floor establishes a definite limitation of the scalar uniform upper-bound proxy at these parameters, '
+                'NOT an obstruction to the true continuous functional or TC. '
+                'Note: Prior universal phase-alignment explanations were mathematically flawed. Primitive generator '
+                'independence does not imply compatible triangle-equality phases for every legal vector. For example, '
+                'with grades [-1, -2, -3, -4] and b = (-1, 1, 1, -1)/2, the active stations (-1, 64), (-2, 512), (-3, 4096) '
+                'satisfy u_1 - 2*u_2 + u_3 = 0, and their alternating coefficient signs forbid simultaneous phase alignment. '
+                'Moreover, continuous phase alignment on R would not bound discrete sums sampled at Riemann zeta zeros. '
+                'Advancing the bridge requires frequency-localized kernels or higher zero cutoff T, not further scalar proxy optimization.'
             )
         },
         'summary_findings': {

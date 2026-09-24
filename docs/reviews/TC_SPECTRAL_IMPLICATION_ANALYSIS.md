@@ -44,7 +44,7 @@ $$\nu_b(\mathbb{R}) = \int_{\mathbb{R}} d\nu_b(y) = \sum_{K \ne J} b_K b_J \left
 Let $s_K = \sigma_K(\mathbb{R}) = \sum_{n \in N_K} a_{K,n} > 0$ denote the total mass of grade $K$. Then:
 $$\nu_b(\mathbb{R}) = \sum_{K \ne J} b_K b_J s_K s_J = \left(\sum_K b_K s_K\right)^2 - \sum_K b_K^2 s_K^2.$$
 
-### 2.3 Strict Negativity under Standard Normalization
+### 2.3 Strict Negativity under Balanced Normalization
 When stations and weights are balanced across grades such that $s_K = s > 0$ for all $K \in G$, and $b$ is a legal zero-sum coefficient vector ($\sum_K b_K = 0$):
 $$\nu_b(\mathbb{R}) = \left( s \sum_K b_K \right)^2 - s^2 \sum_K b_K^2 = 0 - s^2 \|b\|_2^2 = -s^2 \|b\|_2^2 < 0.$$
 
@@ -53,7 +53,9 @@ For any non-trivial coefficient vector $b \ne 0$, the total mass of the cross-gr
 $$\nu_b(\mathbb{R}) = -s^2 \|b\|_2^2 < 0.$$
 Because a non-zero signed measure can never have non-zero total mass while vanishing identically:
 $$\nu_b(\mathbb{R}) \ne 0 \Longrightarrow \nu_b \ne 0.$$
-**Conclusion**: Under equal-mass station weights, $\nu_b = 0$ is mathematically impossible. Any valid bridge from an off-critical zero cannot target the unweighted atomic measure $\nu_b$ directly without breaking station symmetry or moving to a frequency-localized integral transform.
+**Crucial Reductio Interpretation**:
+Establishing that $\nu_b \ne 0$ holds algebraically on the authentic family does **not** refute the reductio implication $H \Longrightarrow \nu_b = 0$.
+Rather, the non-vanishing $\nu_b \ne 0$ provides the exact terminal contradiction once the antecedent implication $H \Longrightarrow \nu_b = 0$ is derived.
 
 ---
 
@@ -68,7 +70,7 @@ $$q_{\rho_0}(b) = -4 \operatorname{Re}\left( \mathcal{F}[F_b](\rho_0) \overline{
 To construct an admissible $b$ that responds to $\rho_0$, one considers the exact deflation condition:
 $$\mathcal{F}[F_b](\rho_0) = 0.$$
 
-### 3.2 Dimensional Mismatch: 2 Real Constraints vs Infinite Constraints
+### 3.2 Finite Algebraic System vs. 2 Real Deflation Constraints
 Evaluating $\mathcal{F}[F_b](\rho_0) = 0$ yields:
 $$\sum_{K \in G} b_K \mathcal{F}[F_K](\rho_0) = 0.$$
 Because $\mathcal{F}[F_K](\rho_0) \in \mathbb{C}$, this complex equation represents exactly **two real linear constraints** on the coefficient vector $b \in \mathbb{R}^r$:
@@ -77,12 +79,10 @@ Together with the zero-sum condition $\sum_K b_K = 0$, this imposes 3 linear con
 For $r \ge 4$ grades (e.g. $r=4, 6, 8$), the nullspace has dimension $r - 3 \ge 1$. Thus, there exists a non-trivial subspace of legal directions $b$ that deflate the single off-critical zero $\rho_0$.
 
 **However**:
-Vanishing of the correlation measure $\nu_b = 0$ requires that for **all** test functions $\phi \in C_c(\mathbb{R})$:
-$$\int_{\mathbb{R}} \phi(y) d\nu_b(y) = 0,$$
-or equivalently, that its Fourier transform vanishes identically for all frequencies $\xi \in \mathbb{R}$:
-$$\widehat{\nu}_b(\xi) = \left|\sum_K b_K \widehat{\sigma}_K(\xi)\right|^2 - \sum_K b_K^2 |\widehat{\sigma}_K(\xi)|^2 \equiv 0 \quad (\forall \xi \in \mathbb{R}).$$
-This constitutes an **infinite-dimensional continuum of constraints** on $b$.
-A finite system of 2 linear equations arising from $\zeta(\rho_0) = 0$ cannot algebraically force an infinite family of nonlinear quadratic equations $\widehat{\nu}_b(\xi) \equiv 0$ without an intermediate functional equation.
+As derived in `TC_FINITE_CORRELATION_EQUATIONS.md`, for finite station support, vanishing of the cross-grade correlation measure $\nu_b = 0$ is equivalent to a **finite algebraic system of $L$ quadratic equations** on distinct spatial ratios $y_\ell = \tau^{K-J}(n/m)$:
+$$c_\ell(b) = \sum_{\text{atoms at } y_\ell} b_K b_J a_{K,n} a_{J,m} = 0 \qquad (\ell = 1, \dots, L),$$
+or equivalently, the vanishing of the first $L$ power moments $\mu_r(\nu_b) = 0$ ($r = 0, \dots, L-1$) via Vandermonde invertibility.
+The two linear equations arising from $\zeta(\rho_0) = 0$ supply only 2 constraints on $b$, which cannot algebraically force $L \gg 2$ independent quadratic equations $c_\ell(b) = 0$ without a deep structural bridge identity. Furthermore, setting $\mathcal{F}[F_b](\rho_0) = 0$ artificially suppresses the target quartet response under the reflected pairing.
 
 ---
 

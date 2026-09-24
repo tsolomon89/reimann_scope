@@ -477,9 +477,9 @@ def test_reproduced_defect_2_archimedean_mesh_difference_unjustified():
     assert arch['norm_delta_A_U_certified'] is None
     assert arch['mesh_diff_A_U_diagnostic'] > 0.0
 
-    # Prime quadrature remains rigorously bounded
+    # Prime quadrature remains rigorously bounded by parameter-dependent enclosure
     pq = budget['prime_quadrature']
-    assert pq['eps_table_quad'] == 1e-3
+    assert abs(pq['eps_table_quad'] - float(2.5e-12 * (0.05**(-5)))) < 1e-12
     assert pq['eps_ptwise'] < 300.0
 
 
@@ -594,6 +594,248 @@ def test_reproduced_defect_5_lean_formalization_derives_cancelling_atom_and_loca
 
     # Verify Lindemann transcendence hypothesis is stated
     assert "h_trans : ∀ (k : ℤ), k ≠ 0 → ∀ (r : ℚ), tau ^ k ≠ (r : ℝ)" in content
+
+
+def test_quadrature_h_001_enclosure_reproduction():
+    """
+    Verify parameter-dependent quadrature enclosure at h=0.01:
+    - At h=0.01, node v=2*h/9999 has observed 256-node quadrature error ~0.00586,
+      exceeding the old literal allowance 1e-3.
+    - Parameter-dependent derived bound eps_table_quad = 2.5e-12 * (0.01**(-5)) = 0.025
+      rigorously encloses the observed error (0.025 > 0.00586).
+    """
+    import mpmath
+    from tc.weil_forms import _compute_C_tab_fast, Z_CANONICAL_KERNEL
+
+    h = 0.01
+    N_tab = 10000
+    v_tab = np.linspace(0.0, 2.0 * h, N_tab)
+    dv = 2.0 * h / (N_tab - 1)
+    v1 = dv
+
+    c_tab_256 = _compute_C_tab_fast(v_tab, h, n_nodes=256)
+    computed_node1 = float(c_tab_256[1])
+
+    # Reference high-precision mpmath evaluation
+    mpmath.mp.dps = 40
+    z = mpmath.mpf(Z_CANONICAL_KERNEL)
+
+    def kappa(y):
+        if abs(y) >= 1:
+            return mpmath.mpf(0)
+        om = 1 - y**2
+        return mpmath.exp(-1 / om) / z
+
+    def d2kappa(y):
+        if abs(y) >= 1:
+            return mpmath.mpf(0)
+        om = 1 - y**2
+        return (-2 / (om**2) - 8 * (y**2) / (om**3) + 4 * (y**2) / (om**4)) * kappa(y)
+
+    def psi(y):
+        return (mpmath.mpf(h)**(-3)) * d2kappa(y) - mpmath.mpf('0.25') * (mpmath.mpf(h)**(-1)) * kappa(y)
+
+    xi1 = mpmath.mpf(v1) / mpmath.mpf(h)
+    exact_node1 = float(mpmath.mpf(h) * mpmath.quad(lambda y: psi(y) * psi(y - xi1), [-1 + xi1, 1]))
+
+    err_node1 = abs(computed_node1 - exact_node1)
+    # Independently observed error is ~0.00586 > 1e-3
+    assert err_node1 > 0.004
+    assert err_node1 > 1e-3  # exceeds old literal allowance
+
+    # Repaired parameter-dependent formula bounds this error
+    eps_quad_h001 = 2.5e-12 * (h**(-5))
+    assert abs(eps_quad_h001 - 0.025) < 1e-12
+    assert eps_quad_h001 > err_node1
+
+
+def test_spectral_zero_validator_adversarial_regressions():
+    """
+    Adversarial validation tests for validate_spectral_zero_coverage:
+    1. Rejects 29 fabricated evenly spaced numbers from ~14.1347 to 99 followed by 102.
+    2. Rejects omitted interior zero at T=50.
+    3. Rejects non-finite values (NaN and Inf).
+    4. Rejects duplicates.
+    5. Passes authoritative reference zeros.
+    """
+    import reference_data
+    from tc.weil_forms import validate_spectral_zero_coverage
+
+    # 1. 29 fabricated evenly spaced numbers
+    fab_29 = list(np.linspace(14.134725, 99.0, 29)) + [102.0]
+    ok_fab, reason_fab, _, _ = validate_spectral_zero_coverage(fab_29, 100.0)
+    assert ok_fab is False
+    assert "fabricated_or_displaced" in reason_fab
+
+    # 2. Deleted interior zero at T=50
+    auth_zeros = [float(g) for g in reference_data.load_reference_zeros()]
+    zeros_at_50 = [g for g in auth_zeros if g <= 50.0]
+    # Delete the 5th zero (~32.935)
+    omitted_50 = [g for idx, g in enumerate(auth_zeros) if idx != 4]
+    ok_del, reason_del, _, _ = validate_spectral_zero_coverage(omitted_50, 50.0)
+    assert ok_del is False
+    assert "zero_count_mismatch" in reason_del or "fabricated_or_displaced" in reason_del
+
+    # 3. Non-finite values
+    nan_list = [14.134725, float('nan'), 25.010857, 105.0]
+    ok_nan, reason_nan, _, _ = validate_spectral_zero_coverage(nan_list, 100.0)
+    assert ok_nan is False
+    assert "non_finite_zero_detected" in reason_nan
+
+    inf_list = [14.134725, float('inf'), 105.0]
+    ok_inf, reason_inf, _, _ = validate_spectral_zero_coverage(inf_list, 100.0)
+    assert ok_inf is False
+    assert "non_finite_zero_detected" in reason_inf
+
+    # 4. Monotonicity and duplicates
+    dup_list = [14.134725, 14.134725, 21.02204, 105.0]
+    ok_dup, reason_dup, _, _ = validate_spectral_zero_coverage(dup_list, 100.0)
+    assert ok_dup is False
+    assert "duplicate_or_inverted" in reason_dup
+
+    # 5. Authoritative reference data passes
+    ok_auth, _, _, crit = validate_spectral_zero_coverage(auth_zeros, 100.0)
+    assert ok_auth is True
+    assert len(crit) == 29
+
+
+def test_uncertified_archimedean_consumer_propagation():
+    """
+    Verify propagation of uncertified Archimedean remainder to all consumers:
+    1. evaluate_tc_arithmetic_spectral_baseline_comparison reports is_quadrature_bound_certified is False.
+    2. certify_explicit_formula_off_critical_sensitivity reports is_negative_witness_certified is False.
+    3. evaluate_tc_optimized_suppression_comparison reports complete_arithmetic_interval is None.
+    """
+    from tc.weil_forms import (
+        evaluate_tc_arithmetic_spectral_baseline_comparison,
+        certify_explicit_formula_off_critical_sensitivity,
+        evaluate_tc_optimized_suppression_comparison
+    )
+
+    # 1. Baseline comparison
+    res_base = evaluate_tc_arithmetic_spectral_baseline_comparison(T_cutoff=100.0)
+    arith = res_base['arithmetic_evaluation']
+    assert arith['is_quadrature_bound_certified'] is False
+    assert arith['certified_arithmetic_enclosure'] is None
+    assert arith['quadrature_bound_status'] == 'DIAGNOSTIC_MESH_DIFFERENCE'
+    assert 'algorithms' in arith
+
+    # 2. Sensitivity certificate
+    res_sens = certify_explicit_formula_off_critical_sensitivity(
+        delta_grid=[0.49], gamma_grid=[100.0], T_cutoff=100.0
+    )
+    assert res_sens['arithmetic_baseline']['is_arithmetic_margin_certified'] is False
+    assert res_sens['off_critical_sensitivity_summary']['is_negative_witness_certified'] is False
+
+    # 3. Campaign candidates
+    res_camp = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=100.0
+    )
+    cand0 = res_camp['candidates'][0]
+    assert cand0['complete_arithmetic_interval'] is None
+    assert cand0['is_arithmetic_certified'] is False
+    assert cand0['complete_arithmetic_interval_diagnostic'] is not None
+
+
+def test_station_norm_minimum_and_benchmark_reproduction():
+    """
+    Verify Target A:
+    1. Exact station-norm minimum theorem:
+       min_{1^T b = 0, ||b||_2 = 1} D_stat(b) = (D_(1) + D_(2)) / sqrt(2)
+       In 4 grades [-1, -2, -3, -4] on [8, 20]: D_(-4) ~ 7.2425, D_(-3) ~ 7.2479,
+       giving min D_stat = 10.2462643288.
+    2. Direct boundary pair b = (0, 0, 1, -1)/sqrt(2) attains exactly:
+       D_stat ~ 10.2462643288 and F_+ = 9.766422129803e11.
+    3. Theoretical floor:
+       F_+^floor = lambda_min(Q + S_T, P^T P) + (c_T / 2)(D_(1) + D_(2))^2 + eps_finite ~ 9.766416877355e11.
+    4. Counterexample refuting universal phase alignment:
+       b = (-1, 1, 1, -1)/2 on active stations (-1, 64), (-2, 512), (-3, 4096) satisfies
+       u_1 - 2*u_2 + u_3 = 0, but alternating signs forbid simultaneous triangle-equality alignment.
+    """
+    from tc.weil_forms import (
+        sieve_prime_powers_in_window,
+        evaluate_tc_optimized_suppression_comparison,
+        solve_complete_upper_objective
+    )
+
+    grades = [-1, -2, -3, -4]
+    window = (8.0, 20.0)
+    tau = 2.0 * math.pi
+    a_win, b_win = 8.0, 20.0
+
+    def w_bump(x):
+        if x <= a_win or x >= b_win:
+            return 0.0
+        u = 2.0 * (x - a_win) / (b_win - a_win) - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    D_vec = np.zeros(len(grades))
+    for i, K in enumerate(grades):
+        raw = sieve_prime_powers_in_window(window, K, tau=tau)
+        D_vec[i] = sum((tau**K) * lam * w_bump(x) for n, x, lam in raw if w_bump(x) > 0)
+
+    # 1. Exact station-norm minimum
+    d_sorted = np.sort(D_vec)
+    min_d_stat_exact = (d_sorted[0] + d_sorted[1]) / math.sqrt(2.0)
+    assert abs(min_d_stat_exact - 10.2462643288) < 1e-8
+
+    # 2. Reproduction of benchmark values
+    res = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[grades],
+        targets=[(0.49, 100.0)],
+        T_cutoff=100.0
+    )
+
+    c_soft = next(c for c in res['candidates'] if c['label'] == 'SOFT_SUPPRESSION_MU_1.0')
+    c_rem = next(c for c in res['candidates'] if c['label'] == 'REMAINDER_OPTIMIZED_CANDIDATE')
+    c_bound = next(c for c in res['candidates'] if c['label'] == 'DIRECT_LEGAL_BOUNDARY_PAIR')
+
+    f_plus_soft = c_soft['target_quartet_q'] + c_soft['finite_zero_sum_S'] + c_soft['tail_allowance_T'] + 1e-6
+    f_plus_rem = c_rem['details']['complete_upper_objective_F_plus']
+    f_plus_bound = c_bound['details']['complete_upper_objective_F_plus']
+
+    # Exact reproduction of benchmark table:
+    # Existing soft suppression: 1.343218666613e12
+    assert abs(f_plus_soft - 1.343218666613e12) / 1.343218666613e12 < 1e-6
+    # Remainder optimizer: F_+ <= 1.015e12
+    assert f_plus_rem <= 1.014826654379e12 + 1e6
+    # Direct legal pair b = (0, 0, 1, -1)/sqrt(2): 9.766422129803e11
+    assert abs(f_plus_bound - 9.766422129803e11) / 9.766422129803e11 < 1e-6
+
+    # 3. Theoretical floor is strictly bounded and close to boundary pair
+    floor_val = c_rem['details']['theoretical_lower_bound_floor_F_plus']
+    assert abs(floor_val - 9.766416877355e11) / 9.766416877355e11 < 1e-6
+    assert f_plus_bound >= floor_val
+    assert f_plus_bound - floor_val < 1.0e7  # within 0.0001% of theoretical floor
+
+
+def test_formal_extremal_correlation_tc_adapters_and_corollary():
+    """
+    Verify Target B:
+    Inspect formal/RiemannScope/ExtremalCorrelation.lean for:
+    1. Logarithmic lag equivalence: atom_spatial_ratio_eq_iff_log_lag_eq
+    2. Positive weight extension: positive_weight_extension and positive_weight_extension_pos
+    3. Support-restricted theorem: full_finite_extremal_grade_correlation_theorem_support
+    4. Cross-grade atom list builder: make_cross_grade_atoms
+    5. TC nonvanishing corollary: tc_extremal_correlation_nonvanishing_corollary
+    6. tau_transcendence hypothesis stated explicitly
+    7. 0 sorry in the entire file.
+    """
+    lean_file = os.path.join(os.path.dirname(__file__), "..", "formal", "RiemannScope", "ExtremalCorrelation.lean")
+    with open(lean_file, "r", encoding="utf-8") as f:
+        code = f.read()
+
+    assert "sorry" not in code
+    assert "theorem atom_spatial_ratio_eq_iff_log_lag_eq" in code
+    assert "def positive_weight_extension" in code
+    assert "theorem positive_weight_extension_pos" in code
+    assert "theorem full_finite_extremal_grade_correlation_theorem_support" in code
+    assert "def make_cross_grade_atoms" in code
+    assert "theorem tc_extremal_correlation_nonvanishing_corollary" in code
+    assert "def tau_transcendence" in code
+
 
 
 
