@@ -4,12 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "a5c24799dae5f9a9846e9273f8ec2f09c8a83553",
-  "timestamp": "2026-09-24T12:25:27.456336+00:00",
+  "producing_git_commit": "8fb7def0eabaf6ef662de0b80ec74676acfed061",
+  "timestamp": "2026-09-24T17:15:23.167279+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 284,
-  "total_theorems": 284,
+  "project_theorem_declarations_compiled": 293,
+  "total_theorems": 293,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "862ae6dd267120a2acd3fed27acdfe2c1970891f317b72e5a4c118a548e1bedc",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -23,7 +23,7 @@
     "formal/RiemannScope/Contradiction.lean": "cf88773c4bd0890f72d6e896324e6f5a268d35eaacdb7fd04a7f7085c325f3cb",
     "formal/RiemannScope/ArithmeticBridge.lean": "1b042194e43c2033d1a1b0b830631f65455b4f1b29f28583e9f5110240eca71f",
     "formal/RiemannScope/CurvatureTransport.lean": "c7b516c226155154414b16b34194bd8cecd5efae77c4774ac8bfc56d7243694f",
-    "formal/RiemannScope/ExtremalCorrelation.lean": "42a3db5c368f793d960add312f7936d4b6f3d57beba4dc563704973a67b4a54e"
+    "formal/RiemannScope/ExtremalCorrelation.lean": "5020f53de8754228cf671dcc516010b77758e332d88de40e95a58ef3c2b74691"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
@@ -32,7 +32,7 @@
     "scripts/build_formal.py": "648f57e759aef651b8ed64bad178efd01e8f2682c2a5cdbd827288b919f9247d",
     "certification.py": "ef0db9f9611d2c31730f84cd25c4bcf6a808ee4dbbf798d0d7e00e8102250ebc"
   },
-  "build_stdout": "\u2139 [1550/1560] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:347:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:348:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\nBuild completed successfully.",
+  "build_stdout": "\u2139 [1547/1560] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:580:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:581:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:582:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:583:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "f33126df09963926148011c9f70d7746586b5697e2588c23bf89ddc20029fb95"
+  "report_hash": "eb4d4ea8c7db59b7de2b8d288a1eb50b29cdc088230366814ae67e117ab60496"
 }
