@@ -4473,16 +4473,15 @@ def test_baseline_canonical_weil_error_budget(tmp_path):
     out_file = str(tmp_path / "test_error_budget.json")
     res = transcendental.certify_baseline_canonical_weil_error_budget(output_path=out_file)
 
-    assert res['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED'
-    assert res['epistemic_class'] == 'CERTIFIED_FINITE_QUADRATURE_ERROR_BUDGET'
-    assert res['error_budget']['is_strictly_positive'] is True
+    assert res['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_NUMERICALLY_UNRESOLVED'
+    assert res['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
+    assert res['error_budget']['is_strictly_positive'] is False
 
     # Error budget numbers
     eb = res['error_budget']
     assert eb['lambda_min_computed'] > 1.3e7
-    assert eb['certified_lambda_min_lower_margin'] > 1.3e7
-    assert eb['bound_delta_W_G'] < 2000.0
-    assert eb['margin_ratio'] > 8000.0
+    assert eb['bound_delta_W_G_prime_certified'] < 2000.0
+    assert eb['mesh_diff_A_U_diagnostic'] > 0.0
 
     # Subspace contraction
     sc = res['subspace_contraction']
@@ -4500,7 +4499,7 @@ def test_baseline_canonical_weil_error_budget(tmp_path):
     assert os.path.exists(out_file)
     with open(out_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
-    assert data['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED'
+    assert data['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_NUMERICALLY_UNRESOLVED'
 
 
 def test_enlarged_grade_space_rayleigh_spectrum():

@@ -1,6 +1,6 @@
 {
-  "status": "BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED",
-  "epistemic_class": "CERTIFIED_FINITE_QUADRATURE_ERROR_BUDGET",
+  "status": "BASELINE_CANONICAL_WEIL_ERROR_BUDGET_NUMERICALLY_UNRESOLVED",
+  "epistemic_class": "NUMERICALLY_UNRESOLVED",
   "parameters": {
     "grades": [
       -1,
@@ -29,8 +29,11 @@
   "archimedean_quadrature": {
     "N_t_baseline": 1000,
     "N_t_refined": 2000,
-    "mesh_diff_A_U": 2.8539920919670867,
-    "norm_delta_A_U": 5.7079841839351735,
+    "norm_delta_A_U": 2.8539920919670867,
+    "mesh_diff_A_U_diagnostic": 2.8539920919670867,
+    "norm_delta_A_U_certified": null,
+    "is_remainder_theorem_certified": false,
+    "diagnostic_note": "Empirical mesh difference across N_t=1000 and 2000 is retained as a numerical convergence diagnostic, but does not constitute an analytic remainder theorem without verified interval arithmetic.",
     "W_arch_1000_00": 56881224862.19152,
     "W_arch_2000_00": 56881224862.179214
   },
@@ -38,15 +41,15 @@
     "norm_psi_prime_sq": 20797123831128.625,
     "delta_v": 1.0001000100010001e-05,
     "eps_interp": 260.0160484986471,
-    "eps_table_quad": 1e-10,
-    "eps_ptwise": 260.01604849874707,
+    "eps_table_quad": 0.001,
+    "eps_ptwise": 260.01704849864706,
     "M_pair_norm_F": 618546.3413936852,
     "M_pair_norm_2": 618546.3399340526,
     "contracted_M_norm": 3.0993863083017703,
-    "norm_delta_W_prime": 805.8901806557458,
-    "relative_discrepancy_pct": 0.00014783726763015098,
-    "W_prime_00_interp": -184798412.40405273,
-    "W_prime_00_direct_or_bound": -184798412.40405273
+    "norm_delta_W_prime": 805.8932800417441,
+    "relative_discrepancy_pct": 0.00014783783619987464,
+    "W_prime_00_interp": -184798411.03002155,
+    "W_prime_00_direct_or_bound": -184798411.03002155
   },
   "subspace_contraction": {
     "norm_DP_sq": 0.07621149371767985,
@@ -60,60 +63,62 @@
     "tail_psd_justification": "At T_U = 320.0 >= 10.0, digamma weight omega(t) >= 3.9304 > 0. By Bochner's theorem, the Fourier transform of the non-negative tail weight is positive semidefinite (R_U >= 0). Therefore, tail truncation strictly underestimates quadratic form positivity."
   },
   "error_budget": {
-    "bound_delta_W_G_arch": 0.4350140007745914,
-    "bound_delta_W_G_prime": 805.8901806557458,
-    "bound_delta_W_G": 806.3251946565204,
-    "lambda_min_computed": 13225698.898040771,
-    "certified_lambda_min_lower_margin": 13224892.572846115,
-    "margin_ratio": 16402.437857190704,
-    "is_strictly_positive": true
+    "mesh_diff_A_U_diagnostic": 2.8539920919670867,
+    "bound_delta_W_G_arch_diagnostic": 0.2175070003872576,
+    "bound_delta_W_G_prime_certified": 805.8932800417441,
+    "bound_delta_W_G": 806.1107870421314,
+    "lambda_min_computed": 13225698.892593263,
+    "certified_lambda_min_lower_margin": 13224892.781806221,
+    "margin_ratio": 16406.800535596878,
+    "is_strictly_positive": false,
+    "unresolved_reason": "Archimedean continuous quadrature on [0, U_phys] lacks an applicable analytic remainder theorem. Per Rule 0, an unresolved check creates a research obligation and prevents a certified status."
   },
   "eigenvalues_computed": [
-    13225698.898040771,
-    137877925.5402305,
-    4428967703.106849
+    13225698.892593263,
+    137877925.59465298,
+    4428967703.579116
   ],
   "W_G": [
     [
-      1481526784.5433564,
-      1451007287.1096435,
-      1362921341.0756795
+      1481526784.7535398,
+      1451007287.285702,
+      1362921341.1842196
     ],
     [
-      1451007287.1096432,
-      1664364277.121843,
-      1530863090.3674
+      1451007287.2857018,
+      1664364277.3390522,
+      1530863090.5257416
     ],
     [
-      1362921341.0756795,
-      1530863090.3674,
-      1434180265.8799193
+      1362921341.1842196,
+      1530863090.5257416,
+      1434180265.9737716
     ]
   ],
   "W_net_raw": [
     [
-      57066023274.58327,
-      17301721647.579685,
-      -143942392010.27676,
-      80814339215.12033
+      57066023273.209236,
+      17301721590.092167,
+      -143942392433.13525,
+      80814337278.34346
     ],
     [
-      17301721647.579685,
-      273570387433.83307,
-      -167434019736.05478,
-      -281461745074.8165
+      17301721590.092167,
+      273570387093.24835,
+      -167434022597.56348,
+      -281461762683.8886
     ],
     [
-      -143942392010.27676,
-      -167434019736.05478,
-      2101290109489.4248,
-      486928963001.2117
+      -143942392433.13525,
+      -167434022597.56348,
+      2101290091607.983,
+      486928856320.02563
     ],
     [
-      80814339215.12033,
-      -281461745074.8165,
-      486928963001.2117,
-      12597477478325.209
+      80814337278.34346,
+      -281461762683.8886,
+      486928856320.02563,
+      12597476830005.438
     ]
   ],
   "M_pair": [
@@ -142,5 +147,5 @@
       603082.4865191692
     ]
   ],
-  "mathematical_conclusion": "The contracted canonical Weil quadratic form W_G at baseline (grades=[-1, -2, -3, -4], h=0.05, window=(8.0, 20.0), U=320.0) has computed minimum eigenvalue lambda_min = 1.3226e+07 > 0. Under the analytic autocorrelation interpolation theorem ||C_h - \\Pi C_h||_infty <= (\\Delta v^2/8) ||psi_h'||_2^2 (eps_ptwise = 260.02) and authentic prime pairing contraction (|||P|^T D M_pair D |P|||_2 = 3.0994), the contracted prime error is rigorously bounded by 805.89. Archimedean quadrature error on [0, 320.0] is bounded by 0.4350. The certified lower margin lambda_min(W_G) - ||Delta W_G|| >= 1.3225e+07 (CERTIFIED POSITIVE). Together with R_U >= 0 by Bochner's theorem, complete positivity is rigorously established."
+  "mathematical_conclusion": "The contracted canonical Weil quadratic form W_G at baseline (grades=[-1, -2, -3, -4], h=0.05, window=(8.0, 20.0), U=320.0) has computed minimum eigenvalue lambda_min = 1.3226e+07 > 0. Under the analytic autocorrelation interpolation theorem ||C_h - \\Pi C_h||_infty <= (\\Delta v^2/8) ||psi_h'||_2^2 + eps_table_quad (eps_ptwise = 260.02) and authentic prime pairing contraction (|||P|^T D M_pair D |P|||_2 = 3.0994), the contracted prime error is rigorously bounded by 805.89. However, Archimedean continuous quadrature lacks an applicable analytic remainder theorem (mesh difference 2.8540e+00 is diagnostic only). Therefore, the complete error budget is NUMERICALLY_UNRESOLVED pending a certified Archimedean remainder theorem."
 }

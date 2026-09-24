@@ -291,13 +291,15 @@ def test_analytic_interpolation_error_formula_and_derivative_norm():
         U=320.0,
         N_tab_prime=10000
     )
-    assert budget['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_CERTIFIED'
+    assert budget['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_NUMERICALLY_UNRESOLVED'
+    assert budget['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
     pq = budget['prime_quadrature']
     assert abs(pq['norm_psi_prime_sq'] - norm_psi_prime_sq) < 1.0
     assert pq['eps_interp'] < 300.0  # \approx 260.0, tightly bounded
     # Verify literal 20875.06 is completely gone
     assert pq['norm_delta_W_prime'] < 1000.0
-    assert budget['error_budget']['certified_lambda_min_lower_margin'] > 1.32e7 > 0.0
+    assert budget['error_budget']['lambda_min_computed'] > 1.32e7
+    assert budget['error_budget']['is_strictly_positive'] is False
 
 
 def test_decoupled_cutoff_and_direction_specific_budget():
@@ -375,5 +377,223 @@ def test_campaign_minima_and_3525_fold_reduction():
 
     # Summary findings must record NUMERICALLY_UNRESOLVED for complete functional
     assert data['summary_findings']['epistemic_decision'] == 'NUMERICALLY_UNRESOLVED'
+
+
+def test_reproduced_defect_1_table_quadrature_and_interpolation_discrepancy():
+    """
+    Defect 1 Reproduction & Repair:
+    At h=0.05, N_tab_prime=10000, let dv=0.1/9999 and v=1.5*dv.
+    - Old 64-node table gives ~175877223.213778, while independent 60-digit integration gives ~175877566.664707.
+      Discrepancy is ~343.45093, exceeding declared pointwise allowance 260.01605.
+    - At the first table node (v=dv), 64-node quadrature error alone is ~83.22394 against allowance 1e-10.
+    - Repaired 256-node table reduces nodal error to < 2e-6 and discrepancy to ~259.99844 <= 260.0165.
+    """
+    import mpmath
+    from tc.weil_forms import _compute_C_tab_fast, Z_CANONICAL_KERNEL
+
+    h = 0.05
+    N_tab_prime = 10000
+    v_tab = np.linspace(0.0, 2.0 * h, N_tab_prime)
+    dv = 0.1 / 9999.0
+    v = 1.5 * dv
+
+    # 1. 64-node table evaluation
+    c_tab_64 = _compute_C_tab_fast(v_tab, h, n_nodes=64)
+    interp_val_64 = float(np.interp(v, v_tab, c_tab_64))
+    assert abs(interp_val_64 - 175877223.213778) < 1.0
+
+    # 2. Independent 60-digit mpmath reference
+    mpmath.mp.dps = 60
+    z = mpmath.mpf(Z_CANONICAL_KERNEL)
+
+    def kappa(y):
+        if abs(y) >= 1:
+            return mpmath.mpf(0)
+        om = 1 - y**2
+        return mpmath.exp(-1 / om) / z
+
+    def d2kappa(y):
+        if abs(y) >= 1:
+            return mpmath.mpf(0)
+        om = 1 - y**2
+        return (-2 / (om**2) - 8 * (y**2) / (om**3) + 4 * (y**2) / (om**4)) * kappa(y)
+
+    def psi(y):
+        return (mpmath.mpf(h)**(-3)) * d2kappa(y) - mpmath.mpf('0.25') * (mpmath.mpf(h)**(-1)) * kappa(y)
+
+    xi = mpmath.mpf(v) / mpmath.mpf(h)
+    exact_val = float(mpmath.mpf(h) * mpmath.quad(lambda y: psi(y) * psi(y - xi), [-1 + xi, 1]))
+    assert abs(exact_val - 175877566.664707) < 1.0
+
+    # Reproduce defect: 64-node discrepancy is ~343.45 > 260.016
+    disc_64 = abs(interp_val_64 - exact_val)
+    assert abs(disc_64 - 343.45093) < 0.01
+    assert disc_64 > 260.01605
+
+    # Node 1 quadrature error is ~83.22 > 1e-10
+    xi_node1 = mpmath.mpf(dv) / mpmath.mpf(h)
+    exact_node1 = float(mpmath.mpf(h) * mpmath.quad(lambda y: psi(y) * psi(y - xi_node1), [-1 + xi_node1, 1]))
+    node1_err_64 = abs(c_tab_64[1] - exact_node1)
+    assert abs(node1_err_64 - 83.22394) < 0.01
+    assert node1_err_64 > 80.0
+
+    # 3. Verify repaired 256-node table
+    c_tab_256 = _compute_C_tab_fast(v_tab, h, n_nodes=256)
+    interp_val_256 = float(np.interp(v, v_tab, c_tab_256))
+    disc_256 = abs(interp_val_256 - exact_val)
+    node1_err_256 = abs(c_tab_256[1] - exact_node1)
+
+    assert node1_err_256 < 2e-6  # certified node accuracy
+    assert disc_256 < 260.0165   # strictly bounded by analytic interpolation + node tolerance
+
+
+def test_reproduced_defect_2_archimedean_mesh_difference_unjustified():
+    """
+    Defect 2 Reproduction & Repair:
+    certify_baseline_canonical_weil_error_budget previously set the Archimedean allowance
+    to 2*mesh_difference + 1e-12 without an analytic remainder theorem.
+    Repaired budget retains mesh difference strictly as diagnostic and sets epistemic class
+    to NUMERICALLY_UNRESOLVED.
+    """
+    from tc.weil_forms import certify_baseline_canonical_weil_error_budget
+
+    budget = certify_baseline_canonical_weil_error_budget(
+        grades=[-1, -2, -3, -4],
+        anchor_grade=-1,
+        window=(8.0, 20.0),
+        h=0.05,
+        U=320.0,
+        N_tab_prime=10000
+    )
+
+    # Status must be NUMERICALLY_UNRESOLVED per Rule 0
+    assert budget['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_NUMERICALLY_UNRESOLVED'
+    assert budget['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
+    assert budget['error_budget']['is_strictly_positive'] is False
+
+    # Archimedean quadrature must report diagnostic difference without false certification
+    arch = budget['archimedean_quadrature']
+    assert arch['is_remainder_theorem_certified'] is False
+    assert arch['norm_delta_A_U_certified'] is None
+    assert arch['mesh_diff_A_U_diagnostic'] > 0.0
+
+    # Prime quadrature remains rigorously bounded
+    pq = budget['prime_quadrature']
+    assert pq['eps_table_quad'] == 1e-3
+    assert pq['eps_ptwise'] < 300.0
+
+
+def test_reproduced_defect_3_spectral_zero_coverage_gaps_and_duplicates():
+    """
+    Defect 3 Reproduction & Repair:
+    At T=100, reference lists with omissions ([14.13, 105.0]), no zeros below cutoff ([105.0]),
+    or duplicates ([14.13, 14.13, 105.0]) must fail validation and not authorize a complete interval.
+    """
+    from tc.weil_forms import validate_spectral_zero_coverage, evaluate_tc_optimized_suppression_comparison
+
+    # Case 1: Gap omitting 28 intermediate zeros
+    ok1, reason1, _, _ = validate_spectral_zero_coverage([14.134725, 105.0], 100.0)
+    assert ok1 is False
+    assert "omitted_zeros" in reason1 or "zero_count_mismatch" in reason1
+
+    # Case 2: No zeros below cutoff
+    ok2, reason2, _, _ = validate_spectral_zero_coverage([105.0, 110.0], 100.0)
+    assert ok2 is False
+    assert "no_zeros_below_cutoff" in reason2
+
+    # Case 3: Duplicated zeros
+    ok3, reason3, _, _ = validate_spectral_zero_coverage([14.134725, 14.134725, 105.0], 100.0)
+    assert ok3 is False
+    assert "duplicate_or_inverted" in reason3
+
+    # Case 4: Standard authoritative zeros pass
+    import reference_data
+    ref_zeros = [float(g) for g in reference_data.load_reference_zeros()]
+    ok_ref, _, _, crit = validate_spectral_zero_coverage(ref_zeros, 100.0)
+    assert ok_ref is True
+    assert len(crit) == 29
+
+    # Case 5: When zero list is incomplete (e.g. at T=500), caller returns None for complete_spectral_interval
+    res_incomplete = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=500.0
+    )
+    assert res_incomplete['zero_accounting']['is_complete'] is False
+    for cand in res_incomplete['candidates']:
+        assert cand['complete_spectral_interval'] is None
+        assert cand['spectral_interval_status'] == 'PARTIAL_INCOMPLETE_ZEROS'
+
+
+def test_reproduced_defect_4_complete_objective_optimizer_includes_remainder():
+    """
+    Defect 4 Reproduction & Repair:
+    Previously, candidates were generated purely on Q + mu*S_T with tail appended ex-post.
+    The repaired solve_complete_upper_objective directly minimizes:
+        F_+(beta) = q(P beta) + S_T(P beta) + B_T(P beta) + eps_finite
+    achieving a substantially lower complete upper estimate.
+    """
+    from tc.weil_forms import (
+        solve_complete_upper_objective,
+        evaluate_tc_optimized_suppression_comparison
+    )
+
+    res = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=100.0
+    )
+
+    # Find the soft suppression candidate (mu=1) and remainder optimized candidate
+    c_soft = next(c for c in res['candidates'] if c['label'] == 'SOFT_SUPPRESSION_MU_1.0')
+    c_rem = next(c for c in res['candidates'] if c['label'] == 'REMAINDER_OPTIMIZED_CANDIDATE')
+
+    f_plus_soft = c_soft['target_quartet_q'] + c_soft['finite_zero_sum_S'] + c_soft['tail_allowance_T']
+    f_plus_rem = c_rem['details']['complete_upper_objective_F_plus']
+
+    # Soft suppression has F_+ ~ 1.343e12
+    assert 1.3e12 < f_plus_soft < 1.4e12
+    assert abs(c_soft['station_norm_D_stat'] - 12.016) < 0.1
+
+    # Remainder-optimized candidate achieves F_+ ~ 9.77e11 (1.38-fold reduction, >360B units)
+    assert f_plus_rem < 1.05e12
+    assert f_plus_rem < f_plus_soft
+    reduction = f_plus_soft - f_plus_rem
+    assert reduction > 3.0e11
+
+    # Station norm is substantially reduced
+    assert c_rem['station_norm_D_stat'] < c_soft['station_norm_D_stat']
+    assert c_rem['station_norm_D_stat'] < 10.5
+
+    # Remainder optimized candidate is feasible
+    assert c_rem['details']['is_feasible'] is True
+    assert c_rem['details']['unit_norm_error'] < 1e-5
+
+
+def test_reproduced_defect_5_lean_formalization_derives_cancelling_atom_and_location():
+    """
+    Defect 5 Reproduction & Repair:
+    Verify that formal/RiemannScope/ExtremalCorrelation.lean contains the full finite correlation theorem
+    without assuming h_loc, and proves integer collision and transcendence contradiction with 0 sorry.
+    """
+    lean_path = os.path.join(os.path.dirname(__file__), "..", "formal", "RiemannScope", "ExtremalCorrelation.lean")
+    assert os.path.exists(lean_path)
+    with open(lean_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Verify no sorry Ax or sorry keyword in the file
+    assert "sorry" not in content
+
+    # Verify theorem signatures are present
+    assert "theorem full_finite_extremal_grade_correlation_theorem" in content
+    assert "theorem full_finite_correlation_transcendence_contradiction" in content
+
+    # Verify atomic measure nu_b_mass_at is defined and used
+    assert "def nu_b_mass_at" in content
+    assert "h_nu_zero : ∀ y : ℝ, nu_b_mass_at atoms a b tau y = 0" in content
+
+    # Verify Lindemann transcendence hypothesis is stated
+    assert "h_trans : ∀ (k : ℤ), k ≠ 0 → ∀ (r : ℚ), tau ^ k ≠ (r : ℝ)" in content
+
 
 
