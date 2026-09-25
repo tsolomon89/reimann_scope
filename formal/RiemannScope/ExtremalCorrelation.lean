@@ -577,9 +577,98 @@ theorem tc_extremal_correlation_nonvanishing_corollary
     b hb_plus hb_minus a_ext h_a_ext_pos atoms h_atoms_in_G h_atoms_pos
     n0 m0 hn0 hm0 h_p0_in h_nu_ext_zero
 
+/-- Three-Coefficient Legal Zero Deduction:
+    On three grades with zero sum b1 + b2 + b3 = 0, if the three pairwise cross-grade
+    coefficients c12 = a12 * b1 * b2, c13 = a13 * b1 * b3, and c23 = a23 * b2 * b3
+    all vanish with strictly positive station-amplitude products a12 > 0, a13 > 0, a23 > 0,
+    then every legal coordinate must vanish: b1 = 0 ∧ b2 = 0 ∧ b3 = 0.
+    Equivalently, every non-zero legal vector has at least one non-zero selected coefficient. -/
+theorem three_coefficient_legal_vanishing
+    (b1 b2 b3 : ℝ)
+    (h_sum : b1 + b2 + b3 = 0)
+    (a12 a13 a23 : ℝ)
+    (ha12 : 0 < a12)
+    (ha13 : 0 < a13)
+    (ha23 : 0 < a23)
+    (h12 : a12 * b1 * b2 = 0)
+    (h13 : a13 * b1 * b3 = 0)
+    (h23 : a23 * b2 * b3 = 0) :
+    b1 = 0 ∧ b2 = 0 ∧ b3 = 0 := by
+  have ha12_ne : a12 ≠ 0 := ne_of_gt ha12
+  have ha13_ne : a13 ≠ 0 := ne_of_gt ha13
+  have ha23_ne : a23 ≠ 0 := ne_of_gt ha23
+  have hb12 : b1 * b2 = 0 := by
+    have h12' : a12 * (b1 * b2) = 0 := by
+      calc a12 * (b1 * b2) = a12 * b1 * b2 := by rw [mul_assoc]
+      _ = 0 := h12
+    cases mul_eq_zero.mp h12' with
+    | inl h => exact False.elim (ha12_ne h)
+    | inr h => exact h
+  have hb13 : b1 * b3 = 0 := by
+    have h13' : a13 * (b1 * b3) = 0 := by
+      calc a13 * (b1 * b3) = a13 * b1 * b3 := by rw [mul_assoc]
+      _ = 0 := h13
+    cases mul_eq_zero.mp h13' with
+    | inl h => exact False.elim (ha13_ne h)
+    | inr h => exact h
+  have hb23 : b2 * b3 = 0 := by
+    have h23' : a23 * (b2 * b3) = 0 := by
+      calc a23 * (b2 * b3) = a23 * b2 * b3 := by rw [mul_assoc]
+      _ = 0 := h23
+    cases mul_eq_zero.mp h23' with
+    | inl h => exact False.elim (ha23_ne h)
+    | inr h => exact h
+  by_cases hb1 : b1 = 0
+  · subst hb1
+    have hb3_eq : b3 = -b2 := by linarith
+    have hb2_sq : b2 * b2 = 0 := by
+      calc b2 * b2 = -(b2 * (-b2)) := by ring
+      _ = -(b2 * b3) := by rw [hb3_eq]
+      _ = -0 := by rw [hb23]
+      _ = 0 := by ring
+    have hb2 : b2 = 0 := by
+      cases mul_eq_zero.mp hb2_sq with
+      | inl h => exact h
+      | inr h => exact h
+    have hb3 : b3 = 0 := by linarith
+    exact ⟨rfl, hb2, hb3⟩
+  · have hb2 : b2 = 0 := by
+      cases mul_eq_zero.mp hb12 with
+      | inl h => exact False.elim (hb1 h)
+      | inr h => exact h
+    have hb3 : b3 = 0 := by
+      cases mul_eq_zero.mp hb13 with
+      | inl h => exact False.elim (hb1 h)
+      | inr h => exact h
+    have hb1_zero : b1 = 0 := by linarith
+    exact False.elim (hb1 hb1_zero)
+
+/-- Non-zero Legal Vector Has Non-Zero Selected Coefficient:
+    For any legal vector b with sum b1 + b2 + b3 = 0 and (b1 ≠ 0 ∨ b2 ≠ 0 ∨ b3 ≠ 0),
+    at least one of the three selected cross-grade coefficients is non-zero. -/
+theorem nonzero_legal_has_nonzero_selected_coefficient
+    (b1 b2 b3 : ℝ)
+    (h_sum : b1 + b2 + b3 = 0)
+    (h_nonzero : b1 ≠ 0 ∨ b2 ≠ 0 ∨ b3 ≠ 0)
+    (a12 a13 a23 : ℝ)
+    (ha12 : 0 < a12)
+    (ha13 : 0 < a13)
+    (ha23 : 0 < a23) :
+    a12 * b1 * b2 ≠ 0 ∨ a13 * b1 * b3 ≠ 0 ∨ a23 * b2 * b3 ≠ 0 := by
+  by_contra h_all_zero
+  push_neg at h_all_zero
+  have ⟨h12, h13, h23⟩ := h_all_zero
+  have ⟨hb1, hb2, hb3⟩ := three_coefficient_legal_vanishing b1 b2 b3 h_sum a12 a13 a23 ha12 ha13 ha23 h12 h13 h23
+  rcases h_nonzero with h | h | h
+  · exact h hb1
+  · exact h hb2
+  · exact h hb3
+
 #print axioms full_finite_extremal_grade_correlation_theorem
 #print axioms full_finite_correlation_transcendence_contradiction
 #print axioms full_finite_extremal_grade_correlation_theorem_support
 #print axioms tc_extremal_correlation_nonvanishing_corollary
+#print axioms three_coefficient_legal_vanishing
+#print axioms nonzero_legal_has_nonzero_selected_coefficient
 
 end RiemannScope

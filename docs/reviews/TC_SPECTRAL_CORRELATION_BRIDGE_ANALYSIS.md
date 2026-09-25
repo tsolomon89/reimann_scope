@@ -23,8 +23,8 @@ This document presents the detailed mathematical and computational investigation
 
 ## 2. Mathematical Structure of the Grouped Correlation System
 
-For a finite set of integer grades $\mathcal{G} \subset \mathbb{Z}$ and compact window $[a, b] \subset (0, \infty)$, active stations $n \in \mathcal{S}_K$ are prime powers $n = p^m$ with amplitudes:
-$$a_{K, n} = \tau^K \frac{\Lambda(n)}{\sqrt{n}} w(\tau^K n) > 0.$$
+For a finite set of integer grades $\mathcal{G} \subset \mathbb{Z}$ and compact window $[a, b] \subset (0, \infty)$, active stations $n \in \mathcal{S}_K$ are prime powers $n = p^m$ with authentic amplitudes:
+$$a_{K, n} = \tau^K \Lambda(n) w(\tau^K n) > 0.$$
 The Dirichlet polynomial on grade $K$ is:
 $$E_K(z) = \sum_{n \in \mathcal{S}_K} a_{K, n} (\tau^K n)^z.$$
 For a legal zero-sum coefficient vector $b$ ($\mathbf{1}^T b = 0$, $b = P \beta$ on legal subspace of dimension $m = r - 1$), the total Dirichlet polynomial is:
@@ -41,11 +41,14 @@ where:
    $$\nu_b = \sum_{\substack{K \ne J \\ n \in \mathcal{S}_K, m \in \mathcal{S}_J}} b_K b_J a_{K, n} a_{J, m} \, \delta_{\tau^{K-J} n / m} = \sum_{\ell=1}^L c_\ell(b) \, \delta_{y_\ell}.$$
    Each atom is indexed by the exact reduced key $(d, \operatorname{num}, \operatorname{den})$ where $d = K - J$ and $\operatorname{num}/\operatorname{den} = \operatorname{reduce}(n/m)$.
 
-### Multi-Grade Coincidences
+### Multi-Grade Coincidences & Reciprocal Atoms
 Multiple distinct station pairs across different grades can share the identical spatial ratio:
 $$(1, 1, 8) \iff y = \frac{\tau}{8}: \quad \begin{cases} \text{Grade } (-1, 64) \text{ and } (-2, 512) & (d=1, 64/512 = 1/8) \\ \text{Grade } (-2, 512) \text{ and } (-3, 4096) & (d=1, 512/4096 = 1/8) \end{cases}$$
-The grouped matrix $M_{(1, 1/8)}$ combines both interactions:
-$$c_{(1, 1/8)}(b) = 2 b_{-1} b_{-2} a_{-1, 64} a_{-2, 512} + 2 b_{-2} b_{-3} a_{-2, 512} a_{-3, 4096} = \beta^T G_{(1, 1/8)} \beta.$$
+The grouped matrix $M_{(1, 1/8)}$ combines both interactions with their authentic oriented coefficients (without spurious doubling):
+$$c_{(1, 1/8)}(b) = b_{-1} b_{-2} a_{-1, 64} a_{-2, 512} + b_{-2} b_{-3} a_{-2, 512} a_{-3, 4096} = \beta^T G_{(1, 1/8)} \beta.$$
+The reciprocal atom $(-1, 8, 1)$ ($y = 8/\tau = (\tau/8)^{-1}$) has the identical coefficient:
+$$c_{(-1, 8, 1)}(b) = b_{-2} b_{-1} a_{-2, 512} a_{-1, 64} + b_{-3} b_{-2} a_{-3, 4096} a_{-2, 512} = c_{(1, 1/8)}(b).$$
+Thus, any legal vector $b$ that nulls the oriented atom $c_{(1, 1/8)}(b)$ simultaneously nulls the reciprocal atom $c_{(-1, 8, 1)}(b)$.
 
 ---
 
@@ -53,59 +56,73 @@ $$c_{(1, 1/8)}(b) = 2 b_{-1} b_{-2} a_{-1, 64} a_{-2, 512} + 2 b_{-2} b_{-3} a_{
 
 We evaluated three potential mathematical mechanisms to deduce $\nu_b = 0$ from hypothesis $H$:
 
-### Mechanism A: Zero-Density and Paley-Wiener Barriers
+### Mechanism A: Critical-Line Zero Density and Fixed-Function Barriers
 **Can an admissible test function or Dirichlet polynomial vanish on all critical zeros to isolate an off-critical zero?**
 
-1. **Riemann Zero Growth**: By the Riemann-von Mangoldt formula, the number of critical zeros up to height $T$ grows super-linearly:
-   $$N(T) = \frac{T}{2\pi} \log\left(\frac{T}{2\pi e}\right) + \frac{7}{8} + S(T) \sim \frac{T \log T}{2\pi}.$$
-   At $T = 100$, $N(100) \approx 29$. At $T = 1000$, $N(1000) \approx 649$. At $T = 10000$, $N(10000) \approx 10,143$.
-2. **Paley-Wiener Linear Bound**: If $g \in C_c^\infty(\mathbb{R})$ has compact support in $[-R, R]$, its Fourier transform $\widehat{g}(z)$ is an entire function of exponential type $R$. By Jensen's formula, its zero count $n_{\widehat{g}}(T)$ in $[-T, T]$ satisfies:
+1. **Critical-Line Zero Density (Conrey 1989)**:
+   While the Riemann-von Mangoldt formula counts all non-trivial zeros in the critical strip with multiplicity:
+   $$N(T) = \frac{T}{2\pi} \log\left(\frac{T}{2\pi e}\right) + \frac{7}{8} + S(T) \sim \frac{T \log T}{2\pi},$$
+   the key mathematical fact required for distinct zero isolation is the density of distinct zeros *on* the critical line.
+   By Theorem 1 of J. B. Conrey ("More than two fifths of the zeros of the Riemann zeta function are on the critical line", Bull. Amer. Math. Soc. 20 (1989), 79–81):
+   $$N_0(T) \ge \left(\frac{2}{5} - \epsilon\right) N(T) \ge c \, T \log T \quad (c > 0).$$
+   Thus, the number of distinct critical-line zeros up to height $T$ grows at least as $c T \log T$.
+2. **Fixed-Function Paley-Wiener Linear Bound**:
+   If $g \in C_c^\infty(\mathbb{R})$ is a fixed, non-zero compactly supported test function supported in $[-R, R]$, its Fourier-Laplace transform $\widehat{g}(z)$ is an entire function of finite exponential type $R$. By Jensen's formula, the number of zeros $n_{\widehat{g}}(T)$ of $\widehat{g}$ in $[-T, T]$ is linearly bounded:
    $$n_{\widehat{g}}(T) \le \frac{2R}{\log 2} T + O(1) = O(T).$$
-3. **Dirichlet Polynomial Zero Bound**: The finite Dirichlet polynomial $E_b(it) = \sum_{\alpha=1}^N c_\alpha x_\alpha^{it}$ has frequencies bounded in $[x_{\min}, x_{\max}] \subset [8, 20]$. By the classical density theorem for almost-periodic functions, the number of zeros of $E_b$ in $[-T, T]$ is bounded by:
-   $$N_{E_b}(T) \le \frac{T}{2\pi} \log\left(\frac{x_{\max}}{x_{\min}}\right) + O(1) \le \frac{\log(2.5)}{2\pi} T \approx 0.1458 T.$$
-   At $T = 1000$, $N_{E_b}(1000) \le 146$, which is less than $23\%$ of the $649$ Riemann zeros.
-4. **Conclusion**:
-   $$\lim_{T \to \infty} \frac{N_{E_b}(T)}{N(T)} = 0, \qquad \lim_{T \to \infty} \frac{n_{\widehat{g}}(T)}{N(T)} = 0.$$
-   **Theorem**: No non-trivial compactly supported test function and no finite Dirichlet polynomial can vanish on all critical zeros of the Riemann zeta function. The critical zero spectral background $\sum_k |\widehat{g}(\gamma_k)|^2 |E_b(i\gamma_k)|^2$ is strictly positive and non-extinguishable.
+3. **Dirichlet Polynomial Zero Bound**:
+   Similarly, the finite Dirichlet polynomial $E_b(it) = \sum_{\alpha=1}^N c_\alpha x_\alpha^{it}$ with frequencies in $[x_{\min}, x_{\max}] \subset [8, 20]$ has zeros bounded by almost-periodic density:
+   $$N_{E_b}(T) \le \frac{T}{2\pi} \log\left(\frac{x_{\max}}{x_{\min}}\right) + O(1) \le \frac{\log(2.5)}{2\pi} T \approx 0.1458 T = O(T).$$
+4. **Fixed-Function Vanishing Obstruction**:
+   $$\lim_{T \to \infty} \frac{N_{E_b}(T)}{N_0(T)} = 0, \qquad \lim_{T \to \infty} \frac{n_{\widehat{g}}(T)}{N_0(T)} = 0.$$
+   **Narrow Fixed-Function Theorem**: A fixed non-zero compactly supported test transform of finite exponential type (and any fixed finite Dirichlet polynomial) has $O(T)$ zeros and therefore cannot vanish at every distinct critical zero, whose count is at least $c T \log T$.
+   *Scope Limitation*: This theorem applies strictly to a fixed function. It does not rule out approximate suppression, parameter-dependent sequences $g_\sigma$ whose support expands with $\sigma$, or an authentic negative complete Weil witness.
 
-### Mechanism B: Bandpass Spectral Filtering & Exponential Amplification
+### Mechanism B: Bandpass Spectral Filtering & Reflected Normalization
 **Can a sequence of bandpass test functions $g_\sigma$ isolate an off-critical zero by frequency concentration?**
 
 Consider the modulated Gaussian test family:
 $$g_\sigma(u) = \frac{1}{\sqrt{2\pi}\sigma} e^{-u^2 / (2\sigma^2)} \cos(\gamma_0 u), \qquad \widehat{g}_\sigma(t) = \frac{1}{2} \left[ e^{-\sigma^2 (t - \gamma_0)^2 / 2} + e^{-\sigma^2 (t + \gamma_0)^2 / 2} \right].$$
-Evaluating the terms of the explicit formula as duration $\sigma \to \infty$:
+Evaluating the terms of the explicit formula under the reflected pairing as duration $\sigma \to \infty$:
 1. **Critical Zeros**: The closest critical zero to $\gamma_0 = 100.0$ is at $\gamma_1 \approx 101.318$ ($\Delta_{\min} \approx 1.169$).
    The critical zero contribution decays exponentially:
    $$|\widehat{g}_\sigma(\gamma_k)|^2 \le e^{-\sigma^2 \Delta_{\min}^2} = e^{-1.366 \sigma^2} \longrightarrow 0 \quad (1.38 \times 10^{-19} \text{ at } \sigma = 5.0).$$
-2. **Archimedean Background**:
-   $$B_{\rm arch}(g_\sigma, g_\sigma) \sim \log(\gamma_0 / 2) = \log(50) \approx 3.9120 = O(1).$$
-3. **Prime Sum**: Oscillatory cancellation across prime powers stabilizes the prime sum:
-   $$B_{\rm prime}(g_\sigma, g_\sigma) \approx 2.81 = O(1).$$
-4. **Off-Critical Target Quartet**: At $z_0 = \delta_0 + i\gamma_0$, the argument in the Fourier transform is $t = \gamma_0 - i\delta_0$:
-   $$|\widehat{g}_\sigma(\gamma_0 - i\delta_0)|^2 \sim \frac{1}{4} e^{\sigma^2 \delta_0^2}.$$
-   For $\delta_0 = 0.49$, this grows exponentially: $404.44$ at $\sigma = 5.0$, and $2.68 \times 10^{10}$ at $\sigma = 10.0$.
-5. **Conclusion**:
-   While bandpass filtering successfully suppresses critical zeros relative to an off-critical target, the resulting explicit formula relation is a **single scalar growth identity**. It shows that under $H$, an uncancelled off-critical zero dominates the scalar functional. However, it does **not** generate a multi-dimensional constraint forcing the vector measure $\nu_b = 0$.
+2. **Archimedean Energy Scaling**:
+   The Archimedean quadratic form for this even Gaussian scales as:
+   $$B_{\rm arch}(g_\sigma, g_\sigma) = \frac{1}{2\pi} \int_{-\infty}^\infty \omega(t) |\widehat{g}_\sigma(t)|^2 dt \sim \frac{\omega(\gamma_0)}{4 \sqrt{\pi} \sigma} \longrightarrow 0 \quad (\text{as } \sigma \to \infty),$$
+   rather than remaining a non-zero $O(1)$ constant.
+3. **Reflected Quartet Sign & Off-Axis Amplification**:
+   Under the reflected convention $q(b) = 4 \operatorname{Re}[A_h(z_0)^2 E_b(z_0) E_b(-z_0)]$, at $z_0 = \delta_0 + i\gamma_0$:
+   $$\widehat{g}_\sigma(\gamma_0 - i\delta_0) \widehat{g}_\sigma(-\gamma_0 - i\delta_0) \sim \frac{1}{4} e^{\sigma^2 \delta_0^2} > 0.$$
+   For the displayed even Gaussian alone, this leading factor is strictly positive. Off-axis amplification of a modulus alone does not produce a negative quartet. Constructing a negative quartet response requires a kernel whose complex phase or asymmetry forces a negative real part, together with rigorous admissibility arguments and complete enclosures for the infinite tail contributions.
+4. **Scalar vs Vector Dimensionality**:
+   Even if an admissible kernel sequence isolates an off-critical zero, the explicit formula yields only a **single scalar identity per test function**. While a scalar sum of squares can force multiple quantities to vanish, an unconstrained scalar equation does not automatically force the multi-dimensional correlation measure $\nu_b = 0$.
 
 ### Mechanism C: Indefinite Null Cones vs Total Measure Vanishing
 **Can algebraic deflation of target atoms force the entire measure $\nu_b$ to vanish?**
 
 On the legal subspace $b = P \beta$ ($r = 3$ grades, $m = 2$, $\beta \in \mathbb{R}^2$):
 1. **Target Atom Matrix**: For the authentic same-gap coincidence key $(1, 1, 8)$ ($y = \tau/8$):
-   $$G_{(1, 1/8)} = P^T M_{(1, 1/8)}^{\rm sym} P = \begin{pmatrix} -0.00095368 & -0.00045760 \\ -0.00045760 & 0.00000000 \end{pmatrix}.$$
-   The eigenvalues are $\lambda_1 \approx -0.001138$ and $\lambda_2 \approx +0.000184$ (opposite signs).
-2. **Target Deflation**: Because $G_{(1, 1/8)}$ is indefinite, it possesses an exact 1-dimensional null cone in $\mathbb{R}^2$:
-   $$\beta_1 / \beta_2 \approx -1.042039 \implies b = [0.029096, -0.721205, 0.692110]^T.$$
-   At this legal vector, $c_{(1, 1/8)}(b) = 0$ exactly!
-3. **Persistence of All Other Atoms**:
-   Evaluating the complete grouped correlation system at this exact null vector reveals:
-   - Maximum atom coefficient: $\max_\ell |c_\ell(b)| \approx 2.628677 \times 10^{-3} > 0$.
-   - Same-grade omission error at $z=0$: $\Delta_{\rm omission} \approx 52.235 > 0$.
-   - The remaining 76,693 atoms remain non-zero.
-4. **Dimension Mismatch Barrier**:
-   Vanishing of the measure $\nu_b = 0$ requires the simultaneous vanishing of all $L = 76,694$ quadratic forms:
-   $$\beta^T G_\ell \beta = 0 \quad \text{for all } \ell = 1, \dots, L.$$
-   In $\mathbb{R}^2$, two non-proportional quadratic forms share at most $2 \times 2 = 4$ intersection rays. For tens of thousands of authentic prime-power atoms with incommensurate frequencies, the only simultaneous solution is $\beta = 0$ ($b = 0$).
+   $$c_{(1, 1/8)}(b) = b_{-2} (A_{12} b_{-1} + A_{23} b_{-3}),$$
+   where $A_{12} = a_{-1, 64} a_{-2, 512} \approx 9.536817 \times 10^{-4}$ and $A_{23} = a_{-2, 512} a_{-3, 4096} \approx 3.847407 \times 10^{-5}$, with ratio $A_{12} / A_{23} \approx 24.787647$.
+   The projected symmetric matrix $G_{(1, 1/8)} = P^T M_{(1, 1/8)}^{\rm sym} P$ is indefinite, with one positive and one negative eigenvalue.
+2. **Corrected Algebraic Null Cone**:
+   Setting $c_{(1, 1/8)}(b) = 0$ on the legal zero-sum hyperplane $b_{-1} + b_{-2} + b_{-3} = 0$ admits two exact branches:
+   - *Trivial Branch ($b_{-2} = 0$)*: $b = \frac{1}{\sqrt{2}} [1, 0, -1]^T$. Both product terms vanish identically.
+   - *Active Cancellation Branch ($b_{-2} \ne 0$)*: $b_{-3} = -\frac{A_{12}}{A_{23}} b_{-1}$, forcing $b_{-1}$ and $b_{-3}$ to have opposite signs.
+     With $b_{-2} = -(b_{-1} + b_{-3}) = (\frac{A_{12}}{A_{23}} - 1) b_{-1}$, the normalized null vector is:
+     $$b = [0.02909535, \; 0.69211002, \; -0.72120537]^T.$$
+     Here $b_{-1} b_{-2} > 0$ and $b_{-2} b_{-3} < 0$, producing exact cancellation $A_{12} b_{-1} b_{-2} + A_{23} b_{-2} b_{-3} = 0$.
+     *(Note: The previously recorded vector $[0.029096, -0.721205, 0.692110]^T$ had inverted coordinate signs making both terms negative and failed to vanish; the corrected vector derived from authentic positive weights is exact).*
+3. **Simultaneous Reciprocal Nulling and Non-Zero Residuals**:
+   - Because $c_{(-1, 8, 1)}(b) = c_{(1, 1/8)}(b)$, nulling the $(1, 1, 8)$ atom simultaneously nulls its reciprocal atom $(-1, 8, 1)$.
+   - However, other non-reciprocal atom coefficients remain strictly non-zero. For example, evaluating the full grouped correlation system at the corrected null vector gives maximum atom coefficient $\max_\ell |c_\ell(b)| \approx 2.63 \times 10^{-3} > 0$, and same-grade omission error $\Delta_{\rm omission} \approx 52.235 > 0$.
+4. **Dimension of the Legal Symmetric Space**:
+   Do not describe tens of thousands of atom matrices as algebraically independent. On $r = 3$ grades with legal subspace dimension $m = 2$, the space of real symmetric matrices $\operatorname{Sym}(2)$ has dimension exactly:
+   $$\dim \operatorname{Sym}(2) = \frac{2 \times 3}{2} = 3.$$
+   Every atom matrix $G_\ell$ is a linear combination of at most three basis matrices.
+   As established in Target B, three concrete non-zero keys—such as $(1, 89, 563)$, $(2, 89, 3511)$, and $(1, 563, 3511)$—already span $\operatorname{Sym}(2)$ with full rank 3.
+   For these three keys, $c_{12} = c_{13} = c_{23} = 0 \land \sum b = 0 \implies b = 0$.
+   Therefore, no non-zero legal vector can simultaneously null all three of these basis atoms, proving $\nu_b \ne 0$ for all legal $b \ne 0$ through a compact 3-equation system.
 
 ---
 

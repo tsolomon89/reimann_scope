@@ -216,6 +216,7 @@ from tc.weil_forms import (
     solve_complete_upper_objective,
     compute_grouped_correlation_system,
     test_spectral_matrix_span_recovery,
+    certify_production_convolution_table,
 )
 
 from tc.approximation import (
@@ -411,6 +412,7 @@ __all__ = [
     "solve_complete_upper_objective",
     "compute_grouped_correlation_system",
     "test_spectral_matrix_span_recovery",
+    "certify_production_convolution_table",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

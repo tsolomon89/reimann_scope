@@ -157,37 +157,36 @@
       "task_id": "TASK-TC-008",
       "priority": 10,
       "objective": "Close certification defects on bounded baseline, repair full spectral-correlation identity, and investigate the spectral-correlation bridge in the TC reductio",
-      "status": "ACCEPTED",
-      "review_status": "ACCEPTED",
-      "open_implication": "1. Certification defects (metadata cutoff discrepancy, failure to fail closed on incomplete zero tables, displaced ordinates, uncertified diagnostic baseline reporting, deflation robustness, and underived literal quadrature bounds) undermined defensibility of the 4-grade benchmark F_+ = 976,642,212,980.2515, D_stat = 10.246264328805642. 2. Omitting same-grade n != m cross-terms in E_b(z)E_b(-z) introduced an order ~52 omission error at z=0, invalidating earlier claims of an operator obstruction. Proving whether spectral responses force c_ell(b) = 0 under H remains the unresolved bridge obligation.",
-      "planned_calculation": "1. Fix all 6 certification defects in tc/weil_forms.py. 2. Derive 3-term dimensionless kernel quadrature enclosure eps_quad(h) = 4.0e-12 h^-5 + 1.0e-13 h^-3 + 1.0e-15 h^-1 + eps_fp. 3. Recompute and verify the 4-grade benchmark F_+ and D_stat theoretical floor. 4. Restore exact same-grade cross-terms in compute_grouped_correlation_system, compute exact keys (d, num/den), detect authentic same-gap coincidence (1, 1, 8) giving y = tau/8, and test spectral matrix span recovery.",
-      "acceptance_criterion": "All 33 defect tests pass in test_tc_reproduced_defects.py; three-term enclosure covers measured error; full spectral rank spanned (Sym(2) dim 3); Spectral-Correlation Bridge Sublemma formulated as open research obligation; tau_transcendence hypothesis retained in formal coverage.",
+      "status": "REOPENED_PENDING_QUADRATURE_PROOF",
+      "review_status": "REOPENED_PENDING_QUADRATURE_REMAINDER_PROOF",
+      "open_implication": "1. The 3-term quadrature enclosure coefficients (4e-12, 1e-13, 1e-15) remain asserted constants without an applicable quadrature remainder theorem; empirical 40-dps agreement is diagnostic only. While table enclosure is certified on declared baseline (h=0.05, window [8, 20], N_tab=2001, 256 nodes), full prime matrix and complete Weil functional certification remain open. 2. Repaired identity E_b(z)E_b(-z) restores exact same-grade cross-terms, but complete-functional arithmetic certification fails closed where dependencies lack proof.",
+      "planned_calculation": "1. Replace asserted literal constants with an explicit quadrature remainder theorem or outward-rounded interval enclosures across nodes. 2. Bound station weights, log errors, tau representation, and prime sum truncation. 3. Propagate certified table enclosure into prime matrix. 4. Maintain fails-closed behavior for h=0.01 outside certified domain.",
+      "acceptance_criterion": "Certified production convolution table enclosure combining nodal error and ||C_h - interp(C_h)||_inf <= (Delta v)^2 ||psi'_h||_2^2 / 8; fails-closed domain enforcement; rigorous separation of table certification from complete prime matrix and infinite tail.",
       "dependencies": ["TASK-TC-007"],
       "evidence": [
-        ".agents/claims/reviews/TASK-TC-008-derivation-review.md",
-        "data/tc_baseline_canonical_weil_error_budget.json",
-        "docs/reviews/TC_FINITE_CORRELATION_EQUATIONS.md",
         "tc/weil_forms.py",
-        "tests/test_tc_reproduced_defects.py"
+        "tests/test_tc_reproduced_defects.py",
+        "tests/test_tc_numerical_and_span_defects.py"
       ],
-      "resolution": "Closed all 6 certification defects. Derived 3-term quadrature enclosure replacing asserted literal. Verified exact 4-grade benchmark F_+ = 976,642,212,980.2515, D_stat = 10.246264328805642, proxy floor 976,641,687,735.502. Repaired full spectral-correlation identity with exact same-grade cross-terms (discrepancy < 1e-11 at z=0 and z=0.49+100j), detected authentic same-gap coincidence (-1, 64) with (-2, 512) and (-2, 512) with (-3, 4096) yielding key (1, 1, 8) and y = tau/8. Demonstrated spectral matrices span Sym(2) with rank 3/3, linearly recovering grouped correlation matrices to machine precision (relative residual <= 1e-15). Isolated the Spectral-Correlation Bridge Sublemma as an open research obligation."
+      "resolution": "Production convolution table enclosed and certified on baseline h=0.05, window [8, 20], N_tab=2001, 256 nodes with combined nodal (4.08e-5) and interpolation (1.09e-4) error <= 1.499e-4. Adversarial scaling at h=0.01 confirmed to fail closed outside certified domain. Repaired full spectral-correlation identity with exact same-grade cross-terms. Asserted global constants (4e-12, etc.) reopened pending rigorous quadrature remainder proof; complete Weil functional status remains NUMERICALLY_UNRESOLVED."
     },
     {
       "task_id": "TASK-TC-009",
       "priority": 11,
       "objective": "Investigate the Spectral-Correlation Bridge Sublemma: test function profiles, explicit formula spectral isolation, and asymptotic vanishing constraints",
-      "status": "COMPLETED",
+      "status": "REOPENED_PENDING_CORRECTED_BRIDGE_DERIVATION",
       "review_status": "AWAITING_INDEPENDENT_REVIEW",
-      "open_implication": "While spectral matrices span Sym(m) and linearly recover grouped correlation matrices, the explicit formula yields only a single scalar identity per test function. Proving whether admissible test functions g_nu or legal coefficient sequences b^(nu) can force a target grouped correlation coefficient c_ell(b) to vanish under H remains the unresolved reductio bridge obligation.",
-      "planned_calculation": "1. Formulate test function sequences g_nu (e.g., concentrated spectral bandpass or prolate spheroidal wave profiles) paired with explicit formula responses. 2. Analyze the interplay between the single scalar explicit formula constraint and the multi-dimensional correlation matrix space. 3. Test whether any admissible profile can isolate an individual c_ell(b) without activating competing critical zeros or non-zero Arch/prime background terms. 4. Characterize theoretical barriers to zero isolation or construct candidate sequences.",
-      "acceptance_criterion": "Definitive mathematical characterization of test function isolation capabilities, quantitative evaluation on authentic station ensemble, and identification of necessary conditions for bridge closure.",
+      "open_implication": "Earlier barrier arguments rested on defective claims: 1) The reported null vector for tau/8 had negative signs on both products; corrected vector b = [0.029095, 0.692110, -0.721205] nulls both (1,1,8) and reciprocal (-1,8,1), refuting 'all remaining 76,693 atoms are non-zero'. 2) Riemann-von Mangoldt counts all nontrivial zeros, not distinct critical-line zeros (repaired by citing Conrey 1989 N_0(T) >= 2/5 N(T) >= c T log T). 3) Gaussian off-axis amplification does not establish negative quartet; reflected leading quartet is positive. 4) Sym(2) has dimension 3, so three coefficient equations suffice rather than tens of thousands of independent equations.",
+      "planned_calculation": "1. Reduce three-grade correlation problem to three concrete keys: (1, 89, 563), (2, 89, 3511), (1, 563, 3511). 2. Formally prove c_12 = c_13 = c_23 = 0 and sum b = 0 => b = 0 in Lean 4 with 0 sorry. 3. Recover coefficient matrices via repaired physical spectral observables with authentic weights 2|A_h(i gamma)|^2 and reflected quartet Q(z) = 4 P^T Re[A_h(z)^2 sym(e(z)e(-z)^T)] P. 4. Determine whether recoverability depends on H and isolate the exact missing H-dependent bridge step.",
+      "acceptance_criterion": "Definitive correction of defective barrier claims; Lean 4 formalization of 3-coefficient legal vanishing with 0 sorry; physical quartet and critical-zero matrix span verification; explicit isolation of unresolved bridge identity.",
       "dependencies": ["TASK-TC-008"],
       "evidence": [
-        "docs/reviews/TC_FINITE_CORRELATION_EQUATIONS.md",
         "docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md",
-        "tc/weil_forms.py"
+        "formal/RiemannScope/ExtremalCorrelation.lean",
+        "tc/weil_forms.py",
+        "tests/test_tc_numerical_and_span_defects.py"
       ],
-      "resolution": "Investigated the Spectral-Correlation Bridge Sublemma across three rigorous mathematical dimensions: 1) Proved by Paley-Wiener and Jensen bounds that zero density of Riemann zeros N(T) ~ T/(2pi) log T super-linearly dominates compactly supported test functions n_g(T) = O(T) and finite Dirichlet polynomials N_Eb(T) <= 0.1458 T, so critical zeros cannot be completely extinguished. 2) Proved that Gaussian bandpass filtering isolates an off-critical zero with exponential amplification exp(sigma^2 delta_0^2), but yields a single scalar identity insufficient to force the multi-dimensional correlation measure nu_b = 0. 3) Proved that while the target coincidence matrix G_(1, 1/8) has an exact null cone (e.g. b = [0.0291, -0.7212, 0.6921]), the remaining 76,693 atoms remain non-zero (max |c_ell| = 2.63e-3, omission error 52.235 > 0). Documented full findings in docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md, isolating H ==> nu_b = 0 as an open research obligation in strict accordance with Rule 0."
+      "resolution": "1) Corrected docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md: removed 1/sqrt(n), fixed atom counting, replaced tau/8 null vector, verified simultaneous reciprocal nulling, cited Conrey 1989, recomputed Gaussian section (positive leading quartet), and corrected Sym(2) dimension 3 discussion. 2) Target B completed: reduced 3-grade correlation to keys (1,89,563), (2,89,3511), (1,563,3511) spanning Sym(2) (rank 3). 3) Proved three_coefficient_legal_vanishing and nonzero_legal_has_nonzero_selected_coefficient in Lean 4 (0 sorry). 4) Repaired physical spectral observables (quartet and 2|A_h|^2 critical zero weights); showed critical zeros alone span Sym(2) (rank 3, cond 92.8), proving finite recoverability is independent of H. 5) Isolated the missing H-dependent bridge step: linear recoverability does not imply vanishing c_i(b) = 0 without an additional identity connecting an off-critical zero rho_0 to the correlation measure nu_b."
     }
   ]
 }

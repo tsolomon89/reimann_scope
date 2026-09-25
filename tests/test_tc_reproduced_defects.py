@@ -1012,6 +1012,30 @@ def test_target_a4_three_term_quadrature_enclosure():
     # At h=0.05, total table error is <= 3e-5
     assert pq['eps_table_quad'] < 3.0e-5
 
+    # 40-dps mpmath diagnostic check (independent high-precision comparison remains a diagnostic)
+    import mpmath
+    from tc.weil_forms import _compute_C_tab_fast
+    with mpmath.workdps(40):
+        Z_mp = mpmath.quad(lambda y: mpmath.exp(-1 / (1 - y**2)), [-1, 1])
+        def eval_mp_C0(h_val):
+            def f_mp(y):
+                om = 1 - y**2
+                y2 = y**2
+                k = mpmath.exp(-1 / om) / Z_mp
+                d2k = (-2 / (om**2) - 8 * y2 / (om**3) + 4 * y2 / (om**4)) * k
+                return d2k - 0.25 * (h_val**2) * k
+            val, _ = mpmath.quad(lambda y: f_mp(y)**2, [-1, 1], error=True)
+            return float((h_val**(-5)) * val)
+
+        for h_test in [0.05, 0.01]:
+            C_mp_0 = eval_mp_C0(h_test)
+            c_fast = _compute_C_tab_fast(np.array([0.0]), h=h_test, n_nodes=256)
+            measured_err = abs(c_fast[0] - C_mp_0)
+            eps_formula = 4.0e-12 * (h_test**(-5)) + 1.0e-13 * (h_test**(-3)) + 1.0e-15 * (h_test**(-1)) + 1e-15
+            assert measured_err <= eps_formula, (
+                f"At h={h_test}, measured 40-dps discrepancy {measured_err} exceeds formula bound {eps_formula}"
+            )
+
 
 def test_target_b_grouped_correlation_system_and_same_gap_coincidence():
     """

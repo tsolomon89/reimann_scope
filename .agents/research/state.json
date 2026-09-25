@@ -36,10 +36,10 @@
         "Arithmetic-spectral explicit formula integration closing intermediate gap and authentic prime transform sensitivity [NUMERICALLY_UNRESOLVED_COMPLETE_FORM]",
         "Resolve cutoff-sensitive h=1 candidate, withdraw unsupported negative witness, and decouple physical cutoffs [COMPLETED]",
         "Legal space quartet optimization, critical-zero deflation audit, and reductio bridge lemma formulation [COMPLETED_EXPLORATORY]",
-        "Close certification defects, derive 3-term quadrature enclosure, repair full spectral-correlation identity, and investigate spectral matrix span recovery [COMPLETED]",
-        "Investigate the Spectral-Correlation Bridge Sublemma: test function profiles, explicit formula spectral isolation, and asymptotic vanishing constraints [COMPLETED]"
+        "Close certification defects, derive 3-term quadrature enclosure, repair full spectral-correlation identity, and investigate spectral matrix span recovery [REOPENED_PENDING_QUADRATURE_PROOF]",
+        "Investigate the Spectral-Correlation Bridge Sublemma: test function profiles, explicit formula spectral isolation, and asymptotic vanishing constraints [REOPENED_PENDING_CORRECTED_BRIDGE_DERIVATION]"
       ],
-      "active_note": "TASK-TC-008 accepted with independent derivation review (.agents/claims/reviews/TASK-TC-008-derivation-review.md). TASK-TC-009 completed: proved zero density of Riemann zeros prevents complete spectral extinction, proved bandpass exponential amplification exp(sigma^2 delta_0^2) yields scalar rather than vector constraint, and proved target atom deflation leaves remaining 76,693 atoms non-zero (omission error 52.235 > 0). Documented in docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md, isolating the Spectral-Correlation Bridge Sublemma as an open research obligation."
+      "active_note": "TASK-TC-008 reopened for rigorous quadrature remainder proof; baseline convolution table enclosure certified at h=0.05, window [8, 20] (Target A). TASK-TC-009 barrier arguments revised per Section 4; Target B completed with 3-grade reduction to keys (1,89,563), (2,89,3511), (1,563,3511) spanning Sym(2) (rank 3), Lean 4 formalization (0 sorry), and spectral recovery with authentic quartet/critical weights showing recoverability is independent of H."
     }
   },
   "linked_runs": {
