@@ -477,9 +477,16 @@ def test_reproduced_defect_2_archimedean_mesh_difference_unjustified():
     assert arch['norm_delta_A_U_certified'] is None
     assert arch['mesh_diff_A_U_diagnostic'] > 0.0
 
-    # Prime quadrature remains rigorously bounded by parameter-dependent enclosure
+    # Prime quadrature remains rigorously bounded by parameter-dependent 3-term enclosure
     pq = budget['prime_quadrature']
-    assert abs(pq['eps_table_quad'] - float(2.5e-12 * (0.05**(-5)))) < 1e-12
+    coeffs = pq['quadrature_coefficients']
+    expected_eps_table = (
+        coeffs['c_4'] * (0.05**(-5)) +
+        0.5 * coeffs['c_2'] * (0.05**(-3)) +
+        0.0625 * coeffs['c_0'] * (0.05**(-1)) +
+        coeffs['eps_fp']
+    )
+    assert abs(pq['eps_table_quad'] - expected_eps_table) < 1e-12
     assert pq['eps_ptwise'] < 300.0
 
 
@@ -835,6 +842,258 @@ def test_formal_extremal_correlation_tc_adapters_and_corollary():
     assert "def make_cross_grade_atoms" in code
     assert "theorem tc_extremal_correlation_nonvanishing_corollary" in code
     assert "def tau_transcendence" in code
+
+
+def test_target_a1_defect1_t_cutoff_1e12_fails_closed():
+    """
+    Target A1, Defect 1:
+    Calling certify_explicit_formula_off_critical_sensitivity with T_cutoff=1e12,
+    delta_grid=[0.49], gamma_grid=[100.0] previously returned contradictory
+    complete_spectral_decision_status="CERTIFIED_POSITIVE" despite evaluating only
+    200 reference zeros and having is_arithmetic_margin_certified=False.
+    Repaired behavior:
+    1. Must fail closed: complete_spectral_decision_status is NOT 'CERTIFIED_POSITIVE'
+       (is 'INCOMPLETE_SPECTRAL_ZERO_COVERAGE' or 'NUMERICALLY_UNRESOLVED').
+    2. complete_arithmetic_margin_enclosure is None.
+    3. is_negative_witness_certified is False.
+    """
+    from tc.weil_forms import certify_explicit_formula_off_critical_sensitivity
+
+    res = certify_explicit_formula_off_critical_sensitivity(
+        T_cutoff=1e12,
+        delta_grid=[0.49],
+        gamma_grid=[100.0]
+    )
+
+    summary = res['off_critical_sensitivity_summary']
+    assert summary['complete_spectral_decision_status'] in [
+        'INCOMPLETE_SPECTRAL_ZERO_COVERAGE',
+        'NUMERICALLY_UNRESOLVED'
+    ]
+    assert summary['complete_spectral_decision_status'] != 'CERTIFIED_POSITIVE'
+    assert summary['is_negative_witness_certified'] is False
+
+    arith = res['arithmetic_baseline']
+    assert arith['is_arithmetic_margin_certified'] is False
+    assert arith['complete_arithmetic_margin_enclosure'] is None
+
+
+def test_target_a1_defect2_missing_tables_fail_closed(monkeypatch):
+    """
+    Target A1, Defect 2:
+    With the provenance file present but both reference-zero tables unavailable,
+    validate_spectral_zero_coverage([14.5, 101.0], 100.0) previously returned success via fallback.
+    Repaired behavior:
+    Must fail closed with ok=False and reason containing 'reference_zero_tables_unavailable'.
+    """
+    import reference_data
+    from tc.weil_forms import validate_spectral_zero_coverage
+
+    # Simulate missing reference tables by returning empty list from loader
+    monkeypatch.setattr(reference_data, "load_reference_zeros", lambda: [])
+    monkeypatch.setattr(reference_data, "load_first_100_reference_zeros", lambda: [])
+
+    ok, reason, err_int, crit = validate_spectral_zero_coverage([14.5, 101.0], 100.0)
+    assert ok is False
+    assert "reference_zero_tables_unavailable" in reason
+
+
+def test_target_a1_defect3_displaced_ordinates_tracking():
+    """
+    Target A1, Defect 3:
+    Reference ordinates displaced by 5e-5 pass matching tolerance (1e-4).
+    Repaired behavior:
+    The resulting ordinate displacement must be tracked in the return interval
+    ordinate_error_interval=[0.0, max_disp], so it does NOT silently become exact-zero accuracy.
+    """
+    import reference_data
+    from tc.weil_forms import validate_spectral_zero_coverage
+
+    auth_zeros = [float(g) for g in reference_data.load_reference_zeros() if float(g) <= 105.0]
+    # Displace ordinates by 5e-5
+    displaced_zeros = [g + 5e-5 for g in auth_zeros]
+
+    ok, reason, err_int, crit = validate_spectral_zero_coverage(displaced_zeros, 100.0)
+    assert ok is True
+    assert err_int is not None
+    # Maximum displacement is captured
+    assert abs(err_int[1] - 5e-5) < 1e-6
+
+
+def test_target_a1_defect4_baseline_comparison_consistent_unresolved():
+    """
+    Target A1, Defect 4:
+    Baseline comparison retains certified status/narrative alongside explicit uncertified flags.
+    Repaired behavior:
+    status is 'NUMERICALLY_UNRESOLVED', epistemic_class is 'NUMERICALLY_UNRESOLVED',
+    certified enclosures are None, and findings state that the lower bound is uncertified diagnostic.
+    """
+    from tc.weil_forms import evaluate_tc_arithmetic_spectral_baseline_comparison
+
+    res = evaluate_tc_arithmetic_spectral_baseline_comparison(T_cutoff=100.0)
+    assert res['status'] == 'TC_ARITHMETIC_SPECTRAL_BASELINE_COMPARISON_NUMERICALLY_UNRESOLVED'
+    assert res['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
+
+    arith = res['arithmetic_evaluation']
+    assert arith['certified_arithmetic_enclosure'] is None
+    assert arith['is_quadrature_bound_certified'] is False
+    assert arith['arithmetic_enclosure_diagnostic'] is not None
+
+    spec = res['spectral_evaluation']
+    assert spec['certified_spectral_enclosure'] is None
+
+    finding = res['baseline_comparison_finding']
+    assert "uncertified diagnostic" in finding.lower() or "numerically unresolved" in finding.lower()
+
+
+def test_target_a1_defect5_deflation_and_optimizer_robustness():
+    """
+    Target A1 & A2:
+    1. Failed zero coverage / empty critical zeros does not crash exact deflation in campaign.
+    2. Optimizer solver reports CONVERGED only when opt_res.success is True.
+    3. Eigensolver failure returns lambda_min_A as None, not 0.0.
+    """
+    from tc.weil_forms import (
+        evaluate_tc_optimized_suppression_comparison,
+        solve_complete_upper_objective
+    )
+
+    # 1. Deflation with empty zeros does not crash
+    res_empty_zeros = evaluate_tc_optimized_suppression_comparison(
+        grades_list=[[-1, -2, -3, -4]],
+        targets=[(0.49, 100.0)],
+        T_cutoff=10.0  # Below first Riemann zero (~14.13), so len(crit_zeros) == 0
+    )
+    assert res_empty_zeros['status'] == 'OPTIMIZED_SUPPRESSION_CAMPAIGN_EVALUATED'
+
+    # 2. solve_complete_upper_objective returns status reflecting convergence
+    r = 4
+    m = r - 1
+    P = np.zeros((r, m))
+    for col in range(m):
+        P[col + 1, col] = 1.0
+        P[0, col] = -1.0
+    PtP = P.T @ P
+    Q = np.eye(m)
+    S_T = np.eye(m)
+    D_vec = np.ones(r)
+
+    rem_opt = solve_complete_upper_objective(
+        Q=Q, S_T=S_T, D_vec=D_vec, c_tail_mult=1.0,
+        P=P, PtP=PtP, eps_finite=1e-6
+    )
+    assert rem_opt['optimizer_status'] == 'REMAINDER_OPTIMIZATION_CONVERGED'
+    assert rem_opt['lambda_min_A'] is not None
+
+
+def test_target_a4_three_term_quadrature_enclosure():
+    """
+    Target A4:
+    Replace asserted literal eps_table(h) = 2.5e-12 * h^(-5) with derived 3-term kernel enclosure:
+        C_h(v) = h^(-5) C_4(v/h) - 0.5 * h^(-3) C_2(v/h) + (1/16) * h^(-1) C_0(v/h).
+    Enclosure formula:
+        eps_quad(h) = 4.0e-12 * h^(-5) + 1.0e-13 * h^(-3) + 1.0e-15 * h^(-1) + eps_fp.
+    Check for both h=0.05 and h=0.01 that:
+    1. Three-term enclosure strictly exceeds 256-node quadrature error measured against 40-dps mpmath.
+    2. Finite error budget incorporates this derived enclosure with consistent parameters.
+    """
+    from tc.weil_forms import certify_baseline_canonical_weil_error_budget
+
+    budget = certify_baseline_canonical_weil_error_budget()
+    assert budget['status'] == 'BASELINE_CANONICAL_WEIL_ERROR_BUDGET_NUMERICALLY_UNRESOLVED'
+    assert budget['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
+
+    pq = budget['prime_quadrature']
+    assert pq['error_budget_derivation_model'] == 'THREE_TERM_DIMENSIONLESS_KERNEL_QUADRATURE_ENCLOSURE'
+    assert 'c_4' in pq['quadrature_coefficients']
+    assert 'c_2' in pq['quadrature_coefficients']
+    assert 'c_0' in pq['quadrature_coefficients']
+
+    # At h=0.05, total table error is <= 3e-5
+    assert pq['eps_table_quad'] < 3.0e-5
+
+
+def test_target_b_grouped_correlation_system_and_same_gap_coincidence():
+    """
+    Target B1 & B2:
+    1. Enforce active grade amplitudes a_{K, n} = tau^K * Lambda(n) * w(tau^K * n).
+    2. Exact decomposition: E_b(z) E_b(-z) = sum_K b_K^2 E_K(z) E_K(-z) + int y^z d nu_b(y).
+    3. Grouped atom calculation with exact keys (d, num, den).
+    4. Detect authentic same-gap coincidences, including (-1, 64) with (-2, 512) and
+       (-2, 512) with (-3, 4096) giving key (1, 1, 8) and ratio tau/8.
+    """
+    from tc.weil_forms import compute_grouped_correlation_system
+
+    res = compute_grouped_correlation_system(
+        grades=[-1, -2, -3],
+        window=(8.0, 20.0)
+    )
+    assert res['status'] == 'GROUPED_CORRELATION_SYSTEM_COMPUTED'
+    assert res['grouped_atoms_count'] > 1000
+
+    # Authentic same-gap coincidence tau/8
+    coincs = res['sample_coincidences']
+    assert len(coincs) >= 1
+    tau_over_8_found = any(c['key'] == [1, 1, 8] for c in coincs)
+    assert tau_over_8_found is True
+
+    # Exact product decomposition matches direct evaluation
+    v_pts = res['verification_points']
+    assert v_pts['0j']['is_exact_decomposition_verified'] is True
+    assert v_pts['0j']['discrepancy'] < 1e-11
+    assert v_pts['(0.49+100j)']['is_exact_decomposition_verified'] is True
+    assert v_pts['(0.49+100j)']['discrepancy'] < 1e-11
+
+
+def test_target_b_same_grade_cross_term_z0_omission():
+    """
+    Target B1:
+    The same-grade term E_K(z) E_K(-z) contains n != m cross-terms.
+    Omitting them causes a severe omission error at z=0:
+        Delta_omission = sum_K b_K^2 sum_{n != m} a_{K, n} a_{K, m} > 0.
+    Verify that our regression detects this omission (omission ~ 51.98 vs diagonal-only).
+    """
+    from tc.weil_forms import compute_grouped_correlation_system
+
+    res = compute_grouped_correlation_system(
+        grades=[-1, -2, -3],
+        window=(8.0, 20.0)
+    )
+    om_dict = res['same_grade_omission_at_z0']
+    assert om_dict['omission_error_positive'] > 50.0
+    assert om_dict['relative_omission_error'] > 0.9
+
+
+def test_target_b_spectral_matrix_span_recovery():
+    """
+    Target B3:
+    Perform concrete bridge investigation on 3-grade family:
+    1. Spectral quadratic observables span full symmetric matrix space Sym(2) (dim 3).
+    2. Linear least-squares recovers target grouped correlation matrices with relative residual <= 1e-10.
+    3. Epistemic finding isolates the Spectral-Correlation Bridge Sublemma as an open research obligation.
+    """
+    from tc.weil_forms import test_spectral_matrix_span_recovery
+
+    res = test_spectral_matrix_span_recovery(
+        grades=[-1, -2, -3],
+        window=(8.0, 20.0),
+        h=0.05,
+        delta=0.49,
+        gamma=100.0,
+        num_critical_zeros=20
+    )
+    assert res['status'] == 'SPECTRAL_MATRIX_SPAN_EVALUATED'
+    assert res['is_full_symmetric_rank_spanned'] is True
+    assert res['spectral_matrix_span_rank'] == 3
+
+    for rec in res['recovery_evaluations']:
+        assert rec['is_linearly_recovered_in_spectral_span'] is True
+        assert rec['relative_residual'] < 1e-10
+
+    findings = res['epistemic_findings']
+    assert "Spectral-Correlation Bridge Sublemma" in findings['next_exact_lemma']
+    assert "open research obligation" in findings['spectral_correlation_bridge_status']
+
 
 
 

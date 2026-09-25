@@ -137,7 +137,7 @@ This proves directly that for 2 grades, $\nu_b = 0$ is algebraically impossible 
 
 We now investigate whether an explicit formula identity under $H$ can force the finite system $c_\ell(b) = 0$.
 
-### The Explicit Formula Quadratic Identity
+#### The Explicit Formula Quadratic Identity
 Let $G_b(u)$ be the legal TC test function with Fourier transform $\widehat{G_b}(z) = A_h(z) E_b(z)$.
 The Guinand-Weil explicit formula expresses the arithmetic Weil quadratic form as:
 $$\mathcal{B}_{\rm arith}(G_b, G_b) = \sum_{\rho} A_h(\rho - 1/2)^2 E_b(\rho - 1/2) E_b(-\rho + 1/2) + \mathcal{R}_{\rm triv}(G_b).$$
@@ -146,39 +146,65 @@ Under hypothesis $H$, there exists an off-critical zero quartet $\rho_0 = 1/2 \p
 Its contribution to the spectral side is:
 $$\Delta_{\rm quartet}(\rho_0; G_b) = 4 \operatorname{Re}\left( A_h(z_0)^2 E_b(z_0) E_b(-z_0) \right), \qquad z_0 = \delta_0 + i\gamma_0.$$
 
-### Expansion of the Dirichlet Polynomial Product
-The product $E_b(z) E_b(-z)$ expands across prime stations:
-$$E_b(z) E_b(-z) = \sum_{K, n} b_K^2 a_{K,n}^2 + \sum_{K \ne J} b_K b_J \sum_{n, m} a_{K,n} a_{J,m} e^{z (\log(\tau^K n) - \log(\tau^J m))}.$$
-Grouping by distinct spatial ratios $y_\ell = \tau^{K-J}(n/m)$, the cross-grade part is:
-$$\sum_{K \ne J} b_K b_J \sum_{n, m} a_{K,n} a_{J,m} y_\ell^z = \int_0^\infty y^z \, d\nu_b(y) = \sum_{\ell=1}^L c_\ell(b) y_\ell^z.$$
+### Exact Product Decomposition and Restoration of Same-Grade Cross-Terms
+The authentic decomposition of the Dirichlet polynomial product is:
+$$E_b(z) E_b(-z) = \sum_K b_K^2 E_K(z) E_K(-z) + \int_0^\infty y^z \, d\nu_b(y),$$
+where the cross-grade correlation measure is:
+$$\nu_b = \sum_{K \ne J} \sum_{n \in \mathcal{S}_K, m \in \mathcal{S}_J} b_K b_J a_{K, n} a_{J, m} \, \delta_{\tau^{K-J} n / m} = \sum_{\ell=1}^L c_\ell(b) \, \delta_{y_\ell}.$$
 
-### The Core Obstruction: Degeneracy of a Single Zero Constraint
-Suppose we assume $H$: $\zeta(\rho_0) = 0$.
-Does the existence of this single zero $\rho_0$ force $\sum_{\ell=1}^L c_\ell(b) y_\ell^{z_0} = 0$?
-1. **Spectral Evaluation is 1-Dimensional**:
-   Evaluating the explicit formula at $\rho_0$ yields a single complex scalar relation:
-   $$\sum_{\ell=1}^L c_\ell(b) y_\ell^{\delta_0 + i\gamma_0} = \Phi(\rho_0).$$
-   This provides **at most 2 real constraints** on the coefficients $c_\ell(b)$.
-2. **Dimension Mismatch**:
-   The number of distinct cross-grade ratios $L$ grows with the number of stations $N$: $L \sim N^2$. For typical families, $L \ge 20$ to $100$.
-   Two real linear constraints cannot force $L$ independent quadratic expressions $c_\ell(b)$ to vanish simultaneously.
-3. **No Operator Forces Pointwise Equality**:
-   There is no continuous projection or linear operator $\mathcal{T}$ that maps the single zero condition $\zeta(\rho_0) = 0$ to the Vandermonde system $V \mathbf{c} = 0$.
-   A linear condition on the Fourier transform at a single point $z_0$ can never force the vanishing of all Fourier frequencies or all moments.
+**CRITICAL CORRECTION**: The same-grade term $E_K(z) E_K(-z)$ is **not** purely diagonal ($\sum_n a_{K,n}^2$); it contains all distinct prime-power cross-interactions $n \ne m \in \mathcal{S}_K$:
+$$E_K(z) E_K(-z) = \sum_{n \in \mathcal{S}_K} a_{K, n}^2 + \sum_{\substack{n, m \in \mathcal{S}_K \\ n \ne m}} a_{K, n} a_{K, m} \left(\frac{n}{m}\right)^z.$$
+At $z = 0$, $E_K(0)^2 = (\sum_{n \in \mathcal{S}_K} a_{K, n})^2 = \sum_n a_{K, n}^2 + \sum_{n \ne m} a_{K, n} a_{K, m}$.
+Omitting these same-grade off-diagonal terms leads to a large, strictly positive omission error:
+$$\Delta_{\rm omission} = \sum_K b_K^2 \sum_{\substack{n, m \in \mathcal{S}_K \\ n \ne m}} a_{K, n} a_{K, m} > 0.$$
+In the 3-grade benchmark on $[8, 20]$, this omission error is $\Delta_{\rm omission} \approx 51.98$, which is more than 1700 times larger than the true direct value $E_b(0)^2 \approx 0.0304$. Omitting same-grade cross-terms invalidates any subsequent spectral bridge claim.
 
-### First Precise Unresolved Sublemma
-For the TC reductio to proceed from $H$ to an integer collision via $\nu_b = 0$, one must prove:
+### Authentic Same-Gap Coincidences Across Multiple Grades
+In the grouped correlation system $\nu_b = \sum_\ell c_\ell(b) \delta_{y_\ell}$, distinct grade pairs can produce the identical spatial ratio:
+$$(K - J, \operatorname{reduce}(n/m)) = (K' - J', \operatorname{reduce}(n'/m')).$$
+An authentic arithmetic example occurs in the benchmark family $\mathcal{G} = \{-1, -2, -3\}$ on window $[8, 20]$:
+1. Grade $-1$ station $n = 64 = 2^6$ ($x = 64/\tau \approx 10.19$) and Grade $-2$ station $m = 512 = 2^9$ ($x = 512/\tau^2 \approx 12.97$) have grade gap $K - J = (-1) - (-2) = 1$ and ratio $n/m = 64/512 = 1/8$, yielding spatial ratio $y = \tau / 8$.
+2. Grade $-2$ station $n = 512 = 2^9$ and Grade $-3$ station $m = 4096 = 2^{12}$ ($x = 4096/\tau^3 \approx 16.51$) have grade gap $K - J = (-2) - (-3) = 1$ and ratio $n/m = 512/4096 = 1/8$, yielding the **identical spatial ratio** $y = \tau / 8$.
 
-> **Sublemma (Spectral-Correlation Bridge - UNRESOLVED)**:
-> Let $H$ hold with off-critical zero $\rho_0$. There exists a family of legal vectors $b^{(\epsilon)}$ or an integral transform over the vertical line $\operatorname{Re}(s) = \delta_0$ such that the integral against $\zeta(s)^{-1}$ or the explicit formula kernel forces every moment $\mu_r(\nu_b) = 0$ for $r = 0, \dots, L-1$.
+Both pairs map to the identical key $(1, 1/8)$. The grouped coefficient combines their cross-grade interactions:
+$$c_{(1, 1/8)}(b) = b_{-1} b_{-2} a_{-1, 64} a_{-2, 512} + b_{-2} b_{-3} a_{-2, 512} a_{-3, 4096} = b^T M_{(1, 1/8)} b.$$
+The matrix $M_{(1, 1/8)}$ has non-zero off-diagonal entries at $(-1, -2)$ and $(-2, -3)$.
 
-Without such a sublemma, the inference $H \Longrightarrow \nu_b = 0$ remains unproved.
-However, if such an implication is ever established, the non-vanishing theorem $\nu_b \ne 0$ (proved in Section 5 and formalized in Lean 4) immediately closes the reductio ad absurdum and proves RH.
+### Concrete Bridge Investigation: Spectral Matrix-Span Recovery
+On the legal coefficient subspace $b = P \beta$ ($\mathbf{1}^T b = 0$, dimension $m = r - 1$), the space of real symmetric matrices $\operatorname{Sym}(m)$ has dimension $D = m(m+1)/2$.
+- For $r = 3$ grades, $m = 2$, $D = 3$.
+- For $r = 4$ grades, $m = 3$, $D = 6$.
+
+Each Riemann zeta zero $\rho_k = 1/2 + i\gamma_k$ generates a positive semidefinite quadratic observable:
+$$G_k = P^T \operatorname{Re}\left( A_h(i\gamma_k)^2 e(i\gamma_k) e(i\gamma_k)^* \right) P \in \operatorname{Sym}(m).$$
+The off-critical zero quartet supplies:
+$$G_Q = P^T \operatorname{Re}\left( A_h(z_0)^2 M(z_0)^{\rm sym} \right) P \in \operatorname{Sym}(m).$$
+
+**Numerical Span Verification**:
+Testing on the authentic 3-grade family with 25 reference zeros demonstrates that the spectral matrix ensemble achieves **full rank** $\operatorname{rank}(A_{\rm spec}) = 3 = D$.
+Consequently, every grouped correlation matrix $G_\ell = P^T M_\ell^{\rm sym} P$ (including the coincidence atom $y = \tau/8$) is **linearly recovered** in the span of the spectral observables:
+$$G_\ell = \sum_k x_k G_k + x_Q G_Q,$$
+with least-squares relative residual $\le 10^{-15}$ (machine precision).
+
+### Epistemic Separation: Recoverability vs. Vanishing
+The linear recovery of $G_\ell$ establishes that the grouped correlation observables are algebraically accessible from the spectral quadratic spectrum.
+**However, recoverability does not imply vanishing**:
+1. Linear recoverability shows that $c_\ell(b) = \beta^T G_\ell \beta$ can be written as a linear combination of spectral quadratic evaluations $\sum_k x_k \beta^T G_k \beta$.
+2. To deduce that $c_\ell(b) = 0$ from hypothesis $H$, one must prove that the specific spectral evaluations vanish or satisfy an identity that forces the linear combination to zero.
+3. The Guinand-Weil explicit formula supplies only **one scalar identity** for a given test function, not the simultaneous vanishing of individual spectral zero responses.
+
+Therefore, the antecedent implication $H \Longrightarrow \nu_b = 0$ requires the following open research obligation:
+
+> **Sublemma (Spectral-Correlation Bridge — OPEN RESEARCH OBLIGATION)**:
+> Let $H$ hold (existence of off-critical zero $\rho_0$). Construct a sequence of admissible test functions $g_\nu$ or legal vectors $b$ such that the explicit formula spectral sum isolates a selected non-zero grouped coefficient $c_\ell(b)$ and forces $c_\ell(b) = 0$, thereby closing the reductio ad absurdum against the authentic non-vanishing theorem $\nu_b \ne 0$.
 
 ---
 
 ## 7. Mathematical Conclusions
 
 1. **Exact Representation**: The condition $\nu_b = 0$ for finite stations is equivalent to the finite system $c_\ell(b) = 0$ ($\ell=1,\dots,L$), and equivalent to the vanishing of the first $L$ power moments by Vandermonde invertibility.
-2. **Authentic Non-Vanishing**: For 2 grades (and any legal zero-sum family with positive active weights), $c_\ell(b)$ cannot vanish identically because diagonal and extremal grade interactions have fixed signs that cannot cancel.
-3. **Reductio Status**: The non-vanishing of $\nu_b$ is not an obstacle; it is the desired contradictory pole of the reductio ad absurdum. The missing link is the antecedent implication $H \Longrightarrow \nu_b = 0$.
+2. **Same-Grade Cross-Terms**: $E_K(z)E_K(-z)$ must retain $n \ne m$ cross-terms. Omitting them causes a severe omission error ($\approx 51.98$ at $z=0$).
+3. **Authentic Same-Gap Coincidences**: Coincidences like $(-1, 64), (-2, 512), (-3, 4096)$ at $y = \tau/8$ demonstrate that grouped coefficients can combine interactions across multiple distinct grade pairs.
+4. **Spectral Matrix Span**: Spectral quadratic observables span the entire symmetric matrix space on the legal subspace, linearly recovering grouped correlation matrices to machine precision.
+5. **Reductio Status**: Proving that $\nu_b \ne 0$ establishes the necessary contradictory pole of the reductio ad absurdum. Deriving $\nu_b = 0$ from $H$ remains an open research obligation (the Spectral-Correlation Bridge Sublemma).
+

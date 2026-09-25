@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-007",
+  "active_task_id": "TASK-TC-008",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -152,6 +152,24 @@
         "tests/test_tc_reproduced_defects.py"
       ],
       "resolution": "Formulated exact bridge lemma and dependency chain. Solved generalized eigenvalue problem Q beta = lambda (P^T P) beta, finding lambda_min ~= -10,268.14 on 4-grade legal unit sphere (refuting 92.08 bound). Audited critical zero deflation: 4-grade deflates 1 zero (cond 15.6), 6-grade deflates 2 zeros (cond 188.7), 8-grade deflates 3 zeros (cond 1556.3); surviving directions exhibit growing derivative and station norms while Stieltjes tail (~4.45e9) dominates. Discovered that discrete zero cancellation does not force support collisions m*tau^K = n*tau^J due to non-trivial linear combinations of distinct exponentials vanishing at isolated points without exponent coincidence."
+    },
+    {
+      "task_id": "TASK-TC-008",
+      "priority": 10,
+      "objective": "Close certification defects on bounded baseline, repair full spectral-correlation identity, and investigate the spectral-correlation bridge in the TC reductio",
+      "status": "COMPLETED",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "1. Certification defects (metadata cutoff discrepancy, failure to fail closed on incomplete zero tables, displaced ordinates, uncertified diagnostic baseline reporting, deflation robustness, and underived literal quadrature bounds) undermined defensibility of the 4-grade benchmark F_+ = 976,642,212,980.2515, D_stat = 10.246264328805642. 2. Omitting same-grade n != m cross-terms in E_b(z)E_b(-z) introduced an order ~52 omission error at z=0, invalidating earlier claims of an operator obstruction. Proving whether spectral responses force c_ell(b) = 0 under H remains the unresolved bridge obligation.",
+      "planned_calculation": "1. Fix all 6 certification defects in tc/weil_forms.py. 2. Derive 3-term dimensionless kernel quadrature enclosure eps_quad(h) = 4.0e-12 h^-5 + 1.0e-13 h^-3 + 1.0e-15 h^-1 + eps_fp. 3. Recompute and verify the 4-grade benchmark F_+ and D_stat theoretical floor. 4. Restore exact same-grade cross-terms in compute_grouped_correlation_system, compute exact keys (d, num/den), detect authentic same-gap coincidence (1, 1, 8) giving y = tau/8, and test spectral matrix span recovery.",
+      "acceptance_criterion": "All 33 defect tests pass in test_tc_reproduced_defects.py; three-term enclosure covers measured error; full spectral rank spanned (Sym(2) dim 3); Spectral-Correlation Bridge Sublemma formulated as open research obligation; tau_transcendence hypothesis retained in formal coverage.",
+      "dependencies": ["TASK-TC-007"],
+      "evidence": [
+        "data/tc_baseline_canonical_weil_error_budget.json",
+        "docs/reviews/TC_FINITE_CORRELATION_EQUATIONS.md",
+        "tc/weil_forms.py",
+        "tests/test_tc_reproduced_defects.py"
+      ],
+      "resolution": "Closed all 6 certification defects. Derived 3-term quadrature enclosure replacing asserted literal. Verified exact 4-grade benchmark F_+ = 976,642,212,980.2515, D_stat = 10.246264328805642, proxy floor 976,641,687,735.502. Repaired full spectral-correlation identity with exact same-grade cross-terms (discrepancy < 1e-11 at z=0 and z=0.49+100j), detected authentic same-gap coincidence (-1, 64) with (-2, 512) and (-2, 512) with (-3, 4096) yielding key (1, 1, 8) and y = tau/8. Demonstrated spectral matrices span Sym(2) with rank 3/3, linearly recovering grouped correlation matrices to machine precision (relative residual <= 1e-15). Isolated the Spectral-Correlation Bridge Sublemma as an open research obligation."
     }
   ]
 }

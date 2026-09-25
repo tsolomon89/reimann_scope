@@ -198,6 +198,8 @@ from tc.weil_forms import (
     evaluate_tc_optimized_suppression_comparison,
     validate_spectral_zero_coverage,
     solve_complete_upper_objective,
+    compute_grouped_correlation_system,
+    test_spectral_matrix_span_recovery,
 )
 
 from tc.approximation import (
@@ -391,6 +393,8 @@ __all__ = [
     "evaluate_tc_optimized_suppression_comparison",
     "validate_spectral_zero_coverage",
     "solve_complete_upper_objective",
+    "compute_grouped_correlation_system",
+    "test_spectral_matrix_span_recovery",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

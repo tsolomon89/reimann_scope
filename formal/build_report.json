@@ -4,8 +4,8 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "8fb7def0eabaf6ef662de0b80ec74676acfed061",
-  "timestamp": "2026-09-24T17:15:23.167279+00:00",
+  "producing_git_commit": "70937e92e754641723a079988dd49864da3e2989",
+  "timestamp": "2026-09-25T16:58:44.883824+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 293,
@@ -32,7 +32,7 @@
     "scripts/build_formal.py": "648f57e759aef651b8ed64bad178efd01e8f2682c2a5cdbd827288b919f9247d",
     "certification.py": "ef0db9f9611d2c31730f84cd25c4bcf6a808ee4dbbf798d0d7e00e8102250ebc"
   },
-  "build_stdout": "\u2139 [1547/1560] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:580:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:581:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:582:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:583:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully.",
+  "build_stdout": "\u2139 [1543/1560] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:580:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:581:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:582:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:583:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "eb4d4ea8c7db59b7de2b8d288a1eb50b29cdc088230366814ae67e117ab60496"
+  "report_hash": "d10ff2e684a5d56fd5a8f3515184c317ee8f7b18538ae08c62710807e7ba8f0d"
 }
