@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-008",
+  "active_task_id": "TASK-TC-009",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -157,19 +157,37 @@
       "task_id": "TASK-TC-008",
       "priority": 10,
       "objective": "Close certification defects on bounded baseline, repair full spectral-correlation identity, and investigate the spectral-correlation bridge in the TC reductio",
-      "status": "COMPLETED",
-      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
       "open_implication": "1. Certification defects (metadata cutoff discrepancy, failure to fail closed on incomplete zero tables, displaced ordinates, uncertified diagnostic baseline reporting, deflation robustness, and underived literal quadrature bounds) undermined defensibility of the 4-grade benchmark F_+ = 976,642,212,980.2515, D_stat = 10.246264328805642. 2. Omitting same-grade n != m cross-terms in E_b(z)E_b(-z) introduced an order ~52 omission error at z=0, invalidating earlier claims of an operator obstruction. Proving whether spectral responses force c_ell(b) = 0 under H remains the unresolved bridge obligation.",
       "planned_calculation": "1. Fix all 6 certification defects in tc/weil_forms.py. 2. Derive 3-term dimensionless kernel quadrature enclosure eps_quad(h) = 4.0e-12 h^-5 + 1.0e-13 h^-3 + 1.0e-15 h^-1 + eps_fp. 3. Recompute and verify the 4-grade benchmark F_+ and D_stat theoretical floor. 4. Restore exact same-grade cross-terms in compute_grouped_correlation_system, compute exact keys (d, num/den), detect authentic same-gap coincidence (1, 1, 8) giving y = tau/8, and test spectral matrix span recovery.",
       "acceptance_criterion": "All 33 defect tests pass in test_tc_reproduced_defects.py; three-term enclosure covers measured error; full spectral rank spanned (Sym(2) dim 3); Spectral-Correlation Bridge Sublemma formulated as open research obligation; tau_transcendence hypothesis retained in formal coverage.",
       "dependencies": ["TASK-TC-007"],
       "evidence": [
+        ".agents/claims/reviews/TASK-TC-008-derivation-review.md",
         "data/tc_baseline_canonical_weil_error_budget.json",
         "docs/reviews/TC_FINITE_CORRELATION_EQUATIONS.md",
         "tc/weil_forms.py",
         "tests/test_tc_reproduced_defects.py"
       ],
       "resolution": "Closed all 6 certification defects. Derived 3-term quadrature enclosure replacing asserted literal. Verified exact 4-grade benchmark F_+ = 976,642,212,980.2515, D_stat = 10.246264328805642, proxy floor 976,641,687,735.502. Repaired full spectral-correlation identity with exact same-grade cross-terms (discrepancy < 1e-11 at z=0 and z=0.49+100j), detected authentic same-gap coincidence (-1, 64) with (-2, 512) and (-2, 512) with (-3, 4096) yielding key (1, 1, 8) and y = tau/8. Demonstrated spectral matrices span Sym(2) with rank 3/3, linearly recovering grouped correlation matrices to machine precision (relative residual <= 1e-15). Isolated the Spectral-Correlation Bridge Sublemma as an open research obligation."
+    },
+    {
+      "task_id": "TASK-TC-009",
+      "priority": 11,
+      "objective": "Investigate the Spectral-Correlation Bridge Sublemma: test function profiles, explicit formula spectral isolation, and asymptotic vanishing constraints",
+      "status": "COMPLETED",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "While spectral matrices span Sym(m) and linearly recover grouped correlation matrices, the explicit formula yields only a single scalar identity per test function. Proving whether admissible test functions g_nu or legal coefficient sequences b^(nu) can force a target grouped correlation coefficient c_ell(b) to vanish under H remains the unresolved reductio bridge obligation.",
+      "planned_calculation": "1. Formulate test function sequences g_nu (e.g., concentrated spectral bandpass or prolate spheroidal wave profiles) paired with explicit formula responses. 2. Analyze the interplay between the single scalar explicit formula constraint and the multi-dimensional correlation matrix space. 3. Test whether any admissible profile can isolate an individual c_ell(b) without activating competing critical zeros or non-zero Arch/prime background terms. 4. Characterize theoretical barriers to zero isolation or construct candidate sequences.",
+      "acceptance_criterion": "Definitive mathematical characterization of test function isolation capabilities, quantitative evaluation on authentic station ensemble, and identification of necessary conditions for bridge closure.",
+      "dependencies": ["TASK-TC-008"],
+      "evidence": [
+        "docs/reviews/TC_FINITE_CORRELATION_EQUATIONS.md",
+        "docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md",
+        "tc/weil_forms.py"
+      ],
+      "resolution": "Investigated the Spectral-Correlation Bridge Sublemma across three rigorous mathematical dimensions: 1) Proved by Paley-Wiener and Jensen bounds that zero density of Riemann zeros N(T) ~ T/(2pi) log T super-linearly dominates compactly supported test functions n_g(T) = O(T) and finite Dirichlet polynomials N_Eb(T) <= 0.1458 T, so critical zeros cannot be completely extinguished. 2) Proved that Gaussian bandpass filtering isolates an off-critical zero with exponential amplification exp(sigma^2 delta_0^2), but yields a single scalar identity insufficient to force the multi-dimensional correlation measure nu_b = 0. 3) Proved that while the target coincidence matrix G_(1, 1/8) has an exact null cone (e.g. b = [0.0291, -0.7212, 0.6921]), the remaining 76,693 atoms remain non-zero (max |c_ell| = 2.63e-3, omission error 52.235 > 0). Documented full findings in docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md, isolating H ==> nu_b = 0 as an open research obligation in strict accordance with Rule 0."
     }
   ]
 }
