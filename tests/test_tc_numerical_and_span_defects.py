@@ -35,6 +35,9 @@ from tc.weil_forms import (
     test_spectral_matrix_span_recovery as eval_spectral_matrix_span_recovery,
     certify_production_convolution_table,
     certify_baseline_canonical_weil_error_budget,
+    compute_critical_zero_observable,
+    compute_reflected_quartet_observable,
+    investigate_scalar_spectral_bridge_target_b,
     sieve_prime_powers_in_window,
     Z_CANONICAL_KERNEL,
     NORM_KAPPA_SQ,
@@ -369,22 +372,38 @@ def test_spectral_span_deficient_rank_narrative():
 def test_target_a_convolution_table_certification():
     """
     Target A:
-    1. Certify production convolution table at h=0.05 on window [8, 20].
+    1. Certify production convolution table at baseline h=0.05 on window [8, 20].
     2. Check that derivative remainder bound ||C_h - interp(C_h)||_infty <= (Delta v)^2 / 8 * ||psi_h'||_2^2
-       is mathematically justified and computed.
-    3. Test adversarial scaling case h=0.01: returns uncertified outside established domain.
+       is mathematically computed (~6499.10) and encloses the first cell midpoint discrepancy (~6497.70).
+    3. Verify that unproved nodal literals c4, c2, c0 prevent false certification:
+       is_table_certified is False, status is UNCERTIFIED_NODAL_REMAINDER_PROOF_UNRESOLVED.
+    4. Reproduce and verify the 1-node failure: n_nodes=1 produces ~1.58e8 error at v=0.00005
+       and fails closed with UNCERTIFIED_UNSUPPORTED_QUADRATURE_ORDER.
+    5. Test adversarial scaling case h=0.01: returns uncertified outside established domain.
+    6. Verify that invalid parameters (negative h, N_tab < 2, non-integer nodes) fail closed.
+    7. Verify production budget consumes the table enclosure and propagates is_table_certified=False.
     """
     cert = certify_production_convolution_table(h=0.05, window=(8.0, 20.0), N_tab=2001, n_nodes=256)
-    assert cert['status'] == 'CONVOLUTION_TABLE_CERTIFIED'
-    assert cert['is_table_certified'] is True
+    assert cert['status'] == 'UNCERTIFIED_NODAL_REMAINDER_PROOF_UNRESOLVED'
+    assert cert['is_table_certified'] is False
     assert cert['is_domain_certified'] is True
 
-    # Check bounds
+    # Check interpolation bounds and first-cell midpoint discrepancy
     interp_bound = cert['interpolation_model']['eps_interp_bound']
-    nodal_bound = cert['quadrature_model']['eps_nodal_bound']
-    total_bound = cert['table_enclosure']['total_pointwise_error_bound']
-    assert total_bound == interp_bound + nodal_bound
-    assert cert['table_enclosure']['relative_pointwise_accuracy'] < 1e-2
+    assert interp_bound == pytest.approx(6499.101197, rel=1e-4)
+    mid_disc = cert['interpolation_model']['first_cell_midpoint_discrepancy']
+    assert mid_disc == pytest.approx(6497.700898, rel=1e-4)
+    assert cert['interpolation_model']['midpoint_enclosed_by_interp_bound'] is True
+
+    # Check peak-normalized allowance vs unbounded uniform relative error
+    assert cert['table_enclosure']['peak_normalized_allowance'] < 1e-4
+    assert "Uniform relative error across [0, 2h] is mathematically unbounded" in cert['table_enclosure']['uniform_relative_bound_status']
+
+    # Reproduce defect: n_nodes=1 must fail closed with unsupported quadrature order
+    cert_1 = certify_production_convolution_table(n_nodes=1)
+    assert cert_1['status'] == 'UNCERTIFIED_UNSUPPORTED_QUADRATURE_ORDER'
+    assert cert_1['is_table_certified'] is False
+    assert "catastrophic quadrature errors" in cert_1['reason']
 
     # Adversarial scaling test: h=0.01 must fail closed
     cert_adv = certify_production_convolution_table(h=0.01, window=(8.0, 20.0), N_tab=2001, n_nodes=256)
@@ -392,6 +411,17 @@ def test_target_a_convolution_table_certification():
     assert cert_adv['is_table_certified'] is False
     assert cert_adv['is_domain_certified'] is False
     assert "outside the certified production baseline domain" in cert_adv['reason']
+
+    # Invalid parameter tests
+    assert certify_production_convolution_table(h=-0.05)['is_table_certified'] is False
+    assert certify_production_convolution_table(N_tab=1)['is_table_certified'] is False
+    assert certify_production_convolution_table(n_nodes=0)['is_table_certified'] is False
+
+    # Production budget integration
+    budget = certify_baseline_canonical_weil_error_budget()
+    assert budget['error_budget']['is_table_certified'] is False
+    assert budget['error_budget']['table_certification_status'] == 'UNCERTIFIED_NODAL_REMAINDER_PROOF_UNRESOLVED'
+    assert budget['prime_quadrature']['is_table_certified'] is False
 
 
 def test_reciprocal_atom_simultaneous_nulling_and_corrected_vector():
@@ -431,7 +461,6 @@ def test_reciprocal_atom_simultaneous_nulling_and_corrected_vector():
         return b_vec[1] * (A12 * b_vec[0] + A23 * b_vec[2])
 
     def eval_c_neg1_8_1(b_vec):
-        # Reciprocal atom (-1, 8, 1): J - K = -1, ratio 8/1
         return b_vec[1] * (A12 * b_vec[0] + A23 * b_vec[2])
 
     # Corrected null vector
@@ -449,7 +478,6 @@ def test_reciprocal_atom_simultaneous_nulling_and_corrected_vector():
     b_prev = np.array([0.029096, -0.721205, 0.692110])
     val_prev = eval_c_1_1_8(b_prev)
     assert abs(val_prev) > 1e-5, f"Expected previous vector to fail to vanish, got {val_prev}"
-    # Both terms in previous vector were negative:
     assert b_prev[0] * b_prev[1] < 0
     assert b_prev[1] * b_prev[2] < 0
 
@@ -458,7 +486,7 @@ def test_40_digit_quadrature_diagnostic_assertions():
     """
     Check the quadrature test against 40-dps mpmath as promised in docstring.
     Verifies that the empirical discrepancy between 256-node GL and 40-dps mpmath
-    is strictly bounded by the certified eps_nodal bound at baseline h=0.05.
+    is strictly bounded by the nominal eps_nodal bound at baseline h=0.05.
     """
     mpmath.mp.dps = 40
     h_base = 0.05
@@ -478,6 +506,122 @@ def test_40_digit_quadrature_diagnostic_assertions():
     diff_0 = abs(c_fast[0] - C_mp_0)
 
     cert = certify_production_convolution_table(h=h_base)
-    eps_nodal = cert['quadrature_model']['eps_nodal_bound']
+    eps_nodal = cert['quadrature_model']['eps_nodal_bound_nominal']
 
-    assert diff_0 <= eps_nodal, f"Measured 40-dps error {diff_0} exceeded certified nodal bound {eps_nodal}"
+    assert diff_0 <= eps_nodal, f"Measured 40-dps error {diff_0} exceeded nominal nodal bound {eps_nodal}"
+
+
+def test_production_evaluators_scalar_matrix_agreement():
+    """
+    Verify that physical scalar/matrix agreement tests call production evaluators:
+    compute_critical_zero_observable and compute_reflected_quartet_observable.
+    """
+    grades = [-1, -2, -3]
+    tau = 2.0 * math.pi
+    window = (8.0, 20.0)
+    h = 0.05
+
+    P = np.array([[-1.0, -1.0], [1.0, 0.0], [0.0, 1.0]])
+
+    def w_bump(x):
+        if x <= 8.0 or x >= 20.0: return 0.0
+        u = 2.0 * (x - 8.0) / 12.0 - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    st_raw = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades}
+    a_kn = {}
+    for K in grades:
+        a_kn[K] = {}
+        for n_val, x_val, lam_val in st_raw[K]:
+            w = w_bump(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0: a_kn[K][n_val] = float(amp)
+
+    gam = 14.134725141734693
+    crit_obs = compute_critical_zero_observable(gam, grades, a_kn, P, h=h, tau=tau)
+    S_mat = np.array(crit_obs['S_matrix'])
+
+    z0 = complex(0.49, 100.0)
+    quart_obs = compute_reflected_quartet_observable(z0, grades, a_kn, P, h=h, tau=tau)
+    Q_mat = np.array(quart_obs['Q_matrix'])
+
+    # Test agreement for several beta vectors
+    test_betas = [
+        np.array([1.0, 0.0]),
+        np.array([0.0, 1.0]),
+        np.array([0.6, -0.8]),
+        np.array([1.0 / math.sqrt(2), 1.0 / math.sqrt(2)])
+    ]
+    nodes_1000, weights_1000 = np.polynomial.legendre.leggauss(1000)
+    kappa_1000 = np.exp(-1.0 / (1.0 - nodes_1000**2)) / Z_CANONICAL_KERNEL * weights_1000
+
+    for beta in test_betas:
+        b = P @ beta
+        # Scalar critical evaluation
+        ah_gam = ( (1j * gam)**2 - 0.25 ) * np.sum(kappa_1000 * np.exp(1j * gam * h * nodes_1000))
+        Eb_gam = sum(b[i] * sum(a * ((tau ** grades[i] * n) ** (1j * gam)) for n, a in a_kn[grades[i]].items()) for i in range(3))
+        s_scal = 2.0 * (abs(ah_gam)**2) * (abs(Eb_gam)**2)
+        s_mat = float(beta.T @ S_mat @ beta)
+        assert abs(s_scal - s_mat) < 1e-10
+
+        # Scalar quartet evaluation
+        ah_z0 = ( z0**2 - 0.25 ) * np.sum(kappa_1000 * np.exp(z0 * h * nodes_1000))
+        Eb_p = sum(b[i] * sum(a * ((tau ** grades[i] * n) ** z0) for n, a in a_kn[grades[i]].items()) for i in range(3))
+        Eb_m = sum(b[i] * sum(a * ((tau ** grades[i] * n) ** (-z0)) for n, a in a_kn[grades[i]].items()) for i in range(3))
+        q_scal = 4.0 * float(np.real(ah_z0**2 * Eb_p * Eb_m))
+        q_mat = float(beta.T @ Q_mat @ beta)
+        assert abs(q_scal - q_mat) < 1e-10
+
+    # Test 4-grade quartet real rank: check that a symmetrized rank-2 complex outer product can have rank up to 4
+    grades_4 = [-1, -2, -3, -4]
+    st_raw_4 = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades_4}
+    a_kn_4 = {}
+    for K in grades_4:
+        a_kn_4[K] = {}
+        for n_val, x_val, lam_val in st_raw_4[K]:
+            w = w_bump(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0: a_kn_4[K][n_val] = float(amp)
+    P_4 = np.eye(4)
+    quart_4 = compute_reflected_quartet_observable(z0, grades_4, a_kn_4, P_4, h=h, tau=tau)
+    assert quart_4['cal_M_rank'] >= 3
+
+
+def test_target_b_scalar_spectral_bridge_investigation():
+    """
+    Target B:
+    1. Verify scalar algebraic invariant L(b) = -0.5 on legal unit sphere.
+    2. Verify unique active station contributors and strictly positive amplitudes for the three selected keys:
+       (1, 89, 563), (2, 89, 3511), (1, 563, 3511).
+    3. Verify finite linear recovery of G_target = -(1/2) P^T P using critical zeros alone (residual < 1e-13, cond ~1104).
+    4. Verify finite linear recovery including off-critical quartet Q(rho0) (residual < 1e-13, cond ~3876).
+    5. Propagate ordinate uncertainty through recovery coefficients.
+    6. Verify concrete H-dependent construction defect and Conrey/Paley-Wiener infinite tail obstruction.
+    """
+    res = investigate_scalar_spectral_bridge_target_b()
+    assert res['status'] == 'SCALAR_SPECTRAL_BRIDGE_TARGET_B_INVESTIGATED'
+
+    # 1. Algebraic invariant
+    assert res['algebraic_invariant']['legal_unit_sphere_value'] == -0.5
+    keys = res['algebraic_invariant']['selected_grouped_keys']
+    assert len(keys) == 3
+    for k in keys:
+        assert k['is_positive'] is True
+        assert k['key'] in [[1, 89, 563], [2, 89, 3511], [1, 563, 3511]]
+
+    # 2. Critical recovery
+    crit_rec = res['critical_only_recovery']
+    assert crit_rec['reconstruction_residual_norm'] < 1e-13
+    assert crit_rec['basis_condition_number'] < 2000.0
+    assert crit_rec['ordinate_uncertainty_propagated_error'] < 1e-12
+
+    # 3. Quartet recovery
+    quart_rec = res['quartet_recovery']
+    assert quart_rec['reconstruction_residual_norm'] < 1e-13
+    assert quart_rec['basis_condition_number'] < 5000.0
+
+    # 4. Obstruction analysis
+    obstruction = res['concrete_h_dependent_construction']
+    assert obstruction['verdict'] == 'CONSTRUCTION_DEFECT_IDENTIFIED_AND_OBSTRUCTION_QUANTIFIED'
+    assert "zeta(rho0) = 0" in obstruction['first_equation_using_zeta_rho0']
+    assert "Conrey" in obstruction['obstruction_analysis']

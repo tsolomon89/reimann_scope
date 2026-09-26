@@ -217,6 +217,9 @@ from tc.weil_forms import (
     compute_grouped_correlation_system,
     test_spectral_matrix_span_recovery,
     certify_production_convolution_table,
+    compute_critical_zero_observable,
+    compute_reflected_quartet_observable,
+    investigate_scalar_spectral_bridge_target_b,
 )
 
 from tc.approximation import (
@@ -413,6 +416,9 @@ __all__ = [
     "compute_grouped_correlation_system",
     "test_spectral_matrix_span_recovery",
     "certify_production_convolution_table",
+    "compute_critical_zero_observable",
+    "compute_reflected_quartet_observable",
+    "investigate_scalar_spectral_bridge_target_b",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
     "evaluate_two_variable_explicit_expansion",

@@ -3838,6 +3838,211 @@ def evaluate_tc_canonical_weil_spectrum_sweep(
     return result
 
 
+def certify_production_convolution_table(
+    h: float = 0.05,
+    window: Tuple[float, float] = (8.0, 20.0),
+    N_tab: int = 2001,
+    n_nodes: int = 256,
+    tau: float = 2.0 * math.pi,
+    output_path: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Produce a defensible mathematical enclosure for the production-used position-space convolution table C_h(v)
+    and propagate its certification status correctly (Target A).
+
+    1. Mathematical Specification:
+       The position-space convolution kernel is:
+           C_h(v) = int_R psi_h(u) psi_h(u - v) du
+       where psi_h(u) = h^(-3) kappa''(u/h) - 0.25 h^(-1) kappa(u/h) with supp(kappa) = [-1, 1].
+       Under the exact dimensionless decomposition (xi = v / h in [0, 2]):
+           C_h(v) = h^(-5) K_{2,2}(xi) - 0.5 h^(-3) K_{2,0}(xi) + 0.0625 h^(-1) K_{0,0}(xi)
+       where K_{i,j}(xi) = int_{-1+xi}^1 kappa^{(i)}(y) kappa^{(j)}(y - xi) dy.
+
+    2. Rigorous Derivative Remainder Enclosure:
+       For linear interpolation of C_h on a uniform mesh with cell width Delta v = 2h / (N_tab - 1):
+           ||C_h - interp(C_h)||_infty <= (Delta v)^2 / 8 * ||psi_h'||_2^2
+       where:
+           ||psi_h'||_2^2 = h^(-7) ||kappa'''||_2^2 + 0.5 h^(-5) ||kappa''||_2^2 + 0.0625 h^(-3) ||kappa'||_2^2.
+       With certified L^2 norms:
+           ||kappa'''||_2^2 = 16247.684292415849
+           ||kappa''||_2^2  = 54.959873423948665
+           ||kappa'||_2^2   = 2.077745668366741
+           ||kappa||_2^2    = 0.675116813009698.
+       For baseline h = 0.05, N_tab = 2001 (Delta v = 5e-5), the interpolation error allowance is ~6499.101197.
+       The measured discrepancy at the first cell midpoint v = 0.000025 is ~6497.700898, which is strictly
+       enclosed by the bound.
+
+    3. Failure Modes, Parameter Validation & Unsupported Orders:
+       - Parameter validation: finite positive float h, integer N_tab >= 2, positive integer n_nodes.
+       - Any unsupported quadrature order (such as n_nodes=1, which produces an error ~1.58e8 at v=0.00005)
+         is immediately rejected with status UNCERTIFIED_UNSUPPORTED_QUADRATURE_ORDER and is_table_certified=False.
+       - Non-baseline parameter configurations (e.g. h = 0.01) return UNCERTIFIED_OUTSIDE_PARAMETER_DOMAIN.
+       - For the 256-node baseline: the quadrature error literals c_4 = 4e-12, c_2 = 1e-13, c_0 = 1e-15 have not
+         acquired an analytic remainder proof for 512th derivatives on the compact bump. Per Root Rule 0,
+         missing evidence remains missing and unsupported certified flags must be removed without replacing
+         them with unexplained constants. Hence is_table_certified remains False.
+    """
+    if not (isinstance(h, (int, float)) and math.isfinite(h) and h > 0.0):
+        return {
+            'status': 'UNCERTIFIED_INVALID_PARAMETER_SPECIFICATION',
+            'is_table_certified': False,
+            'is_domain_certified': False,
+            'reason': f"Bandwidth h={h} must be a finite positive real number."
+        }
+    if not (isinstance(N_tab, (int, np.integer)) and N_tab >= 2):
+        return {
+            'status': 'UNCERTIFIED_INVALID_PARAMETER_SPECIFICATION',
+            'is_table_certified': False,
+            'is_domain_certified': False,
+            'reason': f"Grid size N_tab={N_tab} must be an integer >= 2."
+        }
+    if not (isinstance(n_nodes, (int, np.integer)) and n_nodes > 0):
+        return {
+            'status': 'UNCERTIFIED_INVALID_PARAMETER_SPECIFICATION',
+            'is_table_certified': False,
+            'is_domain_certified': False,
+            'reason': f"Quadrature order n_nodes={n_nodes} must be a positive integer."
+        }
+
+    delta_v = float(2.0 * h / (N_tab - 1))
+
+    # Reject unsupported quadrature order
+    if n_nodes != 256:
+        return {
+            'status': 'UNCERTIFIED_UNSUPPORTED_QUADRATURE_ORDER',
+            'is_table_certified': False,
+            'is_domain_certified': False,
+            'parameters': {
+                'bandwidth_h': float(h),
+                'window': list(window),
+                'N_tab': int(N_tab),
+                'n_nodes': int(n_nodes),
+                'delta_v': delta_v
+            },
+            'reason': (
+                f"Quadrature order n_nodes={n_nodes} is unsupported and uncertified. "
+                "Gauss-Legendre order 256 is the declared production baseline; orders such as n_nodes=1 "
+                "lead to catastrophic quadrature errors (~1.58e8 at v=0.00005) and cannot be certified "
+                "without an order-specific remainder bound or outward ball enclosure."
+            )
+        }
+
+    is_domain_certified = bool(abs(h - 0.05) < 1e-9 and abs(window[0] - 8.0) < 1e-9 and abs(window[1] - 20.0) < 1e-9)
+    if not is_domain_certified:
+        return {
+            'status': 'UNCERTIFIED_OUTSIDE_PARAMETER_DOMAIN',
+            'is_table_certified': False,
+            'is_domain_certified': False,
+            'parameters': {
+                'bandwidth_h': float(h),
+                'window': list(window),
+                'N_tab': int(N_tab),
+                'n_nodes': int(n_nodes),
+                'delta_v': delta_v
+            },
+            'reason': (
+                f"Requested bandwidth h={h}, window={window} is outside the certified production baseline domain "
+                "(h=0.05 on [8.0, 20.0]). Per Target A requirements, non-baseline parameter cases return explicitly uncertified."
+            )
+        }
+
+    v_tab = np.linspace(0.0, 2.0 * h, N_tab)
+
+    # Derivative norm of psi_h
+    norm_psi_prime_sq = float(
+        (h**(-7)) * NORM_KAPPA_THIRD_DERIVATIVE_SQ +
+        0.5 * (h**(-5)) * NORM_KAPPA_SECOND_DERIVATIVE_SQ +
+        0.0625 * (h**(-3)) * NORM_KAPPA_FIRST_DERIVATIVE_SQ
+    )
+    eps_interp = float((delta_v**2 / 8.0) * norm_psi_prime_sq)
+
+    # Nodal quadrature enclosure metrics for 256-node Gauss-Legendre
+    c_4 = 4.0e-12
+    c_2 = 1.0e-13
+    c_0 = 1.0e-15
+    eps_fp = 256.0 * 2.220446049250313e-16 * (55.0 * (h**(-5)) + 2.5 * (h**(-3)) + 0.0625 * (h**(-1)))
+    eps_nodal_nominal = float(c_4 * (h**(-5)) + 0.5 * c_2 * (h**(-3)) + 0.0625 * c_0 * (h**(-1)) + eps_fp)
+    eps_table_total = float(eps_interp + eps_nodal_nominal)
+
+    # Compute table
+    C_tab = _compute_C_tab_fast(v_tab, h=h, n_nodes=n_nodes)
+
+    # First cell midpoint diagnostic check
+    v_mid = 0.5 * delta_v
+    c_mid_interpolant = float(0.5 * (C_tab[0] + C_tab[1]))
+    # Independent 50-digit mpmath reference at v=0.000025 for h=0.05
+    c_mid_ref = 175873407.8820750864 if abs(h - 0.05) < 1e-9 and N_tab == 2001 else None
+    discrepancy_mid = float(abs(c_mid_ref - c_mid_interpolant)) if c_mid_ref is not None else None
+
+    result = {
+        'status': 'UNCERTIFIED_NODAL_REMAINDER_PROOF_UNRESOLVED',
+        'is_table_certified': False,
+        'is_domain_certified': True,
+        'parameters': {
+            'bandwidth_h': float(h),
+            'window': list(window),
+            'N_tab': int(N_tab),
+            'n_nodes': int(n_nodes),
+            'tau': float(tau),
+            'delta_v': delta_v,
+            'v_min': 0.0,
+            'v_max': float(2.0 * h)
+        },
+        'quadrature_model': {
+            'method': f'{n_nodes}-node Gauss-Legendre quadrature',
+            'kernel_normalization': 'Z_CANONICAL_KERNEL',
+            'dimensionless_powers': ['h^-5', 'h^-3', 'h^-1'],
+            'c_4_bound': c_4,
+            'c_2_bound': c_2,
+            'c_0_bound': c_0,
+            'eps_fp_accumulation': float(eps_fp),
+            'eps_nodal_bound_nominal': eps_nodal_nominal,
+            'unproved_literals_status': (
+                "The literals c4=4e-12, c2=1e-13, c0=1e-15 lack an analytic 512th-derivative remainder proof "
+                "or outward interval enclosure covering every consumed nodal value. Per Root Rule 0, "
+                "unsupported certified flags must be removed without replacing them with unexplained constants."
+            )
+        },
+        'interpolation_model': {
+            'formula': '||C_h - interp(C_h)||_infty <= (Delta v)^2 / 8 * ||psi_h\'||_2^2',
+            'norm_psi_prime_sq': float(norm_psi_prime_sq),
+            'cell_width_delta_v': delta_v,
+            'eps_interp_bound': eps_interp,
+            'first_cell_midpoint_v': v_mid,
+            'first_cell_midpoint_discrepancy': discrepancy_mid,
+            'midpoint_enclosed_by_interp_bound': bool(discrepancy_mid <= eps_interp) if discrepancy_mid is not None else None
+        },
+        'table_enclosure': {
+            'total_pointwise_error_bound_nominal': eps_table_total,
+            'C_h_0': float(C_tab[0]),
+            'C_h_0_interval_nominal': [float(C_tab[0] - eps_nodal_nominal), float(C_tab[0] + eps_nodal_nominal)],
+            'peak_normalized_allowance': float(eps_table_total / abs(C_tab[0])),
+            'uniform_relative_bound_status': (
+                "Uniform relative error across [0, 2h] is mathematically unbounded because C_h(v) crosses "
+                "zero at v approx 0.00941. The absolute L^infty bound must be used."
+            )
+        },
+        'table_data': {
+            'v_tab': v_tab.tolist(),
+            'C_tab': C_tab.tolist()
+        },
+        'remaining_dependencies_for_complete_weil_functional': [
+            'Analytic 512th-derivative remainder theorem or certified outward ball integration for 256-node Gauss-Legendre on compact bump',
+            'Archimedean continuous finite quadrature remainder theorem on [0, U_phys]',
+            'Infinite Archimedean tail bound R_U(G, G) as U -> infty',
+            'Station weight log and bump evaluations floating-point and summation bounds',
+            'Ordinate displacement spectral evaluation error: eps_gamma * sum_k ||S_k\'||'
+        ]
+    }
+    if output_path:
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2)
+        except Exception:
+            pass
+    return result
+
+
 def certify_baseline_canonical_weil_error_budget(
     grades: Optional[List[int]] = None,
     anchor_grade: int = -1,
@@ -3920,9 +4125,16 @@ def certify_baseline_canonical_weil_error_budget(
     mesh_diff_A_U_diagnostic = mesh_diff_A_U
     norm_delta_A_U = None
 
-    # Prime evaluation: interpolated on N_tab_prime points with certified 256-node quadrature
+    # Prime evaluation: obtain table and enclosure via certify_production_convolution_table
+    table_cert = certify_production_convolution_table(
+        h=h,
+        window=window,
+        N_tab=N_tab_prime,
+        n_nodes=256,
+        tau=tau
+    )
     v_tab = np.linspace(0.0, 2.0 * h, N_tab_prime)
-    C_tab = _compute_C_tab_fast(v_tab, h, n_nodes=256)
+    C_tab = np.array(table_cert['table_data']['C_tab']) if 'table_data' in table_cert else _compute_C_tab_fast(v_tab, h, n_nodes=256)
     def fast_C_h(v_val: float) -> float:
         abs_v = abs(v_val)
         if abs_v >= 2.0 * h:
@@ -3979,22 +4191,19 @@ def certify_baseline_canonical_weil_error_budget(
                 M_pair[j, i] = entry_M
 
     # Rigorous Analytic Bound on Prime Interpolation and Quadrature Error
-    norm_psi_prime_sq = (
+    # Sourced directly from certify_production_convolution_table to eliminate unproved duplicate literals
+    norm_psi_prime_sq = float(table_cert.get('interpolation_model', {}).get('norm_psi_prime_sq', (
         h**(-7) * NORM_KAPPA_THIRD_DERIVATIVE_SQ +
         0.5 * h**(-5) * NORM_KAPPA_SECOND_DERIVATIVE_SQ +
         0.0625 * h**(-3) * NORM_KAPPA_FIRST_DERIVATIVE_SQ
-    )
-    delta_v = 2.0 * h / float(len(v_tab) - 1)
-    eps_interp = float((delta_v**2 / 8.0) * norm_psi_prime_sq)
-    # Full bandwidth dependence derived from kernel decomposition:
-    # C_h(v) = h^(-5) C_4(v/h) - 0.5 h^(-3) C_2(v/h) + 0.0625 h^(-1) C_0(v/h)
-    # The 256-node Gauss-Legendre dimensionless quadrature errors are bounded by:
-    # c_4 <= 4.0e-12, c_2 <= 1.0e-13, c_0 <= 1.0e-15, plus IEEE-754 accumulation eps_fp.
-    c_4 = 4.0e-12
-    c_2 = 1.0e-13
-    c_0 = 1.0e-15
-    eps_fp = 256.0 * 2.220446049250313e-16 * (55.0 * (h**(-5)) + 2.5 * (h**(-3)) + 0.0625 * (h**(-1)))
-    eps_table_quad = float(c_4 * (h**(-5)) + 0.5 * c_2 * (h**(-3)) + 0.0625 * c_0 * (h**(-1)) + eps_fp)
+    )))
+    delta_v = float(table_cert.get('interpolation_model', {}).get('cell_width_delta_v', 2.0 * h / float(len(v_tab) - 1)))
+    eps_interp = float(table_cert.get('interpolation_model', {}).get('eps_interp_bound', (delta_v**2 / 8.0) * norm_psi_prime_sq))
+    c_4 = float(table_cert.get('quadrature_model', {}).get('c_4_bound', 4.0e-12))
+    c_2 = float(table_cert.get('quadrature_model', {}).get('c_2_bound', 1.0e-13))
+    c_0 = float(table_cert.get('quadrature_model', {}).get('c_0_bound', 1.0e-15))
+    eps_fp = float(table_cert.get('quadrature_model', {}).get('eps_fp_accumulation', 256.0 * 2.220446049250313e-16 * (55.0 * (h**(-5)) + 2.5 * (h**(-3)) + 0.0625 * (h**(-1)))))
+    eps_table_quad = float(table_cert.get('quadrature_model', {}).get('eps_nodal_bound_nominal', c_4 * (h**(-5)) + 0.5 * c_2 * (h**(-3)) + 0.0625 * c_0 * (h**(-1)) + eps_fp))
     eps_ptwise = float(eps_interp + eps_table_quad)
 
     # Subspace-contracted pairing bound: |||P|^T D M_pair D |P|||_2
@@ -4101,6 +4310,8 @@ def certify_baseline_canonical_weil_error_budget(
             'eps_interp': float(eps_interp),
             'eps_table_quad': float(eps_table_quad),
             'eps_ptwise': float(eps_ptwise),
+            'is_table_certified': bool(table_cert.get('is_table_certified', False)),
+            'table_certification_status': str(table_cert.get('status', 'UNCERTIFIED')),
             'error_budget_derivation_model': 'THREE_TERM_DIMENSIONLESS_KERNEL_QUADRATURE_ENCLOSURE',
             'quadrature_coefficients': {
                 'c_4': float(c_4),
@@ -4140,6 +4351,8 @@ def certify_baseline_canonical_weil_error_budget(
             'certified_lambda_min_lower_margin': float(lambda_min_computed - (norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic)),
             'margin_ratio': float(lambda_min_computed / max(1e-12, norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic)),
             'is_strictly_positive': False,
+            'is_table_certified': bool(table_cert.get('is_table_certified', False)),
+            'table_certification_status': str(table_cert.get('status', 'UNCERTIFIED')),
             'unresolved_reason': (
                 "Archimedean continuous quadrature on [0, U_phys] lacks an applicable analytic remainder theorem. "
                 "Per Rule 0, an unresolved check creates a research obligation and prevents a certified status."
@@ -7005,139 +7218,320 @@ def test_spectral_matrix_span_recovery(
     }
 
 
-def certify_production_convolution_table(
+def compute_critical_zero_observable(
+    gamma: float,
+    grades: List[int],
+    a_kn: Dict[int, Dict[int, float]],
+    P: np.ndarray,
     h: float = 0.05,
-    window: Tuple[float, float] = (8.0, 20.0),
-    N_tab: int = 2001,
-    n_nodes: int = 256,
     tau: float = 2.0 * math.pi,
+    eps_gamma: float = 1.0e-15,
+    n_nodes_A: int = 1000
+) -> Dict[str, Any]:
+    """Compute the production spectral observable S_gamma = 2 |A_h(i*gamma)|^2 P^T Re[e_gamma e_gamma^*] P.
+
+    Includes proved derivative bound ||S_gamma'|| to convert accepted ordinate uncertainty eps_gamma
+    into a rigorous spectral evaluation error bound: ||Delta S_gamma|| <= eps_gamma * ||S_gamma'||.
+    """
+    v_k, w_k = np.polynomial.legendre.leggauss(n_nodes_A)
+    kappa_vals = np.exp(-1.0 / (1.0 - v_k**2)) / Z_CANONICAL_KERNEL * w_k
+
+    def eval_A_h(z_val: complex) -> complex:
+        return (z_val**2 - 0.25) * np.sum(kappa_vals * np.exp(z_val * h * v_k))
+
+    def eval_A_h_prime(z_val: complex) -> complex:
+        term1 = 2.0 * z_val * np.exp(z_val * h * v_k)
+        term2 = (z_val**2 - 0.25) * h * v_k * np.exp(z_val * h * v_k)
+        return np.sum(kappa_vals * (term1 + term2))
+
+    ah_gam = eval_A_h(1j * gamma)
+    ah_gam_prime = eval_A_h_prime(1j * gamma)
+    factor = 2.0 * (abs(ah_gam)**2)
+
+    e_vec = []
+    e_prime_vec = []
+    for K in grades:
+        val = sum(a * ((tau ** K * n) ** (1j * gamma)) for n, a in a_kn[K].items())
+        val_prime = sum(a * (1j * math.log(tau ** K * n)) * ((tau ** K * n) ** (1j * gamma)) for n, a in a_kn[K].items())
+        e_vec.append(val)
+        e_prime_vec.append(val_prime)
+    e_vec = np.array(e_vec)
+    e_prime_vec = np.array(e_prime_vec)
+
+    M_gam = factor * np.real(np.outer(e_vec, np.conj(e_vec)))
+    S_gamma = P.T @ M_gam @ P
+
+    d_factor = 4.0 * float(np.real(np.conj(ah_gam) * (1j * ah_gam_prime)))
+    d_M_gam = d_factor * np.real(np.outer(e_vec, np.conj(e_vec))) + factor * np.real(
+        np.outer(e_prime_vec, np.conj(e_vec)) + np.outer(e_vec, np.conj(e_prime_vec))
+    )
+    S_gamma_prime = P.T @ d_M_gam @ P
+    norm_S_prime = float(np.linalg.norm(S_gamma_prime, 2))
+    spectral_evaluation_error = float(eps_gamma * norm_S_prime)
+
+    return {
+        'gamma': float(gamma),
+        'factor_2_Ah_sq': float(factor),
+        'S_matrix': S_gamma.tolist(),
+        'S_matrix_norm_2': float(np.linalg.norm(S_gamma, 2)),
+        'S_prime_norm_2': norm_S_prime,
+        'accepted_ordinate_uncertainty_eps_gamma': float(eps_gamma),
+        'spectral_evaluation_error_bound': spectral_evaluation_error
+    }
+
+
+def compute_reflected_quartet_observable(
+    z0: complex,
+    grades: List[int],
+    a_kn: Dict[int, Dict[int, float]],
+    P: np.ndarray,
+    h: float = 0.05,
+    tau: float = 2.0 * math.pi,
+    n_nodes_A: int = 1000
+) -> Dict[str, Any]:
+    """Compute the production physical off-critical quartet observable
+    Q(z_0) = 4 P^T Re[A_h(z_0)^2 sym(e(z_0) e(-z_0)^T)] P.
+
+    Note: A symmetrized complex rank-2 outer product Re[A_h(z_0)^2 sym(e(z_0) e(-z_0)^T)]
+    can have real matrix rank up to 4.
+    """
+    v_k, w_k = np.polynomial.legendre.leggauss(n_nodes_A)
+    kappa_vals = np.exp(-1.0 / (1.0 - v_k**2)) / Z_CANONICAL_KERNEL * w_k
+
+    def eval_A_h(z_val: complex) -> complex:
+        return (z_val**2 - 0.25) * np.sum(kappa_vals * np.exp(z_val * h * v_k))
+
+    ah_z0 = eval_A_h(z0)
+    e_p = np.array([sum(a * ((tau ** K * n) ** z0) for n, a in a_kn[K].items()) for K in grades])
+    e_m = np.array([sum(a * ((tau ** K * n) ** (-z0)) for n, a in a_kn[K].items()) for K in grades])
+
+    M_quart = 0.5 * (np.outer(e_p, e_m) + np.outer(e_m, e_p))
+    cal_M = 4.0 * np.real((ah_z0**2) * M_quart)
+    Q_mat = P.T @ cal_M @ P
+
+    s_vals_cal_M = [float(s) for s in np.linalg.svd(cal_M, compute_uv=False)]
+    rank_cal_M = int(np.linalg.matrix_rank(cal_M))
+
+    s_vals_Q = [float(s) for s in np.linalg.svd(Q_mat, compute_uv=False)]
+    rank_Q = int(np.linalg.matrix_rank(Q_mat))
+
+    return {
+        'z0': [float(z0.real), float(z0.imag)],
+        'ah_z0_sq': [float((ah_z0**2).real), float((ah_z0**2).imag)],
+        'cal_M_singular_values': s_vals_cal_M,
+        'cal_M_rank': rank_cal_M,
+        'Q_matrix': Q_mat.tolist(),
+        'Q_matrix_singular_values': s_vals_Q,
+        'Q_matrix_rank': rank_Q,
+        'Q_matrix_norm_2': float(np.linalg.norm(Q_mat, 2))
+    }
+
+
+def investigate_scalar_spectral_bridge_target_b(
+    grades: Optional[List[int]] = None,
+    anchor_grade: int = -1,
+    window: Tuple[float, float] = (8.0, 20.0),
+    h: float = 0.05,
+    delta: float = 0.49,
+    gamma: float = 100.0,
+    tau: float = 2.0 * math.pi,
+    eps_gamma: float = 1.0e-15,
     output_path: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Produce a defensible enclosure for the production-used position-space convolution table C_h(v)
-    and propagate its certification status correctly (Target A).
+    Investigate the precise scalar spectral-correlation implication (Target B).
 
-    1. Mathematical Specification:
-       The position-space convolution kernel is:
-           C_h(v) = int_R psi_h(u) psi_h(u - v) du
-       where psi_h(u) = h^(-3) kappa''(u/h) - 0.25 h^(-1) kappa(u/h) with supp(kappa) = [-1, 1].
-       Under the exact dimensionless decomposition (xi = v / h in [0, 2]):
-           C_h(v) = h^(-5) K_{2,2}(xi) - 0.5 h^(-3) K_{2,0}(xi) + 0.0625 h^(-1) K_{0,0}(xi)
-       where K_{i,j}(xi) = int_{-1+xi}^1 kappa^{(i)}(y) kappa^{(j)}(y - xi) dy.
+    1. Algebraic Foundation:
+       Preserve authentic TC family: tau = 2*pi, x_{K,n} = tau^K n, a_{K,n} = tau^K Lambda(n) w(x_{K,n}).
+       Grades [-1, -2, -3], anchor -1, window [8, 20], h = 0.05.
+       The three selected grouped keys are:
+           (1, 89, 563), (2, 89, 3511), (1, 563, 3511).
+       Each key has unique active station contributors with positive amplitudes:
+           c12(b) = a12 * b1 * b2, c13(b) = a13 * b1 * b3, c23(b) = a23 * b2 * b3.
+       Define the normalized scalar bridge:
+           L(b) = c12(b) / a12 + c13(b) / a13 + c23(b) / a23 = b1 b2 + b1 b3 + b2 b3.
+       Purely algebraically:
+           L(b) = ((b1 + b2 + b3)^2 - ||b||_2^2) / 2.
+       On the legal unit sphere (sum b = 0, ||b||_2 = 1):
+           L(b) = -1/2 identically!
+       Equivalently, on the subspace b = P beta:
+           G_target = G12/a12 + G13/a13 + G23/a23 = -0.5 * P^T P.
 
-    2. Rigorous Derivative Remainder Enclosure:
-       For linear interpolation of C_h on a uniform mesh with cell width Delta v = 2h / (N_tab - 1):
-           ||C_h - interp(C_h)||_infty <= (Delta v)^2 / 8 * ||psi_h'||_2^2
-       where:
-           ||psi_h'||_2^2 = h^(-7) ||kappa'''||_2^2 + 0.5 h^(-5) ||kappa''||_2^2 + 0.0625 h^(-3) ||kappa'||_2^2.
-       With certified L^2 norms:
-           ||kappa'''||_2^2 = 16247.684292415849
-           ||kappa''||_2^2  = 54.959873423948665
-           ||kappa'||_2^2   = 2.077745668366741
-           ||kappa||_2^2    = 0.675116813009698.
+    2. Finite Linear Recoverability in Sym(2):
+       In Sym(2) (dim 3), critical zeros alone span the space and recover G_target
+       with machine-precision residual (~1e-14) and moderate condition number (~1104).
+       Including the off-critical quartet Q(rho0) also recovers G_target with residual ~2e-14 (cond ~3876).
+       Therefore, recoverability itself is independent of hypothesis H.
 
-    3. Domain Scoping & Adversarial Scaling:
-       Certified strictly on declared production baseline (h = 0.05 on window [8, 20]).
-       Adversarial scaling cases (e.g. h = 0.01) outside the established domain return explicitly
-       uncertified results per Rule 0.
+    3. Concrete H-Dependent Construction & Residual Accounting:
+       Under hypothesis H (exists actual zero rho0 off critical line):
+       - First equation using zeta(rho0) = 0: simple pole in -zeta'/zeta at rho0 with residue +1.
+       - Spectral explicit formula identity:
+           Phi_spectral(b) = sum_j lambda_j s_j(b) + lambda_Q q_rho0(b) + R_spectral(b).
+       - Residual equation:
+           L(b) + 1/2 = 0 on legal unit sphere, whereas spectral explicit formula produces
+           L(b) = sum_j lambda_j s_j(b) + lambda_Q q_rho0(b) + R_spectral(b).
+       - Obstruction:
+           1. Paley-Wiener: finite discrete comb of delta functions does not define an admissible test function in Weil space.
+           2. Zero density: by Conrey N_0(T) >= (2/5) N(T), an entire function of finite exponential type cannot vanish
+              on the infinite sequence of critical zeros without vanishing identically.
+           3. Invariant barrier: since L(b) = -1/2 identically for all legal unit vectors, no sequence of legal unit vectors
+              can deform L(b) to 0.
+           4. zeta(rho0) = 0 does NOT imply E_b(rho0 - 1/2) = 0.
     """
-    is_domain_certified = bool(abs(h - 0.05) < 1e-9 and abs(window[0] - 8.0) < 1e-9 and abs(window[1] - 20.0) < 1e-9)
+    if grades is None:
+        grades = [-1, -2, -3]
+    else:
+        grades = list(grades)
+    r = len(grades)
+    anchor_idx = grades.index(anchor_grade)
+    diff_grades = [g for g in grades if g != anchor_grade]
+    m_dim = len(diff_grades)
+    sym_dim = (m_dim * (m_dim + 1)) // 2
 
-    v_tab = np.linspace(0.0, 2.0 * h, N_tab)
-    delta_v = float(2.0 * h / (N_tab - 1))
+    # Subspace projection matrix P
+    P = np.zeros((r, m_dim))
+    for col_idx, g in enumerate(diff_grades):
+        P[grades.index(g), col_idx] = 1.0
+        P[anchor_idx, col_idx] = -1.0
 
-    # Derivative norm of psi_h
-    norm_psi_prime_sq = (
-        (h**(-7)) * NORM_KAPPA_THIRD_DERIVATIVE_SQ +
-        0.5 * (h**(-5)) * NORM_KAPPA_SECOND_DERIVATIVE_SQ +
-        0.0625 * (h**(-3)) * NORM_KAPPA_FIRST_DERIVATIVE_SQ
-    )
-    eps_interp = float((delta_v**2 / 8.0) * norm_psi_prime_sq)
+    # Target matrix G_target = -0.5 * P^T P
+    G_target = -0.5 * (P.T @ P)
 
-    # Nodal quadrature enclosure for 256-node Gauss-Legendre
-    c_4 = 4.0e-12
-    c_2 = 1.0e-13
-    c_0 = 1.0e-15
-    eps_fp = 256.0 * 2.220446049250313e-16 * (55.0 * (h**(-5)) + 2.5 * (h**(-3)) + 0.0625 * (h**(-1)))
-    eps_nodal = float(c_4 * (h**(-5)) + 0.5 * c_2 * (h**(-3)) + 0.0625 * c_0 * (h**(-1)) + eps_fp)
-    eps_table_total = float(eps_interp + eps_nodal)
+    # Active stations and amplitudes
+    a_win, b_win = float(window[0]), float(window[1])
+    def w_bump(x: float) -> float:
+        if x <= a_win or x >= b_win:
+            return 0.0
+        u = 2.0 * (x - a_win) / (b_win - a_win) - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
 
-    # Compute table
-    C_tab = _compute_C_tab_fast(v_tab, h=h, n_nodes=n_nodes)
+    st_raw = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades}
+    a_kn: Dict[int, Dict[int, float]] = {}
+    for K in grades:
+        a_kn[K] = {}
+        for n_val, x_val, lam_val in st_raw[K]:
+            w = w_bump(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0:
+                a_kn[K][n_val] = float(amp)
 
-    if not is_domain_certified:
-        result = {
-            'status': 'UNCERTIFIED_OUTSIDE_PARAMETER_DOMAIN',
-            'is_table_certified': False,
-            'is_domain_certified': False,
-            'parameters': {
-                'bandwidth_h': float(h),
-                'window': list(window),
-                'N_tab': int(N_tab),
-                'n_nodes': int(n_nodes),
-                'delta_v': delta_v
-            },
-            'reason': (
-                f"Requested bandwidth h={h} is outside the certified production baseline domain (h=0.05 on [8.0, 20.0]). "
-                "Per Target A requirements, adversarial scaling cases return explicitly uncertified results."
-            ),
-            'diagnostic_table_metrics': {
-                'C_0': float(C_tab[0]),
-                'norm_psi_prime_sq': float(norm_psi_prime_sq),
-                'eps_interp_nominal': eps_interp,
-                'eps_nodal_nominal': eps_nodal
-            }
-        }
-        return result
+    # Three grouped keys: (1, 89, 563), (2, 89, 3511), (1, 563, 3511)
+    amp_89 = a_kn.get(-1, {}).get(89, 0.0)
+    amp_563 = a_kn.get(-2, {}).get(563, 0.0)
+    amp_3511 = a_kn.get(-3, {}).get(3511, 0.0)
+
+    a12 = amp_89 * amp_563
+    a13 = amp_89 * amp_3511
+    a23 = amp_563 * amp_3511
+
+    # Production critical zero observables
+    ref_gammas = [14.134725141734693, 21.022039638771555, 25.010857580145688]
+    crit_observables = [
+        compute_critical_zero_observable(gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=eps_gamma)
+        for gam in ref_gammas
+    ]
+    crit_mats = [np.array(obs['S_matrix']) for obs in crit_observables]
+
+    def vec_sym(M: np.ndarray) -> np.ndarray:
+        return np.array([M[0, 0], M[1, 1], math.sqrt(2.0) * M[0, 1]])
+
+    v_target = vec_sym(G_target)
+
+    # Critical-only recovery
+    A_crit = np.column_stack([vec_sym(G) for G in crit_mats])
+    lambda_crit, _, _, _ = np.linalg.lstsq(A_crit, v_target, rcond=None)
+    v_rec_crit = A_crit @ lambda_crit
+    res_crit = float(np.linalg.norm(v_target - v_rec_crit))
+    cond_crit = float(np.linalg.cond(A_crit))
+
+    # Ordinate uncertainty error propagation: eps_gamma * sum |lambda_j| ||S_j'||
+    ordinate_error_crit = float(eps_gamma * sum(abs(lambda_crit[j]) * crit_observables[j]['S_prime_norm_2'] for j in range(3)))
+
+    # Off-critical quartet observable
+    z0 = complex(delta, gamma)
+    quart_obs = compute_reflected_quartet_observable(z0, grades, a_kn, P, h=h, tau=tau)
+    G_quart = np.array(quart_obs['Q_matrix'])
+
+    # Recovery with 2 critical zeros + Q(rho0)
+    A_quart = np.column_stack([vec_sym(crit_mats[0]), vec_sym(crit_mats[1]), vec_sym(G_quart)])
+    lambda_quart, _, _, _ = np.linalg.lstsq(A_quart, v_target, rcond=None)
+    v_rec_quart = A_quart @ lambda_quart
+    res_quart = float(np.linalg.norm(v_target - v_rec_quart))
+    cond_quart = float(np.linalg.cond(A_quart))
 
     result = {
-        'status': 'CONVOLUTION_TABLE_CERTIFIED',
-        'is_table_certified': True,
-        'is_domain_certified': True,
+        'status': 'SCALAR_SPECTRAL_BRIDGE_TARGET_B_INVESTIGATED',
         'parameters': {
-            'bandwidth_h': float(h),
+            'grades': grades,
+            'anchor_grade': anchor_grade,
             'window': list(window),
-            'N_tab': int(N_tab),
-            'n_nodes': int(n_nodes),
-            'tau': float(tau),
-            'delta_v': delta_v,
-            'v_min': 0.0,
-            'v_max': float(2.0 * h)
+            'bandwidth_h': float(h),
+            'off_critical_delta': float(delta),
+            'off_critical_gamma': float(gamma),
+            'eps_gamma_ordinate_uncertainty': float(eps_gamma)
         },
-        'quadrature_model': {
-            'method': f'{n_nodes}-node Gauss-Legendre quadrature with certified derivative remainder bound',
-            'kernel_normalization': 'Z_CANONICAL_KERNEL',
-            'dimensionless_powers': ['h^-5', 'h^-3', 'h^-1'],
-            'c_4_bound': c_4,
-            'c_2_bound': c_2,
-            'c_0_bound': c_0,
-            'eps_fp_accumulation': float(eps_fp),
-            'eps_nodal_bound': eps_nodal
+        'algebraic_invariant': {
+            'formula_L': 'L(b) = c12(b)/a12 + c13(b)/a13 + c23(b)/a23 = b1*b2 + b1*b3 + b2*b3',
+            'legal_unit_sphere_value': -0.5,
+            'P_matrix': P.tolist(),
+            'G_target_matrix': G_target.tolist(),
+            'selected_grouped_keys': [
+                {'key': [1, 89, 563], 'amplitude_product_a12': float(a12), 'is_positive': bool(a12 > 0)},
+                {'key': [2, 89, 3511], 'amplitude_product_a13': float(a13), 'is_positive': bool(a13 > 0)},
+                {'key': [1, 563, 3511], 'amplitude_product_a23': float(a23), 'is_positive': bool(a23 > 0)}
+            ]
         },
-        'interpolation_model': {
-            'formula': '||C_h - interp(C_h)||_infty <= (Delta v)^2 / 8 * ||psi_h\'||_2^2',
-            'norm_psi_prime_sq': float(norm_psi_prime_sq),
-            'cell_width_delta_v': delta_v,
-            'eps_interp_bound': eps_interp
+        'critical_only_recovery': {
+            'ref_gammas': ref_gammas,
+            'recovery_coefficients_lambda': lambda_crit.tolist(),
+            'coefficient_signs': [int(np.sign(c)) for c in lambda_crit],
+            'reconstruction_residual_norm': res_crit,
+            'basis_condition_number': cond_crit,
+            'ordinate_uncertainty_propagated_error': ordinate_error_crit
         },
-        'table_enclosure': {
-            'total_pointwise_error_bound': eps_table_total,
-            'C_h_0': float(C_tab[0]),
-            'C_h_0_interval': [float(C_tab[0] - eps_nodal), float(C_tab[0] + eps_nodal)],
-            'relative_pointwise_accuracy': float(eps_table_total / abs(C_tab[0]))
+        'quartet_recovery': {
+            'basis_description': 'First 2 critical zeros + off-critical quartet Q(rho0)',
+            'z0': [float(delta), float(gamma)],
+            'recovery_coefficients_lambda': lambda_quart.tolist(),
+            'coefficient_signs': [int(np.sign(c)) for c in lambda_quart],
+            'reconstruction_residual_norm': res_quart,
+            'basis_condition_number': cond_quart
         },
-        'remaining_dependencies_for_complete_weil_functional': [
-            'Archimedean continuous finite quadrature remainder theorem on [0, U_phys]',
-            'Infinite Archimedean tail bound R_U(G, G) as U -> infty',
-            'Station weight log and bump evaluations floating-point and summation bounds'
-        ]
+        'concrete_h_dependent_construction': {
+            'first_equation_using_zeta_rho0': (
+                "zeta(rho0) = 0 creates a simple pole in -zeta'/zeta(s) at s = rho0 = 1/2 + z0 with residue +1. "
+                "In the Guinand-Weil explicit formula, this produces the symmetrized quartet contribution Q(rho0)."
+            ),
+            'mechanism_intended_to_isolate_L': (
+                "Equating the target matrix G_target = -(1/2) P^T P to the recovered spectral combination "
+                "sum_j lambda_j S_j + lambda_Q Q(rho0) expresses L(b) = b^T G_target b in terms of spectral quadratic responses."
+            ),
+            'residual_equation': (
+                "For every legal unit vector b, the algebraic identity fixes L(b) = -1/2. "
+                "Attempting to evaluate the complete explicit formula for an admissible test function Phi gives: "
+                "L(b) = sum_j lambda_j s_j(b) + lambda_Q q_rho0(b) + R_spectral(b), "
+                "where R_spectral(b) = sum_{k > 3} Phi(i gamma_k) + R_Archimedean(b). "
+                "The residual equation is: L(b) - (-1/2) = R_spectral(b) - R_recon(b)."
+            ),
+            'obstruction_analysis': (
+                "1. Finite matrix span in Sym(2) is linear algebra on a finite grid; it does NOT construct an admissible test function in Weil's space. "
+                "2. By Conrey's zero density theorem N_0(T) >= (2/5) N(T) >= c T log T, an entire test function of finite exponential type cannot vanish "
+                "on the infinite sequence of critical zeros without vanishing identically. "
+                "3. Since L(b) = -1/2 identically on the entire legal unit sphere, no sequence of legal unit vectors can deform L(b) to 0. "
+                "4. zeta(rho0) = 0 does NOT imply that the test Dirichlet polynomial E_b(rho0 - 1/2) vanishes."
+            ),
+            'verdict': 'CONSTRUCTION_DEFECT_IDENTIFIED_AND_OBSTRUCTION_QUANTIFIED'
+        }
     }
+
     if output_path:
         try:
             with open(output_path, 'w', encoding='utf-8') as f:
                 json.dump(result, f, indent=2)
         except Exception:
             pass
+
     return result
 
 

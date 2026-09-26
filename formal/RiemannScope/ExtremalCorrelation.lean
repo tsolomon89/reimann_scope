@@ -664,11 +664,64 @@ theorem nonzero_legal_has_nonzero_selected_coefficient
   · exact h hb2
   · exact h hb3
 
+/-- Pure Algebraic Scalar Identity:
+    For any real numbers b1, b2, b3, the sum of pairwise products equals
+    b1 * b2 + b1 * b3 + b2 * b3 = ((b1 + b2 + b3)^2 - (b1^2 + b2^2 + b3^2)) / 2. -/
+theorem scalar_pairwise_sum_identity (b1 b2 b3 : ℝ) :
+    b1 * b2 + b1 * b3 + b2 * b3 = ((b1 + b2 + b3)^2 - (b1^2 + b2^2 + b3^2)) / 2 := by
+  ring
+
+/-- Legal Unit Sphere Scalar Invariant:
+    On the legal unit sphere where b1 + b2 + b3 = 0 and b1^2 + b2^2 + b3^2 = 1,
+    the pairwise sum b1 * b2 + b1 * b3 + b2 * b3 is identically -1/2. -/
+theorem legal_unit_scalar_invariant (b1 b2 b3 : ℝ)
+    (h_sum : b1 + b2 + b3 = 0)
+    (h_unit : b1^2 + b2^2 + b3^2 = 1) :
+    b1 * b2 + b1 * b3 + b2 * b3 = -1/2 := by
+  have h := scalar_pairwise_sum_identity b1 b2 b3
+  rw [h_sum, h_unit] at h
+  calc b1 * b2 + b1 * b3 + b2 * b3
+    _ = (0^2 - 1) / 2 := h
+    _ = -1/2 := by ring
+
+/-- Three-Coefficient Scalar Bridge L(b) Invariant:
+    For selected grouped cross-grade coefficients c12 = a12 * b1 * b2, c13 = a13 * b1 * b3,
+    c23 = a23 * b2 * b3 with non-zero station-amplitude products a12 ≠ 0, a13 ≠ 0, a23 ≠ 0,
+    the normalized functional L(b) = c12 / a12 + c13 / a13 + c23 / a23 identically equals -1/2
+    on the legal unit sphere. -/
+theorem scalar_bridge_L_invariant
+    (b1 b2 b3 : ℝ)
+    (h_sum : b1 + b2 + b3 = 0)
+    (h_unit : b1^2 + b2^2 + b3^2 = 1)
+    (a12 a13 a23 : ℝ)
+    (ha12 : a12 ≠ 0)
+    (ha13 : a13 ≠ 0)
+    (ha23 : a23 ≠ 0)
+    (c12 c13 c23 : ℝ)
+    (hc12 : c12 = a12 * b1 * b2)
+    (hc13 : c13 = a13 * b1 * b3)
+    (hc23 : c23 = a23 * b2 * b3) :
+    c12 / a12 + c13 / a13 + c23 / a23 = -1/2 := by
+  have h12 : c12 / a12 = b1 * b2 := by
+    rw [hc12, mul_assoc]
+    exact mul_div_cancel_left₀ (b1 * b2) ha12
+  have h13 : c13 / a13 = b1 * b3 := by
+    rw [hc13, mul_assoc]
+    exact mul_div_cancel_left₀ (b1 * b3) ha13
+  have h23 : c23 / a23 = b2 * b3 := by
+    rw [hc23, mul_assoc]
+    exact mul_div_cancel_left₀ (b2 * b3) ha23
+  rw [h12, h13, h23]
+  exact legal_unit_scalar_invariant b1 b2 b3 h_sum h_unit
+
 #print axioms full_finite_extremal_grade_correlation_theorem
 #print axioms full_finite_correlation_transcendence_contradiction
 #print axioms full_finite_extremal_grade_correlation_theorem_support
 #print axioms tc_extremal_correlation_nonvanishing_corollary
 #print axioms three_coefficient_legal_vanishing
 #print axioms nonzero_legal_has_nonzero_selected_coefficient
+#print axioms scalar_pairwise_sum_identity
+#print axioms legal_unit_scalar_invariant
+#print axioms scalar_bridge_L_invariant
 
 end RiemannScope
