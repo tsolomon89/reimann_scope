@@ -25,9 +25,17 @@ Regression tests reproducing and verifying the repair of numerical, caching, and
 """
 
 import math
+from typing import NamedTuple
 import numpy as np
 import pytest
 import mpmath
+
+
+class KeyContributor(NamedTuple):
+    grades: tuple[int, int]
+    stations: tuple[int, int]
+    amp_prod: float
+
 
 from tc.weil_forms import (
     _compute_C_tab_fast,
@@ -281,7 +289,7 @@ def test_target_b_three_keys_uniqueness_and_span():
                 a_kn[K][n_val] = float(amp)
 
     target_keys = [(1, 89, 563), (2, 89, 3511), (1, 563, 3511)]
-    key_contribs = {k: [] for k in target_keys}
+    key_contribs: dict[tuple[int, int, int], list[KeyContributor]] = {k: [] for k in target_keys}
 
     for i, K in enumerate(grades):
         for j, J in enumerate(grades):
@@ -292,20 +300,20 @@ def test_target_b_three_keys_uniqueness_and_span():
                     g = math.gcd(n_val, m_val)
                     k = (d, n_val // g, m_val // g)
                     if k in key_contribs:
-                        key_contribs[k].append({
-                            'grades': (K, J),
-                            'stations': (n_val, m_val),
-                            'amp_prod': a_n * a_m
-                        })
+                        key_contribs[k].append(KeyContributor(
+                            grades=(K, J),
+                            stations=(n_val, m_val),
+                            amp_prod=float(a_n * a_m)
+                        ))
 
     # Each key has exactly 1 contributor
     for k in target_keys:
         assert len(key_contribs[k]) == 1, f"Key {k} has {len(key_contribs[k])} contributors, expected 1"
-        assert key_contribs[k][0]['amp_prod'] > 0.0
+        assert key_contribs[k][0].amp_prod > 0.0
 
-    a12 = key_contribs[(1, 89, 563)][0]['amp_prod']
-    a13 = key_contribs[(2, 89, 3511)][0]['amp_prod']
-    a23 = key_contribs[(1, 563, 3511)][0]['amp_prod']
+    a12 = key_contribs[(1, 89, 563)][0].amp_prod
+    a13 = key_contribs[(2, 89, 3511)][0].amp_prod
+    a23 = key_contribs[(1, 563, 3511)][0].amp_prod
 
     assert abs(a12 - 0.1143016654) < 1e-4
     assert abs(a13 - 0.0234781599) < 1e-4
@@ -324,9 +332,9 @@ def test_target_b_three_keys_uniqueness_and_span():
     for k in target_keys:
         M = np.zeros((3, 3))
         c = key_contribs[k][0]
-        i = grades.index(c['grades'][0])
-        j = grades.index(c['grades'][1])
-        M[i, j] += c['amp_prod']
+        i = grades.index(c.grades[0])
+        j = grades.index(c.grades[1])
+        M[i, j] += c.amp_prod
         M_sym = 0.5 * (M + M.T)
         G = P.T @ M_sym @ P
         G_mats.append(G)
