@@ -6729,6 +6729,9 @@ def compute_grouped_correlation_system(
 
         # Omission error if same-grade n != m is dropped
         omission_error = float(abs(same_grade_val - wrong_same))
+        if z_test == 0.0 + 0.0j:
+            same_grade_val_z0 = float(same_grade_val.real)
+            omission_error_z0 = omission_error
 
         verification_points[str(z_test)] = {
             'direct_product': [float(direct_val.real), float(direct_val.imag)],
@@ -6762,10 +6765,10 @@ def compute_grouped_correlation_system(
         'max_atom_coefficient_magnitude': max_c_atom,
         'verification_points': verification_points,
         'same_grade_omission_at_z0': {
-            'exact_same_grade_E_K_squared': float(verification_points['0j']['same_grade_full'][0]),
-            'diagonal_only_omitted': float(verification_points['0j']['same_grade_diag_only']),
-            'omission_error_positive': float(verification_points['0j']['omission_error_magnitude']),
-            'relative_omission_error': float(verification_points['0j']['omission_error_magnitude'] / (verification_points['0j']['same_grade_full'][0] + 1e-15))
+            'exact_same_grade_E_K_squared': same_grade_val_z0,
+            'diagonal_only_omitted': float(wrong_same),
+            'omission_error_positive': float(omission_error_z0),
+            'relative_omission_error': float(omission_error_z0 / (same_grade_val_z0 + 1e-15))
         },
         'vandermonde_moment_criterion': {
             'description': 'nu_b = 0 iff c_ell(b) = 0 for all ell in {1, ..., L} iff sum_ell c_ell(b) y_ell^j = 0 for j = 0, ..., L-1',
