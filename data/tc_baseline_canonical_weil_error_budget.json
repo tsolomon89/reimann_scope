@@ -43,6 +43,8 @@
     "eps_interp": 260.0160484986471,
     "eps_table_quad": 2.280597866018369e-05,
     "eps_ptwise": 260.01607130462577,
+    "is_table_certified": false,
+    "table_certification_status": "UNCERTIFIED_NODAL_REMAINDER_PROOF_UNRESOLVED",
     "error_budget_derivation_model": "THREE_TERM_DIMENSIONLESS_KERNEL_QUADRATURE_ENCLOSURE",
     "quadrature_coefficients": {
       "c_4": 4e-12,
@@ -72,13 +74,17 @@
   "error_budget": {
     "mesh_diff_A_U_diagnostic": 2.8539920919670867,
     "bound_delta_W_G_arch_diagnostic": 0.2175070003872576,
-    "bound_delta_W_G_prime_certified": 805.8902513399739,
+    "bound_delta_W_G_prime_analytic": 805.8902513399739,
+    "bound_delta_W_G_prime_certified": null,
     "bound_delta_W_G": 806.1077583403612,
     "lambda_min_computed": 13225698.892590746,
-    "certified_lambda_min_lower_margin": 13224892.784832407,
+    "diagnostic_lambda_min_lower_margin": 13224892.784832407,
+    "certified_lambda_min_lower_margin": null,
     "margin_ratio": 16406.862179096515,
     "is_strictly_positive": false,
-    "unresolved_reason": "Archimedean continuous quadrature on [0, U_phys] lacks an applicable analytic remainder theorem. Per Rule 0, an unresolved check creates a research obligation and prevents a certified status."
+    "is_table_certified": false,
+    "table_certification_status": "UNCERTIFIED_NODAL_REMAINDER_PROOF_UNRESOLVED",
+    "unresolved_reason": "Archimedean continuous quadrature on [0, U_phys] lacks an applicable analytic remainder theorem, and convolution table nodal quadrature lacks an analytic 512th-derivative remainder proof. Per Rule 0, an unresolved check creates a research obligation and prevents a certified status."
   },
   "eigenvalues_computed": [
     13225698.892590746,
@@ -154,5 +160,5 @@
       603082.4865191692
     ]
   ],
-  "mathematical_conclusion": "The contracted canonical Weil quadratic form W_G at baseline (grades=[-1, -2, -3, -4], h=0.05, window=(8.0, 20.0), U=320.0) has computed minimum eigenvalue lambda_min = 1.3226e+07 > 0. Under the analytic autocorrelation interpolation theorem ||C_h - \\Pi C_h||_infty <= (\\Delta v^2/8) ||psi_h'||_2^2 + eps_table_quad (eps_ptwise = 260.02) and authentic prime pairing contraction (|||P|^T D M_pair D |P|||_2 = 3.0994), the contracted prime error is rigorously bounded by 805.89. However, Archimedean continuous quadrature lacks an applicable analytic remainder theorem (mesh difference 2.8540e+00 is diagnostic only). Therefore, the complete error budget is NUMERICALLY_UNRESOLVED pending a certified Archimedean remainder theorem."
+  "mathematical_conclusion": "The contracted canonical Weil quadratic form W_G at baseline (grades=[-1, -2, -3, -4], h=0.05, window=(8.0, 20.0), U=320.0) has computed minimum eigenvalue lambda_min = 1.3226e+07 > 0. Under the analytic autocorrelation interpolation theorem ||C_h - \\Pi C_h||_infty <= (\\Delta v^2/8) ||psi_h'||_2^2 + eps_table_quad (eps_ptwise = 260.02) and authentic prime pairing contraction (|||P|^T D M_pair D |P|||_2 = 3.0994), the contracted prime error is analytically estimated by 805.89 under the uncertified convolution table. Because the convolution table lacks an analytic 512th-derivative remainder proof (is_table_certified=False) and Archimedean continuous quadrature lacks an analytic remainder theorem (mesh difference 2.8540e+00 is diagnostic only), the complete error budget is NUMERICALLY_UNRESOLVED per Rule 0."
 }

@@ -4480,7 +4480,8 @@ def test_baseline_canonical_weil_error_budget(tmp_path):
     # Error budget numbers
     eb = res['error_budget']
     assert eb['lambda_min_computed'] > 1.3e7
-    assert eb['bound_delta_W_G_prime_certified'] < 2000.0
+    assert eb['bound_delta_W_G_prime_analytic'] < 2000.0
+    assert eb['bound_delta_W_G_prime_certified'] is None
     assert eb['mesh_diff_A_U_diagnostic'] > 0.0
 
     # Subspace contraction

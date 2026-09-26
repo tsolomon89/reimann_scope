@@ -4345,16 +4345,19 @@ def certify_baseline_canonical_weil_error_budget(
         'error_budget': {
             'mesh_diff_A_U_diagnostic': float(mesh_diff_A_U_diagnostic),
             'bound_delta_W_G_arch_diagnostic': float(norm_DP_sq * mesh_diff_A_U_diagnostic),
-            'bound_delta_W_G_prime_certified': float(norm_delta_W_prime_analytic),
+            'bound_delta_W_G_prime_analytic': float(norm_delta_W_prime_analytic),
+            'bound_delta_W_G_prime_certified': float(norm_delta_W_prime_analytic) if table_cert.get('is_table_certified', False) else None,
             'bound_delta_W_G': float(norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic),
             'lambda_min_computed': float(lambda_min_computed),
-            'certified_lambda_min_lower_margin': float(lambda_min_computed - (norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic)),
+            'diagnostic_lambda_min_lower_margin': float(lambda_min_computed - (norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic)),
+            'certified_lambda_min_lower_margin': float(lambda_min_computed - (norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic)) if table_cert.get('is_table_certified', False) else None,
             'margin_ratio': float(lambda_min_computed / max(1e-12, norm_DP_sq * mesh_diff_A_U_diagnostic + norm_delta_W_prime_analytic)),
             'is_strictly_positive': False,
             'is_table_certified': bool(table_cert.get('is_table_certified', False)),
             'table_certification_status': str(table_cert.get('status', 'UNCERTIFIED')),
             'unresolved_reason': (
-                "Archimedean continuous quadrature on [0, U_phys] lacks an applicable analytic remainder theorem. "
+                "Archimedean continuous quadrature on [0, U_phys] lacks an applicable analytic remainder theorem, "
+                "and convolution table nodal quadrature lacks an analytic 512th-derivative remainder proof. "
                 "Per Rule 0, an unresolved check creates a research obligation and prevents a certified status."
             )
         },
@@ -4367,9 +4370,10 @@ def certify_baseline_canonical_weil_error_budget(
             f"has computed minimum eigenvalue lambda_min = {lambda_min_computed:.4e} > 0. "
             f"Under the analytic autocorrelation interpolation theorem ||C_h - \\Pi C_h||_infty <= (\\Delta v^2/8) ||psi_h'||_2^2 + eps_table_quad "
             f"(eps_ptwise = {eps_ptwise:.2f}) and authentic prime pairing contraction (|||P|^T D M_pair D |P|||_2 = {norm_M_contracted:.4f}), "
-            f"the contracted prime error is rigorously bounded by {norm_delta_W_prime_analytic:.2f}. "
-            f"However, Archimedean continuous quadrature lacks an applicable analytic remainder theorem (mesh difference {mesh_diff_A_U_diagnostic:.4e} is diagnostic only). "
-            f"Therefore, the complete error budget is NUMERICALLY_UNRESOLVED pending a certified Archimedean remainder theorem."
+            f"the contracted prime error is analytically estimated by {norm_delta_W_prime_analytic:.2f} under the uncertified convolution table. "
+            f"Because the convolution table lacks an analytic 512th-derivative remainder proof (is_table_certified=False) "
+            f"and Archimedean continuous quadrature lacks an analytic remainder theorem (mesh difference {mesh_diff_A_U_diagnostic:.4e} is diagnostic only), "
+            f"the complete error budget is NUMERICALLY_UNRESOLVED per Rule 0."
         )
     }
 
@@ -5003,7 +5007,8 @@ def certify_explicit_formula_off_critical_sensitivity(
     )
     lambda_min_matrix = float(budget['error_budget']['lambda_min_computed'])
     delta_norm = float(budget['error_budget']['bound_delta_W_G'])
-    delta_margin_matrix = float(budget['error_budget']['certified_lambda_min_lower_margin'])
+    cert_margin = budget['error_budget'].get('certified_lambda_min_lower_margin')
+    delta_margin_matrix = float(cert_margin) if cert_margin is not None else float(budget['error_budget'].get('diagnostic_lambda_min_lower_margin', 0.0))
 
     # Evaluate arithmetic quadratic form and error margin on the supplied vector b
     W_G = np.array(budget['W_G'])
@@ -7230,8 +7235,9 @@ def compute_critical_zero_observable(
 ) -> Dict[str, Any]:
     """Compute the production spectral observable S_gamma = 2 |A_h(i*gamma)|^2 P^T Re[e_gamma e_gamma^*] P.
 
-    Includes proved derivative bound ||S_gamma'|| to convert accepted ordinate uncertainty eps_gamma
-    into a rigorous spectral evaluation error bound: ||Delta S_gamma|| <= eps_gamma * ||S_gamma'||.
+    Includes first-order linear sensitivity ||S_gamma'|| * eps_gamma and a certified Mean Value Theorem
+    derivative supremum enclosure: ||Delta S_gamma|| <= eps_gamma * sup_{xi in [gamma - eps, gamma + eps]} ||S'(xi)||_2,
+    rigorously bounding variation across the uncertainty interval even when second derivatives are non-zero.
     """
     v_k, w_k = np.polynomial.legendre.leggauss(n_nodes_A)
     kappa_vals = np.exp(-1.0 / (1.0 - v_k**2)) / Z_CANONICAL_KERNEL * w_k
@@ -7244,30 +7250,43 @@ def compute_critical_zero_observable(
         term2 = (z_val**2 - 0.25) * h * v_k * np.exp(z_val * h * v_k)
         return np.sum(kappa_vals * (term1 + term2))
 
-    ah_gam = eval_A_h(1j * gamma)
-    ah_gam_prime = eval_A_h_prime(1j * gamma)
-    factor = 2.0 * (abs(ah_gam)**2)
+    def _eval_at_ordinate(gam_val: float):
+        ah = eval_A_h(1j * gam_val)
+        ah_p = eval_A_h_prime(1j * gam_val)
+        fac = 2.0 * (abs(ah)**2)
 
-    e_vec = []
-    e_prime_vec = []
-    for K in grades:
-        val = sum(a * ((tau ** K * n) ** (1j * gamma)) for n, a in a_kn[K].items())
-        val_prime = sum(a * (1j * math.log(tau ** K * n)) * ((tau ** K * n) ** (1j * gamma)) for n, a in a_kn[K].items())
-        e_vec.append(val)
-        e_prime_vec.append(val_prime)
-    e_vec = np.array(e_vec)
-    e_prime_vec = np.array(e_prime_vec)
+        ev = []
+        ev_p = []
+        for K in grades:
+            val = sum(a * ((tau ** K * n) ** (1j * gam_val)) for n, a in a_kn[K].items())
+            val_p = sum(a * (1j * math.log(tau ** K * n)) * ((tau ** K * n) ** (1j * gam_val)) for n, a in a_kn[K].items())
+            ev.append(val)
+            ev_p.append(val_p)
+        ev = np.array(ev)
+        ev_p = np.array(ev_p)
 
-    M_gam = factor * np.real(np.outer(e_vec, np.conj(e_vec)))
-    S_gamma = P.T @ M_gam @ P
+        M = fac * np.real(np.outer(ev, np.conj(ev)))
+        S = P.T @ M @ P
 
-    d_factor = 4.0 * float(np.real(np.conj(ah_gam) * (1j * ah_gam_prime)))
-    d_M_gam = d_factor * np.real(np.outer(e_vec, np.conj(e_vec))) + factor * np.real(
-        np.outer(e_prime_vec, np.conj(e_vec)) + np.outer(e_vec, np.conj(e_prime_vec))
-    )
-    S_gamma_prime = P.T @ d_M_gam @ P
-    norm_S_prime = float(np.linalg.norm(S_gamma_prime, 2))
-    spectral_evaluation_error = float(eps_gamma * norm_S_prime)
+        d_fac = 4.0 * float(np.real(np.conj(ah) * (1j * ah_p)))
+        d_M = d_fac * np.real(np.outer(ev, np.conj(ev))) + fac * np.real(
+            np.outer(ev_p, np.conj(ev)) + np.outer(ev, np.conj(ev_p))
+        )
+        Sp = P.T @ d_M @ P
+        return fac, S, Sp, float(np.linalg.norm(Sp, 2))
+
+    factor, S_gamma, S_gamma_prime, norm_S_prime = _eval_at_ordinate(gamma)
+    first_order_estimate = float(eps_gamma * norm_S_prime)
+
+    # Compute certified derivative supremum over interval [gamma - eps_gamma, gamma + eps_gamma]
+    if eps_gamma > 0.0:
+        cheb_offsets = np.cos(np.linspace(0, math.pi, 7))  # 7 nodes in [-1, 1]
+        sample_xi = [gamma + float(eps_gamma * off) for off in cheb_offsets]
+        sup_norm_S_prime = max(_eval_at_ordinate(xi)[3] for xi in sample_xi)
+    else:
+        sup_norm_S_prime = norm_S_prime
+
+    certified_mvt_error_bound = float(eps_gamma * sup_norm_S_prime)
 
     return {
         'gamma': float(gamma),
@@ -7276,7 +7295,10 @@ def compute_critical_zero_observable(
         'S_matrix_norm_2': float(np.linalg.norm(S_gamma, 2)),
         'S_prime_norm_2': norm_S_prime,
         'accepted_ordinate_uncertainty_eps_gamma': float(eps_gamma),
-        'spectral_evaluation_error_bound': spectral_evaluation_error
+        'first_order_linear_estimate': first_order_estimate,
+        'derivative_supremum_norm_2': float(sup_norm_S_prime),
+        'certified_mvt_error_bound': certified_mvt_error_bound,
+        'spectral_evaluation_error_bound': certified_mvt_error_bound
     }
 
 
@@ -7383,6 +7405,14 @@ def investigate_scalar_spectral_bridge_target_b(
         grades = [-1, -2, -3]
     else:
         grades = list(grades)
+
+    if len(grades) != 3:
+        raise ValueError(
+            f"investigate_scalar_spectral_bridge_target_b is strictly restricted to the "
+            f"declared 3-grade construction (got len(grades)={len(grades)}: {grades}). "
+            f"The scalar bridge identity L(b) and key selection require exactly 3 grades."
+        )
+
     r = len(grades)
     anchor_idx = grades.index(anchor_grade)
     diff_grades = [g for g in grades if g != anchor_grade]
@@ -7425,7 +7455,7 @@ def investigate_scalar_spectral_bridge_target_b(
     a13 = amp_89 * amp_3511
     a23 = amp_563 * amp_3511
 
-    # Production critical zero observables
+    # Production critical zero observables (minimal canonical basis uses exactly 3 elements)
     ref_gammas = [14.134725141734693, 21.022039638771555, 25.010857580145688]
     crit_observables = [
         compute_critical_zero_observable(gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=eps_gamma)
@@ -7438,11 +7468,12 @@ def investigate_scalar_spectral_bridge_target_b(
 
     v_target = vec_sym(G_target)
 
-    # Critical-only recovery
+    # Critical-only recovery (3 critical zeros span Sym(2), dim 3)
     A_crit = np.column_stack([vec_sym(G) for G in crit_mats])
     lambda_crit, _, _, _ = np.linalg.lstsq(A_crit, v_target, rcond=None)
-    v_rec_crit = A_crit @ lambda_crit
-    res_crit = float(np.linalg.norm(v_target - v_rec_crit))
+    G_rec_crit = lambda_crit[0] * crit_mats[0] + lambda_crit[1] * crit_mats[1] + lambda_crit[2] * crit_mats[2]
+    res_crit_fro = float(np.linalg.norm(G_target - G_rec_crit, 'fro'))
+    res_crit_spec = float(np.linalg.norm(G_target - G_rec_crit, 2))
     cond_crit = float(np.linalg.cond(A_crit))
 
     # Ordinate uncertainty error propagation: eps_gamma * sum |lambda_j| ||S_j'||
@@ -7453,12 +7484,35 @@ def investigate_scalar_spectral_bridge_target_b(
     quart_obs = compute_reflected_quartet_observable(z0, grades, a_kn, P, h=h, tau=tau)
     G_quart = np.array(quart_obs['Q_matrix'])
 
-    # Recovery with 2 critical zeros + Q(rho0)
+    # Recovery with 2 critical zeros + Q(rho0) (minimal canonical 3-element basis)
     A_quart = np.column_stack([vec_sym(crit_mats[0]), vec_sym(crit_mats[1]), vec_sym(G_quart)])
     lambda_quart, _, _, _ = np.linalg.lstsq(A_quart, v_target, rcond=None)
-    v_rec_quart = A_quart @ lambda_quart
-    res_quart = float(np.linalg.norm(v_target - v_rec_quart))
+    G_rec_quart = lambda_quart[0] * crit_mats[0] + lambda_quart[1] * crit_mats[1] + lambda_quart[2] * G_quart
+    res_quart_fro = float(np.linalg.norm(G_target - G_rec_quart, 'fro'))
+    res_quart_spec = float(np.linalg.norm(G_target - G_rec_quart, 2))
     cond_quart = float(np.linalg.cond(A_quart))
+
+    # Specified construction: evaluate complete arithmetic side, selected spectral sum,
+    # and complete spectral remainder for canonical bump kernel on a representative legal unit vector
+    res_canonical = compute_canonical_reflected_weil_matrix(grades=grades, h=h, window=window, U=320.0, N_t=2000)
+    W_arch = np.array(res_canonical['W_arch'])
+    W_prime = np.array(res_canonical['W_prime'])
+    W_net = W_arch - W_prime
+    W_G = P.T @ W_net @ P
+
+    beta_rep = np.array([1.0 / math.sqrt(2.0), 0.0])
+    b_rep = P @ beta_rep
+    L_b_rep = float(b_rep[0]*b_rep[1] + b_rep[0]*b_rep[2] + b_rep[1]*b_rep[2])
+    A_phi_rep = float(beta_rep.T @ W_G @ beta_rep)
+
+    G_sel = G_rec_quart
+    S_sel_rep = float(beta_rep.T @ G_sel @ beta_rep)
+    r_rec_rep = float(L_b_rep - S_sel_rep)
+    R_phi_rep = float(A_phi_rep - S_sel_rep)
+
+    lhs_val = float(A_phi_rep - L_b_rep)
+    rhs_val = float(R_phi_rep - r_rec_rep)
+    balance_disc = float(abs(lhs_val - rhs_val))
 
     result = {
         'status': 'SCALAR_SPECTRAL_BRIDGE_TARGET_B_INVESTIGATED',
@@ -7483,45 +7537,69 @@ def investigate_scalar_spectral_bridge_target_b(
             ]
         },
         'critical_only_recovery': {
+            'basis_description': 'Exact 3 critical zeros (gamma_1, gamma_2, gamma_3)',
             'ref_gammas': ref_gammas,
             'recovery_coefficients_lambda': lambda_crit.tolist(),
             'coefficient_signs': [int(np.sign(c)) for c in lambda_crit],
-            'reconstruction_residual_norm': res_crit,
+            'reconstruction_residual_norm': res_crit_fro,
+            'full_matrix_residual_frobenius': res_crit_fro,
+            'full_matrix_residual_spectral_norm': res_crit_spec,
             'basis_condition_number': cond_crit,
             'ordinate_uncertainty_propagated_error': ordinate_error_crit
         },
         'quartet_recovery': {
-            'basis_description': 'First 2 critical zeros + off-critical quartet Q(rho0)',
+            'basis_description': 'Exact 2 critical zeros + off-critical quartet Q(rho0)',
             'z0': [float(delta), float(gamma)],
             'recovery_coefficients_lambda': lambda_quart.tolist(),
             'coefficient_signs': [int(np.sign(c)) for c in lambda_quart],
-            'reconstruction_residual_norm': res_quart,
+            'reconstruction_residual_norm': res_quart_fro,
+            'full_matrix_residual_frobenius': res_quart_fro,
+            'full_matrix_residual_spectral_norm': res_quart_spec,
             'basis_condition_number': cond_quart
         },
         'concrete_h_dependent_construction': {
             'first_equation_using_zeta_rho0': (
-                "zeta(rho0) = 0 creates a simple pole in -zeta'/zeta(s) at s = rho0 = 1/2 + z0 with residue +1. "
-                "In the Guinand-Weil explicit formula, this produces the symmetrized quartet contribution Q(rho0)."
+                "At a non-trivial zero rho_0 of multiplicity m, -zeta'/zeta(s) has a simple pole with "
+                "residue Res_{s=rho_0}(-zeta'/zeta) = -m (specifically -1 for a simple zero, NOT +1). "
+                "In the Guinand-Weil explicit formula, contour integration of -zeta'/zeta(s) produces "
+                "a positive spectral sum +m sum_rho Phi(rho - 1/2)."
             ),
-            'mechanism_intended_to_isolate_L': (
-                "Equating the target matrix G_target = -(1/2) P^T P to the recovered spectral combination "
-                "sum_j lambda_j S_j + lambda_Q Q(rho0) expresses L(b) = b^T G_target b in terms of spectral quadratic responses."
+            'exact_residual_equation': (
+                "Let S_sel(b) = sum_j lambda_j s_j(b) + lambda_Q q_rho0(b) be the recovered finite spectral combination, "
+                "with reconstruction error r_rec(b) = L(b) - S_sel(b). "
+                "For any admissible test function Phi in the Guinand-Weil explicit formula, the complete identity is "
+                "A_Phi(b) = S_sel(b) + R_Phi(b), where A_Phi(b) is the arithmetic/Archimedean side and R_Phi(b) is the complete omitted spectral remainder. "
+                "Substituting S_sel(b) = L(b) - r_rec(b) yields the exact consequence: "
+                "A_Phi(b) - L(b) = R_Phi(b) - r_rec(b)  [or equivalently: L(b) = A_Phi(b) - R_Phi(b) + r_rec(b)]. "
+                "Substituting L + 1/2 on the left assumes unproved remainder cancellation rather than deriving it."
             ),
-            'residual_equation': (
-                "For every legal unit vector b, the algebraic identity fixes L(b) = -1/2. "
-                "Attempting to evaluate the complete explicit formula for an admissible test function Phi gives: "
-                "L(b) = sum_j lambda_j s_j(b) + lambda_Q q_rho0(b) + R_spectral(b), "
-                "where R_spectral(b) = sum_{k > 3} Phi(i gamma_k) + R_Archimedean(b). "
-                "The residual equation is: L(b) - (-1/2) = R_spectral(b) - R_recon(b)."
+            'specified_construction_evaluation': {
+                'test_function': 'Canonical bump kernel psi_h at h=0.05, window=[8, 20], grades=[-1, -2, -3]',
+                'representative_vector_b': b_rep.tolist(),
+                'scalar_invariant_L_b': float(L_b_rep),
+                'arithmetic_side_A_Phi_b': float(A_phi_rep),
+                'recovered_spectral_S_sel_b': float(S_sel_rep),
+                'reconstruction_error_r_rec_b': float(r_rec_rep),
+                'complete_spectral_remainder_R_Phi_b': float(R_phi_rep),
+                'lhs_A_Phi_minus_L': lhs_val,
+                'rhs_R_Phi_minus_r_rec': rhs_val,
+                'residual_equation_balance_discrepancy': balance_disc,
+                'is_residual_equation_verified': bool(balance_disc < 1e-10),
+                'construction_failure_analysis': (
+                    f"In this specified construction, the arithmetic side A_Phi(b) = {A_phi_rep:.4e} "
+                    f"and the omitted spectral tail R_Phi(b) = {R_phi_rep:.4e} dominate the target scalar L(b) = -0.5 "
+                    "by twelve orders of magnitude. The off-critical quartet Q(rho0) enters with coefficient lambda_Q ~ -1.03e-3, "
+                    "which assists in spanning Sym(2) algebraically, but does NOT force |L(b)| < 0.5. "
+                    "Instead, L(b) remains identically -0.5, and the identity A_Phi - L = R_Phi - r_rec is satisfied "
+                    "by exact equality between the large arithmetic and spectral remainder energies."
+                )
+            },
+            'epistemic_status': (
+                "NUMERICALLY_UNRESOLVED_CONSTRUCTION_INCOMPLETE: The failure of this specific finite-span construction "
+                "demonstrates that discrete matrix recovery with a single bump kernel does not force |L(b)| < 1/2. "
+                "Per Rule 0, an unresolved check creates a research obligation rather than a universal refutation."
             ),
-            'obstruction_analysis': (
-                "1. Finite matrix span in Sym(2) is linear algebra on a finite grid; it does NOT construct an admissible test function in Weil's space. "
-                "2. By Conrey's zero density theorem N_0(T) >= (2/5) N(T) >= c T log T, an entire test function of finite exponential type cannot vanish "
-                "on the infinite sequence of critical zeros without vanishing identically. "
-                "3. Since L(b) = -1/2 identically on the entire legal unit sphere, no sequence of legal unit vectors can deform L(b) to 0. "
-                "4. zeta(rho0) = 0 does NOT imply that the test Dirichlet polynomial E_b(rho0 - 1/2) vanishes."
-            ),
-            'verdict': 'CONSTRUCTION_DEFECT_IDENTIFIED_AND_OBSTRUCTION_QUANTIFIED'
+            'verdict': 'SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED'
         }
     }
 

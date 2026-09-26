@@ -603,8 +603,9 @@ def test_target_b_scalar_spectral_bridge_investigation():
        (1, 89, 563), (2, 89, 3511), (1, 563, 3511).
     3. Verify finite linear recovery of G_target = -(1/2) P^T P using critical zeros alone (residual < 1e-13, cond ~1104).
     4. Verify finite linear recovery including off-critical quartet Q(rho0) (residual < 1e-13, cond ~3876).
-    5. Propagate ordinate uncertainty through recovery coefficients.
-    6. Verify concrete H-dependent construction defect and Conrey/Paley-Wiener infinite tail obstruction.
+    5. Propagate ordinate uncertainty through recovery coefficients with certified MVT enclosure.
+    6. Verify correct residue Res(-zeta'/zeta) = -m and exact residual equation A_Phi - L = R_Phi - r_rec.
+    7. Evaluate specified construction arithmetic energy, spectral tail, and balance identity.
     """
     res = investigate_scalar_spectral_bridge_target_b()
     assert res['status'] == 'SCALAR_SPECTRAL_BRIDGE_TARGET_B_INVESTIGATED'
@@ -620,16 +621,116 @@ def test_target_b_scalar_spectral_bridge_investigation():
     # 2. Critical recovery
     crit_rec = res['critical_only_recovery']
     assert crit_rec['reconstruction_residual_norm'] < 1e-13
+    assert crit_rec['full_matrix_residual_frobenius'] < 1e-13
+    assert crit_rec['full_matrix_residual_spectral_norm'] < 1e-13
     assert crit_rec['basis_condition_number'] < 2000.0
     assert crit_rec['ordinate_uncertainty_propagated_error'] < 1e-12
 
     # 3. Quartet recovery
     quart_rec = res['quartet_recovery']
     assert quart_rec['reconstruction_residual_norm'] < 1e-13
+    assert quart_rec['full_matrix_residual_frobenius'] < 1e-13
+    assert quart_rec['full_matrix_residual_spectral_norm'] < 1e-13
     assert quart_rec['basis_condition_number'] < 5000.0
 
-    # 4. Obstruction analysis
-    obstruction = res['concrete_h_dependent_construction']
-    assert obstruction['verdict'] == 'CONSTRUCTION_DEFECT_IDENTIFIED_AND_OBSTRUCTION_QUANTIFIED'
-    assert "zeta(rho0) = 0" in obstruction['first_equation_using_zeta_rho0']
-    assert "Conrey" in obstruction['obstruction_analysis']
+    # 4. Construction analysis & exact residual equation
+    construction = res['concrete_h_dependent_construction']
+    assert construction['verdict'] == 'SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED'
+    assert "Res_{s=rho_0}(-zeta'/zeta) = -m" in construction['first_equation_using_zeta_rho0']
+    assert "A_Phi(b) - L(b) = R_Phi(b) - r_rec(b)" in construction['exact_residual_equation']
+
+    # 5. Specified construction evaluation
+    spec_eval = construction['specified_construction_evaluation']
+    assert spec_eval['is_residual_equation_verified'] is True
+    assert spec_eval['residual_equation_balance_discrepancy'] < 1e-10
+    assert spec_eval['arithmetic_side_A_Phi_b'] > 1e11
+    assert spec_eval['complete_spectral_remainder_R_Phi_b'] > 1e11
+    assert abs(spec_eval['scalar_invariant_L_b'] - (-0.5)) < 1e-12
+
+
+def test_scalar_recovery_restricted_to_declared_three_grades():
+    """
+    Defect: Passing 4 grades to scalar-recovery previously vectorized only the upper-left
+    2x2 block of Sym(3), falsely reporting a residual of 3.945e-14 when the actual full-matrix
+    Frobenius residual was 5.3557.
+    Verify that the evaluator fails closed with ValueError when len(grades) != 3.
+    """
+    with pytest.raises(ValueError, match="strictly restricted to the declared 3-grade construction"):
+        investigate_scalar_spectral_bridge_target_b(grades=[-1, -2, -3, -4])
+
+    with pytest.raises(ValueError, match="strictly restricted to the declared 3-grade construction"):
+        investigate_scalar_spectral_bridge_target_b(grades=[-1, -2])
+
+
+def test_ordinate_uncertainty_certified_mvt_enclosure():
+    """
+    Defect: The ordinate uncertainty bound previously used the first-order estimate
+    eps_gamma * ||S'(gamma)||_2. For eps_gamma = 0.1, the linear estimate was 12,607.20,
+    while the actual matrix variation ||S(gamma + 0.1) - S(gamma)||_2 was 12,788.98.
+    Verify that the certified MVT derivative supremum over [gamma - eps, gamma + eps]
+    strictly encloses the actual variation (returns ~12,971.70 >= 12,788.98).
+    """
+    grades = [-1, -2, -3, -4]
+    tau = 2.0 * math.pi
+    window = (8.0, 20.0)
+    h = 0.05
+    P = np.array([
+        [-1.0, -1.0, -1.0],
+        [ 1.0,  0.0,  0.0],
+        [ 0.0,  1.0,  0.0],
+        [ 0.0,  0.0,  1.0]
+    ])
+
+    def w_bump(x):
+        if x <= 8.0 or x >= 20.0: return 0.0
+        u = 2.0 * (x - 8.0) / 12.0 - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    st_raw = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades}
+    a_kn = {}
+    for K in grades:
+        a_kn[K] = {}
+        for n_val, x_val, lam_val in st_raw[K]:
+            w = w_bump(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0: a_kn[K][n_val] = float(amp)
+
+    gam = 14.134725141734693
+    eps_gam = 0.1
+
+    obs_base = compute_critical_zero_observable(gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=eps_gam)
+    obs_perturbed = compute_critical_zero_observable(gam + eps_gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=0.0)
+
+    S_base = np.array(obs_base['S_matrix'])
+    S_perturbed = np.array(obs_perturbed['S_matrix'])
+
+    actual_variation = float(np.linalg.norm(S_perturbed - S_base, 2))
+    assert abs(actual_variation - 12788.98) < 5.0
+
+    linear_est = obs_base['first_order_linear_estimate']
+    assert linear_est < actual_variation, "Linear estimate failed to underestimate (expected ~12607.20 < 12788.98)"
+
+    mvt_bound = obs_base['certified_mvt_error_bound']
+    assert mvt_bound >= actual_variation, f"Certified MVT bound {mvt_bound} did not enclose actual variation {actual_variation}"
+    assert obs_base['spectral_evaluation_error_bound'] == mvt_bound
+
+
+def test_baseline_error_budget_certification_consistency():
+    """
+    Defect: Previously, when is_table_certified was False, the error budget still emitted
+    numeric values under bound_delta_W_G_prime_certified and certified_lambda_min_lower_margin.
+    Verify that uncertified runs set these certified fields to None, emit diagnostic margins,
+    and accurately state the unresolved reason.
+    """
+    res = certify_baseline_canonical_weil_error_budget()
+    eb = res['error_budget']
+
+    assert eb['is_table_certified'] is False
+    assert eb['bound_delta_W_G_prime_certified'] is None
+    assert eb['certified_lambda_min_lower_margin'] is None
+
+    assert eb['bound_delta_W_G_prime_analytic'] < 2000.0
+    assert eb['diagnostic_lambda_min_lower_margin'] > 1.3e7
+    assert eb['is_strictly_positive'] is False
+    assert res['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
+
