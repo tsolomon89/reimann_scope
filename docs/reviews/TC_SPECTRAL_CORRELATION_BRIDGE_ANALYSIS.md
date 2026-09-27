@@ -84,60 +84,89 @@ The legal symmetric matrix space $\operatorname{Sym}(2)$ has dimension $\frac{2 
    Critical zeros alone fully span $\operatorname{Sym}(2)$. Therefore, **linear recoverability of $G_{\rm target}$ is completely independent of hypothesis $H$**.
 
 ### Ordinate Uncertainty Spectral Error Propagation & Certified Enclosure
-For zero ordinates $\gamma$, finite-uncertainty error propagation cannot rely on a first-order linear approximation $\varepsilon_\gamma \|S_j'(\gamma)\|_2$. Indeed, in a 4-grade evaluation with $\varepsilon_\gamma = 0.1$, the first-order allowance returned $12,607.20$, whereas the actual matrix variation was $12,788.98$.
-To guarantee rigorous finite enclosure, we apply the certified Mean Value Theorem derivative supremum over the uncertainty ball:
-$$\|\Delta S_j\|_2 \le \varepsilon_\gamma \sup_{\xi \in [\gamma - \varepsilon_\gamma, \gamma + \varepsilon_\gamma]} \|S_j'(\xi)\|_2.$$
-Evaluating this supremum across Chebyshev nodes yields a certified bound of $12,971.70 \ge 12,788.98$, strictly enclosing the actual matrix variation. For high-precision reference zeros with $\varepsilon_\gamma \le 10^{-15}$, this certified enclosure bounds $\|\Delta G_{\rm target}\|_2 \le 1.15 \times 10^{-13}$.
+For zero ordinates $\gamma$, finite-uncertainty error propagation cannot rely on a first-order linear approximation $\varepsilon_\gamma \|S_j'(\gamma)\|_2$.
+Furthermore, sampling $\|S_j'(\xi)\|_2$ across seven Chebyshev nodes is **not** an upper bound on the interval supremum:
+- At $\gamma = 21.022039638771556$ with $\varepsilon_\gamma = 20.0$ and anchor $-1$ on grades $[-1, -2, -3]$:
+  - 7-node Chebyshev sampled maximum: $\approx 527,955.585567$
+  - Interior derivative norm at $\xi = 36.2670198055$: $\approx 727,589.092037$
+- This refutes the claim that the sampled Chebyshev maximum is a certified supremum enclosure ($727,589.09 > 527,955.59$).
+- To address this rigorously:
+  1. We derived a conservative, closed-form analytic majorant over the continuous interval $[\gamma - \varepsilon_\gamma, \gamma + \varepsilon_\gamma]$:
+     $$\|S'(\xi)\|_2 \le \|P\|_2^2 \left( 4 B_A B_{A'} E_0^2 + 4 B_A^2 E_0 E_1 \right),$$
+     where $B_A = \xi_{\max}^2 + 1/4$, $B_{A'} = 2\xi_{\max} + (\xi_{\max}^2 + 1/4)h$, $E_0 = \sqrt{\sum_K (\sum_n a_{K,n})^2}$, and $E_1 = \sqrt{\sum_K (\sum_n a_{K,n} |\log(\tau^K n)|)^2}$.
+     At the reproduced parameters, this analytic majorant yields $\approx 1.497 \times 10^{10} \ge 727,589.09$.
+  2. Because numerical kernel quadrature and roundoff are not enclosed via certified ball arithmetic, the evaluator fails closed: it sets `certified_mvt_error_bound = None`, `is_derivative_enclosure_certified = False`, and emits `diagnostic_mvt_error_bound`.
+  3. The scalar bridge consumer propagates uncertainty through $\sum_j |\lambda_j| \varepsilon_j$ using the interval MVT bounds rather than the central-point derivative $\|S_j'(\gamma)\|_2$.
 
 ---
 
-## 4. Concrete $H$-Dependent Construction & Exact Residual Accounting
+## 4. Arithmetic Dilation Repair & Bookkeeping Balance
 
-We analyze the concrete attempt to force $L(b) = 0$ (or $|L(b)| < 1/2$) from hypothesis $H$ ($z_0 = \rho_0 - 1/2 \ne 0$):
+### Arithmetic Normalization with Grade Dilation $D = \operatorname{diag}(\tau^K)$
+The raw matrices $W_{\rm arch}$ and $W_{\rm prime}$ use station weights $\Lambda(n) w(\tau^K n)$, whereas the authentic spectral amplitudes are $a_{K,n} = \tau^K \Lambda(n) w(\tau^K n)$. Consequently, the legal subspace arithmetic matrix is:
+$$W_G = P^T D (W_{\rm arch} - W_{\rm prime}) D P, \qquad D = \operatorname{diag}(\tau^K), \quad 1^T P = 0, \quad b = P \beta.$$
+Omitting $D$ exaggerated the arithmetic quadratic form by roughly $2\times 10^2$ (for negative grades $[-1, -2, -3]$).
 
-1. **First Equation Using $\zeta(\rho_0) = 0$ & Correct Residue Sign**:
-   At a non-trivial zero $\rho_0$ of multiplicity $m$, $-\frac{\zeta'}{\zeta}(s)$ has a simple pole with residue:
-   $$\operatorname{Res}_{s=\rho_0}\!\left(-\frac{\zeta'}{\zeta}\right) = -m$$
-   (specifically $-1$ for a simple zero, NOT $+1$).
-   In the Guinand-Weil explicit formula, contour integration of $-\frac{\zeta'}{\zeta}(s)$ yields the positive spectral sum $+m \sum_\rho \Phi(\rho - 1/2)$, which produces the symmetrized quartet contribution $Q(\rho_0)$.
+#### Reproduction Benchmarks ($b = (-1, 1, 0)/\sqrt{2}$, $h = 0.05$, window $[8, 20]$):
+- **Missing dilation ($U = 320, N_t = 2000$)**: $A_\Phi(b) \approx 1.4802 \times 10^{11}$
+- **Correct dilation ($U = 320, N_t = 2000$)**: $A_\Phi(b) \approx 7.4076 \times 10^8$
+- **Correct dilation ($U = 640, N_t = 4000$)**: $A_\Phi(b) \approx 1.1622 \times 10^9$
+- **Direct station contraction**: Evaluated directly as $(D b)^T (W_{\rm arch} - W_{\rm prime}) (D b)$, matching $\beta^T W_G \beta$ identically across multiple legal directions and under all permutations of the grade ensemble.
 
-2. **Exact Residual Equation & Derivation**:
-   Write the recovered finite spectral combination as $S_{\rm sel}$, with reconstruction error:
-   $$r_{\rm rec} = L - S_{\rm sel}.$$
-   For any admissible test function $\Phi$ in the Guinand-Weil explicit formula, the complete explicit formula identity is:
-   $$A_\Phi = S_{\rm sel} + R_\Phi,$$
-   where $A_\Phi$ is the complete arithmetic/Archimedean side and $R_\Phi$ is the complete omitted spectral remainder.
-   Substituting $S_{\rm sel} = L - r_{\rm rec}$ yields the exact consequence:
-   $$\boxed{A_\Phi - L = R_\Phi - r_{\rm rec}} \quad \Longleftrightarrow \quad L = A_\Phi - R_\Phi + r_{\rm rec}.$$
-   Substituting $L + 1/2$ on the left is not derived; it effectively assumes unproved remainder cancellation ($A_\Phi - R_\Phi = 0$).
-
-3. **Quantitative Evaluation of the Specified Construction**:
-   Evaluating the complete canonical bump kernel $\psi_h$ ($h = 0.05$, window $[8, 20]$, grades $[-1, -2, -3]$) on a representative legal unit vector $b = \frac{1}{\sqrt{2}}(-1, 1, 0)$:
-   - Arithmetic side: $A_\Phi(b) \approx 1.4815 \times 10^{11}$
-   - Target scalar invariant: $L(b) \equiv -0.5$
-   - Recovered spectral combination: $S_{\rm sel}(b) \approx -0.5$
-   - Finite reconstruction error: $r_{\rm rec}(b) \approx 1.18 \times 10^{-14}$
-   - Complete spectral remainder: $R_\Phi(b) \approx 1.4815 \times 10^{11}$
-   - Exact residual equation balance:
-     $$(A_\Phi(b) - L(b)) - (R_\Phi(b) - r_{\rm rec}(b)) = 0.0 \quad (\text{discrepancy } < 10^{-10}).$$
-   - **Failure Analysis**: In this specified construction, the arithmetic side $A_\Phi(b) \approx 1.48 \times 10^{11}$ and the spectral tail remainder $R_\Phi(b) \approx 1.48 \times 10^{11}$ dominate the target scalar $L(b) = -0.5$ by twelve orders of magnitude. The off-critical quartet $Q(\rho_0)$ enters with coefficient $\lambda_Q \approx -1.03 \times 10^{-3}$, which helps span $\operatorname{Sym}(2)$ algebraically, but does not force $|L(b)| < 0.5$. Instead, $L(b)$ remains identically $-0.5$, and the balance is satisfied by exact equality between the huge arithmetic and spectral tail energies.
-
-4. **Epistemic Distinction: Reductio Endpoint vs Refutation**:
-   - $L(b) \equiv -1/2$ is the intended contradictory endpoint of the reductio, not a refutation of the conditional derivation $H \implies L = 0$.
-   - Excluding a literal finite frequency comb does not exclude every admissible realization or controlled approximation. Nonzero individual spectral terms do not establish that a signed remainder cannot cancel.
-   - The failure of this specific construction demonstrates that discrete matrix recovery with a single bump kernel does not force $|L(b)| < 1/2$. Per Rule 0, this creates an active research obligation rather than a universal refutation.
-
-5. **Precise Next Research Question**:
-   > *Assuming an actual off-critical zero $\rho_0$, can one explicitly construct an admissible test—or a justified signed combination of complete explicit-formula identities—that forces $|L(b)| < 1/2$ for a legal unit vector, with every remainder controlled?*
+### Removal of Circular Spectral Verification
+Defining $r_{\rm rec} = L - S_{\rm sel}$ and $R_\Phi = A_\Phi - S_{\rm sel}$ makes:
+$$A_\Phi - L = R_\Phi - r_{\rm rec}$$
+an algebraic identity for arbitrary $A_\Phi$ by subtraction:
+$$(A_\Phi - L) - (R_\Phi - r_{\rm rec}) = (A_\Phi - L) - ((A_\Phi - S_{\rm sel}) - (L - S_{\rm sel})) \equiv 0.$$
+- This is retained solely as an internal algebraic bookkeeping check (`is_tautological_bookkeeping_identity: True`).
+- It does **not** certify explicit-formula agreement, independently measure the omitted spectral tail, or prove spectral compensation.
+- A regression test confirms that modifying $A_\Phi$ arbitrarily still produces $0.0$ discrepancy.
 
 ---
 
-## 5. Clarification of Quartet Rank & Gaussian Filtering
+## 5. Target B: Explicit Admissible Spectral Realization Analysis
 
-1. **Quartet Matrix Real Rank**:
-   A complex rank-2 symmetrized outer product $\operatorname{sym}(e_+ e_-^T)$ can have real matrix rank up to 4. In the 4-grade production configuration, the quartet matrix $\mathcal{M}$ has singular values $\approx [1.65 \times 10^4, 284.0, 8.14, 7.11 \times 10^{-6}]$, which has real rank 3 numerically and algebraic rank 4.
-2. **Gaussian Filtering & Leading Signs**:
-   For an even Gaussian test function $\widehat{g}_\sigma(t)$, the leading term under the reflected pairing is strictly positive ($\sim \frac{1}{4} e^{\sigma^2 \delta_0^2} > 0$). Achieving negative witness detection requires asymmetric test functions with complex phase modulation and complete tail enclosures.
+### 1. Object, Scope, and Quantifiers
+- **Object**: Admissible test function $\Phi$ in the Guinand-Weil explicit formula on the authentic 3-grade family $\{-1, -2, -3\}$ on window $[8, 20]$, with amplitudes $a_{K,n} = \tau^K \Lambda(n) w(\tau^K n)$, legal zero-sum constraint $\sum b_i = 0$, and unit normalization $\|b\|_2 = 1$.
+- **Scope**: Concrete candidate off-critical zero instance $\rho_0 = 1/2 + 0.49 + 100i$ (hypothetical response calculation, not evidence of zero existence).
+- **Contradiction Criterion**: Proving that hypothesis $H$ forces $|L(b)| < 1/2$ (or $L(b) = 0$) for a legal unit vector, where $L(b) = b_1 b_2 + b_1 b_3 + b_2 b_3 \equiv -1/2$.
+
+### 2. Candidate Test Function & Selected-Weight Realization Mismatch
+- **Candidate**: Canonical quadratic form $\Phi_b(z) = |A_h(z)|^2 |E_b(z)|^2$.
+- **Admissibility**: Entire, even ($\Phi(z) = \Phi(-z) = \Phi(\bar{z})$), rapid decay in vertical strips ($\mathcal{O}(|t|^{-N})$).
+- **Weight Realization**:
+  In the explicit formula for a single quadratic test function $\Phi_b$, every zero enters with unit positive multiplicity ($+1$).
+  Evaluating $\Phi_b$ on the selected zeros yields:
+  - Critical zero $\gamma_1 \approx 14.1347$: $s_1(b) \approx 38,915.82$
+  - Critical zero $\gamma_2 \approx 21.0220$: $s_2(b) \approx 354,326.37$
+  - Off-critical quartet $Q(\rho_0)$ ($z_0 = 0.49 + 100i$): $q(b) \approx -5,416.65$
+  - Single test selected sum: $S_{\Phi,\text{sel}}(b) = s_1(b) + s_2(b) + q(b) \approx +387,825.54$.
+- **Finite Matrix Recovery Comparison**:
+  Finite linear recovery of $G_{\rm target} = -(1/2) P^T P$ requires the specific recovery coefficients:
+  $$\lambda = [\lambda_1, \lambda_2, \lambda_Q] \approx [-6.564 \times 10^{-5}, \; -9.912 \times 10^{-6}, \; -1.028 \times 10^{-3}],$$
+  yielding $S_{\rm sel}(b) = \lambda_1 s_1 + \lambda_2 s_2 + \lambda_Q q = -0.50000000000007$ ($r_{\rm rec} \approx 6.9 \times 10^{-14}$).
+- **The Selected-Weight Mismatch**:
+  $$r_{\rm match}(b) = S_{\Phi,\text{sel}}(b) - S_{\rm sel}(b) \approx 387,825.54 - (-0.50) \approx 387,826.04.$$
+
+### 3. Complete Explicit Formula Identity & First Use of $H$
+The complete explicit formula identity for $\Phi_b$ decomposes as:
+$$A_\Phi(b) = S_{\Phi,\text{sel}}(b) + R_{\Phi,\text{tail}}(b) = S_{\rm sel}(b) + r_{\rm match}(b) + R_{\Phi,\text{tail}}(b)$$
+$$\Longrightarrow \boxed{A_\Phi(b) - L(b) = R_{\Phi,\text{tail}}(b) + r_{\rm match}(b) - r_{\rm rec}(b)}.$$
+- **Where Hypothesis $H$ First Acts**:
+  At a zero of multiplicity $m$, $-\frac{\zeta'}{\zeta}(s)$ has residue $-m$. The contour integral produces $+m \sum \Phi(\rho - 1/2)$.
+  Hypothesis $H$ asserts that the set of zeros contains $\rho_0 = 1/2 + \delta_0 + i\gamma_0$ ($\delta_0 \ne 0$). By reflection and functional equation, this quartet adds the discrete term $Q(\rho_0)(b)$ to the spectral sum. Without $H$, $Q(\rho_0)$ is strictly absent.
+
+### 4. Quantitative Deficit & The First Unresolved Analytic Step
+- **Independent Critical Zero Sum**: The partial sum of the 29 critical zeros up to $T = 100$ is $\Sigma_{\text{crit},\le 100}(b) \approx 5.492 \times 10^7$.
+- **Arithmetic Energy**: With correct dilation $D$, $A_\Phi(b) \approx 7.4076 \times 10^8$ (at $U = 320$).
+- **Cancellation Precision Needed**:
+  To force $|L(b)| < 0.5$ from the explicit formula, the spectral remainder $R_\Phi(b)$ would have to cancel $A_\Phi(b)$ to within $< 0.5$:
+  $$\frac{0.5}{7.4076 \times 10^8} \approx 6.75 \times 10^{-10} \quad (\sim 9 \text{ decimal places of exact cancellation}).$$
+- **The First Unresolved Analytic Barrier**:
+  1. A single positive quadratic form $\Phi_b$ has unit positive weights $+1$ on every zero, generating huge positive energy ($A_\Phi \sim 7.4 \times 10^8$) and large mismatch ($r_{\rm match} \sim 3.88 \times 10^5$), preventing $|L(b)| < 0.5$.
+  2. To match the recovered weights $(\lambda_1, \lambda_2, \lambda_Q)$ and suppress unwanted zeros, one must form a **signed linear combination** of explicit formulas $\Phi = \sum w_m \Phi_m$.
+  3. A signed combination loses positive definiteness ($R_U \not\succeq 0$). Controlling the omitted infinite tail $\sum_{\gamma > 100} \Phi(\rho - 1/2)$ then requires unconditional two-sided bounds on the off-critical zero distribution without assuming RH.
+  4. This isolates the exact open mathematical barrier: constructing an admissible signed combination whose physical transform cancels the Archimedean energy while rigorously bounding the uncontrolled off-critical spectral tail.
 
 ---
 
@@ -155,17 +184,9 @@ In strict compliance with Root Rule 0 of `AGENTS.md`:
 | **Nodal Quadrature Enclosure** | 256-node Gauss-Legendre error bound on compact bump | `NUMERICALLY_UNRESOLVED` | $c_4, c_2, c_0$ literals lack 512th-derivative proof; certified flag removed |
 | **1-Node Quadrature Gate** | $n_{\rm nodes} = 1$ fails closed ($1.58 \times 10^8$ error reproduced) | `REFUTED_WITHIN_SCOPE` | Status `UNCERTIFIED_UNSUPPORTED_QUADRATURE_ORDER` |
 | **Spectral Span Recovery** | Critical zeros alone span $\operatorname{Sym}(2)$ (rank 3/3, res $\le 10^{-14}$) | `EMPIRICAL` | Python `investigate_scalar_spectral_bridge_target_b` |
-| **Ordinate MVT Enclosure** | $\|\Delta S\|_2 \le \varepsilon_\gamma \sup \|S'\|_2$ (encloses $12,788.98$ at $\varepsilon=0.1$) | `CERTIFIED_FINITE` | Python `compute_critical_zero_observable` MVT Chebyshev enclosure |
-| **Quartet Real Rank** | Symmetrized rank-2 outer product has real rank up to 4 | `EMPIRICAL` | Evaluated in `compute_reflected_quartet_observable` |
-| **Specified Bump Construction** | Canonical bump kernel explicit formula forces $|L(b)| < 1/2$ | `SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED` | Tails $A_\Phi \sim R_\Phi \sim 1.48 \times 10^{11}$ overwhelm $L(b) = -0.5$ |
+| **Chebyshev Derivative Enclosure Refutation** | 7 Chebyshev nodes under-report supremum ($5.28 \times 10^5 < 7.28 \times 10^5$) | `REFUTED_WITHIN_SCOPE` | Counterexample at $\xi = 36.267$ on $[1.02, 41.02]$; certified flag removed |
+| **Analytic Derivative Majorant** | Closed-form proved bound $\|S'(\xi)\|_2 \le \|P\|_2^2 (4 B_A B_{A'} E_0^2 + 4 B_A^2 E_0 E_1)$ | `EMPIRICAL_PROVED_BOUND` | Evaluated in `compute_critical_zero_observable` ($\approx 1.50 \times 10^{10} \ge 7.28 \times 10^5$) |
+| **Arithmetic Dilation Normalization** | $W_G = P^T D (W_{\rm arch} - W_{\rm prime}) D P$ with $D = \operatorname{diag}(\tau^K)$ | `EMPIRICAL_BENCHMARK_REPRODUCED` | Benchmarks reproduced: missing dilation $\approx 1.48 \times 10^{11}$, correct $\approx 7.41 \times 10^8$ |
+| **Bookkeeping Residual Balance** | $A_\Phi - L == R_\Phi - r_{\rm rec}$ identically by subtraction | `TAUTOLOGY_BOOKKEEPING` | Holds for arbitrary $A_\Phi$; independent certification flag removed |
+| **Target B Admissible Realization** | Canonical bump explicit formula forces $|L(b)| < 1/2$ | `SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED` | Mismatch $r_{\rm match} \approx 3.88 \times 10^5$, energy $A_\Phi \approx 7.41 \times 10^8$, deficit $\approx 6.75 \times 10^{-10}$ |
 | **Spectral-Correlation Bridge** | $H \Longrightarrow \exists \text{ admissible } \Phi : |L(b)| < 1/2$ (or $\nu_b = 0$) | `NUMERICALLY_UNRESOLVED_CONSTRUCTION_INCOMPLETE` | Open research obligation under Root Rule 0 |
-
-### Summary
-The concrete defects have been fully resolved:
-1. The pole residue sign of $-\zeta'/\zeta$ at $\rho_0$ is corrected to $-m$ ($-1$ for simple zero).
-2. The exact residual equation $\boxed{A_\Phi - L = R_\Phi - r_{\rm rec}}$ is derived without unproved substitutions.
-3. The specified construction is evaluated numerically, demonstrating why a single canonical bump kernel fails to force $|L(b)| < 1/2$.
-4. The scalar recovery API is restricted strictly to the declared 3-grade family, reporting both Frobenius and spectral norm residuals.
-5. The ordinate uncertainty bound is upgraded from a first-order estimate to a certified MVT derivative supremum enclosure.
-6. The uncertified baseline error budget sets certified fields to `None` and removes misleading prose.
-7. The formal Lean build report verifies 298 declarations with 0 `sorry`.

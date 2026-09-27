@@ -1,6 +1,6 @@
 {
-  "status": "EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED",
-  "epistemic_class": "CERTIFIED_FINITE_PARAMETER_SENSITIVITY",
+  "status": "EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_DIAGNOSTIC",
+  "epistemic_class": "DIAGNOSTIC_FINITE_PARAMETER_SENSITIVITY",
   "parameters": {
     "grades": [
       -1,
@@ -39,7 +39,8 @@
     "beta_vector_norm_sq": 0.9999999611358799,
     "B_arith_computed": 13225739.84646114,
     "bound_delta_arith": 806.1076811222465,
-    "certified_arithmetic_margin": 13224933.738780018,
+    "certified_arithmetic_margin": null,
+    "diagnostic_arithmetic_margin": 13224933.738780018,
     "is_arithmetic_margin_certified": false,
     "quadrature_bound_status": "DIAGNOSTIC_ONLY_PENDING_ARCHIMEDEAN_REMAINDER",
     "is_strictly_positive": true,

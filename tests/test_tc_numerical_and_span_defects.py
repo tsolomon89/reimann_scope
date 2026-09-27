@@ -603,9 +603,10 @@ def test_target_b_scalar_spectral_bridge_investigation():
        (1, 89, 563), (2, 89, 3511), (1, 563, 3511).
     3. Verify finite linear recovery of G_target = -(1/2) P^T P using critical zeros alone (residual < 1e-13, cond ~1104).
     4. Verify finite linear recovery including off-critical quartet Q(rho0) (residual < 1e-13, cond ~3876).
-    5. Propagate ordinate uncertainty through recovery coefficients with certified MVT enclosure.
-    6. Verify correct residue Res(-zeta'/zeta) = -m and exact residual equation A_Phi - L = R_Phi - r_rec.
-    7. Evaluate specified construction arithmetic energy, spectral tail, and balance identity.
+    5. Propagate ordinate uncertainty through sum_j |lambda_j| eps_j with MVT enclosure.
+    6. Verify correct residue Res(-zeta'/zeta) = -m and bookkeeping balance identity.
+    7. Evaluate correct arithmetic dilation D = diag(tau^K) yielding benchmark ~7.41e8 (not >1e11).
+    8. Evaluate Target B admissible realization analysis, selected-weight mismatch, and first use of H.
     """
     res = investigate_scalar_spectral_bridge_target_b()
     assert res['status'] == 'SCALAR_SPECTRAL_BRIDGE_TARGET_B_INVESTIGATED'
@@ -633,53 +634,106 @@ def test_target_b_scalar_spectral_bridge_investigation():
     assert quart_rec['full_matrix_residual_spectral_norm'] < 1e-13
     assert quart_rec['basis_condition_number'] < 5000.0
 
-    # 4. Construction analysis & exact residual equation
-    construction = res['concrete_h_dependent_construction']
-    assert construction['verdict'] == 'SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED'
-    assert "Res_{s=rho_0}(-zeta'/zeta) = -m" in construction['first_equation_using_zeta_rho0']
-    assert "A_Phi(b) - L(b) = R_Phi(b) - r_rec(b)" in construction['exact_residual_equation']
+    # 4. Bookkeeping balance (removing circular spectral verification)
+    bookkeeping = res['bookkeeping_balance']
+    assert bookkeeping['is_tautological_bookkeeping_identity'] is True
+    assert bookkeeping['independent_explicit_formula_verified'] is False
+    assert bookkeeping['bookkeeping_discrepancy'] < 1e-10
+    assert bookkeeping['direct_station_evaluation_check_passed'] is True
 
-    # 5. Specified construction evaluation
-    spec_eval = construction['specified_construction_evaluation']
-    assert spec_eval['is_residual_equation_verified'] is True
-    assert spec_eval['residual_equation_balance_discrepancy'] < 1e-10
-    assert spec_eval['arithmetic_side_A_Phi_b'] > 1e11
-    assert spec_eval['complete_spectral_remainder_R_Phi_b'] > 1e11
-    assert abs(spec_eval['scalar_invariant_L_b'] - (-0.5)) < 1e-12
+    # 5. Arithmetic scaling repair benchmark with dilation D = diag(tau^K)
+    # Correct dilation yields ~7.4076e8 at U=320, N_t=2000 (missing dilation gave ~1.4802e11)
+    arith_energy = bookkeeping['arithmetic_side_A_Phi_b']
+    assert abs(arith_energy - 7.4076e8) < 1.0e6, f"Expected ~7.4076e8 with dilation D, got {arith_energy}"
+
+    # 6. Target B Admissible Realization Analysis
+    tb = res['target_b_admissible_realization_analysis']
+    assert tb['verdict'] == 'SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED'
+    assert "Res_{s=rho_0}(-zeta'/zeta) = -m" in tb['first_equation_using_H']
+    assert tb['selected_weight_mismatch_r_match'] > 1e5
+    assert tb['critical_zeros_partial_sum_T100'] > 5e7
+    assert tb['cancellation_precision_needed_to_force_L'] < 1e-9
+    assert abs(tb['scalar_invariant_L_b'] - (-0.5)) < 1e-12
+
+
+def test_circular_spectral_verification_regression():
+    """
+    Defect: Defining r_rec = L - S_sel and R_Phi = A_Phi - S_sel makes
+    A_Phi - L = R_Phi - r_rec an algebraic identity for arbitrary A_Phi.
+    Verify that perturbing only the arithmetic input A_Phi' = A_Phi + 1e6 still produces
+    (A_Phi' - L) - (R_Phi' - r_rec) == 0, proving this identity is an algebraic tautology
+    by subtraction and does not count as independent arithmetic-spectral agreement.
+    """
+    res = investigate_scalar_spectral_bridge_target_b()
+    bb = res['bookkeeping_balance']
+    A_phi = bb['arithmetic_side_A_Phi_b']
+    S_sel = bb['recovered_spectral_S_sel_b']
+    L_val = res['algebraic_invariant']['legal_unit_sphere_value']
+    r_rec = L_val - S_sel
+
+    # Perturbed arithmetic input by arbitrary constant
+    A_phi_perturbed = A_phi + 1.234567e6
+    R_phi_perturbed = A_phi_perturbed - S_sel
+
+    lhs = A_phi_perturbed - L_val
+    rhs = R_phi_perturbed - r_rec
+    discrepancy = abs(lhs - rhs)
+    assert discrepancy < 1e-10, "Bookkeeping balance failed to hold tautologically for perturbed arithmetic input"
 
 
 def test_scalar_recovery_restricted_to_declared_three_grades():
     """
-    Defect: Passing 4 grades to scalar-recovery previously vectorized only the upper-left
-    2x2 block of Sym(3), falsely reporting a residual of 3.945e-14 when the actual full-matrix
-    Frobenius residual was 5.3557.
-    Verify that the evaluator fails closed with ValueError when len(grades) != 3.
+    Defect:
+    1. Passing len(grades) != 3 must fail closed with ValueError.
+    2. Passing grades not equal to {-1, -2, -3} (e.g. [-1, -2, 0]) must fail closed with ValueError.
+    3. Passing window (8, 9) where all 3 selected amplitude products vanish must fail closed with ValueError.
+    4. Permutations of {-1, -2, -3} (e.g. [-3, -1, -2]) must succeed and preserve L(b) = -0.5.
     """
-    with pytest.raises(ValueError, match="strictly restricted to the declared 3-grade construction"):
+    with pytest.raises(ValueError, match="strictly restricted to the declared authentic 3-grade ensemble"):
         investigate_scalar_spectral_bridge_target_b(grades=[-1, -2, -3, -4])
 
-    with pytest.raises(ValueError, match="strictly restricted to the declared 3-grade construction"):
+    with pytest.raises(ValueError, match="strictly restricted to the declared authentic 3-grade ensemble"):
         investigate_scalar_spectral_bridge_target_b(grades=[-1, -2])
+
+    with pytest.raises(ValueError, match="strictly restricted to the declared authentic 3-grade ensemble"):
+        investigate_scalar_spectral_bridge_target_b(grades=[-1, -2, 0])
+
+    with pytest.raises(ValueError, match="Selected station keys must have strictly positive active amplitudes"):
+        investigate_scalar_spectral_bridge_target_b(window=(8.0, 9.0))
+
+    # Permuted grade ordering must preserve exact invariant and direct evaluation
+    res_perm = investigate_scalar_spectral_bridge_target_b(grades=[-3, -1, -2])
+    assert res_perm['algebraic_invariant']['legal_unit_sphere_value'] == -0.5
+    assert res_perm['bookkeeping_balance']['direct_station_evaluation_check_passed'] is True
 
 
 def test_ordinate_uncertainty_certified_mvt_enclosure():
     """
-    Defect: The ordinate uncertainty bound previously used the first-order estimate
-    eps_gamma * ||S'(gamma)||_2. For eps_gamma = 0.1, the linear estimate was 12,607.20,
-    while the actual matrix variation ||S(gamma + 0.1) - S(gamma)||_2 was 12,788.98.
-    Verify that the certified MVT derivative supremum over [gamma - eps, gamma + eps]
-    strictly encloses the actual variation (returns ~12,971.70 >= 12,788.98).
+    Defect: 7 Chebyshev nodes sampled maximum is not a certified supremum upper bound.
+    Reproduce accepted input:
+      grades = [-1, -2, -3], anchor = -1, h = 0.05, window = [8, 20],
+      gamma = 21.022039638771556, eps_gamma = 20.0:
+      - Claimed Chebyshev sampled max: ~527,955.59
+      - Interior derivative norm at xi = 36.2670198055: ~727,589.09
+    Verify:
+      1. Interior derivative norm strictly exceeds the 7-node Chebyshev sample (refuting supremum enclosure).
+      2. The analytic majorant strictly encloses the interior derivative norm.
+      3. certified_mvt_error_bound is None and is_derivative_enclosure_certified is False.
+      4. Negative uncertainty radii fail closed with ValueError.
     """
-    grades = [-1, -2, -3, -4]
+    grades = [-1, -2, -3]
     tau = 2.0 * math.pi
     window = (8.0, 20.0)
     h = 0.05
-    P = np.array([
-        [-1.0, -1.0, -1.0],
-        [ 1.0,  0.0,  0.0],
-        [ 0.0,  1.0,  0.0],
-        [ 0.0,  0.0,  1.0]
-    ])
+    anchor_grade = -1
+    diff_grades = [g for g in grades if g != anchor_grade]
+    r = len(grades)
+    m_dim = len(diff_grades)
+    anchor_idx = grades.index(anchor_grade)
+    P = np.zeros((r, m_dim))
+    for col_idx, g in enumerate(diff_grades):
+        P[grades.index(g), col_idx] = 1.0
+        P[anchor_idx, col_idx] = -1.0
 
     def w_bump(x):
         if x <= 8.0 or x >= 20.0: return 0.0
@@ -695,24 +749,59 @@ def test_ordinate_uncertainty_certified_mvt_enclosure():
             amp = (tau ** K) * lam_val * w
             if amp > 0: a_kn[K][n_val] = float(amp)
 
-    gam = 14.134725141734693
-    eps_gam = 0.1
+    gam = 21.022039638771556
+    eps_gam = 20.0
 
     obs_base = compute_critical_zero_observable(gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=eps_gam)
-    obs_perturbed = compute_critical_zero_observable(gam + eps_gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=0.0)
+    obs_xi = compute_critical_zero_observable(36.2670198055, grades, a_kn, P, h=h, tau=tau, eps_gamma=0.0)
 
-    S_base = np.array(obs_base['S_matrix'])
-    S_perturbed = np.array(obs_perturbed['S_matrix'])
+    cheb_sampled_max = obs_base['diagnostic_chebyshev_sampled_max']
+    interior_norm = obs_xi['S_prime_norm_2']
 
-    actual_variation = float(np.linalg.norm(S_perturbed - S_base, 2))
-    assert abs(actual_variation - 12788.98) < 5.0
+    # Reproduce defect: Chebyshev sampled max underestimates interior derivative
+    assert abs(cheb_sampled_max - 527955.585567) < 5.0
+    assert abs(interior_norm - 727589.092037) < 5.0
+    assert interior_norm > cheb_sampled_max, "Interior derivative failed to exceed Chebyshev sampled max"
 
-    linear_est = obs_base['first_order_linear_estimate']
-    assert linear_est < actual_variation, "Linear estimate failed to underestimate (expected ~12607.20 < 12788.98)"
+    # Analytic majorant strictly encloses the interior derivative
+    analytic_majorant = obs_base['analytic_derivative_majorant']
+    assert analytic_majorant >= interior_norm, "Analytic majorant failed to enclose interior derivative"
 
-    mvt_bound = obs_base['certified_mvt_error_bound']
-    assert mvt_bound >= actual_variation, f"Certified MVT bound {mvt_bound} did not enclose actual variation {actual_variation}"
-    assert obs_base['spectral_evaluation_error_bound'] == mvt_bound
+    # Uncertified status is correctly returned
+    assert obs_base['certified_mvt_error_bound'] is None
+    assert obs_base['is_derivative_enclosure_certified'] is False
+    assert obs_base['diagnostic_mvt_error_bound'] > 0.0
+
+    # Negative uncertainty radius validation
+    with pytest.raises(ValueError, match="eps_gamma must be non-negative"):
+        compute_critical_zero_observable(gam, grades, a_kn, P, h=h, tau=tau, eps_gamma=-1.0)
+
+
+def test_admissible_spectral_realization_investigation():
+    """
+    Target B: Verify dedicated admissible spectral realization investigation.
+    1. Returns status ADMISSIBLE_SPECTRAL_REALIZATION_INVESTIGATED.
+    2. Quantifies single test function selected mismatch r_match ~ 3.88e5.
+    3. Quantifies critical zeros partial sum ~ 5.49e7.
+    4. Evaluates complete arithmetic energy with D ~ 7.41e8.
+    5. Pinpoints first use of H (adding Q(rho0)).
+    6. Identifies first unresolved analytic barrier.
+    """
+    from tc.weil_forms import investigate_admissible_spectral_realization
+    res = investigate_admissible_spectral_realization()
+
+    assert res['status'] == 'ADMISSIBLE_SPECTRAL_REALIZATION_INVESTIGATED'
+    single_test = res['single_test_function_realization']
+    assert single_test['selected_weight_mismatch_r_match'] > 3.8e5
+
+    complete_id = res['complete_identity_and_use_of_H']
+    assert complete_id['arithmetic_side_A_Phi'] > 7.4e8
+    assert complete_id['critical_zeros_partial_sum_T100'] > 5e7
+    assert "Res_{s=rho_0}(-zeta'/zeta) = -m" in complete_id['where_H_first_acts']
+
+    gap = res['quantitative_gap_and_unresolved_step']
+    assert gap['verdict'] == 'SPECIFIED_CONSTRUCTION_ANALYZED_BOUND_NOT_FORCED'
+    assert "unconditional two-sided bounds" in gap['first_unresolved_analytic_step']
 
 
 def test_baseline_error_budget_certification_consistency():

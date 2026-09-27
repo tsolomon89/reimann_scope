@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-009",
+  "active_task_id": "TASK-TC-010",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -187,6 +187,26 @@
         "tests/test_tc_numerical_and_span_defects.py"
       ],
       "resolution": "Target B completed: 1) Investigated scalar spectral-correlation bridge on authentic 3-grade family [-1, -2, -3], window [8, 20], h=0.05. 2) Selected grouped keys (1,89,563), (2,89,3511), (1,563,3511) have unique active station contributors and strictly positive amplitudes (a_12 ~ 0.1143, a_13 ~ 0.02348, a_23 ~ 0.005266). 3) Proved pure algebraic scalar invariant L(b) = c_12(b)/a_12 + c_13(b)/a_13 + c_23(b)/a_23 = b_1 b_2 + b_1 b_3 + b_2 b_3 == -1/2 on legal unit sphere, and matrix identity G_target = -(1/2)P^T P. 4) Formalized in Lean 4 (formal/RiemannScope/ExtremalCorrelation.lean) with 0 sorry: scalar_pairwise_sum_identity, legal_unit_scalar_invariant, scalar_bridge_L_invariant (all 298 project theorems compiled). 5) In Sym(2) (dim 3), proved critical zeros alone recover G_target with residual ~1.06e-14 (cond ~1104), and with Q(rho_0) with residual ~2.33e-14 (cond ~3876), proving recoverability is independent of H; strictly restricted API to 3 grades. 6) Corrected pole residue sign to Res(-zeta'/zeta) = -m, derived exact consequence A_Phi(b) - L(b) = R_Phi(b) - r_rec(b), and evaluated complete arithmetic and spectral remainder energies on canonical bump kernel (A_Phi ~ R_Phi ~ 1.48e11 vs L = -0.5), demonstrating why this specified construction fails to force |L(b)| < 1/2. Formulated precise next research question."
+    },
+    {
+      "task_id": "TASK-TC-010",
+      "priority": 12,
+      "objective": "Repair functional consistency and construct an admissible spectral realization",
+      "status": "COMPLETED_EXPLORATORY",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "1) Arithmetic dilation D = diag(tau^K) was omitted from scalar investigation, exaggerating arithmetic energy by ~200x. 2) Balance identity A_Phi - L = R_Phi - r_rec was treated as independent verification rather than tautology by subtraction. 3) 7-node Chebyshev sampled max underestimated interval supremum (interior point xi=36.267 norm 727,589.09 > 527,955.59). 4) Selected keys assume grades {-1,-2,-3} and positive amplitudes at (89, 563, 3511). 5) Epistemic status in explicit formula sensitivity certificate must be DIAGNOSTIC. 6) Admissible spectral test Phi_b(z) = |A_h(z)|^2 |E_b(z)|^2 supplies its own spectral weights, creating selected-term mismatch r_match; complete identity A_Phi - L = R_Phi,tail + r_match - r_rec connects to L; exact H-dependence enters at pole residue -m adding Q(rho_0); first unresolved analytic barrier is controlling off-critical tail of signed combinations without RH.",
+      "planned_calculation": "1. Restore D dilation in W_G = P^T D (W_arch - W_prime) D P. 2. Remove circular spectral verification, document bookkeeping balance, and add regression test. 3. Derive proved analytic derivative majorant ||S'(xi)||_2 <= 1.497e10 and propagate through sum |lambda_j| eps_j. 4. Enforce set(grades) == {-1,-2,-3} and positive amplitudes. 5. Propagate uncertified margin to sensitivity certificate. 6. Derive complete admissible identity, compute quantitative deficit (~6.75e-10 relative cancellation needed), and isolate the first unresolved analytic step.",
+      "acceptance_criterion": "Reproduction benchmarks matched (~7.4076e8 at U=320, ~1.1622e9 at U=640); Chebyshev refutation verified; all 18 defects tests passing; fast tier passing; complete identity and unresolved analytic barrier formulated.",
+      "dependencies": ["TASK-TC-009"],
+      "evidence": [
+        "tc/weil_forms.py",
+        "tc/__init__.py",
+        "transcendental.py",
+        "data/tc_explicit_formula_sensitivity_certificate.json",
+        "tests/test_tc_numerical_and_span_defects.py",
+        "docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md"
+      ],
+      "resolution": "Target A completed: Restored D = diag(tau^K) dilation (reproduced U=320 benchmark ~7.4076e8, U=640 ~1.1622e9; verified against direct station evaluation and grade permutation). Circular verification replaced with explicit tautological bookkeeping balance. Refuted 7-node Chebyshev sample (interior xi=36.267 norm 727,589.09 > 527,955.59) and implemented closed-form proved analytic majorant ||S'(xi)||_2 <= 1.497e10. Strictly enforced set(grades) == {-1, -2, -3} and positive station amplitudes. Repaired sensitivity certificate epistemic class to DIAGNOSTIC_FINITE_PARAMETER_SENSITIVITY with certified_arithmetic_margin: null. Target B completed: Investigated admissible test Phi_b(z) = |A_h(z)|^2 |E_b(z)|^2. Identified selected-weight mismatch r_match = S_Phi,sel - S_sel ~ 387,826.04. Derived complete explicit-formula identity A_Phi(b) - L(b) = R_Phi,tail(b) + r_match(b) - r_rec(b). Identified exact entry point of H (pole residue -m producing Q(rho_0)). Quantified deficit (A_Phi ~ 7.41e8 vs L = -0.5 requires 6.75e-10 cancellation). Formulated the first unresolved analytic barrier: signed combinations lose positivity, requiring two-sided bounds on the off-critical tail without RH."
     }
   ]
 }

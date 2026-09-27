@@ -4542,13 +4542,15 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
     out_file = str(tmp_path / "test_sensitivity_cert.json")
     res = transcendental.certify_explicit_formula_off_critical_sensitivity(output_path=out_file)
 
-    assert res['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
-    assert res['epistemic_class'] == 'CERTIFIED_FINITE_PARAMETER_SENSITIVITY'
+    assert res['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_DIAGNOSTIC'
+    assert res['epistemic_class'] == 'DIAGNOSTIC_FINITE_PARAMETER_SENSITIVITY'
 
     # Arithmetic baseline
     ab = res['arithmetic_baseline']
     assert ab['is_strictly_positive'] is True
-    assert ab['certified_arithmetic_margin'] > 1.3e7
+    assert ab['is_arithmetic_margin_certified'] is False
+    assert ab['certified_arithmetic_margin'] is None
+    assert ab['diagnostic_arithmetic_margin'] > 1.3e7
 
     # Spectral remainders (with closed zero interval T_cutoff = 100.0)
     sr = res['spectral_remainders']
@@ -4571,7 +4573,7 @@ def test_explicit_formula_off_critical_sensitivity(tmp_path):
     assert os.path.exists(out_file)
     with open(out_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
-    assert data['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
+    assert data['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_DIAGNOSTIC'
     assert data['off_critical_sensitivity_summary']['is_finite_quadrature_margin_positive_against_worst_quartet'] is True
     assert data['off_critical_sensitivity_summary']['is_positivity_unconditionally_preserved_for_single_zero'] is False
 
@@ -4705,7 +4707,8 @@ def test_tc_quadratic_functional_homogeneity_and_zero_input():
     )
     assert res_zero['arithmetic_baseline']['B_arith_computed'] == 0.0
     assert res_zero['arithmetic_baseline']['bound_delta_arith'] == 0.0
-    assert res_zero['arithmetic_baseline']['certified_arithmetic_margin'] == 0.0
+    assert res_zero['arithmetic_baseline']['certified_arithmetic_margin'] is None
+    assert res_zero['arithmetic_baseline']['diagnostic_arithmetic_margin'] == 0.0
     assert res_zero['spectral_remainders']['cumulative_critical_zeros_sum'] == 0.0
     assert res_zero['spectral_remainders']['stieltjes_nontrivial_zero_tail_bound'] == 0.0
     assert res_zero['homogeneity_invariants']['zero_input_produces_zero'] is True
@@ -4731,8 +4734,8 @@ def test_tc_quadratic_functional_homogeneity_and_zero_input():
         assert abs(val_scaled - lam_sq * val_orig) / val_orig < 1e-10
 
         # Margin scales by lambda^2
-        margin_orig = res_orig['arithmetic_baseline']['certified_arithmetic_margin']
-        margin_scaled = res_scaled['arithmetic_baseline']['certified_arithmetic_margin']
+        margin_orig = res_orig['arithmetic_baseline']['diagnostic_arithmetic_margin']
+        margin_scaled = res_scaled['arithmetic_baseline']['diagnostic_arithmetic_margin']
         assert abs(margin_scaled - lam_sq * margin_orig) / margin_orig < 1e-10
 
         # Critical zero sum scales by lambda^2
@@ -4856,7 +4859,7 @@ def test_tc_exact_off_critical_sensitivity_overturn_ratio(tmp_path):
         output_path=out_file
     )
 
-    assert res['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_CERTIFIED'
+    assert res['status'] == 'EXPLICIT_FORMULA_OFF_CRITICAL_SENSITIVITY_DIAGNOSTIC'
     summary = res['off_critical_sensitivity_summary']
 
     # Max negative quartet is small
