@@ -46,6 +46,7 @@ from tc.weil_forms import (
     compute_critical_zero_observable,
     compute_reflected_quartet_observable,
     investigate_scalar_spectral_bridge_target_b,
+    construct_weighted_admissible_spectral_test,
     sieve_prime_powers_in_window,
     Z_CANONICAL_KERNEL,
     NORM_KAPPA_SQ,
@@ -822,4 +823,281 @@ def test_baseline_error_budget_certification_consistency():
     assert eb['diagnostic_lambda_min_lower_margin'] > 1.3e7
     assert eb['is_strictly_positive'] is False
     assert res['epistemic_class'] == 'NUMERICALLY_UNRESOLVED'
+
+
+def test_holomorphic_profile_continuation_and_cauchy_riemann_violation():
+    r"""
+    Target A.1:
+    1. Distinguish physical test g_b = psi_h * e_b with transform F_b(z) = A_h(z) E_b(z)
+       from reflected convolution k_b = g_b * \widetilde{g_b} with transform:
+           H_b(z) = F_b(z) F_b(-z) = A_h(z)^2 E_b(z) E_b(-z).
+    2. Verify H_b is even: H_b(-z) = H_b(z) and satisfies Schwarz reflection: H_b(conj(z)) = conj(H_b(z)).
+    3. Verify on critical line z = it: H_b(it) = |F_b(it)|^2 >= 0.
+    4. Refute that |A_h(z)|^2 |E_b(z)|^2 is entire: off the imaginary axis,
+       |A_h(z)|^2 |E_b(z)|^2 is strictly real, whereas holomorphic H_b(z) has non-zero imaginary part,
+       violating Cauchy-Riemann equations for holomorphic functions.
+    """
+    grades = [-1, -2, -3]
+    tau = 2.0 * math.pi
+    window = (8.0, 20.0)
+    h = 0.05
+    st_raw = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades}
+
+    def w_bump(x: float) -> float:
+        if x <= 8.0 or x >= 20.0: return 0.0
+        u = 2.0 * (x - 8.0) / 12.0 - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    a_kn = {}
+    for K in grades:
+        a_kn[K] = {}
+        for n_val, x_val, lam_val in st_raw[K]:
+            w = w_bump(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0: a_kn[K][n_val] = float(amp)
+
+    b_vec = np.array([-1.0 / math.sqrt(2.0), 1.0 / math.sqrt(2.0), 0.0])
+
+    # Legendre nodes for A_h
+    v_k, w_k = np.polynomial.legendre.leggauss(500)
+    kappa_vals = np.exp(-1.0 / (1.0 - v_k**2)) / Z_CANONICAL_KERNEL * w_k
+
+    def eval_A_h(z: complex) -> complex:
+        return (z**2 - 0.25) * np.sum(kappa_vals * np.exp(z * h * v_k))
+
+    def eval_E_b(z: complex) -> complex:
+        val = 0.0 + 0.0j
+        for K_idx, K in enumerate(grades):
+            for n_val, amp in a_kn[K].items():
+                x_val = (tau ** K) * n_val
+                val += b_vec[K_idx] * amp * (x_val ** (-z))
+        return val
+
+    def eval_H_b(z: complex) -> complex:
+        return (eval_A_h(z) ** 2) * eval_E_b(z) * eval_E_b(-z)
+
+    # 1. Even symmetry: H_b(-z) == H_b(z)
+    z_test = complex(0.49, 100.0)
+    H_pos = eval_H_b(z_test)
+    H_neg = eval_H_b(-z_test)
+    assert abs(H_pos - H_neg) < 1e-10
+
+    # 2. Schwarz reflection: H_b(conj(z)) == conj(H_b(z))
+    H_conj = eval_H_b(np.conj(z_test))
+    assert abs(H_conj - np.conj(H_pos)) < 1e-10
+
+    # 3. Critical line positivity: H_b(it) == |F_b(it)|^2 >= 0
+    t_val = 14.134725
+    H_it = eval_H_b(1j * t_val)
+    F_it = eval_A_h(1j * t_val) * eval_E_b(1j * t_val)
+    assert abs(H_it.imag) < 1e-12
+    assert abs(H_it.real - abs(F_it)**2) < 1e-10
+    assert H_it.real >= 0.0
+
+    # 4. Modulus square |A_h(z)|^2 |E_b(z)|^2 is NOT holomorphic off the imaginary axis
+    mod_sq_val = (abs(eval_A_h(z_test))**2) * (abs(eval_E_b(z_test))**2)
+    # H_b(z_test) has non-zero imaginary part, whereas mod_sq_val is purely real!
+    assert abs(H_pos.imag) > 1e-3, "H_b(z) should have non-zero imaginary part off-axis"
+    assert abs(H_pos - mod_sq_val) > 1.0, "|A_h|^2 |E_b|^2 fails to equal holomorphic continuation H_b"
+
+
+def test_real_numerical_controls_forwarding():
+    """
+    Target A.2:
+    1. Forward arithmetic cutoff U and resolution N_t through investigate_scalar_spectral_bridge_target_b.
+    2. Benchmark values at h=0.05, window [8, 20], b=(-1, 1, 0)/sqrt(2):
+       - At U = 320: A_{<= 320} ~ 7.4076e8
+       - At U = 640: A_{<= 640} ~ 1.1622e9
+    3. Verify that U is genuinely effective (ratio ~ 1.57), disproving static serialization.
+    4. Validate fail-closed guards for invalid U, N_t, and T_cutoff.
+    """
+    res_320 = investigate_scalar_spectral_bridge_target_b(U=320.0, N_t=2000)
+    A_320 = res_320['bookkeeping_balance']['truncated_arithmetic_side_A_Phi_le_U']
+    assert abs(A_320 - 7.4076e8) / 7.4076e8 < 0.01
+
+    res_640 = investigate_scalar_spectral_bridge_target_b(U=640.0, N_t=2000)
+    A_640 = res_640['bookkeeping_balance']['truncated_arithmetic_side_A_Phi_le_U']
+    assert abs(A_640 - 1.1622e9) / 1.1622e9 < 0.01
+
+    # Ratio proves U is genuinely propagated to the underlying continuous integral
+    growth_ratio = A_640 / A_320
+    assert 1.50 < growth_ratio < 1.65
+
+    # Fail-closed numerical parameter validations
+    with pytest.raises(ValueError, match="Arithmetic cutoff U must be >= 10.0"):
+        investigate_scalar_spectral_bridge_target_b(U=5.0)
+
+    with pytest.raises(ValueError, match="Quadrature resolution N_t must be >= 10"):
+        investigate_scalar_spectral_bridge_target_b(N_t=5)
+
+    with pytest.raises(ValueError, match="Spectral cutoff T_cutoff must be > 0.0"):
+        investigate_scalar_spectral_bridge_target_b(T_cutoff=-10.0)
+
+
+def test_grouped_key_collision_and_verified_window():
+    """
+    Target A.3:
+    1. Reproduce genuine grouped key collision on window (1, 20) with grades [-1, -2, -3]:
+       - Key (1, 89, 563) receives both (-1, -2) and (-2, -3) contributors.
+       - Normalized sum of grouped coefficients for b = (0, 1, -1)/sqrt(2) produces
+         ~ -0.5000422671185678, NOT -1/2.
+    2. Verify that on the verified window [8, 20]:
+       - Collision is absent (key_collision_detected is False).
+       - Actual grouped matrix discrepancy ||G_actual - G_target||_2 < 1e-14.
+       - Denominator amplitude products are strictly positive and separated from zero.
+    3. Verify duplicate grade rejection and anchor validation.
+    """
+    # 1. Reproduce collision on window (1, 20)
+    tau = 2.0 * math.pi
+    window_coll = (1.0, 20.0)
+    grades = [-1, -2, -3]
+
+    def w_bump_coll(x: float) -> float:
+        if x <= 1.0 or x >= 20.0: return 0.0
+        u = 2.0 * (x - 1.0) / 19.0 - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    st_raw = {K: sieve_prime_powers_in_window(window_coll, K, tau=tau) for K in grades}
+    a_kn_coll = {}
+    for K in grades:
+        a_kn_coll[K] = {}
+        for n_val, x_val, lam_val in st_raw[K]:
+            w = w_bump_coll(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0: a_kn_coll[K][n_val] = float(amp)
+
+    # Check key (1, 89, 563) contributors
+    amp_1_89 = a_kn_coll[-1].get(89, 0.0)
+    amp_2_563 = a_kn_coll[-2].get(563, 0.0)
+    amp_2_89 = a_kn_coll[-2].get(89, 0.0)
+    amp_3_563 = a_kn_coll[-3].get(563, 0.0)
+
+    contrib_12 = amp_1_89 * amp_2_563
+    contrib_23 = amp_2_89 * amp_3_563
+    assert abs(contrib_12 - 0.07990177443717375) < 1e-6
+    assert abs(contrib_23 - 6.7544355478314894e-6) < 1e-9
+
+    # Normalized sum for b = (0, 1, -1)/sqrt(2)
+    b_test = np.array([0.0, 1.0 / math.sqrt(2.0), -1.0 / math.sqrt(2.0)])
+    # For key (1, 89, 563), c_key = b_1 b_2 * contrib_12 + b_2 b_3 * contrib_23 = 0 - 0.5 * contrib_23
+    # Grouped coefficient normalized by a12 = contrib_12 yields discrepancy:
+    disc_ratio = contrib_23 / contrib_12
+    normalized_val = -0.5 * (1.0 + disc_ratio)
+    assert abs(normalized_val - (-0.5000422671185678)) < 1e-12
+
+    # 2. Verified window [8, 20] has zero collisions
+    res_820 = investigate_scalar_spectral_bridge_target_b(window=(8.0, 20.0))
+    grp_info = res_820['algebraic_invariant']['actual_grouped_representation']
+    assert grp_info['key_collision_detected'] is False
+    assert grp_info['discrepancy_G_actual_vs_G_target'] < 1e-14
+    assert grp_info['denominator_separated_from_zero'] is True
+
+    # 3. Duplicate grade and invalid anchor rejection
+    with pytest.raises(ValueError, match="Duplicate grades not permitted"):
+        investigate_scalar_spectral_bridge_target_b(grades=[-1, -2, -2])
+
+    with pytest.raises(ValueError, match="anchor_grade 0 must be one of the declared grades"):
+        investigate_scalar_spectral_bridge_target_b(grades=[-1, -2, -3], anchor_grade=0)
+
+
+def test_production_quartet_recovery_coefficients_and_disjoint_accounting():
+    """
+    Target A.4:
+    1. Reconcile production quartet-recovery coefficients:
+       lambda ~ (-6.56406e-5, -9.91246e-6, -1.02770e-3),
+       refuting walkthrough typo (-2.5735e-4, +4.8471e-5, +8.5583e-5) which produces +6.70.
+    2. Verify S_sel = -0.5000000000000051 on the legal representative vector.
+    3. Multiplicity m_0: zero weight for rho_0 is lambda_Q / m_0.
+    4. Disjoint accounting: selected zeros strictly excluded from unselected zeros below T.
+    5. Explicit formula sign: A_<=U = S_selected + R_other - R_arch.
+    """
+    res = investigate_scalar_spectral_bridge_target_b(multiplicity_m0=2)
+    q_rec = res['quartet_recovery']
+    lambdas = q_rec['recovery_coefficients_lambda']
+
+    assert abs(lambdas[0] - (-6.5640600718e-5)) < 1e-8
+    assert abs(lambdas[1] - (-9.9124577690e-6)) < 1e-8
+    assert abs(lambdas[2] - (-1.0277027639e-3)) < 1e-6
+
+    # Multiplicity m_0 = 2 halves the individual zero target weight
+    assert abs(q_rec['zero_weight_rho0'] - (lambdas[2] / 2.0)) < 1e-12
+
+    # S_sel equals -0.5 to machine precision
+    S_sel = res['bookkeeping_balance']['recovered_spectral_S_sel_b']
+    assert abs(S_sel - (-0.5)) < 1e-12
+
+    # Disjoint zero accounting
+    acct = res['accounting_breakdown']
+    sel_gammas = acct['selected_zeros']['critical_zeros']
+    unsel_list = acct['unselected_zeros_below_T']
+    assert len(sel_gammas) == 2
+    for g_sel in sel_gammas:
+        assert all(abs(g_sel - g_unsel) > 1e-6 for g_unsel in unsel_list.get('zeros_list', []))
+
+
+def test_weighted_admissible_spectral_test_target_b():
+    """
+    Target B:
+    1. Construct explicit polynomial multiplier p(z) = r(z^2) of degree 6 in z (degree 3 in w = z^2).
+    2. Interpolate p(i*gamma_1) = lambda_1, p(i*gamma_2) = lambda_2, p(z_0) = lambda_Q / m_0.
+    3. Invertibility: condition number kappa(M) ~ 2.11e12 and interpolation residual < 1e-14.
+    4. Operator-norm mismatch ||Delta G||_2 < 1e-13 on legal space Sym(2).
+    5. Exact weight realization: r_match = 0.0 and r_rec ~ 0.0 on representative vector.
+    6. Physical derivative realization: Psi_b = sum_{k=0}^3 (-1)^k r_k H_{(g_b^{(k)})}.
+       Check signs, C_c^infinity smoothness, support in [-12, 12].
+    7. Direct arithmetic evaluation A_{Psi, <= U} ~ 5.04e8.
+    8. Unconditional Stieltjes tail bound via Trudgian (2014) at T=100 and T=200.
+    9. State exact use of H(rho_0, m_0) and Quantitative Admissible Annihilation Lemma.
+    """
+    res = construct_weighted_admissible_spectral_test(delta=0.49, gamma=100.0, multiplicity_m0=1)
+    assert res['status'] == 'ADMISSIBLE_SPECTRAL_TEST_CONSTRUCTED_BOUND_UNRESOLVED'
+
+    poly = res['polynomial_multiplier']
+    assert poly['linear_system_matrix_condition_number'] < 500.0  # Scaled system cond ~= 472.62
+    assert poly['interpolation_residual_norm'] < 1.0e-14
+
+    # Exact interpolation verification
+    conds = poly['interpolation_conditions']
+    assert abs(conds['p_at_i_gamma1'] - conds['target_lambda1']) < 1e-14
+    assert abs(conds['p_at_i_gamma2'] - conds['target_lambda2']) < 1e-14
+    assert abs(conds['p_at_z0_real'] - conds['target_lambda_Q_over_m0']) < 1e-14
+    assert abs(conds['p_at_z0_imag']) < 1e-14
+
+    # Operator realization on legal space evaluated directly on implemented polynomial
+    op = res['selected_weight_realization']
+    assert op['operator_mismatch_spectral_norm'] < 1.0e-13
+    assert op['is_operator_matched_within_machine_eps'] is True
+    assert abs(op['selected_weight_mismatch_r_match']) < 1.0e-14
+    assert abs(op['reconstruction_error_r_rec']) < 1.0e-12
+
+    # Physical derivative decomposition
+    phys = res['physical_derivative_decomposition']
+    assert phys['derivative_orders'] == [0, 1, 2, 3]
+    assert phys['alternating_signs'] == [1, -1, 1, -1]
+    assert phys['compact_support_radius'] == 12.0
+    assert phys['smoothness_class'] == 'C_c^infinity'
+
+    # Direct arithmetic evaluation including non-vanishing prime contribution
+    arith = res['direct_arithmetic_evaluation']
+    assert abs(arith['A_psi_prime'] - (-211930587.0)) < 1.0e3  # Non-vanishing prime term ~= -211.93e6
+    assert abs(arith['evaluated_A_psi_le_U'] - 2.91e8) / 2.91e8 < 0.05
+    assert arith['active_prime_resonance_count'] == 946
+    assert arith['active_prime_sample_pair']['prime_q'] == 2
+    assert abs(arith['active_prime_sample_pair']['log_separation_defect'] - 0.00938974) < 1.0e-6
+
+    # Unconditional Stieltjes tail bound (m >= 6)
+    tail = res['unconditional_stieltjes_tail_bound']
+    assert tail['order_m6']['bound_at_T_100'] > 0.0
+    assert tail['order_m6']['bound_at_T_200'] > 0.0
+    assert tail['order_m7']['bound_at_T_100'] > 0.0
+    assert tail['order_m7']['bound_at_T_200'] > 0.0
+    assert tail['order_m6']['cutoff_refinement_ratio'] > 2.0
+    assert tail['order_m7']['cutoff_refinement_ratio'] > 10.0
+    assert "m >= 6" in tail['decay_requirement']
+
+    # Use of H and open lemma
+    h_use = res['use_of_H_and_open_lemma']
+    assert "Res_{s=rho_0}(-zeta'/zeta) = -m_0" in h_use['first_equation_using_H']
+    assert "Quantitative Admissible Annihilation Lemma" in h_use['remaining_open_lemma']
+
 

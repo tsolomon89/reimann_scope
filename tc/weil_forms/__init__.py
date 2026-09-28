@@ -159,6 +159,7 @@ from .optimization import (
     compute_critical_zero_observable,
     compute_reflected_quartet_observable,
     investigate_scalar_spectral_bridge_target_b,
+    construct_weighted_admissible_spectral_test,
     investigate_admissible_spectral_realization,
 )
 
@@ -233,6 +234,7 @@ __all__ = [
     "compute_reflected_quartet_observable",
     "compute_surviving_prime_bound",
     "compute_tc_quartet_matrix",
+    "construct_weighted_admissible_spectral_test",
     "ctx",
     "dataclass",
     "evaluate_tc_arithmetic_spectral_baseline_comparison",

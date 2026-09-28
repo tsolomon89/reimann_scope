@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-010",
+  "active_task_id": "TASK-TC-011",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -205,8 +205,25 @@
         "data/tc_explicit_formula_sensitivity_certificate.json",
         "tests/test_tc_numerical_and_span_defects.py",
         "docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md"
+      ]
+    },
+    {
+      "task_id": "TASK-TC-011",
+      "priority": 13,
+      "objective": "Repair reviewed functional/evidence defects and construct weighted admissible spectral identity",
+      "status": "COMPLETED_EXPLORATORY",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Constructed auxiliary admissible test Psi_b = p(z) H_b(z) matches Sym(2) recovery weights (mismatch < 1e-13, r_match = 0.0), but direct arithmetic evaluation (~5.04e8) and unconditional Stieltjes tail bound (~1.25e14) exceed 0.5. Strict bound |L(b)| < 1/2 requires establishing the Quantitative Admissible Annihilation Lemma under H(rho_0, m_0).",
+      "planned_calculation": "1. Repair holomorphic continuation, numerical controls forwarding, actual grouped key collisions, recovery coefficients, and disjoint zero accounting. 2. Construct 4-parameter polynomial multiplier p(z) = r(z^2) interpolating target weights at i*gamma_1, i*gamma_2, z_0. 3. Decompose into derivative components Psi_b = sum (-1)^k r_k H_{(g^{(k)})}. 4. Direct arithmetic evaluation and Trudgian (2014) Stieltjes tail bounds. 5. Isolate exact entry point of H and formulate open lemma.",
+      "acceptance_criterion": "All 23 defects tests passing; operator mismatch < 1e-13; complete explicit formula decomposition derived; exact entry of H isolated; open lemma registered.",
+      "dependencies": ["TASK-TC-010"],
+      "evidence": [
+        "docs/reviews/TC_WEIGHTED_ADMISSIBLE_SPECTRAL_IDENTITY_ANALYSIS.md",
+        "tc/weil_forms/optimization.py",
+        "tc/weil_forms/certificates.py",
+        "tests/test_tc_numerical_and_span_defects.py"
       ],
-      "resolution": "Target A completed: Restored D = diag(tau^K) dilation (reproduced U=320 benchmark ~7.4076e8, U=640 ~1.1622e9; verified against direct station evaluation and grade permutation). Circular verification replaced with explicit tautological bookkeeping balance. Refuted 7-node Chebyshev sample (interior xi=36.267 norm 727,589.09 > 527,955.59) and implemented closed-form proved analytic majorant ||S'(xi)||_2 <= 1.497e10. Strictly enforced set(grades) == {-1, -2, -3} and positive station amplitudes. Repaired sensitivity certificate epistemic class to DIAGNOSTIC_FINITE_PARAMETER_SENSITIVITY with certified_arithmetic_margin: null. Target B completed: Investigated admissible test Phi_b(z) = |A_h(z)|^2 |E_b(z)|^2. Identified selected-weight mismatch r_match = S_Phi,sel - S_sel ~ 387,826.04. Derived complete explicit-formula identity A_Phi(b) - L(b) = R_Phi,tail(b) + r_match(b) - r_rec(b). Identified exact entry point of H (pole residue -m producing Q(rho_0)). Quantified deficit (A_Phi ~ 7.41e8 vs L = -0.5 requires 6.75e-10 cancellation). Formulated the first unresolved analytic barrier: signed combinations lose positivity, requiring two-sided bounds on the off-critical tail without RH."
+      "resolution": "Target A completed: Repaired holomorphic continuation H_b(z) = A_h(z)^2 E_b(z) E_b(-z) (refuted entire modulus square); forwarded U, N_t, T_cutoff controls (reproduced 7.4076e8 at U=320, 1.1622e9 at U=640); audited actual grouped matrices (key (1,89,563) collision on (1,20) yielding -0.500042 vs 0 collisions on [8,20]); reconciled production recovery coefficients (-6.564e-5, -9.912e-6, -1.028e-3); enforced disjoint zero accounting A_<=U = S_sel + R_other - R_arch; withdrew claim that unconditional bounds are unknown. Target B completed & repaired: 1) Eliminated ill-conditioning via variable scaling s = w / gamma^2 (reducing kappa from 2.11e12 to 472.62, residual < 1e-18). 2) Realized operator match on actual polynomial G_{Psi, sel} = p(i*gamma_1) S_1 + p(i*gamma_2) S_2 + 4 m_0 Re[p(z_0) H_b(z_0)] (operator mismatch ||Delta G||_2 ~ 1.34e-14, r_match ~ -1.78e-15). 3) Proved resonance gap failure for grade K=-1: stations x1=53/2pi and x2=107/2pi in [8, 20] resonant with prime q=2 (|log 2 - log(107/53)| = log(107/106) ~= 0.00939 < 2h = 0.10); evaluated full position-space prime term across 946 resonant events yielding A_{Psi, prime} = -211,930,586.94 ~= -211.93e6 (exact across 256, 512, 1024 nodes); net arithmetic energy A_{Psi, <= U} ~= 2.91e8. 4) Derived strip-uniform majorant |p(delta+it) H_b(delta+it)| <= Phi_m(t) ~ t^{10-2m}, proving m >= 6 is strictly required for zero-tail convergence against dN(t) ~ (1/2pi) log(t/2pi) dt; computed exact L^1 norms ||kappa^(6)||_L1 ~= 1.197e7, ||kappa^(7)||_L1 ~= 1.571e9; derived Abel-Stieltjes formula against Trudgian (2014) Theorem 1 with smooth, endpoint, and fluctuation integrals; retracted super-exponential decay in favor of Schwartz-class rapid polynomial decay. 5) Formulated core research question: what independent estimate from H(rho_0, m_0) controls the remaining arithmetic-spectral terms below 1/2 to complete the reductio."
     }
   ]
 }

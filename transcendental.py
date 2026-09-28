@@ -220,6 +220,7 @@ from tc.weil_forms import (
     compute_critical_zero_observable,
     compute_reflected_quartet_observable,
     investigate_scalar_spectral_bridge_target_b,
+    construct_weighted_admissible_spectral_test,
     investigate_admissible_spectral_realization,
 )
 
@@ -420,6 +421,7 @@ __all__ = [
     "compute_critical_zero_observable",
     "compute_reflected_quartet_observable",
     "investigate_scalar_spectral_bridge_target_b",
+    "construct_weighted_admissible_spectral_test",
     "investigate_admissible_spectral_realization",
     "evaluate_tc_grade_orbit_countermodel",
     "evaluate_theorem_d_partition_of_unity",
