@@ -1878,7 +1878,7 @@ def _get_d_kappa_lambdas():
     global _D_KAPPA_LAMBDAS
     if _D_KAPPA_LAMBDAS is not None:
         return _D_KAPPA_LAMBDAS
-    import sympy as sp
+    import sympy as sp  # type: ignore
     u_sym = sp.Symbol('u', real=True)
     om_sym = 1 - u_sym**2
     kappa_sym = sp.exp(-1 / om_sym) / sp.Float(Z_CANONICAL_KERNEL, 30)
@@ -2002,7 +2002,7 @@ L1_NORM_KAPPA_DERIVATIVES = CERTIFIED_L1_NORM_KAPPA_DERIVATIVES
 
 
 def compute_certified_stieltjes_tail_bound(
-    r_poly: Sequence[float],
+    r_poly: Union[Sequence[float], np.ndarray],
     C_E: float,
     h: float = 0.05,
     delta: float = 0.49,
