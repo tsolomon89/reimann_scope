@@ -55,20 +55,25 @@ from .matrix import compute_canonical_reflected_weil_matrix
 from .certificates import certify_baseline_canonical_weil_error_budget
 def validate_spectral_zero_coverage(
     ref_zeros: List[float],
-    T_cutoff: float
+    T_cutoff: float,
+    tolerance: float = 1e-4
 ) -> Tuple[bool, str, Optional[List[float]], List[float]]:
     """Validate spectral zero coverage on [0, T_cutoff].
 
-    Enforces 7 rigorous invariant mathematical and provenance checks:
+    Enforces rigorous invariant mathematical, disjoint-interval, and provenance checks:
     1. Non-empty input list.
     2. Finite values only: rejects NaN, +inf, -inf.
     3. Strict monotonicity and no duplicates: gamma_{k+1} - gamma_k >= 1e-6.
-    4. Provenance integrity: verifies reference data hash against provenance.json.
-    5. Authoritative zero locations and counting: compares against authoritative
-       Odlyzko reference zeros within 1e-4 tolerance. Rejects fabricated values
-       (e.g. evenly spaced synthetic sequences) and interior omissions (e.g. missing zeros at any T).
-    6. Must contain zeros below T_cutoff (crit_zeros non-empty).
-    7. Bracketing above T_cutoff: authoritative zero > T_cutoff must be present.
+    4. Cutoff boundary non-intersection: rejects zeros whose uncertainty interval
+       [gamma - tolerance, gamma + tolerance] intersects T_cutoff (|gamma - T_cutoff| <= tolerance).
+    5. Provenance integrity: verifies reference data hash against provenance.json.
+    6. Authoritative zero locations and counting: compares against authoritative
+       Odlyzko reference zeros within disjoint tolerance intervals [gamma_k^auth - tol, gamma_k^auth + tol].
+       Requires tol < 0.5 * min_spacing (so intervals are strictly disjoint).
+       Guarantees exact 1-to-1 bijection between accepted zeros and authoritative reference zeros:
+       rejects fabricated values, interior omissions, duplicate matches, and ambiguous overlaps.
+    7. Must contain zeros below T_cutoff (crit_zeros non-empty).
+    8. Bracketing above T_cutoff: authoritative zero > T_cutoff must be present and matched within tolerance.
     """
     if not ref_zeros:
         return False, "empty_zero_list", [0.0, float(T_cutoff)], []
@@ -88,7 +93,13 @@ def validate_spectral_zero_coverage(
         if diff <= 1e-6:
             return False, f"duplicate_or_inverted_zeros_at_index_{i}_{ref_zeros[i]:.4f}_and_{ref_zeros[i+1]:.4f}", [ref_zeros[i], ref_zeros[i+1]], crit_zeros
 
-    # 3. Provenance and authoritative comparison
+    # 3. Cutoff boundary non-intersection check:
+    # A zero whose uncertainty interval intersects T_cutoff leaves boundary inclusion ambiguous.
+    for g in ref_zeros:
+        if abs(g - T_cutoff) <= tolerance:
+            return False, f"ambiguous_cutoff_boundary_zero_at_{g:.6f}_within_tolerance_{tolerance:.1e}", [g - tolerance, g + tolerance], crit_zeros
+
+    # 4. Provenance and authoritative comparison
     import reference_data
     if not reference_data.verify_provenance():
         return False, "provenance_hash_mismatch_in_reference_data", [0.0, float(T_cutoff)], []
@@ -108,21 +119,28 @@ def validate_spectral_zero_coverage(
     if len(crit_zeros) != len(auth_crit):
         return False, f"zero_count_mismatch_expected_{len(auth_crit)}_got_{len(crit_zeros)}", [crit_zeros[-1], float(T_cutoff)], crit_zeros
 
+    # Disjoint interval 1-to-1 matching:
+    # Minimum spacing on auth_crit must strictly exceed 2 * tolerance to guarantee disjoint intervals
+    if len(auth_crit) > 1:
+        min_spacing = min(auth_crit[i+1] - auth_crit[i] for i in range(len(auth_crit) - 1))
+        if min_spacing <= 2.0 * tolerance:
+            return False, f"reference_zero_spacing_{min_spacing:.6f}_violates_disjoint_interval_condition_2tol_{2*tolerance:.6f}", [0.0, float(T_cutoff)], crit_zeros
+
     max_disp = 0.0
     for k in range(len(crit_zeros)):
         disp = abs(crit_zeros[k] - auth_crit[k])
-        if disp > 1e-4:
+        if disp > tolerance:
             return False, f"fabricated_or_displaced_zero_at_index_{k}_got_{crit_zeros[k]:.4f}_expected_{auth_crit[k]:.4f}", [crit_zeros[k], auth_crit[k]], crit_zeros
         if disp > max_disp:
             max_disp = disp
 
-    # Bracketing zero verification
+    # Bracketing zero verification strictly above T_cutoff
     first_above_input = min((g for g in ref_zeros if g > T_cutoff), default=None)
     first_above_auth = min(g for g in auth_zeros if g > T_cutoff)
     if first_above_input is None:
         return False, "reference_data_truncated_before_or_at_T", [crit_zeros[-1], float(T_cutoff)], crit_zeros
     disp_br = abs(first_above_input - first_above_auth)
-    if disp_br > 1e-4:
+    if disp_br > tolerance:
         return False, f"fabricated_or_displaced_bracketing_zero_got_{first_above_input:.4f}_expected_{first_above_auth:.4f}", [crit_zeros[-1], first_above_input], crit_zeros
     if disp_br > max_disp:
         max_disp = disp_br
@@ -1992,9 +2010,12 @@ def evaluate_position_space_prime_functional(
     return prime_pairing_raw, prime_contribution_signed, active_details
 
 
+# Analytically derived total variation integrals I_m = ||kappa^(m)||_1 = TV(kappa^(m-1))
+# on [-1, 1], evaluated at high precision and rounded upward to next integer.
+# Note: Certified Arb ball enclosures with directed outward rounding remain an open research obligation.
 CERTIFIED_L1_NORM_KAPPA_DERIVATIVES = {
-    6: 11974462.0,       # Exact total variation of kappa^(5): 11,974,461.062135...
-    7: 1571233583.0,      # Exact total variation of kappa^(6): 1,571,233,582.371358...
+    6: 11974462.0,       # Total variation of kappa^(5): 11,974,461.062135... (rounded upward)
+    7: 1571233583.0,      # Total variation of kappa^(6): 1,571,233,582.371358... (rounded upward)
 }
 
 # Legacy alias for backward compatibility:
@@ -2010,7 +2031,7 @@ def compute_certified_stieltjes_tail_bound(
     m: int = 6,
     n_nodes: Optional[int] = None
 ) -> Dict[str, Any]:
-    """Certified unconditional Stieltjes tail bound against Trudgian (2014) Theorem 1/2.
+    """Certified unconditional Stieltjes tail bound against Trudgian (2014) Theorem 1/2 and Brent (2016).
 
     Mathematical Remainder Theorem:
     1. For a degree-6 polynomial multiplier p(z) = sum_{k=0}^3 r_k z^{2k} and differentiated bump
@@ -2026,13 +2047,22 @@ def compute_certified_stieltjes_tail_bound(
        strictly requires the leading exponent to satisfy:
            -p_0 = 10 - 2m < -1 <=> 2m > 11 <=> m >= 6.
        Unsupported orders (m < 6 or m >= 8) are strictly rejected.
-    3. Proved analytic integration against Trudgian (2014) counting envelope |N(t) - M(t)| <= E(t):
-           \\int_T^\\infty Phi dN <= \\int_T^\\infty Phi M'(t) dt + 2 Phi(T) E(T) + \\int_T^\\infty (-Phi') (E(t) - E(T)) dt.
-       Smooth part per power c_p t^{-p} (M'(t) = log(t/2pi)/(2pi)):
-           c_p T^{1-p}/(2pi) * [ log(T/2pi)/(p-1) + 1/(p-1)^2 ].
-       Envelope E(t) = a log t + b log log t + c (Trudgian 2014 Theorem 2):
-           \\int_T^\\infty (-Phi') E(t) dt = Phi(T) E(T) + sum_p c_p [ a T^{-p}/p + b E_1(p log T) ].
-       Total positive ordinates bound: smooth + 2 Phi(T) E(T) + sum_p c_p [ a T^{-p}/p + b E_1(p log T) ].
+    3. Proved analytic integration against Trudgian (2014) counting envelope |N(t) - M(t)| <= E_tot(t):
+           E_tot(t) = E_S(t) + E_gamma(t)
+       where:
+           E_S(t) = a log t + b log log t + c (Trudgian 2014 Theorem 2 for t >= e)
+           E_gamma(t) = C_gamma / t with C_gamma = 1/150 (Brent 2016 Theorem 5 / Corollary 4 for t >= 10).
+           (Note: the leading asymptotic term 1/(48*pi*t) is a lower bound, not an upper envelope;
+            Brent Theorem 5 proves |theta(t)/pi + 1 - M(t)| <= 1/(150*t) for all t >= 10).
+    4. Explicit Stieltjes integration:
+           \\int_T^\\infty Phi dN <= \\int_T^\\infty Phi M'(t) dt + |\\int_T^\\infty Phi d(N - M)|.
+       Integrating by parts:
+           |\\int_T^\\infty Phi d(N - M)| <= Phi(T) E_tot(T) + \\int_T^\\infty (-Phi') E_tot(t) dt.
+       For the Trudgian S(t) component (rearranged via Trudgian's identity):
+           Phi(T) E_S(T) + \\int_T^\\infty (-Phi') E_S(t) dt = 2 Phi(T) E_S(T) + \\int_T^\\infty (-Phi') (E_S(t) - E_S(T)) dt.
+           where \\int_T^\\infty (-Phi') (E_S(t) - E_S(T)) dt = sum_p c_p [ a T^{-p}/p + b E_1(p log T) ].
+       For the Brent (2016) Stirling gamma component E_gamma(t) = C_gamma / t:
+           Phi(T) E_gamma(T) + \\int_T^\\infty (-Phi') E_gamma(t) dt = C_gamma sum_p c_p (1 + p / (p + 1)) T^{-p - 1}.
        Factoring 2 for both signs (+gamma and -gamma) gives the complete certified bound.
     """
     if m not in (6, 7):
@@ -2069,19 +2099,19 @@ def compute_certified_stieltjes_tail_bound(
         coeffs_cp.append(cp)
 
     # Trudgian (2014) Theorem 1/2 envelope constants for t >= e:
-    # S(t) bound: |S(t)| <= a_env * log t + b_env * log log t + c_env
-    # Full zero counting N(t) - M(t) incorporates the Stirling gamma remainder |theta(t)/pi + 1 - M(t)| <= c_gamma / t:
     a_env = 0.112
     b_env = 0.278
     c_env = 2.511
-    c_gamma = 1.0 / (48.0 * math.pi)  # Stirling gamma correction factor ~ 0.006631456
+    # Brent (2016) Theorem 5 / Corollary 4 rigorous upper envelope for t >= 10:
+    c_gamma = 1.0 / 150.0  # Rigorous upper bound on |theta(t)/pi + 1 - M(t)| <= 1/(150*t)
 
     T = float(T_cutoff)
     phi_T = sum(cp * (T ** (-pj)) for pj, cp in zip(powers_p, coeffs_cp))
-    E_T = a_env * math.log(T) + b_env * math.log(math.log(T)) + c_env + c_gamma / T
+    E_S_T = a_env * math.log(T) + b_env * math.log(math.log(T)) + c_env
 
     smooth_total = 0.0
-    fluct_integral = 0.0
+    fluct_S_integral = 0.0
+    gamma_integral = 0.0
     for pj, cp in zip(powers_p, coeffs_cp):
         # Closed-form smooth contribution:
         sm_j = (cp * (T ** (1.0 - pj)) / (2.0 * math.pi)) * (
@@ -2089,15 +2119,20 @@ def compute_certified_stieltjes_tail_bound(
         )
         smooth_total += sm_j
 
-        # Closed-form fluctuation contribution (including gamma correction integral):
+        # Trudgian S(t) fluctuation integral (using Trudgian 2014 Theorem 2 formula):
         e1_val = float(scipy.special.exp1(pj * math.log(T)))
-        gamma_fl_j = c_gamma * (pj / (pj + 1.0)) * (T ** (-pj - 1.0))
-        fl_j = cp * (a_env * (T ** (-pj)) / pj + b_env * e1_val + gamma_fl_j)
-        fluct_integral += fl_j
+        fl_S_j = cp * (a_env * (T ** (-pj)) / pj + b_env * e1_val)
+        fluct_S_integral += fl_S_j
 
-    endpoint_term = phi_T * E_T
+        # Brent (2016) Stirling gamma remainder contribution:
+        # \Phi(T) E_gamma(T) + \int_T^\infty (-\Phi') E_gamma(t) dt = c_gamma * cp * (1 + pj / (pj + 1)) * T^{-pj - 1}
+        gamma_j = c_gamma * cp * (1.0 + pj / (pj + 1.0)) * (T ** (-pj - 1.0))
+        gamma_integral += gamma_j
+
+    # Trudgian S(t) Stieltjes total: \Phi(T) E_S(T) + \int_T^\infty (-\Phi') E_S(t) dt = 2 \Phi(T) E_S(T) + \int_T^\infty (-\Phi') (E_S(t) - E_S(T)) dt
+    endpoint_term = phi_T * E_S_T
     # Total for positive zeros:
-    pos_zeros_tail = smooth_total + 2.0 * endpoint_term + fluct_integral
+    pos_zeros_tail = smooth_total + 2.0 * endpoint_term + fluct_S_integral + gamma_integral
     # Complete tail for both signs:
     both_signs_tail = 2.0 * pos_zeros_tail
 
@@ -2111,13 +2146,15 @@ def compute_certified_stieltjes_tail_bound(
         'gamma_correction_constant': c_gamma,
         'smooth_integral': float(2.0 * smooth_total),
         'endpoint_term': float(4.0 * endpoint_term),
-        'fluctuation_integral': float(2.0 * fluct_integral),
+        'fluctuation_integral': float(2.0 * fluct_S_integral),
+        'gamma_correction_integral': float(2.0 * gamma_integral),
         'total_tail_bound': float(both_signs_tail),
         'powers_p': powers_p,
         'coeffs_cp': coeffs_cp,
         'is_analytic_closed_form': True,
         'open_certification_obligation': (
-            "Derivative total-variation identities and closed-form Stieltjes integration are proved analytically. "
+            "Derivative total-variation identities, Brent (2016) Stirling gamma envelope, "
+            "and closed-form Stieltjes integration are proved analytically. "
             "However, floating point evaluations and scipy.special.exp1 do not implement directed outward rounding "
             "or certified Arb ball enclosures. Rigorous interval certification remains an open research obligation."
         )
@@ -2436,14 +2473,26 @@ def construct_weighted_admissible_spectral_test(
             f"and floating point evaluations do not constitute certified interval ball arithmetic."
         )
 
-    unselected_zeros = [
-        g for g in loaded_zeros
-        if abs(g - ref_gammas[0]) > 1e-6 and abs(g - ref_gammas[1]) > 1e-6 and g <= T_cutoff
-    ]
+    if is_valid_coverage and validated_crit:
+        # Stable 1-to-1 disjoint partition:
+        # Zero 0 is selected zero 1 (matching gamma_1)
+        # Zero 1 is selected zero 2 (matching gamma_2)
+        # Zeros 2: are unselected zeros <= T_cutoff
+        unselected_zeros = validated_crit[2:]
+        max_disp = float(unres_range[1]) if unres_range and len(unres_range) > 1 else 0.0
+        effective_eps_gamma = max(float(eps_gamma), max_disp)
+    else:
+        unselected_zeros = [
+            g for g in loaded_zeros
+            if abs(g - ref_gammas[0]) > 1e-4 and abs(g - ref_gammas[1]) > 1e-4 and g <= T_cutoff
+        ]
+        max_disp = 0.0
+        effective_eps_gamma = float(eps_gamma)
+
     S_psi_unsel_le_T = 0.0
     for g_val in unselected_zeros:
         p_val = float(r_poly[0] - r_poly[1]*(g_val**2) + r_poly[2]*(g_val**4) - r_poly[3]*(g_val**6))
-        obs_g = compute_critical_zero_observable(g_val, grades, a_kn, P, h=h, tau=tau, eps_gamma=0.0)
+        obs_g = compute_critical_zero_observable(g_val, grades, a_kn, P, h=h, tau=tau, eps_gamma=effective_eps_gamma)
         s_g = float(beta_rep.T @ np.array(obs_g['S_matrix']) @ beta_rep)
         S_psi_unsel_le_T += p_val * s_g
 
@@ -2462,7 +2511,7 @@ def construct_weighted_admissible_spectral_test(
     tail_bound_T200 = tail_bound_m6_T200['total_tail_bound']
 
     D_truncated = float(arithmetic_truncated - S_psi_unsel_le_T)
-    D_val = D_truncated
+    D_val = D_truncated  # Deprecated alias for D_truncated
 
     result = {
         'status': 'ADMISSIBLE_SPECTRAL_TEST_CONSTRUCTED_BOUND_UNRESOLVED',
@@ -2553,10 +2602,32 @@ def construct_weighted_admissible_spectral_test(
             'reference_load_success': reference_load_success,
             'spectral_coverage_certified': spectral_coverage_certified,
             'complete_spectral_enclosure_available': complete_spectral_enclosure_available,
-            'unclosed_coverage_obligation': unclosed_coverage_obligation
+            'unclosed_coverage_obligation': unclosed_coverage_obligation,
+            'max_input_displacement': float(max_disp),
+            'effective_eps_gamma': float(effective_eps_gamma),
+            'spectral_partition_disjoint_and_complete': bool(is_valid_coverage),
+            'selected_zero_count': 2 if is_valid_coverage else 0
+        },
+        'spectral_evidence_status': {
+            'reference_agreement': bool(spectral_coverage_certified),
+            'reference_agreement_tolerance': 1e-4,
+            'max_input_displacement': float(max_disp),
+            'effective_eps_gamma': float(effective_eps_gamma),
+            'evaluated_at_canonical_reference': False,
+            'verified_zero_isolation_and_coverage': False,
+            'verified_zero_isolation_rationale': (
+                "Numerical agreement with authoritative Odlyzko reference zeros does not constitute "
+                "a formal zero-isolation certificate or a verified critical-strip counting theorem. "
+                "Downstream certification remains closed until full zero-counting enclosures are proved."
+            ),
+            'complete_spectral_enclosure_available': False,
+            'complete_spectral_enclosure_rationale': (
+                "Infinite Stieltjes tail allowance (~1.04e17 at T=100) dominates the functional, "
+                "and floating-point evaluations do not implement certified interval ball arithmetic."
+            )
         },
         'unconditional_stieltjes_tail_bound': {
-            'reference_theorem': 'Trudgian (2014) Theorem 1/2 unconditional zero counting remainder envelope',
+            'reference_theorem': 'Trudgian (2014) Theorem 1/2 and Brent (2016) Theorem 5 / Corollary 4 envelope',
             'decay_requirement': '|p(delta+it) H_b(delta+it)| <= Phi_m(t) ~ t^{10-2m}; strictly requires m >= 6 for tail convergence',
             'supported_orders': [6, 7],
             'actual_cutoff_T': {
@@ -2594,7 +2665,7 @@ def construct_weighted_admissible_spectral_test(
             'arithmetic_truncated': arithmetic_truncated,
             'S_psi_unsel_le_T': S_psi_unsel_le_T,
             'D_truncated': D_truncated,
-            'D_val': D_truncated,
+            'D_val': D_truncated,  # Deprecated alias for D_truncated
             'selected_weight_mismatch_r_match': r_match_val,
             'reconstruction_error_r_rec': r_rec_val,
             'target_scalar_L_b': L_b_rep,
@@ -2623,7 +2694,7 @@ def construct_weighted_admissible_spectral_test(
             'remaining_open_lemma': (
                 "Quantitative Admissible Annihilation Lemma: Let H(rho_0, m_0) hold (exists rho_0 with delta != 0). "
                 "What independent estimate from H(rho_0, m_0) controls the remaining arithmetic-spectral terms "
-                "strongly enough to force |A_{Psi, <= U}(b) + A_{Psi, prime}(b) - S_{Psi, unsel, <= T}(b) - R_{Psi, tail}(b)| < 1/2? "
+                "strongly enough to force |A_{Psi, <= U}(b) + R_{Psi, arch}(b) - S_{Psi, unsel, <= T}(b) - R_{Psi, spectral}(b)| < 1/2? "
                 "Polynomial interpolation establishes the selected contribution; it does not yet supply the "
                 "independent estimate needed to complete the reductio."
             )

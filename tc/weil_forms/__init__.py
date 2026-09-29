@@ -163,6 +163,21 @@ from .optimization import (
     investigate_admissible_spectral_realization,
 )
 
+# 8. Regularized Curvature Transfer
+from .curvature_transfer import (
+    curvature_kernel_g_a,
+    fourier_curvature_kernel,
+    hadamard_finite_part_pairing,
+    evaluate_regularized_test_function,
+    single_zero_curvature_response,
+    spectral_test_observable,
+    reflected_pair_correction,
+    quartet_correction,
+    evaluate_distributional_jump_bound,
+    evaluate_finite_symmetric_multiset_transfer,
+    audit_regularized_curvature_transfer,
+)
+
 __all__ = [
     "Any",
     "ArchimedeanKernelEvaluator",
@@ -268,4 +283,15 @@ __all__ = [
     "validate_or_project_legal_b",
     "validate_spectral_zero_coverage",
     "verify_canonical_reflected_weil_sign_certificate",
+    "curvature_kernel_g_a",
+    "fourier_curvature_kernel",
+    "hadamard_finite_part_pairing",
+    "evaluate_regularized_test_function",
+    "single_zero_curvature_response",
+    "spectral_test_observable",
+    "reflected_pair_correction",
+    "quartet_correction",
+    "evaluate_distributional_jump_bound",
+    "evaluate_finite_symmetric_multiset_transfer",
+    "audit_regularized_curvature_transfer",
 ]

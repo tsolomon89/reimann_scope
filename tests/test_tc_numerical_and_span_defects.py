@@ -29,6 +29,7 @@ from typing import NamedTuple
 import numpy as np
 import pytest
 import mpmath
+import scipy.integrate
 
 
 class KeyContributor(NamedTuple):
@@ -47,6 +48,7 @@ from tc.weil_forms import (
     compute_reflected_quartet_observable,
     investigate_scalar_spectral_bridge_target_b,
     construct_weighted_admissible_spectral_test,
+    validate_spectral_zero_coverage,
     sieve_prime_powers_in_window,
     Z_CANONICAL_KERNEL,
     NORM_KAPPA_SQ,
@@ -1280,6 +1282,8 @@ def test_target_a4_coherent_cutoffs_and_fail_closed_coverage():
     d_trunc = res_100['complete_explicit_formula_identity']['D_truncated']
     assert abs(d_trunc - 714651998.4127) < 1.0, f"D_truncated mismatch: {d_trunc}"
     tail_m6 = res_100['unconditional_stieltjes_tail_bound']['actual_cutoff_T']['order_m6_bound']
+    # Repaired Stieltjes bound incorporating Brent (2016) Theorem 5 / Corollary 4 envelope 1/(150t)
+    # and explicit single-endpoint integration yields ~1.04194e17.
     assert abs(tail_m6 - 1.04194e17) / 1.04194e17 < 1e-4, f"Tail allowance mismatch: {tail_m6}"
 
     # Issue 2 Reproduction: Reject incomplete, omitted, or duplicated zero coverage
@@ -1335,4 +1339,204 @@ def test_target_b2_falsification_compensation_control():
         assert c_total < -1.0 * m / (delta**2), f"Curvature at t={t_val} not dominated: {c_total}"
 
 
+def test_target_1a_shifted_zeros_partition_and_uncertainty():
+    """Target 1A: Verify shifted-zero reproduction, disjoint partitioning, and uncertainty propagation.
 
+    Specific defect reproduced and repaired:
+    - At T=100, shift each of the first two reference ordinates by +5e-5.
+    - Previously: accepted by validator under 1e-4, but excluded via 1e-6, causing the 2 selected zeros
+      to reappear as unselected (unselected count jumping from 27 to 29) with eps_gamma=0.0.
+    - Repaired: stable 1-to-1 disjoint partition ensures selected zeros match indices 0 and 1,
+      unselected count remains exactly 27, and max input displacement (5e-5) is preserved and
+      propagated into effective_eps_gamma.
+    """
+    import reference_data
+    raw_zeros = [float(g) for g in reference_data.load_reference_zeros()]
+    crit_100 = [g for g in raw_zeros if g <= 100.0]
+    first_above = min(g for g in raw_zeros if g > 100.0)
+    test_zeros = list(crit_100) + [first_above]
+
+    # Baseline normal run
+    res_normal = construct_weighted_admissible_spectral_test(T_cutoff=100.0, reference_zeros=test_zeros)
+    unsel_normal = res_normal['unselected_zeros_evaluation']
+    assert unsel_normal['unselected_zero_count'] == 27
+    assert unsel_normal['selected_zero_count'] == 2
+    assert unsel_normal['spectral_partition_disjoint_and_complete'] is True
+    assert unsel_normal['max_input_displacement'] == 0.0
+
+    # Shifted run: +5e-5 on first two zeros
+    shifted_zeros = list(test_zeros)
+    shifted_zeros[0] += 5.0e-5
+    shifted_zeros[1] += 5.0e-5
+
+    # Validator accepts under 1e-4 tolerance and returns max displacement 5e-5
+    ok, reason, unres, crit = validate_spectral_zero_coverage(shifted_zeros, 100.0)
+    assert ok is True
+    assert reason == "authoritative_reference_data_verified"
+    assert abs(unres[1] - 5.0e-5) < 1e-10
+
+    # Constructor correctly partitions: unselected count remains 27 (NOT 29!)
+    res_shifted = construct_weighted_admissible_spectral_test(T_cutoff=100.0, reference_zeros=shifted_zeros)
+    unsel_shifted = res_shifted['unselected_zeros_evaluation']
+    assert unsel_shifted['unselected_zero_count'] == 27, (
+        f"Defect reproduced if 29: got {unsel_shifted['unselected_zero_count']}"
+    )
+    assert unsel_shifted['selected_zero_count'] == 2
+    assert unsel_shifted['spectral_partition_disjoint_and_complete'] is True
+    assert abs(unsel_shifted['max_input_displacement'] - 5.0e-5) < 1e-10
+    assert unsel_shifted['effective_eps_gamma'] >= 5.0e-5
+
+    # Check separate evidence dimensions
+    evidence = res_shifted['spectral_evidence_status']
+    assert evidence['reference_agreement'] is True
+    assert evidence['reference_agreement_tolerance'] == 1.0e-4
+    assert abs(evidence['max_input_displacement'] - 5.0e-5) < 1e-10
+    assert evidence['verified_zero_isolation_and_coverage'] is False
+    assert "Numerical agreement" in evidence['verified_zero_isolation_rationale']
+    assert evidence['complete_spectral_enclosure_available'] is False
+
+
+def test_target_1a_coverage_rejections_and_boundary_checks():
+    """Target 1A: Test robust zero validation failure modes and cutoff boundary checking."""
+    import reference_data
+    raw_zeros = [float(g) for g in reference_data.load_reference_zeros()]
+    crit_100 = [g for g in raw_zeros if g <= 100.0]
+    first_above = min(g for g in raw_zeros if g > 100.0)
+
+    # 1. Ambiguous cutoff boundary intersection: zero within 1e-4 of T_cutoff
+    boundary_zero_list = list(crit_100) + [100.00005, first_above]
+    ok_b, reason_b, _, _ = validate_spectral_zero_coverage(boundary_zero_list, 100.0)
+    assert ok_b is False
+    assert "ambiguous_cutoff_boundary_zero" in reason_b
+
+    # 2. Missing interior zero: omit index 5 (6th zero)
+    omitted_list = [g for idx, g in enumerate(crit_100) if idx != 5] + [first_above]
+    ok_m, reason_m, _, _ = validate_spectral_zero_coverage(omitted_list, 100.0)
+    assert ok_m is False
+    assert "zero_count_mismatch" in reason_m
+
+    # 3. Duplicate interior zero
+    dup_list = list(crit_100)
+    dup_list.insert(5, dup_list[5])
+    dup_list.append(first_above)
+    ok_d, reason_d, _, _ = validate_spectral_zero_coverage(dup_list, 100.0)
+    assert ok_d is False
+    assert "duplicate_or_inverted_zeros" in reason_d
+
+    # 4. Displaced zero exceeding tolerance (e.g. +2e-4)
+    disp_list = list(crit_100) + [first_above]
+    disp_list[3] += 2.0e-4
+    ok_disp, reason_disp, _, _ = validate_spectral_zero_coverage(disp_list, 100.0)
+    assert ok_disp is False
+    assert "fabricated_or_displaced_zero" in reason_disp
+
+
+def test_target_1b_brent_gamma_envelope_and_stieltjes_tail():
+    """Target 1B: Verify Brent (2016) Stirling gamma envelope and repaired Stieltjes integration."""
+    import mpmath
+    mpmath.mp.dps = 40
+
+    # Primary source verification: Brent (2016) Theorem 5 / Corollary 4
+    # At t=100: theta(t)/pi + 1 - M(t) exceeds leading asymptotic term 1/(48*pi*t)
+    t = mpmath.mpf('100.0')
+    th = mpmath.siegeltheta(t)
+    M = (t / (2 * mpmath.pi)) * mpmath.log(t / (2 * mpmath.pi)) - t / (2 * mpmath.pi) - mpmath.mpf('0.125') + 1
+    diff = th / mpmath.pi + 1 - M
+    leading_term = 1 / (48 * mpmath.pi * t)
+    brent_bound = 1 / (150 * t)
+
+    # Prove that leading term is a LOWER bound, not an upper envelope
+    assert diff > leading_term, f"Expected diff > 1/(48pi*t): diff={diff}, leading={leading_term}"
+    # Prove that 1/(150*t) is a valid upper envelope
+    assert diff <= brent_bound, f"Expected diff <= 1/(150*t): diff={diff}, brent={brent_bound}"
+
+    # Check for t in {10, 20, 50, 200, 500}
+    for t_val in [10.0, 20.0, 50.0, 200.0, 500.0]:
+        t_m = mpmath.mpf(t_val)
+        th_m = mpmath.siegeltheta(t_m)
+        M_m = (t_m / (2 * mpmath.pi)) * mpmath.log(t_m / (2 * mpmath.pi)) - t_m / (2 * mpmath.pi) - mpmath.mpf('0.125') + 1
+        d_m = th_m / mpmath.pi + 1 - M_m
+        assert d_m > 1 / (48 * mpmath.pi * t_m)
+        assert d_m <= 1 / (150 * t_m)
+
+    # Verify implementation of compute_certified_stieltjes_tail_bound
+    dummy_r = np.array([1.0, 0.01, 1e-4, 1e-6])
+    tail_res = compute_certified_stieltjes_tail_bound(dummy_r, C_E=1.0, h=0.05, T_cutoff=100.0, m=6)
+    assert tail_res['gamma_correction_constant'] == 1.0 / 150.0
+    assert tail_res['epistemic_status'] == 'ANALYTIC_POWER_MAJORANT_EMPIRICALLY_EVALUATED'
+    assert 'gamma_correction_integral' in tail_res
+
+    # Check exact sum of components
+    components_sum = (
+        tail_res['smooth_integral'] +
+        tail_res['endpoint_term'] +
+        tail_res['fluctuation_integral'] +
+        tail_res['gamma_correction_integral']
+    )
+    assert abs(components_sum - tail_res['total_tail_bound']) < 1e-10 * tail_res['total_tail_bound']
+
+
+def test_target_2_regularized_curvature_transfer():
+    """Target 2: Verify exact regularized curvature response, finite-part limit, and reflected quartet correction."""
+    from tc.weil_forms.curvature_transfer import (
+        curvature_kernel_g_a,
+        fourier_curvature_kernel,
+        single_zero_curvature_response,
+        spectral_test_observable,
+        reflected_pair_correction,
+        quartet_correction,
+        evaluate_distributional_jump_bound,
+        evaluate_finite_symmetric_multiset_transfer,
+        audit_regularized_curvature_transfer
+    )
+
+    # 1. Fourier transform check for g_a(x)
+    a = 0.35
+    for u_val in [0.5, 1.0, 2.5]:
+        val_fourier = fourier_curvature_kernel(u_val, a)
+        # Direct numerical integration: \int_{-\infty}^\infty g_a(x) cos(u*x) dx
+        dir_val, _ = scipy.integrate.quad(
+            lambda x: curvature_kernel_g_a(x, a) * math.cos(u_val * x),
+            -100.0, 100.0, limit=500, epsabs=1e-9, epsrel=1e-9
+        )
+        assert abs(dir_val - val_fourier) < 1e-3, f"Fourier mismatch: direct={dir_val}, formula={val_fourier}"
+
+    # 2. Reflected pair and quartet correction on smooth bump
+    R_supp = math.log(20.0 / 8.0) + 2.0 * 0.05
+    def bump_fb(u: float) -> float:
+        if abs(u) >= R_supp:
+            return 0.0
+        return (1.0 - (u / R_supp)**2)**4
+
+    # On critical line (a = 0):
+    # K_{phi_{f_b}}(0, gamma) must equal Psi_b(i*gamma) identically
+    for gam in [14.134725, 21.022040, 25.010858]:
+        psi_0 = spectral_test_observable(bump_fb, complex(0.0, gam), R_supp)
+        k_0 = single_zero_curvature_response(bump_fb, 0.0, gam, R_supp)
+        corr_0 = reflected_pair_correction(bump_fb, 0.0, gam, R_supp)
+        assert abs(psi_0 - k_0) < 1e-12, f"Critical zero mismatch: psi={psi_0}, k={k_0}"
+        assert abs(corr_0) == 0.0
+
+    # Off critical line (a = 0.49, gamma = 50.0):
+    a0 = 0.49
+    gam0 = 50.0
+    psi_off = spectral_test_observable(bump_fb, complex(a0, gam0), R_supp)
+    k_off = single_zero_curvature_response(bump_fb, a0, gam0, R_supp)
+    pair_corr = reflected_pair_correction(bump_fb, a0, gam0, R_supp)
+    # Reflected pair identity: Psi(a + i*gamma) + Psi(-a + i*gamma) = 2 * Psi(a + i*gamma)
+    # 2 * Psi(a + i*gamma) - 2 * K(a, gamma) = pair_corr
+    diff = 2.0 * psi_off - 2.0 * k_off
+    assert abs(diff - pair_corr) < 1e-14, f"Reflected pair identity mismatch: diff={diff}, corr={pair_corr}"
+
+    # 3. Finite symmetric multiset audit
+    audit_rep = audit_regularized_curvature_transfer()
+    assert audit_rep['epistemic_status'] == 'EXACT_FINITE_IDENTITY_UNRESOLVED_INFINITE_EXTENSION'
+    multiset_audit = audit_rep['finite_symmetric_multiset_verification']
+    assert multiset_audit['is_transfer_exact_within_tol'] is True
+    assert multiset_audit['balance_discrepancy'] < 1e-12
+
+    # 4. Distributional integration by parts bounds
+    jump_audit = audit_rep['distributional_jump_bounds']
+    assert jump_audit['asymptotic_decay_power'] == -2.0
+    assert jump_audit['correction_bound'] > 0.0
+    assert jump_audit['response_bound'] > 0.0

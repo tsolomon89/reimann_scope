@@ -222,6 +222,7 @@ from tc.weil_forms import (
     investigate_scalar_spectral_bridge_target_b,
     construct_weighted_admissible_spectral_test,
     investigate_admissible_spectral_realization,
+    audit_regularized_curvature_transfer,
 )
 
 from tc.approximation import (
@@ -478,4 +479,5 @@ __all__ = [
     "verify_theorem_B_bilateral_boundedness_criterion",
     "verify_research_milestone_completion",
     "zero_worldline_point",
+    "audit_regularized_curvature_transfer",
 ]

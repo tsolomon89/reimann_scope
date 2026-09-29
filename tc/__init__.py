@@ -206,6 +206,17 @@ from tc.weil_forms import (
     investigate_scalar_spectral_bridge_target_b,
     construct_weighted_admissible_spectral_test,
     investigate_admissible_spectral_realization,
+    curvature_kernel_g_a,
+    fourier_curvature_kernel,
+    hadamard_finite_part_pairing,
+    evaluate_regularized_test_function,
+    single_zero_curvature_response,
+    spectral_test_observable,
+    reflected_pair_correction,
+    quartet_correction,
+    evaluate_distributional_jump_bound,
+    evaluate_finite_symmetric_multiset_transfer,
+    audit_regularized_curvature_transfer,
 )
 
 from tc.approximation import (
@@ -462,4 +473,15 @@ __all__ = [
     "verify_theorem_B_bilateral_boundedness_criterion",
     "verify_research_milestone_completion",
     "zero_worldline_point",
+    "curvature_kernel_g_a",
+    "fourier_curvature_kernel",
+    "hadamard_finite_part_pairing",
+    "evaluate_regularized_test_function",
+    "single_zero_curvature_response",
+    "spectral_test_observable",
+    "reflected_pair_correction",
+    "quartet_correction",
+    "evaluate_distributional_jump_bound",
+    "evaluate_finite_symmetric_multiset_transfer",
+    "audit_regularized_curvature_transfer",
 ]

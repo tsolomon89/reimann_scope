@@ -1,0 +1,105 @@
+{
+  "epistemic_status": "EXACT_FINITE_IDENTITY_UNRESOLVED_INFINITE_EXTENSION",
+  "parameters": {
+    "bandwidth_h": 0.05,
+    "autocorrelation_support_radius_R_supp": 1.0162907318741552,
+    "formula_R_supp": "log(20/8) + 2h = log(2.5) + 0.10 ~= 1.01629"
+  },
+  "transfer_theorems": {
+    "single_zero_response": "K_{phi_{f_b}}(a, gamma) = \\int_{-R}^R f_b(u) exp(-a*|u|) exp(i*u*gamma) du. For a=0: K_{phi_{f_b}}(0, gamma) = Psi_b(i*gamma) identically.",
+    "reflected_pair_correction": "Psi_b(a + i*gamma) + Psi_b(-a + i*gamma) - 2 K_{phi_{f_b}}(a, gamma) = 2 \\int_{-R}^R f_b(u) sinh(a*|u|) exp(i*u*gamma) du.",
+    "quartet_correction": "Delta_{quartet}(a, gamma) = 8 m_0 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du.",
+    "distributional_bound": "|K_{f_b}(a, gamma)| <= (||f_b''||_1 + ||f_b'||_1 + (1/4)||f_b||_1 + |f_b(0)|) / gamma^2."
+  },
+  "finite_symmetric_multiset_verification": {
+    "total_zeros_count": 6,
+    "total_spectral_sum_S": 0.0017421747028173442,
+    "total_curvature_sum_K": 0.003321157945685292,
+    "total_predicted_correction_Delta": -0.0015789832428679356,
+    "balance_discrepancy": 1.235990476633475e-17,
+    "is_transfer_exact_within_tol": true,
+    "zero_details": [
+      {
+        "a": 0.0,
+        "gamma": 14.13472514,
+        "multiplicity": 1,
+        "is_quartet": false,
+        "psi_sum": 0.0015692238423771002,
+        "k_curvature_sum": 0.0015692238423771002,
+        "pair_discrepancy": 0.0,
+        "predicted_correction": 0.0,
+        "residual": 0.0
+      },
+      {
+        "a": 0.0,
+        "gamma": 21.02203964,
+        "multiplicity": 1,
+        "is_quartet": false,
+        "psi_sum": 5.558660914212199e-05,
+        "k_curvature_sum": 5.558660914212199e-05,
+        "pair_discrepancy": 0.0,
+        "predicted_correction": 0.0,
+        "residual": 0.0
+      },
+      {
+        "a": 0.0,
+        "gamma": 25.01085758,
+        "multiplicity": 1,
+        "is_quartet": false,
+        "psi_sum": 9.320118822471121e-05,
+        "k_curvature_sum": 9.320118822471121e-05,
+        "pair_discrepancy": 0.0,
+        "predicted_correction": 0.0,
+        "residual": 0.0
+      },
+      {
+        "a": 0.0,
+        "gamma": 30.42487613,
+        "multiplicity": 1,
+        "is_quartet": false,
+        "psi_sum": -9.481106260166017e-06,
+        "k_curvature_sum": -9.481106260166017e-06,
+        "pair_discrepancy": 0.0,
+        "predicted_correction": 0.0,
+        "residual": 0.0
+      },
+      {
+        "a": 0.0,
+        "gamma": 32.93506159,
+        "multiplicity": 1,
+        "is_quartet": false,
+        "psi_sum": 2.6429844664232344e-05,
+        "k_curvature_sum": 2.6429844664232344e-05,
+        "pair_discrepancy": 0.0,
+        "predicted_correction": 0.0,
+        "residual": 0.0
+      },
+      {
+        "a": 0.49,
+        "gamma": 50.0,
+        "multiplicity": 1,
+        "is_quartet": true,
+        "psi_sum": 7.214324669344499e-06,
+        "k_curvature_sum": 0.0015861975675372922,
+        "pair_discrepancy": -0.0015789832428679477,
+        "predicted_correction": -0.0015789832428679356,
+        "residual": 1.214306433183765e-17
+      }
+    ]
+  },
+  "distributional_jump_bounds": {
+    "gamma": 50.0,
+    "a": 0.49,
+    "R_supp": 1.0162907318741552,
+    "response_bound": 0.004280372375559461,
+    "correction_bound": 0.005743402718970355,
+    "asymptotic_decay_power": -2.0,
+    "linear_a_vanish_factor": 29.30307509678753
+  },
+  "reductio_implication_audit": {
+    "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies a non-vanishing discrete quartet term and a non-vanishing local correction Delta_{quartet}(delta_0, gamma_0) = 8 m_0 \\int_0^R f_b(u) sinh(delta_0 u) cos(u gamma_0) du. By the distributional integration-by-parts bound, |Delta_{quartet}| <= O(delta_0 / gamma_0^2).",
+    "what_remains_unproved": "1. Hypothesis H does not bound the collective sum over critical zeros or exclude other off-critical zeros. 2. The arithmetic energy A_{Psi, <= U} ~ 7.15e8 is balanced by the infinite sum over all zeros in the Guinand-Weil explicit formula, holding identically whether H is true or false. 3. The local quartet correction O(1/gamma_0^2) is orders of magnitude smaller than 7.15e8 and cannot force the remainder |D| < 1/2 without an independent global arithmetic obstruction. 4. An unregularized curvature integral diverges as (t-gamma_j)^{-2} at critical-line zeros; Hadamard finite-part regularization eliminates local divergence, but the infinite regularized curvature series sum_{gamma} K_{phi_b}(gamma) requires unconditional zero-counting summation control.",
+    "circularity_check": "Asserting that |D| < 1/2 follows from H assumes that the spectral explicit formula sum fails to cancel the arithmetic energy by at least 7.14e8. But this asserts the contradiction that the reductio is intended to deduce, introducing circularity if asserted as a premise.",
+    "governing_next_question": "Can an independent global arithmetic lower bound on |A_{Psi, <= U}(b) - S_{Psi, crit}(b)| be proved from the non-vanishing of rho_0 off the critical line, without assuming the reductio conclusion?"
+  }
+}

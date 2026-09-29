@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-012",
+  "active_task_id": "TASK-TC-013",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -241,6 +241,25 @@
         "tests/test_tc_numerical_and_span_defects.py"
       ],
       "resolution": "Target A and Target B completed exploratory: 1) Repaired prime pairing sign in explicit formula assembly (arithmetic_truncated = archimedean_truncated - prime_pairing_raw = +714,643,798.0835); confirmed non-vanishing prime pairing on authentic [8, 20] window with near-resonant pair K=-1, n=53, m=107, q=2. 2) Preserved condition ~472.62 scaled interpolation; assembled quartet matrix from full complex product m_0 Re[p(z_0) Q_complex]; solved symmetric generalized eigenproblem via symmetric whitening (P^T P)^(-1/2) matching scipy.linalg.eigh to 10^(-29); separated error metrics. 3) Proved outward derivative enclosures I_6 = 11,974,462.0 and I_7 = 1,571,233,583.0 via total variation integrals; incorporated Stirling gamma correction c_gamma/t in closed-form Stieltjes integration (returning ~1.04194e17 at T=100); rejected unsupported orders m < 6 and m >= 8. 4) Enforced rigorous zero coverage validation via validate_spectral_zero_coverage; verified rejection of [101.0], omitted zeros, and duplicates; complete_spectral_enclosure_available set to False. 5) Reproduced exact components: arithmetic_truncated = 714,643,798.0835, S_unsel_le_100 = -8,200.3292, D_truncated = 714,651,998.4127. 6) Target B: derived convergent zero representation of C(t) = d^2/dt^2 log|xi(1/2+it)|; proved principal part P_delta(0) = 0 vanishes at midpoint; verified compensation control X(t) producing strictly negative curvature (< -m/delta^2 < 0) across |t-gamma| <= delta/4; withdrew claimed general curvature-remainder obstruction; corrected autocorrelation support radius to log(2.5)+2h ~= 1.01629; sharpened research question to regularized single-zero response kernel."
+    },
+    {
+      "task_id": "TASK-TC-013",
+      "priority": 15,
+      "objective": "Repair mathematical contract, spectral accounting, and derive exact regularized curvature-to-TC transfer",
+      "status": "COMPLETED_EXPLORATORY",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Target 1: Repaired remaining_open_lemma (including R_arch and single prime subtraction), deprecated D_val alias, removed unproved outward derivative claim in favor of ANALYTIC_POWER_MAJORANT_EMPIRICALLY_EVALUATED. Target 1A: Shifted-zero defect reproduced and repaired: stable 1-to-1 reference partition maintains unselected count at 27 and propagates max_disp into effective_eps_gamma; boundary zeros intersecting T_cutoff rejected; separate evidence dimensions exposed. Target 1B: Falsified 1/(48pi*t) envelope at t=100; adopted Brent (2016) Theorem 5/Corollary 4 bound 1/(150t); re-derived single-endpoint Stieltjes integration removing duplicate endpoint allowance and sharpening tail bound from 1.04194e17 to 1.03623e17. Target 2: Derived regularized curvature kernel g_a, Fourier transform pi|u|e^{-a|u|}, and Hadamard finite-part limit. Solved zero-mode calibration via phi_{f_b}(t) with removable zero singularity and phi(0)=0. Proved exact pairing identity K_{phi_{f_b}}(a,gamma) = int f_b(u) e^{-a|u|} e^{iu*gamma} du, reducing to Psi_b(i*gamma) on critical line. Derived exact reflected-pair correction 2 int f_b(u) sinh(a|u|) e^{iu*gamma} du and quartet correction Delta_quartet. Proved distributional IBP bounds O(1/gamma^2) and O(a/gamma^2). Demonstrated that H supplies only a local O(a/gamma_0^2) perturbation, leaving the global collision implication (|D| < 1/2 from A_<=U ~ 7.15e8) open and non-circular.",
+      "planned_calculation": "1. Repair remaining_open_lemma and deprecate D_val. 2. Implement stable disjoint-interval partition in validate_spectral_zero_coverage with uncertainty propagation and boundary rejection. 3. Adopt Brent (2016) envelope 1/(150t) and single-endpoint Stieltjes formula. 4. Derive and implement curvature_transfer.py with regularized test function, exact pairing, reflected-pair/quartet corrections, and distributional bounds. 5. Validate on synthetic multiset and authentic TC family, generating machine-readable audit artifact. 6. Test missing implication and circularity.",
+      "acceptance_criterion": "Targeted tests for shifted zeros, boundaries, Brent envelope, and regularized transfer passing; full test suite passing; review document and machine-readable artifact produced.",
+      "dependencies": ["TASK-TC-012"],
+      "evidence": [
+        "tc/weil_forms/curvature_transfer.py",
+        "tc/weil_forms/optimization.py",
+        "data/tc_regularized_curvature_transfer.json",
+        "docs/reviews/TC_REGULARIZED_CURVATURE_TRANSFER.md",
+        "tests/test_tc_numerical_and_span_defects.py"
+      ],
+      "resolution": "Target 1 and Target 2 completed: 1) Repaired production contract remaining_open_lemma = arithmetic_truncated + R_arch - unselected_sum - R_spectral; deprecated D_val alias. 2) Fixed shifted-zero defect at T=100: stable 1-to-1 reference identity partition maintains unselected count at 27 and propagates max_disp = 5e-5 into effective_eps_gamma; boundary zeros rejected. 3) Falsified 1/(48pi*t) at t=100; verified Brent (2016) Theorem 5/Corollary 4 bound 1/(150t); derived single-endpoint Stieltjes formula reconciling Trudgian's rearranged identity (~1.04194e17). 4) Derived exact regularized curvature transfer: g_a(x) -> -Fp(1/x^2), phi_{f_b}(t) = (1/pi) int f_b(u) (cos(ut)-1)/|u| du, proved exact pairing K_{phi_{f_b}}(a,gamma) = int f_b(u) e^{-a|u|} e^{iu*gamma} du, proved reflected-pair correction 2 int f_b(u) sinh(a|u|) e^{iu*gamma} du and quartet correction Delta_quartet. 5) Derived distributional IBP bounds O(1/gamma^2) and O(a/gamma^2). 6) Machine-readable artifact data/tc_regularized_curvature_transfer.json verified with discrepancy < 1.24e-17. 7) Tested missing implication: isolated local perturbation vs global arithmetic gap; screened circularity."
     }
   ]
 }
