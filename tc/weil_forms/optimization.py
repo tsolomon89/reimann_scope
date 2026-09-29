@@ -2068,14 +2068,17 @@ def compute_certified_stieltjes_tail_bound(
         powers_p.append(pj)
         coeffs_cp.append(cp)
 
-    # Trudgian (2014) Theorem 2 envelope constants for t >= e:
+    # Trudgian (2014) Theorem 1/2 envelope constants for t >= e:
+    # S(t) bound: |S(t)| <= a_env * log t + b_env * log log t + c_env
+    # Full zero counting N(t) - M(t) incorporates the Stirling gamma remainder |theta(t)/pi + 1 - M(t)| <= c_gamma / t:
     a_env = 0.112
     b_env = 0.278
     c_env = 2.511
+    c_gamma = 1.0 / (48.0 * math.pi)  # Stirling gamma correction factor ~ 0.006631456
 
     T = float(T_cutoff)
     phi_T = sum(cp * (T ** (-pj)) for pj, cp in zip(powers_p, coeffs_cp))
-    E_T = a_env * math.log(T) + b_env * math.log(math.log(T)) + c_env
+    E_T = a_env * math.log(T) + b_env * math.log(math.log(T)) + c_env + c_gamma / T
 
     smooth_total = 0.0
     fluct_integral = 0.0
@@ -2086,9 +2089,10 @@ def compute_certified_stieltjes_tail_bound(
         )
         smooth_total += sm_j
 
-        # Closed-form fluctuation contribution:
+        # Closed-form fluctuation contribution (including gamma correction integral):
         e1_val = float(scipy.special.exp1(pj * math.log(T)))
-        fl_j = cp * (a_env * (T ** (-pj)) / pj + b_env * e1_val)
+        gamma_fl_j = c_gamma * (pj / (pj + 1.0)) * (T ** (-pj - 1.0))
+        fl_j = cp * (a_env * (T ** (-pj)) / pj + b_env * e1_val + gamma_fl_j)
         fluct_integral += fl_j
 
     endpoint_term = phi_T * E_T
@@ -2098,18 +2102,25 @@ def compute_certified_stieltjes_tail_bound(
     both_signs_tail = 2.0 * pos_zeros_tail
 
     return {
+        'epistemic_status': 'ANALYTIC_POWER_MAJORANT_EMPIRICALLY_EVALUATED',
         'derivative_order_m': m,
         'L1_norm_kappa_m': I_m,
         'L1_norm_enclosure_upper': I_m,
         'constant_K_m': K_m,
         'T_cutoff': T,
+        'gamma_correction_constant': c_gamma,
         'smooth_integral': float(2.0 * smooth_total),
         'endpoint_term': float(4.0 * endpoint_term),
         'fluctuation_integral': float(2.0 * fluct_integral),
         'total_tail_bound': float(both_signs_tail),
         'powers_p': powers_p,
         'coeffs_cp': coeffs_cp,
-        'is_analytic_closed_form': True
+        'is_analytic_closed_form': True,
+        'open_certification_obligation': (
+            "Derivative total-variation identities and closed-form Stieltjes integration are proved analytically. "
+            "However, floating point evaluations and scipy.special.exp1 do not implement directed outward rounding "
+            "or certified Arb ball enclosures. Rigorous interval certification remains an open research obligation."
+        )
     }
 
 
@@ -2126,6 +2137,7 @@ def construct_weighted_admissible_spectral_test(
     T_cutoff: float = 100.0,
     tau: float = 2.0 * math.pi,
     eps_gamma: float = 1.0e-15,
+    reference_zeros: Optional[List[float]] = None,
     output_path: Optional[str] = None
 ) -> Dict[str, Any]:
     """Target B: Construct and analyze an explicit admissible spectral test function Psi_b.
@@ -2379,30 +2391,50 @@ def construct_weighted_admissible_spectral_test(
     arithmetic_truncated = float(archimedean_truncated - prime_pairing_raw)
     incorrect_assembled_diagnostic = float(archimedean_truncated + prime_pairing_raw)
 
-    # Target A4: Fail-closed zero coverage accounting up to requested T_cutoff
+    # Target A4: Rigorous zero coverage validation via validate_spectral_zero_coverage
     loaded_zeros: List[float] = []
     reference_load_success = False
     spectral_coverage_certified = False
     unclosed_coverage_obligation: Optional[str] = None
 
-    try:
-        import reference_data
-        raw_ref_zeros = reference_data.load_reference_zeros()
-        if raw_ref_zeros and len(raw_ref_zeros) > 0:
-            loaded_zeros = [float(g) for g in raw_ref_zeros]
-            reference_load_success = True
-            max_loaded = max(loaded_zeros)
-            if max_loaded >= T_cutoff:
-                spectral_coverage_certified = True
-            else:
-                unclosed_coverage_obligation = (
-                    f"Reference zeros only extend to gamma={max_loaded:.4f} < T_cutoff={T_cutoff:.1f}. "
-                    f"Certified completeness enclosure requires independent zero counting certificate up to T_cutoff."
-                )
-    except Exception as exc:
-        unclosed_coverage_obligation = f"Failed to load reference zeros: {exc}. Missing coverage leaves spectral enclosure unavailable."
+    if reference_zeros is not None:
+        loaded_zeros = [float(g) for g in reference_zeros]
+        reference_load_success = len(loaded_zeros) > 0
+    else:
+        try:
+            import reference_data
+            raw_ref_zeros = reference_data.load_reference_zeros()
+            if raw_ref_zeros and len(raw_ref_zeros) > 0:
+                loaded_zeros = [float(g) for g in raw_ref_zeros]
+                reference_load_success = True
+        except Exception as exc:
+            reference_load_success = False
 
-    complete_spectral_enclosure_available = spectral_coverage_certified
+    is_valid_coverage = False
+    coverage_reason = "reference_zeros_not_loaded"
+    unres_range = None
+    if reference_load_success and loaded_zeros:
+        is_valid_coverage, coverage_reason, unres_range, validated_crit = validate_spectral_zero_coverage(
+            loaded_zeros, T_cutoff
+        )
+
+    spectral_coverage_certified = bool(is_valid_coverage)
+    # Complete spectral enclosure remains unavailable because infinite Stieltjes tail allowance
+    # (~1.04e17 at T=100) dominates the functional and individual zero observables are floating point
+    # evaluations rather than certified interval ball arithmetic.
+    complete_spectral_enclosure_available = False
+
+    if not is_valid_coverage:
+        unclosed_coverage_obligation = (
+            f"Spectral zero coverage check failed validation against authoritative reference data up to T_cutoff={T_cutoff:.1f}: "
+            f"reason='{coverage_reason}', range={unres_range}. Incomplete or unverified zeros leave spectral enclosure unavailable."
+        )
+    else:
+        unclosed_coverage_obligation = (
+            f"Zero locations match authoritative reference data on [0, T_cutoff={T_cutoff:.1f}], "
+            f"but complete spectral enclosure remains unavailable because infinite Stieltjes tail allowance (~1.04e17) "
+            f"and floating point evaluations do not constitute certified interval ball arithmetic."
+        )
 
     unselected_zeros = [
         g for g in loaded_zeros
@@ -2429,7 +2461,8 @@ def construct_weighted_admissible_spectral_test(
     tail_bound_T100 = tail_bound_m6_T100['total_tail_bound']
     tail_bound_T200 = tail_bound_m6_T200['total_tail_bound']
 
-    D_val = float(arithmetic_truncated - S_psi_unsel_le_T)
+    D_truncated = float(arithmetic_truncated - S_psi_unsel_le_T)
+    D_val = D_truncated
 
     result = {
         'status': 'ADMISSIBLE_SPECTRAL_TEST_CONSTRUCTED_BOUND_UNRESOLVED',
@@ -2558,11 +2591,21 @@ def construct_weighted_admissible_spectral_test(
         'complete_explicit_formula_identity': {
             'formula': 'L(b) = D - r_match + r_rec, where D = arithmetic_truncated + R_arch - S_unsel_le_T - R_spectral',
             'dominant_arithmetic_term': f'arithmetic_truncated(b) = {arithmetic_truncated:.2e} (Archimedean: {archimedean_truncated:.2e}, Prime Signed: {prime_contribution_signed:.2e})',
-            'D_truncated': D_val,
+            'arithmetic_truncated': arithmetic_truncated,
+            'S_psi_unsel_le_T': S_psi_unsel_le_T,
+            'D_truncated': D_truncated,
+            'D_val': D_truncated,
             'selected_weight_mismatch_r_match': r_match_val,
             'reconstruction_error_r_rec': r_rec_val,
             'target_scalar_L_b': L_b_rep,
-            'reductio_contradiction_condition': '|D| + epsilon_match + epsilon_rec < 1/2'
+            'reductio_contradiction_condition': '|D| + epsilon_match + epsilon_rec < 1/2',
+            'epistemic_warning': (
+                "D_truncated is the difference of truncated components: arithmetic_truncated - S_unsel_le_T. "
+                "The complete remainder D = D_truncated + R_arch - R_spectral includes the infinite tails. "
+                "Under hypothesis H, D = L(b) + r_match - r_rec = -1/2. "
+                "Identifying D with D_truncated (~7.15e8) is mathematically invalid because the tail bounds "
+                "B_tail(T) ~ 1.04e17 dominate the truncated terms."
+            )
         },
         'use_of_H_and_open_lemma': {
             'first_equation_using_H': (

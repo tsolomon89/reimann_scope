@@ -1268,8 +1268,37 @@ def test_target_a4_coherent_cutoffs_and_fail_closed_coverage():
     assert tail_150['T_cutoff'] == 150.0
     assert tail_150['order_m6_bound'] > 0.0
 
-    # At T_cutoff=150, reference zeros reach ~396.38 > 150, so coverage is certified:
+    # At T_cutoff=100 with authoritative reference data:
+    res_100 = construct_weighted_admissible_spectral_test(T_cutoff=100.0)
+    audit_100 = res_100['unselected_zeros_evaluation']
+    assert audit_100['spectral_coverage_certified'] is True
+    assert audit_100['complete_spectral_enclosure_available'] is False
+
+    # Issue 1 Reproduction: Unselected zero sum through T=100, truncated difference, and tail allowance
+    s_unsel = audit_100['S_psi_unsel_le_T']
+    assert abs(s_unsel - (-8200.3292)) < 1.0, f"Unselected zero sum mismatch: {s_unsel}"
+    d_trunc = res_100['complete_explicit_formula_identity']['D_truncated']
+    assert abs(d_trunc - 714651998.4127) < 1.0, f"D_truncated mismatch: {d_trunc}"
+    tail_m6 = res_100['unconditional_stieltjes_tail_bound']['actual_cutoff_T']['order_m6_bound']
+    assert abs(tail_m6 - 1.04194e17) / 1.04194e17 < 1e-4, f"Tail allowance mismatch: {tail_m6}"
+
+    # Issue 2 Reproduction: Reject incomplete, omitted, or duplicated zero coverage
+    # a. Single zero above T_cutoff [101.0] must NOT certify coverage:
+    res_single = construct_weighted_admissible_spectral_test(T_cutoff=100.0, reference_zeros=[101.0])
+    assert res_single['unselected_zeros_evaluation']['spectral_coverage_certified'] is False
+    assert res_single['unselected_zeros_evaluation']['complete_spectral_enclosure_available'] is False
+
+    # b. Omitted interior zeros [14.1347, 101.0] must NOT certify coverage:
+    res_omitted = construct_weighted_admissible_spectral_test(T_cutoff=100.0, reference_zeros=[14.1347, 101.0])
+    assert res_omitted['unselected_zeros_evaluation']['spectral_coverage_certified'] is False
+
+    # c. Duplicate interior zeros must NOT certify coverage:
+    res_dup = construct_weighted_admissible_spectral_test(T_cutoff=100.0, reference_zeros=[14.1347, 14.1347, 101.0])
+    assert res_dup['unselected_zeros_evaluation']['spectral_coverage_certified'] is False
+
+    # At T_cutoff=150, authoritative reference zeros reach ~396.38 > 150, so coverage is certified:
     assert res_150['unselected_zeros_evaluation']['spectral_coverage_certified'] is True
+    assert res_150['unselected_zeros_evaluation']['complete_spectral_enclosure_available'] is False
 
     # At T_cutoff=500, reference zeros (max ~396.38) do not cover up to 500, so it must fail-closed:
     res_500 = construct_weighted_admissible_spectral_test(T_cutoff=500.0)
