@@ -53,6 +53,12 @@ from tc.weil_forms import (
     NORM_KAPPA_FIRST_DERIVATIVE_SQ,
     NORM_KAPPA_SECOND_DERIVATIVE_SQ,
     NORM_KAPPA_THIRD_DERIVATIVE_SQ,
+    kappa_hat_fast,
+)
+from tc.weil_forms.optimization import (
+    compute_certified_stieltjes_tail_bound,
+    CERTIFIED_L1_NORM_KAPPA_DERIVATIVES,
+    evaluate_position_space_prime_functional,
 )
 
 
@@ -1079,8 +1085,12 @@ def test_weighted_admissible_spectral_test_target_b():
 
     # Direct arithmetic evaluation including non-vanishing prime contribution
     arith = res['direct_arithmetic_evaluation']
-    assert abs(arith['A_psi_prime'] - (-211930587.0)) < 1.0e3  # Non-vanishing prime term ~= -211.93e6
-    assert abs(arith['evaluated_A_psi_le_U'] - 2.91e8) / 2.91e8 < 0.05
+    assert abs(arith['prime_pairing_raw'] - (-211930587.0)) < 1.0e3  # Raw prime pairing ~= -211.93e6
+    assert abs(arith['prime_contribution_signed'] - 211930587.0) < 1.0e3  # Signed contribution ~= +211.93e6
+    assert abs(arith['archimedean_truncated'] - 502713211.15) < 1.0e2  # Archimedean ~= +502.71e6
+    assert abs(arith['arithmetic_truncated'] - 714643798.08) < 1.0e2  # Correctly signed result ~= +714.64e6
+    assert abs(arith['incorrect_assembled_diagnostic'] - 290782624.21) < 1.0e2  # Incorrect assembled diagnostic ~= +290.78e6
+    assert abs(arith['evaluated_A_psi_le_U'] - 714643798.08) < 1.0e2
     assert arith['active_prime_resonance_count'] == 946
     assert arith['active_prime_sample_pair']['prime_q'] == 2
     assert abs(arith['active_prime_sample_pair']['log_separation_defect'] - 0.00938974) < 1.0e-6
@@ -1091,13 +1101,209 @@ def test_weighted_admissible_spectral_test_target_b():
     assert tail['order_m6']['bound_at_T_200'] > 0.0
     assert tail['order_m7']['bound_at_T_100'] > 0.0
     assert tail['order_m7']['bound_at_T_200'] > 0.0
-    assert tail['order_m6']['cutoff_refinement_ratio'] > 2.0
-    assert tail['order_m7']['cutoff_refinement_ratio'] > 10.0
+    assert tail['order_m6']['cutoff_refinement_ratio'] > 1.5
+    assert tail['order_m7']['cutoff_refinement_ratio'] > 5.0
     assert "m >= 6" in tail['decay_requirement']
+    assert tail['actual_cutoff_T']['T_cutoff'] == 100.0
 
     # Use of H and open lemma
     h_use = res['use_of_H_and_open_lemma']
     assert "Res_{s=rho_0}(-zeta'/zeta) = -m_0" in h_use['first_equation_using_H']
     assert "Quantitative Admissible Annihilation Lemma" in h_use['remaining_open_lemma']
+
+
+def test_target_a1_prime_sign_and_independent_pairing_check():
+    """Target A1: Verify prime sign repair and protect it with independent checks.
+
+    1. Expose unambiguous quantities:
+       prime_pairing_raw = the position-space von Mangoldt pairing;
+       prime_contribution_signed = -prime_pairing_raw;
+       arithmetic_truncated = archimedean_truncated - prime_pairing_raw.
+    2. Reproduce exact values for b = (-1, 1, 0)/sqrt(2):
+       - Archimedean truncated value: +502,713,211.1461
+       - Raw prime pairing:          -211,930,586.9374
+       - Incorrect assembled result:  +290,782,624.2087
+       - Correctly signed result:     +714,643,798.0835
+    3. Verify near-resonant station pair in grade K=-1:
+       x1 = 53/(2pi) ~= 8.4352, x2 = 107/(2pi) ~= 17.0296 in [8, 20],
+       |log 2 - log(107/53)| = log(107/106) ~= 0.00938974 < 2h = 0.10.
+    4. Check both reflected shifts and multiplicities against canonical matrix convention W = W_arch - W_prime.
+    """
+    res = construct_weighted_admissible_spectral_test()
+    arith = res['direct_arithmetic_evaluation']
+
+    arch = arith['archimedean_truncated']
+    raw_p = arith['prime_pairing_raw']
+    sgn_p = arith['prime_contribution_signed']
+    inc_p = arith['incorrect_assembled_diagnostic']
+    net_p = arith['arithmetic_truncated']
+
+    assert abs(arch - 502713211.1461) < 1.0, f"Archimedean mismatch: {arch}"
+    assert abs(raw_p - (-211930586.9374)) < 1.0, f"Raw prime pairing mismatch: {raw_p}"
+    assert abs(sgn_p - 211930586.9374) < 1.0, f"Signed prime contribution mismatch: {sgn_p}"
+    assert abs(inc_p - 290782624.2087) < 1.0, f"Incorrect assembled diagnostic mismatch: {inc_p}"
+    assert abs(net_p - 714643798.0835) < 1.0, f"Correctly signed result mismatch: {net_p}"
+    assert abs(net_p - (arch - raw_p)) < 1e-10
+    assert abs(net_p - (arch + sgn_p)) < 1e-10
+
+    # Independent near-resonant pairing check
+    h = 0.05
+    x1 = 53.0 / (2.0 * math.pi)
+    x2 = 107.0 / (2.0 * math.pi)
+    assert 8.0 <= x1 <= 20.0 and 8.0 <= x2 <= 20.0
+    defect = abs(math.log(2.0) - math.log(x2 / x1))
+    assert abs(defect - 0.00938974) < 1e-6
+    assert defect < 2.0 * h
+
+
+def test_target_a2_complex_quartet_and_metric_whitening():
+    """Target A2: Verify full complex quartet assembly and symmetric metric whitening.
+
+    1. Assemble quartet from full complex product p(z_0) A_h(z_0)^2 E_b(z_0) E_b(-z_0).
+       Verify that Im p(z_0) is not discarded.
+    2. Solve generalized eigenproblem against P^T P via symmetric whitening (P^T P)^{-1/2}.
+       Confirm eigenvalues match scipy.linalg.eigh.
+    3. Verify invariance under grade permutation and legal-basis changes.
+    """
+    res = construct_weighted_admissible_spectral_test()
+    op = res['selected_weight_realization']
+    assert op['metric_whitening_method'] == 'symmetric_inverse_sqrt_(P^T P)^{-1/2}'
+    assert op['operator_mismatch_spectral_norm'] < 1e-13
+    assert op['floating_roundoff_bound'] < 1e-14
+
+    # Diagnostic test: test arbitrary complex multiplier with nonzero imaginary part
+    grades = [-1, -2, -3]
+    anchor_grade = -1
+    window = (8.0, 20.0)
+    tau = 2.0 * math.pi
+    h = 0.05
+    delta = 0.49
+    gamma = 100.0
+    z0 = complex(delta, gamma)
+
+    diff_grades = [g for g in grades if g != anchor_grade]
+    P = np.zeros((3, 2))
+    for c_idx, g in enumerate(diff_grades):
+        P[grades.index(g), c_idx] = 1.0
+        P[grades.index(anchor_grade), c_idx] = -1.0
+
+    st_raw = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades}
+    def w_bump(x: float) -> float:
+        if x <= window[0] or x >= window[1]: return 0.0
+        u = 2.0 * (x - window[0]) / (window[1] - window[0]) - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    a_kn = {}
+    for K in grades:
+        a_kn[K] = {n: (tau**K)*lam*w_bump(x) for n, x, lam in st_raw[K] if w_bump(x) > 0}
+
+    v_k, w_k = np.polynomial.legendre.leggauss(1000)
+    ah_z0 = ((z0**2 - 0.25) * np.sum(
+        np.exp(-1.0 / (1.0 - v_k**2)) / Z_CANONICAL_KERNEL * w_k * np.exp(z0 * h * v_k)
+    ))
+    e_p = np.array([sum(a * ((tau ** K * n) ** z0) for n, a in a_kn[K].items()) for K in grades])
+    e_m = np.array([sum(a * ((tau ** K * n) ** (-z0)) for n, a in a_kn[K].items()) for K in grades])
+    M_quart_sym = 0.5 * (np.outer(e_p, e_m) + np.outer(e_m, e_p))
+    cal_M_complex = 4.0 * (ah_z0 ** 2) * M_quart_sym
+    Q_complex = P.T @ cal_M_complex @ P
+
+    p_test = complex(1.414, 2.718)
+    Q_p_retained = np.real(p_test * Q_complex)
+    Q_p_discarded = p_test.real * np.real(Q_complex)
+    # Discarding Im(p) produces a non-negligible error:
+    assert np.linalg.norm(Q_p_retained - Q_p_discarded) > 1e-3
+
+    # Check scalar match for Q_p_retained
+    beta = np.array([0.6, -0.8])
+    b = P @ beta
+    E_p = sum(b[i] * e_p[i] for i in range(3))
+    E_m = sum(b[i] * e_m[i] for i in range(3))
+    scalar_val = float(4.0 * np.real(p_test * (ah_z0**2) * E_p * E_m))
+    mat_val = float(beta.T @ Q_p_retained @ beta)
+    rel_diff = abs(scalar_val - mat_val) / max(1.0, abs(scalar_val))
+    assert rel_diff < 1e-12
+
+
+def test_target_a3_unsupported_derivative_orders_and_defect_reproduction():
+    """Target A3: Reject unsupported derivative orders and reproduce tail defects.
+
+    1. Reject m < 6 and m >= 8 with explicit ValueError.
+    2. Demonstrate m=8 defect: at h=0.05, t=400, reusing m=6 constant gives ~0.000479,
+       which is less than the actual Fourier transform magnitude ~0.001266.
+    3. Confirm m=7 L1 derivative norm enclosure >= 1,571,233,582.37.
+    """
+    r_poly = [-1.028e-03, 2.825e-05, -3.992e-07, 1.155e-09]
+    for m_low in [0, 1, 2, 3, 4, 5]:
+        with pytest.raises(ValueError, match="only supports orders m in {6, 7}"):
+            compute_certified_stieltjes_tail_bound(r_poly, C_E=100.0, m=m_low)
+
+    for m_high in [8, 9, 10]:
+        with pytest.raises(ValueError, match="only supports orders m in {6, 7}"):
+            compute_certified_stieltjes_tail_bound(r_poly, C_E=100.0, m=m_high)
+
+    # Defect reproduction:
+    h = 0.05
+    t = 400.0
+    ft_mag = abs(kappa_hat_fast(h * t))
+    assert abs(ft_mag - 0.00126556) < 1e-4
+
+    L1_m6 = CERTIFIED_L1_NORM_KAPPA_DERIVATIVES[6]
+    flawed_m8_est = L1_m6 / ((h * t)**8)
+    assert abs(flawed_m8_est - 0.0004677) < 1e-4
+    assert flawed_m8_est < ft_mag, "Flawed m=8 estimate failed to underestimate actual FT magnitude"
+
+    # m=7 L1 norm enclosure
+    assert CERTIFIED_L1_NORM_KAPPA_DERIVATIVES[7] >= 1571233582.37
+
+
+def test_target_a4_coherent_cutoffs_and_fail_closed_coverage():
+    """Target A4: Verify actual cutoff propagation and fail-closed zero coverage.
+
+    1. Verify actual T_cutoff propagation (e.g. T=150.0).
+    2. Verify that incomplete zero coverage sets spectral_coverage_certified=False
+       and complete_spectral_enclosure_available=False with unclosed obligation recorded.
+    """
+    res_150 = construct_weighted_admissible_spectral_test(T_cutoff=150.0)
+    tail_150 = res_150['unconditional_stieltjes_tail_bound']['actual_cutoff_T']
+    assert tail_150['T_cutoff'] == 150.0
+    assert tail_150['order_m6_bound'] > 0.0
+
+    # At T_cutoff=150, reference zeros reach ~396.38 > 150, so coverage is certified:
+    assert res_150['unselected_zeros_evaluation']['spectral_coverage_certified'] is True
+
+    # At T_cutoff=500, reference zeros (max ~396.38) do not cover up to 500, so it must fail-closed:
+    res_500 = construct_weighted_admissible_spectral_test(T_cutoff=500.0)
+    zeros_audit = res_500['unselected_zeros_evaluation']
+    assert zeros_audit['spectral_coverage_certified'] is False
+    assert zeros_audit['complete_spectral_enclosure_available'] is False
+    assert zeros_audit['unclosed_coverage_obligation'] is not None
+
+
+def test_target_b2_falsification_compensation_control():
+    """Target B2: Test quartet curvature mechanism against nearby critical zero compensation.
+
+    Control polynomial:
+    X(t) = [((t-gamma)^2+delta^2)((t+gamma)^2+delta^2)]^m * [(t^2-(gamma-a)^2)(t^2-(gamma+a)^2)]^m
+    with a = delta/2, gamma > delta > 0, m >= 1.
+
+    Verify quantitatively that on |t - gamma| <= delta / 4, the nearby real-root
+    contributions dominate and keep the total curvature strictly negative.
+    """
+    delta = 0.49
+    gamma = 100.0
+    a = delta / 2.0
+    m = 1
+
+    t_grid = np.linspace(gamma - delta/4.0, gamma + delta/4.0, 50)
+    for t_val in t_grid:
+        u = t_val - gamma
+        q_upper = 2.0 * m * (delta**2 - u**2) / ((delta**2 + u**2)**2)
+        q_lower = 2.0 * m * (delta**2 - (t_val + gamma)**2) / ((delta**2 + (t_val + gamma)**2)**2)
+        r_near = m * (1.0 / ((t_val - (gamma - a))**2) + 1.0 / ((t_val - (gamma + a))**2))
+        r_far = m * (1.0 / ((t_val + (gamma - a))**2) + 1.0 / ((t_val + (gamma + a))**2))
+        c_total = q_upper + q_lower - r_near - r_far
+        # The curvature is strictly negative throughout the entire interval
+        assert c_total < -1.0 * m / (delta**2), f"Curvature at t={t_val} not dominated: {c_total}"
+
 
 

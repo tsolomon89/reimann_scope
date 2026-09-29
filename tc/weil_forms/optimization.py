@@ -1987,20 +1987,18 @@ def evaluate_position_space_prime_functional(
 
     diff_map = dict(zip(unique_diffs, K_unique))
     A_prime = sum(coeff * diff_map[v] for coeff, v in resonant_events)
-    W_prime = -A_prime
-    return float(W_prime), float(A_prime), active_details
+    prime_pairing_raw = float(A_prime)
+    prime_contribution_signed = float(-A_prime)
+    return prime_pairing_raw, prime_contribution_signed, active_details
 
 
-L1_NORM_KAPPA_DERIVATIVES = {
-    0: 1.0,
-    1: 2.077745668366741,
-    2: 54.959873423948665,
-    3: 16247.684292415849,
-    4: 8.65345712e4,
-    5: 8.92134567e5,
-    6: 1.1974562469e+07,
-    7: 1.5712295551e+09
+CERTIFIED_L1_NORM_KAPPA_DERIVATIVES = {
+    6: 11974462.0,       # Exact total variation of kappa^(5): 11,974,461.062135...
+    7: 1571233583.0,      # Exact total variation of kappa^(6): 1,571,233,582.371358...
 }
+
+# Legacy alias for backward compatibility:
+L1_NORM_KAPPA_DERIVATIVES = CERTIFIED_L1_NORM_KAPPA_DERIVATIVES
 
 
 def compute_certified_stieltjes_tail_bound(
@@ -2010,59 +2008,108 @@ def compute_certified_stieltjes_tail_bound(
     delta: float = 0.49,
     T_cutoff: float = 100.0,
     m: int = 6,
-    n_nodes: int = 2000
+    n_nodes: Optional[int] = None
 ) -> Dict[str, Any]:
-    """Certified unconditional Stieltjes tail bound against Trudgian (2014) Theorem 1.
+    """Certified unconditional Stieltjes tail bound against Trudgian (2014) Theorem 1/2.
 
-    Zero tail decays as |p(delta + it) H_b(delta + it)| <= Phi_m(t) ~ t^{10 - 2m}.
-    Stieltjes integral against dN(t) ~ (1/2pi) log(t/2pi) dt converges iff 10 - 2m < -1 <=> m >= 6.
+    Mathematical Remainder Theorem:
+    1. For a degree-6 polynomial multiplier p(z) = sum_{k=0}^3 r_k z^{2k} and differentiated bump
+       profile A_h(z) = (z^2 - 1/4) \\hat{kappa}(i h z), m integrations by parts yield:
+           |\\hat{kappa}(i h z)| <= exp(h/2) I_m / (h |z|)^m <= exp(h/2) I_m / (h t)^m,
+       uniformly across the critical strip |Re(z)| <= 1/2.
+    2. Power majorant on |Re(z)| <= 1/2:
+           |p(z)| <= \\sum_{k=0}^3 |r_k| (t^2 + 0.25)^k,
+           |A_h(z)|^2 <= (t^2 + 0.5)^2 * K_m^2 / t^{2m},  where K_m = exp(h/2) I_m / h^m.
+       Multiplying gives |p(z) H_b(z)| <= Phi_m(t) = sum_{j=0}^5 c_{p_j} t^{-p_j},
+       where p_j = 2m - 10 + 2j.
+       Convergence against Riemann-von Mangoldt counting measure dN(t) ~ (1/2pi) log(t/2pi) dt
+       strictly requires the leading exponent to satisfy:
+           -p_0 = 10 - 2m < -1 <=> 2m > 11 <=> m >= 6.
+       Unsupported orders (m < 6 or m >= 8) are strictly rejected.
+    3. Proved analytic integration against Trudgian (2014) counting envelope |N(t) - M(t)| <= E(t):
+           \\int_T^\\infty Phi dN <= \\int_T^\\infty Phi M'(t) dt + 2 Phi(T) E(T) + \\int_T^\\infty (-Phi') (E(t) - E(T)) dt.
+       Smooth part per power c_p t^{-p} (M'(t) = log(t/2pi)/(2pi)):
+           c_p T^{1-p}/(2pi) * [ log(T/2pi)/(p-1) + 1/(p-1)^2 ].
+       Envelope E(t) = a log t + b log log t + c (Trudgian 2014 Theorem 2):
+           \\int_T^\\infty (-Phi') E(t) dt = Phi(T) E(T) + sum_p c_p [ a T^{-p}/p + b E_1(p log T) ].
+       Total positive ordinates bound: smooth + 2 Phi(T) E(T) + sum_p c_p [ a T^{-p}/p + b E_1(p log T) ].
+       Factoring 2 for both signs (+gamma and -gamma) gives the complete certified bound.
     """
-    if m < 6:
-        raise ValueError(f"Tail bound requires derivative order m >= 6 for convergence, got m={m}")
+    if m not in (6, 7):
+        raise ValueError(
+            f"Tail bound only supports orders m in {{6, 7}} for which certified derivative L1 bounds are established; got m={m}"
+        )
+    if T_cutoff < 10.0:
+        raise ValueError(f"T_cutoff must be >= 10.0, got {T_cutoff}")
 
-    L1_m = L1_NORM_KAPPA_DERIVATIVES.get(m, 1.1974562469e+07)
-    K_m = math.exp(abs(delta) * h) * L1_m
+    import scipy.special
 
-    def P_abs(t):
-        return abs(r_poly[0]) + abs(r_poly[1])*(t**2) + abs(r_poly[2])*(t**4) + abs(r_poly[3])*(t**6)
+    I_m = CERTIFIED_L1_NORM_KAPPA_DERIVATIVES[m]
+    K_m = math.exp(0.5 * h) * I_m / (h ** m)
 
-    def Phi_m(t):
-        poly_factor = P_abs(t)
-        Ah_sq_factor = ((t**2 + 0.25)**2) * (K_m**2) / ((t * h)**(2*m))
-        return 2.0 * C_E * poly_factor * Ah_sq_factor
+    # Polynomial majorant coefficients on |Re(z)| <= 1/2:
+    u_c = 0.25
+    r0 = abs(r_poly[0]) + abs(r_poly[1])*u_c + abs(r_poly[2])*(u_c**2) + abs(r_poly[3])*(u_c**3)
+    r1 = abs(r_poly[1]) + 2*abs(r_poly[2])*u_c + 3*abs(r_poly[3])*(u_c**2)
+    r2 = abs(r_poly[2]) + 3*abs(r_poly[3])*u_c
+    r3 = abs(r_poly[3])
 
-    def S_bound(t):
-        return 0.112 * math.log(t) + 0.278 * math.log(math.log(t)) + 2.510
+    # Convolve with (w + 0.5)^2 = w^2 + w + 0.25 in w = t^2:
+    p_poly = [r3, r2, r1, r0]
+    sq_poly = [1.0, 1.0, 0.25]
+    prod_w = np.convolve(p_poly, sq_poly)
 
-    nds, wts = np.polynomial.legendre.leggauss(n_nodes)
-    u = 0.5 * (1.0 - 1e-12) * (nds + 1.0) + 1e-12
-    w = 0.5 * (1.0 - 1e-12) * wts
-    t_vals = T_cutoff / u
-    dt_vals = T_cutoff / (u**2)
+    C_total = float(C_E * (K_m ** 2))
+    powers_p = []
+    coeffs_cp = []
+    for j in range(6):
+        pj = 2 * m - 10 + 2 * j
+        cp = float(C_total * prod_w[j])
+        powers_p.append(pj)
+        coeffs_cp.append(cp)
 
-    phi_vals = np.array([Phi_m(tv) for tv in t_vals])
-    log_vals = np.log(t_vals / (2.0 * math.pi))
-    smooth_int = float((1.0 / (2.0 * math.pi)) * np.sum(w * dt_vals * phi_vals * log_vals))
+    # Trudgian (2014) Theorem 2 envelope constants for t >= e:
+    a_env = 0.112
+    b_env = 0.278
+    c_env = 2.511
 
-    endpoint_term = float(Phi_m(T_cutoff) * S_bound(T_cutoff))
+    T = float(T_cutoff)
+    phi_T = sum(cp * (T ** (-pj)) for pj, cp in zip(powers_p, coeffs_cp))
+    E_T = a_env * math.log(T) + b_env * math.log(math.log(T)) + c_env
 
-    eps = 1e-5
-    phi_plus = np.array([Phi_m(tv * (1.0 + eps)) for tv in t_vals])
-    phi_minus = np.array([Phi_m(tv * (1.0 - eps)) for tv in t_vals])
-    dphi_dt = np.abs((phi_plus - phi_minus) / (2.0 * eps * t_vals))
-    S_vals = np.array([S_bound(tv) for tv in t_vals])
-    fluct_int = float(np.sum(w * dt_vals * dphi_dt * S_vals))
+    smooth_total = 0.0
+    fluct_integral = 0.0
+    for pj, cp in zip(powers_p, coeffs_cp):
+        # Closed-form smooth contribution:
+        sm_j = (cp * (T ** (1.0 - pj)) / (2.0 * math.pi)) * (
+            math.log(T / (2.0 * math.pi)) / (pj - 1.0) + 1.0 / ((pj - 1.0) ** 2)
+        )
+        smooth_total += sm_j
 
-    total = smooth_int + endpoint_term + fluct_int
+        # Closed-form fluctuation contribution:
+        e1_val = float(scipy.special.exp1(pj * math.log(T)))
+        fl_j = cp * (a_env * (T ** (-pj)) / pj + b_env * e1_val)
+        fluct_integral += fl_j
+
+    endpoint_term = phi_T * E_T
+    # Total for positive zeros:
+    pos_zeros_tail = smooth_total + 2.0 * endpoint_term + fluct_integral
+    # Complete tail for both signs:
+    both_signs_tail = 2.0 * pos_zeros_tail
+
     return {
         'derivative_order_m': m,
-        'L1_norm_kappa_m': L1_m,
+        'L1_norm_kappa_m': I_m,
+        'L1_norm_enclosure_upper': I_m,
         'constant_K_m': K_m,
-        'T_cutoff': float(T_cutoff),
-        'smooth_integral': smooth_int,
-        'endpoint_term': endpoint_term,
-        'fluctuation_integral': fluct_int,
-        'total_tail_bound': total
+        'T_cutoff': T,
+        'smooth_integral': float(2.0 * smooth_total),
+        'endpoint_term': float(4.0 * endpoint_term),
+        'fluctuation_integral': float(2.0 * fluct_integral),
+        'total_tail_bound': float(both_signs_tail),
+        'powers_p': powers_p,
+        'coeffs_cp': coeffs_cp,
+        'is_analytic_closed_form': True
     }
 
 
@@ -2216,8 +2263,16 @@ def construct_weighted_admissible_spectral_test(
     v_target = vec_sym(G_target)
 
     z0 = complex(delta, gamma)
-    quart_obs = compute_reflected_quartet_observable(z0, grades, a_kn, P, h=h, tau=tau)
-    G_quart = np.array(quart_obs['Q_matrix'])
+    ah_z0 = ((z0**2 - 0.25) * np.sum(
+        np.exp(-1.0 / (1.0 - np.polynomial.legendre.leggauss(1000)[0]**2)) / Z_CANONICAL_KERNEL *
+        np.polynomial.legendre.leggauss(1000)[1] * np.exp(z0 * h * np.polynomial.legendre.leggauss(1000)[0])
+    ))
+    e_p = np.array([sum(a * ((tau ** K * n) ** z0) for n, a in a_kn[K].items()) for K in grades])
+    e_m = np.array([sum(a * ((tau ** K * n) ** (-z0)) for n, a in a_kn[K].items()) for K in grades])
+    M_quart_sym = 0.5 * (np.outer(e_p, e_m) + np.outer(e_m, e_p))
+    cal_M_complex = 4.0 * (ah_z0 ** 2) * M_quart_sym
+    Q_complex = P.T @ cal_M_complex @ P
+    G_quart = np.real(Q_complex)
 
     A_quart = np.column_stack([vec_sym(crit_mats[0]), vec_sym(crit_mats[1]), vec_sym(G_quart)])
     lambda_quart, _, _, _ = np.linalg.lstsq(A_quart, v_target, rcond=None)
@@ -2254,9 +2309,11 @@ def construct_weighted_admissible_spectral_test(
     p_gam2 = float(r_poly[0] + r_poly[1]*w2 + r_poly[2]*(w2**2) + r_poly[3]*(w2**3))
     p_z0 = complex(r_poly[0] + r_poly[1]*w0 + r_poly[2]*(w0**2) + r_poly[3]*(w0**3))
 
-    # Actual operator realization on Sym(2):
-    # G_{Psi, sel} = p(i*gamma_1) S_1 + p(i*gamma_2) S_2 + 4 m_0 Re[p(z_0) H_b(z_0)]
-    G_psi_sel = p_gam1 * crit_mats[0] + p_gam2 * crit_mats[1] + (multiplicity_m0 * p_z0.real) * G_quart
+    # Target A2: Full complex product assembly
+    # Q(p, z_0) = 4 m_0 Re[ p(z_0) A_h(z_0)^2 E_b(z_0) E_b(-z_0) ]
+    # Retaining Im(p(z_0)) before taking the final real part:
+    G_quart_weighted = multiplicity_m0 * np.real(p_z0 * Q_complex)
+    G_psi_sel = p_gam1 * crit_mats[0] + p_gam2 * crit_mats[1] + G_quart_weighted
 
     b_rep = np.zeros(3)
     b_rep[idx_1] = -1.0 / math.sqrt(2.0)
@@ -2270,11 +2327,16 @@ def construct_weighted_admissible_spectral_test(
     r_match_val = float(S_psi_sel_rep - S_sel_rep)
     r_rec_val = float(L_b_rep - S_sel_rep)
 
+    # Target A2: Symmetric generalized eigenproblem against P^T P via whitening (P^T P)^{-1/2}
     PTP = P.T @ P
     delta_G = G_psi_sel - G_target
-    evals_mismatch = np.linalg.eigvalsh(np.linalg.inv(PTP) @ delta_G)
+    eigvals_PTP, eigvecs_PTP = np.linalg.eigh(PTP)
+    sqrt_PTP_inv = eigvecs_PTP @ np.diag(1.0 / np.sqrt(eigvals_PTP)) @ eigvecs_PTP.T
+    whitened_delta_G = sqrt_PTP_inv @ delta_G @ sqrt_PTP_inv
+    evals_mismatch = np.linalg.eigvalsh(whitened_delta_G)
     norm_delta_G_spec = float(np.max(np.abs(evals_mismatch)))
     norm_delta_G_fro = float(np.linalg.norm(delta_G, 'fro'))
+    floating_roundoff_bound = float(2.0 * np.finfo(float).eps * np.linalg.norm(G_psi_sel, 2))
 
     # Direct arithmetic evaluation of Psi_b via Gauss-Legendre quadrature
     nodes_raw, weights_raw = np.polynomial.legendre.leggauss(int(N_t))
@@ -2299,10 +2361,10 @@ def construct_weighted_admissible_spectral_test(
             C_arr += coeff * np.cos(t_nodes * t_station)
             S_arr += coeff * np.sin(t_nodes * t_station)
 
-    A_psi_arch = float(np.sum(base_psi * (C_arr**2 + S_arr**2)))
+    archimedean_truncated = float(np.sum(base_psi * (C_arr**2 + S_arr**2)))
 
-    # Direct position-space evaluation of full polynomial-weighted prime term
-    W_psi_prime, A_psi_prime, active_prime_details = evaluate_position_space_prime_functional(
+    # Target A1: Position-space evaluation of full polynomial-weighted prime term
+    prime_pairing_raw, prime_contribution_signed, active_prime_details = evaluate_position_space_prime_functional(
         grades=grades,
         stations_by_grade=stations_by_grade,
         b_vec=b_rep,
@@ -2311,18 +2373,39 @@ def construct_weighted_admissible_spectral_test(
         window=window,
         n_nodes=256
     )
-    A_psi_le_U = float(A_psi_arch + A_psi_prime)
 
-    # Unselected zeros evaluation below T_cutoff
-    all_loaded_zeros: List[float] = []
+    # In Guinand-Weil explicit formula, the prime pairing is subtracted:
+    # A_{Psi, <= U} = archimedean_truncated - prime_pairing_raw = archimedean_truncated + prime_contribution_signed
+    arithmetic_truncated = float(archimedean_truncated - prime_pairing_raw)
+    incorrect_assembled_diagnostic = float(archimedean_truncated + prime_pairing_raw)
+
+    # Target A4: Fail-closed zero coverage accounting up to requested T_cutoff
+    loaded_zeros: List[float] = []
+    reference_load_success = False
+    spectral_coverage_certified = False
+    unclosed_coverage_obligation: Optional[str] = None
+
     try:
         import reference_data
-        all_loaded_zeros = [float(g) for g in reference_data.load_reference_zeros()]
-    except Exception:
-        all_loaded_zeros = [14.134725141734693, 21.022039638771555, 25.010857580145688]
+        raw_ref_zeros = reference_data.load_reference_zeros()
+        if raw_ref_zeros and len(raw_ref_zeros) > 0:
+            loaded_zeros = [float(g) for g in raw_ref_zeros]
+            reference_load_success = True
+            max_loaded = max(loaded_zeros)
+            if max_loaded >= T_cutoff:
+                spectral_coverage_certified = True
+            else:
+                unclosed_coverage_obligation = (
+                    f"Reference zeros only extend to gamma={max_loaded:.4f} < T_cutoff={T_cutoff:.1f}. "
+                    f"Certified completeness enclosure requires independent zero counting certificate up to T_cutoff."
+                )
+    except Exception as exc:
+        unclosed_coverage_obligation = f"Failed to load reference zeros: {exc}. Missing coverage leaves spectral enclosure unavailable."
+
+    complete_spectral_enclosure_available = spectral_coverage_certified
 
     unselected_zeros = [
-        g for g in all_loaded_zeros
+        g for g in loaded_zeros
         if abs(g - ref_gammas[0]) > 1e-6 and abs(g - ref_gammas[1]) > 1e-6 and g <= T_cutoff
     ]
     S_psi_unsel_le_T = 0.0
@@ -2332,10 +2415,12 @@ def construct_weighted_admissible_spectral_test(
         s_g = float(beta_rep.T @ np.array(obs_g['S_matrix']) @ beta_rep)
         S_psi_unsel_le_T += p_val * s_g
 
-    # Unconditional Stieltjes tail bound via Trudgian (2014) Theorem 1 for m >= 6
+    # Target A3 & A4: Unconditional Stieltjes tail bound at actual requested T_cutoff
     C_E_root = sum(abs(b_rep[grades.index(K)]) * sum(amp * math.sqrt((tau**K)*n) for n, amp in a_kn[K].items()) for K in grades)
     C_E = float(C_E_root ** 2)
 
+    tail_bound_actual_T_m6 = compute_certified_stieltjes_tail_bound(r_poly, C_E, h=h, delta=delta, T_cutoff=T_cutoff, m=6)
+    tail_bound_actual_T_m7 = compute_certified_stieltjes_tail_bound(r_poly, C_E, h=h, delta=delta, T_cutoff=T_cutoff, m=7)
     tail_bound_m6_T100 = compute_certified_stieltjes_tail_bound(r_poly, C_E, h=h, delta=delta, T_cutoff=100.0, m=6)
     tail_bound_m6_T200 = compute_certified_stieltjes_tail_bound(r_poly, C_E, h=h, delta=delta, T_cutoff=200.0, m=6)
     tail_bound_m7_T100 = compute_certified_stieltjes_tail_bound(r_poly, C_E, h=h, delta=delta, T_cutoff=100.0, m=7)
@@ -2343,6 +2428,8 @@ def construct_weighted_admissible_spectral_test(
 
     tail_bound_T100 = tail_bound_m6_T100['total_tail_bound']
     tail_bound_T200 = tail_bound_m6_T200['total_tail_bound']
+
+    D_val = float(arithmetic_truncated - S_psi_unsel_le_T)
 
     result = {
         'status': 'ADMISSIBLE_SPECTRAL_TEST_CONSTRUCTED_BOUND_UNRESOLVED',
@@ -2356,7 +2443,8 @@ def construct_weighted_admissible_spectral_test(
             'multiplicity_m0': int(multiplicity_m0),
             'cutoff_U': float(U),
             'quadrature_resolution_N_t': int(N_t),
-            'cutoff_T': float(T_cutoff)
+            'cutoff_T': float(T_cutoff),
+            'epistemic_target_status': 'CONDITIONAL_DIAGNOSTIC_HYPOTHESIS'
         },
         'polynomial_multiplier': {
             'formula': 'p(z) = r_0 + r_1*z^2 + r_2*z^4 + r_3*z^6 with r(w) = r_0 + r_1*w + r_2*w^2 + r_3*w^3 (w = z^2)',
@@ -2382,7 +2470,9 @@ def construct_weighted_admissible_spectral_test(
             'selected_weight_mismatch_r_match': r_match_val,
             'reconstruction_error_r_rec': r_rec_val,
             'selected_spectral_sum_S_psi_sel': S_psi_sel_rep,
-            'target_algebraic_scalar_L_b': L_b_rep
+            'target_algebraic_scalar_L_b': L_b_rep,
+            'floating_roundoff_bound': floating_roundoff_bound,
+            'metric_whitening_method': 'symmetric_inverse_sqrt_(P^T P)^{-1/2}'
         },
         'physical_derivative_decomposition': {
             'formula': 'Psi_b(z) = sum_{k=0}^3 (-1)^k r_k H_{(g_b^{(k)})}(z)',
@@ -2398,9 +2488,14 @@ def construct_weighted_admissible_spectral_test(
         'direct_arithmetic_evaluation': {
             'cutoff_U': float(U),
             'quadrature_resolution_N_t': int(N_t),
-            'A_psi_archimedean': A_psi_arch,
-            'A_psi_prime': A_psi_prime,
-            'evaluated_A_psi_le_U': A_psi_le_U,
+            'A_psi_archimedean': archimedean_truncated,
+            'archimedean_truncated': archimedean_truncated,
+            'A_psi_prime': prime_pairing_raw,
+            'prime_pairing_raw': prime_pairing_raw,
+            'prime_contribution_signed': prime_contribution_signed,
+            'arithmetic_truncated': arithmetic_truncated,
+            'evaluated_A_psi_le_U': arithmetic_truncated,
+            'incorrect_assembled_diagnostic': incorrect_assembled_diagnostic,
             'active_prime_resonance_count': len(active_prime_details),
             'active_prime_sample_pair': {
                 'grade': -1,
@@ -2410,20 +2505,36 @@ def construct_weighted_admissible_spectral_test(
                 'log_separation_defect': abs(math.log(2.0) - math.log(107.0 / 53.0)),
                 'bandwidth_threshold_2h': 2.0 * h
             },
-            'prime_power_resonance_gap_audit': (
-                f'Resonance gap fails for grade K=-1: stations x1=53/2pi and x2=107/2pi lie in [8, 20] '
-                f'with |log 2 - log(107/53)| = log(107/106) ~= 0.00938974 < 2h = {2.0*h}. '
-                f'Direct position-space evaluation yields A_{{Psi, prime}} = {A_psi_prime:.2f}.'
-            )
+            'prime_sign_reproduction_audit': {
+                'archimedean_truncated_target': 502713211.1461,
+                'raw_prime_pairing_target': -211930586.9374,
+                'incorrect_assembled_target': 290782624.2087,
+                'correctly_signed_target': 714643798.0835,
+                'formula': 'arithmetic_truncated = archimedean_truncated - prime_pairing_raw = archimedean_truncated + prime_contribution_signed'
+            }
         },
         'unselected_zeros_evaluation': {
             'cutoff_T': float(T_cutoff),
             'unselected_zero_count': len(unselected_zeros),
-            'S_psi_unsel_le_T': S_psi_unsel_le_T
+            'S_psi_unsel_le_T': S_psi_unsel_le_T,
+            'reference_load_success': reference_load_success,
+            'spectral_coverage_certified': spectral_coverage_certified,
+            'complete_spectral_enclosure_available': complete_spectral_enclosure_available,
+            'unclosed_coverage_obligation': unclosed_coverage_obligation
         },
         'unconditional_stieltjes_tail_bound': {
-            'reference_theorem': 'Trudgian (2014) Theorem 1 unconditional zero counting',
-            'decay_requirement': '|p(delta+it) H_b(delta+it)| <= Phi_m(t) ~ t^{10-2m}; requires m >= 6 for tail convergence',
+            'reference_theorem': 'Trudgian (2014) Theorem 1/2 unconditional zero counting remainder envelope',
+            'decay_requirement': '|p(delta+it) H_b(delta+it)| <= Phi_m(t) ~ t^{10-2m}; strictly requires m >= 6 for tail convergence',
+            'supported_orders': [6, 7],
+            'actual_cutoff_T': {
+                'T_cutoff': float(T_cutoff),
+                'order_m6_bound': tail_bound_actual_T_m6['total_tail_bound'],
+                'order_m7_bound': tail_bound_actual_T_m7['total_tail_bound'],
+                'smooth_integral_m6': tail_bound_actual_T_m6['smooth_integral'],
+                'fluct_integral_m6': tail_bound_actual_T_m6['fluctuation_integral'],
+                'smooth_integral_m7': tail_bound_actual_T_m7['smooth_integral'],
+                'fluct_integral_m7': tail_bound_actual_T_m7['fluctuation_integral']
+            },
             'order_m6': {
                 'bound_at_T_100': tail_bound_m6_T100['total_tail_bound'],
                 'bound_at_T_200': tail_bound_m6_T200['total_tail_bound'],
@@ -2445,13 +2556,13 @@ def construct_weighted_admissible_spectral_test(
             'cutoff_refinement_ratio': float(tail_bound_T100 / tail_bound_T200) if tail_bound_T200 > 0 else float('inf')
         },
         'complete_explicit_formula_identity': {
-            'formula': 'L(b) = A_{Psi, <= U}(b) + R_{Psi, arch}(b) - S_{Psi, unsel, <= T}(b) - R_{Psi, tail}(b) - r_match + r_rec',
-            'dominant_term': f'A_{{Psi, <= U}}(b) = {A_psi_le_U:.2e} (Archimedean: {A_psi_arch:.2e}, Prime: {A_psi_prime:.2e})',
-            'cancellation_mechanism': (
-                'Because L(b) = -1/2 identically, the exact Guinand-Weil explicit formula forces '
-                'A_{Psi, <= U} + R_{Psi, arch} - S_{Psi, unsel, <= T} - R_{Psi, tail} == -1/2. '
-                'The net positive arithmetic energy (~ 2.92e8) is cancelled by the infinite sum of non-trivial zeros.'
-            )
+            'formula': 'L(b) = D - r_match + r_rec, where D = arithmetic_truncated + R_arch - S_unsel_le_T - R_spectral',
+            'dominant_arithmetic_term': f'arithmetic_truncated(b) = {arithmetic_truncated:.2e} (Archimedean: {archimedean_truncated:.2e}, Prime Signed: {prime_contribution_signed:.2e})',
+            'D_truncated': D_val,
+            'selected_weight_mismatch_r_match': r_match_val,
+            'reconstruction_error_r_rec': r_rec_val,
+            'target_scalar_L_b': L_b_rep,
+            'reductio_contradiction_condition': '|D| + epsilon_match + epsilon_rec < 1/2'
         },
         'use_of_H_and_open_lemma': {
             'first_equation_using_H': (
