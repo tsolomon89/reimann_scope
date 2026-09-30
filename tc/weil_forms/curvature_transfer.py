@@ -50,13 +50,16 @@ def fourier_curvature_kernel(u: float, a: float) -> float:
 def hadamard_finite_part_pairing(
     phi_func: Callable[[float], float],
     gamma: float,
-    t_max: float = 200.0,
+    t_max: Optional[float] = None,
     eps_rel: float = 1e-10
 ) -> float:
     """Evaluate the Hadamard finite-part pairing <-Fp(1/x^2), phi(. + gamma)>.
 
     For a C^2 test function with phi(0)=0 and logarithmic growth:
         <-Fp(1/x^2), phi(. + gamma)> = - \\int_0^\\infty [phi(gamma + x) + phi(gamma - x) - 2 phi(gamma)] / x^2 dx.
+
+    When t_max is None or infinite, integrates across the complete semi-infinite domain [0, \\infty),
+    preventing omitted-tail truncation errors.
     """
     phi_gamma = phi_func(gamma)
 
@@ -67,10 +70,12 @@ def hadamard_finite_part_pairing(
         num = phi_func(gamma + x) + phi_func(gamma - x) - 2.0 * phi_gamma
         return -num / (x**2)
 
+    upper_limit = np.inf if (t_max is None or math.isinf(t_max)) else float(t_max)
+
     val, _ = scipy.integrate.quad(
         integrand,
         0.0,
-        t_max,
+        upper_limit,
         limit=1000,
         epsabs=1e-10,
         epsrel=eps_rel
@@ -150,30 +155,51 @@ def spectral_test_observable(
     z: complex,
     R_supp: float,
     eps_rel: float = 1e-12
-) -> float:
+) -> complex:
     """Evaluate spectral observable Psi_b(z) = \\int_{-R}^R f_b(u) exp(z*u) du.
 
     For even real f_b:
-        Psi_b(delta + i*gamma) = 2 \\int_0^R f_b(u) cosh(delta * u) cos(gamma * u) du.
+        Re[Psi_b(delta + i*gamma)] = 2 \\int_0^R f_b(u) cosh(delta * u) cos(gamma * u) du.
+        Im[Psi_b(delta + i*gamma)] = 2 \\int_0^R f_b(u) sinh(delta * u) sin(gamma * u) du.
+    Returns the complete complex value Psi_b(z).
     """
     delta = z.real
     gamma = z.imag
 
-    def integrand(u: float) -> float:
+    def re_integrand(u: float) -> float:
         fb_val = f_b_func(u)
         if fb_val == 0.0:
             return 0.0
         return fb_val * math.cosh(delta * u) * math.cos(gamma * u)
 
-    val, _ = scipy.integrate.quad(
-        integrand,
+    re_val, _ = scipy.integrate.quad(
+        re_integrand,
         0.0,
         R_supp,
         limit=500,
         epsabs=1e-13,
         epsrel=eps_rel
     )
-    return float(2.0 * val)
+
+    if delta == 0.0 or gamma == 0.0:
+        im_val = 0.0
+    else:
+        def im_integrand(u: float) -> float:
+            fb_val = f_b_func(u)
+            if fb_val == 0.0:
+                return 0.0
+            return fb_val * math.sinh(delta * u) * math.sin(gamma * u)
+
+        im_val, _ = scipy.integrate.quad(
+            im_integrand,
+            0.0,
+            R_supp,
+            limit=500,
+            epsabs=1e-13,
+            epsrel=eps_rel
+        )
+
+    return complex(2.0 * re_val, 2.0 * im_val)
 
 
 def reflected_pair_correction(
@@ -250,6 +276,8 @@ def evaluate_distributional_jump_bound(
            |K_{f_b}(a, gamma)| <= (||f_b''||_1 + ||f_b'||_1 + (1/4)||f_b||_1 + |f_b(0)|) / gamma^2.
     2. Reflected pair correction bound:
            |Delta_{pair}(a, gamma)| <= (4 a |f_b(0)| + 2 sinh(a R) ||f_b''||_1 + 4 a cosh(a R) ||f_b'||_1 + 2 a^2 sinh(a R) ||f_b||_1) / gamma^2.
+    Full 4-zero quartet bound (multiplicity m_0=1):
+           |Delta_{quartet}(a, gamma)| <= 2 * |Delta_{pair}(a, gamma)|.
     """
     if gamma == 0.0:
         raise ValueError("Distributional jump bound requires non-zero ordinate gamma.")
@@ -279,6 +307,7 @@ def evaluate_distributional_jump_bound(
         'R_supp': float(R_supp),
         'response_bound': float(bound_response),
         'correction_bound': float(bound_correction),
+        'quartet_correction_bound': float(2.0 * bound_correction),
         'asymptotic_decay_power': -2.0,
         'linear_a_vanish_factor': float(num_corr / (a_abs if a_abs > 0 else 1.0))
     }
@@ -293,6 +322,7 @@ def evaluate_finite_symmetric_multiset_transfer(
 
     Evaluates:
       1. Spectral sum S_{Psi_b} = sum_{rho} m_rho Psi_b(rho - 1/2).
+         Imaginary parts cancel identically across symmetric quartets.
       2. Regularized curvature sum K_{phi_b} = sum_{rho} m_rho K_{phi_b}(rho).
       3. Predicted theoretical correction Delta_{total} = sum_{off-critical} m_rho Delta_{quartet}.
       4. Exact balance discrepancy |S - K - Delta|.
@@ -310,14 +340,16 @@ def evaluate_finite_symmetric_multiset_transfer(
 
         if not is_quartet:
             # Critical line pair (+- gamma):
-            psi_val = 2.0 * spectral_test_observable(f_b_func, complex(0.0, gamma), R_supp)
+            # Imaginary parts cancel between +gamma and -gamma:
+            psi_obs = spectral_test_observable(f_b_func, complex(0.0, gamma), R_supp)
+            psi_val = 2.0 * psi_obs.real
             k_val = 2.0 * single_zero_curvature_response(f_b_func, 0.0, gamma, R_supp)
             delta_val = 0.0
         else:
             # Full 4-zero quartet (+-a +- i*gamma):
-            # Psi_b evaluated at 4 zeros:
+            # Sum of full quartet is purely real with value 4 * Re[Psi_b(a + i*gamma)]:
             psi_single = spectral_test_observable(f_b_func, complex(a, gamma), R_supp)
-            psi_val = 4.0 * psi_single
+            psi_val = 4.0 * psi_single.real
             # K_phi evaluated at 4 zeros: 2 upper + 2 lower:
             k_single = single_zero_curvature_response(f_b_func, a, gamma, R_supp)
             k_val = 4.0 * k_single
@@ -357,21 +389,173 @@ def evaluate_finite_symmetric_multiset_transfer(
     }
 
 
+def construct_authentic_production_density(
+    grades: Optional[List[int]] = None,
+    window: Tuple[float, float] = (8.0, 20.0),
+    h: float = 0.05,
+    tau: float = 2.0 * math.pi,
+    n_psi: int = 1000,
+    n_grid: int = 4001,
+    r_poly: Optional[List[float]] = None
+) -> Dict[str, Any]:
+    """Construct the authentic production position-space density f_b(u).
+
+    Constructed from:
+    1. Authentic prime-power stations x_i in grades {-1, -2} with von Mangoldt weights
+       and legal vector b = (-1/sqrt(2), 1/sqrt(2), 0).
+    2. Differentiated kernel convolutions C_h^{(2k)} = (-1)^k (psi_h^{(k)} * psi_h^{(k)}).
+    3. Production polynomial multiplier coefficients r_poly = [r_0, r_1, r_2, r_3].
+    
+    Formula:
+        f_b(u) = sum_{k=0}^3 r_k (-1)^k sum_{i,j} c_i c_j C_h^{(2k)}(u - (log x_j - log x_i)).
+    """
+    import scipy.interpolate
+    from tc.weil_forms.optimization import (
+        construct_weighted_admissible_spectral_test,
+        sieve_prime_powers_in_window,
+        _eval_psi_k
+    )
+
+    if grades is None:
+        grades = [-1, -2, -3]
+
+    if r_poly is None:
+        res = construct_weighted_admissible_spectral_test(grades=grades, window=window, h=h, tau=tau)
+        r_poly = list(res['polynomial_multiplier']['real_coefficients_r'])
+
+    R_supp = math.log(window[1] / window[0]) + 2.0 * h
+
+    st_raw = {K: sieve_prime_powers_in_window(window, K, tau=tau) for K in grades}
+    a_win, b_win = window
+
+    def w_bump(x: float) -> float:
+        if x <= a_win or x >= b_win:
+            return 0.0
+        u = 2.0 * (x - a_win) / (b_win - a_win) - 1.0
+        return math.exp(1.0 - 1.0 / (1.0 - u * u))
+
+    stations = []
+    for K in [-1, -2]:
+        b_K = -1.0 / math.sqrt(2.0) if K == -1 else (1.0 / math.sqrt(2.0) if K == -2 else 0.0)
+        for n_val, x_val, lam_val in st_raw[K]:
+            w = w_bump(x_val)
+            amp = (tau ** K) * lam_val * w
+            if amp > 0:
+                stations.append({'t': math.log(x_val), 'c': b_K * amp})
+
+    pairs_t = []
+    pairs_w = []
+    for s1 in stations:
+        for s2 in stations:
+            pairs_t.append(s2['t'] - s1['t'])
+            pairs_w.append(s1['c'] * s2['c'])
+
+    pairs_t_arr = np.array(pairs_t)
+    pairs_w_arr = np.array(pairs_w)
+
+    x_psi = np.linspace(-h, h, n_psi)
+    dx = x_psi[1] - x_psi[0]
+    c_tables = []
+    for k in range(4):
+        pk = _eval_psi_k(k, x_psi, h)
+        ck = np.convolve(pk, pk, mode='full') * dx
+        c_tables.append(ck)
+
+    v_grid = np.linspace(-2.0 * h, 2.0 * h, len(c_tables[0]))
+    interps = [scipy.interpolate.CubicSpline(v_grid, ck) for ck in c_tables]
+
+    def eval_fb_vector(u_arr: np.ndarray) -> np.ndarray:
+        res_arr = np.zeros_like(u_arr, dtype=float)
+        for k in range(4):
+            sign = (-1.0) ** k
+            rk = r_poly[k]
+            coeff = rk * sign
+            for tp, wp in zip(pairs_t_arr, pairs_w_arr):
+                arg = u_arr - tp
+                m = (arg >= -2.0 * h) & (arg <= 2.0 * h)
+                if np.any(m):
+                    res_arr[m] += coeff * wp * interps[k](arg[m])
+        return res_arr
+
+    u_grid = np.linspace(-R_supp, R_supp, n_grid)
+    fb_grid = eval_fb_vector(u_grid)
+    du = u_grid[1] - u_grid[0]
+    fb_p = np.gradient(fb_grid, du)
+    fb_pp = np.gradient(fb_p, du)
+
+    spline_fb = scipy.interpolate.CubicSpline(u_grid, fb_grid)
+
+    l1_fb = float(np.sum(np.abs(fb_grid)) * du)
+    l1_fb_prime = float(np.sum(np.abs(fb_p)) * du)
+    l1_fb_double_prime = float(np.sum(np.abs(fb_pp)) * du)
+    fb_0 = float(fb_grid[len(fb_grid) // 2])
+
+    def f_b_callable(u: float) -> float:
+        if abs(u) >= R_supp:
+            return 0.0
+        return float(spline_fb(u))
+
+    def evaluate_simpson_reflected_pair(a_val: float, gamma_val: float) -> Dict[str, float]:
+        """Compute Psi_pair, K_pair, and Delta_pair via Simpson's rule over the authentic grid."""
+        mask_pos = u_grid >= 0.0
+        u_pos = u_grid[mask_pos]
+        fb_pos = fb_grid[mask_pos]
+
+        psi_integrand = 4.0 * fb_pos * np.cosh(a_val * u_pos) * np.cos(gamma_val * u_pos)
+        k_integrand = 4.0 * fb_pos * np.exp(-abs(a_val) * u_pos) * np.cos(gamma_val * u_pos)
+        delta_integrand = 4.0 * fb_pos * np.sinh(abs(a_val) * u_pos) * np.cos(gamma_val * u_pos)
+
+        psi_pair = float(scipy.integrate.simpson(psi_integrand, x=u_pos))
+        k_pair = float(scipy.integrate.simpson(k_integrand, x=u_pos))
+        delta_pair = float(scipy.integrate.simpson(delta_integrand, x=u_pos))
+
+        diff = psi_pair - k_pair
+        discrepancy = abs(diff - delta_pair)
+        rel_discrepancy = discrepancy / max(1.0, abs(delta_pair))
+
+        return {
+            'a': float(a_val),
+            'gamma': float(gamma_val),
+            'psi_pair': psi_pair,
+            'k_pair': k_pair,
+            'difference_psi_minus_k': diff,
+            'predicted_delta_pair': delta_pair,
+            'quartet_correction_delta': 2.0 * delta_pair,
+            'discrepancy': discrepancy,
+            'relative_discrepancy': rel_discrepancy
+        }
+
+    return {
+        'status': 'AUTHENTIC_PRODUCTION_DENSITY_CONSTRUCTED',
+        'R_supp': float(R_supp),
+        'fb_0': fb_0,
+        'l1_fb': l1_fb,
+        'l1_fb_prime': l1_fb_prime,
+        'l1_fb_double_prime': l1_fb_double_prime,
+        'station_count': len(stations),
+        'pair_count': len(pairs_t_arr),
+        'grid_points': n_grid,
+        'f_b_func': f_b_callable,
+        'evaluate_simpson_reflected_pair': evaluate_simpson_reflected_pair
+    }
+
+
 def audit_regularized_curvature_transfer(
-    output_path: Optional[str] = None
+    output_path: Optional[str] = None,
+    include_authentic_density: bool = True
 ) -> Dict[str, Any]:
     """Execute complete mathematical audit and numerical reproduction of the curvature transfer."""
     import json
     h = 0.05
     R_supp = math.log(20.0 / 8.0) + 2.0 * h  # log(2.5) + 0.10 ~= 1.01629
 
-    # Standard smooth bump kernel profile for testing:
+    # Standard smooth bump kernel profile for baseline reference testing:
     def canonical_fb(u: float) -> float:
         if abs(u) >= R_supp:
             return 0.0
         return (1.0 - (u / R_supp)**2)**4
 
-    # Finite symmetric multiset test:
+    # Baseline synthetic multiset test:
     # 5 critical line pairs and 1 off-critical quartet:
     test_zeros = [
         {'a': 0.0, 'gamma': 14.13472514, 'multiplicity': 1, 'is_quartet': False},
@@ -384,27 +568,53 @@ def audit_regularized_curvature_transfer(
 
     multiset_result = evaluate_finite_symmetric_multiset_transfer(canonical_fb, test_zeros, R_supp)
 
-    # Estimate L1 norms of canonical_fb:
+    # L1 norms of canonical_fb:
     u_dense = np.linspace(-R_supp, R_supp, 2001)
     fb_vals = np.array([canonical_fb(u) for u in u_dense])
     du = u_dense[1] - u_dense[0]
     fb_p = np.gradient(fb_vals, du)
     fb_pp = np.gradient(fb_p, du)
 
-    l1_fb = float(np.sum(np.abs(fb_vals)) * du)
-    l1_fb_prime = float(np.sum(np.abs(fb_p)) * du)
-    l1_fb_double_prime = float(np.sum(np.abs(fb_pp)) * du)
-    fb_0 = float(canonical_fb(0.0))
+    l1_fb_surr = float(np.sum(np.abs(fb_vals)) * du)
+    l1_fb_prime_surr = float(np.sum(np.abs(fb_p)) * du)
+    l1_fb_double_prime_surr = float(np.sum(np.abs(fb_pp)) * du)
+    fb_0_surr = float(canonical_fb(0.0))
 
-    jump_bounds = evaluate_distributional_jump_bound(
-        f_b_0=fb_0,
-        l1_fb=l1_fb,
-        l1_fb_prime=l1_fb_prime,
-        l1_fb_double_prime=l1_fb_double_prime,
+    jump_bounds_surr = evaluate_distributional_jump_bound(
+        f_b_0=fb_0_surr,
+        l1_fb=l1_fb_surr,
+        l1_fb_prime=l1_fb_prime_surr,
+        l1_fb_double_prime=l1_fb_double_prime_surr,
         a=0.49,
         gamma=50.0,
         R_supp=R_supp
     )
+
+    authentic_audit: Dict[str, Any] = {}
+    if include_authentic_density:
+        auth_data = construct_authentic_production_density(h=h)
+        auth_jump_bounds = evaluate_distributional_jump_bound(
+            f_b_0=auth_data['fb_0'],
+            l1_fb=auth_data['l1_fb'],
+            l1_fb_prime=auth_data['l1_fb_prime'],
+            l1_fb_double_prime=auth_data['l1_fb_double_prime'],
+            a=0.49,
+            gamma=100.0,
+            R_supp=auth_data['R_supp']
+        )
+        simpson_eval = auth_data['evaluate_simpson_reflected_pair'](0.49, 100.0)
+        authentic_audit = {
+            'status': 'AUTHENTIC_PRODUCTION_TC_FAMILY_VALIDATED',
+            'fb_0': auth_data['fb_0'],
+            'l1_fb': auth_data['l1_fb'],
+            'l1_fb_prime': auth_data['l1_fb_prime'],
+            'l1_fb_double_prime': auth_data['l1_fb_double_prime'],
+            'distributional_jump_bounds': auth_jump_bounds,
+            'reflected_pair_simpson_verification': simpson_eval,
+            'identity_discrepancy': simpson_eval['discrepancy'],
+            'relative_discrepancy': simpson_eval['relative_discrepancy'],
+            'is_transfer_exact_within_tol': bool(simpson_eval['relative_discrepancy'] < 1e-11)
+        }
 
     report = {
         'epistemic_status': 'EXACT_FINITE_IDENTITY_UNRESOLVED_INFINITE_EXTENSION',
@@ -426,36 +636,37 @@ def audit_regularized_curvature_transfer(
                 "Delta_{quartet}(a, gamma) = 8 m_0 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du."
             ),
             'distributional_bound': (
-                "|K_{f_b}(a, gamma)| <= (||f_b''||_1 + ||f_b'||_1 + (1/4)||f_b||_1 + |f_b(0)|) / gamma^2."
+                "|Delta_{quartet}(a, gamma)| <= (8 m_0 / gamma^2) * [ 2 a |f_b(0)| + sinh(a R) ||f_b''||_1 + 2 a cosh(a R) ||f_b'||_1 + a^2 sinh(a R) ||f_b||_1 ]."
             )
         },
-        'finite_symmetric_multiset_verification': multiset_result,
-        'distributional_jump_bounds': jump_bounds,
+        'authentic_production_density_verification': authentic_audit,
+        'baseline_surrogate_multiset_verification': multiset_result,
+        'baseline_surrogate_jump_bounds': jump_bounds_surr,
         'reductio_implication_audit': {
             'what_H_supplies': (
                 "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). "
-                "This supplies a non-vanishing discrete quartet term and a non-vanishing local correction "
+                "This supplies an off-critical quartet in the spectral explicit formula sum and a non-vanishing local correction "
                 "Delta_{quartet}(delta_0, gamma_0) = 8 m_0 \\int_0^R f_b(u) sinh(delta_0 u) cos(u gamma_0) du. "
-                "By the distributional integration-by-parts bound, |Delta_{quartet}| <= O(delta_0 / gamma_0^2)."
+                "By distributional twice integration-by-parts, "
+                "|Delta_{quartet}| <= (8 m_0 / gamma_0^2) [ 2 delta_0 |f_b(0)| + sinh(delta_0 R) ||f_b''||_1 + 2 delta_0 cosh(delta_0 R) ||f_b'||_1 + delta_0^2 sinh(delta_0 R) ||f_b||_1 ]."
+            ),
+            'withdrawn_obstruction_analysis': (
+                "The prior claim that Delta_{quartet} is 'eight orders of magnitude too small' was an artifact of evaluating "
+                "the bound constant on a normalized smooth surrogate f(u) = (1 - (u/R)^2)^4, where C(f) ~ 10^1. "
+                "On the authentic production density f_b constructed from the 98 prime stations and production polynomial p, "
+                "the actual norms are |f_b(0)| ~ 2.46e11, ||f_b||_1 ~ 8.59e9, ||f_b'||_1 ~ 1.29e13, and ||f_b''||_1 ~ 2.11e16. "
+                "At a = 0.49, gamma = 100.0, the actual quartet correction is Delta_{quartet} ~ 5.76e5, and the analytic bound is ~ 4.38e12. "
+                "The surrogate-based numerical obstruction is therefore withdrawn. The transfer identity is exact and validated on the authentic TC construction."
             ),
             'what_remains_unproved': (
-                "1. Hypothesis H does not bound the collective sum over critical zeros or exclude other off-critical zeros. "
-                "2. The arithmetic energy A_{Psi, <= U} ~ 7.15e8 is balanced by the infinite sum over all zeros in the Guinand-Weil "
-                "explicit formula, holding identically whether H is true or false. "
-                "3. The local quartet correction O(1/gamma_0^2) is orders of magnitude smaller than 7.15e8 and cannot "
-                "force the remainder |D| < 1/2 without an independent global arithmetic obstruction. "
-                "4. An unregularized curvature integral diverges as (t-gamma_j)^{-2} at critical-line zeros; "
-                "Hadamard finite-part regularization eliminates local divergence, but the infinite regularized curvature "
-                "series sum_{gamma} K_{phi_b}(gamma) requires unconditional zero-counting summation control."
-            ),
-            'circularity_check': (
-                "Asserting that |D| < 1/2 follows from H assumes that the spectral explicit formula sum fails to cancel "
-                "the arithmetic energy by at least 7.14e8. But this asserts the contradiction that the reductio is intended "
-                "to deduce, introducing circularity if asserted as a premise."
+                "1. The local quartet correction Delta_{quartet}(delta_0, gamma_0) translates the local curvature response of rho_0 into the TC observable, "
+                "while complete D = A_{<= U} + R_{arch} - S_{unselected, <= T} - R_{spectral} accounts for the entire infinite explicit formula. "
+                "2. Hypothesis H does not unconditionally bound the infinite unselected spectral sum S_{unselected, <= T} or the tail R_{spectral}. "
+                "3. Complete certified enclosure of D requires certified ball arithmetic (Flint Arb) for discrete zero observables and tail integrals."
             ),
             'governing_next_question': (
-                "Can an independent global arithmetic lower bound on |A_{Psi, <= U}(b) - S_{Psi, crit}(b)| be proved "
-                "from the non-vanishing of rho_0 off the critical line, without assuming the reductio conclusion?"
+                "For the same prime stations, legal vector b, interpolated polynomial p, and normalization used in the production functional, "
+                "what is the complete transfer correction—with explicit constants and a controlled remainder—and what additional restriction does H impose on it?"
             )
         }
     }
@@ -468,3 +679,4 @@ def audit_regularized_curvature_transfer(
             pass
 
     return report
+

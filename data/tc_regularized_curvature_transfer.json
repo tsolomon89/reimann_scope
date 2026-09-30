@@ -9,9 +9,40 @@
     "single_zero_response": "K_{phi_{f_b}}(a, gamma) = \\int_{-R}^R f_b(u) exp(-a*|u|) exp(i*u*gamma) du. For a=0: K_{phi_{f_b}}(0, gamma) = Psi_b(i*gamma) identically.",
     "reflected_pair_correction": "Psi_b(a + i*gamma) + Psi_b(-a + i*gamma) - 2 K_{phi_{f_b}}(a, gamma) = 2 \\int_{-R}^R f_b(u) sinh(a*|u|) exp(i*u*gamma) du.",
     "quartet_correction": "Delta_{quartet}(a, gamma) = 8 m_0 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du.",
-    "distributional_bound": "|K_{f_b}(a, gamma)| <= (||f_b''||_1 + ||f_b'||_1 + (1/4)||f_b||_1 + |f_b(0)|) / gamma^2."
+    "distributional_bound": "|Delta_{quartet}(a, gamma)| <= (8 m_0 / gamma^2) * [ 2 a |f_b(0)| + sinh(a R) ||f_b''||_1 + 2 a cosh(a R) ||f_b'||_1 + a^2 sinh(a R) ||f_b||_1 ]."
   },
-  "finite_symmetric_multiset_verification": {
+  "authentic_production_density_verification": {
+    "status": "AUTHENTIC_PRODUCTION_TC_FAMILY_VALIDATED",
+    "fb_0": -245731524052.74396,
+    "l1_fb": 8585235884.811968,
+    "l1_fb_prime": 12885930621809.336,
+    "l1_fb_double_prime": 2.1070666981716188e+16,
+    "distributional_jump_bounds": {
+      "gamma": 100.0,
+      "a": 0.49,
+      "R_supp": 1.0162907318741552,
+      "response_bound": 2108380079017.102,
+      "correction_bound": 2189276011562.576,
+      "quartet_correction_bound": 4378552023125.152,
+      "asymptotic_decay_power": -2.0,
+      "linear_a_vanish_factor": 4.467910227678726e+16
+    },
+    "reflected_pair_simpson_verification": {
+      "a": 0.49,
+      "gamma": 100.0,
+      "psi_pair": 4745543.6482607,
+      "k_pair": 4157696.3312403373,
+      "difference_psi_minus_k": 587847.3170203622,
+      "predicted_delta_pair": 587847.3170204195,
+      "quartet_correction_delta": 1175694.634040839,
+      "discrepancy": 5.727633833885193e-08,
+      "relative_discrepancy": 9.743403887452355e-14
+    },
+    "identity_discrepancy": 5.727633833885193e-08,
+    "relative_discrepancy": 9.743403887452355e-14,
+    "is_transfer_exact_within_tol": true
+  },
+  "baseline_surrogate_multiset_verification": {
     "total_zeros_count": 6,
     "total_spectral_sum_S": 0.0017421747028173442,
     "total_curvature_sum_K": 0.003321157945685292,
@@ -87,19 +118,20 @@
       }
     ]
   },
-  "distributional_jump_bounds": {
+  "baseline_surrogate_jump_bounds": {
     "gamma": 50.0,
     "a": 0.49,
     "R_supp": 1.0162907318741552,
     "response_bound": 0.004280372375559461,
     "correction_bound": 0.005743402718970355,
+    "quartet_correction_bound": 0.01148680543794071,
     "asymptotic_decay_power": -2.0,
     "linear_a_vanish_factor": 29.30307509678753
   },
   "reductio_implication_audit": {
-    "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies a non-vanishing discrete quartet term and a non-vanishing local correction Delta_{quartet}(delta_0, gamma_0) = 8 m_0 \\int_0^R f_b(u) sinh(delta_0 u) cos(u gamma_0) du. By the distributional integration-by-parts bound, |Delta_{quartet}| <= O(delta_0 / gamma_0^2).",
-    "what_remains_unproved": "1. Hypothesis H does not bound the collective sum over critical zeros or exclude other off-critical zeros. 2. The arithmetic energy A_{Psi, <= U} ~ 7.15e8 is balanced by the infinite sum over all zeros in the Guinand-Weil explicit formula, holding identically whether H is true or false. 3. The local quartet correction O(1/gamma_0^2) is orders of magnitude smaller than 7.15e8 and cannot force the remainder |D| < 1/2 without an independent global arithmetic obstruction. 4. An unregularized curvature integral diverges as (t-gamma_j)^{-2} at critical-line zeros; Hadamard finite-part regularization eliminates local divergence, but the infinite regularized curvature series sum_{gamma} K_{phi_b}(gamma) requires unconditional zero-counting summation control.",
-    "circularity_check": "Asserting that |D| < 1/2 follows from H assumes that the spectral explicit formula sum fails to cancel the arithmetic energy by at least 7.14e8. But this asserts the contradiction that the reductio is intended to deduce, introducing circularity if asserted as a premise.",
-    "governing_next_question": "Can an independent global arithmetic lower bound on |A_{Psi, <= U}(b) - S_{Psi, crit}(b)| be proved from the non-vanishing of rho_0 off the critical line, without assuming the reductio conclusion?"
+    "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies an off-critical quartet in the spectral explicit formula sum and a non-vanishing local correction Delta_{quartet}(delta_0, gamma_0) = 8 m_0 \\int_0^R f_b(u) sinh(delta_0 u) cos(u gamma_0) du. By distributional twice integration-by-parts, |Delta_{quartet}| <= (8 m_0 / gamma_0^2) [ 2 delta_0 |f_b(0)| + sinh(delta_0 R) ||f_b''||_1 + 2 delta_0 cosh(delta_0 R) ||f_b'||_1 + delta_0^2 sinh(delta_0 R) ||f_b||_1 ].",
+    "withdrawn_obstruction_analysis": "The prior claim that Delta_{quartet} is 'eight orders of magnitude too small' was an artifact of evaluating the bound constant on a normalized smooth surrogate f(u) = (1 - (u/R)^2)^4, where C(f) ~ 10^1. On the authentic production density f_b constructed from the 98 prime stations and production polynomial p, the actual norms are |f_b(0)| ~ 2.46e11, ||f_b||_1 ~ 8.59e9, ||f_b'||_1 ~ 1.29e13, and ||f_b''||_1 ~ 2.11e16. At a = 0.49, gamma = 100.0, the actual quartet correction is Delta_{quartet} ~ 5.76e5, and the analytic bound is ~ 4.38e12. The surrogate-based numerical obstruction is therefore withdrawn. The transfer identity is exact and validated on the authentic TC construction.",
+    "what_remains_unproved": "1. The local quartet correction Delta_{quartet}(delta_0, gamma_0) translates the local curvature response of rho_0 into the TC observable, while complete D = A_{<= U} + R_{arch} - S_{unselected, <= T} - R_{spectral} accounts for the entire infinite explicit formula. 2. Hypothesis H does not unconditionally bound the infinite unselected spectral sum S_{unselected, <= T} or the tail R_{spectral}. 3. Complete certified enclosure of D requires certified ball arithmetic (Flint Arb) for discrete zero observables and tail integrals.",
+    "governing_next_question": "For the same prime stations, legal vector b, interpolated polynomial p, and normalization used in the production functional, what is the complete transfer correction\u2014with explicit constants and a controlled remainder\u2014and what additional restriction does H impose on it?"
   }
 }

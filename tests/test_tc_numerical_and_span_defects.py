@@ -1521,22 +1521,39 @@ def test_target_2_regularized_curvature_transfer():
     a0 = 0.49
     gam0 = 50.0
     psi_off = spectral_test_observable(bump_fb, complex(a0, gam0), R_supp)
+    psi_neg = spectral_test_observable(bump_fb, complex(-a0, gam0), R_supp)
     k_off = single_zero_curvature_response(bump_fb, a0, gam0, R_supp)
     pair_corr = reflected_pair_correction(bump_fb, a0, gam0, R_supp)
-    # Reflected pair identity: Psi(a + i*gamma) + Psi(-a + i*gamma) = 2 * Psi(a + i*gamma)
-    # 2 * Psi(a + i*gamma) - 2 * K(a, gamma) = pair_corr
-    diff = 2.0 * psi_off - 2.0 * k_off
+    # Reflected pair identity: Psi(a + i*gamma) + Psi(-a + i*gamma) - 2 * K(a, gamma) = pair_corr
+    # The non-zero imaginary parts cancel across the reflected pair:
+    pair_sum = psi_off + psi_neg
+    assert abs(pair_sum.imag) < 1e-15, f"Imaginary parts must cancel: {pair_sum.imag}"
+    diff = pair_sum.real - 2.0 * k_off
     assert abs(diff - pair_corr) < 1e-14, f"Reflected pair identity mismatch: diff={diff}, corr={pair_corr}"
 
-    # 3. Finite symmetric multiset audit
+    # 3. Hadamard finite-part pairing on complete [0, inf) vs truncated [0, 200]
+    from tc.weil_forms.curvature_transfer import hadamard_finite_part_pairing
+    pairing_inf = hadamard_finite_part_pairing(lambda t: -0.5 * math.log(1.0 + t**2), 0.0)
+    pairing_200 = hadamard_finite_part_pairing(lambda t: -0.5 * math.log(1.0 + t**2), 0.0, t_max=200.0)
+    assert abs(pairing_inf - math.pi) < 1e-12, f"Complete pairing must match pi: {pairing_inf}"
+    assert abs((pairing_inf - pairing_200) - 0.0629832153) < 1e-5, f"Truncation at 200 misses omitted tail: {pairing_inf - pairing_200}"
+
+    # 4. Finite symmetric multiset audit and authentic density verification
     audit_rep = audit_regularized_curvature_transfer()
     assert audit_rep['epistemic_status'] == 'EXACT_FINITE_IDENTITY_UNRESOLVED_INFINITE_EXTENSION'
-    multiset_audit = audit_rep['finite_symmetric_multiset_verification']
+    multiset_audit = audit_rep['baseline_surrogate_multiset_verification']
     assert multiset_audit['is_transfer_exact_within_tol'] is True
     assert multiset_audit['balance_discrepancy'] < 1e-12
 
-    # 4. Distributional integration by parts bounds
-    jump_audit = audit_rep['distributional_jump_bounds']
+    # 5. Authentic production TC density verification
+    auth_audit = audit_rep['authentic_production_density_verification']
+    assert auth_audit['status'] == 'AUTHENTIC_PRODUCTION_TC_FAMILY_VALIDATED'
+    assert auth_audit['is_transfer_exact_within_tol'] is True
+    assert auth_audit['relative_discrepancy'] < 1e-11
+
+    # 6. Distributional integration by parts bounds
+    jump_audit = audit_rep['baseline_surrogate_jump_bounds']
     assert jump_audit['asymptotic_decay_power'] == -2.0
     assert jump_audit['correction_bound'] > 0.0
     assert jump_audit['response_bound'] > 0.0
+

@@ -2490,11 +2490,43 @@ def construct_weighted_admissible_spectral_test(
         effective_eps_gamma = float(eps_gamma)
 
     S_psi_unsel_le_T = 0.0
+    S_psi_unsel_uncertainty_linear = 0.0
+    S_psi_unsel_uncertainty_analytic = 0.0
+    norm_beta_sq = float(np.linalg.norm(beta_rep)**2)
+
     for g_val in unselected_zeros:
         p_val = float(r_poly[0] - r_poly[1]*(g_val**2) + r_poly[2]*(g_val**4) - r_poly[3]*(g_val**6))
+        dp_dt_val = float(-2.0 * r_poly[1] * g_val + 4.0 * r_poly[2] * (g_val**3) - 6.0 * r_poly[3] * (g_val**5))
+
         obs_g = compute_critical_zero_observable(g_val, grades, a_kn, P, h=h, tau=tau, eps_gamma=effective_eps_gamma)
         s_g = float(beta_rep.T @ np.array(obs_g['S_matrix']) @ beta_rep)
         S_psi_unsel_le_T += p_val * s_g
+
+        # Linear sensitivity from observable matrix S(g)
+        delta_s_linear = float(obs_g['first_order_linear_estimate'] * norm_beta_sq)
+        # Analytic MVT enclosure from observable matrix S(g)
+        delta_s_analytic = float(obs_g['analytic_mvt_bound'] * norm_beta_sq)
+
+        # Sensitivity from polynomial multiplier p(it): |p'(it)| * eps_gamma
+        delta_p_linear = float(effective_eps_gamma * abs(dp_dt_val))
+        g_max_local = g_val + effective_eps_gamma
+        dp_sup_local = float(
+            2.0 * abs(r_poly[1]) * g_max_local +
+            4.0 * abs(r_poly[2]) * (g_max_local**3) +
+            6.0 * abs(r_poly[3]) * (g_max_local**5)
+        )
+        delta_p_analytic = float(effective_eps_gamma * dp_sup_local)
+
+        # Combined product rule uncertainty: d/dt [p(t) s(t)] = p'(t) s(t) + p(t) s'(t)
+        term_unc_linear = abs(p_val) * delta_s_linear + abs(s_g) * delta_p_linear
+        term_unc_analytic = (
+            abs(p_val) * delta_s_analytic +
+            abs(s_g) * delta_p_analytic +
+            delta_p_analytic * delta_s_analytic
+        )
+
+        S_psi_unsel_uncertainty_linear += term_unc_linear
+        S_psi_unsel_uncertainty_analytic += term_unc_analytic
 
     # Target A3 & A4: Unconditional Stieltjes tail bound at actual requested T_cutoff
     C_E_root = sum(abs(b_rep[grades.index(K)]) * sum(amp * math.sqrt((tau**K)*n) for n, amp in a_kn[K].items()) for K in grades)
@@ -2599,6 +2631,8 @@ def construct_weighted_admissible_spectral_test(
             'cutoff_T': float(T_cutoff),
             'unselected_zero_count': len(unselected_zeros),
             'S_psi_unsel_le_T': S_psi_unsel_le_T,
+            'S_psi_unsel_uncertainty_linear': float(S_psi_unsel_uncertainty_linear),
+            'S_psi_unsel_uncertainty_analytic': float(S_psi_unsel_uncertainty_analytic),
             'reference_load_success': reference_load_success,
             'spectral_coverage_certified': spectral_coverage_certified,
             'complete_spectral_enclosure_available': complete_spectral_enclosure_available,
@@ -2613,6 +2647,8 @@ def construct_weighted_admissible_spectral_test(
             'reference_agreement_tolerance': 1e-4,
             'max_input_displacement': float(max_disp),
             'effective_eps_gamma': float(effective_eps_gamma),
+            'S_psi_unsel_uncertainty_linear': float(S_psi_unsel_uncertainty_linear),
+            'S_psi_unsel_uncertainty_analytic': float(S_psi_unsel_uncertainty_analytic),
             'evaluated_at_canonical_reference': False,
             'verified_zero_isolation_and_coverage': False,
             'verified_zero_isolation_rationale': (

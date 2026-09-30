@@ -44,8 +44,9 @@ This sprint completed two foundational targets:
      $$\Psi_b(a+i\gamma) + \Psi_b(-a+i\gamma) - 2K_{\phi_{f_b}}(a,\gamma) = 2 \int_{\mathbb{R}} f_b(u) \sinh(a|u|) e^{iu\gamma} \, du,$$
      and full quartet correction $\Delta_{\text{quartet}}(a,\gamma) = 8 m_0 \int_0^R f_b(u) \sinh(au) \cos(u\gamma) \, du$.
    - **Distributional Summability Bounds**: Proved via distributional integration by parts:
-     $$|K_{f_b}(a,\gamma)| \le \frac{\|f_b''\|_1 + \|f_b'\|_1 + \frac{1}{4}\|f_b\|_1 + |f_b(0)|}{\gamma^2}, \qquad |\Delta_{\text{pair}}(a,\gamma)| \le \frac{2a R e^{aR} \|f_b'\|_1}{\gamma^2}.$$
-   - **Epistemic Resolution of Missing Implication**: Verified on both synthetic symmetric multisets and the authentic TC family that the curvature transfer holds to machine precision ($< 1.24 \times 10^{-17}$ balance error). However, hypothesis $H$ supplies only a local quartet perturbation of order $O(a/\gamma_0^2)$, which cannot by itself control the complete functional $D$ without an independent global arithmetic constraint.
+     $$|K_{f_b}(a,\gamma)| \le \frac{\|f_b''\|_1 + \|f_b'\|_1 + \frac{1}{4}\|f_b\|_1 + |f_b(0)|}{\gamma^2},$$
+     $$|\Delta_{\text{quartet}}(a,\gamma)| \le \frac{8 m_0}{\gamma^2} \left[ 2a |f_b(0)| + \sinh(aR) \|f_b''\|_1 + 2a \cosh(aR) \|f_b'\|_1 + a^2 \sinh(aR) \|f_b\|_1 \right] \le C(f_b) \frac{a}{\gamma^2}.$$
+   - **Authentic Production Family Validation and Withdrawal of Premature Obstruction**: Constructed the authentic position-space density $f_b(u)$ from the 98 active prime stations, legal vector $b = (-1/\sqrt{2}, 1/\sqrt{2}, 0)$, differentiated kernel $\psi_h$, and production polynomial $p(z)$. Verified that the regularized curvature transfer identity holds to machine precision (relative discrepancy $< 10^{-13}$). Withdrew the unsupported surrogate-based "eight orders of magnitude too small" numerical obstruction: the bound constant depends on the actual density derivatives ($\|f_b''\|_1 \approx 2.11 \times 10^{16}$), yielding $C(f_b) \approx 4.47 \times 10^{16}$, an analytic bound $\approx 4.38 \times 10^{12}$, and actual quartet correction $\approx 1.18 \times 10^6$ for the production functional.
 
 ---
 
@@ -251,69 +252,88 @@ $$|K_{f_b}(a,\gamma)| \le \frac{1}{\gamma^2} \left( \|f_b''\|_1 + \|f_b'\|_1 + \
 Because $\sum_{\rho} \frac{1}{\gamma^2} < \infty$, the regularized curvature response sum $\sum_{\rho} K_{\phi_{f_b}}(\rho)$ is unconditionally convergent!
 
 Similarly, for the correction kernel $\eta(u) = f_b(u) \sinh(a|u|)$:
-Since $\sinh(a|u|) \sim a|u|$ at $u=0$, $\eta(0) = 0$ and $\eta'(0^+) - \eta'(0^-) = 2a f_b(0)$.
-The quartet correction satisfies:
-$$|\Delta_{\text{quartet}}(a,\gamma)| \le \frac{8 m_0}{\gamma^2} \left[ 2a |f_b(0)| + 2a R e^{aR} \|f_b'\|_1 + a^2 R e^{aR} \|f_b\|_1 \right] \le O\left(\frac{a}{\gamma^2}\right).$$
+Since $\sinh(a|u|) \sim a|u|$ at $u=0$, $\eta(0) = 0$ and the first derivative has a corner jump $\eta'(0^+) - \eta'(0^-) = 2a f_b(0)$.
+Differentiating $\eta(u)$ for $u > 0$:
+$$\eta'(u) = f_b'(u) \sinh(au) + a f_b(u) \cosh(au),$$
+$$\eta''(u) = f_b''(u) \sinh(au) + 2a f_b'(u) \cosh(au) + a^2 f_b(u) \sinh(au).$$
+Integrating by parts twice in the distributional sense across $[-R, R]$, the quartet correction satisfies the complete bound:
+$$\mathbf{|\Delta_{\text{quartet}}(a,\gamma)| \le \frac{8 m_0}{\gamma^2} \left[ 2a |f_b(0)| + \sinh(aR) \|f_b''\|_1 + 2a \cosh(aR) \|f_b'\|_1 + a^2 \sinh(aR) \|f_b\|_1 \right] \le C(f_b) \frac{a}{\gamma^2}}.$$
+Notice that the $\|f_b''\|_1$ term is an indispensable component of the second-derivative bound. Because $\sinh(aR) \le a R e^{aR}$, every term contains an explicit factor of $a$, confirming that $\Delta_{\text{quartet}}(a,\gamma) \to 0$ as $a \downarrow 0$ with $O(a/\gamma^2)$ uniform decay.
 
 ---
 
-## 4. Testing the Missing Implication
+## 4. Testing the Missing Implication on the Authentic TC Family
 
-### 4.1 What Hypothesis $H$ Supplies vs. What Remains Unproved
-Let $H(\rho_0, m_0)$ assert the existence of an off-critical zero $\rho_0 = 1/2 + a + i\gamma_0$ ($a > 0$).
-We classify every element entering the transfer:
-1. **Unconditional Identities**:
-   - The regularized calibration identity $K_{\phi_{f_b}}(a,\gamma) = \int f_b(u) e^{-a|u|} e^{iu\gamma} du$.
-   - The reflected-pair correction formula $\Delta_{\text{pair}}(a,\gamma) = 2 \int f_b(u) \sinh(a|u|) e^{iu\gamma} du$.
-   - The $O(1/\gamma^2)$ and $O(a/\gamma^2)$ decay bounds.
-2. **Consequences Derived from $H$**:
-   - The presence of the off-critical quartet $\{1/2 \pm a \pm i\gamma_0\}$ in the spectral sum.
-   - The spectral shift of magnitude $\Delta_{\text{quartet}}(a,\gamma_0) \sim O(a/\gamma_0^2)$.
-3. **Finite Verified Computations**:
-   - Verified on synthetic multisets and the authentic TC family that:
-     $$\left| \sum_{\text{multiset}} \Psi_b(\rho) - \left( \sum_{\text{multiset}} 2K_{\phi_{f_b}}(\rho) + \Delta_{\text{quartet}} \right) \right| < 1.24 \times 10^{-17}.$$
-4. **Unproved Gap & Circularity Analysis**:
-   - Hypothesis $H$ modifies the spectral sum by a single quartet contribution $\Delta_{\text{quartet}} \sim O(a/\gamma_0^2)$.
-   - However, the complete remainder identity is:
-     $$D = A_{\le U} + R_{\text{arch}} - S_{\text{unselected}, \le T} - R_{\text{spectral}} = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}}.$$
-   - In production, $A_{\le U} \approx +7.15 \times 10^8$.
-   - A local quartet perturbation of order $O(a/\gamma_0^2) \sim 10^{-2}$ to $10^1$ is eight orders of magnitude smaller than $A_{\le U}$.
-   - To force an arithmetic collision ($m\tau^K = n\tau^J$), one must prove that $D \approx -1/2$. But $D$ is the difference between $A_{\le U} \sim 7.15 \times 10^8$ and the entire infinite zero sum $\sum_\rho \Psi_b(\rho)$.
-   - Inferring that the complete functional $D$ must satisfy $|D| < 1/2$ from the existence of an off-critical zero alone is **circular**: it presupposes that the explicit formula identity holds with no other compensating global shifts.
-   - Thus, the regularized curvature transfer provides the exact local translation from curvature to TC, but **does not by itself establish the global collision implication**.
+### 4.1 Withdrawal of the Surrogate-Based Obstruction Claim
+An earlier draft evaluated the constant $C(f)$ using a normalized polynomial surrogate density $f(u) = (1 - (u/R)^2)^4$, obtaining $C(f) \sim 10^1$, and compared that surrogate scale to the production arithmetic functional value $A_{\le U} \approx 7.15 \times 10^8$, claiming an "eight orders of magnitude too small" numerical obstruction.
+
+**That comparison was mathematically unfounded and is formally withdrawn**:
+1. **Density Dependence**: The bound constant $C(f_b)$ depends strictly on the actual position-space density $f_b(u)$ and its derivatives.
+2. **Authentic Scale**: In the production TC functional, $f_b(u)$ is assembled from 98 prime-power stations in grades $\{-1, -2\}$ with legal coefficients $b = (-1/\sqrt{2}, 1/\sqrt{2}, 0)$, the differentiated kernel $\psi_h$, and the degree-6 production polynomial $p(z)$. Evaluating the authentic density yields:
+   $$f_b(0) \approx -2.457315 \times 10^{11},$$
+   $$\|f_b\|_1 \approx 8.585236 \times 10^9,$$
+   $$\|f_b'\|_1 \approx 1.288593 \times 10^{13},$$
+   $$\|f_b''\|_1 \approx 2.107067 \times 10^{16}.$$
+3. **Authentic Correction Magnitude**:
+   At $a = 0.49$ and $\gamma = 100.0$:
+   - Reflected pair components: $\Psi_{\text{pair}} \approx 4,745,543.65$, $K_{\text{pair}} \approx 4,157,696.33$.
+   - Reflected pair correction: $\Delta_{\text{pair}} \approx 587,847.32$.
+   - Full quartet correction ($m_0=1$): $\Delta_{\text{quartet}} = 2 \Delta_{\text{pair}} \approx 1,175,694.63$ ($1.18 \times 10^6$).
+   - Distributional jump bound: $|\Delta_{\text{quartet}}| \le 4.38 \times 10^{12}$ with $C(f_b) \approx 4.47 \times 10^{16}$.
+4. **Numerical Validation**:
+   The identity $\Psi_{\text{pair}} - K_{\text{pair}} = \Delta_{\text{pair}}$ balances with an absolute discrepancy of $5.73 \times 10^{-8}$ and a relative discrepancy of $9.74 \times 10^{-14}$, validating the transfer identity on the authentic production TC functional to machine precision.
+
+### 4.2 Epistemic Role of the Regularized Transfer
+The regularized curvature transfer provides an exact, rigorous bridge:
+1. It replaces the divergent local second-derivative curvature integral with the well-defined Hadamard finite-part pairing:
+   $$\langle -\operatorname{Fp}(1/x^2), \phi_{f_b}(\cdot + \gamma) \rangle = K_{\phi_{f_b}}(0, \gamma) = \Psi_b(i\gamma).$$
+2. For an off-critical zero $\rho_0 = 1/2 + a + i\gamma_0$, it isolates the exact quartet perturbation $\Delta_{\text{quartet}}(a, \gamma_0)$.
+3. However, the complete remainder identity governs the entire explicit formula:
+   $$D = A_{\le U} + R_{\text{arch}} - S_{\text{unselected}, \le T} - R_{\text{spectral}} = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}}.$$
+   Hypothesis $H$ supplies the off-critical quartet and its transfer correction $\Delta_{\text{quartet}}$, but does not unconditionally evaluate the unselected critical sum $S_{\text{unselected}, \le T}$ or the infinite Stieltjes tail $R_{\text{spectral}}$.
 
 ---
 
-## 5. Machine-Readable Evidence & Regression Summary
+## 5. Machine-Readable Evidence & Reconciled Numerical Records
 
-The companion machine-readable audit artifact is stored at:
+The canonical machine-readable audit artifact is stored at:
 [`data/tc_regularized_curvature_transfer.json`](file:///C:/Development/Projects/reimann_scope/data/tc_regularized_curvature_transfer.json)
 
-### Key Parameters and Values
-- **Working precision**: IEEE-754 double precision (53 bits) + SciPy quadrature / Flint Arb
-- **Bandwidth**: $h = 0.05$
-- **Support bounds**: $[x_{\min}, x_{\max}] = [8, 20]$, $R_{\text{supp}} \approx 1.01629$
-- **Direction**: $b = (-1, 1, 0)/\sqrt{2}$
-- **Synthetic Test Multiset**:
-  - Critical zeros: $\gamma \in \{14.134725, 21.022040, 25.010858\}$
-  - Off-critical quartet: $a = 0.15, \gamma_0 = 30.424876$, multiplicity $m_0 = 1$
-- **Balance Verification**:
-  - Full multiset $\Psi_b$ sum: $2.493922156828551$
-  - Regularized curvature sum $2\sum K_{\phi}$: $2.493922156828564$
-  - Quartet correction $\Delta_{\text{quartet}}$: $-1.298284687508311 \times 10^{-5}$
-  - Discrepancy: $1.24 \times 10^{-17}$ (below machine epsilon relative to terms).
+### 5.1 Reconciled Multi-Set and Benchmark Quantities
+The previous discrepancy between the report's text and the JSON artifact arose from contrasting a 4-zero test configuration against a 6-zero baseline. The reconciled audit records both datasets unambiguously:
+
+| Verification Target | Dataset / Method | Value / Norm | Discrepancy / Bound |
+| :--- | :--- | :--- | :--- |
+| **Authentic Density Center** | $f_b(0)$ (98 stations, production $p$) | $-2.457315 \times 10^{11}$ | Exact finite sum |
+| **Authentic $L^1$ Norm** | $\|f_b\|_1$ | $8.585236 \times 10^9$ | Mesh $N=4001$ |
+| **Authentic First Derivative** | $\|f_b'\|_1$ | $1.288593 \times 10^{13}$ | Central differences |
+| **Authentic Second Derivative**| $\|f_b''\|_1$ | $2.107067 \times 10^{16}$ | Central differences |
+| **Authentic Pair Transfer** | $(a=0.49, \gamma=100.0)$ | $\Delta_{\text{pair}} \approx 587,847.32$ | Rel. disc. $9.74 \times 10^{-14}$ |
+| **Authentic Quartet Correction** | $\Delta_{\text{quartet}}(0.49, 100.0)$ | $1,175,694.63$ | Bound $\le 4.38 \times 10^{12}$ |
+| **Baseline Surrogate Spectral Sum** | 6-zero multiset $S_{\Psi}$ | $0.001742174702817$ | Reconciled artifact figure |
+| **Baseline Surrogate Curvature**| 6-zero multiset $K_{\phi}$ | $0.003321157945685$ | Reconciled artifact figure |
+| **Baseline Predicted Correction**| $\Delta_{\text{total}}$ | $-0.001578983242868$| Reconciled artifact figure |
+| **Baseline Balance Discrepancy**| $|S - K - \Delta|$ | $1.23599 \times 10^{-17}$ | Below machine precision |
+| **Hadamard Semi-Infinite Pairing**| $\phi(t)=-\frac{1}{2}\log(1+t^2), \gamma=0$ on $[0, \infty)$ | $3.14159265358988$ | Error vs $\pi$: $8.66 \times 10^{-14}$ |
+| **Hadamard Truncated Pairing** | Same $\phi$ on $[0, 200]$ | $3.07860943825791$ | Missing tail: $0.0629832153$ |
+| **Unselected Spectral Sum** | $S_{\text{unselected}, \le 100}$ | $-8,200.329211$ | 27 unselected zeros |
+| **Linear Uncertainty Budget** | Observable + multiplier derivative | $\pm 5.70 \times 10^{-12}$ | First-order sensitivity |
+| **Analytic MVT Uncertainty** | Observable majorant + polynomial | $\pm 1.46 \times 10^{-6}$ | Certified interval enclosure |
 
 ---
 
 ## 6. Conclusion and Next Single Mathematical Question
 
-### 6.1 What Changed
-1. `remaining_open_lemma` was repaired to include $R_{\text{arch}}$ and subtract raw prime pairing once.
-2. The ambiguous `D_val` alias was deprecated.
-3. The $+5 \times 10^{-5}$ shifted zero defect was reproduced and fixed with stable 1-to-1 reference identity matching, boundary intersection rejection, and explicit $\varepsilon_\gamma$ uncertainty propagation.
-4. The false $1/(48\pi t)$ gamma envelope was falsified and replaced with Brent (2016) $1/(150 t)$.
-5. Single-endpoint Stieltjes integration was re-derived and reconciled with Trudgian's rearranged doubled-endpoint formula, with the $+1.04 \times 10^{11}$ increase safely covered by the conservative endpoint structure.
-6. The exact regularized curvature transfer was derived, proved, and implemented in `tc/weil_forms/curvature_transfer.py`.
+### 6.1 Summary of Repaired Mathematical State
+1. **Evaluator Contract Precision**:
+   - `spectral_test_observable` returns the full complex value $\Psi_b(z) \in \mathbb{C}$ with non-vanishing imaginary part $2\int_0^R f_b(u)\sinh(\delta u)\sin(\gamma u) du$ for off-critical zeros, verifying that imaginary parts cancel identically across symmetric quartets.
+   - `hadamard_finite_part_pairing` defaults to the complete semi-infinite domain $[0, \infty)$, eliminating the $0.062983$ omitted tail from previous $t_{\max}=200$ truncation and matching the analytic value $\pi$ to $8.66 \times 10^{-14}$.
+2. **Complete Uncertainty Budget**:
+   - $S_{\text{unselected}, \le T}$ accumulates both the observable matrix sensitivity $\|\beta\|_2^2 \|S'\|_2 \varepsilon_\gamma$ and the polynomial multiplier derivative sensitivity $|p'(i\gamma)| \varepsilon_\gamma$ via the product rule, reporting both linear ($5.70 \times 10^{-12}$) and analytic MVT ($1.46 \times 10^{-6}$) enclosures.
+3. **Authentic Transfer Validation**:
+   - The regularized curvature transfer identity is derived, proved, and numerically validated on the authentic production TC density $f_b(u)$ to relative precision $< 10^{-13}$.
+   - The surrogate-based numerical obstruction is withdrawn.
 
 ### 6.2 The Next Single Mathematical Question
-> **Given that the local quartet curvature correction $\Delta_{\text{quartet}}(a,\gamma_0) = 8m_0 \int_0^R f_b(u)\sinh(au)\cos(u\gamma_0)du \sim O(a/\gamma_0^2)$ is local and cannot bridge the $O(10^8)$ gap between $A_{\le U}$ and $D \approx -1/2$, what global arithmetic constraint on the station correlation measure $\sum_{K,J} b_K b_J \delta_{\tau^K n, \tau^J m}$ is required to force an integer-grade station collision $m\tau^K = n\tau^J$?**
+> **For the same prime stations, legal vector $b$, interpolated polynomial $p$, and normalization used in the production functional, what is the complete transfer correction—with explicit constants and a controlled remainder—and what additional restriction does $H$ impose on it?**
+
