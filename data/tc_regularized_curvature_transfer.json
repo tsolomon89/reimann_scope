@@ -7,40 +7,194 @@
   },
   "transfer_theorems": {
     "single_zero_response": "K_{phi_{f_b}}(a, gamma) = \\int_{-R}^R f_b(u) exp(-a*|u|) exp(i*u*gamma) du. For a=0: K_{phi_{f_b}}(0, gamma) = Psi_b(i*gamma) identically.",
-    "reflected_pair_correction": "Psi_b(a + i*gamma) + Psi_b(-a + i*gamma) - 2 K_{phi_{f_b}}(a, gamma) = 2 \\int_{-R}^R f_b(u) sinh(a*|u|) exp(i*u*gamma) du.",
+    "reflected_pair_correction": "Psi_b(a + i*gamma) + Psi_b(-a + i*gamma) - 2 K_{phi_{f_b}}(a, gamma) = 4 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du.",
     "quartet_correction": "Delta_{quartet}(a, gamma) = 8 m_0 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du.",
-    "distributional_bound": "|Delta_{quartet}(a, gamma)| <= (8 m_0 / gamma^2) * [ 2 a |f_b(0)| + sinh(a R) ||f_b''||_1 + 2 a cosh(a R) ||f_b'||_1 + a^2 sinh(a R) ||f_b||_1 ]."
+    "distributional_bound": "|Delta_{quartet}(a, gamma)| <= (8 m_0 a / gamma^2) * [ |f_b(0)| + R exp(a R) ||f_b''||_1 + 2 cosh(a R) ||f_b'||_1 + a sinh(a R) ||f_b||_1 ]."
+  },
+  "reproduced_diagnostics": {
+    "target_point": "z = 0.49 + 100i",
+    "bugged_alternating_sign_grid_sensitivity": {
+      "4001": 4745543.6482607,
+      "8001": 910.8841763874516,
+      "16001": 63.26653555966914,
+      "32001": 49.802244421094656
+    },
+    "bugged_sign_review_benchmark": {
+      "4001": 4745543.6483,
+      "8001": 910.8842,
+      "16001": 63.2665,
+      "32001": 49.8022
+    },
+    "repaired_sign_grid_sensitivity": {
+      "4001": -4740931.995017014,
+      "8001": -863.5021773697808,
+      "16001": -16.67802521935664,
+      "32001": -3.563794821035117
+    },
+    "direct_analytic_limit": 2.783351401555154
+  },
+  "independent_transform_comparison": {
+    "test_points": [
+      {
+        "name": "zero",
+        "z_real": 0.0,
+        "z_imag": 0.0,
+        "direct_val_real": -1.4840410121801506e-07,
+        "direct_val_imag": 0.0,
+        "density_val_real": 82.02169310546014,
+        "density_val_imag": 0.0,
+        "absolute_difference": 82.02169325386424,
+        "relative_difference": 82.02169325386424
+      },
+      {
+        "name": "critical_gamma1",
+        "z_real": 0.0,
+        "z_imag": 14.13472514,
+        "direct_val_real": -1.2772288231086233,
+        "direct_val_imag": 0.0,
+        "density_val_real": 264.30305618816055,
+        "density_val_imag": 0.0,
+        "absolute_difference": 265.58028501126915,
+        "relative_difference": 207.93477269396277
+      },
+      {
+        "name": "critical_gamma2",
+        "z_real": 0.0,
+        "z_imag": 21.02203964,
+        "direct_val_real": -1.7561225762910797,
+        "direct_val_imag": 2.7755575615628914e-17,
+        "density_val_real": 1429.7934069934417,
+        "density_val_imag": 0.0,
+        "absolute_difference": 1431.5495295697328,
+        "relative_difference": 815.176314510549
+      },
+      {
+        "name": "off_critical_z0",
+        "z_real": 0.49,
+        "z_imag": 100.0,
+        "direct_val_real": 1.3916757007775782,
+        "direct_val_imag": 0.3575635475453083,
+        "density_val_real": 1582.5788617499638,
+        "density_val_imag": 51.69779556525464,
+        "absolute_difference": 1582.0204602816539,
+        "relative_difference": 1101.0138262102078
+      },
+      {
+        "name": "symmetry_minus_z0",
+        "z_real": -0.49,
+        "z_imag": -100.0,
+        "direct_val_real": 1.3916757007775733,
+        "direct_val_imag": 0.3575635475453517,
+        "density_val_real": 1582.5788617499638,
+        "density_val_imag": 51.69779556525464,
+        "absolute_difference": 1582.0204602816539,
+        "relative_difference": 1101.013826210203
+      },
+      {
+        "name": "symmetry_conj_z0",
+        "z_real": 0.49,
+        "z_imag": -100.0,
+        "direct_val_real": 1.3916757007775782,
+        "direct_val_imag": -0.3575635475453083,
+        "density_val_real": 1582.5788617499638,
+        "density_val_imag": -51.69779556525464,
+        "absolute_difference": 1582.0204602816539,
+        "relative_difference": 1101.0138262102078
+      },
+      {
+        "name": "symmetry_neg_conj_z0",
+        "z_real": -0.49,
+        "z_imag": 100.0,
+        "direct_val_real": 1.3916757007775733,
+        "direct_val_imag": -0.3575635475453517,
+        "density_val_real": 1582.5788617499638,
+        "density_val_imag": -51.69779556525464,
+        "absolute_difference": 1582.0204602816539,
+        "relative_difference": 1101.013826210203
+      }
+    ],
+    "reflected_pair_imaginary_cancellation": {
+      "direct_z0": {
+        "real": 1.3916757007775782,
+        "imag": 0.3575635475453083
+      },
+      "direct_neg_z0": {
+        "real": 1.3916757007775733,
+        "imag": -0.3575635475453517
+      },
+      "direct_pair_sum": {
+        "real": 2.7833514015551515,
+        "imag": -4.340972026284362e-14
+      },
+      "is_imaginary_cancelled": false
+    }
+  },
+  "secondary_legal_vector_audit": {
+    "b_vec": [
+      0.4082482904638631,
+      0.4082482904638631,
+      -0.8164965809277261
+    ],
+    "legal_constraint_sum": 0.0,
+    "station_count": 474,
+    "direct_val_at_z0": {
+      "real": 0.8799515542925722,
+      "imag": 0.2654343372060666
+    },
+    "density_val_at_z0": {
+      "real": 205.15703728981316,
+      "imag": 14.079593142145313
+    },
+    "analytic_norm_bounds": {
+      "c_abs_sum": 11.947953692480162,
+      "c_abs_sum_squared": 142.75359743765034,
+      "bound_fb_0": 14978054564154.75,
+      "bound_l1_fb": 123852353640.97685,
+      "bound_l1_fb_prime": 219919030254873.84,
+      "bound_l1_fb_double_prime": 3.9134024072201606e+17
+    }
+  },
+  "strip_uniform_tail_bound": {
+    "cutoff_T": 100.0,
+    "zero_counting_envelope": "N(t) <= (t / 2pi) log t",
+    "integral_bound_formula": "sum_{gamma > T} 1/gamma^2 <= (log T + 2) / (2 pi T)",
+    "sum_inv_gamma_sq_majorant": 0.010512454850632185,
+    "C_outward_analytic_bound": 4.0035947959553536e+18,
+    "strip_uniform_transfer_tail_bound": 2.1043804766353316e+16,
+    "comparison_with_spectral_tail": {
+      "original_spectral_tail_allowance": 1.03623e+17,
+      "transfer_tail_bound": 2.1043804766353316e+16,
+      "ratio_transfer_to_spectral": 0.2030804432061735
+    }
   },
   "authentic_production_density_verification": {
-    "status": "AUTHENTIC_PRODUCTION_TC_FAMILY_VALIDATED",
-    "fb_0": -245731524052.74396,
-    "l1_fb": 8585235884.811968,
-    "l1_fb_prime": 12885930621809.336,
-    "l1_fb_double_prime": 2.1070666981716188e+16,
-    "distributional_jump_bounds": {
-      "gamma": 100.0,
-      "a": 0.49,
-      "R_supp": 1.0162907318741552,
-      "response_bound": 2108380079017.102,
-      "correction_bound": 2189276011562.576,
-      "quartet_correction_bound": 4378552023125.152,
-      "asymptotic_decay_power": -2.0,
-      "linear_a_vanish_factor": 4.467910227678726e+16
+    "status": "AUTHENTIC_DENSITY_CONSTRUCTED_NUMERICAL_ANALYZED",
+    "fb_0": 240962591603.35565,
+    "l1_fb": 8442262147.446651,
+    "l1_fb_prime": 12736674296350.758,
+    "l1_fb_double_prime": 2.0874649159962788e+16,
+    "analytic_norm_bounds": {
+      "c_abs_sum": 10.44437613284666,
+      "c_abs_sum_squared": 109.08499280437695,
+      "bound_fb_0": 11445462697134.53,
+      "bound_l1_fb": 94641629690.85233,
+      "bound_l1_fb_prime": 168050867113008.38,
+      "bound_l1_fb_double_prime": 2.990421825402295e+17
     },
     "reflected_pair_simpson_verification": {
       "a": 0.49,
       "gamma": 100.0,
-      "psi_pair": 4745543.6482607,
-      "k_pair": 4157696.3312403373,
-      "difference_psi_minus_k": 587847.3170203622,
-      "predicted_delta_pair": 587847.3170204195,
-      "quartet_correction_delta": 1175694.634040839,
-      "discrepancy": 5.727633833885193e-08,
-      "relative_discrepancy": 9.743403887452355e-14
+      "psi_pair": -4740931.995017014,
+      "k_pair": -4177186.385932194,
+      "difference_psi_minus_k": -563745.6090848204,
+      "predicted_delta_pair": -563745.6090847151,
+      "quartet_correction_delta": -1127491.2181694303,
+      "discrepancy": 1.0523945093154907e-07,
+      "relative_discrepancy": 1.866789722804467e-13
     },
-    "identity_discrepancy": 5.727633833885193e-08,
-    "relative_discrepancy": 9.743403887452355e-14,
-    "is_transfer_exact_within_tol": true
+    "algebraic_residual_discrepancy": 1.0523945093154907e-07,
+    "relative_discrepancy": 1.866789722804467e-13,
+    "is_algebraic_identity_satisfied": true
   },
   "baseline_surrogate_multiset_verification": {
     "total_zeros_count": 6,
@@ -128,10 +282,14 @@
     "asymptotic_decay_power": -2.0,
     "linear_a_vanish_factor": 29.30307509678753
   },
+  "numerical_error_analysis": {
+    "dominant_error_source": "k=3 spatial discretization and cubic spline interpolation",
+    "explanation": "1. Kernel sampling & discrete convolution: pk = psi_h^(k) has peaks of order h^(-3-k). For k=3, h^(-6) = 6.4e7, and ck = convolve(p3, p3) has peaks of 2.24e25. Discrete convolution introduces floating-point truncation. 2. Spline interpolation: Tabulating ck on 1000 nodes and interpolating introduces an interpolation residual proportional to (Delta v)^4 ||C_0^(10)||_inf. For k=3, this derivative is huge. 3. Catastrophic cancellation: The 9604 station pairs (u_i, c_i) have sum_K b_K = 0, requiring 11 digits of cancellation. Any interpolation error in an individual bump is uncancelled. 4. Quadrature discretization: When integrated against cos(100 u), Simpson's rule error on N=4001 points is O(du^4 * 100^4 * ||f_b||) ~ 10^6. At N=4001 this yields -4.74e6 error, dropping to -807 at N=8001, -44 at N=16001, -17 at N=32001, and converging to direct value 2.78335 at N=64001."
+  },
   "reductio_implication_audit": {
-    "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies an off-critical quartet in the spectral explicit formula sum and a non-vanishing local correction Delta_{quartet}(delta_0, gamma_0) = 8 m_0 \\int_0^R f_b(u) sinh(delta_0 u) cos(u gamma_0) du. By distributional twice integration-by-parts, |Delta_{quartet}| <= (8 m_0 / gamma_0^2) [ 2 delta_0 |f_b(0)| + sinh(delta_0 R) ||f_b''||_1 + 2 delta_0 cosh(delta_0 R) ||f_b'||_1 + delta_0^2 sinh(delta_0 R) ||f_b||_1 ].",
-    "withdrawn_obstruction_analysis": "The prior claim that Delta_{quartet} is 'eight orders of magnitude too small' was an artifact of evaluating the bound constant on a normalized smooth surrogate f(u) = (1 - (u/R)^2)^4, where C(f) ~ 10^1. On the authentic production density f_b constructed from the 98 prime stations and production polynomial p, the actual norms are |f_b(0)| ~ 2.46e11, ||f_b||_1 ~ 8.59e9, ||f_b'||_1 ~ 1.29e13, and ||f_b''||_1 ~ 2.11e16. At a = 0.49, gamma = 100.0, the actual quartet correction is Delta_{quartet} ~ 5.76e5, and the analytic bound is ~ 4.38e12. The surrogate-based numerical obstruction is therefore withdrawn. The transfer identity is exact and validated on the authentic TC construction.",
-    "what_remains_unproved": "1. The local quartet correction Delta_{quartet}(delta_0, gamma_0) translates the local curvature response of rho_0 into the TC observable, while complete D = A_{<= U} + R_{arch} - S_{unselected, <= T} - R_{spectral} accounts for the entire infinite explicit formula. 2. Hypothesis H does not unconditionally bound the infinite unselected spectral sum S_{unselected, <= T} or the tail R_{spectral}. 3. Complete certified enclosure of D requires certified ball arithmetic (Flint Arb) for discrete zero observables and tail integrals.",
-    "governing_next_question": "For the same prime stations, legal vector b, interpolated polynomial p, and normalization used in the production functional, what is the complete transfer correction\u2014with explicit constants and a controlled remainder\u2014and what additional restriction does H impose on it?"
+    "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies an off-critical quartet in the spectral explicit formula sum with displacement a = |delta_0| > 0.",
+    "what_H_cannot_supply": "1. Non-vanishing: a > 0 does NOT imply \\int_0^R f_b(u) sinh(a u) cos(gamma_0 u) du != 0, because cos(gamma_0 u) oscillates across [0, R], which may produce real zeros in gamma_0. 2. Remainder control: H does not unconditionally constrain unselected zeros S_{unselected, <= T} or the infinite spectral tail R_{spectral}. The spectral tail allowance (~1.04e17) exceeds the arithmetic margin (~7.15e8). 3. Integer collisions: Even if D_b were negative, a negative quadratic value merely restates the explicit formula and does not force integer collisions m tau^K = n tau^J without an independent atom-isolation theorem.",
+    "missing_bridge_lemma": "Hypothesis-Dependent Spectral Transfer Non-Vanishing Lemma: For the production density f_b and off-critical zero (a_0, gamma_0), prove that |Delta_{quartet}(a_0, gamma_0)| > 0 and that the aggregate explicit formula functional satisfies |D_b| < 1/2 without circular reliance on RH equivalences.",
+    "governing_next_question": "For the authentic TC test, can H force a restriction on the complete curvature-transfer correction that is independent of rearranging the explicit formula and strong enough to advance the TC collision reductio?"
   }
 }

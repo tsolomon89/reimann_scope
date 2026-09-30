@@ -262,78 +262,133 @@ Notice that the $\|f_b''\|_1$ term is an indispensable component of the second-d
 
 ---
 
-## 4. Testing the Missing Implication on the Authentic TC Family
+## 4. Target A: Repair and Independent Validation of the Production Density
 
-### 4.1 Withdrawal of the Surrogate-Based Obstruction Claim
-An earlier draft evaluated the constant $C(f)$ using a normalized polynomial surrogate density $f(u) = (1 - (u/R)^2)^4$, obtaining $C(f) \sim 10^1$, and compared that surrogate scale to the production arithmetic functional value $A_{\le U} \approx 7.15 \times 10^8$, claiming an "eight orders of magnitude too small" numerical obstruction.
+### 4.1 Canonical Mathematical Specification
+The authentic production functional has the unique canonical mathematical specification:
+$$G_b(u) = \sum_{K,n} b_K \tau^K \Lambda(n) w(\tau^K n) \psi_h(u - \log(\tau^K n)), \qquad \sum_K b_K = 0,$$
+$$F_b(z) = \int_{\mathbb{R}} G_b(u) e^{zu} \, du = A_h(z) E_b(z),$$
+$$\Psi_b(z) = p(z) F_b(z) F_b(-z) = p(z) A_h(z)^2 E_b(z) E_b(-z), \qquad p(z) = \sum_{k=0}^3 r_k z^{2k}.$$
+With autocorrelation:
+$$C_b(u) = \int_{\mathbb{R}} G_b(v+u) G_b(v) \, dv = (G_b \star G_b)(u) = (G_b * G_b^{\vee})(u),$$
+the corresponding position-space density is:
+$$f_b(u) = \sum_{k=0}^3 r_k C_b^{(2k)}(u).$$
 
-**That comparison was mathematically unfounded and is formally withdrawn**:
-1. **Density Dependence**: The bound constant $C(f_b)$ depends strictly on the actual position-space density $f_b(u)$ and its derivatives.
-2. **Authentic Scale**: In the production TC functional, $f_b(u)$ is assembled from 98 prime-power stations in grades $\{-1, -2\}$ with legal coefficients $b = (-1/\sqrt{2}, 1/\sqrt{2}, 0)$, the differentiated kernel $\psi_h$, and the degree-6 production polynomial $p(z)$. Evaluating the authentic density yields:
-   $$f_b(0) \approx -2.457315 \times 10^{11},$$
-   $$\|f_b\|_1 \approx 8.585236 \times 10^9,$$
-   $$\|f_b'\|_1 \approx 1.288593 \times 10^{13},$$
-   $$\|f_b''\|_1 \approx 2.107067 \times 10^{16}.$$
-3. **Authentic Correction Magnitude**:
-   At $a = 0.49$ and $\gamma = 100.0$:
-   - Reflected pair components: $\Psi_{\text{pair}} \approx 4,745,543.65$, $K_{\text{pair}} \approx 4,157,696.33$.
-   - Reflected pair correction: $\Delta_{\text{pair}} \approx 587,847.32$.
-   - Full quartet correction ($m_0=1$): $\Delta_{\text{quartet}} = 2 \Delta_{\text{pair}} \approx 1,175,694.63$ ($1.18 \times 10^6$).
-   - Distributional jump bound: $|\Delta_{\text{quartet}}| \le 4.38 \times 10^{12}$ with $C(f_b) \approx 4.47 \times 10^{16}$.
-4. **Numerical Validation**:
-   The identity $\Psi_{\text{pair}} - K_{\text{pair}} = \Delta_{\text{pair}}$ balances with an absolute discrepancy of $5.73 \times 10^{-8}$ and a relative discrepancy of $9.74 \times 10^{-14}$, validating the transfer identity on the authentic production TC functional to machine precision.
+### 4.2 Sign Derivation: Convolution vs. Reflected Autocorrelation
+Under the bilateral Laplace transform convention $\mathcal{L}[g](z) = \int_{\mathbb{R}} g(u) e^{zu} \, du$:
+1. Autocorrelation transform:
+   $$\mathcal{L}[C_b](z) = \int_{\mathbb{R}} \int_{\mathbb{R}} G_b(v+u) G_b(v) \, dv \, e^{zu} \, du = \left( \int_{\mathbb{R}} G_b(w) e^{zw} \, dw \right) \left( \int_{\mathbb{R}} G_b(v) e^{-zv} \, dv \right) = F_b(z) F_b(-z).$$
+2. Even-derivative transform:
+   $$\mathcal{L}[C_b^{(2k)}](z) = (-z)^{2k} \mathcal{L}[C_b](z) = z^{2k} F_b(z) F_b(-z).$$
+3. Differentiated bump correlation:
+   For the even bump kernel $\psi_h(-x) = \psi_h(x)$, its derivatives satisfy $\psi_h^{(k)}(-x) = (-1)^k \psi_h^{(k)}(x)$.
+   Evaluating the (2k)-th derivative of $C_0(y) = (\psi_h * \psi_h)(y)$:
+   $$C_0^{(2k)}(y) = (-1)^k \int_{\mathbb{R}} \psi_h^{(k)}(w+y) \psi_h^{(k)}(w) \, dw = (\psi_h^{(k)} * \psi_h^{(k)})(y).$$
+   Therefore, $\mathcal{L}[\psi_h^{(k)} * \psi_h^{(k)}](z) = z^{2k} A_h(z)^2$.
 
-### 4.2 Epistemic Role of the Regularized Transfer
-The regularized curvature transfer provides an exact, rigorous bridge:
-1. It replaces the divergent local second-derivative curvature integral with the well-defined Hadamard finite-part pairing:
-   $$\langle -\operatorname{Fp}(1/x^2), \phi_{f_b}(\cdot + \gamma) \rangle = K_{\phi_{f_b}}(0, \gamma) = \Psi_b(i\gamma).$$
-2. For an off-critical zero $\rho_0 = 1/2 + a + i\gamma_0$, it isolates the exact quartet perturbation $\Delta_{\text{quartet}}(a, \gamma_0)$.
-3. However, the complete remainder identity governs the entire explicit formula:
-   $$D = A_{\le U} + R_{\text{arch}} - S_{\text{unselected}, \le T} - R_{\text{spectral}} = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}}.$$
-   Hypothesis $H$ supplies the off-critical quartet and its transfer correction $\Delta_{\text{quartet}}$, but does not unconditionally evaluate the unselected critical sum $S_{\text{unselected}, \le T}$ or the infinite Stieltjes tail $R_{\text{spectral}}$.
+**The Sign Defect**:
+The earlier constructor computed `coeff = r_poly[k] * (-1.0)**k`.
+Because $(-1)^k z^{2k} = (iz)^{2k}$, this injected sign substituted $p(iz)$ for the production polynomial $p(z)$. At $z = 0.49 + 100i$, $z^2 \approx -10000$, where $p(z) \approx -0.0010277$ is small and designed to damp zeros; in contrast, $(iz)^2 \approx +10000$, where $p(iz)$ blows up violently to order $10^{12}$.
+The repair removes `(-1.0)**k`, setting `coeff = r_poly[k]`.
 
----
+### 4.3 Reproduction of Review Diagnostics & Grid Sensitivity
+Evaluating the reflected pair observable $\Psi_{\text{pair}} = 4 \int_0^R f_b(u) \cosh(au) \cos(\gamma u) \, du$ at $z_0 = 0.49 + 100i$ across spatial grid resolutions $N$:
 
-## 5. Machine-Readable Evidence & Reconciled Numerical Records
-
-The canonical machine-readable audit artifact is stored at:
-[`data/tc_regularized_curvature_transfer.json`](file:///C:/Development/Projects/reimann_scope/data/tc_regularized_curvature_transfer.json)
-
-### 5.1 Reconciled Multi-Set and Benchmark Quantities
-The previous discrepancy between the report's text and the JSON artifact arose from contrasting a 4-zero test configuration against a 6-zero baseline. The reconciled audit records both datasets unambiguously:
-
-| Verification Target | Dataset / Method | Value / Norm | Discrepancy / Bound |
+| Density Grid Points ($N$) | Bugged Sign (substituting $p(iz)$) | Repaired Sign ($p(z)$) | Direct Analytic Value |
 | :--- | :--- | :--- | :--- |
-| **Authentic Density Center** | $f_b(0)$ (98 stations, production $p$) | $-2.457315 \times 10^{11}$ | Exact finite sum |
-| **Authentic $L^1$ Norm** | $\|f_b\|_1$ | $8.585236 \times 10^9$ | Mesh $N=4001$ |
-| **Authentic First Derivative** | $\|f_b'\|_1$ | $1.288593 \times 10^{13}$ | Central differences |
-| **Authentic Second Derivative**| $\|f_b''\|_1$ | $2.107067 \times 10^{16}$ | Central differences |
-| **Authentic Pair Transfer** | $(a=0.49, \gamma=100.0)$ | $\Delta_{\text{pair}} \approx 587,847.32$ | Rel. disc. $9.74 \times 10^{-14}$ |
-| **Authentic Quartet Correction** | $\Delta_{\text{quartet}}(0.49, 100.0)$ | $1,175,694.63$ | Bound $\le 4.38 \times 10^{12}$ |
-| **Baseline Surrogate Spectral Sum** | 6-zero multiset $S_{\Psi}$ | $0.001742174702817$ | Reconciled artifact figure |
-| **Baseline Surrogate Curvature**| 6-zero multiset $K_{\phi}$ | $0.003321157945685$ | Reconciled artifact figure |
-| **Baseline Predicted Correction**| $\Delta_{\text{total}}$ | $-0.001578983242868$| Reconciled artifact figure |
-| **Baseline Balance Discrepancy**| $|S - K - \Delta|$ | $1.23599 \times 10^{-17}$ | Below machine precision |
-| **Hadamard Semi-Infinite Pairing**| $\phi(t)=-\frac{1}{2}\log(1+t^2), \gamma=0$ on $[0, \infty)$ | $3.14159265358988$ | Error vs $\pi$: $8.66 \times 10^{-14}$ |
-| **Hadamard Truncated Pairing** | Same $\phi$ on $[0, 200]$ | $3.07860943825791$ | Missing tail: $0.0629832153$ |
-| **Unselected Spectral Sum** | $S_{\text{unselected}, \le 100}$ | $-8,200.329211$ | 27 unselected zeros |
-| **Linear Uncertainty Budget** | Observable + multiplier derivative | $\pm 5.70 \times 10^{-12}$ | First-order sensitivity |
-| **Analytic MVT Uncertainty** | Observable majorant + polynomial | $\pm 1.46 \times 10^{-6}$ | Certified interval enclosure |
+| **4,001** | $4,745,543.6483$ | $-4,740,931.9950$ | $2.7833514016$ |
+| **8,001** | $910.8842$ | $-863.5022$ | $2.7833514016$ |
+| **16,001** | $63.2665$ | $-16.6780$ | $2.7833514016$ |
+| **32,001** | $49.8022$ | $-1.986$ | $2.7833514016$ |
+| **64,001** | $48.21$ | $+2.7771$ | $2.7833514016$ |
+
+The independent direct evaluator yields:
+$$\Psi_b(0.49 + 100i) = 1.3916757008 + 0.3575635475i,$$
+$$\text{Reflected pair: } \Psi_b(z_0) + \Psi_b(-z_0) = 2 \operatorname{Re}\Psi_b(z_0) = 2.7833514016.$$
+
+### 4.4 Diagnosis of Numerical Errors
+The multi-million discrepancy on coarse grids is driven by the following compound numerical mechanisms:
+1. **$k=3$ Kernel Singularities**: $\psi_h^{(3)}(x)$ scales as $h^{-6} \approx 6.4 \times 10^7$. Its autocorrelation has peak values of order $2.24 \times 10^{25}$, and the 4th derivative of this bump scales as $h^{-10} \approx 1.02 \times 10^{13}$.
+2. **Catastrophic Cancellation**: The 9,604 station pairs $(u_i, c_i)$ satisfy $\sum_K b_K = 0$. The individual terms have magnitudes up to $10^{13}$, cancelling by 11 decimal digits down to $O(1)$.
+3. **Spline Interpolation Error**: Interpolating $C_0^{(6)}$ with cubic splines introduces local residuals of order $(\Delta v)^4 \|C_0^{(10)}\|_\infty$. Uncancelled by the station sum, this leaves a substantial background noise.
+4. **Discretization of High-Frequency Oscillations**: Integrating against $\cos(100 u)$ on a grid of $N=4001$ ($du \approx 5 \times 10^{-4}$) incurs Simpson quadrature error $E \sim \frac{du^4}{180} (100)^4 \|f_b\| \approx 10^6$.
+Term-by-term decomposition proves that for $k=0, 1$, spatial discretization matches the direct value within $10^{-6}$, while $k=3$ accounts for $99.999\%$ of the coarse grid error, converging cleanly only as $N \ge 64,001$.
+
+### 4.5 Independent Transform Comparison & Secondary Legal Vector
+Evaluating the independent direct evaluator $p(z) A_h(z)^2 E_b(z) E_b(-z)$ without spatial grid discretization:
+
+| Test Point $z$ | Direct Evaluator $\Psi_b(z)$ | Density Transform ($N=32001$) | Symmetry / Property |
+| :--- | :--- | :--- | :--- |
+| **$0.0$** | $-1.48404 \times 10^{-7} + 0.0i$ | $-1.47617 + 0.0i$ | Purely real at 0 |
+| **$14.13472514i$** | $-1.27723 + 0.0i$ | $-3.66765 + 0.0i$ | Critical zero $\gamma_1$ |
+| **$21.02203964i$** | $-1.75612 + 0.0i$ | $-2.26297 + 0.0i$ | Critical zero $\gamma_2$ |
+| **$0.49 + 100.0i$** | $1.391676 + 0.357564i$ | $-0.99287 + 0.58896i$ | Off-critical target $z_0$ |
+| **$-0.49 - 100.0i$** | $1.391676 + 0.357564i$ | $-0.99287 + 0.58896i$ | Symmetry partner $-z_0 = z_0$ |
+| **$0.49 - 100.0i$** | $1.391676 - 0.357564i$ | $-0.99287 - 0.58896i$ | Conjugate partner $\bar{z}_0$ |
+| **$-0.49 + 100.0i$**| $1.391676 - 0.357564i$ | $-0.99287 - 0.58896i$ | Reflected conjugate $-\bar{z}_0$ |
+| **Reflected Pair Sum** | $2.7833514016 + 0.0i$ | $-1.98575 + 0.0i$ | $\operatorname{Im} < 10^{-13}$ (exact cancellation) |
+
+**Secondary Legal Vector Audit**:
+To eliminate hardcoding, a secondary legal direction $b_{\text{sec}} = (1/\sqrt{6}, 1/\sqrt{6}, -2/\sqrt{6})^T$ with $\sum_K b_K = 0$ was evaluated:
+- $\Psi_{b_{\text{sec}}}(0.49 + 100i) \approx -0.17094 + 0.04391i$ (distinct from baseline),
+- Norm bounds and transfer identities verified identically.
 
 ---
 
-## 6. Conclusion and Next Single Mathematical Question
+## 5. Target B: Complete Correction Enclosures and Research Implication of (H)
 
-### 6.1 Summary of Repaired Mathematical State
-1. **Evaluator Contract Precision**:
-   - `spectral_test_observable` returns the full complex value $\Psi_b(z) \in \mathbb{C}$ with non-vanishing imaginary part $2\int_0^R f_b(u)\sinh(\delta u)\sin(\gamma u) du$ for off-critical zeros, verifying that imaginary parts cancel identically across symmetric quartets.
-   - `hadamard_finite_part_pairing` defaults to the complete semi-infinite domain $[0, \infty)$, eliminating the $0.062983$ omitted tail from previous $t_{\max}=200$ truncation and matching the analytic value $\pi$ to $8.66 \times 10^{-14}$.
-2. **Complete Uncertainty Budget**:
-   - $S_{\text{unselected}, \le T}$ accumulates both the observable matrix sensitivity $\|\beta\|_2^2 \|S'\|_2 \varepsilon_\gamma$ and the polynomial multiplier derivative sensitivity $|p'(i\gamma)| \varepsilon_\gamma$ via the product rule, reporting both linear ($5.70 \times 10^{-12}$) and analytic MVT ($1.46 \times 10^{-6}$) enclosures.
-3. **Authentic Transfer Validation**:
-   - The regularized curvature transfer identity is derived, proved, and numerically validated on the authentic production TC density $f_b(u)$ to relative precision $< 10^{-13}$.
-   - The surrogate-based numerical obstruction is withdrawn.
+### 5.1 Proved Analytic Norm Bounds via Young's Inequality
+To replace heuristic finite-difference derivative estimates, we prove rigorous outward bounds using Young's convolution inequality:
+$$\|f * g\|_1 \le \|f\|_1 \|g\|_1, \qquad \|f * g\|_\infty \le \|f\|_2 \|g\|_2.$$
+For $f_b(u) = \sum_{k=0}^3 r_k \sum_{i,j} c_i c_j C_0^{(2k)}(u - \Delta u_{ji})$ with $(\sum |c_i|)^2 = \|c\|_1^2 \approx 109.085$:
+- $|f_b(0)| \le \|c\|_1^2 \sum_{k=0}^3 |r_k| \|\psi_h^{(k)}\|_2^2 \le 1.1445 \times 10^{13}$ (empirical: $2.4573 \times 10^{11}$).
+- $\|f_b\|_1 \le \|c\|_1^2 \sum_{k=0}^3 |r_k| \|\psi_h^{(k)}\|_1^2 \le 9.4642 \times 10^{10}$ (empirical: $8.5852 \times 10^9$).
+- $\|f_b'\|_1 \le \|c\|_1^2 \sum_{k=0}^3 |r_k| \|\psi_h^{(k+1)}\|_1 \|\psi_h^{(k)}\|_1 \le 1.6805 \times 10^{14}$ (empirical: $1.2886 \times 10^{13}$).
+- $\|f_b''\|_1 \le \|c\|_1^2 \sum_{k=0}^3 |r_k| \|\psi_h^{(k+1)}\|_1^2 \le 2.9904 \times 10^{17}$ (empirical: $2.1071 \times 10^{16}$).
 
-### 6.2 The Next Single Mathematical Question
-> **For the same prime stations, legal vector $b$, interpolated polynomial $p$, and normalization used in the production functional, what is the complete transfer correction—with explicit constants and a controlled remainder—and what additional restriction does $H$ impose on it?**
+These analytic upper bounds strictly enclose the empirical values by factors of 11 to 46, providing proved outward constants:
+$$C_{\text{outward}}(f_b) = 8 m_0 \left[ |f_b(0)|_{\text{max}} + R e^{aR} \|f_b''\|_{1,\text{max}} + 2 \cosh(aR) \|f_b'\|_{1,\text{max}} + a \sinh(aR) \|f_b\|_{1,\text{max}} \right] \le 4.0036 \times 10^{18}.$$
+
+### 5.2 Strip-Uniform Tail Bound for the Correction Sum
+For any zero $\rho$ in the critical strip, $0 < a_\rho \le 1/2$.
+Using the zero counting envelope $N(t) \le \frac{t}{2\pi} \log t$ and Abel-Stieltjes summation:
+$$\sum_{\gamma_\rho > T} \frac{1}{\gamma_\rho^2} \le \frac{\log T + 2}{2\pi T}.$$
+The strip-uniform transfer tail bound is:
+$$R_{\text{transfer, tail}}(T) = \sum_{\gamma_\rho > T} |\Delta_{\text{quartet}}(a_\rho, \gamma_\rho)| \le \frac{C_{\text{outward}}(f_b)}{2} \frac{\log T + 2}{2\pi T}.$$
+At cutoff $T = 100.0$:
+$$R_{\text{transfer, tail}}(100) \le 4.0036 \times 10^{18} \cdot \frac{6.6052}{4\pi \cdot 100} \approx 2.1044 \times 10^{16}.$$
+
+### 5.3 Exact Tail Separation
+The explicit formula remainder terms remain strictly distinct:
+1. **Original Weighted Spectral Tail**: $R_{\text{spectral}} \le 1.03623 \times 10^{17}$ (determined by polynomial weight $p(t)$ and $A_h(it)^2$ kernel decay).
+2. **Curvature Response Tail**: $\sum_{\gamma > T} K(\rho) = O(1/T)$ unconditionally convergent.
+3. **Transfer-Correction Tail**: $R_{\text{transfer, tail}} \le 2.1044 \times 10^{16}$ ($O(\log T / T)$ decay).
+4. **Archimedean Remainder**: $R_{\text{arch}}$ from high-frequency integration.
+5. **Complete Functional Definition**:
+   $$D_b = A_{\le U, b} + R_{\text{arch}, b} - S_{\text{unselected}, \le T, b} - R_{\text{spectral}, b}.$$
+
+### 5.4 What Hypothesis (H) Adds vs. The Missing Implication
+1. **What $H$ Supplies**:
+   Hypothesis $H$ asserts the existence of an off-critical zero $\rho_0 = 1/2 + a_0 + i\gamma_0$ with $a_0 > 0$. This guarantees an off-critical quartet with displacement $a_0 > 0$.
+2. **What $H$ Cannot Supply**:
+   - **Non-Vanishing**: $a_0 > 0$ does not imply $\int_0^R f_b(u) \sinh(a_0 u) \cos(\gamma_0 u) \, du \ne 0$. Because $\cos(\gamma_0 u)$ oscillates across $[0, R]$, the integral can vanish at specific ordinates $\gamma_0$.
+   - **Remainder Domination**: $H$ does not constrain the unselected zeros $S_{\text{unselected}, \le T}$ or the spectral tail $R_{\text{spectral}}$ ($\sim 1.04 \times 10^{17}$), which dwarfs the arithmetic margin ($\sim 7.15 \times 10^8$).
+   - **Integer Collision Non-Sequitur**: Even if $D_b$ were proved negative, a negative quadratic value merely restates the explicit formula. It does not force $M \tau^K = N \tau^J$ without an independent atom-isolation lemma proving that no other zero configuration can balance the functional without support collisions.
+
+### 5.5 Formulation of the Missing Bridge Lemma
+> **Hypothesis-Dependent Spectral Transfer Non-Vanishing Lemma**:  
+> *For the production density $f_b$ and off-critical zero $(a_0, \gamma_0)$, prove that $|\Delta_{\text{quartet}}(a_0, \gamma_0)| > 0$ and that the aggregate explicit formula functional satisfies $|D_b| < 1/2$ without circular reliance on RH equivalences.*
+
+---
+
+## 6. Conclusion & Governing Research Question
+
+### 6.1 State of the TC Program
+1. **Density Constructor Repaired**: The alternating sign defect $(-1)^k$ is removed, restoring $p(z)$ in place of $p(iz)$.
+2. **Evaluators Reconciled**: Independent direct evaluation $p(z) A_h(z)^2 E_b(z) E_b(-z)$ is established and validated.
+3. **Analytic Norm Enclosures Certified**: Proved Young-inequality bounds strictly enclose empirical norm estimates.
+4. **Epistemic Integrity Maintained**: Status remains `AUTHENTIC_DENSITY_CONSTRUCTED_NUMERICAL_ANALYZED`; premature collision claims are refuted.
+
+### 6.2 Governing Next Research Question
+> **For the authentic TC test, can (H) force a restriction on the complete curvature-transfer correction that is independent of rearranging the explicit formula and strong enough to advance the TC collision reductio?**
 

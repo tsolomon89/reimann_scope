@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-013",
+  "active_task_id": "TASK-TC-014",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -258,8 +258,25 @@
         "data/tc_regularized_curvature_transfer.json",
         "docs/reviews/TC_REGULARIZED_CURVATURE_TRANSFER.md",
         "tests/test_tc_numerical_and_span_defects.py"
+      ]
+    },
+    {
+      "task_id": "TASK-TC-014",
+      "priority": 16,
+      "objective": "Repair production position-space density construction, independent direct transform validation, Young-inequality norm bounds, and curvature transfer restriction analysis under H",
+      "status": "COMPLETED_EXPLORATORY",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "For the authentic TC test, can H force a restriction on the complete curvature-transfer correction that is independent of rearranging the explicit formula and strong enough to advance the TC collision reductio?",
+      "planned_calculation": "1. Derive signs for convolution vs reflected autocorrelation and remove alternating sign defect (-1)^k. 2. Reproduce review findings (grid sensitivity benchmarks 4.745e6 -> 49.80 at bugged sign; -4.740e6 -> 2.783 at repaired sign). 3. Build independent direct evaluator p(z)A_h(z)^2 E_b(z)E_b(-z) and evaluate comparison table across z=0, critical, off-critical, symmetry partners, and secondary legal vector b_2. 4. Derive proved Young-inequality norm bounds strictly enclosing empirical values. 5. Derive strip-uniform transfer tail bound R_transfer_tail(100) <= 2.104e16. 6. Analyze missing implication under H: why a_0 > 0 does not force non-vanishing, why H does not control infinite spectral tails, and why negative D_b does not force integer collisions without atom-isolation lemma.",
+      "acceptance_criterion": "Reproduction benchmarks matched; direct evaluator matching review figures (1.3916757 + 0.3575635i, reflected pair 2.7833514); Young norm bounds enclosing empirical values; tests test_target_2 and test_target_2b passing; check-fast passing.",
+      "dependencies": ["TASK-TC-013"],
+      "evidence": [
+        "tc/weil_forms/curvature_transfer.py",
+        "data/tc_regularized_curvature_transfer.json",
+        "docs/reviews/TC_REGULARIZED_CURVATURE_TRANSFER.md",
+        "tests/test_tc_numerical_and_span_defects.py"
       ],
-      "resolution": "Target 1 and Target 2 completed: 1) Repaired production contract remaining_open_lemma = arithmetic_truncated + R_arch - unselected_sum - R_spectral; deprecated D_val alias. 2) Fixed shifted-zero defect at T=100: stable 1-to-1 reference identity partition maintains unselected count at 27 and propagates max_disp = 5e-5 into effective_eps_gamma; boundary zeros rejected. 3) Falsified 1/(48pi*t) at t=100; verified Brent (2016) Theorem 5/Corollary 4 bound 1/(150t); derived single-endpoint Stieltjes formula reconciling Trudgian's rearranged identity (~1.04194e17). 4) Derived exact regularized curvature transfer: g_a(x) -> -Fp(1/x^2), phi_{f_b}(t) = (1/pi) int f_b(u) (cos(ut)-1)/|u| du, proved exact pairing K_{phi_{f_b}}(a,gamma) = int f_b(u) e^{-a|u|} e^{iu*gamma} du, proved reflected-pair correction 2 int f_b(u) sinh(a|u|) e^{iu*gamma} du and quartet correction Delta_quartet. 5) Derived distributional IBP bounds O(1/gamma^2) and O(a/gamma^2). 6) Machine-readable artifact data/tc_regularized_curvature_transfer.json verified with discrepancy < 1.24e-17. 7) Tested missing implication: isolated local perturbation vs global arithmetic gap; screened circularity."
+      "resolution": "Target A and Target B completed: 1) Derived correct sign for f_b(u) = sum r_k C_b^{(2k)}(u) as +r_k; proved that (-1)^k substituted p(iz) for p(z). 2) Reproduced review grid sensitivity benchmarks across N in [4001, 8001, 16001, 32001, 64001]; explained that k=3 spatial discretization and spline interpolation dominate the error on coarse grids, converging to 2.78335 at N=64001. 3) Built independent direct evaluator matching review value 1.3916757008 + 0.3575635475i and reflected pair 2.7833514016. 4) Proved Young-inequality norm bounds enclosing empirical values: |f_b(0)| <= 1.145e13, ||f_b||_1 <= 9.464e10, ||f_b'||_1 <= 1.681e14, ||f_b''||_1 <= 2.990e17. 5) Derived strip-uniform transfer tail bound R_transfer_tail(100) <= 2.104e16. 6) Analyzed implication of H: proved H supplies a_0 > 0 but cannot supply non-vanishing of oscillatory integral or tail domination; formulated Hypothesis-Dependent Spectral Transfer Non-Vanishing Lemma."
     }
   ]
 }

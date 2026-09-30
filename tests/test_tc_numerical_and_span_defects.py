@@ -1547,8 +1547,8 @@ def test_target_2_regularized_curvature_transfer():
 
     # 5. Authentic production TC density verification
     auth_audit = audit_rep['authentic_production_density_verification']
-    assert auth_audit['status'] == 'AUTHENTIC_PRODUCTION_TC_FAMILY_VALIDATED'
-    assert auth_audit['is_transfer_exact_within_tol'] is True
+    assert auth_audit['status'] == 'AUTHENTIC_DENSITY_CONSTRUCTED_NUMERICAL_ANALYZED'
+    assert auth_audit['is_algebraic_identity_satisfied'] is True
     assert auth_audit['relative_discrepancy'] < 1e-11
 
     # 6. Distributional integration by parts bounds
@@ -1556,4 +1556,76 @@ def test_target_2_regularized_curvature_transfer():
     assert jump_audit['asymptotic_decay_power'] == -2.0
     assert jump_audit['correction_bound'] > 0.0
     assert jump_audit['response_bound'] > 0.0
+
+
+def test_target_2b_authentic_density_and_transform_diagnostics():
+    """Target 2B: Independent direct transform comparison, sign repair, norm bounds, and diagnostics."""
+    from tc.weil_forms.curvature_transfer import (
+        construct_authentic_production_density,
+        evaluate_direct_production_transform,
+        evaluate_density_transform,
+        compute_analytic_density_norm_bounds,
+        audit_regularized_curvature_transfer
+    )
+
+    # 1. Reproduce review findings on pinned baseline
+    # A) Bugged alternating sign: substitutes p(iz) for p(z)
+    d_bug_4k = construct_authentic_production_density(n_grid=4001, inject_alternating_sign=True)
+    ev_bug_4k = d_bug_4k['evaluate_simpson_reflected_pair'](0.49, 100.0)
+    assert abs(ev_bug_4k['psi_pair'] - 4745543.6483) < 1.0, f"Must reproduce 4.745e6 benchmark: {ev_bug_4k['psi_pair']}"
+
+    d_bug_8k = construct_authentic_production_density(n_grid=8001, inject_alternating_sign=True)
+    ev_bug_8k = d_bug_8k['evaluate_simpson_reflected_pair'](0.49, 100.0)
+    assert abs(ev_bug_8k['psi_pair'] - 910.8842) < 1.0, f"Must reproduce 910.88 benchmark: {ev_bug_8k['psi_pair']}"
+
+    # B) Repaired sign: computes p(z) directly
+    d_rep_4k = construct_authentic_production_density(n_grid=4001, inject_alternating_sign=False)
+    ev_rep_4k = d_rep_4k['evaluate_simpson_reflected_pair'](0.49, 100.0)
+    assert abs(ev_rep_4k['psi_pair'] - (-4740931.995)) < 1.0
+
+    # 2. Independent direct evaluation of production transform
+    # Direct evaluation: Psi_b(z) = p(z) A_h(z)^2 E_b(z) E_b(-z)
+    stations = d_rep_4k['stations']
+    r_poly = d_rep_4k['r_poly']
+
+    z0 = complex(0.49, 100.0)
+    dir_psi_z0 = evaluate_direct_production_transform(z0, stations, r_poly, h=0.05)
+    # Review benchmark: Psi_b(0.49 + 100i) ~= 1.3916757008 + 0.3575635475i
+    assert abs(dir_psi_z0.real - 1.3916757008) < 1e-6, f"Real part mismatch: {dir_psi_z0.real}"
+    assert abs(dir_psi_z0.imag - 0.3575635475) < 1e-6, f"Imag part mismatch: {dir_psi_z0.imag}"
+
+    # Symmetry partners and imaginary cancellation across reflected pair
+    dir_psi_neg_z0 = evaluate_direct_production_transform(complex(-0.49, 100.0), stations, r_poly, h=0.05)
+    pair_sum = dir_psi_z0 + dir_psi_neg_z0
+    assert abs(pair_sum.imag) < 1e-13, f"Imaginary parts must cancel identically: {pair_sum.imag}"
+    assert abs(pair_sum.real - 2.7833514016) < 1e-6, f"Reflected pair mismatch: {pair_sum.real}"
+
+    # Critical zero values:
+    dir_psi_0 = evaluate_direct_production_transform(0.0, stations, r_poly, h=0.05)
+    assert abs(dir_psi_0.real) < 1e-6, f"Psi_b(0) near zero: {dir_psi_0.real}"
+    assert abs(dir_psi_0.imag) < 1e-14
+
+    # 3. Proved analytic Young-inequality norm bounds strictly enclose empirical values
+    bounds = compute_analytic_density_norm_bounds(stations, r_poly, h=0.05)
+    assert bounds['bound_fb_0'] >= abs(d_rep_4k['fb_0']), f"Enclosure failure: {bounds['bound_fb_0']} < {abs(d_rep_4k['fb_0'])}"
+    assert bounds['bound_l1_fb'] >= d_rep_4k['l1_fb'], f"Enclosure failure: {bounds['bound_l1_fb']} < {d_rep_4k['l1_fb']}"
+    assert bounds['bound_l1_fb_prime'] >= d_rep_4k['l1_fb_prime'], f"Enclosure failure: {bounds['bound_l1_fb_prime']} < {d_rep_4k['l1_fb_prime']}"
+    assert bounds['bound_l1_fb_double_prime'] >= d_rep_4k['l1_fb_double_prime'], f"Enclosure failure: {bounds['bound_l1_fb_double_prime']} < {d_rep_4k['l1_fb_double_prime']}"
+
+    # 4. Secondary legal direction verification (detect hardcoding)
+    b_sec = np.array([1.0 / math.sqrt(6.0), 1.0 / math.sqrt(6.0), -2.0 / math.sqrt(6.0)])
+    assert abs(np.sum(b_sec)) < 1e-12
+    d_sec = construct_authentic_production_density(n_grid=4001, b_vec=b_sec, inject_alternating_sign=False)
+    dir_sec = evaluate_direct_production_transform(z0, d_sec['stations'], r_poly, h=0.05)
+    assert math.isfinite(dir_sec.real) and math.isfinite(dir_sec.imag)
+    assert dir_sec != dir_psi_z0, "Secondary direction must evaluate distinctly from baseline"
+
+    # 5. Audit report completeness and strip-uniform tail bound
+    rep = audit_regularized_curvature_transfer()
+    assert 'reproduced_diagnostics' in rep
+    assert 'strip_uniform_tail_bound' in rep
+    assert 'numerical_error_analysis' in rep
+    tail_bound = rep['strip_uniform_tail_bound']['strip_uniform_transfer_tail_bound']
+    assert tail_bound > 0.0 and math.isfinite(tail_bound)
+
 
