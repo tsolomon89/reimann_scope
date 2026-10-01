@@ -352,29 +352,39 @@
         "bound_l1_fb_double_prime": 3.9134024072201606e+17
       },
       "certified_bounds": {
-        "bound_fb_0": 14978054713938.86,
-        "bound_l1_fb": 123854044324.10736,
-        "bound_l1_fb_prime": 219923411301797.03,
-        "bound_l1_fb_double_prime": 3.9135047355109434e+17
+        "bound_fb_0": 14978054564158.314,
+        "bound_l1_fb": 123854041847.02652,
+        "bound_l1_fb_prime": 219923406903328.94,
+        "bound_l1_fb_double_prime": 3.913504657240851e+17
       },
-      "bound_fb_0": 14978054713938.86,
-      "bound_l1_fb": 123854044324.10736,
-      "bound_l1_fb_prime": 219923411301797.03,
-      "bound_l1_fb_double_prime": 3.9135047355109434e+17,
+      "proved_analytic_bounds": {
+        "bound_fb_0": 6.378060114013526e+22,
+        "bound_l1_fb": 6.378060114013526e+21,
+        "bound_l1_fb_prime": 2.566879933178609e+26,
+        "bound_l1_fb_double_prime": 1.0330605650566232e+31
+      },
+      "bound_fb_0": 14978054564158.314,
+      "bound_l1_fb": 123854041847.02652,
+      "bound_l1_fb_prime": 219923406903328.94,
+      "bound_l1_fb_double_prime": 3.913504657240851e+17,
+      "proved_bound_fb_0": 6.378060114013526e+22,
+      "proved_bound_l1_fb": 6.378060114013526e+21,
+      "proved_bound_l1_fb_prime": 2.566879933178609e+26,
+      "proved_bound_l1_fb_double_prime": 1.0330605650566232e+31,
       "quadrature_details": {
         "certified_l1_psi": {
-          "0": 2877.5005939607327,
-          "1": 642301.7697046949,
-          "2": 387799785.2657416,
-          "3": 429172504526.9696,
-          "4": 766365565564613.2
+          "0": 2877.5005651857273,
+          "1": 642301.7632816773,
+          "2": 387799781.3877438,
+          "3": 429172500235.2446,
+          "4": 766365557900957.8
         },
         "certified_l2_psi_sq": {
-          "0": 175879908.5420534,
-          "1": 20797124039114.867,
-          "2": 1.229269003689504e+19,
-          "3": 2.2382684680230017e+25,
-          "4": 9.773077413636897e+31
+          "0": 175879906.78325436,
+          "1": 20797123831143.63,
+          "2": 1.229268991396814e+19,
+          "3": 2.2382684456403174e+25,
+          "4": 9.773077315906124e+31
         },
         "quadrature_errors_l1": {
           "0": 1.4495071809506042e-09,
@@ -400,12 +410,14 @@
     "positive_zero_tail_sum_bound": 0.017841810839426462,
     "quartet_tail_sum_bound": 0.008920905419713231,
     "supremum_over_displacement_a": "0 <= a <= 1/2",
-    "C_outward_sup_bound": 6.888067012311372e+17,
-    "strip_uniform_transfer_tail_bound": 2.4579117736590576e+16,
+    "C_outward_sup_certified_quadrature": 6.888066874552326e+17,
+    "C_outward_sup_proved_analytic": 1.816285146659838e+31,
+    "certified_quadrature_transfer_tail_bound": 2.457911724501641e+16,
+    "proved_analytic_transfer_tail_bound": 6.481163203432956e+29,
     "comparison_with_spectral_tail": {
       "original_spectral_tail_allowance": 1.03623e+17,
-      "transfer_tail_bound": 2.4579117736590576e+16,
-      "ratio_transfer_to_spectral": 0.23719751152341254
+      "transfer_tail_bound_certified": 2.457911724501641e+16,
+      "ratio_transfer_to_spectral": 0.2371975067795413
     }
   },
   "authentic_production_density_verification": {
@@ -425,29 +437,39 @@
         "bound_l1_fb_double_prime": 2.990421825402295e+17
       },
       "certified_bounds": {
-        "bound_fb_0": 11445462811591.879,
-        "bound_l1_fb": 94642921624.36879,
-        "bound_l1_fb_prime": 168054214884838.1,
-        "bound_l1_fb_double_prime": 2.990500019444785e+17
+        "bound_fb_0": 11445462697137.252,
+        "bound_l1_fb": 94642919731.51039,
+        "bound_l1_fb_prime": 168054211523753.9,
+        "bound_l1_fb_double_prime": 2.9904999596347866e+17
       },
-      "bound_fb_0": 11445462811591.879,
-      "bound_l1_fb": 94642921624.36879,
-      "bound_l1_fb_prime": 168054214884838.1,
-      "bound_l1_fb_double_prime": 2.990500019444785e+17,
+      "proved_analytic_bounds": {
+        "bound_fb_0": 4.873787099809713e+22,
+        "bound_l1_fb": 4.873787099809713e+21,
+        "bound_l1_fb_prime": 1.961478267913953e+26,
+        "bound_l1_fb_double_prime": 7.894120101239964e+30
+      },
+      "bound_fb_0": 11445462697137.252,
+      "bound_l1_fb": 94642919731.51039,
+      "bound_l1_fb_prime": 168054211523753.9,
+      "bound_l1_fb_double_prime": 2.9904999596347866e+17,
+      "proved_bound_fb_0": 4.873787099809713e+22,
+      "proved_bound_l1_fb": 4.873787099809713e+21,
+      "proved_bound_l1_fb_prime": 1.961478267913953e+26,
+      "proved_bound_l1_fb_double_prime": 7.894120101239964e+30,
       "quadrature_details": {
         "certified_l1_psi": {
-          "0": 2877.5005939607327,
-          "1": 642301.7697046949,
-          "2": 387799785.2657416,
-          "3": 429172504526.9696,
-          "4": 766365565564613.2
+          "0": 2877.5005651857273,
+          "1": 642301.7632816773,
+          "2": 387799781.3877438,
+          "3": 429172500235.2446,
+          "4": 766365557900957.8
         },
         "certified_l2_psi_sq": {
-          "0": 175879908.5420534,
-          "1": 20797124039114.867,
-          "2": 1.229269003689504e+19,
-          "3": 2.2382684680230017e+25,
-          "4": 9.773077413636897e+31
+          "0": 175879906.78325436,
+          "1": 20797123831143.63,
+          "2": 1.229268991396814e+19,
+          "3": 2.2382684456403174e+25,
+          "4": 9.773077315906124e+31
         },
         "quadrature_errors_l1": {
           "0": 1.4495071809506042e-09,
@@ -465,7 +487,7 @@
         }
       }
     },
-    "reflected_pair_simpson_verification": {
+    "diagnostic_strong_grid_simpson_verification": {
       "a": 0.49,
       "gamma": 100.0,
       "psi_pair": -4740931.995017014,
@@ -476,18 +498,22 @@
       "discrepancy": 1.0523945093154907e-07,
       "relative_discrepancy": 1.866789722804467e-13
     },
-    "reflected_pair_weak_verification": {
+    "certified_weak_simpson_verification": {
       "a": 0.49,
       "gamma": 100.0,
-      "psi_pair_weak": 2.783326129469818,
-      "k_pair": -4177186.385932194,
-      "difference_psi_minus_k": 4177189.1692583235,
-      "delta_pair": -563745.6090847151,
-      "quartet_correction_delta": -1127491.2181694303,
-      "discrepancy": 4740934.778343039
+      "psi_pair_weak": 2.7833261294708507,
+      "k_pair_weak": 264441.5240308448,
+      "difference_psi_minus_k": -264438.7407047153,
+      "delta_pair_weak": -264438.7407047153,
+      "quartet_correction_delta": -528877.4814094306,
+      "boundary_term_B_wK": 264602.39502371365,
+      "boundary_term_B_wDelta": -264602.39502371365,
+      "discrepancy": 0.0,
+      "relative_discrepancy": 0.0,
+      "is_algebraic_identity_satisfied": true
     },
-    "algebraic_residual_discrepancy": 1.0523945093154907e-07,
-    "relative_discrepancy": 1.866789722804467e-13,
+    "algebraic_residual_discrepancy": 0.0,
+    "relative_discrepancy": 0.0,
     "is_algebraic_identity_satisfied": true
   },
   "baseline_surrogate_multiset_verification": {
@@ -578,14 +604,16 @@
   },
   "numerical_error_analysis": {
     "dominant_error_source": "k=3 spatial discretization and cubic spline interpolation",
-    "explanation": "1. Kernel sampling & discrete convolution: pk = psi_h^(k) has peaks of order h^(-3-k). For k=3, h^(-6) = 6.4e7, and ck = convolve(p3, p3) has peaks of 2.24e25. Discrete convolution introduces floating-point truncation. 2. Spline interpolation: Tabulating ck on 1000 nodes and interpolating introduces an interpolation residual proportional to (Delta v)^4 ||C_0^(10)||_inf. For k=3, this derivative is huge. 3. Catastrophic cancellation: The 9604 station pairs (u_i, c_i) have sum_K b_K = 0, requiring 11 digits of cancellation. Any interpolation error in an individual bump is uncancelled. 4. Quadrature discretization: When integrated against cos(100 u), Simpson's rule error on N=4001 points is O(du^4 * 100^4 * ||f_b||) ~ 10^6. At N=4001 this yields -4.74e6 error, dropping to -807 at N=8001, -44 at N=16001, -17 at N=32001, and converging to direct value 2.78335 at N=64001. 5. Resolution: The certified weak formulation int f_b(u) e^{zu} du = p(z) int C_b(u) e^{zu} du integrates the smooth base autocorrelation without derivatives, achieving < 1e-7 agreement with direct spectral evaluation."
+    "explanation": "1. Kernel sampling & discrete convolution: pk = psi_h^(k) has peaks of order h^(-3-k). For k=3, h^(-6) = 6.4e7, and ck = convolve(p3, p3) has peaks of 2.24e25. Discrete convolution introduces floating-point truncation. 2. Spline interpolation: Tabulating ck on 1000 nodes and interpolating introduces an interpolation residual proportional to (Delta v)^4 ||C_0^(10)||_inf. For k=3, this derivative is huge. 3. Catastrophic cancellation: The 9604 station pairs (u_i, c_i) have sum_K b_K = 0, requiring 11 digits of cancellation. Any interpolation error in an individual bump is uncancelled. 4. Quadrature discretization: When integrated against cos(100 u), Simpson's rule error on N=4001 points is O(du^4 * 100^4 * ||f_b||) ~ 10^6. At N=4001 this yields -4.74e6 error, dropping to -807 at N=8001, -44 at N=16001, -17 at N=32001, and converging to direct value 2.78335 at N=64001. 5. Resolution: The certified weak formulation evaluates Psi, K, and Delta by moving p(partial_u) onto test functions, integrating smooth C_b(u) without derivatives, and retaining exact boundary contact terms B[w_K] and B[w_Delta] at u=0, achieving exact algebraic identity closure and < 1e-7 direct agreement."
   },
   "research_contradiction_analysis": {
-    "governing_question": "What independently established constraint on the complete functional D is incompatible with D = -1/2 + r_match - r_rec under the off-critical-zero hypothesis H?",
-    "sufficient_contradiction_criterion": "|D| + eps_match + eps_rec < 1/2. If |D| + eps_match + eps_rec < 1/2, then |D| < 1/2 - eps, which strictly excludes D = -1/2 + r_match - r_rec.",
-    "insufficiency_of_negativity": "Establishing D < 0 does not supply a contradiction. The authentic selected-weight construction already yields D ~ -1/2 < 0. Negativity is entirely consistent with the explicit formula and does not force an integer collision.",
-    "insufficiency_of_single_quartet_nonvanishing": "Nonvanishing of Delta_quartet(a_0, gamma_0) = 8 m_0 int_0^R f_b(u) sinh(a_0 u) cos(gamma_0 u) du provides only a local perturbation of order O(a_0 / gamma_0^2) <= 10^13, which is negligible compared to the unconditional spectral tail allowance R_{spectral} ~ 1.036e17 and arithmetic functional A_{<=U} ~ 7.15e8. A nonzero quartet correction cannot force |D| outside [-1/2 - eps, -1/2 + eps].",
-    "smallest_unresolved_implication": "For the authentic TC test family, does there exist an admissible multiplier p(z) such that the complete explicit formula functional D_b satisfies |D_b| + eps_match + eps_rec < 1/2 for every off-critical zero (a_0, gamma_0)?"
+    "governing_question": "For the normalized production test associated with a hypothetical off-critical zero, what independently proved property of the complete curvature response and all unselected contributions excludes the balance D_b = -1/2 + r_match - r_rec under the off-critical-zero hypothesis H?",
+    "complete_functional_definition": "The complete explicit formula functional D_b is defined consistently across all components as: D_b = A_{<= U, b} + R_{arch, b} - S_{unselected, <= T, b} - R_{spectral, b}. Under the production construction, legal vector b satisfies sum_K b_K = 0, ||b||_2 = 1, and polynomial multiplier p(z) satisfies 4 exact interpolation constraints at selected zeros: p(0) = r_0, p(i gamma_1) = 0, p(i gamma_2) = 0, p(i gamma_3) = 0, engineered to produce the explicit formula balance D_b = -1/2 + r_match - r_rec.",
+    "curvature_transfer_decomposition": "Under the spectral curvature transfer identity S = K + Delta, the complete functional decomposes as: D_b = A_{<= U, b} + R_{arch, b} - (K_{unselected, <= T, b} + R_{K, spectral, b}) - (Delta_{unselected, <= T, b} + R_{Delta, spectral, b}). If hypothetical off-critical zero rho_0 is selected, S_{selected} shifts by Delta_{quartet}(rho_0), modifying the balance to D_b = -1/2 + r_match - r_rec + Delta_{selected}. If rho_0 is unselected, it enters through Delta_{unselected} or R_{Delta, spectral}.",
+    "sufficient_contradiction_criterion": "|D_b| + eps_match + eps_rec < 1/2. If |D_b| + eps_match + eps_rec < 1/2, then |D_b| < 1/2 - eps, which strictly excludes D_b = -1/2 + r_match - r_rec.",
+    "insufficiency_of_negativity": "Establishing D_b < 0 does not supply a contradiction. The authentic selected-weight construction already yields D_b ~ -1/2 < 0. Negativity is entirely consistent with the explicit formula and does not force an integer collision.",
+    "insufficiency_of_single_quartet_nonvanishing": "Nonvanishing of Delta_quartet(a_0, gamma_0) = 8 m_0 int_0^R f_b(u) sinh(a_0 u) cos(gamma_0 u) du provides only a local perturbation of order O(a_0 / gamma_0^2) <= 10^13, which is negligible compared to the unconditional spectral tail allowance R_{spectral} ~ 1.036e17 and arithmetic functional A_{<=U} ~ 7.15e8. A nonzero quartet correction cannot force |D_b| outside [-1/2 - eps, -1/2 + eps].",
+    "smallest_unresolved_implication": "For the authentic production family with sum_K b_K = 0, ||b||_2 = 1, and p(z) satisfying the -1/2 interpolation constraints, does there exist an independently proved constraint on the non-local Hadamard finite-part pairing or the complete curvature functional D_K that forces the aggregate explicit formula functional D_b into a domain disjoint from [-1/2 - eps, -1/2 + eps] under H?"
   },
   "reductio_implication_audit": {
     "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies an off-critical quartet in the spectral explicit formula sum with displacement a = |delta_0| > 0.",

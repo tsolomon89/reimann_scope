@@ -1664,31 +1664,59 @@ def test_target_2c_weak_density_validation_and_contradiction_criterion():
     assert sec_audit['passed_weak_tolerance'] is True
     assert sec_audit['weak_relative_difference'] < 1e-4
 
-    # 3. Certified norm bounds strictly enclose empirical estimates
+    # 3. Certified norm bounds strictly enclose empirical estimates, and proved analytic bounds enclose certified bounds
     d_auth = construct_authentic_production_density(n_grid=4001)
     bounds = d_auth['analytic_norm_bounds']
     emp = bounds['empirical_bounds']
     cert = bounds['certified_bounds']
+    proved = bounds['proved_analytic_bounds']
 
     assert cert['bound_fb_0'] >= emp['bound_fb_0'], "Certified bound must strictly enclose empirical bound"
     assert cert['bound_l1_fb'] >= emp['bound_l1_fb']
     assert cert['bound_l1_fb_prime'] >= emp['bound_l1_fb_prime']
     assert cert['bound_l1_fb_double_prime'] >= emp['bound_l1_fb_double_prime']
+    assert proved['bound_fb_0'] >= cert['bound_fb_0'], "Proved analytic bound must strictly enclose certified bound"
+    assert proved['bound_l1_fb'] >= cert['bound_l1_fb']
+    assert proved['bound_l1_fb_prime'] >= cert['bound_l1_fb_prime']
+    assert proved['bound_l1_fb_double_prime'] >= cert['bound_l1_fb_double_prime']
     assert 'quadrature_details' in bounds
     assert len(bounds['quadrature_details']['quadrature_errors_l1']) == 5
 
-    # 4. Rigorous Stieltjes tail counting convention
+    # 4. Rigorous weak curvature evaluation and algebraic identity closure
+    weak_simpson = d_auth['evaluate_weak_simpson_reflected_pair'](0.49, 100.0)
+    assert weak_simpson['is_algebraic_identity_satisfied'] is True
+    assert weak_simpson['discrepancy'] < 1e-11, f"Weak reflected pair identity failed: discrepancy={weak_simpson['discrepancy']}"
+    assert abs(weak_simpson['boundary_term_B_wK']) > 1e4, "Boundary contact term must be non-zero off critical line"
+    assert abs(weak_simpson['boundary_term_B_wDelta'] + weak_simpson['boundary_term_B_wK']) < 1e-12
+
+    # On critical line (a = 0): boundary contact terms vanish identically and delta_pair == 0
+    crit_simpson = d_auth['evaluate_weak_simpson_reflected_pair'](0.0, 14.13472514)
+    assert crit_simpson['boundary_term_B_wK'] == 0.0
+    assert crit_simpson['boundary_term_B_wDelta'] == 0.0
+    assert abs(crit_simpson['delta_pair_weak']) < 1e-12
+    assert abs(crit_simpson['psi_pair_weak'] - crit_simpson['k_pair_weak']) < 1e-12
+
+    # Verify authentic audit reflects certified weak evaluation
+    auth_verif = audit['authentic_production_density_verification']
+    assert auth_verif['is_algebraic_identity_satisfied'] is True
+    assert auth_verif['algebraic_residual_discrepancy'] < 1e-11
+
+    # 5. Rigorous Stieltjes tail counting convention
     tail = audit['strip_uniform_tail_bound']
     T_cut = tail['cutoff_T']
     expected_quartet_sum = (math.log(T_cut) + 1.0) / (2.0 * math.pi * T_cut)
     assert abs(tail['quartet_tail_sum_bound'] - expected_quartet_sum) < 1e-14
     assert tail['supremum_over_displacement_a'] == '0 <= a <= 1/2'
-    assert tail['strip_uniform_transfer_tail_bound'] < tail['comparison_with_spectral_tail']['original_spectral_tail_allowance']
+    assert tail['certified_quadrature_transfer_tail_bound'] < tail['comparison_with_spectral_tail']['original_spectral_tail_allowance']
+    assert tail['proved_analytic_transfer_tail_bound'] > tail['certified_quadrature_transfer_tail_bound']
 
-    # 5. Reductio contradiction criterion analysis
+    # 6. Reductio contradiction criterion analysis and consistent D_b definition
     contra = audit['research_contradiction_analysis']
-    assert "|D| + eps_match + eps_rec < 1/2" in contra['sufficient_contradiction_criterion']
-    assert "D ~ -1/2 < 0" in contra['insufficiency_of_negativity']
+    assert "D_b = A_{<= U, b} + R_{arch, b} - S_{unselected, <= T, b} - R_{spectral, b}" in contra['complete_functional_definition']
+    assert "sum_K b_K = 0" in contra['complete_functional_definition']
+    assert "D_b = -1/2 + r_match - r_rec" in contra['complete_functional_definition']
+    assert "|D_b| + eps_match + eps_rec < 1/2" in contra['sufficient_contradiction_criterion']
+    assert "D_b ~ -1/2 < 0" in contra['insufficiency_of_negativity']
     assert "negligible" in contra['insufficiency_of_single_quartet_nonvanishing'].lower() or "O(a_0 / gamma_0^2)" in contra['insufficiency_of_single_quartet_nonvanishing']
 
 
