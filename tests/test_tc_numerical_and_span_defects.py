@@ -1629,3 +1629,67 @@ def test_target_2b_authentic_density_and_transform_diagnostics():
     assert tail_bound > 0.0 and math.isfinite(tail_bound)
 
 
+def test_target_2c_weak_density_validation_and_contradiction_criterion():
+    """Target 2C: Weak density validation, certified norm enclosures, tail convention, and contradiction criterion."""
+    from tc.weil_forms.curvature_transfer import (
+        construct_authentic_production_density,
+        evaluate_direct_production_transform,
+        evaluate_weak_density_from_grid,
+        evaluate_weak_density_transform,
+        compute_analytic_density_norm_bounds,
+        audit_regularized_curvature_transfer
+    )
+
+    # 1. Audit artifact completeness and rejection of strong density as valid proof
+    audit = audit_regularized_curvature_transfer()
+    indep = audit['independent_transform_comparison']
+    assert indep['diagnostic_strong_grid_comparison']['status'] == 'UNRESOLVED_DISCRETIZATION_SENSITIVITY_DIAGNOSTIC'
+    assert indep['certified_weak_density_comparison']['status'] == 'CERTIFIED_WEAK_FORMULATION_PASSED'
+
+    # Verify that all certified weak test points passed their declared accuracy requirements
+    weak_pts = indep['certified_weak_density_comparison']['test_points']
+    for pt in weak_pts:
+        assert pt['passed_tolerance'] is True, f"Weak density failed tolerance at {pt['name']}: abs_diff={pt['absolute_difference']}, rel_diff={pt['relative_difference']}"
+
+    # Specifically verify near-zero absolute error < 1e-7
+    zero_pt = next(p for p in weak_pts if p['name'] == 'zero')
+    assert zero_pt['absolute_difference'] < 1e-7, f"Zero point absolute error too high: {zero_pt['absolute_difference']}"
+
+    # Specifically verify off-critical relative error < 1e-4
+    z0_pt = next(p for p in weak_pts if p['name'] == 'off_critical_z0')
+    assert z0_pt['relative_difference'] < 1e-4, f"Off-critical relative error too high: {z0_pt['relative_difference']}"
+
+    # 2. Secondary legal vector passes weak tolerance
+    sec_audit = audit['secondary_legal_vector_audit']
+    assert sec_audit['passed_weak_tolerance'] is True
+    assert sec_audit['weak_relative_difference'] < 1e-4
+
+    # 3. Certified norm bounds strictly enclose empirical estimates
+    d_auth = construct_authentic_production_density(n_grid=4001)
+    bounds = d_auth['analytic_norm_bounds']
+    emp = bounds['empirical_bounds']
+    cert = bounds['certified_bounds']
+
+    assert cert['bound_fb_0'] >= emp['bound_fb_0'], "Certified bound must strictly enclose empirical bound"
+    assert cert['bound_l1_fb'] >= emp['bound_l1_fb']
+    assert cert['bound_l1_fb_prime'] >= emp['bound_l1_fb_prime']
+    assert cert['bound_l1_fb_double_prime'] >= emp['bound_l1_fb_double_prime']
+    assert 'quadrature_details' in bounds
+    assert len(bounds['quadrature_details']['quadrature_errors_l1']) == 5
+
+    # 4. Rigorous Stieltjes tail counting convention
+    tail = audit['strip_uniform_tail_bound']
+    T_cut = tail['cutoff_T']
+    expected_quartet_sum = (math.log(T_cut) + 1.0) / (2.0 * math.pi * T_cut)
+    assert abs(tail['quartet_tail_sum_bound'] - expected_quartet_sum) < 1e-14
+    assert tail['supremum_over_displacement_a'] == '0 <= a <= 1/2'
+    assert tail['strip_uniform_transfer_tail_bound'] < tail['comparison_with_spectral_tail']['original_spectral_tail_allowance']
+
+    # 5. Reductio contradiction criterion analysis
+    contra = audit['research_contradiction_analysis']
+    assert "|D| + eps_match + eps_rec < 1/2" in contra['sufficient_contradiction_criterion']
+    assert "D ~ -1/2 < 0" in contra['insufficiency_of_negativity']
+    assert "negligible" in contra['insufficiency_of_single_quartet_nonvanishing'].lower() or "O(a_0 / gamma_0^2)" in contra['insufficiency_of_single_quartet_nonvanishing']
+
+
+

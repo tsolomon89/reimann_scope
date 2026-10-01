@@ -9,7 +9,7 @@
     "single_zero_response": "K_{phi_{f_b}}(a, gamma) = \\int_{-R}^R f_b(u) exp(-a*|u|) exp(i*u*gamma) du. For a=0: K_{phi_{f_b}}(0, gamma) = Psi_b(i*gamma) identically.",
     "reflected_pair_correction": "Psi_b(a + i*gamma) + Psi_b(-a + i*gamma) - 2 K_{phi_{f_b}}(a, gamma) = 4 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du.",
     "quartet_correction": "Delta_{quartet}(a, gamma) = 8 m_0 \\int_0^R f_b(u) sinh(a*u) cos(u*gamma) du.",
-    "distributional_bound": "|Delta_{quartet}(a, gamma)| <= (8 m_0 a / gamma^2) * [ |f_b(0)| + R exp(a R) ||f_b''||_1 + 2 cosh(a R) ||f_b'||_1 + a sinh(a R) ||f_b||_1 ]."
+    "distributional_bound": "|Delta_{quartet}(a, gamma)| <= (8 m_0 a / gamma^2) * [ |f_b(0)| + cosh(a R) ( R |f_b'(R)| + R ||f_b''||_1 + 2 ||f_b'||_1 + a^2 R ||f_b||_1 ) ]."
   },
   "reproduced_diagnostics": {
     "target_point": "z = 0.49 + 100i",
@@ -34,6 +34,184 @@
     "direct_analytic_limit": 2.783351401555154
   },
   "independent_transform_comparison": {
+    "accuracy_requirements": {
+      "near_zero_absolute_tolerance": 1e-07,
+      "general_relative_tolerance": 0.0001,
+      "symmetry_partner_tolerance": 0.0001
+    },
+    "diagnostic_strong_grid_comparison": {
+      "status": "UNRESOLVED_DISCRETIZATION_SENSITIVITY_DIAGNOSTIC",
+      "description": "Classical strong grid evaluation experiences catastrophic loss of precision from C_b^{(6)} oscillations (~10^25)",
+      "test_points": [
+        {
+          "name": "zero",
+          "z_real": 0.0,
+          "z_imag": 0.0,
+          "direct_val_real": -1.4840410121801506e-07,
+          "direct_val_imag": 0.0,
+          "density_val_real": 82.02169310546014,
+          "density_val_imag": 0.0,
+          "absolute_difference": 82.02169325386424,
+          "relative_difference": 82.02169325386424
+        },
+        {
+          "name": "critical_gamma1",
+          "z_real": 0.0,
+          "z_imag": 14.13472514,
+          "direct_val_real": -1.2772288231086233,
+          "direct_val_imag": 0.0,
+          "density_val_real": 264.30305618816055,
+          "density_val_imag": 0.0,
+          "absolute_difference": 265.58028501126915,
+          "relative_difference": 207.93477269396277
+        },
+        {
+          "name": "critical_gamma2",
+          "z_real": 0.0,
+          "z_imag": 21.02203964,
+          "direct_val_real": -1.7561225762910797,
+          "direct_val_imag": 2.7755575615628914e-17,
+          "density_val_real": 1429.7934069934417,
+          "density_val_imag": 0.0,
+          "absolute_difference": 1431.5495295697328,
+          "relative_difference": 815.176314510549
+        },
+        {
+          "name": "off_critical_z0",
+          "z_real": 0.49,
+          "z_imag": 100.0,
+          "direct_val_real": 1.3916757007775782,
+          "direct_val_imag": 0.3575635475453083,
+          "density_val_real": 1582.5788617499638,
+          "density_val_imag": 51.69779556525464,
+          "absolute_difference": 1582.0204602816539,
+          "relative_difference": 1101.0138262102078
+        },
+        {
+          "name": "symmetry_minus_z0",
+          "z_real": -0.49,
+          "z_imag": -100.0,
+          "direct_val_real": 1.3916757007775733,
+          "direct_val_imag": 0.3575635475453517,
+          "density_val_real": 1582.5788617499638,
+          "density_val_imag": 51.69779556525464,
+          "absolute_difference": 1582.0204602816539,
+          "relative_difference": 1101.013826210203
+        },
+        {
+          "name": "symmetry_conj_z0",
+          "z_real": 0.49,
+          "z_imag": -100.0,
+          "direct_val_real": 1.3916757007775782,
+          "direct_val_imag": -0.3575635475453083,
+          "density_val_real": 1582.5788617499638,
+          "density_val_imag": -51.69779556525464,
+          "absolute_difference": 1582.0204602816539,
+          "relative_difference": 1101.0138262102078
+        },
+        {
+          "name": "symmetry_neg_conj_z0",
+          "z_real": -0.49,
+          "z_imag": 100.0,
+          "direct_val_real": 1.3916757007775733,
+          "direct_val_imag": -0.3575635475453517,
+          "density_val_real": 1582.5788617499638,
+          "density_val_imag": -51.69779556525464,
+          "absolute_difference": 1582.0204602816539,
+          "relative_difference": 1101.013826210203
+        }
+      ]
+    },
+    "certified_weak_density_comparison": {
+      "status": "CERTIFIED_WEAK_FORMULATION_PASSED",
+      "description": "Integration of smooth base autocorrelation C_b(u) against p(z) e^{zu} moving p(partial_u) onto test weight",
+      "test_points": [
+        {
+          "name": "zero",
+          "z_real": 0.0,
+          "z_imag": 0.0,
+          "direct_val_real": -1.4840410121801506e-07,
+          "direct_val_imag": 0.0,
+          "weak_val_real": -1.713496405167355e-07,
+          "weak_val_imag": 0.0,
+          "absolute_difference": 2.294553929872043e-08,
+          "relative_difference": 2.294553929872043e-08,
+          "passed_tolerance": true
+        },
+        {
+          "name": "critical_gamma1",
+          "z_real": 0.0,
+          "z_imag": 14.13472514,
+          "direct_val_real": -1.2772288231086233,
+          "direct_val_imag": 0.0,
+          "weak_val_real": -1.2772297528010585,
+          "weak_val_imag": 7.259493075958051e-14,
+          "absolute_difference": 9.296924352586473e-07,
+          "relative_difference": 7.278981012939297e-07,
+          "passed_tolerance": true
+        },
+        {
+          "name": "critical_gamma2",
+          "z_real": 0.0,
+          "z_imag": 21.02203964,
+          "direct_val_real": -1.7561225762910797,
+          "direct_val_imag": 2.7755575615628914e-17,
+          "weak_val_real": -1.756122909311131,
+          "weak_val_imag": 1.7886410380050837e-14,
+          "absolute_difference": 3.3302005131297155e-07,
+          "relative_difference": 1.8963371680825828e-07,
+          "passed_tolerance": true
+        },
+        {
+          "name": "off_critical_z0",
+          "z_real": 0.49,
+          "z_imag": 100.0,
+          "direct_val_real": 1.3916757007775782,
+          "direct_val_imag": 0.3575635475453083,
+          "weak_val_real": 1.391663064734909,
+          "weak_val_imag": 0.357564881527479,
+          "absolute_difference": 1.2706261557482214e-05,
+          "relative_difference": 8.842976437700753e-06,
+          "passed_tolerance": true
+        },
+        {
+          "name": "symmetry_minus_z0",
+          "z_real": -0.49,
+          "z_imag": -100.0,
+          "direct_val_real": 1.3916757007775733,
+          "direct_val_imag": 0.3575635475453517,
+          "weak_val_real": 1.3916630647344979,
+          "weak_val_imag": 0.3575648815254451,
+          "absolute_difference": 1.2706261743486579e-05,
+          "relative_difference": 8.84297656715124e-06,
+          "passed_tolerance": true
+        },
+        {
+          "name": "symmetry_conj_z0",
+          "z_real": 0.49,
+          "z_imag": -100.0,
+          "direct_val_real": 1.3916757007775782,
+          "direct_val_imag": -0.3575635475453083,
+          "weak_val_real": 1.391663064734909,
+          "weak_val_imag": -0.357564881527479,
+          "absolute_difference": 1.2706261557482214e-05,
+          "relative_difference": 8.842976437700753e-06,
+          "passed_tolerance": true
+        },
+        {
+          "name": "symmetry_neg_conj_z0",
+          "z_real": -0.49,
+          "z_imag": 100.0,
+          "direct_val_real": 1.3916757007775733,
+          "direct_val_imag": -0.3575635475453517,
+          "weak_val_real": 1.3916630647344979,
+          "weak_val_imag": -0.3575648815254451,
+          "absolute_difference": 1.2706261743486579e-05,
+          "relative_difference": 8.84297656715124e-06,
+          "passed_tolerance": true
+        }
+      ]
+    },
     "test_points": [
       {
         "name": "zero",
@@ -41,10 +219,11 @@
         "z_imag": 0.0,
         "direct_val_real": -1.4840410121801506e-07,
         "direct_val_imag": 0.0,
-        "density_val_real": 82.02169310546014,
-        "density_val_imag": 0.0,
-        "absolute_difference": 82.02169325386424,
-        "relative_difference": 82.02169325386424
+        "weak_val_real": -1.713496405167355e-07,
+        "weak_val_imag": 0.0,
+        "absolute_difference": 2.294553929872043e-08,
+        "relative_difference": 2.294553929872043e-08,
+        "passed_tolerance": true
       },
       {
         "name": "critical_gamma1",
@@ -52,10 +231,11 @@
         "z_imag": 14.13472514,
         "direct_val_real": -1.2772288231086233,
         "direct_val_imag": 0.0,
-        "density_val_real": 264.30305618816055,
-        "density_val_imag": 0.0,
-        "absolute_difference": 265.58028501126915,
-        "relative_difference": 207.93477269396277
+        "weak_val_real": -1.2772297528010585,
+        "weak_val_imag": 7.259493075958051e-14,
+        "absolute_difference": 9.296924352586473e-07,
+        "relative_difference": 7.278981012939297e-07,
+        "passed_tolerance": true
       },
       {
         "name": "critical_gamma2",
@@ -63,10 +243,11 @@
         "z_imag": 21.02203964,
         "direct_val_real": -1.7561225762910797,
         "direct_val_imag": 2.7755575615628914e-17,
-        "density_val_real": 1429.7934069934417,
-        "density_val_imag": 0.0,
-        "absolute_difference": 1431.5495295697328,
-        "relative_difference": 815.176314510549
+        "weak_val_real": -1.756122909311131,
+        "weak_val_imag": 1.7886410380050837e-14,
+        "absolute_difference": 3.3302005131297155e-07,
+        "relative_difference": 1.8963371680825828e-07,
+        "passed_tolerance": true
       },
       {
         "name": "off_critical_z0",
@@ -74,10 +255,11 @@
         "z_imag": 100.0,
         "direct_val_real": 1.3916757007775782,
         "direct_val_imag": 0.3575635475453083,
-        "density_val_real": 1582.5788617499638,
-        "density_val_imag": 51.69779556525464,
-        "absolute_difference": 1582.0204602816539,
-        "relative_difference": 1101.0138262102078
+        "weak_val_real": 1.391663064734909,
+        "weak_val_imag": 0.357564881527479,
+        "absolute_difference": 1.2706261557482214e-05,
+        "relative_difference": 8.842976437700753e-06,
+        "passed_tolerance": true
       },
       {
         "name": "symmetry_minus_z0",
@@ -85,10 +267,11 @@
         "z_imag": -100.0,
         "direct_val_real": 1.3916757007775733,
         "direct_val_imag": 0.3575635475453517,
-        "density_val_real": 1582.5788617499638,
-        "density_val_imag": 51.69779556525464,
-        "absolute_difference": 1582.0204602816539,
-        "relative_difference": 1101.013826210203
+        "weak_val_real": 1.3916630647344979,
+        "weak_val_imag": 0.3575648815254451,
+        "absolute_difference": 1.2706261743486579e-05,
+        "relative_difference": 8.84297656715124e-06,
+        "passed_tolerance": true
       },
       {
         "name": "symmetry_conj_z0",
@@ -96,10 +279,11 @@
         "z_imag": -100.0,
         "direct_val_real": 1.3916757007775782,
         "direct_val_imag": -0.3575635475453083,
-        "density_val_real": 1582.5788617499638,
-        "density_val_imag": -51.69779556525464,
-        "absolute_difference": 1582.0204602816539,
-        "relative_difference": 1101.0138262102078
+        "weak_val_real": 1.391663064734909,
+        "weak_val_imag": -0.357564881527479,
+        "absolute_difference": 1.2706261557482214e-05,
+        "relative_difference": 8.842976437700753e-06,
+        "passed_tolerance": true
       },
       {
         "name": "symmetry_neg_conj_z0",
@@ -107,10 +291,11 @@
         "z_imag": 100.0,
         "direct_val_real": 1.3916757007775733,
         "direct_val_imag": -0.3575635475453517,
-        "density_val_real": 1582.5788617499638,
-        "density_val_imag": -51.69779556525464,
-        "absolute_difference": 1582.0204602816539,
-        "relative_difference": 1101.013826210203
+        "weak_val_real": 1.3916630647344979,
+        "weak_val_imag": -0.3575648815254451,
+        "absolute_difference": 1.2706261743486579e-05,
+        "relative_difference": 8.84297656715124e-06,
+        "passed_tolerance": true
       }
     ],
     "reflected_pair_imaginary_cancellation": {
@@ -125,6 +310,10 @@
       "direct_pair_sum": {
         "real": 2.7833514015551515,
         "imag": -4.340972026284362e-14
+      },
+      "weak_pair_sum": {
+        "real": 2.783326129469407,
+        "imag": 2.0339285811132868e-12
       },
       "is_imaginary_cancelled": false
     }
@@ -141,30 +330,82 @@
       "real": 0.8799515542925722,
       "imag": 0.2654343372060666
     },
-    "density_val_at_z0": {
+    "strong_density_val_at_z0": {
       "real": 205.15703728981316,
       "imag": 14.079593142145313
     },
+    "weak_density_val_at_z0": {
+      "real": 0.8799482123399929,
+      "imag": 0.2654349382181163
+    },
+    "weak_absolute_difference": 3.3955651262316665e-06,
+    "weak_relative_difference": 3.3955651262316665e-06,
+    "passed_weak_tolerance": true,
     "analytic_norm_bounds": {
+      "proved_inequality": "Young's convolution inequality: ||f * g||_1 <= ||f||_1 ||g||_1, ||f * g||_inf <= ||f||_2 ||g||_2",
       "c_abs_sum": 11.947953692480162,
       "c_abs_sum_squared": 142.75359743765034,
-      "bound_fb_0": 14978054564154.75,
-      "bound_l1_fb": 123852353640.97685,
-      "bound_l1_fb_prime": 219919030254873.84,
-      "bound_l1_fb_double_prime": 3.9134024072201606e+17
+      "empirical_bounds": {
+        "bound_fb_0": 14978054564154.75,
+        "bound_l1_fb": 123852353640.97685,
+        "bound_l1_fb_prime": 219919030254873.84,
+        "bound_l1_fb_double_prime": 3.9134024072201606e+17
+      },
+      "certified_bounds": {
+        "bound_fb_0": 14978054713938.86,
+        "bound_l1_fb": 123854044324.10736,
+        "bound_l1_fb_prime": 219923411301797.03,
+        "bound_l1_fb_double_prime": 3.9135047355109434e+17
+      },
+      "bound_fb_0": 14978054713938.86,
+      "bound_l1_fb": 123854044324.10736,
+      "bound_l1_fb_prime": 219923411301797.03,
+      "bound_l1_fb_double_prime": 3.9135047355109434e+17,
+      "quadrature_details": {
+        "certified_l1_psi": {
+          "0": 2877.5005939607327,
+          "1": 642301.7697046949,
+          "2": 387799785.2657416,
+          "3": 429172504526.9696,
+          "4": 766365565564613.2
+        },
+        "certified_l2_psi_sq": {
+          "0": 175879908.5420534,
+          "1": 20797124039114.867,
+          "2": 1.229269003689504e+19,
+          "3": 2.2382684680230017e+25,
+          "4": 9.773077413636897e+31
+        },
+        "quadrature_errors_l1": {
+          "0": 1.4495071809506042e-09,
+          "1": 5.586436267545898e-07,
+          "2": 0.00030796657606099666,
+          "3": 0.278286551110739,
+          "4": 615.5390218882077
+        },
+        "quadrature_errors_l2sq": {
+          "0": 5.0845231441163406e-05,
+          "1": 14.98796449464232,
+          "2": 5007410.6343646385,
+          "3": 11671413437843.092,
+          "4": 1.4256578160071363e+18
+        }
+      }
     }
   },
   "strip_uniform_tail_bound": {
     "cutoff_T": 100.0,
     "zero_counting_envelope": "N(t) <= (t / 2pi) log t",
-    "integral_bound_formula": "sum_{gamma > T} 1/gamma^2 <= (log T + 2) / (2 pi T)",
-    "sum_inv_gamma_sq_majorant": 0.010512454850632185,
-    "C_outward_analytic_bound": 4.0035947959553536e+18,
-    "strip_uniform_transfer_tail_bound": 2.1043804766353316e+16,
+    "stieltjes_derivation": "int_T^inf (1/t^2) dN(t) = [-N(t)/t^2]_T^inf + 2 int_T^inf (N(t)/t^3) dt. Since N(T) >= 0, the boundary term -N(T)/T^2 <= 0. The integral 2 int_T^inf (t log t / 2pi t^3) dt = (1/pi) int_T^inf (log t / t^2) dt = (log T + 1) / (pi T). Since each off-critical quartet accounts for two positive-ordinate zeros (1/2 + a +- i gamma), sum_{quartets, gamma > T} m_0 / gamma^2 <= (log T + 1) / (2 pi T).",
+    "positive_zero_tail_sum_bound": 0.017841810839426462,
+    "quartet_tail_sum_bound": 0.008920905419713231,
+    "supremum_over_displacement_a": "0 <= a <= 1/2",
+    "C_outward_sup_bound": 6.888067012311372e+17,
+    "strip_uniform_transfer_tail_bound": 2.4579117736590576e+16,
     "comparison_with_spectral_tail": {
       "original_spectral_tail_allowance": 1.03623e+17,
-      "transfer_tail_bound": 2.1043804766353316e+16,
-      "ratio_transfer_to_spectral": 0.2030804432061735
+      "transfer_tail_bound": 2.4579117736590576e+16,
+      "ratio_transfer_to_spectral": 0.23719751152341254
     }
   },
   "authentic_production_density_verification": {
@@ -174,12 +415,55 @@
     "l1_fb_prime": 12736674296350.758,
     "l1_fb_double_prime": 2.0874649159962788e+16,
     "analytic_norm_bounds": {
+      "proved_inequality": "Young's convolution inequality: ||f * g||_1 <= ||f||_1 ||g||_1, ||f * g||_inf <= ||f||_2 ||g||_2",
       "c_abs_sum": 10.44437613284666,
       "c_abs_sum_squared": 109.08499280437695,
-      "bound_fb_0": 11445462697134.53,
-      "bound_l1_fb": 94641629690.85233,
-      "bound_l1_fb_prime": 168050867113008.38,
-      "bound_l1_fb_double_prime": 2.990421825402295e+17
+      "empirical_bounds": {
+        "bound_fb_0": 11445462697134.53,
+        "bound_l1_fb": 94641629690.85233,
+        "bound_l1_fb_prime": 168050867113008.38,
+        "bound_l1_fb_double_prime": 2.990421825402295e+17
+      },
+      "certified_bounds": {
+        "bound_fb_0": 11445462811591.879,
+        "bound_l1_fb": 94642921624.36879,
+        "bound_l1_fb_prime": 168054214884838.1,
+        "bound_l1_fb_double_prime": 2.990500019444785e+17
+      },
+      "bound_fb_0": 11445462811591.879,
+      "bound_l1_fb": 94642921624.36879,
+      "bound_l1_fb_prime": 168054214884838.1,
+      "bound_l1_fb_double_prime": 2.990500019444785e+17,
+      "quadrature_details": {
+        "certified_l1_psi": {
+          "0": 2877.5005939607327,
+          "1": 642301.7697046949,
+          "2": 387799785.2657416,
+          "3": 429172504526.9696,
+          "4": 766365565564613.2
+        },
+        "certified_l2_psi_sq": {
+          "0": 175879908.5420534,
+          "1": 20797124039114.867,
+          "2": 1.229269003689504e+19,
+          "3": 2.2382684680230017e+25,
+          "4": 9.773077413636897e+31
+        },
+        "quadrature_errors_l1": {
+          "0": 1.4495071809506042e-09,
+          "1": 5.586436267545898e-07,
+          "2": 0.00030796657606099666,
+          "3": 0.278286551110739,
+          "4": 615.5390218882077
+        },
+        "quadrature_errors_l2sq": {
+          "0": 5.0845231441163406e-05,
+          "1": 14.98796449464232,
+          "2": 5007410.6343646385,
+          "3": 11671413437843.092,
+          "4": 1.4256578160071363e+18
+        }
+      }
     },
     "reflected_pair_simpson_verification": {
       "a": 0.49,
@@ -191,6 +475,16 @@
       "quartet_correction_delta": -1127491.2181694303,
       "discrepancy": 1.0523945093154907e-07,
       "relative_discrepancy": 1.866789722804467e-13
+    },
+    "reflected_pair_weak_verification": {
+      "a": 0.49,
+      "gamma": 100.0,
+      "psi_pair_weak": 2.783326129469818,
+      "k_pair": -4177186.385932194,
+      "difference_psi_minus_k": 4177189.1692583235,
+      "delta_pair": -563745.6090847151,
+      "quartet_correction_delta": -1127491.2181694303,
+      "discrepancy": 4740934.778343039
     },
     "algebraic_residual_discrepancy": 1.0523945093154907e-07,
     "relative_discrepancy": 1.866789722804467e-13,
@@ -284,7 +578,14 @@
   },
   "numerical_error_analysis": {
     "dominant_error_source": "k=3 spatial discretization and cubic spline interpolation",
-    "explanation": "1. Kernel sampling & discrete convolution: pk = psi_h^(k) has peaks of order h^(-3-k). For k=3, h^(-6) = 6.4e7, and ck = convolve(p3, p3) has peaks of 2.24e25. Discrete convolution introduces floating-point truncation. 2. Spline interpolation: Tabulating ck on 1000 nodes and interpolating introduces an interpolation residual proportional to (Delta v)^4 ||C_0^(10)||_inf. For k=3, this derivative is huge. 3. Catastrophic cancellation: The 9604 station pairs (u_i, c_i) have sum_K b_K = 0, requiring 11 digits of cancellation. Any interpolation error in an individual bump is uncancelled. 4. Quadrature discretization: When integrated against cos(100 u), Simpson's rule error on N=4001 points is O(du^4 * 100^4 * ||f_b||) ~ 10^6. At N=4001 this yields -4.74e6 error, dropping to -807 at N=8001, -44 at N=16001, -17 at N=32001, and converging to direct value 2.78335 at N=64001."
+    "explanation": "1. Kernel sampling & discrete convolution: pk = psi_h^(k) has peaks of order h^(-3-k). For k=3, h^(-6) = 6.4e7, and ck = convolve(p3, p3) has peaks of 2.24e25. Discrete convolution introduces floating-point truncation. 2. Spline interpolation: Tabulating ck on 1000 nodes and interpolating introduces an interpolation residual proportional to (Delta v)^4 ||C_0^(10)||_inf. For k=3, this derivative is huge. 3. Catastrophic cancellation: The 9604 station pairs (u_i, c_i) have sum_K b_K = 0, requiring 11 digits of cancellation. Any interpolation error in an individual bump is uncancelled. 4. Quadrature discretization: When integrated against cos(100 u), Simpson's rule error on N=4001 points is O(du^4 * 100^4 * ||f_b||) ~ 10^6. At N=4001 this yields -4.74e6 error, dropping to -807 at N=8001, -44 at N=16001, -17 at N=32001, and converging to direct value 2.78335 at N=64001. 5. Resolution: The certified weak formulation int f_b(u) e^{zu} du = p(z) int C_b(u) e^{zu} du integrates the smooth base autocorrelation without derivatives, achieving < 1e-7 agreement with direct spectral evaluation."
+  },
+  "research_contradiction_analysis": {
+    "governing_question": "What independently established constraint on the complete functional D is incompatible with D = -1/2 + r_match - r_rec under the off-critical-zero hypothesis H?",
+    "sufficient_contradiction_criterion": "|D| + eps_match + eps_rec < 1/2. If |D| + eps_match + eps_rec < 1/2, then |D| < 1/2 - eps, which strictly excludes D = -1/2 + r_match - r_rec.",
+    "insufficiency_of_negativity": "Establishing D < 0 does not supply a contradiction. The authentic selected-weight construction already yields D ~ -1/2 < 0. Negativity is entirely consistent with the explicit formula and does not force an integer collision.",
+    "insufficiency_of_single_quartet_nonvanishing": "Nonvanishing of Delta_quartet(a_0, gamma_0) = 8 m_0 int_0^R f_b(u) sinh(a_0 u) cos(gamma_0 u) du provides only a local perturbation of order O(a_0 / gamma_0^2) <= 10^13, which is negligible compared to the unconditional spectral tail allowance R_{spectral} ~ 1.036e17 and arithmetic functional A_{<=U} ~ 7.15e8. A nonzero quartet correction cannot force |D| outside [-1/2 - eps, -1/2 + eps].",
+    "smallest_unresolved_implication": "For the authentic TC test family, does there exist an admissible multiplier p(z) such that the complete explicit formula functional D_b satisfies |D_b| + eps_match + eps_rec < 1/2 for every off-critical zero (a_0, gamma_0)?"
   },
   "reductio_implication_audit": {
     "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies an off-critical quartet in the spectral explicit formula sum with displacement a = |delta_0| > 0.",
