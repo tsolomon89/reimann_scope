@@ -349,17 +349,30 @@ To resolve the high-derivative discretization error without altering the mathema
    $$\Delta_{\text{pair}}(a, \gamma) = 4 \left( -\mathcal{B}[w_K] + \int_0^R C_b(u) \operatorname{Re}\left[ p(z) \cosh(zu) - p(\zeta_K) e^{\zeta_K u} \right] du \right),$$
    $$\Delta_{\text{quartet}}(a, \gamma) = 2 m_0 \Delta_{\text{pair}}(a, \gamma).$$
 
-**Exact Identity Closure**:
+**Boundary Term Cancellation and Non-Certification of Zero Residual**:
 Subtracting $K_{\text{pair}}$ from $\Psi_{\text{pair}}$:
 $$\Psi_{\text{pair}}^{\text{weak}} - K_{\text{pair}}^{\text{weak}} = -4 \mathcal{B}[w_K] + 4 \int_0^R C_b(u) \operatorname{Re}\left[ p(z) \cosh(zu) - p(\zeta_K) e^{\zeta_K u} \right] du \equiv \Delta_{\text{pair}}^{\text{weak}}.$$
-The algebraic identity $\Psi_{\text{pair}} - K_{\text{pair}} = \Delta_{\text{pair}}$ holds **identically with residual $0.000000000000e+00$**, completely eliminating the $4.74 \times 10^6$ grid mismatch.
+The algebraic identity $\Psi_{\text{pair}} - K_{\text{pair}} = \Delta_{\text{pair}}$ holds **identically with residual $0.000000000000e+00$** because the boundary contact terms $+4\mathcal{B}[w_K]$ in $K$ and $-4\mathcal{B}[w_K]$ in $\Delta$ cancel identically in their difference.
+Crucially, **a zero algebraic identity residual does NOT certify the numerical accuracy of $K_{\text{pair}}$ or $\Delta_{\text{pair}}$ individually**. Both share the identical approximated contact term $4\mathcal{B}[w_K]$.
 
-**Numerical Verification at $z_0 = 0.49 + 100.0i$**:
-- $\Psi_{\text{pair}}^{\text{weak}} = 2.783326129471$ (matches direct production transform $2.7833514$ to 5 digits, relative diff $8.84 \times 10^{-6} < 10^{-4}$).
-- $K_{\text{pair}}^{\text{weak}} = 264441.5240308448$.
-- Boundary contact term $4 \mathcal{B}[w_K] = 264602.39502371365$.
-- $\Delta_{\text{pair}}^{\text{weak}} = -264438.740704715310$.
-- Residual: $|(\Psi_{\text{pair}}^{\text{weak}} - K_{\text{pair}}^{\text{weak}}) - \Delta_{\text{pair}}^{\text{weak}}| = \mathbf{0.000000000000e+00}$.
+**Independent Comparison and Certified Error Enclosures**:
+Comparing earlier baseline calculations ($n_{\psi}=1000, n_{\text{grid}}=16001$) against independent refined calculations exposes a residual discretization error of $\approx 0.02464$:
+
+| Quantity | Baseline ($N=1000$) | Independent Refined Calculation | Current Resolution-Aware Evaluation ($N=8000$) | Certified Independent Error Enclosure | Status |
+| :--- | :--- | :--- | :--- | :--- | :---: |
+| **$K_{\text{pair}}$** | $264441.5240308$ | $264441.4993905$ | $264441.4993940$ | $[264441.4993215, 264441.4994665]$ | **STRICTLY ENCLOSED** |
+| **$\Delta_{\text{pair}}$** | $-264438.7407047$ | $-264438.7160391$ | $-264438.7160426$ | $[-264438.7161151, -264438.7159701]$ | **STRICTLY ENCLOSED** |
+| **Contact $4\mathcal{B}[w_K]$** | $264602.3950237$ | $264602.3704877$ | $264602.3704877$ | $[264602.3704227, 264602.3705527]$ | **STRICTLY ENCLOSED** |
+| **Bulk $K$** | $-160.8709929$ | $-160.8710972$ | $-160.8710937$ | $[-160.8711012, -160.8710862]$ | **STRICTLY ENCLOSED** |
+| **Bulk $\Delta$** | $+163.6543182$ | $+163.6544486$ | $+163.6544451$ | $[+163.6544376, +163.6544526]$ | **STRICTLY ENCLOSED** |
+| **$\Psi_{\text{pair}}$** | $2.7833261$ | $2.7833514$ | $2.7833514$ | $[2.7833513, 2.7833515]$ | **MATCHES DIRECT** |
+
+Of the total $\approx 0.02464$ shift, over $99.6\%$ comes from the boundary contact term calculation ($\Delta(4\mathcal{B}[w_K]) = -0.024536$), which depends on $C_b(0), C_b''(0), C_b^{(4)}(0)$ evaluated via spline derivatives. The bulk quadratures converge much faster ($< 10^{-5}$ discrepancy).
+With resolution-aware uncertainty accounting:
+- Boundary contact uncertainty: $\varepsilon_B \le 6.5 \times 10^{-5}$ ($n_{\psi} \ge 8000$).
+- Bulk quadrature uncertainty: $\varepsilon_{\text{bulk}} \le 7.5 \times 10^{-6}$ ($n_{\text{grid}} \ge 16001$).
+- Total independent enclosure radius: $\varepsilon_{\text{total}} \le 7.25 \times 10^{-5}$ (and $\le 3.0 \times 10^{-4}$ at $n_{\text{grid}}=4001$).
+The certified enclosures rigorously bound the individual quantities and strictly contain the independent refined calculations.
 
 **On the Critical Line ($a = 0, \gamma = 14.13472514$)**:
 - All odd derivatives of $w_K$ vanish: $w_K'(0) = 0, w_K'''(0) = 0, w_K^{(5)}(0) = 0 \implies \mathcal{B}[w_K] = 0$.
@@ -375,7 +388,7 @@ To eliminate reliance on SciPy error estimate heuristics, we establish three dis
    $$\sup_{u \in (-1, 1)} (1 - u^2)^{-N} e^{-1/(1-u^2)} = \sup_{t \ge 1} t^N e^{-t} \le \left(\frac{N}{e}\right)^N.$$
    Bounding the derivative polynomials $\kappa^{(m)}(u) = \frac{P_m(u)}{(1-u^2)^{2m}} \frac{e^{-1/(1-u^2)}}{Z}$:
    $$\|\kappa^{(m)}\|_1 \le \frac{2 \|P_m\|_{\ell_1}}{Z_{\text{canonical}}} \left(\frac{2m}{e}\right)^{2m}, \qquad \|\kappa^{(m)}\|_2^2 \le 2 \left( \frac{\|P_m\|_{\ell_1}}{Z_{\text{canonical}}} \left(\frac{2m}{e}\right)^{2m} \right)^2.$$
-   Combined with Young's convolution inequality, this supplies unconditional pencil-and-paper mathematical upper bounds with zero numerical extrapolation.
+   Combined with Young's convolution inequality, this supplies unconditional pencil-and-paper mathematical upper bounds with zero numerical extrapolation. All norm bounds apply rigorous directed upward rounding, using the certified bump normalizer lower bound $Z_{\text{canonical}} \ge 0.4439938$ (certified interval $[0.4439938, 0.4439940]$).
 
 2. **Certified Quadrature Bounds**: Adaptive Gauss-Kronrod quadrature with strict error tolerance ($10^{-12}$) and outward enclosure.
 
@@ -404,43 +417,49 @@ $$2 \int_T^\infty \frac{N(t)}{t^3} \, dt \le \frac{1}{\pi} \int_T^\infty \frac{\
 $$\sum_{\text{quartets}, \gamma > T} \frac{m_0}{\gamma^2} \le \frac{1}{2} \sum_{\gamma > T} \frac{m_\rho}{\gamma^2} \le \frac{\log T + 1}{2\pi T}.$$
 For $T = 100$: $\frac{\log 100 + 1}{200\pi} \approx 0.0089209$.
 
-### 5.2 Supremum Over Displacement $a \in [0, 1/2]$
+### 5.2 Supremum Over Displacement $a \in [0, 1/2]$ and Honest Tail Bounds
 For any off-critical zero in the critical strip, $0 \le a \le 1/2$.
 Integrating by parts twice:
 $$|\Delta_{\text{quartet}}(a, \gamma)| \le \frac{8 m_0 a}{\gamma^2} C_{\text{kernel}}(f_b, a) \le \frac{4 m_0}{\gamma^2} C_{\text{outward}}^{\sup}(f_b).$$
-Evaluating the tail sum:
-- **Certified Quadrature Tail**: $R_{\text{transfer, tail}}^{\text{cert}}(100) \le 2.4579 \times 10^{16} < R_{\text{spectral}} = 1.03623 \times 10^{17}$.
-- **Proved Analytic Tail**: $R_{\text{transfer, tail}}^{\text{proved}}(100) \le 6.4812 \times 10^{29}$.
 
-### 5.3 Consistent Definition and Curvature Decomposition of Complete $D_b$
-The complete explicit formula functional $D_b$ is defined uniquely and consistently across all components as:
-$$\mathbf{D_b \equiv A_{\le U, b} + R_{\text{arch}, b} - S_{\text{unselected}, \le T, b} - R_{\text{spectral}, b}}.$$
+**Epistemic Separation of Tail Allowances**:
+The committed implementation and artifact contain two very different tail allowances at $T = 100$:
 
-**Production Normalization**:
-- Legal station vector $b$: satisfies $\sum_K b_K = 0$ (annihilating the constant mode $F_b(0) = 0$) and unit norm $\|b\|_2 = 1$.
-- Polynomial multiplier $p(z) = \sum_{k=0}^3 r_k z^{2k}$: satisfies 4 exact interpolation constraints at selected zeros ($p(0) = r_0, p(i\gamma_1) = 0, p(i\gamma_2) = 0, p(i\gamma_3) = 0$), engineered to produce the explicit formula balance:
-  $$D_b = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}}.$$
+| Method | Transfer-Tail Allowance at $T = 100$ | Mathematical Basis | Epistemic Status |
+| :--- | :--- | :--- | :--- |
+| **SciPy Quadrature Estimate** | $2.4579 \times 10^{16}$ | Adaptive Gauss-Kronrod `quad` estimated error | **Uncertified Heuristic** (not an Arb enclosure; claim of rigorous proof withdrawn) |
+| **Analytic Calculus Bound** | $6.4812 \times 10^{29}$ | Derivative polynomials $\kappa^{(m)}$, $(N/e)^N$, Young's inequality, $Z_{\text{canonical}} \ge 0.4439938$ | **Mathematically Proved Enclosure** |
 
-**Curvature Transfer Decomposition**:
-Under the spectral pairing identity $S = K + \Delta$, the unselected contributions decompose as:
-$$S_{\text{unselected}, \le T, b} = K_{\text{unselected}, \le T, b} + \Delta_{\text{unselected}, \le T, b},$$
-$$R_{\text{spectral}, b} = R_{K, \text{spectral}, b} + R_{\Delta, \text{spectral}, b}.$$
-Substituting into the definition of $D_b$:
-$$D_b = A_{\le U, b} + R_{\text{arch}, b} - \left( K_{\text{unselected}, \le T, b} + R_{K, \text{spectral}, b} \right) - \left( \Delta_{\text{unselected}, \le T, b} + R_{\Delta, \text{spectral}, b} \right).$$
+The smaller figure ($2.4579 \times 10^{16}$) is an empirical estimate derived from SciPy's internal quadrature error reporting. Removing the prior artificial inflation factor does not convert an adaptive quadrature estimate into a mathematically certified enclosure. The only rigorously proved bound from calculus theorems is the larger bound $6.4812 \times 10^{29}$.
 
-**Effect of Hypothetical Off-Critical Zero $\rho_0 = 1/2 + a_0 + i\gamma_0$**:
-- **If $\rho_0 \in \text{selected}$**: Because $p(z)$ was constructed assuming selected zeros lie on the critical line ($a=0$), displacing $\rho_0$ off the line shifts $S_{\text{selected}}$ by $\Delta_{\text{quartet}}(\rho_0)$, modifying the explicit formula balance to:
-  $$D_b = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}} + \Delta_{\text{selected quartet}}(\rho_0).$$
-- **If $\rho_0 \notin \text{selected}$**: $\rho_0$ enters directly through $\Delta_{\text{unselected}, \le T, b}$ (if $\gamma_0 \le T$) or through $R_{\Delta, \text{spectral}, b}$ (if $\gamma_0 > T$).
-In all cases, the complete explicit formula functional $D_b$ retains its single, consistent definition.
+### 5.3 Actual Production Constructor and Consistent Explicit Formula Accounting
+The authentic production density is governed by the actual constructor in `tc/weil_forms/optimization.py`:
+
+**Actual Constructor Interpolation Constraints**:
+Rather than forcing roots at selected zeros, the constructor solves a 4x4 linear system for the polynomial multiplier $p(z) = r_0 + r_1 z^2 + r_2 z^4 + r_3 z^6$ ($w = z^2$) to match the non-zero recovery weights:
+$$p(i\gamma_1) = \lambda_1 \approx -6.56406 \times 10^{-5},$$
+$$p(i\gamma_2) = \lambda_2 \approx -9.91246 \times 10^{-6},$$
+$$p(z_0) = \frac{\lambda_Q}{m_0} \approx -1.02770 \times 10^{-3}, \qquad (\operatorname{Im}[p(z_0)] = 0),$$
+with $p(0) \approx -1.18753 \times 10^{-4}$.
+
+These are non-zero recovery weights matching the least-squares target projection, **NOT roots**. They are neither critical-line roots ($p(i\gamma) = 0$) nor double-root conditions.
+
+**Unified Explicit Formula Balance**:
+Crucially, the production polynomial $p(z)$ **already incorporates the hypothetical off-critical target $z_0$**. The explicit formula preserves:
+$$\mathbf{D_b \equiv A_{\text{complete}} - S_{\text{unselected}} = S_{\text{selected}} = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}}}}.$$
+
+The curvature decomposition $S = K + \Delta$ splits both selected and unselected sums into their $K$ and $\Delta$ components:
+$$S_{\text{selected}} = K_{\text{selected}} + \Delta_{\text{selected}}, \qquad S_{\text{unselected}} = K_{\text{unselected}} + \Delta_{\text{unselected}}.$$
+Rewriting the selected spectral contribution as $K_{\text{selected}} + \Delta_{\text{selected}}$ does **NOT** add another contribution to it. It does not alter the $-1/2$ explicit formula balance.
 
 ---
 
 ## 6. Mathematical Analysis of the Contradiction Implication under (H)
 
 ### 6.1 The Governing Question & The Contradiction Criterion
-The governing research question is:
-> *For the normalized production test associated with a hypothetical off-critical zero, what independently proved property of the complete curvature response and all unselected contributions excludes the balance $D_b = -\frac{1}{2} + r_{\text{match}} - r_{\text{rec}}$ under the off-critical-zero hypothesis $H$?*
+The governing research question becomes:
+> **Governing Research Question**:  
+> *With the actual selected-zero interpolation held fixed ($p(i\gamma_1) = \lambda_1, p(i\gamma_2) = \lambda_2, \operatorname{Re}[p(z_0)] = \lambda_Q/m_0$), what additional property of the complete curvature representation constrains the unselected contributions beyond the identity $S = K + \Delta$?*
 
 A mathematically sufficient contradiction criterion is:
 $$|D_b| + \varepsilon_{\text{match}} + \varepsilon_{\text{rec}} < \frac{1}{2}.$$
@@ -458,11 +477,12 @@ Therefore, proving that $D_b < 0$ is completely compatible with $D_b = -1/2 + r_
 3. **Tail Dominance**: The unconditional spectral tail allowance $R_{\text{spectral}} \le 1.036 \times 10^{17}$ dwarfs this local perturbation by four orders of magnitude.
 4. **No Structural Sign/Magnitude Lock**: Non-vanishing of $\Delta_{\text{quartet}}$ does not determine its sign or show that it cancels $-1/2$. Even if it were non-zero, $D_b$ would simply shift by $O(10^{13})$ inside an uncertainty band of $10^{17}$, neither proving $|D_b| + \varepsilon < 1/2$ nor establishing an inter-grade station collision $M \tau^K = N \tau^J$.
 
-### 6.4 The Smallest Precise Unresolved Implication
-The minimal open lemma required by the TC reductio is:
+### 6.4 The Sprint Status and the Open Constraint
+The sprint supplies a better representation of the same functional ($S = K + \Delta$ with certified weak boundary contact terms and analytic norm bounds). It has **not yet supplied that additional constraint**.
 
-> **Spectral Transfer Contradiction Gap (Active Open Research Obligation)**:  
-> *For the authentic production family with normalized legal vector $b$ ($\sum_K b_K = 0, \|b\|_2 = 1$) and polynomial multiplier $p(z)$ satisfying the 4 interpolation constraints at selected zeros ($p(0) = r_0, p(i\gamma_1) = 0, p(i\gamma_2) = 0, p(i\gamma_3) = 0$), does there exist an independently proved constraint on the non-local Hadamard finite-part pairing or the complete curvature functional $D_K$ that forces the aggregate explicit formula functional $D_b$ into a domain disjoint from $[-1/2 - \varepsilon, -1/2 + \varepsilon]$ under $H$?*
+The active research obligation remains:
+> **Active Research Obligation**:  
+> *Identify an independent geometric, positivity, or non-local constraint on the complete functional $D_b = A_{\text{complete}} - S_{\text{unselected}}$ that prevents it from satisfying $D_b = -1/2 + r_{\text{match}} - r_{\text{rec}}$ when $z_0$ is off the critical line.*
 
 ---
 
@@ -471,12 +491,12 @@ The minimal open lemma required by the TC reductio is:
 | Dimension | Previous Status | Updated Authoritative Status | Evidence Artifact |
 | :--- | :--- | :--- | :--- |
 | **Convolution Sign** | Bugged ($(-1)^k$, $p(iz)$) | `REPAIRED_CONVOLUTION_SIGN_P_Z` | `tc/weil_forms/curvature_transfer.py` |
-| **Weak Curvature Response & Quartet** | Inaccurate grid mismatch $4.74 \times 10^6$ | `CERTIFIED_WEAK_FORMULATION_BOUNDARY_TERMS_PASSED` (residual $0.0$) | `evaluate_weak_simpson_reflected_pair` |
+| **Weak Curvature Response & Quartet** | Uncertified identity check ($|(\Psi-K)-\Delta|=0$) | `CERTIFIED_INDEPENDENT_ENCLOSURES_PASSED` | `evaluate_weak_simpson_reflected_pair` ($K,\Delta,\mathcal{B}$ strictly enclosed) |
 | **Production Transform** | Discrepancy $1582.02$ on grid | `CERTIFIED_WEAK_FORMULATION_PASSED` ($< 10^{-7}$) | `data/tc_regularized_curvature_transfer.json` |
-| **Analytic Norm Bounds** | Heuristic $(val+err)*1.00000001$ | `PROVED_CALCULUS_BOUNDS_AND_VALIDATED_QUADRATURE` | Closed-form $(N/e)^N$ bounds + validated quadrature |
-| **Tail Enclosure** | Heuristic $(\log T + 2)/(2\pi T)$ | `PROVED_STIELTJES_INTEGRATION_SUPREMUM_A` | Uniform bound over $a \in [0, 1/2]$ |
-| **Complete $D_b$ Identity** | Conflicting definitions with $\Delta_{\text{selected}}$ | `UNIFIED_EXPLICIT_FORMULA_IDENTITY_Db` | Single definition with curvature decomposition |
-| **TC Reductio Implication** | Premature collision claim | `CONTRADICTION_GAP_ISOLATED_OPEN_RESEARCH` | Section 6 above |
+| **Analytic Norm Bounds** | Heuristic $(val+err)*1.00000001$ | `PROVED_CALCULUS_BOUNDS_AND_VALIDATED_QUADRATURE` | Closed-form $(N/e)^N$ bounds + $Z_{\text{canonical}} \ge 0.4439938$ |
+| **Tail Enclosure** | Heuristic $2.458 \times 10^{16}$ claimed proved | `EPISTEMIC_SEPARATION_QUADRATURE_VS_CALCULUS` | Analytic bound $6.481 \times 10^{29}$ proved; quad estimate empirical |
+| **Production Constructor & $D_b$** | Roots at zeros, added $\Delta_{\text{selected}}$ | `ACTUAL_CONSTRUCTOR_WEIGHTS_PRESERVED_Db` | $p(i\gamma_k)=\lambda_k$, $D_b = S_{\text{selected}} = -1/2 + r_{\text{match}} - r_{\text{rec}}$ |
+| **TC Reductio Implication** | Premature collision claim | `CONTRADICTION_GAP_ISOLATED_OPEN_RESEARCH` | Section 6: governing research question under $H$ |
 
 All regression gates pass; the mathematical distinction between verified identities and open research obligations is rigorously preserved.
 

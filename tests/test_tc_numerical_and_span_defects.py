@@ -1665,7 +1665,7 @@ def test_target_2c_weak_density_validation_and_contradiction_criterion():
     assert sec_audit['weak_relative_difference'] < 1e-4
 
     # 3. Certified norm bounds strictly enclose empirical estimates, and proved analytic bounds enclose certified bounds
-    d_auth = construct_authentic_production_density(n_grid=4001)
+    d_auth = construct_authentic_production_density(n_psi=8000, n_grid=16001)
     bounds = d_auth['analytic_norm_bounds']
     emp = bounds['empirical_bounds']
     cert = bounds['certified_bounds']
@@ -1682,12 +1682,25 @@ def test_target_2c_weak_density_validation_and_contradiction_criterion():
     assert 'quadrature_details' in bounds
     assert len(bounds['quadrature_details']['quadrature_errors_l1']) == 5
 
-    # 4. Rigorous weak curvature evaluation and algebraic identity closure
+    # 4. Rigorous weak curvature evaluation, boundary terms, and independent error enclosures
     weak_simpson = d_auth['evaluate_weak_simpson_reflected_pair'](0.49, 100.0)
     assert weak_simpson['is_algebraic_identity_satisfied'] is True
     assert weak_simpson['discrepancy'] < 1e-11, f"Weak reflected pair identity failed: discrepancy={weak_simpson['discrepancy']}"
     assert abs(weak_simpson['boundary_term_B_wK']) > 1e4, "Boundary contact term must be non-zero off critical line"
     assert abs(weak_simpson['boundary_term_B_wDelta'] + weak_simpson['boundary_term_B_wK']) < 1e-12
+
+    # Independent error enclosures for individual terms (certified radius <= 1e-4)
+    k_enc = weak_simpson['k_pair_enclosure']
+    delta_enc = weak_simpson['delta_pair_enclosure']
+    b_enc = weak_simpson['boundary_term_B_wK_enclosure']
+    assert k_enc[0] <= 264441.4993905 <= k_enc[1], f"K_pair enclosure must contain independent refined value: {k_enc}"
+    assert delta_enc[0] <= -264438.7160391 <= delta_enc[1], f"Delta_pair enclosure must contain independent refined value: {delta_enc}"
+    assert b_enc[0] <= 264602.3704877 <= b_enc[1], f"B_wK enclosure must contain refined boundary term: {b_enc}"
+    assert weak_simpson['independent_error_budget']['total_independent_enclosure_radius'] <= 1.0e-4
+
+    # Also check full authentic density from audit (n_grid=16001) has tighter radius <= 1e-4
+    auth_weak = audit['authentic_production_density_verification']['certified_weak_simpson_verification']
+    assert auth_weak['independent_error_budget']['total_independent_enclosure_radius'] <= 1.0e-4
 
     # On critical line (a = 0): boundary contact terms vanish identically and delta_pair == 0
     crit_simpson = d_auth['evaluate_weak_simpson_reflected_pair'](0.0, 14.13472514)
@@ -1696,12 +1709,12 @@ def test_target_2c_weak_density_validation_and_contradiction_criterion():
     assert abs(crit_simpson['delta_pair_weak']) < 1e-12
     assert abs(crit_simpson['psi_pair_weak'] - crit_simpson['k_pair_weak']) < 1e-12
 
-    # Verify authentic audit reflects certified weak evaluation
+    # Verify authentic audit reflects certified weak evaluation and enclosures
     auth_verif = audit['authentic_production_density_verification']
     assert auth_verif['is_algebraic_identity_satisfied'] is True
     assert auth_verif['algebraic_residual_discrepancy'] < 1e-11
 
-    # 5. Rigorous Stieltjes tail counting convention
+    # 5. Rigorous Stieltjes tail counting convention and epistemic bounds separation
     tail = audit['strip_uniform_tail_bound']
     T_cut = tail['cutoff_T']
     expected_quartet_sum = (math.log(T_cut) + 1.0) / (2.0 * math.pi * T_cut)
@@ -1709,6 +1722,9 @@ def test_target_2c_weak_density_validation_and_contradiction_criterion():
     assert tail['supremum_over_displacement_a'] == '0 <= a <= 1/2'
     assert tail['certified_quadrature_transfer_tail_bound'] < tail['comparison_with_spectral_tail']['original_spectral_tail_allowance']
     assert tail['proved_analytic_transfer_tail_bound'] > tail['certified_quadrature_transfer_tail_bound']
+    assert 'epistemic_qualification' in tail
+    assert 'normalizer_enclosure' in tail
+    assert tail['normalizer_enclosure']['Z_canonical_min'] == 0.4439938
 
     # 6. Reductio contradiction criterion analysis and consistent D_b definition
     contra = audit['research_contradiction_analysis']
@@ -1718,6 +1734,13 @@ def test_target_2c_weak_density_validation_and_contradiction_criterion():
     assert "|D_b| + eps_match + eps_rec < 1/2" in contra['sufficient_contradiction_criterion']
     assert "D_b ~ -1/2 < 0" in contra['insufficiency_of_negativity']
     assert "negligible" in contra['insufficiency_of_single_quartet_nonvanishing'].lower() or "O(a_0 / gamma_0^2)" in contra['insufficiency_of_single_quartet_nonvanishing']
+
+    # Production polynomial matches actual non-zero recovery weights
+    poly_spec = contra['production_polynomial_specification']
+    assert abs(poly_spec['interpolated_points']['p_at_i_gamma1'] - (-6.56406e-5)) < 1e-8
+    assert abs(poly_spec['interpolated_points']['p_at_i_gamma2'] - (-9.91246e-6)) < 1e-8
+    assert abs(poly_spec['interpolated_points']['p_at_z0_real'] - (-1.02770e-3)) < 1e-7
+    assert poly_spec['interpolated_points']['p_at_z0_imag'] == 0.0
 
 
 

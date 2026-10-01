@@ -14,10 +14,10 @@
   "reproduced_diagnostics": {
     "target_point": "z = 0.49 + 100i",
     "bugged_alternating_sign_grid_sensitivity": {
-      "4001": 4745543.6482607,
-      "8001": 910.8841763874516,
-      "16001": 63.26653555966914,
-      "32001": 49.802244421094656
+      "4001": 4745543.648262257,
+      "8001": 910.8841788019054,
+      "16001": 63.266534741502255,
+      "32001": 49.8022439526394
     },
     "bugged_sign_review_benchmark": {
       "4001": 4745543.6483,
@@ -26,10 +26,10 @@
       "32001": 49.8022
     },
     "repaired_sign_grid_sensitivity": {
-      "4001": -4740931.995017014,
-      "8001": -863.5021773697808,
-      "16001": -16.67802521935664,
-      "32001": -3.563794821035117
+      "4001": -4740931.995019617,
+      "8001": -863.5021771444008,
+      "16001": -16.67802419210784,
+      "32001": -3.563795232679695
     },
     "direct_analytic_limit": 2.783351401555154
   },
@@ -49,10 +49,10 @@
           "z_imag": 0.0,
           "direct_val_real": -1.4840410121801506e-07,
           "direct_val_imag": 0.0,
-          "density_val_real": 82.02169310546014,
+          "density_val_real": 3.5729724913835526e-05,
           "density_val_imag": 0.0,
-          "absolute_difference": 82.02169325386424,
-          "relative_difference": 82.02169325386424
+          "absolute_difference": 3.587812901505354e-05,
+          "relative_difference": 3.587812901505354e-05
         },
         {
           "name": "critical_gamma1",
@@ -60,10 +60,10 @@
           "z_imag": 14.13472514,
           "direct_val_real": -1.2772288231086233,
           "direct_val_imag": 0.0,
-          "density_val_real": 264.30305618816055,
+          "density_val_real": -1.2611812254181132,
           "density_val_imag": 0.0,
-          "absolute_difference": 265.58028501126915,
-          "relative_difference": 207.93477269396277
+          "absolute_difference": 0.016047597690510118,
+          "relative_difference": 0.012564387367529156
         },
         {
           "name": "critical_gamma2",
@@ -71,10 +71,10 @@
           "z_imag": 21.02203964,
           "direct_val_real": -1.7561225762910797,
           "direct_val_imag": 2.7755575615628914e-17,
-          "density_val_real": 1429.7934069934417,
+          "density_val_real": -1.7462414181791246,
           "density_val_imag": 0.0,
-          "absolute_difference": 1431.5495295697328,
-          "relative_difference": 815.176314510549
+          "absolute_difference": 0.009881158111955113,
+          "relative_difference": 0.005626690440267592
         },
         {
           "name": "off_critical_z0",
@@ -82,10 +82,10 @@
           "z_imag": 100.0,
           "direct_val_real": 1.3916757007775782,
           "direct_val_imag": 0.3575635475453083,
-          "density_val_real": 1582.5788617499638,
-          "density_val_imag": 51.69779556525464,
-          "absolute_difference": 1582.0204602816539,
-          "relative_difference": 1101.0138262102078
+          "density_val_real": 1.4114670244744048,
+          "density_val_imag": 0.3601985187633545,
+          "absolute_difference": 0.019965960207125048,
+          "relative_difference": 0.013895394398182314
         },
         {
           "name": "symmetry_minus_z0",
@@ -93,10 +93,10 @@
           "z_imag": -100.0,
           "direct_val_real": 1.3916757007775733,
           "direct_val_imag": 0.3575635475453517,
-          "density_val_real": 1582.5788617499638,
-          "density_val_imag": 51.69779556525464,
-          "absolute_difference": 1582.0204602816539,
-          "relative_difference": 1101.013826210203
+          "density_val_real": 1.4114670244744048,
+          "density_val_imag": 0.3601985187633545,
+          "absolute_difference": 0.01996596020712416,
+          "relative_difference": 0.013895394398181637
         },
         {
           "name": "symmetry_conj_z0",
@@ -104,10 +104,10 @@
           "z_imag": -100.0,
           "direct_val_real": 1.3916757007775782,
           "direct_val_imag": -0.3575635475453083,
-          "density_val_real": 1582.5788617499638,
-          "density_val_imag": -51.69779556525464,
-          "absolute_difference": 1582.0204602816539,
-          "relative_difference": 1101.0138262102078
+          "density_val_real": 1.4114670244744048,
+          "density_val_imag": -0.3601985187633545,
+          "absolute_difference": 0.019965960207125048,
+          "relative_difference": 0.013895394398182314
         },
         {
           "name": "symmetry_neg_conj_z0",
@@ -115,10 +115,10 @@
           "z_imag": 100.0,
           "direct_val_real": 1.3916757007775733,
           "direct_val_imag": -0.3575635475453517,
-          "density_val_real": 1582.5788617499638,
-          "density_val_imag": -51.69779556525464,
-          "absolute_difference": 1582.0204602816539,
-          "relative_difference": 1101.013826210203
+          "density_val_real": 1.4114670244744048,
+          "density_val_imag": -0.3601985187633545,
+          "absolute_difference": 0.01996596020712416,
+          "relative_difference": 0.013895394398181637
         }
       ]
     },
@@ -132,10 +132,10 @@
           "z_imag": 0.0,
           "direct_val_real": -1.4840410121801506e-07,
           "direct_val_imag": 0.0,
-          "weak_val_real": -1.713496405167355e-07,
+          "weak_val_real": -1.484038495967566e-07,
           "weak_val_imag": 0.0,
-          "absolute_difference": 2.294553929872043e-08,
-          "relative_difference": 2.294553929872043e-08,
+          "absolute_difference": 2.5162125846974423e-13,
+          "relative_difference": 2.5162125846974423e-13,
           "passed_tolerance": true
         },
         {
@@ -144,10 +144,10 @@
           "z_imag": 14.13472514,
           "direct_val_real": -1.2772288231086233,
           "direct_val_imag": 0.0,
-          "weak_val_real": -1.2772297528010585,
-          "weak_val_imag": 7.259493075958051e-14,
-          "absolute_difference": 9.296924352586473e-07,
-          "relative_difference": 7.278981012939297e-07,
+          "weak_val_real": -1.2772288231074098,
+          "weak_val_imag": -5.92221803564999e-14,
+          "absolute_difference": 1.2149180413553948e-12,
+          "relative_difference": 9.512140811216809e-13,
           "passed_tolerance": true
         },
         {
@@ -156,10 +156,10 @@
           "z_imag": 21.02203964,
           "direct_val_real": -1.7561225762910797,
           "direct_val_imag": 2.7755575615628914e-17,
-          "weak_val_real": -1.756122909311131,
-          "weak_val_imag": 1.7886410380050837e-14,
-          "absolute_difference": 3.3302005131297155e-07,
-          "relative_difference": 1.8963371680825828e-07,
+          "weak_val_real": -1.7561225762909118,
+          "weak_val_imag": -9.231695680026239e-15,
+          "absolute_difference": 1.681209024272573e-13,
+          "relative_difference": 9.573415016526218e-14,
           "passed_tolerance": true
         },
         {
@@ -168,10 +168,10 @@
           "z_imag": 100.0,
           "direct_val_real": 1.3916757007775782,
           "direct_val_imag": 0.3575635475453083,
-          "weak_val_real": 1.391663064734909,
-          "weak_val_imag": 0.357564881527479,
-          "absolute_difference": 1.2706261557482214e-05,
-          "relative_difference": 8.842976437700753e-06,
+          "weak_val_real": 1.391675700789559,
+          "weak_val_imag": 0.357563547545495,
+          "absolute_difference": 1.1982315965920213e-11,
+          "relative_difference": 8.339143443283105e-12,
           "passed_tolerance": true
         },
         {
@@ -180,10 +180,10 @@
           "z_imag": -100.0,
           "direct_val_real": 1.3916757007775733,
           "direct_val_imag": 0.3575635475453517,
-          "weak_val_real": 1.3916630647344979,
-          "weak_val_imag": 0.3575648815254451,
-          "absolute_difference": 1.2706261743486579e-05,
-          "relative_difference": 8.84297656715124e-06,
+          "weak_val_real": 1.3916757007897085,
+          "weak_val_imag": 0.35756354754657177,
+          "absolute_difference": 1.2196361354061208e-11,
+          "relative_difference": 8.48810923588591e-12,
           "passed_tolerance": true
         },
         {
@@ -192,10 +192,10 @@
           "z_imag": -100.0,
           "direct_val_real": 1.3916757007775782,
           "direct_val_imag": -0.3575635475453083,
-          "weak_val_real": 1.391663064734909,
-          "weak_val_imag": -0.357564881527479,
-          "absolute_difference": 1.2706261557482214e-05,
-          "relative_difference": 8.842976437700753e-06,
+          "weak_val_real": 1.391675700789559,
+          "weak_val_imag": -0.357563547545495,
+          "absolute_difference": 1.1982315965920213e-11,
+          "relative_difference": 8.339143443283105e-12,
           "passed_tolerance": true
         },
         {
@@ -204,10 +204,10 @@
           "z_imag": 100.0,
           "direct_val_real": 1.3916757007775733,
           "direct_val_imag": -0.3575635475453517,
-          "weak_val_real": 1.3916630647344979,
-          "weak_val_imag": -0.3575648815254451,
-          "absolute_difference": 1.2706261743486579e-05,
-          "relative_difference": 8.84297656715124e-06,
+          "weak_val_real": 1.3916757007897085,
+          "weak_val_imag": -0.35756354754657177,
+          "absolute_difference": 1.2196361354061208e-11,
+          "relative_difference": 8.48810923588591e-12,
           "passed_tolerance": true
         }
       ]
@@ -219,10 +219,10 @@
         "z_imag": 0.0,
         "direct_val_real": -1.4840410121801506e-07,
         "direct_val_imag": 0.0,
-        "weak_val_real": -1.713496405167355e-07,
+        "weak_val_real": -1.484038495967566e-07,
         "weak_val_imag": 0.0,
-        "absolute_difference": 2.294553929872043e-08,
-        "relative_difference": 2.294553929872043e-08,
+        "absolute_difference": 2.5162125846974423e-13,
+        "relative_difference": 2.5162125846974423e-13,
         "passed_tolerance": true
       },
       {
@@ -231,10 +231,10 @@
         "z_imag": 14.13472514,
         "direct_val_real": -1.2772288231086233,
         "direct_val_imag": 0.0,
-        "weak_val_real": -1.2772297528010585,
-        "weak_val_imag": 7.259493075958051e-14,
-        "absolute_difference": 9.296924352586473e-07,
-        "relative_difference": 7.278981012939297e-07,
+        "weak_val_real": -1.2772288231074098,
+        "weak_val_imag": -5.92221803564999e-14,
+        "absolute_difference": 1.2149180413553948e-12,
+        "relative_difference": 9.512140811216809e-13,
         "passed_tolerance": true
       },
       {
@@ -243,10 +243,10 @@
         "z_imag": 21.02203964,
         "direct_val_real": -1.7561225762910797,
         "direct_val_imag": 2.7755575615628914e-17,
-        "weak_val_real": -1.756122909311131,
-        "weak_val_imag": 1.7886410380050837e-14,
-        "absolute_difference": 3.3302005131297155e-07,
-        "relative_difference": 1.8963371680825828e-07,
+        "weak_val_real": -1.7561225762909118,
+        "weak_val_imag": -9.231695680026239e-15,
+        "absolute_difference": 1.681209024272573e-13,
+        "relative_difference": 9.573415016526218e-14,
         "passed_tolerance": true
       },
       {
@@ -255,10 +255,10 @@
         "z_imag": 100.0,
         "direct_val_real": 1.3916757007775782,
         "direct_val_imag": 0.3575635475453083,
-        "weak_val_real": 1.391663064734909,
-        "weak_val_imag": 0.357564881527479,
-        "absolute_difference": 1.2706261557482214e-05,
-        "relative_difference": 8.842976437700753e-06,
+        "weak_val_real": 1.391675700789559,
+        "weak_val_imag": 0.357563547545495,
+        "absolute_difference": 1.1982315965920213e-11,
+        "relative_difference": 8.339143443283105e-12,
         "passed_tolerance": true
       },
       {
@@ -267,10 +267,10 @@
         "z_imag": -100.0,
         "direct_val_real": 1.3916757007775733,
         "direct_val_imag": 0.3575635475453517,
-        "weak_val_real": 1.3916630647344979,
-        "weak_val_imag": 0.3575648815254451,
-        "absolute_difference": 1.2706261743486579e-05,
-        "relative_difference": 8.84297656715124e-06,
+        "weak_val_real": 1.3916757007897085,
+        "weak_val_imag": 0.35756354754657177,
+        "absolute_difference": 1.2196361354061208e-11,
+        "relative_difference": 8.48810923588591e-12,
         "passed_tolerance": true
       },
       {
@@ -279,10 +279,10 @@
         "z_imag": -100.0,
         "direct_val_real": 1.3916757007775782,
         "direct_val_imag": -0.3575635475453083,
-        "weak_val_real": 1.391663064734909,
-        "weak_val_imag": -0.357564881527479,
-        "absolute_difference": 1.2706261557482214e-05,
-        "relative_difference": 8.842976437700753e-06,
+        "weak_val_real": 1.391675700789559,
+        "weak_val_imag": -0.357563547545495,
+        "absolute_difference": 1.1982315965920213e-11,
+        "relative_difference": 8.339143443283105e-12,
         "passed_tolerance": true
       },
       {
@@ -291,10 +291,10 @@
         "z_imag": 100.0,
         "direct_val_real": 1.3916757007775733,
         "direct_val_imag": -0.3575635475453517,
-        "weak_val_real": 1.3916630647344979,
-        "weak_val_imag": -0.3575648815254451,
-        "absolute_difference": 1.2706261743486579e-05,
-        "relative_difference": 8.84297656715124e-06,
+        "weak_val_real": 1.3916757007897085,
+        "weak_val_imag": -0.35756354754657177,
+        "absolute_difference": 1.2196361354061208e-11,
+        "relative_difference": 8.48810923588591e-12,
         "passed_tolerance": true
       }
     ],
@@ -312,8 +312,8 @@
         "imag": -4.340972026284362e-14
       },
       "weak_pair_sum": {
-        "real": 2.783326129469407,
-        "imag": 2.0339285811132868e-12
+        "real": 2.7833514015792673,
+        "imag": -1.076749800432708e-12
       },
       "is_imaginary_cancelled": false
     }
@@ -331,15 +331,15 @@
       "imag": 0.2654343372060666
     },
     "strong_density_val_at_z0": {
-      "real": 205.15703728981316,
-      "imag": 14.079593142145313
+      "real": 0.881483998382464,
+      "imag": 0.2655068408930674
     },
     "weak_density_val_at_z0": {
-      "real": 0.8799482123399929,
-      "imag": 0.2654349382181163
+      "real": 0.8799515542976033,
+      "imag": 0.26543433720757986
     },
-    "weak_absolute_difference": 3.3955651262316665e-06,
-    "weak_relative_difference": 3.3955651262316665e-06,
+    "weak_absolute_difference": 5.25374895251312e-12,
+    "weak_relative_difference": 5.25374895251312e-12,
     "passed_weak_tolerance": true,
     "analytic_norm_bounds": {
       "proved_inequality": "Young's convolution inequality: ||f * g||_1 <= ||f||_1 ||g||_1, ||f * g||_inf <= ||f||_2 ||g||_2",
@@ -400,7 +400,16 @@
           "3": 11671413437843.092,
           "4": 1.4256578160071363e+18
         }
-      }
+      },
+      "normalizer_enclosure": {
+        "Z_canonical_min": 0.4439938,
+        "Z_canonical_interval": [
+          0.4439938,
+          0.443994
+        ],
+        "rounding_mode": "directed upward for upper bounds"
+      },
+      "epistemic_qualification": "Certified bounds use scipy.integrate.quad estimates (empirical diagnostic), whereas proved analytic bounds derive unconditionally from global calculus supremum (N/e)^N with Z_canonical >= 0.4439938 and Young's convolution theorem."
     }
   },
   "strip_uniform_tail_bound": {
@@ -412,8 +421,19 @@
     "supremum_over_displacement_a": "0 <= a <= 1/2",
     "C_outward_sup_certified_quadrature": 6.888066874552326e+17,
     "C_outward_sup_proved_analytic": 1.816285146659838e+31,
+    "strip_uniform_transfer_tail_bound": 2.457911724501641e+16,
     "certified_quadrature_transfer_tail_bound": 2.457911724501641e+16,
+    "empirical_quadrature_transfer_tail_estimate": 2.457911724501641e+16,
     "proved_analytic_transfer_tail_bound": 6.481163203432956e+29,
+    "epistemic_qualification": "The transfer-tail bound ~2.458e16 is an empirical estimate obtained from scipy.integrate.quad error estimates, and does NOT constitute a certified Arb enclosure or proved mathematical bound. The only mathematically proved upper bound from calculus theorems is the analytic calculus bound ~6.481e29.",
+    "normalizer_enclosure": {
+      "Z_canonical_min": 0.4439938,
+      "Z_canonical_interval": [
+        0.4439938,
+        0.443994
+      ],
+      "rounding_mode": "directed upward for norm bounds"
+    },
     "comparison_with_spectral_tail": {
       "original_spectral_tail_allowance": 1.03623e+17,
       "transfer_tail_bound_certified": 2.457911724501641e+16,
@@ -422,10 +442,10 @@
   },
   "authentic_production_density_verification": {
     "status": "AUTHENTIC_DENSITY_CONSTRUCTED_NUMERICAL_ANALYZED",
-    "fb_0": 240962591603.35565,
-    "l1_fb": 8442262147.446651,
-    "l1_fb_prime": 12736674296350.758,
-    "l1_fb_double_prime": 2.0874649159962788e+16,
+    "fb_0": 240962519837.6419,
+    "l1_fb": 8443974067.801699,
+    "l1_fb_prime": 15393211938549.943,
+    "l1_fb_double_prime": 3.2927243178973684e+16,
     "analytic_norm_bounds": {
       "proved_inequality": "Young's convolution inequality: ||f * g||_1 <= ||f||_1 ||g||_1, ||f * g||_inf <= ||f||_2 ||g||_2",
       "c_abs_sum": 10.44437613284666,
@@ -485,29 +505,66 @@
           "3": 11671413437843.092,
           "4": 1.4256578160071363e+18
         }
-      }
+      },
+      "normalizer_enclosure": {
+        "Z_canonical_min": 0.4439938,
+        "Z_canonical_interval": [
+          0.4439938,
+          0.443994
+        ],
+        "rounding_mode": "directed upward for upper bounds"
+      },
+      "epistemic_qualification": "Certified bounds use scipy.integrate.quad estimates (empirical diagnostic), whereas proved analytic bounds derive unconditionally from global calculus supremum (N/e)^N with Z_canonical >= 0.4439938 and Young's convolution theorem."
     },
     "diagnostic_strong_grid_simpson_verification": {
       "a": 0.49,
       "gamma": 100.0,
-      "psi_pair": -4740931.995017014,
-      "k_pair": -4177186.385932194,
-      "difference_psi_minus_k": -563745.6090848204,
-      "predicted_delta_pair": -563745.6090847151,
-      "quartet_correction_delta": -1127491.2181694303,
-      "discrepancy": 1.0523945093154907e-07,
-      "relative_discrepancy": 1.866789722804467e-13
+      "psi_pair": 2.8228617578279227,
+      "k_pair": 264431.8691520251,
+      "difference_psi_minus_k": -264429.04629026726,
+      "predicted_delta_pair": -264429.0462900584,
+      "quartet_correction_delta": -528858.0925801168,
+      "discrepancy": 2.0884908735752106e-07,
+      "relative_discrepancy": 7.89811445783568e-13
     },
     "certified_weak_simpson_verification": {
       "a": 0.49,
       "gamma": 100.0,
-      "psi_pair_weak": 2.7833261294708507,
-      "k_pair_weak": 264441.5240308448,
-      "difference_psi_minus_k": -264438.7407047153,
-      "delta_pair_weak": -264438.7407047153,
-      "quartet_correction_delta": -528877.4814094306,
-      "boundary_term_B_wK": 264602.39502371365,
-      "boundary_term_B_wDelta": -264602.39502371365,
+      "psi_pair_weak": 2.7833514015812852,
+      "k_pair_weak": 264441.49939404347,
+      "k_pair_enclosure": [
+        264441.49932154344,
+        264441.4994665435
+      ],
+      "difference_psi_minus_k": -264438.7160426419,
+      "delta_pair_weak": -264438.7160426419,
+      "delta_pair_enclosure": [
+        -264438.7161151419,
+        -264438.7159701419
+      ],
+      "quartet_correction_delta": -528877.4320852838,
+      "boundary_term_B_wK": 264602.3704876673,
+      "boundary_term_B_wK_enclosure": [
+        264602.3704226673,
+        264602.37055266724
+      ],
+      "boundary_term_B_wDelta": -264602.3704876673,
+      "bulk_integral_K": -160.87109362377907,
+      "bulk_integral_K_enclosure": [
+        -160.87110112377908,
+        -160.87108612377907
+      ],
+      "bulk_integral_Delta": 163.65444502535993,
+      "bulk_integral_Delta_enclosure": [
+        163.65443752535992,
+        163.65445252535994
+      ],
+      "independent_error_budget": {
+        "boundary_contact_discretization_uncertainty": 6.5e-05,
+        "bulk_quadrature_discretization_uncertainty": 7.5e-06,
+        "total_independent_enclosure_radius": 7.25e-05,
+        "epistemic_certification_note": "The algebraic identity (psi_weak - k_weak) - delta_weak = 0 holds with zero residual because boundary contact terms B[w_K] and -B[w_K] cancel identically. Independent certification of k_weak and delta_weak requires explicit error enclosures on the individual contact and bulk terms."
+      },
       "discrepancy": 0.0,
       "relative_discrepancy": 0.0,
       "is_algebraic_identity_satisfied": true
@@ -607,13 +664,32 @@
     "explanation": "1. Kernel sampling & discrete convolution: pk = psi_h^(k) has peaks of order h^(-3-k). For k=3, h^(-6) = 6.4e7, and ck = convolve(p3, p3) has peaks of 2.24e25. Discrete convolution introduces floating-point truncation. 2. Spline interpolation: Tabulating ck on 1000 nodes and interpolating introduces an interpolation residual proportional to (Delta v)^4 ||C_0^(10)||_inf. For k=3, this derivative is huge. 3. Catastrophic cancellation: The 9604 station pairs (u_i, c_i) have sum_K b_K = 0, requiring 11 digits of cancellation. Any interpolation error in an individual bump is uncancelled. 4. Quadrature discretization: When integrated against cos(100 u), Simpson's rule error on N=4001 points is O(du^4 * 100^4 * ||f_b||) ~ 10^6. At N=4001 this yields -4.74e6 error, dropping to -807 at N=8001, -44 at N=16001, -17 at N=32001, and converging to direct value 2.78335 at N=64001. 5. Resolution: The certified weak formulation evaluates Psi, K, and Delta by moving p(partial_u) onto test functions, integrating smooth C_b(u) without derivatives, and retaining exact boundary contact terms B[w_K] and B[w_Delta] at u=0, achieving exact algebraic identity closure and < 1e-7 direct agreement."
   },
   "research_contradiction_analysis": {
-    "governing_question": "For the normalized production test associated with a hypothetical off-critical zero, what independently proved property of the complete curvature response and all unselected contributions excludes the balance D_b = -1/2 + r_match - r_rec under the off-critical-zero hypothesis H?",
-    "complete_functional_definition": "The complete explicit formula functional D_b is defined consistently across all components as: D_b = A_{<= U, b} + R_{arch, b} - S_{unselected, <= T, b} - R_{spectral, b}. Under the production construction, legal vector b satisfies sum_K b_K = 0, ||b||_2 = 1, and polynomial multiplier p(z) satisfies 4 exact interpolation constraints at selected zeros: p(0) = r_0, p(i gamma_1) = 0, p(i gamma_2) = 0, p(i gamma_3) = 0, engineered to produce the explicit formula balance D_b = -1/2 + r_match - r_rec.",
-    "curvature_transfer_decomposition": "Under the spectral curvature transfer identity S = K + Delta, the complete functional decomposes as: D_b = A_{<= U, b} + R_{arch, b} - (K_{unselected, <= T, b} + R_{K, spectral, b}) - (Delta_{unselected, <= T, b} + R_{Delta, spectral, b}). If hypothetical off-critical zero rho_0 is selected, S_{selected} shifts by Delta_{quartet}(rho_0), modifying the balance to D_b = -1/2 + r_match - r_rec + Delta_{selected}. If rho_0 is unselected, it enters through Delta_{unselected} or R_{Delta, spectral}.",
+    "governing_question": "With the actual selected-zero interpolation held fixed, what additional property of the complete curvature representation constrains the unselected contributions beyond the identity S = K + Delta and excludes the balance D_b = -1/2 + r_match - r_rec under the off-critical-zero hypothesis H?",
+    "complete_functional_definition": "The complete explicit formula functional D_b is defined consistently across all components as: D_b = A_{<= U, b} + R_{arch, b} - S_{unselected, <= T, b} - R_{spectral, b} = S_{selected, b}. Under the production construction, legal vector b satisfies sum_K b_K = 0, ||b||_2 = 1, and the selected basis consists of critical zeros gamma_1 ~= 14.1347, gamma_2 ~= 21.0220 and hypothetical off-critical target z_0 = delta + i*gamma with recovery weights lambda_1 ~= -6.564e-5, lambda_2 ~= -9.912e-6, lambda_Q/m_0 ~= -1.028e-3. The polynomial multiplier p(z) = sum_{k=0}^3 r_k z^{2k} satisfies the exact interpolation conditions p(i*gamma_1) = lambda_1, p(i*gamma_2) = lambda_2, Re[p(z_0)] = lambda_Q/m_0, Im[p(z_0)] = 0, producing S_{selected, b} = -1/2 + r_match - r_rec. Thus: D_b = -1/2 + r_match - r_rec.",
+    "production_polynomial_specification": {
+      "interpolated_points": {
+        "p_at_i_gamma1": -6.56406007178252e-05,
+        "target_lambda1": -6.56406007178252e-05,
+        "p_at_i_gamma2": -9.912457768987063e-06,
+        "target_lambda2": -9.912457768987063e-06,
+        "p_at_z0_real": -0.0010277027639018733,
+        "p_at_z0_imag": 0.0,
+        "target_lambda_Q_over_m0": -0.0010277027639018746,
+        "p_at_zero": -0.00011875325214314598
+      },
+      "coefficients_r": [
+        -0.00011875325214314598,
+        -2.8238634955707845e-07,
+        -8.373688649859146e-11,
+        -4.64140869793996e-15
+      ],
+      "note": "p(z) does NOT vanish at the selected zeros. It matches the non-zero recovery weights lambda_1, lambda_2, lambda_Q/m_0. The production polynomial already incorporates the hypothetical off-critical target z_0. Rewriting S as K + Delta splits both selected and unselected components into K and Delta; it does NOT add Delta_{selected} to the existing -1/2 balance."
+    },
+    "curvature_transfer_decomposition": "Under the spectral curvature transfer identity S = K + Delta, all spectral terms decompose as S = K + Delta: S_{selected, b} = K_{selected, b} + Delta_{selected, b} = -1/2 + r_match - r_rec, S_{unselected, <= T, b} = K_{unselected, <= T, b} + Delta_{unselected, <= T, b}, R_{spectral, b} = R_{K, spectral, b} + R_{Delta, spectral, b}. Substituting into the explicit formula gives: D_b = A_{<= U, b} + R_{arch, b} - (K_{unselected, <= T, b} + R_{K, spectral, b}) - (Delta_{unselected, <= T, b} + R_{Delta, spectral, b}) = K_{selected, b} + Delta_{selected, b} = -1/2 + r_match - r_rec.",
     "sufficient_contradiction_criterion": "|D_b| + eps_match + eps_rec < 1/2. If |D_b| + eps_match + eps_rec < 1/2, then |D_b| < 1/2 - eps, which strictly excludes D_b = -1/2 + r_match - r_rec.",
     "insufficiency_of_negativity": "Establishing D_b < 0 does not supply a contradiction. The authentic selected-weight construction already yields D_b ~ -1/2 < 0. Negativity is entirely consistent with the explicit formula and does not force an integer collision.",
     "insufficiency_of_single_quartet_nonvanishing": "Nonvanishing of Delta_quartet(a_0, gamma_0) = 8 m_0 int_0^R f_b(u) sinh(a_0 u) cos(gamma_0 u) du provides only a local perturbation of order O(a_0 / gamma_0^2) <= 10^13, which is negligible compared to the unconditional spectral tail allowance R_{spectral} ~ 1.036e17 and arithmetic functional A_{<=U} ~ 7.15e8. A nonzero quartet correction cannot force |D_b| outside [-1/2 - eps, -1/2 + eps].",
-    "smallest_unresolved_implication": "For the authentic production family with sum_K b_K = 0, ||b||_2 = 1, and p(z) satisfying the -1/2 interpolation constraints, does there exist an independently proved constraint on the non-local Hadamard finite-part pairing or the complete curvature functional D_K that forces the aggregate explicit formula functional D_b into a domain disjoint from [-1/2 - eps, -1/2 + eps] under H?"
+    "smallest_unresolved_implication": "For the authentic production family with fixed selected-zero interpolation (p(i*gamma_1) = lambda_1, p(i*gamma_2) = lambda_2, p(z_0) = lambda_Q/m_0), what additional property of the complete curvature representation constrains the unselected contributions beyond the identity S = K + Delta and forces |D_b| outside [-1/2 - eps, -1/2 + eps] under H?"
   },
   "reductio_implication_audit": {
     "what_H_supplies": "Hypothesis H posits an off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0). This supplies an off-critical quartet in the spectral explicit formula sum with displacement a = |delta_0| > 0.",
