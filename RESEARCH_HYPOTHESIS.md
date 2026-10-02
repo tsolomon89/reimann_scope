@@ -81,13 +81,23 @@ The proof-facing radial-class argument can therefore use \(\xi\) without losing 
 
 # 3. Transcendental continuation of the proof object
 
-Define
+The canonical grade domain is the field of real algebraic numbers:
 
 \[
 \boxed{
-\mathcal X_\tau(s,k)
+K\in\mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R.
+}
+\]
+
+Define for the completed function:
+
+\[
+\boxed{
+\mathcal X_\tau(s,K)
 =
-\xi(\tau^{-k}s),
+\xi(\tau^{-K}s),
+\qquad
+K\in\mathbb A_{\mathbb R},
 }
 \]
 
@@ -111,11 +121,11 @@ If
 \xi(\rho)=0,
 \]
 
-then the corresponding zero worldline is
+then the corresponding algebraic zero worldline is
 
 \[
 \boxed{
-s_\rho(k)=\tau^k\rho.
+s_\rho(K)=\tau^K\rho, \qquad K\in\mathbb A_{\mathbb R}.
 }
 \]
 
@@ -126,19 +136,19 @@ The critical surface is
 \mathcal C_\tau
 =
 \left\{
-(s,k):
-\Re(s)=\frac{\tau^k}{2}
+(s,K)\in\mathbb C\times\mathbb A_{\mathbb R}:
+\Re(s)=\frac{\tau^K}{2}
 \right\}.
 }
 \]
 
-Define normalized radial coordinate
+Define the normalized radial coordinate
 
 \[
 \boxed{
-R_\tau(s,k)
+R_\tau(s,K)
 =
-\tau^{-k}\Re(s)-\frac12.
+\tau^{-K}\Re(s)-\frac12.
 }
 \]
 
@@ -150,39 +160,50 @@ For
 
 \[
 \boxed{
-R_\tau(s_\rho(k),k)=\delta
+R_\tau(s_\rho(K),K)=\delta
 }
 \]
 
-for every grade \(k\).
+for every algebraic grade \(K\in\mathbb A_{\mathbb R}\).
 
 Thus each zero worldline belongs to one exact radial leaf
 
 \[
-\mathcal R_\delta.
+\mathcal R_\delta
+=
+\{(s,K)\in\mathbb C\times\mathbb A_{\mathbb R} : R_\tau(s,K)=\delta\}.
 \]
 
 ---
 
-# 4. The contradiction programme
+# 4. The contradiction programme and the Earliest Missing Implication
 
-The current intended proof structure is:
+The proof structure is:
 
 \[
 \boxed{
 \begin{aligned}
-1.&\ \textbf{Assume RH is false.}\\
-2.&\ \textbf{Construct the counterexample worldline.}\\
-3.&\ \textbf{Expose its bilateral radial defect across }\tau\text{-grades.}\\
-4.&\ \textbf{Derive a global transcendental-coherence law.}\\
-5.&\ \textbf{Prove radial rigidity / no mixed-leaf occupancy.}\\
-6.&\ \textbf{Use the established critical class to select }\mathcal R_0.\\
-7.&\ \textbf{Contradict the assumed off-critical leaf.}
+1.&\ \textbf{Assume RH is false }(H: \delta_0 \ne 0, \zeta(\rho_0) = 0).\\
+2.&\ \textbf{Construct the counterexample worldline across }\mathbb A_{\mathbb R}: \rho_{0,K} = \tau^K \rho_0.\\
+3.&\ \textbf{Expose its bilateral radial defect across algebraic grades}: R_\tau(\rho_{0,K}, K) = \delta_0 \ne 0.\\
+4.&\ \textbf{Apply an independently derived cross-grade constraint.}\\
+5.&\ \textbf{Derive a contradiction / incompatibility: }\bot.
 \end{aligned}
 }
 \]
 
-The exact content of steps 4–5 is not known. That is the research problem.
+### The Earliest Missing Implication
+By the **Pure Pullback Null Model**, coordinate transport $F_K(s) = f(\tau^{-K} s)$ alone preserves any root configuration with zero radial restriction. Therefore, step 4 requires an authentic coupling between zeta's arithmetic/analytic structure (primes, Euler product, explicit formula) and the graded grids $L_K = \tau^K(\pm\mathbb N)$.
+
+The exact statement of the earliest missing implication where deductive proof halts is:
+
+\[
+\boxed{
+H \Longrightarrow \left| D_b + \Delta_{\mathrm{quartet}}(\rho_0) \right| + \varepsilon_{\mathrm{match}} + \varepsilon_{\mathrm{rec}} < \frac{1}{2} \quad \text{or} \quad \exists K \ne J \in \mathbb A_{\mathbb R}, \; m, n \in \pm\mathbb N : m\tau^K = n\tau^J.
+}
+\]
+
+*Epistemic Note*: On the critical line, $D_b = S_{\mathrm{selected}} \approx -1/2 < 0$ already holds. Because the unselected spectral tail allowance ($\approx 1.036 \times 10^{17}$) dwarfs the off-critical quartet perturbation ($|\Delta_{\mathrm{quartet}}| \sim 10^{13}$), proving that $H$ forces the total explicit formula balance outside $[-1/2 - \varepsilon, -1/2 + \varepsilon]$ remains unproved. All downstream claims are strictly conditional upon this missing implication.
 
 ---
 
@@ -219,13 +240,13 @@ Transcendental continuation maps the assumed zero to
 
 \[
 \boxed{
-\rho_{*,k}
+\rho_{*,K}
 =
-\tau^k\rho_*.
+\tau^K\rho_*, \qquad K\in\mathbb A_{\mathbb R}.
 }
 \]
 
-At integer grades,
+At canonical integer checkpoints,
 
 \[
 \boxed{
@@ -240,7 +261,7 @@ K\in\mathbb Z.
 The worldline misses the critical surface at every grade because
 
 \[
-R_\tau(\rho_{*,k},k)=\delta\neq0.
+R_\tau(\rho_{*,K},K)=\delta\neq0.
 \]
 
 Compression and expansion alter absolute coordinates but do not change the normalized radial class.

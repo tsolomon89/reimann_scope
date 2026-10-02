@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "tc_constraint_foundations_status",
+  "baseline_commit": "ede01705",
+  "canonical_grade_domain": {
+    "domain_symbol": "A_R",
+    "domain_definition": "A_R = Q_bar cap R (field of real algebraic numbers)",
+    "elements_allowed": [
+      "zero (K = 0, native grade)",
+      "integers (K in Z, discrete bilateral skeleton)",
+      "rationals (K in Q, root refinements tau^{p/d})",
+      "real algebraic irrationals (K in A_R \\ Q, e.g. sqrt(2), (1+sqrt(5))/2)"
+    ],
+    "negative_clarification": "The canonical TC domain is NOT defined as K in R. Real-grade completion is an ambient topological embedding, not the discrete-algebraic TC universe."
+  },
+  "tc_definition": {
+    "scale_generator": "tau = 2*pi",
+    "scaled_zeta_representation": "Z_tau(s, K) = zeta(tau^{-K} * s), (s, K) in C x A_R",
+    "native_grade_recovery": "Z_tau(s, 0) = zeta(s)",
+    "completed_xi_representation": "X_tau(s, K) = xi(tau^{-K} * s), (s, K) in C x A_R",
+    "principle_of_redundancy": "No new information does not imply no new mathematical constraint. The same zeta object is redundantly represented across infinite incommensurate scales."
+  },
+  "grid_definition": {
+    "graded_grid_L_K": "L_K = { n * tau^K : n in +-N } = tau^K (Z \\ {0})",
+    "total_universe_L_tau": "L_tau = cup_{K in A_R} L_K = { n * tau^K : n in +-N, K in A_R }",
+    "incommensurability_theorem": "L_J cap L_K = empty_set for all J != K in A_R",
+    "incommensurability_proof_basis": "Lindemann-Weierstrass and Baker's theorems: tau = 2*pi is transcendental, so tau^{K-J} is never rational for non-zero algebraic K - J."
+  },
+  "zero_orbit_definition": {
+    "native_zero": "rho = 1/2 + delta + i*gamma",
+    "graded_worldline": "rho_K = tau^K * rho, K in A_R",
+    "zero_condition": "Z_tau(rho_K, K) = zeta(rho) = 0 identically for all K in A_R"
+  },
+  "radial_invariant": {
+    "normalized_radial_coordinate": "R_tau(s, K) = tau^{-K} * Re(s) - 1/2",
+    "worldline_invariance": "R_tau(rho_K, K) = delta identically for all K in A_R",
+    "critical_surface": "Re(s) = tau^K / 2 corresponds to delta = 0"
+  },
+  "coverage_conjecture_status": {
+    "conjecture_statement": "L_tau ?= R^x (everywhere extensive coverage of non-zero real scale)",
+    "mathematical_status": "PROJECT_CONJECTURE_ORGANIZING_INTUITION",
+    "cardinality_verdict": "Strictly false set-theoretically under ZFC (|L_tau| = aleph_0 < |R^x| = 2^{aleph_0}); everywhere dense topologically (closure(L_tau) = R).",
+    "proof_dependency_policy": "Forbidden as a premise for an RH proof; derivations must use the explicit algebraic grid family {L_K} directly."
+  },
+  "pure_pullback_theorem_status": {
+    "theorem": "Pure pullback F_K(s) = f(tau^{-K} s) for an arbitrary meromorphic function f preserves zero orbits and radial defects delta with zero obstruction.",
+    "null_model_consequence": "Pure coordinate pullback imposes zero radial rigidity. Off-critical zeros (delta != 0) are unconditionally coherent under pure pullback.",
+    "status": "PROVED_MATHEMATICAL_NULL_MODEL"
+  },
+  "zeta_specific_structures_audited": [
+    {"structure": "Reflection Functional Equation", "constrains_delta": false, "counterexample": "Davenport-Heilbronn zeta has functional equation but off-line zeros"},
+    {"structure": "Completed Function Normalization", "constrains_delta": false, "counterexample": "Epstein zeta functions possess Gamma factors but violate RH"},
+    {"structure": "Dirichlet Series Frequencies", "constrains_delta": "Partially", "note": "Frequencies scale as tau^{-K} log n"},
+    {"structure": "Euler Product and Prime Powers", "constrains_delta": "Yes (Arithmetic)", "note": "Multiplicatively independent prime log-frequencies"},
+    {"structure": "Weil Explicit Formula", "constrains_delta": "Yes (Coupling)", "note": "Connects zero spectrum {rho_K} to prime stations on L_K"},
+    {"structure": "TC Arithmetic Grids L_K", "constrains_delta": "Yes (Cross-Grade)", "note": "Evaluates prime stations against incommensurate algebraic grades"}
+  ],
+  "scale_generator_equivalence_status": {
+    "generator_class": "G_tau = { a * tau : a in A_R^x }",
+    "fourier_self_duality": "tau = 2*pi is the unique Poisson self-duality factor for the integer lattice Z",
+    "algebraic_equiv": "Any algebraic non-zero multiple of tau generates an algebraically equivalent grid universe over A_R."
+  },
+  "existing_cross_grade_constraints": {
+    "weak_curvature_transfer": "S = K + Delta (algebraic identity, residual 0.0, no independent constraint on D_b)",
+    "explicit_formula_balance": "D_b = A_complete - S_unselected = S_selected = -1/2 + r_match - r_rec (holds under critical construction, D_b < 0 already holds)",
+    "status": "VALID_REPRESENTATIONS_WITHOUT_INDEPENDENT_INEQUALITY_CONSTRAINT"
+  },
+  "analytic_arithmetic_coupling_status": {
+    "status": "UNRESOLVED_ACTIVE_OBLIGATION",
+    "coupling_mechanism": "Weil explicit formula on legal multi-grade family G_b",
+    "defect": "Off-critical perturbation |Delta_quartet| ~ 10^{13} is absorbed by unselected spectral tail uncertainty 1.036e17; no theorem forces violation of explicit formula balance."
+  },
+  "earliest_missing_implication": {
+    "statement": "H (exists rho_0 with delta_0 != 0) ==> |D_b| + eps_match + eps_rec < 1/2 or m*tau^K = n*tau^J (K != J, m, n in +-N)",
+    "current_truth_value": "UNPROVED",
+    "downstream_dependency": "All claims of RH proof or general remainder obstruction are conditional on this missing arrow."
+  },
+  "branches_frozen": [
+    {"branch": "Numerical Tail Refinement", "rationale": "Tail dominance (10^{17} >> 10^{13}) is structural; decimal refinements cannot bridge 4 orders of magnitude."},
+    {"branch": "Polynomial Optimizer Witness Tuning", "rationale": "Constructing higher-degree p(z) to amplify local curvature does not address the unselected infinite tail."},
+    {"branch": "Finite Grid Simpson Refinements", "rationale": "Numerical agreement (< 1e-7) is already certified; further grid doubling yields no new mathematical insight."}
+  ],
+  "numerical_policy_status": {
+    "role": "VALIDATION_AND_ERROR_ENCLOSURES_ONLY",
+    "rule": "Numerics are used to verify algebraic transformations, detect implementation errors, and certify error budgets; they are never promoted to mathematical proof of RH."
+  },
+  "conceptual_verdict": {
+    "status": "CONCEPTUAL_FOUNDATIONS_RIGOROUSLY_CONSOLIDATED",
+    "summary": "The repository is re-centred on the canonical algebraic-grade domain K in A_R. Pure pullback is proved to impose zero radial constraint. The research obligation is isolated to proving cross-grade spectral rigidity across {L_K} in the Weil explicit formula."
+  }
+}

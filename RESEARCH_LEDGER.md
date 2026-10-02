@@ -22,33 +22,36 @@ No agent should promote a claim without changing its classification here and doc
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
-| TC-001 | `Transcendental continuation` is the project-defined extension \(\mathcal Z_\tau(s,k)=\zeta(\tau^{-k}s)\). | **DESIGN DEFINITION** | This names the formal framework used by the repo. |
-| TC-002 | \(k=0\) recovers ordinary analytically continued zeta: \(\mathcal Z_\tau(s,0)=\zeta(s)\). | **PROVED** | Direct substitution. |
-| TC-003 | Integer \(K\) gives the canonical bilateral grade family \(\tau^K\). | **DESIGN DEFINITION** | Canonical project skeleton. |
-| TC-004 | Rational grades provide root refinements; real grades provide the full positive continuous scale axis. | **PROVED** | \(\tau^\mathbb R=\mathbb R_{>0}\); rational powers give roots. |
+| TC-001 | `Transcendental continuation` is the project-defined extension \(\mathcal Z_\tau(s,K)=\zeta(\tau^{-K}s)\) across canonical real algebraic grades \(K \in \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R\). | **DESIGN DEFINITION** | This names the formal framework used by the repo. |
+| TC-002 | \(K=0\) recovers ordinary analytically continued zeta: \(\mathcal Z_\tau(s,0)=\zeta(s)\). | **PROVED** | Direct substitution. |
+| TC-003 | Integer \(K \in \mathbb Z\) gives the canonical discrete skeleton \(\tau^K\); canonical domain is \(K \in \mathbb A_{\mathbb R}\). | **DESIGN DEFINITION** | Integer skeleton inside algebraic domain. |
+| TC-004 | Rational grades provide root refinements; continuous real coordinate \(k \in \mathbb R\) provides ambient embedding and scale flow; canonical TC domain is \(\mathbb A_{\mathbb R}\). | **PROVED** | \(\tau^{\mathbb Z} \subset \tau^{\mathbb Q} \subset \tau^{\mathbb A_{\mathbb R}} \subset \tau^{\mathbb R} = \mathbb R_{>0}\). |
 | TC-005 | Transcendental continuation is standard established terminology in analytic number theory. | **FALSE** | It is a project-defined term. |
 | TC-006 | The framework itself proves RH. | **FALSE** | It supplies an extended geometry and candidate constraints only. |
+| TC-007 | Informational redundancy vs constraint: "No new information \(\not\Rightarrow\) no new mathematical constraint". Redundancy is the construction; do not quotient it away. | **DESIGN DEFINITION** | Maximum redundancy across grades to expose joint compatibility conditions. |
+| TC-008 | Pure Pullback Null Model: Generic meromorphic function \(f\) under \(F_K(s) = f(\tau^{-K}s)\) satisfies all pullback identities with zero radial rigidity on \(\delta\). | **PROVED / KNOWN INSUFFICIENT** | Exact coordinate transport alone imposes zero restriction on zero locations. |
 
 ---
 
-# 2. Parallel construction and lattice claims
+# 2. Graded arithmetic grids and universe claims
 
-Define
+Define for every algebraic grade \(K \in \mathbb A_{\mathbb R}\):
 
 \[
-L_K=\tau^K\mathbb Z.
+L_K = \{n\tau^K : n \in \pm\mathbb N\}, \qquad \mathfrak L_\tau = \bigcup_{K \in \mathbb A_{\mathbb R}} L_K.
 \]
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
-| L-001 | Every \(L_K\) has cardinality \(\aleph_0\). | **PROVED** | Scaling is a bijection from \(\mathbb Z\). |
-| L-002 | Distinct integer-grade lattices satisfy \(L_J\cap L_K=\{0\}\). | **PROVED** | A nonzero intersection would make \(\tau^{K-J}\) rational. |
-| L-003 | Distinct rational-grade lattices also intersect only at \(0\). | **PROVED** | Nonzero rational powers of transcendental \(\tau\) are transcendental. |
-| L-004 | The integer/rational grade lines are scale-isomorphic but arithmetically noncoincident. | **PROVED / TERMINOLOGY** | Summarizes L-001 through L-003. |
-| L-005 | Distinct arbitrary real-grade lattices are always noncoincident. | **FALSE** | Example \(k=\log_\tau 2\) gives \(L_k=2\mathbb Z\). |
+| L-001 | Every \(L_K\) has cardinality \(\aleph_0\). | **PROVED** | Scaling is a bijection from \(\mathbb Z \setminus \{0\}\). |
+| L-002 | Distinct algebraic-grade grids satisfy \(L_J\cap L_K=\emptyset\) for all \(J \ne K \in \mathbb A_{\mathbb R}\). | **PROVED** | Nonzero intersection would make \(\tau^{K-J} \in \mathbb Q\), contradicting transcendence of \(\tau\) and Baker's theorem. |
+| L-003 | Total grid universe \(\mathfrak L_\tau\) has cardinality \(\aleph_0\). | **PROVED** | Countable union of countable sets. |
+| L-004 | Distinct algebraic grids are scale-isomorphic, equipotent, and arithmetically disjoint. | **PROVED / TERMINOLOGY** | Summarizes L-001 through L-003. |
+| L-005 | Distinct arbitrary real-grade lattices are always noncoincident. | **FALSE** | Example \(k=\log_\tau 2\) gives \(L_k=2\mathbb Z\), overlapping \(L_0 = \mathbb Z\). |
 | L-006 | The coordinate spaces of distinct grades are non-isomorphic. | **FALSE** | Multiplication by the scale ratio gives an invertible real map. |
 | L-007 | Parallel construction means one line must be finitely traversed to reach another. | **FALSE** | The framework constructs grades by making grade part of the coordinate. |
 | L-008 | Exact symbolic grade identity and finite numerical realization are the same thing. | **FALSE** | The repo explicitly separates them. |
+| L-009 | TC Coverage Conjecture: \(\mathfrak L_\tau \stackrel{?}{=} \mathbb R^\times\). | **PROJECT CONJECTURE / NOT A THEOREM** | Literal set equality fails in ZFC (\(\aleph_0 < 2^{\aleph_0}\)); dense closure \(\overline{\mathfrak L_\tau} = \mathbb R\); must never be assumed as an unproved lemma. |
 
 ---
 
@@ -56,7 +59,7 @@ L_K=\tau^K\mathbb Z.
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
-| N-001 | \(\tau^K\) is exactly specifiable symbolically for integer \(K\). | **PROVED / STANDARD** | It is an exact mathematical expression. |
+| N-001 | \(\tau^K\) is exactly specifiable symbolically for integer and algebraic \(K\). | **PROVED / STANDARD** | It is an exact mathematical expression. |
 | N-002 | A finite positional numerical representation exhausts the full real value of nonzero \(\tau^K\). | **FALSE** | Its positional expansion is nonterminating. |
 | N-003 | Authoritative numerical work should distinguish exact symbolic referent from finite numerical realization. | **RESEARCH REQUIREMENT** | Prevents false exactness claims. |
 | N-004 | The repo must take a position on philosophical disputes over the word `computable`. | **FALSE AS REQUIREMENT** | Use `exactly specified, finitely realized` instead. |
@@ -72,24 +75,24 @@ For a native zero
 \rho=\frac12+\delta+i\gamma,
 \]
 
-define
+define for \(K \in \mathbb A_{\mathbb R}\):
 
 \[
-s_\rho(k)=\tau^k\rho
+s_\rho(K)=\tau^K\rho
 \]
 
 and
 
 \[
-R_\tau(s,k)=\tau^{-k}\Re(s)-\frac12.
+R_\tau(s,K)=\tau^{-K}\Re(s)-\frac12.
 \]
 
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
-| W-001 | \(s_\rho(k)\) is a zero of \(\mathcal Z_\tau(\cdot,k)\). | **PROVED** | \(\zeta(\tau^{-k}\tau^k\rho)=\zeta(\rho)=0\). |
-| W-002 | The critical line becomes \(\Re(s)=\tau^k/2\). | **PROVED** | Origin-dilation image. |
-| W-003 | \(R_\tau(s_\rho(k),k)=\delta\) along every zero worldline. | **PROVED** | Exact cancellation. |
-| W-004 | Transcendental continuation preserves normalized radial class. | **PROVED** | W-003. |
+| W-001 | \(s_\rho(K)\) is a zero of \(\mathcal Z_\tau(\cdot,K)\) for all \(K \in \mathbb A_{\mathbb R}\). | **PROVED** | \(\zeta(\tau^{-K}\tau^K\rho)=\zeta(\rho)=0\). |
+| W-002 | The critical line becomes \(\Re(s)=\tau^K/2\). | **PROVED** | Origin-dilation image. |
+| W-003 | \(R_\tau(s_\rho(K),K)=\delta\) along every zero worldline across \(\mathbb A_{\mathbb R}\). | **PROVED** | Exact cancellation. |
+| W-004 | Transcendental continuation preserves normalized radial class across all algebraic grades. | **PROVED** | W-003. |
 | W-005 | Compression forces an off-line worldline to intersect the critical surface. | **FALSE** | Absolute defect shrinks but normalized \(\delta\) remains nonzero. |
 | W-006 | The existence of multiple mathematical radial leaves is contradictory. | **FALSE** | The ambient geometry permits them. |
 | W-007 | RH is equivalent to all actual nontrivial zero worldlines occupying \(R_\tau=0\). | **PROVED REFORMULATION** | Equivalent to \(\Re(\rho)=1/2\). |
@@ -101,13 +104,14 @@ R_\tau(s,k)=\tau^{-k}\Re(s)-\frac12.
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
 | R-001 | If RH is false, the actual nontrivial spectrum contains an occupied \(R_\tau\neq0\) leaf in addition to established \(R_\tau=0\) zeros. | **PROVED CONDITIONAL STRUCTURE** | Definition of a counterexample plus known on-line zeros. |
-| R-002 | A counterexample generates a bilateral transcendental radial defect worldline. | **PROVED** | Exact worldline and grade formulas. |
-| R-003 | The complete grade family may impose a global coherence law not reducible to coordinate covariance. | **OPEN** | Central discovery target. |
+| R-002 | A counterexample generates a bilateral transcendental radial defect worldline across \(\mathbb A_{\mathbb R}\). | **PROVED** | Exact worldline and grade formulas. |
+| R-003 | The complete algebraic grade family may impose a global coherence law not reducible to coordinate covariance. | **OPEN** | Central discovery target. |
 | R-004 | Such a coherence law forces only one occupied radial leaf. | **OPEN** | Missing radial-rigidity theorem. |
 | R-005 | `Transcendental Coherence -> Transcendental Radial Rigidity` is the central missing implication. | **OPEN / CURRENT TARGET** | Core proof programme. |
 | R-006 | Global participation of all zeros in one xi/zeta object automatically forces one radial leaf. | **FALSE AS AN INFERENCE** | Global dependence does not by itself equal radial rigidity. |
 | R-007 | An off-line zero is impossible because there is literally no geometric space left between grade lines. | **FALSE / UNSUPPORTED** | Countable/dense families do not fill the continuum in that sense. |
 | R-008 | The train-line intuition is better represented as intersection of exact grade constraints than literal intersection of points. | **CURRENT FORMULATION** | Mathematically stronger and avoids the space-filling error. |
+| R-009 | Earliest Missing TC Implication: \(H \implies |D_b + \Delta_{\mathrm{quartet}}| + \varepsilon_{\mathrm{match}} + \varepsilon_{\mathrm{rec}} < 1/2\) or \(\exists K \ne J, m, n: m\tau^K = n\tau^J\). | **RESEARCH REQUIREMENT / OPEN** | Unproved; critical line already has \(D_b \approx -1/2\), and unselected spectral tail allowance (\(\sim 10^{17}\)) dwarfs off-critical quartet perturbation (\(\sim 10^{13}\)). |
 
 ---
 

@@ -27,19 +27,28 @@ The working contradiction programme is:
 \[
 \boxed{
 \begin{aligned}
-1.&\ \text{Assume RH is false.}\\
+1.&\ \text{Assume RH is false }(H: \delta_0 \ne 0, \zeta(\rho_0) = 0).\\
 2.&\ \text{Then the nontrivial spectrum contains both }
-\delta=0\text{ and }\delta\neq0\text{ radial classes.}\\
-3.&\ \text{Construct the complete }\tau\text{-graded transcendental continuation.}\\
+\delta=0\text{ and }\delta_0\neq0\text{ radial classes.}\\
+3.&\ \text{Construct the complete }\tau\text{-graded transcendental continuation across }\mathbb A_{\mathbb R}.\\
 4.&\ \text{Derive an exact global coherence law across that family.}\\
 5.&\ \text{Prove that the law admits only one occupied radial class.}\\
 6.&\ \text{Known critical-line zeros fix that class at }\delta=0.\\
-7.&\ \delta\neq0\text{ is contradictory.}
+7.&\ \delta_0\neq0\text{ is contradictory.}
 \end{aligned}
 }
 \]
 
-Steps 4–5 are the missing mathematics. The project exists to discover, kill, or formalize them.
+### The Earliest Missing Implication
+The exact point where deductive proof halts is:
+
+\[
+\boxed{
+H \Longrightarrow \left| D_b + \Delta_{\mathrm{quartet}}(\rho_0) \right| + \varepsilon_{\mathrm{match}} + \varepsilon_{\mathrm{rec}} < \frac{1}{2} \quad \text{or} \quad \exists K \ne J \in \mathbb A_{\mathbb R}, \; m, n \in \pm\mathbb N : m\tau^K = n\tau^J.
+}
+\]
+
+Under the critical line, $D_b = S_{\mathrm{selected}} \approx -1/2 < 0$ already holds. Proving that an off-critical zero forces the balance outside $[-1/2 - \varepsilon, -1/2 + \varepsilon]$ against the unselected spectral tail allowance ($\approx 1.036 \times 10^{17}$) is the central open challenge. The project exists to discover, test, or formalize the coupling bridging this gap.
 
 ---
 
@@ -51,13 +60,21 @@ Let
 \tau=2\pi.
 \]
 
-Define the project-facing extended family
+The canonical grade domain is the field of real algebraic numbers:
 
 \[
 \boxed{
-\mathcal Z_\tau(s,k)=\zeta(\tau^{-k}s),
+K \in \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R.
+}
+\]
+
+Define the project-facing extended family:
+
+\[
+\boxed{
+\mathcal Z_\tau(s,K)=\zeta(\tau^{-K}s),
 \qquad
-(s,k)\in\mathbb C\times\mathbb R.
+(s,K)\in\mathbb C\times\mathbb A_{\mathbb R}.
 }
 \]
 
@@ -69,15 +86,16 @@ The ordinary analytically continued zeta function is the native grade:
 }
 \]
 
-Thus \(k=0\) is not outside transcendental continuation. It is its standard analytic-continuation state.
+Thus \(K=0\) is not outside transcendental continuation. It is its standard analytic-continuation state.
 
 The project distinguishes:
 
-- \(k\in\mathbb R\): continuous transcendental-continuation coordinate;
-- \(K\in\mathbb Z\): canonical bilateral integer grade;
-- \(q\in\mathbb Q\): rational/root grade refinement.
+- \(K\in\mathbb A_{\mathbb R}\): canonical real algebraic grade domain;
+- \(K\in\mathbb Z\): canonical bilateral integer discrete skeleton;
+- \(q\in\mathbb Q\): rational/root grade refinement;
+- \(k\in\mathbb R\): continuous ambient embedding and scale flow (not canonical domain).
 
-The exact integer-grade family is
+The exact integer-grade skeleton is:
 
 \[
 \boxed{
@@ -95,42 +113,35 @@ See `TRANSCENDENTAL_CONTINUATION.md`.
 
 ---
 
-## Parallel construction principle
+## Graded arithmetic grids and universe
 
-For the arithmetic model
+For every algebraic grade \(K \in \mathbb A_{\mathbb R}\), define the nonzero arithmetic grid:
 
 \[
-L_K=\tau^K\mathbb Z,
-\qquad K\in\mathbb Z,
+L_K = \{n\tau^K : n \in \pm\mathbb N\}, \qquad \mathfrak L_\tau = \bigcup_{K \in \mathbb A_{\mathbb R}} L_K.
 \]
 
-every line has countably infinitely many stops and is scale-isomorphic to every other line.
+Each grid has countably infinitely many points (\(|L_K|=\aleph_0\)) and is scale-isomorphic to every other grid.
 
-For \(J\neq K\),
+For any distinct algebraic grades \(J \ne K \in \mathbb A_{\mathbb R}\):
 
 \[
 \boxed{
-L_J\cap L_K=\{0\}.
+L_J\cap L_K=\emptyset.
 }
 \]
 
-So the integer-grade lines are **scale-isomorphic but arithmetically noncoincident**.
+So the algebraic-grade grids are **scale-isomorphic, equipotent, and arithmetically disjoint** (by Baker's theorem and the transcendence of \(\tau = 2\pi\)).
 
-Transcendental continuation does not numerically traverse one infinite line until it reaches another. It formally constructs the family in parallel by making the grade part of the coordinate.
+The organizing intuition of the project is the **TC Coverage Conjecture**: \(\mathfrak L_\tau \stackrel{?}{=} \mathbb R^\times\). In ZFC set theory, \(|\mathfrak L_\tau| = \aleph_0 < |\mathbb R^\times| = 2^{\aleph_0}\), but the topological closure is dense: \(\overline{\mathfrak L_\tau} = \mathbb R\). The coverage conjecture serves as organizing motivation, never as an unproved premise in an RH proof.
 
-A lattice point may therefore be represented structurally by
-
-\[
-(K,n)
-\]
-
-with numerical realization
+A grid point is represented structurally by:
 
 \[
-n\tau^K.
+(K,n), \qquad K \in \mathbb A_{\mathbb R}, \; n \in \pm\mathbb N,
 \]
 
-For \(K\neq0\), the grade is exactly specified symbolically even though any positional numerical realization is finite-precision.
+with exact symbolic realization \(n\tau^K\).
 
 ---
 

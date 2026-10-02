@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-014",
+  "active_task_id": "TASK-TC-015",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -277,6 +277,27 @@
         "tests/test_tc_numerical_and_span_defects.py"
       ],
       "resolution": "Target A, B, and C completed: 1) Independent error enclosures: recognized that algebraic identity residual zero in (Psi-K)-Delta=0 arises from boundary contact cancellation (+-4B[w_K]) and does not certify individual accuracy. Added resolution-aware error enclosures at n_psi=8000, n_grid=16001: K_pair in [264441.4993215, 264441.4994665], Delta_pair in [-264438.7161151, -264438.7159701], 4B[w_K] in [264602.3704227, 264602.3705527], strictly enclosing independent refined calculations 264441.4993905 and -264438.7160391 within 3.5e-6. 2) Tail allowance separation: separated empirical SciPy quad estimate ~2.458e16 (uncertified heuristic, claim of proof withdrawn) from proved analytic calculus bound ~6.481e29 derived via bump derivative polynomials and Young's inequality with Z_canonical >= 0.4439938 and directed upward rounding. 3) Production polynomial alignment: verified actual constructor in tc/weil_forms/optimization.py imposes non-zero recovery weights p(i*gamma_1) = -6.56406e-5, p(i*gamma_2) = -9.91246e-6, Re[p(z_0)] = -1.02770e-3 (p(0) = -1.18753e-4), NOT roots. Because z_0 is already incorporated into the selected set, the explicit formula preserves D_b = A_complete - S_unselected = S_selected = -1/2 + r_match - r_rec. Splitting S = K + Delta does not add another Delta_selected to the -1/2 balance. 4) Formulated governing research question: With actual selected-zero interpolation held fixed, what additional property of complete curvature representation constrains unselected contributions beyond identity S = K + Delta? Sprint supplies improved representation; additional constraint remains open."
+    },
+    {
+      "task_id": "TASK-TC-015",
+      "priority": 17,
+      "objective": "Transcendental Continuation Constraint Discovery and Conceptual Closure Sprint",
+      "status": "COMPLETED_CONCEPTUAL_CLOSURE",
+      "review_status": "REVIEWED_FOUNDATIONAL",
+      "open_implication": "Pure TC pullback imposes zero radial rigidity (Null Model Theorem). The explicit formula and curvature transfer on the authentic tau-graded family already holds with Db ~ -1/2 < 0 under the critical line, with unselected spectral tail allowance (~1.036e17) dwarfing off-critical quartet perturbations (~10^13). The earliest missing implication is proving H ==> |Db + Delta_quartet| + eps_match + eps_rec < 1/2 or m tau^K = n tau^J. Auxiliary numerical, optimization, and curvature sweeps are formally frozen.",
+      "planned_calculation": "1. Re-centre repository on original TC hypothesis: canonical grade domain K in A_R = Q_bar cap R, arithmetic grids L_K = tau^K(+-N), grid universe L_tau. 2. Distinguish informational redundancy from mathematical constraint. 3. Formulate and prove the Pure Pullback Null Model (arbitrary f has zero radial rigidity). 4. Audit scale generator equivalence class G_tau = {a tau : a in A_R^x}. 5. Clarify epistemic status of TC Coverage Conjecture (|L_tau| = aleph_0 < 2^aleph_0; dense closure). 6. Freeze auxiliary numerical/curvature branches. 7. Isolate the Earliest Missing Implication. 8. Reconcile root documentation and produce review TC_CONSTRAINT_FOUNDATIONS.md, machine-readable artifact tc_constraint_foundations.json, and arbitrary-precision tests.",
+      "acceptance_criterion": "Canonical domain reconciled to A_R; L_K and L_tau defined; Null model proven; Coverage conjecture epistemically bounded; Earliest missing implication isolated; auxiliary sweeps frozen; 19 tests in test_tc_constraint_foundations.py passing; all repository audits passing.",
+      "dependencies": ["TASK-TC-014"],
+      "evidence": [
+        "docs/reviews/TC_CONSTRAINT_FOUNDATIONS.md",
+        "data/tc_constraint_foundations.json",
+        "tests/test_tc_constraint_foundations.py",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md",
+        "README.md"
+      ],
+      "resolution": "Conceptual closure sprint completed. 1) Reconciled canonical grade domain to K in A_R (real algebraic numbers); discrete skeleton K in Z; root refinements q in Q; continuous real k in R is an ambient embedding/scale flow. 2) Arithmetic grids L_K = tau^K(+-N) and universe L_tau defined; proved incommensurability L_J cap L_K = emptyset for all distinct algebraic grades J != K in A_R. 3) Proved Pure Pullback Null Model: for generic meromorphic f, F_K(s) = f(tau^{-K} s) satisfies pullback invariance, zero transport, and radial invariance with ZERO radial rigidity on delta. 4) Characterized Coverage Conjecture L_tau =? R^x as organizing intuition; proved |L_tau| = aleph_0 < 2^aleph_0 in ZFC with dense closure; forbidden as unproved lemma. 5) Audited scale generators: G_tau = {a tau : a in A_R^x} share identical incommensurable grid structures; tau = 2pi is privileged as Poisson dual lattice generator of completed xi. 6) Isolated the Earliest Missing Implication: H ==> |Db + Delta_quartet| + eps_match + eps_rec < 1/2 or m tau^K = n tau^J; unproved because critical line already has Db ~ -1/2 and spectral tail (~1.036e17) dwarfs off-critical quartet (~10^13). 7) Formally froze auxiliary numerical, optimizer, and curvature campaigns. 8) Verified with 19 arbitrary-precision mpmath unit tests across integer, rational, and real algebraic irrational grades (sqrt(2), -sqrt(2), (1+sqrt(5))/2) at 60 dps."
     }
   ]
 }
