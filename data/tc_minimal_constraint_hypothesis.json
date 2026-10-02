@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "tc_minimal_constraint_hypothesis_status",
+  "task_identifier": "TASK-TC-016",
+  "parent_baseline_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
+  "date": "2026-10-02",
+  "epistemic_framework": {
+    "principle_of_redundancy": "No new information does not imply no new mathematical constraint. The same underlying zeta object is represented across multiple algebraic grades K in A_R.",
+    "canonical_grade_domain": "K in A_R = Q_bar cap R (field of real algebraic numbers)",
+    "bilateral_integer_skeleton": "K in Z",
+    "rational_refinements": "q in Q",
+    "ambient_continuous_scale_flow": "k in R (interpolation and differentiation parameter, not canonical TC domain)"
+  },
+  "incommensurability_theorems_and_status": {
+    "rational_grade_differences": {
+      "hypothesis": "K - J in Q \\ {0}",
+      "statement": "L_J cap L_K = empty_set on non-zero grids",
+      "status": "PROVED",
+      "proof_basis": "tau^{p/q} = n/m implies tau^p = (n/m)^q in Q, which implies a non-zero integer power of tau = 2*pi is algebraic, contradicting transcendence of tau (Lindemann 1882)."
+    },
+    "irrational_algebraic_grade_differences": {
+      "hypothesis": "K - J in A_R \\ Q",
+      "statement": "L_J cap L_K = empty_set on non-zero grids",
+      "status": "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC",
+      "analysis": "Gelfond-Schneider theorem requires an algebraic base (alpha^beta with algebraic alpha != 0, 1) and does NOT apply to transcendental tau = 2*pi.",
+      "mandatory_control_example": {
+        "base_b": "b = 2^{1/sqrt(2)}",
+        "base_transcendence": "Transcendental by Gelfond-Schneider (base 2 is algebraic, exponent 1/sqrt(2) is irrational algebraic)",
+        "exponent_beta": "sqrt(2) (irrational algebraic)",
+        "result": "b^{sqrt(2)} = (2^{1/sqrt(2)})^{sqrt(2)} = 2 in Q",
+        "implication": "Transcendence of a base alone does NOT imply noncollision at irrational algebraic exponents."
+      },
+      "downstream_policy": "Full algebraic-grade grid disjointness must NOT be asserted as a theorem or used as a premise downstream."
+    },
+    "scale_generator_multiples": {
+      "statement": "For non-zero algebraic a, a*tau is transcendental, but L_{K, a*tau} = {n(a*tau)^K} does not equal L_{K, tau} = {m*tau^K} because n*a^K is not generally an integer.",
+      "status": "WITHDRAWN_AND_RECLASSIFIED_AS_OPEN_COMPARISON"
+    }
+  },
+  "canonical_three_layer_architecture": {
+    "layer_1_proved_algebraic": {
+      "name": "Minimal Exact Spectral Detector",
+      "status": "PROVED_AND_EXACT",
+      "definitions": {
+        "centered_tc_character": "chi_rho(K) = tau^{K(rho - 1/2)}",
+        "modulus": "|chi_rho(K)| = tau^{K*delta}",
+        "reflected_modulus": "|chi_{rho^#}(K)| = tau^{-K*delta}",
+        "finite_grade_reflection_defect": "B_rho(K) = |chi_rho(K)| + |chi_{rho^#}(K)| - 2 = tau^{K*delta} + tau^{-K*delta} - 2 = 4*sinh^2(K*delta*log(tau)/2)"
+      },
+      "theorems": {
+        "universal_nonnegativity": "B_rho(K) >= 0 for all K in A_R, delta in R",
+        "sharp_zero_rigidity": "For any K != 0 in A_R: B_rho(K) = 0 iff delta = 0",
+        "continuous_curvature_limit": "B_rho''(0) = 2*delta^2*(log(tau))^2 (infinitesimal limit, not foundational requirement)"
+      },
+      "generic_base_control": {
+        "detector": "B_{rho, b}(K) = b^{K*delta} + b^{-K*delta} - 2 = 4*sinh^2(K*delta*log(b)/2)",
+        "verdict": "B_{rho, b}(K) >= 0 and B_{rho, b}(K) = 0 iff delta = 0 for all b > 1",
+        "critical_insight": "The positivity and zero-rigidity of B_rho(K) are generic hyperbolic properties, NOT tau-specific. All tau/zeta specificity must reside in the arithmetic functional A_K."
+      },
+      "common_grade_shift_relation": {
+        "bivariate_correlator": "G_rho(K, J) = chi_rho(K) * conj(chi_rho(J))",
+        "shift_law": "G_rho(K+A, J+A) = tau^{2*A*delta} * G_rho(K, J)",
+        "invariance_condition": "G_rho(K+A, J+A) = G_rho(K, J) for non-zero A iff delta = 0"
+      }
+    },
+    "layer_2_conditional_rigidity": {
+      "name": "TC Same-Referent Constraint Rigidity",
+      "status": "PROVED_CONDITIONAL_ON_LAYER_3",
+      "hypothesis": "Exists a zero-independent, zeta-intrinsic functional A_K such that A_K = A_0 for K in A_R (or non-zero K), representing the identical zeta object",
+      "spectral_expansion": "A_K - A_0 = sum_{rho in Z^+} w_rho * B_rho(K) with w_rho > 0",
+      "deduction": "Same-referent invariance A_K = A_0 forces 0 = 4 * sum_{rho} w_rho * sinh^2(K*delta_rho*log(tau)/2). Every term is non-negative and w_rho > 0, forcing delta_rho = 0 for all nontrivial zeros rho.",
+      "conclusion": "Riemann Hypothesis holds conditionally."
+    },
+    "layer_3_open_arithmetic": {
+      "name": "True Earliest Missing Implication",
+      "status": "OPEN_RESEARCH_OBLIGATION",
+      "obligation_statement": "Construct A_K from zeta's arithmetic/analytic structure alone (Euler product, primes, Gamma factor, functional equation) and prove A_K - A_0 = sum_{rho} w_rho * B_rho(K) with w_rho > 0 without assuming zeros, RH, or Weil positivity.",
+      "prohibitions": [
+        "Must NOT be defined from the zero set itself",
+        "Must NOT assume RH or known RH equivalences",
+        "Must NOT assume full algebraic-grid disjointness",
+        "Must NOT assume a lattice collision",
+        "Must NOT insert ad hoc positive spectral weighting solely to force the result"
+      ]
+    }
+  },
+  "reclassification_of_existing_machinery": {
+    "weil_explicit_formula_branch": "Candidate machinery for constructing A_K via prime-zero pairing; tail dominance (1.036e17 >> 10^13) remains an obstacle for unregularized multi-grade linear combinations.",
+    "weak_curvature_transfer_branch": "Algebraic identity S = K + Delta; verifies coordinate and contact consistency; does not provide independent inequality constraint on D_b.",
+    "continuous_curvature_transport_branch": "Infinitesimal limit B_rho''(0) = 2*delta^2*(log(tau))^2; fully subsumed by the finite algebraic-grade reflection defect B_rho(K) = 4*sinh^2(K*delta*log(tau)/2).",
+    "radial_defect_quotient_branch": "Normalized relative curvature delta^2/gamma^2; candidate positive weight profile."
+  },
+  "governing_verdict": {
+    "question": "Can the fact that every TC grade represents the same zeta object be converted into a zero-independent arithmetic identity whose spectral difference between grades is a positive sum of reflection defects B_rho(K)?",
+    "status": "ACTIVE_THEORETICAL_QUESTION_ISOLATED"
+  }
+}

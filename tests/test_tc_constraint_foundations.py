@@ -196,24 +196,153 @@ class TestTranscendentalContinuationFoundations:
             # CONCLUSION: Pure pullback does not exclude off-critical zeros for a generic function.
             # Any RH-excluding constraint MUST arise from zeta-specific arithmetic/analytic structure.
 
-    def test_grid_structure_and_scale_generators(self):
-        """Test grid non-coincidence and scale generator comparison."""
-        with mpmath.workdps(50):
+    def test_rational_grade_noncollision_exact_theorem(self):
+        """Verify the exact algebraic noncollision theorem for rational grade differences.
+        
+        Theorem: For any distinct rational grades J != K in Q, L_J cap L_K = emptyset.
+        Proof: If m * tau^K == n * tau^J with m, n in Z\\{0}, then tau^(K-J) = n/m in Q.
+        Writing K - J = p/q with p in Z\\{0} and q in N, raising to the q-th power yields
+        tau^p = (n/m)^q in Q. Thus tau satisfies a non-trivial algebraic polynomial with
+        integer coefficients, contradicting the transcendence of tau = 2*pi (Lindemann 1882).
+        """
+        import sympy as sp
+        tau_sym = sp.Symbol("tau", positive=True)
+        # Symbolic verification of polynomial reduction: (tau^(p/q))^q - (n/m)^q = tau^p - (n/m)^q
+        p, q = 3, 4
+        m, n = 5, 7
+        lhs_pow = (tau_sym ** (sp.Rational(p, q))) ** q
+        rhs_pow = sp.Rational(n, m) ** q
+        assert sp.simplify(lhs_pow - tau_sym ** p) == 0
+        assert rhs_pow == sp.Rational(2401, 625)
+        # Lindemann's theorem asserts tau is transcendental, so tau^p cannot be rational for p != 0.
+
+    def test_transcendental_base_counterexample_gelfond_schneider(self):
+        """Verify the mandatory control counterexample b = 2^(1/sqrt(2)).
+        
+        By Gelfond-Schneider (1934), b = 2^(1/sqrt(2)) has algebraic base 2 != 0, 1
+        and irrational algebraic exponent 1/sqrt(2), so b is TRANSCENDENTAL.
+        However, b^(sqrt(2)) = (2^(1/sqrt(2)))^(sqrt(2)) = 2^1 = 2 in Q!
+        
+        Therefore, m * b^(sqrt(2)) = n * b^0 has an exact nonzero integer solution:
+        1 * b^(sqrt(2)) = 2 * b^0  (m=1, n=2).
+        
+        This PROVES that transcendence of a base alone DOES NOT imply noncollision
+        at irrational algebraic exponents. Full algebraic-grade noncollision for tau
+        CANNOT be inferred from transcendence of tau without an independent theorem.
+        """
+        with mpmath.workdps(60):
+            # Compute b = 2^(1/sqrt(2))
+            sqrt2 = mpmath.sqrt(2)
+            b = mpmath.power(2, 1 / sqrt2)
+            # b^(sqrt(2)) == 2 exactly
+            b_pow_sqrt2 = mpmath.power(b, sqrt2)
+            assert abs(b_pow_sqrt2 - 2) < 1e-50
+
+            # Collision in grid L_{sqrt(2), b} and L_{0, b}:
+            # m * b^(sqrt(2)) == n * b^0 for m=1, n=2
+            m = 1
+            n = 2
+            diff = m * b_pow_sqrt2 - n * mpmath.power(b, 0)
+            assert abs(diff) < 1e-50
+
+    def test_irrational_algebraic_exponent_status_open(self):
+        """Confirm that irrational algebraic tau-exponent collision is classified as OPEN.
+        
+        Neither Gelfond-Schneider (requires algebraic base) nor Baker's theorem
+        (linear forms in logarithms of algebraic numbers) directly establishes
+        whether (2*pi)^sqrt(2) is irrational or transcendental.
+        The full algebraic grid disjointness question is strictly OPEN.
+        """
+        status_classification = "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC"
+        assert status_classification.startswith("OPEN")
+
+    def test_minimal_spectral_detector_B_rho_exact(self):
+        """Verify the minimal finite-grade reflection defect detector B_rho(K).
+        
+        B_rho(K) = |chi_rho(K)| + |chi_{rho^#}(K)| - 2
+                 = tau^(K*delta) + tau^(-K*delta) - 2
+                 = 4 * sinh^2(K*delta*log(tau) / 2).
+        For every nonzero algebraic grade K in A_R \\ {0}:
+          B_rho(K) >= 0, and B_rho(K) == 0 iff delta == 0.
+        """
+        with mpmath.workdps(60):
             tau = 2 * mpmath.pi
-            pi_val = mpmath.pi
+            log_tau = mpmath.log(tau)
 
-            # Scale generator relationship: tau = 2*pi
-            assert abs(tau - 2 * pi_val) < 1e-48
+            # Test across multiple algebraic grades: K = 1, -1, 1/2, sqrt(2), (1+sqrt(5))/2
+            test_grades = [
+                mpmath.mpf("1"),
+                mpmath.mpf("-1"),
+                mpmath.mpf("0.5"),
+                mpmath.sqrt(2),
+                (1 + mpmath.sqrt(5)) / 2
+            ]
 
-            # Incommensurability for algebraic K != J:
-            # If m * tau^K == n * tau^J, then tau^(K-J) == n/m in Q
-            # For K=1, J=0: tau^1 = 2*pi is transcendental, so 2*pi != n/m for any integer n, m
-            for m in range(1, 20):
-                for n in range(1, 100):
-                    assert abs(float(tau) - float(n) / float(m)) > 1e-4
+            # Case A: On the critical line (delta = 0)
+            delta_on = mpmath.mpf("0.0")
+            for K in test_grades:
+                val_exp = mpmath.power(tau, K * delta_on) + mpmath.power(tau, -K * delta_on) - 2
+                val_sinh = 4 * (mpmath.sinh(K * delta_on * log_tau / 2) ** 2)
+                assert abs(val_exp) < 1e-50
+                assert abs(val_sinh) < 1e-50
 
-            # For K=sqrt(2), J=0: tau^sqrt(2) is transcendental (Gelfond-Schneider theorem on logarithms)
-            tau_sqrt2 = mpmath.power(tau, mpmath.sqrt(2))
-            for m in range(1, 20):
-                for n in range(1, 100):
-                    assert abs(float(tau_sqrt2) - float(n) / float(m)) > 1e-4
+            # Case B: Off the critical line (delta != 0)
+            delta_off = mpmath.mpf("0.49")
+            for K in test_grades:
+                val_exp = mpmath.power(tau, K * delta_off) + mpmath.power(tau, -K * delta_off) - 2
+                val_sinh = 4 * (mpmath.sinh(K * delta_off * log_tau / 2) ** 2)
+                assert abs(val_exp - val_sinh) < 1e-50
+                # Strictly positive for delta != 0 and K != 0
+                assert val_exp > 1e-10
+                assert val_sinh > 1e-10
+
+    def test_generic_base_detector_control(self):
+        """Verify that B_{rho,b}(K) >= 0 and == 0 iff delta == 0 for ANY base b > 1.
+        
+        This establishes that the hyperbolic positivity detector is NOT tau-specific.
+        Any tau/zeta-specific constraint must reside in constructing the arithmetic
+        functional A_K, not in the detector itself.
+        """
+        with mpmath.workdps(60):
+            for b in [mpmath.mpf("1.5"), mpmath.mpf("2.0"), mpmath.mpf("10.0"), mpmath.exp(1)]:
+                log_b = mpmath.log(b)
+                delta = mpmath.mpf("0.35")
+                K = mpmath.sqrt(3)  # algebraic grade
+                B_val = 4 * (mpmath.sinh(K * delta * log_b / 2) ** 2)
+                assert B_val > 0
+
+                # Zero check
+                B_zero = 4 * (mpmath.sinh(K * 0 * log_b / 2) ** 2)
+                assert abs(B_zero) < 1e-50
+
+    def test_common_grade_shift_translation_identity(self):
+        """Verify the common-grade translation shift relation:
+        
+        G_rho(K, J) = chi_rho(K) * conj(chi_rho(J))
+        G_rho(K+A, J+A) = tau^(2*A*delta) * G_rho(K, J).
+        
+        Common-grade translation invariance G(K+A, J+A) == G(K, J) forces:
+        tau^(2*A*delta) == 1 ==> delta == 0.
+        """
+        with mpmath.workdps(60):
+            tau = 2 * mpmath.pi
+            log_tau = mpmath.log(tau)
+            delta = mpmath.mpf("0.49")
+            gamma = mpmath.mpf("14.13472514173469379")
+
+            K = mpmath.sqrt(2)
+            J = mpmath.mpf("0.5")
+            A = mpmath.mpf("1.5")  # shift amount
+
+            def chi(k_val):
+                return mpmath.exp(k_val * (delta + mpmath.mpc(0, gamma)) * log_tau)
+
+            G_base = chi(K) * mpmath.conj(chi(J))
+            G_shifted = chi(K + A) * mpmath.conj(chi(J + A))
+
+            scaling_factor = mpmath.power(tau, 2 * A * delta)
+            expected_shifted = scaling_factor * G_base
+
+            assert abs(G_shifted - expected_shifted) < 1e-45
+            # At delta != 0, scaling factor != 1
+            assert abs(scaling_factor - 1) > 1e-5

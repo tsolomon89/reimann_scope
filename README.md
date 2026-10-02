@@ -40,15 +40,26 @@ The working contradiction programme is:
 \]
 
 ### The Earliest Missing Implication
-The exact point where deductive proof halts is:
+The foundational missing theorem is the construction of a zero-independent same-referent functional:
 
 \[
 \boxed{
-H \Longrightarrow \left| D_b + \Delta_{\mathrm{quartet}}(\rho_0) \right| + \varepsilon_{\mathrm{match}} + \varepsilon_{\mathrm{rec}} < \frac{1}{2} \quad \text{or} \quad \exists K \ne J \in \mathbb A_{\mathbb R}, \; m, n \in \pm\mathbb N : m\tau^K = n\tau^J.
+\begin{gathered}
+\text{Construct a zero-independent, zeta-intrinsic arithmetic functional } \mathscr A_K \text{ such that } \mathscr A_K = \mathscr A_0 \\
+\text{and prove } \mathscr A_K - \mathscr A_0 = \sum_{\rho \in Z^+} w_\rho B_\rho(K) \quad \text{with } w_\rho > 0,
+\end{gathered}
 }
 \]
 
-Under the critical line, $D_b = S_{\mathrm{selected}} \approx -1/2 < 0$ already holds. Proving that an off-critical zero forces the balance outside $[-1/2 - \varepsilon, -1/2 + \varepsilon]$ against the unselected spectral tail allowance ($\approx 1.036 \times 10^{17}$) is the central open challenge. The project exists to discover, test, or formalize the coupling bridging this gap.
+where $B_\rho(K)$ is the finite-grade reflection defect:
+
+\[
+\boxed{
+B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = 4\sinh^2\left(\frac{K\delta_\rho\log\tau}{2}\right) \ge 0, \qquad B_\rho(K) = 0 \iff \delta_\rho = 0.
+}
+\]
+
+Since $B_\rho(K) \ge 0$ for all $\rho$ and vanishes only on the critical line ($\delta_\rho = 0$), the same-referent identity $\mathscr A_K = \mathscr A_0$ forces $\delta_\rho = 0$ for all nontrivial zeros, establishing RH conditionally. Constructing $\mathscr A_K$ directly from zeta's arithmetic/analytic structure without assuming zeros, RH, or Weil positivity is the central open challenge. All downstream contradiction machinery is conditional on this construction.
 
 ---
 
@@ -123,15 +134,19 @@ L_K = \{n\tau^K : n \in \pm\mathbb N\}, \qquad \mathfrak L_\tau = \bigcup_{K \in
 
 Each grid has countably infinitely many points (\(|L_K|=\aleph_0\)) and is scale-isomorphic to every other grid.
 
-For any distinct algebraic grades \(J \ne K \in \mathbb A_{\mathbb R}\):
+For any distinct grades $J \ne K \in \mathbb A_{\mathbb R}$, a collision $m\tau^K = n\tau^J$ ($m, n \in \mathbb Z \setminus \{0\}$) requires $\tau^{K-J} = n/m \in \mathbb Q$:
 
-\[
-\boxed{
-L_J\cap L_K=\emptyset.
-}
-\]
-
-So the algebraic-grade grids are **scale-isomorphic, equipotent, and arithmetically disjoint** (by Baker's theorem and the transcendence of \(\tau = 2\pi\)).
+- **Rational Grade Differences ($K - J \in \mathbb Q \setminus \{0\}$)**:
+  Rigorous noncollision is proved: if $K - J = p/q$, then $\tau^{p/q} = n/m$ implies $\tau^p = (n/m)^q \in \mathbb Q$, which would mean a nonzero integer power of $\tau = 2\pi$ is algebraic, contradicting the transcendence of $\tau$ (Lindemann 1882). Hence:
+  \[
+  \boxed{
+  L_J \cap L_K = \emptyset \qquad \forall J \ne K \text{ with } K - J \in \mathbb Q.
+  }
+  \]
+- **Irrational Algebraic Grade Differences ($K - J \in \mathbb A_{\mathbb R} \setminus \mathbb Q$)**:
+  The arithmetic nature of $\tau^{K-J}$ is strictly open (`OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC`). The Gelfond–Schneider theorem requires an algebraic base ($\alpha^\beta$ with algebraic $\alpha \ne 0, 1$) and does **not** apply to the transcendental base $\tau = 2\pi$. As shown by the control counterexample $b = 2^{1/\sqrt{2}}$ (which is transcendental by Gelfond–Schneider, yet $b^{\sqrt{2}} = 2 \in \mathbb Q$), base transcendence alone does not exclude rational powers under irrational algebraic exponents. Disjointness across all algebraic grades must not be asserted as a theorem or used downstream.
+- **Scale-Generator Multiples**:
+  For nonzero algebraic $a$, $a\tau$ is transcendental, but $L_{K, a\tau} = \{n(a\tau)^K\}$ does not equal $L_{K, \tau} = \{m\tau^K\}$ because $n a^K$ is not generally an integer. The algebraic-multiple universes are not proved identical; their relationship remains an open comparison problem.
 
 The organizing intuition of the project is the **TC Coverage Conjecture**: \(\mathfrak L_\tau \stackrel{?}{=} \mathbb R^\times\). In ZFC set theory, \(|\mathfrak L_\tau| = \aleph_0 < |\mathbb R^\times| = 2^{\aleph_0}\), but the topological closure is dense: \(\overline{\mathfrak L_\tau} = \mathbb R\). The coverage conjecture serves as organizing motivation, never as an unproved premise in an RH proof.
 

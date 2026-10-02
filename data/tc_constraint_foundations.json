@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "artifact_type": "tc_constraint_foundations_status",
-  "baseline_commit": "0706d54f",
+  "baseline_commit": "8ed90a3c",
   "canonical_grade_domain": {
     "domain_symbol": "A_R",
     "domain_definition": "A_R = Q_bar cap R (field of real algebraic numbers)",
@@ -23,8 +23,10 @@
   "grid_definition": {
     "graded_grid_L_K": "L_K = { n * tau^K : n in +-N } = tau^K (Z \\ {0})",
     "total_universe_L_tau": "L_tau = cup_{K in A_R} L_K = { n * tau^K : n in +-N, K in A_R }",
-    "incommensurability_theorem": "L_J cap L_K = empty_set for all J != K in A_R",
-    "incommensurability_proof_basis": "Lindemann-Weierstrass and Baker's theorems: tau = 2*pi is transcendental, so tau^{K-J} is never rational for non-zero algebraic K - J."
+    "incommensurability_status": {
+      "rational_grade_differences": "L_J cap L_K = empty_set for all J != K with K - J in Q \\ {0} (PROVED: tau^{p/q} in Q ==> tau^p in Q, contradicting transcendence of tau by Lindemann 1882)",
+      "irrational_algebraic_grade_differences": "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC (Gelfond-Schneider requires an algebraic base; does NOT apply to transcendental tau = 2*pi; control example b = 2^{1/sqrt(2)} is transcendental yet b^{sqrt(2)} = 2 in Q, proving base transcendence alone does not exclude rational powers under irrational algebraic exponents)"
+    }
   },
   "zero_orbit_definition": {
     "native_zero": "rho = 1/2 + delta + i*gamma",
@@ -58,7 +60,7 @@
   "scale_generator_equivalence_status": {
     "generator_class": "G_tau = { a * tau : a in A_R^x }",
     "fourier_self_duality": "tau = 2*pi is the unique Poisson self-duality factor for the integer lattice Z",
-    "algebraic_equiv": "Any algebraic non-zero multiple of tau generates an algebraically equivalent grid universe over A_R."
+    "algebraic_multiples_clarification": "For nonzero algebraic a, a*tau is transcendental, but n*(a*tau)^K = (n*a^K)*tau^K does not prove membership in L_K because n*a^K is not generally an integer. The algebraic-multiple universes are not proved identical; their relationship remains an open comparison problem."
   },
   "existing_cross_grade_constraints": {
     "weak_curvature_transfer": "S = K + Delta (algebraic identity, residual 0.0, no independent constraint on D_b)",
@@ -71,9 +73,9 @@
     "defect": "Off-critical perturbation |Delta_quartet| ~ 10^{13} is absorbed by unselected spectral tail uncertainty 1.036e17; no theorem forces violation of explicit formula balance."
   },
   "earliest_missing_implication": {
-    "statement": "H (exists rho_0 with delta_0 != 0) ==> |D_b| + eps_match + eps_rec < 1/2 or m*tau^K = n*tau^J (K != J, m, n in +-N)",
+    "statement": "Construct a zero-independent, zeta-intrinsic functional A_K such that A_K = A_0 and A_K - A_0 = sum_{rho in Z^+} w_rho * B_rho(K) with w_rho > 0, where B_rho(K) = 4*sinh^2(K*delta*log(tau)/2) >= 0.",
     "current_truth_value": "UNPROVED",
-    "downstream_dependency": "All claims of RH proof or general remainder obstruction are conditional on this missing arrow."
+    "downstream_dependency": "All claims of RH proof or general remainder obstruction are conditional on this missing arithmetic construction."
   },
   "branches_frozen": [
     {"branch": "Numerical Tail Refinement", "rationale": "Tail dominance (10^{17} >> 10^{13}) is structural; decimal refinements cannot bridge 4 orders of magnitude."},

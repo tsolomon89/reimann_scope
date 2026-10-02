@@ -56,95 +56,79 @@ The ordinary critical line is
 
 # 2. Grade notation
 
-The repository distinguishes three grade types.
+The repository establishes the canonical grade hierarchy:
 
-## 2.1 Continuous grade
-
-\[
-\boxed{k\in\mathbb R.}
-\]
-
-Define
+## 2.1 Canonical algebraic grade domain
 
 \[
-\boxed{
-a(k)=\tau^k.
-}
+\boxed{K \in \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R.}
 \]
 
-Then
-
-\[
-a(k)>0,
-\]
-
-\[
-a(k_1+k_2)=a(k_1)a(k_2),
-\]
-
-\[
-a(-k)=a(k)^{-1},
-\]
-
-and
-
-\[
-a(0)=1.
-\]
-
-Since \(k\mapsto\tau^k\) is a bijection,
+Define for any algebraic grade $K \in \mathbb A_{\mathbb R}$:
 
 \[
 \boxed{
-\tau^\mathbb R=\mathbb R_{>0}.
+A_K = \tau^K.
 }
 \]
 
-## 2.2 Canonical integer grade
+Properties:
+- $A_K > 0$ for all real algebraic $K$.
+- $A_{K_1 + K_2} = A_{K_1} A_{K_2}$.
+- $A_{-K} = A_K^{-1}$.
+- $A_0 = 1$.
+
+The field of real algebraic numbers $\mathbb A_{\mathbb R}$ is the canonical domain for Transcendental Continuation.
+
+## 2.2 Canonical discrete integer skeleton
 
 \[
-\boxed{K\in\mathbb Z.}
+\boxed{K \in \mathbb Z.}
 \]
 
-Define
+The canonical bilateral integer sequence is:
 
 \[
-\boxed{
-A_K=\tau^K.
-}
+\ldots, \tau^{-2}, \tau^{-1}, 1, \tau, \tau^2, \ldots
 \]
 
-The canonical bilateral sequence is
+with $A_{-K} = A_K^{-1}$.
 
-\[
-\ldots,\tau^{-2},\tau^{-1},1,\tau,\tau^2,\ldots
-\]
-
-with
-
-\[
-A_{-K}=A_K^{-1}.
-\]
-
-## 2.3 Rational/root grade
+## 2.3 Rational/root grade refinement
 
 For
 
 \[
-q\in\mathbb Q,
+q \in \mathbb Q,
 \]
 
 define
 
 \[
 \boxed{
-A_q=\tau^q.
+A_q = \tau^q.
 }
 \]
 
-Rational grades contain exact root refinements of the integer-grade family.
+Rational grades provide exact root refinements of the integer-grade family.
 
-Do not use one variable interchangeably for continuous \(k\), integer \(K\), and rational \(q\).
+## 2.4 Ambient continuous scale flow
+
+\[
+\boxed{k \in \mathbb R.}
+\]
+
+Define
+
+\[
+\boxed{
+a(k) = \tau^k.
+}
+\]
+
+Continuous real $k$ serves as an ambient interpolation and differentiation parameter where genuinely required (e.g. continuous character variation, zero worldlines $s_\rho(k) = \tau^k \rho$, and curvature $B_\rho''(0)$). However, continuous $k$ must not silently replace the canonical algebraic TC domain $\mathbb A_{\mathbb R}$.
+
+Do not use one variable interchangeably for continuous $k$, canonical algebraic $K \in \mathbb A_{\mathbb R}$, integer $K \in \mathbb Z$, and rational $q \in \mathbb Q$.
 
 ---
 
@@ -392,51 +376,77 @@ RH is equivalent to:
 
 ---
 
-# 9. Arithmetic grade lattices
+# 9. Arithmetic grade grids and incommensurability
 
-For integer grade,
-
-\[
-\boxed{
-L_K=\tau^K\mathbb Z.
-}
-\]
-
-Each is countably infinite and scale-isomorphic to \(\mathbb Z\).
-
-For distinct integers \(J\neq K\),
+For any algebraic grade $K \in \mathbb A_{\mathbb R}$, define the nonzero arithmetic grid:
 
 \[
 \boxed{
-L_J\cap L_K=\{0\}.
+L_K = \{n\tau^K : n \in \mathbb Z \setminus \{0\}\}.
 }
 \]
 
-Reason:
+Each grid is countably infinite and scale-isomorphic to $\mathbb Z \setminus \{0\}$.
 
-A nonzero common point would imply
+A collision between distinct grades $J \ne K \in \mathbb A_{\mathbb R}$ requires:
 
 \[
-\tau^{K-J}\in\mathbb Q,
+m\tau^K = n\tau^J \iff \tau^{K-J} = \frac{n}{m} \in \mathbb Q^\times.
 \]
 
-contradicting transcendence of \(\tau\).
+Two cases must be rigorously distinguished:
 
-For distinct rational grades \(r\neq q\),
+### 9.1 Rational grade differences ($K - J \in \mathbb Q \setminus \{0\}$) — PROVED
+
+If $K - J = p/q \in \mathbb Q \setminus \{0\}$ with $p \in \mathbb Z \setminus \{0\}, q \in \mathbb N^+$, then $\tau^{p/q} = n/m$ implies:
+
+\[
+\tau^p = \left(\frac{n}{m}\right)^q \in \mathbb Q.
+\]
+
+This would mean that a nonzero integer power of $\tau = 2\pi$ is algebraic, contradicting the transcendence of $\tau = 2\pi$ (Lindemann 1882). Therefore:
 
 \[
 \boxed{
-\tau^r\mathbb Z
-\cap
-\tau^q\mathbb Z
-=
-\{0\}.
+L_J \cap L_K = \emptyset \qquad \forall J \ne K \in \mathbb A_{\mathbb R} \text{ with } K - J \in \mathbb Q.
 }
 \]
 
-Do not extend this result to arbitrary real grades.
+Rational-difference grade grids are strictly noncoincident.
 
-Do not infer from arithmetic-lattice noncoincidence that zeta zero sets at distinct grades are automatically disjoint.
+### 9.2 Irrational algebraic grade differences ($K - J \in \mathbb A_{\mathbb R} \setminus \mathbb Q$) — OPEN
+
+For $K - J \in \mathbb A_{\mathbb R} \setminus \mathbb Q$, the arithmetic nature of $\tau^{K-J}$ is strictly open:
+
+\[
+\boxed{\text{Status: } \texttt{OPEN\_TAU\_ALGEBRAIC\_EXPONENT\_ARITHMETIC}}
+\]
+
+**Crucial negative control**: Gelfond–Schneider requires an algebraic base ($\alpha^\beta$ with algebraic $\alpha \ne 0, 1$ and irrational algebraic $\beta$ is transcendental). It does **not** apply to the transcendental base $\tau = 2\pi$. The control counterexample:
+
+\[
+b = 2^{1/\sqrt 2}
+\]
+
+is transcendental by Gelfond–Schneider, yet:
+
+\[
+b^{\sqrt 2} = 2 \in \mathbb Q.
+\]
+
+This proves that base transcendence alone does not exclude rational powers under irrational algebraic exponents. Disjointness across all algebraic grades must not be asserted as a theorem or used downstream.
+
+### 9.3 Scale-generator multiples
+
+For nonzero algebraic $a \in \mathbb A_{\mathbb R}^\times$, $a\tau$ is transcendental, but:
+
+\[
+n(a\tau)^K = (n a^K)\tau^K
+\]
+
+does not imply membership in $L_K = \{m\tau^K : m \in \mathbb Z \setminus \{0\}\}$ because $n a^K$ is not generally an integer. Therefore, do not claim that $\tau, \pi, \tau/4, a\tau$ generate identical grid universes. Their relations remain an open comparison problem.
+
+Do not infer from grid noncoincidence that zeta zero sets at distinct grades are automatically disjoint.
 
 ---
 
@@ -836,248 +846,139 @@ Do not describe it as conformal or analytic.
 
 ---
 
-# 20. Tau-grade zero character
+# 20. Tau-grade zero character and translation
 
-For
-
-\[
-\rho=\frac12+\delta+i\gamma,
-\]
-
-define
+For a nontrivial zero
 
 \[
-\boxed{
-q_\rho
-=
-\tau^{\rho-\frac12}.
-}
+\rho = \frac{1}{2} + \delta + i\gamma,
 \]
 
-Using the real logarithm of positive \(\tau\),
-
-\[
-q_\rho
-=
-e^{(\rho-\frac12)\log\tau}
-=
-\tau^\delta e^{i\gamma\log\tau}.
-\]
-
-Therefore
+define the centered TC character for any algebraic grade $K \in \mathbb A_{\mathbb R}$:
 
 \[
 \boxed{
-|q_\rho|=\tau^\delta.
+\chi_\rho(K) = \tau^{K(\rho - \frac{1}{2})}.
 }
 \]
 
-At integer grade \(K\),
+Using the real logarithm of positive $\tau = 2\pi$:
+
+\[
+\chi_\rho(K) = e^{K(\rho - \frac{1}{2})\log\tau} = \tau^{K\delta} e^{iK\gamma\log\tau}.
+\]
+
+Therefore:
 
 \[
 \boxed{
-q_\rho^K
-=
-\tau^{K\delta}
-e^{iK\gamma\log\tau}.
+|\chi_\rho(K)| = \tau^{K\delta}.
 }
 \]
 
-Hence
+For the reflected partner $\rho^\# = 1 - \bar\rho = \frac{1}{2} - \delta + i\gamma$:
 
 \[
 \boxed{
-|q_\rho^K|
-=
-\tau^{K\delta},
+|\chi_{\rho^\#}(K)| = \tau^{-K\delta} = |\chi_\rho(K)|^{-1}.
 }
 \]
+
+On the critical line ($\delta = 0$):
+
+\[
+|\chi_\rho(K)| = 1 \qquad \forall K \in \mathbb A_{\mathbb R}.
+\]
+
+### 20.1 Common-grade shift translation
+
+For grades $K, J \in \mathbb A_{\mathbb R}$, define the bivariate grade correlator:
 
 \[
 \boxed{
-\log|q_\rho^K|
-=
-K\delta\log\tau.
+G_\rho(K, J) = \chi_\rho(K)\overline{\chi_\rho(J)}.
 }
 \]
 
-For real grade parameter \(k\), avoid generic complex-power branch ambiguity by defining the continuous grade character directly:
+Under a common grade shift by $A \in \mathbb A_{\mathbb R}$:
 
 \[
 \boxed{
-Q_\rho(k)
-=
-\tau^{k(\rho-\frac12)}
-=
-e^{k(\rho-\frac12)\log\tau}.
+G_\rho(K+A, J+A) = \tau^{2A\delta} G_\rho(K, J).
 }
 \]
 
-Hence
-
-\[
-\boxed{
-Q_\rho(k)
-=
-\tau^{k\delta}
-e^{ik\gamma\log\tau}
-}
-\]
-
-and
-
-\[
-\boxed{
-\frac{d}{dk}
-\log|Q_\rho(k)|
-=
-\delta\log\tau.
-}
-\]
-
-For
-
-\[
-\delta=0,
-\]
-
-\[
-\boxed{
-|q_\rho^K|=1
-\quad
-\forall K\in\mathbb Z.
-}
-\]
+Hence common-grade shift invariance $G(K+A, J+A) = G(K, J)$ holds if and only if $\delta = 0$.
 
 ---
 
-# 21. Symmetry-complete grade defect
+# 21. Minimal finite-grade reflection defect
 
-Let
-
-\[
-\rho_+
-=
-\frac12+\delta+i\gamma,
-\]
-
-\[
-\rho_-
-=
-\frac12-\delta+i\gamma,
-\]
-
-and baseline
-
-\[
-\rho_0
-=
-\frac12+i\gamma.
-\]
-
-Then
-
-\[
-q_+^K
-=
-\tau^{K\delta}
-e^{iK\gamma\log\tau},
-\]
-
-\[
-q_-^K
-=
-\tau^{-K\delta}
-e^{iK\gamma\log\tau},
-\]
-
-\[
-q_0^K
-=
-e^{iK\gamma\log\tau}.
-\]
-
-Define
+Define the finite-grade reflection defect:
 
 \[
 \boxed{
-D_K
-=
-q_+^K+q_-^K-2q_0^K.
+B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2.
 }
 \]
 
-Then
+Substituting the moduli:
 
 \[
 \boxed{
-D_K
-=
-2e^{iK\gamma\log\tau}
-\left[
-\cosh(K\delta\log\tau)-1
-\right].
+B_\rho(K) = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right).
 }
 \]
 
-Therefore
+### 21.1 Exact spectral detection theorem
+
+For every nonzero real algebraic grade $K \in \mathbb A_{\mathbb R} \setminus \{0\}$:
+1. **Universal Nonnegativity**:
+   \[
+   B_\rho(K) \ge 0.
+   \]
+2. **Sharp Critical-Line Rigidity**:
+   \[
+   \boxed{
+   B_\rho(K) = 0 \iff \delta = 0.
+   }
+   \]
+
+This is the **minimal exact spectral detector**. It requires no numerical evidence, no high-precision evaluation, and no continuous-grade derivative.
+
+### 21.2 Generic-base control
+
+For any real base $b > 1$, define:
+
+\[
+B_{\rho, b}(K) = b^{K\delta} + b^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log b}{2}\right).
+\]
+
+Then:
+
+\[
+B_{\rho, b}(K) \ge 0 \qquad \text{and} \qquad B_{\rho, b}(K) = 0 \iff \delta = 0.
+\]
+
+**Crucial Control Finding**: The positivity and zero-rigidity of $B_\rho(K)$ are generic properties of hyperbolic functions and are **not** specific to $\tau = 2\pi$ or to the Riemann zeta function. Therefore, the $\tau$-specific and zeta-specific mathematical content cannot reside in the detector itself; it must reside entirely in the arithmetic construction of the same-referent functional $\mathscr A_K$.
+
+### 21.3 Connection to continuous curvature
+
+Expanding $B_\rho(k)$ near $k = 0$ for continuous grade $k \in \mathbb R$:
+
+\[
+B_\rho(k) = (k\delta\log\tau)^2 + O((k\delta)^4).
+\]
+
+Taking the second derivative at $k = 0$:
 
 \[
 \boxed{
-|D_K|
-=
-4\sinh^2
-\left(
-\frac{K\delta\log\tau}{2}
-\right).
+B_\rho''(0) = 2\delta^2(\log\tau)^2.
 }
 \]
 
-Properties:
-
-\[
-D_K=0
-\quad
-\text{for }\delta=0,
-\]
-
-\[
-D_0=0,
-\]
-
-\[
-|D_{-K}|=|D_K|,
-\]
-
-and near
-
-\[
-K\delta=0,
-\]
-
-\[
-\boxed{
-|D_K|
-=
-(K\delta\log\tau)^2
-+
-O((K\delta)^4).
-}
-\]
-
-For fixed nonzero \(\delta\),
-
-\[
-|D_K|\to\infty
-\]
-
-as
-
-\[
-|K|\to\infty.
-\]
-
-This is an exact grade-character identity, not a proof of RH.
+Thus the continuous curvature transport invariant $B_\rho''(0)$ is the infinitesimal limit of the finite algebraic-grade defect $B_\rho(K)$. The finite algebraic-grade defect $B_\rho(K)$ is exact on its own and eliminates the need to treat continuous $k$-differentiation as foundational.
 
 ---
 

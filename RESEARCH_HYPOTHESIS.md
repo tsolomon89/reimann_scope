@@ -192,18 +192,41 @@ The proof structure is:
 }
 \]
 
-### The Earliest Missing Implication
-By the **Pure Pullback Null Model**, coordinate transport $F_K(s) = f(\tau^{-K} s)$ alone preserves any root configuration with zero radial restriction. Therefore, step 4 requires an authentic coupling between zeta's arithmetic/analytic structure (primes, Euler product, explicit formula) and the graded grids $L_K = \tau^K(\pm\mathbb N)$.
-
-The exact statement of the earliest missing implication where deductive proof halts is:
-
+### Minimal Exact Spectral Detector: Finite-Grade Reflection Defect
+For a nontrivial zero $\rho = 1/2 + \delta + i\gamma$, the centered character $\chi_\rho(K) = \tau^{K(\delta + i\gamma)}$ and reflection partner $\rho^\# = 1/2 - \delta + i\gamma$ yield:
+\[
+|\chi_\rho(K)| = \tau^{K\delta}, \qquad |\chi_{\rho^\#}(K)| = \tau^{-K\delta}.
+\]
+Define the **finite-grade reflection defect**:
 \[
 \boxed{
-H \Longrightarrow \left| D_b + \Delta_{\mathrm{quartet}}(\rho_0) \right| + \varepsilon_{\mathrm{match}} + \varepsilon_{\mathrm{rec}} < \frac{1}{2} \quad \text{or} \quad \exists K \ne J \in \mathbb A_{\mathbb R}, \; m, n \in \pm\mathbb N : m\tau^K = n\tau^J.
+B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) \ge 0.
 }
 \]
+For every nonzero algebraic grade $K \in \mathbb A_{\mathbb R} \setminus \{0\}$, $B_\rho(K) = 0 \iff \delta = 0$.
 
-*Epistemic Note*: On the critical line, $D_b = S_{\mathrm{selected}} \approx -1/2 < 0$ already holds. Because the unselected spectral tail allowance ($\approx 1.036 \times 10^{17}$) dwarfs the off-critical quartet perturbation ($|\Delta_{\mathrm{quartet}}| \sim 10^{13}$), proving that $H$ forces the total explicit formula balance outside $[-1/2 - \varepsilon, -1/2 + \varepsilon]$ remains unproved. All downstream claims are strictly conditional upon this missing implication.
+### The TC Same-Referent Constraint Hypothesis
+The canonical research hypothesis is:
+\[
+\boxed{
+\begin{gathered}
+\textbf{TC Same-Referent Constraint Hypothesis}\\[4pt]
+\exists\text{ a zero-independent, zeta-intrinsic functional } \mathscr A_K \text{ such that } \mathscr A_K = \mathscr A_0\\[4pt]
+\text{for at least one nonzero } K \in \mathbb A_{\mathbb R}, \text{ with convergent spectral expansion:}\\[4pt]
+\mathscr A_K - \mathscr A_0 = \sum_{\rho \in Z^+} w_\rho B_\rho(K) = 4\sum_{\rho \in Z^+} w_\rho \sinh^2\left(\frac{K\delta_\rho\log\tau}{2}\right), \qquad w_\rho > 0.
+\end{gathered}
+}
+\]
+Because $w_\rho > 0$ and $B_\rho(K) \ge 0$, same-referent invariance $\mathscr A_K - \mathscr A_0 = 0$ forces $\delta_\rho = 0$ for all nontrivial zeros $\rho$, establishing RH.
+
+### The True Earliest Missing Implication
+The exact point where deductive proof halts is:
+\[
+\boxed{
+\text{Construct } \mathscr A_K \text{ from zeta's arithmetic/analytic structure alone and prove } \mathscr A_K - \mathscr A_0 = \sum_\rho w_\rho B_\rho(K), \quad w_\rho > 0.
+}
+\]
+The functional must not be defined from the zeros themselves, must not assume RH or Weil positivity, and must not assume full algebraic-grid disjointness or lattice collisions. Historical Weil, curvature, and explicit formula machinery are candidate attempts to construct $\mathscr A_K$.
 
 ---
 

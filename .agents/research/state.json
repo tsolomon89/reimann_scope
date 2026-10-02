@@ -1,9 +1,9 @@
 {
   "mission": "Transcendental Continuation (TC) Autonomous Research Mission",
-  "active_commit": "0706d54f3d07b1a3842dd058c17f46b12572dde7",
+  "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "CONCEPTUAL_CLOSURE_AND_CONSTRAINT_FOUNDATIONS",
+  "current_phase": "MINIMAL_TC_CONSTRAINT_HYPOTHESIS_AND_THEORETICAL_RECONCILIATION",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -59,10 +59,28 @@
         "Reconcile root documentation, author review TC_CONSTRAINT_FOUNDATIONS.md, and create machine-readable artifact data/tc_constraint_foundations.json"
       ],
       "completion_note": "TASK-TC-015 completed: Canonical grade domain reconciled to A_R, grid universe L_tau defined with proved incommensurability, pure pullback null model proved, earliest missing implication isolated, auxiliary numerical/curvature branches frozen, and 19 arbitrary-precision mpmath verification tests passing."
+    },
+    "track_4_minimal_tc_constraint_hypothesis": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Withdraw false full algebraic-grade incommensurability theorem",
+        "Prove rational-difference noncollision separately (Lindemann 1882)",
+        "Classify irrational algebraic-grade collision status as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC",
+        "Add mandatory Gelfond-Schneider control counterexample b = 2^{1/sqrt(2)}",
+        "Withdraw false algebraic-multiple scale generator universe equivalence",
+        "Reconcile canonical algebraic grade domain K in A_R across all documents",
+        "Replace old Db missing implication with True Earliest Missing Implication (constructing A_K)",
+        "Establish finite-grade reflection defect B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0 as minimal exact spectral detector",
+        "Document generic-base control showing detector positivity is not tau-specific",
+        "Test common-grade shift translation identity G_rho(K+A, J+A) = tau^{2A delta} G_rho(K, J)",
+        "Author docs/reviews/TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md and data/tc_minimal_constraint_hypothesis.json"
+      ],
+      "completion_note": "TASK-TC-016 completed: Theoretical reconciliation executed. Rational noncollision proved, irrational algebraic collision classified as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC, Gelfond-Schneider base mismatch and b = 2^{1/sqrt(2)} control documented, scale generator universe equivalence withdrawn, canonical domain K in A_R synchronized, minimal exact spectral detector B_rho(K) established with generic base control, and TC Same-Referent Constraint Hypothesis structured across 3 canonical layers."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_minimal_constraint_hypothesis.json",
       "data/tc_constraint_foundations.json",
       "data/tc_arithmetic_residual_research.json",
       "data/tc_negative_grade_approximation_campaign.json",

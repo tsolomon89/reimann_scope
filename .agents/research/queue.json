@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-015",
+  "active_task_id": "TASK-TC-016",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -298,6 +298,30 @@
         "README.md"
       ],
       "resolution": "Conceptual closure sprint completed. 1) Reconciled canonical grade domain to K in A_R (real algebraic numbers); discrete skeleton K in Z; root refinements q in Q; continuous real k in R is an ambient embedding/scale flow. 2) Arithmetic grids L_K = tau^K(+-N) and universe L_tau defined; proved incommensurability L_J cap L_K = emptyset for all distinct algebraic grades J != K in A_R. 3) Proved Pure Pullback Null Model: for generic meromorphic f, F_K(s) = f(tau^{-K} s) satisfies pullback invariance, zero transport, and radial invariance with ZERO radial rigidity on delta. 4) Characterized Coverage Conjecture L_tau =? R^x as organizing intuition; proved |L_tau| = aleph_0 < 2^aleph_0 in ZFC with dense closure; forbidden as unproved lemma. 5) Audited scale generators: G_tau = {a tau : a in A_R^x} share identical incommensurable grid structures; tau = 2pi is privileged as Poisson dual lattice generator of completed xi. 6) Isolated the Earliest Missing Implication: H ==> |Db + Delta_quartet| + eps_match + eps_rec < 1/2 or m tau^K = n tau^J; unproved because critical line already has Db ~ -1/2 and spectral tail (~1.036e17) dwarfs off-critical quartet (~10^13). 7) Formally froze auxiliary numerical, optimizer, and curvature campaigns. 8) Verified with 19 arbitrary-precision mpmath unit tests across integer, rational, and real algebraic irrational grades (sqrt(2), -sqrt(2), (1+sqrt(5))/2) at 60 dps."
+    },
+    {
+      "task_id": "TASK-TC-016",
+      "priority": 18,
+      "objective": "Correct Algebraic-Grade Claims and Test the Minimal TC Constraint Hypothesis",
+      "status": "COMPLETED_THEORETICAL_RECONCILIATION",
+      "review_status": "REVIEWED_FOUNDATIONAL",
+      "open_implication": "Construct a zero-independent, zeta-intrinsic arithmetic functional A_K such that A_K = A_0 and A_K - A_0 = sum_{rho in Z^+} w_rho B_rho(K) with w_rho > 0, where B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0. All downstream contradiction machinery is conditional on this construction.",
+      "planned_calculation": "1. Withdraw false full algebraic-grade incommensurability theorem; prove rational differences rigorously noncoincident; classify irrational algebraic differences as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC; add mandatory control example b = 2^{1/sqrt(2)}. 2. Remove finite numerical rational tests; add exact symbolic rational noncollision, control counterexample, and open status tests. 3. Withdraw algebraic-multiple scale generator equivalence claim (na^K not an integer). 4. Reconcile canonical algebraic grade domain K in A_R across authoritative documents. 5. Replace earliest missing implication with minimal exact spectral detector B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0, sharp zero-rigidity, and generic base control b > 1. 6. Test common-grade shift translation identity G_rho(K+A, J+A) = tau^{2A delta} G_rho(K, J). 7. Reclassify existing machinery and author TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md and data/tc_minimal_constraint_hypothesis.json.",
+      "acceptance_criterion": "False incommensurability withdrawn; rational noncollision proved; irrational algebraic marked open; control example verified; numerical tests repaired; scale generator equivalence withdrawn; canonical domain reconciled to A_R; earliest missing implication replaced by same-referent functional construction; finite-grade reflection defect established as minimal detector; generic base control documented; tests passing; review and machine-readable artifact produced.",
+      "dependencies": ["TASK-TC-015"],
+      "evidence": [
+        "docs/reviews/TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md",
+        "data/tc_minimal_constraint_hypothesis.json",
+        "tests/test_tc_constraint_foundations.py",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md",
+        "README.md",
+        "MATH_CONTRACT.md",
+        "CURVATURE_TRANSPORT.md",
+        "LEAN_FORMALIZATION_PLAN.md"
+      ],
+      "resolution": "TASK-TC-016 completed. 1) Withdrew false full algebraic-grade incommensurability theorem: proved rational differences K-J in Q\\{0} strictly noncoincident via Lindemann (1882); classified irrational algebraic differences as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC noting Gelfond-Schneider does not apply to tau = 2pi; added mandatory control b = 2^{1/sqrt(2)} (transcendental base with b^{sqrt(2)} = 2 in Q). 2) Repaired tests: replaced numerical rational search with exact symbolic noncollision, control counterexample, open status check, minimal detector B_rho(K) exactness, generic base control, and common-grade shift translation. 3) Withdrew algebraic-multiple scale-generator equivalence: na^K not an integer in general; comparison remains open. 4) Reconciled canonical grade domain K in A_R across all documents. 5) Established finite-grade reflection defect B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0 (zero iff delta=0) as minimal exact spectral detector. 6) Proved detector is generic (holds for any b > 1); all tau/zeta specificity must reside in A_K. 7) Formulated TC Same-Referent Constraint Hypothesis across 3 canonical layers (Proved algebraic, Conditional rigidity, Open arithmetic) and isolated the True Earliest Missing Implication."
     }
   ]
 }

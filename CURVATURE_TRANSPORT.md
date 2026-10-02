@@ -65,11 +65,13 @@ To preserve complete mathematical rigor, the following concepts are separated wi
 
 ## 3. Exact Radial Geometry and Lattice Scaling
 
-Let $\tau = 2\pi$. We distinguish:
-- **Continuous grade parameter** $k \in \mathbb{R}$ for continuous scaling, differentiation, and curvature;
-- **Discrete integer grade checkpoints** $K \in \mathbb{Z}$ for bilateral checkpoint lattices and ray sampling.
+Let $\tau = 2\pi$. The repository defines the canonical grade hierarchy:
+- **Canonical algebraic grade domain** $K \in \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R$ for exact Transcendental Continuation;
+- **Discrete bilateral integer skeleton** $K \in \mathbb Z$ for checkpoint lattices and ray sampling;
+- **Rational refinements** $q \in \mathbb Q$ for exact root refinements;
+- **Continuous ambient scale flow** $k \in \mathbb R$ for continuous interpolation, differentiation, and infinitesimal curvature limits.
 
-For each integer grade $K \in \mathbb{Z}$, define:
+For each algebraic grade $K \in \mathbb A_{\mathbb R}$, define:
 - Scale factor: $a_K = \tau^K$;
 - Transported radial unit: $r_K = a_K^{-1} = \tau^{-K}$;
 - Circle circumference: $C_K = \tau r_K = \tau^{1-K}$;
@@ -78,20 +80,26 @@ For each integer grade $K \in \mathbb{Z}$, define:
 ### Exact Identities & Shift Laws
 
 1. **Reciprocity**:
-   $$r_K \kappa_K = \tau^{-K} \cdot \tau^K = 1 \quad (\forall K \in \mathbb{Z})$$
+   $$r_K \kappa_K = \tau^{-K} \cdot \tau^K = 1 \quad (\forall K \in \mathbb A_{\mathbb R})$$
 2. **Unit Circumference at Grade $K=1$**:
    $$C_1 = \tau \cdot r_1 = \tau \cdot \tau^{-1} = 1, \qquad r_1 = \tau^{-1}, \qquad \kappa_1 = \tau$$
 3. **Grade-Shift Transport Laws**:
    $$r_{K+1} = \tau^{-1}r_K, \qquad C_{K+1} = \tau^{-1}C_K, \qquad \kappa_{K+1} = \tau \kappa_K$$
 4. **Angular Fourier Frequency Lattice**:
-   For a circle of circumference $C_K$, the fundamental periodic boundary condition $f(\theta + C_K) = f(\theta)$ forces Fourier modes $e^{i \omega \theta}$ with $\omega C_K \in 2\pi \mathbb{Z} = \tau \mathbb{Z}$. Thus the dual frequency lattice is:
-   $$\Delta\omega_K = \frac{\tau}{C_K} = \frac{\tau}{\tau^{1-K}} = \tau^K \implies L_K = \tau^K \mathbb{Z}$$
+   For a circle of circumference $C_K$, the fundamental periodic boundary condition $f(\theta + C_K) = f(\theta)$ forces Fourier modes $e^{i \omega \theta}$ with $\omega C_K \in 2\pi \mathbb Z = \tau \mathbb Z$. Thus the dual frequency lattice is:
+   $$\Delta\omega_K = \frac{\tau}{C_K} = \frac{\tau}{\tau^{1-K}} = \tau^K \implies L_K = \tau^K \mathbb Z$$
+
+### Grade Incommensurability & The Exponent Control
+
+For distinct grades $J \ne K \in \mathbb A_{\mathbb R}$, a nonzero collision $m\tau^K = n\tau^J$ ($m, n \in \mathbb Z \setminus \{0\}$) requires $\tau^{K-J} \in \mathbb Q$:
+- **Rational Differences ($K - J \in \mathbb Q \setminus \{0\}$)**: PROVED noncoincident ($L_J \cap L_K = \{0\}$) because $\tau^{p/q} \in \mathbb Q \implies \tau^p \in \mathbb Q$, contradicting the transcendence of $\tau = 2\pi$ (Lindemann 1882).
+- **Irrational Algebraic Differences ($K - J \in \mathbb A_{\mathbb R} \setminus \mathbb Q$)**: OPEN (`OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC`). Gelfond–Schneider does not apply to the transcendental base $\tau = 2\pi$. The control counterexample $b = 2^{1/\sqrt 2}$ is transcendental, yet $b^{\sqrt 2} = 2 \in \mathbb Q$, proving that base transcendence alone does not exclude exponent collision.
 
 ### Generic-Base Scale Control $b > 1$
 
 For any real base $b > 1$:
 $$a_{K,b} = b^K, \quad r_{K,b} = b^{-K}, \quad C_{K,b} = \tau b^{-K}, \quad \kappa_{K,b} = b^K \implies r_{K,b}\kappa_{K,b} = 1, \quad \frac{\tau}{C_{K,b}} = b^K$$
-*Attribution*: Reciprocity, shift laws, and Fourier lattice spacing are generic positive-scale properties. The unit circumference $C_1 = 1$ is specific to choosing the scale generator $b = \tau = 2\pi$. The non-coincidence of lattices $L_K \cap L_L = \{0\}$ ($K \ne L$) relies on the transcendence of $\tau$.
+*Attribution*: Reciprocity, shift laws, and Fourier lattice spacing are generic positive-scale properties. The unit circumference $C_1 = 1$ is specific to choosing the scale generator $b = \tau = 2\pi$.
 
 ---
 
@@ -159,21 +167,30 @@ $$|\chi_\rho(k)| \cdot |\chi_{\rho^\#}(k)| = 1 \quad (\forall k \in \mathbb{R})$
 
 ### Phase-Independent Reflection-Pair Defect
 
-Define the reflection-pair defect functional for continuous grade $k \in \mathbb{R}$:
-$$B_\rho(k) = |\chi_\rho(k)| + |\chi_{\rho^\#}(k)| - 2 = e^{k\delta\log\tau} + e^{-k\delta\log\tau} - 2$$
+Define the reflection-pair defect functional for any algebraic grade $K \in \mathbb A_{\mathbb R}$ (or continuous grade $k \in \mathbb R$):
+$$B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2$$
 
 ### Exact $\cosh$ and $\sinh^2$ Representations
 
 1. **Hyperbolic Cosine Form**:
-   $$B_\rho(k) = 2(\cosh(k\delta\log\tau) - 1)$$
+   $$B_\rho(K) = 2(\cosh(K\delta\log\tau) - 1)$$
 2. **Squared Hyperbolic Sine Form**:
-   $$B_\rho(k) = 4\sinh^2\left(\frac{k\delta\log\tau}{2}\right)$$
-3. **Non-Negativity**:
-   $$B_\rho(k) \ge 0 \quad (\forall k, \delta \in \mathbb{R})$$
-4. **Zero-Rigidity**:
-   $$\text{For } k \ne 0: \quad B_\rho(k) = 0 \iff \delta = 0$$
+   $$B_\rho(K) = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right)$$
+3. **Universal Non-Negativity**:
+   $$B_\rho(K) \ge 0 \quad (\forall K \in \mathbb A_{\mathbb R}, \; \delta \in \mathbb R)$$
+4. **Sharp Zero-Rigidity**:
+   $$\text{For any } K \ne 0 \in \mathbb A_{\mathbb R}: \quad B_\rho(K) = 0 \iff \delta = 0$$
 
-### Continuous Grade Curvature & The Transported Invariant
+> [!IMPORTANT]
+> **Minimal Exact Spectral Detector**: $B_\rho(K)$ requires no continuous differentiation, no numerical approximation, and no unproved number-theoretic properties. The finite algebraic-grade defect is exact on its own and eliminates the need to treat continuous $k$-differentiation as foundational.
+
+### Generic-Base Control $b > 1$
+
+For any real base $b > 1$:
+$$B_{\rho,b}(K) = b^{K\delta} + b^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log b}{2}\right) \ge 0, \qquad B_{\rho,b}(K) = 0 \iff \delta = 0$$
+This proves that the detector positivity and zero-rigidity are **generic hyperbolic properties**, not $\tau$-specific. All $\tau$-specific and zeta-specific content must reside in constructing the same-referent arithmetic functional $\mathscr A_K$.
+
+### Continuous Grade Curvature & The Transported Invariant Limit
 
 Differentiating $B_\rho(k)$ with respect to continuous grade $k$ at $k = 0$:
 $$B_\rho'(k) = \frac{d}{dk} B_\rho(k) = 2\delta\log\tau \sinh(k\delta\log\tau) \implies B_\rho'(0) = 0$$

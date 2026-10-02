@@ -44,14 +44,16 @@ L_K = \{n\tau^K : n \in \pm\mathbb N\}, \qquad \mathfrak L_\tau = \bigcup_{K \in
 | ID | Statement | Classification | Reason |
 |---|---|---|---|
 | L-001 | Every \(L_K\) has cardinality \(\aleph_0\). | **PROVED** | Scaling is a bijection from \(\mathbb Z \setminus \{0\}\). |
-| L-002 | Distinct algebraic-grade grids satisfy \(L_J\cap L_K=\emptyset\) for all \(J \ne K \in \mathbb A_{\mathbb R}\). | **PROVED** | Nonzero intersection would make \(\tau^{K-J} \in \mathbb Q\), contradicting transcendence of \(\tau\) and Baker's theorem. |
+| L-002 | Distinct rational-difference grids satisfy \(L_J\cap L_K=\emptyset\) for all \(K - J \in \mathbb Q \setminus \{0\}\). | **PROVED** | Nonzero intersection would make \(\tau^p \in \mathbb Q\) for \(p \ne 0 \in \mathbb Z\), contradicting transcendence of \(\tau\). |
+| L-002B | Distinct irrational-algebraic-difference grids satisfy \(L_J\cap L_K=\emptyset\) for \(K - J \in \mathbb A_{\mathbb R} \setminus \mathbb Q\). | **OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC** | Gelfond-Schneider requires algebraic base and does not apply to \(\tau\); control counterexample \(b = 2^{1/\sqrt{2}}\) has \(b^{\sqrt{2}} = 2 \in \mathbb Q\). |
 | L-003 | Total grid universe \(\mathfrak L_\tau\) has cardinality \(\aleph_0\). | **PROVED** | Countable union of countable sets. |
-| L-004 | Distinct algebraic grids are scale-isomorphic, equipotent, and arithmetically disjoint. | **PROVED / TERMINOLOGY** | Summarizes L-001 through L-003. |
+| L-004 | Rational-difference algebraic grids are scale-isomorphic, equipotent, and arithmetically disjoint. | **PROVED / TERMINOLOGY** | Summarizes L-001 through L-003 for rational grade differences. |
 | L-005 | Distinct arbitrary real-grade lattices are always noncoincident. | **FALSE** | Example \(k=\log_\tau 2\) gives \(L_k=2\mathbb Z\), overlapping \(L_0 = \mathbb Z\). |
 | L-006 | The coordinate spaces of distinct grades are non-isomorphic. | **FALSE** | Multiplication by the scale ratio gives an invertible real map. |
 | L-007 | Parallel construction means one line must be finitely traversed to reach another. | **FALSE** | The framework constructs grades by making grade part of the coordinate. |
 | L-008 | Exact symbolic grade identity and finite numerical realization are the same thing. | **FALSE** | The repo explicitly separates them. |
 | L-009 | TC Coverage Conjecture: \(\mathfrak L_\tau \stackrel{?}{=} \mathbb R^\times\). | **PROJECT CONJECTURE / NOT A THEOREM** | Literal set equality fails in ZFC (\(\aleph_0 < 2^{\aleph_0}\)); dense closure \(\overline{\mathfrak L_\tau} = \mathbb R\); must never be assumed as an unproved lemma. |
+| L-010 | Scale generator algebraic multiples \(a\tau\) (\(a \in \mathbb A_{\mathbb R}^\times\)) generate identical integer grid universes: \(L_{K, a\tau} = L_{K, \tau}\). | **FALSE / OPEN COMPARISON** | \(na^K\) is algebraic, not necessarily an integer in \(\pm\mathbb N\); coefficient domains differ. |
 
 ---
 
@@ -111,7 +113,10 @@ R_\tau(s,K)=\tau^{-K}\Re(s)-\frac12.
 | R-006 | Global participation of all zeros in one xi/zeta object automatically forces one radial leaf. | **FALSE AS AN INFERENCE** | Global dependence does not by itself equal radial rigidity. |
 | R-007 | An off-line zero is impossible because there is literally no geometric space left between grade lines. | **FALSE / UNSUPPORTED** | Countable/dense families do not fill the continuum in that sense. |
 | R-008 | The train-line intuition is better represented as intersection of exact grade constraints than literal intersection of points. | **CURRENT FORMULATION** | Mathematically stronger and avoids the space-filling error. |
-| R-009 | Earliest Missing TC Implication: \(H \implies |D_b + \Delta_{\mathrm{quartet}}| + \varepsilon_{\mathrm{match}} + \varepsilon_{\mathrm{rec}} < 1/2\) or \(\exists K \ne J, m, n: m\tau^K = n\tau^J\). | **RESEARCH REQUIREMENT / OPEN** | Unproved; critical line already has \(D_b \approx -1/2\), and unselected spectral tail allowance (\(\sim 10^{17}\)) dwarfs off-critical quartet perturbation (\(\sim 10^{13}\)). |
+| R-009 | Earliest Missing Implication (True Open Theorem): Construct a zero-independent, zeta-intrinsic functional \(\mathscr A_K\) such that \(\mathscr A_K - \mathscr A_0 = \sum w_\rho B_\rho(K)\) with \(w_\rho > 0\). | **RESEARCH REQUIREMENT / OPEN** | Same-referent invariance \(\mathscr A_K = \mathscr A_0\) forces \(\sum w_\rho B_\rho(K) = 0 \implies \delta_\rho = 0 \;\forall \rho \implies \text{RH}\). Downstream machinery is conditional on this construction. |
+| R-010 | Minimal Spectral Detector: \(B_\rho(K) = 4\sinh^2(K\delta\log\tau / 2) \ge 0\), and \(B_\rho(K) = 0 \iff \delta = 0\) for every nonzero algebraic grade \(K \in \mathbb A_{\mathbb R} \setminus \{0\}\). | **PROVED / EXACT** | Exact finite-grade hyperbolic identity; requires no numerical estimates or continuous derivatives. |
+| R-011 | Generic-Base Detector Control: \(B_{\rho,b}(K) = 4\sinh^2(K\delta\log b / 2) \ge 0\) and \(= 0 \iff \delta = 0\) for any base \(b > 1\). | **PROVED / EXACT** | Proves hyperbolic positivity is generic and NOT \(\tau\)-specific; constraint mechanism must reside in \(\mathscr A_K\). |
+| R-012 | Common-Grade Shift Translation: \(G_\rho(K, J) = \chi_\rho(K)\overline{\chi_\rho(J)} \implies G_\rho(K+A, J+A) = \tau^{2A\delta} G_\rho(K, J)\). | **PROVED / EXACT** | Common-grade translation invariance \(G(K+A, J+A) = G(K, J)\) forces \(\tau^{2A\delta} = 1 \implies \delta = 0\). |
 
 ---
 

@@ -147,55 +147,55 @@ This should remain explicitly separate from origin dilation.
 
 ---
 
-# 5. Phase 3 — tau-grade group
+# 5. Phase 3 — tau-grade group and canonical domain
 
 Define:
 
 \[
-\tau=2\pi.
+\tau = 2\pi.
 \]
 
-For real
+The canonical grade domain is the field of real algebraic numbers:
 
 \[
-k,
+\boxed{K \in \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R.}
 \]
 
-define:
+For any algebraic grade $K \in \mathbb A_{\mathbb R}$, define:
 
 \[
-a(k)=\tau^k.
+A_K = \tau^K.
 \]
 
-Prove:
+Prove algebraic group homomorphism properties:
 
 \[
-a(0)=1,
-\]
-
-\[
-a(k_1+k_2)=a(k_1)a(k_2),
+A_0 = 1,
 \]
 
 \[
-a(-k)=a(k)^{-1}.
+A_{K_1 + K_2} = A_{K_1} A_{K_2},
 \]
 
-Specialize integer grade:
+\[
+A_{-K} = A_K^{-1}.
+\]
+
+Specialize discrete integer skeleton:
 
 \[
-A_K=\tau^K,
-\qquad
-K\in\mathbb Z.
+A_K = \tau^K, \qquad K \in \mathbb Z.
 \]
 
 Prove bilateral inverse relation:
 
 \[
 \boxed{
-A_KA_{-K}=1.
+A_K A_{-K} = 1.
 }
 \]
+
+Specialize rational refinements $q \in \mathbb Q$, and retain continuous real $k \in \mathbb R$ as ambient scale flow and differentiation parameter.
 
 ---
 
@@ -329,9 +329,9 @@ Where useful, formalize the scaling bijection between lines.
 
 ---
 
-# 10. Phase 8 — rational-grade lattice refinement
+# 10. Phase 8 — rational-grade lattice refinement and incommensurability
 
-If practical, formalize:
+Formalize exact rational noncollision:
 
 \[
 r,q\in\mathbb Q,
@@ -351,11 +351,9 @@ implies
 }
 \]
 
-This requires a clean formal treatment of rational real powers and the fact that a nonzero rational power of a transcendental positive real remains transcendental.
+This uses the theorem that for $p/q \in \mathbb Q \setminus \{0\}$, $\tau^{p/q} \in \mathbb Q \implies \tau^p \in \mathbb Q$, contradicting the transcendence of $\tau = 2\pi$ (Lindemann 1882).
 
-If Mathlib makes this disproportionately expensive, record it as `PAPER_PROVED` and defer formalization.
-
-Do not block the core project on this refinement.
+**Classification Boundary**: For irrational algebraic differences $K - J \in \mathbb A_{\mathbb R} \setminus \mathbb Q$, collision status is open (`OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC`). Gelfond–Schneider does not apply to the transcendental base $\tau = 2\pi$. Do not attempt to formalize noncollision for irrational algebraic grades without an explicit new theorem.
 
 ---
 
@@ -415,53 +413,45 @@ This formal ordering prevents generic scale facts from being mislabeled tau-spec
 
 # 12. Phase 10 — symmetric grade defect
 
-For:
+For algebraic grade $K \in \mathbb A_{\mathbb R}$ and zero $\rho = 1/2 + \delta + i\gamma$:
+
+Define centered TC character:
 
 \[
-\rho_\pm
-=
-\frac12\pm\delta+i\gamma,
+\chi_\rho(K) = \tau^{K(\rho - \frac{1}{2})}, \qquad \chi_{\rho^\#}(K) = \tau^{K(\rho^\# - \frac{1}{2})}.
 \]
 
-\[
-\rho_0
-=
-\frac12+i\gamma,
-\]
-
-define:
-
-\[
-D_K=q_+^K+q_-^K-2q_0^K.
-\]
-
-Prove:
+Define finite-grade reflection defect:
 
 \[
 \boxed{
-D_K
-=
-2e^{iK\gamma\log\tau}
-[
-\cosh(K\delta\log\tau)-1
-].
+B_\rho(K) = |\chi_\rho(K)| + |\chi_{\rho^\#}(K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2.
 }
 \]
 
-Then:
+Prove exact squared hyperbolic sine identity:
 
 \[
 \boxed{
-|D_K|
-=
-4\sinh^2
-\left(
-\frac{K\delta\log\tau}{2}
-\right).
+B_\rho(K) = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right).
 }
 \]
 
-This is a calibration theorem, not an RH theorem.
+Prove exact spectral detection theorem:
+1. $B_\rho(K) \ge 0$ for all $K \in \mathbb A_{\mathbb R}$ and all $\delta \in \mathbb R$.
+2. For $K \ne 0$, $B_\rho(K) = 0 \iff \delta = 0$.
+
+### The Canonical 3-Layer Proof Architecture
+
+The formalization plan strictly organizes into 3 layers:
+
+1. **Layer 1: Proved Algebraic Layer (Lean 4 Formalized)**:
+   - $B_\rho(K) = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) \ge 0$ and $B_\rho(K) = 0 \iff \delta = 0$.
+   - Generic base control $b > 1$: $B_{\rho, b}(K) \ge 0$, showing detector positivity is generic and not $\tau$-specific.
+2. **Layer 2: Conditional Rigidity Layer (Lean 4 Formalized)**:
+   - Given a same-referent functional $\mathscr A_K = \mathscr A_0$, if $\mathscr A_K - \mathscr A_0 = \sum_\rho w_\rho B_\rho(K)$ with $w_\rho > 0$, then $\delta_\rho = 0$ for all nontrivial zeros $\rho$, establishing RH conditionally.
+3. **Layer 3: Open Arithmetic Layer (Research Target)**:
+   - Construct $\mathscr A_K$ from zeta's arithmetic/analytic structure alone, without assuming zeros, RH, or Weil positivity.
 
 ---
 
