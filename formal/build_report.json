@@ -4,14 +4,14 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "ecece4cfe33fb6719fd52b037fbc2f7389105c95",
-  "timestamp": "2026-10-03T10:08:38.131182+00:00",
+  "producing_git_commit": "4cda71725335587b4cca60fd25aa911b08eeca73",
+  "timestamp": "2026-10-03T11:15:17.714138+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 308,
-  "total_theorems": 308,
+  "project_theorem_declarations_compiled": 316,
+  "total_theorems": 316,
   "formal_source_hashes": {
-    "formal/RiemannScope.lean": "27d4b6856ad7f443f74a54b41ff7a8f36f69d68435b4fcd44da809ca1b60e09f",
+    "formal/RiemannScope.lean": "03d304c495fb52b44480fcba7f8df42141678f024bf20ce6707876b2038fc7f7",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
     "formal/RiemannScope/Grade.lean": "3a1991eec4b098557663af2122410a07275fe49a38ba088f58c7b903c2f3375b",
     "formal/RiemannScope/RadialDefect.lean": "d3ea82e0fc2baf1dec0fca0b15809537a140fe160c0c995ccaf6f7864a6c9921",
@@ -24,16 +24,17 @@
     "formal/RiemannScope/ArithmeticBridge.lean": "1b042194e43c2033d1a1b0b830631f65455b4f1b29f28583e9f5110240eca71f",
     "formal/RiemannScope/CurvatureTransport.lean": "c7b516c226155154414b16b34194bd8cecd5efae77c4774ac8bfc56d7243694f",
     "formal/RiemannScope/ExtremalCorrelation.lean": "e47a019a17383947d45a371e37b53fef7ec38e5f015873dedd5f9adec2a9e184",
-    "formal/RiemannScope/GradedMonoid.lean": "a8ec65fbaa88789d1e71088de8e69e1e1227bdc492fea191299fce8ba5fc2052"
+    "formal/RiemannScope/GradedMonoid.lean": "a8ec65fbaa88789d1e71088de8e69e1e1227bdc492fea191299fce8ba5fc2052",
+    "formal/RiemannScope/GradeCharacter.lean": "c57068f4b6c66dcca42c61451c9847068829f9d519a96b389be43350b016aeb5"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
-    "scripts/build_formal.py": "30fbce0975211f04be597a8e08fd85461c8173f945520fb128f350b24704561b",
-    "certification.py": "ba9e1e6e47b42a75223d0f665e2068b265ae80acab9289847260aca4d0a7bb9a"
+    "scripts/build_formal.py": "25515fef071e29c9fa9479a299276358e14a0ead4e0f3e0bfa0414eaac7a58fa",
+    "certification.py": "b95f198559eb908acbe00e0faab77c6eb7ac0d21496b56ec55aeb5f3bd283633"
   },
-  "build_stdout": "\u2139 [1543/1561] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:717:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:718:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:719:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:720:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:721:0: 'RiemannScope.three_coefficient_legal_vanishing' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:722:0: 'RiemannScope.nonzero_legal_has_nonzero_selected_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:723:0: 'RiemannScope.scalar_pairwise_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:724:0: 'RiemannScope.legal_unit_scalar_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:725:0: 'RiemannScope.scalar_bridge_L_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully.",
+  "build_stdout": "\u2139 [1542/1562] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:717:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:718:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:719:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:720:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:721:0: 'RiemannScope.three_coefficient_legal_vanishing' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:722:0: 'RiemannScope.nonzero_legal_has_nonzero_selected_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:723:0: 'RiemannScope.scalar_pairwise_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:724:0: 'RiemannScope.legal_unit_scalar_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:725:0: 'RiemannScope.scalar_bridge_L_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "d7f848ed4b66a0b6ce2d5b75222081ef05f877646da7925ebb7e2e100edaa32e"
+  "report_hash": "608d963845dee938f69dcb89d6239bca2e1f68ec383c1be2c890c0275e1eef81"
 }
