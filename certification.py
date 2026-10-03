@@ -119,6 +119,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/ExtremalCorrelation.lean",
     "formal/RiemannScope/GradedMonoid.lean",
     "formal/RiemannScope/GradeCharacter.lean",
+    "formal/RiemannScope/TranscendenceRigidity.lean",
 ]
 
 

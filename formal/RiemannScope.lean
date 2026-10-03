@@ -17,4 +17,5 @@ import RiemannScope.CurvatureTransport
 import RiemannScope.ExtremalCorrelation
 import RiemannScope.GradedMonoid
 import RiemannScope.GradeCharacter
+import RiemannScope.TranscendenceRigidity
 

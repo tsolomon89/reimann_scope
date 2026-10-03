@@ -297,6 +297,25 @@ Construct an admissible test function \(\psi_K\) or integral kernel such that th
 \]
 where \(\mu_K^{\mathrm{analytic}} = \sum_n \Lambda(n)\tau^{-K}\delta_{\tau^{-K}\log n}\) and \(\mu_K^{\mathrm{grid}} = \sum_n \Lambda(n)\delta_{\log n + K\log\tau}\). Same-referent grade equivalence requires \(\Delta_K[\psi] = 0\), which would force \(\delta = 0\).
 
+### Suzuki Localized Weil Positivity, TC Grade Covariance, and Two-Direction Transcendence Rigidity (TASK-TC-020)
+TASK-TC-020 resolves the interaction between TC grade actions and Masatoshi Suzuki's localized Weil/screw-function theory (Suzuki 2023 [W2], 2026 [W10]):
+1. **Unconditional Local Positivity vs Global Positivity**: Suzuki (2026) proves that on a localized interval $[-R, R]$ with $R < R_0$, the lowest eigenvalue $\lambda_1(R)$ of the localized Weil operator $A_R$ is strictly positive ($\lambda_1(R) = \frac{3}{2R^2} + O(1/R) > 0$). However, global screw-function positivity on all of $\mathbb R$ is strictly `RH_EQUIVALENT` (Suzuki 2023).
+2. **Failure of Local Positivity Propagation**:
+   - Dilation $(S_K v)(x) = \tau^{K/2} v(\tau^K x)$ rescales the interval to $[-\tau^{-K} R, \tau^{-K} R]$, but $Q_W(S_K v) = \tau^{-K} \sum_\rho |\widehat{v}(\tau^{-K} z_\rho)|^2$ evaluates against dilated frequencies rather than zeta zeros. In log-space, discrete prime stations $\log p$ move to non-arithmetic points $\tau^{-K} \log p$, breaking operator similarity: $S_K^* A_{\tau^{-K} R} S_K \ne A_R$ (`NO_NATURAL_INTERTWINER`).
+   - Coordinate dilation scales the interval and operator simultaneously without controlling new physical domain (`PURE_COORDINATE_RESCALING_NO_GAIN`).
+   - Log-test translation $T_h v$ preserves individual form values ($Q_W(T_h v) = Q_W(v)$), but controlling cross-grade linear combinations requires full Weil positivity ($C_h(0) = Q_W(h) \ge 0$).
+   - TC grade covariance cannot propagate local positivity to global scales without assuming an RH-equivalent premise.
+3. **The Two-Pairing Firewall**:
+   - Reflected Weil pairing $Q_W(f, g) = \sum_\rho F(w_\rho) \overline{G(-\overline{w_\rho})}$ is unconditionally shift-invariant, but positivity is `RH_EQUIVALENT`.
+   - Ordinary Gram pairing $Q_+(f, g) = \sum_\rho F(w_\rho) \overline{G(w_\rho)}$ is unconditionally positive, but translation scales off-line modes by $e^{-2\delta h}$, breaking shift-invariance unless $\delta = 0$.
+   - Conflating positivity from $Q_+$ with invariance from $Q_W$ is circular.
+4. **Exceptional Exponent Collinearity Theorem**:
+   For $S_\tau = \{\alpha \in \mathbb A_{\mathbb R} : \tau^\alpha \in \overline{\mathbb Q}\}$, $S_\tau \cap \mathbb Q = \{0\}$ (Lindemann 1882), and Gelfond–Schneider proves $\dim_{\mathbb Q} S_\tau \le 1$ (`PROVED_FROM_GELFOND_SCHNEIDER`). All exceptional exponents lie on at most one rational line in $\mathbb A_{\mathbb R}$.
+5. **Rational-Grade Algebraic Separation**:
+   For $m, n \in \overline{\mathbb Q}^\times$ and $K, J \in \mathbb Q$: $m\tau^K = n\tau^J \iff K = J \text{ and } m = n$ (`PROVED_EXACT`).
+6. **Two-Direction Collision Architecture**:
+   An audit confirms that an off-critical zero supplies at most one displacement $\delta$; no existing mechanism forces two $\mathbb Q$-independent algebraic exponents into $S_\tau$. The status is `TWO_DIRECTION_COLLISION_BRIDGE_OPEN` (Report: `NO_EXISTING_TWO_DIRECTION_BRIDGE`).
+
 ---
 
 # 5. Step 1 — assume a counterexample

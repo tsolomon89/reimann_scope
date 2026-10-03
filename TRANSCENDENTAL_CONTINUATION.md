@@ -1117,6 +1117,49 @@ $$\eta_\rho(K)^{-1} = \overline{\eta_\rho(K)} \iff |\eta_\rho(K)| = 1 \iff \delt
 ### 25.6 Herglotz Analysis and Weil Equivalence
 By Herglotz's Theorem (1911), positive-definite sequences on $\mathbb Z$ admit only unitary characters in their spectral measure on $\mathbb T$. Off-line zero characters have $|q_\rho| = \tau^{-\delta} \ne 1$ and cannot appear in the support of any positive Herglotz measure. Deducing zero-character unitarity from arithmetic requires Weil positivity. The positive-definite TC constraint is classified as `EQUIVALENT_REFORMULATION_OF_WEIL`.
 
+---
+
+# 26. Suzuki Localized Weil Positivity and Scale Covariance
+
+TASK-TC-020 tests the transport of Masatoshi Suzuki's localized Weil/screw-function operators (Suzuki 2023 [W2], 2026 [W10]) under TC grade actions:
+
+### 26.1 Unconditional Local Positivity (Suzuki 2026)
+Suzuki (2026 [W10], Theorem 1.1) constructs the self-adjoint operator $A_R$ representing the localized closed form $Q_W^R(v) = \langle A_R v, v \rangle_{L^2(-R, R)}$ as the Friedrichs extension of $B_R = D^* G_R D$ on $H_0^1(-R, R)$. For sufficiently small $R < R_0$, the lowest eigenvalue $\lambda_1(R)$ is strictly positive:
+$$\lambda_1(R) = \frac{3}{2R^2} + O(1/R) > 0 \qquad (R \to 0^+).$$
+This provides unconditional local positivity on compact intervals $(-R_0, R_0)$. Global screw-function positivity on all of $\mathbb R$ is strictly `RH_EQUIVALENT` (Suzuki 2023 [W2], Theorem 1.2).
+
+### 26.2 Failure of Local Positivity Propagation
+1. **Analytic Dilation**: $(S_K v)(x) = \tau^{K/2} v(\tau^K x)$ rescales the interval to $[-\tau^{-K} R, \tau^{-K} R]$. However, the quadratic form $Q_W(S_K v) = \tau^{-K} \sum_\rho |\widehat{v}(\tau^{-K} z_\rho)|^2$ evaluates against dilated frequencies $\{\tau^{-K} z_\rho\}$ rather than zeta zeros. In log-space, dilation moves discrete prime stations $\log p$ to non-arithmetic points $\tau^{-K} \log p$, so $S_K^* A_{\tau^{-K} R} S_K \ne A_R$. Dilation does not intertwine the arithmetic operators (`NO_NATURAL_INTERTWINER`).
+2. **Pure Rescaling**: Dilation scales the coordinate window and operator simultaneously without controlling new physical domain (`PURE_COORDINATE_RESCALING_NO_GAIN`).
+3. **Log-Test Translation**: $(T_h v)(x) = v(x - h)$ with $h = K\log\tau$ preserves form values for single vectors ($Q_W(T_h v) = Q_W(v)$), but controlling linear combinations across translates requires cross-grade positivity, which is mathematically identical to full Weil positivity ($C_h(0) = Q_W(h) \ge 0$).
+4. **Conclusion**: TC grade covariance cannot propagate local positivity to global scales without assuming an RH-equivalent premise.
+
+---
+
+# 27. The Two-Pairing Firewall and Exceptional Exponent Rigidity
+
+### 27.1 The Two-Pairing Firewall
+The project strictly enforces the firewall between:
+- **Reflected Weil Pairing**: $Q_W(f, g) = \sum_\rho F(w_\rho) \overline{G(-\overline{w_\rho})}$. Unconditionally shift-invariant ($Q_W(T_h f, T_h g) = Q_W(f, g)$), but positivity is `RH_EQUIVALENT`.
+- **Ordinary Gram Pairing**: $Q_+(f, g) = \sum_\rho F(w_\rho) \overline{G(w_\rho)}$. Unconditionally positive, but translation scales off-line modes by $e^{-2\delta h}$, breaking shift-invariance unless $\delta = 0$.
+Never conflate positivity from $Q_+$ with shift-invariance from $Q_W$.
+
+### 27.2 Exceptional Exponent Collinearity Theorem
+Let $S_\tau = \{\alpha \in \mathbb A_{\mathbb R} : \tau^\alpha \in \overline{\mathbb Q}\}$ with $\tau = 2\pi > 1$.
+1. $S_\tau \cap \mathbb Q = \{0\}$ by Lindemann (1882) transcendence of $\tau$.
+2. For any nonzero $\alpha, \beta \in S_\tau$, Gelfond–Schneider forces $\beta/\alpha \in \mathbb Q$.
+3. Therefore:
+   $$\boxed{\dim_{\mathbb Q} S_\tau \le 1 \qquad (\texttt{PROVED\_FROM\_GELFOND\_SCHNEIDER}).}$$
+*Epistemic qualification*: This proves all exceptional exponents in $\mathbb A_{\mathbb R}$ are $\mathbb Q$-collinear, lying on at most one rational line. It does not prove $S_\tau = \{0\}$.
+
+### 27.3 Rational-Grade Algebraic-Coefficient Noncollision
+For $m, n \in \overline{\mathbb Q}^\times$ and $K, J \in \mathbb Q$:
+$$\boxed{m\tau^K = n\tau^J \iff K = J \text{ and } m = n \qquad (\texttt{PROVED\_EXACT}).}$$
+This extends grid noncollision from integer coefficients to arbitrary nonzero algebraic coefficients.
+
+### 27.4 Two-Direction Collision Architecture
+An audit of all existing TC mechanisms confirms that an off-critical zero $\rho = 1/2 + \delta + i\gamma$ supplies at most one displacement direction $\delta$. No existing mechanism forces two $\mathbb Q$-independent algebraic exponents into $S_\tau$. The status is classified as `TWO_DIRECTION_COLLISION_BRIDGE_OPEN` (Report: `NO_EXISTING_TWO_DIRECTION_BRIDGE`).
+
 
 
 

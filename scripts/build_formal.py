@@ -43,6 +43,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/ExtremalCorrelation.lean",
     "formal/RiemannScope/GradedMonoid.lean",
     "formal/RiemannScope/GradeCharacter.lean",
+    "formal/RiemannScope/TranscendenceRigidity.lean",
 ]
 
 

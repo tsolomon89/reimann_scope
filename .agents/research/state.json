@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "GRADE_CHARACTER_UNITARITY_INVESTIGATION",
+  "current_phase": "SUZUKI_LOCALIZATION_AND_TRANSCENDENCE_RIGIDITY",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -129,10 +129,27 @@
         "Author docs/reviews/TC_GRADE_CHARACTER_UNITARITY.md and data/tc_grade_character_unitarity.json"
       ],
       "completion_note": "TASK-TC-019 completed: Zero-induced grade-unit characters formalized in Lean 4; RH proved equivalent to character unitarity on Z; B_rho identified as exact non-unitarity defect; Mellin scaling unitarity and 1/2 centering derived; Herglotz analysis completed; Weil equivalence classified; 11/11 unit tests passing."
+    },
+    "track_8_suzuki_localization_and_transcendence_rigidity": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Audit Suzuki primary sources: W2 (2023), W8 (2025), W10 (2026 arXiv:2606.09096v3)",
+        "Enforce Two-Pairing Firewall: distinguish shift-invariant reflected Weil pairing Q_W from positive ordinary Gram pairing Q_+",
+        "Derive TC action on Suzuki localized operator A_R and window transformation Phi_K(R)",
+        "Classify positivity propagation (PURE_COORDINATE_RESCALING_NO_GAIN and NO_NATURAL_INTERTWINER)",
+        "Analyze Suzuki 2026 lowest localized eigenvalue lambda_1(R) and compact-uniform limit (TC_COMPATIBLE_BUT_NO_NEW_CONTROL)",
+        "Prove exceptional exponent theorem dim_Q S_tau <= 1 via Gelfond-Schneider with strict epistemic bounds",
+        "Prove rational-grade algebraic-coefficient noncollision m tau^K = n tau^J ==> K=J and m=n",
+        "Audit TC branches for two-direction collision bridge (result: TWO_DIRECTION_COLLISION_BRIDGE_OPEN)",
+        "Compile Lean 4 formalization formal/RiemannScope/TranscendenceRigidity.lean and verify 12 unit tests",
+        "Author docs/reviews/TC_SUZUKI_LOCALIZED_GRADE_COVARIANCE.md and data/tc_suzuki_localized_grade_covariance.json"
+      ],
+      "completion_note": "TASK-TC-020 completed: Suzuki primary sources verified; localized operator A_R self-adjointness confirmed unconditional but positivity lambda_1(R) >= 0 is RH-equivalent; TC covariance fails to propagate local control across scales (dilation rescales window and operator simultaneously without controlling new native domain; translation preserves single seeds but cross-grade combinations require full Weil positivity); two-pairing firewall rigorously enforced; exceptional exponent theorem dim_Q S_tau <= 1 proved from Gelfond-Schneider; rational-grade algebraic noncollision proved; two-direction collision bridge audited and classified as OPEN; Lean 4 formalization verified (322 theorems, 0 errors, 0 sorries); 12/12 unit tests passing."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_suzuki_localized_grade_covariance.json",
       "data/tc_grade_character_unitarity.json",
       "data/tc_graded_arithmetic_closure.json",
       "data/tc_analytic_arithmetic_intertwining.json",

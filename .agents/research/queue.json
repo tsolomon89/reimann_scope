@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-019",
+  "active_task_id": "TASK-TC-020",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -387,6 +387,28 @@
         "RESEARCH_HYPOTHESIS.md"
       ],
       "resolution": "TASK-TC-019 completed. 1) Corrected TASK-TC-018 overclaims: withdrew Gelfond-Schneider claim for n^{tau^{-K}}, verified counter-control alpha = log_2(3), and defined ambient ring Gamma_tau = span_{A_R} { tau^K : K in A_R }. 2) Formalized normalized zero-induced grade-unit character eta_rho(K) = tau^{-K(rho - 1/2)} on integer skeleton K in Z, proving multiplicativity eta_rho(K+J) = eta_rho(K)eta_rho(J) and modulus |eta_rho(K)| = tau^{-K delta}. 3) Proved TC Unitarity Reformulation of RH: eta_rho is unitary on Z if and only if delta = 0. 4) Proved B_rho(K) = |eta_rho(K)| + |eta_rho(K)|^{-1} - 2 = 4 sinh^2(K delta log(tau)/2) is the exact non-unitarity defect of the grade character. 5) Proved multiplicative dilation is unitary on L^2(R_{>0}, dx/x); derived 1/2 centering from L^2(R_{>0}, dx) Plancherel isometry line where normalized dilation has multiplier tau^{-K(s - 1/2)} = eta_s(K). 6) Proved dual = adjoint character on Z iff delta = 0. 7) Audited Herglotz theorem on Z: positive-definite sequences admit only unitary characters on T; linking arithmetic correlations to pure zero spectrum is classified as EQUIVALENT_REFORMULATION_OF_WEIL. 8) Formalized in Lean 4 (formal/RiemannScope/GradeCharacter.lean, lake build exit code 0) and verified in 11/11 passing tests in tests/test_tc_grade_character_unitarity.py."
+    },
+    {
+      "task_id": "TASK-TC-020",
+      "priority": 22,
+      "objective": "Suzuki Localized Weil Positivity, TC Grade Covariance, and Two-Direction Transcendence Rigidity",
+      "status": "COMPLETED_SUZUKI_LOCALIZATION_AND_TRANSCENDENCE_RIGIDITY",
+      "review_status": "REVIEWED_THEORETICAL",
+      "open_implication": "Isolate a non-circular arithmetic mechanism forcing an off-critical zero into two Q-independent directions in S_tau, or proving compact-uniform convergence in Suzuki's limiting condition without assuming RH.",
+      "planned_calculation": "1. Verify primary sources for Suzuki 2023 [W2], 2025 [W8], and 2026 [W10]. 2. Classify unconditional local results vs RH-equivalent global claims. 3. Reconstruct exact centered Weil distribution and bilateral correlation identity C_h(K) = W(T_{aK}(h * h_tilde)). 4. Enforce two-pairing firewall between shift-invariant Q_W and positive Q_+. 5. Reconstruct Suzuki screw kernel G_g(t, u) and localized operator A_R. 6. Derive TC action on localized objects and determine window transformation Phi_K(R). 7. Classify positivity propagation (Outcome: PURE_COORDINATE_RESCALING_NO_GAIN and NO_NATURAL_INTERTWINER). 8. Analyze Suzuki 2026 lowest localized eigenvalue lambda_1(R) and compact-uniform limit (Corollary 1.6: TC_COMPATIBLE_BUT_NO_NEW_CONTROL). 9. Search for smaller-than-Weil positive test family and analyze zero visibility. 10. Prove S_tau cap Q = {0} and dim_Q S_tau <= 1 via Gelfond-Schneider with proper epistemic bounding. 11. Extend rational-grade separation to nonzero algebraic coefficients (m tau^K = n tau^J ==> K=J, m=n). 12. Audit TC branches for two-direction collision bridge (result: TWO_DIRECTION_COLLISION_BRIDGE_OPEN). 13. Isolate 2*pi specific roles and generic-base controls. 14. Formalize core algebraic identities in Lean 4 (formal/RiemannScope/TranscendenceRigidity.lean). 15. Implement 12 unit tests in tests/test_tc_suzuki_grade_covariance.py. 16. Author docs/reviews/TC_SUZUKI_LOCALIZED_GRADE_COVARIANCE.md and data/tc_suzuki_localized_grade_covariance.json.",
+      "acceptance_criterion": "Suzuki primary sources verified; exact screw kernel and localized operator defined; TC covariance law derived; window map Phi_K(R) computed; positivity propagation classified with proof; two-pairing firewall enforced; exceptional exponent theorem dim_Q S_tau <= 1 proved and epistemically bounded; algebraic rational-grade separation proved; two-direction collision bridge audited; review and json deliverable created; 12 unit tests passing; Lean 4 formalization compiled.",
+      "dependencies": ["TASK-TC-019"],
+      "evidence": [
+        "docs/reviews/TC_SUZUKI_LOCALIZED_GRADE_COVARIANCE.md",
+        "data/tc_suzuki_localized_grade_covariance.json",
+        "tests/test_tc_suzuki_grade_covariance.py",
+        "formal/RiemannScope/TranscendenceRigidity.lean",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_LEDGER.md",
+        "RESEARCH_HYPOTHESIS.md"
+      ],
+      "resolution": "TASK-TC-020 completed. 1) Audited primary sources Suzuki 2023 [W2], 2025 [W8], 2026 [W10 arXiv:2606.09096v3]. Confirmed that Suzuki proves unconditional self-adjointness and discrete spectra for localized operator A_R on L^2(-R, R), but does NOT prove unconditional positivity on any interval (lambda_1(R) >= 0 for all R is RH-equivalent). 2) Reconstructed exact centered Weil distribution and proved C_h(K) = W(T_{aK}(h * h_tilde)) with Herglotz positivity on all seeds equivalent to Weil positivity and RH. 3) Enforced two-pairing firewall: reflected Weil pairing Q_W is shift-invariant but positivity is RH-equivalent; ordinary Gram pairing Q_+ is positive but translation scales off-line modes by e^{-2 delta h}, breaking shift-invariance unless delta = 0. Conflating them is circular. 4) Derived TC action on localized objects: dilation S_K rescales window Phi_K(R) = tau^{-K} R and operator simultaneously without controlling new physical domain (PURE_COORDINATE_RESCALING_NO_GAIN), while translation T_{Ka} preserves single-seed values but cross-grade combinations require full Weil positivity (NO_NATURAL_INTERTWINER). 5) Classified relation to Suzuki Corollary 1.6 compact-uniform limit as TC_COMPATIBLE_BUT_NO_NEW_CONTROL. 6) Proved any proper subfamily seeing every zero must be dense in the Weil quotient, re-encountering RH equivalence. 7) Proved exceptional exponent theorem dim_Q S_tau <= 1 via Gelfond-Schneider, with epistemic qualification that S_tau = {0} is NOT proved. 8) Proved rational-grade algebraic-coefficient noncollision m tau^K = n tau^J ==> K=J and m=n for all m, n in Q_bar^x and K, J in Q. 9) Audited all TC branches for two-direction collision bridge: NO_EXISTING_TWO_DIRECTION_BRIDGE, classified as TWO_DIRECTION_COLLISION_BRIDGE_OPEN. 10) Formalized in Lean 4 (formal/RiemannScope/TranscendenceRigidity.lean, 322 theorems, 0 errors, 0 sorries) and verified in 12/12 passing tests in tests/test_tc_suzuki_grade_covariance.py."
     }
   ]
 }

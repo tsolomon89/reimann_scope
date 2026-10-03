@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "tc_suzuki_localized_grade_covariance",
+  "task_id": "TASK-TC-020",
+  "timestamp": "2026-10-03T21:42:00Z",
+  "governing_question": "Does the TC grade action induce a genuine covariance between Suzuki's localized Weil/screw-function objects at different scales, strong enough to propagate a locally controlled property globally?",
+  "outcome_classification": "PROVED_PURE_RESCALING_AND_NO_NATURAL_INTERTWINER",
+  "suzuki_primary_sources": {
+    "W2": {
+      "citation": "Masatoshi Suzuki, 'Aspects of the screw function corresponding to the Riemann zeta-function', Journal of the London Mathematical Society 108 (2023), 1448-1487",
+      "theorems": [
+        {
+          "number": "Theorem 1.2",
+          "hypotheses": "Continuous real-valued even function g(t) defined on R from Weil explicit formula",
+          "statement": "The kernel G_g(t, u) = g(t-u) - g(t) - g(-u) + g(0) is positive semidefinite for all t, u in R iff RH holds",
+          "unconditional": false,
+          "classification": "RH_EQUIVALENT"
+        }
+      ]
+    },
+    "W8": {
+      "citation": "Masatoshi Suzuki, 'On the Hilbert space derived from the Weil distribution', Canadian Journal of Mathematics (2025)",
+      "theorems": [
+        {
+          "number": "Theorem 1.1",
+          "hypotheses": "Assumes RH",
+          "statement": "Identifies the completion of C_c^infty(R) with respect to Q_W as a Hilbert space isometrically isomorphic to a de Branges space",
+          "unconditional": false,
+          "classification": "PROVED_SPECIAL_CASE_CONDITIONAL_ON_RH"
+        }
+      ]
+    },
+    "W10": {
+      "citation": "Masatoshi Suzuki, 'Weil\\'s quadratic form via the screw function', arXiv:2606.09096v3, 23 September 2026",
+      "theorems": [
+        {
+          "number": "Theorem 1.1",
+          "hypotheses": "a > 0 (interval [-a, a]), Friedrichs extension of symmetric operator B_a = D^* G_a D on H_0^1(-a, a)",
+          "statement": "A_a is the self-adjoint operator on L^2(-a, a) representing the closed localized form Q_W^a(v) = <A_a v, v>_{L^2}",
+          "unconditional": true,
+          "classification": "PROVED_STANDARD_OPERATOR_THEOREM"
+        },
+        {
+          "number": "Theorem 1.3",
+          "hypotheses": "a in (0, infty)",
+          "statement": "The lowest eigenvalue lambda_a = inf_{v != 0} Q_W^a(v) / ||v||^2 is continuous in a",
+          "unconditional": true,
+          "classification": "PROVED_CONTINUITY_THEOREM"
+        },
+        {
+          "number": "Theorem 1.4",
+          "hypotheses": "Sufficiently small a > 0",
+          "statement": "lambda_a is strictly positive, simple, with lambda_a = 3/(2 a^2) + O(1/a) as a -> 0+, and the ground state is even",
+          "unconditional": true,
+          "classification": "PROVED_LOCAL_POSITIVITY_THEOREM"
+        },
+        {
+          "number": "Theorem 1.5",
+          "hypotheses": "a > 0, lambda < lambda_a, T_a = A_a - lambda I > 0, completion H(T_a)",
+          "statement": "D_a = i d/dx has deficiency indices (1, 1); self-adjoint extensions have real spectrum given by zeros of entire W(a, theta; z), and all zeros of W(a, theta; z) are real",
+          "unconditional": true,
+          "classification": "PROVED_REAL_SPECTRUM_THEOREM"
+        },
+        {
+          "number": "Corollary 1.6",
+          "hypotheses": "Existence of choices lambda(a) < lambda_a, theta(a), phi(a, z) such that exp(phi(a, z)) * W(a, theta(a); z) -> 1 / (1 - i xi'/xi) compact-uniformly in Im(z) > 0",
+          "statement": "If this compact-uniform limit holds, then RH holds",
+          "unconditional": false,
+          "classification": "CONJECTURAL_LIMIT_EQUIVALENT_TO_RH",
+          "notes": "Requires lambda(a) = 0 for large a, which requires A_a > 0 for large a, already equivalent to Weil positivity and RH"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "screw_function": "g(t) = 2 log|t| + C_1 + sum_{n <= exp(|t|)} n^{-1/2} Lambda(n) (|t| - log n) + archimedean_terms",
+    "screw_kernel": "G_g(t, u) = g(t - u) - g(t) - g(-u) + g(0)",
+    "localized_object": "Quadratic form Q_W^R(v) = <A_R v, v>_{L^2(-R, R)} on domain C_c^infty(-R, R) with R > 0"
+  },
+  "tc_transformations": {
+    "log_test_translation": {
+      "definition": "(T_h v)(x) = v(x - h) with h = K log(tau)",
+      "quadratic_form_action": "Q_W(T_h v) = Q_W(v) for single test function v",
+      "window_transformation": "supp(T_h v) = [h - R, h + R] (asymmetric shift, not centered)",
+      "propagation_status": "NO_PROPAGATION (controls only 1-dimensional translated ray, cross-terms require full Weil positivity)"
+    },
+    "analytic_dilation": {
+      "definition": "(S_K v)(x) = tau^{K/2} v(tau^K x)",
+      "quadratic_form_action": "Q_W(S_K v) = tau^{-K} sum_rho |hat{v}(tau^{-K} z_rho)|^2 (evaluates against dilated frequencies, not zeta zeros)",
+      "operator_intertwining": "S_K^* A_{tau^{-K} R} S_K != A_R (arithmetic prime impulses Lambda(n) at log n are fixed, not homogeneous under dilation)",
+      "window_transformation": "Phi_K(R) = tau^{-K} R",
+      "propagation_status": "PURE_COORDINATE_RESCALING_NO_GAIN"
+    }
+  },
+  "positivity_propagation_audit": {
+    "classification": "PURE_COORDINATE_RESCALING_NO_GAIN",
+    "case_selection": "Case B (Pure rescaling) / Case C (No natural covariance)",
+    "mathematical_reason": "Dilation deforms fixed arithmetic prime stations log(p) into non-arithmetic points tau^{-K} log(p), breaking operator similarity. Coordinate relabeling scales interval and operator simultaneously without controlling new physical domain. Log-translation preserves form on single vectors but cross-grade linear combinations require full Weil positivity, which is RH-equivalent."
+  },
+  "compact_uniform_limit_relation": {
+    "classification": "TC_COMPATIBLE_BUT_NO_NEW_CONTROL",
+    "notes": "Suzuki Corollary 1.6 requires lambda = 0 for large a, which requires A_a > 0 for all large a. TC grade covariance adds no new control over the large-a limit."
+  },
+  "restricted_test_family_audit": {
+    "candidate_single_orbit": "F_h = span{T_{aK} h : K in Z}",
+    "visibility_theorem": "FAILED: Any zero rho where hat{h}(z_rho) = 0 has hat{T_{aK} h}(z_rho) = 0 for ALL K in Z, hence is completely invisible",
+    "candidate_local_eigenfunctions": "v_R for R < R_0",
+    "visibility_theorem_local": "FAILED: On (-R_0, R_0), Q_W is strictly positive; no off-line zero can ever produce a negative witness in this interval",
+    "general_conclusion": "NO_SEPARABLE_SMALLER_POSITIVE_DETECTION_FAMILY: Any family with unconditionally provable positivity cannot detect off-line zeros; any family detecting every off-line zero requires support large enough to encounter prime stations where positivity is RH-equivalent."
+  },
+  "two_pairing_firewall": {
+    "reflected_weil_pairing": {
+      "formula": "Q_W(f, g) = sum_rho F(w_rho) * conjugate(G(-bar{w_rho}))",
+      "shift_invariance": "EXACT: Q_W(T_h f, T_h g) = Q_W(f, g) for all h in R",
+      "unconditional_positivity": "FALSE (positivity is strictly RH_EQUIVALENT)"
+    },
+    "ordinary_gram_pairing": {
+      "formula": "Q_+(f, g) = sum_rho F(w_rho) * conjugate(G(w_rho))",
+      "shift_invariance": "FAILS off-line: Q_+(T_h f, T_h f) = sum_rho exp(-2*delta*h) |F(w_rho)|^2 != Q_+(f, f)",
+      "unconditional_positivity": "TRUE (sum of absolute squares)"
+    },
+    "enforced_firewall_rule": "Never borrow positivity from Q_+ and shift-invariance from Q_W into one object without proving their equality, which requires delta = 0 (RH)."
+  },
+  "base_specificity_audit": {
+    "scale_geometry": "GENERIC_SCALE_GEOMETRY (dilation window scaling holds for all b > 1)",
+    "transcendental_scale": "TRANSCENDENTAL_SCALE (tau = 2*pi is transcendental, required for rational grade separation)",
+    "period_geometry": "FOURIER_PERIOD (2*pi i is the period of complex exp)",
+    "poisson_duality": "POISSON_DUALITY / GAMMA_COMPLETION (Gaussian self-duality and Euler Gamma functional equation)"
+  },
+  "exceptional_exponent_rigidity": {
+    "set_definition": "S_tau = {alpha in A_R : tau^alpha in Q_bar}",
+    "rational_intersection": "S_tau cap Q = {0} (PROVED_EXACT from Lindemann transcendence of tau)",
+    "collinearity_theorem": "dim_Q S_tau <= 1 (PROVED_FROM_GELFOND_SCHNEIDER: ratio beta/alpha cannot be algebraic irrational without making tau^beta transcendental)",
+    "epistemic_qualification": "dim_Q S_tau <= 1 does NOT prove S_tau = {0}; it proves exceptional exponents lie on at most one rational line in A_R",
+    "two_direction_collision_bridge": {
+      "status": "TWO_DIRECTION_COLLISION_BRIDGE_OPEN",
+      "audit_result": "NO_EXISTING_TWO_DIRECTION_BRIDGE",
+      "details": "An off-critical zero rho provides at most one displacement delta. No existing TC mechanism forces two Q-linearly independent algebraic exponents into S_tau."
+    }
+  },
+  "rational_grade_algebraic_noncollision": {
+    "theorem": "For m, n in Q_bar^times and K, J in Q: m * tau^K = n * tau^J <=> K = J and m = n",
+    "status": "PROVED_EXACT",
+    "proof": "K != J implies tau^{K-J} = n/m in Q_bar. Clearing denominator of K-J gives non-zero integer power of tau algebraic, contradicting Lindemann."
+  },
+  "next_theorem_obligation": "Derive an unconditional positive factorization Q_W(f) = ||A f||^2 on an arithmetic test space, or prove an arithmetic contradiction forcing off-line zero displacement delta to vanish."
+}
