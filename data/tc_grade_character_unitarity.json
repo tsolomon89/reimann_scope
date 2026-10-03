@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "artifact_type": "tc_grade_character_unitarity",
+  "task": "TASK-TC-019",
+  "timestamp": "2026-10-03T12:15:00Z",
+  "status": "ACCEPTED",
+  "zero_character_definition": {
+    "formula": "eta_rho(K) = tau^{-K * (rho - 1/2)} = tau^{-K * (delta + i * gamma)}",
+    "domain": "K in Z (bilateral integer skeleton)",
+    "parameters": {
+      "tau": "2 * pi",
+      "rho": "1/2 + delta + i * gamma",
+      "delta": "Re(rho) - 1/2 (off-critical displacement)",
+      "gamma": "Im(rho) (zero ordinate)"
+    }
+  },
+  "character_law": {
+    "multiplicativity": "eta_rho(K + J) = eta_rho(K) * eta_rho(J)",
+    "identity": "eta_rho(0) = 1",
+    "inversion": "eta_rho(-K) = eta_rho(K)^{-1}",
+    "homomorphism": "eta_rho in Hom((Z, +), (C^\\times, *))"
+  },
+  "modulus": {
+    "formula": "|eta_rho(K)| = tau^{-K * delta}",
+    "critical_line": "|eta_rho(K)| = 1 for all K in Z when delta = 0",
+    "off_critical": "|eta_rho(K)| != 1 for K != 0 when delta != 0"
+  },
+  "unitarity_criterion": {
+    "definition": "A character eta: Z -> C^\\times is unitary if |eta(K)| = 1 for all K in Z",
+    "exact_theorem": "eta_rho is unitary on Z <=> delta = 0",
+    "proof": "tau = 2pi > 1. |eta_rho(1)| = tau^{-delta} = 1 <=> -delta * log(tau) = 0 <=> delta = 0."
+  },
+  "rh_equivalence": {
+    "statement": "Riemann Hypothesis <=> Every nontrivial zero rho induces a unitary grade character eta_rho on Z",
+    "nature": "Strict reformulation of RH in the category of graded-monoid unit characters (not a proof of RH)"
+  },
+  "reflection_defect": {
+    "formula": "B_rho(K) = |eta_rho(K)| + |eta_rho(K)|^{-1} - 2 = tau^{K*delta} + tau^{-K*delta} - 2 = 4 * sinh^2(K * delta * log(tau) / 2)",
+    "interpretation": "Exact non-unitarity defect of the zero-induced grade character",
+    "positivity": "B_rho(K) >= 0 unconditionally; for K != 0, B_rho(K) = 0 <=> delta = 0 <=> eta_rho is unitary"
+  },
+  "positive_definite_correlation_candidates": [
+    {
+      "candidate": "Hilbert-space inner product C(K) = <U_K v, v>",
+      "positivity_status": "UNCONDITIONALLY_POSITIVE_DEFINITE",
+      "spectral_nature": "Spectral measure supported on the unit circle T by Herglotz's theorem"
+    },
+    {
+      "candidate": "Zero quadratic form C_zeros(K) = sum_rho w_rho * eta_rho(K)",
+      "positivity_status": "CONDITIONAL_ON_RH",
+      "spectral_nature": "Positive definite iff all eta_rho are unitary (delta_rho = 0)"
+    },
+    {
+      "candidate": "Arithmetic prime-power correlation C_arith(K) = sum_n Lambda(n)/sqrt(n) * psi(K, log n)",
+      "positivity_status": "EXPLICIT_FORMULA_COUPLED",
+      "spectral_nature": "Couples zero characters to prime powers and archimedean distributions via explicit formula"
+    }
+  ],
+  "arithmetic_derivation_status": {
+    "geometric_side": "Unconditional positivity exists for any unitary group action U_K on a Hilbert space",
+    "spectral_connection": "Equating the arithmetic correlation with a pure sum of zero characters requires the explicit formula and archimedean cancellation"
+  },
+  "mellin_unitarity_status": {
+    "haar_space": "Multiplicative dilation T_K: f(x) |-> f(tau^K x) is strictly unitary on L^2(R_{>0}, dx/x)",
+    "lebesgue_space": "Normalized dilation (U_K f)(x) = tau^{K/2} f(tau^K x) is strictly unitary on L^2(R_{>0}, dx)"
+  },
+  "half_centering_status": {
+    "derivation": "Mellin transform of normalized dilation satisfies M[U_K f](s) = tau^{-K(s - 1/2)} M[f](s) = eta_s(K) * M[f](s)",
+    "origin": "The 1/2 centering is the unique shift aligning multiplicative dilation with the Lebesgue-measure Mellin-Plancherel isometry line Re(s) = 1/2"
+  },
+  "functional_equation_adjoint_status": {
+    "reflection_action": "eta_{1-rho}(K) = eta_rho(-K) = eta_rho(K)^{-1} (functional equation reflection corresponds to grade inversion)",
+    "schwarz_reflection": "eta_{1-conj(rho)}(K) = conj(eta_rho(-K)) = conj(eta_rho(K)^{-1})",
+    "dual_equals_adjoint": "eta_rho(K)^{-1} = conj(eta_rho(K)) <=> |eta_rho(K)| = 1 <=> delta = 0"
+  },
+  "herglotz_status": {
+    "theorem": "Herglotz (1911): C: Z -> C is positive definite iff C(K) = int_T z^K dmu(z) for a positive Borel measure mu on the unit circle T",
+    "unitarity_forcing": "All spectral atoms of a positive-definite sequence on Z must lie on T (|z| = 1)",
+    "off_line_obstruction": "Off-line zero characters have |q_rho| = tau^{-delta} != 1, so they cannot belong to the spectral support of any positive Herglotz measure"
+  },
+  "weil_comparison": {
+    "classification": "EQUIVALENT_REFORMULATION_OF_WEIL",
+    "justification": "Deducing zero-character unitarity from arithmetic requires the zero quadratic form to be positive semi-definite, which Weil (1952) proved is equivalent to RH. TC unitarity reformulates Weil positivity in the category of graded monoid characters."
+  },
+  "circularity_audit": {
+    "status": "NON_CIRCULAR_REFORMULATION_ESTABLISHED",
+    "caveat": "The assertion that zero characters are unitary is a valid reformulation of RH, but CANNOT be used to prove RH without independently establishing the Weil positivity criterion."
+  },
+  "corrections_to_task_tc_018": {
+    "exponent_transcendence": "WITHDRAWN: Gelfond-Schneider does not apply to n^{tau^{-K}} because tau^{-K} is transcendental. Counter-control alpha = log_2(3) proves alpha is transcendental yet 2^alpha = 3 is integer. Transcendence of n^{tau^{-K}} is OPEN; elementary nonintegrality (e.g. 1 < 2^{tau^{-K}} < 2) is used instead.",
+    "ambient_closure": "CORRECTED: The set A_R * tau^{A_R} is not closed under addition. The actual ambient ring is Gamma_tau = span_{A_R} { tau^K : K in A_R } (a countable algebraic-transcendental ring)."
+  },
+  "earliest_missing_implication": {
+    "statement": "Independent, non-circular proof that arithmetic same-referent equivalence forces the prime discrepancy functional Delta_K[psi] to dominate the archimedean tail without assuming Weil positivity.",
+    "next_recommended_task": "TASK-TC-020: Archimedean Spectral Cancellation and Test-Function Admissibility in the TC Explicit Formula."
+  }
+}

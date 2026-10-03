@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "GRADED_ARITHMETIC_CLOSURE_INVESTIGATION",
+  "current_phase": "GRADE_CHARACTER_UNITARITY_INVESTIGATION",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -111,11 +111,29 @@
         "Author docs/reviews/TC_GRADED_ARITHMETIC_CLOSURE.md and data/tc_graded_arithmetic_closure.json",
         "Compile Lean 4 formalization formal/RiemannScope/GradedMonoid.lean and verify 13 unit tests"
       ],
-      "completion_note": "TASK-TC-018 completed: Graded arithmetic monoid M_tau and grade units u_K formalized in Lean 4; unique prime factorization proved; quotient recovers native integer arithmetic; refined Euler product derived; rational-grade escape theorem proved; Fork B resolution established (ambient completion M_tau^{ambient}); reflection defect B_rho(K) derived directly from grade-unit characters; generic-base control verified; 13/13 unit tests passing."
+      "completion_note": "TASK-TC-018 completed: Graded arithmetic monoid M_tau and grade units u_K formalized in Lean 4; unique prime factorization proved; quotient recovers native integer arithmetic; refined Euler product derived; rational-grade escape theorem proved; Fork B resolution established (ambient completion Gamma_tau x exp(Lambda_tau)); Gelfond-Schneider claim withdrawn (counter-control log_2 3); reflection defect B_rho(K) derived directly from grade-unit characters; generic-base control verified; 15/15 unit tests passing."
+    },
+    "track_7_grade_character_unitarity": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Correct TASK-TC-018 overclaims: withdraw Gelfond-Schneider claim for n^{tau^{-K}}, add counter-control log_2(3), define ambient ring Gamma_tau",
+        "Define normalized zero-induced grade-unit character eta_rho(K) = tau^{-K(rho - 1/2)} on integer skeleton Z",
+        "Prove character law and modulus |eta_rho(K)| = tau^{-K delta}",
+        "Prove TC Unitarity Reformulation of RH: eta_rho unitary on Z <=> delta = 0",
+        "Prove B_rho(K) = |eta_rho(K)| + |eta_rho(K)|^{-1} - 2 is the exact non-unitarity defect",
+        "Analyze Mellin dilation unitarity on L^2(R_{>0}, dx/x) and derive 1/2-centering from L^2(R_{>0}, dx) Plancherel isometry",
+        "Prove dual = adjoint character on Z <=> delta = 0",
+        "Audit Herglotz harmonic analysis on Z: positive-definite sequences admit only unitary characters on T",
+        "Classify arithmetic grade correlation vs Weil positivity as EQUIVALENT_REFORMULATION_OF_WEIL",
+        "Formalize in Lean 4 formal/RiemannScope/GradeCharacter.lean and verify 11 unit tests in tests/test_tc_grade_character_unitarity.py",
+        "Author docs/reviews/TC_GRADE_CHARACTER_UNITARITY.md and data/tc_grade_character_unitarity.json"
+      ],
+      "completion_note": "TASK-TC-019 completed: Zero-induced grade-unit characters formalized in Lean 4; RH proved equivalent to character unitarity on Z; B_rho identified as exact non-unitarity defect; Mellin scaling unitarity and 1/2 centering derived; Herglotz analysis completed; Weil equivalence classified; 11/11 unit tests passing."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_grade_character_unitarity.json",
       "data/tc_graded_arithmetic_closure.json",
       "data/tc_analytic_arithmetic_intertwining.json",
       "data/tc_minimal_constraint_hypothesis.json",

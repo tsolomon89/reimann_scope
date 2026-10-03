@@ -269,12 +269,24 @@ The full collection of TC arithmetic grids forms an \(\mathbb A_{\mathbb R}\)-gr
 1. **Grade Units & Unique Prime Factorization**: Unit group is \(U(\mathcal M_\tau) = \mathbb A_{\mathbb R} \times \{\pm 1\}\). Every grade defines an invertible grade unit \(u_K = (K, 1)\) with \(u_K \star u_J = u_{K+J}\) and \(u_K^{-1} = u_{-K}\). Every element factors uniquely into a grade unit, a sign, and native rational primes: \((K, n) = u_K \star (0, \operatorname{sgn} n) \star \prod_p (0, p)^{v_p(|n|)}\). **TC grades do not create new primes.**
 2. **Grade-Unit Quotient**: \(\mathcal M_\tau / U_{\mathrm{grade}} \cong \mathbb Z_{\ne 0}\) via projection \(\pi(K, n) = n\). Rigorously formalizes "distinct grids, same arithmetic referent": each coset consists of all grade representations of one integer referent.
 3. **Refined Euler Product**: \(D_K[\zeta](s) = \chi_s(u_K)\zeta(s) = \tau^{-Ks}\prod_p (1 - p^{-s})^{-1}\). Fixed-grade series is a global grade-unit twist of native zeta, NOT an independent Euler product.
-4. **Rational-Grade Escape Theorem**: For all \(K \in \mathbb Q \setminus \{0\}\) and \(J \in \mathbb A_{\mathbb R} \setminus \{0\}\), \(J\tau^{-K} \notin \mathbb A_{\mathbb R}\) by Lindemann (1882). Under analytic dilation, \((J, n) \mapsto (J\tau^{-K}, n^{\tau^{-K}})\) simultaneously escapes both \(\mathbb A_{\mathbb R}\) and \(\mathbb Z\).
-5. **Resolution of Fork B**: Algebraic-grade coordinate closure is an imposed indexing convention, not an intrinsic constraint of \(\zeta(s)\). Escape \(J\tau^{-K} \notin \mathbb A_{\mathbb R}\) holds unconditionally whether RH is true or false (\(\delta\)-independent). Analytic dilation naturally escapes into the ambient completion \(\mathcal M_\tau^{\mathrm{ambient}} = (\mathbb A_{\mathbb R} \cdot \tau^{\mathbb A_{\mathbb R}}) \times \exp(\mathcal L_\tau)\) with no contradiction and no required closure.
+4. **Rational-Grade Escape Theorem**: For all \(K \in \mathbb Q \setminus \{0\}\) and \(J \in \mathbb A_{\mathbb R} \setminus \{0\}\), \(J\tau^{-K} \notin \mathbb A_{\mathbb R}\) by Lindemann (1882). Under analytic dilation, \((J, n) \mapsto (J\tau^{-K}, n^{\tau^{-K}})\) simultaneously escapes both \(\mathbb A_{\mathbb R}\) and \(\mathbb Z\) (elementary nonintegrality witness: \(1 < 2^{\tau^{-K}} < 2\) for \(K > 0\); general transcendence status is OPEN; counter-control \(\alpha = \log_2 3\) is transcendental yet \(2^\alpha = 3 \in \mathbb Z\)).
+5. **Resolution of Fork B**: Algebraic-grade coordinate closure is an imposed indexing convention, not an intrinsic constraint of \(\zeta(s)\). Escape \(J\tau^{-K} \notin \mathbb A_{\mathbb R}\) holds unconditionally whether RH is true or false (\(\delta\)-independent). Analytic dilation naturally escapes into the ambient completion \(\mathcal M_\tau^{\mathrm{ambient}} = \Gamma_\tau \times \exp(\Lambda_\tau) \subset \mathbb R \times \mathbb R_{>0}\), where \(\Gamma_\tau = \operatorname{span}_{\mathbb A_{\mathbb R}}\{\tau^K : K \in \mathbb A_{\mathbb R}\}\) and \(\Lambda_\tau = \operatorname{span}_{\mathbb Z}\{\tau^K \log p : K \in \mathbb A_{\mathbb R}, p \in \mathcal P\}\), with no contradiction and no required closure.
 6. **Origin of Spectral Detector from Grade Units**: The reflection defect \(B_\rho(K)\) is the exact bilateral reflection defect of the normalized grade-unit character \(\widehat\chi_s(u_K) = \tau^{-K(s - 1/2)}\):
 \[
 \boxed{|\widehat\chi_\rho(u_K)| + |\widehat\chi_{1-\rho}(u_K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}
 \]
+
+### Grade-Unit Characters, Unitarity, and the Positive-Definite Constraint (TASK-TC-019)
+TASK-TC-019 establishes the representation-theoretic reformulation of RH on the integer grade skeleton \(K \in \mathbb Z\):
+1. **Zero-Induced Grade Character**: \(\eta_\rho(K) = \tau^{-K(\rho - 1/2)}\) is a multiplicative character on \(\mathbb Z\) with modulus \(|\eta_\rho(K)| = \tau^{-K\delta}\).
+2. **RH as Grade Unitarity**:
+\[
+\boxed{\text{Riemann Hypothesis} \iff \forall \rho \in \mathcal Z(\zeta), \; \eta_\rho \text{ is unitary on } \mathbb Z \iff \delta = 0.}
+\]
+3. **Representation Meaning of \(B_\rho(K)\)**: \(B_\rho(K) = |\eta_\rho(K)| + |\eta_\rho(K)|^{-1} - 2 = 4\sinh^2(K\delta\log\tau/2)\) is the exact non-unitarity defect of \(\eta_\rho\).
+4. **Mellin Dilation Unitarity & \(1/2\) Centering**: Multiplicative dilation is unitary on \(L^2(\mathbb R_{>0}, dx/x)\); on \(L^2(\mathbb R_{>0}, dx)\), normalized dilation \((U_K f)(x) = \tau^{K/2} f(\tau^K x)\) has Mellin multiplier \(\tau^{-K(s - 1/2)} = \eta_s(K)\), deriving the \(1/2\) centering from the Mellin-Plancherel isometry line.
+5. **Dual = Adjoint Equivalence**: \(\eta_\rho(K)^{-1} = \overline{\eta_\rho(K)} \iff \delta = 0\).
+6. **Herglotz Analysis & Weil Positivity**: By Herglotz (1911), positive-definite sequences on \(\mathbb Z\) admit only unitary characters in their spectral measure on \(\mathbb T\). Connecting arithmetic grade correlations to a pure zero spectrum is classified as `EQUIVALENT_REFORMULATION_OF_WEIL`.
 
 **Earliest Remaining Implication (Sharpened Formulation)**:
 Construct an admissible test function \(\psi_K\) or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure:

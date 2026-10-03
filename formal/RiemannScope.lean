@@ -16,4 +16,5 @@ import RiemannScope.ArithmeticBridge
 import RiemannScope.CurvatureTransport
 import RiemannScope.ExtremalCorrelation
 import RiemannScope.GradedMonoid
+import RiemannScope.GradeCharacter
 

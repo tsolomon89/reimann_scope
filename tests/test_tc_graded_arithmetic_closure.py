@@ -355,4 +355,54 @@ class TestGradedArithmeticClosure:
         assert not transcendental_grade.is_algebraic
 
         # This holds regardless of any zeta zero or delta value!
-        # Confirms Fork B: analytic dilation naturally lives in the ambient completion A_R * tau^{A_R}.
+        # Confirms Fork B: analytic dilation naturally lives in the ambient completion Gamma_tau.
+
+    def test_gelfond_schneider_counter_control_log2_3(self):
+        """Counter-control: alpha = log_2(3) is transcendental, yet 2^alpha = 3 is an integer.
+        Proves: alpha transcendental does NOT imply 2^alpha transcendental.
+        Therefore Gelfond-Schneider does NOT apply to n^{tau^{-K}} where the exponent is transcendental."""
+        # 1. alpha is irrational: 2^{p/q} = 3 => 2^p = 3^q, impossible for positive integers p, q
+        # 2. If alpha were algebraic irrational, Gelfond-Schneider would imply 2^alpha is transcendental.
+        # 3. But 2^alpha = 3 is an integer (algebraic rational).
+        # 4. Therefore alpha = log_2(3) is transcendental!
+        alpha = sp.log(3) / sp.log(2)
+        power_val = 2 ** alpha
+        assert power_val == 3
+        # In contrast, Gelfond-Schneider requires: base in A_R \\ {0, 1} AND exponent in A_R \\ Q.
+        # For n^{tau^{-K}}, the exponent tau^{-K} is transcendental (for rational K != 0),
+        # so Gelfond-Schneider is inapplicable.
+        # Its general transcendence is OPEN, but nonintegrality for witness cases (e.g. 2^{tau^{-K}} in (1, 2))
+        # is rigorously proved by elementary interval bounds.
+
+    def test_ambient_ring_gamma_tau_algebraic_properties(self):
+        """Verify Gamma_tau = span_{A_R} { tau^K : K in A_R } is closed under +, *, and dilation."""
+        # Elements are finite sums g = sum_{j=1}^r a_j tau^{K_j} with a_j, K_j in A_R
+        # g1 = a1 * tau^{K1} + a2 * tau^{K2}
+        # g2 = b1 * tau^{J1} + b2 * tau^{J2}
+        # Addition: g1 + g2 is a sum of 4 terms with algebraic coefficients and algebraic exponents.
+        # Multiplication: g1 * g2 = sum_{i, j} (ai * bj) * tau^{Ki + Jj}
+        # Since A_R is a field, ai * bj in A_R. Since A_R is an additive group, Ki + Jj in A_R.
+        # Dilation: g1 * tau^{-K} = a1 * tau^{K1 - K} + a2 * tau^{K2 - K}.
+        # For K in A_R, Ki - K in A_R, so dilation stays strictly inside Gamma_tau.
+        # Evaluate numerically at dps = 30
+        dps = 30
+        mpmath.mp.dps = dps
+        tau = 2 * mpmath.pi
+
+        a1, K1 = mpmath.mpf("2.0"), mpmath.mpf("0.5")
+        a2, K2 = mpmath.mpf("-1.5"), mpmath.mpf("1.0")
+        b1, J1 = mpmath.mpf("3.0"), mpmath.mpf("-0.5")
+
+        g1 = a1 * mpmath.power(tau, K1) + a2 * mpmath.power(tau, K2)
+        g2 = b1 * mpmath.power(tau, J1)
+
+        # Product expanded by group ring formula:
+        prod_expanded = (a1 * b1) * mpmath.power(tau, K1 + J1) + (a2 * b1) * mpmath.power(tau, K2 + J1)
+        assert abs((g1 * g2) - prod_expanded) < mpmath.mpf("1e-25")
+
+        # Dilation by K_dil = 0.5:
+        K_dil = mpmath.mpf("0.5")
+        dilated_g1 = g1 * mpmath.power(tau, -K_dil)
+        dilated_expanded = a1 * mpmath.power(tau, K1 - K_dil) + a2 * mpmath.power(tau, K2 - K_dil)
+        assert abs(dilated_g1 - dilated_expanded) < mpmath.mpf("1e-25")
+

@@ -523,9 +523,11 @@ The realization map $\Phi_\tau(K, n) = n \tau^K$ is a monoid homomorphism into $
 
 4. **Rational-Grade Escape Theorem**:  
    For all $K \in \mathbb Q \setminus \{0\}$ and $J \in \mathbb A_{\mathbb R} \setminus \{0\}$, $J \tau^{-K} \notin \mathbb A_{\mathbb R}$ by Lindemann (1882) transcendence of $\pi$. Analytic dilation $(J, n) \mapsto (J\tau^{-K}, n^{\tau^{-K}})$ simultaneously escapes both $\mathbb A_{\mathbb R}$ and $\mathbb Z$.
+   - *Base coordinate nonintegrality*: For $K > 0$ and $n = 2$, $1 < 2^{\tau^{-K}} < 2$, so $2^{\tau^{-K}} \notin \mathbb Z$.
+   - *Status classification*: General transcendence of $n^{\tau^{-K}}$ is OPEN. Gelfond–Schneider does not apply because $\tau^{-K}$ is transcendental. Counter-control: $\alpha = \log_2 3$ is transcendental yet $2^\alpha = 3 \in \mathbb Z$.
 
 5. **Resolution of Governing Decision Point (Fork B)**:  
-   Algebraic-grade closure is an imposed indexing skeleton, not an intrinsic constraint of $\zeta(s)$. The escape $J \tau^{-K} \notin \mathbb A_{\mathbb R}$ holds unconditionally whether RH is true or false ($\delta$-independent). The analytic action naturally lives in the ambient completion $\mathcal M_\tau^{\mathrm{ambient}} = (\mathbb A_{\mathbb R} \cdot \tau^{\mathbb A_{\mathbb R}}) \times \exp(\mathcal L_\tau) \subset \mathbb R \times \mathbb R_{>0}$ with no contradiction and no required closure.
+   Algebraic-grade closure is an imposed indexing skeleton, not an intrinsic constraint of $\zeta(s)$. The escape $J \tau^{-K} \notin \mathbb A_{\mathbb R}$ holds unconditionally whether RH is true or false ($\delta$-independent). The analytic action naturally lives in the ambient completion $\mathcal M_\tau^{\mathrm{ambient}} = \Gamma_\tau \times \exp(\Lambda_\tau) \subset \mathbb R \times \mathbb R_{>0}$, where $\Gamma_\tau = \operatorname{span}_{\mathbb A_{\mathbb R}}\{\tau^K : K \in \mathbb A_{\mathbb R}\}$ is a countable algebraic-transcendental ring and $\Lambda_\tau = \operatorname{span}_{\mathbb Z}\{\tau^K \log p : K \in \mathbb A_{\mathbb R}, p \in \mathcal P\}$, with no contradiction and no required closure.
 
 6. **Origin of the Spectral Detector from Grade Units**:  
    The reflection defect $B_\rho(K)$ is the exact reflection defect of the normalized grade-unit character $\widehat\chi_s(u_K) = \tau^{-K(s - 1/2)}$:
@@ -533,6 +535,48 @@ The realization map $\Phi_\tau(K, n) = n \tau^K$ is a monoid homomorphism into $
    \boxed{|\widehat\chi_\rho(u_K)| + |\widehat\chi_{1-\rho}(u_K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}
    \]
    Positivity and zero-rigidity ($B_\rho(K) = 0 \iff \delta = 0$) arise algebraically from the grade-unit character under functional equation reflection.
+
+### 9.6 Zero-Induced Grade Characters, Unitarity, and the Positive-Definite Constraint
+
+TASK-TC-019 establishes the representation-theoretic reformulation of the Riemann Hypothesis via grade-unit characters:
+
+1. **Normalized Zero-Induced Grade Character**:  
+   For a nontrivial zero $\rho = 1/2 + \delta + i\gamma$ and integer grade $K \in \mathbb Z$:
+   \[
+   \boxed{\eta_\rho(K) \coloneqq \tau^{-K(\rho - 1/2)} = \tau^{-K(\delta + i\gamma)}, \qquad |\eta_\rho(K)| = \tau^{-K\delta}.}
+   \]
+   $\eta_\rho: (\mathbb Z, +) \to (\mathbb C^\times, \times)$ is a multiplicative group character: $\eta_\rho(K + J) = \eta_\rho(K)\eta_\rho(J)$, $\eta_\rho(0) = 1$, $\eta_\rho(-K) = \eta_\rho(K)^{-1}$.
+
+2. **TC Unitarity Reformulation of RH**:  
+   A character $\eta$ on $\mathbb Z$ is unitary if $|\eta(K)| = 1$ for all $K \in \mathbb Z$.
+   \[
+   \boxed{\eta_\rho \text{ is unitary on } \mathbb Z \iff \delta = 0.}
+   \]
+   \[
+   \boxed{\text{Riemann Hypothesis} \iff \forall \rho \in \mathcal Z(\zeta), \; \eta_\rho \text{ is unitary on } \mathbb Z.}
+   \]
+
+3. **$B_\rho(K)$ as Non-Unitarity Defect**:  
+   \[
+   \boxed{B_\rho(K) = |\eta_\rho(K)| + |\eta_\rho(K)|^{-1} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right).}
+   \]
+   $B_\rho(K)$ is the exact non-unitarity defect of the grade character.
+
+4. **Mellin Dilation Unitarity and Natural $1/2$ Centering**:  
+   Multiplicative dilation $x \mapsto \tau^K x$ is strictly unitary on $L^2(\mathbb R_{>0}, dx/x)$. On $L^2(\mathbb R_{>0}, dx)$, normalized dilation $(U_K f)(x) = \tau^{K/2} f(\tau^K x)$ is unitary, with Mellin multiplier:
+   \[
+   \mathcal M[U_K f](s) = \tau^{-K(s - 1/2)} \mathcal M[f](s) = \eta_s(K) \mathcal M[f](s).
+   \]
+   The $1/2$ centering is the unique shift aligning multiplicative dilation with the Lebesgue-measure Mellin-Plancherel isometry line $\operatorname{Re}(s) = 1/2$.
+
+5. **Dual = Adjoint Equivalence**:  
+   Inversion equals complex conjugation on $\mathbb Z$ if and only if $\delta = 0$:
+   \[
+   \eta_\rho(K)^{-1} = \overline{\eta_\rho(K)} \iff |\eta_\rho(K)| = 1 \iff \delta = 0.
+   \]
+
+6. **Herglotz Analysis and Weil Equivalence**:  
+   By Herglotz's Theorem (1911), positive-definite sequences on $\mathbb Z$ admit only unitary characters in their spectral measure on $\mathbb T$. Deducing that the zero characters $\eta_\rho$ are unitary from an arithmetic correlation requires Weil positivity. The positive-definite TC constraint is classified as `EQUIVALENT_REFORMULATION_OF_WEIL`.
 
 ---
 

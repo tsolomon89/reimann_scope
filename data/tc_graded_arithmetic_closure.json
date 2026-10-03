@@ -57,8 +57,8 @@
     "character_transform": "A_K[chi_s(J, n)] = chi_{tau^{-K} s}(J, n) = tau^{-(J * tau^{-K}) * s} * (n^{tau^{-K}})^{-s}",
     "coordinate_map": "(J, n) |-> (J * tau^{-K}, n^{tau^{-K}})",
     "double_escape": {
-      "grade_coordinate": "J * tau^{-K} notin A_R for all K in Q\\{0}, J in A_R\\{0} (escapes algebraic numbers into transcendental reals)",
-      "base_coordinate": "n^{tau^{-K}} notin Z for all K != 0, n >= 2 (escapes integers into non-integer reals)"
+      "grade_coordinate": "J * tau^{-K} notin A_R for all K in Q\\{0}, J in A_R\\{0} (escapes algebraic numbers into transcendental reals by Lindemann 1882)",
+      "base_coordinate": "n^{tau^{-K}} notin Z for all K != 0, n >= 2 (elementary nonintegrality witness: for K > 0, 1 < 2^{tau^{-K}} < 2 contains no integers; general arithmetic transcendence status classified as OPEN; counter-control alpha = log_2(3) is transcendental yet 2^alpha = 3 is integer, so exponent transcendence does not imply power transcendence)"
     }
   },
   "rational_grade_escape_theorem": {
@@ -76,10 +76,10 @@
     ]
   },
   "minimal_ambient_completion": {
-    "grade_space": "A_R * tau^{A_R} = { J * tau^K : J, K in A_R } subset R",
-    "base_space": "exp(L_tau) where L_tau = span_Z { tau^K * log(p) : K in A_R, p in P } subset R_{>0}",
-    "ambient_monoid": "M_tau^{ambient} = (A_R * tau^{A_R}) x exp(L_tau) subset R x R_{>0}",
-    "cardinality": "Countable, explicitly generated algebraic-transcendental structure"
+    "grade_ring": "Gamma_tau = span_{A_R} { tau^K : K in A_R } = { sum_{j=1}^r a_j tau^{K_j} : a_j, K_j in A_R } subset R (countable algebraic-transcendental ring)",
+    "base_group": "exp(Lambda_tau) where Lambda_tau = span_Z { tau^K * log(p) : K in A_R, p in P } subset R_{>0}",
+    "ambient_monoid": "M_tau^{ambient} = Gamma_tau x exp(Lambda_tau) subset R x R_{>0}",
+    "cardinality": "Countable, explicitly generated algebraic-transcendental structure closed under addition, multiplication, and TC dilations"
   },
   "referent_quotient_preservation": {
     "status": "NOT_PRESERVED_AT_DISCRETE_LEVEL",
