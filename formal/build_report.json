@@ -4,8 +4,8 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "94ce1c67d0a4213d41e263b124af0711a7b4b9f8",
-  "timestamp": "2026-10-03T20:41:59.090688+00:00",
+  "producing_git_commit": "43f447ebf0cdc2d2a77a5065f9cfbbc5ed025b4a",
+  "timestamp": "2026-10-03T21:39:00.939496+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 323,
@@ -33,9 +33,9 @@
   "lake_manifest_hash": "07b25d989d5e3525186b2a69e6fb55a027b5c62b2869d794efc3682595ccf8ca",
   "builder_source_hashes": {
     "scripts/build_formal.py": "820258550a1955ed4c1343d767fbd06e0bd7e3b3076b38bfd505bfaf37eaa5a7",
-    "certification.py": "b95f198559eb908acbe00e0faab77c6eb7ac0d21496b56ec55aeb5f3bd283633"
+    "certification.py": "6bea47af446cb25c80fa4ebb8d5c6806ef8c1892c6e8a9ca771b35c388fbde62"
   },
   "build_stdout": "\u2139 [1543/1563] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:717:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:718:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:719:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:720:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:721:0: 'RiemannScope.three_coefficient_legal_vanishing' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:722:0: 'RiemannScope.nonzero_legal_has_nonzero_selected_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:723:0: 'RiemannScope.scalar_pairwise_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:724:0: 'RiemannScope.legal_unit_scalar_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:725:0: 'RiemannScope.scalar_bridge_L_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "2f683fdcaaa8eab26f5cf10a7e81520bc116ede3070b28dca2c68ba9c0449455"
+  "report_hash": "6cee16fff0f6236e09a044780a813870b410dca499172fa75bca67ac73213409"
 }
