@@ -1022,7 +1022,7 @@ Any historical identification of $n^{\tau^{-K}}$ with $\tau^K n$, or Fourier sca
 - $\tau^K n$ preserves addition ($\tau^K(m+n) = \tau^K m + \tau^K n$) and grid spacing, but breaks multiplication ($(\tau^K m)(\tau^K n) = \tau^{2K} m n \in L_{2K} \ne L_K$). The grid $L_K$ cannot carry an Euler product.
 
 ### 23.2 Semidirect Affine Group Structure
-$A_K$ and $D_J$ generate the positive 1D affine group $\operatorname{Aff}_+(\mathbb R)$, satisfying the exact semidirect relation:
+$A_K$ and $D_J$ generate a countable dense proper subgroup $G_{\mathrm{TC}} = \mathcal T_{\mathrm{closure}} \rtimes \tau^{\mathbb A_{\mathbb R}} \subsetneq \operatorname{Aff}_+(\mathbb R)$ of the positive 1D affine group, satisfying the exact semidirect relation:
 $$\boxed{A_K D_J = D_{J \tau^{-K}} A_K \iff A_K D_J A_K^{-1} = D_{J \tau^{-K}}.}$$
 The affine commutator discrepancy in log-space is:
 $$S_K T_J(x) - T_J S_K(x) = (1 - \tau^{-J}) K \log \tau.$$
@@ -1034,6 +1034,54 @@ Its reflection defect against $\rho^\# = 1/2 - \delta + i\gamma$ yields the mini
 $$\boxed{|R_{\mathrm{norm}}(\rho)| + |R_{\mathrm{norm}}(\rho^\#)| - 2 = 4\sinh^2\left(\frac{K_{\mathrm{eff}}\delta\log\tau}{2}\right) = B_\rho(K_{\mathrm{eff}}),}$$
 where $K_{\mathrm{eff}} = J(\tau^K - 1) \ne 0$ for $K \ne 0, J \ne 0$.
 The spectral detector $B_\rho$ is the exact reflection defect of the normalized affine commutator evaluated at the zeros.
+
+---
+
+# 24. Graded Arithmetic Monoid, Grade Units, and the Fork B Resolution
+
+TASK-TC-018 establishes the complete algebraic structure underlying the TC arithmetic grids:
+
+### 24.1 The Graded Arithmetic Monoid $\mathcal M_\tau$
+An individual grid $L_K = \tau^K (\mathbb Z \setminus \{0\})$ is not multiplicatively closed ($L_K \cdot L_K = L_{2K} \ne L_K$). The complete collection of all grids forms an $\mathbb A_{\mathbb R}$-graded commutative monoid:
+$$\boxed{\mathcal M_\tau = \mathbb A_{\mathbb R} \times \mathbb Z_{\ne 0} = (\mathbb A_{\mathbb R}, +) \times (\mathbb Z_{\ne 0}, \times),}$$
+with multiplication:
+$$(K, n) \star (J, m) = (K + J, n m), \qquad e = (0, 1).$$
+The realization map $\Phi_\tau: \mathcal M_\tau \to \mathbb R^\times$, $\Phi_\tau(K, n) = n \tau^K$ is an exact monoid homomorphism:
+$$\Phi_\tau((K, n) \star (J, m)) = \Phi_\tau(K, n) \Phi_\tau(J, m).$$
+
+### 24.2 Grade Units and Unique Prime Factorization
+The unit group of $\mathcal M_\tau$ is $U(\mathcal M_\tau) = \mathbb A_{\mathbb R} \times \{\pm 1\} \cong (\mathbb A_{\mathbb R}, +) \times (\mathbb Z / 2\mathbb Z)$.  
+Every algebraic grade defines an invertible **grade unit**:
+$$u_K = (K, 1), \qquad u_K \star u_J = u_{K+J}, \qquad u_K^{-1} = u_{-K}.$$
+Every element has a unique canonical factorization into a grade unit, a sign, and native rational primes:
+$$(K, n) = u_K \star (0, \operatorname{sgn} n) \star \prod_{p \in \mathcal P} (0, p)^{v_p(|n|)}.$$
+**TC grades do not create new primes.** The realized elements $p \tau^K = \Phi_\tau(u_K \star (0, p))$ are native rational primes transported by grade units.
+
+### 24.3 Grade-Unit Quotient Recovers Ordinary Integer Arithmetic
+The projection $\pi: \mathcal M_\tau \to \mathbb Z_{\ne 0}$, $\pi(K, n) = n$ has kernel $\ker \pi = U_{\mathrm{grade}} = \{ u_K : K \in \mathbb A_{\mathbb R} \}$. Thus:
+$$\mathcal M_\tau / U_{\mathrm{grade}} \cong (\mathbb Z_{\ne 0}, \times).$$
+This formalizes the concept of **"many distinct graded representations of one arithmetic referent"**: each coset in $\mathcal M_\tau / U_{\mathrm{grade}}$ consists of all pairs $(K, n)$ representing the single native integer referent $n$.
+
+### 24.4 Refined Euler-Product Interpretation
+The canonical character $\chi_s(K, n) = \tau^{-Ks} n^{-s}$ yields:
+$$D_K[\zeta](s) = \sum_{n=1}^\infty \chi_s(K, n) = \chi_s(u_K) \zeta(s) = \tau^{-Ks} \prod_{p \in \mathcal P} (1 - p^{-s})^{-1}.$$
+The fixed-grade Dirichlet series is a single global grade-unit twist of the universal native Euler product, not an independent product over "grid primes."
+
+### 24.5 Rational-Grade Escape Theorem
+**Theorem (Lindemann 1882)**: For all nonzero rational $K \in \mathbb Q \setminus \{0\}$ and nonzero algebraic $J \in \mathbb A_{\mathbb R} \setminus \{0\}$:
+$$\boxed{J \tau^{-K} \notin \mathbb A_{\mathbb R}.}$$
+Under analytic dilation, $(J, n) \mapsto (J \tau^{-K}, n^{\tau^{-K}})$ simultaneously escapes both the algebraic grade domain $\mathbb A_{\mathbb R}$ and the integer lattice $\mathbb Z$.
+
+### 24.6 Resolution of the Governing Decision Point (Fork B)
+The repository resolves the fork in favor of **Fork B**:
+1. The algebraic grade domain $\mathbb A_{\mathbb R}$ is an imposed indexing skeleton, not an intrinsic constraint required by $\zeta(s)$.
+2. The escape $J \tau^{-K} \notin \mathbb A_{\mathbb R}$ holds unconditionally for all $K \in \mathbb Q \setminus \{0\}$ whether RH is true or false ($\delta$-independent). Treating it as an RH obstruction is a domain-restriction fallacy.
+3. Analytic dilation naturally escapes into the minimal ambient completion $\mathcal M_\tau^{\mathrm{ambient}} = (\mathbb A_{\mathbb R} \cdot \tau^{\mathbb A_{\mathbb R}}) \times \exp(\mathcal L_\tau) \subset \mathbb R \times \mathbb R_{>0}$ with no contradiction and no required closure.
+
+### 24.7 Origin of the Spectral Detector from Grade Units
+The reflection defect $B_\rho(K)$ is the exact reflection defect of the normalized grade-unit character $\widehat\chi_s(u_K) = \tau^{-K(s - 1/2)}$:
+$$\boxed{|\widehat\chi_\rho(u_K)| + |\widehat\chi_{1-\rho}(u_K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}$$
+Positivity and zero-rigidity ($B_\rho(K) = 0 \iff \delta = 0$) arise algebraically from the grade-unit character under the functional equation reflection.
 
 
 

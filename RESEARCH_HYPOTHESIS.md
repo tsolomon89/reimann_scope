@@ -240,7 +240,7 @@ First-principles analysis isolates the exact distinction between the two grade a
    - Breaks Euler product multiplicativity because the grid \(L_K = \tau^K \mathbb Z\) is an additive lattice, not a multiplicative semigroup.
 
 **Non-Commutation & Semidirect Relation**:
-The two operators generate a semidirect product \(\mathbb R \rtimes \tau^{\mathbb A_{\mathbb R}} \subset \operatorname{Aff}_+(\mathbb R)\) satisfying:
+The two operators generate a countable dense proper subgroup \(G_{\mathrm{TC}} = \mathcal T_{\mathrm{closure}} \rtimes \tau^{\mathbb A_{\mathbb R}} \subsetneq \operatorname{Aff}_+(\mathbb R)\) of the positive 1D affine group satisfying:
 \[
 \boxed{
 A_K D_J = D_{J\tau^{-K}} A_K \iff A_K D_J A_K^{-1} = D_{J\tau^{-K}}.
@@ -263,6 +263,18 @@ Bilateral symmetrization with respect to zero reflection yields the exact reflec
 }
 \]
 where \(K_{\mathrm{eff}} = J(\tau^K - 1)\).
+
+### Graded Arithmetic Monoid, Grade Units, and Fork B Resolution (TASK-TC-018)
+The full collection of TC arithmetic grids forms an \(\mathbb A_{\mathbb R}\)-graded commutative monoid \(\mathcal M_\tau = \mathbb A_{\mathbb R} \times \mathbb Z_{\ne 0}\) under \((K, n) \star (J, m) = (K+J, nm)\) with realization homomorphism \(\Phi_\tau(K, n) = n\tau^K\) into \((\mathbb R^\times, \times)\).
+1. **Grade Units & Unique Prime Factorization**: Unit group is \(U(\mathcal M_\tau) = \mathbb A_{\mathbb R} \times \{\pm 1\}\). Every grade defines an invertible grade unit \(u_K = (K, 1)\) with \(u_K \star u_J = u_{K+J}\) and \(u_K^{-1} = u_{-K}\). Every element factors uniquely into a grade unit, a sign, and native rational primes: \((K, n) = u_K \star (0, \operatorname{sgn} n) \star \prod_p (0, p)^{v_p(|n|)}\). **TC grades do not create new primes.**
+2. **Grade-Unit Quotient**: \(\mathcal M_\tau / U_{\mathrm{grade}} \cong \mathbb Z_{\ne 0}\) via projection \(\pi(K, n) = n\). Rigorously formalizes "distinct grids, same arithmetic referent": each coset consists of all grade representations of one integer referent.
+3. **Refined Euler Product**: \(D_K[\zeta](s) = \chi_s(u_K)\zeta(s) = \tau^{-Ks}\prod_p (1 - p^{-s})^{-1}\). Fixed-grade series is a global grade-unit twist of native zeta, NOT an independent Euler product.
+4. **Rational-Grade Escape Theorem**: For all \(K \in \mathbb Q \setminus \{0\}\) and \(J \in \mathbb A_{\mathbb R} \setminus \{0\}\), \(J\tau^{-K} \notin \mathbb A_{\mathbb R}\) by Lindemann (1882). Under analytic dilation, \((J, n) \mapsto (J\tau^{-K}, n^{\tau^{-K}})\) simultaneously escapes both \(\mathbb A_{\mathbb R}\) and \(\mathbb Z\).
+5. **Resolution of Fork B**: Algebraic-grade coordinate closure is an imposed indexing convention, not an intrinsic constraint of \(\zeta(s)\). Escape \(J\tau^{-K} \notin \mathbb A_{\mathbb R}\) holds unconditionally whether RH is true or false (\(\delta\)-independent). Analytic dilation naturally escapes into the ambient completion \(\mathcal M_\tau^{\mathrm{ambient}} = (\mathbb A_{\mathbb R} \cdot \tau^{\mathbb A_{\mathbb R}}) \times \exp(\mathcal L_\tau)\) with no contradiction and no required closure.
+6. **Origin of Spectral Detector from Grade Units**: The reflection defect \(B_\rho(K)\) is the exact bilateral reflection defect of the normalized grade-unit character \(\widehat\chi_s(u_K) = \tau^{-K(s - 1/2)}\):
+\[
+\boxed{|\widehat\chi_\rho(u_K)| + |\widehat\chi_{1-\rho}(u_K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}
+\]
 
 **Earliest Remaining Implication (Sharpened Formulation)**:
 Construct an admissible test function \(\psi_K\) or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure:

@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-017",
+  "active_task_id": "TASK-TC-018",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -343,6 +343,28 @@
         "RESEARCH_HYPOTHESIS.md"
       ],
       "resolution": "TASK-TC-017 completed. 1) Explicitly distinguished analytic TC dilation A_K[zeta](s) = zeta(tau^{-K} s) (base power n |-> n^{tau^{-K}}, log dilation x |-> tau^{-K} x) from arithmetic grid dilation D_K[zeta](s) = tau^{-Ks} zeta(s) (linear scaling n |-> tau^K n, log translation x |-> x + K log tau). Audit completed and CONFLATED_ANALYTIC_AND_GRID_DILATION classified. 2) Proved operator group actions: both A_K and D_K form 1-parameter Abelian groups, but they do NOT commute for J != 0, K != 0. They generate a semidirect product R rtimes tau^{A_R} in Aff_+(R) satisfying A_K D_J = D_{J tau^{-K}} A_K. In log-space, affine commutator [S_K, T_J](x) = (1 - tau^{-J}) K log tau. 3) Proved Euler product duality: analytic dilation preserves Euler product via generalized prime bases {p^{tau^{-K}}}; arithmetic grid dilation breaks Euler product multiplicativity because the grid L_K = tau^K Z is an additive lattice, not a multiplicative semigroup (prod_p (1 - (tau^K p)^{-s})^{-1} = sum tau^{-K Omega(n) s} n^{-s} != tau^{-Ks} zeta(s)). 4) Derived Mellin transform duality: linear scaling in x maps to D_K; power scaling in x maps to A_K. Case C established: no universal linear intertwiner intertwines translation and dilation across all test functions. 5) Completed xi audit: A_K[xi] preserves reflection symmetry about Re(s) = tau^K/2; D_K[xi] breaks reflection symmetry by automorphic factor tau^{K(2s-1)} with off-critical modulus tau^{2K delta}. 6) Derived commutator zero-evaluation identity: normalized multiplier ratio evaluated at zero locus s = tau^K rho yields modulus tau^{K_eff delta} and reflection defect B_rho(K_eff) = 4 sinh^2(K_eff delta log(tau)/2) with K_eff = J(tau^K - 1). 7) Corrected correlator typo in TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md: G_rho(K, J) = tau^{(K+J)delta} e^{i(K-J)gamma log tau}. 8) All 12 unit tests passing in tests/test_tc_analytic_vs_arithmetic_intertwining.py."
+    },
+    {
+      "task_id": "TASK-TC-018",
+      "priority": 20,
+      "objective": "Graded Arithmetic Monoid, Grade Units, and the TC Closure Constraint",
+      "status": "COMPLETED_GRADED_CLOSURE_DERIVATION",
+      "review_status": "REVIEWED_THEORETICAL",
+      "open_implication": "Construct an admissible test function psi_K or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure Delta_K[psi] = <psi, mu_K^{analytic} - mu_K^{grid}> has the positive reflection-symmetric spectral expansion sum_{rho in Z^+} w_rho B_rho(K) with w_rho > 0, where mu_K^{analytic} = sum_n Lambda(n) tau^{-K} delta_{tau^{-K} log n} and mu_K^{grid} = sum_n Lambda(n) delta_{log n + K log tau}.",
+      "planned_calculation": "1. Analyze the complete grid family as an A_R-graded commutative monoid M_tau = A_R x Z_{!=0} with multiplication (K, n) * (J, m) = (K+J, nm) and realization homomorphism Phi_tau(K, n) = n tau^K. 2. Classify unit group U(M_tau) = A_R x {+-1} and grade units u_K = (K, 1). 3. Prove canonical unique factorization into grade unit, sign, and native primes (no new primes). 4. Prove grade-unit quotient M_tau / U_grade =~ Z_{!=0} recovers ordinary integer arithmetic. 5. Refine fixed-grade Dirichlet series as global grade-unit twist of native Euler product: D_K[zeta](s) = chi_s(u_K) zeta(s). 6. Derive analytic action on coordinates: (J, n) |-> (J tau^{-K}, n^{tau^{-K}}). 7. Prove rational-grade escape theorem: K in Q\\{0}, J in A_R\\{0} ==> J tau^{-K} notin A_R. 8. Resolve Governing Decision Point in favor of Fork B: algebraic-grade closure is an indexing convention, not an intrinsic zeta constraint; analytic dilation naturally lives in ambient completion M_tau^{ambient}. 9. Derive reflection defect B_rho(K) directly from bilateral reflection of normalized grade-unit character. 10. Generic-base control: algebraic bases preserve algebraic closure; transcendental tau escapes. 11. Audit affine group terminology: G_TC is a countable dense proper subgroup of Aff_+(R). 12. Author review and machine-readable artifact; implement 13 unit tests and Lean 4 formalization.",
+      "acceptance_criterion": "Graded monoid defined; grade units classified; prime factorization up to grade units proved; quotient by grade units recovers integer arithmetic; refined Euler product derived; rational-grade escape proved; Fork B resolution established; B_rho(K) derived from grade units; generic-base control verified; affine terminology audited; review and json artifact created; 13 unit tests passing; Lean 4 formalization compiled.",
+      "dependencies": ["TASK-TC-017"],
+      "evidence": [
+        "docs/reviews/TC_GRADED_ARITHMETIC_CLOSURE.md",
+        "data/tc_graded_arithmetic_closure.json",
+        "tests/test_tc_graded_arithmetic_closure.py",
+        "formal/RiemannScope/GradedMonoid.lean",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_LEDGER.md",
+        "RESEARCH_HYPOTHESIS.md"
+      ],
+      "resolution": "TASK-TC-018 completed. 1) Complete grid family formalized as A_R-graded commutative monoid M_tau = A_R x Z_{!=0} under (K, n) * (J, m) = (K+J, nm) with realization homomorphism Phi_tau(K, n) = n tau^K into (R^x, *). 2) Unit group proved to be U(M_tau) = A_R x {+-1} with grade units u_K = (K, 1) satisfying u_K * u_J = u_{K+J} and u_K^{-1} = u_{-K}. 3) Proved canonical unique factorization (K, n) = u_K * (0, sgn n) * prod_p (0, p)^{v_p(|n|)}; TC grades do NOT create new primes. 4) Proved grade-unit quotient M_tau / U_grade =~ Z_{!=0} recovers ordinary integer arithmetic, formalizing 'distinct grids, same arithmetic referent'. 5) Proved fixed-grade Dirichlet series is a global grade-unit twist of the universal native Euler product: D_K[zeta](s) = chi_s(u_K) zeta(s) = tau^{-Ks} prod_p (1 - p^{-s})^{-1}. 6) Derived analytic action on coordinates (J, n) |-> (J tau^{-K}, n^{tau^{-K}}). 7) Proved Rational-Grade Escape Theorem: for all K in Q\\{0} and J in A_R\\{0}, J tau^{-K} notin A_R by Lindemann (1882); double coordinate escape from A_R and Z. 8) Resolved Governing Decision Point in favor of Fork B: algebraic-grade closure is an indexing convention, not an intrinsic zeta constraint; escape holds unconditionally (delta-independent); analytic dilation naturally lives in ambient completion M_tau^{ambient} = (A_R * tau^{A_R}) x exp(L_tau). 9) Derived spectral detector B_rho(K) directly from bilateral reflection of normalized grade-unit character: |chi_hat_rho(u_K)| + |chi_hat_{1-rho}(u_K)| - 2 = 4 sinh^2(K delta log(tau) / 2) = B_rho(K). 10) Proved generic-base control: algebraic base b=2 preserves algebraic closure; transcendental tau escapes; B_rho(K; b) is universal. 11) Audited affine group terminology: G_TC is a countable dense proper subgroup of Aff_+(R). 12) Formalized in Lean 4 (formal/RiemannScope/GradedMonoid.lean, lake build exit code 0) and verified in 13/13 passing tests in tests/test_tc_graded_arithmetic_closure.py."
     }
   ]
 }

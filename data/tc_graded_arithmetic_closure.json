@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "tc_graded_arithmetic_closure_status",
+  "task_identifier": "TASK-TC-018",
+  "parent_baseline_commit": "4ca8ea9af30374e64f7b607ce146702a8bf3df05",
+  "date": "2026-10-03",
+  "governing_question": "What is the correct algebraic object underlying the TC arithmetic grids, and does analytic TC dilation preserve that object or force it outside its canonical algebraic-grade domain?",
+  "graded_arithmetic_object": {
+    "definition": "M_tau = A_R x Z_{!=0} (A_R-graded commutative monoid, direct product of (A_R, +) and (Z_{!=0}, *))",
+    "positive_submonoid": "M_tau^+ = A_R x Z_{>=1}",
+    "grading_structure": "M_tau = bigsqcup_{K in A_R} M_{tau, K} where M_{tau, K} = {K} x Z_{!=0}",
+    "multiplication_law": "(K, n) * (J, m) = (K + J, n * m)",
+    "identity": "e = (0, 1)"
+  },
+  "unit_group": {
+    "full_unit_group": "U(M_tau) = A_R x {1, -1} =~ (A_R, +) x (Z/2Z)",
+    "grade_unit_group": "U_grade = { u_K = (K, 1) : K in A_R } =~ (A_R, +)",
+    "unit_multiplication": "u_K * u_J = u_{K+J}",
+    "unit_inversion": "u_K^{-1} = u_{-K}",
+    "identity_unit": "u_0 = (0, 1) = e"
+  },
+  "realization_map": {
+    "definition": "Phi_tau: M_tau -> R^x, Phi_tau(K, n) = n * tau^K",
+    "homomorphism_property": "Phi_tau((K, n) * (J, m)) = Phi_tau(K, n) * Phi_tau(J, m)",
+    "image": "Phi_tau(M_tau) = L_tau = bigcup_{K in A_R} L_K (multiplicative submonoid of R^x)",
+    "injectivity_status": {
+      "rational_grade_differences": "PROVED_INJECTIVE: For K - J in Q\\{0}, tau^{K-J} is transcendental (Lindemann 1882), so tau^{K-J} != m/n for all m, n in Z\\{0}.",
+      "irrational_algebraic_grade_differences": "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC: Gelfond-Schneider does not apply directly to tau = 2pi; collision status remains open.",
+      "coordinate_independence": "The abstract monoid M_tau is well-defined and free of collisions regardless of whether Phi_tau is globally injective."
+    }
+  },
+  "prime_factorization": {
+    "irreducible_elements": "Irr(M_tau) = { (K, +-p) : K in A_R, p in P }",
+    "canonical_factorization": "(K, n) = u_K * (0, sgn n) * prod_{p in P} (0, p)^{v_p(|n|)}",
+    "uniqueness": "Unique up to permutation of prime factors in P",
+    "verdict": "TC grades do NOT create new primes. The irreducible elements modulo units are in canonical bijection with the native primes P. Realized elements p * tau^K are native primes transported by grade units."
+  },
+  "grade_unit_quotient": {
+    "equivalence_relation": "(K, n) ~ (J, m) iff exists A in A_R such that (K, n) = u_A * (J, m) iff n = m",
+    "projection_homomorphism": "pi: M_tau -> Z_{!=0}, pi(K, n) = n",
+    "kernel": "ker pi = U_grade",
+    "isomorphism": "M_tau / U_grade =~ (Z_{!=0}, *), M_tau^+ / U_grade =~ (Z_{>=1}, *)",
+    "same_referent_interpretation": "Each coset in M_tau / U_grade contains all graded representations (K, n) for a single invariant native integer referent n."
+  },
+  "canonical_dirichlet_character": {
+    "definition": "chi_s(K, n) = Phi_tau(K, n)^{-s} = tau^{-K*s} * n^{-s}",
+    "multiplicativity": "chi_s((K, n) * (J, m)) = chi_s(K, n) * chi_s(J, m)",
+    "grade_unit_factorization": "chi_s(K, n) = chi_s(u_K) * chi_s(0, n) = tau^{-K*s} * n^{-s}",
+    "fixed_grade_character_sum": "sum_{n=1}^infty chi_s(K, n) = tau^{-K*s} * zeta(s) = D_K[zeta](s)"
+  },
+  "refined_euler_product": {
+    "formula": "D_K[zeta](s) = chi_s(u_K) * zeta(s) = tau^{-K*s} * prod_{p in P} (1 - p^{-s})^{-1}",
+    "contrast_with_naive_grid_primes": "prod_p (1 - (tau^K p)^{-s})^{-1} = sum tau^{-K Omega(n) s} n^{-s} != tau^{-K s} zeta(s)",
+    "interpretation": "A fixed grade does not possess an independent prime system. The character sum D_K[zeta](s) is the universal native Euler product multiplied by a single global grade-unit twist chi_s(u_K) = tau^{-K*s}."
+  },
+  "analytic_action_on_pairs": {
+    "character_transform": "A_K[chi_s(J, n)] = chi_{tau^{-K} s}(J, n) = tau^{-(J * tau^{-K}) * s} * (n^{tau^{-K}})^{-s}",
+    "coordinate_map": "(J, n) |-> (J * tau^{-K}, n^{tau^{-K}})",
+    "double_escape": {
+      "grade_coordinate": "J * tau^{-K} notin A_R for all K in Q\\{0}, J in A_R\\{0} (escapes algebraic numbers into transcendental reals)",
+      "base_coordinate": "n^{tau^{-K}} notin Z for all K != 0, n >= 2 (escapes integers into non-integer reals)"
+    }
+  },
+  "rational_grade_escape_theorem": {
+    "statement": "For all K in Q\\{0} and J in A_R\\{0}, J * tau^{-K} notin A_R.",
+    "proof_summary": "If J * tau^{-K} in A_R, then (J * tau^{-K})/J = tau^{-K} in A_R. For K = a/b, (tau^{-a/b})^{-b} = (2pi)^a in A_R, implying pi is algebraic. This contradicts Lindemann (1882).",
+    "scope": "Proved unconditionally for all rational grades K and algebraic grades J."
+  },
+  "governing_decision_point_resolution": {
+    "fork_chosen": "FORK_B_AMBIENT_COMPLETION",
+    "rationale": [
+      "Algebraic-grade coordinate closure is an imposed convention on the indexing set, not an intrinsic requirement of zeta or TC.",
+      "The escape J * tau^{-K} notin A_R is an unconditional property of tau that holds identically whether RH is true or false (delta-independent).",
+      "Treating algebraic-grade escape as an RH obstruction is a fallacy of imposed domain restriction.",
+      "Analytic dilation naturally escapes into the ambient completion M_tau^{ambient} with no contradiction and no required closure."
+    ]
+  },
+  "minimal_ambient_completion": {
+    "grade_space": "A_R * tau^{A_R} = { J * tau^K : J, K in A_R } subset R",
+    "base_space": "exp(L_tau) where L_tau = span_Z { tau^K * log(p) : K in A_R, p in P } subset R_{>0}",
+    "ambient_monoid": "M_tau^{ambient} = (A_R * tau^{A_R}) x exp(L_tau) subset R x R_{>0}",
+    "cardinality": "Countable, explicitly generated algebraic-transcendental structure"
+  },
+  "referent_quotient_preservation": {
+    "status": "NOT_PRESERVED_AT_DISCRETE_LEVEL",
+    "detail": "Under analytic dilation, n |-> n^{tau^{-K}} notin Z for n >= 2. However, in log-space, the referent x = log n transforms equivariantly under the continuous dilation flow x |-> tau^{-K} x."
+  },
+  "spectral_detector_relation": {
+    "derivation": "Normalized grade unit character is chi_hat_s(u_K) = tau^{-K(s - 1/2)}. At off-critical zero pair (rho, 1 - rho) with rho = 1/2 + delta + i*gamma, |chi_hat_rho(u_K)| = tau^{-K*delta} and |chi_hat_{1-rho}(u_K)| = tau^{K*delta}.",
+    "exact_identity": "|chi_hat_rho(u_K)| + |chi_hat_{1-rho}(u_K)| - 2 = tau^{K*delta} + tau^{-K*delta} - 2 = 4 * sinh^2(K * delta * log(tau) / 2) = B_rho(K)",
+    "significance": "B_rho(K) is the exact bilateral reflection defect of the grade-unit character under functional equation reflection. It is strictly positive for delta != 0 and vanishes iff delta = 0."
+  },
+  "generic_base_control": {
+    "base": "b > 1",
+    "algebraic_base_closure": "For algebraic base b = 2 and K in Q, b^{-K} in A_R, so J * b^{-K} in A_R. Algebraic-grade closure HOLDS for algebraic bases!",
+    "transcendental_base_escape": "For transcendental base tau = 2pi, tau^{-K} is transcendental for K in Q\\{0}, so J * tau^{-K} notin A_R. Grade escape is specific to transcendental bases.",
+    "detector_universality": "B_rho(K; b) = 4 * sinh^2(K * delta * log(b) / 2) holds for any base b > 1."
+  },
+  "affine_group_terminology_audit": {
+    "correction": "G_TC = T_{closure} rtimes tau^{A_R} is a countable, dense, proper subgroup of the 2D Lie group Aff_+(R) = R rtimes R_{>0}, not isomorphic to the full Lie group."
+  },
+  "earliest_remaining_implication": {
+    "equation": "int_0^infty psi_K(x) d(mu_K^{analytic} - mu_K^{grid})(x) = sum_{rho in Z^+} w_rho * B_rho(K) with w_rho > 0",
+    "description": "Layer 3 of the TC Programme: construct the explicit test function psi_K coupling the prime measure discrepancy functional Delta_K[psi] to the spectral sum of grade-unit reflection defects B_rho(K)."
+  },
+  "next_task_recommendation": "TASK-TC-019: Explicit Formula Contour Integration on the Prime Measure Discrepancy mu_K^{analytic} - mu_K^{grid} and Test-Function Admissibility."
+}

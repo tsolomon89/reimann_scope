@@ -488,6 +488,52 @@ Evaluating the prefactor ratio of $A_K D_J$ and $D_J A_K$ at a zero $s = \tau^K 
 \boxed{|R_{\mathrm{norm}}(\rho)| + |R_{\mathrm{norm}}(\rho^\#)| - 2 = 4\sinh^2\left(\frac{K_{\mathrm{eff}}\delta\log\tau}{2}\right) = B_\rho(K_{\mathrm{eff}}).}
 \]
 
+### 9.5 Graded Arithmetic Monoid, Grade Units, and Resolution of Fork B
+
+The full family of TC arithmetic grids forms an $\mathbb A_{\mathbb R}$-graded commutative monoid:
+\[
+\boxed{\mathcal M_\tau = \mathbb A_{\mathbb R} \times \mathbb Z_{\ne 0} = (\mathbb A_{\mathbb R}, +) \times (\mathbb Z_{\ne 0}, \times),}
+\]
+with multiplication law:
+\[
+(K, n) \star (J, m) = (K + J, n m), \qquad e = (0, 1).
+\]
+The realization map $\Phi_\tau(K, n) = n \tau^K$ is a monoid homomorphism into $(\mathbb R^\times, \times)$.
+
+1. **Grade Units and Unique Factorization**:  
+   The unit group is $U(\mathcal M_\tau) = \mathbb A_{\mathbb R} \times \{\pm 1\}$. Every grade defines an invertible **grade unit** $u_K = (K, 1)$ satisfying $u_K \star u_J = u_{K+J}$ and $u_K^{-1} = u_{-K}$. Every element factors uniquely as:
+   \[
+   (K, n) = u_K \star (0, \operatorname{sgn} n) \star \prod_{p \in \mathcal P} (0, p)^{v_p(|n|)}.
+   \]
+   **TC grades do not create new primes.** Realized elements $p\tau^K$ are native rational primes transported by grade units.
+
+2. **Quotient Recovers Native Integer Arithmetic**:  
+   The projection $\pi: \mathcal M_\tau \to \mathbb Z_{\ne 0}$, $\pi(K, n) = n$ has kernel $\ker \pi = U_{\mathrm{grade}} = \{ u_K : K \in \mathbb A_{\mathbb R} \}$, proving:
+   \[
+   \mathcal M_\tau / U_{\mathrm{grade}} \cong (\mathbb Z_{\ne 0}, \times).
+   \]
+   Every coset in $\mathcal M_\tau / U_{\mathrm{grade}}$ comprises all graded representations of one native integer referent.
+
+3. **Refined Euler-Product Interpretation**:  
+   The fixed-grade Dirichlet series is a single global grade-unit twist of the universal native Euler product:
+   \[
+   D_K[\zeta](s) = \chi_s(u_K) \zeta(s) = \tau^{-K s} \prod_{p \in \mathcal P} (1 - p^{-s})^{-1}.
+   \]
+   The grid does not possess an independent Euler product.
+
+4. **Rational-Grade Escape Theorem**:  
+   For all $K \in \mathbb Q \setminus \{0\}$ and $J \in \mathbb A_{\mathbb R} \setminus \{0\}$, $J \tau^{-K} \notin \mathbb A_{\mathbb R}$ by Lindemann (1882) transcendence of $\pi$. Analytic dilation $(J, n) \mapsto (J\tau^{-K}, n^{\tau^{-K}})$ simultaneously escapes both $\mathbb A_{\mathbb R}$ and $\mathbb Z$.
+
+5. **Resolution of Governing Decision Point (Fork B)**:  
+   Algebraic-grade closure is an imposed indexing skeleton, not an intrinsic constraint of $\zeta(s)$. The escape $J \tau^{-K} \notin \mathbb A_{\mathbb R}$ holds unconditionally whether RH is true or false ($\delta$-independent). The analytic action naturally lives in the ambient completion $\mathcal M_\tau^{\mathrm{ambient}} = (\mathbb A_{\mathbb R} \cdot \tau^{\mathbb A_{\mathbb R}}) \times \exp(\mathcal L_\tau) \subset \mathbb R \times \mathbb R_{>0}$ with no contradiction and no required closure.
+
+6. **Origin of the Spectral Detector from Grade Units**:  
+   The reflection defect $B_\rho(K)$ is the exact reflection defect of the normalized grade-unit character $\widehat\chi_s(u_K) = \tau^{-K(s - 1/2)}$:
+   \[
+   \boxed{|\widehat\chi_\rho(u_K)| + |\widehat\chi_{1-\rho}(u_K)| - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}
+   \]
+   Positivity and zero-rigidity ($B_\rho(K) = 0 \iff \delta = 0$) arise algebraically from the grade-unit character under functional equation reflection.
+
 ---
 
 # 10. Structural versus numerical grade representation

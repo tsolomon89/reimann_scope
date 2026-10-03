@@ -15,4 +15,5 @@ import RiemannScope.RadialDefect
 import RiemannScope.ArithmeticBridge
 import RiemannScope.CurvatureTransport
 import RiemannScope.ExtremalCorrelation
+import RiemannScope.GradedMonoid
 

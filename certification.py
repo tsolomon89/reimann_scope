@@ -117,6 +117,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/ArithmeticBridge.lean",
     "formal/RiemannScope/CurvatureTransport.lean",
     "formal/RiemannScope/ExtremalCorrelation.lean",
+    "formal/RiemannScope/GradedMonoid.lean",
 ]
 
 
