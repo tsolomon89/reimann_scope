@@ -142,7 +142,7 @@ The continuous curvature transport invariant $\mathscr K_\tau(\rho) = \delta^2$ 
 ## 7. Common-Grade Shift Formulation
 
 For grades $K, J \in \mathbb A_{\mathbb R}$, define the bivariate correlator:
-$$G_\rho(K, J) = \chi_\rho(K)\overline{\chi_\rho(J)} = \tau^{(K-J)\delta} e^{i(K-J)\gamma\log\tau} \cdot \tau^{(K+J)\delta} = \tau^{(K+J)\delta} e^{i(K-J)\gamma\log\tau}.$$
+$$G_\rho(K, J) = \chi_\rho(K)\overline{\chi_\rho(J)} = \left(\tau^{K\delta} e^{iK\gamma\log\tau}\right)\left(\tau^{J\delta} e^{-iJ\gamma\log\tau}\right) = \tau^{(K+J)\delta} e^{i(K-J)\gamma\log\tau}.$$
 Under a common shift by $A \in \mathbb A_{\mathbb R}$:
 $$G_\rho(K+A, J+A) = \chi_\rho(K+A)\overline{\chi_\rho(J+A)} = \tau^{2A\delta} G_\rho(K, J).$$
 Hence:

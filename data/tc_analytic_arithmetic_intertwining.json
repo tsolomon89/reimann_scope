@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "tc_analytic_arithmetic_intertwining_status",
+  "task_identifier": "TASK-TC-017",
+  "parent_baseline_commit": "8756d562854717faefa7b4ca8bd2025d90c46b27",
+  "date": "2026-10-03",
+  "governing_question": "Do analytic TC dilation and arithmetic tau-grid dilation admit a common zeta-intrinsic intertwining law?",
+  "definitions": {
+    "analytic_tc_dilation_operator": {
+      "symbol": "A_K",
+      "definition": "A_K[F](s) = F(tau^{-K} * s)",
+      "dirichlet_action": "sum a_n n^{-s} |-> sum a_n (n^{tau^{-K}})^{-s}",
+      "dirichlet_base_map": "n |-> n^{tau^{-K}}",
+      "log_space_action": "x = log n |-> T_K(x) = tau^{-K} * x (dilation in log-space)"
+    },
+    "arithmetic_grid_dilation_operator": {
+      "symbol": "D_K",
+      "definition": "D_K[F](s) = tau^{-K * s} * F(s)",
+      "dirichlet_action": "sum a_n n^{-s} |-> sum a_n (tau^K n)^{-s} = tau^{-K * s} sum a_n n^{-s}",
+      "dirichlet_base_map": "n |-> tau^K * n",
+      "log_space_action": "x = log n |-> S_K(x) = x + K * log(tau) (translation in log-space)"
+    }
+  },
+  "conflation_audit": {
+    "classification": "CONFLATED_ANALYTIC_AND_GRID_DILATION",
+    "resolution": "Definitively resolved: n^{tau^{-K}} is base-power dilation (log-space scaling); tau^K n is linear grid scaling (log-space translation). They belong to dual geometric categories in the 1D affine group."
+  },
+  "composition_and_commutator_laws": {
+    "group_properties": {
+      "analytic_action": "A_{K1} A_{K2} = A_{K1 + K2}, A_0 = Id, A_K^{-1} = A_{-K}",
+      "arithmetic_action": "D_{J1} D_{J2} = D_{J1 + J2}, D_0 = Id, D_J^{-1} = D_{-J}"
+    },
+    "non_commutation": {
+      "A_K_D_J": "A_K(D_J[F])(s) = tau^{-J * tau^{-K} * s} * F(tau^{-K} * s)",
+      "D_J_A_K": "D_J(A_K[F])(s) = tau^{-J * s} * F(tau^{-K} * s)",
+      "discrepancy_ratio": "tau^{J * (1 - tau^{-K}) * s}",
+      "semidirect_conjugation": "A_K D_J = D_{J * tau^{-K}} A_K",
+      "group_isomorphism": "G = <A_K, D_J> =~ Aff_+(R) (positive 1D affine group)"
+    },
+    "log_space_commutator": {
+      "discrepancy": "S_K(T_J(x)) - T_J(S_K(x)) = (1 - tau^{-J}) * K * log(tau)",
+      "interpretation": "Non-commutation of translation and scaling in log-space"
+    }
+  },
+  "mellin_transform_duality": {
+    "linear_scaling": "M o M_{tau^K} = D_K o M (linear scaling x |-> tau^K x maps to arithmetic grid dilation D_K)",
+    "power_scaling": "M o P_K = A_K o M (power scaling x |-> x^{tau^K} with Jacobian tau^K maps to analytic dilation A_K)",
+    "intertwining_verdict": "Case C: No universal linear intertwiner exists between linear scaling and power scaling on function spaces."
+  },
+  "generic_vs_zeta_specific": {
+    "generic_dirichlet_algebra": [
+      "Semidirect commutation A_K D_J = D_{J * tau^{-K}} A_K",
+      "Log-space affine structure",
+      "Mellin duality"
+    ],
+    "zeta_specific_structures": [
+      "Euler product: preserved under A_K; broken under D_K",
+      "Completed xi reflection: preserved under A_K about Re(s)=tau^K/2; broken under D_K by tau^{K(2s - 1)}",
+      "Zero locus: transported by A_K (rho |-> tau^K rho); fixed by D_K (rho |-> rho)"
+    ]
+  },
+  "euler_product_result": {
+    "analytic_tc": "Preserved: zeta(tau^{-K} s) = prod_p (1 - (p^{tau^{-K}})^{-s})^{-1} (unique factorization in generalized bases)",
+    "arithmetic_grid": "Broken: prod_p (1 - (tau^K p)^{-s})^{-1} = sum tau^{-K Omega(n) s} n^{-s} != tau^{-K s} zeta(s)",
+    "lattice_closure": "tau^K m * tau^K n = tau^{2K} m n in L_{2K} != L_K. L_K is an additive lattice, not a multiplicative semigroup."
+  },
+  "completed_xi_result": {
+    "analytic_tc": "Preserves reflection symmetry: A_K[xi](tau^K - s) = A_K[xi](s)",
+    "arithmetic_grid": "Breaks reflection symmetry: D_K[xi](1 - s) = tau^{K(2s - 1)} D_K[xi](s)",
+    "symmetry_breaking_modulus": "|tau^{K(2s - 1)}| = tau^{2 * K * delta} (pure phase on critical line; exponential radial deviation off-line)"
+  },
+  "bilateral_and_spectral_defect_result": {
+    "bilateral_symmetrization": "|tau^{-K(rho - 1/2)}| + |tau^{K(rho - 1/2)}| - 2 = tau^{K * delta} + tau^{-K * delta} - 2 = B_rho(K)",
+    "commutator_zero_evaluation": "Normalized commutator ratio at zero s = tau^K rho has modulus tau^{K_eff * delta} with K_eff = J * (tau^K - 1)",
+    "commutator_reflection_defect": "|R_norm(rho)| + |R_norm(rho^#)| - 2 = 4 * sinh^2(K_eff * delta * log(tau) / 2) = B_rho(K_eff)"
+  },
+  "earliest_missing_implication": {
+    "equation": "int_0^infty psi_K(x) d(mu_K^{analytic} - mu_K^{grid})(x) = sum_{rho in Z^+} w_rho * B_rho(K) with w_rho > 0",
+    "description": "Constructing an explicit test function psi_K such that the difference between the analytic measure and grid measure integrates to a positive sum of reflection defects B_rho."
+  },
+  "next_task_recommendation": "TASK-TC-018: Construct the affine measure difference functional and test candidate prime-kernel pairings against the positive defect sum."
+}

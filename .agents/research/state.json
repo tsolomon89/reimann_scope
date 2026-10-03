@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "MINIMAL_TC_CONSTRAINT_HYPOTHESIS_AND_THEORETICAL_RECONCILIATION",
+  "current_phase": "ANALYTIC_VS_ARITHMETIC_INTERTWINING_INVESTIGATION",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -76,10 +76,28 @@
         "Author docs/reviews/TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md and data/tc_minimal_constraint_hypothesis.json"
       ],
       "completion_note": "TASK-TC-016 completed: Theoretical reconciliation executed. Rational noncollision proved, irrational algebraic collision classified as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC, Gelfond-Schneider base mismatch and b = 2^{1/sqrt(2)} control documented, scale generator universe equivalence withdrawn, canonical domain K in A_R synchronized, minimal exact spectral detector B_rho(K) established with generic base control, and TC Same-Referent Constraint Hypothesis structured across 3 canonical layers."
+    },
+    "track_5_analytic_vs_arithmetic_intertwining": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Distinguish analytic TC dilation A_K[zeta](s) = zeta(tau^{-K}s) from arithmetic grid dilation D_K[zeta](s) = tau^{-Ks}zeta(s)",
+        "Audit repository for conflation; establish label CONFLATED_ANALYTIC_AND_GRID_DILATION",
+        "Derive operator group actions, composition laws, non-commutation, and semidirect relation A_K D_J = D_{J tau^{-K}} A_K",
+        "Derive log-space affine structure: S_K translation vs T_J dilation with commutator discrepancy (1 - tau^{-J}) K log(tau)",
+        "Analyze logarithmic derivative and prime/von Mangoldt measure pushforward",
+        "Audit Euler product: preserved under analytic dilation, broken on arithmetic lattice L_K",
+        "Derive Mellin transform duality (Case C: linear vs power scaling; no universal linear intertwiner)",
+        "Audit completed xi reflection symmetry preservation (A_K) vs automorphic breakage (D_K)",
+        "Derive commutator zero-evaluation identity yielding B_rho(K_eff) with K_eff = J(tau^K - 1)",
+        "Test bilateral symmetrization and correct correlator typo in TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md",
+        "Author docs/reviews/TC_ANALYTIC_ARITHMETIC_INTERTWINING.md and data/tc_analytic_arithmetic_intertwining.json"
+      ],
+      "completion_note": "TASK-TC-017 completed: Analytic and arithmetic grade actions rigorously distinguished; CONFLATED_ANALYTIC_AND_GRID_DILATION classified; semidirect affine commutation law A_K D_J = D_{J tau^{-K}} A_K proved; Euler product breakage on additive grid L_K established; Mellin duality Case C proved; commutator zero-evaluation identity connects operator non-commutation to reflection defect B_rho(K_eff); earliest remaining implication sharpened to prime-measure arithmetic discrepancy functional Delta_K[psi]."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_analytic_arithmetic_intertwining.json",
       "data/tc_minimal_constraint_hypothesis.json",
       "data/tc_constraint_foundations.json",
       "data/tc_arithmetic_residual_research.json",

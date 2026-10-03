@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-016",
+  "active_task_id": "TASK-TC-017",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -322,6 +322,27 @@
         "LEAN_FORMALIZATION_PLAN.md"
       ],
       "resolution": "TASK-TC-016 completed. 1) Withdrew false full algebraic-grade incommensurability theorem: proved rational differences K-J in Q\\{0} strictly noncoincident via Lindemann (1882); classified irrational algebraic differences as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC noting Gelfond-Schneider does not apply to tau = 2pi; added mandatory control b = 2^{1/sqrt(2)} (transcendental base with b^{sqrt(2)} = 2 in Q). 2) Repaired tests: replaced numerical rational search with exact symbolic noncollision, control counterexample, open status check, minimal detector B_rho(K) exactness, generic base control, and common-grade shift translation. 3) Withdrew algebraic-multiple scale-generator equivalence: na^K not an integer in general; comparison remains open. 4) Reconciled canonical grade domain K in A_R across all documents. 5) Established finite-grade reflection defect B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0 (zero iff delta=0) as minimal exact spectral detector. 6) Proved detector is generic (holds for any b > 1); all tau/zeta specificity must reside in A_K. 7) Formulated TC Same-Referent Constraint Hypothesis across 3 canonical layers (Proved algebraic, Conditional rigidity, Open arithmetic) and isolated the True Earliest Missing Implication."
+    },
+    {
+      "task_id": "TASK-TC-017",
+      "priority": 19,
+      "objective": "Analytic vs Arithmetic Grade Actions and the TC Intertwining Constraint",
+      "status": "COMPLETED_INTERTWINING_DERIVATION",
+      "review_status": "REVIEWED_THEORETICAL",
+      "open_implication": "Construct an admissible test function psi_K or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure Delta_K[psi] = <psi, mu_K^{analytic} - mu_K^{grid}> has the positive reflection-symmetric spectral expansion sum_{rho in Z^+} w_rho B_rho(K) with w_rho > 0, where mu_K^{analytic} = sum_n Lambda(n) tau^{-K} delta_{tau^{-K} log n} and mu_K^{grid} = sum_n Lambda(n) delta_{log n + K log tau}.",
+      "planned_calculation": "1. Distinguish analytic TC dilation A_K[zeta](s) = zeta(tau^{-K} s) from arithmetic grid dilation D_K[zeta](s) = tau^{-Ks} zeta(s). 2. Audit repo for conflation; label CONFLATED_ANALYTIC_AND_GRID_DILATION. 3. Derive operator group actions, composition laws, non-commutation, and semidirect relation A_K D_J = D_{J tau^{-K}} A_K. 4. Derive log-space affine structure: S_K translation vs T_J dilation with commutator discrepancy (1 - tau^{-J}) K log(tau). 5. Analyze logarithmic derivative and prime/von Mangoldt measure pushforward. 6. Audit Euler product: preserved under analytic dilation, broken on arithmetic lattice L_K. 7. Derive Mellin transform duality (Case C: linear vs power scaling; no universal linear intertwiner). 8. Audit completed xi reflection symmetry preservation (A_K) vs automorphic breakage (D_K). 9. Derive commutator zero-evaluation identity yielding B_rho(K_eff) with K_eff = J(tau^K - 1). 10. Test bilateral symmetrization and correct correlator typo in TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md. 11. Author docs/reviews/TC_ANALYTIC_ARITHMETIC_INTERTWINING.md and data/tc_analytic_arithmetic_intertwining.json.",
+      "acceptance_criterion": "Analytic vs arithmetic grade actions distinguished; Dirichlet transformations n^{tau^{-K}} vs tau^K n derived; log-space dilation vs translation established; semidirect relation A_K D_J = D_{J tau^{-K}} A_K derived; Euler product failure on lattice proved; Mellin duality analyzed; completed xi corrections derived; commutator zero-evaluation identity connects operator non-commutation to reflection defect B_rho(K_eff); correlator typo corrected; review and machine-readable artifact produced; 12 unit tests passing.",
+      "dependencies": ["TASK-TC-016"],
+      "evidence": [
+        "docs/reviews/TC_ANALYTIC_ARITHMETIC_INTERTWINING.md",
+        "data/tc_analytic_arithmetic_intertwining.json",
+        "tests/test_tc_analytic_vs_arithmetic_intertwining.py",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_LEDGER.md",
+        "RESEARCH_HYPOTHESIS.md"
+      ],
+      "resolution": "TASK-TC-017 completed. 1) Explicitly distinguished analytic TC dilation A_K[zeta](s) = zeta(tau^{-K} s) (base power n |-> n^{tau^{-K}}, log dilation x |-> tau^{-K} x) from arithmetic grid dilation D_K[zeta](s) = tau^{-Ks} zeta(s) (linear scaling n |-> tau^K n, log translation x |-> x + K log tau). Audit completed and CONFLATED_ANALYTIC_AND_GRID_DILATION classified. 2) Proved operator group actions: both A_K and D_K form 1-parameter Abelian groups, but they do NOT commute for J != 0, K != 0. They generate a semidirect product R rtimes tau^{A_R} in Aff_+(R) satisfying A_K D_J = D_{J tau^{-K}} A_K. In log-space, affine commutator [S_K, T_J](x) = (1 - tau^{-J}) K log tau. 3) Proved Euler product duality: analytic dilation preserves Euler product via generalized prime bases {p^{tau^{-K}}}; arithmetic grid dilation breaks Euler product multiplicativity because the grid L_K = tau^K Z is an additive lattice, not a multiplicative semigroup (prod_p (1 - (tau^K p)^{-s})^{-1} = sum tau^{-K Omega(n) s} n^{-s} != tau^{-Ks} zeta(s)). 4) Derived Mellin transform duality: linear scaling in x maps to D_K; power scaling in x maps to A_K. Case C established: no universal linear intertwiner intertwines translation and dilation across all test functions. 5) Completed xi audit: A_K[xi] preserves reflection symmetry about Re(s) = tau^K/2; D_K[xi] breaks reflection symmetry by automorphic factor tau^{K(2s-1)} with off-critical modulus tau^{2K delta}. 6) Derived commutator zero-evaluation identity: normalized multiplier ratio evaluated at zero locus s = tau^K rho yields modulus tau^{K_eff delta} and reflection defect B_rho(K_eff) = 4 sinh^2(K_eff delta log(tau)/2) with K_eff = J(tau^K - 1). 7) Corrected correlator typo in TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md: G_rho(K, J) = tau^{(K+J)delta} e^{i(K-J)gamma log tau}. 8) All 12 unit tests passing in tests/test_tc_analytic_vs_arithmetic_intertwining.py."
     }
   ]
 }

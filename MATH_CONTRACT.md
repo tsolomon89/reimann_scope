@@ -448,6 +448,46 @@ does not imply membership in $L_K = \{m\tau^K : m \in \mathbb Z \setminus \{0\}\
 
 Do not infer from grid noncoincidence that zeta zero sets at distinct grades are automatically disjoint.
 
+### 9.4 Analytic vs Arithmetic-Grid Dilation Operators
+
+The mathematical contract rigorously separates two distinct grade operators:
+
+1. **Analytic TC Dilation Operator ($A_K$)**:
+   \[
+   \boxed{A_K[F](s) = F(\tau^{-K} s).}
+   \]
+   Acts on Dirichlet series as base-power dilation $n \mapsto n^{\tau^{-K}}$, which in log-space $x = \log n$ is pure **dilation**:
+   \[
+   T_K(x) = \tau^{-K} x.
+   \]
+   Preserves multiplicativity ($(mn)^{\tau^{-K}} = m^{\tau^{-K}} n^{\tau^{-K}}$) and the Euler product. Transports zeros as $s_\rho(K) = \tau^K \rho$.
+
+2. **Arithmetic-Grid Dilation Operator ($D_K$)**:
+   \[
+   \boxed{D_K[F](s) = \tau^{-K s} F(s).}
+   \]
+   Acts on Dirichlet series by scaling grid elements $n \mapsto \tau^K n$, which in log-space $x = \log n$ is pure **translation**:
+   \[
+   S_K(x) = x + K \log \tau.
+   \]
+   Preserves addition ($\tau^K(m+n) = \tau^K m + \tau^K n$), but breaks multiplicativity ($(\tau^K m)(\tau^K n) = \tau^{2K} m n \notin L_K$). The grid $L_K$ cannot carry an Euler product. Leaves zero locus fixed ($Z(D_K[F]) = Z(F)$).
+
+**Defect Classification `CONFLATED_ANALYTIC_AND_GRID_DILATION`**:
+Any identification of base-power dilation $n^{\tau^{-K}}$ with grid scaling $\tau^K n$, or Fourier frequency dilation $\tau^{-K} \log n$ with the grid shift $\log n + K \log \tau$, is strictly prohibited and classified as `CONFLATED_ANALYTIC_AND_GRID_DILATION`.
+
+**Semidirect Commutation Law**:
+$A_K$ and $D_J$ do not commute; they satisfy:
+\[
+\boxed{A_K D_J = D_{J \tau^{-K}} A_K \iff A_K D_J A_K^{-1} = D_{J \tau^{-K}}.}
+\]
+The log-space commutator discrepancy is $S_K T_J(x) - T_J S_K(x) = (1 - \tau^{-J}) K \log \tau$.
+
+**Commutator Zero-Evaluation Identity**:
+Evaluating the prefactor ratio of $A_K D_J$ and $D_J A_K$ at a zero $s = \tau^K \rho$ yields normalized modulus $\tau^{K_{\mathrm{eff}} \delta}$ with $K_{\mathrm{eff}} = J(\tau^K - 1)$. Its reflection defect is identically:
+\[
+\boxed{|R_{\mathrm{norm}}(\rho)| + |R_{\mathrm{norm}}(\rho^\#)| - 2 = 4\sinh^2\left(\frac{K_{\mathrm{eff}}\delta\log\tau}{2}\right) = B_\rho(K_{\mathrm{eff}}).}
+\]
+
 ---
 
 # 10. Structural versus numerical grade representation

@@ -228,6 +228,51 @@ The exact point where deductive proof halts is:
 \]
 The functional must not be defined from the zeros themselves, must not assume RH or Weil positivity, and must not assume full algebraic-grid disjointness or lattice collisions. Historical Weil, curvature, and explicit formula machinery are candidate attempts to construct $\mathscr A_K$.
 
+### Analytic vs Arithmetic Grade Actions & The Intertwining Constraint (TASK-TC-017)
+First-principles analysis isolates the exact distinction between the two grade actions present in TC:
+1. **Analytic TC Dilation** \(A_K[\zeta](s) = \zeta(\tau^{-K}s) = \sum_{n \ge 1} (n^{\tau^{-K}})^{-s}\):
+   - Action on Dirichlet bases: \(n \mapsto n^{\tau^{-K}}\).
+   - Action in log-space \(x = \log n\): **dilation** \(T_K(x) = \tau^{-K} x\).
+   - Preserves Euler product multiplicativity via generalized prime bases \(\{p^{\tau^{-K}}\}\).
+2. **Arithmetic Grid Dilation** \(D_K[\zeta](s) = \sum_{n \ge 1} (\tau^K n)^{-s} = \tau^{-Ks}\zeta(s)\):
+   - Action on Dirichlet bases: \(n \mapsto \tau^K n\).
+   - Action in log-space \(x = \log n\): **translation** \(S_K(x) = x + K \log \tau\).
+   - Breaks Euler product multiplicativity because the grid \(L_K = \tau^K \mathbb Z\) is an additive lattice, not a multiplicative semigroup.
+
+**Non-Commutation & Semidirect Relation**:
+The two operators generate a semidirect product \(\mathbb R \rtimes \tau^{\mathbb A_{\mathbb R}} \subset \operatorname{Aff}_+(\mathbb R)\) satisfying:
+\[
+\boxed{
+A_K D_J = D_{J\tau^{-K}} A_K \iff A_K D_J A_K^{-1} = D_{J\tau^{-K}}.
+}
+\]
+In log-space, the affine commutator is:
+\[
+[S_K, T_J](x) = S_K(T_J(x)) - T_J(S_K(x)) = (1 - \tau^{-J}) K \log \tau.
+\]
+
+**Commutator Zero-Evaluation Defect**:
+Evaluating the normalized multiplier ratio \(R_{\mathrm{norm}}(s) = \tau^{J(\tau^{-K}-1)s}\) along the zero worldline \(s = \tau^K\rho\) has modulus:
+\[
+|R_{\mathrm{norm}}(\tau^K\rho)| = \tau^{J(\tau^K-1)\delta}.
+\]
+Bilateral symmetrization with respect to zero reflection yields the exact reflection defect:
+\[
+\boxed{
+|\tau^{K_{\mathrm{eff}}(\rho-1/2)}| + |\tau^{-K_{\mathrm{eff}}(\rho-1/2)}| - 2 = 4\sinh^2\left(\frac{K_{\mathrm{eff}}\delta\log\tau}{2}\right) = B_\rho(K_{\mathrm{eff}}),
+}
+\]
+where \(K_{\mathrm{eff}} = J(\tau^K - 1)\).
+
+**Earliest Remaining Implication (Sharpened Formulation)**:
+Construct an admissible test function \(\psi_K\) or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure:
+\[
+\boxed{
+\Delta_K[\psi] = \int_0^\infty \psi(x)\, d(\mu_K^{\mathrm{analytic}} - \mu_K^{\mathrm{grid}})(x) = \sum_{\rho \in Z^+} w_\rho B_\rho(K), \qquad w_\rho > 0,
+}
+\]
+where \(\mu_K^{\mathrm{analytic}} = \sum_n \Lambda(n)\tau^{-K}\delta_{\tau^{-K}\log n}\) and \(\mu_K^{\mathrm{grid}} = \sum_n \Lambda(n)\delta_{\log n + K\log\tau}\). Same-referent grade equivalence requires \(\Delta_K[\psi] = 0\), which would force \(\delta = 0\).
+
 ---
 
 # 5. Step 1 — assume a counterexample

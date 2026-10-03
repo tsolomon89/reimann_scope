@@ -1002,19 +1002,38 @@ The exact theoretical classification of this constraint space is `coordinate_red
 
 ---
 
-# 22. Curvature-Transport Unification and Reflection Rigidity
+# 23. Analytic vs Arithmetic Grade Actions and the Intertwining Constraint
 
-The geometric foliation of Transcendental Continuation is unified via the **Curvature-Transport Framework** (`CURVATURE_TRANSPORT.md`):
+The repository explicitly separates the two distinct grade actions:
 
-1. **Radial Reciprocity**: Circle radius $r_K = \tau^{-K}$, circumference $C_K = \tau^{1-K}$, and curvature $\kappa_K = \tau^K$ at integer checkpoints $K \in \mathbb Z$ satisfy $r_K\kappa_K = 1, C_1 = 1$, and Fourier lattice spacing $\Delta\omega_K = \tau/C_K = \tau^K \implies L_K = \tau^K\mathbb Z$.
-2. **Radial Unit Transport**: Zero worldline horizontal coordinate $d_{\rho}(k) = \tau^k\delta$ at continuous grade $k \in \mathbb R$ under the transported radial unit $r(k) = \tau^{-k}$ preserves the invariant $(r(k) d_{\rho}(k))^2 = \delta^2$.
-3. **Mellin Half-Density Dilation**: $(U_{\tau^k} f)(x) = \tau^{k/2}f(\tau^k x)$ acts on the completed zeta function as $\tau^{-k(s-1/2)}\Lambda(s) = \chi_s(k)^{-1}\Lambda(s)$, whose unitary axis is $\Re(s)=1/2$.
-4. **Reflection Defect**: $B_\rho(k) = |\chi_\rho(k)| + |\chi_{\rho^\#}(k)| - 2 = 2(\cosh(k\delta\log\tau)-1) \ge 0$, with native continuous second variation $B_\rho''(0) = 2\delta^2(\log\tau)^2 \implies \mathscr K_\tau(\rho) = \delta^2$.
-5. **Scalar-Transport No-Go & Holomorphic Obstruction**: For scalar multipliers $F_k = g_k L$, all grade derivatives at zeros vanish identically ($0 \equiv 0$); no fixed holomorphic local kernel $H(z)$ can equal $(\Re z)^2$ on an open set ($\partial_{\bar z}(\Re z)^2 = \Re z = \delta \ne 0$).
-6. **Canonical Weil–Hermitian Curvature Bridge**: Pointwise rational identity $\frac{1}{2}(1/|\rho|^2 + 1/|1-\rho|^2) - \Re(1/(\rho(1-\rho))) = \frac{2\delta^2}{|\rho|^2|1-\rho|^2} = \frac{B_\rho''(0)}{(\log\tau)^2 |\rho|^2|1-\rho|^2} \ge 0$, with geometric discrepancy $|J(\rho) - C(\rho)|^2 = 4\delta_\rho^2$, and zeta divisor summation target $N_\xi - C_\xi = \sum \frac{2\delta^2}{|\rho|^2|1-\rho|^2} \ge 0$ ($C_\xi = 2 + \gamma_{\text{Euler}} - \log(4\pi)$).
-7. **Additive Formulation, Probe Regularization & GNS Barrier**: Unified under additive logarithmic coordinates $u = \log x \in \mathbb R$; naive indicator $g_0(x) = x^{-1/2}\mathbf 1_{[1, \tau]}(x)$ yields $\widehat g_0(s) \ne 1/s$ (`FAIL_TEST_FUNCTION_IDENTIFICATION`), requiring an admissible smoothing family $\Phi_\varepsilon \to 1/s$ (`OPEN_ADMISSIBLE_PROBE_REGULARIZATION`). Pure local prime weights are strictly negative-definite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`), and assuming global Weil positivity $Q_W(f * f^*) \ge 0$ is equivalent to RH (Weil 1952; `OPEN_GLOBAL_POSITIVE_TYPE_FACTORIZATION`).
-8. **Transcendental Curvature Rigidity Theorem (Conditional)**: An arithmetic functional $\mathscr A_\tau = 0$ matching $\sum W_\rho \delta_\rho^2$ ($W_\rho > 0$) implies RH. Formally verified in Lean 4 (`RiemannScope.CurvatureTransport`).
-9. **Canonical Earliest Open Obligation (`OBL-CT-001A`)**: Constructing a zero-independent, non-scalar arithmetic functional $\mathscr A_\tau(\xi)$ (or $Q_H(f)$) is the program's canonical earliest open obligation (`CURVATURE_TRANSPORT.md` §15).
+1. **Analytic TC Dilation ($A_K$)**:
+   $$\mathcal Z_\tau(s, K) = A_K[\zeta](s) = \zeta(\tau^{-K} s) = \sum_{n=1}^\infty \left(n^{\tau^{-K}}\right)^{-s}.$$
+   Induces base-power dilation $n \mapsto n^{\tau^{-K}}$. In logarithmic space $x = \log n$, it acts as **dilation**:
+   $$T_K(x) = \tau^{-K} x.$$
+
+2. **Arithmetic-Grid Dilation ($D_K$)**:
+   $$D_K[\zeta](s) = \tau^{-K s} \zeta(s) = \sum_{n=1}^\infty (\tau^K n)^{-s}.$$
+   Induces linear grid scaling $n \mapsto \tau^K n$. In logarithmic space $x = \log n$, it acts as **translation**:
+   $$S_K(x) = x + K \log \tau.$$
+
+### 23.1 Defect Classification: `CONFLATED_ANALYTIC_AND_GRID_DILATION`
+Any historical identification of $n^{\tau^{-K}}$ with $\tau^K n$, or Fourier scaling $\tau^{-K} \log n$ with the grid shift $\log n + K \log \tau$, is formally classified as `CONFLATED_ANALYTIC_AND_GRID_DILATION`. The two actions are distinct:
+- $n^{\tau^{-K}}$ preserves multiplication ($(m n)^{\tau^{-K}} = m^{\tau^{-K}} n^{\tau^{-K}}$) and the Euler product;
+- $\tau^K n$ preserves addition ($\tau^K(m+n) = \tau^K m + \tau^K n$) and grid spacing, but breaks multiplication ($(\tau^K m)(\tau^K n) = \tau^{2K} m n \in L_{2K} \ne L_K$). The grid $L_K$ cannot carry an Euler product.
+
+### 23.2 Semidirect Affine Group Structure
+$A_K$ and $D_J$ generate the positive 1D affine group $\operatorname{Aff}_+(\mathbb R)$, satisfying the exact semidirect relation:
+$$\boxed{A_K D_J = D_{J \tau^{-K}} A_K \iff A_K D_J A_K^{-1} = D_{J \tau^{-K}}.}$$
+The affine commutator discrepancy in log-space is:
+$$S_K T_J(x) - T_J S_K(x) = (1 - \tau^{-J}) K \log \tau.$$
+
+### 23.3 Exact Commutator Zero-Evaluation Identity
+Evaluating the prefactor ratio of $A_K D_J$ and $D_J A_K$ at the zero locus $s = \tau^K \rho$:
+$$R_{\mathrm{norm}}(K, J; \rho) = \tau^{J(\tau^K - 1)\delta}.$$
+Its reflection defect against $\rho^\# = 1/2 - \delta + i\gamma$ yields the minimal spectral detector:
+$$\boxed{|R_{\mathrm{norm}}(\rho)| + |R_{\mathrm{norm}}(\rho^\#)| - 2 = 4\sinh^2\left(\frac{K_{\mathrm{eff}}\delta\log\tau}{2}\right) = B_\rho(K_{\mathrm{eff}}),}$$
+where $K_{\mathrm{eff}} = J(\tau^K - 1) \ne 0$ for $K \ne 0, J \ne 0$.
+The spectral detector $B_\rho$ is the exact reflection defect of the normalized affine commutator evaluated at the zeros.
 
 
 
