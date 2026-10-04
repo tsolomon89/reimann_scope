@@ -4887,8 +4887,8 @@ def exact_resolvent_L2_norm_squared(
         return {
             "a": str(a_f),
             "delta": str(d_f),
-            "exact_L2_norm_squared": mpmath.nstr(exact_val, n=20),
-            "leading_asymptotic": mpmath.nstr(leading_asymptotic, n=20),
+            "exact_L2_norm_squared": mpmath.nstr(exact_val, n=dps),
+            "leading_asymptotic": mpmath.nstr(leading_asymptotic, n=dps),
             "relative_asymptotic_error": mpmath.nstr(abs(exact_val - leading_asymptotic) / exact_val, n=8) if exact_val != 0 else "0.0",
             "status": "EXACT_RESOLVENT_NORM_EVALUATED"
         }

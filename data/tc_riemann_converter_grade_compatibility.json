@@ -1,0 +1,74 @@
+{
+  "task_id": "TASK-TC-021",
+  "title": "Riemann Converter Grade Covariance and Prime-Staircase Compatibility",
+  "status": "COMPLETED",
+  "classification": "PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH",
+  "converter_specification": {
+    "displayed_formula": "T_{sigma,t}(x) = Re( sum_{n=1}^infty (mu(n)/n) * int_{-infty + i*t*log(x)/n}^{(sigma + i*t)*log(x)/n} (e^z / z) dz )",
+    "standard_notation_formula": "T_{sigma,t}(x) = Re( sum_{n=1}^infty (mu(n)/n) * Ei((sigma + i*t)*log(x)/n) ) = Re( sum_{n=1}^infty (mu(n)/n) * Li(x^{(sigma + i*t)/n}) )",
+    "branch_and_path_convention": "Principal branch of exponential integral Ei(z) with branch cut on negative real axis (-infty, 0]; the lower contour endpoint -infty + i*t*log(x)/n defines the standard horizontal integration contour avoiding the branch cut for t != 0.",
+    "mathematical_source": "Bernhard Riemann (1859), 'Ueber die Anzahl der Primzahlen unter einer gegebenen Groesse', combined with Mobius inversion connecting prime-power counting J(x) to prime counting pi(x).",
+    "component_identity": "Single-frequency Mobius-inverted Riemann/Gram harmonic building block of the prime-counting function pi(x). When summed over nontrivial zero pairs rho and combined with the Li(x) trend, it reconstructs the prime staircase."
+  },
+  "scale_covariance_theorem": {
+    "statement": "For any real scale c > 0, complex frequency s = sigma + i*t, and coordinate x > 1: T_{c*sigma, c*t}(x^{1/c}) = T_{sigma,t}(x)",
+    "proof_mechanism": "Under coordinate transformation (s, log x) |-> (c*s, c^{-1}*log x), the upper integration limit (c*s)*log(x^{1/c})/n = s*log(x)/n and lower contour height (c*t)*log(x^{1/c})/n = t*log(x)/n are identically invariant for every term n >= 1. The Mobius factor mu(n)/n is unaltered.",
+    "tc_specialization": "T_{tau^K*sigma, tau^K*t}(x^{tau^{-K}}) = T_{sigma,t}(x) for tau = 2*pi and K in A_R",
+    "generic_base_control": "GENERIC_CONVERTER_SCALE_COVARIANCE: Identity holds identically for every positive real base b > 0 and scale factor c > 0. It is a fundamental conformal invariance of the logarithmic integral Li(x^s), not a tau-specific RH mechanism."
+  },
+  "prime_side_zeta_pushforward": {
+    "analytic_zeta": "zeta_K(s) = zeta(tau^{-K} s)",
+    "dirichlet_series": "sum_{n=1}^infty (n^{tau^{-K}})^{-s}",
+    "logarithmic_derivative": "-zeta_K'(s)/zeta_K(s) = tau^{-K} sum_{n=1}^infty Lambda(n) (n^{tau^{-K}})^{-s}",
+    "log_station_action": "u |-> tau^{-K} * u (log-space dilation)",
+    "staircase_transform": "pi_K^{analytic}(x) = pi(x^{tau^K}) and J_K^{analytic}(x) = J(x^{tau^K})",
+    "staircase_jump_locations": "Jumps occur at x = p^{tau^{-K}} for primes p, with exact integer height increment Delta pi_K = 1"
+  },
+  "prime_embeddings_comparison": {
+    "analytic_embedding": "A_K(p) = p^{tau^{-K}} with log A_K(p) = tau^{-K} * log p (dilation)",
+    "arithmetic_realization": "G_K(p) = p * tau^K with log G_K(p) = log p + K * log(tau) (translation)",
+    "geometry_distinction": "Dilation u |-> tau^{-K}*u on R vs Translation u |-> u + K*log(tau) on R; these generate the affine group Aff_+(R) and do NOT commute for K != 0",
+    "arithmetic_status": {
+      "G_K_p": "Transcendental for all rational K != 0 by Lindemann (1882), since p in Q_bar^x and tau^K is transcendental",
+      "A_K_p": "OPEN_TRANSCENDENCE_STATUS: p^{tau^{-K}} is an algebraic number raised to a transcendental exponent; Gelfond-Schneider does NOT apply to transcendental exponents"
+    }
+  },
+  "staircase_interpretations_audit": {
+    "interpretation_A_horizontal": {
+      "definition": "pi_K^{horiz}(x) = pi(x / tau^K) with jumps at x = p * tau^K",
+      "mellin_transform": "tau^{-Ks} * P(s), corresponding to arithmetic grid dilation D_K[zeta](s) = tau^{-Ks} * zeta(s)"
+    },
+    "interpretation_B_vertical": {
+      "definition": "pi_K^{vert}(x) = tau^K * pi(x) with jumps at native p and scaled height tau^K",
+      "mellin_transform": "tau^K * P(s), a global scalar multiple"
+    },
+    "interpretation_C_abstract_graded": {
+      "definition": "pi_K^{graded}(x) = pi(x) with formal grade labels (K, n) in M_tau projecting to native referents under M_tau / U_grade =~ Z_{!=0}",
+      "mellin_transform": "Native zeta Dirichlet series with formal grade unit twist chi_s(u_K) = tau^{-Ks}"
+    },
+    "canonical_selection": "Interpretation A reflects physical grid translation; Interpretation C reflects abstract monoid referents. Neither coincides with the analytic converter staircase N(x^{tau^K})."
+  },
+  "centered_harmonic_and_defect": {
+    "centered_harmonic": "H_rho(x) = x^{rho - 1/2} = e^{w_rho * log x} with |H_rho(x)| = x^delta",
+    "analytic_action": "w |-> tau^K * w, x |-> x^{tau^{-K}} ==> H_{rho,K}(x_K) = H_rho(x) identically invariant (|H_K| = x^delta)",
+    "arithmetic_action": "x |-> tau^K * x ==> H_rho(tau^K * x) = tau^{K * w_rho} * H_rho(x) with modulus |H_rho(tau^K * x)| = tau^{K * delta} * |H_rho(x)|",
+    "modulus_discrepancy": "tau^{K * delta}",
+    "bilateral_symmetrization": "tau^{K*delta} + tau^{-K*delta} - 2 = 4*sinh^2(K*delta*log(tau)/2) = B_rho(K)",
+    "defect_derivation_provenance": "The canonical TC non-unitarity defect B_rho(K) is derived directly from the contrast between converter-invariant analytic scaling and arithmetic linear grade realization."
+  },
+  "intrinsic_prime_referent_audit": {
+    "candidate_invariants": [
+      {"name": "Prime ordinal count increment", "status": "INVARIANT (Delta pi = 1 in Z)", "forces_compatibility": false},
+      {"name": "Mobius index and weights", "status": "INVARIANT (mu(n)/n in Q)", "forces_compatibility": false},
+      {"name": "Native prime referents", "status": "INVARIANT (p in P)", "forces_compatibility": false},
+      {"name": "Harmonic equality H(A_K(p)) = H(G_K(p))", "status": "MATHEMATICALLY_IMPOSSIBLE_ON_TWO_PRIMES", "forces_compatibility": false}
+    ],
+    "multi_prime_rigidity_proof": "If p_1^{tau^{-K}(rho-1/2)} = tau^{K(rho-1/2)} * p_1^{rho-1/2} and p_2^{tau^{-K}(rho-1/2)} = tau^{K(rho-1/2)} * p_2^{rho-1/2} for rho != 1/2, then (tau^{-K} - 1)*log(p_1) = (tau^{-K} - 1)*log(p_2) = K*log(tau), forcing log(p_1) = log(p_2) and p_1 = p_2. Thus coincidence on multiple primes is strictly refuted."
+  },
+  "conclusions": {
+    "principal_classification": "PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH",
+    "why_tuning_survives": "The Riemann Converter tunes logarithmic coordinates to prime powers via the dimensionless combination s*log(x). Reciprocal scaling (s, log x) |-> (c*s, c^{-1}*log x) preserves every phase and amplitude exactly.",
+    "why_arithmetic_grid_does_not_constrain": "The arithmetic grid realization x |-> tau^K * x translates log-space (u |-> u + K*log(tau)) rather than dilating it (u |-> tau^{-K}*u). It alters the harmonic modulus by tau^{K*delta}. However, no intrinsic prime-referent identity forces the converter to equal its translated counterpart on physical coordinates.",
+    "earliest_missing_bridge": "Construct an authentic arithmetic functional or boundary condition that directly forces the physical prime stations to obey the translation group action without breaking the conformal scaling of the explicit formula."
+  }
+}

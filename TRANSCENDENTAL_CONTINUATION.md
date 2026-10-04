@@ -1160,6 +1160,48 @@ This extends grid noncollision from integer coefficients to arbitrary nonzero al
 ### 27.4 Two-Direction Collision Architecture
 An audit of all existing TC mechanisms confirms that an off-critical zero $\rho = 1/2 + \delta + i\gamma$ supplies at most one displacement direction $\delta$. No existing mechanism forces two $\mathbb Q$-independent algebraic exponents into $S_\tau$. The status is classified as `TWO_DIRECTION_COLLISION_BRIDGE_OPEN` (Report: `NO_EXISTING_TWO_DIRECTION_BRIDGE`).
 
+---
+
+# 28. Riemann Converter Scale Covariance and Prime Staircase Compatibility
+
+TASK-TC-021 recenters on the concrete harmonic conversion mechanism of the Riemann explicit formula:
+
+### 28.1 The Riemann Converter
+The single-frequency building block converting complex frequency $s = \sigma + it$ into a spatial waveform along $x > 1$ is:
+\[
+\boxed{T_{\sigma,t}(x) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \int_{-\infty + i\,t\log(x)/n}^{(\sigma + it)\log(x)/n} \frac{e^z}{z} dz \right) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \operatorname{Ei}\left( \frac{(\sigma + it)\log x}{n} \right) \right) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \operatorname{Li}\left( x^{(\sigma + it)/n} \right) \right).}
+\]
+This represents the Möbius-inverted Gram/Riemann harmonic component of $\pi(x)$, derived from $J(x) = \sum_{n=1}^\infty \frac{1}{n} \pi(x^{1/n})$.
+
+### 28.2 Exact Scale-Covariance Theorem
+For any real scale factor $c > 0$, complex frequency $s = \sigma + it$, and coordinate $x > 1$:
+\[
+\boxed{T_{c\sigma, ct}\left(x^{1/c}\right) = T_{\sigma, t}(x) \qquad (\texttt{GENERIC\_CONVERTER\_SCALE\_COVARIANCE}).}
+\]
+Specializing to $c = \tau^K$ gives exact TC covariance $T_{\tau^K \sigma, \tau^K t}(x^{\tau^{-K}}) = T_{\sigma, t}(x)$. This identity holds term-by-term for every $n \ge 1$, for any truncation, and for any base $b > 0$. It is a fundamental conformal symmetry of the logarithmic integral $\operatorname{Li}(x^s)$, not an RH mechanism.
+
+### 28.3 Dilation vs. Translation of Prime Stations
+- **Analytic TC Staircase**: $\pi_K(x) = \pi(x^{\tau^K})$ with jumps at $A_K(p) = p^{\tau^{-K}}$, corresponding in log-space to multiplicative dilation $u \mapsto \tau^{-K} u$. Arithmetic status: `OPEN_TRANSCENDENCE_STATUS`.
+- **Arithmetic TC Realization**: Primes mapped to $G_K(p) = p\tau^K$, corresponding in log-space to additive translation $u \mapsto u + K\log\tau$. Arithmetic status: transcendental for rational $K \ne 0$ by Lindemann (1882).
+
+### 28.4 Centered Harmonic Action and Non-Unitarity Defect
+For centered zero coordinate $w_\rho = \rho - 1/2 = \delta + i\gamma$ and normalized harmonic $H_\rho(x) = x^{w_\rho} = e^{w_\rho \log x}$ with modulus $|H_\rho(x)| = x^\delta$:
+- Analytic reciprocal scaling $w \mapsto \tau^K w$, $x \mapsto x^{\tau^{-K}}$ leaves both phase and modulus strictly invariant: $|H_{\rho, K}(x_K)| = |H_\rho(x)| = x^\delta$.
+- Arithmetic linear scaling $x \mapsto \tau^K x$ multiplies the harmonic by $\tau^{K w_\rho}$, transforming modulus by $|H_\rho(\tau^K x)| = \tau^{K\delta} |H_\rho(x)|$.
+- Bilateral symmetrization recovers the canonical TC non-unitarity defect:
+  \[
+  \boxed{\frac{|H_\rho(\tau^K x)|}{|H_\rho(x)|} + \frac{|H_\rho(\tau^{-K} x)|}{|H_\rho(x)|} - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}
+  \]
+
+### 28.5 Multi-Prime Rigidity and Compatibility Status
+Coincidence between dilation and translation on any two distinct primes $p_1 \ne p_2$ is mathematically impossible:
+\[
+(\tau^{-K} - 1)\log p_1 = (\tau^{-K} - 1)\log p_2 = K\log\tau \implies \log p_1 = \log p_2 \implies p_1 = p_2.
+\]
+Candidate intrinsic prime invariants (prime labels $p$, step increments $\Delta\pi = 1$, Möbius weights $\mu(n)/n$) do not force the converter to equal its translated counterpart.
+Classification: `PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH`.
+
+
 
 
 

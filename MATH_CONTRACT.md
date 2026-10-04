@@ -2818,8 +2818,48 @@ where $S_1(a) = \sum_{n\ge 2} \Lambda(n)^2 n^{-1-2a}\log n$ and $S_2(a) = \sum_{
 The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the off-diagonal terms ($m\ne n$) are non-zero due to $\widehat W(\log(m/n)) \ne 0$ (`FULL_WINDOWED_ZETA_CROSS_TERM_DERIVED`, Lean 4 `finite_double_sum_2x2_decomp`). Knowing window variance alone does not diagonalize a finite-window inner product.
 6. **Smooth Two-Bump Prime Gram Matrix**: With bump convolution $\psi_\varepsilon \in C_c^\infty(\mathbb R)$ of support $\varepsilon < \frac{1}{2}\min |\log n_1 - \log n_2|$, $W_{\text{prime}, p} = \begin{pmatrix} 0 & -w_p \\ -w_p & 0 \end{pmatrix}$ with eigenvalues $\pm w_p$, indefinite (`FAIL_NAIVE_PRIME_LOCAL_FACTORIZATION`).
 
-
-
-
-
-
+### Riemann Converter Scale Covariance and Prime Staircase Compatibility (TASK-TC-021)
+1. **The Riemann Converter Formula**:
+   The single-frequency building block converting complex frequency $s = \sigma + it$ into a spatial waveform along $x > 1$ is:
+   \[
+   \boxed{T_{\sigma,t}(x) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \int_{-\infty + i\,t\log(x)/n}^{(\sigma + it)\log(x)/n} \frac{e^z}{z} dz \right) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \operatorname{Ei}\left( \frac{(\sigma + it)\log x}{n} \right) \right) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \operatorname{Li}\left( x^{(\sigma + it)/n} \right) \right).}
+   \]
+   This equals the Möbius-inverted Gram/Riemann harmonic component of the prime-counting function $\pi(x)$, derived from the explicit formula for $J(x) = \sum_{n=1}^\infty \frac{1}{n} \pi(x^{1/n})$.
+2. **Exact Scale-Covariance Theorem**:
+   For any positive real scale factor $c > 0$, complex frequency $s = \sigma + it$, and coordinate $x > 1$:
+   \[
+   \boxed{T_{c\sigma, ct}\left(x^{1/c}\right) = T_{\sigma, t}(x).}
+   \]
+   *Proof*: The upper limit $(c\sigma + ict)\log(x^{1/c})/n = (\sigma + it)\log(x)/n$ and the lower contour imaginary height $(ct)\log(x^{1/c})/n = t\log(x)/n$ are identically invariant for every $n \ge 1$. The integrand $e^z/z$ and the weights $\mu(n)/n$ are unaltered. Specializing to $c = \tau^K$ yields exact TC covariance:
+   \[
+   \boxed{T_{\tau^K \sigma, \tau^K t}\left(x^{\tau^{-K}}\right) = T_{\sigma, t}(x).}
+   \]
+3. **Generic Scale Geometry**:
+   Because the covariance holds identically for any real scale factor $c > 0$ ($c = 2, 3, \pi, \sqrt{2}$), it represents conformal scaling of the logarithmic integral $\operatorname{Li}(x^s) = \operatorname{Ei}(s\log x)$, classified as `GENERIC_CONVERTER_SCALE_COVARIANCE`.
+4. **Prime-Side Counting Transformation**:
+   Analytic TC dilation $\zeta_K(s) = \zeta(\tau^{-K} s)$ induces the prime-counting staircase:
+   \[
+   \boxed{\pi_K^{\mathrm{analytic}}(x) = \pi(x^{\tau^K}), \qquad J_K^{\mathrm{analytic}}(x) = J(x^{\tau^K}).}
+   \]
+   Its jumps occur at $x = p^{\tau^{-K}}$ for primes $p$, with exact integer height increment $\Delta \pi_K = 1 \in \mathbb{Z}$.
+5. **Dilation vs. Translation of Prime Stations**:
+   - Analytic TC embedding: $A_K(p) = p^{\tau^{-K}}$, with log-station $\log A_K(p) = \tau^{-K} \log p$ (multiplicative dilation $u \mapsto \tau^{-K} u$). Arithmetic status: `OPEN_TRANSCENDENCE_STATUS`.
+   - Arithmetic TC realization: $G_K(p) = p\tau^K$, with log-station $\log G_K(p) = \log p + K\log\tau$ (additive translation $u \mapsto u + K\log\tau$). Arithmetic status: transcendental for rational $K \ne 0$ by Lindemann (1882).
+6. **Centered Zero Harmonic Transformation**:
+   For centered zero coordinate $w_\rho = \rho - 1/2 = \delta + i\gamma$ and normalized harmonic $H_\rho(x) = x^{w_\rho} = e^{w_\rho \log x}$ with modulus $|H_\rho(x)| = x^\delta$:
+   - Analytic reciprocal scaling $w \mapsto \tau^K w$, $x \mapsto x^{\tau^{-K}}$ leaves both phase and modulus strictly invariant: $|H_{\rho, K}(x_K)| = |H_\rho(x)| = x^\delta$.
+   - Arithmetic linear scaling $x \mapsto \tau^K x$ multiplies the harmonic by $\tau^{K w_\rho}$, transforming modulus by:
+     \[
+     \boxed{|H_\rho(\tau^K x)| = \tau^{K\delta} |H_\rho(x)|.}
+     \]
+   - Bilateral symmetrization recovers the canonical TC non-unitarity defect:
+     \[
+     \boxed{\frac{|H_\rho(\tau^K x)|}{|H_\rho(x)|} + \frac{|H_\rho(\tau^{-K} x)|}{|H_\rho(x)|} - 2 = \tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2\left(\frac{K\delta\log\tau}{2}\right) = B_\rho(K).}
+     \]
+7. **Multi-Prime Rigidity Theorem**:
+   Dilation and translation cannot coincide on any two distinct primes $p_1 \ne p_2$:
+   \[
+   (\tau^{-K} - 1)\log p_1 = K\log\tau \quad \text{and} \quad (\tau^{-K} - 1)\log p_2 = K\log\tau \implies \log p_1 = \log p_2 \implies p_1 = p_2.
+   \]
+   Thus, no intrinsic prime-referent identity forces the converter to equal its translated counterpart.
+8. **Classification**: `PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH`.

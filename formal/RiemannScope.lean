@@ -18,4 +18,5 @@ import RiemannScope.ExtremalCorrelation
 import RiemannScope.GradedMonoid
 import RiemannScope.GradeCharacter
 import RiemannScope.TranscendenceRigidity
+import RiemannScope.RiemannConverter
 
