@@ -1258,6 +1258,69 @@ Decompositions in $R_\tau$ are strictly unique: $F(\tau) = G(\tau) \iff F = G$.
 No natural zeta identity equates a finite cross-grade expression to an algebraic number. Bilateral products $(p\tau^K)(p\tau^{-K}) = p^2$ and $|\eta_\rho(K)| \cdot |\eta_\rho(K)|^{-1} = 1$ balance total grade to zero identically.
 Constraint classification: `NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL`.
 
+---
+
+# 30. Algebraic-Grade Completion, Exceptional Transfer Geometry, and Functional-Equation Grade Bridge (TASK-TC-023)
+
+### 30.1 Restoration of Full Real-Algebraic Grade Domain
+The canonical TC grade domain is restored to all real algebraic numbers:
+\[
+\boxed{\mathcal A = \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R.}
+\]
+For every $K \in \mathcal A$, we distinguish:
+- Integer lattice: $L_K = \{n\tau^K : n \in \mathbb Z \setminus \{0\}\}$;
+- Prime system: $P_K = \{p\tau^K : p \in \mathbb P\}$;
+- Algebraic span: $V_K = \overline{\mathbb Q}\tau^K$.
+
+The integer skeleton ($K \in \mathbb Z$) and rational extension ($K \in \mathbb Q$) are proved subcases where $V_K \cap V_J = \{0\}$ for all $K - J \in \mathbb Q \setminus \{0\}$.
+
+### 30.2 The Exceptional Transfer Set $S_\tau$ and Dimension Bound
+Define:
+\[
+\boxed{S_\tau = \{\alpha \in \mathcal A : \tau^\alpha \in \overline{\mathbb Q}\}, \qquad \tau = 2\pi.}
+\]
+- **Vector Space Structure**: $S_\tau$ is proved to be a $\mathbb Q$-vector space: closed under addition ($\tau^{\alpha+\beta} = \tau^\alpha\tau^\beta$), negation ($\tau^{-\alpha} = (\tau^\alpha)^{-1}$), and positive real rational scaling ($(\tau^\alpha)^q \in \overline{\mathbb Q}$).
+- **Rational Intersection**: $S_\tau \cap \mathbb Q = \{0\}$ by Lindemann (1882) transcendence of $\pi$.
+- **Exceptional Direction Classification**: By Gelfond–Schneider (1934), if $\alpha, \beta \in S_\tau \setminus \{0\}$, then $(\tau^\alpha)^{\beta/\alpha} = \tau^\beta \in \overline{\mathbb Q}$ with algebraic base and power forces $\beta/\alpha \in \mathbb Q$.
+  Therefore:
+  \[
+  \boxed{\dim_{\mathbb Q} S_\tau \le 1 \qquad (\texttt{ONE\_EXCEPTIONAL\_Q\_DIRECTION\_ONLY}).}
+  \]
+  Whether $S_\tau = \{0\}$ is an unconditionally open problem in transcendental number theory.
+- **Two-Direction Impossibility**: Two $\mathbb Q$-independent algebraic transfer directions cannot exist: $(K_1 - J_1)/(K_2 - J_2) \in \mathbb Q$ for all non-zero $K_1 - J_1, K_2 - J_2 \in S_\tau$.
+
+### 30.3 Algebraic Transfer Criterion and Grid Collisions
+- **Exact Transfer Criterion**:
+  \[
+  \boxed{V_K = V_J \iff K - J \in S_\tau \iff \exists a, b \in \overline{\mathbb Q}^\times : a\tau^K = b\tau^J.}
+  \]
+- **Integer Grid Collision**: $L_K \cap L_J \ne \emptyset \iff \tau^{K-J} \in \mathbb Q_{>0}$. If one station collides ($b\tau^K = a\tau^J$ in lowest positive terms), the whole intersection is an infinite common subgrid $\{bt\tau^K : t \in \mathbb Z \setminus \{0\}\}$.
+- **Prime Grid Collision**: For $K \ne J$, distinct prime grids share at most one point: $|P_K \cap P_J| \le 1$ by unique prime factorization.
+
+### 30.4 Two-Grade Functional Equation & Centered Reflection
+- **Canonical Grid Zeta**: $Z_K(s) = \tau^{-Ks}\zeta(s)$ has stationary zero set ($Z_K(s) = 0 \iff \zeta(s) = 0$). Zeros do not move under arithmetic grading.
+- **Functional Equation**:
+  \[
+  \boxed{Z_K(s) = \chi(s) \tau^{J(1-s) - Ks} Z_J(1-s), \qquad E_{K,J}(s) = J(1-s) - Ks.}
+  \]
+- **Centered Completed Reflection**: For $\Xi_K(s) = \tau^{-K(s - 1/2)}\xi(s)$,
+  \[
+  \boxed{\Xi_K(s) = \Xi_{-K}(1-s).}
+  \]
+  This is an exact reflection correspondence between grade labels $K$ and $-K$, not multiplication of opposite grades.
+- **Local Zero Germ Scaling**: At a zero $\rho$ of multiplicity $m$, $\Xi_K^{(m)}(\rho)/\Xi_J^{(m)}(\rho) = \tau^{-(K-J)(\rho-1/2)}$. Modulus is $\tau^{-(K-J)\delta}$, which equals $1 \iff \delta = 0$. Valid detector, not an independent proof.
+
+### 30.5 Euler–Bernoulli Special Values & Ledger Correction
+- Euler formula: $\zeta(2n) = (-1)^{n+1} \frac{B_{2n}}{2(2n)!}\tau^{2n} \implies Z_1(2n) \in \mathbb Q$.
+- Negative-odd reflected values: $Z_0(1-2n) = \zeta(1-2n) = -\frac{B_{2n}}{2n} \in \mathbb Q$.
+- Exact cross-grade relation:
+  \[
+  \boxed{Z_1(2n) = \frac{(-1)^n}{2(2n-1)!} Z_0(1-2n).}
+  \]
+- **Reconciliation**: The TASK-TC-022 conclusion ("no cross-grade algebraic relation") is narrowed. The functional equation transfers $\tau$-periods across reflection $s \leftrightarrow 1-s$, yielding authentic rational-coefficient cross-grade relations at special integer points (`SPECIAL_VALUE_GRADE_TRANSFER_ONLY`).
+- At nontrivial zeros, values vanish identically ($0=0$) and local germs do not yield an algebraic constraint (`NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`, `NO_TWO_DIRECTION_ZETA_TRANSFER`).
+
+
 
 
 

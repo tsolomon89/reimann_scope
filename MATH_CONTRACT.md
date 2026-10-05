@@ -622,6 +622,64 @@ TASK-TC-020 resolves the interaction between TC grade actions and Masatoshi Suzu
 4. **Two-Direction Collision Architecture**:  
    An audit of all current TC mechanisms confirms that an off-critical zero $\rho = 1/2 + \delta + i\gamma$ supplies at most one displacement direction $\delta$. No existing mechanism forces two $\mathbb Q$-independent algebraic exponents into $S_\tau$. Status is classified as `TWO_DIRECTION_COLLISION_BRIDGE_OPEN` (Report: `NO_EXISTING_TWO_DIRECTION_BRIDGE`).
 
+### 9.9 Riemann Converter Scale Covariance and Prime Staircase Compatibility (TASK-TC-021)
+
+1. **Riemann Converter Formula**:
+   The single-frequency Möbius-inverted Riemann/Gram harmonic building block of the prime-counting function $\pi(x)$ is:
+   \[
+   T_{\sigma,t}(x) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \int_{-\infty + i\,t\log(x)/n}^{(\sigma + it)\log(x)/n} \frac{e^z}{z} dz \right) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \operatorname{Ei}\left( \frac{(\sigma+it)\log x}{n} \right) \right).
+   \]
+2. **Scale Covariance**:
+   $T_{c\sigma, ct}(x^{1/c}) = T_{\sigma, t}(x)$ holds term-by-term for all real $c > 0$ (`GENERIC_CONVERTER_SCALE_COVARIANCE`). Specializing to $c = \tau^K$ yields exact TC covariance $T_{\tau^K\sigma, \tau^Kt}(x^{\tau^{-K}}) = T_{\sigma, t}(x)$.
+3. **Dilation vs. Translation of Prime Stations**:
+   Analytic dilation jumps at $p^{\tau^{-K}}$, whereas arithmetic realization translates primes to $p\tau^K$. Dilation and translation cannot coincide on any two distinct primes: $(\tau^{-K}-1)\log p_1 = (\tau^{-K}-1)\log p_2 \implies p_1 = p_2$. Classification: `PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH`.
+
+### 9.10 Faithful Tau-Graded Prime Algebra (TASK-TC-022)
+
+1. **The Graded Ring $R_\tau$**:
+   Integer-grade arithmetic realizations form the ring $R_\tau = \mathbb Z[\tau, \tau^{-1}] \subset \mathbb R$ with $\tau = 2\pi$. By Lindemann (1882) transcendence of $\tau$, $\operatorname{ev}_\tau : \mathbb Z[X, X^{-1}] \to R_\tau$ is an injective ring isomorphism: $R_\tau \cong \mathbb Z[X, X^{-1}]$.
+2. **Faithful Direct Sum Grading & Grade-Zero Selection**:
+   $R_\tau = \bigoplus_{K \in \mathbb Z} \mathbb Z \tau^K$. Distinct integer grades are $\overline{\mathbb Q}$-linearly independent (`FINITE_CROSS_GRADE_LINEAR_INDEPENDENCE`). A finite Laurent polynomial $F(X) \in \overline{\mathbb Q}[X, X^{-1}]$ evaluates to an algebraic native value $F(\tau) \in \overline{\mathbb Q}$ iff all nonzero-grade components vanish identically (`GRADE_ZERO_ALGEBRAICITY_SELECTION`).
+3. **Primes and Graded Associates**:
+   $U(R_\tau) = \{\pm\tau^K : K \in \mathbb Z\}$. For $p \in \mathbb P$, $p$ is a prime element of $R_\tau$, and $p\tau^K$ is an associate prime element. Multiplicative grades add: $(p\tau^K)(q\tau^{-K}) = pq \in \mathbb Z$.
+4. **Canonical Grid Zeta**:
+   $Z_K^{\mathrm{grid}}(s) = \tau^{-Ks}\zeta(s)$ has stationary zero sets ($Z_K(s) = 0 \iff \zeta(s) = 0$). Status: `ARITHMETIC_TC_IS_GRID_UNIT_TWIST`.
+
+### 9.11 Algebraic-Grade Completion, Exceptional Transfer Geometry, and Functional-Equation Grade Bridge (TASK-TC-023)
+
+1. **Canonical Grade Domain**:
+   The full canonical grade domain of Transcendental Continuation is the field of real algebraic numbers:
+   \[
+   \boxed{\mathcal A = \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R.}
+   \]
+   The discrete integer skeleton $K \in \mathbb Z$ and rational extension $K \in \mathbb Q$ are proved subcases where $V_K \cap V_J = \{0\}$ for all $K - J \in \mathbb Q \setminus \{0\}$.
+
+2. **Exceptional Algebraic Transfer Set $S_\tau$**:
+   Let $S_\tau = \{\alpha \in \mathcal A : \tau^\alpha \in \overline{\mathbb Q}\}$ with $\tau = 2\pi$.
+   - $S_\tau$ is a vector space over $\mathbb Q$ (closed under addition, negation, and positive real rational scaling).
+   - $S_\tau \cap \mathbb Q = \{0\}$ by Lindemann's theorem.
+   - Gelfond–Schneider proves $\dim_{\mathbb Q} S_\tau \le 1$ (`ONE_EXCEPTIONAL_Q_DIRECTION_ONLY`).
+   - Two $\mathbb Q$-independent algebraic transfer directions cannot exist: if $\alpha_1, \alpha_2 \in S_\tau \setminus \{0\}$, then $\alpha_2 / \alpha_1 \in \mathbb Q$.
+   - Unconditionally, whether $S_\tau = \{0\}$ is an OPEN problem in transcendental number theory.
+
+3. **Exact Transfer Criterion and Subgrid Collisions**:
+   - $V_K = V_J \iff K - J \in S_\tau \iff \exists a, b \in \overline{\mathbb Q}^\times : a\tau^K = b\tau^J$.
+   - Integer grid collision $L_K \cap L_J \ne \emptyset \iff \tau^{K-J} \in \mathbb Q_{>0}$. If one station collides ($b\tau^K = a\tau^J$), the intersection is an infinite common subgrid $\{bt\tau^K : t \in \mathbb Z \setminus \{0\}\}$.
+   - Prime grid collision uniqueness: for $K \ne J$, distinct prime grids share at most one point ($|P_K \cap P_J| \le 1$).
+
+4. **Canonical Grid Zeta Family & Functional Equation**:
+   - For all $K \in \mathcal A$, $Z_K(s) = \tau^{-Ks}\zeta(s)$ has stationary zero sets ($Z_K(s) = 0 \iff \zeta(s) = 0$).
+   - Two-grade functional equation: $Z_K(s) = \chi(s)\tau^{J(1-s) - Ks} Z_J(1-s)$ with cross-grade exponent $E_{K,J}(s) = J(1-s) - Ks$.
+   - Centered completed grid family $\Xi_K(s) = \tau^{-K(s-1/2)}\xi(s)$ satisfies the exact reflection law $\Xi_K(s) = \Xi_{-K}(1-s)$.
+   - Local zero germ scaling: $\Xi_K^{(m)}(\rho)/\Xi_J^{(m)}(\rho) = \tau^{-(K-J)(\rho-1/2)}$. Modulus is $\tau^{-(K-J)\delta}$, which equals $1 \iff \delta = 0$. Valid detector, not an independent proof.
+
+5. **Euler–Bernoulli Special Value Relations**:
+   - $Z_1(2n) = \tau^{-2n}\zeta(2n) = (-1)^{n+1} \frac{B_{2n}}{2(2n)!} \in \mathbb Q$.
+   - $Z_0(1-2n) = \zeta(1-2n) = -\frac{B_{2n}}{2n} \in \mathbb Q$.
+   - Exact cross-grade relation: $Z_1(2n) = \frac{(-1)^n}{2(2n-1)!} Z_0(1-2n)$.
+   - The functional equation transfers $\tau$-periods across reflection $s \leftrightarrow 1-s$, narrowing the TASK-TC-022 ledger classification to `SPECIAL_VALUE_GRADE_TRANSFER_ONLY`.
+   - At nontrivial zeros, values vanish identically and local germs supply no algebraic relation (`NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`, `NO_TWO_DIRECTION_ZETA_TRANSFER`).
+
 ---
 
 # 10. Structural versus numerical grade representation
