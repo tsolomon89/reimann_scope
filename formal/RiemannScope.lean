@@ -19,4 +19,5 @@ import RiemannScope.GradedMonoid
 import RiemannScope.GradeCharacter
 import RiemannScope.TranscendenceRigidity
 import RiemannScope.RiemannConverter
+import RiemannScope.FaithfulGradedAlgebra
 

@@ -3662,3 +3662,62 @@ in Lean 4. For $W=[1]$ and $c=[i]$, the Hermitian form evaluates to $+1$, correc
 - $E_{\mathcal F}$: $\exists g \in \mathcal F$ with $B(g, g) < 0$.
 - $D_{\mathcal F}$: $H \implies E_{\mathcal F}$.
 $P_{\mathcal F}$ implies $\neg E_{\mathcal F}$, which does not refute $D_{\mathcal F}$. Under $P_{\mathcal F}$, $D_{\mathcal F} \iff \neg H$ (RH). Failure of localized bump approximation schemes does not refute $D_{\mathcal F}$, and the Transcendental Continuation bridge remains strictly OPEN.
+
+---
+
+# 28. Riemann Converter Grade Covariance and Prime Staircase Compatibility (TASK-TC-021)
+
+1. **Formula Identification**:
+   The single-frequency Riemann Converter:
+   \[
+   T_{\sigma,t}(x) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \int_{-\infty + i\,t\log(x)/n}^{(\sigma + it)\log(x)/n} \frac{e^z}{z} dz \right) = \Re\left( \sum_{n=1}^\infty \frac{\mu(n)}{n} \operatorname{Ei}\left( \frac{(\sigma+it)\log x}{n} \right) \right)
+   \]
+   is proved to be the single-frequency Möbius-inverted Riemann/Gram harmonic building block of the prime-counting function $\pi(x)$, derived from Riemann's explicit formula for $J(x)$.
+2. **Scale Covariance**:
+   $T_{c\sigma, ct}(x^{1/c}) = T_{\sigma, t}(x)$ holds term-by-term for every $n \ge 1$ and all real $c > 0$ (`GENERIC_CONVERTER_SCALE_COVARIANCE`). Specializing to $c = \tau^K$ yields exact TC covariance $T_{\tau^K\sigma, \tau^Kt}(x^{\tau^{-K}}) = T_{\sigma, t}(x)$.
+3. **Dilation vs. Translation of Prime Stations**:
+   - Analytic TC dilation $\zeta(\tau^{-K} s)$ induces $\pi_K(x) = \pi(x^{\tau^K})$, with jumps at $A_K(p) = p^{\tau^{-K}}$ (dilation $u \mapsto \tau^{-K} u$). Status: `OPEN_TRANSCENDENCE_STATUS`.
+   - Arithmetic TC realization maps primes to $G_K(p) = p\tau^K$ (translation $u \mapsto u + K\log\tau$), transcendental for rational $K \ne 0$.
+4. **Centered Harmonic Transformation and Bilateral Defect**:
+   - For $H_\rho(x) = x^{\rho - 1/2}$, analytic reciprocal scaling preserves modulus and phase ($|H_{\rho, K}(x_K)| = x^\delta$).
+   - Arithmetic linear scaling transforms modulus by $|H_\rho(\tau^K x)| = \tau^{K\delta} |H_\rho(x)|$.
+   - Bilateral symmetrization recovers the canonical TC defect: $\tau^{K\delta} + \tau^{-K\delta} - 2 = 4\sinh^2(K\delta\log\tau / 2) = B_\rho(K)$.
+5. **Multi-Prime Rigidity**:
+   Dilation and translation cannot coincide on any two distinct primes: $(\tau^{-K} - 1)\log p_1 = (\tau^{-K} - 1)\log p_2 = K\log\tau \implies p_1 = p_2$.
+6. **Principal Classification**: `PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH`.
+
+---
+
+# 29. Faithful Tau-Graded Prime Algebra and Cross-Grade Constraint (TASK-TC-022)
+
+1. **The TC Laurent Ring $R_\tau$**:
+   The arithmetic structure governing integer-grade arithmetic realizations is the subring:
+   \[
+   \boxed{R_\tau = \mathbb Z[\tau, \tau^{-1}] \subset \mathbb R, \qquad \tau = 2\pi.}
+   \]
+   Evaluation $\operatorname{ev}_\tau : \mathbb Z[X, X^{-1}] \to R_\tau$ is an injective ring isomorphism by Lindemann (1882) transcendence of $\tau$: $R_\tau \cong \mathbb Z[X, X^{-1}]$.
+2. **Faithful Direct Sum Grading**:
+   \[
+   \boxed{R_\tau = \bigoplus_{K \in \mathbb Z} \mathbb Z \tau^K.}
+   \]
+   Finite linear independence over $\overline{\mathbb Q}$ holds: for any distinct integer grades $K_1, \dots, K_r$ and $a_j \in \overline{\mathbb Q}$, $\sum_{j=1}^r a_j \tau^{K_j} = 0 \implies a_j = 0$ for all $j$ (`FINITE_CROSS_GRADE_LINEAR_INDEPENDENCE`).
+3. **Grade-Zero Algebraicity Selection Rule**:
+   A finite Laurent expression $F(X) \in \overline{\mathbb Q}[X, X^{-1}]$ evaluates to an algebraic native value $F(\tau) \in \overline{\mathbb Q}$ if and only if all nonzero-grade components vanish identically: $F(\tau) = a_0 \in \overline{\mathbb Q}$ (`GRADE_ZERO_ALGEBRAICITY_SELECTION`). Laurent grade decompositions are strictly unique.
+4. **Units and Graded Prime Associates**:
+   - $U(R_\tau) = \{\pm \tau^K : K \in \mathbb Z\}$.
+   - For rational prime $p \in \mathbb P$, $R_\tau / (p) \cong \mathbb F_p[X, X^{-1}]$ is an integral domain; thus $p$ is a prime element of $R_\tau$.
+   - $p\tau^K = (\tau^K) p$ is an associate of $p$ in $R_\tau$, and therefore a prime element of $R_\tau$.
+   - $P_K = \{p\tau^K : p \in \mathbb P\}$ forms the grade-$K$ homogeneous representative system of ordinary prime associate classes.
+   - No algebraic transfer station: no algebraic scalar $\alpha \in \overline{\mathbb Q}^\times$ satisfies $\alpha (m\tau^K) = n\tau^J$ for $K \ne J$ (`NO_ALGEBRAIC_TRANSFER_STATION`).
+5. **Multiplicative Grade Conservation**:
+   - Distinct grades cannot cancel linearly over $\overline{\mathbb Q}$, but multiplicative grades add: $\deg(xy) = \deg x + \deg y$.
+   - Opposite grades cancel to grade zero: $(p\tau^K)(q\tau^{-K}) = pq \in \mathbb Z = R_0$. Transcendence cancels multiplicatively.
+   - Total-grade-zero monomial rule: $M = a \prod_{j=1}^r (p_j \tau^{K_j})^{e_j} \in \overline{\mathbb Q} \iff \sum_{j=1}^r e_j K_j = 0$ (`TOTAL_GRADE_ZERO_ALGEBRAICITY`).
+6. **Canonical Arithmetic TC Grid Zeta vs. Analytic Pullback**:
+   - **Canonical Grid Zeta**: For $L_K^+ = \{n\tau^K : n \ge 1\}$, $Z_K^{\mathrm{grid}}(s) = \sum_{n=1}^\infty (n\tau^K)^{-s} = \tau^{-Ks}\zeta(s)$. Because $\tau^{-Ks} \ne 0$, $Z_K^{\mathrm{grid}}(s) = 0 \iff \zeta(s) = 0$. Zeros do not move under arithmetic grading.
+   - **Auxiliary Analytic Pullback**: $Z_K^{\mathrm{pull}}(s) = \zeta(\tau^{-K} s)$ is an auxiliary coordinate dilation moving zeros to $\tau^K \rho$ and prime stations to $p^{\tau^{-K}}$.
+   - Foundational status: `ARITHMETIC_TC_IS_GRID_UNIT_TWIST`.
+7. **Cross-Grade Constraint Audit**:
+   No natural zeta identity equates a finite cross-grade expression to an algebraic number. Bilateral products $(p\tau^K)(p\tau^{-K}) = p^2$ and $|\eta_\rho(K)| \cdot |\eta_\rho(K)|^{-1} = 1$ balance total grade to zero identically.
+   Constraint status: `NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL`.
+

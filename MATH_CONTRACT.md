@@ -2863,3 +2863,54 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \]
    Thus, no intrinsic prime-referent identity forces the converter to equal its translated counterpart.
 8. **Classification**: `PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH`.
+
+### Faithful Tau-Graded Prime Algebra and Cross-Grade Constraint (TASK-TC-022)
+1. **The TC Laurent Ring $R_\tau$**:
+   The algebraic structure governing integer-grade arithmetic realizations is the subring:
+   \[
+   \boxed{R_\tau = \mathbb Z[\tau, \tau^{-1}] \subset \mathbb R, \qquad \tau = 2\pi.}
+   \]
+   Evaluation homomorphism $\operatorname{ev}_\tau : \mathbb Z[X, X^{-1}] \to R_\tau$ ($X \mapsto \tau$) is an isomorphism of rings by Lindemann (1882) transcendence of $\tau$:
+   \[
+   \boxed{R_\tau \cong \mathbb Z[X, X^{-1}].}
+   \]
+2. **Faithful Direct Sum Grading**:
+   The canonical polynomial grading transfers isomorphically:
+   \[
+   \boxed{R_\tau = \bigoplus_{K \in \mathbb Z} \mathbb Z \tau^K.}
+   \]
+   Finite linear independence holds over $\overline{\mathbb Q}$: for any finite distinct integer grades $\{K_1, \dots, K_r\} \subset \mathbb Z$ and $a_j \in \overline{\mathbb Q}$,
+   \[
+   \sum_{j=1}^r a_j \tau^{K_j} = 0 \implies a_1 = \dots = a_r = 0 \qquad (`FINITE_CROSS_GRADE_LINEAR_INDEPENDENCE`).
+   \]
+3. **Grade-Zero Algebraicity Selection Theorem**:
+   For any finite Laurent expression $F(X) = \sum_{K=-M}^N a_K X^K \in \overline{\mathbb Q}[X, X^{-1}]$,
+   \[
+   \boxed{F(\tau) \in \overline{\mathbb Q} \iff a_K = 0 \quad \forall K \ne 0 \iff F(\tau) = a_0 \in \overline{\mathbb Q} \qquad (`GRADE_ZERO_ALGEBRAICITY_SELECTION`).}
+   \]
+   Laurent grade decompositions are strictly unique: $F(\tau) = G(\tau) \iff F = G$.
+4. **Units and Graded Prime Associates**:
+   - Unit group: $U(R_\tau) = \{\pm \tau^K : K \in \mathbb Z\}$.
+   - For rational prime $p \in \mathbb P$, $R_\tau / (p) \cong \mathbb F_p[X, X^{-1}]$ is an integral domain; hence $p$ is a prime element of $R_\tau$.
+   - The element $p\tau^K = (\tau^K) p$ is an associate of $p$ in $R_\tau$, and therefore a prime element of $R_\tau$.
+   - $P_K = \{p\tau^K : p \in \mathbb P\}$ forms the grade-$K$ homogeneous representative system of ordinary prime associate classes.
+5. **No Algebraic Transfer Station**:
+   For $x = m\tau^K \in L_K$ and $y = n\tau^J \in L_J$ with $m, n \in \overline{\mathbb Q}^\times$ and $K \ne J$, no algebraic scalar $\alpha \in \overline{\mathbb Q}^\times$ satisfies $\alpha x = y$ (`NO_ALGEBRAIC_TRANSFER_STATION`), since $\tau^{J-K} = \alpha m / n \in \overline{\mathbb Q}$ contradicts transcendence.
+   Coordinate transfer exists exclusively via the transcendental grade unit multiplier $\tau^{J-K}$.
+6. **Multiplicative Grade Conservation vs. Additive Rigidity**:
+   - Additive combinations across distinct grades cannot cancel over $\overline{\mathbb Q}$.
+   - Multiplicative combinations add grades: $\deg(xy) = \deg x + \deg y$.
+   - Opposite grades cancel to grade zero: $(p\tau^K)(q\tau^{-K}) = pq \in \mathbb Z = R_0$. Transcendence cancels multiplicatively.
+   - Total-grade-zero monomial rule: $M = a \prod_{j=1}^r (p_j \tau^{K_j})^{e_j} \in \overline{\mathbb Q} \iff \sum_{j=1}^r e_j K_j = 0$ (`TOTAL_GRADE_ZERO_ALGEBRAICITY`).
+7. **Canonical Arithmetic TC Grid Zeta vs Auxiliary Analytic Pullback**:
+   - **Canonical Arithmetic Grid Zeta**: For $L_K^+ = \{n\tau^K : n \ge 1\}$,
+     \[
+     \boxed{Z_K^{\mathrm{grid}}(s) = \sum_{n=1}^\infty (n\tau^K)^{-s} = \tau^{-Ks} \zeta(s).}
+     \]
+     Because $\tau^{-Ks} \ne 0$, $Z_K^{\mathrm{grid}}(s) = 0 \iff \zeta(s) = 0$. Zeros do not move under arithmetic grading.
+   - **Auxiliary Analytic Pullback**: $Z_K^{\mathrm{pull}}(s) = \zeta(\tau^{-K} s)$ is an auxiliary coordinate dilation moving zeros to $\tau^K \rho$ and prime stations to $p^{\tau^{-K}}$.
+   - Foundational classification: `ARITHMETIC_TC_IS_GRID_UNIT_TWIST`.
+8. **Cross-Grade Constraint Audit**:
+   No natural zeta identity equates a finite cross-grade expression to an algebraic number. Bilateral products $(p\tau^K)(p\tau^{-K}) = p^2$ and $|\eta_\rho(K)| \cdot |\eta_\rho(K)|^{-1} = 1$ balance total grade to zero identically.
+   Constraint classification: `NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL`.
+

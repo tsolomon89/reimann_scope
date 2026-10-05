@@ -1,0 +1,114 @@
+{
+  "artifact_name": "tc_faithful_graded_prime_algebra",
+  "task_id": "TASK-TC-022",
+  "schema_version": "1.0.0",
+  "timestamp": "2026-10-05T09:10:00Z",
+  "laurent_ring_definition": {
+    "symbol": "R_tau",
+    "definition": "Z[tau, tau^-1] subset R",
+    "base": "tau = 2*pi",
+    "formal_isomorphism": "ev_tau: Z[X, X^-1] -> R_tau, X |-> tau",
+    "injectivity_status": "PROVED_INJECTIVE_BY_LINDEMANN_TRANSCENDENCE",
+    "ring_isomorphism": "R_tau \\cong Z[X, X^-1]"
+  },
+  "grading_structure": {
+    "grading_group": "Z",
+    "direct_sum_decomposition": "R_tau = \\bigoplus_{K in Z} Z tau^K",
+    "finite_linear_independence": {
+      "theorem_label": "FINITE_CROSS_GRADE_LINEAR_INDEPENDENCE",
+      "statement": "For any finite distinct integer grades K_1, ..., K_r and algebraic coefficients a_1, ..., a_r in Q_bar, sum_{j=1}^r a_j tau^{K_j} = 0 implies a_1 = ... = a_r = 0",
+      "evidence_scope": "EXACT_ALGEBRAIC_PROOF_LINDEMANN"
+    },
+    "grade_zero_algebraicity_selection": {
+      "theorem_label": "GRADE_ZERO_ALGEBRAICITY_SELECTION",
+      "statement": "A finite Laurent expression F(X) = sum_{K=-M}^N a_K X^K in Q_bar[X, X^-1] evaluates to an algebraic native value F(tau) in Q_bar if and only if a_K = 0 for all K != 0, so that F(tau) = a_0",
+      "uniqueness": "F(tau) = G(tau) in Q_bar[tau, tau^-1] iff F = G identically"
+    }
+  },
+  "unit_group": {
+    "units": "U(R_tau) = {\\pm tau^K : K in Z}",
+    "algebraic_meaning": "The elements tau^K are the canonical non-trivial units of the TC Laurent ring",
+    "unit_inverse_law": "tau^K * tau^-K = 1 in R_0 = Z"
+  },
+  "graded_prime_classification": {
+    "definition": "p tau^K for rational prime p in P and K in Z",
+    "algebraic_status": "Prime element of R_tau associate to rational prime p",
+    "proof_basis": "R_tau / (p) \\cong F_p[X, X^-1] is an integral domain because F_p is a field; units preserve primality",
+    "associate_relation": "p tau^K ~ p tau^J via unit tau^{J-K} in U(R_tau)",
+    "geometric_status": "Distinct spatial points in R for K != J: same prime referent under distinct grade units"
+  },
+  "grade_lines_and_transfer": {
+    "line_definition": "L_K = {n tau^K : n in Z \\ {0}}",
+    "pairwise_intersection": "L_K \\cap L_J = \\emptyset for K != J; including zero: L_K^0 \\cap L_J^0 = {0}",
+    "algebraic_no_transfer_theorem": {
+      "theorem_label": "NO_ALGEBRAIC_TRANSFER_STATION",
+      "statement": "For x = m tau^K in L_K and y = n tau^J in L_J with m, n in Q_bar^x and K != J, there exists no algebraic scalar alpha in Q_bar^x such that alpha * x = y",
+      "proof_contradiction": "alpha * (m tau^K) = n tau^J implies tau^{J-K} = alpha * m / n in Q_bar, contradicting Lindemann (1882)"
+    },
+    "transcendental_transfer_map": "Exact coordinate bijection exists: x |-> tau^{J-K} x from L_K to L_J via transcendental grade unit multiplier"
+  },
+  "unit_metric_and_staircase": {
+    "unit_metric": "d_K(x, y) = |x - y| / tau^K",
+    "integer_distance_recovery": "d_K(m tau^K, n tau^K) = |m - n|",
+    "prime_gap_invariance": "(p_{r+1} tau^K - p_r tau^K) / tau^K = p_{r+1} - p_r",
+    "staircase_definition": "pi_K(x) = pi(x / tau^K)",
+    "staircase_station_invariance": "pi_K(p tau^K) = pi(p) and pi_K(tau^K u) = pi(u)"
+  },
+  "multiplication_and_grade_conservation": {
+    "multiplication_law": "For x in R_K and y in R_J, x * y in R_{K+J}, so deg(x * y) = deg(x) + deg(y)",
+    "opposite_grade_cancellation": "(p tau^K)(q tau^-K) = p * q in R_0 = Z; tau^K * tau^-K = 1",
+    "overclaim_correction": "Transcendence DOES cancel multiplicatively under bilateral pairing; the correct invariant is that distinct grades cannot cancel linearly over algebraic coefficients",
+    "total_grade_zero_monomial_rule": {
+      "theorem_label": "TOTAL_GRADE_ZERO_ALGEBRAICITY",
+      "statement": "A monomial product M = a prod_{j=1}^r (p_j tau^{K_j})^{e_j} with a in Q_bar^x is algebraic if and only if total grade G = sum_{j=1}^r e_j K_j = 0"
+    }
+  },
+  "domain_extensions_and_boundaries": {
+    "rational_grades": {
+      "status": "RATIONAL_GRADE_FAITHFULNESS_PROVED",
+      "mechanism": "Common denominator reduction to N: u = tau^{1/N} is transcendental; distinct integer powers of u are linearly independent over Q_bar"
+    },
+    "irrational_algebraic_grades": {
+      "status": "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC",
+      "rigorous_bound": "dim_Q S_tau <= 1 via Gelfond-Schneider line collinearity; general linear independence across irrational algebraic grades is NOT proved"
+    }
+  },
+  "zeta_grade_families_reconciliation": {
+    "grid_family": {
+      "label": "ARITHMETIC_TC_GRID_FAMILY",
+      "formula": "Z_K^grid(s) = sum_{n=1}^inf (n tau^K)^-s = tau^{-Ks} * zeta(s)",
+      "zero_set": "Z_K^grid(s) = 0 iff zeta(s) = 0 (stationary zero set: zeros DO NOT move)",
+      "euler_product": "Z_K^grid(s) = tau^{-Ks} prod_p (1 - p^-s)^-1",
+      "composite_conservation_note": "A product prod_p (1 - (p tau^K)^-s)^-1 would produce tau^{-K Omega(n) s} instead of tau^{-Ks}; global grade unit tau^K must be factored globally"
+    },
+    "pullback_family": {
+      "label": "AUXILIARY_ANALYTIC_PULLBACK_FAMILY",
+      "formula": "Z_K^pull(s) = zeta(tau^-K s)",
+      "zero_set": "Zeros transported to tau^K rho (moving zeros)",
+      "prime_stations": "Staircase jumps at p^{tau^-K} (dilation u |-> tau^-K u)"
+    },
+    "repository_conflation_audit": {
+      "verdict": "GRID_PULLBACK_CONFLATION_IDENTIFIED_AND_RECONCILED",
+      "resolution": "Z_K^grid(s) = tau^{-Ks} zeta(s) is the canonical arithmetic TC zeta object; Z_K^pull(s) = zeta(tau^-K s) is reclassified as auxiliary analytic coordinate dilation"
+    },
+    "zero_character_interpretation": {
+      "character": "eta_rho(K) = tau^{-K(rho - 1/2)}",
+      "reinterpretation": "Evaluated normalized grade-unit twist factor of Z_K^grid on spectral parameter rho; does not require physical transport of zeros on the arithmetic prime line"
+    }
+  },
+  "cross_grade_constraint_audit": {
+    "candidate_sources_audited": [
+      "Euler product ratios: Z_K^grid(s) / Z_J^grid(s) = tau^{-(K-J)s} vanishes at zeros identically (0/0)",
+      "Logarithmic derivative: introduces log(tau) which is transcendental, violating Q_bar coefficient firewall",
+      "Riemann converter: single-frequency covariance is a conformal change of variables, not a mixed-grade sum",
+      "Bilateral pairing: (p tau^K)(p tau^-K) = p^2 cancels grade trivially; |eta_rho(K)| * |eta_rho(K)|^-1 = tau^{K delta} * tau^{-K delta} = 1 cancels spectral exponent identically"
+    ],
+    "coefficient_field_firewall": "Coefficients in any legal linear relation must be proved to lie in Q_bar; non-algebraic quantities (log p, gamma, rho, log tau) cannot enter",
+    "bilateral_sum_algebraicity": "tau^{K delta} + tau^{-K delta} is transcendental for any rational delta != 0, but no zeta identity equates this sum to an algebraic native value",
+    "constraint_status": "NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE"
+  },
+  "final_classifications": {
+    "foundational_classification": "ARITHMETIC_TC_IS_GRID_UNIT_TWIST",
+    "constraint_classification": "NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL"
+  }
+}

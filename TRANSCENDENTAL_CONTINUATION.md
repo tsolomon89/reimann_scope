@@ -1201,6 +1201,64 @@ Coincidence between dilation and translation on any two distinct primes $p_1 \ne
 Candidate intrinsic prime invariants (prime labels $p$, step increments $\Delta\pi = 1$, Möbius weights $\mu(n)/n$) do not force the converter to equal its translated counterpart.
 Classification: `PURE_CONVERTER_COVARIANCE_AND_ARITHMETIC_REALIZATION_MISMATCH`.
 
+---
+
+# 29. Faithful Tau-Graded Prime Algebra and Cross-Grade Constraint (TASK-TC-022)
+
+### 29.1 Foundational Reclassification: The Graded Ring $R_\tau$
+The arithmetic foundation of TC is the integer-graded subring of $\mathbb R$:
+\[
+\boxed{R_\tau = \mathbb Z[\tau, \tau^{-1}] \subset \mathbb R, \qquad \tau = 2\pi.}
+\]
+Because $\tau$ is transcendental over $\mathbb Q$ by Lindemann (1882), the evaluation homomorphism $\operatorname{ev}_\tau : \mathbb Z[X, X^{-1}] \to R_\tau$ is an injective ring isomorphism:
+\[
+\boxed{R_\tau \cong \mathbb Z[X, X^{-1}].}
+\]
+
+### 29.2 Faithful Grading and Linear Independence
+The canonical polynomial grading transfers isomorphically:
+\[
+\boxed{R_\tau = \bigoplus_{K \in \mathbb Z} \mathbb Z \tau^K.}
+\]
+For any finite set of distinct integer grades $\{K_1, \dots, K_r\} \subset \mathbb Z$ and algebraic coefficients $a_j \in \overline{\mathbb Q}$:
+\[
+\sum_{j=1}^r a_j \tau^{K_j} = 0 \implies a_1 = \dots = a_r = 0 \qquad (\texttt{FINITE\_CROSS\_GRADE\_LINEAR\_INDEPENDENCE}).
+\]
+Distinct integer (and rational) grades cannot cancel linearly over $\overline{\mathbb Q}$.
+
+### 29.3 Grade-Zero Algebraicity Selection Rule
+A finite Laurent expression $F(X) = \sum_{K=-M}^N a_K X^K \in \overline{\mathbb Q}[X, X^{-1}]$ evaluates to an algebraic native value $F(\tau) \in \overline{\mathbb Q}$ if and only if all nonzero-grade components vanish identically:
+\[
+\boxed{F(\tau) \in \overline{\mathbb Q} \iff a_K = 0 \quad \forall K \ne 0 \iff F(\tau) = a_0 \in \overline{\mathbb Q} \qquad (\texttt{GRADE\_ZERO\_ALGEBRAICITY\_SELECTION}).}
+\]
+Decompositions in $R_\tau$ are strictly unique: $F(\tau) = G(\tau) \iff F = G$.
+
+### 29.4 Units and Graded Primes
+- **Unit Group**: $U(R_\tau) = \{\pm \tau^K : K \in \mathbb Z\}$. The elements $\tau^K$ are the non-trivial units of $R_\tau$.
+- **Prime Elements**: For any rational prime $p \in \mathbb P$, $R_\tau / (p) \cong \mathbb F_p[X, X^{-1}]$ is an integral domain; thus $p$ is a prime element of $R_\tau$.
+- **Graded Prime Associates**: $p\tau^K = (\tau^K) p$ is an associate of $p$ in $R_\tau$, and therefore a prime element of $R_\tau$.
+- **Prime System $P_K$**: $P_K = \{p\tau^K : p \in \mathbb P\}$ forms the grade-$K$ homogeneous representative system of ordinary prime associate classes.
+- **No Algebraic Transfer Station**: For $x \in L_K$ and $y \in L_J$ ($K \ne J$), no algebraic scalar $\alpha \in \overline{\mathbb Q}^\times$ satisfies $\alpha x = y$ (`NO_ALGEBRAIC_TRANSFER_STATION`). Transfer is achieved solely via the transcendental grade unit $\tau^{J-K}$.
+
+### 29.5 Multiplicative Grade Conservation vs. Additive Rigidity
+- While distinct grades cannot cancel linearly over $\overline{\mathbb Q}$, multiplicative grades add: $\deg(xy) = \deg x + \deg y$.
+- Opposite grades cancel to grade zero: $(p\tau^K)(q\tau^{-K}) = pq \in \mathbb Z = R_0$. Transcendence cancels multiplicatively.
+- Monomial selection rule: $M = a \prod_{j=1}^r (p_j \tau^{K_j})^{e_j} \in \overline{\mathbb Q} \iff \sum_{j=1}^r e_j K_j = 0$ (`TOTAL_GRADE_ZERO_ALGEBRAICITY`).
+
+### 29.6 The Canonical Arithmetic TC Grid Zeta Family
+- **Grid Dirichlet Series**: For the positive integer lattice $L_K^+ = \{n\tau^K : n \ge 1\}$,
+  \[
+  \boxed{Z_K^{\mathrm{grid}}(s) = \sum_{n=1}^\infty (n\tau^K)^{-s} = \tau^{-Ks} \zeta(s).}
+  \]
+- **Zero Set Invariance**: $Z_K^{\mathrm{grid}}(s) = 0 \iff \zeta(s) = 0$. Zeros do not move under arithmetic grading.
+- **Euler Product**: $Z_K^{\mathrm{grid}}(s) = \tau^{-Ks} \prod_p (1 - p^{-s})^{-1}$. (Factoring $\prod_p (1 - (p\tau^K)^{-s})^{-1}$ would yield $\tau^{-K\Omega(n)s} \ne \tau^{-Ks}$).
+- **Foundational Status**: `ARITHMETIC_TC_IS_GRID_UNIT_TWIST`. The analytic pullback $Z_K^{\mathrm{pull}}(s) = \zeta(\tau^{-K} s)$ is reclassified as an auxiliary coordinate dilation.
+
+### 29.7 Cross-Grade Constraint Audit
+No natural zeta identity equates a finite cross-grade expression to an algebraic number. Bilateral products $(p\tau^K)(p\tau^{-K}) = p^2$ and $|\eta_\rho(K)| \cdot |\eta_\rho(K)|^{-1} = 1$ balance total grade to zero identically.
+Constraint classification: `NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL`.
+
+
 
 
 

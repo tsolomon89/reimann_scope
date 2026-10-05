@@ -45,6 +45,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/GradeCharacter.lean",
     "formal/RiemannScope/TranscendenceRigidity.lean",
     "formal/RiemannScope/RiemannConverter.lean",
+    "formal/RiemannScope/FaithfulGradedAlgebra.lean",
 ]
 
 
