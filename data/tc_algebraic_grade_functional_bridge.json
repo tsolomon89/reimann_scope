@@ -85,7 +85,7 @@
   },
   "three_grade_experiment": {
     "setup": "K0, K1, K2 in A_R with (K1-K0)/(K2-K0) not in Q",
-    "outcome": "NO_TWO_DIRECTION_ZETA_TRANSFER",
+    "outcome": "NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND",
     "reason": "At nontrivial zeros, values vanish identically (0=0), and local zero germ ratios involve transcendental non-algebraic factors without independent algebraic relations"
   },
   "final_classifications": {

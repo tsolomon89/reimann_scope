@@ -3766,6 +3766,39 @@ $P_{\mathcal F}$ implies $\neg E_{\mathcal F}$, which does not refute $D_{\mathc
    - $Z_0(1-2n) = \zeta(1-2n) = -\frac{B_{2n}}{2n} \in \mathbb Q$.
    - Exact cross-grade relation: $Z_1(2n) = \frac{(-1)^n}{2(2n-1)!} Z_0(1-2n)$.
    - The functional equation transfers $\tau$-periods across reflection $s \leftrightarrow 1-s$, narrowing the TASK-TC-022 ledger classification to `SPECIAL_VALUE_GRADE_TRANSFER_ONLY`.
-   - At nontrivial zeros, values vanish identically and local germs supply no algebraic relation (`NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`, `NO_TWO_DIRECTION_ZETA_TRANSFER`).
+   - At nontrivial zeros, values vanish identically and local germs supply no algebraic relation (`NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`, `NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND` within audited structures).
+
+---
+
+## 41. Local Zero Germ, Prime-Side Unit Change, and Intrinsic Grade Invariance (TASK-TC-024)
+
+1. **Local Zero Germ Transformation**:
+   - $c_{\Xi_K}(\rho) = \tau^{-K(\rho - 1/2)} c_\xi(\rho)$.
+   - Modulus ratio: $|c_{\Xi_K}(\rho)/c_{\Xi_J}(\rho)| = \tau^{-(K-J)\delta}$.
+   - Logarithmic difference: $\log|c_{\Xi_K}(\rho)| - \log|c_{\Xi_J}(\rho)| = -(K-J)\delta\log\tau$.
+
+2. **Generic Entire-Function Control**:
+   - For arbitrary holomorphic $F(s)$ and $F_K(s) = e^{-KL(s-s_0)}F(s)$, $c_{F_K}(\rho) = e^{-KL(\rho-s_0)} c_F(\rho)$.
+   - Proved to be `GENERIC_NONVANISHING_PREFACTOR_COVARIANCE`, not zeta-specific.
+
+3. **Hadamard Factorization**:
+   - Zero divisor and canonical product $\prod_\rho E(s/\rho)$ are invariant.
+   - Only linear exponent $B \mapsto B - K\log\tau$ shifts (`NORMALIZATION_DEPENDENT`).
+
+4. **Unit-Normalized Germ Invariance**:
+   - $\widehat{c}_K(\rho) = \tau^{K(\rho - 1/2)} c_{\Xi_K}(\rho) = c_\xi(\rho)$ is identically grade-invariant.
+   - Normalization removes the $\tau^{-K\delta}$ modulus variation completely.
+
+5. **Prime-Side vs Grid-Zeta Logarithmic Derivative**:
+   - $-Z_K'/Z_K(s) = K\log\tau - \zeta'/\zeta(s)$ is an additive constant shift.
+   - Geometric prime measure $\mu_K^{\text{geom}}$ has Laplace transform $\tau^{-Ks}(-\zeta'/\zeta(s))$.
+   - Explicit formula residues are discrete integers (multiplicities), independent of $|c_\xi(\rho)|$.
+
+6. **Unitarity & Weil Positivity**:
+   - Off-critical zero modes $e^{(\rho - 1/2)x} \notin L^2(\mathbb{R})$; translation unitarity does not force $\delta = 0$.
+   - Reductio to positive translation kernel is `RH_EQUIVALENT_REFORMULATION`.
+
+7. **Principal Classification**:
+   - `LOCAL_GERM_IS_GENERIC_GAUGE_DATA`. The local zero germ route is formally FROZEN.
 
 

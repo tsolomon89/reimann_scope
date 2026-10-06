@@ -1318,7 +1318,49 @@ Define:
   \boxed{Z_1(2n) = \frac{(-1)^n}{2(2n-1)!} Z_0(1-2n).}
   \]
 - **Reconciliation**: The TASK-TC-022 conclusion ("no cross-grade algebraic relation") is narrowed. The functional equation transfers $\tau$-periods across reflection $s \leftrightarrow 1-s$, yielding authentic rational-coefficient cross-grade relations at special integer points (`SPECIAL_VALUE_GRADE_TRANSFER_ONLY`).
-- At nontrivial zeros, values vanish identically ($0=0$) and local germs do not yield an algebraic constraint (`NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`, `NO_TWO_DIRECTION_ZETA_TRANSFER`).
+- At nontrivial zeros, values vanish identically ($0=0$) and local germs do not yield an algebraic constraint (`NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`, `NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND` within audited structures).
+
+---
+
+## 31. Local Zero Germ, Prime-Side Unit Change, and Intrinsic Grade Invariance (TASK-TC-024)
+
+### 31.1 Canonical Local Zero Germ and Transformation Law
+- **Local Germ Definition**: For holomorphic $F(s)$ with zero of order $m \ge 1$ at $\rho$:
+  \[
+  \boxed{c_F(\rho) = \frac{F^{(m)}(\rho)}{m!}.}
+  \]
+- **Centered Completed Family**: For $\Xi_K(s) = \tau^{-K(s - 1/2)}\xi(s)$ ($K \in \mathbb{A}_{\mathbb{R}}$, $\tau = 2\pi$):
+  \[
+  \boxed{c_{\Xi_K}(\rho) = \tau^{-K(\rho - 1/2)} c_\xi(\rho).}
+  \]
+- **Modulus Ratio & Log Difference**:
+  \[
+  \boxed{\left| \frac{c_{\Xi_K}(\rho)}{c_{\Xi_J}(\rho)} \right| = \tau^{-(K-J)\delta}, \qquad \log \frac{|c_{\Xi_K}(\rho)|}{|c_{\Xi_J}(\rho)|} = -(K-J)\delta\log\tau.}
+  \]
+
+### 31.2 Generic Entire-Function Prefactor Control
+- **Generic Theorem**: For any holomorphic function $F(s)$ and $F_K(s) = e^{-KL(s - s_0)} F(s)$, the leading coefficient scales by $e^{-KL(\rho - s_0)}$, and $|c_{F_K}(\rho)/c_{F_J}(\rho)| = e^{-(K-J)L\operatorname{Re}(\rho - s_0)}$.
+- **Classification**: `GENERIC_NONVANISHING_PREFACTOR_COVARIANCE`. The local germ transformation is not zeta-specific; it holds identically for any holomorphic function multiplied by a non-vanishing exponential factor.
+
+### 31.3 Hadamard Factorization and Normalization Invariants
+- **Zero Divisor Invariance**: Multiplying by $\tau^{-K(s - 1/2)}$ leaves the zero divisor $\{\rho, m_\rho\}$ and canonical Weierstrass product $\prod_\rho E(s/\rho)$ completely unchanged.
+- **Prefactor Ambiguity**: Only the non-vanishing exponential prefactor changes ($A \mapsto A + \frac{1}{2}KL, B \mapsto B - KL$). Local germ magnitude variation is the standard normalization ambiguity of multiplying an entire function by $e^{as + b}$.
+
+### 31.4 Unit-Normalized Germ and Gauge Freedom
+- **Unit-Normalized Germ**:
+  \[
+  \boxed{\widehat{c}_K(\rho) = \tau^{K(\rho - 1/2)} c_{\Xi_K}(\rho) = c_\xi(\rho).}
+  \]
+  Identically grade-invariant for all $K \in \mathbb{A}_{\mathbb{R}}$.
+- **Detector Status**: Normalization removes the $\tau^{-K\delta}$ modulus variation completely. The variation was measuring coordinate unit weight $w = -(\rho - 1/2)$, not an arithmetic inconsistency.
+
+### 31.5 Logarithmic Derivatives and Prime-Side Geometry
+- **Grid Zeta Log Derivative**: $-\frac{Z_K'}{Z_K}(s) = K\log\tau - \frac{\zeta'}{\zeta}(s) = K\log\tau + \sum_n \Lambda(n) n^{-s}$.
+- **Geometric Prime Measure**: $\mu_K^{\text{geom}} = \sum_n \Lambda(n) \delta_{\log n + K\log\tau}$ has Laplace transform $\tau^{-Ks}(-\zeta'/\zeta(s))$, distinct from the additive shift of the grid zeta.
+- **Explicit Formula Residue**: Explicit formulas measure zero locations and multiplicities via residues $\operatorname{Res}(F'/F) = m$, independent of derivative magnitudes $|c_\xi(\rho)|$.
+
+### 31.6 Governing Conclusion
+- **Principal Classification**: `LOCAL_GERM_IS_GENERIC_GAUGE_DATA`. The local zero germ magnitude variation is entirely coordinate/normalization covariance. The local-germ route is formally frozen.
 
 
 

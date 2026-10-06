@@ -10,7 +10,7 @@
 - **Zeta-Bridge Classification**: `SPECIAL_VALUE_GRADE_TRANSFER_ONLY` and `NO_NONTRIVIAL_ZERO_GRADE_BRIDGE`
   - Exact rational-coefficient cross-grade relation exists at reflected integer points: $Z_1(2n) = \frac{(-1)^n}{2(2n-1)!} Z_0(1-2n)$.
   - At nontrivial zeros $\rho$, values vanish identically at all grades, and local germ ratios $\tau^{-(K-J)(\rho-1/2)}$ do not yield an algebraic constraint.
-- **Three-Grade Experiment**: `NO_TWO_DIRECTION_ZETA_TRANSFER`
+- **Three-Grade Experiment**: `NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND` (within audited structures; no impossibility theorem claimed)
 - **Lean 4 Formalization**: Clean build with 0 sorries, 362 total project theorems (+14 new theorems in `formal/RiemannScope/ExceptionalTransfer.lean`).
 
 ---
@@ -298,7 +298,7 @@ At nontrivial zeros $\rho$:
 - Local zero germs satisfy $\Xi_K^{(m)}(\rho)/\Xi_J^{(m)}(\rho) = \tau^{-(K-J)(\rho-1/2)}$.
 - For three grades $K_0, K_1, K_2$ with $\mathbb{Q}$-independent differences, at most one difference can belong to $S_\tau$.
 - However, zero germs do not produce an independent algebraic equation forcing transfer along both directions.
-- Classification: `NO_NONTRIVIAL_ZERO_GRADE_BRIDGE` and `NO_TWO_DIRECTION_ZETA_TRANSFER`.
+- Classification: `NO_NONTRIVIAL_ZERO_GRADE_BRIDGE` and `NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND` (within audited structures; no impossibility theorem claimed).
 
 ### V. Earliest Remaining Theorems
 

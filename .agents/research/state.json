@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "ALGEBRAIC_GRADE_FUNCTIONAL_BRIDGE",
+  "current_phase": "LOCAL_GERM_PRIME_SIDE_INVARIANCE",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -199,10 +199,32 @@
         "Author docs/reviews/TC_ALGEBRAIC_GRADE_FUNCTIONAL_BRIDGE.md and data/tc_algebraic_grade_functional_bridge.json"
       ],
       "completion_note": "TASK-TC-023 completed: Full canonical grade domain restored to A_R; S_tau proved Q-vector space; dim_Q S_tau <= 1 proved from Gelfond-Schneider (ONE_EXCEPTIONAL_Q_DIRECTION_ONLY); exact transfer criterion and prime-grid collision uniqueness proved; literature audit confirmed (2*pi)^alpha transcendence is open; grid zeta zero set invariance proved; two-grade functional equation and centered reflection derived; local zero germ scaling classified; Euler-Bernoulli special value relation proved; ledger reconciled (SPECIAL_VALUE_GRADE_TRANSFER_ONLY, NO_NONTRIVIAL_ZERO_GRADE_BRIDGE); Lean 4 formalization compiled (362 theorems, 0 sorry); 15/15 unit tests passing."
+    },
+    "track_12_local_germ_and_prime_side_invariance": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Audit local zero germ transformation c_{Xi_K}(rho) = tau^{-K(rho - 1/2)} c_xi(rho) and classify generic-prefactor covariance",
+        "Prove Hadamard product invariance: canonical Weierstrass factor unchanged; linear exponent shifts B -> B - K log tau",
+        "Distinguish zero-divisor invariants (zero locations, multiplicity m, log-derivative residue m) from normalization-dependent quantities",
+        "Derive grid-zeta log derivative -Z_K'/Z_K(s) = K log tau + sum_n Lambda(n) n^{-s}; contrast additive K log tau with multiplicative prime translation",
+        "Audit geometric prime station measure vs Euler product measure (no Euler product over p tau^K)",
+        "Analyze completed log derivative Xi_K'/Xi_K(s) at zeros: residue m is grade-invariant; regularized constant shifts h_{rho, K} = h_rho - K log tau",
+        "Derive unit-normalized germ hat{c}_K(rho) = tau^{K(rho - 1/2)} c_{Xi_K}(rho) = c_xi(rho); prove normalization cancels tau^{-K delta} variation",
+        "Audit candidate dimensionless invariants (reflected pairs, conjugate quartets, cross-ratios); confirm all invariants either lose delta or are normalization-dependent",
+        "Prove reflected germ identity c_{Xi_K}(rho) = (-1)^m c_{Xi_{-K}}(1-rho) and opposite-grade product cancellation",
+        "Audit prime-side explicit formula: zeros enter via log-derivative residues -1, independent of derivative magnitude |xi'(rho)|",
+        "Evaluate log-grade translation representation and unitary action on L^2(R); prove off-critical modes e^{(delta + i gamma)x} are non-unitary and not in L^2",
+        "Classify translation spectral bridge as RH_EQUIVALENT_REFORMULATION (Weil/Herglotz equivalence without unconditional spectral membership)",
+        "Correct epistemic overstatements from TASK-TC-023: NO_TWO_DIRECTION_ZETA_TRANSFER -> NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND",
+        "Compile Lean 4 formalization formal/RiemannScope/LocalGermInvariance.lean (378 theorems, 0 sorry) and verify 16 unit tests",
+        "Author docs/reviews/TC_LOCAL_GERM_PRIME_SIDE_INVARIANCE.md and data/tc_local_germ_prime_side_invariance.json"
+      ],
+      "completion_note": "TASK-TC-024 completed: Local zero germ modulus variation tau^{-(K-J)delta} proved to be generic nonvanishing prefactor covariance; zero divisor and canonical Hadamard product invariant; unit-normalized germ hat{c}_K(rho) = c_xi(rho) is identically grade-invariant, removing the delta detector; explicit formulas independent of derivative values |xi'(rho)|; translation representation on L^2(R) excludes off-critical modes e^{(delta+i gamma)x}; bridge to RH reduces to Weil/Herglotz positivity without supplying missing hypotheses; epistemic overstatements corrected to NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND; Lean 4 formalization verified (378 theorems, 0 errors, 0 sorries); 16/16 unit tests passing. Principal classification: LOCAL_GERM_IS_GENERIC_GAUGE_DATA (route frozen)."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_local_germ_prime_side_invariance.json",
       "data/tc_algebraic_grade_functional_bridge.json",
       "data/tc_faithful_graded_prime_algebra.json",
       "data/tc_riemann_converter_grade_compatibility.json",

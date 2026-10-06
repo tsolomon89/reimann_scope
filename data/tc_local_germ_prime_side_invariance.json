@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "TASK-TC-024",
+  "title": "Local Zero Germ, Prime-Side Unit Change, and Intrinsic Grade Invariance",
+  "timestamp": "2026-10-06T10:00:00Z",
+  "canonical_definitions": {
+    "grid_zeta": "Z_K(s) = tau^{-Ks} * zeta(s), tau = 2*pi, K in A_R",
+    "centered_completed_grid": "Xi_K(s) = tau^{-K(s - 1/2)} * xi(s)",
+    "local_zero_germ": "c_F(rho) = F^{(m)}(rho) / m!, where m = ord_{s=rho}(F)",
+    "unit_normalized_germ": "hat_c_K(rho) = tau^{K(rho - 1/2)} * c_{Xi_K}(rho)"
+  },
+  "local_germ_transformation": {
+    "leading_germ_law": "c_{Xi_K}(rho) = tau^{-K(rho - 1/2)} * c_xi(rho)",
+    "modulus_ratio": "|c_{Xi_K}(rho) / c_{Xi_J}(rho)| = tau^{-(K - J)*delta}",
+    "log_finite_difference": "log |c_{Xi_K}(rho)| - log |c_{Xi_J}(rho)| = -(K - J)*delta*log(tau)",
+    "conformal_scaling_weight": "w = -(rho - 1/2) = -delta - i*gamma"
+  },
+  "generic_prefactor_control": {
+    "setup": "F_K(s) = exp(-K*L*(s - s_0)) * F(s) for arbitrary holomorphic F",
+    "theorem": "c_{F_K}(rho) = exp(-K*L*(rho - s_0)) * c_F(rho)",
+    "modulus_ratio": "|c_{F_K}(rho) / c_{F_J}(rho)| = exp(-(K - J)*L*Re(rho - s_0))",
+    "classification": "GENERIC_NONVANISHING_PREFACTOR_COVARIANCE",
+    "is_zeta_specific": false
+  },
+  "hadamard_factorization_audit": {
+    "xi_factorization": "xi(s) = exp(A + B*s) * prod_rho E(s / rho)",
+    "Xi_K_factorization": "Xi_K(s) = exp((A + 0.5*K*L) + (B - K*L)*s) * prod_rho E(s / rho)",
+    "zero_divisor_status": "ZERO_DIVISOR_INVARIANT",
+    "canonical_product_status": "ZERO_DIVISOR_INVARIANT",
+    "linear_hadamard_shift": "B |-> B - K*log(tau)",
+    "exponential_prefactor_status": "NORMALIZATION_DEPENDENT"
+  },
+  "logarithmic_derivative_analysis": {
+    "grid_zeta_shift": "-Z_K'/Z_K(s) = K*log(tau) - zeta'/zeta(s)",
+    "interpretation_of_K_log_tau": "Additive constant baseline reflecting global grid prefactor; does not shift individual prime stations",
+    "completed_shift": "Xi_K'/Xi_K(s) = -K*log(tau) + xi'/xi(s)",
+    "residue_at_zero": "Res_{s=rho}(Xi_K'/Xi_K) = m (grade-independent, ZERO_DIVISOR_INVARIANT)",
+    "regularized_finite_part": "h_{rho, K} = h_rho - K*log(tau) (GRADE_COVARIANT, independent of rho and delta)"
+  },
+  "prime_side_structural_audit": {
+    "geometric_station_measure": "mu_K^{geom} = sum_n Lambda(n) delta_{log n + K*log(tau)}",
+    "geometric_laplace_transform": "int e^{-sx} dmu_K^{geom}(x) = tau^{-Ks} * (-zeta'/zeta(s))",
+    "distinction_from_grid_zeta": "Geometric prime measure translates prime stations individually (multiplicative tau^{-Ks} on Laplace transform); grid zeta applies one global unit to overall sum (additive K*log(tau) on log derivative)",
+    "naive_shifted_euler_product": "prod_p (1 - (p*tau^K)^{-s})^{-1} assigns weight tau^{-K*Omega(n)*s}, violating global grade K (FIREWALL_CONFIRMED)",
+    "explicit_formula_derivative_dependence": false,
+    "explicit_formula_zero_input": "Zero locations and multiplicities m_rho via residues, independent of |xi'(rho)|",
+    "exact_prime_side_germ_formula_exists": false
+  },
+  "unit_normalized_germ_analysis": {
+    "definition": "hat_c_K(rho) = tau^{K(rho - 1/2)} * c_{Xi_K}(rho)",
+    "evaluation": "hat_c_K(rho) = c_xi(rho) for all K in A_R",
+    "grade_invariance": true,
+    "delta_detector_removed": true,
+    "physical_interpretation": "Normalization removes the coordinate unit weight tau^K; detector was measuring unit scaling, not arithmetic inconsistency"
+  },
+  "translation_unitarity_audit": {
+    "real_translation_operator": "(T_a f)(x) = f(x - a) is unitary on L^2(R, dx)",
+    "centered_zero_mode": "f_rho(x) = exp((rho - 1/2)*x) = exp((delta + i*gamma)*x)",
+    "zero_mode_L2_membership": false,
+    "reason": "For delta != 0, f_rho grows exponentially as x -> +-infty and does not belong to L^2(R)",
+    "unitarity_argument_valid": false,
+    "reduction_to_weil_positivity": true,
+    "classification": "RH_EQUIVALENT_REFORMULATION"
+  },
+  "candidate_intrinsic_invariants": [
+    {
+      "observable": "zero_location_rho",
+      "grade_invariant": true,
+      "normalization_invariant": true,
+      "delta_sensitive": false,
+      "classification": "GRADE_INVARIANT_NO_DELTA"
+    },
+    {
+      "observable": "zero_multiplicity_m",
+      "grade_invariant": true,
+      "normalization_invariant": true,
+      "delta_sensitive": false,
+      "classification": "GRADE_INVARIANT_NO_DELTA"
+    },
+    {
+      "observable": "log_derivative_residue",
+      "grade_invariant": true,
+      "normalization_invariant": true,
+      "delta_sensitive": false,
+      "classification": "GRADE_INVARIANT_NO_DELTA"
+    },
+    {
+      "observable": "unit_normalized_germ_hat_c_K",
+      "grade_invariant": true,
+      "normalization_invariant": true,
+      "delta_sensitive": false,
+      "classification": "GRADE_INVARIANT_NO_DELTA"
+    },
+    {
+      "observable": "reflected_germ_product_c_Xi_K(rho)*c_Xi_K(1-rho)",
+      "grade_invariant": true,
+      "normalization_invariant": false,
+      "delta_sensitive": false,
+      "classification": "GRADE_INVARIANT_NO_DELTA"
+    },
+    {
+      "observable": "bilateral_character_product",
+      "grade_invariant": true,
+      "normalization_invariant": true,
+      "delta_sensitive": false,
+      "classification": "GRADE_INVARIANT_NO_DELTA"
+    },
+    {
+      "observable": "raw_local_germ_modulus",
+      "grade_invariant": false,
+      "normalization_invariant": false,
+      "delta_sensitive": true,
+      "classification": "DELTA_SENSITIVE_BUT_NORMALIZATION_DEPENDENT"
+    },
+    {
+      "observable": "germ_modulus_ratio",
+      "grade_invariant": false,
+      "normalization_invariant": false,
+      "delta_sensitive": true,
+      "classification": "DELTA_SENSITIVE_BUT_NORMALIZATION_DEPENDENT"
+    },
+    {
+      "observable": "grade_character_eta_rho",
+      "grade_invariant": false,
+      "normalization_invariant": false,
+      "delta_sensitive": true,
+      "classification": "DELTA_SENSITIVE_BUT_NORMALIZATION_DEPENDENT"
+    },
+    {
+      "observable": "non_unitarity_defect_B_rho",
+      "grade_invariant": false,
+      "normalization_invariant": false,
+      "delta_sensitive": true,
+      "classification": "DELTA_SENSITIVE_BUT_NORMALIZATION_DEPENDENT"
+    }
+  ],
+  "epistemic_scoping_correction": {
+    "prior_label": "NO_TWO_DIRECTION_ZETA_TRANSFER",
+    "corrected_label": "NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND",
+    "scope": "Audited structures only; no impossibility theorem claimed",
+    "updated_files": [
+      "TRANSCENDENTAL_CONTINUATION.md",
+      "RESEARCH_LEDGER.md",
+      "RESEARCH_HYPOTHESIS.md",
+      "MATH_CONTRACT.md",
+      "docs/reviews/TC_ALGEBRAIC_GRADE_FUNCTIONAL_BRIDGE.md",
+      "data/tc_algebraic_grade_functional_bridge.json",
+      ".agents/research/queue.json"
+    ]
+  },
+  "final_classification": "LOCAL_GERM_IS_GENERIC_GAUGE_DATA",
+  "status_of_local_germ_route": "FROZEN",
+  "next_theorem": "Investigate whether discrete prime-power stations p^k * tau^K in the faithful graded algebra R_tau = Z[tau, tau^-1] impose cross-grade constraints on global trace invariants without passing through local zero derivatives or gauge prefactors."
+}

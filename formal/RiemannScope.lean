@@ -21,4 +21,5 @@ import RiemannScope.TranscendenceRigidity
 import RiemannScope.RiemannConverter
 import RiemannScope.FaithfulGradedAlgebra
 import RiemannScope.ExceptionalTransfer
+import RiemannScope.LocalGermInvariance
 
