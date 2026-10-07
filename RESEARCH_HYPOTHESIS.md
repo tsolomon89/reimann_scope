@@ -3801,4 +3801,64 @@ $P_{\mathcal F}$ implies $\neg E_{\mathcal F}$, which does not refute $D_{\mathc
 7. **Principal Classification**:
    - `LOCAL_GERM_IS_GENERIC_GAUGE_DATA`. The local zero germ route is formally FROZEN.
 
+---
+
+## 42. Intrinsic Grade-Fiber Arithmetic, Ambient Realization, and the Four-Strata TC Foundation (TASK-TC-025)
+
+### 42.1 Abstract Grade Fiber and Transported Arithmetic
+1. **Tagged Fiber Specification**:
+   - For each algebraic grade $K \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$, arithmetic internal to the unit $\tau^K$ is formalized by the tagged fiber:
+     $$\mathcal{F}_K = \{K\} \times \mathbb{Z} = \{(K, n) : n \in \mathbb{Z}\}.$$
+   - Internal operations: $(K, m) \oplus_K (K, n) = (K, m + n)$ and $(K, m) \odot_K (K, n) = (K, mn)$.
+   - Multiplicative unit: $1_K = (K, 1)$, realizing as $\Phi_K(1_K) = \tau^K$.
+   - Realized multiplication: $(m\tau^K) \odot_K (n\tau^K) = mn\tau^K = \frac{(m\tau^K)(n\tau^K)}{\tau^K}$.
+2. **Ring Isomorphism to Integers**:
+   - $\varphi_K: \mathbb{Z} \xrightarrow{\sim} (\mathcal{F}_K, \oplus_K, \odot_K)$ is a canonical ring isomorphism.
+   - On the realized line: $(L_K, +, \odot_K) \cong \mathbb{Z}$.
+   - Holds for any real base $b > 0$ (`GENERIC_BASE_FIBER_INVARIANCE`).
+3. **Canonical Transfer Functoriality**:
+   - $T_{J \leftarrow K}: (K, n) \mapsto (J, n)$ is a ring isomorphism.
+   - $T_{K \leftarrow K} = \operatorname{id}$, $T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}$.
+   - Coordinate scaling: $\Phi_J(T_{J \leftarrow K}(x)) = \tau^{J - K}\Phi_K(x)$.
+   - Normalized size $N_K(K, n) = n$ is strictly multiplicative: $N_K(x \odot_K y) = N_K(x) N_K(y)$.
+   - Realized metric $d_K(m\tau^K, n\tau^K) = |m - n|$ is strictly isometric across all grades.
+
+### 42.2 Intrinsic Zeta vs. Ambient Dirichlet Series
+1. **Intrinsic Zeta Function**:
+   - Defined by summing over positive fiber elements using intrinsic normalized size:
+     $$\zeta_K^{\mathrm{int}}(s) = \sum_{n \ge 1} N_K(K, n)^{-s} = \sum_{n \ge 1} n^{-s} = \zeta(s).$$
+   - Strictly grade-invariant for all $K \in \mathbb{A}_{\mathbb{R}}$.
+   - Canonical Euler product: $\prod_{(K, p)} (1 - N_K(K, p)^{-s})^{-1} = \prod_p (1 - p^{-s})^{-1} = \zeta(s)$.
+2. **Ambient-Coordinate Dirichlet Series**:
+   - $Z_K^{\mathrm{amb}}(s) = \sum_{n \ge 1} (n\tau^K)^{-s} = \tau^{-Ks}\zeta(s) = \tau^{-Ks}\zeta_K^{\mathrm{int}}(s)$.
+   - Reclassified as `AMBIENT_COORDINATE_DIRICHLET_SERIES`. The prefactor $\tau^{-Ks}$ is the dimensional realization factor of evaluating dimensionless arithmetic in ambient real coordinates.
+3. **Resolution of TASK-TC-024 Gauge Covariance**:
+   - The completed intrinsic function is $\xi_K^{\mathrm{int}}(s) = \xi(s)$.
+   - The ambient completed family is $\Xi_K^{\mathrm{amb}}(s) = \tau^{-K(s - 1/2)}\xi(s)$.
+   - The local zero germ modulus variation $|c_{\Xi_K}(\rho)/c_{\Xi_J}(\rho)| = \tau^{-(K-J)\delta}$ is the coordinate representation of complex scaling weight $w = -(\rho - 1/2)$.
+   - The unit-normalized local germ $\widehat{c}_K(\rho) = \tau^{K(\rho - 1/2)}c_{\Xi_K}(\rho) = c_\xi(\rho)$ is the intrinsic arithmetic invariant, removing $\tau^{-K\delta}$ completely.
+
+### 42.3 Ambient Group Algebra and Finite Cross-Grade Collapse
+1. **Group Algebra & Realization Map**:
+   - Ambient group algebra: $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ with evaluation homomorphism:
+     $$\operatorname{ev}_\tau: \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{R}, \qquad \sum_{j=1}^r a_j [K_j] \longmapsto \sum_{j=1}^r a_j \tau^{K_j}.$$
+   - Kernel $\ker(\operatorname{ev}_\tau)$ represents all finite algebraic cross-grade additive collapses $\sum a_j \tau^{K_j} = 0$.
+2. **Injectivity Classification**:
+   - Integer grades $\mathbb{Z}$: Injective (Lindemann 1882).
+   - Rational grades $\mathbb{Q}$: Injective on finite support by clearing denominators.
+   - Full algebraic grades $\mathbb{A}_{\mathbb{R}}$: **OPEN** (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
+   - Gelfond–Schneider bounds two-term relations ($\dim_{\mathbb{Q}} S_\tau \le 1$), but multi-term linear independence is unproved.
+3. **Rank-One Support Theorem**:
+   - For $K_j = K_0 + q_j \alpha$ ($q_j \in \mathbb{Q}$), if $\alpha \notin S_\tau$, then $\{\tau^{K_j}\}$ are linearly independent over $\overline{\mathbb{Q}}$.
+
+### 42.4 Four Canonical Strata and Governing Verdict
+1. `INTRINSIC_FIBER_ARITHMETIC`: Tagged fibers $\mathcal{F}_K \cong \mathbb{Z}$, size $N_K$, intrinsic zeta $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$ (transport of structure).
+2. `AMBIENT_REALIZATION`: Realized sets $n\tau^K \in \mathbb{R}$, ambient series $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$, local germ scaling $\tau^{-K(\rho - 1/2)}$ (coordinate scaling).
+3. `AMBIENT_CROSS_GRADE_ALGEBRA`: Group algebra $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ and evaluation $\operatorname{ev}_\tau$, cross-grade multiplication $\star$, opposite-grade cancellation $\tau^K \tau^{-K} = 1$ (ambient cross-grade relations).
+4. `ANALYTIC_PULLBACK`: Auxiliary coordinate dilation $\zeta(\tau^{-K}s)$ with moving zeros $\tau^K \rho$ (auxiliary diagnostic).
+
+- **Principal Classification**: `DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED`
+- **Secondary Classification**: `INTRINSIC_TC_IS_TRANSPORT_OF_STRUCTURE_ONLY`
+
+
 

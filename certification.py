@@ -123,6 +123,8 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/RiemannConverter.lean",
     "formal/RiemannScope/FaithfulGradedAlgebra.lean",
     "formal/RiemannScope/ExceptionalTransfer.lean",
+    "formal/RiemannScope/LocalGermInvariance.lean",
+    "formal/RiemannScope/FiberArithmetic.lean",
 ]
 
 

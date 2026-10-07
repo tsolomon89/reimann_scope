@@ -134,7 +134,7 @@ The explicit formula records **zero locations and multiplicities**, never local 
 
 ### L. Is there an exact prime-side formula for the leading zero germ?
 
-**No.** There is no known or mathematically legitimate prime-side arithmetic formula that reconstructs $c_\xi(\rho) = \xi'(\rho)$ as an isolated arithmetic functional. The prime counting distribution depends only on the zero divisor (locations and multiplicities).
+**No.** No such functional was found in the standard explicit-formula structures audited. The prime counting distribution depends only on the zero divisor (locations and multiplicities), with no dependence on local derivative values.
 
 ---
 
@@ -169,6 +169,7 @@ This is a standard theorem of harmonic analysis (Stone's theorem).
 
 **No.** The centered zero mode is:
 $$f_\rho(x) = e^{(\rho - 1/2)x} = e^{(\delta + i\gamma)x}.$$
+Plane-wave critical-line characters ($\delta = 0$) are also generally not elements of $L^2(\mathbb{R})$; they are generalized unitary Fourier characters. The meaningful distinction is unit modulus versus exponential growth/decay under translation.
 When $\delta \ne 0$, $f_\rho(x)$ grows exponentially as $x \to +\infty$ (if $\delta > 0$) or as $x \to -\infty$ (if $\delta < 0$).
 Therefore:
 $$\boxed{f_\rho \notin L^2(\mathbb{R}).}$$

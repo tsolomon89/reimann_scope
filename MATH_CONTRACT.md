@@ -690,6 +690,18 @@ TASK-TC-020 resolves the interaction between TC grade actions and Masatoshi Suzu
    - Unitarity audit: zero modes $e^{(\rho - 1/2)x} \notin L^2(\mathbb{R})$ for $\delta \ne 0$; translation unitarity does not force $\delta = 0$ (`RH_EQUIVALENT_REFORMULATION`).
    - Principal classification: `LOCAL_GERM_IS_GENERIC_GAUGE_DATA`. Local-germ route toward RH proof is formally FROZEN.
 
+7. **Intrinsic Grade-Fiber Arithmetic, Ambient Realization, and Four Strata (TASK-TC-025)**:
+   - Tagged arithmetic fibers: $\mathcal{F}_K = \{K\} \times \mathbb{Z} \cong \mathbb{Z}$ with internal operations $(K, m) \oplus_K (K, n) = (K, m+n)$, $(K, m) \odot_K (K, n) = (K, mn)$, and unit $1_K = (K, 1)$.
+   - Realized multiplication: $(m\tau^K) \odot_K (n\tau^K) = mn\tau^K = \frac{(m\tau^K)(n\tau^K)}{\tau^K}$. Isomorphism $(L_K, +, \odot_K) \cong \mathbb{Z}$ is base-independent (`GENERIC_BASE_FIBER_INVARIANCE`).
+   - Canonical transfer maps: $T_{J \leftarrow K}: (K, n) \mapsto (J, n)$ are ring isomorphisms with $\Phi_J(T_{J \leftarrow K}(x)) = \tau^{J-K}\Phi_K(x)$.
+   - Normalized size & metric: $N_K(K, n) = n$, $d_K(m\tau^K, n\tau^K) = |m - n|$. Transfer maps are exact isometries.
+   - Intrinsic zeta function: $\zeta_K^{\mathrm{int}}(s) = \sum_{n \ge 1} N_K(K, n)^{-s} = \zeta(s)$ is strictly grade-invariant, with canonical Euler product $\prod_p (1 - p^{-s})^{-1}$.
+   - Ambient Dirichlet series: $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta_K^{\mathrm{int}}(s) = \tau^{-Ks}\zeta(s)$ (`AMBIENT_COORDINATE_DIRICHLET_SERIES`). The prefactor $\tau^{-Ks}$ is the dimensional unit realization factor.
+   - Ambient group algebra: $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ with evaluation $\operatorname{ev}_\tau: \sum a_j [K_j] \mapsto \sum a_j \tau^{K_j}$.
+   - Injectivity status: $\operatorname{ev}_\tau$ is injective on $\mathbb{Z}$ (Lindemann 1882) and $\mathbb{Q}$ (clearing denominators), but open on full $\mathbb{A}_{\mathbb{R}}$ (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
+   - Four canonical strata: `INTRINSIC_FIBER_ARITHMETIC`, `AMBIENT_REALIZATION`, `AMBIENT_CROSS_GRADE_ALGEBRA`, and `ANALYTIC_PULLBACK`.
+   - Principal classification: `DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED` (and `INTRINSIC_TC_IS_TRANSPORT_OF_STRUCTURE_ONLY`).
+
 ---
 
 # 10. Structural versus numerical grade representation

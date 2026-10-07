@@ -1362,6 +1362,74 @@ Define:
 ### 31.6 Governing Conclusion
 - **Principal Classification**: `LOCAL_GERM_IS_GENERIC_GAUGE_DATA`. The local zero germ magnitude variation is entirely coordinate/normalization covariance. The local-germ route is formally frozen.
 
+---
+
+## 32. Intrinsic Grade-Fiber Arithmetic, Ambient Realization, and the Four-Strata TC Foundation (TASK-TC-025)
+
+### 32.1 Tagged Grade Fibers and Internal Arithmetic
+- **Abstract Grade Fiber**: For each $K \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$, arithmetic internal to the unit $\tau^K$ is represented by the tagged fiber:
+  \[
+  \boxed{\mathcal{F}_K = \{K\} \times \mathbb{Z} = \{(K, n) : n \in \mathbb{Z}\}.}
+  \]
+- **Internal Ring Operations**:
+  \[
+  (K, m) \oplus_K (K, n) = (K, m + n), \qquad (K, m) \odot_K (K, n) = (K, mn).
+  \]
+- **Multiplicative Unit**: $1_K = (K, 1)$, with real realization $\Phi_K(1_K) = \tau^K$.
+- **Realized Multiplication**:
+  \[
+  \boxed{(m\tau^K) \odot_K (n\tau^K) = mn\tau^K = \frac{(m\tau^K)(n\tau^K)}{\tau^K}.}
+  \]
+- **Ring Isomorphism to Integers**:
+  \[
+  \boxed{\varphi_K: \mathbb{Z} \xrightarrow{\sim} (\mathcal{F}_K, \oplus_K, \odot_K), \quad n \mapsto (K, n)}
+  \]
+  proves that every grade fiber is literally a copy of $\mathbb{Z}$. On the realized line, $\widetilde{\varphi}_K: n \mapsto n\tau^K$ is an isomorphism $(L_K, +, \odot_K) \cong \mathbb{Z}$.
+- **Base Independence**: The isomorphism $\mathcal{F}_K \cong \mathbb{Z}$ holds for any real base $b > 0$, showing intrinsic arithmetic is completely base-independent (`GENERIC_BASE_FIBER_INVARIANCE`).
+
+### 32.2 Canonical Transfer Maps and Intrinsic Metrics
+- **Functorial Transfer**: $T_{J \leftarrow K}: (K, n) \mapsto (J, n)$ is a canonical ring isomorphism satisfying $T_{K \leftarrow K} = \operatorname{id}$ and $T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}$.
+- **Coordinate Scaling**: $\Phi_J(T_{J \leftarrow K}(x)) = \tau^{J - K}\Phi_K(x)$.
+- **Intrinsic Normalized Size**: $N_K(K, n) = n$, on the realized line $N_K(n\tau^K) = (n\tau^K)/\tau^K = n$. Strictly multiplicative: $N_K(x \odot_K y) = N_K(x) N_K(y)$.
+- **Intrinsic Metric**: $d_K(m\tau^K, n\tau^K) = |m\tau^K - n\tau^K|/\tau^K = |m - n|$. Transfer maps are exact isometries.
+- **Intrinsic Arithmetic Functions**: $\mu_K(K, n) = \mu(n)$, $\Lambda_K(K, n) = \Lambda(n)$, and $\pi_K^{\mathrm{int}}(u) = \pi(u)$ are strictly grade-invariant.
+- **Logarithmic Coordinates**: Intrinsic log $u_K(x) = \log(x/\tau^K) = \log n$ is grade-invariant; ambient log $u_{\mathrm{amb}}(x) = \log x = \log n + K\log\tau$ is translated.
+
+### 32.3 Intrinsic Zeta vs. Ambient Dirichlet Series
+- **Intrinsic Arithmetic Zeta**:
+  \[
+  \boxed{\zeta_K^{\mathrm{int}}(s) = \sum_{n \ge 1} N_K(K, n)^{-s} = \sum_{n \ge 1} n^{-s} = \zeta(s).}
+  \]
+  Euler product: $\prod_{(K, p)} (1 - N_K(K, p)^{-s})^{-1} = \prod_p (1 - p^{-s})^{-1} = \zeta(s)$.
+- **Ambient-Coordinate Dirichlet Series**:
+  \[
+  \boxed{Z_K^{\mathrm{amb}}(s) = \sum_{n \ge 1} (n\tau^K)^{-s} = \tau^{-Ks}\zeta(s) = \tau^{-Ks}\zeta_K^{\mathrm{int}}(s).}
+  \]
+  Classified as `AMBIENT_COORDINATE_DIRICHLET_SERIES`. The prefactor $\tau^{-Ks}$ is the dimensional unit realization factor, not intrinsic arithmetic.
+- **Reconciliation with TASK-TC-024**: The completed intrinsic function is $\xi_K^{\mathrm{int}}(s) = \xi(s)$, while the ambient completed family is $\Xi_K^{\mathrm{amb}}(s) = \tau^{-K(s - 1/2)}\xi(s)$. The local germ scaling is the coordinate manifestation of complex scaling weight $w = -(\rho - 1/2)$, while the normalized germ $\widehat{c}_K(\rho) = c_\xi(\rho)$ is the intrinsic arithmetic invariant.
+
+### 32.4 Ambient Group Algebra and Kernel of Realization
+- **Ambient Group Algebra**: $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ with evaluation homomorphism:
+  \[
+  \operatorname{ev}_\tau: \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{R}, \qquad \sum_{j=1}^r a_j [K_j] \longmapsto \sum_{j=1}^r a_j \tau^{K_j}.
+  \]
+- **Additive Collapses**: $\ker(\operatorname{ev}_\tau)$ represents finite algebraic cross-grade relations $\sum a_j \tau^{K_j} = 0$.
+- **Injectivity Hierarchy**:
+  - Integer grades $\mathbb{Z}$: Injective (Lindemann 1882).
+  - Rational grades $\mathbb{Q}$: Injective on finite support by clearing denominators.
+  - Full algebraic grades $\mathbb{A}_{\mathbb{R}}$: **OPEN** (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`). Gelfond–Schneider bounds two-term relations ($\dim_{\mathbb{Q}} S_\tau \le 1$), but multi-term linear independence is unproved.
+- **Rank-One Support Theorem**: For $K_j = K_0 + q_j \alpha$ ($q_j \in \mathbb{Q}$), if $\alpha \notin S_\tau$, then $\{\tau^{K_j}\}$ are linearly independent over $\overline{\mathbb{Q}}$.
+
+### 32.5 Four Canonical Strata of Transcendental Continuation
+1. `INTRINSIC_FIBER_ARITHMETIC`: Tagged fibers $\mathcal{F}_K \cong \mathbb{Z}$, intrinsic size $N_K$, intrinsic zeta $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$. (Transport of structure only; no $\tau$-dependence).
+2. `AMBIENT_REALIZATION`: Realized points $n\tau^K \in \mathbb{R}$, ambient series $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$, local germ scaling $\tau^{-K(\rho - 1/2)}$. (Unit-dependent coordinate scaling).
+3. `AMBIENT_CROSS_GRADE_ALGEBRA`: Group algebra $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ and evaluation $\operatorname{ev}_\tau$, cross-grade multiplication $(m\tau^K)(n\tau^J) = mn\tau^{K+J}$, cancellation $\tau^K \tau^{-K} = 1$. (Ambient cross-grade relations).
+4. `ANALYTIC_PULLBACK`: Auxiliary coordinate dilation $\zeta(\tau^{-K}s)$ with moving zeros $\tau^K \rho$. (Auxiliary diagnostic).
+
+- **Principal Classification**: `DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED`
+- **Secondary Classification**: `INTRINSIC_TC_IS_TRANSPORT_OF_STRUCTURE_ONLY`
+
+
 
 
 

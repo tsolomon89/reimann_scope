@@ -1,0 +1,138 @@
+{
+  "task_id": "TASK-TC-025",
+  "task_name": "Intrinsic Grade-Fiber Arithmetic, Ambient Realization, and the Correct TC Zeta",
+  "canonical_grade_domain": "A_R = Q_bar cap R",
+  "scale_generator": "tau = 2*pi",
+  "fiber_definition": {
+    "tagged_fiber": "F_K = {K} x Z = {(K, n) : n in Z}",
+    "rationale": "Separates abstract arithmetic referents from real-coordinate embedding to preserve distinction under potential realization collisions"
+  },
+  "internal_operations": {
+    "fiber_addition": "(K, m) oplus_K (K, n) = (K, m + n)",
+    "fiber_multiplication": "(K, m) odot_K (K, n) = (K, mn)",
+    "realized_multiplication": "(m*tau^K) odot_K (n*tau^K) = mn*tau^K = ((m*tau^K)*(n*tau^K)) / tau^K"
+  },
+  "fiber_multiplicative_unit": {
+    "abstract_unit": "1_K = (K, 1)",
+    "real_realization": "Phi_K(1_K) = tau^K"
+  },
+  "ring_isomorphism": {
+    "abstract_fiber_isomorphism": "phi_K: Z -> (F_K, oplus_K, odot_K), n |-> (K, n) is a ring isomorphism",
+    "realized_ring_isomorphism": "widetilde_phi_K: Z -> (L_K, +, odot_K), n |-> n*tau^K is a ring isomorphism",
+    "status": "PROVED"
+  },
+  "prime_classification": {
+    "fiber_prime": "(K, p) is prime in (F_K, oplus_K, odot_K) iff p is an ordinary rational prime in Z",
+    "realized_prime": "p*tau^K is the grade-K realization of rational prime p",
+    "intrinsic_factorization": "(K, n) = prod_p^{odot_K} (K, p)^{odot_K v_p(n)} stays strictly at grade K",
+    "ambient_product_warning": "Ordinary real product prod_p (p*tau^K)^{v_p(n)} moves to grade K*Omega(n), violating single-fiber arithmetic"
+  },
+  "canonical_transfer_maps": {
+    "definition": "T_{J <- K}: F_K -> F_J, (K, n) |-> (J, n)",
+    "functoriality": "T_{K <- K} = id, T_{M <- J} circ T_{J <- K} = T_{M <- K}",
+    "ring_isomorphism": true,
+    "coordinate_scaling": "Phi_J(T_{J <- K}(x)) = tau^{J - K} * Phi_K(x)"
+  },
+  "intrinsic_normalized_size": {
+    "definition": "N_K(K, n) = n",
+    "realized_form": "N_K(n*tau^K) = (n*tau^K) / tau^K = n",
+    "multiplicativity": "N_K(x odot_K y) = N_K(x) * N_K(y)",
+    "metric_identity": "d_K(m*tau^K, n*tau^K) = |m*tau^K - n*tau^K| / tau^K = |m - n|",
+    "isometry_status": "Transfer maps T_{J <- K} are exact isometries in intrinsic units"
+  },
+  "intrinsic_arithmetic_functions": {
+    "mobius": "mu_K(K, n) = mu(n) (strictly grade-invariant)",
+    "von_mangoldt": "Lambda_K(K, n) = Lambda(n) (strictly grade-invariant)",
+    "euler_phi": "phi_K(K, n) = phi(n) (strictly grade-invariant)",
+    "prime_counting_int": "pi_K^{int}(u) = pi(u)",
+    "prime_counting_amb": "pi_K^{amb}(x) = pi(x / tau^K)"
+  },
+  "logarithmic_coordinates": {
+    "intrinsic_log": "u_K(x) = log(x / tau^K) = log(n) (grade-independent)",
+    "ambient_log": "u_{amb}(x) = log(x) = log(n) + K*log(tau) (translated by K*log(tau))"
+  },
+  "zeta_functions": {
+    "intrinsic_zeta": {
+      "definition": "zeta_K^{int}(s) = sum_{n >= 1} N_K(K, n)^{-s} = zeta(s)",
+      "euler_product": "prod_{(K, p)} (1 - N_K(K, p)^{-s})^{-1} = prod_p (1 - p^{-s})^{-1} = zeta(s)",
+      "grade_invariance": "Identically independent of K for all K in A_R"
+    },
+    "ambient_dirichlet_series": {
+      "definition": "Z_K^{amb}(s) = sum_{n >= 1} (n*tau^K)^{-s} = tau^{-Ks} * zeta(s)",
+      "classification": "AMBIENT_COORDINATE_DIRICHLET_SERIES",
+      "prefactor_interpretation": "tau^{-Ks} is the dimensional unit realization factor, not intrinsic arithmetic"
+    },
+    "relation": "Z_K^{amb}(s) = tau^{-Ks} * zeta_K^{int}(s)"
+  },
+  "riemann_converter_interpretation": {
+    "normalized_grade_coordinates": "T_K^{int}(s, u) = T_0(s, u) (identical in native units)",
+    "ambient_coordinates": "Evaluated at x = u*tau^K introduces log shift K*log(tau)"
+  },
+  "local_germ_reconciliation": {
+    "completed_intrinsic_xi": "xi_K^{int}(s) = xi(s)",
+    "completed_ambient_Xi": "Xi_K^{amb}(s) = tau^{-K(s - 1/2)} * xi(s)",
+    "local_germ_status": "Modulus variation tau^{-(K-J)delta} is ambient unit covariance of quantity with scaling weight w = -(rho - 1/2)",
+    "unit_normalized_germ": "hat_c_K(rho) = tau^{K(rho - 1/2)} * c_{Xi_K}(rho) = c_xi(rho) is intrinsic and strictly grade-invariant"
+  },
+  "ambient_cross_grade_algebra": {
+    "definition": "(K, m) star (J, n) = (K + J, mn), realized as (m*tau^K)*(n*tau^J) = mn*tau^{K + J}",
+    "classification": "AMBIENT_CROSS_GRADE_ALGEBRA",
+    "status_of_opposite_grade_cancel": "tau^K * tau^{-K} = 1 belongs strictly to ambient cross-grade algebra, not intrinsic fiber arithmetic"
+  },
+  "full_algebraic_grade_group_algebra": {
+    "algebra": "Q_bar[A_R]",
+    "elements": "sum_{j=1}^r a_j [K_j] with a_j in Q_bar and K_j in A_R",
+    "realization_homomorphism": "ev_tau: Q_bar[A_R] -> R, sum a_j [K_j] |-> sum a_j tau^{K_j}",
+    "kernel": "ker(ev_tau) = {sum a_j [K_j] : sum a_j tau^{K_j} = 0}",
+    "kernel_meaning": "Finite algebraic cross-grade additive collapses"
+  },
+  "injectivity_status": {
+    "integer_grades": {
+      "domain": "Q_bar[Z]",
+      "injective": true,
+      "proof": "Lindemann (1882) transcendence of tau = 2*pi"
+    },
+    "rational_grades": {
+      "domain": "Q_bar[Q]",
+      "injective": true,
+      "proof": "Common-denominator reduction to polynomials in transcendental tau^{1/N}"
+    },
+    "full_algebraic_grades": {
+      "domain": "Q_bar[A_R]",
+      "injective": "OPEN",
+      "gelfond_schneider_bound": "dim_Q S_tau <= 1 controls two-term relations, not arbitrary multi-term relations",
+      "classification": "OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE"
+    },
+    "rank_one_support_theorem": {
+      "statement": "If K_j = K_0 + q_j*alpha with q_j in Q and alpha notin S_tau, then {tau^{K_j}} are linearly independent over Q_bar",
+      "status": "PROVED_FROM_LINDEMANN"
+    }
+  },
+  "generic_base_control": {
+    "statement": "For any real base b > 0, (F_K, oplus_K, odot_{b, K}) is canonically isomorphic to Z via (m*b^K) odot_{b, K} (n*b^K) = mn*b^K",
+    "base_independence": true,
+    "conclusion": "Intrinsic fiber arithmetic does not depend on tau or its transcendence"
+  },
+  "role_of_transcendence": {
+    "does_not_do": [
+      "Does not create fiber primes",
+      "Does not alter integer factorization",
+      "Does not alter intrinsic zeta",
+      "Does not alter Mobius or von Mangoldt arithmetic"
+    ],
+    "does_do": [
+      "Prevents ambient station collisions on rational subgrids",
+      "Guarantees injectivity of ev_tau on Q_bar[Q]",
+      "Constrains pairwise algebraic transfer factors via dim_Q S_tau <= 1"
+    ]
+  },
+  "four_canonical_strata": [
+    "INTRINSIC_FIBER_ARITHMETIC",
+    "AMBIENT_REALIZATION",
+    "AMBIENT_CROSS_GRADE_ALGEBRA",
+    "ANALYTIC_PULLBACK"
+  ],
+  "final_classification": "DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED",
+  "secondary_classification": "INTRINSIC_TC_IS_TRANSPORT_OF_STRUCTURE_ONLY",
+  "next_research_question": "Does the non-trivial zero divisor of zeta force an authentic algebraic relation in ker(ev_tau) on Q_bar[A_R] through an explicit cross-grade arithmetic-spectral coupling functional?"
+}

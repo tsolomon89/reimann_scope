@@ -44,7 +44,7 @@
     "naive_shifted_euler_product": "prod_p (1 - (p*tau^K)^{-s})^{-1} assigns weight tau^{-K*Omega(n)*s}, violating global grade K (FIREWALL_CONFIRMED)",
     "explicit_formula_derivative_dependence": false,
     "explicit_formula_zero_input": "Zero locations and multiplicities m_rho via residues, independent of |xi'(rho)|",
-    "exact_prime_side_germ_formula_exists": false
+    "exact_prime_side_germ_formula_found": false
   },
   "unit_normalized_germ_analysis": {
     "definition": "hat_c_K(rho) = tau^{K(rho - 1/2)} * c_{Xi_K}(rho)",
@@ -57,7 +57,7 @@
     "real_translation_operator": "(T_a f)(x) = f(x - a) is unitary on L^2(R, dx)",
     "centered_zero_mode": "f_rho(x) = exp((rho - 1/2)*x) = exp((delta + i*gamma)*x)",
     "zero_mode_L2_membership": false,
-    "reason": "For delta != 0, f_rho grows exponentially as x -> +-infty and does not belong to L^2(R)",
+    "reason": "Plane-wave critical-line characters are generalized Fourier characters; for delta != 0, f_rho grows exponentially and fails unit modulus and L^2(R) membership",
     "unitarity_argument_valid": false,
     "reduction_to_weil_positivity": true,
     "classification": "RH_EQUIVALENT_REFORMULATION"

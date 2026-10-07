@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "LOCAL_GERM_PRIME_SIDE_INVARIANCE",
+  "current_phase": "INTRINSIC_FIBER_AND_AMBIENT_REALIZATION",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -220,10 +220,33 @@
         "Author docs/reviews/TC_LOCAL_GERM_PRIME_SIDE_INVARIANCE.md and data/tc_local_germ_prime_side_invariance.json"
       ],
       "completion_note": "TASK-TC-024 completed: Local zero germ modulus variation tau^{-(K-J)delta} proved to be generic nonvanishing prefactor covariance; zero divisor and canonical Hadamard product invariant; unit-normalized germ hat{c}_K(rho) = c_xi(rho) is identically grade-invariant, removing the delta detector; explicit formulas independent of derivative values |xi'(rho)|; translation representation on L^2(R) excludes off-critical modes e^{(delta+i gamma)x}; bridge to RH reduces to Weil/Herglotz positivity without supplying missing hypotheses; epistemic overstatements corrected to NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND; Lean 4 formalization verified (378 theorems, 0 errors, 0 sorries); 16/16 unit tests passing. Principal classification: LOCAL_GERM_IS_GENERIC_GAUGE_DATA (route frozen)."
+    },
+    "track_13_intrinsic_fiber_and_ambient_realization": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Define tagged arithmetic fibers F_K = {K} x Z = {(K, n) : n in Z} with internal operations oplus_K, odot_K and unit 1_K = (K, 1)",
+        "Prove ring isomorphism phi_K: Z -> (F_K, oplus_K, odot_K) and realized isomorphism (L_K, +, odot_K) cong Z with x odot_K y = xy / tau^K",
+        "Prove base independence (F_K, oplus_K, odot_{b, K}) cong Z for any real base b > 0 (GENERIC_BASE_FIBER_INVARIANCE)",
+        "Define canonical transfer maps T_{J <- K}: (K, n) |-> (J, n) and prove ring isomorphism and functorial composition",
+        "Prove coordinate scaling Phi_J(T_{J <- K}(x)) = tau^{J - K} Phi_K(x) and isometric metric d_K(m*tau^K, n*tau^K) = |m - n|",
+        "Derive intrinsic normalized size N_K(K, n) = n and prove multiplicativity N_K(x odot_K y) = N_K(x) N_K(y)",
+        "Prove intrinsic arithmetic functions mu_K, Lambda_K, phi_K and prime counting pi_K^{int}(u) = pi(u) are strictly grade-invariant",
+        "Derive intrinsic arithmetic zeta zeta_K^{int}(s) = sum n^{-s} = zeta(s) with canonical Euler product prod_p (1 - p^{-s})^{-1}",
+        "Classify ambient series Z_K^{amb}(s) = tau^{-Ks} zeta(s) as AMBIENT_COORDINATE_DIRICHLET_SERIES with dimensional unit factor tau^{-Ks}",
+        "Reconcile TASK-TC-024 local germ scaling as coordinate covariance of scaling weight w = -(rho - 1/2), with unit-normalized germ hat_c_K as intrinsic invariant",
+        "Formulate ambient group algebra Q_bar[A_R] with evaluation map ev_tau and kernel ker(ev_tau) representing finite algebraic cross-grade collapses",
+        "Classify injectivity: proved on Z (Lindemann 1882) and Q (clearing denominators); OPEN on full A_R (OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE)",
+        "Prove rank-one finite support linear independence theorem for K_j = K_0 + q_j*alpha with alpha notin S_tau",
+        "Establish four canonical strata: INTRINSIC_FIBER_ARITHMETIC, AMBIENT_REALIZATION, AMBIENT_CROSS_GRADE_ALGEBRA, ANALYTIC_PULLBACK",
+        "Compile Lean 4 formalization formal/RiemannScope/FiberArithmetic.lean (414 project declarations, 0 sorry) and verify 22 unit tests",
+        "Author docs/reviews/TC_INTRINSIC_FIBER_AMBIENT_REALIZATION.md and data/tc_intrinsic_fiber_ambient_realization.json"
+      ],
+      "completion_note": "TASK-TC-025 completed: Tagged arithmetic fibers F_K cong Z defined; internal operations proved base-independent (GENERIC_BASE_FIBER_INVARIANCE); canonical transfer maps proved ring isomorphisms and isometries; intrinsic zeta proved identically zeta(s); ambient series classified as AMBIENT_COORDINATE_DIRICHLET_SERIES with dimensional prefactor tau^{-Ks}; local germ scaling reconciled as coordinate covariance; ambient group algebra Q_bar[A_R] and ker(ev_tau) formulated (open on A_R); rank-one support theorem proved; four canonical strata established; Lean 4 formalization verified (414 declarations, 0 errors, 0 sorries); 22/22 unit tests passing. Principal classification: DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_intrinsic_fiber_ambient_realization.json",
       "data/tc_local_germ_prime_side_invariance.json",
       "data/tc_algebraic_grade_functional_bridge.json",
       "data/tc_faithful_graded_prime_algebra.json",
