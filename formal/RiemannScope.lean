@@ -24,4 +24,5 @@ import RiemannScope.ExceptionalTransfer
 import RiemannScope.LocalGermInvariance
 import RiemannScope.FiberArithmetic
 import RiemannScope.UnitRescaling
+import RiemannScope.MultiGradeNaturality
 

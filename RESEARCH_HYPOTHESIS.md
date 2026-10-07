@@ -3892,7 +3892,7 @@ $P_{\mathcal F}$ implies $\neg E_{\mathcal F}$, which does not refute $D_{\mathc
 - `GENUINE_ARITHMETIC_GRADE_COUPLING`: **None found** in any standard TC construction. Coefficients satisfy $a_{n,K} = a_n$ identically; ratios $a_{n,K}/a_{n,J} = 1$ are independent of $n$.
 
 ### 43.3 Ambient Realization Kernel Search
-- No standard zeta identity produces a non-trivial algebraic relation $\sum_{j=1}^r A_j \tau^{K_j} = 0$ ($A_j \in \overline{\mathbb{Q}}$). Special values $\zeta(2n)/\tau^{2n} \in \mathbb{Q}$ do not produce a relation because $\zeta(2n)$ is transcendental; zero ordinates $\gamma_n$ and $\log p$ are non-algebraic.
+- No standard zeta identity produces a non-trivial algebraic relation $\sum_{j=1}^r A_j \tau^{K_j} = 0$ ($A_j \in \mathbb{A}_{\mathbb{R}}$). Special values $\zeta(2n)/\tau^{2n} \in \mathbb{Q}$ do not produce a relation because $\zeta(2n)$ is transcendental; zero ordinates $\gamma_n$ have unknown arithmetic nature (conjecturally transcendental, but unproved), while $\log p$ is proved transcendental for rational primes $p$ (Lindemann 1882).
 - Status: `NO_KERNEL_ELEMENT_FROM_STANDARD_ZETA_STRUCTURES_FOUND`.
 
 ### 43.4 Governing Verdict
@@ -3902,6 +3902,21 @@ Any future TC route to the Riemann Hypothesis must seek either:
 2. An authentic multi-grade relation linking zeta to the ambient realization kernel $\ker(\operatorname{ev}_\tau)$.
 
 - **Principal Classification**: `PURE_UNIT_RESCALING_NO_GO_PROVED`
+
+---
+
+## 44. Multi-Grade Naturality No-Go Theorem and RH Programme Status (TASK-TC-027)
+
+### 44.1 Canonical Multi-Grade Structure
+1. **Transfer Groupoid**: The canonical transfer maps $T_{J \leftarrow K}(K, n) = (J, n)$ form a trivial pair groupoid with identity $T_{K \leftarrow K} = \operatorname{id}$ and path independence $T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}$. Closed loops have trivial holonomy: $\prod T = \operatorname{id}_{\mathcal F_{K_0}}$.
+2. **Exact Coboundaries**: Ambient scale cocycle $c(J, K) = \tau^{J-K} = g(J)/g(K)$ and spectral cocycle $c_s(J, K) = \tau^{-(J-K)s} = g_s(J)/g_s(K)$ are exact 1-coboundaries whose loop products are identically $1$.
+3. **Simultaneous Dirichlet Equivalence**: Imposing all pairwise compatibility relations $D_J^{\mathrm{amb}}(s) = \tau^{-(J-K)s} D_K^{\mathrm{amb}}(s)$ simultaneously is an identity of coboundaries. It introduces no new constraint on $\zeta(s)$ and leaves zero divisors strictly invariant.
+
+### 44.2 Epistemic Decision and Programme Freezing
+- **Principal Classification**: `MULTIGRADE_NATURALITY_NO_GO_PROVED`.
+- Current TC axioms contain no demonstrated route to the Riemann Hypothesis.
+- All core TC routes to RH (unit rescaling, character unitarity, local germ, converter covariance, and multi-grade transfer compatibility) are officially frozen.
+- The open transcendence problem $\ker(\operatorname{ev}_\tau)$ on $\mathbb A_{\mathbb R}[\mathbb A_{\mathbb R}]$ survives as an independent problem in number theory.
 
 
 

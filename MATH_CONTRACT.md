@@ -134,6 +134,12 @@ Do not use one variable interchangeably for continuous $k$, canonical algebraic 
 
 # 3. Transcendental continuation
 
+> [!IMPORTANT]
+> **HISTORICAL / AUXILIARY PULLBACK NOTATION (SUPERSEDED AS CANONICAL ARITHMETIC TC)**
+> Classification: `ANALYTIC_PULLBACK`.
+> Under the canonical four-way architecture established in TASK-TC-025, TASK-TC-026, and TASK-TC-027 (Sections 21–23 below), $\mathcal Z_\tau(s, k) = \zeta(\tau^{-k}s)$ is the **auxiliary analytic pullback** $Z_k^{\mathrm{pull}}(s)$. The moving-zero law $\rho \mapsto \tau^k \rho$ belongs *only* to this auxiliary pullback.
+> In canonical arithmetic TC, the intrinsic fiber is $\mathcal{F}_K = \{K\} \times \mathbb{Z} \cong \mathbb{Z}$, the intrinsic zeta is $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$ (identically constant with stationary zeros), and the ambient coordinate transform is $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$ (zeros invariant).
+
 The project-defined transcendental-continuation family uses origin-dilation semantics.
 
 Define
@@ -3003,7 +3009,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 3. **Canonical Four-Way Classification**:
    - `INTRINSIC_FIBER_ARITHMETIC`: Intrinsic rings $\mathcal F_K \cong \mathbb Z$, intrinsic zeta $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$.
    - `AMBIENT_REALIZATION`: Embedded points $n\tau^K \in \mathbb R$, ambient series $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$, local germ scaling $\tau^{-K(\rho - 1/2)}$.
-   - `AMBIENT_CROSS_GRADE_ALGEBRA`: Group algebra $\overline{\mathbb Q}[\mathbb A_{\mathbb R}]$ and evaluation $\operatorname{ev}_\tau$, cross-grade algebra $(m\tau^K)(n\tau^J) = mn\tau^{K+J}$.
+   - `AMBIENT_CROSS_GRADE_ALGEBRA`: Group algebra $\mathbb A_{\mathbb R}[\mathbb A_{\mathbb R}]$ and evaluation $\operatorname{ev}_\tau: \mathbb A_{\mathbb R}[\mathbb A_{\mathbb R}] \to \mathbb R$ (or $\overline{\mathbb Q}[\mathbb A_{\mathbb R}] \to \mathbb C$), cross-grade algebra $(m\tau^K)(n\tau^J) = mn\tau^{K+J}$.
    - `ANALYTIC_PULLBACK`: Auxiliary coordinate dilation $\zeta(\tau^{-K} s)$ with moving zeros $\tau^K \rho$.
 4. **Realization Kernel**: $\ker(\operatorname{ev}_\tau)$ controls finite cross-grade collapses $\sum a_j \tau^{K_j} = 0$. Injective on $\mathbb Z$ and $\mathbb Q$; open on $\mathbb A_{\mathbb R}$ (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
 
@@ -3032,5 +3038,34 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 5. **No-Go Conclusion**:
    Pure unit rescaling is an exact symmetry / gauge transformation of Dirichlet and Mellin transforms. It leaves zero divisors invariant.
    Principal classification: `PURE_UNIT_RESCALING_NO_GO_PROVED`.
+
+---
+
+# 23. Multi-Grade Naturality, Cocycle/Holonomy Triviality, and Scoped No-Go Theorem (TASK-TC-027)
+
+1. **Transfer Functoriality and Loop Holonomy**:
+   For the real algebraic grade set $G = \mathbb A_{\mathbb R}$, the canonical transfer maps $T_{J \leftarrow K}(K, n) = (J, n)$ form a canonically trivial pair groupoid:
+   \[
+   T_{K \leftarrow K} = \operatorname{id}_{\mathcal F_K}, \qquad T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}.
+   \]
+   For any closed loop $K_0 \to K_1 \to \cdots \to K_r = K_0$, the composite transfer map satisfies $\prod_{i=0}^{r-1} T_{K_{i+1} \leftarrow K_i} = \operatorname{id}_{\mathcal F_{K_0}}$. There are no path-dependent or holonomy defects.
+
+2. **Ambient Scale and Spectral Cocycles as Exact Coboundaries**:
+   - The ambient coordinate scale transition factor $c(J, K) = \tau^{J-K} = g(J)/g(K)$ where $g(K) = \tau^K$.
+   - The spectral grade transition factor $c_s(J, K) = \tau^{-(J-K)s} = g_s(J)/g_s(K)$ where $g_s(K) = \tau^{-Ks}$.
+   - For every closed loop, the product around the cycle is identically $1$: $\prod_{i=0}^{r-1} c(K_{i+1}, K_i) = 1$ and $\prod_{i=0}^{r-1} c_s(K_{i+1}, K_i) = 1$. Both cocycles are exact 1-coboundaries.
+
+3. **Natural Observable Reconstruction Theorem**:
+   Any family of observables $O_K: \mathcal F_K \to X$ natural under transfers ($O_J \circ T_{J \leftarrow K} = O_K$) is uniquely determined by its value on reference grade 0: $O_K = O_0 \circ T_{0 \leftarrow K}$. Extends to all $r$-ary operations.
+
+4. **Simultaneous Dirichlet Compatibility and Zero-Divisor Invariance**:
+   Imposing all pairwise equations $D_J^{\mathrm{amb}}(s) = \tau^{-(J-K)s} D_K^{\mathrm{amb}}(s)$ simultaneously across all $K, J \in \mathbb A_{\mathbb R}$ is an identity of coboundaries. It introduces zero additional equations on $\zeta(s)$ and preserves the zero divisor identically: $\operatorname{Div}_0(D_K^{\mathrm{amb}}) = \operatorname{Div}_0(D_0)$.
+
+5. **Ambient Realization Kernel Independence**:
+   Trivial transfer holonomy does not resolve the ambient evaluation kernel $\ker(\operatorname{ev}_\tau) = \{\sum a_j [K_j] \in \mathbb A_{\mathbb R}[\mathbb A_{\mathbb R}] : \sum a_j \tau^{K_j} = 0\}$. Exhaustive audit of standard zeta identities yields `NO_ZETA_TO_REALIZATION_KERNEL_BRIDGE_FOUND`.
+
+6. **Governing Classification**:
+   Principal Classification: `MULTIGRADE_NATURALITY_NO_GO_PROVED`.
+   Current TC axioms contain no demonstrated RH constraint beyond transport and unit covariance. The pure unit-rescaling, character unitarity, local germ, converter covariance, and multi-grade transfer compatibility routes are officially frozen.
 
 

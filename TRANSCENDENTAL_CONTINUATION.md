@@ -12,6 +12,47 @@ The term names a precise mathematical framework:
 
 The usefulness of the framework must be established by exact identities, computation, falsification, and eventually proof.
 
+## 0.1 Canonical TC Architecture and Source of Truth (TASK-TC-027)
+
+> [!IMPORTANT]
+> **CANONICAL DEFINITION OF TRANSCENDENTAL CONTINUATION**
+> This section is the unique, canonical source of truth for the definition of Transcendental Continuation across the repository.
+> 
+> 1. **Canonical Grade Domain**:
+>    \[
+>    \boxed{K \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}.}
+>    \]
+> 2. **Canonical Arithmetic TC**:
+>    \[
+>    \boxed{\mathcal{F}_K = \{K\} \times \mathbb{Z} = \{(K, n) : n \in \mathbb{Z}\}.}
+>    \]
+>    All intrinsic fibers are transported copies of the ring of integers $\mathbb{Z}$ under operations $(K, m) \oplus_K (K, n) = (K, m+n)$ and $(K, m) \odot_K (K, n) = (K, mn)$.
+> 3. **Canonical Transfer**:
+>    \[
+>    \boxed{T_{J \leftarrow K}(K, n) = (J, n).}
+>    \]
+>    Functorial ring isomorphism satisfying $T_{K \leftarrow K} = \operatorname{id}$, $T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}$, and trivial loop holonomy.
+> 4. **Ambient Realization**:
+>    \[
+>    \boxed{\Phi_K(K, n) = n\tau^K, \qquad \tau = 2\pi.}
+>    \]
+> 5. **Intrinsic Spectral Object**:
+>    \[
+>    \boxed{\zeta_K^{\mathrm{int}}(s) = \sum_{n \ge 1} N_K(K, n)^{-s} = \sum_{n \ge 1} n^{-s} = \zeta(s).}
+>    \]
+>    Zeros are stationary and identical to native $\zeta(s)$.
+> 6. **Ambient Coordinate Series**:
+>    \[
+>    \boxed{Z_K^{\mathrm{amb}}(s) = \sum_{n \ge 1} (n\tau^K)^{-s} = \tau^{-Ks}\zeta(s).}
+>    \]
+> 7. **Auxiliary Analytic Pullback**:
+>    \[
+>    \boxed{Z_K^{\mathrm{pull}}(s) = \zeta(\tau^{-K}s).}
+>    \]
+>    The moving-zero law $\rho \mapsto \tau^K \rho$ belongs **only** to this auxiliary pullback. No canonical arithmetic-TC statement implies that its zeros move.
+> 8. **Authority Hierarchy**:
+>    `MATH_CONTRACT.md` > `TRANSCENDENTAL_CONTINUATION.md` > `RESEARCH_HYPOTHESIS.md` > `RESEARCH_LEDGER.md` > `docs/reviews/*` > historical files.
+
 ---
 
 # 1. Base constant and scale generator
@@ -76,6 +117,12 @@ The canonical transcendental-continuation domain is:
 \]
 
 The real grade completion \(k \in \mathbb R\) provides an ambient continuous embedding and interpolation scale flow, but is **not** the canonical TC grade domain.
+
+> [!IMPORTANT]
+> **HISTORICAL / AUXILIARY PULLBACK NOTATION (SUPERSEDED AS CANONICAL ARITHMETIC TC)**
+> Classification: `ANALYTIC_PULLBACK`.
+> Under the canonical four-way architecture established in TASK-TC-025 and TASK-TC-027 (see Section 0.1 and Section 32), the construction $\mathcal Z_\tau(s, K) = \zeta(\tau^{-K}s)$ is the **auxiliary analytic pullback** $Z_K^{\mathrm{pull}}(s)$. The moving-zero law $\rho \mapsto \tau^K \rho$ belongs *only* to this auxiliary pullback.
+> In canonical arithmetic TC, the intrinsic fiber is $\mathcal{F}_K = \{K\} \times \mathbb{Z} \cong \mathbb{Z}$, the intrinsic zeta is $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$ (identically constant with stationary zeros), and the ambient coordinate transform is $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$ (zeros invariant).
 
 Under the origin-dilation convention, define
 
@@ -452,6 +499,11 @@ The same construction motivates treating \(K\) as a structural coordinate of the
 ---
 
 # 10. Zeta slices
+
+> [!NOTE]
+> **AUXILIARY ANALYTIC PULLBACK SLICES**
+> Classification: `ANALYTIC_PULLBACK`.
+> The slices $\mathcal Z_{\tau, K}(s) = \zeta(\tau^{-K}s)$ represent the auxiliary analytic pullback family $Z_K^{\mathrm{pull}}(s)$. In canonical arithmetic TC, the slices are $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$ (intrinsic constant) and $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$ (ambient coordinate series).
 
 For each fixed algebraic grade \(K \in \mathbb A_{\mathbb R}\), define the complete \(s\)-slice
 
@@ -1409,10 +1461,11 @@ Define:
 - **Reconciliation with TASK-TC-024**: The completed intrinsic function is $\xi_K^{\mathrm{int}}(s) = \xi(s)$, while the ambient completed family is $\Xi_K^{\mathrm{amb}}(s) = \tau^{-K(s - 1/2)}\xi(s)$. The local germ scaling is the coordinate manifestation of complex scaling weight $w = -(\rho - 1/2)$, while the normalized germ $\widehat{c}_K(\rho) = c_\xi(\rho)$ is the intrinsic arithmetic invariant.
 
 ### 32.4 Ambient Group Algebra and Kernel of Realization
-- **Ambient Group Algebra**: $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ with evaluation homomorphism:
+- **Ambient Group Algebra**: Real algebraic group ring $\mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}]$ with evaluation homomorphism:
   \[
-  \operatorname{ev}_\tau: \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{R}, \qquad \sum_{j=1}^r a_j [K_j] \longmapsto \sum_{j=1}^r a_j \tau^{K_j}.
+  \operatorname{ev}_\tau: \mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{R}, \qquad \sum_{j=1}^r a_j [K_j] \longmapsto \sum_{j=1}^r a_j \tau^{K_j}
   \]
+  (or complex algebraic group ring $\operatorname{ev}_\tau: \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{C}$ when complex algebraic coefficients are permitted; the coefficient field and codomain must match).
 - **Additive Collapses**: $\ker(\operatorname{ev}_\tau)$ represents finite algebraic cross-grade relations $\sum a_j \tau^{K_j} = 0$.
 - **Injectivity Hierarchy**:
   - Integer grades $\mathbb{Z}$: Injective (Lindemann 1882).
@@ -1460,7 +1513,7 @@ Define:
 - `GENUINE_ARITHMETIC_GRADE_COUPLING`: **None found** in any standard TC construction. Coefficients satisfy $a_{n,K} = a_n$ identically; ratios $a_{n,K}/a_{n,J} = 1$ are independent of $n$.
 
 ### 33.4 Ambient Realization Kernel Search
-- No standard zeta identity produces a non-trivial algebraic relation $\sum_{j=1}^r A_j \tau^{K_j} = 0$ ($A_j \in \overline{\mathbb{Q}}$). Special values $\zeta(2n)/\tau^{2n} \in \mathbb{Q}$ do not produce a relation because $\zeta(2n)$ is transcendental; zero ordinates $\gamma_n$ and $\log p$ are non-algebraic.
+- No standard zeta identity produces a non-trivial algebraic relation $\sum_{j=1}^r A_j \tau^{K_j} = 0$ ($A_j \in \mathbb{A}_{\mathbb{R}}$). Special values $\zeta(2n)/\tau^{2n} \in \mathbb{Q}$ do not produce a relation because $\zeta(2n)$ is transcendental; zero ordinates $\gamma_n$ have unknown arithmetic nature (conjecturally transcendental, but unproved), while $\log p$ is proved transcendental for rational primes $p$ (Lindemann 1882).
 - Status: `NO_KERNEL_ELEMENT_FROM_STANDARD_ZETA_STRUCTURES_FOUND`.
 
 ### 33.5 Generic-Base Control and Role of Transcendence
@@ -1468,6 +1521,98 @@ Define:
 - Transcendence of $\tau$ plays no role in one-grade transform factorization or zero preservation; it governs only the ambient cross-grade algebra $\ker(\operatorname{ev}_\tau)$.
 
 - **Principal Classification**: `PURE_UNIT_RESCALING_NO_GO_PROVED`
+
+---
+
+## 34. Multi-Grade Naturality, Cocycle/Holonomy Triviality, and the Final TC Decision (TASK-TC-027)
+
+### 34.1 Functoriality and Pair-Groupoid Structure
+For the real algebraic grade set $G = \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$, the family of intrinsic fibers $\{\mathcal{F}_K\}_{K \in G}$ with canonical transfer maps:
+\[
+T_{J \leftarrow K}: \mathcal{F}_K \longrightarrow \mathcal{F}_J, \qquad (K, n) \longmapsto (J, n)
+\]
+forms a canonically trivial pair groupoid over rings:
+- **Identity Law**:
+  \[
+  \boxed{T_{K \leftarrow K} = \operatorname{id}_{\mathcal{F}_K}.}
+  \]
+- **Functorial Composition / Path Independence**:
+  \[
+  \boxed{T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}.}
+  \]
+  For any finite sequence of grades $K_0 \to K_1 \to \cdots \to K_r$, the accumulated transfer composite equals the direct transfer map $T_{K_r \leftarrow K_0}$.
+
+### 34.2 Loop Holonomy Triviality
+For any closed grade loop $K_0 \to K_1 \to \cdots \to K_r = K_0$, the composite transfer map satisfies:
+\[
+\boxed{\prod_{i=0}^{r-1} T_{K_{i+1} \leftarrow K_i} = T_{K_0 \leftarrow K_0} = \operatorname{id}_{\mathcal{F}_{K_0}}.}
+\]
+There are zero holonomy, monodromy, or path-dependent obstructions across any closed loop of grades in the intrinsic arithmetic structure.
+
+### 34.3 Ambient Scale and Spectral Cocycles as Exact Coboundaries
+1. **Ambient Scale Cocycle**:
+   $c(J, K) = \tau^{J-K}$ satisfies $c(K, K) = 1$ and $c(M, J)c(J, K) = c(M, K)$.
+   It is an exact 1-coboundary:
+   \[
+   \boxed{c(J, K) = \frac{g(J)}{g(K)}, \qquad g(K) = \tau^K.}
+   \]
+   For any closed loop, the scale factor telescopes to 1: $\prod_{i=0}^{r-1} c(K_{i+1}, K_i) = 1$.
+2. **Spectral Grade Cocycle**:
+   $c_s(J, K) = \tau^{-(J-K)s}$ satisfies $c_s(K, K) = 1$ and $c_s(M, J)c_s(J, K) = c_s(M, K)$.
+   It is an exact 1-coboundary:
+   \[
+   \boxed{c_s(J, K) = \frac{g_s(J)}{g_s(K)}, \qquad g_s(K) = \tau^{-Ks}.}
+   \]
+   For any closed loop, the spectral character product telescopes to 1: $\prod_{i=0}^{r-1} c_s(K_{i+1}, K_i) = 1$.
+
+### 34.4 Natural Observable Reconstruction Theorem
+A family of fiber observables $\{O_K: \mathcal{F}_K \to X\}_{K \in G}$ is transfer-natural if $O_J \circ T_{J \leftarrow K} = O_K$ for all $K, J$.
+- **Theorem**: Any transfer-natural observable is uniquely determined by its value on reference grade 0:
+  \[
+  \boxed{O_K = O_0 \circ T_{0 \leftarrow K}.}
+  \]
+- **Finite-Arity Extension**: For any $r$-ary observable $O_K: \mathcal{F}_K^r \to X$, transfer naturality forces $O_K(x_1, \ldots, x_r) = O_0(T_{0 \leftarrow K}(x_1), \ldots, T_{0 \leftarrow K}(x_r))$.
+- In particular, intrinsic addition $\oplus_K$, multiplication $\odot_K$, divisibility, prime ideals, von Mangoldt weights, and Dirichlet coefficients $a_{(K, n)} = a_n$ contain zero new grade-dependent data.
+
+### 34.5 Simultaneous Dirichlet Compatibility and Zero-Divisor Invariance
+For any intrinsic Dirichlet series $D(s) = \sum_{n \ge 1} a_n n^{-s}$, the ambient family satisfies:
+\[
+D_J^{\mathrm{amb}}(s) = \tau^{-(J-K)s} D_K^{\mathrm{amb}}(s).
+\]
+Imposing all pairwise equations simultaneously across the full grade family $\mathbb{A}_{\mathbb{R}}$ is an identity of coboundaries:
+\[
+\forall K \in \mathbb{A}_{\mathbb{R}}, \qquad D_K^{\mathrm{amb}}(s) = \tau^{-Ks} D_0(s).
+\]
+Because $\tau^{-Ks} \ne 0$ everywhere on $\mathbb{C}$, the zero divisors satisfy:
+\[
+\boxed{\operatorname{Div}_0(D_K^{\mathrm{amb}}) = \operatorname{Div}_0(D_J^{\mathrm{amb}}) = \operatorname{Div}_0(D).}
+\]
+Simultaneous compatibility introduces **zero additional algebraic or analytic equations** on $D(s)$. Every off-critical zero of $\zeta(s)$ satisfies all pairwise and multi-grade relations identically.
+
+### 34.6 Deliberate Falsification and Counterexample Controls
+- **Synthetic Non-Coboundary Cocycle**: A synthetic multiplier with non-trivial loop phase defect $\prod c_{\mathrm{synth}} \ne 1$ creates genuine holonomy obstructions. Standard TC scale cocycles satisfy $\prod c = 1$ identically.
+- **Synthetic Grade-Dependent Coefficients**: Deforming coefficients to $a_{n,K} = n^{K/2}$ gives $D_K(s) = \zeta(s - K/2)$, shifting zeros to $\rho + K/2$. This proves that genuine coupling can move zeros, whereas standard TC unit rescaling preserves them.
+
+### 34.7 Independence of the Ambient Realization Kernel
+Trivial transfer holonomy does not resolve the ambient realization kernel:
+\[
+\ker(\operatorname{ev}_\tau) = \left\{ \sum_{j=1}^r a_j [K_j] \in \mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}] : \sum_{j=1}^r a_j \tau^{K_j} = 0 \right\}.
+\]
+Injectivity on $\mathbb{A}_{\mathbb{R}}$ remains an independent open problem in transcendental number theory. Standard zeta structures produce no non-trivial elements in $\ker(\operatorname{ev}_\tau)$ (`NO_ZETA_TO_REALIZATION_KERNEL_BRIDGE_FOUND`).
+
+### 34.8 Final Epistemic Verdict
+- **Principal Classification**: `MULTIGRADE_NATURALITY_NO_GO_PROVED`
+- **Governing Verdict**:
+  \[
+  \boxed{
+  \begin{gathered}
+  \textbf{Current TC axioms contain no demonstrated route to the Riemann Hypothesis.}\\
+  \textbf{All standard TC structures factor through nowhere-zero grade characters or}\\
+  \textbf{form exact coboundaries with trivial loop holonomy.}
+  \end{gathered}
+  }
+  \]
+- **Frozen Routes**: Pure unit rescaling, grade-character unitarity, local zero germ scaling, converter covariance, moving-zero pullback as arithmetic TC, and multi-grade transfer compatibility are officially frozen.
 
 
 

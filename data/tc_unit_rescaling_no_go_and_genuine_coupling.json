@@ -96,9 +96,9 @@
     "status": "NO_GENUINE_ARITHMETIC_GRADE_COUPLING_IN_STANDARD_CONSTRUCTIONS"
   },
   "ambient_realization_kernel_audit": {
-    "definition": "ker(ev_tau) = { sum a_j [K_j] in Q_bar[A_R] : sum a_j tau^{K_j} = 0 }",
+    "definition": "ker(ev_tau) = { sum a_j [K_j] in A_R[A_R] : sum a_j tau^{K_j} = 0 } with ev_tau: A_R[A_R] -> R (or Q_bar[A_R] -> C)",
     "search_scope": "Euler special values, zero ordinates, von Mangoldt weights, gamma factors",
-    "finding": "Special values zeta(2n) give ratios in Q*tau^{2n} with transcendental zeta(2n); zero ordinates and log(p) are not algebraic; no standard zeta identity produces a linear relation among tau^{K_j} with algebraic coefficients",
+    "finding": "Special values zeta(2n) give ratios in Q*tau^{2n} with transcendental zeta(2n); zero ordinates have unknown arithmetic status (conjecturally transcendental, unproved), and log(p) is proved transcendental (Lindemann 1882); no standard zeta identity produces a non-trivial linear relation among tau^{K_j} with algebraic coefficients",
     "status": "NO_KERNEL_ELEMENT_FROM_STANDARD_ZETA_STRUCTURES_FOUND"
   },
   "falsification_and_counterexample_search": {

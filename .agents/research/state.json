@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "UNIT_RESCALING_NO_GO_AND_GENUINE_COUPLING",
+  "current_phase": "CANONICAL_RECONCILIATION_AND_MULTIGRADE_NATURALITY",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -258,10 +258,28 @@
         "Author docs/reviews/TC_UNIT_RESCALING_NO_GO_AND_GENUINE_COUPLING.md and data/tc_unit_rescaling_no_go_and_genuine_coupling.json"
       ],
       "completion_note": "TASK-TC-026 completed: Pure unit-rescaling no-go theorem proved across Dirichlet series, Mellin transforms, and log-coordinate distributions; zero divisor and multiplicity strictly preserved; logarithmic derivative residue invariant; generic-base control confirms base-independence; standard constructions classified as factorable or intrinsic constant; genuine coupling audited as absent; no kernel element in ker(ev_tau) found from standard zeta identities; Lean 4 formalization compiled (431 declarations, 0 errors, 0 sorries); 20/20 unit tests passing. Principal classification: PURE_UNIT_RESCALING_NO_GO_PROVED."
+    },
+    "track_15_canonical_reconciliation_and_multigrade_naturality": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Audit repository for canonical TC definitions vs auxiliary pullback, zero-ordinate algebraicity, Gelfond-Schneider external dependencies, and ev_tau typing",
+        "Authoritative documentation hierarchy established (MATH_CONTRACT, TRANSCENDENTAL_CONTINUATION, RESEARCH_HYPOTHESIS, RESEARCH_LEDGER, reviews)",
+        "Formalize multi-grade pair groupoid, transfer identity, and path independence T_{M <- J} o T_{J <- K} = T_{M <- K}",
+        "Formalize trivial loop holonomy: prod T = id_{F_{K_0}} for all finite grade loops",
+        "Formalize ambient scale cocycle c(J, K) = tau^{J-K} = g(J)/g(K) and spectral cocycle c_s(J, K) = tau^{-(J-K)s} as exact 1-coboundaries",
+        "Formalize natural observable reconstruction from reference grade 0: O_K = O_0 o T_{0 <- K}",
+        "Formalize finite-path Dirichlet multiplier telescoping and simultaneous zero-divisor equivalence Div_0(D_{K_i}^{amb}) = Div_0(D)",
+        "Search standard zeta structures for genuine multi-grade invariants or kernel elements in ker(ev_tau) (none found)",
+        "Compile Lean 4 formalization formal/RiemannScope/MultiGradeNaturality.lean (459 project declarations, 0 sorry)",
+        "Implement 22 unit tests in tests/test_tc_multigrade_naturality_and_canonicalization.py",
+        "Author docs/reviews/TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md, docs/reviews/TC_CANONICAL_STATE_AND_MULTIGRADE_NATURALITY_EPIC.md, docs/TC_CURRENT_CANONICAL_STATUS.md, data/tc_formal_claim_dependency_registry.json, and data/tc_canonical_reconciliation_and_multigrade_naturality.json"
+      ],
+      "completion_note": "TASK-TC-027 completed: Canonical TC architecture reconciled across the repository; moving zeros confirmed auxiliary pullback only; zero-ordinate algebraicity claims corrected to unknown; Gelfond-Schneider decoupled from Lean collinearity proof; ev_tau typed to A_R[A_R] -> R; full multi-grade naturality no-go theorem proved (trivial holonomy, exact coboundary transitions, natural observables determined by grade 0, simultaneous zero divisor invariant); Lean 4 formalization compiled (459 declarations, 0 errors, 0 sorries); 22/22 unit tests passing. Principal classification: MULTIGRADE_NATURALITY_NO_GO_PROVED. Core TC routes to RH frozen."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_canonical_reconciliation_and_multigrade_naturality.json",
       "data/tc_unit_rescaling_no_go_and_genuine_coupling.json",
       "data/tc_intrinsic_fiber_ambient_realization.json",
       "data/tc_local_germ_prime_side_invariance.json",
