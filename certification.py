@@ -125,6 +125,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/ExceptionalTransfer.lean",
     "formal/RiemannScope/LocalGermInvariance.lean",
     "formal/RiemannScope/FiberArithmetic.lean",
+    "formal/RiemannScope/UnitRescaling.lean",
 ]
 
 

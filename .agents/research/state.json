@@ -3,7 +3,7 @@
   "active_commit": "8ed90a3c8d5e08deddbb7e81800465f7a2ec7af1",
   "immutable_legacy_baseline": "82643cafd605492233c6c1e992b78c2c30d45f13",
   "primary_reductio_objective": "H ==> exists K != J in A_R, m, n in Z\\{0}: m*tau^K = n*tau^J (tau = 2*pi), where H: exists rho off critical line",
-  "current_phase": "INTRINSIC_FIBER_AND_AMBIENT_REALIZATION",
+  "current_phase": "UNIT_RESCALING_NO_GO_AND_GENUINE_COUPLING",
   "active_tracks": {
     "track_0_enforcement_repairs": {
       "status": "COMPLETED",
@@ -242,10 +242,27 @@
         "Author docs/reviews/TC_INTRINSIC_FIBER_AMBIENT_REALIZATION.md and data/tc_intrinsic_fiber_ambient_realization.json"
       ],
       "completion_note": "TASK-TC-025 completed: Tagged arithmetic fibers F_K cong Z defined; internal operations proved base-independent (GENERIC_BASE_FIBER_INVARIANCE); canonical transfer maps proved ring isomorphisms and isometries; intrinsic zeta proved identically zeta(s); ambient series classified as AMBIENT_COORDINATE_DIRICHLET_SERIES with dimensional prefactor tau^{-Ks}; local germ scaling reconciled as coordinate covariance; ambient group algebra Q_bar[A_R] and ker(ev_tau) formulated (open on A_R); rank-one support theorem proved; four canonical strata established; Lean 4 formalization verified (414 declarations, 0 errors, 0 sorries); 22/22 unit tests passing. Principal classification: DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED."
+    },
+    "track_14_unit_rescaling_no_go_and_genuine_coupling": {
+      "status": "COMPLETED",
+      "tasks": [
+        "Formulate and prove Dirichlet-series unit-rescaling theorem: D_K^{amb}(s) = tau^{-Ks} D(s)",
+        "Prove zero-divisor and multiplicity invariance: Div_0(D_K^{amb}) = Div_0(D) and mult_rho(D_K^{amb}) = mult_rho(D)",
+        "Formulate Mellin-transform and log-coordinate translation versions with grade character chi_s(K) = tau^{-Ks}",
+        "Prove logarithmic derivative additive shift -(D_K^{amb})'/D_K^{amb} = K*log(tau) - D'/D with invariant residue -mult_rho(D)",
+        "Perform generic-base control: b^{-Ks} holds for all b > 0 (base-independent)",
+        "Exhaustively audit standard TC constructions: all classified as INTRINSIC_CONSTANT or UNIT_RESCALING_FACTORABLE",
+        "Audit arithmetic coefficients for genuine coupling: a_{n,K} = a_n confirmed, cross-grade ratio independent of n",
+        "Audit standard zeta structures for relations in ker(ev_tau): reported as NO_KERNEL_ELEMENT_FROM_STANDARD_ZETA_STRUCTURES_FOUND",
+        "Compile Lean 4 formalization formal/RiemannScope/UnitRescaling.lean (431 project declarations, 0 sorry) and verify 20 unit tests",
+        "Author docs/reviews/TC_UNIT_RESCALING_NO_GO_AND_GENUINE_COUPLING.md and data/tc_unit_rescaling_no_go_and_genuine_coupling.json"
+      ],
+      "completion_note": "TASK-TC-026 completed: Pure unit-rescaling no-go theorem proved across Dirichlet series, Mellin transforms, and log-coordinate distributions; zero divisor and multiplicity strictly preserved; logarithmic derivative residue invariant; generic-base control confirms base-independence; standard constructions classified as factorable or intrinsic constant; genuine coupling audited as absent; no kernel element in ker(ev_tau) found from standard zeta identities; Lean 4 formalization compiled (431 declarations, 0 errors, 0 sorries); 20/20 unit tests passing. Principal classification: PURE_UNIT_RESCALING_NO_GO_PROVED."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_unit_rescaling_no_go_and_genuine_coupling.json",
       "data/tc_intrinsic_fiber_ambient_realization.json",
       "data/tc_local_germ_prime_side_invariance.json",
       "data/tc_algebraic_grade_functional_bridge.json",

@@ -1426,8 +1426,49 @@ Define:
 3. `AMBIENT_CROSS_GRADE_ALGEBRA`: Group algebra $\overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ and evaluation $\operatorname{ev}_\tau$, cross-grade multiplication $(m\tau^K)(n\tau^J) = mn\tau^{K+J}$, cancellation $\tau^K \tau^{-K} = 1$. (Ambient cross-grade relations).
 4. `ANALYTIC_PULLBACK`: Auxiliary coordinate dilation $\zeta(\tau^{-K}s)$ with moving zeros $\tau^K \rho$. (Auxiliary diagnostic).
 
-- **Principal Classification**: `DUAL_INTRINSIC_AMBIENT_STRUCTURE_REQUIRED`
-- **Secondary Classification**: `INTRINSIC_TC_IS_TRANSPORT_OF_STRUCTURE_ONLY`
+---
+
+## 33. Unit-Rescaling No-Go Theorem and Search for Genuine Arithmetic Grade Coupling (TASK-TC-026)
+
+### 33.1 The Pure Unit-Rescaling No-Go Theorem
+- **Hypothesis**: Let $\{a_n\}_{n \ge 1}$ be an intrinsic arithmetic sequence preserved across all grades ($a_{(K, n)} = a_n$), with grade dependence entering solely through ambient coordinate realization $x_n = n\tau^K$.
+- **General Dirichlet Transform Law**:
+  \[
+  \boxed{D_K^{\mathrm{amb}}(s) = \sum_{n=1}^\infty a_n (n\tau^K)^{-s} = \tau^{-Ks} \sum_{n=1}^\infty a_n n^{-s} = \tau^{-Ks} D(s).}
+  \]
+  Valid on all finite partial sums, throughout the convergence half-plane, and under meromorphic continuation.
+- **Mellin Transform Formulation**: For Radon measures under dilation $x \mapsto \tau^K x$, $\mathcal{M}[\mu_K](s) = \tau^{K(s-1)}\mathcal{M}[\mu](s)$; for functions $f_K(x) = f(x/\tau^K)$, $\mathcal{M}[f_K](s) = \tau^{Ks}\mathcal{M}[f](s)$.
+- **Log-Coordinate Translation**: In logarithmic coordinate $u = \log x$, translation $u \mapsto u + K\log\tau$ acts on Fourier/Laplace transforms via the multiplier $e^{-s K\log\tau} = \tau^{-Ks}$.
+- **Grade Character Homomorphism**: $\chi_s(K) = \tau^{-Ks}$ is an additive character $\chi_s(K + J) = \chi_s(K)\chi_s(J)$ with $\chi_s(0) = 1$ and $|\chi_s(K)| = \tau^{-K\operatorname{Re}(s)} > 0$.
+
+### 33.2 Zero-Divisor and Multiplicity Invariance
+- **Zero Divisor Preservation**: Because $\tau^{-Ks} \ne 0$ everywhere on $\mathbb{C}$,
+  \[
+  \boxed{\operatorname{Div}_0(D_K^{\mathrm{amb}}) = \operatorname{Div}_0(D), \qquad \operatorname{mult}_\rho(D_K^{\mathrm{amb}}) = \operatorname{mult}_\rho(D).}
+  \]
+  Zero locations and multiplicities are strictly invariant. Pure unit rescaling cannot move, create, or destroy any zero of $\zeta(s)$, nor can it establish the Riemann Hypothesis.
+- **Logarithmic Derivative Additive Shift**:
+  \[
+  \boxed{-\frac{(D_K^{\mathrm{amb}})'}{D_K^{\mathrm{amb}}}(s) = K\log\tau - \frac{D'}{D}(s).}
+  \]
+  The additive shift $K\log\tau$ is an entire constant function; poles and residues at all zeros $\rho$ are strictly preserved: $\operatorname{Res}_{s=\rho}[-(D_K^{\mathrm{amb}})'/D_K^{\mathrm{amb}}] = -\operatorname{mult}_\rho(D)$.
+
+### 33.3 Comprehensive Repository Construction Audit
+- `INTRINSIC_CONSTANT`: $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$, Euler product $\prod_p (1 - p^{-s})^{-1}$, normalized converter $T_K^{\mathrm{int}}$, unit-normalized germ $\widehat{c}_K(\rho) = c_\xi(\rho)$.
+- `UNIT_RESCALING_FACTORABLE`: Ambient grid series $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$, completed ambient $\Xi_K^{\mathrm{amb}}(s) = \tau^{-K(s-1/2)}\xi(s)$, functional equation $Z_K^{\mathrm{amb}}(s) = \chi(s)\tau^{J(1-s)-Ks}Z_J^{\mathrm{amb}}(1-s)$, ambient converter $T_K^{\mathrm{amb}}$, ambient prime comb transform.
+- `DERIVED_GAUGE_COVARIANCE`: Local germ modulus variation $|c_{\Xi_K}(\rho)| = \tau^{-K\delta} |c_\xi(\rho)|$, logarithmic derivative shift $K\log\tau$.
+- `GENUINE_ARITHMETIC_GRADE_COUPLING`: **None found** in any standard TC construction. Coefficients satisfy $a_{n,K} = a_n$ identically; ratios $a_{n,K}/a_{n,J} = 1$ are independent of $n$.
+
+### 33.4 Ambient Realization Kernel Search
+- No standard zeta identity produces a non-trivial algebraic relation $\sum_{j=1}^r A_j \tau^{K_j} = 0$ ($A_j \in \overline{\mathbb{Q}}$). Special values $\zeta(2n)/\tau^{2n} \in \mathbb{Q}$ do not produce a relation because $\zeta(2n)$ is transcendental; zero ordinates $\gamma_n$ and $\log p$ are non-algebraic.
+- Status: `NO_KERNEL_ELEMENT_FROM_STANDARD_ZETA_STRUCTURES_FOUND`.
+
+### 33.5 Generic-Base Control and Role of Transcendence
+- For any real base $b > 0$, $D_{b,K}^{\mathrm{amb}}(s) = b^{-Ks}D(s)$. The unit-rescaling no-go theorem is base-independent.
+- Transcendence of $\tau$ plays no role in one-grade transform factorization or zero preservation; it governs only the ambient cross-grade algebra $\ker(\operatorname{ev}_\tau)$.
+
+- **Principal Classification**: `PURE_UNIT_RESCALING_NO_GO_PROVED`
+
 
 
 

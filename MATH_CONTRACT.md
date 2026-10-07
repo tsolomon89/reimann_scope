@@ -2994,3 +2994,43 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    No natural zeta identity equates a finite cross-grade expression to an algebraic number. Bilateral products $(p\tau^K)(p\tau^{-K}) = p^2$ and $|\eta_\rho(K)| \cdot |\eta_\rho(K)|^{-1} = 1$ balance total grade to zero identically.
    Constraint classification: `NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL`.
 
+---
+
+# 21. Intrinsic Grade-Fiber Arithmetic & Canonical Four-Way Architecture (TASK-TC-025)
+
+1. **Tagged Grade Fiber**: For each $K \in \mathbb A_{\mathbb R} = \overline{\mathbb Q} \cap \mathbb R$, the intrinsic arithmetic fiber is $\mathcal F_K = \{K\} \times \mathbb Z \cong \mathbb Z$, with operations $(K, m) \oplus_K (K, n) = (K, m + n)$, $(K, m) \odot_K (K, n) = (K, mn)$, unit $1_K = (K, 1)$, and normalized size $N_K(K, n) = n$.
+2. **Canonical Transfer Isomorphisms**: $T_{J \leftarrow K}: (K, n) \mapsto (J, n)$ is an exact ring isomorphism and isometric coordinate transfer. Intrinsic zeta $\zeta_K^{\mathrm{int}}(s) = \sum N_K(K, n)^{-s} = \zeta(s)$ is strictly grade-invariant.
+3. **Canonical Four-Way Classification**:
+   - `INTRINSIC_FIBER_ARITHMETIC`: Intrinsic rings $\mathcal F_K \cong \mathbb Z$, intrinsic zeta $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$.
+   - `AMBIENT_REALIZATION`: Embedded points $n\tau^K \in \mathbb R$, ambient series $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$, local germ scaling $\tau^{-K(\rho - 1/2)}$.
+   - `AMBIENT_CROSS_GRADE_ALGEBRA`: Group algebra $\overline{\mathbb Q}[\mathbb A_{\mathbb R}]$ and evaluation $\operatorname{ev}_\tau$, cross-grade algebra $(m\tau^K)(n\tau^J) = mn\tau^{K+J}$.
+   - `ANALYTIC_PULLBACK`: Auxiliary coordinate dilation $\zeta(\tau^{-K} s)$ with moving zeros $\tau^K \rho$.
+4. **Realization Kernel**: $\ker(\operatorname{ev}_\tau)$ controls finite cross-grade collapses $\sum a_j \tau^{K_j} = 0$. Injective on $\mathbb Z$ and $\mathbb Q$; open on $\mathbb A_{\mathbb R}$ (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
+
+---
+
+# 22. Pure Unit-Rescaling No-Go Theorem & Zero-Divisor Invariance (TASK-TC-026)
+
+1. **Dirichlet Factorization Theorem**:
+   For any intrinsic Dirichlet series $D(s) = \sum_{n=1}^\infty a_n n^{-s}$, the series realized under ambient coordinate scaling $x_n = n\tau^K$ factors as:
+   \[
+   \boxed{D_K^{\mathrm{amb}}(s) = \sum_{n=1}^\infty a_n (n\tau^K)^{-s} = \tau^{-Ks} \sum_{n=1}^\infty a_n n^{-s} = \tau^{-Ks} D(s).}
+   \]
+2. **Zero-Divisor Preservation**:
+   Because $\tau^{-Ks} = \exp(-Ks\log\tau) \ne 0$ for all $s \in \mathbb C$, multiplication by $\tau^{-Ks}$ preserves zero locations and multiplicities identically:
+   \[
+   \boxed{\operatorname{Div}_0(D_K^{\mathrm{amb}}) = \operatorname{Div}_0(D), \qquad \operatorname{mult}_\rho(D_K^{\mathrm{amb}}) = \operatorname{mult}_\rho(D).}
+   \]
+   Pure unit rescaling cannot create, move, or destroy any zero of $\zeta(s)$.
+3. **Logarithmic Derivative Invariance**:
+   \[
+   \boxed{-\frac{(D_K^{\mathrm{amb}})'}{D_K^{\mathrm{amb}}}(s) = K\log\tau - \frac{D'}{D}(s).}
+   \]
+   The additive shift $K\log\tau$ is an entire constant function; residue at every zero $\rho$ is strictly $-\operatorname{mult}_\rho(D)$.
+4. **Base-Independence**:
+   For any real base $b > 0$, $D_{b,K}^{\mathrm{amb}}(s) = b^{-Ks}D(s)$. The no-go theorem is a general property of real dilations, independent of the transcendence of $\tau$.
+5. **No-Go Conclusion**:
+   Pure unit rescaling is an exact symmetry / gauge transformation of Dirichlet and Mellin transforms. It leaves zero divisors invariant.
+   Principal classification: `PURE_UNIT_RESCALING_NO_GO_PROVED`.
+
+

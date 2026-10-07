@@ -49,6 +49,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/ExceptionalTransfer.lean",
     "formal/RiemannScope/LocalGermInvariance.lean",
     "formal/RiemannScope/FiberArithmetic.lean",
+    "formal/RiemannScope/UnitRescaling.lean",
 ]
 
 
