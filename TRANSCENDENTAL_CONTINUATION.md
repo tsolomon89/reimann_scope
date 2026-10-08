@@ -124,7 +124,7 @@ The real grade completion \(k \in \mathbb R\) provides an ambient continuous emb
 > Under the canonical four-way architecture established in TASK-TC-025 and TASK-TC-027 (see Section 0.1 and Section 32), the construction $\mathcal Z_\tau(s, K) = \zeta(\tau^{-K}s)$ is the **auxiliary analytic pullback** $Z_K^{\mathrm{pull}}(s)$. The moving-zero law $\rho \mapsto \tau^K \rho$ belongs *only* to this auxiliary pullback.
 > In canonical arithmetic TC, the intrinsic fiber is $\mathcal{F}_K = \{K\} \times \mathbb{Z} \cong \mathbb{Z}$, the intrinsic zeta is $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$ (identically constant with stationary zeros), and the ambient coordinate transform is $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$ (zeros invariant).
 
-Under the origin-dilation convention, define
+Under the historical auxiliary analytic-pullback origin-dilation convention, define
 
 \[
 \boxed{
@@ -136,7 +136,7 @@ K\in\mathbb A_{\mathbb R}.
 }
 \]
 
-The convention is chosen so that the \(K\)-slice zero coordinates expand as \(\tau^K\rho\).
+The auxiliary pullback convention is chosen so that the \(K\)-slice zero coordinates expand as \(\tau^K\rho\).
 
 At native grade:
 
@@ -498,7 +498,7 @@ The same construction motivates treating \(K\) as a structural coordinate of the
 
 ---
 
-# 10. Zeta slices
+# 10. Auxiliary analytic pullback zeta slices
 
 > [!NOTE]
 > **AUXILIARY ANALYTIC PULLBACK SLICES**
@@ -533,13 +533,13 @@ With discrete integer skeleton:
 }
 \]
 
-These slices are exact coordinate re-expressions of the analytically continued zeta object under the declared origin-dilation convention.
+These slices are exact coordinate re-expressions of the analytically continued zeta object under the historical auxiliary analytic-pullback origin-dilation convention.
 
 The fact that they are coordinate-related is a control, not a proof result.
 
 ---
 
-# 11. Zero worldlines
+# 11. Zero worldlines under auxiliary analytic pullback
 
 Suppose
 
@@ -1329,8 +1329,12 @@ The integer skeleton ($K \in \mathbb Z$) and rational extension ($K \in \mathbb 
 ### 30.2 The Exceptional Transfer Set $S_\tau$ and Dimension Bound
 Define:
 \[
-\boxed{S_\tau = \{\alpha \in \mathcal A : \tau^\alpha \in \overline{\mathbb Q}\}, \qquad \tau = 2\pi.}
+\boxed{S_\tau = \{\alpha \in \mathbb A_{\mathbb R} : \tau^\alpha \in \overline{\mathbb Q}\}, \qquad \tau = 2\pi.}
 \]
+> [!NOTE]
+> **NOTATION WARNING (NO CONFLATION WITH LATTICE UNIONS)**  
+> The symbol $S_\tau$ strictly designates the exceptional algebraic exponent set $\{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}$. It must not be conflated with the dense union of discrete arithmetic lattices $\mathfrak{L}_\tau = \bigcup_{K \in \mathbb{Z}} L_K$ (sometimes denoted $S_\tau$ in historical legacy documents).
+
 - **Vector Space Structure**: $S_\tau$ is proved to be a $\mathbb Q$-vector space: closed under addition ($\tau^{\alpha+\beta} = \tau^\alpha\tau^\beta$), negation ($\tau^{-\alpha} = (\tau^\alpha)^{-1}$), and positive real rational scaling ($(\tau^\alpha)^q \in \overline{\mathbb Q}$).
 - **Rational Intersection**: $S_\tau \cap \mathbb Q = \{0\}$ by Lindemann (1882) transcendence of $\pi$.
 - **Exceptional Direction Classification**: By Gelfond–Schneider (1934), if $\alpha, \beta \in S_\tau \setminus \{0\}$, then $(\tau^\alpha)^{\beta/\alpha} = \tau^\beta \in \overline{\mathbb Q}$ with algebraic base and power forces $\beta/\alpha \in \mathbb Q$.
@@ -1471,7 +1475,29 @@ Define:
   - Integer grades $\mathbb{Z}$: Injective (Lindemann 1882).
   - Rational grades $\mathbb{Q}$: Injective on finite support by clearing denominators.
   - Full algebraic grades $\mathbb{A}_{\mathbb{R}}$: **OPEN** (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`). Gelfond–Schneider bounds two-term relations ($\dim_{\mathbb{Q}} S_\tau \le 1$), but multi-term linear independence is unproved.
-- **Rank-One Support Theorem**: For $K_j = K_0 + q_j \alpha$ ($q_j \in \mathbb{Q}$), if $\alpha \notin S_\tau$, then $\{\tau^{K_j}\}$ are linearly independent over $\overline{\mathbb{Q}}$.
+- **Rank-One Support Theorem**: For $K_j = K_0 + q_j \alpha$ ($q_j \in \mathbb{Q}$), if $\alpha \notin S_\tau$, then $\{\tau^{K_j}\}$ are linearly independent over $\overline{\mathbb{Q}}$ (and over $\mathbb{A}_{\mathbb{R}}$).
+  - **Exact Derivation**:
+    Suppose there exists a non-trivial linear relation $\sum_{j=1}^r c_j \tau^{K_j} = 0$ with $c_j \in \overline{\mathbb{Q}}$ not all zero, and $K_j = K_0 + q_j \alpha$ with distinct $q_j \in \mathbb{Q}$.
+    1. Factor out $\tau^{K_0} \ne 0$:
+       \[
+       \sum_{j=1}^r c_j \tau^{q_j \alpha} = 0.
+       \]
+    2. Clear denominators in the rational exponents: write each $q_j = m_j / D$ with common denominator $D \in \mathbb{Z}_{\ge 1}$ and $m_j \in \mathbb{Z}$.
+    3. Define $X = \tau^{\alpha / D} > 0$. The relation becomes a Laurent polynomial in $X$:
+       \[
+       P(X) = \sum_{j=1}^r c_j X^{m_j} = 0.
+       \]
+    4. Multiplying by $X^M$ for $M = \max(0, -\min_j m_j)$ yields a non-zero algebraic polynomial equation $Q(X) = X^M P(X) = 0$ with coefficients in $\overline{\mathbb{Q}}$. Since at least one $c_j \ne 0$ and the exponents $m_j$ are distinct, $Q(X)$ is a non-zero polynomial.
+    5. Because $X = \tau^{\alpha/D} > 0$ is a root of a non-zero polynomial with coefficients in $\overline{\mathbb{Q}}$, $X$ is algebraic: $X \in \overline{\mathbb{Q}}$ (and since $X \in \mathbb{R}$, $X \in \mathbb{A}_{\mathbb{R}}$).
+    6. Since $\overline{\mathbb{Q}}$ is an algebraically closed field, $(\tau^{\alpha/D})^D = \tau^\alpha \in \overline{\mathbb{Q}}$ (specifically $\tau^\alpha \in \mathbb{A}_{\mathbb{R}}$).
+    7. By definition of the canonical exceptional set $S_\tau = \{\beta \in \mathbb{A}_{\mathbb{R}} : \tau^\beta \in \overline{\mathbb{Q}}\}$, this forces $\alpha \in S_\tau$, contradicting the hypothesis $\alpha \notin S_\tau$.
+    8. Hence no non-trivial linear relation can exist, proving linear independence of $\{\tau^{K_j}\}$ over $\overline{\mathbb{Q}}$ (and over $\mathbb{A}_{\mathbb{R}}$).
+  - **Attribution & External Dependencies**:
+    The reduction of rank-one linear independence to $X \in \overline{\mathbb{Q}}$ is an elementary single-variable polynomial degree reduction.
+    The classical transcendental number theory theorems are strictly **upstream** to $S_\tau$:
+    - **Lindemann's Theorem (1882)**: $e^z$ is transcendental for non-zero algebraic $z$; hence $\pi$ and $\tau = 2\pi$ are transcendental over $\mathbb{Q}$, establishing $1 \notin S_\tau$.
+    - **Gelfond–Schneider Theorem (1934)**: If $a \ne 0, 1$ is algebraic and $b$ is irrational algebraic, $a^b$ is transcendental. This establishes that $\dim_{\mathbb{Q}} S_\tau \le 1$ and for algebraic $K$, $\tau^K$ can only be algebraic if $K$ lies in a rank-one $\mathbb{Q}$-subspace.
+    Neither Lindemann nor Gelfond–Schneider proves multi-term linear independence across distinct irrational algebraic grades ($\dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}} \{K_j\} \ge 2$), which remains open.
 
 ### 32.5 Four Canonical Strata of Transcendental Continuation
 1. `INTRINSIC_FIBER_ARITHMETIC`: Tagged fibers $\mathcal{F}_K \cong \mathbb{Z}$, intrinsic size $N_K$, intrinsic zeta $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$. (Transport of structure only; no $\tau$-dependence).

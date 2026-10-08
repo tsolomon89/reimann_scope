@@ -132,7 +132,7 @@ Do not use one variable interchangeably for continuous $k$, canonical algebraic 
 
 ---
 
-# 3. Transcendental continuation
+# 3. Auxiliary analytic-pullback family (Historical)
 
 > [!IMPORTANT]
 > **HISTORICAL / AUXILIARY PULLBACK NOTATION (SUPERSEDED AS CANONICAL ARITHMETIC TC)**
@@ -140,7 +140,7 @@ Do not use one variable interchangeably for continuous $k$, canonical algebraic 
 > Under the canonical four-way architecture established in TASK-TC-025, TASK-TC-026, and TASK-TC-027 (Sections 21–23 below), $\mathcal Z_\tau(s, k) = \zeta(\tau^{-k}s)$ is the **auxiliary analytic pullback** $Z_k^{\mathrm{pull}}(s)$. The moving-zero law $\rho \mapsto \tau^k \rho$ belongs *only* to this auxiliary pullback.
 > In canonical arithmetic TC, the intrinsic fiber is $\mathcal{F}_K = \{K\} \times \mathbb{Z} \cong \mathbb{Z}$, the intrinsic zeta is $\zeta_K^{\mathrm{int}}(s) = \zeta(s)$ (identically constant with stationary zeros), and the ambient coordinate transform is $Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s)$ (zeros invariant).
 
-The project-defined transcendental-continuation family uses origin-dilation semantics.
+The historical auxiliary analytic-pullback family uses origin-dilation semantics.
 
 Define
 
@@ -176,7 +176,7 @@ It is not an RH result.
 
 ---
 
-# 4. Completed transcendental continuation
+# 4. Completed auxiliary analytic pullback
 
 Define
 
@@ -210,7 +210,7 @@ The zeros of \(\xi\) are the nontrivial zeros of \(\zeta\).
 
 ---
 
-# 5. Zero worldlines
+# 5. Zero worldlines under auxiliary analytic pullback
 
 Let
 

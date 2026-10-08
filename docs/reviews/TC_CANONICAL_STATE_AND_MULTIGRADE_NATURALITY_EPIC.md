@@ -88,12 +88,14 @@ Let $G = \mathbb A_{\mathbb R}$. Canonical transfers $T_{J \leftarrow K}: (K, n)
   \[
   \prod_{i=0}^{r-1} T_{K_{i+1} \leftarrow K_i} = \operatorname{id}_{\mathcal F_{K_0}}.
   \]
+  *(Lean proves low-order cases $r \in \{2, 3, 4\}$ via `fiber_loop_holonomy_two`, `fiber_loop_holonomy_three`, `fiber_loop_holonomy_four`; arbitrary finite-path composition is `PROVED_PAPER_DERIVATION`.)*
 There is zero holonomy or monodromy defect around any cycle.
 
 ### 2. Scale and Spectral Cocycles as Exact Coboundaries
 - Ambient scale cocycle: $c(J, K) = \tau^{J-K} = \frac{g(J)}{g(K)}$ where $g(K) = \tau^K$.
 - Spectral cocycle: $c_s(J, K) = \tau^{-(J-K)s} = \frac{g_s(J)}{g_s(K)}$ where $g_s(K) = \tau^{-Ks}$.
 - For any closed path: $\prod_{i=0}^{r-1} c(K_{i+1}, K_i) = 1$ and $\prod_{i=0}^{r-1} c_s(K_{i+1}, K_i) = 1$.
+*(Lean proves low-order cycle products for $r \in \{2, 3, 4\}$ via `scaleCocycle_loop_two`, `scaleCocycle_loop_three`, `scaleCocycle_loop_four`, `spectralCocycle_loop_two`, `spectralCocycle_loop_three`; general finite-path telescoping is `PROVED_PAPER_DERIVATION`.)*
 Every loop product telescopes trivially to 1.
 
 ### 3. Natural Observable Reconstruction
@@ -101,7 +103,9 @@ Any transfer-natural family $O_K: \mathcal F_K \to X$ commuting with transfer ma
 \[
 O_K = O_0 \circ T_{0 \leftarrow K}.
 \]
-This extends to all finite-arity operations. Simultaneous compatibility of natural observables introduces no new information beyond the native structure at grade 0.
+> [!NOTE]
+> **NATURALITY ARITY SCOPE**  
+> Unary and binary naturality are Lean-proved (`natural_observable_from_ref`, `natural_binary_from_ref`); finite-arity extension is routine paper derivation (`PROVED_PAPER_DERIVATION`). Simultaneous compatibility of natural observables introduces no new information beyond the native structure at grade 0.
 
 ---
 

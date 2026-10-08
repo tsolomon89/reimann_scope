@@ -115,5 +115,36 @@ Authoritative register of mathematical claims, formalization targets, and empiri
 | `CLM-CT-029` | Shared Spectral Zero Set & Distinct Arithmetic Obligations: The five zero-rigid spectral research formulations in the repository (RDQ, Curvature Transport, Weil-Hermitian, CMSA, Sesquilinear Form) share the exact critical-line spectral zero set \(\{\rho \in \mathbb C : \zeta(\rho) = 0\}\) (`SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS`), while maintaining distinct arithmetic representations and unproved arithmetic descent obligations without functional route isomorphism. | Master Obligation Unification | SHARED_SPECTRAL_ZERO_SET_WITH_DISTINCT_ARITHMETIC_OBLIGATIONS | `CURVATURE_TRANSPORT.md` §17 | Lean 4 `master_radial_defect_unification`, `finite_positive_weight_curvature_rigidity`; Python `reconcile_surviving_radial_descent_routes` |
 | `CLM-RH-001` | Exclusivity of radial leaf \(R_\tau = 0\): all nontrivial zeros of \(\zeta(s)\) have \(\delta = 0\). | Central Programme | OPEN / CONJECTURED (RH) | `RESEARCH_HYPOTHESIS.md` | Global contradiction proof |
 
+---
+
+## Transcendental Continuation Architectural Stratification & Supersession Registry
+
+The following stratification and supersession registry provides canonical status classification for all Transcendental Continuation (`CLM-TC-*`) claims, distinguishing historical auxiliary analytic pullback formulations from the canonical intrinsic-fiber / ambient-realization architecture:
+
+| Claim Reference | Canonical Layer | Supersession & Epistemic Classification | Canonical Role & Reference |
+| :--- | :--- | :--- | :--- |
+| [CLM-TC-001] | `ANALYTIC_PULLBACK_AUXILIARY` | `SUPERSEDED_HISTORICAL` | Auxiliary argument dilation $\mathcal{Z}_\tau(s, k) = \zeta(\tau^{-k}s)$. Superseded as canonical TC arithmetic; retained as auxiliary analytic diagnostic. See `TRANSCENDENTAL_CONTINUATION.md` §10. |
+| [CLM-TC-002] | `ANALYTIC_PULLBACK_AUXILIARY` | `SUPERSEDED_HISTORICAL` | Moving zero worldline $s_\rho(k) = \tau^k \rho$ under auxiliary pullback $\mathcal{Z}_\tau$. Superseded as canonical TC zero behavior; canonical intrinsic zeros are invariant ($\zeta_K^{\mathrm{int}}(\rho) = 0$). See `TRANSCENDENTAL_CONTINUATION.md` §11. |
+| [CLM-TC-003] | `ANALYTIC_PULLBACK_AUXILIARY` | `SUPERSEDED_HISTORICAL` | Radial coordinate foliation $R_\tau = \delta$ under pullback worldline dilation. Superseded as canonical TC coordinate; retained as auxiliary pullback property. See `TRANSCENDENTAL_CONTINUATION.md` §11. |
+| [CLM-TC-004] | `ANALYTIC_PULLBACK_AUXILIARY` | `SUPERSEDED_HISTORICAL` | Bilateral discrete defect under pullback dilation. Superseded as canonical TC defect; under canonical TC, intrinsic defect vanishes identically. See `MATH_CONTRACT.md` §3. |
+| [CLM-TC-005] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Station lattice non-coincidence ($L_K \cap L_J = \{0\}$ for $K \ne J$) via transcendence of $\tau$, decoupling from scalar Dirichlet dilation $\tau^{-Ks}\zeta(s)$. |
+| [CLM-TC-006] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Grade character $\chi_\rho(K)$ admitting all $\delta \in (-1/2, 1/2)$; smooth symmetry laws do not quantize without extra premises. |
+| [CLM-TC-007] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Completed logarithmic derivative difference $(K-J)\log\tau$ cancels all zero/pole divisors identically on $\mathbb{C}$. |
+| [CLM-TC-008] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Common-Referent Collision Theorem & Observable Inventory Classification; CR-1, CR-2, CR-3 analysis. |
+| [CLM-TC-009] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Unitary and Bilateral Boundedness Grade-Character Criteria (Theorems A & B); norm audit. |
+| [CLM-TC-010] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Log-Haar Temperedness Bridge & Prime Error Equivalence (Theorem C). |
+| [CLM-TC-011] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Prime-Error Distributional Temperedness Equivalence Theorem ($T_E \in \mathcal{S}' \iff \text{RH}$). |
+| [CLM-TC-012] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Discrete Grade-Orbit Criterion and failure of coordinate naturality to imply grade-uniform temperedness. |
+| [CLM-TC-013] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Intrinsic semiring isomorphism, ambient Dirichlet series $\tau^{-Ks}\zeta(s)$, impossibility of concrete collision witness. |
+| [CLM-TC-014] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Dense disjoint grade layers $L_K = \tau^K \mathbb{Z}$; absence of grade-limit defect. |
+| [CLM-TC-015] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Prime-measure scaling limit and half-density TC bridge audit. |
+| [CLM-TC-016] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | TC zero-phase nonresonance, certified incommensurability bounds, and Vandermonde cancellation. |
+| [CLM-TC-017] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Complete smoothed TC transport, quantitative Vandermonde block detectability. |
+| [CLM-TC-018] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Multi-grade complete transport and remainder-aware Vandermonde detection. |
+| [CLM-TC-019] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | TC test-family investigation, complex remainder formalization. |
+| [CLM-TC-020] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Autonomous TC mechanism discovery epic synthesis: Vandermonde reconstruction in Lean 4. |
+| [CLM-TC-021] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Spectral isolation repairs, arithmetic overlap observable contract, Lean 4 formalization. |
+| [CLM-TC-022] | `CANONICAL_TC` | `CURRENTLY_ACTIVE` | Two-variable formula, remainder cancellation, finite spectral perturbation rigidity. |
+
 
 

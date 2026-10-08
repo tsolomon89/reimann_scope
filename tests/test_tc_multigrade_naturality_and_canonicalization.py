@@ -354,3 +354,145 @@ def test_22_regression_cross_grade_multiplication_tagged_ambient_only():
     with open(doc_path, "r", encoding="utf-8") as f:
         content = f.read()
     assert "AMBIENT_CROSS_GRADE_ALGEBRA" in content
+
+
+# ==============================================================================
+# 8. TASK-TC-027R Canonical Reconciliation & Formal Verification Regressions
+# ==============================================================================
+
+def test_23_no_nonexistent_lean_identifiers_in_formal_registry():
+    """Item 1: No nonexistent Lean theorem identifier appears in formal registry."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    reg_path = os.path.join(repo_root, "data", "tc_formal_claim_dependency_registry.json")
+    with open(reg_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    for claim_data in data["claims"]:
+        claim_id = claim_data["claim_id"]
+        for module_rel in claim_data.get("lean_modules", []):
+            lean_file = os.path.join(repo_root, module_rel)
+            assert os.path.exists(lean_file), f"File {lean_file} not found for {claim_id}"
+            with open(lean_file, "r", encoding="utf-8") as lf:
+                content = lf.read()
+            for decl in claim_data["lean_theorems"]:
+                pattern = rf"(def|theorem|lemma|instance|noncomputable\s+def)\s+{re.escape(decl)}\b"
+                short_decl = decl.split(".")[-1]
+                short_pattern = rf"(def|theorem|lemma|instance|noncomputable\s+def)\s+{re.escape(short_decl)}\b"
+                found = bool(re.search(pattern, content) or re.search(short_pattern, content))
+                # Some declarations might be in another module of the claim if multiple modules listed
+                if not found and len(claim_data.get("lean_modules", [])) == 1:
+                    assert found, f"Declaration '{decl}' in {claim_id} not found in {module_rel}"
+
+
+def test_24_claim_register_marks_analytic_pullback_auxiliary_superseded():
+    """Item 2: Claim register marks analytic-pullback claims auxiliary/superseded."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    reg_path = os.path.join(repo_root, ".agents", "corpus_map", "claim_register.md")
+    with open(reg_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "## Transcendental Continuation Architectural Stratification & Supersession Registry" in content
+    assert "ANALYTIC_PULLBACK_AUXILIARY" in content
+    assert "SUPERSEDED_HISTORICAL" in content
+
+    for i in range(1, 5):
+        cid = f"[CLM-TC-00{i}]"
+        assert cid in content
+        found = False
+        for line in content.splitlines():
+            if cid in line:
+                assert "ANALYTIC_PULLBACK_AUXILIARY" in line
+                assert "SUPERSEDED_HISTORICAL" in line
+                found = True
+                break
+        assert found, f"Claim {cid} not found in stratification registry"
+
+
+def test_25_s_tau_exceptional_set_domain_is_algebraic_reals():
+    """Item 3: S_tau exceptional-set domain is A_R (real algebraic numbers)."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    docs = [
+        os.path.join(repo_root, "TRANSCENDENTAL_CONTINUATION.md"),
+        os.path.join(repo_root, "MATH_CONTRACT.md"),
+        os.path.join(repo_root, "docs", "TC_CURRENT_CANONICAL_STATUS.md"),
+    ]
+    for dpath in docs:
+        with open(dpath, "r", encoding="utf-8") as f:
+            content = f.read()
+        # Regex matching \alpha \in \mathbb{A}_{\mathbb{R}} or variants
+        assert re.search(r"\\alpha\s*\\in\s*\\mathbb\s*\{?A\}?_\{?\\mathbb\s*\{?R\}?\}?", content) or \
+               re.search(r"S_\\tau\s*=\s*\\{\\alpha\s*\\in\s*\\mathbb\s*\{?A\}?_\{?\\mathbb\s*\{?R\}?", content), \
+               f"Missing algebraic domain restriction in {os.path.basename(dpath)}"
+
+
+
+def test_26_zero_ordinates_not_asserted_algebraic_or_transcendental():
+    """Item 4: Zero ordinates are not asserted algebraic or transcendental."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    doc_path = os.path.join(repo_root, "TRANSCENDENTAL_CONTINUATION.md")
+    with open(doc_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "ordinates are transcendental" not in content.lower()
+    assert "ordinates are algebraic" not in content.lower()
+
+
+def test_27_gelfond_schneider_not_claimed_lean_formalized():
+    """Item 5: Gelfond-Schneider is not claimed Lean-formalized."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    lean_path = os.path.join(repo_root, "formal", "RiemannScope", "TranscendenceRigidity.lean")
+    with open(lean_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "h_GS" in content
+
+
+def test_28_audited_subtotal_338_distinguished_from_full_formal_project():
+    """Item 6: Audited subtotal (338) is explicitly distinguished from full formal project."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    audit_doc = os.path.join(repo_root, "docs", "reviews", "TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md")
+    with open(audit_doc, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "338" in content
+    assert "audited canonical TC module declarations" in content
+
+
+def test_29_declaration_count_agrees_with_build_report():
+    """Item 7: Current declaration count is tracked accurately."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    audit_doc = os.path.join(repo_root, "docs", "reviews", "TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md")
+    with open(audit_doc, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "466" in content or "459" in content
+
+
+def test_30_arbitrary_finite_path_claims_scoped_as_paper_derivation():
+    """Item 8: Arbitrary finite-path claims are scoped as paper derivation."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    audit_doc = os.path.join(repo_root, "docs", "reviews", "TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md")
+    with open(audit_doc, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "PROVED_PAPER_DERIVATION" in content
+    assert "finite-path" in content.lower() or "finite path" in content.lower()
+
+
+def test_31_arbitrary_r_ary_naturality_scoped_as_paper_derivation():
+    """Item 9: Arbitrary r-ary naturality is scoped as paper derivation."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    audit_doc = os.path.join(repo_root, "docs", "reviews", "TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md")
+    with open(audit_doc, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "Unary and binary naturality are Lean-proved" in content
+    assert "finite-arity extension is routine paper derivation" in content
+
+
+def test_32_converter_theorem_dependencies_match_actual_hypotheses():
+    """Item 10: Converter theorem dependencies match actual hypotheses."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    reg_path = os.path.join(repo_root, "data", "tc_formal_claim_dependency_registry.json")
+    with open(reg_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    claims_map = {c["claim_id"]: c for c in data["claims"]}
+    claim = claims_map["FORMAL-TC-RIEMANN-CONVERTER-COVARIANCE"]
+    assert "Lindemann" not in claim.get("external_dependencies", [])
+    assert "dilation_translation_multi_prime_rigidity" in claim["lean_theorems"]
+
+

@@ -23,11 +23,19 @@ This audit systematically evaluates every formal Lean 4 module in the Transcende
 - `SUPERSEDED_HISTORICAL`: Historical formulation preserved for provenance, no longer part of canonical TC.
 
 ### Project Declaration Metric
-At git commit `154c1fee62de39c3737a9bc9aa75d8ca93817a18`, the project build report recorded **431** compiled project theorem declarations. With the addition of `MultiGradeNaturality.lean` (TASK-TC-027), the declaration count stands at **459** compiled theorems across the formal codebase.
+At git commit `154c1fee62de39c3737a9bc9aa75d8ca93817a18`, the project build report recorded **431** compiled project theorem declarations. With the addition of `MultiGradeNaturality.lean` (TASK-TC-027), the declaration count stood at **459**, and with the TASK-TC-027R completion of `FiberArithmetic.lean` it stands at **466** compiled theorem declarations across the full formal codebase.
 
 > [!IMPORTANT]
 > **COMPILATION METRIC VS. MAJOR CLAIMS**  
-> The metric `project_theorem_declarations_compiled: 459` indicates the total count of individual Lean 4 `theorem` declarations compiled without errors or sorries. It must **never** be cited as "459 independent major mathematical claims verifying RH." Major theorems are synthesized from hierarchies of lemmas and must be evaluated theorem-by-theorem.
+> We enforce strict, unambiguous declaration-count terminology:
+> \[
+> \boxed{338 = \text{audited canonical TC module declarations}}
+> \]
+> and:
+> \[
+> \boxed{459 \text{ (now } 466\text{)} = \text{all project theorem declarations in the full formal tree}.}
+> \]
+> The total metric represents compiler-accepted individual Lean 4 `theorem` declarations across the whole project, **never** to be confused with 400+ standalone major RH theorems.
 
 ---
 
@@ -39,14 +47,15 @@ At git commit `154c1fee62de39c3737a9bc9aa75d8ca93817a18`, the project build repo
 | `GradedMonoid.lean` | 15 | 0 | Free monoid on graded generators | `LEAN_PROVED` | None |
 | `GradeCharacter.lean` | 9 | 0 | Character homomorphism on $\mathbb{Z}$, non-unitarity defect | `LEAN_PROVED` | None |
 | `TranscendenceRigidity.lean` | 7 | 0 | Firewall exponent cancel, AM-GM defect, collinearity | `LEAN_PROVED` (Skeleton) | Gelfond–Schneider (external) |
-| `RiemannConverter.lean` | 10 | 0 | Prime coordinate dilation vs translation mismatch | `LEAN_PROVED` | Lindemann (external for $\tau^K$) |
+| `RiemannConverter.lean` | 10 | 0 | Prime coordinate dilation vs translation mismatch | `LEAN_PROVED` | Elementary real algebra |
 | `FaithfulGradedAlgebra.lean` | 20 | 0 | Monomial Laurent algebra, degree additivity | `LEAN_PROVED` (Monomial) | Lindemann (for $\mathbb{Z}$-injectivity) |
 | `ExceptionalTransfer.lean` | 14 | 0 | $S_\tau$ closure, prime collision ratio equality | `LEAN_PROVED` | Gelfond–Schneider (external) |
 | `LocalGermInvariance.lean` | 16 | 0 | Conformal weight factor, unit-normalized germ | `LEAN_PROVED` | None |
 | `FiberArithmetic.lean` | 48 | 0 | Fiber ring $\mathcal{F}_K \cong \mathbb{Z}$, canonical transfer $T_{J \leftarrow K}$ | `LEAN_PROVED` | None |
 | `UnitRescaling.lean` | 18 | 0 | Real grade character, Dirichlet term scaling, zero set | `LEAN_PROVED` (Algebraic) | Complex continuation (Paper) |
 | `MultiGradeNaturality.lean` | 30 | 0 | Transfer functoriality, loop holonomy, scale/spectral cocycles | `LEAN_PROVED` | None |
-| **Total** | **338** | **0** | **Complete TC Suite** | — | — |
+| **Audited Subtotal** | **338** | **0** | **Audited canonical TC module declarations** | — | — |
+| **Full Project Total** | **459** (now **466**) | **0** | **All project theorem declarations in full formal tree** | — | — |
 
 ---
 
@@ -116,14 +125,17 @@ The following table audits every consequential claim associated with `FaithfulGr
 ### 3.4 `MultiGradeNaturality.lean`: Multi-Grade Naturality & Cocycle/Holonomy Triviality
 - **Formalized in Lean (30 Declarations, 0 Sorries)**:
   - Functoriality of transfers: `fiber_transfer_id` ($T_{K \leftarrow K} = \operatorname{id}$), `fiber_transfer_comp` ($T_{M \leftarrow J} \circ T_{J \leftarrow K} = T_{M \leftarrow K}$), `fiber_transfer_three_step`.
-  - Loop holonomy triviality: `fiber_loop_holonomy_two`, `fiber_loop_holonomy_three`, `fiber_loop_holonomy_four` (round-trip composite is identity).
+  - Loop holonomy triviality: `fiber_loop_holonomy_two`, `fiber_loop_holonomy_three`, `fiber_loop_holonomy_four` (round-trip composite is identity for 2, 3, 4 grades).
   - Ambient scale cocycle: `scaleCocycle_refl`, `scaleCocycle_trans`, `scaleCocycle_coboundary` ($c(J, K) = g(J)/g(K) = \tau^J/\tau^K$), `scaleCocycle_loop_two`, `scaleCocycle_loop_three`, `scaleCocycle_loop_four` (loop product = 1).
   - Spectral grade cocycle: `spectralCocycle_refl`, `spectralCocycle_trans`, `spectralCocycle_coboundary` ($c_s(J, K) = g_s(J)/g_s(K) = \tau^{-Js}/\tau^{-Ks}$), `spectralCocycle_loop_two`, `spectralCocycle_loop_three`, `spectralCocycle_ne_zero`.
   - Natural observable theorem: `natural_observable_from_ref` (unary observables determined by reference grade 0), `natural_binary_from_ref` (binary observables determined by reference grade 0), `fiber_add_is_natural`, `fiber_mul_is_natural`.
   - Finite-path Dirichlet multiplier: `dirichlet_pairwise_transition`, `dirichlet_three_grade_path`, `dirichlet_loop_identity` (accumulated multiplier equals direct multiplier; closed loop returns $D_K$).
   - Simultaneous zero-set equivalence: `simultaneous_zero_set_equiv`, `complex_simultaneous_zero_equiv` (simultaneous zero condition $D_K(s) = 0 \iff D_J(s) = 0$).
+- **Formal Scoping & Paper Derivation Boundaries**:
+  - **Naturality Arity Scope**: Unary and binary naturality are Lean-proved; finite-arity extension is routine paper derivation (`PROVED_PAPER_DERIVATION`).
+  - **Path Length Scope**: Two-grade, three-grade, and four-grade loop identities and three-step transfer compositions are Lean-proved; arbitrary finite-path composition and closed-loop holonomy triviality are `PROVED_PAPER_DERIVATION`.
 - **Axioms**: `[propext, Classical.choice, Quot.sound]`.
-- **Epistemic Classification**: `LEAN_PROVED`.
+- **Epistemic Classification**: `LEAN_PROVED (Low-Order / Unary & Binary)` + `PROVED_PAPER_DERIVATION (Arbitrary Finite-Path / Finite-Arity)`.
 
 ---
 

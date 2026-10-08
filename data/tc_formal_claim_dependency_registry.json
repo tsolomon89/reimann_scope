@@ -2,10 +2,10 @@
   "schema_version": "1.0.0",
   "registry_type": "tc_formal_claim_dependency_registry",
   "metadata": {
-    "task_id": "TASK-TC-027",
-    "title": "Formal Claim Dependency Registry for Transcendental Continuation",
-    "date": "2026-10-07",
-    "project_theorem_declarations_compiled": 459,
+    "task_id": "TASK-TC-027R",
+    "title": "Formal Claim Dependency Registry for Transcendental Continuation (Canonical Repair)",
+    "date": "2026-10-08",
+    "project_theorem_declarations_compiled": 466,
     "formal_lean_version": "v4.8.0",
     "axioms_used": ["propext", "Classical.choice", "Quot.sound"]
   },
@@ -18,16 +18,21 @@
         "GradeFiber.add_assoc",
         "GradeFiber.add_comm",
         "GradeFiber.zero_add",
+        "GradeFiber.add_zero",
         "GradeFiber.add_left_neg",
         "GradeFiber.mul_assoc",
         "GradeFiber.mul_comm",
         "GradeFiber.one_mul",
         "GradeFiber.mul_one",
         "GradeFiber.left_distrib",
+        "GradeFiber.right_distrib",
         "GradeFiber.toZ_fromZ",
-        "GradeFiber.fromZ_toZ"
+        "GradeFiber.fromZ_toZ",
+        "GradeFiber.ringEquivZ",
+        "GradeFiber.ringEquivZ_apply",
+        "GradeFiber.ringEquivZ_symm_apply"
       ],
-      "theorem_statement": "The tagged fiber (GradeFiber K, add, mul) forms a commutative ring canonically isomorphic to (Z, +, *) via toZ and fromZ.",
+      "theorem_statement": "The tagged fiber GradeFiber K forms a commutative ring (instance CommRing (GradeFiber K)) canonically isomorphic to (Z, +, *) via ring equivalence ringEquivZ K : GradeFiber K ≃+* ℤ.",
       "theorem_hypotheses": [],
       "lean_axioms": ["propext", "Classical.choice", "Quot.sound"],
       "external_theorems": [],
@@ -141,14 +146,19 @@
         "formal/RiemannScope/LocalGermInvariance.lean"
       ],
       "lean_theorems": [
-        "centered_weight_real_part",
-        "germ_modulus_scaling",
-        "unit_normalized_germ_invariant",
-        "unit_normalized_germ_real",
-        "normalized_germ_derivative_ratio"
+        "centered_germ_scaling",
+        "centered_real_exponent",
+        "log_modulus_finite_difference",
+        "harmonic_translation_exponent",
+        "harmonic_modulus_exponent",
+        "unit_normalized_germ_invariance",
+        "reflected_germ_relation",
+        "reflected_germ_product_exponent_cancel",
+        "reflected_germ_product_independent",
+        "germ_modulus_ratio_detector"
       ],
-      "theorem_statement": "The normalized germ c_hat_K(rho) = tau^{K*(rho - 1/2)} * c_{Xi_K}(rho) equals c_xi(rho) identically across all grades K.",
-      "theorem_hypotheses": ["0 < tau"],
+      "theorem_statement": "unit_normalized_germ_invariance: tau_K_factor * (tau_K_factor⁻¹ * c_xi_rho) = c_xi_rho; germ modulus ratio equals 1 iff delta = 0.",
+      "theorem_hypotheses": ["tau_K_factor ≠ 0"],
       "lean_axioms": ["propext", "Classical.choice", "Quot.sound"],
       "external_theorems": [],
       "full_claim_formalized": true,
@@ -161,18 +171,19 @@
         "formal/RiemannScope/RiemannConverter.lean"
       ],
       "lean_theorems": [
-        "converter_dilation_translation_contrast",
-        "two_prime_rigidity",
-        "converter_scale_factor_pos",
-        "reciprocal_dilation_modulus_invariant"
+        "converter_endpoint_scaling",
+        "converter_contour_height_scaling",
+        "dilation_translation_coincidence_iff",
+        "dilation_translation_multi_prime_rigidity",
+        "centered_harmonic_analytic_invariance",
+        "centered_harmonic_arithmetic_shift"
       ],
-      "theorem_statement": "(tau^(-K) - 1) * log p1 = (tau^(-K) - 1) * log p2 implies p1 = p2.",
-      "theorem_hypotheses": ["0 < p1", "0 < p2"],
+      "theorem_statement": "For c_inv - 1 ≠ 0 and log_p1 ≠ log_p2, dilation (c_inv - 1) * log_p1 = shift and (c_inv - 1) * log_p2 = shift cannot simultaneously hold.",
+      "theorem_hypotheses": ["log_p1 ≠ log_p2", "c_inv - 1 ≠ 0"],
       "lean_axioms": ["propext", "Classical.choice", "Quot.sound"],
-      "external_theorems": [
-        "Lindemann (1882) transcendence of log p for rational primes p"
-      ],
+      "external_theorems": [],
       "full_claim_formalized": true,
+      "formalization_scope_note": "The Lean theorem dilation_translation_multi_prime_rigidity is elementary real algebra over assumed distinct log-stations (log_p1 ≠ log_p2) and scale factor (c_inv - 1 ≠ 0), without external transcendence axioms. Specialization to distinct rational primes uses injectivity of real logarithm on Q^+; external Lindemann transcendence applies upstream to tau^K but is not invoked by the rigidity theorem itself.",
       "evidence_classification": "LEAN_PROVED"
     },
     {

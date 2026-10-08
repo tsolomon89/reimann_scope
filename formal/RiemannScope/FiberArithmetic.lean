@@ -21,6 +21,8 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
+import Mathlib.Algebra.Ring.Equiv
+import Mathlib.Logic.Equiv.TransferInstance
 import RiemannScope.Grade
 import RiemannScope.GradedMonoid
 import RiemannScope.TranscendenceRigidity
@@ -66,6 +68,20 @@ instance (K : ℝ) : Neg (GradeFiber K) where
   neg := neg
 
 theorem neg_val (x : GradeFiber K) : (-x).val = -x.val := rfl
+
+/-- Fiber subtraction: (K, m) - (K, n) = (K, m - n). -/
+def sub (x y : GradeFiber K) : GradeFiber K := ⟨x.val - y.val⟩
+
+instance (K : ℝ) : Sub (GradeFiber K) where
+  sub := sub
+
+theorem sub_val (x y : GradeFiber K) : (x - y).val = x.val - y.val := rfl
+
+/-- Additive inverse law: -x + x = 0. -/
+theorem add_left_neg (x : GradeFiber K) : -x + x = 0 := by
+  cases x
+  show GradeFiber.mk (-_ + _) = GradeFiber.mk 0
+  rw [_root_.add_left_neg]
 
 /-- Fiber multiplication (intrinsic ⊙_K): (K, m) ⊙_K (K, n) = (K, mn). -/
 def mul (x y : GradeFiber K) : GradeFiber K :=
@@ -163,6 +179,35 @@ theorem toZ_mul (x y : GradeFiber K) : toZ (x * y) = toZ x * toZ y := rfl
 theorem toZ_zero : toZ (0 : GradeFiber K) = 0 := rfl
 
 theorem toZ_one : toZ (1 : GradeFiber K) = 1 := rfl
+
+theorem toZ_neg (x : GradeFiber K) : toZ (-x) = -toZ x := rfl
+
+theorem toZ_sub (x y : GradeFiber K) : toZ (x - y) = toZ x - toZ y := rfl
+
+theorem toZ_injective (K : ℝ) : Function.Injective (toZ : GradeFiber K → ℤ) := by
+  intro a b h
+  cases a; cases b
+  dsimp [toZ] at h
+  rw [h]
+
+/-- Canonical bijection between GradeFiber K and ℤ. -/
+def equivZ (K : ℝ) : GradeFiber K ≃ ℤ where
+  toFun := toZ
+  invFun := fromZ K
+  left_inv := fromZ_toZ
+  right_inv := toZ_fromZ
+
+/-- Commutative ring structure on GradeFiber K, canonically transferred from ℤ. -/
+instance (K : ℝ) : CommRing (GradeFiber K) := (equivZ K).commRing
+
+/-- Canonical ring equivalence GradeFiber K ≃+* ℤ. -/
+def ringEquivZ (K : ℝ) : GradeFiber K ≃+* ℤ := (equivZ K).ringEquiv
+
+/-- Forward evaluation of the ring equivalence equals the integer referent. -/
+theorem ringEquivZ_apply (x : GradeFiber K) : ringEquivZ K x = x.val := rfl
+
+/-- Inverse evaluation of the ring equivalence embeds an integer referent. -/
+theorem ringEquivZ_symm_apply (n : ℤ) : (ringEquivZ K).symm n = fromZ K n := rfl
 
 /-! ### 3. Realized Fiber Multiplication -/
 

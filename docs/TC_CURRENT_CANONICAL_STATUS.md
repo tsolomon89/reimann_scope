@@ -117,10 +117,16 @@ Let $G = \mathbb{A}_{\mathbb{R}}$. The family of intrinsic fibers $\{\mathcal{F}
    \[
    T_{K_0 \leftarrow K_{r-1}} \circ \cdots \circ T_{K_1 \leftarrow K_0} = \operatorname{id}_{\mathcal{F}_{K_0}}.
    \]
+   *(Lean proves low-order cases $r \in \{2, 3, 4\}$ via `fiber_loop_holonomy_two`, `fiber_loop_holonomy_three`, `fiber_loop_holonomy_four`; arbitrary finite-path composition is `PROVED_PAPER_DERIVATION`.)*
 3. **Exact 1-Coboundaries**:
    - Ambient scale cocycle: $c(J, K) = \tau^{J-K} = \frac{g(J)}{g(K)}$ where $g(K) = \tau^K$. Loop product is identically $1$.
    - Spectral grade cocycle: $c_s(J, K) = \tau^{-(J-K)s} = \frac{g_s(J)}{g_s(K)}$ where $g_s(K) = \tau^{-Ks}$. Loop product is identically $1$.
-4. **Natural Observable Reconstruction**: Any transfer-natural observable $O_K: \mathcal{F}_K \to X$ satisfying $O_J \circ T_{J \leftarrow K} = O_K$ is uniquely determined by reference grade 0:
+   *(Lean proves low-order cycle products for $r \in \{2, 3, 4\}$ via `scaleCocycle_loop_two`, `scaleCocycle_loop_three`, `scaleCocycle_loop_four`, `spectralCocycle_loop_two`, `spectralCocycle_loop_three`; general finite-path telescoping is `PROVED_PAPER_DERIVATION`.)*
+4. **Natural Observable Reconstruction**:
+   > [!NOTE]
+   > **NATURALITY ARITY SCOPE**  
+   > Unary and binary naturality are Lean-proved (`natural_observable_from_ref`, `natural_binary_from_ref`); finite-arity extension is routine paper derivation (`PROVED_PAPER_DERIVATION`).
+   Any transfer-natural observable $O_K: \mathcal{F}_K \to X$ satisfying $O_J \circ T_{J \leftarrow K} = O_K$ is uniquely determined by reference grade 0:
    \[
    O_K = O_0 \circ T_{0 \leftarrow K}.
    \]
@@ -135,8 +141,12 @@ The ambient realization kernel $\ker(\operatorname{ev}_\tau)$ is an independent 
 ### 4.1 Exceptional Transfer Directions
 Define the exceptional exponent set:
 \[
-S_\tau = \{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}.
+\boxed{S_\tau = \{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}.}
 \]
+> [!NOTE]
+> **NOTATION WARNING (NO CONFLATION WITH LATTICE UNIONS)**  
+> The symbol $S_\tau$ strictly designates the exceptional algebraic exponent set $\{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}$. It must not be conflated with the dense union of discrete arithmetic lattices $\mathfrak{L}_\tau = \bigcup_{K \in \mathbb{Z}} L_K$ (sometimes denoted $S_\tau$ in historical legacy documents).
+
 - $S_\tau$ is a $\mathbb{Q}$-vector space with $S_\tau \cap \mathbb{Q} = \{0\}$ (Lindemann 1882).
 - By the Gelfond–Schneider theorem (1934), for any non-zero $\alpha, \beta \in S_\tau$, the ratio $\beta/\alpha$ is rational. Therefore:
   \[
@@ -147,7 +157,7 @@ S_\tau = \{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathb
 ### 4.2 Injectivity Status of $\operatorname{ev}_\tau$
 - **Integer Grades $\mathbb{Z}$**: Strictly injective (Lindemann 1882).
 - **Rational Grades $\mathbb{Q}$**: Strictly injective on finite support by clearing denominators.
-- **Rank-One Rational Affine Supports**: Injective for $K_j = K_0 + q_j \alpha$ ($q_j \in \mathbb{Q}$) whenever $\alpha \notin S_\tau$.
+- **Rank-One Rational Affine Supports**: Injective for $K_j = K_0 + q_j \alpha$ ($q_j \in \mathbb{Q}$) whenever $\alpha \notin S_\tau$. (Derived by reducing $\sum c_j \tau^{q_j \alpha} = 0$ to a single-variable algebraic polynomial in $X = \tau^{\alpha/D}$ over $\mathbb{A}_{\mathbb{R}}$ or $\overline{\mathbb{Q}}$, forcing $X \in \overline{\mathbb{Q}}$ and hence $\alpha \in S_\tau$ by definition).
 - **Full Algebraic Grades $\mathbb{A}_{\mathbb{R}}$**: Strictly **OPEN** (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
 
 ### 4.3 Search for Zeta-to-Kernel Bridge
@@ -173,3 +183,38 @@ The following approaches have been proven unable to force RH or constrain zero d
 ### 5.2 Genuinely Open Problems
 1. **Ambient Realization Kernel**: Does $\ker(\operatorname{ev}_\tau)$ contain non-trivial elements on the full algebraic grade domain $\mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}]$? (Pure transcendence problem in number theory).
 2. **Authentic Arithmetic Deformations**: Can an authentic, non-factorable arithmetic deformation $a_{n,K} \ne a_n$ be mathematically formulated from arithmetic geometry? (Would require new axioms not present in standard TC).
+
+---
+
+## 6. Evidence Status Summary
+
+### 6.1 Lean Proved
+- **Fiber Commutative Ring**: `GradeFiber K` commutative ring instance and ring equivalence `ringEquivZ K : GradeFiber K ≃+* ℤ` (`RiemannScope.FiberArithmetic`).
+- **Transfer Functoriality & Low-Order Holonomy**: `fiber_transfer_id`, `fiber_transfer_comp`, `fiber_transfer_three_step`, `fiber_loop_holonomy_two`, `fiber_loop_holonomy_three`, `fiber_loop_holonomy_four` (`RiemannScope.MultiGradeNaturality`).
+- **Scale and Spectral Coboundaries**: `scaleCocycle_coboundary`, `scaleCocycle_loop_four`, `spectralCocycle_coboundary`, `spectralCocycle_loop_three` (`RiemannScope.MultiGradeNaturality`).
+- **Unary and Binary Natural Observables**: `natural_observable_from_ref`, `natural_binary_from_ref` (`RiemannScope.MultiGradeNaturality`).
+- **Elementary Prime Dilation-Translation Rigidity**: `dilation_translation_multi_prime_rigidity` (`RiemannScope.RiemannConverter`).
+- **Single-Station Injectivity & Monomial Laurent Algebra**: `graded_station_nonzero`, `prime_station_grade_injective` (`RiemannScope.FaithfulGradedAlgebra`).
+- **Exceptional Exponent Commensurability Consequence**: `exceptional_exponents_Q_collinear`, `two_direction_Q_collinear` under hypothesis `h_GS` (`RiemannScope.TranscendenceRigidity`, `RiemannScope.ExceptionalTransfer`).
+
+### 6.2 External Theorem
+- **Lindemann (1882) Transcendence of $\pi$ and $\tau = 2\pi$**: Guarantees integer station disjointness $L_K \cap L_J = \emptyset$ ($K \ne J \in \mathbb{Z}$) and $S_\tau \cap \mathbb{Q} = \{0\}$.
+- **Gelfond–Schneider Theorem (1934)**: Establishes commensurability of non-zero directions in $S_\tau$, forcing $\dim_{\mathbb{Q}} S_\tau \le 1$.
+- **Baker's Theorem (1966)**: Linear forms in logarithms for quantitative non-resonance.
+
+### 6.3 Paper Derivation
+- **Complex Analytic Continuation**: Holomorphic continuation of Dirichlet series $\sum a_n (n\tau^K)^{-s} = \tau^{-Ks} D(s)$ to $\mathbb{C}$.
+- **Zero Divisor Multiplicity Preservation**: $\operatorname{mult}_\rho(D_K^{\mathrm{amb}}) = \operatorname{mult}_\rho(D)$ via non-vanishing of entire exponential factor $\exp(-Ks\log\tau)$.
+- **Arbitrary Finite-Path Holonomy Triviality**: General finite-sequence path composition $T_{K_r \leftarrow K_0} = T_{K_r \leftarrow K_{r-1}} \circ \cdots \circ T_{K_1 \leftarrow K_0}$ and closed loop identity $T_{\text{loop}} = \operatorname{id}$.
+- **Finite-Arity Naturality Extension**: Commutation of $r$-ary operations ($r > 2$) with transfer maps.
+- **Rank-One Support Linear Independence**: Over $\mathbb{A}_{\mathbb{R}}$ (real scalars into $\mathbb{R}$) or $\overline{\mathbb{Q}}$ (complex scalars into $\mathbb{C}$) for $\alpha \notin S_\tau$ via single-variable algebraic polynomial root reduction.
+
+### 6.4 Audit Findings
+- `NO_ZETA_TO_REALIZATION_KERNEL_BRIDGE_FOUND`: Standard zeta structures (Euler values, prime logs, zero ordinates) yield no elements of $\ker(\operatorname{ev}_\tau)$.
+- `NO_COUPLING_OUTSIDE_GAUGE_COVARIANCE_FOUND`: All tested linear and bilinear combinations of standard TC objects reduce to gauge factors or coordinate pullbacks.
+- `NO_GENUINE_DEFORMATION_IN_STANDARD_TC_FOUND`: Standard TC axioms enforce $a_{(K, n)} = a_n$; genuine arithmetic deformations require axioms outside TC.
+
+### 6.5 Open
+- **Ambient Realization Kernel**: Injectivity of $\operatorname{ev}_\tau$ on the full real algebraic grade ring $\mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}]$ (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
+- **Exceptional Exponent Set**: Whether $S_\tau = \{0\}$ unconditionally in transcendental number theory.
+- **Zeta-to-Kernel Bridge**: Whether any non-trivial bridge connects the zeros of $\zeta(s)$ to $\ker(\operatorname{ev}_\tau)$.
