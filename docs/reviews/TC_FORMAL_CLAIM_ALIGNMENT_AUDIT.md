@@ -29,7 +29,7 @@ At git commit `154c1fee62de39c3737a9bc9aa75d8ca93817a18`, the project build repo
 > **COMPILATION METRIC VS. MAJOR CLAIMS**  
 > We enforce strict, unambiguous declaration-count terminology:
 > \[
-> \boxed{338 = \text{audited canonical TC module declarations}}
+> \boxed{348 = \text{audited canonical TC module declarations}}
 > \]
 > and:
 > \[
@@ -51,10 +51,10 @@ At git commit `154c1fee62de39c3737a9bc9aa75d8ca93817a18`, the project build repo
 | `FaithfulGradedAlgebra.lean` | 20 | 0 | Monomial Laurent algebra, degree additivity | `LEAN_PROVED` (Monomial) | Lindemann (for $\mathbb{Z}$-injectivity) |
 | `ExceptionalTransfer.lean` | 14 | 0 | $S_\tau$ closure, prime collision ratio equality | `LEAN_PROVED` | Gelfond–Schneider (external) |
 | `LocalGermInvariance.lean` | 16 | 0 | Conformal weight factor, unit-normalized germ | `LEAN_PROVED` | None |
-| `FiberArithmetic.lean` | 48 | 0 | Fiber ring $\mathcal{F}_K \cong \mathbb{Z}$, canonical transfer $T_{J \leftarrow K}$ | `LEAN_PROVED` | None |
+| `FiberArithmetic.lean` | 58 | 0 | Fiber ring $\mathcal{F}_K \cong \mathbb{Z}$, canonical transfer $T_{J \leftarrow K}$ | `LEAN_PROVED` | None |
 | `UnitRescaling.lean` | 18 | 0 | Real grade character, Dirichlet term scaling, zero set | `LEAN_PROVED` (Algebraic) | Complex continuation (Paper) |
 | `MultiGradeNaturality.lean` | 30 | 0 | Transfer functoriality, loop holonomy, scale/spectral cocycles | `LEAN_PROVED` | None |
-| **Audited Subtotal** | **338** | **0** | **Audited canonical TC module declarations** | — | — |
+| **Audited Subtotal** | **348** | **0** | **Audited canonical TC module declarations** | — | — |
 | **Full Project Total** | **459** (now **466**) | **0** | **All project theorem declarations in full formal tree** | — | — |
 
 ---

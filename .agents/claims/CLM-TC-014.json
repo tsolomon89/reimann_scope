@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "claim_id": "CLM-TC-014",
-  "statement": "Dense Disjoint Grade Layers and Limit-Compatibility Audit: For dilation scale tau = 2*pi and discrete grade layers L_K = tau^K * Z (K in Z), the layer union S_tau = Union_{K in Z} L_K is countable and dense in R, and S_tau^+ = Union_{K in Z} L_K^+ (L_K^+ = tau^K * N_{>0}) is dense in R_{>0}, while distinct integer layers remain arithmetically separated (L_K cap L_J = {0} and L_K^+ cap L_J^+ = empty set for K != J) by the transcendence of 2*pi (Lindemann 1882). When continuous prime-zeta observables are transported along competing grade sequences x_r = n_r * tau^{K_r} -> x and y_r = m_r * tau^{J_r} -> x (K_r != J_r, K_r -> -infty), the correctly converted intrinsic Dirichlet characters A_K^raw = tau^{-Ks} * A_K^int and zero modes satisfy lim_{r -> infty} [A(x_r) - A(y_r)] = 0 identically for all complex frequencies s and zero displacements delta in R. Centered zero modes x^rho / rho are smooth continuous functions of the external coordinate x in (0, infty) for every rho = 1/2 + delta + i*gamma, ensuring that the limit is strictly sequence-independent and grade-compatible for both on-line (delta = 0) and off-line (delta != 0) zeros. Raw pointwise Chebyshev evaluation psi(tau^{-K}X) diverges as K -> -infty and is withdrawn from pointwise limit claims pending Jacobian-normalized measure analysis in Cycle 10. Lean formalizes nu_K multiplicativity under transported multiplication, the exact identity between raw and converted Dirichlet summands, the rational characterization of layer coincidence, and the constructive nearest-integer lattice approximation error bound |x - n*Delta| <= Delta/2 under Mathlib foundational axioms. Therefore, while layer density ensures uniqueness of continuous extension to R_{>0}, the limit-compatibility bridge for continuous observables produces no grade-limit defect and does not distinguish on-line from off-line zeros: transcendental continuation via dense disjoint layers does not provide an exclusion mechanism.",
+  "statement": "Dense Disjoint Grade Layers and Limit-Compatibility Audit: For dilation scale tau = 2*pi and discrete grade layers L_K = tau^K * Z (K in Z), the lattice union \\mathfrak{L}_tau = Union_{K in Z} L_K is countable and dense in R, and \\mathfrak{L}_tau^+ = Union_{K in Z} L_K^+ (L_K^+ = tau^K * N_{>0}) is dense in R_{>0}, while distinct integer layers remain arithmetically separated (L_K cap L_J = {0} and L_K^+ cap L_J^+ = empty set for K != J) by the transcendence of 2*pi (Lindemann 1882). When continuous prime-zeta observables are transported along competing grade sequences x_r = n_r * tau^{K_r} -> x and y_r = m_r * tau^{J_r} -> x (K_r != J_r, K_r -> -infty), the correctly converted intrinsic Dirichlet characters A_K^raw = tau^{-Ks} * A_K^int and zero modes satisfy lim_{r -> infty} [A(x_r) - A(y_r)] = 0 identically for all complex frequencies s and zero displacements delta in R. Centered zero modes x^rho / rho are smooth continuous functions of the external coordinate x in (0, infty) for every rho = 1/2 + delta + i*gamma, ensuring that the limit is strictly sequence-independent and grade-compatible for both on-line (delta = 0) and off-line (delta != 0) zeros. Raw pointwise Chebyshev evaluation psi(tau^{-K}X) diverges as K -> -infty and is withdrawn from pointwise limit claims pending Jacobian-normalized measure analysis in Cycle 10. Lean formalizes nu_K multiplicativity under transported multiplication, the exact identity between raw and converted Dirichlet summands, the rational characterization of layer coincidence, and the constructive nearest-integer lattice approximation error bound |x - n*Delta| <= Delta/2 under Mathlib foundational axioms. Therefore, while layer density ensures uniqueness of continuous extension to R_{>0}, the limit-compatibility bridge for continuous observables produces no grade-limit defect and does not distinguish on-line from off-line zeros: transcendental continuation via dense disjoint layers does not provide an exclusion mechanism.",
   "quantified_variables": [
     {
       "name": "K",
@@ -38,19 +38,19 @@
   ],
   "hypotheses": [
     "tau = 2 * pi is transcendental (Lindemann 1882)",
-    "S_tau = Union_{K in Z} tau^K * Z is dense in R",
-    "S_tau^+ = Union_{K in Z} tau^K * N_{>0} is dense in R_{>0}",
+    "\\mathfrak{L}_tau = Union_{K in Z} tau^K * Z is dense in R",
+    "\\mathfrak{L}_tau^+ = Union_{K in Z} tau^K * N_{>0} is dense in R_{>0}",
     "iota_K(n) = tau^K * n embeds N_{>0} into L_K^+",
     "nu_K(x) = x / tau^K is the intrinsic unit-reading map",
     "chi_{K,s}(x) = nu_K(x)^{-s} is the transported Dirichlet character"
   ],
-  "object_studied": "Dense disjoint layer union S_tau^+, competing grade sequences x_r and y_r, and limit compatibility of converted observables and zero modes",
+  "object_studied": "Dense disjoint layer union \\mathfrak{L}_tau^+, competing grade sequences x_r and y_r, and limit compatibility of converted observables and zero modes",
   "fourier_normalization": "Additive Fourier-Laplace transform on R; Mellin transform on R_+",
   "multiplicity_convention": "Nontrivial zero multiplicity m_rho >= 1 and discrete grade indexing K, J in Z",
   "measure_and_window": "Counting measure on discrete layers L_K^+; Lebesgue measure dx on R_+",
   "order_of_limits": "Grade index limit K_r, J_r -> -infty; point convergence x_r, y_r -> x > 0",
   "exact_conclusion": "The layer union is dense and its constituent layers are arithmetically separated. Correct unit conversion makes the tested prime-zeta observables restrictions of ordinary continuous functions of the external coordinate for every rho. Density therefore gives uniqueness of continuation but does not produce any grade-limit defect for delta != 0.",
-  "logical_negation": "The union S_tau fails to be dense, or integer layers intersect at non-zero points, or correctly converted zero modes exhibit a grade-limit defect distinguishing delta != 0 from delta = 0 (FALSIFIED / REFUTED)",
+  "logical_negation": "The union \\mathfrak{L}_tau fails to be dense, or integer layers intersect at non-zero points, or correctly converted zero modes exhibit a grade-limit defect distinguishing delta != 0 from delta = 0 (FALSIFIED / REFUTED)",
   "epistemic_role": "ALGEBRAIC_IDENTITY",
   "evidence_scope": "FINITE_EXACT_ALGEBRA",
   "exact_or_truncated": "EXACT",

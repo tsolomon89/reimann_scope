@@ -198,7 +198,7 @@ The following approaches have been proven unable to force RH or constrain zero d
 - **Exceptional Exponent Commensurability Consequence**: `exceptional_exponents_Q_collinear`, `two_direction_Q_collinear` under hypothesis `h_GS` (`RiemannScope.TranscendenceRigidity`, `RiemannScope.ExceptionalTransfer`).
 
 ### 6.2 External Theorem
-- **Lindemann (1882) Transcendence of $\pi$ and $\tau = 2\pi$**: Guarantees integer station disjointness $L_K \cap L_J = \emptyset$ ($K \ne J \in \mathbb{Z}$) and $S_\tau \cap \mathbb{Q} = \{0\}$.
+- **Lindemann (1882) Transcendence of $\pi$ and $\tau = 2\pi$**: Guarantees integer station separation $L_K \cap L_J = \{0\}$ ($K \ne J \in \mathbb{Z}$, with positive layers $L_K^+ \cap L_J^+ = \emptyset$) and $S_\tau \cap \mathbb{Q} = \{0\}$.
 - **Gelfond–Schneider Theorem (1934)**: Establishes commensurability of non-zero directions in $S_\tau$, forcing $\dim_{\mathbb{Q}} S_\tau \le 1$.
 - **Baker's Theorem (1966)**: Linear forms in logarithms for quantitative non-resonance.
 

@@ -445,13 +445,13 @@ def test_27_gelfond_schneider_not_claimed_lean_formalized():
     assert "h_GS" in content
 
 
-def test_28_audited_subtotal_338_distinguished_from_full_formal_project():
-    """Item 6: Audited subtotal (338) is explicitly distinguished from full formal project."""
+def test_28_audited_subtotal_348_distinguished_from_full_formal_project():
+    """Item 6: Audited subtotal (348) is explicitly distinguished from full formal project."""
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     audit_doc = os.path.join(repo_root, "docs", "reviews", "TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md")
     with open(audit_doc, "r", encoding="utf-8") as f:
         content = f.read()
-    assert "338" in content
+    assert "348" in content
     assert "audited canonical TC module declarations" in content
 
 

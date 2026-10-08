@@ -25,7 +25,7 @@ This audit documents the concise, issue-by-issue repairs applied during **TASK-T
 ## 3. Formal Dependency Registry: Local Germ Covariance
 
 - **Defect Found**: Claim `FORMAL-TC-LOCAL-GERM-COVARIANCE` cited invented identifiers (`zero_germ_scaling_weight`, `unit_normalized_germ_invariance_at_zero`, `reflected_germ_pairing_invariance`).
-- **File / Location**: `data/tc_formal_claim_dependency_registry.json` and `formal/RiemannScope/LocalGermCovariance.lean`.
+- **File / Location**: `data/tc_formal_claim_dependency_registry.json` and `formal/RiemannScope/LocalGermInvariance.lean`.
 - **Repair Applied**: Replaced citations with exact committed Lean declarations (`centered_germ_scaling`, `centered_real_exponent`, `log_modulus_finite_difference`, `harmonic_translation_exponent`, `harmonic_modulus_exponent`, `unit_normalized_germ_invariance`, `reflected_germ_relation`, `reflected_germ_product_exponent_cancel`, `reflected_germ_product_independent`, `germ_modulus_ratio_detector`).
 - **Resulting Evidence Classification**: `FORMAL_LEAN_PROOF`.
 
@@ -44,7 +44,7 @@ This audit documents the concise, issue-by-issue repairs applied during **TASK-T
 
 - **Defect Found**: `docs/reviews/TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md` ambiguously labeled the 338-declaration subtotal across the 11 audited modules as the "Complete TC Suite", creating confusion with the full formal project build count.
 - **File / Location**: `docs/reviews/TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md`.
-- **Repair Applied**: Standardized exact terminology: $\boxed{338 = \text{audited canonical TC module declarations}}$ vs $\boxed{459 \text{ (now } 466\text{)} = \text{all project theorem declarations in the full formal tree}}$.
+- **Repair Applied**: Standardized exact terminology: $\boxed{348 = \text{audited canonical TC module declarations}}$ vs $\boxed{466 = \text{all project theorem declarations in the full formal tree}}$.
 - **Resulting Evidence Classification**: `AUDIT_CLASSIFICATION`.
 
 ---
