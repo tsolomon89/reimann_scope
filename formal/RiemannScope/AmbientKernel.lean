@@ -1,24 +1,30 @@
 /-
 RiemannScope.AmbientKernel
-TASK-TC-028: Ambient Realization Kernel, Rational Support Rank, and Algebraic-Power Independence.
+TASK-TC-028 / TASK-TC-028R: Ambient Realization Kernel, Rational Support Rank, and Algebraic-Power Independence.
 
-Formalizes:
-1. Support translation invariance of ambient evaluation:
-   sum a_j tau^(K_j) = 0 <==> sum a_j tau^(K_j - K_0) = 0
-2. Rank-zero trivial coefficient cancellation:
-   If all grades coincide (K_j = K_0), sum a_j tau^(K_0) = 0 <==> sum a_j = 0
-3. Rational support rank base-independence:
-   Affine difference coordinate shifts are invariant under change of base grade
-4. Rank-one Laurent-to-polynomial reduction:
-   Grade differences on Q*alpha clear powers to polynomial form
-5. Explicit kernel witness for algebraic generator (alpha ∈ S_tau):
+LEAN_PROVED Scope (Algebraic Skeleton / Low Arity):
+1. Support translation invariance of ambient evaluation for 2-term and 3-term sums:
+   a1*tau^K1 + a2*tau^K2 = 0 <==> a1*tau^(K1-K0) + a2*tau^(K2-K0) = 0
+2. Rank-zero trivial coefficient cancellation for 2-term and 3-term sums:
+   a1*tau^K0 + a2*tau^K0 = 0 <==> a1 + a2 = 0
+3. Base-grade affine difference identity of real numbers:
+   (K - K0') = (K - K0) - (K0' - K0)
+4. Explicit kernel witness for algebraic generator (alpha ∈ S_tau):
    tau^alpha = A ==> 1 * tau^alpha + (-A) * tau^0 = 0
-6. Rank-one injectivity under transcendental generator (alpha ∉ S_tau):
-   No non-trivial two-term algebraic linear relation can vanish
-7. Group-algebra structural multiplication vs additive kernel distinction:
-   tau^K * tau^J = tau^(K + J) is an algebra homomorphism law, not a basis collapse
-8. Bivariate Laurent polynomial clearing for rank-two support
-9. Pairwise transcendence insufficiency abstract countermodel
+5. Rank-one 2-term linear impossibility under abstract algebraicity predicate:
+   c1 * tau^alpha + c0 = 0 with c1 ≠ 0 and c0, c1 algebraic forces tau^alpha algebraic
+6. Group-algebra structural multiplication law:
+   tau^K * tau^J = tau^(K + J) is an algebra homomorphism law
+7. Bivariate Laurent monomial clearing algebra identity:
+   c * X^(m + Nx) * Y^(n + Ny) = (X^Nx * Y^Ny) * (c * X^m * Y^n)
+8. Pairwise transcendence insufficiency abstract countermodel:
+   v = u^2 ==> v - u^2 = 0
+
+NOTE ON SCOPE BOUNDARIES:
+- LEAN_PROVED: The algebraic skeleton and low-arity identities enumerated above.
+- PROVED_PAPER_DERIVATION: Full group algebra Q_bar[Q*alpha] injectivity,
+  equality of Q-spans and vector space dimensions, higher-rank multivariate
+  algebraic-independence equivalence, and the two-case Schanuel conditional theorem.
 -/
 
 import Mathlib.Data.Real.Basic

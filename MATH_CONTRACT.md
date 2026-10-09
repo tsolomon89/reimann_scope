@@ -3070,19 +3070,20 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 
 ---
 
-# 24. Ambient Realization Kernel, Algebraic-Power Independence, and Zeta-Bridge Firewall (TASK-TC-028)
+# 24. Ambient Realization Kernel, Algebraic-Power Independence, and Zeta-Bridge Firewall (TASK-TC-028 / TASK-TC-028R)
 
 1. **Ambient Evaluation Map & Translation Invariance**:
    For $\tau = 2\pi$, the evaluation map $\operatorname{ev}_\tau: \mathbb A_{\mathbb R}[\mathbb A_{\mathbb R}] \to \mathbb R$ (or $\overline{\mathbb Q}[\mathbb A_{\mathbb R}] \to \mathbb C$) acts by $\operatorname{ev}_\tau(\sum a_j [K_j]) = \sum a_j \tau^{K_j}$.
    Support translation invariance holds: $\sum a_j \tau^{K_j} = 0 \iff \sum a_j \tau^{K_j - K_0} = 0$ for any $K_0$. Kernel relations depend strictly on affine differences.
 
 2. **Rational Support Rank $r(S)$ & Rank-Zero Triviality**:
-   $r(S) = \dim_{\mathbb Q} \operatorname{span}_{\mathbb Q} \{K_j - K_0\}$ is base-grade invariant.
+   $r(S) = \dim_{\mathbb Q} \operatorname{span}_{\mathbb Q} \{K_j - K_0\}$ is base-grade invariant, computed via exact number-field primitive element embeddings.
    For $r(S) = 0$ (all grades coincide), $\sum a_j \tau^{K_0} = 0 \iff \sum a_j = 0$ (`RANK_ZERO_TRIVIAL_COEFFICIENT_CANCELLATION`).
 
 3. **Exact Rank-One Classification ($r=1$)**:
    For grade differences along a rational line $\mathbb Q\alpha$ ($\alpha \in \mathbb A_{\mathbb R} \setminus \{0\}$), $\operatorname{ev}_\tau$ is injective on $\overline{\mathbb Q}[\mathbb Q\alpha]$ if and only if $\alpha \notin S_\tau = \{\alpha \in \mathbb A_{\mathbb R} : \tau^\alpha \in \overline{\mathbb Q}\}$.
    If $\alpha \in S_\tau$, an explicit kernel witness is $[\alpha] - A[0]$ with $A = \tau^\alpha \in \overline{\mathbb Q}$ (`RANK_ONE_KERNEL_CLASSIFIED`). By external Gelfond–Schneider, $\dim_{\mathbb Q} S_\tau \le 1$ (`ONE_EXCEPTIONAL_Q_DIRECTION_ONLY`).
+   Base grade $1 \in \mathbb{A}_{\mathbb{R}}$ is algebraic; what is transcendental is $\tau^1 = 2\pi$, equivalently $1 \notin S_\tau$.
 
 4. **Higher-Rank Reduction Theorem ($r \ge 2$)**:
    Finite support kernel relations of rational rank $r \ge 2$ reduce precisely to multivariate algebraic-dependence relations among $r$ algebraic powers of $2\pi$:
@@ -3091,13 +3092,19 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \]
    Principal classification: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
 
-5. **Schanuel Lower Bound & Minimal Open Case**:
-   Standard Schanuel's conjecture implies $\operatorname{trdeg}_{\overline{\mathbb Q}} \overline{\mathbb Q}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$.
+5. **Strengthened Schanuel Theorem & Minimal Open Case**:
+   A rigorous two-case derivation (Case A: $1, \alpha_1, \dots, \alpha_r$ $\mathbb{Q}$-independent; Case B: $1 \in \operatorname{span}_{\mathbb{Q}}\{\alpha_1, \dots, \alpha_r\}$) proves $\operatorname{trdeg}_{\overline{\mathbb Q}} \overline{\mathbb Q}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$.
+   Consequently, **Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support** (`SCHANUEL_IMPLIES_FULL_FINITE_RANK_INJECTIVITY`).
    The minimal open case is identified as $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ ($r=2$).
-   Certified absence of relations is established via Arb ball arithmetic for 15,624 quadratic polynomials (height $\le 2$, min distance $> 0.2017$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
+   Certified absence of relations is established via Arb ball arithmetic with native algebraic ball construction (`expr_to_arb`) and certified interval lower bounds (`abs_lower()`) for 15,624 quadratic polynomials (height $\le 2$, certified distance $> 0.201733$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
 
-6. **Zeta-Bridge Firewall**:
-   All audited zeta quantities ($\gamma_n, \rho_n, \log p, \zeta(2n), \Gamma(\rho)$, infinite explicit formulas) fail the algebraic-coefficient firewall (`NO_ZETA_TO_KERNEL_BRIDGE_FOUND`). Zero-arithmetic research is logically distinct from the TC ambient kernel.
+6. **Zeta-Bridge Firewall Audit**:
+   Auditing familiar standard zeta candidates reveals they fail the algebraic-coefficient firewall: $\gamma_n, \rho_n, \zeta(2n+1), \Gamma(\rho)$ are `ALGEBRAICITY_UNPROVED` (inadmissible as proved algebraic coefficients; irrational $\ne$ transcendental), while $\log p, \zeta(2n)$ are `PROVED_TRANSCENDENTAL`.
+   The finding `NO_ZETA_TO_KERNEL_BRIDGE_FOUND` is strictly an audit finding, not a universal impossibility theorem. Zero-arithmetic research is logically distinct from the TC ambient kernel.
+
+7. **Verification Scope Delineation**:
+   - `LEAN_PROVED: algebraic skeleton / low arity`: 2- and 3-term translation invariance, 2- and 3-term rank-zero cancellation, real affine difference identity, bivariate monomial clearing identity, and abstract 2-term impossibility (`RiemannScope.AmbientKernel`).
+   - `PROVED_PAPER_DERIVATION: full rank-one and higher-rank classification`: Full group algebra $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ injectivity, equality of $\mathbb{Q}$-spans and dimensions under base change, general multivariate Laurent reduction, and two-case Schanuel conditional theorem.
 
 
 

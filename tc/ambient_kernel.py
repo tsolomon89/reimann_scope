@@ -24,42 +24,88 @@ import sympy as sp
 from sympy import Rational, Matrix, sympify
 
 
-def compute_rational_support_rank(grades: List[Any], base_grade: Optional[Any] = None) -> Tuple[int, List[Rational]]:
-    """Compute rational support rank r(S) = dim_Q span_Q {K_j - K_0}.
+def classify_support_rank_0_1_or_ge2(grades: List[Any], base_grade: Optional[Any] = None) -> Tuple[int, List[Any]]:
+    """Classify rational support rank into 0, 1, or >= 2 (reported as 2).
 
     Parameters:
         grades: List of numbers or sympy expressions in A_R.
         base_grade: Optional reference grade K_0. If None, grades[0] is used.
 
     Returns:
-        (rank, differences_relative_to_base)
+        (rank_class, differences_relative_to_base)
+        where rank_class is 0 (all diffs 0), 1 (all diffs collinear over Q), or 2 (at least rank 2).
     """
     if not grades:
         return 0, []
 
     s_grades = [sympify(g) for g in grades]
     k0 = sympify(base_grade) if base_grade is not None else s_grades[0]
-    diffs = [g - k0 for g in s_grades]
+    diffs = [sp.simplify(g - k0) for g in s_grades]
 
-    # Non-zero differences
     nz_diffs = [d for d in diffs if d != 0]
     if not nz_diffs:
         return 0, diffs
 
-    # Find rational dimension among non-zero differences
-    # We test linear independence over Q using sympy Matrix rank
-    # For radical / algebraic expressions, simplify and compute rank
-    # Convert differences to a basis over Q
-    # We can decompose algebraic numbers into a rational basis
-    # Or use pairwise ratios for rank 1 vs >= 2
-    ratios = []
     first = nz_diffs[0]
     for d in nz_diffs[1:]:
         rat = sp.simplify(d / first)
         if not rat.is_rational:
-            return 2, diffs  # At least rank 2
+            return 2, diffs
 
     return 1, diffs
+
+
+def compute_rational_support_rank(grades: List[Any], base_grade: Optional[Any] = None) -> Tuple[int, List[Any]]:
+    """Compute exact rational support rank r(S) = dim_Q span_Q {K_j - K_0}.
+
+    Parameters:
+        grades: List of numbers or sympy expressions in A_R.
+        base_grade: Optional reference grade K_0. If None, grades[0] is used.
+
+    Returns:
+        (exact_rank, differences_relative_to_base)
+    """
+    if not grades:
+        return 0, []
+
+    s_grades = [sympify(g) for g in grades]
+    k0 = sympify(base_grade) if base_grade is not None else s_grades[0]
+    diffs = [sp.simplify(g - k0) for g in s_grades]
+
+    nz_diffs = [d for d in diffs if d != 0]
+    if not nz_diffs:
+        return 0, diffs
+
+    if len(nz_diffs) == 1:
+        return 1, diffs
+
+    # Fast collinearity check
+    first = nz_diffs[0]
+    all_collinear = True
+    for d in nz_diffs[1:]:
+        rat = sp.simplify(d / first)
+        if not rat.is_rational:
+            all_collinear = False
+            break
+
+    if all_collinear:
+        return 1, diffs
+
+    # Exact number field dimension over Q
+    try:
+        from sympy.polys.numberfields import to_number_field
+        an = to_number_field(nz_diffs)
+        deg = an.minpoly.degree()
+        rows = []
+        for d in nz_diffs:
+            c = to_number_field(d, an).coeffs()
+            c_padded = [0] * (deg - len(c)) + c
+            rows.append(c_padded)
+        mat = Matrix(rows)
+        return int(mat.rank()), diffs
+    except Exception:
+        # Fallback to classify 0, 1, or >=2
+        return 2, diffs
 
 
 def translate_support(coefficients: List[Any], grades: List[Any], k0: Any) -> Tuple[List[Any], List[Any]]:
@@ -180,6 +226,40 @@ def search_polynomial_relation(
         mp.dps = old_dps
 
 
+def expr_to_arb(expr: Any) -> arb:
+    """Convert an algebraic expression or number into a certified Arb ball natively.
+
+    Constructs exact radicals and fractions inside Arb directly without intermediate
+    floating-point decimal conversion to avoid precision leakage.
+    """
+    s = sympify(expr)
+    if s.is_Integer:
+        return arb(int(s))
+    if s.is_Rational:
+        return arb(int(s.p)) / arb(int(s.q))
+    if s.is_Pow:
+        base = expr_to_arb(s.base)
+        exp = s.exp
+        if exp == Rational(1, 2):
+            return base.sqrt()
+        elif exp.is_Rational:
+            p, q = int(exp.p), int(exp.q)
+            if q > 0:
+                return (base ** p).root(q)
+        return base ** expr_to_arb(exp)
+    if s.is_Add:
+        res = arb(0)
+        for arg in s.args:
+            res += expr_to_arb(arg)
+        return res
+    if s.is_Mul:
+        res = arb(1)
+        for arg in s.args:
+            res *= expr_to_arb(arg)
+        return res
+    return arb(str(s.evalf(ctx.dps + 10)))
+
+
 def certify_finite_relation_exclusion(
     alpha_expr: Any,
     beta_expr: Any,
@@ -189,7 +269,8 @@ def certify_finite_relation_exclusion(
 ) -> Dict[str, Any]:
     """Certify that no non-zero polynomial P(X, Y) with deg(P) <= max_degree and ||coeffs||_inf <= height_bound vanishes.
 
-    Uses Arb ball arithmetic to compute certified non-containment of 0.
+    Uses native Arb ball arithmetic to compute certified non-containment of 0
+    and certified minimum distance abs_lower() from zero across all candidate polynomials.
     """
     old_prec = ctx.prec
     try:
@@ -197,12 +278,9 @@ def certify_finite_relation_exclusion(
         pi_ball = arb.pi()
         tau_ball = 2 * pi_ball
 
-        # Evaluate alpha and beta balls
-        alpha_val = sympify(alpha_expr).evalf(dps)
-        beta_val = sympify(beta_expr).evalf(dps)
-
-        alpha_arb = arb(str(alpha_val))
-        beta_arb = arb(str(beta_val))
+        # Native Arb ball evaluation of algebraic exponents
+        alpha_arb = expr_to_arb(alpha_expr)
+        beta_arb = expr_to_arb(beta_expr)
 
         X = tau_ball ** alpha_arb
         Y = tau_ball ** beta_arb
@@ -227,13 +305,15 @@ def certify_finite_relation_exclusion(
                 enclosing_coeffs = coeffs
                 break
 
-            d = abs(float(val.mid()))
+            # Certified lower bound of the entire interval/ball from zero
+            d = float(val.abs_lower())
             if d < min_dist:
                 min_dist = d
             certified_count += 1
 
         return {
             "status": "CERTIFIED_NONZERO" if not zero_enclosed else "INCONCLUSIVE",
+            "evidence_class": "CERTIFIED_FINITE_RELATION_EXCLUSION",
             "alpha": str(alpha_expr),
             "beta": str(beta_expr),
             "max_degree": max_degree,
@@ -249,40 +329,62 @@ def certify_finite_relation_exclusion(
         ctx.prec = old_prec
 
 
-# Zeta Bridge Firewall Checklist
-DISALLOWED_COEFFICIENT_OR_GRADE_PATTERNS = [
-    "gamma",          # Nontrivial zeta zero imaginary ordinate
-    "rho",            # Nontrivial zero s = 1/2 + i*gamma
-    "log(p)",         # Transcendental von Mangoldt weight
-    "log(",           # General log of integer/prime
-    "zeta(2",         # Transcendental even zeta value (multiple of pi^(2n))
-    "zeta(3",         # Apery constant (irrational, not algebraic)
-    "zeta(",          # General zeta evaluation
-    "gamma_fn",       # Complex Gamma evaluation
-    "Gamma("          # Complex Gamma evaluation
+# Zeta Bridge Firewall Pattern Registry with rigorous arithmetic classification
+FIREWALL_PATTERN_RULES = [
+    ("gamma", "ALGEBRAICITY_UNPROVED", "Zeta zero ordinate: algebraicity unproved; inadmissible as proved algebraic coefficient or grade"),
+    ("rho", "ALGEBRAICITY_UNPROVED", "Nontrivial zero: algebraicity unproved; inadmissible as proved algebraic coefficient or grade"),
+    ("log(p)", "PROVED_TRANSCENDENTAL", "Prime weight: log(p) is proved transcendental by Lindemann (1882); inadmissible in algebraic field"),
+    ("log(", "PROVED_TRANSCENDENTAL", "Logarithm: non-zero logarithm of integer/rational is transcendental; inadmissible in algebraic field"),
+    ("zeta(2", "PROVED_TRANSCENDENTAL", "Even zeta value: non-zero rational multiple of pi^(2n), proved transcendental by Lindemann (1882)"),
+    ("zeta(3", "ALGEBRAICITY_UNPROVED", "Apéry constant: irrational (Apéry 1978), but algebraicity unproved; inadmissible as proved algebraic coefficient"),
+    ("zeta(5", "ALGEBRAICITY_UNPROVED", "Odd zeta value: irrational, but algebraicity unproved; inadmissible as proved algebraic coefficient"),
+    ("zeta(", "ALGEBRAICITY_UNPROVED", "General zeta value: algebraicity unproved; inadmissible as proved algebraic coefficient"),
+    ("gamma_fn", "ALGEBRAICITY_UNPROVED", "Complex Gamma evaluation: algebraicity unproved at nontrivial points; inadmissible as proved algebraic coefficient"),
+    ("Gamma(", "ALGEBRAICITY_UNPROVED", "Complex Gamma evaluation: algebraicity unproved at nontrivial points; inadmissible as proved algebraic coefficient")
 ]
 
 
 def verify_zeta_bridge_firewall(coefficients: List[str], grades: List[str]) -> Dict[str, Any]:
     """Audits candidate expressions against the Zeta-to-Kernel Firewall.
 
-    Reject any candidate involving unproved algebraicity of zeta zeros,
-    log primes, or special values.
+    Rejects candidate expressions relying on unproved algebraicity of zeta zeros,
+    odd zeta values, Gamma evaluations, or proved transcendental values (log p, pi^(2n)).
+    
+    Status is strictly an audit finding: 'NO_ZETA_TO_KERNEL_BRIDGE_FOUND', indicating that
+    the audited familiar zeta candidates do not furnish proved algebraic coefficients and grades.
     """
     violations = []
     for c in coefficients:
-        for pat in DISALLOWED_COEFFICIENT_OR_GRADE_PATTERNS:
-            if pat in str(c):
-                violations.append({"term": str(c), "type": "coefficient", "pattern": pat, "reason": "Non-proved algebraicity or transcendental special value"})
+        c_str = str(c)
+        for pat, classification, desc in FIREWALL_PATTERN_RULES:
+            if pat in c_str:
+                violations.append({
+                    "term": c_str,
+                    "type": "coefficient",
+                    "pattern": pat,
+                    "classification": classification,
+                    "reason": f"{classification}: {desc}"
+                })
+                break
 
     for g in grades:
-        for pat in DISALLOWED_COEFFICIENT_OR_GRADE_PATTERNS:
-            if pat in str(g):
-                violations.append({"term": str(g), "type": "grade", "pattern": pat, "reason": "Non-proved algebraicity of grade"})
+        g_str = str(g)
+        for pat, classification, desc in FIREWALL_PATTERN_RULES:
+            if pat in g_str:
+                violations.append({
+                    "term": g_str,
+                    "type": "grade",
+                    "pattern": pat,
+                    "classification": classification,
+                    "reason": f"{classification}: {desc}"
+                })
+                break
 
     return {
         "passed": len(violations) == 0,
         "violations_count": len(violations),
         "violations": violations,
-        "firewall_verdict": "PERMITTED_ALGEBRAIC" if len(violations) == 0 else "REJECTED_BY_FIREWALL"
+        "status": "BRIDGE_CANDIDATE_PERMITTED" if len(violations) == 0 else "NO_ZETA_TO_KERNEL_BRIDGE_FOUND",
+        "firewall_verdict": "PERMITTED_ALGEBRAIC" if len(violations) == 0 else "REJECTED_BY_FIREWALL",
+        "audit_finding": "NO_ZETA_TO_KERNEL_BRIDGE_FOUND: Audited familiar zeta structures do not furnish proved algebraic coefficients and grades; not an unconditional nonexistence theorem."
     }

@@ -73,7 +73,7 @@
       "hypotheses": "alpha in Q_bar \\ {0}",
       "proves": "e^alpha and pi are transcendental",
       "applies_to_2pi_base": true,
-      "kernel_consequence": "tau = 2*pi is transcendental; K=1 has no algebraic relation with K=0"
+      "kernel_consequence": "tau = 2*pi is transcendental; base grade 1 in A_R is algebraic, while tau^1 = 2*pi is transcendental (1 not in S_tau)"
     },
     {
       "theorem": "Lindemann-Weierstrass (1885)",
@@ -115,14 +115,15 @@
       "hypotheses": "z_1, ..., z_n Q-linearly independent",
       "proves": "trdeg_Q Q(z_1, ..., z_n, e^(z_1), ..., e^(z_n)) >= n",
       "applies_to_2pi_base": true,
-      "kernel_consequence": "Directly proves trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) >= r - 1; full independence (r) requires joint independence of log(2*pi)"
+      "kernel_consequence": "Two-case derivation proves trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) = r, implying full finite-rank injectivity of ev_tau on all algebraic supports"
     }
   ],
   "schanuel_consequence": {
-    "input_vectors": "z_j = alpha_j * log(2*pi) for j = 1, ..., r",
-    "input_field_trdeg": "trdeg_Q Q(z_1, ..., z_r) <= 1 since all z_j in Q_bar(log(2*pi))",
-    "exponentials": "e^(z_j) = tau^(alpha_j)",
-    "derived_lower_bound": "trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) >= r - 1",
+    "theorem": "Schanuel's conjecture implies full finite-rank injectivity of ev_tau",
+    "case_a": "1, alpha_1, ..., alpha_r Q-independent => Schanuel on (i*pi, L, alpha_1*L, ..., alpha_r*L) gives trdeg >= r + 2 on r + 2 generators => trdeg_Qbar Q_bar(X_1, ..., X_r) = r",
+    "case_b": "1 in span_Q {alpha_1, ..., alpha_r} => tau^D = prod X_j^n_j => i*pi in Q_bar(X_1, ..., X_r) => Schanuel on (i*pi, alpha_1*L, ..., alpha_r*L) forces r + 1 <= 1 + trdeg_Qbar Q_bar(X_1, ..., X_r) => trdeg_Qbar Q_bar(X_1, ..., X_r) = r",
+    "exponentials": "X_j = tau^(alpha_j)",
+    "derived_transcendence_degree": "trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) = r",
     "conditional_on": "Standard Schanuel's Conjecture"
   },
   "bounded_computational_exclusions": {
@@ -141,6 +142,8 @@
         "height_bound": 5,
         "polynomials_tested": 1330,
         "status": "CERTIFIED_NONZERO",
+        "evidence_class": "CERTIFIED_FINITE_RELATION_EXCLUSION",
+        "min_certified_distance_method": "val.abs_lower()",
         "min_certified_distance": 0.116921434557
       },
       {
@@ -150,22 +153,24 @@
         "height_bound": 2,
         "polynomials_tested": 15624,
         "status": "CERTIFIED_NONZERO",
+        "evidence_class": "CERTIFIED_FINITE_RELATION_EXCLUSION",
+        "min_certified_distance_method": "val.abs_lower()",
         "min_certified_distance": 0.201733708865
       }
     ]
   },
   "zeta_bridge_firewall": {
     "disallowed_entities": [
-      "gamma_n (zeta zero ordinate, non-proved algebraicity)",
-      "rho_n = 1/2 + i*gamma_n (nontrivial zero, non-proved algebraicity)",
-      "log p (prime log weight, transcendental)",
-      "zeta(2n) (even special value, transcendental multiple of pi^(2n))",
-      "zeta(2n+1) (odd special values, irrational/unknown, not in Q_bar)",
-      "Gamma(s) (Gamma evaluations, non-algebraic)",
-      "Dirichlet series / explicit formulas (infinite sums, not finite support)"
+      "gamma_n (zeta zero ordinate, ALGEBRAICITY_UNPROVED)",
+      "rho_n = 1/2 + i*gamma_n (nontrivial zero, ALGEBRAICITY_UNPROVED)",
+      "log p (prime log weight, PROVED_TRANSCENDENTAL by Lindemann 1882)",
+      "zeta(2n) (even special value, PROVED_TRANSCENDENTAL rational multiple of pi^(2n))",
+      "zeta(2n+1) (odd special values, ALGEBRAICITY_UNPROVED; irrational != transcendental)",
+      "Gamma(s) (Gamma evaluations, ALGEBRAICITY_UNPROVED at nontrivial points)",
+      "Dirichlet series / explicit formulas (infinite distributions, not finite support)"
     ],
     "verdict": "REJECTED_BY_FIREWALL",
-    "bridge_exists": false
+    "audit_finding": "NO_ZETA_TO_KERNEL_BRIDGE_FOUND (audited familiar zeta candidates do not furnish proved algebraic coefficients and grades; not an unconditional nonexistence theorem)"
   },
   "zero_arithmetic_relation": {
     "logically_distinct": true,
@@ -175,16 +180,38 @@
       "Zeta explicit formula produces continuous distributions, not finite elements of Q_bar[A_R]"
     ]
   },
+  "formal_verification_scope": {
+    "lean_proved_algebraic_skeleton": [
+      "sum_tau_pow_zero_iff_translated_zero_two",
+      "sum_tau_pow_zero_iff_translated_zero_three",
+      "rank_zero_kernel_iff",
+      "rank_zero_kernel_three_iff",
+      "base_change_linear_span",
+      "s_tau_explicit_kernel_witness",
+      "rank_one_injective_of_transcendental_power",
+      "group_algebra_mul_law",
+      "bivariate_monomial_clearing",
+      "pairwise_transcendence_not_algebraic_independence_model"
+    ],
+    "proved_paper_derivation": [
+      "Full group algebra Q_bar[Q*alpha] injectivity on arbitrary finite support",
+      "Equality of Q-spans and vector space dimensions under base change",
+      "Higher-rank multivariate polynomial clearing equivalence",
+      "Two-case Schanuel conditional theorem proving trdeg = r and full finite-rank injectivity of ev_tau"
+    ]
+  },
   "principal_classification": "FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE",
   "secondary_classifications": [
     "RANK_ZERO_TRIVIAL",
     "RANK_ONE_KERNEL_CLASSIFIED",
     "ONE_EXCEPTIONAL_Q_DIRECTION_ONLY",
     "HIGHER_RANK_ALGEBRAIC_INDEPENDENCE_OPEN",
+    "SCHANUEL_IMPLIES_FULL_FINITE_RANK_INJECTIVITY",
     "PAIRWISE_TRANSCENDENCE_INSUFFICIENT",
     "NO_ZETA_TO_KERNEL_BRIDGE_FOUND",
     "ZERO_ARITHMETIC_TRACK_LOGICALLY_DISTINCT",
-    "CERTIFIED_FINITE_RELATION_EXCLUSION"
+    "CERTIFIED_FINITE_RELATION_EXCLUSION",
+    "LEAN_PROVED_ALGEBRAIC_SKELETON"
   ],
   "next_task": "TASK-TC-029: Minimal Rank-Two Transcendence Bounds and Arithmetic Log-Independence Formulation"
 }

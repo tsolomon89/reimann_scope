@@ -1673,13 +1673,19 @@ For $r \ge 2$, clearing denominators in a $\mathbb{Q}$-basis $\alpha_1, \dots, \
 \]
 Principal classification: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
 
-### 35.4 Minimal Open Case and Bounded Exclusions
+### 35.4 Minimal Open Case, Schanuel Theorem, and Bounded Exclusions
 - **Minimal Open Case**: $\alpha_1 = \sqrt{2}, \alpha_2 = \sqrt{3}$. Determining whether $(2\pi)^{\sqrt{2}}$ and $(2\pi)^{\sqrt{3}}$ are algebraically independent over $\overline{\mathbb{Q}}$ (`MINIMAL_HIGHER_RANK_OPEN_TC_KERNEL_PROBLEM`).
-- **Schanuel Lower Bound**: Standard Schanuel's conjecture implies $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$.
-- **Certified Ball Arithmetic Exclusions**: Rigorous Arb interval arithmetic proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ for 15,624 quadratic polynomials (height $\le 2$, min distance $> 0.2017$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
+- **Schanuel Conditional Full Injectivity**: A rigorous two-case application of Schanuel's conjecture (Case A: $1, \alpha_1, \dots, \alpha_r$ $\mathbb{Q}$-independent; Case B: $1 \in \operatorname{span}_{\mathbb{Q}}\{\alpha_1, \dots, \alpha_r\}$) proves $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$. Consequently, **Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support**.
+- **Certified Ball Arithmetic Exclusions**: Rigorous Arb interval arithmetic with native algebraic ball construction (`expr_to_arb`) and interval lower bounds (`abs_lower()`) proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ for 15,624 quadratic polynomials (height $\le 2$, certified distance $> 0.201733$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
 
-### 35.5 Zeta-Bridge Firewall
-All standard zeta entities ($\gamma_n, \rho_n, \log p, \zeta(2n), \Gamma(\rho)$, infinite explicit formulas) fail the algebraic-coefficient firewall (`NO_ZETA_TO_KERNEL_BRIDGE_FOUND`). Zeta-zero arithmetic research is logically distinct from the TC ambient realization kernel.
+### 35.5 Zeta-Bridge Firewall Audit
+Auditing familiar standard zeta candidates shows they fail the algebraic-coefficient firewall:
+- $\gamma_n, \rho_n$: `ALGEBRAICITY_UNPROVED`.
+- $\log p, \zeta(2n)$: `PROVED_TRANSCENDENTAL` (Lindemann 1882).
+- $\zeta(2n+1)$: `ALGEBRAICITY_UNPROVED` (Apéry 1978 proved $\zeta(3) \notin \mathbb{Q}$, but irrational $\ne$ transcendental).
+- $\Gamma(\rho)$: `ALGEBRAICITY_UNPROVED` (lacks known arithmetic classification at nontrivial zeros).
+- Dirichlet series / explicit formulas: Infinite distributions, not finite support elements.
+Audit finding: `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`. Zeta-zero arithmetic research is logically distinct from the TC ambient realization kernel.
 
 
 

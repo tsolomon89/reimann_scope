@@ -210,14 +210,14 @@ The following approaches have been proven unable to force RH or constrain zero d
 - **Finite-Arity Naturality Extension**: Commutation of $r$-ary operations ($r > 2$) with transfer maps.
 - **Rank-One Support Linear Independence**: Over $\mathbb{A}_{\mathbb{R}}$ (real scalars into $\mathbb{R}$) or $\overline{\mathbb{Q}}$ (complex scalars into $\mathbb{C}$) for $\alpha \notin S_\tau$ via single-variable algebraic polynomial root reduction.
 - **Higher-Rank Multivariate Reduction & Algebraic Independence**: Finite support kernel relations of rational rank $r \ge 2$ reduce precisely to multivariate algebraic dependence of $r$ algebraic powers of $2\pi$; injectivity on $\overline{\mathbb{Q}}[\mathbb{Q}\alpha_1 \oplus \cdots \oplus \mathbb{Q}\alpha_r]$ is equivalent to algebraic independence of $\{\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\}$ over $\overline{\mathbb{Q}}$ (TASK-TC-028).
-- **Schanuel Conditional Lower Bound**: Standard Schanuel's Conjecture on $(\alpha_1\log\tau, \dots, \alpha_r\log\tau)$ implies $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$ (TASK-TC-028).
+- **Schanuel Conditional Full Injectivity**: Standard Schanuel's Conjecture applied in a rigorous two-case formulation (Case A: $\mathbb{Q}$-independent with 1; Case B: $1$ in $\mathbb{Q}$-span) proves $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$, establishing that Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support (TASK-TC-028 / TASK-TC-028R).
 
 ### 6.4 Audit Findings
-- `NO_ZETA_TO_REALIZATION_KERNEL_BRIDGE_FOUND`: Standard zeta structures (Euler values, prime logs, zero ordinates) yield no elements of $\ker(\operatorname{ev}_\tau)$.
+- `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`: Audited familiar zeta candidates (zero ordinates, prime logs, odd zeta values, Gamma factors) fail the algebraic-coefficient firewall (`ALGEBRAICITY_UNPROVED`), yielding no elements of $\ker(\operatorname{ev}_\tau)$. This is strictly an audit finding, not an impossibility theorem.
 - `NO_COUPLING_OUTSIDE_GAUGE_COVARIANCE_FOUND`: All tested linear and bilinear combinations of standard TC objects reduce to gauge factors or coordinate pullbacks.
 - `NO_GENUINE_DEFORMATION_IN_STANDARD_TC_FOUND`: Standard TC axioms enforce $a_{(K, n)} = a_n$; genuine arithmetic deformations require axioms outside TC.
 - `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`: Evaluation kernel relations reduce to algebraic-dependence relations among algebraic powers of $2\pi$ (TASK-TC-028).
-- `CERTIFIED_FINITE_RELATION_EXCLUSION`: Rigorous Arb ball arithmetic proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ at degree $\le 2, \|c\|_\infty \le 2$ (min distance $> 0.2017$) (TASK-TC-028).
+- `CERTIFIED_FINITE_RELATION_EXCLUSION`: Rigorous Arb ball arithmetic with native algebraic enclosure and interval lower bounds (`abs_lower()`) proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ at degree $\le 2, \|c\|_\infty \le 2$ (certified distance $> 0.201733$) (TASK-TC-028 / TASK-TC-028R).
 
 ### 6.5 Open
 - **Minimal Higher-Rank Ambient Realization Kernel**: Algebraic independence of $((2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$ over $\overline{\mathbb{Q}}$, or any non-zero bivariate polynomial relation $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ (`OPEN_MINIMAL_RANK_TWO_KERNEL_PROBLEM`, TASK-TC-028).

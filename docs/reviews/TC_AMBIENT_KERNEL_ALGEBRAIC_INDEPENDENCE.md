@@ -1,18 +1,20 @@
 # TC Ambient Realization Kernel, Algebraic-Power Independence, and Zeta-Bridge Firewall
 
-**Task**: TASK-TC-028  
+**Task**: TASK-TC-028 / TASK-TC-028R  
 **Date**: October 9, 2026  
-**Status**: COMPLETE  
+**Status**: COMPLETE (REPAIRED)  
 **Primary Classification**: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`  
 **Secondary Classifications**:
 - `RANK_ZERO_TRIVIAL`
 - `RANK_ONE_KERNEL_CLASSIFIED`
 - `ONE_EXCEPTIONAL_Q_DIRECTION_ONLY`
 - `HIGHER_RANK_ALGEBRAIC_INDEPENDENCE_OPEN`
+- `SCHANUEL_IMPLIES_FULL_FINITE_RANK_INJECTIVITY`
 - `PAIRWISE_TRANSCENDENCE_INSUFFICIENT`
 - `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`
 - `ZERO_ARITHMETIC_TRACK_LOGICALLY_DISTINCT`
 - `CERTIFIED_FINITE_RELATION_EXCLUSION`
+- `LEAN_PROVED_ALGEBRAIC_SKELETON`
 
 ---
 
@@ -20,20 +22,25 @@
 
 TASK-TC-025 through TASK-TC-027R completed the canonical formulation of Transcendental Continuation (TC), establishing the ring equivalence $\operatorname{GradeFiber}(K) \simeq_{\mathrm{ring}} \mathbb{Z}$ and proving that multi-grade transfers are strictly functorial with trivial cocycles ($c(M, J)c(J, K) = c(M, K)$). All prospective TC-to-RH mechanisms based on unit rescaling, local-germ covariance, grade-character unitarity, and moving-zero pullbacks $\zeta(\tau^{-K}s)$ have been formally settled and frozen.
 
-TASK-TC-028 investigates the remaining open TC-specific mathematical structure: the **ambient realization evaluation map**
+TASK-TC-028 and TASK-TC-028R investigate the remaining open TC-specific mathematical structure: the **ambient realization evaluation map**
 $$\operatorname{ev}_\tau: \mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{R}, \qquad \tau = 2\pi,$$
 and its complex algebraic coefficient counterpart $\operatorname{ev}_\tau: \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{C}$, evaluating finite linear combinations:
 $$\operatorname{ev}_\tau\left(\sum_{j=1}^m a_j [K_j]\right) = \sum_{j=1}^m a_j (2\pi)^{K_j}, \qquad a_j \in \overline{\mathbb{Q}}, \; K_j \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}.$$
 
 This sprint rigorously establishes:
 1. **Support Translation Invariance**: Kernel vanishing depends strictly on affine differences among grades ($\sum a_j \tau^{K_j} = 0 \iff \sum a_j \tau^{K_j - K_0} = 0$).
-2. **Rational Support Rank $r(S)$**: Defined as $\dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}} \{K_j - K_0\}$, base-grade invariant.
+2. **Rational Support Rank $r(S)$**: Defined as $\dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}} \{K_j - K_0\}$, base-grade invariant, and computed via exact algebraic number field primitive elements.
 3. **Exact Rank-Zero Classification ($r=0$)**: Vanishes if and only if $\sum a_j = 0$ (trivial coefficient cancellation within a single grade).
 4. **Exact Rank-One Classification ($r=1$)**: Injectivity on a rational line $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ holds if and only if $\alpha \notin S_\tau = \{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}$. If $\alpha \in S_\tau$, an explicit non-zero kernel witness is $[\alpha] - A[0]$ with $A = \tau^\alpha \in \overline{\mathbb{Q}}$. By external Gelfond–Schneider, $\dim_{\mathbb{Q}} S_\tau \le 1$, so at most one rational line can contain non-trivial kernel elements.
 5. **Canonical Reduction for Higher Rank ($r \ge 2$)**: Finite evaluation kernel relations of rational support rank $r$ reduce precisely to multivariate algebraic-dependence relations among $r$ algebraic powers of $2\pi$.
-6. **Schanuel Conditional Audit**: Schanuel's conjecture for $(z_1, \dots, z_r) = (\alpha_1 \log\tau, \dots, \alpha_r \log\tau)$ directly implies $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$. Full algebraic independence ($r$) requires the joint independence of $\log(2\pi)$.
-7. **Minimal Open Case**: Concretely identified as $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ ($r=2$).
-8. **Zeta-Bridge Firewall**: Standard zeta explicit formulas and zero distributions cannot canonically produce algebraic coefficients and algebraic grades, proving that TC ambient kernel transcendence is logically distinct from Riemann Hypothesis mathematics.
+6. **Corrected & Strengthened Schanuel Theorem**: A rigorous two-case application of Schanuel's conjecture proves:
+   $$\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\right) = r.$$
+   Consequently, **Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support**.
+7. **Arithmetically Precise Firewall Audit**: $\zeta(2n+1)$ and $\Gamma(\rho)$ are classified as `ALGEBRAICITY_UNPROVED` (inadmissible as proved algebraic coefficients, but not proved non-algebraic; irrational does not mean transcendental). The audit finding `NO_ZETA_TO_KERNEL_BRIDGE_FOUND` establishes that examined familiar zeta structures furnish no bridge, without asserting a nonexistence theorem.
+8. **Clarified Base-Grade Arithmetic**: Grade $1 \in \mathbb{A}_{\mathbb{R}}$ is algebraic; what is transcendental is $\tau^1 = 2\pi$, equivalently $1 \notin S_\tau$.
+9. **Rigorous Scope Delineation**:
+   - `LEAN_PROVED`: The algebraic skeleton and low-arity lemmas in `RiemannScope.AmbientKernel` (2- and 3-term translation invariance, 2- and 3-term rank-zero cancellation, real affine difference identity, bivariate monomial clearing identity, and abstract 2-term impossibility).
+   - `PROVED_PAPER_DERIVATION`: Full group algebra $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ injectivity, equality of $\mathbb{Q}$-spans and dimensions, multivariate algebraic-dependence equivalence, and the two-case Schanuel conditional theorem.
 
 ---
 
@@ -86,7 +93,7 @@ $$\boxed{r(S) = \dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}} \{ K_j - K_0 
 $$K - K_0' = (K - K_0) - (K_0' - K_0).$$
 Since $K_0' \in S$, the difference $(K_0' - K_0)$ lies in $V = \operatorname{span}_{\mathbb{Q}} \{K_j - K_0\}$. Therefore, every generator $(K - K_0')$ belongs to $V$, implying $\operatorname{span}_{\mathbb{Q}} \{K_j - K_0'\} \subseteq V$. By symmetry, swapping $K_0$ and $K_0'$ yields the reverse inclusion. Thus the $\mathbb{Q}$-linear subspaces coincide, and their dimensions are identical: $\dim_{\mathbb{Q}} V' = \dim_{\mathbb{Q}} V$. $\blacksquare$
 
-*Lean 4 Verification*: Formalized in `RiemannScope.AmbientKernel` as `base_change_linear_span` and `support_affine_difference_base_change`.
+*Formal Verification Scope*: Formalized in `RiemannScope.AmbientKernel` as `base_change_linear_span` (affine difference identity of real numbers) and `support_affine_difference_base_change`. Full equality of $\mathbb{Q}$-spans and vector space dimensions is a `PROVED_PAPER_DERIVATION`.
 
 ---
 
@@ -132,7 +139,7 @@ This contradicts the hypothesis $\alpha \notin S_\tau$. Therefore no such non-tr
 
 *Classification*: `RANK_ONE_KERNEL_CLASSIFIED`.
 
-*Lean 4 Verification*: Formalized in `RiemannScope.AmbientKernel` as `s_tau_explicit_kernel_witness`, `s_tau_explicit_kernel_witness_scaled`, and `rank_one_injective_of_transcendental_power`.
+*Formal Verification Scope*: Formalized in `RiemannScope.AmbientKernel` as `s_tau_explicit_kernel_witness`, `s_tau_explicit_kernel_witness_scaled`, and `rank_one_injective_of_transcendental_power` (proving the impossibility of a 2-term relation $c_1 \tau^\alpha + c_0 = 0$ with $c_1 \ne 0$ under an abstract algebraicity predicate). Injectivity of the full group algebra $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ on arbitrary finite support is a `PROVED_PAPER_DERIVATION` via Laurent polynomial clearing.
 
 ---
 
@@ -170,7 +177,7 @@ $$P(X_1, \dots, X_r) = \sum_{j=1}^m a_j \prod_{\ell=1}^r X_\ell^{m_{j\ell}} = 0.
 6. Multiply by the clearing monomial $\prod_{\ell=1}^r X_\ell^{N_\ell}$ where $N_\ell = -\min_j m_{j\ell} \ge 0$. Since $X_\ell > 0$, this monomial is strictly positive and does not alter vanishing.
 7. The resulting expression $Q(X_1, \dots, X_r) = \sum_{j=1}^m a_j \prod_{\ell=1}^r X_\ell^{m_{j\ell} + N_\ell}$ has non-negative exponents and algebraic coefficients $a_j$. Because the support points $K_j$ are distinct and $F \ne 0$, $Q$ is not the zero polynomial. Thus $Q(X_1, \dots, X_r) = 0$ is a non-trivial algebraic dependence relation over $\overline{\mathbb{Q}}$. $\blacksquare$
 
-*Lean 4 Verification*: Formalized in `RiemannScope.AmbientKernel` as `bivariate_monomial_clearing`.
+*Formal Verification Scope*: Formalized in `RiemannScope.AmbientKernel` as `bivariate_monomial_clearing` (algebra identity for bivariate common-power factoring). The general $r$-variate Laurent reduction and equivalence theorem is a `PROVED_PAPER_DERIVATION`.
 
 ---
 
@@ -228,44 +235,86 @@ $$X = \tau^\alpha, \qquad Y = \tau^\beta, \qquad \alpha, \beta \in \mathbb{A}_{\
 
 | Theorem | Primary Reference | Hypotheses | What it Proves | Applies to Base $2\pi$? | Kernel Consequence |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Lindemann** | Lindemann (1882) | $\alpha \in \overline{\mathbb{Q}} \setminus \{0\}$ | $e^\alpha$ is transcendental; $\pi$ is transcendental. | YES (for $\tau^1 = 2\pi$) | Proves $\tau = 2\pi \notin \overline{\mathbb{Q}}$. Base grade $K=1$ is transcendental. |
+| **Lindemann** | Lindemann (1882) | $\alpha \in \overline{\mathbb{Q}} \setminus \{0\}$ | $e^\alpha$ is transcendental; $\pi$ is transcendental. | YES (for $\tau^1 = 2\pi$) | Proves $\tau = 2\pi \notin \overline{\mathbb{Q}}$. Base grade $1 \in \mathbb{A}_{\mathbb{R}}$ is algebraic; what is transcendental is $\tau^1 = 2\pi$, equivalently $1 \notin S_\tau$. |
 | **Lindemann–Weierstrass** | Weierstrass (1885) | $\beta_1, \dots, \beta_n \in \overline{\mathbb{Q}}$ $\mathbb{Q}$-linearly independent | $e^{\beta_1}, \dots, e^{\beta_n}$ are algebraically independent over $\overline{\mathbb{Q}}$. | **NO** | $\tau^\alpha = e^{\alpha \log(2\pi)}$. Exponent $\alpha\log(2\pi)$ is **not** algebraic (it involves $\log(2\pi)$). Does not apply. |
 | **Gelfond–Schneider** | Gelfond (1934), Schneider (1934) | $a \in \overline{\mathbb{Q}} \setminus \{0, 1\}$, $b \in \overline{\mathbb{Q}} \setminus \mathbb{Q}$ | $a^b$ is transcendental. | **NO (directly)** | Base $2\pi$ is transcendental, violating the algebraic base hypothesis. Applies only to ratios where $2\pi$ cancels ($\dim_{\mathbb{Q}} S_\tau \le 1$). |
 | **Six Exponentials** | Eramian (1965), Lang (1966) | $x_1, x_2 \in \mathbb{C}$ $\mathbb{Q}$-indep; $y_1, y_2, y_3 \in \mathbb{C}$ $\mathbb{Q}$-indep | At least one of $e^{x_i y_j}$ ($1 \le i \le 2, 1 \le j \le 3$) is transcendental. | **VACUOUS** | Taking $x = (1, \log\tau)$ and $y_j = \alpha_j$, $e^{1 \cdot \alpha_j}$ are already transcendental by Lindemann. Guarantees nothing about $\tau^{\alpha_j}$. |
 | **Four Exponentials** | Open Conjecture | $x_1, x_2$ $\mathbb{Q}$-indep; $y_1, y_2$ $\mathbb{Q}$-indep | At least one of the four $e^{x_i y_j}$ is transcendental. | **VACUOUS** | Again satisfied by $e^{\alpha_1}, e^{\alpha_2}$ being transcendental. |
 | **Baker's Theorem** | Baker (1966) | $\alpha_1, \dots, \alpha_n \in \overline{\mathbb{Q}} \setminus \{0\}$, $b_j \in \overline{\mathbb{Q}}$ | $\beta_0 + \sum b_j \log \alpha_j \ne 0$ for non-zero forms. | **NO** | $\log(2\pi)$ is not the logarithm of an algebraic number. Baker applies to algebraic inputs only. |
 | **Nesterenko** | Nesterenko (1996) | Modular forms / Eisenstein series | $\pi, e^\pi, \Gamma(1/4)$ are algebraically independent over $\mathbb{Q}$. | **NO** | Powers $(2\pi)^\alpha$ are not generated by Eisenstein series or Ramanujan functions. |
-| **Schanuel's Conjecture** | Schanuel (c. 1965) | $z_1, \dots, z_n \in \mathbb{C}$ $\mathbb{Q}$-linearly independent | $\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(z_1, \dots, z_n, e^{z_1}, \dots, e^{z_n}) \ge n$. | **YES (Conditionally)** | Yields $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$. (See Section L). |
+| **Schanuel's Conjecture** | Schanuel (c. 1965) | $z_1, \dots, z_n \in \mathbb{C}$ $\mathbb{Q}$-linearly independent | $\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(z_1, \dots, z_n, e^{z_1}, \dots, e^{z_n}) \ge n$. | **YES (Conditionally)** | Two-case derivation proves full algebraic independence: $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$, implying full finite-rank injectivity of $\operatorname{ev}_\tau$ on all algebraic supports. (See Section L). |
 
 ---
 
-## Section L. Schanuel Conditional Audit
+## Section L. Corrected & Strengthened Schanuel Conditional Theorem
 
-Let $\alpha_1, \dots, \alpha_r \in \mathbb{A}_{\mathbb{R}}$ be $\mathbb{Q}$-linearly independent. Consider the exponents:
-$$z_j = \alpha_j \log(2\pi), \qquad j = 1, \dots, r.$$
-Because $\log(2\pi) \ne 0$ and the $\alpha_j$ are $\mathbb{Q}$-linearly independent, the complex numbers $z_1, \dots, z_r$ are $\mathbb{Q}$-linearly independent.
+Schanuel's Conjecture states that if $z_1, \dots, z_n \in \mathbb{C}$ are $\mathbb{Q}$-linearly independent, then:
+$$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}\left(z_1, \dots, z_n, e^{z_1}, \dots, e^{z_n}\right) \ge n.$$
 
-**Theorem (Schanuel Lower Bound for Algebraic Powers of $2\pi$)**:  
-*Assuming Schanuel's Conjecture,*
-$$\boxed{\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left((2\pi)^{\alpha_1}, \dots, (2\pi)^{\alpha_r}\right) \ge r - 1.}$$
+Let $\alpha_1, \dots, \alpha_r \in \mathbb{A}_{\mathbb{R}}$ be a $\mathbb{Q}$-basis of a rational support space of rank $r \ge 1$. Put:
+$$L = \log\tau = \log(2\pi), \qquad X_j = e^{\alpha_j L} = \tau^{\alpha_j} \quad (j = 1, \dots, r).$$
 
-*Derivation*:  
-1. By Schanuel's Conjecture applied to $(z_1, \dots, z_r)$:
-$$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(z_1, \dots, z_r, e^{z_1}, \dots, e^{z_r}) \ge r.$$
-2. The exponentials are $e^{z_j} = \tau^{\alpha_j}$.
-3. The coordinate field generated by the inputs is:
-$$\mathbb{Q}(z_1, \dots, z_r) = \mathbb{Q}(\alpha_1 \log\tau, \dots, \alpha_r \log\tau) \subset \overline{\mathbb{Q}}(\log\tau).$$
-Since $\log\tau$ is a single complex number, $\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(z_1, \dots, z_r) \le 1$.
-4. By the transcendence degree addition property for field towers:
-$$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(\log\tau, \tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = \operatorname{trdeg}_{\mathbb{Q}(\log\tau)} \mathbb{Q}(\log\tau, \tau^{\alpha_1}, \dots, \tau^{\alpha_r}) + \operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(\log\tau).$$
-Because $\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}(\log\tau) \le 1$, we obtain:
-$$\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1. \quad \blacksquare$$
+We prove that Schanuel's conjecture implies full algebraic independence of $\{X_1, \dots, X_r\}$ over $\overline{\mathbb{Q}}$ by considering two mutually exclusive cases:
 
-**Significance of the $(r-1)$ Bound**:
-- For $r = 1$: bound is $\ge 0$, which is trivially true.
-- For $r = 2$: bound is $\ge 1$, proving that **at least one** of $\tau^{\alpha_1}, \tau^{\alpha_2}$ is transcendental (or their quotient is).
-- For general $r$: it guarantees that the $r$ powers span at least an $(r-1)$-dimensional algebraic variety.
-- **Why Schanuel does not trivially give full algebraic independence ($r$)**: To get $\operatorname{trdeg} = r$, the single parameter $\log(2\pi)$ must be algebraically independent of the powers $\tau^{\alpha_1}, \dots, \tau^{\alpha_r}$. If $\log(2\pi)$ were in the algebraic closure of the powers, the transcendence degree of the powers alone would be $r-1$. Proving full algebraic independence ($r$) therefore requires an extended transcendence degree argument incorporating $\pi$ (via $z_0 = i\pi$) or a stronger conjecture such as the Algebraic Independence of Logarithms Conjecture.
+### Case A: $1, \alpha_1, \dots, \alpha_r$ are $\mathbb{Q}$-linearly independent
+Consider the $r + 2$ complex numbers:
+$$z_0 = i\pi, \quad z_{\log} = L, \quad z_1 = \alpha_1 L, \quad \dots, \quad z_r = \alpha_r L.$$
+- $z_0 = i\pi$ is purely imaginary, whereas $L, \alpha_1 L, \dots, \alpha_r L$ are non-zero real numbers.
+- Among the real numbers, linear independence over $\mathbb{Q}$ reduces to the linear independence of $1, \alpha_1, \dots, \alpha_r$ over $\mathbb{Q}$ (dividing through by $L \ne 0$).
+- Hence, $z_0, z_{\log}, z_1, \dots, z_r$ are $r + 2$ complex numbers that are $\mathbb{Q}$-linearly independent.
+
+Their exponentials are:
+$$e^{z_0} = e^{i\pi} = -1, \quad e^{z_{\log}} = e^L = 2\pi, \quad e^{z_j} = e^{\alpha_j L} = X_j \quad (j = 1, \dots, r).$$
+
+Applying Schanuel's conjecture to these $r + 2$ numbers:
+$$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}\left(i\pi, L, \alpha_1 L, \dots, \alpha_r L, -1, 2\pi, X_1, \dots, X_r\right) \ge r + 2.$$
+
+Notice that over $\overline{\mathbb{Q}}$:
+1. $2\pi = -2i(i\pi)$ is algebraic over $i\pi$.
+2. Each $\alpha_j L$ is algebraic over the field generated by $L$ (since $\alpha_j \in \mathbb{A}_{\mathbb{R}} \subset \overline{\mathbb{Q}}$).
+3. $-1$ is rational.
+
+Therefore, the generated field is an algebraic extension of the field generated by the $r + 2$ elements:
+$$\overline{\mathbb{Q}}\left(i\pi, L, X_1, \dots, X_r\right).$$
+Consequently:
+$$\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(i\pi, L, X_1, \dots, X_r\right) \ge r + 2.$$
+Because there are exactly $r + 2$ displayed generators, their transcendence degree cannot exceed $r + 2$. Therefore, they must have transcendence degree exactly $r + 2$, meaning that **all $r + 2$ generators are mutually algebraically independent over $\overline{\mathbb{Q}}$**. In particular:
+$$\boxed{\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(X_1, \dots, X_r\right) = r.}$$
+
+### Case B: $1 \in \operatorname{span}_{\mathbb{Q}}\{\alpha_1, \dots, \alpha_r\}$
+Because $1$ lies in the rational span of the basis, there exist rational coefficients $q_j \in \mathbb{Q}$ such that:
+$$1 = \sum_{j=1}^r q_j \alpha_j.$$
+Multiplying by $L = \log\tau$:
+$$L = \sum_{j=1}^r q_j (\alpha_j L).$$
+Clearing denominators with a common positive integer $D \ge 1$ ($n_j = D q_j \in \mathbb{Z}$):
+$$\tau^D = \prod_{j=1}^r X_j^{n_j}.$$
+Thus $\tau = 2\pi$ is algebraic over $\overline{\mathbb{Q}}(X_1, \dots, X_r)$. Since $i\pi = \tau / (2i)$, $i\pi$ is also algebraic over $\overline{\mathbb{Q}}(X_1, \dots, X_r)$.
+
+Now consider the $r + 1$ numbers:
+$$z_0 = i\pi, \quad z_1 = \alpha_1 L, \quad \dots, \quad z_r = \alpha_r L.$$
+These $r + 1$ numbers are $\mathbb{Q}$-linearly independent: $i\pi$ is purely imaginary, and the real numbers $\alpha_1 L, \dots, \alpha_r L$ are $\mathbb{Q}$-linearly independent because $\alpha_1, \dots, \alpha_r$ form a $\mathbb{Q}$-basis.
+
+Their exponentials are $-1, X_1, \dots, X_r$. Applying Schanuel's conjecture:
+$$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}\left(i\pi, \alpha_1 L, \dots, \alpha_r L, -1, X_1, \dots, X_r\right) \ge r + 1.$$
+
+Over $\overline{\mathbb{Q}}$:
+- $i\pi \in \overline{\mathbb{Q}}(X_1, \dots, X_r)$.
+- Each $\alpha_j L$ is a rational multiple of $L$.
+Thus the only possible additional transcendence degree contributed by the logarithmic side $\{i\pi, \alpha_1 L, \dots, \alpha_r L\}$ over $\overline{\mathbb{Q}}(X_1, \dots, X_r)$ is at most $1$ (contributed by $L$). Therefore:
+$$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}\left(i\pi, \alpha_1 L, \dots, \alpha_r L, -1, X_1, \dots, X_r\right) \le 1 + \operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(X_1, \dots, X_r\right).$$
+Combining this with Schanuel's lower bound gives:
+$$r + 1 \le 1 + \operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(X_1, \dots, X_r\right) \implies \operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(X_1, \dots, X_r\right) \ge r.$$
+Since there are only $r$ generators $X_1, \dots, X_r$, the transcendence degree is bounded by $r$, hence:
+$$\boxed{\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(X_1, \dots, X_r\right) = r.}$$
+
+### Fundamental Schanuel Theorem
+In both Case A and Case B, the transcendence degree is maximal:
+$$\boxed{\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\right) = r.}$$
+By the equivalence theorem established in Section H, algebraic independence of $\{\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\}$ over $\overline{\mathbb{Q}}$ is equivalent to the injectivity of $\operatorname{ev}_\tau$ on $\overline{\mathbb{Q}}[\mathbb{Q}\alpha_1 \oplus \cdots \oplus \mathbb{Q}\alpha_r]$. Therefore:
+
+$$\boxed{\begin{gathered}\textbf{Theorem (Schanuel Full-Injectivity Conditional Theorem):} \\ \textbf{Schanuel's Conjecture implies that the ambient realization evaluation map } \operatorname{ev}_\tau \\ \textbf{is injective on every finite algebraic-grade support } S \subset \mathbb{A}_{\mathbb{R}}.\end{gathered}}$$
+
+This materially strengthens the transcendence picture: the non-injectivity of $\operatorname{ev}_\tau$ is not an open structural phenomenon, but would constitute a counterexample to Schanuel's conjecture!
 
 ---
 
@@ -282,7 +331,7 @@ The identical phenomenon occurs for the Four Exponentials Conjecture: the algebr
 
 ---
 
-## Section N. Bounded Computational Exclusions
+## Section N. Bounded Computational Exclusions and Certified Rigor
 
 To verify that no small or accidental algebraic relation exists for canonical rank-two supports, high-precision numerical searches and certified interval exclusions were executed.
 
@@ -296,11 +345,13 @@ To verify that no small or accidental algebraic relation exists for canonical ra
 
 ### 2. Certified Arb Ball Arithmetic Exclusions
 Using `flint.arb` with guaranteed interval arithmetic enclosure:
+- **Native Algebraic Enclosure**: Exponents $\sqrt{2}, \sqrt{3}$ are enclosed directly inside Arb via `expr_to_arb()` (`arb(2).sqrt()`, `arb(3).sqrt()`, and `2 * arb.pi()`), avoiding decimal-string roundtripping.
+- **Certified Lower Distance**: Distance is computed via `float(val.abs_lower())`, which gives a mathematically certified lower bound on the distance of the entire interval/ball from zero (not merely its midpoint).
 
-| Support $(\alpha, \beta)$ | Monomial Basis | Max Degree | Height Bound $H$ | Polynomials Tested | Status | Min Certified Distance |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| $(\sqrt{2}, \sqrt{3})$ | $\{1, X, Y\}$ | 1 | 5 | 1,330 | `CERTIFIED_NONZERO` | $0.116921$ |
-| $(\sqrt{2}, \sqrt{3})$ | $\{1, X, Y, X^2, XY, Y^2\}$ | 2 | 2 | 15,624 | `CERTIFIED_NONZERO` | $0.201734$ |
+| Support $(\alpha, \beta)$ | Monomial Basis | Max Degree | Height Bound $H$ | Polynomials Tested | Status | Min Certified Distance | Evidence Class |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| $(\sqrt{2}, \sqrt{3})$ | $\{1, X, Y\}$ | 1 | 5 | 1,330 | `CERTIFIED_NONZERO` | $> 0.116921$ | `CERTIFIED_FINITE_RELATION_EXCLUSION` |
+| $(\sqrt{2}, \sqrt{3})$ | $\{1, X, Y, X^2, XY, Y^2\}$ | 2 | 2 | 15,624 | `CERTIFIED_NONZERO` | $> 0.201733$ | `CERTIFIED_FINITE_RELATION_EXCLUSION` |
 
 *Evidence Class*: `CERTIFIED_FINITE_RELATION_EXCLUSION`.  
 *Explicit Boundary*: This certified exclusion rigorously proves that no non-zero polynomial of degree $\le 2$ with coefficients $|c_{ij}| \le 2$ vanishes at $((2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$. It does **not** constitute mathematical proof of algebraic independence.
@@ -317,15 +368,17 @@ A legitimate mathematical bridge from the Riemann zeta function to the ambient r
 
 | Candidate Quantity | Mathematical Origin | Arithmetic Status | Firewall Verdict | Reason |
 | :--- | :--- | :--- | :--- | :--- |
-| $\gamma_n$ | Zeta zero ordinate $\rho_n = 1/2 + i\gamma_n$ | **UNKNOWN** | **REJECTED** | Not proved algebraic or transcendental. Cannot appear as grade or coefficient. |
-| $\rho_n$ | Nontrivial zero | **UNKNOWN** | **REJECTED** | Not proved algebraic. |
-| $\log p$ | Prime weight $\Lambda(n)$ | **TRANSCENDENTAL** | **REJECTED** | Transcendental by Lindemann (1882). Cannot appear in algebraic coefficient field. |
-| $\zeta(2n)$ | Euler special value | **TRANSCENDENTAL** | **REJECTED** | $\zeta(2n) = (-1)^{n+1} B_{2n} (2\pi)^{2n} / (2(2n)!)$ is a non-zero rational multiple of $\pi^{2n}$. |
-| $\zeta(2n+1)$ | Odd zeta values ($\zeta(3)$, etc.) | **IRRATIONAL / UNKNOWN** | **REJECTED** | $\zeta(3)$ irrational (Apéry 1978); not algebraic. |
-| $\Gamma(\rho)$ | Gamma functional factor | **TRANSCENDENTAL / UNKNOWN** | **REJECTED** | Non-algebraic. |
-| $\sum \Lambda(n) n^{-s}$ | Dirichlet series / Explicit formula | **INFINITE SUM** | **REJECTED** | Infinite distribution; kernel is defined on finite supports. |
+| $\gamma_n$ | Zeta zero ordinate $\rho_n = 1/2 + i\gamma_n$ | `ALGEBRAICITY_UNPROVED` | **REJECTED** | Algebraicity unproved. Cannot appear as proved algebraic grade or coefficient. |
+| $\rho_n$ | Nontrivial zero | `ALGEBRAICITY_UNPROVED` | **REJECTED** | Algebraicity unproved. |
+| $\log p$ | Prime weight $\Lambda(n)$ | `PROVED_TRANSCENDENTAL` | **REJECTED** | Transcendental by Lindemann (1882). Cannot appear in algebraic coefficient field. |
+| $\zeta(2n)$ | Euler special value | `PROVED_TRANSCENDENTAL` | **REJECTED** | $\zeta(2n) = (-1)^{n+1} B_{2n} (2\pi)^{2n} / (2(2n)!)$ is a non-zero rational multiple of $\pi^{2n}$. |
+| $\zeta(2n+1)$ | Odd zeta values ($\zeta(3)$, $\zeta(5)$, etc.) | `ALGEBRAICITY_UNPROVED` | **REJECTED** | Apéry (1978) proved $\zeta(3) \notin \mathbb{Q}$; recent results establish $\zeta(5) \notin \mathbb{Q}$. But irrational does not mean transcendental; algebraicity is unproved. Inadmissible as proved algebraic coefficient. |
+| $\Gamma(\rho)$ | Gamma functional factor | `ALGEBRAICITY_UNPROVED` | **REJECTED** | At nontrivial zeros, lacks any known arithmetic classification licensing algebraicity. Inadmissible as proved algebraic coefficient. |
+| $\sum \Lambda(n) n^{-s}$ | Dirichlet series / Explicit formula | `INFINITE_DISTRIBUTION` | **REJECTED** | Infinite distribution; kernel is defined on finite supports. |
 
-**Firewall Conclusion**: Standard zeta explicit formulas, completed functional equations, and zero distributions cannot canonically produce an element of $\ker(\operatorname{ev}_\tau)$.
+**Firewall Finding**:  
+$$\boxed{\texttt{NO\_ZETA\_TO\_KERNEL\_BRIDGE\_FOUND}}$$
+This is strictly an **audit finding** over all examined standard zeta structures, explicit formulas, and special values: they fail to furnish proved algebraic coefficients and grades. This establishes that no bridge has been found, without asserting an unproved universal nonexistence theorem.
 
 ---
 
@@ -341,7 +394,7 @@ We explicitly establish that **zero arithmetic and TC ambient kernel transcenden
 
 ---
 
-## Section Q. Final Kernel Classification
+## Section Q. Final Kernel Classification & Scope Delineation
 
 ### Primary Classification
 $$\boxed{\texttt{FINITE\_KERNEL\_REDUCES\_TO\_ALGEBRAIC\_INDEPENDENCE}}$$
@@ -352,16 +405,32 @@ The ambient evaluation kernel on finite supports of rational rank $r$ is complet
 - `RANK_ONE_KERNEL_CLASSIFIED`: $r=1$ injective iff $\alpha \notin S_\tau$.
 - `ONE_EXCEPTIONAL_Q_DIRECTION_ONLY`: $\dim_{\mathbb{Q}} S_\tau \le 1$ via Gelfond–Schneider.
 - `HIGHER_RANK_ALGEBRAIC_INDEPENDENCE_OPEN`: $r \ge 2$ is an open transcendence problem.
+- `SCHANUEL_IMPLIES_FULL_FINITE_RANK_INJECTIVITY`: Two-case Schanuel proof establishes full injectivity conditional on Schanuel's conjecture.
 - `PAIRWISE_TRANSCENDENCE_INSUFFICIENT`: Pairwise separation does not imply algebraic independence.
-- `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`: Zeta quantities fail the algebraic firewall.
+- `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`: Audit finding: standard zeta quantities fail the algebraic firewall.
 - `ZERO_ARITHMETIC_TRACK_LOGICALLY_DISTINCT`: Independent of zeta-zero transcendence.
-- `CERTIFIED_FINITE_RELATION_EXCLUSION`: Verified via Arb ball arithmetic.
+- `CERTIFIED_FINITE_RELATION_EXCLUSION`: Verified via Arb ball arithmetic with native algebraic enclosure and interval lower bounds.
+
+### Verification Scope Delineation
+- $\boxed{\texttt{LEAN\_PROVED: algebraic skeleton / low arity}}$:
+  - 2- and 3-term support translation invariance (`sum_tau_pow_zero_iff_translated_zero_two`, `three`)
+  - 2- and 3-term rank-zero coefficient cancellation (`rank_zero_kernel_iff`, `three_iff`)
+  - Base-grade difference identity of real numbers (`base_change_linear_span`)
+  - 2-term explicit kernel witness for $\alpha \in S_\tau$ (`s_tau_explicit_kernel_witness`)
+  - 2-term linear impossibility under abstract algebraicity predicate (`rank_one_injective_of_transcendental_power`)
+  - Group algebra structural multiplication law (`group_algebra_mul_law`)
+  - Bivariate monomial clearing identity (`bivariate_monomial_clearing`)
+  - Abstract pairwise countermodel $v = u^2$ (`pairwise_transcendence_not_algebraic_independence_model`)
+- $\boxed{\texttt{PROVED\_PAPER\_DERIVATION: full rank-one and higher-rank classification}}$:
+  - Full group algebra $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ injectivity on arbitrary finite support via Laurent polynomial clearing
+  - Equality of $\mathbb{Q}$-spans and exact dimension invariance under base-grade change
+  - General $r$-variate Laurent polynomial reduction to algebraic independence
+  - Two-case Schanuel conditional theorem proving $\operatorname{trdeg} = r$ and full finite-rank injectivity of $\operatorname{ev}_\tau$
 
 ---
 
 ## Section R. Exact Next Mathematical Problem
 
-Future research investigating the ambient realization map should address the specific minimal target:
+With the conditional injectivity under Schanuel settled, future research investigating unconditional ambient realization should address the minimal concrete problem:
 
-$$\boxed{\text{Determine whether } (2\pi)^{\sqrt{2}} \text{ and } (2\pi)^{\sqrt{3}} \text{ are algebraically independent over } \overline{\mathbb{Q}},}$$
-or derive a conditional transcendence-degree theorem for $2\pi$ under an explicit arithmetic conjecture.
+$$\boxed{\text{Determine unconditionally whether } (2\pi)^{\sqrt{2}} \text{ and } (2\pi)^{\sqrt{3}} \text{ are algebraically independent over } \overline{\mathbb{Q}}.}$$
