@@ -3918,6 +3918,35 @@ Any future TC route to the Riemann Hypothesis must seek either:
 - All core TC routes to RH (unit rescaling, character unitarity, local germ, converter covariance, and multi-grade transfer compatibility) are officially frozen.
 - The open transcendence problem $\ker(\operatorname{ev}_\tau)$ on $\mathbb A_{\mathbb R}[\mathbb A_{\mathbb R}]$ survives as an independent problem in number theory.
 
+---
+
+## 45. Ambient Realization Kernel, Algebraic-Power Independence, and Zeta-Bridge Firewall (TASK-TC-028)
+
+### 45.1 Exact Evaluation Map & Translation Invariance
+The ambient evaluation map $\operatorname{ev}_\tau: \mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}] \to \mathbb{R}$ evaluates $\operatorname{ev}_\tau(\sum a_j [K_j]) = \sum a_j (2\pi)^{K_j}$ for algebraic grades $K_j \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$ and algebraic coefficients $a_j \in \overline{\mathbb{Q}}$.
+For any reference grade $K_0$:
+\[
+\boxed{\sum_{j=1}^m a_j \tau^{K_j} = 0 \iff \sum_{j=1}^m a_j \tau^{K_j - K_0} = 0.}
+\]
+Kernel relations depend solely on affine differences among grades.
+
+### 45.2 Rational Support Rank & Classification
+For finite support $S = \{K_1, \dots, K_m\}$, rational support rank is $r(S) = \dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}} \{K_j - K_0\}$ (base-grade invariant).
+- **Rank Zero ($r=0$)**: $\sum a_j \tau^{K_0} = 0 \iff \sum a_j = 0$ (`RANK_ZERO_TRIVIAL_COEFFICIENT_CANCELLATION`).
+- **Rank One ($r=1$)**: For direction $\alpha \in \mathbb{A}_{\mathbb{R}} \setminus \{0\}$, $\operatorname{ev}_\tau$ is injective on $\overline{\mathbb{Q}}[\mathbb{Q}\alpha] \iff \alpha \notin S_\tau = \{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}$. If $\alpha \in S_\tau$, an explicit kernel witness is $[\alpha] - A[0]$ ($A = \tau^\alpha \in \overline{\mathbb{Q}}$) (`RANK_ONE_KERNEL_CLASSIFIED`). By external Gelfond–Schneider, $\dim_{\mathbb{Q}} S_\tau \le 1$ (`ONE_EXCEPTIONAL_Q_DIRECTION_ONLY`).
+
+### 45.3 Higher-Rank Reduction & Algebraic Independence Equivalence ($r \ge 2$)
+Finite kernel relations of rational rank $r \ge 2$ reduce precisely to multivariate algebraic dependence of $r$ algebraic powers of $2\pi$:
+\[
+\boxed{\operatorname{ev}_\tau \text{ injective on } \overline{\mathbb{Q}}[\mathbb{Q}\alpha_1 \oplus \cdots \oplus \mathbb{Q}\alpha_r] \iff \{\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\} \text{ are algebraically independent over } \overline{\mathbb{Q}}.}
+\]
+- **Principal Classification**: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
+- **Schanuel Conditional Lower Bound**: Standard Schanuel's conjecture implies $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$.
+- **Minimal Open Case**: $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ ($r=2$) (`MINIMAL_HIGHER_RANK_OPEN_TC_KERNEL_PROBLEM`).
+- **Certified Finite Exclusions**: Arb interval arithmetic certifies absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ for 15,624 quadratic polynomials (height $\le 2$, min distance $> 0.2017$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
+- **Zeta-Bridge Firewall**: All audited zeta quantities ($\gamma_n, \rho_n, \log p, \zeta(2n), \Gamma(\rho)$, infinite explicit formulas) fail the algebraic-coefficient firewall (`NO_ZETA_TO_KERNEL_BRIDGE_FOUND`). Zero-arithmetic research is logically distinct from the TC ambient realization kernel.
+
+
 
 
 

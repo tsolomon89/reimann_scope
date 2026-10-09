@@ -196,6 +196,7 @@ The following approaches have been proven unable to force RH or constrain zero d
 - **Elementary Prime Dilation-Translation Rigidity**: `dilation_translation_multi_prime_rigidity` (`RiemannScope.RiemannConverter`).
 - **Single-Station Injectivity & Monomial Laurent Algebra**: `graded_station_nonzero`, `prime_station_grade_injective` (`RiemannScope.FaithfulGradedAlgebra`).
 - **Exceptional Exponent Commensurability Consequence**: `exceptional_exponents_Q_collinear`, `two_direction_Q_collinear` under hypothesis `h_GS` (`RiemannScope.TranscendenceRigidity`, `RiemannScope.ExceptionalTransfer`).
+- **Ambient Kernel Translation & Rank-One Classification**: `tau_pow_translation`, `sum_tau_pow_zero_iff_translated_zero_two`, `rank_zero_kernel_iff`, `s_tau_explicit_kernel_witness`, `rank_one_injective_of_transcendental_power`, `group_algebra_mul_relation_is_structural`, `bivariate_monomial_clearing`, `pairwise_transcendence_not_algebraic_independence_model` (`RiemannScope.AmbientKernel`).
 
 ### 6.2 External Theorem
 - **Lindemann (1882) Transcendence of $\pi$ and $\tau = 2\pi$**: Guarantees integer station separation $L_K \cap L_J = \{0\}$ ($K \ne J \in \mathbb{Z}$, with positive layers $L_K^+ \cap L_J^+ = \emptyset$) and $S_\tau \cap \mathbb{Q} = \{0\}$.
@@ -208,13 +209,17 @@ The following approaches have been proven unable to force RH or constrain zero d
 - **Arbitrary Finite-Path Holonomy Triviality**: General finite-sequence path composition $T_{K_r \leftarrow K_0} = T_{K_r \leftarrow K_{r-1}} \circ \cdots \circ T_{K_1 \leftarrow K_0}$ and closed loop identity $T_{\text{loop}} = \operatorname{id}$.
 - **Finite-Arity Naturality Extension**: Commutation of $r$-ary operations ($r > 2$) with transfer maps.
 - **Rank-One Support Linear Independence**: Over $\mathbb{A}_{\mathbb{R}}$ (real scalars into $\mathbb{R}$) or $\overline{\mathbb{Q}}$ (complex scalars into $\mathbb{C}$) for $\alpha \notin S_\tau$ via single-variable algebraic polynomial root reduction.
+- **Higher-Rank Multivariate Reduction & Algebraic Independence**: Finite support kernel relations of rational rank $r \ge 2$ reduce precisely to multivariate algebraic dependence of $r$ algebraic powers of $2\pi$; injectivity on $\overline{\mathbb{Q}}[\mathbb{Q}\alpha_1 \oplus \cdots \oplus \mathbb{Q}\alpha_r]$ is equivalent to algebraic independence of $\{\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\}$ over $\overline{\mathbb{Q}}$ (TASK-TC-028).
+- **Schanuel Conditional Lower Bound**: Standard Schanuel's Conjecture on $(\alpha_1\log\tau, \dots, \alpha_r\log\tau)$ implies $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$ (TASK-TC-028).
 
 ### 6.4 Audit Findings
 - `NO_ZETA_TO_REALIZATION_KERNEL_BRIDGE_FOUND`: Standard zeta structures (Euler values, prime logs, zero ordinates) yield no elements of $\ker(\operatorname{ev}_\tau)$.
 - `NO_COUPLING_OUTSIDE_GAUGE_COVARIANCE_FOUND`: All tested linear and bilinear combinations of standard TC objects reduce to gauge factors or coordinate pullbacks.
 - `NO_GENUINE_DEFORMATION_IN_STANDARD_TC_FOUND`: Standard TC axioms enforce $a_{(K, n)} = a_n$; genuine arithmetic deformations require axioms outside TC.
+- `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`: Evaluation kernel relations reduce to algebraic-dependence relations among algebraic powers of $2\pi$ (TASK-TC-028).
+- `CERTIFIED_FINITE_RELATION_EXCLUSION`: Rigorous Arb ball arithmetic proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ at degree $\le 2, \|c\|_\infty \le 2$ (min distance $> 0.2017$) (TASK-TC-028).
 
 ### 6.5 Open
-- **Ambient Realization Kernel**: Injectivity of $\operatorname{ev}_\tau$ on the full real algebraic grade ring $\mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}]$ (`OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE`).
+- **Minimal Higher-Rank Ambient Realization Kernel**: Algebraic independence of $((2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$ over $\overline{\mathbb{Q}}$, or any non-zero bivariate polynomial relation $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ (`OPEN_MINIMAL_RANK_TWO_KERNEL_PROBLEM`, TASK-TC-028).
 - **Exceptional Exponent Set**: Whether $S_\tau = \{0\}$ unconditionally in transcendental number theory.
-- **Zeta-to-Kernel Bridge**: Whether any non-trivial bridge connects the zeros of $\zeta(s)$ to $\ker(\operatorname{ev}_\tau)$.
+- **Zeta-to-Kernel Bridge**: Strictly open; no valid bridge exists from standard zeta structures across the algebraic-coefficient firewall.

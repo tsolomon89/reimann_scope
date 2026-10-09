@@ -1640,6 +1640,48 @@ Injectivity on $\mathbb{A}_{\mathbb{R}}$ remains an independent open problem in 
   \]
 - **Frozen Routes**: Pure unit rescaling, grade-character unitarity, local zero germ scaling, converter covariance, moving-zero pullback as arithmetic TC, and multi-grade transfer compatibility are officially frozen.
 
+---
+
+## 35. Ambient Realization Kernel, Algebraic-Power Independence, and Zeta-Bridge Firewall (TASK-TC-028)
+
+### 35.1 Ambient Realization Map and Translation Invariance
+The ambient evaluation map is the algebra homomorphism:
+\[
+\operatorname{ev}_\tau: \mathbb{A}_{\mathbb{R}}[\mathbb{A}_{\mathbb{R}}] \longrightarrow \mathbb{R}, \qquad [K] \longmapsto \tau^K = (2\pi)^K,
+\]
+extended to complex algebraic coefficients as $\operatorname{ev}_\tau: \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}] \to \mathbb{C}$.
+
+For any reference grade $K_0 \in \mathbb{A}_{\mathbb{R}}$:
+\[
+\boxed{\sum_{j=1}^m a_j \tau^{K_j} = 0 \iff \sum_{j=1}^m a_j \tau^{K_j - K_0} = 0.}
+\]
+Evaluation vanishing is strictly affine: it depends solely on relative differences $\{K_j - K_0\}$.
+
+### 35.2 Rational Support Rank and Classification
+For finite support $S = \{K_1, \dots, K_m\}$, the rational support rank is:
+\[
+\boxed{r(S) = \dim_{\mathbb{Q}} \operatorname{span}_{\mathbb{Q}} \{K_j - K_0\},}
+\]
+which is base-grade invariant.
+- **Rank Zero ($r=0$)**: All grades coincide. Evaluation vanishes if and only if $\sum a_j = 0$ (`RANK_ZERO_TRIVIAL_COEFFICIENT_CANCELLATION`).
+- **Rank One ($r=1$)**: All differences lie along a rational line $\mathbb{Q}\alpha$. Then $\operatorname{ev}_\tau$ is injective on $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ if and only if $\alpha \notin S_\tau = \{\alpha \in \mathbb{A}_{\mathbb{R}} : \tau^\alpha \in \overline{\mathbb{Q}}\}$. If $\alpha \in S_\tau$, an explicit non-zero kernel witness is $[\alpha] - A[0]$ with $A = \tau^\alpha \in \overline{\mathbb{Q}}$ (`RANK_ONE_KERNEL_CLASSIFIED`). By external Gelfond–Schneider, $\dim_{\mathbb{Q}} S_\tau \le 1$ (`ONE_EXCEPTIONAL_Q_DIRECTION_ONLY`).
+
+### 35.3 Higher-Rank Reduction to Algebraic Independence ($r \ge 2$)
+For $r \ge 2$, clearing denominators in a $\mathbb{Q}$-basis $\alpha_1, \dots, \alpha_r$ of grade differences converts any kernel relation into a non-zero multivariate algebraic polynomial $Q(X_1, \dots, X_r) = 0$ for $X_\ell = \tau^{\alpha_\ell/D}$. Because the field extension $\overline{\mathbb{Q}}(X_1, \dots, X_r)/\overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r})$ is finite algebraic, transcendence degrees are identical:
+\[
+\boxed{\operatorname{ev}_\tau \text{ is injective on } \overline{\mathbb{Q}}[\mathbb{Q}\alpha_1 \oplus \cdots \oplus \mathbb{Q}\alpha_r] \iff \{\tau^{\alpha_1}, \dots, \tau^{\alpha_r}\} \text{ are algebraically independent over } \overline{\mathbb{Q}}.}
+\]
+Principal classification: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
+
+### 35.4 Minimal Open Case and Bounded Exclusions
+- **Minimal Open Case**: $\alpha_1 = \sqrt{2}, \alpha_2 = \sqrt{3}$. Determining whether $(2\pi)^{\sqrt{2}}$ and $(2\pi)^{\sqrt{3}}$ are algebraically independent over $\overline{\mathbb{Q}}$ (`MINIMAL_HIGHER_RANK_OPEN_TC_KERNEL_PROBLEM`).
+- **Schanuel Lower Bound**: Standard Schanuel's conjecture implies $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) \ge r - 1$.
+- **Certified Ball Arithmetic Exclusions**: Rigorous Arb interval arithmetic proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ for 15,624 quadratic polynomials (height $\le 2$, min distance $> 0.2017$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
+
+### 35.5 Zeta-Bridge Firewall
+All standard zeta entities ($\gamma_n, \rho_n, \log p, \zeta(2n), \Gamma(\rho)$, infinite explicit formulas) fail the algebraic-coefficient firewall (`NO_ZETA_TO_KERNEL_BRIDGE_FOUND`). Zeta-zero arithmetic research is logically distinct from the TC ambient realization kernel.
+
+
 
 
 

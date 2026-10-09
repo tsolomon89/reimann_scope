@@ -127,6 +127,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/FiberArithmetic.lean",
     "formal/RiemannScope/UnitRescaling.lean",
     "formal/RiemannScope/MultiGradeNaturality.lean",
+    "formal/RiemannScope/AmbientKernel.lean",
 ]
 
 

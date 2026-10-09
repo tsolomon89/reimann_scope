@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "TASK-TC-028",
+  "title": "Ambient Realization Kernel, Algebraic-Power Independence, and Zeta-Bridge Firewall",
+  "timestamp": "2026-10-09T12:20:00+00:00",
+  "producing_commit": "addaea795feaf5c0c3a8d81db92e49460c2e599b",
+  "evaluation_map": {
+    "real_algebraic_form": "ev_tau : A_R[A_R] -> R",
+    "complex_algebraic_form": "ev_tau : Q_bar[A_R] -> C",
+    "base": "tau = 2*pi",
+    "action": "ev_tau(sum a_j [K_j]) = sum a_j * (2*pi)^(K_j)",
+    "support_translation_invariance": "sum a_j tau^(K_j) = 0 <=> sum a_j tau^(K_j - K_0) = 0",
+    "formalized_lean_lemmas": [
+      "tau_pow_translation",
+      "sum_tau_pow_translation_two",
+      "sum_tau_pow_translation_three",
+      "sum_tau_pow_zero_iff_translated_zero_two",
+      "sum_tau_pow_zero_iff_translated_zero_three"
+    ]
+  },
+  "support_rank": {
+    "definition": "r(S) = dim_Q span_Q { K_j - K_0 } for finite support S = {K_1, ..., K_m}",
+    "base_grade_independence": "Proved; coordinate shifts between base grades lie in the rational span",
+    "formalized_lean_lemmas": [
+      "base_change_linear_span",
+      "support_affine_difference_base_change"
+    ]
+  },
+  "rank_zero_classification": {
+    "rank": 0,
+    "condition": "All grades coincide: K_j = K_0",
+    "theorem": "sum a_j tau^(K_0) = 0 <=> sum a_j = 0",
+    "status": "RANK_ZERO_TRIVIAL_COEFFICIENT_CANCELLATION",
+    "formalized_lean_lemmas": [
+      "rank_zero_evaluation_factor",
+      "rank_zero_kernel_iff",
+      "rank_zero_kernel_three_iff"
+    ]
+  },
+  "rank_one_classification": {
+    "rank": 1,
+    "condition": "K_j - K_0 = q_j * alpha for alpha in A_R \\ {0} and q_j in Q",
+    "exceptional_set": "S_tau = { alpha in A_R : tau^alpha in Q_bar }",
+    "dichotomy_theorem": "ev_tau is injective on Q_bar[Q*alpha] <=> alpha not in S_tau",
+    "explicit_witness_if_in_s_tau": "[alpha] - A[0] where tau^alpha = A in Q_bar",
+    "gelfond_schneider_bound": "dim_Q S_tau <= 1 (at most one rational line in A_R can be non-injective)",
+    "status": "RANK_ONE_KERNEL_CLASSIFIED",
+    "formalized_lean_lemmas": [
+      "s_tau_explicit_kernel_witness",
+      "s_tau_explicit_kernel_witness_scaled",
+      "rank_one_injective_of_transcendental_power"
+    ]
+  },
+  "higher_rank_reduction": {
+    "rank": "r >= 2",
+    "basis": "alpha_1, ..., alpha_r in A_R Q-linearly independent",
+    "reduction_theorem": "Finite support kernel relations of rational rank r are precisely multivariate algebraic-dependence relations Q(X_1, ..., X_r) = 0 for X_l = tau^(alpha_l / D)",
+    "algebraic_independence_equivalence": "ev_tau is injective on Q_bar[Q*alpha_1 + ... + Q*alpha_r] <=> {tau^(alpha_1), ..., tau^(alpha_r)} are algebraically independent over Q_bar",
+    "transcendence_degree_equality": "trdeg_Qbar Q_bar(X_1, ..., X_r) = trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) via finite algebraic field extension of degree <= D^r",
+    "status": "FINITE_SUPPORT_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE"
+  },
+  "minimal_open_case": {
+    "rank": 2,
+    "support": ["sqrt(2)", "sqrt(3)"],
+    "generators": ["(2*pi)^sqrt(2)", "(2*pi)^sqrt(3)"],
+    "target_problem": "Does there exist any non-zero P in Q_bar[X, Y] such that P((2*pi)^sqrt(2), (2*pi)^sqrt(3)) = 0?",
+    "minimal_linear_open_relation": "a_0 + a_1*(2*pi)^sqrt(2) + a_2*(2*pi)^sqrt(3) + a_3*(2*pi)^(sqrt(2)+sqrt(3)) = 0",
+    "status": "MINIMAL_HIGHER_RANK_OPEN_TC_KERNEL_PROBLEM"
+  },
+  "literature_theorem_matrix": [
+    {
+      "theorem": "Lindemann (1882)",
+      "hypotheses": "alpha in Q_bar \\ {0}",
+      "proves": "e^alpha and pi are transcendental",
+      "applies_to_2pi_base": true,
+      "kernel_consequence": "tau = 2*pi is transcendental; K=1 has no algebraic relation with K=0"
+    },
+    {
+      "theorem": "Lindemann-Weierstrass (1885)",
+      "hypotheses": "beta_1, ..., beta_n in Q_bar Q-linearly independent",
+      "proves": "e^(beta_1), ..., e^(beta_n) are algebraically independent",
+      "applies_to_2pi_base": false,
+      "kernel_consequence": "Fails because log(2*pi) is not proved algebraic; exponents alpha_j * log(2*pi) are not in Q_bar"
+    },
+    {
+      "theorem": "Gelfond-Schneider (1934)",
+      "hypotheses": "a in Q_bar \\ {0, 1}, b in Q_bar \\ Q",
+      "proves": "a^b is transcendental",
+      "applies_to_2pi_base": false,
+      "kernel_consequence": "Fails directly because base 2*pi is transcendental; applies only to quotients of S_tau, giving dim_Q S_tau <= 1"
+    },
+    {
+      "theorem": "Six Exponentials Theorem (1965/1966)",
+      "hypotheses": "2x3 matrix of Q-independent exponents",
+      "proves": "At least one of 6 exponentials is transcendental",
+      "applies_to_2pi_base": false,
+      "kernel_consequence": "Vacuous for (1, log tau) x (alpha_1, alpha_2, alpha_3) because e^(alpha_j) is already transcendental by Lindemann"
+    },
+    {
+      "theorem": "Four Exponentials Conjecture",
+      "hypotheses": "2x2 matrix of Q-independent exponents",
+      "proves": "At least one of 4 exponentials is transcendental",
+      "applies_to_2pi_base": false,
+      "kernel_consequence": "Vacuous for identical reason: e^(alpha_1), e^(alpha_2) are already transcendental"
+    },
+    {
+      "theorem": "Baker's Theorem (1966)",
+      "hypotheses": "Linear forms in logarithms of algebraic numbers",
+      "proves": "Quantitative non-vanishing of log forms",
+      "applies_to_2pi_base": false,
+      "kernel_consequence": "Does not apply because log(2*pi) is not the logarithm of an algebraic number"
+    },
+    {
+      "theorem": "Schanuel's Conjecture (c. 1965)",
+      "hypotheses": "z_1, ..., z_n Q-linearly independent",
+      "proves": "trdeg_Q Q(z_1, ..., z_n, e^(z_1), ..., e^(z_n)) >= n",
+      "applies_to_2pi_base": true,
+      "kernel_consequence": "Directly proves trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) >= r - 1; full independence (r) requires joint independence of log(2*pi)"
+    }
+  ],
+  "schanuel_consequence": {
+    "input_vectors": "z_j = alpha_j * log(2*pi) for j = 1, ..., r",
+    "input_field_trdeg": "trdeg_Q Q(z_1, ..., z_r) <= 1 since all z_j in Q_bar(log(2*pi))",
+    "exponentials": "e^(z_j) = tau^(alpha_j)",
+    "derived_lower_bound": "trdeg_Qbar Q_bar(tau^(alpha_1), ..., tau^(alpha_r)) >= r - 1",
+    "conditional_on": "Standard Schanuel's Conjecture"
+  },
+  "bounded_computational_exclusions": {
+    "pslq_search": {
+      "support": ["sqrt(2)", "sqrt(3)"],
+      "max_degree": 2,
+      "max_coeff": 1000,
+      "precision_dps": 80,
+      "result": "None (no relation found)"
+    },
+    "certified_arb_exclusions": [
+      {
+        "support": ["sqrt(2)", "sqrt(3)"],
+        "basis": ["1", "X", "Y"],
+        "max_degree": 1,
+        "height_bound": 5,
+        "polynomials_tested": 1330,
+        "status": "CERTIFIED_NONZERO",
+        "min_certified_distance": 0.116921434557
+      },
+      {
+        "support": ["sqrt(2)", "sqrt(3)"],
+        "basis": ["1", "X", "Y", "X^2", "X*Y", "Y^2"],
+        "max_degree": 2,
+        "height_bound": 2,
+        "polynomials_tested": 15624,
+        "status": "CERTIFIED_NONZERO",
+        "min_certified_distance": 0.201733708865
+      }
+    ]
+  },
+  "zeta_bridge_firewall": {
+    "disallowed_entities": [
+      "gamma_n (zeta zero ordinate, non-proved algebraicity)",
+      "rho_n = 1/2 + i*gamma_n (nontrivial zero, non-proved algebraicity)",
+      "log p (prime log weight, transcendental)",
+      "zeta(2n) (even special value, transcendental multiple of pi^(2n))",
+      "zeta(2n+1) (odd special values, irrational/unknown, not in Q_bar)",
+      "Gamma(s) (Gamma evaluations, non-algebraic)",
+      "Dirichlet series / explicit formulas (infinite sums, not finite support)"
+    ],
+    "verdict": "REJECTED_BY_FIREWALL",
+    "bridge_exists": false
+  },
+  "zero_arithmetic_relation": {
+    "logically_distinct": true,
+    "reasons": [
+      "Transcendence of gamma_1 would disqualify it from being an algebraic grade",
+      "Algebraicity of gamma_1 would not supply an algebraic relation among powers of 2*pi",
+      "Zeta explicit formula produces continuous distributions, not finite elements of Q_bar[A_R]"
+    ]
+  },
+  "principal_classification": "FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE",
+  "secondary_classifications": [
+    "RANK_ZERO_TRIVIAL",
+    "RANK_ONE_KERNEL_CLASSIFIED",
+    "ONE_EXCEPTIONAL_Q_DIRECTION_ONLY",
+    "HIGHER_RANK_ALGEBRAIC_INDEPENDENCE_OPEN",
+    "PAIRWISE_TRANSCENDENCE_INSUFFICIENT",
+    "NO_ZETA_TO_KERNEL_BRIDGE_FOUND",
+    "ZERO_ARITHMETIC_TRACK_LOGICALLY_DISTINCT",
+    "CERTIFIED_FINITE_RELATION_EXCLUSION"
+  ],
+  "next_task": "TASK-TC-029: Minimal Rank-Two Transcendence Bounds and Arithmetic Log-Independence Formulation"
+}
