@@ -3092,10 +3092,10 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \]
    Principal classification: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
 
-5. **Strengthened Schanuel Theorem & Minimal Open Case**:
+5. **Strengthened Schanuel Theorem & Canonical Minimal Open Instances**:
    A rigorous two-case derivation (Case A: $1, \alpha_1, \dots, \alpha_r$ $\mathbb{Q}$-independent; Case B: $1 \in \operatorname{span}_{\mathbb{Q}}\{\alpha_1, \dots, \alpha_r\}$) proves $\operatorname{trdeg}_{\overline{\mathbb Q}} \overline{\mathbb Q}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$.
    Consequently, **Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support** (`SCHANUEL_IMPLIES_FULL_FINITE_RANK_INJECTIVITY`).
-   The minimal open case is identified as $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ ($r=2$).
+   Rational support rank $r=2$ is established as the minimal unresolved rational support rank; canonical minimal rank-two open instances (`CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE`) include both $(1, \sqrt{2})$ and $(\sqrt{2}, \sqrt{3})$.
    Certified absence of relations is established via Arb ball arithmetic with native algebraic ball construction (`expr_to_arb`) and certified interval lower bounds (`abs_lower()`) for 15,624 quadratic polynomials (height $\le 2$, certified distance $> 0.201733$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
 
 6. **Zeta-Bridge Firewall Audit**:
@@ -3105,6 +3105,32 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 7. **Verification Scope Delineation**:
    - `LEAN_PROVED: algebraic skeleton / low arity`: 2- and 3-term translation invariance, 2- and 3-term rank-zero cancellation, real affine difference identity, bivariate monomial clearing identity, and abstract 2-term impossibility (`RiemannScope.AmbientKernel`).
    - `PROVED_PAPER_DERIVATION: full rank-one and higher-rank classification`: Full group algebra $\overline{\mathbb{Q}}[\mathbb{Q}\alpha]$ injectivity, equality of $\mathbb{Q}$-spans and dimensions under base change, general multivariate Laurent reduction, and two-case Schanuel conditional theorem.
+
+---
+
+# 25. Unconditional Rank-Two Algebraic-Power Frontier (TASK-TC-029)
+
+1. **Governing Research Question**:
+   What, if anything, can be proved unconditionally about $(2\pi)^\alpha, (2\pi)^\beta$ for $\alpha/\beta \notin \mathbb{Q}$?
+
+2. **Opening Gate Post-Audit Repairs**:
+   - `compute_rational_support_rank` fails closed with `ValueError("EXACT_RANK_UNRESOLVED: ...")`.
+   - `expr_to_arb` fails closed with `ValueError("UNSUPPORTED_EXACT_EXPRESSION_FOR_ARB: ...")`.
+   - Zeta-to-kernel firewall parses arguments semantically via regex; `zeta(2n+1)` and `zeta(21)` are `ALGEBRAICITY_UNPROVED`.
+   - Logarithm rule distinguishes algebraic non-units (`log(p)` $\to$ `PROVED_TRANSCENDENTAL`) from transcendental bases (`log(2*pi)` $\to$ `ALGEBRAICITY_UNPROVED`).
+   - Reporting cites exact committed Lean names; Schanuel Case B corrected to "algebraic multiple of $L$"; `CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE` adopted.
+
+3. **Sharp Unconditional Boundary Hierarchy**:
+   - **Rank 0**: Trivial cancellation $\sum c_i = 0$ (`PROVED_EXACT_EQUIVALENCE`).
+   - **Rank 1 Rational**: $\tau^{p/q}$ transcendental by Lindemann (1882) (`PROVED_INJECTIVE_LINDEMANN`).
+   - **Rank 1 Irrational**: Exactly classified by $S_\tau$, with $\dim_{\mathbb{Q}} S_\tau \le 1$ by Gelfond-Schneider (1934).
+   - **Rank 2 Linear Binomials**: $c_1 X + c_2 Y = 0$ forces $Y/X = \tau^{\beta - \alpha} \in \overline{\mathbb{Q}}$. Proved impossible for rational differences $\beta - \alpha \in \mathbb{Q}^\times$ by Lindemann; reduces to $\beta - \alpha \in S_\tau$ for irrational differences.
+   - **Rank 2 Monomials**: $M_{m,n} = X^m Y^n = \tau^{m\alpha+n\beta}$. Proved unconditionally transcendental for rational non-zero combinations by Lindemann; reduces to $m\alpha+n\beta \in S_\tau$ for irrational combinations.
+   - **Rank 2 Quadratic Conjugates**: For $\alpha = a + b\sqrt{d}, \alpha' = a - b\sqrt{d}$, $(X X')^q = (2\pi)^p$ is unconditionally transcendental by Lindemann. Exact algebraic relation over $\overline{\mathbb{Q}}(2\pi)$; open over $\overline{\mathbb{Q}}$ alone.
+   - **Rank 2 General Polynomials**: Unconditionally open in literature (Six/Four Exponentials trivially satisfied by $e, 2\pi$); certified finite relation exclusion by Arb ball arithmetic; conditionally injective under Schanuel.
+
+4. **Lean 4 Formal Verification**:
+   - `RiemannScope.AmbientKernel`: `quadratic_conjugate_product_pow`, `quadratic_conjugate_power_scaling`, `monomial_exponent_reduction_rank_two`, `bivariate_linear_binomial_ratio`, `tau_pow_ratio_sub`. 0 sorries.
 
 
 

@@ -24,6 +24,9 @@ import sympy as sp
 from sympy import Rational, Matrix, sympify
 
 
+CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE = "CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE"
+
+
 def classify_support_rank_0_1_or_ge2(grades: List[Any], base_grade: Optional[Any] = None) -> Tuple[int, List[Any]]:
     """Classify rational support rank into 0, 1, or >= 2 (reported as 2).
 
@@ -103,9 +106,11 @@ def compute_rational_support_rank(grades: List[Any], base_grade: Optional[Any] =
             rows.append(c_padded)
         mat = Matrix(rows)
         return int(mat.rank()), diffs
-    except Exception:
-        # Fallback to classify 0, 1, or >=2
-        return 2, diffs
+    except Exception as e:
+        raise ValueError(
+            f"EXACT_RANK_UNRESOLVED: unable to compute exact rational support rank for grades {grades}: {e}. "
+            "Use classify_support_rank_0_1_or_ge2 for a non-failing 3-way partition."
+        )
 
 
 def translate_support(coefficients: List[Any], grades: List[Any], k0: Any) -> Tuple[List[Any], List[Any]]:
@@ -229,8 +234,16 @@ def search_polynomial_relation(
 def expr_to_arb(expr: Any) -> arb:
     """Convert an algebraic expression or number into a certified Arb ball natively.
 
-    Constructs exact radicals and fractions inside Arb directly without intermediate
-    floating-point decimal conversion to avoid precision leakage.
+    Contract:
+    Constructs certified exact ball enclosures for expressions within the supported
+    exact algebraic grammar:
+      - Integers (int, Integer)
+      - Rationals (Rational)
+      - Square roots and rational radicals (Pow with rational exponent)
+      - Finite sums and products (Add, Mul)
+
+    Fails closed with ValueError on unsupported expressions or non-algebraic inputs
+    to guarantee that only mathematically certified balls are returned.
     """
     s = sympify(expr)
     if s.is_Integer:
@@ -257,7 +270,10 @@ def expr_to_arb(expr: Any) -> arb:
         for arg in s.args:
             res *= expr_to_arb(arg)
         return res
-    return arb(str(s.evalf(ctx.dps + 10)))
+    raise ValueError(
+        f"UNSUPPORTED_EXACT_EXPRESSION_FOR_ARB: expression '{expr}' of type {type(s)} "
+        "is not in the certified exact algebraic grammar (integers, rationals, radicals, powers, sums, products)."
+    )
 
 
 def certify_finite_relation_exclusion(
@@ -329,19 +345,119 @@ def certify_finite_relation_exclusion(
         ctx.prec = old_prec
 
 
-# Zeta Bridge Firewall Pattern Registry with rigorous arithmetic classification
-FIREWALL_PATTERN_RULES = [
-    ("gamma", "ALGEBRAICITY_UNPROVED", "Zeta zero ordinate: algebraicity unproved; inadmissible as proved algebraic coefficient or grade"),
-    ("rho", "ALGEBRAICITY_UNPROVED", "Nontrivial zero: algebraicity unproved; inadmissible as proved algebraic coefficient or grade"),
-    ("log(p)", "PROVED_TRANSCENDENTAL", "Prime weight: log(p) is proved transcendental by Lindemann (1882); inadmissible in algebraic field"),
-    ("log(", "PROVED_TRANSCENDENTAL", "Logarithm: non-zero logarithm of integer/rational is transcendental; inadmissible in algebraic field"),
-    ("zeta(2", "PROVED_TRANSCENDENTAL", "Even zeta value: non-zero rational multiple of pi^(2n), proved transcendental by Lindemann (1882)"),
-    ("zeta(3", "ALGEBRAICITY_UNPROVED", "Apéry constant: irrational (Apéry 1978), but algebraicity unproved; inadmissible as proved algebraic coefficient"),
-    ("zeta(5", "ALGEBRAICITY_UNPROVED", "Odd zeta value: irrational, but algebraicity unproved; inadmissible as proved algebraic coefficient"),
-    ("zeta(", "ALGEBRAICITY_UNPROVED", "General zeta value: algebraicity unproved; inadmissible as proved algebraic coefficient"),
-    ("gamma_fn", "ALGEBRAICITY_UNPROVED", "Complex Gamma evaluation: algebraicity unproved at nontrivial points; inadmissible as proved algebraic coefficient"),
-    ("Gamma(", "ALGEBRAICITY_UNPROVED", "Complex Gamma evaluation: algebraicity unproved at nontrivial points; inadmissible as proved algebraic coefficient")
-]
+def classify_firewall_token(token: str) -> Optional[Tuple[str, str, str]]:
+    """Semantically parses and classifies a mathematical token against arithmetic admissibility.
+
+    Returns:
+        (pattern_name, classification, detailed_reason) if the token violates admissibility,
+        or None if no violation is detected.
+    """
+    import re
+    from fractions import Fraction
+
+    t = token.strip()
+
+    # 1. Zeta values: parse argument semantically
+    zeta_match = re.search(r"\bzeta\(([^)]+)\)", t)
+    if zeta_match:
+        arg = zeta_match.group(1).strip()
+        # Odd formula: 2n+1, 2*n+1, 2k+1, 2m+1
+        if re.match(r"^2\s*\*?\s*[a-zA-Z]\s*\+\s*1$", arg):
+            return (
+                "zeta(2n+1)",
+                "ALGEBRAICITY_UNPROVED",
+                "Odd zeta formula zeta(2n+1): irrationality known in select cases (Apéry 1978 for n=1; at least one of 5,7,9,11 by Rivoal/Zudilin), but algebraicity unproved; inadmissible as proved algebraic coefficient"
+            )
+        # Even formula: 2n, 2*n, 2k, 2m
+        if re.match(r"^2\s*\*?\s*[a-zA-Z]$", arg):
+            return (
+                "zeta(2n)",
+                "PROVED_TRANSCENDENTAL",
+                "Even zeta formula zeta(2n): rational multiple of pi^(2n), proved transcendental by Lindemann (1882); inadmissible in algebraic field"
+            )
+        # Explicit integer argument
+        try:
+            n = int(arg)
+            if n > 0 and n % 2 == 0:
+                return (
+                    f"zeta({n})",
+                    "PROVED_TRANSCENDENTAL",
+                    f"Even zeta value zeta({n}): rational multiple of pi^{n}, proved transcendental by Lindemann (1882); inadmissible in algebraic field"
+                )
+            elif n > 1 and n % 2 == 1:
+                return (
+                    f"zeta({n})",
+                    "ALGEBRAICITY_UNPROVED",
+                    f"Odd zeta value zeta({n}): irrational for n=3 (Apéry 1978), but algebraicity unproved; inadmissible as proved algebraic coefficient"
+                )
+        except ValueError:
+            pass
+
+        return (
+            f"zeta({arg})",
+            "ALGEBRAICITY_UNPROVED",
+            f"Zeta evaluation zeta({arg}): algebraicity unproved; inadmissible as proved algebraic coefficient"
+        )
+
+    # 2. Logarithms: distinguish algebraic non-unit from transcendental argument
+    log_match = re.search(r"\blog\(([^)]+)\)", t)
+    if log_match:
+        arg = log_match.group(1).strip()
+        # Transcendental argument like 2*pi, tau, pi
+        if re.search(r"\b(?:pi|tau)\b", arg):
+            return (
+                f"log({arg})",
+                "ALGEBRAICITY_UNPROVED",
+                f"Logarithm of transcendental argument log({arg}): argument is transcendental; Lindemann applies only to algebraic arguments; algebraicity/transcendence unproved"
+            )
+        # Prime log: log(p)
+        if arg == "p" or arg == "prime":
+            return (
+                "log(p)",
+                "PROVED_TRANSCENDENTAL",
+                "Prime weight log(p): proved transcendental by Hermite-Lindemann (1882); inadmissible in algebraic field"
+            )
+        # Explicit positive rational/integer
+        try:
+            frac = Fraction(arg)
+            if frac > 0 and frac != 1:
+                return (
+                    f"log({arg})",
+                    "PROVED_TRANSCENDENTAL",
+                    f"Logarithm log({arg}): non-zero logarithm of algebraic non-unit is proved transcendental by Hermite-Lindemann (1882); inadmissible in algebraic field"
+                )
+        except (ValueError, ZeroDivisionError):
+            pass
+
+        return (
+            f"log({arg})",
+            "ALGEBRAICITY_UNPROVED",
+            f"Logarithm log({arg}): algebraicity of logarithm of unverified argument is unproved"
+        )
+
+    # 3. Zeta zeros: gamma, gamma_1, gamma_n, rho, rho_1, rho_n
+    if re.search(r"\bgamma(?:_\w+)?\b", t) and not re.search(r"\bgamma_fn\b", t):
+        return (
+            "gamma",
+            "ALGEBRAICITY_UNPROVED",
+            "Zeta zero ordinate: algebraicity unproved; inadmissible as proved algebraic coefficient or grade"
+        )
+    if re.search(r"\brho(?:_\w+)?\b", t):
+        return (
+            "rho",
+            "ALGEBRAICITY_UNPROVED",
+            "Nontrivial zero: algebraicity unproved; inadmissible as proved algebraic coefficient or grade"
+        )
+
+    # 4. Gamma function
+    if re.search(r"\b(?:gamma_fn|Gamma)\(", t):
+        return (
+            "Gamma(...)",
+            "ALGEBRAICITY_UNPROVED",
+            "Complex Gamma evaluation: algebraicity unproved at nontrivial points; inadmissible as proved algebraic coefficient"
+        )
+
+    return None
 
 
 def verify_zeta_bridge_firewall(coefficients: List[str], grades: List[str]) -> Dict[str, Any]:
@@ -356,29 +472,29 @@ def verify_zeta_bridge_firewall(coefficients: List[str], grades: List[str]) -> D
     violations = []
     for c in coefficients:
         c_str = str(c)
-        for pat, classification, desc in FIREWALL_PATTERN_RULES:
-            if pat in c_str:
-                violations.append({
-                    "term": c_str,
-                    "type": "coefficient",
-                    "pattern": pat,
-                    "classification": classification,
-                    "reason": f"{classification}: {desc}"
-                })
-                break
+        classification_result = classify_firewall_token(c_str)
+        if classification_result is not None:
+            pat, classification, desc = classification_result
+            violations.append({
+                "term": c_str,
+                "type": "coefficient",
+                "pattern": pat,
+                "classification": classification,
+                "reason": f"{classification}: {desc}"
+            })
 
     for g in grades:
         g_str = str(g)
-        for pat, classification, desc in FIREWALL_PATTERN_RULES:
-            if pat in g_str:
-                violations.append({
-                    "term": g_str,
-                    "type": "grade",
-                    "pattern": pat,
-                    "classification": classification,
-                    "reason": f"{classification}: {desc}"
-                })
-                break
+        classification_result = classify_firewall_token(g_str)
+        if classification_result is not None:
+            pat, classification, desc = classification_result
+            violations.append({
+                "term": g_str,
+                "type": "grade",
+                "pattern": pat,
+                "classification": classification,
+                "reason": f"{classification}: {desc}"
+            })
 
     return {
         "passed": len(violations) == 0,

@@ -246,4 +246,63 @@ theorem inverse_pair_algebraic_relation (u v : ℝ) (h_inv : v * u = 1) :
   rw [mul_comm u v, h_inv]
   ring
 
+/-! ### 8. TASK-TC-029: Rank-Two Algebraic Power Frontier -/
+
+/-- Quadratic conjugate exponent product identity:
+    For positive base tau and conjugate grades a + b, a - b:
+    tau^(a + b) * tau^(a - b) = tau^(2 * a).
+    The product of generators along conjugate algebraic exponents collapses
+    to the trace power tau^(Tr(alpha)) = tau^(2 * a). -/
+theorem quadratic_conjugate_product_pow (tau_val : ℝ) (htau : 0 < tau_val) (a b : ℝ) :
+    (tau_val ^ (a + b)) * (tau_val ^ (a - b)) = tau_val ^ (2 * a) := by
+  have h_add : (a + b) + (a - b) = 2 * a := by ring
+  rw [← Real.rpow_add htau (a + b) (a - b), h_add]
+
+/-- Quadratic conjugate power scaling identity:
+    (tau^(a + b) * tau^(a - b))^q = (tau^(2 * a))^q.
+    For rational trace 2*a = p/q, taking q-th powers yields tau^p. -/
+theorem quadratic_conjugate_power_scaling (tau_val : ℝ) (htau : 0 < tau_val) (a b q : ℝ) :
+    ((tau_val ^ (a + b)) * (tau_val ^ (a - b))) ^ q = (tau_val ^ (2 * a)) ^ q := by
+  rw [quadratic_conjugate_product_pow tau_val htau a b]
+
+/-- Rank-two monomial reduction to linear combination of exponents:
+    (tau^alpha)^m * (tau^beta)^n = tau^(m * alpha + n * beta).
+    Any monomial in generators X = tau^alpha, Y = tau^beta evaluates to a single
+    power of tau at the combined grade m * alpha + n * beta. -/
+theorem monomial_exponent_reduction_rank_two (tau_val : ℝ) (htau : 0 < tau_val)
+    (alpha beta m n : ℝ) :
+    (tau_val ^ alpha) ^ m * (tau_val ^ beta) ^ n = tau_val ^ (m * alpha + n * beta) := by
+  rw [← Real.rpow_mul (le_of_lt htau) alpha m,
+      ← Real.rpow_mul (le_of_lt htau) beta n]
+  have hm : alpha * m = m * alpha := by ring
+  have hn : beta * n = n * beta := by ring
+  rw [hm, hn]
+  exact (Real.rpow_add htau (m * alpha) (n * beta)).symm
+
+/-- Bivariate linear binomial relation forces ratio to generator power difference:
+    If c1 * X + c2 * Y = 0 with c1, c2 ≠ 0, then Y / X = -c1 / c2. -/
+theorem bivariate_linear_binomial_ratio (X Y c1 c2 : ℝ)
+    (hc1 : c1 ≠ 0) (hc2 : c2 ≠ 0) (hX : X ≠ 0) (h_lin : c1 * X + c2 * Y = 0) :
+    Y / X = -c1 / c2 := by
+  have h_c2_Y : c2 * Y = -c1 * X := by linarith
+  have h_div_c2 : Y = (-c1 * X) / c2 := by
+    calc Y = (c2 * Y) / c2 := (mul_div_cancel_left₀ Y hc2).symm
+      _ = (-c1 * X) / c2 := by rw [h_c2_Y]
+  rw [h_div_c2]
+  calc (-c1 * X) / c2 / X
+    _ = (-c1 / c2) * (X / X) := by ring
+    _ = (-c1 / c2) * 1 := by rw [div_self hX]
+    _ = -c1 / c2 := by ring
+
+/-- Ratio of generator powers equals power of grade difference:
+    tau^beta / tau^alpha = tau^(beta - alpha). -/
+theorem tau_pow_ratio_sub (tau_val : ℝ) (htau : 0 < tau_val) (alpha beta : ℝ) :
+    (tau_val ^ beta) / (tau_val ^ alpha) = tau_val ^ (beta - alpha) := by
+  have h_add : beta = alpha + (beta - alpha) := by ring
+  nth_rw 1 [h_add]
+  rw [Real.rpow_add htau alpha (beta - alpha)]
+  have h_alpha_pos : 0 < tau_val ^ alpha := Real.rpow_pos_of_pos htau alpha
+  have h_alpha_ne : tau_val ^ alpha ≠ 0 := ne_of_gt h_alpha_pos
+  exact mul_div_cancel_left₀ (tau_val ^ (beta - alpha)) h_alpha_ne
+
 end RiemannScope

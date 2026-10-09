@@ -3942,10 +3942,35 @@ Finite kernel relations of rational rank $r \ge 2$ reduce precisely to multivari
 \]
 - **Principal Classification**: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
 - **Schanuel Conditional Full Injectivity**: A rigorous two-case derivation (Case A: $1, \alpha_1, \dots, \alpha_r$ $\mathbb{Q}$-independent; Case B: $1 \in \operatorname{span}_{\mathbb{Q}}\{\alpha_1, \dots, \alpha_r\}$) proves $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$. Consequently, **Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support** (`SCHANUEL_IMPLIES_FULL_FINITE_RANK_INJECTIVITY`).
-- **Minimal Open Case**: $P(\tau^{\sqrt{2}}, \tau^{\sqrt{3}}) = 0$ ($r=2$) (`MINIMAL_HIGHER_RANK_OPEN_TC_KERNEL_PROBLEM`).
+- **Canonical Minimal Open Instances**: Rational support rank $r=2$ is the minimal unresolved rational support rank. Canonical minimal instances (`CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE`) include both $(1, \sqrt{2})$ and $(\sqrt{2}, \sqrt{3})$.
 - **Certified Finite Exclusions**: Arb interval arithmetic with native algebraic ball construction (`expr_to_arb`) and interval lower bounds (`abs_lower()`) certifies absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ for 15,624 quadratic polynomials (height $\le 2$, certified distance $> 0.201733$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
 - **Zeta-Bridge Firewall Audit**: Audited standard zeta candidates fail the algebraic-coefficient firewall: $\gamma_n, \rho_n, \zeta(2n+1), \Gamma(\rho)$ are `ALGEBRAICITY_UNPROVED`, $\log p, \zeta(2n)$ are `PROVED_TRANSCENDENTAL`. Audit finding: `NO_ZETA_TO_KERNEL_BRIDGE_FOUND` (not an impossibility theorem). Zero-arithmetic research is logically distinct from the TC ambient realization kernel.
 - **Formal Scope Delineation**: `LEAN_PROVED: algebraic skeleton / low arity` vs `PROVED_PAPER_DERIVATION: full rank-one and higher-rank classification`.
+
+---
+
+## 46. Unconditional Rank-Two Algebraic-Power Frontier (TASK-TC-029)
+
+### 46.1 Unconditional Boundary Hierarchy
+1. **Rank 0**: Trivial coefficient cancellation $\sum c_i = 0$ (`PROVED_EXACT_EQUIVALENCE`).
+2. **Rank 1 Rational**: $\tau^{p/q}$ proved transcendental by Lindemann (1882) (`PROVED_INJECTIVE_LINDEMANN`).
+3. **Rank 1 Irrational**: Exactly classified by $S_\tau$, with $\dim_{\mathbb{Q}} S_\tau \le 1$ by Gelfond-Schneider (1934).
+4. **Rank 2 Linear Binomials**: $c_1 X + c_2 Y = 0$ forces $Y/X = \tau^{\beta - \alpha} \in \overline{\mathbb{Q}}$. Proved impossible for rational differences $\beta - \alpha \in \mathbb{Q} \setminus \{0\}$ by Lindemann; reduces to $\beta - \alpha \in S_\tau$ for irrational differences.
+5. **Rank 2 Monomials**: $M_{m,n} = X^m Y^n = \tau^{m\alpha+n\beta}$. Proved unconditionally transcendental for rational non-zero combinations by Lindemann; reduces to $m\alpha+n\beta \in S_\tau$ for irrational combinations.
+6. **Rank 2 Quadratic Conjugates**: For $\alpha = a + b\sqrt{d}, \alpha' = a - b\sqrt{d} \in \mathbb{Q}(\sqrt{d})$, the generators $X = \tau^\alpha, X' = \tau^{\alpha'}$ satisfy the unconditional trace/norm product law:
+   \[
+   X \cdot X' = \tau^{\alpha + \alpha'} = \tau^{2a} = (2\pi)^{2a}.
+   \]
+   For $2a = p/q \in \mathbb{Q} \setminus \{0\}$, $(X X')^q = (2\pi)^p$. By Lindemann (1882), $X \cdot X'$ is unconditionally transcendental over $\mathbb{Q}$. This defines an exact algebraic relation over $\overline{\mathbb{Q}}(2\pi)$, while independence over $\overline{\mathbb{Q}}$ alone remains open unconditionally.
+7. **Rank 2 General Polynomials**: Unconditionally open in literature (Six/Four Exponentials trivially satisfied by $e, 2\pi$ without constraining $(2\pi)^\alpha$); certified finite relation exclusion by Arb ball arithmetic; conditionally injective under Schanuel.
+
+### 46.2 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/AmbientKernel.lean`:
+- `quadratic_conjugate_product_pow`
+- `quadratic_conjugate_power_scaling`
+- `monomial_exponent_reduction_rank_two`
+- `bivariate_linear_binomial_ratio`
+- `tau_pow_ratio_sub`
 
 
 

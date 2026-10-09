@@ -1673,8 +1673,8 @@ For $r \ge 2$, clearing denominators in a $\mathbb{Q}$-basis $\alpha_1, \dots, \
 \]
 Principal classification: `FINITE_KERNEL_REDUCES_TO_ALGEBRAIC_INDEPENDENCE`.
 
-### 35.4 Minimal Open Case, Schanuel Theorem, and Bounded Exclusions
-- **Minimal Open Case**: $\alpha_1 = \sqrt{2}, \alpha_2 = \sqrt{3}$. Determining whether $(2\pi)^{\sqrt{2}}$ and $(2\pi)^{\sqrt{3}}$ are algebraically independent over $\overline{\mathbb{Q}}$ (`MINIMAL_HIGHER_RANK_OPEN_TC_KERNEL_PROBLEM`).
+### 35.4 Canonical Minimal Open Instances, Schanuel Theorem, and Bounded Exclusions
+- **Canonical Minimal Open Instances**: Rational support rank $r=2$ is the minimal unresolved rational support rank. Canonical minimal instances (`CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE`) include both the base-one instance $(1, \sqrt{2})$ and the incommensurable radical instance $(\sqrt{2}, \sqrt{3})$.
 - **Schanuel Conditional Full Injectivity**: A rigorous two-case application of Schanuel's conjecture (Case A: $1, \alpha_1, \dots, \alpha_r$ $\mathbb{Q}$-independent; Case B: $1 \in \operatorname{span}_{\mathbb{Q}}\{\alpha_1, \dots, \alpha_r\}$) proves $\operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}(\tau^{\alpha_1}, \dots, \tau^{\alpha_r}) = r$. Consequently, **Schanuel's conjecture implies full finite-rank injectivity of $\operatorname{ev}_\tau$ on every finite algebraic-grade support**.
 - **Certified Ball Arithmetic Exclusions**: Rigorous Arb interval arithmetic with native algebraic ball construction (`expr_to_arb`) and interval lower bounds (`abs_lower()`) proves absence of polynomial relations for $(\tau^{\sqrt{2}}, \tau^{\sqrt{3}})$ for 15,624 quadratic polynomials (height $\le 2$, certified distance $> 0.201733$) (`CERTIFIED_FINITE_RELATION_EXCLUSION`).
 
@@ -1686,6 +1686,41 @@ Auditing familiar standard zeta candidates shows they fail the algebraic-coeffic
 - $\Gamma(\rho)$: `ALGEBRAICITY_UNPROVED` (lacks known arithmetic classification at nontrivial zeros).
 - Dirichlet series / explicit formulas: Infinite distributions, not finite support elements.
 Audit finding: `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`. Zeta-zero arithmetic research is logically distinct from the TC ambient realization kernel.
+
+---
+
+## 36. Unconditional Rank-Two Algebraic-Power Frontier (TASK-TC-029)
+
+### 36.1 The Unconditional Research Frontier
+TASK-TC-029 systematically attacks what can and cannot be proved unconditionally about algebraic powers $(2\pi)^\alpha, (2\pi)^\beta$ for $\alpha/\beta \notin \mathbb{Q}$ ($r=2$).
+
+### 36.2 The Sharp Unconditional Boundary
+1. **Rank 0**: Trivial cancellation $\sum c_i = 0$ (`PROVED_EXACT_EQUIVALENCE`).
+2. **Rank 1 Rational**: $\tau^{p/q}$ transcendental by Lindemann (1882) (`PROVED_INJECTIVE_LINDEMANN`).
+3. **Rank 1 Irrational**: Exactly classified by $S_\tau$, with $\dim_{\mathbb{Q}} S_\tau \le 1$ by Gelfond-Schneider (1934).
+4. **Rank 2 Linear Binomials**: $c_1 X + c_2 Y = 0$ forces $Y/X = \tau^{\beta - \alpha} \in \overline{\mathbb{Q}}$. Proved impossible for rational differences $\beta - \alpha \in \mathbb{Q} \setminus \{0\}$ by Lindemann; reduces to $\beta - \alpha \in S_\tau$ for irrational differences.
+5. **Rank 2 Monomials**: $M_{m,n} = X^m Y^n = \tau^{m\alpha+n\beta}$. Proved unconditionally transcendental for rational non-zero combinations by Lindemann; reduces to $m\alpha+n\beta \in S_\tau$ for irrational combinations.
+6. **Rank 2 Quadratic Conjugates**: For $\alpha = a + b\sqrt{d}, \alpha' = a - b\sqrt{d} \in \mathbb{Q}(\sqrt{d})$, the generators $X = \tau^\alpha, X' = \tau^{\alpha'}$ satisfy the unconditional trace/norm product law:
+   \[
+   X \cdot X' = \tau^{\alpha + \alpha'} = \tau^{2a} = (2\pi)^{2a}.
+   \]
+   For $2a = p/q \in \mathbb{Q} \setminus \{0\}$, $(X X')^q = (2\pi)^p$. By Lindemann (1882), $X \cdot X'$ is unconditionally transcendental over $\mathbb{Q}$. This defines an exact algebraic relation over $\overline{\mathbb{Q}}(2\pi)$, while independence over $\overline{\mathbb{Q}}$ alone remains open unconditionally.
+7. **Rank 2 General Polynomials**: Unconditionally open in literature (Six/Four Exponentials trivially satisfied by $e, 2\pi$ without constraining $(2\pi)^\alpha$); certified finite relation exclusion by Arb ball arithmetic; conditionally injective under Schanuel.
+
+### 36.3 Post-Audit Gate Repairs
+- `compute_rational_support_rank` fails closed with `ValueError("EXACT_RANK_UNRESOLVED: ...")`.
+- `expr_to_arb` fails closed with `ValueError("UNSUPPORTED_EXACT_EXPRESSION_FOR_ARB: ...")`.
+- Firewall regex parsing classifies `zeta(2n+1)` and `zeta(21)` as `ALGEBRAICITY_UNPROVED`.
+- Logarithm rule distinguishes algebraic non-units (`log(p)` $\to$ `PROVED_TRANSCENDENTAL`) from transcendental bases (`log(2*pi)` $\to$ `ALGEBRAICITY_UNPROVED`).
+- Reporting preserves exact committed Lean identifiers; Schanuel Case B corrected to "algebraic multiple of $L$".
+
+### 36.4 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/AmbientKernel.lean`:
+- `quadratic_conjugate_product_pow`
+- `quadratic_conjugate_power_scaling`
+- `monomial_exponent_reduction_rank_two`
+- `bivariate_linear_binomial_ratio`
+- `tau_pow_ratio_sub`
 
 
 

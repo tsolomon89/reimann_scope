@@ -520,3 +520,77 @@ def test_24_native_arb_ball_exact_algebraic_enclosure():
     a_mix = expr_to_arb("1/2 + sqrt(5)")
     assert 0 not in a_mix
     assert float(a_mix.abs_lower()) > 2.736
+
+
+# ============================================================================
+# 25. Fail-Closed Exact Rational Support Rank
+# ============================================================================
+
+def test_25_fail_closed_exact_rational_support_rank():
+    """Item 25: compute_rational_support_rank fails closed with ValueError rather than silently returning 2."""
+    from tc.ambient_kernel import compute_rational_support_rank, classify_support_rank_0_1_or_ge2
+
+    # A symbolic expression with transcendental/unsupported function cannot be converted to number field
+    import sympy as sp
+    unsupported_grades = [0, sp.pi, sp.E]
+
+    with pytest.raises(ValueError, match="EXACT_RANK_UNRESOLVED"):
+        compute_rational_support_rank(unsupported_grades)
+
+    # Meanwhile classify_support_rank_0_1_or_ge2 safely reports 2 (representing >=2)
+    cls_rank, _ = classify_support_rank_0_1_or_ge2(unsupported_grades)
+    assert cls_rank == 2
+
+
+# ============================================================================
+# 26. Fail-Closed expr_to_arb on Unsupported Expressions
+# ============================================================================
+
+def test_26_fail_closed_expr_to_arb_unsupported():
+    """Item 26: expr_to_arb raises ValueError on expressions outside the certified algebraic grammar."""
+    import sympy as sp
+    x = sp.Symbol('x')
+
+    with pytest.raises(ValueError, match="UNSUPPORTED_EXACT_EXPRESSION_FOR_ARB"):
+        expr_to_arb(sp.sin(x))
+
+    with pytest.raises(ValueError, match="UNSUPPORTED_EXACT_EXPRESSION_FOR_ARB"):
+        expr_to_arb("exp(2)")
+
+
+# ============================================================================
+# 27. Semantic Regex Firewall Rules: Odd Zeta, Even Zeta, and Scoped Logarithms
+# ============================================================================
+
+def test_27_firewall_semantic_regex_order_and_log_rules():
+    """Item 27: Verify regex firewall parsing correctly separates zeta(2n+1), zeta(21), zeta(2), log(2*pi), log(p)."""
+    # 1. Odd zeta formula zeta(2n+1) must NEVER match even-zeta zeta(2
+    res_2np1 = verify_zeta_bridge_firewall(coefficients=["zeta(2n+1)"], grades=["0"])
+    assert res_2np1["passed"] is False
+    assert res_2np1["violations"][0]["classification"] == "ALGEBRAICITY_UNPROVED"
+    assert res_2np1["violations"][0]["pattern"] == "zeta(2n+1)"
+
+    # 2. zeta(21) begins with 'zeta(2' but is odd (21 is odd), so it must be ALGEBRAICITY_UNPROVED
+    res_21 = verify_zeta_bridge_firewall(coefficients=["zeta(21)"], grades=["0"])
+    assert res_21["passed"] is False
+    assert res_21["violations"][0]["classification"] == "ALGEBRAICITY_UNPROVED"
+    assert res_21["violations"][0]["pattern"] == "zeta(21)"
+
+    # 3. Even zeta values zeta(2) and zeta(4) are PROVED_TRANSCENDENTAL (Lindemann)
+    res_even = verify_zeta_bridge_firewall(coefficients=["zeta(2)", "zeta(4)"], grades=["0", "1"])
+    assert res_even["passed"] is False
+    for v in res_even["violations"]:
+        assert v["classification"] == "PROVED_TRANSCENDENTAL"
+
+    # 4. log(2*pi) and log(tau) have transcendental arguments: ALGEBRAICITY_UNPROVED
+    res_log_tau = verify_zeta_bridge_firewall(coefficients=["log(2*pi)", "log(tau)"], grades=["0", "1"])
+    assert res_log_tau["passed"] is False
+    for v in res_log_tau["violations"]:
+        assert v["classification"] == "ALGEBRAICITY_UNPROVED"
+        assert "transcendental" in v["reason"].lower()
+
+    # 5. log(p) and log(2) have algebraic non-unit arguments: PROVED_TRANSCENDENTAL (Hermite-Lindemann)
+    res_log_alg = verify_zeta_bridge_firewall(coefficients=["log(p)", "log(2)"], grades=["0", "1"])
+    assert res_log_alg["passed"] is False
+    for v in res_log_alg["violations"]:
+        assert v["classification"] == "PROVED_TRANSCENDENTAL"

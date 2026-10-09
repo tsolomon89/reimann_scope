@@ -167,6 +167,19 @@ Standard exact structures of the zeta function were systematically searched for 
 - **Prime Logarithms $\log p$**: Proved transcendental for rational primes $p$ (Lindemann 1882).
 - **Result**: `NO_ZETA_TO_REALIZATION_KERNEL_BRIDGE_FOUND`.
 
+### 4.4 Unconditional Rank-Two Algebraic-Power Frontier (TASK-TC-029)
+Systematic analysis of generators $X = \tau^\alpha, Y = \tau^\beta$ for $\alpha/\beta \notin \mathbb{Q}$ establishes the exact unconditional boundary:
+- **Base-One Canonical Instance $(1, \sqrt{2})$**: $X = 2\pi$ is transcendental (Lindemann). The transcendence of $(2\pi)^{\sqrt{2}}$ is unconditionally open in the literature (Gelfond-Schneider requires an algebraic base, which $2\pi$ violates; Six Exponentials is trivially satisfied by $e$ and $2\pi$). Under Schanuel's Conjecture, $2\pi$ and $(2\pi)^{\sqrt{2}}$ are algebraically independent. Certified finite relation exclusion verified via Arb ball arithmetic up to degree 1, height 2.
+- **Incommensurable Radicals Canonical Instance $(\sqrt{2}, \sqrt{3})$**: Certified finite relation exclusion up to degree 1, height 2 (124 polynomials); conditional algebraic independence under Schanuel.
+- **Quadratic Conjugate Family $(a + b\sqrt{d}, a - b\sqrt{d})$**: Trace/norm product law:
+  \[
+  X \cdot X' = \tau^{\alpha + \alpha'} = \tau^{2a} = (2\pi)^{2a}.
+  \]
+  For $2a = p/q \in \mathbb{Q} \setminus \{0\}$, $(X X')^q = (2\pi)^p$. By Lindemann (1882), $X \cdot X'$ is unconditionally transcendental over $\mathbb{Q}$. This defines an exact algebraic relation over $\overline{\mathbb{Q}}(2\pi)$, while independence over $\overline{\mathbb{Q}}$ alone remains open unconditionally.
+- **Monomial Reductions**: For $M_{m,n} = X^m Y^n = \tau^{m\alpha + n\beta}$ ($(m,n) \ne (0,0)$):
+  - Rational combination $m\alpha + n\beta \in \mathbb{Q} \setminus \{0\}$: unconditionally transcendental by Lindemann (1882). No algebraic monomial relation can exist.
+  - Irrational combination $m\alpha + n\beta \notin \mathbb{Q}$: $M_{m,n} \in \overline{\mathbb{Q}} \iff m\alpha + n\beta \in S_\tau$ (reduces to $\dim_{\mathbb{Q}} S_\tau \le 1$).
+
 ---
 
 ## 5. Frozen Branches vs. Genuinely Open Research
@@ -196,7 +209,8 @@ The following approaches have been proven unable to force RH or constrain zero d
 - **Elementary Prime Dilation-Translation Rigidity**: `dilation_translation_multi_prime_rigidity` (`RiemannScope.RiemannConverter`).
 - **Single-Station Injectivity & Monomial Laurent Algebra**: `graded_station_nonzero`, `prime_station_grade_injective` (`RiemannScope.FaithfulGradedAlgebra`).
 - **Exceptional Exponent Commensurability Consequence**: `exceptional_exponents_Q_collinear`, `two_direction_Q_collinear` under hypothesis `h_GS` (`RiemannScope.TranscendenceRigidity`, `RiemannScope.ExceptionalTransfer`).
-- **Ambient Kernel Translation & Rank-One Classification**: `tau_pow_translation`, `sum_tau_pow_zero_iff_translated_zero_two`, `rank_zero_kernel_iff`, `s_tau_explicit_kernel_witness`, `rank_one_injective_of_transcendental_power`, `group_algebra_mul_relation_is_structural`, `bivariate_monomial_clearing`, `pairwise_transcendence_not_algebraic_independence_model` (`RiemannScope.AmbientKernel`).
+- **Ambient Kernel Translation & Rank-One Classification**: `tau_pow_translation`, `sum_tau_pow_translation_two`, `sum_tau_pow_translation_three`, `sum_tau_pow_zero_iff_translated_zero_two`, `sum_tau_pow_zero_iff_translated_zero_three`, `rank_zero_evaluation_factor`, `rank_zero_kernel_iff`, `rank_zero_kernel_three_iff`, `base_change_linear_span`, `support_affine_difference_base_change`, `s_tau_explicit_kernel_witness`, `s_tau_explicit_kernel_witness_scaled`, `rank_one_injective_of_transcendental_power`, `group_algebra_mul_law`, `group_algebra_mul_relation_is_structural`, `bivariate_monomial_clearing`, `pairwise_transcendence_not_algebraic_independence_model`, `inverse_pair_algebraic_relation` (`RiemannScope.AmbientKernel`).
+- **Rank-Two Algebraic Power Frontier (TASK-TC-029)**: `quadratic_conjugate_product_pow`, `quadratic_conjugate_power_scaling`, `monomial_exponent_reduction_rank_two`, `bivariate_linear_binomial_ratio`, `tau_pow_ratio_sub` (`RiemannScope.AmbientKernel`).
 
 ### 6.2 External Theorem
 - **Lindemann (1882) Transcendence of $\pi$ and $\tau = 2\pi$**: Guarantees integer station separation $L_K \cap L_J = \{0\}$ ($K \ne J \in \mathbb{Z}$, with positive layers $L_K^+ \cap L_J^+ = \emptyset$) and $S_\tau \cap \mathbb{Q} = \{0\}$.

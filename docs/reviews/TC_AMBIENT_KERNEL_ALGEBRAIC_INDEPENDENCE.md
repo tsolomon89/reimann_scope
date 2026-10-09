@@ -201,15 +201,17 @@ $$\boxed{\begin{gathered}\textbf{Finite TC ambient-kernel relations of rational 
 
 ---
 
-## Section I. Minimal Open Case
+## Section I. Canonical Minimal Rank-Two Open Instance
 
-With $r=0$ trivial and $r=1$ completely classified by $S_\tau$, the boundary of current human mathematical knowledge occurs at **rational rank $r=2$**.
+With $r=0$ trivial and $r=1$ completely classified by $S_\tau$, the boundary of current human mathematical knowledge occurs at **rational support rank $r=2$**, which represents the minimal unresolved rational support rank.
 
-The minimal concrete unresolved instance is:
-$$\boxed{\textbf{MINIMAL HIGHER-RANK OPEN TC KERNEL PROBLEM:}}$$
+A clean canonical concrete representative is:
+$$\boxed{\textbf{CANONICAL MINIMAL RANK-TWO OPEN INSTANCE:}}$$
 $$\alpha_1 = \sqrt{2}, \qquad \alpha_2 = \sqrt{3}.$$
 Does there exist any non-zero bivariate polynomial $P \in \overline{\mathbb{Q}}[X, Y]$ such that:
 $$\boxed{P\left((2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}}\right) = 0 \quad?}$$
+
+Equally, the base-one instance $\alpha_1 = 1, \alpha_2 = \sqrt{2}$ produces generators $X = 2\pi, Y = (2\pi)^{\sqrt{2}}$, which is likewise unresolved by standard classical theorems.
 
 Even the linear case with 4 terms:
 $$a_0 + a_1 (2\pi)^{\sqrt{2}} + a_2 (2\pi)^{\sqrt{3}} + a_3 (2\pi)^{\sqrt{2} + \sqrt{3}} = 0, \qquad a_j \in \mathbb{A}_{\mathbb{R}},$$
@@ -299,7 +301,7 @@ $$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}\left(i\pi, \alpha_1 L, \dots, \al
 
 Over $\overline{\mathbb{Q}}$:
 - $i\pi \in \overline{\mathbb{Q}}(X_1, \dots, X_r)$.
-- Each $\alpha_j L$ is a rational multiple of $L$.
+- Each $\alpha_j L$ is an algebraic multiple of $L$ (since $\alpha_j \in \mathbb{A}_{\mathbb{R}} \subset \overline{\mathbb{Q}}$).
 Thus the only possible additional transcendence degree contributed by the logarithmic side $\{i\pi, \alpha_1 L, \dots, \alpha_r L\}$ over $\overline{\mathbb{Q}}(X_1, \dots, X_r)$ is at most $1$ (contributed by $L$). Therefore:
 $$\operatorname{trdeg}_{\mathbb{Q}} \mathbb{Q}\left(i\pi, \alpha_1 L, \dots, \alpha_r L, -1, X_1, \dots, X_r\right) \le 1 + \operatorname{trdeg}_{\overline{\mathbb{Q}}} \overline{\mathbb{Q}}\left(X_1, \dots, X_r\right).$$
 Combining this with Schanuel's lower bound gives:

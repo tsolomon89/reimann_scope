@@ -219,6 +219,34 @@ from tc.weil_forms import (
     audit_regularized_curvature_transfer,
 )
 
+from tc.ambient_kernel import (
+    CANONICAL_MINIMAL_RANK_TWO_OPEN_INSTANCE,
+    classify_support_rank_0_1_or_ge2,
+    compute_rational_support_rank,
+    translate_support,
+    check_rank_zero_kernel,
+    rank_one_laurent_reduction,
+    construct_s_tau_kernel_witness,
+    BivariateMonomialBasis,
+    search_polynomial_relation,
+    expr_to_arb,
+    certify_finite_relation_exclusion,
+    classify_firewall_token,
+    verify_zeta_bridge_firewall,
+)
+
+from tc.algebraic_power_frontier import (
+    PAIR_TYPE_BASE_ONE,
+    PAIR_TYPE_INCOMMENSURABLE_RADICALS,
+    PAIR_TYPE_QUADRATIC_CONJUGATES,
+    PAIR_TYPE_GENERAL,
+    classify_rank_two_pair,
+    evaluate_quadratic_conjugate_product,
+    analyze_monomial_relation,
+    get_sharp_unconditional_boundary_matrix,
+    certify_rank_two_polynomial_exclusion,
+)
+
 from tc.approximation import (
     _is_finite_vanishing_integral,
     analyze_fourier_zero_compact_support_obstruction,

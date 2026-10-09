@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "task_id": "TASK-TC-029",
+    "title": "Unconditional Rank-Two Algebraic-Power Frontier",
+    "framework": "Riemann Scope: Ambient Kernel & Algebraic-Power Independence",
+    "date": "2026-10-09",
+    "producing_code": "tc/algebraic_power_frontier.py",
+    "reference_base": "tau = 2*pi"
+  },
+  "sharp_unconditional_boundary_matrix": {
+    "rank_0": {
+      "support_type": "Identical grades (Delta_K = 0)",
+      "unconditional_status": "PROVED_EXACT_EQUIVALENCE",
+      "mathematical_mechanism": "Trivial coefficient cancellation: sum c_i * tau^K0 = (sum c_i) * tau^K0 = 0 <==> sum c_i = 0.",
+      "open_questions": null
+    },
+    "rank_1_rational": {
+      "support_type": "Rational grades alpha = p/q in Q without {0}",
+      "unconditional_status": "PROVED_INJECTIVE_LINDEMANN",
+      "mathematical_mechanism": "Lindemann (1882): pi is transcendental ==> (2*pi)^(p/q) is transcendental ==> ev_tau is injective on Q*alpha.",
+      "open_questions": null
+    },
+    "rank_1_irrational": {
+      "support_type": "Single irrational grade alpha in (Q_bar without Q)",
+      "unconditional_status": "EXACTLY_CLASSIFIED_BY_S_TAU",
+      "mathematical_mechanism": "ev_tau has non-trivial kernel on Q*alpha <==> alpha in S_tau. Gelfond-Schneider forces dim_Q S_tau <= 1. Conditionally S_tau = {0}.",
+      "open_questions": "Whether S_tau = {0} unconditionally (Baker-type open problem for transcendental base 2*pi)."
+    },
+    "rank_2_linear_binomial": {
+      "support_type": "Two generators c1 * X + c2 * Y = 0 (c1, c2 in Q_bar without {0})",
+      "unconditional_status": "PARTIALLY_PROVED_LINDEMANN_AND_REDUCED",
+      "mathematical_mechanism": "Y / X = tau^(beta - alpha) in Q_bar. If beta - alpha in Q without {0}, UNCONDITIONALLY IMPOSSIBLE by Lindemann. If beta - alpha not in Q, reduces strictly to beta - alpha in S_tau.",
+      "open_questions": "Only irrational differences beta - alpha outside Q."
+    },
+    "rank_2_monomial": {
+      "support_type": "Laurent monomials X^m * Y^n = tau^(m*alpha + n*beta)",
+      "unconditional_status": "PARTIALLY_PROVED_LINDEMANN_AND_REDUCED",
+      "mathematical_mechanism": "If m*alpha + n*beta in Q without {0}, UNCONDITIONALLY TRANSCENDENTAL by Lindemann (1882). If m*alpha + n*beta not in Q, reduces strictly to m*alpha + n*beta in S_tau.",
+      "open_questions": "Monomials with irrational combined exponents."
+    },
+    "rank_2_quadratic_conjugate_product": {
+      "support_type": "Quadratic conjugate pair (a + b*sqrt(d), a - b*sqrt(d))",
+      "unconditional_status": "PROVED_TRANSCENDENTAL_LINDEMANN_OVER_QBAR_TAU",
+      "mathematical_mechanism": "Trace law: X * X' = tau^(2*a) = (2*pi)^(p/q). Unconditionally transcendental by Lindemann (1882). Gives exact algebraic relation over Q_bar(2*pi): (X * X')^q - (2*pi)^p = 0. Transcendence degree over Q_bar(2*pi) is at most 1.",
+      "open_questions": "Algebraic independence of X, X' over Q_bar alone."
+    },
+    "rank_2_general_polynomial": {
+      "support_type": "General polynomial P(X, Y) in Q_bar[X, Y] for alpha/beta not in Q",
+      "unconditional_status": "OPEN_FRONTIER_WITH_CERTIFIED_FINITE_EXCLUSIONS",
+      "mathematical_mechanism": "Unconditional: Open in modern transcendental number theory (Four/Six Exponentials trivially satisfied by e and 2*pi without constraining tau^alpha). Certified finite exclusion by Arb ball arithmetic on any compact coefficient/degree box. Conditional: PROVED_CONDITIONAL_SCHANUEL (ev_tau injective on every finite algebraic-grade support).",
+      "open_questions": "Unconditional algebraic independence of (2*pi, (2*pi)^sqrt(2)) and ((2*pi)^sqrt(2), (2*pi)^sqrt(3))."
+    }
+  },
+  "evaluated_families": {
+    "base_one_canonical_instance": {
+      "generators": ["tau", "tau^sqrt(2)"],
+      "algebraic_grades": [1, "sqrt(2)"],
+      "rational_support_rank": 2,
+      "classical_theorems": {
+        "lindemann_1882": "tau = 2*pi is proved transcendental",
+        "gelfond_schneider_1934": "Inapplicable because base 2*pi is transcendental, not algebraic",
+        "six_exponentials": "Trivially satisfied by e and 2*pi without constraining (2*pi)^sqrt(2)",
+        "four_exponentials_conjecture": "Trivially satisfied without constraining (2*pi)^sqrt(2)"
+      },
+      "unconditional_status": "OPEN_FRONTIER_WITH_CERTIFIED_FINITE_EXCLUSIONS",
+      "conditional_status": "PROVED_CONDITIONAL_SCHANUEL",
+      "certified_finite_exclusion": {
+        "max_degree": 1,
+        "height_bound": 2,
+        "total_polynomials_tested": 124,
+        "status": "CERTIFIED_FINITE_RELATION_EXCLUSION"
+      }
+    },
+    "incommensurable_radicals_instance": {
+      "generators": ["tau^sqrt(2)", "tau^sqrt(3)"],
+      "algebraic_grades": ["sqrt(2)", "sqrt(3)"],
+      "rational_support_rank": 2,
+      "classical_theorems": {
+        "gelfond_schneider_1934": "Inapplicable to transcendental base 2*pi",
+        "six_exponentials": "Trivially satisfied"
+      },
+      "unconditional_status": "OPEN_FRONTIER_WITH_CERTIFIED_FINITE_EXCLUSIONS",
+      "conditional_status": "PROVED_CONDITIONAL_SCHANUEL",
+      "certified_finite_exclusion": {
+        "max_degree": 1,
+        "height_bound": 2,
+        "total_polynomials_tested": 124,
+        "status": "CERTIFIED_FINITE_RELATION_EXCLUSION"
+      }
+    },
+    "quadratic_conjugate_instance": {
+      "generators": ["tau^(1+sqrt(2))", "tau^(1-sqrt(2))"],
+      "algebraic_grades": ["1+sqrt(2)", "1-sqrt(2)"],
+      "rational_support_rank": 2,
+      "trace": 2,
+      "norm": -1,
+      "product_law": {
+        "relation_over_qbar_tau": "(X * X')^1 = (2*pi)^2",
+        "product_transcendence": "PROVED_TRANSCENDENTAL_LINDEMANN",
+        "product_algebraicity": "REFUTED_WITHIN_SCOPE"
+      },
+      "unconditional_status": "PROVED_TRANSCENDENTAL_LINDEMANN_OVER_QBAR_TAU",
+      "conditional_status": "PROVED_CONDITIONAL_SCHANUEL",
+      "certified_finite_exclusion": {
+        "max_degree": 1,
+        "height_bound": 2,
+        "total_polynomials_tested": 124,
+        "status": "CERTIFIED_FINITE_RELATION_EXCLUSION"
+      }
+    }
+  },
+  "monomial_reductions": {
+    "rational_combinations": "m*alpha + n*beta = p/q != 0 ==> tau^(p/q) is proved transcendental by Lindemann (1882); no algebraic monomial relation can exist.",
+    "irrational_combinations": "m*alpha + n*beta not in Q ==> X^m * Y^n in Q_bar <==> m*alpha + n*beta in S_tau (reduces strictly to dim_Q S_tau <= 1; under Schanuel S_tau = {0})."
+  },
+  "firewall_status": {
+    "zeta_zero_track_firewall": "ENFORCED_DISJOINT: arithmetic zeta-zero methods (gamma_1, rho_1, zeta(5)) remain strictly decoupled from the algebraic-power transcendence frontier."
+  }
+}
