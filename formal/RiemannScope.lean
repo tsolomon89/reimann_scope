@@ -26,4 +26,5 @@ import RiemannScope.FiberArithmetic
 import RiemannScope.UnitRescaling
 import RiemannScope.MultiGradeNaturality
 import RiemannScope.AmbientKernel
+import RiemannScope.TrinomialKernel
 

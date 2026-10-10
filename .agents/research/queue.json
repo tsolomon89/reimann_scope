@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-027",
+  "active_task_id": "TASK-TC-030",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -27,7 +27,9 @@
       "open_implication": "Defects 4A, 4B, 4C, 4D compromise reported approximation and Weil form evidence",
       "planned_calculation": "Implement full Weil quadratic form evaluation B(f, f), profile-dependent R_triv bound, strict target and refinement policy, common-grid H^1 error, and subspace projection stability",
       "acceptance_criterion": "Defect reproduction tests demonstrate rejection of old code; repaired code passes with verified error bounds and regenerated campaign data",
-      "dependencies": ["TASK-TC-001"],
+      "dependencies": [
+        "TASK-TC-001"
+      ],
       "evidence": [
         "tc/approximation.py",
         "tests/test_tc_mechanism_discovery.py"
@@ -43,7 +45,9 @@
       "open_implication": "Determine which directions survive legal continuum cancellation (sum_K b_K = 0) on grades {-1, -2, -3, -4} after controlling numerical error, and determine the exact sign and spectrum of the full Weil form on that subspace",
       "planned_calculation": "Execute multi-grade cancellation search with zero-sum constraint; evaluate B_arch(f, f) and B_prime(f, f) on the surviving subspace; check for negative Weil witness",
       "acceptance_criterion": "Certified or empirical scoped result registered with exact hypotheses, error margins, and independent review artifact",
-      "dependencies": ["TASK-TC-002"],
+      "dependencies": [
+        "TASK-TC-002"
+      ],
       "evidence": [
         "data/tc_continuum_cancellation_weil_spectrum.json",
         "tc/approximation.py"
@@ -59,7 +63,9 @@
       "open_implication": "Mesh differences and observed interpolation discrepancies do not bound distance from the exact mathematical functional. Finite quadrature achieves 0.064% agreement, but the complete infinite functional requires two-sided spectral tail bounds and upper Archimedean tail bounds. Complete relative error target < 0.1% remains numerically unresolved because the spectral tail bound (~4.45e9) dominates baseline value (1.32e7).",
       "planned_calculation": "Replace heuristic differences with validated analytic error bounds on Archimedean quadrature, prime convolution interpolation via second derivative bounds ||C_h''||_inf (Delta v)^2 / 8, station weight accuracy, and Bochner positive-semidefinite tail enclosure R_U >= 0; propagate through DP contraction. Derive sharper tail bounds to close complete functional enclosure.",
       "acceptance_criterion": "Theoretically justified error enclosure ||Delta W_G||_2 <= Bound rigorously bounding the distance from the exact continuous Weil functional, with margin lambda_min(W_G) - Bound > 0 verified.",
-      "dependencies": ["TASK-TC-003"],
+      "dependencies": [
+        "TASK-TC-003"
+      ],
       "evidence": [
         "data/tc_baseline_canonical_weil_error_budget.json",
         "data/tc_arithmetic_spectral_baseline_comparison.json",
@@ -77,7 +83,9 @@
       "open_implication": "Enlarged grade space Rayleigh spectrum must be re-evaluated under justified complete-form error enclosures and independent physical cutoff controls.",
       "planned_calculation": "Re-evaluate 4D and mixed grade configurations under decoupled physical cutoff U and validated error enclosures.",
       "acceptance_criterion": "Function-norm Rayleigh spectrum evaluated with complete-form enclosures across all configurations.",
-      "dependencies": ["TASK-TC-004A"],
+      "dependencies": [
+        "TASK-TC-004A"
+      ],
       "evidence": [
         "tc/weil_forms.py",
         "tests/test_tc_mechanism_discovery.py"
@@ -92,7 +100,9 @@
       "open_implication": "Pointwise kernel bound had h^(2m-2) defect (factor of 400 at h=0.05). Repaired to h^(2m) = h^6, yielding mathematically sound pointwise majorant C_m(h, T)/t^2 >= |A_h(it)|^2 for t >= T. However, the repaired scalar tail allowance (~4.45e9) is an order of magnitude larger than the functional value (1.32e7). A sharper matrix or direction-dependent tail enclosure is needed to establish complete functional sign.",
       "planned_calculation": "Derive explicit transformation from quadratic test function G to its spectral explicit formula representation; verify quadratic homogeneity B(lambda G, lambda G) = |lambda|^2 B(G, G); investigate sharper coefficient-dependent or matrix majorant tail bounds.",
       "acceptance_criterion": "Mathematically derived quadratic profile tail bound with verified homogeneity and uniform critical-strip envelope; sharper tail allowing complete sign determination.",
-      "dependencies": ["TASK-TC-002"],
+      "dependencies": [
+        "TASK-TC-002"
+      ],
       "evidence": [
         "tc/approximation.py",
         "tests/test_tc_mechanism_discovery.py"
@@ -108,7 +118,10 @@
       "open_implication": "Previous sensitivity artifact omitted the spectral tail allowance (~3.59e9) from final preservation decision and claimed 92.08 was a global upper bound on negative quartets. quartet optimization proves lambda_min(Q, P^T P) ~= -10,268.14 on legal unit sphere, refuting 92.08. When tail allowance is included, tail-adjusted margin is negative (-1.13e12 at T=100), so complete spectral positivity is NUMERICALLY_UNRESOLVED.",
       "planned_calculation": "Trace omitted tail allowance in decision logic; implement quartet matrix optimization Q(delta, gamma) over legal space b=P*beta; evaluate critical zero deflation; update sensitivity certificate to report NUMERICALLY_UNRESOLVED for complete spectral positivity.",
       "acceptance_criterion": "Complete spectral accounting without uncounted intervals; explicit reporting of tail allowance in sensitivity decision; legal quartet optimization across parameter space.",
-      "dependencies": ["TASK-TC-004B", "TASK-TC-005A"],
+      "dependencies": [
+        "TASK-TC-004B",
+        "TASK-TC-005A"
+      ],
       "evidence": [
         "data/tc_explicit_formula_sensitivity_certificate.json",
         "tc/weil_forms.py",
@@ -125,7 +138,9 @@
       "open_implication": "Reported negative eigenvalue at h=1 on [8, 20] was driven by severe Archimedean truncation (U=16). Independent calculation proves extending U to 24, 32, 64 turns the quadratic form and frozen eigenvector positive (+0.544 at U=64). Negative-witness and transition-threshold conclusions must be withdrawn unless complete-form enclosures support them.",
       "planned_calculation": "1) Reproduce reference table at U in {16, 24, 32, 64} and nodes in {1000, 2000, 4000}; 2) Track frozen eigenvector selected at U=16 across cutoffs; 3) Decouple physical cutoff U from bandwidth h; 4) Derive analytic tail bounds R_U(G, G); 5) Withdraw unsupported transition-threshold claims; 6) Require complete-form enclosures for any sign determination.",
       "acceptance_criterion": "Exact reproduction of independent reference comparison; formal withdrawal of uncertified negative-witness claims; implementation of decoupled (U, Nt) controls and validated tail enclosures.",
-      "dependencies": ["TASK-TC-004A"],
+      "dependencies": [
+        "TASK-TC-004A"
+      ],
       "evidence": [
         "data/tc_h1_cutoff_sensitivity_certificate.json",
         "data/tc_asymptotic_scaling_certificate.json",
@@ -143,7 +158,10 @@
       "open_implication": "Establish whether legal TC combinations can isolate an off-critical zero strongly enough to force an integer collision m*tau^K = n*tau^J. Requires optimizing quartet matrix Q(delta, gamma) over legal subspace b=P*beta, evaluating critical zero deflation rank and conditioning, and formulating the exact bridge lemma.",
       "planned_calculation": "1) Implement generalized eigensolver for Q(delta, gamma) over P^T P; 2) Audit critical zero deflation E_b(i gamma_j)=0 on 4, 6, 8 grades; 3) Author derivation and bridge lemma document connecting off-critical zero to integer collision; 4) Generate consolidated data artifact data/tc_quartet_optimization_and_deflation.json.",
       "acceptance_criterion": "Reproduction of review defects, quantitative quartet extrema over legal unit sphere, critical zero deflation conditioning audit, and rigorous mathematical bridge lemma analysis.",
-      "dependencies": ["TASK-TC-005B", "TASK-TC-006"],
+      "dependencies": [
+        "TASK-TC-005B",
+        "TASK-TC-006"
+      ],
       "evidence": [
         "data/tc_quartet_optimization_and_deflation.json",
         "docs/reviews/TC_REDUCTIO_BRIDGE_LEMMA_ANALYSIS.md",
@@ -162,7 +180,9 @@
       "open_implication": "1. The 3-term quadrature enclosure coefficients (4e-12, 1e-13, 1e-15) remain asserted constants without an applicable quadrature remainder theorem; empirical 40-dps agreement is diagnostic only. While table enclosure is certified on declared baseline (h=0.05, window [8, 20], N_tab=2001, 256 nodes), full prime matrix and complete Weil functional certification remain open. 2. Repaired identity E_b(z)E_b(-z) restores exact same-grade cross-terms, but complete-functional arithmetic certification fails closed where dependencies lack proof.",
       "planned_calculation": "1. Replace asserted literal constants with an explicit quadrature remainder theorem or outward-rounded interval enclosures across nodes. 2. Bound station weights, log errors, tau representation, and prime sum truncation. 3. Propagate certified table enclosure into prime matrix. 4. Maintain fails-closed behavior for h=0.01 outside certified domain.",
       "acceptance_criterion": "Certified production convolution table enclosure combining nodal error and ||C_h - interp(C_h)||_inf <= (Delta v)^2 ||psi'_h||_2^2 / 8; fails-closed domain enforcement; rigorous separation of table certification from complete prime matrix and infinite tail.",
-      "dependencies": ["TASK-TC-007"],
+      "dependencies": [
+        "TASK-TC-007"
+      ],
       "evidence": [
         "tc/weil_forms.py",
         "tests/test_tc_reproduced_defects.py",
@@ -179,7 +199,9 @@
       "open_implication": "Earlier barrier arguments rested on defective claims: 1) The reported null vector for tau/8 had negative signs on both products; corrected vector b = [0.029095, 0.692110, -0.721205] nulls both (1,1,8) and reciprocal (-1,8,1), refuting 'all remaining 76,693 atoms are non-zero'. 2) Riemann-von Mangoldt counts all nontrivial zeros, not distinct critical-line zeros (repaired by citing Conrey 1989 N_0(T) >= 2/5 N(T) >= c T log T). 3) Gaussian off-axis amplification does not establish negative quartet; reflected leading quartet is positive. 4) Sym(2) has dimension 3, so three coefficient equations suffice rather than tens of thousands of independent equations.",
       "planned_calculation": "1. Reduce three-grade correlation problem to three concrete keys: (1, 89, 563), (2, 89, 3511), (1, 563, 3511). 2. Formally prove c_12 = c_13 = c_23 = 0 and sum b = 0 => b = 0 in Lean 4 with 0 sorry. 3. Recover coefficient matrices via repaired physical spectral observables with authentic weights 2|A_h(i gamma)|^2 and reflected quartet Q(z) = 4 P^T Re[A_h(z)^2 sym(e(z)e(-z)^T)] P. 4. Determine whether recoverability depends on H and isolate the exact missing H-dependent bridge step.",
       "acceptance_criterion": "Definitive correction of defective barrier claims; Lean 4 formalization of 3-coefficient legal vanishing with 0 sorry; physical quartet and critical-zero matrix span verification; explicit isolation of unresolved bridge identity.",
-      "dependencies": ["TASK-TC-008"],
+      "dependencies": [
+        "TASK-TC-008"
+      ],
       "evidence": [
         "docs/reviews/TC_SPECTRAL_CORRELATION_BRIDGE_ANALYSIS.md",
         "formal/RiemannScope/ExtremalCorrelation.lean",
@@ -197,7 +219,9 @@
       "open_implication": "1) Arithmetic dilation D = diag(tau^K) was omitted from scalar investigation, exaggerating arithmetic energy by ~200x. 2) Balance identity A_Phi - L = R_Phi - r_rec was treated as independent verification rather than tautology by subtraction. 3) 7-node Chebyshev sampled max underestimated interval supremum (interior point xi=36.267 norm 727,589.09 > 527,955.59). 4) Selected keys assume grades {-1,-2,-3} and positive amplitudes at (89, 563, 3511). 5) Epistemic status in explicit formula sensitivity certificate must be DIAGNOSTIC. 6) Admissible spectral test Phi_b(z) = |A_h(z)|^2 |E_b(z)|^2 supplies its own spectral weights, creating selected-term mismatch r_match; complete identity A_Phi - L = R_Phi,tail + r_match - r_rec connects to L; exact H-dependence enters at pole residue -m adding Q(rho_0); first unresolved analytic barrier is controlling off-critical tail of signed combinations without RH.",
       "planned_calculation": "1. Restore D dilation in W_G = P^T D (W_arch - W_prime) D P. 2. Remove circular spectral verification, document bookkeeping balance, and add regression test. 3. Derive proved analytic derivative majorant ||S'(xi)||_2 <= 1.497e10 and propagate through sum |lambda_j| eps_j. 4. Enforce set(grades) == {-1,-2,-3} and positive amplitudes. 5. Propagate uncertified margin to sensitivity certificate. 6. Derive complete admissible identity, compute quantitative deficit (~6.75e-10 relative cancellation needed), and isolate the first unresolved analytic step.",
       "acceptance_criterion": "Reproduction benchmarks matched (~7.4076e8 at U=320, ~1.1622e9 at U=640); Chebyshev refutation verified; all 18 defects tests passing; fast tier passing; complete identity and unresolved analytic barrier formulated.",
-      "dependencies": ["TASK-TC-009"],
+      "dependencies": [
+        "TASK-TC-009"
+      ],
       "evidence": [
         "tc/weil_forms.py",
         "tc/__init__.py",
@@ -216,7 +240,9 @@
       "open_implication": "Constructed auxiliary admissible test Psi_b = p(z) H_b(z) matches Sym(2) recovery weights (mismatch < 1e-13, r_match = 0.0), but direct arithmetic evaluation (~5.04e8) and unconditional Stieltjes tail bound (~1.25e14) exceed 0.5. Strict bound |L(b)| < 1/2 requires establishing the Quantitative Admissible Annihilation Lemma under H(rho_0, m_0).",
       "planned_calculation": "1. Repair holomorphic continuation, numerical controls forwarding, actual grouped key collisions, recovery coefficients, and disjoint zero accounting. 2. Construct 4-parameter polynomial multiplier p(z) = r(z^2) interpolating target weights at i*gamma_1, i*gamma_2, z_0. 3. Decompose into derivative components Psi_b = sum (-1)^k r_k H_{(g^{(k)})}. 4. Direct arithmetic evaluation and Trudgian (2014) Stieltjes tail bounds. 5. Isolate exact entry point of H and formulate open lemma.",
       "acceptance_criterion": "All 23 defects tests passing; operator mismatch < 1e-13; complete explicit formula decomposition derived; exact entry of H isolated; open lemma registered.",
-      "dependencies": ["TASK-TC-010"],
+      "dependencies": [
+        "TASK-TC-010"
+      ],
       "evidence": [
         "docs/reviews/TC_WEIGHTED_ADMISSIBLE_SPECTRAL_IDENTITY_ANALYSIS.md",
         "tc/weil_forms/optimization.py",
@@ -234,7 +260,9 @@
       "open_implication": "1) Explicit formula remainder distinction: D = D_truncated + R_arch - R_spectral. Under H, D = L(b) + r_match - r_rec = -1/2. The computed difference D_truncated = arithmetic_truncated - S_unsel_le_T = 714,651,998.4127 is the truncated quantity (arithmetic_truncated = 714,643,798.0835, S_unsel_le_100 = -8,200.3292). The omitted infinite tails have allowance ~1.04e17 at T=100. Comparing local curvature ~8.33 against D_truncated ~7.15e8 was an invalid conflation; general curvature-remainder obstruction claim withdrawn. 2) Zero coverage certification repaired via validate_spectral_zero_coverage: rejects [101.0], omitted interior zeros, and duplicates; complete_spectral_enclosure_available remains False due to tail dominance. 3) Stieltjes tail incorporates Stirling gamma correction c_gamma/t (c_gamma = 1/(48pi) ~= 0.00663); classified as ANALYTIC_POWER_MAJORANT_EMPIRICALLY_EVALUATED pending certified Arb ball enclosure. 4) Compensation control X(t) validly proves that quartet symmetry and positive quartet curvature +2m_0/delta^2 do not force positive total curvature C_X(t) (< -m/delta^2 < 0 on |t-gamma| <= delta/4). 5) True autocorrelation support radius is log(20/8) + 2h ~= 1.01629 (not type 20), which does not forbid controlled approximate localization. Single-zero regularized response kernel remains open.",
       "planned_calculation": "1. Implement prime sign subtraction and verify against independent position-space evaluator and near-resonant stations (K=-1, n=53, m=107, q=2). 2. Full complex quartet assembly and symmetric whitening. 3. Derive total variation derivative enclosures and closed-form Stieltjes integrals with Stirling gamma correction. 4. Enforce rigorous zero coverage validation via validate_spectral_zero_coverage and fail-closed coverage. 5. Derive convergent zero representation for C(t), test compensation control X(t), and formulate regularized single-zero response kernel research question.",
       "acceptance_criterion": "Targeted defect tests passing; reproducible component values matching target (arithmetic_truncated = 714,643,798.0835, S_unsel = -8,200.3292, D_truncated = 714,651,998.4127, tail = 1.04194e17); zero coverage validation rejecting [101.0], gaps, and duplicates; compensation control verified; obstruction claim withdrawn; research note updated.",
-      "dependencies": ["TASK-TC-011"],
+      "dependencies": [
+        "TASK-TC-011"
+      ],
       "evidence": [
         "docs/reviews/TC_QUARTET_CURVATURE_AND_REMAINDER_BRIDGE_ANALYSIS.md",
         "tc/weil_forms/optimization.py",
@@ -251,7 +279,9 @@
       "open_implication": "Target 1: Repaired remaining_open_lemma (including R_arch and single prime subtraction), deprecated D_val alias, removed unproved outward derivative claim in favor of ANALYTIC_POWER_MAJORANT_EMPIRICALLY_EVALUATED. Target 1A: Shifted-zero defect reproduced and repaired: stable 1-to-1 reference partition maintains unselected count at 27 and propagates max_disp into effective_eps_gamma; boundary zeros intersecting T_cutoff rejected; separate evidence dimensions exposed. Target 1B: Falsified 1/(48pi*t) envelope at t=100; adopted Brent (2016) Theorem 5/Corollary 4 bound 1/(150t); re-derived single-endpoint Stieltjes integration removing duplicate endpoint allowance and sharpening tail bound from 1.04194e17 to 1.03623e17. Target 2: Derived regularized curvature kernel g_a, Fourier transform pi|u|e^{-a|u|}, and Hadamard finite-part limit. Solved zero-mode calibration via phi_{f_b}(t) with removable zero singularity and phi(0)=0. Proved exact pairing identity K_{phi_{f_b}}(a,gamma) = int f_b(u) e^{-a|u|} e^{iu*gamma} du, reducing to Psi_b(i*gamma) on critical line. Derived exact reflected-pair correction 2 int f_b(u) sinh(a|u|) e^{iu*gamma} du and quartet correction Delta_quartet. Proved distributional IBP bounds O(1/gamma^2) and O(a/gamma^2). Demonstrated that H supplies only a local O(a/gamma_0^2) perturbation, leaving the global collision implication (|D| < 1/2 from A_<=U ~ 7.15e8) open and non-circular.",
       "planned_calculation": "1. Repair remaining_open_lemma and deprecate D_val. 2. Implement stable disjoint-interval partition in validate_spectral_zero_coverage with uncertainty propagation and boundary rejection. 3. Adopt Brent (2016) envelope 1/(150t) and single-endpoint Stieltjes formula. 4. Derive and implement curvature_transfer.py with regularized test function, exact pairing, reflected-pair/quartet corrections, and distributional bounds. 5. Validate on synthetic multiset and authentic TC family, generating machine-readable audit artifact. 6. Test missing implication and circularity.",
       "acceptance_criterion": "Targeted tests for shifted zeros, boundaries, Brent envelope, and regularized transfer passing; full test suite passing; review document and machine-readable artifact produced.",
-      "dependencies": ["TASK-TC-012"],
+      "dependencies": [
+        "TASK-TC-012"
+      ],
       "evidence": [
         "tc/weil_forms/curvature_transfer.py",
         "tc/weil_forms/optimization.py",
@@ -269,7 +299,9 @@
       "open_implication": "With actual selected-zero interpolation held fixed, what additional property of the complete curvature representation constrains unselected contributions beyond identity S = K + Delta? Contradiction criterion: |D_b| + eps_match + eps_rec < 1/2.",
       "planned_calculation": "1. Establish independent error enclosures for individual curvature and correction terms (K_pair, Delta_pair, contact term 4B[w_K]), strictly enclosing independent refined calculations. 2. Epistemically separate empirical SciPy quad tail estimate (2.458e16, uncertified heuristic) from proved analytic calculus bound (6.481e29), documenting normalizer lower bound Z_canonical >= 0.4439938 and upward rounding. 3. Align polynomial description and explicit formula accounting with actual production constructor: preserve non-zero interpolation weights p(i*gamma_1)=lambda_1, p(i*gamma_2)=lambda_2, Re[p(z_0)]=lambda_Q/m_0; preserve D_b = A_complete - S_unselected = S_selected = -1/2 + r_match - r_rec without spuriously adding Delta_selected. 4. Formulate the governing research question.",
       "acceptance_criterion": "Independent error enclosures for K_pair and Delta_pair enclosing independent targets within radius <= 3e-4 (<= 1e-4 at n_grid=16001); empirical vs proved tail bounds separated; production constructor weights verified; test_target_2c passing.",
-      "dependencies": ["TASK-TC-013"],
+      "dependencies": [
+        "TASK-TC-013"
+      ],
       "evidence": [
         "tc/weil_forms/curvature_transfer.py",
         "data/tc_regularized_curvature_transfer.json",
@@ -287,7 +319,9 @@
       "open_implication": "Pure TC pullback imposes zero radial rigidity (Null Model Theorem). The explicit formula and curvature transfer on the authentic tau-graded family already holds with Db ~ -1/2 < 0 under the critical line, with unselected spectral tail allowance (~1.036e17) dwarfing off-critical quartet perturbations (~10^13). The earliest missing implication is proving H ==> |Db + Delta_quartet| + eps_match + eps_rec < 1/2 or m tau^K = n tau^J. Auxiliary numerical, optimization, and curvature sweeps are formally frozen.",
       "planned_calculation": "1. Re-centre repository on original TC hypothesis: canonical grade domain K in A_R = Q_bar cap R, arithmetic grids L_K = tau^K(+-N), grid universe L_tau. 2. Distinguish informational redundancy from mathematical constraint. 3. Formulate and prove the Pure Pullback Null Model (arbitrary f has zero radial rigidity). 4. Audit scale generator equivalence class G_tau = {a tau : a in A_R^x}. 5. Clarify epistemic status of TC Coverage Conjecture (|L_tau| = aleph_0 < 2^aleph_0; dense closure). 6. Freeze auxiliary numerical/curvature branches. 7. Isolate the Earliest Missing Implication. 8. Reconcile root documentation and produce review TC_CONSTRAINT_FOUNDATIONS.md, machine-readable artifact tc_constraint_foundations.json, and arbitrary-precision tests.",
       "acceptance_criterion": "Canonical domain reconciled to A_R; L_K and L_tau defined; Null model proven; Coverage conjecture epistemically bounded; Earliest missing implication isolated; auxiliary sweeps frozen; 19 tests in test_tc_constraint_foundations.py passing; all repository audits passing.",
-      "dependencies": ["TASK-TC-014"],
+      "dependencies": [
+        "TASK-TC-014"
+      ],
       "evidence": [
         "docs/reviews/TC_CONSTRAINT_FOUNDATIONS.md",
         "data/tc_constraint_foundations.json",
@@ -308,7 +342,9 @@
       "open_implication": "Construct a zero-independent, zeta-intrinsic arithmetic functional A_K such that A_K = A_0 and A_K - A_0 = sum_{rho in Z^+} w_rho B_rho(K) with w_rho > 0, where B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0. All downstream contradiction machinery is conditional on this construction.",
       "planned_calculation": "1. Withdraw false full algebraic-grade incommensurability theorem; prove rational differences rigorously noncoincident; classify irrational algebraic differences as OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC; add mandatory control example b = 2^{1/sqrt(2)}. 2. Remove finite numerical rational tests; add exact symbolic rational noncollision, control counterexample, and open status tests. 3. Withdraw algebraic-multiple scale generator equivalence claim (na^K not an integer). 4. Reconcile canonical algebraic grade domain K in A_R across authoritative documents. 5. Replace earliest missing implication with minimal exact spectral detector B_rho(K) = 4 sinh^2(K delta log(tau)/2) >= 0, sharp zero-rigidity, and generic base control b > 1. 6. Test common-grade shift translation identity G_rho(K+A, J+A) = tau^{2A delta} G_rho(K, J). 7. Reclassify existing machinery and author TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md and data/tc_minimal_constraint_hypothesis.json.",
       "acceptance_criterion": "False incommensurability withdrawn; rational noncollision proved; irrational algebraic marked open; control example verified; numerical tests repaired; scale generator equivalence withdrawn; canonical domain reconciled to A_R; earliest missing implication replaced by same-referent functional construction; finite-grade reflection defect established as minimal detector; generic base control documented; tests passing; review and machine-readable artifact produced.",
-      "dependencies": ["TASK-TC-015"],
+      "dependencies": [
+        "TASK-TC-015"
+      ],
       "evidence": [
         "docs/reviews/TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md",
         "data/tc_minimal_constraint_hypothesis.json",
@@ -332,7 +368,9 @@
       "open_implication": "Construct an admissible test function psi_K or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure Delta_K[psi] = <psi, mu_K^{analytic} - mu_K^{grid}> has the positive reflection-symmetric spectral expansion sum_{rho in Z^+} w_rho B_rho(K) with w_rho > 0, where mu_K^{analytic} = sum_n Lambda(n) tau^{-K} delta_{tau^{-K} log n} and mu_K^{grid} = sum_n Lambda(n) delta_{log n + K log tau}.",
       "planned_calculation": "1. Distinguish analytic TC dilation A_K[zeta](s) = zeta(tau^{-K} s) from arithmetic grid dilation D_K[zeta](s) = tau^{-Ks} zeta(s). 2. Audit repo for conflation; label CONFLATED_ANALYTIC_AND_GRID_DILATION. 3. Derive operator group actions, composition laws, non-commutation, and semidirect relation A_K D_J = D_{J tau^{-K}} A_K. 4. Derive log-space affine structure: S_K translation vs T_J dilation with commutator discrepancy (1 - tau^{-J}) K log(tau). 5. Analyze logarithmic derivative and prime/von Mangoldt measure pushforward. 6. Audit Euler product: preserved under analytic dilation, broken on arithmetic lattice L_K. 7. Derive Mellin transform duality (Case C: linear vs power scaling; no universal linear intertwiner). 8. Audit completed xi reflection symmetry preservation (A_K) vs automorphic breakage (D_K). 9. Derive commutator zero-evaluation identity yielding B_rho(K_eff) with K_eff = J(tau^K - 1). 10. Test bilateral symmetrization and correct correlator typo in TC_MINIMAL_CONSTRAINT_HYPOTHESIS.md. 11. Author docs/reviews/TC_ANALYTIC_ARITHMETIC_INTERTWINING.md and data/tc_analytic_arithmetic_intertwining.json.",
       "acceptance_criterion": "Analytic vs arithmetic grade actions distinguished; Dirichlet transformations n^{tau^{-K}} vs tau^K n derived; log-space dilation vs translation established; semidirect relation A_K D_J = D_{J tau^{-K}} A_K derived; Euler product failure on lattice proved; Mellin duality analyzed; completed xi corrections derived; commutator zero-evaluation identity connects operator non-commutation to reflection defect B_rho(K_eff); correlator typo corrected; review and machine-readable artifact produced; 12 unit tests passing.",
-      "dependencies": ["TASK-TC-016"],
+      "dependencies": [
+        "TASK-TC-016"
+      ],
       "evidence": [
         "docs/reviews/TC_ANALYTIC_ARITHMETIC_INTERTWINING.md",
         "data/tc_analytic_arithmetic_intertwining.json",
@@ -353,7 +391,9 @@
       "open_implication": "Construct an admissible test function psi_K or integral kernel such that the arithmetic discrepancy functional between the analytic prime measure and grid prime measure Delta_K[psi] = <psi, mu_K^{analytic} - mu_K^{grid}> has the positive reflection-symmetric spectral expansion sum_{rho in Z^+} w_rho B_rho(K) with w_rho > 0, where mu_K^{analytic} = sum_n Lambda(n) tau^{-K} delta_{tau^{-K} log n} and mu_K^{grid} = sum_n Lambda(n) delta_{log n + K log tau}.",
       "planned_calculation": "1. Analyze the complete grid family as an A_R-graded commutative monoid M_tau = A_R x Z_{!=0} with multiplication (K, n) * (J, m) = (K+J, nm) and realization homomorphism Phi_tau(K, n) = n tau^K. 2. Classify unit group U(M_tau) = A_R x {+-1} and grade units u_K = (K, 1). 3. Prove canonical unique factorization into grade unit, sign, and native primes (no new primes). 4. Prove grade-unit quotient M_tau / U_grade =~ Z_{!=0} recovers ordinary integer arithmetic. 5. Refine fixed-grade Dirichlet series as global grade-unit twist of native Euler product: D_K[zeta](s) = chi_s(u_K) zeta(s). 6. Derive analytic action on coordinates: (J, n) |-> (J tau^{-K}, n^{tau^{-K}}). 7. Prove rational-grade escape theorem: K in Q\\{0}, J in A_R\\{0} ==> J tau^{-K} notin A_R. 8. Resolve Governing Decision Point in favor of Fork B: algebraic-grade closure is an indexing convention, not an intrinsic zeta constraint; analytic dilation naturally lives in ambient completion M_tau^{ambient}. 9. Derive reflection defect B_rho(K) directly from bilateral reflection of normalized grade-unit character. 10. Generic-base control: algebraic bases preserve algebraic closure; transcendental tau escapes. 11. Audit affine group terminology: G_TC is a countable dense proper subgroup of Aff_+(R). 12. Author review and machine-readable artifact; implement 13 unit tests and Lean 4 formalization.",
       "acceptance_criterion": "Graded monoid defined; grade units classified; prime factorization up to grade units proved; quotient by grade units recovers integer arithmetic; refined Euler product derived; rational-grade escape proved; Fork B resolution established; B_rho(K) derived from grade units; generic-base control verified; affine terminology audited; review and json artifact created; 13 unit tests passing; Lean 4 formalization compiled.",
-      "dependencies": ["TASK-TC-017"],
+      "dependencies": [
+        "TASK-TC-017"
+      ],
       "evidence": [
         "docs/reviews/TC_GRADED_ARITHMETIC_CLOSURE.md",
         "data/tc_graded_arithmetic_closure.json",
@@ -375,7 +415,9 @@
       "open_implication": "Independent, non-circular proof that arithmetic same-referent equivalence forces the prime discrepancy functional Delta_K[psi] to dominate the archimedean tail without assuming Weil positivity.",
       "planned_calculation": "1. Correct TASK-TC-018 overclaims: withdraw Gelfond-Schneider application to n^{tau^{-K}}, add counter-control alpha = log_2(3), replace unclosed A_R * tau^{A_R} with ambient ring Gamma_tau. 2. Define zero-induced grade-unit character eta_rho(K) = tau^{-K(rho - 1/2)} on integer skeleton Z. 3. Prove character multiplicativity and modulus |eta_rho(K)| = tau^{-K delta}. 4. Prove TC Unitarity Reformulation of RH: eta_rho unitary on Z <=> delta = 0. 5. Prove B_rho(K) = |eta_rho(K)| + |eta_rho(K)|^{-1} - 2 is the exact non-unitarity defect. 6. Analyze Mellin dilation unitarity on L^2(R_{>0}, dx/x) and derive 1/2-centering from L^2(R_{>0}, dx) Plancherel isometry. 7. Prove dual = adjoint character on Z <=> delta = 0. 8. Conduct Herglotz harmonic analysis and Weil positivity circularity audit (classified as EQUIVALENT_REFORMULATION_OF_WEIL). 9. Formalize in Lean 4 (formal/RiemannScope/GradeCharacter.lean). 10. Implement 11 unit tests in tests/test_tc_grade_character_unitarity.py. 11. Author docs/reviews/TC_GRADE_CHARACTER_UNITARITY.md and data/tc_grade_character_unitarity.json.",
       "acceptance_criterion": "TASK-TC-018 overclaims corrected; zero-induced grade character defined on Z; character law proved; RH proved equivalent to grade character unitarity; B_rho(K) identified as non-unitarity defect; Mellin scaling unitarity and 1/2 centering derived; Herglotz analysis completed; circularity audited (Weil equivalence); review and machine-readable json artifact created; 11 unit tests passing; Lean 4 formalization compiled.",
-      "dependencies": ["TASK-TC-018"],
+      "dependencies": [
+        "TASK-TC-018"
+      ],
       "evidence": [
         "docs/reviews/TC_GRADE_CHARACTER_UNITARITY.md",
         "data/tc_grade_character_unitarity.json",
@@ -397,7 +439,9 @@
       "open_implication": "Isolate a non-circular arithmetic mechanism forcing an off-critical zero into two Q-independent directions in S_tau, or proving compact-uniform convergence in Suzuki's limiting condition without assuming RH.",
       "planned_calculation": "1. Verify primary sources for Suzuki 2023 [W2], 2025 [W8], and 2026 [W10]. 2. Classify unconditional local results vs RH-equivalent global claims. 3. Reconstruct exact centered Weil distribution and bilateral correlation identity C_h(K) = W(T_{aK}(h * h_tilde)). 4. Enforce two-pairing firewall between shift-invariant Q_W and positive Q_+. 5. Reconstruct Suzuki screw kernel G_g(t, u) and localized operator A_R. 6. Derive TC action on localized objects and determine window transformation Phi_K(R). 7. Classify positivity propagation (Outcome: PURE_COORDINATE_RESCALING_NO_GAIN and NO_NATURAL_INTERTWINER). 8. Analyze Suzuki 2026 lowest localized eigenvalue lambda_1(R) and compact-uniform limit (Corollary 1.6: TC_COMPATIBLE_BUT_NO_NEW_CONTROL). 9. Search for smaller-than-Weil positive test family and analyze zero visibility. 10. Prove S_tau cap Q = {0} and dim_Q S_tau <= 1 via Gelfond-Schneider with proper epistemic bounding. 11. Extend rational-grade separation to nonzero algebraic coefficients (m tau^K = n tau^J ==> K=J, m=n). 12. Audit TC branches for two-direction collision bridge (result: TWO_DIRECTION_COLLISION_BRIDGE_OPEN). 13. Isolate 2*pi specific roles and generic-base controls. 14. Formalize core algebraic identities in Lean 4 (formal/RiemannScope/TranscendenceRigidity.lean). 15. Implement 12 unit tests in tests/test_tc_suzuki_grade_covariance.py. 16. Author docs/reviews/TC_SUZUKI_LOCALIZED_GRADE_COVARIANCE.md and data/tc_suzuki_localized_grade_covariance.json.",
       "acceptance_criterion": "Suzuki primary sources verified; exact screw kernel and localized operator defined; TC covariance law derived; window map Phi_K(R) computed; positivity propagation classified with proof; two-pairing firewall enforced; exceptional exponent theorem dim_Q S_tau <= 1 proved and epistemically bounded; algebraic rational-grade separation proved; two-direction collision bridge audited; review and json deliverable created; 12 unit tests passing; Lean 4 formalization compiled.",
-      "dependencies": ["TASK-TC-019"],
+      "dependencies": [
+        "TASK-TC-019"
+      ],
       "evidence": [
         "docs/reviews/TC_SUZUKI_LOCALIZED_GRADE_COVARIANCE.md",
         "data/tc_suzuki_localized_grade_covariance.json",
@@ -419,7 +463,9 @@
       "open_implication": "Isolate an authentic arithmetic compatibility condition between the analytic prime embedding A_K(p) = p^{tau^{-K}} and the arithmetic grid realization G_K(p) = p*tau^K forcing delta = 0 without assuming RH.",
       "planned_calculation": "1. Transcribe supplied Riemann Converter formula and identify it with the single-frequency Mobius-inverted Riemann/Gram harmonic building block of pi(x) from Riemann's (1859) explicit formula for J(x). 2. Prove term-by-term and sum-by-sum scale-covariance theorem T_{c*sigma, c*t}(x^{1/c}) = T_{sigma, t}(x) for all c > 0. 3. Specialize to TC (c = tau^K) and execute generic-base control (classified as GENERIC_CONVERTER_SCALE_COVARIANCE). 4. Derive prime measure pushforward of zeta(tau^{-K} s), showing jumps at A_K(p) = p^{tau^{-K}} (log dilation u -> tau^{-K} u). 5. Distinguish integer counts and Mobius indices from transformed spatial positions, noting p^{tau^{-K}} has open transcendence status. 6. Audit three staircase interpretations of n*tau^K: A (horizontal scaling pi(x/tau^K), jumps at p*tau^K), B (vertical scaling tau^K pi(x)), C (abstract graded monoid pairs (K, n)). 7. Derive Mellin/Dirichlet transforms for each staircase. 8. Compare analytic reciprocal scaling (dilation u -> tau^{-K} u) with arithmetic realization G_K(p) = p*tau^K (translation u -> u + K log tau). 9. Prove Multi-Prime Rigidity Theorem: dilation and translation cannot coincide on two distinct primes. 10. Center zero harmonics H_rho(x) = x^{rho - 1/2}; prove analytic reciprocal action preserves modulus x^delta, while arithmetic translation multiplies harmonic by tau^{K w_rho}, altering modulus by tau^{K delta}. 11. Derive bilateral symmetrization recovering canonical defect B_rho(K) = 4 sinh^2(K delta log(tau)/2). 12. Audit intrinsic prime-referent invariants across both representations. 13. Formalize core algebraic identities in Lean 4 (formal/RiemannScope/RiemannConverter.lean). 14. Implement 15 unit tests in tests/test_tc_riemann_converter_grade_compatibility.py. 15. Create diagnostic script scratch/visualize_tc_prime_staircase.py. 16. Author docs/reviews/TC_RIEMANN_CONVERTER_GRADE_COMPATIBILITY.md and data/tc_riemann_converter_grade_compatibility.json.",
       "acceptance_criterion": "Converter formula verified and identified mathematically; scale covariance proved and controlled; prime pushforward derived; three staircase interpretations audited; dilation vs translation distinguished; multi-prime rigidity proved; centered harmonic actions and B_rho(K) derived; candidate intrinsic invariants audited; review and json deliverable created; 15 unit tests passing; Lean 4 formalization compiled.",
-      "dependencies": ["TASK-TC-020"],
+      "dependencies": [
+        "TASK-TC-020"
+      ],
       "evidence": [
         "docs/reviews/TC_RIEMANN_CONVERTER_GRADE_COMPATIBILITY.md",
         "data/tc_riemann_converter_grade_compatibility.json",
@@ -442,7 +488,9 @@
       "open_implication": "Determine whether the faithful grading of R_tau = Z[tau, tau^-1] creates a cross-grade algebraic constraint on off-critical Riemann zeta zeros.",
       "planned_calculation": "1. Define R_tau = Z[tau, tau^-1] subset R and prove ev_tau: Z[X, X^-1] -> R_tau is an isomorphism by Lindemann (1882) transcendence of tau = 2*pi. 2. Prove direct sum grading R_tau = bigoplus_{K in Z} Z tau^K and finite cross-grade linear independence over Q_bar (FINITE_CROSS_GRADE_LINEAR_INDEPENDENCE). 3. Prove Grade-Zero Algebraicity Selection Theorem: F(tau) in Q_bar iff a_K = 0 for all K != 0 (GRADE_ZERO_ALGEBRAICITY_SELECTION) and uniqueness of decompositions. 4. Classify unit group U(R_tau) = {+-tau^K : K in Z}. 5. Classify p tau^K as prime elements of R_tau associate to rational prime p via integral domain quotient R_tau / (p) \\cong F_p[X, X^-1]. 6. Prove no algebraic scalar transfer between distinct grades: alpha (m tau^K) = n tau^J forces alpha transcendental (NO_ALGEBRAIC_TRANSFER_STATION). 7. Formulate multiplicative grade addition deg(xy) = deg x + deg y, opposite grade cancellation (p tau^K)(q tau^-K) = pq, and total-grade-zero monomial selection rule (TOTAL_GRADE_ZERO_ALGEBRAICITY). 8. Derive direct grid zeta series Z_K^grid(s) = sum (n tau^K)^-s = tau^-Ks zeta(s) and prove stationary zero set Z_K^grid(s) = 0 iff zeta(s) = 0. 9. Reconcile with analytic pullback Z_K^pull(s) = zeta(tau^-K s) (moving zeros) and classify foundational status as ARITHMETIC_TC_IS_GRID_UNIT_TWIST. 10. Audit zeta identities for finite cross-grade algebraic relations subject to Q_bar coefficient firewall. 11. Classify constraint status: NO_CURRENT_ZETA_CROSS_GRADE_BRIDGE_AND_GRADE_CANCELLATION_TRIVIAL. 12. Formalize core algebraic theorems in Lean 4 (formal/RiemannScope/FaithfulGradedAlgebra.lean). 13. Implement 16 unit tests in tests/test_tc_faithful_graded_prime_algebra.py. 14. Author docs/reviews/TC_FAITHFUL_GRADED_PRIME_ALGEBRA.md and data/tc_faithful_graded_prime_algebra.json.",
       "acceptance_criterion": "R_tau rigorously defined and proved isomorphic to Z[X, X^-1]; faithful grading and finite Q_bar linear independence proved; grade-zero algebraicity selection proved; units and prime associates classified; no algebraic transfer proved; multiplicative grade addition and opposite-grade cancellation proved; grid zeta derived and zero set invariance proved; foundational reclassification completed; cross-grade constraint audited; review and json deliverable created; 16 unit tests passing; Lean 4 formalization compiled.",
-      "dependencies": ["TASK-TC-021"],
+      "dependencies": [
+        "TASK-TC-021"
+      ],
       "evidence": [
         "docs/reviews/TC_FAITHFUL_GRADED_PRIME_ALGEBRA.md",
         "data/tc_faithful_graded_prime_algebra.json",
@@ -464,7 +512,9 @@
       "open_implication": "Determine whether the zeta functional equation or algebraic powers of 2*pi force a cross-grade algebraic relation constraining nontrivial zeros.",
       "planned_calculation": "1. Restore canonical grade domain to all real algebraic numbers A_R = Q_bar cap R. 2. Define exceptional transfer set S_tau = {alpha in A_R : tau^alpha in Q_bar} and prove it is a Q-vector space. 3. Prove exceptional direction classification dim_Q S_tau <= 1 via Gelfond-Schneider (1934). 4. Derive exact transfer criterion V_K = V_J <=> K - J in S_tau and two-direction impossibility. 5. Characterize integer-grid collision (infinite subgrid) and prime-grid collision uniqueness (|P_K cap P_J| <= 1). 6. Conduct targeted literature audit on (2*pi)^alpha for algebraic irrational alpha. 7. Define canonical grid zeta Z_K(s) = tau^{-Ks} zeta(s) on A_R and prove stationary zero set. 8. Derive two-grade functional equation Z_K(s) = chi(s) tau^{J(1-s) - Ks} Z_J(1-s). 9. Construct centered completed family Xi_K(s) = tau^{-K(s-1/2)} xi(s) and prove reflection law Xi_K(s) = Xi_{-K}(1-s). 10. Derive local zero germ scaling and classify critical-line modulus detector tau^{-(K-J)delta}. 11. Audit exact special values: Z_1(2n) in Q, Z_0(1-2n) in Q, and cross-grade relation Z_1(2n) = [(-1)^n / (2(2n-1)!)] Z_0(1-2n). 12. Narrow TASK-TC-022 classification to SPECIAL_VALUE_GRADE_TRANSFER_ONLY. 13. Perform three-grade experiment (NO_TWO_DIRECTION_ZETA_TRANSFER_FOUND). 14. Formalize theorems in Lean 4 (formal/RiemannScope/ExceptionalTransfer.lean). 15. Implement 15 unit tests in tests/test_tc_algebraic_grade_functional_bridge.py. 16. Author docs/reviews/TC_ALGEBRAIC_GRADE_FUNCTIONAL_BRIDGE.md and data/tc_algebraic_grade_functional_bridge.json.",
       "acceptance_criterion": "Canonical domain restored to A_R; S_tau vector space and dimension bound proved; collision criteria characterized; literature audit verified; grid zeta and two-grade FE derived; centered reflection proved; local zero germs classified; special value cross-grade relation derived; ledger reconciled; review and json deliverable created; 15 unit tests passing; Lean 4 formalization compiled.",
-      "dependencies": ["TASK-TC-022"],
+      "dependencies": [
+        "TASK-TC-022"
+      ],
       "evidence": [
         "docs/reviews/TC_ALGEBRAIC_GRADE_FUNCTIONAL_BRIDGE.md",
         "data/tc_algebraic_grade_functional_bridge.json",
@@ -486,7 +536,9 @@
       "open_implication": "Determine whether the grade dependence of the local zero germ |c_{Xi_K}(rho) / c_{Xi_J}(rho)| = tau^{-(K-J)delta} has any intrinsic prime-side arithmetic meaning, or whether it is merely the inevitable normalization freedom caused by multiplication by a nowhere-vanishing exponential factor.",
       "planned_calculation": "1. Audit local zero germ definition c_F(rho) = F^(m)(rho)/m! and transformation law c_{Xi_K}(rho) = tau^{-K(rho - 1/2)} c_xi(rho). 2. Prove generic entire-function control: F_K(s) = e^{-KL(s-s_0)} F(s) satisfies |c_{F_K}(rho)/c_{F_J}(rho)| = e^{-(K-J)L Re(rho-s_0)} (GENERIC_NONVANISHING_PREFACTOR_COVARIANCE). 3. Audit Hadamard factorization: canonical Weierstrass product unchanged; only linear prefactor shifts B -> B - KL. 4. Tabulate zero-divisor invariants vs normalization-dependent quantities. 5. Derive grid-zeta log derivative -Z_K'/Z_K(s) = KL + sum Lambda(n) n^{-s}; contrast additive KL with geometric prime station translation. 6. Audit geometric prime measure vs Euler product measure (firewall against invalid Euler product over p tau^K). 7. Analyze completed log derivative Xi_K'/Xi_K(s): residue m is grade-invariant; regularized constant shifts h_{rho, K} = h_rho - KL. 8. Test unit-normalized germ hat{c}_K(rho) = tau^{K(rho - 1/2)} c_{Xi_K}(rho) = c_xi(rho); confirm normalization removes tau^{-K delta} detector. 9. Search candidate dimensionless invariants (cross-ratios, reflected pairs, conjugate quartets); prove all either lose delta or are normalization-dependent. 10. Prove reflected germ identity c_{Xi_K}(rho) = (-1)^m c_{Xi_{-K}}(1-rho) and opposite-grade cancellation. 11. Check explicit formula for zero derivative magnitude dependence (zeros enter via log-derivative residues -1, independent of |xi'(rho)|). 12. Evaluate log-grade translation on L^2(R): unitary on L^2, but off-critical zero modes e^{(delta + i gamma)x} are non-unitary and not in L^2. 13. Classify translation spectral bridge as RH_EQUIVALENT_REFORMULATION (Weil/Herglotz equivalence without unconditional spectral membership). 14. Formalize core algebraic identities in Lean 4 (formal/RiemannScope/LocalGermInvariance.lean, 378 total theorems). 15. Implement 16 unit tests in tests/test_tc_local_germ_prime_side_invariance.py. 16. Author docs/reviews/TC_LOCAL_GERM_PRIME_SIDE_INVARIANCE.md and data/tc_local_germ_prime_side_invariance.json.",
       "acceptance_criterion": "Generic prefactor control proved; Hadamard factorization audited; zero-divisor vs normalization data separated; grid zeta log derivative derived and KL interpreted; geometric prime measure distinguished from Euler product; completed log derivative analyzed; residue invariance and regularized finite-part shift proved; unit-normalized germ evaluated; candidate dimensionless invariants tested; explicit formula derivative independence audited; translation representation on L^2(R) analyzed; Lean 4 formalization compiled; 16 unit tests passing; review and json deliverable created; principal classification settled.",
-      "dependencies": ["TASK-TC-023"],
+      "dependencies": [
+        "TASK-TC-023"
+      ],
       "evidence": [
         "docs/reviews/TC_LOCAL_GERM_PRIME_SIDE_INVARIANCE.md",
         "data/tc_local_germ_prime_side_invariance.json",
@@ -508,7 +560,9 @@
       "open_implication": "Determine whether intrinsic grade arithmetic is strictly transport of structure isomorphic to Z and base-independent, separate the intrinsic zeta from the ambient Dirichlet series, formulate the full algebraic ambient group algebra Q_bar[A_R], and settle the kernel of realization.",
       "planned_calculation": "1. Define tagged arithmetic fibers F_K = {K} x Z with internal operations oplus_K, odot_K and unit 1_K = (K, 1). 2. Prove ring isomorphism phi_K: Z -> (F_K, oplus_K, odot_K) and realized isomorphism (L_K, +, odot_K) cong Z with x odot_K y = xy / tau^K. 3. Prove generic-base control: (F_K, oplus_K, odot_{b, K}) cong Z for any real base b > 0. 4. Define canonical transfer maps T_{J <- K}: (K, n) |-> (J, n) and prove ring isomorphism, functoriality, and isometry. 5. Derive intrinsic normalized size N_K(K, n) = n and prove multiplicativity N_K(x odot_K y) = N_K(x) N_K(y). 6. Derive intrinsic arithmetic functions mu_K, Lambda_K, phi_K and prime counting pi_K^{int}(u) = pi(u). 7. Derive intrinsic arithmetic zeta zeta_K^{int}(s) = sum n^{-s} = zeta(s) with Euler product prod_p (1 - p^{-s})^{-1}. 8. Classify ambient series Z_K^{amb}(s) = tau^{-Ks} zeta(s) as AMBIENT_COORDINATE_DIRICHLET_SERIES with dimensional prefactor tau^{-Ks}. 9. Reconcile TASK-TC-024 local germ scaling as coordinate covariance of scaling weight w = -(rho - 1/2), with unit-normalized germ hat_c_K as intrinsic invariant. 10. Formulate ambient group algebra Q_bar[A_R] with evaluation map ev_tau and kernel ker(ev_tau) representing finite algebraic cross-grade collapses. 11. Classify injectivity: proved on Z (Lindemann 1882) and Q (clearing denominators); OPEN on full A_R (OPEN_FINITE_ALGEBRAIC_CROSS_GRADE_COLLAPSE). 12. Prove rank-one finite support linear independence theorem for K_j = K_0 + q_j*alpha with alpha notin S_tau. 13. Establish four canonical strata: INTRINSIC_FIBER_ARITHMETIC, AMBIENT_REALIZATION, AMBIENT_CROSS_GRADE_ALGEBRA, ANALYTIC_PULLBACK. 14. Formalize core identities in Lean 4 (formal/RiemannScope/FiberArithmetic.lean, 414 total project declarations). 15. Implement 22 unit tests in tests/test_tc_intrinsic_fiber_ambient_realization.py. 16. Author docs/reviews/TC_INTRINSIC_FIBER_AMBIENT_REALIZATION.md and data/tc_intrinsic_fiber_ambient_realization.json.",
       "acceptance_criterion": "Tagged fibers defined; internal ring operations proved; isomorphism to Z proved base-independent; transfer maps proved ring isomorphisms and isometries; intrinsic normalized size defined; intrinsic zeta proved identically zeta(s); ambient series classified as AMBIENT_COORDINATE_DIRICHLET_SERIES; local germ scaling reconciled; ambient group algebra Q_bar[A_R] and ker(ev_tau) formulated; rank-one support theorem proved; four canonical strata established; Lean 4 formalization compiled; 22 unit tests passing; review and json deliverable created; principal classification settled.",
-      "dependencies": ["TASK-TC-024"],
+      "dependencies": [
+        "TASK-TC-024"
+      ],
       "evidence": [
         "docs/reviews/TC_INTRINSIC_FIBER_AMBIENT_REALIZATION.md",
         "data/tc_intrinsic_fiber_ambient_realization.json",
@@ -530,7 +584,9 @@
       "open_implication": "Determine whether every natural zeta/prime construction induced solely by TC unit rescaling factors into a nowhere-zero grade character times the native arithmetic object, leaving the zero divisor invariant, or identify authentic genuine arithmetic grade coupling.",
       "planned_calculation": "1. Formulate and prove the general Dirichlet-series unit-rescaling factorization theorem D_K^{amb}(s) = tau^{-Ks} D(s). 2. Prove zero-divisor and multiplicity invariance Div_0(D_K^{amb}) = Div_0(D) and mult_rho(D_K^{amb}) = mult_rho(D). 3. Formulate Mellin-transform and log-coordinate translation versions. 4. Derive logarithmic derivative additive shift -(D_K^{amb})'/D_K^{amb}(s) = K*log(tau) - D'/D(s) with invariant residue -mult_rho(D). 5. Perform generic-base control: b^{-Ks} holds for all b > 0. 6. Exhaustively audit standard TC constructions (grid zeta, completed family, functional equation, explicit formula, Riemann Converter, Euler product, local germ, Weil distributions). 7. Audit arithmetic coefficients for genuine coupling: verify a_{n,K} = a_n and cross-grade ratio independence of n. 8. Audit standard zeta structures for relations in ker(ev_tau). 9. Formalize core identities in Lean 4 (formal/RiemannScope/UnitRescaling.lean, 431 total project declarations). 10. Implement 20 unit tests in tests/test_tc_unit_rescaling_no_go_and_genuine_coupling.py. 11. Author docs/reviews/TC_UNIT_RESCALING_NO_GO_AND_GENUINE_COUPLING.md and data/tc_unit_rescaling_no_go_and_genuine_coupling.json.",
       "acceptance_criterion": "General Dirichlet factorization proved; zero-divisor and multiplicity invariance proved; Mellin and log-translation versions derived; logarithmic derivative residue invariance derived; generic-base control confirmed; standard constructions audited and classified; genuine coupling audited; ambient realization kernel searched; deliberate counterexamples attempted; Lean 4 formalization compiled; 20 unit tests passing; review and json deliverables created; principal classification settled.",
-      "dependencies": ["TASK-TC-025"],
+      "dependencies": [
+        "TASK-TC-025"
+      ],
       "evidence": [
         "docs/reviews/TC_UNIT_RESCALING_NO_GO_AND_GENUINE_COUPLING.md",
         "data/tc_unit_rescaling_no_go_and_genuine_coupling.json",
@@ -552,7 +608,9 @@
       "open_implication": "Determine whether the simultaneous family of all algebraic TC grades imposes any constraint that is not already tautologically contained in canonical transfer maps and ambient unit characters, reconcile repository terminology to single canonical TC definition, audit Lean theorems against prose claims, correct zero-ordinate algebraicity statements, decouple Gelfond-Schneider external theorem, and correct ev_tau evaluation map typing.",
       "planned_calculation": "1. Perform repository-wide audit for canonical vs auxiliary TC definitions, moving-zero attribution, zero-ordinate algebraicity, Gelfond-Schneider dependencies, and ev_tau typing. 2. Establish authoritative documentation hierarchy (MATH_CONTRACT, TRANSCENDENTAL_CONTINUATION, RESEARCH_HYPOTHESIS, RESEARCH_LEDGER, reviews). 3. Formalize multi-grade pair groupoid on A_R, transfer identity T_{K <- K} = id, and path independence T_{M <- J} o T_{J <- K} = T_{M <- K}. 4. Prove trivial loop holonomy: prod T = id_{F_{K_0}} for all finite grade loops. 5. Prove ambient scale cocycle c(J, K) = tau^{J-K} = g(J)/g(K) and spectral cocycle c_s(J, K) = tau^{-(J-K)s} = g_s(J)/g_s(K) are exact 1-coboundaries; loop products telescope to 1 identically. 6. Prove transfer-natural observables are completely determined by reference grade 0: O_K = O_0 o T_{0 <- K}. 7. Generalize to finite-arity intrinsic operations (addition, multiplication, divisibility, primes, Mobius, von Mangoldt, intrinsic zeta coefficients). 8. Prove finite-path Dirichlet multiplier telescoping and simultaneous zero-divisor equivalence Div_0(D_{K_i}^{amb}) = Div_0(D). 9. Search for genuine multi-grade invariants or kernel elements in ker(ev_tau) from standard zeta structures (none found). 10. Audit 11 TC Lean modules against prose claims and document exact hypotheses, axioms, and external dependencies. 11. Compile Lean 4 formalization formal/RiemannScope/MultiGradeNaturality.lean (459 total project declarations). 12. Implement 22 unit tests in tests/test_tc_multigrade_naturality_and_canonicalization.py. 13. Author docs/reviews/TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md, docs/reviews/TC_CANONICAL_STATE_AND_MULTIGRADE_NATURALITY_EPIC.md, docs/TC_CURRENT_CANONICAL_STATUS.md, data/tc_formal_claim_dependency_registry.json, and data/tc_canonical_reconciliation_and_multigrade_naturality.json. 14. Choose principal classification MULTIGRADE_NATURALITY_NO_GO_PROVED and freeze core TC-to-RH routes.",
       "acceptance_criterion": "Canonical TC architecture reconciled; auxiliary pullback moving zeros clearly distinguished; zero-ordinate algebraicity claims corrected to unknown; Gelfond-Schneider decoupled; ev_tau typed to A_R[A_R] -> R; multi-grade transfer functoriality, trivial loop holonomy, scale/spectral exact 1-coboundaries, natural observable reconstruction, and simultaneous zero-set equivalence proved; Lean 4 formalization compiled (459 declarations, 0 errors, 0 sorries); 22/22 unit tests passing; all documentation and json deliverables created; principal classification settled.",
-      "dependencies": ["TASK-TC-026"],
+      "dependencies": [
+        "TASK-TC-026"
+      ],
       "evidence": [
         "formal/RiemannScope/MultiGradeNaturality.lean",
         "tests/test_tc_multigrade_naturality_and_canonicalization.py",
@@ -567,6 +625,74 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-027 completed. 1) Canonical TC architecture reconciled across all repository documents: intrinsic fibers F_K = {K} x Z, Phi_K(n) = n*tau^K, zeta_K^{int}(s) = zeta(s), Z_K^{amb}(s) = tau^{-Ks} zeta(s), auxiliary pullback Z_K^{pull}(s) = zeta(tau^{-K}s). Moving zeros rho |-> tau^K rho strictly restricted to auxiliary pullback; no moving zeros in canonical arithmetic TC. 2) Zero-ordinate algebraicity claims corrected: gamma_n arithmetic status is unknown (open problem), strictly distinguished from log p which is transcendental by Lindemann (1882). 3) Gelfond-Schneider decoupled from Lean formalization: Lean formalizes collinearity under commensurability hypothesis; Gelfond-Schneider theorem is external. 4) ev_tau evaluation map typing corrected to A_R[A_R] -> R for real scalars (or Q_bar[A_R] -> C for complex scalars), avoiding codomain mismatch. 5) Multi-grade naturality no-go theorem proved: canonical transfers form a trivial pair groupoid (T_{K <- K} = id, T_{M <- J} o T_{J <- K} = T_{M <- K}); loop holonomy is strictly the identity map prod T = id_{F_{K_0}}; ambient scale cocycle c(J, K) = tau^{J-K} = g(J)/g(K) and spectral cocycle c_s(J, K) = tau^{-(J-K)s} = g_s(J)/g_s(K) are exact 1-coboundaries whose loop products telescope to 1 identically; every transfer-natural observable is uniquely determined by reference grade 0 (O_K = O_0 o T_{0 <- K}); simultaneous pairwise compatibility D_J^{amb}(s) = tau^{-(J-K)s} D_K^{amb}(s) across all algebraic grades leaves Div_0(D) identically invariant and adds zero new constraints on zeros. 6) Genuine multi-grade candidate search confirmed: no genuine multi-grade invariant exists in standard TC axioms; no bridge from zeta to ker(ev_tau) exists in standard identities. 7) Lean 4 formalization formal/RiemannScope/MultiGradeNaturality.lean compiled with 30 declarations (0 errors, 0 sorries); project theorem declaration count is 459 (0 sorries). 8) 22 unit tests passing in tests/test_tc_multigrade_naturality_and_canonicalization.py. Principal classification: MULTIGRADE_NATURALITY_NO_GO_PROVED. Core TC-to-RH routes frozen."
+    },
+    {
+      "task_id": "TASK-TC-028",
+      "priority": 30,
+      "objective": "Ambient Realization Kernel, Rational Support Rank, and Algebraic-Power Independence",
+      "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
+      "open_implication": "Reduce the ambient realization kernel problem to multivariate algebraic independence of powers of 2pi and establish conditional full injectivity under Schanuel.",
+      "planned_calculation": "Prove support translation invariance, exact rational support rank, complete rank 0 and 1 classifications, multivariate Laurent reduction, and two-case Schanuel conditional theorem.",
+      "acceptance_criterion": "Lean 4 formalization compiled, 25 tests passing, certified finite polynomial exclusions, zeta firewall preserved.",
+      "dependencies": [
+        "TASK-TC-027"
+      ],
+      "evidence": [
+        "formal/RiemannScope/AmbientKernel.lean",
+        "tests/test_tc_ambient_kernel_algebraic_independence.py",
+        "tc/ambient_kernel.py",
+        "docs/reviews/TC_AMBIENT_KERNEL_ALGEBRAIC_INDEPENDENCE.md",
+        "data/tc_ambient_kernel_algebraic_independence.json"
+      ],
+      "resolution": "TASK-TC-028 / TASK-TC-028R completed. Kernel reduced to algebraic independence of powers of 2pi; two-case Schanuel conditional full injectivity proved; minimal open case identified; certified finite exclusion derived; Lean formalization compiled (484 declarations)."
+    },
+    {
+      "task_id": "TASK-TC-029",
+      "priority": 31,
+      "objective": "Unconditional Rank-Two Algebraic-Power Frontier and Classical Transcendence Reductions",
+      "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
+      "open_implication": "Classify what can and cannot be proved unconditionally about algebraic powers (2pi)^alpha, (2pi)^beta for alpha/beta not in Q.",
+      "planned_calculation": "Prove trace/norm product law for quadratic conjugates; classify monomial and linear binomial reductions; audit classical transcendence theorems; perform post-audit repairs.",
+      "acceptance_criterion": "Post-audit repairs verified, sharp unconditional boundary proved, Lean formalization compiled (489 declarations), 12 tests passing.",
+      "dependencies": [
+        "TASK-TC-028"
+      ],
+      "evidence": [
+        "formal/RiemannScope/AmbientKernel.lean",
+        "tc/algebraic_power_frontier.py",
+        "tests/test_tc_algebraic_power_frontier.py",
+        "docs/reviews/TC_UNCONDITIONAL_RANK_TWO_POWER_FRONTIER.md",
+        "data/tc_unconditional_rank_two_power_frontier.json"
+      ],
+      "resolution": "TASK-TC-029 completed. Unconditional boundary hierarchy proved; trace/norm product law proved; monomial reductions classified; 5 post-audit repairs executed; Lean formalization compiled (489 declarations); 12 tests passing."
+    },
+    {
+      "task_id": "TASK-TC-030",
+      "priority": 32,
+      "objective": "Minimal Rank-Two Trinomial Kernel, Relation-Space Rigidity, and Sparse Orbit Theorems",
+      "status": "COMPLETED_TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN",
+      "review_status": "REVIEWED_THEORETICAL_AND_CERTIFIED",
+      "open_implication": "Classify the minimal unresolved kernel support: three nonzero terms of affine rational rank two a0 + a1*tau^alpha + a2*tau^beta = 0 with alpha/beta not in Q.",
+      "planned_calculation": "Prove relation space dim <= 1; exclude pairwise exceptional directions; derive real coefficient normalization; classify mixed-sign geometry; prove 3-consecutive orbit rigidity; audit multiplicative groups (Laurent, ESS); certify sparse exclusions via Arb ball arithmetic at 128 bits.",
+      "acceptance_criterion": "Lean 4 formalization formal/RiemannScope/TrinomialKernel.lean compiled (501 project declarations, 0 sorry); 24/24 unit tests passing; certified sparse exclusions on canonical instances; machine-readable artifact data/tc_minimal_rank_two_trinomial_kernel.json; review docs/reviews/TC_MINIMAL_RANK_TWO_TRINOMIAL_KERNEL.md; principal classification TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN.",
+      "dependencies": [
+        "TASK-TC-029"
+      ],
+      "evidence": [
+        "formal/RiemannScope/TrinomialKernel.lean",
+        "tc/trinomial_kernel.py",
+        "tests/test_tc_trinomial_kernel.py",
+        "docs/reviews/TC_MINIMAL_RANK_TWO_TRINOMIAL_KERNEL.md",
+        "data/tc_minimal_rank_two_trinomial_kernel.json",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-030 completed: Minimal support classified (support size 1 impossible, size 2 reduced to S_tau, size 3 affine rank 1 reduced to S_tau, affine rank 2 isolated as FIRST_OPEN_KERNEL_SUPPORT); relation space proved at most 1-dimensional; pairwise exceptional directions excluded; real coefficient normalization derived via Hilbert 90; mixed signs proved necessary; 3-consecutive orbit rigidity proved; multiplicative group audit completed (solutions finite, finite does not imply empty); 90,828 normalized trinomials certified excluded by Arb ball arithmetic at 128 bits; Lean 4 formalization compiled in formal/RiemannScope/TrinomialKernel.lean (total 501 declarations, 0 sorry); 24/24 unit tests passing. Principal classification: TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN."
     }
   ]
 }

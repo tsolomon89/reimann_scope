@@ -3132,5 +3132,70 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 4. **Lean 4 Formal Verification**:
    - `RiemannScope.AmbientKernel`: `quadratic_conjugate_product_pow`, `quadratic_conjugate_power_scaling`, `monomial_exponent_reduction_rank_two`, `bivariate_linear_binomial_ratio`, `tau_pow_ratio_sub`. 0 sorries.
 
+---
+
+# 26. Minimal Rank-Two Trinomial Kernel and Relation-Space Rigidity (TASK-TC-030)
+
+1. **Governing Research Object**:
+   The first genuinely unresolved ambient realization kernel object is a minimal-support relation with three nonzero terms and affine support rank two:
+   \[
+   \boxed{a_0 + a_1\tau^\alpha + a_2\tau^\beta = 0, \qquad a_0, a_1, a_2 \in \overline{\mathbb{Q}}^\times, \quad \alpha, \beta \in \mathbb{A}_{\mathbb{R}}, \quad \frac{\alpha}{\beta} \notin \mathbb{Q}.}
+   \]
+
+2. **Support Complexity Hierarchy**:
+   - **Support Size 1 ($m=1$)**: $a_0\tau^{K_0} = 0$ is strictly impossible since $\tau = 2\pi > 0$ and $a_0 \ne 0$.
+   - **Support Size 2 ($m=2$)**: $a_0 + a_1\tau^\theta = 0$ reduces to $\tau^\theta \in \overline{\mathbb{Q}}$, classified by $S_\tau$ ($\dim_{\mathbb{Q}} S_\tau \le 1$).
+   - **Support Size 3, Affine Rank 1 ($\alpha/\beta \in \mathbb{Q}$)**: Reduces to a one-variable Laurent polynomial relation in $\tau^{\theta/d}$, hence to $S_\tau$.
+   - **Support Size 3, Affine Rank 2 ($\alpha/\beta \notin \mathbb{Q}$)**: Isolated as `FIRST_OPEN_KERNEL_SUPPORT`.
+   The ambient-kernel programme is now separated by support complexity ($m=1, 2, 3$) as well as rational rank ($r=0, 1, 2$).
+
+3. **Relation-Space Rigidity Theorem**:
+   Let $\mathcal{R}_{\alpha, \beta} = \{(a_0, a_1, a_2) \in \overline{\mathbb{Q}}^3 : a_0 + a_1X + a_2Y = 0\}$ for $X = \tau^\alpha, Y = \tau^\beta$.
+   \[
+   \boxed{\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1.}
+   \]
+   Two independent relations force $X, Y \in \overline{\mathbb{Q}}$ via Cramer's rule, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$ (`RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL`).
+
+4. **Pairwise Exceptional-Direction Exclusion**:
+   Every nondegenerate trinomial relation forces all generator powers and their ratio outside $S_\tau$:
+   \[
+   \boxed{\alpha \notin S_\tau, \qquad \beta \notin S_\tau, \qquad \beta - \alpha \notin S_\tau.}
+   \]
+   If any coordinate or ratio were algebraic, the relation would solve algebraically for all coordinates (`PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED`).
+
+5. **Real-Normalization Theorem**:
+   Complex conjugation and $\dim \mathcal{R}_{\alpha, \beta} = 1$ force $(\overline{a_0}, \overline{a_1}, \overline{a_2}) = \lambda (a_0, a_1, a_2)$ with $|\lambda| = 1$.
+   The phase multiplier $\mu = 1 + \lambda$ (or $\mu = i$ if $\lambda = -1$) yields $\overline{\mu a_j} = \mu a_j$, proving that every nondegenerate trinomial relation is algebraically equivalent to one with real algebraic coefficients in $\mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$ (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`).
+
+6. **Sign Geometry & Affine Orientations**:
+   For positive generators $X, Y > 0$ and real coefficients, same-sign coefficients cannot sum to zero (`MIXED_SIGN_NECESSARY`).
+   Every relation is orientable into one of three positive affine geometries:
+   - $Y = u + vX$ with $u, v \in \mathbb{A}_{\mathbb{R}}^{>0}$ ($a_2$ opposite sign);
+   - $X = u + vY$ with $u, v \in \mathbb{A}_{\mathbb{R}}^{>0}$ ($a_1$ opposite sign);
+   - $1 = uX + vY$ with $u, v \in \mathbb{A}_{\mathbb{R}}^{>0}$ ($a_0$ opposite sign).
+
+7. **Three-Consecutive Orbit Rigidity**:
+   For $f(n) = a_0 + a_1 X^n + a_2 Y^n$, the consecutive dilation matrix determinant is:
+   \[
+   \det(M_n) = X^n Y^n (X - 1)(Y - 1)(Y - X) \ne 0.
+   \]
+   Therefore, $f(n) = f(n+1) = f(n+2) = 0 \implies a_0 = a_1 = a_2 = 0$ (`THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY`).
+   A single relation $f(1) = 0$ does not canonically propagate into $f(2) = 0$ (`NO_CANONICAL_RELATION_PROPAGATION`).
+
+8. **Multiplicative-Group Theorem Audit**:
+   For $\Gamma = \langle X, Y \rangle \cong \mathbb{Z}^2$, the line $a_0 + a_1 u + a_2 v = 0$ contains no translate of an algebraic subtorus.
+   By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), the number of solutions in $\Gamma^2$ for a fixed coefficient triple is finite (`FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE`).
+   Critical boundary: `FINITE_DOES_NOT_IMPLY_EMPTY`. Existence of one relation remains open (`MINIMAL_RANK_TWO_TRINOMIAL_EXISTENCE_OPEN`).
+
+9. **Certified Sparse Exclusion**:
+   Certified Arb ball arithmetic at 128-bit precision rigorously excludes all 90,828 normalized trinomials across 36 monomial supports up to degree $D=3$ and height $H=10$ on both canonical rank-two instances:
+   - Base-One $(1, 2\pi, (2\pi)^{\sqrt{2}})$: smallest certified distance lower bound $> 0.02262$;
+   - Radical Pair $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$: smallest certified distance lower bound $> 0.08094$.
+
+10. **Lean 4 Formal Verification**:
+    `formal/RiemannScope/TrinomialKernel.lean` (12 declarations compiled, 0 sorry, total 501 declarations):
+    `trinomial_support_translation`, `trinomial_same_sign_pos_impossible`, `trinomial_same_sign_neg_impossible`, `trinomial_two_relations_cramer`, `trinomial_exceptional_x_forces_exceptional_y`, `trinomial_exceptional_y_forces_exceptional_x`, `trinomial_exceptional_ratio_forces_exceptional_coordinates`, `trinomial_three_consecutive_orbit_determinant`, `trinomial_three_consecutive_orbit_det_ne_zero`, `trinomial_three_consecutive_orbit_rigidity`, `tau_powers_pairwise_distinct_of_ne`, `tau_pow_ne_one_of_ne_zero`.
+
+
 
 

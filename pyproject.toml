@@ -17,3 +17,17 @@ reportMissingModuleSource = "none"
 reportGeneralTypeIssues = "none"
 reportUnknownMemberType = "none"
 extraPaths = ["."]
+
+[tool.pyrefly]
+python-interpreter-path = "C:/Development/anaconda3/python.exe"
+search-path = [
+    ".",
+    "C:/Development/anaconda3/Lib/site-packages",
+    "C:/Users/Audna/AppData/Roaming/Python/Python310/site-packages",
+]
+
+[tool.pyrefly.errors]
+missing-source = "ignore"
+missing-source-for-stubs = "ignore"
+missing-import = "ignore"
+missing-module-attribute = "ignore"

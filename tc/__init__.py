@@ -247,6 +247,26 @@ from tc.algebraic_power_frontier import (
     certify_rank_two_polynomial_exclusion,
 )
 
+from tc.trinomial_kernel import (
+    CANONICAL_INSTANCE_BASE_ONE,
+    CANONICAL_INSTANCE_RADICAL_PAIR,
+    classify_minimal_support,
+    compute_affine_support_rank_trinomial,
+    evaluate_relation_space_dimension_bound,
+    check_exceptional_direction_exclusion,
+    normalize_trinomial_coefficients_real,
+    classify_sign_orientation,
+    evaluate_dilation_orbit,
+    consecutive_orbit_determinant,
+    check_three_consecutive_rigidity,
+    generalized_vandermonde_determinant,
+    audit_multiplicative_group_theorems,
+    enumerate_sparse_trinomial_monomial_pairs,
+    enumerate_normalized_coefficients,
+    certify_sparse_trinomial_exclusion,
+    evaluate_exact_control_relation,
+)
+
 from tc.approximation import (
     _is_finite_vanishing_integral,
     analyze_fourier_zero_compact_support_obstruction,

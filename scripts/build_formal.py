@@ -52,6 +52,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/UnitRescaling.lean",
     "formal/RiemannScope/MultiGradeNaturality.lean",
     "formal/RiemannScope/AmbientKernel.lean",
+    "formal/RiemannScope/TrinomialKernel.lean",
 ]
 
 

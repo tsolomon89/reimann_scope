@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "task_id": "TASK-TC-030",
+  "title": "Minimal Rank-Two Trinomial Kernel, Relation-Space Rigidity, and Sparse Orbit Theorems",
+  "starting_head": "ae8a8dd6e39bb8d713cfc92fbf0dce38ad6fd090",
+  "timestamp": "2026-10-10T12:04:00+01:00",
+  "normalized_relation": "a0 + a1 * (2*pi)^alpha + a2 * (2*pi)^beta = 0 with a0*a1*a2 != 0, alpha, beta in A_R, alpha/beta not in Q",
+  "support_size": 3,
+  "affine_support_rank": 2,
+  "relation_space_dimension_theorem": {
+    "theorem_name": "RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL",
+    "dimension_bound": "dim_{Q_bar} R_{alpha, beta} <= 1",
+    "proof_mechanism": "Two independent affine relations force (1, X, Y) into a 1-dimensional subspace over Q_bar, which implies X, Y in Q_bar via Cramer's rule. This forces alpha, beta in S_tau, contradicting dim_Q S_tau <= 1 for Q-independent grades.",
+    "status": "PROVED_PAPER_DERIVATION_WITH_LEAN_CRAMER_CORE"
+  },
+  "exceptional_direction_conditions": {
+    "theorem_name": "PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED",
+    "excluded_directions": [
+      "alpha not in S_tau",
+      "beta not in S_tau",
+      "beta - alpha not in S_tau"
+    ],
+    "proof_mechanism": "If X in Q_bar, Y is algebraically determined: Y = (-a0 - a1*X)/a2 in Q_bar. If Y in Q_bar, X = (-a0 - a2*Y)/a1 in Q_bar. If Y/X in Q_bar, X = -a0 / (a1 + a2*(Y/X)) in Q_bar.",
+    "status": "LEAN_PROVED_ALGEBRAIC_COORDINATE_FORCING"
+  },
+  "real_normalization_status": {
+    "theorem_name": "TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE",
+    "status": "PROVED_PAPER_DERIVATION",
+    "phase_normalization_mechanism": "Since generators X, Y are strictly positive reals, complex conjugation maps any relation to a relation. By dim R_{alpha, beta} = 1, (conj(a0), conj(a1), conj(a2)) = lambda * (a0, a1, a2) with |lambda| = 1. Choosing mu = 1 + lambda (or mu = I if lambda = -1) satisfies conj(mu * a_j) = mu * a_j, yielding real algebraic coefficients in A_R.",
+    "algorithmic_verification": "Verified symbolically and numerically for non-trivial complex coefficient phases."
+  },
+  "sign_classification": {
+    "theorem_name": "MIXED_SIGN_NECESSARY",
+    "impossible_configurations": [
+      "All coefficients strictly positive (a0 > 0, a1 > 0, a2 > 0)",
+      "All coefficients strictly negative (a0 < 0, a1 < 0, a2 < 0)"
+    ],
+    "three_positive_affine_orientations": [
+      {
+        "type": "Y_AFFINE_X",
+        "form": "Y = u + v * X",
+        "coefficients": "u = -a0/a2 > 0, v = -a1/a2 > 0",
+        "condition": "a2 has opposite sign to a0 and a1"
+      },
+      {
+        "type": "X_AFFINE_Y",
+        "form": "X = u + v * Y",
+        "coefficients": "u = -a0/a1 > 0, v = -a2/a1 > 0",
+        "condition": "a1 has opposite sign to a0 and a2"
+      },
+      {
+        "type": "ONE_AFFINE_XY",
+        "form": "1 = u * X + v * Y",
+        "coefficients": "u = -a1/a0 > 0, v = -a2/a0 > 0",
+        "condition": "a0 has opposite sign to a1 and a2"
+      }
+    ],
+    "affine_exceptional_relation_locus": "A_tau = {(alpha, beta) in A_R^2 : 1, tau^alpha, tau^beta linearly dependent over Q_bar}"
+  },
+  "orbit_determinant": {
+    "formula": "det(M_n) = X^n * Y^n * (X - 1) * (Y - 1) * (Y - X)",
+    "status": "LEAN_PROVED",
+    "lean_theorem": "trinomial_three_consecutive_orbit_determinant"
+  },
+  "orbit_rigidity_status": {
+    "theorem_name": "THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY",
+    "statement": "If f(n) = a0 + a1 * X^n + a2 * Y^n satisfies f(n) = f(n+1) = f(n+2) = 0 for distinct positive bases (1, X, Y), then a0 = a1 = a2 = 0.",
+    "status": "LEAN_PROVED",
+    "lean_theorem": "trinomial_three_consecutive_orbit_rigidity",
+    "generalized_vandermonde_status": "PROVED_PAPER_DERIVATION",
+    "no_propagation_boundary": "f(1) = 0 alone imposes no condition on f(2), f(3), ... TC transport does not produce contradictory grade orbits."
+  },
+  "multiplicative_group_rank": 2,
+  "s_unit_theorem_applicability": {
+    "group_structure": "Gamma = <tau^alpha, tau^beta> is free abelian of rank 2 (Gamma \cong Z^2)",
+    "primary_citations": [
+      "Evertse (1984), On sums of S-units and linear recurrences, Invent. Math.",
+      "Laurent (1984), Equations diophantiennes exponentielles, Invent. Math.",
+      "Evertse, Schlickewei, Schmidt (2002), Linear equations in elements of groups of finite rank, Ann. of Math."
+    ],
+    "conclusion": "FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE",
+    "critical_boundary": "FINITE_DOES_NOT_IMPLY_EMPTY"
+  },
+  "torus_coset_status": {
+    "contains_subtorus_coset": false,
+    "proof_mechanism": "The line a0 + a1*u + a2*v = 0 with nonzero coefficients contains no translate of an algebraic subtorus u^p * v^q = c of G_m^2, because binomial curves are nonlinear for (p, q) != (0, 0)."
+  },
+  "canonical_instances": [
+    {
+      "name": "CANONICAL_MINIMAL_RANK_TWO_BASE_ONE",
+      "generators": ["1", "2*pi", "(2*pi)^sqrt(2)"],
+      "exponents": ["0", "1", "sqrt(2)"],
+      "question": "Can a0 + a1*(2*pi) + a2*(2*pi)^sqrt(2) = 0 with a0*a1*a2 != 0 in Q_bar?"
+    },
+    {
+      "name": "CANONICAL_MINIMAL_RANK_TWO_RADICAL_PAIR",
+      "generators": ["1", "(2*pi)^sqrt(2)", "(2*pi)^sqrt(3)"],
+      "exponents": ["0", "sqrt(2)", "sqrt(3)"],
+      "question": "Can a0 + a1*(2*pi)^sqrt(2) + a2*(2*pi)^sqrt(3) = 0 with a0*a1*a2 != 0 in Q_bar?"
+    }
+  ],
+  "numerical_search_bounds": {
+    "max_degree_D": 3,
+    "max_height_H": 10,
+    "precision_bits": 128
+  },
+  "certified_exclusions": [
+    {
+      "instance": "CANONICAL_MINIMAL_RANK_TWO_BASE_ONE",
+      "supports_tested": 36,
+      "normalized_trinomials_tested": 90828,
+      "smallest_certified_distance_lb": 0.02262196228185964,
+      "smallest_candidate": {
+        "a0": 9,
+        "a1": 4,
+        "a2": -10,
+        "m1": [0, 1],
+        "m2": [1, 0]
+      },
+      "runtime_seconds": 0.257,
+      "classification": "CERTIFIED_FINITE_TRINOMIAL_EXCLUSION"
+    },
+    {
+      "instance": "CANONICAL_MINIMAL_RANK_TWO_RADICAL_PAIR",
+      "supports_tested": 36,
+      "normalized_trinomials_tested": 90828,
+      "smallest_certified_distance_lb": 0.08094699233482108,
+      "smallest_candidate": {
+        "a0": 6,
+        "a1": 5,
+        "a2": -9,
+        "m1": [1, 1],
+        "m2": [2, 0]
+      },
+      "runtime_seconds": 0.270,
+      "classification": "CERTIFIED_FINITE_TRINOMIAL_EXCLUSION"
+    }
+  ],
+  "formal_lean_theorems": {
+    "source_file": "formal/RiemannScope/TrinomialKernel.lean",
+    "theorems_compiled": 12,
+    "theorems_list": [
+      "trinomial_support_translation",
+      "trinomial_same_sign_pos_impossible",
+      "trinomial_same_sign_neg_impossible",
+      "trinomial_two_relations_cramer",
+      "trinomial_exceptional_x_forces_exceptional_y",
+      "trinomial_exceptional_y_forces_exceptional_x",
+      "trinomial_exceptional_ratio_forces_exceptional_coordinates",
+      "trinomial_three_consecutive_orbit_determinant",
+      "trinomial_three_consecutive_orbit_det_ne_zero",
+      "trinomial_three_consecutive_orbit_rigidity",
+      "tau_powers_pairwise_distinct_of_ne",
+      "tau_pow_ne_one_of_ne_zero"
+    ]
+  },
+  "primary_classification": "TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN",
+  "secondary_classifications": [
+    "FIRST_OPEN_SUPPORT_SIZE_THREE",
+    "AFFINE_RANK_TWO_TRINOMIAL",
+    "RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL",
+    "PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED",
+    "TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE",
+    "MIXED_SIGN_NECESSARY",
+    "THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY",
+    "FIXED_COEFFICIENT_SOLUTIONS_FINITE",
+    "FINITE_DOES_NOT_IMPLY_EMPTY",
+    "NO_CANONICAL_RELATION_PROPAGATION",
+    "CERTIFIED_FINITE_TRINOMIAL_EXCLUSION",
+    "NO_ZETA_TO_KERNEL_BRIDGE_FOUND"
+  ],
+  "exact_next_theorem": "Determine whether there exist any Q-independent algebraic grades (alpha, beta) and nonzero real algebraic coefficients (a0, a1, a2) satisfying a0 + a1*(2*pi)^alpha + a2*(2*pi)^beta = 0."
+}

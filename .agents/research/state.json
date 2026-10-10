@@ -275,10 +275,22 @@
         "Author docs/reviews/TC_FORMAL_CLAIM_ALIGNMENT_AUDIT.md, docs/reviews/TC_CANONICAL_STATE_AND_MULTIGRADE_NATURALITY_EPIC.md, docs/TC_CURRENT_CANONICAL_STATUS.md, data/tc_formal_claim_dependency_registry.json, and data/tc_canonical_reconciliation_and_multigrade_naturality.json"
       ],
       "completion_note": "TASK-TC-027 completed: Canonical TC architecture reconciled across the repository; moving zeros confirmed auxiliary pullback only; zero-ordinate algebraicity claims corrected to unknown; Gelfond-Schneider decoupled from Lean collinearity proof; ev_tau typed to A_R[A_R] -> R; full multi-grade naturality no-go theorem proved (trivial holonomy, exact coboundary transitions, natural observables determined by grade 0, simultaneous zero divisor invariant); Lean 4 formalization compiled (459 declarations, 0 errors, 0 sorries); 22/22 unit tests passing. Principal classification: MULTIGRADE_NATURALITY_NO_GO_PROVED. Core TC routes to RH frozen."
+    },
+    "track_16_ambient_kernel_and_trinomial_frontier": {
+      "status": "COMPLETED",
+      "tasks": [
+        "TASK-TC-028: Ambient realization kernel reduction to multivariate algebraic independence of 2pi powers and Schanuel theorem",
+        "TASK-TC-029: Unconditional rank-two algebraic-power frontier, monomial and quadratic-conjugate reductions, and post-audit repairs",
+        "TASK-TC-030: Minimal rank-two trinomial kernel classification, relation-space rigidity (dim <= 1), pairwise exceptional direction exclusion, real normalization, sign geometry, three-consecutive orbit rigidity, multiplicative-group S-unit audit, and certified sparse exclusions"
+      ],
+      "completion_note": "TASK-TC-030 completed: Minimal support classified (m=1 impossible, m=2 reduced to S_tau, m=3 affine rank 1 reduced to S_tau, m=3 affine rank 2 isolated as FIRST_OPEN_KERNEL_SUPPORT); relation space proved dim <= 1; pairwise exceptional directions excluded; real coefficient normalization derived; mixed signs proved necessary; 3-consecutive orbit rigidity proved; multiplicative group audit completed (solutions finite, finite does not imply empty); 90,828 normalized trinomials certified excluded by Arb ball arithmetic at 128 bits; Lean 4 formalization compiled in formal/RiemannScope/TrinomialKernel.lean (total 501 declarations, 0 sorry); 24/24 unit tests passing. Principal classification: TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_minimal_rank_two_trinomial_kernel.json",
+      "data/tc_unconditional_rank_two_power_frontier.json",
+      "data/tc_ambient_kernel_algebraic_independence.json",
       "data/tc_canonical_reconciliation_and_multigrade_naturality.json",
       "data/tc_unit_rescaling_no_go_and_genuine_coupling.json",
       "data/tc_intrinsic_fiber_ambient_realization.json",

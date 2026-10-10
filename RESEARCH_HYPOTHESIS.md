@@ -3972,6 +3972,46 @@ Formalized in `formal/RiemannScope/AmbientKernel.lean`:
 - `bivariate_linear_binomial_ratio`
 - `tau_pow_ratio_sub`
 
+---
+
+## 47. Minimal Rank-Two Trinomial Kernel and Relation-Space Rigidity (TASK-TC-030)
+
+### 47.1 Support Complexity Separation
+The ambient realization kernel programme is now separated by support complexity ($m$) as well as rational rank ($r$):
+- **$m=1$**: $a_0\tau^{K_0} = 0$ is strictly impossible ($a_0 \ne 0, \tau > 0$).
+- **$m=2$**: $a_0 + a_1\tau^\theta = 0$ reduces to $\tau^\theta \in \overline{\mathbb{Q}}$, classified by $S_\tau$.
+- **$m=3, \alpha/\beta \in \mathbb{Q}$**: Reduces to 1-variable polynomial in $\tau^{\theta/d}$, hence to $S_\tau$.
+- **$m=3, \alpha/\beta \notin \mathbb{Q}$**:
+  \[
+  \boxed{a_0 + a_1\tau^\alpha + a_2\tau^\beta = 0, \qquad a_0, a_1, a_2 \in \overline{\mathbb{Q}}^\times, \quad \frac{\alpha}{\beta} \notin \mathbb{Q}.}
+  \]
+  This is the first genuinely unresolved ambient kernel support (`FIRST_OPEN_KERNEL_SUPPORT`).
+
+### 47.2 Structural Rigidity Theorems
+- **Relation-Space Dimension Bound**: $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. Two independent relations force algebraic coordinates, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$ (`RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL`).
+- **Pairwise Exceptional-Direction Exclusion**: $\alpha \notin S_\tau, \beta \notin S_\tau, \beta - \alpha \notin S_\tau$ (`PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED`).
+- **Real-Normalization Theorem**: Complex conjugation and 1-dimensionality force $(a_0, a_1, a_2)$ to be algebraically equivalent to a real algebraic triple in $\mathbb{A}_{\mathbb{R}}^\times$ via Hilbert 90 phase multiplier $\mu = 1 + \lambda$ (or $\mu = i$) (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`).
+- **Sign Geometry**: Mixed signs necessary (`MIXED_SIGN_NECESSARY`). Relations orient into three positive affine forms: $Y = u + vX$, $X = u + vY$, or $1 = uX + vY$ ($u, v > 0$).
+- **Three-Consecutive Orbit Rigidity**: Nonzero trinomials cannot vanish on three consecutive integer dilations: $\det(M_n) = X^n Y^n (X - 1)(Y - 1)(Y - X) \ne 0$ (`THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY`). A single relation does not canonically propagate into an infinite contradictory grade orbit (`NO_CANONICAL_RELATION_PROPAGATION`).
+
+### 47.3 Multiplicative-Group Audit
+For $\Gamma = \langle X, Y \rangle \cong \mathbb{Z}^2$, the line $a_0 + a_1 u + a_2 v = 0$ contains no translate of an algebraic subtorus.
+By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), solutions in $\Gamma^2$ for a fixed coefficient triple are finite (`FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE`).
+However, **`FINITE_DOES_NOT_IMPLY_EMPTY`**: finiteness for a fixed triple does not prove absence of solutions. Existence of a trinomial relation remains strictly open (`MINIMAL_RANK_TWO_TRINOMIAL_EXISTENCE_OPEN`).
+
+### 47.4 Certified Sparse Exclusions
+Using `flint.arb` at 128-bit precision, 90,828 normalized primitive mixed-sign trinomials across 36 monomial supports up to degree $D=3$ and height $H=10$ were tested and excluded:
+- Base-One $(1, 2\pi, (2\pi)^{\sqrt{2}})$: smallest certified distance lower bound $> 0.02262$;
+- Radical Pair $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$: smallest certified distance lower bound $> 0.08094$.
+Classified as `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION`.
+
+### 47.5 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/TrinomialKernel.lean` (12 declarations compiled, 0 sorry, total 501 declarations):
+`trinomial_support_translation`, `trinomial_same_sign_pos_impossible`, `trinomial_same_sign_neg_impossible`, `trinomial_two_relations_cramer`, `trinomial_exceptional_x_forces_exceptional_y`, `trinomial_exceptional_y_forces_exceptional_x`, `trinomial_exceptional_ratio_forces_exceptional_coordinates`, `trinomial_three_consecutive_orbit_determinant`, `trinomial_three_consecutive_orbit_det_ne_zero`, `trinomial_three_consecutive_orbit_rigidity`, `tau_powers_pairwise_distinct_of_ne`, `tau_pow_ne_one_of_ne_zero`.
+
+Audit finding: `NO_ZETA_TO_KERNEL_BRIDGE_FOUND` remains strictly preserved. The trinomial frontier is a pure number-theoretic problem, not an RH route.
+
+
 
 
 
