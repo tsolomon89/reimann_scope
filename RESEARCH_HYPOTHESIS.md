@@ -3988,19 +3988,26 @@ The ambient realization kernel programme is now separated by support complexity 
   This is the first genuinely unresolved ambient kernel support (`FIRST_OPEN_KERNEL_SUPPORT`).
 
 ### 47.2 Structural Rigidity Theorems
-- **Relation-Space Dimension Bound**: $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. Two independent relations force algebraic coordinates, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$ (`RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL`).
-- **Pairwise Exceptional-Direction Exclusion**: $\alpha \notin S_\tau, \beta \notin S_\tau, \beta - \alpha \notin S_\tau$ (`PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED`).
-- **Real-Normalization Theorem**: Complex conjugation and 1-dimensionality force $(a_0, a_1, a_2)$ to be algebraically equivalent to a real algebraic triple in $\mathbb{A}_{\mathbb{R}}^\times$ via Hilbert 90 phase multiplier $\mu = 1 + \lambda$ (or $\mu = i$) (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`).
+- **Relation-Space Dimension Bound**: $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. Classification: `PROVED_PAPER_DERIVATION` + `PROVED_WITH_EXTERNAL_GELFOND_SCHNEIDER`. Two independent relations yield a $2 \times 3$ algebraic coefficient matrix of rank 2 whose 1D nullspace is spanned by $(1, X, Y)^T$. Having first coordinate 1 forces an algebraic basis $(1, \overline{X}, \overline{Y})^T$, proving $X, Y \in \overline{\mathbb{Q}}$ across all nonzero minors (not just the $X, Y$ minor). This forces $\alpha, \beta \in S_\tau$, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$ when $\alpha/\beta \notin \mathbb{Q}$ (`RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL`). Lean theorem `trinomial_two_relations_cramer` formalizes the algebraic Cramer identity under one explicit minor.
+- **Pairwise Exceptional-Direction Exclusion**: $\alpha \notin S_\tau, \beta \notin S_\tau, \beta - \alpha \notin S_\tau$. Classification: `LEAN_PROVED_SOLVING_IDENTITIES` + `PROVED_PAPER_DERIVATION` + `EXTERNAL_GELFOND_SCHNEIDER`. Lean formalizes coordinate solving identities (`trinomial_exceptional_x_forces_exceptional_y`, `trinomial_exceptional_y_forces_exceptional_x`, `trinomial_exceptional_ratio_forces_exceptional_coordinates`). Algebraicity closure and Gelfond-Schneider complete the paper contradiction.
+- **Real-Normalization Theorem**: Complex conjugation and 1-dimensionality force $(a_0, a_1, a_2)$ to be algebraically equivalent to a real algebraic triple in $\mathbb{A}_{\mathbb{R}}^\times$ via direct elementary phase multiplier $\mu = 1 + \lambda$ (or $\mu = i$ if $\lambda = -1$) verifying $\overline{\mu a_j} = \mu a_j$ directly (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`).
 - **Sign Geometry**: Mixed signs necessary (`MIXED_SIGN_NECESSARY`). Relations orient into three positive affine forms: $Y = u + vX$, $X = u + vY$, or $1 = uX + vY$ ($u, v > 0$).
-- **Three-Consecutive Orbit Rigidity**: Nonzero trinomials cannot vanish on three consecutive integer dilations: $\det(M_n) = X^n Y^n (X - 1)(Y - 1)(Y - X) \ne 0$ (`THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY`). A single relation does not canonically propagate into an infinite contradictory grade orbit (`NO_CANONICAL_RELATION_PROPAGATION`).
+- **Three-Consecutive Orbit Rigidity**: Nonzero trinomials cannot vanish on three consecutive integer dilations: $\det(M_n) = X^n Y^n (X - 1)(Y - 1)(Y - X) \ne 0$ (`THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY`). A single relation $f(1)=0$ algebraically constrains coefficients and generators, but does not force $f(2)=0, f(3)=0$, or any further orbit vanishing (`NO_CANONICAL_ORBIT_VANISHING_PROPAGATION`).
 
 ### 47.3 Multiplicative-Group Audit
-For $\Gamma = \langle X, Y \rangle \cong \mathbb{Z}^2$, the line $a_0 + a_1 u + a_2 v = 0$ contains no translate of an algebraic subtorus.
-By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), solutions in $\Gamma^2$ for a fixed coefficient triple are finite (`FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE`).
+Distinguish three multiplicative groups:
+- Base generator group: $\Gamma_0 = \langle X, Y \rangle \subset \mathbb{R}_{>0}^\times$, $\operatorname{rank}_{\mathbb{Z}}(\Gamma_0) = 2$ for $\alpha/\beta \notin \mathbb{Q}$.
+- Solution product group: $(u, v) \in \Gamma_0 \times \Gamma_0$, $\operatorname{rank}_{\mathbb{Z}}(\Gamma_0 \times \Gamma_0) = 4$.
+- Diagonal dilation orbit: $\Delta_{\alpha, \beta} = \{(X^n, Y^n) : n \in \mathbb{Z}\}$, $\operatorname{rank}_{\mathbb{Z}}(\Delta) = 1$.
+The line $a_0 + a_1 u + a_2 v = 0$ in $\Gamma_0 \times \Gamma_0$ contains no translate of an algebraic subtorus.
+By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), solutions in $\Gamma_0 \times \Gamma_0$ for a fixed coefficient triple are finite (`FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE`).
 However, **`FINITE_DOES_NOT_IMPLY_EMPTY`**: finiteness for a fixed triple does not prove absence of solutions. Existence of a trinomial relation remains strictly open (`MINIMAL_RANK_TWO_TRINOMIAL_EXISTENCE_OPEN`).
 
 ### 47.4 Certified Sparse Exclusions
-Using `flint.arb` at 128-bit precision, 90,828 normalized primitive mixed-sign trinomials across 36 monomial supports up to degree $D=3$ and height $H=10$ were tested and excluded:
+Using `flint.arb` at 128-bit precision, constant-anchored normalized primitive mixed-sign trinomials up to degree $D=3$ and height $H=10$ were tested and excluded:
+- Degree $\le 3$ universe: $\binom{10}{3} = 120$ total 3-monomial subsets; campaign tests all $\binom{9}{2} = 36$ constant-anchored supports ($1 \in \mathrm{supp}$).
+- Support breakdown: 30 genuine affine-rank-two supports and 6 affine-rank-one control supports ($X$-axis and $Y$-axis).
+- Candidate totals: 2,523 normalized coefficient triples per support; total tested $90,828 = 75,690 \text{ (rank-two)} + 15,138 \text{ (rank-one control)}$ candidates.
 - Base-One $(1, 2\pi, (2\pi)^{\sqrt{2}})$: smallest certified distance lower bound $> 0.02262$;
 - Radical Pair $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$: smallest certified distance lower bound $> 0.08094$.
 Classified as `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION`.

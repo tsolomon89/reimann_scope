@@ -3154,18 +3154,18 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \[
    \boxed{\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1.}
    \]
-   Two independent relations force $X, Y \in \overline{\mathbb{Q}}$ via Cramer's rule, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$ (`RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL`).
+   Classification: `PROVED_PAPER_DERIVATION` + `PROVED_WITH_EXTERNAL_GELFOND_SCHNEIDER`. Two independent relations yield a $2 \times 3$ algebraic coefficient matrix of rank 2 whose 1D nullspace is spanned by $(1, X, Y)^T$. Because the first coordinate is 1, the nullspace possesses an algebraic basis $(1, \overline{X}, \overline{Y})^T$, forcing $X, Y \in \overline{\mathbb{Q}}$ across all nonzero minors (not just the $X, Y$ minor). This forces $\alpha, \beta \in S_\tau$, contradicting Gelfond-Schneider's $\dim_{\mathbb{Q}} S_\tau \le 1$ when $\alpha/\beta \notin \mathbb{Q}$. (Lean theorem `trinomial_two_relations_cramer` formalizes the algebraic Cramer identity under one explicit minor).
 
 4. **Pairwise Exceptional-Direction Exclusion**:
    Every nondegenerate trinomial relation forces all generator powers and their ratio outside $S_\tau$:
    \[
    \boxed{\alpha \notin S_\tau, \qquad \beta \notin S_\tau, \qquad \beta - \alpha \notin S_\tau.}
    \]
-   If any coordinate or ratio were algebraic, the relation would solve algebraically for all coordinates (`PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED`).
+   Classification: `LEAN_PROVED_SOLVING_IDENTITIES` + `PROVED_PAPER_DERIVATION` + `EXTERNAL_GELFOND_SCHNEIDER`. Lean formalizes coordinate solving identities (`trinomial_exceptional_x_forces_exceptional_y`, `trinomial_exceptional_y_forces_exceptional_x`, `trinomial_exceptional_ratio_forces_exceptional_coordinates`). Algebraicity closure and Gelfond-Schneider dimension bounds complete the paper contradiction.
 
 5. **Real-Normalization Theorem**:
    Complex conjugation and $\dim \mathcal{R}_{\alpha, \beta} = 1$ force $(\overline{a_0}, \overline{a_1}, \overline{a_2}) = \lambda (a_0, a_1, a_2)$ with $|\lambda| = 1$.
-   The phase multiplier $\mu = 1 + \lambda$ (or $\mu = i$ if $\lambda = -1$) yields $\overline{\mu a_j} = \mu a_j$, proving that every nondegenerate trinomial relation is algebraically equivalent to one with real algebraic coefficients in $\mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$ (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`).
+   The direct elementary phase multiplier $\mu = 1 + \lambda$ (or $\mu = i$ if $\lambda = -1$) yields $\overline{\mu a_j} = \mu a_j$ directly, proving that every nondegenerate trinomial relation is algebraically equivalent to one with real algebraic coefficients in $\mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$ (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`).
 
 6. **Sign Geometry & Affine Orientations**:
    For positive generators $X, Y > 0$ and real coefficients, same-sign coefficients cannot sum to zero (`MIXED_SIGN_NECESSARY`).
@@ -3180,17 +3180,23 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \det(M_n) = X^n Y^n (X - 1)(Y - 1)(Y - X) \ne 0.
    \]
    Therefore, $f(n) = f(n+1) = f(n+2) = 0 \implies a_0 = a_1 = a_2 = 0$ (`THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY`).
-   A single relation $f(1) = 0$ does not canonically propagate into $f(2) = 0$ (`NO_CANONICAL_RELATION_PROPAGATION`).
+   A single relation $f(1) = 0$ algebraically constrains coefficients and generators, but does not force $f(2) = 0$, $f(3) = 0$, or any further orbit vanishing (`NO_CANONICAL_ORBIT_VANISHING_PROPAGATION`).
 
 8. **Multiplicative-Group Theorem Audit**:
-   For $\Gamma = \langle X, Y \rangle \cong \mathbb{Z}^2$, the line $a_0 + a_1 u + a_2 v = 0$ contains no translate of an algebraic subtorus.
-   By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), the number of solutions in $\Gamma^2$ for a fixed coefficient triple is finite (`FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE`).
+   Distinguish three multiplicative groups:
+   - Base generator group: $\Gamma_0 = \langle X, Y \rangle \subset \mathbb{R}_{>0}^\times$, $\operatorname{rank}_{\mathbb{Z}}(\Gamma_0) = 2$ for $\alpha/\beta \notin \mathbb{Q}$.
+   - Solution product group: $(u, v) \in \Gamma_0 \times \Gamma_0$, $\operatorname{rank}_{\mathbb{Z}}(\Gamma_0 \times \Gamma_0) = 4$.
+   - Diagonal dilation orbit: $\Delta_{\alpha, \beta} = \{(X^n, Y^n) : n \in \mathbb{Z}\}$, $\operatorname{rank}_{\mathbb{Z}}(\Delta) = 1$.
+   The line $a_0 + a_1 u + a_2 v = 0$ in $\Gamma_0 \times \Gamma_0$ contains no translate of an algebraic subtorus. By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), solutions in $\Gamma_0 \times \Gamma_0$ for a fixed coefficient triple are finite (`FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE`).
    Critical boundary: `FINITE_DOES_NOT_IMPLY_EMPTY`. Existence of one relation remains open (`MINIMAL_RANK_TWO_TRINOMIAL_EXISTENCE_OPEN`).
 
 9. **Certified Sparse Exclusion**:
-   Certified Arb ball arithmetic at 128-bit precision rigorously excludes all 90,828 normalized trinomials across 36 monomial supports up to degree $D=3$ and height $H=10$ on both canonical rank-two instances:
-   - Base-One $(1, 2\pi, (2\pi)^{\sqrt{2}})$: smallest certified distance lower bound $> 0.02262$;
-   - Radical Pair $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$: smallest certified distance lower bound $> 0.08094$.
+   Certified Arb ball arithmetic at 128-bit precision rigorously excludes constant-anchored normalized sparse trinomial relations up to degree $D=3$ and height $H=10$:
+   - Support universe: $\binom{10}{3} = 120$ total three-monomial subsets in degree $\le 3$ box; campaign tests all $\binom{9}{2} = 36$ constant-anchored supports ($1 \in \mathrm{supp}$).
+   - Support breakdown: 30 genuine affine-rank-two supports and 6 affine-rank-one control supports ($X$-axis and $Y$-axis).
+   - Candidate totals: 2,523 normalized coefficient triples per support; total tested $90,828 = 75,690 \text{ (rank-two)} + 15,138 \text{ (rank-one control)}$ candidates.
+   - Certified lower bounds: Base-One $(1, 2\pi, (2\pi)^{\sqrt{2}})$ certified distance $> 0.02262$; Radical Pair $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$ certified distance $> 0.08094$.
+   - Classification: `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION`.
 
 10. **Lean 4 Formal Verification**:
     `formal/RiemannScope/TrinomialKernel.lean` (12 declarations compiled, 0 sorry, total 501 declarations):

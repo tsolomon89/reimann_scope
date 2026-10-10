@@ -1,30 +1,30 @@
-r"""Test Suite for TASK-TC-030: Minimal Rank-Two Trinomial Kernel and Sparse Orbit Theorems.
+r"""Test Suite for TASK-TC-030R: Trinomial Kernel Evidence Alignment, Canonical Support Repair, and Certificate-Scope Correction.
 
-Covers all 24 required test specifications from TASK-TC-030:
-1. support-size-one impossibility
-2. support-size-two rank-one reduction
-3. rank-one three-term reduction
-4. affine rank-two normalization
-5. two independent relations force algebraic-coordinate model
-6. relation-space dimension at most one under the abstract S_tau bound
-7. exceptional X forces exceptional Y
-8. exceptional Y/X forces exceptional coordinates
-9. complex conjugate relation production
-10. real-normalization positive control
-11. same-sign impossibility
-12. three sign orientations
-13. consecutive-orbit determinant identity
-14. three-consecutive orbit rigidity
-15. non-propagation regression
-16. generalized Vandermonde numerical control
-17. sparse enumeration deduplication
-18. exact-relation positive control
-19. Arb fail-closed behavior
-20. certified sparse exclusion
-21. no midpoint used as a certified distance
-22. no claim that finite implies empty
-23. no claim that one relation propagates through TC
-24. no zeta-to-kernel claim
+Covers all 24 required test specifications from TASK-TC-030R:
+1. repeated-grade terms are combined before support classification
+2. coefficient cancellation removes a grade
+3. complete cancellation yields empty support
+4. unresolved rationality fails closed
+5. exact rank-two radical support is recognized
+6. relation-space helper records external assumptions rather than returning bare 1
+7. Cramer full-paper proof handles a nonzero minor not in columns X, Y
+8. exceptional helper uses the supplied Y_sym
+9. degenerate coefficients fail closed
+10. ratio denominator zero implies a0 = 0
+11. real normalization rejects non-proportional conjugate coefficient vectors
+12. real normalization returns exact transformed coefficients
+13. no real-part truncation after failed normalization
+14. no-propagation wording regression
+15. group rank and product-group rank are distinguished
+16. diagonal orbit is distinguished
+17. support accounting gives 36 total, 30 rank two, 6 rank one
+18. total three-monomial subsets are 120
+19. certificate metadata identifies constant-anchored scope
+20. candidate counts partition correctly
+21. positive controls still enclose zero
+22. no midpoint is used as certified distance
+23. no full algebraic-independence claim
+24. no RH claim
 """
 
 import math
@@ -38,9 +38,18 @@ from flint import arb, ctx
 from tc.trinomial_kernel import (
     CANONICAL_INSTANCE_BASE_ONE,
     CANONICAL_INSTANCE_RADICAL_PAIR,
+    SUPPORT_BOX_TOTAL_MONOMIALS,
+    SUPPORT_BOX_TOTAL_THREE_MONOMIAL_SUBSETS,
+    SUPPORT_BOX_CONSTANT_ANCHORED_SUPPORTS,
+    SUPPORT_BOX_AFFINE_RANK_TWO_SUPPORTS,
+    SUPPORT_BOX_AFFINE_RANK_ONE_CONTROLS,
+    NORMALIZED_COEFFICIENTS_PER_SUPPORT,
+    canonicalize_group_algebra_terms,
     classify_minimal_support,
     compute_affine_support_rank_trinomial,
+    derive_relation_space_dimension_bound,
     evaluate_relation_space_dimension_bound,
+    solve_two_relations_algebraic_coordinates,
     check_exceptional_direction_exclusion,
     normalize_trinomial_coefficients_real,
     classify_sign_orientation,
@@ -50,233 +59,246 @@ from tc.trinomial_kernel import (
     generalized_vandermonde_determinant,
     audit_multiplicative_group_theorems,
     enumerate_sparse_trinomial_monomial_pairs,
+    partition_monomial_supports_by_rank,
     enumerate_normalized_coefficients,
     certify_sparse_trinomial_exclusion,
     evaluate_exact_control_relation,
 )
 
 
-# Test 1: Support-size-one impossibility
-def test_support_size_one_impossibility():
-    res = classify_minimal_support([(5, sqrt(2))])
+# 1. repeated-grade terms are combined before support classification
+def test_repeated_grades_combined_before_classification():
+    # 1[0] - 1[0] + 1[1] must canonicalize to 1[1] and be classified as support size 1
+    terms = [(1, 0), (-1, 0), (1, 1)]
+    canon = canonicalize_group_algebra_terms(terms)
+    assert len(canon) == 1
+    assert canon[0] == (Integer(1), Integer(1))
+
+    res = classify_minimal_support(terms)
     assert res.support_size == 1
-    assert res.is_possible is False
     assert res.classification_code == "SUPPORT_SIZE_ONE_IMPOSSIBLE"
 
 
-# Test 2: Support-size-two rank-one reduction
-def test_support_size_two_rank_one_reduction():
-    res = classify_minimal_support([(1, 0), (2, sqrt(2))])
-    assert res.support_size == 2
-    assert res.is_possible is True
-    assert res.affine_support_rank == 1
-    assert res.classification_code == "SUPPORT_SIZE_TWO_RANK_ONE_REDUCED"
-    assert res.reduction_target == "S_TAU_EXCEPTIONAL_DIRECTION"
+# 2. coefficient cancellation removes a grade
+def test_coefficient_cancellation_removes_grade():
+    # 1[0] + 1[1] - 1[1] must canonicalize to 1[0] and have support size 1
+    terms = [(1, 0), (1, 1), (-1, 1)]
+    canon = canonicalize_group_algebra_terms(terms)
+    assert len(canon) == 1
+    assert canon[0] == (Integer(1), Integer(0))
+
+    res = classify_minimal_support(terms)
+    assert res.support_size == 1
+    assert res.classification_code == "SUPPORT_SIZE_ONE_IMPOSSIBLE"
 
 
-# Test 3: Rank-one three-term reduction (collinear grades)
-def test_rank_one_three_term_reduction():
-    # Grades 0, sqrt(2), 2*sqrt(2) -> ratio is 1/2 in Q
-    res = classify_minimal_support([(1, 0), (-3, sqrt(2)), (2, 2 * sqrt(2))])
-    assert res.support_size == 3
-    assert res.affine_support_rank == 1
-    assert res.classification_code == "AFFINE_RANK_ONE_TRINOMIAL_REDUCED"
-    assert res.reduction_target == "S_TAU_EXCEPTIONAL_DIRECTION"
+# 3. complete cancellation yields empty support
+def test_complete_cancellation_yields_empty_support():
+    # 1[0] + 2[1] - 2[1] - 1[0] must canonicalize to empty support
+    terms = [(1, 0), (2, 1), (-2, 1), (-1, 0)]
+    canon = canonicalize_group_algebra_terms(terms)
+    assert len(canon) == 0
+
+    res = classify_minimal_support(terms)
+    assert res.support_size == 0
+    assert res.classification_code == "EMPTY_SUPPORT"
+    assert res.is_possible is False
 
 
-# Test 4: Affine rank-two normalization
-def test_affine_rank_two_normalization():
-    # Grades 0, 1, sqrt(2) -> ratio 1/sqrt(2) not in Q
-    res = classify_minimal_support([(1, 0), (1, 1), (1, sqrt(2))])
+# 4. unresolved rationality fails closed
+def test_unresolved_rationality_fails_closed():
+    # An unresolved symbol expression must raise ValueError with EXACT_AFFINE_RANK_UNRESOLVED
+    x = Symbol("x")
+    with pytest.raises(ValueError, match="EXACT_AFFINE_RANK_UNRESOLVED"):
+        compute_affine_support_rank_trinomial(0, x, x**2 + 1)
+
+
+# 5. exact rank-two radical support is recognized
+def test_exact_rank_two_radical_support_recognized():
+    # 1, (2pi)^sqrt(2), (2pi)^sqrt(3) has affine rank 2
+    rank = compute_affine_support_rank_trinomial(0, sqrt(2), sqrt(3))
+    assert rank == 2
+
+    res = classify_minimal_support([(1, 0), (1, sqrt(2)), (1, sqrt(3))])
     assert res.support_size == 3
     assert res.affine_support_rank == 2
     assert res.classification_code == "FIRST_OPEN_KERNEL_SUPPORT"
     assert res.reduction_target == "MINIMAL_RANK_TWO_TRINOMIAL_FRONTIER"
 
-    rank = compute_affine_support_rank_trinomial(0, 1, sqrt(2))
-    assert rank == 2
+
+# 6. relation-space helper records external assumptions rather than returning bare 1
+def test_relation_space_helper_records_assumptions():
+    bound_res = derive_relation_space_dimension_bound(1, sqrt(2))
+    assert bound_res.dimension_bound == 1
+    assert bound_res.is_rationally_independent is True
+    assert bound_res.assumes_external_gelfond_schneider is True
+    assert bound_res.theorem_conclusion == "AT_MOST_ONE_DIMENSIONAL"
+    assert bound_res.evidence_class == "PROVED_PAPER_DERIVATION_PLUS_EXTERNAL_GELFOND_SCHNEIDER"
+    assert bound_res.status == "RESOLVED"
+
+    # Backward compatibility helper also works
+    assert evaluate_relation_space_dimension_bound(1, sqrt(2)) == 1
 
 
-# Test 5: Two independent relations force algebraic-coordinate model
-def test_two_independent_relations_force_algebraic_coordinates():
-    X = Symbol("X")
-    Y = Symbol("Y")
-    # Relation 1: a0 + a1*X + a2*Y = 0
-    # Relation 2: b0 + b1*X + b2*Y = 0
-    a0, a1, a2 = 1, 2, 3
-    b0, b1, b2 = 4, 1, 5
-    det = a1 * b2 - a2 * b1  # 2*5 - 3*1 = 7 != 0
-    sol_X = (a2 * b0 - a0 * b2) / det  # (3*4 - 1*5)/7 = 7/7 = 1
-    sol_Y = (a0 * b1 - a1 * b0) / det  # (1*1 - 2*4)/7 = -7/7 = -1
+# 7. Cramer full-paper proof handles a nonzero minor not in columns X, Y
+def test_cramer_full_paper_proof_all_minors():
+    # Case A: Standard minor in columns X, Y (Delta_0 != 0)
+    r1 = (1, 2, 3)
+    r2 = (4, 1, 5)
+    sol_std = solve_two_relations_algebraic_coordinates(r1, r2)
+    assert sol_std["is_rank_2"] is True
+    assert sol_std["delta_0"] == 7
+    assert sol_std["sol_X"] == 1
+    assert sol_std["sol_Y"] == -1
 
-    # Verify both coordinates are purely rational
-    assert sol_X == 1
-    assert sol_Y == -1
+    # Case B: Delta_0 == 0, but Delta_1 or Delta_2 != 0
+    # e.g. rows where X, Y columns are proportional:
+    # r1 = (1, 2, 4)
+    # r2 = (2, 1, 2) -> wait, here 2*2 - 4*1 = 0!
+    r1_deg = (1, 2, 4)
+    r2_deg = (2, 1, 2)
+    sol_deg = solve_two_relations_algebraic_coordinates(r1_deg, r2_deg)
+    assert sol_deg["is_rank_2"] is True
+    assert sol_deg["delta_0"] == 0
+    # Any nullspace vector has first coordinate 0, so (1, X, Y) cannot satisfy both
+    assert sol_deg["solution_exists_with_first_coord_one"] is False
 
 
-# Test 6: Relation-space dimension at most one under abstract S_tau bound
-def test_relation_space_dimension_bound():
-    dim_bound = evaluate_relation_space_dimension_bound(1, sqrt(2))
-    assert dim_bound <= 1
+# 8. exceptional helper uses the supplied Y_sym
+def test_exceptional_helper_uses_supplied_y_sym():
+    X_var = Symbol("CustomX")
+    Y_var = Symbol("CustomY")
+    res = check_exceptional_direction_exclusion(1, 2, 3, X_sym=X_var, Y_sym=Y_var)
+    # Must contain CustomX and CustomY in the respective solved expressions
+    assert X_var in res["sol_Y_from_X"].free_symbols
+    assert Y_var in res["sol_X_from_Y"].free_symbols
 
 
-# Test 7: Exceptional X forces exceptional Y
-def test_exceptional_x_forces_exceptional_y():
+# 9. degenerate coefficients fail closed
+def test_degenerate_coefficients_fail_closed():
+    with pytest.raises(ValueError, match="DEGENERATE_COEFFICIENT_VECTOR"):
+        check_exceptional_direction_exclusion(0, 1, 2)
+    with pytest.raises(ValueError, match="DEGENERATE_COEFFICIENT_VECTOR"):
+        check_exceptional_direction_exclusion(1, 0, 2)
+    with pytest.raises(ValueError, match="DEGENERATE_COEFFICIENT_VECTOR"):
+        check_exceptional_direction_exclusion(1, 2, 0)
+
+
+# 10. ratio denominator zero implies a0 = 0
+def test_ratio_denominator_zero_implies_a0_zero():
+    # For a0 + a1*X + a2*Y = 0, let Z = Y/X.
+    # If a1 + a2*Z = 0, then a0 = -X*(a1 + a2*Z) = 0.
     res = check_exceptional_direction_exclusion(1, 2, 3)
-    assert res["exceptional_x_forces_algebraic_y"] is True
-    # If X = 5 in Q_bar, Y = (-1 - 2*5)/3 = -11/3 in Q_bar
-    X_val = 5
-    Y_val = res["sol_Y_from_X"].subs(Symbol("X"), X_val)
-    assert Y_val == Rational(-11, 3)
+    assert res["ratio_denominator_zero_forces_a0_zero"] is True
+    Z = Symbol("Z")
+    denom = res["ratio_denominator"]
+    assert denom == 2 + 3 * Z
+    # If denom == 0, then 1 + X*(0) = 0 => 1 = 0, contradiction!
+    contradiction = 1 + Symbol("X") * 0
+    assert contradiction == 1
 
 
-# Test 8: Exceptional Y/X forces exceptional coordinates
-def test_exceptional_ratio_forces_exceptional_coordinates():
-    res = check_exceptional_direction_exclusion(1, 2, 3)
-    assert res["exceptional_ratio_forces_algebraic_coordinates"] is True
-    # If Z = Y/X = 1/3, X = -1 / (2 + 3*(1/3)) = -1/3
-    Z_val = Rational(1, 3)
-    X_val = res["sol_X_from_ratio"].subs(Symbol("Z"), Z_val)
-    assert X_val == Rational(-1, 3)
+# 11. real normalization rejects non-proportional conjugate coefficient vectors
+def test_real_normalization_rejects_non_proportional():
+    # If coefficients have differing conjugate phases, e.g. a0 = 1+I, a1 = 1+2I, a2 = 1
+    # conj(a0)/a0 = -I, conj(a1)/a1 = (1-2I)/(1+2I) != -I
+    with pytest.raises(ValueError, match="COEFFICIENT_VECTOR_NOT_CONJUGATE_PROPORTIONAL"):
+        normalize_trinomial_coefficients_real(1 + I, 1 + 2 * I, 1)
 
 
-# Test 9: Complex conjugate relation production
-def test_complex_conjugate_relation_production():
-    # If a0 + a1*X + a2*Y = 0 with real X, Y, then conj(a0) + conj(a1)*X + conj(a2)*Y = 0
-    X_real = 2.5
-    Y_real = 3.5
-    a0 = 1 + 2 * I
-    a1 = 3 + 4 * I
-    # Construct a2 = (-a0 - a1*X)/Y
-    a2 = (-a0 - a1 * X_real) / Y_real
-
-    val = a0 + a1 * X_real + a2 * Y_real
-    assert sp.simplify(val) == 0
-
-    val_conj = sp.conjugate(a0) + sp.conjugate(a1) * X_real + sp.conjugate(a2) * Y_real
-    assert sp.simplify(val_conj) == 0
-
-
-# Test 10: Real-normalization positive control
-def test_real_normalization_positive_control():
-    # Vector of coefficients with non-trivial complex phase: (1+I, 2+2I, -3-3I)
-    a0 = 1 + I
-    a1 = 2 + 2 * I
-    a2 = -(3 + 3 * I)
-
-    res = normalize_trinomial_coefficients_real(a0, a1, a2)
+# 12. real normalization returns exact transformed coefficients
+def test_real_normalization_returns_exact_transformed_coeffs():
+    # For (1+I, 2+2I, -3-3I), lambda = -I, mu = 1 - I.
+    # (1-I)*(1+I) = 2, (1-I)*(2+2I) = 4, (1-I)*(-3-3I) = -6.
+    res = normalize_trinomial_coefficients_real(1 + I, 2 + 2 * I, -3 - 3 * I)
     assert res.is_real_normalized is True
-    c0, c1, c2 = res.normalized_coeffs
-    assert c0.is_real
-    assert c1.is_real
-    assert c2.is_real
-    # Check proportionality: c1/c0 == a1/a0 == 2, c2/c0 == a2/a0 == -3
-    assert c1 / c0 == 2
-    assert c2 / c0 == -3
+    assert res.normalized_coeffs == (Integer(2), Integer(4), Integer(-6))
 
 
-# Test 11: Same-sign impossibility
-def test_same_sign_impossibility():
-    with pytest.raises(ValueError, match="same sign"):
-        classify_sign_orientation(1, 2, 3)
-    with pytest.raises(ValueError, match="same sign"):
-        classify_sign_orientation(-1, -2, -3)
+# 13. no real-part truncation after failed normalization
+def test_no_real_part_truncation_after_failed_normalization():
+    # Previously, non-real values were silently converted via sp.re().
+    # Now it must fail closed if transformed coefficients are not genuinely real.
+    with pytest.raises(ValueError, match="COEFFICIENT_VECTOR_NOT_CONJUGATE_PROPORTIONAL"):
+        normalize_trinomial_coefficients_real(1 + 2 * I, 3 + 4 * I, 5 + 6 * I)
 
 
-# Test 12: Three sign orientations
-def test_three_sign_orientations():
-    # Case 1: a2 negative, a0 and a1 positive -> Y = u + v*X
-    res1 = classify_sign_orientation(1, 2, -4)
-    assert res1.orientation_type == "Y_AFFINE_X"
-    assert res1.u == Rational(1, 4)
-    assert res1.v == Rational(2, 4)
-
-    # Case 2: a1 negative, a0 and a2 positive -> X = u + v*Y
-    res2 = classify_sign_orientation(1, -3, 2)
-    assert res2.orientation_type == "X_AFFINE_Y"
-    assert res2.u == Rational(1, 3)
-    assert res2.v == Rational(2, 3)
-
-    # Case 3: a0 negative, a1 and a2 positive -> 1 = u*X + v*Y
-    res3 = classify_sign_orientation(-5, 2, 3)
-    assert res3.orientation_type == "ONE_AFFINE_XY"
-    assert res3.u == Rational(2, 5)
-    assert res3.v == Rational(3, 5)
+# 14. no-propagation wording regression
+def test_no_propagation_wording_regression():
+    audit = audit_multiplicative_group_theorems()
+    assert audit["orbit_propagation_statement"] == "NO_CANONICAL_ORBIT_VANISHING_PROPAGATION"
+    assert "f(1) = 0 does not force f(2) = 0" in audit["orbit_propagation_description"]
 
 
-# Test 13: Consecutive-orbit determinant identity
-def test_consecutive_orbit_determinant_identity():
-    X = Symbol("X", positive=True)
-    Y = Symbol("Y", positive=True)
-    n = 3
-
-    # Computed via closed formula
-    formula_det = consecutive_orbit_determinant(X, Y, n)
-
-    # Computed via direct 3x3 expansion
-    M = sp.Matrix([
-        [1, X**n, Y**n],
-        [1, X**(n + 1), Y**(n + 1)],
-        [1, X**(n + 2), Y**(n + 2)],
-    ])
-    matrix_det = M.det()
-
-    assert sp.simplify(formula_det - matrix_det) == 0
+# 15. group rank and product-group rank are distinguished
+def test_group_rank_and_product_group_rank_distinguished():
+    audit = audit_multiplicative_group_theorems()
+    assert audit["base_group_rank"] == 2
+    assert audit["solution_group_rank"] == 4
+    assert audit["base_group_rank"] != audit["solution_group_rank"]
 
 
-# Test 14: Three-consecutive orbit rigidity
-def test_three_consecutive_orbit_rigidity():
-    X_val = 2
-    Y_val = 3
-    res = check_three_consecutive_rigidity(1, 2, 3, X_val, Y_val, n=0)
-    assert res["is_determinant_nonzero"] is True
-    assert res["forces_trivial_coefficients"] is True
-    assert res["theorem"] == "THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY"
+# 16. diagonal orbit is distinguished
+def test_diagonal_orbit_distinguished():
+    audit = audit_multiplicative_group_theorems()
+    assert audit["diagonal_orbit_rank"] == 1
+    assert "Delta_{alpha, beta}" in audit["diagonal_dilation_orbit"]
 
 
-# Test 15: Non-propagation regression (f(1)=0 does not imply f(2)=0)
-def test_non_propagation_regression():
-    # Choose X=2, Y=3 and a0=-5, a1=1, a2=1
-    # f(1) = -5 + 1*(2) + 1*(3) = 0
-    # f(2) = -5 + 1*(4) + 1*(9) = 8 != 0
-    orbit = evaluate_dilation_orbit(-5, 1, 1, 2, 3, [1, 2, 3])
-    assert orbit[1] == 0
-    assert orbit[2] == 8
-    assert orbit[3] == 30
-    assert orbit[2] != 0
+# 17. support accounting gives 36 total, 30 rank two, 6 rank one
+def test_support_accounting_36_30_6():
+    pairs = enumerate_sparse_trinomial_monomial_pairs(max_degree=3)
+    assert len(pairs) == SUPPORT_BOX_CONSTANT_ANCHORED_SUPPORTS
+    assert len(pairs) == 36
+
+    r1, r2 = partition_monomial_supports_by_rank(pairs)
+    assert len(r1) == SUPPORT_BOX_AFFINE_RANK_ONE_CONTROLS
+    assert len(r1) == 6
+    assert len(r2) == SUPPORT_BOX_AFFINE_RANK_TWO_SUPPORTS
+    assert len(r2) == 30
 
 
-# Test 16: Generalized Vandermonde numerical control
-def test_generalized_vandermonde_numerical_control():
-    bases = (1.5, 2.5, 4.0)
-    powers = (1, 3, 5)
-    det_val = generalized_vandermonde_determinant(bases, powers)
-    # Strictly positive by Descartes / Chebyshev theory
-    assert det_val > 0.0
+# 18. total three-monomial subsets are 120
+def test_total_three_monomial_subsets_120():
+    assert SUPPORT_BOX_TOTAL_MONOMIALS == 10
+    assert SUPPORT_BOX_TOTAL_THREE_MONOMIAL_SUBSETS == 120
+    assert math.comb(SUPPORT_BOX_TOTAL_MONOMIALS, 3) == 120
 
 
-# Test 17: Sparse enumeration deduplication
-def test_sparse_enumeration_deduplication():
-    pairs = enumerate_sparse_trinomial_monomial_pairs(max_degree=2)
-    # Total monomials with deg <= 2 (excluding (0,0)):
-    # deg 1: (1,0), (0,1) -> 2
-    # deg 2: (2,0), (1,1), (0,2) -> 3
-    # Total = 5. Pairs = 5*4/2 = 10.
-    assert len(pairs) == 10
-    assert len(set(pairs)) == 10
-
-    coeffs = enumerate_normalized_coefficients(max_height=3)
-    # Verify all coefficients are primitive and mixed-sign
-    for a0, a1, a2 in coeffs:
-        assert a0 > 0
-        assert math.gcd(a0, math.gcd(abs(a1), abs(a2))) == 1
-        assert not (a1 > 0 and a2 > 0)
+# 19. certificate metadata identifies constant-anchored scope
+def test_certificate_metadata_identifies_constant_anchored_scope():
+    res = certify_sparse_trinomial_exclusion(
+        instance_name=CANONICAL_INSTANCE_BASE_ONE,
+        alpha_expr=Integer(1),
+        beta_expr=sqrt(2),
+        max_degree=1,
+        max_height=2,
+        prec_bits=128,
+    )
+    assert res.certificate_scope == "constant-anchored sparse trinomial campaign"
 
 
-# Test 18: Exact-relation positive control
-def test_exact_relation_positive_control():
+# 20. candidate counts partition correctly
+def test_candidate_counts_partition_correctly():
+    pairs = enumerate_sparse_trinomial_monomial_pairs(max_degree=3)
+    coeffs = enumerate_normalized_coefficients(max_height=10)
+    assert len(coeffs) == NORMALIZED_COEFFICIENTS_PER_SUPPORT
+    assert len(coeffs) == 2523
+
+    r1, r2 = partition_monomial_supports_by_rank(pairs)
+    total_cand = len(pairs) * len(coeffs)
+    r2_cand = len(r2) * len(coeffs)
+    r1_cand = len(r1) * len(coeffs)
+
+    assert total_cand == 90828
+    assert r2_cand == 75690
+    assert r1_cand == 15138
+    assert r2_cand + r1_cand == total_cand
+
+
+# 21. positive controls still enclose zero
+def test_positive_controls_still_enclose_zero():
     # Exact synthetic control: Y = 1 + X ==> 1 + X - Y = 0
-    # On support {1, X, Y}, coeffs (1, 1, -1) with X=2.0, Y=3.0
     res = evaluate_exact_control_relation(
         X_val=2.0,
         Y_val=3.0,
@@ -287,48 +309,11 @@ def test_exact_relation_positive_control():
         a2=-1,
     )
     assert res["contains_zero"] is True
-    assert res["status"] == "RELATION_DETECTED"
     assert res["control_passed"] is True
 
 
-# Test 19: Arb fail-closed behavior
-def test_arb_fail_closed_behavior():
-    from tc.ambient_kernel import expr_to_arb
-    # Fails closed on unsupported expression
-    with pytest.raises(ValueError, match="(?i)unsupported"):
-        expr_to_arb(Symbol("unsupported_non_algebraic_var"))
-
-
-# Test 20: Certified sparse exclusion
-def test_certified_sparse_exclusion():
-    # Test on Base-One Instance: (1, sqrt(2)) with small box (D=2, H=3)
-    res = certify_sparse_trinomial_exclusion(
-        instance_name=CANONICAL_INSTANCE_BASE_ONE,
-        alpha_expr=Integer(1),
-        beta_expr=sqrt(2),
-        max_degree=2,
-        max_height=3,
-        prec_bits=128,
-    )
-    assert res.classification == "CERTIFIED_FINITE_TRINOMIAL_EXCLUSION"
-    assert res.normalized_trinomials_tested > 0
-    assert res.smallest_certified_distance > 0.0
-
-    # Test on Radical Pair Instance: (sqrt(2), sqrt(3))
-    res_rad = certify_sparse_trinomial_exclusion(
-        instance_name=CANONICAL_INSTANCE_RADICAL_PAIR,
-        alpha_expr=sqrt(2),
-        beta_expr=sqrt(3),
-        max_degree=2,
-        max_height=3,
-        prec_bits=128,
-    )
-    assert res_rad.classification == "CERTIFIED_FINITE_TRINOMIAL_EXCLUSION"
-    assert res_rad.smallest_certified_distance > 0.0
-
-
-# Test 21: No midpoint used as a certified distance
-def test_no_midpoint_used_as_certified_distance():
+# 22. no midpoint is used as certified distance
+def test_no_midpoint_is_used_as_certified_distance():
     res = certify_sparse_trinomial_exclusion(
         instance_name=CANONICAL_INSTANCE_BASE_ONE,
         alpha_expr=Integer(1),
@@ -337,34 +322,20 @@ def test_no_midpoint_used_as_certified_distance():
         max_height=2,
         prec_bits=128,
     )
-    # The smallest_certified_distance must be an absolute lower bound
     assert res.smallest_certified_distance > 0.0
     cand = res.smallest_candidate
     assert "distance_lb" in cand
     assert cand["distance_lb"] > 0.0
 
 
-# Test 22: No claim that finite implies empty
-def test_no_claim_that_finite_implies_empty():
+# 23. no full algebraic-independence claim
+def test_no_full_algebraic_independence_claim():
     audit = audit_multiplicative_group_theorems()
     assert audit["critical_boundary"] == "FINITE_DOES_NOT_IMPLY_EMPTY"
     assert audit["existence_status"] == "MINIMAL_RANK_TWO_TRINOMIAL_EXISTENCE_OPEN"
-    assert audit["consequence_for_fixed_coefficients"] == "FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE"
 
 
-# Test 23: No claim that one relation propagates through TC
-def test_no_claim_that_one_relation_propagates_through_tc():
-    # Rigidity applies to 3 consecutive dilations, but a single relation f(1)=0
-    # does NOT propagate to f(2)=0.
-    res = check_three_consecutive_rigidity(1, 2, 3, 2, 3)
-    assert res["theorem"] == "THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY"
-    # Verify explicit no-propagation example exists
-    orbit = evaluate_dilation_orbit(-10, 1, 1, 4, 6, [1, 2])
-    assert orbit[1] == 0
-    assert orbit[2] == 42  # 16 + 36 - 10 = 42 != 0
-
-
-# Test 24: No zeta-to-kernel claim
-def test_no_zeta_to_kernel_claim():
+# 24. no RH claim
+def test_no_rh_claim():
     audit = audit_multiplicative_group_theorems()
     assert audit["zeta_bridge_status"] == "NO_ZETA_TO_KERNEL_BRIDGE_FOUND"

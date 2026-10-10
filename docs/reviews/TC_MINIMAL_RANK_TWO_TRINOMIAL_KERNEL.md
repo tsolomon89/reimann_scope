@@ -1,9 +1,11 @@
 # TASK-TC-030 Review: Minimal Rank-Two Trinomial Kernel, Relation-Space Rigidity, and Sparse Orbit Theorems
 
 **Authoritative Status**: Research Review & Derivation Artifact  
-**Task ID**: TASK-TC-030  
-**Baseline Git HEAD**: `ae8a8dd6e39bb8d713cfc92fbf0dce38ad6fd090`  
+**Task ID**: TASK-TC-030 / TASK-TC-030R  
+**Baseline Git HEAD**: `f74fb15987bdedb6c5d845929df5634bb0c7fc6a`  
+**Substantive Parent**: `74469d360fbfdf3fe80370199ed36a83b62816f9`  
 **Primary Classification**: `TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN`  
+**Task Classification**: `TASK_TC_030R_TRINOMIAL_REPAIR_COMPLETE`  
 **Lean Formalization**: `formal/RiemannScope/TrinomialKernel.lean` (12 declarations compiled, 0 sorry, total 501 declarations)  
 **Machine-Readable Data**: `data/tc_minimal_rank_two_trinomial_kernel.json`  
 
@@ -20,20 +22,20 @@ TASK-TC-029 settled:
 The first genuinely unresolved kernel object is therefore not a generic polynomial. It is a **minimal-support relation with three nonzero terms and affine support rank two**:
 $$a_0 + a_1 \tau^\alpha + a_2 \tau^\beta = 0, \qquad a_0, a_1, a_2 \in \overline{\mathbb{Q}}^\times, \quad \frac{\alpha}{\beta} \notin \mathbb{Q}.$$
 
-TASK-TC-030 establishes the complete structural theory of this trinomial frontier:
-- **Relation-Space Rigidity**: $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. Two independent relations force algebraic coordinates, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$.
+TASK-TC-030 and TASK-TC-030R establish the complete structural theory of this trinomial frontier:
+- **Relation-Space Rigidity**: $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. Two independent relations force algebraic coordinates, contradicting $\dim_{\mathbb{Q}} S_\tau \le 1$ via Gelfond-Schneider.
 - **Pairwise Exceptional-Direction Exclusion**: $\alpha \notin S_\tau$, $\beta \notin S_\tau$, and $\beta - \alpha \notin S_\tau$.
-- **Real Coefficient Normalization**: Complex conjugation and 1-dimensionality force $(a_0, a_1, a_2)$ to be algebraically equivalent to a real algebraic triple in $\mathbb{A}_{\mathbb{R}}^\times$.
+- **Real Coefficient Normalization**: Direct elementary proof shows that complex conjugation and 1-dimensionality force $(a_0, a_1, a_2)$ to be algebraically equivalent to a real algebraic triple in $\mathbb{A}_{\mathbb{R}}^\times$.
 - **Sign Geometry**: Same-sign coefficients cannot vanish with positive generators. Every relation orients into positive affine forms: $Y = u + vX$, $X = u + vY$, or $1 = uX + vY$ ($u, v > 0$).
 - **Three-Consecutive Orbit Rigidity**: Nonzero trinomials cannot vanish on three consecutive integer dilations $f(n) = f(n+1) = f(n+2) = 0$.
-- **Multiplicative-Group Finiteness**: By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), for each fixed coefficient triple, solutions $(u, v) \in \Gamma^2$ are finite. However, **`FINITE_DOES_NOT_IMPLY_EMPTY`**; existence of one relation remains open.
-- **Certified Sparse Exclusion**: Certified interval arithmetic (python-flint Arb at 128-bit precision) excludes all $90,828$ normalized trinomials across 36 supports up to degree $D=3$ and height $H=10$ on both canonical rank-two instances.
+- **Multiplicative-Group Finiteness**: By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), for each fixed coefficient triple, solutions $(u, v) \in \Gamma_0 \times \Gamma_0$ are finite. However, **`FINITE_DOES_NOT_IMPLY_EMPTY`**; existence of one relation remains open.
+- **Certified Sparse Exclusion**: Certified interval arithmetic (python-flint Arb at 128-bit precision) excludes all $90,828$ normalized trinomials across 36 constant-anchored supports (30 rank-two, 6 rank-one controls) up to degree $D=3$ and height $H=10$ on both canonical rank-two instances.
 
 ---
 
 ## A. Why Three Terms are the First Open Support
 
-Let $F = \sum_{j=1}^m c_j [K_j] \in \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ be a nonzero kernel element with minimal support among nonempty vanishing subsums.
+Let $F = \sum_{j=1}^m c_j [K_j] \in \overline{\mathbb{Q}}[\mathbb{A}_{\mathbb{R}}]$ be a nonzero kernel element with minimal support among nonempty vanishing subsums, canonicalized via `canonicalize_group_algebra_terms`.
 
 1. **Support Size $m = 1$**:
    $$c_0 \tau^{K_0} = 0.$$
@@ -80,21 +82,29 @@ Let $\alpha, \beta \in \mathbb{A}_{\mathbb{R}}$ be $\mathbb{Q}$-linearly indepen
 $$\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1.$$
 If a nonzero relation exists, $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} = 1$.
 
-### Proof
+**Evidence Class**: `PROVED_PAPER_DERIVATION` + `PROVED_WITH_EXTERNAL_GELFOND_SCHNEIDER`.  
+**Lean Core**: `RiemannScope.trinomial_two_relations_cramer`.
+
+### Invariant Proof
 Suppose $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \ge 2$.
 Then there exist two $\overline{\mathbb{Q}}$-linearly independent relation vectors $(a_0, a_1, a_2)$ and $(b_0, b_1, b_2)$ such that:
 $$a_0 + a_1 X + a_2 Y = 0, \qquad b_0 + b_1 X + b_2 Y = 0.$$
-Consider the linear system for $(X, Y)$:
-$$\begin{pmatrix} a_1 & a_2 \\ b_1 & b_2 \end{pmatrix} \begin{pmatrix} X \\ Y \end{pmatrix} = \begin{pmatrix} -a_0 \\ -b_0 \end{pmatrix}.$$
-Let $\Delta = a_1 b_2 - a_2 b_1$.
-1. If $\Delta \ne 0$, by Cramer's rule:
-   $$X = \frac{a_2 b_0 - a_0 b_2}{a_1 b_2 - a_2 b_1} \in \overline{\mathbb{Q}}, \qquad Y = \frac{a_0 b_1 - a_1 b_0}{a_1 b_2 - a_2 b_1} \in \overline{\mathbb{Q}}.$$
-   (Formalized in Lean 4: `trinomial_two_relations_cramer`).
-2. If $\Delta = 0$, then $(a_1, a_2)$ and $(b_1, b_2)$ are proportional over $\overline{\mathbb{Q}}$. Since the vectors $(a_0, a_1, a_2)$ and $(b_0, b_1, b_2)$ are linearly independent, subtracting a suitable scalar multiple yields a relation with $a_1' = a_2' = 0$ and $a_0' \ne 0$, so $a_0' \cdot 1 = 0$, contradiction.
-
-Thus $\Delta \ne 0$ and both $X = \tau^\alpha$ and $Y = \tau^\beta$ are algebraic:
+Form the $2 \times 3$ algebraic coefficient matrix:
+$$M = \begin{pmatrix} a_0 & a_1 & a_2 \\ b_0 & b_1 & b_2 \end{pmatrix}.$$
+Because the rows are linearly independent over $\overline{\mathbb{Q}}$, $\operatorname{rank}_{\overline{\mathbb{Q}}}(M) = 2$.
+The right nullspace $\ker(M) \subset \mathbb{C}^3$ is 1-dimensional and spanned by the vector of signed $2 \times 2$ minors:
+$$\mathbf{v} = (\Delta_0, -\Delta_1, \Delta_2),$$
+where:
+$$\Delta_0 = a_1 b_2 - a_2 b_1, \qquad \Delta_1 = a_0 b_2 - a_2 b_0, \qquad \Delta_2 = a_0 b_1 - a_1 b_0.$$
+Because $(1, X, Y)^T \in \ker(M)$ and $\dim \ker(M) = 1$, $(1, X, Y)^T = c \cdot \mathbf{v}$ for some $c \in \mathbb{C}^\times$.
+Examining the first coordinate:
+$$1 = c \cdot \Delta_0.$$
+Therefore $\Delta_0 \ne 0$ is **strictly guaranteed** whenever $(1, X, Y)$ satisfies both relations, and $c = 1 / \Delta_0$.
+Solving explicitly:
+$$X = -\frac{\Delta_1}{\Delta_0} = \frac{a_2 b_0 - a_0 b_2}{a_1 b_2 - a_2 b_1} \in \overline{\mathbb{Q}}, \qquad Y = \frac{\Delta_2}{\Delta_0} = \frac{a_0 b_1 - a_1 b_0}{a_1 b_2 - a_2 b_1} \in \overline{\mathbb{Q}}.$$
+Thus both $X = \tau^\alpha$ and $Y = \tau^\beta$ are algebraic:
 $$\tau^\alpha \in \overline{\mathbb{Q}} \implies \alpha \in S_\tau, \qquad \tau^\beta \in \overline{\mathbb{Q}} \implies \beta \in S_\tau.$$
-By external Gelfond-Schneider / Baker transcendence theory, $\dim_{\mathbb{Q}} S_\tau \le 1$.
+By the external Gelfond-Schneider / Baker theorem, $\dim_{\mathbb{Q}} S_\tau \le 1$.
 Consequently, any two elements of $S_\tau$ are $\mathbb{Q}$-linearly dependent.
 However, by hypothesis, $\alpha / \beta \notin \mathbb{Q}$, so $\alpha$ and $\beta$ are $\mathbb{Q}$-linearly independent. Contradiction.
 Therefore $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. $\blacksquare$
@@ -107,20 +117,22 @@ Therefore $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$. $\bl
 Assume there exists a nondegenerate relation $a_0 + a_1 X + a_2 Y = 0$ ($a_0 a_1 a_2 \ne 0$). Then:
 $$\alpha \notin S_\tau, \qquad \beta \notin S_\tau, \qquad \beta - \alpha \notin S_\tau.$$
 
+**Evidence Class**: `LEAN_PROVED_SOLVING_IDENTITIES` feeding `PROVED_PAPER_DERIVATION` + `EXTERNAL_GELFOND_SCHNEIDER`.
+
 ### Proof
 1. If $\alpha \in S_\tau$, then $X \in \overline{\mathbb{Q}}$. Since $a_2 \ne 0$:
    $$Y = \frac{-a_0 - a_1 X}{a_2} \in \overline{\mathbb{Q}}.$$
-   Then $\beta \in S_\tau$, which forces $\alpha / \beta \in \mathbb{Q}$, contradiction. (Lean 4: `trinomial_exceptional_x_forces_exceptional_y`).
+   Then $\beta \in S_\tau$, which forces $\alpha / \beta \in \mathbb{Q}$, contradiction. (Lean 4: `RiemannScope.trinomial_exceptional_x_forces_exceptional_y`).
 2. If $\beta \in S_\tau$, then $Y \in \overline{\mathbb{Q}}$. Since $a_1 \ne 0$:
    $$X = \frac{-a_0 - a_2 Y}{a_1} \in \overline{\mathbb{Q}},$$
-   similarly forcing $\alpha \in S_\tau$, contradiction. (Lean 4: `trinomial_exceptional_y_forces_exceptional_x`).
+   similarly forcing $\alpha \in S_\tau$, contradiction. (Lean 4: `RiemannScope.trinomial_exceptional_y_forces_exceptional_x`).
 3. If $\beta - \alpha \in S_\tau$, then $Z = Y / X = \tau^{\beta - \alpha} \in \overline{\mathbb{Q}}^\times$.
    Dividing the relation by $X > 0$:
    $$\frac{a_0}{X} + a_1 + a_2 Z = 0 \implies \frac{a_0}{X} = -a_1 - a_2 Z.$$
-   If $-a_1 - a_2 Z = 0$, then $a_0 / X = 0 \implies a_0 = 0$, contradicting nondegeneracy.
-   Thus $-a_1 - a_2 Z \ne 0$, and:
+   If $a_1 + a_2 Z = 0$, then $a_0 / X = 0 \implies a_0 = 0$, contradicting nondegeneracy ($a_0 \ne 0$).
+   Thus $a_1 + a_2 Z \ne 0$, and:
    $$X = \frac{-a_0}{a_1 + a_2 Z} \in \overline{\mathbb{Q}}^\times.$$
-   This forces $X \in \overline{\mathbb{Q}}$, hence $\alpha \in S_\tau$, reducing to Case 1. (Lean 4: `trinomial_exceptional_ratio_forces_exceptional_coordinates`). $\blacksquare$
+   This forces $X \in \overline{\mathbb{Q}}$, hence $\alpha \in S_\tau$, reducing to Case 1. (Lean 4: `RiemannScope.trinomial_exceptional_ratio_forces_exceptional_coordinates`). $\blacksquare$
 
 ---
 
@@ -129,22 +141,25 @@ $$\alpha \notin S_\tau, \qquad \beta \notin S_\tau, \qquad \beta - \alpha \notin
 ### Theorem (`TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE`)
 If a nondegenerate trinomial relation exists with coefficients in $\overline{\mathbb{Q}}$, it is algebraically equivalent to one with coefficients in $\mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$.
 
-### Proof
+**Evidence Class**: `PROVED_PAPER_DERIVATION`.
+
+### Direct Elementary Proof
 Since $\tau > 0$ and $\alpha, \beta \in \mathbb{R}$, the generators $X = \tau^\alpha > 0$ and $Y = \tau^\beta > 0$ are real numbers.
 Taking complex conjugation of $a_0 + a_1 X + a_2 Y = 0$:
 $$\overline{a_0} + \overline{a_1} X + \overline{a_2} Y = 0.$$
 Thus $(\overline{a_0}, \overline{a_1}, \overline{a_2}) \in \mathcal{R}_{\alpha, \beta}$.
-By Section C, $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} = 1$.
+By Section C, $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \le 1$.
 Therefore:
 $$(\overline{a_0}, \overline{a_1}, \overline{a_2}) = \lambda (a_0, a_1, a_2)$$
 for some $\lambda \in \overline{\mathbb{Q}}^\times$.
-Conjugating again yields $a_j = \overline{\lambda} \, \overline{a_j} = |\lambda|^2 a_j$, so $|\lambda|^2 = 1$.
-We seek $\mu \in \overline{\mathbb{Q}}^\times$ such that $\mu a_j \in \mathbb{R}$ for all $j$:
-$$\overline{\mu a_j} = \mu a_j \iff \overline{\mu} \lambda a_j = \mu a_j \iff \mu = \overline{\mu} \lambda.$$
-- If $\lambda = -1$: $\overline{a_j} = -a_j$, so $a_j \in i \mathbb{R}$. Setting $\mu = i \in \overline{\mathbb{Q}}^\times$ gives $\mu a_j = i a_j \in \mathbb{R}$.
-- If $\lambda \ne -1$: Choose $\mu = 1 + \lambda \in \overline{\mathbb{Q}}^\times$.
-  Then $\overline{\mu} = 1 + \overline{\lambda} = 1 + \lambda^{-1} = \frac{\lambda + 1}{\lambda} = \frac{\mu}{\lambda}$, so $\overline{\mu} \lambda = \mu$.
-Thus $(\mu a_0, \mu a_1, \mu a_2) \in \mathbb{A}_{\mathbb{R}}^3 \setminus \{(0,0,0)\}$. $\blacksquare$
+Conjugating again yields $a_j = \overline{\lambda} \, \overline{a_j} = \lambda \overline{\lambda} a_j$, so $\lambda \overline{\lambda} = 1$.
+We choose the phase multiplier:
+$$\mu = \begin{cases} 1 + \lambda & \text{if } \lambda \ne -1, \\ i & \text{if } \lambda = -1. \end{cases}$$
+Then:
+- If $\lambda = -1$: $\overline{\mu a_j} = -i \overline{a_j} = -i (-a_j) = i a_j = \mu a_j$.
+- If $\lambda \ne -1$:
+  $$\overline{\mu a_j} = (1 + \overline{\lambda}) \overline{a_j} = (1 + \overline{\lambda}) \lambda a_j = (\lambda + \lambda \overline{\lambda}) a_j = (\lambda + 1) a_j = \mu a_j.$$
+Thus $\mu a_j \in \mathbb{A}_{\mathbb{R}}$ for all $j$, and every nonzero trinomial relation can be rescaled to real algebraic coefficients. $\blacksquare$
 
 ---
 
@@ -154,11 +169,9 @@ Thus $(\mu a_0, \mu a_1, \mu a_2) \in \mathbb{A}_{\mathbb{R}}^3 \setminus \{(0,0
 Let $a_0 + a_1 X + a_2 Y = 0$ be a normalized real relation with $a_0, a_1, a_2 \in \mathbb{A}_{\mathbb{R}}^\times$ and $X, Y > 0$.
 Then the coefficients cannot all have the same sign. Exactly one coefficient has sign opposite to the other two.
 
-### Proof
-If $a_0, a_1, a_2 > 0$, then $a_0 + a_1 X + a_2 Y > 0$, impossible. (Lean 4: `trinomial_same_sign_pos_impossible`).  
-If $a_0, a_1, a_2 < 0$, then $a_0 + a_1 X + a_2 Y < 0$, impossible. (Lean 4: `trinomial_same_sign_neg_impossible`).  
-Among three nonzero real numbers with mixed signs, either one is positive and two are negative, or one is negative and two are positive.
-Multiplying by $\pm 1$ gives exactly three positive affine orientations:
+**Evidence Class**: `LEAN_PROVED` (`RiemannScope.trinomial_same_sign_pos_impossible`, `RiemannScope.trinomial_same_sign_neg_impossible`).
+
+Multiplying by $\pm 1$ gives exactly three positive affine orientations ($u, v \in \mathbb{A}_{\mathbb{R}}^{>0}$):
 1. **$Y$ affine in $X$**: $a_2$ opposite sign $\implies Y = u + vX$ with $u = -a_0/a_2 > 0, v = -a_1/a_2 > 0$.
 2. **$X$ affine in $Y$**: $a_1$ opposite sign $\implies X = u + vY$ with $u = -a_0/a_1 > 0, v = -a_2/a_1 > 0$.
 3. **Unit affine in $X, Y$**: $a_0$ opposite sign $\implies 1 = uX + vY$ with $u = -a_1/a_0 > 0, v = -a_2/a_0 > 0$. $\blacksquare$
@@ -170,28 +183,23 @@ Multiplying by $\pm 1$ gives exactly three positive affine orientations:
 Define the affine exceptional relation locus:
 $$\mathcal{A}_\tau = \left\{ (\alpha, \beta) \in \mathbb{A}_{\mathbb{R}}^2 : 1, \tau^\alpha, \tau^\beta \text{ are linearly dependent over } \overline{\mathbb{Q}} \right\}.$$
 
-### Distinction from $S_\tau$:
-- If $\alpha \in S_\tau$ or $\beta \in S_\tau$, then $(\alpha, \beta) \in \mathcal{A}_\tau$ trivially via a 2-term subrelation.
-- If $\alpha / \beta \in \mathbb{Q}$, then $(\alpha, \beta) \in \mathcal{A}_\tau \iff \alpha \in S_\tau$.
-- The **genuine minimal rank-two locus** is:
-  $$\mathcal{A}_\tau^\circ = \mathcal{A}_\tau \setminus \left( (S_\tau \times \mathbb{A}_{\mathbb{R}}) \cup (\mathbb{A}_{\mathbb{R}} \times S_\tau) \cup \{(\alpha, \beta) : \beta - \alpha \in S_\tau\} \cup \{(\alpha, \beta) : \alpha / \beta \in \mathbb{Q}\} \right).$$
+The genuine minimal rank-two locus is:
+$$\mathcal{A}_\tau^\circ = \mathcal{A}_\tau \setminus \left( (S_\tau \times \mathbb{A}_{\mathbb{R}}) \cup (\mathbb{A}_{\mathbb{R}} \times S_\tau) \cup \{(\alpha, \beta) : \beta - \alpha \in S_\tau\} \cup \{(\alpha, \beta) : \alpha / \beta \in \mathbb{Q}\} \right).$$
 The open question is whether $\mathcal{A}_\tau^\circ$ is empty.
 
 ---
 
-## H. Grade-Dilation Orbit
+## H. Grade-Dilation Orbit & No Propagation
 
 Given a candidate relation $f(1) = a_0 + a_1 X + a_2 Y = 0$, define the grade-dilation sequence:
 $$f(n) = a_0 + a_1 X^n + a_2 Y^n, \qquad n \in \mathbb{Z}.$$
-This corresponds to dilating the nonzero grades by common integer factor $n$:
-$$a_0 \tau^0 + a_1 \tau^{n\alpha} + a_2 \tau^{n\beta} = f(n).$$
 
-### No Canonical Propagation:
-$f(1) = 0$ imposes **no automatic constraint** on $f(2), f(3), \ldots$:
+### Theorem (`NO_CANONICAL_ORBIT_VANISHING_PROPAGATION`)
+A single relation $f(1) = 0$ **does not force** $f(2) = 0, f(3) = 0$, or any further orbit vanishing:
 - Example: $X = 2, Y = 3$ with $a_0 = -5, a_1 = 1, a_2 = 1$.
   $f(1) = -5 + 2 + 3 = 0$.
   $f(2) = -5 + 4 + 9 = 8 \ne 0$.
-TC transport does not imply $f(1) = 0 \implies f(2) = 0$.
+TC transport does not produce an automatic contradictory chain of zero equations.
 
 ---
 
@@ -202,25 +210,22 @@ Let $1, X, Y$ be pairwise distinct positive reals. If for some integer $n$,
 $$f(n) = f(n+1) = f(n+2) = 0,$$
 then $a_0 = a_1 = a_2 = 0$.
 
+**Evidence Class**: `LEAN_PROVED` (`RiemannScope.trinomial_three_consecutive_orbit_rigidity`).
+
 ### Proof
 The system is $M_n \mathbf{a} = \mathbf{0}$, where:
-$$M_n = \begin{pmatrix} 1 & X^n & Y^n \\ 1 & X^{n+1} & Y^{n+1} \\ 1 & X^{n+2} & Y^{n+2} \end{pmatrix}.$$
-Subtract row 1 from row 2 and row 2 from row 3:
 $$\det(M_n) = X^n Y^n (X - 1)(Y - 1)(Y - X).$$
-(Formalized in Lean 4: `trinomial_three_consecutive_orbit_determinant`).
-Since $X, Y > 0$ and $1, X, Y$ are pairwise distinct:
-$$X^n \ne 0, \quad Y^n \ne 0, \quad X - 1 \ne 0, \quad Y - 1 \ne 0, \quad Y - X \ne 0.$$
-Thus $\det(M_n) \ne 0$. (Lean 4: `trinomial_three_consecutive_orbit_det_ne_zero`).
-Since the determinant is nonzero, the only solution to $M_n \mathbf{a} = \mathbf{0}$ is $a_0 = a_1 = a_2 = 0$. (Lean 4: `trinomial_three_consecutive_orbit_rigidity`). $\blacksquare$
+(Lean 4: `RiemannScope.trinomial_three_consecutive_orbit_determinant`).
+Since $X, Y > 0$ and $1, X, Y$ are pairwise distinct, $\det(M_n) \ne 0$ (Lean 4: `RiemannScope.trinomial_three_consecutive_orbit_det_ne_zero`).
+Therefore $a_0 = a_1 = a_2 = 0$. $\blacksquare$
 
 ---
 
 ## J. Generalized Vandermonde Theorem
 
 For any three distinct integers $n_1 < n_2 < n_3$ and distinct positive bases $0 < x_1 < x_2 < x_3$:
-$$V(n_1, n_2, n_3) = \det \begin{pmatrix} x_1^{n_1} & x_2^{n_1} & x_3^{n_1} \\ x_1^{n_2} & x_2^{n_2} & x_3^{n_2} \\ x_1^{n_3} & x_2^{n_3} & x_3^{n_3} \end{pmatrix}.$$
-By the classical theory of generalized Vandermonde matrices / Chebyshev systems (Gantmacher & Krein 1950, Karlin 1968), $V(n_1, n_2, n_3) > 0$.
-Therefore, $f(n_1) = f(n_2) = f(n_3) = 0 \implies a_0 = a_1 = a_2 = 0$.
+$$V(n_1, n_2, n_3) = \det \begin{pmatrix} x_1^{n_1} & x_2^{n_1} & x_3^{n_1} \\ x_1^{n_2} & x_2^{n_2} & x_3^{n_2} \\ x_1^{n_3} & x_2^{n_3} & x_3^{n_3} \end{pmatrix} > 0.$$
+By Chebyshev system theory (Karlin 1968), $f(n_1) = f(n_2) = f(n_3) = 0 \implies a_0 = a_1 = a_2 = 0$.
 - Status: `PROVED_PAPER_DERIVATION` (general distinct integers); `LEAN_PROVED` for consecutive triples.
 
 ---
@@ -231,14 +236,12 @@ Primary literature reviewed:
 1. **Evertse (1984)**: *On sums of S-units and linear recurrences*, Invent. Math. 73, 117–137.
 2. **Evertse, Schlickewei, Schmidt (2002)**: *Linear equations in elements of groups of finite rank*, Ann. of Math. 155, 807–836.
 
-Let $\Gamma = \langle X, Y \rangle \subset \mathbb{R}_{>0}^\times$.
-Because $\alpha / \beta \notin \mathbb{Q}$, $X^u Y^v = 1 \implies u\alpha + v\beta = 0 \implies u = v = 0$.
-Thus $\Gamma \cong \mathbb{Z}^2$ is a free abelian group of rank 2.
-Consider the linear equation:
-$$a_0 + a_1 u + a_2 v = 0, \qquad (u, v) \in \Gamma^2.$$
-The Evertse-Schlickewei-Schmidt theorem bounds the number of nondegenerate solutions in terms of the rank $r = 2$ and the number of terms $k = 3$:
-$$\text{Number of solutions} \le A(3, 2) < \infty.$$
-Thus, for any **fixed** algebraic triple $(a_0, a_1, a_2)$, the number of solutions in $\Gamma^2$ is **finite**.
+### Exact Multiplicative Groups:
+1. **Base Group**: $\Gamma_0 = \langle X, Y \rangle \subset \mathbb{R}_{>0}^\times$. For $\alpha / \beta \notin \mathbb{Q}$, $\Gamma_0 \cong \mathbb{Z}^2$ (rank 2).
+2. **Ambient Solution Group**: The equation $a_0 + a_1 u + a_2 v = 0$ with independently varying $(u, v) \in \Gamma_0^2$ lives in $\Gamma_0 \times \Gamma_0$, a free abelian group of **rank 4**.
+3. **Diagonal Orbit Group**: $\Delta_{\alpha, \beta} = \{(X^n, Y^n) : n \in \mathbb{Z}\}$ is a cyclic group of **rank 1**.
+
+By the Evertse-Schlickewei-Schmidt theorem on linear equations in groups of finite rank, the number of nondegenerate solutions $(u, v) \in \Gamma_0 \times \Gamma_0$ to $a_0 + a_1 u + a_2 v = 0$ for a **fixed** algebraic triple $(a_0, a_1, a_2)$ is **finite**.
 
 ---
 
@@ -249,60 +252,55 @@ Primary literature reviewed:
 2. **Hindry (1988)**: *Autour d'une conjecture de Serge Lang*, Ann. of Math. 128, 97–137.
 
 ### Subtorus Non-Degeneracy:
-Consider the affine line $L \subset \mathbb{G}_m^2$ defined by $a_0 + a_1 u + a_2 v = 0$ with $a_0 a_1 a_2 \ne 0$.
-A 1-dimensional algebraic subtorus $T \subset \mathbb{G}_m^2$ is defined by a monomial relation $u^p v^q = 1$ with $(p, q) \ne (0, 0) \in \mathbb{Z}^2$.
-A coset translate $c \cdot T$ has parametric form $u^p v^q = c$.
-Can $L$ contain a coset $c \cdot T$?
-- If $(p, q) = (1, 0)$, $u = c$ (vertical line). In $L$, $a_0 + a_1 c + a_2 v = 0 \implies v$ is constant, not a 1D curve.
-- If $(p, q) = (0, 1)$, horizontal line.
-- If $p \cdot q \ne 0$, $u^p v^q = c$ is a nonlinear curve in the plane. A line cannot contain a nonlinear curve.
-
-Thus $L$ contains **no** positive-dimensional subtorus coset!
-By Laurent's theorem, $L \cap \Gamma$ is finite:
+The affine line $L \subset \mathbb{G}_m^2$ defined by $a_0 + a_1 u + a_2 v = 0$ ($a_0 a_1 a_2 \ne 0$) contains no translate of an algebraic subtorus $u^p v^q = c$ in $\mathbb{G}_m^2$.
+By Laurent's theorem, $L \cap (\Gamma_0 \times \Gamma_0)$ is finite:
 $$\boxed{\texttt{FIXED\_COEFFICIENT\_TRINOMIAL\_SOLUTIONS\_FINITE}}.$$
 
 ### The Critical Non-Implication:
 $$\boxed{\texttt{FINITE\_DOES\_NOT\_IMPLY\_EMPTY}}.$$
-Finiteness of solutions for a given $(a_0, a_1, a_2)$ does **not** imply that the specific point $(u, v) = (X, Y)$ is not a solution, nor does it exclude the existence of another triple $(a_0', a_1', a_2')$ having $(X, Y)$ as its unique solution!
-Thus, Laurent and ESS do not resolve the existence question.
+Finiteness of solutions for a given $(a_0, a_1, a_2)$ does **not** prove that $(X, Y)$ is not a solution, nor does it constrain relations when coefficients vary over $\overline{\mathbb{Q}}$.
 
 ---
 
 ## M. Canonical Examples
 
-We isolate two canonical minimal rank-two instances:
 1. **Base-One Instance**:
-   $$1, \quad 2\pi, \quad (2\pi)^{\sqrt{2}}.$$
-   Here $\alpha = 1, \beta = \sqrt{2}$, with ratio $\alpha / \beta = 1/\sqrt{2} \notin \mathbb{Q}$.
+   $$1, \quad 2\pi, \quad (2\pi)^{\sqrt{2}}, \qquad \alpha = 1, \; \beta = \sqrt{2}.$$
 2. **Radical Pair Instance**:
-   $$1, \quad (2\pi)^{\sqrt{2}}, \quad (2\pi)^{\sqrt{3}}.$$
-   Here $\alpha = \sqrt{2}, \beta = \sqrt{3}$, with ratio $\sqrt{2/3} \notin \mathbb{Q}$.
-
-Neither is called "the" unique minimal instance; both represent authentic, minimal rank-two instances.
+   $$1, \quad (2\pi)^{\sqrt{2}}, \quad (2\pi)^{\sqrt{3}}, \qquad \alpha = \sqrt{2}, \; \beta = \sqrt{3}.$$
 
 ---
 
-## N. Certified Sparse Exclusions
+## N. Certified Sparse Exclusions & Support Accounting
 
 Using `python-flint` Arb interval ball arithmetic at 128-bit precision, we evaluate:
 $$V = a_0 + a_1 (X^{i_1} Y^{j_1}) + a_2 (X^{i_2} Y^{j_2})$$
-over all 36 distinct monomial supports up to degree $D = 3$ and all normalized primitive mixed-sign integer coefficient triples $\|a\|_\infty \le 10$:
+over all 36 constant-anchored monomial supports up to degree $D = 3$ and primitive mixed-sign integer coefficient triples $\|a\|_\infty \le 10$.
 
-| Canonical Instance | Monomial Supports | Normalized Trinomials | Smallest Certified Lower Bound | Smallest Candidate $(a_0, a_1, a_2, M_1, M_2)$ | Time (s) | Status |
+### Support Universe Accounting:
+- Total degree $\le 3$ monomials: 10 ($1, X, Y, X^2, XY, Y^2, X^3, X^2Y, XY^2, Y^3$).
+- Total 3-monomial subsets in box: $\binom{10}{3} = 120$.
+- **Constant-anchored supports tested**: $\binom{9}{2} = 36$ supports.
+- **Partition of tested supports**:
+  - $30$ genuine affine-rank-two supports;
+  - $6$ affine-rank-one control supports ($X$-axis: $\{1, X, X^2\}, \{1, X, X^3\}, \{1, X^2, X^3\}$; $Y$-axis: $\{1, Y, Y^2\}, \{1, Y, Y^3\}, \{1, Y^2, Y^3\}$).
+- **Candidate Count Partition**:
+  - $2,523$ normalized coefficient triples per support;
+  - $30 \times 2,523 = 75,690$ rank-two candidates;
+  - $6 \times 2,523 = 15,138$ rank-one control candidates;
+  - Total candidates certified: $90,828$.
+
+| Canonical Instance | Constant-Anchored Supports Tested | Normalized Trinomials | Smallest Certified Lower Bound | Smallest Candidate $(a_0, a_1, a_2, M_1, M_2)$ | Scope | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Base-One** $(1, 2\pi, (2\pi)^{\sqrt{2}})$ | 36 | 90,828 | **0.02262** | $(9, 4, -10, Y, X)$ | 0.257 | `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION` |
-| **Radical Pair** $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$ | 36 | 90,828 | **0.08095** | $(6, 5, -9, XY, X^2)$ | 0.270 | `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION` |
+| **Base-One** $(1, 2\pi, (2\pi)^{\sqrt{2}})$ | 36 (30 rank 2, 6 rank 1) | 90,828 | **0.02262** | $(9, 4, -10, Y, X)$ | Constant-anchored campaign | `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION` |
+| **Radical Pair** $(1, (2\pi)^{\sqrt{2}}, (2\pi)^{\sqrt{3}})$ | 36 (30 rank 2, 6 rank 1) | 90,828 | **0.08095** | $(6, 5, -9, XY, X^2)$ | Constant-anchored campaign | `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION` |
 
-### Strict Certification Safeguards:
-1. No midpoints used: every distance is an Arb `abs_lower()` interval bound.
-2. Fails closed on unsupported expressions.
-3. Exact synthetic controls ($Y = 1 + X$ and $Y = X^2$) contain 0 and return `RELATION_DETECTED` rather than falsely certifying exclusion.
+**Honest Campaign Scope**: This campaign certifies nonvanishing only on the explicit finite set of 90,828 constant-anchored candidates. It does not certify general 3-monomial supports (which would require a Laurent box with negative exponents) nor arbitrary algebraic coefficients.
 
 ---
 
 ## O. Exact Remaining Open Problem
 
-After all reductions (Section A–L), the exact open mathematical core is:
 $$\boxed{
 \begin{gathered}
 \text{Do there exist } \alpha, \beta \in \mathbb{A}_{\mathbb{R}} \text{ with } \frac{\alpha}{\beta} \notin \mathbb{Q} \\
@@ -317,11 +315,22 @@ $$\boxed{\texttt{MINIMAL\_RANK\_TWO\_TRINOMIAL\_EXISTENCE\_OPEN}}.$$
 
 ---
 
-## P. Implications for TC
+## P. Lean 4 Formalization Evidence Table
 
-1. **Separation by Support Complexity**: The ambient-kernel programme is now cleanly separated by support complexity ($m = 1, 2, 3$) as well as rational support rank ($r = 0, 1, 2$).
-2. **Finite-Dimensional Relation Rigidity**: A genuine rank-two kernel element cannot belong to a high-dimensional relation space; it is rigid ($\dim \mathcal{R}_{\alpha, \beta} = 1$).
-3. **No Automatic Contradiction**: A single trinomial relation does not propagate into an infinite contradictory grade orbit under TC dilation. Orbit rigidity shows that vanishing on 3 consecutive grades is impossible, but a single relation remains geometrically unconstrained by dilation alone.
+| Mathematical Claim | Lean Theorem | What Lean Proves | Additional Paper Step | External Theorem |
+| :--- | :--- | :--- | :--- | :--- |
+| **Support Translation** | `RiemannScope.trinomial_support_translation` | Factoring $\tau^{K_0}$ from 3-term sum for $\tau > 0$ | None | None |
+| **Same-Sign Positivity** | `RiemannScope.trinomial_same_sign_pos_impossible` | $a_0 + a_1 X + a_2 Y \ne 0$ for $a_j, X, Y > 0$ | None | None |
+| **Same-Sign Negativity** | `RiemannScope.trinomial_same_sign_neg_impossible` | $a_0 + a_1 X + a_2 Y \ne 0$ for $a_j < 0, X, Y > 0$ | None | None |
+| **Cramer Coordinate Determination** | `RiemannScope.trinomial_two_relations_cramer` | Expresses $X, Y$ as rational functions of coefficients when $\Delta_0 \ne 0$ | Invariant nullspace proof that $\Delta_0 \ne 0$ is guaranteed, and field closure of $\overline{\mathbb{Q}}$ | Gelfond-Schneider ($\dim_{\mathbb{Q}} S_\tau \le 1$) |
+| **Exceptional $X$ Solves $Y$** | `RiemannScope.trinomial_exceptional_x_forces_exceptional_y` | $Y = (-a_0 - a_1 X)/a_2$ for $a_2 \ne 0$ | Field closure of $\overline{\mathbb{Q}}$ and $S_\tau$ membership | Gelfond-Schneider ($\dim_{\mathbb{Q}} S_\tau \le 1$) |
+| **Exceptional $Y$ Solves $X$** | `RiemannScope.trinomial_exceptional_y_forces_exceptional_x` | $X = (-a_0 - a_2 Y)/a_1$ for $a_1 \ne 0$ | Field closure of $\overline{\mathbb{Q}}$ and $S_\tau$ membership | Gelfond-Schneider ($\dim_{\mathbb{Q}} S_\tau \le 1$) |
+| **Exceptional Ratio Solves $X$** | `RiemannScope.trinomial_exceptional_ratio_forces_exceptional_coordinates` | $X = -a_0 / (a_1 + a_2(Y/X))$ when denom $\ne 0$ | Proof that denom $\ne 0$ because $a_1 + a_2(Y/X) = 0 \implies a_0 = 0$, and field closure | Gelfond-Schneider ($\dim_{\mathbb{Q}} S_\tau \le 1$) |
+| **Consecutive Orbit Determinant** | `RiemannScope.trinomial_three_consecutive_orbit_determinant` | $\det(M_n) = X^n Y^n (X-1)(Y-1)(Y-X)$ | None | None |
+| **Orbit Determinant Nonvanishing** | `RiemannScope.trinomial_three_consecutive_orbit_det_ne_zero` | $\det(M_n) \ne 0$ for distinct positive bases | None | None |
+| **Three-Consecutive Orbit Rigidity** | `RiemannScope.trinomial_three_consecutive_orbit_rigidity` | $f(n)=f(n+1)=f(n+2)=0 \implies a_j = 0$ | Dilation does not canonically propagate $f(1)=0$ into higher zeros | None |
+| **Distinct Powers of $\tau > 1$** | `RiemannScope.tau_powers_pairwise_distinct_of_ne` | $\tau^\alpha \ne \tau^\beta$ for $\tau > 1, \alpha \ne \beta$ | None | None |
+| **Non-Unit Power for Exponent $\ne 0$** | `RiemannScope.tau_pow_ne_one_of_ne_zero` | $\tau^\alpha \ne 1$ for $\tau > 1, \alpha \ne 0$ | None | None |
 
 ---
 
@@ -336,6 +345,7 @@ $$\boxed{\texttt{MINIMAL\_RANK\_TWO\_TRINOMIAL\_EXISTENCE\_OPEN}}.$$
 ## Principal and Secondary Classifications
 
 - **Primary**: `TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN`
+- **Task Classification**: `TASK_TC_030R_TRINOMIAL_REPAIR_COMPLETE`
 - **Secondary**:
   - `FIRST_OPEN_SUPPORT_SIZE_THREE`
   - `AFFINE_RANK_TWO_TRINOMIAL`
@@ -346,6 +356,6 @@ $$\boxed{\texttt{MINIMAL\_RANK\_TWO\_TRINOMIAL\_EXISTENCE\_OPEN}}.$$
   - `THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY`
   - `FIXED_COEFFICIENT_SOLUTIONS_FINITE`
   - `FINITE_DOES_NOT_IMPLY_EMPTY`
-  - `NO_CANONICAL_RELATION_PROPAGATION`
+  - `NO_CANONICAL_ORBIT_VANISHING_PROPAGATION`
   - `CERTIFIED_FINITE_TRINOMIAL_EXCLUSION`
   - `NO_ZETA_TO_KERNEL_BRIDGE_FOUND`

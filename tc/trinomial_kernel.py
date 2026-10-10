@@ -1,7 +1,7 @@
 r"""Minimal Rank-Two Trinomial Kernel, Relation-Space Rigidity, and Sparse Orbit Theorems.
 
-TASK-TC-030: Classification and certified sparse exclusion of the first genuinely
-unresolved ambient realization kernel support:
+TASK-TC-030 / TASK-TC-030R: Classification, relation-space rigidity, and certified sparse
+exclusion of the first genuinely unresolved ambient realization kernel support:
     a0 + a1 * tau^alpha + a2 * tau^beta = 0
 where a0, a1, a2 in Q_bar^\times, alpha, beta in A_R, and alpha / beta not in Q.
 
@@ -15,40 +15,48 @@ Mathematical Hierarchy:
       hence to S_tau.
     - Affine rank 2 (alpha/beta not in Q): FIRST_OPEN_KERNEL_SUPPORT.
 
-Structural Theorems:
+Structural Theorems & Evidence Alignment:
 1. RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL:
-   Two independent linear relations among (1, X, Y) force X, Y in Q_bar,
-   contradicting dim_Q S_tau <= 1. Hence dim_{Q_bar} R_{alpha, beta} <= 1.
+   Two independent relations force (1, X, Y) into a 1-dimensional nullspace over Q_bar,
+   forcing X, Y in Q_bar via Cramer's rule. This requires alpha, beta in S_tau.
+   By external Gelfond-Schneider (Baker 1975), dim_Q S_tau <= 1, contradicting Q-independence.
+   Evidence: PROVED_PAPER_DERIVATION + PROVED_WITH_EXTERNAL_GELFOND_SCHNEIDER.
+   Lean Core: trinomial_two_relations_cramer proves coordinate solvability for Delta_0 != 0.
 2. PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED:
-   A nondegenerate trinomial relation forces alpha, beta, beta-alpha outside S_tau.
+   A nondegenerate relation forces alpha, beta, beta-alpha outside S_tau.
+   Evidence: LEAN_PROVED_SOLVING_IDENTITIES feeding PROVED_PAPER_DERIVATION + EXTERNAL_GELFOND_SCHNEIDER.
 3. TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE:
-   Complex conjugation and dim <= 1 yield (conj(a0), conj(a1), conj(a2)) = lambda (a0, a1, a2)
-   with |lambda| = 1. Setting mu = 1 + lambda (or mu = i if lambda = -1) normalizes all
-   coefficients into A_R = Q_bar \cap R.
+   Direct elementary proof: complex conjugation and dim <= 1 yield conj(a_j) = lambda * a_j with
+   |lambda| = 1. Choosing mu = 1 + lambda (or mu = I if lambda = -1) normalizes all coefficients
+   into A_R = Q_bar \cap R.
+   Evidence: PROVED_PAPER_DERIVATION.
 4. MIXED_SIGN_NECESSARY:
    For positive generators X, Y > 0 and real coefficients, same-sign coefficients
    cannot sum to zero. Every relation is orientable into one of:
    - Y = u + v * X (u, v in A_R^{>0})
    - X = u + v * Y (u, v in A_R^{>0})
    - 1 = u * X + v * Y (u, v in A_R^{>0})
+   Evidence: LEAN_PROVED (trinomial_same_sign_pos_impossible, trinomial_same_sign_neg_impossible).
 5. THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY:
    For f(n) = a0 + a1 * X^n + a2 * Y^n, det(M_n) = X^n * Y^n * (X - 1) * (Y - 1) * (Y - X) != 0.
    Thus f(n) = f(n+1) = f(n+2) = 0 implies a0 = a1 = a2 = 0.
-6. NO_CANONICAL_RELATION_PROPAGATION:
-   f(1) = 0 does not imply f(2) = 0. TC transport does not produce contradictory grade orbits.
-7. MULTIPLICATIVE_GROUP_S_UNIT_AUDIT:
-   Gamma = <X, Y> \cong Z^2. By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002),
-   solutions to a0 + a1 * u + a2 * v = 0 with (u, v) in Gamma^2 are FINITE.
-   However, FINITE_DOES_NOT_IMPLY_EMPTY; existence of one relation remains OPEN.
+   Evidence: LEAN_PROVED (trinomial_three_consecutive_orbit_rigidity).
+6. NO_CANONICAL_ORBIT_VANISHING_PROPAGATION:
+   f(1) = 0 does not force f(2) = 0, f(3) = 0, or any further orbit vanishing.
+7. MULTIPLICATIVE_GROUP_THEOREMS:
+   - Base group: Gamma_0 = <X, Y> \cong Z^2 (rank 2).
+   - Solution group for (u, v): Gamma_0 x Gamma_0 (rank 4).
+   - Diagonal orbit: Delta_{alpha, beta} (rank 1).
+   - By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), solutions for fixed coefficients
+     are FINITE. However, FINITE_DOES_NOT_IMPLY_EMPTY; existence of one relation remains OPEN.
 """
 
 from __future__ import annotations
 
-import itertools
 import math
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import flint
 from flint import arb, ctx
@@ -65,6 +73,14 @@ from tc.ambient_kernel import (
 # Canonical Instance Definitions
 CANONICAL_INSTANCE_BASE_ONE = "BASE_ONE_INSTANCE"
 CANONICAL_INSTANCE_RADICAL_PAIR = "RADICAL_PAIR_INSTANCE"
+
+# Support Universe Constants for Degree <= 3 Box
+SUPPORT_BOX_TOTAL_MONOMIALS = 10  # 1, X, Y, X^2, XY, Y^2, X^3, X^2Y, XY^2, Y^3
+SUPPORT_BOX_TOTAL_THREE_MONOMIAL_SUBSETS = 120  # comb(10, 3)
+SUPPORT_BOX_CONSTANT_ANCHORED_SUPPORTS = 36  # comb(9, 2)
+SUPPORT_BOX_AFFINE_RANK_TWO_SUPPORTS = 30
+SUPPORT_BOX_AFFINE_RANK_ONE_CONTROLS = 6
+NORMALIZED_COEFFICIENTS_PER_SUPPORT = 2523  # height H=10 primitive mixed-sign triples
 
 
 @dataclass(frozen=True)
@@ -92,6 +108,7 @@ class RealNormalizationResult:
     mu_val: sp.Expr
     normalized_coeffs: Tuple[sp.Expr, sp.Expr, sp.Expr]
     is_real_normalized: bool
+    proof_method: str = "DIRECT_ELEMENTARY_CONJUGATE_PHASE_NORMALIZATION"
 
 
 @dataclass(frozen=True)
@@ -103,31 +120,94 @@ class DilationOrbitResult:
 
 
 @dataclass(frozen=True)
+class RelationSpaceDimensionBound:
+    alpha: sp.Expr
+    beta: sp.Expr
+    is_rationally_independent: bool
+    assumes_external_gelfond_schneider: bool
+    dimension_bound: int
+    theorem_conclusion: str
+    evidence_class: str
+    status: str
+    description: str
+
+
+@dataclass(frozen=True)
 class CertifiedTrinomialExclusionResult:
     canonical_instance: str
     alpha_expr: sp.Expr
     beta_expr: sp.Expr
     max_degree_D: int
     max_height_H: int
-    supports_tested: int
-    normalized_trinomials_tested: int
+    all_three_monomial_subsets_in_box: int
+    constant_anchored_supports_tested: int
+    affine_rank_two_supports_tested: int
+    affine_rank_one_control_supports: int
+    normalized_coefficients_per_support: int
+    rank_two_candidates_certified: int
+    rank_one_control_candidates_certified: int
+    total_candidates_certified: int
     smallest_certified_distance: float
     smallest_candidate: Dict[str, Any]
     precision_bits: int
     runtime_seconds: float
+    certificate_scope: str
     classification: str
+
+
+def canonicalize_group_algebra_terms(
+    terms: List[Tuple[Any, Any]]
+) -> List[Tuple[sp.Expr, sp.Expr]]:
+    r"""Canonicalize a formal sum \sum a_j [K_j] in the group algebra \overline{\mathbb{Q}}[\mathbb{A}_\mathbb{R}].
+
+    Steps:
+    1. Converts each coefficient and grade to exact symbolic form (sp.sympify).
+    2. Groups all terms having the same grade (via sp.simplify(g1 - g2) == 0).
+    3. Sums coefficients within each grade.
+    4. Simplifies coefficient sums exactly (sp.simplify).
+    5. Removes grades whose combined coefficient is exactly zero.
+    6. Sorts remaining grades deterministically by (evalf, string).
+    """
+    grouped: List[Tuple[sp.Expr, sp.Expr]] = []  # (coeff_sum, canonical_grade)
+    for c, g in terms:
+        c_sym = sp.simplify(sympify(c))
+        g_sym = sp.simplify(sympify(g))
+        found = False
+        for idx, (c_acc, g_acc) in enumerate(grouped):
+            if sp.simplify(g_sym - g_acc) == 0:
+                grouped[idx] = (sp.simplify(c_acc + c_sym), g_acc)
+                found = True
+                break
+        if not found:
+            grouped.append((c_sym, g_sym))
+
+    cleaned: List[Tuple[sp.Expr, sp.Expr]] = []
+    for c_sum, g_can in grouped:
+        c_simp = sp.simplify(c_sum)
+        if c_simp != 0:
+            cleaned.append((c_simp, g_can))
+
+    # Deterministic sort
+    cleaned.sort(
+        key=lambda item: (
+            float(item[1].evalf()) if item[1].is_number and item[1].evalf().is_real else 0.0,
+            str(item[1]),
+            str(item[0]),
+        )
+    )
+    return cleaned
 
 
 def classify_minimal_support(terms: List[Tuple[Any, Any]]) -> MinimalSupportClassification:
     r"""Classify a candidate minimal-support kernel element \sum_{j=1}^m a_j [K_j].
 
     Parameters:
-        terms: List of (coeff, grade) pairs with coeff in Q_bar \ {0}, grade in A_R.
+        terms: List of (coeff, grade) pairs with coeff in Q_bar, grade in A_R.
 
     Returns:
         MinimalSupportClassification with exact support size, affine rank, and reduction status.
     """
-    cleaned_terms = [(sympify(c), sympify(g)) for c, g in terms if sympify(c) != 0]
+    cleaned_terms = canonicalize_group_algebra_terms(terms)
     m = len(cleaned_terms)
 
     if m == 0:
@@ -137,7 +217,7 @@ def classify_minimal_support(terms: List[Tuple[Any, Any]]) -> MinimalSupportClas
             affine_support_rank=0,
             classification_code="EMPTY_SUPPORT",
             reduction_target="NONE",
-            description="Empty linear combination vanishes vacuously.",
+            description="Empty linear combination vanishes vacuously after coefficient cancellation.",
         )
 
     if m == 1:
@@ -178,16 +258,16 @@ def classify_minimal_support(terms: List[Tuple[Any, Any]]) -> MinimalSupportClas
                 description="Repeated grade collapses support to size <= 2.",
             )
 
-        # Affine rank calculation: check if alpha / beta in Q
-        ratio = sp.simplify(alpha / beta)
-        if ratio.is_rational:
+        # Affine rank calculation: fail-closed via compute_rational_support_rank
+        rank = compute_affine_support_rank_trinomial(k0, k1, k2)
+        if rank == 1:
             return MinimalSupportClassification(
                 support_size=3,
                 is_possible=True,
                 affine_support_rank=1,
                 classification_code="AFFINE_RANK_ONE_TRINOMIAL_REDUCED",
                 reduction_target="S_TAU_EXCEPTIONAL_DIRECTION",
-                description=f"Rationally collinear grades (ratio {ratio} in Q) reduce to a 1-variable Laurent relation, classified by S_tau.",
+                description="Rationally collinear grades reduce to a 1-variable Laurent relation, classified by S_tau.",
             )
 
         # Genuine affine rank two
@@ -217,38 +297,152 @@ def compute_affine_support_rank_trinomial(k0: Any, k1: Any, k2: Any) -> int:
     """Compute the affine rational rank of three grades {k0, k1, k2}.
 
     The affine rational rank is dim_Q span_Q {k1 - k0, k2 - k0}.
+    Uses compute_rational_support_rank to establish exact rank over Q.
+    Fails closed with ValueError("EXACT_AFFINE_RANK_UNRESOLVED: ...") if unresolved.
     """
     g0 = sympify(k0)
     g1 = sympify(k1)
     g2 = sympify(k2)
-    alpha = sp.simplify(g1 - g0)
-    beta = sp.simplify(g2 - g0)
-
-    if alpha == 0 and beta == 0:
-        return 0
-    if alpha == 0 or beta == 0 or alpha == beta:
-        return 1
-
-    ratio = sp.simplify(alpha / beta)
-    if ratio.is_rational:
-        return 1
-    return 2
+    try:
+        rank, _ = compute_rational_support_rank([g0, g1, g2], base_grade=g0)
+        return rank
+    except Exception as e:
+        raise ValueError(
+            f"EXACT_AFFINE_RANK_UNRESOLVED: unable to compute exact affine rational rank for grades [{g0}, {g1}, {g2}]: {e}"
+        ) from e
 
 
-def evaluate_relation_space_dimension_bound(alpha: Any, beta: Any) -> int:
-    r"""Determine the dimension bound of the trinomial relation space R_{alpha, beta}.
+def derive_relation_space_dimension_bound(
+    alpha: Any, beta: Any, assume_gelfond_schneider: bool = True
+) -> RelationSpaceDimensionBound:
+    r"""Derive the dimension bound of the trinomial relation space R_{alpha, beta}.
 
     R_{alpha, beta} = {(a0, a1, a2) in Q_bar^3 : a0 + a1*X + a2*Y = 0}
     where X = tau^alpha, Y = tau^beta with alpha/beta not in Q.
 
     Theorem:
         dim_{Q_bar} R_{alpha, beta} <= 1.
-        If a nonzero relation exists, dim_{Q_bar} R_{alpha, beta} = 1.
+    Evidence Class:
+        PROVED_PAPER_DERIVATION + PROVED_WITH_EXTERNAL_GELFOND_SCHNEIDER.
+    Lean Core:
+        trinomial_two_relations_cramer proves coordinate solvability under a nonzero minor.
     """
-    # For any alpha, beta with alpha/beta not in Q, two independent relations
-    # would force X, Y in Q_bar via Cramer's rule, forcing alpha, beta in S_tau.
-    # But dim_Q S_tau <= 1 while alpha, beta are Q-independent, a contradiction.
-    return 1
+    a_sym = sympify(alpha)
+    b_sym = sympify(beta)
+
+    # Establish rational independence
+    try:
+        rank = compute_affine_support_rank_trinomial(0, a_sym, b_sym)
+        is_q_indep = bool(rank == 2)
+    except Exception:
+        return RelationSpaceDimensionBound(
+            alpha=a_sym,
+            beta=b_sym,
+            is_rationally_independent=False,
+            assumes_external_gelfond_schneider=assume_gelfond_schneider,
+            dimension_bound=-1,
+            theorem_conclusion="UNRESOLVED",
+            evidence_class="UNRESOLVED_RATIONAL_INDEPENDENCE",
+            status="UNRESOLVED",
+            description="Could not resolve rational independence of alpha and beta.",
+        )
+
+    if not is_q_indep:
+        return RelationSpaceDimensionBound(
+            alpha=a_sym,
+            beta=b_sym,
+            is_rationally_independent=False,
+            assumes_external_gelfond_schneider=assume_gelfond_schneider,
+            dimension_bound=-1,
+            theorem_conclusion="RATIONALLY_DEPENDENT_REDUCES_TO_RANK_ONE",
+            evidence_class="REDUCED_TO_S_TAU",
+            status="RESOLVED_DEPENDENT",
+            description="Grades alpha, beta are collinear over Q; relation reduces to single-variable S_tau.",
+        )
+
+    return RelationSpaceDimensionBound(
+        alpha=a_sym,
+        beta=b_sym,
+        is_rationally_independent=True,
+        assumes_external_gelfond_schneider=assume_gelfond_schneider,
+        dimension_bound=1,
+        theorem_conclusion="AT_MOST_ONE_DIMENSIONAL",
+        evidence_class="PROVED_PAPER_DERIVATION_PLUS_EXTERNAL_GELFOND_SCHNEIDER",
+        status="RESOLVED",
+        description=(
+            "Two independent relations force (1, X, Y) into a 1-dimensional nullspace over Q_bar, "
+            "forcing X, Y in Q_bar via Cramer's rule. This requires alpha, beta in S_tau. "
+            "By external Gelfond-Schneider, dim_Q S_tau <= 1, contradicting Q-independence. "
+            "Therefore dim_{Q_bar} R_{alpha, beta} <= 1."
+        ),
+    )
+
+
+def evaluate_relation_space_dimension_bound(alpha: Any, beta: Any) -> int:
+    r"""Backward-compatible helper returning the integer dimension bound (1)."""
+    bound_res = derive_relation_space_dimension_bound(alpha, beta)
+    if bound_res.dimension_bound < 0:
+        raise ValueError(f"Relation space dimension unresolved: {bound_res.description}")
+    return bound_res.dimension_bound
+
+
+def solve_two_relations_algebraic_coordinates(
+    r1: Tuple[Any, Any, Any], r2: Tuple[Any, Any, Any]
+) -> Dict[str, Any]:
+    r"""Solve for algebraic coordinates (X, Y) given two Q_bar-independent relations.
+
+    Handles all possible nonzero 2x2 minors of the 2x3 matrix:
+        M = [[a0, a1, a2],
+             [b0, b1, b2]]
+
+    Invariant proof:
+    1. rank(M) = 2 over Q_bar because r1, r2 are linearly independent.
+    2. The 1D right nullspace of M is spanned by the vector of signed minors:
+       v = (Delta_0, -Delta_1, Delta_2)
+       where:
+         Delta_0 = a1*b2 - a2*b1  (columns 1, 2)
+         Delta_1 = a0*b2 - a2*b0  (columns 0, 2)
+         Delta_2 = a0*b1 - a1*b0  (columns 0, 1)
+    3. If (1, X, Y)^T is in the nullspace, then (1, X, Y)^T = c * v for some c in C^x.
+       In particular, 1 = c * Delta_0, so Delta_0 != 0 and c = 1 / Delta_0.
+    4. Therefore, X = -Delta_1 / Delta_0 in Q_bar, and Y = Delta_2 / Delta_0 in Q_bar.
+    """
+    a0, a1, a2 = sympify(r1[0]), sympify(r1[1]), sympify(r1[2])
+    b0, b1, b2 = sympify(r2[0]), sympify(r2[1]), sympify(r2[2])
+
+    delta_0 = sp.simplify(a1 * b2 - a2 * b1)
+    delta_1 = sp.simplify(a0 * b2 - a2 * b0)
+    delta_2 = sp.simplify(a0 * b1 - a1 * b0)
+
+    is_rank_2 = bool(delta_0 != 0 or delta_1 != 0 or delta_2 != 0)
+    if not is_rank_2:
+        raise ValueError("COEFFICIENT_VECTORS_DEPENDENT: rows do not form a rank-2 matrix")
+
+    # If delta_0 == 0, then any nullspace vector has first coordinate 0,
+    # meaning (1, X, Y) CANNOT be in the nullspace.
+    if delta_0 == 0:
+        return {
+            "is_rank_2": True,
+            "delta_0": delta_0,
+            "delta_1": delta_1,
+            "delta_2": delta_2,
+            "solution_exists_with_first_coord_one": False,
+            "proof": "Delta_0 = 0 implies all nullspace vectors have first coordinate 0, so (1, X, Y) cannot satisfy both relations.",
+        }
+
+    sol_X = sp.simplify(-delta_1 / delta_0)
+    sol_Y = sp.simplify(delta_2 / delta_0)
+    return {
+        "is_rank_2": True,
+        "delta_0": delta_0,
+        "delta_1": delta_1,
+        "delta_2": delta_2,
+        "solution_exists_with_first_coord_one": True,
+        "sol_X": sol_X,
+        "sol_Y": sol_Y,
+        "coordinates_algebraic": True,
+        "proof_method": "INVARIANT_NULLSPACE_AND_CRAMER_SOLVING",
+    }
 
 
 def check_exceptional_direction_exclusion(
@@ -257,9 +451,11 @@ def check_exceptional_direction_exclusion(
     r"""Prove that a nondegenerate trinomial relation excludes all pairwise exceptional directions.
 
     If a0 + a1*X + a2*Y = 0 with a0*a1*a2 != 0:
-    1. If X in Q_bar, then Y = (-a0 - a1*X) / a2 in Q_bar.
-    2. If Y in Q_bar, then X = (-a0 - a2*Y) / a1 in Q_bar.
-    3. If Y/X in Q_bar, dividing by X yields X = -a0 / (a1 + a2*(Y/X)) in Q_bar.
+    1. If X in Q_bar, then Y = (-a0 - a1*X) / a2 in Q_bar (Lean: trinomial_exceptional_x_forces_exceptional_y).
+    2. If Y in Q_bar, then X = (-a0 - a2*Y) / a1 in Q_bar (Lean: trinomial_exceptional_y_forces_exceptional_x).
+    3. If Y/X in Q_bar, dividing by X yields X = -a0 / (a1 + a2*(Y/X)) in Q_bar
+       (Lean: trinomial_exceptional_ratio_forces_exceptional_coordinates).
+       If a1 + a2*(Y/X) == 0, then a0 = -X*(a1 + a2*(Y/X)) = 0, which contradicts nondegeneracy.
 
     In all three cases, X, Y in Q_bar, forcing alpha, beta in S_tau, which contradicts
     dim_Q S_tau <= 1 for Q-independent grades.
@@ -267,24 +463,38 @@ def check_exceptional_direction_exclusion(
     c0 = sympify(a0)
     c1 = sympify(a1)
     c2 = sympify(a2)
-    X = X_sym or Symbol("X")
-    Y = Symbol("Y")
+
+    if c0 == 0 or c1 == 0 or c2 == 0:
+        raise ValueError(
+            f"DEGENERATE_COEFFICIENT_VECTOR: all coefficients must be nonzero, got ({c0}, {c1}, {c2})"
+        )
+
+    X = X_sym if X_sym is not None else Symbol("X")
+    Y = Y_sym if Y_sym is not None else Symbol("Y")
 
     sol_Y_given_X = sp.simplify((-c0 - c1 * X) / c2)
     sol_X_given_Y = sp.simplify((-c0 - c2 * Y) / c1)
 
     Z = Symbol("Z")  # Z = Y / X
-    # c0 * X^(-1) + c1 + c2 * Z = 0 ==> X = -c0 / (c1 + c2 * Z)
+    # c0 + X * (c1 + c2 * Z) = 0 ==> X = -c0 / (c1 + c2 * Z)
     sol_X_given_ratio = sp.simplify(-c0 / (c1 + c2 * Z))
+    ratio_denom = sp.simplify(c1 + c2 * Z)
 
     return {
-        "is_nondegenerate": bool(c0 != 0 and c1 != 0 and c2 != 0),
+        "is_nondegenerate": True,
         "sol_Y_from_X": sol_Y_given_X,
         "sol_X_from_Y": sol_X_given_Y,
         "sol_X_from_ratio": sol_X_given_ratio,
-        "exceptional_x_forces_algebraic_y": True,
-        "exceptional_y_forces_algebraic_x": True,
-        "exceptional_ratio_forces_algebraic_coordinates": True,
+        "ratio_denominator": ratio_denom,
+        "ratio_denominator_zero_forces_a0_zero": True,
+        "algebraicity_closure_inference": "X in Q_bar <=> Y in Q_bar <=> Y/X in Q_bar via field operations in Q_bar",
+        "external_s_tau_contradiction": "dim_Q S_tau <= 1 (Gelfond-Schneider) excludes Q-independent alpha, beta in S_tau",
+        "evidence_class": "LEAN_PROVED_SOLVING_IDENTITIES_FEEDING_PAPER_PLUS_GELFOND_SCHNEIDER",
+        "assumptions": [
+            "a0 * a1 * a2 != 0 (nondegeneracy)",
+            "alpha / beta not in Q (Q-independence)",
+            "dim_Q S_tau <= 1 (external Baker / Gelfond-Schneider theorem)",
+        ],
         "theorem": "PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED",
         "description": "Any nondegenerate trinomial relation forces alpha, beta, and beta - alpha entirely outside S_tau.",
     }
@@ -295,29 +505,67 @@ def normalize_trinomial_coefficients_real(
 ) -> RealNormalizationResult:
     r"""Normalize complex algebraic trinomial coefficients to real algebraic coefficients.
 
-    Because X, Y in R_{>0}, conjugation sends a relation to a relation.
-    Since dim R_{alpha, beta} = 1, (conj(a0), conj(a1), conj(a2)) = lambda * (a0, a1, a2)
-    with lambda * conj(lambda) = 1.
-    If lambda == -1: mu = I produces real coefficients.
-    If lambda != -1: mu = 1 + lambda produces real coefficients.
+    Direct elementary proof:
+    Because generators X, Y in R_{>0}, complex conjugation sends any relation to another relation:
+        conj(a0) + conj(a1)*X + conj(a2)*Y = 0.
+    Since dim R_{alpha, beta} <= 1, the conjugate vector must be proportional to (a0, a1, a2):
+        conj(a_j) = lambda * a_j  for all j, with lambda * conj(lambda) = 1.
+    Choosing the phase multiplier:
+        mu = 1 + lambda  (if lambda != -1)
+        mu = I           (if lambda == -1)
+    satisfies:
+        conj(mu * a_j) = conj(mu) * conj(a_j)
+                       = (1 + conj(lambda)) * (lambda * a_j)
+                       = (lambda + lambda * conj(lambda)) * a_j
+                       = (lambda + 1) * a_j
+                       = mu * a_j.
+    Thus mu * a_j is strictly invariant under complex conjugation and hence real algebraic.
+
+    Fails closed with ValueError("COEFFICIENT_VECTOR_NOT_CONJUGATE_PROPORTIONAL") if
+    the coefficients do not satisfy conjugate proportionality.
     """
     c0 = sympify(a0)
     c1 = sympify(a1)
     c2 = sympify(a2)
 
-    # First check if already all real
-    if c0.is_real and c1.is_real and c2.is_real:
+    if c0 == 0 and c1 == 0 and c2 == 0:
+        raise ValueError("ALL_COEFFICIENTS_ZERO: cannot normalize trivial coefficient vector")
+
+    # Check if already all real
+    if (
+        sp.simplify(sp.im(c0)) == 0
+        and sp.simplify(sp.im(c1)) == 0
+        and sp.simplify(sp.im(c2)) == 0
+    ):
         return RealNormalizationResult(
             original_coeffs=(c0, c1, c2),
             lambda_val=Integer(1),
             mu_val=Integer(1),
             normalized_coeffs=(c0, c1, c2),
             is_real_normalized=True,
+            proof_method="DIRECT_ELEMENTARY_CONJUGATE_PHASE_NORMALIZATION",
         )
 
-    # Pick a nonzero coefficient to compute lambda = conj(c) / c
+    # Pick a nonzero coefficient as pivot to compute candidate lambda = conj(c) / c
     c_pivot = c0 if c0 != 0 else (c1 if c1 != 0 else c2)
     lambda_val = sp.simplify(sp.conjugate(c_pivot) / c_pivot)
+
+    # Verify |lambda| == 1
+    norm_sq = sp.simplify(lambda_val * sp.conjugate(lambda_val))
+    if norm_sq != 1:
+        raise ValueError(
+            f"COEFFICIENT_VECTOR_NOT_CONJUGATE_PROPORTIONAL: lambda={lambda_val} does not satisfy |lambda|=1"
+        )
+
+    # Verify that every nonzero coefficient satisfies conj(c) == lambda * c
+    coeffs = [c0, c1, c2]
+    for idx, c in enumerate(coeffs):
+        if c != 0:
+            diff = sp.simplify(sp.conjugate(c) - lambda_val * c)
+            if diff != 0:
+                raise ValueError(
+                    f"COEFFICIENT_VECTOR_NOT_CONJUGATE_PROPORTIONAL: coefficient {idx} ({c}) does not satisfy conj(c) = lambda * c"
+                )
 
     # Choose mu
     if sp.simplify(lambda_val + 1) == 0:
@@ -329,45 +577,63 @@ def normalize_trinomial_coefficients_real(
     norm_c1 = sp.simplify(sp.expand(mu_val * c1))
     norm_c2 = sp.simplify(sp.expand(mu_val * c2))
 
-    # Verify that imaginary parts vanish
-    is_real = bool(
-        sp.simplify(sp.im(norm_c0)) == 0
-        and sp.simplify(sp.im(norm_c1)) == 0
-        and sp.simplify(sp.im(norm_c2)) == 0
-    )
+    # Verify that imaginary parts vanish exactly
+    im0 = sp.simplify(sp.im(norm_c0))
+    im1 = sp.simplify(sp.im(norm_c1))
+    im2 = sp.simplify(sp.im(norm_c2))
+
+    if im0 != 0 or im1 != 0 or im2 != 0:
+        raise ValueError(
+            f"COEFFICIENT_VECTOR_NOT_CONJUGATE_PROPORTIONAL: transformed coefficients ({norm_c0}, {norm_c1}, {norm_c2}) have nonzero imaginary parts ({im0}, {im1}, {im2})"
+        )
 
     return RealNormalizationResult(
         original_coeffs=(c0, c1, c2),
         lambda_val=lambda_val,
         mu_val=mu_val,
-        normalized_coeffs=(sp.re(norm_c0), sp.re(norm_c1), sp.re(norm_c2)),
-        is_real_normalized=is_real,
+        normalized_coeffs=(norm_c0, norm_c1, norm_c2),
+        is_real_normalized=True,
+        proof_method="DIRECT_ELEMENTARY_CONJUGATE_PHASE_NORMALIZATION",
     )
 
 
 def classify_sign_orientation(a0: Any, a1: Any, a2: Any) -> SignOrientation:
     r"""Classify a real trinomial relation a0 + a1*X + a2*Y = 0 (X, Y > 0) by its sign geometry.
 
-    Since generators are strictly positive, coefficients cannot have the same sign.
+    Since generators are strictly positive, real coefficients cannot have the same sign.
     Exactly one coefficient has opposite sign, orienting the relation into one of three
     positive affine geometries:
     1. Y = u + v * X (a2 opposite sign to a0, a1)
     2. X = u + v * Y (a1 opposite sign to a0, a2)
     3. 1 = u * X + v * Y (a0 opposite sign to a1, a2)
     with positive algebraic u, v in A_R^{>0}.
+
+    Fails closed if coefficients are zero, non-real, or of ambiguous sign.
     """
     c0 = sympify(a0)
     c1 = sympify(a1)
     c2 = sympify(a2)
 
-    # Normalize overall sign so at least one is positive
+    if c0 == 0 or c1 == 0 or c2 == 0:
+        raise ValueError(f"DEGENERATE_COEFFICIENT: zero coefficient in ({c0}, {c1}, {c2})")
+
+    if (
+        sp.simplify(sp.im(c0)) != 0
+        or sp.simplify(sp.im(c1)) != 0
+        or sp.simplify(sp.im(c2)) != 0
+    ):
+        raise ValueError(f"NON_REAL_COEFFICIENT: coefficients must be real, got ({c0}, {c1}, {c2})")
+
     s0 = sp.sign(c0)
     s1 = sp.sign(c1)
     s2 = sp.sign(c2)
 
+    if not (s0.is_number and s1.is_number and s2.is_number):
+        raise ValueError(f"UNRESOLVED_COEFFICIENT_SIGN: signs cannot be determined symbolically for ({c0}, {c1}, {c2})")
+
     if (s0 > 0 and s1 > 0 and s2 > 0) or (s0 < 0 and s1 < 0 and s2 < 0):
         raise ValueError(
-            f"All coefficients have same sign ({s0}, {s1}, {s2}): no positive solution (X, Y > 0) can exist."
+            f"SAME_SIGN_COEFFICIENTS_IMPOSSIBLE: all coefficients have same sign ({s0}, {s1}, {s2}): no positive solution (X, Y > 0) can exist."
         )
 
     # Identify the odd sign
@@ -462,7 +728,6 @@ def generalized_vandermonde_determinant(
     x1, x2, x3 = bases
     n1, n2, n3 = powers
 
-    # Matrix: row i has [x1^ni, x2^ni, x3^ni]
     r1 = [x1**n1, x2**n1, x3**n1]
     r2 = [x1**n2, x2**n2, x3**n2]
     r3 = [x1**n3, x2**n3, x3**n3]
@@ -478,28 +743,39 @@ def generalized_vandermonde_determinant(
 def audit_multiplicative_group_theorems() -> Dict[str, Any]:
     r"""Primary-source literature audit of finite-rank multiplicative group theorems.
 
-    Citations:
-    - Evertse (1984), "On sums of S-units and linear recurrences"
-    - Evertse, Schlickewei, Schmidt (2002), "Linear equations in elements of groups of finite rank"
-    - Laurent (1984), "Équations diophantiennes exponentielles"
-    - Lang's conjecture / Mordell-Lang for algebraic tori (Hindry 1988)
+    Distinguishes the relevant groups:
+    1. Base multiplicative group:
+       Gamma_0 = <X, Y> = <tau^alpha, tau^beta> \subset R_{>0}^\times.
+       For alpha/beta not in Q, Gamma_0 \cong Z^2 (rank 2).
+    2. Ambient solution group for a0 + a1*u + a2*v = 0:
+       Independently varying (u, v) in Gamma_0 x Gamma_0 lives in a rank-4 group.
+    3. Diagonal dilation orbit:
+       Delta_{alpha, beta} = {(X^n, Y^n) : n in Z} is a rank-1 cyclic subgroup.
 
-    Mathematical Analysis:
-    1. Multiplicative group Gamma = <X, Y> = <tau^alpha, tau^beta> \subset R_{>0}^\times.
-       Since alpha / beta not in Q, Gamma \cong Z^2.
-    2. Curve C: a0 + a1*u + a2*v = 0 with a0*a1*a2 != 0 in G_m^2.
-    3. C cannot contain a translate of a positive-dimensional subtorus (binomial curve u^p * v^q = c
-       is nonlinear for (p, q) != (0, 0), while C is a linear line).
-    4. By Laurent (1984) and Evertse-Schlickewei-Schmidt (2002), C \cap Gamma^2 is FINITE.
-    5. CRITICAL BOUNDARY: FINITE_DOES_NOT_IMPLY_EMPTY. Finiteness for each fixed triple
-       does not prove the set of solutions is empty.
+    Citations & Theorems:
+    - Laurent (1984), "Équations diophantiennes exponentielles", Invent. Math.
+    - Evertse, Schlickewei, Schmidt (2002), "Linear equations in elements of groups of finite rank", Ann. of Math.
+    - Hindry (1988), Autour d'une conjecture de Serge Lang.
+
+    Consequences:
+    - Line a0 + a1*u + a2*v = 0 in G_m^2 contains no 1D translate of an algebraic subtorus.
+    - By Laurent/ESS, solutions (u, v) in Gamma_0 x Gamma_0 for fixed coefficients are FINITE.
+    - CRITICAL BOUNDARY: FINITE_DOES_NOT_IMPLY_EMPTY.
+    - NO_CANONICAL_ORBIT_VANISHING_PROPAGATION:
+      f(1) = 0 does not force f(2) = 0, f(3) = 0, or any further orbit vanishing.
     """
     return {
-        "multiplicative_group": "Gamma = <tau^alpha, tau^beta> subset R_{>0}^x",
-        "rank": 2,
-        "is_free_abelian": True,
+        "base_multiplicative_group": "Gamma_0 = <tau^alpha, tau^beta> subset R_{>0}^x",
+        "base_group_rank": 2,
+        "is_base_group_free_abelian": True,
+        "solution_ambient_group": "Gamma_0 x Gamma_0",
+        "solution_group_rank": 4,
+        "diagonal_dilation_orbit": "Delta_{alpha, beta} = {(X^n, Y^n) : n in Z}",
+        "diagonal_orbit_rank": 1,
         "subtorus_coset_in_line": False,
-        "subtorus_audit_detail": "Line a0 + a1*u + a2*v = 0 with non-zero coefficients contains no 1D subtorus coset u^p*v^q = c.",
+        "subtorus_audit_detail": (
+            "Line a0 + a1*u + a2*v = 0 with nonzero algebraic coefficients contains no 1D subtorus coset u^p*v^q = c in G_m^2."
+        ),
         "citations": [
             "Evertse (1984), Invent. Math.",
             "Laurent (1984), Invent. Math. (Mordell-Lang for algebraic tori)",
@@ -507,6 +783,9 @@ def audit_multiplicative_group_theorems() -> Dict[str, Any]:
         ],
         "consequence_for_fixed_coefficients": "FIXED_COEFFICIENT_TRINOMIAL_SOLUTIONS_FINITE",
         "critical_boundary": "FINITE_DOES_NOT_IMPLY_EMPTY",
+        "diagonal_orbit_vanishing_bound": "At most 2 distinct integer zeros for nonzero (a0, a1, a2) via generalized Vandermonde",
+        "orbit_propagation_statement": "NO_CANONICAL_ORBIT_VANISHING_PROPAGATION",
+        "orbit_propagation_description": "f(1) = 0 does not force f(2) = 0, f(3) = 0, or any further orbit vanishing.",
         "existence_status": "MINIMAL_RANK_TWO_TRINOMIAL_EXISTENCE_OPEN",
         "zeta_bridge_status": "NO_ZETA_TO_KERNEL_BRIDGE_FOUND",
     }
@@ -519,6 +798,7 @@ def enumerate_sparse_trinomial_monomial_pairs(
 
     Each monomial is represented by its power pair (i, j) for X^i * Y^j.
     Together with the constant 1 = X^0 * Y^0, these form the 3-element support {1, M1, M2}.
+    For max_degree=3: 9 nonconstant monomials yield comb(9, 2) = 36 constant-anchored supports.
     """
     monomials: List[Tuple[int, int]] = []
     for d in range(1, max_degree + 1):
@@ -531,6 +811,34 @@ def enumerate_sparse_trinomial_monomial_pairs(
         for idx2 in range(idx1 + 1, len(monomials)):
             pairs.append((monomials[idx1], monomials[idx2]))
     return pairs
+
+
+def partition_monomial_supports_by_rank(
+    pairs: List[Tuple[Tuple[int, int], Tuple[int, int]]]
+) -> Tuple[List[Tuple[Tuple[int, int], Tuple[int, int]]], List[Tuple[Tuple[int, int], Tuple[int, int]]]]:
+    r"""Partition constant-anchored supports {1, M1, M2} into affine rank-one controls and rank-two supports.
+
+    For M1 = X^i1 Y^j1 and M2 = X^i2 Y^j2 with constant anchor 1 = X^0 Y^0:
+    The affine rank is dim_Q span_Q {(i1, j1), (i2, j2)}:
+    - Rank 1 if i1 * j2 - i2 * j1 == 0 (collinear exponent vectors, e.g. both on X-axis or both on Y-axis).
+    - Rank 2 if i1 * j2 - i2 * j1 != 0.
+
+    For max_degree=3 (36 pairs):
+    - 6 pairs are affine rank one (3 on X-axis, 3 on Y-axis).
+    - 30 pairs are genuine affine rank two.
+    """
+    rank_one: List[Tuple[Tuple[int, int], Tuple[int, int]]] = []
+    rank_two: List[Tuple[Tuple[int, int], Tuple[int, int]]] = []
+
+    for p in pairs:
+        (i1, j1), (i2, j2) = p
+        det = i1 * j2 - i2 * j1
+        if det == 0:
+            rank_one.append(p)
+        else:
+            rank_two.append(p)
+
+    return rank_one, rank_two
 
 
 def enumerate_normalized_coefficients(
@@ -577,7 +885,7 @@ def certify_sparse_trinomial_exclusion(
 
     Evaluates:
         V = a0 + a1 * (X^i1 * Y^j1) + a2 * (X^i2 * Y^j2)
-    over all normalized supports {1, M1, M2} with deg <= max_degree
+    over all normalized constant-anchored supports {1, M1, M2} with deg <= max_degree
     and primitive mixed-sign integer coefficients ||a||_inf <= max_height.
 
     Rigorous certification rules:
@@ -602,12 +910,13 @@ def certify_sparse_trinomial_exclusion(
         pairs = enumerate_sparse_trinomial_monomial_pairs(max_degree)
         coeffs = enumerate_normalized_coefficients(max_height)
 
+        r1_supports, r2_supports = partition_monomial_supports_by_rank(pairs)
+
         smallest_dist = float("inf")
         smallest_candidate: Dict[str, Any] = {}
         total_evaluations = 0
 
         for (i1, j1), (i2, j2) in pairs:
-            # Monomial values
             m1_val = (X_arb**i1) * (Y_arb**j1)
             m2_val = (X_arb**i2) * (Y_arb**j2)
 
@@ -639,18 +948,26 @@ def certify_sparse_trinomial_exclusion(
                     }
 
         runtime = time.time() - t0
+        all_box_subsets = math.comb(math.comb(max_degree + 2, 2), 3) if max_degree >= 2 else len(pairs)
         return CertifiedTrinomialExclusionResult(
             canonical_instance=instance_name,
             alpha_expr=sympify(alpha_expr),
             beta_expr=sympify(beta_expr),
             max_degree_D=max_degree,
             max_height_H=max_height,
-            supports_tested=len(pairs),
-            normalized_trinomials_tested=total_evaluations,
+            all_three_monomial_subsets_in_box=all_box_subsets,
+            constant_anchored_supports_tested=len(pairs),
+            affine_rank_two_supports_tested=len(r2_supports),
+            affine_rank_one_control_supports=len(r1_supports),
+            normalized_coefficients_per_support=len(coeffs),
+            rank_two_candidates_certified=len(r2_supports) * len(coeffs),
+            rank_one_control_candidates_certified=len(r1_supports) * len(coeffs),
+            total_candidates_certified=total_evaluations,
             smallest_certified_distance=smallest_dist,
             smallest_candidate=smallest_candidate,
             precision_bits=prec_bits,
             runtime_seconds=runtime,
+            certificate_scope="constant-anchored sparse trinomial campaign",
             classification="CERTIFIED_FINITE_TRINOMIAL_EXCLUSION",
         )
 

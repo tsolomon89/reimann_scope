@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-030",
+  "active_task_id": "TASK-TC-030R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -693,6 +693,33 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-030 completed: Minimal support classified (support size 1 impossible, size 2 reduced to S_tau, size 3 affine rank 1 reduced to S_tau, affine rank 2 isolated as FIRST_OPEN_KERNEL_SUPPORT); relation space proved at most 1-dimensional; pairwise exceptional directions excluded; real coefficient normalization derived via Hilbert 90; mixed signs proved necessary; 3-consecutive orbit rigidity proved; multiplicative group audit completed (solutions finite, finite does not imply empty); 90,828 normalized trinomials certified excluded by Arb ball arithmetic at 128 bits; Lean 4 formalization compiled in formal/RiemannScope/TrinomialKernel.lean (total 501 declarations, 0 sorry); 24/24 unit tests passing. Principal classification: TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN."
+    },
+    {
+      "task_id": "TASK-TC-030R",
+      "priority": 33,
+      "objective": "Trinomial Kernel Evidence Alignment, Canonical Support Repair, and Certificate-Scope Correction",
+      "status": "COMPLETED_TASK_TC_030R_TRINOMIAL_REPAIR_COMPLETE",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Correct evidence scopes, support canonicalization, fail-closed affine rank, all-minor Cramer proof, direct real normalization, multiplicative group distinctions, and certificate candidate breakdown.",
+      "planned_calculation": "Implement canonicalize_group_algebra_terms; make compute_affine_support_rank_trinomial fail closed; hypothesis-aware derive_relation_space_dimension_bound; solve_two_relations_algebraic_coordinates for all minors; check_exceptional_direction_exclusion with Y_sym; direct elementary normalize_trinomial_coefficients_real; fail-closed classify_sign_orientation; partition supports (120 total, 36 constant-anchored: 30 rank-two, 6 rank-one) and candidate counts (90,828 = 75,690 + 15,138); align Lean theorem scopes.",
+      "acceptance_criterion": "24/24 unit tests passing in tests/test_tc_trinomial_kernel.py; repair review docs/reviews/TC_030R_TRINOMIAL_KERNEL_REPAIR_AUDIT.md; updated data/tc_minimal_rank_two_trinomial_kernel.json; Lean 4 build clean (501 declarations, 0 sorry); all repository checks passing.",
+      "dependencies": [
+        "TASK-TC-030"
+      ],
+      "evidence": [
+        "formal/RiemannScope/TrinomialKernel.lean",
+        "tc/trinomial_kernel.py",
+        "tests/test_tc_trinomial_kernel.py",
+        "docs/reviews/TC_030R_TRINOMIAL_KERNEL_REPAIR_AUDIT.md",
+        "docs/reviews/TC_MINIMAL_RANK_TWO_TRINOMIAL_KERNEL.md",
+        "data/tc_minimal_rank_two_trinomial_kernel.json",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-030R completed: Support canonicalization implemented; fail-closed exact affine rank; hypothesis-aware relation-space dimension bound; invariant all-minor Cramer proof; exceptional direction diagnostics using Y_sym; direct elementary real normalization; NO_CANONICAL_ORBIT_VANISHING_PROPAGATION wording; multiplicative groups distinguished (ranks 2, 4, 1); campaign universe clarified (120 total 3-monomial subsets, 36 constant-anchored tested: 30 rank-two, 6 rank-one controls; 90,828 = 75,690 + 15,138 candidates); Lean evidence scope aligned with detailed mapping table; 24/24 regression tests passing. Principal classifications: TASK_TC_030R_TRINOMIAL_REPAIR_COMPLETE and TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN."
     }
   ]
 }

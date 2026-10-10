@@ -1,17 +1,39 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "task_id": "TASK-TC-030",
-  "title": "Minimal Rank-Two Trinomial Kernel, Relation-Space Rigidity, and Sparse Orbit Theorems",
-  "starting_head": "ae8a8dd6e39bb8d713cfc92fbf0dce38ad6fd090",
-  "timestamp": "2026-10-10T12:04:00+01:00",
+  "task_id": "TASK-TC-030R",
+  "title": "Trinomial Kernel Evidence Alignment, Canonical Support Repair, and Certificate-Scope Correction",
+  "starting_head": "f74fb15987bdedb6c5d845929df5634bb0c7fc6a",
+  "substantive_parent": "74469d360fbfdf3fe80370199ed36a83b62816f9",
+  "timestamp": "2026-10-10T15:30:00+01:00",
   "normalized_relation": "a0 + a1 * (2*pi)^alpha + a2 * (2*pi)^beta = 0 with a0*a1*a2 != 0, alpha, beta in A_R, alpha/beta not in Q",
   "support_size": 3,
   "affine_support_rank": 2,
+  "support_canonicalization": "Exact symbolic grouping via canonicalize_group_algebra_terms prior to support classification; eliminates cancelled grades and verifies primitive support",
+  "relation_space_evidence": "PROVED_PAPER_DERIVATION_PLUS_EXTERNAL_GELFOND_SCHNEIDER",
+  "gelfond_schneider_dependency": "dim_Q S_tau <= 1 (Baker / Gelfond-Schneider theorem) used to deduce contradiction from alpha, beta in S_tau",
+  "exceptional_direction_evidence": "LEAN_PROVED_SOLVING_IDENTITIES_FEEDING_PAPER_PLUS_GELFOND_SCHNEIDER",
+  "real_normalization_validation": "Direct elementary proof: lambda = conj(a_pivot)/a_pivot with |lambda|=1; mu = 1 + lambda (or mu = I if lambda = -1); verified fail-closed on non-proportional vectors",
+  "orbit_nonpropagation_statement": "NO_CANONICAL_ORBIT_VANISHING_PROPAGATION",
+  "orbit_nonpropagation_description": "f(1) = 0 does not force f(2) = 0, f(3) = 0, or any further orbit vanishing.",
+  "multiplicative_group_base_rank": 2,
+  "solution_group_rank": 4,
+  "diagonal_orbit_rank": 1,
+  "all_three_monomial_subsets_in_box": 120,
+  "constant_anchored_supports_tested": 36,
+  "affine_rank_two_supports_tested": 30,
+  "affine_rank_one_control_supports": 6,
+  "normalized_coefficients_per_support": 2523,
+  "rank_two_candidates_certified": 75690,
+  "rank_one_control_candidates_certified": 15138,
+  "total_candidates_certified": 90828,
+  "certificate_scope": "constant-anchored sparse trinomial campaign",
   "relation_space_dimension_theorem": {
     "theorem_name": "RANK_TWO_TRINOMIAL_RELATION_SPACE_AT_MOST_ONE_DIMENSIONAL",
     "dimension_bound": "dim_{Q_bar} R_{alpha, beta} <= 1",
-    "proof_mechanism": "Two independent affine relations force (1, X, Y) into a 1-dimensional subspace over Q_bar, which implies X, Y in Q_bar via Cramer's rule. This forces alpha, beta in S_tau, contradicting dim_Q S_tau <= 1 for Q-independent grades.",
-    "status": "PROVED_PAPER_DERIVATION_WITH_LEAN_CRAMER_CORE"
+    "invariant_proof_mechanism": "The 2x3 algebraic coefficient matrix M has rank 2, so its right nullspace over Q_bar is 1-dimensional. The vector (1, X, Y) spans this nullspace. Since the first coordinate is nonzero (1), the unique basis vector with first coordinate 1 is algebraic, forcing X, Y in Q_bar. Alternatively, the signed minor Delta_0 = a1*b2 - a2*b1 must be nonzero whenever (1, X, Y) is in the nullspace because Delta_0 is the first coordinate of the nullspace generator; hence Cramer's rule applies directly.",
+    "external_contradiction": "X, Y in Q_bar implies alpha, beta in S_tau. External Gelfond-Schneider forces dim_Q S_tau <= 1, contradicting Q-independence of alpha, beta.",
+    "evidence_class": "PROVED_PAPER_DERIVATION_PLUS_EXTERNAL_GELFOND_SCHNEIDER",
+    "lean_core_theorem": "RiemannScope.trinomial_two_relations_cramer"
   },
   "exceptional_direction_conditions": {
     "theorem_name": "PAIRWISE_EXCEPTIONAL_DIRECTIONS_EXCLUDED",
@@ -20,17 +42,27 @@
       "beta not in S_tau",
       "beta - alpha not in S_tau"
     ],
-    "proof_mechanism": "If X in Q_bar, Y is algebraically determined: Y = (-a0 - a1*X)/a2 in Q_bar. If Y in Q_bar, X = (-a0 - a2*Y)/a1 in Q_bar. If Y/X in Q_bar, X = -a0 / (a1 + a2*(Y/X)) in Q_bar.",
-    "status": "LEAN_PROVED_ALGEBRAIC_COORDINATE_FORCING"
+    "solving_identities": {
+      "Y_from_X": "Y = (-a0 - a1*X)/a2 in Q_bar (Lean: trinomial_exceptional_x_forces_exceptional_y)",
+      "X_from_Y": "X = (-a0 - a2*Y)/a1 in Q_bar (Lean: trinomial_exceptional_y_forces_exceptional_x)",
+      "X_from_ratio": "X = -a0 / (a1 + a2*(Y/X)) in Q_bar (Lean: trinomial_exceptional_ratio_forces_exceptional_coordinates)"
+    },
+    "denominator_nonvanishing_proof": "If a1 + a2*(Y/X) == 0, then a0 = -X*(a1 + a2*(Y/X)) = 0, which contradicts nondegeneracy a0*a1*a2 != 0.",
+    "evidence_class": "LEAN_PROVED_SOLVING_IDENTITIES_FEEDING_PAPER_PLUS_GELFOND_SCHNEIDER"
   },
   "real_normalization_status": {
     "theorem_name": "TRINOMIAL_COEFFICIENTS_REAL_NORMALIZABLE",
-    "status": "PROVED_PAPER_DERIVATION",
-    "phase_normalization_mechanism": "Since generators X, Y are strictly positive reals, complex conjugation maps any relation to a relation. By dim R_{alpha, beta} = 1, (conj(a0), conj(a1), conj(a2)) = lambda * (a0, a1, a2) with |lambda| = 1. Choosing mu = 1 + lambda (or mu = I if lambda = -1) satisfies conj(mu * a_j) = mu * a_j, yielding real algebraic coefficients in A_R.",
-    "algorithmic_verification": "Verified symbolically and numerically for non-trivial complex coefficient phases."
+    "evidence_class": "PROVED_PAPER_DERIVATION",
+    "phase_normalization_mechanism": "Generators X, Y in R_{>0} are real, so conjugation sends a relation to another relation. By dim R_{alpha, beta} <= 1, conj(a_j) = lambda * a_j with |lambda| = 1. Choosing mu = 1 + lambda (or mu = I if lambda = -1) satisfies conj(mu * a_j) = mu * a_j, yielding real algebraic coefficients in A_R.",
+    "fail_closed_validation": "Tested in Python: raises ValueError on non-proportional conjugate coefficient vectors; returns exact symbolic expressions without real-part truncation."
   },
   "sign_classification": {
     "theorem_name": "MIXED_SIGN_NECESSARY",
+    "evidence_class": "LEAN_PROVED",
+    "lean_theorems": [
+      "RiemannScope.trinomial_same_sign_pos_impossible",
+      "RiemannScope.trinomial_same_sign_neg_impossible"
+    ],
     "impossible_configurations": [
       "All coefficients strictly positive (a0 > 0, a1 > 0, a2 > 0)",
       "All coefficients strictly negative (a0 < 0, a1 < 0, a2 < 0)"
@@ -60,19 +92,20 @@
   "orbit_determinant": {
     "formula": "det(M_n) = X^n * Y^n * (X - 1) * (Y - 1) * (Y - X)",
     "status": "LEAN_PROVED",
-    "lean_theorem": "trinomial_three_consecutive_orbit_determinant"
+    "lean_theorem": "RiemannScope.trinomial_three_consecutive_orbit_determinant"
   },
   "orbit_rigidity_status": {
     "theorem_name": "THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY",
     "statement": "If f(n) = a0 + a1 * X^n + a2 * Y^n satisfies f(n) = f(n+1) = f(n+2) = 0 for distinct positive bases (1, X, Y), then a0 = a1 = a2 = 0.",
     "status": "LEAN_PROVED",
-    "lean_theorem": "trinomial_three_consecutive_orbit_rigidity",
+    "lean_theorem": "RiemannScope.trinomial_three_consecutive_orbit_rigidity",
     "generalized_vandermonde_status": "PROVED_PAPER_DERIVATION",
-    "no_propagation_boundary": "f(1) = 0 alone imposes no condition on f(2), f(3), ... TC transport does not produce contradictory grade orbits."
+    "no_propagation_boundary": "f(1) = 0 does not force f(2) = 0, f(3) = 0, or any further orbit vanishing. Dilation does not canonically propagate into contradictory grade orbits."
   },
-  "multiplicative_group_rank": 2,
   "s_unit_theorem_applicability": {
-    "group_structure": "Gamma = <tau^alpha, tau^beta> is free abelian of rank 2 (Gamma \cong Z^2)",
+    "base_group": "Gamma_0 = <tau^alpha, tau^beta> \subset R_{>0}^x is free abelian of rank 2 (Gamma_0 \cong Z^2)",
+    "ambient_solution_group": "Independently varying (u, v) lives in Gamma_0 x Gamma_0 of rank 4",
+    "diagonal_orbit_group": "Delta_{alpha, beta} = {(X^n, Y^n) : n in Z} is a cyclic group of rank 1",
     "primary_citations": [
       "Evertse (1984), On sums of S-units and linear recurrences, Invent. Math.",
       "Laurent (1984), Equations diophantiennes exponentielles, Invent. Math.",
@@ -102,13 +135,21 @@
   "numerical_search_bounds": {
     "max_degree_D": 3,
     "max_height_H": 10,
-    "precision_bits": 128
+    "precision_bits": 128,
+    "supports_tested_description": "36 constant-anchored supports (30 rank-two supports, 6 rank-one control supports) out of 120 total 3-monomial subsets in degree <= 3 box"
   },
   "certified_exclusions": [
     {
       "instance": "CANONICAL_MINIMAL_RANK_TWO_BASE_ONE",
-      "supports_tested": 36,
-      "normalized_trinomials_tested": 90828,
+      "certificate_scope": "constant-anchored sparse trinomial campaign",
+      "constant_anchored_supports_tested": 36,
+      "affine_rank_two_supports_tested": 30,
+      "affine_rank_one_control_supports": 6,
+      "all_three_monomial_subsets_in_box": 120,
+      "normalized_coefficients_per_support": 2523,
+      "rank_two_candidates_certified": 75690,
+      "rank_one_control_candidates_certified": 15138,
+      "total_candidates_certified": 90828,
       "smallest_certified_distance_lb": 0.02262196228185964,
       "smallest_candidate": {
         "a0": 9,
@@ -122,8 +163,15 @@
     },
     {
       "instance": "CANONICAL_MINIMAL_RANK_TWO_RADICAL_PAIR",
-      "supports_tested": 36,
-      "normalized_trinomials_tested": 90828,
+      "certificate_scope": "constant-anchored sparse trinomial campaign",
+      "constant_anchored_supports_tested": 36,
+      "affine_rank_two_supports_tested": 30,
+      "affine_rank_one_control_supports": 6,
+      "all_three_monomial_subsets_in_box": 120,
+      "normalized_coefficients_per_support": 2523,
+      "rank_two_candidates_certified": 75690,
+      "rank_one_control_candidates_certified": 15138,
+      "total_candidates_certified": 90828,
       "smallest_certified_distance_lb": 0.08094699233482108,
       "smallest_candidate": {
         "a0": 6,
@@ -139,22 +187,95 @@
   "formal_lean_theorems": {
     "source_file": "formal/RiemannScope/TrinomialKernel.lean",
     "theorems_compiled": 12,
-    "theorems_list": [
-      "trinomial_support_translation",
-      "trinomial_same_sign_pos_impossible",
-      "trinomial_same_sign_neg_impossible",
-      "trinomial_two_relations_cramer",
-      "trinomial_exceptional_x_forces_exceptional_y",
-      "trinomial_exceptional_y_forces_exceptional_x",
-      "trinomial_exceptional_ratio_forces_exceptional_coordinates",
-      "trinomial_three_consecutive_orbit_determinant",
-      "trinomial_three_consecutive_orbit_det_ne_zero",
-      "trinomial_three_consecutive_orbit_rigidity",
-      "tau_powers_pairwise_distinct_of_ne",
-      "tau_pow_ne_one_of_ne_zero"
+    "evidence_table": [
+      {
+        "claim": "Support translation factoring",
+        "lean_theorem": "RiemannScope.trinomial_support_translation",
+        "what_lean_proves": "a0*tau^K0 + a1*tau^K1 + a2*tau^K2 = tau^K0 * (a0 + a1*tau^(K1-K0) + a2*tau^(K2-K0)) for tau > 0",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Same-sign positive impossibility",
+        "lean_theorem": "RiemannScope.trinomial_same_sign_pos_impossible",
+        "what_lean_proves": "a0 + a1*X + a2*Y != 0 for a0, a1, a2, X, Y > 0",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Same-sign negative impossibility",
+        "lean_theorem": "RiemannScope.trinomial_same_sign_neg_impossible",
+        "what_lean_proves": "a0 + a1*X + a2*Y != 0 for a0, a1, a2 < 0 and X, Y > 0",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Cramer coordinate determination",
+        "lean_theorem": "RiemannScope.trinomial_two_relations_cramer",
+        "what_lean_proves": "Expresses X and Y as rational functions of coefficients when Delta_0 = a1*b2 - a2*b1 != 0",
+        "additional_paper_step": "Invariant nullspace proof that Delta_0 != 0 is guaranteed whenever (1, X, Y) satisfies two independent relations, and field closure of Q_bar",
+        "external_theorem": "Gelfond-Schneider (dim_Q S_tau <= 1)"
+      },
+      {
+        "claim": "Exceptional X forces algebraic Y",
+        "lean_theorem": "RiemannScope.trinomial_exceptional_x_forces_exceptional_y",
+        "what_lean_proves": "Y = (-a0 - a1*X)/a2 for a2 != 0",
+        "additional_paper_step": "Field closure of Q_bar (Y in Q_bar) and S_tau membership",
+        "external_theorem": "Gelfond-Schneider (dim_Q S_tau <= 1)"
+      },
+      {
+        "claim": "Exceptional Y forces algebraic X",
+        "lean_theorem": "RiemannScope.trinomial_exceptional_y_forces_exceptional_x",
+        "what_lean_proves": "X = (-a0 - a2*Y)/a1 for a1 != 0",
+        "additional_paper_step": "Field closure of Q_bar (X in Q_bar) and S_tau membership",
+        "external_theorem": "Gelfond-Schneider (dim_Q S_tau <= 1)"
+      },
+      {
+        "claim": "Exceptional ratio forces algebraic coordinates",
+        "lean_theorem": "RiemannScope.trinomial_exceptional_ratio_forces_exceptional_coordinates",
+        "what_lean_proves": "X = -a0 / (a1 + a2*(Y/X)) when denominator != 0",
+        "additional_paper_step": "Proof that denominator != 0 because a1 + a2*(Y/X) == 0 forces a0 = 0 (contradiction), plus Q_bar closure",
+        "external_theorem": "Gelfond-Schneider (dim_Q S_tau <= 1)"
+      },
+      {
+        "claim": "Consecutive dilation orbit determinant identity",
+        "lean_theorem": "RiemannScope.trinomial_three_consecutive_orbit_determinant",
+        "what_lean_proves": "det(M_n) = Xn * Yn * (X - 1) * (Y - 1) * (Y - X)",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Consecutive orbit determinant nonvanishing",
+        "lean_theorem": "RiemannScope.trinomial_three_consecutive_orbit_det_ne_zero",
+        "what_lean_proves": "det(M_n) != 0 when generators Xn, Yn != 0 and X != 1, Y != 1, Y != X",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Three-consecutive dilation orbit rigidity",
+        "lean_theorem": "RiemannScope.trinomial_three_consecutive_orbit_rigidity",
+        "what_lean_proves": "f(n)=f(n+1)=f(n+2)=0 implies a0 = a1 = a2 = 0 for distinct positive bases",
+        "additional_paper_step": "Dilation does not automatically propagate a single vanishing equation f(1)=0 into f(2)=0",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Distinct powers for base > 1",
+        "lean_theorem": "RiemannScope.tau_powers_pairwise_distinct_of_ne",
+        "what_lean_proves": "tau^alpha != tau^beta for tau > 1 and alpha != beta",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      },
+      {
+        "claim": "Non-unit power for nonzero exponent",
+        "lean_theorem": "RiemannScope.tau_pow_ne_one_of_ne_zero",
+        "what_lean_proves": "tau^alpha != 1 for tau > 1 and alpha != 0",
+        "additional_paper_step": "None",
+        "external_theorem": "None"
+      }
     ]
   },
   "primary_classification": "TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN",
+  "task_classification": "TASK_TC_030R_TRINOMIAL_REPAIR_COMPLETE",
   "secondary_classifications": [
     "FIRST_OPEN_SUPPORT_SIZE_THREE",
     "AFFINE_RANK_TWO_TRINOMIAL",
@@ -165,7 +286,7 @@
     "THREE_CONSECUTIVE_DILATION_ORBIT_RIGIDITY",
     "FIXED_COEFFICIENT_SOLUTIONS_FINITE",
     "FINITE_DOES_NOT_IMPLY_EMPTY",
-    "NO_CANONICAL_RELATION_PROPAGATION",
+    "NO_CANONICAL_ORBIT_VANISHING_PROPAGATION",
     "CERTIFIED_FINITE_TRINOMIAL_EXCLUSION",
     "NO_ZETA_TO_KERNEL_BRIDGE_FOUND"
   ],
