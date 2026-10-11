@@ -170,6 +170,14 @@ class ChebyshevWronskianResult:
     max_real_zeros_bound: int
     classification: str
     evidence_class: str
+    wronskian_w0_symbolic: Optional[sp.Expr] = None
+    wronskian_w1_symbolic: Optional[sp.Expr] = None
+    wronskian_w2_symbolic: Optional[sp.Expr] = None
+    successive_wronskians_positive: bool = True
+    external_theorem_citation: str = (
+        "Karlin & Studden (1966, Tchebycheff Systems: With Applications in Analysis and Statistics, "
+        "Chapter XI, Theorem 1.1, p. 376); Pólya & Szegő (1925, Part V, No. 75)"
+    )
 
 
 @dataclass(frozen=True)
@@ -699,22 +707,42 @@ def compute_exponential_wronskian(
     has at most 3 - 1 = 2 real zeros, counted with multiplicity.
     """
     l0, l1, l2 = [sympify(e) for e in exponents]
+    
+    # Successive Wronskians W_0, W_1, W_2 for the ECT system:
+    # W_0(x) = e^{\lambda_0 x}
+    w0_sym = sp.exp(l0 * x)
+    # W_1(x) = \det [ e^{\lambda_0 x}, e^{\lambda_1 x} ; \lambda_0 e^{\lambda_0 x}, \lambda_1 e^{\lambda_1 x} ]
+    #        = e^{(\lambda_0 + \lambda_1) x} * (\lambda_1 - \lambda_0)
+    w1_sym = sp.exp((l0 + l1) * x) * (l1 - l0)
+    # W_2(x) = \det [ e^{\lambda_j x} ; \lambda_j e^{\lambda_j x} ; \lambda_j^2 e^{\lambda_j x} ]
+    #        = e^{(\lambda_0 + \lambda_1 + \lambda_2) x} * (\lambda_1 - \lambda_0) * (\lambda_2 - \lambda_0) * (\lambda_2 - \lambda_1)
     exp_sum = l0 + l1 + l2
     vandermonde = (l1 - l0) * (l2 - l0) * (l2 - l1)
+    w2_sym = sp.exp(exp_sum * x) * vandermonde
 
-    W_sym = sp.exp(exp_sum * x) * vandermonde
     formula = "e^{(\\lambda_0 + \\lambda_1 + \\lambda_2)x} * (\\lambda_1 - \\lambda_0) * (\\lambda_2 - \\lambda_0) * (\\lambda_2 - \\lambda_1)"
 
-    is_positive = bool(vandermonde > 0)
+    w0_pos = True  # exp is strictly positive on R
+    w1_pos = bool((l1 - l0) > 0)
+    w2_pos = bool(vandermonde > 0)
+    all_positive = w0_pos and w1_pos and w2_pos
 
     return ChebyshevWronskianResult(
         exponents_ordered=(l0, l1, l2),
         wronskian_formula=formula,
-        wronskian_symbolic=W_sym,
-        is_strictly_positive_on_real_line=is_positive,
+        wronskian_symbolic=w2_sym,
+        is_strictly_positive_on_real_line=w2_pos,
         max_real_zeros_bound=2,
         classification=CLASSIFICATION_AT_MOST_TWO_REAL_EXPONENTIAL_POLYNOMIAL_ZEROS,
         evidence_class="PROVED_WITH_EXTERNAL_CHEBYSHEV_THEOREM",
+        wronskian_w0_symbolic=w0_sym,
+        wronskian_w1_symbolic=w1_sym,
+        wronskian_w2_symbolic=w2_sym,
+        successive_wronskians_positive=all_positive,
+        external_theorem_citation=(
+            "Karlin & Studden (1966, Tchebycheff Systems: With Applications in Analysis and Statistics, "
+            "Chapter XI, Theorem 1.1, p. 376); Pólya & Szegő (1925, Part V, No. 75)"
+        ),
     )
 
 

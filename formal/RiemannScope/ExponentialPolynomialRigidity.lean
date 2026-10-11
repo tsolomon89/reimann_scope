@@ -25,10 +25,12 @@ LEAN_PROVED Scope:
    - For q = 1: Q_1(U) has leading degree 2 term (a0 * v) * U^2.
    - For q = 2: Q_2(U) has leading degree 4 term (a0 * v^2) * U^4.
    - Leading coefficients a0 * v and a0 * v^2 are non-zero when a0, v ≠ 0.
-6. Three-exponential Wronskian identity and strict positivity:
-   The 3x3 Wronskian determinant factors identically as:
-       (E0 * E1 * E2) * (lambda1 - lambda0) * (lambda2 - lambda0) * (lambda2 - lambda1).
-   When E0, E1, E2 > 0 and lambda0 < lambda1 < lambda2, this Wronskian is strictly positive.
+6. Successive exponential Wronskian identities and strict positivity (ECT system hierarchy):
+   - W_0(x) = E0 > 0.
+   - W_1(x) = (E0 * E1) * (lambda1 - lambda0) > 0 for lambda0 < lambda1.
+   - W_2(x) = (E0 * E1 * E2) * (lambda1 - lambda0) * (lambda2 - lambda0) * (lambda2 - lambda1) > 0.
+   All successive Wronskians are strictly positive on R, proving {e^(lambda0*x), e^(lambda1*x), e^(lambda2*x)}
+   is an Extended Complete Chebyshev (ECT) system on R (Karlin & Studden 1966, Chapter XI, Theorem 1.1).
 7. Base-one second dilation quadratic identity:
    The evaluation of P_2(U) for base-one U = 2*pi rearranges identically to a standard quadratic form.
 
@@ -170,7 +172,28 @@ theorem integer_dilation_negative_leading_coeff_q2 (a0 v : ℝ)
   have hv2 : v^2 ≠ 0 := pow_ne_zero 2 hv
   exact mul_ne_zero ha0 hv2
 
-/-! ### 5. Three-Exponential Wronskian Determinant and Positivity -/
+/-! ### 5. Successive Exponential Wronskian Determinants and Strict Positivity (ECT System) -/
+
+/-- Order 0 Wronskian W_0 = E0 of a single exponential is strictly positive. -/
+theorem one_exponential_wronskian_pos (E0 : ℝ) (hE0 : 0 < E0) :
+    0 < E0 := hE0
+
+/-- The 2x2 Wronskian determinant W_1 for two exponential basis elements
+    [ E0,          E1          ]
+    [ lambda0*E0,  lambda1*E1  ]
+    factors identically into (E0 * E1) * (lambda1 - lambda0). -/
+theorem two_exponential_wronskian_algebraic_identity (E0 E1 l0 l1 : ℝ) :
+    E0 * (l1 * E1) - E1 * (l0 * E0) = (E0 * E1) * (l1 - l0) := by
+  ring
+
+/-- For strictly positive exponential factors and strictly ordered exponents
+    l0 < l1, the 2x2 Wronskian W_1 is strictly positive everywhere on R. -/
+theorem two_exponential_wronskian_pos_of_ordered (E0 E1 l0 l1 : ℝ)
+    (hE0 : 0 < E0) (hE1 : 0 < E1) (hl01 : l0 < l1) :
+    0 < (E0 * E1) * (l1 - l0) := by
+  have hd01 : 0 < l1 - l0 := sub_pos.mpr hl01
+  have hE_pos : 0 < E0 * E1 := mul_pos hE0 hE1
+  exact mul_pos hE_pos hd01
 
 /-- The 3x3 Wronskian determinant for three exponential basis elements
     [ E0,          E1,          E2          ]

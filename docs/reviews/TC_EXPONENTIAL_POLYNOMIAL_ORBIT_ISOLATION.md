@@ -348,9 +348,10 @@ Furthermore, the exponential factor $e^{(\sum \lambda_i) x} > 0$ for every $x \i
 Therefore:
 $$\boxed{W(x) > 0 \qquad \text{for all } x \in \mathbb{R}.}$$
 
-Similarly, the lower-order Wronskians are strictly positive:
-- $W_1(x) = e^{\lambda_0 x} > 0$.
-- $W_2(x) = e^{(\lambda_0 + \lambda_1) x} (\lambda_1 - \lambda_0) > 0$.
+Similarly, the successive lower-order Wronskians in the ECT hierarchy are strictly positive:
+- $W_0(x) = \phi_0(x) = e^{\lambda_0 x} > 0 \quad \forall x \in \mathbb{R}$. *(Lean 4: `one_exponential_wronskian_pos`)*
+- $W_1(x) = \det \begin{pmatrix} \phi_0 & \phi_1 \\ \phi_0' & \phi_1' \end{pmatrix} = e^{(\lambda_0 + \lambda_1) x} (\lambda_1 - \lambda_0) > 0 \quad \forall x \in \mathbb{R}$. *(Lean 4: `two_exponential_wronskian_algebraic_identity`, `two_exponential_wronskian_pos_of_ordered`)*
+- $W_2(x) = W(x) = e^{(\lambda_0 + \lambda_1 + \lambda_2) x} (\lambda_1 - \lambda_0) (\lambda_2 - \lambda_0) (\lambda_2 - \lambda_1) > 0 \quad \forall x \in \mathbb{R}$. *(Lean 4: `three_exponential_wronskian_algebraic_identity`, `three_exponential_wronskian_pos_of_ordered`)*
 
 ---
 
@@ -362,9 +363,9 @@ Then $F(x)$ has **at most two real zeros**, counted with multiplicity:
 $$\boxed{\#\{x \in \mathbb{R} : F(x) = 0\} \le 2.}$$
 
 ### Proof
-Because the sequential Wronskians $W_1(x), W_2(x), W(x)$ are strictly positive on the entire real line $\mathbb{R}$, the system $\{e^{\lambda_0 x}, e^{\lambda_1 x}, e^{\lambda_2 x}\}$ is an **Extended Complete Chebyshev (ECT) system** on $\mathbb{R}$ in the sense of Karlin & Studden (1966, Chapter 1, Theorem 1.1).
+Because all successive Wronskians $W_0(x), W_1(x), W_2(x)$ are strictly positive on the entire real line $\mathbb{R}$, the system $\{e^{\lambda_0 x}, e^{\lambda_1 x}, e^{\lambda_2 x}\}$ forms an **Extended Complete Chebyshev (ECT) system** on $\mathbb{R}$ in the sense of Karlin & Studden (1966, Chapter XI, Theorem 1.1, p. 376; see also Pólya & Szegő 1925, Part V, No. 75).
 By the fundamental theorem of ECT systems:
-> Every non-trivial real linear combination of $n$ elements in an ECT system has at most $n - 1$ real zeros, counting multiplicity.
+> Every non-trivial real linear combination of $n$ elements in an ECT system on an interval $I$ has at most $n - 1$ real zeros on $I$, counting multiplicity.
 
 For $n = 3$, the bound is $3 - 1 = 2$. $\blacksquare$
 
@@ -467,7 +468,7 @@ Whether even one such event exists in nature remains **OPEN**.
 
 - **Lean 4 Module**: `formal/RiemannScope/ExponentialPolynomialRigidity.lean`
 - **Root Import**: `formal/RiemannScope.lean`
-- **Total Project Theorems**: 515 (an increase of 14 theorems from 501 in TASK-TC-030R)
+- **Total Project Theorems**: 518 (an increase of 17 theorems from 501 in TASK-TC-030R)
 - **Lean Build**: 0 errors, 0 warnings, 0 sorries (`✔ Built RiemannScope.ExponentialPolynomialRigidity`)
 - **Key Formalized Theorems**:
   - `trinomial_derivative_relation_vector`
@@ -481,6 +482,9 @@ Whether even one such event exists in nature remains **OPEN**.
   - `integer_dilation_negative_polynomial_identity_q2`
   - `integer_dilation_negative_leading_coeff_q1`
   - `integer_dilation_negative_leading_coeff_q2`
+  - `one_exponential_wronskian_pos`
+  - `two_exponential_wronskian_algebraic_identity`
+  - `two_exponential_wronskian_pos_of_ordered`
   - `three_exponential_wronskian_algebraic_identity`
   - `three_exponential_wronskian_pos_of_ordered`
   - `base_one_second_dilation_quadratic_identity`

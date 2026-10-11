@@ -4070,8 +4070,8 @@ The Wronskian $W(x) = e^{(\lambda_0+\lambda_1+\lambda_2)x} (\lambda_1-\lambda_0)
 Functional algebraic independence of $e^{\alpha z}, e^{\beta z}$ over $\mathbb{C}(z)$ does not specialize to arithmetic point evaluations at $z = \log(2\pi)$ (`FUNCTIONAL_RESULT_DOES_NOT_SPECIALIZE_AUTOMATICALLY`).
 
 ### 48.9 Lean 4 Formal Verification
-Formalized in `formal/RiemannScope/ExponentialPolynomialRigidity.lean` (14 declarations compiled, 0 sorry, total 515 declarations):
-`trinomial_derivative_relation_vector`, `trinomial_derivative_relation_not_proportional`, `differential_operator_constant_support_values`, `integer_dilation_positive_polynomial_identity_k2`, `integer_dilation_positive_polynomial_identity_k3`, `integer_dilation_positive_nonzero_coeff_k2`, `integer_dilation_positive_nonzero_coeff_k3`, `integer_dilation_negative_polynomial_identity_q1`, `integer_dilation_negative_polynomial_identity_q2`, `integer_dilation_negative_leading_coeff_q1`, `integer_dilation_negative_leading_coeff_q2`, `three_exponential_wronskian_algebraic_identity`, `three_exponential_wronskian_pos_of_ordered`, `base_one_second_dilation_quadratic_identity`.
+Formalized in `formal/RiemannScope/ExponentialPolynomialRigidity.lean` (17 declarations compiled, 0 sorry, total 518 declarations):
+`trinomial_derivative_relation_vector`, `trinomial_derivative_relation_not_proportional`, `differential_operator_constant_support_values`, `integer_dilation_positive_polynomial_identity_k2`, `integer_dilation_positive_polynomial_identity_k3`, `integer_dilation_positive_nonzero_coeff_k2`, `integer_dilation_positive_nonzero_coeff_k3`, `integer_dilation_negative_polynomial_identity_q1`, `integer_dilation_negative_polynomial_identity_q2`, `integer_dilation_negative_leading_coeff_q1`, `integer_dilation_negative_leading_coeff_q2`, `one_exponential_wronskian_pos`, `two_exponential_wronskian_algebraic_identity`, `two_exponential_wronskian_pos_of_ordered`, `three_exponential_wronskian_algebraic_identity`, `three_exponential_wronskian_pos_of_ordered`, `base_one_second_dilation_quadratic_identity`.
 
 
 

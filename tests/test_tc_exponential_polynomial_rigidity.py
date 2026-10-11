@@ -263,26 +263,33 @@ def test_18_integer_dilation_ray_classification():
 
 
 def test_19_wronskian_identity():
-    """19. Wronskian determinant factors identically into Vandermonde product."""
+    """19. Wronskian determinants W0, W1, W2 factor identically into exponential-Vandermonde products."""
     res = compute_exponential_wronskian(exponents=(0, 1, sqrt(2)))
-    # Check that symbolic expression equals exp(sum * x) * (l1 - l0) * (l2 - l0) * (l2 - l1)
     x = Symbol("x", real=True)
-    expected = exp((1 + sqrt(2)) * x) * (1 - 0) * (sqrt(2) - 0) * (sqrt(2) - 1)
-    assert sp.expand(res.wronskian_symbolic - expected) == 0
+    expected_w0 = exp(0 * x)
+    expected_w1 = exp((0 + 1) * x) * (1 - 0)
+    expected_w2 = exp((1 + sqrt(2)) * x) * (1 - 0) * (sqrt(2) - 0) * (sqrt(2) - 1)
+    assert sp.expand(res.wronskian_w0_symbolic - expected_w0) == 0
+    assert sp.expand(res.wronskian_w1_symbolic - expected_w1) == 0
+    assert sp.expand(res.wronskian_w2_symbolic - expected_w2) == 0
+    assert sp.expand(res.wronskian_symbolic - expected_w2) == 0
 
 
 def test_20_wronskian_nonvanishing_for_distinct_exponents():
-    """20. W(x) > 0 everywhere on R for strictly ordered exponents."""
+    """20. All successive Wronskians W0, W1, W2 > 0 everywhere on R for strictly ordered exponents."""
     res = compute_exponential_wronskian(exponents=(0, 1, sqrt(2)))
     assert res.is_strictly_positive_on_real_line is True
+    assert res.successive_wronskians_positive is True
 
 
 def test_21_at_most_two_real_zeros_positive_control():
-    """21. ECT system guarantees at most 2 real zeros counting multiplicity."""
+    """21. ECT system guarantees at most 2 real zeros counting multiplicity (Karlin & Studden 1966)."""
     res = compute_exponential_wronskian(exponents=(0, Rational(1, 2), Rational(3, 2)))
     assert res.max_real_zeros_bound == 2
     assert res.classification == CLASSIFICATION_AT_MOST_TWO_REAL_EXPONENTIAL_POLYNOMIAL_ZEROS
     assert res.evidence_class == "PROVED_WITH_EXTERNAL_CHEBYSHEV_THEOREM"
+    assert "Karlin & Studden" in res.external_theorem_citation
+    assert "Pólya & Szegő" in res.external_theorem_citation
 
 
 def test_22_sign_variation_diagnostic():

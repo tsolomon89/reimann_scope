@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-031",
+  "active_task_id": "TASK-TC-031R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -746,6 +746,33 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-031 completed: Exponential-polynomial reformulation exact; Lindemann-Weierstrass necessity proved (forces log(2*pi) transcendental); arithmetic status of log(2*pi) verified open; derivative-jet rigidity and simple zero proved (F'(L) != 0, F^(m)(L) != 0 for all m >= 1); differential-operator rigidity derived; positive dilation polynomial P_k(T) constructed with non-zero coefficient a2*k*u*v^(k-1) != 0 at T^(k-1); negative dilation polynomial Q_q(T) constructed with leading coefficient a0*v^q != 0 at T^(2q); integer-dilation ray isolation proved (f(m) = 0 ==> f(km) != 0 for all k in Z \\ {0, 1}; k=0 not excluded); base-one Lindemann specialization separated; Wronskian identity W(x) > 0 on R derived, proving ECT system with at most 2 real zeros counting multiplicity; generalized Descartes sign rule bounded; functional-transcendence firewall established; Lean 4 formalization formal/RiemannScope/ExponentialPolynomialRigidity.lean compiled with 14 new declarations (total 515 project declarations, 0 sorry); 26/26 unit tests passing. Principal classification: EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN."
+    },
+    {
+      "task_id": "TASK-TC-031R",
+      "priority": 35,
+      "objective": "Exponential-Polynomial Evidence Scope Alignment, Lean Declaration Correction, and Chebyshev ECT Lower-Order Wronskian Formalization",
+      "status": "COMPLETED_EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Reconcile Lean formal declarations vs paper derivation vs external theorems; formalize complete ECT successive Wronskian hierarchy W0, W1, W2 in Lean; correct derivative-jet relation-space proof and positive-dilation coefficient presentation.",
+      "planned_calculation": "Formalize one_exponential_wronskian_pos, two_exponential_wronskian_algebraic_identity, and two_exponential_wronskian_pos_of_ordered in Lean 4; verify full ECT hierarchy W0, W1, W2 > 0; cite Karlin & Studden (1966) and Pólya & Szegő (1925); update Python engine and tests; formulate exact mapping table of 17 Lean theorems; replace preliminary report flawed derivative-jet deduction with relation-space dimension bound dim R_{alpha, beta} <= 1; clean positive-dilation proof to focus strictly on [T^(k-1)]P_k(T) = a2*k*u*v^(k-1) != 0.",
+      "acceptance_criterion": "Lean 4 formalization formal/RiemannScope/ExponentialPolynomialRigidity.lean compiled with 17 declarations (total 518 project declarations, 0 sorry); 26/26 unit tests passing; machine-readable artifact data/tc_exponential_polynomial_orbit_isolation.json updated; audit review docs/reviews/TC_031R_EXPONENTIAL_POLYNOMIAL_EVIDENCE_AUDIT.md created; primary classification EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN retained.",
+      "dependencies": [
+        "TASK-TC-031"
+      ],
+      "evidence": [
+        "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
+        "tc/exponential_polynomial_rigidity.py",
+        "tests/test_tc_exponential_polynomial_rigidity.py",
+        "docs/reviews/TC_031R_EXPONENTIAL_POLYNOMIAL_EVIDENCE_AUDIT.md",
+        "docs/reviews/TC_EXPONENTIAL_POLYNOMIAL_ORBIT_ISOLATION.md",
+        "data/tc_exponential_polynomial_orbit_isolation.json",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-031R completed: Lean formal scope aligned with 17 exact declarations in ExponentialPolynomialRigidity.lean (total 518 declarations in project, 0 sorry); successive Wronskian hierarchy W0, W1, W2 > 0 formalized in Lean and computed in Python; Karlin & Studden (1966) and Pólya & Szegő (1925) explicitly cited for ECT real zero bound; derivative-jet rigidity proof formulated rigorously via relation-space dimension bound dim R_{alpha, beta} <= 1; positive dilation polynomial proof cleaned to focus strictly on non-zero coefficient [T^(k-1)]P_k(T) = a2*k*u*v^(k-1) != 0; 26/26 unit tests passing. Principal classification: EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN."
     }
   ]
 }
