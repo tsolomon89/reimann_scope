@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-030R",
+  "active_task_id": "TASK-TC-031",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -720,6 +720,32 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-030R completed: Support canonicalization implemented; fail-closed exact affine rank; hypothesis-aware relation-space dimension bound; invariant all-minor Cramer proof; exceptional direction diagnostics using Y_sym; direct elementary real normalization; NO_CANONICAL_ORBIT_VANISHING_PROPAGATION wording; multiplicative groups distinguished (ranks 2, 4, 1); campaign universe clarified (120 total 3-monomial subsets, 36 constant-anchored tested: 30 rank-two, 6 rank-one controls; 90,828 = 75,690 + 15,138 candidates); Lean evidence scope aligned with detailed mapping table; 24/24 regression tests passing. Principal classifications: TASK_TC_030R_TRINOMIAL_REPAIR_COMPLETE and TRINOMIAL_FRONTIER_STRUCTURALLY_CLASSIFIED_EXISTENCE_OPEN."
+    },
+    {
+      "task_id": "TASK-TC-031",
+      "priority": 34,
+      "objective": "Exponential-Polynomial Jet Rigidity and Integer-Dilation Orbit Isolation",
+      "status": "COMPLETED_EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Extract exact consequences of hypothetical minimal trinomial relation by treating it as an exponential-polynomial zero at L = log(2*pi).",
+      "planned_calculation": "Reformulate relation as F(L) = 0 where F(z) = a0 + a1*e^(alpha*z) + a2*e^(beta*z); prove Lindemann-Weierstrass necessity; derive derivative-jet rigidity and simple zero; derive differential-operator rigidity; construct positive dilation polynomial P_k(T) with non-zero T^(k-1) coefficient; construct negative dilation polynomial Q_q(T) with non-zero leading coefficient T^(2q); prove integer-dilation ray isolation; prove base-one Lindemann specialization; derive 3-exponential Wronskian identity and at-most-two real zero bound; establish functional-transcendence firewall.",
+      "acceptance_criterion": "26/26 unit tests passing in tests/test_tc_exponential_polynomial_rigidity.py; Lean 4 formalization formal/RiemannScope/ExponentialPolynomialRigidity.lean compiled (515 total declarations, 0 sorry); machine-readable artifact data/tc_exponential_polynomial_orbit_isolation.json; review docs/reviews/TC_EXPONENTIAL_POLYNOMIAL_ORBIT_ISOLATION.md; primary classification EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN.",
+      "dependencies": [
+        "TASK-TC-030R"
+      ],
+      "evidence": [
+        "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
+        "tc/exponential_polynomial_rigidity.py",
+        "tests/test_tc_exponential_polynomial_rigidity.py",
+        "docs/reviews/TC_EXPONENTIAL_POLYNOMIAL_ORBIT_ISOLATION.md",
+        "data/tc_exponential_polynomial_orbit_isolation.json",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-031 completed: Exponential-polynomial reformulation exact; Lindemann-Weierstrass necessity proved (forces log(2*pi) transcendental); arithmetic status of log(2*pi) verified open; derivative-jet rigidity and simple zero proved (F'(L) != 0, F^(m)(L) != 0 for all m >= 1); differential-operator rigidity derived; positive dilation polynomial P_k(T) constructed with non-zero coefficient a2*k*u*v^(k-1) != 0 at T^(k-1); negative dilation polynomial Q_q(T) constructed with leading coefficient a0*v^q != 0 at T^(2q); integer-dilation ray isolation proved (f(m) = 0 ==> f(km) != 0 for all k in Z \\ {0, 1}; k=0 not excluded); base-one Lindemann specialization separated; Wronskian identity W(x) > 0 on R derived, proving ECT system with at most 2 real zeros counting multiplicity; generalized Descartes sign rule bounded; functional-transcendence firewall established; Lean 4 formalization formal/RiemannScope/ExponentialPolynomialRigidity.lean compiled with 14 new declarations (total 515 project declarations, 0 sorry); 26/26 unit tests passing. Principal classification: EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN."
     }
   ]
-}
+}

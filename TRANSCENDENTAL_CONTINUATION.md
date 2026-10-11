@@ -1785,6 +1785,68 @@ Formalized in `formal/RiemannScope/TrinomialKernel.lean` (12 declarations compil
 
 Audit finding: `NO_ZETA_TO_KERNEL_BRIDGE_FOUND` remains strictly preserved. The trinomial frontier is a pure number-theoretic problem, not an RH route.
 
+---
+
+## 38. Exponential-Polynomial Jet Rigidity and Integer-Dilation Orbit Isolation (TASK-TC-031)
+
+### 38.1 Exponential-Polynomial Reformulation
+The minimal unresolved ambient trinomial relation is reformulated as a zero of an exponential polynomial:
+\[
+L = \log\tau = \log(2\pi) > 0, \qquad F(z) = a_0 + a_1 e^{\alpha z} + a_2 e^{\beta z},
+\]
+\[
+\boxed{F(L) = 0 \iff a_0 + a_1\tau^\alpha + a_2\tau^\beta = 0.}
+\]
+The integer dilation sequence $f(n) = a_0 + a_1 X^n + a_2 Y^n$ is the restriction of $F$ to $L\mathbb{Z}$: $f(n) = F(nL)$.
+Canonical terminology: `EXPONENTIAL_POLYNOMIAL`, `LOG_TAU_EVALUATION`, `INTEGER_DILATION_ORBIT`.
+
+### 38.2 Lindemann–Weierstrass Necessity Theorem
+If $F(L) = 0$, then $L = \log(2\pi)$ must be transcendental (`TRINOMIAL_RELATION_IMPLIES_LOG_TAU_TRANSCENDENTAL`).
+Reason: If $L \in \overline{\mathbb{Q}}$, then $0, \alpha L, \beta L$ are 3 distinct algebraic numbers, so $1, e^{\alpha L}, e^{\beta L}$ are linearly independent over $\overline{\mathbb{Q}}$ by Lindemann–Weierstrass (1885), contradicting $a_0 \cdot 1 + a_1 e^{\alpha L} + a_2 e^{\beta L} = 0$.
+The arithmetic nature of $\log(2\pi)$ remains an open problem in number theory (Waldschmidt, Baker).
+
+### 38.3 Derivative-Jet Rigidity and Simple Zero
+For every integer $m \ge 1$:
+\[
+F^{(m)}(L) = a_1\alpha^m X + a_2\beta^m Y \ne 0.
+\]
+The derivative vector $(0, a_1\alpha^m, a_2\beta^m)$ cannot be proportional to $(a_0, a_1, a_2)$ because $a_0 \ne 0$. A second vanishing forces $\dim_{\overline{\mathbb{Q}}} \mathcal{R}_{\alpha, \beta} \ge 2$, contradicting $\dim \le 1$ from Gelfond–Schneider.
+In particular, $F'(L) \ne 0$, so any hypothetical trinomial zero at $L$ must be strictly simple (`TRINOMIAL_ZERO_SIMPLE`, `ALL_POSITIVE_DERIVATIVE_JETS_NONZERO`).
+
+### 38.4 Differential-Operator Rigidity
+For any polynomial $P(T) \in \overline{\mathbb{Q}}[T]$, $P(D)F(L) = 0$ forces $P(0) = P(\alpha) = P(\beta)$ (`DIFFERENTIAL_OPERATOR_RIGIDITY`).
+
+### 38.5 Integer-Dilation Ray Isolation
+The trinomial frontier has been sharpened from mere non-propagation to integer-dilation ray isolation:
+\[
+\boxed{f(m) = 0 \implies f(km) \ne 0 \quad \text{for every integer } k \in \mathbb{Z} \setminus \{0, 1\}.}
+\]
+For the original relation ($m = 1$), $f(n) \ne 0$ for all $n \in \mathbb{Z} \setminus \{0, 1\}$ (`INTEGER_DILATION_RAY_ISOLATION`).
+- Positive multipliers $k \ge 2$: $P_k(T) = a_0 + a_1 T^k + a_2(u + v T)^k$ has non-vanishing coefficient $a_2 k u v^{k-1} \ne 0$ at $T^{k-1}$.
+- Negative multipliers $k = -q \le -1$: $Q_q(T) = a_0 T^q (u + v T)^q + a_1(u + v T)^q + a_2 T^q$ has non-vanishing leading coefficient $a_0 v^q \ne 0$ at $T^{2q}$.
+Both force $U = \tau^{m\alpha} \in \overline{\mathbb{Q}}$, contradicting Gelfond–Schneider.
+The value $k = 0$ is explicitly not excluded: $f(0) = a_0 + a_1 + a_2$ is an independent constant sum.
+
+### 38.6 Base-One Lindemann Specialization
+For $\alpha = 1, \beta = \sqrt{2}$, $U = (2\pi)^m \in \overline{\mathbb{Q}}$ directly contradicts Lindemann (1882) transcendence of $\pi$ without invoking Gelfond–Schneider (`BASE_ONE_ORBIT_ISOLATION_BY_LINDEMANN`).
+
+### 38.7 Chebyshev System and Real-Zero Count
+The Wronskian $W(x) = e^{(\lambda_0+\lambda_1+\lambda_2)x} (\lambda_1-\lambda_0)(\lambda_2-\lambda_0)(\lambda_2-\lambda_1) > 0$ on $\mathbb{R}$.
+The basis $\{e^{\lambda_0 x}, e^{\lambda_1 x}, e^{\lambda_2 x}\}$ forms an Extended Complete Chebyshev (ECT) system on $\mathbb{R}$, proving $F(x)$ has at most 2 real zeros counting multiplicity (`AT_MOST_TWO_REAL_EXPONENTIAL_POLYNOMIAL_ZEROS`).
+
+### 38.8 Distinction of Three Zero Notions
+- Real zeros of $F(x)$: at most 2 on $\mathbb{R}$ counting multiplicity.
+- Integer dilation zeros $f(n) = F(nL)$: at most two integers in $\mathbb{Z}$ ($n = 1$ and $n = 0$ if $a_0+a_1+a_2=0$).
+- Ambient-kernel relation $F(L) = 0$: existence remains open (`EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN`).
+
+### 38.9 Functional-Transcendence Firewall
+Functional algebraic independence of $e^{\alpha z}, e^{\beta z}$ over $\mathbb{C}(z)$ (Ax–Schanuel, differential Galois theory, Siegel–Shidlovskii) does not specialize to arithmetic point evaluations at transcendental $z = \log(2\pi)$ (`FUNCTIONAL_RESULT_DOES_NOT_SPECIALIZE_AUTOMATICALLY`).
+
+### 38.10 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/ExponentialPolynomialRigidity.lean` (14 declarations compiled, 0 sorry, total 515 declarations):
+`trinomial_derivative_relation_vector`, `trinomial_derivative_relation_not_proportional`, `differential_operator_constant_support_values`, `integer_dilation_positive_polynomial_identity_k2`, `integer_dilation_positive_polynomial_identity_k3`, `integer_dilation_positive_nonzero_coeff_k2`, `integer_dilation_positive_nonzero_coeff_k3`, `integer_dilation_negative_polynomial_identity_q1`, `integer_dilation_negative_polynomial_identity_q2`, `integer_dilation_negative_leading_coeff_q1`, `integer_dilation_negative_leading_coeff_q2`, `three_exponential_wronskian_algebraic_identity`, `three_exponential_wronskian_pos_of_ordered`, `base_one_second_dilation_quadratic_identity`.
+
+
 
 
 

@@ -27,4 +27,6 @@ import RiemannScope.UnitRescaling
 import RiemannScope.MultiGradeNaturality
 import RiemannScope.AmbientKernel
 import RiemannScope.TrinomialKernel
+import RiemannScope.ExponentialPolynomialRigidity
+
 

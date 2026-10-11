@@ -53,7 +53,9 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/MultiGradeNaturality.lean",
     "formal/RiemannScope/AmbientKernel.lean",
     "formal/RiemannScope/TrinomialKernel.lean",
+    "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
 ]
+
 
 
 REQUIRED_BUILDER_FILES = [

@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0.0",
+  "task": "TASK-TC-031",
+  "task_description": "Exponential-Polynomial Jet Rigidity and Integer-Dilation Orbit Isolation",
+  "starting_head": "16aec95997094fec3a298eb5f7596caaff1b3305",
+  "substantive_parent": "e54a9d65f0a36094e3fd4be717d0a9c9ec4f226e",
+  "principal_classification": "EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN",
+  "secondary_classifications": [
+    "TRINOMIAL_RELATION_IMPLIES_LOG_TAU_TRANSCENDENTAL",
+    "TRINOMIAL_ZERO_SIMPLE",
+    "ALL_POSITIVE_DERIVATIVE_JETS_NONZERO",
+    "DIFFERENTIAL_OPERATOR_RIGIDITY",
+    "INTEGER_DILATION_RAY_ISOLATION",
+    "BASE_ONE_ORBIT_ISOLATION_BY_LINDEMANN",
+    "AT_MOST_TWO_REAL_EXPONENTIAL_POLYNOMIAL_ZEROS",
+    "FUNCTIONAL_RESULT_DOES_NOT_SPECIALIZE_AUTOMATICALLY",
+    "TRINOMIAL_EXISTENCE_OPEN",
+    "NO_ZETA_TO_KERNEL_BRIDGE_FOUND",
+    "NO_RH_IMPLICATION"
+  ],
+  "canonical_terminology": {
+    "EXPONENTIAL_POLYNOMIAL": "F(z) = a0 + a1 * e^(alpha * z) + a2 * e^(beta * z)",
+    "LOG_TAU_EVALUATION": "F(L) where L = log(tau) = log(2*pi) > 0",
+    "INTEGER_DILATION_ORBIT": "f(n) = F(n*L) = a0 + a1 * X^n + a2 * Y^n for n in Z"
+  },
+  "normalized_relation": {
+    "equation": "a0 + a1 * tau^alpha + a2 * tau^beta = 0",
+    "tau": "2*pi",
+    "coefficients": "a0, a1, a2 in Q_bar^times",
+    "exponents": "alpha, beta in A_R^times, alpha / beta not in Q",
+    "ambient_generators": "X = tau^alpha, Y = tau^beta",
+    "affine_rank": 2
+  },
+  "exponential_polynomial": {
+    "definition": "F(z) = a0 + a1 * exp(alpha * z) + a2 * exp(beta * z)",
+    "evaluation_point": "L = log(tau) = log(2*pi) > 0",
+    "equivalence": "F(L) = 0 <=> a0 + a1 * tau^alpha + a2 * tau^beta = 0",
+    "dilation_restriction": "f(n) = F(n * L) on L * Z"
+  },
+  "lindemann_weierstrass_necessity": {
+    "theorem": "F(L) = 0 implies L = log(2*pi) is transcendental",
+    "proof_summary": "If L in Q_bar, then 0, alpha*L, beta*L are 3 pairwise distinct algebraic numbers (since L != 0, alpha, beta != 0, alpha != beta). By Lindemann-Weierstrass (1885), 1, exp(alpha*L), exp(beta*L) are linearly independent over Q_bar, contradicting a0*1 + a1*exp(alpha*L) + a2*exp(beta*L) = 0 with a0*a1*a2 != 0.",
+    "literature_status_log_tau": "OPEN: Arithmetic status of log(2*pi) is unproved (unknown whether rational, algebraic irrational, or transcendental). Conjectured transcendental via Schanuel's conjecture.",
+    "evidence_class": "PROVED_WITH_EXTERNAL_LINDEMANN_WEIERSTRASS",
+    "classification": "TRINOMIAL_RELATION_IMPLIES_LOG_TAU_TRANSCENDENTAL"
+  },
+  "derivative_jet_rigidity": {
+    "theorem": "F(L) = 0 implies F^(m)(L) != 0 for every integer m >= 1; in particular, F'(L) != 0 so any trinomial zero at L is simple.",
+    "mth_derivative_formula": "F^(m)(z) = a1 * alpha^m * exp(alpha * z) + a2 * beta^m * exp(beta * z)",
+    "evaluation_at_L": "F^(m)(L) = a1 * alpha^m * X + a2 * beta^m * Y",
+    "coefficient_vector": "(0, a1 * alpha^m, a2 * beta^m)",
+    "non_proportionality_proof": "The original relation vector is (a0, a1, a2) with a0 != 0. The derivative vector has first coordinate 0 while its second coordinate is a1 * alpha^m != 0. They cannot be proportional. Thus a second vanishing F^(m)(L) = 0 forces dim_Q_bar R_{alpha, beta} >= 2, contradicting dim <= 1 from Gelfond-Schneider.",
+    "evidence_class": "PROVED_PAPER_DERIVATION + EXTERNAL_GELFOND_SCHNEIDER",
+    "classifications": [
+      "TRINOMIAL_ZERO_SIMPLE",
+      "ALL_POSITIVE_DERIVATIVE_JETS_NONZERO"
+    ]
+  },
+  "differential_operator_rigidity": {
+    "theorem": "For P(T) in Q_bar[T], P(D)F(L) = 0 forces P(0) = P(alpha) = P(beta).",
+    "operator_action": "P(D)F(L) = a0 * P(0) * 1 + a1 * P(alpha) * X + a2 * P(beta) * Y",
+    "derivation": "Relation-space dimension at most 1 forces (a0 * P(0), a1 * P(alpha), a2 * P(beta)) = lambda * (a0, a1, a2). Since a0, a1, a2 != 0, lambda = P(0) = P(alpha) = P(beta).",
+    "application_to_jets": "P(T) = T^m gives P(0) = 0 != P(alpha) = alpha^m, immediately recovering derivative-jet non-vanishing for all m >= 1.",
+    "classification": "DIFFERENTIAL_OPERATOR_RIGIDITY",
+    "evidence_class": "PROVED_PAPER_DERIVATION + EXTERNAL_GELFOND_SCHNEIDER"
+  },
+  "integer_dilation_orbit_isolation": {
+    "setup": "f(n) = a0 + a1 * X^n + a2 * Y^n. Assume f(m) = 0 for m in Z \\ {0}. Then U = X^m = tau^(m*alpha), V = Y^m = tau^(m*beta) satisfy a0 + a1 * U + a2 * V = 0, so V = u + v * U where u = -a0/a2 != 0, v = -a1/a2 != 0.",
+    "positive_multipliers_k_ge_2": {
+      "equation": "P_k(U) = a0 + a1 * U^k + a2 * (u + v * U)^k = 0",
+      "distinguished_power": "T^(k-1)",
+      "distinguished_coefficient": "a2 * k * u * v^(k-1)",
+      "non_vanishing_proof": "a2 != 0, k >= 2, u != 0, v != 0, and T^(k-1) does not appear in a0 + a1 * T^k since 0 < k-1 < k. Hence P_k is a non-zero polynomial in Q_bar[T], forcing U in Q_bar.",
+      "lean_theorems": [
+        "integer_dilation_positive_polynomial_identity_k2",
+        "integer_dilation_positive_polynomial_identity_k3",
+        "integer_dilation_positive_nonzero_coeff_k2",
+        "integer_dilation_positive_nonzero_coeff_k3"
+      ]
+    },
+    "negative_multipliers_k_le_neg1": {
+      "equation": "Q_q(U) = a0 * U^q * (u + v * U)^q + a1 * (u + v * U)^q + a2 * U^q = 0 where k = -q <= -1",
+      "distinguished_power": "T^(2q)",
+      "distinguished_coefficient": "a0 * v^q",
+      "non_vanishing_proof": "The term a0 * T^q * (u + v * T)^q has degree 2q with leading coefficient a0 * v^q != 0 (since a0 != 0, v != 0). All other terms have degree at most q < 2q. Hence Q_q is a non-zero polynomial in Q_bar[T], forcing U in Q_bar.",
+      "lean_theorems": [
+        "integer_dilation_negative_polynomial_identity_q1",
+        "integer_dilation_negative_polynomial_identity_q2",
+        "integer_dilation_negative_leading_coeff_q1",
+        "integer_dilation_negative_leading_coeff_q2"
+      ]
+    },
+    "ray_theorem": "f(m) = 0 implies f(km) != 0 for all k in Z \\ {0, 1}. For m = 1, f(n) != 0 for all n in Z \\ {0, 1}.",
+    "k_zero_status": "k = 0 is explicitly NOT excluded: f(0) = a0 + a1 + a2 is an independent constant coefficient sum.",
+    "classification": "INTEGER_DILATION_RAY_ISOLATION",
+    "evidence_class": "PROVED_PAPER_DERIVATION + EXTERNAL_GELFOND_SCHNEIDER"
+  },
+  "base_one_specialization": {
+    "support": "alpha = 1, beta = sqrt(2)",
+    "generator": "U = tau^m = (2*pi)^m",
+    "contradiction": "P_k(U) = 0 or Q_q(U) = 0 forces 2*pi in Q_bar, which contradicts Lindemann (1882) transcendence of pi directly.",
+    "distinction": "Does not require external Gelfond-Schneider theorem for S_tau.",
+    "classification": "BASE_ONE_ORBIT_ISOLATION_BY_LINDEMANN",
+    "evidence_class": "PROVED_WITH_EXTERNAL_LINDEMANN",
+    "lean_theorems": [
+      "base_one_second_dilation_quadratic_identity"
+    ]
+  },
+  "chebyshev_wronskian_structure": {
+    "ordered_exponents": "lambda0 < lambda1 < lambda2 where {lambda0, lambda1, lambda2} = {0, alpha, beta}",
+    "wronskian_identity": "W(x) = exp((lambda0 + lambda1 + lambda2) * x) * (lambda1 - lambda0) * (lambda2 - lambda0) * (lambda2 - lambda1)",
+    "non_vanishing": "W(x) > 0 everywhere on R, establishing that {exp(lambda0*x), exp(lambda1*x), exp(lambda2*x)} is an Extended Complete Chebyshev (ECT) system on R.",
+    "real_zero_bound": "Every non-trivial real linear combination F(x) has at most 3 - 1 = 2 real zeros, counted with multiplicity (Karlin & Studden 1966).",
+    "classification": "AT_MOST_TWO_REAL_EXPONENTIAL_POLYNOMIAL_ZEROS",
+    "evidence_class": "PROVED_WITH_EXTERNAL_CHEBYSHEV_THEOREM",
+    "lean_theorems": [
+      "three_exponential_wronskian_algebraic_identity",
+      "three_exponential_wronskian_pos_of_ordered"
+    ]
+  },
+  "sign_variation_refinement": {
+    "theorem": "Generalized Descartes rule of signs for exponential polynomials (Laguerre 1883, Karlin & Studden 1966): number of real zeros counting multiplicity is bounded by sign variations v(c0, c1, c2).",
+    "bounds": {
+      "v_0_same_sign": "0 real zeros (no vanishing possible)",
+      "v_1_single_variation": "At most 1 real zero (strictly monotonic derivative quotient)",
+      "v_2_two_variations": "At most 2 real zeros (matches full ECT bound)"
+    },
+    "evidence_class": "PROVED_PAPER_DERIVATION"
+  },
+  "distinction_of_three_zero_notions": {
+    "1_real_zeros": "F(x) = 0 for x in R: at most 2 real zeros counted with multiplicity (ECT bound).",
+    "2_dilation_orbit_zeros": "f(n) = F(n*L) = 0 for n in Z: at most two integers in Z (n = 1 if relation exists, n = 0 if a0+a1+a2=0).",
+    "3_ambient_kernel_relation": "F(L) = 0: existence of even one relation remains OPEN."
+  },
+  "functional_transcendence_firewall": {
+    "classification": "FUNCTIONAL_RESULT_DOES_NOT_SPECIALIZE_AUTOMATICALLY",
+    "theorems_audited": [
+      {
+        "name": "Ax-Schanuel (1971)",
+        "scope": "Differential fields and C(z)",
+        "why_it_does_not_specialize": "Functional algebraic independence over C(z) requires the full arithmetic Schanuel conjecture to specialize at transcendental points z = log(2*pi)."
+      },
+      {
+        "name": "Differential Galois Theory / Kolchin (1973)",
+        "scope": "Differential field automorphisms",
+        "why_it_does_not_specialize": "Governs function fields, not point evaluations at complex constants."
+      },
+      {
+        "name": "Siegel-Shidlovskii Theory (1929/1959)",
+        "scope": "E-functions at algebraic points",
+        "why_it_does_not_specialize": "Applies strictly to algebraic points z in Q_bar; L = log(2*pi) is not known algebraic (and is proved transcendental if a relation holds)."
+      }
+    ]
+  },
+  "literature_audit_matrix": [
+    {
+      "theorem": "Lindemann-Weierstrass (1885)",
+      "hypotheses": "Distinct algebraic exponents alpha_i in Q_bar",
+      "consequence_for_F": "If L in Q_bar, 1, exp(alpha*L), exp(beta*L) are linearly independent over Q_bar",
+      "arithmetic_consequence_at_L": "F(L) = 0 forces L = log(2*pi) to be transcendental",
+      "does_it_prove_nonexistence": "No (status of log(2*pi) is open)"
+    },
+    {
+      "theorem": "Gelfond-Schneider (1934) / Baker (1975)",
+      "hypotheses": "Linear forms in logarithms; dim_Q S_tau <= 1",
+      "consequence_for_F": "Two independent relations force coordinates into Q_bar",
+      "arithmetic_consequence_at_L": "Positive/negative dilation polynomials force U in Q_bar, contradicting Q-independence of alpha, beta",
+      "does_it_prove_nonexistence": "No (excludes recurrence/dilation orbit, but leaves F(L) = 0 open)"
+    },
+    {
+      "theorem": "Laguerre (1883) / Karlin-Studden (1966)",
+      "hypotheses": "Real exponential sums with ordered real exponents",
+      "consequence_for_F": "W(x) > 0 everywhere on R; ECT system",
+      "arithmetic_consequence_at_L": "F has at most 2 real zeros counting multiplicity",
+      "does_it_prove_nonexistence": "No (L could be one of the at most 2 real zeros)"
+    },
+    {
+      "theorem": "Ax-Schanuel (1971)",
+      "hypotheses": "Analytic/meromorphic functions on C",
+      "consequence_for_F": "exp(alpha*z) and exp(beta*z) are algebraically independent over C(z)",
+      "arithmetic_consequence_at_L": "Does not specialize without arithmetic Schanuel conjecture",
+      "does_it_prove_nonexistence": "No"
+    },
+    {
+      "theorem": "Siegel-Shidlovskii (1929/1959)",
+      "hypotheses": "E-functions evaluated at algebraic points",
+      "consequence_for_F": "Values of E-functions at algebraic points reflect algebraic relations",
+      "arithmetic_consequence_at_L": "Does not apply because L = log(2*pi) is not known algebraic",
+      "does_it_prove_nonexistence": "No"
+    }
+  ],
+  "exact_remaining_open_problem": "Does there exist any triple (a0, a1, a2) in (Q_bar^times)^3 and incommensurable (alpha, beta) in (A_R^times)^2 such that F(log(2*pi)) = a0 + a1 * (2*pi)^alpha + a2 * (2*pi)^beta = 0?",
+  "formalization_status": {
+    "lake_build_exit_code": 0,
+    "project_theorems_count": 515,
+    "new_theorems_count": 14,
+    "lean_module": "formal/RiemannScope/ExponentialPolynomialRigidity.lean"
+  }
+}

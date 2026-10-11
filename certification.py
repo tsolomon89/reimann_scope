@@ -129,6 +129,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/MultiGradeNaturality.lean",
     "formal/RiemannScope/AmbientKernel.lean",
     "formal/RiemannScope/TrinomialKernel.lean",
+    "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
 ]
 
 
