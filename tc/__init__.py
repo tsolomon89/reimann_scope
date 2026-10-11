@@ -262,6 +262,7 @@ from tc.trinomial_kernel import (
     DilationOrbitResult,
     CertifiedTrinomialExclusionResult,
     canonicalize_group_algebra_terms,
+    exact_grades_equal,
     classify_minimal_support,
     compute_affine_support_rank_trinomial,
     derive_relation_space_dimension_bound,

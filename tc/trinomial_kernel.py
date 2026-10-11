@@ -155,6 +155,43 @@ class CertifiedTrinomialExclusionResult:
     classification: str
 
 
+def exact_grades_equal(g1: Any, g2: Any) -> bool:
+    r"""Decide exact equality of two grades in \mathbb{A}_{\mathbb{R}}, failing closed if undecided.
+
+    Returns:
+        True if g1 == g2 is proven.
+        False if g1 != g2 is proven.
+
+    Raises:
+        ValueError("GRADE_EQUALITY_UNRESOLVED: ...") if symbolic equality cannot be resolved.
+    """
+    g1_sym = sympify(g1)
+    g2_sym = sympify(g2)
+    if g1_sym == g2_sym:
+        return True
+    diff = sp.simplify(g1_sym - g2_sym)
+    if diff == 0 or diff.is_zero is True:
+        return True
+    if diff.is_zero is False:
+        return False
+    eq = diff.equals(0)
+    if eq is True:
+        return True
+    if eq is False:
+        return False
+    # If eq is None, try algebraic number field reduction
+    try:
+        from sympy.polys.numberfields import to_number_field
+        an = to_number_field([diff])
+        if an == 0 or sp.simplify(an) == 0:
+            return True
+    except Exception:
+        pass
+    raise ValueError(
+        f"GRADE_EQUALITY_UNRESOLVED: unable to decide equality of grades {g1_sym} and {g2_sym}"
+    )
+
+
 def canonicalize_group_algebra_terms(
     terms: List[Tuple[Any, Any]]
 ) -> List[Tuple[sp.Expr, sp.Expr]]:
@@ -162,7 +199,7 @@ def canonicalize_group_algebra_terms(
 
     Steps:
     1. Converts each coefficient and grade to exact symbolic form (sp.sympify).
-    2. Groups all terms having the same grade (via sp.simplify(g1 - g2) == 0).
+    2. Groups all terms having the same grade (via fail-closed exact_grades_equal).
     3. Sums coefficients within each grade.
     4. Simplifies coefficient sums exactly (sp.simplify).
     5. Removes grades whose combined coefficient is exactly zero.
@@ -174,7 +211,7 @@ def canonicalize_group_algebra_terms(
         g_sym = sp.simplify(sympify(g))
         found = False
         for idx, (c_acc, g_acc) in enumerate(grouped):
-            if sp.simplify(g_sym - g_acc) == 0:
+            if exact_grades_equal(g_sym, g_acc):
                 grouped[idx] = (sp.simplify(c_acc + c_sym), g_acc)
                 found = True
                 break
@@ -360,11 +397,29 @@ def derive_relation_space_dimension_bound(
             description="Grades alpha, beta are collinear over Q; relation reduces to single-variable S_tau.",
         )
 
+    if not assume_gelfond_schneider:
+        return RelationSpaceDimensionBound(
+            alpha=a_sym,
+            beta=b_sym,
+            is_rationally_independent=True,
+            assumes_external_gelfond_schneider=False,
+            dimension_bound=-1,
+            theorem_conclusion="CONDITIONAL_ON_EXTERNAL_GELFOND_SCHNEIDER",
+            evidence_class="CONDITIONAL_ON_EXTERNAL_GELFOND_SCHNEIDER",
+            status="UNRESOLVED_WITHOUT_GELFOND_SCHNEIDER",
+            description=(
+                "Two independent relations force X, Y in Q_bar (alpha, beta in S_tau). "
+                "Without assuming the external Gelfond-Schneider theorem (dim_Q S_tau <= 1), "
+                "having alpha, beta in S_tau does not contradict rational independence of alpha and beta. "
+                "Therefore, the dimension bound <= 1 is conditional on external Gelfond-Schneider."
+            ),
+        )
+
     return RelationSpaceDimensionBound(
         alpha=a_sym,
         beta=b_sym,
         is_rationally_independent=True,
-        assumes_external_gelfond_schneider=assume_gelfond_schneider,
+        assumes_external_gelfond_schneider=True,
         dimension_bound=1,
         theorem_conclusion="AT_MOST_ONE_DIMENSIONAL",
         evidence_class="PROVED_PAPER_DERIVATION_PLUS_EXTERNAL_GELFOND_SCHNEIDER",

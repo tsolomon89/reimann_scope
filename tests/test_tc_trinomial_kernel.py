@@ -44,6 +44,7 @@ from tc.trinomial_kernel import (
     SUPPORT_BOX_AFFINE_RANK_TWO_SUPPORTS,
     SUPPORT_BOX_AFFINE_RANK_ONE_CONTROLS,
     NORMALIZED_COEFFICIENTS_PER_SUPPORT,
+    exact_grades_equal,
     canonicalize_group_algebra_terms,
     classify_minimal_support,
     compute_affine_support_rank_trinomial,
@@ -135,6 +136,15 @@ def test_relation_space_helper_records_assumptions():
     assert bound_res.theorem_conclusion == "AT_MOST_ONE_DIMENSIONAL"
     assert bound_res.evidence_class == "PROVED_PAPER_DERIVATION_PLUS_EXTERNAL_GELFOND_SCHNEIDER"
     assert bound_res.status == "RESOLVED"
+
+    # Operative assume_gelfond_schneider=False produces conditional result
+    bound_no_gs = derive_relation_space_dimension_bound(1, sqrt(2), assume_gelfond_schneider=False)
+    assert bound_no_gs.dimension_bound == -1
+    assert bound_no_gs.is_rationally_independent is True
+    assert bound_no_gs.assumes_external_gelfond_schneider is False
+    assert bound_no_gs.status == "UNRESOLVED_WITHOUT_GELFOND_SCHNEIDER"
+    assert bound_no_gs.theorem_conclusion == "CONDITIONAL_ON_EXTERNAL_GELFOND_SCHNEIDER"
+    assert bound_no_gs.evidence_class == "CONDITIONAL_ON_EXTERNAL_GELFOND_SCHNEIDER"
 
     # Backward compatibility helper also works
     assert evaluate_relation_space_dimension_bound(1, sqrt(2)) == 1
@@ -339,3 +349,24 @@ def test_no_full_algebraic_independence_claim():
 def test_no_rh_claim():
     audit = audit_multiplicative_group_theorems()
     assert audit["zeta_bridge_status"] == "NO_ZETA_TO_KERNEL_BRIDGE_FOUND"
+
+
+# 25. unresolved grade equality fails closed
+def test_unresolved_grade_equality_fails_closed():
+    f = sp.Function("f")
+    g = sp.Function("g")
+    terms = [(1, f(1)), (1, g(1))]
+    with pytest.raises(ValueError, match="GRADE_EQUALITY_UNRESOLVED"):
+        canonicalize_group_algebra_terms(terms)
+
+
+# 26. exact_grades_equal helper verifies algebraic equality and non-equality
+def test_exact_grades_equal_helper():
+    assert exact_grades_equal(sqrt(2), sqrt(8) / 2) is True
+    assert exact_grades_equal(sqrt(2), sqrt(3)) is False
+    assert exact_grades_equal(0, 0) is True
+    assert exact_grades_equal(sqrt(2) + sqrt(3), sqrt(5 + 2 * sqrt(6))) is True
+    f = sp.Function("f")
+    g = sp.Function("g")
+    with pytest.raises(ValueError, match="GRADE_EQUALITY_UNRESOLVED"):
+        exact_grades_equal(f(1), g(1))

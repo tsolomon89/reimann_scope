@@ -94,6 +94,19 @@ This corrective pass repaired ten specific evidence, algebraic canonicalization,
 - **Evidence Classification**: `EVIDENCE_HIERARCHY_ALIGNED`
 - **Regression Tests**: `test_no_full_algebraic_independence_claim`, `test_no_rh_claim`.
 
+### Defect 11: Operative Gelfond-Schneider Flag, Fail-Closed Grade Equality, and Build Provenance
+- **Defect**:
+  1. `derive_relation_space_dimension_bound` recorded `assume_gelfond_schneider` as metadata but returned resolved status and bound 1 even when `False`.
+  2. `canonicalize_group_algebra_terms` used `sp.simplify(g1 - g2) == 0`, potentially treating undecided symbolic equality as inequality.
+  3. `formal/build_report.json` was amended locally into transient SHAs rather than bound via the two-commit pattern.
+- **Affected Files**: `tc/trinomial_kernel.py`, `tc/__init__.py`, `tests/test_tc_trinomial_kernel.py`, `formal/build_report.json`.
+- **Repair**:
+  1. `derive_relation_space_dimension_bound` now branches on `not assume_gelfond_schneider`, returning `dimension_bound=-1`, `status="UNRESOLVED_WITHOUT_GELFOND_SCHNEIDER"`, and `theorem_conclusion="CONDITIONAL_ON_EXTERNAL_GELFOND_SCHNEIDER"`.
+  2. Implemented `exact_grades_equal` which checks `equals(0)` and number field reductions, raising `ValueError("GRADE_EQUALITY_UNRESOLVED: ...")` if equality cannot be certified.
+  3. Formal build report provenance is generated against an actual committed SHA and committed separately in a dedicated build commit.
+- **Evidence Classification**: `HYPOTHESIS_VALIDATION_ENFORCED`
+- **Regression Tests**: `test_relation_space_helper_records_assumptions` (tests both `True` and `False`), `test_unresolved_grade_equality_fails_closed`, `test_exact_grades_equal_helper`.
+
 ---
 
 ## Lean 4 Evidence Mapping Table
