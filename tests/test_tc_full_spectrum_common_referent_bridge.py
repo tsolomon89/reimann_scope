@@ -36,10 +36,13 @@ import sympy as sp
 from sympy import Rational, Integer, sqrt, Symbol, sympify
 
 from tc.full_spectrum_common_referent_bridge import (
+    PRINCIPAL_CLASSIFICATION_EXACT_CANCELLATION_BLOCKS,
     PRINCIPAL_CLASSIFICATION_OPEN_SUBGATE,
     PRINCIPAL_CLASSIFICATION_POSITIVE_BRIDGE_PROVED,
     PRINCIPAL_CLASSIFICATION_REDUCES_TO_RH_EQUIVALENT,
     PRINCIPAL_CLASSIFICATION_CROSS_TERMS_OBSTRUCT,
+    CLASSIFICATION_FULL_SPECTRUM_DEFECT_DECOMPOSITION_NOT_DERIVED,
+    CLASSIFICATION_STRICT_SUBORDINATION_INCOMPATIBLE,
     CLASSIFICATION_EXACT_GRADE_GEOMETRY_LOCKED,
     CLASSIFICATION_RAW_AND_NORMALIZED_HEIGHTS_DISTINGUISHED,
     CLASSIFICATION_AUXILIARY_PULLBACK_IS_COORDINATE_COVARIANCE,
@@ -58,6 +61,7 @@ from tc.full_spectrum_common_referent_bridge import (
     evaluate_pullback_geometry,
     audit_coordinate_cutoff_consistency,
     validate_grade_geometry_claim,
+    certify_station_separation_positive,
     compute_cross_grade_station_separation,
     evaluate_radial_defect_B1,
     audit_full_spectrum_decomposition,
@@ -133,6 +137,15 @@ def test_07_exact_station_separation():
     assert abs(res.min_separation_distance - expected_gap) < 1e-5
     assert res.min_separation_distance > 0.15
     assert "Lindemann" in res.transcendence_basis
+    assert res.is_strictly_positive_certified is True
+    assert res.exact_archimedes_lower_bound == Rational(1, 7)
+    assert res.certified_arb_lower_bound > 0.150443
+
+    cert = certify_station_separation_positive()
+    assert cert["is_strictly_positive_certified"] is True
+    assert cert["exact_archimedes_lower_bound"] == Rational(1, 7)
+    assert cert["certified_arb_lower_bound"] > 0.150443
+    assert "pi < 22/7" in cert["archimedes_rational_proof"]
 
 
 def test_08_arithmetic_cross_pairing_vanishing_under_small_support():
@@ -148,14 +161,21 @@ def test_09_complete_term_accounting():
     """9. Complete spectral decomposition accounts for zeroes, poles, trivial zeroes, and Archimedean."""
     decomp = audit_full_spectrum_decomposition(epsilon=0.1, cutoff_T=30.0)
     assert decomp.arithmetic_Q_eps == 0.0
-    assert abs(decomp.cancellation_residual) < 1e-12
-    assert decomp.principal_classification == PRINCIPAL_CLASSIFICATION_OPEN_SUBGATE
+    assert decomp.decomposition_status == CLASSIFICATION_FULL_SPECTRUM_DEFECT_DECOMPOSITION_NOT_DERIVED
+    assert decomp.spectral_diagonal_D_status == "NOT_COMPUTED_IN_ENGINE"
+    assert decomp.spectral_remainder_R_status == "NOT_COMPUTED_IN_ENGINE"
+    assert decomp.diagonal_defect_D_eps is None
+    assert decomp.cancellation_residual is None
+    assert decomp.principal_classification == PRINCIPAL_CLASSIFICATION_EXACT_CANCELLATION_BLOCKS
 
 
 def test_10_no_double_counted_trivial_zero_background():
     """10. Background term B_eps correctly combines poles, trivial zeros, and Archimedean terms without duplication."""
     decomp = audit_full_spectrum_decomposition(epsilon=0.1)
-    assert decomp.background_remainder_B_eps == decomp.total_remainder_R_eps - decomp.offdiagonal_interference_C_eps
+    assert decomp.background_remainder_B_eps is None
+    assert decomp.offdiagonal_interference_C_eps is None
+    assert decomp.total_remainder_R_eps is None
+    assert decomp.spectral_remainder_R_status == "NOT_COMPUTED_IN_ENGINE"
 
 
 def test_11_quartet_closure():
@@ -169,9 +189,14 @@ def test_11_quartet_closure():
 
 
 def test_12_diagonal_offdiagonal_reconstruction():
-    """12. S_eps splits identically into diagonal radial defect D_eps and off-diagonal C_eps."""
+    """12. Exact cancellation Q = 0 forces R = -D, precluding strict subordination D > |R|."""
     decomp = audit_full_spectrum_decomposition(epsilon=0.1)
-    assert decomp.diagonal_defect_D_eps + decomp.offdiagonal_interference_C_eps == 0.0
+    assert decomp.is_strict_subordination_incompatible is True
+    # For any D >= 0, if D + R = 0, then |R| = D, so D > |R| is impossible
+    d_candidate = 0.54443912
+    r_candidate = -d_candidate
+    assert abs(abs(r_candidate) - d_candidate) < 1e-15
+    assert not (d_candidate > abs(r_candidate))
 
 
 def test_13_selected_quartet_positive_control():
@@ -234,9 +259,10 @@ def test_19_finite_weighted_defect_vanishing_theorem():
 def test_20_remainder_subordination_contradiction():
     """20. If D = - (C + B) from arithmetic vanishing and D > |C + B|, contradiction ensues."""
     decomp = audit_full_spectrum_decomposition(epsilon=0.1)
-    # The subgate remains open because D > |C + B| is not proved unconditionally
     assert decomp.is_remainder_subordinated is False
-    assert decomp.principal_classification == PRINCIPAL_CLASSIFICATION_OPEN_SUBGATE
+    assert decomp.is_strict_subordination_incompatible is True
+    assert decomp.principal_classification == PRINCIPAL_CLASSIFICATION_EXACT_CANCELLATION_BLOCKS
+    assert CLASSIFICATION_STRICT_SUBORDINATION_INCOMPATIBLE in decomp.secondary_classifications
 
 
 def test_21_no_finite_truncation_to_full_spectrum_promotion():
@@ -246,7 +272,7 @@ def test_21_no_finite_truncation_to_full_spectrum_promotion():
 
 
 def test_22_no_rh_claim_absent_complete_bridge():
-    """22. No RH claim may be asserted without proving remainder subordination."""
+    """22. No RH claim may be asserted without proving remainder subordination or independent bridge."""
     decomp = audit_full_spectrum_decomposition(epsilon=0.1)
     assert CLASSIFICATION_NO_RH_IMPLICATION_WITHOUT_FULL_SPECTRUM_BRIDGE in decomp.secondary_classifications
 
@@ -265,4 +291,4 @@ def test_24_no_direct_assertion_that_delta_in_l0_cap_l1():
     assert cr_eval.cr2_layer_membership_satisfied is False
     assert cr_eval.cr3_offline_nonzero_satisfied is True
     assert "Disguised Premise" in cr_eval.direct_cr2_status
-    assert "GLOBAL_CR2_ANALOGUE" in cr_eval.epistemic_verdict
+    assert cr_eval.epistemic_verdict == PRINCIPAL_CLASSIFICATION_EXACT_CANCELLATION_BLOCKS

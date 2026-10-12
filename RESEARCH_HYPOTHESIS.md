@@ -4075,7 +4075,7 @@ Formalized in `formal/RiemannScope/ExponentialPolynomialRigidity.lean` (17 decla
 
 ---
 
-# 49. Exact Grade-Geometry Firewall and Full-Spectrum Common-Referent Bridge (TASK-TC-032)
+# 49. Exact Grade-Geometry Firewall, Rigorous Sign Proof, and Full-Spectrum Cancellation Obstruction (TASK-TC-032 / TASK-TC-032R)
 
 ### 49.1 Grade-Geometry Firewall
 The repository establishes a strict firewall between the auxiliary pullback geometry and canonical arithmetic TC:
@@ -4095,39 +4095,52 @@ The Common-Referent Collision Theorem conditions are:
 The theorem proves $\mathrm{CR1} + \mathrm{CR2} + \mathrm{CR3} \implies \delta = 0$.
 For $K=0, J=1$, integer layers $L_0 = \mathbb{Z}$ and $L_1 = \tau\mathbb{Z}$ satisfy $L_0 \cap L_1 = \{0\}$ by Lindemann (1882) transcendence of $\pi$.
 The direct scalar candidate $A = \delta$ satisfies CR1 and CR3, but asserting $A \in L_0 \cap L_1$ is the `DISGUISED_PREMISE_OBSTRUCTION` ($\delta \in \{0\}$ assumes RH).
-The two-variable explicit-formula functional $Q_\varepsilon^{0,1}[w]$ provides the legitimate global functional replacement for pointwise CR2 (`GLOBAL_CR2_ANALOGUE`).
+The two-variable explicit-formula functional $Q_\varepsilon^{0,1}[w]$ provides the legitimate global functional analogue (`GLOBAL_CR2_ANALOGUE`).
 
-### 49.3 Cross-Grade Arithmetic Vanishing Gate
+### 49.3 Cross-Grade Arithmetic Vanishing Gate & Rigorous Sign Proof
 On $[8, 20]$, grade-0 prime-power stations $S_0 = \{8, 9, 11, 13, 16, 17, 19\}$ and grade-1 stations $S_1 = \{2\tau, 3\tau\} = \{4\pi, 6\pi\} \approx \{12.566371, 18.849556\}$ have minimum separation:
 \[
 \Delta_{\min} = 19 - 6\pi \approx 0.150444 > 0.
 \]
-Positivity of $\Delta_{\min}$ is certified by Lindemann's transcendence of $\pi$.
-For test functions $w(u, v) = \phi((u - v)/\varepsilon) \chi(u) \chi(v)$ with $\operatorname{supp}(\phi) \subset [-\varepsilon, \varepsilon]$ and $\varepsilon < \Delta_{\min}$, pairwise disjoint arithmetic support guarantees exact vanishing:
+- **Transcendence**: Lindemann (1882) proves $\pi \notin \overline{\mathbb{Q}}$, so $19 - 6\pi \ne 0$ is irrational.
+- **Rigorous Sign**: By Archimedes' theorem $\pi < 22/7$,
+  \[
+  19 - 6\pi > 19 - 6\left(\frac{22}{7}\right) = 19 - \frac{132}{7} = \frac{1}{7} \approx 0.142857 > 0.
+  \]
+- **Certified Outward Enclosure**: `flint.arb.pi()` certifies $19 - 6\pi \in [0.15044407846124 \pm 2.64 \times 10^{-15}] > 0.150444$.
+For test functions $w(u, v) = \phi((u - v)/\varepsilon) \chi(u) \chi(v)$ with $\operatorname{supp}(\phi) \subset [-\varepsilon, \varepsilon]$ and $\varepsilon < 1/7 < \Delta_{\min}$, pairwise disjoint arithmetic support guarantees exact vanishing:
 \[
 \boxed{Q_\varepsilon^{0,1}[w] = 0.}
 \]
 Classification: `CROSS_GRADE_ARITHMETIC_VANISHING_PROVED`.
 
-### 49.4 Complete Spectral Formula & Remainder Cancellation
-The complete explicit formula decomposes $Q_\varepsilon^{0,1}[w]$ into:
+### 49.4 Candidate Spectral Expansion & Remainder Cancellation
+The candidate explicit formula decomposes $Q_\varepsilon^{0,1}[w]$ into:
 \[
 Q_\varepsilon^{0,1}[w] = \mathcal{D}_\varepsilon + \mathcal{C}_\varepsilon + \mathcal{P}_\varepsilon + \mathcal{T}_\varepsilon + \mathcal{A}_\varepsilon = \mathcal{D}_\varepsilon + \mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon,
 \]
-where $\mathcal{D}_\varepsilon = \sum_\rho W_{\rho, \varepsilon} B_\rho(1)$ with $B_\rho(1) = 4\sinh^2(\delta_\rho\log\tau / 2) \ge 0$, $\mathcal{C}_\varepsilon$ is the off-diagonal cross-zero interference, and $\mathcal{B}_\varepsilon$ contains background terms.
+where $\mathcal{D}_\varepsilon = \sum_\rho W_{\rho, \varepsilon} B_\rho(1)$ with $B_\rho(1) = 4\sinh^2(\delta_\rho\log\tau / 2) \ge 0$, $\mathcal{C}_\varepsilon$ is the off-diagonal cross-zero interference, and $\mathcal{B}_\varepsilon$ contains background terms. This decomposition is a proposed candidate model (`CANDIDATE_DECOMPOSITION_NOT_DERIVED`). Continuous components are not computed in the active engine (`NOT_COMPUTED_IN_ENGINE`).
 Vanishing $Q_\varepsilon^{0,1}[w] \equiv 0$ forces exact remainder cancellation:
 \[
 \boxed{\mathcal{D}_\varepsilon = - (\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon).}
 \]
 Proving an isolated quartet has positive defect $A_\varepsilon > 0$ does not imply $Q_\varepsilon > 0$, because the omitted spectral complement cancels it identically (`SELECTED_BLOCK_REMAINDER_GAP`).
 
-### 49.5 Full-Spectrum Remainder Subordination Subgate
-If a zero-independent test family satisfies $\mathcal{D}_\varepsilon > |\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon|$ off the critical line, then $Q_\varepsilon > 0$, directly contradicting $Q_\varepsilon = 0$ and forcing $\delta = 0$.
-Proving this subordination without assuming an RH-equivalent positivity condition remains the open subgate (`ONE_PRECISE_FULL_SPECTRUM_SUBGATE_OPEN`).
+### 49.5 Logical Impossibility of Remainder Subordination
+Exact arithmetic vanishing $Q_\varepsilon = 0$ forces exact remainder cancellation $\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon = -\mathcal{D}_\varepsilon$.
+For $\mathcal{D}_\varepsilon \ge 0$, $|\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon| = |-\mathcal{D}_\varepsilon| = \mathcal{D}_\varepsilon$.
+Consequently, strict subordination $\mathcal{D}_\varepsilon > |\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon|$ forces $\mathcal{D}_\varepsilon > \mathcal{D}_\varepsilon$, which is impossible ($a > a \implies \text{False}$).
+Lean 4 theorems `remainder_subordination_contradiction` and `exact_cancellation_precludes_strict_subordination` prove that these assumptions deduce `False`.
+Strict remainder subordination is mathematically incompatible with exact cancellation and is eliminated as a viable route.
+Principal classification:
+\[
+\boxed{\texttt{EXACT\_CANCELLATION\_BLOCKS\_STRICT\_SUBORDINATION\_ROUTE}}
+\]
+Secondary classifications: `FULL_SPECTRUM_DEFECT_DECOMPOSITION_NOT_DERIVED`, `STRICT_REMAINDER_SUBORDINATION_INCOMPATIBLE`.
 
 ### 49.6 Lean 4 Formal Verification
-Formalized in `formal/RiemannScope/FullSpectrumCommonReferentBridge.lean` (17 declarations compiled, 0 sorry, total 535 declarations):
-`pullback_real_scaling`, `pullback_imag_scaling`, `pullback_critical_line`, `normalized_delta_invariant`, `normalized_gamma_invariant`, `canonical_tc_zero_stationary`, `pullback_cutoff_scaling`, `common_referent_collision`, `common_referent_cr2_disguised_premise`, `radial_defect_critical_line_zero`, `radial_defect_pos_of_off_critical`, `diagonal_off_diagonal_split`, `arithmetic_zero_remainder_cancellation`, `remainder_subordination_contradiction`, `finite_weighted_defect_sum_vanishing`, `generic_base_covariance_algebraic`.
+Formalized in `formal/RiemannScope/FullSpectrumCommonReferentBridge.lean` (19 declarations compiled, 0 sorry, total 537 declarations in repo):
+`pullback_origin_coordinates_scale`, `pullback_origin_critical_line_scales`, `pullback_origin_normalized_delta_invariant`, `pullback_origin_normalized_gamma_invariant`, `pullback_centered_critical_line_preserved`, `canonical_arithmetic_zeros_stationary`, `pullback_raw_cutoff_scales`, `common_referent_collision_forces_critical_line`, `cr2_disguised_premise`, `radialDefectB1_zero_on_critical_line`, `am_gm_defect_algebraic`, `am_gm_defect_strictly_positive`, `spectral_diagonal_offdiagonal_decomposition`, `arithmetic_vanishing_forces_spectral_cancellation`, `remainder_subordination_contradiction`, `exact_cancellation_precludes_strict_subordination`, `archimedes_station_gap_positive`, `two_term_weighted_defect_zero_iff`, `generic_base_coordinate_covariance`.
 
 
 
