@@ -54,6 +54,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/AmbientKernel.lean",
     "formal/RiemannScope/TrinomialKernel.lean",
     "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
+    "formal/RiemannScope/FullSpectrumCommonReferentBridge.lean",
 ]
 
 

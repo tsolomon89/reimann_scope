@@ -323,6 +323,19 @@ from tc.exponential_polynomial_rigidity import (
     audit_functional_transcendence_firewall,
 )
 
+from tc.full_spectrum_common_referent_bridge import (
+    evaluate_pullback_geometry,
+    audit_coordinate_cutoff_consistency,
+    validate_grade_geometry_claim,
+    compute_cross_grade_station_separation,
+    evaluate_radial_defect_B1,
+    audit_full_spectrum_decomposition,
+    evaluate_generic_base_covariance,
+    audit_pair_isolation_inference,
+    audit_weil_positivity_equivalence,
+    evaluate_common_referent_status,
+)
+
 
 from tc.approximation import (
     _is_finite_vanishing_integral,
@@ -625,5 +638,15 @@ __all__ = [
     "compute_exponential_wronskian",
     "analyze_descartes_sign_variations",
     "audit_functional_transcendence_firewall",
+    "evaluate_pullback_geometry",
+    "audit_coordinate_cutoff_consistency",
+    "validate_grade_geometry_claim",
+    "compute_cross_grade_station_separation",
+    "evaluate_radial_defect_B1",
+    "audit_full_spectrum_decomposition",
+    "evaluate_generic_base_covariance",
+    "audit_pair_isolation_inference",
+    "audit_weil_positivity_equivalence",
+    "evaluate_common_referent_status",
 ]
 

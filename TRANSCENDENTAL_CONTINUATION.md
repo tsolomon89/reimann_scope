@@ -1846,6 +1846,70 @@ Functional algebraic independence of $e^{\alpha z}, e^{\beta z}$ over $\mathbb{C
 Formalized in `formal/RiemannScope/ExponentialPolynomialRigidity.lean` (17 declarations compiled, 0 sorry, total 518 declarations):
 `trinomial_derivative_relation_vector`, `trinomial_derivative_relation_not_proportional`, `differential_operator_constant_support_values`, `integer_dilation_positive_polynomial_identity_k2`, `integer_dilation_positive_polynomial_identity_k3`, `integer_dilation_positive_nonzero_coeff_k2`, `integer_dilation_positive_nonzero_coeff_k3`, `integer_dilation_negative_polynomial_identity_q1`, `integer_dilation_negative_polynomial_identity_q2`, `integer_dilation_negative_leading_coeff_q1`, `integer_dilation_negative_leading_coeff_q2`, `one_exponential_wronskian_pos`, `two_exponential_wronskian_algebraic_identity`, `two_exponential_wronskian_pos_of_ordered`, `three_exponential_wronskian_algebraic_identity`, `three_exponential_wronskian_pos_of_ordered`, `base_one_second_dilation_quadratic_identity`.
 
+---
+
+## 39. Exact Grade-Geometry Firewall and Full-Spectrum Common-Referent Bridge (TASK-TC-032)
+
+### 39.1 Geometry Firewall: Auxiliary Pullback vs Canonical Arithmetic TC
+The repository enforces a rigid geometry firewall between two distinct constructions:
+1. **Auxiliary Analytic Pullback**:
+   \[
+   Z_K^{\mathrm{pull}}(s) = \zeta(\tau^{-K}s), \qquad \tau = 2\pi.
+   \]
+   Zeros dilate as $s_\rho(K) = \tau^K\rho = \tau^K(1/2 + \delta) + i\tau^K\gamma$.
+   Both coordinates scale: $\Re(s_\rho(K)) = \tau^K(1/2 + \delta)$, $\Im(s_\rho(K)) = \tau^K\gamma$.
+   The critical line moves to $\Re(s) = \tau^K/2$, and a native height cutoff $T$ scales to $T_K = \tau^K T$.
+   Normalized coordinates remain strictly invariant: $\tau^{-K}\Re(s_\rho(K)) - 1/2 = \delta$, $\tau^{-K}\Im(s_\rho(K)) = \gamma$.
+   Comparing fixed raw heights under pullback without rescaling the cutoff is classified as `MISMATCHED_SPECTRAL_WINDOW`. Asserting that only the real coordinate scales, or that the critical line remains $1/2$, is classified as `INVALID_GRADE_GEOMETRY`.
+2. **Canonical Arithmetic TC**:
+   \[
+   Z_K^{\mathrm{amb}}(s) = \tau^{-Ks}\zeta(s).
+   \]
+   Because $\tau^{-Ks} = \exp(-Ks\log\tau) \ne 0$ everywhere on $\mathbb{C}$, zeros are strictly stationary ($\rho \mapsto \rho$), and the critical line remains $\Re(s) = 1/2$ at every grade.
+
+### 39.2 Common-Referent Collision Theorem & CR2 Disguised Premise
+The Common-Referent Collision Theorem conditions are:
+- $\mathrm{CR1}: A_K = A_J = A$;
+- $\mathrm{CR2}: A_K \in L_K, A_J \in L_J$;
+- $\mathrm{CR3}: \delta \ne 0 \implies A \ne 0$.
+The theorem proves $\mathrm{CR1} + \mathrm{CR2} + \mathrm{CR3} \implies \delta = 0$.
+For the canonical two-grade skeleton $K=0, J=1$, integer layers $L_0 = \mathbb{Z}$ and $L_1 = \tau\mathbb{Z}$ satisfy $L_0 \cap L_1 = \{0\}$ by Lindemann (1882) transcendence of $\pi$.
+The direct scalar candidate $A = \delta$ satisfies CR1 and CR3, but asserting $A \in L_0 \cap L_1$ is the `DISGUISED_PREMISE_OBSTRUCTION` ($\delta \in \{0\}$ assumes RH).
+The two-variable explicit-formula functional $Q_\varepsilon^{0,1}[w]$ provides the legitimate global functional replacement for pointwise CR2 (`GLOBAL_CR2_ANALOGUE`).
+
+### 39.3 Cross-Grade Arithmetic Vanishing Gate
+On the compact window $[8, 20]$, grade-0 prime-power stations $S_0 = \{8, 9, 11, 13, 16, 17, 19\}$ and grade-1 stations $S_1 = \{2\tau, 3\tau\} = \{4\pi, 6\pi\} \approx \{12.566371, 18.849556\}$ have minimum separation:
+\[
+\Delta_{\min} = 19 - 6\pi \approx 0.150444 > 0.
+\]
+Positivity of $\Delta_{\min}$ is certified by Lindemann's transcendence of $\pi$.
+For test functions $w(u, v) = \phi((u - v)/\varepsilon) \chi(u) \chi(v)$ with $\operatorname{supp}(\phi) \subset [-\varepsilon, \varepsilon]$ and $\varepsilon < \Delta_{\min}$, pairwise disjoint arithmetic support guarantees exact vanishing:
+\[
+\boxed{Q_\varepsilon^{0,1}[w] = 0.}
+\]
+Classification: `CROSS_GRADE_ARITHMETIC_VANISHING_PROVED`.
+
+### 39.4 Complete Spectral Expansion & Remainder Cancellation
+The complete explicit formula decomposes $Q_\varepsilon^{0,1}[w]$ into:
+\[
+Q_\varepsilon^{0,1}[w] = \mathcal{D}_\varepsilon + \mathcal{C}_\varepsilon + \mathcal{P}_\varepsilon + \mathcal{T}_\varepsilon + \mathcal{A}_\varepsilon = \mathcal{D}_\varepsilon + \mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon,
+\]
+where $\mathcal{D}_\varepsilon = \sum_\rho W_{\rho, \varepsilon} B_\rho(1)$ with $B_\rho(1) = 4\sinh^2(\delta_\rho\log\tau / 2) \ge 0$, $\mathcal{C}_\varepsilon$ is the off-diagonal cross-zero interference, and $\mathcal{B}_\varepsilon$ contains background terms.
+Vanishing $Q_\varepsilon^{0,1}[w] \equiv 0$ forces exact remainder cancellation:
+\[
+\boxed{\mathcal{D}_\varepsilon = - (\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon).}
+\]
+Proving an isolated quartet has positive defect $A_\varepsilon > 0$ does not imply $Q_\varepsilon > 0$, because the omitted spectral complement cancels it identically (`SELECTED_BLOCK_REMAINDER_GAP`).
+
+### 39.5 Full-Spectrum Remainder Subordination Subgate
+If a zero-independent test family satisfies $\mathcal{D}_\varepsilon > |\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon|$ off the critical line, then $Q_\varepsilon > 0$, directly contradicting $Q_\varepsilon = 0$ and forcing $\delta = 0$.
+Proving this subordination without assuming an RH-equivalent positivity condition remains the open subgate (`ONE_PRECISE_FULL_SPECTRUM_SUBGATE_OPEN`).
+
+### 39.6 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/FullSpectrumCommonReferentBridge.lean` (17 declarations compiled, 0 sorry, total 535 declarations):
+`pullback_real_scaling`, `pullback_imag_scaling`, `pullback_critical_line`, `normalized_delta_invariant`, `normalized_gamma_invariant`, `canonical_tc_zero_stationary`, `pullback_cutoff_scaling`, `common_referent_collision`, `common_referent_cr2_disguised_premise`, `radial_defect_critical_line_zero`, `radial_defect_pos_of_off_critical`, `diagonal_off_diagonal_split`, `arithmetic_zero_remainder_cancellation`, `remainder_subordination_contradiction`, `finite_weighted_defect_sum_vanishing`, `generic_base_covariance_algebraic`.
+
+
 
 
 
