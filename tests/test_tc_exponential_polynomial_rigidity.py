@@ -96,7 +96,7 @@ def test_03_distinct_algebraic_exponents_under_canonical_hypotheses():
 
 def test_04_lindemann_weierstrass_necessity_metadata():
     """4. verify_lindemann_weierstrass_necessity returns required classification and open status."""
-    res = verify_lindemann_weierstrass_necessity(alpha=1, beta=sqrt(2))
+    res = verify_lindemann_weierstrass_necessity(alpha=Integer(1), beta=sqrt(2))
     assert res.is_transcendental_forced is True
     assert res.classification == CLASSIFICATION_TRINOMIAL_RELATION_IMPLIES_LOG_TAU_TRANSCENDENTAL
     assert res.evidence_class == "PROVED_WITH_EXTERNAL_LINDEMANN_WEIERSTRASS"
@@ -236,7 +236,7 @@ def test_15_k_zero_not_excluded_by_orbit_isolation():
 def test_16_base_one_lindemann_branch():
     """16. Base-one instance alpha=1, beta=sqrt(2) invokes Lindemann transcendence directly."""
     coeffs = (Integer(3), Integer(-2), Integer(-1))
-    res = check_integer_dilation_ray_isolation(coeffs, alpha=1, beta=sqrt(2), m=1, k_multiplier=2)
+    res = check_integer_dilation_ray_isolation(coeffs, alpha=Integer(1), beta=sqrt(2), m=1, k_multiplier=2)
     assert res.base_one_specialization is True
     assert res.classification == CLASSIFICATION_BASE_ONE_ORBIT_ISOLATION_BY_LINDEMANN
     assert res.evidence_class == "PROVED_WITH_EXTERNAL_LINDEMANN"
@@ -264,7 +264,7 @@ def test_18_integer_dilation_ray_classification():
 
 def test_19_wronskian_identity():
     """19. Wronskian determinants W0, W1, W2 factor identically into exponential-Vandermonde products."""
-    res = compute_exponential_wronskian(exponents=(0, 1, sqrt(2)))
+    res = compute_exponential_wronskian(exponents=(Integer(0), Integer(1), sqrt(2)))
     x = Symbol("x", real=True)
     expected_w0 = exp(0 * x)
     expected_w1 = exp((0 + 1) * x) * (1 - 0)
@@ -277,14 +277,14 @@ def test_19_wronskian_identity():
 
 def test_20_wronskian_nonvanishing_for_distinct_exponents():
     """20. All successive Wronskians W0, W1, W2 > 0 everywhere on R for strictly ordered exponents."""
-    res = compute_exponential_wronskian(exponents=(0, 1, sqrt(2)))
+    res = compute_exponential_wronskian(exponents=(Integer(0), Integer(1), sqrt(2)))
     assert res.is_strictly_positive_on_real_line is True
     assert res.successive_wronskians_positive is True
 
 
 def test_21_at_most_two_real_zeros_positive_control():
     """21. ECT system guarantees at most 2 real zeros counting multiplicity (Karlin & Studden 1966)."""
-    res = compute_exponential_wronskian(exponents=(0, Rational(1, 2), Rational(3, 2)))
+    res = compute_exponential_wronskian(exponents=(Integer(0), Rational(1, 2), Rational(3, 2)))
     assert res.max_real_zeros_bound == 2
     assert res.classification == CLASSIFICATION_AT_MOST_TWO_REAL_EXPONENTIAL_POLYNOMIAL_ZEROS
     assert res.evidence_class == "PROVED_WITH_EXTERNAL_CHEBYSHEV_THEOREM"
@@ -297,17 +297,17 @@ def test_22_sign_variation_diagnostic():
     exps = (Integer(0), Integer(1), Integer(2))
 
     # All positive: 0 sign changes -> 0 real zeros
-    res0 = analyze_descartes_sign_variations((1, 2, 3), exps)
+    res0 = analyze_descartes_sign_variations((Integer(1), Integer(2), Integer(3)), exps)
     assert res0.sign_changes == 0
     assert res0.max_real_zeros_descartes == 0
 
     # One sign change: (+, +, -) -> at most 1 real zero
-    res1 = analyze_descartes_sign_variations((1, 2, -3), exps)
+    res1 = analyze_descartes_sign_variations((Integer(1), Integer(2), Integer(-3)), exps)
     assert res1.sign_changes == 1
     assert res1.max_real_zeros_descartes == 1
 
     # Two sign changes: (+, -, +) -> at most 2 real zeros
-    res2 = analyze_descartes_sign_variations((1, -2, 3), exps)
+    res2 = analyze_descartes_sign_variations((Integer(1), Integer(-2), Integer(3)), exps)
     assert res2.sign_changes == 2
     assert res2.max_real_zeros_descartes == 2
 
