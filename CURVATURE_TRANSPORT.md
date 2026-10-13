@@ -598,3 +598,21 @@ $$\mathcal C_h = Q(F, \Delta_h) + Q(F, \Delta_{-h}) - 2Q(F, 0) = |\Delta_h|^2 + 
 | "Excitation" | Off-line zero displacement $\delta \ne 0$ | Pointwise perturbation of zero coordinates |
 | "Curvature" | Second derivative with respect to grade parameter $\left.\frac{d^2}{dk^2} B(k)\right|_{k=0}$ | Exact second-order variation in 1-parameter family |
 
+---
+
+## 20. Infinitesimal Transport-Mismatch Curvature Audit (`TASK-TC-034`)
+
+Following the `TASK-TC-033` result (`TRANSPORT_MOMENT_INCOMPATIBILITY_PROVED`), `TASK-TC-034` (`docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md`, `tc/transport_mismatch_curvature.py`, `formal/RiemannScope/TransportMismatchCurvature.lean`) audited whether the missing zero-independent arithmetic curvature functional (`OBL-CT-001A`) arises from the **infinitesimal second variation** around the unique label-preserving transport $b = 1$ ($b = 1 + \eta$, $\eta \to 0$):
+$$F_{K,\eta}(x,y) = \tau^{aK} F_0\!\left(\tau^{-(1+\eta)K}x, \tau^{-(1+\eta)K}y\right), \qquad \widehat{\mathcal M}_K(\eta) = \sum_{n,m\ge 2}\Lambda(n)\Lambda(m)F_0\!\left(\tau^{-\eta K}n, \tau^{-\eta K}m\right).$$
+
+1. **Arithmetic Euler-Generator Law (`LEAN_PROVED` + `PROVED_PAPER_DERIVATION`)**:
+   With $\mathcal E = x\partial_x + y\partial_y$ and $A_j(F_0) = \sum_{n,m\ge 2}\Lambda(n)\Lambda(m)(\mathcal E^j F_0)(n,m)$,
+   $$\widehat{\mathcal M}_K^{(j)}(0) = (-K\log\tau)^j A_j(F_0), \qquad \mathfrak C_{\mathrm{arith}}(F_0) = A_0 A_2 - A_1^2 = \frac{\widehat{\mathcal M}_K(0)\widehat{\mathcal M}_K''(0) - (\widehat{\mathcal M}_K'(0))^2}{K^2(\log\tau)^2}.$$
+2. **Arithmetic Flatness Not Implied & Sign Indefiniteness (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`, `GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE`)**:
+   Label preservation at $\eta = 0$ makes $\mathfrak C_{\mathrm{arith}}(F_0)$ independent of $K \ne 0$, but does not force $\mathfrak C_{\mathrm{arith}}(F_0) = 0$. Across nonnegative kernels $F_0 \ge 0$, $\mathfrak C_{\mathrm{arith}}(F_0)$ takes strictly negative, zero, and strictly positive values.
+3. **Compact-Support Homogeneity No-Go (`COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED`, `NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`)**:
+   Structural arithmetic flatness $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ requires Euler homogeneity $\mathcal E F_0 = d F_0$, which forces $F_0(rx, ry) = r^d F_0(x,y)$ along every positive ray and therefore $F_0 \equiv 0$ for any $F_0 \in C_c^\infty((0,\infty)^2)$.
+4. **Spectral Pairing & Reconciliation with `OBL-CT-001A` (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`, `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A`)**:
+   Under half-density centering, the conjugate pairing $t = \bar\rho$ yields radial exponent $2\delta_\rho$ and even mismatch defect $2(\cosh(2\eta K\delta_\rho\log\tau)-1) = B_\rho(2\eta K)$, reproducing the existing detector $B_\rho(k)$ up to $k = 2\eta K$ (`MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A`). However, the actual two-variable arithmetic energy induces the unrestricted double zero sum over all pairs $(\rho,\sigma)$ plus pole, trivial-zero, and Archimedean terms (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`), and global positivity of a reflected Hermitian form remains RH-equivalent (`CURVATURE_POSITIVITY_IS_RH_EQUIVALENT`).
+5. **Status of `OBL-CT-001A`**:
+   Remains **OPEN**. Per the Hypothesis-Fidelity Rule, failure of this candidate implementation and test space does not refute the general TC hypothesis.

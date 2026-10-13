@@ -302,10 +302,18 @@
         "TASK-TC-033: Three-grade Hankel constraint and transport-moment compatibility audit: nonzero equal-grade arithmetic energy M_K on grades {-1, 0, 1}; two-variable Mellin transform scaling H_K(s, t) = tau^{K(a+b(s+t))} H_0(s, t); full transport b=1 uniquely preserves native station labels yielding arithmetic rank one (H_0 = 0), but cancels all zero-dependent spectral moments ((1-1)K(s+t) = 0); fixed raw window b=0 fails arithmetic rank one; partial transport b in (0, 1) fails rank one; signed-weight, double-sum, Weil-equivalence, and generic-base firewalls; Lean 4 formalization compiled (548 declarations, 0 sorry); 24/24 unit tests passing"
       ],
       "completion_note": "TASK-TC-033 completed: Transport-moment incompatibility proved: exact arithmetic label-preserving transport b=1 required for arithmetic rank one cancels the net spectral exponent ((1-1)K(s+t) = 0), eliminating all zero-dependent spectral moment variation (tau^{2K delta_rho} -> 1); fixed window b=0 fails arithmetic rank one; signed weights can produce negative Hankel determinants; Lean 4 formalization compiled (12 new declarations, total 548 declarations in repository, 0 sorry); 24/24 unit tests passing. Principal classification: TRANSPORT_MOMENT_INCOMPATIBILITY_PROVED."
+    },
+    "track_19_infinitesimal_transport_mismatch_curvature": {
+      "status": "COMPLETED",
+      "tasks": [
+        "TASK-TC-034: Infinitesimal transport-mismatch curvature and non-scalar arithmetic descent (OBL-CT-001A audit): relative transport parameter b = 1 + eta around b = 1; arithmetic Euler-generator theorem M_K^{(j)}(0) = (-K log tau)^j A_j(F_0); K-independent arithmetic curvature C_arith(F_0) = A_0 A_2 - A_1^2; sign firewall proving C_arith(F_0) is sign-indefinite on nonnegative kernels; compact-support homogeneity no-go theorem (E F_0 = d F_0 on C_c^infty((0,inf)^2) ==> F_0 == 0); centering and zero-pairing audit (conjugate 2*delta_rho, reflection 2*i*gamma_rho, natural unrestricted double zero sum); reconciliation with B_rho(2*eta*K); Phase II non-scalar theta-Mellin candidate audit; generic-base and Weil-equivalence firewalls; Lean 4 formalization compiled (566 declarations, 0 sorry); 28/28 unit tests passing"
+      ],
+      "completion_note": "TASK-TC-034 completed: Audited infinitesimal second variation around b = 1 (b = 1 + eta); proved arithmetic Euler-generator theorem and K-independence of normalized mismatch curvature C_arith(F_0) = A_0 A_2 - A_1^2; proved arithmetic flatness is not implied by label preservation (ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED) and C_arith is sign-indefinite on F_0 >= 0 (GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE); proved compact-support homogeneity no-go (COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED / NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE); audited centered conjugate, reflection, and general double-sum spectral pairings (SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM); reconciled centered conjugate even defect with B_rho(2*eta*K) (MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A); audited bilinear theta-Mellin fallback; OBL-CT-001A remains OPEN; Lean 4 formalization compiled (18 new declarations, total 566 declarations in repository, 0 sorry); 28/28 unit tests passing. Principal classification: MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_transport_mismatch_curvature.json",
       "data/tc_three_grade_hankel_constraint.json",
       "data/tc_full_spectrum_common_referent_bridge.json",
       "data/tc_exponential_polynomial_orbit_isolation.json",

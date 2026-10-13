@@ -1,0 +1,201 @@
+{
+  "task_id": "TASK-TC-034",
+  "title": "Infinitesimal Transport-Mismatch Curvature and Non-Scalar Arithmetic Descent",
+  "starting_head": "90493831c9bd803526593691e7f39b55a7b9fb40",
+  "substantive_parent": "1d777ea1bc7e962ee6ad03f3f72b83c731dfb186",
+  "mismatch_parameter": "b = 1 + eta, eta in R (infinitesimal expansion around b = 1 at eta = 0)",
+  "transported_kernel": "F_{K,eta}(x,y) = tau^{aK} F_0(tau^{-(1+eta)K}x, tau^{-(1+eta)K}y)",
+  "arithmetic_derivative_formulas": {
+    "M_K_0": "A_0(F_0)",
+    "M_K_prime_0": "-K * log(tau) * A_1(F_0)",
+    "M_K_double_prime_0": "K^2 * (log(tau))^2 * A_2(F_0)",
+    "general_j": "(-K * log(tau))^j * A_j(F_0)"
+  },
+  "euler_operator": "E = x d/dx + y d/dy",
+  "arithmetic_curvature": "C_arith(F_0) = A_0(F_0)*A_2(F_0) - A_1(F_0)^2",
+  "curvature_sign_status": "GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE",
+  "homogeneity_status": "E F_0 = d F_0 implies A_1 = d A_0, A_2 = d^2 A_0, and C_arith(F_0) = 0; not implied by arithmetic label preservation alone (ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED).",
+  "compact_support_obstruction": "NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE",
+  "mellin_scaling": {
+    "raw_factor": "tau^{K(a + (1 + eta)(s + t))} H_0(s, t)",
+    "net_normalized_factor": "tau^{eta K (s + t)}",
+    "first_derivative_at_0": "K log(tau) (s + t)",
+    "second_derivative_at_0": "K^2 (log(tau))^2 (s + t)^2"
+  },
+  "centered_exponent_convention": {
+    "uncentered": "s + t",
+    "half_density_centered": "(s - 1/2) + (t - 1/2) = s + t - 1",
+    "conjugate_pair_t_eq_bar_rho": "2 * delta_rho (radial)",
+    "reflection_pair_t_eq_1_minus_bar_rho": "2 * i * gamma_rho (ordinate/phase)",
+    "general_pair_rho_sigma": "(delta_rho + delta_sigma) + i*(gamma_rho + gamma_sigma)"
+  },
+  "natural_zero_pairing": "UNRESTRICTED_DOUBLE_ZERO_SUM_WITH_BACKGROUND",
+  "spectral_curvature_type": "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
+  "weight_sign": "COMPLEX_SIGNED_DOUBLE_SUM_WEIGHTS",
+  "cross_term_status": "UNRESTRICTED_DOUBLE_SUM_WITH_POLE_TRIVIAL_AND_ARCHIMEDEAN_TERMS",
+  "theta_candidate_status": {
+    "candidate_name": "Bilinear scale-mismatched theta-Mellin quadratic functional Q_Theta(eta; Phi_0)",
+    "scalar_candidate_status": "REJECTED_FROZEN_IDENTICALLY_ZERO_AT_ZEROS",
+    "purely_theta_or_arithmetic_defined": true,
+    "zero_independent_definition": true,
+    "exact_scale_flatness_law": false,
+    "convergent_on_regularized_test_space": true,
+    "second_mismatch_variation_computable": true,
+    "contains_delta_squared_in_spectral_expansion": true,
+    "avoids_assumed_weil_positivity": true,
+    "avoids_selected_zero_construction": true,
+    "reduces_to_double_mellin_weil_form": true,
+    "closes_obl_ct_001a": false,
+    "classification": "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A",
+    "exact_remaining_theorem": "OBL-CT-001A: Construct a zero-independent non-scalar arithmetic or theta functional whose transport curvature at b = 1 satisfies a kernel-independent arithmetic flatness or sign bound while its complete spectral expansion isolates a positive radial moment in delta_rho^2 without assuming Weil positivity."
+  },
+  "tau_specificity": "GENERIC_SCALE_CURVATURE",
+  "weil_equivalence_status": "CURVATURE_POSITIVITY_IS_RH_EQUIVALENT",
+  "relation_to_OBL_CT_001A": "MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A",
+  "principal_classification": "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A",
+  "triggered_outcome_codes": [
+    "ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED",
+    "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED",
+    "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
+    "CURVATURE_POSITIVITY_IS_RH_EQUIVALENT",
+    "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A"
+  ],
+  "exact_remaining_subgate": "OBL-CT-001A: Construct a zero-independent non-scalar arithmetic or theta functional whose transport curvature at b = 1 satisfies a kernel-independent arithmetic flatness or sign bound while its complete spectral expansion isolates a positive radial moment in delta_rho^2 without assuming Weil positivity.",
+  "obl_ct_001a_completed": false,
+  "rh_claimed": false,
+  "candidate_failure_refutes_tc": false,
+  "hypothesis_fidelity": {
+    "tc_hypothesis": "The same arithmetic object across transcendental grades implies a constraint.",
+    "candidate_implementation": "The constraint is the curvature of relative transport at b = 1.",
+    "distinction": "Failure of the infinitesimal transport-mismatch curvature candidate on compactly supported two-variable kernels refutes this candidate implementation and test space, NOT the general TC hypothesis."
+  },
+  "diagnostics": {
+    "sign_audit": {
+      "negative_kernel_A0": 44.289382225731536,
+      "negative_kernel_curvature": -6442.342951827457,
+      "positive_kernel_A0": 292.8649412915519,
+      "positive_kernel_curvature": 191886.97907781193,
+      "zero_control_curvature": 0.0,
+      "all_three_signs_realized": true,
+      "outcome_b_flatness_not_implied": "ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED",
+      "classification": "GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE"
+    },
+    "compact_support_no_go": {
+      "degree_d": -1.0,
+      "ray_scaling_verified": true,
+      "compact_support_compatible_for_nonzero_kernel": false,
+      "classification": "NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE",
+      "outcome_code": "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED",
+      "scope_note": "Proved for all C_c^infty((0, inf)^2) kernels: Euler homogeneity E F_0 = d F_0 forces F_0(r x, r y) = r^d F_0(x, y) along every positive ray, which is incompatible with compact support unless F_0 == 0. Does not by itself refute noncompact or distributional candidates."
+    },
+    "finite_station_accidental_zero": {
+      "small_window_n_max": 3,
+      "small_window_A0": 3.210401995568401,
+      "small_window_curvature": 0.0,
+      "large_window_n_max": 5,
+      "large_window_A0": 12.56673142582328,
+      "large_window_curvature": -1192.0867640308488,
+      "vanishes_on_selected_window": true,
+      "breaks_on_expanded_window": true,
+      "classification": "FINITE_ACCIDENTAL_ARITHMETIC_CURVATURE_ZERO"
+    },
+    "homogeneous_control": {
+      "alpha": 0.5,
+      "beta": 0.75,
+      "degree_d": 1.25,
+      "A0": 7311.6729350587,
+      "A1": 9139.591168823375,
+      "A2": 11424.488961029214,
+      "A1_minus_d_A0": 0.0,
+      "A2_minus_d2_A0": 5.4569682106375694e-12,
+      "arithmetic_curvature": -4.470348358154297e-08,
+      "normalized_log_curvature": -8.361955552649729e-16,
+      "single_character_response_abs_err": 9.094947017729282e-13,
+      "is_flat": true
+    },
+    "spectral_pairing_audit": {
+      "rho": {
+        "real": 0.62,
+        "imag": 14.134725
+      },
+      "delta": 0.12,
+      "gamma": 14.134725,
+      "uncentered_conjugate_exponent": {
+        "real": 1.24,
+        "imag": 0.0
+      },
+      "centered_conjugate_exponent": {
+        "real": 0.24,
+        "imag": 0.0
+      },
+      "centered_reflection_exponent": {
+        "real": 0.0,
+        "imag": 28.26945
+      },
+      "general_pair_centered_exponent": {
+        "real": 0.07,
+        "imag": 35.156765
+      },
+      "conjugate_even_defect": 0.0019459237258194761,
+      "reflection_even_defect": -1.0707901581529207,
+      "conjugate_second_variation_coeff": 0.19456082560704505,
+      "reflection_second_variation_coeff": -2699.402434794259,
+      "naturally_induced_pairing": "UNRESTRICTED_DOUBLE_ZERO_SUM_WITH_BACKGROUND",
+      "spectral_curvature_classification": "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM"
+    },
+    "curvature_transport_reconciliation": {
+      "effective_k": 0.1,
+      "B_rho_at_2etaK": 0.0007600513599888004,
+      "centered_conjugate_even_mismatch": 0.0007600513599888004,
+      "detector_identity_abs_err": 0.0,
+      "B_rho_second_deriv_at_0": 0.15200064500550395,
+      "mismatch_second_deriv_at_0": 0.3040012900110079,
+      "chain_rule_ratio_4K2_to_2": 2.0,
+      "expected_chain_rule_ratio": 2.0,
+      "classification": "MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A",
+      "outcome_code": "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A",
+      "new_arithmetic_descent_constructed": false
+    },
+    "spectral_firewalls": {
+      "complete_spectral_type": "DOUBLE_SPECTRAL_SUM_PLUS_POLE_AND_ARCHIMEDEAN_BACKGROUND",
+      "spectral_curvature_outcome": "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
+      "diagonal_projection_without_proof_allowed": false,
+      "incomplete_diagonal_only_classification": "SELECTED_CURVATURE_BLOCK_ONLY",
+      "selected_zero_construction_allowed": false,
+      "remainder_domination_reopened": false,
+      "task_tc_032r_firewall_status": "EXACT_CANCELLATION_BLOCKS_STRICT_SUBORDINATION_ROUTE",
+      "includes_zero_zero_cross_terms": true,
+      "includes_pole_terms": true,
+      "includes_trivial_zero_terms": true,
+      "includes_archimedean_terms": true,
+      "includes_window_boundary_terms": true,
+      "includes_normalization_factor_derivatives": true,
+      "weil_equivalence_classification": "CURVATURE_POSITIVITY_IS_RH_EQUIVALENT"
+    },
+    "generic_base_control": {
+      "bases_tested": [
+        2.0,
+        2.718281828459045,
+        6.283185307179586,
+        10.0
+      ],
+      "reference_C_arith": -9659.282069425171,
+      "per_base_normalized_curvatures": {
+        "2.000000": -9659.282069425171,
+        "2.718282": -9659.28206942517,
+        "6.283185": -9659.282069425171,
+        "10.000000": -9659.282069425171
+      },
+      "max_base_spread_abs_err": 1.8189894035458565e-12,
+      "holds_for_all_q_gt_1": true,
+      "where_tau_enters": [
+        "Fourier self-dual normalization e^{-2*pi*i*x*xi}",
+        "Jacobi theta modularity Theta(1/t) = sqrt(t) Theta(t) with exp(-pi n^2 t)",
+        "Completed-zeta Archimedean factor pi^{-s/2} Gamma(s/2)",
+        "Lindemann transcendence of tau = 2*pi for rational prime-power lattice non-coincidence"
+      ],
+      "tau_specific_theorem_used_in_euler_curvature": false,
+      "classification": "GENERIC_SCALE_CURVATURE"
+    }
+  }
+}

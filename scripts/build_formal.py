@@ -56,6 +56,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
     "formal/RiemannScope/FullSpectrumCommonReferentBridge.lean",
     "formal/RiemannScope/GradeHankelConstraint.lean",
+    "formal/RiemannScope/TransportMismatchCurvature.lean",
 ]
 
 

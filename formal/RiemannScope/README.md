@@ -53,3 +53,13 @@ This directory houses the formal Lean 4 verification layer for `reimann_scope` c
    - Full-transport spectral factor cancellation: $b = 1 \implies (1 - 1)K(s + t) = 0$
    - Signed-weight countermodel: signed weights can yield $\mathcal{H}_0 < 0$
    - Generic-base scale covariance control: $(1 - 1)K = 0$ holds for all $q > 0$
+
+10. **`TransportMismatchCurvature.lean`**:
+   - Euler scaling derivative factorization $\mathcal{M}_K^{(j)}(0) = (-K \log q)^j A_j$ and grade-$K$ cancellation in $\mathfrak{C}_{\mathrm{arith}} = A_0 A_2 - A_1^2$
+   - Homogeneous kernel identity ($A_1 = d A_0, A_2 = d^2 A_0 \implies \mathfrak{C}_{\mathrm{arith}} = 0$)
+   - Compact-support ray homogeneity vanishing theorem (`compact_support_ray_homogeneity_implies_zero`)
+   - Two-point and three-point positive exponential mixture curvature identities and strict positivity
+   - Spectral mismatch scaling algebra ($aK + (1+\eta)K(s+t) - K(s+t) - aK = \eta K(s+t)$)
+   - Centered conjugate ($2\delta$) vs. reflection ($2\gamma$) pairing algebra and reduction to `OBL-CT-001A`
+   - Countermodels for arithmetic curvature non-vanishing and signed spectral curvature
+
