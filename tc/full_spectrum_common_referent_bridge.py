@@ -390,12 +390,12 @@ def certify_station_separation_positive(
     arb_lower = 0.1504440784612
     arb_upper = 0.1504440784613
     try:
-        import flint
-        p_arb = flint.arb.pi()
+        from flint import arb  # type: ignore[attr-defined]
+        p_arb = arb.pi()
         diff_arb = 19 - 6 * p_arb
         arb_lower = float(diff_arb.lower())
         arb_upper = float(diff_arb.upper())
-    except ImportError:
+    except (ImportError, AttributeError):
         pass
 
     return {

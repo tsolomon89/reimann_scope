@@ -1234,7 +1234,7 @@ def certify_worldline(
             "nontrivial_index": source_idx if not is_trivial else None,
             "grade_K": grade,
             "symbolic_scale": f"tau^{grade}" if grade != 0 else "1",
-            "delta": delta_str if not is_trivial else str(s_exact - 0.5),
+            "delta": delta_str if not is_trivial else str(s_exact - 0.5),  # type: ignore[possibly-unbound] # pyright: ignore[reportPossiblyUnboundVariable]
             "transformed_point": {
                 "real_mid": wl_re_m,
                 "real_rad": wl_re_r,
