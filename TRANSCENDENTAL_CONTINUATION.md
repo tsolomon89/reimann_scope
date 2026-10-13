@@ -1922,6 +1922,59 @@ Secondary classifications: `FULL_SPECTRUM_DEFECT_DECOMPOSITION_NOT_DERIVED`, `ST
 Formalized in `formal/RiemannScope/FullSpectrumCommonReferentBridge.lean` (19 declarations compiled, 0 sorry, total 537 declarations in repo):
 `pullback_origin_coordinates_scale`, `pullback_origin_critical_line_scales`, `pullback_origin_normalized_delta_invariant`, `pullback_origin_normalized_gamma_invariant`, `pullback_centered_critical_line_preserved`, `canonical_arithmetic_zeros_stationary`, `pullback_raw_cutoff_scales`, `common_referent_collision_forces_critical_line`, `cr2_disguised_premise`, `radialDefectB1_zero_on_critical_line`, `am_gm_defect_algebraic`, `am_gm_defect_strictly_positive`, `spectral_diagonal_offdiagonal_decomposition`, `arithmetic_vanishing_forces_spectral_cancellation`, `remainder_subordination_contradiction`, `exact_cancellation_precludes_strict_subordination`, `archimedes_station_gap_positive`, `two_term_weighted_defect_zero_iff`, `generic_base_coordinate_covariance`.
 
+---
+
+## 40. Three-Grade Hankel Constraint and Transport–Moment Compatibility Audit (TASK-TC-033)
+
+### 40.1 Nonzero Equal-Grade Energy across Grades $\{-1, 0, 1\}$
+To avoid the exact remainder cancellation flaw of identically zero cross-grade functionals ($\mathcal{D} = -\mathcal{R} \implies |\mathcal{R}| = \mathcal{D}$), TASK-TC-033 audited the nonzero equal-grade arithmetic energy:
+\[
+\mathcal{M}_K = \langle \mu_K \otimes \mu_K, F_K \rangle = \sum_{n, m \ge 2} \Lambda(n)\Lambda(m) F_K(\tau^K n, \tau^K m) > 0.
+\]
+The three-grade Hankel determinant across $K \in \{-1, 0, 1\}$ is:
+\[
+\mathcal{H}_0 = \operatorname{det}\begin{pmatrix} \mathcal{M}_{-1} & \mathcal{M}_0 \\ \mathcal{M}_0 & \mathcal{M}_1 \end{pmatrix} = \mathcal{M}_{-1}\mathcal{M}_1 - \mathcal{M}_0^2.
+\]
+
+### 40.2 Rank-One Arithmetic Law vs Positive Moment Spectral Law
+- **Arithmetic Rank One**: $\mathcal{M}_K = A c^K \implies \mathcal{H}_0 = 0$ (`geometric_sequence_hankel_zero`).
+- **Spectral Positive Moments**: $\mathcal{M}_K = \sum_\rho w_\rho r_\rho^K$ ($w_\rho > 0, r_\rho > 0$) forces:
+  \[
+  \mathcal{H}_0 = \frac{1}{2}\sum_{\rho, \sigma} w_\rho w_\sigma \frac{(r_\rho - r_\sigma)^2}{r_\rho r_\sigma} \ge 0.
+  \]
+  For any off-critical zero $\rho = 1/2 + \delta + i\gamma$ ($\delta \ne 0$), reflection yields distinct reciprocal support points $r = \tau^{2\delta}$ and $r^{-1} \ne r$, forcing $\mathcal{H}_0 > 0$ strictly (`reciprocal_pair_hankel_strict_pos`).
+- Contradiction: $\mathcal{H}_0 = 0$ and $\mathcal{H}_0 > 0$ cannot coexist (`rank_one_and_strict_hankel_contradiction`).
+
+### 40.3 Transport–Moment Incompatibility Theorem
+Under the two-parameter kernel ansatz $F_K(x, y) = \tau^{aK}F_0(\tau^{-bK}x, \tau^{-bK}y)$, two-variable Mellin scaling satisfies:
+\[
+H_K(s, t) = \tau^{K(a + b(s+t))} H_0(s, t).
+\]
+Pairing with explicit formula prime pushforward factors $\tau^{-Ks}\tau^{-Kt}$ and normalizing by $\tau^{-aK}$ yields the net spectral zero-coupling factor:
+\[
+\tau^{(b - 1)K(s + t)}.
+\]
+- **Full Transport ($b = 1$)**: Preserves native integer station labels and forces arithmetic rank one ($\widehat{\mathcal{H}}_0 = 0$). However, the spectral exponent vanishes identically:
+  \[
+  (1 - 1)K(s + t) = 0 \implies \tau^0 = 1.
+  \]
+  All zero-dependent spectral moments $\tau^{2K\delta_\rho}$ are identically erased; $\widehat{\mathcal{M}}_K$ is constant across $K$, giving $\widehat{\mathcal{H}}_0 = 0$ spectrally as well.
+- **Partial/Fixed Transport ($b \ne 1$)**: Spectral exponent survives, but the discrete prime powers inside the window change with $K$, breaking exact arithmetic rank one ($\mathcal{H}_0 \ne 0$ arithmetically).
+- Principal Classification:
+  \[
+  \boxed{\texttt{TRANSPORT\_MOMENT\_INCOMPATIBILITY\_PROVED}}
+  \]
+
+### 40.4 Firewalls
+- `SIGNED_SPECTRAL_WEIGHTS_DO_NOT_IMPLY_HANKEL_POSITIVITY`: Signed weights allow $\mathcal{H}_0 < 0$ despite distinct positive support (`signed_weights_hankel_negative`).
+- `DOUBLE_SPECTRAL_SUM_NOT_POSITIVE_MOMENT_SEQUENCE`: Quadratic double sums $\sum C_{\rho, \sigma} q_\rho^K \overline{q_\sigma}^K$ cannot be treated as scalar positive moment sequences.
+- `HANKEL_POSITIVITY_IS_RH_EQUIVALENT`: Spectral positivity on arbitrary test functions is Weil-equivalent.
+- `GENERIC_PUSHFORWARD_COVARIANCE`: Exponent cancellation $(1 - 1)K = 0$ holds for any base $q > 1$ (`generic_base_covariance`).
+
+### 40.5 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/GradeHankelConstraint.lean` (11 declarations compiled, 0 sorry, total 548 declarations in repo):
+`hankel0`, `geometric_sequence_hankel_zero`, `two_point_hankel_identity`, `two_point_positive_moment_hankel_pos`, `reciprocal_pair_hankel_strict_pos`, `finite_positive_moment_hankel_nonneg`, `rank_one_and_strict_hankel_contradiction`, `transported_kernel_mellin_scaling_algebra`, `full_transport_spectral_factor_cancellation`, `full_transport_net_exponent_zero`, `signed_weights_hankel_negative`, `generic_base_covariance`.
+
 
 
 

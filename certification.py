@@ -131,6 +131,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/TrinomialKernel.lean",
     "formal/RiemannScope/ExponentialPolynomialRigidity.lean",
     "formal/RiemannScope/FullSpectrumCommonReferentBridge.lean",
+    "formal/RiemannScope/GradeHankelConstraint.lean",
 ]
 
 

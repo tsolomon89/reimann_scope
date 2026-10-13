@@ -29,5 +29,6 @@ import RiemannScope.AmbientKernel
 import RiemannScope.TrinomialKernel
 import RiemannScope.ExponentialPolynomialRigidity
 import RiemannScope.FullSpectrumCommonReferentBridge
+import RiemannScope.GradeHankelConstraint
 
 

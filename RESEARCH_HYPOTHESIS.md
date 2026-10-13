@@ -4142,6 +4142,74 @@ Secondary classifications: `FULL_SPECTRUM_DEFECT_DECOMPOSITION_NOT_DERIVED`, `ST
 Formalized in `formal/RiemannScope/FullSpectrumCommonReferentBridge.lean` (19 declarations compiled, 0 sorry, total 537 declarations in repo):
 `pullback_origin_coordinates_scale`, `pullback_origin_critical_line_scales`, `pullback_origin_normalized_delta_invariant`, `pullback_origin_normalized_gamma_invariant`, `pullback_centered_critical_line_preserved`, `canonical_arithmetic_zeros_stationary`, `pullback_raw_cutoff_scales`, `common_referent_collision_forces_critical_line`, `cr2_disguised_premise`, `radialDefectB1_zero_on_critical_line`, `am_gm_defect_algebraic`, `am_gm_defect_strictly_positive`, `spectral_diagonal_offdiagonal_decomposition`, `arithmetic_vanishing_forces_spectral_cancellation`, `remainder_subordination_contradiction`, `exact_cancellation_precludes_strict_subordination`, `archimedes_station_gap_positive`, `two_term_weighted_defect_zero_iff`, `generic_base_coordinate_covariance`.
 
+---
+
+# 50. Three-Grade Hankel Constraint and Transport–Moment Compatibility Audit (TASK-TC-033)
+
+### 50.1 Nonzero Functional Architecture & Candidate Three-Grade Hankel Mechanism
+Following the elimination of linear exact-zero domination in TASK-TC-032R (where $Q_K = \mathcal{D}_K + \mathcal{R}_K = 0 \implies |\mathcal{R}_K| = \mathcal{D}_K$, rendering $\mathcal{D}_K > |\mathcal{R}_K|$ logically impossible), TASK-TC-033 audited a nonlinear, strictly nonzero functional architecture:
+- **Starting Arithmetic Object**: The nonzero equal-grade arithmetic energy:
+  \[
+  \mathcal{M}_K = \langle \mu_K \otimes \mu_K, F_K \rangle = \sum_{n \ge 2} \Lambda(n)^2 w(\tau^K n)^2 > 0
+  \]
+  across primary grades $K \in \{-1, 0, 1\}$ on compact window $[8, 20]$.
+- **Candidate Mechanism**:
+  1. Arithmetic rank-one law: $\mathcal{M}_K = c^K \mathcal{M}_0 \implies \mathcal{H}_0 = \mathcal{M}_{-1}\mathcal{M}_1 - \mathcal{M}_0^2 = 0$.
+  2. Spectral positive-moment law: $\mathcal{M}_K = \sum_\rho w_\rho r_\rho^K$ ($w_\rho > 0, r_\rho > 0$), where off-critical reflection pairs $(r_\rho, r_\rho^{-1})$ force $\mathcal{H}_0 = \frac{1}{2}\sum_{\rho, \sigma} w_\rho w_\sigma \frac{(r_\rho - r_\sigma)^2}{r_\rho r_\sigma} > 0$.
+  3. Contradiction target: $\mathcal{H}_0 = 0$ arithmetically vs $\mathcal{H}_0 > 0$ spectrally under $\neg\mathrm{RH}$.
+
+### 50.2 General Transported-Kernel Ansatz & Mellin Scaling
+For the two-parameter transported-kernel family:
+\[
+F_K(x, y) = \tau^{aK} F_0(\tau^{-bK}x, \tau^{-bK}y), \qquad \varepsilon_K = \tau^{bK}\varepsilon_0,
+\]
+the two-variable Mellin transform scales as:
+\[
+H_K(s, t) = \iint F_K(x, y) x^{s-1} y^{t-1} \,dx\,dy = \tau^{K(a + b(s+t))} H_0(s, t).
+\]
+In the explicit formula, the prime pushforward measure $\mu_K = \sum \Lambda(n)\delta_{\tau^K n}$ contributes scale factors $\tau^{-Ks}\tau^{-Kt} = \tau^{-K(s+t)}$, yielding the net spectral pairing factor:
+\[
+\tau^{aK + (b-1)K(s+t)}.
+\]
+Normalizing by the arithmetic amplitude scaling $N_K = \tau^{-aK}$ leaves the net spectral grade factor:
+\[
+\tau^{(b-1)K(s+t)}.
+\]
+
+### 50.3 Full Transport ($b=1$) and Decisive Transport-Moment Incompatibility
+- **Arithmetic Rank One**: Full coordinate transport $b = 1$ is the unique choice that preserves native arithmetic station labels independent of grade:
+  \[
+  F_K(\tau^K n, \tau^K m) = \tau^{aK} F_0(n, m).
+  \]
+  This guarantees exact geometric scaling $\mathcal{M}_K = \tau^{aK}\mathcal{M}_0$. Normalized by $N_K = \tau^{-aK}$, $\widehat{\mathcal{M}}_K = \mathcal{M}_0$, giving $\widehat{\mathcal{H}}_0 = 0$. Certified Arb interval enclosure: $\widehat{\mathcal{H}}_0 \in [-7.74 \times 10^{-48}, +7.74 \times 10^{-48}]$.
+- **Spectral Exponent Cancellation**: At $b = 1$, the net spectral exponent vanishes identically:
+  \[
+  (b - 1)K(s + t) = (1 - 1)K(s + t) = 0 \implies \tau^0 = 1.
+  \]
+  All zero-dependent spectral moment variation ($\tau^{2K\delta_\rho}$) is identically eliminated! The spectral sequence is identically constant in $K$, forcing $\widehat{\mathcal{H}}_0 = 0$ spectrally as well.
+- **Decisive Incompatibility**: The exact arithmetic transport required to prove arithmetic rank one identically erases the spectral grade dependence required for off-critical Hankel detection.
+- **Principal Classification**:
+  \[
+  \boxed{\texttt{TRANSPORT\_MOMENT\_INCOMPATIBILITY\_PROVED}}
+  \]
+
+### 50.4 Fixed and Partial Transport Controls ($b \ne 1$)
+- **Fixed Raw Window ($b = 0$)**: Spectral grade factors survive as $\tau^{-K(s+t)}$, but the active prime-power station sets change drastically with grade ($K=1$: 2 stations, $K=0$: 6 stations, $K=-1$: 19 stations). Arithmetic rank one fails completely ($\mathcal{H}_0 \approx -404.357 \ne 0$).
+  Classification: `SPECTRAL_MOMENT_SURVIVES_ARITHMETIC_RANK_ONE_FAILS`.
+- **Partial Transport ($b \in (0, 1)$)**: Station arguments $\tau^{(1-b)K}n$ sample non-prime points; no zero-independent normalization achieves arithmetic rank one.
+  Classification: `FINITE_ACCIDENTAL_HANKEL_ZERO`.
+
+### 50.5 Firewalls and Invariance Controls
+1. `SIGNED_SPECTRAL_WEIGHTS_DO_NOT_IMPLY_HANKEL_POSITIVITY`: Signed weights can produce negative Hankel determinants ($\mathcal{H}_0 = -1 < 0$ for $w_1 = 1, w_2 = -2, r_1 = 1, r_2 = 2$) despite multiple support points.
+2. `DOUBLE_SPECTRAL_SUM_NOT_POSITIVE_MOMENT_SEQUENCE`: Equal-grade quadratic energy produces double zero sums $\sum_{\rho, \sigma} C_{\rho, \sigma} q_\rho^K \overline{q_\sigma}^K$ that cannot be treated as scalar positive moment sequences without independent diagonalizability proof.
+3. `HANKEL_POSITIVITY_IS_RH_EQUIVALENT`: Positivity of the spectral quadratic form without arithmetic complement control is a Weil-equivalent reformulation.
+4. `GENERIC_PUSHFORWARD_COVARIANCE`: Exponent cancellation $(1 - 1)K = 0$ holds for any base $q > 1$, proving this is a generic property of pushforward covariance, not $\tau$-specific.
+
+### 50.6 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/GradeHankelConstraint.lean` (12 declarations compiled, 0 sorry, total 548 declarations in repository):
+`hankel0`, `geometric_sequence_hankel_zero`, `two_point_hankel_identity`, `two_point_positive_moment_hankel_pos`, `reciprocal_pair_hankel_strict_pos`, `finite_positive_moment_hankel_nonneg`, `rank_one_and_strict_hankel_contradiction`, `transported_kernel_mellin_scaling_algebra`, `full_transport_spectral_factor_cancellation`, `full_transport_net_exponent_zero`, `signed_weights_hankel_negative`, `generic_base_covariance`.
+
+
 
 
 

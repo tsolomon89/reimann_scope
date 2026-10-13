@@ -41,3 +41,15 @@ This directory houses the formal Lean 4 verification layer for `reimann_scope` c
    - Functional equation reflection theorem $\delta(1 - s) = -\delta(s)$
    - Conditional reflection theorem: reflection closure + radial rigidity ($\forall s \in S, \delta(s) = \delta_0$) forces $\delta_0 = 0$ and $\Re(s) = 1/2$ for all $s \in S$
    - Deductive contradiction corollary forbidding off-line zeros under radial rigidity
+
+9. **`GradeHankelConstraint.lean`**:
+   - Three-grade Hankel determinant $\mathcal{H}_0 = \mathcal{M}_{-1}\mathcal{M}_1 - \mathcal{M}_0^2$
+   - Geometric sequence rank-one vanishing ($\mathcal{M}_K = Ac^K \implies \mathcal{H}_0 = 0$)
+   - Two-point moment algebraic identity $\mathcal{H}_0 = w_1 w_2 (r_1 - r_2)^2 / (r_1 r_2)$
+   - Strict positivity $\mathcal{H}_0 > 0$ for positive weights and distinct support points
+   - Reciprocal pair strict positivity under off-critical reflection ($r_1 \ne 1 \implies \mathcal{H}_0 > 0$)
+   - Contradiction theorem between arithmetic rank-one law and strict moment positivity
+   - Transported-kernel Mellin scaling algebra: exponent $aK + (b - 1)K(s + t)$
+   - Full-transport spectral factor cancellation: $b = 1 \implies (1 - 1)K(s + t) = 0$
+   - Signed-weight countermodel: signed weights can yield $\mathcal{H}_0 < 0$
+   - Generic-base scale covariance control: $(1 - 1)K = 0$ holds for all $q > 0$

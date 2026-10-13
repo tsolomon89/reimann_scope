@@ -287,13 +287,29 @@
         "TASK-TC-031R: Exponential-polynomial evidence scope alignment, Lean declaration correction (17 theorems, 518 total declarations), successive Wronskian hierarchy formalization (W0, W1, W2 > 0), Karlin & Studden ECT external citation, derivative-jet relation-space proof formulation, and clean positive-dilation presentation"
       ],
       "completion_note": "TASK-TC-031 / TASK-TC-031R completed: Minimal trinomial relation reformulated as exponential-polynomial zero F(L) = 0 where L = log(2*pi); Lindemann-Weierstrass necessity theorem proved (forces log(2*pi) transcendental; status in literature open); derivative-jet rigidity proved via relation-space dimension bound dim R_{alpha, beta} <= 1 (F^(m)(L) != 0 for all m >= 1; F'(L) != 0 proves zero at L is strictly simple); differential-operator rigidity derived; positive dilation polynomial P_k(T) constructed with non-zero coefficient a2*k*u*v^(k-1) != 0 at T^(k-1); negative dilation polynomial Q_q(T) constructed with leading coefficient a0*v^q != 0 at T^(2q); the trinomial frontier has been sharpened from mere non-propagation to integer-dilation ray isolation (f(m) = 0 ==> f(km) != 0 for all k in Z \\ {0, 1}; k=0 not excluded); base-one Lindemann specialization separated; successive Wronskians W0, W1, W2 > 0 on R derived and formalized in Lean, proving ECT system with at most 2 real zeros counting multiplicity (Karlin & Studden 1966); functional-transcendence firewall established; Lean 4 formalization formal/RiemannScope/ExponentialPolynomialRigidity.lean compiled with 17 declarations (total 518 project declarations, 0 sorry); 26/26 unit tests passing. Principal classification: EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN."
+    },
+    "track_17_full_spectrum_common_referent_bridge": {
+      "status": "COMPLETED",
+      "tasks": [
+        "TASK-TC-032: Grade-geometry firewall, zero-cancellation defect gate, common-referent collision theorem, certified cross-grade arithmetic vanishing on [8, 20] via station gap 19 - 6pi > 1/7 > 0, candidate spectral decomposition, and selected-block remainder gap classification",
+        "TASK-TC-032R: Strict remainder domination logical impossibility proof: exact arithmetic vanishing Q_epsilon = 0 forces exact remainder cancellation R_epsilon = -D_epsilon, hence |R_epsilon| = D_epsilon, precluding D_epsilon > |R_epsilon|; Lean 4 formalization (537 declarations, 0 sorry)"
+      ],
+      "completion_note": "TASK-TC-032 / TASK-TC-032R completed: Grade-geometry firewall locked; common-referent collision theorem proved; exact cross-grade arithmetic vanishing certified on [8, 20]; candidate spectral decomposition audited; strict remainder subordination proved logically impossible for exact-zero functional; Lean 4 formalization compiled (537 declarations in repository, 0 sorry); 24/24 unit tests passing. Principal classification: EXACT_CANCELLATION_BLOCKS_STRICT_SUBORDINATION_ROUTE."
+    },
+    "track_18_three_grade_hankel_constraint_and_transport_moment_compatibility": {
+      "status": "COMPLETED",
+      "tasks": [
+        "TASK-TC-033: Three-grade Hankel constraint and transport-moment compatibility audit: nonzero equal-grade arithmetic energy M_K on grades {-1, 0, 1}; two-variable Mellin transform scaling H_K(s, t) = tau^{K(a+b(s+t))} H_0(s, t); full transport b=1 uniquely preserves native station labels yielding arithmetic rank one (H_0 = 0), but cancels all zero-dependent spectral moments ((1-1)K(s+t) = 0); fixed raw window b=0 fails arithmetic rank one; partial transport b in (0, 1) fails rank one; signed-weight, double-sum, Weil-equivalence, and generic-base firewalls; Lean 4 formalization compiled (548 declarations, 0 sorry); 24/24 unit tests passing"
+      ],
+      "completion_note": "TASK-TC-033 completed: Transport-moment incompatibility proved: exact arithmetic label-preserving transport b=1 required for arithmetic rank one cancels the net spectral exponent ((1-1)K(s+t) = 0), eliminating all zero-dependent spectral moment variation (tau^{2K delta_rho} -> 1); fixed window b=0 fails arithmetic rank one; signed weights can produce negative Hankel determinants; Lean 4 formalization compiled (12 new declarations, total 548 declarations in repository, 0 sorry); 24/24 unit tests passing. Principal classification: TRANSPORT_MOMENT_INCOMPATIBILITY_PROVED."
     }
   },
   "linked_runs": {
     "campaign_artifacts": [
+      "data/tc_three_grade_hankel_constraint.json",
+      "data/tc_full_spectrum_common_referent_bridge.json",
       "data/tc_exponential_polynomial_orbit_isolation.json",
       "data/tc_minimal_rank_two_trinomial_kernel.json",
-
       "data/tc_unconditional_rank_two_power_frontier.json",
       "data/tc_ambient_kernel_algebraic_independence.json",
       "data/tc_canonical_reconciliation_and_multigrade_naturality.json",

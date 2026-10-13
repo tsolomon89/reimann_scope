@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "TASK-TC-033",
+  "sprint_title": "Three-Grade Hankel Constraint and Transport–Moment Compatibility Audit",
+  "starting_head": "42f8989b52a4e21a28a39e944d180eb7502a5a0d",
+  "parent_head": "7cb308f3067589f25ca44854ceaf6bf2705d008c",
+  "grade_triple": [-1, 0, 1],
+  "arithmetic_energy_definition": {
+    "functional_form": "M_K = <mu_K (x) mu_K, F_K> = sum_{n, m >= 2} Lambda(n) Lambda(m) F_K(tau^K n, tau^K m)",
+    "diagonal_form": "Q_eps^{K,K}[w] = sum_{n >= 2} Lambda(n)^2 [w_K(tau^K n)]^2",
+    "is_strictly_positive": true,
+    "strictly_positive_reason": "Equal-grade diagonal energy contains active prime-power stations in compact window [8, 20]."
+  },
+  "kernel_transport_parameters": {
+    "ansatz": "F_K(x, y) = tau^{a*K} * F_0(tau^{-b*K}*x, tau^{-b*K}*y)",
+    "support_width": "eps_K = tau^{b*K} * eps_0",
+    "station_evaluation": "F_K(tau^K n, tau^K m) = tau^{a*K} * F_0(tau^{(1-b)*K} * n, tau^{(1-b)*K} * m)",
+    "native_mode_b": 1.0,
+    "fixed_mode_b": 0.0
+  },
+  "normalization": {
+    "amplitude_scaling": "N_K = tau^{-a*K}",
+    "derivation_source": "Canonical two-variable Mellin scaling Jacobian and amplitude normalization",
+    "is_post_hoc_fitted": false,
+    "prohibited_status": "POST_HOC_RANK_ONE_NORMALIZATION rejected"
+  },
+  "exact_arithmetic_scaling": {
+    "native_mode_result": "M_K = tau^{a*K} * M_0",
+    "normalized_sequence": "hat_M_K = M_0 (constant sequence, rank one)",
+    "native_normalized_values": [29.275008838711152, 29.275008838711152, 29.275008838711152]
+  },
+  "arithmetic_hankel_status": {
+    "native_mode_H0": 0.0,
+    "native_arb_enclosure": "[-7.7446e-48, 7.7446e-48]",
+    "is_rank_one": true,
+    "fixed_mode_H0": -404.35733329960163,
+    "fixed_mode_is_rank_one": false
+  },
+  "mellin_scaling_identity": {
+    "transform_formula": "H_K(s, t) = tau^{K*(a + b*(s+t))} * H_0(s, t)",
+    "pairing_formula": "tau^{-K*(rho+sigma)} * H_K(rho, sigma) = tau^{a*K + (b-1)*K*(rho+sigma)} * H_0(rho, sigma)",
+    "normalized_spectral_exponent": "(b - 1)*K*(s + t)"
+  },
+  "spectral_grade_factor": {
+    "full_transport_b_equals_1": "tau^{(1-1)*K*(rho+sigma)} = tau^0 = 1",
+    "is_zero_dependent": false,
+    "cancellation_verdict": "Spectral zero-pairing grade factor identically reduces to 1; all zero-dependent moment variation is eliminated."
+  },
+  "spectral_moment_status": {
+    "native_mode": "Constant sequence across K, giving H_0 = 0 spectrally (no off-critical detection)",
+    "fixed_mode": "Zero-dependent factor survives as tau^{-K*(rho+sigma)}, but arithmetic rank one fails"
+  },
+  "weight_sign_status": {
+    "firewall": "SIGNED_SPECTRAL_WEIGHTS_DO_NOT_IMPLY_HANKEL_POSITIVITY",
+    "countermodel": "w1 = 1, w2 = -2, r1 = 1, r2 = 2 gives H_0 = -1 < 0 despite distinct positive support points."
+  },
+  "off_diagonal_status": {
+    "firewall": "DOUBLE_SPECTRAL_SUM_NOT_POSITIVE_MOMENT_SEQUENCE",
+    "countermodel": "Quadratic double zero sums sum_{rho,sigma} C_{rho,sigma} q_rho^K q_sigma^K cannot be treated as scalar positive moment sequences."
+  },
+  "reflection_strictness_status": {
+    "theorem": "For genuine positive weights, an off-critical reciprocal pair r, r^{-1} with r != 1 forces H_0 = w1*w2*(r - r^{-1})^2 > 0.",
+    "formal_lean_proof": "RiemannScope.reciprocal_pair_hankel_strict_pos"
+  },
+  "generic_base_status": {
+    "classification": "GENERIC_PUSHFORWARD_COVARIANCE",
+    "verdict": "The cancellation (1 - 1)*K = 0 holds for every base q > 1; not specific to tau = 2*pi."
+  },
+  "tau_specific_input": {
+    "station_transcendence": "Separation of prime stations requires transcendence of pi (Lindemann 1882) to avoid accidental rational lattice collisions.",
+    "role_in_hankel": "Prevents accidental discrete station commensurability, but does not circumvent the structural transport-moment cancellation."
+  },
+  "numerical_enclosures": {
+    "window": [8.0, 20.0],
+    "native_hat_M_neg1": [29.275008838711152, 29.275008838711152],
+    "native_hat_M_0": [29.275008838711152, 29.275008838711152],
+    "native_hat_M_1": [29.275008838711152, 29.275008838711152],
+    "native_norm_H0": [-7.7446e-48, 7.7446e-48],
+    "fixed_norm_H0": [-404.3573332996016, -404.3573332996016]
+  },
+  "lean_theorems": [
+    "RiemannScope.hankel0",
+    "RiemannScope.geometric_sequence_hankel_zero",
+    "RiemannScope.two_point_hankel_identity",
+    "RiemannScope.two_point_positive_moment_hankel_pos",
+    "RiemannScope.reciprocal_pair_hankel_strict_pos",
+    "RiemannScope.finite_positive_moment_hankel_nonneg",
+    "RiemannScope.rank_one_and_strict_hankel_contradiction",
+    "RiemannScope.transported_kernel_mellin_scaling_algebra",
+    "RiemannScope.full_transport_spectral_factor_cancellation",
+    "RiemannScope.full_transport_net_exponent_zero",
+    "RiemannScope.signed_weights_hankel_negative",
+    "RiemannScope.generic_base_covariance"
+  ],
+  "principal_classification": "TRANSPORT_MOMENT_INCOMPATIBILITY_PROVED",
+  "exact_remaining_subgate": "None for the three-grade equal-grade Hankel architecture; the full-transport arithmetic rank-one condition is structurally incompatible with spectral zero-moment detection."
+}
