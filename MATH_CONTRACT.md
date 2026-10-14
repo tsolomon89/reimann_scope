@@ -3394,7 +3394,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 
 ---
 
-# 66. Infinitesimal Transport-Mismatch Curvature and Non-Scalar Arithmetic Descent (TASK-TC-034)
+# 66. Infinitesimal Transport-Mismatch Curvature and Non-Scalar Arithmetic Descent (TASK-TC-034 / TASK-TC-034R)
 
 1. **Mismatch Parameter and Arithmetic Euler-Generator Law**:
    Write $b = 1 + \eta$ ($\eta \in \mathbb{R}$) around the unique label-preserving transport $b = 1$:
@@ -3406,13 +3406,13 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \widehat{\mathcal M}_K^{(j)}(0) = (-K\log\tau)^j A_j(F_0), \qquad \mathfrak C_{\mathrm{arith}}(F_0) = A_0(F_0)A_2(F_0) - A_1(F_0)^2 = \frac{\widehat{\mathcal M}_K(0)\widehat{\mathcal M}_K''(0) - (\widehat{\mathcal M}_K'(0))^2}{K^2(\log\tau)^2}.
    \]
 
-2. **Arithmetic Flatness Not Implied, Sign Indefiniteness, & Compact-Support Homogeneity No-Go**:
-   - Label preservation at $\eta = 0$ makes $\mathfrak C_{\mathrm{arith}}(F_0)$ independent of $K \ne 0$, but does not imply $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`). Across nonnegative $F_0 \ge 0$, $\mathfrak C_{\mathrm{arith}}(F_0)$ takes positive, zero, and negative values (`GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE`).
-   - Structural vanishing $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ via $\mathcal E F_0 = d F_0$ forces $F_0(rx, ry) = r^d F_0(x,y)$ along every positive ray, which is impossible for any nonzero $F_0 \in C_c^\infty((0,\infty)^2)$ (`NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`, `COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED`).
+2. **Arithmetic Flatness Not Implied, Certified Compact-Support Sign Indefiniteness, & Compact-Support Homogeneity No-Go**:
+   - Label preservation at $\eta = 0$ makes $\mathfrak C_{\mathrm{arith}}(F_0)$ independent of $K \ne 0$, but does not imply $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`). Using the $C^\infty$ plateau cutoff $\mathrm{X}_{15} \in C_c^\infty((1.5, 15.5)^2)$ equal to $1$ on $[1.75, 15.25]^2$, genuinely compactly supported nonnegative witnesses $\widetilde G_\pm = \mathrm{X}_{15} G_\pm \in C_c^\infty((0,\infty)^2)$ have complete arithmetic sums certified by outward 128-bit Arb ball arithmetic to be strictly negative ($\mathfrak C_{\mathrm{arith}}(\widetilde G_-) \approx -6442.343 < 0$, `COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED`) and strictly positive ($\mathfrak C_{\mathrm{arith}}(\widetilde G_+) \approx +191887.248 > 0$, `COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED`), establishing `COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE`.
+   - Structural vanishing $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ via $\mathcal E F_0 = d F_0$ is proved in Lean to force $A_0 A_2 - A_1^2 = 0$ (`homogeneous_arithmetic_curvature_zero`) and proved by paper ODE derivation along positive rays ($F_0(rx, ry) = r^d F_0(x,y)$) to be impossible for any nonzero $F_0 \in C_c^\infty((0,\infty)^2)$ (`NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`, `COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED`).
 
-3. **Spectral Mismatch Scaling, Centering, and Reconciliation with `OBL-CT-001A`**:
+3. **Spectral Mismatch Scaling, Centering, Conditional Theta–Mellin Audit, and Reconciliation with `OBL-CT-001A`**:
    - Mellin scaling yields net normalized factor $\tau^{\eta K(s+t)}$ (uncentered) or $\tau^{\eta K((s-1/2)+(t-1/2))}$ (half-density centered).
-   - For $\rho = 1/2 + \delta_\rho + i\gamma_\rho$, conjugate pairing $t = \bar\rho$ gives radial exponent $2\delta_\rho$ and even mismatch defect $2(\cosh(2\eta K\delta_\rho\log\tau)-1) = B_\rho(2\eta K)$, reflection pairing $t = 1-\bar\rho$ gives ordinate exponent $2i\gamma_\rho$, and the actual two-variable arithmetic energy induces the unrestricted double zero sum over all pairs $(\rho,\sigma)$ plus pole, trivial-zero, and Archimedean terms (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`).
+   - For $\rho = 1/2 + \delta_\rho + i\gamma_\rho$, conjugate pairing $t = \bar\rho$ gives radial exponent $2\delta_\rho$ and even mismatch defect $2(\cosh(2\eta K\delta_\rho\log\tau)-1) = B_\rho(2\eta K)$, reflection pairing $t = 1-\bar\rho$ gives ordinate exponent $2i\gamma_\rho$, the actual two-variable arithmetic energy induces the unrestricted double zero sum over all pairs $(\rho,\sigma)$ plus pole, trivial-zero, and Archimedean terms (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`), and the bilinear theta–Mellin fallback remains conditional on regularization (`THETA_MELLIN_AUDIT_CONDITIONAL`, `CONDITIONAL_ON_REGULARIZATION`, `COMPLETE_EXPANSION_NOT_DERIVED`).
    - Principal Classification:
      \[
      \boxed{\texttt{MISMATCH\_CURVATURE\_REDUCES\_TO\_OBL\_CT\_001A}}
@@ -3420,6 +3420,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
      (`OBL-CT-001A` remains **OPEN**; candidate failure does not refute the general TC hypothesis).
 
 4. **Lean 4 Formal Verification**:
-   `formal/RiemannScope/TransportMismatchCurvature.lean` (18 declarations compiled, 0 sorry, total 566 declarations in repo):
+   `formal/RiemannScope/TransportMismatchCurvature.lean` (18 module declarations: `1 def` + `17 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 565 compiled `theorem` declarations in repo):
    `curvatureDet`, `single_exponential_log_curvature_zero`, `two_exponential_curvature_identity`, `two_exponential_positive_log_curvature`, `positive_finite_exponential_curvature_nonneg`, `three_exponential_curvature_identity`, `three_exponential_curvature_nonneg`, `reciprocal_pair_curvature_strict_pos`, `homogeneous_arithmetic_curvature_zero`, `arithmetic_zero_curvature_and_spectral_positive_contradiction`, `euler_generator_scaling_algebra`, `mismatch_curvature_k_independent`, `even_second_difference_quadratic_ident`, `centered_conjugate_pairing_radial`, `centered_reflection_pairing_real_zero`, `mellin_mismatch_net_exponent`, `signed_weight_curvature_negative`, `generic_base_mismatch_curvature_scaling`.
+
 

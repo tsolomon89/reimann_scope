@@ -850,7 +850,7 @@
       "review_status": "REVIEWED_AND_VERIFIED",
       "open_implication": "Determine whether the infinitesimal second variation (transport curvature) around the unique label-preserving transport b = 1 (b = 1 + eta, eta -> 0) defines a zero-independent arithmetic curvature functional detecting delta_rho^2 and closing OBL-CT-001A.",
       "planned_calculation": "Derive arithmetic Euler-generator theorem M_K^{(j)}(0) = (-K log tau)^j A_j(F_0) for E = x d/dx + y d/dy; define K-independent arithmetic curvature C_arith(F_0) = A_0 A_2 - A_1^2; prove positive exponential mixture Lagrange identity; audit Euler homogeneity E F_0 = d F_0 and compact-support homogeneity no-go; test arithmetic curvature sign firewall across nonnegative kernels; audit Mellin mismatch scaling, half-density centering, and conjugate vs reflection vs general zero-zero pairings; reconcile with existing detector B_rho(k); audit one canonical bilinear theta-Mellin non-scalar candidate; verify generic-base and Weil-equivalence firewalls; formalize algebraic theorems in Lean 4.",
-      "acceptance_criterion": "28/28 unit tests passing in tests/test_tc_transport_mismatch_curvature.py; Lean 4 formalization formal/RiemannScope/TransportMismatchCurvature.lean compiled (566 total declarations, 0 sorry); machine-readable artifact data/tc_transport_mismatch_curvature.json; review docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md; principal classification MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A; OBL-CT-001A kept OPEN.",
+      "acceptance_criterion": "28/28 unit tests passing in tests/test_tc_transport_mismatch_curvature.py; Lean 4 formalization formal/RiemannScope/TransportMismatchCurvature.lean compiled (18 module declarations: 1 def + 17 theorems, 565 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); machine-readable artifact data/tc_transport_mismatch_curvature.json; review docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md; principal classification MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A; OBL-CT-001A kept OPEN.",
       "dependencies": [
         "TASK-TC-033"
       ],
@@ -869,7 +869,37 @@
         "RESEARCH_HYPOTHESIS.md",
         "RESEARCH_LEDGER.md"
       ],
-      "resolution": "TASK-TC-034 completed: Proved arithmetic Euler-generator theorem and K-independence of normalized mismatch curvature C_arith(F_0) = A_0 A_2 - A_1^2; proved arithmetic flatness is not implied by label preservation (ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED) and C_arith is sign-indefinite across nonnegative kernels (GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE); proved compact-support homogeneity no-go (COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED / NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE); audited centered conjugate (2*delta_rho), reflection (2*i*gamma_rho), and naturally induced unrestricted double-sum spectral pairings (SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM); reconciled centered conjugate even defect with B_rho(2*eta*K) (MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A); audited bilinear theta-Mellin fallback; verified generic-base and Weil-equivalence firewalls; OBL-CT-001A remains OPEN; Lean 4 formalization compiled (18 new declarations, total 566 declarations in repository, 0 sorry); 28/28 unit tests passing. Principal classification: MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A."
+      "resolution": "TASK-TC-034 completed (and evidence-repaired in TASK-TC-034R): Proved arithmetic Euler-generator theorem and K-independence of normalized mismatch curvature C_arith(F_0) = A_0 A_2 - A_1^2; proved arithmetic flatness is not implied by label preservation (ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED) and C_arith is sign-indefinite across nonnegative compactly supported kernels (COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE); proved compact-support homogeneity no-go by paper ODE derivation (COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED / NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE); audited centered conjugate (2*delta_rho), reflection (2*i*gamma_rho), and naturally induced unrestricted double-sum spectral pairings (SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM); reconciled centered conjugate even defect with B_rho(2*eta*K) (MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A); audited bilinear theta-Mellin fallback (THETA_MELLIN_AUDIT_CONDITIONAL); verified generic-base and Weil-equivalence firewalls; OBL-CT-001A remains OPEN; Lean 4 formalization compiled (18 module declarations: 1 def + 17 theorems, total 565 compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); 28/28 unit tests passing. Principal classification: MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A."
+    },
+    {
+      "task_id": "TASK-TC-034R",
+      "priority": 40,
+      "objective": "Transport-Mismatch Curvature Evidence Repair, Compact-Support Witnesses, and Conditional Theta-Mellin Audit",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Correct false Lean theorem attribution for compact-support ray homogeneity, replace noncompact finite-cutoff sign prototypes with genuinely compactly supported C_c^infty((0,inf)^2) kernels whose complete arithmetic sums have Arb-certified positive and negative curvature, separate finite-truncation diagnostics from complete compact-support evaluations, and replace unconditional-looking theta-Mellin Booleans with explicit conditional/unresolved evidence status strings while preserving MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A and keeping OBL-CT-001A OPEN.",
+      "planned_calculation": "Remove nonexistent Lean theorem identifier from formal/RiemannScope/README.md and classify compact-support ray-homogeneity no-go as PROVED_PAPER_DERIVATION; implement smooth C^infty plateau cutoff X_15 supported in (1.5, 15.5)^2 and equal to 1 on [1.75, 15.25]^2 preserving order-2 Euler jets at all active stations 2 <= n, m <= 15; certify complete arithmetic sums of compactly supported witnesses G_tilde_minus = X_15 G_minus and G_tilde_plus = X_15 G_plus in outward 128-bit Arb ball arithmetic with fail-closed fallback; replace Boolean fields in ThetaMellinNonScalarCandidateAudit with explicit status strings; synchronize Lean declaration map (1 def + 17 theorems, 565 total compiled theorems) and canonical docs.",
+      "acceptance_criterion": "28/28 unit tests passing in tests/test_tc_transport_mismatch_curvature.py covering all 28 TASK-TC-034R regression items; zero occurrences of nonexistent Lean identifier in repo; Arb-certified complete compact-support positive and negative curvature enclosures; docs/reviews/TC_034R_TRANSPORT_MISMATCH_CURVATURE_REPAIR_AUDIT.md and updated docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md; data/tc_transport_mismatch_curvature.json with all 22 required keys; OBL-CT-001A kept OPEN.",
+      "dependencies": [
+        "TASK-TC-034"
+      ],
+      "evidence": [
+        "tc/transport_mismatch_curvature.py",
+        "tests/test_tc_transport_mismatch_curvature.py",
+        "docs/reviews/TC_034R_TRANSPORT_MISMATCH_CURVATURE_REPAIR_AUDIT.md",
+        "docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md",
+        "data/tc_transport_mismatch_curvature.json",
+        "formal/RiemannScope/README.md",
+        "CURVATURE_TRANSPORT.md",
+        "ARITHMETIC_RADIAL_BRIDGE.md",
+        "CMSA_GATE_G4.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-034R completed: Removed nonexistent Lean theorem reference from formal/RiemannScope/README.md and classified compact-support ray-homogeneity no-go as PROVED_PAPER_DERIVATION (COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED); implemented smooth C^infty plateau compactification operator X_15 supported in (1.5, 15.5)^2 with flat plateau [1.75, 15.25]^2 preserving order-2 Euler jets at all 81 active prime-power station pairs 2 <= n, m <= 15; certified complete arithmetic sums for G_tilde_minus (C_arith in [-6442.34295182745976846022999751473105 +/- 8.42e-33] < 0, COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED) and G_tilde_plus (C_arith in [+191887.248334839729574771407499577571 +/- 6.37e-31] > 0, COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED) in 128-bit Arb ball arithmetic with fail-closed fallback (superseding FINITE_TRUNCATION_SIGN_INDEFINITENESS_OBSERVED with COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE); replaced theta-Mellin Boolean claims with explicit conditional status strings (THETA_MELLIN_AUDIT_CONDITIONAL); preserved MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A and kept OBL-CT-001A OPEN. Task completion classification: TASK_TC_034R_TRANSPORT_CURVATURE_REPAIR_COMPLETE."
     }
   ]
 }

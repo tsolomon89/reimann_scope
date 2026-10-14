@@ -420,7 +420,7 @@ $$\boxed{\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}}$$
 ## 12. Current Status and Research Protocol
 
 - **`OBL-RADIAL-DEFECT-DESCENT`**: Active master obligation governing the 4 surviving radial-defect extraction routes.
-- **`OBL-CT-001A` (Non-Scalar Arithmetic Functional Construction)**: Canonical **EARLIEST OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §15; audited in `TASK-TC-034`, `docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md`, classified as `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A` — remains **OPEN**).
+- **`OBL-CT-001A` (Non-Scalar Arithmetic Functional Construction)**: Canonical **EARLIEST OPEN OBLIGATION** (`CURVATURE_TRANSPORT.md` §15, §20; audited in `TASK-TC-034` / `TASK-TC-034R`, `docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md`, `docs/reviews/TC_034R_TRANSPORT_MISMATCH_CURVATURE_REPAIR_AUDIT.md`, classified as `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A` — remains **OPEN**).
 - **`OBL-WH-002` (Admissible Probe Regularization)**: Active analytic obligation for smoothing family $\Phi_\varepsilon \to 1/s$.
 - **`OBL-TC-ACT` (Transcendental Continuation Activation Theorem)**: Active earliest open subgate for CMSA Gate G4.
 - **Closed / Falsified Subgates**:
@@ -430,7 +430,7 @@ $$\boxed{\mathbf{OBL\text{-}RADIAL\text{-}DEFECT\text{-}DESCENT}}$$
   - `FAIL_ZERO_ARITHMETIC_ANCHOR_UNDER_UNNORMALIZED_T_LIMIT` (integrated-$\sigma$ unnormalized arithmetic divergence).
   - `GRADE_COORDINATE_REDUNDANT` / `SCALE_GENERIC_NOT_TAU_SPECIFIC` (dilation pullback redundancy and generic scale).
   - `TRANSPORT_MOMENT_INCOMPATIBILITY_PROVED` (`TASK-TC-033`: full transport $b=1$ gives arithmetic rank one but cancels spectral grade factors; $b \neq 1$ breaks arithmetic rank one).
-  - `ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED` / `COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED` / `SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM` / `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A` (`TASK-TC-034`: infinitesimal transport-mismatch curvature around $b = 1 + \eta$ yields $K$-independent Euler curvature $\mathfrak C_{\mathrm{arith}}(F_0) = A_0 A_2 - A_1^2$ which is sign-indefinite on $F_0 \ge 0$, cannot vanish structurally on nonzero $F_0 \in C_c^\infty((0,\infty)^2)$, and expands spectrally into a double zero sum with background terms; candidate failure does not refute TC).
+  - `ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED` / `COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE` / `COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED` / `SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM` / `THETA_MELLIN_AUDIT_CONDITIONAL` / `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A` (`TASK-TC-034` / `TASK-TC-034R`: infinitesimal transport-mismatch curvature around $b = 1 + \eta$ yields $K$-independent Euler curvature $\mathfrak C_{\mathrm{arith}}(F_0) = A_0 A_2 - A_1^2$ whose complete compact-support sums on $\widetilde G_\pm \in C_c^\infty((1.5,15.5)^2)$ are Arb-certified strictly negative and strictly positive, cannot vanish structurally via Euler homogeneity on nonzero $F_0 \in C_c^\infty((0,\infty)^2)$ by paper ODE derivation, and expands spectrally into a double zero sum with background terms; candidate failure does not refute TC).
 - **Announcement Protocol**: Adheres strictly to Rule 01 (Mathematical Rigor Protocol). No proof of RH is announced.
 
 

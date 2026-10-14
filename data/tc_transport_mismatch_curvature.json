@@ -1,8 +1,10 @@
 {
-  "task_id": "TASK-TC-034",
-  "title": "Infinitesimal Transport-Mismatch Curvature and Non-Scalar Arithmetic Descent",
-  "starting_head": "90493831c9bd803526593691e7f39b55a7b9fb40",
-  "substantive_parent": "1d777ea1bc7e962ee6ad03f3f72b83c731dfb186",
+  "task_id": "TASK-TC-034R",
+  "repaired_task_id": "TASK-TC-034",
+  "task_completion_status": "TASK_TC_034R_TRANSPORT_CURVATURE_REPAIR_COMPLETE",
+  "title": "Transport-Mismatch Curvature Evidence Repair, Compact-Support Witnesses, and Conditional Theta-Mellin Audit",
+  "starting_head": "9f4701280a05c5c4ba9dc8be8d2bdb968588c799",
+  "substantive_parent": "684c324960c8cfb3014808004926bb4d157c2fd9",
   "mismatch_parameter": "b = 1 + eta, eta in R (infinitesimal expansion around b = 1 at eta = 0)",
   "transported_kernel": "F_{K,eta}(x,y) = tau^{aK} F_0(tau^{-(1+eta)K}x, tau^{-(1+eta)K}y)",
   "arithmetic_derivative_formulas": {
@@ -13,9 +15,510 @@
   },
   "euler_operator": "E = x d/dx + y d/dy",
   "arithmetic_curvature": "C_arith(F_0) = A_0(F_0)*A_2(F_0) - A_1(F_0)^2",
-  "curvature_sign_status": "GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE",
-  "homogeneity_status": "E F_0 = d F_0 implies A_1 = d A_0, A_2 = d^2 A_0, and C_arith(F_0) = 0; not implied by arithmetic label preservation alone (ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED).",
+  "compact_support_no_go_evidence": "PROVED_PAPER_DERIVATION",
   "compact_support_obstruction": "NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE",
+  "compactification_operator": {
+    "symbol": "X_N(x, y) = chi_{a, b, c, d}(x) * chi_{a, b, c, d}(y)",
+    "flat_function": "h(t) = exp(-1/t) for t > 0, 0 for t <= 0",
+    "smooth_step": "S(t) = h(t) / (h(t) + h(1 - t))",
+    "plateau_1d": "chi_{a,b,c,d}(x) = S((x - a)/(b - a)) * S((d - x)/(d - c))",
+    "N_cutoff": 15,
+    "a": 1.5,
+    "b": 1.75,
+    "c": 15.25,
+    "d": 15.5,
+    "support_rectangle": [
+      [
+        1.5,
+        15.5
+      ],
+      [
+        1.5,
+        15.5
+      ]
+    ],
+    "plateau_rectangle": [
+      [
+        1.75,
+        15.25
+      ],
+      [
+        1.75,
+        15.25
+      ]
+    ],
+    "active_station_set": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13
+    ],
+    "highest_admitted_integer_station": 15,
+    "first_excluded_integer_station": 16,
+    "verified_derivative_order": 2
+  },
+  "plateau_interval": [
+    1.75,
+    15.25
+  ],
+  "support_interval": [
+    1.5,
+    15.5
+  ],
+  "jet_preservation_order": 2,
+  "negative_witness": {
+    "name": "tilde_G_minus_compact_N15",
+    "definition": "tilde{G}_-(x, y) = X_{15}(x, y) * exp(-(3/2) * (log(x*y / 16))^2)",
+    "prototype_G_minus": "exp(-(3/2) * (log(x*y / 16))^2)",
+    "prototype_E_G_minus": "-6 * log(x*y / 16) * exp(-(3/2) * (log(x*y / 16))^2)",
+    "prototype_E2_G_minus": "(36 * (log(x*y / 16))^2 - 12) * exp(-(3/2) * (log(x*y / 16))^2)",
+    "nonnegative": true,
+    "compactly_supported_in_open_quadrant": true,
+    "support_rectangle": [
+      [
+        1.5,
+        15.5
+      ],
+      [
+        1.5,
+        15.5
+      ]
+    ],
+    "plateau_rectangle": [
+      [
+        1.75,
+        15.25
+      ],
+      [
+        1.75,
+        15.25
+      ]
+    ],
+    "classification": "COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED"
+  },
+  "negative_witness_complete_sum": {
+    "name": "tilde_G_minus_compact_N15",
+    "N_cutoff": 15,
+    "support_interval": [
+      1.5,
+      15.5
+    ],
+    "plateau_interval": [
+      1.75,
+      15.25
+    ],
+    "support_rectangle": [
+      [
+        1.5,
+        15.5
+      ],
+      [
+        1.5,
+        15.5
+      ]
+    ],
+    "plateau_rectangle": [
+      [
+        1.75,
+        15.25
+      ],
+      [
+        1.75,
+        15.25
+      ]
+    ],
+    "active_station_set": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13
+    ],
+    "active_station_pairs": 81,
+    "highest_admitted_integer_station": 15,
+    "highest_active_prime_power_station": 13,
+    "first_excluded_integer_station": 16,
+    "verified_derivative_order": 2,
+    "max_cutoff_plateau_value_err": 0.0,
+    "max_cutoff_plateau_e1_err": 0.0,
+    "max_cutoff_plateau_e2_err": 0.0,
+    "max_station_jet0_err": 0.0,
+    "max_station_jet1_err": 0.0,
+    "max_station_jet2_err": 0.0,
+    "max_exterior_value_and_jet_abs": 0.0,
+    "complete_sum_tail_difference_up_to_40": 0.0,
+    "is_complete_compact_support_sum": true,
+    "is_infinite_sum_truncation": false
+  },
+  "negative_curvature_arb_enclosure": {
+    "witness_kind": "negative",
+    "witness_name": "tilde_G_minus_compact_N15",
+    "status": "COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+    "certified": true,
+    "is_complete_compact_support_sum": true,
+    "is_infinite_sum_truncation": false,
+    "precision_bits": 128,
+    "active_stations": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13
+    ],
+    "active_station_pairs": 81,
+    "support_interval": [
+      1.5,
+      15.5
+    ],
+    "plateau_interval": [
+      1.75,
+      15.25
+    ],
+    "A0_enclosure": {
+      "arb_ball_str": "[44.2893822257315392244411121427552897 +/- 5.18e-35]",
+      "lower_bound_str": "[44.289382225731539224441112142755289648 +/- 2.06e-37]",
+      "upper_bound_str": "[44.289382225731539224441112142755289672 +/- 4.74e-37]",
+      "outward_float_interval": [
+        44.28938222573153,
+        44.28938222573154
+      ],
+      "radius_upper_bound": 1.1587244571855205e-35,
+      "zero_excluded": true,
+      "strictly_negative": false,
+      "strictly_positive": true,
+      "display_midpoint_approx": 44.289382225731536,
+      "display_float_is_certificate": false
+    },
+    "A1_enclosure": {
+      "arb_ball_str": "[-98.8728807644731569044746281367217238 +/- 6.25e-35]",
+      "lower_bound_str": "[-98.872880764473156904474628136721723863 +/- 1.79e-37]",
+      "upper_bound_str": "[-98.872880764473156904474628136721723819 +/- 1.88e-37]",
+      "outward_float_interval": [
+        -98.87288076447317,
+        -98.87288076447314
+      ],
+      "radius_upper_bound": 2.1463969106805393e-35,
+      "zero_excluded": true,
+      "strictly_negative": true,
+      "strictly_positive": false,
+      "display_midpoint_approx": -98.87288076447315,
+      "display_float_is_certificate": false
+    },
+    "A2_enclosure": {
+      "arb_ball_str": "[75.266428008597175307782211751148849 +/- 5.07e-34]",
+      "lower_bound_str": "[75.266428008597175307782211751148848493 +/- 3.87e-37]",
+      "upper_bound_str": "[75.266428008597175307782211751148848597 +/- 2.06e-37]",
+      "outward_float_interval": [
+        75.26642800859716,
+        75.26642800859719
+      ],
+      "radius_upper_bound": 5.174652262633964e-35,
+      "zero_excluded": true,
+      "strictly_negative": false,
+      "strictly_positive": true,
+      "display_midpoint_approx": 75.26642800859717,
+      "display_float_is_certificate": false
+    },
+    "curvature_enclosure": {
+      "arb_ball_str": "[-6442.34295182745976846022999751473105 +/- 8.42e-33]",
+      "lower_bound_str": "[-6442.3429518274597684602299975147310565 +/- 3.88e-35]",
+      "upper_bound_str": "[-6442.3429518274597684602299975147310416 +/- 3.54e-35]",
+      "outward_float_interval": [
+        -6442.342951827461,
+        -6442.342951827459
+      ],
+      "radius_upper_bound": 7.46854627956442e-33,
+      "zero_excluded": true,
+      "strictly_negative": true,
+      "strictly_positive": false,
+      "display_midpoint_approx": -6442.34295182746,
+      "display_float_is_certificate": false
+    },
+    "zero_excluded": true,
+    "sup_curvature_lt_zero": true,
+    "inf_curvature_gt_zero": false
+  },
+  "positive_witness": {
+    "name": "tilde_G_plus_compact_N15",
+    "definition": "tilde{G}_+(x, y) = X_{15}(x, y) * cosh((6/5)*log(x*y / 25)) * exp(-(2/25)*(log(x*y / 25))^2)",
+    "prototype_G_plus": "cosh((6/5)*w) * exp(-(2/25)*w^2), w = log(x*y / 25)",
+    "prototype_E_G_plus": "2 * ((6/5)*sinh((6/5)*w) - (4/25)*w*cosh((6/5)*w)) * exp(-(2/25)*w^2)",
+    "prototype_E2_G_plus": "4 * (((32/25) + (16/625)*w^2)*cosh((6/5)*w) - (48/125)*w*sinh((6/5)*w)) * exp(-(2/25)*w^2)",
+    "nonnegative": true,
+    "compactly_supported_in_open_quadrant": true,
+    "support_rectangle": [
+      [
+        1.5,
+        15.5
+      ],
+      [
+        1.5,
+        15.5
+      ]
+    ],
+    "plateau_rectangle": [
+      [
+        1.75,
+        15.25
+      ],
+      [
+        1.75,
+        15.25
+      ]
+    ],
+    "classification": "COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED"
+  },
+  "positive_witness_complete_sum": {
+    "name": "tilde_G_plus_compact_N15",
+    "N_cutoff": 15,
+    "support_interval": [
+      1.5,
+      15.5
+    ],
+    "plateau_interval": [
+      1.75,
+      15.25
+    ],
+    "support_rectangle": [
+      [
+        1.5,
+        15.5
+      ],
+      [
+        1.5,
+        15.5
+      ]
+    ],
+    "plateau_rectangle": [
+      [
+        1.75,
+        15.25
+      ],
+      [
+        1.75,
+        15.25
+      ]
+    ],
+    "active_station_set": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13
+    ],
+    "active_station_pairs": 81,
+    "highest_admitted_integer_station": 15,
+    "highest_active_prime_power_station": 13,
+    "first_excluded_integer_station": 16,
+    "verified_derivative_order": 2,
+    "max_cutoff_plateau_value_err": 0.0,
+    "max_cutoff_plateau_e1_err": 0.0,
+    "max_cutoff_plateau_e2_err": 0.0,
+    "max_station_jet0_err": 0.0,
+    "max_station_jet1_err": 0.0,
+    "max_station_jet2_err": 0.0,
+    "max_exterior_value_and_jet_abs": 0.0,
+    "complete_sum_tail_difference_up_to_40": 0.0,
+    "is_complete_compact_support_sum": true,
+    "is_infinite_sum_truncation": false
+  },
+  "positive_curvature_arb_enclosure": {
+    "witness_kind": "positive",
+    "witness_name": "tilde_G_plus_compact_N15",
+    "status": "COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+    "certified": true,
+    "is_complete_compact_support_sum": true,
+    "is_infinite_sum_truncation": false,
+    "precision_bits": 128,
+    "active_stations": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13
+    ],
+    "active_station_pairs": 81,
+    "support_interval": [
+      1.5,
+      15.5
+    ],
+    "plateau_interval": [
+      1.75,
+      15.25
+    ],
+    "A0_enclosure": {
+      "arb_ball_str": "[292.8649412915518129501589111545221895 +/- 6.68e-35]",
+      "lower_bound_str": "[292.86494129155181295015891115452218943 +/- 2.81e-36]",
+      "upper_bound_str": "[292.86494129155181295015891115452218953 +/- 8.98e-37]",
+      "outward_float_interval": [
+        292.86494129155176,
+        292.8649412915519
+      ],
+      "radius_upper_bound": 4.7747607558430793e-35,
+      "zero_excluded": true,
+      "strictly_negative": false,
+      "strictly_positive": true,
+      "display_midpoint_approx": 292.8649412915518,
+      "display_float_is_certificate": false
+    },
+    "A1_enclosure": {
+      "arb_ball_str": "[357.663215482460087728691417420808556 +/- 5.12e-34]",
+      "lower_bound_str": "[357.66321548246008772869141742080855549 +/- 2.43e-36]",
+      "upper_bound_str": "[357.66321548246008772869141742080855562 +/- 2.99e-36]",
+      "outward_float_interval": [
+        357.66321548246003,
+        357.66321548246015
+      ],
+      "radius_upper_bound": 6.681504338689886e-35,
+      "zero_excluded": true,
+      "strictly_negative": false,
+      "strictly_positive": true,
+      "display_midpoint_approx": 357.6632154824601,
+      "display_float_is_certificate": false
+    },
+    "A2_enclosure": {
+      "arb_ball_str": "[1092.005832564697891727523075342162585 +/- 4.48e-34]",
+      "lower_bound_str": "[1092.0058325646978917275230753421625845 +/- 4.85e-35]",
+      "upper_bound_str": "[1092.0058325646978917275230753421625851 +/- 2.63e-35]",
+      "outward_float_interval": [
+        1092.0058325646976,
+        1092.005832564698
+      ],
+      "radius_upper_bound": 2.846648557922755e-34,
+      "zero_excluded": true,
+      "strictly_negative": false,
+      "strictly_positive": true,
+      "display_midpoint_approx": 1092.0058325646978,
+      "display_float_is_certificate": false
+    },
+    "curvature_enclosure": {
+      "arb_ball_str": "[191887.248334839729574771407499577571 +/- 6.37e-31]",
+      "lower_bound_str": "[191887.24833483972957477140749957757036 +/- 3.28e-33]",
+      "upper_bound_str": "[191887.24833483972957477140749957757074 +/- 3.87e-33]",
+      "outward_float_interval": [
+        191887.2483348397,
+        191887.24833483977
+      ],
+      "radius_upper_bound": 1.8599989145839413e-31,
+      "zero_excluded": true,
+      "strictly_negative": false,
+      "strictly_positive": true,
+      "display_midpoint_approx": 191887.24833483974,
+      "display_float_is_certificate": false
+    },
+    "zero_excluded": true,
+    "sup_curvature_lt_zero": false,
+    "inf_curvature_gt_zero": true
+  },
+  "compact_support_sign_indefiniteness_status": "COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE",
+  "curvature_sign_status": "COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE",
+  "finite_accidental_zero_scope": {
+    "classification": "FINITE_ACCIDENTAL_ARITHMETIC_CURVATURE_ZERO",
+    "scope_specification": {
+      "complete_plateau_kernel_X3": {
+        "kernel_name": "X_3(x, y) = chi_{1.5, 1.75, 3.25, 3.5}(x) chi_{1.5, 1.75, 3.25, 3.5}(y)",
+        "support_rectangle": [
+          [
+            1.5,
+            3.5
+          ],
+          [
+            1.5,
+            3.5
+          ]
+        ],
+        "plateau_rectangle": [
+          [
+            1.75,
+            3.25
+          ],
+          [
+            1.75,
+            3.25
+          ]
+        ],
+        "active_stations_in_complete_support": [
+          2,
+          3
+        ],
+        "evaluation_scope": "ONE_COMPACTLY_SUPPORTED_KERNEL_COMPLETE_SUPPORT",
+        "A0": 3.210401995568401,
+        "A1": 0.0,
+        "A2": 0.0,
+        "arithmetic_curvature": 0.0,
+        "why_accidental_not_structural": "E X_3 = 0 only on the plateau [1.75, 3.25]^2 and exterior; on the transition ramps (1.5, 1.75) and (3.25, 3.5), E X_3 != 0. The zero at eta = 0 relies on placing the cutoff transition in the integer-free gap (3.25, 3.5)."
+      },
+      "fixed_kernel_F_acc_restricted_vs_complete": {
+        "kernel_name": "F_acc(x, y) = chi_{1.5, 1.75, 3.25, 5.5}(x) chi_{1.5, 1.75, 3.25, 5.5}(y)",
+        "support_rectangle": [
+          [
+            1.5,
+            5.5
+          ],
+          [
+            1.5,
+            5.5
+          ]
+        ],
+        "plateau_rectangle": [
+          [
+            1.75,
+            3.25
+          ],
+          [
+            1.75,
+            3.25
+          ]
+        ],
+        "restricted_station_subset": [
+          2,
+          3
+        ],
+        "restricted_subset_scope": "ONE_RESTRICTED_ARITHMETIC_WINDOW_OF_FIXED_KERNEL",
+        "restricted_subset_A0": 3.210401995568401,
+        "restricted_subset_curvature": 0.0,
+        "complete_support_stations": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "complete_support_scope": "COMPLETE_SUPPORT_OF_SAME_FIXED_KERNEL",
+        "complete_support_A0": 5.8594697186208275,
+        "complete_support_curvature": 1477.6577618002589
+      }
+    },
+    "small_window_n_max": 3,
+    "small_window_A0": 3.210401995568401,
+    "small_window_curvature": 0.0,
+    "large_window_n_max": 5,
+    "large_window_A0": 5.8594697186208275,
+    "large_window_curvature": 1477.6577618002589,
+    "vanishes_on_selected_window": true,
+    "nonzero_on_complete_support_of_fixed_kernel": true
+  },
+  "homogeneity_status": "E F_0 = d F_0 implies A_1 = d A_0, A_2 = d^2 A_0, and C_arith(F_0) = 0; not implied by arithmetic label preservation alone (ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED).",
   "mellin_scaling": {
     "raw_factor": "tau^{K(a + (1 + eta)(s + t))} H_0(s, t)",
     "net_normalized_factor": "tau^{eta K (s + t)}",
@@ -25,7 +528,7 @@
   "centered_exponent_convention": {
     "uncentered": "s + t",
     "half_density_centered": "(s - 1/2) + (t - 1/2) = s + t - 1",
-    "conjugate_pair_t_eq_bar_rho": "2 * delta_rho (radial)",
+    "conjugate_pair_t_eq_bar_rho": "2 * delta_rho (radial, DIAGONAL_CONJUGATE_BLOCK_ONLY)",
     "reflection_pair_t_eq_1_minus_bar_rho": "2 * i * gamma_rho (ordinate/phase)",
     "general_pair_rho_sigma": "(delta_rho + delta_sigma) + i*(gamma_rho + gamma_sigma)"
   },
@@ -33,34 +536,219 @@
   "spectral_curvature_type": "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
   "weight_sign": "COMPLEX_SIGNED_DOUBLE_SUM_WEIGHTS",
   "cross_term_status": "UNRESTRICTED_DOUBLE_SUM_WITH_POLE_TRIVIAL_AND_ARCHIMEDEAN_TERMS",
+  "theta_definition_status": "PROVED_BY_DEFINITION",
+  "theta_convergence_status": "CONDITIONAL_ON_REGULARIZATION",
+  "theta_second_variation_status": "FORMAL_CANDIDATE_NOT_DERIVED",
+  "theta_delta_squared_status": "DIAGONAL_CONJUGATE_BLOCK_ONLY",
+  "theta_complete_expansion_status": "COMPLETE_EXPANSION_NOT_DERIVED",
+  "theta_positivity_status": "RH_EQUIVALENT_IF_POSITIVE",
+  "theta_obl_ct_001a_status": "FALSE",
   "theta_candidate_status": {
     "candidate_name": "Bilinear scale-mismatched theta-Mellin quadratic functional Q_Theta(eta; Phi_0)",
     "scalar_candidate_status": "REJECTED_FROZEN_IDENTICALLY_ZERO_AT_ZEROS",
-    "purely_theta_or_arithmetic_defined": true,
-    "zero_independent_definition": true,
-    "exact_scale_flatness_law": false,
-    "convergent_on_regularized_test_space": true,
-    "second_mismatch_variation_computable": true,
-    "contains_delta_squared_in_spectral_expansion": true,
-    "avoids_assumed_weil_positivity": true,
-    "avoids_selected_zero_construction": true,
-    "reduces_to_double_mellin_weil_form": true,
-    "closes_obl_ct_001a": false,
-    "classification": "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A",
+    "purely_theta_or_arithmetic_defined_status": "PROVED_BY_DEFINITION",
+    "zero_independent_definition_status": "PROVED_BY_DEFINITION",
+    "exact_scale_flatness_law_status": "FALSE",
+    "exact_scale_flatness_law_basis": "Theta_1^+(t) = sum_{n>=1} exp(-pi n^2 t) is a multi-exponential sum rather than a single homogeneous power, and no nonzero convergent test kernel Phi_0 on (0, infty)^2 is Euler-homogeneous.",
+    "convergence_status": "CONDITIONAL_ON_REGULARIZATION",
+    "second_mismatch_variation_status": "FORMAL_CANDIDATE_NOT_DERIVED",
+    "delta_squared_detection_status": "DIAGONAL_CONJUGATE_BLOCK_ONLY",
+    "complete_spectral_expansion_status": "COMPLETE_EXPANSION_NOT_DERIVED",
+    "positive_complete_spectral_curvature_status": "RH_EQUIVALENT_IF_POSITIVE",
+    "selected_zero_construction_status": "PROVED_BY_DEFINITION",
+    "closes_obl_ct_001a_status": "FALSE",
+    "overall_classification": "CANDIDATE_THETA_MELLIN_AUDIT",
+    "secondary_classification": "THETA_MELLIN_AUDIT_CONDITIONAL",
+    "reduces_to_obligation": "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A",
     "exact_remaining_theorem": "OBL-CT-001A: Construct a zero-independent non-scalar arithmetic or theta functional whose transport curvature at b = 1 satisfies a kernel-independent arithmetic flatness or sign bound while its complete spectral expansion isolates a positive radial moment in delta_rho^2 without assuming Weil positivity."
+  },
+  "lean_theorem_map": {
+    "module_path": "formal/RiemannScope/TransportMismatchCurvature.lean",
+    "total_module_declarations": 18,
+    "module_def_count": 1,
+    "module_theorem_count": 17,
+    "repository_compiled_theorem_declarations": 565,
+    "formal_proof_hygiene": "0 sorry, 0 admit, no nonstandard project axioms introduced",
+    "declarations": [
+      {
+        "identifier": "curvatureDet",
+        "kind": "def",
+        "statement_scope": "def curvatureDet (A0 A1 A2 : R) : R := A0 * A2 - A1 ^ 2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 6 arithmetic and exponential-moment curvature determinant A_0 A_2 - A_1^2",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "single_exponential_log_curvature_zero",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet w (w * x) (w * x ^ 2) = 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7 single-exponential baseline M(eta) = w e^{eta x} has zero curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "two_exponential_curvature_identity",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet (w1 + w2) (w1*x1 + w2*x2) (w1*x1^2 + w2*x2^2) = w1 * w2 * (x1 - x2)^2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7 two-term Lagrange sum-of-squares identity",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "two_exponential_positive_log_curvature",
+        "kind": "theorem",
+        "statement_scope": "0 < w1, 0 < w2, x1 != x2 ==> 0 < curvatureDet (w1 + w2) (w1*x1 + w2*x2) (w1*x1^2 + w2*x2^2)",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7 strict positivity of two-point exponential mixture curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "positive_finite_exponential_curvature_nonneg",
+        "kind": "theorem",
+        "statement_scope": "0 <= w1, 0 <= w2 ==> 0 <= curvatureDet (w1 + w2) (w1*x1 + w2*x2) (w1*x1^2 + w2*x2^2)",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7 nonnegativity of two-point nonnegative exponential mixture curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "three_exponential_curvature_identity",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet (w1+w2+w3) (sum w_i x_i) (sum w_i x_i^2) = sum_{i<j} w_i w_j (x_i - x_j)^2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7 three-term Lagrange sum-of-squares identity",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "three_exponential_curvature_nonneg",
+        "kind": "theorem",
+        "statement_scope": "0 <= w1, w2, w3 ==> 0 <= curvatureDet (w1+w2+w3) (sum w_i x_i) (sum w_i x_i^2)",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7 nonnegativity of three-point nonnegative exponential mixture curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "reciprocal_pair_curvature_strict_pos",
+        "kind": "theorem",
+        "statement_scope": "0 < w1, 0 < w2, x != 0 ==> 0 < curvatureDet (w1 + w2) (w1*x + w2*(-x)) (w1*x^2 + w2*(-x)^2)",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 7/9 strict positivity 4 w1 w2 x^2 > 0 for opposite/reciprocal exponent pair",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "homogeneous_arithmetic_curvature_zero",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet A0 (d * A0) (d ^ 2 * A0) = 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 11 algebraic moment consequence A_1 = d A_0, A_2 = d^2 A_0 ==> C_arith = 0",
+        "external_theorem_dependency": "None (does not formalize the PDE E F_0 = d F_0 or compact-support ODE no-go)"
+      },
+      {
+        "identifier": "arithmetic_zero_curvature_and_spectral_positive_contradiction",
+        "kind": "theorem",
+        "statement_scope": "C = 0 -> 0 < C -> False",
+        "algebraic_only": true,
+        "paper_step_supported": "Conditional incompatibility between vanishing arithmetic curvature and positive spectral curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "euler_generator_scaling_algebra",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet A0 (-K * log_tau * A1) (K^2 * log_tau^2 * A2) = K^2 * log_tau^2 * curvatureDet A0 A1 A2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 5/6 factorization of (-K log tau)^2 in unnormalized mismatch curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "mismatch_curvature_k_independent",
+        "kind": "theorem",
+        "statement_scope": "K != 0, log_tau != 0 ==> curvatureDet A0 (-K*log_tau*A1) (K^2*log_tau^2*A2) / (K^2*log_tau^2) = curvatureDet A0 A1 A2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 6 grade-K independence of normalized arithmetic transport curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "even_second_difference_quadratic_ident",
+        "kind": "theorem",
+        "statement_scope": "(M0 + eta*M1 + 1/2*eta^2*M2) + (M0 - eta*M1 + 1/2*(-eta)^2*M2) - 2*M0 = eta^2 * M2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 10 symmetric mismatch difference cancellation of odd derivative M1",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "centered_conjugate_pairing_radial",
+        "kind": "theorem",
+        "statement_scope": "((1/2 + delta - 1/2) + (1/2 + delta - 1/2)) = 2 * delta",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 9 half-density centered conjugate pairing real radial exponent 2*delta",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "centered_reflection_pairing_real_zero",
+        "kind": "theorem",
+        "statement_scope": "((1/2 + delta - 1/2) + (1 - (1/2 + delta) - 1/2)) = 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 9 half-density centered functional-equation reflection real-part cancellation",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "mellin_mismatch_net_exponent",
+        "kind": "theorem",
+        "statement_scope": "(K * (a + (1 + eta) * (s + t)) - K * (s + t)) - a * K = eta * K * (s + t)",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 8 Mellin mismatch net exponent algebra at b = 1 + eta",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "signed_weight_curvature_negative",
+        "kind": "theorem",
+        "statement_scope": "w1 = 1, w2 = -2, x1 = 0, x2 = 1 ==> curvatureDet (w1+w2) (w1*x1+w2*x2) (w1*x1^2+w2*x2^2) < 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 14/16 finite countermodel showing signed weights can yield negative curvature",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "generic_base_mismatch_curvature_scaling",
+        "kind": "theorem",
+        "statement_scope": "K != 0, log_q != 0 ==> curvatureDet A0 (-K*log_q*A1) (K^2*log_q^2*A2) / (K^2*log_q^2) = curvatureDet A0 A1 A2",
+        "algebraic_only": true,
+        "paper_step_supported": "Section 19 generic-base scale covariance control for arbitrary base q > 1",
+        "external_theorem_dependency": "None"
+      }
+    ],
+    "not_formalized_in_lean": [
+      "Compact-support Euler-PDE homogeneity no-go (F_0 in C_c^infty((0, infty)^2), E F_0 = d F_0 ==> F_0 == 0)",
+      "Full two-variable explicit formula expansion",
+      "Theta-Mellin regularized analytic descent",
+      "Positivity of the complete spectral curvature",
+      "OBL-CT-001A"
+    ]
   },
   "tau_specificity": "GENERIC_SCALE_CURVATURE",
   "weil_equivalence_status": "CURVATURE_POSITIVITY_IS_RH_EQUIVALENT",
   "relation_to_OBL_CT_001A": "MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A",
   "principal_classification": "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A",
+  "secondary_classifications": [
+    "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED",
+    "COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE",
+    "COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+    "COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+    "FINITE_ACCIDENTAL_ARITHMETIC_CURVATURE_ZERO",
+    "THETA_MELLIN_AUDIT_CONDITIONAL",
+    "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
+    "CURVATURE_POSITIVITY_IS_RH_EQUIVALENT",
+    "GENERIC_SCALE_CURVATURE",
+    "OBL_CT_001A_OPEN",
+    "CANDIDATE_FAILURE_DOES_NOT_REFUTE_TC"
+  ],
   "triggered_outcome_codes": [
     "ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED",
-    "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED",
+    "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED",
     "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
     "CURVATURE_POSITIVITY_IS_RH_EQUIVALENT",
     "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A"
   ],
   "exact_remaining_subgate": "OBL-CT-001A: Construct a zero-independent non-scalar arithmetic or theta functional whose transport curvature at b = 1 satisfies a kernel-independent arithmetic flatness or sign bound while its complete spectral expansion isolates a positive radial moment in delta_rho^2 without assuming Weil positivity.",
+  "obl_ct_001a_status": "OPEN",
   "obl_ct_001a_completed": false,
   "rh_claimed": false,
   "candidate_failure_refutes_tc": false,
@@ -71,38 +759,317 @@
   },
   "diagnostics": {
     "sign_audit": {
-      "negative_kernel_A0": 44.289382225731536,
-      "negative_kernel_curvature": -6442.342951827457,
-      "positive_kernel_A0": 292.8649412915519,
-      "positive_kernel_curvature": 191886.97907781193,
+      "negative_witness_name": "tilde_G_minus_compact_N15",
+      "negative_witness_status": "COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+      "negative_kernel_A0_display": 44.289382225731536,
+      "negative_kernel_curvature_display": -6442.342951827457,
+      "negative_curvature_arb_enclosure": {
+        "witness_kind": "negative",
+        "witness_name": "tilde_G_minus_compact_N15",
+        "status": "COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+        "certified": true,
+        "is_complete_compact_support_sum": true,
+        "is_infinite_sum_truncation": false,
+        "precision_bits": 128,
+        "active_stations": [
+          2,
+          3,
+          4,
+          5,
+          7,
+          8,
+          9,
+          11,
+          13
+        ],
+        "active_station_pairs": 81,
+        "support_interval": [
+          1.5,
+          15.5
+        ],
+        "plateau_interval": [
+          1.75,
+          15.25
+        ],
+        "A0_enclosure": {
+          "arb_ball_str": "[44.2893822257315392244411121427552897 +/- 5.18e-35]",
+          "lower_bound_str": "[44.289382225731539224441112142755289648 +/- 2.06e-37]",
+          "upper_bound_str": "[44.289382225731539224441112142755289672 +/- 4.74e-37]",
+          "outward_float_interval": [
+            44.28938222573153,
+            44.28938222573154
+          ],
+          "radius_upper_bound": 1.1587244571855205e-35,
+          "zero_excluded": true,
+          "strictly_negative": false,
+          "strictly_positive": true,
+          "display_midpoint_approx": 44.289382225731536,
+          "display_float_is_certificate": false
+        },
+        "A1_enclosure": {
+          "arb_ball_str": "[-98.8728807644731569044746281367217238 +/- 6.25e-35]",
+          "lower_bound_str": "[-98.872880764473156904474628136721723863 +/- 1.79e-37]",
+          "upper_bound_str": "[-98.872880764473156904474628136721723819 +/- 1.88e-37]",
+          "outward_float_interval": [
+            -98.87288076447317,
+            -98.87288076447314
+          ],
+          "radius_upper_bound": 2.1463969106805393e-35,
+          "zero_excluded": true,
+          "strictly_negative": true,
+          "strictly_positive": false,
+          "display_midpoint_approx": -98.87288076447315,
+          "display_float_is_certificate": false
+        },
+        "A2_enclosure": {
+          "arb_ball_str": "[75.266428008597175307782211751148849 +/- 5.07e-34]",
+          "lower_bound_str": "[75.266428008597175307782211751148848493 +/- 3.87e-37]",
+          "upper_bound_str": "[75.266428008597175307782211751148848597 +/- 2.06e-37]",
+          "outward_float_interval": [
+            75.26642800859716,
+            75.26642800859719
+          ],
+          "radius_upper_bound": 5.174652262633964e-35,
+          "zero_excluded": true,
+          "strictly_negative": false,
+          "strictly_positive": true,
+          "display_midpoint_approx": 75.26642800859717,
+          "display_float_is_certificate": false
+        },
+        "curvature_enclosure": {
+          "arb_ball_str": "[-6442.34295182745976846022999751473105 +/- 8.42e-33]",
+          "lower_bound_str": "[-6442.3429518274597684602299975147310565 +/- 3.88e-35]",
+          "upper_bound_str": "[-6442.3429518274597684602299975147310416 +/- 3.54e-35]",
+          "outward_float_interval": [
+            -6442.342951827461,
+            -6442.342951827459
+          ],
+          "radius_upper_bound": 7.46854627956442e-33,
+          "zero_excluded": true,
+          "strictly_negative": true,
+          "strictly_positive": false,
+          "display_midpoint_approx": -6442.34295182746,
+          "display_float_is_certificate": false
+        },
+        "zero_excluded": true,
+        "sup_curvature_lt_zero": true,
+        "inf_curvature_gt_zero": false
+      },
+      "positive_witness_name": "tilde_G_plus_compact_N15",
+      "positive_witness_status": "COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+      "positive_kernel_A0_display": 292.8649412915519,
+      "positive_kernel_curvature_display": 191887.24833483988,
+      "positive_curvature_arb_enclosure": {
+        "witness_kind": "positive",
+        "witness_name": "tilde_G_plus_compact_N15",
+        "status": "COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED",
+        "certified": true,
+        "is_complete_compact_support_sum": true,
+        "is_infinite_sum_truncation": false,
+        "precision_bits": 128,
+        "active_stations": [
+          2,
+          3,
+          4,
+          5,
+          7,
+          8,
+          9,
+          11,
+          13
+        ],
+        "active_station_pairs": 81,
+        "support_interval": [
+          1.5,
+          15.5
+        ],
+        "plateau_interval": [
+          1.75,
+          15.25
+        ],
+        "A0_enclosure": {
+          "arb_ball_str": "[292.8649412915518129501589111545221895 +/- 6.68e-35]",
+          "lower_bound_str": "[292.86494129155181295015891115452218943 +/- 2.81e-36]",
+          "upper_bound_str": "[292.86494129155181295015891115452218953 +/- 8.98e-37]",
+          "outward_float_interval": [
+            292.86494129155176,
+            292.8649412915519
+          ],
+          "radius_upper_bound": 4.7747607558430793e-35,
+          "zero_excluded": true,
+          "strictly_negative": false,
+          "strictly_positive": true,
+          "display_midpoint_approx": 292.8649412915518,
+          "display_float_is_certificate": false
+        },
+        "A1_enclosure": {
+          "arb_ball_str": "[357.663215482460087728691417420808556 +/- 5.12e-34]",
+          "lower_bound_str": "[357.66321548246008772869141742080855549 +/- 2.43e-36]",
+          "upper_bound_str": "[357.66321548246008772869141742080855562 +/- 2.99e-36]",
+          "outward_float_interval": [
+            357.66321548246003,
+            357.66321548246015
+          ],
+          "radius_upper_bound": 6.681504338689886e-35,
+          "zero_excluded": true,
+          "strictly_negative": false,
+          "strictly_positive": true,
+          "display_midpoint_approx": 357.6632154824601,
+          "display_float_is_certificate": false
+        },
+        "A2_enclosure": {
+          "arb_ball_str": "[1092.005832564697891727523075342162585 +/- 4.48e-34]",
+          "lower_bound_str": "[1092.0058325646978917275230753421625845 +/- 4.85e-35]",
+          "upper_bound_str": "[1092.0058325646978917275230753421625851 +/- 2.63e-35]",
+          "outward_float_interval": [
+            1092.0058325646976,
+            1092.005832564698
+          ],
+          "radius_upper_bound": 2.846648557922755e-34,
+          "zero_excluded": true,
+          "strictly_negative": false,
+          "strictly_positive": true,
+          "display_midpoint_approx": 1092.0058325646978,
+          "display_float_is_certificate": false
+        },
+        "curvature_enclosure": {
+          "arb_ball_str": "[191887.248334839729574771407499577571 +/- 6.37e-31]",
+          "lower_bound_str": "[191887.24833483972957477140749957757036 +/- 3.28e-33]",
+          "upper_bound_str": "[191887.24833483972957477140749957757074 +/- 3.87e-33]",
+          "outward_float_interval": [
+            191887.2483348397,
+            191887.24833483977
+          ],
+          "radius_upper_bound": 1.8599989145839413e-31,
+          "zero_excluded": true,
+          "strictly_negative": false,
+          "strictly_positive": true,
+          "display_midpoint_approx": 191887.24833483974,
+          "display_float_is_certificate": false
+        },
+        "zero_excluded": true,
+        "sup_curvature_lt_zero": false,
+        "inf_curvature_gt_zero": true
+      },
       "zero_control_curvature": 0.0,
+      "display_floats_are_certificates": false,
+      "is_complete_compact_support_evaluation": true,
+      "is_infinite_sum_truncation": false,
       "all_three_signs_realized": true,
+      "superseded_classification": "FINITE_TRUNCATION_SIGN_INDEFINITENESS_OBSERVED",
       "outcome_b_flatness_not_implied": "ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED",
-      "classification": "GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE"
+      "classification": "COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE"
     },
     "compact_support_no_go": {
       "degree_d": -1.0,
       "ray_scaling_verified": true,
       "compact_support_compatible_for_nonzero_kernel": false,
+      "evidence_status": "PROVED_PAPER_DERIVATION",
+      "lean_formalized": false,
       "classification": "NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE",
-      "outcome_code": "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED",
-      "scope_note": "Proved for all C_c^infty((0, inf)^2) kernels: Euler homogeneity E F_0 = d F_0 forces F_0(r x, r y) = r^d F_0(x, y) along every positive ray, which is incompatible with compact support unless F_0 == 0. Does not by itself refute noncompact or distributional candidates."
+      "outcome_code": "COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED",
+      "proof_steps": [
+        "1. Fix (x_0, y_0) in (0, infty)^2.",
+        "2. Define g(r) = F_0(r x_0, r y_0) for r > 0.",
+        "3. Euler homogeneity E F_0 = d F_0 gives r g'(r) = d g(r).",
+        "4. Integrating on (0, infty) gives g(r) = r^d g(1).",
+        "5. If g(1) != 0, then g(r) != 0 for every r > 0.",
+        "6. Hence supp(F_0) contains the unbounded ray {(r x_0, r y_0) : r > 0}, contradicting compact support.",
+        "7. Therefore F_0(x_0, y_0) = 0 for every (x_0, y_0) in (0, infty)^2."
+      ],
+      "scope_note": "PROVED_PAPER_DERIVATION for all C_c^infty((0, inf)^2) kernels: Euler homogeneity E F_0 = d F_0 forces F_0(r x, r y) = r^d F_0(x, y) along every positive ray, contradicting compact support unless F_0 == 0. Not formalized as a PDE theorem in Lean (Lean formalizes only the algebraic consequence A_1 = d A_0, A_2 = d^2 A_0 ==> A_0 A_2 - A_1^2 = 0 in `homogeneous_arithmetic_curvature_zero`)."
     },
     "finite_station_accidental_zero": {
+      "classification": "FINITE_ACCIDENTAL_ARITHMETIC_CURVATURE_ZERO",
+      "scope_specification": {
+        "complete_plateau_kernel_X3": {
+          "kernel_name": "X_3(x, y) = chi_{1.5, 1.75, 3.25, 3.5}(x) chi_{1.5, 1.75, 3.25, 3.5}(y)",
+          "support_rectangle": [
+            [
+              1.5,
+              3.5
+            ],
+            [
+              1.5,
+              3.5
+            ]
+          ],
+          "plateau_rectangle": [
+            [
+              1.75,
+              3.25
+            ],
+            [
+              1.75,
+              3.25
+            ]
+          ],
+          "active_stations_in_complete_support": [
+            2,
+            3
+          ],
+          "evaluation_scope": "ONE_COMPACTLY_SUPPORTED_KERNEL_COMPLETE_SUPPORT",
+          "A0": 3.210401995568401,
+          "A1": 0.0,
+          "A2": 0.0,
+          "arithmetic_curvature": 0.0,
+          "why_accidental_not_structural": "E X_3 = 0 only on the plateau [1.75, 3.25]^2 and exterior; on the transition ramps (1.5, 1.75) and (3.25, 3.5), E X_3 != 0. The zero at eta = 0 relies on placing the cutoff transition in the integer-free gap (3.25, 3.5)."
+        },
+        "fixed_kernel_F_acc_restricted_vs_complete": {
+          "kernel_name": "F_acc(x, y) = chi_{1.5, 1.75, 3.25, 5.5}(x) chi_{1.5, 1.75, 3.25, 5.5}(y)",
+          "support_rectangle": [
+            [
+              1.5,
+              5.5
+            ],
+            [
+              1.5,
+              5.5
+            ]
+          ],
+          "plateau_rectangle": [
+            [
+              1.75,
+              3.25
+            ],
+            [
+              1.75,
+              3.25
+            ]
+          ],
+          "restricted_station_subset": [
+            2,
+            3
+          ],
+          "restricted_subset_scope": "ONE_RESTRICTED_ARITHMETIC_WINDOW_OF_FIXED_KERNEL",
+          "restricted_subset_A0": 3.210401995568401,
+          "restricted_subset_curvature": 0.0,
+          "complete_support_stations": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "complete_support_scope": "COMPLETE_SUPPORT_OF_SAME_FIXED_KERNEL",
+          "complete_support_A0": 5.8594697186208275,
+          "complete_support_curvature": 1477.6577618002589
+        }
+      },
       "small_window_n_max": 3,
       "small_window_A0": 3.210401995568401,
       "small_window_curvature": 0.0,
       "large_window_n_max": 5,
-      "large_window_A0": 12.56673142582328,
-      "large_window_curvature": -1192.0867640308488,
+      "large_window_A0": 5.8594697186208275,
+      "large_window_curvature": 1477.6577618002589,
       "vanishes_on_selected_window": true,
-      "breaks_on_expanded_window": true,
-      "classification": "FINITE_ACCIDENTAL_ARITHMETIC_CURVATURE_ZERO"
+      "nonzero_on_complete_support_of_fixed_kernel": true
     },
     "homogeneous_control": {
       "alpha": 0.5,
       "beta": 0.75,
       "degree_d": 1.25,
+      "evaluation_mode": "FINITE_TRUNCATION_DIAGNOSTIC",
+      "is_compactly_supported": false,
       "A0": 7311.6729350587,
       "A1": 9139.591168823375,
       "A2": 11424.488961029214,
@@ -148,6 +1115,10 @@
       "B_rho_at_2etaK": 0.0007600513599888004,
       "centered_conjugate_even_mismatch": 0.0007600513599888004,
       "detector_identity_abs_err": 0.0,
+      "equality_exact_on_conjugate_block": true,
+      "reproduces_existing_spectral_detector": true,
+      "complete_functional_induces": "UNRESTRICTED_DOUBLE_ZERO_SUM_WITH_BACKGROUND",
+      "positive_diagonal_projection_derived": false,
       "B_rho_second_deriv_at_0": 0.15200064500550395,
       "mismatch_second_deriv_at_0": 0.3040012900110079,
       "chain_rule_ratio_4K2_to_2": 2.0,
@@ -159,6 +1130,7 @@
     "spectral_firewalls": {
       "complete_spectral_type": "DOUBLE_SPECTRAL_SUM_PLUS_POLE_AND_ARCHIMEDEAN_BACKGROUND",
       "spectral_curvature_outcome": "SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM",
+      "conjugate_block_delta_squared_scope": "DIAGONAL_CONJUGATE_BLOCK_ONLY",
       "diagonal_projection_without_proof_allowed": false,
       "incomplete_diagonal_only_classification": "SELECTED_CURVATURE_BLOCK_ONLY",
       "selected_zero_construction_allowed": false,
@@ -179,14 +1151,14 @@
         6.283185307179586,
         10.0
       ],
-      "reference_C_arith": -9659.282069425171,
+      "reference_C_arith": -6442.342951827457,
       "per_base_normalized_curvatures": {
-        "2.000000": -9659.282069425171,
-        "2.718282": -9659.28206942517,
-        "6.283185": -9659.282069425171,
-        "10.000000": -9659.282069425171
+        "2.000000": -6442.342951827458,
+        "2.718282": -6442.342951827456,
+        "6.283185": -6442.342951827457,
+        "10.000000": -6442.342951827456
       },
-      "max_base_spread_abs_err": 1.8189894035458565e-12,
+      "max_base_spread_abs_err": 9.094947017729282e-13,
       "holds_for_all_q_gt_1": true,
       "where_tau_enters": [
         "Fourier self-dual normalization e^{-2*pi*i*x*xi}",

@@ -624,11 +624,11 @@ To maintain rigorous mathematical neutrality, every retained historical term is 
 
 ---
 
-### 9.15 Cross-Reference: Infinitesimal Transport-Mismatch Curvature (`TASK-TC-034`)
+### 9.15 Cross-Reference: Infinitesimal Transport-Mismatch Curvature (`TASK-TC-034` / `TASK-TC-034R`)
 
-In parallel with the CMSA Gate G4 analysis, `TASK-TC-034` (`docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md`) audited the infinitesimal second variation around the unique label-preserving transport $b = 1$ ($b = 1 + \eta$, $\eta \to 0$) for two-variable prime-power kernels $F_{K,\eta}(x,y) = \tau^{aK}F_0(\tau^{-(1+\eta)K}x, \tau^{-(1+\eta)K}y)$:
-- The normalized arithmetic mismatch curvature $\mathfrak C_{\mathrm{arith}}(F_0) = A_0 A_2 - A_1^2$ is $K$-independent for $K \ne 0$ (`mismatch_curvature_k_independent`), but is not forced to vanish (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`) and is sign-indefinite across nonnegative kernels (`GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE`).
-- Structural vanishing via Euler homogeneity $\mathcal E F_0 = d F_0$ is impossible for nonzero compactly supported kernels $F_0 \in C_c^\infty((0,\infty)^2)$ (`NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`).
+In parallel with the CMSA Gate G4 analysis, `TASK-TC-034` and `TASK-TC-034R` (`docs/reviews/TC_TRANSPORT_MISMATCH_CURVATURE.md`, `docs/reviews/TC_034R_TRANSPORT_MISMATCH_CURVATURE_REPAIR_AUDIT.md`) audited the infinitesimal second variation around the unique label-preserving transport $b = 1$ ($b = 1 + \eta$, $\eta \to 0$) for two-variable prime-power kernels $F_{K,\eta}(x,y) = \tau^{aK}F_0(\tau^{-(1+\eta)K}x, \tau^{-(1+\eta)K}y)$:
+- The normalized arithmetic mismatch curvature $\mathfrak C_{\mathrm{arith}}(F_0) = A_0 A_2 - A_1^2$ is $K$-independent for $K \ne 0$ (`mismatch_curvature_k_independent`), but is not forced to vanish (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`), and genuinely compactly supported witnesses $\widetilde G_\pm = \mathrm{X}_{15} G_\pm \in C_c^\infty((1.5,15.5)^2)$ have complete arithmetic sums certified by outward 128-bit Arb ball arithmetic to be strictly negative and strictly positive (`COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE`).
+- Structural vanishing via Euler homogeneity $\mathcal E F_0 = d F_0$ is proved in Lean to force $A_0 A_2 - A_1^2 = 0$ (`homogeneous_arithmetic_curvature_zero`) and proved by paper ODE derivation to be impossible for nonzero compactly supported kernels $F_0 \in C_c^\infty((0,\infty)^2)$ (`COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED`, `NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`).
 - On the spectral side, the two-variable energy induces an unrestricted double sum over zero pairs $(\rho,\sigma)$ plus pole and Archimedean terms (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`), and on the centered conjugate block reproduces $B_\rho(2\eta K)$, reducing to the open obligation `OBL-CT-001A` (`MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A`).
 
 

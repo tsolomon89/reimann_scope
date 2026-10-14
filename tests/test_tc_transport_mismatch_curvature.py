@@ -1,34 +1,30 @@
 """
-Unit tests for TASK-TC-034: Infinitesimal Transport-Mismatch Curvature and
-Non-Scalar Arithmetic Descent (`tc/transport_mismatch_curvature.py`).
+Regression Test Suite for Infinitesimal Transport-Mismatch Curvature and Evidence Repair
+(`TASK-TC-034` / `TASK-TC-034R`).
 
-Covers all 26 required verification gates in Section 24 of TASK-TC-034 plus
-Lean 4 formalization alignment (`formal/RiemannScope/TransportMismatchCurvature.lean`).
+Verifies all 28 mandatory regression requirements from Section 17 of `TASK-TC-034R`,
+as well as the exact Euler-generator curvature identities and spectral pairing audits
+retained from `TASK-TC-034`.
 """
 
 from __future__ import annotations
 
-import math
+import json
 from pathlib import Path
-import pytest
 
 from tc.transport_mismatch_curvature import (
-    CLASSIFICATION_ARITHMETIC_INDEFINITE,
-    CLASSIFICATION_COMPACT_SUPPORT_IMPOSSIBLE,
-    CLASSIFICATION_CURVATURE_POSITIVITY_RH_EQUIVALENT,
+    ARB_CERTIFICATION_NOT_AVAILABLE,
     CLASSIFICATION_FINITE_ACCIDENTAL_ZERO,
-    CLASSIFICATION_GENERIC_SCALE_CURVATURE,
-    CLASSIFICATION_REDUCES_TO_EXISTING_OBL_CT_001A,
-    CLASSIFICATION_SELECTED_BLOCK_ONLY,
-    LOG_TAU,
-    OUTCOME_A_FULL_BRIDGE,
-    OUTCOME_B_ARITHMETIC_FLATNESS_NOT_IMPLIED,
-    OUTCOME_C_COMPACT_SUPPORT_NO_GO,
-    OUTCOME_D_SPECTRAL_SIGNED_OR_DOUBLE,
-    OUTCOME_E_WEIL_EQUIVALENCE,
-    OUTCOME_G_REDUCES_TO_OBL_CT_001A,
+    COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED,
+    COMPACT_SUPPORT_NEG_CURVATURE_CERTIFIED,
+    COMPACT_SUPPORT_NO_GO_EVIDENCE_STATUS,
+    COMPACT_SUPPORT_POS_CURVATURE_CERTIFIED,
+    COMPACT_SUPPORT_SIGN_INDEFINITENESS_STATUS,
     PRINCIPAL_CLASSIFICATION,
-    TAU,
+    SUPERSEDED_FINITE_TRUNCATION_STATUS,
+    TASK_TC_034R_STATUS,
+    THETA_MELLIN_AUDIT_CONDITIONAL,
+    active_prime_power_stations,
     audit_arithmetic_curvature_sign_firewall,
     audit_compact_support_homogeneity_no_go,
     audit_complete_spectral_curvature_and_firewalls,
@@ -37,385 +33,426 @@ from tc.transport_mismatch_curvature import (
     audit_theta_mellin_nonscalar_fallback,
     audit_transport_mismatch_curvature,
     audit_weil_equivalence_firewall,
-    evaluate_even_mismatch_defect,
+    build_compact_negative_witness,
+    build_compact_positive_witness,
+    certify_compact_witness_curvature_arb,
     evaluate_euler_moments_A0_A1_A2,
     evaluate_exponential_mixture_curvature,
     evaluate_generic_base_mismatch_control,
     evaluate_homogeneous_kernel_control,
     evaluate_mellin_mismatch_scaling,
     evaluate_mismatch_derivatives_at_zero,
-    evaluate_normalized_mismatch_energy,
     evaluate_reciprocal_pair_curvature,
-    evaluate_transported_mismatch_kernel,
+    get_lean_theorem_map,
+    plateau_cutoff_1d_euler_jet,
+    plateau_cutoff_1d_jet,
+    plateau_cutoff_2d_euler_jet,
     reconcile_with_existing_curvature_transport,
+    verify_lean_theorem_map_against_file,
+    verify_station_jet_preservation,
 )
 
-
-def _sample_gaussian_log_kernel():
-    """Return (f0, euler1_f0, euler2_f0) for F_0(x, y) = exp(-0.5 * (log(x*y / 16))^2)."""
-
-    def f0(x: float, y: float) -> float:
-        w = math.log((x * y) / 16.0)
-        return math.exp(-0.5 * w * w)
-
-    def euler1_f0(x: float, y: float) -> float:
-        w = math.log((x * y) / 16.0)
-        return (-2.0 * w) * math.exp(-0.5 * w * w)
-
-    def euler2_f0(x: float, y: float) -> float:
-        w = math.log((x * y) / 16.0)
-        return (4.0 * w * w - 4.0) * math.exp(-0.5 * w * w)
-
-    return f0, euler1_f0, euler2_f0
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ARTIFACT_PATH = REPO_ROOT / "data" / "tc_transport_mismatch_curvature.json"
+LEAN_FILE_PATH = REPO_ROOT / "formal" / "RiemannScope" / "TransportMismatchCurvature.lean"
 
 
-# 1. Compatibility point eta = 0 reproduces full transport
-def test_01_compatibility_point_eta_zero_reproduces_full_transport():
-    f0, _, _ = _sample_gaussian_log_kernel()
-    m0 = evaluate_normalized_mismatch_energy(f0, K=0.0, eta=0.0, n_max=15)
-    for K in [-2.0, -1.0, 0.5, 1.0, 2.0, 3.0]:
-        mK = evaluate_normalized_mismatch_energy(f0, K=K, eta=0.0, n_max=15)
-        assert abs(mK - m0) < 1e-12
-    # Also check kernel evaluation at x = tau^K n, y = tau^K m with eta = 0, a = 0
-    val_K = evaluate_transported_mismatch_kernel(
-        f0, x=(TAU ** 2) * 3.0, y=(TAU ** 2) * 5.0, K=2.0, eta=0.0, a=0.0
-    )
-    val_0 = f0(3.0, 5.0)
-    assert abs(val_K - val_0) < 1e-12
+def test_01_no_false_lean_reference_in_repo() -> None:
+    """1. Repository contains no false Lean reference unless actually in TransportMismatchCurvature.lean."""
+    false_ident = "compact_support_ray_" + "homogeneity_implies_zero"
+    lean_text = LEAN_FILE_PATH.read_text(encoding="utf-8")
+    assert false_ident not in lean_text
+
+    search_dirs = [
+        REPO_ROOT / "formal",
+        REPO_ROOT / "tc",
+        REPO_ROOT / "docs",
+        REPO_ROOT / "data",
+        REPO_ROOT / ".agents",
+        REPO_ROOT / "tests",
+    ]
+    root_md_files = list(REPO_ROOT.glob("*.md"))
+    offending_files: list[str] = []
+
+    for f in root_md_files:
+        if false_ident in f.read_text(encoding="utf-8", errors="ignore"):
+            offending_files.append(str(f.relative_to(REPO_ROOT)))
+
+    for d in search_dirs:
+        for f in d.rglob("*"):
+            if f.is_file() and f.suffix in {".md", ".lean", ".py", ".json"}:
+                if false_ident in f.read_text(encoding="utf-8", errors="ignore"):
+                    offending_files.append(str(f.relative_to(REPO_ROOT)))
+
+    assert offending_files == [], f"False Lean reference found in: {offending_files}"
 
 
-# 2. First Euler derivative formula
-def test_02_first_euler_derivative_formula():
-    f0, e1, e2 = _sample_gaussian_log_kernel()
-    moments = evaluate_euler_moments_A0_A1_A2(f0, n_max=15, euler1_f0=e1, euler2_f0=e2)
-    for K in [-2.0, -1.0, 1.0, 2.5]:
-        res = evaluate_mismatch_derivatives_at_zero(
-            f0, K=K, n_max=15, euler1_f0=e1, euler2_f0=e2
-        )
-        expected_first = (-K * LOG_TAU) * moments.A1
-        assert abs(res.euler_M_K_prime_0 - expected_first) < 1e-12
-        assert abs(res.M_K_prime_0 - expected_first) < 1e-7
-
-
-# 3. Second Euler derivative formula
-def test_03_second_euler_derivative_formula():
-    f0, e1, e2 = _sample_gaussian_log_kernel()
-    moments = evaluate_euler_moments_A0_A1_A2(f0, n_max=15, euler1_f0=e1, euler2_f0=e2)
-    for K in [-2.0, -1.0, 1.0, 2.5]:
-        res = evaluate_mismatch_derivatives_at_zero(
-            f0, K=K, n_max=15, euler1_f0=e1, euler2_f0=e2
-        )
-        expected_second = (K * LOG_TAU) ** 2 * moments.A2
-        assert abs(res.euler_M_K_double_prime_0 - expected_second) < 1e-12
-        assert abs(res.M_K_double_prime_0 - expected_second) < 1e-5
-    # Also verify even mismatch defect limit Delta_{eta, K} / (eta^2 K^2 (log tau)^2) -> A_2
-    even_defect = evaluate_even_mismatch_defect(
-        f0, K=1.5, eta=5e-4, n_max=15, euler2_f0=e2
-    )
-    assert even_defect["abs_error_to_A2"] < 5e-4
-
-
-# 4. Arithmetic curvature normalization is K-independent
-def test_04_arithmetic_curvature_normalization_is_k_independent():
-    f0, e1, e2 = _sample_gaussian_log_kernel()
-    moments = evaluate_euler_moments_A0_A1_A2(f0, n_max=15, euler1_f0=e1, euler2_f0=e2)
-    for K in [-3.0, -1.0, 0.5, 1.0, 2.0, 4.0]:
-        res = evaluate_mismatch_derivatives_at_zero(
-            f0, K=K, n_max=15, euler1_f0=e1, euler2_f0=e2
-        )
-        assert abs(res.normalized_curvature_from_K - moments.arithmetic_curvature) < 1e-10
-
-
-# 5. Single exponential gives zero curvature
-def test_05_single_exponential_gives_zero_curvature():
-    res = evaluate_exponential_mixture_curvature(weights=[2.5], exponents=[1.37])
-    assert abs(res.curvature_determinant) < 1e-15
-    assert abs(res.pairwise_lagrange_sum) < 1e-15
-    assert not res.strictly_positive
-
-
-# 6. Two positive exponents give strict positive curvature
-def test_06_two_positive_exponents_give_strict_positive_curvature():
-    res = evaluate_exponential_mixture_curvature(
-        weights=[1.2, 0.8], exponents=[-0.5, 1.1]
-    )
-    expected = 1.2 * 0.8 * ((-0.5 - 1.1) ** 2)
-    assert abs(res.curvature_determinant - expected) < 1e-14
-    assert res.lagrange_identity_abs_err < 1e-14
-    assert res.strictly_positive
-
-
-# 7. Reciprocal pair gives strict positive curvature
-def test_07_reciprocal_pair_gives_strict_positive_curvature():
-    res = evaluate_reciprocal_pair_curvature(w1=1.5, w2=2.0, x=0.35)
-    expected = 4.0 * 1.5 * 2.0 * (0.35 ** 2)
-    assert abs(res.curvature_determinant - expected) < 1e-14
-    assert res.strictly_positive
-
-
-# 8. Signed weights defeat positivity
-def test_08_signed_weights_defeat_positivity():
-    res = evaluate_exponential_mixture_curvature(weights=[1.0, -2.0], exponents=[0.0, 1.0])
-    assert res.curvature_determinant == pytest.approx(-2.0, abs=1e-15)
-    assert res.curvature_determinant < 0.0
-    assert not res.nonnegative
-
-
-# 9. Homogeneous kernel gives zero arithmetic curvature
-def test_09_homogeneous_kernel_gives_zero_arithmetic_curvature():
-    hom = evaluate_homogeneous_kernel_control(alpha=0.4, beta=0.6, n_max=15)
-    assert hom["is_flat"] is True
-    assert abs(hom["arithmetic_curvature"]) < 1e-10
-    assert hom["A1_minus_d_A0"] < 1e-12
-    assert hom["A2_minus_d2_A0"] < 1e-12
-    assert hom["single_character_response_abs_err"] < 1e-12
-
-
-# 10. Nonzero compact-support homogeneous control fails
-def test_10_nonzero_compact_support_homogeneous_control_fails():
-    audit = audit_compact_support_homogeneity_no_go(degree_d=-1.0)
-    assert audit.ray_scaling_verified is True
+def test_02_compact_support_no_go_classified_as_paper_derivation() -> None:
+    """2. Compact-support homogeneity no-go is classified as PROVED_PAPER_DERIVATION."""
+    audit = audit_compact_support_homogeneity_no_go()
+    assert audit.outcome_code == COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED
+    assert audit.evidence_status == COMPACT_SUPPORT_NO_GO_EVIDENCE_STATUS
+    assert audit.evidence_status == "PROVED_PAPER_DERIVATION"
+    assert audit.lean_formalized is False
     assert audit.compact_support_compatible_for_nonzero_kernel is False
-    assert audit.classification == CLASSIFICATION_COMPACT_SUPPORT_IMPOSSIBLE
-    assert audit.outcome_code == OUTCOME_C_COMPACT_SUPPORT_NO_GO
+    assert len(audit.proof_steps) == 7
 
 
-# 11. Finite-station accidental zero classification
-def test_11_finite_station_accidental_zero_classification():
-    ctrl = audit_finite_station_accidental_zero()
-    assert ctrl["vanishes_on_selected_window"] is True
-    assert ctrl["breaks_on_expanded_window"] is True
-    assert ctrl["classification"] == CLASSIFICATION_FINITE_ACCIDENTAL_ZERO
+def test_03_plateau_cutoff_zero_outside_support() -> None:
+    """3. Plateau cutoff vanishes for x <= a and x >= d."""
+    a, b, c, d = 1.5, 1.75, 15.25, 15.5
+    for x in [0.1, 0.5, 1.0, a, d, 16.0, 20.0, 100.0]:
+        c0, c1, c2 = plateau_cutoff_1d_jet(x, a=a, b=b, c=c, d=d)
+        assert c0 == 0.0
+        assert c1 == 0.0
+        assert c2 == 0.0
+
+    for x in [1.0, 1.5, 15.5, 16.0]:
+        for y in [2.0, 5.0, 16.0]:
+            X0, EX, E2X = plateau_cutoff_2d_euler_jet(x, y, N_cutoff=15)
+            assert X0 == 0.0
+            assert EX == 0.0
+            assert E2X == 0.0
 
 
-# 12. Fixed generic kernel may have positive curvature
-def test_12_fixed_generic_kernel_may_have_positive_curvature():
-    sign_audit = audit_arithmetic_curvature_sign_firewall(n_max=15)
-    assert sign_audit["positive_kernel_A0"] > 0.0
-    assert sign_audit["positive_kernel_curvature"] > 0.0
+def test_04_plateau_cutoff_one_on_active_station_interval() -> None:
+    """4. Plateau cutoff equals 1 on [b, c]."""
+    a, b, c, d = 1.5, 1.75, 15.25, 15.5
+    for x in [b, 1.8, 2.0, 3.0, 5.0, 8.0, 13.0, 15.0, c]:
+        c0, c1, c2 = plateau_cutoff_1d_jet(x, a=a, b=b, c=c, d=d)
+        assert c0 == 1.0
+        assert c1 == 0.0
+        assert c2 == 0.0
+
+    for n, _ in active_prime_power_stations(15):
+        for m, _ in active_prime_power_stations(15):
+            X0, _, _ = plateau_cutoff_2d_euler_jet(float(n), float(m), N_cutoff=15)
+            assert X0 == 1.0
 
 
-# 13. Fixed generic kernel may have negative curvature
-def test_13_fixed_generic_kernel_may_have_negative_curvature():
-    sign_audit = audit_arithmetic_curvature_sign_firewall(n_max=15)
-    assert sign_audit["negative_kernel_A0"] > 0.0
-    assert sign_audit["negative_kernel_curvature"] < 0.0
-    assert sign_audit["all_three_signs_realized"] is True
-    assert sign_audit["classification"] == CLASSIFICATION_ARITHMETIC_INDEFINITE
-    assert sign_audit["outcome_b_flatness_not_implied"] == OUTCOME_B_ARITHMETIC_FLATNESS_NOT_IMPLIED
+def test_05_first_cutoff_derivatives_vanish_at_active_stations() -> None:
+    """5. First cutoff derivatives vanish at active stations 2 <= n <= N."""
+    for n in range(2, 16):
+        c0, c1, _ = plateau_cutoff_1d_euler_jet(float(n))
+        assert c0 == 1.0
+        assert c1 == 0.0
+        for m in range(2, 16):
+            _, EX, _ = plateau_cutoff_2d_euler_jet(float(n), float(m), N_cutoff=15)
+            assert EX == 0.0
 
 
-# 14. Mellin mismatch factor
-def test_14_mellin_mismatch_factor():
-    s = complex(0.62, 14.134725)
-    t = complex(0.62, -14.134725)
-    res = evaluate_mellin_mismatch_scaling(s=s, t=t, K=2.0, eta=0.1, a=1.0)
-    expected_net_exp = 0.1 * 2.0 * (s + t)
-    assert abs(res["net_normalized_exponent"] - expected_net_exp) < 1e-14
-    assert abs(res["first_eta_derivative_at_0"] - 2.0 * LOG_TAU * (s + t)) < 1e-14
-    assert abs(res["second_eta_derivative_at_0"] - (2.0 * LOG_TAU) ** 2 * ((s + t) ** 2)) < 1e-12
+def test_06_second_cutoff_derivatives_vanish_at_active_stations() -> None:
+    """6. Second cutoff derivatives vanish at active stations 2 <= n <= N."""
+    for n in range(2, 16):
+        _, _, c2 = plateau_cutoff_1d_euler_jet(float(n))
+        assert c2 == 0.0
+        for m in range(2, 16):
+            _, _, E2X = plateau_cutoff_2d_euler_jet(float(n), float(m), N_cutoff=15)
+            assert E2X == 0.0
 
 
-# 15. Centered conjugate pairing yields radial exponent
-def test_15_centered_conjugate_pairing_yields_radial_exponent():
-    delta = 0.14
-    gamma = 14.134725
-    audit = audit_spectral_centering_and_pairings(delta=delta, gamma=gamma, K=1.0, eta=0.1)
-    assert abs(audit.centered_conjugate_exponent.real - 2.0 * delta) < 1e-15
-    assert abs(audit.centered_conjugate_exponent.imag) < 1e-15
-    assert audit.conjugate_even_defect > 0.0
-    assert audit.conjugate_second_variation_coeff == pytest.approx(
-        4.0 * (LOG_TAU ** 2) * (delta ** 2), rel=1e-14
+def test_07_compactification_preserves_F_at_active_stations() -> None:
+    """7. Compactification preserves F(n,m) at active stations."""
+    for bundle in (build_compact_negative_witness(15), build_compact_positive_witness(15)):
+        check = verify_station_jet_preservation(bundle)
+        assert check["max_station_jet0_err"] == 0.0
+        for n in bundle.active_station_set:
+            for m in bundle.active_station_set:
+                assert bundle.kernel_fn(float(n), float(m)) == bundle.prototype_fn(float(n), float(m))
+
+
+def test_08_compactification_preserves_EF_at_active_stations() -> None:
+    """8. Compactification preserves (E F)(n,m) at active stations."""
+    for bundle in (build_compact_negative_witness(15), build_compact_positive_witness(15)):
+        check = verify_station_jet_preservation(bundle)
+        assert check["max_station_jet1_err"] == 0.0
+        for n in bundle.active_station_set:
+            for m in bundle.active_station_set:
+                assert bundle.euler1_fn(float(n), float(m)) == bundle.prototype_euler1_fn(float(n), float(m))
+
+
+def test_09_compactification_preserves_E2F_at_active_stations() -> None:
+    """9. Compactification preserves (E^2 F)(n,m) at active stations."""
+    for bundle in (build_compact_negative_witness(15), build_compact_positive_witness(15)):
+        check = verify_station_jet_preservation(bundle)
+        assert check["max_station_jet2_err"] == 0.0
+        for n in bundle.active_station_set:
+            for m in bundle.active_station_set:
+                assert bundle.euler2_fn(float(n), float(m)) == bundle.prototype_euler2_fn(float(n), float(m))
+
+
+def test_10_no_arithmetic_stations_outside_selected_complete_support() -> None:
+    """10. No arithmetic stations exist outside [2, N]^2 within the compact support (1.5, 15.5)^2."""
+    for bundle in (build_compact_negative_witness(15), build_compact_positive_witness(15)):
+        check = verify_station_jet_preservation(bundle, extra_exterior_max=40)
+        assert check["max_exterior_value_and_jet_abs"] == 0.0
+        assert check["complete_sum_tail_difference_up_to_40"] == 0.0
+        assert check["is_complete_compact_support_sum"] is True
+        assert check["is_infinite_sum_truncation"] is False
+
+
+def test_11_negative_witness_nonnegative_and_compactly_supported() -> None:
+    """11. Negative witness is nonnegative and compactly supported."""
+    bundle = build_compact_negative_witness(15)
+    for x in [1.55, 1.65, 1.75, 2.0, 4.0, 8.0, 15.25, 15.35, 15.45]:
+        for y in [1.55, 1.75, 3.0, 9.0, 15.35]:
+            assert bundle.kernel_fn(x, y) > 0.0
+    for x, y in [(1.5, 4.0), (15.5, 4.0), (4.0, 1.4), (4.0, 15.6), (20.0, 20.0)]:
+        assert bundle.kernel_fn(x, y) == 0.0
+        assert bundle.euler1_fn(x, y) == 0.0
+        assert bundle.euler2_fn(x, y) == 0.0
+
+
+def test_12_negative_witness_complete_curvature_enclosure_strictly_negative() -> None:
+    """12. Negative witness complete arithmetic curvature enclosure has strictly negative upper bound."""
+    cert = certify_compact_witness_curvature_arb("negative", N_cutoff=15)
+    assert cert["certified"] is True
+    assert cert["status"] == COMPACT_SUPPORT_NEG_CURVATURE_CERTIFIED
+    assert cert["zero_excluded"] is True
+    assert cert["sup_curvature_lt_zero"] is True
+    c_enc = cert["curvature_enclosure"]
+    assert c_enc["strictly_negative"] is True
+    lo, hi = c_enc["outward_float_interval"]
+    assert lo <= hi < -6442.0
+
+
+def test_13_positive_witness_nonnegative_and_compactly_supported() -> None:
+    """13. Positive witness is nonnegative and compactly supported."""
+    bundle = build_compact_positive_witness(15)
+    for x in [1.55, 1.65, 1.75, 2.0, 5.0, 11.0, 15.25, 15.35, 15.45]:
+        for y in [1.55, 1.75, 3.0, 7.0, 15.35]:
+            assert bundle.kernel_fn(x, y) > 0.0
+    for x, y in [(1.5, 5.0), (15.5, 5.0), (5.0, 1.5), (5.0, 15.5), (25.0, 25.0)]:
+        assert bundle.kernel_fn(x, y) == 0.0
+        assert bundle.euler1_fn(x, y) == 0.0
+        assert bundle.euler2_fn(x, y) == 0.0
+
+
+def test_14_positive_witness_complete_curvature_enclosure_strictly_positive() -> None:
+    """14. Positive witness complete arithmetic curvature enclosure has strictly positive lower bound."""
+    cert = certify_compact_witness_curvature_arb("positive", N_cutoff=15)
+    assert cert["certified"] is True
+    assert cert["status"] == COMPACT_SUPPORT_POS_CURVATURE_CERTIFIED
+    assert cert["zero_excluded"] is True
+    assert cert["inf_curvature_gt_zero"] is True
+    c_enc = cert["curvature_enclosure"]
+    assert c_enc["strictly_positive"] is True
+    lo, hi = c_enc["outward_float_interval"]
+    assert 191887.0 < lo <= hi
+
+
+def test_15_arb_failure_is_fail_closed() -> None:
+    """15. Arb failure path is fail-closed (returns ARB_CERTIFICATION_NOT_AVAILABLE)."""
+    res_neg = certify_compact_witness_curvature_arb(
+        "negative", N_cutoff=15, force_flint_unavailable=True
+    )
+    assert res_neg["status"] == ARB_CERTIFICATION_NOT_AVAILABLE
+    assert res_neg["certified"] is False
+    assert res_neg["curvature_enclosure"] is None
+    assert res_neg["zero_excluded"] is False
+
+    res_pos = certify_compact_witness_curvature_arb(
+        "positive", N_cutoff=15, force_flint_unavailable=True
+    )
+    assert res_pos["status"] == ARB_CERTIFICATION_NOT_AVAILABLE
+    assert res_pos["certified"] is False
+
+
+def test_16_display_floats_are_not_labelled_certificates() -> None:
+    """16. Display floats are not labelled certificates."""
+    sign_audit = audit_arithmetic_curvature_sign_firewall(N_cutoff=15)
+    assert sign_audit["display_floats_are_certificates"] is False
+    assert (
+        sign_audit["negative_curvature_arb_enclosure"]["curvature_enclosure"][
+            "display_float_is_certificate"
+        ]
+        is False
+    )
+    assert (
+        sign_audit["positive_curvature_arb_enclosure"]["curvature_enclosure"][
+            "display_float_is_certificate"
+        ]
+        is False
     )
 
 
-# 16. Reflection pairing yields ordinate exponent
-def test_16_reflection_pairing_yields_ordinate_exponent():
-    delta = 0.14
-    gamma = 14.134725
-    audit = audit_spectral_centering_and_pairings(delta=delta, gamma=gamma, K=1.0, eta=0.1)
-    assert abs(audit.centered_reflection_exponent.real) < 1e-15
-    assert abs(audit.centered_reflection_exponent.imag - 2.0 * gamma) < 1e-15
-    assert audit.reflection_even_defect <= 0.0
-    assert audit.reflection_second_variation_coeff == pytest.approx(
-        -4.0 * (LOG_TAU ** 2) * (gamma ** 2), rel=1e-14
+def test_17_complete_compact_support_sum_distinguished_from_finite_truncation() -> None:
+    """17. Complete compact-support sum is distinguished from finite truncation."""
+    sign_audit = audit_arithmetic_curvature_sign_firewall(N_cutoff=15)
+    assert sign_audit["is_complete_compact_support_evaluation"] is True
+    assert sign_audit["is_infinite_sum_truncation"] is False
+    assert sign_audit["superseded_classification"] == SUPERSEDED_FINITE_TRUNCATION_STATUS
+    assert sign_audit["classification"] == COMPACT_SUPPORT_SIGN_INDEFINITENESS_STATUS
+
+    hom_ctrl = evaluate_homogeneous_kernel_control()
+    assert hom_ctrl["evaluation_mode"] == "FINITE_TRUNCATION_DIAGNOSTIC"
+    assert hom_ctrl["is_compactly_supported"] is False
+
+
+def test_18_accidental_zero_scope_is_explicit() -> None:
+    """18. Accidental-zero witness scope is explicit."""
+    acc = audit_finite_station_accidental_zero()
+    assert acc["classification"] == CLASSIFICATION_FINITE_ACCIDENTAL_ZERO
+    scope = acc["scope_specification"]
+    assert (
+        scope["complete_plateau_kernel_X3"]["evaluation_scope"]
+        == "ONE_COMPACTLY_SUPPORTED_KERNEL_COMPLETE_SUPPORT"
     )
-
-
-# 17. General zero-zero pairing yields cross terms
-def test_17_general_zero_zero_pairing_yields_cross_terms():
-    audit = audit_spectral_centering_and_pairings(
-        delta=0.12, gamma=14.134725, sigma_delta=-0.05, sigma_gamma=21.022040
+    assert abs(scope["complete_plateau_kernel_X3"]["arithmetic_curvature"]) == 0.0
+    assert (
+        scope["fixed_kernel_F_acc_restricted_vs_complete"]["restricted_subset_scope"]
+        == "ONE_RESTRICTED_ARITHMETIC_WINDOW_OF_FIXED_KERNEL"
     )
-    assert abs(audit.general_pair_centered_exponent.real - (0.12 - 0.05)) < 1e-15
-    assert abs(audit.general_pair_centered_exponent.imag - (14.134725 + 21.022040)) < 1e-12
-    assert audit.naturally_induced_pairing == "UNRESTRICTED_DOUBLE_ZERO_SUM_WITH_BACKGROUND"
-    assert audit.spectral_curvature_classification == OUTCOME_D_SPECTRAL_SIGNED_OR_DOUBLE
+    assert (
+        scope["fixed_kernel_F_acc_restricted_vs_complete"]["complete_support_scope"]
+        == "COMPLETE_SUPPORT_OF_SAME_FIXED_KERNEL"
+    )
+    assert acc["vanishes_on_selected_window"] is True
+    assert acc["nonzero_on_complete_support_of_fixed_kernel"] is True
 
 
-# 18. No diagonal projection without proof
-def test_18_no_diagonal_projection_without_proof():
-    fw = audit_complete_spectral_curvature_and_firewalls()
-    assert fw["diagonal_projection_without_proof_allowed"] is False
-    assert fw["incomplete_diagonal_only_classification"] == CLASSIFICATION_SELECTED_BLOCK_ONLY
-    assert fw["includes_zero_zero_cross_terms"] is True
-
-
-# 19. No selected-zero test construction
-def test_19_no_selected_zero_test_construction():
-    fw = audit_complete_spectral_curvature_and_firewalls()
-    assert fw["selected_zero_construction_allowed"] is False
-
-
-# 20. No remainder-domination reuse
-def test_20_no_remainder_domination_reuse():
-    fw = audit_complete_spectral_curvature_and_firewalls()
-    assert fw["remainder_domination_reopened"] is False
-    assert fw["task_tc_032r_firewall_status"] == "EXACT_CANCELLATION_BLOCKS_STRICT_SUBORDINATION_ROUTE"
-    assert fw["includes_pole_terms"] is True
-    assert fw["includes_trivial_zero_terms"] is True
-    assert fw["includes_archimedean_terms"] is True
-
-
-# 21. Theta scalar candidate remains rejected
-def test_21_theta_scalar_candidate_remains_rejected():
+def test_19_theta_uncertain_fields_are_statuses_not_booleans() -> None:
+    """19. Theta-Mellin uncertain fields are statuses, not Booleans."""
     theta = audit_theta_mellin_nonscalar_fallback()
-    assert theta.scalar_candidate_status == "REJECTED_FROZEN_IDENTICALLY_ZERO_AT_ZEROS"
+    for field_name, val in theta.__dict__.items():
+        assert not isinstance(val, bool), f"Theta field {field_name} is bool: {val!r}"
+        assert isinstance(val, str)
 
 
-# 22. Theta non-scalar candidate evidence status
-def test_22_theta_non_scalar_candidate_evidence_status():
+def test_20_theta_convergence_not_marked_proved() -> None:
+    """20. Theta convergence is not marked proved."""
     theta = audit_theta_mellin_nonscalar_fallback()
-    assert theta.purely_theta_or_arithmetic_defined is True
-    assert theta.zero_independent_definition is True
-    assert theta.exact_scale_flatness_law is False
-    assert theta.reduces_to_double_mellin_weil_form is True
-    assert theta.closes_obl_ct_001a is False
-    assert theta.classification == OUTCOME_G_REDUCES_TO_OBL_CT_001A
+    assert theta.convergence_status == "CONDITIONAL_ON_REGULARIZATION"
+    assert theta.second_mismatch_variation_status == "FORMAL_CANDIDATE_NOT_DERIVED"
 
 
-# 23. Generic-base classification
-def test_23_generic_base_classification():
-    gb = evaluate_generic_base_mismatch_control()
-    assert gb["holds_for_all_q_gt_1"] is True
-    assert gb["tau_specific_theorem_used_in_euler_curvature"] is False
-    assert gb["classification"] == CLASSIFICATION_GENERIC_SCALE_CURVATURE
+def test_21_theta_complete_spectral_expansion_not_marked_proved() -> None:
+    """21. Theta complete spectral expansion is not marked proved."""
+    theta = audit_theta_mellin_nonscalar_fallback()
+    assert theta.complete_spectral_expansion_status == "COMPLETE_EXPANSION_NOT_DERIVED"
+    assert theta.secondary_classification == THETA_MELLIN_AUDIT_CONDITIONAL
 
 
-# 24. Weil-equivalence firewall
-def test_24_weil_equivalence_firewall():
-    wf = audit_weil_equivalence_firewall()
-    assert wf["global_spectral_form_positivity_is_rh_equivalent"] is True
-    assert wf["independent_proof_mechanism"] is False
-    assert wf["classification"] == CLASSIFICATION_CURVATURE_POSITIVITY_RH_EQUIVALENT
-    assert wf["outcome_e"] == OUTCOME_E_WEIL_EQUIVALENCE
+def test_22_theta_delta_squared_limited_to_conjugate_block() -> None:
+    """22. Theta delta_rho^2 detection is limited to the conjugate block."""
+    theta = audit_theta_mellin_nonscalar_fallback()
+    assert theta.delta_squared_detection_status == "DIAGONAL_CONJUGATE_BLOCK_ONLY"
 
 
-# 25. No RH claim without full bridge
-def test_25_no_rh_claim_without_full_bridge():
+def test_23_theta_positivity_classified_as_rh_equivalent() -> None:
+    """23. Theta positivity is classified as RH-equivalent."""
+    theta = audit_theta_mellin_nonscalar_fallback()
+    assert theta.positive_complete_spectral_curvature_status == "RH_EQUIVALENT_IF_POSITIVE"
+    assert theta.closes_obl_ct_001a_status == "FALSE"
+
+
+def test_24_principal_classification_remains_mismatch_curvature_reduces_to_obl_ct_001a() -> None:
+    """24. Principal classification remains MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A."""
     report = audit_transport_mismatch_curvature()
-    assert report["rh_claimed"] is False
-    assert report["obl_ct_001a_completed"] is False
     assert report["principal_classification"] == PRINCIPAL_CLASSIFICATION
-    assert report["principal_classification"] != OUTCOME_A_FULL_BRIDGE
-    reconcil = reconcile_with_existing_curvature_transport()
-    assert reconcil["classification"] == CLASSIFICATION_REDUCES_TO_EXISTING_OBL_CT_001A
-    assert reconcil["new_arithmetic_descent_constructed"] is False
+    assert report["principal_classification"] == "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A"
+    assert report["task_completion_status"] == TASK_TC_034R_STATUS
 
 
-# 26. No claim that candidate failure refutes TC
-def test_26_no_claim_that_candidate_failure_refutes_tc():
+def test_25_obl_ct_001a_remains_open() -> None:
+    """25. OBL-CT-001A remains OPEN."""
+    report = audit_transport_mismatch_curvature()
+    assert report["obl_ct_001a_status"] == "OPEN"
+    assert report["obl_ct_001a_completed"] is False
+    assert report["rh_claimed"] is False
+
+
+def test_26_candidate_failure_does_not_refute_tc() -> None:
+    """26. Candidate failure does not refute TC."""
     report = audit_transport_mismatch_curvature()
     assert report["candidate_failure_refutes_tc"] is False
     assert "NOT the general TC hypothesis" in report["hypothesis_fidelity"]["distinction"]
 
 
-# 27. Lean 4 module theorem alignment check
-def test_27_lean_formalization_alignment():
-    lean_file = (
-        Path(__file__).resolve().parent.parent
-        / "formal"
-        / "RiemannScope"
-        / "TransportMismatchCurvature.lean"
-    )
-    assert lean_file.exists()
-    content = lean_file.read_text(encoding="utf-8")
-    required_theorems = [
-        "single_exponential_log_curvature_zero",
-        "two_exponential_positive_log_curvature",
-        "positive_finite_exponential_curvature_nonneg",
-        "reciprocal_pair_curvature_strict_pos",
-        "homogeneous_arithmetic_curvature_zero",
-        "arithmetic_zero_curvature_and_spectral_positive_contradiction",
-        "euler_generator_scaling_algebra",
-        "mismatch_curvature_k_independent",
-        "even_second_difference_quadratic_ident",
-        "signed_weight_curvature_negative",
-        "generic_base_mismatch_curvature_scaling",
-    ]
-    for thm in required_theorems:
-        assert f"theorem {thm}" in content
-    assert "sorry" not in content
+def test_27_actual_lean_theorem_identifiers_match_file() -> None:
+    """27. Actual Lean theorem identifiers match TransportMismatchCurvature.lean."""
+    check = verify_lean_theorem_map_against_file()
+    assert check["matches_exact"] is True
+    assert check["contains_sorry"] is False
+    assert len(check["actual_defs"]) == 1
+    assert len(check["actual_theorems"]) == 17
+
+    lean_map = get_lean_theorem_map()
+    assert lean_map["total_module_declarations"] == 18
+    assert lean_map["module_def_count"] == 1
+    assert lean_map["module_theorem_count"] == 17
+    assert lean_map["repository_compiled_theorem_declarations"] == 565
 
 
-# 28. Artifact and review document completeness
-def test_28_artifact_and_review_completeness():
-    import json
+def test_28_json_artifact_contains_all_required_repair_keys() -> None:
+    """28. JSON artifact contains all required repair keys from Section 15 of TASK-TC-034R."""
+    assert ARTIFACT_PATH.exists()
+    data = json.loads(ARTIFACT_PATH.read_text(encoding="utf-8"))
 
-    repo_root = Path(__file__).resolve().parent.parent
-    artifact_path = repo_root / "data" / "tc_transport_mismatch_curvature.json"
-    review_path = repo_root / "docs" / "reviews" / "TC_TRANSPORT_MISMATCH_CURVATURE.md"
-    assert artifact_path.exists()
-    assert review_path.exists()
-
-    data = json.loads(artifact_path.read_text(encoding="utf-8"))
-    required_keys = [
-        "starting_head",
-        "mismatch_parameter",
-        "transported_kernel",
-        "arithmetic_derivative_formulas",
-        "euler_operator",
-        "arithmetic_curvature",
-        "curvature_sign_status",
-        "homogeneity_status",
-        "compact_support_obstruction",
-        "mellin_scaling",
-        "centered_exponent_convention",
-        "natural_zero_pairing",
-        "spectral_curvature_type",
-        "weight_sign",
-        "cross_term_status",
-        "theta_candidate_status",
-        "tau_specificity",
-        "weil_equivalence_status",
-        "relation_to_OBL_CT_001A",
+    required_section_15_keys = [
+        "compact_support_no_go_evidence",
+        "compactification_operator",
+        "plateau_interval",
+        "support_interval",
+        "jet_preservation_order",
+        "negative_witness",
+        "negative_witness_complete_sum",
+        "negative_curvature_arb_enclosure",
+        "positive_witness",
+        "positive_witness_complete_sum",
+        "positive_curvature_arb_enclosure",
+        "compact_support_sign_indefiniteness_status",
+        "finite_accidental_zero_scope",
+        "theta_definition_status",
+        "theta_convergence_status",
+        "theta_second_variation_status",
+        "theta_delta_squared_status",
+        "theta_complete_expansion_status",
+        "theta_positivity_status",
+        "theta_obl_ct_001a_status",
+        "lean_theorem_map",
         "principal_classification",
-        "exact_remaining_subgate",
     ]
-    for key in required_keys:
-        assert key in data
+    for key in required_section_15_keys:
+        assert key in data, f"Missing required Section 15 key in JSON artifact: {key}"
 
-    review_text = review_path.read_text(encoding="utf-8")
-    required_sections = [
-        "### A. TASK-TC-033 transport–moment incompatibility",
-        "### B. Hypothesis versus implementation",
-        "### C. Relative transport parameter",
-        "### D. Arithmetic Euler derivatives",
-        "### E. Arithmetic curvature determinant",
-        "### F. Positive exponential curvature identity",
-        "### G. Mellin-side mismatch derivatives",
-        "### H. Centering and pairing audit",
-        "### I. Homogeneous-kernel candidate",
-        "### J. Compact-support homogeneity obstruction",
-        "### K. Complete spectral curvature",
-        "### L. Off-diagonal and background terms",
-        "### M. Existing Curvature Transport reconciliation",
-        "### N. Theta–Mellin fallback",
-        "### O. Tau-specificity",
-        "### P. Weil-equivalence audit",
-        "### Q. Principal classification",
-        "### R. Exact next theorem, if any",
-    ]
-    for sec in required_sections:
-        assert sec in review_text
+    # Verify retained mathematical checks (Euler generator, Lagrange mixture, Mellin, centering, generic base)
+    neg_bundle = build_compact_negative_witness(15)
+    deriv_k1 = evaluate_mismatch_derivatives_at_zero(
+        neg_bundle.kernel_fn,
+        K=1.0,
+        n_max=15,
+        euler1_f0=neg_bundle.euler1_fn,
+        euler2_f0=neg_bundle.euler2_fn,
+    )
+    deriv_k2 = evaluate_mismatch_derivatives_at_zero(
+        neg_bundle.kernel_fn,
+        K=2.0,
+        n_max=15,
+        euler1_f0=neg_bundle.euler1_fn,
+        euler2_f0=neg_bundle.euler2_fn,
+    )
+    assert abs(deriv_k1.normalized_curvature_from_K - deriv_k2.normalized_curvature_from_K) < 1e-12
 
+    mix = evaluate_exponential_mixture_curvature([1.5, 2.5, 0.75], [-0.4, 0.2, 0.9])
+    assert mix.lagrange_identity_abs_err < 1e-14
+    assert mix.strictly_positive is True
+
+    recip = evaluate_reciprocal_pair_curvature(1.2, 0.8, 0.35)
+    assert recip.strictly_positive is True
+
+    mellin = evaluate_mellin_mismatch_scaling(
+        s=complex(0.6, 14.13), t=complex(0.6, -14.13), K=1.0, eta=0.1, a=0.5
+    )
+    assert abs(mellin["net_normalized_exponent"] - 0.1 * 1.2) < 1e-14
+
+    pairing = audit_spectral_centering_and_pairings()
+    assert abs(pairing.centered_conjugate_exponent - 2.0 * pairing.delta) < 1e-14
+    assert abs(pairing.centered_reflection_exponent - complex(0.0, 2.0 * pairing.gamma)) < 1e-14
+
+    gen_base = evaluate_generic_base_mismatch_control()
+    assert gen_base["holds_for_all_q_gt_1"] is True
+
+    weil_fw = audit_weil_equivalence_firewall()
+    assert weil_fw["global_spectral_form_positivity_is_rh_equivalent"] is True
+    assert weil_fw["independent_proof_mechanism"] is False

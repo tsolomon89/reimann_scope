@@ -1977,7 +1977,7 @@ Formalized in `formal/RiemannScope/GradeHankelConstraint.lean` (11 declarations 
 
 ---
 
-# 41. Infinitesimal Transport-Mismatch Curvature and Non-Scalar Arithmetic Descent (`TASK-TC-034`)
+# 41. Infinitesimal Transport-Mismatch Curvature and Non-Scalar Arithmetic Descent (`TASK-TC-034` / `TASK-TC-034R`)
 
 ### 41.1 Relative Transport Mismatch and Arithmetic Euler Derivatives
 Writing $b = 1 + \eta$ ($\eta \in \mathbb{R}$) around the unique label-preserving transport $b = 1$ from `TASK-TC-033`, the mismatch-transported kernel and normalized equal-grade arithmetic energy are:
@@ -1989,13 +1989,13 @@ With the two-variable Euler scaling generator $\mathcal E = x\partial_x + y\part
 \widehat{\mathcal M}_K^{(j)}(0) = (-K\log\tau)^j A_j(F_0), \qquad \mathfrak C_{\mathrm{arith}}(F_0) = A_0 A_2 - A_1^2 = \frac{\widehat{\mathcal M}_K(0)\widehat{\mathcal M}_K''(0) - (\widehat{\mathcal M}_K'(0))^2}{K^2(\log\tau)^2}.
 \]
 
-### 41.2 Arithmetic Curvature Sign Indefiniteness & Compact-Support Homogeneity No-Go
-- **Flatness Not Implied (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`)**: Same-label preservation at $\eta = 0$ makes $\mathfrak C_{\mathrm{arith}}(F_0)$ independent of $K \ne 0$, but does not force $\mathfrak C_{\mathrm{arith}}(F_0) = 0$. Because $\mathcal E^2 F_0$ contains second radial derivatives of the kernel profile, $\mathfrak C_{\mathrm{arith}}(F_0)$ takes negative, zero, and positive values across nonnegative kernels $F_0 \ge 0$ (`GENERAL_ARITHMETIC_MISMATCH_CURVATURE_INDEFINITE`).
-- **Compact-Support Homogeneity No-Go (`COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PROVED`, `NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`)**: Structural vanishing $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ via Euler homogeneity $\mathcal E F_0 = d F_0$ forces $F_0(rx, ry) = r^d F_0(x,y)$ along every positive ray, implying $F_0 \equiv 0$ for every $F_0 \in C_c^\infty((0,\infty)^2)$.
+### 41.2 Certified Compact-Support Arithmetic Curvature Sign Indefiniteness & Homogeneity No-Go
+- **Flatness Not Implied & Certified Sign Indefiniteness (`ARITHMETIC_CURVATURE_FLATNESS_NOT_IMPLIED`, `COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE`)**: Same-label preservation at $\eta = 0$ makes $\mathfrak C_{\mathrm{arith}}(F_0)$ independent of $K \ne 0$, but does not force $\mathfrak C_{\mathrm{arith}}(F_0) = 0$. Using the $C^\infty$ plateau cutoff $\mathrm{X}_{15} \in C_c^\infty((1.5,15.5)^2)$ equal to $1$ on $[1.75,15.25]^2$, genuinely compactly supported nonnegative witnesses $\widetilde G_\pm = \mathrm{X}_{15} G_\pm \in C_c^\infty((0,\infty)^2)$ have complete arithmetic sums certified by outward 128-bit Arb ball arithmetic to be strictly negative ($\mathfrak C_{\mathrm{arith}}(\widetilde G_-) \approx -6442.343 < 0$, `COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED`) and strictly positive ($\mathfrak C_{\mathrm{arith}}(\widetilde G_+) \approx +191887.248 > 0$, `COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED`).
+- **Compact-Support Homogeneity No-Go (`COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED`, `NONZERO_COMPACT_SUPPORT_HOMOGENEOUS_KERNEL_IMPOSSIBLE`)**: Structural vanishing $\mathfrak C_{\mathrm{arith}}(F_0) = 0$ via Euler homogeneity $\mathcal E F_0 = d F_0$ is proved in Lean to force $A_0 A_2 - A_1^2 = 0$ (`homogeneous_arithmetic_curvature_zero`) and proved by paper ODE derivation along positive rays ($F_0(rx, ry) = r^d F_0(x,y)$) to force $F_0 \equiv 0$ for every $F_0 \in C_c^\infty((0,\infty)^2)$.
 
-### 41.3 Spectral Centering, Pairing Audit, and Reconciliation with `OBL-CT-001A`
+### 41.3 Spectral Centering, Conditional Theta–Mellin Audit, and Reconciliation with `OBL-CT-001A`
 - Under half-density centering, the conjugate pairing $t = \bar\rho$ yields radial exponent $2\delta_\rho$ and even mismatch defect $2(\cosh(2\eta K\delta_\rho\log\tau)-1) = B_\rho(2\eta K)$, reproducing the existing detector $B_\rho(k)$ with $k = 2\eta K$ (`MISMATCH_CURVATURE_REDUCES_TO_EXISTING_OBL_CT_001A`).
-- The reflection pairing $t = 1-\bar\rho$ yields ordinate exponent $2i\gamma_\rho$, while the actual two-variable arithmetic energy induces the unrestricted double sum over all zero pairs $(\rho,\sigma)$ plus pole, trivial-zero, and Archimedean background terms (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`).
+- The reflection pairing $t = 1-\bar\rho$ yields ordinate exponent $2i\gamma_\rho$, the actual two-variable arithmetic energy induces the unrestricted double sum over all zero pairs $(\rho,\sigma)$ plus pole, trivial-zero, and Archimedean background terms (`SPECTRAL_CURVATURE_IS_SIGNED_OR_DOUBLE_SUM`), and the bilinear theta–Mellin fallback remains conditional on regularization (`THETA_MELLIN_AUDIT_CONDITIONAL`, `CONDITIONAL_ON_REGULARIZATION`, `COMPLETE_EXPANSION_NOT_DERIVED`).
 - Principal Classification:
   \[
   \boxed{\texttt{MISMATCH\_CURVATURE\_REDUCES\_TO\_OBL\_CT\_001A}}
@@ -2003,6 +2003,7 @@ With the two-variable Euler scaling generator $\mathcal E = x\partial_x + y\part
   (`OBL-CT-001A` remains **OPEN**; per the Hypothesis-Fidelity Rule, failure of this candidate implementation and test space does not refute the general TC hypothesis).
 
 ### 41.4 Lean 4 Formal Verification
-Formalized in `formal/RiemannScope/TransportMismatchCurvature.lean` (18 declarations compiled, 0 sorry, total 566 declarations in repo):
+Formalized in `formal/RiemannScope/TransportMismatchCurvature.lean` (18 module declarations: `1 def` + `17 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 565 compiled `theorem` declarations in repo):
 `curvatureDet`, `single_exponential_log_curvature_zero`, `two_exponential_curvature_identity`, `two_exponential_positive_log_curvature`, `positive_finite_exponential_curvature_nonneg`, `three_exponential_curvature_identity`, `three_exponential_curvature_nonneg`, `reciprocal_pair_curvature_strict_pos`, `homogeneous_arithmetic_curvature_zero`, `arithmetic_zero_curvature_and_spectral_positive_contradiction`, `euler_generator_scaling_algebra`, `mismatch_curvature_k_independent`, `even_second_difference_quadratic_ident`, `centered_conjugate_pairing_radial`, `centered_reflection_pairing_real_zero`, `mellin_mismatch_net_exponent`, `signed_weight_curvature_negative`, `generic_base_mismatch_curvature_scaling`.
+
 

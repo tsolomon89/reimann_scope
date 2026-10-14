@@ -54,12 +54,13 @@ This directory houses the formal Lean 4 verification layer for `reimann_scope` c
    - Signed-weight countermodel: signed weights can yield $\mathcal{H}_0 < 0$
    - Generic-base scale covariance control: $(1 - 1)K = 0$ holds for all $q > 0$
 
-10. **`TransportMismatchCurvature.lean`**:
-   - Euler scaling derivative factorization $\mathcal{M}_K^{(j)}(0) = (-K \log q)^j A_j$ and grade-$K$ cancellation in $\mathfrak{C}_{\mathrm{arith}} = A_0 A_2 - A_1^2$
-   - Homogeneous kernel identity ($A_1 = d A_0, A_2 = d^2 A_0 \implies \mathfrak{C}_{\mathrm{arith}} = 0$)
-   - Compact-support ray homogeneity vanishing theorem (`compact_support_ray_homogeneity_implies_zero`)
-   - Two-point and three-point positive exponential mixture curvature identities and strict positivity
-   - Spectral mismatch scaling algebra ($aK + (1+\eta)K(s+t) - K(s+t) - aK = \eta K(s+t)$)
-   - Centered conjugate ($2\delta$) vs. reflection ($2\gamma$) pairing algebra and reduction to `OBL-CT-001A`
-   - Countermodels for arithmetic curvature non-vanishing and signed spectral curvature
+10. **`TransportMismatchCurvature.lean`** (1 `def` + 17 `theorem` declarations):
+   - Curvature determinant `curvatureDet` ($A_0 A_2 - A_1^2$) and single-exponential vanishing (`single_exponential_log_curvature_zero`)
+   - Two-point and three-point positive exponential mixture Lagrange identities and nonnegativity/positivity (`two_exponential_curvature_identity`, `two_exponential_positive_log_curvature`, `positive_finite_exponential_curvature_nonneg`, `three_exponential_curvature_identity`, `three_exponential_curvature_nonneg`, `reciprocal_pair_curvature_strict_pos`)
+   - Algebraic moment flatness under Euler-homogeneity relations $A_1 = d A_0, A_2 = d^2 A_0 \implies \mathfrak{C}_{\mathrm{arith}} = 0$ (`homogeneous_arithmetic_curvature_zero`) and contradiction with positive spectral curvature (`arithmetic_zero_curvature_and_spectral_positive_contradiction`)
+   - Euler scaling derivative factorization and grade-$K$ cancellation (`euler_generator_scaling_algebra`, `mismatch_curvature_k_independent`)
+   - Even second-difference quadratic identity (`even_second_difference_quadratic_ident`), centered conjugate ($2\delta$) vs. reflection ($0$ real part) pairing algebra (`centered_conjugate_pairing_radial`, `centered_reflection_pairing_real_zero`), and Mellin mismatch net exponent (`mellin_mismatch_net_exponent`)
+   - Signed-weight countermodel (`signed_weight_curvature_negative`) and generic-base scale covariance control (`generic_base_mismatch_curvature_scaling`)
+   - *Scope note:* Does not formalize the compact-support Euler-PDE homogeneity no-go (`PROVED_PAPER_DERIVATION`), the full two-variable explicit formula, the theta–Mellin regularized descent, global spectral positivity, or `OBL-CT-001A`.
+
 
