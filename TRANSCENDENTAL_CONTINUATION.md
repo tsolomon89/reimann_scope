@@ -2015,15 +2015,15 @@ Because `TASK-TC-034R` certified that the complete arithmetic curvature $\mathfr
 
 ### 42.2 Audit of the Six Candidate Selector Principles
 1. **Selector I — Functional Equation Uniqueness (Hamburger / Burnol Co-Poisson Dictionary)**:
-   Selects the 1D distribution ray $\mathbb C\cdot \xi(s)$ (the prime-power weights $\Lambda(n)$), **not** a unique test kernel $F_0$ (`FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL`). Even on compactly supported smooth kernels satisfying $F_0 \ge 0$, permutation symmetry $F_0(x,y) = F_0(y,x)$, and multiplicative inversion symmetry $F_0(16/x, 16/y) = F_0(x,y)$ around $c_0 = 4$, 128-bit Arb ball arithmetic certifies both strictly negative ($\mathfrak C_{\mathrm{arith}}(\widetilde G_-^{\mathrm{inv}}) \approx -4379.275 < 0$) and strictly positive ($\mathfrak C_{\mathrm{arith}}(\widetilde G_+^{\mathrm{inv}}) \approx +25489.771 > 0$) complete arithmetic curvature (`INVERSION_AND_PERMUTATION_SYMMETRIC_SUBSPACE_SIGN_INDEFINITE`).
+   Characterizes the $\zeta$-side distribution ($\zeta(s) = \sum_{n\ge 1} n^{-s}$), while the Euler product and logarithmic differentiation determine the von Mangoldt prime-power distribution ($-\zeta'(s)/\zeta(s) = \sum_{n\ge 2}\Lambda(n)n^{-s}$); neither selects a unique test kernel $F_0$ (`FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL`). Even on compactly supported smooth kernels satisfying $F_0 \ge 0$, permutation symmetry $F_0(x,y) = F_0(y,x)$, and multiplicative inversion symmetry $F_0(16/x, 16/y) = F_0(x,y)$ around $c_0 = 4$, 128-bit Arb ball arithmetic certifies both strictly negative ($\mathfrak C_{\mathrm{arith}}(\widetilde G_-^{\mathrm{inv}}) \approx -4379.275 < 0$) and strictly positive ($\mathfrak C_{\mathrm{arith}}(\widetilde G_+^{\mathrm{inv}}) \approx +25489.771 > 0$) complete arithmetic curvature (`INVERSION_AND_PERMUTATION_SYMMETRIC_SUBSPACE_SIGN_INDEFINITE`).
 2. **Selector II — Jacobi Theta Self-Duality and the Additive-to-Multiplicative Chain-Rule Drift Theorem**:
-   Fourier self-duality $\hat f = f$ with ground-state positivity uniquely selects the canonical additive Gaussian $\Theta_1(x,y) = e^{-\pi(x^2+y^2)}$ at $t = 1$. However:
+   Within the positive heat-semigroup / harmonic-oscillator ground-state / minimum-uncertainty class (whereas the full self-Fourier subspace $\hat f = f$ is infinite-dimensional), Fourier self-duality at $t = 1$ uniquely selects the canonical additive Gaussian $\Theta_1(x,y) = e^{-\pi(x^2+y^2)}$. However:
    - **Separable Tensor-Square Reduction (`tensor_square_curvature_reduction`)**: Any separable kernel $F_0 = f \otimes f$ satisfies $\mathfrak C_{\mathrm{arith}}(f \otimes f) = 2 m_0^2(m_0 m_2 - m_1^2)$ and factorizes the 2D spectral sum into the square of the 1D linear explicit formula.
    - **Euler Chain-Rule Drift Identity (`euler_chain_rule_second_deriv_curvature`)**: Because multiplicative prime-station transport acts by $\mathcal E = x\partial_x + y\partial_y = 2t\partial_t$ via $(t\partial_t)^2 = t^2\partial_t^2 + t\partial_t$,
      \[
      \mathfrak C_{\mathrm{arith}}(\Theta_t) = 4\pi^2 t^2(M_0 M_2 - M_1^2) - 4\pi t M_0 M_1.
      \]
-     At $t = 1$, 128-bit Arb certifies that the negative Euler chain-rule drift $-4\pi M_0 M_1 \approx -3.432263 \times 10^{-21}$ dominates the positive Bernstein variance $4\pi^2(M_0 M_2 - M_1^2) \approx +1.609709 \times 10^{-26}$ by five orders of magnitude, forcing $\mathfrak C_{\mathrm{arith}}(\Theta_1) \approx -3.432247 \times 10^{-21} < 0$ (`THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT`).
+     At $t = 1$ ($N_{\mathrm{cutoff}} = 15$, outward tail bound $\approx 4.91 \times 10^{-347}$), 128-bit Arb certifies that the negative Euler chain-rule drift $-4\pi M_0 M_1 \approx -3.432263 \times 10^{-21}$ dominates the positive Bernstein variance $4\pi^2(M_0 M_2 - M_1^2) \approx +1.609709 \times 10^{-26}$ by five orders of magnitude, forcing $\mathfrak C_{\mathrm{arith}}(\Theta_1) \approx -3.432247 \times 10^{-21} < 0$ (`THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT`).
    - **Multiplicative Log-Gaussian Variance Threshold (`log_gaussian_curvature_identity`)**: For $\Phi_{\alpha, w_0}(x,y) = e^{-\alpha(\log(xy)-w_0)^2}$, $\mathfrak C_{\mathrm{arith}}(\Phi_{\alpha, w_0}) = 16\alpha^2(S_0 S_2 - S_1^2) - 8\alpha S_0^2 = 8\alpha S_0^2(2\alpha\operatorname{Var}_w(\log(nm)) - 1)$, whose sign depends on the arbitrary width $\alpha$ relative to $\alpha_\star = \frac{1}{2\operatorname{Var}_w(\log(nm))}$.
 3. **Selectors III–VI and the Canonical Selector Trilemma**:
    - **Selector III (Prime/Archimedean Balance & Conductor Operator $\log|x|+\log|y|$)**: `PRIME_ARCHIMEDEAN_BALANCE_IS_UNIVERSAL_DISTRIBUTIONAL_IDENTITY`.
@@ -2034,8 +2034,43 @@ Because `TASK-TC-034R` certified that the complete arithmetic curvature $\mathfr
      \[
      \boxed{\texttt{NO\_ZERO\_INDEPENDENT\_SINGLE\_KERNEL\_SELECTOR\_FOUND\_IN\_STANDARD\_ZETA\_AXIOMS}}
      \]
-     (`CANONICAL_SELECTOR_TRILEMMA_PROVED_OBL_CT_001A_OPEN`; `OBL-CT-001A` remains **OPEN**).
+     (`SIX_STANDARD_SELECTOR_FAMILIES_AUDITED`, `CONDITIONAL_COMPLEMENT_SIGN_DICHOTOMY_LEAN_PROVED`; `OBL-CT-001A` remains **OPEN**).
 
 ### 42.3 Lean 4 Formal Verification
-Formalized in `formal/RiemannScope/CanonicalSelectorAudit.lean` (16 module declarations: `1 def` + `15 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 580 compiled `theorem` declarations in repo):
+Formalized in `formal/RiemannScope/CanonicalSelectorAudit.lean` (16 module declarations: `1 def` + `15 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced):
 `oneDimCurvature`, `tensor_square_moment_A0`, `tensor_square_moment_A1`, `tensor_square_moment_A2`, `tensor_square_curvature_reduction`, `tensor_square_curvature_pos_iff`, `tensor_square_curvature_neg_iff`, `euler_chain_rule_second_deriv_curvature`, `euler_drift_strictly_negative_of_dominant`, `single_station_theta_gaussian_curvature_neg`, `log_gaussian_curvature_identity`, `log_gaussian_curvature_neg_of_subcritical_variance`, `log_gaussian_curvature_pos_of_supercritical_variance`, `log_gaussian_critical_width_zero`, `selector_trilemma_algebraic_dichotomy`, `selector_trilemma_contradiction_of_nonneg_complement`.
+
+---
+
+# 43. Modular-Covariant Theta–Conductor Curvature Audit (`TASK-TC-036`)
+
+### 43.1 Theta Heat Scaling and Unique Heat-Drift Compensator
+On the 2D Gaussian heat family $\Theta_t(x,y) = e^{-\pi t(x^2+y^2)}$ ($t > 0$) with $\mathcal E = x\partial_x + y\partial_y$ and $\mathcal D = t\partial_t$:
+\[
+\mathcal E\Theta_t = 2\mathcal D\Theta_t, \qquad \mathcal E^2\Theta_t = 4t^2\partial_t^2\Theta_t + 4t\partial_t\Theta_t, \qquad \mathcal L_c\Theta_t = \mathcal E(\mathcal E - c)\Theta_t = 4t^2\partial_t^2\Theta_t + (4 - 2c)t\partial_t\Theta_t.
+\]
+Hence $c = 2$ uniquely cancels the first-order $t\partial_t$ heat drift (`HEAT_DRIFT_COMPENSATOR_UNIQUELY_FORCED`, `HEAT_DRIFT_COMPENSATOR_UNIQUE_BUT_NOT_MODULAR_SELECTOR`):
+\[
+\boxed{\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E - 2) = 4(\mathcal D^2 - \mathcal D), \qquad \mathcal L_{\mathrm{heat}}\Theta_t = 4t^2\partial_t^2\Theta_t = 4\pi^2 t^2(x^2+y^2)^2\Theta_t.}
+\]
+
+### 43.2 Modular Covariance vs. Heat-Drift Compensator
+For $f(1/t) = t^w f(t)$, the weight-normalized state $\widetilde f(t) = t^{w/2}f(t)$ satisfies $\widetilde f(1/t) = \widetilde f(t)$, with covariant derivative $\nabla_w = \mathcal D + w/2$, $\nabla_w f(1) = 0$, and modular Hessian $\mathcal H_{\mathrm{mod},w} = (\mathcal D + w/2)^2$. For $w = 1$ (2D theta), $4\mathcal H_{\mathrm{mod},1} = 4(\mathcal D + 1/2)^2 = (\mathcal E + I)^2$ and $\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E - 2)$ differ by the nonzero connection operator:
+\[
+\boxed{4\mathcal H_{\mathrm{mod},1} - \mathcal L_{\mathrm{heat}} = 8\mathcal D + I = 4\mathcal E + I \neq 0}
+\]
+(`HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS`, `MODULAR_HESSIAN_DOES_NOT_REMOVE_HEAT_DRIFT`, `HEAT_COMPENSATOR_NOT_MODULARLY_FORCED`, `MODULAR_HESSIAN_DIFFERS_FROM_HEAT_COMPENSATOR`).
+
+### 43.3 Burnol Conductor Operator, Dilation Commutation, and Completed Spectral Transfer
+- **Primary-Source Conductor Commutation (`CONDUCTOR_COMMUTES_WITH_DILATION`)**: In Burnol (`math/9902080v1`, `math/9812012v1`, `math/0101068v1`), $H_\nu = A + B = M_{\log|\cdot|_\nu} + \mathcal F M_{\log|\cdot|_\nu}\mathcal F^{-1}$ acts on 1D $L^2(K_\nu, dx)$ with dense invariant core $\Delta(K_\nu)$. Under the 1D dilation generator $\mathcal A = x\partial_x + 1/2$, $[\mathcal A, A] = I$ and $[\mathcal A, B] = -I$ cancel on $\Delta(\mathbb R)$, so $[\mathcal A, \mathcal C] = 0$ and $[\mathcal A, [\mathcal A, \mathcal C]] = 0$ (`CONDUCTOR_DILATION_COMMUTATION_REMOVES_NEW_GRADE_SIGNAL`).
+- **Prime-Only Covariant Variance & No-Contradiction Firewall (`PRIME_ONLY_COVARIANT_VARIANCE_POSITIVE_CERTIFIED`, `POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW`)**: Replacing $\mathcal E^2$ by $\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E - 2)$ flips the prime-only curvature sign to $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) = 4\pi^2 t^2(M_0 M_2 - M_1^2) > 0$, certified in 128-bit Arb at $t = 1$ ($N_{\mathrm{cutoff}} = 15$ and $N = \infty$) as $[+1.6097089323851242452337142816 \times 10^{-26} \pm 3.98 \times 10^{-55}] > 0$. Because both $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) \ge 0$ and a hypothetical positive spectral curvature satisfy $\ge 0$, there is no sign incompatibility.
+- **Completed Spectral Transfer & Weil Equivalence (`UNRESTRICTED_DOUBLE_ZERO_SUM`, `THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`, `THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`, `GENERIC_HEAT_VARIANCE_NOT_TC_CONSTRAINT`)**: On the pole-regularized theta state $\Phi_t = \mathcal D(\mathcal D - 1/2)(t^{1/4}g_t) \in \Delta(\mathbb R_+^\times)$, the completed linear functional $W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t)$ is a `SIGNED_SINGLE_ZERO_SUM`, while the completed quadratic variance $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t)$ expands into an `UNRESTRICTED_DOUBLE_ZERO_SUM` over all ordered pairs $(\rho, \sigma)$. Global positivity of the single-zero convolution form $Z(g * g^*)$ across primes is RH-equivalent, and the heat-variance scaling holds identically across all bases $q \in \{2, e, \tau, 10\}$.
+- **Principal Classification**:
+  \[
+  \boxed{\texttt{ONE\_PRECISE\_THETA\_CONDUCTOR\_SUBGATE\_OPEN} \qquad (\texttt{SUBGATE-TC-036A}, \; \texttt{OBL-CT-001A} = \texttt{OPEN}).}
+  \]
+
+### 43.4 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/ModularThetaConductorCurvature.lean` (14 module declarations: `1 def` + `13 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 593 compiled `theorem` declarations in repo):
+`heatDriftCoeff`, `theta_heat_euler_scaling`, `heat_drift_operator_expansion`, `heat_drift_compensator_unique`, `modular_weight_normalization_involution`, `modular_covariant_deriv_vanishes_at_self_dual`, `heat_and_modular_hessian_difference`, `heat_and_modular_hessian_incompatibility`, `dilation_conductor_commutator_cancellation`, `covariant_prime_variance_identity`, `covariant_prime_variance_nonneg`, `arithmetic_sign_and_spectral_sign_no_contradiction`, `complement_nonnegativity_contradiction`, `generic_quadratic_heat_base_control`.
+

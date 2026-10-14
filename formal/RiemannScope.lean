@@ -32,5 +32,6 @@ import RiemannScope.FullSpectrumCommonReferentBridge
 import RiemannScope.GradeHankelConstraint
 import RiemannScope.TransportMismatchCurvature
 import RiemannScope.CanonicalSelectorAudit
+import RiemannScope.ModularThetaConductorCurvature
 
 

@@ -819,11 +819,15 @@ def audit_six_candidate_selectors() -> List[CandidateSelectorMechanismAudit]:
             governing_zero_independent_axioms=(
                 "Completed functional equation xi(s) = xi(1 - s) with pi^{-s/2} Gamma(s/2) "
                 "Archimedean factor, moderate polynomial growth, and S-support / co-Poisson "
-                "lattice condition on Z."
+                "lattice condition on Z; followed by Euler product and logarithmic differentiation "
+                "-zeta'(s)/zeta(s) = sum_{n>=2} Lambda(n) n^{-s}."
             ),
             unique_object_selected=(
-                "1D scalar ray C * zeta(s) (equivalently the integer counting measure "
-                "sum_{n>=1} delta_n and von Mangoldt log-derivative measure sum_{n>=2} Lambda(n) delta_n)."
+                "(1) Functional equation + growth/support assumptions characterize the zeta-side "
+                "distribution zeta(s) = sum_{n>=1} n^{-s} (1D scalar ray); (2) Euler product and "
+                "logarithmic differentiation determine the von Mangoldt prime-power distribution "
+                "-zeta'(s)/zeta(s) = sum_{n>=2} Lambda(n) n^{-s}; (3) neither theorem selects a "
+                "unique test kernel."
             ),
             selects_unique_test_kernel_status="SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL",
             arithmetic_curvature_constraint_status=(
@@ -850,13 +854,14 @@ def audit_six_candidate_selectors() -> List[CandidateSelectorMechanismAudit]:
             selector_id="SELECTOR-II",
             selector_name="Jacobi Theta Self-Duality and Canonical Self-Dual Gaussian",
             governing_zero_independent_axioms=(
-                "Fourier self-duality hat{f} = f on R combined with ground-state strict positivity "
-                "(or oscillator ground-state equation (-d^2/dx^2 + 4*pi^2*x^2) psi_0 = 2*pi*psi_0), "
-                "inducing theta(1/t) = sqrt(t) theta(t)."
+                "The Gaussian is uniquely selected within the specified positive heat-semigroup, "
+                "harmonic-oscillator ground-state, or minimum-uncertainty class (the full self-Fourier "
+                "space is not one-dimensional), inducing theta(1/t) = sqrt(t) theta(t)."
             ),
             unique_object_selected=(
                 "Canonical additive Gaussian Theta_1(x, y) = exp(-pi*(x^2 + y^2)) at the unique "
-                "self-dual scale t = 1 (up to positive scalar)."
+                "self-dual scale t = 1 within the positive heat-semigroup / oscillator ground-state / "
+                "minimum-uncertainty class (up to positive scalar)."
             ),
             selects_unique_test_kernel_status="SELECTS_UNIQUE_ADDITIVE_GAUSSIAN_GROUND_STATE",
             arithmetic_curvature_constraint_status=(
@@ -1097,6 +1102,13 @@ def audit_selector_trilemma() -> Dict[str, Any]:
             "selector_trilemma_algebraic_dichotomy",
             "selector_trilemma_contradiction_of_nonneg_complement",
         ],
+        "selector_families_scope_status": "SIX_STANDARD_SELECTOR_FAMILIES_AUDITED",
+        "lean_dichotomy_scope_status": "CONDITIONAL_COMPLEMENT_SIGN_DICHOTOMY_LEAN_PROVED",
+        "lean_scope_note": (
+            "Lean proves the conditional algebraic complement-sign dichotomy "
+            "(selector_trilemma_algebraic_dichotomy, selector_trilemma_contradiction_of_nonneg_complement), "
+            "not that every possible zero-independent selector falls into the six-family research trilemma."
+        ),
         "obl_ct_001a_status": "OPEN",
     }
 

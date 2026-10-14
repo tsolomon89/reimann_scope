@@ -134,6 +134,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/GradeHankelConstraint.lean",
     "formal/RiemannScope/TransportMismatchCurvature.lean",
     "formal/RiemannScope/CanonicalSelectorAudit.lean",
+    "formal/RiemannScope/ModularThetaConductorCurvature.lean",
 ]
 
 

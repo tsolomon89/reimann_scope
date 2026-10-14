@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-035",
+  "active_task_id": "TASK-TC-036",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -927,7 +927,40 @@
         "RESEARCH_HYPOTHESIS.md",
         "RESEARCH_LEDGER.md"
       ],
-      "resolution": "TASK-TC-035 completed: Audited all six candidate zero-independent selector mechanisms with 12 primary arXiv sources retrieved via literature-search-arxiv; proved that functional-equation reflection + permutation symmetry leaves C_arith sign-indefinite on compactly supported smooth kernels (128-bit Arb certified tilde{G}_-^inv in [-4379.27517355180899705054019478775897 +/- 3.99e-33] < 0 and tilde{G}_+^inv in [+25489.7711759506050296948994043254704 +/- 2.78e-32] > 0; FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL); proved Separable Tensor-Square Curvature Reduction C_arith(f x f) = 2*m_0^2*(m_0*m_2 - m_1^2) and Additive-to-Multiplicative Euler Chain-Rule Drift Identity C_arith(Theta_t) = 4*pi^2*t^2*(M_0*M_2 - M_1^2) - 4*pi*t*M_0*M_1, certifying in 128-bit Arb that the unique theta self-dual Gaussian ground state Theta_1(x,y) = exp(-pi*(x^2+y^2)) has strictly negative multiplicative Euler curvature C_arith(Theta_1) in [-3.432247058619752688206766472100430e-21 +/- 3.80e-55] < 0 (THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT); proved Multiplicative Log-Gaussian Variance-Threshold Identity showing threshold crossing at alpha_* = 1/(2*Var_w(log(nm))); established Canonical Selector Trilemma (CANONICAL_SELECTOR_TRILEMMA_PROVED_OBL_CT_001A_OPEN) in Lean 4 (formal/RiemannScope/CanonicalSelectorAudit.lean: 1 def + 15 theorems = 16 declarations, total 580 compiled theorems in repository, 0 sorry, 0 admit); kept OBL-CT-001A OPEN. Principal classification: NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS."
+      "resolution": "TASK-TC-035 completed: Audited all six candidate zero-independent selector mechanisms with 12 primary arXiv sources retrieved via literature-search-arxiv (SIX_STANDARD_SELECTOR_FAMILIES_AUDITED, CONDITIONAL_COMPLEMENT_SIGN_DICHOTOMY_LEAN_PROVED); proved that functional-equation reflection + permutation symmetry leaves C_arith sign-indefinite on compactly supported smooth kernels (128-bit Arb certified tilde{G}_-^inv in [-4379.27517355180899705054019478775897 +/- 3.99e-33] < 0 and tilde{G}_+^inv in [+25489.7711759506050296948994043254704 +/- 2.78e-32] > 0; FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL); proved Separable Tensor-Square Curvature Reduction C_arith(f x f) = 2*m_0^2*(m_0*m_2 - m_1^2) and Additive-to-Multiplicative Euler Chain-Rule Drift Identity C_arith(Theta_t) = 4*pi^2*t^2*(M_0*M_2 - M_1^2) - 4*pi*t*M_0*M_1, certifying in 128-bit Arb (with N_cutoff = 15 and certified tail bound <= 4.91e-347) that the unique theta self-dual Gaussian ground state Theta_1(x,y) = exp(-pi*(x^2+y^2)) has strictly negative multiplicative Euler curvature C_arith(Theta_1) in [-3.432247058619752688206766472100430e-21 +/- 3.80e-55] < 0 (THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT); proved Multiplicative Log-Gaussian Variance-Threshold Identity showing threshold crossing at alpha_* = 1/(2*Var_w(log(nm))); established Scoped Selector Trilemma in Lean 4 (formal/RiemannScope/CanonicalSelectorAudit.lean: 1 def + 15 theorems = 16 declarations, 0 sorry, 0 admit); kept OBL-CT-001A OPEN. Principal classification: NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS."
+    },
+    {
+      "task_id": "TASK-TC-036",
+      "priority": 42,
+      "objective": "Modular-Covariant Theta-Conductor Curvature Audit (OBL-CT-001A Operator-Level Audit)",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Test whether Jacobi theta self-duality together with the Burnol/Weil conductor operator and modularly covariant scale differentiation canonically produces a zero-independent arithmetic functional whose complete spectral curvature is positive exactly off the critical line, or isolate the exact remaining subgate under OBL-CT-001A.",
+      "planned_calculation": "1) Repair TASK-TC-035 scope notes (distinguish zeta from -zeta'/zeta and test-kernel selection; scope Gaussian uniqueness to the positive heat-semigroup / harmonic-oscillator ground-state / minimum-uncertainty class; align all prose with committed N_cutoff = 15 and tail bound <= 4.91e-347; scope selector trilemma to SIX_STANDARD_SELECTOR_FAMILIES_AUDITED and CONDITIONAL_COMPLEMENT_SIGN_DICHOTOMY_LEAN_PROVED). 2) Prove exact theta heat-scaling E Theta_t = 2 D Theta_t and E^2 Theta_t = 4 t^2 partial_t^2 Theta_t + 4 t partial_t Theta_t, and prove L_c = E(E-c) uniquely eliminates first-order heat drift at c=2 (L_heat = E(E-2) = 4(D^2 - D)). 3) Derive weight-w modular covariant derivative nabla_w = D + w/2 and modular Hessian H_mod,1 = (D + 1/2)^2 = (E+1)^2 / 4, proving 4 H_mod,1 - L_heat = 8 D + I = 4 E + I != 0. 4) Audit Burnol primary-source conductor H_nu = A + B on L^2(K_nu, dx) with invariant core Delta(K_nu) and prove dilation commutator cancellation [A, C] = [A, A] + [A, B] = I - I = 0. 5) Certify prime-only covariant variance C_prime^cov(1) = 4*pi^2*(M_0*M_2 - M_1^2) > 0 in 128-bit Arb and prove no-contradiction firewall. 6) Construct pole-regularized completed functional A_{Theta,C}^cov(t) on Phi_t = D(D-1/2)(t^{1/4} g_t) in Delta(R_+^x), audit its unrestricted double zero sum, RH-equivalence firewall, and generic heat base control, and isolate SUBGATE-TC-036A.",
+      "acceptance_criterion": "30/30 unit tests passing in tests/test_tc_modular_theta_conductor_curvature.py, 8/8 in tests/test_tc_canonical_selector_audit.py, 28/28 in tests/test_tc_transport_mismatch_curvature.py, 24/24 in tests/test_tc_full_spectrum_common_referent_bridge.py; Lean 4 formalization formal/RiemannScope/ModularThetaConductorCurvature.lean compiled (14 module declarations: 1 def + 13 theorems, 593 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); machine-readable artifact data/tc_modular_theta_conductor_curvature.json with all 36 required keys; review docs/reviews/TC_MODULAR_THETA_CONDUCTOR_CURVATURE.md with all 18 sections A-R; principal classification ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN (SUBGATE-TC-036A); OBL-CT-001A kept OPEN.",
+      "dependencies": [
+        "TASK-TC-035"
+      ],
+      "evidence": [
+        "formal/RiemannScope/ModularThetaConductorCurvature.lean",
+        "tc/modular_theta_conductor_curvature.py",
+        "tests/test_tc_modular_theta_conductor_curvature.py",
+        "docs/reviews/TC_MODULAR_THETA_CONDUCTOR_CURVATURE.md",
+        "data/tc_modular_theta_conductor_curvature.json",
+        "tc/canonical_selector_audit.py",
+        "docs/reviews/TC_CANONICAL_ZETA_SELECTOR_AUDIT.md",
+        "data/tc_canonical_zeta_selector_audit.json",
+        "formal/RiemannScope/README.md",
+        "CURVATURE_TRANSPORT.md",
+        "ARITHMETIC_RADIAL_BRIDGE.md",
+        "CMSA_GATE_G4.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-036 completed: Executed all four Section 3 scope repairs to TASK-TC-035; proved exact theta heat-scaling and unique drift-compensating operator L_heat = E(E-2) = 4(D^2 - D) at c=2 (HEAT_DRIFT_COMPENSATOR_UNIQUELY_FORCED, HEAT_DRIFT_COMPENSATOR_UNIQUE_BUT_NOT_MODULAR_SELECTOR); proved modular covariant Hessian discrepancy 4 H_mod,1 - L_heat = 8 D + I = 4 E + I != 0 (HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS, MODULAR_HESSIAN_DOES_NOT_REMOVE_HEAT_DRIFT, HEAT_COMPENSATOR_NOT_MODULARLY_FORCED, MODULAR_HESSIAN_DIFFERS_FROM_HEAT_COMPENSATOR); audited Burnol primary-source conductor H_nu = A + B on L^2(K_nu, dx) with invariant core Delta(K_nu) and proved dilation commutator cancellation [A, C] = I - I = 0 (CONDUCTOR_COMMUTES_WITH_DILATION, CONDUCTOR_DILATION_COMMUTATION_REMOVES_NEW_GRADE_SIGNAL); certified prime-only covariant variance C_prime^cov(1) in [+1.6097089323851242452337142816e-26 +/- 3.98e-55] > 0 in 128-bit Arb (PRIME_ONLY_COVARIANT_VARIANCE_POSITIVE_CERTIFIED) and proved no-contradiction firewall (POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW); constructed pole-regularized completed functional A_{Theta,C}^cov(t) on Phi_t = D(D-1/2)(t^{1/4} g_t) in Delta(R_+^x) (COMPLETED_THETA_CONDUCTOR_FUNCTIONAL_DEFINED), proved unrestricted double zero sum retention (UNRESTRICTED_DOUBLE_ZERO_SUM, THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL), RH-equivalence firewall (THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT), and generic base control across q in {2, e, tau, 10} (GENERIC_HEAT_VARIANCE_NOT_TC_CONSTRAINT); isolated SUBGATE-TC-036A (Zero-Independent Diagonal-Isolation and Sign-Incompatibility Identity) while keeping OBL-CT-001A OPEN; compiled Lean 4 formal/RiemannScope/ModularThetaConductorCurvature.lean (14 module declarations: 1 def + 13 theorems, total 593 compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 30/30 unit tests. Principal classification: ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN."
     }
   ]
 }
