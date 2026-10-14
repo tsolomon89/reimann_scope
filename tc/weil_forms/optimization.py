@@ -57,7 +57,7 @@ def validate_spectral_zero_coverage(
     ref_zeros: List[float],
     T_cutoff: float,
     tolerance: float = 1e-4
-) -> Tuple[bool, str, Optional[List[float]], List[float]]:
+) -> Tuple[bool, str, List[float], List[float]]:
     """Validate spectral zero coverage on [0, T_cutoff].
 
     Enforces rigorous invariant mathematical, disjoint-interval, and provenance checks:
@@ -288,6 +288,7 @@ def solve_complete_upper_objective(
 
     # Theoretical lower bound floor for this complete upper objective proxy
     d_sorted = np.sort(D_vec)
+    lambda_min_A: Optional[float] = None
     if len(d_sorted) >= 2:
         D_stat_min = float((d_sorted[0] + d_sorted[1]) / math.sqrt(2.0))
         tail_floor = float(c_tail_mult * (D_stat_min ** 2))
@@ -301,6 +302,7 @@ def solve_complete_upper_objective(
     else:
         D_stat_min = 0.0
         tail_floor = 0.0
+        lambda_min_A = None
         f_plus_floor = float(eps_finite)
 
     # Gated certified decision: requires f_plus < 0, certified finite error, feasibility
@@ -985,6 +987,9 @@ def compute_grouped_correlation_system(
     b_outer = np.outer(b_vec, b_vec)
     atom_c_vals = {key: float(np.sum(b_outer * M_mat)) for key, M_mat in grouped_M.items()}
     wrong_same = float(np.sum(b_outer * M_same_diag))
+
+    same_grade_val_z0: float = 0.0
+    omission_error_z0: float = 0.0
 
     # Check identity at z = 0 and z = 0.49 + 100j
     verification_points = {}
@@ -2450,6 +2455,7 @@ def construct_weighted_admissible_spectral_test(
     is_valid_coverage = False
     coverage_reason = "reference_zeros_not_loaded"
     unres_range = None
+    validated_crit: List[float] = []
     if reference_load_success and loaded_zeros:
         is_valid_coverage, coverage_reason, unres_range, validated_crit = validate_spectral_zero_coverage(
             loaded_zeros, T_cutoff

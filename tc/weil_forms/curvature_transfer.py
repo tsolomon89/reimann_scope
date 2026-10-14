@@ -913,7 +913,7 @@ def construct_authentic_production_density(
             'relative_discrepancy': rel_discrepancy
         }
 
-    def evaluate_weak_simpson_reflected_pair(a_val: float, gamma_val: float) -> Dict[str, float]:
+    def evaluate_weak_simpson_reflected_pair(a_val: float, gamma_val: float) -> Dict[str, Any]:
         """Compute reflected pair and quartet correction using certified weak formulation.
 
         Weakly evaluates Psi, K, and Delta by moving p(partial_u) onto the test functions,
