@@ -63,4 +63,9 @@ This directory houses the formal Lean 4 verification layer for `reimann_scope` c
    - Signed-weight countermodel (`signed_weight_curvature_negative`) and generic-base scale covariance control (`generic_base_mismatch_curvature_scaling`)
    - *Scope note:* Does not formalize the compact-support Euler-PDE homogeneity no-go (`PROVED_PAPER_DERIVATION`), the full two-variable explicit formula, the theta–Mellin regularized descent, global spectral positivity, or `OBL-CT-001A`.
 
-
+11. **`CanonicalSelectorAudit.lean`** (1 `def` + 15 `theorem` declarations):
+   - 1D Euler curvature determinant `oneDimCurvature` ($m_0 m_2 - m_1^2$) and separable tensor-square moment/curvature reduction $A_0 = m_0^2$, $A_1 = 2 m_0 m_1$, $A_2 = 2 m_0 m_2 + 2 m_1^2 \implies \mathfrak{C}_{\mathrm{arith}}(f \otimes f) = 2 m_0^2(m_0 m_2 - m_1^2)$ (`tensor_square_moment_A0`, `tensor_square_moment_A1`, `tensor_square_moment_A2`, `tensor_square_curvature_reduction`, `tensor_square_curvature_pos_iff`, `tensor_square_curvature_neg_iff`)
+   - Additive-to-multiplicative Euler chain-rule drift identity for Jacobi theta / heat kernels $\Theta_t(x,y) = e^{-\pi t(x^2+y^2)}$: $\mathfrak{C}_{\mathrm{arith}}(\Theta_t) = c^2(M_0 M_2 - M_1^2) - 2c M_0 M_1$ (`euler_chain_rule_second_deriv_curvature`, `euler_drift_strictly_negative_of_dominant`, `single_station_theta_gaussian_curvature_neg`)
+   - Multiplicative log-Gaussian curvature variance-vs-concavity identity $\mathfrak{C}_{\mathrm{arith}}(\Phi_{\alpha, w_0}) = 16\alpha^2(S_0 S_2 - S_1^2) - 8\alpha S_0^2$ and critical variance width threshold (`log_gaussian_curvature_identity`, `log_gaussian_curvature_neg_of_subcritical_variance`, `log_gaussian_curvature_pos_of_supercritical_variance`, `log_gaussian_critical_width_zero`)
+   - Canonical Selector Trilemma algebraic dichotomy (`selector_trilemma_algebraic_dichotomy`, `selector_trilemma_contradiction_of_nonneg_complement`)
+   - *Scope note:* Does not formalize Hamburger's uniqueness theorem, Burnol's co-Poisson dictionary, Nyman–Beurling $L^2$ completeness, Connes–Consani's semi-local trace formula, or `OBL-CT-001A`.

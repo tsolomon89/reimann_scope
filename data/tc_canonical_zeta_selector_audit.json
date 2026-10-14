@@ -1,0 +1,588 @@
+{
+  "task_id": "TASK-TC-035",
+  "task_completion_status": "TASK_TC_035_CANONICAL_SELECTOR_AUDIT_COMPLETE",
+  "title": "Canonical Zeta Selector Principle and Uniqueness Audit",
+  "parent_task_id": "TASK-TC-034R",
+  "parent_head": "d06d13c9cbd5f66589692f8eae41409781b18908",
+  "primary_research_question": "Which zero-independent axioms, derived from the completed zeta and its prime-side structure, uniquely select a non-scalar arithmetic functional from the otherwise arbitrary kernel space before curvature or spectral positivity is tested?",
+  "principal_classification": "NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS",
+  "secondary_trilemma_classification": "CANONICAL_SELECTOR_TRILEMMA_PROVED_OBL_CT_001A_OPEN",
+  "candidate_selector_audits": [
+    {
+      "selector_id": "SELECTOR-I",
+      "selector_name": "Uniqueness under the Functional Equation (Hamburger / Burnol Co-Poisson Dictionary)",
+      "governing_zero_independent_axioms": "Completed functional equation xi(s) = xi(1 - s) with pi^{-s/2} Gamma(s/2) Archimedean factor, moderate polynomial growth, and S-support / co-Poisson lattice condition on Z.",
+      "unique_object_selected": "1D scalar ray C * zeta(s) (equivalently the integer counting measure sum_{n>=1} delta_n and von Mangoldt log-derivative measure sum_{n>=2} Lambda(n) delta_n).",
+      "selects_unique_test_kernel_status": "SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL",
+      "arithmetic_curvature_constraint_status": "SIGN_INDEFINITE_ON_INVERSION_AND_PERMUTATION_SYMMETRIC_COMPACT_KERNELS",
+      "spectral_positivity_or_isolation_status": "DOUBLE_SPECTRAL_SUM_UNCHANGED_BY_KERNEL_INVOLUTION_SYMMETRY",
+      "circularity_or_obstruction_firewall": "Certified in 128-bit Arb: tilde{G}_-^inv and tilde{G}_+^inv in C_c^infty((0, infty)^2) are simultaneously nonnegative, permutation-symmetric F(x,y)=F(y,x), and inversion-symmetric F(16/x, 16/y)=F(x,y), yet C_arith(tilde{G}_-^inv) < 0 < C_arith(tilde{G}_+^inv).",
+      "evidence_class": "CERTIFIED_FINITE_AND_EXTERNAL_THEOREM",
+      "classification": "FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL",
+      "primary_literature_references": [
+        "Hamburger (1921), Math. Z. 10, 240-254",
+        "Burnol (2012), Deux extensions de Theoremes de Hamburger, Expos. Math. 30, 295-308, https://arxiv.org/abs/1106.4749v2",
+        "Burnol (2007), Entrelacement de co-Poisson, Ann. Inst. Fourier 57(2), 525-602, https://arxiv.org/abs/math/0407443v3",
+        "Baez-Duarte (2002), A general statement of the functional equation for the Riemann zeta-function, https://arxiv.org/abs/math/0207237v1"
+      ]
+    },
+    {
+      "selector_id": "SELECTOR-II",
+      "selector_name": "Jacobi Theta Self-Duality and Canonical Self-Dual Gaussian",
+      "governing_zero_independent_axioms": "Fourier self-duality hat{f} = f on R combined with ground-state strict positivity (or oscillator ground-state equation (-d^2/dx^2 + 4*pi^2*x^2) psi_0 = 2*pi*psi_0), inducing theta(1/t) = sqrt(t) theta(t).",
+      "unique_object_selected": "Canonical additive Gaussian Theta_1(x, y) = exp(-pi*(x^2 + y^2)) at the unique self-dual scale t = 1 (up to positive scalar).",
+      "selects_unique_test_kernel_status": "SELECTS_UNIQUE_ADDITIVE_GAUSSIAN_GROUND_STATE",
+      "arithmetic_curvature_constraint_status": "STRICTLY_NEGATIVE_EULER_CURVATURE_CERTIFIED_AT_SELF_DUAL_POINT",
+      "spectral_positivity_or_isolation_status": "TENSOR_SQUARE_FACTORIZES_INTO_1D_LINEAR_SUM_SQUARED_NO_DIAGONAL_ISOLATION",
+      "circularity_or_obstruction_firewall": "Additive-to-multiplicative chain-rule drift (t d/dt)^2 = t^2 d^2/dt^2 + t d/dt gives C_arith(Theta_t) = 4*pi^2*t^2*(M_0*M_2 - M_1^2) - 4*pi*t*M_0*M_1. At t = 1, the negative drift -4*pi*M_0*M_1 dominates the positive Bernstein variance by 5 orders of magnitude (C_arith / A_0^2 ~ -100.5305 ~ -32*pi < 0, certified in 128-bit Arb).",
+      "evidence_class": "LEAN_PROVED_AND_CERTIFIED_FINITE",
+      "classification": "THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT",
+      "primary_literature_references": [
+        "Riemann (1859), Monatsber. Berlin Akad., 671-680",
+        "Edwards (1974), Riemann's Zeta Function, Academic Press",
+        "Burnol (2004), Two complete and minimal systems associated with the zeros of the Riemann zeta function, J. Theor. Nombres Bordeaux 16, 65-94, https://arxiv.org/abs/math/0203120v7"
+      ]
+    },
+    {
+      "selector_id": "SELECTOR-III",
+      "selector_name": "Prime/Archimedean Explicit-Formula Balance and Conductor Operator",
+      "governing_zero_independent_axioms": "Weil explicit-formula distributional equality between prime-power von Mangoldt stations, the Archimedean Gamma distribution, and the dilaton-invariant conductor operator log|x| + log|y|.",
+      "unique_object_selected": "The global Weil explicit-formula linear functional W_zeta in D'(R_{>0}) (universal identity across all admissible test functions, not a single test kernel).",
+      "selects_unique_test_kernel_status": "UNIVERSAL_IDENTITY_ACROSS_ALL_ADMISSIBLE_KERNELS",
+      "arithmetic_curvature_constraint_status": "SUPPORT_VANISHING_TRIGGERS_EXACT_COMPLEMENT_CANCELLATION",
+      "spectral_positivity_or_isolation_status": "EXACT_CANCELLATION_BLOCKS_STRICT_SUBORDINATION_ROUTE",
+      "circularity_or_obstruction_firewall": "By TASK-TC-032R (`exact_cancellation_precludes_strict_subordination`), whenever support separation forces the arithmetic functional Q_eps = 0 identically, the omitted spectral/Archimedean complement R_eps = -D_eps cancels the selected block exactly rather than isolating a positive definite zero sum.",
+      "evidence_class": "LEAN_PROVED_AND_EXTERNAL_THEOREM",
+      "classification": "PRIME_ARCHIMEDEAN_BALANCE_IS_UNIVERSAL_DISTRIBUTIONAL_IDENTITY",
+      "primary_literature_references": [
+        "Weil (1952), Sur les 'formules explicites' de la theorie des nombres premiers, Comm. Sem. Math. Univ. Lund, 252-265",
+        "Burnol (2000), Sur les Formules Explicites I: analyse invariante, C. R. Acad. Sci. Paris 331, 423-428, https://arxiv.org/abs/math/0101068v1"
+      ]
+    },
+    {
+      "selector_id": "SELECTOR-IV",
+      "selector_name": "Extremal and Variational Principles (Nyman-Beurling-Baez-Duarte, Li, Suzuki)",
+      "governing_zero_independent_axioms": "Strict L^2 projection convexity d_N^2 = inf ||chi_{(0,1)} - sum_{k=1}^N c_k {1/(kx)}||^2 (Nyman-Beurling-Baez-Duarte), canonical rational test basis phi_n(s) = 1 - (1 - 1/s)^n (Li / Lagarias), or localized Rayleigh quotient minimization lambda_1(R) (Suzuki).",
+      "unique_object_selected": "For each fixed complexity/window parameter N or R, selects a unique finite-stage extremal vector f_N^* and value d_N^2 (or lambda_n, lambda_1(R)).",
+      "selects_unique_test_kernel_status": "SELECTS_INDEXED_INFINITE_SEQUENCE_NOT_SINGLE_KERNEL",
+      "arithmetic_curvature_constraint_status": "SINGLE_FINITE_STAGE_STRICTLY_POSITIVE_UNCONDITIONALLY_NO_ZERO_EXCLUSION",
+      "spectral_positivity_or_isolation_status": "CRITICAL_LINE_EXCLUSION_REQUIRES_ASYMPTOTIC_LIMIT_RH_EQUIVALENT",
+      "circularity_or_obstruction_firewall": "At any single finite N, d_N^2 > 0 holds unconditionally whether or not RH holds; excluding delta_rho != 0 requires lim_{N->infty} d_N = 0 (or forall n, lambda_n >= 0; forall R, lambda_1(R) >= 0), which is a known RH-equivalent criterion, and Mellin grade dilation D_K is an L^2 isometry (`PURE_COORDINATE_RESCALING_NO_GAIN`).",
+      "evidence_class": "PROVED_PAPER_DERIVATION_AND_EXTERNAL_THEOREM",
+      "classification": "VARIATIONAL_SELECTORS_REQUIRE_INFINITE_ASYMPTOTIC_FAMILY_RH_EQUIVALENT",
+      "primary_literature_references": [
+        "Baez-Duarte (2003), A new necessary and sufficient condition for the Riemann hypothesis, https://arxiv.org/abs/math/0307215v1",
+        "Burnol (2003), On an analytic estimate in the theory of the Riemann Zeta function and a Theorem of Baez-Duarte, Acta Cient. Venez. 54, 210-215, https://arxiv.org/abs/math/0202166v1",
+        "Lagarias (2007), Li Coefficients for Automorphic L-Functions, Ann. Inst. Fourier 57, 1689-1740, https://arxiv.org/abs/math/0404394v4",
+        "Suzuki (2026), Lowest eigenvalues of localized Weil operators, https://arxiv.org/abs/2606.09096v3"
+      ]
+    },
+    {
+      "selector_id": "SELECTOR-V",
+      "selector_name": "Canonical Operator Trace (Connes-Consani Semi-Local Trace and Sonin Compression)",
+      "governing_zero_independent_axioms": "Compression of the multiplicative scaling action onto the orthogonal complement of phase-space cutoff projections (Sonin space, cutoff parameter Lambda = 1) and expansion via prolate spheroidal wave functions.",
+      "unique_object_selected": "Canonical compressed scaling trace Tr_Sonin at the Archimedean place and semi-local trace functional over the adele class / scaling site.",
+      "selects_unique_test_kernel_status": "SELECTS_TRACE_FUNCTIONAL_AND_PROLATE_BASIS",
+      "arithmetic_curvature_constraint_status": "ARCHIMEDEAN_TRACE_POSITIVE_GLOBAL_SEMI_LOCAL_TRACE_WEIL_EQUIVALENT",
+      "spectral_positivity_or_isolation_status": "GLOBAL_TRACE_POSITIVITY_ACROSS_PRIMES_IS_RH_EQUIVALENT",
+      "circularity_or_obstruction_firewall": "In Connes-Consani (2020, 2021), positivity of the compressed scaling trace holds at the single Archimedean place via prolate/Toeplitz control, whereas in the general semi-local case including prime places, global positivity of the Weil functional remains equivalent to RH (`CURVATURE_POSITIVITY_IS_RH_EQUIVALENT`).",
+      "evidence_class": "EXTERNAL_THEOREM",
+      "classification": "OPERATOR_TRACE_COMPRESSION_REDUCES_TO_SEMI_LOCAL_WEIL_POSITIVITY",
+      "primary_literature_references": [
+        "Connes & Consani (2020), Weil positivity and Trace formula, the archimedean place, https://arxiv.org/abs/2006.13771v1",
+        "Connes & Consani (2021), Spectral Triples and Zeta-Cycles, https://arxiv.org/abs/2106.01715v1",
+        "Connes & Consani (2021), BC-system, absolute cyclotomy and the quantized calculus, https://arxiv.org/abs/2112.08820v1",
+        "Burnol (2001), Sur certains espaces de Hilbert de fonctions entieres (Sonine spaces), C. R. Acad. Sci. Paris 333, 201-206, https://arxiv.org/abs/math/0105120v1"
+      ]
+    },
+    {
+      "selector_id": "SELECTOR-VI",
+      "selector_name": "Functorial and Multi-Grade Naturality Stronger than Ordinary Rescaling",
+      "governing_zero_independent_axioms": "Multi-grade fiber isomorphism naturality F_K ~= F_J with exact 1-coboundary transitions c(J, K) = tau^{J-K}, strengthened to infinitesimal Euler scale homogeneity E F_0 = d F_0.",
+      "unique_object_selected": "Under ordinary transfer naturality: uniquely selects b = 1 (leaving F_0 arbitrary). Under strengthened Euler homogeneity E F_0 = d F_0 on C_c^infty((0, infty)^2): uniquely selects the zero kernel F_0 == 0.",
+      "selects_unique_test_kernel_status": "ORDINARY_NATURALITY_ARBITRARY_STRONG_HOMOGENEITY_ZERO_KERNEL",
+      "arithmetic_curvature_constraint_status": "ORDINARY_NATURALITY_K_INDEPENDENT_SIGN_INDEFINITE_HOMOGENEITY_IMPOSSIBLE_ON_COMPACT_SUPPORT",
+      "spectral_positivity_or_isolation_status": "VALUE_LEVEL_COVARIANCE_CANCELS_SPECTRAL_EXPONENT_AT_B_EQ_1",
+      "circularity_or_obstruction_firewall": "By TASK-TC-027 (`MULTIGRADE_NATURALITY_NO_GO_PROVED`), TASK-TC-033 (`TRANSPORT_MOMENT_INCOMPATIBILITY_PROVED`), and TASK-TC-034R (`COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED`), ordinary naturality leaves F_0 unselected while Euler homogeneity E F_0 = d F_0 forces F_0 == 0 on compact support.",
+      "evidence_class": "LEAN_PROVED_AND_PROVED_PAPER_DERIVATION",
+      "classification": "STRONGER_SCALE_NATURALITY_COLLAPSES_TO_HOMOGENEITY_NO_GO",
+      "primary_literature_references": [
+        "TASK-TC-027 (formal/RiemannScope/MultiGradeNaturality.lean)",
+        "TASK-TC-033 (formal/RiemannScope/GradeHankelConstraint.lean)",
+        "TASK-TC-034R (formal/RiemannScope/TransportMismatchCurvature.lean, docs/reviews/TC_034R_TRANSPORT_MISMATCH_CURVATURE_REPAIR_AUDIT.md)"
+      ]
+    }
+  ],
+  "selector_status_summary": {
+    "functional_equation_hamburger": "FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL",
+    "jacobi_theta_self_duality": "THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT",
+    "prime_archimedean_explicit_formula_balance": "PRIME_ARCHIMEDEAN_BALANCE_IS_UNIVERSAL_DISTRIBUTIONAL_IDENTITY",
+    "variational_extremal_principles": "VARIATIONAL_SELECTORS_REQUIRE_INFINITE_ASYMPTOTIC_FAMILY_RH_EQUIVALENT",
+    "canonical_operator_trace_compression": "OPERATOR_TRACE_COMPRESSION_REDUCES_TO_SEMI_LOCAL_WEIL_POSITIVITY",
+    "stronger_scale_naturality": "STRONGER_SCALE_NATURALITY_COLLAPSES_TO_HOMOGENEITY_NO_GO"
+  },
+  "separable_tensor_square_reduction": {
+    "m0": 7.586219138530122,
+    "m1": -5.867693380972925,
+    "m2": -2.5249966414112435,
+    "one_dim_curvature": -53.585003458911736,
+    "A0_2d": 57.55072081780071,
+    "A1_2d": -89.02721565152666,
+    "A2_2d": 30.549295534630485,
+    "two_dim_curvature": -6167.711148169429,
+    "formula_rhs": -6167.711148169429,
+    "A0_abs_err": 0.0,
+    "A1_abs_err": 1.4210854715202004e-14,
+    "A2_abs_err": 3.907985046680551e-14,
+    "curvature_identity_abs_err": 0.0,
+    "classification": "SEPARABLE_TENSOR_SQUARE_REDUCES_TO_1D_CURVATURE"
+  },
+  "inversion_and_permutation_symmetry_audit": {
+    "symmetry_verification": {
+      "inversion_center_c0": 4.0,
+      "inversion_map": "(x, y) |-> (16.0/x, 16.0/y)",
+      "support_interval": [
+        1.5238095238095237,
+        10.5
+      ],
+      "plateau_interval": [
+        1.5609756097560976,
+        10.25
+      ],
+      "active_station_set": [
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9
+      ],
+      "max_permutation_symmetry_abs_err": 0.0,
+      "max_inversion_symmetry_abs_err": 1.1102230246251565e-16,
+      "min_sampled_interior_value": 0.018003330822923262,
+      "max_exterior_jet_abs": 0.0,
+      "permutation_symmetric": true,
+      "inversion_symmetric": true,
+      "compactly_supported": true,
+      "nonnegative": true
+    },
+    "negative_inversion_symmetric_arb_enclosure": {
+      "witness_kind": "negative",
+      "certified": true,
+      "status": "INVERSION_SYMMETRIC_COMPACT_NEGATIVE_CURVATURE_CERTIFIED",
+      "prec_bits": 128,
+      "active_station_count": 7,
+      "active_station_pairs": 49,
+      "is_complete_compact_support_sum": true,
+      "permutation_symmetric": true,
+      "inversion_symmetric_around_c0_eq_4": true,
+      "A0_str": "[31.97511791996379592518104016176053908 +/- 7.39e-36]",
+      "A1_str": "[-44.8322735841015402080160775389498343 +/- 2.33e-35]",
+      "A2_str": "[-74.0995678190375518565342257975099912 +/- 4.77e-35]",
+      "curvature_enclosure": {
+        "arb_str": "[-4379.27517355180899705054019478775897 +/- 3.99e-33]",
+        "mid_display_float": -4379.275173551809,
+        "rad_display_float": 2.0393466099507997e-33,
+        "outward_float_interval": [
+          -4379.275173551809,
+          -4379.275173551809
+        ],
+        "strictly_negative": true,
+        "strictly_positive": false
+      },
+      "zero_excluded": true
+    },
+    "positive_inversion_symmetric_arb_enclosure": {
+      "witness_kind": "positive",
+      "certified": true,
+      "status": "INVERSION_SYMMETRIC_COMPACT_POSITIVE_CURVATURE_CERTIFIED",
+      "prec_bits": 128,
+      "active_station_count": 7,
+      "active_station_pairs": 49,
+      "is_complete_compact_support_sum": true,
+      "permutation_symmetric": true,
+      "inversion_symmetric_around_c0_eq_4": true,
+      "A0_str": "[90.1441650276811289805638842472560745 +/- 5.41e-35]",
+      "A1_str": "[91.0834790426325382338016911541519942 +/- 5.72e-35]",
+      "A2_str": "[374.799315297728007628661711642492346 +/- 5.14e-34]",
+      "curvature_enclosure": {
+        "arb_str": "[25489.7711759506050296948994043254704 +/- 2.78e-32]",
+        "mid_display_float": 25489.771175950606,
+        "rad_display_float": 1.3707050472023725e-32,
+        "outward_float_interval": [
+          25489.771175950606,
+          25489.771175950606
+        ],
+        "strictly_negative": false,
+        "strictly_positive": true
+      },
+      "zero_excluded": true
+    },
+    "classification": "INVERSION_AND_PERMUTATION_SYMMETRIC_SUBSPACE_SIGN_INDEFINITE"
+  },
+  "canonical_theta_gaussian_audit": {
+    "certified": true,
+    "status": "CANONICAL_THETA_GAUSSIAN_NEGATIVE_CURVATURE_CERTIFIED",
+    "prec_bits": 128,
+    "t": 1.0,
+    "N_cutoff": 15,
+    "M0_str": "[5.84305936627826185128361183211138217e-12 +/- 5.86e-48]",
+    "M1_str": "[4.67444888867549425074472651284519958e-11 +/- 6.09e-47]",
+    "M2_str": "[3.73956092528931269795724384242395039e-10 +/- 2.20e-46]",
+    "A0_str": "[5.84305936627826185128361183211138217e-12 +/- 5.86e-48]",
+    "A1_str": "[-2.93704285764878119747267934509396966e-10 +/- 1.52e-46]",
+    "A2_str": "[1.41757862150211216810475768131889443e-8 +/- 5.02e-44]",
+    "additive_bernstein_variance_term_str": "[1.6097089323851242452337142816e-26 +/- 3.96e-55]",
+    "multiplicative_euler_drift_term_str": "[-3.43226315570907653944921880924324602e-21 +/- 4.57e-57]",
+    "bernstein_term_positive": true,
+    "drift_term_negative": true,
+    "drift_dominates_bernstein": true,
+    "chain_rule_identity_verified": true,
+    "compact_support_curvature_enclosure": {
+      "arb_str": "[-3.432247058619752688206766472100430e-21 +/- 3.80e-55]",
+      "strictly_negative": true
+    },
+    "infinite_lattice_tail_bound_str": "[4.9089417609029824715230442864678994e-347 +/- 4.96e-382]",
+    "infinite_lattice_curvature_enclosure": {
+      "arb_str": "[-3.432247058619752688206766472100430e-21 +/- 3.80e-55]",
+      "strictly_negative": true
+    },
+    "normalized_curvature_over_A0_sq_str": "[-100.53052344669058612167632679576770 +/- 8.66e-33]",
+    "single_station_asymptotic_limit_minus_32_pi": -100.53096491487338,
+    "zero_excluded": true
+  },
+  "multiplicative_log_gaussian_variance_audit": {
+    "identity": "C_arith(F_{alpha, w0}) = 16*alpha^2*(S_0*S_2 - S_1^2) - 8*alpha*S_0^2",
+    "critical_width_formula": "alpha_* = S_0^2 / (2*(S_0*S_2 - S_1^2)) = 1 / (2*Var_w(log(nm)))",
+    "alpha_1_5_evaluation": {
+      "alpha": 1.5,
+      "w0": 2.772588722239781,
+      "S0": 44.289382225731515,
+      "S1": 16.47881346074552,
+      "S2": 16.853861519927108,
+      "station_variance_det": 474.89582176155227,
+      "normalized_variance": 0.24210240491678237,
+      "critical_alpha": 2.0652417730912855,
+      "variance_term_16_alpha2_det": 17096.249583415884,
+      "concavity_term_minus_8_alpha_S02": -23538.59253524331,
+      "arithmetic_curvature_direct": -6442.342951827459,
+      "arithmetic_curvature_formula": -6442.342951827428,
+      "identity_abs_err": 3.092281986027956e-11,
+      "sign_regime": "SUBCRITICAL_VARIANCE_NEGATIVE_CURVATURE"
+    },
+    "alpha_0_05_evaluation": {
+      "alpha": 0.05,
+      "w0": 2.772588722239781,
+      "S0": 148.9080679325511,
+      "S1": 165.58196351708665,
+      "S2": 272.47829315299697,
+      "station_variance_det": 13156.829544798231,
+      "normalized_variance": 0.5933552518270759,
+      "critical_alpha": 0.84266550006996,
+      "variance_term_16_alpha2_det": 526.2731817919293,
+      "concavity_term_minus_8_alpha_S02": -8869.4450781621,
+      "arithmetic_curvature_direct": -8343.171896370175,
+      "arithmetic_curvature_formula": -8343.171896370171,
+      "identity_abs_err": 3.637978807091713e-12,
+      "sign_regime": "SUBCRITICAL_VARIANCE_NEGATIVE_CURVATURE"
+    },
+    "classification": "LOG_GAUSSIAN_CURVATURE_SIGN_DEPENDS_ON_VARIANCE_RATIO"
+  },
+  "canonical_selector_trilemma": {
+    "trilemma_name": "Canonical Zeta Selector Trilemma",
+    "classification": "CANONICAL_SELECTOR_TRILEMMA_PROVED_OBL_CT_001A_OPEN",
+    "branches": {
+      "branch_1_scale_homogeneous_flatness": {
+        "condition": "E F_0 = d F_0",
+        "arithmetic_curvature_consequence": "C_arith(F_0) = A_0 A_2 - A_1^2 = 0 (Lean: homogeneous_arithmetic_curvature_zero)",
+        "obstruction": "Only F_0 == 0 lies in C_c^infty((0, infty)^2) (COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED); noncompact homogeneous powers do not converge across the critical strip.",
+        "status": "STRONGER_SCALE_NATURALITY_COLLAPSES_TO_HOMOGENEITY_NO_GO"
+      },
+      "branch_2_classical_symmetry_or_theta_self_duality": {
+        "condition": "Permutation symmetry F(x,y)=F(y,x), multiplicative inversion symmetry F(c_0^2/x, c_0^2/y)=F(x,y), or Fourier/theta self-duality hat{f}=f",
+        "arithmetic_curvature_consequence": "Inversion+permutation-symmetric compact kernels remain Arb-certified sign-indefinite; the canonical self-dual Gaussian Theta_1 has Arb-certified C_arith(Theta_1) < 0 due to the additive-to-multiplicative chain-rule drift -4*pi*M_0*M_1.",
+        "obstruction": "By Lean theorem `selector_trilemma_algebraic_dichotomy`, C_arith <= 0 and C_arith = S_diag + R_comp with S_diag > 0 merely implies R_comp < 0 unless R_comp >= 0 is independently proved (`selector_trilemma_contradiction_of_nonneg_complement`, OBL-CT-001A).",
+        "status": "THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT"
+      },
+      "branch_3_variational_or_semi_local_trace_family": {
+        "condition": "Nyman-Beurling L^2 projection sequence d_N^2, Li rational basis lambda_n, Suzuki localized Rayleigh minimum lambda_1(R), or Connes-Consani semi-local trace",
+        "arithmetic_curvature_consequence": "Selects a canonical indexed sequence or semi-local trace functional rather than a single finite kernel.",
+        "obstruction": "Each individual finite stage is strictly positive unconditionally; critical-line zero confinement holds only in the infinite asymptotic limit or global trace positivity, which is RH-equivalent.",
+        "status": "VARIATIONAL_SELECTORS_REQUIRE_INFINITE_ASYMPTOTIC_FAMILY_RH_EQUIVALENT"
+      }
+    },
+    "lean_dichotomy_theorems": [
+      "selector_trilemma_algebraic_dichotomy",
+      "selector_trilemma_contradiction_of_nonneg_complement"
+    ],
+    "obl_ct_001a_status": "OPEN"
+  },
+  "lean_theorem_map": {
+    "module_path": "formal/RiemannScope/CanonicalSelectorAudit.lean",
+    "total_module_declarations": 16,
+    "module_def_count": 1,
+    "module_theorem_count": 15,
+    "repository_compiled_theorem_declarations": 580,
+    "formal_proof_hygiene": "0 sorry, 0 admit, no nonstandard project axioms introduced",
+    "declarations": [
+      {
+        "identifier": "oneDimCurvature",
+        "kind": "def",
+        "statement_scope": "oneDimCurvature m0 m1 m2 := m0 * m2 - m1^2",
+        "algebraic_only": true,
+        "paper_step_supported": "1D prime-station Euler curvature determinant",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "tensor_square_moment_A0",
+        "kind": "theorem",
+        "statement_scope": "m0 * m0 = m0^2",
+        "algebraic_only": true,
+        "paper_step_supported": "Separable tensor-square zeroth Euler moment A_0(f x f) = m_0^2",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "tensor_square_moment_A1",
+        "kind": "theorem",
+        "statement_scope": "m1 * m0 + m0 * m1 = 2 * m0 * m1",
+        "algebraic_only": true,
+        "paper_step_supported": "Separable tensor-square first Euler moment A_1(f x f) = 2 m_0 m_1",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "tensor_square_moment_A2",
+        "kind": "theorem",
+        "statement_scope": "m2 * m0 + 2 * m1 * m1 + m0 * m2 = 2 * m0 * m2 + 2 * m1^2",
+        "algebraic_only": true,
+        "paper_step_supported": "Separable tensor-square second Euler moment A_2(f x f) = 2 m_0 m_2 + 2 m_1^2",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "tensor_square_curvature_reduction",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet (m0^2) (2*m0*m1) (2*m0*m2 + 2*m1^2) = 2 * m0^2 * oneDimCurvature m0 m1 m2",
+        "algebraic_only": true,
+        "paper_step_supported": "Theorem 1: 2D separable kernel curvature reduces to 2 m_0^2 (m_0 m_2 - m_1^2)",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "tensor_square_curvature_pos_iff",
+        "kind": "theorem",
+        "statement_scope": "m0 != 0 ==> (0 < curvatureDet (m0^2) (2*m0*m1) (2*m0*m2 + 2*m1^2) <-> 0 < oneDimCurvature m0 m1 m2)",
+        "algebraic_only": true,
+        "paper_step_supported": "Positive curvature equivalence for separable tensor-square kernels",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "tensor_square_curvature_neg_iff",
+        "kind": "theorem",
+        "statement_scope": "m0 != 0 ==> (curvatureDet (m0^2) (2*m0*m1) (2*m0*m2 + 2*m1^2) < 0 <-> oneDimCurvature m0 m1 m2 < 0)",
+        "algebraic_only": true,
+        "paper_step_supported": "Negative curvature equivalence for separable tensor-square kernels",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "euler_chain_rule_second_deriv_curvature",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet M0 (-c * M1) (c^2 * M2 - 2 * c * M1) = c^2 * curvatureDet M0 M1 M2 - 2 * c * M0 * M1",
+        "algebraic_only": true,
+        "paper_step_supported": "Theorem 2: Additive-to-multiplicative Euler chain-rule drift identity for Jacobi theta / heat kernels",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "euler_drift_strictly_negative_of_dominant",
+        "kind": "theorem",
+        "statement_scope": "0 < c /\\ c * curvatureDet M0 M1 M2 < 2 * M0 * M1 ==> curvatureDet M0 (-c * M1) (c^2 * M2 - 2 * c * M1) < 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Strict negativity of multiplicative Euler curvature when chain-rule drift dominates Bernstein variance",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "single_station_theta_gaussian_curvature_neg",
+        "kind": "theorem",
+        "statement_scope": "0 < w /\\ 0 < r /\\ 0 < c ==> curvatureDet w (-c*(w*r)) (c^2*(w*r^2) - 2*c*(w*r)) = -2*c*w^2*r /\\ < 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Exact negative Euler curvature -2 c w^2 r < 0 at a single dominant prime-station pair",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "log_gaussian_curvature_identity",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet S0 (-4*a*S1) (16*a^2*S2 - 8*a*S0) = 16 * a^2 * curvatureDet S0 S1 S2 - 8 * a * S0^2",
+        "algebraic_only": true,
+        "paper_step_supported": "Theorem 3: Multiplicative log-Gaussian curvature variance-vs-concavity identity",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "log_gaussian_curvature_neg_of_subcritical_variance",
+        "kind": "theorem",
+        "statement_scope": "0 < a /\\ 2 * a * curvatureDet S0 S1 S2 < S0^2 ==> curvatureDet S0 (-4*a*S1) (16*a^2*S2 - 8*a*S0) < 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Strict negativity of multiplicative log-Gaussian curvature in the subcritical variance regime",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "log_gaussian_curvature_pos_of_supercritical_variance",
+        "kind": "theorem",
+        "statement_scope": "0 < a /\\ S0^2 < 2 * a * curvatureDet S0 S1 S2 ==> 0 < curvatureDet S0 (-4*a*S1) (16*a^2*S2 - 8*a*S0)",
+        "algebraic_only": true,
+        "paper_step_supported": "Strict positivity of multiplicative log-Gaussian curvature in the supercritical variance regime",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "log_gaussian_critical_width_zero",
+        "kind": "theorem",
+        "statement_scope": "2 * a * curvatureDet S0 S1 S2 = S0^2 ==> curvatureDet S0 (-4*a*S1) (16*a^2*S2 - 8*a*S0) = 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Vanishing of multiplicative log-Gaussian curvature at the critical variance width",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "selector_trilemma_algebraic_dichotomy",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet A0 A1 A2 = S_diag + R_comp /\\ curvatureDet A0 A1 A2 <= 0 /\\ 0 < S_diag ==> R_comp < 0",
+        "algebraic_only": true,
+        "paper_step_supported": "Selector Trilemma dichotomy: nonpositive arithmetic curvature with positive diagonal block forces R_comp < 0 unless R_comp >= 0 is proved",
+        "external_theorem_dependency": "None"
+      },
+      {
+        "identifier": "selector_trilemma_contradiction_of_nonneg_complement",
+        "kind": "theorem",
+        "statement_scope": "curvatureDet A0 A1 A2 = S_diag + R_comp /\\ curvatureDet A0 A1 A2 <= 0 /\\ 0 < S_diag /\\ 0 <= R_comp ==> False",
+        "algebraic_only": true,
+        "paper_step_supported": "Conditional contradiction under independent complement nonnegativity (OBL-CT-001A)",
+        "external_theorem_dependency": "None"
+      }
+    ],
+    "not_formalized_in_lean": [
+      "Hamburger's uniqueness theorem for Dirichlet series with functional equation",
+      "Burnol's co-Poisson distribution dictionary",
+      "Nyman-Beurling-Baez-Duarte L^2 completeness theorem",
+      "Connes-Consani semi-local trace formula and prolate spheroidal wave function expansion",
+      "OBL-CT-001A"
+    ]
+  },
+  "arxiv_literature_retrieved": [
+    {
+      "arxiv_id": "1106.4749v2",
+      "url": "https://arxiv.org/abs/1106.4749v2",
+      "authors": [
+        "Jean-Francois Burnol"
+      ],
+      "title": "Deux extensions de Theoremes de Hamburger",
+      "relevance": "Selector I: Functional equation uniqueness and S-support distribution dictionary"
+    },
+    {
+      "arxiv_id": "math/0407443v3",
+      "url": "https://arxiv.org/abs/math/0407443v3",
+      "authors": [
+        "Jean-Francois Burnol"
+      ],
+      "title": "Entrelacement de co-Poisson",
+      "relevance": "Selector I & III: Co-Poisson intertwining and Mellin-zeta distribution duality"
+    },
+    {
+      "arxiv_id": "math/0101068v1",
+      "url": "https://arxiv.org/abs/math/0101068v1",
+      "authors": [
+        "Jean-Francois Burnol"
+      ],
+      "title": "Sur les Formules Explicites I: analyse invariante",
+      "relevance": "Selector III: Dilaton-invariant conductor operator log|x| + log|y| and local explicit-formula terms"
+    },
+    {
+      "arxiv_id": "math/0203120v7",
+      "url": "https://arxiv.org/abs/math/0203120v7",
+      "authors": [
+        "Jean-Francois Burnol"
+      ],
+      "title": "Two complete and minimal systems associated with the zeros of the Riemann zeta function",
+      "relevance": "Selector II & V: Co-Poisson formula and de Branges-Sonine Hilbert spaces"
+    },
+    {
+      "arxiv_id": "math/0105120v1",
+      "url": "https://arxiv.org/abs/math/0105120v1",
+      "authors": [
+        "Jean-Francois Burnol"
+      ],
+      "title": "Sur certains espaces de Hilbert de fonctions entieres, lies a la transformation de Fourier et aux fonctions L de Dirichlet et de Riemann",
+      "relevance": "Selector V: Sonine spaces of entire functions and zero-attached quotient vectors"
+    },
+    {
+      "arxiv_id": "math/0207237v1",
+      "url": "https://arxiv.org/abs/math/0207237v1",
+      "authors": [
+        "Luis Baez-Duarte"
+      ],
+      "title": "A general statement of the functional equation for the Riemann zeta-function",
+      "relevance": "Selector I: Dilation-invariant unitary operators and functional equation generality"
+    },
+    {
+      "arxiv_id": "math/0307215v1",
+      "url": "https://arxiv.org/abs/math/0307215v1",
+      "authors": [
+        "Luis Baez-Duarte"
+      ],
+      "title": "A new necessary and sufficient condition for the Riemann hypothesis",
+      "relevance": "Selector IV: Asymptotic sequence nature of Nyman-Beurling-Baez-Duarte criteria"
+    },
+    {
+      "arxiv_id": "math/0202166v1",
+      "url": "https://arxiv.org/abs/math/0202166v1",
+      "authors": [
+        "Jean-Francois Burnol"
+      ],
+      "title": "On an analytic estimate in the theory of the Riemann Zeta function and a Theorem of Baez-Duarte",
+      "relevance": "Selector IV: Complex-analytic proof of strengthened Nyman-Beurling criterion"
+    },
+    {
+      "arxiv_id": "math/0404394v4",
+      "url": "https://arxiv.org/abs/math/0404394v4",
+      "authors": [
+        "Jeffrey C. Lagarias"
+      ],
+      "title": "Li Coefficients for Automorphic L-Functions",
+      "relevance": "Selector IV: Li coefficients as values of Weil's quadratic functional on a canonical basis"
+    },
+    {
+      "arxiv_id": "2006.13771v1",
+      "url": "https://arxiv.org/abs/2006.13771v1",
+      "authors": [
+        "Alain Connes",
+        "Caterina Consani"
+      ],
+      "title": "Weil positivity and Trace formula, the archimedean place",
+      "relevance": "Selector V: Sonin-space compression of scaling action and prolate spheroidal wave functions"
+    },
+    {
+      "arxiv_id": "2106.01715v1",
+      "url": "https://arxiv.org/abs/2106.01715v1",
+      "authors": [
+        "Alain Connes",
+        "Caterina Consani"
+      ],
+      "title": "Spectral Triples and Zeta-Cycles",
+      "relevance": "Selector V: Restricted Weil quadratic form and prolate spheroidal eigenvectors"
+    },
+    {
+      "arxiv_id": "2112.08820v1",
+      "url": "https://arxiv.org/abs/2112.08820v1",
+      "authors": [
+        "Alain Connes",
+        "Caterina Consani"
+      ],
+      "title": "BC-system, absolute cyclotomy and the quantized calculus",
+      "relevance": "Selector V & VI: Bost-Connes scaling site and quantized calculus in relation to Weil positivity"
+    }
+  ],
+  "obl_ct_001a_status": "OPEN",
+  "obl_ct_001a_completed": false,
+  "rh_claimed": false,
+  "candidate_selector_exhaustion_refutes_tc": false,
+  "hypothesis_fidelity": {
+    "tc_hypothesis": "The same arithmetic object across transcendental grades implies a constraint.",
+    "selector_audit_finding": "Standard zero-independent zeta axioms (functional equation, theta self-duality, explicit-formula balance, finite-stage variational projections, semi-local trace compression, and multi-grade coboundary naturality) either select the distribution W_zeta while leaving the test kernel sign-indefinite, select the additive Gaussian Theta_1 whose multiplicative Euler curvature is strictly negative by chain-rule drift, or select an infinite family whose positivity is RH-equivalent.",
+    "distinction": "Absence of a single-kernel curvature selector among standard zero-independent structures refutes naive single-kernel selector implementations, NOT the general TC hypothesis; OBL-CT-001A remains OPEN."
+  }
+}

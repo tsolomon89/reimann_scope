@@ -3423,4 +3423,45 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    `formal/RiemannScope/TransportMismatchCurvature.lean` (18 module declarations: `1 def` + `17 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 565 compiled `theorem` declarations in repo):
    `curvatureDet`, `single_exponential_log_curvature_zero`, `two_exponential_curvature_identity`, `two_exponential_positive_log_curvature`, `positive_finite_exponential_curvature_nonneg`, `three_exponential_curvature_identity`, `three_exponential_curvature_nonneg`, `reciprocal_pair_curvature_strict_pos`, `homogeneous_arithmetic_curvature_zero`, `arithmetic_zero_curvature_and_spectral_positive_contradiction`, `euler_generator_scaling_algebra`, `mismatch_curvature_k_independent`, `even_second_difference_quadratic_ident`, `centered_conjugate_pairing_radial`, `centered_reflection_pairing_real_zero`, `mellin_mismatch_net_exponent`, `signed_weight_curvature_negative`, `generic_base_mismatch_curvature_scaling`.
 
+---
 
+# 67. Canonical Zeta Selector Principle and Uniqueness Audit (TASK-TC-035)
+
+1. **The Canonical Selector Problem**:
+   Because `TASK-TC-034R` certified that the complete arithmetic curvature $\mathfrak C_{\mathrm{arith}}(F_0) = A_0(F_0)A_2(F_0) - A_1(F_0)^2$ is sign-indefinite across generic nonnegative compactly supported smooth kernels $F_0 \in C_c^\infty((0,\infty)^2)$, `TASK-TC-035` audited six candidate zero-independent $\zeta$-specific principles to determine whether any of them uniquely selects a non-scalar arithmetic functional before curvature or spectral positivity is tested.
+
+2. **Exact Structural Theorems (`formal/RiemannScope/CanonicalSelectorAudit.lean`)**:
+   - **Separable Tensor-Square Curvature Reduction (`tensor_square_curvature_reduction`)**:
+     For any separable kernel $F_0(x,y) = f(x)f(y)$ with 1D Euler moments $m_k = \sum_{n\ge 2}\Lambda(n)((x\partial_x)^k f)(n)$,
+     \[
+     A_0(f\otimes f) = m_0^2, \qquad A_1(f\otimes f) = 2 m_0 m_1, \qquad A_2(f\otimes f) = 2 m_0 m_2 + 2 m_1^2, \qquad \mathfrak C_{\mathrm{arith}}(f\otimes f) = 2 m_0^2(m_0 m_2 - m_1^2).
+     \]
+   - **Additive-to-Multiplicative Euler Chain-Rule Drift Identity (`euler_chain_rule_second_deriv_curvature`)**:
+     For the Jacobi theta / heat family $\Theta_t(x,y) = \exp(-\pi t(x^2+y^2))$ with additive radial moments $M_k(t) = \sum_{n,m\ge 2}\Lambda(n)\Lambda(m)(n^2+m^2)^k e^{-\pi t(n^2+m^2)}$, the multiplicative Euler generator $\mathcal E = x\partial_x + y\partial_y = 2t\partial_t$ acts via $(t\partial_t)^2 = t^2\partial_t^2 + t\partial_t$, yielding:
+     \[
+     \mathfrak C_{\mathrm{arith}}(\Theta_t) = 4\pi^2 t^2\bigl(M_0(t)M_2(t) - M_1(t)^2\bigr) - 4\pi t\,M_0(t)M_1(t).
+     \]
+     At the unique Fourier self-dual point $t = 1$, 128-bit Arb ball arithmetic certifies that the negative chain-rule drift $-4\pi M_0 M_1 \approx -3.432263 \times 10^{-21}$ dominates the positive Bernstein variance $4\pi^2(M_0 M_2 - M_1^2) \approx +1.609709 \times 10^{-26}$ by five orders of magnitude, giving $\mathfrak C_{\mathrm{arith}}(\Theta_1) \approx -3.432247 \times 10^{-21} < 0$ (`THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT`).
+   - **Multiplicative Log-Gaussian Variance-Threshold Identity (`log_gaussian_curvature_identity`)**:
+     For $\Phi_{\alpha, w_0}(x,y) = \exp(-\alpha(\log(xy)-w_0)^2)$,
+     \[
+     \mathfrak C_{\mathrm{arith}}(\Phi_{\alpha, w_0}) = 16\alpha^2(S_0 S_2 - S_1^2) - 8\alpha S_0^2 = 8\alpha S_0^2\bigl(2\alpha\operatorname{Var}_w(\log(nm)) - 1\bigr),
+     \]
+     whose sign changes at the critical variance width $\alpha_\star = \frac{1}{2\operatorname{Var}_w(\log(nm))}$ (`LOG_GAUSSIAN_CURVATURE_SIGN_DEPENDS_ON_VARIANCE_RATIO`).
+
+3. **Inversion- and Permutation-Symmetric Compact Witness Sign Indefiniteness**:
+   By Hamburger (1921) and Burnol (2007, 2012), the functional equation $\xi(s) = \xi(1-s)$ selects the 1D distribution ray $\mathbb C\cdot \xi(s)$, not a single test kernel (`FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL`). Even on compactly supported smooth kernels $F_0 \in C_c^\infty((0,\infty)^2)$ satisfying $F_0 \ge 0$, permutation symmetry $F_0(x,y) = F_0(y,x)$, and multiplicative inversion symmetry $F_0(16/x, 16/y) = F_0(x,y)$ around $c_0 = 4$, 128-bit Arb certifies opposite curvature signs:
+   \[
+   \mathfrak C_{\mathrm{arith}}(\widetilde G_-^{\mathrm{inv}}) \approx -4379.275 < 0, \qquad \mathfrak C_{\mathrm{arith}}(\widetilde G_+^{\mathrm{inv}}) \approx +25489.771 > 0
+   \]
+   (`INVERSION_AND_PERMUTATION_SYMMETRIC_SUBSPACE_SIGN_INDEFINITE`).
+
+4. **Principal Classification and Open Obligation**:
+   \[
+   \boxed{\texttt{NO\_ZERO\_INDEPENDENT\_SINGLE\_KERNEL\_SELECTOR\_FOUND\_IN\_STANDARD\_ZETA\_AXIOMS}}
+   \]
+   (`CANONICAL_SELECTOR_TRILEMMA_PROVED_OBL_CT_001A_OPEN`; `OBL-CT-001A` remains **OPEN**; candidate selector exhaustion refutes naive single-kernel selector implementations, not the general TC hypothesis).
+
+5. **Lean 4 Formal Verification**:
+   `formal/RiemannScope/CanonicalSelectorAudit.lean` (16 module declarations: `1 def` + `15 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 580 compiled `theorem` declarations in repo):
+   `oneDimCurvature`, `tensor_square_moment_A0`, `tensor_square_moment_A1`, `tensor_square_moment_A2`, `tensor_square_curvature_reduction`, `tensor_square_curvature_pos_iff`, `tensor_square_curvature_neg_iff`, `euler_chain_rule_second_deriv_curvature`, `euler_drift_strictly_negative_of_dominant`, `single_station_theta_gaussian_curvature_neg`, `log_gaussian_curvature_identity`, `log_gaussian_curvature_neg_of_subcritical_variance`, `log_gaussian_curvature_pos_of_supercritical_variance`, `log_gaussian_critical_width_zero`, `selector_trilemma_algebraic_dichotomy`, `selector_trilemma_contradiction_of_nonneg_complement`.

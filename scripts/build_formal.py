@@ -57,6 +57,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/FullSpectrumCommonReferentBridge.lean",
     "formal/RiemannScope/GradeHankelConstraint.lean",
     "formal/RiemannScope/TransportMismatchCurvature.lean",
+    "formal/RiemannScope/CanonicalSelectorAudit.lean",
 ]
 
 

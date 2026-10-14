@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-033",
+  "active_task_id": "TASK-TC-035",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -900,6 +900,34 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-034R completed: Removed nonexistent Lean theorem reference from formal/RiemannScope/README.md and classified compact-support ray-homogeneity no-go as PROVED_PAPER_DERIVATION (COMPACT_SUPPORT_HOMOGENEITY_NO_GO_PAPER_PROVED); implemented smooth C^infty plateau compactification operator X_15 supported in (1.5, 15.5)^2 with flat plateau [1.75, 15.25]^2 preserving order-2 Euler jets at all 81 active prime-power station pairs 2 <= n, m <= 15; certified complete arithmetic sums for G_tilde_minus (C_arith in [-6442.34295182745976846022999751473105 +/- 8.42e-33] < 0, COMPACT_SUPPORT_NEGATIVE_ARITHMETIC_CURVATURE_CERTIFIED) and G_tilde_plus (C_arith in [+191887.248334839729574771407499577571 +/- 6.37e-31] > 0, COMPACT_SUPPORT_POSITIVE_ARITHMETIC_CURVATURE_CERTIFIED) in 128-bit Arb ball arithmetic with fail-closed fallback (superseding FINITE_TRUNCATION_SIGN_INDEFINITENESS_OBSERVED with COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE); replaced theta-Mellin Boolean claims with explicit conditional status strings (THETA_MELLIN_AUDIT_CONDITIONAL); preserved MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A and kept OBL-CT-001A OPEN. Task completion classification: TASK_TC_034R_TRANSPORT_CURVATURE_REPAIR_COMPLETE."
+    },
+    {
+      "task_id": "TASK-TC-035",
+      "priority": 41,
+      "objective": "Canonical Zeta Selector Principle and Uniqueness Audit (OBL-CT-001A Selector Audit)",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Determine which zero-independent axioms, derived from the completed zeta xi(s) and its prime-side structure, uniquely select a non-scalar arithmetic functional from the otherwise arbitrary kernel space before curvature or spectral positivity is tested, while keeping OBL-CT-001A OPEN unless a genuine zero-independent selector and unconditional positivity theorem are proved.",
+      "planned_calculation": "Audit all six candidate zero-independent selector principles (I: Functional equation / Hamburger-Burnol co-Poisson dictionary; II: Jacobi theta self-duality and canonical Gaussian Theta_1(x,y) = exp(-pi*(x^2+y^2)); III: Prime/Archimedean explicit-formula balance and Burnol's dilaton-invariant conductor operator log|x|+log|y|; IV: Extremal/variational principles Nyman-Beurling-Baez-Duarte d_N^2, Li lambda_n, Suzuki lambda_1(R); V: Connes-Consani semi-local trace formula and Sonin-space prolate spheroidal wave function compression; VI: Stronger multi-grade scale naturality); prove Separable Tensor-Square Curvature Reduction C_arith(f x f) = 2*m_0^2*(m_0*m_2 - m_1^2); prove Additive-to-Multiplicative Euler Chain-Rule Drift Identity C_arith(Theta_t) = 4*pi^2*t^2*(M_0*M_2 - M_1^2) - 4*pi*t*M_0*M_1 and certify C_arith(Theta_1) < 0 in 128-bit Arb; prove Multiplicative Log-Gaussian Variance-Threshold Identity; certify opposite curvature signs on functional-equation inversion + permutation symmetric compact kernels tilde{G}_-^inv, tilde{G}_+^inv in 128-bit Arb; formalize Canonical Selector Trilemma in Lean 4 (formal/RiemannScope/CanonicalSelectorAudit.lean: 1 def + 15 theorems = 16 declarations, 580 total compiled theorems in repository, 0 sorry, 0 admit).",
+      "acceptance_criterion": "8/8 unit tests passing in tests/test_tc_canonical_selector_audit.py and 28/28 in tests/test_tc_transport_mismatch_curvature.py; Lean 4 formalization formal/RiemannScope/CanonicalSelectorAudit.lean compiled (16 module declarations: 1 def + 15 theorems, 580 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); machine-readable artifact data/tc_canonical_zeta_selector_audit.json; review docs/reviews/TC_CANONICAL_ZETA_SELECTOR_AUDIT.md; 12 primary arXiv sources retrieved via literature-search-arxiv; principal classification NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS; OBL-CT-001A kept OPEN.",
+      "dependencies": [
+        "TASK-TC-034R"
+      ],
+      "evidence": [
+        "formal/RiemannScope/CanonicalSelectorAudit.lean",
+        "tc/canonical_selector_audit.py",
+        "tests/test_tc_canonical_selector_audit.py",
+        "docs/reviews/TC_CANONICAL_ZETA_SELECTOR_AUDIT.md",
+        "data/tc_canonical_zeta_selector_audit.json",
+        "formal/RiemannScope/README.md",
+        "CURVATURE_TRANSPORT.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-035 completed: Audited all six candidate zero-independent selector mechanisms with 12 primary arXiv sources retrieved via literature-search-arxiv; proved that functional-equation reflection + permutation symmetry leaves C_arith sign-indefinite on compactly supported smooth kernels (128-bit Arb certified tilde{G}_-^inv in [-4379.27517355180899705054019478775897 +/- 3.99e-33] < 0 and tilde{G}_+^inv in [+25489.7711759506050296948994043254704 +/- 2.78e-32] > 0; FUNCTIONAL_EQUATION_SELECTS_DISTRIBUTION_RAY_NOT_TEST_KERNEL); proved Separable Tensor-Square Curvature Reduction C_arith(f x f) = 2*m_0^2*(m_0*m_2 - m_1^2) and Additive-to-Multiplicative Euler Chain-Rule Drift Identity C_arith(Theta_t) = 4*pi^2*t^2*(M_0*M_2 - M_1^2) - 4*pi*t*M_0*M_1, certifying in 128-bit Arb that the unique theta self-dual Gaussian ground state Theta_1(x,y) = exp(-pi*(x^2+y^2)) has strictly negative multiplicative Euler curvature C_arith(Theta_1) in [-3.432247058619752688206766472100430e-21 +/- 3.80e-55] < 0 (THETA_SELF_DUAL_GAUSSIAN_HAS_NEGATIVE_EULER_CURVATURE_BY_DRIFT); proved Multiplicative Log-Gaussian Variance-Threshold Identity showing threshold crossing at alpha_* = 1/(2*Var_w(log(nm))); established Canonical Selector Trilemma (CANONICAL_SELECTOR_TRILEMMA_PROVED_OBL_CT_001A_OPEN) in Lean 4 (formal/RiemannScope/CanonicalSelectorAudit.lean: 1 def + 15 theorems = 16 declarations, total 580 compiled theorems in repository, 0 sorry, 0 admit); kept OBL-CT-001A OPEN. Principal classification: NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS."
     }
   ]
 }
