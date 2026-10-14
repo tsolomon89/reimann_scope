@@ -60,7 +60,13 @@
     ],
     "highest_admitted_integer_station": 15,
     "first_excluded_integer_station": 16,
-    "verified_derivative_order": 2
+    "verified_derivative_order": 2,
+    "mathematical_vs_floating_cutoff_distinction": {
+      "exact_mathematical_cutoff": "Exact C^infty function h(t) = exp(-1/t) for all t > 0 and 0 for t <= 0; on active stations 2 <= n <= 15 inside [1.75, 15.25], chi_{15}(n) = 1 and all derivatives vanish identically, while on excluded integers n <= 1 or n >= 16 outside (1.5, 15.5), chi_{15}(n) = 0 and all derivatives vanish identically.",
+      "floating_numerical_evaluator": "The IEEE-754 binary64 callable `flat_transition_h_jet(t)` used away from active integer stations includes an underflow shortcut `if inv_t > 700.0: return (0.0, 0.0, 0.0)` where exp(-1/t) < exp(-700) ~ 9.86e-305 approaches binary64 subnormal/underflow range.",
+      "arbitrary_precision_arb_evaluator": "`flat_transition_h_jet_arb(t, prec_bits)` evaluates the mathematical C^infty jet in outward Arb ball arithmetic without any artificial threshold, including 0 < t < 1/700.",
+      "affects_certified_station_sums": false
+    }
   },
   "plateau_interval": [
     1.75,
@@ -748,6 +754,12 @@
     "MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A"
   ],
   "exact_remaining_subgate": "OBL-CT-001A: Construct a zero-independent non-scalar arithmetic or theta functional whose transport curvature at b = 1 satisfies a kernel-independent arithmetic flatness or sign bound while its complete spectral expansion isolates a positive radial moment in delta_rho^2 without assuming Weil positivity.",
+  "canonical_selector_problem": {
+    "question": "What zeta-specific principle selects one canonical non-scalar arithmetic functional whose law is stronger than generic grade invariance?",
+    "governing_obstruction": "Arithmetic label compatibility (b = 1) makes mismatch curvature C_arith(F) = A_0 A_2 - A_1^2 grade-invariant, but does not make it zero, positive, or sign-definite: across nonnegative compactly supported kernels F in C_c^infty((0, infty)^2), C_arith(F) realizes certified strictly negative and strictly positive values. Until a zeta-specific selector is derived, arbitrary test kernels can realize arbitrary curvature signs and no universal TC constraint follows.",
+    "parent_obligation": "OBL-CT-001A",
+    "status": "OPEN"
+  },
   "obl_ct_001a_status": "OPEN",
   "obl_ct_001a_completed": false,
   "rh_claimed": false,

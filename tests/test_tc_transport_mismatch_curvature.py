@@ -43,6 +43,8 @@ from tc.transport_mismatch_curvature import (
     evaluate_mellin_mismatch_scaling,
     evaluate_mismatch_derivatives_at_zero,
     evaluate_reciprocal_pair_curvature,
+    flat_transition_h_jet,
+    flat_transition_h_jet_arb,
     get_lean_theorem_map,
     plateau_cutoff_1d_euler_jet,
     plateau_cutoff_1d_jet,
@@ -113,6 +115,16 @@ def test_03_plateau_cutoff_zero_outside_support() -> None:
             assert X0 == 0.0
             assert EX == 0.0
             assert E2X == 0.0
+
+    # At t = 0.001 (1/t = 1000 > 700), IEEE-754 binary64 underflows to 0.0, whereas
+    # the Arb arbitrary-precision evaluator certifies h(0.001) = exp(-1000) > 0 without shortcut.
+    assert flat_transition_h_jet(0.001) == (0.0, 0.0, 0.0)
+    arb_ramp = flat_transition_h_jet_arb(0.001, prec_bits=128)
+    assert arb_ramp["is_positive_t"] is True
+    assert arb_ramp["strictly_positive_h"] is True
+    arb_zero = flat_transition_h_jet_arb(0.0, prec_bits=128)
+    assert arb_zero["is_positive_t"] is False
+    assert arb_zero["strictly_positive_h"] is False
 
 
 def test_04_plateau_cutoff_one_on_active_station_interval() -> None:
@@ -456,3 +468,13 @@ def test_28_json_artifact_contains_all_required_repair_keys() -> None:
     weil_fw = audit_weil_equivalence_firewall()
     assert weil_fw["global_spectral_form_positivity_is_rh_equivalent"] is True
     assert weil_fw["independent_proof_mechanism"] is False
+
+    # Verify mathematical vs IEEE-754 floating cutoff distinction and canonical selector problem
+    cutoff_distinction = data["compactification_operator"][
+        "mathematical_vs_floating_cutoff_distinction"
+    ]
+    assert cutoff_distinction["affects_certified_station_sums"] is False
+    assert "flat_transition_h_jet_arb" in cutoff_distinction["arbitrary_precision_arb_evaluator"]
+    assert "canonical_selector_problem" in data
+    assert data["canonical_selector_problem"]["parent_obligation"] == "OBL-CT-001A"
+    assert data["canonical_selector_problem"]["status"] == "OPEN"

@@ -541,10 +541,23 @@ def evaluate_even_mismatch_defect(
 
 def flat_transition_h_jet(t: float) -> Tuple[float, float, float]:
     """
-    Evaluate the standard C^infty flat function h(t) and its first two derivatives:
+    IEEE-754 binary64 floating-point numerical realization of the standard C^infty flat
+    function h(t) and its first two derivatives away from the active integer stations:
         h(t) = 0          for t <= 0,
         h(t) = e^{-1/t}   for t > 0.
     Returns (h(t), h'(t), h''(t)).
+
+    Implementation note:
+      - The mathematical cutoff uses the exact C^infty function h(t) = exp(-1/t) for all t > 0.
+      - In IEEE-754 binary64 arithmetic, exp(-1/t) < exp(-700) ~ 9.86e-305 approaches binary64
+        subnormal/underflow range when 1/t > 700 (t < 1/700), so this float callable returns
+        (0.0, 0.0, 0.0) for inv_t > 700.0 as a numerical underflow guard.
+      - For exact arbitrary-precision evaluation without any artificial threshold (including
+        0 < t < 1/700), use `flat_transition_h_jet_arb(t, prec_bits)`.
+      - Neither transition evaluator affects the certified arithmetic curvature sums at
+        integer stations, because all active stations 2 <= n <= 15 lie strictly inside the
+        plateau [1.75, 15.25] where the cutoff is identically (1, 0, 0), and all excluded
+        integers n <= 1 or n >= 16 lie strictly outside (1.5, 15.5) where it is (0, 0, 0).
     """
     if t <= 0.0:
         return (0.0, 0.0, 0.0)
@@ -556,6 +569,53 @@ def flat_transition_h_jet(t: float) -> Tuple[float, float, float]:
     d1 = inv_t2 * val
     d2 = (inv_t2 * inv_t2 - 2.0 * inv_t2 * inv_t) * val
     return (val, d1, d2)
+
+
+def flat_transition_h_jet_arb(
+    t: float,
+    prec_bits: int = 128,
+) -> Dict[str, Any]:
+    """
+    Evaluate the exact mathematical C^infty flat function h(t) = exp(-1/t) (t > 0) and its
+    first two derivatives in outward Arb ball arithmetic without any artificial binary64
+    underflow threshold (valid including 0 < t < 1/700).
+    """
+    if t <= 0.0:
+        return {
+            "t": t,
+            "is_positive_t": False,
+            "h_str": "0",
+            "h_prime_str": "0",
+            "h_double_prime_str": "0",
+            "strictly_positive_h": False,
+        }
+    if flint is None:
+        return {
+            "t": t,
+            "status": ARB_CERTIFICATION_NOT_AVAILABLE,
+            "strictly_positive_h": False,
+        }
+    saved_prec = flint.ctx.prec
+    try:
+        flint.ctx.prec = prec_bits
+        arb = flint.arb
+        t_arb = arb(str(t))
+        inv_t = arb(1) / t_arb
+        val = (-inv_t).exp()
+        inv_t2 = inv_t * inv_t
+        d1 = inv_t2 * val
+        d2 = (inv_t2 * inv_t2 - arb(2) * inv_t2 * inv_t) * val
+        return {
+            "t": t,
+            "is_positive_t": True,
+            "h_str": str(val),
+            "h_prime_str": str(d1),
+            "h_double_prime_str": str(d2),
+            "strictly_positive_h": bool(val > 0),
+        }
+    finally:
+        flint.ctx.prec = saved_prec
+
 
 
 def smooth_step_S_jet(t: float) -> Tuple[float, float, float]:
@@ -2048,6 +2108,24 @@ def audit_transport_mismatch_curvature() -> Dict[str, Any]:
             "highest_admitted_integer_station": neg_bundle.highest_admitted_integer_station,
             "first_excluded_integer_station": neg_bundle.first_excluded_integer_station,
             "verified_derivative_order": neg_bundle.verified_derivative_order,
+            "mathematical_vs_floating_cutoff_distinction": {
+                "exact_mathematical_cutoff": (
+                    "Exact C^infty function h(t) = exp(-1/t) for all t > 0 and 0 for t <= 0; "
+                    "on active stations 2 <= n <= 15 inside [1.75, 15.25], chi_{15}(n) = 1 and "
+                    "all derivatives vanish identically, while on excluded integers n <= 1 or "
+                    "n >= 16 outside (1.5, 15.5), chi_{15}(n) = 0 and all derivatives vanish identically."
+                ),
+                "floating_numerical_evaluator": (
+                    "The IEEE-754 binary64 callable `flat_transition_h_jet(t)` used away from "
+                    "active integer stations includes an underflow shortcut `if inv_t > 700.0: return (0.0, 0.0, 0.0)` "
+                    "where exp(-1/t) < exp(-700) ~ 9.86e-305 approaches binary64 subnormal/underflow range."
+                ),
+                "arbitrary_precision_arb_evaluator": (
+                    "`flat_transition_h_jet_arb(t, prec_bits)` evaluates the mathematical C^infty "
+                    "jet in outward Arb ball arithmetic without any artificial threshold, including 0 < t < 1/700."
+                ),
+                "affects_certified_station_sums": False,
+            },
         },
         "plateau_interval": [1.75, 15.25],
         "support_interval": [1.5, 15.5],
@@ -2144,6 +2222,21 @@ def audit_transport_mismatch_curvature() -> Dict[str, Any]:
             OUTCOME_G_REDUCES_TO_OBL_CT_001A,
         ],
         "exact_remaining_subgate": theta_fallback.exact_remaining_theorem,
+        "canonical_selector_problem": {
+            "question": (
+                "What zeta-specific principle selects one canonical non-scalar arithmetic "
+                "functional whose law is stronger than generic grade invariance?"
+            ),
+            "governing_obstruction": (
+                "Arithmetic label compatibility (b = 1) makes mismatch curvature C_arith(F) = A_0 A_2 - A_1^2 "
+                "grade-invariant, but does not make it zero, positive, or sign-definite: across nonnegative "
+                "compactly supported kernels F in C_c^infty((0, infty)^2), C_arith(F) realizes certified "
+                "strictly negative and strictly positive values. Until a zeta-specific selector is derived, "
+                "arbitrary test kernels can realize arbitrary curvature signs and no universal TC constraint follows."
+            ),
+            "parent_obligation": "OBL-CT-001A",
+            "status": "OPEN",
+        },
         "obl_ct_001a_status": "OPEN",
         "obl_ct_001a_completed": False,
         "rh_claimed": False,
@@ -2231,6 +2324,7 @@ __all__ = [
     "evaluate_reciprocal_pair_curvature",
     "evaluate_transported_mismatch_kernel",
     "flat_transition_h_jet",
+    "flat_transition_h_jet_arb",
     "get_lean_theorem_map",
     "plateau_cutoff_1d_euler_jet",
     "plateau_cutoff_1d_jet",

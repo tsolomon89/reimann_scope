@@ -59,7 +59,32 @@ Both compactified witnesses use the $C^\infty$ plateau cutoff $\mathrm{X}_{15}(x
 
 ---
 
-## 4. Final Classifications
+## 4. Mathematical $C^\infty$ Cutoff vs. Floating-Point Transition Evaluator
+
+To avoid any ambiguity between the analytical definition of the plateau cutoff and its numerical evaluators:
+
+- **Exact Mathematical $C^\infty$ Cutoff:**
+  $$h(t) = \begin{cases} 0, & t \le 0, \\ e^{-1/t}, & t > 0, \end{cases} \qquad S(t) = \frac{h(t)}{h(t) + h(1-t)}, \qquad \mathrm{X}_{15}(x,y) = \chi_{1.5, 1.75, 15.25, 15.5}(x)\chi_{1.5, 1.75, 15.25, 15.5}(y) \in C_c^\infty((0,\infty)^2).$$
+  At every active integer station $2 \le n,m \le 15$ inside the flat plateau $[1.75, 15.25]^2$, the mathematical definition gives $(\mathrm{X}_{15}, \mathcal E\mathrm{X}_{15}, \mathcal E^2\mathrm{X}_{15})(n,m) = (1, 0, 0)$ identically; at every excluded integer station $n \le 1$ or $n \ge 16$ outside $(1.5, 15.5)^2$, it gives $(0, 0, 0)$ identically.
+- **Floating-Point Numerical Realization Away from Active Stations:**
+  The IEEE-754 binary64 callable `flat_transition_h_jet(t)` used when sampling non-integer points on the open transition ramps $(1.5, 1.75)$ and $(15.25, 15.5)$ includes a numerical underflow guard `if inv_t > 700.0: return (0.0, 0.0, 0.0)` where $e^{-1/t} < e^{-700} \approx 9.86 \times 10^{-305}$ enters IEEE-754 binary64 subnormal/underflow range.
+- **Arbitrary-Precision Arb Evaluator:**
+  `flat_transition_h_jet_arb(t, prec_bits)` evaluates $(h(t), h'(t), h''(t))$ in outward Arb ball arithmetic without any artificial threshold (including $0 < t < 1/700$). Neither ramp evaluator affects the certified arithmetic curvature sums at integer stations because all integer stations lie strictly in the plateau $[1.75, 15.25]^2$ or strictly outside $(1.5, 15.5)^2$.
+
+---
+
+## 5. The Canonical Non-Scalar Selector Problem (`OBL-CT-001A`)
+
+With `TASK-TC-034R` complete, the mathematical state of the curvature program is sharp:
+1. Arithmetic label compatibility ($b = 1$) makes the normalized mismatch curvature $\mathfrak C_{\mathrm{arith}}(F) = A_0 A_2 - A_1^2$ **grade-invariant**, but does **not** make it zero, positive, or sign-definite (`COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE`).
+2. Therefore the implication *"same arithmetic across grades $\implies \mathfrak C_{\mathrm{arith}} = 0$"* is false for the natural compact-kernel class $C_c^\infty((0,\infty)^2)$.
+3. The next substantive research problem under `OBL-CT-001A` is no longer another transport or curvature variation, but the **Selector Problem**:
+   $$\boxed{\begin{gathered}\textbf{What }\zeta\textbf{-specific principle selects one canonical non-scalar}\\\textbf{arithmetic functional whose law is stronger than generic}\\\textbf{grade invariance?}\end{gathered}}$$
+   Until that selector is derived, arbitrary test kernels can realize arbitrary curvature signs, and no universal TC constraint follows.
+
+---
+
+## 6. Final Classifications
 
 - **Task Completion Classification:** `TASK_TC_034R_TRANSPORT_CURVATURE_REPAIR_COMPLETE`
 - **Principal Mathematical Classification:** `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A`
@@ -75,3 +100,4 @@ Both compactified witnesses use the $C^\infty$ plateau cutoff $\mathrm{X}_{15}(x
   - `GENERIC_SCALE_CURVATURE`
   - `OBL_CT_001A_OPEN`
   - `CANDIDATE_FAILURE_DOES_NOT_REFUTE_TC`
+

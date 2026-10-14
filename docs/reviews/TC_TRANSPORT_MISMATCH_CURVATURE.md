@@ -276,10 +276,12 @@ $$\boxed{\texttt{CURVATURE\_POSITIVITY\_IS\_RH\_EQUIVALENT}.}$$
 
 ---
 
-### R. Principal classification & remaining open obligation (`OBL-CT-001A`)
+### R. Principal classification, cutoff implementation note, & Canonical Non-Scalar Selector Problem (`OBL-CT-001A`)
 
 - **Task Completion Status:** `TASK_TC_034R_TRANSPORT_CURVATURE_REPAIR_COMPLETE`
 - **Principal Classification:** `MISMATCH_CURVATURE_REDUCES_TO_OBL_CT_001A`
 - **`OBL-CT-001A` Status:** `OPEN` (`OBL_CT_001A_OPEN`)
+- **Mathematical $C^\infty$ Cutoff vs. Floating-Point Transition Evaluator:** The mathematical plateau cutoff uses the exact $C^\infty$ function $h(t) = e^{-1/t}$ ($t > 0$), $0$ ($t \le 0$). The IEEE-754 binary64 callable `flat_transition_h_jet(t)` used away from active stations includes an underflow shortcut (`inv_t > 700.0`) where $e^{-1/t} < e^{-700} \approx 9.86 \times 10^{-305}$, whereas `flat_transition_h_jet_arb(t, prec_bits)` evaluates the mathematical $C^\infty$ jet in outward Arb ball arithmetic without any threshold shortcut. Neither transition evaluator affects the certified arithmetic curvature sums at integer stations, because all contributing stations $2 \le n \le 15$ lie strictly inside the plateau $[1.75, 15.25]^2$ where the cutoff is returned identically as $(1,0,0)$, and all excluded integers $n \le 1$ or $n \ge 16$ lie strictly outside $(1.5, 15.5)^2$ where it is $(0,0,0)$.
 
-> **Remaining Theorem (`OBL-CT-001A`):** Construct a zero-independent, non-scalar arithmetic or theta-side functional whose relative transport curvature around $b = 1$ obeys a kernel-independent arithmetic flatness or sign law, while its complete spectral expansion (including all off-diagonal, pole, trivial-zero, and Archimedean terms) isolates a positive radial moment in $\delta_\rho^2$ without assuming a Weil-equivalent positivity hypothesis.
+> **Remaining Theorem & Canonical Non-Scalar Selector Problem (`OBL-CT-001A`):** Arithmetic label compatibility ($b = 1$) makes mismatch curvature $\mathfrak C_{\mathrm{arith}}(F) = A_0 A_2 - A_1^2$ grade-invariant, but does not make it zero, positive, or sign-definite (`COMPACT_SUPPORT_ARITHMETIC_CURVATURE_SIGN_INDEFINITE`). The next substantive problem under `OBL-CT-001A` is the **Selector Problem**: *What $\zeta$-specific principle selects one canonical non-scalar arithmetic functional whose law is stronger than generic grade invariance, while its complete spectral expansion isolates a positive radial moment in $\delta_\rho^2$ without assuming Weil positivity?*
+
