@@ -129,6 +129,19 @@ POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW = (
     "POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW"
 )
 
+# Section 15 Pole-Regularization Repair Classifications (`TASK-TC-036R`)
+TASK_TC_036R_ID = "TASK-TC-036R"
+TASK_TC_036R_STATUS = "TASK_TC_036R_POLE_REGULARIZATION_REPAIR_COMPLETE"
+UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES = (
+    "UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES"
+)
+CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH = (
+    "CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH"
+)
+COMPLETED_THETA_CONDUCTOR_REGULARIZATION_REPAIRED = (
+    "COMPLETED_THETA_CONDUCTOR_REGULARIZATION_REPAIRED"
+)
+
 # Section 16 & 17 Spectral Transfer and Pairing Classifications
 UNRESTRICTED_DOUBLE_ZERO_SUM = "UNRESTRICTED_DOUBLE_ZERO_SUM"
 SIGNED_SINGLE_ZERO_SUM = "SIGNED_SINGLE_ZERO_SUM"
@@ -150,6 +163,7 @@ ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN = (
 )
 PRINCIPAL_CLASSIFICATION = ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN
 OBL_CT_001A_STATUS = "OPEN"
+
 
 
 # ---------------------------------------------------------------------------
@@ -755,15 +769,19 @@ def solve_operator_selector_axioms() -> Dict[str, Any]:
             and Axiom 3 (2D theta modular inversion symmetry t |-> 1/t) require the odd-in-A_2
             coefficients to vanish:
                 b_1 = 0,   b_4 = 0,
-            so the second-order scale part must be b_2 A_2^2 = b_2 (E + I)^2 = b_2 (E^2 + 2 E + I),
+            leaving the 2-parameter scale family:
+                b_0 I + b_2 A_2^2 = b_0 I + b_2 (E + I)^2 = b_2 E^2 + 2 b_2 E + (b_0 + b_2) I,
             forcing:
-                c_2 = b_2,   c_1 = +2 c_2,   c_0 = c_2,   c_4 = 0.
+                c_2 = b_2,   c_1 = +2 c_2,   c_0 = c_2 + b_0 (with independent scalar b_0),   c_4 = 0.
+            Imposing vanishing on the dilation-invariant mode ker(A_2) (b_0 = 0) further restricts
+            to the single projective ray R^x * (E + I)^2 = R^x * 4 H_{mod,1} (where c_0 = c_2).
     Step 3: Axiom 4 (degree-two heat covariance / exact removal of t d/dt drift on Theta_t)
             requires the scale operator to be a multiple of L_heat = E(E - 2) = E^2 - 2 E,
             forcing:
                 c_1 = -2 c_2,   c_0 = 0.
-    Step 4: Combining (c_1 = +2 c_2) and (c_1 = -2 c_2) forces:
-                4 c_2 = 0  ==>  c_2 = 0, c_1 = 0, c_0 = 0!
+    Step 4: Combining modular/Fourier symmetry (c_1 = +2 c_2) and heat-drift removal (c_1 = -2 c_2)
+            forces (independently of the scalar offset b_0):
+                4 c_2 = 0  ==>  c_2 = 0, c_1 = 0, c_0 = 0 (and b_0 = 0)!
             And the remaining pure-conductor polynomial c_3 C + c_5 C^2 has degree 0 in scale
             differentiation E, violating Axiom 5 (second order in scale differentiation).
     """
@@ -789,9 +807,9 @@ def solve_operator_selector_axioms() -> Dict[str, Any]:
     reduced_basis_on_delta = ["I", "E", "E^2", "C", "C E", "C^2"]
 
     # Symbolic linear system for the scale-derivative coefficients (c_0, c_1, c_2, c_4):
-    # Modular/Fourier covariance (Axioms 1, 2, 3): c_1 - 2*c_2 = 0, c_0 - c_2 = 0, c_4 = 0
+    # Modular/Fourier covariance (Axioms 1, 2, 3): c_1 - 2*c_2 = 0, c_0 = c_2 + b_0, c_4 = 0
     # Heat-drift removal (Axiom 4):                c_1 + 2*c_2 = 0, c_0 = 0
-    # Unique solution: c_0 = c_1 = c_2 = c_4 = 0.
+    # Unique solution (even before fixing b_0):    c_2 = c_1 = c_0 = b_0 = c_4 = 0.
     return {
         "axioms_audited": axioms,
         "candidate_generators": generators_input,
@@ -802,8 +820,13 @@ def solve_operator_selector_axioms() -> Dict[str, Any]:
             "surviving_degree_le_2_monomials": reduced_basis_on_delta,
         },
         "modular_and_fourier_constraint_on_scale_part": {
-            "selected_projective_ray": "R^x * (E + I)^2 = R^x * 4 H_{mod,1}",
-            "coefficient_relations": {"c_1": "2 * c_2", "c_0": "c_2", "c_4": "0"},
+            "two_parameter_invariant_subspace": "b_0 I + b_2 (E + I)^2 = b_2 E^2 + 2 b_2 E + (b_0 + b_2) I",
+            "selected_projective_ray_after_ker_A2_normalization": "R^x * (E + I)^2 = R^x * 4 H_{mod,1} (at b_0 = 0)",
+            "coefficient_relations": {
+                "c_1": "2 * c_2",
+                "c_0": "c_2 + b_0 (c_0 = c_2 when normalized by b_0 = 0 on ker(E + I))",
+                "c_4": "0",
+            },
         },
         "heat_drift_removal_constraint_on_scale_part": {
             "selected_projective_ray": "R^x * E(E - 2) = R^x * L_heat",
@@ -814,6 +837,7 @@ def solve_operator_selector_axioms() -> Dict[str, Any]:
             "c_1": 0.0,
             "c_2": 0.0,
             "c_4": 0.0,
+            "b_0": 0.0,
             "second_order_scale_term_survives_joint_axioms": False,
         },
         "fitted_coefficients_used": False,
@@ -822,7 +846,7 @@ def solve_operator_selector_axioms() -> Dict[str, Any]:
         ),
         "split_canonical_rays_audited": {
             "ray_A_heat_compensator": "L_heat = E(E - 2) = 4(D^2 - D) (satisfies Axioms 4, 5, 6, 8; violates Axioms 1, 2, 3)",
-            "ray_B_modular_hessian": "4 H_{mod,1} = (E + I)^2 = 4(D + 1/2)^2 (satisfies Axioms 1, 2, 3, 5, 6, 8; violates Axiom 4)",
+            "ray_B_modular_hessian": "4 H_{mod,1} = (E + I)^2 = 4(D + 1/2)^2 (satisfies Axioms 1, 2, 3, 5, 6, 8 at b_0 = 0; violates Axiom 4)",
         },
     }
 
@@ -1005,55 +1029,207 @@ def audit_no_contradiction_firewall() -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def evaluate_unshifted_vs_corrected_pole_regularizer(
+    t: float = 1.0,
+    s_samples: Sequence[float] = (0.0, 0.25, 0.5, 0.75, 1.0, 2.0),
+) -> Dict[str, Any]:
+    """
+    Audit the TASK-TC-036R pole-regularization repair on the weight-normalized
+    1D theta state tilde{g}_t(u) = t^{1/4} exp(-pi * t * u^2):
+
+    1. Because M[tilde{g}_t](s) = int_0^infty tilde{g}_t(u) u^{s-1} du
+       = (1/2) pi^{-s/2} Gamma(s/2) t^{1/4 - s/2}, the heat Euler generator
+       D = t d/dt acts on the Mellin transform by:
+           lambda(s) = 1/4 - s/2 = -z/2,   where z = s - 1/2.
+    2. The unshifted operator D(D - 1/2) used in TASK-TC-036 therefore acts by:
+           (1/4 - s/2)(1/4 - s/2 - 1/2) = (1/4 - s/2)(-1/4 - s/2) = s^2/4 - 1/16,
+       which evaluates to -1/16 != 0 at s = 0 and +3/16 != 0 at s = 1, and in spatial
+       coordinates gives:
+           D(D - 1/2)(t^{1/4} e^{-r}) = t^{1/4} (r^2 - r - 1/16) e^{-r},   r = pi * t * u^2,
+       whose origin value at u = 0 is -(1/16) t^{1/4} != 0 (failing to kill the u = 0 mode).
+    3. The exact pole-annihilating operator on tilde{g}_t(u) is:
+           P_reg(D) := D^2 - 1/16 = (D - 1/4)(D + 1/4),
+       whose Mellin multiplier on t^{1/4 - s/2} is:
+           (1/4 - s/2)^2 - 1/16 = (1/4) s (s - 1) = (1/4) (z^2 - 1/4),
+       which vanishes at both s = 0 (z = -1/2) and s = 1 (z = +1/2), annihilates both
+       quarter-power modes t^{1/4} = tilde{g}_t(0) and t^{-1/4} = int_R tilde{g}_t(u) du,
+       and produces the repaired spatial state:
+           Phi_t(u) := (D^2 - 1/16)(t^{1/4} e^{-r})
+                     = t^{1/4} (r^2 - (3/2) r) e^{-r}
+                     = pi * t^{5/4} * u^2 * (pi * t * u^2 - 3/2) * exp(-pi * t * u^2),
+       satisfying Phi_t(0) = 0, Phi_t'(0) = 0, and int_0^infty Phi_t(u) du = 0.
+    4. Because Gamma(s/2) ~ 2/s has a simple pole at s = 0, the single factor s(s - 1)/4
+       cancels the Gamma-pole at s = 0 to give the finite value M[Phi_t](0) = -(1/4) t^{1/4}
+       and vanishes at s = 1 (M[Phi_t](1) = 0), while the squared regularizer
+       P_reg(D)^2 = (D^2 - 1/16)^2 produces Phi_t^{(2)}(u) = (D^2 - 1/16)^2 tilde{g}_t(u)
+       with M[Phi_t^{(2)}](0) = M[Phi_t^{(2)}](1) = 0.
+    """
+    if t <= 0.0:
+        raise ValueError(f"Heat parameter t must be positive, got {t}")
+    t_quarter = t ** 0.25
+    t_minus_quarter = t ** (-0.25)
+
+    # Spatial origin values at u = 0 (r = 0)
+    unshifted_origin_val = -t_quarter / 16.0
+    corrected_origin_val = 0.0
+
+    # Zero-frequency integral int_0^infty (...) du:
+    # For tilde{g}_t(u), int_0^infty tilde{g}_t(u) du = (1/2) t^{-1/4}.
+    # D acts on t^{-1/4} by -1/4:
+    #   D(D - 1/2)(1/2 t^{-1/4}) = (-1/4)(-3/4)(1/2 t^{-1/4}) = +3/32 t^{-1/4} != 0
+    #   (D^2 - 1/16)(1/2 t^{-1/4}) = (1/16 - 1/16)(1/2 t^{-1/4}) = 0.
+    unshifted_half_line_integral = (3.0 / 32.0) * t_minus_quarter
+    corrected_half_line_integral = 0.0
+
+    mellin_samples = []
+    max_multiplier_identity_err = 0.0
+    for s in s_samples:
+        z = s - 0.5
+        lam = 0.25 - 0.5 * s
+        unshifted_mult = lam * (lam - 0.5)
+        unshifted_formula = 0.25 * s * s - 0.0625
+        corrected_mult = lam * lam - 0.0625
+        corrected_s_formula = 0.25 * s * (s - 1.0)
+        corrected_z_formula = 0.25 * (z * z - 0.25)
+        err = max(
+            abs(unshifted_mult - unshifted_formula),
+            abs(corrected_mult - corrected_s_formula),
+            abs(corrected_mult - corrected_z_formula),
+        )
+        max_multiplier_identity_err = max(max_multiplier_identity_err, err)
+        mellin_samples.append(
+            {
+                "s": s,
+                "z": z,
+                "lambda_D": lam,
+                "unshifted_D_D_minus_half_multiplier": unshifted_mult,
+                "corrected_D2_minus_1_16_multiplier": corrected_mult,
+                "corrected_s_formula_s_s_minus_1_over_4": corrected_s_formula,
+                "corrected_z_formula_z2_minus_1_4_over_4": corrected_z_formula,
+                "abs_identity_err": err,
+            }
+        )
+
+    return {
+        "defect_status": UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES,
+        "repair_status": CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH,
+        "completed_repair_status": COMPLETED_THETA_CONDUCTOR_REGULARIZATION_REPAIRED,
+        "weight_normalized_state": "tilde{g}_t(u) = t^{1/4} exp(-pi * t * u^2)",
+        "mellin_scaling_power": "t^{1/4 - s/2} = t^{-z/2} (z = s - 1/2)",
+        "D_mellin_eigenvalue": "lambda(s) = 1/4 - s/2 = -z/2",
+        "defective_unshifted_operator": {
+            "operator": "D(D - 1/2)",
+            "mellin_multiplier_on_tilde_g_t": "(1/4 - s/2)(-1/4 - s/2) = s^2/4 - 1/16",
+            "value_at_s_eq_0": -1.0 / 16.0,
+            "value_at_s_eq_1": 3.0 / 16.0,
+            "spatial_polynomial_factor": "r^2 - r - 1/16 (r = pi * t * u^2)",
+            "origin_value_at_u_eq_0": unshifted_origin_val,
+            "half_line_integral_value": unshifted_half_line_integral,
+            "annihilates_poles": False,
+        },
+        "repaired_pole_regularizer": {
+            "operator": "P_reg(D) = D^2 - 1/16 = (D - 1/4)(D + 1/4)",
+            "mellin_multiplier_s": "(1/4 - s/2)^2 - 1/16 = (1/4) s (s - 1)",
+            "mellin_multiplier_z": "(1/4) (z^2 - 1/4), z = s - 1/2",
+            "value_at_s_eq_0": 0.0,
+            "value_at_s_eq_1": 0.0,
+            "annihilates_t_pos_quarter": True,
+            "annihilates_t_neg_quarter": True,
+            "spatial_formula": (
+                "Phi_t(u) = (D^2 - 1/16)(t^{1/4} e^{-pi t u^2}) "
+                "= t^{1/4} (pi^2 t^2 u^4 - (3/2) pi t u^2) e^{-pi t u^2}"
+            ),
+            "spatial_polynomial_factor": "r^2 - (3/2) r (r = pi * t * u^2)",
+            "origin_value_Phi_t_0": corrected_origin_val,
+            "origin_first_derivative_Phi_t_prime_0": 0.0,
+            "half_line_integral_int_0_infty_Phi_t_du": corrected_half_line_integral,
+            "mellin_transform_formula": (
+                "M[Phi_t](s) = (1/8) s (s - 1) pi^{-s/2} Gamma(s/2) t^{1/4 - s/2}, "
+                "holomorphic on Re(s) > -2 with M[Phi_t](0) = -(1/4) t^{1/4} and M[Phi_t](1) = 0"
+            ),
+            "squared_regularizer_formula": (
+                "Phi_t^{(2)}(u) = (D^2 - 1/16)^2 tilde{g}_t(u) "
+                "= t^{1/4} (r^4 - 6 r^3 + (45/8) r^2 - (3/8) r) e^{-r}, "
+                "with M[Phi_t^{(2)}](s) = (1/32) s^2 (s - 1)^2 pi^{-s/2} Gamma(s/2) t^{1/4 - s/2} "
+                "satisfying M[Phi_t^{(2)}](0) = M[Phi_t^{(2)}](1) = 0"
+            ),
+            "annihilates_poles": True,
+        },
+        "mellin_samples": mellin_samples,
+        "max_multiplier_identity_abs_err": max_multiplier_identity_err,
+    }
+
+
 def audit_completed_theta_conductor_functional() -> Dict[str, Any]:
     """
-    Audit Sections 15–19:
+    Audit Sections 15–19 (repaired in TASK-TC-036R):
     1. Construct the zero-independent completed arithmetic functional A_{Theta, C}^{cov}(t)
+       on the repaired pole-regularized theta state
+           Phi_t(u) = P_reg(D) tilde{g}_t(u) = (D^2 - 1/16)(t^{1/4} e^{-pi t u^2})
+                    = t^{1/4} (pi^2 t^2 u^4 - (3/2) pi t u^2) e^{-pi t u^2}
+       (and its squared pole-annihilated companion Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t),
        including prime-power terms, pole terms at s = 0 and s = 1, trivial-zero / Archimedean
-       gamma-factor terms via Burnol's local conductor H_infty, zero-mode regularization at u = 0,
-       and explicit domain conditions on Delta(R_+^x).
-    2. Derive the spectral representation and natural zero pairing.
+       gamma-factor terms via Burnol's local conductor H_infty, zero-mode cancellation at u = 0
+       and infinity, and explicit domain conditions on Delta(R_+^x).
+    2. Derive the spectral representation and natural zero pairing on the repaired state.
     3. Audit complement-sign and Weil-equivalence firewalls.
     """
+    pole_reg_audit = evaluate_unshifted_vs_corrected_pole_regularizer(t=1.0)
     required_background_terms = {
         "prime_power_terms": (
-            "W_prim(Phi_t) = -sum_{n>=2} Lambda(n) n^{-1/2} (Phi_t(n) + Phi_t(n^{-1})) = -sum_p H_p(Phi_{t,p})(1)"
+            "W_prim(J Phi_t) = -sum_{n>=2} Lambda(n) n^{-1/2} ((J Phi_t)(n) + (J Phi_t)(n^{-1})) "
+            "= -sum_p H_p(Phi_{t,p})(1), where (J Phi_t)(u) = u^{1/2} Phi_t(u); "
+            "because Phi_t(n^{-1}) = O(n^{-2}) as n -> infty, the reflected prime-power sum "
+            "sum_{n>=2} Lambda(n) n^{-1} Phi_t(n^{-1}) = O(sum_{n>=2} Lambda(n) n^{-3}) converges absolutely."
         ),
         "pole_terms_s_eq_0_and_1": (
-            "W_pole(Phi_t) = hat{Phi_t}(-1/2) + hat{Phi_t}(1/2) = int_0^infty Phi_t(u) (u^{-1/2} + u^{1/2}) du/u"
+            "W_pole(J Phi_t) = hat{(J Phi_t)}(-1/2) + hat{(J Phi_t)}(1/2) = M[Phi_t](0) + M[Phi_t](1). "
+            "For Phi_t = (D^2 - 1/16) tilde{g}_t, the factor s(s-1)/4 cancels the simple pole of "
+            "Gamma(s/2) ~ 2/s at s = 0 (leaving the finite value M[Phi_t](0) = -(1/4) t^{1/4}, which is "
+            "subsequently annihilated by L_heat = 4(D^2 - D) when paired with (D - 1/4), or vanishes "
+            "identically on the squared state Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t where "
+            "M[Phi_t^{(2)}](0) = M[Phi_t^{(2)}](1) = 0)."
         ),
         "trivial_zero_and_archimedean_gamma_terms": (
-            "W_infty(Phi_t) = -H_infty(Phi_{t,infty})(1) = (log(2*pi) + gamma_E) Phi_t(1) "
-            "+ int_{1/2}^infty (Phi_t(1/u) u^{1/2} - Phi_t(1))/|1 - u| du/(2u) "
-            "+ int_{-infty}^{1/2} Phi_t(1/|u|) |u|^{1/2} / |1 - u| du/(2|u|) "
+            "W_infty(J Phi_t) = -H_infty(Phi_{t,infty})(1) = (log(2*pi) + gamma_E) Phi_t(1) "
+            "+ int_{1/2}^infty (Phi_t(1/u) u - Phi_t(1))/|1 - u| du/(2u) "
+            "+ int_{-infty}^{1/2} Phi_t(1/|u|) |u| / |1 - u| du/(2|u|) "
             "(encodes pi^{-s/2} Gamma(s/2) and all trivial zeros s = -2m via Burnol Theorem D3)"
         ),
         "normalization_terms": (
-            "Half-density unitary isomorphism J: L^2(R, dx) -> L^2(R_+^x, du/u), (J phi)(u) = sqrt(2*u) phi(u), "
-            "centering the Mellin transform at Re(s) = 1/2"
+            "Multiplicative half-density lift (J Phi_t)(u) = u^{1/2} Phi_t(u) in L^2(R_+^x, du/u), "
+            "so that hat{(J Phi_t)}(z) = int_0^infty (J Phi_t)(u) u^{z} du/u = int_0^infty Phi_t(u) u^{s-1} du "
+            "= M[Phi_t](s) with s = 1/2 + z"
         ),
         "regularization_at_origin_and_infinity": (
-            "Because raw g_t(0) = 1 != 0 causes the reflected prime sum sum_{n>=2} Lambda(n) n^{-1/2} g_t(n^{-1}) "
-            "and the s = 0 pole integral to diverge, the theta state must be regularized by applying the "
-            "pole-annihilating differential factor P_reg(D) = D(D - 1/2) (which multiplies the Mellin transform "
-            "by s(s - 1)/4, matching completed xi(s) = 1/2 s(s - 1) pi^{-s/2} Gamma(s/2) zeta(s)) or compact "
-            "inversion-symmetric smoothing in Delta(R_+^x)."
+            "Because raw tilde{g}_t(0) = t^{1/4} != 0 and int_0^infty tilde{g}_t(u) du = (1/2) t^{-1/4} != 0 "
+            "cause the reflected prime sum and the s = 0, 1 pole integrals to diverge (and the unshifted "
+            "operator D(D - 1/2) gives D(D - 1/2) tilde{g}_t(0) = -(1/16) t^{1/4} != 0 with Mellin multiplier "
+            "s^2/4 - 1/16), the weight-normalized theta state MUST be regularized by the shifted pole-annihilator "
+            "P_reg(D) := D^2 - 1/16 = (D - 1/4)(D + 1/4), which multiplies M[tilde{g}_t](s) by "
+            "(1/4 - s/2)^2 - 1/16 = s(s - 1)/4 = (z^2 - 1/4)/4 (matching completed xi(s) = 1/2 s(s - 1) pi^{-s/2} Gamma(s/2) zeta(s))."
         ),
         "operator_domain_condition": (
-            "Phi_t := D(D - 1/2) tilde{g_t} in Delta(R_+^x), where hat{Phi_t}(z) is entire of rapid vertical decay "
-            "and vanishes at the pole locations z = +-1/2."
+            "Phi_t(u) := (D^2 - 1/16) tilde{g}_t(u) = t^{1/4} (pi^2 t^2 u^4 - (3/2) pi t u^2) e^{-pi t u^2} "
+            "(and Phi_t^{(2)} := (D^2 - 1/16)^2 tilde{g}_t), satisfying Phi_t(0) = 0, Phi_t'(0) = 0, "
+            "int_0^infty Phi_t(u) du = 0, super-polynomial Gaussian decay as u -> infty, and "
+            "hat{(J Phi_t)}(z) = (1/8)(z^2 - 1/4) pi^{-(z+1/2)/2} Gamma((z+1/2)/2) t^{-z/2} holomorphic on Re(z) > -5/2."
         ),
     }
 
     return {
         "functional_symbol": "A_{Theta, C}^{cov}(t)",
+        "pole_regularization_repair": pole_reg_audit,
         "zero_independent_definition": (
-            "For the pole-regularized theta state Phi_t = D(D - 1/2)(t^{1/4} g_t) in Delta(R_+^x) "
+            "For the repaired pole-regularized theta state Phi_t = (D^2 - 1/16)(t^{1/4} g_t) "
+            "(or its squared pole-vanishing companion Phi_t^{(2)} = (D^2 - 1/16)^2(t^{1/4} g_t)) "
             "and the completed zero-independent explicit-formula linear functional "
             "W_comp(Psi) := W_pole(Psi) - sum_{p} H_p(Psi_p)(1) - H_infty(Psi_infty)(1), "
             "define the quadratic completed functional "
-            "A_{Theta, C}^{cov}(t) := W_comp(Phi_t) W_comp(L_heat Phi_t) - W_comp(E Phi_t)^2 "
-            "(and its linear counterpart L_{Theta, C}^{cov}(t) := W_comp(L_heat Phi_t))."
+            "A_{Theta, C}^{cov}(t) := W_comp(J Phi_t) W_comp(L_heat J Phi_t) - W_comp(2 D J Phi_t)^2 "
+            "(and its linear counterpart L_{Theta, C}^{cov}(t) := W_comp(L_heat J Phi_t), "
+            "where 2 D = E_1D - 1/2 I acts on t^{1/4 - s/2} = t^{-z/2} by -z and "
+            "L_heat = 4(D^2 - D) = 2D(2D - 2) acts by z(z + 2))."
         ),
         "defined_without_nontrivial_zero_coordinates": True,
         "structural_type": {
@@ -1065,11 +1241,11 @@ def audit_completed_theta_conductor_functional() -> Dict[str, Any]:
         "all_background_terms_explicit": True,
         "complete_spectral_representation": {
             "linear_form_expansion": (
-                "L_{Theta, C}^{cov}(t) = sum_rho m_rho z_rho (z_rho + 2) hat{Phi_t}(z_rho), "
-                "where z_rho = rho - 1/2 = delta_rho + i*gamma_rho"
+                "L_{Theta, C}^{cov}(t) = sum_rho m_rho z_rho (z_rho + 2) hat{(J Phi_t)}(z_rho) - W_pole(L_heat J Phi_t), "
+                "where z_rho = rho - 1/2 = delta_rho + i*gamma_rho and hat{(J Phi_t)}(z_rho) = (1/4) t^{-z_rho/2} xi_factor(rho)"
             ),
             "quadratic_variance_expansion": (
-                "A_{Theta, C}^{cov}(t) = 1/2 sum_{rho, sigma} m_rho m_sigma hat{Phi_t}(z_rho) hat{Phi_t}(z_sigma) "
+                "A_{Theta, C}^{cov}(t) = 1/2 sum_{rho, sigma} m_rho m_sigma hat{(J Phi_t^{(2)})}(z_rho) hat{(J Phi_t^{(2)})}(z_sigma) "
                 "* [(z_rho - z_sigma)^2 + 2*(z_rho + z_sigma)]"
             ),
             "includes_multiplicities": True,
@@ -1077,7 +1253,7 @@ def audit_completed_theta_conductor_functional() -> Dict[str, Any]:
             "includes_cross_zero_terms": True,
             "includes_pole_and_archimedean_transfer": True,
             "convergence_justification": (
-                "Rapid Gaussian/Gamma decay |hat{Phi_t}(delta + i*gamma)| << |gamma|^{A} exp(-pi*gamma/4) "
+                "Rapid Gaussian/Gamma decay |hat{(J Phi_t)}(delta + i*gamma)| << |gamma|^{A} exp(-pi*|gamma|/4) "
                 "gives absolute convergence of both the single and double sums over nontrivial zeros."
             ),
             "linear_transfer_classification": SIGNED_SINGLE_ZERO_SUM,
@@ -1099,7 +1275,7 @@ def audit_completed_theta_conductor_functional() -> Dict[str, Any]:
                 "present_in_quadratic_variance": True,
                 "reason": (
                     "The quadratic variance is a product of two global explicit-formula sums "
-                    "W_comp(Phi_1) W_comp(Phi_2), which expands over all ordered zero pairs (rho, sigma)."
+                    "W_comp(Psi_1) W_comp(Psi_2), which expands over all ordered zero pairs (rho, sigma)."
                 ),
             },
             "conjugate_block_selected_by_hand": False,
@@ -1239,9 +1415,9 @@ def build_primary_source_literature_table() -> List[Dict[str, str]]:
                 "and ground-state / minimum-uncertainty selection at t = 1"
             ),
             "selected_object": "1D Gaussian g_1(x) = exp(-pi x^2), 2D Gaussian Theta_1(x, y) = exp(-pi(x^2+y^2)), and theta series theta(t)",
-            "operator_identity": "E Theta_t = 2 D Theta_t, L_heat Theta_t = E(E - 2) Theta_t = 4 t^2 d_t^2 Theta_t, nabla_w = D + w/2",
+            "operator_identity": "E Theta_t = 2 D Theta_t, L_heat Theta_t = E(E - 2) Theta_t = 4 t^2 d_t^2 Theta_t, nabla_w = D + w/2, P_reg(D) = D^2 - 1/16",
             "arithmetic_implication": "Uncompensated Euler curvature C_arith(Theta_1) < 0 by drift; drift-compensated prime variance C_prime^cov(t) >= 0",
-            "spectral_implication": "Mellin transform of pole-regularized theta state gives completed xi(s); quadratic variance yields double zero sum",
+            "spectral_implication": "Mellin transform of pole-regularized theta state (D^2 - 1/16) tilde{g}_t gives completed xi(s); quadratic variance yields double zero sum",
             "rh_equivalent": "NO (unconditional analytic continuation and functional equation)",
         },
         {
@@ -1266,7 +1442,7 @@ def build_primary_source_literature_table() -> List[Dict[str, str]]:
 
 
 # ---------------------------------------------------------------------------
-# Section 23: Exact Lean Theorem Map & Synchronization Verifier (`TASK-TC-036`)
+# Section 23: Exact Lean Theorem Map & Synchronization Verifier (`TASK-TC-036` / `TASK-TC-036R`)
 # ---------------------------------------------------------------------------
 
 
@@ -1281,6 +1457,14 @@ def get_modular_theta_conductor_lean_map() -> Dict[str, Any]:
             "statement_scope": "heatDriftCoeff c := 4 - 2 * c",
             "algebraic_only": True,
             "paper_step_supported": "First-order heat-drift coefficient 4 - 2c in L_c Theta_t",
+            "external_theorem_dependency": "None",
+        },
+        {
+            "identifier": "poleRegMultiplier",
+            "kind": "def",
+            "statement_scope": "poleRegMultiplier s := (1 / 4 - s / 2) ^ 2 - 1 / 16",
+            "algebraic_only": True,
+            "paper_step_supported": "TASK-TC-036R: Mellin multiplier of the corrected pole regularizer P_reg(D) = D^2 - 1/16 on t^{1/4 - s/2}",
             "external_theorem_dependency": "None",
         },
         {
@@ -1387,6 +1571,38 @@ def get_modular_theta_conductor_lean_map() -> Dict[str, Any]:
             "paper_step_supported": "Section 20: Generic scale base q > 1 homogeneity control (L = K log q)",
             "external_theorem_dependency": "None",
         },
+        {
+            "identifier": "unshifted_regularizer_mellin_defect",
+            "kind": "theorem",
+            "statement_scope": "(1/4 - s/2)*(1/4 - s/2 - 1/2) = s^2/4 - 1/16 /\\ value(0) = -1/16 /\\ value(1) = 3/16",
+            "algebraic_only": True,
+            "paper_step_supported": "TASK-TC-036R: Unshifted D(D - 1/2) fails to annihilate s = 0, 1 on t^{1/4 - s/2}",
+            "external_theorem_dependency": "None",
+        },
+        {
+            "identifier": "corrected_pole_regularizer_mellin_identity",
+            "kind": "theorem",
+            "statement_scope": "z = s - 1/2 -> poleRegMultiplier s = (1/4)*s*(s - 1) /\\ poleRegMultiplier s = (1/4)*(z^2 - 1/4) /\\ poleRegMultiplier 0 = 0 /\\ poleRegMultiplier 1 = 0",
+            "algebraic_only": True,
+            "paper_step_supported": "TASK-TC-036R: Repaired P_reg(D) = D^2 - 1/16 has Mellin multiplier s(s-1)/4 = (z^2 - 1/4)/4 vanishing at s = 0, 1",
+            "external_theorem_dependency": "None",
+        },
+        {
+            "identifier": "corrected_pole_regularizer_annihilates_quarter_powers",
+            "kind": "theorem",
+            "statement_scope": "((1/4)^2 - 1/16) * t_pos = 0 /\\ ((-1/4)^2 - 1/16) * t_neg = 0",
+            "algebraic_only": True,
+            "paper_step_supported": "TASK-TC-036R: P_reg(D) = D^2 - 1/16 annihilates both t^{1/4} = tilde{g}_t(0) and t^{-1/4} = int tilde{g}_t(u) du",
+            "external_theorem_dependency": "None",
+        },
+        {
+            "identifier": "corrected_pole_regularizer_spatial_jet",
+            "kind": "theorem",
+            "statement_scope": "((1/4 - r)^2 - r) - 1/16 = r^2 - (3/2)*r /\\ value_at_r_eq_0 = 0",
+            "algebraic_only": True,
+            "paper_step_supported": "TASK-TC-036R: Spatial polynomial factor r^2 - (3/2)r of Phi_t(u) = (D^2 - 1/16) tilde{g}_t(u) vanishes at u = 0",
+            "external_theorem_dependency": "None",
+        },
     ]
 
     return {
@@ -1394,7 +1610,7 @@ def get_modular_theta_conductor_lean_map() -> Dict[str, Any]:
         "total_module_declarations": len(declarations),
         "module_def_count": sum(1 for d in declarations if d["kind"] == "def"),
         "module_theorem_count": sum(1 for d in declarations if d["kind"] == "theorem"),
-        "repository_compiled_theorem_declarations": 593,
+        "repository_compiled_theorem_declarations": 597,
         "formal_proof_hygiene": "0 sorry, 0 admit, no nonstandard project axioms introduced",
         "declarations": declarations,
         "not_formalized_in_lean": [
@@ -1443,15 +1659,16 @@ def verify_modular_theta_conductor_lean_map_against_file(
 
 
 # ---------------------------------------------------------------------------
-# Section 24 & 27: Master Audit Entrypoint for `TASK-TC-036`
+# Section 24 & 27: Master Audit Entrypoint for `TASK-TC-036` / `TASK-TC-036R`
 # ---------------------------------------------------------------------------
 
 
 def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
     """
-    Run the complete `TASK-TC-036` Modular-Covariant Theta-Conductor Curvature Audit
-    and return the JSON-serializable artifact dictionary containing all 36 required keys
-    from Section 27 plus full diagnostic and literature metadata.
+    Run the complete `TASK-TC-036` / `TASK-TC-036R` Modular-Covariant Theta-Conductor
+    Curvature Audit (including the `TASK-TC-036R` pole-regularization and completed-functional
+    evidence repair) and return the JSON-serializable artifact dictionary containing all
+    required keys from Section 27 plus full diagnostic and literature metadata.
     """
     scope_patch = build_task_tc_035_scope_corrections()
     scaling_sample = evaluate_theta_euler_and_heat_jets(2.0, 3.0, t=1.0)
@@ -1464,6 +1681,7 @@ def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
     lq_firewall = audit_linear_quadratic_firewall()
     prime_var_arb = certify_prime_only_covariant_variance_arb(t=1.0, N_cutoff=15)
     no_contra = audit_no_contradiction_firewall()
+    pole_reg_repair = evaluate_unshifted_vs_corrected_pole_regularizer(t=1.0)
     completed_audit = audit_completed_theta_conductor_functional()
     generic_base = evaluate_generic_base_heat_control()
     lit_table = build_primary_source_literature_table()
@@ -1475,11 +1693,12 @@ def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
         "exact_statement": (
             "There exists a zero-independently defined operator pair (P, Q) on the invariant "
             "domain Delta(A_Q^x / Q^x) of the completed explicit-formula distribution W_xi and "
-            "a pole-regularized theta state Phi_t in Delta such that: (1) the arithmetic "
-            "evaluation A(Phi_t) := <W_xi, P Phi_t> (or bilinear form <W_xi, P Phi_t><W_xi, Q Phi_t>) "
-            "satisfies an unconditional zero-independent nonpositivity law A_arith(Phi_t) <= 0 "
-            "from prime-power, Archimedean conductor, and pole terms alone; and (2) its complete "
-            "spectral transfer A_spec(Phi_t) eliminates off-diagonal zero-zero cross terms "
+            "a pole-regularized theta state Phi_t = (D^2 - 1/16) tilde{g}_t (or Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t) "
+            "in Delta such that: (1) the arithmetic evaluation A(Phi_t) := <W_xi, P Phi_t> "
+            "(or bilinear form <W_xi, P Phi_t><W_xi, Q Phi_t>) satisfies an unconditional "
+            "zero-independent nonpositivity law A_arith(Phi_t) <= 0 from prime-power, "
+            "Archimedean conductor, and pole terms alone; and (2) its complete spectral "
+            "transfer A_spec(Phi_t) eliminates off-diagonal zero-zero cross terms "
             "(rho, sigma) (sigma != 1 - bar{rho}) and signed ordinate phases -4*gamma_rho^2 "
             "without invoking Weil positivity, reducing to a radial sum sum_rho w_rho(t) delta_rho^2 "
             "+ R_comp(t) with w_rho(t) > 0 and unconditionally certified R_comp(t) >= 0."
@@ -1491,19 +1710,23 @@ def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
             "contributing no non-commuting scale curvature; "
             "(c) L_heat flips the prime-only variance sign from C_arith < 0 to C_prime^cov > 0, "
             "which is compatible with spectral positivity (no contradiction); and "
-            "(d) the completed quadratic variance induces an unrestricted double zero sum over "
-            "(rho, sigma), whereas the single-zero convolution form Z(g * g^*) reduces to "
-            "RH-equivalent Weil positivity."
+            "(d) on the repaired pole-regularized state Phi_t = (D^2 - 1/16) tilde{g}_t "
+            "(and Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t), the completed quadratic variance "
+            "induces an unrestricted double zero sum over (rho, sigma), whereas the single-zero "
+            "convolution form Z(g * g^*) reduces to RH-equivalent Weil positivity."
         ),
     }
 
     return {
         "task_id": TASK_TC_036_ID,
         "task_completion_status": TASK_TC_036_STATUS,
-        "title": "Modular-Covariant Theta-Conductor Curvature Audit",
+        "repair_task_id": TASK_TC_036R_ID,
+        "repair_task_status": TASK_TC_036R_STATUS,
+        "title": "Modular-Covariant Theta-Conductor Curvature Audit (with TASK-TC-036R Pole-Regularization Repair)",
         "starting_head": STARTING_HEAD,
         "substantive_parent_head": SUBSTANTIVE_PARENT_HEAD,
         "task_tc_035_scope_corrections": scope_patch,
+        "pole_regularization_repair": pole_reg_repair,
         "theta_heat_state": {
             "one_dimensional": "g_t(x) = exp(-pi * t * x^2), t > 0",
             "two_dimensional": "Theta_t(x, y) = g_t(x) g_t(y) = exp(-pi * t * (x^2 + y^2)), t > 0",
@@ -1555,9 +1778,9 @@ def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
         "completed_functional_status": " explicitly_defined_regularized_quadratic_and_linear_distributions_on_delta ".strip().upper(),
         "completed_functional_audit": completed_audit,
         "linear_or_quadratic": (
-            "STRICTLY_SEPARATED: linear explicit-formula functional <W_comp, O Phi_t> is "
+            "STRICTLY_SEPARATED: linear explicit-formula functional <W_comp, O J Phi_t> is "
             "LINEAR_DISTRIBUTIONAL_REGULARIZED (SIGNED_SINGLE_ZERO_SUM); quadratic variance "
-            "W_comp(Phi_t) W_comp(L_heat Phi_t) - W_comp(E Phi_t)^2 is "
+            "W_comp(J Phi_t) W_comp(L_heat J Phi_t) - W_comp(2 D J Phi_t)^2 is "
             "QUADRATIC_DISTRIBUTIONAL_REGULARIZED (UNRESTRICTED_DOUBLE_ZERO_SUM)"
         ),
         "complete_spectral_transfer_status": UNRESTRICTED_DOUBLE_ZERO_SUM,
@@ -1672,7 +1895,9 @@ def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
                 "and modular Hessian 4 H_{mod,1} = (E + 1)^2 differ by 8D + 1; Burnol's conductor "
                 "commutes with dilation ([A_dil, C] = 0); prime-only drift compensation makes "
                 "arithmetic variance positive (creating no contradiction with spectral positivity); "
-                "and the completed quadratic variance remains an unrestricted double zero sum."
+                "and on the repaired pole-regularized state Phi_t = (D^2 - 1/16) tilde{g}_t "
+                "(and Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t), the completed quadratic variance "
+                "remains an unrestricted double zero sum."
             ),
             "general_tc_hypothesis_refuted": False,
         },
@@ -1680,10 +1905,12 @@ def audit_modular_theta_conductor_curvature() -> Dict[str, Any]:
 
 
 __all__ = [
+    "COMPLETED_THETA_CONDUCTOR_REGULARIZATION_REPAIRED",
     "COMPLETE_SPECTRAL_TRANSFER_NOT_DERIVED",
     "CONDITIONAL_COMPLEMENT_SIGN_DICHOTOMY_LEAN_PROVED",
     "CONDUCTOR_COMMUTES_WITH_DILATION",
     "CONDUCTOR_DILATION_COMMUTATION_REMOVES_NEW_GRADE_SIGNAL",
+    "CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH",
     "GENERIC_HEAT_VARIANCE_NOT_TC_CONSTRAINT",
     "HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS",
     "HEAT_COMPENSATOR_NOT_MODULARLY_FORCED",
@@ -1701,11 +1928,14 @@ __all__ = [
     "SIX_STANDARD_SELECTOR_FAMILIES_AUDITED",
     "STARTING_HEAD",
     "SUBSTANTIVE_PARENT_HEAD",
+    "TASK_TC_036R_ID",
+    "TASK_TC_036R_STATUS",
     "TASK_TC_036_ID",
     "TASK_TC_036_STATUS",
     "THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL",
     "THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT",
     "UNRESTRICTED_DOUBLE_ZERO_SUM",
+    "UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES",
     "audit_completed_theta_conductor_functional",
     "audit_conductor_operator_primary_sources",
     "audit_dilation_conductor_commutator",
@@ -1722,6 +1952,7 @@ __all__ = [
     "evaluate_generic_base_heat_control",
     "evaluate_modular_covariant_derivative_1d_theta",
     "evaluate_theta_euler_and_heat_jets",
+    "evaluate_unshifted_vs_corrected_pole_regularizer",
     "get_modular_theta_conductor_lean_map",
     "jacobi_theta_1d_truncated",
     "modular_weight_normalized_value",

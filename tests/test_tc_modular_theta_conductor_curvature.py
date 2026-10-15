@@ -8,6 +8,9 @@ from pathlib import Path
 
 from tc.canonical_selector_audit import audit_canonical_zeta_selector
 from tc.modular_theta_conductor_curvature import (
+    COMPLETED_THETA_CONDUCTOR_REGULARIZATION_REPAIRED,
+    CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH,
+    UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES,
     audit_completed_theta_conductor_functional,
     audit_conductor_operator_primary_sources,
     audit_dilation_conductor_commutator,
@@ -22,6 +25,7 @@ from tc.modular_theta_conductor_curvature import (
     evaluate_general_drift_operator_L_c,
     evaluate_generic_base_heat_control,
     evaluate_theta_euler_and_heat_jets,
+    evaluate_unshifted_vs_corrected_pole_regularizer,
     solve_operator_selector_axioms,
     verify_modular_theta_conductor_lean_map_against_file,
 )
@@ -468,14 +472,14 @@ def test_27_tau_specific_inputs_isolated():
 
 
 def test_28_lean_module_compiles_with_zero_sorry():
-    """Verify formal/RiemannScope/ModularThetaConductorCurvature.lean exists, has 0 sorry/admit, and declares all 13 theorems."""
+    """Verify formal/RiemannScope/ModularThetaConductorCurvature.lean exists, has 0 sorry/admit, and declares all 17 theorems and 2 defs."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_modular_theta_conductor_lean_map_against_file(LEAN_MODULE_PATH)
     assert ver["matches_exact"] is True
     assert ver["contains_sorry"] is False
     assert ver["contains_admit"] is False
-    assert len(ver["actual_theorems"]) == 13
-    assert len(ver["actual_defs"]) == 1
+    assert len(ver["actual_theorems"]) == 17
+    assert len(ver["actual_defs"]) == 2
 
 
 def test_29_artifact_json_schema_complete():
@@ -499,3 +503,65 @@ def test_30_obl_ct_001a_status_matches_proof_status():
     )
     assert report["exact_remaining_subgate"]["subgate_id"] == "SUBGATE-TC-036A"
     assert report["exact_remaining_subgate"]["status"] == "OPEN"
+
+
+def test_31_unshifted_regularizer_defect_diagnosed():
+    """Verify TASK-TC-036R diagnoses the unshifted regularizer D(D - 1/2) defect on tilde{g}_t(u) = t^{1/4} exp(-pi t u^2)."""
+    res = evaluate_unshifted_vs_corrected_pole_regularizer(t=1.0)
+    assert res["defect_status"] == UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES
+    defect = res["defective_unshifted_operator"]
+    assert defect["annihilates_poles"] is False
+    assert math.isclose(defect["value_at_s_eq_0"], -1.0 / 16.0, abs_tol=1e-15)
+    assert math.isclose(defect["value_at_s_eq_1"], 3.0 / 16.0, abs_tol=1e-15)
+    assert math.isclose(defect["origin_value_at_u_eq_0"], -1.0 / 16.0, abs_tol=1e-15)
+    assert math.isclose(defect["half_line_integral_value"], 3.0 / 32.0, abs_tol=1e-15)
+
+
+def test_32_corrected_pole_regularizer_mellin_and_spatial_identities():
+    """Verify TASK-TC-036R repaired regularizer P_reg(D) = D^2 - 1/16 has Mellin multiplier s(s-1)/4 = (z^2-1/4)/4 and vanishes at u=0 and in half-line integral."""
+    res = evaluate_unshifted_vs_corrected_pole_regularizer(t=1.0)
+    assert res["repair_status"] == CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH
+    assert res["completed_repair_status"] == COMPLETED_THETA_CONDUCTOR_REGULARIZATION_REPAIRED
+    assert res["max_multiplier_identity_abs_err"] < 1e-15
+
+    rep = res["repaired_pole_regularizer"]
+    assert rep["annihilates_poles"] is True
+    assert rep["annihilates_t_pos_quarter"] is True
+    assert rep["annihilates_t_neg_quarter"] is True
+    assert rep["value_at_s_eq_0"] == 0.0
+    assert rep["value_at_s_eq_1"] == 0.0
+    assert rep["origin_value_Phi_t_0"] == 0.0
+    assert rep["origin_first_derivative_Phi_t_prime_0"] == 0.0
+    assert rep["half_line_integral_int_0_infty_Phi_t_du"] == 0.0
+
+
+def test_33_completed_functional_uses_corrected_regularizer_D2_minus_1_16():
+    """Verify completed theta-conductor functional uses P_reg(D) = D^2 - 1/16 and preserves double-zero and RH-equivalence classifications."""
+    comp = audit_completed_theta_conductor_functional()
+    assert "(D^2 - 1/16)" in comp["zero_independent_definition"]
+    assert "D^2 - 1/16" in comp["background_terms_included"]["operator_domain_condition"]
+    assert (
+        comp["complete_spectral_representation"]["quadratic_transfer_classification"]
+        == "UNRESTRICTED_DOUBLE_ZERO_SUM"
+    )
+    assert (
+        comp["natural_zero_pairing_audit"]["pairing_classification"]
+        == "THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL"
+    )
+    assert (
+        comp["weil_equivalence_audit"]["classification"]
+        == "THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT"
+    )
+
+
+def test_34_section_11_two_parameter_modular_fourier_subspace_documented():
+    """Verify Section 11 operator selector documents the 2-parameter invariant subspace b_0 I + b_2 (E + I)^2 before ker(E + I) normalization."""
+    sel = solve_operator_selector_axioms()
+    mod_part = sel["modular_and_fourier_constraint_on_scale_part"]
+    assert "b_0 I + b_2 (E + I)^2" in mod_part["two_parameter_invariant_subspace"]
+    assert "c_2 + b_0" in mod_part["coefficient_relations"]["c_0"]
+    sol = sel["joint_linear_system_solution_for_scale_part"]
+    assert sol["c_2"] == 0.0
+    assert sol["c_1"] == 0.0
+    assert sol["b_0"] == 0.0
+

@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-036",
+  "active_task_id": "TASK-TC-036R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -960,7 +960,37 @@
         "RESEARCH_HYPOTHESIS.md",
         "RESEARCH_LEDGER.md"
       ],
-      "resolution": "TASK-TC-036 completed: Executed all four Section 3 scope repairs to TASK-TC-035; proved exact theta heat-scaling and unique drift-compensating operator L_heat = E(E-2) = 4(D^2 - D) at c=2 (HEAT_DRIFT_COMPENSATOR_UNIQUELY_FORCED, HEAT_DRIFT_COMPENSATOR_UNIQUE_BUT_NOT_MODULAR_SELECTOR); proved modular covariant Hessian discrepancy 4 H_mod,1 - L_heat = 8 D + I = 4 E + I != 0 (HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS, MODULAR_HESSIAN_DOES_NOT_REMOVE_HEAT_DRIFT, HEAT_COMPENSATOR_NOT_MODULARLY_FORCED, MODULAR_HESSIAN_DIFFERS_FROM_HEAT_COMPENSATOR); audited Burnol primary-source conductor H_nu = A + B on L^2(K_nu, dx) with invariant core Delta(K_nu) and proved dilation commutator cancellation [A, C] = I - I = 0 (CONDUCTOR_COMMUTES_WITH_DILATION, CONDUCTOR_DILATION_COMMUTATION_REMOVES_NEW_GRADE_SIGNAL); certified prime-only covariant variance C_prime^cov(1) in [+1.6097089323851242452337142816e-26 +/- 3.98e-55] > 0 in 128-bit Arb (PRIME_ONLY_COVARIANT_VARIANCE_POSITIVE_CERTIFIED) and proved no-contradiction firewall (POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW); constructed pole-regularized completed functional A_{Theta,C}^cov(t) on Phi_t = D(D-1/2)(t^{1/4} g_t) in Delta(R_+^x) (COMPLETED_THETA_CONDUCTOR_FUNCTIONAL_DEFINED), proved unrestricted double zero sum retention (UNRESTRICTED_DOUBLE_ZERO_SUM, THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL), RH-equivalence firewall (THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT), and generic base control across q in {2, e, tau, 10} (GENERIC_HEAT_VARIANCE_NOT_TC_CONSTRAINT); isolated SUBGATE-TC-036A (Zero-Independent Diagonal-Isolation and Sign-Incompatibility Identity) while keeping OBL-CT-001A OPEN; compiled Lean 4 formal/RiemannScope/ModularThetaConductorCurvature.lean (14 module declarations: 1 def + 13 theorems, total 593 compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 30/30 unit tests. Principal classification: ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN."
+      "resolution": "TASK-TC-036 completed: Executed all four Section 3 scope repairs to TASK-TC-035; proved exact theta heat-scaling and unique drift-compensating operator L_heat = E(E-2) = 4(D^2 - D) at c=2 (HEAT_DRIFT_COMPENSATOR_UNIQUELY_FORCED, HEAT_DRIFT_COMPENSATOR_UNIQUE_BUT_NOT_MODULAR_SELECTOR); proved modular covariant Hessian discrepancy 4 H_mod,1 - L_heat = 8 D + I = 4 E + I != 0 (HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS, MODULAR_HESSIAN_DOES_NOT_REMOVE_HEAT_DRIFT, HEAT_COMPENSATOR_NOT_MODULARLY_FORCED, MODULAR_HESSIAN_DIFFERS_FROM_HEAT_COMPENSATOR); audited Burnol primary-source conductor H_nu = A + B on L^2(K_nu, dx) with invariant core Delta(K_nu) and proved dilation commutator cancellation [A, C] = I - I = 0 (CONDUCTOR_COMMUTES_WITH_DILATION, CONDUCTOR_DILATION_COMMUTATION_REMOVES_NEW_GRADE_SIGNAL); certified prime-only covariant variance C_prime^cov(1) in [+1.6097089323851242452337142816e-26 +/- 3.98e-55] > 0 in 128-bit Arb (PRIME_ONLY_COVARIANT_VARIANCE_POSITIVE_CERTIFIED) and proved no-contradiction firewall (POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW); isolated SUBGATE-TC-036A (Zero-Independent Diagonal-Isolation and Sign-Incompatibility Identity) while keeping OBL-CT-001A OPEN. Principal classification: ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN."
+    },
+    {
+      "task_id": "TASK-TC-036R",
+      "priority": 43,
+      "objective": "Pole-Regularization and Completed-Functional Evidence Repair for TASK-TC-036",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Replace the defective unshifted pole-regularizer D(D-1/2) on tilde{g}_t(u) = t^{1/4}exp(-pi t u^2) (which produces Mellin multiplier s^2/4 - 1/16 != 0 at s=0 and leaves -1/16 t^{1/4} != 0 at u=0) with the exact pole-annihilating operator P_reg(D) = D^2 - 1/16 = (D-1/4)(D+1/4), prove its Mellin multiplier (1/4)s(s-1) = (1/4)(z^2 - 1/4) and invariant-core membership Phi_t in S_0(R) cap Delta(R_+^x), and verify that UNRESTRICTED_DOUBLE_ZERO_SUM, THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL, and THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT hold on the repaired state.",
+      "planned_calculation": "1) Prove unshifted_regularizer_mellin_defect, corrected_pole_regularizer_mellin_identity, corrected_pole_regularizer_annihilates_quarter_powers, and corrected_pole_regularizer_spatial_jet in formal/RiemannScope/ModularThetaConductorCurvature.lean (bringing module to 2 def + 17 theorems = 19 declarations, 597 total compiled theorems in repository). 2) Implement evaluate_unshifted_vs_corrected_pole_regularizer() and update audit_completed_theta_conductor_functional() and solve_operator_selector_axioms() in tc/modular_theta_conductor_curvature.py. 3) Regenerate data/tc_modular_theta_conductor_curvature.json and update tests/test_tc_modular_theta_conductor_curvature.py (34 tests). 4) Synchronize all documentation and status ledgers.",
+      "acceptance_criterion": "34/34 unit tests passing in tests/test_tc_modular_theta_conductor_curvature.py (94/94 across the 4 targeted suites); Lean 4 formalization formal/RiemannScope/ModularThetaConductorCurvature.lean compiled (19 module declarations: 2 def + 17 theorems, 597 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); machine-readable artifact data/tc_modular_theta_conductor_curvature.json and review docs/reviews/TC_MODULAR_THETA_CONDUCTOR_CURVATURE.md updated; principal classification ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN (SUBGATE-TC-036A) and OBL-CT-001A = OPEN preserved.",
+      "dependencies": [
+        "TASK-TC-036"
+      ],
+      "evidence": [
+        "formal/RiemannScope/ModularThetaConductorCurvature.lean",
+        "tc/modular_theta_conductor_curvature.py",
+        "tests/test_tc_modular_theta_conductor_curvature.py",
+        "docs/reviews/TC_MODULAR_THETA_CONDUCTOR_CURVATURE.md",
+        "data/tc_modular_theta_conductor_curvature.json",
+        "formal/RiemannScope/README.md",
+        "CURVATURE_TRANSPORT.md",
+        "ARITHMETIC_RADIAL_BRIDGE.md",
+        "CMSA_GATE_G4.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-036R completed: Replaced the defective unshifted operator D(D-1/2) on tilde{g}_t(u) = t^{1/4}exp(-pi t u^2) with the exact pole-annihilating operator P_reg(D) = D^2 - 1/16 = (D-1/4)(D+1/4); proved its Mellin multiplier on t^{1/4 - s/2} is (1/4 - s/2)^2 - 1/16 = (1/4)s(s-1) = (1/4)(z^2 - 1/4) vanishing at s in {0, 1}, annihilating both t^{1/4} = tilde{g}_t(0) and t^{-1/4} = int_R tilde{g}_t(u)du, and placing Phi_t(u) = t^{1/4}(pi^2 t^2 u^4 - (3/2)pi t u^2)exp(-pi t u^2) in S_0(R) cap Delta(R_+^x) (EXACT_POLE_ANNIHILATING_OPERATOR_PROVED, COMPLETED_THETA_STATE_IN_INVARIANT_CORE_PROVED); verified both Phi_t and its squared companion Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t (with W_pole(J Phi_t^{(2)}) = 0) preserve UNRESTRICTED_DOUBLE_ZERO_SUM, THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL, and THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT; tightened Section 11 operator-selector wording to the 2-parameter self-adjoint subspace b_0 I + b_2(E+I)^2; compiled Lean 4 formal/RiemannScope/ModularThetaConductorCurvature.lean (19 module declarations: 2 def + 17 theorems, 597 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 34/34 unit tests (94/94 across the 4 targeted suites). Task completion classification: TASK_TC_036R_POLE_REGULARIZATION_REPAIR_COMPLETE."
     }
   ]
 }

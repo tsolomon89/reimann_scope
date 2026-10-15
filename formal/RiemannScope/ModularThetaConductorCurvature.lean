@@ -40,6 +40,20 @@ Formalizes the exact algebraic identities and firewall implications for TASK-TC-
 13. `generic_quadratic_heat_base_control`:
      Replacing tau = 2*pi by any scale base q > 1 with log-scale factor L = log q scales
      every Euler derivative by L and the covariant variance by L^2 * c^2 * (M_0 M_2 - M_1^2).
+14. `unshifted_regularizer_mellin_defect` (TASK-TC-036R):
+     On tilde{g}_t(u) = t^{1/4} exp(-pi t u^2) whose Mellin transform scales as t^{1/4 - s/2},
+     D = t d/dt acts by lambda(s) = 1/4 - s/2, so D(D - 1/2) acts by s^2/4 - 1/16
+     (which takes nonzero values -1/16 at s = 0 and 3/16 at s = 1, failing to kill s = 0, 1).
+15. `corrected_pole_regularizer_mellin_identity` (TASK-TC-036R):
+     The corrected pole-annihilator P_reg(D) = D^2 - 1/16 acts on t^{1/4 - s/2} by
+     (1/4 - s/2)^2 - 1/16 = (1/4) s (s - 1) = (1/4) (z^2 - 1/4) (where z = s - 1/2),
+     vanishing at both s = 0 and s = 1 (z = -1/2 and z = 1/2).
+16. `corrected_pole_regularizer_annihilates_quarter_powers` (TASK-TC-036R):
+     P_reg(D) = D^2 - 1/16 annihilates both t^{1/4} (the origin value tilde{g}_t(0))
+     and t^{-1/4} (the zero-frequency Fourier integral mode int tilde{g}_t(u) du).
+17. `corrected_pole_regularizer_spatial_jet` (TASK-TC-036R):
+     On tilde{g}_t(u) = t^{1/4} exp(-r) with r = pi t u^2, P_reg(D) = D^2 - 1/16 produces
+     the spatial polynomial factor ((1/4 - r)^2 - r) - 1/16 = r^2 - (3/2) r, which vanishes at r = 0.
 
 Note: Burnol's functional-analytic conductor operator domain theory, the global explicit formula,
 modular theta transformation analysis, global spectral positivity, and trace-class properties are
@@ -50,11 +64,18 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 import RiemannScope.CanonicalSelectorAudit
 
+noncomputable section
+
 namespace RiemannScope
 
 /-- Heat-drift operator coefficient of the first-order term t d/dt on Theta_t for L_c = E(E - c). -/
 def heatDriftCoeff (c : ℝ) : ℝ :=
   4 - 2 * c
+
+/-- Mellin multiplier of the corrected pole regularizer P_reg(D) = D^2 - 1/16 on t^{1/4 - s/2},
+    where D = t d/dt acts by 1/4 - s/2. -/
+def poleRegMultiplier (s : ℝ) : ℝ :=
+  (1 / 4 - s / 2) ^ 2 - 1 / 16
 
 /-- 1. Spatial Euler generator E = x d/dx + y d/dy vs heat Euler generator D = t d/dt on
     the quadratic heat exponent -p * t * (x^2 + y^2): E Theta_t = 2 D Theta_t. -/
@@ -179,4 +200,44 @@ theorem generic_quadratic_heat_base_control (M0 M1 M2 c L : ℝ) :
   unfold curvatureDet
   ring
 
+/-- 14. Unshifted regularizer defect (TASK-TC-036R):
+    on tilde{g}_t(u) = t^{1/4} exp(-pi t u^2) whose Mellin transform scales as t^{1/4 - s/2},
+    D(D - 1/2) acts by (1/4 - s/2)(1/4 - s/2 - 1/2) = s^2 / 4 - 1/16, which equals -1/16 at s = 0
+    and 3/16 at s = 1, failing to vanish at s = 0, 1. -/
+theorem unshifted_regularizer_mellin_defect (s : ℝ) :
+    (1 / 4 - s / 2) * (1 / 4 - s / 2 - 1 / 2) = s ^ 2 / 4 - 1 / 16 ∧
+      ((1 / 4 - (0 : ℝ) / 2) * (1 / 4 - (0 : ℝ) / 2 - 1 / 2) = -1 / 16) ∧
+      ((1 / 4 - (1 : ℝ) / 2) * (1 / 4 - (1 : ℝ) / 2 - 1 / 2) = 3 / 16) := by
+  refine ⟨by ring, by ring, by ring⟩
+
+/-- 15. Corrected pole-regularizer Mellin multiplier identity (TASK-TC-036R):
+    P_reg(D) = D^2 - 1/16 acts on t^{1/4 - s/2} by
+    (1/4 - s/2)^2 - 1/16 = (1/4) s (s - 1) = (1/4) (z^2 - 1/4) for z = s - 1/2,
+    vanishing at s = 0 and s = 1. -/
+theorem corrected_pole_regularizer_mellin_identity (s z : ℝ) (hz : z = s - 1 / 2) :
+    poleRegMultiplier s = (1 / 4) * s * (s - 1) ∧
+      poleRegMultiplier s = (1 / 4) * (z ^ 2 - 1 / 4) ∧
+      poleRegMultiplier 0 = 0 ∧
+      poleRegMultiplier 1 = 0 := by
+  unfold poleRegMultiplier
+  refine ⟨by ring, ?_, by ring, by ring⟩
+  rw [hz]
+  ring
+
+/-- 16. Corrected pole-regularizer annihilates both t^{1/4} (origin mode tilde{g}_t(0))
+    and t^{-1/4} (Fourier zero-frequency integral mode int tilde{g}_t(u) du). -/
+theorem corrected_pole_regularizer_annihilates_quarter_powers (t_pos t_neg : ℝ) :
+    ((1 / 4 : ℝ) ^ 2 - 1 / 16) * t_pos = 0 ∧
+      ((-1 / 4 : ℝ) ^ 2 - 1 / 16) * t_neg = 0 := by
+  refine ⟨by ring, by ring⟩
+
+/-- 17. Spatial polynomial jet of the corrected pole-regularized state
+    Phi_t(u) = (D^2 - 1/16)(t^{1/4} exp(-r)) with r = pi t u^2:
+    ((1/4 - r)^2 - r) - 1/16 = r^2 - (3/2) r, which vanishes at r = 0 (u = 0). -/
+theorem corrected_pole_regularizer_spatial_jet (r : ℝ) :
+    ((1 / 4 - r) ^ 2 - r) - 1 / 16 = r ^ 2 - (3 / 2) * r ∧
+      (((1 / 4 - (0 : ℝ)) ^ 2 - (0 : ℝ)) - 1 / 16 = 0) := by
+  refine ⟨by ring, by ring⟩
+
 end RiemannScope
+

@@ -1,9 +1,9 @@
-# TASK-TC-036 — Modular-Covariant Theta–Conductor Curvature Audit
+# TASK-TC-036 / TASK-TC-036R — Modular-Covariant Theta–Conductor Curvature Audit and Pole-Regularization Repair
 
-**Task ID:** `TASK-TC-036`  
-**Task Completion Status:** `TASK_TC_036_MODULAR_THETA_CONDUCTOR_AUDIT_COMPLETE`  
-**Starting Commit:** `e3e967f5288e41e55e101e9d7e88f7f541e94d43`  
-**Substantive Parent Commit:** `a8d7ccd5bd72e7c0f9577befaf15b0dc11777f54`  
+**Task ID:** `TASK-TC-036` (repaired in `TASK-TC-036R`)  
+**Task Completion Status:** `TASK_TC_036_MODULAR_THETA_CONDUCTOR_AUDIT_COMPLETE` / `TASK_TC_036R_POLE_REGULARIZATION_REPAIR_COMPLETE`  
+**Starting Commit:** `e3e967f5288e41e55e101e9d7e88f7f541e94d43` (`TASK-TC-036R` starting HEAD `ba339873f3fbdf27922c69ee22b200e9ab67d437`)  
+**Substantive Parent Commit:** `a8d7ccd5bd72e7c0f9577befaf15b0dc11777f54` (`TASK-TC-036` substantive commit `13f8342a6484b14b3421bc996bd1ec74c7786716`)  
 **Principal Classification:** `ONE_PRECISE_THETA_CONDUCTOR_SUBGATE_OPEN`  
 **Open Obligation Status:** `OBL-CT-001A = OPEN`  
 **Exact Remaining Subgate:** `SUBGATE-TC-036A` (*Zero-Independent Diagonal-Isolation and Sign-Incompatibility Identity*)
@@ -12,7 +12,7 @@
 
 ## Section A — Executive Classification and `OBL-CT-001A` Status
 
-After `TASK-TC-035` established `NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS` across six standard single-kernel selector families, `TASK-TC-036` audits the canonical **operator-level functional** candidate defined by the intersection of:
+After `TASK-TC-035` established `NO_ZERO_INDEPENDENT_SINGLE_KERNEL_SELECTOR_FOUND_IN_STANDARD_ZETA_AXIOMS` across six standard single-kernel selector families, `TASK-TC-036` (together with the `TASK-TC-036R` pole-regularization repair) audits the canonical **operator-level functional** candidate defined by the intersection of:
 
 1. Jacobi theta self-duality ($\theta(1/t) = \sqrt{t}\,\theta(t)$, weight $w = 1/2$ in 1D and $w = 1$ in 2D);
 2. heat-kernel scaling ($\Theta_t(x,y) = e^{-\pi t(x^2+y^2)}$, $\mathcal E\Theta_t = 2\mathcal D\Theta_t$);
@@ -71,8 +71,14 @@ The modular-covariant theta–conductor construction yields exact algebraic and 
    $$
    Because $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) \ge 0$ and a hypothetical positive spectral curvature also satisfies $\mathscr A_{\mathrm{spec}} \ge 0$, both sides have the **same sign** ($\ge 0$). There is no sign incompatibility of the form $\mathscr A_{\mathrm{arith}} \le 0$ vs. $\mathscr A_{\mathrm{spec}} > 0$.
 
-4. **Unrestricted Double-Zero Sum vs. RH-Equivalent Weil Positivity (`UNRESTRICTED_DOUBLE_ZERO_SUM` / `THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`)**:
-   When completed with pole, trivial-zero/Gamma, and local conductor terms on the pole-regularized theta state $\Phi_t = \mathcal D(\mathcal D - 1/2)(t^{1/4}g_t) \in \Delta(\mathbb R_+^\times)$, the linear explicit-formula functional $\mathscr L_{\Theta,\mathcal C}^{\mathrm{cov}}(t) = W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t)$ is a signed single-zero sum (`SIGNED_SINGLE_ZERO_SUM`), while the quadratic variance functional $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t) = W_{\mathrm{comp}}(\Phi_t)W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t) - W_{\mathrm{comp}}(\mathcal E\Phi_t)^2$ is a product of two global explicit-formula sums and therefore expands into an unrestricted double sum over all ordered pairs $(\rho, \sigma)$ of nontrivial zeros (`UNRESTRICTED_DOUBLE_ZERO_SUM`, `THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`). Isolating a positive-definite single-zero Hermitian form requires the multiplicative convolution square $g * g^*$, whose global positivity across primes is equivalent to Weil's positivity criterion (`THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`).
+4. **Repaired Pole Regularization and Unrestricted Double-Zero Sum vs. RH-Equivalent Weil Positivity (`CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH` / `UNRESTRICTED_DOUBLE_ZERO_SUM` / `THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`)**:
+   On the weight-normalized 1D theta state $\widetilde g_t(u) = t^{1/4}e^{-\pi t u^2}$, whose Mellin transform $\mathcal M[\widetilde g_t](s) = \frac{1}{2}\pi^{-s/2}\Gamma(s/2)t^{1/4-s/2}$ scales as $t^{1/4-s/2} = t^{-z/2}$ ($z = s - 1/2$), $\mathcal D = t\partial_t$ acts by $\frac{1}{4} - \frac{s}{2}$ (so the unshifted operator $\mathcal D(\mathcal D - \frac{1}{2})$ used in `TASK-TC-036` has Mellin multiplier $\frac{s^2}{4} - \frac{1}{16}$ and nonzero origin value $-\frac{1}{16}t^{1/4} \ne 0$, failing to annihilate the poles at $s = 0, 1$; `UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES`). In `TASK-TC-036R`, this is repaired by the exact pole-annihilator
+   $$
+   \mathcal P_{\mathrm{reg}}(\mathcal D) := \mathcal D^2 - \frac{1}{16} = \left(\mathcal D - \frac{1}{4}\right)\left(\mathcal D + \frac{1}{4}\right),
+   \qquad
+   \Phi_t(u) := \left(\mathcal D^2 - \frac{1}{16}\right)\widetilde g_t(u) = t^{1/4}\left(\pi^2 t^2 u^4 - \frac{3}{2}\pi t u^2\right)e^{-\pi t u^2},
+   $$
+   whose Mellin multiplier is $\left(\frac{1}{4}-\frac{s}{2}\right)^2 - \frac{1}{16} = \frac{1}{4}s(s-1) = \frac{1}{4}\left(z^2 - \frac{1}{4}\right)$ and which satisfies $\Phi_t(0) = 0$, $\Phi_t'(0) = 0$, and $\int_0^\infty \Phi_t(u)\,du = 0$ (with squared companion $\Phi_t^{(2)} = (\mathcal D^2 - \frac{1}{16})^2\widetilde g_t$ vanishing at both $s = 0$ and $s = 1$ even after multiplying by $\Gamma(s/2)$). On the repaired state, the linear explicit-formula functional $\mathscr L_{\Theta,\mathcal C}^{\mathrm{cov}}(t)$ remains a signed single-zero sum (`SIGNED_SINGLE_ZERO_SUM`), while the quadratic variance functional $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t)$ expands into an unrestricted double sum over all ordered pairs $(\rho, \sigma)$ of nontrivial zeros (`UNRESTRICTED_DOUBLE_ZERO_SUM`, `THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`), and global positivity of the convolution square $Z(g * g^*)$ remains equivalent to Weil's positivity criterion (`THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`).
 
 ---
 
@@ -342,15 +348,23 @@ Since $[\mathcal E, \mathcal C] = 0$ and $[\mathcal E, [\mathcal E, \mathcal C]]
 $$
 \mathcal O = c_2\mathcal E^2 + c_1\mathcal E + c_0 I + c_3\mathcal C + c_4\mathcal C\mathcal E + c_5\mathcal C^2.
 $$
-Under Fourier/modular inversion ($\mathcal E + I \mapsto -(\mathcal E + I)$ and $\mathcal C \mapsto \mathcal C$), Axioms 1–3 require $\mathcal O$ to be an even polynomial in $\mathcal E + I = 2(\mathcal D + 1/2)$, forcing:
+Writing $\mathcal A_2 := \mathcal E + I = 2(\mathcal D + 1/2)$ (so $\mathcal E = \mathcal A_2 - I$), under Fourier/modular inversion ($\mathcal A_2 \mapsto -\mathcal A_2$ and $\mathcal C \mapsto \mathcal C$), Axioms 1–3 require $\mathcal O$ to be even in $\mathcal A_2$, selecting on the pure scale sector the **two-parameter invariant subspace**:
 $$
+b_0 I + b_2\mathcal A_2^2 = b_0 I + b_2(\mathcal E + I)^2 = b_2\mathcal E^2 + 2b_2\mathcal E + (b_0 + b_2)I,
+$$
+which forces:
+$$
+c_2 = b_2,
+\qquad
 c_1 = 2c_2,
 \qquad
-c_4 = 0,
+c_0 = c_2 + b_0 \quad (\text{with independent scalar } b_0),
+\qquad
+c_4 = 0.
 $$
-and selecting on the pure scale sector the **modular Hessian ray**:
+Imposing vanishing on the dilation-invariant mode $\ker(\mathcal E + I)$ ($b_0 = 0$) restricts this two-parameter subspace to the single projective **modular Hessian ray**:
 $$
-\mathbb R^\times \cdot (\mathcal E + I)^2 = \mathbb R^\times \cdot 4\mathcal H_{\mathrm{mod},1}.
+\mathbb R^\times \cdot (\mathcal E + I)^2 = \mathbb R^\times \cdot 4\mathcal H_{\mathrm{mod},1} \qquad (c_0 = c_2).
 $$
 Conversely, Axiom 4 (exact removal of the $t\partial_t$ heat drift in $\mathcal E^2\Theta_t = 4t^2\partial_t^2\Theta_t + 4t\partial_t\Theta_t$) requires:
 $$
@@ -362,11 +376,11 @@ selecting the **heat-drift compensator ray**:
 $$
 \mathbb R^\times \cdot \mathcal E(\mathcal E - 2) = \mathbb R^\times \cdot \mathcal L_{\mathrm{heat}}.
 $$
-Imposing both constraints simultaneously gives (formalized as `heat_and_modular_hessian_incompatibility` in `formal/RiemannScope/ModularThetaConductorCurvature.lean`):
+Imposing both constraints simultaneously gives (independently of the scalar offset $b_0$, and formalized as `heat_and_modular_hessian_incompatibility` in `formal/RiemannScope/ModularThetaConductorCurvature.lean`):
 $$
-2c_2 = c_1 = -2c_2 \implies 4c_2 = 0 \implies c_2 = 0, \quad c_1 = 0,
+2c_2 = c_1 = -2c_2 \implies 4c_2 = 0 \implies c_2 = 0, \quad c_1 = 0 \quad (\text{and } c_0 = b_0 = 0),
 $$
-which violates Axiom 5 ($c_2 \neq 0$). Thus the joint axiom system has **no nonzero second-order solution**; instead it splits cleanly into two distinct 1D projective rays (`Ray A`: $\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E - 2)$ satisfying Axioms 4, 5, 6, 8; `Ray B`: $4\mathcal H_{\mathrm{mod},1} = (\mathcal E + I)^2$ satisfying Axioms 1, 2, 3, 5, 6, 8).
+which violates Axiom 5 ($c_2 \neq 0$). Thus the joint axiom system has **no nonzero second-order solution**; instead it splits cleanly into two distinct 1D projective rays (`Ray A`: $\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E - 2)$ satisfying Axioms 4, 5, 6, 8; `Ray B`: $4\mathcal H_{\mathrm{mod},1} = (\mathcal E + I)^2$ satisfying Axioms 1, 2, 3, 5, 6, 8 at $b_0 = 0$).
 
 ---
 
@@ -448,64 +462,125 @@ When $\mathcal E^2$ is replaced by $\mathcal L_{\mathrm{heat}} = \mathcal E(\mat
 
 ---
 
-## Section M — Completed Theta–Conductor Functional and Background Terms
+## Section M — Completed Theta–Conductor Functional and `TASK-TC-036R` Pole-Regularization Repair
 
-To construct a genuine completed-zeta functional without reference to nontrivial zero locations $\rho$, we account for the origin/infinity behavior of $g_t(x) = e^{-\pi t x^2}$. Because $g_t(0) = 1 \neq 0$, the raw reflected prime sum $\sum_{n\ge 2}\Lambda(n)n^{-1/2}g_t(n^{-1})$ and the $s = 0$ pole integral diverge unless regularized by the completed-$\xi$ pole-annihilating differential factor
+### 1. Diagnosis of the Unshifted Regularizer Defect (`UNSHIFTED_REGULARIZER_DOES_NOT_ANNIHILATE_POLES`)
+On the weight-normalized 1D theta Gaussian state
 $$
-P_{\mathrm{reg}}(\mathcal D) := \mathcal D\left(\mathcal D - \frac{1}{2}\right),
+\widetilde g_t(u) := t^{1/4}g_t(u) = t^{1/4}e^{-\pi t u^2} \qquad (t > 0),
 $$
-which multiplies the centered Mellin transform by $\frac{1}{4}s(s - 1) = \frac{1}{4}(z^2 - 1/4)$ ($z = s - 1/2$), matching Riemann's completed $\xi(s) = \frac{1}{2}s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$.
+its raw Mellin transform is
+$$
+\mathcal M[\widetilde g_t](s) := \int_0^\infty \widetilde g_t(u)\,u^{s-1}\,du = \frac{1}{2}\pi^{-s/2}\Gamma(s/2)\,t^{1/4 - s/2} = \frac{1}{2}\pi^{-(z+1/2)/2}\Gamma\!\left(\frac{z+1/2}{2}\right)t^{-z/2},
+\qquad z = s - \frac{1}{2}.
+$$
+Therefore $\mathcal D = t\partial_t$ acts on $\mathcal M[\widetilde g_t](s)$ by multiplication by
+$$
+\lambda(s) = \frac{1}{4} - \frac{s}{2} = -\frac{z}{2}.
+$$
+In `TASK-TC-036`, the unshifted operator $\mathcal D(\mathcal D - \frac{1}{2})$ (which applies to the unnormalized factor $t^{-s/2}$ rather than the weight-$1/2$ normalized factor $t^{1/4 - s/2}$) was mistakenly applied to $\widetilde g_t$. On $t^{1/4 - s/2}$, $\mathcal D(\mathcal D - \frac{1}{2})$ acts by the multiplier (formalized as `unshifted_regularizer_mellin_defect`):
+$$
+\left(\frac{1}{4} - \frac{s}{2}\right)\left(\frac{1}{4} - \frac{s}{2} - \frac{1}{2}\right) = \left(\frac{1}{4} - \frac{s}{2}\right)\left(-\frac{1}{4} - \frac{s}{2}\right) = \frac{s^2}{4} - \frac{1}{16},
+$$
+which equals $-\frac{1}{16} \neq 0$ at $s = 0$ and $+\frac{3}{16} \neq 0$ at $s = 1$, and in spatial coordinates ($r := \pi t u^2$) produces
+$$
+\mathcal D\left(\mathcal D - \frac{1}{2}\right)\widetilde g_t(u) = t^{1/4}\left(r^2 - r - \frac{1}{16}\right)e^{-r},
+$$
+whose value at $u = 0$ is $-\frac{1}{16}t^{1/4} \neq 0$ and whose half-line integral is $+\frac{3}{32}t^{-1/4} \neq 0$. Thus $\mathcal D(\mathcal D - \frac{1}{2})$ fails to annihilate either endpoint mode on $\widetilde g_t$.
 
-Let $\Phi_t(u) := \mathcal D(\mathcal D - 1/2)\bigl(t^{1/4}g_t(u)\bigr) \in \Delta(\mathbb R_+^\times)$. Then the zero-independent completed linear explicit-formula functional is
+### 2. Exact Pole-Regularizer Repair (`CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH`)
+Because the origin term $\widetilde g_t(0) = t^{1/4}$ has $\mathcal D$-eigenvalue $+1/4$ and the zero-frequency integral $\int_{\mathbb R}\widetilde g_t(u)\,du = t^{-1/4}$ has $\mathcal D$-eigenvalue $-1/4$, the unique monic second-order polynomial in $\mathcal D$ that annihilates both quarter-power modes on $\widetilde g_t(u) = t^{1/4}e^{-\pi t u^2}$ is (formalized as `corrected_pole_regularizer_mellin_identity`, `corrected_pole_regularizer_annihilates_quarter_powers`, and `corrected_pole_regularizer_spatial_jet`):
+$$
+\boxed{
+\mathcal P_{\mathrm{reg}}(\mathcal D) := \left(\mathcal D - \frac{1}{4}\right)\left(\mathcal D + \frac{1}{4}\right) = \mathcal D^2 - \frac{1}{16}.
+}
+$$
+On $\mathcal M[\widetilde g_t](s) \propto t^{1/4 - s/2}$, $\mathcal P_{\mathrm{reg}}(\mathcal D)$ multiplies by:
+$$
+\left(\frac{1}{4} - \frac{s}{2}\right)^2 - \frac{1}{16} = \frac{1}{4}s(s - 1) = \frac{1}{4}\left(z^2 - \frac{1}{4}\right),
+\qquad z = s - \frac{1}{2},
+$$
+which vanishes at both $s = 0$ ($z = -1/2$) and $s = 1$ ($z = +1/2$), matching Riemann's completed factor $\xi(s) = \frac{1}{2}s(s - 1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$.
+
+### 3. Spatial Formula and Domain Verification for the Repaired State $\Phi_t$
+Applying $\mathcal P_{\mathrm{reg}}(\mathcal D) = \mathcal D^2 - \frac{1}{16}$ to $\widetilde g_t(u) = t^{1/4}e^{-r}$ ($r = \pi t u^2$) yields the repaired state:
+$$
+\boxed{
+\Phi_t(u) := \left(\mathcal D^2 - \frac{1}{16}\right)\!\bigl(t^{1/4}e^{-\pi t u^2}\bigr)
+= t^{1/4}\left(r^2 - \frac{3}{2}r\right)e^{-r}
+= \pi t^{5/4}u^2\left(\pi t u^2 - \frac{3}{2}\right)e^{-\pi t u^2}.
+}
+$$
+We verify all endpoint, integral, and Mellin domain conditions explicitly:
+1. **Vanishing at the Origin ($u = 0$)**: $\Phi_t(0) = 0$ and $\Phi_t'(0) = 0$ (in fact $\Phi_t(u) = -\frac{3}{2}\pi t^{5/4}u^2 + O(u^4)$ as $u \to 0$).
+2. **Vanishing Half-Line Integral**:
+   $$
+   \int_0^\infty \Phi_t(u)\,du = \frac{t^{1/4}}{2\sqrt{\pi t}}\int_0^\infty \left(r^{3/2} - \frac{3}{2}r^{1/2}\right)e^{-r}\,dr = \frac{t^{-1/4}}{2\sqrt{\pi}}\left(\Gamma\!\left(\frac{5}{2}\right) - \frac{3}{2}\Gamma\!\left(\frac{3}{2}\right)\right) = 0.
+   $$
+3. **Analytic Mellin Transform and Pole Behavior at $s = 0, 1$**:
+   Lifting $\Phi_t$ to the multiplicative half-density $(J\Phi_t)(u) := u^{1/2}\Phi_t(u) \in L^2(\mathbb R_+^\times, du/u)$, its centered Mellin transform $\widehat{J\Phi_t}(z) := \int_0^\infty (J\Phi_t)(u)u^z\,\frac{du}{u} = \mathcal M[\Phi_t](s)$ ($s = 1/2 + z$) is:
+   $$
+   \widehat{J\Phi_t}(z) = \mathcal M[\Phi_t](s) = \frac{1}{8}s(s - 1)\pi^{-s/2}\Gamma(s/2)\,t^{1/4 - s/2},
+   $$
+   which is holomorphic on $\operatorname{Re}(s) > -2$ ($\operatorname{Re}(z) > -5/2$). Because $\Gamma(s/2) = \frac{2}{s} + O(1)$ has a simple pole at $s = 0$, the single factor $\frac{1}{4}s(s-1)$ cancels the $\Gamma$-pole at $s = 0$ to leave the finite value $\mathcal M[\Phi_t](0) = -\frac{1}{4}t^{1/4}$ while vanishing at $s = 1$ ($\mathcal M[\Phi_t](1) = 0$). Applying $\mathcal P_{\mathrm{reg}}(\mathcal D)$ a second time produces the squared pole-vanishing state
+   $$
+   \Phi_t^{(2)}(u) := \left(\mathcal D^2 - \frac{1}{16}\right)^2\widetilde g_t(u) = t^{1/4}\left(r^4 - 6r^3 + \frac{45}{8}r^2 - \frac{3}{8}r\right)e^{-r},
+   $$
+   whose Mellin transform $\mathcal M[\Phi_t^{(2)}](s) = \frac{1}{32}s^2(s-1)^2\pi^{-s/2}\Gamma(s/2)t^{1/4-s/2}$ vanishes at **both** $s = 0$ and $s = 1$: $\mathcal M[\Phi_t^{(2)}](0) = \mathcal M[\Phi_t^{(2)}](1) = 0$, so $W_{\mathrm{pole}}(J\Phi_t^{(2)}) = 0$.
+
+### 4. Explicit Background Terms of the Repaired Completed Functional
+For $\Psi = J\Phi_t$ (or $\Psi = J\Phi_t^{(2)}$), the zero-independent completed linear explicit-formula functional is
 $$
 W_{\mathrm{comp}}(\Psi) := W_{\mathrm{pole}}(\Psi) - \sum_{p} H_p(\Psi_p)(1) - H_\infty(\Psi_\infty)(1),
 $$
-where every background term is explicitly included:
+where every background term converges absolutely and is explicitly included:
 1. **Prime-Power Terms ($p < \infty$)**:
    $$
-   W_{\mathrm{prim}}(\Psi) = -\sum_{p} H_p(\Psi_p)(1) = -\sum_{n\ge 2} \Lambda(n)n^{-1/2}\bigl(\Psi(n) + \Psi(n^{-1})\bigr).
+   W_{\mathrm{prim}}(J\Phi_t) = -\sum_{p} H_p(\Phi_{t,p})(1) = -\sum_{n\ge 2} \Lambda(n)\bigl(\Phi_t(n) + n^{-1}\Phi_t(n^{-1})\bigr).
    $$
-2. **Pole Terms at $s = 0$ and $s = 1$ ($z = \pm 1/2$)**:
+   Because $\Phi_t(n^{-1}) = O(n^{-2})$ as $n \to \infty$, the reflected prime-power sum $\sum_{n\ge 2}\Lambda(n)n^{-1}\Phi_t(n^{-1}) = O(\sum_{n\ge 2}\Lambda(n)n^{-3})$ converges absolutely.
+2. **Pole Terms at $s = 0$ and $s = 1$ ($z = \mp 1/2$)**:
    $$
-   W_{\mathrm{pole}}(\Psi) = \widehat\Psi(-1/2) + \widehat\Psi(1/2) = \int_0^\infty \Psi(u)\bigl(u^{-1/2} + u^{1/2}\bigr)\frac{du}{u}
-   \quad\bigl(= 0 \text{ on } \Phi_t \text{ by } P_{\mathrm{reg}}(\mathcal D)\bigr).
+   W_{\mathrm{pole}}(J\Phi_t) = \widehat{J\Phi_t}(-1/2) + \widehat{J\Phi_t}(1/2) = \mathcal M[\Phi_t](0) + \mathcal M[\Phi_t](1) = -\frac{1}{4}t^{1/4} + 0,
+   \qquad
+   W_{\mathrm{pole}}(J\Phi_t^{(2)}) = 0 + 0 = 0.
    $$
 3. **Trivial-Zero / Archimedean Gamma & Local Real Conductor Term ($\nu = \infty$)**:
-   By Burnol (`math/9902080v1` Theorem D3), the local conductor evaluation $-H_\infty(\Psi_\infty)(1)$ equals the Archimedean explicit-formula functional encoding $\pi^{-s/2}\Gamma(s/2)$ (and all trivial zeros $s = -2m$):
+   By Burnol (`math/9902080v1` Theorem D3), the local conductor evaluation $-H_\infty(\Phi_{t,\infty})(1)$ encodes $\pi^{-s/2}\Gamma(s/2)$ and all trivial zeros $s = -2m$ ($m \ge 1$):
    $$
-   W_\infty(\Psi) = -H_\infty(\Psi_\infty)(1) = \bigl(\log(2\pi) + \gamma_E\bigr)\Psi(1) + \int_{1/2}^\infty \frac{\Psi(1/u)u^{1/2} - \Psi(1)}{|1 - u|}\frac{du}{2u} + \int_{-\infty}^{1/2} \frac{\Psi(1/|u|)|u|^{1/2}}{|1 - u|}\frac{du}{2|u|}.
+   W_\infty(J\Phi_t) = -H_\infty(\Phi_{t,\infty})(1) = \bigl(\log(2\pi) + \gamma_E\bigr)\Phi_t(1) + \int_{1/2}^\infty \frac{\Phi_t(1/u)u - \Phi_t(1)}{|1 - u|}\frac{du}{2u} + \int_{-\infty}^{1/2} \frac{\Phi_t(1/|u|)|u|}{|1 - u|}\frac{du}{2|u|}.
    $$
-4. **Normalization Terms**: The unitary half-density map $(J\phi)(u) = \sqrt{2u}\,\phi(u)$ from $L^2(\mathbb R_{\ge 0}, 2\,dx)$ to $L^2(\mathbb R_+^\times, du/u)$, centering the Mellin transform on $\operatorname{Re}(s) = 1/2$.
-5. **Regularization at $0$ and $\infty$**: $P_{\mathrm{reg}}(\mathcal D) = \mathcal D(\mathcal D - 1/2)$ kills the constant term at $u = 0$, placing $\Phi_t \in \Delta(\mathbb R_+^\times)$ with rapid vertical decay in $z = \delta + i\gamma$.
+4. **Normalization Terms**: The multiplicative half-density lift $(J\Phi_t)(u) = u^{1/2}\Phi_t(u)$ centering the Mellin transform at $\operatorname{Re}(s) = 1/2$.
+5. **Regularization at $0$ and $\infty$**: $\mathcal P_{\mathrm{reg}}(\mathcal D) = \mathcal D^2 - \frac{1}{16}$ (and $\mathcal P_{\mathrm{reg}}(\mathcal D)^2$) kills both quarter-power modes $t^{\pm 1/4}$ at $u = 0$ and $u = \infty$, with rapid vertical decay $|\widehat{J\Phi_t}(\delta + i\gamma)| \ll |\gamma|^A e^{-\pi|\gamma|/4}$.
 
-From $W_{\mathrm{comp}}$, the completed linear and quadratic functionals are:
+From $W_{\mathrm{comp}}$, using $2\mathcal D\,(t^{1/4 - s/2}) = (1/2 - s)t^{1/4 - s/2} = -z\,t^{1/4 - s/2}$ and $\mathcal L_{\mathrm{heat}} = 4(\mathcal D^2 - \mathcal D) = 2\mathcal D(2\mathcal D - 2)$, the completed linear and quadratic functionals are:
 $$
-\mathscr L_{\Theta,\mathcal C}^{\mathrm{cov}}(t) := W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t),
+\mathscr L_{\Theta,\mathcal C}^{\mathrm{cov}}(t) := W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}J\Phi_t),
 \qquad
-\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t) := W_{\mathrm{comp}}(\Phi_t)W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t) - W_{\mathrm{comp}}(\mathcal E\Phi_t)^2.
+\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t) := W_{\mathrm{comp}}(J\Phi_t^{(2)})W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}J\Phi_t^{(2)}) - W_{\mathrm{comp}}(2\mathcal D J\Phi_t^{(2)})^2.
 $$
 
 ---
 
-## Section N — Complete Spectral Representation and Zero-Pairing Audit
+## Section N — Complete Spectral Representation and Zero-Pairing Audit on the Repaired State
 
-By the Riemann–Weil–Burnol explicit formula (`math/9902080v1` Theorem C1; `math/0101068v1` Theorem 3.3), for $\Psi \in \Delta(\mathbb R_+^\times)$:
+By the Riemann–Weil–Burnol explicit formula (`math/9902080v1` Theorem C1; `math/0101068v1` Theorem 3.3), for $\Psi = J\Phi_t^{(2)}$:
 $$
 W_{\mathrm{comp}}(\Psi) = \sum_\rho m_\rho\,\widehat\Psi(z_\rho),
 \qquad
 z_\rho := \rho - \frac{1}{2} = \delta_\rho + i\gamma_\rho.
 $$
-Since $\widehat{(\mathcal E\Phi_t)}(z) = -z\,\widehat\Phi_t(z)$ and $\widehat{(\mathcal L_{\mathrm{heat}}\Phi_t)}(z) = z(z + 2)\widehat\Phi_t(z)$:
+Since $\widehat{(2\mathcal D\,\Psi)}(z) = -z\,\widehat\Psi(z)$ and $\widehat{(\mathcal L_{\mathrm{heat}}\Psi)}(z) = z(z + 2)\widehat\Psi(z)$:
 
 1. **Complete Spectral Transfer of the Linear Functional**:
    $$
-   \mathscr L_{\Theta,\mathcal C}^{\mathrm{cov}}(t) = \sum_\rho m_\rho\,z_\rho(z_\rho + 2)\,\widehat\Phi_t(z_\rho)
+   \mathscr L_{\Theta,\mathcal C}^{\mathrm{cov}}(t) = \sum_\rho m_\rho\,z_\rho(z_\rho + 2)\,\widehat{J\Phi_t}(z_\rho) - W_{\mathrm{pole}}(\mathcal L_{\mathrm{heat}}J\Phi_t)
    \qquad (\texttt{SIGNED\_SINGLE\_ZERO\_SUM}).
    $$
 2. **Complete Spectral Transfer of the Quadratic Variance Functional**:
    $$
    \mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t)
-   = \frac{1}{2}\sum_{\rho,\sigma} m_\rho m_\sigma\,\widehat\Phi_t(z_\rho)\widehat\Phi_t(z_\sigma)\bigl[(z_\rho - z_\sigma)^2 + 2(z_\rho + z_\sigma)\bigr]
+   = \frac{1}{2}\sum_{\rho,\sigma} m_\rho m_\sigma\,\widehat{J\Phi_t^{(2)}}(z_\rho)\widehat{J\Phi_t^{(2)}}(z_\sigma)\bigl[(z_\rho - z_\sigma)^2 + 2(z_\rho + z_\sigma)\bigr]
    \qquad (\texttt{UNRESTRICTED\_DOUBLE\_ZERO\_SUM}).
    $$
 
@@ -525,7 +600,7 @@ We check how the spectral kernel $(z_\rho - z_\sigma)^2 + 2(z_\rho + z_\sigma)$ 
   2(z_\rho + z_{1-\bar\rho}) = 4i\gamma_\rho.
   $$
 - **General ordered pair $(\rho, \sigma)$**:
-  Because $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t)$ is the product of two global explicit-formula evaluations $W_{\mathrm{comp}}(\Phi_1)W_{\mathrm{comp}}(\Phi_2)$, **every ordered pair $(\rho, \sigma)$ is present**. Neither the conjugate diagonal nor the reflection diagonal is isolated by the completed variance functional (`THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`).
+  Because $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t)$ is the product of two global explicit-formula evaluations $W_{\mathrm{comp}}(\Psi_1)W_{\mathrm{comp}}(\Psi_2)$, **every ordered pair $(\rho, \sigma)$ is present**. Neither the conjugate diagonal nor the reflection diagonal is isolated by the completed variance functional (`THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`).
 
 ---
 
@@ -537,7 +612,7 @@ $$
 $$
 the conditional contradiction theorem `complement_nonnegativity_contradiction` in `formal/RiemannScope/ModularThetaConductorCurvature.lean` proves that $\mathscr A \le 0$, $S_{\mathrm{rad}} > 0$, and $R_{\mathrm{comp}} \ge 0$ are mutually incompatible. However:
 - Neither $R_{\mathrm{comp}} = 0$ nor $R_{\mathrm{comp}} \ge 0$ holds unconditionally for the quadratic double-zero sum $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t)$.
-- To eliminate off-diagonal zero-zero cross terms $(\rho, \sigma)$ ($\sigma \neq 1 - \bar\rho$) and form a single-zero sum over reflection pairs, one must replace the product of two global functionals $W_{\mathrm{comp}}(\Phi_1)W_{\mathrm{comp}}(\Phi_2)$ by the **single explicit-formula evaluation of a multiplicative convolution square** $Z(g * g^*) = \sum_\rho |\widehat g(\rho - 1/2)|^2$.
+- To eliminate off-diagonal zero-zero cross terms $(\rho, \sigma)$ ($\sigma \neq 1 - \bar\rho$) and form a single-zero sum over reflection pairs, one must replace the product of two global functionals $W_{\mathrm{comp}}(\Psi_1)W_{\mathrm{comp}}(\Psi_2)$ by the **single explicit-formula evaluation of a multiplicative convolution square** $Z(g * g^*) = \sum_\rho |\widehat g(\rho - 1/2)|^2$.
 - As Burnol explicitly notes (`math/0101068v1` p. 2 and Theorem 3.7; `math/9902080v1` Theorem H2) and Connes–Consani confirm (`2006.13771v1`), the local Archimedean conductor is unconditionally positive/bounded below on $\operatorname{Re}(s) = 1/2$ (and $Z(g * g^*) \ge 0$ holds unconditionally when $\operatorname{supp}(g) \subset [1/\sqrt{2}, \sqrt{2}]$ so no primes $p \ge 2$ enter), **but global positivity across prime powers is equivalent to Weil's positivity criterion and therefore to RH** (`THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`).
 
 ---
@@ -572,7 +647,7 @@ is **identical across $q \in \{2, e, \tau = 2\pi, 10\}$** (maximum floating-poin
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Hamburger (1921); Burnol (`math/0407443v3`, `1106.4749v2`); Báez-Duarte (`math/0207237v1`)** | Tempered / co-Poisson distribution supported on $\mathbb Z$ with functional equation $\xi(s)=\xi(1-s)$ and polynomial growth | 1D $\zeta$-distribution ray $\mathbb C\cdot\zeta(s)$ (and via Euler product + log-derivative, $-\zeta'/\zeta = \sum \Lambda(n)n^{-s}$) | $\mathcal F\mathcal I = \Gamma(\chi, s)$ on multiplicative characters | Fixes integer / prime-power station weights, NOT a unique test kernel | Valid across all admissible test functions in the explicit formula | **NO** (unconditional characterization of $\zeta$) |
 | **Burnol (`math/9812012v1`, `math/9902080v1`, `math/0101068v1`)** | Local completion $K_\nu$ with additive Haar measure $dx$, initial domain $\mathcal S_0(K_\nu)$ or invariant Schwartz–Mellin core $\Delta(K_\nu) \subset L^2(K_\nu, dx)$ | Local conductor operator $H_\nu = \log\|x\|_\nu + \mathcal F\log\|x\|_\nu\mathcal F^{-1}$ and bounded commutator $K_\nu = i[B,A]$ | $[\mathcal A, H_\nu] = 0$, $\mathcal F H_\nu\mathcal F^{-1} = H_\nu$, $\mathcal I H_\nu\mathcal I^{-1} = H_\nu$, multiplier $\frac{d}{ds}\log\Gamma_\nu(\chi,s)$ | $W(g;\chi) = \sum_\nu H_\nu(g_{\nu;\chi})(1)$ reproduces all local Weil terms uniformly | Reproduces linear explicit-formula sum over zeros and poles on $\operatorname{Re}(s)=1/2$ | **NO** for operator identity; **YES** for global positivity $Z(g*g^*)\ge 0$ (`math/0101068v1` Thm 3.7 proves local positivity only for $\operatorname{supp}(g)\subset[1/c,c]$, $c\le\sqrt{2}$) |
-| **Jacobi (1829); Riemann (1859)** | Positive heat semigroup $g_t(x)=e^{-\pi t x^2}$ ($t>0$), Poisson summation on $\mathbb Z$, ground-state / minimum-uncertainty selection at $t=1$ | 1D Gaussian $g_1(x)=e^{-\pi x^2}$, 2D Gaussian $\Theta_1(x,y)=e^{-\pi(x^2+y^2)}$, and theta series $\theta(t)$ | $\mathcal E\Theta_t = 2\mathcal D\Theta_t$, $\mathcal L_{\mathrm{heat}}\Theta_t = \mathcal E(\mathcal E-2)\Theta_t = 4t^2\partial_t^2\Theta_t$, $\nabla_w = \mathcal D + w/2$ | Uncompensated Euler curvature $\mathfrak C_{\mathrm{arith}}(\Theta_1) < 0$ by drift; drift-compensated prime variance $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) \ge 0$ | Mellin transform of pole-regularized theta state gives completed $\xi(s)$; quadratic variance yields double zero sum | **NO** (unconditional analytic continuation and functional equation) |
+| **Jacobi (1829); Riemann (1859)** | Positive heat semigroup $g_t(x)=e^{-\pi t x^2}$ ($t>0$), Poisson summation on $\mathbb Z$, ground-state / minimum-uncertainty selection at $t=1$ | 1D Gaussian $g_1(x)=e^{-\pi x^2}$, 2D Gaussian $\Theta_1(x,y)=e^{-\pi(x^2+y^2)}$, and theta series $\theta(t)$ | $\mathcal E\Theta_t = 2\mathcal D\Theta_t$, $\mathcal L_{\mathrm{heat}}\Theta_t = \mathcal E(\mathcal E-2)\Theta_t = 4t^2\partial_t^2\Theta_t$, $\nabla_w = \mathcal D + w/2$, $\mathcal P_{\mathrm{reg}}(\mathcal D) = \mathcal D^2 - 1/16$ | Uncompensated Euler curvature $\mathfrak C_{\mathrm{arith}}(\Theta_1) < 0$ by drift; drift-compensated prime variance $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) \ge 0$ | Mellin transform of pole-regularized theta state $(\mathcal D^2 - 1/16)\widetilde g_t$ gives completed $\xi(s)$; quadratic variance yields double zero sum | **NO** (unconditional analytic continuation and functional equation) |
 | **Weil (1952); Haran (1990)** | Smooth compactly supported / rapidly decaying test function $g$ on $\mathbb R_+^\times$ | Global explicit-formula distribution $\mathcal W_\zeta$ and sesquilinear form $Z(g * g^*)$ | $Z(g) = \sum_\rho \widehat g(\rho-1/2) - (\widehat g(-1/2)+\widehat g(1/2)) = -\sum_\nu W_\nu(g)$ | Prime-power plus Archimedean local functional | Single-zero sum for linear evaluation; reflection-paired Hermitian sum for convolution square $g*g^*$ | **YES**: $Z(g*g^*) \ge 0$ for all $g \in C_c^\infty(\mathbb R_+^\times) \iff \text{RH}$ |
 | **Connes & Consani (`2006.13771v1`, `2106.01715v1`, `2112.08820v1`); Burnol (`math/0105120v1`, `math/0203120v7`)** | Compression of scaling operator to Sonin space (orthogonal to cutoff projections $P_\Lambda$, $\mathcal F P_\Lambda\mathcal F^{-1}$) | Prolate spheroidal wave function basis and compressed semi-local trace functional | Angle-operator / prolate differential operator commuting with time-and-band limiting | Archimedean compressed trace is positive by prolate/Toeplitz positivity | Semi-local trace formula over finite primes + archimedean place reduces global positivity to Weil positivity | **NO** at single archimedean place; **YES** for global semi-local Weil positivity across primes |
 
@@ -596,13 +671,14 @@ is **identical across $q \in \{2, e, \tau = 2\pi, 10\}$** (maximum floating-poin
 
 ### 1. Lean 4 Formalization Map (`formal/RiemannScope/ModularThetaConductorCurvature.lean`)
 - **Module**: `formal/RiemannScope/ModularThetaConductorCurvature.lean`
-- **Module Declarations**: `14` total (`1 def` + `13 theorem`s)
-- **Repository Compiled `theorem` Declarations**: `593` (`580` prior + `13` new)
+- **Module Declarations**: `19` total (`2 def`s + `17 theorem`s)
+- **Repository Compiled `theorem` Declarations**: `597` (`580` prior + `17` in `ModularThetaConductorCurvature.lean`)
 - **Proof Hygiene**: `0 sorry, 0 admit, no nonstandard project axioms introduced`
 
 | Declaration Identifier | Kind | Exact Statement Scope | Algebraic Only? | Paper Step Supported | External Dependency |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `heatDriftCoeff` | `def` | `heatDriftCoeff c := 4 - 2 * c` | Yes | First-order drift coefficient $4 - 2c$ in $\mathcal L_c\Theta_t$ | None |
+| `poleRegMultiplier` | `def` | `poleRegMultiplier s := (1 / 4 - s / 2) ^ 2 - 1 / 16` | Yes | `TASK-TC-036R`: Mellin multiplier of $\mathcal P_{\mathrm{reg}}(\mathcal D) = \mathcal D^2 - 1/16$ on $t^{1/4 - s/2}$ | None |
 | `theta_heat_euler_scaling` | `theorem` | `(x*(-2*p*t*x) + y*(-2*p*t*y))*theta = 2*(t*(-p*(x^2+y^2))*theta)` | Yes | Section 5: $\mathcal E\Theta_t = 2\mathcal D\Theta_t$ | None |
 | `heat_drift_operator_expansion` | `theorem` | `(4*d2 + 4*d1) - c*(2*d1) = 4*d2 + heatDriftCoeff c * d1` | Yes | Section 6: $\mathcal L_c\Theta_t = 4t^2\partial_t^2\Theta_t + (4-2c)t\partial_t\Theta_t$ | None |
 | `heat_drift_compensator_unique` | `theorem` | `(heatDriftCoeff c = 0 ↔ c = 2) ∧ ((4*d2 + 4*d1) - 2*(2*d1) = 4*d2)` | Yes | Section 6: Unique compensator $c = 2$ ($\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E-2)$) | None |
@@ -616,6 +692,10 @@ is **identical across $q \in \{2, e, \tau = 2\pi, 10\}$** (maximum floating-poin
 | `arithmetic_sign_and_spectral_sign_no_contradiction` | `theorem` | `0 ≤ v → ∃ A_arith A_spec, A_arith = v ∧ A_spec = v ∧ A_arith = A_spec ∧ 0 ≤ A_arith ∧ 0 ≤ A_spec` | Yes | Section 14: No-contradiction firewall when both sides are $\ge 0$ | None |
 | `complement_nonnegativity_contradiction` | `theorem` | `A = S_rad + R_comp → A ≤ 0 → 0 < S_rad → 0 ≤ R_comp → False` | Yes | Section 18: Conditional complement-sign contradiction | None |
 | `generic_quadratic_heat_base_control` | `theorem` | `curvatureDet M0 (-(L*c)*M1) ((L*c)^2*M2) = L^2 * (c^2 * curvatureDet M0 M1 M2)` | Yes | Section 20: Generic base $q > 1$ homogeneity control ($L = K\log q$) | None |
+| `unshifted_regularizer_mellin_defect` | `theorem` | `(1/4 - s/2)*(1/4 - s/2 - 1/2) = s^2/4 - 1/16 ∧ value(0) = -1/16 ∧ value(1) = 3/16` | Yes | `TASK-TC-036R`: Unshifted $\mathcal D(\mathcal D - 1/2)$ fails to annihilate $s = 0, 1$ on $t^{1/4 - s/2}$ | None |
+| `corrected_pole_regularizer_mellin_identity` | `theorem` | `z = s - 1/2 → poleRegMultiplier s = (1/4)*s*(s-1) ∧ poleRegMultiplier s = (1/4)*(z^2-1/4) ∧ poleRegMultiplier 0 = 0 ∧ poleRegMultiplier 1 = 0` | Yes | `TASK-TC-036R`: Repaired $\mathcal P_{\mathrm{reg}}(\mathcal D) = \mathcal D^2 - 1/16$ has Mellin multiplier $\frac{1}{4}s(s-1) = \frac{1}{4}(z^2-1/4)$ vanishing at $s = 0, 1$ | None |
+| `corrected_pole_regularizer_annihilates_quarter_powers` | `theorem` | `((1/4)^2 - 1/16) * t_pos = 0 ∧ ((-1/4)^2 - 1/16) * t_neg = 0` | Yes | `TASK-TC-036R`: $\mathcal P_{\mathrm{reg}}(\mathcal D) = \mathcal D^2 - 1/16$ annihilates both $t^{1/4} = \widetilde g_t(0)$ and $t^{-1/4} = \int \widetilde g_t(u)\,du$ | None |
+| `corrected_pole_regularizer_spatial_jet` | `theorem` | `((1/4 - r)^2 - r) - 1/16 = r^2 - (3/2)*r ∧ value_at_r_eq_0 = 0` | Yes | `TASK-TC-036R`: Spatial polynomial factor $r^2 - \frac{3}{2}r$ of $\Phi_t(u) = (\mathcal D^2 - 1/16)\widetilde g_t(u)$ vanishes at $u = 0$ | None |
 
 **Not Formalized in Lean (Paper / Arb / Literature Scope)**:
 - Burnol's functional-analytic conductor domain $\mathcal S_0(K_\nu) / \Delta(K_\nu)$ and essential self-adjointness theorems;
@@ -629,7 +709,7 @@ is **identical across $q \in \{2, e, \tau = 2\pi, 10\}$** (maximum floating-poin
 - **Subgate ID**: `SUBGATE-TC-036A`
 - **Theorem Name**: *Zero-Independent Diagonal-Isolation and Sign-Incompatibility Identity*
 - **Exact Statement**:
-  > There exists a zero-independently defined operator pair $(\mathcal P, \mathcal Q)$ on the invariant domain $\Delta(\mathbb A_{\mathbb Q}^\times / \mathbb Q^\times)$ of the completed explicit-formula distribution $\mathcal W_\xi$ and a pole-regularized state $\Phi_t \in \Delta$ such that:
+  > There exists a zero-independently defined operator pair $(\mathcal P, \mathcal Q)$ on the invariant domain $\Delta(\mathbb A_{\mathbb Q}^\times / \mathbb Q^\times)$ of the completed explicit-formula distribution $\mathcal W_\xi$ and a pole-regularized state $\Phi_t = (\mathcal D^2 - \frac{1}{16})\widetilde g_t$ (or $\Phi_t^{(2)} = (\mathcal D^2 - \frac{1}{16})^2\widetilde g_t$) in $\Delta$ such that:
   > 1. **Zero-Independent Arithmetic Nonpositivity**: The arithmetic evaluation $\mathscr A_{\mathrm{arith}}(\Phi_t)$ satisfies an unconditional nonpositivity law $\mathscr A_{\mathrm{arith}}(\Phi_t) \le 0$ from prime-power, Archimedean conductor, and pole terms alone; and
   > 2. **Diagonal-Isolated Spectral Positivity**: Its complete spectral transfer $\mathscr A_{\mathrm{spec}}(\Phi_t)$ eliminates off-diagonal zero-zero cross terms $(\rho, \sigma)$ ($\sigma \neq 1 - \bar\rho$) and signed ordinate phases $-4\gamma_\rho^2$ without invoking Weil positivity, reducing to $\sum_\rho w_\rho(t)\delta_\rho^2 + R_{\mathrm{comp}}(t)$ with $w_\rho(t) > 0$ and unconditionally certified $R_{\mathrm{comp}}(t) \ge 0$.
 - **Status**: `OPEN` (`OBL-CT-001A = OPEN`).

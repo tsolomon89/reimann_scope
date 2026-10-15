@@ -3468,7 +3468,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 
 ---
 
-# 68. Modular-Covariant Theta–Conductor Curvature Audit (TASK-TC-036)
+# 68. Modular-Covariant Theta–Conductor Curvature Audit & Pole-Regularization Repair (TASK-TC-036 / TASK-TC-036R)
 
 1. **Theta Heat Scaling and Unique Heat-Drift Compensator**:
    On $\Theta_t(x,y) = \exp(-\pi t(x^2+y^2))$ ($t > 0$) with $\mathcal E = x\partial_x + y\partial_y$ and $\mathcal D = t\partial_t$:
@@ -3485,7 +3485,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \[
    \boxed{4\mathcal H_{\mathrm{mod},1} - \mathcal L_{\mathrm{heat}} = 8\mathcal D + I = 4\mathcal E + I \neq 0}
    \]
-   (`HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS`, `MODULAR_HESSIAN_DOES_NOT_REMOVE_HEAT_DRIFT`, `HEAT_COMPENSATOR_NOT_MODULARLY_FORCED`, `MODULAR_HESSIAN_DIFFERS_FROM_HEAT_COMPENSATOR`).
+   (`HEAT_AND_MODULAR_HESSIANS_DIFFER_BY_FORCED_CONNECTION_TERMS`, `MODULAR_HESSIAN_DOES_NOT_REMOVE_HEAT_DRIFT`, `HEAT_COMPENSATOR_NOT_MODULARLY_FORCED`, `MODULAR_HESSIAN_DIFFERS_FROM_HEAT_COMPENSATOR`). Under inversion $\mathcal E + I \mapsto -(\mathcal E + I)$, self-adjointness on $c_2\mathcal E^2 + c_1\mathcal E + c_0 I$ selects the 2-parameter family $b_0 I + b_2(\mathcal E + I)^2$ ($c_1 = 2c_2$), restricted to the ray $(\mathcal E + I)^2$ after normalizing $b_0 = 0$ on $\ker(\mathcal E + I)$.
 
 3. **Burnol Conductor Operator and Dilation Commutator**:
    In Burnol (`math/9902080v1`, `math/9812012v1`, `math/0101068v1`), the local conductor $H_\nu = A + B = M_{\log|\cdot|_\nu} + \mathcal F M_{\log|\cdot|_\nu}\mathcal F^{-1}$ acts on 1D $L^2(K_\nu, dx)$ with dense invariant core $\Delta(K_\nu)$. Under the 1D dilation generator $\mathcal A = x\partial_x + 1/2$:
@@ -3494,19 +3494,20 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \]
    (`CONDUCTOR_COMMUTES_WITH_DILATION`, `CONDUCTOR_DILATION_COMMUTATION_REMOVES_NEW_GRADE_SIGNAL`).
 
-4. **Prime-Only Covariant Variance, No-Contradiction Firewall, and Completed Spectral Transfer**:
+4. **Prime-Only Covariant Variance, No-Contradiction Firewall, Repaired Pole Regularization, and Completed Spectral Transfer**:
    - Replacing $\mathcal E^2$ by $\mathcal L_{\mathrm{heat}} = \mathcal E(\mathcal E - 2)$ yields the prime-only variance identity
      \[
      \mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) = A_0(t)A_{2,\mathrm{cov}}(t) - A_1(t)^2 = 4\pi^2 t^2\bigl(M_0(t)M_2(t) - M_1(t)^2\bigr) > 0,
      \]
      certified in 128-bit Arb at $t = 1$ ($N_{\mathrm{cutoff}} = 15$ and $N = \infty$) as $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(1) \in [+1.6097089323851242452337142816 \times 10^{-26} \pm 3.98 \times 10^{-55}] > 0$ (`PRIME_ONLY_COVARIANT_VARIANCE_POSITIVE_CERTIFIED`, control theorem only).
    - Because both $\mathfrak C_{\mathrm{prime}}^{\mathrm{cov}}(t) \ge 0$ and a hypothetical positive spectral curvature satisfy $\ge 0$, there is no sign incompatibility (`POSITIVE_ARITHMETIC_VARIANCE_HAS_NO_CONTRADICTORY_SPECTRAL_LAW`).
-   - On the pole-regularized theta state $\Phi_t = \mathcal D(\mathcal D - 1/2)(t^{1/4}g_t) \in \Delta(\mathbb R_+^\times)$, the completed linear functional $W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t)$ is a `SIGNED_SINGLE_ZERO_SUM`, while the completed quadratic variance $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t) = W_{\mathrm{comp}}(\Phi_t)W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t) - W_{\mathrm{comp}}(\mathcal E\Phi_t)^2$ is an `UNRESTRICTED_DOUBLE_ZERO_SUM` over all ordered pairs $(\rho, \sigma)$ (`THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`). Global positivity of the single-zero convolution form $Z(g * g^*)$ across primes is RH-equivalent (`THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`), and the heat-variance scaling is generic across all bases $q \in \{2, e, \tau, 10\}$ (`GENERIC_HEAT_VARIANCE_NOT_TC_CONSTRAINT`).
+   - On the half-weight normalized state $\widetilde g_t(u) = t^{1/4}e^{-\pi t u^2}$ whose Mellin transform scales as $t^{1/4 - s/2}$, the unshifted operator $\mathcal D(\mathcal D - 1/2)$ acts by $(1/4 - s/2)(-1/4 - s/2) = s^2/4 - 1/16$ (nonzero at $s = 0$) and leaves $-\frac{1}{16}t^{1/4} \neq 0$ at $u = 0$. The exact pole-annihilating operator is $\mathcal P_{\mathrm{reg}}(\mathcal D) := \mathcal D^2 - \frac{1}{16} = (\mathcal D - \frac{1}{4})(\mathcal D + \frac{1}{4})$, which acts on $t^{1/4 - s/2}$ by $\frac{1}{4}s(s - 1) = \frac{1}{4}(z^2 - \frac{1}{4})$ (`EXACT_POLE_ANNIHILATING_OPERATOR_PROVED`, `COMPLETED_THETA_STATE_IN_INVARIANT_CORE_PROVED`). On the repaired state $\Phi_t = (\mathcal D^2 - 1/16)\widetilde g_t \in \mathcal S_0(\mathbb R) \cap \Delta(\mathbb R_+^\times)$ (and its squared companion $\Phi_t^{(2)} = (\mathcal D^2 - 1/16)^2\widetilde g_t$ with $W_{\mathrm{pole}}(J\Phi_t^{(2)}) = 0$), the completed linear functional $W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t)$ is a `SIGNED_SINGLE_ZERO_SUM`, while the completed quadratic variance $\mathscr A_{\Theta,\mathcal C}^{\mathrm{cov}}(t) = W_{\mathrm{comp}}(\Phi_t)W_{\mathrm{comp}}(\mathcal L_{\mathrm{heat}}\Phi_t) - W_{\mathrm{comp}}(\mathcal E\Phi_t)^2$ is an `UNRESTRICTED_DOUBLE_ZERO_SUM` over all ordered pairs $(\rho, \sigma)$ (`THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL`). Global positivity of the single-zero convolution form $Z(g * g^*)$ across primes is RH-equivalent (`THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT`), and the heat-variance scaling is generic across all bases $q \in \{2, e, \tau, 10\}$ (`GENERIC_HEAT_VARIANCE_NOT_TC_CONSTRAINT`).
 
 5. **Principal Classification and Lean 4 Formal Verification**:
    \[
    \boxed{\texttt{ONE\_PRECISE\_THETA\_CONDUCTOR\_SUBGATE\_OPEN} \qquad (\texttt{SUBGATE-TC-036A}, \; \texttt{OBL-CT-001A} = \texttt{OPEN})}
    \]
-   `formal/RiemannScope/ModularThetaConductorCurvature.lean` (14 module declarations: `1 def` + `13 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 593 compiled `theorem` declarations in repo):
-   `heatDriftCoeff`, `theta_heat_euler_scaling`, `heat_drift_operator_expansion`, `heat_drift_compensator_unique`, `modular_weight_normalization_involution`, `modular_covariant_deriv_vanishes_at_self_dual`, `heat_and_modular_hessian_difference`, `heat_and_modular_hessian_incompatibility`, `dilation_conductor_commutator_cancellation`, `covariant_prime_variance_identity`, `covariant_prime_variance_nonneg`, `arithmetic_sign_and_spectral_sign_no_contradiction`, `complement_nonnegativity_contradiction`, `generic_quadratic_heat_base_control`.
+   `formal/RiemannScope/ModularThetaConductorCurvature.lean` (19 module declarations: `2 def` + `17 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 597 compiled `theorem` declarations in repo):
+   `covariantSecondMoment`, `poleRegMultiplier`, `theta_heat_euler_scaling`, `heat_drift_operator_expansion`, `heat_drift_compensator_unique`, `modular_weight_normalization_involution`, `modular_covariant_deriv_vanishes_at_self_dual`, `heat_and_modular_hessian_difference`, `heat_and_modular_hessian_incompatibility`, `dilation_conductor_commutator_cancellation`, `covariant_prime_variance_identity`, `covariant_prime_variance_nonneg`, `arithmetic_sign_and_spectral_sign_no_contradiction`, `theta_conductor_sign_incompatibility_contradiction`, `generic_quadratic_heat_base_control`, `unshifted_regularizer_mellin_defect`, `corrected_pole_regularizer_mellin_identity`, `corrected_pole_regularizer_annihilates_quarter_powers`, `corrected_pole_regularizer_spatial_jet`.
+
 
