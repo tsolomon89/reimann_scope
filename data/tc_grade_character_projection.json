@@ -1,0 +1,870 @@
+{
+  "starting_head": "02dce7dd62492605e88f72c05c9efb67a900f84e",
+  "substantive_parent_head": "fc549855377581ca325782831caef2cb75b0e20d",
+  "task_id": "TASK-TC-037",
+  "task_status": "TASK_TC_037_BIGRADED_CHARACTER_PROJECTION_AUDIT_COMPLETE",
+  "corrected_theta_state_used": {
+    "regularizer_status": "CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH",
+    "half_density_gaussian": "tilde{g}_t(u) = t^{1/4} exp(-pi t u^2)",
+    "pole_regularizer_operator": "P_reg(D) = D^2 - 1/16,  D = t d/dt",
+    "single_regularized_state": "Phi_t = (D^2 - 1/16) tilde{g}_t",
+    "double_regularized_state": "Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t",
+    "mellin_multiplier_order_1": "(1/4) s (s - 1) = (1/4) (z^2 - 1/4)",
+    "mellin_multiplier_order_2": "(1/16) s^2 (s - 1)^2 = (1/16) (z^2 - 1/4)^2",
+    "unshifted_D_D_minus_half_used": false,
+    "zero_independent": true,
+    "pole_multiplier_at_s_eq_0": {
+      "re": 0.0,
+      "im": 0.0
+    },
+    "pole_multiplier_at_s_eq_1": {
+      "re": 0.0,
+      "im": 0.0
+    },
+    "sample_mellin_modulus_at_first_critical_zero": 0.021795697304715284
+  },
+  "centered_zero_symmetries": {
+    "group_structure": "Klein four-group V_4 = {I, C, F, R} ~= Z/2Z x Z/2Z",
+    "table": [
+      {
+        "symmetry": "I",
+        "zero": "rho",
+        "centered_coordinate": "z = delta + i*gamma"
+      },
+      {
+        "symmetry": "C",
+        "zero": "conj(rho)",
+        "centered_coordinate": "conj(z) = delta - i*gamma"
+      },
+      {
+        "symmetry": "F",
+        "zero": "1 - rho",
+        "centered_coordinate": "-z = -delta - i*gamma"
+      },
+      {
+        "symmetry": "R = F o C",
+        "zero": "1 - conj(rho)",
+        "centered_coordinate": "-conj(z) = -delta + i*gamma"
+      }
+    ],
+    "relations": {
+      "I_sq": "I",
+      "C_sq": "I",
+      "F_sq": "I",
+      "R_sq": "I",
+      "F_compose_C": "R",
+      "C_compose_F": "R"
+    },
+    "critical_zero_control": {
+      "delta": 0.0,
+      "gamma": 14.134725141734693,
+      "rho": {
+        "re": 0.5,
+        "im": 14.134725141734693
+      },
+      "z": {
+        "re": 0.0,
+        "im": 14.134725141734693
+      },
+      "symmetries": {
+        "I": {
+          "name": "Identity",
+          "zero_formula": "rho",
+          "centered_formula": "z",
+          "rho": {
+            "re": 0.5,
+            "im": 14.134725141734693
+          },
+          "z": {
+            "re": 0.0,
+            "im": 14.134725141734693
+          }
+        },
+        "C": {
+          "name": "Schwarz conjugation",
+          "zero_formula": "conj(rho)",
+          "centered_formula": "conj(z)",
+          "rho": {
+            "re": 0.5,
+            "im": -14.134725141734693
+          },
+          "z": {
+            "re": 0.0,
+            "im": -14.134725141734693
+          }
+        },
+        "F": {
+          "name": "Functional-equation reflection",
+          "zero_formula": "1 - rho",
+          "centered_formula": "-z",
+          "rho": {
+            "re": 0.5,
+            "im": -14.134725141734693
+          },
+          "z": {
+            "re": -0.0,
+            "im": -14.134725141734693
+          }
+        },
+        "R": {
+          "name": "Same-height reflection",
+          "zero_formula": "1 - conj(rho)",
+          "centered_formula": "-conj(z)",
+          "rho": {
+            "re": 0.5,
+            "im": 14.134725141734693
+          },
+          "z": {
+            "re": -0.0,
+            "im": 14.134725141734693
+          }
+        }
+      },
+      "consistency_max_residual": 0.0,
+      "R_squared_equals_I": true,
+      "R_equals_F_compose_C": true,
+      "R_equals_C_compose_F": true,
+      "is_self_reflected_under_R": true
+    },
+    "offcritical_zero_control": {
+      "delta": 0.15,
+      "gamma": 14.134725141734693,
+      "rho": {
+        "re": 0.65,
+        "im": 14.134725141734693
+      },
+      "z": {
+        "re": 0.15,
+        "im": 14.134725141734693
+      },
+      "symmetries": {
+        "I": {
+          "name": "Identity",
+          "zero_formula": "rho",
+          "centered_formula": "z",
+          "rho": {
+            "re": 0.65,
+            "im": 14.134725141734693
+          },
+          "z": {
+            "re": 0.15,
+            "im": 14.134725141734693
+          }
+        },
+        "C": {
+          "name": "Schwarz conjugation",
+          "zero_formula": "conj(rho)",
+          "centered_formula": "conj(z)",
+          "rho": {
+            "re": 0.65,
+            "im": -14.134725141734693
+          },
+          "z": {
+            "re": 0.15,
+            "im": -14.134725141734693
+          }
+        },
+        "F": {
+          "name": "Functional-equation reflection",
+          "zero_formula": "1 - rho",
+          "centered_formula": "-z",
+          "rho": {
+            "re": 0.35,
+            "im": -14.134725141734693
+          },
+          "z": {
+            "re": -0.15,
+            "im": -14.134725141734693
+          }
+        },
+        "R": {
+          "name": "Same-height reflection",
+          "zero_formula": "1 - conj(rho)",
+          "centered_formula": "-conj(z)",
+          "rho": {
+            "re": 0.35,
+            "im": 14.134725141734693
+          },
+          "z": {
+            "re": -0.15,
+            "im": 14.134725141734693
+          }
+        }
+      },
+      "consistency_max_residual": 0.0,
+      "R_squared_equals_I": true,
+      "R_equals_F_compose_C": true,
+      "R_equals_C_compose_F": true,
+      "is_self_reflected_under_R": false
+    },
+    "lean_theorem": "centered_zero_reflection_identity"
+  },
+  "grade_character_convention": {
+    "scale_base": "tau = 2*pi",
+    "arithmetic_station_action": "Prime-power stations n = p^k scale at grade K as x_K(n) = tau^K n, corresponding to testing the explicit-formula distribution against the inverse half-density dilated state (U_{-K} Psi)(u) = tau^{-K/2} Psi(tau^{-K} u).",
+    "forward_half_density_dilation": "(U_K Psi)(u) = tau^{K/2} Psi(tau^K u)  ==>  hat{U_K Psi}(z) = tau^{-K z} hat{Psi}(z)",
+    "inverse_station_dilation": "(U_{-K} Psi)(u) = tau^{-K/2} Psi(tau^{-K} u)  ==>  hat{U_{-K} Psi}(z) = tau^{+K z} hat{Psi}(z)",
+    "canonical_sign_choice": "+1 (station-dilation convention chi_z(K) = tau^{K z}; forward U_K gives tau^{-K z})",
+    "centered_mellin_definition": "hat{Psi}(z) = int_0^infty Psi(u) u^{z - 1/2} du,  s = 1/2 + z",
+    "centered_spectral_character": "chi_z(K) = tau^{K z} = exp(K (delta + i*gamma) log(tau))",
+    "amplitude_formula": "|chi_z(K)| = tau^{K delta}",
+    "phase_formula": "arg(chi_z(K)) = K gamma log(tau)  (mod 2*pi)",
+    "unitarity_equivalence": "|chi_z(K)| = 1 for K != 0  <=>  Re(z) = delta = 0",
+    "scope_note": "Control fact only: scalar grade-character unitarity is equivalent to delta = 0 and is never assumed as a premise.",
+    "sample_on_critical_line": {
+      "delta": 0.0,
+      "gamma": 14.134725141734693,
+      "K": 1.0,
+      "base_q": 6.283185307179586,
+      "sign_convention": 1,
+      "character_value": {
+        "re": 0.6636221095762818,
+        "im": 0.7480679753080769
+      },
+      "amplitude": 1.0,
+      "amplitude_residual": 0.0,
+      "phase_angle_radians": 25.977887177993775,
+      "is_unitary": true,
+      "critical_line_iff_unitary_for_nonzero_K": true
+    },
+    "sample_off_critical_line": {
+      "delta": 0.12,
+      "gamma": 14.134725141734693,
+      "K": 1.0,
+      "base_q": 6.283185307179586,
+      "sign_convention": 1,
+      "character_value": {
+        "re": 0.8273750702580438,
+        "im": 0.9326584884634074
+      },
+      "amplitude": 1.24675633665418,
+      "amplitude_residual": 2.220446049250313e-16,
+      "phase_angle_radians": 25.977887177993775,
+      "is_unitary": false,
+      "critical_line_iff_unitary_for_nonzero_K": true
+    }
+  },
+  "bigraded_functional": {
+    "symbol": "G_S(K, J)",
+    "independent_grade_variables": [
+      "K",
+      "J"
+    ],
+    "common_shift_coordinate": "r = (K + J) / 2",
+    "relative_grade_coordinate": "d = (J - K) / 2",
+    "reconstructed_grades": {
+      "K": "r - d",
+      "J": "r + d"
+    },
+    "admissible_state_used": "Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t  or its inversion-even part Psi_t^+",
+    "zero_independent_definition": true,
+    "candidates": {
+      "G_I": {
+        "form_type": "bilinear",
+        "zero_independent": true,
+        "arithmetic_definition": "W_arith(U_{-K} Psi_t) * W_arith(U_{-J} Psi_t)",
+        "complete_spectral_expansion": "sum_{rho, sigma} m_rho m_sigma hat{Psi}_t(z_rho) hat{Psi}_t(z_sigma) tau^{r(z_rho + z_sigma)} tau^{d(z_sigma - z_rho)}",
+        "convergence_domain": "t > 0, all real grades (K, J) in R^2 via super-exponential Gamma * Gaussian decay"
+      },
+      "G_C": {
+        "form_type": "sesquilinear",
+        "zero_independent": true,
+        "arithmetic_definition": "W_arith(U_{-K} Psi_t) * conj(W_arith(U_{-J} Psi_t))",
+        "complete_spectral_expansion": "sum_{rho, sigma} m_rho m_sigma hat{Psi}_t(z_rho) conj(hat{Psi}_t(z_sigma)) tau^{r(z_rho + conj(z_sigma))} tau^{d(conj(z_sigma) - z_rho)}",
+        "convergence_domain": "t > 0, all real grades (K, J) in R^2 via super-exponential Gamma * Gaussian decay"
+      }
+    },
+    "multiplicity_rule": "If rho has multiplicity m_rho and sigma = 1 - conj(rho) has the same multiplicity m_{1-conj(rho)} = m_rho (by functional equation and Schwarz reflection of xi(s)), the stationary block (rho, 1 - conj(rho)) contributes with multiplicity weight m_rho^2."
+  },
+  "second_leg_involution_table": {
+    "status": "REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION",
+    "selected_structure_for_R_pair": "C (sesquilinear correlation G_C(K, J) = W_comp(U_{-K} Psi) conj(W_comp(U_{-J} Psi)))",
+    "target_pair_exponent": "lambda_C(rho, sigma) = z_rho + conj(z_sigma)",
+    "stationary_iff": "z_rho + conj(z_sigma) = 0  <=>  sigma = 1 - conj(rho)",
+    "table": [
+      {
+        "second_leg_structure": "I (bilinear: W_comp(U_{-K} Psi) W_comp(U_{-J} Psi))",
+        "form_type": "bilinear",
+        "second_leg_mellin_factor": "hat{Psi}(z_sigma) tau^{J z_sigma}",
+        "pair_exponent_lambda": "z_rho + z_sigma = (delta_rho + delta_sigma) + i*(gamma_rho + gamma_sigma)",
+        "relative_exponent_mu": "z_sigma - z_rho",
+        "stationary_condition_lambda_eq_0": "z_rho + z_sigma = 0  <=>  delta_sigma = -delta_rho and gamma_sigma = -gamma_rho",
+        "selected_zero_relation": "sigma = 1 - rho  (functional-equation F-pair)",
+        "selects_same_height_reflection_R": false
+      },
+      {
+        "second_leg_structure": "C (sesquilinear conjugation: W_comp(U_{-K} Psi) conj(W_comp(U_{-J} Psi)))",
+        "form_type": "sesquilinear",
+        "second_leg_mellin_factor": "conj(hat{Psi}(z_sigma)) tau^{J conj(z_sigma)}",
+        "pair_exponent_lambda": "z_rho + conj(z_sigma) = (delta_rho + delta_sigma) + i*(gamma_rho - gamma_sigma)",
+        "relative_exponent_mu": "conj(z_sigma) - z_rho",
+        "stationary_condition_lambda_eq_0": "z_rho + conj(z_sigma) = 0  <=>  delta_sigma = -delta_rho and gamma_sigma = gamma_rho",
+        "selected_zero_relation": "sigma = 1 - conj(rho)  (same-height reflection R-pair)",
+        "selects_same_height_reflection_R": true
+      },
+      {
+        "second_leg_structure": "F (bilinear + multiplicative inversion I on second grade action: J |-> -J)",
+        "form_type": "bilinear",
+        "second_leg_mellin_factor": "hat{I Psi}(z_sigma) tau^{-J z_sigma} = hat{Psi}(-z_sigma) tau^{-J z_sigma}",
+        "pair_exponent_lambda": "z_rho - z_sigma = (delta_rho - delta_sigma) + i*(gamma_rho - gamma_sigma)",
+        "relative_exponent_mu": "-z_sigma - z_rho",
+        "stationary_condition_lambda_eq_0": "z_rho - z_sigma = 0  <=>  delta_sigma = delta_rho and gamma_sigma = gamma_rho",
+        "selected_zero_relation": "sigma = rho  (diagonal I-pair)",
+        "selects_same_height_reflection_R": false
+      },
+      {
+        "second_leg_structure": "R = F o C (sesquilinear + grade-inversion J |-> -J)",
+        "form_type": "sesquilinear",
+        "second_leg_mellin_factor": "conj(hat{I Psi}(z_sigma)) tau^{-J conj(z_sigma)}",
+        "pair_exponent_lambda": "z_rho - conj(z_sigma) = (delta_rho - delta_sigma) + i*(gamma_rho + gamma_sigma)",
+        "relative_exponent_mu": "-conj(z_sigma) - z_rho",
+        "stationary_condition_lambda_eq_0": "z_rho - conj(z_sigma) = 0  <=>  delta_sigma = delta_rho and gamma_sigma = -gamma_rho",
+        "selected_zero_relation": "sigma = conj(rho)  (Schwarz conjugate C-pair)",
+        "selects_same_height_reflection_R": false
+      }
+    ]
+  },
+  "common_shift_parameter": "r = (K + J) / 2  (K = r - d, J = r + d)",
+  "relative_grade_parameter": "d = (J - K) / 2  (relative difference J - K = 2 d)",
+  "pair_character_formula": "exp(r * lambda_C(rho, sigma) * log(tau)) = tau^{r (z_rho + conj(z_sigma))} with modulus |q_{rho,sigma}|^r = tau^{r (delta_rho + delta_sigma)}",
+  "reflection_stationary_iff": {
+    "statement": "z_rho + conj(z_sigma) = 0  <=>  sigma = 1 - conj(rho)",
+    "critical_line_self_reflection": "rho = 1 - conj(rho)  <=>  delta_rho = 0",
+    "offcritical_distinct_reflection_pair": "delta_rho != 0  ==>  rho != 1 - conj(rho)",
+    "status": "REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION",
+    "lean_theorem": "reflection_stationary_iff"
+  },
+  "finite_laurent_projector_status": {
+    "status": "FINITE_GRADE_LAURENT_PROJECTOR_NO_GO",
+    "filter_form": "Pi_N[f] = sum_{K=-N}^N c_K f(K),  P_N(q) = sum_{K=-N}^N c_K q^K",
+    "projector_requirements": {
+      "stationary_preservation": "P_N(1) != 0",
+      "nonstationary_annihilation": "P_N(q_{rho, sigma}) = 0 for all nonstationary pairs (rho, sigma)"
+    },
+    "distinct_character_theorem": {
+      "status": "INFINITELY_MANY_DISTINCT_PAIR_CHARACTERS_PROVED",
+      "fixed_zero": "rho_0 (any nontrivial zero of zeta(s))",
+      "character_family": "q_sigma = tau^{z_{rho_0} + conj(z_sigma)} = exp((z_{rho_0} + conj(z_sigma)) log(tau))",
+      "vertical_period_spacing": 3.418719032962866,
+      "proof_steps": [
+        "1. Fix one nontrivial zero rho_0 = 1/2 + z_{rho_0}.",
+        "2. Suppose toward a contradiction that {q_sigma : zeta(sigma) = 0} takes only finitely many values {w_1, ..., w_M}.",
+        "3. Since exp(z log(tau)) = exp(z' log(tau)) iff z - z' in (2*pi*i / log(tau)) Z, each value w_j restricts Re(z_sigma) to a single value and Im(z_sigma) = gamma_sigma to a single vertical arithmetic progression gamma_0^{(j)} + (2*pi / log(tau)) Z.",
+        "4. A finite union of M vertical arithmetic progressions with spacing 2*pi / log(tau) contains at most M * (T * log(tau) / pi + 2) = O(T) points with |gamma_sigma| <= T.",
+        "5. By the Riemann-von Mangoldt zero-counting theorem N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T) (von Mangoldt 1905; Titchmarsh 1986, Theorem 9.4; Trudgian 2014), the number of nontrivial zeros up to height T grows as (T/(2*pi)) log(T/(2*pi)) = Omega(T log T), contradicting O(T).",
+        "6. Therefore {q_sigma} contains infinitely many distinct nonzero complex numbers != 1."
+      ],
+      "riemann_von_mangoldt_formula": "N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T)"
+    },
+    "laurent_root_bound": "Multiplying P_N(q) by q^N gives a polynomial Q_{2N}(q) = q^N P_N(q) of degree <= 2N. Since Q_{2N}(q) vanishes on infinitely many distinct values q_sigma (in particular on at least 2N + 1 distinct values), Q_{2N} = 0 identically, forcing all c_K = 0 and P_N(1) = 0.",
+    "lean_theorem": "finite_polynomial_projector_root_no_go"
+  },
+  "finite_differential_projector_status": {
+    "status": "FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO",
+    "differential_filter_form": "p(d/dr) e^{r lambda} = p(lambda) e^{r lambda},  p(lambda) = sum_{m=0}^M a_m lambda^m",
+    "projector_requirements": {
+      "stationary_preservation": "p(0) != 0",
+      "nonstationary_annihilation": "p(lambda_{rho, sigma}) = 0 for all nonstationary lambda_{rho, sigma} != 0"
+    },
+    "distinct_exponent_argument": "For fixed rho_0, the nontrivial zeros sigma have infinitely many distinct ordinates gamma_sigma (since N(T) -> infty and every zero has finite multiplicity), yielding infinitely many distinct nonzero pair exponents lambda_{rho_0, sigma} = (z_{rho_0} + conj(z_sigma)) log(tau). A polynomial p of degree <= M vanishing on more than M distinct points must satisfy p = 0 identically, forcing p(0) = 0.",
+    "rational_filter_extension": "For any finite rational filter R(lambda) = p(lambda)/q(lambda) analytic at lambda = 0 (so q(0) != 0 and R(0) = p(0)/q(0) != 0), vanishing on all nonstationary pair exponents lambda_{rho_0, sigma} outside the finite pole set of q still forces the polynomial numerator p(lambda) to have infinitely many distinct roots, hence p = 0 and R = 0.",
+    "lean_theorem": "finite_differential_projector_root_no_go"
+  },
+  "distinct_character_theorem_status": {
+    "status": "INFINITELY_MANY_DISTINCT_PAIR_CHARACTERS_PROVED",
+    "fixed_zero": "rho_0 (any nontrivial zero of zeta(s))",
+    "character_family": "q_sigma = tau^{z_{rho_0} + conj(z_sigma)} = exp((z_{rho_0} + conj(z_sigma)) log(tau))",
+    "vertical_period_spacing": 3.418719032962866,
+    "proof_steps": [
+      "1. Fix one nontrivial zero rho_0 = 1/2 + z_{rho_0}.",
+      "2. Suppose toward a contradiction that {q_sigma : zeta(sigma) = 0} takes only finitely many values {w_1, ..., w_M}.",
+      "3. Since exp(z log(tau)) = exp(z' log(tau)) iff z - z' in (2*pi*i / log(tau)) Z, each value w_j restricts Re(z_sigma) to a single value and Im(z_sigma) = gamma_sigma to a single vertical arithmetic progression gamma_0^{(j)} + (2*pi / log(tau)) Z.",
+      "4. A finite union of M vertical arithmetic progressions with spacing 2*pi / log(tau) contains at most M * (T * log(tau) / pi + 2) = O(T) points with |gamma_sigma| <= T.",
+      "5. By the Riemann-von Mangoldt zero-counting theorem N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T) (von Mangoldt 1905; Titchmarsh 1986, Theorem 9.4; Trudgian 2014), the number of nontrivial zeros up to height T grows as (T/(2*pi)) log(T/(2*pi)) = Omega(T log T), contradicting O(T).",
+      "6. Therefore {q_sigma} contains infinitely many distinct nonzero complex numbers != 1."
+    ],
+    "riemann_von_mangoldt_formula": "N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T)"
+  },
+  "riemann_von_mangoldt_dependency": {
+    "formula": "N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T)",
+    "used_for": "Proving that for fixed rho_0, the pair characters q_sigma = tau^{z_{rho_0} + conj(z_sigma)} take infinitely many distinct values (since any finite union of vertical progressions of spacing 2*pi/log(tau) has O(T) points up to height T vs Omega(T log T) zeros).",
+    "evidence_class": "PROVED_PAPER_DERIVATION_FROM_CLASSICAL_THEOREM",
+    "claimed_in_lean": false,
+    "primary_citations": [
+      "von Mangoldt (1905), Math. Ann. 60, 1-19",
+      "Titchmarsh (1986), The Theory of the Riemann Zeta-Function, 2nd ed., Theorem 9.4",
+      "Trudgian (2014), J. Number Theory 134, 280-292 (arXiv:1208.5846v2)"
+    ]
+  },
+  "discrete_cesaro_status": {
+    "status": "OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION",
+    "formula": "A_N(q) = (1/(2N+1)) sum_{K=-N}^N q^K",
+    "stationary_q_eq_1": "A_N(1) = 1",
+    "unitary_q_ne_1": "|A_N(q)| <= 2 / ((2N+1) |q - 1|) -> 0 as N -> infty",
+    "nonunitary_mod_q_ne_1": "A_N(q) grows exponentially as max(|q|, |q|^{-1})^N / (2N+1) -> +infty",
+    "sample_evaluation": {
+      "N_10_modulus": 27.86880155035509,
+      "N_25_modulus": 44831.25391257441,
+      "grows_exponentially": true
+    }
+  },
+  "continuous_cesaro_status": {
+    "status": "CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS",
+    "formula": "C_T(lambda) = (1/(2T)) int_{-T}^T exp(r lambda) dr = sinh(T lambda) / (T lambda)",
+    "stationary_lambda_eq_0": "C_T(0) = 1",
+    "unitary_imaginary_lambda": "C_T(i omega) = sin(T omega) / (T omega) -> 0 as T -> infty (omega != 0)",
+    "nonunitary_re_lambda_ne_0": "|C_T(lambda)| ~ exp(T |Re(lambda)|) / (2 T |lambda|) -> +infty",
+    "sample_evaluation": {
+      "T_10_modulus": 22.493904020577514,
+      "T_25_modulus": 35151.2922244288,
+      "grows_exponentially": true
+    }
+  },
+  "abel_status": {
+    "convergence_annulus": "r < |q| < 1/r",
+    "diverges_as_r_approaches_1_for_nonunitary_q": true,
+    "sample_inside_annulus": {
+      "q": {
+        "re": 1.7356172605944091,
+        "im": 0.0
+      },
+      "modulus_q": 1.7356172605944091,
+      "r": 0.28808194718503866,
+      "annulus_lower": 0.28808194718503866,
+      "annulus_upper": 3.471234521188818,
+      "series_converges_at_r": true,
+      "divergence_threshold_r": 0.5761638943700773,
+      "A_r": {
+        "re": 1.215387598545109,
+        "im": 0.0
+      },
+      "A_r_modulus": 1.215387598545109
+    },
+    "sample_outside_annulus_r_0_95": {
+      "q": {
+        "re": 1.7356172605944091,
+        "im": 0.0
+      },
+      "modulus_q": 1.7356172605944091,
+      "r": 0.95,
+      "annulus_lower": 0.95,
+      "annulus_upper": 1.0526315789473684,
+      "series_converges_at_r": false,
+      "divergence_threshold_r": 0.5761638943700773,
+      "A_r": null,
+      "A_r_modulus": Infinity
+    }
+  },
+  "gaussian_average_status": {
+    "exact_formula": "G_T(lambda) = exp(T^2 lambda^2 / 2)",
+    "T_5_modulus": 44.70190531186326,
+    "T_10_modulus": 3993044.380465252,
+    "diverges_super_exponentially_on_real_diagonal": true
+  },
+  "offcritical_diagonal_character": {
+    "pair": "(rho, rho)",
+    "exponent": "lambda_{rho,rho} = z_rho + conj(z_rho) = 2 delta_rho",
+    "character": "q_{rho,rho} = tau^{2 delta_rho}",
+    "unitary_iff": "|q_{rho,rho}| = 1  <=>  delta_rho = 0",
+    "mellin_weight_nonvanishing": {
+      "unsymmetrized_modulus": 0.02316668821592485,
+      "inversion_even_modulus_squared": 1.356458111472452e-05,
+      "gamma_factor_zero_free": true,
+      "polynomial_multiplier_roots": [
+        "s = 0 (z = -1/2)",
+        "s = 1 (z = +1/2)"
+      ],
+      "provably_nonzero_on_open_strip_0_lt_Re_s_lt_1": true
+    }
+  },
+  "nonunitarity_status": {
+    "status": "OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION",
+    "pontryagin_firewall_status": "GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE",
+    "pontryagin_audit": {
+      "status": "GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE",
+      "additive_grade_group": "(Z, +) or (R, +)",
+      "unitary_dual_characters": "q = e^{i theta} in T (for Z) or e^{i r omega} with omega in R (for R)",
+      "boundedness_criterion": "exp(r lambda) is bounded on R (or Z) iff Re(lambda) = 0",
+      "single_zero_character_scope": "For a single-zero character chi_z(K) = tau^{K z}, boundedness/unitarity on Z or R holds iff Re(z) = delta_rho = 0, which IS the Riemann Hypothesis for rho.",
+      "pair_character_scope": "For the sesquilinear common-shift pair character tau^{r(z_rho + conj(z_sigma))}, boundedness/unitarity for ALL pairs (rho, sigma)\u2014and in particular for the diagonal pair sigma = rho where z_rho + conj(z_rho) = 2 delta_rho\u2014holds iff every delta_rho = 0. Therefore, invoking Pontryagin character orthogonality or an invariant mean on Z or R to annihilate all nonstationary pair characters implicitly assumes delta_rho = 0."
+    },
+    "complex_grade_audit": {
+      "status": "NO_FIXED_COMPLEX_GRADE_CONTOUR_UNITARIZES_SPECTRUM",
+      "complex_grade_parameter": "K = v exp(i theta),  v in R",
+      "modulus_formula": "|tau^{K lambda}| = exp(v log(tau) (cos(theta) Re(lambda) - sin(theta) Im(lambda)))",
+      "obstruction_proof": "For off-diagonal pairs with Im(lambda) = gamma_rho - gamma_sigma != 0 and Re(lambda) = 0, bilateral boundedness in v requires sin(theta) = 0 (theta in pi Z, the real grade axis). On the real grade axis sin(theta) = 0, cos(theta) = +-1, so any off-critical diagonal pair with Re(lambda) = 2 delta_rho != 0 has growth rate +-2 delta_rho != 0. Since sin^2(theta) + cos^2(theta) = 1, no fixed zero-independent angle theta can simultaneously make both families unitary.",
+      "sample_angle_audit": [
+        {
+          "theta_radians": 0.0,
+          "diagonal_growth_rate_cos_theta_2delta": 0.3,
+          "offdiagonal_growth_rate_neg_sin_theta_dgamma": -0.0,
+          "both_zero": false
+        },
+        {
+          "theta_radians": 0.5235987755982988,
+          "diagonal_growth_rate_cos_theta_2delta": 0.2598076211353316,
+          "offdiagonal_growth_rate_neg_sin_theta_dgamma": -3.4434999999999993,
+          "both_zero": false
+        },
+        {
+          "theta_radians": 0.7853981633974483,
+          "diagonal_growth_rate_cos_theta_2delta": 0.21213203435596426,
+          "offdiagonal_growth_rate_neg_sin_theta_dgamma": -4.869844402031752,
+          "both_zero": false
+        },
+        {
+          "theta_radians": 1.5707963267948966,
+          "diagonal_growth_rate_cos_theta_2delta": 1.8369701987210297e-17,
+          "offdiagonal_growth_rate_neg_sin_theta_dgamma": -6.887,
+          "both_zero": false
+        }
+      ]
+    }
+  },
+  "inversion_even_state_status": {
+    "status": "INVERSION_EVEN_REAL_STATE_WEIGHT_NONNEGATIVE_PROVED",
+    "definition": "Psi_t^+ = (1/2) (Phi_t^{(2)} + I Phi_t^{(2)}),  (I Psi)(u) = u^{-1} Psi(u^{-1})",
+    "mellin_evenness": "hat{Psi}_t^+(-z) = hat{Psi}_t^+(z)",
+    "mellin_reality": "hat{Psi}_t^+(conj(z)) = conj(hat{Psi}_t^+(z))",
+    "reflection_weight_identity": "hat{Psi}_t^+(z) hat{Psi}_t^+(-conj(z)) = |hat{Psi}_t^+(z)|^2 >= 0",
+    "unsymmetrized_state_nonvanishing_in_strip": "For unsymmetrized Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t at t = 1, hat{Phi}_1^{(2)}(z) = (1/32) (z^2 - 1/4)^2 pi^{-(1/2 + z)/2} Gamma((1/2 + z)/2)  equals Psi_1^+(z) identically by theta self-duality tilde{g}_1 = F tilde{g}_1 (functional equation of the completed Gaussian factor), and since Gamma((1/2 + z)/2) has no zeros in C and (z^2 - 1/4)^2 vanishes only at z = +-1/2 (s = 0, 1), hat{Phi}_1^{(2)}(z) != 0 everywhere in the open critical strip 0 < Re(s) < 1.",
+    "sample_on_line": {
+      "z": {
+        "re": 0.0,
+        "im": 14.134725141734693
+      },
+      "t": 1.0,
+      "order": 2,
+      "psi_even_z": {
+        "re": -0.0034266960741333795,
+        "im": 0.0
+      },
+      "even_symmetry_residual": 0.0,
+      "schwarz_conjugation_residual": 0.0,
+      "reflection_product": {
+        "re": 1.1742245984481115e-05,
+        "im": -0.0
+      },
+      "modulus_squared": 1.1742245984481115e-05,
+      "reflection_product_equals_modulus_squared_residual": 0.0,
+      "weight_nonnegative": true
+    },
+    "sample_off_line": {
+      "z": {
+        "re": 0.15,
+        "im": 14.134725141734693
+      },
+      "t": 1.0,
+      "order": 2,
+      "psi_even_z": {
+        "re": -0.0033297187364001116,
+        "im": -0.001574024857234015
+      },
+      "even_symmetry_residual": 0.0,
+      "schwarz_conjugation_residual": 0.0,
+      "reflection_product": {
+        "re": 1.3564581114724518e-05,
+        "im": 0.0
+      },
+      "modulus_squared": 1.356458111472452e-05,
+      "reflection_product_equals_modulus_squared_residual": 1.6940658945086007e-21,
+      "weight_nonnegative": true
+    },
+    "lean_theorem": "reflection_quartet_radial_defect_nonneg"
+  },
+  "reflection_quartet_formula": {
+    "single_reflection_pair": "P(z_rho, -conj(z_rho)) = 4 delta_rho^2 + 4 i gamma_rho",
+    "conjugate_reflection_pair": "P(conj(z_rho), -z_rho) = 4 delta_rho^2 - 4 i gamma_rho",
+    "quartet_sum": "P_rho + P_{conj(rho)} = 8 delta_rho^2",
+    "weighted_quartet_sum": "8 m_rho^2 |hat{Psi}_t^+(z_rho)|^2 delta_rho^2 >= 0",
+    "audit": {
+      "status": "FORMAL_STATIONARY_SECTOR_RADIAL_QUARTET_IDENTITY_PROVED",
+      "pair_polynomial_formula": "P(z_rho, -conj(z_rho)) = 4 delta_rho^2 + 4 i gamma_rho",
+      "conjugate_pair_polynomial_formula": "P(conj(z_rho), -z_rho) = 4 delta_rho^2 - 4 i gamma_rho",
+      "quartet_sum_formula": "P_rho + P_{conj(rho)} = 8 delta_rho^2",
+      "weighted_quartet_formula": "W_rho delta_rho^2 = 8 m_rho^2 |hat{Psi}_t^+(z_rho)|^2 delta_rho^2 >= 0",
+      "sample_off_critical": {
+        "delta": 0.12,
+        "gamma": 14.134725141734693,
+        "multiplicity": 1,
+        "P_reflection_pair": {
+          "re": 0.0576,
+          "im": 56.53890056693877
+        },
+        "P_conjugate_reflection_pair": {
+          "re": 0.0576,
+          "im": -56.53890056693877
+        },
+        "P_pair_formula_residual": 0.0,
+        "P_conj_pair_formula_residual": 0.0,
+        "quartet_sum": {
+          "re": 0.1152,
+          "im": 0.0
+        },
+        "quartet_sum_formula_residual": 0.0,
+        "imaginary_part_cancelled": true,
+        "degree_le_2_leg_basis_on_reflection_pair": {
+          "z_rho_minus_z_sigma": 0.24,
+          "z_rho_plus_z_sigma_imag": 28.269450283469386,
+          "relative_square_(z_rho_minus_z_sigma)^2": 0.0576,
+          "common_square_(z_rho_plus_z_sigma)^2": -799.1618193295474,
+          "product_z_rho_z_sigma": -199.80485483238684
+        },
+        "mellin_weight_modulus_squared": 1.2907830355852044e-05,
+        "weighted_quartet_radial_value": 1.4869820569941554e-06,
+        "weighted_quartet_nonnegative": true,
+        "scope_classification": "FORMAL_STATIONARY_SECTOR_IDENTITY_ONLY_UNTIL_PROJECTOR_EXISTS"
+      },
+      "sample_on_critical": {
+        "delta": 0.0,
+        "gamma": 14.134725141734693,
+        "multiplicity": 1,
+        "P_reflection_pair": {
+          "re": 0.0,
+          "im": 56.53890056693877
+        },
+        "P_conjugate_reflection_pair": {
+          "re": 0.0,
+          "im": -56.53890056693877
+        },
+        "P_pair_formula_residual": 0.0,
+        "P_conj_pair_formula_residual": 0.0,
+        "quartet_sum": {
+          "re": 0.0,
+          "im": 0.0
+        },
+        "quartet_sum_formula_residual": 0.0,
+        "imaginary_part_cancelled": true,
+        "degree_le_2_leg_basis_on_reflection_pair": {
+          "z_rho_minus_z_sigma": 0.0,
+          "z_rho_plus_z_sigma_imag": 28.269450283469386,
+          "relative_square_(z_rho_minus_z_sigma)^2": 0.0,
+          "common_square_(z_rho_plus_z_sigma)^2": -799.1618193295474,
+          "product_z_rho_z_sigma": -199.79045483238684
+        },
+        "mellin_weight_modulus_squared": 1.1742245984481115e-05,
+        "weighted_quartet_radial_value": 0.0,
+        "weighted_quartet_nonnegative": true,
+        "scope_classification": "FORMAL_STATIONARY_SECTOR_IDENTITY_ONLY_UNTIL_PROJECTOR_EXISTS"
+      },
+      "lean_theorems": [
+        "reflection_quartet_imaginary_cancellation",
+        "reflection_quartet_radial_defect_nonneg"
+      ]
+    }
+  },
+  "reflection_weight_sign_status": "NONNEGATIVE_ON_STATIONARY_SECTOR_STRICTLY_POSITIVE_FOR_OFFCRITICAL_UNSYMMETRIZED_AND_SELFDUAL_THETA_STATE",
+  "cross_grade_arithmetic_zero_status": {
+    "base_pair": "(K, J) = (0, 1)",
+    "arithmetic_value": "Q_eps^{0,1}[w] = 0 for eps < Delta_min(N, 1) / 2",
+    "support_gap_N15": 0.1504440784612413,
+    "common_shift_preservation_requires": "b = 1 in F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y)"
+  },
+  "common_shift_transport_status": {
+    "status": "COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY",
+    "principal_outcome": "GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY",
+    "base_cross_grade_pair": "(K, J) = (0, 1)",
+    "support_separation_gap_N15": 0.1504440784612413,
+    "common_shift_translation": "(K, J) = (0, 1) |-> (r, 1 + r)",
+    "transported_kernel_ansatz": "F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y)",
+    "arithmetic_station_argument": "F_r(tau^r n, tau^{1+r} m) = tau^{a r} F_0(tau^{(1-b)r} n, tau^{(1-b)r} tau m)",
+    "required_b_for_arithmetic_preservation": 1.0,
+    "two_variable_mellin_grade_factor": "tau^{r (a + b (s + t))}",
+    "net_spectral_common_shift_exponent_formula": "r (a + b (s + t)) - r (s + t) = a r + (b - 1) r (s + t)",
+    "at_b_eq_1_zero_dependent_exponent": {
+      "re": 0.0,
+      "im": 0.0
+    },
+    "common_shift_spectral_character_survives_at_b_eq_1": false,
+    "arithmetic_support_separation_survives_at_b_ne_1": false,
+    "b_eq_0_sample_zero_dependent_exponent": {
+      "re": -1.9500000000000002,
+      "im": 0.0
+    },
+    "lean_theorem": "transport_projection_incompatibility_algebra"
+  },
+  "spectral_signal_survival_status": "ERASED_IDENTICALLY_AT_FULL_ARITHMETIC_TRANSPORT_B_EQ_1_AND_DIVERGENT_AT_UNTRANSPORTED_B_EQ_0",
+  "ratio_kernel_status": {
+    "status": "SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER",
+    "kernel_form": "F(x, y) = phi(x / y) = tilde{phi}(log x - log y)",
+    "common_scaling_invariance": "F(tau^r x, tau^r y) = phi((tau^r x)/(tau^r y)) = F(x, y)",
+    "two_variable_mellin_transform": "Setting u = x/y and v = y (dx dy / (x y) = du dv / (u v)), int_0^infty int_0^infty phi(x/y) x^s y^t dx/x dy/y = (int_0^infty phi(u) u^s du/u) * (int_0^infty v^{s + t} dv/v) = 2*pi * hat{phi}(s) * delta(Im(s + t)) on s + t = 0.",
+    "mellin_support_locus": "s + t = 0  (in centered coordinates: z_1 + z_2 = -1, or for half-density normalized ratio kernels: z_1 + z_2 = 0)",
+    "common_shift_exponent_on_locus": "r (s + t) = 0",
+    "common_shift_character_survives": false,
+    "lean_theorem": "transport_projection_incompatibility_algebra"
+  },
+  "relative_grade_fallback_status": {
+    "status": "RELATIVE_GRADE_SMOOTH_UNIFORM_GAP_FAILS_ON_FULL_SPECTRUM",
+    "layer_intersection_property": "tau^K Z cap tau^J Z = {0} for K != J (by Lindemann transcendence of tau = 2*pi)",
+    "finite_cutoff_gaps": [
+      {
+        "d": 1,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 0.43362938564082754
+      },
+      {
+        "d": 2,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 65.95683520871486
+      },
+      {
+        "d": 3,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 483.10042688479706
+      },
+      {
+        "d": 4,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 3104.0909130880773
+      },
+      {
+        "d": 5,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 19572.25982625801
+      },
+      {
+        "d": 6,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 123044.81677763895
+      },
+      {
+        "d": 7,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 773182.0663108586
+      },
+      {
+        "d": 8,
+        "finite_cutoff_max_n": 15,
+        "min_abs_gap_up_to_max_n": 4858114.880228132
+      }
+    ],
+    "diophantine_log_gap_shrinking": [
+      {
+        "cutoff": 15,
+        "min_log_gap_d1": 0.033925110492246
+      },
+      {
+        "cutoff": 50,
+        "min_log_gap_d1": 0.00040241845360222683
+      },
+      {
+        "cutoff": 200,
+        "min_log_gap_d1": 0.00040241845360178274
+      }
+    ],
+    "obstruction_explanation": "While tau^K Z cap tau^J Z = {0} holds pointwise for K != J, a smooth zero-independent explicit-formula functional over infinitely many relative grades d = J - K faces a dilemma: (1) on the full untruncated prime-power spectrum, {log(p^k) - log(q^l)} is dense or accumulates arbitrarily close to d log(tau), so no positive support width eps > 0 avoids cross-grade collisions uniformly; (2) if the support is truncated to a finite station window [2, N], then as d grows, tau^d [2, N] moves out of the fixed window (giving trivial zero overlap only by support disjointness, which carries no common-shift stationary reflection projection)."
+  },
+  "arithmetic_projected_value_status": "NONNEGATIVE_ON_SESQUILINEAR_CORRELATION_AND_TRIVIALLY_COVARIANT_ON_TRANSPORTED_OVERLAP",
+  "spectral_projected_value_status": "FORMAL_STATIONARY_SECTOR_NONNEGATIVE_8_M_RHO_SQ_WEIGHT_DELTA_SQ_BUT_ANALYTIC_PROJECTOR_BLOCKED",
+  "contradiction_status": "REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION",
+  "weil_equivalence_status": "GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE",
+  "zero_dependency_firewall": {
+    "status": "ZERO_DEPENDENT_GRADE_FILTER_REJECTED",
+    "hardcoded_zero_list_used_for_theorem": false,
+    "audit": {
+      "candidate_description": "zero_independent_polynomial_or_cesaro",
+      "depends_on_zeros": false,
+      "status": "ZERO_INDEPENDENT_FILTER_ADMISSIBLE_FOR_AUDIT",
+      "rejected_inputs": [
+        "rho",
+        "gamma_rho",
+        "delta_rho",
+        "numerically_computed_zero_list",
+        "pair_character_values_q_{rho,sigma}",
+        "canonical_product_over_nontrivial_zero_spectrum"
+      ],
+      "admissible_as_tc_proof_mechanism": true
+    }
+  },
+  "generic_base_status": {
+    "status": "GRADE_PROJECTION_ALGEBRA_HOLDS_FOR_ALL_BASES_Q_GT_1",
+    "bases_tested": [
+      2.0,
+      2.718281828459045,
+      6.283185307179586,
+      10.0
+    ],
+    "records": [
+      {
+        "base_q": 2.0,
+        "log_q": 0.6931471805599453,
+        "single_character_modulus": 1.109569472067845,
+        "diagonal_character_q_2delta": 1.2311444133449163,
+        "diagonal_nonunitary_for_delta_ne_0": true,
+        "full_transport_b1_exponent": 0.0
+      },
+      {
+        "base_q": 2.718281828459045,
+        "log_q": 1.0,
+        "single_character_modulus": 1.161834242728283,
+        "diagonal_character_q_2delta": 1.349858807576003,
+        "diagonal_nonunitary_for_delta_ne_0": true,
+        "full_transport_b1_exponent": 0.0
+      },
+      {
+        "base_q": 6.283185307179586,
+        "log_q": 1.8378770664093453,
+        "single_character_modulus": 1.3174282753130848,
+        "diagonal_character_q_2delta": 1.7356172605944091,
+        "diagonal_nonunitary_for_delta_ne_0": true,
+        "full_transport_b1_exponent": 0.0
+      },
+      {
+        "base_q": 10.0,
+        "log_q": 2.302585092994046,
+        "single_character_modulus": 1.4125375446227544,
+        "diagonal_character_q_2delta": 1.9952623149688795,
+        "diagonal_nonunitary_for_delta_ne_0": true,
+        "full_transport_b1_exponent": 0.0
+      }
+    ],
+    "tau_specific_on_spectral_projection_side": false,
+    "tau_specificity_restricted_to": "Lindemann transcendence of tau = 2*pi in the arithmetic layer disjointness tau^K Z cap tau^J Z = {0} (K != J) and the completed zeta functional equation."
+  },
+  "obl_ct_001a_status": "OPEN",
+  "principal_classification": "GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY",
+  "secondary_classification": "OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION",
+  "candidate_failure_refutes_tc": false,
+  "no_rh_claim": true,
+  "exact_remaining_subgate": {
+    "subgate_id": "SUBGATE-TC-037A (refining SUBGATE-TC-036A under OBL-CT-001A)",
+    "status": "OPEN",
+    "precise_theorem_target": "Does there exist a zero-independent operator or kernel construction across tau-grades that (a) does not rely on full common-scale coordinate transport b = 1 (which erases the common-shift spectral character) and (b) does not rely on unitary grade-character averaging (which diverges on off-critical diagonal terms tau^{2 delta_rho} != 1), yet still enforces a nonpositive arithmetic law paired with a nonnegative non-reflection spectral complement?"
+  },
+  "lean_theorem_map": {
+    "lean_file": "C:/Development/Projects/reimann_scope/formal/RiemannScope/GradeCharacterProjection.lean",
+    "declared_theorems": [
+      "centered_zero_reflection_identity",
+      "reflection_stationary_iff",
+      "grade_pair_character_modulus",
+      "offcritical_diagonal_character_nonunitary",
+      "finite_polynomial_projector_root_no_go",
+      "finite_differential_projector_root_no_go",
+      "cesaro_unit_character_limit_control",
+      "reflection_quartet_imaginary_cancellation",
+      "reflection_quartet_radial_defect_nonneg",
+      "transport_projection_incompatibility_algebra",
+      "projected_arithmetic_zero_and_positive_radial_contradiction"
+    ],
+    "required_theorems": [
+      "centered_zero_reflection_identity",
+      "reflection_stationary_iff",
+      "grade_pair_character_modulus",
+      "offcritical_diagonal_character_nonunitary",
+      "finite_polynomial_projector_root_no_go",
+      "finite_differential_projector_root_no_go",
+      "cesaro_unit_character_limit_control",
+      "reflection_quartet_imaginary_cancellation",
+      "reflection_quartet_radial_defect_nonneg",
+      "transport_projection_incompatibility_algebra",
+      "projected_arithmetic_zero_and_positive_radial_contradiction"
+    ],
+    "missing_theorems": [],
+    "all_required_present": true,
+    "sorry_count": 0,
+    "admit_count": 0,
+    "axiom_count": 0,
+    "assurance_statement": "0 sorry, 0 admit, no nonstandard project axioms introduced."
+  }
+}

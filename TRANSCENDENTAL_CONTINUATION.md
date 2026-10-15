@@ -2074,4 +2074,43 @@ For $f(1/t) = t^w f(t)$, the weight-normalized state $\widetilde f(t) = t^{w/2}f
 Formalized in `formal/RiemannScope/ModularThetaConductorCurvature.lean` (19 module declarations: `2 def` + `17 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 597 compiled `theorem` declarations in repo):
 `covariantSecondMoment`, `poleRegMultiplier`, `theta_heat_euler_scaling`, `heat_drift_operator_expansion`, `heat_drift_compensator_unique`, `modular_weight_normalization_involution`, `modular_covariant_deriv_vanishes_at_self_dual`, `heat_and_modular_hessian_difference`, `heat_and_modular_hessian_incompatibility`, `dilation_conductor_commutator_cancellation`, `covariant_prime_variance_identity`, `covariant_prime_variance_nonneg`, `arithmetic_sign_and_spectral_sign_no_contradiction`, `theta_conductor_sign_incompatibility_contradiction`, `generic_quadratic_heat_base_control`, `unshifted_regularizer_mellin_defect`, `corrected_pole_regularizer_mellin_identity`, `corrected_pole_regularizer_annihilates_quarter_powers`, `corrected_pole_regularizer_spatial_jet`.
 
+---
 
+# 44. Bigraded Character Projection, Reflection-Sector Isolation, and Transport-Compatibility Audit (`TASK-TC-037`)
+
+### 44.1 Bigraded Spectral Decomposition and Sesquilinear Reflection-Pair Stationarity
+In `TASK-TC-037` (`docs/reviews/TC_GRADE_CHARACTER_REFLECTION_PROJECTION.md`, `tc/grade_character_projection.py`, `formal/RiemannScope/GradeCharacterProjection.lean`, `data/tc_grade_character_projection.json`), the bigraded correlation $\mathcal B(K, J) = \sum_{\rho,\sigma} C(\rho,\sigma)\eta_\rho(K)\overline{\eta_\sigma(J)} + \mathcal R_{\mathrm{nonzero}}(K, J)$ with centered grade characters $\eta_\rho(K) = \tau^{-K(\rho - 1/2)} = \tau^{-K(\delta_\rho + i\gamma_\rho)}$ transforms under a common grade shift $(K, J) \mapsto (K+A, J+A)$ by the pair character:
+\[
+\chi_{\rho,\sigma}^{\mathrm{shift}}(A) = \tau^{-A(z_\rho + \bar z_\sigma)}, \qquad z_\rho + \bar z_\sigma = (\delta_\rho + \delta_\sigma) + i(\gamma_\rho - \gamma_\sigma).
+\]
+Because $z_{1-\bar\rho} = -\bar z_\rho$ (`centered_zero_reflection_identity`), the pair character is stationary ($\chi_{\rho,\sigma}^{\mathrm{shift}}(A) = 1$ for all $A$) if and only if $\sigma = 1 - \bar\rho$ (`reflection_stationary_iff`, `REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION`):
+\[
+\boxed{z_\rho + \bar z_\sigma = 0 \iff \delta_\rho + \delta_\sigma = 0 \;\land\; \gamma_\rho = \gamma_\sigma \iff \sigma = 1 - \bar\rho.}
+\]
+On the reflection sector $\sigma = 1 - \bar\rho$, the relative difference $B = K - J$ carries the radial displacement:
+\[
+\eta_\rho(K)\overline{\eta_{1-\bar\rho}(J)} = \tau^{-(K-J)\delta_\rho}\tau^{-i(K-J)\gamma_\rho}.
+\]
+
+### 44.2 Finite and Asymptotic Grade-Projector No-Go Theorems
+1. **Finite Laurent Projector No-Go (`finite_polynomial_projector_root_no_go`, `FINITE_GRADE_LAURENT_PROJECTOR_NO_GO`)**: Any nontrivial finite grade filter $\mathcal P_w(u) = \sum_{r=1}^M w_r e^{-A_r u\log\tau}$ with $\mathcal P_w(0) = 1$ is a nonconstant exponential polynomial and cannot vanish on the countably infinite off-reflection spectrum $\{z_\rho + \bar z_\sigma \neq 0\}$ without prior knowledge of the zeros.
+2. **Finite Differential Projector No-Go (`finite_differential_projector_root_no_go`, `FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO`)**: Any finite-order differential projector $Q(\partial_A)$ with $Q(0) = 1$ has at most $\deg Q$ roots and cannot annihilate the infinite nonstationary spectrum.
+3. **Off-Critical Non-Unitarity & Continuous Haar Obstruction (`grade_pair_character_modulus`, `offcritical_diagonal_character_nonunitary`, `cesaro_unit_character_limit_control`, `OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION`, `CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS`, `GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE`)**: The pair character has modulus $|\chi_{\rho,\sigma}^{\mathrm{shift}}(A)| = \tau^{-A(\delta_\rho + \delta_\sigma)}$. For an off-critical diagonal pair $\sigma = \rho$ with $\delta_\rho \neq 0$, $|\chi_{\rho,\rho}^{\mathrm{shift}}(A)| = \tau^{-2A\delta_\rho}$, which grows exponentially along one half-line ($A \to -\operatorname{sgn}(\delta_\rho)\infty$). Thus two-sided Cesàro/Haar averages on $\mathbb Z$ and $L^2$/tempered distributional Fourier projections on $\mathbb R$ diverge off-line, while one-sided averages $A \ge 0$ diverge whenever $\delta_\rho + \delta_\sigma < 0$. Assuming all pair characters $\chi_{\rho,\sigma}^{\mathrm{shift}}(A)$ are unitary so that standard abelian character orthogonality applies is equivalent to assuming $\delta_\rho + \delta_\sigma = 0$ (including $\sigma = \rho \implies \delta_\rho = 0$), which is a disguised RH assumption.
+
+### 44.3 Transport–Projection Incompatibility and Reflection-Sector Sign Audit
+- **Transport–Projection Incompatibility (`transport_projection_incompatibility_algebra`, `COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY`, `SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER`)**: Under the bigraded kernel ansatz $F_{K,J}(x,y) = \tau^{a(K+J)}F_0(\tau^{-b_1 K}x, \tau^{-b_2 J}y)$, the net common-shift spectral exponent is $(b_1 - 1)z_\rho + (b_2 - 1)\bar z_\sigma$. Preserving native prime-power labels on the arithmetic side requires full transport $b_1 = b_2 = 1$, which identically erases the common-shift exponent ($(1-1)z_\rho + (1-1)\bar z_\sigma = 0$) and makes all pairs $(\rho,\sigma)$ stationary simultaneously. Conversely, keeping the common-shift character alive ($b_1 = b_2 = 0$) shifts the arithmetic prime stations as $F_0(\tau^A n, \tau^A m)$, breaking label invariance.
+- **Reflection-Sector Sign Audit (`reflection_quartet_imaginary_cancellation`, `reflection_quartet_radial_defect_nonneg`, `projected_arithmetic_zero_and_positive_radial_contradiction`, `REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION`)**: Even if the reflection sector $\sigma = 1-\bar\rho$ were isolated, pairing $\rho$ with $1-\rho$ cancels the imaginary $\sinh\sin$ term and leaves $2|c(\rho)|^2\cosh(B\delta_\rho\log\tau)\cos(B\gamma_\rho\log\tau)$, whose bilateral symmetrization has nonnegative infinitesimal curvature $B^2(\log\tau)^2\sum_{\gamma_\rho>0} 2|c(\rho)|^2\delta_\rho^2\cos(B\gamma_\rho\log\tau)$ as $B \to 0$, but no zero-independent arithmetic identity forces the projected arithmetic side to be $\le 0$. Zero-dependent filters are rejected (`ZERO_DEPENDENT_GRADE_FILTER_REJECTED`), and the algebra is generic across all bases $q \in \{2, e, \tau, 10\}$.
+- **Principal Classifications**:
+  \[
+  \boxed{
+  \begin{gathered}
+  \texttt{GRADE\_CHARACTER\_PROJECTION\_DOES\_NOT\_ESCAPE\_TRANSPORT\_MOMENT\_INCOMPATIBILITY}\\[4pt]
+  \texttt{OFF\_CRITICAL\_NONUNITARITY\_BLOCKS\_GRADE\_HAAR\_PROJECTION}\\[4pt]
+  (\texttt{SUBGATE-TC-037A} = \texttt{OPEN}, \quad \texttt{OBL-CT-001A} = \texttt{OPEN}, \quad \texttt{candidate\_failure\_refutes\_tc} = \texttt{false}).
+  \end{gathered}
+  }
+  \]
+
+### 44.4 Lean 4 Formal Verification
+Formalized in `formal/RiemannScope/GradeCharacterProjection.lean` (16 module declarations: `5 def` + `11 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 608 compiled `theorem` declarations in repo):
+`centeredCoord`, `reflectedZero`, `commonShiftExponent`, `reflectionPairRadialDefect`, `bigradedNetShiftCoeff`, `centered_zero_reflection_identity`, `reflection_stationary_iff`, `grade_pair_character_modulus`, `offcritical_diagonal_character_nonunitary`, `finite_polynomial_projector_root_no_go`, `finite_differential_projector_root_no_go`, `cesaro_unit_character_limit_control`, `reflection_quartet_imaginary_cancellation`, `reflection_quartet_radial_defect_nonneg`, `transport_projection_incompatibility_algebra`, `projected_arithmetic_zero_and_positive_radial_contradiction`.

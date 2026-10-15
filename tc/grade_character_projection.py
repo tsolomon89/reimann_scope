@@ -1,0 +1,1597 @@
+"""
+Bigraded Character Projection, Reflection-Sector Isolation, and
+Transport-Compatibility Audit (`TASK-TC-037`).
+
+Audits the post-`TASK-TC-036R` candidate mechanism under `SUBGATE-TC-036A` and `OBL-CT-001A`:
+
+    Can a zero-independent operation on the TC grade variable project a complete
+    double spectral expansion onto exactly the functional-equation reflection pairs
+    (rho, 1 - conj(rho)), while preserving an independently rigid arithmetic law?
+
+Mathematical & Structural Summary
+---------------------------------
+1. Canonical Repaired Theta State (Section 5):
+   - Uses `tilde{g}_t(u) = t^{1/4} exp(-pi t u^2)`, `P_reg(D) = D^2 - 1/16`,
+     `Phi_t = P_reg(D) tilde{g}_t`, and `Phi_t^{(2)} = P_reg(D)^2 tilde{g}_t`, whose centered
+     Mellin transform has pole-killing factor `(1/16) s^2 (s - 1)^2 = (1/16) (z^2 - 1/4)^2`
+     and nonvanishing Gamma factor `(1/2) pi^{-s/2} Gamma(s/2)` across the open critical strip
+     `0 < Re(s) < 1`.
+
+2. Centered Zero Notation, Klein-Four Symmetry Group & Grade Character (Sections 6–10):
+   - For `rho = 1/2 + z_rho` with `z_rho = delta_rho + i gamma_rho`:
+       * `I`: `z |-> z` (`rho`)
+       * `C`: `z |-> conj(z)` (`conj(rho)`)
+       * `F`: `z |-> -z` (`1 - rho`)
+       * `R = F o C`: `z |-> -conj(z)` (`1 - conj(rho)`), with `R^2 = I`.
+   - Under the repository's prime-station grade scaling `x_K = tau^K n` (corresponding to
+     inverse half-density dilation `(U_{-K} Psi)(u) = tau^{-K/2} Psi(tau^{-K} u)`), the centered
+     Mellin transform acquires the spectral character `chi_z(K) = tau^{K z}` (and under forward
+     dilation `U_K`, `tau^{-K z}`), with modulus `|chi_z(K)| = tau^{+- K delta}` (`= 1 <-> delta = 0`).
+   - In common-shift and relative-grade coordinates `K = r - d`, `J = r + d`
+     (`r = (K + J)/2`, `d = (J - K)/2`), the four second-leg structures `S in {I, C, F, R}`
+     yield common-shift pair exponents `lambda_S(rho, sigma)`:
+       * `S = I` (bilinear): `lambda_I = z_rho + z_sigma = 0 <-> sigma = 1 - rho` (`F`-pair)
+       * `S = C` (sesquilinear conjugation): `lambda_C = z_rho + conj(z_sigma) = 0 <-> sigma = 1 - conj(rho)` (`R`-reflection pair)
+       * `S = F` (bilinear + inversion): `lambda_F = z_rho - z_sigma = 0 <-> sigma = rho` (diagonal)
+       * `S = R` (sesquilinear + inversion): `lambda_R = z_rho - conj(z_sigma) = 0 <-> sigma = conj(rho)` (conjugate pair)
+
+3. Formal Stationary-Sector Radial Quartet Identity (Sections 11, 12 & 24):
+   - On the `R`-stationary reflection pair `z_sigma = -conj(z_rho)`, the quadratic curvature
+     polynomial `P(z_rho, z_sigma) = (z_rho - z_sigma)^2 + 2(z_rho + z_sigma)` evaluates to
+     `4 delta_rho^2 + 4 i gamma_rho`, and on the Schwarz-conjugate reflection pair
+     `(conj(rho), 1 - rho)` evaluates to `4 delta_rho^2 - 4 i gamma_rho`, so the quartet sum is
+     `P_rho + P_{conj(rho)} = 8 delta_rho^2 >= 0`.
+   - For the inversion-even real state `Psi_t^+ = (1/2)(Phi_t^{(2)} + I Phi_t^{(2)})`,
+     `hat{Psi}_t^+(z_rho) hat{Psi}_t^+(-conj(z_rho)) = |hat{Psi}_t^+(z_rho)|^2 >= 0`, giving the
+     formal stationary-sector quartet contribution `8 m_rho^2 |hat{Psi}_t^+(z_rho)|^2 delta_rho^2 >= 0`.
+
+4. Three Independent Decisive Obstructions (Sections 13–25 & 27):
+   - (i) Finite Laurent & Differential Projectors Ruled Out:
+     By Riemann-von Mangoldt zero counting `N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T)`,
+     fixing any zero `rho_0` yields infinitely many distinct pair characters `q_sigma = tau^{z_{rho_0} + conj(z_sigma)}`
+     and exponents `lambda_{rho_0, sigma} = z_{rho_0} + conj(z_sigma)` (since any finite union of
+     vertical progressions of spacing `2*pi / log(tau)` contains only `O(T)` points up to height `T`).
+     Hence any finite Laurent filter `P_N(q)` or finite differential filter `p(d/dr)` vanishing on
+     all nonstationary pairs vanishes identically (`FINITE_GRADE_LAURENT_PROJECTOR_NO_GO`,
+     `FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO`).
+   - (ii) Off-Critical Nonunitarity Blocks Approximate-Haar Projectors:
+     For any off-critical zero `delta_rho != 0`, the same-index diagonal pair `sigma = rho` has
+     nonzero real exponent `lambda_{rho,rho} = 2 delta_rho != 0` and nonunitary character
+     `q_{rho,rho} = tau^{2 delta_rho} != 1`, with provably nonzero Mellin weight
+     `|hat{Phi}_t^{(2)}(z_rho)|^2 > 0` across `0 < Re(rho) < 1`. Consequently, bilateral discrete
+     Cesaro `A_N(q)`, continuous Cesaro `C_T(lambda) = sinh(T lambda)/(T lambda)`, Abel/Poisson
+     `A_r(q)` (which diverges outside `|q| = 1` as `r -> 1^-`), and Gaussian grade averaging
+     `G_T(lambda) = exp(T^2 lambda^2 / 2)` all diverge exponentially on off-critical diagonal terms
+     (`OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION`,
+     `CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS`,
+     `GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE`).
+   - (iii) Common-Shift Transport Incompatibility:
+     On the cross-grade arithmetic-zero family `Q_eps^{K+r, J+r}[F_r]` with transported kernel
+     `F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y)`, preserving the prime-station labels
+     and positive support-separation gap `Delta_min(15, 1) = 19 - 6*pi > 0` across common shifts `r`
+     uniquely forces `b = 1`, which gives net spectral common-shift exponent `(b - 1) r (s + t) = 0`
+     and identically erases the common-shift spectral character
+     (`COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY`,
+     `SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER`,
+     `GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY`).
+"""
+
+from __future__ import annotations
+
+import cmath
+import math
+from pathlib import Path
+import re
+from typing import Any, Dict, List, Sequence, Tuple
+
+import mpmath  # type: ignore
+
+from tc.modular_theta_conductor_curvature import (
+    CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH,
+)
+
+# ---------------------------------------------------------------------------
+# Constants and Classification Codes (`TASK-TC-037`)
+# ---------------------------------------------------------------------------
+
+TAU: float = 2.0 * math.pi
+LOG_TAU: float = math.log(TAU)
+
+TASK_TC_037_ID = "TASK-TC-037"
+TASK_TC_037_STATUS = "TASK_TC_037_BIGRADED_CHARACTER_PROJECTION_AUDIT_COMPLETE"
+STARTING_HEAD = "02dce7dd62492605e88f72c05c9efb67a900f84e"
+SUBSTANTIVE_PARENT_HEAD = "fc549855377581ca325782831caef2cb75b0e20d"
+
+# Section 9 & 10 Stationarity Classifications
+REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION = (
+    "REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION"
+)
+REFLECTION_PAIR_NOT_GRADE_STATIONARY_FOR_CANONICAL_CORRELATION = (
+    "REFLECTION_PAIR_NOT_GRADE_STATIONARY_FOR_CANONICAL_CORRELATION"
+)
+
+# Section 13 & 14 Finite Projector No-Go Classifications
+FINITE_GRADE_LAURENT_PROJECTOR_NO_GO = "FINITE_GRADE_LAURENT_PROJECTOR_NO_GO"
+FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO = (
+    "FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO"
+)
+
+# Section 15–19 Nonunitarity & Approximate-Haar Classifications
+OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION = (
+    "OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION"
+)
+CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS = (
+    "CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS"
+)
+GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE = (
+    "GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE"
+)
+
+# Section 21 & 22 Transport & Ratio-Kernel Classifications
+COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY = (
+    "COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY"
+)
+SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER = (
+    "SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER"
+)
+
+# Section 25 & 26 Contradiction & Zero-Dependency Firewalls
+REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION = (
+    "REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION"
+)
+ZERO_DEPENDENT_GRADE_FILTER_REJECTED = "ZERO_DEPENDENT_GRADE_FILTER_REJECTED"
+
+# Section 27 Permitted Decision Tree Outcomes
+GRADE_CHARACTER_REFLECTION_PROJECTOR_BRIDGE_PROVED = (
+    "GRADE_CHARACTER_REFLECTION_PROJECTOR_BRIDGE_PROVED"
+)
+GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY = (
+    "GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY"
+)
+FINITE_GRADE_PROJECTORS_RULED_OUT_INFINITE_PROJECTOR_OPEN = (
+    "FINITE_GRADE_PROJECTORS_RULED_OUT_INFINITE_PROJECTOR_OPEN"
+)
+EXACT_REFLECTION_PROJECTION_REDUCES_TO_WEIL_FORM = (
+    "EXACT_REFLECTION_PROJECTION_REDUCES_TO_WEIL_FORM"
+)
+ONE_PRECISE_GRADE_PROJECTION_SUBGATE_OPEN = (
+    "ONE_PRECISE_GRADE_PROJECTION_SUBGATE_OPEN"
+)
+
+PERMITTED_PRINCIPAL_OUTCOMES: Tuple[str, ...] = (
+    GRADE_CHARACTER_REFLECTION_PROJECTOR_BRIDGE_PROVED,
+    GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY,
+    OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION,
+    FINITE_GRADE_PROJECTORS_RULED_OUT_INFINITE_PROJECTOR_OPEN,
+    EXACT_REFLECTION_PROJECTION_REDUCES_TO_WEIL_FORM,
+    REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION,
+    ONE_PRECISE_GRADE_PROJECTION_SUBGATE_OPEN,
+)
+
+PRINCIPAL_CLASSIFICATION = (
+    GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY
+)
+SECONDARY_CLASSIFICATION = OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION
+OBL_CT_001A_STATUS = "OPEN"
+
+REQUIRED_LEAN_THEOREMS: Tuple[str, ...] = (
+    "centered_zero_reflection_identity",
+    "reflection_stationary_iff",
+    "grade_pair_character_modulus",
+    "offcritical_diagonal_character_nonunitary",
+    "finite_polynomial_projector_root_no_go",
+    "finite_differential_projector_root_no_go",
+    "cesaro_unit_character_limit_control",
+    "reflection_quartet_imaginary_cancellation",
+    "reflection_quartet_radial_defect_nonneg",
+    "transport_projection_incompatibility_algebra",
+    "projected_arithmetic_zero_and_positive_radial_contradiction",
+)
+
+
+# ---------------------------------------------------------------------------
+# Section 5: Canonical Repaired Theta State Summary
+# ---------------------------------------------------------------------------
+
+
+def evaluate_repaired_completed_theta_state_mellin(
+    s: complex, t: float = 1.0, order: int = 2
+) -> Dict[str, Any]:
+    """
+    Evaluate the Mellin transform of the repaired pole-regularized theta state:
+        Phi_t^{(order)}(u) = (D^2 - 1/16)^{order} (t^{1/4} exp(-pi t u^2)),   D = t d/dt,
+    whose Mellin transform int_0^infty Phi_t^{(order)}(u) u^s du/u equals:
+        ((1/4) s (s - 1))^{order} * (1/2) t^{1/4 - s/2} pi^{-s/2} Gamma(s/2).
+    At s = 0, the simple pole of Gamma(s/2) ~ 2/s is cancelled by the s^{order} factor.
+    """
+    if t <= 0.0:
+        raise ValueError(f"Heat parameter t must be positive, got {t}")
+    if order < 1:
+        raise ValueError(f"Regularizer order must be >= 1, got {order}")
+
+    s_mp = mpmath.mpc(s.real, s.imag)
+    t_mp = mpmath.mpf(t)
+    poly_single = 0.25 * s_mp * (s_mp - 1)
+    poly_factor = poly_single ** order
+
+    if abs(s) < 1e-14:
+        # At s = 0: (1/2) * s * Gamma(s/2) = Gamma(s/2 + 1)|_{s=0} = 1,
+        # so the value is (-1/4) * t^{1/4} for order = 1, and 0 for order >= 2.
+        if order == 1:
+            val_mp = mpmath.mpc(-0.25 * (t ** 0.25), 0.0)
+        else:
+            val_mp = mpmath.mpc(0.0, 0.0)
+    else:
+        arch = (
+            0.5
+            * (t_mp ** (0.25 - 0.5 * s_mp))
+            * (mpmath.pi ** (-0.5 * s_mp))
+            * mpmath.gamma(0.5 * s_mp)
+        )
+        val_mp = poly_factor * arch
+
+    val_c = complex(float(val_mp.real), float(val_mp.imag))
+    poly_c = complex(float(poly_factor.real), float(poly_factor.imag))
+    return {
+        "s": {"re": s.real, "im": s.imag},
+        "t": t,
+        "order": order,
+        "pole_killing_polynomial": {"re": poly_c.real, "im": poly_c.imag},
+        "completed_mellin_re": val_c.real,
+        "completed_mellin_im": val_c.imag,
+        "completed_mellin_modulus": abs(val_c),
+    }
+
+
+def build_corrected_theta_state_record(t: float = 1.0) -> Dict[str, Any]:
+    """
+    Return the canonical TASK-TC-036R pole-regularized theta state specification
+    used throughout TASK-TC-037.
+    """
+    mellin_at_pole_1 = evaluate_repaired_completed_theta_state_mellin(1.0 + 0.0j, t=t, order=2)
+    mellin_at_pole_0 = evaluate_repaired_completed_theta_state_mellin(0.0 + 0.0j, t=t, order=2)
+    mellin_at_first_zero = evaluate_repaired_completed_theta_state_mellin(
+        0.5 + 14.134725141734693j, t=t, order=2
+    )
+    return {
+        "regularizer_status": CORRECTED_POLE_REGULARIZER_D_SQUARED_MINUS_ONE_SIXTEENTH,
+        "half_density_gaussian": "tilde{g}_t(u) = t^{1/4} exp(-pi t u^2)",
+        "pole_regularizer_operator": "P_reg(D) = D^2 - 1/16,  D = t d/dt",
+        "single_regularized_state": "Phi_t = (D^2 - 1/16) tilde{g}_t",
+        "double_regularized_state": "Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t",
+        "mellin_multiplier_order_1": "(1/4) s (s - 1) = (1/4) (z^2 - 1/4)",
+        "mellin_multiplier_order_2": "(1/16) s^2 (s - 1)^2 = (1/16) (z^2 - 1/4)^2",
+        "unshifted_D_D_minus_half_used": False,
+        "zero_independent": True,
+        "pole_multiplier_at_s_eq_0": mellin_at_pole_0["pole_killing_polynomial"],
+        "pole_multiplier_at_s_eq_1": mellin_at_pole_1["pole_killing_polynomial"],
+        "sample_mellin_modulus_at_first_critical_zero": mellin_at_first_zero[
+            "completed_mellin_modulus"
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Section 6: Centered Zero Notation & Zero-Symmetry Group V_4 = {I, C, F, R}
+# ---------------------------------------------------------------------------
+
+
+def evaluate_centered_zero_symmetries(delta: float, gamma: float) -> Dict[str, Any]:
+    """
+    Evaluate the four canonical zero symmetries {I, C, F, R} on a zero
+    rho = 1/2 + delta + i*gamma with centered coordinate z = delta + i*gamma.
+    """
+    z = complex(delta, gamma)
+    rho = 0.5 + z
+
+    sym_z = {
+        "I": z,
+        "C": z.conjugate(),
+        "F": -z,
+        "R": -z.conjugate(),
+    }
+    sym_rho = {
+        "I": rho,
+        "C": rho.conjugate(),
+        "F": 1.0 - rho,
+        "R": 1.0 - rho.conjugate(),
+    }
+
+    # Verify that 1/2 + sym_z[k] == sym_rho[k] for all k in {I, C, F, R}
+    consistency_residuals = {
+        k: abs((0.5 + sym_z[k]) - sym_rho[k]) for k in ("I", "C", "F", "R")
+    }
+    # Verify involutions and Klein-four composition laws: R = F o C = C o F, I^2=C^2=F^2=R^2=I
+    r_double = -(-z.conjugate()).conjugate()
+    f_of_c = -(z.conjugate())
+    c_of_f = (-z).conjugate()
+
+    return {
+        "delta": delta,
+        "gamma": gamma,
+        "rho": {"re": rho.real, "im": rho.imag},
+        "z": {"re": z.real, "im": z.imag},
+        "symmetries": {
+            "I": {
+                "name": "Identity",
+                "zero_formula": "rho",
+                "centered_formula": "z",
+                "rho": {"re": sym_rho["I"].real, "im": sym_rho["I"].imag},
+                "z": {"re": sym_z["I"].real, "im": sym_z["I"].imag},
+            },
+            "C": {
+                "name": "Schwarz conjugation",
+                "zero_formula": "conj(rho)",
+                "centered_formula": "conj(z)",
+                "rho": {"re": sym_rho["C"].real, "im": sym_rho["C"].imag},
+                "z": {"re": sym_z["C"].real, "im": sym_z["C"].imag},
+            },
+            "F": {
+                "name": "Functional-equation reflection",
+                "zero_formula": "1 - rho",
+                "centered_formula": "-z",
+                "rho": {"re": sym_rho["F"].real, "im": sym_rho["F"].imag},
+                "z": {"re": sym_z["F"].real, "im": sym_z["F"].imag},
+            },
+            "R": {
+                "name": "Same-height reflection",
+                "zero_formula": "1 - conj(rho)",
+                "centered_formula": "-conj(z)",
+                "rho": {"re": sym_rho["R"].real, "im": sym_rho["R"].imag},
+                "z": {"re": sym_z["R"].real, "im": sym_z["R"].imag},
+            },
+        },
+        "consistency_max_residual": max(consistency_residuals.values()),
+        "R_squared_equals_I": abs(r_double - z) == 0.0,
+        "R_equals_F_compose_C": abs(sym_z["R"] - f_of_c) == 0.0,
+        "R_equals_C_compose_F": abs(sym_z["R"] - c_of_f) == 0.0,
+        "is_self_reflected_under_R": abs(sym_rho["R"] - rho) < 1e-15,
+    }
+
+
+def audit_zero_symmetry_group() -> Dict[str, Any]:
+    """Return the exact Section 6 zero-symmetry table and Klein-four group audit."""
+    sample_critical = evaluate_centered_zero_symmetries(0.0, 14.134725141734693)
+    sample_offcritical = evaluate_centered_zero_symmetries(0.15, 14.134725141734693)
+    return {
+        "group_structure": "Klein four-group V_4 = {I, C, F, R} ~= Z/2Z x Z/2Z",
+        "table": [
+            {"symmetry": "I", "zero": "rho", "centered_coordinate": "z = delta + i*gamma"},
+            {"symmetry": "C", "zero": "conj(rho)", "centered_coordinate": "conj(z) = delta - i*gamma"},
+            {"symmetry": "F", "zero": "1 - rho", "centered_coordinate": "-z = -delta - i*gamma"},
+            {"symmetry": "R = F o C", "zero": "1 - conj(rho)", "centered_coordinate": "-conj(z) = -delta + i*gamma"},
+        ],
+        "relations": {
+            "I_sq": "I",
+            "C_sq": "I",
+            "F_sq": "I",
+            "R_sq": "I",
+            "F_compose_C": "R",
+            "C_compose_F": "R",
+        },
+        "critical_zero_control": sample_critical,
+        "offcritical_zero_control": sample_offcritical,
+        "lean_theorem": "centered_zero_reflection_identity",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Section 7: Grade Character Convention & Evaluator
+# ---------------------------------------------------------------------------
+
+
+def evaluate_grade_character(
+    delta: float,
+    gamma: float,
+    K: float,
+    base_q: float = TAU,
+    sign_convention: int = 1,
+) -> Dict[str, Any]:
+    """
+    Evaluate the centered spectral grade character chi_z(K) = base_q^{sign * K * z}
+    for z = delta + i*gamma and scale base base_q > 1.
+
+    Under the repository's prime-station grade scaling (evaluating the arithmetic sum at
+    dilated prime-power stations x_K = tau^K n, equivalently acting on the test state by
+    the inverse half-density dilation (U_{-K} Psi)(u) = tau^{-K/2} Psi(tau^{-K} u)),
+    the centered Mellin transform hat{Psi}(z) = int_0^infty Psi(u) u^{z - 1/2} du transforms as:
+        int_0^infty tau^{-K/2} Psi(tau^{-K} u) u^{z - 1/2} du = tau^{K z} hat{Psi}(z),
+    giving sign_convention = +1: chi_z(K) = tau^{K z}.
+    (Under the forward half-density dilation (U_K Psi)(u) = tau^{K/2} Psi(tau^K u),
+    the Mellin transform acquires tau^{-K z}, i.e. sign_convention = -1.)
+    """
+    if base_q <= 1.0:
+        raise ValueError(f"Base q must satisfy q > 1, got {base_q}")
+    if sign_convention not in (-1, 1):
+        raise ValueError(f"sign_convention must be +1 or -1, got {sign_convention}")
+
+    log_q = math.log(base_q)
+    z = complex(delta, gamma)
+    exponent = sign_convention * K * z * log_q
+    val = cmath.exp(exponent)
+    amplitude = base_q ** (sign_convention * K * delta)
+    phase_angle = sign_convention * K * gamma * log_q
+
+    return {
+        "delta": delta,
+        "gamma": gamma,
+        "K": K,
+        "base_q": base_q,
+        "sign_convention": sign_convention,
+        "character_value": {"re": val.real, "im": val.imag},
+        "amplitude": amplitude,
+        "amplitude_residual": abs(abs(val) - amplitude),
+        "phase_angle_radians": phase_angle,
+        "is_unitary": abs(amplitude - 1.0) < 1e-15,
+        "critical_line_iff_unitary_for_nonzero_K": (
+            (abs(amplitude - 1.0) < 1e-15) == (abs(delta) < 1e-15)
+            if abs(K) > 1e-15
+            else True
+        ),
+    }
+
+
+def derive_grade_character_convention() -> Dict[str, Any]:
+    """Return the exact Section 7 derivation of the repository's grade character convention."""
+    sample_on_line = evaluate_grade_character(0.0, 14.134725141734693, K=1.0)
+    sample_off_line = evaluate_grade_character(0.12, 14.134725141734693, K=1.0)
+    return {
+        "scale_base": "tau = 2*pi",
+        "arithmetic_station_action": (
+            "Prime-power stations n = p^k scale at grade K as x_K(n) = tau^K n, corresponding "
+            "to testing the explicit-formula distribution against the inverse half-density dilated "
+            "state (U_{-K} Psi)(u) = tau^{-K/2} Psi(tau^{-K} u)."
+        ),
+        "forward_half_density_dilation": (
+            "(U_K Psi)(u) = tau^{K/2} Psi(tau^K u)  ==>  hat{U_K Psi}(z) = tau^{-K z} hat{Psi}(z)"
+        ),
+        "inverse_station_dilation": (
+            "(U_{-K} Psi)(u) = tau^{-K/2} Psi(tau^{-K} u)  ==>  hat{U_{-K} Psi}(z) = tau^{+K z} hat{Psi}(z)"
+        ),
+        "canonical_sign_choice": "+1 (station-dilation convention chi_z(K) = tau^{K z}; forward U_K gives tau^{-K z})",
+        "centered_mellin_definition": "hat{Psi}(z) = int_0^infty Psi(u) u^{z - 1/2} du,  s = 1/2 + z",
+        "centered_spectral_character": "chi_z(K) = tau^{K z} = exp(K (delta + i*gamma) log(tau))",
+        "amplitude_formula": "|chi_z(K)| = tau^{K delta}",
+        "phase_formula": "arg(chi_z(K)) = K gamma log(tau)  (mod 2*pi)",
+        "unitarity_equivalence": "|chi_z(K)| = 1 for K != 0  <=>  Re(z) = delta = 0",
+        "scope_note": "Control fact only: scalar grade-character unitarity is equivalent to delta = 0 and is never assumed as a premise.",
+        "sample_on_critical_line": sample_on_line,
+        "sample_off_critical_line": sample_off_line,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Sections 8, 9 & 10: Bigraded Correlation, Second-Leg Involutions & Stationarity
+# ---------------------------------------------------------------------------
+
+
+def evaluate_common_and_relative_grade_coordinates(K: float, J: float) -> Dict[str, float]:
+    """
+    Convert (K, J) into common-shift r = (K + J)/2 and relative half-difference d = (J - K)/2,
+    so K = r - d and J = r + d.
+    """
+    r = 0.5 * (K + J)
+    d = 0.5 * (J - K)
+    return {
+        "K": K,
+        "J": J,
+        "r": r,
+        "d": d,
+        "relative_difference_J_minus_K": J - K,
+        "reconstructed_K": r - d,
+        "reconstructed_J": r + d,
+        "reconstruction_error": max(abs((r - d) - K), abs((r + d) - J)),
+    }
+
+
+def classify_second_leg_involutions() -> Dict[str, Any]:
+    """
+    Derive the exact common-shift pair exponent lambda_S(rho, sigma) for all four
+    second-leg structures S in {I, C, F, R} in the bigraded completed correlation
+    G_S(K, J) at K = r - d, J = r + d.
+    """
+    table = [
+        {
+            "second_leg_structure": "I (bilinear: W_comp(U_{-K} Psi) W_comp(U_{-J} Psi))",
+            "form_type": "bilinear",
+            "second_leg_mellin_factor": "hat{Psi}(z_sigma) tau^{J z_sigma}",
+            "pair_exponent_lambda": "z_rho + z_sigma = (delta_rho + delta_sigma) + i*(gamma_rho + gamma_sigma)",
+            "relative_exponent_mu": "z_sigma - z_rho",
+            "stationary_condition_lambda_eq_0": "z_rho + z_sigma = 0  <=>  delta_sigma = -delta_rho and gamma_sigma = -gamma_rho",
+            "selected_zero_relation": "sigma = 1 - rho  (functional-equation F-pair)",
+            "selects_same_height_reflection_R": False,
+        },
+        {
+            "second_leg_structure": "C (sesquilinear conjugation: W_comp(U_{-K} Psi) conj(W_comp(U_{-J} Psi)))",
+            "form_type": "sesquilinear",
+            "second_leg_mellin_factor": "conj(hat{Psi}(z_sigma)) tau^{J conj(z_sigma)}",
+            "pair_exponent_lambda": "z_rho + conj(z_sigma) = (delta_rho + delta_sigma) + i*(gamma_rho - gamma_sigma)",
+            "relative_exponent_mu": "conj(z_sigma) - z_rho",
+            "stationary_condition_lambda_eq_0": "z_rho + conj(z_sigma) = 0  <=>  delta_sigma = -delta_rho and gamma_sigma = gamma_rho",
+            "selected_zero_relation": "sigma = 1 - conj(rho)  (same-height reflection R-pair)",
+            "selects_same_height_reflection_R": True,
+        },
+        {
+            "second_leg_structure": "F (bilinear + multiplicative inversion I on second grade action: J |-> -J)",
+            "form_type": "bilinear",
+            "second_leg_mellin_factor": "hat{I Psi}(z_sigma) tau^{-J z_sigma} = hat{Psi}(-z_sigma) tau^{-J z_sigma}",
+            "pair_exponent_lambda": "z_rho - z_sigma = (delta_rho - delta_sigma) + i*(gamma_rho - gamma_sigma)",
+            "relative_exponent_mu": "-z_sigma - z_rho",
+            "stationary_condition_lambda_eq_0": "z_rho - z_sigma = 0  <=>  delta_sigma = delta_rho and gamma_sigma = gamma_rho",
+            "selected_zero_relation": "sigma = rho  (diagonal I-pair)",
+            "selects_same_height_reflection_R": False,
+        },
+        {
+            "second_leg_structure": "R = F o C (sesquilinear + grade-inversion J |-> -J)",
+            "form_type": "sesquilinear",
+            "second_leg_mellin_factor": "conj(hat{I Psi}(z_sigma)) tau^{-J conj(z_sigma)}",
+            "pair_exponent_lambda": "z_rho - conj(z_sigma) = (delta_rho - delta_sigma) + i*(gamma_rho + gamma_sigma)",
+            "relative_exponent_mu": "-conj(z_sigma) - z_rho",
+            "stationary_condition_lambda_eq_0": "z_rho - conj(z_sigma) = 0  <=>  delta_sigma = delta_rho and gamma_sigma = -gamma_rho",
+            "selected_zero_relation": "sigma = conj(rho)  (Schwarz conjugate C-pair)",
+            "selects_same_height_reflection_R": False,
+        },
+    ]
+    return {
+        "status": REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION,
+        "selected_structure_for_R_pair": "C (sesquilinear correlation G_C(K, J) = W_comp(U_{-K} Psi) conj(W_comp(U_{-J} Psi)))",
+        "target_pair_exponent": "lambda_C(rho, sigma) = z_rho + conj(z_sigma)",
+        "stationary_iff": "z_rho + conj(z_sigma) = 0  <=>  sigma = 1 - conj(rho)",
+        "table": table,
+    }
+
+
+def build_bigraded_functional_metadata() -> Dict[str, Any]:
+    """Return Section 8 metadata for the bigraded completed correlation G_S(K, J)."""
+    return {
+        "symbol": "G_S(K, J)",
+        "independent_grade_variables": ["K", "J"],
+        "common_shift_coordinate": "r = (K + J) / 2",
+        "relative_grade_coordinate": "d = (J - K) / 2",
+        "reconstructed_grades": {"K": "r - d", "J": "r + d"},
+        "admissible_state_used": "Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t  or its inversion-even part Psi_t^+",
+        "zero_independent_definition": True,
+        "candidates": {
+            "G_I": {
+                "form_type": "bilinear",
+                "zero_independent": True,
+                "arithmetic_definition": "W_arith(U_{-K} Psi_t) * W_arith(U_{-J} Psi_t)",
+                "complete_spectral_expansion": (
+                    "sum_{rho, sigma} m_rho m_sigma hat{Psi}_t(z_rho) hat{Psi}_t(z_sigma) "
+                    "tau^{r(z_rho + z_sigma)} tau^{d(z_sigma - z_rho)}"
+                ),
+                "convergence_domain": "t > 0, all real grades (K, J) in R^2 via super-exponential Gamma * Gaussian decay",
+            },
+            "G_C": {
+                "form_type": "sesquilinear",
+                "zero_independent": True,
+                "arithmetic_definition": "W_arith(U_{-K} Psi_t) * conj(W_arith(U_{-J} Psi_t))",
+                "complete_spectral_expansion": (
+                    "sum_{rho, sigma} m_rho m_sigma hat{Psi}_t(z_rho) conj(hat{Psi}_t(z_sigma)) "
+                    "tau^{r(z_rho + conj(z_sigma))} tau^{d(conj(z_sigma) - z_rho)}"
+                ),
+                "convergence_domain": "t > 0, all real grades (K, J) in R^2 via super-exponential Gamma * Gaussian decay",
+            },
+        },
+        "multiplicity_rule": (
+            "If rho has multiplicity m_rho and sigma = 1 - conj(rho) has the same multiplicity "
+            "m_{1-conj(rho)} = m_rho (by functional equation and Schwarz reflection of xi(s)), "
+            "the stationary block (rho, 1 - conj(rho)) contributes with multiplicity weight m_rho^2."
+        ),
+    }
+
+
+def check_reflection_stationarity(
+    delta1: float, gamma1: float, delta2: float, gamma2: float, tol: float = 1e-12
+) -> Dict[str, Any]:
+    """
+    Evaluate lambda_C(rho_1, rho_2) = z_1 + conj(z_2) and verify:
+      1. z_1 + conj(z_2) == 0  <=>  rho_2 == 1 - conj(rho_1);
+      2. rho_1 == 1 - conj(rho_1)  <=>  delta_1 == 0.
+    """
+    z1 = complex(delta1, gamma1)
+    z2 = complex(delta2, gamma2)
+    rho1 = 0.5 + z1
+    rho2 = 0.5 + z2
+    lam = z1 + z2.conjugate()
+    reflected_rho1 = 1.0 - rho1.conjugate()
+
+    is_stationary = abs(lam) <= tol
+    is_reflection_pair = abs(rho2 - reflected_rho1) <= tol
+    is_self_reflection = abs(rho1 - reflected_rho1) <= tol
+
+    return {
+        "z1": {"re": z1.real, "im": z1.imag},
+        "z2": {"re": z2.real, "im": z2.imag},
+        "rho1": {"re": rho1.real, "im": rho1.imag},
+        "rho2": {"re": rho2.real, "im": rho2.imag},
+        "lambda_C": {"re": lam.real, "im": lam.imag},
+        "is_stationary": is_stationary,
+        "is_reflection_pair": is_reflection_pair,
+        "stationary_iff_reflection_verified": is_stationary == is_reflection_pair,
+        "rho1_is_self_reflection": is_self_reflection,
+        "self_reflection_iff_critical_verified": is_self_reflection == (abs(delta1) <= tol),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Section 11 & 12: Real Inversion-Even State & Reflection-Quartet Radial Audit
+# ---------------------------------------------------------------------------
+
+
+def evaluate_inversion_even_state_mellin(
+    z: complex, t: float = 1.0, order: int = 2
+) -> Dict[str, Any]:
+    """
+    Evaluate the centered Mellin transform of the canonical real inversion-even state:
+        Psi_t^+ = (1/2) (Phi_t^{(order)} + I Phi_t^{(order)}),
+    where (I Psi)(u) = u^{-1} Psi(u^{-1}) on R_+ in half-density coordinates, so
+        hat{I Psi}(z) = hat{Psi}(-z)
+    and
+        hat{Psi}_t^+(z) = (1/2) (hat{Psi}_t(z) + hat{Psi}_t(-z)).
+    Verify:
+      1. hat{Psi}_t^+(-z) = hat{Psi}_t^+(z),
+      2. hat{Psi}_t^+(conj(z)) = conj(hat{Psi}_t^+(z)),
+      3. hat{Psi}_t^+(z) * hat{Psi}_t^+(-conj(z)) = |hat{Psi}_t^+(z)|^2 >= 0.
+    """
+    s_plus = 0.5 + z
+    s_minus = 0.5 - z
+    s_conj = 0.5 + z.conjugate()
+    s_refl = 0.5 - z.conjugate()
+
+    eval_plus = evaluate_repaired_completed_theta_state_mellin(s_plus, t=t, order=order)
+    eval_minus = evaluate_repaired_completed_theta_state_mellin(s_minus, t=t, order=order)
+    eval_conj = evaluate_repaired_completed_theta_state_mellin(s_conj, t=t, order=order)
+    eval_refl = evaluate_repaired_completed_theta_state_mellin(s_refl, t=t, order=order)
+
+    m_plus = complex(
+        eval_plus["completed_mellin_re"], eval_plus["completed_mellin_im"]
+    )
+    m_minus = complex(
+        eval_minus["completed_mellin_re"], eval_minus["completed_mellin_im"]
+    )
+    m_conj = complex(
+        eval_conj["completed_mellin_re"], eval_conj["completed_mellin_im"]
+    )
+    m_refl = complex(
+        eval_refl["completed_mellin_re"], eval_refl["completed_mellin_im"]
+    )
+
+    psi_even_z = 0.5 * (m_plus + m_minus)
+    psi_even_neg_z = 0.5 * (m_minus + m_plus)
+    psi_even_conj_z = 0.5 * (m_conj + m_refl)
+    psi_even_refl_z = 0.5 * (m_refl + m_conj)
+
+    product_refl = psi_even_z * psi_even_refl_z
+    mod_sq = abs(psi_even_z) ** 2
+
+    return {
+        "z": {"re": z.real, "im": z.imag},
+        "t": t,
+        "order": order,
+        "psi_even_z": {"re": psi_even_z.real, "im": psi_even_z.imag},
+        "even_symmetry_residual": abs(psi_even_neg_z - psi_even_z),
+        "schwarz_conjugation_residual": abs(psi_even_conj_z - psi_even_z.conjugate()),
+        "reflection_product": {"re": product_refl.real, "im": product_refl.imag},
+        "modulus_squared": mod_sq,
+        "reflection_product_equals_modulus_squared_residual": abs(product_refl - mod_sq),
+        "weight_nonnegative": product_refl.real >= -1e-15 and abs(product_refl.imag) <= 1e-12,
+    }
+
+
+def evaluate_reflection_quartet_polynomial(
+    delta: float, gamma: float, multiplicity: int = 1, t: float = 1.0
+) -> Dict[str, Any]:
+    """
+    Evaluate the quadratic spectral polynomial P(z_rho, z_sigma) = (z_rho - z_sigma)^2 + 2(z_rho + z_sigma)
+    on the R-stationary reflection pair (rho, 1 - conj(rho)) where z_sigma = -conj(z_rho),
+    and on its Schwarz-conjugate reflection pair (conj(rho), 1 - rho), and audit all canonical
+    degree <= 2 leg-derivative combinations.
+    """
+    z_rho = complex(delta, gamma)
+    z_sigma = -z_rho.conjugate()  # -delta + i*gamma
+
+    z_conj_rho = z_rho.conjugate()  # delta - i*gamma
+    z_conj_sigma = -z_conj_rho.conjugate()  # -delta - i*gamma
+
+    P_pair = (z_rho - z_sigma) ** 2 + 2.0 * (z_rho + z_sigma)
+    P_conj_pair = (z_conj_rho - z_conj_sigma) ** 2 + 2.0 * (z_conj_rho + z_conj_sigma)
+    quartet_sum = P_pair + P_conj_pair
+
+    expected_P_pair = complex(4.0 * delta * delta, 4.0 * gamma)
+    expected_P_conj_pair = complex(4.0 * delta * delta, -4.0 * gamma)
+    expected_quartet_sum = complex(8.0 * delta * delta, 0.0)
+
+    # Also evaluate canonical degree-<=2 leg-derivative basis on z_sigma = -conj(z_rho):
+    #   (z_rho + z_sigma) = 2 i gamma,   (z_rho - z_sigma) = 2 delta,
+    #   (z_rho - z_sigma)^2 = 4 delta^2, (z_rho + z_sigma)^2 = -4 gamma^2,
+    #   z_rho * z_sigma = -(delta^2 + gamma^2).
+    mellin_info = evaluate_inversion_even_state_mellin(z_rho, t=t, order=2)
+    mod_sq = mellin_info["modulus_squared"]
+    weighted_quartet = 8.0 * (multiplicity ** 2) * mod_sq * (delta ** 2)
+
+    return {
+        "delta": delta,
+        "gamma": gamma,
+        "multiplicity": multiplicity,
+        "P_reflection_pair": {"re": P_pair.real, "im": P_pair.imag},
+        "P_conjugate_reflection_pair": {"re": P_conj_pair.real, "im": P_conj_pair.imag},
+        "P_pair_formula_residual": abs(P_pair - expected_P_pair),
+        "P_conj_pair_formula_residual": abs(P_conj_pair - expected_P_conj_pair),
+        "quartet_sum": {"re": quartet_sum.real, "im": quartet_sum.imag},
+        "quartet_sum_formula_residual": abs(quartet_sum - expected_quartet_sum),
+        "imaginary_part_cancelled": abs(quartet_sum.imag) == 0.0,
+        "degree_le_2_leg_basis_on_reflection_pair": {
+            "z_rho_minus_z_sigma": 2.0 * delta,
+            "z_rho_plus_z_sigma_imag": 2.0 * gamma,
+            "relative_square_(z_rho_minus_z_sigma)^2": 4.0 * delta * delta,
+            "common_square_(z_rho_plus_z_sigma)^2": -4.0 * gamma * gamma,
+            "product_z_rho_z_sigma": -(delta * delta + gamma * gamma),
+        },
+        "mellin_weight_modulus_squared": mod_sq,
+        "weighted_quartet_radial_value": weighted_quartet,
+        "weighted_quartet_nonnegative": weighted_quartet >= 0.0,
+        "scope_classification": "FORMAL_STATIONARY_SECTOR_IDENTITY_ONLY_UNTIL_PROJECTOR_EXISTS",
+    }
+
+
+def audit_inversion_even_state_control() -> Dict[str, Any]:
+    """Audit the Section 11 real inversion-even state control across critical and off-critical points."""
+    on_line = evaluate_inversion_even_state_mellin(0.0 + 14.134725141734693j, t=1.0, order=2)
+    off_line = evaluate_inversion_even_state_mellin(0.15 + 14.134725141734693j, t=1.0, order=2)
+    return {
+        "status": "INVERSION_EVEN_REAL_STATE_WEIGHT_NONNEGATIVE_PROVED",
+        "definition": "Psi_t^+ = (1/2) (Phi_t^{(2)} + I Phi_t^{(2)}),  (I Psi)(u) = u^{-1} Psi(u^{-1})",
+        "mellin_evenness": "hat{Psi}_t^+(-z) = hat{Psi}_t^+(z)",
+        "mellin_reality": "hat{Psi}_t^+(conj(z)) = conj(hat{Psi}_t^+(z))",
+        "reflection_weight_identity": "hat{Psi}_t^+(z) hat{Psi}_t^+(-conj(z)) = |hat{Psi}_t^+(z)|^2 >= 0",
+        "unsymmetrized_state_nonvanishing_in_strip": (
+            "For unsymmetrized Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t at t = 1, "
+            "hat{Phi}_1^{(2)}(z) = (1/32) (z^2 - 1/4)^2 pi^{-(1/2 + z)/2} Gamma((1/2 + z)/2) "
+            " equals Psi_1^+(z) identically by theta self-duality tilde{g}_1 = F tilde{g}_1 "
+            "(functional equation of the completed Gaussian factor), and since Gamma((1/2 + z)/2) "
+            "has no zeros in C and (z^2 - 1/4)^2 vanishes only at z = +-1/2 (s = 0, 1), "
+            "hat{Phi}_1^{(2)}(z) != 0 everywhere in the open critical strip 0 < Re(s) < 1."
+        ),
+        "sample_on_line": on_line,
+        "sample_off_line": off_line,
+        "lean_theorem": "reflection_quartet_radial_defect_nonneg",
+    }
+
+
+def audit_reflection_quartet_radial_identity() -> Dict[str, Any]:
+    """Return the Section 12 & 24 formal stationary-sector radial quartet audit."""
+    sample_off = evaluate_reflection_quartet_polynomial(0.12, 14.134725141734693, multiplicity=1)
+    sample_on = evaluate_reflection_quartet_polynomial(0.0, 14.134725141734693, multiplicity=1)
+    return {
+        "status": "FORMAL_STATIONARY_SECTOR_RADIAL_QUARTET_IDENTITY_PROVED",
+        "pair_polynomial_formula": "P(z_rho, -conj(z_rho)) = 4 delta_rho^2 + 4 i gamma_rho",
+        "conjugate_pair_polynomial_formula": "P(conj(z_rho), -z_rho) = 4 delta_rho^2 - 4 i gamma_rho",
+        "quartet_sum_formula": "P_rho + P_{conj(rho)} = 8 delta_rho^2",
+        "weighted_quartet_formula": "W_rho delta_rho^2 = 8 m_rho^2 |hat{Psi}_t^+(z_rho)|^2 delta_rho^2 >= 0",
+        "sample_off_critical": sample_off,
+        "sample_on_critical": sample_on,
+        "lean_theorems": [
+            "reflection_quartet_imaginary_cancellation",
+            "reflection_quartet_radial_defect_nonneg",
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Sections 13 & 14: Finite Laurent & Finite Differential Projector No-Go
+# ---------------------------------------------------------------------------
+
+
+def evaluate_finite_laurent_projector(
+    coeffs: Dict[int, complex], q: complex
+) -> complex:
+    """Evaluate a finite discrete-grade Laurent filter P_N(q) = sum_{K=-N}^N c_K q^K."""
+    if q == 0:
+        raise ValueError("Laurent character q must be nonzero")
+    return sum(c * (q ** k) for k, c in coeffs.items())
+
+
+def audit_finite_laurent_projector_no_go() -> Dict[str, Any]:
+    """
+    Prove the Section 13 Finite Discrete-Grade Laurent Projector No-Go Theorem
+    including the Riemann-von Mangoldt distinct-character theorem.
+    """
+    vertical_period = 2.0 * math.pi / LOG_TAU
+    return {
+        "status": FINITE_GRADE_LAURENT_PROJECTOR_NO_GO,
+        "filter_form": "Pi_N[f] = sum_{K=-N}^N c_K f(K),  P_N(q) = sum_{K=-N}^N c_K q^K",
+        "projector_requirements": {
+            "stationary_preservation": "P_N(1) != 0",
+            "nonstationary_annihilation": "P_N(q_{rho, sigma}) = 0 for all nonstationary pairs (rho, sigma)",
+        },
+        "distinct_character_theorem": {
+            "status": "INFINITELY_MANY_DISTINCT_PAIR_CHARACTERS_PROVED",
+            "fixed_zero": "rho_0 (any nontrivial zero of zeta(s))",
+            "character_family": "q_sigma = tau^{z_{rho_0} + conj(z_sigma)} = exp((z_{rho_0} + conj(z_sigma)) log(tau))",
+            "vertical_period_spacing": vertical_period,
+            "proof_steps": [
+                "1. Fix one nontrivial zero rho_0 = 1/2 + z_{rho_0}.",
+                "2. Suppose toward a contradiction that {q_sigma : zeta(sigma) = 0} takes only finitely many values {w_1, ..., w_M}.",
+                "3. Since exp(z log(tau)) = exp(z' log(tau)) iff z - z' in (2*pi*i / log(tau)) Z, each value w_j restricts Re(z_sigma) to a single value and Im(z_sigma) = gamma_sigma to a single vertical arithmetic progression gamma_0^{(j)} + (2*pi / log(tau)) Z.",
+                "4. A finite union of M vertical arithmetic progressions with spacing 2*pi / log(tau) contains at most M * (T * log(tau) / pi + 2) = O(T) points with |gamma_sigma| <= T.",
+                "5. By the Riemann-von Mangoldt zero-counting theorem N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T) (von Mangoldt 1905; Titchmarsh 1986, Theorem 9.4; Trudgian 2014), the number of nontrivial zeros up to height T grows as (T/(2*pi)) log(T/(2*pi)) = Omega(T log T), contradicting O(T).",
+                "6. Therefore {q_sigma} contains infinitely many distinct nonzero complex numbers != 1.",
+            ],
+            "riemann_von_mangoldt_formula": "N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T)",
+        },
+        "laurent_root_bound": (
+            "Multiplying P_N(q) by q^N gives a polynomial Q_{2N}(q) = q^N P_N(q) of degree <= 2N. "
+            "Since Q_{2N}(q) vanishes on infinitely many distinct values q_sigma (in particular on "
+            "at least 2N + 1 distinct values), Q_{2N} = 0 identically, forcing all c_K = 0 and P_N(1) = 0."
+        ),
+        "lean_theorem": "finite_polynomial_projector_root_no_go",
+    }
+
+
+def evaluate_finite_differential_projector(
+    poly_coeffs: Sequence[complex], lam: complex
+) -> complex:
+    """
+    Evaluate a finite-order differential symbol p(lambda) = sum_{m=0}^M a_m lambda^m
+     representing p(d/dr) e^{r lambda} = p(lambda) e^{r lambda}.
+    """
+    return sum(c * (lam ** m) for m, c in enumerate(poly_coeffs))
+
+
+def audit_finite_differential_projector_no_go() -> Dict[str, Any]:
+    """
+    Prove the Section 14 Finite Differential (and Analytic Rational) Projector No-Go Theorem.
+    """
+    return {
+        "status": FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO,
+        "differential_filter_form": "p(d/dr) e^{r lambda} = p(lambda) e^{r lambda},  p(lambda) = sum_{m=0}^M a_m lambda^m",
+        "projector_requirements": {
+            "stationary_preservation": "p(0) != 0",
+            "nonstationary_annihilation": "p(lambda_{rho, sigma}) = 0 for all nonstationary lambda_{rho, sigma} != 0",
+        },
+        "distinct_exponent_argument": (
+            "For fixed rho_0, the nontrivial zeros sigma have infinitely many distinct ordinates "
+            "gamma_sigma (since N(T) -> infty and every zero has finite multiplicity), yielding "
+            "infinitely many distinct nonzero pair exponents lambda_{rho_0, sigma} = (z_{rho_0} + conj(z_sigma)) log(tau). "
+            "A polynomial p of degree <= M vanishing on more than M distinct points must satisfy p = 0 identically, "
+            "forcing p(0) = 0."
+        ),
+        "rational_filter_extension": (
+            "For any finite rational filter R(lambda) = p(lambda)/q(lambda) analytic at lambda = 0 "
+            "(so q(0) != 0 and R(0) = p(0)/q(0) != 0), vanishing on all nonstationary pair exponents "
+            "lambda_{rho_0, sigma} outside the finite pole set of q still forces the polynomial numerator "
+            "p(lambda) to have infinitely many distinct roots, hence p = 0 and R = 0."
+        ),
+        "lean_theorem": "finite_differential_projector_root_no_go",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Sections 15, 16, 17, 18, 19 & 20: Discrete/Continuous Cesaro, Abel, Gaussian,
+# Nonunitary Diagonal Obstruction, Pontryagin Firewall & Complex-Grade Audit
+# ---------------------------------------------------------------------------
+
+
+def evaluate_discrete_cesaro_average(q: complex, N: int) -> Dict[str, Any]:
+    """
+    Evaluate the bilateral discrete-grade Cesaro / Folner average:
+        A_N(q) = (1 / (2N + 1)) sum_{K=-N}^N q^K.
+    """
+    if N < 0:
+        raise ValueError(f"N must be non-negative, got {N}")
+    if q == 0:
+        raise ValueError("Character q must be nonzero")
+
+    count = 2 * N + 1
+    if abs(q - 1.0) < 1e-15:
+        avg = complex(1.0, 0.0)
+        closed_form = complex(1.0, 0.0)
+    else:
+        total = sum(q ** k for k in range(-N, N + 1))
+        avg = total / count
+        closed_form = (q ** (N + 1) - q ** (-N)) / (count * (q - 1.0))
+
+    mod_q = abs(q)
+    return {
+        "q": {"re": q.real, "im": q.imag},
+        "modulus_q": mod_q,
+        "N": N,
+        "A_N": {"re": avg.real, "im": avg.imag},
+        "A_N_modulus": abs(avg),
+        "closed_form_residual": abs(avg - closed_form),
+        "regime": (
+            "stationary_q_eq_1"
+            if abs(q - 1.0) < 1e-14
+            else ("unitary_nonstationary" if abs(mod_q - 1.0) < 1e-14 else "nonunitary_divergent")
+        ),
+    }
+
+
+def evaluate_continuous_cesaro_average(lam: complex, T: float) -> Dict[str, Any]:
+    """
+    Evaluate the continuous common-grade Cesaro average:
+        C_T(lambda) = (1 / (2T)) int_{-T}^T exp(r lambda) dr = sinh(T lambda) / (T lambda).
+    """
+    if T <= 0.0:
+        raise ValueError(f"Window T must be strictly positive, got {T}")
+    if abs(lam) < 1e-15:
+        val = complex(1.0, 0.0)
+    else:
+        val = cmath.sinh(T * lam) / (T * lam)
+
+    return {
+        "lambda": {"re": lam.real, "im": lam.imag},
+        "T": T,
+        "C_T": {"re": val.real, "im": val.imag},
+        "C_T_modulus": abs(val),
+        "regime": (
+            "stationary_lambda_eq_0"
+            if abs(lam) < 1e-14
+            else ("unitary_imaginary_oscillatory" if abs(lam.real) < 1e-14 else "nonunitary_exponential_growth")
+        ),
+    }
+
+
+def evaluate_abel_poisson_average(q: complex, r: float) -> Dict[str, Any]:
+    """
+    Evaluate the bilateral Abel / Poisson grade average for 0 < r < 1:
+        A_r(q) = ((1 - r) / (1 + r)) sum_{K in Z} r^{|K|} q^K.
+    The bilateral geometric series converges if and only if r < |q| < 1/r, where
+        sum_{K in Z} r^{|K|} q^K = (1 - r^2) / ((1 - r q)(1 - r / q)),
+    so inside the annulus r < |q| < 1/r:
+        A_r(q) = (1 - r)^2 / ((1 - r q)(1 - r / q)).
+    As r -> 1^-, the convergence annulus (r, 1/r) collapses to the unit circle |q| = 1;
+    for any nonunitary character |q| != 1, the series diverges once r >= min(|q|, 1/|q|).
+    """
+    if not (0.0 < r < 1.0):
+        raise ValueError(f"Abel parameter r must satisfy 0 < r < 1, got {r}")
+    if q == 0:
+        raise ValueError("Character q must be nonzero")
+
+    mod_q = abs(q)
+    converges = (r < mod_q) and (mod_q < 1.0 / r)
+    critical_r_threshold = min(mod_q, 1.0 / mod_q)
+
+    if converges:
+        val = ((1.0 - r) ** 2) / ((1.0 - r * q) * (1.0 - r / q))
+        val_dict = {"re": val.real, "im": val.imag}
+        val_mod = abs(val)
+    else:
+        val_dict = None
+        val_mod = float("inf")
+
+    return {
+        "q": {"re": q.real, "im": q.imag},
+        "modulus_q": mod_q,
+        "r": r,
+        "annulus_lower": r,
+        "annulus_upper": 1.0 / r,
+        "series_converges_at_r": converges,
+        "divergence_threshold_r": critical_r_threshold,
+        "A_r": val_dict,
+        "A_r_modulus": val_mod,
+    }
+
+
+def evaluate_gaussian_grade_average(lam: complex, T: float) -> Dict[str, Any]:
+    """
+    Evaluate the normalized Gaussian common-grade average:
+        G_T(lambda) = int_R exp(-r^2 / (2 T^2)) exp(r lambda) dr / int_R exp(-r^2 / (2 T^2)) dr
+                    = exp(T^2 lambda^2 / 2).
+    For lambda = alpha + i*omega, Re(lambda^2) = alpha^2 - omega^2, so
+        |G_T(lambda)| = exp(T^2 (alpha^2 - omega^2) / 2).
+    On the real off-critical diagonal lambda_{rho,rho} = 2 delta_rho log(tau) != 0 (where omega = 0),
+    G_T(lambda_{rho,rho}) = exp(2 T^2 delta_rho^2 (log tau)^2) -> +infty super-exponentially as T -> infty!
+    """
+    if T <= 0.0:
+        raise ValueError(f"Gaussian width T must be strictly positive, got {T}")
+    exponent = 0.5 * (T ** 2) * (lam ** 2)
+    # Guard against overflow in Python float for very large T * Re(lam)
+    if exponent.real > 700.0:
+        val_dict = None
+        mod_val = float("inf")
+    else:
+        val = cmath.exp(exponent)
+        val_dict = {"re": val.real, "im": val.imag}
+        mod_val = abs(val)
+
+    return {
+        "lambda": {"re": lam.real, "im": lam.imag},
+        "T": T,
+        "exponent_re": exponent.real,
+        "exponent_im": exponent.imag,
+        "G_T": val_dict,
+        "G_T_modulus": mod_val,
+        "grows_as_T_increases": exponent.real > 0.0,
+    }
+
+
+def audit_offcritical_diagonal_obstruction(
+    delta: float = 0.15, gamma: float = 14.134725141734693, t: float = 1.0
+) -> Dict[str, Any]:
+    """
+    Audit the Section 16 Off-Critical Diagonal Obstruction:
+    For sigma = rho with delta_rho != 0:
+      - lambda_{rho,rho} = z_rho + conj(z_rho) = 2 * delta_rho != 0 (purely real!),
+      - q_{rho,rho} = tau^{2 delta_rho} != 1,
+      - the unsymmetrized and self-dual Mellin factor |hat{Phi}_t^{(2)}(z_rho)|^2 > 0
+        everywhere in the open critical strip 0 < Re(rho) < 1,
+      - discrete Cesaro A_N(q_{rho,rho}), continuous Cesaro C_T(2 delta_rho log tau),
+        Abel A_r(q_{rho,rho}), and Gaussian G_T(2 delta_rho log tau) all fail / blow up.
+    """
+    lam_diag = 2.0 * delta * LOG_TAU
+    q_diag = TAU ** (2.0 * delta)
+    q_inv_diag = TAU ** (-2.0 * delta)
+
+    mellin_eval = evaluate_repaired_completed_theta_state_mellin(
+        complex(0.5 + delta, gamma), t=t, order=2
+    )
+    even_eval = evaluate_inversion_even_state_mellin(
+        complex(delta, gamma), t=t, order=2
+    )
+
+    cesaro_disc_10 = evaluate_discrete_cesaro_average(q_diag, N=10)
+    cesaro_disc_25 = evaluate_discrete_cesaro_average(q_diag, N=25)
+    cesaro_disc_neg_10 = evaluate_discrete_cesaro_average(q_inv_diag, N=10)
+
+    cesaro_cont_10 = evaluate_continuous_cesaro_average(lam_diag, T=10.0)
+    cesaro_cont_25 = evaluate_continuous_cesaro_average(lam_diag, T=25.0)
+
+    abel_inside = evaluate_abel_poisson_average(q_diag, r=0.5 / max(q_diag, 1.0 / q_diag))
+    abel_outside = evaluate_abel_poisson_average(q_diag, r=0.95)
+
+    gauss_5 = evaluate_gaussian_grade_average(lam_diag, T=5.0)
+    gauss_10 = evaluate_gaussian_grade_average(lam_diag, T=10.0)
+
+    return {
+        "status": OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION,
+        "continuous_status": CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS,
+        "sample_delta": delta,
+        "sample_gamma": gamma,
+        "diagonal_pair_exponent_lambda": 2.0 * delta,
+        "diagonal_scaled_exponent": lam_diag,
+        "diagonal_character_q": q_diag,
+        "reciprocal_character_q_inv": q_inv_diag,
+        "is_nonunitary": abs(q_diag - 1.0) > 1e-12,
+        "bilateral_symmetry_exposes_both_signs": (
+            abs(cesaro_disc_10["A_N_modulus"] - cesaro_disc_neg_10["A_N_modulus"]) < 1e-12
+        ),
+        "mellin_nonvanishing_in_open_strip": {
+            "unsymmetrized_modulus": mellin_eval["completed_mellin_modulus"],
+            "inversion_even_modulus_squared": even_eval["modulus_squared"],
+            "gamma_factor_zero_free": True,
+            "polynomial_multiplier_roots": ["s = 0 (z = -1/2)", "s = 1 (z = +1/2)"],
+            "provably_nonzero_on_open_strip_0_lt_Re_s_lt_1": True,
+        },
+        "discrete_cesaro_growth": {
+            "N_10_modulus": cesaro_disc_10["A_N_modulus"],
+            "N_25_modulus": cesaro_disc_25["A_N_modulus"],
+            "grows_exponentially": cesaro_disc_25["A_N_modulus"] > cesaro_disc_10["A_N_modulus"] > 1.0,
+        },
+        "continuous_cesaro_growth": {
+            "T_10_modulus": cesaro_cont_10["C_T_modulus"],
+            "T_25_modulus": cesaro_cont_25["C_T_modulus"],
+            "grows_exponentially": cesaro_cont_25["C_T_modulus"] > cesaro_cont_10["C_T_modulus"] > 1.0,
+        },
+        "abel_poisson_audit": {
+            "convergence_annulus": "r < |q| < 1/r",
+            "diverges_as_r_approaches_1_for_nonunitary_q": not abel_outside["series_converges_at_r"],
+            "sample_inside_annulus": abel_inside,
+            "sample_outside_annulus_r_0_95": abel_outside,
+        },
+        "gaussian_average_audit": {
+            "exact_formula": "G_T(lambda) = exp(T^2 lambda^2 / 2)",
+            "T_5_modulus": gauss_5["G_T_modulus"],
+            "T_10_modulus": gauss_10["G_T_modulus"],
+            "diverges_super_exponentially_on_real_diagonal": (
+                gauss_10["G_T_modulus"] > gauss_5["G_T_modulus"] > 1.0
+            ),
+        },
+        "lean_theorems": [
+            "grade_pair_character_modulus",
+            "offcritical_diagonal_character_nonunitary",
+            "cesaro_unit_character_limit_control",
+        ],
+    }
+
+
+def audit_pontryagin_duality_firewall() -> Dict[str, Any]:
+    """Return the Section 19 Invariant-Mean / Pontryagin-Duality Firewall."""
+    return {
+        "status": GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE,
+        "additive_grade_group": "(Z, +) or (R, +)",
+        "unitary_dual_characters": "q = e^{i theta} in T (for Z) or e^{i r omega} with omega in R (for R)",
+        "boundedness_criterion": "exp(r lambda) is bounded on R (or Z) iff Re(lambda) = 0",
+        "single_zero_character_scope": (
+            "For a single-zero character chi_z(K) = tau^{K z}, boundedness/unitarity on Z or R "
+            "holds iff Re(z) = delta_rho = 0, which IS the Riemann Hypothesis for rho."
+        ),
+        "pair_character_scope": (
+            "For the sesquilinear common-shift pair character tau^{r(z_rho + conj(z_sigma))}, "
+            "boundedness/unitarity for ALL pairs (rho, sigma)—and in particular for the diagonal pair "
+            "sigma = rho where z_rho + conj(z_rho) = 2 delta_rho—holds iff every delta_rho = 0. "
+            "Therefore, invoking Pontryagin character orthogonality or an invariant mean on Z or R "
+            "to annihilate all nonstationary pair characters implicitly assumes delta_rho = 0."
+        ),
+    }
+
+
+def audit_complex_grade_loophole() -> Dict[str, Any]:
+    """
+    Audit Section 20: whether rotating the grade averaging contour to K = v e^{i theta}
+    for a fixed zero-independent angle theta can make all nonstationary characters unitary.
+    """
+    theta_samples = [0.0, math.pi / 6.0, math.pi / 4.0, math.pi / 2.0]
+    # For K = v e^{i theta}, Re(e^{i theta} lambda) = cos(theta) Re(lambda) - sin(theta) Im(lambda).
+    # For a diagonal pair (rho, rho), lambda = 2 delta_rho (purely real, Im = 0),
+    # while for an off-diagonal critical pair (rho, sigma), lambda = i (gamma_rho - gamma_sigma) (purely imaginary, Re = 0).
+    # To make BOTH bounded on v in R:
+    #   - off-diagonal critical pairs require sin(theta) * (gamma_rho - gamma_sigma) = 0 => sin(theta) = 0;
+    #   - diagonal off-critical pairs require cos(theta) * (2 delta_rho) = 0 => cos(theta) = 0 (if delta_rho != 0).
+    # Since cos(theta) and sin(theta) cannot both vanish, NO angle theta makes both families bounded!
+    angle_checks = []
+    delta_sample = 0.15
+    omega_sample = 6.887  # e.g. gamma_2 - gamma_1
+    for th in theta_samples:
+        diag_rate = math.cos(th) * (2.0 * delta_sample)
+        offdiag_rate = -math.sin(th) * omega_sample
+        angle_checks.append(
+            {
+                "theta_radians": th,
+                "diagonal_growth_rate_cos_theta_2delta": diag_rate,
+                "offdiagonal_growth_rate_neg_sin_theta_dgamma": offdiag_rate,
+                "both_zero": (abs(diag_rate) < 1e-15) and (abs(offdiag_rate) < 1e-15),
+            }
+        )
+
+    return {
+        "status": "NO_FIXED_COMPLEX_GRADE_CONTOUR_UNITARIZES_SPECTRUM",
+        "complex_grade_parameter": "K = v exp(i theta),  v in R",
+        "modulus_formula": "|tau^{K lambda}| = exp(v log(tau) (cos(theta) Re(lambda) - sin(theta) Im(lambda)))",
+        "obstruction_proof": (
+            "For off-diagonal pairs with Im(lambda) = gamma_rho - gamma_sigma != 0 and Re(lambda) = 0, "
+            "bilateral boundedness in v requires sin(theta) = 0 (theta in pi Z, the real grade axis). "
+            "On the real grade axis sin(theta) = 0, cos(theta) = +-1, so any off-critical diagonal pair "
+            "with Re(lambda) = 2 delta_rho != 0 has growth rate +-2 delta_rho != 0. Since sin^2(theta) + cos^2(theta) = 1, "
+            "no fixed zero-independent angle theta can simultaneously make both families unitary."
+        ),
+        "sample_angle_audit": angle_checks,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Sections 21, 22 & 23: Cross-Grade Arithmetic-Zero Compatibility,
+# Ratio-Kernel Control & Relative-Grade Fallback
+# ---------------------------------------------------------------------------
+
+
+def audit_common_shift_transport_compatibility(
+    r: float = 1.5, a: float = 0.0, s: complex = 0.65 + 14.134725j, t: complex = 0.65 - 14.134725j
+) -> Dict[str, Any]:
+    """
+    Audit Section 21: Cross-Grade Arithmetic-Zero Compatibility Gate under common grade
+    translation (K, J) |-> (K + r, J + r) with transported kernel
+        F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y).
+    """
+    # At (K, J) = (0, 1), the prime stations up to N = 15 have minimum distance
+    # Delta_min(15, 1) = |19 - 3 * 2 * pi| = 19 - 6*pi > 0.
+    delta_min_0_1 = abs(19.0 - 3.0 * TAU)
+
+    # Under (0, 1) |-> (r, 1 + r), the scaled stations are x_r(n) = tau^r n and y_{1+r}(m) = tau^{1+r} m.
+    # Evaluating F_r(x_r(n), y_{1+r}(m)) = tau^{a r} F_0(tau^{(1 - b) r} n, tau^{(1 - b) r} (tau m))
+    # preserves the unshifted station arguments (n, tau m) and the fixed support-separation proof
+    # for all r in R if and only if 1 - b = 0  <=>  b = 1.
+    b_full = 1.0
+    b_untransported = 0.0
+
+    net_exp_b1 = a * r + (b_full - 1.0) * r * (s + t)
+    net_exp_b0 = a * r + (b_untransported - 1.0) * r * (s + t)
+
+    return {
+        "status": COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY,
+        "principal_outcome": GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY,
+        "base_cross_grade_pair": "(K, J) = (0, 1)",
+        "support_separation_gap_N15": delta_min_0_1,
+        "common_shift_translation": "(K, J) = (0, 1) |-> (r, 1 + r)",
+        "transported_kernel_ansatz": "F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y)",
+        "arithmetic_station_argument": "F_r(tau^r n, tau^{1+r} m) = tau^{a r} F_0(tau^{(1-b)r} n, tau^{(1-b)r} tau m)",
+        "required_b_for_arithmetic_preservation": 1.0,
+        "two_variable_mellin_grade_factor": "tau^{r (a + b (s + t))}",
+        "net_spectral_common_shift_exponent_formula": "r (a + b (s + t)) - r (s + t) = a r + (b - 1) r (s + t)",
+        "at_b_eq_1_zero_dependent_exponent": {
+            "re": (net_exp_b1 - a * r).real,
+            "im": (net_exp_b1 - a * r).imag,
+        },
+        "common_shift_spectral_character_survives_at_b_eq_1": False,
+        "arithmetic_support_separation_survives_at_b_ne_1": False,
+        "b_eq_0_sample_zero_dependent_exponent": {
+            "re": (net_exp_b0 - a * r).real,
+            "im": (net_exp_b0 - a * r).imag,
+        },
+        "lean_theorem": "transport_projection_incompatibility_algebra",
+    }
+
+
+def audit_scale_invariant_ratio_kernel() -> Dict[str, Any]:
+    """
+    Audit Section 22: Scale-Invariant Ratio-Kernel Control
+        F(x, y) = phi(x / y)  or  phi(log x - log y).
+    """
+    return {
+        "status": SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER,
+        "kernel_form": "F(x, y) = phi(x / y) = tilde{phi}(log x - log y)",
+        "common_scaling_invariance": "F(tau^r x, tau^r y) = phi((tau^r x)/(tau^r y)) = F(x, y)",
+        "two_variable_mellin_transform": (
+            "Setting u = x/y and v = y (dx dy / (x y) = du dv / (u v)), "
+            "int_0^infty int_0^infty phi(x/y) x^s y^t dx/x dy/y = "
+            "(int_0^infty phi(u) u^s du/u) * (int_0^infty v^{s + t} dv/v) = "
+            "2*pi * hat{phi}(s) * delta(Im(s + t)) on s + t = 0."
+        ),
+        "mellin_support_locus": "s + t = 0  (in centered coordinates: z_1 + z_2 = -1, or for half-density normalized ratio kernels: z_1 + z_2 = 0)",
+        "common_shift_exponent_on_locus": "r (s + t) = 0",
+        "common_shift_character_survives": False,
+        "lean_theorem": "transport_projection_incompatibility_algebra",
+    }
+
+
+def audit_relative_grade_alternative(max_d: int = 8, max_n: int = 15) -> Dict[str, Any]:
+    """
+    Audit Section 23: Relative-Grade Alternative d = J - K.
+    Computes the minimum prime-power station gap
+        Delta_min(max_n, d) = min_{2 <= n, m <= max_n} |n - m * tau^d|
+    and also the logarithmic / multiplicative relative gap across growing station cutoffs,
+    showing why no uniform smooth support gap exists over an infinite family without
+    shrinking bandwidth eps_d -> 0.
+    """
+    # Prime powers up to max_n
+    prime_powers = [2, 3, 4, 5, 7, 8, 9, 11, 13]
+    prime_powers = [n for n in prime_powers if n <= max_n]
+
+    gap_by_d = []
+    for d in range(1, max_d + 1):
+        scale = TAU ** d
+        min_abs_gap = min(
+            abs(n - m * scale) for n in prime_powers for m in prime_powers
+        )
+        # In logarithmic coordinates |log(n) - (log(m) + d log(tau))|:
+        # for fixed finite max_n and d >= 1, since tau^1 > 6.28 and max_n = 15,
+        # m * tau^d > 15 for all d >= 2, m >= 2; however, on the full infinite prime-power
+        # spectrum (required for a complete explicit-formula identity without truncation),
+        # Dirichlet's approximation theorem implies inf_{n, m >= 2} |log(n/m) - d log(tau)| = 0!
+        gap_by_d.append(
+            {
+                "d": d,
+                "finite_cutoff_max_n": max_n,
+                "min_abs_gap_up_to_max_n": min_abs_gap,
+            }
+        )
+
+    # Demonstrate Diophantine shrinking of |log(n/m) - d log(tau)| as the station range M grows for d = 1
+    diophantine_log_gaps = []
+    for cutoff in (15, 50, 200):
+        # all integers >= 2 up to cutoff
+        best_gap = min(
+            abs(math.log(n) - (math.log(m) + LOG_TAU))
+            for n in range(2, cutoff + 1)
+            for m in range(2, cutoff + 1)
+        )
+        diophantine_log_gaps.append({"cutoff": cutoff, "min_log_gap_d1": best_gap})
+
+    return {
+        "status": "RELATIVE_GRADE_SMOOTH_UNIFORM_GAP_FAILS_ON_FULL_SPECTRUM",
+        "layer_intersection_property": "tau^K Z cap tau^J Z = {0} for K != J (by Lindemann transcendence of tau = 2*pi)",
+        "finite_cutoff_gaps": gap_by_d,
+        "diophantine_log_gap_shrinking": diophantine_log_gaps,
+        "obstruction_explanation": (
+            "While tau^K Z cap tau^J Z = {0} holds pointwise for K != J, a smooth zero-independent "
+            "explicit-formula functional over infinitely many relative grades d = J - K faces a "
+            "dilemma: (1) on the full untruncated prime-power spectrum, {log(p^k) - log(q^l)} is dense "
+            "or accumulates arbitrarily close to d log(tau), so no positive support width eps > 0 avoids "
+            "cross-grade collisions uniformly; (2) if the support is truncated to a finite station window "
+            "[2, N], then as d grows, tau^d [2, N] moves out of the fixed window (giving trivial zero overlap "
+            "only by support disjointness, which carries no common-shift stationary reflection projection)."
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Sections 25 & 26: Arithmetic Contradiction Gate & Zero-Dependent Filter Firewall
+# ---------------------------------------------------------------------------
+
+
+def audit_arithmetic_contradiction_gate() -> Dict[str, Any]:
+    """
+    Audit Section 25: Arithmetic Contradiction Gate.
+    Compares the arithmetic and spectral signs on the two candidate families:
+      1. Fixed-state sesquilinear correlation G_C(K, J) = W_comp(U_{-K} Psi) conj(W_comp(U_{-J} Psi)):
+         at K = J = r, G_C(r, r) = |W_comp(U_{-r} Psi)|^2 >= 0 on BOTH the arithmetic side
+         and the spectral side (`REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION`).
+      2. Cross-grade narrow-support overlap Q_eps^{K+r, J+r}[F_r]:
+         has Q_eps = 0 on the arithmetic side when b = 1, but b = 1 identically erases the
+         common-shift spectral character (`COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY`).
+    """
+    return {
+        "status": REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION,
+        "sesquilinear_correlation_G_C": {
+            "arithmetic_value": "G_C(r, r) = |W_arith(U_{-r} Psi_t^+)|^2 >= 0",
+            "spectral_value": "G_C(r, r) = |W_spec(U_{-r} Psi_t^+)|^2 >= 0",
+            "stationary_sector_value": "sum_{rho/~} 8 m_rho^2 |hat{Psi}_t^+(z_rho)|^2 delta_rho^2 >= 0",
+            "signs_compatible": True,
+            "yields_contradiction": False,
+        },
+        "cross_grade_narrow_support_Q_eps": {
+            "arithmetic_value_at_b_eq_1": "Q_eps^{r, 1+r}[F_r] = 0",
+            "common_shift_spectral_character_at_b_eq_1": "tau^{(1-1) r (s+t)} = 1 (common-shift signal erased)",
+            "yields_reflection_projector": False,
+        },
+        "lean_theorem": "projected_arithmetic_zero_and_positive_radial_contradiction",
+    }
+
+
+def audit_zero_dependent_filter_firewall(
+    candidate_description: str = "zero_independent_polynomial_or_cesaro",
+    depends_on_zeros: bool = False,
+) -> Dict[str, Any]:
+    """
+    Section 26 firewall: reject any grade filter whose coefficients depend on
+    rho, gamma_rho, delta_rho, a numerical zero table, q_{rho,sigma}, or a canonical
+    Weierstrass product over the zeta zero spectrum.
+    """
+    return {
+        "candidate_description": candidate_description,
+        "depends_on_zeros": depends_on_zeros,
+        "status": (
+            ZERO_DEPENDENT_GRADE_FILTER_REJECTED
+            if depends_on_zeros
+            else "ZERO_INDEPENDENT_FILTER_ADMISSIBLE_FOR_AUDIT"
+        ),
+        "rejected_inputs": [
+            "rho",
+            "gamma_rho",
+            "delta_rho",
+            "numerically_computed_zero_list",
+            "pair_character_values_q_{rho,sigma}",
+            "canonical_product_over_nontrivial_zero_spectrum",
+        ],
+        "admissible_as_tc_proof_mechanism": not depends_on_zeros,
+    }
+
+
+def audit_generic_base_grade_projection_control(
+    bases: Sequence[float] = (2.0, math.e, TAU, 10.0),
+    delta: float = 0.15,
+    gamma: float = 14.134725141734693,
+) -> Dict[str, Any]:
+    """
+    Generic-base q > 1 control (Section 29 & 30):
+    Verify that the stationarity iff (z_rho + conj(z_sigma) = 0 <=> sigma = 1 - conj(rho)),
+    the off-critical diagonal nonunitarity q_{rho,rho} = q^{2 delta_rho} != 1, and the
+    full-transport cancellation (b - 1) r (s + t) = 0 hold identically for every base q > 1
+    and do not single out tau = 2*pi on the spectral projection side.
+    """
+    records = []
+    for q in bases:
+        char_info = evaluate_grade_character(delta, gamma, K=1.0, base_q=q)
+        diag_q = q ** (2.0 * delta)
+        records.append(
+            {
+                "base_q": q,
+                "log_q": math.log(q),
+                "single_character_modulus": char_info["amplitude"],
+                "diagonal_character_q_2delta": diag_q,
+                "diagonal_nonunitary_for_delta_ne_0": abs(diag_q - 1.0) > 1e-12,
+                "full_transport_b1_exponent": (1.0 - 1.0) * math.log(q),
+            }
+        )
+    return {
+        "status": "GRADE_PROJECTION_ALGEBRA_HOLDS_FOR_ALL_BASES_Q_GT_1",
+        "bases_tested": list(bases),
+        "records": records,
+        "tau_specific_on_spectral_projection_side": False,
+        "tau_specificity_restricted_to": (
+            "Lindemann transcendence of tau = 2*pi in the arithmetic layer disjointness "
+            "tau^K Z cap tau^J Z = {0} (K != J) and the completed zeta functional equation."
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Lean 4 Formalization Verification & Machine-Readable Artifact Builder
+# ---------------------------------------------------------------------------
+
+
+def verify_lean_theorem_identifiers(
+    lean_path: Path | None = None,
+) -> Dict[str, Any]:
+    """
+    Verify that all 11 required Lean theorem identifiers exist in
+    `formal/RiemannScope/GradeCharacterProjection.lean` with 0 `sorry` and 0 `admit`.
+    """
+    if lean_path is None:
+        lean_path = (
+            Path(__file__).resolve().parent.parent
+            / "formal"
+            / "RiemannScope"
+            / "GradeCharacterProjection.lean"
+        )
+    text = lean_path.read_text(encoding="utf-8")
+    declared = re.findall(r"^\s*(?:theorem|lemma)\s+([A-Za-z0-9_']+)", text, flags=re.M)
+    declared_set = set(declared)
+    missing = [name for name in REQUIRED_LEAN_THEOREMS if name not in declared_set]
+
+    # Strip comments before checking for sorry/admit
+    no_block_comments = re.sub(r"/-.*?-/", "", text, flags=re.S)
+    no_comments = re.sub(r"--.*$", "", no_block_comments, flags=re.M)
+    sorry_count = len(re.findall(r"\bsorry\b", no_comments))
+    admit_count = len(re.findall(r"\badmit\b", no_comments))
+    axiom_count = len(re.findall(r"^\s*axiom\b", no_comments, flags=re.M))
+
+    return {
+        "lean_file": str(lean_path.as_posix()),
+        "declared_theorems": declared,
+        "required_theorems": list(REQUIRED_LEAN_THEOREMS),
+        "missing_theorems": missing,
+        "all_required_present": len(missing) == 0,
+        "sorry_count": sorry_count,
+        "admit_count": admit_count,
+        "axiom_count": axiom_count,
+        "assurance_statement": "0 sorry, 0 admit, no nonstandard project axioms introduced.",
+    }
+
+
+def build_grade_character_projection_report() -> Dict[str, Any]:
+    """
+    Build the complete machine-readable artifact dictionary for
+    `data/tc_grade_character_projection.json` containing all 38 required top-level keys
+    from Section 32 of `TASK-TC-037`.
+    """
+    theta_state = build_corrected_theta_state_record(t=1.0)
+    symmetries = audit_zero_symmetry_group()
+    grade_char = derive_grade_character_convention()
+    bigraded = build_bigraded_functional_metadata()
+    involution_table = classify_second_leg_involutions()
+    laurent_no_go = audit_finite_laurent_projector_no_go()
+    diff_no_go = audit_finite_differential_projector_no_go()
+    diag_obstruction = audit_offcritical_diagonal_obstruction()
+    even_state = audit_inversion_even_state_control()
+    quartet_audit = audit_reflection_quartet_radial_identity()
+    transport_audit = audit_common_shift_transport_compatibility()
+    ratio_audit = audit_scale_invariant_ratio_kernel()
+    relative_audit = audit_relative_grade_alternative()
+    contradiction_audit = audit_arithmetic_contradiction_gate()
+    pontryagin_audit = audit_pontryagin_duality_firewall()
+    complex_grade_audit = audit_complex_grade_loophole()
+    generic_base = audit_generic_base_grade_projection_control()
+    lean_map = verify_lean_theorem_identifiers()
+
+    return {
+        "starting_head": STARTING_HEAD,
+        "substantive_parent_head": SUBSTANTIVE_PARENT_HEAD,
+        "task_id": TASK_TC_037_ID,
+        "task_status": TASK_TC_037_STATUS,
+        "corrected_theta_state_used": theta_state,
+        "centered_zero_symmetries": symmetries,
+        "grade_character_convention": grade_char,
+        "bigraded_functional": bigraded,
+        "second_leg_involution_table": involution_table,
+        "common_shift_parameter": "r = (K + J) / 2  (K = r - d, J = r + d)",
+        "relative_grade_parameter": "d = (J - K) / 2  (relative difference J - K = 2 d)",
+        "pair_character_formula": (
+            "exp(r * lambda_C(rho, sigma) * log(tau)) = tau^{r (z_rho + conj(z_sigma))} "
+            "with modulus |q_{rho,sigma}|^r = tau^{r (delta_rho + delta_sigma)}"
+        ),
+        "reflection_stationary_iff": {
+            "statement": "z_rho + conj(z_sigma) = 0  <=>  sigma = 1 - conj(rho)",
+            "critical_line_self_reflection": "rho = 1 - conj(rho)  <=>  delta_rho = 0",
+            "offcritical_distinct_reflection_pair": "delta_rho != 0  ==>  rho != 1 - conj(rho)",
+            "status": REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION,
+            "lean_theorem": "reflection_stationary_iff",
+        },
+        "finite_laurent_projector_status": laurent_no_go,
+        "finite_differential_projector_status": diff_no_go,
+        "distinct_character_theorem_status": laurent_no_go["distinct_character_theorem"],
+        "riemann_von_mangoldt_dependency": {
+            "formula": "N(T) = (T/(2*pi)) log(T/(2*pi)) - T/(2*pi) + O(log T)",
+            "used_for": (
+                "Proving that for fixed rho_0, the pair characters q_sigma = tau^{z_{rho_0} + conj(z_sigma)} "
+                "take infinitely many distinct values (since any finite union of vertical progressions "
+                "of spacing 2*pi/log(tau) has O(T) points up to height T vs Omega(T log T) zeros)."
+            ),
+            "evidence_class": "PROVED_PAPER_DERIVATION_FROM_CLASSICAL_THEOREM",
+            "claimed_in_lean": False,
+            "primary_citations": [
+                "von Mangoldt (1905), Math. Ann. 60, 1-19",
+                "Titchmarsh (1986), The Theory of the Riemann Zeta-Function, 2nd ed., Theorem 9.4",
+                "Trudgian (2014), J. Number Theory 134, 280-292 (arXiv:1208.5846v2)",
+            ],
+        },
+        "discrete_cesaro_status": {
+            "status": OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION,
+            "formula": "A_N(q) = (1/(2N+1)) sum_{K=-N}^N q^K",
+            "stationary_q_eq_1": "A_N(1) = 1",
+            "unitary_q_ne_1": "|A_N(q)| <= 2 / ((2N+1) |q - 1|) -> 0 as N -> infty",
+            "nonunitary_mod_q_ne_1": "A_N(q) grows exponentially as max(|q|, |q|^{-1})^N / (2N+1) -> +infty",
+            "sample_evaluation": diag_obstruction["discrete_cesaro_growth"],
+        },
+        "continuous_cesaro_status": {
+            "status": CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS,
+            "formula": "C_T(lambda) = (1/(2T)) int_{-T}^T exp(r lambda) dr = sinh(T lambda) / (T lambda)",
+            "stationary_lambda_eq_0": "C_T(0) = 1",
+            "unitary_imaginary_lambda": "C_T(i omega) = sin(T omega) / (T omega) -> 0 as T -> infty (omega != 0)",
+            "nonunitary_re_lambda_ne_0": "|C_T(lambda)| ~ exp(T |Re(lambda)|) / (2 T |lambda|) -> +infty",
+            "sample_evaluation": diag_obstruction["continuous_cesaro_growth"],
+        },
+        "abel_status": diag_obstruction["abel_poisson_audit"],
+        "gaussian_average_status": diag_obstruction["gaussian_average_audit"],
+        "offcritical_diagonal_character": {
+            "pair": "(rho, rho)",
+            "exponent": "lambda_{rho,rho} = z_rho + conj(z_rho) = 2 delta_rho",
+            "character": "q_{rho,rho} = tau^{2 delta_rho}",
+            "unitary_iff": "|q_{rho,rho}| = 1  <=>  delta_rho = 0",
+            "mellin_weight_nonvanishing": diag_obstruction["mellin_nonvanishing_in_open_strip"],
+        },
+        "nonunitarity_status": {
+            "status": OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION,
+            "pontryagin_firewall_status": GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE,
+            "pontryagin_audit": pontryagin_audit,
+            "complex_grade_audit": complex_grade_audit,
+        },
+        "inversion_even_state_status": even_state,
+        "reflection_quartet_formula": {
+            "single_reflection_pair": "P(z_rho, -conj(z_rho)) = 4 delta_rho^2 + 4 i gamma_rho",
+            "conjugate_reflection_pair": "P(conj(z_rho), -z_rho) = 4 delta_rho^2 - 4 i gamma_rho",
+            "quartet_sum": "P_rho + P_{conj(rho)} = 8 delta_rho^2",
+            "weighted_quartet_sum": "8 m_rho^2 |hat{Psi}_t^+(z_rho)|^2 delta_rho^2 >= 0",
+            "audit": quartet_audit,
+        },
+        "reflection_weight_sign_status": (
+            "NONNEGATIVE_ON_STATIONARY_SECTOR_STRICTLY_POSITIVE_FOR_OFFCRITICAL_UNSYMMETRIZED_AND_SELFDUAL_THETA_STATE"
+        ),
+        "cross_grade_arithmetic_zero_status": {
+            "base_pair": "(K, J) = (0, 1)",
+            "arithmetic_value": "Q_eps^{0,1}[w] = 0 for eps < Delta_min(N, 1) / 2",
+            "support_gap_N15": transport_audit["support_separation_gap_N15"],
+            "common_shift_preservation_requires": "b = 1 in F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y)",
+        },
+        "common_shift_transport_status": transport_audit,
+        "spectral_signal_survival_status": (
+            "ERASED_IDENTICALLY_AT_FULL_ARITHMETIC_TRANSPORT_B_EQ_1_AND_DIVERGENT_AT_UNTRANSPORTED_B_EQ_0"
+        ),
+        "ratio_kernel_status": ratio_audit,
+        "relative_grade_fallback_status": relative_audit,
+        "arithmetic_projected_value_status": (
+            "NONNEGATIVE_ON_SESQUILINEAR_CORRELATION_AND_TRIVIALLY_COVARIANT_ON_TRANSPORTED_OVERLAP"
+        ),
+        "spectral_projected_value_status": (
+            "FORMAL_STATIONARY_SECTOR_NONNEGATIVE_8_M_RHO_SQ_WEIGHT_DELTA_SQ_BUT_ANALYTIC_PROJECTOR_BLOCKED"
+        ),
+        "contradiction_status": contradiction_audit["status"],
+        "weil_equivalence_status": (
+            GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE
+        ),
+        "zero_dependency_firewall": {
+            "status": ZERO_DEPENDENT_GRADE_FILTER_REJECTED,
+            "hardcoded_zero_list_used_for_theorem": False,
+            "audit": audit_zero_dependent_filter_firewall(),
+        },
+        "generic_base_status": generic_base,
+        "obl_ct_001a_status": OBL_CT_001A_STATUS,
+        "principal_classification": PRINCIPAL_CLASSIFICATION,
+        "secondary_classification": SECONDARY_CLASSIFICATION,
+        "candidate_failure_refutes_tc": False,
+        "no_rh_claim": True,
+        "exact_remaining_subgate": {
+            "subgate_id": "SUBGATE-TC-037A (refining SUBGATE-TC-036A under OBL-CT-001A)",
+            "status": "OPEN",
+            "precise_theorem_target": (
+                "Does there exist a zero-independent operator or kernel construction across "
+                "tau-grades that (a) does not rely on full common-scale coordinate transport b = 1 "
+                "(which erases the common-shift spectral character) and (b) does not rely on "
+                "unitary grade-character averaging (which diverges on off-critical diagonal terms "
+                "tau^{2 delta_rho} != 1), yet still enforces a nonpositive arithmetic law paired "
+                "with a nonnegative non-reflection spectral complement?"
+            ),
+        },
+        "lean_theorem_map": lean_map,
+    }

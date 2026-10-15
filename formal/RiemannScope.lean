@@ -33,5 +33,6 @@ import RiemannScope.GradeHankelConstraint
 import RiemannScope.TransportMismatchCurvature
 import RiemannScope.CanonicalSelectorAudit
 import RiemannScope.ModularThetaConductorCurvature
+import RiemannScope.GradeCharacterProjection
 
 

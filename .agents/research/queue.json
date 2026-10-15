@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-036R",
+  "active_task_id": "TASK-TC-037",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -991,6 +991,37 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-036R completed: Replaced the defective unshifted operator D(D-1/2) on tilde{g}_t(u) = t^{1/4}exp(-pi t u^2) with the exact pole-annihilating operator P_reg(D) = D^2 - 1/16 = (D-1/4)(D+1/4); proved its Mellin multiplier on t^{1/4 - s/2} is (1/4 - s/2)^2 - 1/16 = (1/4)s(s-1) = (1/4)(z^2 - 1/4) vanishing at s in {0, 1}, annihilating both t^{1/4} = tilde{g}_t(0) and t^{-1/4} = int_R tilde{g}_t(u)du, and placing Phi_t(u) = t^{1/4}(pi^2 t^2 u^4 - (3/2)pi t u^2)exp(-pi t u^2) in S_0(R) cap Delta(R_+^x) (EXACT_POLE_ANNIHILATING_OPERATOR_PROVED, COMPLETED_THETA_STATE_IN_INVARIANT_CORE_PROVED); verified both Phi_t and its squared companion Phi_t^{(2)} = (D^2 - 1/16)^2 tilde{g}_t (with W_pole(J Phi_t^{(2)}) = 0) preserve UNRESTRICTED_DOUBLE_ZERO_SUM, THETA_CONDUCTOR_FUNCTIONAL_REMAINS_DOUBLE_SPECTRAL, and THETA_CONDUCTOR_POSITIVITY_IS_RH_EQUIVALENT; tightened Section 11 operator-selector wording to the 2-parameter self-adjoint subspace b_0 I + b_2(E+I)^2; compiled Lean 4 formal/RiemannScope/ModularThetaConductorCurvature.lean (19 module declarations: 2 def + 17 theorems, 597 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 34/34 unit tests (94/94 across the 4 targeted suites). Task completion classification: TASK_TC_036R_POLE_REGULARIZATION_REPAIR_COMPLETE."
+    },
+    {
+      "task_id": "TASK-TC-037",
+      "priority": 44,
+      "objective": "Bigraded Character Projection, Reflection-Sector Isolation, and Transport-Compatibility Audit (OBL-CT-001A / SUBGATE-TC-036A Projection Audit)",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Determine whether a zero-independent operation on the TC grade variables (K, J) can project a complete double spectral expansion onto the functional-equation reflection pairs (rho, 1 - bar(rho)) while preserving an independently rigid arithmetic law, or whether it collapses to transport-moment incompatibility and off-critical character non-unitarity.",
+      "planned_calculation": "1) Derive bigraded sesquilinear and bilinear spectral correlation shift laws under common shift (K, J) |-> (K+A, J+A) and relative shift B = K - J, proving sesquilinear stationarity z_rho + bar(z_sigma) = 0 <=> sigma = 1 - bar(rho). 2) Prove finite Laurent projector no-go and finite-order differential projector no-go on the infinite nonstationary zero-pair spectrum. 3) Prove off-critical diagonal non-unitarity |chi_{rho,rho}^shift(A)| = tau^{-2 A delta_rho} != 1 blocks two-sided discrete Cesaro/Haar and continuous L^2/distributional Fourier projection, and prove assuming character unitarity is a disguised RH premise. 4) Prove transport-projection incompatibility: full label-preserving transport b_1 = b_2 = 1 erases the common-shift exponent (b_1-1)z_rho + (b_2-1)bar(z_sigma) = 0, while b_1 = b_2 = 0 shifts arithmetic prime stations F_0(tau^A n, tau^A m). 5) Prove reflection quartet imaginary cancellation and nonnegative radial defect on the hypothetical projected sector with no arithmetic sign contradiction. 6) Compile Lean 4 formalization formal/RiemannScope/GradeCharacterProjection.lean (5 def + 11 theorems = 16 declarations, 608 total compiled theorems in repository, 0 sorry, 0 admit) and verify 37 unit tests.",
+      "acceptance_criterion": "37/37 unit tests passing in tests/test_tc_grade_character_projection.py (131/131 across the 5 targeted suites); Lean 4 formalization formal/RiemannScope/GradeCharacterProjection.lean compiled (16 module declarations: 5 def + 11 theorems, 608 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); machine-readable artifact data/tc_grade_character_projection.json with all 38 required keys; review docs/reviews/TC_GRADE_CHARACTER_REFLECTION_PROJECTION.md with all 23 sections A-W; principal classification GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY and secondary classification OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION; OBL-CT-001A and SUBGATE-TC-037A kept OPEN.",
+      "dependencies": [
+        "TASK-TC-036R"
+      ],
+      "evidence": [
+        "formal/RiemannScope/GradeCharacterProjection.lean",
+        "tc/grade_character_projection.py",
+        "tests/test_tc_grade_character_projection.py",
+        "docs/reviews/TC_GRADE_CHARACTER_REFLECTION_PROJECTION.md",
+        "data/tc_grade_character_projection.json",
+        "formal/RiemannScope/README.md",
+        "CURVATURE_TRANSPORT.md",
+        "ARITHMETIC_RADIAL_BRIDGE.md",
+        "CMSA_GATE_G4.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-037 completed: Proved sesquilinear reflection-pair stationarity z_rho + bar(z_sigma) = 0 <=> sigma = 1 - bar(rho) under common grade shift (K, J) |-> (K+A, J+A) (REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION); proved finite Laurent projector no-go (FINITE_GRADE_LAURENT_PROJECTOR_NO_GO) and finite differential projector no-go (FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO); proved off-critical non-unitarity |chi_{rho,rho}^shift(A)| = tau^{-2 A delta_rho} != 1 blocks discrete Cesaro/Haar and continuous L^2/distributional Fourier projection (OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION, CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS) and identified assuming character unitarity as a disguised RH premise (GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE); proved transport-projection incompatibility showing full transport b_1 = b_2 = 1 erases the common-shift exponent while b_1 = b_2 = 0 shifts arithmetic prime stations (COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY, SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER); proved reflection quartet imaginary cancellation and nonnegative radial defect with no arithmetic sign contradiction (REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION, ZERO_DEPENDENT_GRADE_FILTER_REJECTED); kept SUBGATE-TC-037A and OBL-CT-001A OPEN; compiled Lean 4 formal/RiemannScope/GradeCharacterProjection.lean (16 module declarations: 5 def + 11 theorems, 608 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 37/37 unit tests (131/131 across the 5 targeted suites). Principal classification: GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY; Secondary classification: OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION."
     }
   ]
-}
+}
+
