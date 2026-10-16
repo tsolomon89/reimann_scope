@@ -23,6 +23,7 @@ from tc.grade_character_projection import (
     GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE,
     INFINITELY_MANY_DISTINCT_PAIR_CHARACTERS_PROVED,
     INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN,
+    INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE,
     LOG_TAU,
     OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION,
     OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION,
@@ -37,6 +38,7 @@ from tc.grade_character_projection import (
     RELATIVE_GRADE_REFLECTION_EXPONENT_REPAIRED,
     REQUIRED_LEAN_THEOREMS,
     SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER,
+    STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN,
     TASK_TC_037R_ID,
     TASK_TC_037R_STATUS,
     TAU,
@@ -657,11 +659,14 @@ def test_52_reflection_weight_nonnegative() -> None:
 
 
 def test_53_strict_offcritical_positivity_for_psi_plus_classified_as_open() -> None:
-    """53 (037R-16). Strict off-critical positivity for hat{Psi_t^+} is classified as open and critical-line sign change is certified."""
+    """53 (037R-16 / 038-Sec3). Strip zero-freeness for hat{Psi_t^+} is FALSE (sign change at (0.25, 1.0)) and strict off-critical weight at zeta zero ordinates is OPEN."""
     res = verify_fourier_vs_multiplicative_inversion()
     assert res["reflection_weight_strict_positivity_status"] == REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED
-    assert res["symmetrized_mellin_zero_free_strip_status"] == INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN
+    assert res["symmetrized_mellin_zero_free_strip_status"] == INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE
+    assert res["strict_reflection_weight_at_zeta_zero_ordinates_status"] == STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN
     sign_cert = res["critical_line_oscillation_zero_witness_at_t1"]
+    assert sign_cert["gamma_a"] == 0.25
+    assert sign_cert["gamma_b"] == 1.0
     assert sign_cert["hat_Psi_1_plus_at_i_gamma_a_re"] > 0.0
     assert sign_cert["hat_Psi_1_plus_at_i_gamma_b_re"] < 0.0
     assert sign_cert["opposite_signs_on_critical_line"] is True

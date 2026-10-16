@@ -34,5 +34,6 @@ import RiemannScope.TransportMismatchCurvature
 import RiemannScope.CanonicalSelectorAudit
 import RiemannScope.ModularThetaConductorCurvature
 import RiemannScope.GradeCharacterProjection
+import RiemannScope.ZeroArithmeticInvariants
 
 

@@ -53,10 +53,11 @@ Mathematical & Structural Summary (Repaired in `TASK-TC-037R`)
      (`FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS`).
    - While `hat{Phi}_t^{(2)}(z) != 0` in `-1/2 < Re(z) < 1/2`, the inversion-even symmetrization
      `hat{Psi}_t^+(z) = (1/2)(hat{Phi}_t^{(2)}(z) + hat{Phi}_t^{(2)}(-z))` oscillates through zero on
-     `Re(z) = 0` and has open strip zero-free status (`INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN`),
+     `Re(z) = 0` (`INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE`),
      so `W_rho = m_rho^2 |hat{Psi}_t^+(z_rho)|^2 >= 0` is proved (`REFLECTION_WEIGHT_NONNEGATIVE_PROVED`)
-     while strict positivity `W_rho > 0` at hypothetical off-critical zeros is not yet proved
-     (`REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED`).
+     while strict positivity `W_rho > 0` (`hat{Psi}_t^+(z_rho) != 0`) at hypothetical off-critical zeros
+     remains open (`REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED`,
+     `STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN`).
 
 5. Three Decisive Obstructions (Repaired in `TASK-TC-037R`):
    - (i) Finite Complex Laurent & Differential Projectors Ruled Out:
@@ -148,12 +149,18 @@ REFLECTION_QUARTET_RADIAL_IDENTITY_PRESERVED = (
     "REFLECTION_QUARTET_RADIAL_IDENTITY_PRESERVED"
 )
 
-# Fourier Self-Duality vs Multiplicative Inversion & Mellin Weight Classifications (`TASK-TC-037R`)
+# Fourier Self-Duality vs Multiplicative Inversion & Mellin Weight Classifications (`TASK-TC-037R` / `TASK-TC-038` Sec 3.1)
 FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS = (
     "FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS"
 )
+INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE = (
+    "INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE"
+)
+STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN = (
+    "STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN"
+)
 INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN = (
-    "INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN"
+    INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE
 )
 REFLECTION_WEIGHT_NONNEGATIVE_PROVED = "REFLECTION_WEIGHT_NONNEGATIVE_PROVED"
 REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED = (
@@ -811,7 +818,10 @@ def audit_inversion_even_state_control() -> Dict[str, Any]:
             FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS
         ),
         "symmetrized_zero_free_strip_status": (
-            INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN
+            INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE
+        ),
+        "strict_reflection_weight_at_zeta_zero_ordinates_status": (
+            STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN
         ),
         "definition": "Psi_t^+ = (1/2) (Phi_t^{(2)} + I Phi_t^{(2)}),  (I Psi)(u) = u^{-1} Psi(u^{-1})",
         "mellin_evenness": "hat{Psi}_t^+(-z) = hat{Psi}_t^+(z)",
@@ -1968,7 +1978,10 @@ def verify_fourier_vs_multiplicative_inversion(
             FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS
         ),
         "symmetrized_mellin_zero_free_strip_status": (
-            INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN
+            INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE
+        ),
+        "strict_reflection_weight_at_zeta_zero_ordinates_status": (
+            STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN
         ),
         "reflection_weight_nonnegative_status": REFLECTION_WEIGHT_NONNEGATIVE_PROVED,
         "reflection_weight_strict_positivity_status": (
@@ -2174,7 +2187,10 @@ def build_grade_character_projection_report() -> Dict[str, Any]:
         "raw_phi_t1_inversion_even": False,
         "symmetrized_psi_plus_inversion_even": True,
         "symmetrized_mellin_zero_free_strip_status": (
-            INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN
+            INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE
+        ),
+        "strict_reflection_weight_at_zeta_zero_ordinates_status": (
+            STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN
         ),
         "reflection_weight_nonnegative_status": REFLECTION_WEIGHT_NONNEGATIVE_PROVED,
         "reflection_weight_strict_positivity_status": (

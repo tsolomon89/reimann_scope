@@ -1,0 +1,1054 @@
+{
+  "starting_head": "63770418ca4b4498b0c9300a854e45d52434f52b",
+  "substantive_parent": "70c757ce6cead947fc806b2dadd78f2de0363fc6",
+  "task_id": "TASK-TC-038",
+  "task_status": "TASK_TC_038_ZERO_ARITHMETIC_FRONTIER_AUDIT_COMPLETE",
+  "branch_classification": "ZERO_ARITHMETIC_BRANCH",
+  "preflight_tc_037r_housekeeping": {
+    "mellin_zero_free_strip_status": "INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE",
+    "strict_reflection_weight_at_zeta_zero_ordinates_status": "STRICT_REFLECTION_WEIGHT_AT_ZETA_ZERO_ORDINATES_OPEN",
+    "synchronized_critical_line_sign_change_witness": {
+      "gamma_a": 0.25,
+      "gamma_b": 1.0,
+      "hat_Psi_1_plus_at_i_gamma_a_re": 0.005930018171819737,
+      "hat_Psi_1_plus_at_i_gamma_b_re": -0.01007544310514176,
+      "arb_128bit_certified": true
+    }
+  },
+  "candidate_objects": {
+    "candidate_A_ordinate": {
+      "symbol": "gamma_n",
+      "definition": "Im(rho_n) in R",
+      "domain": "R \\ {0}",
+      "independent_arithmetic_target": true,
+      "rh_assumed": false
+    },
+    "candidate_B_full_zero": {
+      "symbol": "rho_n = beta_n + i*gamma_n",
+      "definition": "Nontrivial zero of zeta(s) in the critical strip 0 < beta_n < 1",
+      "domain": "{s in C : 0 < Re(s) < 1}",
+      "independent_arithmetic_target": true,
+      "rh_assumed": false,
+      "note": "Unconditionally, rho_n in Q_bar <=> (beta_n in Q_bar and gamma_n in Q_bar). Conditionally under RH (beta_n = 1/2), rho_n in Q_bar <=> gamma_n in Q_bar."
+    },
+    "candidate_C_shifted_ordinate": {
+      "symbol": "gamma_n + 1/2",
+      "definition": "Real translation of the ordinate gamma_n by the rational constant 1/2",
+      "domain": "R",
+      "independent_arithmetic_target": false,
+      "status": "SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE",
+      "not_to_be_confused_with": "rho_n = 1/2 + i*gamma_n (complex critical-line zero)"
+    }
+  },
+  "shifted_ordinate_status": "SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE",
+  "shifted_ordinate_audit": {
+    "classification": "SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE",
+    "rational_equivalence": "gamma in Q  <=>  gamma + 1/2 in Q",
+    "algebraic_equivalence": "gamma in Q_bar  <=>  gamma + 1/2 in Q_bar",
+    "transcendental_equivalence": "gamma transcendental  <=>  gamma + 1/2 transcendental",
+    "field_extension_equality": "Q(gamma) = Q(gamma + 1/2)",
+    "polynomial_translation_bijection": "P(gamma) = 0  <=>  2^d P((gamma + 1/2) - 1/2) = 0",
+    "bijection_symbolic_checks": [
+      {
+        "P": "X - 14",
+        "degree": 1,
+        "Q_shifted": "2*X - 29",
+        "identity_residual_zero": true
+      },
+      {
+        "P": "X**2 - 14*X + 1",
+        "degree": 2,
+        "Q_shifted": "4*X**2 - 60*X + 33",
+        "identity_residual_zero": true
+      },
+      {
+        "P": "2*X**3 - 3*X**2 + 5*X - 7",
+        "degree": 3,
+        "Q_shifted": "16*X**3 - 48*X**2 + 76*X - 84",
+        "identity_residual_zero": true
+      }
+    ],
+    "all_symbolic_checks_passed": true,
+    "confusion_firewall": "gamma + 1/2 in R is a real affine shift of Im(rho), whereas 1/2 + i*gamma in C is the complex zero on the critical line.",
+    "lean_theorems": [
+      "shifted_ordinate_rational_iff",
+      "shifted_ordinate_algebraic_iff",
+      "shifted_ordinate_transcendental_iff"
+    ]
+  },
+  "rho_vs_gamma_algebraicity": {
+    "unconditional_equivalence": "rho = beta + i*gamma in Q_bar  <=>  (beta in Q_bar and gamma in Q_bar)",
+    "audit": {
+      "unconditional_forward": {
+        "statement": "rho = beta + i*gamma in Q_bar  ==>  beta in Q_bar and gamma in Q_bar",
+        "proof": "Q_bar is a subfield of C stable under complex conjugation (since the minimal polynomial of rho over Q has real rational coefficients, so conj(rho) is also a root). Because i in Q_bar (i^2 + 1 = 0) and 2 in Q_bar, beta = (rho + conj(rho))/2 in Q_bar and gamma = (rho - conj(rho))/(2i) in Q_bar.",
+        "status": "PROVED"
+      },
+      "unconditional_converse": {
+        "statement": "beta in Q_bar and gamma in Q_bar  ==>  rho = beta + i*gamma in Q_bar",
+        "proof": "Q_bar is a field containing beta, gamma, and i; hence beta + i*gamma in Q_bar.",
+        "status": "PROVED"
+      },
+      "unconditional_contrapositive": {
+        "statement": "(beta transcendental or gamma transcendental)  ==>  rho = beta + i*gamma transcendental",
+        "status": "PROVED"
+      },
+      "unconditional_one_way_warning": "Unconditionally (without assuming beta in Q_bar), gamma in Q_bar does NOT imply rho in Q_bar unless beta in Q_bar is also known; and rho transcendental does NOT determine which of beta or gamma is transcendental unless beta = 1/2 (or beta in Q_bar) is known.",
+      "conditional_rh_equivalence": {
+        "premise": "RH for rho (beta = 1/2)",
+        "statement": "Under beta = 1/2, rho in Q_bar  <=>  gamma in Q_bar (and rho transcendental <=> gamma transcendental)",
+        "status": "CONDITIONAL_ON_RH",
+        "used_unconditionally": false
+      },
+      "individual_zero_implication_trees": {
+        "if_rho_algebraic": [
+          "conj(rho) is algebraic of the same degree over Q",
+          "beta = (rho + conj(rho))/2 in Q_bar cap (0, 1)",
+          "gamma = (rho - conj(rho))/(2i) in Q_bar \\ {0}",
+          "1 - rho and 1 - conj(rho) are algebraic",
+          "quartet polynomial (X^2 - z^2)(X^2 - conj(z)^2) has algebraic coefficients in Q_bar[X]"
+        ],
+        "if_gamma_algebraic_unconditional": [
+          "gamma + 1/2 in Q_bar",
+          "1/2 + i*gamma in Q_bar",
+          "Does NOT imply rho = beta + i*gamma in Q_bar unless beta in Q_bar"
+        ],
+        "if_rh_and_gamma_algebraic": [
+          "beta = 1/2 in Q",
+          "rho = 1/2 + i*gamma in Q(gamma, i) subset Q_bar",
+          "z_rho = i*gamma in Q_bar"
+        ],
+        "if_rho_rational": [
+          "IMPOSSIBLE for nontrivial zeros: gamma_n != 0 because zeta(s) < 0 for all real s in (0, 1) ((1 - 2^{1-s}) zeta(s) = sum_{n>=1} (-1)^{n-1} n^{-s} > 0 while 1 - 2^{1-s} < 0)."
+        ],
+        "if_gamma_rational": [
+          "gamma + 1/2 in Q",
+          "Under RH (beta = 1/2), rho = 1/2 + i*gamma lies in the Gaussian rationals Q(i) (imaginary quadratic field of degree 2).",
+          "Unconditionally for the first zero gamma_1, excluded for all denominators 1 <= q <= 10000 by 128-bit Arb interval arithmetic, but universal irrationality gamma_n notin Q for all n remains OPEN_IN_LITERATURE."
+        ]
+      },
+      "symbolic_reconstruction_verified": true,
+      "lean_theorem": "complex_zero_re_im_algebraicity"
+    }
+  },
+  "conditional_rh_equivalences": {
+    "premise": "RH for rho (beta = 1/2)",
+    "statement": "Under beta = 1/2, rho in Q_bar  <=>  gamma in Q_bar (and rho transcendental <=> gamma transcendental)",
+    "status": "CONDITIONAL_ON_RH",
+    "used_unconditionally": false
+  },
+  "individual_zero_rationality_status": {
+    "rho_n_rational": "REFUTED_PROVED (Im(rho_n) != 0 since zeta(s) < 0 on (0, 1))",
+    "gamma_n_rational": "OPEN_IN_LITERATURE",
+    "gamma_1_bounded_denominator_exclusion_Q_10000": "CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION"
+  },
+  "individual_zero_algebraicity_status": {
+    "rho_n_algebraic": "OPEN_IN_LITERATURE",
+    "gamma_n_algebraic": "OPEN_IN_LITERATURE",
+    "gamma_1_and_rho_1_finite_box_D4_H100": "CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION"
+  },
+  "individual_zero_transcendence_status": {
+    "rho_n_transcendental": "OPEN_IN_LITERATURE",
+    "gamma_n_transcendental": "OPEN_IN_LITERATURE",
+    "shifted_ordinate_transcendental_iff_ordinate_transcendental": "PROVED"
+  },
+  "primary_literature_audit": {
+    "individual_zero_claims": {
+      "rho_n_non_real_for_nontrivial_zeros": {
+        "statement": "Every zero rho in 0 < Re(rho) < 1 satisfies Im(rho) != 0, hence rho notin R and rho notin Q.",
+        "proof_mechanism": "For real s in (0, 1), (1 - 2^{1-s}) zeta(s) = sum_{n>=1} (-1)^{n-1} n^{-s} > 0 and 1 - 2^{1-s} < 0, so zeta(s) < 0 on (0, 1).",
+        "status": "PROVED",
+        "source_status": "PRIMARY_SOURCE_VERIFIED",
+        "citations": [
+          "Titchmarsh (1986), Section 2.12"
+        ]
+      },
+      "gamma_n_irrational": {
+        "statement": "For a specific nontrivial zero ordinate gamma_n (e.g., gamma_1), gamma_n notin Q.",
+        "status": "OPEN_IN_LITERATURE",
+        "source_status": "PRIMARY_SOURCE_VERIFIED",
+        "distinction_note": "Explicitly recognized as an open Diophantine problem in the analytic number theory literature (related to the Linear Independence Conjecture of Wintner 1935 / Ingham 1942 / Rubinstein-Sarnak 1994): not even the irrationality of gamma_1 is proved."
+      },
+      "gamma_n_transcendental": {
+        "statement": "For a specific nontrivial zero ordinate gamma_n, gamma_n notin Q_bar.",
+        "status": "OPEN_IN_LITERATURE",
+        "source_status": "PRIMARY_SOURCE_VERIFIED",
+        "distinction_note": "Known to be open in the literature; implied by the Grand Linear Independence Conjecture (LI: the positive ordinates gamma_n are Q-linearly independent, or Q_bar-linearly independent), which remains completely unproved."
+      },
+      "rho_n_transcendental": {
+        "statement": "For a specific nontrivial zero rho_n = beta_n + i*gamma_n, rho_n notin Q_bar.",
+        "status": "OPEN_IN_LITERATURE",
+        "source_status": "PRIMARY_SOURCE_VERIFIED",
+        "distinction_note": "Known to be open; equivalent to transcendence of beta_n or gamma_n."
+      },
+      "rho_n_excluded_from_named_number_field": {
+        "statement": "No nontrivial zero rho_n lies in a fixed algebraic number field K (e.g., Q(i)).",
+        "status": "NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT",
+        "source_status": "NO_PRIMARY_SOURCE_FOUND",
+        "distinction_note": "While finite bounded-height searches exclude small algebraic numbers for a fixed zero gamma_1, no unconditional theorem in the primary literature proves zeta(alpha) != 0 for all alpha in Q(i) cap {0 < Re(s) < 1}."
+      },
+      "gamma_n_linear_or_algebraic_independence": {
+        "statement": "The positive ordinates gamma_1, gamma_2, ... are Q-linearly independent.",
+        "status": "CONDITIONAL_ON_NAMED_CONJECTURE",
+        "named_conjecture": "Linear Independence Conjecture (LI, Wintner 1935; Ingham 1942; Rubinstein-Sarnak 1994)",
+        "source_status": "PRIMARY_SOURCE_VERIFIED"
+      }
+    },
+    "broader_L_function_comparison": {
+      "dirichlet_L_functions": {
+        "status": "OPEN_IN_LITERATURE",
+        "summary": "Nontrivial zeros of Dirichlet L(s, chi) in 0 < Re(s) < 1 have the same open irrationality/transcendence status as zeta(s) (even the nonvanishing L(1/2, chi) != 0 at the single algebraic point s = 1/2 is Chowla's conjecture, still open in general)."
+      },
+      "dedekind_and_automorphic_L_functions": {
+        "status": "OPEN_IN_LITERATURE",
+        "summary": "For Dedekind zeta_K(s) and GL(N) automorphic L-functions (Lagarias 2004, arXiv:math/0404394v4), global zero sums (Li coefficients) are expressed via logarithmic derivatives of completed L-functions, while individual critical-strip zero locations have open arithmetic status."
+      },
+      "selberg_zeta_functions": {
+        "status": "OPEN_IN_LITERATURE",
+        "summary": "Selberg zeta zeros correspond to Laplace eigenvalues lambda_j = 1/4 + r_j^2 on hyperbolic surfaces; transcendence of individual non-explicit spectral parameters r_j is open."
+      },
+      "exponential_polynomials": {
+        "status": "PROVED_WITH_EXTERNAL_THEOREM",
+        "summary": "For finite exponential polynomials sum_{j=1}^m a_j exp(omega_j s) with algebraic parameters, Lindemann-Weierstrass / Gelfond-Schneider / Baker control simple 2-term or commensurable zeros, whereas zeta(s) is an infinite Dirichlet series whose analytic continuation into 0 < Re(s) < 1 is NOT a finite exponential polynomial."
+      },
+      "siegel_E_and_G_functions": {
+        "status": "PROVED_WITH_EXTERNAL_THEOREM",
+        "summary": "By the Siegel-Shidlovsky theorem (1929/1959) and Beukers (2006), if an E-function f(z) in Q_bar[[z]] satisfies a linear differential equation over Q_bar(z), its values and non-singular zeros are transcendental. OBSTRUCTION FOR ZETA: By Hilbert (1900) and Ostrowski (1920), zeta(s) is differentially transcendental (satisfies NO algebraic differential equation), and its Dirichlet series sum n^{-s} is a power series in p^{-s}, not an E-function in s."
+      }
+    },
+    "arxiv_primary_sources_used": [
+      {
+        "id": "math/0104051v4",
+        "title": "Zeta functions for Riemann zeros",
+        "authors": [
+          "A. Voros"
+        ],
+        "url": "https://arxiv.org/abs/math/0104051v4",
+        "pdf_url": "https://arxiv.org/pdf/math/0104051v4",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "math/0311029v1",
+        "title": "Zeta functions over zeros of general zeta and L-functions",
+        "authors": [
+          "A. Voros"
+        ],
+        "url": "https://arxiv.org/abs/math/0311029v1",
+        "pdf_url": "https://arxiv.org/pdf/math/0311029v1",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "1403.4558v2",
+        "title": "Zeta functions over zeros of Zeta functions and an exponential-asymptotic view of the Riemann Hypothesis",
+        "authors": [
+          "Andre Voros"
+        ],
+        "url": "https://arxiv.org/abs/1403.4558v2",
+        "pdf_url": "https://arxiv.org/pdf/1403.4558v2",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "math/0404394v4",
+        "title": "Li Coefficients for Automorphic L-Functions",
+        "authors": [
+          "Jeffrey C. Lagarias"
+        ],
+        "url": "https://arxiv.org/abs/math/0404394v4",
+        "pdf_url": "https://arxiv.org/pdf/math/0404394v4",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "math/0104249v1",
+        "title": "Irrationality of values of zeta-function",
+        "authors": [
+          "Wadim Zudilin"
+        ],
+        "url": "https://arxiv.org/abs/math/0104249v1",
+        "pdf_url": "https://arxiv.org/pdf/math/0104249v1",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "math/0206176v2",
+        "title": "Arithmetic of linear forms involving odd zeta values",
+        "authors": [
+          "Wadim Zudilin"
+        ],
+        "url": "https://arxiv.org/abs/math/0206176v2",
+        "pdf_url": "https://arxiv.org/pdf/math/0206176v2",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "1803.03160v1",
+        "title": "A note on odd zeta values",
+        "authors": [
+          "Tanguy Rivoal",
+          "Wadim Zudilin"
+        ],
+        "url": "https://arxiv.org/abs/1803.03160v1",
+        "pdf_url": "https://arxiv.org/pdf/1803.03160v1",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "1803.08905v2",
+        "title": "Many odd zeta values are irrational",
+        "authors": [
+          "Stephane Fischler",
+          "Johannes Sprang",
+          "Wadim Zudilin"
+        ],
+        "url": "https://arxiv.org/abs/1803.08905v2",
+        "pdf_url": "https://arxiv.org/pdf/1803.08905v2",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "2505.05005v2",
+        "title": "A note on the irrationality of zeta_2(5)",
+        "authors": [
+          "Li Lai",
+          "Johannes Sprang",
+          "Wadim Zudilin"
+        ],
+        "url": "https://arxiv.org/abs/2505.05005v2",
+        "pdf_url": "https://arxiv.org/pdf/2505.05005v2",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "2505.23088v1",
+        "title": "On the irrationality of certain p-adic zeta values",
+        "authors": [
+          "Li Lai",
+          "Cezar Lupu",
+          "Johannes Sprang"
+        ],
+        "url": "https://arxiv.org/abs/2505.23088v1",
+        "pdf_url": "https://arxiv.org/pdf/2505.23088v1",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      },
+      {
+        "id": "2411.16774v3",
+        "title": "A Note on a Recent Attempt to Prove the Irrationality of zeta(5)",
+        "authors": [
+          "Keyu Chen",
+          "Wei He",
+          "Yixin He",
+          "Yuxiang Huang",
+          "Yanyang Li",
+          "Quanyu Tang",
+          "Lei Wu",
+          "Shenhao Xu",
+          "Shuo Yang",
+          "Zijun Yu"
+        ],
+        "url": "https://arxiv.org/abs/2411.16774v3",
+        "pdf_url": "https://arxiv.org/pdf/2411.16774v3",
+        "verification": "PRIMARY_SOURCE_VERIFIED"
+      }
+    ]
+  },
+  "transcendence_theorem_applicability": [
+    {
+      "theorem": "Lindemann-Weierstrass (1882/1885)",
+      "input_structure_required": "Distinct algebraic numbers alpha_1, ..., alpha_m in Q_bar such that exp(alpha_j) satisfy a nontrivial Q_bar-linear relation.",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "If rho in Q_bar, the terms n^{-rho} = exp(-rho log n) have exponents -rho log n which are transcendental for all n >= 2 (since log n notin Q_bar), and the critical-strip analytic continuation is an infinite non-absolutely-convergent limit, not a finite Q_bar-linear relation among exp(alpha_j) for alpha_j in Q_bar."
+    },
+    {
+      "theorem": "Gelfond-Schneider (1934)",
+      "input_structure_required": "Algebraic base alpha in Q_bar \\ {0, 1} and irrational algebraic exponent beta in Q_bar \\ Q such that alpha^beta lies in Q_bar.",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "Assuming rho in Q_bar \\ Q makes each individual prime power p^{-rho} transcendental by Gelfond-Schneider, but zeta(rho) = 0 is a vanishing analytic continuation of an infinite sum/product, which does NOT force any single p^{-rho} or pi^{-rho/2} to be algebraic."
+    },
+    {
+      "theorem": "Baker's theorem on linear forms in logarithms (1966)",
+      "input_structure_required": "A finite linear combination beta_0 + beta_1 log(alpha_1) + ... + beta_m log(alpha_m) with alpha_j, beta_j in Q_bar.",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "zeta(rho) = 0 is a relation among infinitely many exponentials n^{-rho} (via analytic continuation), not a finite linear form in logarithms of algebraic numbers; furthermore, the Euler product log zeta(s) = -sum_p log(1 - p^{-s}) diverges in 0 < Re(s) < 1."
+    },
+    {
+      "theorem": "Siegel-Shidlovsky theory (1929/1959)",
+      "input_structure_required": "A vector of E-functions f_1(z), ..., f_m(z) in Q_bar[[z]] satisfying a first-order system of linear differential equations over Q_bar(z), evaluated at a non-singular alpha in Q_bar^x.",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "zeta(s) is NOT an E-function in s, and by Ostrowski (1920) / Hilbert (1900) zeta(s) satisfies NO algebraic differential equation over C(s) whatsoever."
+    },
+    {
+      "theorem": "Schneider-Lang criterion (1949/1966)",
+      "input_structure_required": "Meromorphic functions f_1, ..., f_d of finite order with transcendence degree >= 2 such that d/ds maps the ring K[f_1, ..., f_d] into itself (algebraic differential ring), simultaneously taking values in a number field K at sufficiently many points.",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "Neither zeta(s) nor Gamma(s/2) generates a finitely generated ring closed under d/ds (both are differentially transcendental), and a single hypothetical algebraic zero rho gives only one evaluation point where zeta(rho) = 0 while zeta'(rho), zeta''(rho), ... have unknown arithmetic nature."
+    },
+    {
+      "theorem": "Nesterenko algebraic independence (1996)",
+      "input_structure_required": "Values of Ramanujan quasi-modular Eisenstein series E_2(q), E_4(q), E_6(q) at an algebraic modular parameter q in (0, 1) (yielding algebraic independence of pi, e^pi, Gamma(1/4)).",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "Nesterenko's theorem controls special modular periods at CM / algebraic nomina q (which correspond to Gamma(1/4), Gamma(1/3), pi, e^pi), NOT the Mellin integral of theta_3(it) at an off-lattice complex exponent rho in 0 < Re(rho) < 1."
+    },
+    {
+      "theorem": "Lindemann's theorem on pi (1882)",
+      "input_structure_required": "pi in Q_bar (contradicted by e^{i*pi} = -1).",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "In xi(rho) = 0, the factor pi^{-rho/2} is multiplied by (1/2)rho(rho-1)Gamma(rho/2)zeta(rho); because zeta(rho) = 0 makes the entire product vanish (0 = 0), no algebraic value is assigned to pi^{-rho/2}."
+    },
+    {
+      "theorem": "Transcendence of Gamma(alpha) at algebraic alpha (Chudnovsky 1976; Rohrlich-Lang)",
+      "input_structure_required": "Evaluation of Gamma(alpha) at special rational points alpha in {1/2, 1/3, 1/4, 1/6} (where Gamma(alpha) is transcendental via CM elliptic periods).",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "1) For general algebraic alpha in Q_bar \\ Q (and even most rationals p/q), transcendence of Gamma(alpha) is itself OPEN; 2) At a nontrivial zero rho, Gamma(rho/2) has no zeros or poles and is multiplied by zeta(rho) = 0, yielding no equation constraining Gamma(rho/2)."
+    },
+    {
+      "theorem": "Differential transcendence of Gamma (Holder 1887) and zeta (Hilbert 1900 / Ostrowski 1920)",
+      "input_structure_required": "An identically satisfied polynomial differential relation P(s, f(s), f'(s), ..., f^{(n)}(s)) = 0 for all s in an open domain.",
+      "does_zeta_zero_provide_it": "No",
+      "obstruction": "Differential transcendence is a functional identity statement over C(s); a differentially transcendental function can have arbitrary prescribed algebraic or rational zeros (e.g., (s - alpha) * Gamma(s) is differentially transcendental and vanishes at s = alpha)."
+    }
+  ],
+  "functional_equation_algebraic_zero_audit": {
+    "classification": "FUNCTIONAL_EQUATION_DOES_NOT_EXCLUDE_ALGEBRAIC_ZERO",
+    "zero_order_identity": {
+      "equation": "xi(rho) = xi(1 - rho) = 0",
+      "division_by_zeta_rho_blocked": true,
+      "explanation": "Because zeta(rho) = 0 and the archimedean prefactor A(s) = (1/2)s(s-1)pi^{-s/2}Gamma(s/2) is nonzero everywhere on 0 < Re(s) < 1, zeta(1 - rho) = 0 follows, while dividing xi(rho) = xi(1 - rho) by zeta(rho) = 0 is division by zero and strictly invalid."
+    },
+    "first_derivative_at_simple_zero": {
+      "equation": "xi'(rho) = -xi'(1 - rho)",
+      "expanded_identity": "A(rho) * zeta'(rho) = -A(1 - rho) * zeta'(1 - rho)  (since zeta(rho) = zeta(1 - rho) = 0)",
+      "ratio_identity": "zeta'(rho) / zeta'(1 - rho) = -A(1 - rho) / A(rho) = -pi^{rho - 1/2} * Gamma((1 - rho)/2) / Gamma(rho/2) = -chi(1 - rho)",
+      "why_no_contradiction_arises": "Even if rho in Q_bar is assumed, the derivative values zeta'(rho) and zeta'(1 - rho) have completely unknown arithmetic nature (they are NOT constrained to be algebraic), and the transcendence status of pi^{rho - 1/2} * Gamma((1 - rho)/2) / Gamma(rho/2) at a non-real algebraic point rho = beta + i*gamma (gamma != 0) is also unknown."
+    }
+  },
+  "euler_product_firewall": {
+    "classification": "EULER_PRODUCT_NONVANISHING_NOT_AVAILABLE_IN_CRITICAL_STRIP",
+    "euler_product_expression": "prod_p (1 - p^{-s})^{-1}",
+    "absolute_convergence_domain": "Re(s) > 1",
+    "nontrivial_zero_domain": "0 < Re(rho) < 1",
+    "domains_disjoint": true,
+    "fallacy_blocked": "The argument 'each Euler factor (1 - p^{-rho})^{-1} is nonzero, therefore zeta(rho) != 0' is invalid in 0 < Re(s) < 1 because the infinite Euler product diverges there and analytic continuation does not preserve nonvanishing of divergent infinite products."
+  },
+  "xi_hadamard_product_status": {
+    "completed_xi_definition": "xi(s) = (1/2) * s * (s - 1) * pi^{-s/2} * Gamma(s/2) * zeta(s)",
+    "regularized_origin_form": "xi(s) = (s - 1) * pi^{-s/2} * Gamma(1 + s/2) * zeta(s)",
+    "xi_at_0_and_1": "xi(0) = xi(1) = 1/2",
+    "hadamard_genus": 1,
+    "canonical_weierstrass_product": "xi(s) = xi(0) * exp(b_0 * s) * prod_rho (1 - s/rho) exp(s/rho), where b_0 = xi'(0)/xi(0) = log(2*sqrt(pi)) - 1 - gamma_E/2 = -S_1",
+    "symmetric_paired_product": "xi(s) = xi(0) * lim_{T -> infty} prod_{|Im(rho)| <= T} (1 - s/rho) = xi(0) * prod_{{rho, 1-rho}} (1 - s(1 - s) / (rho(1 - rho)))",
+    "why_exponential_factors_cancel_under_symmetric_pairing": "Pairing rho with 1 - rho (or conj(rho) on the critical line) gives 1/rho + 1/(1 - rho) = 1/(rho(1 - rho)) = O(|gamma_rho|^{-2}). Since sum_rho |gamma_rho|^{-2} < infty by Riemann-von Mangoldt N(T) = O(T log T), the Weierstrass convergence factors exp(s(1/rho + 1/(1 - rho))) have convergent exponent sum S_1 * s, which cancels exp(b_0 * s) = exp(-S_1 * s) identically.",
+    "unpaired_product_warning": "Writing xi(s) = xi(0) prod_rho (1 - s/rho) WITHOUT specifying symmetric pairing |Im(rho)| <= T or (rho, 1 - rho) grouping is invalid because sum_rho |rho|^{-1} = infty.",
+    "status": "PROVED_WITH_EXTERNAL_THEOREM",
+    "primary_citations": [
+      "Riemann (1859), Monatsber. Berlin Akad., 671-680",
+      "Hadamard (1893), J. Math. Pures Appl. (4) 9, 171-215",
+      "Davenport (2000), Multiplicative Number Theory, Chapter 12",
+      "Titchmarsh (1986), The Theory of the Riemann Zeta-Function, Section 2.12"
+    ]
+  },
+  "reciprocal_sum_S1": {
+    "symbol": "S_1 = sum_rho^{sym} (1 / rho)",
+    "ordering_convention": "lim_{T -> infty} sum_{|Im(rho)| <= T} (1 / rho) = (1/2) sum_rho (1/rho + 1/(1 - rho))",
+    "convergence_type": "CONDITIONALLY_CONVERGENT_UNDER_SYMMETRIC_PAIRING",
+    "absolute_convergence": false,
+    "exact_formula": "1 + gamma_E / 2 - log(2 * sqrt(pi)) = 1 + gamma_E / 2 - log(2) - (1/2) * log(pi)",
+    "derivation_steps": [
+      "1. Write xi(s) = (1 - s) * pi^{-s/2} * Gamma(1 + s/2) * (-zeta(s)) near s = 0.",
+      "2. Differentiate log xi(s) at s = 0 using zeta(0) = -1/2, zeta'(0) = -(1/2)log(2*pi), and (d/ds)log Gamma(1 + s/2)|_{s=0} = (1/2)psi(1) = -gamma_E/2.",
+      "3. Obtain xi'(0)/xi(0) = -1 - (1/2)log(pi) - gamma_E/2 + log(2*pi) = log(2*sqrt(pi)) - 1 - gamma_E/2.",
+      "4. From the symmetrically paired Hadamard product xi(s) = xi(0) prod^{sym}(1 - s/rho), xi'(0)/xi(0) = -sum_rho^{sym} (1/rho), giving S_1 = -xi'(0)/xi(0) = 1 + gamma_E/2 - log(2*sqrt(pi))."
+    ],
+    "value_50dps": "0.0230957089661210338143102479064952916219321272",
+    "value_float": 0.023095708966121033,
+    "symbolic_derivation_verified": true,
+    "mpmath_50dps_residual": 1.0440487148797639e-51,
+    "relation_to_li_lambda_1": "S_1 = lambda_1"
+  },
+  "reflection_invariant_sum": {
+    "symbol": "sum_rho 1 / (rho * (1 - rho))",
+    "partial_fraction_identity": "1 / (rho * (1 - rho)) = 1 / rho + 1 / (1 - rho)",
+    "convergence_type": "ABSOLUTELY_CONVERGENT",
+    "absolute_convergence": true,
+    "why_absolutely_convergent": "|rho(1 - rho)| = |1/4 - z_rho^2| ~ gamma_rho^2 as |gamma_rho| -> infty, and sum_rho gamma_rho^{-2} < infty because N(T) = O(T log T).",
+    "exact_formula": "2 + gamma_E - log(4 * pi) = 2 * S_1 = 2 * lambda_1",
+    "value_50dps": "0.0461914179322420676286204958129905832438642543",
+    "value_float": 0.04619141793224207,
+    "mpmath_50dps_residual": 3.2574319904248634e-51,
+    "normalization_comparison": {
+      "standard_li_lambda_1": "lambda_1 = S_1 = 1 + gamma_E/2 - log(2*sqrt(pi))",
+      "reflection_sum_equals_2_lambda_1": "sum_rho 1/(rho(1-rho)) = 2 * lambda_1 = 2 + gamma_E - log(4*pi)"
+    },
+    "lean_theorem": "reflection_reciprocal_identity"
+  },
+  "reciprocal_sum_S2": {
+    "symbol": "S_2 = sum_rho (1 / rho^2)",
+    "convergence_type": "ABSOLUTELY_CONVERGENT",
+    "absolute_convergence": true,
+    "derivative_relation": "S_2 = - (d/ds)|_{s=0} (xi'(s) / xi(s)) = - (d^2/ds^2)|_{s=0} log xi(s)",
+    "exact_formula_at_s0": "1 - pi^2 / 24 + 2 * zeta''(0) + log(2 * pi)^2",
+    "exact_formula_at_s1_stieltjes": "1 + gamma_E^2 - pi^2 / 8 + 2 * gamma_1",
+    "equivalence_identity_between_s0_and_s1": "2 * zeta''(0) + log(2 * pi)^2 = gamma_E^2 - pi^2 / 12 + 2 * gamma_1",
+    "constants_entering": [
+      "Euler-Mascheroni constant gamma_E",
+      "pi^2",
+      "First Stieltjes constant gamma_1 (or equivalently zeta''(0) and log(2*pi))"
+    ],
+    "value_50dps": "-0.0461543172958046027571079903790773035302679623",
+    "value_float": -0.0461543172958046,
+    "symbolic_s0_verified": true,
+    "symbolic_s1_verified": true,
+    "mpmath_s0_residual": 2.6727647100921956e-51,
+    "mpmath_s1_residual": 1.0022867662845734e-51,
+    "arithmetic_nature_status": "OPEN_IN_LITERATURE"
+  },
+  "reciprocal_power_hierarchy": {
+    "general_definition": "S_m = sum_rho rho^{-m}",
+    "absolute_convergence_for_m_ge_2": "For every integer m >= 2, sum_rho |rho|^{-m} < infty by partial summation against N(T) = (T/(2*pi))log(T/(2*pi)) - T/(2*pi) + O(log T) = O(T log T), since int_2^infty T^{-m} log T dT < infty for m >= 2.",
+    "general_log_derivative_identity": "S_m = - (1 / (m - 1)!) * (d^m / ds^m)|_{s=0} log xi(s) = ((-1)^m / (m - 1)!) * (d^m / ds^m)|_{s=1} log xi(s)",
+    "table_m_1_to_4": [
+      {
+        "m": 1,
+        "convergence": "Conditionally convergent (symmetric pairing |Im(rho)| <= T)",
+        "log_derivative_formula": "-(d/ds)|_{s=0} log xi(s)",
+        "exact_expression": "1 + gamma_E/2 - log(2*sqrt(pi))",
+        "value_50dps": "0.02309570896612103381431024790649529162193",
+        "residual_vs_closed_form": 1.0440487148797639e-51
+      },
+      {
+        "m": 2,
+        "convergence": "Absolutely convergent",
+        "log_derivative_formula": "-(d^2/ds^2)|_{s=0} log xi(s)",
+        "exact_expression": "1 + gamma_E^2 - pi^2/8 + 2*gamma_1  (= 1 - pi^2/24 + 2*zeta''(0) + log^2(2*pi))",
+        "value_50dps": "-0.04615431729580460275710799037907730353027",
+        "residual_vs_closed_form": 1.0022867662845734e-51
+      },
+      {
+        "m": 3,
+        "convergence": "Absolutely convergent",
+        "log_derivative_formula": "-(1/2!)*(d^3/ds^3)|_{s=0} log xi(s)",
+        "exact_expression": "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1 + (3/2)*gamma_2",
+        "value_50dps": "-0.0001111582314521059227626682389145784739642",
+        "residual_vs_closed_form": 2.7177893109213855e-52
+      },
+      {
+        "m": 4,
+        "convergence": "Absolutely convergent",
+        "log_derivative_formula": "-(1/3!)*(d^4/ds^4)|_{s=0} log xi(s)",
+        "exact_expression": "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1 + 2*gamma_1^2 + 2*gamma_E*gamma_2 + (2/3)*gamma_3",
+        "value_50dps": "0.00007362722126168951832677130703060151131283",
+        "residual_vs_closed_form": 4.9249735472218864e-52
+      }
+    ],
+    "lean_theorem": "reciprocal_power_log_derivative_sign_identity"
+  },
+  "centered_zero_invariants": {
+    "centered_coordinate": "z_rho = rho - 1/2 = delta_rho + i*gamma_rho",
+    "completed_centered_function": "Xi(z) := xi(1/2 + z) = Xi(-z)",
+    "odd_centered_sums_vanish": {
+      "statement": "sum_rho^{sym} z_rho^{-(2m-1)} = 0 for all m >= 1",
+      "proof": "Under functional-equation reflection rho <-> 1 - rho, z_{1-rho} = -z_rho, so z_rho^{-(2m-1)} + (-z_rho)^{-(2m-1)} = 0 identically; equivalently, log Xi(z) is an even analytic function at z = 0.",
+      "mpmath_odd_derivative_residuals": {
+        "m_eq_1": 1.2446030555722283e-60,
+        "m_eq_2": 2.967364920549937e-67
+      },
+      "lean_theorem": "reciprocal_power_log_derivative_sign_identity"
+    },
+    "even_centered_sums": {
+      "general_formula": "Sigma_{2m} = sum_rho z_rho^{-2m} = -(1 / (2m - 1)!) * (d^{2m}/dz^{2m})|_{z=0} log Xi(z)",
+      "Sigma_2": {
+        "exact_expression": "8 - (1/4)*psi_1(1/4) - (d^2/ds^2)|_{s=1/2} log(-zeta(s))",
+        "quartet_decomposition": "sum_{quartets} 4*(delta^2 - gamma^2) / (delta^2 + gamma^2)^2",
+        "value_50dps": "-0.04620998623083794157786762086067802800676",
+        "closed_form_residual": 1.0022867662845734e-51
+      },
+      "Sigma_4": {
+        "exact_expression": "-(1/6) * (d^4/dz^4)|_{z=0} log Xi(z)",
+        "value_50dps": "0.0000743451985705393723297325249434811569073"
+      },
+      "simpler_than_uncentered_note": "Unlike S_m at s = 0/1 where log(-zeta(s)) has an explicit Laurent expansion in gamma_E and Stieltjes constants gamma_k, centered sums Sigma_{2m} at s = 1/2 depend onzeta^{(k)}(1/2)/zeta(1/2), which have no simpler closed form in classic constants; however, all odd centered sums vanish identically by reflection symmetry."
+    }
+  },
+  "quartet_polynomial": {
+    "centered_quartet_roots": "{z, -z, conj(z), -conj(z)} with z = delta + i*gamma",
+    "monic_polynomial": "(X^2 - z^2)(X^2 - conj(z)^2) = X^4 - 2*(delta^2 - gamma^2)*X^2 + (delta^2 + gamma^2)^2",
+    "quadratic_coefficient_c2": "-2 * (delta^2 - gamma^2) = -(z^2 + conj(z)^2)",
+    "constant_coefficient_c0": "(delta^2 + gamma^2)^2 = z^2 * conj(z)^2 >= 0",
+    "global_symmetric_relation": "The global centered invariant Sigma_2 = sum_rho z_rho^{-2} determines the sum over quartets of -c2 / c0 = 4*(delta^2 - gamma^2)/(delta^2 + gamma^2)^2, and Sigma_4 determines the sum of (c2^2 - 2*c0)/c0^2, but global symmetric sums cannot isolate an individual quartet's (delta_rho, gamma_rho).",
+    "lean_theorems": [
+      "centered_quartet_polynomial_identity",
+      "centered_quartet_coefficients_real"
+    ]
+  },
+  "li_coefficient_audit": {
+    "spectral_definition": "lambda_n = sum_rho^{sym} [1 - (1 - 1/rho)^n]",
+    "derivative_representation": "lambda_n = (1 / (n - 1)!) * (d^n / ds^n)|_{s=1} [s^{n-1} log xi(s)]",
+    "binomial_reciprocal_expansion": "lambda_n = sum_{j=1}^n (-1)^{j-1} * binom(n, j) * S_j",
+    "lambda_1_identity": "lambda_1 = S_1 = 1 + gamma_E/2 - log(2*sqrt(pi))",
+    "li_criterion": "lambda_n > 0 for all n >= 1  <=>  RH (Li 1997; Bombieri-Lagarias 1999)",
+    "positivity_firewall": "LI_COEFFICIENT_POSITIVITY_IS_RH_EQUIVALENT",
+    "values_n_1_to_4": [
+      {
+        "n": 1,
+        "value_50dps": "0.02309570896612103381431024790649529162193",
+        "binomial_vs_derivative_residual": 0.0
+      },
+      {
+        "n": 2,
+        "value_50dps": "0.09234573522804667038572848619206788677413",
+        "binomial_vs_derivative_residual": 0.0
+      },
+      {
+        "n": 3,
+        "value_50dps": "0.2076389205543248037914920466178032069826",
+        "binomial_vs_derivative_residual": 3.3409558876152446e-52
+      },
+      {
+        "n": 4,
+        "value_50dps": "0.3687904794922416385905114896377560722622",
+        "binomial_vs_derivative_residual": 0.0
+      }
+    ],
+    "lean_theorem": "li_first_coefficient_finite_algebra_identity",
+    "primary_citations": [
+      "X.-J. Li (1997), J. Number Theory 65, 325-333",
+      "E. Bombieri and J. C. Lagarias (1999), J. Number Theory 77, 274-287",
+      "J. C. Lagarias (2004/2007), arXiv:math/0404394v4"
+    ]
+  },
+  "superzeta_audit": {
+    "families_studied_by_voros": {
+      "uncentered_superzeta": "Z_zeros(s) = sum_rho rho^{-s} (and Hurwitz shift sum_rho (rho + v)^{-s})",
+      "centered_quadratic_superzeta": "Z(sigma, x) = sum_{k>=1} (tau_k^2 + x^2)^{-sigma} where rho_k = 1/2 +- i*tau_k"
+    },
+    "analytic_continuation_status": {
+      "status": "PROVED_WITH_EXTERNAL_THEOREM",
+      "summary": "Voros (2003, Ann. Inst. Fourier 53, 665-699, arXiv:math/0104051v4; 2005, arXiv:math/0311029v1; 2010 Springer monograph; 2014, arXiv:1403.4558v2) proved meromorphic continuation of both superzeta families to all s in C via explicit-formula contour integral representations involving log xi(s) and the incomplete Gamma / Gram-Jorgenson-Lang expansion."
+    },
+    "special_values_and_regularized_products": {
+      "positive_integers_m_ge_2": "Z_zeros(m) = S_m = -(1/(m-1)!)(d^m/ds^m)|_{s=0} log xi(s)",
+      "negative_odd_values_of_quadratic_superzeta": "Expressible explicitly in terms of Bernoulli numbers, pi, log(2*pi), and derivatives of log Gamma",
+      "zeta_regularized_determinant": "exp(-d/ds|_{s=0} sum_rho (rho - s_0)^{-s}) recovers the Hadamard product xi(s_0)/xi(0) up to explicit elementary/Archimedean anomaly factors (Voros 2003, Theorem 1)."
+    },
+    "arithmetic_nature_of_positive_special_values": {
+      "status": "OPEN_IN_LITERATURE",
+      "explanation": "Although Z_zeros(m) = S_m has an exact closed form in terms of gamma_E, pi, log(2*pi), zeta(2k+1), and Stieltjes constants gamma_j, NO positive integer value S_m (m >= 1) has proved rationality, irrationality, or transcendence in the literature because the irrationality and algebraic independence of gamma_E and Stieltjes constants gamma_j are open."
+    },
+    "primary_citations": [
+      "A. Voros (2003), Ann. Inst. Fourier (Grenoble) 53, 665-699 (arXiv:math/0104051v4)",
+      "A. Voros (2005), in Number Theory, Physics and Geometry (arXiv:math/0311029v1)",
+      "A. Voros (2010), Zeta Functions over Zeros of Zeta Functions, Springer LNUMI Vol. 8",
+      "A. Voros (2014), arXiv:1403.4558v2"
+    ]
+  },
+  "zero_sum_constant_arithmetic_status": [
+    {
+      "invariant": "S_1 = sum_rho^{sym} 1/rho = lambda_1",
+      "exact_expression": "1 + gamma_E/2 - log(2*sqrt(pi))",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "gamma_E (Euler's constant: even irrationality is open)",
+        "log(pi) (irrationality/transcendence of log(pi) and Q-linear independence of {1, gamma_E, log(4*pi)} are open)"
+      ]
+    },
+    {
+      "invariant": "sum_rho 1 / (rho * (1 - rho)) = 2 * S_1 = 2 * lambda_1",
+      "exact_expression": "2 + gamma_E - log(4 * pi)",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "gamma_E",
+        "log(4*pi) = 2*log(2) + log(pi)",
+        "Possible rational cancellation between gamma_E and log(4*pi) is unexcluded"
+      ]
+    },
+    {
+      "invariant": "S_2 = sum_rho 1 / rho^2",
+      "exact_expression": "1 + gamma_E^2 - pi^2 / 8 + 2 * gamma_1  (= 1 - pi^2 / 24 + 2 * zeta''(0) + log^2(2*pi))",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "gamma_E",
+        "First Stieltjes constant gamma_1 (irrationality open)",
+        "zeta''(0) and log(2*pi)",
+        "Algebraic independence of {pi^2, gamma_E, gamma_1}"
+      ]
+    },
+    {
+      "invariant": "S_3 = sum_rho 1 / rho^3",
+      "exact_expression": "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1 + (3/2)*gamma_2",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "zeta(3) (proved irrational by Apery 1979, but transcendence open)",
+        "gamma_E, gamma_1, gamma_2 (Stieltjes constants)"
+      ]
+    },
+    {
+      "invariant": "S_4 = sum_rho 1 / rho^4",
+      "exact_expression": "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1 + 2*gamma_1^2 + 2*gamma_E*gamma_2 + (2/3)*gamma_3",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "gamma_E, gamma_1, gamma_2, gamma_3 (Stieltjes constants vs. pi^4)"
+      ]
+    },
+    {
+      "invariant": "Sigma_{2m-1} = sum_rho^{sym} (rho - 1/2)^{-(2m-1)}",
+      "exact_expression": "0 (identically for all m >= 1)",
+      "rationality_known": "Yes (equals 0 in Q)",
+      "irrationality_known": "False (rational: 0)",
+      "transcendence_known": "False (algebraic: 0)",
+      "main_unresolved_constants": []
+    },
+    {
+      "invariant": "Sigma_2 = sum_rho (rho - 1/2)^{-2}",
+      "exact_expression": "8 - (1/4)*psi_1(1/4) - (d^2/ds^2)|_{s=1/2} log(-zeta(s))",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "psi_1(1/4) = pi^2 + 8*G (Catalan's constant G, irrationality open)",
+        "zeta'(1/2)/zeta(1/2) and zeta''(1/2)/zeta(1/2)"
+      ]
+    },
+    {
+      "invariant": "lambda_n (Li coefficients, n >= 1)",
+      "exact_expression": "sum_{j=1}^n (-1)^{j-1} binom(n, j) S_j",
+      "rationality_known": "No (OPEN_IN_LITERATURE)",
+      "irrationality_known": "No (OPEN_IN_LITERATURE)",
+      "transcendence_known": "No (OPEN_IN_LITERATURE)",
+      "main_unresolved_constants": [
+        "gamma_E, log(4*pi), pi^{2k}, zeta(2k+1), Stieltjes constants gamma_0, ..., gamma_{n-1}"
+      ]
+    }
+  ],
+  "zeta5_current_status": {
+    "status_code": "ZETA5_CURRENT_STATUS_VERIFIED",
+    "archimedean_zeta5_individually_proved_irrational": false,
+    "archimedean_zeta5_status": "OPEN_IN_LITERATURE",
+    "source_verification": "PRIMARY_SOURCE_VERIFIED",
+    "verified_theorems_in_primary_literature": {
+      "apery_1979_zeta3": {
+        "theorem": "zeta(3) notin Q (irrationality exponent mu(zeta(3)) < 5.5138800, Giraudin 2026 arXiv:2609.26980v1; Rhin-Viola 2001).",
+        "citation": "R. Apery (1979), Asterisque 61, 11-13; F. Beukers (1979), Bull. London Math. Soc. 11, 268-272."
+      },
+      "rivoal_2000_ball_rivoal_2001_infinite_odd_zeta": {
+        "theorem": "dim_Q span_Q(1, zeta(3), zeta(5), ..., zeta(2n+1)) >= ((1 + o(1))/(1 + log 2)) log n; in particular, infinitely many odd zeta values are irrational.",
+        "citation": "T. Rivoal (2000), C. R. Acad. Sci. Paris 331, 267-270; K. Ball and T. Rivoal (2001), Invent. Math. 146, 193-207."
+      },
+      "zudilin_2001_one_of_four": {
+        "theorem": "At least one of the four odd zeta values {zeta(5), zeta(7), zeta(9), zeta(11)} is irrational.",
+        "citation": "W. Zudilin (2001), Russ. Math. Surveys 56(4), 149-150; Izv. Math. 66 (2002), 489-542 (arXiv:math/0104249v1; arXiv:math/0206176v2)."
+      },
+      "rivoal_zudilin_2018_two_among_69": {
+        "theorem": "At least two of the odd zeta values {zeta(5), zeta(7), ..., zeta(69)} are irrational.",
+        "citation": "T. Rivoal and W. Zudilin (2018/2020), Compos. Math. 156 (arXiv:1803.03160v1)."
+      },
+      "fischler_sprang_zudilin_2019_subexponential_count": {
+        "theorem": "At least 2^{(1 - eps) log s / log log s} odd zeta values between 3 and s are irrational.",
+        "citation": "S. Fischler, J. Sprang, and W. Zudilin (2019), Compos. Math. 155(5), 938-952 (arXiv:1803.08905v2)."
+      },
+      "lai_sprang_zudilin_2025_2adic_zeta2_5": {
+        "theorem": "The 2-adic Kubota-Leopoldt zeta value zeta_2(5) is irrational (following Calegari-Dimitrov-Tang on zeta_2(3) and Lai-Lupu-Sprang 2025 arXiv:2505.23088v1 on p-adic Zudilin tuples).",
+        "citation": "L. Lai, J. Sprang, and W. Zudilin (May 2025), 'A note on the irrationality of zeta_2(5)', arXiv:2505.05005v2."
+      },
+      "refuted_2024_preprint_on_archimedean_zeta5": {
+        "claim_inspected": "S. Suman (July 2024), 'A note on the Irrationality of zeta(5) and Higher Odd Zeta Values', arXiv:2407.07121 [math.GM].",
+        "refutation": "Explicitly refuted by K. Chen, W. He, Y. He, Y. Huang, Y. Li, Q. Tang, L. Wu, S. Xu, S. Yang, and Z. Yu (Nov 2024), 'A Note on a Recent Attempt to Prove the Irrationality of zeta(5)', arXiv:2411.16774v3."
+      }
+    },
+    "record_correction": "Individual irrationality of the Archimedean constant zeta(5) remains OPEN_IN_LITERATURE (explicitly restated as open in Lai-Lupu-Sprang May 2025, arXiv:2505.23088v1). The verified recent 2025 breakthrough by Lai-Sprang-Zudilin (arXiv:2505.05005v2) proves the irrationality of the 2-adic zeta value zeta_2(5), while the 2024 math.GM claim for Archimedean zeta(5) (arXiv:2407.07121) was refuted in arXiv:2411.16774v3."
+  },
+  "special_value_method_transfer": {
+    "classification": "SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER",
+    "secondary_outcome_code": "SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER",
+    "structural_comparison_table": [
+      {
+        "feature": "Argument known?",
+        "zeta_m_arithmetic": "Yes: fixed positive integer m in Z_{>=2} (known rational/integer input).",
+        "zeta_rho_eq_0_arithmetic": "No: rho = beta + i*gamma in {0 < Re(s) < 1} is the unknown target."
+      },
+      {
+        "feature": "Value known?",
+        "zeta_m_arithmetic": "No: zeta(m) in R is the unknown target whose irrationality is tested.",
+        "zeta_rho_eq_0_arithmetic": "Yes: zeta(rho) = 0 is fixed identically to zero."
+      },
+      {
+        "feature": "Integral / series representation usable?",
+        "zeta_m_arithmetic": "Yes: Beukers/MZV hypercube integrals int_{[0,1]^m} ... and Ball-Rivoal well-poised hypergeometric series sum_{k>=1} R_n(k) with integer poles of fixed multiplicity m.",
+        "zeta_rho_eq_0_arithmetic": "No: m enters as the integer dimension of the hypercube [0,1]^m or the integer pole order of (k + j)^{-m} in partial-fraction decomposition; neither exists for complex non-integer rho."
+      },
+      {
+        "feature": "Pade / linear-form construction target",
+        "zeta_m_arithmetic": "Linear form L_n = A_n * zeta(m) + B_n (or sum_{j} A_{n,j} zeta(2j+1) + B_n) with A_n, B_n in Q and common denominator d_n^m.",
+        "zeta_rho_eq_0_arithmetic": "Setting m -> rho in A_n * zeta(rho) + B_n gives A_n * 0 + B_n = B_n, which eliminates zeta(rho) completely and leaves no small nonzero linear form in rho."
+      },
+      {
+        "feature": "Algebraic-number input available?",
+        "zeta_m_arithmetic": "Yes: integer shifts k + 1, ..., k + n in Q allow lcm(1..n)^m denominator control.",
+        "zeta_rho_eq_0_arithmetic": "Only under a reductio assumption rho in Q_bar, where rho appears in exponents k^{-rho}."
+      },
+      {
+        "feature": "Auxiliary polynomial target",
+        "zeta_m_arithmetic": "Rational function R_n(t) with integer poles whose residues produce rational combinations of zeta(j).",
+        "zeta_rho_eq_0_arithmetic": "Would require P_n(X) in Z[X] with 0 < |P_n(rho)| < C^{-n}, which zeta(rho) = 0 does not generate."
+      }
+    ],
+    "method_by_method_transfer_test": [
+      {
+        "method": "Apery (1979) / Beukers (1979) hypercube integral I_n = int_{[0,1]^m} P_n(x_1).../(1 - x_1...x_m) dx",
+        "object_produced_for_zeta_m": "I_n = A_n * zeta(m) - B_n with d_n^m I_n in Z and 0 < |I_n| -> 0 (for m = 2, 3).",
+        "what_fails_when_m_replaced_by_rho": "1) The integral dimension m must be a positive integer; 2) Even in fractional Mellin form, evaluating at zeta(rho) = 0 makes A_n * zeta(rho) - B_n = -B_n != 0 of order O(1) instead of exponentially small O(r^n)."
+      },
+      {
+        "method": "Ball-Rivoal (2001) / Zudilin (2001) / Fischler-Sprang-Zudilin (2019) hypergeometric series sum_{k>=1} R_n(k)",
+        "object_produced_for_zeta_m": "L_n = a_0 + sum_{j=1}^s a_j zeta(2j+1) via partial-fraction expansion of R_n(t) = n!^{s-2r} prod_{j=0}^{r n}(t - j) / prod_{j=0}^n (t + j)^s.",
+        "what_fails_when_m_replaced_by_rho": "The partial-fraction decomposition into Hurwitz shifts sum_{k>=1} (k + j)^{-m} requires m to be a positive integer pole multiplicity (1 <= m <= s); a complex zero location rho cannot serve as a rational-function pole multiplicity."
+      },
+      {
+        "method": "Brown (2014/2016) moduli space M_{0,n} period integrals",
+        "object_produced_for_zeta_m": "Motivic period linear forms in multiple zeta values (MZVs) of integer weight.",
+        "what_fails_when_m_replaced_by_rho": "M_{0,n} periods are algebraic-geometric periods of mixed Tate motives over Z (integer weights only); critical-strip zeros rho of zeta(s) are not weights of mixed Tate motives."
+      },
+      {
+        "method": "Calegari-Dimitrov-Tang (2024) / Lai-Sprang-Zudilin (2025) 2-adic holonomic / overconvergent method for zeta_2(5)",
+        "object_produced_for_zeta_m": "2-adic rational approximations p_n/q_n to zeta_2(5) with 0 < |zeta_2(5) - p_n/q_n|_2 < H_n^{-1-delta}.",
+        "what_fails_when_m_replaced_by_rho": "Constructs p-adic linear forms in fixed integer-weight p-adic zeta values; does not act on Archimedean critical-strip zero arguments rho."
+      }
+    ]
+  },
+  "auxiliary_polynomial_audit": {
+    "required_ingredients_for_auxiliary_polynomial_proof": [
+      "1. A sequence of nonzero integer polynomials P_n(X) in Z[X] \\ {0} of degree d_n <= D_n and height H(P_n) <= e^{h_n}.",
+      "2. Nonvanishing certificate: P_n(alpha) != 0 for the target alpha in {rho_1, gamma_1} for infinitely many n.",
+      "3. Analytic upper bound: |P_n(alpha)| <= exp(-U_n) derived from an analytic identity (such as Cauchy/Jensen on an entire function with high-order zeros).",
+      "4. Liouville / Mahler algebraic lower bound: If alpha in Q_bar of degree d and Mahler measure M(alpha), then P_n(alpha) != 0 implies |P_n(alpha)| >= (d_n + 1)^{-(d-1)} H(P_n)^{-d + 1} M(alpha)^{-d_n d}.",
+      "5. Asymptotic contradiction inequality: U_n > (d - 1) h_n + d * log M(alpha) * d_n for large n."
+    ],
+    "why_zeta_rho_eq_0_does_not_supply_P_n": {
+      "for_P_n_of_rho_1": "Taylor polynomials T_N(s) of xi(s) (or zeta(s)) have transcendental coefficients (involving log(pi), gamma_E, Stieltjes constants gamma_k, and zeta^{(k)}(0)), NOT integer/algebraic coefficients; conversely, Dirichlet partial sums sum_{m=1}^N m^{-s} are polynomials in p^{-s} = exp(-s log p), not polynomials in s, and do not converge exponentially to 0 at s = rho_1 inside 0 < Re(s) < 1.",
+      "for_P_n_of_gamma_1": "Replacing rho_1 by gamma_1 via Xi(i*gamma_1) = xi(1/2 + i*gamma_1) = 0 produces an even power series sum_{m>=0} c_{2m} gamma_1^{2m} = 0 whose coefficients c_{2m} = (-1)^m Xi^{(2m)}(0)/(2m)! are themselves transcendental/unknown constants (related to Sigma_{2m}), so truncating it does not yield P_n(gamma_1) in Z[gamma_1]."
+    },
+    "privileging_gamma_1_avoided": true,
+    "status": "NO_AUXILIARY_POLYNOMIAL_CONSTRUCTION_KNOWN_FOR_ZETA_ZEROS"
+  },
+  "gamma_function_firewall": {
+    "special_rational_values_known_transcendental": {
+      "Gamma(1/2)": "sqrt(pi) (transcendental by Lindemann 1882)",
+      "Gamma(1/4)": "transcendental and algebraically independent of pi (Chudnovsky 1976; Nesterenko 1996)",
+      "Gamma(1/3)": "transcendental and algebraically independent of pi (Chudnovsky 1976)",
+      "Gamma(1/6)": "transcendental (expressed via Gamma(1/3) and sqrt(pi))"
+    },
+    "general_rational_values_status": "For general rational p/q notin {1/2, 1/3, 1/4, 1/6} mod Z (e.g., Gamma(1/5)), individual transcendence of Gamma(p/q) is OPEN (Rohrlich-Lang conjecture; Wolfart-Wustholz 1985 give linear-independence bounds on beta values).",
+    "general_complex_algebraic_values_status": "For non-real algebraic alpha = (beta + i*gamma)/2 in Q_bar \\ R, NO general theorem establishes transcendence or algebraic independence of Gamma(alpha).",
+    "obstruction_for_functional_equation": "In xi(rho) = (1/2)rho(rho-1)pi^{-rho/2}Gamma(rho/2)zeta(rho), neither Gamma(rho/2) nor pi^{-rho/2}Gamma(rho/2) has known arithmetic properties at a hypothetical non-real algebraic rho, blocking any naive functional-equation transcendence contradiction."
+  },
+  "differential_transcendence_firewall": {
+    "classification": "DIFFERENTIAL_TRANSCENDENCE_DOES_NOT_DETERMINE_ZERO_ARITHMETIC",
+    "holder_theorem_gamma": "Holder (1887): Gamma(s) satisfies no algebraic differential equation over C(s).",
+    "hilbert_ostrowski_theorem_zeta": "Hilbert (1900) / Ostrowski (1920): zeta(s) satisfies no algebraic differential equation over C(s).",
+    "counterexample_to_zero_inference": "For any prescribed algebraic number alpha in Q_bar, the entire function F_alpha(s) = (s - alpha) / Gamma(s) (or (s - alpha) * xi(s)) is differentially transcendental over C(s), yet vanishes at the algebraic point s = alpha. Hence differential transcendence of a function never implies transcendence of its zeros."
+  },
+  "finite_algebraicity_exclusion": {
+    "classification": "CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION",
+    "is_irrationality_proof": false,
+    "is_transcendence_proof": false,
+    "normalization_rules": {
+      "gcd_of_coefficients": 1,
+      "leading_coefficient_positive": true,
+      "exact_degree_d": "1 <= d <= D",
+      "zero_polynomial_excluded": true
+    },
+    "explicit_individual_enumeration": {
+      "D": 4,
+      "H": 3,
+      "number_of_polynomials_tested": 8160,
+      "gamma_1_min_certified_abs_lower_bound": 11.134725141734695,
+      "shifted_ordinate_min_certified_abs_lower_bound": 11.634725141734695,
+      "rho_1_min_certified_abs_lower_bound": 14.143565845725995,
+      "all_excluded": true,
+      "translated_control_max_residual": 1.7561674632962845e-28
+    },
+    "hierarchical_arb_box_certificate_D4_H100": {
+      "D": 4,
+      "H": 100,
+      "number_of_primitive_polynomials_in_space": 158062321920,
+      "primitive_polynomials_by_degree": {
+        "1": 12175,
+        "2": 3355121,
+        "3": 749507743,
+        "4": 157309446881
+      },
+      "gamma_1_certificate": {
+        "certified": true,
+        "D": 4,
+        "H": 100,
+        "box_exclusions": 69060,
+        "leaf_exclusions": 58744,
+        "min_certified_abs_lower_bound": 9.15045298643503e-06,
+        "closest_polynomial_coeffs_a0_to_a4": [
+          28,
+          73,
+          -45,
+          -82,
+          6
+        ]
+      },
+      "shifted_ordinate_certificate": {
+        "certified": true,
+        "D": 4,
+        "H": 100,
+        "box_exclusions": 62268,
+        "leaf_exclusions": 51009,
+        "min_certified_abs_lower_bound": 1.5789647584753502e-05,
+        "closest_polynomial_coeffs_a0_to_a4": [
+          82,
+          76,
+          69,
+          -49,
+          3
+        ]
+      },
+      "rho_1_certificate": {
+        "certified": true,
+        "D": 4,
+        "H": 100,
+        "im_exclusions": 91193,
+        "re_leaf_exclusions": 0,
+        "min_certified_abs_lower_bound": 0.5718179364432054,
+        "closest_polynomial_coeffs_a0_to_a4": [
+          0,
+          100,
+          99,
+          1,
+          0
+        ]
+      }
+    },
+    "candidate_comparison_control": {
+      "gamma_1_and_shifted_ordinate_behave_identically_under_translation": true,
+      "explanation": "Every polynomial relation P(gamma_1) = 0 of degree d and height H bijects with the integer polynomial relation Q(gamma_1 + 1/2) = 2^d P((gamma_1 + 1/2) - 1/2) = 0, confirming computationally that gamma_1 + 1/2 defines no independent arithmetic problem."
+    }
+  },
+  "bounded_denominator_rational_exclusion": {
+    "classification": "CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION",
+    "is_irrationality_proof": false,
+    "max_denominator_Q": 10000,
+    "denominators_tested": 10000,
+    "gamma_1": {
+      "all_rationals_q_le_Q_excluded": true,
+      "closest_rational_convergent": "94109/6658",
+      "min_certified_distance_abs_gamma1_minus_p_over_q": 9.50797348022772e-10
+    },
+    "shifted_ordinate_gamma_1_plus_half": {
+      "all_rationals_q_le_Q_excluded": true,
+      "closest_rational_convergent": "48719/3329",
+      "min_certified_distance_abs_shifted_minus_p_over_q": 9.50797348022772e-10
+    }
+  },
+  "pslq_diagnostic": {
+    "classification": "NUMERICAL_EVIDENCE_ONLY",
+    "is_proof_or_certificate": false,
+    "working_precision_dps": 80,
+    "max_degree": 4,
+    "maxcoeff": 1000,
+    "gamma_1_relation_found": null,
+    "shifted_ordinate_relation_found": null,
+    "firewall_note": "PSLQ / algdep output is strictly diagnostic (NUMERICAL_EVIDENCE_ONLY) and is never classified as a mathematical proof or certified exclusion."
+  },
+  "partial_sum_numerical_controls": {
+    "reference_zero_count_pairs": 200,
+    "max_ordinate_T_200": 396.3818542225922,
+    "S1_partial_200_pairs": 0.02103486031742673,
+    "S1_partial_plus_asymptotic_tail": 0.02310047646149268,
+    "S1_exact": 0.023095708966121033,
+    "S1_tail_corrected_error": 4.767495371644455e-06,
+    "reflection_sum_partial_200_pairs": 0.04206972063485346,
+    "reflection_sum_exact": 0.04619141793224207,
+    "S2_partial_200_pairs": -0.04203262378253486,
+    "S2_exact": -0.0461543172958046,
+    "Sigma2_partial_200_pairs": -0.04208828704138816,
+    "Sigma2_exact": -0.04620998623083794,
+    "Sigma4_partial_200_pairs": 7.433763031887243e-05,
+    "Sigma4_exact": 7.434519857053937e-05,
+    "Sigma4_absolute_error_200_pairs": 7.568251666948056e-09,
+    "evidence_class": "Exact analytic values via log xi(s) derivatives at s=0/1/1/2; finite 200-pair spectral truncation is a numerical control matching the asymptotic tail."
+  },
+  "tc_interaction": {
+    "classification": "ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL",
+    "branch_classification": "ZERO_ARITHMETIC_BRANCH",
+    "canonical_real_grade_domain": "K in Q_bar cap R = A_R",
+    "exceptional_exponent_set_definition": "S_tau = {alpha in A_R : tau^alpha in Q_bar},  tau = 2*pi",
+    "complex_exponent_domain_firewall": "When rho = beta + i*gamma is complex (gamma != 0), tau^{K*rho} = tau^{K*beta} exp(i*K*gamma*log(tau)) has non-real exponent K*rho notin A_R, so tau^{K*rho} is NOT a positive real ambient grade.",
+    "real_exponents_tested_under_algebraic_zero": {
+      "beta": {
+        "in_A_R_if_rho_algebraic": true,
+        "forced_into_S_tau": false,
+        "reason": "zeta(rho) = 0 imposes no algebraic value on tau^beta."
+      },
+      "gamma": {
+        "in_A_R_if_rho_algebraic": true,
+        "forced_into_S_tau": false,
+        "reason": "zeta(rho) = 0 imposes no algebraic value on tau^gamma or exp(i*gamma*log(tau))."
+      },
+      "delta_eq_beta_minus_half": {
+        "in_A_R_if_rho_algebraic": true,
+        "forced_into_S_tau": false,
+        "reason": "As established in TASK-TC-037, q_{rho,rho} = tau^{2*delta_rho} is nonunitary for delta_rho != 0, and no zero-independent arithmetic identity forces tau^{2*delta_rho} in Q_bar."
+      }
+    },
+    "ambient_kernel_reopening_blocked": true,
+    "obl_ct_001a_status": "OPEN"
+  },
+  "principal_classification": "ZERO_ARITHMETIC_FRONTIER_CLASSIFIED_INDIVIDUAL_STATUS_OPEN",
+  "secondary_classification": "SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER",
+  "exact_remaining_subgate": {
+    "subgate_id": "SUBGATE-TC-038A",
+    "branch": "ZERO_ARITHMETIC_BRANCH",
+    "obl_ct_001a_status": "OPEN",
+    "rh_claimed": false,
+    "individual_zero_irrationality_or_transcendence_claimed": false,
+    "governing_question_answer": "Current analytic and Diophantine methods control only global symmetric invariants of the zero set (S_m, sum 1/(rho(1-rho)), Sigma_{2m}, lambda_n, and Voros superzeta values); no established transcendence theorem interacts strongly enough with zeta(rho) = 0 in 0 < Re(rho) < 1 to exclude algebraicity of an individual zero.",
+    "strongest_exact_invariant": "The absolutely convergent reflection-invariant reciprocal sum sum_rho 1/(rho(1 - rho)) = 2*S_1 = 2*lambda_1 = 2 + gamma_E - log(4*pi) (together with the second reciprocal power S_2 = 1 + gamma_E^2 - pi^2/8 + 2*gamma_1).",
+    "single_smallest_missing_theorem_for_tc_039": "Prove irrationality of the first reflection-invariant zero sum 2*lambda_1 = 2 + gamma_E - log(4*pi) (equivalently gamma_E - log(4*pi) notin Q), or prove linear independence over Q of {1, S_1, S_2} so that at least one of the first two symmetric zero-sum invariants (S_1, S_2) is unconditionally irrational."
+  },
+  "lean_theorem_map": {
+    "lean_file": "formal/RiemannScope/ZeroArithmeticInvariants.lean",
+    "required_theorems": [
+      "shifted_ordinate_rational_iff",
+      "shifted_ordinate_algebraic_iff",
+      "shifted_ordinate_transcendental_iff",
+      "complex_zero_re_im_algebraicity",
+      "reflection_reciprocal_identity",
+      "centered_quartet_polynomial_identity",
+      "centered_quartet_coefficients_real",
+      "li_first_coefficient_finite_algebra_identity",
+      "reciprocal_power_log_derivative_sign_identity"
+    ],
+    "found_declarations": [
+      "shifted_ordinate_rational_iff",
+      "half_mem_subfield",
+      "shifted_ordinate_algebraic_iff",
+      "shifted_ordinate_transcendental_iff",
+      "complex_zero_re_im_algebraicity",
+      "reflection_reciprocal_identity",
+      "centered_quartet_polynomial_identity",
+      "centered_quartet_coefficients_real",
+      "li_first_coefficient_finite_algebra_identity",
+      "reciprocal_power_log_derivative_sign_identity"
+    ],
+    "missing_required_theorems": [],
+    "all_required_present": true,
+    "sorry_count": 0,
+    "admit_count": 0,
+    "nonstandard_axiom_count": 0,
+    "audit_note": "0 sorry, 0 admit, no nonstandard project axioms introduced.",
+    "unformalized_external_analytic_facts_not_claimed_in_lean": [
+      "Hadamard factorization of xi(s)",
+      "Irrationality or transcendence status of zeta zeros",
+      "Bui-Conrey-Young simple-zero density theorem",
+      "Li's criterion (lambda_n > 0 <=> RH)",
+      "Voros superzeta meromorphic continuation"
+    ]
+  }
+}
