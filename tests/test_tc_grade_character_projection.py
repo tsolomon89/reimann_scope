@@ -13,18 +13,32 @@ from pathlib import Path
 from tc.grade_character_projection import (
     COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY,
     CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS,
+    DISTINCT_PAIR_CHARACTERS_PROVED_USING_DISTINCT_ZERO_DENSITY,
+    FINITE_COMPLEX_GRADE_PROJECTOR_NO_GO_FORMALIZED,
     FINITE_GRADE_LAURENT_PROJECTOR_NO_GO,
     FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO,
+    FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS,
     GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY,
+    GRADE_CHARACTER_PROJECTION_INCOMPATIBLE_WITH_TESTED_TRANSPORT_ANSATZ,
     GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE,
+    INFINITELY_MANY_DISTINCT_PAIR_CHARACTERS_PROVED,
+    INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN,
     LOG_TAU,
+    OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION,
     OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION,
     PERMITTED_PRINCIPAL_OUTCOMES,
     PRINCIPAL_CLASSIFICATION,
     REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION,
     REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION,
+    REFLECTION_QUARTET_RADIAL_IDENTITY_PRESERVED,
+    REFLECTION_WEIGHT_NONNEGATIVE_PROVED,
+    REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED,
+    RELATIVE_GRADE_DIFFERENTIATION_NOT_PURE_RADIAL,
+    RELATIVE_GRADE_REFLECTION_EXPONENT_REPAIRED,
     REQUIRED_LEAN_THEOREMS,
     SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER,
+    TASK_TC_037R_ID,
+    TASK_TC_037R_STATUS,
     TAU,
     ZERO_DEPENDENT_GRADE_FILTER_REJECTED,
     audit_arithmetic_contradiction_gate,
@@ -56,7 +70,11 @@ from tc.grade_character_projection import (
     evaluate_grade_character,
     evaluate_inversion_even_state_mellin,
     evaluate_reflection_quartet_polynomial,
+    verify_distinct_zero_density_justification,
+    verify_finite_complex_projector_no_go,
+    verify_fourier_vs_multiplicative_inversion,
     verify_lean_theorem_identifiers,
+    verify_relative_grade_reflection_algebra,
 )
 
 
@@ -468,3 +486,300 @@ def test_37_json_artifact_contains_all_required_keys() -> None:
     ]
     for k in required_keys:
         assert k in data, f"Missing required key: {k}"
+
+
+# ============================================================================
+# TASK-TC-037R: 25 Required Evidence-Repair Verification Tests
+# ============================================================================
+
+
+def test_38_n_of_t_vs_n_dist_of_t_distinction_recorded() -> None:
+    """38 (037R-1). N(T) (with multiplicity) vs N_dist(T) (distinct zeros) distinction recorded."""
+    res = verify_distinct_zero_density_justification()
+    assert "N(T)" in res["multiplicity_zero_count_definition"]
+    assert "N_dist(T)" in res["distinct_zero_count_definition"]
+    assert "WITH multiplicity" in res["why_N_T_alone_was_insufficient"]
+
+
+def test_39_distinct_critical_line_zeros_justified_by_simple_zero_theorem() -> None:
+    """39 (037R-2). Distinct critical-line zeros justified by simple-zero density theorem, not N(T) alone."""
+    res = verify_distinct_zero_density_justification()
+    assert res["status"] == DISTINCT_PAIR_CHARACTERS_PROVED_USING_DISTINCT_ZERO_DENSITY
+    primary = res["primary_citations"][0]
+    assert "Bui" in primary["authors"] and "Conrey" in primary["authors"] and "Young" in primary["authors"]
+    assert primary["arxiv_id"] == "1002.4127v2"
+    assert res["bcy_2011_simple_zero_proportion"] >= 0.4058
+    assert all(row["distinct_zeros_exceed_vertical_progressions"] is True for row in res["sample_height_comparisons"])
+
+
+def test_40_offcritical_delta_implies_nonunit_character_modulus() -> None:
+    """40 (037R-3). Off-critical delta_{rho_0} != 0 implies |q_{rho_0,sigma_n}| = tau^{delta_{rho_0}} != 1."""
+    delta_rho0 = 0.15
+    gamma_rho0 = 14.134725141734693
+    sample_gammas = [14.134725141734693, 21.022039638771555, 25.010857580145688, 30.424876125859513]
+    for g in sample_gammas:
+        lam = complex(delta_rho0, gamma_rho0 - g)
+        q_val = cmath.exp(LOG_TAU * lam)
+        assert abs(abs(q_val) - (TAU ** delta_rho0)) < 1e-15
+        assert abs(abs(q_val) - 1.0) > 0.1
+        assert abs(q_val - 1.0) > 0.1
+
+
+def test_41_distinct_exponents_for_distinct_ordinates() -> None:
+    """41 (037R-4). Distinct exponents lambda_{rho_0,sigma_n} verified for distinct gamma_n."""
+    res = verify_distinct_zero_density_justification()
+    assert "sigma_1 = sigma_2" in res["exponent_vs_character_distinction"]["exponent_distinctness_rule"]
+    delta_rho0 = 0.15
+    gamma_rho0 = 14.134725141734693
+    sample_gammas = [14.134725141734693, 21.022039638771555, 25.010857580145688, 30.424876125859513]
+    exps = [complex(delta_rho0, gamma_rho0 - g) for g in sample_gammas]
+    for i in range(len(exps)):
+        for j in range(i + 1, len(exps)):
+            assert abs(exps[i] - exps[j]) > 1.0
+
+
+def test_42_distinct_characters_under_vertical_period_spacing() -> None:
+    """42 (037R-5). Distinct characters q_{rho_0,sigma_{n_k}} verified under spacing > 2*pi / log(tau)."""
+    res = verify_distinct_zero_density_justification()
+    assert res["legacy_status"] == INFINITELY_MANY_DISTINCT_PAIR_CHARACTERS_PROVED
+    period = res["vertical_period_spacing"]
+    assert abs(period - (2.0 * math.pi / LOG_TAU)) < 1e-15
+    delta_rho0 = 0.15
+    gamma_rho0 = 14.134725141734693
+    # Subsequence with spacing > 2*pi / log(tau) ~ 3.41878
+    subseq_gammas = [14.134725141734693, 21.022039638771555, 25.010857580145688, 30.424876125859513]
+    for i in range(len(subseq_gammas) - 1):
+        assert (subseq_gammas[i + 1] - subseq_gammas[i]) > period
+    chars = [cmath.exp(LOG_TAU * complex(delta_rho0, gamma_rho0 - g)) for g in subseq_gammas]
+    for i in range(len(chars)):
+        for j in range(i + 1, len(chars)):
+            assert abs(chars[i] - chars[j]) > 1e-4
+
+
+def test_43_complex_polynomial_projector_no_go_in_lean() -> None:
+    """43 (037R-6). Complex polynomial projector no-go theorem present in Lean over Polynomial C."""
+    res = verify_finite_complex_projector_no_go()
+    assert res["status"] == FINITE_COMPLEX_GRADE_PROJECTOR_NO_GO_FORMALIZED
+    assert res["complex_laurent_lean_theorem"] == "finite_complex_polynomial_projector_root_no_go"
+    assert res["polynomial_ring_in_lean"] == "Polynomial ℂ"
+    assert res["sympy_complex_witness_check"]["Q_at_1_equals_1"] is True
+    assert res["sympy_complex_witness_check"]["Q_at_w1_equals_0"] is True
+    assert res["sympy_complex_witness_check"]["Q_at_w2_equals_0"] is True
+    assert res["sympy_complex_witness_check"]["Q_at_third_distinct_complex_point_nonzero"] is True
+    info = verify_lean_theorem_identifiers()
+    assert "finite_complex_polynomial_projector_root_no_go" in info["declared_theorems"]
+
+
+def test_44_complex_differential_projector_no_go_in_lean() -> None:
+    """44 (037R-7). Complex differential projector no-go theorem present in Lean over Polynomial C."""
+    res = verify_finite_complex_projector_no_go()
+    assert res["differential_status"] == FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO
+    assert res["complex_differential_lean_theorem"] == "finite_complex_differential_projector_root_no_go"
+    info = verify_lean_theorem_identifiers()
+    assert "finite_complex_differential_projector_root_no_go" in info["declared_theorems"]
+
+
+def test_45_relative_grade_exponent_at_reflection_equals_minus_two_z() -> None:
+    """45 (037R-8). Relative-grade exponent at sigma = 1 - conj(rho) equals -2*z_rho = -2*delta_rho - 2*i*gamma_rho."""
+    res = verify_relative_grade_reflection_algebra(delta=0.18, gamma=14.134725141734693, d=0.35)
+    assert res["exponent_repair_status"] == RELATIVE_GRADE_REFLECTION_EXPONENT_REPAIRED
+    assert res["sympy_exact_checks"]["common_coeff_is_zero"] is True
+    assert res["sympy_exact_checks"]["relative_coeff_equals_neg_2_z_rho"] is True
+    assert res["sympy_exact_checks"]["full_exponent_equals_neg_2_d_z_rho"] is True
+    assert res["numerical_sample"]["full_exponent_residual"] < 1e-14
+
+
+def test_46_relative_grade_second_derivative_not_pure_radial() -> None:
+    """46 (037R-9). Relative-grade second derivative equals 8*(log tau)^2*(delta^2 - gamma^2), not 8*(log tau)^2*delta^2."""
+    delta = 0.15
+    gamma = 14.134725141734693
+    res = verify_relative_grade_reflection_algebra(delta=delta, gamma=gamma, d=0.25)
+    assert res["differentiation_status"] == RELATIVE_GRADE_DIFFERENTIATION_NOT_PURE_RADIAL
+    assert res["sympy_exact_checks"]["relative_quartet_equals_8_L2_delta2_minus_gamma2"] is True
+    expected = 8.0 * (LOG_TAU ** 2) * (delta ** 2 - gamma ** 2)
+    assert abs(res["numerical_sample"]["relative_second_derivative_quartet_value"] - expected) < 1e-12
+    assert res["numerical_sample"]["relative_quartet_is_negative_for_delta_lt_gamma"] is True
+    assert res["numerical_sample"]["arb_certified_negative"] is True
+
+
+def test_47_reflection_quartet_curvature_polynomial_still_equals_8_delta_squared() -> None:
+    """47 (037R-10). Reflection-quartet curvature polynomial P(z,-conj(z)) + P(conj(z),-z) still equals 8*delta^2."""
+    delta = 0.15
+    gamma = 14.134725141734693
+    res = verify_relative_grade_reflection_algebra(delta=delta, gamma=gamma)
+    assert res["curvature_polynomial_status"] == REFLECTION_QUARTET_RADIAL_IDENTITY_PRESERVED
+    assert res["sympy_exact_checks"]["curvature_polynomial_quartet_equals_8_delta2"] is True
+    p_res = evaluate_reflection_quartet_polynomial(delta=delta, gamma=gamma)
+    assert abs(p_res["quartet_sum"]["re"] - 8.0 * (delta ** 2)) < 1e-14
+    assert abs(p_res["quartet_sum"]["im"]) < 1e-14
+
+
+def test_48_fourier_self_duality_distinguished_from_multiplicative_inversion_evenness() -> None:
+    """48 (037R-11). Fourier self-duality of exp(-pi u^2) distinguished from multiplicative inversion-evenness."""
+    res = verify_fourier_vs_multiplicative_inversion()
+    assert (
+        res["fourier_vs_inversion_status"]
+        == FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS
+    )
+    assert "F tilde{g}_1 = tilde{g}_1" in res["fourier_self_duality_definition"]
+    assert "u^{-1} Psi(u^{-1})" in res["multiplicative_inversion_definition"]
+
+
+def test_49_raw_phi_t_mellin_nonvanishing_on_open_strip() -> None:
+    """49 (037R-12). Raw hat{Phi_t^{(2)}}(z) is nonvanishing on -1/2 < Re(z) < 1/2."""
+    diag = audit_offcritical_diagonal_obstruction(delta=0.15, gamma=14.134725141734693)
+    assert diag["mellin_nonvanishing_in_open_strip"]["provably_nonzero_on_open_strip_0_lt_Re_s_lt_1"] is True
+    assert diag["mellin_nonvanishing_in_open_strip"]["unsymmetrized_modulus"] > 0.0
+
+
+def test_50_raw_phi_t_is_not_multiplicative_inversion_even() -> None:
+    """50 (037R-13). Raw Phi_t^{(2)} is not multiplicative inversion-even (hat{Phi_1^{(2)}}(z) != hat{Phi_1^{(2)}}(-z))."""
+    res = verify_fourier_vs_multiplicative_inversion()
+    assert res["raw_phi_t1_inversion_even"] is False
+    witness = res["raw_mellin_asymmetry_witness_at_t1"]
+    assert witness["asymmetry_modulus_diff"] > 1e-12
+    assert witness["arb_certified_nonzero_asymmetry"] is True
+
+
+def test_51_symmetrized_psi_plus_mellin_even_symmetry() -> None:
+    """51 (037R-14). Symmetrized hat{Psi_t^+}(z) satisfies hat{Psi_t^+}(-z) = hat{Psi_t^+}(z)."""
+    res = verify_fourier_vs_multiplicative_inversion()
+    assert res["symmetrized_psi_plus_inversion_even"] is True
+    assert res["symmetrized_state_symmetry_witness"]["even_symmetry_residual"] < 1e-15
+
+
+def test_52_reflection_weight_nonnegative() -> None:
+    """52 (037R-15). Reflection weight w_+(rho) = |hat{Psi_t^+}(z_rho)|^2 >= 0."""
+    res = verify_fourier_vs_multiplicative_inversion()
+    assert res["reflection_weight_nonnegative_status"] == REFLECTION_WEIGHT_NONNEGATIVE_PROVED
+    assert res["symmetrized_state_symmetry_witness"]["reflection_product_equals_modulus_squared_residual"] < 1e-15
+    assert res["arb_point_weights_certified_positive"] is True
+
+
+def test_53_strict_offcritical_positivity_for_psi_plus_classified_as_open() -> None:
+    """53 (037R-16). Strict off-critical positivity for hat{Psi_t^+} is classified as open and critical-line sign change is certified."""
+    res = verify_fourier_vs_multiplicative_inversion()
+    assert res["reflection_weight_strict_positivity_status"] == REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED
+    assert res["symmetrized_mellin_zero_free_strip_status"] == INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN
+    sign_cert = res["critical_line_oscillation_zero_witness_at_t1"]
+    assert sign_cert["hat_Psi_1_plus_at_i_gamma_a_re"] > 0.0
+    assert sign_cert["hat_Psi_1_plus_at_i_gamma_b_re"] < 0.0
+    assert sign_cert["opposite_signs_on_critical_line"] is True
+    assert sign_cert["arb_certified_sign_change_in_open_strip"] is True
+
+
+def test_54_folner_cesaro_terminology_replaces_raw_probability_haar() -> None:
+    """54 (037R-17). Folner/Cesaro terminology replaces raw probability-Haar wording on noncompact Z and R."""
+    report = build_grade_character_projection_report()
+    assert report["folner_nonunitarity_obstruction_status"] == OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION
+    assert report["nonunitarity_status"]["folner_status"] == OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION
+    assert report["discrete_cesaro_status"]["folner_status"] == OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION
+    assert report["continuous_cesaro_status"]["folner_status"] == OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION
+
+
+def test_55_transport_incompatibility_scoped_to_tested_ansatz() -> None:
+    """55 (037R-18). Transport incompatibility is explicitly scoped to the tested bigraded transport ansatz."""
+    report = build_grade_character_projection_report()
+    assert (
+        report["tested_transport_incompatibility_status"]
+        == GRADE_CHARACTER_PROJECTION_INCOMPATIBLE_WITH_TESTED_TRANSPORT_ANSATZ
+    )
+    assert (
+        report["common_shift_transport_status"]["scoped_status"]
+        == GRADE_CHARACTER_PROJECTION_INCOMPATIBLE_WITH_TESTED_TRANSPORT_ANSATZ
+    )
+
+
+def test_56_subgate_tc_037a_does_not_assume_unproved_strict_weight_positivity() -> None:
+    """56 (037R-19). SUBGATE-TC-037A does not assume unproved strict weight positivity."""
+    report = build_grade_character_projection_report()
+    subgate = report["exact_remaining_subgate"]
+    assert subgate["subgate_id"] == "SUBGATE-TC-037A"
+    assert subgate["status"] == "OPEN"
+    assert "provably strictly positive" in subgate["precise_theorem_target"]
+    assert "provably nonnegative >= 0" in subgate["precise_theorem_target"]
+
+
+def test_57_repair_obl_ct_001a_remains_open() -> None:
+    """57 (037R-20). OBL-CT-001A remains OPEN after TASK-TC-037R repair."""
+    report = build_grade_character_projection_report()
+    assert report["obl_ct_001a_status"] == "OPEN"
+
+
+def test_58_repair_does_not_refute_tc() -> None:
+    """58 (037R-21). Failure or repair of the projector candidate does not refute TC."""
+    report = build_grade_character_projection_report()
+    assert report["candidate_failure_refutes_tc"] is False
+
+
+def test_59_repair_no_rh_proof_or_disproof_claimed() -> None:
+    """59 (037R-22). No RH proof or disproof is claimed in TASK-TC-037R."""
+    report = build_grade_character_projection_report()
+    assert report["no_rh_claim"] is True
+    assert report["task_id"] == TASK_TC_037R_ID
+    assert report["task_status"] == TASK_TC_037R_STATUS
+
+
+def test_60_lean_file_has_zero_sorry_and_zero_admit() -> None:
+    """60 (037R-23). Lean file formal/RiemannScope/GradeCharacterProjection.lean has 0 sorry and 0 admit."""
+    info = verify_lean_theorem_identifiers()
+    assert info["sorry_count"] == 0
+    assert info["admit_count"] == 0
+    assert info["axiom_count"] == 0
+    assert len(info["declared_theorems"]) == 17
+
+
+def test_61_lean_theorem_names_in_docs_and_json_match_compiled_file() -> None:
+    """61 (037R-24). All 17 Lean theorem names in docs and JSON artifact match the compiled Lean file."""
+    info = verify_lean_theorem_identifiers()
+    compiled_set = set(info["declared_theorems"])
+    assert len(REQUIRED_LEAN_THEOREMS) == 17
+    assert set(REQUIRED_LEAN_THEOREMS) == compiled_set
+
+    root = Path(__file__).resolve().parent.parent
+    artifact_data = json.loads((root / "data" / "tc_grade_character_projection.json").read_text(encoding="utf-8"))
+    assert set(artifact_data["lean_theorem_map"]["declared_theorems"]) == compiled_set
+
+    review_text = (root / "docs" / "reviews" / "TC_GRADE_CHARACTER_REFLECTION_PROJECTION.md").read_text(
+        encoding="utf-8"
+    )
+    for thm in REQUIRED_LEAN_THEOREMS:
+        assert thm in review_text, f"Missing theorem {thm} in review doc"
+
+
+def test_62_json_artifact_contains_all_required_repair_keys() -> None:
+    """62 (037R-25). JSON artifact contains all 22 required TASK-TC-037R repair keys from Section 22."""
+    artifact_path = (
+        Path(__file__).resolve().parent.parent
+        / "data"
+        / "tc_grade_character_projection.json"
+    )
+    data = json.loads(artifact_path.read_text(encoding="utf-8"))
+    repair_keys = [
+        "starting_head",
+        "substantive_parent",
+        "distinct_zero_count_definition",
+        "distinct_zero_density_theorem_citation",
+        "distinct_pair_characters_status",
+        "finite_complex_polynomial_projector_lean_theorem",
+        "finite_complex_differential_projector_lean_theorem",
+        "folner_nonunitarity_obstruction_status",
+        "relative_grade_reflection_exponent_formula",
+        "relative_grade_second_derivative_quartet_formula",
+        "relative_grade_differentiation_status",
+        "reflection_quartet_polynomial_status",
+        "fourier_self_duality_vs_multiplicative_inversion_status",
+        "raw_phi_t1_inversion_even",
+        "symmetrized_psi_plus_inversion_even",
+        "symmetrized_mellin_zero_free_strip_status",
+        "reflection_weight_nonnegative_status",
+        "reflection_weight_strict_positivity_status",
+        "tested_transport_incompatibility_status",
+        "subgate_id",
+        "obl_ct_001a_status",
+        "principal_classification",
+    ]
+    for k in repair_keys:
+        assert k in data, f"Missing repair key: {k}"
+
+

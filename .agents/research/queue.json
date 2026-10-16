@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-037",
+  "active_task_id": "TASK-TC-037R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1021,6 +1021,36 @@
         "RESEARCH_LEDGER.md"
       ],
       "resolution": "TASK-TC-037 completed: Proved sesquilinear reflection-pair stationarity z_rho + bar(z_sigma) = 0 <=> sigma = 1 - bar(rho) under common grade shift (K, J) |-> (K+A, J+A) (REFLECTION_PAIR_STATIONARY_FOR_SESQUILINEAR_CORRELATION); proved finite Laurent projector no-go (FINITE_GRADE_LAURENT_PROJECTOR_NO_GO) and finite differential projector no-go (FINITE_ORDER_GRADE_DIFFERENTIAL_PROJECTOR_NO_GO); proved off-critical non-unitarity |chi_{rho,rho}^shift(A)| = tau^{-2 A delta_rho} != 1 blocks discrete Cesaro/Haar and continuous L^2/distributional Fourier projection (OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION, CONTINUOUS_GRADE_HAAR_PROJECTION_REQUIRES_UNITARY_CHARACTERS) and identified assuming character unitarity as a disguised RH premise (GRADE_ORTHOGONALITY_OUTSIDE_UNITARY_AXIS_IS_DISGUISED_RH_PREMISE); proved transport-projection incompatibility showing full transport b_1 = b_2 = 1 erases the common-shift exponent while b_1 = b_2 = 0 shifts arithmetic prime stations (COMMON_SHIFT_PROJECTION_TRANSPORT_INCOMPATIBILITY, SCALE_INVARIANT_ARITHMETIC_KERNEL_ERASES_COMMON_GRADE_CHARACTER); proved reflection quartet imaginary cancellation and nonnegative radial defect with no arithmetic sign contradiction (REFLECTION_PROJECTION_HAS_NO_ARITHMETIC_SIGN_CONTRADICTION, ZERO_DEPENDENT_GRADE_FILTER_REJECTED); kept SUBGATE-TC-037A and OBL-CT-001A OPEN; compiled Lean 4 formal/RiemannScope/GradeCharacterProjection.lean (16 module declarations: 5 def + 11 theorems, 608 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 37/37 unit tests (131/131 across the 5 targeted suites). Principal classification: GRADE_CHARACTER_PROJECTION_DOES_NOT_ESCAPE_TRANSPORT_MOMENT_INCOMPATIBILITY; Secondary classification: OFF_CRITICAL_NONUNITARITY_BLOCKS_GRADE_HAAR_PROJECTION."
+    },
+    {
+      "task_id": "TASK-TC-037R",
+      "priority": 45,
+      "objective": "Complex-Character Projection Evidence Repair, Distinct-Zero Justification, and Relative-Grade Correction (OBL-CT-001A / SUBGATE-TC-037A Evidence Repair)",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Repair four mathematical claims in TASK-TC-037: (1) prove infinitely many distinct complex grade characters occur without deducing distinctness from N(T) alone; (2) formalize finite Laurent and differential projector root no-go over Polynomial C rather than only over R; (3) correct the reflection-sector relative-grade exponent from 2 delta_rho to -2 z_rho = -2 delta_rho - 2i gamma_rho and separate relative-grade differentiation from the quartet curvature polynomial identity; (4) separate Fourier self-duality from multiplicative inversion-evenness and repair the reflection-weight positivity claim.",
+      "planned_calculation": "1) Separate N(T) (with multiplicity) from N_dist(T) (distinct zeros) and invoke Bui-Conrey-Young (2011, Acta Arith. 150, 35-64, arXiv:1002.4127v2) simple critical-line zero density N_dist(T) >= N_0^*(T) >= (0.4058 - o(1))N(T) >> T log T to prove infinitely many distinct complex exponents lambda_{rho_0,sigma_n} and distinct complex grade characters q_{rho_0,sigma_n} = tau^{lambda_{rho_0,sigma_n}} != 1. 2) Formalize finite_complex_polynomial_projector_root_no_go and finite_complex_differential_projector_root_no_go over Polynomial C in Lean 4. 3) Prove sesquilinear_relative_exponent_at_reflection (lambda_relative = -2 z_rho) and relative_grade_second_derivative_not_radial (8(log tau)^2(delta_rho^2 - gamma_rho^2)) and distinguish from P(z_rho, -bar(z_rho)) + P(bar(z_rho), -z_rho) = 8 delta_rho^2. 4) Prove inversion_even_mellin_symmetry_algebra and reflection_weight_nonnegative, certify in 128-bit Arb that raw Phi_1^{(2)} is not inversion-even while symmetrized hat(Psi_1^+)(i gamma) changes sign between gamma = 0.25 and gamma = 1.0 (INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN). 5) Compile Lean 4 formal/RiemannScope/GradeCharacterProjection.lean (5 def + 17 theorems = 22 declarations, 614 total compiled theorems in repository, 0 sorry, 0 admit) and verify 62 unit tests.",
+      "acceptance_criterion": "62/62 unit tests passing in tests/test_tc_grade_character_projection.py (156/156 across the 5 targeted suites); Lean 4 formalization formal/RiemannScope/GradeCharacterProjection.lean compiled (22 module declarations: 5 def + 17 theorems, 614 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); machine-readable artifact data/tc_grade_character_projection.json with all 60 required keys; review docs/reviews/TC_GRADE_CHARACTER_REFLECTION_PROJECTION.md updated with repaired proofs and primary-source Bui-Conrey-Young citation; task completion classification TASK_TC_037R_GRADE_PROJECTION_EVIDENCE_REPAIR_COMPLETE; OBL-CT-001A and SUBGATE-TC-037A kept OPEN.",
+      "dependencies": [
+        "TASK-TC-037"
+      ],
+      "evidence": [
+        "formal/RiemannScope/GradeCharacterProjection.lean",
+        "tc/grade_character_projection.py",
+        "tests/test_tc_grade_character_projection.py",
+        "docs/reviews/TC_GRADE_CHARACTER_REFLECTION_PROJECTION.md",
+        "data/tc_grade_character_projection.json",
+        "formal/RiemannScope/README.md",
+        "CURVATURE_TRANSPORT.md",
+        "ARITHMETIC_RADIAL_BRIDGE.md",
+        "CMSA_GATE_G4.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md"
+      ],
+      "resolution": "TASK-TC-037R completed: Separated N(T) (counted with multiplicity) from N_dist(T) (distinct zeros) and invoked Bui, Conrey & Young (2011, Acta Arith. 150, 35-64, Theorem 1.1 & Section 2.2, arXiv:1002.4127v2; cf. Conrey 1989; Pratt-Robles-Zaharescu-Zeindler 2020, arXiv:1802.10521v3) simple critical-line zero density N_dist(T) >= N_0^*(T) >= (0.4058 - o(1))N(T) >> T log T to prove infinitely many distinct complex exponents lambda_{rho_0,sigma_n} and distinct complex grade characters q_{rho_0,sigma_n} = tau^{lambda_{rho_0,sigma_n}} != 1 (INFINITE_DISTINCT_CRITICAL_LINE_ZEROS_PROVED_FROM_SIMPLE_ZERO_DENSITY, INFINITE_DISTINCT_COMPLEX_GRADE_CHARACTERS_PROVED); formalized finite Laurent and differential projector root no-go over Polynomial C in Lean 4 (finite_complex_polynomial_projector_root_no_go, finite_complex_differential_projector_root_no_go, FINITE_COMPLEX_LAURENT_PROJECTOR_NO_GO_FORMALIZED, FINITE_COMPLEX_DIFFERENTIAL_PROJECTOR_NO_GO_FORMALIZED); corrected the reflection-sector relative-grade exponent under K=r-d, J=r+d to lambda_relative = bar(z_sigma) - z_rho = -2 z_rho = -2 delta_rho - 2i gamma_rho (sesquilinear_relative_exponent_at_reflection, SESQUILINEAR_RELATIVE_GRADE_EXPONENT_IS_MINUS_TWO_Z), proved relative-grade second derivative at d=0 yields 8(log tau)^2(delta_rho^2 - gamma_rho^2) (relative_grade_second_derivative_not_radial, RELATIVE_GRADE_DIFFERENTIATION_NOT_PURE_RADIAL), and separated it from the independent quartet curvature polynomial identity P(z_rho, -bar(z_rho)) + P(bar(z_rho), -z_rho) = 8 delta_rho^2 (REFLECTION_QUARTET_RADIAL_IDENTITY_PRESERVED); separated Fourier self-duality from multiplicative inversion-evenness (I Psi)(u) = u^{-1}Psi(u^{-1}) (FOURIER_SELF_DUALITY_DISTINCT_FROM_MULTIPLICATIVE_INVERSION_EVENNESS), proved raw Phi_t^{(2)} Mellin nonvanishing on -1/2 < Re(z) < 1/2 (RAW_PHI_T_MELLIN_NONVANISHING_ON_OPEN_STRIP_PROVED) and nonnegative reflection weights w_+(rho) = |hat(Psi_t^+)(z_rho)|^2 >= 0 (inversion_even_mellin_symmetry_algebra, reflection_weight_nonnegative, REFLECTION_WEIGHT_NONNEGATIVE_PROVED, REFLECTION_WEIGHT_STRICT_POSITIVITY_NOT_YET_PROVED), and certified in 128-bit Arb a critical-line sign change of hat(Psi_1^+)(i gamma) between gamma = 0.25 and gamma = 1.0 (INVERSION_EVEN_MELLIN_WEIGHT_ZERO_FREE_STRIP_OPEN); scoped transport incompatibility to the tested ansatz (GRADE_CHARACTER_PROJECTION_INCOMPATIBLE_WITH_TESTED_TRANSPORT_ANSATZ) and updated Folner/Cesaro terminology (OFF_CRITICAL_NONUNITARITY_BLOCKS_FOLNER_CHARACTER_PROJECTION); kept SUBGATE-TC-037A and OBL-CT-001A OPEN; compiled Lean 4 formal/RiemannScope/GradeCharacterProjection.lean (22 module declarations: 5 def + 17 theorems, 614 total compiled theorems in repository, 0 sorry, 0 admit, no nonstandard project axioms introduced); verified 62/62 unit tests (156/156 across the 5 targeted suites). Task completion classification: TASK_TC_037R_GRADE_PROJECTION_EVIDENCE_REPAIR_COMPLETE."
     }
   ]
 }

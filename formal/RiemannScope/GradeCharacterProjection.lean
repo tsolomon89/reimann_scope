@@ -1,10 +1,11 @@
 /-
 RiemannScope.GradeCharacterProjection — Bigraded Character Projection, Reflection-Sector Isolation,
-and Transport-Compatibility Audit (TASK-TC-037)
+Transport-Compatibility Audit, and Evidence Repair (TASK-TC-037 / TASK-TC-037R)
 
-Formalizes the exact algebraic identities, finite-projector root no-go theorems,
-nonunitary diagonal character obstructions, reflection-quartet radial formulas,
-transport-projection incompatibility algebra, and conditional contradiction firewalls:
+Formalizes the exact algebraic identities, finite-projector root no-go theorems over ℝ and ℂ,
+nonunitary diagonal character obstructions, relative-grade vs curvature-polynomial reflection formulas,
+inversion-even Mellin symmetrization algebra, transport-projection incompatibility algebra, and
+conditional contradiction firewalls:
 1. `centered_zero_reflection_identity`:
      In centered coordinates z = rho - 1/2 = ⟨delta, gamma⟩, the four canonical zero symmetries
      act by I(z) = z (rho), C(z) = ⟨delta, -gamma⟩ (conj rho), F(z) = -z (1 - rho), and
@@ -42,7 +43,7 @@ transport-projection incompatibility algebra, and conditional contradiction fire
 9. `reflection_quartet_radial_defect_nonneg`:
      For inversion-even real Mellin weights where hat{Psi}^+(z_rho) hat{Psi}^+(-conj z_rho) = u^2 + v^2 >= 0,
      the quartet radial weight 8 * m^2 * (u^2 + v^2) * delta^2 >= 0, with strict positivity
-     whenever m != 0, u^2 + v^2 > 0, and delta != 0.
+     whenever m != 0, u != 0, and delta != 0.
 10. `transport_projection_incompatibility_algebra`:
      Under common grade shift (K, J) |-> (K + r, J + r) with transported kernel
      F_r(x, y) = tau^{a r} F_0(tau^{-b r} x, tau^{-b r} y), the net common-shift spectral exponent is
@@ -53,12 +54,37 @@ transport-projection incompatibility algebra, and conditional contradiction fire
      If an exact projector existed with A_proj = S_rad, A_proj <= 0, and S_rad > 0, a contradiction
      would follow; conversely, when both A_proj >= 0 and S_rad >= 0 have the same sign, no
      contradiction follows.
+12. `sesquilinear_relative_exponent_at_reflection` (TASK-TC-037R):
+     For K = r - d and J = r + d, the sesquilinear exponent (r - d) z_1 + (r + d) conj z_2
+     equals r (z_1 + conj z_2) + d (conj z_2 - z_1), and on the reflection pair z_2 = -conj z_1
+     has vanishing common-shift coefficient z_1 + conj z_2 = 0 and relative-grade coefficient
+     conj z_2 - z_1 = -2 z_1 = ⟨-2 delta, -2 gamma⟩ (NOT purely real 2 delta).
+13. `relative_grade_second_derivative_not_radial` (TASK-TC-037R):
+     The relative-grade second derivative factor (-2 z_rho)^2 = ⟨4(delta^2 - gamma^2), 8 delta gamma⟩
+     combined with its conjugate partner (-2 conj z_rho)^2 = ⟨4(delta^2 - gamma^2), -8 delta gamma⟩
+     gives quartet sum L^2 ((-2 z_rho)^2 + (-2 conj z_rho)^2) = ⟨8 L^2 (delta^2 - gamma^2), 0⟩,
+     which differs from 8 L^2 delta^2 whenever L != 0 and gamma != 0, and is strictly negative
+     when L != 0 and delta^2 < gamma^2.
+14. `finite_complex_polynomial_projector_root_no_go` (TASK-TC-037R):
+     Any polynomial P in ℂ[X] that vanishes on an injective family f : Fin n -> ℂ of distinct complex
+     character values with P.natDegree < n must be P = 0, forcing P.eval 1 = 0.
+15. `finite_complex_differential_projector_root_no_go` (TASK-TC-037R):
+     Any polynomial differential symbol p(lambda) in ℂ[X] that vanishes on an injective family
+     f : Fin n -> ℂ of distinct complex pair exponents with p.natDegree < n must be p = 0,
+     forcing p.eval 0 = 0.
+16. `inversion_even_mellin_symmetry_algebra` (TASK-TC-037R):
+     The inversion-even Mellin symmetrization hat{Psi}^+(z) = (M_z + M_{-z}) / 2 is invariant under
+     swapping M_z <-> M_{-z}, satisfies hat{Psi}^+(z) * conj(hat{Psi}^+(z)) = ⟨((a+c)/2)^2 + ((b+d)/2)^2, 0⟩,
+     and can vanish via cancellation M_{-z} = -M_z even when M_z != 0.
+17. `reflection_weight_nonnegative` (TASK-TC-037R):
+     For W_rho = m^2 (u^2 + v^2), proves 0 <= W_rho and 0 <= 8 W_rho delta^2, while W_rho = 0
+     whenever u = 0 and v = 0 even if m != 0 and delta != 0.
 
 SCOPE FIREWALL:
-This Lean module formalizes ONLY the algebraic, polynomial-root, and real/complex coordinate
-identities listed above. It does NOT formalize the Riemann-von Mangoldt zero-counting formula N(T),
-infinite spectral series convergence, Haar/Cesaro convergence on the actual zeta spectrum,
-the global Weil explicit formula, or Weil positivity.
+This Lean module formalizes ONLY the algebraic, polynomial-root (over ℝ and ℂ), and real/complex
+coordinate identities listed above. It does NOT formalize the Riemann-von Mangoldt zero-counting
+formula N(T), simple critical-line zero density N_0^*(T), infinite spectral series convergence,
+Folner/Cesaro convergence on the actual zeta spectrum, the global Weil explicit formula, or Weil positivity.
 -/
 
 import Mathlib.Data.Real.Basic
@@ -320,4 +346,156 @@ theorem projected_arithmetic_zero_and_positive_radial_contradiction :
   · intro v hv
     exact ⟨v, v, rfl, rfl, rfl, hv, hv⟩
 
+/-- 12. Sesquilinear relative-grade exponent at the reflection pair (TASK-TC-037R):
+    For grades K = r - d and J = r + d (represented as complex scalars ⟨r - d, 0⟩ and ⟨r + d, 0⟩),
+    the sesquilinear pair exponent K * z_1 + J * conj(z_2) decomposes as
+    r * (z_1 + conj(z_2)) + d * (conj(z_2) - z_1).
+    At the reflection partner z_2 = centeredReflectionR(z_1) = ⟨-δ, γ⟩ (so conj(z_2) = -z_1 = ⟨-δ, -γ⟩),
+    the common-shift coefficient z_1 + conj(z_2) = 0 vanishes, while the relative-grade coefficient is
+    conj(z_2) - z_1 = -2 * z_1 = ⟨-2 * δ, -2 * γ⟩ (NOT purely real 2 * δ). -/
+theorem sesquilinear_relative_exponent_at_reflection (r d δ γ : ℝ) :
+    let z₁ := centeredZeroCoord δ γ
+    let z₂ := centeredReflectionR z₁
+    let K : ℂ := ⟨r - d, 0⟩
+    let J : ℂ := ⟨r + d, 0⟩
+    let rC : ℂ := ⟨r, 0⟩
+    let dC : ℂ := ⟨d, 0⟩
+    K * z₁ + J * complexConjCoord z₂ =
+        rC * (z₁ + complexConjCoord z₂) + dC * (complexConjCoord z₂ - z₁) ∧
+      z₁ + complexConjCoord z₂ = 0 ∧
+      complexConjCoord z₂ - z₁ = (-2 : ℂ) * z₁ ∧
+      complexConjCoord z₂ - z₁ = ⟨-2 * δ, -2 * γ⟩ ∧
+      K * z₁ + J * complexConjCoord z₂ = ⟨-2 * d * δ, -2 * d * γ⟩ := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · apply Complex.ext <;>
+      dsimp [centeredZeroCoord, centeredReflectionR, complexConjCoord] <;>
+      ring
+  · apply Complex.ext <;>
+      dsimp [centeredZeroCoord, centeredReflectionR, complexConjCoord] <;>
+      ring
+  · apply Complex.ext <;>
+      dsimp [centeredZeroCoord, centeredReflectionR, complexConjCoord] <;>
+      ring
+  · apply Complex.ext <;>
+      dsimp [centeredZeroCoord, centeredReflectionR, complexConjCoord] <;>
+      ring
+  · apply Complex.ext <;>
+      dsimp [centeredZeroCoord, centeredReflectionR, complexConjCoord] <;>
+      ring
+
+/-- 13. Relative-grade second derivative is NOT pure radial (TASK-TC-037R):
+    For z_rho = ⟨δ, γ⟩ and scale factor L = log(tau), the relative-grade second derivative at d = 0
+    for the reflection pair (rho, 1 - conj rho) carries the factor ((-2 * z_rho)^2) = ⟨4*(δ^2 - γ^2), 8*δ*γ⟩,
+    and for the conjugate reflection pair (conj rho, 1 - rho) carries ((-2 * conj z_rho)^2) = ⟨4*(δ^2 - γ^2), -8*δ*γ⟩.
+    Their scaled quartet sum is ⟨8 * L^2 * (δ^2 - γ^2), 0⟩, which does NOT equal 8 * L^2 * δ^2 whenever
+    L != 0 and γ != 0, and has strictly negative real part 8 * L^2 * (δ^2 - γ^2) < 0 whenever
+    L != 0 and δ^2 < γ^2. -/
+theorem relative_grade_second_derivative_not_radial (L δ γ : ℝ) :
+    let z := centeredZeroCoord δ γ
+    let zc := complexConjCoord z
+    let neg2 : ℂ := ⟨-2, 0⟩
+    let LC : ℂ := ⟨L, 0⟩
+    (neg2 * z) ^ 2 = ⟨4 * (δ ^ 2 - γ ^ 2), 8 * δ * γ⟩ ∧
+      (neg2 * zc) ^ 2 = ⟨4 * (δ ^ 2 - γ ^ 2), -8 * δ * γ⟩ ∧
+      LC ^ 2 * ((neg2 * z) ^ 2 + (neg2 * zc) ^ 2) =
+        ⟨8 * L ^ 2 * (δ ^ 2 - γ ^ 2), 0⟩ ∧
+      (L ≠ 0 → γ ≠ 0 → 8 * L ^ 2 * (δ ^ 2 - γ ^ 2) ≠ 8 * L ^ 2 * δ ^ 2) ∧
+      (L ≠ 0 → δ ^ 2 < γ ^ 2 → 8 * L ^ 2 * (δ ^ 2 - γ ^ 2) < 0) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · simp only [sq]
+    apply Complex.ext <;> dsimp [centeredZeroCoord] <;> ring
+  · simp only [sq]
+    apply Complex.ext <;> dsimp [centeredZeroCoord, complexConjCoord] <;> ring
+  · simp only [sq]
+    apply Complex.ext <;> dsimp [centeredZeroCoord, complexConjCoord] <;> ring
+  · intro hL hγ heq
+    have hL2 : 0 < L ^ 2 := sq_pos_of_ne_zero hL
+    have hγ2 : 0 < γ ^ 2 := sq_pos_of_ne_zero hγ
+    nlinarith
+  · intro hL hlt
+    have hL2 : 0 < L ^ 2 := sq_pos_of_ne_zero hL
+    nlinarith
+
+/-- 14. Finite complex polynomial projector root no-go theorem over ℂ[X] (TASK-TC-037R):
+    No polynomial P in ℂ[X] can preserve the stationary character (P.eval 1 != 0) while
+    vanishing on an injective family f : Fin n -> ℂ of distinct complex pair characters
+    q_{rho_0, sigma} = tau^{z_{rho_0} + conj z_sigma} whose cardinality n exceeds P.natDegree. -/
+theorem finite_complex_polynomial_projector_root_no_go {n : ℕ} (P : Polynomial ℂ) (f : Fin n → ℂ)
+    (hf : Function.Injective f)
+    (h_roots : ∀ i : Fin n, P.eval (f i) = 0)
+    (h_card : P.natDegree < n) :
+    P = 0 ∧ P.eval 1 = 0 := by
+  have h_card' : P.natDegree < Fintype.card (Fin n) := by
+    simpa using h_card
+  have hP0 : P = 0 :=
+    Polynomial.eq_zero_of_natDegree_lt_card_of_eval_eq_zero P hf h_roots h_card'
+  refine ⟨hP0, ?_⟩
+  rw [hP0, Polynomial.eval_zero]
+
+/-- 15. Finite complex differential projector root no-go theorem over ℂ[X] (TASK-TC-037R):
+    No polynomial symbol p(lambda) in ℂ[X] of a finite-order differential filter p(d/dr) can
+    preserve the stationary exponent lambda = 0 (p.eval 0 != 0) while vanishing on an injective
+    family f : Fin n -> ℂ of distinct complex pair exponents lambda_{rho_0, sigma}
+    whose cardinality n exceeds p.natDegree. -/
+theorem finite_complex_differential_projector_root_no_go {n : ℕ} (p : Polynomial ℂ) (f : Fin n → ℂ)
+    (hf : Function.Injective f)
+    (h_roots : ∀ i : Fin n, p.eval (f i) = 0)
+    (h_card : p.natDegree < n) :
+    p = 0 ∧ p.eval 0 = 0 := by
+  have h_card' : p.natDegree < Fintype.card (Fin n) := by
+    simpa using h_card
+  have hp0 : p = 0 :=
+    Polynomial.eq_zero_of_natDegree_lt_card_of_eval_eq_zero p hf h_roots h_card'
+  refine ⟨hp0, ?_⟩
+  rw [hp0, Polynomial.eval_zero]
+
+/-- 16. Inversion-even Mellin symmetrization algebra (TASK-TC-037R):
+    For raw Mellin values M_z = ⟨a, b⟩ and M_{-z} = ⟨c, d⟩, the inversion-even symmetrization
+    hat{Psi}^+(z) = (M_z + M_{-z}) / 2 = ⟨(a + c) / 2, (b + d) / 2⟩ satisfies:
+    (a) exact symmetry under z |-> -z (swapping M_z and M_{-z});
+    (b) for a real-valued state where hat{Psi}^+(-conj z) = conj(hat{Psi}^+(z)), the reflection
+        product is hat{Psi}^+(z) * conj(hat{Psi}^+(z)) = ⟨((a + c) / 2)^2 + ((b + d) / 2)^2, 0⟩;
+    (c) raw nonvanishing M_z != 0 does not imply symmetrized nonvanishing: when M_{-z} = -M_z
+        (i.e. c = -a and d = -b), the symmetrized Mellin weight (M_z + M_{-z}) / 2 = 0 vanishes. -/
+theorem inversion_even_mellin_symmetry_algebra (a b c d : ℝ) :
+    let Mz : ℂ := ⟨a, b⟩
+    let Mnegz : ℂ := ⟨c, d⟩
+    let psiPlus : ℂ := ⟨(a + c) / 2, (b + d) / 2⟩
+    let psiSwap : ℂ := ⟨(c + a) / 2, (d + b) / 2⟩
+    psiPlus = psiSwap ∧
+      psiPlus * complexConjCoord psiPlus =
+        ⟨((a + c) / 2) ^ 2 + ((b + d) / 2) ^ 2, 0⟩ ∧
+      (c = -a → d = -b → Mz + Mnegz = 0 ∧ psiPlus = 0) := by
+  refine ⟨?_, ?_, ?_⟩
+  · apply Complex.ext <;> dsimp <;> ring
+  · apply Complex.ext <;> dsimp [complexConjCoord] <;> ring
+  · intro hc hd
+    refine ⟨?_, ?_⟩
+    · apply Complex.ext <;> dsimp <;> linarith
+    · apply Complex.ext <;> dsimp <;> linarith
+
+/-- 17. Reflection weight nonnegativity vs strict-positivity condition (TASK-TC-037R):
+    For W_rho = m^2 * (u^2 + v^2) where hat{Psi}^+(z_rho) = ⟨u, v⟩:
+    (a) 0 <= m^2 * (u^2 + v^2) and 0 <= 8 * m^2 * (u^2 + v^2) * δ^2 for all m, u, v, δ;
+    (b) if u = 0 and v = 0 (a zero of hat{Psi}^+), then 8 * m^2 * (u^2 + v^2) * δ^2 = 0
+        even when m != 0 and δ != 0;
+    (c) if m != 0, δ != 0, and (u != 0 ∨ v != 0), then 0 < 8 * m^2 * (u^2 + v^2) * δ^2. -/
+theorem reflection_weight_nonnegative (m u v δ : ℝ) :
+    0 ≤ m ^ 2 * (u ^ 2 + v ^ 2) ∧
+      0 ≤ 8 * m ^ 2 * (u ^ 2 + v ^ 2) * δ ^ 2 ∧
+      (u = 0 → v = 0 → 8 * m ^ 2 * (u ^ 2 + v ^ 2) * δ ^ 2 = 0) ∧
+      (m ≠ 0 → δ ≠ 0 → (u ≠ 0 ∨ v ≠ 0) → 0 < 8 * m ^ 2 * (u ^ 2 + v ^ 2) * δ ^ 2) := by
+  refine ⟨by positivity, by positivity, ?_, ?_⟩
+  · intro hu hv
+    rw [hu, hv]
+    ring
+  · intro hm hδ huv
+    rcases huv with hu | hv
+    · have : 0 < u ^ 2 := sq_pos_of_ne_zero hu
+      positivity
+    · have : 0 < v ^ 2 := sq_pos_of_ne_zero hv
+      positivity
+
 end RiemannScope
+
+
