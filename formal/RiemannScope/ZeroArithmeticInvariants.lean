@@ -1,9 +1,9 @@
 /-
 RiemannScope.ZeroArithmeticInvariants
-TASK-TC-038: Arithmetic Nature of Nontrivial Zeros, Exact Zero-Sum Invariants,
+TASK-TC-038 / TASK-TC-038R: Arithmetic Nature of Nontrivial Zeros, Exact Zero-Sum Invariants,
 and Special-Value Transfer Audit.
 
-Formalizes the exact algebraic identities of TASK-TC-038:
+Formalizes the exact algebraic identities of TASK-TC-038 and TASK-TC-038R:
 1. `shifted_ordinate_rational_iff`: γ is rational iff γ + 1/2 is rational.
 2. `shifted_ordinate_algebraic_iff`: for any subfield A ≤ ℝ (such as Q̄ ∩ ℝ), γ ∈ A ↔ γ + 1/2 ∈ A.
 3. `shifted_ordinate_transcendental_iff`: for any subfield A ≤ ℝ, γ ∉ A ↔ γ + 1/2 ∉ A.
@@ -18,9 +18,15 @@ Formalizes the exact algebraic identities of TASK-TC-038:
    [1 - (1 - 1/ρ)] + [1 - (1 - 1/(1 - ρ))] = 1/(ρ(1 - ρ)).
 9. `reciprocal_power_log_derivative_sign_identity`: sign normalization of reciprocal-power terms
    and centered odd-power cancellation z^{-(2k+1)} + (-z)^{-(2k+1)} = 0 vs even-power doubling.
+10. `stieltjes_notation_no_effect_algebra`: disambiguated Stieltjes notation (γ₀_St = γ_E, γ₁_St)
+    preserves S₁, S₂ polynomial algebra and avoids collision with zero ordinate γ₁.
+11. `s2_equivalent_closed_forms`: exact equivalence of S₂ = 1 + γ_E^2 - π^2/8 + 2γ₁_St and
+    S₂ = 1 - π^2/24 + 2ζ''(0) + log^2(2π), and residual (3/4)γ_E^2 - γ_E + 3γ₁_St against the
+    erroneous historical expression.
 
 Scope firewall:
 Does NOT claim to formalize Hadamard factorization of ξ(s), transcendence status of zeta zeros,
+Fauzan's 2026 ζ(5) irrationality proof (formalized externally in `mo271/Zeta5`),
 Bui–Conrey–Young zero density, Li's criterion, or Voros superzeta analytic continuation.
 -/
 
@@ -190,4 +196,40 @@ theorem reciprocal_power_log_derivative_sign_identity (ρ z : ℂ) (m k : ℕ) :
   · rw [h_even]
     ring
 
+/-! ### 6. TASK-TC-038R Stieltjes Disambiguation and S₂ Closed-Form Equivalence -/
+
+/-- 10. Stieltjes notation disambiguation algebraic invariance:
+    Under the canonical identification `γ₀_St = γ_E`, the polynomial algebra for `S₁` and `S₂`
+    in the disambiguated Stieltjes symbols `(γ₀_St, γ₁_St)` equals the canonical expression in
+    `(γ_E, γ₁_St)`, and remains algebraically independent of the first zero ordinate `γ₁`
+    whenever `γ₁_St ≠ γ₁`. -/
+theorem stieltjes_notation_no_effect_algebra
+    (γ_E γ₀_St γ₁_St γ₁ log4pi pi_sq : ℝ) (h0 : γ₀_St = γ_E) (hne : γ₁_St ≠ γ₁) :
+    (1 + γ₀_St / 2 - log4pi / 2 = 1 + γ_E / 2 - log4pi / 2) ∧
+    (1 + γ₀_St ^ 2 - pi_sq / 8 + 2 * γ₁_St = 1 + γ_E ^ 2 - pi_sq / 8 + 2 * γ₁_St) ∧
+    ((1 + γ_E ^ 2 - pi_sq / 8 + 2 * γ₁_St) - (1 + γ_E ^ 2 - pi_sq / 8 + 2 * γ₁) =
+      2 * (γ₁_St - γ₁) ∧ 2 * (γ₁_St - γ₁) ≠ 0) := by
+  subst h0
+  refine ⟨rfl, rfl, by ring, ?_⟩
+  exact mul_ne_zero two_ne_zero (sub_ne_zero.mpr hne)
+
+/-- 11. Equivalent closed forms for `S₂` and nonvanishing residual against erroneous form:
+    If the second derivative of `ζ` at `s = 0` satisfies the functional-equation bridge
+    `2 * zeta_dd0 + log_tau ^ 2 = γ_E ^ 2 + 2 * γ₁_St - pi_sq / 12`, then the Stieltjes-form
+    `1 + γ_E ^ 2 - pi_sq / 8 + 2 * γ₁_St` equals the `s = 0` form
+    `1 - pi_sq / 24 + 2 * zeta_dd0 + log_tau ^ 2`.
+    Moreover, the difference between the true `S₂` and the erroneous expression
+    `1 - pi_sq / 8 + γ_E + γ_E ^ 2 / 4 - γ₁_St` is identically `(3 / 4) * γ_E ^ 2 - γ_E + 3 * γ₁_St`. -/
+theorem s2_equivalent_closed_forms
+    (γ_E γ₁_St pi_sq zeta_dd0 log_tau : ℝ)
+    (h_bridge : 2 * zeta_dd0 + log_tau ^ 2 = γ_E ^ 2 + 2 * γ₁_St - pi_sq / 12) :
+    (1 + γ_E ^ 2 - pi_sq / 8 + 2 * γ₁_St =
+      1 - pi_sq / 24 + 2 * zeta_dd0 + log_tau ^ 2) ∧
+    ((1 + γ_E ^ 2 - pi_sq / 8 + 2 * γ₁_St) -
+      (1 - pi_sq / 8 + γ_E + γ_E ^ 2 / 4 - γ₁_St) =
+      (3 / 4 : ℝ) * γ_E ^ 2 - γ_E + 3 * γ₁_St) := by
+  refine ⟨?_, by ring⟩
+  linarith [h_bridge]
+
 end RiemannScope
+

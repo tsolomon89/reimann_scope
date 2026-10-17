@@ -136,6 +136,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/CanonicalSelectorAudit.lean",
     "formal/RiemannScope/ModularThetaConductorCurvature.lean",
     "formal/RiemannScope/GradeCharacterProjection.lean",
+    "formal/RiemannScope/ZeroArithmeticInvariants.lean",
 ]
 
 

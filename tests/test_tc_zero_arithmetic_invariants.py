@@ -19,28 +19,59 @@ from tc.grade_character_projection import (
 )
 from tc.zero_arithmetic_invariants import (
     ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL,
+    CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE,
     CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION,
     CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION,
+    CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
     CONDITIONAL_ON_RH,
     DIFFERENTIAL_TRANSCENDENCE_DOES_NOT_DETERMINE_ZERO_ARITHMETIC,
     EULER_PRODUCT_NONVANISHING_NOT_AVAILABLE_IN_CRITICAL_STRIP,
+    EXPLICIT_POLYNOMIAL_ENUMERATION,
+    FAUZAN_HANKEL_METHOD_EXPOSES_NEW_AUXILIARY_POLYNOMIAL_ROUTE,
+    FAUZAN_HANKEL_METHOD_HAS_NO_ZERO_LOCATION_TRANSFER,
+    FAUZAN_HANKEL_METHOD_HAS_PARTIAL_ZERO_LOCATION_TRANSFER,
+    FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED,
+    FIXED_NUMBER_FIELD_REQUIRES_BOUNDED_DEGREE_AND_BOUNDED_HEIGHT,
+    FORMAL_SOURCE_INVENTORY_REPAIRED,
+    FORMAL_SOURCE_INVENTORY_SYNCHRONIZED,
+    FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
     FUNCTIONAL_EQUATION_DOES_NOT_EXCLUDE_ALGEBRAIC_ZERO,
+    HIERARCHICAL_BOX_EXCLUSION,
+    LEAN_PROVED_EXTERNAL_REPOSITORY,
     LI_COEFFICIENT_POSITIVITY_IS_RH_EQUIVALENT,
+    NO_INDIVIDUAL_ORDINATE_IRRATIONALITY_OR_TRANSCENDENCE_THEOREM_FOUND,
     NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
     NUMERICAL_EVIDENCE_ONLY,
     OPEN_IN_LITERATURE,
+    PEER_REVIEW_STATUS_PENDING,
     PERMITTED_PRINCIPAL_OUTCOMES,
     PRIMARY_SOURCE_VERIFIED,
     PRINCIPAL_CLASSIFICATION,
     REQUIRED_ARTIFACT_KEYS,
+    REQUIRED_FAUZAN_ARCHITECTURE_KEYS,
     REQUIRED_LEAN_THEOREMS,
+    REQUIRED_TC_038R_REPAIR_KEYS,
+    S2_CANONICAL_FORMULA_REPAIRED,
+    S3_S4_REAUDITED,
     SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE,
+    SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED,
     SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER,
     SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER,
+    SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED,
+    STIELTJES_NOTATION_DISAMBIGUATED,
     SUBGATE_TC_038A_ID,
+    SUBGATE_TC_039A_ID,
+    TASK_TC_038R_ID,
+    TASK_TC_038R_STATUS,
     TASK_TC_038_BRANCH,
     TASK_TC_038_ID,
+    VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE,
+    ZERO_ARITHMETIC_MODULE_INCLUDED_IN_BUILD_PROVENANCE,
+    ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE,
     ZETA5_CURRENT_STATUS_VERIFIED,
+    ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN,
+    ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM,
+    ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN,
     audit_euler_product_firewall,
     audit_full_zero_vs_ordinate_algebraicity,
     audit_functional_equation_algebraic_zero,
@@ -57,12 +88,20 @@ from tc.zero_arithmetic_invariants import (
     count_primitive_polynomials_up_to,
     derive_xi_hadamard_and_reciprocal_sums,
     enumerate_normalized_primitive_polynomials,
+    load_fauzan_zeta5_architecture,
     run_pslq_diagnostic_control,
+    verify_formal_source_inventory_provenance,
     verify_lean_theorem_identifiers,
     verify_zeta5_and_special_value_transfer,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+PERMITTED_TRANSFER_OUTCOMES = (
+    FAUZAN_HANKEL_METHOD_HAS_NO_ZERO_LOCATION_TRANSFER,
+    FAUZAN_HANKEL_METHOD_HAS_PARTIAL_ZERO_LOCATION_TRANSFER,
+    FAUZAN_HANKEL_METHOD_EXPOSES_NEW_AUXILIARY_POLYNOMIAL_ROUTE,
+    FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED,
+)
 
 
 # 1. Preflight TASK-TC-037R status update: INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE
@@ -263,20 +302,21 @@ def test_19_differential_transcendence_and_gamma_firewalls() -> None:
     assert "Gamma(1/4)" in gamma_fw["special_rational_values_known_transcendental"]
 
 
-# 20. Current status of zeta(5) and special-value transfer classification
+# 20. Current status of zeta(5) and special-value transfer classification (repaired in TASK-TC-038R)
 def test_20_zeta5_status_and_special_value_transfer() -> None:
     zeta5, transfer, aux = verify_zeta5_and_special_value_transfer()
     assert zeta5["status_code"] == ZETA5_CURRENT_STATUS_VERIFIED
-    assert zeta5["archimedean_zeta5_individually_proved_irrational"] is False
-    assert zeta5["archimedean_zeta5_status"] == OPEN_IN_LITERATURE
+    assert zeta5["lean_formalization_status"] == ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN
+    assert zeta5["preprint_claim_status"] == ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM
+    assert zeta5["conventional_peer_review_status"] == PEER_REVIEW_STATUS_PENDING
     assert zeta5["source_verification"] == PRIMARY_SOURCE_VERIFIED
     assert (
-        transfer["classification"]
-        == SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER
+        transfer["repaired_audit_status"]
+        == SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED
     )
     assert (
-        transfer["secondary_outcome_code"]
-        == SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER
+        transfer["classification"]
+        == FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED
     )
     assert aux["privileging_gamma_1_avoided"] is True
 
@@ -297,7 +337,14 @@ def test_22_certified_arb_finite_algebraicity_exclusion() -> None:
     res = certify_finite_algebraicity_exclusion(
         D_explicit=3, H_explicit=2, D_box=4, H_box=20
     )
-    assert res["classification"] == CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION
+    assert (
+        res["exclusion_scope_status"]
+        == CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION
+    )
+    assert (
+        res["classification"]
+        == CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION
+    )
     assert res["is_irrationality_proof"] is False
     assert res["is_transcendence_proof"] is False
     assert res["explicit_individual_enumeration"]["all_excluded"] is True
@@ -358,7 +405,9 @@ def test_26_artifact_schema_and_lean_identifiers() -> None:
     for k in REQUIRED_ARTIFACT_KEYS:
         assert k in data, f"Missing required artifact key: {k}"
 
-    assert data["task_id"] == TASK_TC_038_ID
+    assert data["task_id"] == TASK_TC_038R_ID
+    assert data["parent_task_id"] == TASK_TC_038_ID
+    assert data["task_tc_038r_status"] == TASK_TC_038R_STATUS
     assert data["principal_classification"] in PERMITTED_PRINCIPAL_OUTCOMES
     assert data["principal_classification"] == PRINCIPAL_CLASSIFICATION
     assert data["exact_remaining_subgate"]["subgate_id"] == SUBGATE_TC_038A_ID
@@ -387,3 +436,373 @@ def test_26_artifact_schema_and_lean_identifiers() -> None:
     assert lean_info["admit_count"] == 0
     for thm in REQUIRED_LEAN_THEOREMS:
         assert thm in lean_info["found_declarations"]
+
+
+# =============================================================================
+# TASK-TC-038R Required Tests (Section 37: 30 items)
+# =============================================================================
+
+
+# TC-038R Test 1: ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM present
+def test_038r_01_zeta5_irrationality_2026_preprint_claim_present() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    assert (
+        arch["evidence_classification"]["manuscript_claim"]
+        == ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM
+    )
+    assert arch["paper_reference"]["doi"] == "10.5281/zenodo.22826419"
+
+
+# TC-038R Test 2: ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN present
+def test_038r_02_zeta5_irrationality_formalized_in_lean_present() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    ev = arch["evidence_classification"]
+    assert ev["formal_verification"] == ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN
+    assert ev["external_lean_status"] == LEAN_PROVED_EXTERNAL_REPOSITORY
+    assert ev["local_build_audit_status"] == SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED
+
+
+# TC-038R Test 3: mo271/Zeta5 repository and theorem Apery.irrational_five recorded
+def test_038r_03_mo271_zeta5_and_apery_irrational_five_recorded() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    assert "mo271/Zeta5" in arch["lean_repository"]["repository_url"]
+    assert "Apery.irrational_five" in arch["target_theorem"]["apery_main_theorem"]
+    assert "riemannZeta 5" in arch["target_theorem"]["apery_main_theorem"]
+
+
+# TC-038R Test 4: ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN recorded with standard Lean axioms
+def test_038r_04_zeta5_formalization_dependency_graph_clean() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    assert (
+        arch["evidence_classification"]["dependency_graph_status"]
+        == ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN
+    )
+    assert arch["lean_repository"]["print_axioms_result"] == [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+    ]
+    assert arch["lean_repository"]["sorry_admit_audit"]["apery_directory_sorry_count"] == 0
+    assert arch["lean_repository"]["sorry_admit_audit"]["apery_directory_admit_count"] == 0
+
+
+# TC-038R Test 5: PEER_REVIEW_STATUS_PENDING recorded separately from formalization status
+def test_038r_05_peer_review_status_pending_separate() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    ev = arch["evidence_classification"]
+    assert ev["conventional_peer_review_status"] == PEER_REVIEW_STATUS_PENDING
+    assert ev["conventional_peer_review_status"] != ev["formal_verification"]
+
+
+# TC-038R Test 6: data/fauzan_zeta5_architecture.json exists and has all required keys
+def test_038r_06_fauzan_zeta5_architecture_json_schema() -> None:
+    path = REPO_ROOT / "data" / "fauzan_zeta5_architecture.json"
+    assert path.exists()
+    data = json.loads(path.read_text(encoding="utf-8"))
+    for k in REQUIRED_FAUZAN_ARCHITECTURE_KEYS:
+        assert k in data, f"Missing required Fauzan architecture key: {k}"
+
+
+# TC-038R Test 7: Fauzan polynomial degree 37n and parameters K=40n, N=3n recorded
+def test_038r_07_fauzan_polynomial_degree_and_parameters() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    params = arch["polynomial_family"]["parameters"]
+    assert params["K"] == "40 * n"
+    assert params["N"] == "3 * n"
+    assert params["h"] == "K - N = 37 * n"
+    assert "37n" in arch["degree_formula"]["exact_degree"]
+
+
+# TC-038R Test 8: Fauzan small-value vs denominator-growth comparison recorded
+def test_038r_08_fauzan_small_value_vs_denominator_growth() -> None:
+    arch = load_fauzan_zeta5_architecture(REPO_ROOT)
+    assert "139/5 = 27.8" in arch["small_value_rate"]["paper_rate"]
+    assert "5.5964" in arch["small_value_rate"]["lean_formalized_rate"]
+    assert "A_{\\mathrm{eff}} + U = -0.0069955 < 0" in arch["denominator_growth_rate"]["lean_constant"]
+
+
+# TC-038R Test 9: VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE present
+def test_038r_09_value_vs_argument_polynomial_architecture() -> None:
+    _, transfer, aux = verify_zeta5_and_special_value_transfer()
+    assert (
+        transfer["structural_distinction"]
+        == VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE
+    )
+    assert (
+        aux["structural_distinction"]
+        == VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE
+    )
+
+
+# TC-038R Test 10: FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED or permitted transfer classification present
+def test_038r_10_fauzan_hankel_zero_location_transfer_classification() -> None:
+    _, transfer, _ = verify_zeta5_and_special_value_transfer()
+    assert transfer["classification"] in PERMITTED_TRANSFER_OUTCOMES
+    assert (
+        transfer["classification"]
+        == FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED
+    )
+    assert (
+        transfer["repaired_audit_status"]
+        == SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED
+    )
+
+
+# TC-038R Test 11: SUBGATE-TC-039A gate map Z1-Z6 present and complete
+def test_038r_11_subgate_tc_039a_gate_map_complete() -> None:
+    _, _, aux = verify_zeta5_and_special_value_transfer()
+    sub = aux["subgate_tc_039a"]
+    assert sub["subgate_id"] == SUBGATE_TC_039A_ID
+    assert sub["status"] == "OPEN"
+    gate_ids = [g["gate_id"] for g in sub["gates"]]
+    assert gate_ids == ["Z1", "Z2", "Z3", "Z4", "Z5", "Z6"]
+
+
+# TC-038R Test 12: formal/RiemannScope/ZeroArithmeticInvariants.lean is in scripts/build_formal.py::FORMAL_SOURCE_FILES
+def test_038r_12_zero_arithmetic_invariants_in_build_formal_sources() -> None:
+    prov = verify_formal_source_inventory_provenance(REPO_ROOT)
+    assert prov["zero_arithmetic_lean_file_in_inventories"] is True
+    assert prov["missing_from_build_formal"] == []
+
+
+# TC-038R Test 13: formal/RiemannScope/ZeroArithmeticInvariants.lean is in certification.py::REQUIRED_FORMAL_SOURCES
+def test_038r_13_zero_arithmetic_invariants_in_certification_required_sources() -> None:
+    prov = verify_formal_source_inventory_provenance(REPO_ROOT)
+    assert prov["zero_arithmetic_lean_file_in_inventories"] is True
+    assert prov["missing_from_certification"] == []
+
+
+# TC-038R Test 14: Every local import RiemannScope.* in formal/RiemannScope.lean is present in both formal source lists
+def test_038r_14_all_riemann_scope_imports_in_both_formal_source_lists() -> None:
+    prov = verify_formal_source_inventory_provenance(REPO_ROOT)
+    assert prov["synchronized"] is True
+    assert prov["lists_match_exactly"] is True
+    assert prov["status"] == FORMAL_SOURCE_INVENTORY_SYNCHRONIZED
+
+
+# TC-038R Test 15: formal/RiemannScope/ZeroArithmeticInvariants.lean contains 0 sorry and 0 admit
+def test_038r_15_zero_arithmetic_invariants_lean_zero_sorry_admit() -> None:
+    lean_info = verify_lean_theorem_identifiers(REPO_ROOT)
+    assert lean_info["sorry_count"] == 0
+    assert lean_info["admit_count"] == 0
+
+
+# TC-038R Test 16: Exact theorem count of ZeroArithmeticInvariants.lean matches reported count
+def test_038r_16_zero_arithmetic_invariants_exact_theorem_count() -> None:
+    lean_info = verify_lean_theorem_identifiers(REPO_ROOT)
+    prov = verify_formal_source_inventory_provenance(REPO_ROOT)
+    assert lean_info["theorem_declaration_count"] == 12
+    assert lean_info["total_declaration_count"] == 12
+    assert len(REQUIRED_LEAN_THEOREMS) == 11
+    assert lean_info["all_required_present"] is True
+    assert prov["zero_arithmetic_lean_theorem_count"] == 12
+    assert prov["total_formal_theorem_count"] == 626
+
+
+# TC-038R Test 17: Stieltjes constants use disambiguated notation in code/artifact/report
+def test_038r_17_stieltjes_notation_disambiguated() -> None:
+    sums = derive_xi_hadamard_and_reciprocal_sums()
+    assert (
+        sums["stieltjes_notation_policy"]["status"] == STIELTJES_NOTATION_DISAMBIGUATED
+    )
+    assert "gamma_1^St" in sums["reciprocal_sum_S2"]["exact_formula_at_s1_stieltjes"]
+    assert "gamma_2^St" in sums["S3_reaudit"]["exact_formula_stieltjes"]
+    assert "gamma_3^St" in sums["S4_reaudit"]["exact_formula_stieltjes"]
+    review_text = (
+        REPO_ROOT / "docs" / "reviews" / "TC_ZERO_ARITHMETIC_INVARIANTS.md"
+    ).read_text(encoding="utf-8")
+    assert STIELTJES_NOTATION_DISAMBIGUATED in review_text
+    assert r"\gamma_1^{\mathrm{St}}" in review_text
+
+
+# TC-038R Test 18: S_2 at s=0 and s=1 agree to <1e-45
+def test_038r_18_s2_s0_and_s1_agreement_50dps() -> None:
+    sums = derive_xi_hadamard_and_reciprocal_sums()
+    s2 = sums["reciprocal_sum_S2"]
+    assert s2["status"] == S2_CANONICAL_FORMULA_REPAIRED
+    assert s2["s0_vs_s1_derivative_residual"] < 1e-45
+    assert s2["mpmath_s0_residual"] < 1e-45
+    assert s2["mpmath_s1_residual"] < 1e-45
+
+
+# TC-038R Test 19: Erroneous S_2 formula does not appear anywhere in canonical docs
+def test_038r_19_erroneous_s2_formula_removed_from_canonical_docs() -> None:
+    erroneous_fragments = [
+        r"\frac{\gamma_{\mathrm{Euler}}^2}{4} - \gamma_1^{\mathrm{Stieltjes}}",
+        r"\gamma_E^2/4 - \gamma_1",
+    ]
+    canonical_docs = [
+        REPO_ROOT / "RESEARCH_HYPOTHESIS.md",
+        REPO_ROOT / "RESEARCH_LEDGER.md",
+        REPO_ROOT / "MATH_CONTRACT.md",
+        REPO_ROOT / "TRANSCENDENTAL_CONTINUATION.md",
+        REPO_ROOT / "docs" / "TC_CURRENT_CANONICAL_STATUS.md",
+    ]
+    for doc_path in canonical_docs:
+        content = doc_path.read_text(encoding="utf-8")
+        for frag in erroneous_fragments:
+            assert frag not in content, f"Erroneous S_2 fragment {frag!r} found in {doc_path.name}"
+
+
+# TC-038R Test 20: S_3 and S_4 symbolic/50-dps/partial-sum checks pass
+def test_038r_20_s3_and_s4_reaudit_checks_pass() -> None:
+    sums = derive_xi_hadamard_and_reciprocal_sums()
+    s3 = sums["S3_reaudit"]
+    s4 = sums["S4_reaudit"]
+    assert s3["status"] == S3_S4_REAUDITED
+    assert s3["route_1_symbolic_laurent_verified"] is True
+    assert s3["route_2_mpmath_50dps_s0_vs_closed_residual"] < 1e-45
+    assert s3["route_2_mpmath_50dps_s1_vs_closed_residual"] < 1e-45
+    assert s3["route_3_tail_corrected_residual"] < 2e-6
+    assert s4["status"] == S3_S4_REAUDITED
+    assert s4["route_1_symbolic_laurent_verified"] is True
+    assert s4["route_2_mpmath_50dps_s0_vs_closed_residual"] < 1e-45
+    assert s4["route_2_mpmath_50dps_s1_vs_closed_residual"] < 1e-45
+    assert s4["route_3_tail_corrected_residual"] < 1e-8
+
+
+# TC-038R Test 21: Finite box D<=4, H<=100 exclusion passes for gamma_1, rho_1, and gamma_1 + 1/2
+def test_038r_21_finite_box_d4_h100_exclusion_passes() -> None:
+    artifact = json.loads(
+        (REPO_ROOT / "data" / "tc_zero_arithmetic_invariants.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    box = artifact["finite_algebraicity_exclusion"][
+        "hierarchical_arb_box_certificate_D4_H100"
+    ]
+    assert box["number_of_primitive_polynomials_in_space"] == 158062321920
+    assert box["gamma_1_certificate"]["certified"] is True
+    assert box["shifted_ordinate_certificate"]["certified"] is True
+    assert box["rho_1_certificate"]["certified"] is True
+
+
+# TC-038R Test 22: Route A: FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED is present and no uncertified full-box global minimum is claimed
+def test_038r_22_route_a_full_box_global_minimum_not_certified() -> None:
+    artifact = json.loads(
+        (REPO_ROOT / "data" / "tc_zero_arithmetic_invariants.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    fa = artifact["finite_algebraicity_exclusion"]
+    assert fa["global_minimum_scope_status"] == FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED
+    box = fa["hierarchical_arb_box_certificate_D4_H100"]
+    assert box["certification_method"] == HIERARCHICAL_BOX_EXCLUSION
+    assert box["full_box_global_minimum_certified"] is False
+    for key in (
+        "gamma_1_certificate",
+        "shifted_ordinate_certificate",
+        "rho_1_certificate",
+    ):
+        assert (
+            box[key]["global_minimum_scope"]
+            == FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED
+        )
+        assert box[key]["full_box_global_minimum_certified"] is False
+        assert "min_certified_lower_bound" not in box[key]
+
+
+# TC-038R Test 23: Explicit small-box D<=4, H<=3 global minimum is certified
+def test_038r_23_explicit_small_box_d4_h3_global_minimum_certified() -> None:
+    artifact = json.loads(
+        (REPO_ROOT / "data" / "tc_zero_arithmetic_invariants.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    exp = artifact["finite_algebraicity_exclusion"][
+        "explicit_individual_enumeration"
+    ]
+    assert exp["D"] == 4
+    assert exp["H"] == 3
+    assert exp["certification_method"] == EXPLICIT_POLYNOMIAL_ENUMERATION
+    assert exp["number_of_polynomials_tested"] == 8160
+    assert exp["full_box_global_minimum_certified"] is True
+    assert exp["gamma_1_min_certified_abs_lower_bound"] > 11.0
+    assert exp["shifted_ordinate_min_certified_abs_lower_bound"] > 11.5
+    assert exp["rho_1_min_certified_abs_lower_bound"] > 14.0
+
+
+# TC-038R Test 24: Bounded-denominator rational exclusion q<=10^4 passes
+def test_038r_24_bounded_denominator_rational_exclusion_q10000() -> None:
+    rat = certify_bounded_denominator_rational_exclusion(Q=10000)
+    assert rat["max_denominator_Q"] == 10000
+    assert rat["gamma_1"]["all_rationals_q_le_Q_excluded"] is True
+    assert rat["shifted_ordinate_gamma_1_plus_half"]["all_rationals_q_le_Q_excluded"] is True
+
+
+# TC-038R Test 25: PSLQ remains NUMERICAL_EVIDENCE_ONLY
+def test_038r_25_pslq_remains_numerical_evidence_only() -> None:
+    pslq = run_pslq_diagnostic_control(dps=60, max_degree=3)
+    assert pslq["classification"] == NUMERICAL_EVIDENCE_ONLY
+    assert pslq["is_proof_or_certificate"] is False
+
+
+# TC-038R Test 26: Cardinality transcendence row is removed or replaced with CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE
+def test_038r_26_cardinality_transcendence_repair() -> None:
+    lit = audit_primary_literature_individual_zeros()
+    card = lit["individual_zero_claims"]["cardinality_transcendence_fallacy_repaired"]
+    assert (
+        card["status"]
+        == CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE
+    )
+    assert (
+        card["literature_row_status"]
+        == NO_INDIVIDUAL_ORDINATE_IRRATIONALITY_OR_TRANSCENDENCE_THEOREM_FOUND
+    )
+    review_text = (
+        REPO_ROOT / "docs" / "reviews" / "TC_ZERO_ARITHMETIC_INVARIANTS.md"
+    ).read_text(encoding="utf-8")
+    assert CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE in review_text
+
+
+# TC-038R Test 27: Fixed-number-field statements include bounded-height qualification
+def test_038r_27_fixed_number_field_bounded_height_qualification() -> None:
+    lit = audit_primary_literature_individual_zeros()
+    nf = lit["individual_zero_claims"]["rho_n_excluded_from_named_number_field"]
+    assert "bounded height" in nf["northcott_height_qualification"]
+    assert lit["fixed_number_field_scope_distinction"]["height_qualification_required"] is True
+    review_text = (
+        REPO_ROOT / "docs" / "reviews" / "TC_ZERO_ARITHMETIC_INVARIANTS.md"
+    ).read_text(encoding="utf-8")
+    assert FIXED_NUMBER_FIELD_REQUIRES_BOUNDED_DEGREE_AND_BOUNDED_HEIGHT in review_text
+
+
+# TC-038R Test 28: SUBGATE-TC-038A is scoped to zero-sum constants
+def test_038r_28_subgate_tc_038a_scoped_to_zero_sum_constants() -> None:
+    artifact = json.loads(
+        (REPO_ROOT / "data" / "tc_zero_arithmetic_invariants.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    sub38 = artifact["exact_remaining_subgate"]
+    assert sub38["subgate_id"] == SUBGATE_TC_038A_ID
+    assert (
+        sub38["subgate_classification"] == ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE
+    )
+
+
+# TC-038R Test 29: OBL-CT-001A remains OPEN
+def test_038r_29_obl_ct_001a_remains_open() -> None:
+    artifact = json.loads(
+        (REPO_ROOT / "data" / "tc_zero_arithmetic_invariants.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert artifact["exact_remaining_subgate"]["obl_ct_001a_status"] == "OPEN"
+    reassessed = artifact["principal_classification_reassessed"]
+    assert reassessed["obl_ct_001a_status"] == "OBL_CT_001A_OPEN"
+    assert reassessed["subgate_tc_038a_status"] == "SUBGATE_TC_038A_OPEN"
+    assert reassessed["subgate_tc_039a_status"] == "SUBGATE_TC_039A_OPEN"
+
+
+# TC-038R Test 30: data/tc_zero_arithmetic_invariants.json contains all required TASK-TC-038R keys
+def test_038r_30_artifact_contains_all_tc_038r_repair_keys() -> None:
+    artifact = json.loads(
+        (REPO_ROOT / "data" / "tc_zero_arithmetic_invariants.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    for k in REQUIRED_TC_038R_REPAIR_KEYS:
+        assert k in artifact, f"Missing required TASK-TC-038R key: {k}"
+
+

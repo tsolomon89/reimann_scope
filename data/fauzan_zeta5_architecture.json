@@ -1,0 +1,232 @@
+{
+  "task_id": "TASK-TC-038R",
+  "title": "Fauzan (2026) and mo271/Zeta5 Irrationality Architecture & Zero-Location Transfer Audit",
+  "evidence_classification": {
+    "manuscript_claim": "ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM",
+    "formal_verification": "ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN",
+    "external_lean_status": "LEAN_PROVED_EXTERNAL_REPOSITORY",
+    "local_build_audit_status": "SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED",
+    "dependency_graph_status": "ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN",
+    "conventional_peer_review_status": "PEER_REVIEW_STATUS_PENDING",
+    "zero_location_transfer_status": "FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED"
+  },
+  "source_commit": "7fe736760f4b96bfdb4334b68e3b3124ecbe10b0",
+  "paper_reference": {
+    "author": "Aabir Fauzan",
+    "affiliation": "Aalto University",
+    "orcid": "0009-0001-1673-9710",
+    "title": "\\zeta(5) is irrational",
+    "date": "2026-09-17",
+    "zenodo_record_url": "https://zenodo.org/records/22826419",
+    "doi": "10.5281/zenodo.22826419",
+    "manuscript_file": "ZETA5_IS_IRRATIONAL.pdf",
+    "claimed_theorems": {
+      "theorem_1_1": "\\zeta(5) \\notin \\mathbb{Q}, with irrationality measure |\\zeta(5) - a/b| > b^{-260} for all sufficiently large positive integers b.",
+      "theorem_2_1": "For every integer n >= 1, there exists an integer polynomial Q_n(X) \\in \\mathbb{Z}[X] of degree 37n such that for all sufficiently large n, 0 < Q_n(\\zeta(5)) < \\exp(-139 n^2 / 5)."
+    },
+    "evidence_class": "PRIMARY_SOURCE_VERIFIED",
+    "conventional_peer_review_status": "PEER_REVIEW_STATUS_PENDING"
+  },
+  "lean_repository": {
+    "repository_url": "https://github.com/mo271/Zeta5",
+    "commit": "7fe736760f4b96bfdb4334b68e3b3124ecbe10b0",
+    "lean_version": "leanprover/lean4:v4.34.0-rc1",
+    "mathlib_commit": "f385f9fd18abed332ebcd3df239cb357e264aceb",
+    "dependency_commits": {
+      "mathlib": "f385f9fd18abed332ebcd3df239cb357e264aceb",
+      "PrimeNumberTheoremAnd": "04d81b2a68ea3548b9990813fdc463c78511f412",
+      "formal_conjectures_challenge": "2db01438fda960163f58ff2c2385b52e53f56dd2",
+      "comparator": "777e7f56119efc0fac34003db4efe831e0b53723",
+      "landrun": "811cfff51ceaf3d98433708aa6d22e9b84ccac8b4"
+    },
+    "ci_comparator_config": {
+      "challenge_module": "Challenge",
+      "solution_module": "Solution",
+      "theorem_names": ["RiemannZetaValues.irrational_five"],
+      "permitted_axioms": ["propext", "Classical.choice", "Quot.sound"],
+      "enable_nanoda": false
+    },
+    "source_file_count_apery": 251,
+    "sorry_admit_audit": {
+      "apery_directory_sorry_count": 0,
+      "apery_directory_admit_count": 0,
+      "apery_directory_axiom_count": 0,
+      "apery_directory_unsafe_count": 0,
+      "apery_directory_implemented_by_count": 0,
+      "solution_lean_sorry_count": 0,
+      "challenge_lean_benchmark_sorry_note": "Challenge.lean contains the unmodified benchmark statement copied verbatim from google-deepmind/formal-conjectures; Solution.lean discharges it via Apery.irrational_five.",
+      "prime_number_theorem_dependency_note": "Apery/PNT.lean imports PrimeNumberTheoremAnd.Consequences for Chebyshev.theta ~[atTop] id (chebyshev_asymptotic); the 2 sorrys in PrimeNumberTheoremAnd/Wiener.lean are outside the transitive dependency cone of Apery.irrational_five."
+    },
+    "print_axioms_result": ["propext", "Classical.choice", "Quot.sound"],
+    "audit_status": "SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED"
+  },
+  "target_theorem": {
+    "apery_main_theorem": "Apery.irrational_five : \\exists x, Irrational x \\wedge riemannZeta 5 = x",
+    "apery_real_series_theorem": "Apery.irrational_zeta5 : Irrational Apery.zeta5",
+    "formal_conjectures_solution": "RiemannZetaValues.irrational_five : \\exists x, Irrational x \\wedge riemannZeta 5 = x",
+    "bridge_lemma": "Apery.riemannZeta_five : riemannZeta 5 = (Apery.zeta5 : \\mathbb{C})"
+  },
+  "criterion_statement": {
+    "lean_identifier": "Apery.irrational_of_eventually_exists_int_poly",
+    "source_file": "Apery/Criterion.lean",
+    "mathematical_statement": "If \\xi \\in \\mathbb{R} and for all sufficiently large n there exists Q_n \\in \\mathbb{Z}[X] with \\deg Q_n \\le d_n and 0 < Q_n(\\xi) \\le \\varepsilon_n, where b^{d_n} \\varepsilon_n \\to 0 as n \\to \\infty for every integer b \\ge 1, then \\xi \\notin \\mathbb{Q}.",
+    "mechanism": "If \\xi = a/b with a \\in \\mathbb{Z}, b \\in \\mathbb{Z}_{\\ge 1}, then b^{d_n} Q_n(a/b) = \\sum_{k=0}^{d_n} c_k a^k b^{d_n-k} \\in \\mathbb{Z}_{\\ge 1}, contradicting b^{d_n} Q_n(\\xi) \\le b^{d_n} \\varepsilon_n < 1 for large n."
+  },
+  "polynomial_family": {
+    "parameters": {
+      "K": "40 * n",
+      "N": "3 * n",
+      "h": "K - N = 37 * n"
+    },
+    "node_polynomials": "D_m(t) = \\prod_{j=1}^m (t + j^2) \\in \\mathbb{Q}[t]",
+    "rational_hankel_determinant": "\\Delta_K(X) = \\det_{0 \\le i,j < h} \\mu_X(D_N(t)^6 t^{i+j} / D_K(t)) \\in \\mathbb{Q}[X]",
+    "rational_rescaled_polynomial": "F_K(X) = S_K \\Delta_K(X) \\in \\mathbb{Q}[X], where S_K = \\frac{(K!)^{2h} 4^{h-1}}{(N!)^{12h} \\prod_{i=1}^{h-1} ((2i)!)^2}",
+    "integer_polynomial": "Q_n(X) = m_N(n) F_K(X) \\in \\mathbb{Z}[X], where m_N(n) = \\prod_{p \\le 2h} p^{-L_p(n,p)} \\in \\mathbb{Q}_{>0}",
+    "variable_type": "VALUE_POLYNOMIAL_IN_X_EVALUATED_AT_ZETA5"
+  },
+  "degree_formula": {
+    "lean_identifiers": ["Apery.natDegree_\\Delta", "Apery.natDegree_F", "Apery.degree_F"],
+    "source_file": "Apery/Degree.lean",
+    "exact_degree": "\\deg \\Delta_K(X) = \\deg F_K(X) = \\deg Q_n(X) = h = 37n",
+    "proof_mechanism": "Each entry G_K(X)_{i,j} is affine (degree <= 1) in X because X enters only linearly in poleValue(j) = j^4(X - H_j^{(5)}) - 1/4 + 1/(2j) for N < j <= K (since D_N(-j^2) = 0 for 1 <= j <= N). The coefficient of X^h in \\det G_K(X) is \\det(V^T \\operatorname{diag}(w_k) V) = (\\det V)^2 \\prod_{k=0}^{h-1} w_k \\ne 0 at distinct nodes x_k = -(N+1+k)^2 with nonzero weights w_k = D_N(x_k)^6 (N+1+k)^4 / D_K'(x_k)."
+  },
+  "moment_functional": {
+    "lean_identifiers": ["Apery.\\mu mono", "Apery.\\mu poly", "Apery.poleValue", "Apery.\\mu X"],
+    "source_file": "Apery/Construction.lean",
+    "monomial_moments": "\\mu(t^e) = (-1)^e B_{2e+2} \\frac{(2e+3)(2e+4)(2e+5)}{24} \\in \\mathbb{Q} (encoding \\int_0^\\infty y^{2e} w(y) dy via Euler's formula for \\zeta(2e+2))",
+    "simple_pole_moments": "\\mu_X(1/(t + j^2)) = j^4 (X - H_j^{(5)}) - 1/4 + 1/(2j) \\in \\mathbb{Q}[X], where H_j^{(5)} = \\sum_{v=1}^j v^{-5}",
+    "extension_to_rational_functions": "By polynomial division and partial fractions over distinct roots t = -j^2 (1 <= j <= K) of D_K(t): P(t)/D_K(t) = (P /_m D_K)(t) + \\sum_{j=1}^K \\frac{P(-j^2)/D_K'(-j^2)}{t + j^2}, to which \\mu_X is applied Q-linearly."
+  },
+  "hankel_matrix": {
+    "lean_identifiers": ["Apery.G", "Apery.\\Delta"],
+    "source_file": "Apery/Construction.lean",
+    "dimension": "h x h with h = 37n",
+    "matrix_entries": "G_K(X)_{i,j} = \\mu_X(D_N(t)^6 t^{i+j} / D_K(t)) for 0 <= i,j < 37n",
+    "gram_specialization_at_zeta5": "At X = \\zeta(5), G_K(\\zeta(5))_{i,j} = \\int_0^\\infty (y^2)^{i+j} \\nu_n(y) dy where \\nu_n(y) = \\frac{D_N(y^2)^6}{D_K(y^2)} w(y) > 0 on (0, \\infty)."
+  },
+  "positivity_source": {
+    "lean_identifiers": ["Apery.pole_moment", "Apery.moment_rep", "Apery.\\Delta_pos"],
+    "source_files": ["Apery/Weight.lean", "Apery/Moments.lean", "Apery/HermiteFormula.lean", "Apery/Positivity.lean"],
+    "weight_function": "w(y) = \\frac{(2\\pi)^4 y^5}{12} \\sum_{\\ell \\ge 1} \\ell^4 e^{-2\\pi \\ell y} = \\frac{y^5}{12} \\frac{d^4}{dy^4}\\left(\\frac{1}{e^{2\\pi y}-1}\\right) > 0 for y > 0",
+    "hermite_identity_at_s_eq_5": "\\int_0^\\infty \\frac{w(y)}{y^2 + j^2} dy = j^4(\\zeta(5) - H_j^{(5)}) - \\frac{1}{4} + \\frac{1}{2j} for all integers j >= 1 (proved by 4 integrations by parts against Mittag-Leffler partial fractions of 1/(e^{2\\pi y}-1))",
+    "strict_gram_positivity": "Because \\nu_n(y) > 0 on (0,\\infty) and non-zero polynomials in y^2 vanish at only finitely many points, G_K(\\zeta(5)) is the Gram matrix of linearly independent functions in L^2((0,\\infty), \\nu_n(y)dy), so \\Delta_K(\\zeta(5)) = \\det G_K(\\zeta(5)) > 0 and Q_n(\\zeta(5)) > 0."
+  },
+  "integrality_normalization": {
+    "lean_identifiers": ["Apery.mN", "Apery.integral_mN", "Apery.normalization"],
+    "source_files": ["Apery/Norm.lean", "Apery/MainEstimate.lean"],
+    "normalizer_definition": "m_N(n) = \\prod_{p \\le 2h} p^{-L_p(n,p)} \\in \\mathbb{Q}_{>0}",
+    "primes_above_2h": "For every prime p > 2h = 74n, v_p^G(F_K) >= 0 directly (GV_F_big), so no denominator factors occur at primes p > 2h.",
+    "integrality_theorem": "For every n >= 1, m_N(n) F_K(X) lifts to an integer polynomial Q_n(X) \\in \\mathbb{Z}[X]."
+  },
+  "prime_valuation_strategy": {
+    "source_files": [
+      "Apery/Arith/SmallPrimeF.lean",
+      "Apery/Arith/InnerAlloc.lean",
+      "Apery/Arith/OuterEntryMain.lean",
+      "Apery/Norm.lean",
+      "Apery/Growth.lean"
+    ],
+    "three_prime_regimes": {
+      "small_primes": "400p <= K (p <= K/400): local Gauss valuation bound (3.12) L_small(n,p) = -(6h \\lfloor \\log_p(5K) \\rfloor + h v_p(24)) via change of basis to even integer-valued binomial polynomials q_i(-z^2) = \\binom{z+i}{2i} + \\binom{z+i-1}{2i}.",
+      "inner_primes": "K/400 < p <= K/3: unimodular residue-class polynomial basis mod p, p-adic valuation of Vandermonde/factorial factors v_p(S_K), and water-filling allocation w_cap across quadratic residue classes (`inner_bound_cap`).",
+      "outer_primes": "K/3 < p <= 2h: von Staudt-Clausen integrality of Bernoulli moments for 2e+2 < p-1, harmonic congruences for H_j^{(5)}, and Schur-complement low-rank reduction (`outer_bound`) with rank loss r = \\max(0, h - (p-3)/2)."
+    }
+  },
+  "analytic_real_bound": {
+    "lean_identifiers": ["Apery.\\Delta_eq_integral", "Apery.log_\\Delta_le", "Apery.log_S_le", "Apery.real_bound"],
+    "source_files": ["Apery/DetIntegral.lean", "Apery/EnergyBound.lean", "Apery/EnergyFinal.lean", "Apery/EnergyConst.lean", "Apery/RealBound.lean"],
+    "andreief_multiple_integral": "\\Delta_K(\\zeta(5)) = \\frac{1}{h!} \\int_{(0,\\infty)^h} (\\det_{0 \\le i,j < h}(y_j^{2i}))^2 \\prod_{j=0}^{h-1} \\nu_n(y_j) dy",
+    "potential_theory_upper_bound": "Bounds the Vandermonde logarithmic energy against a 16-component arcsine equilibrium measure \\rho (verified on 684 intervals in Lemma 6.1 plus non-positivity of zero-mass circle/arcsine energy in Lemma 6.2) together with Stirling's bound for \\log S_K.",
+    "asymptotic_inequality": "\\log F_K(\\zeta(5)) \\le U K^2 + 27 K \\log K + 200 K for all n >= 1, with U = -2733991 / 2000000 = -1.3669955."
+  },
+  "small_value_rate": {
+    "paper_rate": "0 < Q_n(\\zeta(5)) < \\exp(-c_{\\mathrm{paper}} n^2) with c_{\\mathrm{paper}} = 139/5 = 27.8 (from U \\approx -1.36700 and A_{200} \\approx 1.34960, margin U + A_{200} \\approx -0.01740 per K^2 = 1600 n^2)",
+    "lean_formalized_rate": "0 < Q_n(\\zeta(5)) < \\exp(-c_{\\mathrm{Lean}} n^2) eventually with c_{\\mathrm{Lean}} = -800(A_{\\mathrm{eff}} + U) = 800(1.3669955 - 1.36) = 5.5964 > 0 (since K^2 = 1600 n^2 and half the margin 1600 \\delta / 2 = 800 \\delta absorbs lower-order terms)"
+  },
+  "denominator_growth_rate": {
+    "lean_identifiers": ["Apery.growth_mN", "Apery.Aeff_margin"],
+    "source_files": ["Apery/Growth.lean", "Apery/Constants.lean"],
+    "asymptotic_bound": "\\log m_N(n) \\le (A_{\\mathrm{eff}} + \\varepsilon) K^2 eventually for every \\varepsilon > 0, using Chebyshev's Prime Number Theorem \\theta(x) \\sim x.",
+    "paper_constant": "A_{200} \\approx 1.34960",
+    "lean_constant": "1.348003... < A_{\\mathrm{eff}} = 34/25 = 1.36 < -U = 1.3669955 (strict negative net quadratic exponent A_{\\mathrm{eff}} + U = -0.0069955 < 0)"
+  },
+  "irrationality_contradiction": {
+    "lean_identifiers": ["Apery.main_estimate", "Apery.irrational_zeta5", "Apery.irrational_five"],
+    "source_files": ["Apery/MainEstimate.lean", "Apery/Main.lean"],
+    "contradiction_mechanism": "If \\zeta(5) = a/b with b \\in \\mathbb{Z}_{\\ge 1}, then b^{37n} Q_n(a/b) is a positive integer (>= 1), whereas b^{37n} Q_n(\\zeta(5)) < \\exp(37n \\log b - c n^2) \\to 0 as n \\to \\infty because the linear degree-growth term 37n \\log b is overwhelmed by the quadratic decay -c n^2."
+  },
+  "paper_vs_formalization_deviations": [
+    {
+      "id": "DEV-1",
+      "component": "Outer-range prime rank-loss bound (Proposition 4.3 / Apery/Arith/OuterEntryMain.lean)",
+      "paper_choice": "Uses rank loss \\min(r, z) in the outer prime range K/3 < p <= 2h.",
+      "lean_choice": "Replaces \\min(r, z) by the simpler upper bound r (proven via Schur complement on a basis pivot without needing full matrix rank theory over \\mathbb{Q}_p).",
+      "impact": "Increases the asymptotic normalization constant by exactly 9/640 = 0.0140625, leaving 1.348003... < A_eff = 1.36 < -U = 1.3669955, so the net exponent remains strictly negative."
+    },
+    {
+      "id": "DEV-2",
+      "component": "Small-prime vs. inner-range cutoff M (Apery/Norm.lean)",
+      "paper_choice": "Uses cutoff M = 200 in Proposition 5.2.",
+      "lean_choice": "Uses Mcut = 400 so the inner-range tail sum over 20 <= x <= 400 is negative (<= -0.053462), compensating for the 9/640 outer-range relaxation.",
+      "impact": "Preserves the strict quadratic decay margin A_eff + U < 0 while simplifying the outer-range algebra."
+    },
+    {
+      "id": "DEV-3",
+      "component": "Local partial-fraction decomposition (Apery/Arith/ClassPF.lean)",
+      "paper_choice": "Uses a Tate-algebra distribution formula (Section 3.3).",
+      "lean_choice": "Proves the class-wise partial-fraction expansion tauX_direct directly over \\mathbb{Q}[t] by algebraic induction.",
+      "impact": "Avoids formalizing p-adic Tate algebras while proving the exact same local valuation inequalities."
+    }
+  ],
+  "potential_zero_location_transfer_points": [
+    "Hankel determinant of a parameterized moment matrix G_K(X) with affine entry dependence on X, yielding exact degree control \\deg \\det G_K(X) = h via Vandermonde factorization of the X-coefficient matrix.",
+    "Gram-matrix realization at the target specialization together with Andreief's multiple-integral identity converting \\det G_K into an h-fold Vandermonde logarithmic energy integral.",
+    "Competition between O(n) polynomial degree growth and O(n^2) quadratic log-determinant decay from Vandermonde potential theory vs. O(n^2) prime-valuation normalization via PNT.",
+    "Local p-adic Gauss valuation lowering via integer-valued polynomial bases (binomial / residue-class bases) and Schur-complement low-rank reductions."
+  ],
+  "nontransferable_weight5_specific_parts": [
+    "Value-polynomial vs. argument-polynomial role reversal: Fauzan's indeterminate X is the VALUE \\zeta(5) at fixed integer argument s = 5, entering linearly in poleValue(j) = j^4(X - H_j^{(5)}) - 1/4 + 1/(2j); for a nontrivial zero \\rho = \\beta + i\\gamma, the value \\zeta(\\rho) = 0 is already rational/zero while the unknown target \\rho or \\gamma is the ARGUMENT inside n^{-\\rho} or (y^2 + \\rho^2)^{-1}.",
+    "Weight-5 Hermite identity: 4 integrations by parts of w(y) = ((2\\pi)^4 y^5 / 12) \\sum_{\\ell \\ge 1} \\ell^4 e^{-2\\pi \\ell y} against 1/(y^2 + j^2) rely specifically on integer weight s = 5 (order-4 derivative of 1/(e^{2\\pi y}-1)) to produce rational harmonic shifts H_j^{(5)} = \\sum_{v=1}^j v^{-5}.",
+    "Even-moment Bernoulli rationality: \\mu(t^e) = (-1)^e B_{2e+2}(2e+3)(2e+4)(2e+5)/24 uses Euler's formula for \\zeta(2e+2) and von Staudt-Clausen denominator bounds at integer even arguments.",
+    "Strict real Gram positivity on (0, \\infty): G_K(\\zeta(5)) is a real positive-definite Gram matrix because \\zeta(5) \\in \\mathbb{R} and \\nu_n(y) > 0; at a complex zero \\rho = \\beta + i\\gamma or inside an oscillatory spectral kernel, positivity is not automatic and \\zeta(\\rho) = 0 risks collapsing a naive moment functional identically."
+  ],
+  "task_tc_039_gate_map": {
+    "subgate_id": "SUBGATE-TC-039A",
+    "title": "Hankel Auxiliary-Polynomial Transfer to Zeta-Zero Argument",
+    "status": "OPEN",
+    "structural_distinction": "VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE",
+    "substitution_firewall": "DO_NOT_SUBSTITUTE_5_TO_RHO_SYMBOLICALLY",
+    "gates": [
+      {
+        "gate_id": "Z1",
+        "name": "Zero-location target representation",
+        "requirement": "Construct a zero-independent moment functional or Hankel matrix whose indeterminate X is the zero ordinate X = \\gamma_1 or complex zero location X = \\rho_1 (an argument-polynomial architecture, not a value-polynomial architecture)."
+      },
+      {
+        "gate_id": "Z2",
+        "name": "Algebraic polynomiality",
+        "requirement": "Prove that the resulting Hankel determinant \\Delta_n(X) belongs to \\mathbb{Q}[X] with controlled degree \\deg P_n \\le C n and becomes P_n(X) \\in \\mathbb{Z}[X] under explicit arithmetic normalization."
+      },
+      {
+        "gate_id": "Z3",
+        "name": "Nonvanishing at the zero",
+        "requirement": "Prove P_n(\\alpha) \\ne 0 for \\alpha \\in \\{\\gamma_1, \\rho_1\\}; the defining equation \\zeta(\\rho_1) = 0 must not force the auxiliary Hankel determinant to vanish identically."
+      },
+      {
+        "gate_id": "Z4",
+        "name": "Arithmetic denominator/height control",
+        "requirement": "Bound \\deg P_n \\le C n and coefficient height \\log H(P_n) \\le C' n^2 (or C' n) via explicit p-adic valuation bounds."
+      },
+      {
+        "gate_id": "Z5",
+        "name": "Analytic smallness",
+        "requirement": "Prove superexponential decay 0 < |P_n(\\alpha)| \\le \\exp(-c n^2) (via Andreief / Vandermonde logarithmic energy or contour saddle bounds) with c strictly exceeding the Liouville/Mahler denominator/height constant."
+      },
+      {
+        "gate_id": "Z6",
+        "name": "Irrationality/algebraicity contradiction",
+        "requirement": "Combine Gates Z1-Z5 with the rational clearing bound (for \\gamma_1 \\notin \\mathbb{Q}) or the Liouville-Mahler algebraic lower bound |P_n(\\alpha)| \\ge ((d_n + 1)^{1/2} H(P_n))^{-(D-1)} M(\\alpha)^{-d_n} (for \\alpha \\notin \\overline{\\mathbb{Q}}). Terminate at the earliest failed gate."
+      }
+    ]
+  }
+}

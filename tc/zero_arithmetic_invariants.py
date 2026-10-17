@@ -1,42 +1,42 @@
 """
-TASK-TC-038 — Arithmetic Nature of Nontrivial Zeros, Exact Zero-Sum Invariants,
-and Special-Value Transfer Audit.
+TASK-TC-038 / TASK-TC-038R — Arithmetic Nature of Nontrivial Zeros, Exact Zero-Sum
+Invariants, Fauzan (2026) zeta(5) Irrationality Audit, and Special-Value Transfer Audit.
 
-This module implements the complete mathematical, symbolic, literature, and
-certified finite-interval audit for TASK-TC-038:
+This module implements the complete mathematical, symbolic, literature, formal-provenance,
+and certified finite-interval audit for TASK-TC-038 and its repair sprint TASK-TC-038R:
 
 1. Candidate-object classifier (`gamma_n`, `rho_n = beta_n + i*gamma_n`, `gamma_n + 1/2`)
    and shifted-ordinate redundancy theorem (`SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE`).
 2. Full-zero versus ordinate algebraicity implication tree (unconditional conjugation
    closure vs. RH-conditional equivalence).
 3. Primary-source literature audit distinguishing `OPEN_IN_LITERATURE` from
-   `NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT`, and broader L-function / E-function comparison.
-4. Transcendence-theorem applicability matrix (Lindemann-Weierstrass, Gelfond-Schneider,
-   Baker, Siegel-Shidlovsky, Schneider-Lang, Nesterenko, Chudnovsky, Rohrlich-Lang, Hölder-Ostrowski).
-5. Functional-equation algebraicity test (`FUNCTIONAL_EQUATION_DOES_NOT_EXCLUDE_ALGEBRAIC_ZERO`),
-   Euler-product critical-strip firewall (`EULER_PRODUCT_NONVANISHING_NOT_AVAILABLE_IN_CRITICAL_STRIP`),
-   Gamma-function arithmetic firewall, and differential-transcendence firewall
-   (`DIFFERENTIAL_TRANSCENDENCE_DOES_NOT_DETERMINE_ZERO_ARITHMETIC`).
-6. Exact Hadamard factorization of `xi(s) = (1/2)s(s-1)pi^{-s/2}Gamma(s/2)zeta(s)`,
-   exact symbolic & 50-digit derivations of `S_1`, the reflection-invariant sum
-   `sum_rho 1/(rho(1-rho)) = 2*S_1 = 2*lambda_1`, `S_2`, the reciprocal-power hierarchy
-   `S_m` (`m = 1, 2, 3, 4`), centered zero invariants `Sigma_{2m} = sum_rho (rho - 1/2)^{-2m}`,
-   quartet polynomial `(X^2 - z^2)(X^2 - conj(z)^2)`, Li/Keiper coefficients `lambda_n`
-   (`LI_COEFFICIENT_POSITIVITY_IS_RH_EQUIVALENT`), Voros superzeta functions, and
-   the arithmetic status of exact zero-sum constants.
-7. Primary-source verification of the current status of `zeta(5)` (`ZETA5_CURRENT_STATUS_VERIFIED`),
-   special-value vs. zero-location methodology comparison, explicit transfer test
-   (`SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER`), and
-   auxiliary-polynomial requirements for `P_n(rho)` and `P_n(gamma)`.
-8. Certified 128-bit outward Arb/Acb finite algebraic-relation exclusion
-   (`CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION`), bounded-denominator rational exclusion
-   (`CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION`), diagnostic PSLQ firewall
-   (`NUMERICAL_EVIDENCE_ONLY`), and TC interaction audit
-   (`ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL`).
+   `NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT`, cardinality vs. transcendence repair
+   (`CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE`), and Northcott fixed-number-field
+   height qualification.
+4. Transcendence-theorem applicability matrix, functional-equation algebraicity test,
+   Euler-product critical-strip firewall, Gamma-function firewall, and differential-transcendence firewall.
+5. Exact Hadamard factorization of `xi(s)`, disambiguated Stieltjes constant notation
+   (`gamma_0^St = gamma_E, gamma_1^St, gamma_2^St, gamma_3^St`, `STIELTJES_NOTATION_DISAMBIGUATED`),
+   repaired canonical `S_2` formula (`S2_CANONICAL_FORMULA_REPAIRED`), and 3-route independent
+   re-audit of `S_3` and `S_4` (`S3_S4_REAUDITED`).
+6. Primary-source audit of Aabir Fauzan's 17 September 2026 preprint ("zeta(5) is irrational",
+   Zenodo 22826419) and the public Lean 4 formalization `mo271/Zeta5` (`Apery.irrational_five`),
+   with multi-dimensional evidence taxonomy (`ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM`,
+   `ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN`, `ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN`,
+   `PEER_REVIEW_STATUS_PENDING`, `SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED`), 6-gate
+   Fauzan architecture reconstruction, value-polynomial vs. argument-polynomial distinction,
+   Liouville-Mahler algebraic lower bound derivation, and `SUBGATE-TC-039A` (`Z1`-`Z6`).
+7. Scope-repaired 128-bit outward Arb/Acb finite degree/height exclusion
+   (`CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION`, `FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED`
+   for `HIERARCHICAL_BOX_EXCLUSION` on `D <= 4, H <= 100` vs. certified minimum for
+   `EXPLICIT_POLYNOMIAL_ENUMERATION` on `D <= 4, H <= 3`).
+8. Formal provenance inventory repair (`FORMAL_SOURCE_INVENTORY_REPAIRED`,
+   `ZERO_ARITHMETIC_MODULE_INCLUDED_IN_BUILD_PROVENANCE`).
 """
 
 from __future__ import annotations
 
+import hashlib
 import itertools
 import json
 import math
@@ -50,27 +50,41 @@ import sympy as sp
 from tc.core import FLINT_AVAILABLE, acb, arb, ctx
 
 # ---------------------------------------------------------------------------
-# Constants, Provenance, and Classification Tokens (`TASK-TC-038`)
+# Constants, Provenance, and Classification Tokens (`TASK-TC-038` / `TASK-TC-038R`)
 # ---------------------------------------------------------------------------
 
 TAU: float = 2.0 * math.pi
 LOG_TAU: float = math.log(TAU)
 
 TASK_TC_038_ID = "TASK-TC-038"
+TASK_TC_038R_ID = "TASK-TC-038R"
 TASK_TC_038_BRANCH = "ZERO_ARITHMETIC_BRANCH"
 TASK_TC_038_STATUS = "TASK_TC_038_ZERO_ARITHMETIC_FRONTIER_AUDIT_COMPLETE"
+TASK_TC_038R_STATUS = "TASK_TC_038R_ZERO_ARITHMETIC_EVIDENCE_REPAIR_COMPLETE"
 
-STARTING_HEAD = "63770418ca4b4498b0c9300a854e45d52434f52b"
+STARTING_HEAD = "92d14a77b93e974658c2b5596a69a1f63a64727f"
+TC038_STARTING_HEAD = "63770418ca4b4498b0c9300a854e45d52434f52b"
 SUBSTANTIVE_PARENT_HEAD = "70c757ce6cead947fc806b2dadd78f2de0363fc6"
+TASK_TC_038R_STARTING_HEAD = "92d14a77b93e974658c2b5596a69a1f63a64727f"
+TASK_TC_038_SUBSTANTIVE_COMMIT = "4576c23c38af0224a0f8ddd59fdd922aebab1a0e"
+SUBSTANTIVE_TC038_COMMIT = TASK_TC_038_SUBSTANTIVE_COMMIT
 
 # Section 6: Shifted-ordinate classification
 SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE = (
     "SHIFTED_ORDINATE_ARITHMETICALLY_EQUIVALENT_TO_ORDINATE"
 )
 
-# Section 8: Literature status tokens
+# Section 8 & Section 40: Literature and evidence classification tokens
 PROVED = "PROVED"
+PROVED_PAPER_DERIVATION = "PROVED_PAPER_DERIVATION"
 PROVED_WITH_EXTERNAL_THEOREM = "PROVED_WITH_EXTERNAL_THEOREM"
+LEAN_PROVED_EXTERNAL_REPOSITORY = "LEAN_PROVED_EXTERNAL_REPOSITORY"
+SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED = (
+    "SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED"
+)
+CERTIFIED_FINITE_EXCLUSION = "CERTIFIED_FINITE_EXCLUSION"
+AUDIT_FINDING = "AUDIT_FINDING"
+OPEN = "OPEN"
 OPEN_IN_LITERATURE = "OPEN_IN_LITERATURE"
 NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT = (
     "NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT"
@@ -83,7 +97,79 @@ PRIMARY_SOURCE_VERIFIED = "PRIMARY_SOURCE_VERIFIED"
 SECONDARY_SOURCE_ONLY = "SECONDARY_SOURCE_ONLY"
 NO_PRIMARY_SOURCE_FOUND = "NO_PRIMARY_SOURCE_FOUND"
 
-# Section 11, 12, 20, 23, 25, 29, 30, 32, 33, 37: Specific audit classifications
+# TASK-TC-038R: 2026 zeta(5) & Fauzan Hankel taxonomy tokens (Sections 4–9, 43)
+ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM = "ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM"
+ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM_VERIFIED = (
+    "ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM_VERIFIED"
+)
+ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN = "ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN"
+ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN = (
+    "ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN"
+)
+ZETA5_CONVENTIONAL_PEER_REVIEW_STATUS_RECORDED = (
+    "ZETA5_CONVENTIONAL_PEER_REVIEW_STATUS_RECORDED"
+)
+PEER_REVIEW_STATUS_PENDING = "PEER_REVIEW_STATUS_PENDING"
+
+FAUZAN_HANKEL_ARCHITECTURE_AUDITED = "FAUZAN_HANKEL_ARCHITECTURE_AUDITED"
+SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT = (
+    "SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT"
+)
+SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED = (
+    "SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED"
+)
+FAUZAN_HANKEL_METHOD_HAS_NO_ZERO_LOCATION_TRANSFER = (
+    "FAUZAN_HANKEL_METHOD_HAS_NO_ZERO_LOCATION_TRANSFER"
+)
+FAUZAN_HANKEL_METHOD_HAS_PARTIAL_ZERO_LOCATION_TRANSFER = (
+    "FAUZAN_HANKEL_METHOD_HAS_PARTIAL_ZERO_LOCATION_TRANSFER"
+)
+FAUZAN_HANKEL_METHOD_EXPOSES_NEW_AUXILIARY_POLYNOMIAL_ROUTE = (
+    "FAUZAN_HANKEL_METHOD_EXPOSES_NEW_AUXILIARY_POLYNOMIAL_ROUTE"
+)
+FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED = (
+    "FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED"
+)
+VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE = (
+    "VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE"
+)
+
+# TASK-TC-038R: Formal provenance, Stieltjes/S2/S3/S4, finite-box, and cardinality tokens
+FORMAL_SOURCE_INVENTORY_REPAIRED = "FORMAL_SOURCE_INVENTORY_REPAIRED"
+FORMAL_SOURCE_INVENTORY_SYNCHRONIZED = "FORMAL_SOURCE_INVENTORY_SYNCHRONIZED"
+ZERO_ARITHMETIC_MODULE_INCLUDED_IN_BUILD_PROVENANCE = (
+    "ZERO_ARITHMETIC_MODULE_INCLUDED_IN_BUILD_PROVENANCE"
+)
+STIELTJES_NOTATION_DISAMBIGUATED = "STIELTJES_NOTATION_DISAMBIGUATED"
+S2_CANONICAL_FORMULA_REPAIRED = "S2_CANONICAL_FORMULA_REPAIRED"
+S3_S4_REAUDITED = "S3_S4_REAUDITED"
+CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION = (
+    "CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION"
+)
+CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION_ESTABLISHED = (
+    "CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION_ESTABLISHED"
+)
+FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED = "FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED"
+EXPLICIT_POLYNOMIAL_ENUMERATION = "EXPLICIT_POLYNOMIAL_ENUMERATION"
+HIERARCHICAL_BOX_EXCLUSION = "HIERARCHICAL_BOX_EXCLUSION"
+CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE = (
+    "CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE"
+)
+NO_INDIVIDUAL_ORDINATE_IRRATIONALITY_OR_TRANSCENDENCE_THEOREM_FOUND = (
+    "NO_INDIVIDUAL_ORDINATE_IRRATIONALITY_OR_TRANSCENDENCE_THEOREM_FOUND"
+)
+FIXED_NUMBER_FIELD_REQUIRES_BOUNDED_DEGREE_AND_BOUNDED_HEIGHT = (
+    "FIXED_NUMBER_FIELD_REQUIRES_BOUNDED_DEGREE_AND_BOUNDED_HEIGHT"
+)
+ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE = "ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE"
+FAUZAN_HANKEL_TO_ZERO_ARGUMENT_TRANSFER_SUBGATE = (
+    "FAUZAN_HANKEL_TO_ZERO_ARGUMENT_TRANSFER_SUBGATE"
+)
+SUBGATE_TC_038A_OPEN = "SUBGATE_TC_038A_OPEN"
+SUBGATE_TC_039A_OPEN = "SUBGATE_TC_039A_OPEN"
+OBL_CT_001A_OPEN = "OBL_CT_001A_OPEN"
+
+# Specific audit classifications
 FUNCTIONAL_EQUATION_DOES_NOT_EXCLUDE_ALGEBRAIC_ZERO = (
     "FUNCTIONAL_EQUATION_DOES_NOT_EXCLUDE_ALGEBRAIC_ZERO"
 )
@@ -94,6 +180,7 @@ LI_COEFFICIENT_POSITIVITY_IS_RH_EQUIVALENT = (
     "LI_COEFFICIENT_POSITIVITY_IS_RH_EQUIVALENT"
 )
 ZETA5_CURRENT_STATUS_VERIFIED = "ZETA5_CURRENT_STATUS_VERIFIED"
+# Retained only as deprecated historical constant for classical hypergeometric/Beukers methods:
 SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER = (
     "SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER"
 )
@@ -114,7 +201,7 @@ ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL = (
     "ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL"
 )
 
-# Section 38: Early decision tree outcomes
+# Principal & secondary outcomes
 INDIVIDUAL_NONTRIVIAL_ZERO_ARITHMETIC_THEOREM_PROVED = (
     "INDIVIDUAL_NONTRIVIAL_ZERO_ARITHMETIC_THEOREM_PROVED"
 )
@@ -129,14 +216,13 @@ PERMITTED_PRINCIPAL_OUTCOMES: Tuple[str, ...] = (
     NEW_ZERO_SUM_ARITHMETIC_THEOREM_PROVED,
     ONE_PRECISE_ZERO_ARITHMETIC_SUBGATE_OPEN,
     ZERO_ARITHMETIC_FRONTIER_CLASSIFIED_INDIVIDUAL_STATUS_OPEN,
-    SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER,
+    FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED,
 )
 
 PRINCIPAL_CLASSIFICATION = ZERO_ARITHMETIC_FRONTIER_CLASSIFIED_INDIVIDUAL_STATUS_OPEN
-SECONDARY_TRANSFER_CLASSIFICATION = (
-    SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER
-)
+SECONDARY_TRANSFER_CLASSIFICATION = FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED
 SUBGATE_TC_038A_ID = "SUBGATE-TC-038A"
+SUBGATE_TC_039A_ID = "SUBGATE-TC-039A"
 
 REQUIRED_LEAN_THEOREMS: Tuple[str, ...] = (
     "shifted_ordinate_rational_iff",
@@ -148,6 +234,62 @@ REQUIRED_LEAN_THEOREMS: Tuple[str, ...] = (
     "centered_quartet_coefficients_real",
     "li_first_coefficient_finite_algebra_identity",
     "reciprocal_power_log_derivative_sign_identity",
+    "stieltjes_notation_no_effect_algebra",
+    "s2_equivalent_closed_forms",
+)
+
+REQUIRED_FAUZAN_ARCHITECTURE_KEYS: Tuple[str, ...] = (
+    "source_commit",
+    "paper_reference",
+    "lean_repository",
+    "target_theorem",
+    "criterion_statement",
+    "polynomial_family",
+    "degree_formula",
+    "moment_functional",
+    "hankel_matrix",
+    "positivity_source",
+    "integrality_normalization",
+    "prime_valuation_strategy",
+    "analytic_real_bound",
+    "small_value_rate",
+    "denominator_growth_rate",
+    "irrationality_contradiction",
+    "paper_vs_formalization_deviations",
+    "potential_zero_location_transfer_points",
+    "nontransferable_weight5_specific_parts",
+    "task_tc_039_gate_map",
+)
+
+REQUIRED_TC_038R_REPAIR_KEYS: Tuple[str, ...] = (
+    "task_tc_038r_status",
+    "zeta5_2026_preprint_status",
+    "zeta5_lean_formalization_status",
+    "zeta5_lean_repository",
+    "zeta5_formal_theorem",
+    "zeta5_axiom_dependency_status",
+    "zeta5_peer_review_status",
+    "fauzan_proof_architecture",
+    "fauzan_degree_growth",
+    "fauzan_height_denominator_growth",
+    "fauzan_small_value_rate",
+    "fauzan_positivity_gate",
+    "fauzan_integrality_gate",
+    "special_value_transfer_classification_repaired",
+    "formal_source_inventory_repaired",
+    "zero_arithmetic_module_hashed",
+    "formal_theorem_count_recomputed",
+    "stieltjes_notation_policy",
+    "S2_correct_formula",
+    "S3_reaudit",
+    "S4_reaudit",
+    "finite_box_exclusion_status",
+    "finite_box_global_minimum_status",
+    "explicit_small_box_minimum_status",
+    "cardinality_transcendence_claim_status",
+    "zero_sum_constant_arithmetic_subgate",
+    "subgate_tc_039a",
+    "principal_classification_reassessed",
 )
 
 REQUIRED_ARTIFACT_KEYS: Tuple[str, ...] = (
@@ -186,7 +328,7 @@ REQUIRED_ARTIFACT_KEYS: Tuple[str, ...] = (
     "principal_classification",
     "exact_remaining_subgate",
     "lean_theorem_map",
-)
+) + REQUIRED_TC_038R_REPAIR_KEYS
 
 # High-precision enclosure of gamma_1 (Odlyzko / mpmath zetazero(1) verified to 60 digits)
 GAMMA1_60DPS_STR = (
@@ -426,10 +568,32 @@ def audit_primary_literature_individual_zeros() -> Dict[str, Any]:
                 "statement": "No nontrivial zero rho_n lies in a fixed algebraic number field K (e.g., Q(i)).",
                 "status": NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
                 "source_status": NO_PRIMARY_SOURCE_FOUND,
+                "northcott_height_qualification": (
+                    "Northcott's theorem guarantees finiteness only for algebraic numbers of BOTH bounded "
+                    "degree [Q(alpha):Q] <= D AND bounded height H(alpha) <= H_0. A fixed number field K "
+                    "(or Q_bar) without an explicit height bound contains infinitely many elements of "
+                    "unbounded height, so neither Northcott finiteness nor cardinality excludes infinitely "
+                    "many zero ordinates from lying in K or Q_bar."
+                ),
                 "distinction_note": (
-                    "While finite bounded-height searches exclude small algebraic numbers for a fixed zero gamma_1, "
-                    "no unconditional theorem in the primary literature proves zeta(alpha) != 0 for all "
-                    "alpha in Q(i) cap {0 < Re(s) < 1}."
+                    "While finite bounded-degree AND bounded-height searches exclude small algebraic numbers "
+                    "for a fixed zero gamma_1, no unconditional theorem in the primary literature proves "
+                    "zeta(alpha) != 0 for all alpha in K cap {0 < Re(s) < 1}."
+                ),
+            },
+            "cardinality_transcendence_fallacy_repaired": {
+                "statement": (
+                    "Does the existence of infinitely many distinct nontrivial zero ordinates {gamma_n : n >= 1} "
+                    "imply that some gamma_n is transcendental by cardinality?"
+                ),
+                "status": CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE,
+                "literature_row_status": NO_INDIVIDUAL_ORDINATE_IRRATIONALITY_OR_TRANSCENDENCE_THEOREM_FOUND,
+                "source_status": PRIMARY_SOURCE_VERIFIED,
+                "explanation": (
+                    "FALSE: Both the set of nontrivial zero ordinates {gamma_n : n >= 1} (of the non-identically-zero "
+                    "entire function Xi(t)) and the field of algebraic numbers Q_bar (or any fixed number field K) "
+                    "are countably infinite (cardinality aleph_0). Cardinality alone provides zero irrationality "
+                    "or transcendence information for zeta zeros."
                 ),
             },
             "gamma_n_linear_or_algebraic_independence": {
@@ -438,6 +602,13 @@ def audit_primary_literature_individual_zeros() -> Dict[str, Any]:
                 "named_conjecture": "Linear Independence Conjecture (LI, Wintner 1935; Ingham 1942; Rubinstein-Sarnak 1994)",
                 "source_status": PRIMARY_SOURCE_VERIFIED,
             },
+        },
+        "fixed_number_field_scope_distinction": {
+            "fixed_number_field_K": "Countably infinite field extension K / Q of fixed finite degree [K:Q] = d, but UNBOUNDED height.",
+            "bounded_degree_and_bounded_height": "Finite set by Northcott's theorem ({alpha in Q_bar : deg(alpha) <= D and H(alpha) <= H_0} is finite).",
+            "bounded_degree_unbounded_height": "Countably infinite set; Northcott finiteness does NOT apply without a height bound.",
+            "total_algebraic_numbers_Q_bar": "Countably infinite field (union of all finite-degree extensions, unbounded degree and height).",
+            "height_qualification_required": True,
         },
         "broader_L_function_comparison": {
             "dirichlet_L_functions": {
@@ -484,6 +655,22 @@ def audit_primary_literature_individual_zeros() -> Dict[str, Any]:
             },
         },
         "arxiv_primary_sources_used": [
+            {
+                "id": "zenodo:22826419",
+                "title": "zeta(5) is irrational",
+                "authors": ["Aabir Fauzan"],
+                "url": "https://zenodo.org/records/22826419",
+                "pdf_url": "https://zenodo.org/records/22826419/files/ZETA5_IS_IRRATIONAL.pdf",
+                "verification": PRIMARY_SOURCE_VERIFIED,
+            },
+            {
+                "id": "github:mo271/Zeta5@7fe73676",
+                "title": "Zeta5: Lean 4 formalization of Apery.irrational_five (riemannZeta 5 irrational)",
+                "authors": ["Aabir Fauzan", "Moritz Firsching (mo271) / contributors"],
+                "url": "https://github.com/mo271/Zeta5",
+                "pdf_url": "https://github.com/mo271/Zeta5/tree/7fe736760f4b96bfdb4334b68e3b3124ecbe10b0",
+                "verification": PRIMARY_SOURCE_VERIFIED,
+            },
             {
                 "id": "math/0104051v4",
                 "title": "Zeta functions for Riemann zeros",
@@ -823,8 +1010,9 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
       - Hadamard factorization of `xi(s) = (1/2)s(s-1)pi^{-s/2}Gamma(s/2)zeta(s)` (Section 13)
       - First reciprocal sum `S_1 = sum_rho^{sym} 1/rho = 1 + gamma_E/2 - log(2*sqrt(pi))` (Section 14)
       - Reflection-invariant sum `sum_rho 1/(rho(1-rho)) = 2*S_1 = 2 + gamma_E - log(4*pi) = 2*lambda_1` (Section 15)
-      - Second reciprocal sum `S_2 = sum_rho 1/rho^2` in both `s = 0` (`zeta''(0)`) and `s = 1` (`gamma_1`) forms (Section 16)
-      - General reciprocal-power hierarchy `S_m` for `m = 1, 2, 3, 4` (Section 17)
+      - Second reciprocal sum `S_2 = sum_rho 1/rho^2` in both `s = 0` (`zeta''(0)`) and `s = 1` (`gamma_1^St`) forms
+        with disambiguated Stieltjes notation `gamma_0^St = gamma_E, gamma_1^St, gamma_2^St, gamma_3^St` (Sections 15–16)
+      - 3-route independent re-audit of `S_3` and `S_4` and general `S_m` normalization (Sections 17–18)
       - Centered zero invariants `Sigma_{2m} = sum_rho (rho - 1/2)^{-2m}` (Section 18)
       - Quartet polynomial `(X^2 - z^2)(X^2 - conj(z)^2)` (Section 19)
       - Li/Keiper coefficients `lambda_1, lambda_2, lambda_3, lambda_4` (Section 20)
@@ -837,15 +1025,12 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
     log_2 = sp.Symbol("log_2")
     pi_sym = sp.Symbol("pi")
     zeta2_0 = sp.Symbol("zeta_pp_0")  # zeta''(0)
-    gamma_1 = sp.Symbol("gamma_1")  # first Stieltjes constant
+    zeta_3_sym = sp.Symbol("zeta_3")  # zeta(3)
+    gamma_1_st = sp.Symbol("gamma_1_St")  # first Stieltjes constant gamma_1^St
+    gamma_2_st = sp.Symbol("gamma_2_St")  # second Stieltjes constant gamma_2^St
+    gamma_3_st = sp.Symbol("gamma_3_St")  # third Stieltjes constant gamma_3^St
 
     # Regularized factors of xi(s) = (1 - s) * pi^{-s/2} * Gamma(1 + s/2) * (-zeta(s)) near s = 0:
-    # log(1 - s) = -s - s^2/2 + O(s^3)
-    # log(pi^{-s/2}) = -(s/2)*log(pi)
-    # log Gamma(1 + s/2) = -gamma_E*(s/2) + (pi^2/6)*(s/2)^2 / 2 + O(s^3) = -(gamma_E/2)*s + (pi^2/48)*s^2 + O(s^3)
-    # Since zeta(0) = -1/2, zeta'(0) = -(1/2)*log(2*pi) = -(1/2)*(log_2 + log_pi):
-    # -zeta(s) = (1/2) * (1 + (log_2 + log_pi)*s - 2*zeta''(0)*s^2/2 + O(s^3))
-    # log(-zeta(s)) = -log(2) + (log_2 + log_pi)*s + (-zeta''(0) - (log_2 + log_pi)^2 / 2)*s^2 + O(s^3)
     log_xi_series_s0 = (
         (-s - s**2 / 2)
         + (-s * log_pi / 2)
@@ -866,31 +1051,78 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
     s1_symbolic_match = bool(sp.simplify(S1_sym_s0 - expected_S1_sym) == 0)
     s2_s0_symbolic_match = bool(sp.simplify(S2_sym_s0 - expected_S2_sym_s0) == 0)
 
-    # Symbolic derivation of S_2 at s = 1 via xi(1 - w) = xi(w) where w = 1 - s (at w = 0, i.e., s = 1):
-    # xi(s) = (1/2) * s * pi^{-s/2} * Gamma(s/2) * ((s - 1)*zeta(s))
-    # Let u = s - 1:
-    # log(1 + u) = u - u^2/2 + O(u^3)
-    # log(pi^{-(1+u)/2}) = const - (u/2)*log_pi
-    # log Gamma((1+u)/2) = log Gamma(1/2) + (1/2)*psi(1/2)*u + (1/8)*psi_1(1/2)*u^2/2 + O(u^3)
-    #   with psi(1/2) = -gamma_E - 2*log_2 and psi_1(1/2) = pi^2 / 2
-    # (s - 1)*zeta(s) = 1 + gamma_E*u - gamma_1*u^2 + O(u^3)
-    #   => log((s - 1)*zeta(s)) = gamma_E*u + (-gamma_1 - gamma_E^2/2)*u^2 + O(u^3)
+    # Route 1 (Symbolic Laurent expansion of log xi(1 + u) up to O(u^5) for m = 1, 2, 3, 4):
+    # xi(1 + u) = (1/2) * (1 + u) * pi^{-(1+u)/2} * Gamma((1+u)/2) * (u * zeta(1 + u))
+    # 1) log(1 + u) = u - u^2/2 + u^3/3 - u^4/4 + O(u^5)
+    # 2) log(pi^{-(1+u)/2}) = const - (log_pi/2) * u
+    # 3) log Gamma((1+u)/2) = const + (1/2)*psi(1/2)*u + (1/8)*psi_1(1/2)*u^2/2
+    #                         + (1/8)*psi_2(1/2)*u^3/6 + (1/16)*psi_3(1/2)*u^4/24 + O(u^5)
+    #    where psi(1/2) = -gamma_E - 2*log_2, psi_1(1/2) = pi^2/2, psi_2(1/2) = -14*zeta(3), psi_3(1/2) = pi^4.
+    # 4) u * zeta(1 + u) = 1 + gamma_E*u - gamma_1^St*u^2 + (gamma_2^St/2)*u^3 - (gamma_3^St/6)*u^4 + O(u^5).
+    #    Let w_zeta = gamma_E*u - gamma_1^St*u^2 + (gamma_2^St/2)*u^3 - (gamma_3^St/6)*u^4,
+    #    and expand log(1 + w_zeta) = w_zeta - w_zeta^2/2 + w_zeta^3/3 - w_zeta^4/4 mod u^5.
     u = sp.Symbol("u")
-    log_xi_series_s1 = (
-        (u - u**2 / 2)
-        + (-u * log_pi / 2)
-        + ((-gamma_E / 2 - log_2) * u + (pi_sym**2 / 16) * u**2)
-        + (gamma_E * u + (-gamma_1 - gamma_E**2 / 2) * u**2)
+    w_zeta = (
+        gamma_E * u
+        - gamma_1_st * u**2
+        + (gamma_2_st / sp.Integer(2)) * u**3
+        - (gamma_3_st / sp.Integer(6)) * u**4
     )
-    d1_log_xi_1 = sp.expand(sp.diff(log_xi_series_s1, u).subs(u, 0))
-    d2_log_xi_1 = sp.expand(sp.diff(log_xi_series_s1, u, 2).subs(u, 0))
-    # Note: xi(1 + u) = xi(-u) => (d/du)|_{0} log xi(1+u) = -(d/ds)|_{0} log xi(s) = S_1,
-    # and (d^2/du^2)|_{0} log xi(1+u) = (d^2/ds^2)|_{0} log xi(s) = -S_2.
-    S1_sym_s1 = sp.expand(d1_log_xi_1)
-    S2_sym_s1 = sp.expand(-d2_log_xi_1)
-    expected_S2_sym_s1 = 1 + gamma_E**2 - pi_sym**2 / 8 + 2 * gamma_1
-    s1_s1_symbolic_match = bool(sp.simplify(S1_sym_s1 - expected_S1_sym) == 0)
-    s2_s1_symbolic_match = bool(sp.simplify(S2_sym_s1 - expected_S2_sym_s1) == 0)
+    log_uzeta_s1 = sp.series(
+        w_zeta - w_zeta**2 / 2 + w_zeta**3 / 3 - w_zeta**4 / 4, u, 0, 5
+    ).removeO()
+    log_xi_series_s1 = sp.expand(
+        (u - u**2 / 2 + u**3 / 3 - u**4 / 4)
+        + (-u * log_pi / 2)
+        + (
+            (-gamma_E / 2 - log_2) * u
+            + (pi_sym**2 / 16) * u**2
+            - (sp.Rational(7, 24) * zeta_3_sym) * u**3
+            + (pi_sym**4 / 384) * u**4
+        )
+        + log_uzeta_s1
+    )
+    # Since xi(1 + u) = xi(-u), (d^m/ds^m)|_{s=0} log xi(s) = (-1)^m (d^m/du^m)|_{u=0} log xi(1+u),
+    # and S_m = -(1/(m-1)!) (d^m/ds^m)|_{s=0} log xi(s) = ((-1)^{m+1}/(m-1)!) (d^m/du^m)|_{u=0} log xi(1+u).
+    S_sym_s1: Dict[int, Any] = {}
+    for m in (1, 2, 3, 4):
+        dm_u0 = sp.diff(log_xi_series_s1, u, m).subs(u, 0)
+        S_sym_s1[m] = sp.expand(((-1) ** (m + 1)) * dm_u0 / sp.factorial(m - 1))
+
+    expected_S2_sym_s1 = 1 + gamma_E**2 - pi_sym**2 / 8 + 2 * gamma_1_st
+    expected_S3_sym_s1 = (
+        1
+        - sp.Rational(7, 8) * zeta_3_sym
+        + gamma_E**3
+        + 3 * gamma_E * gamma_1_st
+        + sp.Rational(3, 2) * gamma_2_st
+    )
+    expected_S4_sym_s1 = (
+        1
+        - pi_sym**4 / 96
+        + gamma_E**4
+        + 4 * gamma_E**2 * gamma_1_st
+        + 2 * gamma_1_st**2
+        + 2 * gamma_E * gamma_2_st
+        + sp.Rational(2, 3) * gamma_3_st
+    )
+    s1_s1_symbolic_match = bool(sp.simplify(S_sym_s1[1] - expected_S1_sym) == 0)
+    s2_s1_symbolic_match = bool(sp.simplify(S_sym_s1[2] - expected_S2_sym_s1) == 0)
+    s3_s1_symbolic_match = bool(sp.simplify(S_sym_s1[3] - expected_S3_sym_s1) == 0)
+    s4_s1_symbolic_match = bool(sp.simplify(S_sym_s1[4] - expected_S4_sym_s1) == 0)
+
+    # Check the difference between true S_2 and erroneous historical expression:
+    erroneous_S2_sym = (
+        1 - pi_sym**2 / 8 + gamma_E + gamma_E**2 / 4 - gamma_1_st
+    )
+    s2_erroneous_diff_sym = sp.expand(expected_S2_sym_s1 - erroneous_S2_sym)
+    s2_erroneous_diff_verified = bool(
+        sp.simplify(
+            s2_erroneous_diff_sym
+            - (sp.Rational(3, 4) * gamma_E**2 - gamma_E + 3 * gamma_1_st)
+        )
+        == 0
+    )
 
     # 2. High-precision (50 dps) verification of S_1..S_4, centered sums, and Li coefficients
     old_dps = mpmath.mp.dps
@@ -908,13 +1140,22 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                 + mpmath.log(-mpmath.zeta(x))
             )
 
+        def log_xi_at_1_u(u_val: Any) -> Any:
+            # Valid near u = 0 (s = 1 + u): xi(1+u) = xi(-u)
+            return log_xi_at_0(-u_val)
+
         def log_Xi_centered(z: Any) -> Any:
             return log_xi_at_0(mp_half + z)
 
         S_mp: Dict[int, Any] = {}
+        S_mp_from_s1: Dict[int, Any] = {}
         for m in (1, 2, 3, 4):
-            deriv_m = mpmath.diff(log_xi_at_0, mpmath.mpf(0), m)
-            S_mp[m] = -deriv_m / mpmath.factorial(m - 1)
+            deriv_m_0 = mpmath.diff(log_xi_at_0, mpmath.mpf(0), m)
+            S_mp[m] = -deriv_m_0 / mpmath.factorial(m - 1)
+            deriv_m_1 = mpmath.diff(log_xi_at_1_u, mpmath.mpf(0), m)
+            S_mp_from_s1[m] = (
+                ((-1) ** (m + 1)) * deriv_m_1 / mpmath.factorial(m - 1)
+            )
 
         S1_closed = (
             mp_one
@@ -934,11 +1175,13 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
             - (mpmath.pi**2) / 8
             + 2 * mpmath.stieltjes(1)
         )
-        # S_3 at s = 1: -(1/2) (d^3/ds^3)|_{s=1} log xi(s)
-        # d^3/du^3 log(1+u)|_0 = 2
-        # d^3/du^3 log Gamma((1+u)/2)|_0 = (1/8) psi_2(1/2) = -(7/4) zeta(3)
-        # d^3/du^3 log(1 + gamma_E u - gamma_1 u^2 + (gamma_2/2) u^3)|_0 = 2 gamma_E^3 + 6 gamma_E gamma_1 + 3 gamma_2
-        # Since d^3/ds^3|_0 log xi(s) = -d^3/du^3|_0 log xi(1+u), S_3 = -(1/2) d^3/ds^3|_0 = +(1/2) d^3/du^3|_0:
+        S2_erroneous_val = (
+            mp_one
+            - (mpmath.pi**2) / 8
+            + mpmath.euler
+            + (mpmath.euler**2) / 4
+            - mpmath.stieltjes(1)
+        )
         S3_closed_s1 = (
             mp_one
             - mpmath.mpf(7) / 8 * mpmath.zeta(3)
@@ -946,19 +1189,15 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
             + 3 * mpmath.euler * mpmath.stieltjes(1)
             + mpmath.mpf(3) / 2 * mpmath.stieltjes(2)
         )
-        # S_4 at s = 1: -(1/6) (d^4/ds^4)|_{s=0} log xi(s) = -(1/6) (d^4/du^4)|_{u=0} log xi(1+u)
-        # d^4/du^4 log(1+u)|_0 = -6
-        # d^4/du^4 log Gamma((1+u)/2)|_0 = (1/16) psi_3(1/2) = (1/16)*(pi^4) = pi^4 / 16
-        # For f(u) = 1 + c_1 u + c_2 u^2 + c_3 u^3 + c_4 u^4 with c_k = (-1)^{k-1} gamma_{k-1} / (k-1)!:
-        # c_1 = gamma_E, c_2 = -gamma_1, c_3 = gamma_2 / 2, c_4 = -gamma_3 / 6
-        # [u^4] log f(u) = c_4 - c_1 c_3 - c_2^2/2 + c_1^2 c_2 - c_1^4/4
-        c1 = mpmath.euler
-        c2 = -mpmath.stieltjes(1)
-        c3 = mpmath.stieltjes(2) / 2
-        c4 = -mpmath.stieltjes(3) / 6
-        u4_log_zeta = c4 - c1 * c3 - (c2**2) / 2 + (c1**2) * c2 - (c1**4) / 4
-        d4_log_xi_1 = -6 + (mpmath.pi**4) / 16 + 24 * u4_log_zeta
-        S4_closed_s1 = -d4_log_xi_1 / 6
+        S4_closed_s1 = (
+            mp_one
+            - (mpmath.pi**4) / 96
+            + mpmath.euler**4
+            + 4 * (mpmath.euler**2) * mpmath.stieltjes(1)
+            + 2 * (mpmath.stieltjes(1) ** 2)
+            + 2 * mpmath.euler * mpmath.stieltjes(2)
+            + mpmath.mpf(2) / 3 * mpmath.stieltjes(3)
+        )
 
         # Centered zero invariants Sigma_k = sum_rho z_rho^{-k} = -(1/(k-1)!) (d^k/dz^k)|_{z=0} log Xi(z)
         Sigma2_mp = -mpmath.diff(log_Xi_centered, mpmath.mpf(0), 2)
@@ -966,9 +1205,6 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
         Sigma1_odd_mp = -mpmath.diff(log_Xi_centered, mpmath.mpf(0), 1)
         Sigma3_odd_mp = -mpmath.diff(log_Xi_centered, mpmath.mpf(0), 3) / 2
 
-        # Exact closed formula for Sigma_2 at s = 1/2:
-        # log Xi(z) = log(1/4 - z^2) - (1/4 + z/2) log(pi) + log Gamma(1/4 + z/2) + log(-zeta(1/2 + z))
-        # -(d^2/dz^2)|_{z=0} log Xi(z) = 8 - (1/4) psi_1(1/4) - (d^2/ds^2)|_{s=1/2} log(-zeta(s))
         log_neg_zeta = lambda z: mpmath.log(-mpmath.zeta(mp_half + z))
         Sigma2_closed = (
             8
@@ -976,14 +1212,6 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
             - mpmath.diff(log_neg_zeta, mpmath.mpf(0), 2)
         )
 
-        # Binomial conversion between uncentered S_m and centered Sigma_k:
-        # Wait: lambda_n = sum_{j=1}^n binom(n, j) (-1)^{j-1} S_j
-        # And directly from derivative representation (Section 20):
-        # lambda_n = (1/(n-1)!) (d^n/ds^n)|_{s=1} [s^{n-1} log xi(s)]
-        # Using xi(s) = xi(1 - s), let w = 1 - s (at s = 1, w = 0):
-        # (d/ds)^n|_{s=1} [(1 - w)^{n-1} log xi(w)] = (-1)^n (d/dw)^n|_{w=0} [(1 - w)^{n-1} log xi(w)]
-        # Note that log xi(0) = log(1/2) = -log(2), and since deg((1 - w)^{n-1}) = n - 1 < n,
-        # the constant term log xi(0) is annihilated by (d/dw)^n!
         lambda_binomial: Dict[int, Any] = {}
         lambda_deriv: Dict[int, Any] = {}
         for n in (1, 2, 3, 4):
@@ -998,7 +1226,7 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                 / mpmath.factorial(n - 1)
             )
 
-        # 3. Partial-sum numerical controls over the 200 reference zeros in data/zeros_reference.json
+        # 3. Route 3: Partial-sum numerical controls over the 200 reference zeros in data/zeros_reference.json
         zeros_path = Path(__file__).resolve().parent.parent / "data" / "zeros_reference.json"
         ordinates_200: List[Any] = []
         if zeros_path.exists():
@@ -1007,30 +1235,55 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
         else:
             ordinates_200 = [mpmath.im(mpmath.zetazero(k)) for k in range(1, 51)]
 
-        # Symmetric partial sum for S_1 and reflection sum over the first N conjugate pairs
-        # For each positive ordinate gamma_k (assuming critical line 1/2 +- i*gamma_k for the 200 reference zeros):
-        # Pair contribution to S_1 = 1/(1/2 + i*gamma_k) + 1/(1/2 - i*gamma_k) = 1/(1/4 + gamma_k^2)
-        # Pair contribution to reflection sum = 2 / (1/4 + gamma_k^2)
-        # Pair contribution to S_2 = 1/(1/2 + i*gamma_k)^2 + 1/(1/2 - i*gamma_k)^2 = 2*(1/4 - gamma_k^2)/(1/4 + gamma_k^2)^2
-        # Pair contribution to Sigma_2 = 1/(i*gamma_k)^2 + 1/(-i*gamma_k)^2 = -2 / gamma_k^2
-        # Pair contribution to Sigma_4 = 1/(i*gamma_k)^4 + 1/(-i*gamma_k)^4 = +2 / gamma_k^4
+        # Pair contributions for rho_k = 1/2 +- i*gamma_k:
         partial_S1_200 = sum(1 / (mpmath.mpf("0.25") + g**2) for g in ordinates_200)
         partial_refl_200 = 2 * partial_S1_200
         partial_S2_200 = sum(
             2 * (mpmath.mpf("0.25") - g**2) / ((mpmath.mpf("0.25") + g**2) ** 2)
             for g in ordinates_200
         )
+        partial_S3_200 = sum(
+            2 * mpmath.re((mp_half + mpmath.j * g) ** (-3)) for g in ordinates_200
+        )
+        partial_S4_200 = sum(
+            2 * mpmath.re((mp_half + mpmath.j * g) ** (-4)) for g in ordinates_200
+        )
         partial_Sigma2_200 = sum(-2 / (g**2) for g in ordinates_200)
         partial_Sigma4_200 = sum(2 / (g**4) for g in ordinates_200)
 
-        # Asymptotic tail estimate for sum_{k > N} 1/(1/4 + gamma_k^2) ~ int_{T_N}^infty (log(t/(2*pi))/(2*pi)) dt / t^2
-        # = (log(T_N/(2*pi)) + 1) / (2*pi*T_N)
         T_200 = ordinates_200[-1]
         asymptotic_tail_S1 = (mpmath.log(T_200 / (2 * mpmath.pi)) + 1) / (
             2 * mpmath.pi * T_200
         )
+        # For S_3, Re((1/2 + i*t)^{-3}) = (1/8 - (3/2)t^2) / (1/4 + t^2)^3 ~ -(3/2) t^{-4},
+        # so tail_S3 ~ 2 * int_{T_200}^infty (-3/2) t^{-4} (log(t/(2*pi))/(2*pi)) dt
+        # ~ -(3 / (2*pi)) * (log(T_200/(2*pi)) + 1/3) / (3 * T_200^3) = -(3*log(T_200/(2*pi)) + 1) / (6*pi*T_200^3).
+        asymptotic_tail_S3 = -(3 * mpmath.log(T_200 / (2 * mpmath.pi)) + 1) / (
+            6 * mpmath.pi * (T_200**3)
+        )
+        # For S_4, Re((1/2 + i*t)^{-4}) ~ +t^{-4},
+        # so tail_S4 ~ +2 * int_{T_200}^infty t^{-4} (log(t/(2*pi))/(2*pi)) dt
+        # = (3*log(T_200/(2*pi)) + 1) / (9*pi*T_200^3).
+        asymptotic_tail_S4 = (3 * mpmath.log(T_200 / (2 * mpmath.pi)) + 1) / (
+            9 * mpmath.pi * (T_200**3)
+        )
 
         results = {
+            "stieltjes_notation_policy": {
+                "status": STIELTJES_NOTATION_DISAMBIGUATED,
+                "zero_ordinate_symbol": "gamma_1 = Im(rho_1) = 14.134725141734693790...",
+                "stieltjes_constant_symbols": [
+                    "gamma_0^St = gamma_E",
+                    "gamma_1^St",
+                    "gamma_2^St",
+                    "gamma_3^St",
+                ],
+                "laurent_expansion_convention": (
+                    "zeta(s) = 1/(s - 1) + sum_{k>=0} ((-1)^k / k!) * gamma_k^St * (s - 1)^k"
+                ),
+                "bare_gamma_1_for_stieltjes_forbidden": True,
+                "lean_theorem": "stieltjes_notation_no_effect_algebra",
+            },
             "xi_hadamard_product_status": {
                 "completed_xi_definition": "xi(s) = (1/2) * s * (s - 1) * pi^{-s/2} * Gamma(s/2) * zeta(s)",
                 "regularized_origin_form": "xi(s) = (s - 1) * pi^{-s/2} * Gamma(1 + s/2) * zeta(s)",
@@ -1101,19 +1354,23 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                 "lean_theorem": "reflection_reciprocal_identity",
             },
             "reciprocal_sum_S2": {
+                "status": S2_CANONICAL_FORMULA_REPAIRED,
                 "symbol": "S_2 = sum_rho (1 / rho^2)",
                 "convergence_type": "ABSOLUTELY_CONVERGENT",
                 "absolute_convergence": True,
                 "derivative_relation": "S_2 = - (d/ds)|_{s=0} (xi'(s) / xi(s)) = - (d^2/ds^2)|_{s=0} log xi(s)",
                 "exact_formula_at_s0": "1 - pi^2 / 24 + 2 * zeta''(0) + log(2 * pi)^2",
-                "exact_formula_at_s1_stieltjes": "1 + gamma_E^2 - pi^2 / 8 + 2 * gamma_1",
+                "exact_formula_at_s1_stieltjes": "1 + gamma_E^2 - pi^2 / 8 + 2 * gamma_1^St",
                 "equivalence_identity_between_s0_and_s1": (
-                    "2 * zeta''(0) + log(2 * pi)^2 = gamma_E^2 - pi^2 / 12 + 2 * gamma_1"
+                    "2 * zeta''(0) + log(2 * pi)^2 = gamma_E^2 - pi^2 / 12 + 2 * gamma_1^St"
                 ),
+                "erroneous_historical_formula_removed": "1 - pi^2 / 8 + gamma_E + gamma_E^2 / 4 - gamma_1^St",
+                "erroneous_formula_discrepancy": float(abs(S2_closed_s1 - S2_erroneous_val)),
+                "erroneous_formula_symbolic_diff_verified": s2_erroneous_diff_verified,
                 "constants_entering": [
-                    "Euler-Mascheroni constant gamma_E",
+                    "Euler-Mascheroni constant gamma_E = gamma_0^St",
                     "pi^2",
-                    "First Stieltjes constant gamma_1 (or equivalently zeta''(0) and log(2*pi))",
+                    "First Stieltjes constant gamma_1^St (or equivalently zeta''(0) and log(2*pi))",
                 ],
                 "value_50dps": mpmath.nstr(S2_closed_s1, 45),
                 "value_float": float(S2_closed_s1),
@@ -1121,7 +1378,58 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                 "symbolic_s1_verified": s2_s1_symbolic_match,
                 "mpmath_s0_residual": float(abs(S_mp[2] - S2_closed_s0)),
                 "mpmath_s1_residual": float(abs(S_mp[2] - S2_closed_s1)),
+                "s0_vs_s1_derivative_residual": float(abs(S_mp[2] - S_mp_from_s1[2])),
                 "arithmetic_nature_status": OPEN_IN_LITERATURE,
+                "lean_theorem": "s2_equivalent_closed_forms",
+            },
+            "S3_reaudit": {
+                "status": S3_S4_REAUDITED,
+                "symbol": "S_3 = sum_rho (1 / rho^3)",
+                "derivative_relation": (
+                    "S_3 = -(1/2!) * (d^3/ds^3)|_{s=0} log xi(s) = +(1/2!) * (d^3/du^3)|_{u=0} log xi(1 + u)"
+                ),
+                "exact_formula_stieltjes": (
+                    "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1^St + (3/2)*gamma_2^St"
+                ),
+                "route_1_symbolic_laurent_verified": s3_s1_symbolic_match,
+                "route_2_mpmath_50dps_s0_vs_closed_residual": float(
+                    abs(S_mp[3] - S3_closed_s1)
+                ),
+                "route_2_mpmath_50dps_s1_vs_closed_residual": float(
+                    abs(S_mp_from_s1[3] - S3_closed_s1)
+                ),
+                "route_3_partial_sum_200_pairs": float(partial_S3_200),
+                "route_3_partial_plus_tail": float(partial_S3_200 + asymptotic_tail_S3),
+                "route_3_tail_corrected_residual": float(
+                    abs((partial_S3_200 + asymptotic_tail_S3) - S3_closed_s1)
+                ),
+                "value_50dps": mpmath.nstr(S3_closed_s1, 45),
+                "value_float": float(S3_closed_s1),
+            },
+            "S4_reaudit": {
+                "status": S3_S4_REAUDITED,
+                "symbol": "S_4 = sum_rho (1 / rho^4)",
+                "derivative_relation": (
+                    "S_4 = -(1/3!) * (d^4/ds^4)|_{s=0} log xi(s) = -(1/3!) * (d^4/du^4)|_{u=0} log xi(1 + u)"
+                ),
+                "exact_formula_stieltjes": (
+                    "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1^St + 2*(gamma_1^St)^2 "
+                    "+ 2*gamma_E*gamma_2^St + (2/3)*gamma_3^St"
+                ),
+                "route_1_symbolic_laurent_verified": s4_s1_symbolic_match,
+                "route_2_mpmath_50dps_s0_vs_closed_residual": float(
+                    abs(S_mp[4] - S4_closed_s1)
+                ),
+                "route_2_mpmath_50dps_s1_vs_closed_residual": float(
+                    abs(S_mp_from_s1[4] - S4_closed_s1)
+                ),
+                "route_3_partial_sum_200_pairs": float(partial_S4_200),
+                "route_3_partial_plus_tail": float(partial_S4_200 + asymptotic_tail_S4),
+                "route_3_tail_corrected_residual": float(
+                    abs((partial_S4_200 + asymptotic_tail_S4) - S4_closed_s1)
+                ),
+                "value_50dps": mpmath.nstr(S4_closed_s1, 45),
+                "value_float": float(S4_closed_s1),
             },
             "reciprocal_power_hierarchy": {
                 "general_definition": "S_m = sum_rho rho^{-m}",
@@ -1132,13 +1440,21 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                 ),
                 "general_log_derivative_identity": (
                     "S_m = - (1 / (m - 1)!) * (d^m / ds^m)|_{s=0} log xi(s) "
-                    "= ((-1)^m / (m - 1)!) * (d^m / ds^m)|_{s=1} log xi(s)"
+                    "= ((-1)^{m+1} / (m - 1)!) * (d^m / ds^m)|_{s=1} log xi(s)"
+                ),
+                "all_symbolic_m_1_to_4_verified": bool(
+                    s1_symbolic_match
+                    and s1_s1_symbolic_match
+                    and s2_s0_symbolic_match
+                    and s2_s1_symbolic_match
+                    and s3_s1_symbolic_match
+                    and s4_s1_symbolic_match
                 ),
                 "table_m_1_to_4": [
                     {
                         "m": 1,
                         "convergence": "Conditionally convergent (symmetric pairing |Im(rho)| <= T)",
-                        "log_derivative_formula": "-(d/ds)|_{s=0} log xi(s)",
+                        "log_derivative_formula": "-(d/ds)|_{s=0} log xi(s) = +(d/ds)|_{s=1} log xi(s)",
                         "exact_expression": "1 + gamma_E/2 - log(2*sqrt(pi))",
                         "value_50dps": mpmath.nstr(S_mp[1], 40),
                         "residual_vs_closed_form": float(abs(S_mp[1] - S1_closed)),
@@ -1146,24 +1462,24 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                     {
                         "m": 2,
                         "convergence": "Absolutely convergent",
-                        "log_derivative_formula": "-(d^2/ds^2)|_{s=0} log xi(s)",
-                        "exact_expression": "1 + gamma_E^2 - pi^2/8 + 2*gamma_1  (= 1 - pi^2/24 + 2*zeta''(0) + log^2(2*pi))",
+                        "log_derivative_formula": "-(d^2/ds^2)|_{s=0} log xi(s) = -(d^2/ds^2)|_{s=1} log xi(s)",
+                        "exact_expression": "1 + gamma_E^2 - pi^2/8 + 2*gamma_1^St  (= 1 - pi^2/24 + 2*zeta''(0) + log^2(2*pi))",
                         "value_50dps": mpmath.nstr(S_mp[2], 40),
                         "residual_vs_closed_form": float(abs(S_mp[2] - S2_closed_s1)),
                     },
                     {
                         "m": 3,
                         "convergence": "Absolutely convergent",
-                        "log_derivative_formula": "-(1/2!)*(d^3/ds^3)|_{s=0} log xi(s)",
-                        "exact_expression": "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1 + (3/2)*gamma_2",
+                        "log_derivative_formula": "-(1/2!)*(d^3/ds^3)|_{s=0} log xi(s) = +(1/2!)*(d^3/ds^3)|_{s=1} log xi(s)",
+                        "exact_expression": "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1^St + (3/2)*gamma_2^St",
                         "value_50dps": mpmath.nstr(S_mp[3], 40),
                         "residual_vs_closed_form": float(abs(S_mp[3] - S3_closed_s1)),
                     },
                     {
                         "m": 4,
                         "convergence": "Absolutely convergent",
-                        "log_derivative_formula": "-(1/3!)*(d^4/ds^4)|_{s=0} log xi(s)",
-                        "exact_expression": "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1 + 2*gamma_1^2 + 2*gamma_E*gamma_2 + (2/3)*gamma_3",
+                        "log_derivative_formula": "-(1/3!)*(d^4/ds^4)|_{s=0} log xi(s) = -(1/3!)*(d^4/ds^4)|_{s=1} log xi(s)",
+                        "exact_expression": "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1^St + 2*(gamma_1^St)^2 + 2*gamma_E*gamma_2^St + (2/3)*gamma_3^St",
                         "value_50dps": mpmath.nstr(S_mp[4], 40),
                         "residual_vs_closed_form": float(abs(S_mp[4] - S4_closed_s1)),
                     },
@@ -1200,8 +1516,8 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                     },
                     "simpler_than_uncentered_note": (
                         "Unlike S_m at s = 0/1 where log(-zeta(s)) has an explicit Laurent expansion in "
-                        "gamma_E and Stieltjes constants gamma_k, centered sums Sigma_{2m} at s = 1/2 "
-                        "depend onzeta^{(k)}(1/2)/zeta(1/2), which have no simpler closed form in classic "
+                        "gamma_E and Stieltjes constants gamma_k^St, centered sums Sigma_{2m} at s = 1/2 "
+                        "depend on zeta^{(k)}(1/2)/zeta(1/2), which have no simpler closed form in classic "
                         "constants; however, all odd centered sums vanish identically by reflection symmetry."
                     ),
                 },
@@ -1261,6 +1577,16 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
                 "reflection_sum_exact": float(refl_sum_closed),
                 "S2_partial_200_pairs": float(partial_S2_200),
                 "S2_exact": float(S2_closed_s1),
+                "S3_partial_200_pairs": float(partial_S3_200),
+                "S3_partial_plus_asymptotic_tail": float(
+                    partial_S3_200 + asymptotic_tail_S3
+                ),
+                "S3_exact": float(S3_closed_s1),
+                "S4_partial_200_pairs": float(partial_S4_200),
+                "S4_partial_plus_asymptotic_tail": float(
+                    partial_S4_200 + asymptotic_tail_S4
+                ),
+                "S4_exact": float(S4_closed_s1),
                 "Sigma2_partial_200_pairs": float(partial_Sigma2_200),
                 "Sigma2_exact": float(Sigma2_mp),
                 "Sigma4_partial_200_pairs": float(partial_Sigma4_200),
@@ -1287,7 +1613,8 @@ def derive_xi_hadamard_and_reciprocal_sums() -> Dict[str, Any]:
 def audit_superzeta_and_constant_arithmetic() -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """
     Audit Voros superzeta functions (Section 21) and construct the Section 22 table
-    of arithmetic nature for all exact zero-sum invariants.
+    of arithmetic nature for all exact zero-sum invariants using disambiguated
+    Stieltjes notation `gamma_0^St = gamma_E, gamma_1^St, gamma_2^St, gamma_3^St`.
     """
     superzeta_audit = {
         "families_studied_by_voros": {
@@ -1319,9 +1646,9 @@ def audit_superzeta_and_constant_arithmetic() -> Tuple[Dict[str, Any], List[Dict
             "status": OPEN_IN_LITERATURE,
             "explanation": (
                 "Although Z_zeros(m) = S_m has an exact closed form in terms of gamma_E, pi, log(2*pi), "
-                "zeta(2k+1), and Stieltjes constants gamma_j, NO positive integer value S_m (m >= 1) has "
+                "zeta(2k+1), and Stieltjes constants gamma_j^St, NO positive integer value S_m (m >= 1) has "
                 "proved rationality, irrationality, or transcendence in the literature because the "
-                "irrationality and algebraic independence of gamma_E and Stieltjes constants gamma_j are open."
+                "irrationality and algebraic independence of gamma_E and Stieltjes constants gamma_j^St are open."
             ),
         },
         "primary_citations": [
@@ -1340,7 +1667,7 @@ def audit_superzeta_and_constant_arithmetic() -> Tuple[Dict[str, Any], List[Dict
             "irrationality_known": "No (OPEN_IN_LITERATURE)",
             "transcendence_known": "No (OPEN_IN_LITERATURE)",
             "main_unresolved_constants": [
-                "gamma_E (Euler's constant: even irrationality is open)",
+                "gamma_E = gamma_0^St (Euler's constant: even irrationality is open)",
                 "log(pi) (irrationality/transcendence of log(pi) and Q-linear independence of {1, gamma_E, log(4*pi)} are open)",
             ],
         },
@@ -1351,43 +1678,43 @@ def audit_superzeta_and_constant_arithmetic() -> Tuple[Dict[str, Any], List[Dict
             "irrationality_known": "No (OPEN_IN_LITERATURE)",
             "transcendence_known": "No (OPEN_IN_LITERATURE)",
             "main_unresolved_constants": [
-                "gamma_E",
+                "gamma_E = gamma_0^St",
                 "log(4*pi) = 2*log(2) + log(pi)",
                 "Possible rational cancellation between gamma_E and log(4*pi) is unexcluded",
             ],
         },
         {
             "invariant": "S_2 = sum_rho 1 / rho^2",
-            "exact_expression": "1 + gamma_E^2 - pi^2 / 8 + 2 * gamma_1  (= 1 - pi^2 / 24 + 2 * zeta''(0) + log^2(2*pi))",
+            "exact_expression": "1 + gamma_E^2 - pi^2 / 8 + 2 * gamma_1^St  (= 1 - pi^2 / 24 + 2 * zeta''(0) + log^2(2*pi))",
             "rationality_known": "No (OPEN_IN_LITERATURE)",
             "irrationality_known": "No (OPEN_IN_LITERATURE)",
             "transcendence_known": "No (OPEN_IN_LITERATURE)",
             "main_unresolved_constants": [
-                "gamma_E",
-                "First Stieltjes constant gamma_1 (irrationality open)",
+                "gamma_E = gamma_0^St",
+                "First Stieltjes constant gamma_1^St (irrationality open)",
                 "zeta''(0) and log(2*pi)",
-                "Algebraic independence of {pi^2, gamma_E, gamma_1}",
+                "Algebraic independence of {pi^2, gamma_E, gamma_1^St}",
             ],
         },
         {
             "invariant": "S_3 = sum_rho 1 / rho^3",
-            "exact_expression": "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1 + (3/2)*gamma_2",
+            "exact_expression": "1 - (7/8)*zeta(3) + gamma_E^3 + 3*gamma_E*gamma_1^St + (3/2)*gamma_2^St",
             "rationality_known": "No (OPEN_IN_LITERATURE)",
             "irrationality_known": "No (OPEN_IN_LITERATURE)",
             "transcendence_known": "No (OPEN_IN_LITERATURE)",
             "main_unresolved_constants": [
                 "zeta(3) (proved irrational by Apery 1979, but transcendence open)",
-                "gamma_E, gamma_1, gamma_2 (Stieltjes constants)",
+                "gamma_E, gamma_1^St, gamma_2^St (Stieltjes constants)",
             ],
         },
         {
             "invariant": "S_4 = sum_rho 1 / rho^4",
-            "exact_expression": "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1 + 2*gamma_1^2 + 2*gamma_E*gamma_2 + (2/3)*gamma_3",
+            "exact_expression": "1 - pi^4/96 + gamma_E^4 + 4*gamma_E^2*gamma_1^St + 2*(gamma_1^St)^2 + 2*gamma_E*gamma_2^St + (2/3)*gamma_3^St",
             "rationality_known": "No (OPEN_IN_LITERATURE)",
             "irrationality_known": "No (OPEN_IN_LITERATURE)",
             "transcendence_known": "No (OPEN_IN_LITERATURE)",
             "main_unresolved_constants": [
-                "gamma_E, gamma_1, gamma_2, gamma_3 (Stieltjes constants vs. pi^4)",
+                "gamma_E, gamma_1^St, gamma_2^St, gamma_3^St (Stieltjes constants vs. pi^4)",
             ],
         },
         {
@@ -1416,7 +1743,7 @@ def audit_superzeta_and_constant_arithmetic() -> Tuple[Dict[str, Any], List[Dict
             "irrationality_known": "No (OPEN_IN_LITERATURE)",
             "transcendence_known": "No (OPEN_IN_LITERATURE)",
             "main_unresolved_constants": [
-                "gamma_E, log(4*pi), pi^{2k}, zeta(2k+1), Stieltjes constants gamma_0, ..., gamma_{n-1}",
+                "gamma_E, log(4*pi), pi^{2k}, zeta(2k+1), Stieltjes constants gamma_0^St, ..., gamma_{n-1}^St",
             ],
         },
     ]
@@ -1425,22 +1752,59 @@ def audit_superzeta_and_constant_arithmetic() -> Tuple[Dict[str, Any], List[Dict
 
 
 # ---------------------------------------------------------------------------
-# 5. Odd-Zeta Irrationality Verification & Special-Value Transfer Audit (Sections 23–26)
+# 5. Fauzan (2026) zeta(5) Audit & Special-Value Transfer Audit (TASK-TC-038R Sections 4–11, 25–30)
 # ---------------------------------------------------------------------------
+
+
+def load_fauzan_zeta5_architecture(repo_root: Optional[Path] = None) -> Dict[str, Any]:
+    """
+    Load the structured primary-source architecture artifact `data/fauzan_zeta5_architecture.json`.
+    """
+    root = repo_root or Path(__file__).resolve().parent.parent
+    arch_path = root / "data" / "fauzan_zeta5_architecture.json"
+    if not arch_path.exists():
+        raise FileNotFoundError(f"Missing Fauzan architecture artifact: {arch_path}")
+    return json.loads(arch_path.read_text(encoding="utf-8"))
 
 
 def verify_zeta5_and_special_value_transfer() -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
     """
-    Verify from primary literature the exact current status of `zeta(5)` (Section 23),
-    compare special-value vs. zero-location methodology (Section 24), perform the explicit
-    transfer test (Section 25), and audit auxiliary polynomials `P_n(rho)` / `P_n(gamma)` (Section 26).
+    Verify from primary sources the October 2026 status of Archimedean `zeta(5)` (Sections 4–8),
+    reconstruct the 6-gate Fauzan / `mo271/Zeta5` Hankel irrationality proof, compare classical
+    vs. Fauzan 2026 methods against zero-location arithmetic (Sections 8–10, 30), and derive the
+    Liouville-Mahler algebraic lower bound and 6-gate `SUBGATE-TC-039A` map (Sections 11, 27–29).
     """
+    fauzan_arch = load_fauzan_zeta5_architecture()
+
     zeta5_status = {
         "status_code": ZETA5_CURRENT_STATUS_VERIFIED,
-        "archimedean_zeta5_individually_proved_irrational": False,
-        "archimedean_zeta5_status": OPEN_IN_LITERATURE,
+        "preprint_claim_status": ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM,
+        "preprint_verification_status": ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM_VERIFIED,
+        "lean_formalization_status": ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN,
+        "external_lean_evidence_class": LEAN_PROVED_EXTERNAL_REPOSITORY,
+        "local_build_audit_status": SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED,
+        "dependency_graph_status": ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN,
+        "conventional_peer_review_status": PEER_REVIEW_STATUS_PENDING,
+        "peer_review_status_recorded": ZETA5_CONVENTIONAL_PEER_REVIEW_STATUS_RECORDED,
+        "archimedean_zeta5_status": (
+            "ZETA5_IRRATIONALITY_2026_PREPRINT_AND_LEAN_FORMALIZED_PEER_REVIEW_PENDING"
+        ),
         "source_verification": PRIMARY_SOURCE_VERIFIED,
+        "fauzan_2026_preprint": fauzan_arch["paper_reference"],
+        "mo271_zeta5_lean_repository": fauzan_arch["lean_repository"],
         "verified_theorems_in_primary_literature": {
+            "fauzan_2026_and_mo271_zeta5": {
+                "theorem": (
+                    "zeta(5) notin Q: Aabir Fauzan (17 Sep 2026, Zenodo 22826419, DOI 10.5281/zenodo.22826419) "
+                    "constructs integer polynomials Q_n in Z[X] of degree 37n via a 37n x 37n Hankel determinant "
+                    "satisfying 0 < Q_n(zeta(5)) < exp(-c n^2); mechanically formalized in Lean 4 without sorry "
+                    "in mo271/Zeta5 (commit 7fe736760f4b96bfdb4334b68e3b3124ecbe10b0) as Apery.irrational_five "
+                    "and RiemannZetaValues.irrational_five depending only on [propext, Classical.choice, Quot.sound]."
+                ),
+                "manuscript_status": ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM,
+                "formal_status": ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN,
+                "peer_review_status": PEER_REVIEW_STATUS_PENDING,
+            },
             "apery_1979_zeta3": {
                 "theorem": "zeta(3) notin Q (irrationality exponent mu(zeta(3)) < 5.5138800, Giraudin 2026 arXiv:2609.26980v1; Rhin-Viola 2001).",
                 "citation": "R. Apery (1979), Asterisque 61, 11-13; F. Beukers (1979), Bull. London Math. Soc. 11, 268-272.",
@@ -1474,133 +1838,216 @@ def verify_zeta5_and_special_value_transfer() -> Tuple[Dict[str, Any], Dict[str,
             "refuted_2024_preprint_on_archimedean_zeta5": {
                 "claim_inspected": "S. Suman (July 2024), 'A note on the Irrationality of zeta(5) and Higher Odd Zeta Values', arXiv:2407.07121 [math.GM].",
                 "refutation": (
-                    "Explicitly refuted by K. Chen, W. He, Y. He, Y. Huang, Y. Li, Q. Tang, L. Wu, S. Xu, S. Yang, "
-                    "and Z. Yu (Nov 2024), 'A Note on a Recent Attempt to Prove the Irrationality of zeta(5)', arXiv:2411.16774v3."
+                    "Explicitly refuted by K. Chen et al. (Nov 2024), 'A Note on a Recent Attempt to Prove the Irrationality of zeta(5)', arXiv:2411.16774v3."
                 ),
             },
         },
         "record_correction": (
-            "Individual irrationality of the Archimedean constant zeta(5) remains OPEN_IN_LITERATURE "
-            "(explicitly restated as open in Lai-Lupu-Sprang May 2025, arXiv:2505.23088v1). "
-            "The verified recent 2025 breakthrough by Lai-Sprang-Zudilin (arXiv:2505.05005v2) proves "
-            "the irrationality of the 2-adic zeta value zeta_2(5), while the 2024 math.GM claim for "
-            "Archimedean zeta(5) (arXiv:2407.07121) was refuted in arXiv:2411.16774v3."
+            "TASK-TC-038R repair: As of 17 September 2026, Aabir Fauzan released the preprint "
+            "'zeta(5) is irrational' (Zenodo 22826419) and the complete Lean 4 formalization "
+            "mo271/Zeta5 (commit 7fe736760f4b96bfdb4334b68e3b3124ecbe10b0) proving Apery.irrational_five "
+            "without sorry and using only standard Lean axioms [propext, Classical.choice, Quot.sound]. "
+            "We classify the manuscript claim (ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM), the Lean 4 "
+            "verification (ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN / LEAN_PROVED_EXTERNAL_REPOSITORY / "
+            "SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED), and conventional journal peer review "
+            "(PEER_REVIEW_STATUS_PENDING) across separate evidence dimensions."
         ),
     }
 
+    classical_vs_fauzan_comparison = [
+        {
+            "feature": "Target is a value vs. an argument",
+            "classical_special_value_method": "Linear form in the VALUE zeta(m) at fixed integer argument m: L_n = A_n zeta(m) - B_n.",
+            "fauzan_2026_method": "Nonlinear polynomial Q_n(X) in Z[X] of degree 37n in the VALUE variable X, evaluated at X = zeta(5).",
+            "relevance_to_zero_location_arithmetic": (
+                "Both act on a VALUE variable X = zeta(5), whereas zero arithmetic requires an ARGUMENT "
+                "polynomial P_n(X) evaluated at X = gamma_1 or X = rho_1 (where zeta(rho_1) = 0 is already 0)."
+            ),
+        },
+        {
+            "feature": "Hankel determinant",
+            "classical_special_value_method": "None (single Pade / hypergeometric linear form).",
+            "fauzan_2026_method": "37n x 37n Hankel determinant Delta_K(X) = det_{0<=i,j<37n} mu_X(D_N(t)^6 t^{i+j} / D_K(t)).",
+            "relevance_to_zero_location_arithmetic": (
+                "Introduces a determinant mechanism generating degree O(n) polynomials with O(n^2) log-decay "
+                "from Vandermonde energy; testable in TASK-TC-039 if a zero-argument moment functional exists."
+            ),
+        },
+        {
+            "feature": "Moment functional",
+            "classical_special_value_method": "Direct series sum_{k>=1} R_n(k) or Beukers hypercube integral.",
+            "fauzan_2026_method": (
+                "Q-linear functional mu_X on P(t)/D_K(t) combining rational Bernoulli even moments mu(t^e) "
+                "with affine pole values mu_X(1/(t+j^2)) = j^4(X - H_j^{(5)}) - 1/4 + 1/(2j)."
+            ),
+            "relevance_to_zero_location_arithmetic": (
+                "Requires an integral identity expressing rational pole values in terms of the target parameter X."
+            ),
+        },
+        {
+            "feature": "Positivity / nonvanishing",
+            "classical_special_value_method": "Strict positivity of Beukers integrand on (0,1)^m or saddle-point nonvanishing.",
+            "fauzan_2026_method": (
+                "At X = zeta(5), G_K(zeta(5)) is the Gram matrix of {(y^2)^i}_{i=0}^{h-1} against positive measure "
+                "nu_n(y) dy = (D_N(y^2)^6 / D_K(y^2)) w(y) dy on (0, infty), forcing Delta_K(zeta(5)) > 0."
+            ),
+            "relevance_to_zero_location_arithmetic": (
+                "High-priority transfer gate (Z3): for a zero rho_1, zeta(rho_1) = 0 must NOT make the moment "
+                "matrix singular or vanish identically."
+            ),
+        },
+        {
+            "feature": "Integer polynomial construction",
+            "classical_special_value_method": "Degree-1 linear form A_n X - B_n in Z[X].",
+            "fauzan_2026_method": "Degree-37n integer polynomial Q_n(X) = m_N(n) S_K Delta_K(X) in Z[X].",
+            "relevance_to_zero_location_arithmetic": (
+                "Moves beyond degree-1 rational approximations to degree-O(n) integer polynomials."
+            ),
+        },
+        {
+            "feature": "Denominator / valuation estimates",
+            "classical_special_value_method": "d_n^m = lcm(1..n)^m ~ e^{m n} clearing denominators of partial fractions.",
+            "fauzan_2026_method": (
+                "Local p-adic Gauss valuation bounds v_p^G(F_K) >= L_p(n,p) across small (p <= K/400), "
+                "inner (K/400 < p <= K/3, water-filling), and outer (K/3 < p <= 2h, Schur rank loss) primes, "
+                "giving log m_N(n) <= (A_eff + eps) K^2 via PNT."
+            ),
+            "relevance_to_zero_location_arithmetic": (
+                "Quadratic log-normalizer O(n^2) works for rationality (D=1) because b^{37n} grows only like e^{O(n)}, "
+                "but for algebraicity of degree D >= 2, (D-1) log H(P_n) competes directly with O(n^2) decay."
+            ),
+        },
+        {
+            "feature": "Asymptotic smallness",
+            "classical_special_value_method": "Exponential decay e^{-c n} competing with e^{m n} (fails for m >= 5 in Apery/Beukers).",
+            "fauzan_2026_method": (
+                "Superexponential quadratic decay exp(U K^2 + O(K log K)) with U = -1.3669955 < -A_eff = -1.36 "
+                "from Andreief's identity and 16-component arcsine Vandermonde logarithmic energy."
+            ),
+            "relevance_to_zero_location_arithmetic": (
+                "Quadratic exponent n^2 from h x h Vandermonde repulsion is strong enough to beat any O(n) "
+                "degree/Mahler factor if coefficient height growth is controlled."
+            ),
+        },
+        {
+            "feature": "Degree growth",
+            "classical_special_value_method": "Fixed degree 1 in zeta(5) (or fixed number of odd zetas).",
+            "fauzan_2026_method": "Linear degree growth deg Q_n = h = 37n.",
+            "relevance_to_zero_location_arithmetic": (
+                "Linear degree d_n = O(n) ensures b^{d_n} = e^{O(n)} is negligible compared to e^{-c n^2}."
+            ),
+        },
+        {
+            "feature": "Role of the specific exponent 5",
+            "classical_special_value_method": "Dimension 5 of hypercube [0,1]^5 or pole order 5 in (k+j)^{-5}.",
+            "fauzan_2026_method": (
+                "Enters specifically via weight w(y) = (y^5/12)(d^4/dy^4)(1/(e^{2*pi*y}-1)) and 4 integrations "
+                "by parts in Hermite's formula at s = 5, plus Bernoulli moments zeta(2e+2)."
+            ),
+            "relevance_to_zero_location_arithmetic": (
+                "Weight-5 Hermite IBP and Bernoulli moments are specific to s = 5; literal substitution 5 -> rho "
+                "is invalid (Section 29 firewall)."
+            ),
+        },
+    ]
+
     transfer_audit = {
-        "classification": SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER,
-        "secondary_outcome_code": SPECIAL_VALUE_IRRATIONALITY_METHOD_NO_DIRECT_ZERO_LOCATION_TRANSFER,
-        "structural_comparison_table": [
-            {
-                "feature": "Argument known?",
-                "zeta_m_arithmetic": "Yes: fixed positive integer m in Z_{>=2} (known rational/integer input).",
-                "zeta_rho_eq_0_arithmetic": "No: rho = beta + i*gamma in {0 < Re(s) < 1} is the unknown target.",
-            },
-            {
-                "feature": "Value known?",
-                "zeta_m_arithmetic": "No: zeta(m) in R is the unknown target whose irrationality is tested.",
-                "zeta_rho_eq_0_arithmetic": "Yes: zeta(rho) = 0 is fixed identically to zero.",
-            },
-            {
-                "feature": "Integral / series representation usable?",
-                "zeta_m_arithmetic": (
-                    "Yes: Beukers/MZV hypercube integrals int_{[0,1]^m} ... and Ball-Rivoal well-poised "
-                    "hypergeometric series sum_{k>=1} R_n(k) with integer poles of fixed multiplicity m."
-                ),
-                "zeta_rho_eq_0_arithmetic": (
-                    "No: m enters as the integer dimension of the hypercube [0,1]^m or the integer pole order "
-                    "of (k + j)^{-m} in partial-fraction decomposition; neither exists for complex non-integer rho."
-                ),
-            },
-            {
-                "feature": "Pade / linear-form construction target",
-                "zeta_m_arithmetic": (
-                    "Linear form L_n = A_n * zeta(m) + B_n (or sum_{j} A_{n,j} zeta(2j+1) + B_n) with "
-                    "A_n, B_n in Q and common denominator d_n^m."
-                ),
-                "zeta_rho_eq_0_arithmetic": (
-                    "Setting m -> rho in A_n * zeta(rho) + B_n gives A_n * 0 + B_n = B_n, which eliminates "
-                    "zeta(rho) completely and leaves no small nonzero linear form in rho."
-                ),
-            },
-            {
-                "feature": "Algebraic-number input available?",
-                "zeta_m_arithmetic": "Yes: integer shifts k + 1, ..., k + n in Q allow lcm(1..n)^m denominator control.",
-                "zeta_rho_eq_0_arithmetic": "Only under a reductio assumption rho in Q_bar, where rho appears in exponents k^{-rho}.",
-            },
-            {
-                "feature": "Auxiliary polynomial target",
-                "zeta_m_arithmetic": "Rational function R_n(t) with integer poles whose residues produce rational combinations of zeta(j).",
-                "zeta_rho_eq_0_arithmetic": "Would require P_n(X) in Z[X] with 0 < |P_n(rho)| < C^{-n}, which zeta(rho) = 0 does not generate.",
-            },
-        ],
-        "method_by_method_transfer_test": [
-            {
-                "method": "Apery (1979) / Beukers (1979) hypercube integral I_n = int_{[0,1]^m} P_n(x_1).../(1 - x_1...x_m) dx",
-                "object_produced_for_zeta_m": "I_n = A_n * zeta(m) - B_n with d_n^m I_n in Z and 0 < |I_n| -> 0 (for m = 2, 3).",
-                "what_fails_when_m_replaced_by_rho": (
-                    "1) The integral dimension m must be a positive integer; "
-                    "2) Even in fractional Mellin form, evaluating at zeta(rho) = 0 makes A_n * zeta(rho) - B_n = -B_n != 0 "
-                    "of order O(1) instead of exponentially small O(r^n)."
-                ),
-            },
-            {
-                "method": "Ball-Rivoal (2001) / Zudilin (2001) / Fischler-Sprang-Zudilin (2019) hypergeometric series sum_{k>=1} R_n(k)",
-                "object_produced_for_zeta_m": (
-                    "L_n = a_0 + sum_{j=1}^s a_j zeta(2j+1) via partial-fraction expansion of "
-                    "R_n(t) = n!^{s-2r} prod_{j=0}^{r n}(t - j) / prod_{j=0}^n (t + j)^s."
-                ),
-                "what_fails_when_m_replaced_by_rho": (
-                    "The partial-fraction decomposition into Hurwitz shifts sum_{k>=1} (k + j)^{-m} "
-                    "requires m to be a positive integer pole multiplicity (1 <= m <= s); a complex "
-                    "zero location rho cannot serve as a rational-function pole multiplicity."
-                ),
-            },
-            {
-                "method": "Brown (2014/2016) moduli space M_{0,n} period integrals",
-                "object_produced_for_zeta_m": "Motivic period linear forms in multiple zeta values (MZVs) of integer weight.",
-                "what_fails_when_m_replaced_by_rho": (
-                    "M_{0,n} periods are algebraic-geometric periods of mixed Tate motives over Z (integer weights only); "
-                    "critical-strip zeros rho of zeta(s) are not weights of mixed Tate motives."
-                ),
-            },
-            {
-                "method": "Calegari-Dimitrov-Tang (2024) / Lai-Sprang-Zudilin (2025) 2-adic holonomic / overconvergent method for zeta_2(5)",
-                "object_produced_for_zeta_m": "2-adic rational approximations p_n/q_n to zeta_2(5) with 0 < |zeta_2(5) - p_n/q_n|_2 < H_n^{-1-delta}.",
-                "what_fails_when_m_replaced_by_rho": (
-                    "Constructs p-adic linear forms in fixed integer-weight p-adic zeta values; "
-                    "does not act on Archimedean critical-strip zero arguments rho."
-                ),
-            },
-        ],
+        "interim_classification": SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT,
+        "repaired_audit_status": SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED,
+        "classification": FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED,
+        "secondary_outcome_code": FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED,
+        "classical_methods_status": SPECIAL_VALUE_IRRATIONALITY_METHOD_HAS_NO_DIRECT_ZERO_LOCATION_TRANSFER,
+        "structural_distinction": VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE,
+        "substitution_firewall": "DO_NOT_SUBSTITUTE_5_TO_RHO_SYMBOLICALLY",
+        "classical_vs_fauzan_2026_comparison_table": classical_vs_fauzan_comparison,
+        "fauzan_6_gate_architecture": {
+            "Gate_A_moment_hankel_construction": (
+                "Define K = 40n, N = 3n, h = 37n, D_m(t) = prod_{j=1}^m (t + j^2), Q-linear functional mu_X on "
+                "P(t)/D_K(t) with monomial moments mu(t^e) = (-1)^e B_{2e+2}(2e+3)(2e+4)(2e+5)/24 and pole values "
+                "mu_X(1/(t+j^2)) = j^4(X - H_j^{(5)}) - 1/4 + 1/(2j), and 37n x 37n Hankel matrix "
+                "G_K(X)_{i,j} = mu_X(D_N(t)^6 t^{i+j} / D_K(t)), Delta_K(X) = det G_K(X) (`Apery/Construction.lean`)."
+            ),
+            "Gate_B_polynomiality_and_exact_degree": (
+                "Entries G_K(X)_{i,j} are affine in X; the X^h coefficient of Delta_K(X) is det(V^T diag(w_k) V) "
+                "at distinct nodes x_k = -(N+1+k)^2 with nonzero weights w_k = D_N(x_k)^6 (N+1+k)^4 / D_K'(x_k), "
+                "proving deg Delta_K = deg F_K = h = 37n (`Apery/Degree.lean`, `natDegree_F`)."
+            ),
+            "Gate_C_positivity_at_zeta5": (
+                "By 4 integrations by parts against Mittag-Leffler (`Apery/HermiteFormula.lean`, `hermite_pole`), "
+                "int_0^infty w(y)/(y^2+j^2) dy = poleValue(j)(zeta(5)), so G_K(zeta(5)) is the Gram matrix of "
+                "{(y^2)^i}_{i=0}^{h-1} against positive measure nu_n(y) dy = (D_N(y^2)^6/D_K(y^2)) w(y) dy on (0, infty), "
+                "forcing Delta_K(zeta(5)) > 0 and Q_n(zeta(5)) > 0 (`Apery/Positivity.lean`, `Delta_pos`)."
+            ),
+            "Gate_D_arithmetic_integrality_normalization": (
+                "Local p-adic Gauss valuation bounds v_p^G(F_K) >= L_p(n,p) across small (400p <= K), inner "
+                "(K/400 < p <= K/3), and outer (K/3 < p <= 2h) primes plus v_p^G(F_K) >= 0 for p > 2h prove that "
+                "m_N(n) = prod_{p <= 2h} p^{-L_p(n,p)} clears all denominators: Q_n(X) = m_N(n) F_K(X) in Z[X], "
+                "with log m_N(n) <= (A_eff + eps) K^2 (A_eff = 1.36) by PNT (`Apery/Norm.lean`, `Apery/Growth.lean`)."
+            ),
+            "Gate_E_superexponential_analytic_decay": (
+                "By Andreief's identity (`Apery/DetIntegral.lean`, `Delta_eq_integral`) and potential-theoretic "
+                "bounds against a 16-component arcsine equilibrium measure (`Apery/Energy*.lean`, `Apery/RealBound.lean`), "
+                "log F_K(zeta(5)) <= U K^2 + 27 K log K + 200 K with U = -1.3669955 < -A_eff = -1.36, giving "
+                "0 < Q_n(zeta(5)) < exp(-c n^2) (c_Lean = 5.5964, c_paper = 27.8)."
+            ),
+            "Gate_F_irrationality_contradiction": (
+                "If zeta(5) = a/b (b >= 1), then b^{37n} Q_n(a/b) in Z_{>=1}, whereas b^{37n} Q_n(zeta(5)) < "
+                "b^{37n} exp(-c n^2) -> 0 as n -> infty, contradiction (`Apery/Criterion.lean`, `Apery/Main.lean`)."
+            ),
+        },
+        "transferable_ingredients_vs_obstructions": {
+            "conceptually_transferable_ingredients": fauzan_arch[
+                "potential_zero_location_transfer_points"
+            ],
+            "nontransferable_weight5_specific_ingredients": fauzan_arch[
+                "nontransferable_weight5_specific_parts"
+            ],
+        },
     }
 
     auxiliary_poly_audit = {
-        "required_ingredients_for_auxiliary_polynomial_proof": [
-            "1. A sequence of nonzero integer polynomials P_n(X) in Z[X] \\ {0} of degree d_n <= D_n and height H(P_n) <= e^{h_n}.",
-            "2. Nonvanishing certificate: P_n(alpha) != 0 for the target alpha in {rho_1, gamma_1} for infinitely many n.",
-            "3. Analytic upper bound: |P_n(alpha)| <= exp(-U_n) derived from an analytic identity (such as Cauchy/Jensen on an entire function with high-order zeros).",
-            "4. Liouville / Mahler algebraic lower bound: If alpha in Q_bar of degree d and Mahler measure M(alpha), then P_n(alpha) != 0 implies |P_n(alpha)| >= (d_n + 1)^{-(d-1)} H(P_n)^{-d + 1} M(alpha)^{-d_n d}.",
-            "5. Asymptotic contradiction inequality: U_n > (d - 1) h_n + d * log M(alpha) * d_n for large n.",
-        ],
-        "why_zeta_rho_eq_0_does_not_supply_P_n": {
-            "for_P_n_of_rho_1": (
-                "Taylor polynomials T_N(s) of xi(s) (or zeta(s)) have transcendental coefficients "
-                "(involving log(pi), gamma_E, Stieltjes constants gamma_k, and zeta^{(k)}(0)), NOT "
-                "integer/algebraic coefficients; conversely, Dirichlet partial sums sum_{m=1}^N m^{-s} "
-                "are polynomials in p^{-s} = exp(-s log p), not polynomials in s, and do not converge "
-                "exponentially to 0 at s = rho_1 inside 0 < Re(s) < 1."
-            ),
-            "for_P_n_of_gamma_1": (
-                "Replacing rho_1 by gamma_1 via Xi(i*gamma_1) = xi(1/2 + i*gamma_1) = 0 produces an "
-                "even power series sum_{m>=0} c_{2m} gamma_1^{2m} = 0 whose coefficients c_{2m} = "
-                "(-1)^m Xi^{(2m)}(0)/(2m)! are themselves transcendental/unknown constants (related "
-                "to Sigma_{2m}), so truncating it does not yield P_n(gamma_1) in Z[gamma_1]."
-            ),
+        "structural_distinction": VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE,
+        "value_vs_argument_explanation": (
+            "Fauzan (2026) constructs a polynomial Q_n(X) in Z[X] in a VALUE variable X and evaluates at "
+            "X = zeta(5), using the fact that the pole integral int_0^infty w(y)/(y^2+j^2) dy is affine in "
+            "the value zeta(5). For a zeta zero rho_1 = beta_1 + i*gamma_1, the value zeta(rho_1) = 0 is "
+            "already rational (zero), while the unknown target alpha in {gamma_1, rho_1} is the ARGUMENT "
+            "entering nonlinearly inside n^{-rho_1}, Gamma(rho_1/2), or (y^2 + z_{rho_1}^2)^{-1}."
+        ),
+        "irrationality_vs_transcendence_diophantine_requirements": {
+            "for_gamma_1_irrationality_D_eq_1": {
+                "target": "gamma_1 notin Q",
+                "diophantine_lower_bound": "If gamma_1 = a/b with b in Z_{>=1} and P_n(gamma_1) != 0, then |P_n(a/b)| >= b^{-d_n} = exp(-d_n log b).",
+                "required_asymptotic_inequality": (
+                    "With linear degree d_n <= C n, b^{-d_n} = exp(-O(n)) is independent of the coefficient "
+                    "height H(P_n)! Hence ANY superexponential decay 0 < |P_n(gamma_1)| <= exp(-c n^2) (c > 0) "
+                    "with P_n in Z[X] proves gamma_1 notin Q, even if log H(P_n) = O(n^2)."
+                ),
+            },
+            "for_gamma_1_or_rho_1_algebraicity_exclusion_D_ge_2": {
+                "target": "alpha notin Q_bar (or exclusion of algebraic degree [Q(alpha):Q] = D >= 2, required for non-real rho_1)",
+                "liouville_mahler_lower_bound": (
+                    "For algebraic alpha of degree D = [Q(alpha):Q] and Mahler measure M(alpha), and any "
+                    "P_n in Z[X] of degree d_n and naive height H(P_n) with P_n(alpha) != 0: "
+                    "|P_n(alpha)| >= ((d_n + 1) H(P_n))^{-(D - 1)} M(alpha)^{-d_n}, i.e., "
+                    "log |P_n(alpha)| >= -(D - 1) log H(P_n) - d_n log M(alpha) - (D - 1) log(d_n + 1)."
+                ),
+                "regime_1_linear_log_height": (
+                    "If d_n <= C n and log H(P_n) <= C' n (exponential height), then the lower bound is "
+                    "exp(-O_D(n)), so |P_n(alpha)| <= exp(-c n^2) (c > 0) excludes ALL algebraic degrees D >= 1 "
+                    "(proving full transcendence alpha notin Q_bar)."
+                ),
+                "regime_2_quadratic_log_height": (
+                    "If log H(P_n) ~ A n^2 (as in Fauzan's normalizer where log H(Q_n) = O(n^2)) and "
+                    "log |P_n(alpha)| <= -c n^2, then for D >= 2 the height term -(D - 1) A n^2 does NOT "
+                    "vanish: contradiction at degree D requires c > (D - 1) A, and excluding all D >= 2 "
+                    "simultaneously requires log H(P_n) = o(n^2) (or decay faster than exp(-c n^2))."
+                ),
+            },
         },
+        "subgate_tc_039a": fauzan_arch["task_tc_039_gate_map"],
         "privileging_gamma_1_avoided": True,
-        "status": "NO_AUXILIARY_POLYNOMIAL_CONSTRUCTION_KNOWN_FOR_ZETA_ZEROS",
+        "status": FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED,
     }
 
     return zeta5_status, transfer_audit, auxiliary_poly_audit
@@ -1742,6 +2189,13 @@ def _certify_real_ball_polynomial_box(
     `P(X) = a_0 + a_1 X + ... + a_d X^d` with `1 <= d <= D` and `max_j |a_j| <= H`
     using 128-bit outward Arb interval arithmetic (hierarchical outward box + leaf checks).
     Fails closed (`RuntimeError`) if any polynomial enclosure contains 0.
+
+    Scope note (TASK-TC-038R Route A, Section 20.1):
+    Because pruned coefficient branches are excluded by outward interval enclosures without
+    minimizing `|P|` over every pruned integer lattice point, this routine certifies
+    `CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION` (`0 notin P(I)` for all `P` in the
+    box) under method `HIERARCHICAL_BOX_EXCLUSION`, and explicitly sets
+    `global_minimum_scope = FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED`.
     """
     if D > 4:
         raise ValueError("Hierarchical box certifier supports D <= 4.")
@@ -1765,8 +2219,8 @@ def _certify_real_ball_polynomial_box(
         if abs(x_mid) < 1.0:
             raise RuntimeError("Real ordinate midpoint unexpectedly small.")
 
-        min_lower_bound = float("inf")
-        min_witness_coeffs: Tuple[int, ...] = ()
+        min_evaluated_leaf_lb = float("inf")
+        min_evaluated_leaf_coeffs: Tuple[int, ...] = ()
         box_exclusions = 0
         leaf_exclusions = 0
 
@@ -1839,18 +2293,22 @@ def _certify_real_ball_polynomial_box(
                                 )
                             leaf_exclusions += 1
                             lb = float(val.lower())
-                            if lb < min_lower_bound:
-                                min_lower_bound = lb
-                                min_witness_coeffs = (a0, a1, a2, a3, a4)
+                            if lb < min_evaluated_leaf_lb:
+                                min_evaluated_leaf_lb = lb
+                                min_evaluated_leaf_coeffs = (a0, a1, a2, a3, a4)
 
         return {
             "certified": True,
+            "certification_method": HIERARCHICAL_BOX_EXCLUSION,
+            "exclusion_scope": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
+            "global_minimum_scope": FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
+            "full_box_global_minimum_certified": False,
             "D": D,
             "H": H,
             "box_exclusions": box_exclusions,
             "leaf_exclusions": leaf_exclusions,
-            "min_certified_abs_lower_bound": min_lower_bound,
-            "closest_polynomial_coeffs_a0_to_a4": list(min_witness_coeffs),
+            "min_evaluated_leaf_abs_lower_bound_not_global_min": min_evaluated_leaf_lb,
+            "closest_evaluated_leaf_polynomial_coeffs_a0_to_a4": list(min_evaluated_leaf_coeffs),
         }
     finally:
         ctx.prec = old_prec
@@ -1866,6 +2324,13 @@ def _certify_rho1_polynomial_box(
     Key algebraic speedup: Since `a_0 in Z` is real, `Im(P(rho_1))` is completely
     independent of `a_0`! Whenever `0 notin Im(a_1 rho_1 + a_2 rho_1^2 + a_3 rho_1^3 + a_4 rho_1^4)`,
     all `a_0 in [-H, H]` are excluded simultaneously by `Im(P(rho_1)) != 0`.
+
+    Scope note (TASK-TC-038R Route A, Section 20.1):
+    Because imaginary-part pruning excludes all `a_0 in [-H, H]` simultaneously without
+    checking whether `gcd(a_0, a_1, ..., a_d) = 1` or minimizing `|P(rho_1)|` over every
+    pruned branch, this routine certifies `CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION`
+    under method `HIERARCHICAL_BOX_EXCLUSION`, and explicitly sets
+    `global_minimum_scope = FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED`.
     """
     if D > 4:
         raise ValueError("Certifier supports D <= 4.")
@@ -1894,8 +2359,8 @@ def _certify_rho1_polynomial_box(
         im_rem3 = B * im3 + im_rem2
         im1_mid = float(im1.mid())
 
-        min_lower_bound = float("inf")
-        min_witness_coeffs: Tuple[int, ...] = ()
+        min_re_leaf_lb = float("inf")
+        min_re_leaf_coeffs: Tuple[int, ...] = ()
         im_exclusions = 0
         re_leaf_exclusions = 0
 
@@ -1936,12 +2401,8 @@ def _certify_rho1_polynomial_box(
                         im_val = abs(im_v2 + a1 * im1)
                         if im_val > 0:
                             im_exclusions += 1
-                            lb_im = float(im_val.lower())
-                            if lb_im < min_lower_bound:
-                                min_lower_bound = lb_im
-                                min_witness_coeffs = (0, a1, a2, a3, a4)
                             continue
-                        # Here 0 in Im(P(rho_1)) (which occurs exactly when a4 = a3 = 0 and a1 + a2 = 0):
+                        # Here 0 in Im(P(rho_1)) (which occurs when a4 = a3 = 0 and a1 + a2 = 0):
                         # Check Re(P(rho_1)) = a0 + a1*re1 + a2*re2 + a3*re3 + a4*re4
                         re_v1 = a4 * re4 + a3 * re3 + a2 * re2 + a1 * re1
                         if not (0 in (re_v1 + B)):
@@ -1966,18 +2427,22 @@ def _certify_rho1_polynomial_box(
                                 )
                             re_leaf_exclusions += 1
                             lb = float(mod_val.lower())
-                            if lb < min_lower_bound:
-                                min_lower_bound = lb
-                                min_witness_coeffs = (a0, a1, a2, a3, a4)
+                            if lb < min_re_leaf_lb:
+                                min_re_leaf_lb = lb
+                                min_re_leaf_coeffs = (a0, a1, a2, a3, a4)
 
         return {
             "certified": True,
+            "certification_method": HIERARCHICAL_BOX_EXCLUSION,
+            "exclusion_scope": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
+            "global_minimum_scope": FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
+            "full_box_global_minimum_certified": False,
             "D": D,
             "H": H,
             "im_exclusions": im_exclusions,
             "re_leaf_exclusions": re_leaf_exclusions,
-            "min_certified_abs_lower_bound": min_lower_bound,
-            "closest_polynomial_coeffs_a0_to_a4": list(min_witness_coeffs),
+            "min_evaluated_re_leaf_abs_lower_bound_not_global_min": min_re_leaf_lb,
+            "closest_evaluated_re_leaf_polynomial_coeffs_a0_to_a4": list(min_re_leaf_coeffs),
         }
     finally:
         ctx.prec = old_prec
@@ -1991,12 +2456,18 @@ def certify_finite_algebraicity_exclusion(
     custom_enclosure: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
-    Execute the Section 30, 31, and 34 certified finite algebraic-relation exclusions:
-      1. Explicit polynomial-by-polynomial normalized enumeration for `1 <= d <= D_explicit`,
-         `max_j |a_j| <= H_explicit` across all three candidate objects (`gamma_1`, `rho_1`,
-         `gamma_1 + 1/2`), plus translated-control verification `Q(gamma_1 + 1/2) = 2^d P(gamma_1)`.
-      2. Full `1 <= d <= D_box`, `max_j |a_j| <= H_box` (`D <= 4, H <= 100`) outward 128-bit
-         Arb/Acb interval certificate across `gamma_1`, `rho_1`, and `gamma_1 + 1/2`.
+    Execute the certified finite algebraic-relation exclusions (repaired in TASK-TC-038R
+    Sections 19-21 under Route A):
+      1. `EXPLICIT_POLYNOMIAL_ENUMERATION`: Exhaustive polynomial-by-polynomial normalized
+         enumeration for `1 <= d <= D_explicit`, `max_j |a_j| <= H_explicit` (`D <= 4, H <= 3`,
+         `8,160` primitive polynomials) across all three candidate objects (`gamma_1`, `rho_1`,
+         `gamma_1 + 1/2`), with certified global minima over the `D <= 4, H <= 3` box and
+         translated-control verification `Q(gamma_1 + 1/2) = 2^d P(gamma_1)`.
+      2. `HIERARCHICAL_BOX_EXCLUSION`: Full `1 <= d <= D_box`, `max_j |a_j| <= H_box`
+         (`D <= 4, H <= 100`, `158,062,321,920` primitive polynomials) outward 128-bit Arb/Acb
+         interval certificate across `gamma_1`, `rho_1`, and `gamma_1 + 1/2`. Certifies
+         `CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION` (`0 notin P(I)` for all `P`
+         in the box) while explicitly setting `FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED`.
     Fails closed (`RuntimeError`) if zero enclosure precision is insufficient or if `0 in P(I)`.
     """
     if not FLINT_AVAILABLE:
@@ -2025,6 +2496,7 @@ def certify_finite_algebraicity_exclusion(
                     )
             return {
                 "classification": CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION,
+                "exclusion_scope_status": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
                 "custom_enclosure_certified": True,
                 "polynomials_tested": len(polys_small),
             }
@@ -2037,8 +2509,11 @@ def certify_finite_algebraicity_exclusion(
         # 1. Explicit individual polynomial-by-polynomial normalized search (D_explicit, H_explicit)
         polys = enumerate_normalized_primitive_polynomials(D=D_explicit, H=H_explicit)
         min_g1 = float("inf")
+        min_g1_coeffs: Tuple[int, ...] = ()
         min_shifted = float("inf")
+        min_shifted_coeffs: Tuple[int, ...] = ()
         min_rho1 = float("inf")
+        min_rho1_coeffs: Tuple[int, ...] = ()
         translation_max_diff = 0.0
 
         for coeffs in polys:
@@ -2058,14 +2533,22 @@ def certify_finite_algebraicity_exclusion(
                 raise RuntimeError(
                     f"Explicit polynomial {coeffs} failed exclusion; failing closed."
                 )
-            min_g1 = min(min_g1, float(abs_g1.lower()))
-            min_shifted = min(min_shifted, float(abs_sh.lower()))
-            min_rho1 = min(min_rho1, float(abs_rho.lower()))
+            lb_g1 = float(abs_g1.lower())
+            if lb_g1 < min_g1:
+                min_g1 = lb_g1
+                min_g1_coeffs = coeffs
+            lb_sh = float(abs_sh.lower())
+            if lb_sh < min_shifted:
+                min_shifted = lb_sh
+                min_shifted_coeffs = coeffs
+            lb_rho = float(abs_rho.lower())
+            if lb_rho < min_rho1:
+                min_rho1 = lb_rho
+                min_rho1_coeffs = coeffs
 
             # Section 34 control: verify that evaluating the translated polynomial
             # Q(Y) = 2^d P(Y - 1/2) at Y = gamma_1 + 1/2 matches 2^d P(gamma_1)
             if d <= 2 and len(coeffs) <= 3:
-                # Quick exact check on degree <= 2 polynomials
                 y_minus_half = shifted_ball - arb("0.5")
                 val_trans = arb(0)
                 for c in reversed(coeffs):
@@ -2074,7 +2557,7 @@ def certify_finite_algebraicity_exclusion(
                 if diff > translation_max_diff:
                     translation_max_diff = diff
 
-        # 2. Full D <= 4, H <= 100 outward Arb/Acb box+leaf certificate
+        # 2. Full D <= 4, H <= 100 outward Arb/Acb hierarchical box+leaf exclusion certificate (Route A)
         primitive_counts_box = count_primitive_polynomials_up_to(D=D_box, H=H_box)
         cert_g1_box = _certify_real_ball_polynomial_box(g1_ball, D=D_box, H=H_box)
         cert_shifted_box = _certify_real_ball_polynomial_box(
@@ -2084,6 +2567,9 @@ def certify_finite_algebraicity_exclusion(
 
         return {
             "classification": CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION,
+            "exclusion_scope_status": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
+            "global_minimum_scope_status": FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
+            "route_selected": "Route_A_Certify_Exclusion_Only_For_Pruned_Box",
             "is_irrationality_proof": False,
             "is_transcendence_proof": False,
             "normalization_rules": {
@@ -2093,16 +2579,25 @@ def certify_finite_algebraicity_exclusion(
                 "zero_polynomial_excluded": True,
             },
             "explicit_individual_enumeration": {
+                "certification_method": EXPLICIT_POLYNOMIAL_ENUMERATION,
+                "full_box_global_minimum_certified": True,
                 "D": D_explicit,
                 "H": H_explicit,
                 "number_of_polynomials_tested": len(polys),
                 "gamma_1_min_certified_abs_lower_bound": min_g1,
+                "gamma_1_closest_polynomial_coeffs": list(min_g1_coeffs),
                 "shifted_ordinate_min_certified_abs_lower_bound": min_shifted,
+                "shifted_ordinate_closest_polynomial_coeffs": list(min_shifted_coeffs),
                 "rho_1_min_certified_abs_lower_bound": min_rho1,
+                "rho_1_closest_polynomial_coeffs": list(min_rho1_coeffs),
                 "all_excluded": True,
                 "translated_control_max_residual": translation_max_diff,
             },
             "hierarchical_arb_box_certificate_D4_H100": {
+                "certification_method": HIERARCHICAL_BOX_EXCLUSION,
+                "exclusion_scope": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
+                "global_minimum_scope": FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
+                "full_box_global_minimum_certified": False,
                 "D": D_box,
                 "H": H_box,
                 "number_of_primitive_polynomials_in_space": primitive_counts_box[
@@ -2112,6 +2607,13 @@ def certify_finite_algebraicity_exclusion(
                 "gamma_1_certificate": cert_g1_box,
                 "shifted_ordinate_certificate": cert_shifted_box,
                 "rho_1_certificate": cert_rho1_box,
+                "scope_explanation": (
+                    "Outward interval pruning proves 0 notin P(I) for every normalized primitive "
+                    "polynomial with 1 <= d <= 4 and H <= 100 (158,062,321,920 polynomials), but "
+                    "because pruned branches are excluded in aggregate without minimizing |P| over "
+                    "every pruned lattice point (and without checking primitive gcd on imaginary-pruned "
+                    "branches for rho_1), no global minimum |P| over the full D <= 4, H <= 100 box is claimed."
+                ),
             },
             "candidate_comparison_control": {
                 "gamma_1_and_shifted_ordinate_behave_identically_under_translation": True,
@@ -2274,27 +2776,36 @@ def audit_tc_interaction() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# 8. Lean Theorem Verification & Artifact Generation (Sections 39, 41, 48)
+# 8. Lean Theorem Verification, Inventory Provenance & Artifact Generation
 # ---------------------------------------------------------------------------
 
 
 def verify_lean_theorem_identifiers(repo_root: Optional[Path] = None) -> Dict[str, Any]:
     """
     Verify that `formal/RiemannScope/ZeroArithmeticInvariants.lean` exists, contains
-    all 9 required theorem declarations from Section 39, and has 0 `sorry` and 0 `admit`.
+    all 11 required theorem declarations fromTASK-TC-038 + TASK-TC-038R (12 total
+    `theorem` declarations + 4 `def` declarations = 16 declarations), and has 0 `sorry`
+    and 0 `admit`.
     """
     root = repo_root or Path(__file__).resolve().parent.parent
     lean_file = root / "formal" / "RiemannScope" / "ZeroArithmeticInvariants.lean"
     if not lean_file.exists():
         raise FileNotFoundError(f"Missing Lean file: {lean_file}")
 
-    text = lean_file.read_text(encoding="utf-8")
+    raw_bytes = lean_file.read_bytes()
+    file_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+    text = raw_bytes.decode("utf-8")
     # Strip comments before checking for sorry / admit
     no_block_comments = re.sub(r"/-.*?-/", "", text, flags=re.DOTALL)
     no_comments = re.sub(r"--.*$", "", no_block_comments, flags=re.MULTILINE)
 
-    found_theorems = re.findall(
+    found_declarations = re.findall(
         r"^\s*(?:theorem|lemma|def)\s+([A-Za-z0-9_']+)",
+        no_comments,
+        flags=re.MULTILINE,
+    )
+    found_theorem_only = re.findall(
+        r"^\s*theorem\s+([A-Za-z0-9_']+)",
         no_comments,
         flags=re.MULTILINE,
     )
@@ -2302,12 +2813,16 @@ def verify_lean_theorem_identifiers(repo_root: Optional[Path] = None) -> Dict[st
     admit_count = len(re.findall(r"\badmit\b", no_comments))
     axiom_count = len(re.findall(r"^\s*axiom\b", no_comments, flags=re.MULTILINE))
 
-    missing = [name for name in REQUIRED_LEAN_THEOREMS if name not in found_theorems]
+    missing = [name for name in REQUIRED_LEAN_THEOREMS if name not in found_declarations]
 
     return {
         "lean_file": "formal/RiemannScope/ZeroArithmeticInvariants.lean",
+        "sha256": file_sha256,
         "required_theorems": list(REQUIRED_LEAN_THEOREMS),
-        "found_declarations": found_theorems,
+        "found_declarations": found_declarations,
+        "found_theorem_declarations": found_theorem_only,
+        "theorem_declaration_count": len(found_theorem_only),
+        "total_declaration_count": len(found_declarations),
         "missing_required_theorems": missing,
         "all_required_present": len(missing) == 0,
         "sorry_count": sorry_count,
@@ -2320,14 +2835,94 @@ def verify_lean_theorem_identifiers(repo_root: Optional[Path] = None) -> Dict[st
             "Bui-Conrey-Young simple-zero density theorem",
             "Li's criterion (lambda_n > 0 <=> RH)",
             "Voros superzeta meromorphic continuation",
+            "Fauzan (2026) zeta(5) irrationality proof (audited externally in mo271/Zeta5)",
         ],
+    }
+
+
+def verify_formal_source_inventory_provenance(
+    repo_root: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """
+    Verify formal-source inventory synchronization across:
+      - `formal/RiemannScope.lean` (every local `import RiemannScope.<Module>`)
+      - `scripts/build_formal.py::FORMAL_SOURCE_FILES`
+      - `certification.py::REQUIRED_FORMAL_SOURCES`
+    and count total `theorem` declarations across all formal source files (Sections 12 & 14).
+    """
+    root = repo_root or Path(__file__).resolve().parent.parent
+    umbrella_path = root / "formal" / "RiemannScope.lean"
+    umbrella_text = umbrella_path.read_text(encoding="utf-8")
+
+    imported_modules = re.findall(
+        r"^\s*import\s+RiemannScope\.([A-Za-z0-9_]+)\s*$",
+        umbrella_text,
+        flags=re.MULTILINE,
+    )
+    expected_imported_paths = [
+        f"formal/RiemannScope/{mod}.lean" for mod in imported_modules
+    ]
+
+    from certification import REQUIRED_FORMAL_SOURCES
+    from scripts.build_formal import FORMAL_SOURCE_FILES
+
+    missing_from_build_formal = [
+        p for p in expected_imported_paths if p not in FORMAL_SOURCE_FILES
+    ]
+    missing_from_certification = [
+        p for p in expected_imported_paths if p not in REQUIRED_FORMAL_SOURCES
+    ]
+    lists_match_exactly = list(FORMAL_SOURCE_FILES) == list(REQUIRED_FORMAL_SOURCES)
+    target_rel = "formal/RiemannScope/ZeroArithmeticInvariants.lean"
+    target_in_both = (target_rel in FORMAL_SOURCE_FILES) and (
+        target_rel in REQUIRED_FORMAL_SOURCES
+    )
+
+    total_theorem_count = 0
+    per_file_theorem_counts: Dict[str, int] = {}
+    for rel_path in FORMAL_SOURCE_FILES:
+        fpath = root / rel_path
+        if fpath.exists():
+            txt = fpath.read_text(encoding="utf-8")
+            cnt = len(
+                re.findall(r"^\s*theorem\s+[A-Za-z0-9_]+", txt, flags=re.MULTILINE)
+            )
+            per_file_theorem_counts[rel_path] = cnt
+            total_theorem_count += cnt
+
+    synchronized = (
+        len(missing_from_build_formal) == 0
+        and len(missing_from_certification) == 0
+        and lists_match_exactly
+        and target_in_both
+    )
+
+    return {
+        "status": (
+            FORMAL_SOURCE_INVENTORY_SYNCHRONIZED
+            if synchronized
+            else "FORMAL_SOURCE_INVENTORY_OUT_OF_SYNC"
+        ),
+        "synchronized": synchronized,
+        "umbrella_imported_module_count": len(expected_imported_paths),
+        "build_formal_source_count": len(FORMAL_SOURCE_FILES),
+        "certification_required_source_count": len(REQUIRED_FORMAL_SOURCES),
+        "missing_from_build_formal": missing_from_build_formal,
+        "missing_from_certification": missing_from_certification,
+        "lists_match_exactly": lists_match_exactly,
+        "zero_arithmetic_lean_file_in_inventories": target_in_both,
+        "zero_arithmetic_lean_theorem_count": per_file_theorem_counts.get(
+            target_rel, 0
+        ),
+        "total_formal_theorem_count": total_theorem_count,
     }
 
 
 def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
     """
     Build the complete machine-readable artifact dictionary for
-    `data/tc_zero_arithmetic_invariants.json` with all 35 required top-level keys (Section 41).
+    `data/tc_zero_arithmetic_invariants.json` including all 35 original TASK-TC-038
+    keys and all 28 required TASK-TC-038R repair keys (Section 40).
     """
     candidates = classify_candidate_objects()
     shifted_audit = audit_shifted_ordinate_redundancy()
@@ -2340,6 +2935,7 @@ def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
     xi_and_sums = derive_xi_hadamard_and_reciprocal_sums()
     superzeta, const_table = audit_superzeta_and_constant_arithmetic()
     zeta5, transfer, aux_poly = verify_zeta5_and_special_value_transfer()
+    fauzan_arch = load_fauzan_zeta5_architecture()
     finite_excl = certify_finite_algebraicity_exclusion(
         D_explicit=4, H_explicit=3, D_box=4, H_box=100
     )
@@ -2347,13 +2943,221 @@ def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
     pslq_diag = run_pslq_diagnostic_control(dps=80, max_degree=4)
     tc_inter = audit_tc_interaction()
     lean_map = verify_lean_theorem_identifiers()
+    formal_prov = verify_formal_source_inventory_provenance()
+
+    subgate_tc_038a_obj = {
+        "subgate_id": SUBGATE_TC_038A_ID,
+        "subgate_classification": ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE,
+        "status": "OPEN",
+        "branch": TASK_TC_038_BRANCH,
+        "scope": (
+            "Arithmetic nature (irrationality / Q-linear independence) of the exact global "
+            "symmetric zero-sum constants 2*lambda_1 = 2 + gamma_E - log(4*pi) and "
+            "S_2 = 1 + gamma_E^2 - pi^2/8 + 2*gamma_1^{St}."
+        ),
+        "statement": (
+            "Prove irrationality of the first reflection-invariant zero sum "
+            "2*lambda_1 = 2 + gamma_E - log(4*pi) (equivalently gamma_E - log(4*pi) notin Q), "
+            "or prove Q-linear independence of {1, S_1, S_2} so that at least one of the "
+            "first two symmetric zero-sum invariants (S_1, S_2) is unconditionally irrational."
+        ),
+        "note": (
+            "Addressing SUBGATE-TC-038A concerns global symmetric zero-sum constants and "
+            "does NOT by itself resolve individual-zero arithmetic or transfer Fauzan's "
+            "2026 Hankel architecture to zero locations (which is tracked separately under "
+            "SUBGATE-TC-039A)."
+        ),
+    }
+
+    subgate_tc_039a_obj = {
+        "subgate_id": SUBGATE_TC_039A_ID,
+        "subgate_classification": FAUZAN_HANKEL_TO_ZERO_ARGUMENT_TRANSFER_SUBGATE,
+        "status": "OPEN",
+        "branch": TASK_TC_038_BRANCH,
+        "target_sprint": "TASK-TC-039",
+        "governing_question": (
+            "Can a Hankel/Hermite/Gram/potential-theoretic determinant architecture produce "
+            "an auxiliary polynomial P_n(X) in Z[X] in a zero-location coordinate "
+            "X in {gamma_1, rho_1} with certified nonvanishing P_n(X) != 0 and superexponential "
+            "decay beating coefficient-height and degree growth?"
+        ),
+        "gate_map_Z1_to_Z6": fauzan_arch["task_tc_039_gate_map"]["gates"],
+    }
 
     report: Dict[str, Any] = {
-        "starting_head": STARTING_HEAD,
-        "substantive_parent": SUBSTANTIVE_PARENT_HEAD,
-        "task_id": TASK_TC_038_ID,
+        "task_id": TASK_TC_038R_ID,
+        "parent_task_id": TASK_TC_038_ID,
         "task_status": TASK_TC_038_STATUS,
+        "starting_head": STARTING_HEAD,
+        "substantive_tc038_commit": SUBSTANTIVE_TC038_COMMIT,
+        "tc038_starting_head": TC038_STARTING_HEAD,
+        "substantive_parent": SUBSTANTIVE_PARENT_HEAD,
         "branch_classification": TASK_TC_038_BRANCH,
+        # --- 28 Required TASK-TC-038R top-level repair keys (Section 40) ---
+        "task_tc_038r_status": TASK_TC_038R_STATUS,
+        "zeta5_2026_preprint_status": ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM,
+        "zeta5_lean_formalization_status": ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN,
+        "zeta5_lean_evidence_scope": SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED,
+        "zeta5_lean_repository": {
+            "url": fauzan_arch["lean_repository"]["repository_url"],
+            "commit": fauzan_arch["lean_repository"]["commit"],
+            "lean_toolchain": fauzan_arch["lean_repository"]["lean_version"],
+            "mathlib_revision": fauzan_arch["lean_repository"]["mathlib_commit"],
+            "pnt_revision": fauzan_arch["lean_repository"]["dependency_commits"][
+                "PrimeNumberTheoremAnd"
+            ],
+            "evidence_class": LEAN_PROVED_EXTERNAL_REPOSITORY,
+            "evidence_scope": SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED,
+        },
+        "zeta5_formal_theorem": fauzan_arch["target_theorem"],
+        "zeta5_axiom_dependency_status": {
+            "status": ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN,
+            "standard_lean_axioms": fauzan_arch["lean_repository"][
+                "print_axioms_result"
+            ],
+            "sorry_count": 0,
+            "admit_count": 0,
+            "custom_axiom_count": 0,
+        },
+        "zeta5_formal_dependency_status": ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN,
+        "zeta5_peer_review_status": PEER_REVIEW_STATUS_PENDING,
+        "zeta5_exported_lean_theorems": [
+            "Apery.irrational_five",
+            "Apery.irrational_zeta5",
+            "RiemannZetaValues.irrational_five",
+        ],
+        "zeta5_standard_lean_axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound",
+        ],
+        "zeta5_paper_vs_lean_deviations": fauzan_arch[
+            "paper_vs_formalization_deviations"
+        ],
+        "fauzan_proof_architecture": fauzan_arch,
+        "fauzan_hankel_architecture_summary": {
+            "K_parameter": fauzan_arch["polynomial_family"]["parameters"]["K"],
+            "N_parameter": fauzan_arch["polynomial_family"]["parameters"]["N"],
+            "h_degree": fauzan_arch["polynomial_family"]["parameters"]["h"],
+            "hankel_matrix_definition": fauzan_arch["hankel_matrix"]["matrix_entries"],
+            "hermite_weight": fauzan_arch["positivity_source"]["weight_function"],
+            "normalizer_growth_constant": fauzan_arch["denominator_growth_rate"][
+                "lean_constant"
+            ],
+            "analytic_decay_constant": fauzan_arch["analytic_real_bound"][
+                "asymptotic_inequality"
+            ],
+            "net_quadratic_margin_lean": 5.5964,
+            "net_quadratic_margin_paper": 27.8,
+        },
+        "fauzan_degree_growth": fauzan_arch["degree_formula"]["exact_degree"],
+        "fauzan_height_denominator_growth": fauzan_arch["denominator_growth_rate"][
+            "asymptotic_bound"
+        ],
+        "fauzan_small_value_rate": fauzan_arch["small_value_rate"],
+        "fauzan_positivity_gate": fauzan_arch["positivity_source"][
+            "hermite_identity_at_s_eq_5"
+        ],
+        "fauzan_integrality_gate": fauzan_arch["integrality_normalization"][
+            "integrality_theorem"
+        ],
+        "special_value_transfer_classification_repaired": (
+            FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED
+        ),
+        "special_value_transfer_status": SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED,
+        "value_vs_argument_polynomial_distinction": VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE,
+        "fauzan_zero_transfer_gate_map": fauzan_arch["task_tc_039_gate_map"]["gates"],
+        "formal_source_inventory_repaired": FORMAL_SOURCE_INVENTORY_REPAIRED,
+        "formal_source_inventory_status": formal_prov["status"],
+        "zero_arithmetic_module_hashed": {
+            "status": ZERO_ARITHMETIC_MODULE_INCLUDED_IN_BUILD_PROVENANCE,
+            "path": "formal/RiemannScope/ZeroArithmeticInvariants.lean",
+            "sha256": lean_map["sha256"],
+            "in_build_formal_py": formal_prov["zero_arithmetic_lean_file_in_inventories"],
+            "in_certification_py": formal_prov["zero_arithmetic_lean_file_in_inventories"],
+        },
+        "formal_theorem_count_recomputed": {
+            "zero_arithmetic_invariants_theorem_declarations": formal_prov[
+                "zero_arithmetic_lean_theorem_count"
+            ],
+            "zero_arithmetic_invariants_total_declarations": lean_map[
+                "total_declaration_count"
+            ],
+            "total_repository_theorem_declarations": formal_prov[
+                "total_formal_theorem_count"
+            ],
+        },
+        "zero_arithmetic_lean_file_in_build_report": formal_prov[
+            "zero_arithmetic_lean_file_in_inventories"
+        ],
+        "zero_arithmetic_lean_theorem_count": formal_prov[
+            "zero_arithmetic_lean_theorem_count"
+        ],
+        "total_formal_theorem_count": formal_prov["total_formal_theorem_count"],
+        "stieltjes_notation_policy": {
+            "status": STIELTJES_NOTATION_DISAMBIGUATED,
+            "zero_ordinate_symbol": "gamma_n = Im(rho_n) in R",
+            "euler_mascheroni_symbol": "gamma_E = gamma_0^{St}",
+            "stieltjes_constant_symbols": ["gamma_1^{St}", "gamma_2^{St}", "gamma_3^{St}"],
+            "laurent_expansion": (
+                "zeta(s) = 1/(s - 1) + sum_{k=0}^infty ((-1)^k / k!) gamma_k^{St} (s - 1)^k"
+            ),
+        },
+        "stieltjes_notation_status": STIELTJES_NOTATION_DISAMBIGUATED,
+        "S2_correct_formula": {
+            "status": S2_CANONICAL_FORMULA_REPAIRED,
+            "stieltjes_form": "S_2 = 1 + gamma_E^2 - pi^2/8 + 2*gamma_1^{St}",
+            "s0_form": "S_2 = 1 - pi^2/24 + 2*zeta''(0) + log^2(2*pi)",
+            "value_50dps": xi_and_sums["reciprocal_sum_S2"]["value_50dps"],
+            "erroneous_formula_removed_from_canonical_docs": (
+                "1 - pi^2/8 + gamma_Euler + gamma_Euler^2/4 - gamma_1^{Stieltjes}"
+            ),
+            "discrepancy_of_erroneous_formula": xi_and_sums["reciprocal_sum_S2"][
+                "erroneous_formula_discrepancy"
+            ],
+        },
+        "s2_canonical_formula_status": S2_CANONICAL_FORMULA_REPAIRED,
+        "S3_reaudit": xi_and_sums["S3_reaudit"],
+        "S4_reaudit": xi_and_sums["S4_reaudit"],
+        "s3_s4_reaudit_status": S3_S4_REAUDITED,
+        "finite_box_exclusion_status": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
+        "finite_exclusion_scope_status": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
+        "finite_box_global_minimum_status": FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
+        "global_minimum_scope_status": FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED,
+        "explicit_small_box_minimum_status": {
+            "method": EXPLICIT_POLYNOMIAL_ENUMERATION,
+            "D": 4,
+            "H": 3,
+            "polynomials_enumerated": finite_excl["explicit_individual_enumeration"][
+                "number_of_polynomials_tested"
+            ],
+            "full_box_global_minimum_certified": True,
+            "gamma_1_min_abs_lower_bound": finite_excl[
+                "explicit_individual_enumeration"
+            ]["gamma_1_min_certified_abs_lower_bound"],
+            "shifted_ordinate_min_abs_lower_bound": finite_excl[
+                "explicit_individual_enumeration"
+            ]["shifted_ordinate_min_certified_abs_lower_bound"],
+            "rho_1_min_abs_lower_bound": finite_excl[
+                "explicit_individual_enumeration"
+            ]["rho_1_min_certified_abs_lower_bound"],
+        },
+        "cardinality_transcendence_claim_status": (
+            CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE
+        ),
+        "cardinality_row_repair_status": CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE,
+        "fixed_number_field_northcott_status": FIXED_NUMBER_FIELD_REQUIRES_BOUNDED_DEGREE_AND_BOUNDED_HEIGHT,
+        "zero_sum_constant_arithmetic_subgate": subgate_tc_038a_obj,
+        "subgate_tc_038a": subgate_tc_038a_obj,
+        "subgate_tc_039a": subgate_tc_039a_obj,
+        "principal_classification_reassessed": {
+            "principal_classification": PRINCIPAL_CLASSIFICATION,
+            "secondary_classification": SECONDARY_TRANSFER_CLASSIFICATION,
+            "subgate_tc_038a_status": SUBGATE_TC_038A_OPEN,
+            "subgate_tc_039a_status": SUBGATE_TC_039A_OPEN,
+            "obl_ct_001a_status": OBL_CT_001A_OPEN,
+        },
+        # --- Preserved and updated TASK-TC-038 keys ---
         "preflight_tc_037r_housekeeping": {
             "mellin_zero_free_strip_status": "INVERSION_EVEN_MELLIN_ZERO_FREE_STRIP_FALSE",
             "strict_reflection_weight_at_zeta_zero_ordinates_status": (
@@ -2377,17 +3181,18 @@ def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
         "conditional_rh_equivalences": rho_vs_gamma["conditional_rh_equivalence"],
         "individual_zero_rationality_status": {
             "rho_n_rational": "REFUTED_PROVED (Im(rho_n) != 0 since zeta(s) < 0 on (0, 1))",
-            "gamma_n_rational": OPEN_IN_LITERATURE,
+            "gamma_n_rational": NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
             "gamma_1_bounded_denominator_exclusion_Q_10000": CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION,
         },
         "individual_zero_algebraicity_status": {
-            "rho_n_algebraic": OPEN_IN_LITERATURE,
-            "gamma_n_algebraic": OPEN_IN_LITERATURE,
-            "gamma_1_and_rho_1_finite_box_D4_H100": CERTIFIED_FINITE_ALGEBRAIC_RELATION_EXCLUSION,
+            "rho_n_algebraic": NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
+            "gamma_n_algebraic": NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
+            "gamma_1_and_rho_1_finite_box_D4_H100": CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION,
         },
         "individual_zero_transcendence_status": {
-            "rho_n_transcendental": OPEN_IN_LITERATURE,
-            "gamma_n_transcendental": OPEN_IN_LITERATURE,
+            "rho_n_transcendental": NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
+            "gamma_n_transcendental": NO_RESULT_FOUND_AFTER_PRIMARY_SOURCE_AUDIT,
+            "cardinality_transcendence_claim": CARDINALITY_DOES_NOT_IMPLY_ZERO_ORDINATE_TRANSCENDENCE,
             "shifted_ordinate_transcendental_iff_ordinate_transcendental": PROVED,
         },
         "primary_literature_audit": lit_audit,
@@ -2414,31 +3219,37 @@ def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
         "pslq_diagnostic": pslq_diag,
         "partial_sum_numerical_controls": xi_and_sums["partial_sum_numerical_controls"],
         "tc_interaction": tc_inter,
+        "formal_source_inventory_provenance": formal_prov,
         "principal_classification": PRINCIPAL_CLASSIFICATION,
         "secondary_classification": SECONDARY_TRANSFER_CLASSIFICATION,
         "exact_remaining_subgate": {
             "subgate_id": SUBGATE_TC_038A_ID,
+            "subgate_classification": ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE,
+            "parallel_transfer_subgate_id": SUBGATE_TC_039A_ID,
+            "parallel_transfer_subgate_classification": FAUZAN_HANKEL_TO_ZERO_ARGUMENT_TRANSFER_SUBGATE,
             "branch": TASK_TC_038_BRANCH,
             "obl_ct_001a_status": "OPEN",
             "rh_claimed": False,
             "individual_zero_irrationality_or_transcendence_claimed": False,
             "governing_question_answer": (
-                "Current analytic and Diophantine methods control only global symmetric invariants "
-                "of the zero set (S_m, sum 1/(rho(1-rho)), Sigma_{2m}, lambda_n, and Voros superzeta "
-                "values); no established transcendence theorem interacts strongly enough with "
-                "zeta(rho) = 0 in 0 < Re(rho) < 1 to exclude algebraicity of an individual zero."
+                "After incorporating Fauzan's September 2026 preprint and Lean 4 formalization "
+                "(`mo271/Zeta5`, `Apery.irrational_five`, `irrational_zeta_five`) and repairing "
+                "formal provenance, Stieltjes notation, and finite-exclusion certification scope, "
+                "individual zero ordinate irrationality/transcendence remains unresolved, exact "
+                "global symmetric zero-sum invariants (S_m, 2*lambda_1, Sigma_{2m}) and certified "
+                "finite degree/height exclusions (D <= 4, H <= 100 and q <= 10^4) remain proved, "
+                "and TASK-TC-039 is scoped to test SUBGATE-TC-039A (gates Z1-Z6: whether a "
+                "Hankel/Hermite/Gram/potential-theoretic determinant architecture can transfer "
+                "from value-polynomial evaluation at X = zeta(5) to argument-polynomial evaluation "
+                "at X in {gamma_1, rho_1})."
             ),
             "strongest_exact_invariant": (
                 "The absolutely convergent reflection-invariant reciprocal sum "
                 "sum_rho 1/(rho(1 - rho)) = 2*S_1 = 2*lambda_1 = 2 + gamma_E - log(4*pi) "
-                "(together with the second reciprocal power S_2 = 1 + gamma_E^2 - pi^2/8 + 2*gamma_1)."
+                "(together with the second reciprocal power S_2 = 1 + gamma_E^2 - pi^2/8 + 2*gamma_1^{St})."
             ),
-            "single_smallest_missing_theorem_for_tc_039": (
-                "Prove irrationality of the first reflection-invariant zero sum "
-                "2*lambda_1 = 2 + gamma_E - log(4*pi) (equivalently gamma_E - log(4*pi) notin Q), "
-                "or prove linear independence over Q of {1, S_1, S_2} so that at least one of the "
-                "first two symmetric zero-sum invariants (S_1, S_2) is unconditionally irrational."
-            ),
+            "subgate_tc_038a": subgate_tc_038a_obj,
+            "subgate_tc_039a": subgate_tc_039a_obj,
         },
         "lean_theorem_map": lean_map,
     }
@@ -2461,3 +3272,4 @@ def write_zero_arithmetic_invariants_artifact(
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return target
+
