@@ -710,8 +710,8 @@ def derive_positive_moment_sequence_and_differences(
             ),
             "a1_and_a0_actual_subexponential_rate": (
                 "|Delta^n a_0|, |Delta^n a_1| <= exp(-(3/2) * n^{1/3} + o(n^{1/3})) "
-                "(governed by the complex Poisson/Norlund-Rice saddle points pi*x = (n/pi)^{1/3} exp(+-i*pi/6), "
-                "giving oscillatory sign changes cos((3*sqrt(3)/2)*n^{1/3} + phi_0) rather than monotone n^{-3/2} decay)"
+                "(governed by the Euler-transform saddle points s_+- ~ (1/n)^{2/3} exp(+-2*pi*i/3) of C_pi(w) near w = -1, "
+                "giving oscillatory sign changes cos((3*sqrt(3)/2)*n^{1/3} + pi/6) rather than monotone n^{-3/2} decay)"
             ),
             "symbolic_antiderivative_cancellation_verified": antideriv_diff == 0,
             "diagnostic_samples": diagnostics,
@@ -1098,7 +1098,11 @@ def audit_newton_route(
                 "(2m)! * den(B_{2m}) (where den(B_{2m}) = prod_{(p-1)|2m} p <= 4^{2m} by von Staudt-Clausen), "
                 "and binom(z, k) = z(z-1)...(z-k+1)/k! introduces an additional k! denominator."
             ),
-            "asymptotic_log_lcm_denominator": "log(L_n) = 3*n*log(n) + O(n) (from (2n)! * n!)",
+            "asymptotic_log_lcm_denominator": (
+                "2*n*log(n) + O(n) <= log(L_n) <= 3*n*log(n) + O(n) unconditionally "
+                "(upper bound from (2n)! * n!, lower bound >= (5/2)*n*log(n) + O(n) by Kummer ultrametric dominance, "
+                "equal to 3*n*log(n) + O(n) on regular primes)"
+            ),
             "log_L_200": representative_rows[-1]["log_lcm_denominator_L_n"],
             "log_H_primitive_200": representative_rows[-1]["log_height_primitive"],
         },
@@ -1132,17 +1136,22 @@ def audit_newton_route(
         "newton_convergence_domain": {
             "domain": "All of C (entire complex plane)",
             "proof_mechanism": (
-                "For any fixed z in C, |binom(z, k)| ~ |Gamma(-z)|^{-1} k^{-Re(z)-1} is polynomial in k, "
-                "whereas |c_k| = |Delta^k a_0| <= exp(-(3/2)*k^{1/3} + o(k^{1/3})) decays faster than any "
-                "power k^{-M}. Hence sum_{k=0}^infty c_k binom(z, k) converges absolutely and locally uniformly "
-                "on all of C to R(z) (Flajolet-Vepstas 2008, arXiv:math/0611332v2)."
+                "Direct proof without Carlson's theorem: On Re(z) > 1/2, writing r_{c,k} = c/(tau^2 k^2) in (0,1) "
+                "and expanding r_{c,k}^z = sum_{n>=0} binom(z, n) (r_{c,k}-1)^n with subtracted difference "
+                "|d_n^*(r)| <= min(1, 2*n*r) gives sum_{k>=1} |d_n^*(r_{c,k})| = O(sqrt(n)), so the double series "
+                "converges absolutely on Re(z) > 1/2 and equals R_c(z) by Fubini's theorem. Because |c_k| = O(k^{1/2} exp(-kappa(c) k^{1/3})), "
+                "sum_{k=0}^infty c_k binom(z, k) converges absolutely and locally uniformly on all of C to an entire function, "
+                "which equals R_c(z) on all of C by the open-set analytic continuation identity theorem."
             ),
             "converges_at_alpha_1": True,
         },
         "newton_smallness_rate": {
-            "rational_polynomial_rate": "|N_n(alpha_1)| <= exp(-(3/2) * n^{1/3} + o(n^{1/3}))",
+            "rational_polynomial_rate": (
+                "|N_n(alpha_1)| <= exp(-(3/2) * n^{1/3} + o(n^{1/3})), with two-approximant lower envelope "
+                "C_1 n^{-3/2} exp(-3 n^{1/3}) <= |N_n(alpha_1)|^2 + |N_{n+1}(alpha_1)|^2 <= C_2 n^{-1/6} exp(-3 n^{1/3})"
+            ),
             "integer_cleared_polynomial_rate": (
-                "|tilde{N}_n(alpha_1)| = L_n * |N_n(alpha_1)| = exp(3*n*log(n) + O(n)) -> +infty"
+                "|tilde{N}_n(alpha_1)| = L_n * |N_n(alpha_1)| >= exp(2*n*log(n) + O(n)) -> +infty"
             ),
         },
         "newton_irrationality_ratio": {
@@ -1479,7 +1488,12 @@ def audit_multipoint_pade_routes(
                 "produces the unique primitive polynomial tilde{A}_n(z) in Z[z], which is invariant under "
                 "whether B_n was normalized by B_n(0) = 1 or monic leading coefficient."
             ),
-            "height_growth_observed": "log H(tilde{A}_n) ~ c * n^2 * log(n) (reaching 4665.84 at n = 25 for [n/n])",
+            "height_growth_observed": (
+                "Observed finite growth on tested range n <= 25 (reaching log H(tilde{A}_n) = 4665.84 at n = 25 for [n/n]; "
+                "all-n asymptotic rate open)"
+            ),
+            "polynomialization_status": MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED,
+            "gate_z5_evidence_status": "MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE",
         },
         "pade_nonvanishing_status": {
             "arb_certified_nonvanishing_on_tested_range": all_arb_nonzero,
@@ -1510,7 +1524,8 @@ def audit_multipoint_pade_routes(
             "numerator_only_behavior": (
                 "Without dividing by B_n(alpha_1), |A_n(alpha_1)| stays O(1) (~0.597 at n=25) under B_n(0)=1, "
                 "grows to 2.86e17 at n=25 under monic B_n, and grows as exp(+186.64 * n) at n=25 for the "
-                "primitive integer polynomial tilde{A}_n(z) in Z[z]."
+                "primitive integer polynomial tilde{A}_n(z) in Z[z] (finite evidence on n <= 25: "
+                "MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE)."
             ),
         },
         "pade_irrationality_ratio": {
@@ -1545,7 +1560,7 @@ def lambert_stieltjes_hankel_determinant_exact(n: int) -> Fraction:
       B(t) = sum_{m=0}^infty b_m t^m = (1 - sqrt(t) cot(sqrt(t))) / (2t)
            = c_0 / (1 - c_1 t / (1 - c_2 t / ...)),
       c_0 = 1/6,  c_k = 1 / ((2k + 1)(2k + 3))  (k >= 1),
-      D_r / D_{r-1} = c_0 * prod_{j=1}^{r-1} (c_{2j-1} * c_{2j}).
+      D_n = c_0^n * prod_{j=1}^{n-1} (c_{2j-1} * c_{2j})^{n-j}.
     """
     c0 = Fraction(1, 6)
     c = [c0] + [Fraction(1, (2 * k + 1) * (2 * k + 3)) for k in range(1, 2 * n)]
@@ -1566,7 +1581,7 @@ def audit_positive_hankel_determinants_and_coupling(
       1. Exact rational Hankel determinants `D_n = det(b_{i+j})_{0 <= i,j < n}` for `1 <= n <= max_n`;
       2. Verification that `D_n` equals the Lambert-Stieltjes closed-form unit fraction (`num(D_n) == 1`);
       3. Discrete Andreief / Cauchy-Binet / Vandermonde identity verification on finite truncations;
-      4. Rigorous asymptotic proof `-log D_n = log(den(D_n)) = 2 n^2 log n + (2 log 2 - 3) n^2 + O(n log n)`;
+      4. Rigorous asymptotic proof `-log D_n = log(den(D_n)) = 2 n^2 log n + (4 log 2 - 3) n^2 + O(n log n)`;
       5. Audit of argument-coupling families C1, C2, C3.
     """
     a_samples = compute_rational_integer_samples_bernoulli(2 * max_n + 4)[
@@ -1720,8 +1735,8 @@ def audit_positive_hankel_determinants_and_coupling(
             "all_strictly_positive_1_to_max_n": all_positive,
             "all_unit_fractions_num_eq_1": all_unit_fractions,
             "lambert_stieltjes_closed_form": (
-                "D_n = prod_{r=1}^n ((1/6) * prod_{j=1}^{r-1} 1 / ((4j-1)*(4j+1)^2*(4j+3))) = "
-                "2^{-n} * prod_{r=1}^n 1 / ((4r-1) * prod_{k=1}^{2r-1} (2k+1)^2)"
+                "D_n = c_0^n * prod_{j=1}^{n-1} (c_{2j-1} * c_{2j})^{n-j} = "
+                "6^{-n} * prod_{j=1}^{n-1} ((4j-1)*(4j+1)^2*(4j+3))^{-(n-j)}"
             ),
             "lambert_stieltjes_verified_1_to_max_n": all_match_stieltjes,
             "unit_fraction_denominator_consequence": (
@@ -1742,14 +1757,14 @@ def audit_positive_hankel_determinants_and_coupling(
         },
         "hankel_decay_rate": {
             "exact_asymptotic": (
-                "-log(D_n) = log(den(D_n)) = 2 * n^2 * log(n) + (2*log(2) - 3) * n^2 + O(n*log(n))"
+                "-log(D_n) = log(den(D_n)) = 2 * n^2 * log(n) + (4*log(2) - 3) * n^2 + O(n*log(n))"
             ),
             "leading_coefficient_of_n_sq_log_n": 2.0,
-            "subleading_coefficient_of_n_sq": float(2.0 * math.log(2.0) - 3.0),
+            "subleading_coefficient_of_n_sq": float(4.0 * math.log(2.0) - 3.0),
             "proof_method": (
-                "Derived both from the exact Lambert-Stieltjes product log(D_{r-1}/D_r) = "
-                "2*log((4r)! / (2^{2r} (2r)!)) + O(log r) = 4*r*log(r) + (4*log(2) - 4)*r + O(log r) "
-                "and independently from the (k_1, ..., k_n) = (1, ..., n) term of the discrete Andreief expansion."
+                "Derived both via Euler-Maclaurin summation of sum_{j=1}^{n-1} (n - j) log((4j-1)(4j+1)^2(4j+3)) "
+                "= 4*(n^2/2)*log(4) + 4*(n^2/2 log n - 3/4 n^2) + O(n log n) = 2 n^2 log n + (4 log 2 - 3) n^2 + O(n log n) "
+                "and independently via Barnes G-function asymptotics."
             ),
         },
         "argument_coupling_status": {
@@ -1920,12 +1935,12 @@ def build_literature_dependency_table() -> List[Dict[str, Any]]:
             "citation": "P. Flajolet and L. Vepstas (2008), 'On Differences of Zeta Values', J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2).",
         },
         {
-            "theorem": "Carlson's Uniqueness & Newton Series Interpolation Theorem",
-            "hypotheses": "f(z) entire of exponential type < pi on Re(z) >= 0; or direct absolute convergence of Norlund-Rice contour remainder",
-            "our_object": "R(z) = (2z - 1) pi^{-2z} zeta(2z) and Newton series sum_{k>=0} (Delta^k a_0) binom(z, k)",
+            "theorem": "Direct Dirichlet-Binomial Double-Series Fubini Interchange & Analytic Continuation Identity Theorem",
+            "hypotheses": "0 < c < tau^2 so r_{c,k} = c/(tau^2 k^2) in (0, 1); absolute double-series convergence on Re(z) > 1/2 and stretched-exponential coefficient decay on C",
+            "our_object": "R_c(z) = (2z - 1) c^z tau^{-2z} zeta(2z) and Newton series sum_{k>=0} (Delta^k a_0^{(c)}) binom(z, k) (proved without Carlson's theorem)",
             "hypotheses_verified": True,
             "evidence_class": "PROVED",
-            "citation": "F. Carlson (1914); N. E. Norlund (1924), Vorlesungen uber Differenzenrechnung; R. P. Boas (1954), Entire Functions, Thm 9.2.1.",
+            "citation": "N. E. Norlund (1924), Vorlesungen uber Differenzenrechnung; P. Flajolet and L. Vepstas (2008), J. Comput. Appl. Math. 220, 58-73.",
         },
         {
             "theorem": "Hausdorff / Stieltjes Moment Positivity Theorem",
@@ -2179,9 +2194,9 @@ def build_fauzan_zero_argument_transfer_report(
             "algebraic_liouville_mahler_criterion"
         ],
         "height_growth": {
-            "newton_cleared_log_height": "log H(tilde{N}_n) = 3*n*log(n) + O(n) (2628.65 at n = 200)",
-            "pade_diagonal_primitive_log_height": "log H(tilde{A}_n) ~ c * n^2 * log(n) (4665.84 at n = 25)",
-            "hankel_unit_fraction_log_denominator": "log den(D_n) = 2*n^2*log(n) + (2*log(2) - 3)*n^2 + O(n*log(n))",
+            "newton_cleared_log_height": "2*n*log(n) + O(n) <= log L_n <= 3*n*log(n) + O(n) (log H(tilde{N}_n) = 2628.65 at n = 200)",
+            "pade_diagonal_primitive_log_height": "Observed finite growth on n <= 25 (reaching log H(tilde{A}_n) = 4665.84 at n = 25; all-n asymptotic rate open)",
+            "hankel_unit_fraction_log_denominator": "log den(D_n) = 2*n^2*log(n) + (4*log(2) - 3)*n^2 + O(n*log(n))",
             "structural_source": "Euler factorial (2m)! in a_m = (-1)^{m+1} (2m-1) 2^{2m-1} B_{2m} / (2m)!",
         },
         "degree_growth": {

@@ -4450,44 +4450,64 @@ Formalized in `formal/RiemannScope/ZeroArithmeticInvariants.lean` (`12` `theorem
 
 ---
 
-# 56. Fauzan Hankel Irrationality Architecture Transfer to Zeta-Zero Arguments (`TASK-TC-039`)
+# 56. Fauzan Hankel Irrationality Architecture Transfer, Gate-Z5 Lower-Envelope Audit, and $\pi\leftrightarrow\tau$ Arithmetic-Normalization Analysis (`TASK-TC-039` / `TASK-TC-039R`)
 
-### 56.1 Governing Question, Gate Z1 Rationalized Entire Completed Zeta Function $\mathcal{R}(z)$, and Rational Integer Sampling
-In `TASK-TC-039` (`docs/reviews/TC_FAUZAN_ZERO_ARGUMENT_TRANSFER.md`, `tc/fauzan_zero_argument_transfer.py`, `formal/RiemannScope/FauzanZeroArgumentTransfer.lean`, `data/tc_fauzan_zero_argument_transfer.json`), `SUBGATE-TC-039A` is executed across Gates `Z1`–`Z6` to test whether Fauzan's 2026 value-polynomial Hankel irrationality architecture for $\zeta(5)$ can be converted into a zero-independent argument-polynomial architecture $P_n(X) \in \mathbb{Z}[X]$ evaluated at the zero argument $X \in \{\gamma_1, \alpha_1 = \rho_1/2\}$.
-1. **Rationalized Entire Completed Zeta Function (`Z1_ARGUMENT_TARGET_REPRESENTATION_PROVED`, `RATIONALIZED_XI_RATIONAL_INTEGER_SAMPLING_PROVED`)**:
+### 56.1 Governing Question, Gate Z1 Rationalized Entire Completed Zeta Gauge Family $\mathcal{R}_c(z)$, and $\pi\leftrightarrow\tau$ Rational Integer Sampling
+In `TASK-TC-039` and `TASK-TC-039R` (`docs/reviews/TC_FAUZAN_ZERO_ARGUMENT_TRANSFER.md`, `docs/reviews/TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md`, `tc/fauzan_zero_argument_transfer.py`, `tc/fauzan_zero_argument_asymptotic_repair.py`, `formal/RiemannScope/FauzanZeroArgumentTransfer.lean`, `data/tc_fauzan_zero_argument_transfer.json`, `data/tc_fauzan_zero_argument_asymptotic_repair.json`), `SUBGATE-TC-039A` is executed and repaired across Gates `Z1`–`Z6` in both $\pi$ and $\tau = 2\pi$ normalizations.
+1. **Exponential Gauge Family of Rationalized Entire Completed Zeta Functions (`Z1_ARGUMENT_TARGET_REPRESENTATION_PROVED`, `RATIONALIZED_XI_RATIONAL_INTEGER_SAMPLING_PROVED`, `TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`)**:
    \[
-   \boxed{\mathcal{R}(z) := \frac{\pi^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\pi^{-2z}\zeta(2z), \qquad z \in \mathbb{C}.}
+   \boxed{
+   \mathcal{R}_\tau(z) := \frac{2^z\tau^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\tau^{-2z}\zeta(2z), \qquad
+   \mathcal{R}_\pi(z) := \frac{\pi^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\pi^{-2z}\zeta(2z) = 4^z\mathcal{R}_\tau(z), \qquad
+   \mathcal{R}_c(z) := c^z\mathcal{R}_\tau(z) \quad (c \in \mathbb{Q}_{>0}).
+   }
    \]
-   Because $\pi^{-z}$, $\xi(2z)$, and $1/\Gamma(z+1)$ are entire on $\mathbb{C}$, $\mathcal{R}(z)$ is entire on $\mathbb{C}$ with $\mathcal{R}(1/2) = 1/\pi$ and $\mathcal{R}'(1/2) = 2(\gamma_E - \log\pi)/\pi$. In $0 < \Re(z) < 1/2$, $\xi(2z) = 0 \iff \mathcal{R}(z) = 0$, so the first critical-line zero $\rho_1 = \frac{1}{2} + i\gamma_1$ maps to $\alpha_1 := \rho_1/2 = \frac{1}{4} + i\frac{\gamma_1}{2}$ with $\mathcal{R}(\alpha_1) = 0$.
-2. **Exact Rational Integer Samples & Bernoulli OGF**: By Euler's even-zeta theorem, at all integers $m \ge 0$:
+   Because $c^z\tau^{-z}$, $\xi(2z)$, and $1/\Gamma(z+1)$ are entire on $\mathbb{C}$ and $c^z \neq 0$, every $\mathcal{R}_c(z)$ is entire on $\mathbb{C}$ with identical zero divisor ($\mathcal{R}_\pi(1/2) = 1/\pi, \mathcal{R}_\tau(1/2) = 1/\tau$). In $0 < \Re(z) < 1/2$, $\xi(2z) = 0 \iff \mathcal{R}_c(z) = 0$, so the first critical-line zero $\rho_1 = \frac{1}{2} + i\gamma_1$ maps to $\alpha_1 := \rho_1/2 = \frac{1}{4} + i\frac{\gamma_1}{2}$ with $\mathcal{R}_c(\alpha_1) = 0$.
+2. **Exact Rational Integer Samples & Bernoulli OGF**: By Euler's even-zeta theorem $\tau^{-2m}\zeta(2m) = (-1)^{m+1}\frac{B_{2m}}{2(2m)!} \in \mathbb{Q}$, at all integers $m \ge 0$:
    \[
-   \boxed{a_m := \mathcal{R}(m) = (-1)^{m+1}\frac{(2m - 1)2^{2m-1}B_{2m}}{(2m)!} \in \mathbb{Q}_{>0}, \qquad a_0 = \frac{1}{2}, \; a_1 = \frac{1}{6}, \; a_2 = \frac{1}{30}, \; a_3 = \frac{1}{189}, \dots}
+   \boxed{
+   a_m^{(\tau)} := \mathcal{R}_\tau(m) = (-1)^{m+1}\frac{(2m - 1)B_{2m}}{2(2m)!} \in \mathbb{Q}_{>0}, \qquad
+   a_m^{(c)} := \mathcal{R}_c(m) = c^m a_m^{(\tau)} \in \mathbb{Q}_{>0}, \qquad
+   a_m^{(\pi)} = 4^m a_m^{(\tau)},
+   }
    \]
-   with OGF $A(t) = \sum_{m=0}^\infty a_m t^m = \frac{t}{2\sin^2\sqrt{t}}$ ($|t| < \pi^2$) and positive Hausdorff/Stieltjes moment sequence $b_{m-1} := \frac{a_m}{2m-1} = \pi^{-2m}\zeta(2m) = \sum_{k=1}^\infty q_k^m \in \mathbb{Q}_{>0}$ ($q_k = (\pi k)^{-2}$), whose OGF is $B(t) = \frac{1 - \sqrt{t}\cot\sqrt{t}}{2t}$.
+   with OGF $A_c(t) = A_\tau(ct) = \frac{ct}{8\sin^2(\sqrt{ct}/2)}$ ($|t| < \tau^2/c$) and shifted positive Hausdorff/Stieltjes moment sequence $b_{m-1}^{(c)} := \frac{a_m^{(c)}}{2m-1} = c^m\tau^{-2m}\zeta(2m) = \sum_{k=1}^\infty (c/\tau^2 k^2)^m \in \mathbb{Q}_{>0}$ ($b_0^{(\pi)} = 1/6, b_0^{(\tau)} = 1/24$, shifting off $m=0$ where $a_0^{(c)}/(2\cdot 0 - 1) = -1/2 < 0$).
 
-### 56.2 Gates Z2 & Z3 — Target-Zero-Independent Argument Polynomials and Consecutive-Approximant Positivity
-1. **Route A (Newton Interpolation, `Z2_ALGEBRAIC_ARGUMENT_POLYNOMIALITY_PROVED`, `NEWTON_ARGUMENT_POLYNOMIALIZATION_PROVED`)**: $N_n(z) = \sum_{k=0}^n (\Delta^k a_0)\binom{z}{k} \in \mathbb{Q}[z]$ and $\widetilde{N}_n(z) = L_n N_n(z) \in \mathbb{Z}[z]$ have coefficients constructed purely from $(a_m)_{0\le m\le n}$ (`candidate_coefficients_depend_on_gamma1 = False`).
-2. **Real Ordinate Norm Polynomials & Consecutive-Approximant Strict Positivity (`Z3_COFINAL_STRUCTURAL_NONVANISHING_PROVED_FOR_TWO_APPROXIMANT_NORM_SUM`, Lean: `argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`, `newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`)**: For $P \in \mathbb{Q}[z]$, $\mathcal{N}_P(Y) = P(\frac{1}{4}+i\frac{Y}{2})\overline{P}(\frac{1}{4}-i\frac{Y}{2}) \in \mathbb{Q}[Y]$ has degree $\le 2\deg P$ and satisfies $\mathcal{N}_P(Y) \ge 0$ on $\mathbb{R}$. Because $N_{n+1}(z) - N_n(z) = (\Delta^{n+1}a_0)\binom{z}{n+1}$ and $N_n(m) = a_m > 0$ on $0 \le m \le n$, whenever $\Delta^{n+1}a_0 \neq 0$ (which holds on a cofinal infinite set since $a_m \to 0 \neq a_0 = 1/2$, and for all $0 \le n \le 200$), $\gcd(N_n, N_{n+1}) = 1$ and $G_n(Y) := C_n(\mathcal{N}_{N_n}(Y) + \mathcal{N}_{N_{n+1}}(Y)) \in \mathbb{Z}[Y]$ satisfies $G_n(Y) > 0$ for all $Y \in \mathbb{R}$.
-3. **Route B (Multipoint Padé Approximation, `MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`, Lean: `pade_interpolation_zero_residual_identity`)**: The linearized interpolation system $A_n(m) - a_m B_n(m) = 0$ ($0 \le m \le d_A + d_B$) has full rank $d_A + d_B + 1$ and nullity $1$ across $[n/n], [n/(n-1)], [(n-1)/n]$ ($1 \le n \le 25$), and at $\alpha_1$ where $\mathcal{R}(\alpha_1) = 0$, $R_n(\alpha_1) = A_n(\alpha_1) - \mathcal{R}(\alpha_1)B_n(\alpha_1) = A_n(\alpha_1)$.
+### 56.2 Gates Z2 & Z3 — Target-Zero-Independent Argument Polynomials, Direct Newton Identity Without Carlson, and Consecutive-Approximant Positivity
+1. **Route A (Newton Interpolation & Direct Convergence Without Carlson, `Z2_ALGEBRAIC_ARGUMENT_POLYNOMIALITY_PROVED`, `NEWTON_SERIES_IDENTITY_FOR_RATIONALIZED_XI_PROVED_WITHOUT_CARLSON`)**: $N_n^{(c)}(z) = \sum_{k=0}^n (\Delta^k a_0^{(c)})\binom{z}{k} \in \mathbb{Q}[z]$ and $\widetilde{N}_n^{(c)}(z) = L_n^{(c)} N_n^{(c)}(z) \in \mathbb{Z}[z]$ have coefficients constructed purely from $(a_m^{(c)})_{0\le m\le n}$. Because $\mathcal{R}_c(z)$ has Stirling vertical growth of order $1$ along $\Re(z) \to -\infty$, Carlson's theorem is not invoked; instead, for $0 < c < \tau^2$, absolute Fubini interchange of the subtracted Dirichlet-binomial double series on $\Re(z) > 1/2$ combined with locally uniform convergence of $\sum_{n\ge 0}(\Delta^n a_0^{(c)})\binom{z}{n}$ on $\mathbb{C}$ proves $\mathcal{R}_c(z) = \sum_{n=0}^\infty (\Delta^n a_0^{(c)})\binom{z}{n}$ on all of $\mathbb{C}$.
+2. **Real Ordinate Norm Polynomials & Consecutive-Approximant Strict Positivity (`Z3_COFINAL_STRUCTURAL_NONVANISHING_PROVED_FOR_TWO_APPROXIMANT_NORM_SUM`, Lean: `argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`, `newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`)**: Whenever $\Delta^{n+1}a_0^{(c)} \neq 0$ (which holds on a cofinal infinite set and for all $0 \le n \le 200$), $\gcd(N_n^{(c)}, N_{n+1}^{(c)}) = 1$ and $G_n^{(c)}(Y) := C_n(\mathcal{N}_{N_n^{(c)}}(Y) + \mathcal{N}_{N_{n+1}^{(c)}}(Y)) \in \mathbb{Z}[Y]$ satisfies $G_n^{(c)}(Y) > 0$ for all $Y \in \mathbb{R}$.
+3. **Route B (Multipoint Padé Approximation & Binomial Gauge Covariance, `MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`, Lean: `pade_interpolation_zero_residual_identity`, `pade_gauge_covariance_algebra`)**: The linearized interpolation system $A_n^{(c)}(m) - a_m^{(c)} B_n^{(c)}(m) = 0$ ($0 \le m \le d_A + d_B$) has full rank $d_A + d_B + 1$ and nullity $1$ across $[n/n], [n/(n-1)], [(n-1)/n]$ ($1 \le n \le 25$) and satisfies exact binomial gauge covariance $A_n^{(c)}(z) = \sum_{j=0}^{d_A} p_j^{(\tau)}\binom{z}{j}(c-1)^j$, $B_n^{(c)}(z) = B_n^{(\tau)}(z)$ when $d_A \ge d_B$.
 
-### 56.3 Gates Z4 & Z5 — Factorial Denominator Growth, Exact Antiderivative Cancellation, and Subgate Status
-1. **Exact Antiderivative Boundary Cancellation in $\Delta^n a_0$ (`Z4_DEGREE_AND_DENOMINATOR_COMPLEXITY_QUANTIFIED_FACTORIAL_DENOMINATOR_OBSTRUCTION`, `Z5_SUPERLINEAR_LOG_SMALLNESS_FAILED_IN_TESTED_NEWTON_PADE_HANKEL_CLASSES`, `NEWTON_ARGUMENT_POLYNOMIAL_ROUTE_INSUFFICIENT_SMALLNESS`)**: Because $\frac{d}{dx}[\frac{1}{\pi^2 x}(1 - \frac{1}{\pi^2 x^2})^n]\big|_{1/\pi}^\infty = 0$, all algebraic powers in $\Delta^n a_1$ and $\Delta^n a_0$ cancel identically, leaving $|\Delta^n a_0| \ll \exp(-\frac{3}{2}\pi^{2/3}n^{1/3})$. Thus $-\log|N_n(\alpha_1)|/n = O(n^{-2/3}) \to 0$, and clearing denominators by $\log L_n = 3n\log n + O(n)$ yields $\mathcal{I}_n^{\mathrm{int}} = -\log|\widetilde{N}_n(\alpha_1)|/n \sim -3\log n \to -\infty$ ($-13.1608$ at $n = 200$).
-2. **Multipoint Padé Denominator Blow-Up (`MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED_BUT_FAILS_GATE_Z5_INTEGER_SMALLNESS`)**: For $[n/n]$ at $n = 25$, $|A_{25}(\alpha_1)/B_{25}(\alpha_1)| \approx 4.17 \times 10^{-10}$, but $|B_{25}(\alpha_1)|$ absorbs the $(2n)!$ nodal product and $\log H(\widetilde{A}_{25}) = 4665.8428$, giving $\mathcal{I}_{25}(\widetilde{A}_{25}) = -186.6408 < 0$.
-3. **Lambert–Stieltjes Unit-Fraction Hankel Determinants & Coupling Obstruction (`FAUZAN_HANKEL_ARGUMENT_TRANSFER_BLOCKED_BY_TARGET_COUPLING_AND_FACTORIAL_MOMENT_DENOMINATORS`)**: By Lambert's S-fraction $c_0 = 1/6, c_k = \frac{1}{(2k+1)(2k+3)}$, $D_n = \det(b_{i+j})_{0\le i,j<n} = c_0^n c_1^{n-1}\cdots c_{n-1}^1 = 1/\operatorname{den}(D_n)$ is an exact unit fraction for all $n \ge 1$ with $-\log D_n = 2n^2\log n + (2\log 2 - 3)n^2 + O(n\log n)$, while argument-coupling candidates C1/C2/C3 either lose zero cancellation, require non-polynomial $q_k^{\alpha(Y)}$, or reduce to Route B.
+### 56.3 Gates Z4 & Z5 — Repaired Steepest-Descent Asymptotics, Two-Step Lower Envelope, and $\pi\leftrightarrow\tau$ Gauge Invariance
+1. **Repaired Steepest-Descent Asymptotics & Two-Step Lower Envelope (`Z5_NEWTON_ROUTE_GENUINELY_FAILS_BY_TWO_STEP_LOWER_ENVELOPE_AND_FACTORIAL_DENOMINATORS`, Lean: `two_phase_cosine_square_lower_bound`)**: From $C_c(-1+s) \sim \frac{c}{2s^2}\exp(-\sqrt{c}/\sqrt{s})$ around the conjugate saddles $s_\pm = (\frac{\sqrt{c}}{2n})^{2/3}e^{\pm 2\pi i/3}$ (with no $\pi^{2/3}$ contamination),
+   \[
+   \boxed{
+   \Delta^n a_0^{(c)} = (-1)^{n+1}\frac{2\sqrt{c}}{\sqrt{3\pi}} n^{1/2}\exp\!\bigl(-\kappa(c)n^{1/3}\bigr)\!\left[\cos\!\bigl(\omega(c)n^{1/3} + \tfrac{\pi}{6}\bigr) + O(n^{-1/3})\right], \qquad \kappa(c) = \frac{3}{2^{5/3}}c^{1/3}, \quad \omega(c) = \sqrt{3}\,\kappa(c),
+   }
+   \]
+   so $\kappa_\pi = \kappa(4) = 3/2 = 1.5$ and $\kappa_\tau = \kappa(1) = 3/2^{5/3} \approx 0.94494079$. Because the tail $N_n^{(c)}(\alpha_1)$ and step increment $(\Delta^{n+1}a_0^{(c)})\binom{\alpha_1}{n+1}$ have constant asymptotic phase separation $\Delta\theta = \pi/3$ ($\sin^2(\pi/3) = 3/4 > 0$), the two-approximant norm sum $E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2$ satisfies the rigorous two-sided enclosure $C_1(c)n^{-3/2}e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)n^{-1/6}e^{-2\kappa(c)n^{1/3}}$, proving $-\log|\widetilde{N}_n^{(c)}(\alpha_1)|/n \sim -3\log n \to -\infty$ for every fixed $c \in \mathbb{Q}_{>0}$.
+2. **Multipoint Padé Finite-Window Audit & Open Asymptotic Delimiter (`Z5_PADE_FINITE_WINDOW_NEGATIVE_ASYMPTOTIC_OPEN`)**: For $[n/n]$ at $n = 25$, $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\pi)}) = -186.6408 < 0$ and $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\tau)}) = -179.9633 < 0$; the potential-theoretic $n \to \infty$ asymptotic remains an explicitly delimited open analytical question.
+3. **Lambert–Stieltjes Unit-Fraction Hankel Determinants, Subleading Constant, & C1 Degree (`Z5_HANKEL_ROUTE_BLOCKED_BY_UNIT_FRACTION_CANCELLATION_AND_TARGET_COUPLING`)**: For $D_n^{(c)} = \det(b_{i+j}^{(c)})_{0\le i,j<n} = c^{n^2}D_n^{(\tau)}$, both $D_n^{(\pi)}$ and $D_n^{(\tau)}$ are exact unit fractions ($D_1^{(\pi)} = 1/6, D_1^{(\tau)} = 1/24, D_2^{(\pi)} = 1/18900, D_2^{(\tau)} = 1/4838400$) with $-\log D_n^{(\pi)} = 2n^2\log n + (4\log 2 - 3)n^2 + O(n\log n)$ and $-\log D_n^{(\tau)} = 2n^2\log n + (6\log 2 - 3)n^2 + O(n\log n)$, and C1 cleared degree $\deg P_n^{\mathrm{C1}} = \sum_{m=1}^{2n-1}\min(m, 2n-m) = n^2$.
 4. **Principal Classification**:
    \[
    \boxed{
    \begin{gathered}
-   \texttt{RATIONALIZED\_XI\_ARGUMENT\_POLYNOMIALIZATION\_PROVED\_NEWTON\_AND\_PADE\_ROUTES\_FAIL\_GATE\_Z5\_SUPERLINEAR\_SMALLNESS}\\[4pt]
-   (\texttt{SUBGATE-TC-039A} = \texttt{TESTED\_TERMINATED\_AT\_GATE\_Z5\_FACTORIAL\_DENOMINATOR\_AND\_SUBLINEAR\_DECAY\_OBSTRUCTION},\\[2pt]
+   \texttt{TAU\_NORMALIZATION\_EXPOSES\_EVEN\_ZETA\_RATIONAL\_CORE}\\[2pt]
+   \texttt{NEWTON\_SERIES\_IDENTITY\_FOR\_RATIONALIZED\_XI\_PROVED\_WITHOUT\_CARLSON}\\[2pt]
+   \texttt{Z5\_NEWTON\_ROUTE\_GENUINELY\_FAILS\_BY\_TWO\_STEP\_LOWER\_ENVELOPE\_AND\_FACTORIAL\_DENOMINATORS}\\[2pt]
+   \texttt{Z5\_PADE\_FINITE\_WINDOW\_NEGATIVE\_ASYMPTOTIC\_OPEN}\\[2pt]
+   \texttt{Z5\_HANKEL\_ROUTE\_BLOCKED\_BY\_UNIT\_FRACTION\_CANCELLATION\_AND\_TARGET\_COUPLING}\\[2pt]
+   \texttt{PI\_AND\_TAU\_BELONG\_TO\_ONE\_EXPONENTIAL\_GAUGE\_FAMILY\_NO\_FIXED\_GAUGE\_SAVES\_Z5}\\[4pt]
+   (\texttt{SUBGATE-TC-039A} = \texttt{REPAIRED\_NEWTON\_HANKEL\_CLOSED\_AT\_Z5\_PADE\_ASYMPTOTIC\_DELIMITER\_EXPLICIT},\\[2pt]
    \texttt{SUBGATE-TC-040A} = \texttt{OPEN}, \quad \texttt{SUBGATE-TC-038A} = \texttt{OPEN}, \quad \texttt{OBL-CT-001A} = \texttt{OPEN}).
    \end{gathered}
    }
    \]
 
 ### 56.4 Lean 4 Formal Verification
-Formalized in `formal/RiemannScope/FauzanZeroArgumentTransfer.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 9 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 635 compiled `theorem` declarations across 33 local modules + umbrella `formal/RiemannScope.lean` = 34 formal source files):
-`argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`, `newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`, `rational_evaluation_integer_clearing`, `superlinear_log_smallness_irrationality_schema`, `pade_interpolation_zero_residual_identity`.
+Formalized in `formal/RiemannScope/FauzanZeroArgumentTransfer.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 17 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 643 compiled `theorem` declarations across 33 local modules + umbrella `formal/RiemannScope.lean` = 34 formal source files):
+`argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`, `newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`, `rational_evaluation_integer_clearing`, `superlinear_log_smallness_irrationality_schema`, `pade_interpolation_zero_residual_identity`, `pi_tau_rationalized_xi_scaling_algebra`, `pi_tau_integer_sample_scaling`, `gauge_family_zero_invariance`, `pade_gauge_covariance_algebra`, `hankel_determinant_two_by_two_gauge_scaling`, `hankel_determinant_three_by_three_gauge_scaling`, `hankel_determinant_dimension_exponent`, `two_phase_cosine_square_lower_bound`.
+
 
 
 

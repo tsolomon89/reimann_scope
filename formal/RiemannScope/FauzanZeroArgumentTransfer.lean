@@ -188,4 +188,118 @@ theorem pade_interpolation_zero_residual_identity
   rw [h_zero]
   ring
 
+/-! ### 4. TASK-TC-039R: π ↔ τ Normalization, Gauge Scaling, and Two-Phase Lower Envelope (Section 42) -/
+
+/-- 10. `pi_tau_zero_function_scaling`:
+    With `pi_pow_neg2z = four_pow_z * tau_pow_neg2z` (since `π^{-2z} = (τ/2)^{-2z} = 4^z τ^{-2z}`),
+    the rationalized entire functions `R_π(z) = (2z - 1) π^{-2z} ζ(2z)` and
+    `R_τ(z) = (2z - 1) τ^{-2z} ζ(2z)` satisfy `R_π(z) = 4^z R_τ(z)`. -/
+theorem pi_tau_zero_function_scaling
+    (z four_pow_z pi_pow_neg2z tau_pow_neg2z zeta_2z : ℂ)
+    (h_pow : pi_pow_neg2z = four_pow_z * tau_pow_neg2z) :
+    (2 * z - 1) * pi_pow_neg2z * zeta_2z =
+      four_pow_z * ((2 * z - 1) * tau_pow_neg2z * zeta_2z) := by
+  rw [h_pow]
+  ring
+
+/-- 11. `pi_tau_integer_sample_scaling`:
+    For every integer node `m : ℕ`, the `π`-normalized rational sample
+    `a_m^(π) = s * (2m - 1) * 4^m * B_{2m} / (2 * F_{2m})` and the `τ`-normalized
+    rational sample `a_m^(τ) = s * (2m - 1) * B_{2m} / (2 * F_{2m})` satisfy
+    `a_m^(π) = 4^m * a_m^(τ)`. -/
+theorem pi_tau_integer_sample_scaling
+    (m : ℕ) (s B_2m F_2m : ℝ) :
+    s * (2 * (m : ℝ) - 1) * ((4 : ℝ) ^ m) * B_2m / (2 * F_2m) =
+      ((4 : ℝ) ^ m) * (s * (2 * (m : ℝ) - 1) * B_2m / (2 * F_2m)) := by
+  ring
+
+/-- 12. `tau_even_zeta_rational_core_identity`:
+    Given `τ = 2π` (`tau_pow_2m ≠ 0`) and Euler's even-zeta formula
+    `zeta_2m = s * B_2m * tau_pow_2m / (2 * F_2m)`, dividing by `τ^{2m}` isolates
+    the exact rational Bernoulli/factorial core `s * B_2m / (2 * F_2m)`. -/
+theorem tau_even_zeta_rational_core_identity
+    (zeta_2m tau_pow_2m s B_2m F_2m : ℝ)
+    (htau : tau_pow_2m ≠ 0)
+    (h_euler : zeta_2m = s * B_2m * tau_pow_2m / (2 * F_2m)) :
+    zeta_2m / tau_pow_2m = s * B_2m / (2 * F_2m) := by
+  rw [h_euler]
+  calc
+    (s * B_2m * tau_pow_2m / (2 * F_2m)) / tau_pow_2m
+      = (s * B_2m / (2 * F_2m)) * (tau_pow_2m / tau_pow_2m) := by ring
+    _ = (s * B_2m / (2 * F_2m)) * 1 := by rw [div_self htau]
+    _ = s * B_2m / (2 * F_2m) := by ring
+
+/-- 13. `moment_pi_tau_scaling`:
+    Since `q_π = 4 * q_τ`, the `(m+1)`-th Hausdorff moments satisfy
+    `q_π^{m+1} = 4^{m+1} * q_τ^{m+1}` and
+    `s * 4^{m+1} * B / (2 * F) = 4^{m+1} * (s * B / (2 * F))`. -/
+theorem moment_pi_tau_scaling
+    (m : ℕ) (q_pi q_tau s B F : ℝ)
+    (hq : q_pi = 4 * q_tau) :
+    (q_pi ^ (m + 1) = (4 : ℝ) ^ (m + 1) * q_tau ^ (m + 1)) ∧
+    (s * ((4 : ℝ) ^ (m + 1)) * B / (2 * F) =
+      ((4 : ℝ) ^ (m + 1)) * (s * B / (2 * F))) := by
+  refine ⟨?_, by ring⟩
+  rw [hq, mul_pow]
+
+/-- 14. `hankel_gauge_scaling_exponent`:
+    In an `n × n` Hankel determinant `det(c^{i+j+1} b_{i+j})_{0 ≤ i,j < n}`, factoring `c^i`
+    from row `i` and `c^{j+1}` from column `j` yields total exponent
+    `2 * (n * (n - 1) / 2) + n = n^2` (formulated as `n * (n - 1) + n = n ^ 2` for `n ≥ 1`),
+    so `(c ^ (n * (n - 1))) * (c ^ n) = c ^ (n ^ 2)`. -/
+theorem hankel_gauge_scaling_exponent
+    (c : ℝ) (n : ℕ) (hn : 1 ≤ n) :
+    (n * (n - 1) + n = n ^ 2) ∧
+    ((c ^ (n * (n - 1))) * (c ^ n) = c ^ (n ^ 2)) := by
+  have h_exp : n * (n - 1) + n = n ^ 2 := by
+    zify [hn]
+    ring
+  refine ⟨h_exp, ?_⟩
+  rw [← pow_add, h_exp]
+
+/-- 15. `rational_gauge_zero_divisor_invariant`:
+    For any nowhere-vanishing gauge factor `c_pow_z ≠ 0` (`c^z = exp(z log c) ≠ 0`),
+    the gauge-transformed function `R_c(z) = c_pow_z * R_τ(z)` has the exact same
+    zeros as `R_τ(z)`: `c_pow_z * R_tau = 0 ↔ R_tau = 0`. -/
+theorem rational_gauge_zero_divisor_invariant
+    (c_pow_z R_tau : ℂ) (hc : c_pow_z ≠ 0) :
+    c_pow_z * R_tau = 0 ↔ R_tau = 0 := by
+  constructor
+  · intro h
+    exact (mul_eq_zero.mp h).resolve_left hc
+  · intro h
+    rw [h, mul_zero]
+
+/-- 16. `two_phase_cosine_square_lower_bound`:
+    (a) For any two phase cosines/sines `(c₁, s₁)` and `(c₂, s₂)` with `s₁^2 + s₂^2 ≤ 2`,
+        Cauchy–Schwarz / Lagrange's identity gives `(s₂ * c₁ - c₂ * s₁)^2 ≤ 2 * (c₁^2 + c₂^2)`
+        (i.e. `sin^2(θ₂ - θ₁) ≤ 2 (cos^2 θ₁ + cos^2 θ₂)`).
+    (b) For any consecutive values `(u₁, v₁)` and `(u₂, v₂)` with difference
+        `(du, dv) = (u₂ - u₁, v₂ - v₁)`, `3 * ((u₁^2 + v₁^2) + (u₂^2 + v₂^2)) ≥ (u₁^2 + v₁^2) + (du^2 + dv^2)`. -/
+theorem two_phase_cosine_square_lower_bound
+    (c₁ s₁ c₂ s₂ u₁ v₁ u₂ v₂ : ℝ)
+    (h_sin_bound : s₁ ^ 2 + s₂ ^ 2 ≤ 2) :
+    ((s₂ * c₁ - c₂ * s₁) ^ 2 ≤ 2 * (c₁ ^ 2 + c₂ ^ 2)) ∧
+    ((u₁ ^ 2 + v₁ ^ 2) + ((u₂ - u₁) ^ 2 + (v₂ - v₁) ^ 2) ≤
+      3 * ((u₁ ^ 2 + v₁ ^ 2) + (u₂ ^ 2 + v₂ ^ 2))) := by
+  refine ⟨?_, ?_⟩
+  · have h_c_nonneg : 0 ≤ c₁ ^ 2 + c₂ ^ 2 := add_nonneg (sq_nonneg c₁) (sq_nonneg c₂)
+    have h_mul : (c₁ ^ 2 + c₂ ^ 2) * (s₁ ^ 2 + s₂ ^ 2) ≤ (c₁ ^ 2 + c₂ ^ 2) * 2 :=
+      mul_le_mul_of_nonneg_left h_sin_bound h_c_nonneg
+    nlinarith [sq_nonneg (c₁ * s₁ + c₂ * s₂), h_mul]
+  · nlinarith [sq_nonneg (u₁ + u₂), sq_nonneg (v₁ + v₂), sq_nonneg u₂, sq_nonneg v₂]
+
+/-- 17. `fixed_gauge_degree_invariance`:
+    If the `τ`-normalized top Newton difference `c_n_tau ≠ 0` is scaled by a nonzero
+    gauge factor `lambda_n ≠ 0` and divided by `n_fact ≠ 0`, the resulting leading
+    coefficient `(lambda_n * c_n_tau) / n_fact` is nonzero, preserving degree `n`. -/
+theorem fixed_gauge_degree_invariance
+    (lambda_n c_n_tau n_fact : ℝ)
+    (h_lam : lambda_n ≠ 0)
+    (h_cn : c_n_tau ≠ 0)
+    (h_fact : n_fact ≠ 0) :
+    (lambda_n * c_n_tau) / n_fact ≠ 0 := by
+  exact div_ne_zero (mul_ne_zero h_lam h_cn) h_fact
+
 end RiemannScope
+
