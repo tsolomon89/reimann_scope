@@ -7,7 +7,7 @@
 **Implementation Module:** [`tc/fauzan_zero_argument_asymptotic_repair.py`](file:///C:/Development/Projects/reimann_scope/tc/fauzan_zero_argument_asymptotic_repair.py)  
 **Formal Lean 4 Module:** [`formal/RiemannScope/FauzanZeroArgumentTransfer.lean`](file:///C:/Development/Projects/reimann_scope/formal/RiemannScope/FauzanZeroArgumentTransfer.lean) (`17` `theorem` declarations, `0` `sorry`, `0` `admit`)  
 **Principal Classification:**  
-`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`
+`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`
 
 ---
 
@@ -386,50 +386,52 @@ Consider the structurally positive two-approximant quantity
 \[
 \boxed{E_n^{(c)} := |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2.}
 \]
-If one tried to bound \(E_n^{(c)}\) by comparing \(\cos\theta_{\mathrm{tail}}(n)\) and \(\cos\theta_{\mathrm{tail}}(n+1)\) directly, their phase difference would be \(\theta_{\mathrm{tail}}(n+1) - \theta_{\mathrm{tail}}(n) \sim \frac{1}{3}\omega(c)n^{-2/3}\), which would require carrying the saddle expansion to \(o(n^{-2/3})\).
+We strictly separate the **Lean-proved finite algebraic skeleton** (`PROVED_ALGEBRAIC_FINITE_STEP_IDENTITY`) from the **analytic saddle/phase lower envelope** (`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`):
 
-However, we have a much stronger **exact algebraic identity**:
-\[
-\boxed{N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1} a_0^{(c)} \binom{\alpha_1}{n+1}.}
-\]
-By the elementary quadratic inequality (`two_phase_cosine_square_lower_bound` in Lean 4),
-\[
-\boxed{3 E_n^{(c)} = 3\bigl(|N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2\bigr) \ge |N_n^{(c)}(\alpha_1)|^2 + \bigl|N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1)\bigr|^2.}
-\]
-Look at the oscillatory cosine phases of the two terms on the right-hand side:
-- In \(N_n^{(c)}(\alpha_1)\), the cosine factor is \(\cos\theta_{\mathrm{tail}}(n)\) with \(\theta_{\mathrm{tail}}(n) = \omega(c)n^{1/3} + \frac{\pi}{2}\).
-- In \(N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}\), the cosine factor is \(\cos\theta_{\mathrm{diff}}(n)\) with \(\theta_{\mathrm{diff}}(n) = \omega(c)n^{1/3} + \frac{\pi}{6} + O(n^{-2/3})\).
+1. **Lean-Proved Finite Algebraic Skeleton (`PROVED_ALGEBRAIC_FINITE_STEP_IDENTITY`):**
+   - Exact consecutive-step difference identity:
+     \[
+     \boxed{N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1} a_0^{(c)} \binom{\alpha_1}{n+1}.}
+     \]
+   - Elementary maximum step lower bound:
+     \[
+     \boxed{\max\bigl(|N_n^{(c)}(\alpha_1)|, |N_{n+1}^{(c)}(\alpha_1)|\bigr) \ge \frac{1}{2}\left|\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}\right|.}
+     \]
+   - Elementary quadratic inequality (`two_phase_cosine_square_lower_bound` in Lean 4):
+     \[
+     \boxed{3 E_n^{(c)} = 3\bigl(|N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2\bigr) \ge |N_n^{(c)}(\alpha_1)|^2 + \bigl|N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1)\bigr|^2.}
+     \]
 
-Their phase difference is the **constant \(O(1)\) angle**
-\[
-\boxed{\Delta\theta = \theta_{\mathrm{tail}}(n) - \theta_{\mathrm{diff}}(n) = \frac{\pi}{2} - \frac{\pi}{6} = \frac{\pi}{3}, \qquad \sin^2\!\left(\frac{\pi}{3}\right) = \frac{3}{4} > 0!}
-\]
-Hence, for every \(\theta \in \mathbb{R}\),
-\[
-\cos^2\!\left(\theta + \frac{\pi}{2}\right) + \cos^2\!\left(\theta + \frac{\pi}{6}\right) \ge 1 - \cos\!\left(\frac{\pi}{3}\right) = \frac{1}{2} > 0.
-\]
-Because the two cosine phases are separated by \(\frac{\pi}{3} = O(1)\) rather than \(O(n^{-2/3})\), the \(O(n^{-1/3})\) relative error in the leading saddle asymptotics of \(N_n^{(c)}(\alpha_1)\) and \(\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}\) is already small compared to \(\frac{1}{2}\) for all large \(n\)! Since \(|N_n^{(c)}(\alpha_1)|^2\) has prefactor \(\asymp n^{-1/6}e^{-2\kappa(c)n^{1/3}}\) and \(|\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}|^2\) has prefactor \(\asymp n^{-3/2}e^{-2\kappa(c)n^{1/3}}\), we obtain the rigorous two-sided enclosure for all sufficiently large \(n\):
-\[
-\boxed{
-C_1(c)\, n^{-3/2} e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)\, n^{-1/6} e^{-2\kappa(c)n^{1/3}},
-}
-\]
-and therefore
-\[
-\boxed{
--\log E_n^{(c)} = 2\kappa(c)n^{1/3} + O(\log n) \implies \lim_{n\to\infty} \frac{-\log E_n^{(c)}}{n} = 0.
-}
-\]
+2. **Analytic Saddle/Phase Lower Envelope (`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`):**
+   Comparing the oscillatory cosine phases of the two terms on the right-hand side:
+   - In \(N_n^{(c)}(\alpha_1)\), the leading saddle cosine factor is \(\cos\theta_{\mathrm{tail}}(n)\) with \(\theta_{\mathrm{tail}}(n) = \omega(c)n^{1/3} + \frac{\pi}{2}\).
+   - In \(N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}\), the leading saddle cosine factor is \(\cos\theta_{\mathrm{diff}}(n)\) with \(\theta_{\mathrm{diff}}(n) = \omega(c)n^{1/3} + \frac{\pi}{6} + O(n^{-2/3})\).
+   Their leading phase difference is the constant \(O(1)\) angle
+   \[
+   \boxed{\Delta\theta = \theta_{\mathrm{tail}}(n) - \theta_{\mathrm{diff}}(n) = \frac{\pi}{2} - \frac{\pi}{6} = \frac{\pi}{3}, \qquad \sin^2\!\left(\frac{\pi}{3}\right) = \frac{3}{4} > 0,}
+   \]
+   giving \(\cos^2(\theta + \frac{\pi}{2}) + \cos^2(\theta + \frac{\pi}{6}) \ge 1 - \cos(\frac{\pi}{3}) = \frac{1}{2} > 0\). Under the paper saddle derivation (which depends on (i) the \(O(n^{-1/3})\) saddle remainder for \(\Delta^n a_0^{(c)}\), (ii) the complex binomial/tail asymptotic for \(N_n^{(c)}(\alpha_1)\), (iii) the \(\pi/3\) phase displacement between tail and increment, and (iv) uniform domination of subleading contour/saddle contributions at the complex node \(\alpha_1 = \frac{1}{4} + i\frac{\gamma_1}{2}\)), this yields the two-sided paper asymptotic enclosure for sufficiently large \(n\):
+   \[
+   \boxed{
+   C_1(c)\, n^{-3/2} e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)\, n^{-1/6} e^{-2\kappa(c)n^{1/3}},
+   }
+   \]
+   and therefore
+   \[
+   \boxed{
+   -\log E_n^{(c)} = 2\kappa(c)n^{1/3} + O(\log n) \implies \lim_{n\to\infty} \frac{-\log E_n^{(c)}}{n} = 0.
+   }
+   \]
 
 ---
 
 ### R. Gate-Z5 reassessment
 
-Because \(-\log E_n^{(c)} = 2\kappa(c)n^{1/3} + O(\log n)\) holds as a **two-sided asymptotic** (not merely a lower bound on \(-\log E_n^{(c)}\)), no subsequence of \(n\) can achieve superlinear logarithmic decay \(-\log E_n^{(c)} \gg n\). After multiplying by the integer-clearing factor \(C_n^{(c)} \ge 1\) to form \(G_n^{(c)}(Y) = C_n^{(c)}\bigl(\mathcal{N}_{N_n^{(c)}}(Y) + \mathcal{N}_{N_{n+1}^{(c)}}(Y)\bigr) \in \mathbb{Z}[Y]\), we have \(G_n^{(c)}(\gamma_1) = C_n^{(c)} E_n^{(c)} \ge E_n^{(c)}\) (in fact \(C_n^{(c)} E_n^{(c)} \ge \exp(4n\log n + O_c(n)) \to +\infty\)).
+Under the two-sided paper saddle enclosure \(-\log E_n^{(c)} = 2\kappa(c)n^{1/3} + O(\log n)\), no subsequence of \(n\) achieves superlinear logarithmic decay \(-\log E_n^{(c)} \gg n\). After multiplying by the integer-clearing factor \(C_n^{(c)} \ge 1\) to form \(G_n^{(c)}(Y) = C_n^{(c)}\bigl(\mathcal{N}_{N_n^{(c)}}(Y) + \mathcal{N}_{N_{n+1}^{(c)}}(Y)\bigr) \in \mathbb{Z}[Y]\), we have \(G_n^{(c)}(\gamma_1) = C_n^{(c)} E_n^{(c)} \ge E_n^{(c)}\) (with \(C_n^{(c)} E_n^{(c)} \ge \exp(4n\log n + O_c(n)) \to +\infty\)).
 
-Thus **Decision Tree Outcome A** holds unconditionally for every fixed gauge \(c \in (0, \tau^2)\):
+Because the analytic saddle remainder bounds (i)–(iv) at the complex node \(\alpha_1 = \frac{1}{4} + i\frac{\gamma_1}{2}\) are established at the level of a paper steepest-descent derivation rather than a formally verified or ball-certified all-\(n\) remainder theorem, the Newton two-approximant lower-envelope status is classified as:
 \[
-\boxed{\texttt{NEWTON\_TWO\_APPROXIMANT\_ROUTE\_RIGOROUSLY\_FAILS\_GATE\_Z5}.}
+\boxed{\texttt{PROVED\_PAPER\_DERIVATION\_PENDING\_ASYMPTOTIC\_RIGOR\_AUDIT}, \qquad \texttt{SUBGATE-TC-039A} = \texttt{OPEN}.}
 \]
 
 ---
@@ -538,11 +540,11 @@ Although \(\tau = 2\pi\) is the canonical transcendental unit of the `reimann_sc
 ### Z. Principal classification and exact next theorem
 
 1. **Answer to Governing Question 1 (Was the `TASK-TC-039` Gate-Z5 no-go actually proved?):**
-   - For the **Newton route**, `TASK-TC-039R` supplies the missing lower-envelope proof: using the exact consecutive-difference identity \(N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}\), whose oscillatory cosine phase is shifted by \(\Delta\theta = \frac{\pi}{3}\) (\(\sin^2(\pi/3) = 3/4 > 0\)) relative to \(N_n^{(c)}(\alpha_1)\), the two-approximant sum \(E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2\) satisfies the two-sided enclosure \(C_1(c)n^{-3/2}e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)n^{-1/6}e^{-2\kappa(c)n^{1/3}}\), so \((-\log E_n^{(c)})/n \to 0\) (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`).
+   - For the **Newton route**, `TASK-TC-039R` separates the **Lean-proved finite algebraic step skeleton** (`N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}`, `\max(|N_n^{(c)}|, |N_{n+1}^{(c)}|) \ge \frac{1}{2}|\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}|`, and `two_phase_cosine_square_lower_bound`: `3(a^2+b^2) \ge a^2+(b-a)^2`, `PROVED_ALGEBRAIC_FINITE_STEP_IDENTITY`) from the **analytic saddle/phase lower envelope** (`C_1(c)n^{-3/2}e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)n^{-1/6}e^{-2\kappa(c)n^{1/3}}`, `PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`), which depends on the `O(n^{-1/3})` saddle remainder, the complex binomial/tail asymptotic at `\alpha_1`, the `\pi/3` phase displacement, and uniform domination of subleading contour/saddle contributions (`SUBGATE-TC-039A = OPEN`).
    - For the **multipoint Padé route**, algebraic polynomialization is proved for all \(n\) (`MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`), while the Gate-Z5 failure is scoped to certified finite evidence on \(n \le 25\) (`MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE`).
 2. **Answer to Governing Question 2 (Does \(\tau\)-normalization expose a mathematically different arithmetic route?):**
    - Yes at the level of primitive arithmetic structure: \(\mathcal{R}_\tau(z) = (2z-1)\tau^{-2z}\zeta(2z)\) strips out the artificial \(4^m = 2^{2m}\) dyadic factor from \(\mathcal{R}_\pi(m)\) and exposes the rational core \(\tau^{-2m}\zeta(2m) = (-1)^{m+1}\frac{B_{2m}}{2(2m)!} \in \mathbb{Q}_{>0}\) (`TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`).
    - However, at the level of Diophantine approximation order, \(\pi\) (\(c = 4\)) and \(\tau\) (\(c = 1\))—and every fixed rational gauge \(c \in \mathbb{Q}_{>0}\) in \(\mathcal{R}_c(z) = c^z \mathcal{R}_\tau(z)\)—differ only at prime divisors of \(c\) (\(p = 2\) for \(\pi\) vs. \(\tau\)), leaving all odd-prime factorial denominators \((2m)!\), the \(n^{1/3}\) stretched-exponential exponent, the \(n\log n\) Newton denominator class, and the \(2n^2\log n\) Hankel denominator class invariant (`FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`).
 3. **Exact Next Subgate (`SUBGATE-TC-040A`):**
    - Because any exponential gauge \(c^z \mathcal{R}_\tau(z)\) preserves the \((2m)!\) factorial denominator at all odd primes \(p \ge 3\), `SUBGATE-TC-040A` must target a non-exponential entire multiplier \(F(z) = E(z)\mathcal{R}_\tau(z)\) (where \(E(m)\) supplies the factorial factor \((2m)!\) up to \(\exp(O(m))\) denominators while \(E(\alpha_1) \ne 0\)) or a non-polynomial integral/Hadamard kernel, in parallel with `SUBGATE-TC-038A`.
-   - `OBL-CT-001A` remains `OPEN`, and `rh_claimed = False`.
+   - `SUBGATE-TC-039A` remains `OPEN` (pending asymptotic error-term audit), `OBL-CT-001A` remains `OPEN`, and `rh_claimed = False`.

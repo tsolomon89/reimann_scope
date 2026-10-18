@@ -1959,7 +1959,7 @@
       "hypotheses": "Sequence sampled from a meromorphic/entire function with polar singularity structure under Euler transform",
       "our_object": "c_n = Delta^n a_0 and Delta^n a_1 with OGF C(w) = w / (2(1+w)^2 sin^2(sqrt(w/(1+w))))",
       "hypotheses_verified": true,
-      "evidence_class": "PROVED",
+      "evidence_class": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
       "citation": "P. Flajolet and L. Vepstas (2008), 'On Differences of Zeta Values', J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2)."
     },
     {
@@ -2083,7 +2083,7 @@
   },
   "principal_classification": "RATIONALIZED_XI_ARGUMENT_POLYNOMIALIZATION_PROVED_NEWTON_AND_PADE_ROUTES_FAIL_GATE_Z5_SUPERLINEAR_SMALLNESS",
   "exact_remaining_subgate": {
-    "subgate_tc_039a_status": "TESTED_TERMINATED_AT_GATE_Z5_FACTORIAL_DENOMINATOR_AND_SUBLINEAR_DECAY_OBSTRUCTION",
+    "subgate_tc_039a_status": "OPEN",
     "next_subgate_id": "SUBGATE-TC-040A",
     "next_subgate_classification": "SUBFACTORIAL_DENOMINATOR_ZERO_CARRYING_ENTIRE_KERNEL_SAMPLING_SUBGATE",
     "branch": "ZERO_ARITHMETIC_BRANCH",

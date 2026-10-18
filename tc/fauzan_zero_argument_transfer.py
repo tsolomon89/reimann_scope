@@ -106,9 +106,7 @@ ZERO_DEPENDENT_CANDIDATE_REJECTED = "ZERO_DEPENDENT_CANDIDATE_REJECTED"
 PRINCIPAL_CLASSIFICATION = (
     "RATIONALIZED_XI_ARGUMENT_POLYNOMIALIZATION_PROVED_NEWTON_AND_PADE_ROUTES_FAIL_GATE_Z5_SUPERLINEAR_SMALLNESS"
 )
-SUBGATE_TC_039A_CLOSED_STATUS = (
-    "TESTED_TERMINATED_AT_GATE_Z5_FACTORIAL_DENOMINATOR_AND_SUBLINEAR_DECAY_OBSTRUCTION"
-)
+SUBGATE_TC_039A_CLOSED_STATUS = "OPEN"
 SUBGATE_TC_040A_ID = "SUBGATE-TC-040A"
 SUBGATE_TC_040A_CLASSIFICATION = (
     "SUBFACTORIAL_DENOMINATOR_ZERO_CARRYING_ENTIRE_KERNEL_SAMPLING_SUBGATE"
@@ -1931,7 +1929,7 @@ def build_literature_dependency_table() -> List[Dict[str, Any]]:
             "hypotheses": "Sequence sampled from a meromorphic/entire function with polar singularity structure under Euler transform",
             "our_object": "c_n = Delta^n a_0 and Delta^n a_1 with OGF C(w) = w / (2(1+w)^2 sin^2(sqrt(w/(1+w))))",
             "hypotheses_verified": True,
-            "evidence_class": "PROVED",
+            "evidence_class": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
             "citation": "P. Flajolet and L. Vepstas (2008), 'On Differences of Zeta Values', J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2).",
         },
         {

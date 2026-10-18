@@ -102,8 +102,11 @@ HANKEL_DETERMINANT_RATIONAL_GAUGE_SCALING_PROVED = (
 NEWTON_SERIES_IDENTITY_FOR_RATIONALIZED_XI_PROVED_WITHOUT_CARLSON = (
     "NEWTON_SERIES_IDENTITY_FOR_RATIONALIZED_XI_PROVED_WITHOUT_CARLSON"
 )
+PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT = (
+    "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
+)
 NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5 = (
-    "NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5"
+    PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT
 )
 FIXED_RATIONAL_NORMALIZATION_GAUGE_DOES_NOT_CHANGE_NEWTON_STRETCHED_EXPONENT = (
     "FIXED_RATIONAL_NORMALIZATION_GAUGE_DOES_NOT_CHANGE_NEWTON_STRETCHED_EXPONENT"
@@ -119,11 +122,9 @@ TAU_ANALYTIC_NORMALIZATION_DISTINCT_FROM_TC_GRADE_ACTION = (
 )
 
 TC039R_PRINCIPAL_CLASSIFICATION = (
-    "NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER"
+    "TAU_RATIONAL_CORE_AND_GAUGE_SCALING_PROVED_NEWTON_LOWER_ENVELOPE_PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER"
 )
-SUBGATE_TC_039A_REPAIRED_STATUS = (
-    "CLOSED_FOR_NEWTON_ROUTE_BY_RIGOROUS_TWO_APPROXIMANT_LOWER_ENVELOPE_PADE_FINITE_NEGATIVE_EVIDENCE_SCOPED"
-)
+SUBGATE_TC_039A_REPAIRED_STATUS = "OPEN"
 
 REQUIRED_TC039R_LEAN_THEOREMS: Tuple[str, ...] = (
     "pi_tau_zero_function_scaling",
@@ -784,20 +785,23 @@ def verify_direct_newton_series_identity_without_carlson() -> Dict[str, Any]:
             },
         },
         "newton_convergence_domain": {
+            "direct_fubini_gauge_range": "0 < c < tau^2 = 4*pi^2 (includes c_tau = 1 and c_pi = 4)",
             "1_newton_series_convergence_domain": (
-                "All of C (entire complex plane) for any fixed c > 0, by stretched-exponential coefficient decay "
-                "|Delta^n a_0^{(c)}| = O(n^{1/2} exp(-kappa(c) n^{1/3})) vs polynomial growth |binom(z, n)| = O_K(n^{max_K(-Re(z))-1})"
+                "All of C (entire complex plane) for 0 < c < tau^2 = 4*pi^2 (and any c > 0 by stretched-exponential "
+                "coefficient decay |Delta^n a_0^{(c)}| = O(n^{1/2} exp(-kappa(c) n^{1/3})) vs polynomial growth "
+                "|binom(z, n)| = O_K(n^{max_K(-Re(z))-1}))"
             ),
             "2_direct_double_series_equality_domain": (
                 "Open half-plane {z in C : Re(z) > 1/2} for 0 < c < tau^2 via absolute Fubini interchange of the "
-                "subtracted Dirichlet-binomial double sum"
+                "subtracted Dirichlet-binomial double sum (where r_{c,k} = c / (tau^2 k^2) in (0, 1) for all k >= 1)"
             ),
             "3_local_uniform_convergence_domain": (
                 "Every compact subset K subset C (by Weierstrass M-test using sup_{z in K} |binom(z, n)| <= C_K n^{M_K})"
             ),
             "4_analytic_continuation_equality_domain": (
-                "All of C (including the critical strip 0 < Re(z) < 1/2 and the zero argument alpha_1 = 1/4 + i*gamma_1/2) "
-                "by the open-set identity theorem applied to the entire functions F_c(z) and R_c(z) agreeing on Re(z) > 1/2"
+                "All of C for 0 < c < tau^2 (including the critical strip 0 < Re(z) < 1/2 and the zero argument "
+                "alpha_1 = 1/4 + i*gamma_1/2) by the open-set identity theorem applied to the entire functions F_c(z) "
+                "and R_c(z) agreeing on Re(z) > 1/2"
             ),
             "carlson_invoked": False,
         },
@@ -1098,27 +1102,42 @@ def audit_saddle_asymptotics_and_two_step_lower_envelope(
         },
         "newton_two_step_lower_envelope": {
             "definition": "E_n^{(c)} := |N_n^{(c)}(alpha_1)|^2 + |N_{n+1}^{(c)}(alpha_1)|^2",
-            "status": "PROVED_TWO_SIDED_STRETCHED_EXPONENTIAL_ENCLOSURE",
+            "status": PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT,
+            "elementary_single_step_lower_bound": (
+                "max(|N_n^{(c)}(alpha_1)|, |N_{n+1}^{(c)}(alpha_1)|) >= (1/2) * |Delta^{n+1} a_0^{(c)} * binom(alpha_1, n+1)|"
+            ),
             "two_sided_bound": (
                 "C_1(c) * n^{-3/2} * exp(-2 * kappa(c) * n^{1/3}) <= E_n^{(c)} <= "
-                "C_2(c) * n^{-1/6} * exp(-2 * kappa(c) * n^{1/3})  for all sufficiently large n"
+                "C_2(c) * n^{-1/6} * exp(-2 * kappa(c) * n^{1/3})  for all sufficiently large n (paper-derived saddle envelope)"
             ),
             "exponent_A_lower": 1.5,
             "exponent_B_upper": float(-1.0 / 6.0),
+            "lean_proved_algebraic_skeleton": [
+                "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) * binom(alpha_1, n+1)",
+                "3 * (|N_n|^2 + |N_{n+1}|^2) >= |N_n|^2 + |N_{n+1} - N_n|^2",
+                "two_phase_cosine_square_lower_bound: A^2 * cos^2(theta + pi/2) + B^2 * cos^2(theta + pi/6) >= (1/2) * min(A^2, B^2)",
+            ],
+            "analytic_saddle_dependencies_pending_rigor_audit": [
+                "1. Full saddle asymptotic for Delta^n a_0^{(c)} with explicit O(n^{-1/3}) remainder",
+                "2. Complex asymptotic for the Newton tail N_n^{(c)}(alpha_1) at alpha_1 = 1/4 + i*gamma_1/2",
+                "3. The pi/3 phase displacement between the tail N_n^{(c)}(alpha_1) and the single increment (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1)",
+                "4. Uniform domination of all subleading contour/saddle contributions",
+            ],
             "rigorous_phase_separation_proof": (
                 "Instead of comparing the phases of N_n and N_{n+1} directly (which differ by only O(n^{-2/3})), "
                 "use the exact identity N_{n+1}^{(c)}(alpha_1) - N_n^{(c)}(alpha_1) = (Delta^{n+1} a_0^{(c)}) * binom(alpha_1, n+1) "
                 "and the elementary inequality 3 * (|N_n|^2 + |N_{n+1}|^2) >= |N_n|^2 + |N_{n+1} - N_n|^2 "
-                "(formalized in Lean 4 as `two_phase_cosine_square_lower_bound`). "
-                "By the saddle-integration theorem, integrating exp((-kappa(c) + i*omega(c)) k^{1/3}) with respect to k "
+                "(whose finite algebraic cosine-square lower bound is formalized in Lean 4 as `two_phase_cosine_square_lower_bound`). "
+                "In the paper-derived saddle approximation, integrating exp((-kappa(c) + i*omega(c)) k^{1/3}) with respect to k "
                 "divides by (1/3)*(-kappa(c) + i*omega(c)) = (1/3)*(2*kappa(c)*exp(2*pi*i/3)), shifting the oscillatory "
                 "cosine phase of the tail N_n^{(c)}(alpha_1) by Delta_theta = pi/3 relative to the single difference "
                 "(Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1): specifically, theta_tail(n) = omega(c) n^{1/3} + pi/2 while "
                 "theta_diff(n) = omega(c) n^{1/3} + pi/6. Because sin^2(theta_tail - theta_diff) = sin^2(pi/3) = 3/4 > 0, "
-                "Lagrange's identity gives cos^2(theta_tail) + cos^2(theta_diff) >= (1/2) sin^2(pi/3) = 3/8 (in fact = 1/2 + (1/2)cos(2*theta + 2*pi/3) >= 1/2 - 1/4 = 1/4 > 0). "
-                "Since the phase separation pi/3 is O(1) rather than O(n^{-2/3}), the leading O(n^{-1/3}) relative error "
-                "already suffices to bound E_n^{(c)} >= (1/3)*(|N_n|^2 + |N_{n+1} - N_n|^2) >= C_1(c) n^{-3/2} exp(-2*kappa(c)*n^{1/3}) "
-                "for all large n!"
+                "cos^2(theta_tail) + cos^2(theta_diff) >= 1 - cos(pi/3) = 1/2 > 0. "
+                "While the finite algebraic inequality is Lean-proved, the asymptotic lower envelope E_n^{(c)} >= C_1(c) n^{-3/2} exp(-2*kappa(c)*n^{1/3}) "
+                "depends on the analytic saddle asymptotic with explicit O(n^{-1/3}) remainder, the complex tail asymptotic at alpha_1, "
+                "the pi/3 phase displacement, and uniform domination of subleading contour/saddle contributions, and is therefore "
+                "classified as PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT with SUBGATE-TC-039A remaining OPEN."
             ),
             "phase_shift_between_tail_and_increment": "Delta_theta = pi / 3 (O(1) constant phase separation)",
             "min_sum_of_squared_cosines": "min_{theta in R} (cos^2(theta + pi/2) + cos^2(theta + pi/6)) = 1 - cos(pi/3) = 1/2 > 0",
@@ -1128,14 +1147,23 @@ def audit_saddle_asymptotics_and_two_step_lower_envelope(
             "evaluation_table": envelope_rows,
         },
         "z5_newton_status": {
-            "classification": NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5,
+            "classification": PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT,
+            "evidence_class": PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT,
             "fixed_gauge_classification": FIXED_RATIONAL_NORMALIZATION_GAUGE_DOES_NOT_CHANGE_NEWTON_STRETCHED_EXPONENT,
-            "decision_tree_outcome": "Outcome A (rigorous Newton lower envelope proved) + Outcome D (fixed gauges equivalent at leading order)",
+            "direct_fubini_gauge_range": "c in Q cap (0, tau^2), where tau^2 = 4*pi^2 approx 39.4784176 (covers c_tau = 1 and c_pi = 4)",
+            "subgate_tc_039a_status": "OPEN",
+            "decision_tree_outcome": (
+                "Algebraic step inequality Lean-proved (`two_phase_cosine_square_lower_bound`); "
+                "saddle/phase lower envelope paper-derived + numerically supported (`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`); "
+                "fixed gauges in (0, tau^2) equivalent at leading Diophantine order; SUBGATE-TC-039A remains OPEN"
+            ),
             "explanation": (
-                "Even before multiplying by the integer-clearing factor C_n^{(c)} >= exp(4 n log n + O(n)), "
-                "the raw rational two-approximant sum E_n^{(c)} satisfies -log E_n^{(c)} = 2*kappa(c)*n^{1/3} + O(log n), "
-                "so (-log E_n^{(c)}) / (2n + 2) -> 0. After clearing denominators to Z[Y], "
-                "G_n^{(c)}(gamma_1) = C_n^{(c)} E_n^{(c)} diverges as exp(>= 4 n log n + O_c(n)) -> +infty."
+                "Under the paper-derived saddle/phase lower envelope, even before multiplying by the integer-clearing factor "
+                "C_n^{(c)} >= exp(4 n log n + O(n)), the raw rational two-approximant sum E_n^{(c)} satisfies "
+                "-log E_n^{(c)} = 2*kappa(c)*n^{1/3} + O(log n), so (-log E_n^{(c)}) / (2n + 2) -> 0. After clearing denominators "
+                "to Z[Y], G_n^{(c)}(gamma_1) = C_n^{(c)} E_n^{(c)} diverges as exp(>= 4 n log n + O_c(n)) -> +infty. "
+                "Because the analytic saddle remainder bounds are paper-derived rather than formally certified, this step is "
+                "classified as PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT and SUBGATE-TC-039A remains OPEN."
             ),
         },
     }
@@ -1841,10 +1869,10 @@ def build_tc039r_literature_table() -> List[Dict[str, Any]]:
         },
         {
             "theorem": "Flajolet-Vepstas / Wright Saddle-Point Asymptotics for Euler-Transformed Generating Functions",
-            "hypotheses": "Euler-transformed OGF C_c(-1+s) ~ (c/(2s^2)) exp(-sqrt(c)/sqrt(s)) with conjugate saddles in Re(s) < 0",
+            "hypotheses": "Euler-transformed OGF C_c(-1+s) ~ (c/(2s^2)) exp(-sqrt(c)/sqrt(s)) with conjugate saddles in Re(s) < 0 (0 < c < tau^2)",
             "object": "Delta^n a_0^{(c)} = (-1)^{n+1} K(c) n^{1/2} exp(-kappa(c) n^{1/3}) [cos(omega(c) n^{1/3} + pi/6) + O(n^{-1/3})]",
             "hypotheses_verified": True,
-            "evidence_class": "PROVED",
+            "evidence_class": PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT,
             "citation": "E. M. Wright (1935), J. London Math. Soc. 10, 287-293; P. Flajolet and L. Vepstas (2008), J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2).",
         },
         {
@@ -1852,8 +1880,8 @@ def build_tc039r_literature_table() -> List[Dict[str, Any]]:
             "hypotheses": "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1) with pi/3 saddle integration phase shift",
             "object": "E_n^{(c)} = |N_n^{(c)}(alpha_1)|^2 + |N_{n+1}^{(c)}(alpha_1)|^2 >= C_1(c) n^{-3/2} exp(-2 kappa(c) n^{1/3})",
             "hypotheses_verified": True,
-            "evidence_class": "PROVED",
-            "citation": "Derived in TASK-TC-039R §26-29; algebraic inequality formalized in Lean 4 as `two_phase_cosine_square_lower_bound`.",
+            "evidence_class": PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT,
+            "citation": "Derived in TASK-TC-039R §26-29; finite algebraic inequality formalized in Lean 4 as `two_phase_cosine_square_lower_bound`; analytic saddle remainder pending formal rigor audit.",
         },
         {
             "theorem": "Von Staudt-Clausen & Kummer Ultrametric Valuation Theorem for Bernoulli Differences",
@@ -2047,21 +2075,22 @@ def build_fauzan_zero_argument_asymptotic_repair_report(
         "governing_questions_answered": {
             "was_tc039_z5_nogo_actually_proved_for_newton": (
                 "In TASK-TC-039, only an upper bound on |N_n(alpha_1)| was stated, which did not rule out anomalous "
-                "cos(omega n^{1/3} + phi) phase-zero subsequences. In TASK-TC-039R, the Gate-Z5 failure for the Newton "
-                "two-approximant route IS rigorously proved via the consecutive-difference identity "
-                "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1), whose oscillatory cosine "
-                "phase is separated from that of N_n(alpha_1) by the constant O(1) shift Delta_theta = pi/3 (sin^2(pi/3) = 3/4 > 0), "
-                "yielding C_1(c) n^{-3/2} exp(-2 kappa(c) n^{1/3}) <= E_n^{(c)} <= C_2(c) n^{-1/6} exp(-2 kappa(c) n^{1/3}) "
-                "and (-log E_n^{(c)}) / n -> 0 (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`)."
+                "cos(omega n^{1/3} + phi) phase-zero subsequences. In TASK-TC-039R, the consecutive-difference identity "
+                "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1) and the finite algebraic "
+                "cosine-square lower bound (`two_phase_cosine_square_lower_bound`) are proved in Lean 4, while the saddle/phase "
+                "lower envelope C_1(c) n^{-3/2} exp(-2 kappa(c) n^{1/3}) <= E_n^{(c)} <= C_2(c) n^{-1/6} exp(-2 kappa(c) n^{1/3}) "
+                "using the pi/3 phase shift is paper-derived and numerically supported (`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`), "
+                "keeping SUBGATE-TC-039A OPEN pending formal certification of the analytic saddle remainder."
             ),
             "does_tau_normalization_expose_different_arithmetic_route": (
                 "tau-normalization R_tau(z) = (2z - 1) tau^{-2z} zeta(2z) exposes the primitive rational core "
                 "tau^{-2m} zeta(2m) = (-1)^{m+1} B_{2m} / (2*(2m)!) (`TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`) "
                 "and shows that pi-normalization was merely the c = 4 member of the zero-preserving rational gauge family "
-                "R_c(z) = c^z R_tau(z). However, prime-by-prime valuation analysis proves that c = 4 vs c = 1 changes ONLY "
-                "the 2-adic valuation p = 2 (by 2n in log L_n and 2 n^2 in -log D_n) and rescales kappa(c) = (3/2^{5/3}) c^{1/3}, "
-                "leaving all odd-prime factorial denominators (2m)!, the n^{1/3} stretched-exponential exponent, the n log n "
-                "Newton denominator order, and the 2 n^2 log n Hankel denominator order invariant "
+                "R_c(z) = c^z R_tau(z) (with direct Newton/Fubini convergence proved for 0 < c < tau^2). Prime-by-prime "
+                "valuation analysis proves that c = 4 vs c = 1 changes ONLY the 2-adic valuation p = 2 (by 2n in log L_n "
+                "and 2 n^2 in -log D_n) and rescales kappa(c) = (3/2^{5/3}) c^{1/3}, leaving all odd-prime factorial "
+                "denominators (2m)!, the n^{1/3} stretched-exponential exponent, the n log n Newton denominator order, "
+                "and the 2 n^2 log n Hankel denominator order invariant "
                 "(`FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`)."
             ),
         },

@@ -352,14 +352,16 @@ def test_27_phase_constant_formula(artifact_data: dict) -> None:
         )
 
 
-# 28. lower-envelope claim only emitted if proved
+# 28. lower-envelope claim scoped to PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT with Lean skeleton separated from analytic saddle obligations
 def test_28_lower_envelope_backed_by_phase_separation_proof(
     artifact_data: dict,
 ) -> None:
     env = artifact_data["newton_two_step_lower_envelope"]
-    assert env["status"] == "PROVED_TWO_SIDED_STRETCHED_EXPONENTIAL_ENCLOSURE"
+    assert env["status"] == "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
     assert env["phase_shift_between_tail_and_increment"] == "Delta_theta = pi / 3 (O(1) constant phase separation)"
     assert env["lean_theorem"] == "two_phase_cosine_square_lower_bound"
+    assert len(env["lean_proved_algebraic_skeleton"]) == 3
+    assert len(env["analytic_saddle_dependencies_pending_rigor_audit"]) == 4
     # Verify one-loop saddle accuracy across validation rows
     val_rows = artifact_data["delta_n_a0_full_asymptotic"]["validation_rows"]
     assert all(
@@ -368,8 +370,6 @@ def test_28_lower_envelope_backed_by_phase_separation_proof(
     assert all(
         r["one_loop_rel_error_tau"] < 3e-2 for r in val_rows if r["n"] in (120, 200)
     )
-
-
 
 
 # 29. upper bound not treated as lower bound
@@ -381,10 +381,13 @@ def test_29_upper_bound_not_treated_as_lower_bound(artifact_data: dict) -> None:
     assert "C_2(c) * n^{-1/6}" in env["two_sided_bound"]
 
 
-# 30. fixed-gauge n^{1/3} exponent classification
+# 30. fixed-gauge n^{1/3} exponent classification and direct Fubini gauge range 0 < c < tau^2
 def test_30_fixed_gauge_n_pow_1_3_exponent_classification(artifact_data: dict) -> None:
     z5 = artifact_data["z5_newton_status"]
-    assert z5["classification"] == NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    assert z5["classification"] == "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
+    assert z5["evidence_class"] == "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
+    assert z5["subgate_tc_039a_status"] == "OPEN"
+    assert "0, tau^2" in z5["direct_fubini_gauge_range"]
     assert (
         z5["fixed_gauge_classification"]
         == FIXED_RATIONAL_NORMALIZATION_GAUGE_DOES_NOT_CHANGE_NEWTON_STRETCHED_EXPONENT
@@ -481,9 +484,10 @@ def test_38_no_irrationality_claim(artifact_data: dict) -> None:
     )
 
 
-# 39. OBL-CT-001A remains open
+# 39. OBL-CT-001A and SUBGATE-TC-039A remain open
 def test_39_obl_ct_001a_remains_open(artifact_data: dict) -> None:
     assert artifact_data["obl_ct_001a_status"] == "OPEN"
+    assert artifact_data["subgate_tc_039a_status"] == "OPEN"
     assert (
         artifact_data["exact_next_subgate"]["parallel_subgate_tc_038a_status"]
         == "OPEN"
@@ -501,6 +505,7 @@ def test_40_canonical_classifications_schema_and_lean_theorems(
     assert artifact_data["task_id"] == TASK_TC_039R_ID
     assert artifact_data["principal_classification"] == TC039R_PRINCIPAL_CLASSIFICATION
     assert artifact_data["subgate_tc_039a_status"] == SUBGATE_TC_039A_REPAIRED_STATUS
+    assert artifact_data["subgate_tc_039a_status"] == "OPEN"
     assert (
         FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER
         in artifact_data["principal_classification"]
@@ -517,3 +522,4 @@ def test_40_canonical_classifications_schema_and_lean_theorems(
         assert thm in lean_info["found_theorem_declarations"]
     for thm in ALL_FAUZAN_TRANSFER_LEAN_THEOREMS:
         assert thm in lean_info["found_theorem_declarations"]
+

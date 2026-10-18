@@ -94,14 +94,14 @@ At a nontrivial zero $\rho = \beta + i\gamma$ (such as $\rho_1 = \frac{1}{2} + i
 Define the rationalized-$\xi$ function in $\pi$-normalization ($\mathcal{R}_\pi$) and $\tau$-normalization ($\mathcal{R}_\tau$, where $\tau = 2\pi$):
 $$
 \boxed{
-\mathcal{R}_\pi(z) := \frac{\pi^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\pi^{-2z}\zeta(2z) = 4^z \mathcal{R}_\tau(z), \qquad \mathcal{R}_\tau(z) := \frac{2^z \tau^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\tau^{-2z}\zeta(2z).
+\mathcal{R}_\pi(z) := \frac{\pi^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\pi^{-2z}\zeta(2z) = 4^z \mathcal{R}_\tau(z), \qquad \mathcal{R}_\tau(z) := \frac{(2\tau)^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\tau^{-2z}\zeta(2z).
 }
 $$
 
 1. **Equivalence of the definitions**: Since $\xi(s) = \frac{1}{2}s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$, substituting $s = 2z$ gives $\xi(2z) = z(2z-1)\pi^{-z}\Gamma(z)\zeta(2z)$. Dividing by $\pi^z \Gamma(z+1) = \pi^z z\Gamma(z)$ yields $(2z-1)\pi^{-2z}\zeta(2z) = 4^z(2z-1)\tau^{-2z}\zeta(2z)$ identically on $\mathbb{C}$.
 2. **Entirety and removable singularity at $z = 1/2$**: Because $\pi^{-z}$, $\xi(2z)$, and $1/\Gamma(z+1)$ are entire on $\mathbb{C}$, $\mathcal{R}_\pi(z)$ and $\mathcal{R}_\tau(z)$ are entire on $\mathbb{C}$. At $z = 1/2$, the simple pole $\zeta(1 + 2\varepsilon) = \frac{1}{2\varepsilon} + \gamma_E + O(\varepsilon)$ cancels against $(2z - 1) = 2\varepsilon$, giving:
    $$
-   \mathcal{R}_\pi\!\left(\frac{1}{2}\right) = \frac{1}{\pi}, \qquad \mathcal{R}_\tau\!\left(\frac{1}{2}\right) = \frac{1}{\tau}.
+   \mathcal{R}_\pi\!\left(\frac{1}{2}\right) = \frac{1}{\pi}, \qquad \mathcal{R}_\tau\!\left(\frac{1}{2}\right) = \frac{1}{2\tau} = \frac{1}{4\pi}.
    $$
 3. **Zero mapping**: Inside the critical strip $0 < \operatorname{Re}(2z) < 1$ (i.e., $0 < \operatorname{Re}(z) < 1/2$), $\pi^{-z} \ne 0$, $\tau^{-z} \ne 0$, and $\operatorname{Re}(z+1) \in (1, 3/2)$ where $\Gamma(z+1)$ has neither zeros nor poles. Therefore:
    $$
@@ -479,7 +479,7 @@ $$
   - **Z3**: The two-approximant norm sum $G_n^{(c)}(Y) = C_n(|N_n^{(c)}(\alpha(Y))|^2 + |N_{n+1}^{(c)}(\alpha(Y))|^2) \in \mathbb{Z}[Y]$ is strictly positive on all of $\mathbb{R}$ for the infinite cofinal set of $n$ with $\Delta^{n+1}a_0^{(c)} \ne 0$.
   - **Z4**: Exact degree and denominator/height growth are quantified ($\log L_n^{(c)} = 3n\log n + O(n)$ for Newton; $\log H(\widetilde{A}_n^{(c)}) \sim 6n^2\log n$ for $[n/n]$ Padé; $\log\operatorname{den}(D_n^{(c)}) = 2n^2\log n + O(n^2)$ for Hankel).
 - **Gate Z5 fails across all three tested routes (repaired and audited in `TASK-TC-039R`, [TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md))**:
-  - **Route A (Newton)**: Exact boundary cancellation of $\frac{d}{dx}\!\left[\frac{c}{\tau^2 x}(1 - \frac{c}{\tau^2 x^2})^n\right]$ at $x = \sqrt{c}/\tau$ and $x = \infty$ plus the two-approximant phase-separation lower envelope ($\Delta\theta = \pi/3$, $\sin^2(\pi/3) = 3/4 > 0$) proves $E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2 = \Theta(e^{-2\kappa(c)n^{1/3}})$ ($\kappa_\pi = 3/2, \kappa_\tau = 3/2^{5/3}$), so $\mathcal{I}_n(\widetilde{N}_n^{(c)}) \sim -3\log n \to -\infty$ (`Z5_NEWTON_ROUTE_GENUINELY_FAILS_BY_TWO_STEP_LOWER_ENVELOPE_AND_FACTORIAL_DENOMINATORS`).
+  - **Route A (Newton)**: Separating the Lean-proved finite algebraic step skeleton ($N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}$, $\max(|N_n^{(c)}|, |N_{n+1}^{(c)}|) \ge \frac{1}{2}|\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}|$, and `two_phase_cosine_square_lower_bound`, `PROVED_ALGEBRAIC_FINITE_STEP_IDENTITY`) from the paper steepest-descent saddle/phase lower envelope ($\Delta\theta = \pi/3$, $\sin^2(\pi/3) = 3/4 > 0$, `PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`) gives $E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2 = \Theta(e^{-2\kappa(c)n^{1/3}})$ ($\kappa_\pi = 3/2, \kappa_\tau = 3/2^{5/3}$) and $\mathcal{I}_n(\widetilde{N}_n^{(c)}) \sim -3\log n \to -\infty$ (`Z5_NEWTON_ROUTE_GENUINELY_FAILS_BY_TWO_STEP_LOWER_ENVELOPE_AND_FACTORIAL_DENOMINATORS`).
   - **Route B (Multipoint Padé)**: $|A_n^{(c)}(\alpha_1)/B_n^{(c)}(\alpha_1)|$ decays exponentially only because $|B_n^{(c)}(\alpha_1)| \asymp (2n)!$ grows factorially; the integer numerator polynomial alone satisfies $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\pi)}) = -186.64 < 0$ and $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\tau)}) = -179.96 < 0$ (`Z5_PADE_FINITE_WINDOW_NEGATIVE_ASYMPTOTIC_OPEN`).
   - **Route C (Hankel Determinant)**: $D_n^{(\pi)} = 4^{n^2}D_n^{(\tau)} \in \mathbb{Q}_{>0}$ are exact unit fractions with $-\log D_n^{(\pi)} = 2n^2\log n + (4\log 2 - 3)n^2 + O(n\log n)$, and coupling the zero argument $X = \alpha_1$ via C1 ($\deg P_n^{\mathrm{C1}} = n^2$)/C2/C3 either loses zero cancellation, requires non-polynomial $q_{k,c}^X$, or reduces to Route B (`Z5_HANKEL_ROUTE_BLOCKED_BY_UNIT_FRACTION_CANCELLATION_AND_TARGET_COUPLING`).
 
@@ -495,6 +495,8 @@ $$
 \texttt{RATIONALIZED\_XI\_RATIONAL\_INTEGER\_SAMPLING\_PROVED} \\
 \texttt{TAU\_NORMALIZATION\_EXPOSES\_EVEN\_ZETA\_RATIONAL\_CORE} \\
 \texttt{NEWTON\_SERIES\_IDENTITY\_FOR\_RATIONALIZED\_XI\_PROVED\_WITHOUT\_CARLSON} \\
+\texttt{PROVED\_ALGEBRAIC\_FINITE\_STEP\_IDENTITY} \\
+\texttt{PROVED\_PAPER\_DERIVATION\_PENDING\_ASYMPTOTIC\_RIGOR\_AUDIT} \\
 \texttt{Z5\_NEWTON\_ROUTE\_GENUINELY\_FAILS\_BY\_TWO\_STEP\_LOWER\_ENVELOPE\_AND\_FACTORIAL\_DENOMINATORS} \\
 \texttt{Z5\_PADE\_FINITE\_WINDOW\_NEGATIVE\_ASYMPTOTIC\_OPEN} \\
 \texttt{Z5\_HANKEL\_ROUTE\_BLOCKED\_BY\_UNIT\_FRACTION\_CANCELLATION\_AND\_TARGET\_COUPLING} \\
@@ -505,7 +507,7 @@ $$
 
 ### Subgate & Obligation Status
 
-- **`SUBGATE-TC-039A`**: `REPAIRED_NEWTON_HANKEL_CLOSED_AT_Z5_PADE_ASYMPTOTIC_DELIMITER_EXPLICIT`
+- **`SUBGATE-TC-039A`**: `OPEN` (algebraic finite step identity proved in Lean; paper saddle/phase lower envelope classified as `PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`; Padé asymptotic delimiter explicit)
 - **`SUBGATE-TC-038A`**: `OPEN` (`ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE`)
 - **`SUBGATE-TC-040A` (Exact Next Subgate)**: `NON_FACTORIAL_ARITHMETIC_ARGUMENT_OPERATOR_OR_ZERO_SUM_INDEPENDENCE_SUBGATE` (`OPEN`):
   > Either (i) prove irrationality / $\mathbb{Q}$-linear independence of the exact global symmetric zero-sum invariants $2\lambda_1 = 2 + \gamma_E - \log(4\pi)$ and $S_2 = 1 + \gamma_E^2 - \pi^2/8 + 2\gamma_1^{\mathrm{St}}$ (`SUBGATE-TC-038A`), or (ii) construct an arithmetic zero-argument operator whose rational evaluations avoid the $(2m)!$ Euler–Bernoulli factorial denominators that force $\log L_n = \Theta(n\log n)$ in Newton interpolation and $\log\operatorname{den}(D_n) = \Theta(n^2\log n)$ in even-zeta Hankel determinants.
