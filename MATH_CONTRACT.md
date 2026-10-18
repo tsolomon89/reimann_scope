@@ -3563,7 +3563,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
      - `EULER_PRODUCT_NONVANISHING_NOT_AVAILABLE_IN_CRITICAL_STRIP`: $\prod_p (1 - p^{-s})^{-1}$ does not converge in $0 < \Re(s) < 1$.
      - `DIFFERENTIAL_TRANSCENDENCE_DOES_NOT_DETERMINE_ZERO_ARITHMETIC`: Differential transcendence over $\mathbb C(s)$ (Hölder 1887; Hilbert–Ostrowski 1920) does not forbid algebraic zeros, as proved by the explicit entire counterexample $g(s) = 1/\Gamma(s)$ whose zero set is $\mathbb Z_{\le 0} \subset \mathbb Q$.
    - **2026 Odd Zeta Status (`ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM` / `ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN`) & Fauzan Hankel Transfer Audit (`SPECIAL_VALUE_TRANSFER_REQUIRES_2026_HANKEL_AUDIT_REPAIRED` / `FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED`)**:
-     - **Archimedean $\zeta(5)$ (September 2026)**: Aabir Fauzan's 17 Sep 2026 preprint (*"$\zeta(5)$ is irrational"*, Zenodo `22826419`, DOI `10.5281/zenodo.22826419`, `ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM`) constructs a rational polynomial $Q_n(X) \in \mathbb Q[X]$ of degree $37n$ ($K = 40n, N = 3n$) evaluated at $X = \zeta(5)$ using a Hankel determinant of a linear differential operator and a power-product symmetric determinant identity, with denominator $\widetilde D_n^{185n} Q_n(X) \in \mathbb Z[X]$ ($185 \approx 443.133399 < 444\log 2 + 27\log 3 \approx 337.420296$ gap closed by symmetric cancellation) and public Lean 4 formalization `mo271/Zeta5` (`7fe736760f4b96bfdb4334b68e3b3124ecbe10b0`, theorem `Apery.irrational_five` for `riemannZeta 5`, `ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN`, `LEAN_PROVED_EXTERNAL_REPOSITORY`, `SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED`, `ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN` with standard axioms `[propext, Classical.choice, Quot.sound]` and 0 `sorry`/0 `admit`, `PEER_REVIEW_STATUS_PENDING`), alongside Apéry ($\zeta(3) \notin \mathbb Q$), Ball–Rivoal, Zudilin (`arXiv:math/0104249v1`), Rivoal–Zudilin (`arXiv:1803.03160v1`), Fischler–Sprang–Zudilin (`arXiv:1803.08905v2`), Lai–Sprang–Zudilin's May 2025 2-adic theorem $\zeta_2(5) \notin \mathbb Q$ (`arXiv:2505.05005v2`), and Chen et al. (`arXiv:2411.16774v3`).
+     - **Archimedean $\zeta(5)$ (September 2026)**: Aabir Fauzan's 17 Sep 2026 preprint (*"$\zeta(5)$ is irrational"*, Zenodo `22826419`, DOI `10.5281/zenodo.22826419`, `ZETA5_IRRATIONALITY_2026_PREPRINT_CLAIM`) constructs a rational polynomial $Q_n(X) \in \mathbb Q[X]$ of degree $37n$ ($K = 40n, N = 3n$) evaluated at $X = \zeta(5)$ using a Hankel determinant of a linear differential operator and a power-product symmetric determinant identity, with denominator $\widetilde D_n^{185n} Q_n(X) \in \mathbb Z[X]$ ($185 \approx 443.133399 < 444\log 2 + 27\log 3 \approx 337.420296$ gap closed by symmetric cancellation) and public Lean 4 formalization `mo271/Zeta5` (`7fe736760f4b96bfdb4334b68e3b3124ecbe10b0`, theorems `Apery.irrational_zeta5`, `Apery.irrational_five`, and `RiemannZetaValues.irrational_five` for `riemannZeta 5`, `ZETA5_IRRATIONALITY_FORMALIZED_IN_LEAN`, `LEAN_PROVED_EXTERNAL_REPOSITORY`, `SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED`, `EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS` in `PrimeNumberTheoremAnd/Wiener.lean`, `TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS` with `#print axioms Apery.irrational_five` reporting only `[propext, Classical.choice, Quot.sound]`, `PEER_REVIEW_STATUS_PENDING`), alongside Apéry ($\zeta(3) \notin \mathbb Q$), Ball–Rivoal, Zudilin (`arXiv:math/0104249v1`), Rivoal–Zudilin (`arXiv:1803.03160v1`), Fischler–Sprang–Zudilin (`arXiv:1803.08905v2`), Lai–Sprang–Zudilin's May 2025 2-adic theorem $\zeta_2(5) \notin \mathbb Q$ (`arXiv:2505.05005v2`), and Chen et al. (`arXiv:2411.16774v3`).
      - **Value-Polynomial vs. Argument-Polynomial Barrier (`VALUE_POLYNOMIAL_ARCHITECTURE_NEQ_ARGUMENT_POLYNOMIAL_ARCHITECTURE`)**: Fauzan's method evaluates $Q_n(X) \in \mathbb Q[X]$ at a *value* $X = \zeta(5)$, whereas excluding an algebraic zero ordinate or location requires a nonzero integer polynomial $P_n(X) \in \mathbb Z[X]$ evaluated at the *argument* $X \in \{\gamma_1, \rho_1\}$ satisfying $0 < |P_n(\gamma_1)| < H(P_n)^{-D+1-\varepsilon}$ ($D = [\mathbb Q(\gamma_1):\mathbb Q]$). Whether a Hankel/Padé or moment-determinant construction on the completed $\xi$-Taylor coefficients $c_k$ or symmetric zero sums $S_m$ can generate argument polynomials $P_n(\gamma_1)$ is isolated as `SUBGATE-TC-039A` (`Z1`–`Z6`, `FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED`).
 
 3. **Exact Symmetric Zero-Sum Invariants, Disambiguated Stieltjes Notation, Centered Sums, and Li Coefficients**:
@@ -3586,7 +3586,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    - **256-bit Arb Finite Exclusions (`CERTIFIED_FINITE_DEGREE_HEIGHT_ALGEBRAICITY_EXCLUSION`)**:
      - **Full Box $1 \le D \le 4, H \le 100$ (`HIERARCHICAL_BOX_EXCLUSION`, `FULL_BOX_GLOBAL_MINIMUM_NOT_CERTIFIED`)**: Certifies that across all $158{,}062{,}321{,}920$ normalized primitive integer polynomials $P \in \mathcal P_{D,H}$, $0 \notin P([\gamma_1])$, $0 \notin P([\gamma_1 + 1/2])$, and $0 \notin P([\rho_1])$. Because hierarchical Taylor enclosure pruning eliminates non-vanishing coefficient sub-boxes without evaluating every polynomial individually, no full-box global minimum is claimed for $H \le 100$.
      - **Explicitly Enumerated Small Box $D = 4, H = 3$ (`EXPLICIT_POLYNOMIAL_ENUMERATION`)**: Certifies exact full-box global minima across all $8{,}160$ normalized primitive polynomials: $\min |P(\gamma_1)| \ge 11.134725141734695 > 0$, $\min |P(\gamma_1 + 1/2)| \ge 11.634725141734695 > 0$, and $\min |P(\rho_1)| \ge 14.143565845725995 > 0$.
-     - **Bounded-Denominator Rational Exclusion (`CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION`)**: For $1 \le q \le 10{,}000$, $\min |\gamma_1 - p/q| \ge 9.50797 \times 10^{-10} > 0$ at $p/q = 94109/6658$, and `ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL`.
+     - **Bounded-Denominator Rational Exclusion (`CERTIFIED_BOUNDED_DENOMINATOR_RATIONAL_EXCLUSION`)**: For $1 \le q \le 10{,}000$, $\min |\gamma_1 - p/q| \ge 9.50797348022772 \times 10^{-10} > 0$ at $p/q = 94109/6658$, and `ALGEBRAIC_ZERO_DOES_NOT_AUTOMATICALLY_ENTER_AMBIENT_KERNEL`.
    - **Principal Classifications**:
      \[
      \boxed{
@@ -3598,7 +3598,59 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
      \end{gathered}
      }
      \]
-   - `formal/RiemannScope/ZeroArithmeticInvariants.lean` (registered in `scripts/build_formal.py::FORMAL_SOURCE_FILES` and `certification.py::REQUIRED_FORMAL_SOURCES`, `FORMAL_PROVENANCE_INCLUDE_ZERO_ARITHMETIC_INVARIANTS_REPAIRED`; 12 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 626 compiled `theorem` declarations across 30 modules in repo):
+   - `formal/RiemannScope/ZeroArithmeticInvariants.lean` (registered in `scripts/build_formal.py::FORMAL_SOURCE_FILES` and `certification.py::REQUIRED_FORMAL_SOURCES`, `FORMAL_PROVENANCE_INCLUDE_ZERO_ARITHMETIC_INVARIANTS_REPAIRED`; 12 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced):
      `shifted_ordinate_rational_iff`, `half_mem_subfield`, `shifted_ordinate_algebraic_iff`, `shifted_ordinate_transcendental_iff`, `complex_zero_re_im_algebraicity`, `reflection_reciprocal_identity`, `centered_quartet_polynomial_identity`, `centered_quartet_coefficients_real`, `li_first_coefficient_finite_algebra_identity`, `reciprocal_power_log_derivative_sign_identity`, `stieltjes_notation_no_effect_algebra`, `s2_equivalent_closed_forms`.
+
+---
+
+# 71. Fauzan Hankel Irrationality Architecture Transfer to Zeta-Zero Arguments (TASK-TC-039)
+
+1. **Gate Z1 — Rationalized Entire Completed Zeta Function $\mathcal{R}(z)$ and Rational Integer Sampling (`Z1_ARGUMENT_TARGET_REPRESENTATION_PROVED`, `RATIONALIZED_XI_RATIONAL_INTEGER_SAMPLING_PROVED`)**:
+   Define the rationalized entire completed zeta function:
+   \[
+   \boxed{\mathcal{R}(z) := \frac{\pi^{-z}\xi(2z)}{\Gamma(z+1)} = (2z - 1)\pi^{-2z}\zeta(2z), \qquad z \in \mathbb{C}.}
+   \]
+   - **Entirety and Removable Singularity at $z = 1/2$**: Since $\pi^{-z}$, $\xi(2z)$, and $1/\Gamma(z+1)$ are entire on $\mathbb{C}$, $\mathcal{R}(z)$ is entire on $\mathbb{C}$, with $\mathcal{R}(1/2) = 1/\pi$ and $\mathcal{R}'(1/2) = 2(\gamma_E - \log\pi)/\pi$.
+   - **Zero Mapping**: In the critical strip $0 < \Re(2z) < 1$ ($0 < \Re(z) < 1/2$), $\pi^{-z} \neq 0$ and $\Gamma(z+1)$ has no zeros or poles, so $\xi(\rho) = 0 \iff \mathcal{R}(\rho/2) = 0$. For the first nontrivial critical-line zero $\rho_1 = \frac{1}{2} + i\gamma_1$, the scaled zero argument is:
+     \[
+     \boxed{\alpha_1 := \frac{\rho_1}{2} = \frac{1}{4} + i\frac{\gamma_1}{2}, \qquad \mathcal{R}(\alpha_1) = 0.}
+     \]
+   - **Exact Rational Integer Samples & Bernoulli OGF**: By Euler's even-zeta theorem, for every integer $m \ge 0$:
+     \[
+     \boxed{a_m := \mathcal{R}(m) = (-1)^{m+1}\frac{(2m - 1)2^{2m-1}B_{2m}}{(2m)!} \in \mathbb{Q}_{>0}, \qquad a_0 = \frac{1}{2}, \; a_1 = \frac{1}{6}, \; a_2 = \frac{1}{30}, \; a_3 = \frac{1}{189}, \dots}
+     \]
+     with ordinary generating function $A(t) = \sum_{m=0}^\infty a_m t^m = \frac{t}{2\sin^2\sqrt{t}}$ ($|t| < \pi^2$) and positive Hausdorff/Stieltjes moment sequence $b_{m-1} := \frac{a_m}{2m-1} = \pi^{-2m}\zeta(2m) = \sum_{k=1}^\infty q_k^m \in \mathbb{Q}_{>0}$ ($q_k = (\pi k)^{-2}$), whose OGF is $B(t) = \frac{1 - \sqrt{t}\cot\sqrt{t}}{2t}$.
+
+2. **Gates Z2 & Z3 — Target-Zero-Independent Argument Polynomials and Consecutive-Approximant Strict Positivity (`Z2_ALGEBRAIC_ARGUMENT_POLYNOMIALITY_PROVED`, `Z3_COFINAL_STRUCTURAL_NONVANISHING_PROVED_FOR_TWO_APPROXIMANT_NORM_SUM`)**:
+   - **Route A (Newton Argument Polynomials, `NEWTON_ARGUMENT_POLYNOMIALIZATION_PROVED`)**:
+     \[
+     \boxed{N_n(z) := \sum_{k=0}^n (\Delta^k a_0)\binom{z}{k} \in \mathbb{Q}[z], \qquad \widetilde{N}_n(z) := L_n N_n(z) \in \mathbb{Z}[z],}
+     \]
+     where $\Delta^k a_0 = \sum_{j=0}^k (-1)^{k-j}\binom{k}{j}a_j \in \mathbb{Q}$ and $L_n = \operatorname{lcm}_{0\le j\le n}\operatorname{den}(c_{n,j})$.
+   - **Real Ordinate Norm Polynomials & Consecutive-Approximant Positivity**: For any $P \in \mathbb{Q}[z]$, $\mathcal{N}_P(Y) := P(\frac{1}{4}+i\frac{Y}{2})\overline{P}(\frac{1}{4}-i\frac{Y}{2}) \in \mathbb{Q}[Y]$ satisfies $\deg\mathcal{N}_P \le 2\deg P$ and $\mathcal{N}_P(Y) = |P(\alpha(Y))|^2 \ge 0$ on $\mathbb{R}$ (`argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`). Because $N_{n+1}(z) - N_n(z) = (\Delta^{n+1}a_0)\binom{z}{n+1}$ and $N_n(m) = a_m > 0$ on $0 \le m \le n$, whenever $\Delta^{n+1}a_0 \neq 0$ (which holds on a cofinal infinite set since $a_m \to 0 \neq a_0 = 1/2$, and for all $0 \le n \le 200$), $\gcd(N_n, N_{n+1}) = 1$ and the integer norm-sum polynomial $G_n(Y) := C_n(\mathcal{N}_{N_n}(Y) + \mathcal{N}_{N_{n+1}}(Y)) \in \mathbb{Z}[Y]$ satisfies $G_n(Y) > 0$ for all $Y \in \mathbb{R}$ (`newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`).
+   - **Route B (Multipoint Padé Argument Polynomials, `MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`)**: The linearized interpolation system $A_n(m) - a_m B_n(m) = 0$ ($0 \le m \le d_A + d_B$) has full rank $d_A + d_B + 1$ and nullity $1$ across $[n/n], [n/(n-1)], [(n-1)/n]$ ($1 \le n \le 25$), and at $\alpha_1$ where $\mathcal{R}(\alpha_1) = 0$, $R_n(\alpha_1) = A_n(\alpha_1) - \mathcal{R}(\alpha_1)B_n(\alpha_1) = A_n(\alpha_1)$ (`pade_interpolation_zero_residual_identity`).
+
+3. **Gates Z4 & Z5 — Factorial Denominator Growth and Failure of Superlinear Log-Smallness (`Z4_DEGREE_AND_DENOMINATOR_COMPLEXITY_QUANTIFIED_FACTORIAL_DENOMINATOR_OBSTRUCTION`, `Z5_SUPERLINEAR_LOG_SMALLNESS_FAILED_IN_TESTED_NEWTON_PADE_HANKEL_CLASSES`, `Z6_NOT_REACHED_TERMINATED_AT_GATE_Z5`)**:
+   - **Exact Antiderivative Boundary Cancellation in $\Delta^n a_0$ (`NEWTON_ARGUMENT_POLYNOMIAL_ROUTE_INSUFFICIENT_SMALLNESS`)**: While $(-1)^n\Delta^n b_0 = \sum_{k\ge 1} q_k(1-q_k)^n = \frac{1}{2\sqrt{\pi}}n^{-1/2} + O(n^{-1}) > 0$, for $a_m = (2m-1)b_{m-1}$ the continuous integral vanishes identically by exact antiderivative cancellation:
+     \[
+     \boxed{\int_{1/\pi}^\infty q(x)(1-q(x))^{n-1}\bigl(1 - (2n+1)q(x)\bigr)\,dx = \left[-\frac{1}{\pi^2 x}\left(1 - \frac{1}{\pi^2 x^2}\right)^n\right]_{1/\pi}^\infty = 0,}
+     \]
+     and the Euler difference generating function $C(w) = \frac{w}{2(1+w)^2\sin^2\sqrt{w/(1+w)}}$ vanishes to infinite order at $w = -1$, giving stretched-exponential decay $|\Delta^n a_0| \ll \exp(-\frac{3}{2}\pi^{2/3}n^{1/3})$. Consequently, $-\log|N_n(\alpha_1)|/n = O(n^{-2/3}) \to 0$, and clearing denominators by $\log L_n = 3n\log n + O(n)$ yields $\mathcal{I}_n^{\mathrm{int}} = -\log|\widetilde{N}_n(\alpha_1)|/n \sim -3\log n \to -\infty$ ($-13.1608$ at $n = 200$).
+   - **Multipoint Padé Denominator Blow-Up (`MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED_BUT_FAILS_GATE_Z5_INTEGER_SMALLNESS`)**: Although $|A_n(\alpha_1)/B_n(\alpha_1)| \approx 4.17 \times 10^{-10}$ at $n = 25$ for $[n/n]$, $|B_n(\alpha_1)|$ absorbs the $(2n)!$ nodal product and $\log H(\widetilde{A}_{25}) = 4665.8428$, giving $\mathcal{I}_{25}(\widetilde{A}_{25}) = -186.6408 < 0$.
+   - **Lambert–Stieltjes Unit-Fraction Hankel Determinants & Coupling Obstruction (`FAUZAN_HANKEL_ARGUMENT_TRANSFER_BLOCKED_BY_TARGET_COUPLING_AND_FACTORIAL_MOMENT_DENOMINATORS`)**: By Lambert's S-fraction $c_0 = 1/6, c_k = \frac{1}{(2k+1)(2k+3)}$, $D_n = \det(b_{i+j})_{0\le i,j<n} = c_0^n c_1^{n-1}\cdots c_{n-1}^1 = 1/\operatorname{den}(D_n)$ is an exact unit fraction for all $n \ge 1$ with $-\log D_n = 2n^2\log n + (2\log 2 - 3)n^2 + O(n\log n)$, while argument-coupling candidates C1/C2/C3 either lose zero cancellation, require non-polynomial $q_k^{\alpha(Y)}$, or reduce to Route B.
+
+4. **Principal Classification, Remaining Subgates, and Lean 4 Verification**:
+   \[
+   \boxed{
+   \begin{gathered}
+   \texttt{RATIONALIZED\_XI\_ARGUMENT\_POLYNOMIALIZATION\_PROVED\_NEWTON\_AND\_PADE\_ROUTES\_FAIL\_GATE\_Z5\_SUPERLINEAR\_SMALLNESS}\\[4pt]
+   (\texttt{SUBGATE-TC-039A} = \texttt{TESTED\_TERMINATED\_AT\_GATE\_Z5\_FACTORIAL\_DENOMINATOR\_AND\_SUBLINEAR\_DECAY\_OBSTRUCTION},\\[2pt]
+   \texttt{SUBGATE-TC-040A} = \texttt{OPEN}, \quad \texttt{SUBGATE-TC-038A} = \texttt{OPEN}, \quad \texttt{OBL-CT-001A} = \texttt{OPEN})
+   \end{gathered}
+   }
+   \]
+   `formal/RiemannScope/FauzanZeroArgumentTransfer.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 9 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 635 compiled `theorem` declarations across 33 local modules + umbrella `formal/RiemannScope.lean` = 34 formal source files):
+   `argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`, `newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`, `rational_evaluation_integer_clearing`, `superlinear_log_smallness_irrationality_schema`, `pade_interpolation_zero_residual_identity`.
+
 
 

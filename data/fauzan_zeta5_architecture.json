@@ -55,7 +55,9 @@
       "apery_directory_implemented_by_count": 0,
       "solution_lean_sorry_count": 0,
       "challenge_lean_benchmark_sorry_note": "Challenge.lean contains the unmodified benchmark statement copied verbatim from google-deepmind/formal-conjectures; Solution.lean discharges it via Apery.irrational_five.",
-      "prime_number_theorem_dependency_note": "Apery/PNT.lean imports PrimeNumberTheoremAnd.Consequences for Chebyshev.theta ~[atTop] id (chebyshev_asymptotic); the 2 sorrys in PrimeNumberTheoremAnd/Wiener.lean are outside the transitive dependency cone of Apery.irrational_five."
+      "external_import_graph_status": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS",
+      "target_theorem_axiom_closure_status": "TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS",
+      "prime_number_theorem_dependency_note": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS / TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS: Apery/PNT.lean -> PrimeNumberTheoremAnd.Consequences -> PrimeNumberTheoremAnd.Wiener places Wiener.lean inside the transitive module import graph, but #print axioms Apery.irrational_five reports only [propext, Classical.choice, Quot.sound], so the two sorry-backed declarations in PrimeNumberTheoremAnd/Wiener.lean are not reached by the target theorem's proof-term axiom closure."
     },
     "print_axioms_result": ["propext", "Classical.choice", "Quot.sound"],
     "audit_status": "SOURCE_AUDITED_BUILD_NOT_LOCALLY_REPRODUCED"

@@ -1,0 +1,2085 @@
+{
+  "task_id": "TASK-TC-039",
+  "starting_head": "4aa4f12d2c09a285e77c3c27e029f5603d299fa0",
+  "primary_target": {
+    "statement": "gamma_1 notin Q",
+    "first_zero": "rho_1 = 1/2 + i*gamma_1",
+    "rationalized_xi_zero_argument": "alpha_1 = rho_1 / 2 = 1/4 + i*gamma_1 / 2",
+    "status_after_task_tc_039": "OPEN_IN_LITERATURE_GATE_Z5_NOT_MET_IN_TESTED_RATIONALIZED_XI_FAMILIES"
+  },
+  "secondary_target": {
+    "statement": "rho_1 notin Q_bar or gamma_1 notin Q_bar",
+    "status_after_task_tc_039": "NOT_ATTEMPTED_BEYOND_MAHLER_CRITERION_BECAUSE_IRRATIONALITY_TERMINATED_AT_GATE_Z5"
+  },
+  "preflight_repairs": {
+    "all_preflight_checks_passed": true,
+    "external_lean_dependency_wording": {
+      "repaired": true,
+      "external_import_graph_status": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS",
+      "target_theorem_axiom_closure_status": "TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS",
+      "import_chain": "Apery/PNT.lean -> PrimeNumberTheoremAnd.Consequences -> PrimeNumberTheoremAnd.Wiener",
+      "print_axioms_apery_irrational_five": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "note": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS / TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS: Apery/PNT.lean -> PrimeNumberTheoremAnd.Consequences -> PrimeNumberTheoremAnd.Wiener places Wiener.lean inside the transitive module import graph, but #print axioms Apery.irrational_five reports only [propext, Classical.choice, Quot.sound], so the two sorry-backed declarations in PrimeNumberTheoremAnd/Wiener.lean are not reached by the target theorem's proof-term axiom closure."
+    },
+    "formal_source_count_derived": {
+      "synchronized": true,
+      "umbrella_imported_module_count": 33,
+      "build_formal_source_count": 34,
+      "certification_required_source_count": 34,
+      "total_formal_theorem_count": 635
+    },
+    "canonical_numerical_consistency": {
+      "s4_value_50dps": "0.0000736272212616895183267713070306015113128315963",
+      "s4_verified": true,
+      "bounded_denominator_q_le_10000_closest_gamma1": "94109/6658",
+      "bounded_denominator_q_le_10000_min_distance": 9.50797348022772e-10,
+      "bounded_denominator_verified": true,
+      "explicit_D4_H3_rho1_global_min_abs": 14.143565845725995,
+      "explicit_D4_H3_rho1_verified": true
+    },
+    "external_theorem_identifiers": {
+      "identifiers_verified": true,
+      "actual_identifiers": [
+        "Apery.irrational_five",
+        "Apery.irrational_zeta5",
+        "RiemannZetaValues.irrational_five"
+      ],
+      "invented_irrational_zeta_five_absent": true
+    }
+  },
+  "fauzan_architecture_source": {
+    "artifact_path": "data/fauzan_zeta5_architecture.json",
+    "paper_doi": "10.5281/zenodo.22826419",
+    "lean_repository": "https://github.com/mo271/Zeta5",
+    "lean_commit": "7fe736760f4b96bfdb4334b68e3b3124ecbe10b0",
+    "value_polynomial_chain": "rational moment functional -> Hankel determinant -> Q_n(X) in Z[X] -> Q_n(zeta(5)) > 0 -> Q_n(zeta(5)) << exp(-c n^2) -> zeta(5) notin Q"
+  },
+  "z1_status": "Z1_ARGUMENT_TARGET_REPRESENTATION_PROVED",
+  "z2_status": "Z2_ALGEBRAIC_ARGUMENT_POLYNOMIALITY_PROVED",
+  "z3_status": "Z3_COFINAL_STRUCTURAL_NONVANISHING_PROVED_FOR_TWO_APPROXIMANT_NORM_SUM",
+  "z4_status": "Z4_DEGREE_AND_DENOMINATOR_COMPLEXITY_QUANTIFIED_FACTORIAL_DENOMINATOR_OBSTRUCTION",
+  "z5_status": "Z5_SUPERLINEAR_LOG_SMALLNESS_FAILED_IN_TESTED_NEWTON_PADE_HANKEL_CLASSES",
+  "z6_status": "Z6_NOT_REACHED_TERMINATED_AT_GATE_Z5",
+  "earliest_failed_gate": "Z5",
+  "rationalized_xi_definition": {
+    "primary_xi_quotient": "R(z) := pi^{-z} * xi(2z) / Gamma(z + 1)",
+    "expanded_zeta_form": "R(z) = (2z - 1) * pi^{-2z} * zeta(2z)",
+    "functional_equation_identity_used": "xi(2z) = (1/2)*(2z)*(2z - 1) * pi^{-z} * Gamma(z) * zeta(2z) and Gamma(z + 1) = z * Gamma(z)",
+    "symbolic_equivalence_verified": true,
+    "max_numerical_discrepancy_60dps": 1.2446030555722283e-60
+  },
+  "rationalized_xi_entire_status": {
+    "is_entire": true,
+    "classification": "RATIONALIZED_XI_ENTIRE_WITH_REMOVABLE_SINGULARITY_AT_HALF",
+    "proof_mechanism": "Both pi^{-z}, xi(2z), and 1/Gamma(z + 1) are entire functions on C, so their product R(z) = pi^{-z} * xi(2z) * (1 / Gamma(z + 1)) is entire on C. Equivalently, in (2z - 1) pi^{-2z} zeta(2z), the simple pole of zeta(2z) at z = 1/2 with residue 1/2 is cancelled by the simple zero of (2z - 1).",
+    "removable_singularity_at_z_eq_half": {
+      "point": "z = 1/2",
+      "value_R_half": "1/pi",
+      "value_R_half_float": 0.3183098861837907,
+      "derivative_R_prime_half": "2*(gamma_E - log(pi))/pi",
+      "taylor_expansion_at_half": "R(1/2 + eps) = (1/pi) + (2*(gamma_E - log(pi))/pi)*eps + O(eps^2)"
+    }
+  },
+  "rationalized_xi_zero_mapping": {
+    "nontrivial_zeros": "xi(rho) = 0 <=> R(rho / 2) = 0 for all nontrivial zeros rho in {0 < Re(s) < 1}",
+    "trivial_zeros": "R(-m) = 0 for all integers m >= 1 (poles of Gamma(z + 1) / trivial zeros of zeta(2z))",
+    "nonvanishing_prefactor_reason": "For any nontrivial zero rho with 0 < Re(rho) < 1, Re(rho/2 + 1) in (1, 3/2) where Gamma(z + 1) has neither zeros nor poles, and pi^{-rho/2} != 0.",
+    "primary_benchmark_target": {
+      "rho_1": "1/2 + i*gamma_1",
+      "alpha_1": "rho_1 / 2 = 1/4 + i*gamma_1 / 2",
+      "R_alpha_1_equals_zero": true,
+      "arb_128bit_enclosure_contains_zero": true,
+      "arb_128bit_abs_upper_bound": 3.31633730605408e-13
+    }
+  },
+  "rational_integer_samples": {
+    "classification": "RATIONALIZED_XI_RATIONAL_INTEGER_SAMPLING_PROVED",
+    "max_m_computed": 200,
+    "a_0_exact": "1/2",
+    "a_0_equals_one_half": true,
+    "all_samples_rational": true,
+    "all_samples_strictly_positive": true,
+    "symbolic_euler_zeta_agreement_0_to_12": true,
+    "first_20_samples": [
+      {
+        "m": 0,
+        "a_m_fraction": "1/2",
+        "numerator": "1",
+        "denominator": "2",
+        "float_value": 0.5,
+        "log_denominator": 0.6931471805599453
+      },
+      {
+        "m": 1,
+        "a_m_fraction": "1/6",
+        "numerator": "1",
+        "denominator": "6",
+        "float_value": 0.16666666666666666,
+        "log_denominator": 1.791759469228055
+      },
+      {
+        "m": 2,
+        "a_m_fraction": "1/30",
+        "numerator": "1",
+        "denominator": "30",
+        "float_value": 0.03333333333333333,
+        "log_denominator": 3.4011973816621555
+      },
+      {
+        "m": 3,
+        "a_m_fraction": "1/189",
+        "numerator": "1",
+        "denominator": "189",
+        "float_value": 0.005291005291005291,
+        "log_denominator": 5.241747015059643
+      },
+      {
+        "m": 4,
+        "a_m_fraction": "1/1350",
+        "numerator": "1",
+        "denominator": "1350",
+        "float_value": 0.0007407407407407407,
+        "log_denominator": 7.2078598714324755
+      },
+      {
+        "m": 5,
+        "a_m_fraction": "1/10395",
+        "numerator": "1",
+        "denominator": "10395",
+        "float_value": 9.62000962000962e-05,
+        "log_denominator": 9.249080200292113
+      },
+      {
+        "m": 6,
+        "a_m_fraction": "691/58046625",
+        "numerator": "691",
+        "denominator": "58046625",
+        "float_value": 1.1904223544435185e-05,
+        "log_denominator": 17.876757124883124
+      },
+      {
+        "m": 7,
+        "a_m_fraction": "2/1403325",
+        "numerator": "2",
+        "denominator": "1403325",
+        "float_value": 1.4251866103717956e-06,
+        "log_denominator": 14.154354978730543
+      },
+      {
+        "m": 8,
+        "a_m_fraction": "3617/21709437750",
+        "numerator": "3617",
+        "denominator": "21709437750",
+        "float_value": 1.666095659248476e-07,
+        "log_denominator": 23.801012922297655
+      },
+      {
+        "m": 9,
+        "a_m_fraction": "43867/2292899734125",
+        "numerator": "43867",
+        "denominator": "2292899734125",
+        "float_value": 1.9131669539287642e-08,
+        "log_denominator": 28.460838391907576
+      },
+      {
+        "m": 10,
+        "a_m_fraction": "174611/80596287646875",
+        "numerator": "174611",
+        "denominator": "80596287646875",
+        "float_value": 2.1664893644362574e-09,
+        "log_denominator": 32.02047370540861
+      },
+      {
+        "m": 11,
+        "a_m_fraction": "155366/640374140030625",
+        "numerator": "155366",
+        "denominator": "640374140030625",
+        "float_value": 2.4261754228952756e-10,
+        "log_denominator": 34.09307371527173
+      },
+      {
+        "m": 12,
+        "a_m_fraction": "236364091/8779111824511153125",
+        "numerator": "236364091",
+        "denominator": "8779111824511153125",
+        "float_value": 2.6923462842798617e-11,
+        "log_denominator": 43.618906917483436
+      },
+      {
+        "m": 13,
+        "a_m_fraction": "1315862/443779279041223125",
+        "numerator": "1315862",
+        "denominator": "443779279041223125",
+        "float_value": 2.965127175029207e-12,
+        "log_denominator": 40.63410371446163
+      },
+      {
+        "m": 14,
+        "a_m_fraction": "6785560294/20913098524817639765625",
+        "numerator": "6785560294",
+        "denominator": "20913098524817639765625",
+        "float_value": 3.2446460699965403e-13,
+        "log_denominator": 51.394662639211944
+      },
+      {
+        "m": 15,
+        "a_m_fraction": "6892673020804/195202717402382161174828125",
+        "numerator": "6892673020804",
+        "denominator": "195202717402382161174828125",
+        "float_value": 3.5310333342315884e-14,
+        "log_denominator": 60.536080826857955
+      },
+      {
+        "m": 16,
+        "a_m_fraction": "7709321041217/2015813566807172297008593750",
+        "numerator": "7709321041217",
+        "denominator": "2015813566807172297008593750",
+        "float_value": 3.824421647001672e-15,
+        "log_denominator": 62.87082037998996
+      },
+      {
+        "m": 17,
+        "a_m_fraction": "151628697551/367589532770719654160390625",
+        "numerator": "151628697551",
+        "denominator": "367589532770719654160390625",
+        "float_value": 4.1249460072514336e-16,
+        "log_denominator": 61.169009147424845
+      },
+      {
+        "m": 18,
+        "a_m_fraction": "26315271553053477373/593656501767616816756789390344140625",
+        "numerator": "26315271553053477373",
+        "denominator": "593656501767616816756789390344140625",
+        "float_value": 4.4327437625461107e-17,
+        "log_denominator": 82.37160894104537
+      },
+      {
+        "m": 19,
+        "a_m_fraction": "308420411983322/64958584283577723684953429296875",
+        "numerator": "308420411983322",
+        "denominator": "64958584283577723684953429296875",
+        "float_value": 4.747954645022863e-18,
+        "log_denominator": 73.25130269177318
+      },
+      {
+        "m": 20,
+        "a_m_fraction": "261082718496449122051/514882850571529200687138490471552734375",
+        "numerator": "261082718496449122051",
+        "denominator": "514882850571529200687138490471552734375",
+        "float_value": 5.070720809726768e-19,
+        "log_denominator": 89.13700274795471
+      }
+    ]
+  },
+  "integer_sample_formula": {
+    "formula": "a_m = (-1)^{m+1} * (2m - 1) * 2^{2m - 1} * B_{2m} / (2m)!",
+    "a_0_separate_check": "a_0 = (-1)^1 * (-1) * 2^{-1} * B_0 / 0! = 1/2",
+    "derivation": "For m >= 1, Euler's formula zeta(2m) = (-1)^{m+1} (2*pi)^{2m} B_{2m} / (2*(2m)!) gives R(m) = (2m - 1)*pi^{-2m}*zeta(2m) = (-1)^{m+1}*(2m - 1)*2^{2m - 1}*B_{2m} / (2m)! in Q_{>0}."
+  },
+  "sample_generating_function": {
+    "classification": "SAMPLE_GENERATING_FUNCTION_PROVED",
+    "generating_function_formula": "A(t) = sum_{m=0}^infty a_m t^m = t / (2 * sin^2(sqrt(t)))",
+    "convergence_disk": "|t| < pi^2 (nearest double pole at t = pi^2)",
+    "differential_operator_derivation": "(1 - 2*t*(d/dt))[(1/2)*sqrt(t)*cot(sqrt(t))] = (1/2)*sqrt(t)*cot(sqrt(t)) - 2*t*(cot(sqrt(t))/(4*sqrt(t)) - 1/(4*sin^2(sqrt(t)))) = t / (2 * sin^2(sqrt(t)))",
+    "partial_fraction_expansion": "A(t) = 1/2 + sum_{k=1}^infty q_k*t*(1 + q_k*t)/(1 - q_k*t)^2,  q_k = 1/(pi^2 * k^2)",
+    "symbolic_operator_identity_verified": true,
+    "taylor_coefficients_match_a_m_up_to_m": 15,
+    "all_taylor_coefficients_match": true
+  },
+  "positive_moment_sequence": {
+    "definition": "b_m := pi^{-2m-2} * zeta(2m + 2) = a_{m+1} / (2m + 1) in Q_{>0}",
+    "series_representation": "b_m = sum_{k=1}^infty q_k^{m+1},  q_k = 1 / (pi^2 * k^2)",
+    "first_10_b_m": [
+      "1/6",
+      "1/90",
+      "1/945",
+      "1/9450",
+      "1/93555",
+      "691/638512875",
+      "2/18243225",
+      "3617/325641566250",
+      "43867/38979295480125",
+      "174611/1531329465290625"
+    ],
+    "all_b_m_positive_rational": true
+  },
+  "moment_measure": {
+    "measure_formula": "nu = sum_{k=1}^infty q_k * delta_{q_k} on [0, 1/pi^2] subset [0, 1]",
+    "support_points": "q_k = 1 / (pi^2 * k^2) in (0, 1/pi^2] accumulating at 0",
+    "total_mass_b_0": "1/6",
+    "moment_problem_class": "POSITIVE_HAUSDORFF_AND_STIELTJES_DISCRETE_MOMENT_SEQUENCE"
+  },
+  "finite_difference_formula": {
+    "b0_forward_difference": "(-1)^n Delta^n b_0 = sum_{k=1}^infty q_k * (1 - q_k)^n > 0",
+    "b0_difference_all_strictly_positive_0_to_max_n": true,
+    "b0_difference_is_hausdorff_moment_sequence": true,
+    "a1_forward_difference": "Delta^n a_1 = sum_{k=1}^infty q_k * (q_k - 1)^{n-1} * ((2n + 1)*q_k - 1)  (n >= 1)",
+    "single_term_binomial_identity_verified": true,
+    "c_k_eq_Delta_k_a0_all_nonzero_0_to_max_n": true
+  },
+  "finite_difference_asymptotics": {
+    "b0_difference_asymptotic": "(-1)^n Delta^n b_0 = (1 / (2*sqrt(pi))) * n^{-1/2} + O(n^{-1}) (proved by Euler-Maclaurin comparison with int_0^infty (1/(pi^2 x^2)) exp(-n/(pi^2 x^2)) dx = 1/(2*sqrt(pi)*sqrt(n)))",
+    "a1_and_a0_algebraic_cancellation_theorem": "Because (d/dx)[(1/(pi^2 x)) * (1 - 1/(pi^2 x^2))^n] = q(x)*(1 - q(x))^{n-1}*((2n+1)*q(x) - 1) vanishes at both x = 1/pi and x = infty, the leading Euler-Maclaurin integral int_{1/pi}^infty q(x)(1-q(x))^{n-1}((2n+1)q(x)-1) dx = (1/(2*pi))*[(2n+1)*B(3/2, n) - B(1/2, n)] = 0 vanishes identically for every n >= 1! Moreover, the Euler-transformed generating function C(w) = sum_{n>=0} (Delta^n a_0) w^n = w / (2*(1+w)^2 * sin^2(sqrt(w/(1+w)))) is C^infty at w = -1 along the unit circle |w| = 1 (decaying as exp(-|pi - arg(w)|^{-1/2})), so ALL algebraic powers n^{-1/2}, n^{-3/2}, n^{-5/2}, ... cancel to all orders.",
+    "a1_and_a0_actual_subexponential_rate": "|Delta^n a_0|, |Delta^n a_1| <= exp(-(3/2) * n^{1/3} + o(n^{1/3})) (governed by the complex Poisson/Norlund-Rice saddle points pi*x = (n/pi)^{1/3} exp(+-i*pi/6), giving oscillatory sign changes cos((3*sqrt(3)/2)*n^{1/3} + phi_0) rather than monotone n^{-3/2} decay)",
+    "symbolic_antiderivative_cancellation_verified": true,
+    "diagnostic_samples": [
+      {
+        "n": 1,
+        "neg1_pow_n_Delta_n_b0": 0.15555555555555556,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.15555555555555556,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": -0.3333333333333333,
+        "Delta_n_a1": -0.13333333333333333,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.13333333333333333,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.22313016014842982
+      },
+      {
+        "n": 2,
+        "neg1_pow_n_Delta_n_b0": 0.1455026455026455,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.20577181463100588,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": 0.2,
+        "Delta_n_a1": 0.1052910052910053,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.297807935356874,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.1510897005985513
+      },
+      {
+        "n": 3,
+        "neg1_pow_n_Delta_n_b0": 0.1364021164021164,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.23625539586838973,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": -0.09470899470899471,
+        "Delta_n_a1": -0.0817989417989418,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.4250397696034102,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.11493662890997443
+      },
+      {
+        "n": 5,
+        "neg1_pow_n_Delta_n_b0": 0.12068728293066917,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.2698649686527263,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": 0.0493025493025493,
+        "Delta_n_a1": -0.04597174176010155,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.5139796980982645,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.07692195673480962
+      },
+      {
+        "n": 10,
+        "neg1_pow_n_Delta_n_b0": 0.09246988333081184,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.2924154462954027,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": -0.16793799744282292,
+        "Delta_n_a1": 2.1973951625336398e-05,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.0006948773633042194,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.039492202364836776
+      },
+      {
+        "n": 20,
+        "neg1_pow_n_Delta_n_b0": 0.06338975766856299,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.28348761444829085,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": -0.06527904838798118,
+        "Delta_n_a1": -0.013215609913484552,
+        "abs_Delta_n_a1_times_n_pow_3_2": 1.1820400852268629,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.01704963599252802
+      },
+      {
+        "n": 40,
+        "neg1_pow_n_Delta_n_b0": 0.043596086974509084,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.2757258638204955,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": 0.05477887009692208,
+        "Delta_n_a1": 0.00034141132884472404,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.08637099345072569,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.005916987427911923
+      },
+      {
+        "n": 80,
+        "neg1_pow_n_Delta_n_b0": 0.031432511594774074,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.2811409305178606,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": -0.008044049204580357,
+        "Delta_n_a1": 0.0006918727449370362,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.49506383662674763,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.0015596340476252209
+      },
+      {
+        "n": 120,
+        "neg1_pow_n_Delta_n_b0": 0.025706387973756854,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.281599371304123,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": -0.00884318323482312,
+        "Delta_n_a1": -0.0002919660355869209,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.38379932091915037,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.0006120869422808856
+      },
+      {
+        "n": 160,
+        "neg1_pow_n_Delta_n_b0": 0.02224830636041846,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.28142128872053346,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": 0.0006493840838898454,
+        "Delta_n_a1": -0.00013841629139554578,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.2801348774934343,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.0002906900874777068
+      },
+      {
+        "n": 200,
+        "neg1_pow_n_Delta_n_b0": 0.01990315858009268,
+        "neg1_pow_n_Delta_n_b0_times_sqrt_n": 0.28147316798029504,
+        "asymptotic_target_1_over_2_sqrt_pi": 0.28209479177387814,
+        "c_n_eq_Delta_n_a0": 0.002882329591750604,
+        "Delta_n_a1": 8.138125138718387e-06,
+        "abs_Delta_n_a1_times_n_pow_3_2": 0.023018093886929936,
+        "saddle_scale_exp_neg_1_5_n_pow_1_3": 0.00015500499517348464
+      }
+    ]
+  },
+  "newton_polynomial_family": {
+    "classification": "NEWTON_ARGUMENT_POLYNOMIALIZATION_PROVED",
+    "formula": "N_n(z) = sum_{k=0}^n c_k * binom(z, k) in Q[z],  c_k = Delta^k a_0 in Q",
+    "interpolation_nodes": "m = 0, 1, ..., n with N_n(m) = R(m) = a_m",
+    "max_n_constructed_exact_rational": 200,
+    "node_interpolation_exact_verified": true,
+    "target_zero_independent": true
+  },
+  "newton_coefficient_denominators": {
+    "source_of_denominators": "Each a_m = (-1)^{m+1} (2m-1) 2^{2m-1} B_{2m} / (2m)! has denominator dividing (2m)! * den(B_{2m}) (where den(B_{2m}) = prod_{(p-1)|2m} p <= 4^{2m} by von Staudt-Clausen), and binom(z, k) = z(z-1)...(z-k+1)/k! introduces an additional k! denominator.",
+    "asymptotic_log_lcm_denominator": "log(L_n) = 3*n*log(n) + O(n) (from (2n)! * n!)",
+    "log_L_200": 2629.340644992827,
+    "log_H_primitive_200": 2628.647497812267
+  },
+  "newton_nonvanishing_status": {
+    "single_approximant_finite_arb_certified": true,
+    "consecutive_common_root_theorem": "If c_{n+1} = Delta^{n+1} a_0 != 0, then N_{n+1}(z) - N_n(z) = c_{n+1} binom(z, n+1) vanishes only at z in {0, 1, ..., n}, where N_n(m) = a_m > 0; hence gcd(N_n, N_{n+1}) = 1 and N_n, N_{n+1} have no common complex root (`newton_consecutive_no_common_root_of_nonzero_samples`).",
+    "cofinal_nonvanishing_of_c_n_proved": "Because a_m > 0 and lim_{m->infty} a_m = 0 != a_0 = 1/2, the sequence (a_m) cannot equal a polynomial on Z_{>=0}; therefore Delta^{n+1} a_0 != 0 holds for an infinite cofinal set of n in N (and is certified by exact rational arithmetic for every 0 <= n <= 200).",
+    "consecutive_gcd_verified_n_le_40": true
+  },
+  "newton_remainder_formula": {
+    "series_tail_identity": "R(z) - N_n(z) = sum_{k=n+1}^infty (Delta^k a_0) * binom(z, k)  (for all z in C)",
+    "at_zero_alpha_1": "Because R(alpha_1) = 0, N_n(alpha_1) = -(R(alpha_1) - N_n(alpha_1)) = -sum_{k=n+1}^infty c_k * binom(alpha_1, k)",
+    "norlund_rice_contour_representation": "R(z) - N_n(z) = ((-1)^{n+1} / (2*pi*i)) * oint_{C_n} (R(zeta) * n!) / (zeta*(zeta-1)*...*(zeta-n)*(zeta-z)) d zeta"
+  },
+  "newton_convergence_domain": {
+    "domain": "All of C (entire complex plane)",
+    "proof_mechanism": "For any fixed z in C, |binom(z, k)| ~ |Gamma(-z)|^{-1} k^{-Re(z)-1} is polynomial in k, whereas |c_k| = |Delta^k a_0| <= exp(-(3/2)*k^{1/3} + o(k^{1/3})) decays faster than any power k^{-M}. Hence sum_{k=0}^infty c_k binom(z, k) converges absolutely and locally uniformly on all of C to R(z) (Flajolet-Vepstas 2008, arXiv:math/0611332v2).",
+    "converges_at_alpha_1": true
+  },
+  "newton_smallness_rate": {
+    "rational_polynomial_rate": "|N_n(alpha_1)| <= exp(-(3/2) * n^{1/3} + o(n^{1/3}))",
+    "integer_cleared_polynomial_rate": "|tilde{N}_n(alpha_1)| = L_n * |N_n(alpha_1)| = exp(3*n*log(n) + O(n)) -> +infty"
+  },
+  "newton_irrationality_ratio": {
+    "formula": "I_n^{Newton} = (-log|N_n(alpha_1)|) / n",
+    "asymptotic_rational_limit": "O(n^{-2/3}) -> 0 (does NOT tend to +infty)",
+    "asymptotic_integer_cleared_limit": "-3*log(n) + O(1) -> -infty",
+    "value_at_n_200_rational": -0.014079594314842667,
+    "value_at_n_200_primitive_int": -13.160782819278976
+  },
+  "newton_route_classification": "NEWTON_ARGUMENT_POLYNOMIAL_ROUTE_INSUFFICIENT_SMALLNESS",
+  "ordinate_norm_polynomial": {
+    "definition": "N_P(Y) := P(alpha(Y)) * P(conj(alpha(Y))),  alpha(Y) = 1/4 + i*Y / 2",
+    "belongs_to_Q_of_Y": true,
+    "real_nonnegativity": "N_P(Y) = |P(alpha(Y))|^2 >= 0 for all Y in R",
+    "degree_bound": "deg(N_P) <= 2 * deg(P)",
+    "lean_theorems": [
+      "argument_norm_polynomial_real",
+      "argument_norm_polynomial_nonneg",
+      "argument_norm_polynomial_degree_bound"
+    ],
+    "samples": [
+      {
+        "n": 1,
+        "deg_N_n": 1,
+        "deg_norm_poly": 2,
+        "minimal_clearing_C_n": 144,
+        "log_height_cleared_norm": 3.2188758248682006,
+        "norm_minus_sq_modulus_upper_bound": 1.0858440892535244e-75,
+        "norm_strictly_positive_at_gamma1": true,
+        "two_approximant_G_n_degree": 4,
+        "two_approximant_G_n_log_height_primitive": 11.244797622953609,
+        "two_approximant_strict_positivity_for_all_real_Y_proved": true
+      },
+      {
+        "n": 2,
+        "deg_N_n": 2,
+        "deg_norm_poly": 4,
+        "minimal_clearing_C_n": 230400,
+        "log_height_cleared_norm": 10.50454685609326,
+        "norm_minus_sq_modulus_upper_bound": 5.898482812926281e-75,
+        "norm_strictly_positive_at_gamma1": true,
+        "two_approximant_G_n_degree": 6,
+        "two_approximant_G_n_log_height_primitive": 25.827055232743817,
+        "two_approximant_strict_positivity_for_all_real_Y_proved": true
+      },
+      {
+        "n": 3,
+        "deg_N_n": 3,
+        "deg_norm_poly": 6,
+        "minimal_clearing_C_n": 526727577600,
+        "log_height_cleared_norm": 25.120720484042778,
+        "norm_minus_sq_modulus_upper_bound": 1.4207292583132072e-74,
+        "norm_strictly_positive_at_gamma1": true,
+        "two_approximant_G_n_degree": 8,
+        "two_approximant_G_n_log_height_primitive": 33.190390663619254,
+        "two_approximant_strict_positivity_for_all_real_Y_proved": true
+      },
+      {
+        "n": 5,
+        "deg_N_n": 5,
+        "deg_norm_poly": 10,
+        "minimal_clearing_C_n": 6526365377495040000,
+        "log_height_cleared_norm": 41.457755674347716,
+        "norm_minus_sq_modulus_upper_bound": 9.169588155391206e-74,
+        "norm_strictly_positive_at_gamma1": true,
+        "two_approximant_G_n_degree": 12,
+        "two_approximant_G_n_log_height_primitive": 70.56355792880233,
+        "two_approximant_strict_positivity_for_all_real_Y_proved": true
+      },
+      {
+        "n": 10,
+        "deg_N_n": 10,
+        "deg_norm_poly": 20,
+        "minimal_clearing_C_n": 6654558418277822448303350541020739941066342400000000000000,
+        "log_height_cleared_norm": 131.3326766117238,
+        "norm_minus_sq_modulus_upper_bound": 3.429933622357795e-71,
+        "norm_strictly_positive_at_gamma1": true,
+        "two_approximant_G_n_degree": 22,
+        "two_approximant_G_n_log_height_primitive": 138.3011022792869,
+        "two_approximant_strict_positivity_for_all_real_Y_proved": true
+      }
+    ]
+  },
+  "ordinate_norm_polynomial_integrality": {
+    "universal_clearing_factor": "C_n^{univ} = 4^{deg P} * L_n^2",
+    "minimal_clearing_factor": "C_n = lcm_{0<=k<=2d} den([Y^k] N_P(Y))",
+    "integer_evaluation_identity": "tilde{N}_{N_n}(gamma_1) = C_n * |N_n(alpha_1)|^2 in R_{>=0}"
+  },
+  "two_approximant_positivity_status": {
+    "classification": "TWO_APPROXIMANT_STRICT_POSITIVITY_PROVED_ON_COFINAL_NONZERO_DIFFERENCE_SET",
+    "polynomial_definition": "G_n(Y) := C_n * (|N_n(alpha(Y))|^2 + |N_{n+1}(alpha(Y))|^2) in Z[Y]",
+    "strict_positivity_condition": "G_n(Y) > 0 for all Y in R whenever c_{n+1} = Delta^{n+1} a_0 != 0 (formalized in Lean 4 as `newton_consecutive_no_common_root_of_nonzero_samples` and `two_approximant_norm_sum_strict_pos`).",
+    "certified_for_all_n_0_to_200": true,
+    "cofinal_infinite_set_proved": true,
+    "eventual_all_n_nonvanishing_status": "EVENTUAL_EVERY_N_FINITE_DIFFERENCE_NONVANISHING_OPEN_DUE_TO_SADDLE_OSCILLATION"
+  },
+  "pade_degree_schedule": {
+    "tested_schedules": [
+      "[n/n]",
+      "[n/(n-1)]",
+      "[(n-1)/n]"
+    ],
+    "tested_n_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      8,
+      10,
+      15,
+      20,
+      25
+    ],
+    "interpolation_condition": "A_n(m) = a_m * B_n(m) for m = 0, 1, ..., deg(A_n) + deg(B_n)",
+    "normalizations_audited": [
+      "B_n(0) = 1 (rational constant-term normalization)",
+      "[z^{deg B_n}] B_n(z) = 1 (rational monic-denominator normalization)",
+      "tilde{A}_n(z) in Z[z] primitive integer polynomial (canonical, scaling-invariant)"
+    ]
+  },
+  "pade_existence_status": {
+    "status": "PROVED_FOR_ALL_N",
+    "proof": "The homogeneous rational linear system has N_eq = deg(A_n) + deg(B_n) + 1 equations in N_vars = deg(A_n) + deg(B_n) + 2 unknowns over Q, so nullity >= 1 for every (deg_A, deg_B)."
+  },
+  "pade_uniqueness_status": {
+    "status": "PROJECTIVELY_UNIQUE_ON_ALL_TESTED_SCHEDULES_FAIL_CLOSED_RULE_ENFORCED",
+    "all_tested_ranks_full": true,
+    "all_tested_interpolations_exact": true,
+    "fail_closed_policy": "If nullity > 1 at any exceptional n, the solver returns projectively_unique = False and refuses to select a target-dependent vector."
+  },
+  "pade_determinant": {
+    "forward_difference_hankel_form": "Eliminating A_n via the (d_A + 1)-th forward difference Delta^{d_A + 1} A_n(r) = 0 (0 <= r < d_B) reduces the system for B_n(z) = sum_{j=0}^{d_B} beta_j z^j to a d_B x (d_B + 1) rational matrix whose maximal minors are generalized Cauchy-Hankel determinants of (a_m).",
+    "cauchy_interpolation_determinant": "Up to a nonzero scalar, A_n(z) and B_n(z) are given by the (d_A + d_B + 2) x (d_A + d_B + 2) determinant whose first d_A + d_B + 1 rows are the node equations at m = 0..d_A+d_B and whose last row is [1, z, ..., z^{d_A}, 0, ..., 0] (for A_n) or [0, ..., 0, 1, z, ..., z^{d_B}] (for B_n)."
+  },
+  "pade_numerator_integrality": {
+    "canonical_primitive_lift": "Clearing the LCM of rational denominators of A_n(z) and dividing by the integer content produces the unique primitive polynomial tilde{A}_n(z) in Z[z], which is invariant under whether B_n was normalized by B_n(0) = 1 or monic leading coefficient.",
+    "height_growth_observed": "log H(tilde{A}_n) ~ c * n^2 * log(n) (reaching 4665.84 at n = 25 for [n/n])"
+  },
+  "pade_nonvanishing_status": {
+    "arb_certified_nonvanishing_on_tested_range": true,
+    "consecutive_coprimality_certified": true,
+    "two_approximant_norm_sum_applicable": "Whenever gcd(A_n, A_{n+1}) = 1 in Q[z] (verified for all tested consecutive pairs), C_n(|A_n(alpha(Y))|^2 + |A_{n+1}(alpha(Y))|^2) in Z[Y] has at most finitely many real roots and is strictly positive at Y = gamma_1."
+  },
+  "pade_residual_formula": {
+    "definition": "E_n(z) := A_n(z) - R(z) * B_n(z)",
+    "zero_specialization_identity": "At z = alpha_1 where R(alpha_1) = 0, E_n(alpha_1) = A_n(alpha_1) - R(alpha_1)*B_n(alpha_1) = A_n(alpha_1) (formalized in Lean 4 as `pade_interpolation_zero_residual_identity`).",
+    "contour_node_factorization": "Because E_n(m) = 0 for m = 0, 1, ..., d_A + d_B, Cauchy/Norlund-Rice interpolation yields E_n(z) = (prod_{m=0}^{d_A+d_B} (z - m)) * (1/(2*pi*i)) * oint_{C_n} (-R(zeta)*B_n(zeta)) / ((prod_{m=0}^{d_A+d_B} (zeta - m)) * (zeta - z)) d zeta."
+  },
+  "pade_smallness_rate": {
+    "rational_quotient_decay": "|A_n(alpha_1) / B_n(alpha_1)| decays exponentially (4.17e-10 at n = 25 for [n/n]) because |B_n(alpha_1)| grows like (2n)! to cancel the node product prod_{m=0}^{2n} (alpha_1 - m).",
+    "numerator_only_behavior": "Without dividing by B_n(alpha_1), |A_n(alpha_1)| stays O(1) (~0.597 at n=25) under B_n(0)=1, grows to 2.86e17 at n=25 under monic B_n, and grows as exp(+186.64 * n) at n=25 for the primitive integer polynomial tilde{A}_n(z) in Z[z]."
+  },
+  "pade_irrationality_ratio": {
+    "formula": "I_n^{Pade} = (-log|A_n(alpha_1)|) / deg(A_n)",
+    "at_n_25_diagonal_b0_eq_1": 0.0206351943277016,
+    "at_n_25_diagonal_monic_B": -1.6077284412863033,
+    "at_n_25_diagonal_primitive_int": -186.64080116993304,
+    "diverges_to_plus_infinity": false
+  },
+  "pade_route_classification": "MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED_BUT_FAILS_GATE_Z5_INTEGER_SMALLNESS",
+  "positive_hankel_determinant": {
+    "definition": "D_n := det(b_{i+j})_{0 <= i,j < n} in Q_{>0}",
+    "all_strictly_positive_1_to_max_n": true,
+    "all_unit_fractions_num_eq_1": true,
+    "lambert_stieltjes_closed_form": "D_n = prod_{r=1}^n ((1/6) * prod_{j=1}^{r-1} 1 / ((4j-1)*(4j+1)^2*(4j+3))) = 2^{-n} * prod_{r=1}^n 1 / ((4r-1) * prod_{k=1}^{2r-1} (2k+1)^2)",
+    "lambert_stieltjes_verified_1_to_max_n": true,
+    "unit_fraction_denominator_consequence": "Because num(D_n) = 1 identically for all n >= 1, 100% of the superexponential decay D_n = exp(-2 n^2 log n + O(n^2)) comes from the rational denominator den(D_n); multiplying by den(D_n) to clear denominators produces the constant integer 1.",
+    "table": [
+      {
+        "n": 1,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 1.791759469228055,
+        "neg_log_D_n": 1.791759469228055,
+        "neg_log_D_n_over_n_sq": 1.791759469228055,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.584962500721156
+      },
+      {
+        "n": 2,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 9.846917201047734,
+        "neg_log_D_n": 9.846917201047734,
+        "neg_log_D_n_over_n_sq": 2.4617293002619336,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.2407625744350477
+      },
+      {
+        "n": 3,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 26.640329509393535,
+        "neg_log_D_n": 26.640329509393535,
+        "neg_log_D_n_over_n_sq": 2.960036612154837,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.1352150706027757
+      },
+      {
+        "n": 4,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 53.66958600656299,
+        "neg_log_D_n": 53.66958600656299,
+        "neg_log_D_n_over_n_sq": 3.3543491254101867,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.0841742943268295
+      },
+      {
+        "n": 5,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 92.01775837211353,
+        "neg_log_D_n": 92.01775837211353,
+        "neg_log_D_n_over_n_sq": 3.6807103348845414,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.054243551156062
+      },
+      {
+        "n": 6,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 142.5349088082065,
+        "neg_log_D_n": 142.5349088082065,
+        "neg_log_D_n_over_n_sq": 3.9593030224501806,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.0346792601766914
+      },
+      {
+        "n": 7,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 205.92114197596936,
+        "neg_log_D_n": 205.92114197596936,
+        "neg_log_D_n_over_n_sq": 4.202472285223864,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.0209619751219265
+      },
+      {
+        "n": 8,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 282.7717908741946,
+        "neg_log_D_n": 282.7717908741946,
+        "neg_log_D_n_over_n_sq": 4.418309232409291,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.010859189353224
+      },
+      {
+        "n": 9,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 373.60479016132746,
+        "neg_log_D_n": 373.60479016132746,
+        "neg_log_D_n_over_n_sq": 4.612404816806512,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.003141960243047
+      },
+      {
+        "n": 10,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 478.87853498136775,
+        "neg_log_D_n": 478.87853498136775,
+        "neg_log_D_n_over_n_sq": 4.788785349813677,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9970786064501937
+      },
+      {
+        "n": 11,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 599.0041856966399,
+        "neg_log_D_n": 599.0041856966399,
+        "neg_log_D_n_over_n_sq": 4.95044781567471,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9922067559749406
+      },
+      {
+        "n": 12,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 734.3545091088563,
+        "neg_log_D_n": 734.3545091088563,
+        "neg_log_D_n_over_n_sq": 5.099684091033724,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9882201869594605
+      },
+      {
+        "n": 13,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 885.2704463517283,
+        "neg_log_D_n": 885.2704463517283,
+        "neg_log_D_n_over_n_sq": 5.238286664803126,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9849082496312436
+      },
+      {
+        "n": 14,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 1052.0661262396613,
+        "neg_log_D_n": 1052.0661262396613,
+        "neg_log_D_n_over_n_sq": 5.367684317549292,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9821214227729522
+      },
+      {
+        "n": 15,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 1235.0327792924018,
+        "neg_log_D_n": 1235.0327792924018,
+        "neg_log_D_n_over_n_sq": 5.489034574632897,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9797507400227352
+      }
+    ]
+  },
+  "hankel_andreief_formula": {
+    "ordered_sum_formula": "D_n = sum_{1 <= k_1 < k_2 < ... < k_n} (prod_{j=1}^n q_{k_j}) * prod_{1 <= a < b <= n} (q_{k_a} - q_{k_b})^2",
+    "symmetric_sum_formula": "D_n = (1 / n!) * sum_{k_1, ..., k_n >= 1} (prod_{j=1}^n q_{k_j}) * prod_{1 <= a < b <= n} (q_{k_a} - q_{k_b})^2",
+    "discrete_andreief_identity_verified": true
+  },
+  "hankel_decay_rate": {
+    "exact_asymptotic": "-log(D_n) = log(den(D_n)) = 2 * n^2 * log(n) + (2*log(2) - 3) * n^2 + O(n*log(n))",
+    "leading_coefficient_of_n_sq_log_n": 2.0,
+    "subleading_coefficient_of_n_sq": -1.6137056388801094,
+    "proof_method": "Derived both from the exact Lambert-Stieltjes product log(D_{r-1}/D_r) = 2*log((4r)! / (2^{2r} (2r)!)) + O(log r) = 4*r*log(r) + (4*log(2) - 4)*r + O(log r) and independently from the (k_1, ..., k_n) = (1, ..., n) term of the discrete Andreief expansion."
+  },
+  "argument_coupling_status": {
+    "target_free_vs_target_coupled_distinction": "D_n = det(b_{i+j}) > 0 is a target-free rational constant; it contains no zero argument X.",
+    "C1_divided_difference_resolvent": {
+      "entry_formula": "(R(m) - R(X)) / (m - X) -> a_m / (m - X) at R(X) = 0",
+      "verdict": "BLOCKED_BY_QUADRATIC_DEGREE_AND_TARGET_BLIND_SPECIALIZATION",
+      "obstruction": "Replacing (R(m) - R(X))/(m - X) by a_m/(m - X) drops R(X) identically for all X, so det(a_{i+j+1}/(i+j+1 - X)) has no zero-specific cancellation at X = alpha_1 (matching non-zero control points), requires universal denominator U_n(X) = prod_{m=1}^{2n-1} (m - X)^{min(m, 2n-m)} of degree n^2 in X, and diverges upon clearing the factorial denominators of a_m.",
+      "samples": [
+        {
+          "n": 1,
+          "universal_denominator_degree_in_X": 1,
+          "abs_det_at_alpha1": 0.023450903335393364,
+          "abs_det_at_non_zero_control": 0.03296454509560992
+        },
+        {
+          "n": 2,
+          "universal_denominator_degree_in_X": 4,
+          "abs_det_at_alpha1": 4.601559135136703e-06,
+          "abs_det_at_non_zero_control": 9.060278232949405e-06
+        },
+        {
+          "n": 3,
+          "universal_denominator_degree_in_X": 9,
+          "abs_det_at_alpha1": 1.1076590174330463e-12,
+          "abs_det_at_non_zero_control": 3.1442872433809465e-12
+        },
+        {
+          "n": 4,
+          "universal_denominator_degree_in_X": 16,
+          "abs_det_at_alpha1": 8.589392700751096e-23,
+          "abs_det_at_non_zero_control": 3.0651680096319163e-22
+        },
+        {
+          "n": 5,
+          "universal_denominator_degree_in_X": 25,
+          "abs_det_at_alpha1": 6.432467670218828e-36,
+          "abs_det_at_non_zero_control": 6.671069408891137e-35
+        }
+      ]
+    },
+    "C2_conjugate_paired_ordinate_resolvent": {
+      "entry_formula": "b_{i+j} / ((i + j + 3/4)^2 + X^2 / 4)",
+      "verdict": "BLOCKED_BY_QUADRATIC_DEGREE_AND_NON_GRAM_SPECIALIZATION",
+      "obstruction": "Produces rational dependence on X^2, but clearing denominators across the n x n Hankel matrix requires degree 2 n^2 in X, and because (m + 3/4)^{-2} is rational in the moment index m rather than geometric in q_k^m, no exact zero identity turns the matrix into a zero-specific Gram matrix at X = gamma_1.",
+      "samples": [
+        {
+          "n": 1,
+          "universal_denominator_degree_in_Y": 2,
+          "abs_det_at_gamma1": 0.003299669203475782,
+          "abs_det_at_non_zero_control_Y_eq_10": 0.006519967400162999
+        },
+        {
+          "n": 2,
+          "universal_denominator_degree_in_Y": 8,
+          "abs_det_at_gamma1": 1.678109939923237e-08,
+          "abs_det_at_non_zero_control_Y_eq_10": 5.5113134242341124e-08
+        },
+        {
+          "n": 3,
+          "universal_denominator_degree_in_Y": 18,
+          "abs_det_at_gamma1": 2.218665180881328e-17,
+          "abs_det_at_non_zero_control_Y_eq_10": 6.835664174061391e-17
+        },
+        {
+          "n": 4,
+          "universal_denominator_degree_in_Y": 32,
+          "abs_det_at_gamma1": 5.7711324561198e-29,
+          "abs_det_at_non_zero_control_Y_eq_10": 5.292064234854035e-28
+        },
+        {
+          "n": 5,
+          "universal_denominator_degree_in_Y": 50,
+          "abs_det_at_gamma1": 3.1381996724672025e-43,
+          "abs_det_at_non_zero_control_Y_eq_10": 5.878291250791404e-42
+        }
+      ]
+    },
+    "C3_interpolation_hankel_hybrid": {
+      "entry_formula": "Determinant of the (d_A + d_B + 2) x (d_A + d_B + 2) multipoint Pade / forward-difference interpolation matrix with polynomial last row",
+      "verdict": "REDUCES_EXACTLY_TO_ROUTE_B_MULTIPOINT_PADE_NUMERATOR",
+      "obstruction": "Preserves linear degree deg(A_n) <= n and encodes R(alpha_1) = 0 via the residual E_n(alpha_1) = A_n(alpha_1) - R(alpha_1) B_n(alpha_1), reducing identically to Route B, where factorial denominators of a_m prevent superlinear smallness of tilde{A}_n(alpha_1)."
+    },
+    "exponential_coupling_firewall": "Coupling X directly into the discrete measure via q_k^X = (pi*k)^{-2X} = exp(-2*X*log(pi*k)) or Gamma(X + 1) produces transcendental exponential-polynomial entries rather than P_n(X) in Z[X], and is terminated under Section 26 & 28."
+  },
+  "hankel_route_classification": "FAUZAN_HANKEL_ARGUMENT_TRANSFER_BLOCKED_BY_TARGET_COUPLING_AND_FACTORIAL_MOMENT_DENOMINATORS",
+  "rational_irrationality_criterion": {
+    "classification": "INTEGER_AUXILIARY_POLYNOMIAL_SUPERLINEAR_SMALLNESS_IMPLIES_IRRATIONAL",
+    "statement": "If P_n(Y) in Z[Y] satisfies P_n(gamma) != 0 with deg(P_n) <= d_n and (-log|P_n(gamma)|) / d_n -> +infty as n -> infty, then gamma notin Q.",
+    "proof": "If gamma = a/b with a in Z and b in Z_{>=1}, then b^{d_n} P_n(a/b) is a nonzero integer, so |P_n(a/b)| >= b^{-d_n}, i.e., (-log|P_n(gamma)|)/d_n <= log(b), contradicting (-log|P_n(gamma)|)/d_n -> +infty.",
+    "lean_theorems": [
+      "rational_evaluation_integer_clearing",
+      "superlinear_log_smallness_irrationality_schema"
+    ]
+  },
+  "algebraic_liouville_mahler_criterion": {
+    "statement": "For alpha in Q_bar of algebraic degree D = [Q(alpha):Q] >= 1 and Mahler measure M(alpha), and any P_n in Z[X] of degree d_n and naive height H(P_n) = max_j |c_{n,j}| with P_n(alpha) != 0: |P_n(alpha)| >= ((d_n + 1) * H(P_n))^{-(D - 1)} * M(alpha)^{-d_n}, i.e., -log|P_n(alpha)| <= (D - 1)*log H(P_n) + d_n*log M(alpha) + (D - 1)*log(d_n + 1).",
+    "citation": "K. Mahler (1962), 'On some inequalities for polynomials in several variables', J. London Math. Soc. 37, 341-344; M. Waldschmidt (2000), Diophantine Approximation on Linear Algebraic Groups, Grundlehren 326, Springer, Proposition 3.14.",
+    "d_eq_1_vs_d_ge_2_distinction": "For D = 1 (rationality), (D - 1)*log H(P_n) = 0 so coefficient height H(P_n) drops out once P_n in Z[X]; for D >= 2 (algebraicity/transcendence), (D - 1)*log H(P_n) is load-bearing and must be beaten by -log|P_n(alpha)|.",
+    "secondary_target_status": "NOT_ATTEMPTED_BEYOND_CRITERION_BECAUSE_IRRATIONALITY_ROUTE_TERMINATES_AT_GATE_Z5"
+  },
+  "height_growth": {
+    "newton_cleared_log_height": "log H(tilde{N}_n) = 3*n*log(n) + O(n) (2628.65 at n = 200)",
+    "pade_diagonal_primitive_log_height": "log H(tilde{A}_n) ~ c * n^2 * log(n) (4665.84 at n = 25)",
+    "hankel_unit_fraction_log_denominator": "log den(D_n) = 2*n^2*log(n) + (2*log(2) - 3)*n^2 + O(n*log(n))",
+    "structural_source": "Euler factorial (2m)! in a_m = (-1)^{m+1} (2m-1) 2^{2m-1} B_{2m} / (2m)!"
+  },
+  "degree_growth": {
+    "newton_N_n": "deg(N_n) = n",
+    "ordinate_norm_N_P": "deg(tilde{N}_{N_n}) = 2*n",
+    "two_approximant_G_n": "deg(G_n) = 2*n + 2",
+    "multipoint_pade_A_n": "deg(A_n) = n (for [n/n] and [n/(n-1)]), n - 1 (for [(n-1)/n])",
+    "hankel_resolvent_C1": "deg_X(U_n) = n^2",
+    "hankel_resolvent_C2": "deg_Y(U_n) = 2*n^2"
+  },
+  "zero_dependency_firewall": {
+    "candidate_coefficients_depend_on_gamma1": false,
+    "candidate_coefficients_depend_on_zero_list": false,
+    "gamma1_used_only_for_evaluation": true,
+    "zero_dependent_candidate_policy": "ZERO_DEPENDENT_CANDIDATE_REJECTED",
+    "direct_fauzan_substitution_firewall": {
+      "code": "DO_NOT_SUBSTITUTE_5_TO_RHO_SYMBOLICALLY",
+      "explanation": "In Fauzan's Hermite identity at s = 5, the integer 5 controls 4th derivatives (d^4/dy^4), y^5 weight, finite harmonic sums H_j^{(5)}, rational Bernoulli moments, and integer pole multiplicities; replacing 5 -> rho_1 is mathematically invalid."
+    },
+    "exponential_polynomial_firewall": {
+      "enforced": true,
+      "explanation": "Expressions of the form sum_j c_j exp(lambda_j X) or sum_j c_j n_j^{-X} (such as Dirichlet partial sums or q_k^X = (pi*k)^{-2X}) are exponential polynomials, NEVER classified as auxiliary integer polynomials P_n(X) in Z[X]. Turning an exponential polynomial at X = rho_1 into an algebraic contradiction would require Schanuel's conjecture or multi-logarithm algebraic independence across primes log(p), which is not assumed."
+    },
+    "rh_assumed": false,
+    "rh_firewall_note": "The first zero rho_1 = 1/2 + i*gamma_1 is individually certified on the critical line by 128-bit Arb Intermediate Value Theorem sign change without assuming RH."
+  },
+  "numerical_evidence": {
+    "evidence_scope": "NUMERICAL_RECONNAISSANCE_AND_CERTIFIED_FINITE_ENCLOSURES_ONLY_NEVER_ASYMPTOTIC_PROOF",
+    "first_zero_certificate": {
+      "source": "tc.zero_arithmetic_invariants.get_certified_first_zero_enclosures (128-bit Arb IVT on Hardy Z function)",
+      "prec_bits": 128,
+      "gamma_1_mid": 14.134725141734695,
+      "gamma_1_rad": 1.000000216229428e-30,
+      "ivt_sign_change_certified": true,
+      "display_60dps_note": "14.13472514173469379045725198356247027078425711569924317568556746 is display data only; evaluations use certified Arb/Acb balls."
+    },
+    "newton_evaluations_1_to_200": [
+      {
+        "n": 1,
+        "degree_d_n": 1,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 1.791759469228055,
+        "log_height_cleared": 1.0986122886681098,
+        "log_height_primitive": 1.0986122886681098,
+        "abs_N_n_alpha1_mid": 2.392351556014772,
+        "abs_N_n_alpha1_lower_bound": 2.392351556014772,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -0.872276796867203,
+        "irrationality_ratio_rational_I_n": -0.872276796867203,
+        "neg_log_abs_N_n_primitive_int": -2.664036266095258,
+        "irrationality_ratio_primitive_int": -2.664036266095258
+      },
+      {
+        "n": 2,
+        "degree_d_n": 2,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 3.4011973816621555,
+        "log_height_cleared": 2.70805020110221,
+        "log_height_primitive": 2.70805020110221,
+        "abs_N_n_alpha1_mid": 5.33577600557497,
+        "abs_N_n_alpha1_lower_bound": 5.33577600557497,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -1.6744343297665127,
+        "irrationality_ratio_rational_I_n": -0.8372171648832564,
+        "neg_log_abs_N_n_primitive_int": -5.075631711428668,
+        "irrationality_ratio_primitive_int": -2.537815855714334
+      },
+      {
+        "n": 5,
+        "degree_d_n": 5,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 14.729719123634105,
+        "log_height_cleared": 14.03657194307416,
+        "log_height_primitive": 14.03657194307416,
+        "abs_N_n_alpha1_mid": 15.444220599136948,
+        "abs_N_n_alpha1_lower_bound": 15.444220599136948,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -2.7372348621083784,
+        "irrationality_ratio_rational_I_n": -0.5474469724216757,
+        "neg_log_abs_N_n_primitive_int": -17.466953985742485,
+        "irrationality_ratio_primitive_int": -3.493390797148497
+      },
+      {
+        "n": 10,
+        "degree_d_n": 10,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 52.708382587265824,
+        "log_height_cleared": 52.01523540670588,
+        "log_height_primitive": 52.01523540670588,
+        "abs_N_n_alpha1_mid": 168.5373727171502,
+        "abs_N_n_alpha1_lower_bound": 168.5373727171502,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -5.127157521740151,
+        "irrationality_ratio_rational_I_n": -0.5127157521740151,
+        "neg_log_abs_N_n_primitive_int": -57.835540109005976,
+        "irrationality_ratio_primitive_int": -5.783554010900597
+      },
+      {
+        "n": 20,
+        "degree_d_n": 20,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 134.7307157467297,
+        "log_height_cleared": 134.20864838393948,
+        "log_height_primitive": 134.20864838393948,
+        "abs_N_n_alpha1_mid": 185.8813775783184,
+        "abs_N_n_alpha1_lower_bound": 185.8813775783184,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -5.225108715305726,
+        "irrationality_ratio_rational_I_n": -0.2612554357652863,
+        "neg_log_abs_N_n_primitive_int": -139.95582446203542,
+        "irrationality_ratio_primitive_int": -6.997791223101771
+      },
+      {
+        "n": 40,
+        "degree_d_n": 40,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 342.27416198199643,
+        "log_height_cleared": 341.5859165973119,
+        "log_height_primitive": 341.5859165973119,
+        "abs_N_n_alpha1_mid": 246.9860310605265,
+        "abs_N_n_alpha1_lower_bound": 246.9860310605265,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -5.5093317806178925,
+        "irrationality_ratio_rational_I_n": -0.1377332945154473,
+        "neg_log_abs_N_n_primitive_int": -347.78349376261434,
+        "irrationality_ratio_primitive_int": -8.694587344065358
+      },
+      {
+        "n": 80,
+        "degree_d_n": 80,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 838.5343459671103,
+        "log_height_cleared": 837.8411987865504,
+        "log_height_primitive": 837.8411987865504,
+        "abs_N_n_alpha1_mid": 84.39516779350056,
+        "abs_N_n_alpha1_lower_bound": 84.39516779350056,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -4.4355101463313495,
+        "irrationality_ratio_rational_I_n": -0.05544387682914187,
+        "neg_log_abs_N_n_primitive_int": -842.9698561134417,
+        "irrationality_ratio_primitive_int": -10.537123201418021
+      },
+      {
+        "n": 120,
+        "degree_d_n": 120,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 1406.0734347411594,
+        "log_height_cleared": 1405.3802875605995,
+        "log_height_primitive": 1405.3802875605995,
+        "abs_N_n_alpha1_mid": 48.220216157485616,
+        "abs_N_n_alpha1_lower_bound": 48.220216157485616,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -3.875778355478059,
+        "irrationality_ratio_rational_I_n": -0.03229815296231716,
+        "neg_log_abs_N_n_primitive_int": -1409.9492130966375,
+        "irrationality_ratio_primitive_int": -11.749576775805313
+      },
+      {
+        "n": 160,
+        "degree_d_n": 160,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 1989.941735723014,
+        "log_height_cleared": 1989.2485885424542,
+        "log_height_primitive": 1989.2485885424542,
+        "abs_N_n_alpha1_mid": 21.264419174929927,
+        "abs_N_n_alpha1_lower_bound": 21.264419174929927,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -3.0570352146683315,
+        "irrationality_ratio_rational_I_n": -0.019106470091677073,
+        "neg_log_abs_N_n_primitive_int": -1992.9987709376824,
+        "irrationality_ratio_primitive_int": -12.456242318360514
+      },
+      {
+        "n": 200,
+        "degree_d_n": 200,
+        "c_n_nonzero": true,
+        "c_n_plus_1_nonzero": true,
+        "consecutive_gcd_degree": 0,
+        "log_lcm_denominator_L_n": 2629.340644992827,
+        "log_height_cleared": 2628.647497812267,
+        "log_height_primitive": 2628.647497812267,
+        "abs_N_n_alpha1_mid": 16.70852157064258,
+        "abs_N_n_alpha1_lower_bound": 16.70852157064258,
+        "arb_enclosure_excludes_zero": true,
+        "neg_log_abs_N_n_rational": -2.8159188629685334,
+        "irrationality_ratio_rational_I_n": -0.014079594314842667,
+        "neg_log_abs_N_n_primitive_int": -2632.1565638557954,
+        "irrationality_ratio_primitive_int": -13.160782819278976
+      }
+    ],
+    "pade_schedules_1_to_25": {
+      "[n/n]": [
+        {
+          "n": 1,
+          "schedule": "[n/n]",
+          "deg_A": 1,
+          "deg_B": 1,
+          "rank": 3,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": null,
+          "log_height_primitive_A": 2.4849066497880004,
+          "abs_A_b0_alpha1": 1.5389913965258502,
+          "abs_B_b0_alpha1": 5.431913931645494,
+          "abs_quotient_A_over_B_alpha1": 0.2833239657130654,
+          "abs_A_monic_alpha1": 2.0519885287011337,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.43112726453952455,
+          "irrationality_ratio_b0_I_n": -0.43112726453952455,
+          "irrationality_ratio_monic_I_n": -0.7188093369913054,
+          "irrationality_ratio_primitive_int_I_n": -3.6091810948874703
+        },
+        {
+          "n": 2,
+          "schedule": "[n/n]",
+          "deg_A": 2,
+          "deg_B": 2,
+          "rank": 5,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 11.776089409608284,
+          "abs_A_b0_alpha1": 1.9334944525861526,
+          "abs_B_b0_alpha1": 38.57634320879366,
+          "abs_quotient_A_over_B_alpha1": 0.05012124768076523,
+          "abs_A_monic_alpha1": 2.442451062298106,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.6593289629564455,
+          "irrationality_ratio_b0_I_n": -0.32966448147822275,
+          "irrationality_ratio_monic_I_n": -0.4465010344137348,
+          "irrationality_ratio_primitive_int_I_n": -6.5642827765623375
+        },
+        {
+          "n": 3,
+          "schedule": "[n/n]",
+          "deg_A": 3,
+          "deg_B": 3,
+          "rank": 7,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 34.207910117819026,
+          "abs_A_b0_alpha1": 1.9037873456625343,
+          "abs_B_b0_alpha1": 134.66911755482428,
+          "abs_quotient_A_over_B_alpha1": 0.014136777460411408,
+          "abs_A_monic_alpha1": 4.860845601758759,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.6438452419291314,
+          "irrationality_ratio_b0_I_n": -0.2146150806430438,
+          "irrationality_ratio_monic_I_n": -0.527070804969653,
+          "irrationality_ratio_primitive_int_I_n": -11.848300846769368
+        },
+        {
+          "n": 4,
+          "schedule": "[n/n]",
+          "deg_A": 4,
+          "deg_B": 4,
+          "rank": 9,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 61.831839685064004,
+          "abs_A_b0_alpha1": 1.6925719293518824,
+          "abs_B_b0_alpha1": 473.06161182755113,
+          "abs_quotient_A_over_B_alpha1": 0.003577910122136245,
+          "abs_A_monic_alpha1": 8.451454801412329,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.5262492237797537,
+          "irrationality_ratio_b0_I_n": -0.13156230594493842,
+          "irrationality_ratio_monic_I_n": -0.5335846480994642,
+          "irrationality_ratio_primitive_int_I_n": -15.762809022350925
+        },
+        {
+          "n": 5,
+          "schedule": "[n/n]",
+          "deg_A": 5,
+          "deg_B": 5,
+          "rank": 11,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 106.42469951055146,
+          "abs_A_b0_alpha1": 1.4861890274262297,
+          "abs_B_b0_alpha1": 1283.9983657774978,
+          "abs_quotient_A_over_B_alpha1": 0.0011574695630755727,
+          "abs_A_monic_alpha1": 19.68800440824857,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.3962151437414501,
+          "irrationality_ratio_b0_I_n": -0.07924302874829002,
+          "irrationality_ratio_monic_I_n": -0.5960019073988163,
+          "irrationality_ratio_primitive_int_I_n": -21.50281236697057
+        },
+        {
+          "n": 8,
+          "schedule": "[n/n]",
+          "deg_A": 8,
+          "deg_B": 8,
+          "rank": 17,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 322.4561119212135,
+          "abs_A_b0_alpha1": 1.0686364351595883,
+          "abs_B_b0_alpha1": 16165.200755273592,
+          "abs_quotient_A_over_B_alpha1": 6.610721706075725e-05,
+          "abs_A_monic_alpha1": 554.451725978835,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.06638347612309184,
+          "irrationality_ratio_b0_I_n": -0.00829793451538648,
+          "irrationality_ratio_monic_I_n": -0.7897474680438833,
+          "irrationality_ratio_primitive_int_I_n": -40.401955322237065
+        },
+        {
+          "n": 10,
+          "schedule": "[n/n]",
+          "deg_A": 10,
+          "deg_B": 10,
+          "rank": 21,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 547.0894208686293,
+          "abs_A_b0_alpha1": 0.9198963565343713,
+          "abs_B_b0_alpha1": 69410.61061779935,
+          "abs_quotient_A_over_B_alpha1": 1.3252964472530906e-05,
+          "abs_A_monic_alpha1": 9847.331808421273,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.083494271226109,
+          "irrationality_ratio_b0_I_n": 0.0083494271226109,
+          "irrationality_ratio_monic_I_n": -0.9194955815077093,
+          "irrationality_ratio_primitive_int_I_n": -54.769907377796315
+        },
+        {
+          "n": 15,
+          "schedule": "[n/n]",
+          "deg_A": 15,
+          "deg_B": 15,
+          "rank": 31,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 1426.450699017058,
+          "abs_A_b0_alpha1": 0.7314816654190545,
+          "abs_B_b0_alpha1": 2063408.54210894,
+          "abs_quotient_A_over_B_alpha1": 3.545016173440049e-07,
+          "abs_A_monic_alpha1": 65126239.06987243,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.31268312319826935,
+          "irrationality_ratio_b0_I_n": 0.02084554154655129,
+          "irrationality_ratio_monic_I_n": -1.1994558722587816,
+          "irrationality_ratio_primitive_int_I_n": -95.12207753829465
+        },
+        {
+          "n": 20,
+          "schedule": "[n/n]",
+          "deg_A": 20,
+          "deg_B": 20,
+          "rank": 41,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 2780.3965152775836,
+          "abs_A_b0_alpha1": 0.645357092978941,
+          "abs_B_b0_alpha1": 54906642.85038872,
+          "abs_quotient_A_over_B_alpha1": 1.1753716116598669e-08,
+          "abs_A_monic_alpha1": 2314353473540.2974,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.43795148285882046,
+          "irrationality_ratio_b0_I_n": 0.021897574142941023,
+          "irrationality_ratio_monic_I_n": -1.4235075743686605,
+          "irrationality_ratio_primitive_int_I_n": -139.03258554876425
+        },
+        {
+          "n": 25,
+          "schedule": "[n/n]",
+          "deg_A": 25,
+          "deg_B": 25,
+          "rank": 51,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 4665.842761925958,
+          "abs_A_b0_alpha1": 0.5969751100348734,
+          "abs_B_b0_alpha1": 1432938091.9330838,
+          "abs_quotient_A_over_B_alpha1": 4.166091427086937e-10,
+          "abs_A_monic_alpha1": 2.8555499492312893e+17,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.51587985819254,
+          "irrationality_ratio_b0_I_n": 0.0206351943277016,
+          "irrationality_ratio_monic_I_n": -1.6077284412863033,
+          "irrationality_ratio_primitive_int_I_n": -186.64080116993304
+        }
+      ],
+      "[n/(n-1)]": [
+        {
+          "n": 1,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 1,
+          "deg_B": 0,
+          "rank": 2,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": null,
+          "log_height_primitive_A": 1.0986122886681098,
+          "abs_A_b0_alpha1": 2.392351556014772,
+          "abs_B_b0_alpha1": 1.0,
+          "abs_quotient_A_over_B_alpha1": 2.392351556014772,
+          "abs_A_monic_alpha1": 2.392351556014772,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.872276796867203,
+          "irrationality_ratio_b0_I_n": -0.872276796867203,
+          "irrationality_ratio_monic_I_n": -0.872276796867203,
+          "irrationality_ratio_primitive_int_I_n": -2.664036266095258
+        },
+        {
+          "n": 2,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 2,
+          "deg_B": 1,
+          "rank": 4,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 7.490529402060711,
+          "abs_A_b0_alpha1": 3.4002520628541,
+          "abs_B_b0_alpha1": 2.3760895906341784,
+          "abs_quotient_A_over_B_alpha1": 1.4310285589637943,
+          "abs_A_monic_alpha1": 11.34050548337373,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -1.2238495650077272,
+          "irrationality_ratio_b0_I_n": -0.6119247825038636,
+          "irrationality_ratio_monic_I_n": -1.2141904362797873,
+          "irrationality_ratio_primitive_int_I_n": -4.7037630738141925
+        },
+        {
+          "n": 3,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 3,
+          "deg_B": 2,
+          "rank": 6,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 21.19981977847789,
+          "abs_A_b0_alpha1": 2.861287372028742,
+          "abs_B_b0_alpha1": 23.88548287953438,
+          "abs_quotient_A_over_B_alpha1": 0.1197918998104224,
+          "abs_A_monic_alpha1": 5.749040181585233,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -1.0512716536335875,
+          "irrationality_ratio_b0_I_n": -0.35042388454452916,
+          "irrationality_ratio_monic_I_n": -0.583010971978014,
+          "irrationality_ratio_primitive_int_I_n": -7.648079537557141
+        },
+        {
+          "n": 4,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 4,
+          "deg_B": 3,
+          "rank": 8,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 44.95839326017803,
+          "abs_A_b0_alpha1": 2.4199483485886115,
+          "abs_B_b0_alpha1": 68.49108906324314,
+          "abs_quotient_A_over_B_alpha1": 0.03533230938048139,
+          "abs_A_monic_alpha1": 12.173372430190554,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.883746196382393,
+          "irrationality_ratio_b0_I_n": -0.22093654909559826,
+          "irrationality_ratio_monic_I_n": -0.6248127446834988,
+          "irrationality_ratio_primitive_int_I_n": -11.633821659280091
+        },
+        {
+          "n": 5,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 5,
+          "deg_B": 4,
+          "rank": 10,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 83.48343268607695,
+          "abs_A_b0_alpha1": 1.9481330869213562,
+          "abs_B_b0_alpha1": 253.39170278037133,
+          "abs_quotient_A_over_B_alpha1": 0.007688227615763376,
+          "abs_A_monic_alpha1": 17.504943830854625,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.6668715226614774,
+          "irrationality_ratio_b0_I_n": -0.13337430453229548,
+          "irrationality_ratio_monic_I_n": -0.5724966691305633,
+          "irrationality_ratio_primitive_int_I_n": -16.968690277859675
+        },
+        {
+          "n": 8,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 8,
+          "deg_B": 7,
+          "rank": 16,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 275.3472925405236,
+          "abs_A_b0_alpha1": 1.2261897219983369,
+          "abs_B_b0_alpha1": 3604.685365512245,
+          "abs_quotient_A_over_B_alpha1": 0.0003401655339270058,
+          "abs_A_monic_alpha1": 315.1383570807765,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.2039115743168155,
+          "irrationality_ratio_b0_I_n": -0.025488946789601938,
+          "irrationality_ratio_monic_I_n": -0.7191264714025937,
+          "irrationality_ratio_primitive_int_I_n": -34.530543911925044
+        },
+        {
+          "n": 10,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 10,
+          "deg_B": 9,
+          "rank": 20,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 478.2723019064374,
+          "abs_A_b0_alpha1": 1.008380320447844,
+          "abs_B_b0_alpha1": 16134.206687506732,
+          "abs_quotient_A_over_B_alpha1": 6.249952910474783e-05,
+          "abs_A_monic_alpha1": 4359.563651887454,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.008345400520255583,
+          "irrationality_ratio_b0_I_n": -0.0008345400520255583,
+          "irrationality_ratio_monic_I_n": -0.8380127251492432,
+          "irrationality_ratio_primitive_int_I_n": -47.89737944875176
+        },
+        {
+          "n": 15,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 15,
+          "deg_B": 14,
+          "rank": 30,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 1296.1282689212376,
+          "abs_A_b0_alpha1": 0.7620609458150568,
+          "abs_B_b0_alpha1": 491911.73023240356,
+          "abs_quotient_A_over_B_alpha1": 1.5491823003590936e-06,
+          "abs_A_monic_alpha1": 18840506.024317734,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.2717287451092422,
+          "irrationality_ratio_b0_I_n": 0.018115249673949483,
+          "irrationality_ratio_monic_I_n": -1.1167679790528007,
+          "irrationality_ratio_primitive_int_I_n": -86.43664582377922
+        },
+        {
+          "n": 20,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 20,
+          "deg_B": 19,
+          "rank": 40,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 2597.0721737174053,
+          "abs_A_b0_alpha1": 0.6598069295615212,
+          "abs_B_b0_alpha1": 13085815.861475391,
+          "abs_quotient_A_over_B_alpha1": 5.042153554246405e-08,
+          "abs_A_monic_alpha1": 500784280880.70245,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.4158080177245876,
+          "irrationality_ratio_b0_I_n": 0.02079040088622938,
+          "irrationality_ratio_monic_I_n": -1.346972063411096,
+          "irrationality_ratio_primitive_int_I_n": -129.86747564401202
+        },
+        {
+          "n": 25,
+          "schedule": "[n/(n-1)]",
+          "deg_A": 25,
+          "deg_B": 24,
+          "rank": 50,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 4422.79111761083,
+          "abs_A_b0_alpha1": 0.6050550809718863,
+          "abs_B_b0_alpha1": 340008661.73654616,
+          "abs_quotient_A_over_B_alpha1": 1.7795284328394844e-09,
+          "abs_A_monic_alpha1": 4.947114289519889e+16,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.5024357821667137,
+          "irrationality_ratio_b0_I_n": 0.02009743128666855,
+          "irrationality_ratio_monic_I_n": -1.537606636907081,
+          "irrationality_ratio_primitive_int_I_n": -176.91927316036893
+        }
+      ],
+      "[(n-1)/n]": [
+        {
+          "n": 1,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 0,
+          "deg_B": 1,
+          "rank": 2,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": null,
+          "log_height_primitive_A": 0.0,
+          "abs_A_b0_alpha1": 0.5,
+          "abs_B_b0_alpha1": 14.21409352833964,
+          "abs_quotient_A_over_B_alpha1": 0.03517635500309005,
+          "abs_A_monic_alpha1": 0.25,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.6931471805599453,
+          "irrationality_ratio_b0_I_n": 0.6931471805599453,
+          "irrationality_ratio_monic_I_n": 1.3862943611198906,
+          "irrationality_ratio_primitive_int_I_n": -0.0
+        },
+        {
+          "n": 2,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 1,
+          "deg_B": 2,
+          "rank": 4,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 4.394449154672439,
+          "abs_A_b0_alpha1": 1.105694102333066,
+          "abs_B_b0_alpha1": 78.59712022043249,
+          "abs_quotient_A_over_B_alpha1": 0.014067870416015883,
+          "abs_A_monic_alpha1": 0.6942730409998321,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.10047328467577601,
+          "irrationality_ratio_b0_I_n": -0.10047328467577601,
+          "irrationality_ratio_monic_I_n": 0.36488996501345733,
+          "irrationality_ratio_primitive_int_I_n": -5.18806961990816
+        },
+        {
+          "n": 3,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 2,
+          "deg_B": 3,
+          "rank": 6,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 16.081723117886604,
+          "abs_A_b0_alpha1": 1.3841931404727776,
+          "abs_B_b0_alpha1": 295.34369730580096,
+          "abs_quotient_A_over_B_alpha1": 0.004686719754305691,
+          "abs_A_monic_alpha1": 1.6283890097387042,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.3251173998236762,
+          "irrationality_ratio_b0_I_n": -0.1625586999118381,
+          "irrationality_ratio_monic_I_n": -0.24379559425370956,
+          "irrationality_ratio_primitive_int_I_n": -8.549993849135113
+        },
+        {
+          "n": 4,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 3,
+          "deg_B": 4,
+          "rank": 8,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 41.17990135174811,
+          "abs_A_b0_alpha1": 1.4017866674961885,
+          "abs_B_b0_alpha1": 995.0280261676595,
+          "abs_quotient_A_over_B_alpha1": 0.0014087911401803985,
+          "abs_A_monic_alpha1": 3.4426240173156715,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.3377476140502633,
+          "irrationality_ratio_b0_I_n": -0.11258253801675444,
+          "irrationality_ratio_monic_I_n": -0.41207799211193485,
+          "irrationality_ratio_primitive_int_I_n": -14.070265382119437
+        },
+        {
+          "n": 5,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 4,
+          "deg_B": 5,
+          "rank": 10,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 81.21314379028236,
+          "abs_A_b0_alpha1": 1.3182583980716207,
+          "abs_B_b0_alpha1": 2768.724463854114,
+          "abs_quotient_A_over_B_alpha1": 0.0004761248059464109,
+          "abs_A_monic_alpha1": 8.459725394151326,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.27631147002951956,
+          "irrationality_ratio_b0_I_n": -0.06907786750737989,
+          "irrationality_ratio_monic_I_n": -0.5338291784427857,
+          "irrationality_ratio_primitive_int_I_n": -20.545650610217958
+        },
+        {
+          "n": 8,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 7,
+          "deg_B": 8,
+          "rank": 16,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 277.4951764636962,
+          "abs_A_b0_alpha1": 1.0278592105875413,
+          "abs_B_b0_alpha1": 35514.760962046,
+          "abs_quotient_A_over_B_alpha1": 2.894174655113113e-05,
+          "abs_A_monic_alpha1": 263.2688405866614,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": -0.027478202972444552,
+          "irrationality_ratio_b0_I_n": -0.003925457567492079,
+          "irrationality_ratio_monic_I_n": -0.7961679596618906,
+          "irrationality_ratio_primitive_int_I_n": -39.74511454960408
+        },
+        {
+          "n": 10,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 9,
+          "deg_B": 10,
+          "rank": 20,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 482.540258481554,
+          "abs_A_b0_alpha1": 0.9003839343231692,
+          "abs_B_b0_alpha1": 153879.2373725109,
+          "abs_quotient_A_over_B_alpha1": 5.85123730593699e-06,
+          "abs_A_monic_alpha1": 4769.721478659052,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.10493401293063603,
+          "irrationality_ratio_b0_I_n": 0.01165933477007067,
+          "irrationality_ratio_monic_I_n": -0.9411159102177094,
+          "irrationality_ratio_primitive_int_I_n": -53.6809412943537
+        },
+        {
+          "n": 15,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 14,
+          "deg_B": 15,
+          "rank": 30,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 1308.5069190185493,
+          "abs_A_b0_alpha1": 0.7268925550826373,
+          "abs_B_b0_alpha1": 4612336.181889835,
+          "abs_quotient_A_over_B_alpha1": 1.5759747911194194e-07,
+          "abs_A_monic_alpha1": 32142245.528854944,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.3189766045544011,
+          "irrationality_ratio_b0_I_n": 0.02278404318245722,
+          "irrationality_ratio_monic_I_n": -1.2346915559243692,
+          "irrationality_ratio_primitive_int_I_n": -93.49150639961105
+        },
+        {
+          "n": 20,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 19,
+          "deg_B": 20,
+          "rank": 40,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 2625.3137689335676,
+          "abs_A_b0_alpha1": 0.6440662224970723,
+          "abs_B_b0_alpha1": 122953007.8165881,
+          "abs_quotient_A_over_B_alpha1": 5.238312050550574e-09,
+          "abs_A_monic_alpha1": 1149192164212.334,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.4399537282000237,
+          "irrationality_ratio_b0_I_n": 0.023155459378948615,
+          "irrationality_ratio_monic_I_n": -1.461583176081927,
+          "irrationality_ratio_primitive_int_I_n": -138.18773486241724
+        },
+        {
+          "n": 25,
+          "schedule": "[(n-1)/n]",
+          "deg_A": 24,
+          "deg_B": 25,
+          "rank": 50,
+          "nullspace_dimension": 1,
+          "projectively_unique": true,
+          "interpolation_exact": true,
+          "coprime_with_previous_tested_numerator": true,
+          "log_height_primitive_A": 4472.38868882878,
+          "abs_A_b0_alpha1": 0.5967522274025527,
+          "abs_B_b0_alpha1": 3209400008.4549737,
+          "abs_quotient_A_over_B_alpha1": 1.859388751263303e-10,
+          "abs_A_monic_alpha1": 1.4217079629367915e+17,
+          "arb_enclosure_excludes_zero": true,
+          "neg_log_abs_A_b0": 0.516253281214566,
+          "irrationality_ratio_b0_I_n": 0.021510553383940253,
+          "irrationality_ratio_monic_I_n": -1.6456585633557983,
+          "irrationality_ratio_primitive_int_I_n": -186.35689928033855
+        }
+      ]
+    },
+    "hankel_determinants_1_to_15": [
+      {
+        "n": 1,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 1.791759469228055,
+        "neg_log_D_n": 1.791759469228055,
+        "neg_log_D_n_over_n_sq": 1.791759469228055,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.584962500721156
+      },
+      {
+        "n": 2,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 9.846917201047734,
+        "neg_log_D_n": 9.846917201047734,
+        "neg_log_D_n_over_n_sq": 2.4617293002619336,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.2407625744350477
+      },
+      {
+        "n": 3,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 26.640329509393535,
+        "neg_log_D_n": 26.640329509393535,
+        "neg_log_D_n_over_n_sq": 2.960036612154837,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.1352150706027757
+      },
+      {
+        "n": 4,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 53.66958600656299,
+        "neg_log_D_n": 53.66958600656299,
+        "neg_log_D_n_over_n_sq": 3.3543491254101867,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.0841742943268295
+      },
+      {
+        "n": 5,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 92.01775837211353,
+        "neg_log_D_n": 92.01775837211353,
+        "neg_log_D_n_over_n_sq": 3.6807103348845414,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.054243551156062
+      },
+      {
+        "n": 6,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 142.5349088082065,
+        "neg_log_D_n": 142.5349088082065,
+        "neg_log_D_n_over_n_sq": 3.9593030224501806,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.0346792601766914
+      },
+      {
+        "n": 7,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 205.92114197596936,
+        "neg_log_D_n": 205.92114197596936,
+        "neg_log_D_n_over_n_sq": 4.202472285223864,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.0209619751219265
+      },
+      {
+        "n": 8,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 282.7717908741946,
+        "neg_log_D_n": 282.7717908741946,
+        "neg_log_D_n_over_n_sq": 4.418309232409291,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.010859189353224
+      },
+      {
+        "n": 9,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 373.60479016132746,
+        "neg_log_D_n": 373.60479016132746,
+        "neg_log_D_n_over_n_sq": 4.612404816806512,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 2.003141960243047
+      },
+      {
+        "n": 10,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 478.87853498136775,
+        "neg_log_D_n": 478.87853498136775,
+        "neg_log_D_n_over_n_sq": 4.788785349813677,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9970786064501937
+      },
+      {
+        "n": 11,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 599.0041856966399,
+        "neg_log_D_n": 599.0041856966399,
+        "neg_log_D_n_over_n_sq": 4.95044781567471,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9922067559749406
+      },
+      {
+        "n": 12,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 734.3545091088563,
+        "neg_log_D_n": 734.3545091088563,
+        "neg_log_D_n_over_n_sq": 5.099684091033724,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9882201869594605
+      },
+      {
+        "n": 13,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 885.2704463517283,
+        "neg_log_D_n": 885.2704463517283,
+        "neg_log_D_n_over_n_sq": 5.238286664803126,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9849082496312436
+      },
+      {
+        "n": 14,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 1052.0661262396613,
+        "neg_log_D_n": 1052.0661262396613,
+        "neg_log_D_n_over_n_sq": 5.367684317549292,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9821214227729522
+      },
+      {
+        "n": 15,
+        "D_n_positive": true,
+        "D_n_numerator": 1,
+        "D_n_is_unit_fraction": true,
+        "matches_lambert_stieltjes_product": true,
+        "log_denominator_D_n": 1235.0327792924018,
+        "neg_log_D_n": 1235.0327792924018,
+        "neg_log_D_n_over_n_sq": 5.489034574632897,
+        "neg_log_D_n_over_n_sq_log_n_plus_1": 1.9797507400227352
+      }
+    ]
+  },
+  "literature_dependency_table": [
+    {
+      "theorem": "Euler Even-Zeta Bernoulli Formula",
+      "hypotheses": "m in Z_{>=1} (and analytic continuation to m = 0 where zeta(0) = -1/2, B_0 = 1)",
+      "our_object": "a_m = R(m) = (2m - 1) pi^{-2m} zeta(2m) = (-1)^{m+1} (2m-1) 2^{2m-1} B_{2m} / (2m)!",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "L. Euler (1740); H. M. Edwards (1974), Riemann's Zeta Function, \u00a71.5."
+    },
+    {
+      "theorem": "Von Staudt-Clausen Theorem on Bernoulli Denominators",
+      "hypotheses": "Even index 2m >= 2",
+      "our_object": "den(B_{2m}) = prod_{(p-1) | 2m} p in the denominator of a_m",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "K. G. C. von Staudt (1840); T. Clausen (1840); Ireland-Rosen (1990), Ch. 15."
+    },
+    {
+      "theorem": "Flajolet-Vepstas Norlund-Rice / Euler Transform Asymptotics of Finite Differences",
+      "hypotheses": "Sequence sampled from a meromorphic/entire function with polar singularity structure under Euler transform",
+      "our_object": "c_n = Delta^n a_0 and Delta^n a_1 with OGF C(w) = w / (2(1+w)^2 sin^2(sqrt(w/(1+w))))",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "P. Flajolet and L. Vepstas (2008), 'On Differences of Zeta Values', J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2)."
+    },
+    {
+      "theorem": "Carlson's Uniqueness & Newton Series Interpolation Theorem",
+      "hypotheses": "f(z) entire of exponential type < pi on Re(z) >= 0; or direct absolute convergence of Norlund-Rice contour remainder",
+      "our_object": "R(z) = (2z - 1) pi^{-2z} zeta(2z) and Newton series sum_{k>=0} (Delta^k a_0) binom(z, k)",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "F. Carlson (1914); N. E. Norlund (1924), Vorlesungen uber Differenzenrechnung; R. P. Boas (1954), Entire Functions, Thm 9.2.1."
+    },
+    {
+      "theorem": "Hausdorff / Stieltjes Moment Positivity Theorem",
+      "hypotheses": "Positive Radon measure nu supported on [0, 1] with infinitely many support points",
+      "our_object": "b_m = int_0^1 x^m d nu(x) with nu = sum_{k>=1} q_k delta_{q_k}, q_k = 1/(pi^2 k^2)",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "T. J. Stieltjes (1894), Ann. Fac. Sci. Toulouse 8; F. Hausdorff (1921), Math. Z. 9, 74-109."
+    },
+    {
+      "theorem": "Lambert Continued Fraction & Stieltjes S-Fraction Hankel Determinant Theorem",
+      "hypotheses": "S-fraction sum_{m>=0} b_m t^m = c_0 / (1 - c_1 t / (1 - c_2 t / ...)) with c_k > 0",
+      "our_object": "B(t) = (1 - sqrt(t) cot(sqrt(t)))/(2t) with c_0 = 1/6, c_k = 1/((2k+1)(2k+3)), giving D_n = det(b_{i+j})",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "J. H. Lambert (1768); T. J. Stieltjes (1894); H. S. Wall (1948), Analytic Theory of Continued Fractions, Thm 51.1; C. Krattenthaler (1999), arXiv:math/9902004."
+    },
+    {
+      "theorem": "Discrete Andreief / Cauchy-Binet Vandermonde Determinant Identity",
+      "hypotheses": "Absoluteness of sum_{k>=1} x_k^{i+j} w_k for positive weights w_k > 0 and nodes x_k in (0, 1)",
+      "our_object": "D_n = det(b_{i+j})_{0<=i,j<n} = sum_{1<=k_1<...<k_n} (prod q_{k_j}) prod_{a<b} (q_{k_a} - q_{k_b})^2",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "C. Andreief (1886), Mem. Soc. Sci. Bordeaux 2, 1-14; G. Szego (1975), Orthogonal Polynomials, \u00a72.1."
+    },
+    {
+      "theorem": "Multipoint Pade / Cauchy-Jacobi Rational Interpolation Existence & Contour Error Formula",
+      "hypotheses": "Prescribed degrees (d_A, d_B) on d_A + d_B + 1 distinct nodes m = 0..d_A+d_B of an entire function",
+      "our_object": "A_n(m) - a_m B_n(m) = 0 on m = 0..d_A+d_B and residual E_n(z) = A_n(z) - R(z) B_n(z)",
+      "hypotheses_verified": true,
+      "evidence_class": "PROVED",
+      "citation": "C. G. J. Jacobi (1846); G. A. Baker and P. Graves-Morris (1996), Pade Approximants, 2nd ed., Cambridge Univ. Press, \u00a77.1."
+    },
+    {
+      "theorem": "Fauzan (2026) / mo271/Zeta5 Irrationality Criterion for Integer Polynomials",
+      "hypotheses": "Q_n in Z[X], deg Q_n <= d_n, Q_n(xi) != 0, and (-log|Q_n(xi)|)/d_n -> +infty",
+      "our_object": "Candidate argument polynomials N_n, G_n, tilde{A}_n evaluated at alpha_1 or gamma_1",
+      "hypotheses_verified": false,
+      "evidence_class": "REFUTED_WITHIN_SCOPE",
+      "citation": "A. Fauzan (2026), Zenodo 22826419; mo271/Zeta5 `Apery/Criterion.lean` (`irrational_of_eventually_exists_int_poly`). Criterion proved, but (-log|P_n|)/d_n -> +infty fails at Gate Z5 for tested families."
+    },
+    {
+      "theorem": "Liouville-Mahler Algebraic Approximation Lower Bound",
+      "hypotheses": "alpha in Q_bar of degree D >= 1, Mahler measure M(alpha), P in Z[X] with P(alpha) != 0",
+      "our_object": "Secondary target rho_1 notin Q_bar or gamma_1 notin Q_bar (D >= 2)",
+      "hypotheses_verified": false,
+      "evidence_class": "PROVED_CONDITIONAL",
+      "citation": "K. Mahler (1962), J. London Math. Soc. 37, 341-344; M. Waldschmidt (2000), Prop. 3.14."
+    }
+  ],
+  "lean_theorem_map": {
+    "lean_file": "formal/RiemannScope/FauzanZeroArgumentTransfer.lean",
+    "sha256": "9b27198afec7c835cee31ec0e6717d3876d9c4424b8ed81c5608f8e40bcf7291",
+    "required_theorems": [
+      "argument_norm_polynomial_real",
+      "argument_norm_polynomial_nonneg",
+      "argument_norm_polynomial_degree_bound",
+      "newton_consecutive_common_root_forces_node",
+      "newton_consecutive_no_common_root_of_nonzero_samples",
+      "two_approximant_norm_sum_strict_pos",
+      "rational_evaluation_integer_clearing",
+      "superlinear_log_smallness_irrationality_schema",
+      "pade_interpolation_zero_residual_identity"
+    ],
+    "found_theorem_declarations": [
+      "argument_norm_polynomial_real",
+      "argument_norm_polynomial_nonneg",
+      "argument_norm_polynomial_degree_bound",
+      "newton_consecutive_common_root_forces_node",
+      "newton_consecutive_no_common_root_of_nonzero_samples",
+      "two_approximant_norm_sum_strict_pos",
+      "rational_evaluation_integer_clearing",
+      "superlinear_log_smallness_irrationality_schema",
+      "pade_interpolation_zero_residual_identity"
+    ],
+    "theorem_declaration_count": 9,
+    "missing_required_theorems": [],
+    "all_required_present": true,
+    "sorry_count": 0,
+    "admit_count": 0,
+    "nonstandard_axiom_count": 0,
+    "in_formal_source_inventories": true,
+    "repository_formal_provenance": {
+      "status": "FORMAL_SOURCE_INVENTORY_SYNCHRONIZED",
+      "synchronized": true,
+      "umbrella_imported_module_count": 33,
+      "build_formal_source_count": 34,
+      "certification_required_source_count": 34,
+      "missing_from_build_formal": [],
+      "missing_from_certification": [],
+      "lists_match_exactly": true,
+      "zero_arithmetic_lean_file_in_inventories": true,
+      "zero_arithmetic_lean_theorem_count": 12,
+      "total_formal_theorem_count": 635
+    },
+    "audit_note": "0 sorry, 0 admit, no nonstandard project axioms introduced.",
+    "not_claimed_in_lean": [
+      "convergence of the Newton series",
+      "Norlund-Rice asymptotics",
+      "Pade asymptotic error",
+      "Hankel potential theory",
+      "irrationality of gamma_1"
+    ]
+  },
+  "principal_classification": "RATIONALIZED_XI_ARGUMENT_POLYNOMIALIZATION_PROVED_NEWTON_AND_PADE_ROUTES_FAIL_GATE_Z5_SUPERLINEAR_SMALLNESS",
+  "exact_remaining_subgate": {
+    "subgate_tc_039a_status": "TESTED_TERMINATED_AT_GATE_Z5_FACTORIAL_DENOMINATOR_AND_SUBLINEAR_DECAY_OBSTRUCTION",
+    "next_subgate_id": "SUBGATE-TC-040A",
+    "next_subgate_classification": "SUBFACTORIAL_DENOMINATOR_ZERO_CARRYING_ENTIRE_KERNEL_SAMPLING_SUBGATE",
+    "branch": "ZERO_ARITHMETIC_BRANCH",
+    "exact_next_theorem_statement": "Construct a zero-independent entire multiplier E(z) (with E(alpha_1) != 0) or transformed rational-node sampling family F(z) = E(z) R(z) such that: (1) F(m) in Q for all m in Z_{>=0} with least common denominator log lcm_{0<=m<=n} den(F(m)) = O(n) (eliminating the (2m)! factorial denominator of unwrapped Euler even-zeta values), and (2) the resulting integer argument-polynomial family tilde{P}_n(Y) in Z[Y] satisfies (-log|tilde{P}_n(gamma_1)|) / deg(tilde{P}_n) -> +infty (or prove a general obstruction theorem showing no rational-node interpolation of R(z) can simultaneously eliminate the (2m)! denominator growth and maintain superlinear decay at alpha_1).",
+    "parallel_subgate_tc_038a_status": "OPEN"
+  },
+  "obl_ct_001a_status": "OPEN",
+  "rh_claimed": false
+}

@@ -3012,6 +3012,8 @@ def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
         "zeta5_formal_theorem": fauzan_arch["target_theorem"],
         "zeta5_axiom_dependency_status": {
             "status": ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN,
+            "external_import_graph_status": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS",
+            "target_theorem_axiom_closure_status": "TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS",
             "standard_lean_axioms": fauzan_arch["lean_repository"][
                 "print_axioms_result"
             ],
@@ -3233,7 +3235,7 @@ def build_zero_arithmetic_invariants_report() -> Dict[str, Any]:
             "individual_zero_irrationality_or_transcendence_claimed": False,
             "governing_question_answer": (
                 "After incorporating Fauzan's September 2026 preprint and Lean 4 formalization "
-                "(`mo271/Zeta5`, `Apery.irrational_five`, `irrational_zeta_five`) and repairing "
+                "(`mo271/Zeta5`, `Apery.irrational_five`, `Apery.irrational_zeta5`, `RiemannZetaValues.irrational_five`) and repairing "
                 "formal provenance, Stieltjes notation, and finite-exclusion certification scope, "
                 "individual zero ordinate irrationality/transcendence remains unresolved, exact "
                 "global symmetric zero-sum invariants (S_m, 2*lambda_1, Sigma_{2m}) and certified "

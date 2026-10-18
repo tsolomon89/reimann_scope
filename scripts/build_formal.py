@@ -61,6 +61,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/ModularThetaConductorCurvature.lean",
     "formal/RiemannScope/GradeCharacterProjection.lean",
     "formal/RiemannScope/ZeroArithmeticInvariants.lean",
+    "formal/RiemannScope/FauzanZeroArgumentTransfer.lean",
 ]
 
 

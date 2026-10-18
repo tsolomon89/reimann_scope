@@ -28,6 +28,8 @@
   },
   "zeta5_axiom_dependency_status": {
     "status": "ZETA5_FORMALIZATION_DEPENDENCY_GRAPH_CLEAN",
+    "external_import_graph_status": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS",
+    "target_theorem_axiom_closure_status": "TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS",
     "standard_lean_axioms": [
       "propext",
       "Classical.choice",
@@ -135,7 +137,9 @@
         "apery_directory_implemented_by_count": 0,
         "solution_lean_sorry_count": 0,
         "challenge_lean_benchmark_sorry_note": "Challenge.lean contains the unmodified benchmark statement copied verbatim from google-deepmind/formal-conjectures; Solution.lean discharges it via Apery.irrational_five.",
-        "prime_number_theorem_dependency_note": "Apery/PNT.lean imports PrimeNumberTheoremAnd.Consequences for Chebyshev.theta ~[atTop] id (chebyshev_asymptotic); the 2 sorrys in PrimeNumberTheoremAnd/Wiener.lean are outside the transitive dependency cone of Apery.irrational_five."
+        "external_import_graph_status": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS",
+        "target_theorem_axiom_closure_status": "TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS",
+        "prime_number_theorem_dependency_note": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS / TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS: Apery/PNT.lean -> PrimeNumberTheoremAnd.Consequences -> PrimeNumberTheoremAnd.Wiener places Wiener.lean inside the transitive module import graph, but #print axioms Apery.irrational_five reports only [propext, Classical.choice, Quot.sound], so the two sorry-backed declarations in PrimeNumberTheoremAnd/Wiener.lean are not reached by the target theorem's proof-term axiom closure."
       },
       "print_axioms_result": [
         "propext",
@@ -432,11 +436,11 @@
   "formal_theorem_count_recomputed": {
     "zero_arithmetic_invariants_theorem_declarations": 12,
     "zero_arithmetic_invariants_total_declarations": 12,
-    "total_repository_theorem_declarations": 626
+    "total_repository_theorem_declarations": 635
   },
   "zero_arithmetic_lean_file_in_build_report": true,
   "zero_arithmetic_lean_theorem_count": 12,
-  "total_formal_theorem_count": 626,
+  "total_formal_theorem_count": 635,
   "stieltjes_notation_policy": {
     "status": "STIELTJES_NOTATION_DISAMBIGUATED",
     "zero_ordinate_symbol": "gamma_n = Im(rho_n) in R",
@@ -1393,7 +1397,9 @@
         "apery_directory_implemented_by_count": 0,
         "solution_lean_sorry_count": 0,
         "challenge_lean_benchmark_sorry_note": "Challenge.lean contains the unmodified benchmark statement copied verbatim from google-deepmind/formal-conjectures; Solution.lean discharges it via Apery.irrational_five.",
-        "prime_number_theorem_dependency_note": "Apery/PNT.lean imports PrimeNumberTheoremAnd.Consequences for Chebyshev.theta ~[atTop] id (chebyshev_asymptotic); the 2 sorrys in PrimeNumberTheoremAnd/Wiener.lean are outside the transitive dependency cone of Apery.irrational_five."
+        "external_import_graph_status": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS",
+        "target_theorem_axiom_closure_status": "TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS",
+        "prime_number_theorem_dependency_note": "EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS / TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS: Apery/PNT.lean -> PrimeNumberTheoremAnd.Consequences -> PrimeNumberTheoremAnd.Wiener places Wiener.lean inside the transitive module import graph, but #print axioms Apery.irrational_five reports only [propext, Classical.choice, Quot.sound], so the two sorry-backed declarations in PrimeNumberTheoremAnd/Wiener.lean are not reached by the target theorem's proof-term axiom closure."
       },
       "print_axioms_result": [
         "propext",
@@ -1790,15 +1796,15 @@
   "formal_source_inventory_provenance": {
     "status": "FORMAL_SOURCE_INVENTORY_SYNCHRONIZED",
     "synchronized": true,
-    "umbrella_imported_module_count": 32,
-    "build_formal_source_count": 33,
-    "certification_required_source_count": 33,
+    "umbrella_imported_module_count": 33,
+    "build_formal_source_count": 34,
+    "certification_required_source_count": 34,
     "missing_from_build_formal": [],
     "missing_from_certification": [],
     "lists_match_exactly": true,
     "zero_arithmetic_lean_file_in_inventories": true,
     "zero_arithmetic_lean_theorem_count": 12,
-    "total_formal_theorem_count": 626
+    "total_formal_theorem_count": 635
   },
   "principal_classification": "ZERO_ARITHMETIC_FRONTIER_CLASSIFIED_INDIVIDUAL_STATUS_OPEN",
   "secondary_classification": "FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED",
@@ -1811,7 +1817,7 @@
     "obl_ct_001a_status": "OPEN",
     "rh_claimed": false,
     "individual_zero_irrationality_or_transcendence_claimed": false,
-    "governing_question_answer": "After incorporating Fauzan's September 2026 preprint and Lean 4 formalization (`mo271/Zeta5`, `Apery.irrational_five`, `irrational_zeta_five`) and repairing formal provenance, Stieltjes notation, and finite-exclusion certification scope, individual zero ordinate irrationality/transcendence remains unresolved, exact global symmetric zero-sum invariants (S_m, 2*lambda_1, Sigma_{2m}) and certified finite degree/height exclusions (D <= 4, H <= 100 and q <= 10^4) remain proved, and TASK-TC-039 is scoped to test SUBGATE-TC-039A (gates Z1-Z6: whether a Hankel/Hermite/Gram/potential-theoretic determinant architecture can transfer from value-polynomial evaluation at X = zeta(5) to argument-polynomial evaluation at X in {gamma_1, rho_1}).",
+    "governing_question_answer": "After incorporating Fauzan's September 2026 preprint and Lean 4 formalization (`mo271/Zeta5`, `Apery.irrational_five`, `Apery.irrational_zeta5`, `RiemannZetaValues.irrational_five`) and repairing formal provenance, Stieltjes notation, and finite-exclusion certification scope, individual zero ordinate irrationality/transcendence remains unresolved, exact global symmetric zero-sum invariants (S_m, 2*lambda_1, Sigma_{2m}) and certified finite degree/height exclusions (D <= 4, H <= 100 and q <= 10^4) remain proved, and TASK-TC-039 is scoped to test SUBGATE-TC-039A (gates Z1-Z6: whether a Hankel/Hermite/Gram/potential-theoretic determinant architecture can transfer from value-polynomial evaluation at X = zeta(5) to argument-polynomial evaluation at X in {gamma_1, rho_1}).",
     "strongest_exact_invariant": "The absolutely convergent reflection-invariant reciprocal sum sum_rho 1/(rho(1 - rho)) = 2*S_1 = 2*lambda_1 = 2 + gamma_E - log(4*pi) (together with the second reciprocal power S_2 = 1 + gamma_E^2 - pi^2/8 + 2*gamma_1^{St}).",
     "subgate_tc_038a": {
       "subgate_id": "SUBGATE-TC-038A",
