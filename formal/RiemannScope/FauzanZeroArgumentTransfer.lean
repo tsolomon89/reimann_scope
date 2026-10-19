@@ -386,6 +386,48 @@ theorem phase_displacement_pi_over_three_sum_sq_lower_bound
   rw [h_id]
   nlinarith [sq_nonneg (s₃ * x / 2 - y / 2)]
 
+/-! ### 6. TASK-TC-039R4: Primitive Norm-Polynomial Leading-Coefficient Content Bound and Exact Cancellation Lower Bound -/
+
+/-- 22. `primitive_multiplier_lower_bound_from_leading_coeff`:
+    If `Q_n^{(c)}(Y) ∈ ℚ[Y]` has positive leading coefficient `0 < q_lead` and
+    `Q̃_n^{(c)}(Y) = M * Q_n^{(c)}(Y) ∈ ℤ[Y]` is its primitive integer normalization
+    (`M = L_n / g_n > 0`), then the integer leading coefficient `q̃_lead = M * q_lead`
+    satisfies `1 ≤ M * q_lead`, which implies `1 / q_lead ≤ M` unconditionally,
+    regardless of how large the common integer content `g_n` is. -/
+theorem primitive_multiplier_lower_bound_from_leading_coeff
+    (M q_lead : ℝ)
+    (hq : 0 < q_lead)
+    (h_int_lead : 1 ≤ M * q_lead) :
+    1 / q_lead ≤ M := by
+  rw [div_le_iff hq]
+  linarith
+
+/-- 23. `primitive_two_approximant_norm_cancellation_lower_bound`:
+    For consecutive Newton evaluations `N_n(α(Y)) = u₁ + i v₁` and `N_{n+1}(α(Y)) = u₂ + i v₂`
+    whose difference norm satisfies `(u₂ - u₁)^2 + (v₂ - v₁)^2 = q_lead * P_nodes`
+    (where `q_lead = (Δ^{n+1} a₀)^2 / (4^{n+1} ((n+1)!)^2) > 0` is the exact leading
+    coefficient of `Q_n(Y)` and `P_nodes = ∏_{j=0}^n ((2j - 1/2)^2 + Y^2) ≥ 0`),
+    any integer polynomial multiple `Q̃_n(Y) = M * Q_n(Y) ∈ ℤ[Y]` with `0 ≤ M` and
+    `1 ≤ M * q_lead` satisfies the exact `q_lead`-cancellation lower bound
+      `(1 / 2) * P_nodes ≤ M * ((u₁^2 + v₁^2) + (u₂^2 + v₂^2))`. -/
+theorem primitive_two_approximant_norm_cancellation_lower_bound
+    (u₁ v₁ u₂ v₂ q_lead P_nodes M : ℝ)
+    (hM : 0 ≤ M)
+    (hP : 0 ≤ P_nodes)
+    (h_int_lead : 1 ≤ M * q_lead)
+    (h_step : (u₂ - u₁) ^ 2 + (v₂ - v₁) ^ 2 = q_lead * P_nodes) :
+    (1 / 2) * P_nodes ≤ M * ((u₁ ^ 2 + v₁ ^ 2) + (u₂ ^ 2 + v₂ ^ 2)) := by
+  have h_para : (1 / 2) * ((u₂ - u₁) ^ 2 + (v₂ - v₁) ^ 2) ≤
+      (u₁ ^ 2 + v₁ ^ 2) + (u₂ ^ 2 + v₂ ^ 2) := by
+    nlinarith [sq_nonneg (u₁ + u₂), sq_nonneg (v₁ + v₂)]
+  rw [h_step] at h_para
+  have h_mul : M * ((1 / 2) * (q_lead * P_nodes)) ≤
+      M * ((u₁ ^ 2 + v₁ ^ 2) + (u₂ ^ 2 + v₂ ^ 2)) :=
+    mul_le_mul_of_nonneg_left h_para hM
+  have h_lead_P : (1 / 2) * P_nodes ≤ (1 / 2) * (M * q_lead) * P_nodes := by
+    nlinarith [mul_le_mul_of_nonneg_right h_int_lead hP]
+  linarith
+
 end RiemannScope
 
 

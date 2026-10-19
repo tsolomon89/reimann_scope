@@ -16,17 +16,22 @@ import pytest
 
 from tc.fauzan_zero_argument_asymptotic_repair import (
     ALL_FAUZAN_TRANSFER_LEAN_THEOREMS,
+    FINITE_DIFFERENCE_SADDLE_ASYMPTOTIC_PROVED,
     FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER,
     FIXED_RATIONAL_NORMALIZATION_GAUGE_DOES_NOT_CHANGE_NEWTON_STRETCHED_EXPONENT,
     HANKEL_DETERMINANT_RATIONAL_GAUGE_SCALING_PROVED,
     MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE,
     NEWTON_SERIES_IDENTITY_FOR_RATIONALIZED_XI_PROVED_WITHOUT_CARLSON,
+    NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5,
     NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5,
+    NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED,
     PI_TAU_NORMALIZATIONS_HAVE_IDENTICAL_ZERO_DIVISOR,
+    PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED,
     RATIONAL_ZERO_PRESERVING_NORMALIZATION_GAUGE_FAMILY_PROVED,
     REQUIRED_TC039R_ARTIFACT_KEYS,
     REQUIRED_TC039R_LEAN_THEOREMS,
     SUBGATE_TC_039A_REPAIRED_STATUS,
+    TASK_TC_039R4_ID,
     TASK_TC_039R_ID,
     TAU_ANALYTIC_NORMALIZATION_DISTINCT_FROM_TC_GRADE_ACTION,
     TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE,
@@ -36,6 +41,7 @@ from tc.fauzan_zero_argument_asymptotic_repair import (
     audit_newton_denominators_and_prime_valuations,
     audit_pade_evidence_scope_and_gauge_scaling,
     audit_pi_tau_normalizations_and_gauge_family,
+    audit_primitive_norm_polynomial_content,
     audit_saddle_asymptotics_and_two_step_lower_envelope,
     audit_variable_gauge_and_invariant_efficiency,
     compute_gauge_integer_samples,
@@ -367,10 +373,24 @@ def test_28_lower_envelope_backed_by_phase_separation_proof(
 ) -> None:
     env = artifact_data["newton_two_step_lower_envelope"]
     assert env["status"] == NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    assert env["raw_lower_envelope_status"] == NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED
+    assert (
+        env["primitive_norm_polynomial_status"]
+        == PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED
+    )
+    assert (
+        env["primitive_gate_z5_status"]
+        == NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    )
     assert "Delta_theta = pi / 3" in env["phase_shift_between_tail_and_increment"]
     assert "phase_displacement_pi_over_three_sum_sq_lower_bound" in env["lean_theorems"]
-    assert len(env["lean_proved_algebraic_skeleton"]) == 6
-    assert len(env["analytic_saddle_obligations_resolved_in_tc039r3"]) == 4
+    assert "primitive_multiplier_lower_bound_from_leading_coeff" in env["lean_theorems"]
+    assert (
+        "primitive_two_approximant_norm_cancellation_lower_bound"
+        in env["lean_theorems"]
+    )
+    assert len(env["lean_proved_algebraic_skeleton"]) == 8
+    assert len(env["analytic_saddle_obligations_resolved_in_tc039r3"]) == 5
     # Verify one-loop and two-term saddle accuracy across validation rows
     val_rows = artifact_data["delta_n_a0_full_asymptotic"]["validation_rows"]
     assert all(
@@ -400,6 +420,22 @@ def test_29_upper_bound_not_treated_as_lower_bound(artifact_data: dict) -> None:
 def test_30_fixed_gauge_n_pow_1_3_exponent_classification(artifact_data: dict) -> None:
     z5 = artifact_data["z5_newton_status"]
     assert z5["classification"] == NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    assert (
+        z5["saddle_asymptotic_classification"]
+        == FINITE_DIFFERENCE_SADDLE_ASYMPTOTIC_PROVED
+    )
+    assert (
+        z5["raw_lower_envelope_classification"]
+        == NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED
+    )
+    assert (
+        z5["primitive_content_classification"]
+        == PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED
+    )
+    assert (
+        z5["primitive_route_classification"]
+        == NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    )
     assert z5["evidence_class"] == "PROVED"
     assert z5["newton_branch_subgate_tc_039a_status"] == "CLOSED_NEGATIVE_AT_GATE_Z5"
     assert z5["subgate_tc_039a_status"] == "OPEN"
@@ -495,6 +531,10 @@ def test_38_no_irrationality_claim(artifact_data: dict) -> None:
         == NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
     )
     assert (
+        artifact_data["z5_newton_status"]["primitive_route_classification"]
+        == NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    )
+    assert (
         artifact_data["pade_z5_status"]["z5_status"]
         == MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE
     )
@@ -511,7 +551,7 @@ def test_39_obl_ct_001a_remains_open(artifact_data: dict) -> None:
     assert artifact_data["exact_next_subgate"]["next_subgate_id"] == SUBGATE_TC_040A_ID
 
 
-# 40. canonical classifications match artifact, schema complete, and all 21 Lean theorems verified
+# 40. canonical classifications match artifact, schema complete, and all 23 Lean theorems verified
 def test_40_canonical_classifications_schema_and_lean_theorems(
     artifact_data: dict,
 ) -> None:
@@ -519,6 +559,7 @@ def test_40_canonical_classifications_schema_and_lean_theorems(
         assert key in artifact_data, f"Missing required TASK-TC-039R key: {key}"
 
     assert artifact_data["task_id"] == TASK_TC_039R_ID
+    assert artifact_data["latest_repair_task_id"] == TASK_TC_039R4_ID
     assert artifact_data["principal_classification"] == TC039R_PRINCIPAL_CLASSIFICATION
     assert artifact_data["subgate_tc_039a_status"] == SUBGATE_TC_039A_REPAIRED_STATUS
     assert artifact_data["subgate_tc_039a_status"] == "OPEN"
@@ -535,7 +576,8 @@ def test_40_canonical_classifications_schema_and_lean_theorems(
     assert lean_info["all_tc039r_present"] is True
     assert lean_info["all_17_present"] is True
     assert lean_info["all_21_present"] is True
-    assert lean_info["theorem_declaration_count"] == 21
+    assert lean_info["all_23_present"] is True
+    assert lean_info["theorem_declaration_count"] == 23
     assert lean_info["sorry_count"] == 0
     assert lean_info["admit_count"] == 0
     assert lean_info["nonstandard_axiom_count"] == 0
@@ -557,6 +599,10 @@ def test_41_vertical_line_saddle_contour_and_concavity_identities(
     assert "vertical_line_saddle_real_concavity_identity" in vc["lean_theorems"]
     assert "vertical_line_saddle_imag_cubic_identity" in vc["lean_theorems"]
     assert artifact_data["delta_n_a0_full_asymptotic"]["phi_c_float"] == 0.0
+    assert (
+        artifact_data["z5_newton_status"]["saddle_asymptotic_classification"]
+        == FINITE_DIFFERENCE_SADDLE_ASYMPTOTIC_PROVED
+    )
 
 
 # 42. TASK-TC-039R3 incomplete-Gamma complex tail asymptotic and +pi/3 phase displacement
@@ -575,6 +621,68 @@ def test_42_incomplete_gamma_complex_tail_and_phase_displacement(
             assert row["rel_error_igamma_tau"] < 4.5e-2
         assert row["abs_exact_N_n_pi"] > 0.0
         assert row["abs_exact_N_n_tau"] > 0.0
+
+
+# 43. TASK-TC-039R4 primitive integer norm-polynomial content and exact cancellation lower bound
+def test_43_primitive_norm_polynomial_content_and_cancellation_bound(
+    artifact_data: dict,
+) -> None:
+    prim = artifact_data["primitive_norm_polynomial_audit"]
+    assert prim["status"] == PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED
+    assert (
+        prim["gate_z5_primitive_status"]
+        == NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    )
+    assert prim["all_pi_rows_verified"] is True
+    assert prim["all_tau_rows_verified"] is True
+    assert "primitive_multiplier_lower_bound_from_leading_coeff" in prim["lean_theorems"]
+    assert (
+        "primitive_two_approximant_norm_cancellation_lower_bound"
+        in prim["lean_theorems"]
+    )
+    for key in ("pi_rows", "tau_rows"):
+        rows = prim[key]
+        assert len(rows) == 13
+        for row in rows:
+            assert row["lead_coeff_matches_formula"] is True
+            assert row["primitive_gcd"] == 1
+            assert row["primitive_leading_int_ge_1"] is True
+            assert row["M_prim_ge_leading_bound"] is True
+            assert row["cancellation_lower_bound_holds"] is True
+            assert row["log_tilde_Q_n_gamma1"] > 0.0
+            assert row["primitive_diophantine_efficiency"] < 0.0
+
+
+# 44. TASK-TC-039R4 contour variable 1 + w = u^2 standardization and exact trig identities
+def test_44_contour_variable_u_squared_and_trig_identity_consistency(
+    artifact_data: dict,
+) -> None:
+    vc = artifact_data["norlund_rice_vertical_line_steepest_descent_proof"]
+    assert "w = -1 + u^2" in vc["1_branch_free_u_plane_contour_representation"]
+    assert "1 + w = u^2" in vc["1_branch_free_u_plane_contour_representation"]
+    assert "1/u^2" not in vc["1_branch_free_u_plane_contour_representation"]
+    assert (
+        "u_{+-} = x_n*(1 +- i*sqrt(3)) = (sqrt(c)/(2*n))^{1/3}"
+        in vc["2_all_singularities_and_saddles_identified"]
+    )
+    prim = artifact_data["primitive_norm_polynomial_audit"]
+    trig = prim["symbolic_trigonometric_identities_verified"]
+    assert trig["double_angle_verified"] is True
+    assert trig["sum_of_squares_verified"] is True
+    assert (
+        "1 + (1/4)*cos(2*theta) - (sqrt(3)/4)*sin(2*theta)"
+        in trig["double_angle_identity"]
+    )
+    assert (
+        "1/2 + ((sqrt(3)/2)*cos(theta) - (1/2)*sin(theta))^2 >= 1/2"
+        in trig["sum_of_squares_identity"]
+    )
+    # Check that tc_fauzan_zero_argument_transfer.py has no stale pi/6 leading saddle phase
+    transfer_py = (REPO_ROOT / "tc" / "fauzan_zero_argument_transfer.py").read_text(
+        encoding="utf-8"
+    )
+    assert "cos(omega * n^{1/3} + pi/6)" not in transfer_py
+
 
 
 

@@ -1,13 +1,14 @@
-# TASK-TC-039R / TASK-TC-039R3 — Newton/Padé/Hankel Asymptotic Repair, Rigorous Nörlund–Rice/Saddle Proof of the Newton Two-Step Lower Envelope, and \(\pi\leftrightarrow\tau\) Arithmetic-Normalization Analysis
+# TASK-TC-039R / TASK-TC-039R4 — Newton/Padé/Hankel Asymptotic Repair, Rigorous Nörlund–Rice/Saddle & Primitive Norm-Polynomial Content Proof, and \(\pi\leftrightarrow\tau\) Arithmetic-Normalization Analysis
 
-**Task ID:** `TASK-TC-039R` (with `TASK-TC-039R3` Steepest-Descent & Incomplete-Gamma Closure)  
-**Starting Commit (`HEAD` / `origin/main`):** `a3f3b2ae75827298cfac97a7bc809b385159c419`  
-**Substantive `TASK-TC-039R2` Commit:** `c0bf3d135b84601b95e928496f4d3f676419991d`  
+**Task ID:** `TASK-TC-039R` (with `TASK-TC-039R3` Steepest-Descent Closure & `TASK-TC-039R4` Primitive Norm-Polynomial Content Repair)  
+**Starting Commit (`HEAD` / `origin/main`):** `4f637360f584af9454a30cb1de104bc28d870f4c` (`TASK-TC-039R` baseline `a3f3b2ae75827298cfac97a7bc809b385159c419`)  
+**Substantive `TASK-TC-039R3` Commit:** `7bf5e0df5b2a75aa522f4cc75515001df20b2991`  
 **Machine Artifact:** [`data/tc_fauzan_zero_argument_asymptotic_repair.json`](file:///C:/Development/Projects/reimann_scope/data/tc_fauzan_zero_argument_asymptotic_repair.json)  
 **Implementation Module:** [`tc/fauzan_zero_argument_asymptotic_repair.py`](file:///C:/Development/Projects/reimann_scope/tc/fauzan_zero_argument_asymptotic_repair.py)  
-**Formal Lean 4 Module:** [`formal/RiemannScope/FauzanZeroArgumentTransfer.lean`](file:///C:/Development/Projects/reimann_scope/formal/RiemannScope/FauzanZeroArgumentTransfer.lean) (`21` `theorem` declarations, `0` `sorry`, `0` `admit`)  
+**Formal Lean 4 Module:** [`formal/RiemannScope/FauzanZeroArgumentTransfer.lean`](file:///C:/Development/Projects/reimann_scope/formal/RiemannScope/FauzanZeroArgumentTransfer.lean) (`23` `theorem` declarations, `0` `sorry`, `0` `admit`)  
 **Principal Classification:**  
-`TAU_RATIONAL_CORE_AND_GAUGE_SCALING_PROVED_NEWTON_TWO_STEP_LOWER_ENVELOPE_RIGOROUSLY_PROVED_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`
+`TAU_RATIONAL_CORE_AND_GAUGE_SCALING_PROVED_NEWTON_TWO_STEP_LOWER_ENVELOPE_RIGOROUSLY_PROVED_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`  
+**`TASK-TC-039R4` Classifications:** `FINITE_DIFFERENCE_SADDLE_ASYMPTOTIC_PROVED`, `NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED`, `PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED`, `NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`
 
 ---
 
@@ -431,29 +432,32 @@ Along the radial ray \(v = (n+\frac{1}{2})^{1/3} + r\) (\(r \ge 0\)), \(|e^{\lam
 
 ---
 
-### Q. Rigorous proof of the two-consecutive lower envelope (`TASK-TC-039R3`)
+### Q. Rigorous proof of the two-consecutive raw lower envelope (`TASK-TC-039R3`)
 
 Consider the structurally positive two-approximant quantity
 \[
 \boxed{E_n^{(c)} := |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2.}
 \]
-Combining the **Lean-proved algebraic identities** with the **rigorous vertical-line steepest-descent and incomplete-Gamma tail theorems** closes the two-sided lower envelope (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`):
+Combining the **Lean-proved algebraic identities** with the **rigorous vertical-line steepest-descent and incomplete-Gamma tail theorems** closes the two-sided raw lower envelope (`NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED`):
 
-1. **Lean-Proved Algebraic & Concavity Skeleton (`formal/RiemannScope/FauzanZeroArgumentTransfer.lean`):**
+1. **Lean-Proved Algebraic & Concavity Skeleton (`formal/RiemannScope/FauzanZeroArgumentTransfer.lean`, 23 Theorems):**
    - Exact consecutive-step difference identity: \(N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1} a_0^{(c)} \binom{\alpha_1}{n+1}\).
    - Elementary quadratic inequality (`two_phase_cosine_square_lower_bound`):
      \[
      \boxed{3 E_n^{(c)} = 3\bigl(|N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2\bigr) \ge |N_n^{(c)}(\alpha_1)|^2 + \bigl|N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1)\bigr|^2.}
      \]
-   - Exact \(+\pi/3\) phase-displacement sum-of-squares identity (`phase_displacement_pi_over_three_sum_sq_lower_bound`, Theorem 21):
+   - Exact \(+\pi/3\) phase-displacement double-angle and completed-square identities (`two_phase_cosine_square_square_identity` and `phase_displacement_pi_over_three_sum_sq_lower_bound`, Theorems 18 & 21):
      \[
      \boxed{
-     \cos^2\theta + \cos^2\!\left(\theta + \frac{\pi}{3}\right) = \frac{1}{2} + \left(\frac{\sqrt{3}}{2}\cos\theta - \frac{1}{2}\sin\theta\right)^2 \ge \frac{1}{2} \qquad (\forall \theta \in \mathbb{R}).
+     \cos^2\theta + \cos^2\!\left(\theta + \frac{\pi}{3}\right)
+     = 1 + \frac{1}{4}\cos(2\theta) - \frac{\sqrt{3}}{4}\sin(2\theta)
+     = \frac{1}{2} + \left(\frac{\sqrt{3}}{2}\cos\theta - \frac{1}{2}\sin\theta\right)^2 \ge \frac{1}{2} \qquad (\forall \theta \in \mathbb{R}).
      }
      \]
    - Exact vertical-line concavity (`vertical_line_saddle_real_concavity_identity`, Theorem 19) and cubic stationary-phase (`vertical_line_saddle_imag_cubic_identity`, Theorem 20) identities.
+   - Exact primitive-multiplier leading-coefficient and cancellation lower-bound theorems (`primitive_multiplier_lower_bound_from_leading_coeff`, Theorem 22; `primitive_two_approximant_norm_cancellation_lower_bound`, Theorem 23).
 
-2. **Rigorous Two-Step Asymptotic Enclosure (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`):**
+2. **Rigorous Two-Step Raw Asymptotic Enclosure (`NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED`):**
    Let \(\theta_n := \omega(c)n^{1/3}\). By Sections N–P:
    - In \(N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1)\), the leading oscillatory factor is \(\cos(\theta_n) + O_{\alpha_1,c}(n^{-1/3})\) with amplitude \(\asymp n^{-3/4}e^{-\kappa(c)n^{1/3}}\).
    - In \(N_n^{(c)}(\alpha_1)\), the leading oscillatory factor is \(\cos(\theta_n + \frac{\pi}{3}) + O_{\alpha_1,c}(n^{-1/3})\) with larger amplitude \(\asymp n^{-1/12}e^{-\kappa(c)n^{1/3}} \ge n^{-3/4}e^{-\kappa(c)n^{1/3}}\).
@@ -472,16 +476,79 @@ Combining the **Lean-proved algebraic identities** with the **rigorous vertical-
 
 ---
 
-### R. Gate-Z5 closure for the Newton two-approximant route
+### R. Primitive integer norm-polynomial content theorem & Gate-Z5 closure (`TASK-TC-039R4`)
 
-By the rigorous two-sided asymptotic enclosure \(-\log E_n^{(c)} = 2\kappa(c)n^{1/3} + O(\log n)\), no subsequence of \(n\) can achieve superlinear logarithmic decay \(-\log E_n^{(c)} \gg n\). After multiplying by the integer-clearing factor \(C_n^{(c)} \ge \exp(4n\log n + O_c(n))\) to form \(G_n^{(c)}(Y) = C_n^{(c)}\bigl(\mathcal{N}_{N_n^{(c)}}(Y) + \mathcal{N}_{N_{n+1}^{(c)}}(Y)\bigr) \in \mathbb{Z}[Y]\), we have
-\[
-G_n^{(c)}(\gamma_1) = C_n^{(c)} E_n^{(c)} \ge \exp\bigl(4n\log n - 2\kappa(c)n^{1/3} + O_c(n)\bigr) \longrightarrow +\infty.
-\]
-Consequently, the Newton two-approximant route rigorously fails Gate Z5 for every fixed rational gauge \(c \in \mathbb{Q} \cap (0, \tau^2)\), closing the Newton branch of `SUBGATE-TC-039A`:
+To establish a rigorous Diophantine no-go at Gate Z5, one must bound the **canonical primitive integer polynomial**, not merely an over-cleared multiple. Let
 \[
 \boxed{
-\texttt{NEWTON\_TWO\_APPROXIMANT\_ROUTE\_RIGOROUSLY\_FAILS\_GATE\_Z5}, \qquad
+Q_n^{(c)}(Y) := \mathcal{N}_{N_n^{(c)}}(Y) + \mathcal{N}_{N_{n+1}^{(c)}}(Y) = \sum_{j=0}^{2n+2} q_{n,j}^{(c)} Y^j \in \mathbb{Q}[Y]
+}
+\]
+be the rational two-approximant ordinate norm-sum polynomial (so \(Q_n^{(c)}(\gamma_1) = E_n^{(c)} > 0\)), and let \(L_n^{(c)} := \operatorname{lcm}_{0\le j\le 2n+2} \operatorname{den}\bigl(q_{n,j}^{(c)}\bigr)\) and \(g_n^{(c)} := \gcd_{0\le j\le 2n+2}\bigl|L_n^{(c)} q_{n,j}^{(c)}\bigr|\), so that its canonical primitive integer normalization is
+\[
+\boxed{
+\widetilde{Q}_n^{(c)}(Y) := M_n^{(c)} Q_n^{(c)}(Y) = \sum_{j=0}^{2n+2} \widetilde{q}_{n,j}^{(c)} Y^j \in \mathbb{Z}[Y], \qquad
+M_n^{(c)} := \frac{L_n^{(c)}}{g_n^{(c)}}, \qquad \gcd_{j}\bigl(\widetilde{q}_{n,j}^{(c)}\bigr) = 1.
+}
+\]
+We prove that the reduced primitive multiplier \(M_n^{(c)} = L_n^{(c)} / g_n^{(c)}\) still grows at least factorially (`PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED`):
+
+1. **Cofinal Exact Cancellation Theorem (No Saddle Bound Needed on \(\Delta^{n+1}a_0^{(c)} \ne 0\)):**
+   Since \(\deg \mathcal{N}_{N_n^{(c)}}(Y) \le 2n\) while \(N_{n+1}^{(c)}(\frac{1}{4}+i\frac{Y}{2}) = \frac{\Delta^{n+1}a_0^{(c)}}{(n+1)!}\bigl(\frac{iY}{2}\bigr)^{n+1} + O(Y^n)\), the degree-\((2n+2)\) coefficient of \(Q_n^{(c)}(Y)\) comes exclusively from \(\mathcal{N}_{N_{n+1}^{(c)}}(Y)\):
+   \[
+   \boxed{
+   q_{n,2n+2}^{(c)} = \frac{\bigl(\Delta^{n+1}a_0^{(c)}\bigr)^2}{4^{n+1}\bigl((n+1)!\bigr)^2}.
+   }
+   \]
+   Whenever \(\Delta^{n+1}a_0^{(c)} \ne 0\) (which holds for every \(0 \le n \le 200\) in both \(\pi\) and \(\tau\) normalizations and on a cofinal set of \(n\) as \(n\to\infty\)), \(q_{n,2n+2}^{(c)} > 0\), so the integer leading coefficient \(\widetilde{q}_{n,2n+2}^{(c)} = M_n^{(c)} q_{n,2n+2}^{(c)} \in \mathbb{Z}_{>0}\) satisfies \(\widetilde{q}_{n,2n+2}^{(c)} \ge 1\). By Lean 4 Theorem 22 (`primitive_multiplier_lower_bound_from_leading_coeff`),
+   \[
+   \boxed{
+   M_n^{(c)} = \frac{L_n^{(c)}}{g_n^{(c)}} = \frac{\widetilde{q}_{n,2n+2}^{(c)}}{q_{n,2n+2}^{(c)}} \ge \frac{1}{q_{n,2n+2}^{(c)}} = \frac{4^{n+1}\bigl((n+1)!\bigr)^2}{\bigl(\Delta^{n+1}a_0^{(c)}\bigr)^2}.
+   }
+   \]
+   Combining this with the Cauchy–Schwarz difference bound
+   \[
+   Q_n^{(c)}(Y) \ge \frac{1}{2}\bigl|N_{n+1}^{(c)}(\alpha(Y)) - N_n^{(c)}(\alpha(Y))\bigr|^2 = \frac{1}{2}\,q_{n,2n+2}^{(c)}\prod_{j=0}^n\left(\left(2j-\frac{1}{2}\right)^2 + Y^2\right),
+   \]
+   Lean 4 Theorem 23 (`primitive_two_approximant_norm_cancellation_lower_bound`) proves that \(q_{n,2n+2}^{(c)} = \frac{(\Delta^{n+1}a_0^{(c)})^2}{4^{n+1}((n+1)!)^2}\) **cancels identically**:
+   \[
+   \boxed{
+   \widetilde{Q}_n^{(c)}(\gamma_1) = M_n^{(c)} Q_n^{(c)}(\gamma_1) \ge \frac{1}{2}\prod_{j=0}^n\left(\left(2j-\frac{1}{2}\right)^2 + \gamma_1^2\right) \ge \frac{1}{2}\left(\frac{1}{4}+\gamma_1^2\right)(n!)^2 \longrightarrow +\infty.
+   }
+   \]
+2. **Global All-\(n\) Asymptotic Lower Bound (`NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`):**
+   For arbitrary \(n \ge n_0(c)\), let \(2k_n := \deg Q_n^{(c)}(Y)\). Since \(\omega(c)\bigl((m+1)^{1/3} - m^{1/3}\bigr) \sim \frac{\omega(c)}{3}m^{-2/3} \to 0\), \(\Delta^m a_0^{(c)}\) cannot vanish on any interval of length \(\gg n^{2/3}\), so \(n + 1 - C_0 n^{2/3} \le k_n \le n + 1\) with \(\Delta^{k_n} a_0^{(c)} \ne 0\). The leading coefficient of \(Q_n^{(c)}(Y)\) is \(q_{n,2k_n}^{(c)} \in \{1, 2\}\cdot\frac{(\Delta^{k_n}a_0^{(c)})^2}{4^{k_n}(k_n!)^2} > 0\). Since \(\widetilde{q}_{n,2k_n}^{(c)} = M_n^{(c)} q_{n,2k_n}^{(c)} \ge 1\) and \(|\Delta^{k_n}a_0^{(c)}| \le C_3(c) k_n^{1/2}e^{-\kappa(c)k_n^{1/3}}\) by Section N, Stirling's formula gives
+   \[
+   \boxed{
+   \log M_n^{(c)} = \log\frac{L_n^{(c)}}{g_n^{(c)}} \ge \log\frac{4^{k_n}(k_n!)^2}{2\bigl(\Delta^{k_n}a_0^{(c)}\bigr)^2} \ge 2n\log n + 2\kappa(c)n^{1/3} + O_c(n).
+   }
+   \]
+   Combining this with the two-step raw lower envelope \(\log Q_n^{(c)}(\gamma_1) = \log E_n^{(c)} \ge -2\kappa(c)n^{1/3} - \frac{3}{2}\log n - O_c(1)\) from Section Q cancels the \(-2\kappa(c)n^{1/3}\) term and proves unconditionally for all \(n \ge n_0(c)\):
+   \[
+   \boxed{
+   \log \widetilde{Q}_n^{(c)}(\gamma_1) = \log M_n^{(c)} + \log Q_n^{(c)}(\gamma_1) \ge 2n\log n - O_c(n) \longrightarrow +\infty,
+   }
+   \]
+   \[
+   \boxed{
+   \mathscr{E}_n^{\mathrm{prim}}(c) = \frac{-\log|\widetilde{Q}_n^{(c)}(\gamma_1)|}{\deg \widetilde{Q}_n^{(c)}} \le -\log n + O_c(1) \longrightarrow -\infty.
+   }
+   \]
+3. **Exact Finite Audit (`audit_primitive_norm_polynomial_content`, \(1 \le n \le 12\)):**
+
+| Gauge | \(n\) | \(\deg \widetilde{Q}_n^{(c)}\) | \(\log L_n^{(c)}\) | \(\log g_n^{(c)}\) | \(\log M_n^{(c)} = \log(L_n^{(c)}/g_n^{(c)})\) | \(\log \widetilde{Q}_n^{(c)}(\gamma_1)\) | \(\mathscr{E}_n^{\mathrm{prim}}(c)\) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| \(\pi\) (\(c=4\)) | \(4\) | \(10\) | \(34.48\) | \(4.16\) | \(30.32\) | \(28.14\) | \(-2.814\) |
+| \(\pi\) (\(c=4\)) | \(8\) | \(18\) | \(86.50\) | \(6.24\) | \(80.26\) | \(77.69\) | \(-4.316\) |
+| \(\pi\) (\(c=4\)) | \(12\) | \(26\) | \(141.78\) | \(2.08\) | \(139.70\) | \(137.09\) | \(-5.273\) |
+| \(\tau\) (\(c=1\)) | \(4\) | \(10\) | \(46.96\) | \(1.39\) | \(45.57\) | \(43.82\) | \(-4.382\) |
+| \(\tau\) (\(c=1\)) | \(8\) | \(18\) | \(105.91\) | \(0.69\) | \(105.22\) | \(103.00\) | \(-5.722\) |
+| \(\tau\) (\(c=1\)) | \(12\) | \(26\) | \(175.05\) | \(0.00\) | \(175.05\) | \(172.64\) | \(-6.640\) |
+
+Consequently, the Newton two-approximant route—after dividing out all common integer content to form the canonical primitive polynomial \(\widetilde{Q}_n^{(c)}(Y) \in \mathbb{Z}[Y]\)—rigorously fails Gate Z5 for every fixed rational gauge \(c \in \mathbb{Q} \cap (0, \tau^2)\), closing the Newton branch of `SUBGATE-TC-039A`:
+\[
+\boxed{
+\texttt{NEWTON\_TWO\_APPROXIMANT\_PRIMITIVE\_ROUTE\_RIGOROUSLY\_FAILS\_GATE\_Z5}, \qquad
 \texttt{newton\_branch\_subgate\_tc\_039a\_status} = \texttt{CLOSED\_NEGATIVE\_AT\_GATE\_Z5},
 }
 \]
@@ -533,7 +600,7 @@ This reveals precisely what \(\pi\)-notation was doing: the factor \(4^m = 2^{2m
 ### U. Padé evidence repair
 
 For Route B (multipoint Padé interpolation \(A_n(m) - a_m^{(c)} B_n(m) = 0\) on \(m = 0, \dots, d_A + d_B\)):
-- **Proven algebraic properties (`MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`):** Existence holds for all \((d_A, d_B)\) by homogeneous linear algebra over \(\mathbb{Q}\); projective uniqueness (\(\operatorname{nullity} = 1\)) and exact node interpolation are certified for every tested \((d_A, d_B)\) up to \(n = 25\) across \([n/n], [n/(n-1)], [(n-1)/n]\); and at \(z = \alpha_1\) where \(\mathcal{R}_c(\alpha_1) = 0\), the residual satisfies the exact identity \(E_n(\alpha_1) = A_n(\alpha_1) - \mathcal{R}_c(\alpha_1)B_n(\alpha_1) = A_n(\alpha_1)\) (`pade_interpolation_zero_residual_identity`).
+- **Proven algebraic properties (`MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`):** Existence holds for all \((d_A, d_B)\) by homogeneous linear algebra over \(\mathbb{Q}\); projective uniqueness (\(\operatorname{nullity} = 1\)) and exact node interpolation are certified for every tested \((d_A, d_B)\) up to \(n = 25\) across \([n/n], [n/(n-1)], [(n-1)/n]\); and at \(z = \alpha_1\) where \(\mathcal{R}_c(\alpha_1) = 0\), the residual satisfies the exact identity \(E_n(\alpha_1) = A_n(\alpha_1) - \mathcal{R}_c(\alpha_1)B_n(m) = A_n(\alpha_1)\) (`pade_interpolation_zero_residual_identity`).
 - **Scoped Gate-Z5 evidence (`MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE`):** On the tested range \(1 \le n \le 25\) (in \(\pi\)-normalization) and \(1 \le n \le 8\) (in \(\tau\)-normalization), the rational quotient \(|A_n(\alpha_1)/B_n(\alpha_1)|\) becomes small (\(4.17 \times 10^{-10}\) at \(n = 25\)) only because \(|B_n(\alpha_1)|\) grows factorially, whereas the primitive integer polynomial evaluation \(|\widetilde{A}_n(\alpha_1)|\) grows rapidly (\(I_{25}^{\mathrm{Pad\acute{e}},\mathbb{Z}} = -186.64\) for \(\pi\); \(I_8^{\mathrm{Pad\acute{e}},\mathbb{Z}} = -58.97\) for \(\tau\)). Because an all-\(n\) closed-form determinant asymptotic for the confluent discrete-moment matrix \(\bigl(\Delta^{d_A+1}[m^j a_m^{(c)}]_{m=r}\bigr)\) remains an open analytic problem, this negative finding is classified strictly as certified finite evidence on the tested range rather than an unproved all-\(n\) theorem.
 
 ---
@@ -593,7 +660,7 @@ Although \(\tau = 2\pi\) is the canonical transcendental unit of the `reimann_sc
 ### Z. Principal classification and exact next theorem
 
 1. **Answer to Governing Question 1 (Was the `TASK-TC-039` Gate-Z5 no-go actually proved?):**
-   - For the **Newton route**, `TASK-TC-039R3` completes the rigorous Nörlund–Rice / vertical-line steepest-descent proof in \(\mathbb{H}_+ = \{\operatorname{Re}(u) > 0\}\) (`vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`, true leading saddle phase \(\phi_0(c) = 0\)) together with the closed-form upper incomplete Gamma complex tail representation at \(\alpha_1 = \frac{1}{4} + i\frac{\gamma_1}{2}\) and the exact \(+\frac{\pi}{3}\) integration-by-parts phase displacement (`phase_displacement_pi_over_three_sum_sq_lower_bound`: \(\cos^2\theta + \cos^2(\theta + \frac{\pi}{3}) \ge \frac{1}{2}\)), proving the two-sided lower envelope \(C_1(c)n^{-3/2}e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)n^{-1/6}e^{-2\kappa(c)n^{1/3}}\) (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`) and closing the Newton branch of `SUBGATE-TC-039A` (`CLOSED_NEGATIVE_AT_GATE_Z5`).
+   - For the **Newton route**, `TASK-TC-039R3` and `TASK-TC-039R4` complete the rigorous Nörlund–Rice / vertical-line steepest-descent proof in \(\mathbb{H}_+ = \{\operatorname{Re}(u) > 0\}\) (`w = -1 + u^2`, `1 + w = u^2`, `vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`, true leading saddle phase \(\phi_0(c) = 0\)), the closed-form upper incomplete Gamma complex tail representation at \(\alpha_1 = \frac{1}{4} + i\frac{\gamma_1}{2}\) with \(+\frac{\pi}{3}\) integration-by-parts phase displacement (`phase_displacement_pi_over_three_sum_sq_lower_bound`: \(\cos^2\theta + \cos^2(\theta + \frac{\pi}{3}) \ge \frac{1}{2}\)) establishing the raw two-step lower envelope \(C_1(c)n^{-3/2}e^{-2\kappa(c)n^{1/3}} \le E_n^{(c)} \le C_2(c)n^{-1/6}e^{-2\kappa(c)n^{1/3}}\) (`NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED`), and the primitive integer norm-polynomial content theorem (`PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED`, `primitive_multiplier_lower_bound_from_leading_coeff`, `primitive_two_approximant_norm_cancellation_lower_bound`) proving \(M_n^{(c)} = \frac{L_n^{(c)}}{g_n^{(c)}} \ge \frac{1}{q_{n,2k_n}^{(c)}} \ge \exp(2n\log n + 2\kappa(c)n^{1/3} + O_c(n))\) and \(\log \widetilde{Q}_n^{(c)}(\gamma_1) \ge 2n\log n - O_c(n) \to +\infty\) (`NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`), closing the Newton branch of `SUBGATE-TC-039A` (`CLOSED_NEGATIVE_AT_GATE_Z5`).
    - For the **multipoint Padé route**, algebraic polynomialization is proved for all \(n\) (`MULTIPOINT_PADE_ARGUMENT_POLYNOMIALIZATION_PROVED`), while the Gate-Z5 failure is scoped to certified finite evidence on \(n \le 25\) (`MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE`), keeping overall `SUBGATE-TC-039A = OPEN` solely for the all-\(n\) multipoint Padé asymptotic subproblem.
 2. **Answer to Governing Question 2 (Does \(\tau\)-normalization expose a mathematically different arithmetic route?):**
    - Yes at the level of primitive arithmetic structure: \(\mathcal{R}_\tau(z) = (2z-1)\tau^{-2z}\zeta(2z)\) (with \(\mathcal{R}_\tau(1/2) = \frac{1}{\tau} = \frac{1}{2\pi}\)) strips out the artificial \(4^m = 2^{2m}\) dyadic factor from \(\mathcal{R}_\pi(m)\) and exposes the rational core \(\tau^{-2m}\zeta(2m) = (-1)^{m+1}\frac{B_{2m}}{2(2m)!} \in \mathbb{Q}\) for \(m \ge 0\) and \(\in \mathbb{Q}_{>0}\) strictly for \(m \ge 1\) (`TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`).

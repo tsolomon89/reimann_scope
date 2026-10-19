@@ -708,8 +708,8 @@ def derive_positive_moment_sequence_and_differences(
             ),
             "a1_and_a0_actual_subexponential_rate": (
                 "|Delta^n a_0|, |Delta^n a_1| <= exp(-(3/2) * n^{1/3} + o(n^{1/3})) "
-                "(governed by the Euler-transform saddle points s_+- ~ (1/n)^{2/3} exp(+-2*pi*i/3) of C_pi(w) near w = -1, "
-                "giving oscillatory sign changes cos((3*sqrt(3)/2)*n^{1/3} + pi/6) rather than monotone n^{-3/2} decay)"
+                "(governed by the right-half-plane vertical-line saddles u_+- = (sqrt(c)/(2n))^{1/3} exp(+-i*pi/3) = (1/n)^{1/3} exp(+-i*pi/3) "
+                "of C_pi(-1 + u^2) under 1 + w = u^2, giving oscillatory sign changes cos((3*sqrt(3)/2)*n^{1/3}) + O(n^{-1/3}) with leading phase phi_0 = 0)"
             ),
             "symbolic_antiderivative_cancellation_verified": antideriv_diff == 0,
             "diagnostic_samples": diagnostics,

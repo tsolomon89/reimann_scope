@@ -597,7 +597,7 @@ def test_038r_16_zero_arithmetic_invariants_exact_theorem_count() -> None:
     assert lean_info["all_required_present"] is True
     assert prov["zero_arithmetic_lean_theorem_count"] == 12
     assert prov["total_formal_theorem_count"] >= 626
-    assert prov["total_formal_theorem_count"] == 647
+    assert prov["total_formal_theorem_count"] == 649
 
 
 
