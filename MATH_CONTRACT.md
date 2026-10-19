@@ -3603,7 +3603,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 
 ---
 
-# 71. Fauzan Hankel Irrationality Architecture Transfer, Rigorous Gate-Z5 Lower-Envelope Proof, and $\pi\leftrightarrow\tau$ Arithmetic-Normalization Analysis (TASK-TC-039 / TASK-TC-039R / TASK-TC-039R2 / TASK-TC-039R3)
+# 71. Fauzan Hankel Irrationality Architecture Transfer, Rigorous Gate-Z5 Lower-Envelope & Primitive Norm-Polynomial Content Proof, and $\pi\leftrightarrow\tau$ Arithmetic-Normalization Analysis (TASK-TC-039 / TASK-TC-039R / TASK-TC-039R2 / TASK-TC-039R3 / TASK-TC-039R4)
 
 1. **Gate Z1 — Exponential Gauge Family of Rationalized Entire Completed Zeta Functions $\mathcal{R}_c(z)$ and $\pi\leftrightarrow\tau$ Rational Integer Sampling (`Z1_ARGUMENT_TARGET_REPRESENTATION_PROVED`, `RATIONALIZED_XI_RATIONAL_INTEGER_SAMPLING_PROVED`, `TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`)**:
    Define the zero-carrying entire gauge family for $c \in \mathbb{Q}_{>0}$ (with $c_\pi = 4$ giving $\mathcal{R}_\pi$ and $c_\tau = 1$ giving $\mathcal{R}_\tau$, where $\tau = 2\pi$):
@@ -3646,7 +3646,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    - **Route B (Multipoint Padé Argument Polynomials & Binomial Gauge Covariance)**: The linearized interpolation system $A_n^{(c)}(m) - a_m^{(c)} B_n^{(c)}(m) = 0$ ($0 \le m \le d_A + d_B$) has full rank $d_A + d_B + 1$ and nullity $1$ across $[n/n], [n/(n-1)], [(n-1)/n]$ ($1 \le n \le 25$), satisfies $R_n^{(c)}(\alpha_1) = A_n^{(c)}(\alpha_1)$ (`pade_interpolation_zero_residual_identity`), and obeys exact binomial gauge covariance $A_n^{(c)}(z) = \sum_{j=0}^{d_A} p_j^{(\tau)}\binom{z}{j}(c-1)^j$, $B_n^{(c)}(z) = B_n^{(\tau)}(z)$ when $d_A \ge d_B$ (`fixed_gauge_degree_invariance`).
 
 3. **Gates Z4 & Z5 — Rigorous Vertical-Line Steepest-Descent Proof of the Two-Step Lower Envelope, Primitive Norm-Polynomial Content Cancellation, and $\pi\leftrightarrow\tau$ Gauge Invariance (`FINITE_DIFFERENCE_SADDLE_ASYMPTOTIC_PROVED`, `NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED`, `PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED`, `NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`, `NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`, `Z5_NEWTON_ROUTE_GENUINELY_FAILS_BY_TWO_STEP_LOWER_ENVELOPE_AND_FACTORIAL_DENOMINATORS`, `Z5_PADE_FINITE_WINDOW_NEGATIVE_ASYMPTOTIC_OPEN`, `Z5_HANKEL_ROUTE_BLOCKED_BY_UNIT_FRACTION_CANCELLATION_AND_TARGET_COUPLING`, `PI_AND_TAU_BELONG_TO_ONE_EXPONENTIAL_GAUGE_FAMILY_NO_FIXED_GAUGE_SAVES_Z5`)**:
-   - **Branch-Free Vertical-Line Steepest Descent, Two-Step Lower Envelope, & Primitive Integer Norm-Polynomial Lower Bound (`TASK-TC-039R3` / `TASK-TC-039R4`)**: Under the single-valued small-$u$ substitution $w = -1 + u^2$ ($1+w = u^2$) on $\mathbb{H}_+ = \{\Re(u) > 0\}$, the Nörlund–Rice / Cauchy integral becomes a branch-free contour integral along $u = x_n + iy$ ($x_n = \frac{1}{2}(\frac{\sqrt{c}}{2n})^{1/3}$) passing through the conjugate saddles $u_\pm = (\frac{\sqrt{c}}{2n})^{1/3}e^{\pm i\pi/3} = x_n(1 \pm i\sqrt{3}) \in \mathbb{H}_+$ while $u_0 = -2x_n < 0 \in \mathbb{H}_-$ lies behind the imaginary-axis pole barrier (`vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`), proving:
+   - **Branch-Free Vertical-Line Steepest Descent, Two-Step Lower Envelope, & Primitive Integer Norm-Polynomial Lower Bound (`TASK-TC-039R3` / `TASK-TC-039R4`)**: Under the single-valued small-$u$ substitution $w = -1 + u^2$ ($1+w = u^2$) on $\mathbb{H}_+ = \{\Re(u) > 0\}$, separating `EXACT_TRANSFORMED_ACTION` ($S_{n,c}^{\mathrm{exact}}(u) = -(n+1)\log(1-u^2) - \frac{\sqrt{c(1-u^2)}}{u}$) from `LOCAL_SADDLE_MODEL_PHI_N` ($\Phi_n(u) = nu^2 - \frac{\sqrt{c}}{u}$), the Nörlund–Rice / Cauchy integral becomes a branch-free contour integral along $u = x_n + iy$ ($x_n = \frac{1}{2}(\frac{\sqrt{c}}{2n})^{1/3}$) passing through the conjugate saddles $u_\pm = (\frac{\sqrt{c}}{2n})^{1/3}e^{\pm i\pi/3} = x_n(1 \pm i\sqrt{3}) \in \mathbb{H}_+$ while $u_0 = -2x_n < 0 \in \mathbb{H}_-$ lies behind the imaginary-axis pole barrier (`vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`), proving:
      \[
      \boxed{
      \Delta^n a_0^{(c)} = (-1)^{n+1}\frac{2\sqrt{c}}{\sqrt{3\pi}} n^{1/2}\exp\!\bigl(-\kappa(c)n^{1/3}\bigr)\!\left[\cos\!\bigl(\omega(c)n^{1/3}\bigr) + O(n^{-1/3})\right] \quad (\phi_0(c) = 0), \qquad \kappa(c) = \frac{3}{2^{5/3}}c^{1/3}, \quad \omega(c) = \sqrt{3}\,\kappa(c),
@@ -3658,7 +3658,7 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
      C_1(c)n^{-3/2}\exp\!\bigl(-2\kappa(c)n^{1/3}\bigr) \le E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2 \le C_2(c)n^{-1/6}\exp\!\bigl(-2\kappa(c)n^{1/3}\bigr) \qquad (\forall n \ge n_0(c)).
      }
      \]
-     Moreover, for the canonical **primitive integer polynomial** $\widetilde{Q}_n^{(c)}(Y) := M_n^{(c)} Q_n^{(c)}(Y) = \frac{L_n^{(c)}}{g_n^{(c)}} Q_n^{(c)}(Y) \in \mathbb{Z}[Y]$ (after dividing out all common integer content $g_n^{(c)}$), its integer leading coefficient $\widetilde{q}_{n,2n+2}^{(c)} = M_n^{(c)} q_{n,2n+2}^{(c)} \ge 1$ forces $M_n^{(c)} \ge \frac{1}{q_{n,2n+2}^{(c)}} = \frac{4^{n+1}((n+1)!)^2}{(\Delta^{n+1}a_0^{(c)})^2}$ (`primitive_multiplier_lower_bound_from_leading_coeff`), so on $\Delta^{n+1}a_0^{(c)} \ne 0$ the leading coefficient cancels identically to give $\widetilde{Q}_n^{(c)}(\gamma_1) \ge \frac{1}{2}\prod_{j=0}^n ((2j-\frac{1}{2})^2 + \gamma_1^2) \ge \frac{1}{2}(\frac{1}{4}+\gamma_1^2)(n!)^2 \to +\infty$ (`primitive_two_approximant_norm_cancellation_lower_bound`), and globally for all $n \ge n_0(c)$ the saddle upper bound on $|\Delta^{k_n}a_0^{(c)}|$ proves $\log\widetilde{Q}_n^{(c)}(\gamma_1) \ge 2n\log n - O_c(n) \to +\infty$ and $\frac{-\log|\widetilde{Q}_n^{(c)}(\gamma_1)|}{\deg\widetilde{Q}_n^{(c)}} \le -\log n + O_c(1) \to -\infty$, closing the Newton two-approximant branch of `SUBGATE-TC-039A` negatively at Gate Z5 (`PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED`, `NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`, `CLOSED_NEGATIVE_AT_GATE_Z5`).
+     Moreover, for the canonical **primitive integer polynomial** $\widetilde{Q}_n^{(c)}(Y) := M_n^{(c)} Q_n^{(c)}(Y) = \frac{L_n^{(c)}}{g_n^{(c)}} Q_n^{(c)}(Y) \in \mathbb{Z}[Y]$ (after dividing out all common integer content $g_n^{(c)}$), its integer leading coefficient $\widetilde{q}_{n,2n+2}^{(c)} = M_n^{(c)} q_{n,2n+2}^{(c)} \ge 1$ forces $M_n^{(c)} \ge \frac{1}{q_{n,2n+2}^{(c)}} = \frac{4^{n+1}((n+1)!)^2}{(\Delta^{n+1}a_0^{(c)})^2}$ (`primitive_multiplier_lower_bound_from_leading_coeff`), so on $\Delta^{n+1}a_0^{(c)} \ne 0$ the leading coefficient cancels identically to give $\widetilde{Q}_n^{(c)}(\gamma_1) \ge \frac{1}{2}\prod_{j=0}^n ((2j-\frac{1}{2})^2 + \gamma_1^2) \ge \frac{1}{2}(\frac{1}{4}+\gamma_1^2)(n!)^2 \to +\infty$ (`primitive_two_approximant_norm_cancellation_lower_bound`), and globally for all $n \ge n_0(c)$ ($n + 1 - C_0 n^{2/3} \le k_n \le n + 1$, $\Delta m \asymp m^{2/3}$, $2k_n\log k_n = 2n\log n + O(n)$) the saddle upper bound on $|\Delta^{k_n}a_0^{(c)}|$ proves $\log\widetilde{Q}_n^{(c)}(\gamma_1) \ge 2n\log n - O_c(n) \to +\infty$ and $\frac{-\log|\widetilde{Q}_n^{(c)}(\gamma_1)|}{\deg\widetilde{Q}_n^{(c)}} \le -\log n + O_c(1) \to -\infty$, closing the Newton two-approximant branch of `SUBGATE-TC-039A` negatively at Gate Z5 (`PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED`, `NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`, `CLOSED_NEGATIVE_AT_GATE_Z5`).
    - **Multipoint Padé Finite-Window Audit & Open Asymptotic Delimiter**: For $[n/n]$ at $n = 25$, $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\pi)}) = -186.6408 < 0$ and $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\tau)}) = -179.9633 < 0$; the potential-theoretic $n \to \infty$ asymptotic remains an explicitly delimited open analytical question.
    - **Lambert–Stieltjes Unit-Fraction Hankel Determinants, Subleading Constant, & C1 Degree**: For $D_n^{(c)} = \det(b_{i+j}^{(c)})_{0\le i,j<n} = c^{n^2}D_n^{(\tau)}$, both $D_n^{(\pi)}$ and $D_n^{(\tau)}$ are exact unit fractions ($D_1^{(\pi)} = 1/6, D_1^{(\tau)} = 1/24, D_2^{(\pi)} = 1/18900, D_2^{(\tau)} = 1/4838400$) with $-\log D_n^{(\pi)} = 2n^2\log n + (4\log 2 - 3)n^2 + O(n\log n)$ and $-\log D_n^{(\tau)} = 2n^2\log n + (6\log 2 - 3)n^2 + O(n\log n)$, and C1 cleared degree $\deg P_n^{\mathrm{C1}} = \sum_{m=1}^{2n-1}\min(m, 2n-m) = n^2$.
 
@@ -3682,10 +3682,65 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \end{gathered}
    }
    \]
-   `formal/RiemannScope/FauzanZeroArgumentTransfer.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 23 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 649 compiled `theorem` declarations across 33 local modules + umbrella `formal/RiemannScope.lean` = 34 formal source files):
+   `formal/RiemannScope/FauzanZeroArgumentTransfer.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 23 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced):
    `argument_norm_polynomial_real`, `argument_norm_polynomial_nonneg`, `argument_norm_polynomial_degree_bound`, `newton_consecutive_common_root_forces_node`, `newton_consecutive_no_common_root_of_nonzero_samples`, `two_approximant_norm_sum_strict_pos`, `rational_evaluation_integer_clearing`, `superlinear_log_smallness_irrationality_schema`, `pade_interpolation_zero_residual_identity`, `pi_tau_zero_function_scaling`, `pi_tau_integer_sample_scaling`, `tau_even_zeta_rational_core_identity`, `moment_pi_tau_scaling`, `hankel_gauge_scaling_exponent`, `rational_gauge_zero_divisor_invariant`, `two_phase_cosine_square_lower_bound`, `fixed_gauge_degree_invariance`, `tau_removable_singularity_half_scaling`, `vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`, `phase_displacement_pi_over_three_sum_sq_lower_bound`, `primitive_multiplier_lower_bound_from_leading_coeff`, `primitive_two_approximant_norm_cancellation_lower_bound`.
 
+---
 
+# 72. Subfactorial-Denominator Zero-Carrying Kernels: Bernoulli Reflection, Gamma-Ratio Tradeoffs, Positive-Moment Hankel Architecture, and Escape from the Newton Factorial Obstruction (TASK-TC-040)
 
+1. **Bernoulli Reflection Kernel $\mathcal{B}(z)$, Entire Companion $\mathcal{K}_0(z)$, and Von Staudt–Clausen Subfactorial Denominators (`BERNOULLI_REFLECTION_KERNEL_ELIMINATES_FACTORIAL_DENOMINATORS`)**:
+   Define the Bernoulli reflected kernel and its cosine-cleared entire companion:
+   \[
+   \boxed{
+   \mathcal{B}(z) := 2\Gamma(2z+1)\mathcal{R}_\tau(z) = (2z-1)\Gamma(2z+1)\tau^{-2z}\zeta(2z) = \frac{2(2z-1)\zeta(1-2z)}{\cos(\pi z)}, \qquad
+   \mathcal{K}_0(z) := \cos(\pi z)\mathcal{B}(z) = 2(2z-1)\zeta(1-2z)
+   }
+   \]
+   (`bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`). On $0 < \Re(z) < 1/2$, $\Gamma(2z+1)$ and $\cos(\pi z)$ are nonvanishing, so $\mathcal{B}(\rho/2) = \mathcal{K}_0(\rho/2) = 0$ for every nontrivial zero $\rho$ ($\mathcal{B}(1/2) = 1/2$, $\mathcal{K}_0(1/2) = 0$). On $\mathbb{Z}_{\ge 0}$, Euler's identity clears $(2m)!$ identically (`gamma_reflection_sample_clearing_identity`, `sign_adjusted_bernoulli_positive_sample_identity`):
+   \[
+   \boxed{
+   \mathcal{B}(m) = (-1)^{m+1}(2m-1)B_{2m} \in \mathbb{Q}_{>0} \;\; (\forall m \ge 0), \qquad
+   \mathcal{K}_0(m) = -(2m-1)B_{2m} \in \mathbb{Q}\setminus\{0\} \;\; (\forall m \ge 0).
+   }
+   \]
+   By the von Staudt–Clausen theorem, $\operatorname{den}(B_{2m}) = \prod_{(p-1)\mid 2m} p$ is squarefree, so the cumulative LCM $\mathcal{V}_N := \operatorname{lcm}_{0\le m\le N}\operatorname{den}(\mathcal{B}(m))$ satisfies:
+   \[
+   \boxed{
+   \log\mathcal{V}_N \le \vartheta(2N+1) = (2 + o(1))N = O(N) \ll N\log N.
+   }
+   \]
 
+2. **Gamma-Ratio Tradeoff Family $\mathcal{B}_q(z)$, Log-Factorial Budget Conservation, and Carlson Obstruction (`GAMMA_RATIO_FAMILY_SHIFTS_FACTORIAL_FROM_DENOMINATOR_TO_GROWTH`)**:
+   For $\mathcal{B}_q(z) := \frac{2\Gamma(2z+1)}{\Gamma(z+1)^q}\mathcal{R}_\tau(z)$ with rational samples $\mathcal{B}_q(m) = (-1)^{m+1}\frac{(2m-1)B_{2m}}{(m!)^q}$, the leading $m\log m$ coefficients of sample denominator $\mathcal{L}_{\mathrm{den}}(q) = 2 - q$, sample growth $\mathcal{L}_{\mathrm{size}}(q) = q$, and degree-$m$ Newton basis $\mathcal{L}_{\mathrm{basis}}(q) = 1$ ($0 \le q \le 2$) satisfy exact conservation (`gamma_ratio_budget_conservation_identity`, `gamma_ratio_newton_basis_total_cost_conservation`):
+   \[
+   \boxed{
+   \mathcal{L}_{\mathrm{den}}(q) + \mathcal{L}_{\mathrm{size}}(q) = (2 - q) + q = 2, \qquad
+   \mathcal{L}_{\mathrm{den}}(q) + \mathcal{L}_{\mathrm{size}}(q) + \mathcal{L}_{\mathrm{basis}}(q) = 3.
+   }
+   \]
+   At $q = 0$, removing the $2m\log m$ denominator shifts the $2m\log m$ factorial growth into $|B_{2m}| \sim 4\sqrt{\pi m}(m/\pi e)^{2m}$, causing the forward differences to explode factorially ($|\Delta^n\mathcal{B}(0)| \sim 4\sqrt{\pi n}(2n/\pi e)^{2n}$, $|\Delta^n\mathcal{K}_0(0)| \sim 4\sqrt{\pi n}(n/\pi e)^{2n}$) and violating Carlson's theorem.
 
+3. **Positive-Moment Bernoulli Hankel Architecture, Carlitz–Touchard Orthogonal Polynomials, and the No-Free-Lunch Conservation Theorem (`POSITIVE_BERNOULLI_HANKEL_RETAINS_TARGET_COUPLING_OBSTRUCTION`, `CARLITZ_TOUCHARD_HANKEL_POLYNOMIAL_REINTRODUCES_FACTORIAL_BASIS`, `SUBFACTORIAL_INTERPOLATION_NO_FREE_LUNCH_IN_TESTED_CLASSES`)**:
+   - **Positive Bernoulli Moments & Carlitz–Touchard Polynomials**: The shifted Bernoulli moments $\mu_k := \frac{\mathcal{B}(k+1)}{2k+1} = (-1)^{k+1}B_{2k+2} = \int_{-\infty}^\infty x^{2k}\frac{\pi^2 dx}{4\cosh^2(\pi x/2)} > 0$ ($k \ge 0$) have strictly positive Hankel determinants $H_n^{\mathcal{B}} = \det(\mu_{i+j})_{0\le i,j<n} > 0$ with $\log H_n^{\mathcal{B}} = 2n^2\log n + O(n^2)$ and subfactorial denominator $\log\operatorname{den}(H_n^{\mathcal{B}}) \le n\log\mathcal{V}_n = O(n^2)$. The monic orthogonal polynomials $\widehat{\Omega}_n(x) = i^n P_n(-ix;1) = (-1)^n{}_3F_2(-n, n+1, 1+x; 1, 1; 1)$ satisfy $\widehat{\Omega}_{k+1}(x) = x\widehat{\Omega}_k(x) - \beta_k\widehat{\Omega}_{k-1}(x)$ with $\beta_k = \frac{k^4}{4(2k-1)(2k+1)} > 0$ (`carlitz_touchard_hankel_recurrence_positivity`). However: (i) the orthogonality identity $\mathcal{L}_x[\widehat{\Omega}_n(x)\widehat{\Omega}_m(x)] = 0$ ($m < n$) is a bilinear inner product in the dummy moment variable $x$ and does not evaluate the complex half-zero $\alpha_1 = \rho_1/2$; and (ii) clearing the rising-factorial basis $(1+x)_k/k!$ in $\widehat{\Omega}_n(2\alpha_1 - 1)$ reintroduces $(n!)^2 \asymp \exp(2n\log n)$.
+   - **No-Free-Lunch Conservation Theorem Across 7 Tested Kernel Classes (`auxiliary_polynomial_factorial_cost_lower_bound_schema`)**: Across all 7 audited candidate subfactorial kernel classes ($\mathcal{B}(z)$, $\mathcal{K}_0(z)$, $\mathcal{B}_q(z)$, Hurwitz/Barnes difference kernels, Dirichlet-regularized $\eta$-kernels, positive-moment Bernoulli Hankel / Carlitz–Touchard polynomials, and rational gauge-product hybrids), any degree-$d_n \asymp n$ polynomial $P_n$ extracted via an $O(n)$-point rational interpolation or Hankel reduction on an arithmetic progression incurs $\log D_n + \log|P_n(\gamma_1)| \ge c_0 n\log n - O(n) \to +\infty$.
+
+4. **Principal Classification, Remaining Subgates, and Lean 4 Verification**:
+   \[
+   \boxed{
+   \begin{gathered}
+   \texttt{SUBFACTORIAL\_SAMPLE\_DENOMINATORS\_ACHIEVED\_BY\_GAMMA\_REFLECTION\_BUT\_FACTORIAL\_COST\_CONSERVED\_IN\_GROWTH\_OR\_BASIS\_ACROSS\_TESTED\_KERNEL\_CLASSES}\\[2pt]
+   \texttt{BERNOULLI\_REFLECTION\_KERNEL\_ELIMINATES\_FACTORIAL\_DENOMINATORS}\\[2pt]
+   \texttt{GAMMA\_RATIO\_FAMILY\_SHIFTS\_FACTORIAL\_FROM\_DENOMINATOR\_TO\_GROWTH}\\[2pt]
+   \texttt{POSITIVE\_BERNOULLI\_HANKEL\_RETAINS\_TARGET\_COUPLING\_OBSTRUCTION}\\[2pt]
+   \texttt{CARLITZ\_TOUCHARD\_HANKEL\_POLYNOMIAL\_REINTRODUCES\_FACTORIAL\_BASIS}\\[2pt]
+   \texttt{SUBFACTORIAL\_INTERPOLATION\_NO\_FREE\_LUNCH\_IN\_TESTED\_CLASSES}\\[2pt]
+   \texttt{NON\_INTERPOLATORY\_HURWITZ\_FOURIER\_OR\_PADE\_POTENTIAL\_SUBGATE}\\[4pt]
+   (\texttt{SUBGATE-TC-039A [Newton]} = \texttt{CLOSED\_NEGATIVE\_AT\_GATE\_Z5}, \quad \texttt{SUBGATE-TC-039A [Padé asymptotic]} = \texttt{OPEN},\\
+   \texttt{SUBGATE-TC-040A} = \texttt{CLOSED\_NEGATIVE\_IN\_TESTED\_INTERPOLATORY\_AND\_HANKEL\_CLASSES}, \quad
+   \texttt{SUBGATE-TC-041A} = \texttt{OPEN}, \quad \texttt{SUBGATE-TC-038A} = \texttt{OPEN}, \quad \texttt{OBL-CT-001A} = \texttt{OPEN})
+   \end{gathered}
+   }
+   \]
+   `formal/RiemannScope/SubfactorialZeroKernel.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 8 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 657 compiled `theorem` declarations across 34 local modules + umbrella `formal/RiemannScope.lean` = 35 formal source files):
+   `bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`, `gamma_reflection_sample_clearing_identity`, `gamma_ratio_budget_conservation_identity`, `sign_adjusted_bernoulli_positive_sample_identity`, `auxiliary_polynomial_factorial_cost_lower_bound_schema`, `gamma_ratio_newton_basis_total_cost_conservation`, `carlitz_touchard_hankel_recurrence_positivity`.

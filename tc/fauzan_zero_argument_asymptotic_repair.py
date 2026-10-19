@@ -1271,7 +1271,12 @@ def audit_saddle_asymptotics_and_two_step_lower_envelope(
 
     return {
         "saddle_points": {
-            "saddle_equation": "d/ds [n*s - sqrt(c)/sqrt(s)] = n + sqrt(c) / (2 * s^{3/2}) = 0  <=>  u^3 = -sqrt(c) / (2*n)  (s = u^2)",
+            "contour_convention": "w = -1 + u^2, 1 + w = u^2 (small-u convention)",
+            "exact_transformed_action_classification": "EXACT_TRANSFORMED_ACTION",
+            "exact_transformed_action": "S_{n,c}^{exact}(u) = -(n + 1)*log(1 - u^2) - sqrt(c*(1 - u^2))/u",
+            "local_saddle_model_classification": "LOCAL_SADDLE_MODEL_PHI_N",
+            "local_saddle_model_phi_n": "Phi_n(u) = n*u^2 - sqrt(c)/u",
+            "saddle_equation": "Phi_n'(u) = 2*n*u + sqrt(c)/u^2 = 0  <=>  u^3 = -sqrt(c) / (2*n)  (s = u^2)",
             "asymptotic_locations": "s_{+-} ~ (sqrt(c) / (2*n))^{2/3} * exp(+- 2*pi*i / 3)  (u_{+-} = (sqrt(c) / (2*n))^{1/3} * exp(+- i*pi / 3) in H_+)",
             "third_saddle_in_left_half_plane": "u_0 = -(sqrt(c) / (2*n))^{1/3} < 0 in H_- (isolated from H_+ by the imaginary-axis pole barrier Re(u) = 0)",
             "at_pi_c_eq_4": "s_{+-}^{(pi)} ~ (1 / n)^{2/3} * exp(+- 2*pi*i / 3)",
@@ -1524,7 +1529,8 @@ def audit_saddle_asymptotics_and_two_step_lower_envelope(
                 "Multiplying Q_n^{(c)}(Y) >= (1/2) |N_{n+1}^{(c)}(alpha(Y)) - N_n^{(c)}(alpha(Y))|^2 = (1/2) q_{n,2n+2}^{(c)} prod_{j=0}^n ((2j - 1/2)^2 + Y^2) "
                 "by M_n^{(c)} >= 1 / q_{n,2n+2}^{(c)} cancels q_{n,2n+2}^{(c)} identically (`primitive_two_approximant_norm_cancellation_lower_bound`) and gives "
                 "tilde{Q}_n^{(c)}(gamma_1) >= (1/2) prod_{j=0}^n ((2j - 1/2)^2 + gamma_1^2) >= (1/2)(1/4 + gamma_1^2)(n!)^2 -> +infty unconditionally! "
-                "(2) Globally for all n >= n_0(c), letting 2 k_n = deg Q_n^{(c)}(Y) = 2n + O(n^{1/3}), the saddle upper bound on |Delta^{k_n} a_0^{(c)}| "
+                "(2) Globally for all n >= n_0(c), letting 2 k_n = deg Q_n^{(c)}(Y) with n + 1 - C_0 n^{2/3} <= k_n <= n + 1 (since theta_{m+1} - theta_m ~ m^{-2/3} "
+                "separates consecutive cosine zeros by Delta m ~ m^{2/3}, which suffices for 2 k_n log k_n = 2 n log n + O(n)), the saddle upper bound on |Delta^{k_n} a_0^{(c)}| "
                 "gives log M_n^{(c)} >= -log q_{n,2k_n}^{(c)} >= 2*n*log(n) + 2*kappa(c)*n^{1/3} + O_c(n), which combined with the raw two-step lower "
                 "envelope log Q_n^{(c)}(gamma_1) >= -2*kappa(c)*n^{1/3} - (3/2)*log(n) - O_c(1) yields log tilde{Q}_n^{(c)}(gamma_1) >= 2*n*log(n) - O_c(n) -> +infty "
                 "and (-log |tilde{Q}_n^{(c)}(gamma_1)|) / deg(tilde{Q}_n^{(c)}) <= -log(n) + O_c(1) -> -infty (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`)."

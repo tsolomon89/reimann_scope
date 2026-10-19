@@ -138,6 +138,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/GradeCharacterProjection.lean",
     "formal/RiemannScope/ZeroArithmeticInvariants.lean",
     "formal/RiemannScope/FauzanZeroArgumentTransfer.lean",
+    "formal/RiemannScope/SubfactorialZeroKernel.lean",
 ]
 
 

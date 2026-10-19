@@ -343,7 +343,15 @@ is **single-valued and meromorphic on \(\mathbb{C}\setminus\{0\}\) with no branc
    \Delta^n a_0^{(c)} = \frac{(-1)^n}{2\pi}\int_{-\infty}^\infty H_c(x_n + iy)\bigl(1 - (x_n + iy)^2\bigr)^{-n-1}\,dy.
    }
    \]
-3. **Complete Saddle Inventory & Global Vertical-Line Concavity:** The model action \(\Phi_n(u) := nu^2 - \frac{\sqrt{c}}{u}\) has \(\Phi_n'(u) = 2nu + \frac{\sqrt{c}}{u^2} = 0 \iff u^3 = -\frac{\sqrt{c}}{2n} = -8x_n^3\), giving three roots:
+3. **Complete Saddle Inventory & Global Vertical-Line Concavity (`EXACT_TRANSFORMED_ACTION` vs. `LOCAL_SADDLE_MODEL_PHI_N`):** Distinguishing the exact transformed action (`EXACT_TRANSFORMED_ACTION`)
+   \[
+   S_{n,c}^{\mathrm{exact}}(u) := -(n+1)\log(1-u^2) - \frac{\sqrt{c(1-u^2)}}{u} \qquad (w = -1 + u^2, \; 1+w = u^2)
+   \]
+   from its small-\(u\) local saddle model (`LOCAL_SADDLE_MODEL_PHI_N`)
+   \[
+   \boxed{\Phi_n(u) := nu^2 - \frac{\sqrt{c}}{u},}
+   \]
+   we have \(\Phi_n'(u) = 2nu + \frac{\sqrt{c}}{u^2} = 0 \iff u^3 = -\frac{\sqrt{c}}{2n} = -8x_n^3\), giving three roots:
    - the conjugate right-half-plane pair \(u_\pm = x_n(1 \pm i\sqrt{3}) = \left(\frac{\sqrt{c}}{2n}\right)^{1/3}e^{\pm i\pi/3} \in \mathbb{H}_+\) (\(s_\pm = u_\pm^2 = \left(\frac{\sqrt{c}}{2n}\right)^{2/3}e^{\pm 2\pi i/3}\));
    - the real negative root \(u_0 = -2x_n < 0 \in \mathbb{H}_-\), which lies in the left half-plane behind the imaginary-axis pole barrier \(\operatorname{Re}(u) = 0\).
    Along the vertical line \(u = x_n + iy\), \(\Phi_n(x_n + iy)\) satisfies two **exact global algebraic identities** (formalized in Lean 4 as `vertical_line_saddle_real_concavity_identity` and `vertical_line_saddle_imag_cubic_identity`):
@@ -517,7 +525,11 @@ We prove that the reduced primitive multiplier \(M_n^{(c)} = L_n^{(c)} / g_n^{(c
    }
    \]
 2. **Global All-\(n\) Asymptotic Lower Bound (`NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`):**
-   For arbitrary \(n \ge n_0(c)\), let \(2k_n := \deg Q_n^{(c)}(Y)\). Since \(\omega(c)\bigl((m+1)^{1/3} - m^{1/3}\bigr) \sim \frac{\omega(c)}{3}m^{-2/3} \to 0\), \(\Delta^m a_0^{(c)}\) cannot vanish on any interval of length \(\gg n^{2/3}\), so \(n + 1 - C_0 n^{2/3} \le k_n \le n + 1\) with \(\Delta^{k_n} a_0^{(c)} \ne 0\). The leading coefficient of \(Q_n^{(c)}(Y)\) is \(q_{n,2k_n}^{(c)} \in \{1, 2\}\cdot\frac{(\Delta^{k_n}a_0^{(c)})^2}{4^{k_n}(k_n!)^2} > 0\). Since \(\widetilde{q}_{n,2k_n}^{(c)} = M_n^{(c)} q_{n,2k_n}^{(c)} \ge 1\) and \(|\Delta^{k_n}a_0^{(c)}| \le C_3(c) k_n^{1/2}e^{-\kappa(c)k_n^{1/3}}\) by Section N, Stirling's formula gives
+   For arbitrary \(n \ge n_0(c)\), let \(2k_n := \deg Q_n^{(c)}(Y)\). Since \(\theta_{m+1} - \theta_m = \omega(c)\bigl((m+1)^{1/3} - m^{1/3}\bigr) \sim \frac{\omega(c)}{3}m^{-2/3} \asymp m^{-2/3}\), consecutive zeros of \(\cos(\omega(c)m^{1/3})\) are separated by \(\Delta m \asymp m^{2/3}\), so \(\Delta^m a_0^{(c)}\) cannot vanish on any interval of length \(\gg n^{2/3}\). This gives the conservative spacing bound
+   \[
+   \boxed{n + 1 - C_0 n^{2/3} \le k_n \le n + 1}
+   \]
+   with \(\Delta^{k_n} a_0^{(c)} \ne 0\), which satisfies \(2k_n\log k_n = 2n\log n + O(n^{2/3}\log n) = 2n\log n + O(n)\). The leading coefficient of \(Q_n^{(c)}(Y)\) is \(q_{n,2k_n}^{(c)} \in \{1, 2\}\cdot\frac{(\Delta^{k_n}a_0^{(c)})^2}{4^{k_n}(k_n!)^2} > 0\). Since \(\widetilde{q}_{n,2k_n}^{(c)} = M_n^{(c)} q_{n,2k_n}^{(c)} \ge 1\) and \(|\Delta^{k_n}a_0^{(c)}| \le C_3(c) k_n^{1/2}e^{-\kappa(c)k_n^{1/3}}\) by Section N, Stirling's formula gives
    \[
    \boxed{
    \log M_n^{(c)} = \log\frac{L_n^{(c)}}{g_n^{(c)}} \ge \log\frac{4^{k_n}(k_n!)^2}{2\bigl(\Delta^{k_n}a_0^{(c)}\bigr)^2} \ge 2n\log n + 2\kappa(c)n^{1/3} + O_c(n).
@@ -534,16 +546,16 @@ We prove that the reduced primitive multiplier \(M_n^{(c)} = L_n^{(c)} / g_n^{(c
    \mathscr{E}_n^{\mathrm{prim}}(c) = \frac{-\log|\widetilde{Q}_n^{(c)}(\gamma_1)|}{\deg \widetilde{Q}_n^{(c)}} \le -\log n + O_c(1) \longrightarrow -\infty.
    }
    \]
-3. **Exact Finite Audit (`audit_primitive_norm_polynomial_content`, \(1 \le n \le 12\)):**
+3. **Exact Finite Audit (`audit_primitive_norm_polynomial_content`, \(1 \le n \le 12\), synchronized with `data/tc_fauzan_zero_argument_asymptotic_repair.json`):**
 
 | Gauge | \(n\) | \(\deg \widetilde{Q}_n^{(c)}\) | \(\log L_n^{(c)}\) | \(\log g_n^{(c)}\) | \(\log M_n^{(c)} = \log(L_n^{(c)}/g_n^{(c)})\) | \(\log \widetilde{Q}_n^{(c)}(\gamma_1)\) | \(\mathscr{E}_n^{\mathrm{prim}}(c)\) |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| \(\pi\) (\(c=4\)) | \(4\) | \(10\) | \(34.48\) | \(4.16\) | \(30.32\) | \(28.14\) | \(-2.814\) |
-| \(\pi\) (\(c=4\)) | \(8\) | \(18\) | \(86.50\) | \(6.24\) | \(80.26\) | \(77.69\) | \(-4.316\) |
-| \(\pi\) (\(c=4\)) | \(12\) | \(26\) | \(141.78\) | \(2.08\) | \(139.70\) | \(137.09\) | \(-5.273\) |
-| \(\tau\) (\(c=1\)) | \(4\) | \(10\) | \(46.96\) | \(1.39\) | \(45.57\) | \(43.82\) | \(-4.382\) |
-| \(\tau\) (\(c=1\)) | \(8\) | \(18\) | \(105.91\) | \(0.69\) | \(105.22\) | \(103.00\) | \(-5.722\) |
-| \(\tau\) (\(c=1\)) | \(12\) | \(26\) | \(175.05\) | \(0.00\) | \(175.05\) | \(172.64\) | \(-6.640\) |
+| \(\pi\) (\(c=4\)) | \(4\) | \(10\) | \(43.32\) | \(0.00\) | \(43.32\) | \(48.96\) | \(-4.896\) |
+| \(\pi\) (\(c=4\)) | \(8\) | \(18\) | \(114.53\) | \(0.00\) | \(114.53\) | \(124.78\) | \(-6.932\) |
+| \(\pi\) (\(c=4\)) | \(12\) | \(26\) | \(167.45\) | \(0.00\) | \(167.45\) | \(179.01\) | \(-6.885\) |
+| \(\tau\) (\(c=1\)) | \(4\) | \(10\) | \(55.80\) | \(0.00\) | \(55.80\) | \(64.65\) | \(-6.465\) |
+| \(\tau\) (\(c=1\)) | \(8\) | \(18\) | \(138.10\) | \(0.00\) | \(138.10\) | \(148.76\) | \(-8.265\) |
+| \(\tau\) (\(c=1\)) | \(12\) | \(26\) | \(204.18\) | \(0.00\) | \(204.18\) | \(214.96\) | \(-8.268\) |
 
 Consequently, the Newton two-approximant route—after dividing out all common integer content to form the canonical primitive polynomial \(\widetilde{Q}_n^{(c)}(Y) \in \mathbb{Z}[Y]\)—rigorously fails Gate Z5 for every fixed rational gauge \(c \in \mathbb{Q} \cap (0, \tau^2)\), closing the Newton branch of `SUBGATE-TC-039A`:
 \[

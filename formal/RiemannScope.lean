@@ -36,3 +36,4 @@ import RiemannScope.ModularThetaConductorCurvature
 import RiemannScope.GradeCharacterProjection
 import RiemannScope.ZeroArithmeticInvariants
 import RiemannScope.FauzanZeroArgumentTransfer
+import RiemannScope.SubfactorialZeroKernel

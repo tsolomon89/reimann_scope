@@ -1,0 +1,3643 @@
+{
+  "task_id": "TASK-TC-040",
+  "title": "Subfactorial-Denominator Zero-Carrying Kernels: Bernoulli Reflection, Gamma-Ratio Tradeoffs, Positive-Moment Hankel Architecture, and Escape from the Newton Factorial Obstruction",
+  "preflight_synchronization_repairs": {
+    "all_repairs_completed": true,
+    "model_action_synchronized": true,
+    "degree_gap_synchronized": true,
+    "primitive_table_synchronized": true,
+    "newton_obstruction_frozen": true
+  },
+  "model_action_synchronization": {
+    "contour_variable_convention": "w = -1 + u^2, 1 + w = u^2 (small-u convention)",
+    "exact_transformed_action_label": "EXACT_TRANSFORMED_ACTION",
+    "exact_transformed_action_formula": "S_{n,c}^{exact}(u) = -(n + 1)*log(1 - u^2) - sqrt(c*(1 - u^2))/u",
+    "local_saddle_model_label": "LOCAL_SADDLE_MODEL_PHI_N",
+    "local_saddle_model_formula": "Phi_n(u) = n*u^2 - sqrt(c)/u",
+    "local_saddle_derivative": "Phi_n'(u) = 2*n*u + sqrt(c)/u^2 = 0  <=>  u^3 = -sqrt(c)/(2*n)",
+    "dominant_saddles_in_H_plus": "u_{+-} = (sqrt(c)/(2*n))^{1/3} * exp(+- i*pi/3)",
+    "mixed_log_u_formula_present": false,
+    "synchronized_in_code_and_docs": true
+  },
+  "degree_gap_synchronization": {
+    "oscillation_phase": "theta_m = omega(c) * m^{1/3}",
+    "phase_step_scaling": "theta_{m+1} - theta_m = (omega(c)/3) * m^{-2/3} * (1 + O(m^{-1}))",
+    "cosine_zero_spacing_scaling": "Delta m ~ (3*pi / omega(c)) * m^{2/3} = Theta(m^{2/3})",
+    "conservative_k_n_bound": "n + 1 - C_0 * n^{2/3} <= k_n <= n + 1",
+    "leading_stirling_asymptotic": "2 * k_n * log(k_n) = 2 * n * log(n) - 2 * C_0 * n^{2/3} * log(n) + O(n) = 2 * n * log(n) + O(n)",
+    "leading_2n_log_n_unchanged": true,
+    "stale_n_plus_O_n_pow_1_3_removed": true
+  },
+  "primitive_content_table_synchronization": {
+    "source_of_truth_artifact": "data/tc_fauzan_zero_argument_asymptotic_repair.json",
+    "synchronized_finite_rows": [
+      {
+        "gauge": "pi (c=4)",
+        "n": 4,
+        "deg_Q_n": 10,
+        "log_L_lcm": 43.32,
+        "log_g_content": 0.0,
+        "log_M_prim": 43.32,
+        "log_tilde_Q_n_gamma1": 48.96,
+        "primitive_diophantine_efficiency": -4.896
+      },
+      {
+        "gauge": "pi (c=4)",
+        "n": 8,
+        "deg_Q_n": 18,
+        "log_L_lcm": 114.53,
+        "log_g_content": 0.0,
+        "log_M_prim": 114.53,
+        "log_tilde_Q_n_gamma1": 124.78,
+        "primitive_diophantine_efficiency": -6.932
+      },
+      {
+        "gauge": "pi (c=4)",
+        "n": 12,
+        "deg_Q_n": 26,
+        "log_L_lcm": 167.45,
+        "log_g_content": 0.0,
+        "log_M_prim": 167.45,
+        "log_tilde_Q_n_gamma1": 179.01,
+        "primitive_diophantine_efficiency": -6.885
+      },
+      {
+        "gauge": "tau (c=1)",
+        "n": 4,
+        "deg_Q_n": 10,
+        "log_L_lcm": 55.8,
+        "log_g_content": 0.0,
+        "log_M_prim": 55.8,
+        "log_tilde_Q_n_gamma1": 64.65,
+        "primitive_diophantine_efficiency": -6.465
+      },
+      {
+        "gauge": "tau (c=1)",
+        "n": 8,
+        "deg_Q_n": 18,
+        "log_L_lcm": 138.1,
+        "log_g_content": 0.0,
+        "log_M_prim": 138.1,
+        "log_tilde_Q_n_gamma1": 148.76,
+        "primitive_diophantine_efficiency": -8.265
+      },
+      {
+        "gauge": "tau (c=1)",
+        "n": 12,
+        "deg_Q_n": 26,
+        "log_L_lcm": 204.18,
+        "log_g_content": 0.0,
+        "log_M_prim": 204.18,
+        "log_tilde_Q_n_gamma1": 214.96,
+        "primitive_diophantine_efficiency": -8.268
+      }
+    ],
+    "all_finite_g_content_equal_one": true,
+    "synchronized_across_reviews_and_artifacts": true
+  },
+  "frozen_newton_obstruction_summary": {
+    "obstruction_id": "CONSECUTIVE_NEWTON_PRIMITIVE_NORM_FACTORIAL_OBSTRUCTION",
+    "raw_lower_envelope_status": "NEWTON_TWO_STEP_RAW_LOWER_ENVELOPE_PROVED",
+    "primitive_norm_lower_bound_status": "PRIMITIVE_NORM_POLYNOMIAL_LOWER_BOUND_PROVED",
+    "gate_z5_status": "NEWTON_TWO_APPROXIMANT_PRIMITIVE_ROUTE_RIGOROUSLY_FAILS_GATE_Z5",
+    "subgate_tc_039a_newton_branch_status": "CLOSED_NEGATIVE_AT_GATE_Z5",
+    "exact_cofinal_lower_bound": "tilde{Q}_n^{(c)}(gamma_1) >= (1/2) * prod_{j=0}^n ((2j - 1/2)^2 + gamma_1^2) >= (1/2)*(1/4 + gamma_1^2)*(n!)^2 -> +infty",
+    "global_all_n_lower_bound": "log tilde{Q}_n^{(c)}(gamma_1) >= 2*n*log(n) - O_c(n) -> +infty"
+  },
+  "candidate_kernel_hierarchy": {
+    "R_tau": {
+      "formula": "R_tau(z) = (2z - 1) * tau^{-2z} * zeta(2z)",
+      "sample_formula": "R_tau(m) = (-1)^{m+1} * (2m - 1) * B_{2m} / (2 * (2m)!)",
+      "sample_growth_log": "-2m * log(tau) + log(2m)",
+      "sample_denominator_lcm_log": "2n * log(n) + O(n)",
+      "ogf_radius": "tau^2 = 4*pi^2"
+    },
+    "K_0": {
+      "formula": "K_0(z) = Gamma(2z + 1) * cos(tau*z/2) * R_tau(z) = z * (2z - 1) * zeta(1 - 2z)",
+      "sample_formula": "K_0(m) = -((2m - 1) / 2) * B_{2m}",
+      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (3/2)*log(m)",
+      "sample_denominator_lcm_log": "vartheta(2n + 1) + log(2) = 2n + o(n)",
+      "ogf_radius": "0 (divergent asymptotic OGF)"
+    },
+    "B": {
+      "formula": "B(z) = B(2z) = -2 * z * zeta(1 - 2z) = -2 * K_0(z) / (2z - 1)",
+      "sample_formula": "B(m) = B_{2m}",
+      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m)",
+      "sample_denominator_lcm_log": "vartheta(2n + 1) = 2n + o(n)",
+      "ogf_radius": "0 (divergent asymptotic OGF)"
+    },
+    "B_q": {
+      "formula": "B_q(z) = K_0(z) / Gamma(z + 1)^q = z * (2z - 1) * zeta(1 - 2z) / Gamma(z + 1)^q",
+      "sample_formula": "B_q(m) = -((2m - 1) / 2) * B_{2m} / (m!)^q",
+      "sample_growth_log": "(2 - q) * m * log(m) + O_q(m)",
+      "sample_denominator_lcm_log": "q * n * log(n) + O_q(n)",
+      "ogf_radius": "0 for q in {0, 1}; pi^2 = tau^2/4 for q = 2; +infty (entire OGF) for q >= 3"
+    },
+    "P": {
+      "formula": "P(z) = -exp(i * tau * z / 2) * B(z) = 2 * z * exp(i * pi * z) * zeta(1 - 2z)",
+      "sample_formula": "P(m) = -(-1)^m * B_{2m} = (-1)^{m+1} * B_{2m} = |B_{2m}| > 0 (m >= 1)",
+      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m)",
+      "sample_denominator_lcm_log": "vartheta(2n + 1) = 2n + o(n)",
+      "stieltjes_moment_property": "mu_m = P(m + 1) = |B_{2m+2}| is a positive Stieltjes moment sequence on (0, infty)"
+    }
+  },
+  "tau_functional_equation_bridge": {
+    "tau_definition": "tau = 2 * pi",
+    "pi_form_functional_equation": "zeta(2z) = 2^{2z} * pi^{2z - 1} * sin(pi * z) * Gamma(1 - 2z) * zeta(1 - 2z)",
+    "tau_form_functional_equation": "zeta(2z) = 2 * tau^{2z - 1} * sin(tau * z / 2) * Gamma(1 - 2z) * zeta(1 - 2z)",
+    "reflection_identity_derivation": "Using Gamma(2z + 1) * Gamma(1 - 2z) = 2*z * Gamma(2z) * Gamma(1 - 2z) = 2*z*pi / sin(2*pi*z) = tau*z / (2*sin(tau*z/2)*cos(tau*z/2)), multiplying R_tau(z) = (2z - 1)*tau^{-2z}*zeta(2z) by Gamma(2z + 1)*cos(tau*z/2) cancels tau^{-2z}, sin(tau*z/2), cos(tau*z/2), and Gamma(1 - 2z) identically, leaving K_0(z) = z * (2z - 1) * zeta(1 - 2z).",
+    "numerical_verification_checks": [
+      {
+        "z": "0.3500 + 1.2000i",
+        "abs_diff_lhs_rhs": 3.323091615075863e-61,
+        "abs_diff_K0_rel_B": 3.8893845486632136e-62,
+        "abs_K0": 1.4388235809157541,
+        "abs_B": 1.1897606731972004
+      },
+      {
+        "z": "0.2500 + 7.0670i",
+        "abs_diff_lhs_rhs": 8.924951155684893e-62,
+        "abs_diff_K0_rel_B": 4.861730685829017e-63,
+        "abs_K0": 0.05751768445344444,
+        "abs_B": 0.008133823156720524
+      },
+      {
+        "z": "1.7500 + -0.8000i",
+        "abs_diff_lhs_rhs": 5.500420378003876e-62,
+        "abs_diff_K0_rel_B": 0.0,
+        "abs_K0": 0.2584541546255484,
+        "abs_B": 0.17415083425859795
+      },
+      {
+        "z": "0.2500 + 7.0674i",
+        "abs_diff_lhs_rhs": 3.0301339645332365e-65,
+        "abs_diff_K0_rel_B": 3.8725919148493183e-121,
+        "abs_K0": 2.5365538373061134e-59,
+        "abs_B": 3.58686609158415e-60
+      }
+    ]
+  },
+  "reflected_kernel_K0_analysis": {
+    "definition": "K_0(z) := Gamma(2z + 1) * cos(tau * z / 2) * R_tau(z) = 4^{-z} * Gamma(2z + 1) * cos(pi * z) * R_pi(z)",
+    "closed_form": "K_0(z) = z * (2z - 1) * zeta(1 - 2z) = -((2z - 1) / 2) * B(z)",
+    "entire_on_C": true,
+    "removable_singularity_at_z_eq_0": "lim_{z -> 0} z * (2z - 1) * zeta(1 - 2z) = (-1) * (-1/2) = 1/2 = -(-1/2)*B_0",
+    "value_at_z_eq_0": "1/2",
+    "value_at_z_eq_1_over_2": "0 (since 2z - 1 = 0 and zeta(0) = -1/2 is finite)",
+    "integer_sample_formula": "K_0(m) = -((2m - 1) / 2) * B_{2m} in Q  (for all m >= 0)",
+    "lean_theorem": "bernoulli_kernel_linear_relation"
+  },
+  "pure_bernoulli_function_B_analysis": {
+    "classical_bernoulli_function": "B_classical(s) := -s * zeta(1 - s)  (with B_classical(2m) = B_{2m} for m >= 1 and B_classical(0) = 1)",
+    "zero_argument_rescaled_kernel": "B(z) := B_classical(2z) = -2 * z * zeta(1 - 2z)",
+    "novelty_classification": "CLASSICAL_IDENTITY_REPURPOSED_FOR_ZERO_ARGUMENT_ARITHMETIC",
+    "evidence_status": "PROVED_WITH_EXTERNAL_THEOREM",
+    "zero_bridge_classification": "BERNOULLI_FUNCTION_NONTRIVIAL_ZETA_ZERO_BRIDGE_PROVED",
+    "entire_on_C": true,
+    "value_at_z_eq_0": "1 = B_0",
+    "value_at_z_eq_1_over_2": "B(1/2) = -zeta(0) = 1/2 != 0",
+    "integer_sample_formula": "B(m) = B_{2m} in Q  (for all m >= 0)",
+    "lean_theorem": "bernoulli_kernel_zero_at_zeta_zero"
+  },
+  "zero_divisor_comparison": {
+    "classification": "BERNOULLI_FUNCTION_NONTRIVIAL_ZETA_ZERO_BRIDGE_PROVED",
+    "nontrivial_zeta_zero_equivalence": "For every nontrivial zero rho of zeta(s) (0 < Re(rho) < 1), the functional equation gives zeta(rho) = 0 <=> zeta(1 - rho) = 0. Hence at z = rho / 2 (0 < Re(z) < 1/2), R_tau(rho/2) = 0 <=> B(rho/2) = 0 <=> K_0(rho/2) = 0 <=> B_q(rho/2) = 0.",
+    "full_zero_divisors_identical": false,
+    "divisor_table": {
+      "R_tau(z)": {
+        "nontrivial_zeros": "{rho / 2 : zeta(rho) = 0, 0 < Re(rho) < 1}",
+        "extra_zeros": "{-k : k in Z_{>= 1}} (trivial zeros of zeta(2z) at 2z = -2k)",
+        "value_at_z_eq_1_over_2": "1 / tau != 0"
+      },
+      "B(z)": {
+        "nontrivial_zeros": "{rho / 2 : zeta(rho) = 0, 0 < Re(rho) < 1}",
+        "extra_zeros": "{k + 1/2 : k in Z_{>= 1}} (where 1 - 2z = -2k hits trivial zeros of zeta)",
+        "value_at_z_eq_1_over_2": "1/2 != 0"
+      },
+      "K_0(z)": {
+        "nontrivial_zeros": "{rho / 2 : zeta(rho) = 0, 0 < Re(rho) < 1}",
+        "extra_zeros": "{1/2} union {k + 1/2 : k in Z_{>= 1}}",
+        "value_at_z_eq_1_over_2": "0 (from factor 2z - 1)"
+      },
+      "B_q(z)": {
+        "nontrivial_zeros": "{rho / 2 : zeta(rho) = 0, 0 < Re(rho) < 1}",
+        "extra_zeros": "{1/2} union {k + 1/2 : k in Z_{>= 1}} union {-k : k in Z_{>= 1}, multiplicity q}",
+        "value_at_z_eq_1_over_2": "0"
+      }
+    }
+  },
+  "bernoulli_sample_values": {
+    "max_m_computed": 30,
+    "sample_rows_0_to_12": [
+      {
+        "m": 0,
+        "B_2m_str": "1",
+        "K0_m_str": "1/2",
+        "R_tau_m_str": "1/2",
+        "B1_m_str": "1/2",
+        "B2_m_str": "1/2",
+        "den_B_2m": 1,
+        "den_K0_m": 2,
+        "den_R_tau_m": 2,
+        "den_B1_m": 2,
+        "den_B2_m": 2,
+        "log_abs_B_m": 0.0,
+        "log_abs_K0_m": -0.6931471805599453
+      },
+      {
+        "m": 1,
+        "B_2m_str": "1/6",
+        "K0_m_str": "-1/12",
+        "R_tau_m_str": "1/24",
+        "B1_m_str": "-1/12",
+        "B2_m_str": "-1/12",
+        "den_B_2m": 6,
+        "den_K0_m": 12,
+        "den_R_tau_m": 24,
+        "den_B1_m": 12,
+        "den_B2_m": 12,
+        "log_abs_B_m": -1.791759469228055,
+        "log_abs_K0_m": -2.4849066497880004
+      },
+      {
+        "m": 2,
+        "B_2m_str": "-1/30",
+        "K0_m_str": "1/20",
+        "R_tau_m_str": "1/480",
+        "B1_m_str": "1/40",
+        "B2_m_str": "1/80",
+        "den_B_2m": 30,
+        "den_K0_m": 20,
+        "den_R_tau_m": 480,
+        "den_B1_m": 40,
+        "den_B2_m": 80,
+        "log_abs_B_m": -3.4011973816621555,
+        "log_abs_K0_m": -2.995732273553991
+      },
+      {
+        "m": 3,
+        "B_2m_str": "1/42",
+        "K0_m_str": "-5/84",
+        "R_tau_m_str": "1/12096",
+        "B1_m_str": "-5/504",
+        "B2_m_str": "-5/3024",
+        "den_B_2m": 42,
+        "den_K0_m": 84,
+        "den_R_tau_m": 12096,
+        "den_B1_m": 504,
+        "den_B2_m": 3024,
+        "log_abs_B_m": -3.7376696182833684,
+        "log_abs_K0_m": -2.821378886409213
+      },
+      {
+        "m": 4,
+        "B_2m_str": "-1/30",
+        "K0_m_str": "7/60",
+        "R_tau_m_str": "1/345600",
+        "B1_m_str": "7/1440",
+        "B2_m_str": "7/34560",
+        "den_B_2m": 30,
+        "den_K0_m": 60,
+        "den_R_tau_m": 345600,
+        "den_B1_m": 1440,
+        "den_B2_m": 34560,
+        "log_abs_B_m": -3.4011973816621555,
+        "log_abs_K0_m": -2.148434413166787
+      },
+      {
+        "m": 5,
+        "B_2m_str": "5/66",
+        "K0_m_str": "-15/44",
+        "R_tau_m_str": "1/10644480",
+        "B1_m_str": "-1/352",
+        "B2_m_str": "-1/42240",
+        "den_B_2m": 66,
+        "den_K0_m": 44,
+        "den_R_tau_m": 10644480,
+        "den_B1_m": 352,
+        "den_B2_m": 42240,
+        "log_abs_B_m": -2.5802168295923247,
+        "log_abs_K0_m": -1.076139432816051
+      },
+      {
+        "m": 6,
+        "B_2m_str": "-691/2730",
+        "K0_m_str": "7601/5460",
+        "R_tau_m_str": "691/237758976000",
+        "B1_m_str": "7601/3931200",
+        "B2_m_str": "7601/2830464000",
+        "den_B_2m": 2730,
+        "den_K0_m": 5460,
+        "den_R_tau_m": 237758976000,
+        "den_B1_m": 3931200,
+        "den_B2_m": 2830464000,
+        "log_abs_B_m": -1.3739170644113354,
+        "log_abs_K0_m": 0.33083102782708984
+      },
+      {
+        "m": 7,
+        "B_2m_str": "7/6",
+        "K0_m_str": "-91/12",
+        "R_tau_m_str": "1/11496038400",
+        "B1_m_str": "-13/8640",
+        "B2_m_str": "-13/43545600",
+        "den_B_2m": 6,
+        "den_K0_m": 12,
+        "den_R_tau_m": 11496038400,
+        "den_B1_m": 8640,
+        "den_B2_m": 43545600,
+        "log_abs_B_m": 0.15415067982725827,
+        "log_abs_K0_m": 2.0259528567288494
+      },
+      {
+        "m": 8,
+        "B_2m_str": "-3617/510",
+        "K0_m_str": "3617/68",
+        "R_tau_m_str": "3617/1422749712384000",
+        "B1_m_str": "3617/2741760",
+        "B2_m_str": "3617/110547763200",
+        "den_B_2m": 510,
+        "den_K0_m": 68,
+        "den_R_tau_m": 1422749712384000,
+        "den_B1_m": 2741760,
+        "den_B2_m": 110547763200,
+        "log_abs_B_m": 1.958989506233726,
+        "log_abs_K0_m": 3.97389252677599
+      },
+      {
+        "m": 9,
+        "B_2m_str": "43867/798",
+        "K0_m_str": "-745739/1596",
+        "R_tau_m_str": "43867/601069907902464000",
+        "B1_m_str": "-745739/579156480",
+        "B2_m_str": "-745739/210164303462400",
+        "den_B_2m": 798,
+        "den_K0_m": 1596,
+        "den_R_tau_m": 601069907902464000,
+        "den_B1_m": 579156480,
+        "den_B2_m": 210164303462400,
+        "log_abs_B_m": 4.006809010510758,
+        "log_abs_K0_m": 6.14687517400703
+      },
+      {
+        "m": 10,
+        "B_2m_str": "-174611/330",
+        "K0_m_str": "3317609/660",
+        "R_tau_m_str": "174611/84511332915609600000",
+        "B1_m_str": "3317609/2395008000",
+        "B2_m_str": "3317609/8691005030400000",
+        "den_B_2m": 330,
+        "den_K0_m": 660,
+        "den_R_tau_m": 84511332915609600000,
+        "den_B1_m": 2395008000,
+        "den_B2_m": 8691005030400000,
+        "log_abs_B_m": 6.271223267088099,
+        "log_abs_K0_m": 8.522515065694595
+      },
+      {
+        "m": 11,
+        "B_2m_str": "854513/138",
+        "K0_m_str": "-5981591/92",
+        "R_tau_m_str": "77683/1342961908513505280000",
+        "B1_m_str": "-77683/47692800",
+        "B2_m_str": "-77683/1903743959040000",
+        "den_B_2m": 138,
+        "den_K0_m": 92,
+        "den_R_tau_m": 1342961908513505280000,
+        "den_B1_m": 47692800,
+        "den_B2_m": 1903743959040000,
+        "log_abs_B_m": 8.731033309840043,
+        "log_abs_K0_m": 11.08240856700352
+      },
+      {
+        "m": 12,
+        "B_2m_str": "-236364091/2730",
+        "K0_m_str": "5436374093/5460",
+        "R_tau_m_str": "236364091/147289055367977710387200000",
+        "B1_m_str": "5436374093/2615348736000",
+        "B2_m_str": "5436374093/1252756229101977600000",
+        "den_B_2m": 2730,
+        "den_K0_m": 5460,
+        "den_R_tau_m": 147289055367977710387200000,
+        "den_B1_m": 2615348736000,
+        "den_B2_m": 1252756229101977600000,
+        "log_abs_B_m": 11.368827044456161,
+        "log_abs_K0_m": 13.811174079825365
+      }
+    ],
+    "lean_clearing_theorem": "gamma_reflection_sample_clearing_identity"
+  },
+  "von_staudt_clausen_denominator_audit": {
+    "classification": "SUBFACTORIAL_RATIONAL_SAMPLE_DENOMINATOR_ACHIEVED",
+    "von_staudt_clausen_theorem": "For every m >= 1, B_{2m} + sum_{(p - 1) | 2m} (1 / p) in Z, so den(B_{2m}) = prod_{(p - 1) | 2m} p is strictly squarefree.",
+    "exact_D_n_B_theorem": "For every integer n >= 1, D_n^B := lcm_{0 <= m <= n} den(B_{2m}) = prod_{p <= 2n + 1} p = exp(vartheta(2n + 1)). Proof: if p | den(B_{2m}) for some m <= n, then p - 1 <= 2m <= 2n, so p <= 2n + 1 and v_p(den(B_{2m})) = 1; conversely, for every prime p <= 2n + 1, m_p = (p - 1)/2 <= n (for odd p) or m_2 = 1 <= n (for p = 2) satisfies (p - 1) | 2*m_p, so p || den(B_{2*m_p}).",
+    "exact_D_n_K0_theorem": "For every integer n >= 1, D_n^{K_0} := lcm_{0 <= m <= n} den(K_0(m)) = 2 * prod_{p <= 2n + 1} p = 2 * D_n^B. Proof: at m = 0, K_0(0) = 1/2 and at m = 1, K_0(1) = -1/12 gives v_2(D_n^{K_0}) = 2; for every odd prime p <= 2n + 1, at m_p = (p - 1)/2 <= n we have 2*m_p - 1 = p - 2, and gcd(p - 2, p) = 1, so the factor (2*m_p - 1) never cancels p from den(B_{p-1}).",
+    "asymptotic_log_D_n_B": "log D_n^B = vartheta(2n + 1) = 2n + o(n) = O(n)",
+    "asymptotic_log_D_n_K0": "log D_n^{K_0} = vartheta(2n + 1) + log(2) = 2n + o(n) = O(n)",
+    "all_den_B_2m_squarefree_verified_to_30": true,
+    "all_D_n_B_equal_primorial_2n_plus_1_to_30": true,
+    "all_D_n_K0_equal_twice_primorial_to_30": true,
+    "rows_1_to_30": [
+      {
+        "n": 1,
+        "D_n_B_str": "6",
+        "D_n_K0_str": "12",
+        "primorial_2n_plus_1_str": "6",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 1.791759469228055,
+        "chebyshev_theta_2n_plus_1": 1.791759469228055,
+        "log_D_n_B_over_n": 1.791759469228055,
+        "log_D_n_K0": 2.4849066497880004,
+        "log_D_n_K0_over_n": 2.4849066497880004,
+        "log_D_n_R_tau": 3.1780538303479458,
+        "log_D_n_R_tau_over_n_log_n": null
+      },
+      {
+        "n": 2,
+        "D_n_B_str": "30",
+        "D_n_K0_str": "60",
+        "primorial_2n_plus_1_str": "30",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 3.4011973816621555,
+        "chebyshev_theta_2n_plus_1": 3.401197381662155,
+        "log_D_n_B_over_n": 1.7005986908310777,
+        "log_D_n_K0": 4.0943445622221,
+        "log_D_n_K0_over_n": 2.04717228111105,
+        "log_D_n_R_tau": 6.173786103901937,
+        "log_D_n_R_tau_over_n_log_n": 4.45344529780426
+      },
+      {
+        "n": 3,
+        "D_n_B_str": "210",
+        "D_n_K0_str": "420",
+        "primorial_2n_plus_1_str": "210",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 5.3471075307174685,
+        "chebyshev_theta_2n_plus_1": 5.3471075307174685,
+        "log_D_n_B_over_n": 1.7823691769058227,
+        "log_D_n_K0": 6.040254711277414,
+        "log_D_n_K0_over_n": 2.013418237092471,
+        "log_D_n_R_tau": 11.010068010853415,
+        "log_D_n_R_tau_over_n_log_n": 3.340598597102698
+      },
+      {
+        "n": 4,
+        "D_n_B_str": "210",
+        "D_n_K0_str": "420",
+        "primorial_2n_plus_1_str": "210",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 5.3471075307174685,
+        "chebyshev_theta_2n_plus_1": 5.3471075307174685,
+        "log_D_n_B_over_n": 1.3367768826793671,
+        "log_D_n_K0": 6.040254711277414,
+        "log_D_n_K0_over_n": 1.5100636778193535,
+        "log_D_n_R_tau": 14.69894746496735,
+        "log_D_n_R_tau_over_n_log_n": 2.650762326749475
+      },
+      {
+        "n": 5,
+        "D_n_B_str": "2310",
+        "D_n_K0_str": "4620",
+        "primorial_2n_plus_1_str": "2310",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 7.745002803515839,
+        "chebyshev_theta_2n_plus_1": 7.745002803515839,
+        "log_D_n_B_over_n": 1.5490005607031678,
+        "log_D_n_K0": 8.438149984075784,
+        "log_D_n_K0_over_n": 1.6876299968151567,
+        "log_D_n_R_tau": 17.789989918325666,
+        "log_D_n_R_tau_over_n_log_n": 2.2107084443438065
+      },
+      {
+        "n": 6,
+        "D_n_B_str": "30030",
+        "D_n_K0_str": "60060",
+        "primorial_2n_plus_1_str": "30030",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 10.309952160977376,
+        "chebyshev_theta_2n_plus_1": 10.309952160977376,
+        "log_D_n_B_over_n": 1.718325360162896,
+        "log_D_n_K0": 11.003099341537322,
+        "log_D_n_K0_over_n": 1.8338498902562204,
+        "log_D_n_R_tau": 28.592418564400838,
+        "log_D_n_R_tau_over_n_log_n": 2.6596221065988774
+      },
+      {
+        "n": 7,
+        "D_n_B_str": "30030",
+        "D_n_K0_str": "60060",
+        "primorial_2n_plus_1_str": "30030",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 10.309952160977376,
+        "chebyshev_theta_2n_plus_1": 10.309952160977376,
+        "log_D_n_B_over_n": 1.4728503087110538,
+        "log_D_n_K0": 11.003099341537322,
+        "log_D_n_K0_over_n": 1.5718713345053317,
+        "log_D_n_R_tau": 29.28556574496078,
+        "log_D_n_R_tau_over_n_log_n": 2.1499719559565285
+      },
+      {
+        "n": 8,
+        "D_n_B_str": "510510",
+        "D_n_K0_str": "1021020",
+        "primorial_2n_plus_1_str": "510510",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 13.143165505033592,
+        "chebyshev_theta_2n_plus_1": 13.143165505033593,
+        "log_D_n_B_over_n": 1.642895688129199,
+        "log_D_n_K0": 13.836312685593537,
+        "log_D_n_K0_over_n": 1.7295390856991921,
+        "log_D_n_R_tau": 34.89136781125678,
+        "log_D_n_R_tau_over_n_log_n": 2.0974001379638736
+      },
+      {
+        "n": 9,
+        "D_n_B_str": "9699690",
+        "D_n_K0_str": "19399380",
+        "primorial_2n_plus_1_str": "9699690",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 16.087604484200032,
+        "chebyshev_theta_2n_plus_1": 16.087604484200035,
+        "log_D_n_B_over_n": 1.7875116093555592,
+        "log_D_n_K0": 16.78075166475998,
+        "log_D_n_K0_over_n": 1.8645279627511089,
+        "log_D_n_R_tau": 43.770700986042804,
+        "log_D_n_R_tau_over_n_log_n": 2.2134338341361195
+      },
+      {
+        "n": 10,
+        "D_n_B_str": "9699690",
+        "D_n_K0_str": "19399380",
+        "primorial_2n_plus_1_str": "9699690",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 16.087604484200032,
+        "chebyshev_theta_2n_plus_1": 16.087604484200035,
+        "log_D_n_B_over_n": 1.608760448420003,
+        "log_D_n_K0": 16.78075166475998,
+        "log_D_n_K0_over_n": 1.6780751664759979,
+        "log_D_n_R_tau": 50.77376644482927,
+        "log_D_n_R_tau_over_n_log_n": 2.2050766592433835
+      },
+      {
+        "n": 11,
+        "D_n_B_str": "223092870",
+        "D_n_K0_str": "446185740",
+        "primorial_2n_plus_1_str": "223092870",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 19.22309870012918,
+        "chebyshev_theta_2n_plus_1": 19.223098700129185,
+        "log_D_n_B_over_n": 1.747554427284471,
+        "log_D_n_K0": 19.91624588068913,
+        "log_D_n_K0_over_n": 1.8105678073353753,
+        "log_D_n_R_tau": 54.60240784131837,
+        "log_D_n_R_tau_over_n_log_n": 2.0700884290533654
+      },
+      {
+        "n": 12,
+        "D_n_B_str": "223092870",
+        "D_n_K0_str": "446185740",
+        "primorial_2n_plus_1_str": "223092870",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 19.22309870012918,
+        "chebyshev_theta_2n_plus_1": 19.223098700129185,
+        "log_D_n_B_over_n": 1.6019248916774318,
+        "log_D_n_K0": 19.91624588068913,
+        "log_D_n_K0_over_n": 1.659687156724094,
+        "log_D_n_R_tau": 63.38993346685127,
+        "log_D_n_R_tau_over_n_log_n": 2.125832153904701
+      },
+      {
+        "n": 13,
+        "D_n_B_str": "223092870",
+        "D_n_K0_str": "446185740",
+        "primorial_2n_plus_1_str": "223092870",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 19.22309870012918,
+        "chebyshev_theta_2n_plus_1": 19.223098700129185,
+        "log_D_n_B_over_n": 1.478699900009937,
+        "log_D_n_K0": 19.91624588068913,
+        "log_D_n_K0_over_n": 1.5320189138991638,
+        "log_D_n_R_tau": 64.08308064741122,
+        "log_D_n_R_tau_over_n_log_n": 1.9218577270418784
+      },
+      {
+        "n": 14,
+        "D_n_B_str": "6469693230",
+        "D_n_K0_str": "12939386460",
+        "primorial_2n_plus_1_str": "6469693230",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 22.590394530115656,
+        "chebyshev_theta_2n_plus_1": 22.59039453011566,
+        "log_D_n_B_over_n": 1.6135996092939755,
+        "log_D_n_K0": 23.283541710675603,
+        "log_D_n_K0_over_n": 1.6631101221911144,
+        "log_D_n_R_tau": 72.05554666338578,
+        "log_D_n_R_tau_over_n_log_n": 1.9502512142927777
+      },
+      {
+        "n": 15,
+        "D_n_B_str": "200560490130",
+        "D_n_K0_str": "401120980260",
+        "primorial_2n_plus_1_str": "200560490130",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 26.0243817346008,
+        "chebyshev_theta_2n_plus_1": 26.024381734600805,
+        "log_D_n_B_over_n": 1.73495878230672,
+        "log_D_n_K0": 26.71752891516075,
+        "log_D_n_K0_over_n": 1.7811685943440498,
+        "log_D_n_R_tau": 84.920935624957,
+        "log_D_n_R_tau_over_n_log_n": 2.090580043909898
+      },
+      {
+        "n": 16,
+        "D_n_B_str": "200560490130",
+        "D_n_K0_str": "401120980260",
+        "primorial_2n_plus_1_str": "200560490130",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 26.0243817346008,
+        "chebyshev_theta_2n_plus_1": 26.024381734600805,
+        "log_D_n_B_over_n": 1.62652385841255,
+        "log_D_n_K0": 26.71752891516075,
+        "log_D_n_K0_over_n": 1.6698455571975468,
+        "log_D_n_R_tau": 92.82932278424704,
+        "log_D_n_R_tau_over_n_log_n": 2.0925688067174075
+      },
+      {
+        "n": 17,
+        "D_n_B_str": "200560490130",
+        "D_n_K0_str": "401120980260",
+        "primorial_2n_plus_1_str": "200560490130",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 26.0243817346008,
+        "chebyshev_theta_2n_plus_1": 26.024381734600805,
+        "log_D_n_B_over_n": 1.5308459843882825,
+        "log_D_n_K0": 26.71752891516075,
+        "log_D_n_K0_over_n": 1.5716193479506322,
+        "log_D_n_R_tau": 93.52246996480699,
+        "log_D_n_R_tau_over_n_log_n": 1.941725205472754
+      },
+      {
+        "n": 18,
+        "D_n_B_str": "7420738134810",
+        "D_n_K0_str": "14841476269620",
+        "primorial_2n_plus_1_str": "7420738134810",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 29.635299647245027,
+        "chebyshev_theta_2n_plus_1": 29.63529964724503,
+        "log_D_n_B_over_n": 1.6464055359580572,
+        "log_D_n_K0": 30.32844682780497,
+        "log_D_n_K0_over_n": 1.6849137126558318,
+        "log_D_n_R_tau": 107.32490744120341,
+        "log_D_n_R_tau_over_n_log_n": 2.062881648893704
+      },
+      {
+        "n": 19,
+        "D_n_B_str": "7420738134810",
+        "D_n_K0_str": "14841476269620",
+        "primorial_2n_plus_1_str": "7420738134810",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 29.635299647245027,
+        "chebyshev_theta_2n_plus_1": 29.63529964724503,
+        "log_D_n_B_over_n": 1.5597526130128962,
+        "log_D_n_K0": 30.32844682780497,
+        "log_D_n_K0_over_n": 1.5962340435686826,
+        "log_D_n_R_tau": 108.01805462176335,
+        "log_D_n_R_tau_over_n_log_n": 1.9308129018098859
+      },
+      {
+        "n": 20,
+        "D_n_B_str": "304250263527210",
+        "D_n_K0_str": "608500527054420",
+        "primorial_2n_plus_1_str": "304250263527210",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 33.348871713949336,
+        "chebyshev_theta_2n_plus_1": 33.348871713949336,
+        "log_D_n_B_over_n": 1.6674435856974668,
+        "log_D_n_K0": 34.04201889450928,
+        "log_D_n_K0_over_n": 1.7021009447254642,
+        "log_D_n_R_tau": 119.42783932781407,
+        "log_D_n_R_tau_over_n_log_n": 1.9932996079474536
+      },
+      {
+        "n": 21,
+        "D_n_B_str": "13082761331670030",
+        "D_n_K0_str": "26165522663340060",
+        "primorial_2n_plus_1_str": "13082761331670030",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 37.1100718296429,
+        "chebyshev_theta_2n_plus_1": 37.1100718296429,
+        "log_D_n_B_over_n": 1.7671462776020428,
+        "log_D_n_K0": 37.803219010202845,
+        "log_D_n_K0_over_n": 1.8001532862001355,
+        "log_D_n_R_tau": 129.97123149951443,
+        "log_D_n_R_tau_over_n_log_n": 2.032866036786254
+      },
+      {
+        "n": 22,
+        "D_n_B_str": "13082761331670030",
+        "D_n_K0_str": "26165522663340060",
+        "primorial_2n_plus_1_str": "13082761331670030",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 37.1100718296429,
+        "chebyshev_theta_2n_plus_1": 37.1100718296429,
+        "log_D_n_B_over_n": 1.68682144680195,
+        "log_D_n_K0": 37.803219010202845,
+        "log_D_n_K0_over_n": 1.7183281368274022,
+        "log_D_n_R_tau": 134.49302007656345,
+        "log_D_n_R_tau_over_n_log_n": 1.9777531970637696
+      },
+      {
+        "n": 23,
+        "D_n_B_str": "614889782588491410",
+        "D_n_K0_str": "1229779565176982820",
+        "primorial_2n_plus_1_str": "614889782588491410",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 40.960219431352954,
+        "chebyshev_theta_2n_plus_1": 40.960219431352954,
+        "log_D_n_B_over_n": 1.780879105710998,
+        "log_D_n_K0": 41.6533666119129,
+        "log_D_n_K0_over_n": 1.811015939648387,
+        "log_D_n_R_tau": 139.03631485883346,
+        "log_D_n_R_tau_over_n_log_n": 1.9279439703842733
+      },
+      {
+        "n": 24,
+        "D_n_B_str": "614889782588491410",
+        "D_n_K0_str": "1229779565176982820",
+        "primorial_2n_plus_1_str": "614889782588491410",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 40.960219431352954,
+        "chebyshev_theta_2n_plus_1": 40.960219431352954,
+        "log_D_n_B_over_n": 1.7066758096397063,
+        "log_D_n_K0": 41.6533666119129,
+        "log_D_n_K0_over_n": 1.7355569421630375,
+        "log_D_n_R_tau": 152.11234106102944,
+        "log_D_n_R_tau_over_n_log_n": 1.994306751620477
+      },
+      {
+        "n": 25,
+        "D_n_B_str": "614889782588491410",
+        "D_n_K0_str": "1229779565176982820",
+        "primorial_2n_plus_1_str": "614889782588491410",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 40.960219431352954,
+        "chebyshev_theta_2n_plus_1": 40.960219431352954,
+        "log_D_n_B_over_n": 1.638408777254118,
+        "log_D_n_K0": 41.6533666119129,
+        "log_D_n_K0_over_n": 1.666134664476516,
+        "log_D_n_R_tau": 155.20338351438775,
+        "log_D_n_R_tau_over_n_log_n": 1.9286656827868491
+      },
+      {
+        "n": 26,
+        "D_n_B_str": "32589158477190044730",
+        "D_n_K0_str": "65178316954380089460",
+        "primorial_2n_plus_1_str": "32589158477190044730",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 44.93051134490508,
+        "chebyshev_theta_2n_plus_1": 44.93051134490508,
+        "log_D_n_B_over_n": 1.728096590188657,
+        "log_D_n_K0": 45.623658525465025,
+        "log_D_n_K0_over_n": 1.7547560971332703,
+        "log_D_n_R_tau": 165.72475576298328,
+        "log_D_n_R_tau_over_n_log_n": 1.9563659312801558
+      },
+      {
+        "n": 27,
+        "D_n_B_str": "32589158477190044730",
+        "D_n_K0_str": "65178316954380089460",
+        "primorial_2n_plus_1_str": "32589158477190044730",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 44.93051134490508,
+        "chebyshev_theta_2n_plus_1": 44.93051134490508,
+        "log_D_n_B_over_n": 1.6640930127742621,
+        "log_D_n_K0": 45.623658525465025,
+        "log_D_n_K0_over_n": 1.6897651305727788,
+        "log_D_n_R_tau": 175.7027012264374,
+        "log_D_n_R_tau_over_n_log_n": 1.974462850377761
+      },
+      {
+        "n": 28,
+        "D_n_B_str": "32589158477190044730",
+        "D_n_K0_str": "65178316954380089460",
+        "primorial_2n_plus_1_str": "32589158477190044730",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 44.93051134490508,
+        "chebyshev_theta_2n_plus_1": 44.93051134490508,
+        "log_D_n_B_over_n": 1.6046611194608957,
+        "log_D_n_K0": 45.623658525465025,
+        "log_D_n_K0_over_n": 1.629416375909465,
+        "log_D_n_R_tau": 181.14943859810373,
+        "log_D_n_R_tau_over_n_log_n": 1.9415443401866612
+      },
+      {
+        "n": 29,
+        "D_n_B_str": "1922760350154212639070",
+        "D_n_K0_str": "3845520700308425278140",
+        "primorial_2n_plus_1_str": "1922760350154212639070",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 49.0080487888108,
+        "chebyshev_theta_2n_plus_1": 49.0080487888108,
+        "log_D_n_B_over_n": 1.6899327168555447,
+        "log_D_n_K0": 49.701195969370744,
+        "log_D_n_K0_over_n": 1.713834343771405,
+        "log_D_n_R_tau": 185.92012322256937,
+        "log_D_n_R_tau_over_n_log_n": 1.9039131265869471
+      },
+      {
+        "n": 30,
+        "D_n_B_str": "117288381359406970983270",
+        "D_n_K0_str": "234576762718813941966540",
+        "primorial_2n_plus_1_str": "117288381359406970983270",
+        "D_n_B_equals_primorial_2n_plus_1": true,
+        "D_n_K0_equals_2_times_primorial_2n_plus_1": true,
+        "log_D_n_B": 53.11892265298411,
+        "chebyshev_theta_2n_plus_1": 53.11892265298411,
+        "log_D_n_B_over_n": 1.7706307550994704,
+        "log_D_n_K0": 53.81206983354405,
+        "log_D_n_K0_over_n": 1.793735661118135,
+        "log_D_n_R_tau": 207.17613383386737,
+        "log_D_n_R_tau_over_n_log_n": 2.030423510564006
+      }
+    ]
+  },
+  "bernoulli_sample_growth_audit": {
+    "classification": "FACTORIAL_COST_MOVES_FROM_DENOMINATOR_TO_SAMPLE_GROWTH_UNDER_REFLECTION",
+    "exact_magnitude_formulas": {
+      "abs_B_m": "|B(m)| = |B_{2m}| = 2 * (2m)! * tau^{-2m} * zeta(2m) = 2 * (2m)! * (2*pi)^{-2m} * zeta(2m)",
+      "abs_K0_m": "|K_0(m)| = (2m - 1) * (2m)! * tau^{-2m} * zeta(2m)"
+    },
+    "stirling_asymptotics": {
+      "log_abs_B_m": "2*m*log(m) - 2*(1 + log(pi))*m + (1/2)*log(m) + log(2*sqrt(pi)) + O(1/m)",
+      "log_abs_K0_m": "2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(2*sqrt(pi)) + O(1/m)"
+    },
+    "ogf_radius_B": 0.0,
+    "ogf_radius_K0": 0.0,
+    "growth_rows": [
+      {
+        "m": 2,
+        "log_abs_B_m": -3.4011973816621555,
+        "log_abs_K0_m": -2.995732273553991,
+        "log_abs_B_m_over_m_log_m": -2.4534452978042594,
+        "log_abs_K0_m_over_m_log_m": -2.1609640474436813,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": -4.188382340722564
+      },
+      {
+        "m": 5,
+        "log_abs_B_m": -2.5802168295923247,
+        "log_abs_K0_m": -1.076139432816051,
+        "log_abs_B_m_over_m_log_m": -0.3206357709928712,
+        "log_abs_K0_m_over_m_log_m": -0.13372860481315577,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": -0.6651912065445615
+      },
+      {
+        "m": 10,
+        "log_abs_B_m": 6.271223267088099,
+        "log_abs_K0_m": 8.522515065694595,
+        "log_abs_B_m_over_m_log_m": 0.2723557659679644,
+        "log_abs_K0_m_over_m_log_m": 0.3701281264968492,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": 0.137111290805229
+      },
+      {
+        "m": 15,
+        "log_abs_B_m": 20.215071538041073,
+        "log_abs_K0_m": 22.8892201874676,
+        "log_abs_B_m_over_m_log_m": 0.49765378622629886,
+        "log_abs_K0_m_over_m_log_m": 0.5634858659107428,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": 0.41603387930071
+      },
+      {
+        "m": 20,
+        "log_abs_B_m": 37.498704238944434,
+        "log_abs_K0_m": 40.46911870451413,
+        "log_abs_B_m_over_m_log_m": 0.6258687495204269,
+        "log_abs_K0_m_over_m_log_m": 0.6754461849239876,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": 0.568143151654205
+      },
+      {
+        "m": 25,
+        "log_abs_B_m": 57.2770608118657,
+        "log_abs_K0_m": 60.47573392941639,
+        "log_abs_B_m_over_m_log_m": 0.7117647766261497,
+        "log_abs_K0_m_over_m_log_m": 0.7515137236695686,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": 0.6674043967277193
+      },
+      {
+        "m": 30,
+        "log_abs_B_m": 79.0486966196708,
+        "log_abs_K0_m": 82.43308688301659,
+        "log_abs_B_m_over_m_log_m": 0.7747143897603882,
+        "log_abs_K0_m_over_m_log_m": 0.8078830054327493,
+        "asymptotic_2_minus_2_log_pi_plus_1_over_log_m": 0.7388383294583882
+      }
+    ]
+  },
+  "gamma_ratio_family_Bq": {
+    "definition": "B_q(z) := K_0(z) / Gamma(z + 1)^q = z * (2z - 1) * zeta(1 - 2z) / Gamma(z + 1)^q",
+    "integer_sample_formula": "B_q(m) = -((2m - 1) / 2) * B_{2m} / (m!)^q",
+    "sample_growth_asymptotic": "log|B_q(m)| = (2 - q)*m*log(m) + ((q - 2) + 2*log(2) - 2*log(tau))*m + O_q(log m)",
+    "lean_theorem": "gamma_ratio_budget_conservation_identity"
+  },
+  "Bq_sample_values_and_denominators": {
+    "q_0": [
+      {
+        "n": 1,
+        "q": 0,
+        "log_D_q_n": 2.4849066497880004,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 2.4849066497880004,
+        "log_D_q_n_over_n_log_n": null
+      },
+      {
+        "n": 2,
+        "q": 0,
+        "log_D_q_n": 4.0943445622221,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 4.0943445622221,
+        "log_D_q_n_over_n_log_n": 2.9534452978042594
+      },
+      {
+        "n": 3,
+        "q": 0,
+        "log_D_q_n": 6.040254711277414,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 1.0986122886681098,
+        "upper_bound_log": 6.040254711277414,
+        "log_D_q_n_over_n_log_n": 1.8326922590074213
+      },
+      {
+        "n": 4,
+        "q": 0,
+        "log_D_q_n": 6.040254711277414,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 1.0986122886681098,
+        "upper_bound_log": 6.040254711277414,
+        "log_D_q_n_over_n_log_n": 1.0892806897082654
+      },
+      {
+        "n": 5,
+        "q": 0,
+        "log_D_q_n": 8.438149984075784,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 2.70805020110221,
+        "upper_bound_log": 8.438149984075784,
+        "log_D_q_n_over_n_log_n": 1.0485834736319832
+      },
+      {
+        "n": 6,
+        "q": 0,
+        "log_D_q_n": 11.003099341537322,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 2.70805020110221,
+        "upper_bound_log": 11.003099341537322,
+        "log_D_q_n_over_n_log_n": 1.023491111251835
+      },
+      {
+        "n": 7,
+        "q": 0,
+        "log_D_q_n": 11.003099341537322,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 4.653960350157523,
+        "upper_bound_log": 11.003099341537322,
+        "log_D_q_n_over_n_log_n": 0.8077820732208179
+      },
+      {
+        "n": 8,
+        "q": 0,
+        "log_D_q_n": 13.836312685593537,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 4.653960350157523,
+        "upper_bound_log": 13.836312685593539,
+        "log_D_q_n_over_n_log_n": 0.8317324873206189
+      },
+      {
+        "n": 9,
+        "q": 0,
+        "log_D_q_n": 16.78075166475998,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 4.653960350157523,
+        "upper_bound_log": 16.78075166475998,
+        "log_D_q_n_over_n_log_n": 0.8485832454193409
+      },
+      {
+        "n": 10,
+        "q": 0,
+        "log_D_q_n": 16.78075166475998,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 4.653960350157523,
+        "upper_bound_log": 16.78075166475998,
+        "log_D_q_n_over_n_log_n": 0.7287787850194064
+      },
+      {
+        "n": 11,
+        "q": 0,
+        "log_D_q_n": 19.91624588068913,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 7.051855622955894,
+        "upper_bound_log": 19.91624588068913,
+        "log_D_q_n_over_n_log_n": 0.7550654225288257
+      },
+      {
+        "n": 12,
+        "q": 0,
+        "log_D_q_n": 19.91624588068913,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 7.051855622955894,
+        "upper_bound_log": 19.91624588068913,
+        "log_D_q_n_over_n_log_n": 0.6679072458781058
+      },
+      {
+        "n": 13,
+        "q": 0,
+        "log_D_q_n": 19.91624588068913,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 9.616804980417431,
+        "upper_bound_log": 19.91624588068913,
+        "log_D_q_n_over_n_log_n": 0.5972901217103805
+      },
+      {
+        "n": 14,
+        "q": 0,
+        "log_D_q_n": 23.283541710675603,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 9.616804980417431,
+        "upper_bound_log": 23.283541710675603,
+        "log_D_q_n_over_n_log_n": 0.6301909790014206
+      },
+      {
+        "n": 15,
+        "q": 0,
+        "log_D_q_n": 26.71752891516075,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 9.616804980417431,
+        "upper_bound_log": 26.71752891516075,
+        "log_D_q_n_over_n_log_n": 0.6577310101633611
+      },
+      {
+        "n": 16,
+        "q": 0,
+        "log_D_q_n": 26.71752891516075,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 9.616804980417431,
+        "upper_bound_log": 26.71752891516075,
+        "log_D_q_n_over_n_log_n": 0.6022694761048422
+      },
+      {
+        "n": 17,
+        "q": 0,
+        "log_D_q_n": 26.71752891516075,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 12.450018324473646,
+        "upper_bound_log": 26.71752891516075,
+        "log_D_q_n_over_n_log_n": 0.5547126732435185
+      },
+      {
+        "n": 18,
+        "q": 0,
+        "log_D_q_n": 30.32844682780497,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 12.450018324473646,
+        "upper_bound_log": 30.328446827804974,
+        "log_D_q_n_over_n_log_n": 0.5829401384278131
+      },
+      {
+        "n": 19,
+        "q": 0,
+        "log_D_q_n": 30.32844682780497,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 15.394457303640086,
+        "upper_bound_log": 30.328446827804974,
+        "log_D_q_n_over_n_log_n": 0.5421182285871554
+      },
+      {
+        "n": 20,
+        "q": 0,
+        "log_D_q_n": 34.04201889450928,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 15.394457303640086,
+        "upper_bound_log": 34.04201889450928,
+        "log_D_q_n_over_n_log_n": 0.5681752537606355
+      }
+    ],
+    "q_1": [
+      {
+        "n": 1,
+        "q": 1,
+        "log_D_q_n": 2.4849066497880004,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 2.4849066497880004,
+        "log_D_q_n_over_n_log_n": null
+      },
+      {
+        "n": 2,
+        "q": 1,
+        "log_D_q_n": 4.787491742782046,
+        "q_log_n_factorial": 0.6931471805599453,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 4.787491742782046,
+        "log_D_q_n_over_n_log_n": 3.4534452978042594
+      },
+      {
+        "n": 3,
+        "q": 1,
+        "log_D_q_n": 7.832014180505469,
+        "q_log_n_factorial": 1.791759469228055,
+        "witness_lower_bound_log": 2.1972245773362196,
+        "upper_bound_log": 7.832014180505469,
+        "log_D_q_n_over_n_log_n": 2.376335510197907
+      },
+      {
+        "n": 4,
+        "q": 1,
+        "log_D_q_n": 9.21830854162536,
+        "q_log_n_factorial": 3.1780538303479458,
+        "witness_lower_bound_log": 2.1972245773362196,
+        "upper_bound_log": 9.21830854162536,
+        "log_D_q_n_over_n_log_n": 1.66240100229841
+      },
+      {
+        "n": 5,
+        "q": 1,
+        "log_D_q_n": 11.61620381442373,
+        "q_log_n_factorial": 4.787491742782046,
+        "witness_lower_bound_log": 3.8066624897703196,
+        "upper_bound_log": 13.22564172685783,
+        "log_D_q_n_over_n_log_n": 1.4435106473732164
+      },
+      {
+        "n": 6,
+        "q": 1,
+        "log_D_q_n": 17.58235055354742,
+        "q_log_n_factorial": 6.579251212010101,
+        "witness_lower_bound_log": 6.51471269087253,
+        "upper_bound_log": 17.58235055354742,
+        "log_D_q_n_over_n_log_n": 1.6354827806140033
+      },
+      {
+        "n": 7,
+        "q": 1,
+        "log_D_q_n": 17.58235055354742,
+        "q_log_n_factorial": 8.525161361065415,
+        "witness_lower_bound_log": 8.460622839927844,
+        "upper_bound_log": 19.528260702602733,
+        "log_D_q_n_over_n_log_n": 1.29079154349027
+      },
+      {
+        "n": 8,
+        "q": 1,
+        "log_D_q_n": 22.495005439283474,
+        "q_log_n_factorial": 10.60460290274525,
+        "witness_lower_bound_log": 8.460622839927844,
+        "upper_bound_log": 24.440915588338786,
+        "log_D_q_n_over_n_log_n": 1.3522263663343554
+      },
+      {
+        "n": 9,
+        "q": 1,
+        "log_D_q_n": 29.582579144841446,
+        "q_log_n_factorial": 12.801827480081469,
+        "witness_lower_bound_log": 12.603757566319377,
+        "upper_bound_log": 29.58257914484145,
+        "log_D_q_n_over_n_log_n": 1.495956886801538
+      },
+      {
+        "n": 10,
+        "q": 1,
+        "log_D_q_n": 31.885164237835493,
+        "q_log_n_factorial": 15.104412573075516,
+        "witness_lower_bound_log": 14.213195478753477,
+        "upper_bound_log": 31.885164237835493,
+        "log_D_q_n_over_n_log_n": 1.3847550883070856
+      },
+      {
+        "n": 11,
+        "q": 1,
+        "log_D_q_n": 35.02065845376464,
+        "q_log_n_factorial": 17.502307845873887,
+        "witness_lower_bound_log": 16.61109075155185,
+        "upper_bound_log": 37.41855372656302,
+        "log_D_q_n_over_n_log_n": 1.3277044494750196
+      },
+      {
+        "n": 12,
+        "q": 1,
+        "log_D_q_n": 37.50556510355264,
+        "q_log_n_factorial": 19.987214495661885,
+        "witness_lower_bound_log": 17.709703040219956,
+        "upper_bound_log": 39.90346037635102,
+        "log_D_q_n_over_n_log_n": 1.2577791438950172
+      },
+      {
+        "n": 13,
+        "q": 1,
+        "log_D_q_n": 37.50556510355264,
+        "q_log_n_factorial": 22.552163853123425,
+        "witness_lower_bound_log": 20.274652397681493,
+        "upper_bound_log": 42.46840973381256,
+        "log_D_q_n_over_n_log_n": 1.124795490059617
+      },
+      {
+        "n": 14,
+        "q": 1,
+        "log_D_q_n": 41.56600811409906,
+        "q_log_n_factorial": 25.19122118273868,
+        "witness_lower_bound_log": 20.274652397681493,
+        "upper_bound_log": 48.47476289341429,
+        "log_D_q_n_over_n_log_n": 1.125023146053196
+      },
+      {
+        "n": 15,
+        "q": 1,
+        "log_D_q_n": 50.442413029106,
+        "q_log_n_factorial": 27.89927138384089,
+        "witness_lower_bound_log": 25.717070108203284,
+        "upper_bound_log": 54.61680029900164,
+        "log_D_q_n_over_n_log_n": 1.2417892156892145
+      },
+      {
+        "n": 16,
+        "q": 1,
+        "log_D_q_n": 54.824439663779884,
+        "q_log_n_factorial": 30.671860106080672,
+        "witness_lower_bound_log": 27.326508020637387,
+        "upper_bound_log": 57.38938902124143,
+        "log_D_q_n_over_n_log_n": 1.2358585503508035
+      },
+      {
+        "n": 17,
+        "q": 1,
+        "log_D_q_n": 54.824439663779884,
+        "q_log_n_factorial": 33.50507345013689,
+        "witness_lower_bound_log": 30.159721364693603,
+        "upper_bound_log": 60.22260236529765,
+        "log_D_q_n_over_n_log_n": 1.138271865693248
+      },
+      {
+        "n": 18,
+        "q": 1,
+        "log_D_q_n": 63.89067869178181,
+        "q_log_n_factorial": 36.39544520803305,
+        "witness_lower_bound_log": 34.92189529949136,
+        "upper_bound_log": 66.72389203583803,
+        "log_D_q_n_over_n_log_n": 1.2280365457649713
+      },
+      {
+        "n": 19,
+        "q": 1,
+        "log_D_q_n": 63.89067869178181,
+        "q_log_n_factorial": 39.339884187199495,
+        "witness_lower_bound_log": 37.8663342786578,
+        "upper_bound_log": 69.66833101500447,
+        "log_D_q_n_over_n_log_n": 1.1420400705737914
+      },
+      {
+        "n": 20,
+        "q": 1,
+        "log_D_q_n": 70.59998303204011,
+        "q_log_n_factorial": 42.335616460753485,
+        "witness_lower_bound_log": 39.475772191091906,
+        "upper_bound_log": 76.37763535526277,
+        "log_D_q_n_over_n_log_n": 1.1783426652523215
+      }
+    ],
+    "q_2": [
+      {
+        "n": 1,
+        "q": 2,
+        "log_D_q_n": 2.4849066497880004,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 2.4849066497880004,
+        "log_D_q_n_over_n_log_n": null
+      },
+      {
+        "n": 2,
+        "q": 2,
+        "log_D_q_n": 5.480638923341991,
+        "q_log_n_factorial": 1.3862943611198906,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 5.480638923341991,
+        "log_D_q_n_over_n_log_n": 3.9534452978042594
+      },
+      {
+        "n": 3,
+        "q": 2,
+        "log_D_q_n": 9.623773649733524,
+        "q_log_n_factorial": 3.58351893845611,
+        "witness_lower_bound_log": 3.295836866004329,
+        "upper_bound_log": 9.623773649733524,
+        "log_D_q_n_over_n_log_n": 2.9199787613883927
+      },
+      {
+        "n": 4,
+        "q": 2,
+        "log_D_q_n": 12.396362371973305,
+        "q_log_n_factorial": 6.3561076606958915,
+        "witness_lower_bound_log": 3.295836866004329,
+        "upper_bound_log": 12.396362371973305,
+        "log_D_q_n_over_n_log_n": 2.2355213148885547
+      },
+      {
+        "n": 5,
+        "q": 2,
+        "log_D_q_n": 14.794257644771676,
+        "q_log_n_factorial": 9.574983485564092,
+        "witness_lower_bound_log": 4.90527477843843,
+        "upper_bound_log": 18.013133469639875,
+        "log_D_q_n_over_n_log_n": 1.8384378211144492
+      },
+      {
+        "n": 6,
+        "q": 2,
+        "log_D_q_n": 24.161601765557524,
+        "q_log_n_factorial": 13.158502424020202,
+        "witness_lower_bound_log": 10.32137518064285,
+        "upper_bound_log": 24.161601765557524,
+        "log_D_q_n_over_n_log_n": 2.247474449976172
+      },
+      {
+        "n": 7,
+        "q": 2,
+        "log_D_q_n": 24.161601765557524,
+        "q_log_n_factorial": 17.05032272213083,
+        "witness_lower_bound_log": 12.267285329698163,
+        "upper_bound_log": 28.053422063668148,
+        "log_D_q_n_over_n_log_n": 1.773801013759722
+      },
+      {
+        "n": 8,
+        "q": 2,
+        "log_D_q_n": 33.09960834202872,
+        "q_log_n_factorial": 21.2092058054905,
+        "witness_lower_bound_log": 12.267285329698163,
+        "upper_bound_log": 35.04551849108404,
+        "log_D_q_n_over_n_log_n": 1.989693367100492
+      },
+      {
+        "n": 9,
+        "q": 2,
+        "log_D_q_n": 42.38440662492292,
+        "q_log_n_factorial": 25.603654960162938,
+        "witness_lower_bound_log": 20.55355478248123,
+        "upper_bound_log": 42.38440662492292,
+        "log_D_q_n_over_n_log_n": 2.1433305281837356
+      },
+      {
+        "n": 10,
+        "q": 2,
+        "log_D_q_n": 46.98957681091101,
+        "q_log_n_factorial": 30.20882514615103,
+        "witness_lower_bound_log": 23.772430607349428,
+        "upper_bound_log": 46.98957681091102,
+        "log_D_q_n_over_n_log_n": 2.040731391594765
+      },
+      {
+        "n": 11,
+        "q": 2,
+        "log_D_q_n": 50.12507102684016,
+        "q_log_n_factorial": 35.00461569174777,
+        "witness_lower_bound_log": 26.1703258801478,
+        "upper_bound_log": 54.920861572436905,
+        "log_D_q_n_over_n_log_n": 1.9003434764212142
+      },
+      {
+        "n": 12,
+        "q": 2,
+        "log_D_q_n": 57.49277959921453,
+        "q_log_n_factorial": 39.97442899132377,
+        "witness_lower_bound_log": 28.367550457484022,
+        "upper_bound_log": 59.8906748720129,
+        "log_D_q_n_over_n_log_n": 1.928066379077041
+      },
+      {
+        "n": 13,
+        "q": 2,
+        "log_D_q_n": 57.49277959921453,
+        "q_log_n_factorial": 45.10432770624685,
+        "witness_lower_bound_log": 30.932499814945558,
+        "upper_bound_log": 65.02057358693598,
+        "log_D_q_n_over_n_log_n": 1.7242139673310122
+      },
+      {
+        "n": 14,
+        "q": 2,
+        "log_D_q_n": 64.81131914778243,
+        "q_log_n_factorial": 50.38244236547736,
+        "witness_lower_bound_log": 30.932499814945558,
+        "upper_bound_log": 73.66598407615297,
+        "log_D_q_n_over_n_log_n": 1.7541793757857553
+      },
+      {
+        "n": 15,
+        "q": 2,
+        "log_D_q_n": 76.73224650051279,
+        "q_log_n_factorial": 55.79854276768178,
+        "witness_lower_bound_log": 41.81733523598914,
+        "upper_bound_log": 82.51607168284254,
+        "log_D_q_n_over_n_log_n": 1.888991237293947
+      },
+      {
+        "n": 16,
+        "q": 2,
+        "log_D_q_n": 85.49629976986056,
+        "q_log_n_factorial": 61.343720212161344,
+        "witness_lower_bound_log": 45.03621106085735,
+        "upper_bound_log": 88.0612491273221,
+        "log_D_q_n_over_n_log_n": 1.9272669951927195
+      },
+      {
+        "n": 17,
+        "q": 2,
+        "log_D_q_n": 85.49629976986056,
+        "q_log_n_factorial": 67.01014690027378,
+        "witness_lower_bound_log": 47.869424404913566,
+        "upper_bound_log": 93.72767581543454,
+        "log_D_q_n_over_n_log_n": 1.7750848571499795
+      },
+      {
+        "n": 18,
+        "q": 2,
+        "log_D_q_n": 100.28612389981487,
+        "q_log_n_factorial": 72.7908904160661,
+        "witness_lower_bound_log": 57.39377227450907,
+        "upper_bound_log": 103.11933724387109,
+        "log_D_q_n_over_n_log_n": 1.9275898723224532
+      },
+      {
+        "n": 19,
+        "q": 2,
+        "log_D_q_n": 100.28612389981487,
+        "q_log_n_factorial": 78.67976837439899,
+        "witness_lower_bound_log": 60.33821125367551,
+        "upper_bound_log": 109.00821520220397,
+        "log_D_q_n_over_n_log_n": 1.7926053433964935
+      },
+      {
+        "n": 20,
+        "q": 2,
+        "log_D_q_n": 112.9355994927936,
+        "q_log_n_factorial": 84.67123292150697,
+        "witness_lower_bound_log": 63.55708707854372,
+        "upper_bound_log": 118.71325181601625,
+        "log_D_q_n_over_n_log_n": 1.8849414630569157
+      }
+    ],
+    "q_3": [
+      {
+        "n": 1,
+        "q": 3,
+        "log_D_q_n": 2.4849066497880004,
+        "q_log_n_factorial": 0.0,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 2.4849066497880004,
+        "log_D_q_n_over_n_log_n": null
+      },
+      {
+        "n": 2,
+        "q": 3,
+        "log_D_q_n": 6.173786103901937,
+        "q_log_n_factorial": 2.0794415416798357,
+        "witness_lower_bound_log": 0.0,
+        "upper_bound_log": 6.173786103901936,
+        "log_D_q_n_over_n_log_n": 4.45344529780426
+      },
+      {
+        "n": 3,
+        "q": 3,
+        "log_D_q_n": 11.415533118961578,
+        "q_log_n_factorial": 5.375278407684165,
+        "witness_lower_bound_log": 4.394449154672439,
+        "upper_bound_log": 11.415533118961578,
+        "log_D_q_n_over_n_log_n": 3.463622012578879
+      },
+      {
+        "n": 4,
+        "q": 3,
+        "log_D_q_n": 15.57441620232125,
+        "q_log_n_factorial": 9.534161491043838,
+        "witness_lower_bound_log": 4.394449154672439,
+        "upper_bound_log": 15.57441620232125,
+        "log_D_q_n_over_n_log_n": 2.808641627478699
+      },
+      {
+        "n": 5,
+        "q": 3,
+        "log_D_q_n": 19.58174938755372,
+        "q_log_n_factorial": 14.362475228346138,
+        "witness_lower_bound_log": 6.00388706710654,
+        "upper_bound_log": 22.80062521242192,
+        "log_D_q_n_over_n_log_n": 2.433364994855682
+      },
+      {
+        "n": 6,
+        "q": 3,
+        "log_D_q_n": 30.740852977567624,
+        "q_log_n_factorial": 19.737753636030305,
+        "witness_lower_bound_log": 14.12803767041317,
+        "upper_bound_log": 30.740852977567624,
+        "log_D_q_n_over_n_log_n": 2.85946611933834
+      },
+      {
+        "n": 7,
+        "q": 3,
+        "log_D_q_n": 32.686763126622935,
+        "q_log_n_factorial": 25.575484083196244,
+        "witness_lower_bound_log": 16.073947819468483,
+        "upper_bound_log": 36.578583424733566,
+        "log_D_q_n_over_n_log_n": 2.3996676268863166
+      },
+      {
+        "n": 8,
+        "q": 3,
+        "log_D_q_n": 43.70421124477397,
+        "q_log_n_factorial": 31.813808708235754,
+        "witness_lower_bound_log": 16.073947819468483,
+        "upper_bound_log": 45.650121393829295,
+        "log_D_q_n_over_n_log_n": 2.6271603678666287
+      },
+      {
+        "n": 9,
+        "q": 3,
+        "log_D_q_n": 55.18623410500439,
+        "q_log_n_factorial": 38.405482440244405,
+        "witness_lower_bound_log": 28.503351998643083,
+        "upper_bound_log": 55.18623410500439,
+        "log_D_q_n_over_n_log_n": 2.7907041695659327
+      },
+      {
+        "n": 10,
+        "q": 3,
+        "log_D_q_n": 62.093989383986525,
+        "q_log_n_factorial": 45.31323771922655,
+        "witness_lower_bound_log": 33.331665735945386,
+        "upper_bound_log": 62.09398938398653,
+        "log_D_q_n_over_n_log_n": 2.6967076948824444
+      },
+      {
+        "n": 11,
+        "q": 3,
+        "log_D_q_n": 67.62737887271405,
+        "q_log_n_factorial": 52.50692353762166,
+        "witness_lower_bound_log": 35.72956100874376,
+        "upper_bound_log": 72.42316941831079,
+        "log_D_q_n_over_n_log_n": 2.563891594276499
+      },
+      {
+        "n": 12,
+        "q": 3,
+        "log_D_q_n": 77.47999409487642,
+        "q_log_n_factorial": 59.96164348698565,
+        "witness_lower_bound_log": 39.02539787474809,
+        "upper_bound_log": 79.87788936767478,
+        "log_D_q_n_over_n_log_n": 2.5983536142590644
+      },
+      {
+        "n": 13,
+        "q": 3,
+        "log_D_q_n": 80.04494345233795,
+        "q_log_n_factorial": 67.65649155937027,
+        "witness_lower_bound_log": 41.59034723220962,
+        "upper_bound_log": 87.5727374400594,
+        "log_D_q_n_over_n_log_n": 2.400555521525484
+      },
+      {
+        "n": 14,
+        "q": 3,
+        "log_D_q_n": 90.00254033052111,
+        "q_log_n_factorial": 75.57366354821605,
+        "witness_lower_bound_log": 41.59034723220962,
+        "upper_bound_log": 98.85720525889165,
+        "log_D_q_n_over_n_log_n": 2.436003495872801
+      },
+      {
+        "n": 15,
+        "q": 3,
+        "log_D_q_n": 104.63151788435368,
+        "q_log_n_factorial": 83.69781415152266,
+        "witness_lower_bound_log": 57.917600363775,
+        "upper_bound_log": 110.41534306668342,
+        "log_D_q_n_over_n_log_n": 2.5758143341598654
+      },
+      {
+        "n": 16,
+        "q": 3,
+        "log_D_q_n": 116.16815987594123,
+        "q_log_n_factorial": 92.01558031824202,
+        "witness_lower_bound_log": 62.7459141010773,
+        "upper_bound_log": 118.73310923340277,
+        "log_D_q_n_over_n_log_n": 2.6186754400346355
+      },
+      {
+        "n": 17,
+        "q": 3,
+        "log_D_q_n": 119.00137321999745,
+        "q_log_n_factorial": 100.51522035041067,
+        "witness_lower_bound_log": 65.57912744513351,
+        "upper_bound_log": 127.23274926557143,
+        "log_D_q_n_over_n_log_n": 2.470721378018476
+      },
+      {
+        "n": 18,
+        "q": 3,
+        "log_D_q_n": 136.6815691078479,
+        "q_log_n_factorial": 109.18633562409916,
+        "witness_lower_bound_log": 79.86564924952678,
+        "upper_bound_log": 139.51478245190413,
+        "log_D_q_n_over_n_log_n": 2.627143198879935
+      },
+      {
+        "n": 19,
+        "q": 3,
+        "log_D_q_n": 139.62600808701436,
+        "q_log_n_factorial": 118.01965256159849,
+        "witness_lower_bound_log": 82.81008822869322,
+        "upper_bound_log": 148.34809938940347,
+        "log_D_q_n_over_n_log_n": 2.4958021951665637
+      },
+      {
+        "n": 20,
+        "q": 3,
+        "log_D_q_n": 155.27121595354708,
+        "q_log_n_factorial": 127.00684938226046,
+        "witness_lower_bound_log": 87.63840196599553,
+        "upper_bound_log": 161.04886827676972,
+        "log_D_q_n_over_n_log_n": 2.5915402608615103
+      }
+    ]
+  },
+  "Bq_two_sided_denominator_theorem": {
+    "classification": "PROVED_TWO_SIDED_DENOMINATOR_ASYMPTOTIC",
+    "tradeoff_classification": "GAMMA_RATIO_FACTORIAL_BUDGET_TRADEOFF_PROVED",
+    "theorem_statement": "For every integer q >= 0 and all n >= 3, the sample denominator LCM D_{q,n} := lcm_{0 <= m <= n} den(B_q(m)) satisfies the unconditional two-sided bound: q * log(n!) + sum_{3 <= p <= n} (1 - q * floor(log_p n)) * log(p) <= log D_{q,n} <= q * log(n!) + vartheta(2n + 1) + log(2), and hence log D_{q,n} = q * n * log(n) + O_q(n).",
+    "irregular_prime_immunity_proof": "For any odd prime 3 <= p <= n, let d_p = (p - 1)/2 <= (n - 1)/2 and K_p = floor(n / d_p) >= 2. Among the two consecutive integers {K_p, K_p - 1}, at least one k_p satisfies k_p != -1 (mod p). Setting m_p = k_p * d_p in [n - p + 2, n], we have: (1) (p - 1) | 2*m_p, so by von Staudt-Clausen v_p(B_{2*m_p}) = -1 (hence p divides the denominator of B_{2*m_p} and CANNOT divide its numerator, completely eliminating irregular-prime numerator cancellation!); (2) 2*m_p - 1 = k_p*(p - 1) - 1 == -(k_p + 1) != 0 (mod p), so v_p(2*m_p - 1) = 0; (3) therefore v_p(den(B_q(m_p))) = 1 + q * v_p(m_p!) >= 1 + q * (v_p(n!) - floor(log_p n)), since n - m_p < p - 1 implies at most one multiple of p^j can lie in (m_p, n] for each 1 <= j <= floor(log_p n).",
+    "all_witnesses_verified_q_0_to_3_n_1_to_20": true
+  },
+  "Bq_generating_function_radii": {
+    "q_eq_0": {
+      "R_OGF": "0 (divergent: |B_0(m)| ~ (2m)! / pi^{2m})",
+      "R_OGF_float": 0.0
+    },
+    "q_eq_1": {
+      "R_OGF": "0 (divergent: |B_1(m)| ~ (2m)! / (m! * pi^{2m}) ~ (4/pi^2)^m * m!)",
+      "R_OGF_float": 0.0
+    },
+    "q_eq_2": {
+      "R_OGF": "pi^2 = tau^2 / 4 (since |B_2(m)| = (2m - 1) * binom(2m, m) * tau^{-2m} * zeta(2m) ~ (2*sqrt(m)/sqrt(pi)) * pi^{-2m})",
+      "R_OGF_float": 9.869604401089358
+    },
+    "q_ge_3": {
+      "R_OGF": "+infty (entire OGF of order 1/(q - 2))",
+      "R_OGF_float": null
+    }
+  },
+  "factorial_budget_conservation_table": {
+    "conservation_law": "Sample growth exponent (2 - q)*n*log(n) + Sample denominator exponent q*n*log(n) = 2*n*log(n)",
+    "rows": [
+      {
+        "kernel": "K_0(z) = B_0(z) / B(z) (q = 0)",
+        "q": 0,
+        "sample_growth_n_log_n_coeff": 2,
+        "sample_denominator_n_log_n_coeff": 0,
+        "sum_sample_plus_den_coeff": 2,
+        "ogf_radius": "0",
+        "equispaced_newton_basis_den_coeff": 1,
+        "dominant_obstruction": "Divergent OGF (R=0) and factorial sample growth 2n log n + Newton basis n log n"
+      },
+      {
+        "kernel": "B_1(z) = K_0(z)/Gamma(z+1) (q = 1)",
+        "q": 1,
+        "sample_growth_n_log_n_coeff": 1,
+        "sample_denominator_n_log_n_coeff": 1,
+        "sum_sample_plus_den_coeff": 2,
+        "ogf_radius": "0",
+        "equispaced_newton_basis_den_coeff": 1,
+        "dominant_obstruction": "Divergent OGF (R=0), sample growth n log n, and sample denominator n log n"
+      },
+      {
+        "kernel": "B_2(z) = K_0(z)/Gamma(z+1)^2 (q = 2)",
+        "q": 2,
+        "sample_growth_n_log_n_coeff": 0,
+        "sample_denominator_n_log_n_coeff": 2,
+        "sum_sample_plus_den_coeff": 2,
+        "ogf_radius": "pi^2 = tau^2 / 4",
+        "equispaced_newton_basis_den_coeff": 1,
+        "dominant_obstruction": "Sample denominator 2n log n (identical to R_tau!) + algebraic finite-difference tail"
+      },
+      {
+        "kernel": "R_tau(z) = 2^q * B_2-like / Gamma(2z+1) (Euler)",
+        "q": 2,
+        "sample_growth_n_log_n_coeff": 0,
+        "sample_denominator_n_log_n_coeff": 2,
+        "sum_sample_plus_den_coeff": 2,
+        "ogf_radius": "tau^2 = 4*pi^2",
+        "equispaced_newton_basis_den_coeff": 1,
+        "dominant_obstruction": "Primitive norm polynomial lower bound log tilde{Q}_n(gamma_1) >= 2n log n - O(n)"
+      },
+      {
+        "kernel": "B_3(z) = K_0(z)/Gamma(z+1)^3 (q = 3)",
+        "q": 3,
+        "sample_growth_n_log_n_coeff": -1,
+        "sample_denominator_n_log_n_coeff": 3,
+        "sum_sample_plus_den_coeff": 2,
+        "ogf_radius": "+infty",
+        "equispaced_newton_basis_den_coeff": 1,
+        "dominant_obstruction": "Sample denominator 3n log n + left-half-plane Gamma pole growth"
+      }
+    ]
+  },
+  "sign_adjusted_positive_kernel_P": {
+    "definition": "P(z) := -exp(i * tau * z / 2) * B(z) = 2 * z * exp(i * pi * z) * zeta(1 - 2z)",
+    "value_at_z_eq_0": "P(0) = -1",
+    "positive_integer_samples": "P(m) = -(-1)^m * B_{2m} = (-1)^{m+1} * B_{2m} = |B_{2m}| > 0  (for all m >= 1)",
+    "nontrivial_zero_vanishing": "P(rho / 2) = 0 for every nontrivial zero rho of zeta(s)",
+    "conjugate_symmetry_broken": "Because exp(i*tau*z/2) = exp(i*pi*z) satisfies conj(exp(i*pi*conj(z))) = exp(-i*pi*z) != exp(i*pi*z), P(conj(z)) != conj(P(z)); its real-real sister P_cos(z) = -cos(tau*z/2)*B(z) restores P_cos(conj(z)) = conj(P_cos(z)) and satisfies P_cos(m) = |B_{2m}| > 0 (m >= 1) and P_cos(rho/2) = 0.",
+    "lean_theorem": "sign_adjusted_bernoulli_positive_sample_identity"
+  },
+  "bernoulli_stieltjes_moment_measure": {
+    "classification": "BERNOULLI_EVEN_ABSOLUTE_VALUES_STIELTJES_MOMENT_SEQUENCE_PROVED",
+    "moment_definition": "mu_m := P(m + 1) = (-1)^m * B_{2m+2} = |B_{2m+2}| > 0  (m >= 0)",
+    "positive_stieltjes_measure_tau": "mu_m = int_0^infty y^m d nu_tau(y), where d nu_tau(y) = (tau * sqrt(y) / (4 * sinh^2(tau * sqrt(y) / 2))) dy on (0, infty)",
+    "positive_stieltjes_measure_pi": "mu_m = int_0^infty y^m d nu_pi(y), where d nu_pi(y) = (pi * sqrt(y) / (2 * sinh^2(pi * sqrt(y)))) dy on (0, infty)",
+    "support_of_measure": "[0, +infty) (unbounded Stieltjes moment problem; Carleman condition sum mu_m^{-1/(2m)} = +infty fails since mu_m^{-1/(2m)} ~ pi / m -> 0, wait: sum (1/m) = +infty! So Carleman's condition sum_{m>=1} mu_m^{-1/(2m)} = +infty HOLDS and the moment problem is determinate!)",
+    "carleman_determinacy": "mu_m ~ 4*sqrt(pi*m)*(m / (pi*e))^{2m+2} => mu_m^{-1/(2m)} ~ pi*e / m => sum_{m=1}^infty mu_m^{-1/(2m)} = +infty (Carleman determinate Stieltjes moment sequence)",
+    "quadrature_verification_rows": [
+      {
+        "m": 0,
+        "exact_mu_m_str": "1/6",
+        "exact_mu_m_float": 0.16666666666666666,
+        "stieltjes_integral_float": 0.16666666666666666,
+        "abs_error": 0.0
+      },
+      {
+        "m": 1,
+        "exact_mu_m_str": "1/30",
+        "exact_mu_m_float": 0.03333333333333333,
+        "stieltjes_integral_float": 0.03333333333333333,
+        "abs_error": 0.0
+      },
+      {
+        "m": 2,
+        "exact_mu_m_str": "1/42",
+        "exact_mu_m_float": 0.023809523809523808,
+        "stieltjes_integral_float": 0.023809523809523808,
+        "abs_error": 0.0
+      },
+      {
+        "m": 3,
+        "exact_mu_m_str": "1/30",
+        "exact_mu_m_float": 0.03333333333333333,
+        "stieltjes_integral_float": 0.03333333333333333,
+        "abs_error": 0.0
+      },
+      {
+        "m": 4,
+        "exact_mu_m_str": "5/66",
+        "exact_mu_m_float": 0.07575757575757576,
+        "stieltjes_integral_float": 0.07575757575757576,
+        "abs_error": 0.0
+      },
+      {
+        "m": 5,
+        "exact_mu_m_str": "691/2730",
+        "exact_mu_m_float": 0.2531135531135531,
+        "stieltjes_integral_float": 0.2531135531135531,
+        "abs_error": 4.3790577010150533e-47
+      }
+    ]
+  },
+  "bernoulli_hankel_determinants": {
+    "definition": "H_n^B := det(mu_{i+j})_{0 <= i,j < n} = det(|B_{2i+2j+2}|)_{0 <= i,j < n}",
+    "carlitz_touchard_jacobi_recurrence": "beta_k^B = H_{k+1}^B * H_{k-1}^B / (H_k^B)^2 = k^3 * (k + 1) * (2k - 1) * (2k + 1)^3 / ((4k - 1) * (4k + 1)^2 * (4k + 3))",
+    "closed_form_product_formula": "H_n^B = 6^{-n} * prod_{k=1}^{n-1} [k^3 * (k + 1) * (2k - 1) * (2k + 1)^3 / ((4k - 1) * (4k + 1)^2 * (4k + 3))]^{n - k} > 0",
+    "asymptotic_log_H_n_B": "log H_n^B = 2 * n^2 * log(n) - (3 + 2*log 2) * n^2 + O(n * log n) -> +infty",
+    "all_positive_verified": true,
+    "all_product_formula_verified": true,
+    "lean_theorem": "carlitz_touchard_hankel_recurrence_positivity",
+    "rows": [
+      {
+        "n": 1,
+        "H_n_B_str": "1/6",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -1.791759469228055,
+        "log_num_H_n_B": 0.0,
+        "log_den_H_n_B": 1.791759469228055,
+        "log_H_n_B_over_n2_log_n": null,
+        "log_D_n_tau": -3.1780538303479458,
+        "log_D_n_tau_over_n2_log_n": null
+      },
+      {
+        "n": 2,
+        "H_n_B_str": "1/350",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -5.857933154483459,
+        "log_num_H_n_B": 0.0,
+        "log_den_H_n_B": 5.857933154483459,
+        "log_H_n_B_over_n2_log_n": -2.1128027779580822,
+        "log_D_n_tau": -15.392094645527296,
+        "log_D_n_tau_over_n2_log_n": -5.55152465349895
+      },
+      {
+        "n": 3,
+        "H_n_B_str": "4/56595",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -9.557381559946629,
+        "log_num_H_n_B": 1.3862943611198906,
+        "log_den_H_n_B": 10.94367592106652,
+        "log_H_n_B_over_n2_log_n": -0.9666115110781573,
+        "log_D_n_tau": -39.11697875947255,
+        "log_D_n_tau_over_n2_log_n": -3.956200943777858
+      },
+      {
+        "n": 4,
+        "H_n_B_str": "128/11022011",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -11.363374567509197,
+        "log_num_H_n_B": 4.852030263919617,
+        "log_den_H_n_B": 16.215404831428813,
+        "log_H_n_B_over_n2_log_n": -0.5123088792596653,
+        "log_D_n_tau": -75.85029578448125,
+        "log_D_n_tau_over_n2_log_n": -3.4196514243197544
+      },
+      {
+        "n": 5,
+        "H_n_B_str": "955514880/25257378862001",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -10.182378566595098,
+        "log_num_H_n_B": 20.677760894521775,
+        "log_den_H_n_B": 30.860139461116873,
+        "log_H_n_B_over_n2_log_n": -0.2530667008134624,
+        "log_D_n_tau": -126.67511740011079,
+        "log_D_n_tau_over_n2_log_n": -3.1483070312051593
+      },
+      {
+        "n": 6,
+        "H_n_B_str": "(63b / 70b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -5.1593770339617535,
+        "log_num_H_n_B": 43.123564731654284,
+        "log_den_H_n_B": 48.28294176561604,
+        "log_H_n_B_over_n2_log_n": -0.07998619858440306,
+        "log_D_n_tau": -192.44150580852258,
+        "log_D_n_tau_over_n2_log_n": -2.983434705035001
+      },
+      {
+        "n": 7,
+        "H_n_B_str": "(92b / 85b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 4.408473668924181,
+        "log_num_H_n_B": 63.15696860978555,
+        "log_den_H_n_B": 58.74849494086137,
+        "log_H_n_B_over_n2_log_n": 0.046234843078384276,
+        "log_D_n_tau": -273.849565670844,
+        "log_D_n_tau_over_n2_log_n": -2.8720579154474066
+      },
+      {
+        "n": 8,
+        "H_n_B_str": "(139b / 111b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 19.118180590961614,
+        "log_num_H_n_B": 95.93585821406488,
+        "log_den_H_n_B": 76.81767762310326,
+        "log_H_n_B_over_n2_log_n": 0.1436547100489581,
+        "log_D_n_tau": -371.4946299858676,
+        "log_D_n_tau_over_n2_log_n": -2.7914242729036025
+      },
+      {
+        "n": 9,
+        "H_n_B_str": "(194b / 137b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 39.48877655973814,
+        "log_num_H_n_B": 134.10577458299653,
+        "log_den_H_n_B": 94.61699802325839,
+        "log_H_n_B_over_n2_log_n": 0.2218779841739261,
+        "log_D_n_tau": -485.89463341203856,
+        "log_D_n_tau_over_n2_log_n": -2.730125650241386
+      },
+      {
+        "n": 10,
+        "H_n_B_str": "(255b / 160b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 65.97941610216539,
+        "log_num_H_n_B": 176.51598942677336,
+        "log_den_H_n_B": 110.53657332460797,
+        "log_H_n_B_over_n2_log_n": 0.2865449633236899,
+        "log_D_n_tau": -617.5079710933568,
+        "log_D_n_tau_over_n2_log_n": -2.681803043771176
+      }
+    ]
+  },
+  "bernoulli_orthogonal_polynomials": {
+    "definition": "Monic orthogonal polynomials P_n^B(y) with respect to d nu_tau(y) on (0, infty): int_0^infty P_m^B(y) P_n^B(y) d nu_tau(y) = (H_{n+1}^B / H_n^B) delta_{m,n}",
+    "zeros_location": "All n zeros y_{n,1} < ... < y_{n,n} of P_n^B(y) are real, simple, and strictly positive on (0, infty), with largest zero scaling like Theta(n^2)",
+    "rows_1_to_6": [
+      {
+        "n": 1,
+        "monic_coeffs_str": [
+          "-1/5",
+          "1"
+        ],
+        "log_primitive_multiplier": 1.6094379124341003,
+        "log_abs_prim_P_n_at_gamma1": 4.243821848863093,
+        "log_abs_prim_P_n_at_alpha1": 3.5649503031992724
+      },
+      {
+        "n": 2,
+        "monic_coeffs_str": [
+          "4/21",
+          "-5/3",
+          "1"
+        ],
+        "log_primitive_multiplier": 3.044522437723423,
+        "log_abs_prim_P_n_at_gamma1": 8.2174072744937,
+        "log_abs_prim_P_n_at_alpha1": 6.972125573450436
+      },
+      {
+        "n": 3,
+        "monic_coeffs_str": [
+          "-60/143",
+          "707/143",
+          "-70/13",
+          "1"
+        ],
+        "log_primitive_multiplier": 4.962844630259907,
+        "log_abs_prim_P_n_at_gamma1": 12.46814530228802,
+        "log_abs_prim_P_n_at_alpha1": 10.974371087877996
+      },
+      {
+        "n": 4,
+        "monic_coeffs_str": [
+          "4032/2431",
+          "-5260/221",
+          "609/17",
+          "-210/17",
+          "1"
+        ],
+        "log_primitive_multiplier": 7.796057974316123,
+        "log_abs_prim_P_n_at_gamma1": 17.176492661038427,
+        "log_abs_prim_P_n_at_alpha1": 16.11802572308885
+      },
+      {
+        "n": 5,
+        "monic_coeffs_str": [
+          "-43200/4199",
+          "385836/2261",
+          "-103015/323",
+          "2937/19",
+          "-165/7",
+          "1"
+        ],
+        "log_primitive_multiplier": 10.288511829739507,
+        "log_abs_prim_P_n_at_gamma1": 17.579491708629643,
+        "log_abs_prim_P_n_at_alpha1": 21.1737427900705
+      },
+      {
+        "n": 6,
+        "monic_coeffs_str": [
+          "684288/7429",
+          "-317785104/185725",
+          "8200192/2185",
+          "-1316029/575",
+          "57057/115",
+          "-1001/25",
+          "1"
+        ],
+        "log_primitive_multiplier": 12.132022364020006,
+        "log_abs_prim_P_n_at_gamma1": 25.34824787685017,
+        "log_abs_prim_P_n_at_alpha1": 25.820497329363302
+      }
+    ]
+  },
+  "bernoulli_hankel_argument_coupling_audit": {
+    "classification": "BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT",
+    "firewall_explanation": "The Stieltjes moment sequence mu_m = |B_{2m+2}| = int_0^infty y^m d nu_tau(y) generates the asymptotic Stieltjes continued fraction for the trigamma/polygamma generating function S_B(w) = int_0^infty d nu_tau(y) / (w - y) ~ sum_{m=0}^infty |B_{2m+2}| / w^{m+1} as |w| -> infty. Here w is the Laplace/Stieltjes transform dual variable to the integration variable y = x^2, NOT the Mellin argument z of P(z) = -exp(i*tau*z/2)*B(z). In particular, P(rho_1/2) = 0 is a point zero in the Mellin index variable z (measuring a complex-exponent moment int_0^infty y^{rho_1/2 - 1} d nu_tau(y)), whereas the orthogonal polynomials P_n^B(y) are polynomials in the integration variable y on (0, infty) whose zeros all lie on (0, infty) and whose evaluations at y = gamma_1 or y = alpha_1 diverge super-factorially.",
+    "couples_to_zeta_zero_argument": false
+  },
+  "hankel_determinant_comparison_D_tau_vs_H_B": {
+    "D_n_tau_formula": "D_n^{(tau)} = det(tau^{-2i-2j-2} zeta(2i+2j+2)) = 24^{-n} prod_{k=1}^{n-1} [16*(4k-1)(4k+1)^2(4k+3)]^{-(n-k)}",
+    "H_n_B_formula": "H_n^B = det(|B_{2i+2j+2}|) = 6^{-n} prod_{k=1}^{n-1} [k^3(k+1)(2k-1)(2k+1)^3 / ((4k-1)(4k+1)^2(4k+3))]^{n-k}",
+    "exact_denominator_polygonal_match": "Notice that BOTH D_n^{(tau)} and H_n^B share the exact same Lambert-Stieltjes denominator factors prod_{k=1}^{n-1} [(4k-1)(4k+1)^2(4k+3)]^{n-k}! Removing 1/(2*(2m+2)!) from b_m^{(tau)} to form mu_m = |B_{2m+2}| multiplies the k-th Jacobi recurrence coefficient by 4*k^3*(k+1)*(2k-1)*(2k+1)^3, flipping the leading asymptotic from -2*n^2*log(n) (super-factorial decay) to +2*n^2*log(n) (super-factorial growth).",
+    "comparison_rows": [
+      {
+        "n": 1,
+        "H_n_B_str": "1/6",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -1.791759469228055,
+        "log_num_H_n_B": 0.0,
+        "log_den_H_n_B": 1.791759469228055,
+        "log_H_n_B_over_n2_log_n": null,
+        "log_D_n_tau": -3.1780538303479458,
+        "log_D_n_tau_over_n2_log_n": null
+      },
+      {
+        "n": 2,
+        "H_n_B_str": "1/350",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -5.857933154483459,
+        "log_num_H_n_B": 0.0,
+        "log_den_H_n_B": 5.857933154483459,
+        "log_H_n_B_over_n2_log_n": -2.1128027779580822,
+        "log_D_n_tau": -15.392094645527296,
+        "log_D_n_tau_over_n2_log_n": -5.55152465349895
+      },
+      {
+        "n": 3,
+        "H_n_B_str": "4/56595",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -9.557381559946629,
+        "log_num_H_n_B": 1.3862943611198906,
+        "log_den_H_n_B": 10.94367592106652,
+        "log_H_n_B_over_n2_log_n": -0.9666115110781573,
+        "log_D_n_tau": -39.11697875947255,
+        "log_D_n_tau_over_n2_log_n": -3.956200943777858
+      },
+      {
+        "n": 4,
+        "H_n_B_str": "128/11022011",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -11.363374567509197,
+        "log_num_H_n_B": 4.852030263919617,
+        "log_den_H_n_B": 16.215404831428813,
+        "log_H_n_B_over_n2_log_n": -0.5123088792596653,
+        "log_D_n_tau": -75.85029578448125,
+        "log_D_n_tau_over_n2_log_n": -3.4196514243197544
+      },
+      {
+        "n": 5,
+        "H_n_B_str": "955514880/25257378862001",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -10.182378566595098,
+        "log_num_H_n_B": 20.677760894521775,
+        "log_den_H_n_B": 30.860139461116873,
+        "log_H_n_B_over_n2_log_n": -0.2530667008134624,
+        "log_D_n_tau": -126.67511740011079,
+        "log_D_n_tau_over_n2_log_n": -3.1483070312051593
+      },
+      {
+        "n": 6,
+        "H_n_B_str": "(63b / 70b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": -5.1593770339617535,
+        "log_num_H_n_B": 43.123564731654284,
+        "log_den_H_n_B": 48.28294176561604,
+        "log_H_n_B_over_n2_log_n": -0.07998619858440306,
+        "log_D_n_tau": -192.44150580852258,
+        "log_D_n_tau_over_n2_log_n": -2.983434705035001
+      },
+      {
+        "n": 7,
+        "H_n_B_str": "(92b / 85b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 4.408473668924181,
+        "log_num_H_n_B": 63.15696860978555,
+        "log_den_H_n_B": 58.74849494086137,
+        "log_H_n_B_over_n2_log_n": 0.046234843078384276,
+        "log_D_n_tau": -273.849565670844,
+        "log_D_n_tau_over_n2_log_n": -2.8720579154474066
+      },
+      {
+        "n": 8,
+        "H_n_B_str": "(139b / 111b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 19.118180590961614,
+        "log_num_H_n_B": 95.93585821406488,
+        "log_den_H_n_B": 76.81767762310326,
+        "log_H_n_B_over_n2_log_n": 0.1436547100489581,
+        "log_D_n_tau": -371.4946299858676,
+        "log_D_n_tau_over_n2_log_n": -2.7914242729036025
+      },
+      {
+        "n": 9,
+        "H_n_B_str": "(194b / 137b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 39.48877655973814,
+        "log_num_H_n_B": 134.10577458299653,
+        "log_den_H_n_B": 94.61699802325839,
+        "log_H_n_B_over_n2_log_n": 0.2218779841739261,
+        "log_D_n_tau": -485.89463341203856,
+        "log_D_n_tau_over_n2_log_n": -2.730125650241386
+      },
+      {
+        "n": 10,
+        "H_n_B_str": "(255b / 160b)",
+        "H_n_B_positive": true,
+        "matches_carlitz_touchard_product": true,
+        "log_H_n_B": 65.97941610216539,
+        "log_num_H_n_B": 176.51598942677336,
+        "log_den_H_n_B": 110.53657332460797,
+        "log_H_n_B_over_n2_log_n": 0.2865449633236899,
+        "log_D_n_tau": -617.5079710933568,
+        "log_D_n_tau_over_n2_log_n": -2.681803043771176
+      }
+    ]
+  },
+  "lagrange_equispaced_interpolation_audit": {
+    "classification": "EQUISPACED_NEWTON_LAGRANGE_BASIS_REINTRODUCES_FACTORIAL_DENOMINATOR",
+    "lagrange_basis_formula": "ell_{n,m}(z) = prod_{0 <= j <= n, j != m} ((z - j) / (m - j)) = ((-1)^{n - m} / (m! * (n - m)!)) * prod_{j != m} (z - j)",
+    "basis_denominator_identity": "Multiplying ell_{n,m}(z) by n! gives (-1)^{n - m} * binom(n, m) * prod_{j != m} (z - j), whose leading coefficient is (-1)^{n - m} * binom(n, m) / n!. Thus clearing the Lagrange basis denominators on equispaced nodes {0, ..., n} requires a factor of order n! = exp(n log n - n + O(log n)) (or (n!)^2 = exp(2n log n + O(n)) in the conjugate-squared norm polynomial)."
+  },
+  "newton_forward_difference_bernoulli_audit": {
+    "classification": "EQUISPACED_NEWTON_LAGRANGE_BASIS_REINTRODUCES_FACTORIAL_DENOMINATOR",
+    "universal_primitive_cancellation_theorem": "For ANY rational sequence f(m) in Q with Delta^{n+1} f(0) != 0, the two-step Newton norm polynomial Q_n^{[f]}(Y) = |N_n^{[f]}(alpha(Y))|^2 + |N_{n+1}^{[f]}(alpha(Y))|^2 in Q[Y] has leading coefficient q_{n,2n+2}^{[f]} = (Delta^{n+1} f(0))^2 / (4^{n+1} * ((n+1)!)^2) > 0, and satisfies Q_n^{[f]}(Y) >= (1/2) * q_{n,2n+2}^{[f]} * prod_{j=0}^n ((2j - 1/2)^2 + Y^2). Therefore, in the canonical primitive integer normalization tilde{Q}_n^{[f]}(Y) = M_n^{[f]} Q_n^{[f]}(Y) in Z[Y], the integer leading coefficient tilde{q}_{n,2n+2}^{[f]} = M_n^{[f]} q_{n,2n+2}^{[f]} >= 1 forces tilde{Q}_n^{[f]}(gamma_1) >= (1/2) * prod_{j=0}^n ((2j - 1/2)^2 + gamma_1^2) >= (1/2)*(1/4 + gamma_1^2)*(n!)^2 -> +infty UNIVERSALLY, independent of the sample sequence f(m)!",
+    "divergence_of_newton_series_for_B_and_K0": "For B(m) = B_{2m} and K_0(m) = -((2m-1)/2)*B_{2m}, the top term in Delta^n f(0) = sum_{m=0}^n (-1)^{n-m} binom(n,m) f(m) has |f(n)| ~ 2*(2n)! / tau^{2n}, so |Delta^n f(0)| / n! ~ 2 * (2n)! / (n! * tau^{2n}) ~ (4*n / (e*tau^2))^n -> +infty, and the Newton series diverges for every non-integer z.",
+    "lean_theorem": "gamma_ratio_newton_basis_total_cost_conservation",
+    "rows_1_to_12": [
+      {
+        "n": 1,
+        "log_abs_Delta_n_B": -0.18232155679395462,
+        "log_abs_Delta_n_K0": -0.538996500732687,
+        "log_abs_Delta_n_B2": -0.538996500732687,
+        "log_abs_N_n_K0_alpha1": 1.420167404989489,
+        "log_abs_N_n_B2_alpha1": 1.420167404989489,
+        "log_universal_primitive_newton_lower_bound": 9.91384038849238
+      },
+      {
+        "n": 2,
+        "log_abs_Delta_n_B": -0.4567584024957149,
+        "log_abs_Delta_n_K0": -0.33314444652853825,
+        "log_abs_Delta_n_B2": -0.386888722535229,
+        "log_abs_N_n_K0_alpha1": 2.9132716733717325,
+        "log_abs_N_n_B2_alpha1": 2.862198380830479,
+        "log_universal_primitive_newton_lower_bound": 15.270617469640749
+      },
+      {
+        "n": 3,
+        "log_abs_Delta_n_B": -0.9776596782504472,
+        "log_abs_Delta_n_K0": -0.04131814933073101,
+        "log_abs_Delta_n_B2": -0.23679450409888486,
+        "log_abs_N_n_K0_alpha1": 4.121187925735953,
+        "log_abs_N_n_B2_alpha1": 3.937272562063055,
+        "log_universal_primitive_newton_lower_bound": 20.708872653672607
+      },
+      {
+        "n": 4,
+        "log_abs_Delta_n_B": -5.3471075307174685,
+        "log_abs_Delta_n_K0": 0.3974969384589875,
+        "log_abs_Delta_n_B2": -0.0886676901992955,
+        "log_abs_N_n_K0_alpha1": 5.229240854455419,
+        "log_abs_N_n_B2_alpha1": 4.776044907539567,
+        "log_universal_primitive_newton_lower_bound": 26.254208112356277
+      },
+      {
+        "n": 5,
+        "log_abs_Delta_n_B": -0.43512131769105244,
+        "log_abs_Delta_n_K0": 1.0770982410172476,
+        "log_abs_Delta_n_B2": 0.05754927559489453,
+        "log_abs_N_n_K0_alpha1": 6.397867452415872,
+        "log_abs_N_n_B2_alpha1": 5.451933766906822,
+        "log_universal_primitive_newton_lower_bound": 31.924228525029683
+      },
+      {
+        "n": 6,
+        "log_abs_Delta_n_B": 0.7810891378563929,
+        "log_abs_Delta_n_K0": 2.0953216917548403,
+        "log_abs_Delta_n_B2": 0.20192131089282533,
+        "log_abs_N_n_K0_alpha1": 7.771184281184748,
+        "log_abs_N_n_B2_alpha1": 6.011118065266627,
+        "log_universal_primitive_newton_lower_bound": 37.72948533842761
+      },
+      {
+        "n": 7,
+        "log_abs_Delta_n_B": 2.0009443562430045,
+        "log_abs_Delta_n_K0": 3.4900411244278113,
+        "log_abs_Delta_n_B2": 0.3445176989752722,
+        "log_abs_N_n_K0_alpha1": 9.425199297715864,
+        "log_abs_N_n_B2_alpha1": 6.484368083095205,
+        "log_universal_primitive_newton_lower_bound": 43.67501184412947
+      },
+      {
+        "n": 8,
+        "log_abs_Delta_n_B": 3.487021108811414,
+        "log_abs_Delta_n_K0": 5.225719286640963,
+        "log_abs_Delta_n_B2": 0.4854098851452024,
+        "log_abs_N_n_K0_alpha1": 11.352286382398418,
+        "log_abs_N_n_B2_alpha1": 6.892921067303235,
+        "log_universal_primitive_newton_lower_bound": 49.76187850961618
+      },
+      {
+        "n": 9,
+        "log_abs_Delta_n_B": 5.295852244211925,
+        "log_abs_Delta_n_K0": 7.245382996178211,
+        "log_abs_Delta_n_B2": 0.6246698714388728,
+        "log_abs_N_n_K0_alpha1": 13.514819538741794,
+        "log_abs_N_n_B2_alpha1": 7.251811828408332,
+        "log_universal_primitive_newton_lower_bound": 55.98849512596943
+      },
+      {
+        "n": 10,
+        "log_abs_Delta_n_B": 7.391570367811109,
+        "log_abs_Delta_n_K0": 9.50422676810189,
+        "log_abs_Delta_n_B2": 0.7623690622158285,
+        "log_abs_N_n_K0_alpha1": 15.881382581117174,
+        "log_abs_N_n_B2_alpha1": 7.5719081202300895,
+        "log_universal_primitive_newton_lower_bound": 62.3515929767885
+      },
+      {
+        "n": 11,
+        "log_abs_Delta_n_B": 9.726788811485086,
+        "log_abs_Delta_n_K0": 11.971248618867389,
+        "log_abs_Delta_n_B2": 0.8985774485688469,
+        "log_abs_N_n_K0_alpha1": 18.430087220534162,
+        "log_abs_N_n_B2_alpha1": 7.861211151157959,
+        "log_universal_primitive_newton_lower_bound": 68.84691964087709
+      },
+      {
+        "n": 12,
+        "log_abs_Delta_n_B": 12.26742652225873,
+        "log_abs_Delta_n_K0": 14.623951026649808,
+        "log_abs_Delta_n_B2": 1.0333630465823458,
+        "log_abs_N_n_K0_alpha1": 21.144748305566146,
+        "log_abs_N_n_B2_alpha1": 8.125711267487576,
+        "log_universal_primitive_newton_lower_bound": 75.46970975969961
+      }
+    ]
+  },
+  "mahler_p_adic_bernoulli_comparison": {
+    "p_adic_kubota_leopoldt_bridge": "In p-adic analysis (p >= 3), the Euler-factor-modified Bernoulli samples c_m^{(p)} := (1 - p^{2m - 1}) * B_{2m} / (2m) satisfy Kummer's congruences Delta_d^k c_m^{(p)} == 0 (mod p^k) for (p - 1) | d, giving a convergent Mahler series for L_p(1 - s, omega^i) on Z_p.",
+    "archimedean_obstruction": "Kummer congruences hold in the p-adic metric |.|_p on steps d divisible by (p - 1), whereas in the archimedean metric |.|_infty on C, |(1 - p^{2m - 1}) * B_{2m} / (2m)| grows even faster (~ p^{2m} * (2m)! / tau^{2m}) and does not evaluate the complex archimedean zero alpha_1 = 1/4 + i*gamma_1/2."
+  },
+  "norlund_bernoulli_polynomial_audit": {
+    "bernoulli_polynomial_identity": "By the classical Hurwitz-zeta identity B_n(x) = -n * zeta(1 - n, x), expanding around shifted nodes or in Bernoulli polynomials B_k(z) = sum_{j=0}^k binom(k, j) B_j z^{k-j} still requires Carlitz-Stieltjes moment determinants of order exp(2*n^2*log n) or factorial coefficient clearing."
+  },
+  "riesz_gram_hadamard_kernel_audit": {
+    "classification": "RIESZ_GRAM_HADAMARD_KERNELS_DO_NOT_SIMULTANEOUSLY_PRESERVE_RATIONAL_SAMPLES_AND_INDIVIDUAL_ZERO_VANISHING",
+    "riesz_function_analysis": "Riesz's function Riesz(x) = sum_{k=1}^infty (-1)^{k+1} x^k / ((k - 1)! * zeta(2k)) has Mellin transform int_0^infty x^{-s-1} Riesz(x) dx = Gamma(-s) / zeta(2s). However: (1) its Taylor coefficients 1 / ((k - 1)! * zeta(2k)) = 2 * (2k)! / ((k - 1)! * |B_{2k}| * tau^{2k}) are transcendental multiples of tau^{-2k}, not rationals; and (2) the zero-free/RH criterion is an asymptotic bound Riesz(x) = O(x^{1/4 + eps}) as x -> +infty (or Baez-Duarte c_n = O(n^{-3/4 + eps})), not a point vanishing F(rho_1 / 2) = 0.",
+    "gram_series_analysis": "The Gram series G(x) = 1 + sum_{k=1}^infty (log x)^k / (k * k! * zeta(k + 1)) approximates R(x) ~ li(x) via global explicit-formula sums over all zeros rho, with irrational coefficients zeta(k + 1)^{-1} at even/odd k.",
+    "hadamard_product_analysis": "The Hadamard product xi(s) = xi(0) * prod_rho (1 - s / rho) vanishes at every individual zero rho, but its Taylor/interpolation coefficients at integer nodes s = m are symmetric functions of all nontrivial zeros (involving log(pi), Euler's gamma, and transcendental derivatives xi^{(k)}(0)), not known rationals."
+  },
+  "multipoint_pade_kernel_comparison": {
+    "classification": "MULTIPOINT_PADE_KERNEL_COMPARISON_FAVORS_BOUNDED_RADIUS_CLASSES_ONLY",
+    "open_asymptotic_classification": "ALL_N_MULTIPOINT_PADE_ASYMPTOTIC_STILL_OPEN",
+    "families_compared": [
+      "R_tau",
+      "R_pi",
+      "B_2",
+      "B_1",
+      "K_0"
+    ],
+    "results_by_family": {
+      "R_tau": [
+        {
+          "n": 1,
+          "degree_2k_n": 4,
+          "primitive_gcd": 1,
+          "log_L_lcm": 64.46217350465336,
+          "log_g_content": 0.0,
+          "log_M_prim": 64.46217350465336,
+          "log_raw_Q_n_gamma1": -2.0676902514404767,
+          "log_abs_A_n_alpha1": -1.1127879867854202,
+          "log_abs_B_n_alpha1": 1.9574133632715554,
+          "log_abs_ratio_An_over_Bn_alpha1": -3.0702013500569754,
+          "log_single_primitive_N_An_gamma1": 17.509730225482983,
+          "log_tilde_Q_n_gamma1": 62.39448325321288,
+          "primitive_diophantine_efficiency": -15.59862081330322
+        },
+        {
+          "n": 2,
+          "degree_2k_n": 6,
+          "primitive_gcd": 1,
+          "log_L_lcm": 158.72538547728263,
+          "log_g_content": 0.0,
+          "log_M_prim": 158.72538547728263,
+          "log_raw_Q_n_gamma1": -3.836379585290298,
+          "log_abs_A_n_alpha1": -1.9957392254673405,
+          "log_abs_B_n_alpha1": 3.912466702829398,
+          "log_abs_ratio_An_over_Bn_alpha1": -5.908205928296739,
+          "log_single_primitive_N_An_gamma1": 49.86408523760053,
+          "log_tilde_Q_n_gamma1": 154.88900589199233,
+          "primitive_diophantine_efficiency": -25.814834315332053
+        },
+        {
+          "n": 3,
+          "degree_2k_n": 8,
+          "primitive_gcd": 1,
+          "log_L_lcm": 294.14511194631046,
+          "log_g_content": 0.0,
+          "log_M_prim": 294.14511194631046,
+          "log_raw_Q_n_gamma1": -5.589127108642802,
+          "log_abs_A_n_alpha1": -2.8883097112036054,
+          "log_abs_B_n_alpha1": 5.8861945671571725,
+          "log_abs_ratio_An_over_Bn_alpha1": -8.774504278360778,
+          "log_single_primitive_N_An_gamma1": 113.76707619375543,
+          "log_tilde_Q_n_gamma1": 288.55598483766767,
+          "primitive_diophantine_efficiency": -36.06949810470846
+        },
+        {
+          "n": 4,
+          "degree_2k_n": 10,
+          "primitive_gcd": 1,
+          "log_L_lcm": 485.7810699893176,
+          "log_g_content": 0.0,
+          "log_M_prim": 485.7810699893176,
+          "log_raw_Q_n_gamma1": -7.111481337656103,
+          "log_abs_A_n_alpha1": -3.677713199191095,
+          "log_abs_B_n_alpha1": 7.8937324315659545,
+          "log_abs_ratio_An_over_Bn_alpha1": -11.571445630757049,
+          "log_single_primitive_N_An_gamma1": 193.69207182208118,
+          "log_tilde_Q_n_gamma1": 478.66958865166146,
+          "primitive_diophantine_efficiency": -47.86695886516615
+        },
+        {
+          "n": 5,
+          "degree_2k_n": 12,
+          "primitive_gcd": 1,
+          "log_L_lcm": 762.571863234845,
+          "log_g_content": 0.0,
+          "log_M_prim": 762.571863234845,
+          "log_raw_Q_n_gamma1": -8.323644658405128,
+          "log_abs_A_n_alpha1": -4.320893893399273,
+          "log_abs_B_n_alpha1": 9.948656893707065,
+          "log_abs_ratio_An_over_Bn_alpha1": -14.269550787106338,
+          "log_single_primitive_N_An_gamma1": 313.3611579760813,
+          "log_tilde_Q_n_gamma1": 754.2482185764397,
+          "primitive_diophantine_efficiency": -62.85401821470331
+        },
+        {
+          "n": 6,
+          "degree_2k_n": 14,
+          "primitive_gcd": 1,
+          "log_L_lcm": 1072.4195522763307,
+          "log_g_content": 0.0,
+          "log_M_prim": 1072.4195522763307,
+          "log_raw_Q_n_gamma1": -9.218143514731985,
+          "log_abs_A_n_alpha1": -4.811878194214726,
+          "log_abs_B_n_alpha1": 12.061262488171833,
+          "log_abs_ratio_An_over_Bn_alpha1": -16.87314068238656,
+          "log_single_primitive_N_An_gamma1": 472.37341816092095,
+          "log_tilde_Q_n_gamma1": 1063.2014087615987,
+          "primitive_diophantine_efficiency": -75.94295776868562
+        },
+        {
+          "n": 7,
+          "degree_2k_n": 16,
+          "primitive_gcd": 1,
+          "log_L_lcm": 1460.8033244722155,
+          "log_g_content": 0.0,
+          "log_M_prim": 1460.8033244722155,
+          "log_raw_Q_n_gamma1": -9.814257478220547,
+          "log_abs_A_n_alpha1": -5.158230168854684,
+          "log_abs_B_n_alpha1": 14.238551759010887,
+          "log_abs_ratio_An_over_Bn_alpha1": -19.39678192786557,
+          "log_single_primitive_N_An_gamma1": 641.6856920136095,
+          "log_tilde_Q_n_gamma1": 1450.989066993995,
+          "primitive_diophantine_efficiency": -90.68681668712469
+        }
+      ],
+      "R_pi": [
+        {
+          "n": 1,
+          "degree_2k_n": 4,
+          "primitive_gcd": 1,
+          "log_L_lcm": 32.21352899041019,
+          "log_g_content": 0.0,
+          "log_M_prim": 32.21352899041019,
+          "log_raw_Q_n_gamma1": 2.3200540301015313,
+          "log_abs_A_n_alpha1": 0.7188093369913054,
+          "log_abs_B_n_alpha1": 1.9799736178929372,
+          "log_abs_ratio_An_over_Bn_alpha1": -1.2611642809016317,
+          "log_single_primitive_N_An_gamma1": 9.990950912014721,
+          "log_tilde_Q_n_gamma1": 34.53358302051172,
+          "primitive_diophantine_efficiency": -8.63339575512793
+        },
+        {
+          "n": 2,
+          "degree_2k_n": 6,
+          "primitive_gcd": 1,
+          "log_L_lcm": 95.05331290597609,
+          "log_g_content": 0.0,
+          "log_M_prim": 95.05331290597609,
+          "log_raw_Q_n_gamma1": 3.3875509294743082,
+          "log_abs_A_n_alpha1": 0.8930020688274696,
+          "log_abs_B_n_alpha1": 3.88631232422157,
+          "log_abs_ratio_An_over_Bn_alpha1": -2.9933102553941002,
+          "log_single_primitive_N_An_gamma1": 31.802308550728913,
+          "log_tilde_Q_n_gamma1": 98.4408638354504,
+          "primitive_diophantine_efficiency": -16.406810639241733
+        },
+        {
+          "n": 3,
+          "degree_2k_n": 8,
+          "primitive_gcd": 1,
+          "log_L_lcm": 191.04098057689222,
+          "log_g_content": 0.0,
+          "log_M_prim": 191.04098057689222,
+          "log_raw_Q_n_gamma1": 4.554454705943708,
+          "log_abs_A_n_alpha1": 1.5812124149089588,
+          "log_abs_B_n_alpha1": 5.840187961771793,
+          "log_abs_ratio_An_over_Bn_alpha1": -4.258975546862834,
+          "log_single_primitive_N_An_gamma1": 78.02127688621565,
+          "log_tilde_Q_n_gamma1": 195.59543528283595,
+          "primitive_diophantine_efficiency": -24.449429410354494
+        },
+        {
+          "n": 4,
+          "degree_2k_n": 10,
+          "primitive_gcd": 1,
+          "log_L_lcm": 329.67617898482075,
+          "log_g_content": 0.0,
+          "log_M_prim": 329.67617898482075,
+          "log_raw_Q_n_gamma1": 6.129147385817109,
+          "log_abs_A_n_alpha1": 2.1343385923978566,
+          "log_abs_B_n_alpha1": 7.767315006190789,
+          "log_abs_ratio_An_over_Bn_alpha1": -5.632976413792933,
+          "log_single_primitive_N_An_gamma1": 137.19282706776653,
+          "log_tilde_Q_n_gamma1": 335.8053263706379,
+          "primitive_diophantine_efficiency": -33.58053263706379
+        },
+        {
+          "n": 5,
+          "degree_2k_n": 12,
+          "primitive_gcd": 1,
+          "log_L_lcm": 538.1161904307666,
+          "log_g_content": 0.0,
+          "log_M_prim": 538.1161904307666,
+          "log_raw_Q_n_gamma1": 7.999516293369714,
+          "log_abs_A_n_alpha1": 2.9800095369940816,
+          "log_abs_B_n_alpha1": 9.74152860474277,
+          "log_abs_ratio_An_over_Bn_alpha1": -6.761519067748688,
+          "log_single_primitive_N_An_gamma1": 228.89106728090462,
+          "log_tilde_Q_n_gamma1": 546.1157067241363,
+          "primitive_diophantine_efficiency": -45.50964222701136
+        },
+        {
+          "n": 6,
+          "degree_2k_n": 14,
+          "primitive_gcd": 1,
+          "log_L_lcm": 773.4641089131028,
+          "log_g_content": 0.0,
+          "log_M_prim": 773.4641089131028,
+          "log_raw_Q_n_gamma1": 10.223664641202552,
+          "log_abs_A_n_alpha1": 3.930073027775913,
+          "log_abs_B_n_alpha1": 11.743074487753331,
+          "log_abs_ratio_An_over_Bn_alpha1": -7.81300145997742,
+          "log_single_primitive_N_An_gamma1": 351.3037489261483,
+          "log_tilde_Q_n_gamma1": 783.6877735543054,
+          "primitive_diophantine_efficiency": -55.977698111021816
+        },
+        {
+          "n": 7,
+          "degree_2k_n": 16,
+          "primitive_gcd": 1,
+          "log_L_lcm": 1074.8751782254844,
+          "log_g_content": 0.0,
+          "log_M_prim": 1074.8751782254844,
+          "log_raw_Q_n_gamma1": 12.714010856904999,
+          "log_abs_A_n_alpha1": 5.062425445786351,
+          "log_abs_B_n_alpha1": 13.810715440226932,
+          "log_abs_ratio_An_over_Bn_alpha1": -8.748289994440581,
+          "log_single_primitive_N_An_gamma1": 482.3170105027391,
+          "log_tilde_Q_n_gamma1": 1087.5891890823896,
+          "primitive_diophantine_efficiency": -67.97432431764935
+        }
+      ],
+      "B_2": [
+        {
+          "n": 1,
+          "degree_2k_n": 4,
+          "primitive_gcd": 1,
+          "log_L_lcm": 56.73445035356157,
+          "log_g_content": 0.0,
+          "log_M_prim": 56.73445035356157,
+          "log_raw_Q_n_gamma1": -0.21525753662650543,
+          "log_abs_A_n_alpha1": -0.5326391592661118,
+          "log_abs_B_n_alpha1": 1.9554977498754644,
+          "log_abs_ratio_An_over_Bn_alpha1": -2.488136909141576,
+          "log_single_primitive_N_An_gamma1": 14.667399527560864,
+          "log_tilde_Q_n_gamma1": 56.51919281693507,
+          "primitive_diophantine_efficiency": -14.129798204233767
+        },
+        {
+          "n": 2,
+          "degree_2k_n": 6,
+          "primitive_gcd": 1,
+          "log_L_lcm": 136.63924460509367,
+          "log_g_content": 0.0,
+          "log_M_prim": 136.63924460509367,
+          "log_raw_Q_n_gamma1": 0.18620747500777313,
+          "log_abs_A_n_alpha1": -0.3864179940222287,
+          "log_abs_B_n_alpha1": 3.930108323448109,
+          "log_abs_ratio_An_over_Bn_alpha1": -4.316526317470338,
+          "log_single_primitive_N_An_gamma1": 45.77411396390359,
+          "log_tilde_Q_n_gamma1": 136.82545208010143,
+          "primitive_diophantine_efficiency": -22.804242013350237
+        },
+        {
+          "n": 3,
+          "degree_2k_n": 8,
+          "primitive_gcd": 1,
+          "log_L_lcm": 247.59813688587587,
+          "log_g_content": 0.0,
+          "log_M_prim": 247.59813688587587,
+          "log_raw_Q_n_gamma1": 0.8548578235830953,
+          "log_abs_A_n_alpha1": -0.1485495739055975,
+          "log_abs_B_n_alpha1": 5.949686031191779,
+          "log_abs_ratio_An_over_Bn_alpha1": -6.0982356050973765,
+          "log_single_primitive_N_An_gamma1": 100.88555039429355,
+          "log_tilde_Q_n_gamma1": 248.45299470945898,
+          "primitive_diophantine_efficiency": -31.056624338682372
+        },
+        {
+          "n": 4,
+          "degree_2k_n": 10,
+          "primitive_gcd": 1,
+          "log_L_lcm": 406.1532468383669,
+          "log_g_content": 0.0,
+          "log_M_prim": 406.1532468383669,
+          "log_raw_Q_n_gamma1": 1.8603733192524412,
+          "log_abs_A_n_alpha1": 0.23751727319424473,
+          "log_abs_B_n_alpha1": 8.032196638318922,
+          "log_abs_ratio_An_over_Bn_alpha1": -7.7946793651246775,
+          "log_single_primitive_N_An_gamma1": 168.36679048089917,
+          "log_tilde_Q_n_gamma1": 408.01362015761936,
+          "primitive_diophantine_efficiency": -40.80136201576194
+        },
+        {
+          "n": 5,
+          "degree_2k_n": 12,
+          "primitive_gcd": 1,
+          "log_L_lcm": 636.2407180005696,
+          "log_g_content": 0.0,
+          "log_M_prim": 636.2407180005696,
+          "log_raw_Q_n_gamma1": 3.203857929750722,
+          "log_abs_A_n_alpha1": 0.7861862571761242,
+          "log_abs_B_n_alpha1": 10.188098574852171,
+          "log_abs_ratio_An_over_Bn_alpha1": -9.401912317676047,
+          "log_single_primitive_N_An_gamma1": 269.6278981756674,
+          "log_tilde_Q_n_gamma1": 639.4445759303203,
+          "primitive_diophantine_efficiency": -53.28704799419336
+        },
+        {
+          "n": 6,
+          "degree_2k_n": 14,
+          "primitive_gcd": 1,
+          "log_L_lcm": 881.0340483032804,
+          "log_g_content": 0.0,
+          "log_M_prim": 881.0340483032804,
+          "log_raw_Q_n_gamma1": 4.860692147057126,
+          "log_abs_A_n_alpha1": 1.4930755653838204,
+          "log_abs_B_n_alpha1": 12.422078323385918,
+          "log_abs_ratio_An_over_Bn_alpha1": -10.929002758002097,
+          "log_single_primitive_N_An_gamma1": 403.73796694972077,
+          "log_tilde_Q_n_gamma1": 885.8947404503375,
+          "primitive_diophantine_efficiency": -63.27819574645268
+        },
+        {
+          "n": 7,
+          "degree_2k_n": 16,
+          "primitive_gcd": 1,
+          "log_L_lcm": 1216.545199158508,
+          "log_g_content": 0.0,
+          "log_M_prim": 1216.545199158508,
+          "log_raw_Q_n_gamma1": 6.800735746463425,
+          "log_abs_A_n_alpha1": 2.3470676141377202,
+          "log_abs_B_n_alpha1": 14.735088384771748,
+          "log_abs_ratio_An_over_Bn_alpha1": -12.388020770634027,
+          "log_single_primitive_N_An_gamma1": 541.1849876464408,
+          "log_tilde_Q_n_gamma1": 1223.3459349049715,
+          "primitive_diophantine_efficiency": -76.45912093156072
+        }
+      ],
+      "B_1": [
+        {
+          "n": 1,
+          "degree_2k_n": 4,
+          "primitive_gcd": 1,
+          "log_L_lcm": 45.55822013434904,
+          "log_g_content": 0.0,
+          "log_M_prim": 45.55822013434904,
+          "log_raw_Q_n_gamma1": 1.5069301860511135,
+          "log_abs_A_n_alpha1": -0.3358477759621548,
+          "log_abs_B_n_alpha1": 1.9555274149650326,
+          "log_abs_ratio_An_over_Bn_alpha1": -2.2913751909271873,
+          "log_single_primitive_N_An_gamma1": 13.71116310814845,
+          "log_tilde_Q_n_gamma1": 47.06515032040016,
+          "primitive_diophantine_efficiency": -11.76628758010004
+        },
+        {
+          "n": 2,
+          "degree_2k_n": 6,
+          "primitive_gcd": 1,
+          "log_L_lcm": 101.99560452572486,
+          "log_g_content": 0.0,
+          "log_M_prim": 101.99560452572486,
+          "log_raw_Q_n_gamma1": 4.4254099802156555,
+          "log_abs_A_n_alpha1": 0.6933988917052148,
+          "log_abs_B_n_alpha1": 3.946962007831416,
+          "log_abs_ratio_An_over_Bn_alpha1": -3.253563116126201,
+          "log_single_primitive_N_An_gamma1": 38.10733670216628,
+          "log_tilde_Q_n_gamma1": 106.42101450594052,
+          "primitive_diophantine_efficiency": -17.736835750990085
+        },
+        {
+          "n": 3,
+          "degree_2k_n": 8,
+          "primitive_gcd": 1,
+          "log_L_lcm": 170.1168493542209,
+          "log_g_content": 0.0,
+          "log_M_prim": 170.1168493542209,
+          "log_raw_Q_n_gamma1": 8.165256911945074,
+          "log_abs_A_n_alpha1": 2.188161692536168,
+          "log_abs_B_n_alpha1": 6.0356248612999535,
+          "log_abs_ratio_An_over_Bn_alpha1": -3.847463168763786,
+          "log_single_primitive_N_An_gamma1": 79.35544951988058,
+          "log_tilde_Q_n_gamma1": 178.28210626616598,
+          "primitive_diophantine_efficiency": -22.285263283270748
+        },
+        {
+          "n": 4,
+          "degree_2k_n": 10,
+          "primitive_gcd": 1,
+          "log_L_lcm": 272.54487664204197,
+          "log_g_content": 0.0,
+          "log_M_prim": 272.54487664204197,
+          "log_raw_Q_n_gamma1": 12.575376808398826,
+          "log_abs_A_n_alpha1": 4.071188724744408,
+          "log_abs_B_n_alpha1": 8.26236246976592,
+          "log_abs_ratio_An_over_Bn_alpha1": -4.191173745021511,
+          "log_single_primitive_N_An_gamma1": 121.17285032118492,
+          "log_tilde_Q_n_gamma1": 285.1202534504408,
+          "primitive_diophantine_efficiency": -28.512025345044083
+        },
+        {
+          "n": 5,
+          "degree_2k_n": 12,
+          "primitive_gcd": 1,
+          "log_L_lcm": 418.79278624430793,
+          "log_g_content": 0.0,
+          "log_M_prim": 418.79278624430793,
+          "log_raw_Q_n_gamma1": 17.547579757601476,
+          "log_abs_A_n_alpha1": 6.281713442118111,
+          "log_abs_B_n_alpha1": 10.64446415321574,
+          "log_abs_ratio_An_over_Bn_alpha1": -4.36275071109763,
+          "log_single_primitive_N_An_gamma1": 192.29688192647689,
+          "log_tilde_Q_n_gamma1": 436.34036600190944,
+          "primitive_diophantine_efficiency": -36.361697166825785
+        },
+        {
+          "n": 6,
+          "degree_2k_n": 14,
+          "primitive_gcd": 1,
+          "log_L_lcm": 588.7837605294665,
+          "log_g_content": 0.0,
+          "log_M_prim": 588.7837605294665,
+          "log_raw_Q_n_gamma1": 22.999875520052772,
+          "log_abs_A_n_alpha1": 8.77035532226534,
+          "log_abs_B_n_alpha1": 13.18416696395297,
+          "log_abs_ratio_An_over_Bn_alpha1": -4.41381164168763,
+          "log_single_primitive_N_An_gamma1": 279.5916818407325,
+          "log_tilde_Q_n_gamma1": 611.7836360495193,
+          "primitive_diophantine_efficiency": -43.698831146394234
+        },
+        {
+          "n": 7,
+          "degree_2k_n": 16,
+          "primitive_gcd": 1,
+          "log_L_lcm": 815.2354551239971,
+          "log_g_content": 0.0,
+          "log_M_prim": 815.2354551239971,
+          "log_raw_Q_n_gamma1": 28.868611272966756,
+          "log_abs_A_n_alpha1": 11.497804661642812,
+          "log_abs_B_n_alpha1": 15.876282414601311,
+          "log_abs_ratio_An_over_Bn_alpha1": -4.378477752958498,
+          "log_single_primitive_N_An_gamma1": 381.27337088871695,
+          "log_tilde_Q_n_gamma1": 844.1040663969638,
+          "primitive_diophantine_efficiency": -52.75650414981024
+        }
+      ],
+      "K_0": [
+        {
+          "n": 1,
+          "degree_2k_n": 4,
+          "primitive_gcd": 1,
+          "log_L_lcm": 34.60892181647135,
+          "log_g_content": 0.0,
+          "log_M_prim": 34.60892181647135,
+          "log_raw_Q_n_gamma1": 4.125866260015836,
+          "log_abs_A_n_alpha1": -0.0436406048300323,
+          "log_abs_B_n_alpha1": 1.955636566316147,
+          "log_abs_ratio_An_over_Bn_alpha1": -1.9992771711461792,
+          "log_single_primitive_N_An_gamma1": 12.980296466206623,
+          "log_tilde_Q_n_gamma1": 38.734788076487185,
+          "primitive_diophantine_efficiency": -9.683697019121796
+        },
+        {
+          "n": 2,
+          "degree_2k_n": 6,
+          "primitive_gcd": 1,
+          "log_L_lcm": 69.76892164595039,
+          "log_g_content": 0.0,
+          "log_M_prim": 69.76892164595039,
+          "log_raw_Q_n_gamma1": 9.74781036761734,
+          "log_abs_A_n_alpha1": 2.055477969140876,
+          "log_abs_B_n_alpha1": 3.984766567702944,
+          "log_abs_ratio_An_over_Bn_alpha1": -1.9292885985620676,
+          "log_single_primitive_N_An_gamma1": 31.197477523365976,
+          "log_tilde_Q_n_gamma1": 79.51673201356773,
+          "primitive_diophantine_efficiency": -13.252788668927955
+        },
+        {
+          "n": 3,
+          "degree_2k_n": 8,
+          "primitive_gcd": 1,
+          "log_L_lcm": 110.0235362550446,
+          "log_g_content": 0.0,
+          "log_M_prim": 110.0235362550446,
+          "log_raw_Q_n_gamma1": 16.325692960731697,
+          "log_abs_A_n_alpha1": 4.872119969708661,
+          "log_abs_B_n_alpha1": 6.187322739479158,
+          "log_abs_ratio_An_over_Bn_alpha1": -1.3152027697704975,
+          "log_single_primitive_N_An_gamma1": 62.94163074433905,
+          "log_tilde_Q_n_gamma1": 126.34922921577629,
+          "primitive_diophantine_efficiency": -15.793653651972036
+        },
+        {
+          "n": 4,
+          "degree_2k_n": 10,
+          "primitive_gcd": 1,
+          "log_L_lcm": 174.4214812360977,
+          "log_g_content": 0.0,
+          "log_M_prim": 174.4214812360977,
+          "log_raw_Q_n_gamma1": 23.604153736378574,
+          "log_abs_A_n_alpha1": 8.162153082695408,
+          "log_abs_B_n_alpha1": 8.605133660315795,
+          "log_abs_ratio_An_over_Bn_alpha1": -0.442980577620387,
+          "log_single_primitive_N_An_gamma1": 91.85413148401345,
+          "log_tilde_Q_n_gamma1": 198.02563497247627,
+          "primitive_diophantine_efficiency": -19.802563497247625
+        },
+        {
+          "n": 5,
+          "degree_2k_n": 12,
+          "primitive_gcd": 1,
+          "log_L_lcm": 264.40255027445255,
+          "log_g_content": 1.6094379124341003,
+          "log_M_prim": 262.79311236201846,
+          "log_raw_Q_n_gamma1": 31.42985271601023,
+          "log_abs_A_n_alpha1": 11.801732104042499,
+          "log_abs_B_n_alpha1": 11.245086696442797,
+          "log_abs_ratio_An_over_Bn_alpha1": 0.5566454075996998,
+          "log_single_primitive_N_An_gamma1": 143.52510161367118,
+          "log_tilde_Q_n_gamma1": 294.22296507802866,
+          "primitive_diophantine_efficiency": -24.518580423169055
+        },
+        {
+          "n": 6,
+          "degree_2k_n": 14,
+          "primitive_gcd": 1,
+          "log_L_lcm": 364.8818095302833,
+          "log_g_content": 0.0,
+          "log_M_prim": 364.8818095302833,
+          "log_raw_Q_n_gamma1": 39.69261167760634,
+          "log_abs_A_n_alpha1": 15.714726786132594,
+          "log_abs_B_n_alpha1": 14.098536278174699,
+          "log_abs_ratio_An_over_Bn_alpha1": 1.6161905079578966,
+          "log_single_primitive_N_An_gamma1": 198.32664229036257,
+          "log_tilde_Q_n_gamma1": 404.5744212078896,
+          "primitive_diophantine_efficiency": -28.898172943420686
+        },
+        {
+          "n": 7,
+          "degree_2k_n": 16,
+          "primitive_gcd": 1,
+          "log_L_lcm": 503.0138121884682,
+          "log_g_content": 3.8918202981106265,
+          "log_M_prim": 499.12199189035755,
+          "log_raw_Q_n_gamma1": 48.30205339826869,
+          "log_abs_A_n_alpha1": 19.8461769004758,
+          "log_abs_B_n_alpha1": 17.15315190371458,
+          "log_abs_ratio_An_over_Bn_alpha1": 2.6930249967612205,
+          "log_single_primitive_N_An_gamma1": 258.9740188864977,
+          "log_tilde_Q_n_gamma1": 547.4240452886263,
+          "primitive_diophantine_efficiency": -34.214002830539144
+        }
+      ]
+    },
+    "summary": "Across 1 <= n <= 7, the divergent-OGF kernels K_0 (q=0) and B_1 (q=1) suffer catastrophic raw evaluation growth (log|Q_n(gamma_1)| > 0) AND quadratic-factorial determinant clearing log M_n ~ C n^2 log n, even though K_0 has subfactorial sample denominators! The bounded-radius kernels R_tau, R_pi, and B_2 (q=2) achieve genuine raw residual decay log|Q_n(gamma_1)| < 0, but their primitive integer clearing multipliers log M_n = log(L_n / g_n) grow far faster than the raw decay, so log tilde{Q}_n(gamma_1) > 0 and grows rapidly for all 1 <= n <= 7."
+  },
+  "pade_asymptotic_for_R_c": {
+    "status": "ALL_N_MULTIPOINT_PADE_ASYMPTOTIC_STILL_OPEN",
+    "hermite_walsh_contour_representation": "For R_c(z) (c in {1, 4}), the multipoint Pad\u00e9 error on {0, ..., 2n} satisfies R_c(z) - A_n(z)/B_n(z) = (omega_{2n+1}(z) / (2*pi*i * B_n(z))) * oint (R_c(zeta) * B_n(zeta) / omega_{2n+1}(zeta)) d zeta where omega_{2n+1}(z) = prod_{m=0}^{2n} (z - m). Because the Cauchy/Laplace kernel of R_c has essential singularity exp(-sqrt(c)/u) at u = 0, raw Pad\u00e9 residuals decay subfactorially while Cramer/Hankel denominator clearing of A_n, B_n scales superlinearly in n log n.",
+    "finite_n_1_to_7_rows_tau": [
+      {
+        "n": 1,
+        "degree_2k_n": 4,
+        "primitive_gcd": 1,
+        "log_L_lcm": 64.46217350465336,
+        "log_g_content": 0.0,
+        "log_M_prim": 64.46217350465336,
+        "log_raw_Q_n_gamma1": -2.0676902514404767,
+        "log_abs_A_n_alpha1": -1.1127879867854202,
+        "log_abs_B_n_alpha1": 1.9574133632715554,
+        "log_abs_ratio_An_over_Bn_alpha1": -3.0702013500569754,
+        "log_single_primitive_N_An_gamma1": 17.509730225482983,
+        "log_tilde_Q_n_gamma1": 62.39448325321288,
+        "primitive_diophantine_efficiency": -15.59862081330322
+      },
+      {
+        "n": 2,
+        "degree_2k_n": 6,
+        "primitive_gcd": 1,
+        "log_L_lcm": 158.72538547728263,
+        "log_g_content": 0.0,
+        "log_M_prim": 158.72538547728263,
+        "log_raw_Q_n_gamma1": -3.836379585290298,
+        "log_abs_A_n_alpha1": -1.9957392254673405,
+        "log_abs_B_n_alpha1": 3.912466702829398,
+        "log_abs_ratio_An_over_Bn_alpha1": -5.908205928296739,
+        "log_single_primitive_N_An_gamma1": 49.86408523760053,
+        "log_tilde_Q_n_gamma1": 154.88900589199233,
+        "primitive_diophantine_efficiency": -25.814834315332053
+      },
+      {
+        "n": 3,
+        "degree_2k_n": 8,
+        "primitive_gcd": 1,
+        "log_L_lcm": 294.14511194631046,
+        "log_g_content": 0.0,
+        "log_M_prim": 294.14511194631046,
+        "log_raw_Q_n_gamma1": -5.589127108642802,
+        "log_abs_A_n_alpha1": -2.8883097112036054,
+        "log_abs_B_n_alpha1": 5.8861945671571725,
+        "log_abs_ratio_An_over_Bn_alpha1": -8.774504278360778,
+        "log_single_primitive_N_An_gamma1": 113.76707619375543,
+        "log_tilde_Q_n_gamma1": 288.55598483766767,
+        "primitive_diophantine_efficiency": -36.06949810470846
+      },
+      {
+        "n": 4,
+        "degree_2k_n": 10,
+        "primitive_gcd": 1,
+        "log_L_lcm": 485.7810699893176,
+        "log_g_content": 0.0,
+        "log_M_prim": 485.7810699893176,
+        "log_raw_Q_n_gamma1": -7.111481337656103,
+        "log_abs_A_n_alpha1": -3.677713199191095,
+        "log_abs_B_n_alpha1": 7.8937324315659545,
+        "log_abs_ratio_An_over_Bn_alpha1": -11.571445630757049,
+        "log_single_primitive_N_An_gamma1": 193.69207182208118,
+        "log_tilde_Q_n_gamma1": 478.66958865166146,
+        "primitive_diophantine_efficiency": -47.86695886516615
+      },
+      {
+        "n": 5,
+        "degree_2k_n": 12,
+        "primitive_gcd": 1,
+        "log_L_lcm": 762.571863234845,
+        "log_g_content": 0.0,
+        "log_M_prim": 762.571863234845,
+        "log_raw_Q_n_gamma1": -8.323644658405128,
+        "log_abs_A_n_alpha1": -4.320893893399273,
+        "log_abs_B_n_alpha1": 9.948656893707065,
+        "log_abs_ratio_An_over_Bn_alpha1": -14.269550787106338,
+        "log_single_primitive_N_An_gamma1": 313.3611579760813,
+        "log_tilde_Q_n_gamma1": 754.2482185764397,
+        "primitive_diophantine_efficiency": -62.85401821470331
+      },
+      {
+        "n": 6,
+        "degree_2k_n": 14,
+        "primitive_gcd": 1,
+        "log_L_lcm": 1072.4195522763307,
+        "log_g_content": 0.0,
+        "log_M_prim": 1072.4195522763307,
+        "log_raw_Q_n_gamma1": -9.218143514731985,
+        "log_abs_A_n_alpha1": -4.811878194214726,
+        "log_abs_B_n_alpha1": 12.061262488171833,
+        "log_abs_ratio_An_over_Bn_alpha1": -16.87314068238656,
+        "log_single_primitive_N_An_gamma1": 472.37341816092095,
+        "log_tilde_Q_n_gamma1": 1063.2014087615987,
+        "primitive_diophantine_efficiency": -75.94295776868562
+      },
+      {
+        "n": 7,
+        "degree_2k_n": 16,
+        "primitive_gcd": 1,
+        "log_L_lcm": 1460.8033244722155,
+        "log_g_content": 0.0,
+        "log_M_prim": 1460.8033244722155,
+        "log_raw_Q_n_gamma1": -9.814257478220547,
+        "log_abs_A_n_alpha1": -5.158230168854684,
+        "log_abs_B_n_alpha1": 14.238551759010887,
+        "log_abs_ratio_An_over_Bn_alpha1": -19.39678192786557,
+        "log_single_primitive_N_An_gamma1": 641.6856920136095,
+        "log_tilde_Q_n_gamma1": 1450.989066993995,
+        "primitive_diophantine_efficiency": -90.68681668712469
+      }
+    ],
+    "finite_n_1_to_7_rows_pi": [
+      {
+        "n": 1,
+        "degree_2k_n": 4,
+        "primitive_gcd": 1,
+        "log_L_lcm": 32.21352899041019,
+        "log_g_content": 0.0,
+        "log_M_prim": 32.21352899041019,
+        "log_raw_Q_n_gamma1": 2.3200540301015313,
+        "log_abs_A_n_alpha1": 0.7188093369913054,
+        "log_abs_B_n_alpha1": 1.9799736178929372,
+        "log_abs_ratio_An_over_Bn_alpha1": -1.2611642809016317,
+        "log_single_primitive_N_An_gamma1": 9.990950912014721,
+        "log_tilde_Q_n_gamma1": 34.53358302051172,
+        "primitive_diophantine_efficiency": -8.63339575512793
+      },
+      {
+        "n": 2,
+        "degree_2k_n": 6,
+        "primitive_gcd": 1,
+        "log_L_lcm": 95.05331290597609,
+        "log_g_content": 0.0,
+        "log_M_prim": 95.05331290597609,
+        "log_raw_Q_n_gamma1": 3.3875509294743082,
+        "log_abs_A_n_alpha1": 0.8930020688274696,
+        "log_abs_B_n_alpha1": 3.88631232422157,
+        "log_abs_ratio_An_over_Bn_alpha1": -2.9933102553941002,
+        "log_single_primitive_N_An_gamma1": 31.802308550728913,
+        "log_tilde_Q_n_gamma1": 98.4408638354504,
+        "primitive_diophantine_efficiency": -16.406810639241733
+      },
+      {
+        "n": 3,
+        "degree_2k_n": 8,
+        "primitive_gcd": 1,
+        "log_L_lcm": 191.04098057689222,
+        "log_g_content": 0.0,
+        "log_M_prim": 191.04098057689222,
+        "log_raw_Q_n_gamma1": 4.554454705943708,
+        "log_abs_A_n_alpha1": 1.5812124149089588,
+        "log_abs_B_n_alpha1": 5.840187961771793,
+        "log_abs_ratio_An_over_Bn_alpha1": -4.258975546862834,
+        "log_single_primitive_N_An_gamma1": 78.02127688621565,
+        "log_tilde_Q_n_gamma1": 195.59543528283595,
+        "primitive_diophantine_efficiency": -24.449429410354494
+      },
+      {
+        "n": 4,
+        "degree_2k_n": 10,
+        "primitive_gcd": 1,
+        "log_L_lcm": 329.67617898482075,
+        "log_g_content": 0.0,
+        "log_M_prim": 329.67617898482075,
+        "log_raw_Q_n_gamma1": 6.129147385817109,
+        "log_abs_A_n_alpha1": 2.1343385923978566,
+        "log_abs_B_n_alpha1": 7.767315006190789,
+        "log_abs_ratio_An_over_Bn_alpha1": -5.632976413792933,
+        "log_single_primitive_N_An_gamma1": 137.19282706776653,
+        "log_tilde_Q_n_gamma1": 335.8053263706379,
+        "primitive_diophantine_efficiency": -33.58053263706379
+      },
+      {
+        "n": 5,
+        "degree_2k_n": 12,
+        "primitive_gcd": 1,
+        "log_L_lcm": 538.1161904307666,
+        "log_g_content": 0.0,
+        "log_M_prim": 538.1161904307666,
+        "log_raw_Q_n_gamma1": 7.999516293369714,
+        "log_abs_A_n_alpha1": 2.9800095369940816,
+        "log_abs_B_n_alpha1": 9.74152860474277,
+        "log_abs_ratio_An_over_Bn_alpha1": -6.761519067748688,
+        "log_single_primitive_N_An_gamma1": 228.89106728090462,
+        "log_tilde_Q_n_gamma1": 546.1157067241363,
+        "primitive_diophantine_efficiency": -45.50964222701136
+      },
+      {
+        "n": 6,
+        "degree_2k_n": 14,
+        "primitive_gcd": 1,
+        "log_L_lcm": 773.4641089131028,
+        "log_g_content": 0.0,
+        "log_M_prim": 773.4641089131028,
+        "log_raw_Q_n_gamma1": 10.223664641202552,
+        "log_abs_A_n_alpha1": 3.930073027775913,
+        "log_abs_B_n_alpha1": 11.743074487753331,
+        "log_abs_ratio_An_over_Bn_alpha1": -7.81300145997742,
+        "log_single_primitive_N_An_gamma1": 351.3037489261483,
+        "log_tilde_Q_n_gamma1": 783.6877735543054,
+        "primitive_diophantine_efficiency": -55.977698111021816
+      },
+      {
+        "n": 7,
+        "degree_2k_n": 16,
+        "primitive_gcd": 1,
+        "log_L_lcm": 1074.8751782254844,
+        "log_g_content": 0.0,
+        "log_M_prim": 1074.8751782254844,
+        "log_raw_Q_n_gamma1": 12.714010856904999,
+        "log_abs_A_n_alpha1": 5.062425445786351,
+        "log_abs_B_n_alpha1": 13.810715440226932,
+        "log_abs_ratio_An_over_Bn_alpha1": -8.748289994440581,
+        "log_single_primitive_N_An_gamma1": 482.3170105027391,
+        "log_tilde_Q_n_gamma1": 1087.5891890823896,
+        "primitive_diophantine_efficiency": -67.97432431764935
+      }
+    ]
+  },
+  "pade_asymptotic_for_B2": {
+    "kernel_formula": "B_2(z) = K_0(z) / Gamma(z + 1)^2 = z * (2z - 1) * zeta(1 - 2z) / Gamma(z + 1)^2",
+    "ogf_radius": "pi^2 = tau^2 / 4 > 0",
+    "left_half_plane_growth_comparison": "Unlike R_tau(z) = (2z - 1)*tau^{-2z}*zeta(2z), which is bounded by O(|z|^{1/2}) on Re(z) >= 1/4, B_2(z) = R_tau(z) * Gamma(2z + 1) * cos(tau*z/2) / Gamma(z + 1)^2 grows like 4^z / sqrt(pi*z) for Re(z) -> +infty and carries double poles of 1/Gamma(z+1)^2 at negative integers z = -1, -2, ..., producing slower raw interpolation decay than R_pi(z) while retaining the same 2*n*log(n) sample denominator cost.",
+    "finite_n_1_to_7_rows": [
+      {
+        "n": 1,
+        "degree_2k_n": 4,
+        "primitive_gcd": 1,
+        "log_L_lcm": 56.73445035356157,
+        "log_g_content": 0.0,
+        "log_M_prim": 56.73445035356157,
+        "log_raw_Q_n_gamma1": -0.21525753662650543,
+        "log_abs_A_n_alpha1": -0.5326391592661118,
+        "log_abs_B_n_alpha1": 1.9554977498754644,
+        "log_abs_ratio_An_over_Bn_alpha1": -2.488136909141576,
+        "log_single_primitive_N_An_gamma1": 14.667399527560864,
+        "log_tilde_Q_n_gamma1": 56.51919281693507,
+        "primitive_diophantine_efficiency": -14.129798204233767
+      },
+      {
+        "n": 2,
+        "degree_2k_n": 6,
+        "primitive_gcd": 1,
+        "log_L_lcm": 136.63924460509367,
+        "log_g_content": 0.0,
+        "log_M_prim": 136.63924460509367,
+        "log_raw_Q_n_gamma1": 0.18620747500777313,
+        "log_abs_A_n_alpha1": -0.3864179940222287,
+        "log_abs_B_n_alpha1": 3.930108323448109,
+        "log_abs_ratio_An_over_Bn_alpha1": -4.316526317470338,
+        "log_single_primitive_N_An_gamma1": 45.77411396390359,
+        "log_tilde_Q_n_gamma1": 136.82545208010143,
+        "primitive_diophantine_efficiency": -22.804242013350237
+      },
+      {
+        "n": 3,
+        "degree_2k_n": 8,
+        "primitive_gcd": 1,
+        "log_L_lcm": 247.59813688587587,
+        "log_g_content": 0.0,
+        "log_M_prim": 247.59813688587587,
+        "log_raw_Q_n_gamma1": 0.8548578235830953,
+        "log_abs_A_n_alpha1": -0.1485495739055975,
+        "log_abs_B_n_alpha1": 5.949686031191779,
+        "log_abs_ratio_An_over_Bn_alpha1": -6.0982356050973765,
+        "log_single_primitive_N_An_gamma1": 100.88555039429355,
+        "log_tilde_Q_n_gamma1": 248.45299470945898,
+        "primitive_diophantine_efficiency": -31.056624338682372
+      },
+      {
+        "n": 4,
+        "degree_2k_n": 10,
+        "primitive_gcd": 1,
+        "log_L_lcm": 406.1532468383669,
+        "log_g_content": 0.0,
+        "log_M_prim": 406.1532468383669,
+        "log_raw_Q_n_gamma1": 1.8603733192524412,
+        "log_abs_A_n_alpha1": 0.23751727319424473,
+        "log_abs_B_n_alpha1": 8.032196638318922,
+        "log_abs_ratio_An_over_Bn_alpha1": -7.7946793651246775,
+        "log_single_primitive_N_An_gamma1": 168.36679048089917,
+        "log_tilde_Q_n_gamma1": 408.01362015761936,
+        "primitive_diophantine_efficiency": -40.80136201576194
+      },
+      {
+        "n": 5,
+        "degree_2k_n": 12,
+        "primitive_gcd": 1,
+        "log_L_lcm": 636.2407180005696,
+        "log_g_content": 0.0,
+        "log_M_prim": 636.2407180005696,
+        "log_raw_Q_n_gamma1": 3.203857929750722,
+        "log_abs_A_n_alpha1": 0.7861862571761242,
+        "log_abs_B_n_alpha1": 10.188098574852171,
+        "log_abs_ratio_An_over_Bn_alpha1": -9.401912317676047,
+        "log_single_primitive_N_An_gamma1": 269.6278981756674,
+        "log_tilde_Q_n_gamma1": 639.4445759303203,
+        "primitive_diophantine_efficiency": -53.28704799419336
+      },
+      {
+        "n": 6,
+        "degree_2k_n": 14,
+        "primitive_gcd": 1,
+        "log_L_lcm": 881.0340483032804,
+        "log_g_content": 0.0,
+        "log_M_prim": 881.0340483032804,
+        "log_raw_Q_n_gamma1": 4.860692147057126,
+        "log_abs_A_n_alpha1": 1.4930755653838204,
+        "log_abs_B_n_alpha1": 12.422078323385918,
+        "log_abs_ratio_An_over_Bn_alpha1": -10.929002758002097,
+        "log_single_primitive_N_An_gamma1": 403.73796694972077,
+        "log_tilde_Q_n_gamma1": 885.8947404503375,
+        "primitive_diophantine_efficiency": -63.27819574645268
+      },
+      {
+        "n": 7,
+        "degree_2k_n": 16,
+        "primitive_gcd": 1,
+        "log_L_lcm": 1216.545199158508,
+        "log_g_content": 0.0,
+        "log_M_prim": 1216.545199158508,
+        "log_raw_Q_n_gamma1": 6.800735746463425,
+        "log_abs_A_n_alpha1": 2.3470676141377202,
+        "log_abs_B_n_alpha1": 14.735088384771748,
+        "log_abs_ratio_An_over_Bn_alpha1": -12.388020770634027,
+        "log_single_primitive_N_An_gamma1": 541.1849876464408,
+        "log_tilde_Q_n_gamma1": 1223.3459349049715,
+        "primitive_diophantine_efficiency": -76.45912093156072
+      }
+    ]
+  },
+  "pade_divergent_carleman_audit_for_B": {
+    "carleman_determinacy_of_moment_sequence": "Although mu_m = |B_{2m+2}| satisfies Carleman's condition sum_{m>=1} mu_m^{-1/(2m)} = +infty, that guarantees convergence of the Stieltjes continued fraction for the asymptotic series S_B(w) = int_0^infty d nu_tau(y) / (w - y) in the transform variable w -> infty, NOT convergence of multipoint rational interpolation of B(m) = B_{2m} at the Mellin zero argument z = alpha_1.",
+    "finite_n_1_to_7_rows_K0": [
+      {
+        "n": 1,
+        "degree_2k_n": 4,
+        "primitive_gcd": 1,
+        "log_L_lcm": 34.60892181647135,
+        "log_g_content": 0.0,
+        "log_M_prim": 34.60892181647135,
+        "log_raw_Q_n_gamma1": 4.125866260015836,
+        "log_abs_A_n_alpha1": -0.0436406048300323,
+        "log_abs_B_n_alpha1": 1.955636566316147,
+        "log_abs_ratio_An_over_Bn_alpha1": -1.9992771711461792,
+        "log_single_primitive_N_An_gamma1": 12.980296466206623,
+        "log_tilde_Q_n_gamma1": 38.734788076487185,
+        "primitive_diophantine_efficiency": -9.683697019121796
+      },
+      {
+        "n": 2,
+        "degree_2k_n": 6,
+        "primitive_gcd": 1,
+        "log_L_lcm": 69.76892164595039,
+        "log_g_content": 0.0,
+        "log_M_prim": 69.76892164595039,
+        "log_raw_Q_n_gamma1": 9.74781036761734,
+        "log_abs_A_n_alpha1": 2.055477969140876,
+        "log_abs_B_n_alpha1": 3.984766567702944,
+        "log_abs_ratio_An_over_Bn_alpha1": -1.9292885985620676,
+        "log_single_primitive_N_An_gamma1": 31.197477523365976,
+        "log_tilde_Q_n_gamma1": 79.51673201356773,
+        "primitive_diophantine_efficiency": -13.252788668927955
+      },
+      {
+        "n": 3,
+        "degree_2k_n": 8,
+        "primitive_gcd": 1,
+        "log_L_lcm": 110.0235362550446,
+        "log_g_content": 0.0,
+        "log_M_prim": 110.0235362550446,
+        "log_raw_Q_n_gamma1": 16.325692960731697,
+        "log_abs_A_n_alpha1": 4.872119969708661,
+        "log_abs_B_n_alpha1": 6.187322739479158,
+        "log_abs_ratio_An_over_Bn_alpha1": -1.3152027697704975,
+        "log_single_primitive_N_An_gamma1": 62.94163074433905,
+        "log_tilde_Q_n_gamma1": 126.34922921577629,
+        "primitive_diophantine_efficiency": -15.793653651972036
+      },
+      {
+        "n": 4,
+        "degree_2k_n": 10,
+        "primitive_gcd": 1,
+        "log_L_lcm": 174.4214812360977,
+        "log_g_content": 0.0,
+        "log_M_prim": 174.4214812360977,
+        "log_raw_Q_n_gamma1": 23.604153736378574,
+        "log_abs_A_n_alpha1": 8.162153082695408,
+        "log_abs_B_n_alpha1": 8.605133660315795,
+        "log_abs_ratio_An_over_Bn_alpha1": -0.442980577620387,
+        "log_single_primitive_N_An_gamma1": 91.85413148401345,
+        "log_tilde_Q_n_gamma1": 198.02563497247627,
+        "primitive_diophantine_efficiency": -19.802563497247625
+      },
+      {
+        "n": 5,
+        "degree_2k_n": 12,
+        "primitive_gcd": 1,
+        "log_L_lcm": 264.40255027445255,
+        "log_g_content": 1.6094379124341003,
+        "log_M_prim": 262.79311236201846,
+        "log_raw_Q_n_gamma1": 31.42985271601023,
+        "log_abs_A_n_alpha1": 11.801732104042499,
+        "log_abs_B_n_alpha1": 11.245086696442797,
+        "log_abs_ratio_An_over_Bn_alpha1": 0.5566454075996998,
+        "log_single_primitive_N_An_gamma1": 143.52510161367118,
+        "log_tilde_Q_n_gamma1": 294.22296507802866,
+        "primitive_diophantine_efficiency": -24.518580423169055
+      },
+      {
+        "n": 6,
+        "degree_2k_n": 14,
+        "primitive_gcd": 1,
+        "log_L_lcm": 364.8818095302833,
+        "log_g_content": 0.0,
+        "log_M_prim": 364.8818095302833,
+        "log_raw_Q_n_gamma1": 39.69261167760634,
+        "log_abs_A_n_alpha1": 15.714726786132594,
+        "log_abs_B_n_alpha1": 14.098536278174699,
+        "log_abs_ratio_An_over_Bn_alpha1": 1.6161905079578966,
+        "log_single_primitive_N_An_gamma1": 198.32664229036257,
+        "log_tilde_Q_n_gamma1": 404.5744212078896,
+        "primitive_diophantine_efficiency": -28.898172943420686
+      },
+      {
+        "n": 7,
+        "degree_2k_n": 16,
+        "primitive_gcd": 1,
+        "log_L_lcm": 503.0138121884682,
+        "log_g_content": 3.8918202981106265,
+        "log_M_prim": 499.12199189035755,
+        "log_raw_Q_n_gamma1": 48.30205339826869,
+        "log_abs_A_n_alpha1": 19.8461769004758,
+        "log_abs_B_n_alpha1": 17.15315190371458,
+        "log_abs_ratio_An_over_Bn_alpha1": 2.6930249967612205,
+        "log_single_primitive_N_An_gamma1": 258.9740188864977,
+        "log_tilde_Q_n_gamma1": 547.4240452886263,
+        "primitive_diophantine_efficiency": -34.214002830539144
+      }
+    ],
+    "finite_n_1_to_7_rows_B1": [
+      {
+        "n": 1,
+        "degree_2k_n": 4,
+        "primitive_gcd": 1,
+        "log_L_lcm": 45.55822013434904,
+        "log_g_content": 0.0,
+        "log_M_prim": 45.55822013434904,
+        "log_raw_Q_n_gamma1": 1.5069301860511135,
+        "log_abs_A_n_alpha1": -0.3358477759621548,
+        "log_abs_B_n_alpha1": 1.9555274149650326,
+        "log_abs_ratio_An_over_Bn_alpha1": -2.2913751909271873,
+        "log_single_primitive_N_An_gamma1": 13.71116310814845,
+        "log_tilde_Q_n_gamma1": 47.06515032040016,
+        "primitive_diophantine_efficiency": -11.76628758010004
+      },
+      {
+        "n": 2,
+        "degree_2k_n": 6,
+        "primitive_gcd": 1,
+        "log_L_lcm": 101.99560452572486,
+        "log_g_content": 0.0,
+        "log_M_prim": 101.99560452572486,
+        "log_raw_Q_n_gamma1": 4.4254099802156555,
+        "log_abs_A_n_alpha1": 0.6933988917052148,
+        "log_abs_B_n_alpha1": 3.946962007831416,
+        "log_abs_ratio_An_over_Bn_alpha1": -3.253563116126201,
+        "log_single_primitive_N_An_gamma1": 38.10733670216628,
+        "log_tilde_Q_n_gamma1": 106.42101450594052,
+        "primitive_diophantine_efficiency": -17.736835750990085
+      },
+      {
+        "n": 3,
+        "degree_2k_n": 8,
+        "primitive_gcd": 1,
+        "log_L_lcm": 170.1168493542209,
+        "log_g_content": 0.0,
+        "log_M_prim": 170.1168493542209,
+        "log_raw_Q_n_gamma1": 8.165256911945074,
+        "log_abs_A_n_alpha1": 2.188161692536168,
+        "log_abs_B_n_alpha1": 6.0356248612999535,
+        "log_abs_ratio_An_over_Bn_alpha1": -3.847463168763786,
+        "log_single_primitive_N_An_gamma1": 79.35544951988058,
+        "log_tilde_Q_n_gamma1": 178.28210626616598,
+        "primitive_diophantine_efficiency": -22.285263283270748
+      },
+      {
+        "n": 4,
+        "degree_2k_n": 10,
+        "primitive_gcd": 1,
+        "log_L_lcm": 272.54487664204197,
+        "log_g_content": 0.0,
+        "log_M_prim": 272.54487664204197,
+        "log_raw_Q_n_gamma1": 12.575376808398826,
+        "log_abs_A_n_alpha1": 4.071188724744408,
+        "log_abs_B_n_alpha1": 8.26236246976592,
+        "log_abs_ratio_An_over_Bn_alpha1": -4.191173745021511,
+        "log_single_primitive_N_An_gamma1": 121.17285032118492,
+        "log_tilde_Q_n_gamma1": 285.1202534504408,
+        "primitive_diophantine_efficiency": -28.512025345044083
+      },
+      {
+        "n": 5,
+        "degree_2k_n": 12,
+        "primitive_gcd": 1,
+        "log_L_lcm": 418.79278624430793,
+        "log_g_content": 0.0,
+        "log_M_prim": 418.79278624430793,
+        "log_raw_Q_n_gamma1": 17.547579757601476,
+        "log_abs_A_n_alpha1": 6.281713442118111,
+        "log_abs_B_n_alpha1": 10.64446415321574,
+        "log_abs_ratio_An_over_Bn_alpha1": -4.36275071109763,
+        "log_single_primitive_N_An_gamma1": 192.29688192647689,
+        "log_tilde_Q_n_gamma1": 436.34036600190944,
+        "primitive_diophantine_efficiency": -36.361697166825785
+      },
+      {
+        "n": 6,
+        "degree_2k_n": 14,
+        "primitive_gcd": 1,
+        "log_L_lcm": 588.7837605294665,
+        "log_g_content": 0.0,
+        "log_M_prim": 588.7837605294665,
+        "log_raw_Q_n_gamma1": 22.999875520052772,
+        "log_abs_A_n_alpha1": 8.77035532226534,
+        "log_abs_B_n_alpha1": 13.18416696395297,
+        "log_abs_ratio_An_over_Bn_alpha1": -4.41381164168763,
+        "log_single_primitive_N_An_gamma1": 279.5916818407325,
+        "log_tilde_Q_n_gamma1": 611.7836360495193,
+        "primitive_diophantine_efficiency": -43.698831146394234
+      },
+      {
+        "n": 7,
+        "degree_2k_n": 16,
+        "primitive_gcd": 1,
+        "log_L_lcm": 815.2354551239971,
+        "log_g_content": 0.0,
+        "log_M_prim": 815.2354551239971,
+        "log_raw_Q_n_gamma1": 28.868611272966756,
+        "log_abs_A_n_alpha1": 11.497804661642812,
+        "log_abs_B_n_alpha1": 15.876282414601311,
+        "log_abs_ratio_An_over_Bn_alpha1": -4.378477752958498,
+        "log_single_primitive_N_An_gamma1": 381.27337088871695,
+        "log_tilde_Q_n_gamma1": 844.1040663969638,
+        "primitive_diophantine_efficiency": -52.75650414981024
+      }
+    ]
+  },
+  "primitive_integer_normalization_all_routes": {
+    "newton_R_tau_n_eq_8": {
+      "route": "Consecutive Newton on R_tau(m) (n=8, deg=18)",
+      "sample_den_scaling": "2n log n",
+      "log_tilde_Q_gamma1": 148.76,
+      "efficiency": -8.265,
+      "gate_z5_outcome": "FAILS (diverges >= (1/2)(1/4+gamma_1^2)(n!)^2)"
+    },
+    "newton_K0_n_eq_8": {
+      "route": "Consecutive Newton on K_0(m) (n=8, deg=18)",
+      "sample_den_scaling": "2n + o(n) (SUBFACTORIAL)",
+      "log_tilde_Q_gamma1_lower_bound": 49.76187850961618,
+      "gate_z5_outcome": "FAILS (universal Newton leading-coeff cancellation + divergent Newton tail)"
+    },
+    "newton_B2_n_eq_8": {
+      "route": "Consecutive Newton on B_2(m) (n=8, deg=18)",
+      "sample_den_scaling": "2n log n",
+      "log_tilde_Q_gamma1_lower_bound": 49.76187850961618,
+      "gate_z5_outcome": "FAILS (universal Newton leading-coeff cancellation)"
+    },
+    "stieltjes_hankel_P_n_eq_6": {
+      "route": "Bernoulli Stieltjes orthogonal polynomial P_6^B(y) (n=6)",
+      "sample_den_scaling": "2n + o(n) (SUBFACTORIAL)",
+      "log_tilde_P_gamma1": 25.34824787685017,
+      "gate_z5_outcome": "FAILS (moment variable y != zero argument alpha_1; zeros on (0, infty))"
+    },
+    "multipoint_pade_K0_n_eq_6": {
+      "route": "Multipoint Pad\u00e9 [6/6]+[7/7] on K_0(m) (deg=14)",
+      "sample_den_scaling": "2n + o(n) (SUBFACTORIAL)",
+      "log_M_prim": 364.8818095302833,
+      "log_tilde_Q_gamma1": 404.5744212078896,
+      "efficiency": -28.898172943420686,
+      "gate_z5_outcome": "FAILS (divergent OGF R=0 causes factorial sample growth in Cramer determinants)"
+    },
+    "multipoint_pade_B2_n_eq_6": {
+      "route": "Multipoint Pad\u00e9 [6/6]+[7/7] on B_2(m) (deg=14)",
+      "sample_den_scaling": "2n log n",
+      "log_M_prim": 881.0340483032804,
+      "log_tilde_Q_gamma1": 885.8947404503375,
+      "efficiency": -63.27819574645268,
+      "gate_z5_outcome": "FAILS for finite n <= 7 (log tilde{Q}_6 > 0)"
+    },
+    "multipoint_pade_R_tau_n_eq_6": {
+      "route": "Multipoint Pad\u00e9 [6/6]+[7/7] on R_tau(m) (deg=14)",
+      "sample_den_scaling": "2n log n",
+      "log_M_prim": 1072.4195522763307,
+      "log_tilde_Q_gamma1": 1063.2014087615987,
+      "efficiency": -75.94295776868562,
+      "gate_z5_outcome": "FAILS for finite n <= 7 (log tilde{Q}_6 > 0; all-n asymptotic OPEN)"
+    }
+  },
+  "factorial_relocation_analysis": {
+    "classification": "FACTORIAL_RELOCATION_ACROSS_DENOMINATOR_GROWTH_AND_BASIS_PROVED",
+    "governing_answer": "YES for the sample denominator alone: Gamma-reflection B(z) = -2z*zeta(1-2z) and K_0(z) = z*(2z-1)*zeta(1-2z) rigorously reduce the integer-sample denominator LCM from exp(2n log n + O(n)) to the squarefree von Staudt-Clausen primorial D_n^B = prod_{p <= 2n+1} p = exp(vartheta(2n+1)) = exp(2n + o(n)) (`SUBFACTORIAL_RATIONAL_SAMPLE_DENOMINATOR_ACHIEVED`), while preserving exact vanishing at every nontrivial zeta-zero argument z = rho/2. NO for escaping the total factorial cost on equispaced integer nodes {0, ..., n}: across the entire Gamma-reflection / Gamma-ratio class B_q(z) = K_0(z)/Gamma(z+1)^q, the 2*n*log(n) factorial budget is strictly conserved between sample growth (2-q)*n*log(n) and sample denominator growth q*n*log(n), while equispaced Newton/Lagrange polynomial bases independently enforce the universal primitive norm lower bound tilde{Q}_n(gamma_1) >= (1/2)*prod_{j=0}^n ((2j - 1/2)^2 + gamma_1^2) -> +infty.",
+    "five_relocation_channels": {
+      "1_sample_denominators": "q * n * log(n) + O_q(n) for B_q(m) (0 for q=0, 2*n*log(n) for q=2 and R_tau)",
+      "2_sample_magnitudes": "(2 - q) * n * log(n) + O_q(n) for |B_q(m)| (2*n*log(n) for q=0, 0 for q=2 and R_tau)",
+      "3_interpolation_basis_denominators": "1 * n * log(n) + O(n) for equispaced Newton/Lagrange basis on {0, ..., n} (2*n*log(n) in squared norm leading coefficient)",
+      "4_hankel_or_pade_determinant_clearing": "Theta(n^2 * log(n)) for Hankel/Cramer determinants of moments or Pad\u00e9 linear systems",
+      "5_entire_multiplier_left_half_plane_growth": "Gamma(2z+1)*cos(tau*z/2)/Gamma(z+1)^q has Stirling growth (2-q)*Re(z)*log|z| on Re(z) > 0 and poles of order q at negative integers"
+    },
+    "lean_theorem": "auxiliary_polynomial_factorial_cost_lower_bound_schema"
+  },
+  "subfactorial_escape_classification": "SUBFACTORIAL_RATIONAL_SAMPLE_DENOMINATOR_ACHIEVED / EQUISPACED_GAMMA_REFLECTION_CLASS_NO_GO_PROVED",
+  "conditional_no_go_or_escape_theorem": {
+    "classification": "EQUISPACED_GAMMA_REFLECTION_CLASS_NO_GO_PROVED",
+    "secondary_classification": "FACTORIAL_RELOCATION_ACROSS_DENOMINATOR_GROWTH_AND_BASIS_PROVED",
+    "theorem_name": "Equispaced Gamma-Ratio & Consecutive-Newton Factorial Conservation No-Go Theorem",
+    "exact_statement": "Let F_q(z) = c^z * K_0(z) / Gamma(z + 1)^q (q in Z_{>= 0}, c in Q_{>0}) be any kernel in the Gamma-reflected / Gamma-ratio hierarchy evaluated on equispaced integer nodes m = 0, 1, ..., n. Then: (1) [Exact Sample-Growth + Sample-Denominator Conservation] By Euler's formula and the irregular-prime-free von Staudt-Clausen witness m_p = k_p*(p-1)/2, log|F_q(n)| = (2 - q)*n*log(n) + O_{q,c}(n) and log(lcm_{0<=m<=n} den(F_q(m))) = q*n*log(n) + O_{q,c}(n), so their sum equals 2*n*log(n) + O_{q,c}(n) for EVERY q >= 0. (2) [Universal Consecutive-Newton Primitive Obstruction] For ANY kernel f(z) with rational samples f(m) in Q and Delta^{n+1} f(0) != 0, the canonical primitive integer two-approximant Newton norm polynomial tilde{Q}_n^{[f]}(Y) in Z[Y] satisfies tilde{Q}_n^{[f]}(Y) >= (1/2) * prod_{j=0}^n ((2j - 1/2)^2 + Y^2) >= (1/2)*(1/4 + Y^2)*(n!)^2 -> +infty for all Y in R, because the primitive multiplier M_n >= 1/q_{n,2n+2} cancels (Delta^{n+1} f(0))^2 identically while retaining 4^{n+1}((n+1)!)^2 from the equispaced Newton basis.",
+    "what_would_be_required_to_escape": "To escape this no-go theorem, an architecture must abandon equispaced integer polynomial interpolation {0, 1, ..., n} (which forces both the (n!)^2 basis denominator and the 2n log n Stirling/Bernoulli trade-off) or establish an all-n multipoint rational/Pad\u00e9 cancellation where common integer content g_n in the Cramer determinant cancels the denominator LCM (which does NOT occur for 1 <= n <= 7)."
+  },
+  "diophantine_efficiency_table": [
+    {
+      "architecture": "Consecutive Newton on R_tau / R_pi",
+      "sample_den_log": "2n log n + O(n)",
+      "sample_growth_log": "O(n)",
+      "raw_residual_log": "-2 kappa(c) n^{1/3} + O(log n)",
+      "primitive_clearing_log": "2n log n + 2 kappa(c) n^{1/3} + O(n)",
+      "primitive_eval_log": ">= 2n log n - O(n) -> +infty",
+      "efficiency_limit": "-infty",
+      "status": "CLOSED_NEGATIVE_AT_GATE_Z5"
+    },
+    {
+      "architecture": "Consecutive Newton on K_0 / B (q = 0)",
+      "sample_den_log": "2n + o(n) [SUBFACTORIAL]",
+      "sample_growth_log": "2n log n + O(n)",
+      "raw_residual_log": "+2n log n + O(n) (diverges)",
+      "primitive_clearing_log": "Universal leading-coeff cancellation",
+      "primitive_eval_log": ">= 2n log n - O(n) -> +infty",
+      "efficiency_limit": "-infty",
+      "status": "CLOSED_NEGATIVE_AT_GATE_Z5"
+    },
+    {
+      "architecture": "Consecutive Newton on B_2 (q = 2)",
+      "sample_den_log": "2n log n + O(n)",
+      "sample_growth_log": "O(n)",
+      "raw_residual_log": "Algebraic / logarithmic",
+      "primitive_clearing_log": ">= 2n log n + O(n)",
+      "primitive_eval_log": ">= 2n log n - O(n) -> +infty",
+      "efficiency_limit": "-infty",
+      "status": "CLOSED_NEGATIVE_AT_GATE_Z5"
+    },
+    {
+      "architecture": "Bernoulli Stieltjes\u2013Hankel P_n^B(y) on mu_m = |B_{2m+2}|",
+      "sample_den_log": "2n + o(n) [SUBFACTORIAL]",
+      "sample_growth_log": "2n log n + O(n)",
+      "raw_residual_log": "+2n log n + O(n) (zeros on (0, infty))",
+      "primitive_clearing_log": "O(n^2)",
+      "primitive_eval_log": "-> +infty (decoupled from alpha_1)",
+      "efficiency_limit": "-infty",
+      "status": "DECOUPLED_AT_GATE_Z1_Z5"
+    },
+    {
+      "architecture": "Multipoint Pad\u00e9 [n/n] on K_0 (q = 0)",
+      "sample_den_log": "4n + o(n) [SUBFACTORIAL]",
+      "sample_growth_log": "4n log n + O(n)",
+      "raw_residual_log": "> 0 (divergent OGF R = 0)",
+      "primitive_clearing_log": "Theta(n^2 log n)",
+      "primitive_eval_log": "-> +infty (finite n <= 7)",
+      "efficiency_limit": "< 0 (diverges)",
+      "status": "REFUTED_FINITE_DIVERGENT_OGF"
+    },
+    {
+      "architecture": "Multipoint Pad\u00e9 [n/n] on R_tau / R_pi / B_2",
+      "sample_den_log": "4n log n + O(n)",
+      "sample_growth_log": "O(n)",
+      "raw_residual_log": "< 0 (convergent OGF R > 0)",
+      "primitive_clearing_log": "Theta(n^2 log n) empirically for n <= 7",
+      "primitive_eval_log": "> 0 and growing for 1 <= n <= 7",
+      "efficiency_limit": "Negative for 1 <= n <= 7; all-n asymptotic OPEN",
+      "status": "OPEN (SUBGATE-TC-039A [Pad\u00e9 asymptotic])"
+    }
+  ],
+  "first_zero_gamma1_numerical_audit": {
+    "gamma_1": 14.134725141734695,
+    "alpha_1": "0.25 + 7.067362570867i",
+    "abs_R_tau_alpha1": 1.4309520207303326e-60,
+    "abs_K0_alpha1": 2.5365538373061134e-59,
+    "abs_B_alpha1": 3.58686609158415e-60,
+    "abs_B2_alpha1": 9.419788397834225e-52,
+    "abs_P_alpha1": 8.169073202336658e-70,
+    "all_kernels_vanish_at_alpha1": true
+  },
+  "synthetic_rational_zero_control": {
+    "alpha_star": "1/4 + 7i",
+    "gamma_star": 14,
+    "rational_denominator_b": 1,
+    "n_tested": 3,
+    "primitive_gcd": 1,
+    "tilde_Q_3_at_gamma_star_exact_int": 240269905648869425,
+    "tilde_Q_3_at_gamma_star_ge_1": true
+  },
+  "trivial_zero_control": {
+    "at_z_eq_neg_1_2z_eq_neg_2": {
+      "abs_R_tau_neg1": 0.0,
+      "B_neg1_value": 2.4041138063191885,
+      "two_zeta_3_value": 2.4041138063191885,
+      "K0_neg1_value": 3.606170709478783,
+      "three_zeta_3_value": 3.606170709478783,
+      "R_tau_vanishes": true,
+      "B_and_K0_nonzero_equal_zeta3_multiples": true
+    },
+    "at_z_eq_3_over_2_1_minus_2z_eq_neg_2": {
+      "R_tau_3_over_2_value": 0.0096920449007292,
+      "abs_B_3_over_2": 0.0,
+      "abs_K0_3_over_2": 0.0,
+      "B_and_K0_vanish": true,
+      "R_tau_nonzero": true
+    }
+  },
+  "davenport_heilbronn_control": {
+    "has_functional_equation": true,
+    "has_euler_product": false,
+    "has_off_line_zeros": true,
+    "reflection_relocation_depends_on_euler_product": false,
+    "explanation": "The Gamma-reflection identity K_0(z) = Gamma(2z+1)*cos(tau*z/2)*R_tau(z) = z*(2z-1)*zeta(1-2z) and the factorial budget conservation (2-q)*n*log(n) + q*n*log(n) = 2*n*log(n) depend ONLY on Riemann's functional equation and Stirling's formula for Gamma, not on the Euler product. For Davenport-Heilbronn, the linear combination coefficients involve algebraic/transcendental L-function factors so rational sampling already fails at Gate Z2, while for Riemann zeta the rational Bernoulli samples pass Gate Z2 with O(n) log-denominator but fail Gate Z5 via factorial sample growth."
+  },
+  "off_line_zero_control": {
+    "hypothetical_zero": "rho_off = beta + i * gamma  (beta != 1/2)",
+    "functional_equation_partner": "1 - rho_off = (1 - beta) - i * gamma",
+    "K0_and_B_vanish_at_rho_off_over_2": true,
+    "conjugate_norm_factor_formula": "beta**2/4 + beta + gamma**2/4 + 1",
+    "depends_on_beta_and_gamma": true,
+    "explanation": "By the functional equation zeta(rho_off) = 0 <=> zeta(1 - rho_off) = 0, both B(rho_off/2) = 0 and K_0(rho_off/2) = 0 hold unconditionally for any nontrivial zero (on-line or off-line). Writing alpha(beta, Y) = beta/2 + i*Y/2 makes P(alpha)*P(conj(alpha)) a polynomial in (beta, Y^2) which specializes to a 1-variable polynomial Q_n(Y) in Q[Y] whenever beta in Q (in particular beta = 1/2)."
+  },
+  "z1_to_z5_gate_status_table": {
+    "Gate_Z1_Zero_Argument_Injection": {
+      "R_tau_R_pi": "PASSED (`R_tau(rho/2) = 0`)",
+      "K0_and_B": "PASSED (`K_0(rho/2) = B(rho/2) = 0` via functional equation)",
+      "B_q": "PASSED (`B_q(rho/2) = 0`)",
+      "Stieltjes_Hankel_P_n_B": "FAILED (polynomial variable `y` is integration moment variable, not `rho/2`)",
+      "Riesz_Gram_Hadamard": "FAILED (global asymptotic or irrational coefficients)"
+    },
+    "Gate_Z2_Rational_Sample_Values_and_Subfactorial_Denominators": {
+      "R_tau_R_pi": "PASSED rational samples; FAILS subfactorial denominator (`log D_n = 2n log n + O(n)`)",
+      "K0_and_B": "PASSED BOTH rational samples AND subfactorial denominator (`D_n^B = prod_{p<=2n+1} p = exp(2n + o(n))`)",
+      "B_q_q_ge_1": "PASSED rational samples; FAILS subfactorial denominator (`log D_{q,n} = q*n*log(n) + O_q(n)`)",
+      "Stieltjes_Hankel_P_n_B": "PASSED rational moments `|B_{2m+2}|` with squarefree denominators"
+    },
+    "Gate_Z3_Nonvanishing_Auxiliary_Polynomial": {
+      "Consecutive_Newton_All_Kernels": "PASSED (`Q_n(Y) = |N_n|^2 + |N_{n+1}|^2 > 0` for all real `Y`)",
+      "Multipoint_Pade_Two_Step": "PASSED for `1 <= n <= 7`"
+    },
+    "Gate_Z4_Raw_Analytic_Smallness_at_Zero_Argument": {
+      "Consecutive_Newton_R_c": "PASSED subfactorial decay `exp(-2*kappa(c)*n^{1/3})`",
+      "Consecutive_Newton_K0_and_B": "FAILED (Newton series diverges: `log|N_n(alpha_1)| ~ +2n log n`)",
+      "Multipoint_Pade_R_c_and_B2": "PASSED raw decay `< 0` for `1 <= n <= 7`",
+      "Multipoint_Pade_K0_and_B1": "FAILED (divergent OGF `R = 0`)"
+    },
+    "Gate_Z5_Primitive_Integer_Diophantine_Efficiency": {
+      "Consecutive_Newton_All_Kernels": "CLOSED_NEGATIVE (`tilde{Q}_n(gamma_1) >= (1/2) prod_{j=0}^n ((2j-1/2)^2 + gamma_1^2) -> +infty`)",
+      "Equispaced_Gamma_Ratio_Class": "CLOSED_NEGATIVE (`EQUISPACED_GAMMA_REFLECTION_CLASS_NO_GO_PROVED`)",
+      "Multipoint_Pade_R_c": "NEGATIVE for `1 <= n <= 7`; all-n asymptotic remains OPEN (`ALL_N_MULTIPOINT_PADE_ASYMPTOTIC_STILL_OPEN`)"
+    }
+  },
+  "subgate_tc_040a_status": "CLOSED_FOR_EQUISPACED_GAMMA_REFLECTION_CLASS_AT_GATE_Z5 (SUBFACTORIAL_RATIONAL_SAMPLE_DENOMINATOR_ACHIEVED; EQUISPACED_GAMMA_REFLECTION_CLASS_NO_GO_PROVED)",
+  "subgate_tc_039a_status": "OPEN (Newton branch CLOSED_NEGATIVE_AT_GATE_Z5; all-n multipoint Pad\u00e9 asymptotic subproblem OPEN)",
+  "subgate_tc_038a_status": "OPEN",
+  "obl_ct_001a_status": "OPEN",
+  "lean_theorems": [
+    "bernoulli_kernel_linear_relation",
+    "bernoulli_kernel_zero_at_zeta_zero",
+    "gamma_reflection_sample_clearing_identity",
+    "gamma_ratio_budget_conservation_identity",
+    "sign_adjusted_bernoulli_positive_sample_identity",
+    "auxiliary_polynomial_factorial_cost_lower_bound_schema",
+    "gamma_ratio_newton_basis_total_cost_conservation",
+    "carlitz_touchard_hankel_recurrence_positivity"
+  ]
+}
