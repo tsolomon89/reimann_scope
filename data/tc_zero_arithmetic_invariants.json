@@ -436,11 +436,11 @@
   "formal_theorem_count_recomputed": {
     "zero_arithmetic_invariants_theorem_declarations": 12,
     "zero_arithmetic_invariants_total_declarations": 12,
-    "total_repository_theorem_declarations": 643
+    "total_repository_theorem_declarations": 647
   },
   "zero_arithmetic_lean_file_in_build_report": true,
   "zero_arithmetic_lean_theorem_count": 12,
-  "total_formal_theorem_count": 643,
+  "total_formal_theorem_count": 647,
   "stieltjes_notation_policy": {
     "status": "STIELTJES_NOTATION_DISAMBIGUATED",
     "zero_ordinate_symbol": "gamma_n = Im(rho_n) in R",
@@ -1804,7 +1804,7 @@
     "lists_match_exactly": true,
     "zero_arithmetic_lean_file_in_inventories": true,
     "zero_arithmetic_lean_theorem_count": 12,
-    "total_formal_theorem_count": 643
+    "total_formal_theorem_count": 647
   },
   "principal_classification": "ZERO_ARITHMETIC_FRONTIER_CLASSIFIED_INDIVIDUAL_STATUS_OPEN",
   "secondary_classification": "FAUZAN_HANKEL_ZERO_LOCATION_TRANSFER_UNRESOLVED",

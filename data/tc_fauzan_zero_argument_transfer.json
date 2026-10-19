@@ -30,7 +30,7 @@
       "umbrella_imported_module_count": 33,
       "build_formal_source_count": 34,
       "certification_required_source_count": 34,
-      "total_formal_theorem_count": 643
+      "total_formal_theorem_count": 647
     },
     "canonical_numerical_consistency": {
       "s4_value_50dps": "0.0000736272212616895183267713070306015113128315963",
@@ -2021,7 +2021,7 @@
   ],
   "lean_theorem_map": {
     "lean_file": "formal/RiemannScope/FauzanZeroArgumentTransfer.lean",
-    "sha256": "47707242f79b556fe64847bcc471f2921e162670476a116073d4ef63416411f5",
+    "sha256": "6643011fd42762a0bc8a445f382d070803d8edccdff1b8e913de1355cd1cc4ee",
     "required_theorems": [
       "argument_norm_polynomial_real",
       "argument_norm_polynomial_nonneg",
@@ -2050,9 +2050,13 @@
       "hankel_gauge_scaling_exponent",
       "rational_gauge_zero_divisor_invariant",
       "two_phase_cosine_square_lower_bound",
-      "fixed_gauge_degree_invariance"
+      "fixed_gauge_degree_invariance",
+      "tau_removable_singularity_half_scaling",
+      "vertical_line_saddle_real_concavity_identity",
+      "vertical_line_saddle_imag_cubic_identity",
+      "phase_displacement_pi_over_three_sum_sq_lower_bound"
     ],
-    "theorem_declaration_count": 17,
+    "theorem_declaration_count": 21,
     "missing_required_theorems": [],
     "all_required_present": true,
     "sorry_count": 0,
@@ -2070,7 +2074,7 @@
       "lists_match_exactly": true,
       "zero_arithmetic_lean_file_in_inventories": true,
       "zero_arithmetic_lean_theorem_count": 12,
-      "total_formal_theorem_count": 643
+      "total_formal_theorem_count": 647
     },
     "audit_note": "0 sorry, 0 admit, no nonstandard project axioms introduced.",
     "not_claimed_in_lean": [

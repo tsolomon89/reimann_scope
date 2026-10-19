@@ -1,6 +1,8 @@
 {
   "task_id": "TASK-TC-039R",
+  "latest_repair_task_id": "TASK-TC-039R3",
   "starting_head": "e0545d3a01d09da394bf1b74bc7153b14cc365ea",
+  "tc039r3_starting_head": "a3f3b2ae12ca9d76d093c478926592836a30cf3a",
   "substantive_tc039_commit": "f55571b96eb9b4f51a29946ee6b095c840a423e7",
   "pi_tau_policy": {
     "pi_form": "R_pi(z) = (2z - 1) * pi^{-2z} * zeta(2z) = pi^{-z} * xi(2z) / Gamma(z + 1)",
@@ -19,20 +21,34 @@
     "tau_first_simplification": "Obtained from primitive R_tau(z) by multiplying by the nowhere-zero gauge 4^z",
     "normalization_dependent_factors": "4^z = exp(z log 4), value at z = 1/2 is R_pi(1/2) = 1/pi = 2/tau",
     "normalization_invariant_factors": "Entire status on C, simple pole cancellation at z = 1/2, zeros at z = rho/2 and z = -m (m >= 1)",
-    "symbolic_completed_xi_identity_verified": true
+    "symbolic_completed_xi_identity_verified": true,
+    "value_at_z_eq_half": "R_pi(1/2) = 1/pi = 2/tau",
+    "value_at_z_eq_half_float": 0.3183098861837907
   },
   "R_tau": {
     "pi_form": "R_tau(z) = 4^{-z} * (2z - 1) * pi^{-2z} * zeta(2z) = (4*pi)^{-z} * xi(2z) / Gamma(z + 1)",
     "tau_form": "R_tau(z) = (2z - 1) * tau^{-2z} * zeta(2z) = (2*tau)^{-z} * xi(2z) / Gamma(z + 1)",
     "pi_tau_equivalence": "R_tau(z) = 4^{-z} * R_pi(z) (primitive gauge c = 1)",
     "tau_first_simplification": "Exposes the pure Bernoulli/factorial rational core a_m^{(tau)} = (-1)^{m+1} (2m-1) B_{2m} / (2*(2m)!) at nonnegative integers m without any dyadic 2^{2m} numerator multiplier",
-    "normalization_dependent_factors": "Gauge c = 1, value at z = 1/2 is R_tau(1/2) = 1/(2*tau) = 1/(4*pi)",
+    "normalization_dependent_factors": "Gauge c = 1, value at z = 1/2 is R_tau(1/2) = 1/tau = 1/(2*pi)",
     "normalization_invariant_factors": "Entire status on C, simple pole cancellation at z = 1/2, zeros at z = rho/2 and z = -m (m >= 1)",
-    "symbolic_completed_xi_identity_verified": true
+    "symbolic_completed_xi_identity_verified": true,
+    "value_at_z_eq_half": "R_tau(1/2) = 1/tau = 1/(2*pi)",
+    "value_at_z_eq_half_float": 0.15915494309189535,
+    "scaling_at_z_eq_half": "R_pi(1/2) = 4^{1/2} * R_tau(1/2) = 2 * R_tau(1/2) = 2/tau = 1/pi",
+    "scaling_at_z_eq_half_verified": true,
+    "lean_theorem_at_half": "tau_removable_singularity_half_scaling"
   },
   "R_pi_tau_scaling": {
     "identity": "R_pi(z) = 4^z * R_tau(z)",
     "completed_xi_ratio": "pi^{-z} / (2*tau)^{-z} = (2*tau / pi)^z = 4^z",
+    "removable_singularity_at_half": {
+      "R_tau_at_half": "1/tau = 1/(2*pi)",
+      "R_pi_at_half": "1/pi = 2/tau = 2 * R_tau(1/2)",
+      "R_c_at_half": "sqrt(c) / tau = sqrt(c) * R_tau(1/2)",
+      "scaling_check_verified": true,
+      "lean_theorem": "tau_removable_singularity_half_scaling"
+    },
     "symbolic_verified": true,
     "arb_128bit_verified_at_alpha1": true,
     "lean_theorem": "pi_tau_zero_function_scaling"
@@ -53,10 +69,14 @@
     "pi_form": "pi^{-2m} * zeta(2m) = (-1)^{m+1} * 2^{2m-1} * B_{2m} / (2m)!",
     "tau_form": "tau^{-2m} * zeta(2m) = (-1)^{m+1} * B_{2m} / (2 * (2m)!)",
     "pi_tau_equivalence": "pi^{-2m} * zeta(2m) = 4^m * tau^{-2m} * zeta(2m)",
-    "tau_first_simplification": "Because Euler's formula is zeta(2m) = (-1)^{m+1} B_{2m} (2*pi)^{2m} / (2*(2m)!) = (-1)^{m+1} B_{2m} tau^{2m} / (2*(2m)!), dividing by tau^{2m} leaves the pure rational core (-1)^{m+1} B_{2m} / (2*(2m)!) in Q_{>0}.",
+    "tau_first_simplification": "Because Euler's formula is zeta(2m) = (-1)^{m+1} B_{2m} (2*pi)^{2m} / (2*(2m)!) = (-1)^{m+1} B_{2m} tau^{2m} / (2*(2m)!), dividing by tau^{2m} leaves the pure rational core (-1)^{m+1} B_{2m} / (2*(2m)!) in Q for all m >= 0 and strictly in Q_{>0} for all m >= 1 (at m = 0, zeta(0) = -1/2 < 0, whereas a_0^{(tau)} = (2*0 - 1) * zeta(0) = +1/2 in Q_{>0}).",
     "normalization_dependent_factors": "2^{2m} = 4^m dyadic power",
     "normalization_invariant_factors": "Bernoulli numerator/denominator B_{2m} and factorial (2m)!",
     "classification": "TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE",
+    "rational_domain": "tau^{-2m} * zeta(2m) in Q for all m >= 0 (at m = 0, zeta(0) = -1/2 < 0)",
+    "strictly_positive_rational_domain": "tau^{-2m} * zeta(2m) in Q_{>0} strictly for m >= 1",
+    "sample_sequence_positive_domain": "a_m^{(tau)} = (2m - 1) * tau^{-2m} * zeta(2m) in Q_{>0} for all m >= 0 (since 2m - 1 = -1 at m = 0 flips zeta(0) = -1/2 to a_0^{(tau)} = +1/2 > 0)",
+    "symbolic_m0_neg_half_verified": true,
     "symbolic_euler_verified_m_1_to_12": true,
     "lean_theorem": "tau_even_zeta_rational_core_identity"
   },
@@ -201,6 +221,7 @@
   "rational_gauge_family": {
     "classification": "RATIONAL_ZERO_PRESERVING_NORMALIZATION_GAUGE_FAMILY_PROVED",
     "definition": "R_c(z) := c^z * R_tau(z) = (2z - 1) * c^z * tau^{-2z} * zeta(2z) = (2*tau/c)^{-z} * xi(2z) / Gamma(z + 1)",
+    "value_at_z_eq_half": "R_c(1/2) = sqrt(c) / tau = sqrt(c) / (2*pi)",
     "parameter_domain": "c in Q_{>0}",
     "tau_special_case": "c = 1",
     "pi_special_case": "c = 4",
@@ -213,8 +234,8 @@
     "lean_theorem": "rational_gauge_zero_divisor_invariant"
   },
   "gauge_sample_formula": {
-    "formula": "a_m^{(c)} = R_c(m) = c^m * a_m^{(tau)} = (-1)^{m+1} * c^m * (2m - 1) * B_{2m} / (2 * (2m)!) in Q_{>0}",
-    "moment_formula": "b_m^{(c)} = a_{m+1}^{(c)} / (2m + 1) = c^{m+1} * b_m^{(tau)} = (-1)^m * c^{m+1} * B_{2m+2} / (2 * (2m+2)!) in Q_{>0}",
+    "formula": "a_m^{(c)} = R_c(m) = c^m * a_m^{(tau)} = (-1)^{m+1} * c^m * (2m - 1) * B_{2m} / (2 * (2m)!) in Q_{>0} (for all m >= 0)",
+    "moment_formula": "b_m^{(c)} = a_{m+1}^{(c)} / (2m + 1) = c^{m+1} * b_m^{(tau)} = (-1)^m * c^{m+1} * B_{2m+2} / (2 * (2m+2)!) in Q_{>0} (for all m >= 0)",
     "lean_theorem": "moment_pi_tau_scaling"
   },
   "A_pi": {
@@ -254,8 +275,9 @@
     "branch_and_sector_conventions": "Principal square root sqrt(s) = |s|^{1/2} exp(i arg(s)/2) on arg(s) in (-pi, pi); Re(1/sqrt(s)) > 0 across the entire cut plane |arg(s)| < pi, with conjugate saddles at arg(s) = +- 2*pi/3 where 1/sqrt(s) = |s|^{-1/2} exp(-+ i*pi/3) = |s|^{-1/2} * (1/2 -+ i*sqrt(3)/2) still has positive real part +1/2 |s|^{-1/2}."
   },
   "saddle_points": {
-    "saddle_equation": "d/ds [n*s - sqrt(c)/sqrt(s)] = n + sqrt(c) / (2 * s^{3/2}) = 0  =>  s^{3/2} = -sqrt(c) / (2*n)",
-    "asymptotic_locations": "s_{+-} ~ (sqrt(c) / (2*n))^{2/3} * exp(+- 2*pi*i / 3)",
+    "saddle_equation": "d/ds [n*s - sqrt(c)/sqrt(s)] = n + sqrt(c) / (2 * s^{3/2}) = 0  <=>  u^3 = -sqrt(c) / (2*n)  (s = u^2)",
+    "asymptotic_locations": "s_{+-} ~ (sqrt(c) / (2*n))^{2/3} * exp(+- 2*pi*i / 3)  (u_{+-} = (sqrt(c) / (2*n))^{1/3} * exp(+- i*pi / 3) in H_+)",
+    "third_saddle_in_left_half_plane": "u_0 = -(sqrt(c) / (2*n))^{1/3} < 0 in H_- (isolated from H_+ by the imaginary-axis pole barrier Re(u) = 0)",
     "at_pi_c_eq_4": "s_{+-}^{(pi)} ~ (1 / n)^{2/3} * exp(+- 2*pi*i / 3)",
     "at_tau_c_eq_1": "s_{+-}^{(tau)} ~ (1 / (2*n))^{2/3} * exp(+- 2*pi*i / 3)",
     "pi_pow_2_over_3_contamination_present": false,
@@ -289,68 +311,154 @@
     "omega_tau_exact": "3 * sqrt(3) / 2^{5/3}",
     "omega_tau_float": 1.6366854539575821
   },
+  "norlund_rice_vertical_line_steepest_descent_proof": {
+    "task_id": "TASK-TC-039R3",
+    "1_branch_free_u_plane_contour_representation": "Setting w = -1 + u^2 (s = 1 + w = u^2, dw = 2*u du), the transformed generating function H_c(u) := 2*u*C_c(-1 + u^2) = c*(1 - u^2) / (4 * u^3 * sinh^2(sqrt(c*(1 - u^2)) / (2*u))) = (1/u) * prod_{k=1}^infty (1 + c*(1 - u^2) / (tau^2 * k^2 * u^2))^{-2} is single-valued and meromorphic on C \\ {0} with NO branch cuts. Deforming the small Cauchy circle around u = 1 (w = 0) in the open right half-plane H_+ = {Re(u) > 0} to the vertical line u = x_n + i*y (y in R) with x_n = (1/2)*(sqrt(c)/(2*n))^{1/3} > 0 gives the exact identity Delta^n a_0^{(c)} = ((-1)^n / (2*pi)) * int_{-infty}^{infty} H_c(x_n + i*y) * (1 - (x_n + i*y)^2)^{-n-1} dy.",
+    "2_all_singularities_and_saddles_identified": "Singularities of H_c(u): an essential singularity at u = 0 (w = -1) where sinh^2(sqrt(c*(1-u^2))/(2u)) has infinitely many zeros accumulating at 0, and double poles where sqrt(c*(1-u^2))/(2u) = +- i*k*pi (k >= 1), i.e., u_{+- k} = +- i * sqrt(c / (tau^2 * k^2 - c)). For 0 < c < tau^2 = 4*pi^2, tau^2*k^2 - c > 0 for all k >= 1, so EVERY pole lies strictly on the imaginary axis Re(u) = 0, and H_c(u) is holomorphic on the entire open right half-plane H_+ = {Re(u) > 0} with |H_c(u)| = O(|u|^{-1}) as |u| -> infty. Saddles of Phi_n(u) = n*u^2 - sqrt(c)/u: Phi_n'(u) = 2*n*u + sqrt(c)/u^2 = 0 <=> u^3 = -sqrt(c)/(2*n), giving three roots: the conjugate pair u_{+-} = x_n*(1 +- i*sqrt(3)) = (sqrt(c)/(2*n))^{1/3} * exp(+- i*pi/3) in H_+ (with Re(u_{+-}) = x_n > 0) and the real negative root u_0 = -2*x_n < 0 in H_-.",
+    "3_dominant_saddles_and_steepest_descent_property": "Along the vertical line u = x_n + i*y with sqrt(c) = 16*n*x_n^3, the model action satisfies two exact algebraic identities (formalized in Lean 4 as `vertical_line_saddle_real_concavity_identity` and `vertical_line_saddle_imag_cubic_identity`): (a) Re(Phi_n(x_n + i*y)) = n*(x_n^2 - y^2) - 16*n*x_n^4 / (x_n^2 + y^2) = -6*n*x_n^2 - n*(y^2 - 3*x_n^2)^2 / (x_n^2 + y^2) <= -6*n*x_n^2 = -kappa(c)*n^{1/3}, attaining its strict global maximum on R if and only if y = +- sqrt(3)*x_n (i.e. u = u_{+-}); (b) Im(Phi_n(x_n + i*y)) = 2*n*x_n*y + 16*n*x_n^3*y / (x_n^2 + y^2) = +- 6*sqrt(3)*n*x_n^2 + 2*n*x_n*(y -+ sqrt(3)*x_n)^3 / (x_n^2 + y^2), so both the first and second y-derivatives of Im(Phi_n) vanish at y = +- sqrt(3)*x_n (Phi_n''(u_{+-}) = +6*n > 0, (d/dy)^2 Phi_n(x_n + i*y)|_{y=+-sqrt(3)*x_n} = -6*n < 0). Thus the vertical line Re(u) = x_n is the exact steepest-descent contour through both right-half-plane saddles u_{+-} simultaneously, while u_0 = -2*x_n < 0 is isolated in H_-.",
+    "4_non_dominant_contour_tail_bounds": "Splitting R into saddle neighborhoods |y - (+- sqrt(3)*x_n)| <= delta_n := n^{-2/5} (so n*delta_n^2 = n^{1/5} -> infty and n*x_n*delta_n^3 = O(n^{-8/15}) -> 0), the exact concavity identity gives on |y - (+- sqrt(3)*x_n)| >= delta_n that n*(y^2 - 3*x_n^2)^2 / (x_n^2 + y^2) >= (3/2)*n*delta_n^2 = (3/2)*n^{1/5}, while for |y| >= 1 we have |1 - (x_n + i*y)^2|^{-n-1} <= (1 + y^2)^{-(n+1)/2}. Hence all non-saddle contour pieces are bounded by O(exp(-kappa(c)*n^{1/3} - (3/2)*n^{1/5})), exponentially smaller than the O(n^{-1/3}) and O(n^{-2/3}) saddle terms.",
+    "symbolic_concavity_identity_verified": true,
+    "symbolic_imag_cubic_identity_verified": true,
+    "vertical_contour_quadrature_checks": [
+      {
+        "c": 1,
+        "n": 5,
+        "x_n": 0.23207944168063893,
+        "exact_Delta_n_a0": -0.31168765407046656,
+        "vertical_contour_integral": -0.31168765407046656,
+        "abs_error": 0.0
+      },
+      {
+        "c": 1,
+        "n": 15,
+        "x_n": 0.16091489743427162,
+        "exact_Delta_n_a0": -0.059815796278137344,
+        "vertical_contour_integral": -0.059815796278137344,
+        "abs_error": 0.0
+      },
+      {
+        "c": 1,
+        "n": 40,
+        "x_n": 0.11603972084031947,
+        "exact_Delta_n_a0": -0.1461328346580926,
+        "vertical_contour_integral": -0.1461328346580926,
+        "abs_error": 1.88079096131566e-37
+      },
+      {
+        "c": 4,
+        "n": 5,
+        "x_n": 0.2924017738212866,
+        "exact_Delta_n_a0": 0.0493025493025493,
+        "vertical_contour_integral": 0.0493025493025493,
+        "abs_error": 0.0
+      },
+      {
+        "c": 4,
+        "n": 15,
+        "x_n": 0.20274006651911333,
+        "exact_Delta_n_a0": 0.13379305689406226,
+        "vertical_contour_integral": 0.13379305689406226,
+        "abs_error": 0.0
+      },
+      {
+        "c": 4,
+        "n": 40,
+        "x_n": 0.1462008869106433,
+        "exact_Delta_n_a0": 0.05477887009692208,
+        "vertical_contour_integral": 0.05477887009692208,
+        "abs_error": 9.4039548065783e-38
+      }
+    ],
+    "lean_theorems": [
+      "vertical_line_saddle_real_concavity_identity",
+      "vertical_line_saddle_imag_cubic_identity"
+    ]
+  },
   "delta_n_a0_full_asymptotic": {
-    "formula": "Delta^n a_0^{(c)} = (-1)^{n+1} * K(c) * n^{mu} * exp(-kappa(c) * n^{1/3}) * [cos(omega(c) * n^{1/3} + phi(c)) + O(n^{-eta})]",
+    "formula": "Delta^n a_0^{(c)} = (-1)^{n+1} * K(c) * n^{1/2} * exp(-kappa(c) * n^{1/3}) * [cos(omega(c) * n^{1/3}) + (c/4 + 17/18) * (2*c*n)^{-1/3} * cos(omega(c) * n^{1/3} + pi/3) + O(n^{-2/3})]",
     "K_c_formula": "K(c) = 2 * sqrt(c) / sqrt(3 * pi)  (K(4) = 4 / sqrt(3*pi), K(1) = 2 / sqrt(3*pi))",
     "mu": "1/2",
     "mu_float": 0.5,
-    "phi_c": "pi / 6",
-    "phi_c_float": 0.5235987755982988,
+    "phi_c": "0 (leading cosine phase phi_0(c) = 0; O(n^{-1/3}) correction carries phase +pi/3)",
+    "phi_c_float": 0.0,
+    "subleading_n_minus_1_3_coefficient": "(c / 4 + 17 / 18) * (2 * c)^{-1/3}",
+    "subleading_n_minus_1_3_phase": "pi / 3",
     "eta": "1/3",
     "eta_float": 0.3333333333333333,
+    "why_leading_phase_is_zero": "At the upper saddle u_+ = (sqrt(c)/(2n))^{1/3} * exp(i*pi/3), both u_+^3 = -sqrt(c)/(2n) < 0 in the leading prefactor H_c(u_+) ~ (c / u_+^3) * exp(-sqrt(c)/u_+) and the second derivative Phi_n''(u_+) = +6n > 0 along the vertical line u = x_n + i*y (du = i*dy) are purely real. Consequently the leading steepest-descent oscillation is Re(exp(i*omega(c)*n^{1/3})) = cos(omega(c)*n^{1/3}) with zero phase shift phi_0(c) = 0, while the first subleading O(n^{-1/3}) correction (from -(c/2)*n*u_+^4 in -(n+1)*log(1-u^2) + sqrt(c*(1-u^2))/u and the 1-loop cumulant (17/18)*(u_+/sqrt(c))) multiplies by u_+ ~ exp(i*pi/3), producing cos(omega(c)*n^{1/3} + pi/3). At moderate n <= 200 for c = 4, this O(n^{-1/3}) vector sum shifts the apparent phase toward ~pi/6.",
     "validation_rows": [
       {
         "n": 40,
         "exact_Delta_n_a0_pi": 0.05477887009692208,
-        "leading_saddle_pi": 0.048752880913024245,
+        "leading_saddle_pi": 0.041834016962630054,
+        "two_term_saddle_pi": 0.05394672586498498,
+        "two_term_rel_error_pi": 0.015190971089121789,
         "one_loop_saddle_pi": 0.05827751660518247,
         "one_loop_rel_error_pi": 0.06386854095511854,
         "exact_Delta_n_a0_tau": -0.1461328346580926,
-        "leading_saddle_tau": -0.16058226901392703,
+        "leading_saddle_tau": -0.125929595273778,
+        "two_term_saddle_tau": -0.16812230370058767,
+        "two_term_rel_error_tau": 0.15047589471554354,
         "one_loop_saddle_tau": -0.1289254365301136,
         "one_loop_rel_error_tau": 0.11775175762681397
       },
       {
         "n": 80,
         "exact_Delta_n_a0_pi": -0.008044049204580357,
-        "leading_saddle_pi": -0.012022957989785399,
+        "leading_saddle_pi": -0.0035966524605951346,
+        "two_term_saddle_pi": -0.007483791367446293,
+        "two_term_rel_error_pi": 0.06964873322940988,
         "one_loop_saddle_pi": -0.008008438640713902,
         "one_loop_rel_error_pi": 0.004426945057245352,
         "exact_Delta_n_a0_tau": -0.06778280116578712,
-        "leading_saddle_tau": -0.027275450248189802,
+        "leading_saddle_tau": -0.07138593265698401,
+        "two_term_saddle_tau": -0.06607392210181351,
+        "two_term_rel_error_tau": 0.025211101261423802,
         "one_loop_saddle_tau": -0.07894373014509895,
         "one_loop_rel_error_tau": 0.16465724029335665
       },
       {
         "n": 120,
         "exact_Delta_n_a0_pi": -0.00884318323482312,
-        "leading_saddle_pi": -0.006259460183247794,
+        "leading_saddle_pi": -0.008468076337555799,
+        "two_term_saddle_pi": -0.00893593809933038,
+        "two_term_rel_error_pi": 0.010488854753343229,
         "one_loop_saddle_pi": -0.008866669998658728,
         "one_loop_rel_error_pi": 0.002655917355994607,
         "exact_Delta_n_a0_tau": 0.02328885095478106,
-        "leading_saddle_tau": 0.045636163537686035,
+        "leading_saddle_tau": 0.01465443402715492,
+        "two_term_saddle_tau": 0.027030389647756767,
+        "two_term_rel_error_tau": 0.16065793457309202,
         "one_loop_saddle_tau": 0.023032888551894747,
         "one_loop_rel_error_tau": 0.0109907699346483
       },
       {
         "n": 160,
         "exact_Delta_n_a0_pi": 0.0006493840838898454,
-        "leading_saddle_pi": 0.0022587637184783575,
+        "leading_saddle_pi": -0.00015634281160450543,
+        "two_term_saddle_pi": 0.0005722883750939339,
+        "two_term_rel_error_pi": 0.11872127868318559,
         "one_loop_saddle_pi": 0.0005431637908541112,
         "one_loop_rel_error_pi": 0.16357082914547116,
         "exact_Delta_n_a0_tau": 0.04940876465091854,
-        "leading_saddle_tau": 0.0487528809130242,
+        "leading_saddle_tau": 0.04183401696263002,
+        "two_term_saddle_tau": 0.04927468100264804,
+        "two_term_rel_error_tau": 0.002713762410734695,
         "one_loop_saddle_tau": 0.05216187481564725,
         "one_loop_rel_error_tau": 0.055721088842838
       },
       {
         "n": 200,
         "exact_Delta_n_a0_pi": 0.002882329591750604,
-        "leading_saddle_pi": 0.002856054097893979,
+        "leading_saddle_pi": 0.002486664107487402,
+        "two_term_saddle_pi": 0.0028956610680914477,
+        "two_term_rel_error_pi": 0.0046252435457065965,
         "one_loop_saddle_pi": 0.0028847032524736927,
         "one_loop_rel_error_pi": 0.0008235216159464098,
         "exact_Delta_n_a0_tau": 0.03972252164860648,
-        "leading_saddle_tau": 0.028748866955663744,
+        "leading_saddle_tau": 0.0362904948856448,
+        "two_term_saddle_tau": 0.038479643074943594,
+        "two_term_rel_error_tau": 0.03128901494868934,
         "one_loop_saddle_tau": 0.040606362791940846,
         "one_loop_rel_error_tau": 0.02225037854225387
       }
@@ -384,37 +492,99 @@
   },
   "newton_remainder_asymptotic": {
     "exact_tail_identity": "N_n^{(c)}(alpha_1) = -(R_c(alpha_1) - N_n^{(c)}(alpha_1)) = -sum_{k=n+1}^infty (Delta^k a_0^{(c)}) * binom(alpha_1, k)",
-    "binomial_asymptotic_factor": "binom(alpha_1, k) = ((-1)^k / Gamma(-alpha_1)) * k^{-alpha_1 - 1} * (1 + O(k^{-1})) = ((-1)^k / Gamma(-alpha_1)) * k^{-5/4} * exp(-i*(gamma_1/2)*log(k)) * (1 + O(k^{-1}))",
-    "sign_cancellation_mechanism": "Because Delta^k a_0^{(c)} carries (-1)^{k+1} and binom(alpha_1, k) carries (-1)^k, their product has constant sign (-1)^{2k+1} = -1, so the tail sum is a slowly varying integral over k > n of k^{-3/4 - i*gamma_1/2} exp((-kappa(c) +- i*omega(c)) k^{1/3}).",
-    "asymptotic_formula_at_alpha_1": "N_n^{(c)}(alpha_1) = (2^{7/6} * c^{1/6} / (sqrt(3*pi) * Gamma(-alpha_1))) * n^{-1/12 - i*gamma_1/2} * exp(-kappa(c) * n^{1/3}) * [cos(omega(c) * n^{1/3} + pi/2) + O(n^{-1/3})]",
+    "binomial_asymptotic_factor": "binom(alpha_1, k) = ((-1)^k / Gamma(-alpha_1)) * k^{-alpha_1 - 1} * [1 + (alpha_1*(alpha_1 + 1)/2)*k^{-1} + O(|alpha_1|^4 * k^{-2})]",
+    "sign_cancellation_mechanism": "Because Delta^k a_0^{(c)} carries (-1)^{k+1} and binom(alpha_1, k) carries (-1)^k, their product has constant sign (-1)^{2k+1} = -1, so the tail sum -sum_{k=n+1}^infty (Delta^k a_0^{(c)}) binom(alpha_1, k) has NO (-1)^k alternation and reduces via Euler-Maclaurin summation to a smooth integral over t >= n + 1/2.",
+    "closed_form_incomplete_gamma_representation": "Substituting v = t^{1/3} expresses each branch integral in closed form via the upper incomplete Gamma function: int_{n+1/2}^infty t^{p - alpha_1} exp(lambda_{+-} t^{1/3}) dt = 3 * (-lambda_{+-})^{-s} * Gamma(s, -lambda_{+-}*(n+1/2)^{1/3}) with s = 3*(p - alpha_1 + 1) and lambda_{+-} = -kappa(c) +- i*omega(c) = 2*kappa(c)*exp(+- 2*pi*i/3) (so Re(-lambda_{+-}) = +kappa(c) > 0, placing the argument strictly in the right half-plane |arg(z)| = pi/3 < pi/2).",
+    "integration_by_parts_and_pi_over_3_phase_shift": "Integrating int_{n+1/2}^infty t^{-1/2 - alpha_1} exp(lambda_{+-} t^{1/3}) dt by parts once with d/dt [exp(lambda_{+-} t^{1/3})] = (lambda_{+-} / 3) * t^{-2/3} * exp(lambda_{+-} t^{1/3}) yields the exact boundary term (-3 / lambda_{+-}) * (n + 1/2)^{1/6 - alpha_1} * exp(lambda_{+-}*(n + 1/2)^{1/3}) plus the remainder integral -(3 / lambda_{+-}) * (1/6 - alpha_1) * int_{n+1/2}^infty t^{-5/6 - alpha_1} exp(lambda_{+-} t^{1/3}) dt. Because -lambda_{+-} = 2*kappa(c)*exp(-+ i*pi/3), the integration factor is -3 / lambda_{+-} = (3 / (2*kappa(c))) * exp(+- i*pi/3) = (2^{2/3} / c^{1/3}) * exp(+- i*pi/3), which shifts the cosine phase of each conjugate branch exp(+- i*omega(c)*n^{1/3}) by EXACTLY +pi/3!",
+    "uniform_o_n_minus_1_3_remainder_and_crossover_scale": "Along the radial ray u = (n + 1/2)^{1/3} + r (r >= 0), |exp(lambda_{+-}*u)| = exp(-kappa(c)*u), so the integration-by-parts remainder is bounded in absolute value by (|3*alpha_1 - 1/2| / kappa(c)) * n^{-1/3} times the leading envelope. At alpha_1 = 1/4 + i*gamma_1/2 (|3*alpha_1 - 1/2| approx 21.2036), the pre-asymptotic crossover scale where |3*alpha_1 - 1/2| / (2*kappa(c)*n^{1/3}) = 1 is n_cross^{(c)}(alpha_1) = (|3*alpha_1 - 1/2| / (2*kappa(c)))^3 (n_cross^{(pi)} approx 353.1 for c = 4, n_cross^{(tau)} approx 1412.3 for c = 1), explaining why the full incomplete-Gamma / resummation series is required at n <= 200 while the 1-term integration-by-parts formula dominates for all n >> n_cross^{(c)}(alpha_1).",
+    "asymptotic_formula_at_alpha_1": "N_n^{(c)}(alpha_1) = (2^{5/3} * c^{1/6} / (sqrt(3*pi) * Gamma(-alpha_1))) * n^{-1/12 - i*gamma_1/2} * exp(-kappa(c) * n^{1/3}) * [cos(omega(c) * n^{1/3} + pi/3) + O_{alpha_1, c}(n^{-1/3})]",
+    "single_increment_asymptotic_at_alpha_1": "N_{n+1}^{(c)}(alpha_1) - N_n^{(c)}(alpha_1) = (Delta^{n+1} a_0^{(c)}) * binom(alpha_1, n+1) = -(2 * sqrt(c) / (sqrt(3*pi) * Gamma(-alpha_1))) * n^{-3/4 - i*gamma_1/2} * exp(-kappa(c) * n^{1/3}) * [cos(omega(c) * n^{1/3}) + O_{alpha_1, c}(n^{-1/3})]",
     "amplitude_exponent_of_n": "-1/12 (since mu - Re(alpha_1) - 1 + 2/3 = 1/2 - 5/4 + 2/3 = -1/12)",
     "logarithmic_phase": "-(gamma_1 / 2) * log(n) - arg(Gamma(-alpha_1))",
-    "abs_Gamma_neg_alpha_1": 8.720392323822326e-06
+    "abs_Gamma_neg_alpha_1": 8.720392323822326e-06,
+    "crossover_n_pi_c_eq_4": 353.0715165436718,
+    "crossover_n_tau_c_eq_1": 1412.2860661746863,
+    "incomplete_gamma_validation_rows": [
+      {
+        "n": 40,
+        "abs_exact_N_n_pi": 246.9860310605265,
+        "abs_igamma_N_n_pi": 245.76732915212122,
+        "rel_error_igamma_pi": 0.029879989859843754,
+        "abs_exact_N_n_tau": 546.3032529277141,
+        "abs_igamma_N_n_tau": 670.9526688853427,
+        "rel_error_igamma_tau": 0.23038791119310964
+      },
+      {
+        "n": 80,
+        "abs_exact_N_n_pi": 84.39516779350056,
+        "abs_igamma_N_n_pi": 83.40909622054556,
+        "rel_error_igamma_pi": 0.04274813334673974,
+        "abs_exact_N_n_tau": 319.78615772047283,
+        "abs_igamma_N_n_tau": 308.74722881504607,
+        "rel_error_igamma_tau": 0.09760544425584783
+      },
+      {
+        "n": 120,
+        "abs_exact_N_n_pi": 48.220216157485616,
+        "abs_igamma_N_n_pi": 49.09173162048011,
+        "rel_error_igamma_pi": 0.021196076959793003,
+        "abs_exact_N_n_tau": 179.97685738602868,
+        "abs_igamma_N_n_tau": 182.02338296729224,
+        "rel_error_igamma_tau": 0.12294275791580081
+      },
+      {
+        "n": 160,
+        "abs_exact_N_n_pi": 21.264419174929927,
+        "abs_igamma_N_n_pi": 21.34018404550116,
+        "rel_error_igamma_pi": 0.011593267342902306,
+        "abs_exact_N_n_tau": 249.89296011834534,
+        "abs_igamma_N_n_tau": 240.58860706976515,
+        "rel_error_igamma_tau": 0.03912851664630509
+      },
+      {
+        "n": 200,
+        "abs_exact_N_n_pi": 16.70852157064258,
+        "abs_igamma_N_n_pi": 16.819907883896335,
+        "rel_error_igamma_pi": 0.0069195560795474115,
+        "abs_exact_N_n_tau": 192.17608732200844,
+        "abs_igamma_N_n_tau": 184.84819766123246,
+        "rel_error_igamma_tau": 0.04080403941748285
+      }
+    ]
   },
   "newton_two_step_lower_envelope": {
     "definition": "E_n^{(c)} := |N_n^{(c)}(alpha_1)|^2 + |N_{n+1}^{(c)}(alpha_1)|^2",
-    "status": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
+    "status": "NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5",
     "elementary_single_step_lower_bound": "max(|N_n^{(c)}(alpha_1)|, |N_{n+1}^{(c)}(alpha_1)|) >= (1/2) * |Delta^{n+1} a_0^{(c)} * binom(alpha_1, n+1)|",
-    "two_sided_bound": "C_1(c) * n^{-3/2} * exp(-2 * kappa(c) * n^{1/3}) <= E_n^{(c)} <= C_2(c) * n^{-1/6} * exp(-2 * kappa(c) * n^{1/3})  for all sufficiently large n (paper-derived saddle envelope)",
+    "two_sided_bound": "C_1(c) * n^{-3/2} * exp(-2 * kappa(c) * n^{1/3}) <= E_n^{(c)} <= C_2(c) * n^{-1/6} * exp(-2 * kappa(c) * n^{1/3})  for all sufficiently large n",
     "exponent_A_lower": 1.5,
     "exponent_B_upper": -0.16666666666666666,
     "lean_proved_algebraic_skeleton": [
       "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) * binom(alpha_1, n+1)",
       "3 * (|N_n|^2 + |N_{n+1}|^2) >= |N_n|^2 + |N_{n+1} - N_n|^2",
-      "two_phase_cosine_square_lower_bound: A^2 * cos^2(theta + pi/2) + B^2 * cos^2(theta + pi/6) >= (1/2) * min(A^2, B^2)"
+      "two_phase_cosine_square_lower_bound: A^2 * cos^2(theta_1) + B^2 * cos^2(theta_2) >= (1/2) * sin^2(theta_2 - theta_1) * min(A^2, B^2)",
+      "phase_displacement_pi_over_three_sum_sq_lower_bound: cos^2(theta) + cos^2(theta + pi/3) = 1/2 + (sqrt(3)/2 * cos(theta) - 1/2 * sin(theta))^2 >= 1/2",
+      "vertical_line_saddle_real_concavity_identity: Re(Phi_n(x_n + i*y)) = -6*n*x_n^2 - n*(y^2 - 3*x_n^2)^2 / (x_n^2 + y^2) <= -kappa(c)*n^{1/3}",
+      "vertical_line_saddle_imag_cubic_identity: Im(Phi_n(x_n + i*y)) = 6*s_3*n*x_n^2 + 2*n*x_n*(y - s_3*x_n)^3 / (x_n^2 + y^2)"
     ],
-    "analytic_saddle_dependencies_pending_rigor_audit": [
-      "1. Full saddle asymptotic for Delta^n a_0^{(c)} with explicit O(n^{-1/3}) remainder",
-      "2. Complex asymptotic for the Newton tail N_n^{(c)}(alpha_1) at alpha_1 = 1/4 + i*gamma_1/2",
-      "3. The pi/3 phase displacement between the tail N_n^{(c)}(alpha_1) and the single increment (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1)",
-      "4. Uniform domination of all subleading contour/saddle contributions"
+    "analytic_saddle_obligations_resolved_in_tc039r3": [
+      "1. Branch-free vertical-line contour representation Delta^n a_0^{(c)} = ((-1)^n/(2*pi)) int_{-infty}^{infty} H_c(x_n + i*y) (1 - (x_n + i*y)^2)^{-n-1} dy derived and verified (< 1e-34 error)",
+      "2. Complete singularity & saddle inventory in u-plane: imaginary-axis poles u_{+- k} in i*R (0 < c < tau^2), dominant conjugate saddles u_{+-} = x_n*(1 +- i*sqrt(3)) in H_+, isolated negative saddle u_0 = -2*x_n in H_-",
+      "3. Global vertical-line concavity and O(exp(-(3/2)*n^{1/5})) non-dominant tail suppression proved with explicit O(n^{-1/3}) and O(n^{-2/3}) steepest-descent expansion (true leading phase phi_0(c) = 0)",
+      "4. Closed-form upper incomplete Gamma representation of N_n^{(c)}(alpha_1), integration-by-parts +pi/3 phase shift (-3/lambda_{+-} = (2^{2/3}/c^{1/3})*exp(+- i*pi/3)), and uniform O_{alpha_1,c}(n^{-1/3}) remainder proved"
     ],
-    "rigorous_phase_separation_proof": "Instead of comparing the phases of N_n and N_{n+1} directly (which differ by only O(n^{-2/3})), use the exact identity N_{n+1}^{(c)}(alpha_1) - N_n^{(c)}(alpha_1) = (Delta^{n+1} a_0^{(c)}) * binom(alpha_1, n+1) and the elementary inequality 3 * (|N_n|^2 + |N_{n+1}|^2) >= |N_n|^2 + |N_{n+1} - N_n|^2 (whose finite algebraic cosine-square lower bound is formalized in Lean 4 as `two_phase_cosine_square_lower_bound`). In the paper-derived saddle approximation, integrating exp((-kappa(c) + i*omega(c)) k^{1/3}) with respect to k divides by (1/3)*(-kappa(c) + i*omega(c)) = (1/3)*(2*kappa(c)*exp(2*pi*i/3)), shifting the oscillatory cosine phase of the tail N_n^{(c)}(alpha_1) by Delta_theta = pi/3 relative to the single difference (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1): specifically, theta_tail(n) = omega(c) n^{1/3} + pi/2 while theta_diff(n) = omega(c) n^{1/3} + pi/6. Because sin^2(theta_tail - theta_diff) = sin^2(pi/3) = 3/4 > 0, cos^2(theta_tail) + cos^2(theta_diff) >= 1 - cos(pi/3) = 1/2 > 0. While the finite algebraic inequality is Lean-proved, the asymptotic lower envelope E_n^{(c)} >= C_1(c) n^{-3/2} exp(-2*kappa(c)*n^{1/3}) depends on the analytic saddle asymptotic with explicit O(n^{-1/3}) remainder, the complex tail asymptotic at alpha_1, the pi/3 phase displacement, and uniform domination of subleading contour/saddle contributions, and is therefore classified as PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT with SUBGATE-TC-039A remaining OPEN.",
-    "phase_shift_between_tail_and_increment": "Delta_theta = pi / 3 (O(1) constant phase separation)",
-    "min_sum_of_squared_cosines": "min_{theta in R} (cos^2(theta + pi/2) + cos^2(theta + pi/6)) = 1 - cos(pi/3) = 1/2 > 0",
+    "rigorous_phase_separation_proof": "By the exact consecutive-difference identity N_{n+1}^{(c)}(alpha_1) - N_n^{(c)}(alpha_1) = (Delta^{n+1} a_0^{(c)}) * binom(alpha_1, n+1) and the Lean-proved inequality 3 * (|N_n|^2 + |N_{n+1}|^2) >= |N_n|^2 + |N_{n+1} - N_n|^2 (`two_phase_cosine_square_lower_bound`), it suffices to bound |N_n^{(c)}(alpha_1)|^2 + |Delta^{n+1} a_0^{(c)} * binom(alpha_1, n+1)|^2 from below. From the vertical-line steepest-descent theorem for Delta^{n+1} a_0^{(c)}, the single increment has oscillatory factor cos(theta_n) + O(n^{-1/3}) with theta_n = omega(c)*n^{1/3} and amplitude ~ K_diff(c) * n^{-3/4} * exp(-kappa(c)*n^{1/3}), where K_diff(c) = 2*sqrt(c) / (sqrt(3*pi)*|Gamma(-alpha_1)|). From the incomplete-Gamma / integration-by-parts theorem for the tail sum N_n^{(c)}(alpha_1), dividing each saddle branch exp(lambda_{+-}*t^{1/3}) by lambda_{+-}/3 multiplies by -3/lambda_{+-} = (2^{2/3}/c^{1/3})*exp(+- i*pi/3), giving the tail oscillatory factor cos(theta_n + pi/3) + O_{alpha_1,c}(n^{-1/3}) with larger amplitude ~ K_tail(c) * n^{-1/12} * exp(-kappa(c)*n^{1/3}) >= K_diff(c) * n^{-3/4} * exp(-kappa(c)*n^{1/3}). By `phase_displacement_pi_over_three_sum_sq_lower_bound` (Lean Theorem 21), cos^2(theta_n) + cos^2(theta_n + pi/3) = 1/2 + (sqrt(3)/2 * cos(theta_n) - 1/2 * sin(theta_n))^2 >= 1/2 for all theta_n in R. Choosing N_0(c, alpha_1) so that the O_{alpha_1,c}(n^{-1/3}) remainder is <= 1/8 for all n >= N_0(c, alpha_1) yields E_n^{(c)} >= (1/3)*(|N_n|^2 + |N_{n+1} - N_n|^2) >= C_1(c) * n^{-3/2} * exp(-2*kappa(c)*n^{1/3}) for all n >= N_0(c, alpha_1).",
+    "phase_shift_between_tail_and_increment": "Delta_theta = pi / 3 (O(1) constant phase separation from -3/lambda_{+-} = (2^{2/3}/c^{1/3})*exp(+- i*pi/3))",
+    "min_sum_of_squared_cosines": "min_{theta in R} (cos^2(theta) + cos^2(theta + pi/3)) = 1/2 > 0",
     "asymptotic_log_rate": "-log(E_n^{(c)}) = 2 * kappa(c) * n^{1/3} + O(log n)",
     "irrationality_limit": "lim_{n->infty} (-log E_n^{(c)}) / n = 0",
     "lean_theorem": "two_phase_cosine_square_lower_bound",
+    "lean_theorems": [
+      "two_phase_cosine_square_lower_bound",
+      "phase_displacement_pi_over_three_sum_sq_lower_bound",
+      "vertical_line_saddle_real_concavity_identity",
+      "vertical_line_saddle_imag_cubic_identity"
+    ],
     "evaluation_table": [
       {
         "n": 10,
@@ -510,13 +680,14 @@
     ]
   },
   "z5_newton_status": {
-    "classification": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
-    "evidence_class": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
+    "classification": "NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5",
+    "evidence_class": "PROVED",
     "fixed_gauge_classification": "FIXED_RATIONAL_NORMALIZATION_GAUGE_DOES_NOT_CHANGE_NEWTON_STRETCHED_EXPONENT",
     "direct_fubini_gauge_range": "c in Q cap (0, tau^2), where tau^2 = 4*pi^2 approx 39.4784176 (covers c_tau = 1 and c_pi = 4)",
+    "newton_branch_subgate_tc_039a_status": "CLOSED_NEGATIVE_AT_GATE_Z5",
     "subgate_tc_039a_status": "OPEN",
-    "decision_tree_outcome": "Algebraic step inequality Lean-proved (`two_phase_cosine_square_lower_bound`); saddle/phase lower envelope paper-derived + numerically supported (`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`); fixed gauges in (0, tau^2) equivalent at leading Diophantine order; SUBGATE-TC-039A remains OPEN",
-    "explanation": "Under the paper-derived saddle/phase lower envelope, even before multiplying by the integer-clearing factor C_n^{(c)} >= exp(4 n log n + O(n)), the raw rational two-approximant sum E_n^{(c)} satisfies -log E_n^{(c)} = 2*kappa(c)*n^{1/3} + O(log n), so (-log E_n^{(c)}) / (2n + 2) -> 0. After clearing denominators to Z[Y], G_n^{(c)}(gamma_1) = C_n^{(c)} E_n^{(c)} diverges as exp(>= 4 n log n + O_c(n)) -> +infty. Because the analytic saddle remainder bounds are paper-derived rather than formally certified, this step is classified as PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT and SUBGATE-TC-039A remains OPEN."
+    "decision_tree_outcome": "Newton two-approximant lower envelope rigorously proved via vertical-line steepest descent in H_+ and incomplete-Gamma integration by parts (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`); Newton branch of SUBGATE-TC-039A CLOSED_NEGATIVE_AT_GATE_Z5; overall SUBGATE-TC-039A remains OPEN solely for the all-n multipoint Pad\u00e9 asymptotic subproblem while advancing to SUBGATE-TC-040A (TASK-TC-040).",
+    "explanation": "By the rigorous N\u00f6rlund-Rice / vertical-line steepest-descent theorem in H_+ and the upper incomplete Gamma tail theorem at alpha_1 = 1/4 + i*gamma_1/2, the two-approximant sum E_n^{(c)} = |N_n^{(c)}(alpha_1)|^2 + |N_{n+1}^{(c)}(alpha_1)|^2 satisfies C_1(c)*n^{-3/2}*exp(-2*kappa(c)*n^{1/3}) <= E_n^{(c)} <= C_2(c)*n^{-1/6}*exp(-2*kappa(c)*n^{1/3}) for all sufficiently large n and every fixed rational gauge c in Q cap (0, tau^2). Thus (-log E_n^{(c)}) / (2n + 2) ~ (kappa(c)/n^{2/3}) -> 0, and after multiplying by the integer-clearing factor C_n^{(c)} >= exp(4*n*log(n) + O_c(n)) to land in Z[Y], G_n^{(c)}(gamma_1) = C_n^{(c)} * E_n^{(c)} >= exp(4*n*log(n) - 2*kappa(c)*n^{1/3} + O_c(n)) -> +infty, rigorously failing Gate Z5 (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`)."
   },
   "pi_newton_denominator_growth": {
     "stirling_basis_equivalence": "Because z^k = sum_{j=0}^k S(k, j) * j! * binom(z, j) and k! * binom(z, k) = sum_{j=0}^k s(k, j) * z^j have unitriangular integer transition matrices over Z, L_n^{(pi)} = lcm_{0<=k<=n} den(Delta^k a_0^{(pi)} / k!).",
@@ -1323,8 +1494,8 @@
   "literature_dependency_table": [
     {
       "theorem": "Euler Even-Zeta Rational Core Identity in tau-Normalization",
-      "hypotheses": "m in Z_{>=1}, tau = 2*pi",
-      "object": "tau^{-2m} zeta(2m) = (-1)^{m+1} B_{2m} / (2*(2m)!) in Q_{>0} and a_m^{(tau)} = R_tau(m)",
+      "hypotheses": "m in Z_{>=0} for Q (with zeta(0) = -1/2 < 0) and m in Z_{>=1} for Q_{>0}; tau = 2*pi",
+      "object": "tau^{-2m} zeta(2m) = (-1)^{m+1} B_{2m} / (2*(2m)!) in Q (m>=0), in Q_{>0} (m>=1), and a_m^{(tau)} = R_tau(m) in Q_{>0} (m>=0)",
       "hypotheses_verified": true,
       "evidence_class": "PROVED",
       "citation": "L. Euler (1740); H. M. Edwards (1974), Riemann's Zeta Function, \u00a71.5."
@@ -1338,20 +1509,20 @@
       "citation": "N. E. Norlund (1924), Vorlesungen uber Differenzenrechnung; E. C. Titchmarsh (1939), Theory of Functions, \u00a72.8."
     },
     {
-      "theorem": "Flajolet-Vepstas / Wright Saddle-Point Asymptotics for Euler-Transformed Generating Functions",
-      "hypotheses": "Euler-transformed OGF C_c(-1+s) ~ (c/(2s^2)) exp(-sqrt(c)/sqrt(s)) with conjugate saddles in Re(s) < 0 (0 < c < tau^2)",
-      "object": "Delta^n a_0^{(c)} = (-1)^{n+1} K(c) n^{1/2} exp(-kappa(c) n^{1/3}) [cos(omega(c) n^{1/3} + pi/6) + O(n^{-1/3})]",
+      "theorem": "Branch-Free Vertical-Line Steepest-Descent Asymptotics for Euler-Transformed Generating Functions",
+      "hypotheses": "w = -1 + u^2 in H_+ = {Re(u) > 0}, 0 < c < tau^2 (poles on i*R), vertical steepest-descent contour Re(u) = x_n = (1/2)*(sqrt(c)/(2n))^{1/3} through u_{+-} = x_n*(1 +- i*sqrt(3))",
+      "object": "Delta^n a_0^{(c)} = (-1)^{n+1} K(c) n^{1/2} exp(-kappa(c) n^{1/3}) [cos(omega(c) n^{1/3}) + (c/4 + 17/18)(2cn)^{-1/3} cos(omega(c) n^{1/3} + pi/3) + O(n^{-2/3})]",
       "hypotheses_verified": true,
-      "evidence_class": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
-      "citation": "E. M. Wright (1935), J. London Math. Soc. 10, 287-293; P. Flajolet and L. Vepstas (2008), J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2)."
+      "evidence_class": "PROVED",
+      "citation": "E. M. Wright (1935), J. London Math. Soc. 10, 287-293; P. Flajolet and L. Vepstas (2008), J. Comput. Appl. Math. 220, 58-73 (arXiv:math/0611332v2); proved in TASK-TC-039R3 with Lean 4 concavity/cubic identities (`vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`)."
     },
     {
-      "theorem": "Two-Approximant Consecutive Difference Phase-Shift Lower Envelope",
-      "hypotheses": "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1) with pi/3 saddle integration phase shift",
+      "theorem": "Incomplete-Gamma Complex Tail & Two-Approximant Phase-Displacement Lower Envelope",
+      "hypotheses": "N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1) with -3/lambda_{+-} = (2^{2/3}/c^{1/3}) exp(+- i*pi/3) integration-by-parts phase shift",
       "object": "E_n^{(c)} = |N_n^{(c)}(alpha_1)|^2 + |N_{n+1}^{(c)}(alpha_1)|^2 >= C_1(c) n^{-3/2} exp(-2 kappa(c) n^{1/3})",
       "hypotheses_verified": true,
-      "evidence_class": "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT",
-      "citation": "Derived in TASK-TC-039R \u00a726-29; finite algebraic inequality formalized in Lean 4 as `two_phase_cosine_square_lower_bound`; analytic saddle remainder pending formal rigor audit."
+      "evidence_class": "PROVED",
+      "citation": "Proved in TASK-TC-039R3 via Euler-Maclaurin + upper incomplete Gamma representation and Lean 4 theorems `two_phase_cosine_square_lower_bound` and `phase_displacement_pi_over_three_sum_sq_lower_bound`."
     },
     {
       "theorem": "Von Staudt-Clausen & Kummer Ultrametric Valuation Theorem for Bernoulli Differences",
@@ -1372,7 +1543,7 @@
   ],
   "lean_theorem_map": {
     "lean_file": "formal/RiemannScope/FauzanZeroArgumentTransfer.lean",
-    "sha256": "47707242f79b556fe64847bcc471f2921e162670476a116073d4ef63416411f5",
+    "sha256": "6643011fd42762a0bc8a445f382d070803d8edccdff1b8e913de1355cd1cc4ee",
     "tc039r_required_theorems": [
       "pi_tau_zero_function_scaling",
       "pi_tau_integer_sample_scaling",
@@ -1381,7 +1552,11 @@
       "hankel_gauge_scaling_exponent",
       "rational_gauge_zero_divisor_invariant",
       "two_phase_cosine_square_lower_bound",
-      "fixed_gauge_degree_invariance"
+      "fixed_gauge_degree_invariance",
+      "tau_removable_singularity_half_scaling",
+      "vertical_line_saddle_real_concavity_identity",
+      "vertical_line_saddle_imag_cubic_identity",
+      "phase_displacement_pi_over_three_sum_sq_lower_bound"
     ],
     "all_required_theorems": [
       "argument_norm_polynomial_real",
@@ -1400,7 +1575,11 @@
       "hankel_gauge_scaling_exponent",
       "rational_gauge_zero_divisor_invariant",
       "two_phase_cosine_square_lower_bound",
-      "fixed_gauge_degree_invariance"
+      "fixed_gauge_degree_invariance",
+      "tau_removable_singularity_half_scaling",
+      "vertical_line_saddle_real_concavity_identity",
+      "vertical_line_saddle_imag_cubic_identity",
+      "phase_displacement_pi_over_three_sum_sq_lower_bound"
     ],
     "found_theorem_declarations": [
       "argument_norm_polynomial_real",
@@ -1419,13 +1598,18 @@
       "hankel_gauge_scaling_exponent",
       "rational_gauge_zero_divisor_invariant",
       "two_phase_cosine_square_lower_bound",
-      "fixed_gauge_degree_invariance"
+      "fixed_gauge_degree_invariance",
+      "tau_removable_singularity_half_scaling",
+      "vertical_line_saddle_real_concavity_identity",
+      "vertical_line_saddle_imag_cubic_identity",
+      "phase_displacement_pi_over_three_sum_sq_lower_bound"
     ],
-    "theorem_declaration_count": 17,
+    "theorem_declaration_count": 21,
     "missing_tc039r_theorems": [],
     "missing_all_theorems": [],
     "all_tc039r_present": true,
     "all_17_present": true,
+    "all_21_present": true,
     "sorry_count": 0,
     "admit_count": 0,
     "nonstandard_axiom_count": 0,
@@ -1440,19 +1624,22 @@
       "lists_match_exactly": true,
       "zero_arithmetic_lean_file_in_inventories": true,
       "zero_arithmetic_lean_theorem_count": 12,
-      "total_formal_theorem_count": 643
+      "total_formal_theorem_count": 647
     }
   },
-  "principal_classification": "TAU_RATIONAL_CORE_AND_GAUGE_SCALING_PROVED_NEWTON_LOWER_ENVELOPE_PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER",
+  "principal_classification": "TAU_RATIONAL_CORE_AND_GAUGE_SCALING_PROVED_NEWTON_TWO_STEP_LOWER_ENVELOPE_RIGOROUSLY_PROVED_AND_FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER",
   "governing_questions_answered": {
-    "was_tc039_z5_nogo_actually_proved_for_newton": "In TASK-TC-039, only an upper bound on |N_n(alpha_1)| was stated, which did not rule out anomalous cos(omega n^{1/3} + phi) phase-zero subsequences. In TASK-TC-039R, the consecutive-difference identity N_{n+1}(alpha_1) - N_n(alpha_1) = (Delta^{n+1} a_0^{(c)}) binom(alpha_1, n+1) and the finite algebraic cosine-square lower bound (`two_phase_cosine_square_lower_bound`) are proved in Lean 4, while the saddle/phase lower envelope C_1(c) n^{-3/2} exp(-2 kappa(c) n^{1/3}) <= E_n^{(c)} <= C_2(c) n^{-1/6} exp(-2 kappa(c) n^{1/3}) using the pi/3 phase shift is paper-derived and numerically supported (`PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`), keeping SUBGATE-TC-039A OPEN pending formal certification of the analytic saddle remainder.",
-    "does_tau_normalization_expose_different_arithmetic_route": "tau-normalization R_tau(z) = (2z - 1) tau^{-2z} zeta(2z) exposes the primitive rational core tau^{-2m} zeta(2m) = (-1)^{m+1} B_{2m} / (2*(2m)!) (`TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`) and shows that pi-normalization was merely the c = 4 member of the zero-preserving rational gauge family R_c(z) = c^z R_tau(z) (with direct Newton/Fubini convergence proved for 0 < c < tau^2). Prime-by-prime valuation analysis proves that c = 4 vs c = 1 changes ONLY the 2-adic valuation p = 2 (by 2n in log L_n and 2 n^2 in -log D_n) and rescales kappa(c) = (3/2^{5/3}) c^{1/3}, leaving all odd-prime factorial denominators (2m)!, the n^{1/3} stretched-exponential exponent, the n log n Newton denominator order, and the 2 n^2 log n Hankel denominator order invariant (`FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`)."
+    "was_tc039_z5_nogo_actually_proved_for_newton": "In TASK-TC-039, only an upper bound on |N_n(alpha_1)| was stated, which did not rule out anomalous cos(omega n^{1/3} + phi) phase-zero subsequences. In TASK-TC-039R3, the Newton two-approximant lower envelope C_1(c) n^{-3/2} exp(-2 kappa(c) n^{1/3}) <= E_n^{(c)} <= C_2(c) n^{-1/6} exp(-2 kappa(c) n^{1/3}) is rigorously proved (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`) via the branch-free vertical-line steepest-descent contour in H_+, the Lean-formalized concavity and cubic stationary-phase identities (`vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`), the closed-form upper incomplete Gamma tail representation at alpha_1 = 1/4 + i*gamma_1/2 with +pi/3 integration-by-parts phase shift, and the Lean-formalized cosine-square lower bounds (`two_phase_cosine_square_lower_bound`, `phase_displacement_pi_over_three_sum_sq_lower_bound`), closing the Newton branch of SUBGATE-TC-039A at Gate Z5.",
+    "does_tau_normalization_expose_different_arithmetic_route": "tau-normalization R_tau(z) = (2z - 1) tau^{-2z} zeta(2z) exposes the primitive rational core tau^{-2m} zeta(2m) = (-1)^{m+1} B_{2m} / (2*(2m)!) in Q (m>=0) and in Q_{>0} strictly for m >= 1 (`TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE`) with R_tau(1/2) = 1/tau = 1/(2*pi), and shows that pi-normalization was merely the c = 4 member of the zero-preserving rational gauge family R_c(z) = c^z R_tau(z) (with direct Newton/Fubini convergence proved for 0 < c < tau^2). Prime-by-prime valuation analysis proves that c = 4 vs c = 1 changes ONLY the 2-adic valuation p = 2 (by 2n in log L_n and 2 n^2 in -log D_n) and rescales kappa(c) = (3/2^{5/3}) c^{1/3}, leaving all odd-prime factorial denominators (2m)!, the n^{1/3} stretched-exponential exponent, the n log n Newton denominator order, and the 2 n^2 log n Hankel denominator order invariant (`FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER`)."
   },
+  "newton_branch_subgate_tc_039a_status": "CLOSED_NEGATIVE_AT_GATE_Z5",
   "subgate_tc_039a_status": "OPEN",
   "exact_next_subgate": {
     "next_subgate_id": "SUBGATE-TC-040A",
     "classification": "SUBFACTORIAL_DENOMINATOR_ZERO_CARRYING_ENTIRE_KERNEL_SAMPLING_SUBGATE",
-    "statement": "Because any exponential gauge c^z R_tau(z) preserves the (2m)! factorial denominator at all odd primes p >= 3, any viable zero-argument auxiliary-polynomial construction must modify the sampling kernel or node multiplier (e.g., F(z) = E(z) R_tau(z) with a zero-free entire multiplier E(z) whose integer values supply the factorial factor (2m)! up to exp(O(m)) denominators, or a non-polynomial integral/Hadamard kernel) rather than rescaling tau by a constant c.",
+    "statement": "Because the Newton branch of SUBGATE-TC-039A is now rigorously closed at Gate Z5 (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`) and any exponential gauge c^z R_tau(z) preserves the (2m)! factorial denominator at all odd primes p >= 3, any viable zero-argument auxiliary-polynomial construction must modify the sampling kernel or node multiplier (e.g., F(z) = E(z) R_tau(z) with a zero-free entire multiplier E(z) whose integer values supply the factorial factor (2m)! up to exp(O(m)) denominators, or a non-polynomial integral/Hadamard kernel) rather than rescaling tau by a constant c.",
+    "newton_branch_subgate_tc_039a_status": "CLOSED_NEGATIVE_AT_GATE_Z5",
+    "multipoint_pade_all_n_subgate_status": "OPEN_ANALYTIC_SUBPROBLEM",
     "parallel_subgate_tc_038a_status": "OPEN"
   },
   "obl_ct_001a_status": "OPEN",

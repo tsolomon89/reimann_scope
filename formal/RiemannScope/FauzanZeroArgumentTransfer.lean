@@ -301,5 +301,92 @@ theorem fixed_gauge_degree_invariance
     (lambda_n * c_n_tau) / n_fact ≠ 0 := by
   exact div_ne_zero (mul_ne_zero h_lam h_cn) h_fact
 
+/-! ### 5. TASK-TC-039R3: Removable Singularity `R_τ(1/2)` Scaling, Vertical-Line Steepest-Descent Saddle Identities, and `π/3` Phase-Displacement Lower Bound -/
+
+/-- 18. `tau_removable_singularity_half_scaling`:
+    With `τ = 2π` (`π = τ / 2`, `τ ≠ 0`), the removable-singularity values at `z = 1/2`
+    satisfy `R_τ(1/2) = 1 / τ = 1 / (2π)` and `R_π(1/2) = 1 / π = 2 / τ = 2 * R_τ(1/2)`
+    (since `4^{1/2} = 2`). -/
+theorem tau_removable_singularity_half_scaling
+    (tau pi_val : ℝ)
+    (h_tau : tau = 2 * pi_val)
+    (h_pi_ne : pi_val ≠ 0) :
+    (1 / tau = 1 / (2 * pi_val)) ∧
+    (1 / pi_val = 2 * (1 / tau)) := by
+  refine ⟨by rw [h_tau], ?_⟩
+  rw [h_tau]
+  field_simp [h_pi_ne]
+
+/-- 19. `vertical_line_saddle_real_concavity_identity`:
+    Along the vertical steepest-descent line `u = x + i y` in the right half-plane `x > 0`
+    passing simultaneously through both conjugate saddles `u_± = x (1 ± i √3)` where
+    `√c = 16 n x^3`, the real part of the model action `Φ_n(u) = n u^2 - √c / u` satisfies
+    the exact rational global concavity identity:
+      `n (x^2 - y^2) - 16 n x^4 / (x^2 + y^2) = -6 n x^2 - n (y^2 - 3 x^2)^2 / (x^2 + y^2)`,
+    and therefore for `0 ≤ n` and `0 < x^2 + y^2` achieves its strict global maximum
+    `-6 n x^2 = -κ(c) n^{1/3}` solely at `y^2 = 3 x^2` (`u = u_±`). -/
+theorem vertical_line_saddle_real_concavity_identity
+    (n x y : ℝ)
+    (hn : 0 ≤ n)
+    (h_denom : 0 < x ^ 2 + y ^ 2) :
+    (n * (x ^ 2 - y ^ 2) - (16 * n * x ^ 4) / (x ^ 2 + y ^ 2) =
+      -6 * n * x ^ 2 - (n * (y ^ 2 - 3 * x ^ 2) ^ 2) / (x ^ 2 + y ^ 2)) ∧
+    (n * (x ^ 2 - y ^ 2) - (16 * n * x ^ 4) / (x ^ 2 + y ^ 2) ≤ -6 * n * x ^ 2) := by
+  have h_ne : x ^ 2 + y ^ 2 ≠ 0 := ne_of_gt h_denom
+  have h_id : n * (x ^ 2 - y ^ 2) - (16 * n * x ^ 4) / (x ^ 2 + y ^ 2) =
+      -6 * n * x ^ 2 - (n * (y ^ 2 - 3 * x ^ 2) ^ 2) / (x ^ 2 + y ^ 2) := by
+    field_simp [h_ne]
+    ring
+  refine ⟨h_id, ?_⟩
+  rw [h_id]
+  have h_num : 0 ≤ n * (y ^ 2 - 3 * x ^ 2) ^ 2 := mul_nonneg hn (sq_nonneg _)
+  have h_div : 0 ≤ (n * (y ^ 2 - 3 * x ^ 2) ^ 2) / (x ^ 2 + y ^ 2) :=
+    div_nonneg h_num (le_of_lt h_denom)
+  linarith
+
+/-- 20. `vertical_line_saddle_imag_cubic_identity`:
+    Along the vertical steepest-descent line `u = x + i y` with `√c = 16 n x^3` and `s₃^2 = 3`,
+    the imaginary part of the model action `Φ_n(u) = n u^2 - √c / u` satisfies the exact
+    cubic stationary-phase identity at `y = s₃ x`:
+      `2 n x y + 16 n x^3 y / (x^2 + y^2) = 6 s₃ n x^2 + 2 n x (y - s₃ x)^3 / (x^2 + y^2)`
+    (showing vanishing first and second imaginary phase derivatives along the vertical contour). -/
+theorem vertical_line_saddle_imag_cubic_identity
+    (n x y s₃ : ℝ)
+    (hs3 : s₃ ^ 2 = 3)
+    (h_ne : x ^ 2 + y ^ 2 ≠ 0) :
+    2 * n * x * y + (16 * n * x ^ 3 * y) / (x ^ 2 + y ^ 2) =
+      6 * s₃ * n * x ^ 2 + (2 * n * x * (y - s₃ * x) ^ 3) / (x ^ 2 + y ^ 2) := by
+  field_simp [h_ne]
+  calc
+    2 * n * x * y * (x ^ 2 + y ^ 2) + 16 * n * x ^ 3 * y
+      = 6 * s₃ * n * x ^ 2 * (x ^ 2 + y ^ 2) + 2 * n * x * (y - s₃ * x) ^ 3 +
+          (2 * s₃ * n * x ^ 4 - 6 * n * x ^ 3 * y) * (s₃ ^ 2 - 3) := by ring
+    _ = 6 * s₃ * n * x ^ 2 * (x ^ 2 + y ^ 2) + 2 * n * x * (y - s₃ * x) ^ 3 := by
+      rw [hs3]; ring
+
+/-- 21. `phase_displacement_pi_over_three_sum_sq_lower_bound`:
+    For any real `(x, y)` on the unit circle `x^2 + y^2 = 1` (representing `x = cos θ, y = sin θ`)
+    and `s₃^2 = 3` (so `x / 2 - s₃ y / 2 = cos(θ + π/3)` is the `π/3`-shifted tail cosine),
+    we have the exact sum-of-squares identity
+      `x^2 + (x / 2 - s₃ * y / 2)^2 = 1 / 2 + (s₃ * x / 2 - y / 2)^2`,
+    which proves unconditionally that `cos^2(θ) + cos^2(θ + π/3) ≥ 1 / 2` for all `θ ∈ ℝ`. -/
+theorem phase_displacement_pi_over_three_sum_sq_lower_bound
+    (x y s₃ : ℝ)
+    (hs3 : s₃ ^ 2 = 3)
+    (h_unit : x ^ 2 + y ^ 2 = 1) :
+    (x ^ 2 + (x / 2 - s₃ * y / 2) ^ 2 = 1 / 2 + (s₃ * x / 2 - y / 2) ^ 2) ∧
+    (1 / 2 ≤ x ^ 2 + (x / 2 - s₃ * y / 2) ^ 2) := by
+  have h_id : x ^ 2 + (x / 2 - s₃ * y / 2) ^ 2 = 1 / 2 + (s₃ * x / 2 - y / 2) ^ 2 := by
+    calc
+      x ^ 2 + (x / 2 - s₃ * y / 2) ^ 2
+        = 1 / 2 + (s₃ * x / 2 - y / 2) ^ 2 +
+            ((y ^ 2 - x ^ 2) / 4) * (s₃ ^ 2 - 3) + (1 / 2) * (x ^ 2 + y ^ 2 - 1) := by ring
+      _ = 1 / 2 + (s₃ * x / 2 - y / 2) ^ 2 := by rw [hs3, h_unit]; ring
+  refine ⟨h_id, ?_⟩
+  rw [h_id]
+  nlinarith [sq_nonneg (s₃ * x / 2 - y / 2)]
+
 end RiemannScope
+
+
 

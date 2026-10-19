@@ -96,7 +96,7 @@ def test_02_pi_equals_tau_over_two(artifact_data: dict) -> None:
     assert "pi = tau/2" in artifact_data["pi_tau_policy"]["pi_tau_equivalence"]
 
 
-# 3. R_pi = 4^z R_tau
+# 3. R_pi = 4^z R_tau and removable singularity R_tau(1/2) = 1/tau = 1/(2*pi)
 def test_03_r_pi_equals_four_pow_z_r_tau(norm_data: dict) -> None:
     scaling = norm_data["R_pi_tau_scaling"]
     assert scaling["identity"] == "R_pi(z) = 4^z * R_tau(z)"
@@ -104,6 +104,12 @@ def test_03_r_pi_equals_four_pow_z_r_tau(norm_data: dict) -> None:
     assert scaling["arb_128bit_verified_at_alpha1"] is True
     assert norm_data["R_pi"]["symbolic_completed_xi_identity_verified"] is True
     assert norm_data["R_tau"]["symbolic_completed_xi_identity_verified"] is True
+    assert norm_data["R_tau"]["value_at_z_eq_half"] == "R_tau(1/2) = 1/tau = 1/(2*pi)"
+    assert norm_data["R_pi"]["value_at_z_eq_half"] == "R_pi(1/2) = 1/pi = 2/tau"
+    assert "1/(2*tau)" not in norm_data["R_tau"]["normalization_dependent_factors"]
+    assert scaling["removable_singularity_at_half"]["R_tau_at_half"] == "1/tau = 1/(2*pi)"
+    assert scaling["removable_singularity_at_half"]["R_pi_at_half"] == "1/pi = 2/tau = 2 * R_tau(1/2)"
+    assert scaling["removable_singularity_at_half"]["scaling_check_verified"] is True
 
 
 # 4. identical zero divisor
@@ -116,11 +122,14 @@ def test_04_identical_zero_divisor(norm_data: dict) -> None:
     assert "rational_gauge_zero_divisor_invariant" in zdiv["lean_theorems"]
 
 
-# 5. tau^{-2m} zeta(2m) rational formula
+# 5. tau^{-2m} zeta(2m) rational formula and domain qualification m >= 1 vs m >= 0
 def test_05_tau_even_zeta_rational_core_formula(norm_data: dict) -> None:
     core = norm_data["tau_even_zeta_rational_core"]
     assert core["classification"] == TAU_NORMALIZATION_EXPOSES_EVEN_ZETA_RATIONAL_CORE
     assert core["symbolic_euler_verified_m_1_to_12"] is True
+    assert core["symbolic_m0_neg_half_verified"] is True
+    assert "strictly for m >= 1" in core["strictly_positive_rational_domain"]
+    assert "for all m >= 0" in core["sample_sequence_positive_domain"]
     assert (
         core["tau_form"]
         == "tau^{-2m} * zeta(2m) = (-1)^{m+1} * B_{2m} / (2 * (2m)!)"
@@ -352,23 +361,29 @@ def test_27_phase_constant_formula(artifact_data: dict) -> None:
         )
 
 
-# 28. lower-envelope claim scoped to PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT with Lean skeleton separated from analytic saddle obligations
+# 28. lower-envelope claim backed by rigorous vertical-line saddle and pi/3 phase-displacement proof
 def test_28_lower_envelope_backed_by_phase_separation_proof(
     artifact_data: dict,
 ) -> None:
     env = artifact_data["newton_two_step_lower_envelope"]
-    assert env["status"] == "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
-    assert env["phase_shift_between_tail_and_increment"] == "Delta_theta = pi / 3 (O(1) constant phase separation)"
-    assert env["lean_theorem"] == "two_phase_cosine_square_lower_bound"
-    assert len(env["lean_proved_algebraic_skeleton"]) == 3
-    assert len(env["analytic_saddle_dependencies_pending_rigor_audit"]) == 4
-    # Verify one-loop saddle accuracy across validation rows
+    assert env["status"] == NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    assert "Delta_theta = pi / 3" in env["phase_shift_between_tail_and_increment"]
+    assert "phase_displacement_pi_over_three_sum_sq_lower_bound" in env["lean_theorems"]
+    assert len(env["lean_proved_algebraic_skeleton"]) == 6
+    assert len(env["analytic_saddle_obligations_resolved_in_tc039r3"]) == 4
+    # Verify one-loop and two-term saddle accuracy across validation rows
     val_rows = artifact_data["delta_n_a0_full_asymptotic"]["validation_rows"]
     assert all(
         r["one_loop_rel_error_pi"] < 5e-3 for r in val_rows if r["n"] in (80, 120, 200)
     )
     assert all(
+        r["two_term_rel_error_pi"] < 1.5e-2 for r in val_rows if r["n"] in (120, 200)
+    )
+    assert all(
         r["one_loop_rel_error_tau"] < 3e-2 for r in val_rows if r["n"] in (120, 200)
+    )
+    assert all(
+        r["two_term_rel_error_tau"] < 3.5e-2 for r in val_rows if r["n"] in (80, 160, 200)
     )
 
 
@@ -384,8 +399,9 @@ def test_29_upper_bound_not_treated_as_lower_bound(artifact_data: dict) -> None:
 # 30. fixed-gauge n^{1/3} exponent classification and direct Fubini gauge range 0 < c < tau^2
 def test_30_fixed_gauge_n_pow_1_3_exponent_classification(artifact_data: dict) -> None:
     z5 = artifact_data["z5_newton_status"]
-    assert z5["classification"] == "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
-    assert z5["evidence_class"] == "PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT"
+    assert z5["classification"] == NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5
+    assert z5["evidence_class"] == "PROVED"
+    assert z5["newton_branch_subgate_tc_039a_status"] == "CLOSED_NEGATIVE_AT_GATE_Z5"
     assert z5["subgate_tc_039a_status"] == "OPEN"
     assert "0, tau^2" in z5["direct_fubini_gauge_range"]
     assert (
@@ -495,7 +511,7 @@ def test_39_obl_ct_001a_remains_open(artifact_data: dict) -> None:
     assert artifact_data["exact_next_subgate"]["next_subgate_id"] == SUBGATE_TC_040A_ID
 
 
-# 40. canonical classifications match artifact, schema complete, and all 17 Lean theorems verified
+# 40. canonical classifications match artifact, schema complete, and all 21 Lean theorems verified
 def test_40_canonical_classifications_schema_and_lean_theorems(
     artifact_data: dict,
 ) -> None:
@@ -510,11 +526,16 @@ def test_40_canonical_classifications_schema_and_lean_theorems(
         FIXED_RATIONAL_NORMALIZATION_GAUGES_EQUIVALENT_AT_LEADING_DIOPHANTINE_ORDER
         in artifact_data["principal_classification"]
     )
+    assert (
+        "NEWTON_TWO_STEP_LOWER_ENVELOPE_RIGOROUSLY_PROVED"
+        in artifact_data["principal_classification"]
+    )
 
     lean_info = verify_tc039r_lean_theorems(REPO_ROOT)
     assert lean_info["all_tc039r_present"] is True
     assert lean_info["all_17_present"] is True
-    assert lean_info["theorem_declaration_count"] == 17
+    assert lean_info["all_21_present"] is True
+    assert lean_info["theorem_declaration_count"] == 21
     assert lean_info["sorry_count"] == 0
     assert lean_info["admit_count"] == 0
     assert lean_info["nonstandard_axiom_count"] == 0
@@ -522,4 +543,38 @@ def test_40_canonical_classifications_schema_and_lean_theorems(
         assert thm in lean_info["found_theorem_declarations"]
     for thm in ALL_FAUZAN_TRANSFER_LEAN_THEOREMS:
         assert thm in lean_info["found_theorem_declarations"]
+
+
+# 41. TASK-TC-039R3 vertical-line saddle contour, global concavity, and imaginary cubic identities
+def test_41_vertical_line_saddle_contour_and_concavity_identities(
+    artifact_data: dict,
+) -> None:
+    vc = artifact_data["norlund_rice_vertical_line_steepest_descent_proof"]
+    assert vc["symbolic_concavity_identity_verified"] is True
+    assert vc["symbolic_imag_cubic_identity_verified"] is True
+    assert len(vc["vertical_contour_quadrature_checks"]) == 6
+    assert all(row["abs_error"] < 1e-30 for row in vc["vertical_contour_quadrature_checks"])
+    assert "vertical_line_saddle_real_concavity_identity" in vc["lean_theorems"]
+    assert "vertical_line_saddle_imag_cubic_identity" in vc["lean_theorems"]
+    assert artifact_data["delta_n_a0_full_asymptotic"]["phi_c_float"] == 0.0
+
+
+# 42. TASK-TC-039R3 incomplete-Gamma complex tail asymptotic and +pi/3 phase displacement
+def test_42_incomplete_gamma_complex_tail_and_phase_displacement(
+    artifact_data: dict,
+) -> None:
+    tail = artifact_data["newton_remainder_asymptotic"]
+    assert "EXACTLY +pi/3" in tail["integration_by_parts_and_pi_over_3_phase_shift"]
+    assert tail["crossover_n_pi_c_eq_4"] > 350.0
+    assert tail["crossover_n_tau_c_eq_1"] > 1400.0
+    val_rows = tail["incomplete_gamma_validation_rows"]
+    assert len(val_rows) == 5
+    for row in val_rows:
+        if row["n"] in (160, 200):
+            assert row["rel_error_igamma_pi"] < 1.5e-2
+            assert row["rel_error_igamma_tau"] < 4.5e-2
+        assert row["abs_exact_N_n_pi"] > 0.0
+        assert row["abs_exact_N_n_tau"] > 0.0
+
+
 

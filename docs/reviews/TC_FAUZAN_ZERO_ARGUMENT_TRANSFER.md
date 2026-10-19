@@ -36,7 +36,7 @@ Before executing the Gate Z1–Z6 audit, four housekeeping evidence items from `
    - In `mo271/Zeta5`, `Apery/PNT.lean` imports `PrimeNumberTheoremAnd.Consequences`, which transitively imports `PrimeNumberTheoremAnd.Wiener`. Thus `PrimeNumberTheoremAnd/Wiener.lean` (which contains two `sorry`-backed declarations) lies **inside** the module transitive import graph (`EXTERNAL_IMPORT_GRAPH_CONTAINS_SORRY_DECLARATIONS`).
    - However, `#print axioms Apery.irrational_five` outputs only the three standard Lean 4 axioms `[propext, Classical.choice, Quot.sound]`, proving that those `sorry`-backed declarations are **not** reached by the target theorem's proof-term axiom closure (`TARGET_THEOREM_AXIOM_CLOSURE_EXCLUDES_SORRY_DECLARATIONS`).
 2. **Formal Source-File Count Derived from Inventory**:
-   - `tc.zero_arithmetic_invariants.verify_formal_source_inventory_provenance` dynamically derives the module count from `formal/RiemannScope.lean` (`33` local `RiemannScope.*` imports after adding `FauzanZeroArgumentTransfer.lean`) and `scripts/build_formal.py::FORMAL_SOURCE_FILES` / `certification.py::REQUIRED_FORMAL_SOURCES` (`34` files including the umbrella `formal/RiemannScope.lean`, with `643` total `theorem` declarations across the formal suite).
+   - `tc.zero_arithmetic_invariants.verify_formal_source_inventory_provenance` dynamically derives the module count from `formal/RiemannScope.lean` (`33` local `RiemannScope.*` imports after adding `FauzanZeroArgumentTransfer.lean`) and `scripts/build_formal.py::FORMAL_SOURCE_FILES` / `certification.py::REQUIRED_FORMAL_SOURCES` (`34` files including the umbrella `formal/RiemannScope.lean`, with `647` total `theorem` declarations across the formal suite).
 3. **Canonical Numerical Consistency**:
    - Verified repository-wide agreement with machine artifacts:
      - $S_4 = 0.0000736272212616895183267713070306015113128315963\ldots$;
@@ -99,9 +99,9 @@ $$
 $$
 
 1. **Equivalence of the definitions**: Since $\xi(s) = \frac{1}{2}s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$, substituting $s = 2z$ gives $\xi(2z) = z(2z-1)\pi^{-z}\Gamma(z)\zeta(2z)$. Dividing by $\pi^z \Gamma(z+1) = \pi^z z\Gamma(z)$ yields $(2z-1)\pi^{-2z}\zeta(2z) = 4^z(2z-1)\tau^{-2z}\zeta(2z)$ identically on $\mathbb{C}$.
-2. **Entirety and removable singularity at $z = 1/2$**: Because $\pi^{-z}$, $\xi(2z)$, and $1/\Gamma(z+1)$ are entire on $\mathbb{C}$, $\mathcal{R}_\pi(z)$ and $\mathcal{R}_\tau(z)$ are entire on $\mathbb{C}$. At $z = 1/2$, the simple pole $\zeta(1 + 2\varepsilon) = \frac{1}{2\varepsilon} + \gamma_E + O(\varepsilon)$ cancels against $(2z - 1) = 2\varepsilon$, giving:
+2. **Entirety and removable singularity at $z = 1/2$**: Because $\pi^{-z}$, $\xi(2z)$, and $1/\Gamma(z+1)$ are entire on $\mathbb{C}$, $\mathcal{R}_\pi(z)$ and $\mathcal{R}_\tau(z)$ are entire on $\mathbb{C}$. At $z = 1/2$, the simple pole $\zeta(1 + 2\varepsilon) = \frac{1}{2\varepsilon} + \gamma_E + O(\varepsilon)$ cancels against $(2z - 1) = 2\varepsilon$ (since $\lim_{s\to 1}(s-1)\zeta(s) = 1$), giving:
    $$
-   \mathcal{R}_\pi\!\left(\frac{1}{2}\right) = \frac{1}{\pi}, \qquad \mathcal{R}_\tau\!\left(\frac{1}{2}\right) = \frac{1}{2\tau} = \frac{1}{4\pi}.
+   \mathcal{R}_\pi\!\left(\frac{1}{2}\right) = \frac{1}{\pi} = \frac{2}{\tau}, \qquad \mathcal{R}_\tau\!\left(\frac{1}{2}\right) = \tau^{-1} = \frac{1}{\tau} = \frac{1}{2\pi}, \qquad \mathcal{R}_\pi\!\left(\frac{1}{2}\right) = 4^{1/2}\mathcal{R}_\tau\!\left(\frac{1}{2}\right) = 2\mathcal{R}_\tau\!\left(\frac{1}{2}\right).
    $$
 3. **Zero mapping**: Inside the critical strip $0 < \operatorname{Re}(2z) < 1$ (i.e., $0 < \operatorname{Re}(z) < 1/2$), $\pi^{-z} \ne 0$, $\tau^{-z} \ne 0$, and $\operatorname{Re}(z+1) \in (1, 3/2)$ where $\Gamma(z+1)$ has neither zeros nor poles. Therefore:
    $$
@@ -224,10 +224,10 @@ We compare the finite differences of $b_m^{(c)}$ with those of $a_m^{(c)} = (2m-
    $$
    C_c(w) := \sum_{n=0}^\infty (\Delta^n a_0^{(c)}) w^n = \frac{1}{1+w}\,A_c\!\left(\frac{w}{1+w}\right) = \frac{c w}{8(1+w)^2 \sin^2\!\left(\frac{1}{2}\sqrt{\frac{c w}{1+w}}\right)}
    $$
-   satisfies $C_c(-1+s) \sim \frac{c}{2s^2}\exp(-\sqrt{c}/\sqrt{s})$ as $s = 1+w \to 0$ ($\operatorname{Re}(s) > 0$). Because $a_m^{(c)}$ already normalizes out $\pi^{-2m}$ (or $\tau^{-2m}$), no factor of $\pi$ appears inside $\exp(-\sqrt{c}/\sqrt{s})$ (`pi_pow_2_over_3_contamination_present = False`). Steepest-descent analysis around the conjugate saddles $s_\pm = (\frac{\sqrt{c}}{2n})^{2/3} e^{\pm 2\pi i/3}$ yields the exact asymptotic ([TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md) §M):
+   satisfies $C_c(-1+s) \sim \frac{c}{2s^2}\exp(-\sqrt{c}/\sqrt{s})$ as $s = 1+w \to 0$ ($\operatorname{Re}(s) > 0$). Because $a_m^{(c)}$ already normalizes out $\pi^{-2m}$ (or $\tau^{-2m}$), no factor of $\pi$ appears inside $\exp(-\sqrt{c}/\sqrt{s})$ (`pi_pow_2_over_3_contamination_present = False`). Steepest-descent analysis on the branch-free vertical line $u = \sigma_n + iv \in \mathbb{H}_+$ ($1+w = 1/u^2$) around the conjugate saddles $u_\pm = (\frac{2n}{\sqrt{c}})^{1/3} e^{\mp i\pi/3} \in \mathbb{H}_+$ yields the exact asymptotic ([TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md) §M–§N):
    $$
    \boxed{
-   \Delta^n a_0^{(c)} = (-1)^{n+1}\frac{2\sqrt{c}}{\sqrt{3\pi}} n^{1/2}\exp\!\bigl(-\kappa(c)n^{1/3}\bigr)\!\left[\cos\!\bigl(\omega(c)n^{1/3} + \tfrac{\pi}{6}\bigr) + O(n^{-1/3})\right],
+   \Delta^n a_0^{(c)} = (-1)^{n+1}\frac{2\sqrt{c}}{\sqrt{3\pi}} n^{1/2}\exp\!\bigl(-\kappa(c)n^{1/3}\bigr)\!\left[\cos\!\bigl(\omega(c)n^{1/3}\bigr) + O(n^{-1/3})\right] \qquad (\phi_0(c) = 0),
    }
    $$
    where $\kappa(c) = \frac{3}{2^{5/3}}c^{1/3}$ and $\omega(c) = \sqrt{3}\,\kappa(c)$. In particular:
@@ -478,8 +478,8 @@ $$
   - **Z2**: Both Newton interpolation $N_n^{(c)}(z) \in \mathbb{Q}[z]$ and multipoint Padé numerators $A_n^{(c)}(z) \in \mathbb{Q}[z]$ (plus the real ordinate norm polynomials $\mathcal{N}_P(Y) \in \mathbb{Q}[Y]$) are zero-independent polynomials in the zero argument.
   - **Z3**: The two-approximant norm sum $G_n^{(c)}(Y) = C_n(|N_n^{(c)}(\alpha(Y))|^2 + |N_{n+1}^{(c)}(\alpha(Y))|^2) \in \mathbb{Z}[Y]$ is strictly positive on all of $\mathbb{R}$ for the infinite cofinal set of $n$ with $\Delta^{n+1}a_0^{(c)} \ne 0$.
   - **Z4**: Exact degree and denominator/height growth are quantified ($\log L_n^{(c)} = 3n\log n + O(n)$ for Newton; $\log H(\widetilde{A}_n^{(c)}) \sim 6n^2\log n$ for $[n/n]$ Padé; $\log\operatorname{den}(D_n^{(c)}) = 2n^2\log n + O(n^2)$ for Hankel).
-- **Gate Z5 fails across all three tested routes (repaired and audited in `TASK-TC-039R`, [TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md))**:
-  - **Route A (Newton)**: Separating the Lean-proved finite algebraic step skeleton ($N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}$, $\max(|N_n^{(c)}|, |N_{n+1}^{(c)}|) \ge \frac{1}{2}|\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}|$, and `two_phase_cosine_square_lower_bound`, `PROVED_ALGEBRAIC_FINITE_STEP_IDENTITY`) from the paper steepest-descent saddle/phase lower envelope ($\Delta\theta = \pi/3$, $\sin^2(\pi/3) = 3/4 > 0$, `PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`) gives $E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2 = \Theta(e^{-2\kappa(c)n^{1/3}})$ ($\kappa_\pi = 3/2, \kappa_\tau = 3/2^{5/3}$) and $\mathcal{I}_n(\widetilde{N}_n^{(c)}) \sim -3\log n \to -\infty$ (`Z5_NEWTON_ROUTE_GENUINELY_FAILS_BY_TWO_STEP_LOWER_ENVELOPE_AND_FACTORIAL_DENOMINATORS`).
+- **Gate Z5 fails across all three tested routes (repaired and proved in `TASK-TC-039R` / `TASK-TC-039R3`, [TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_039R_PI_TAU_ASYMPTOTIC_REPAIR.md))**:
+  - **Route A (Newton)**: Combining the Lean-proved finite algebraic step skeleton ($N_{n+1}^{(c)}(\alpha_1) - N_n^{(c)}(\alpha_1) = \Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}$, $\max(|N_n^{(c)}|, |N_{n+1}^{(c)}|) \ge \frac{1}{2}|\Delta^{n+1}a_0^{(c)}\binom{\alpha_1}{n+1}|$, `two_phase_cosine_square_lower_bound`, and `phase_displacement_pi_over_three_sum_sq_lower_bound`) with the branch-free vertical-line steepest-descent proof (`vertical_line_saddle_real_concavity_identity`, `vertical_line_saddle_imag_cubic_identity`) and incomplete-Gamma complex tail integration-by-parts ($\Delta\theta = \pi/3$, $\sin^2(\pi/3) = 3/4 > 0$, `NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`) proves $E_n^{(c)} = |N_n^{(c)}(\alpha_1)|^2 + |N_{n+1}^{(c)}(\alpha_1)|^2 = \Theta(e^{-2\kappa(c)n^{1/3}})$ ($\kappa_\pi = 3/2, \kappa_\tau = 3/2^{5/3}$) and $\mathcal{I}_n(\widetilde{N}_n^{(c)}) \sim -3\log n \to -\infty$ (`Z5_NEWTON_ROUTE_GENUINELY_FAILS_BY_TWO_STEP_LOWER_ENVELOPE_AND_FACTORIAL_DENOMINATORS`, Newton branch of `SUBGATE-TC-039A`: `CLOSED_NEGATIVE_AT_GATE_Z5`).
   - **Route B (Multipoint Padé)**: $|A_n^{(c)}(\alpha_1)/B_n^{(c)}(\alpha_1)|$ decays exponentially only because $|B_n^{(c)}(\alpha_1)| \asymp (2n)!$ grows factorially; the integer numerator polynomial alone satisfies $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\pi)}) = -186.64 < 0$ and $\mathcal{I}_{25}(\widetilde{A}_{25}^{(\tau)}) = -179.96 < 0$ (`Z5_PADE_FINITE_WINDOW_NEGATIVE_ASYMPTOTIC_OPEN`).
   - **Route C (Hankel Determinant)**: $D_n^{(\pi)} = 4^{n^2}D_n^{(\tau)} \in \mathbb{Q}_{>0}$ are exact unit fractions with $-\log D_n^{(\pi)} = 2n^2\log n + (4\log 2 - 3)n^2 + O(n\log n)$, and coupling the zero argument $X = \alpha_1$ via C1 ($\deg P_n^{\mathrm{C1}} = n^2$)/C2/C3 either loses zero cancellation, requires non-polynomial $q_{k,c}^X$, or reduces to Route B (`Z5_HANKEL_ROUTE_BLOCKED_BY_UNIT_FRACTION_CANCELLATION_AND_TARGET_COUPLING`).
 
@@ -495,8 +495,7 @@ $$
 \texttt{RATIONALIZED\_XI\_RATIONAL\_INTEGER\_SAMPLING\_PROVED} \\
 \texttt{TAU\_NORMALIZATION\_EXPOSES\_EVEN\_ZETA\_RATIONAL\_CORE} \\
 \texttt{NEWTON\_SERIES\_IDENTITY\_FOR\_RATIONALIZED\_XI\_PROVED\_WITHOUT\_CARLSON} \\
-\texttt{PROVED\_ALGEBRAIC\_FINITE\_STEP\_IDENTITY} \\
-\texttt{PROVED\_PAPER\_DERIVATION\_PENDING\_ASYMPTOTIC\_RIGOR\_AUDIT} \\
+\texttt{NEWTON\_TWO\_APPROXIMANT\_ROUTE\_RIGOROUSLY\_FAILS\_GATE\_Z5} \\
 \texttt{Z5\_NEWTON\_ROUTE\_GENUINELY\_FAILS\_BY\_TWO\_STEP\_LOWER\_ENVELOPE\_AND\_FACTORIAL\_DENOMINATORS} \\
 \texttt{Z5\_PADE\_FINITE\_WINDOW\_NEGATIVE\_ASYMPTOTIC\_OPEN} \\
 \texttt{Z5\_HANKEL\_ROUTE\_BLOCKED\_BY\_UNIT\_FRACTION\_CANCELLATION\_AND\_TARGET\_COUPLING} \\
@@ -507,10 +506,11 @@ $$
 
 ### Subgate & Obligation Status
 
-- **`SUBGATE-TC-039A`**: `OPEN` (algebraic finite step identity proved in Lean; paper saddle/phase lower envelope classified as `PROVED_PAPER_DERIVATION_PENDING_ASYMPTOTIC_RIGOR_AUDIT`; Padé asymptotic delimiter explicit)
+- **`SUBGATE-TC-039A`**: Newton two-approximant branch `CLOSED_NEGATIVE_AT_GATE_Z5` (`NEWTON_TWO_APPROXIMANT_ROUTE_RIGOROUSLY_FAILS_GATE_Z5`); overall `SUBGATE-TC-039A = OPEN` solely for the all-$n$ multipoint Padé asymptotic subproblem (`MULTIPOINT_PADE_GATE_Z5_NEGATIVE_NUMERICAL_EVIDENCE` on $1 \le n \le 25$)
 - **`SUBGATE-TC-038A`**: `OPEN` (`ZERO_SUM_CONSTANT_ARITHMETIC_SUBGATE`)
 - **`SUBGATE-TC-040A` (Exact Next Subgate)**: `NON_FACTORIAL_ARITHMETIC_ARGUMENT_OPERATOR_OR_ZERO_SUM_INDEPENDENCE_SUBGATE` (`OPEN`):
   > Either (i) prove irrationality / $\mathbb{Q}$-linear independence of the exact global symmetric zero-sum invariants $2\lambda_1 = 2 + \gamma_E - \log(4\pi)$ and $S_2 = 1 + \gamma_E^2 - \pi^2/8 + 2\gamma_1^{\mathrm{St}}$ (`SUBGATE-TC-038A`), or (ii) construct an arithmetic zero-argument operator whose rational evaluations avoid the $(2m)!$ Euler–Bernoulli factorial denominators that force $\log L_n = \Theta(n\log n)$ in Newton interpolation and $\log\operatorname{den}(D_n) = \Theta(n^2\log n)$ in even-zeta Hankel determinants.
 - **`OBL-CT-001A`**: `OPEN`
 - **`rh_claimed`**: `False`
+
 
