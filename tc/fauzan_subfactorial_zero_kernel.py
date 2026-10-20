@@ -730,7 +730,7 @@ def audit_route_a_bernoulli_and_gamma_ratio(max_n: int = 200) -> Dict[str, Any]:
             "B": {
                 "formula": "B(z) = B(2z) = -2 * z * zeta(1 - 2z) = -2 * K_0(z) / (2z - 1)",
                 "sample_formula": "B(m) = B_{2m}",
-                "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m)",
+                "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
                 "sample_denominator_lcm_log": "vartheta(2n + 1) = 2n + o(n)",
                 "ogf_radius": "0 (divergent asymptotic OGF)",
             },
@@ -744,7 +744,7 @@ def audit_route_a_bernoulli_and_gamma_ratio(max_n: int = 200) -> Dict[str, Any]:
             "P": {
                 "formula": "P(z) = -exp(i * tau * z / 2) * B(z) = 2 * z * exp(i * pi * z) * zeta(1 - 2z)",
                 "sample_formula": "P(m) = -(-1)^m * B_{2m} = (-1)^{m+1} * B_{2m} = |B_{2m}| > 0 (m >= 1)",
-                "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m)",
+                "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
                 "sample_denominator_lcm_log": "vartheta(2n + 1) = 2n + o(n)",
                 "stieltjes_moment_property": "mu_m = P(m + 1) = |B_{2m+2}| is a positive Stieltjes moment sequence on (0, infty)",
             },
@@ -862,8 +862,8 @@ def audit_route_a_bernoulli_and_gamma_ratio(max_n: int = 200) -> Dict[str, Any]:
                 "abs_K0_m": "|K_0(m)| = (2m - 1) * (2m)! * tau^{-2m} * zeta(2m)",
             },
             "stirling_asymptotics": {
-                "log_abs_B_m": "2*m*log(m) - 2*(1 + log(pi))*m + (1/2)*log(m) + log(2*sqrt(pi)) + O(1/m)",
-                "log_abs_K0_m": "2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(2*sqrt(pi)) + O(1/m)",
+                "log_abs_B_m": "2*m*log(m) - 2*(1 + log(pi))*m + (1/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
+                "log_abs_K0_m": "2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
             },
             "ogf_radius_B": 0.0,
             "ogf_radius_K0": 0.0,
@@ -1111,6 +1111,27 @@ def audit_route_b_positive_bernoulli_hankel(
                     "exact_mu_m_float": float(ex_val),
                     "stieltjes_integral_float": float(q_val),
                     "abs_error": float(abs(q_val - ex_val)),
+                }
+            )
+        stieltjes_transform_quad_checks = []
+        for w_neg in (-4, -9, -16):
+            w_mp = mpmath.mpf(w_neg)
+            z_mp = mpmath.sqrt(-w_mp)
+            # Substitute y = x^2 (dy = 2*x dx) into int_0^infty d nu_tau(y) / (w - y)
+            s_quad = mpmath.quad(
+                lambda x: (x**2)
+                * (tau_mp / (2 * (mpmath.sinh(tau_mp * x / 2) ** 2)))
+                / (w_mp - (x**2)),
+                [0, mpmath.inf],
+            )
+            s_closed = 1 + 1 / (2 * z_mp) - z_mp * mpmath.psi(1, z_mp)
+            stieltjes_transform_quad_checks.append(
+                {
+                    "w": w_neg,
+                    "sqrt_neg_w": float(z_mp),
+                    "quadrature_val": float(s_quad),
+                    "closed_form_val": float(s_closed),
+                    "abs_error": float(abs(s_quad - s_closed)),
                 }
             )
     finally:
@@ -1390,10 +1411,21 @@ def audit_route_b_positive_bernoulli_hankel(
         },
         "stieltjes_pade_route": {
             "stieltjes_transform_definition": "S_B(w) := int_0^infty d nu_tau(y) / (w - y) ~ sum_{m=0}^infty |B_{2m+2}| / w^{m+1}  (|w| -> infty)",
+            "exact_closed_form": "S_B(w) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w))  for w in C \\ [0, infty) with Re(sqrt(-w)) > 0",
+            "asymptotic_expansion_at_infinity": (
+                "Using psi'(z) ~ 1/z + 1/(2*z^2) + sum_{m=0}^infty B_{2m+2} / z^{2m+3} at z = sqrt(-w) (z^2 = -w), "
+                "S_B(w) = 1 + 1/(2z) - z*psi'(z) ~ -sum_{m=0}^infty B_{2m+2} / (-w)^{m+1} = sum_{m=0}^infty |B_{2m+2}| / w^{m+1} "
+                "= 1/(6*w) + 1/(30*w^2) + 1/(42*w^3) + 1/(30*w^4) + ..."
+            ),
             "exact_analytic_identification": (
-                "By the Binet/Stieltjes integral for digamma/trigamma, S_B(w) = (1/2)*sqrt(w)*psi'(sqrt(w)) - 1/2 - 1/(4*sqrt(w)), "
-                "so the [n-1 / n] Padé approximants Q_{n-1}^B(w) / P_n^B(w) converge to the polygamma function in w = x^2 on C \\ [0, infty), "
+                "By Binet's integral for the trigamma function psi'(z) at z = sqrt(-w) (Re(z) > 0, z^2 = -w), "
+                "S_B(w) = int_0^infty d nu_tau(y) / (w - y) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w)), "
+                "so the [n-1 / n] Padé approximants Q_{n-1}^B(w) / P_n^B(w) converge to the trigamma Stieltjes transform in w on C \\ [0, infty), "
                 "and have NO algebraic or functional relation to B(z) = -2z*zeta(1-2z), zeta(z), or R_tau(z) at the Mellin zero argument."
+            ),
+            "quadrature_verification_checks": stieltjes_transform_quad_checks,
+            "all_quadrature_checks_match_to_1e_40": all(
+                c["abs_error"] < 1e-40 for c in stieltjes_transform_quad_checks
             ),
             "classification": BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT,
             "secondary_classification": BERNOULLI_HANKEL_ARGUMENT_COUPLING_FAILED,
@@ -2848,7 +2880,7 @@ def build_subfactorial_zero_kernel_report() -> Dict[str, Any]:
             "classification": FACTORIAL_COST_MOVES_FROM_DENOMINATOR_TO_SAMPLE_GROWTH_UNDER_REFLECTION,
             "secondary_classification": FACTORIAL_COST_RELOCATED_TO_SAMPLE_GROWTH,
             "exact_formula": "|K_0(m)| = (2m - 1) * (2m)! * tau^{-2m} * zeta(2m)",
-            "asymptotic_log_K0_m": "log|K_0(m)| = 2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(2*sqrt(pi)) + O(1/m)",
+            "asymptotic_log_K0_m": "log|K_0(m)| = 2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
             "checkpoints_to_200": route_a["bernoulli_sample_growth_audit"]["growth_checkpoints_to_200"],
         },
         "K0_ogf_radius": 0.0,

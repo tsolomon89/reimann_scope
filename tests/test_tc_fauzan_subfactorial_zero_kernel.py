@@ -774,7 +774,9 @@ def test_52_stieltjes_pade_route_audit(artifact_data: dict) -> None:
         == BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT
     )
     assert sp["secondary_classification"] == "BERNOULLI_HANKEL_ARGUMENT_COUPLING_FAILED"
-    assert "psi'(sqrt(w))" in sp["exact_analytic_identification"]
+    assert "psi'(sqrt(-w))" in sp["exact_analytic_identification"]
+    assert "S_B(w) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w))" in sp["exact_closed_form"]
+    assert sp["all_quadrature_checks_match_to_1e_40"] is True
 
 
 def test_53_windowed_factorial_multiplier_audit_up_to_n_30(artifact_data: dict) -> None:
@@ -865,5 +867,109 @@ def test_58_candidate_gate_table_K1_to_K7_complete(artifact_data: dict) -> None:
     assert "NO_SUBFACTORIAL_DIOPHANTINE_ZERO_KERNEL_FOUND" in artifact_data["best_surviving_candidate"]
     assert isinstance(artifact_data["earliest_failed_gate"], dict)
     assert len(artifact_data["earliest_failed_gate"]) == 8
+
+
+def test_59_stieltjes_transform_asymptotic_and_quadrature_verification(
+    artifact_data: dict,
+) -> None:
+    """Verify the repaired Stieltjes transform S_B(w) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w))
+    both by symbolic asymptotic expansion in powers of z = sqrt(-w) and by numerical quadrature."""
+    import sympy as sp
+
+    z = sp.Symbol("z", positive=True)
+    # Asymptotic series of psi'(z) as z -> oo: 1/z + 1/(2*z^2) + sum_{k=1}^4 B_{2k}/z^{2k+1}
+    psi_prime_asymp = (
+        sp.Rational(1, 1) / z
+        + sp.Rational(1, 2) / z**2
+        + sum(sp.bernoulli(2 * k) / z ** (2 * k + 1) for k in range(1, 5))
+    )
+    s_b_asymp_in_z = sp.simplify(1 + 1 / (2 * z) - z * psi_prime_asymp)
+    # Substitute z^2 = -w => z^{-2m} = (-w)^{-m} = (-1)^m / w^m
+    expected_in_z = (
+        -sp.Rational(1, 6) / z**2
+        + sp.Rational(1, 30) / z**4
+        - sp.Rational(1, 42) / z**6
+        + sp.Rational(1, 30) / z**8
+    )
+    assert sp.simplify(s_b_asymp_in_z - expected_in_z) == 0
+
+    # Verify quadrature checks recorded in artifact
+    sp_route = artifact_data["stieltjes_pade_route"]
+    quad_checks = sp_route["quadrature_verification_checks"]
+    assert len(quad_checks) == 3
+    for chk in quad_checks:
+        assert chk["abs_error"] < 1e-40
+
+
+def test_60_stirling_constant_log_4_sqrt_pi_verification(
+    artifact_data: dict,
+) -> None:
+    """Verify the Stirling constant log(4*sqrt(pi)) in log|B(m)| and log|K_0(m)|."""
+    assert (
+        "log(4*sqrt(pi))"
+        in artifact_data["candidate_kernel_hierarchy"]["B"]["sample_growth_log"]
+    )
+    assert (
+        "log(4*sqrt(pi))"
+        in artifact_data["candidate_kernel_hierarchy"]["P"]["sample_growth_log"]
+    )
+    assert (
+        "log(4*sqrt(pi))"
+        in artifact_data["bernoulli_sample_growth_audit"]["stirling_asymptotics"]["log_abs_B_m"]
+    )
+    assert (
+        "log(4*sqrt(pi))"
+        in artifact_data["bernoulli_sample_growth_audit"]["stirling_asymptotics"]["log_abs_K0_m"]
+    )
+    assert (
+        "log(4*sqrt(pi))"
+        in artifact_data["K0_sample_growth"]["asymptotic_log_K0_m"]
+    )
+    # Numerical check of Stirling approximation error for log|B_{2m}| at m = 40
+    m = 40
+    exact_log_b = float(mpmath.log(abs(mpmath.bernoulli(2 * m))))
+    stirling_approx = (
+        2 * m * math.log(m)
+        - 2 * m * (1.0 + math.log(math.pi))
+        + 0.5 * math.log(m)
+        + math.log(4.0 * math.sqrt(math.pi))
+    )
+    # Remainder is O(1/m) ~ 1/(24*40) ~ 0.001
+    assert abs(exact_log_b - stirling_approx) < 0.005
+
+
+def test_61_repository_canonical_synchronization_no_split_brain() -> None:
+    """Verify that no canonical documentation or ledger file retains stale 01bd62e6
+    split-brain Bernoulli formulas or the erroneous Stieltjes formula."""
+    repo_root = Path(__file__).resolve().parent.parent
+    canonical_files = [
+        "RESEARCH_LEDGER.md",
+        ".agents/research/state.json",
+        ".agents/research/queue.json",
+        ".agents/corpus_map/obligation_register.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "formal/RiemannScope/README.md",
+        "docs/reviews/TC_SUBFACTORIAL_ZERO_CARRYING_KERNELS.md",
+    ]
+    forbidden_substrings = [
+        "1/(350*w",
+        "795795",
+        "43229775",
+        "2\\Gamma(2z+1)\\mathcal{R}_\\tau(z)",
+        "2\\Gamma(2z+1)\\mathcal R_\\tau(z)",
+        "2*Gamma(2z+1)*R_tau(z)",
+        "log(2*sqrt(pi))",
+        "\\log m+\\log(2\\sqrt{\\pi})",
+        "\\log m + \\log(2\\sqrt{\\pi})",
+        "\\psi'(\\sqrt w)",
+        "\\psi'(\\sqrt{w})",
+    ]
+    for rel_path in canonical_files:
+        text = (repo_root / rel_path).read_text(encoding="utf-8")
+        for bad in forbidden_substrings:
+            assert bad not in text, f"Found forbidden stale substring {bad!r} in {rel_path}"
 
 

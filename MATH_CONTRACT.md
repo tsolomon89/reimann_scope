@@ -3687,60 +3687,83 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
 
 ---
 
-# 72. Subfactorial-Denominator Zero-Carrying Kernels: Bernoulli Reflection, Gamma-Ratio Tradeoffs, Positive-Moment Hankel Architecture, and Escape from the Newton Factorial Obstruction (TASK-TC-040)
+# 72. Subfactorial-Denominator Zero-Carrying Kernels: Bernoulli Reflection, Gamma-Ratio Tradeoffs, Positive-Moment Hankel Architecture, and Escape from the Newton Factorial Obstruction (TASK-TC-040 / TASK-TC-040R)
 
-1. **Bernoulli Reflection Kernel $\mathcal{B}(z)$, Entire Companion $\mathcal{K}_0(z)$, and Von Staudt–Clausen Subfactorial Denominators (`BERNOULLI_REFLECTION_KERNEL_ELIMINATES_FACTORIAL_DENOMINATORS`)**:
-   Define the Bernoulli reflected kernel and its cosine-cleared entire companion:
+1. **Entire Bernoulli Zero-Bridge $\mathcal{B}(z)$, Reflected Companion $\mathcal{K}_0(z)$, and Von Staudt–Clausen Primorial Denominators (`SUBFACTORIAL_RATIONAL_SAMPLE_DENOMINATOR_ACHIEVED`, `BERNOULLI_FUNCTION_NONTRIVIAL_ZETA_ZERO_BRIDGE_PROVED`, `CLASSICAL_IDENTITY_REPURPOSED_FOR_ZERO_ARGUMENT_ARITHMETIC`)**:
+   Define the classical entire Bernoulli function $B(s) := -s\zeta(1-s)$, its half-zero rescaling $\mathcal{B}(z) := B(2z)$, and its reflected companion $\mathcal{K}_0(z)$:
    \[
    \boxed{
-   \mathcal{B}(z) := 2\Gamma(2z+1)\mathcal{R}_\tau(z) = (2z-1)\Gamma(2z+1)\tau^{-2z}\zeta(2z) = \frac{2(2z-1)\zeta(1-2z)}{\cos(\pi z)}, \qquad
-   \mathcal{K}_0(z) := \cos(\pi z)\mathcal{B}(z) = 2(2z-1)\zeta(1-2z)
+   \mathcal{B}(z) := B(2z) = -2z\,\zeta(1-2z), \qquad
+   \mathcal{K}_0(z) := \Gamma(2z+1)\cos\!\left(\frac{\tau z}{2}\right)\mathcal{R}_\tau(z) = z(2z-1)\zeta(1-2z) = -\frac{2z-1}{2}\mathcal{B}(z)
    }
    \]
-   (`bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`). On $0 < \Re(z) < 1/2$, $\Gamma(2z+1)$ and $\cos(\pi z)$ are nonvanishing, so $\mathcal{B}(\rho/2) = \mathcal{K}_0(\rho/2) = 0$ for every nontrivial zero $\rho$ ($\mathcal{B}(1/2) = 1/2$, $\mathcal{K}_0(1/2) = 0$). On $\mathbb{Z}_{\ge 0}$, Euler's identity clears $(2m)!$ identically (`gamma_reflection_sample_clearing_identity`, `sign_adjusted_bernoulli_positive_sample_identity`):
+   (`bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`). Since $-2z$ cancels the simple pole of $\zeta(1-2z)$ at $z = 0$ ($\zeta(1-2z) = -\frac{1}{2z} + \gamma_E + O(z)$), both $\mathcal{B}(z)$ and $\mathcal{K}_0(z)$ are entire on $\mathbb{C}$ ($\mathcal{B}(0) = 1 = B_0$, $\mathcal{B}(1/2) = 1/2 \ne 0$, $\mathcal{K}_0(0) = 1/2$, $\mathcal{K}_0(1/2) = 0$) and satisfy $B(\rho) = \mathcal{B}(\rho/2) = \mathcal{K}_0(\rho/2) = 0$ for every nontrivial zero $\rho$ of $\zeta(s)$. On $\mathbb{Z}_{\ge 0}$, Euler's identity clears $(2m)!$ identically (`gamma_reflection_sample_clearing_identity`):
    \[
    \boxed{
-   \mathcal{B}(m) = (-1)^{m+1}(2m-1)B_{2m} \in \mathbb{Q}_{>0} \;\; (\forall m \ge 0), \qquad
-   \mathcal{K}_0(m) = -(2m-1)B_{2m} \in \mathbb{Q}\setminus\{0\} \;\; (\forall m \ge 0).
+   \mathcal{B}(m) = B_{2m} \in \mathbb{Q} \;\; (\forall m \ge 0), \qquad
+   \mathcal{K}_0(m) = -\frac{2m-1}{2}B_{2m} = (-1)^m(2m)!\mathcal{R}_\tau(m) \in \mathbb{Q} \;\; (\forall m \ge 0).
    }
    \]
-   By the von Staudt–Clausen theorem, $\operatorname{den}(B_{2m}) = \prod_{(p-1)\mid 2m} p$ is squarefree, so the cumulative LCM $\mathcal{V}_N := \operatorname{lcm}_{0\le m\le N}\operatorname{den}(\mathcal{B}(m))$ satisfies:
+   By the von Staudt–Clausen theorem, $\operatorname{den}(B_{2m}) = \prod_{(p-1)\mid 2m} p$ is squarefree, and for every $n \ge 1$ the cumulative LCMs $D_n^{\mathcal{B}} := \operatorname{lcm}_{0\le m\le n}\operatorname{den}(\mathcal{B}(m))$ and $D_n^{\mathcal{K}_0} := \operatorname{lcm}_{0\le m\le n}\operatorname{den}(\mathcal{K}_0(m))$ satisfy exact primorial identities:
    \[
    \boxed{
-   \log\mathcal{V}_N \le \vartheta(2N+1) = (2 + o(1))N = O(N) \ll N\log N.
+   D_n^{\mathcal{B}} = \prod_{p \le 2n+1} p = e^{\vartheta(2n+1)}, \qquad
+   D_n^{\mathcal{K}_0} = 2\prod_{p \le 2n+1} p = 2e^{\vartheta(2n+1)}, \qquad
+   \log D_n^{\mathcal{B}} = \vartheta(2n+1) = 2n + o(n) = O(n).
    }
    \]
 
-2. **Gamma-Ratio Tradeoff Family $\mathcal{B}_q(z)$, Log-Factorial Budget Conservation, and Carlson Obstruction (`GAMMA_RATIO_FAMILY_SHIFTS_FACTORIAL_FROM_DENOMINATOR_TO_GROWTH`)**:
-   For $\mathcal{B}_q(z) := \frac{2\Gamma(2z+1)}{\Gamma(z+1)^q}\mathcal{R}_\tau(z)$ with rational samples $\mathcal{B}_q(m) = (-1)^{m+1}\frac{(2m-1)B_{2m}}{(m!)^q}$, the leading $m\log m$ coefficients of sample denominator $\mathcal{L}_{\mathrm{den}}(q) = 2 - q$, sample growth $\mathcal{L}_{\mathrm{size}}(q) = q$, and degree-$m$ Newton basis $\mathcal{L}_{\mathrm{basis}}(q) = 1$ ($0 \le q \le 2$) satisfy exact conservation (`gamma_ratio_budget_conservation_identity`, `gamma_ratio_newton_basis_total_cost_conservation`):
+2. **Gamma-Ratio Tradeoff Family $\mathcal{B}_q(z)$, Irregular-Prime-Immune Two-Sided Denominator Theorem, and Log-Factorial Budget Conservation (`GAMMA_RATIO_FACTORIAL_BUDGET_TRADEOFF_PROVED`, `PROVED_TWO_SIDED_DENOMINATOR_ASYMPTOTIC`, `FACTORIAL_COST_MOVES_FROM_DENOMINATOR_TO_SAMPLE_GROWTH_UNDER_REFLECTION`)**:
+   For the entire Gamma-ratio ladder $\mathcal{B}_q(z) := \frac{\mathcal{K}_0(z)}{\Gamma(z+1)^q} = \frac{z(2z-1)\zeta(1-2z)}{\Gamma(z+1)^q}$ ($q \in \mathbb{Z}_{\ge 0}$) with rational samples $\mathcal{B}_q(m) = -\frac{(2m-1)B_{2m}}{2(m!)^q}$ (`gamma_ratio_integer_sample_identity`), the irregular-prime-immune witness $m_p = k_p\frac{p-1}{2} \in [n-p+2, n]$ ($k_p \in \{\lfloor\frac{2n}{p-1}\rfloor, \lfloor\frac{2n}{p-1}\rfloor - 1\}$, $k_p \not\equiv -1 \pmod p$) proves the unconditional two-sided denominator bound $q\log(n!) + \sum_{3\le p\le n}(1 - q\lfloor\log_p n\rfloor)\log p \le \log D_{q,n} \le q\log(n!) + \vartheta(2n+1) + \log 2$, establishing (`gamma_ratio_budget_conservation_identity`, `gamma_ratio_newton_basis_total_cost_conservation`, `factorial_budget_algebraic_inequality`):
    \[
    \boxed{
-   \mathcal{L}_{\mathrm{den}}(q) + \mathcal{L}_{\mathrm{size}}(q) = (2 - q) + q = 2, \qquad
-   \mathcal{L}_{\mathrm{den}}(q) + \mathcal{L}_{\mathrm{size}}(q) + \mathcal{L}_{\mathrm{basis}}(q) = 3.
+   \log|\mathcal{B}_q(m)| = (2-q)m\log m + O_q(m), \qquad
+   \log D_{q,n} = q\,n\log n + O_q(n), \qquad
+   (2 - q) + q = 2, \qquad
+   1 + q + (2 - q) = 3.
    }
    \]
-   At $q = 0$, removing the $2m\log m$ denominator shifts the $2m\log m$ factorial growth into $|B_{2m}| \sim 4\sqrt{\pi m}(m/\pi e)^{2m}$, causing the forward differences to explode factorially ($|\Delta^n\mathcal{B}(0)| \sim 4\sqrt{\pi n}(2n/\pi e)^{2n}$, $|\Delta^n\mathcal{K}_0(0)| \sim 4\sqrt{\pi n}(n/\pi e)^{2n}$) and violating Carlson's theorem.
+   At $q = 0$, removing the $2m\log m$ denominator shifts the exact $2m\log m$ factorial cost into sample growth $\log|\mathcal{B}(m)| = 2m\log m - 2(1+\log\pi)m + \frac{1}{2}\log m + \log(4\sqrt{\pi}) + O(m^{-1})$ and $\log|\mathcal{K}_0(m)| = 2m\log m - 2(1+\log\pi)m + \frac{3}{2}\log m + \log(4\sqrt{\pi}) + O(m^{-1})$ ($R_{\mathrm{OGF}} = 0$).
 
-3. **Positive-Moment Bernoulli Hankel Architecture, Carlitz–Touchard Orthogonal Polynomials, and the No-Free-Lunch Conservation Theorem (`POSITIVE_BERNOULLI_HANKEL_RETAINS_TARGET_COUPLING_OBSTRUCTION`, `CARLITZ_TOUCHARD_HANKEL_POLYNOMIAL_REINTRODUCES_FACTORIAL_BASIS`, `SUBFACTORIAL_INTERPOLATION_NO_FREE_LUNCH_IN_TESTED_CLASSES`)**:
-   - **Positive Bernoulli Moments & Carlitz–Touchard Polynomials**: The shifted Bernoulli moments $\mu_k := \frac{\mathcal{B}(k+1)}{2k+1} = (-1)^{k+1}B_{2k+2} = \int_{-\infty}^\infty x^{2k}\frac{\pi^2 dx}{4\cosh^2(\pi x/2)} > 0$ ($k \ge 0$) have strictly positive Hankel determinants $H_n^{\mathcal{B}} = \det(\mu_{i+j})_{0\le i,j<n} > 0$ with $\log H_n^{\mathcal{B}} = 2n^2\log n + O(n^2)$ and subfactorial denominator $\log\operatorname{den}(H_n^{\mathcal{B}}) \le n\log\mathcal{V}_n = O(n^2)$. The monic orthogonal polynomials $\widehat{\Omega}_n(x) = i^n P_n(-ix;1) = (-1)^n{}_3F_2(-n, n+1, 1+x; 1, 1; 1)$ satisfy $\widehat{\Omega}_{k+1}(x) = x\widehat{\Omega}_k(x) - \beta_k\widehat{\Omega}_{k-1}(x)$ with $\beta_k = \frac{k^4}{4(2k-1)(2k+1)} > 0$ (`carlitz_touchard_hankel_recurrence_positivity`). However: (i) the orthogonality identity $\mathcal{L}_x[\widehat{\Omega}_n(x)\widehat{\Omega}_m(x)] = 0$ ($m < n$) is a bilinear inner product in the dummy moment variable $x$ and does not evaluate the complex half-zero $\alpha_1 = \rho_1/2$; and (ii) clearing the rising-factorial basis $(1+x)_k/k!$ in $\widehat{\Omega}_n(2\alpha_1 - 1)$ reintroduces $(n!)^2 \asymp \exp(2n\log n)$.
-   - **No-Free-Lunch Conservation Theorem Across 7 Tested Kernel Classes (`auxiliary_polynomial_factorial_cost_lower_bound_schema`)**: Across all 7 audited candidate subfactorial kernel classes ($\mathcal{B}(z)$, $\mathcal{K}_0(z)$, $\mathcal{B}_q(z)$, Hurwitz/Barnes difference kernels, Dirichlet-regularized $\eta$-kernels, positive-moment Bernoulli Hankel / Carlitz–Touchard polynomials, and rational gauge-product hybrids), any degree-$d_n \asymp n$ polynomial $P_n$ extracted via an $O(n)$-point rational interpolation or Hankel reduction on an arithmetic progression incurs $\log D_n + \log|P_n(\gamma_1)| \ge c_0 n\log n - O(n) \to +\infty$.
+3. **Positive-Moment Bernoulli Stieltjes–Hankel Architecture, Repaired Stieltjes Transform $S_{\mathcal{B}}(w)$, and the Factorial-Relocation Theorem (`BERNOULLI_EVEN_ABSOLUTE_VALUES_STIELTJES_MOMENT_SEQUENCE_PROVED`, `BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT`, `EQUISPACED_GAMMA_REFLECTION_CLASS_NO_GO_PROVED`, `FACTORIAL_RELOCATION_ACROSS_DENOMINATOR_GROWTH_AND_BASIS_PROVED`)**:
+   - **Positive Bernoulli Stieltjes Moments & Hankel Determinants**: For $\mathcal{P}(z) := -e^{i\tau z/2}\mathcal{B}(z) = 2ze^{i\pi z}\zeta(1-2z)$ (`sign_adjusted_bernoulli_positive_sample_identity`), the shifted samples $\mu_m := \mathcal{P}(m+1) = (-1)^m B_{2m+2} = |B_{2m+2}| > 0$ ($m \ge 0$) satisfy $\mu_m = \int_0^\infty y^m\,d\nu_\tau(y)$ with $d\nu_\tau(y) = \frac{\tau\sqrt{y}}{4\sinh^2(\tau\sqrt{y}/2)}\,dy$ on $(0, \infty)$ ($\mu_0 = 1/6, \mu_1 = 1/30, \mu_2 = 1/42$). By the Stieltjes–Touchard–Carlitz–Al-Salam continued-fraction theorem, $\alpha_k^{\mathcal{B}} = \frac{(k+1)(2k+1)(4k^2+6k+1)}{(4k+1)(4k+5)}$ and $\beta_k^{\mathcal{B}} = \frac{H_{k+1}^{\mathcal{B}}H_{k-1}^{\mathcal{B}}}{(H_k^{\mathcal{B}})^2} = \frac{k^3(k+1)(2k-1)(2k+1)^3}{(4k-1)(4k+1)^2(4k+3)} > 0$ ($\beta_1^{\mathcal{B}} = 18/175$, `carlitz_touchard_hankel_recurrence_positivity`), giving:
+     \[
+     \boxed{
+     H_n^{\mathcal{B}} = \det(|B_{2i+2j+2}|)_{0\le i,j<n} = 6^{-n}\prod_{k=1}^{n-1}\left[\frac{k^3(k+1)(2k-1)(2k+1)^3}{(4k-1)(4k+1)^2(4k+3)}\right]^{n-k} > 0, \qquad
+     \log H_n^{\mathcal{B}} = 2n^2\log n - (3 + 2\log 2)n^2 + O(n\log n),
+     }
+     \]
+     ($H_1^{\mathcal{B}} = 1/6, H_2^{\mathcal{B}} = 1/350, H_3^{\mathcal{B}} = 4/56595, H_4^{\mathcal{B}} = 128/11022011$), while the Stieltjes transform on $\mathbb{C}\setminus[0,\infty)$ ($\operatorname{Re}\sqrt{-w} > 0$) is:
+     \[
+     \boxed{
+     S_{\mathcal{B}}(w) = \int_0^\infty \frac{d\nu_\tau(y)}{w - y} = 1 + \frac{1}{2\sqrt{-w}} - \sqrt{-w}\,\psi'\!\left(\sqrt{-w}\right) \sim \sum_{m=0}^\infty \frac{|B_{2m+2}|}{w^{m+1}} = \frac{1}{6w} + \frac{1}{30w^2} + \frac{1}{42w^3} + \cdots,
+     }
+     \]
+     which lives in the variable $w$ dual to $y = x^2$ rather than the Mellin zero-argument variable $z = \rho/2$ (`BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT`).
+   - **Factorial-Relocation Theorem Across Tested Routes (`auxiliary_polynomial_factorial_cost_lower_bound_schema`, `primitive_auxiliary_efficiency_scaling`, `sample_multiplier_denominator_cancellation_bound`, `even_node_norm_polynomial_degree_bound`, `primitive_hankel_polynomial_nonzero_schema`)**: Across the equispaced Gamma/reflection ladder $\mathcal{B}_q(z)$, alternative equispaced interpolation bases (`EQUISPACED_NEWTON_LAGRANGE_BASIS_REINTRODUCES_FACTORIAL_DENOMINATOR`), positive-moment Bernoulli Hankel polynomials, finite-window multipliers, and Riesz–Gram–Hadamard kernels (`RIESZ_GRAM_HADAMARD_KERNELS_DO_NOT_SIMULTANEOUSLY_PRESERVE_RATIONAL_SAMPLES_AND_INDIVIDUAL_ZERO_VANISHING`), the $2n\log n$ factorial cost is relocated across sample denominators, sample growth, or basis denominators rather than eliminated (`FACTORIAL_RELOCATION_ACROSS_DENOMINATOR_GROWTH_AND_BASIS_PROVED`).
 
 4. **Principal Classification, Remaining Subgates, and Lean 4 Verification**:
    \[
    \boxed{
    \begin{gathered}
-   \texttt{SUBFACTORIAL\_SAMPLE\_DENOMINATORS\_ACHIEVED\_BY\_GAMMA\_REFLECTION\_BUT\_FACTORIAL\_COST\_CONSERVED\_IN\_GROWTH\_OR\_BASIS\_ACROSS\_TESTED\_KERNEL\_CLASSES}\\[2pt]
-   \texttt{BERNOULLI\_REFLECTION\_KERNEL\_ELIMINATES\_FACTORIAL\_DENOMINATORS}\\[2pt]
-   \texttt{GAMMA\_RATIO\_FAMILY\_SHIFTS\_FACTORIAL\_FROM\_DENOMINATOR\_TO\_GROWTH}\\[2pt]
-   \texttt{POSITIVE\_BERNOULLI\_HANKEL\_RETAINS\_TARGET\_COUPLING\_OBSTRUCTION}\\[2pt]
-   \texttt{CARLITZ\_TOUCHARD\_HANKEL\_POLYNOMIAL\_REINTRODUCES\_FACTORIAL\_BASIS}\\[2pt]
-   \texttt{SUBFACTORIAL\_INTERPOLATION\_NO\_FREE\_LUNCH\_IN\_TESTED\_CLASSES}\\[2pt]
-   \texttt{NON\_INTERPOLATORY\_HURWITZ\_FOURIER\_OR\_PADE\_POTENTIAL\_SUBGATE}\\[4pt]
+   \texttt{SUBFACTORIAL\_RATIONAL\_SAMPLE\_DENOMINATOR\_ACHIEVED}\\[2pt]
+   \texttt{BERNOULLI\_FUNCTION\_NONTRIVIAL\_ZETA\_ZERO\_BRIDGE\_PROVED}\\[2pt]
+   \texttt{FACTORIAL\_COST\_MOVES\_FROM\_DENOMINATOR\_TO\_SAMPLE\_GROWTH\_UNDER\_REFLECTION}\\[2pt]
+   \texttt{GAMMA\_RATIO\_FACTORIAL\_BUDGET\_TRADEOFF\_PROVED}\\[2pt]
+   \texttt{PROVED\_TWO\_SIDED\_DENOMINATOR\_ASYMPTOTIC}\\[2pt]
+   \texttt{BERNOULLI\_EVEN\_ABSOLUTE\_VALUES\_STIELTJES\_MOMENT\_SEQUENCE\_PROVED}\\[2pt]
+   \texttt{BERNOULLI\_STIELTJES\_HANKEL\_POSITIVITY\_DOES\_NOT\_COUPLE\_TO\_ZETA\_ZERO\_ARGUMENT}\\[2pt]
+   \texttt{EQUISPACED\_NEWTON\_LAGRANGE\_BASIS\_REINTRODUCES\_FACTORIAL\_DENOMINATOR}\\[2pt]
+   \texttt{EQUISPACED\_GAMMA\_REFLECTION\_CLASS\_NO\_GO\_PROVED}\\[2pt]
+   \texttt{RIESZ\_GRAM\_HADAMARD\_KERNELS\_DO\_NOT\_SIMULTANEOUSLY\_PRESERVE\_RATIONAL\_SAMPLES\_AND\_INDIVIDUAL\_ZERO\_VANISHING}\\[2pt]
+   \texttt{MULTIPOINT\_PADE\_KERNEL\_COMPARISON\_FAVORS\_BOUNDED\_RADIUS\_CLASSES\_ONLY}\\[2pt]
+   \texttt{ALL\_N\_MULTIPOINT\_PADE\_ASYMPTOTIC\_STILL\_OPEN}\\[2pt]
+   \texttt{FACTORIAL\_RELOCATION\_ACROSS\_DENOMINATOR\_GROWTH\_AND\_BASIS\_PROVED}\\[4pt]
    (\texttt{SUBGATE-TC-039A [Newton]} = \texttt{CLOSED\_NEGATIVE\_AT\_GATE\_Z5}, \quad \texttt{SUBGATE-TC-039A [Padé asymptotic]} = \texttt{OPEN},\\
-   \texttt{SUBGATE-TC-040A} = \texttt{CLOSED\_NEGATIVE\_IN\_TESTED\_INTERPOLATORY\_AND\_HANKEL\_CLASSES}, \quad
+   \texttt{SUBGATE-TC-040A} = \texttt{SCOPED\_NEGATIVE\_FOR\_TESTED\_BERNOULLI\_GAMMA\_HANKEL\_CLASSES}, \quad
    \texttt{SUBGATE-TC-041A} = \texttt{OPEN}, \quad \texttt{SUBGATE-TC-038A} = \texttt{OPEN}, \quad \texttt{OBL-CT-001A} = \texttt{OPEN})
    \end{gathered}
    }
    \]
-   `formal/RiemannScope/SubfactorialZeroKernel.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 8 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 657 compiled `theorem` declarations across 34 local modules + umbrella `formal/RiemannScope.lean` = 35 formal source files):
-   `bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`, `gamma_reflection_sample_clearing_identity`, `gamma_ratio_budget_conservation_identity`, `sign_adjusted_bernoulli_positive_sample_identity`, `auxiliary_polynomial_factorial_cost_lower_bound_schema`, `gamma_ratio_newton_basis_total_cost_conservation`, `carlitz_touchard_hankel_recurrence_positivity`.
+   `formal/RiemannScope/SubfactorialZeroKernel.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 14 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 663 compiled `theorem` declarations across 34 local modules + umbrella `formal/RiemannScope.lean` = 35 formal source files):
+   `bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`, `gamma_reflection_sample_clearing_identity`, `gamma_ratio_budget_conservation_identity`, `sign_adjusted_bernoulli_positive_sample_identity`, `auxiliary_polynomial_factorial_cost_lower_bound_schema`, `gamma_ratio_newton_basis_total_cost_conservation`, `carlitz_touchard_hankel_recurrence_positivity`, `primitive_auxiliary_efficiency_scaling`, `sample_multiplier_denominator_cancellation_bound`, `gamma_ratio_integer_sample_identity`, `even_node_norm_polynomial_degree_bound`, `primitive_hankel_polynomial_nonzero_schema`, `factorial_budget_algebraic_inequality`.

@@ -215,12 +215,12 @@ Removing $(2m)!$ from the denominator via $\Gamma(2z+1)\cos(\tau z/2)$ moves the
 By Stirling's formula,
 \[
 \boxed{
-\log|\mathcal{B}(m)| = 2m\log m - 2(1+\log\pi)m + \frac{1}{2}\log m + \log(2\sqrt{\pi}) + O(m^{-1}),
+\log|\mathcal{B}(m)| = 2m\log m - 2(1+\log\pi)m + \frac{1}{2}\log m + \log(4\sqrt{\pi}) + O(m^{-1}),
 }
 \]
 \[
 \boxed{
-\log|\mathcal{K}_0(m)| = 2m\log m - 2(1+\log\pi)m + \frac{3}{2}\log m + \log(2\sqrt{\pi}) + O(m^{-1}),
+\log|\mathcal{K}_0(m)| = 2m\log m - 2(1+\log\pi)m + \frac{3}{2}\log m + \log(4\sqrt{\pi}) + O(m^{-1}),
 }
 \]
 and consequently the ordinary generating functions $\sum_{m=0}^\infty \mathcal{B}(m) t^m$ and $\sum_{m=0}^\infty \mathcal{K}_0(m) t^m$ have radius of convergence
@@ -405,9 +405,13 @@ In the Stieltjes moment integral $\mu_m = |B_{2m+2}| = \int_0^\infty y^m\,d\nu_\
 
 The Stieltjes transform of $d\nu_\tau(y)$ is the asymptotic Laplace/Stieltjes series
 \[
-S_{\mathcal{B}}(w) := \int_0^\infty \frac{d\nu_\tau(y)}{w - y} \sim \sum_{m=0}^\infty \frac{|B_{2m+2}|}{w^{m+1}} \qquad (|w| \to \infty, \; w \in \mathbb{C}\setminus[0, \infty)).
+\boxed{
+S_{\mathcal{B}}(w) := \int_0^\infty \frac{d\nu_\tau(y)}{w - y} = 1 + \frac{1}{2\sqrt{-w}} - \sqrt{-w}\,\psi'\!\left(\sqrt{-w}\right)
+\sim \sum_{m=0}^\infty \frac{|B_{2m+2}|}{w^{m+1}} = \frac{1}{6w} + \frac{1}{30w^2} + \frac{1}{42w^3} + \cdots
+\quad (|w| \to \infty, \; w \in \mathbb{C}\setminus[0, \infty)).
+}
 \]
-By Binet's log-gamma/trigamma integral, $S_{\mathcal{B}}(w) = \frac{1}{2}\sqrt{w}\,\psi'(\sqrt{w}) - \frac{1}{2} - \frac{1}{4\sqrt{w}}$, so its $[n-1/n]$ Stieltjes–Padé approximants $Q_{n-1}^{\mathcal{B}}(w) / P_n^{\mathcal{B}}(w)$ converge to the trigamma function in $w = x^2$ on $\mathbb{C}\setminus[0, \infty)$, and do **not** couple to $\mathcal{B}(z)$, $\zeta(z)$, or $\mathcal{R}_\tau(z)$ at $z = \rho_1/2$.
+Indeed, setting $z = \sqrt{-w}$ with $\operatorname{Re}(z) > 0$ ($z^2 = -w$), Binet's integral for the trigamma function $\psi'(z) = \frac{1}{z} + \frac{1}{2z^2} + \frac{1}{z}\int_0^\infty \frac{d\nu_\tau(y)}{z^2+y}$ gives $\int_0^\infty \frac{d\nu_\tau(y)}{w-y} = -\int_0^\infty \frac{d\nu_\tau(y)}{z^2+y} = 1 + \frac{1}{2z} - z\psi'(z)$, whose asymptotic expansion matches $\mu_0 = 1/6, \mu_1 = 1/30, \mu_2 = 1/42$ term by term (and agrees with numerical quadrature at $w \in \{-4, -9, -16\}$ to $< 10^{-48}$). Consequently, its $[n-1/n]$ Stieltjes–Padé approximants $Q_{n-1}^{\mathcal{B}}(w) / P_n^{\mathcal{B}}(w)$ converge to the trigamma Stieltjes transform in $w$ on $\mathbb{C}\setminus[0, \infty)$, and do **not** couple to $\mathcal{B}(z)$, $\zeta(z)$, or $\mathcal{R}_\tau(z)$ at $z = \rho_1/2$.
 
 For direct multipoint Padé interpolation $A_n(m) - f(m)B_n(m) = 0$ on $m = 0, \dots, 2n$ ($1 \le n \le 7$) in the actual zero-argument variable $z$, [`tc/fauzan_subfactorial_zero_kernel.py`](file:///c:/Development/Projects/reimann_scope/tc/fauzan_subfactorial_zero_kernel.py) proves (`MULTIPOINT_PADE_KERNEL_COMPARISON_FAVORS_BOUNDED_RADIUS_CLASSES_ONLY`, `ALL_N_MULTIPOINT_PADE_ASYMPTOTIC_STILL_OPEN`) that $\mathcal{K}_0$ ($q=0$) and $\mathcal{B}_1$ ($q=1$) fail raw analytic decay due to $R_{\mathrm{OGF}} = 0$, while $\mathcal{R}_\tau, \mathcal{R}_\pi, \mathcal{B}_2$ achieve raw residual decay $< 0$ but have $\log\widetilde{Q}_{n,\mathrm{Pade}}(\gamma_1) > 0$ growing rapidly for all $1 \le n \le 7$.
 

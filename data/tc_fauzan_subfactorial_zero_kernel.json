@@ -318,7 +318,7 @@
     "classification": "FACTORIAL_COST_MOVES_FROM_DENOMINATOR_TO_SAMPLE_GROWTH_UNDER_REFLECTION",
     "secondary_classification": "FACTORIAL_COST_RELOCATED_TO_SAMPLE_GROWTH",
     "exact_formula": "|K_0(m)| = (2m - 1) * (2m)! * tau^{-2m} * zeta(2m)",
-    "asymptotic_log_K0_m": "log|K_0(m)| = 2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(2*sqrt(pi)) + O(1/m)",
+    "asymptotic_log_K0_m": "log|K_0(m)| = 2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
     "checkpoints_to_200": [
       {
         "m": 2,
@@ -3671,7 +3671,33 @@
   ],
   "stieltjes_pade_route": {
     "stieltjes_transform_definition": "S_B(w) := int_0^infty d nu_tau(y) / (w - y) ~ sum_{m=0}^infty |B_{2m+2}| / w^{m+1}  (|w| -> infty)",
-    "exact_analytic_identification": "By the Binet/Stieltjes integral for digamma/trigamma, S_B(w) = (1/2)*sqrt(w)*psi'(sqrt(w)) - 1/2 - 1/(4*sqrt(w)), so the [n-1 / n] Pad\u00e9 approximants Q_{n-1}^B(w) / P_n^B(w) converge to the polygamma function in w = x^2 on C \\ [0, infty), and have NO algebraic or functional relation to B(z) = -2z*zeta(1-2z), zeta(z), or R_tau(z) at the Mellin zero argument.",
+    "exact_closed_form": "S_B(w) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w))  for w in C \\ [0, infty) with Re(sqrt(-w)) > 0",
+    "asymptotic_expansion_at_infinity": "Using psi'(z) ~ 1/z + 1/(2*z^2) + sum_{m=0}^infty B_{2m+2} / z^{2m+3} at z = sqrt(-w) (z^2 = -w), S_B(w) = 1 + 1/(2z) - z*psi'(z) ~ -sum_{m=0}^infty B_{2m+2} / (-w)^{m+1} = sum_{m=0}^infty |B_{2m+2}| / w^{m+1} = 1/(6*w) + 1/(30*w^2) + 1/(42*w^3) + 1/(30*w^4) + ...",
+    "exact_analytic_identification": "By Binet's integral for the trigamma function psi'(z) at z = sqrt(-w) (Re(z) > 0, z^2 = -w), S_B(w) = int_0^infty d nu_tau(y) / (w - y) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w)), so the [n-1 / n] Pad\u00e9 approximants Q_{n-1}^B(w) / P_n^B(w) converge to the trigamma Stieltjes transform in w on C \\ [0, infty), and have NO algebraic or functional relation to B(z) = -2z*zeta(1-2z), zeta(z), or R_tau(z) at the Mellin zero argument.",
+    "quadrature_verification_checks": [
+      {
+        "w": -4,
+        "sqrt_neg_w": 2.0,
+        "quadrature_val": -0.039868133696452875,
+        "closed_form_val": -0.039868133696452875,
+        "abs_error": 6.021204338895698e-47
+      },
+      {
+        "w": -9,
+        "sqrt_neg_w": 3.0,
+        "quadrature_val": -0.018135533878012644,
+        "closed_form_val": -0.018135533878012644,
+        "abs_error": 5.747513232582258e-47
+      },
+      {
+        "w": -16,
+        "sqrt_neg_w": 4.0,
+        "quadrature_val": -0.010291822948461302,
+        "closed_form_val": -0.010291822948461302,
+        "abs_error": 7.800196529933064e-47
+      }
+    ],
+    "all_quadrature_checks_match_to_1e_40": true,
     "classification": "BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT",
     "secondary_classification": "BERNOULLI_HANKEL_ARGUMENT_COUPLING_FAILED"
   },
@@ -4853,7 +4879,7 @@
     "B": {
       "formula": "B(z) = B(2z) = -2 * z * zeta(1 - 2z) = -2 * K_0(z) / (2z - 1)",
       "sample_formula": "B(m) = B_{2m}",
-      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m)",
+      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
       "sample_denominator_lcm_log": "vartheta(2n + 1) = 2n + o(n)",
       "ogf_radius": "0 (divergent asymptotic OGF)"
     },
@@ -4867,7 +4893,7 @@
     "P": {
       "formula": "P(z) = -exp(i * tau * z / 2) * B(z) = 2 * z * exp(i * pi * z) * zeta(1 - 2z)",
       "sample_formula": "P(m) = -(-1)^m * B_{2m} = (-1)^{m+1} * B_{2m} = |B_{2m}| > 0 (m >= 1)",
-      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m)",
+      "sample_growth_log": "2m * log(m) - 2m * (1 + log(pi)) + (1/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
       "sample_denominator_lcm_log": "vartheta(2n + 1) = 2n + o(n)",
       "stieltjes_moment_property": "mu_m = P(m + 1) = |B_{2m+2}| is a positive Stieltjes moment sequence on (0, infty)"
     }
@@ -5792,8 +5818,8 @@
       "abs_K0_m": "|K_0(m)| = (2m - 1) * (2m)! * tau^{-2m} * zeta(2m)"
     },
     "stirling_asymptotics": {
-      "log_abs_B_m": "2*m*log(m) - 2*(1 + log(pi))*m + (1/2)*log(m) + log(2*sqrt(pi)) + O(1/m)",
-      "log_abs_K0_m": "2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(2*sqrt(pi)) + O(1/m)"
+      "log_abs_B_m": "2*m*log(m) - 2*(1 + log(pi))*m + (1/2)*log(m) + log(4*sqrt(pi)) + O(1/m)",
+      "log_abs_K0_m": "2*m*log(m) - 2*(1 + log(pi))*m + (3/2)*log(m) + log(4*sqrt(pi)) + O(1/m)"
     },
     "ogf_radius_B": 0.0,
     "ogf_radius_K0": 0.0,
