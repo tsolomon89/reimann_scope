@@ -638,3 +638,232 @@ def test_46_z1_to_z5_gate_status_table_complete(artifact_data: dict) -> None:
     assert len(gates) == 5
     assert "PASSED BOTH" in gates["Gate_Z2_Rational_Sample_Values_and_Subfactorial_Denominators"]["K0_and_B"]
     assert "CLOSED_NEGATIVE" in gates["Gate_Z5_Primitive_Integer_Diophantine_Efficiency"]["Equispaced_Gamma_Ratio_Class"]
+
+
+# ---------------------------------------------------------------------------
+# 9. Extended Section 20–42 Audits & Schema Verification (Tests 47–58)
+# ---------------------------------------------------------------------------
+
+SECTION_39_REQUIRED_KEYS = (
+    "task_id",
+    "starting_head",
+    "preflight_repairs",
+    "tau_definition",
+    "pi_tau_policy",
+    "bernoulli_function_definition",
+    "bernoulli_function_classical_status",
+    "bernoulli_function_zero_mapping",
+    "K0_tau_form",
+    "K0_pi_form",
+    "K0_reflection_simplification",
+    "K0_entire_status",
+    "K0_nontrivial_zero_preservation",
+    "K0_integer_samples",
+    "K0_sample_denominator_growth",
+    "K0_sample_growth",
+    "K0_ogf_radius",
+    "gamma_ratio_family",
+    "gamma_ratio_q_rows",
+    "gamma_ratio_sample_growth_theorem",
+    "gamma_ratio_denominator_bounds",
+    "gamma_ratio_ogf_radius_table",
+    "gamma_ratio_tradeoff_classification",
+    "positive_bernoulli_kernel",
+    "positive_moment_integral",
+    "stieltjes_measure",
+    "moment_sequence_status",
+    "bernoulli_hankel_determinants",
+    "bernoulli_hankel_positivity",
+    "bernoulli_hankel_product_formula",
+    "bernoulli_hankel_arithmetic",
+    "bernoulli_argument_coupling_status",
+    "orthogonal_polynomial_route",
+    "orthogonal_polynomial_target_evaluations",
+    "stieltjes_pade_route",
+    "windowed_factorial_multiplier",
+    "windowed_multiplier_height",
+    "windowed_multiplier_target_evaluation",
+    "windowed_multiplier_classification",
+    "rational_height_conservation",
+    "borel_transform_route",
+    "interpolation_basis_audit",
+    "rho_scale_vs_half_scale",
+    "candidate_gate_table",
+    "best_surviving_candidate",
+    "earliest_failed_gate",
+    "subgate_tc_039a_status",
+    "subgate_tc_040a_status",
+    "subgate_tc_038a_status",
+    "obl_ct_001a_status",
+    "rh_claimed",
+)
+
+
+def test_47_artifact_has_all_section_39_required_keys(artifact_data: dict) -> None:
+    assert len(SECTION_39_REQUIRED_KEYS) == 51
+    for key in SECTION_39_REQUIRED_KEYS:
+        assert key in artifact_data, f"Missing Section 39 required key: {key}"
+    assert artifact_data["rh_claimed"] is False
+
+
+def test_48_all_14_lean_theorems_including_section_41_targets(artifact_data: dict) -> None:
+    assert len(SUBFACTORIAL_KERNEL_LEAN_THEOREMS) == 14
+    section_41_theorems = (
+        "primitive_auxiliary_efficiency_scaling",
+        "sample_multiplier_denominator_cancellation_bound",
+        "gamma_ratio_integer_sample_identity",
+        "even_node_norm_polynomial_degree_bound",
+        "primitive_hankel_polynomial_nonzero_schema",
+        "factorial_budget_algebraic_inequality",
+    )
+    content = LEAN_FILE_PATH.read_text(encoding="utf-8")
+    for thm in section_41_theorems:
+        assert thm in artifact_data["lean_theorems"]
+        assert f"theorem {thm}" in content
+
+
+def test_49_extended_bernoulli_and_gamma_ladder_up_to_m_200(artifact_data: dict) -> None:
+    vsc = artifact_data["von_staudt_clausen_denominator_audit"]
+    assert vsc["max_n_verified"] == 200
+    assert vsc["all_den_B_2m_squarefree_verified_to_200"] is True
+    assert vsc["all_D_n_B_equal_primorial_2n_plus_1_to_200"] is True
+    assert vsc["all_D_n_K0_equal_twice_primorial_to_200"] is True
+    q_rows = artifact_data["gamma_ratio_q_rows"]
+    assert "checkpoints_to_200" in q_rows
+    for q in (0, 1, 2, 3, 4):
+        assert f"q_{q}" in q_rows
+        assert f"q_{q}" in q_rows["checkpoints_to_200"]
+        cp200 = q_rows["checkpoints_to_200"][f"q_{q}"][-1]
+        assert cp200["n"] == 200
+
+
+
+def test_50_bernoulli_hankel_determinants_exact_up_to_n_20(artifact_data: dict) -> None:
+    h_det = artifact_data["bernoulli_hankel_determinants"]
+    assert h_det["max_n_computed"] == 20
+    rows_20 = h_det["rows_1_to_20"]
+    assert len(rows_20) == 20
+    for r in rows_20:
+        assert r["H_n_B_positive"] is True
+        assert r["matches_carlitz_touchard_product"] is True
+    assert rows_20[-1]["n"] == 20
+    assert rows_20[-1]["log_H_n_B"] > 500.0
+
+
+def test_51_bernoulli_orthogonal_polynomials_and_arb_balls_up_to_n_30(
+    artifact_data: dict,
+) -> None:
+    ortho = artifact_data["orthogonal_polynomial_route"]
+    assert ortho["max_n_computed"] == 30
+    assert ortho["gram_schmidt_matches_jacobi_to_6"] is True
+    assert ortho["zeros_real_positive_verified_to_6"] is True
+    rows_30 = artifact_data["orthogonal_polynomial_target_evaluations"]
+    assert len(rows_30) == 30
+    for r in rows_30:
+        assert r["certified_ball_excludes_zero"] is True
+        assert r["primitive_diophantine_efficiency_at_rho1"] < 0
+        assert r["primitive_diophantine_efficiency_at_gamma1"] < 0
+    assert rows_30[-1]["n"] == 30
+    assert rows_30[-1]["log_abs_prim_P_n_at_gamma1"] > 170.0
+
+
+def test_52_stieltjes_pade_route_audit(artifact_data: dict) -> None:
+    sp = artifact_data["stieltjes_pade_route"]
+    assert (
+        sp["classification"]
+        == BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT
+    )
+    assert sp["secondary_classification"] == "BERNOULLI_HANKEL_ARGUMENT_COUPLING_FAILED"
+    assert "psi'(sqrt(w))" in sp["exact_analytic_identification"]
+
+
+def test_53_windowed_factorial_multiplier_audit_up_to_n_30(artifact_data: dict) -> None:
+    wm = artifact_data["windowed_factorial_multiplier"]
+    assert wm["max_n_computed"] == 30
+    assert wm["all_node_interpolations_exact_1_to_30"] is True
+    assert wm["zero_dependency_firewall"]["depends_on_gamma1"] is False
+    assert (
+        artifact_data["windowed_multiplier_classification"]
+        == "RATIONAL_SAMPLE_DENOMINATOR_CANCELLATION_REQUIRES_MULTIPLIER_HEIGHT"
+    )
+    rows_30 = wm["rows_1_to_30"]
+    assert len(rows_30) == 30
+    for r in rows_30:
+        assert r["certified_ball_excludes_zero"] is True
+    assert rows_30[-1]["n"] == 30
+    assert rows_30[-1]["log_primitive_height_H_tilde_E_n"] > 130.0
+    assert rows_30[-1]["log_abs_tilde_E_n_alpha1"] > 120.0
+
+
+def test_54_rational_height_conservation_audit(artifact_data: dict) -> None:
+    rhc = artifact_data["rational_height_conservation"]
+    assert (
+        rhc["classification"]
+        == "RATIONAL_SAMPLE_DENOMINATOR_CANCELLATION_REQUIRES_MULTIPLIER_HEIGHT"
+    )
+    assert rhc["lean_theorem"] == "sample_multiplier_denominator_cancellation_bound"
+    assert rhc["all_prime_valuation_inequalities_verified_m_1_to_14"] is True
+
+
+def test_55_borel_transform_and_egf_firewall(artifact_data: dict) -> None:
+    bt = artifact_data["borel_transform_route"]
+    assert (
+        bt["classification"]
+        == "BOREL_TRANSFORM_IN_NEW_VARIABLE_DOES_NOT_BY_ITSELF_CONSTRAIN_ZERO_ARGUMENT"
+    )
+    assert "tau = 2 * pi" in bt["egf_radius_of_convergence"]
+    assert bt["symbolic_series_verified_m_0_to_5"] is True
+
+
+def test_56_interpolation_basis_audit_polya_and_even_nodes(
+    artifact_data: dict,
+) -> None:
+    ib = artifact_data["interpolation_basis_audit"]
+    assert (
+        ib["classification"]
+        == "CONSECUTIVE_INTEGER_NODE_POLYNOMIALIZATION_HAS_INTRINSIC_FACTORIAL_LATTICE_COST"
+    )
+    assert len(ib["bases_compared"]) == 7
+    assert len(ib["rows_1_to_8"]) == 8
+    assert ib["rows_1_to_8"][-1]["even_node_top_basis_denominator"] == (2**8) * math.factorial(8)
+
+
+def test_57_direct_rho_scale_vs_half_scale_comparison(artifact_data: dict) -> None:
+    rsh = artifact_data["rho_scale_vs_half_scale"]
+    assert rsh["basis_elements_identically_equal_in_Y"] is True
+    assert rsh["removes_factorial_or_dyadic_penalty"] is False
+    assert rsh["lean_degree_theorem"] == "even_node_norm_polynomial_degree_bound"
+
+
+def test_58_candidate_gate_table_K1_to_K7_complete(artifact_data: dict) -> None:
+    cands = artifact_data["candidate_gate_table"]
+    assert len(cands) == 8
+    cand_ids = {c["candidate_id"] for c in cands}
+    for req_id in (
+        "1_R_tau_control",
+        "2_bernoulli_function_B",
+        "3_reflected_kernel_K0",
+        "4_gamma_ratio_ladder_Bq_q0_to_4",
+        "5_sign_adjusted_positive_kernel_P",
+        "6_bernoulli_stieltjes_hankel_orthogonal_polynomial",
+        "7_windowed_factorial_multiplier_E_n",
+        "8_multipoint_pade_on_R_tau_and_B2",
+    ):
+        assert req_id in cand_ids
+    for c in cands:
+        for k_gate in (
+            "K1_zero_preservation",
+            "K2_rational_sampling",
+            "K3_subfactorial_sample_arithmetic",
+            "K4_tame_sample_growth",
+            "K5_argument_polynomialization",
+            "K6_structural_nonvanishing",
+            "K7_primitive_diophantine_efficiency",
+            "earliest_failed_gate",
+        ):
+            assert k_gate in c
+    assert "NO_SUBFACTORIAL_DIOPHANTINE_ZERO_KERNEL_FOUND" in artifact_data["best_surviving_candidate"]
+    assert isinstance(artifact_data["earliest_failed_gate"], dict)
+    assert len(artifact_data["earliest_failed_gate"]) == 8
+
+

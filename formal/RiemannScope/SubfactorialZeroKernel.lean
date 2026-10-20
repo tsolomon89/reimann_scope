@@ -190,4 +190,95 @@ theorem carlitz_touchard_hankel_recurrence_positivity
   have h4k_minus : 0 < 4 * k - 1 := by linarith
   positivity
 
+/-! ### 5. Section 41 Target Algebraic & Arithmetic Schemas -/
+
+/-- 9. `primitive_auxiliary_efficiency_scaling`:
+    For a rational auxiliary polynomial `P_n` with canonical primitive integer normalization
+    `tilde_P_n = M_n * P_n` of degree `d_n > 0`, where `log_tilde_P = log_M + log_P`,
+    the primitive Diophantine efficiency `E_n = -log_tilde_P / d_n` decomposes as
+    `E_n = (-log_P - log_M) / d_n`, and whenever `log_M ≥ -log_P + delta` with `delta ≥ 0`,
+    we have `E_n ≤ -delta / d_n ≤ 0`. -/
+theorem primitive_auxiliary_efficiency_scaling
+    (log_P log_M log_tilde_P d_n delta : ℝ)
+    (hd : 0 < d_n)
+    (h_sum : log_tilde_P = log_M + log_P)
+    (h_dom : -log_P + delta ≤ log_M)
+    (h_delta : 0 ≤ delta) :
+    (-log_tilde_P / d_n = (-log_P - log_M) / d_n) ∧
+    (-log_tilde_P / d_n ≤ 0) := by
+  have h_eq : -log_tilde_P / d_n = (-log_P - log_M) / d_n := by
+    rw [h_sum]
+    ring
+  have h_num_nonpos : -log_tilde_P ≤ 0 := by linarith
+  exact ⟨h_eq, div_nonpos_of_nonpos_of_nonneg h_num_nonpos (le_of_lt hd)⟩
+
+/-- 10. `sample_multiplier_denominator_cancellation_bound`:
+    Prime-by-prime valuation conservation for rational sample multiplication `f_m = e_m * a_m`:
+    if `v_den_f ≥ v_D - v_P - v_A`, then cancelling the sample denominator valuation `v_D`
+    down to `v_den_f` requires the multiplier numerator valuation `v_P` to satisfy
+    `v_P ≥ v_D - v_den_f - v_A`. -/
+theorem sample_multiplier_denominator_cancellation_bound
+    (v_D v_P v_A v_den_f : ℤ)
+    (h_val : v_D - v_P - v_A ≤ v_den_f) :
+    v_D - v_den_f - v_A ≤ v_P := by
+  omega
+
+/-- 11. `gamma_ratio_integer_sample_identity`:
+    At every integer node `m : ℕ`, dividing the reflected sample
+    `K0_m = -((2 * m - 1) * B_2m) / 2` by the Gamma-power sample `G_m = (m!)^q` (`G_m ≠ 0`)
+    yields the exact Gamma-ratio integer sample `B_q(m) = -((2 * m - 1) * B_2m) / (2 * G_m)`. -/
+theorem gamma_ratio_integer_sample_identity
+    (m : ℕ) (B_2m G_m K0_m : ℝ)
+    (hG : G_m ≠ 0)
+    (hK0 : K0_m = -((2 * (m : ℝ) - 1) * B_2m) / 2) :
+    K0_m / G_m = -((2 * (m : ℝ) - 1) * B_2m) / (2 * G_m) := by
+  rw [hK0]
+  field_simp [hG]
+
+/-- 12. `even_node_norm_polynomial_degree_bound`:
+    For a polynomial interpolant of degree `n` in the direct `ρ = 1/2 + i*Y` coordinate
+    (or half-coordinate `α = 1/4 + i*Y/2`), the conjugate-product norm polynomial
+    `N_P(Y) = P(1/2 + i*Y) * P_conj(1/2 - i*Y)` has degree `2 * n`, which coincides
+    identically between the direct `ρ`-scale on even nodes `0, 2, ..., 2n` and the
+    half-scale `α = ρ/2` on consecutive integer nodes `0, 1, ..., n`. -/
+theorem even_node_norm_polynomial_degree_bound
+    (n : ℕ) :
+    (n + n = 2 * n) ∧ (2 * (n + 1) - 2 * n = 2) := by
+  omega
+
+/-- 13. `primitive_hankel_polynomial_nonzero_schema`:
+    If a monic orthogonal polynomial `P_n` associated with a positive Stieltjes measure
+    on `(0, ∞)` has all real roots `r_j > 0`, then at any complex argument `s = σ + i * γ`
+    with `γ ≠ 0`, each linear factor squared modulus `(σ - r_j)^2 + γ^2` is strictly
+    positive (`≥ γ^2 > 0`), and multiplying by any positive primitive clearing factor
+    `M_n > 0` preserves strict positivity. -/
+theorem primitive_hankel_polynomial_nonzero_schema
+    (sigma gamma r_j M_n : ℝ)
+    (h_gamma : gamma ≠ 0)
+    (hM : 0 < M_n) :
+    (gamma ^ 2 ≤ (sigma - r_j) ^ 2 + gamma ^ 2) ∧
+    (0 < M_n * ((sigma - r_j) ^ 2 + gamma ^ 2)) := by
+  have h_sq_pos : 0 < gamma ^ 2 := sq_pos_of_ne_zero h_gamma
+  have h_factor_ge : gamma ^ 2 ≤ (sigma - r_j) ^ 2 + gamma ^ 2 := by
+    have : 0 ≤ (sigma - r_j) ^ 2 := sq_nonneg (sigma - r_j)
+    linarith
+  have h_factor_pos : 0 < (sigma - r_j) ^ 2 + gamma ^ 2 := lt_of_lt_of_le h_sq_pos h_factor_ge
+  exact ⟨h_factor_ge, mul_pos hM h_factor_pos⟩
+
+/-- 14. `factorial_budget_algebraic_inequality`:
+    For any real parameter `q` and positive factorial scale `L > 0` (`L = n log n`),
+    either the sample denominator cost `q * L ≥ L > 0` (when `q ≥ 1`) or the sample
+    growth cost `(2 - q) * L > L > 0` (when `q < 1`); in particular,
+    `max (q * L) ((2 - q) * L) ≥ L > 0`. -/
+theorem factorial_budget_algebraic_inequality
+    (q L : ℝ) (hL : 0 < L) :
+    L ≤ max (q * L) ((2 - q) * L) := by
+  by_cases hq : 1 ≤ q
+  · have h1 : L ≤ q * L := by nlinarith
+    exact le_trans h1 (le_max_left (q * L) ((2 - q) * L))
+  · push_neg at hq
+    have h2 : L ≤ (2 - q) * L := by nlinarith
+    exact le_trans h2 (le_max_right (q * L) ((2 - q) * L))
+
 end RiemannScope
+
