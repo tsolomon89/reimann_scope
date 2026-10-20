@@ -63,6 +63,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/ZeroArithmeticInvariants.lean",
     "formal/RiemannScope/FauzanZeroArgumentTransfer.lean",
     "formal/RiemannScope/SubfactorialZeroKernel.lean",
+    "formal/RiemannScope/QuartetRemainderConnection.lean",
 ]
 
 

@@ -180,8 +180,11 @@ theorem arithmetic_vanishing_forces_spectral_cancellation (D C B : ℝ) (hQ : D 
 /-- Theorem 15: Remainder Subordination Incompatibility Theorem:
     If arithmetic vanishing forces D = - (C + B), and the diagonal defect dominates
     the total remainder magnitude D > |C + B|, this immediately produces a contradiction.
-    (This proves that strict remainder subordination is mathematically INCOMPATIBLE
-    with exact arithmetic vanishing, precluding any RH proof via strict remainder dominance). -/
+    (WP6 Scope Note: In a reductio under the off-critical zero hypothesis H, deriving
+    D > |C + B| alongside exact arithmetic vanishing Q = D + C + B = 0 yields the
+    intended contradiction H -> False -> ¬H; the algebraic identity D = -(C + B) does
+    not by itself close the reductio route, which instead depends on whether D > |C + B|
+    can be established under H). -/
 theorem remainder_subordination_contradiction (D C B : ℝ)
     (h_cancel : D = - (C + B))
     (h_dominate : |C + B| < D) :

@@ -552,16 +552,20 @@ def audit_full_spectrum_decomposition(
       It has NOT been evaluated or proved from the two-variable integral in the active engine.
     - \mathcal{C}_\varepsilon and \mathcal{B}_\varepsilon are NOT_COMPUTED_IN_ENGINE.
 
-    Decisive Logical Impossibility of Remainder Subordination:
-        Exact arithmetic vanishing Q_\varepsilon = 0 forces:
-            \mathcal{D}_\varepsilon + (\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon) = 0
-            \implies \mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon = - \mathcal{D}_\varepsilon.
-        For any non-negative diagonal defect \mathcal{D}_\varepsilon \ge 0:
-            |\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon| = |- \mathcal{D}_\varepsilon| = \mathcal{D}_\varepsilon.
-        Therefore, strict remainder subordination:
-            \mathcal{D}_\varepsilon > |\mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon|
-        reduces to \mathcal{D}_\varepsilon > \mathcal{D}_\varepsilon, which is impossible (False).
-        Lean 4 theorem `remainder_subordination_contradiction` formalizes this exact deduction.
+    Algebraic Incompatibility & WP6 Reductio Interpretation (Amended in EPIC-TC-041):
+        Exact arithmetic vanishing Q_\varepsilon = 0 and Q_\varepsilon = \mathcal{D}_\varepsilon + \mathcal{R}_\varepsilon
+        give the consistency identity \mathcal{R}_\varepsilon = - \mathcal{D}_\varepsilon.
+        Consequently, [Q_\varepsilon = 0, Q_\varepsilon = \mathcal{D}_\varepsilon + \mathcal{R}_\varepsilon,
+        \mathcal{D}_\varepsilon > 0, \mathcal{R}_\varepsilon > -\mathcal{D}_\varepsilon] are mutually incompatible.
+        WP6 Correction: In a reductio under the off-critical zero hypothesis H, this mutual
+        incompatibility is the desired contradiction:
+            H => [Q_\varepsilon = 0, Q_\varepsilon = C_\varepsilon + R_\varepsilon, C_\varepsilon > 0, R_\varepsilon > -C_\varepsilon]
+              => contradiction => not H.
+        The algebraic identity R_\varepsilon = -C_\varepsilon does not by itself close the reductio
+        route; the open research question (SUBGATE-TC-041B) is whether R_\varepsilon > -C_\varepsilon
+        can be proved under H without circularity.
+        Lean 4 theorems `remainder_subordination_contradiction` and
+        `conditional_reductio_negates_offcritical_hypothesis` formalize both statements.
 
     Remainder Firewall:
     - Selected quartet contribution A_{\varepsilon, \mathcal{Q}_0} > 0 does NOT prove Q_\varepsilon > 0.

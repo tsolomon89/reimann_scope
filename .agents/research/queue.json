@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-040",
+  "active_task_id": "TASK-TC-041",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -754,7 +754,7 @@
       "status": "COMPLETED_EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN",
       "review_status": "REVIEWED_AND_VERIFIED",
       "open_implication": "Reconcile Lean formal declarations vs paper derivation vs external theorems; formalize complete ECT successive Wronskian hierarchy W0, W1, W2 in Lean; correct derivative-jet relation-space proof and positive-dilation coefficient presentation.",
-      "planned_calculation": "Formalize one_exponential_wronskian_pos, two_exponential_wronskian_algebraic_identity, and two_exponential_wronskian_pos_of_ordered in Lean 4; verify full ECT hierarchy W0, W1, W2 > 0; cite Karlin & Studden (1966) and Pólya & Szegő (1925); update Python engine and tests; formulate exact mapping table of 17 Lean theorems; replace preliminary report flawed derivative-jet deduction with relation-space dimension bound dim R_{alpha, beta} <= 1; clean positive-dilation proof to focus strictly on [T^(k-1)]P_k(T) = a2*k*u*v^(k-1) != 0.",
+      "planned_calculation": "Formalize one_exponential_wronskian_pos, two_exponential_wronskian_algebraic_identity, and two_exponential_wronskian_pos_of_ordered in Lean 4; verify full ECT hierarchy W0, W1, W2 > 0; cite Karlin & Studden (1966) and P\u00f3lya & Szeg\u0151 (1925); update Python engine and tests; formulate exact mapping table of 17 Lean theorems; replace preliminary report flawed derivative-jet deduction with relation-space dimension bound dim R_{alpha, beta} <= 1; clean positive-dilation proof to focus strictly on [T^(k-1)]P_k(T) = a2*k*u*v^(k-1) != 0.",
       "acceptance_criterion": "Lean 4 formalization formal/RiemannScope/ExponentialPolynomialRigidity.lean compiled with 17 declarations (total 518 project declarations, 0 sorry); 26/26 unit tests passing; machine-readable artifact data/tc_exponential_polynomial_orbit_isolation.json updated; audit review docs/reviews/TC_031R_EXPONENTIAL_POLYNOMIAL_EVIDENCE_AUDIT.md created; primary classification EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN retained.",
       "dependencies": [
         "TASK-TC-031"
@@ -772,7 +772,7 @@
         "RESEARCH_HYPOTHESIS.md",
         "RESEARCH_LEDGER.md"
       ],
-      "resolution": "TASK-TC-031R completed: Lean formal scope aligned with 17 exact declarations in ExponentialPolynomialRigidity.lean (total 518 declarations in project, 0 sorry); successive Wronskian hierarchy W0, W1, W2 > 0 formalized in Lean and computed in Python; Karlin & Studden (1966) and Pólya & Szegő (1925) explicitly cited for ECT real zero bound; derivative-jet rigidity proof formulated rigorously via relation-space dimension bound dim R_{alpha, beta} <= 1; positive dilation polynomial proof cleaned to focus strictly on non-zero coefficient [T^(k-1)]P_k(T) = a2*k*u*v^(k-1) != 0; 26/26 unit tests passing. Principal classification: EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN."
+      "resolution": "TASK-TC-031R completed: Lean formal scope aligned with 17 exact declarations in ExponentialPolynomialRigidity.lean (total 518 declarations in project, 0 sorry); successive Wronskian hierarchy W0, W1, W2 > 0 formalized in Lean and computed in Python; Karlin & Studden (1966) and P\u00f3lya & Szeg\u0151 (1925) explicitly cited for ECT real zero bound; derivative-jet rigidity proof formulated rigorously via relation-space dimension bound dim R_{alpha, beta} <= 1; positive dilation polynomial proof cleaned to focus strictly on non-zero coefficient [T^(k-1)]P_k(T) = a2*k*u*v^(k-1) != 0; 26/26 unit tests passing. Principal classification: EXPONENTIAL_POLYNOMIAL_FRONTIER_SHARPENED_EXISTENCE_OPEN."
     },
     {
       "task_id": "TASK-TC-032",
@@ -819,7 +819,7 @@
     {
       "task_id": "TASK-TC-033",
       "priority": 38,
-      "objective": "Three-Grade Hankel Constraint and Transport–Moment Compatibility Audit",
+      "objective": "Three-Grade Hankel Constraint and Transport\u2013Moment Compatibility Audit",
       "status": "COMPLETED",
       "review_status": "REVIEWED_AND_VERIFIED",
       "open_implication": "Audit nonzero equal-grade arithmetic energy M_K across three grades {-1, 0, 1} for simultaneous arithmetic rank one (H_0 = 0) and off-critical spectral positive moment rank > 1 (H_0 > 0).",
@@ -1215,7 +1215,45 @@
         ".agents/corpus_map/obligation_register.md"
       ],
       "resolution": "TASK-TC-040 / TASK-TC-040R completed: Synchronized TASK-TC-039R4 preflight repairs (EXACT_TRANSFORMED_ACTION vs LOCAL_SADDLE_MODEL_PHI_N under w = -1 + u^2, 1+w = u^2, conservative degree-gap spacing n+1 - C_0 n^{2/3} <= k_n <= n+1, verbatim finite-table synchronization with data/tc_fauzan_zero_argument_asymptotic_repair.json, TC_039R4_RESIDUAL_SYNCHRONIZATION_CLEAN); proved Route A entire Bernoulli zero bridge B(z) = -2z*zeta(1-2z) and K_0(z) = Gamma(2z+1)*cos(tau*z/2)*R_tau(z) = z*(2z-1)*zeta(1-2z) = -((2z-1)/2)*B(z) achieve exact primorial denominators D_n^B = prod_{p<=2n+1} p = exp(vartheta(2n+1)) and D_n^{K_0} = 2*exp(vartheta(2n+1)) (SUBFACTORIAL_RATIONAL_SAMPLE_DENOMINATOR_ACHIEVED, BERNOULLI_FUNCTION_NONTRIVIAL_ZETA_ZERO_BRIDGE_PROVED) while relocating (2m)! into sample growth log|K_0(m)| = 2m*log(m) - 2*(1+log(pi))*m + (3/2)*log(m) + log(4*sqrt(pi)) + O(1/m) (FACTORIAL_COST_MOVES_FROM_DENOMINATOR_TO_SAMPLE_GROWTH_UNDER_REFLECTION); proved Gamma-ratio ladder B_q(z) = K_0(z)/Gamma(z+1)^q two-sided denominator theorem log D_{q,n} = q*n*log(n) + O_q(n) and factorial budget conservation (2-q)+q=2 (PROVED_TWO_SIDED_DENOMINATOR_ASYMPTOTIC, GAMMA_RATIO_FACTORIAL_BUDGET_TRADEOFF_PROVED); proved Route B Stieltjes-Carlitz-Touchard Hankel product H_n^B = 6^{-n} prod_{k=1}^{n-1} [k^3(k+1)(2k-1)(2k+1)^3 / ((4k-1)(4k+1)^2(4k+3))]^{n-k} > 0 on mu_m = |B_{2m+2}| with log H_n^B = 2n^2*log(n) - (3 + 2*log 2)*n^2 + O(n*log n) -> +infinity and repaired Stieltjes transform S_B(w) = 1 + 1/(2*sqrt(-w)) - sqrt(-w)*psi'(sqrt(-w)) ~ sum_{m=0}^infty |B_{2m+2}| / w^{m+1} (BERNOULLI_EVEN_ABSOLUTE_VALUES_STIELTJES_MOMENT_SEQUENCE_PROVED, BERNOULLI_STIELTJES_HANKEL_POSITIVITY_DOES_NOT_COUPLE_TO_ZETA_ZERO_ARGUMENT); proved Routes C-E factorial relocation across denominator, growth, and basis (FACTORIAL_RELOCATION_ACROSS_DENOMINATOR_GROWTH_AND_BASIS_PROVED, EQUISPACED_GAMMA_REFLECTION_CLASS_NO_GO_PROVED); scoped SUBGATE-TC-040A to SCOPED_NEGATIVE_FOR_TESTED_BERNOULLI_GAMMA_HANKEL_CLASSES and opened SUBGATE-TC-041A while keeping SUBGATE-TC-039A (Pade asymptotic), SUBGATE-TC-038A, and OBL-CT-001A OPEN; compiled formal/RiemannScope/SubfactorialZeroKernel.lean (14 module theorems, 663 total compiled theorems across 34 local modules + umbrella = 35 files, 0 sorry, 0 admit)."
+    },
+    {
+      "task_id": "TASK-TC-041",
+      "epic_id": "EPIC-TC-041",
+      "priority": 51,
+      "objective": "Establish the TC Arithmetic-Spectral Quartet Connection and Resolve the Remainder Inequality (EPIC-TC-041 / WP1-WP6 / SUBGATE-TC-041B)",
+      "status": "COMPLETED",
+      "review_status": "REVIEWED_AND_VERIFIED",
+      "open_implication": "Prove or falsify the remainder lower bound R_epsilon > -C_epsilon (or |R_epsilon| < C_epsilon) for an admissible window w in the quartet-isolating family so that C_epsilon + R_epsilon > 0 under H, contradicting exact arithmetic vanishing D(P_epsilon, P_epsilon) = 0 (SUBGATE-TC-041B: TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN).",
+      "planned_calculation": "1) WP1: Derive and verify Seed Derivation (A)-(E), physical-to-logarithmic coordinate Jacobian, and exact remainder identity 0 = C_epsilon + R_epsilon (H). 2) WP2: Implement tc/quartet_remainder_connection.py, export in tc/__init__.py and transcendental.py, and generate data/tc_quartet_remainder_connection.json with 256-bit Arb ball certificates. 3) WP3: Implement 10 adversarial unit tests in tests/test_tc_quartet_remainder_connection.py. 4) WP4: Assemble remainder components of R_epsilon independently without substituting R_epsilon := -C_epsilon, audit the 4 mechanisms governing R_epsilon > -C_epsilon, and register SUBGATE-TC-041B. 5) WP5: Formalize 2 def + 12 theorems in formal/RiemannScope/QuartetRemainderConnection.lean (675 total compiled theorems across 35 local modules + umbrella = 36 files, 0 sorry, 0 admit). 6) WP6: Repair earlier over-inference on TASK-TC-032R (REDUCTIO_CONTRADICTION_LOGIC_REPAIRED) while preserving all existing tests.",
+      "acceptance_criterion": "All 10 tests in tests/test_tc_quartet_remainder_connection.py, 24 tests in tests/test_tc_full_spectrum_common_referent_bridge.py, and 61 tests in tests/test_tc_fauzan_subfactorial_zero_kernel.py passing; formal/RiemannScope/QuartetRemainderConnection.lean compiled with 12 module theorems (675 total compiled theorems, 0 sorry, 0 admit); data/tc_quartet_remainder_connection.json and docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md generated; SUBGATE-TC-041B registered as OPEN.",
+      "dependencies": [
+        "TASK-TC-032",
+        "TASK-TC-032R",
+        "TASK-TC-040"
+      ],
+      "evidence": [
+        "formal/RiemannScope/QuartetRemainderConnection.lean",
+        "formal/RiemannScope/FullSpectrumCommonReferentBridge.lean",
+        "scripts/build_formal.py",
+        "certification.py",
+        "tc/quartet_remainder_connection.py",
+        "tc/full_spectrum_common_referent_bridge.py",
+        "tc/__init__.py",
+        "transcendental.py",
+        "tests/test_tc_quartet_remainder_connection.py",
+        "tests/test_tc_full_spectrum_common_referent_bridge.py",
+        "docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md",
+        "docs/reviews/TC_FULL_SPECTRUM_COMMON_REFERENT_BRIDGE.md",
+        "data/tc_quartet_remainder_connection.json",
+        "formal/RiemannScope/README.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "EPIC-TC-041 / TASK-TC-041 completed: Seed derivation (A)-(E) and remainder decomposition (F)-(H) independently derived and verified; physical-to-logarithmic coordinate Jacobian derived (PHYSICAL_TO_LOG_COORDINATE_RELATION_ESTABLISHED); positive convolution window w = w_0 * mu_a * nu_b >= 0 and full 16-pair quartet calculation C_epsilon = 4*m^2*|c_epsilon(delta+i*gamma)|^2*W(2*delta)*cos(d*gamma*L)*(tau^delta - tau^{-delta})^2 > 0 under H verified and certified in 256-bit Arb ball arithmetic (ARITHMETIC_SECOND_DIFFERENCE_VANISHING_VERIFIED, QUARTET_ISOLATION_WINDOW_REALIZATION_VERIFIED, FULL_SIXTEEN_PAIR_QUARTET_POSITIVITY_VERIFIED); remainder R_epsilon assembled independently without circular substitution R_epsilon := -C_epsilon and 4 remainder mechanisms audited, isolating SUBGATE-TC-041B (TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN, REMAINDER_DOMINATION_INEQUALITY_OPEN); Lean 4 formal/RiemannScope/QuartetRemainderConnection.lean compiled (2 def + 12 theorems, 675 total compiled theorems across 35 local modules + umbrella = 36 files, 0 sorry, 0 admit); TASK-TC-032R reductio logic repaired (REDUCTIO_CONTRADICTION_LOGIC_REPAIRED); 10/10 unit tests passing."
     }
   ]
 }
-

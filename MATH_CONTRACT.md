@@ -3767,3 +3767,63 @@ The diagonal terms ($m=n$) give $\mathfrak X_{\zeta,\mathrm{diag}}$, while the o
    \]
    `formal/RiemannScope/SubfactorialZeroKernel.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 14 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 663 compiled `theorem` declarations across 34 local modules + umbrella `formal/RiemannScope.lean` = 35 formal source files):
    `bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`, `gamma_reflection_sample_clearing_identity`, `gamma_ratio_budget_conservation_identity`, `sign_adjusted_bernoulli_positive_sample_identity`, `auxiliary_polynomial_factorial_cost_lower_bound_schema`, `gamma_ratio_newton_basis_total_cost_conservation`, `carlitz_touchard_hankel_recurrence_positivity`, `primitive_auxiliary_efficiency_scaling`, `sample_multiplier_denominator_cancellation_bound`, `gamma_ratio_integer_sample_identity`, `even_node_norm_polynomial_degree_bound`, `primitive_hankel_polynomial_nonzero_schema`, `factorial_budget_algebraic_inequality`.
+
+---
+
+# 73. TC Arithmetic–Spectral Quartet Connection, Positive Window Realization, Full 16-Pair Quartet Positivity, and Remainder Decomposition (EPIC-TC-041 / TASK-TC-041)
+
+1. **Symmetrized Logarithmic Prime-Power Distribution, Physical-to-Logarithmic Coordinate Bridge, and Exact Three-Point Second-Difference Vanishing (`ARITHMETIC_SECOND_DIFFERENCE_VANISHING_VERIFIED`, `PHYSICAL_TO_LOG_COORDINATE_RELATION_ESTABLISHED`)**:
+   For an even nonnegative bump $\psi \in C_c^\infty(\mathbb{R})$ supported in $[-1, 1]$ with $\int_{\mathbb{R}} \psi(u)\,du = 1$ and $\psi_\varepsilon(x) = \varepsilon^{-1}\psi(x/\varepsilon)$, define the symmetrized logarithmic prime-power distribution:
+   \[
+   \boxed{
+   P_\varepsilon(x) := \sum_{n\ge 2} \frac{\Lambda(n)}{\sqrt{n}}\bigl[\psi_\varepsilon(x - \log n) + \psi_\varepsilon(x + \log n)\bigr], \qquad L := \log\tau = \log(2\pi).
+   }
+   \]
+   Under the logarithmic change of variables $y = e^x$ ($dy = e^x dx$), the physical-coordinate half-density measure transforms via $\frac{dy}{y^{1/2}y'^{1/2}} = e^{-(x+x')/2}dx$, relating the repository's physical-coordinate overlap functional on $[8, 20]$ to the symmetrized logarithmic pairing (`PHYSICAL_TO_LOG_COORDINATE_RELATION_ESTABLISHED`). For rational $d > 0$, $h \in \{-1, 0, 1\}$, and an even nonnegative compactly supported window $w \in C_c^\infty(\mathbb{R}) \setminus \{0\}$, define:
+   \[
+   \boxed{
+   Q_h := \int_{\mathbb{R}} w(x) P_\varepsilon\!\left(x - \left(h + \frac{d}{2}\right)L\right) P_\varepsilon\!\left(x - \left(h - \frac{d}{2}\right)L\right) dx, \qquad
+   D(F, G) := B_1(F, G) + B_{-1}(F, G) - 2B_0(F, G).
+   }
+   \]
+   Any station collision between the two factors requires $dL = \eta\log m - \xi\log n$ ($\xi, \eta \in \{-1, +1\}$), or $\tau^d = m^\eta / n^\xi \in \mathbb{Q}$, which is impossible for $d \in \mathbb{Q}_{>0}$ by Lindemann's transcendence of $\tau = 2\pi$. Choosing $0 < \varepsilon < \Delta_{\mathrm{sep}}(X_{\max})/2$ on the finite enlarged window $[-X_{\max}, X_{\max}]$ gives exact support disjointness (`arithmetic_second_diff_vanishes`):
+   \[
+   \boxed{
+   Q_1 = Q_0 = Q_{-1} = 0, \qquad D(P_\varepsilon, P_\varepsilon) = Q_1 + Q_{-1} - 2Q_0 = 0.
+   }
+   \]
+
+2. **Exact Explicit-Formula Decomposition and Ordered-Pair Spectral Expansion (`EXPLICIT_FORMULA_IDENTITY_AND_CONVERGENCE_VERIFIED`, `ORDERED_PAIR_SPECTRAL_EXPANSION_VERIFIED`)**:
+   With $z_\rho = \rho - 1/2$, $c_\varepsilon(z) = \int_{\mathbb{R}} \psi_\varepsilon(u)e^{-zu}\,du$, $W(z) = \int_{\mathbb{R}} w(x)e^{zx}\,dx$, and $T(z) = e^{Lz} + e^{-Lz} - 2 = 2(\cosh(Lz) - 1)$, the Weil explicit formula gives $P_\varepsilon(x) = A_\varepsilon(x) - S_\varepsilon(x)$ where $\log(2\tau) = \log(4\pi)$, $A_\varepsilon(x) = c_\varepsilon(1/2)(e^{x/2}+e^{-x/2}) - (\log(2\tau)+\gamma_E)\psi_\varepsilon(x) - \int_0^\infty [\psi_\varepsilon(x-u)+\psi_\varepsilon(x+u)-2e^{-u/2}\psi_\varepsilon(x)]\frac{e^{u/2}}{e^u-e^{-u}}\,du$, $S_\varepsilon(x) = \sum_{\rho\in Z} m_\rho c_\varepsilon(z_\rho)e^{z_\rho x}$, and:
+   \[
+   \boxed{
+   D(S_\varepsilon, S_\varepsilon) = \sum_{\rho, \sigma \in Z} m_\rho m_\sigma c_\varepsilon(z_\rho)c_\varepsilon(z_\sigma) W(z_\rho + z_\sigma) \exp\!\left[-\frac{dL}{2}(z_\rho - z_\sigma)\right] T(z_\rho + z_\sigma).
+   }
+   \]
+
+3. **Positive Convolution Window Realization and Complete 16-Pair Target-Quartet Positivity (`QUARTET_ISOLATION_WINDOW_REALIZATION_VERIFIED`, `FULL_SIXTEEN_PAIR_QUARTET_POSITIVITY_VERIFIED`)**:
+   Under $H$ ($\rho_0 = 1/2 + \delta + i\gamma$, $0 < \delta < 1/2, \gamma > 0$, multiplicity $m$), set $a = \frac{\tau}{8\gamma}$, $b = \frac{\tau}{4\gamma} = 2a$, $\kappa = \cosh(2\delta b) > 1$, $\mu_a = \frac{1}{2}(\Delta_{-a} + \Delta_a)$, and $\nu_b = \frac{\Delta_{-b} + 2\kappa\Delta_0 + \Delta_b}{2(1+\kappa)}$. For any even nonnegative nonzero $w_0 \in C_c^\infty(\mathbb{R})$, $w = w_0 * \mu_a * \nu_b$ is even, nonnegative, smooth, and compactly supported (`prob_conv_nonneg`, `prob_conv_normalization`), with bilateral Laplace transform:
+   \[
+   \boxed{
+   W(z) = W_0(z)\cosh(az)\frac{\cosh(bz) + \cosh(2\delta b)}{1 + \cosh(2\delta b)}, \qquad W(\pm 2i\gamma) = 0, \qquad W(\pm 2\delta \pm 2i\gamma) = 0.
+   }
+   \]
+   Across all $4 \times 4 = 16$ ordered pairs of the target quartet $S_0$ ($\{\pm\delta \pm i\gamma\}$): 4 opposite pairs have $z_\rho + z_\sigma = 0$ and vanish via $T(0) = 0$ (`quartet_opposite_pair_sum_zero`); 4 self-pairs have $z_\rho + z_\sigma = \pm 2\delta \pm 2i\gamma$ and vanish via $W(\pm 2\delta \pm 2i\gamma) = 0$; 4 vertical/reflection pairs have $z_\rho + z_\sigma = \pm 2i\gamma$ and vanish via $W(\pm 2i\gamma) = 0$ (`quartet_vertical_pair_sum`); and the 4 horizontal/conjugate pairs sum to (`quartet_horizontal_pair_sum_pos`, `quartet_second_diff_pos`, `quartet_block_pos_under_H`):
+   \[
+   \boxed{
+   C_\varepsilon := D(S_0, S_0) = 4m^2 |c_\varepsilon(\delta + i\gamma)|^2 W(2\delta)\cos(d\gamma L)\bigl(\tau^\delta - \tau^{-\delta}\bigr)^2 > 0
+   }
+   \]
+   for rational $0 < d < \frac{\tau}{4\gamma L}$ and $0 < \varepsilon < \min\!\left(\frac{\Delta_{\mathrm{sep}}(X_{\max})}{2}, \frac{\log 2}{\sqrt{\delta^2+\gamma^2}}\right)$ (where $|c_\varepsilon(z) - 1| \le e^{\varepsilon|z|} - 1 < 1$, `bump_laplace_error_bound_nonneg`).
+
+4. **Exact Remainder Decomposition, Reductio Logic Repair, Open Subgate `SUBGATE-TC-041B`, and Lean 4 Verification (`EXACT_REMAINDER_DECOMPOSITION_VERIFIED`, `REDUCTIO_CONTRADICTION_LOGIC_REPAIRED`, `REMAINDER_DOMINATION_INEQUALITY_OPEN`)**:
+   Splitting $S_\varepsilon = S_0 + S_{\mathrm{rest}}$ gives (`quartet_remainder_decomposition_identity`):
+   \[
+   \boxed{
+   0 = D(P_\varepsilon, P_\varepsilon) = C_\varepsilon + R_\varepsilon, \qquad
+   R_\varepsilon := D(A_\varepsilon, A_\varepsilon) - 2D(A_\varepsilon, S_0) - 2D(A_\varepsilon, S_{\mathrm{rest}}) + 2D(S_0, S_{\mathrm{rest}}) + D(S_{\mathrm{rest}}, S_{\mathrm{rest}}).
+   }
+   \]
+   If an independent lower bound under $H$ establishes $R_\varepsilon > -C_\varepsilon$, then $C_\varepsilon + R_\varepsilon > 0$, contradicting $0 = C_\varepsilon + R_\varepsilon$ and proving $\neg H$ (`reductio_from_quartet_and_remainder_lower_bound`, `unconditional_subordination_contradiction_repaired`). The remainder inequality $R_\varepsilon > -C_\varepsilon$ is registered as open subgate `SUBGATE-TC-041B` (`TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN`).
+   `formal/RiemannScope/QuartetRemainderConnection.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 14 module declarations: `2 def` + `12 theorem`s compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 675 compiled `theorem` declarations across 35 local modules + umbrella `formal/RiemannScope.lean` = 36 formal source files):
+   `quartetSecondDiff`, `quartetRemainder`, `prob_conv_nonneg`, `prob_conv_normalization`, `quartet_opposite_pair_sum_zero`, `quartet_vertical_pair_sum`, `quartet_horizontal_pair_sum_pos`, `quartet_second_diff_pos`, `quartet_block_pos_under_H`, `bump_laplace_error_bound_nonneg`, `arithmetic_second_diff_vanishes`, `quartet_remainder_decomposition_identity`, `reductio_from_quartet_and_remainder_lower_bound`, `unconditional_subordination_contradiction_repaired`.

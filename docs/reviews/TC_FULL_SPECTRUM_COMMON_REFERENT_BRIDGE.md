@@ -169,9 +169,7 @@ To ensure strict evidence provenance:
 
 ---
 
-## F. Decisive Logical Inconsistency: Strict Subordination Precluded by Exact Cancellation
-
-The central finding of TASK-TC-032R is that **strict remainder subordination is logically impossible** under exact arithmetic vanishing:
+## F. Algebraic Incompatibility and WP6 Reductio Interpretation Repair (`EPIC-TC-041`)
 
 1. **Exact Arithmetic Vanishing**:
    $$Q_\varepsilon^{0,1}[w] = 0.$$
@@ -179,34 +177,24 @@ The central finding of TASK-TC-032R is that **strict remainder subordination is 
    $$Q_\varepsilon = \mathcal{D}_\varepsilon + \mathcal{R}_\varepsilon, \qquad \mathcal{R}_\varepsilon = \mathcal{C}_\varepsilon + \mathcal{B}_\varepsilon.$$
 3. **Forced Cancellation Identity**:
    $$0 = \mathcal{D}_\varepsilon + \mathcal{R}_\varepsilon \implies \mathcal{R}_\varepsilon = -\mathcal{D}_\varepsilon.$$
-4. **Modulus of Cancelling Remainder**:
-   Assuming the diagonal defect is non-negative ($\mathcal{D}_\varepsilon \ge 0$):
-   $$|\mathcal{R}_\varepsilon| = |-\mathcal{D}_\varepsilon| = \mathcal{D}_\varepsilon.$$
-5. **Strict Inequality Impossibility**:
-   The proposed subordination condition $\mathcal{D}_\varepsilon > |\mathcal{R}_\varepsilon|$ becomes:
-   $$\mathcal{D}_\varepsilon > \mathcal{D}_\varepsilon,$$
-   which is impossible for any real number $\mathcal{D}_\varepsilon$.
-
-Lean 4 theorems prove this deduction:
-- `remainder_subordination_contradiction`:
-  $$\mathcal{D} = -(\mathcal{C} + \mathcal{B}) \wedge |\mathcal{C} + \mathcal{B}| < \mathcal{D} \implies \text{False}.$$
-- `exact_cancellation_precludes_strict_subordination`:
-  $$\mathcal{D} = -(\mathcal{C} + \mathcal{B}) \implies \neg(|\mathcal{C} + \mathcal{B}| < \mathcal{D}).$$
-
-**Conclusion**: Strict remainder subordination cannot serve as a valid research obligation or subgate. The arithmetic vanishing identity forces the remainder to cancel the defect exactly; it cannot be strictly subordinated.
+4. **Mutual Incompatibility**:
+   The four statements
+   $$Q_\varepsilon = 0, \qquad Q_\varepsilon = \mathcal{D}_\varepsilon + \mathcal{R}_\varepsilon, \qquad \mathcal{D}_\varepsilon > 0, \qquad \mathcal{R}_\varepsilon > -\mathcal{D}_\varepsilon$$
+   (or $|\mathcal{R}_\varepsilon| < \mathcal{D}_\varepsilon$) are mutually incompatible, as formalized in Lean 4:
+   - `remainder_subordination_contradiction`:
+     $$\mathcal{D} = -(\mathcal{C} + \mathcal{B}) \wedge |\mathcal{C} + \mathcal{B}| < \mathcal{D} \implies \text{False}.$$
+   - `exact_cancellation_precludes_strict_subordination`:
+     $$\mathcal{D} = -(\mathcal{C} + \mathcal{B}) \implies \neg(|\mathcal{C} + \mathcal{B}| < \mathcal{D}).$$
 
 ---
 
-## G. What This Means: Closing the Remainder Subordination Route
+## G. WP6 Amendment (`EPIC-TC-041` / `TASK-TC-041`): Correct Logical Reading in a Reductio Under $H$
 
-The useful mathematical conclusion of TASK-TC-032 / TASK-TC-032R is definitive:
-
-$$\boxed{\begin{gathered}
-\textbf{The selected two-variable zero functional is an exact cancellation identity.}\\
-\textbf{It cannot yield RH through strict dominance of one component over its exact complement.}
-\end{gathered}}$$
-
-This permanently eliminates the strict subordination route from the active research agenda.
+> **WP6 Scope Correction (`EPIC-TC-041`)**: An earlier version of Sections F–G inferred from $Q_\varepsilon = 0 \land Q_\varepsilon = C_\varepsilon + R_\varepsilon \implies R_\varepsilon = -C_\varepsilon$ that *"strict remainder subordination cannot serve as a valid research obligation or subgate"* and *"permanently eliminates the strict subordination route."* That meta-inference was unsupported and is retracted.
+>
+> In a reductio ad absurdum under the off-critical zero hypothesis $H$, incompatible consequences derived from $H$ are the **intended contradiction**:
+> $$H \implies \bigl[Q_\varepsilon = 0,\; Q_\varepsilon = C_\varepsilon + R_\varepsilon,\; C_\varepsilon > 0,\; R_\varepsilon > -C_\varepsilon\bigr] \implies \text{contradiction} \implies \neg H.$$
+> The consistency identity $R_\varepsilon = -C_\varepsilon$ is not an independent analytical estimate of $R_\varepsilon$; rather, the open research question (`SUBGATE-TC-041B`, audited in [docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md](file:///C:/Development/Projects/reimann_scope/docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md)) is whether $R_\varepsilon > -C_\varepsilon$ can actually be proved under $H$ from the independently assembled archimedean, pole, and remaining-zero terms.
 
 ---
 

@@ -2297,3 +2297,27 @@ In `TASK-TC-040` / `TASK-TC-040R` (`docs/reviews/TC_SUBFACTORIAL_ZERO_CARRYING_K
 ### 47.4 Lean 4 Formal Verification
 Formalized in `formal/RiemannScope/SubfactorialZeroKernel.lean` (registered in `formal/RiemannScope.lean`, `scripts/build_formal.py::FORMAL_SOURCE_FILES`, and `certification.py::REQUIRED_FORMAL_SOURCES`; 14 `theorem` declarations compiled, 0 `sorry`, 0 `admit`, no nonstandard project axioms introduced; total 663 compiled `theorem` declarations across 34 local modules + umbrella `formal/RiemannScope.lean` = 35 formal source files):
 `bernoulli_kernel_linear_relation`, `bernoulli_kernel_zero_at_zeta_zero`, `gamma_reflection_sample_clearing_identity`, `gamma_ratio_budget_conservation_identity`, `sign_adjusted_bernoulli_positive_sample_identity`, `auxiliary_polynomial_factorial_cost_lower_bound_schema`, `gamma_ratio_newton_basis_total_cost_conservation`, `carlitz_touchard_hankel_recurrence_positivity`, `primitive_auxiliary_efficiency_scaling`, `sample_multiplier_denominator_cancellation_bound`, `gamma_ratio_integer_sample_identity`, `even_node_norm_polynomial_degree_bound`, `primitive_hankel_polynomial_nonzero_schema`, `factorial_budget_algebraic_inequality`.
+
+---
+
+# 48. TC Arithmetic–Spectral Quartet Connection, Positive Window Realization, Full 16-Pair Quartet Positivity, and Remainder Decomposition (`EPIC-TC-041` / `TASK-TC-041`)
+
+### 48.1 Symmetrized Logarithmic Prime-Power Distribution, Physical-to-Logarithmic Bridge, and Exact Second-Difference Vanishing
+In `EPIC-TC-041` / `TASK-TC-041` (`docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md`, `tc/quartet_remainder_connection.py`, `formal/RiemannScope/QuartetRemainderConnection.lean`, `data/tc_quartet_remainder_connection.json`), the symmetrized logarithmic prime-power distribution $P_\varepsilon(x) = \sum_{n\ge 2}\frac{\Lambda(n)}{\sqrt{n}}[\psi_\varepsilon(x-\log n) + \psi_\varepsilon(x+\log n)]$ is connected to the repository's physical-coordinate overlap functional via $y=e^x$, $\frac{dy}{y^{1/2}y'^{1/2}} = e^{-(x+x')/2}dx$ (`PHYSICAL_TO_LOG_COORDINATE_RELATION_ESTABLISHED`). For rational $d > 0$, $h \in \{-1, 0, 1\}$, and $L = \log\tau = \log(2\pi)$, Lindemann's transcendence of $\tau$ ($\tau^d \notin \mathbb{Q}$) gives positive finite-window separation $\Delta_{\mathrm{sep}}(X_{\max}) > 0$, so for $0 < \varepsilon < \Delta_{\mathrm{sep}}(X_{\max})/2$ (`ARITHMETIC_SECOND_DIFFERENCE_VANISHING_VERIFIED`, Lean: `arithmetic_second_diff_vanishes`):
+\[
+\boxed{
+Q_1 = Q_0 = Q_{-1} = 0, \qquad D(P_\varepsilon, P_\varepsilon) = Q_1 + Q_{-1} - 2Q_0 = 0.
+}
+\]
+
+### 48.2 Positive Convolution Window Realization and Complete 16-Pair Target-Quartet Positivity
+Convolving $w_0 \in C_c^\infty(\mathbb{R})_{\ge 0}$ with the positive probability measures $\mu_a = \frac{1}{2}(\Delta_{-a}+\Delta_a)$ ($a = \tau/(8\gamma)$) and $\nu_b = \frac{\Delta_{-b}+2\kappa\Delta_0+\Delta_b}{2(1+\kappa)}$ ($b = \tau/(4\gamma), \kappa = \cosh(2\delta b)$) produces a nonnegative compactly supported window $w = w_0 * \mu_a * \nu_b \ge 0$ (`QUARTET_ISOLATION_WINDOW_REALIZATION_VERIFIED`, Lean: `prob_conv_nonneg`, `prob_conv_normalization`) whose bilateral Laplace transform $W(z) = W_0(z)\cosh(az)\frac{\cosh(bz)+\cosh(2\delta b)}{1+\cosh(2\delta b)}$ vanishes at $\pm 2i\gamma$ and $\pm 2\delta \pm 2i\gamma$. Across all 16 ordered pairs of the target off-critical quartet $S_0$, 12 non-conjugate pairs vanish identically and the 4 conjugate pairs sum to (`FULL_SIXTEEN_PAIR_QUARTET_POSITIVITY_VERIFIED`, Lean: `quartet_opposite_pair_sum_zero`, `quartet_vertical_pair_sum`, `quartet_horizontal_pair_sum_pos`, `quartet_second_diff_pos`, `quartet_block_pos_under_H`):
+\[
+\boxed{
+C_\varepsilon := D(S_0, S_0) = 4m^2|c_\varepsilon(\delta+i\gamma)|^2 W(2\delta)\cos(d\gamma L)\bigl(\tau^\delta - \tau^{-\delta}\bigr)^2 > 0 \qquad \left(0 < d < \frac{\tau}{4\gamma L} \in \mathbb{Q}\right).
+}
+\]
+
+### 48.3 Exact Remainder Decomposition, Reductio Logic Repair, Open Subgate `SUBGATE-TC-041B`, and Lean 4 Verification
+Splitting $S_\varepsilon = S_0 + S_{\mathrm{rest}}$ in $P_\varepsilon = A_\varepsilon - S_\varepsilon$ yields $0 = D(P_\varepsilon, P_\varepsilon) = C_\varepsilon + R_\varepsilon$ with $R_\varepsilon = D(A_\varepsilon, A_\varepsilon) - 2D(A_\varepsilon, S_0) - 2D(A_\varepsilon, S_{\mathrm{rest}}) + 2D(S_0, S_{\mathrm{rest}}) + D(S_{\mathrm{rest}}, S_{\mathrm{rest}})$ (`EXACT_REMAINDER_DECOMPOSITION_VERIFIED`, Lean: `quartet_remainder_decomposition_identity`). Under $H$, proving $R_\varepsilon > -C_\varepsilon$ forces $C_\varepsilon + R_\varepsilon > 0$, contradicting $0 = C_\varepsilon + R_\varepsilon$ and proving $\neg H$ (`REDUCTIO_CONTRADICTION_LOGIC_REPAIRED`, Lean: `reductio_from_quartet_and_remainder_lower_bound`, `unconditional_subordination_contradiction_repaired`). The remainder inequality $R_\varepsilon > -C_\varepsilon$ is isolated as `SUBGATE-TC-041B = OPEN` (`TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE`, `REMAINDER_DOMINATION_INEQUALITY_OPEN`).
+Formalized in `formal/RiemannScope/QuartetRemainderConnection.lean` (14 module declarations: `2 def` + `12 theorem`s compiled, 0 `sorry`, 0 `admit`; total 675 compiled `theorem` declarations across 35 local modules + umbrella `formal/RiemannScope.lean` = 36 formal source files).
