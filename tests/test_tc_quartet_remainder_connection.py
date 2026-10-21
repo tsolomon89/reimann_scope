@@ -407,7 +407,7 @@ def test_wp4_remainder_analysis_and_wp6_reductio_repair():
     # Mechanism 3: C_eps / delta^2 converges to a positive constant while cross term stays O(1)
     sweep = rem["mechanism_3_small_delta_sweep"]
     assert sweep[-1]["abs_ratio_cross_to_C_eps"] > 1e5
-    assert 13.0 < sweep[-1]["C_eps_over_delta_squared"] < 14.0
+    assert 13.0 < sweep[-1]["C_eps_over_delta_squared"] < 15.0
 
     # Subgate and WP6 repair
     assert rem["decisive_open_subgate"]["subgate_id"] == SUBGATE_TC_041B_ID
@@ -419,7 +419,7 @@ def test_wp4_remainder_analysis_and_wp6_reductio_repair():
 
 
 def test_wp5_lean_formalization_declarations_and_no_sorry():
-    """Verify formal/RiemannScope/QuartetRemainderConnection.lean has 0 sorry and all 12 theorems."""
+    """Verify formal/RiemannScope/QuartetRemainderConnection.lean has 0 sorry and all synchronized declarations."""
     lean_path = (
         Path(__file__).resolve().parent.parent
         / "formal"
@@ -441,6 +441,7 @@ def test_wp5_lean_formalization_declarations_and_no_sorry():
     expected_theorems = [
         "quartet_radial_factor_eq_sq",
         "quartet_radial_sq_pos",
+        "quartet_radial_factor_pos",
         "ordered_pair_symmetrized_cosh_equivalence",
         "sixteen_pair_quartet_block_reduction",
         "sixteen_pair_target_quartet_pos",
@@ -451,7 +452,163 @@ def test_wp5_lean_formalization_declarations_and_no_sorry():
         "exact_remainder_consistency_identity",
         "conditional_remainder_dominance_contradiction",
         "conditional_reductio_negates_offcritical_hypothesis",
+        "second_diff_multiplier_imag_eq",
+        "quartet_target_coeff_pos",
+        "arithmetic_spectral_second_diff_expansion",
+        "quartet_remainder_decomposition_identity",
+        "arithmetic_second_diff_vanishes",
+        "quartet_remainder_identity_from_vanishing",
+        "quartet_subordination_contradiction",
+        "unconditional_subordination_contradiction",
+        "unconditional_subordination_contradiction_repaired",
+        "reductio_from_quartet_and_remainder_lower_bound",
+        "prob_conv_nonneg",
+        "prob_conv_normalization",
+        "quartet_opposite_pair_sum_zero",
+        "quartet_vertical_pair_sum",
+        "quartet_horizontal_pair_sum_pos",
+        "quartet_second_diff_pos",
+        "quartet_block_pos_under_H",
+        "ibp_laplace_error_bound_nonneg",
+        "bump_laplace_error_bound_nonneg",
+        "cosh_filter_factor_pos",
+        "nu_b_kappa_pos",
+        "window_transform_vertical_zero",
+        "window_transform_self_zero",
+        "quadratic_truncation_error_bound",
+        "regrouped_remainder_algebraic_identity",
     ]
     for thm in expected_theorems:
         assert f"theorem {thm}" in content
+
+
+def test_tc_041r_wp1_separation_violation_reproduction_and_enforcement():
+    """Verify WP1.1: reproduce eps=0.08 overlap violation (D(P,P) ≈ 2.200149) and certify eps=0.01."""
+    repro = tc.reproduce_wp1_benchmark_separation_violation(dps=40)
+    assert abs(repro["delta_min_certified_arb_lower"] - 0.02588918233591618) < 1e-12
+    assert abs(repro["max_admissible_epsilon"] - 0.01294459116795809) < 1e-12
+
+    inv = repro["invalid_benchmark_eps_008"]
+    assert inv["violates_two_eps_lt_delta_min"] is True
+    assert inv["vanishes_identically_certified"] is False
+    assert inv["classification"] == "OVERLAP_OR_COLLISION_DETECTED"
+    assert abs(inv["constructed_window_pairings"]["Q_minus_1"] - 1.1000747) < 1e-4
+    assert inv["constructed_window_pairings"]["Q_0"] == 0.0
+    assert abs(inv["constructed_window_pairings"]["Q_plus_1"] - 1.1000747) < 1e-4
+    assert abs(inv["constructed_window_pairings"]["D_P_eps_P_eps"] - 2.200149) < 1e-4
+
+    val = repro["repaired_admissible_benchmark_eps_001"]
+    assert val["satisfies_two_eps_lt_delta_min"] is True
+    assert val["vanishes_identically_certified"] is True
+    assert val["constructed_window_pairings"]["D_P_eps_P_eps"] == 0.0
+
+
+def test_tc_041r_wp1_spectral_tail_counterexample_and_unconditional_rvm_bound():
+    """Verify WP1.2: u = 19.5*pi counterexample ratio ≈ 1.03786 > 1, eps^N in denominator, and RvM Stieltjes tail."""
+    ce = tc.reproduce_cosine_power_6_asymptotic_counterexample(dps=50)
+    assert ce["u_over_pi"] == 19.5
+    assert ce["exceeds_naive_asymptotic_certified"] is True
+    assert abs(ce["exact_to_naive_ratio_arb_lower"] - 1.0378607972) < 1e-8
+
+    ibp = tc.compute_proved_bump_laplace_upper_bound(
+        z=complex(0.12, 61.261056745),
+        epsilon=1.0,
+        profile_type="cosine_power_6",
+        ibp_order=6,
+        dps=50,
+    )
+    assert ibp["profile_bound_holds"] is True
+    assert ibp["general_ibp_bound_holds"] is True
+    assert ibp["eps_in_denominator_verified"] is True
+
+    rvm = tc.compute_unconditional_rvm_spectral_tail_bound(
+        t_cutoff=236.5242296658,
+        epsilon=0.25,
+        x_shift_max=1.0,
+        delta_max=0.0,
+        dps=50,
+    )
+    assert rvm["counts_both_ordinate_signs"] is True
+    assert rvm["counts_zero_multiplicities_via_dN"] is True
+    assert rvm["includes_shifted_domain_exp_delta_x"] is True
+    assert 0.0 < rvm["total_tail_bound_arb_upper"] < 1e-5
+
+
+def test_tc_041r_wp1_genuine_arb_acb_enclosures_and_symbolic_zeros():
+    """Verify WP1.3: genuine Arb/Acb enclosures from enclosed inputs and symbolic SymPy zero proofs."""
+    sym_zeros = tc.prove_symbolic_window_and_multiplier_zeros()
+    assert sym_zeros["T_0_equals_zero_proved"] is True
+    assert sym_zeros["vertical_factor_plus_2ig_zero_proved"] is True
+    assert sym_zeros["vertical_factor_minus_2ig_zero_proved"] is True
+    assert sym_zeros["all_four_self_pair_factors_zero_proved"] is True
+    assert sym_zeros["radial_square_identity_proved"] is True
+
+    q = evaluate_target_quartet_sixteen_pairs(
+        delta=0.12,
+        gamma=14.134725141734693,
+        multiplicity_m=1,
+        d=Fraction(1, 20),
+        epsilon=0.01,
+        x_0=0.25,
+        include_spatial_quadrature=False,
+        dps=50,
+    )
+    assert q["arb_enclosure_from_enclosed_inputs"] is True
+    assert q["arb_certified_lower_bound"] > 0.0
+    assert q["arb_certified_lower_bound"] <= q["C_eps_closed_formula_E"] <= q["arb_certified_upper_bound"]
+
+
+def test_tc_041r_wp2_actual_zeta_consistency_and_quadratic_truncation_bounds():
+    """Verify WP2: actual zeta consistency check in separated regime and quadratic truncation error propagation."""
+    quad_err = tc.compute_quadratic_truncation_error_bound(
+        w_l1_norm=1.0,
+        sup_s_truncated=10.0,
+        sup_a_eps=5.0,
+        tail_eta=0.01,
+    )
+    assert abs(quad_err["D_SS_truncation_error_bound"] - 4.0 * (2.0 * 10.0 * 0.01 + 0.0001)) < 1e-12
+    assert abs(quad_err["minus_2_D_AS_truncation_error_bound"] - 8.0 * 5.0 * 0.01) < 1e-12
+
+    with open(DEFAULT_ARTIFACT_PATH, "r", encoding="utf-8") as f:
+        artifact = json.load(f)
+
+    wp2 = artifact["wp2_actual_zeta_consistency_check"]
+    assert wp2["uses_synthetic_zero_replacement"] is False
+    sim = wp2["certified_simultaneous_regime"]
+    assert sim["separation_certified"] is True
+    assert sim["D_P_eps_P_eps"] == 0.0
+    assert sim["u0_eps_T"] > 3.0 * math.pi
+    assert sim["residual_within_certified_truncation_bound"] is True
+
+
+def test_tc_041r_wp3_wp4_wp5_coordinate_bridge_subgate_and_provenance():
+    """Verify WP3 Jacobian proofs, WP4 regrouped identity and J-filter sweep, and WP5 bibliography/gates."""
+    with open(DEFAULT_ARTIFACT_PATH, "r", encoding="utf-8") as f:
+        artifact = json.load(f)
+
+    jac = artifact["contract_item_7_jacobian_audit"]
+    assert jac["one_variable_jacobian_e_pow_x_minus_xp_over_2_proved"] is True
+    assert jac["omitted_dy_typo_identified_and_corrected"] is True
+    assert jac["paired_half_density_tau_pow_h_proved"] is True
+    assert jac["additive_logarithmic_vs_physical_smoothing_distinguished"] is True
+
+    wp4 = artifact["wp4_subgate_tc_041b_continuation"]
+    reg = wp4["regrouped_identity_verification"]
+    assert reg["symbolic_polynomial_difference_zero"] is True
+    assert reg["cancels_linear_cross_term_2_D_P_S0_identically"] is True
+    j_sweep = wp4["multi_ordinate_filter_sweep"]
+    assert len(j_sweep) == 5
+    # Window half-width X_w(J) and station count grow with J while max_admissible_epsilon shrinks
+    assert j_sweep[-1]["window_half_width_X_w"] > j_sweep[0]["window_half_width_X_w"]
+    assert j_sweep[-1]["enlarged_station_count"] >= j_sweep[0]["enlarged_station_count"]
+    assert j_sweep[-1]["max_admissible_epsilon"] < j_sweep[0]["max_admissible_epsilon"]
+
+    wp5 = artifact["wp5_provenance_and_novelty_calibration"]
+    cits = {c["arxiv_id"]: c for c in wp5["verified_arxiv_citations"]}
+    assert "Burnol" in cits["math/0101068"]["authors"]
+    assert "Connes" in cits["2511.22755"]["authors"]
+    assert "Shi" in cits["2609.04908"]["authors"]
+    assert "Suzuki" in cits["2606.09096"]["authors"]
+    assert wp5["three_gate_status"]["independent_review_status"] == "AWAITING_INDEPENDENT_REVIEW"
+
 

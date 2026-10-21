@@ -1,13 +1,18 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "epic_id": "EPIC-TC-041",
   "task_id": "TASK-TC-041",
+  "repair_task_id": "TASK-TC-041R",
   "title": "Establish the TC Arithmetic-Spectral Quartet Connection and Resolve the Remainder Inequality",
+  "repair_title": "Repair TC-041 Certification and Establish the Full Remainder Estimate",
   "starting_head_snapshot": "0930f714e66f721c16a048ddaa100bae3180997c",
+  "repair_baseline_commit": "18e5aa32b137bf8a44077e5dc66ac15f403f66cb",
   "gates": {
+    "repair_gate": "REPAIR_GATE_PASSED_DEFECTS_FIXED_AND_REPRODUCED",
     "construction_gate": "CONSTRUCTION_GATE_PASSED_WITH_EXACT_REMAINDER_IDENTITY",
     "research_gate": "RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED",
-    "rh_gate": "RH_GATE_OPEN_PENDING_NONCIRCULAR_REMAINDER_DOMINANCE"
+    "rh_gate": "RH_GATE_OPEN_PENDING_NONCIRCULAR_REMAINDER_DOMINANCE",
+    "independent_review_status": "AWAITING_INDEPENDENT_REVIEW"
   },
   "part_A_station_separation": {
     "canonical_tau_certificate": {
@@ -121,6 +126,51 @@
       "second_difference_D_P": 0.0,
       "vanishes_identically_certified": true,
       "classification": "COMPACT_WINDOW_RATIONAL_SEPARATION_PROVED"
+    },
+    "wp1_benchmark_separation_violation_reproduction": {
+      "window_spec": {
+        "delta": 0.12,
+        "gamma": 14.134725141734693,
+        "x_0": 0.25,
+        "a": 0.05556515287859781,
+        "b": 0.11113030575719562,
+        "kappa": 1.0003556994969234,
+        "x_w": 0.41669545863579344,
+        "profile_type": "cosine_power_6"
+      },
+      "delta_min_certified_arb_lower": 0.02588918233591618,
+      "closest_station_pair": [
+        "-log(9)",
+        "-log(8)"
+      ],
+      "max_admissible_epsilon": 0.01294459116795809,
+      "invalid_benchmark_eps_008": {
+        "epsilon": 0.08,
+        "two_eps": 0.16,
+        "violates_two_eps_lt_delta_min": true,
+        "vanishes_identically_certified": false,
+        "classification": "OVERLAP_OR_COLLISION_DETECTED",
+        "constructed_window_pairings": {
+          "Q_minus_1": 1.100074732106375,
+          "Q_0": 0.0,
+          "Q_plus_1": 1.100074732106375,
+          "D_P_eps_P_eps": 2.20014946421275
+        }
+      },
+      "repaired_admissible_benchmark_eps_001": {
+        "epsilon": 0.01,
+        "two_eps": 0.02,
+        "satisfies_two_eps_lt_delta_min": true,
+        "vanishes_identically_certified": true,
+        "classification": "COMPACT_WINDOW_RATIONAL_SEPARATION_PROVED",
+        "constructed_window_pairings": {
+          "Q_minus_1": 0.0,
+          "Q_0": 0.0,
+          "Q_plus_1": 0.0,
+          "D_P_eps_P_eps": 0.0
+        }
+      },
+      "classification": "WP1_SEPARATION_REGIME_ENFORCED_AND_DEFECT_REPRODUCED"
     }
   },
   "part_B_explicit_formula": {
@@ -130,6 +180,33 @@
     "spectral_cutoff_T": 236.5242296658162,
     "log_2tau_equals_log_4pi": true,
     "u0_removable_singularity_verified": true,
+    "asymptotic_counterexample_u_19_5_pi": {
+      "u_over_pi": 19.5,
+      "u_value": 61.26105674500097,
+      "exact_abs_c_eps": 1.1093011323942747e-08,
+      "naive_asymptotic_36pi6_over_u7": 1.0688342168660652e-08,
+      "exact_to_naive_ratio_mid": 1.0378607972028278,
+      "exact_to_naive_ratio_arb_lower": 1.0378607972028278,
+      "exact_to_naive_ratio_arb_upper": 1.0378607972028278,
+      "exceeds_naive_asymptotic_certified": true,
+      "defect_explanation": "Because u^2 - k^2*pi^2 < u^2 for k in {1, 2, 3} whenever u > 3*pi, the exact denominator is strictly smaller than u^7, so |c_eps(i*gamma)| exceeds 36*pi^6/u^7 at every half-integer peak u = (n + 1/2)*pi > 3*pi."
+    },
+    "unconditional_rvm_tail_bound": {
+      "t_cutoff": 236.5242296658162,
+      "epsilon": 0.25,
+      "u0_eps_T": 59.13105741645405,
+      "x_shift_max": 1.0,
+      "delta_max": 0.0,
+      "m6_u0_constant_upper": 36019.396964446074,
+      "b_rvm_at_T_upper": 3.5943963397696415,
+      "main_density_integral_part": 6.785704328136418e-07,
+      "rvm_remainder_stieltjes_part": 2.0554936751633362e-07,
+      "total_tail_bound_arb_mid": 8.841198003299754e-07,
+      "total_tail_bound_arb_upper": 8.841198003299754e-07,
+      "counts_both_ordinate_signs": true,
+      "counts_zero_multiplicities_via_dN": true,
+      "includes_shifted_domain_exp_delta_x": true
+    },
     "pointwise_evaluations": [
       {
         "x": 0.0,
@@ -141,7 +218,8 @@
         "S_eps_truncated": 3.599715053868969,
         "A_minus_S_truncated": 5.3769127946399084e-08,
         "abs_discrepancy": 5.3769127946399084e-08,
-        "analytic_tail_bound": 9.677979313823548e-07
+        "analytic_tail_bound": 8.841198003299754e-07,
+        "discrepancy_within_certified_tail_bound": true
       },
       {
         "x": 0.35,
@@ -153,7 +231,8 @@
         "S_eps_truncated": 0.31843772164636003,
         "A_minus_S_truncated": 6.840861910777388e-09,
         "abs_discrepancy": 6.840861910777388e-09,
-        "analytic_tail_bound": 9.677979313823548e-07
+        "analytic_tail_bound": 8.841198003299754e-07,
+        "discrepancy_within_certified_tail_bound": true
       },
       {
         "x": 0.6931471805599453,
@@ -165,7 +244,8 @@
         "S_eps_truncated": -1.9627938323178609,
         "A_minus_S_truncated": 3.1368260492619746,
         "abs_discrepancy": 9.837376447351334e-09,
-        "analytic_tail_bound": 9.677979313823548e-07
+        "analytic_tail_bound": 8.841198003299754e-07,
+        "discrepancy_within_certified_tail_bound": true
       },
       {
         "x": 1.0,
@@ -177,11 +257,31 @@
         "S_eps_truncated": 0.37117741509865776,
         "A_minus_S_truncated": 1.181860555498848,
         "abs_discrepancy": 2.1247290508800566e-08,
-        "analytic_tail_bound": 9.677979313823548e-07
+        "analytic_tail_bound": 8.841198003299754e-07,
+        "discrepancy_within_certified_tail_bound": true
       }
     ],
     "max_abs_discrepancy": 5.3769127946399084e-08,
+    "all_points_within_certified_tail_bound": true,
     "classification": "SMOOTHED_EXPLICIT_FORMULA_SIGN_AND_SUBTRACTION_VERIFIED"
+  },
+  "wp1_proved_ibp_and_profile_laplace_bounds": {
+    "z": [
+      0.12,
+      14.134725141734693
+    ],
+    "epsilon": 0.25,
+    "u_eps_gamma": 3.533681285433673,
+    "abs_c_eps_exact": 0.6939941351816399,
+    "m6_u0_envelope_constant": Infinity,
+    "proved_profile_bound_upper": Infinity,
+    "profile_bound_holds": true,
+    "ibp_order_N": 6,
+    "psi_N_l1_upper_bound": 138076.081775119,
+    "general_ibp_bound_eps_in_denominator": 73.06159138425102,
+    "general_ibp_bound_holds": true,
+    "wrong_narrative_eps_in_numerator_value": 4.226106109189544e-06,
+    "eps_in_denominator_verified": true
   },
   "part_D_window_isolation": {
     "spec": {
@@ -193,6 +293,13 @@
       "kappa": 1.0003556994969234,
       "x_w": 0.41669545863579344,
       "profile_type": "cosine_power_6"
+    },
+    "symbolic_zero_proofs": {
+      "T_0_equals_zero_proved": true,
+      "vertical_factor_plus_2ig_zero_proved": true,
+      "vertical_factor_minus_2ig_zero_proved": true,
+      "all_four_self_pair_factors_zero_proved": true,
+      "radial_square_identity_proved": true
     },
     "max_transform_zero_residual": 3.8113180181813614e-56,
     "arb_certified_quarter_and_half_period_zeros": true,
@@ -212,25 +319,38 @@
     "d_float": 0.05,
     "d_sign_threshold_tau_over_4gammaL": 0.060466669827003466,
     "is_d_below_threshold": true,
-    "epsilon": 0.02,
-    "abs_c_eps_squared": 0.995414045168416,
+    "epsilon": 0.01,
+    "abs_c_eps_squared": 0.9988516261542338,
+    "abs_c_eps_squared_arb_lower": 0.9988516261542338,
     "W_2delta": 1.0003703135351787,
+    "W_2delta_arb_lower": 1.0003703135351787,
     "cos_d_gamma_L": 0.26856401443895384,
     "radial_factor_tau_2delta": 0.19773584776812478,
-    "C_eps_ordered_16_exp": 0.21152308953867494,
-    "C_eps_ordered_16_cosh": 0.21152308953867494,
-    "C_eps_closed_formula_E": 0.21152308953867494,
-    "C_eps_spatial_quadrature": 0.21152308953867496,
-    "exp_vs_cosh_diff": 3.1834671041532993e-56,
-    "ordered_vs_closed_diff": 3.3409558876152446e-52,
-    "spatial_vs_closed_diff": 3.915306273804224e-17,
-    "arb_certified_lower_bound": 0.21152308953867494,
+    "C_eps_ordered_16_exp": 0.21225356722701874,
+    "C_eps_ordered_16_cosh": 0.21225356722701874,
+    "C_eps_closed_formula_E": 0.21225356722701874,
+    "C_eps_spatial_quadrature": 0.21225356722701877,
+    "exp_vs_cosh_diff": 3.194970709060747e-56,
+    "ordered_vs_closed_diff": 0.0,
+    "spatial_vs_closed_diff": 3.928775007674356e-17,
+    "arb_enclosure_from_enclosed_inputs": true,
+    "arb_certified_lower_bound": 0.21225356722701874,
+    "arb_certified_mid": 0.21225356722701874,
+    "arb_certified_upper_bound": 0.21225356722701874,
+    "arb_certified_radius": 5.6459993232556395e-50,
     "is_strictly_positive_certified": true,
+    "symbolic_zero_proofs": {
+      "T_0_equals_zero_proved": true,
+      "vertical_factor_plus_2ig_zero_proved": true,
+      "vertical_factor_minus_2ig_zero_proved": true,
+      "all_four_self_pair_factors_zero_proved": true,
+      "radial_square_identity_proved": true
+    },
     "category_sums": {
       "opposite_pairs_T0": 0.0,
-      "self_pairs_W_2d_2ig": -3.470732463375943e-55,
-      "vertical_pairs_W_2ig": 1.698105272291881e-55,
-      "conjugate_pairs_2d": 0.21152308953867494
+      "self_pairs_W_2d_2ig": -3.482643536122136e-55,
+      "vertical_pairs_W_2ig": 1.7039695399544492e-55,
+      "conjugate_pairs_2d": 0.21225356722701874
     },
     "pair_records": [
       {
@@ -246,8 +366,8 @@
         ],
         "abs_W": 3.8113180181813614e-56,
         "abs_T": 2.436158630494236,
-        "term_real": -8.676831158439858e-56,
-        "term_imag": 3.1834671041532993e-56
+        "term_real": -8.70660884030534e-56,
+        "term_imag": 3.194970709060747e-56
       },
       {
         "pair": "(z1=+d+ig, z2=+d-ig)",
@@ -262,8 +382,8 @@
         ],
         "abs_W": 1.0003703135351787,
         "abs_T": 0.19773584776812478,
-        "term_real": 0.052880772384668734,
-        "term_imag": -0.18966811377347728
+        "term_real": 0.053063391806754685,
+        "term_imag": -0.19032311709062788
       },
       {
         "pair": "(z1=+d+ig, z3=-d+ig)",
@@ -278,7 +398,7 @@
         ],
         "abs_W": 1.9051638515783383e-56,
         "abs_T": 2.2384227827261114,
-        "term_real": 4.198451447113564e-56,
+        "term_real": 4.212950455776873e-56,
         "term_imag": 0.0
       },
       {
@@ -310,8 +430,8 @@
         ],
         "abs_W": 1.0003703135351787,
         "abs_T": 0.19773584776812478,
-        "term_real": 0.052880772384668734,
-        "term_imag": 0.18966811377347728
+        "term_real": 0.053063391806754685,
+        "term_imag": 0.19032311709062788
       },
       {
         "pair": "(z2=+d-ig, z2=+d-ig)",
@@ -326,8 +446,8 @@
         ],
         "abs_W": 3.8113180181813614e-56,
         "abs_T": 2.436158630494236,
-        "term_real": -8.676831158439858e-56,
-        "term_imag": -3.1834671041532993e-56
+        "term_real": -8.70660884030534e-56,
+        "term_imag": -3.194970709060747e-56
       },
       {
         "pair": "(z2=+d-ig, z3=-d+ig)",
@@ -358,7 +478,7 @@
         ],
         "abs_W": 1.9051638515783383e-56,
         "abs_T": 2.2384227827261114,
-        "term_real": 4.198451447113564e-56,
+        "term_real": 4.212950455776873e-56,
         "term_imag": 0.0
       },
       {
@@ -374,7 +494,7 @@
         ],
         "abs_W": 1.9051638515783383e-56,
         "abs_T": 2.2384227827261114,
-        "term_real": 4.29207491434584e-56,
+        "term_real": 4.306897243995373e-56,
         "term_imag": 0.0
       },
       {
@@ -406,8 +526,8 @@
         ],
         "abs_W": 3.8113180181813614e-56,
         "abs_T": 2.436158630494236,
-        "term_real": -8.676831158439858e-56,
-        "term_imag": -3.1834671041532993e-56
+        "term_real": -8.70660884030534e-56,
+        "term_imag": -3.194970709060747e-56
       },
       {
         "pair": "(z3=-d+ig, z4=-d-ig)",
@@ -422,8 +542,8 @@
         ],
         "abs_W": 1.0003703135351787,
         "abs_T": 0.19773584776812478,
-        "term_real": 0.052880772384668734,
-        "term_imag": -0.18966811377347728
+        "term_real": 0.053063391806754685,
+        "term_imag": -0.19032311709062788
       },
       {
         "pair": "(z4=-d-ig, z1=+d+ig)",
@@ -454,7 +574,7 @@
         ],
         "abs_W": 1.9051638515783383e-56,
         "abs_T": 2.2384227827261114,
-        "term_real": 4.29207491434584e-56,
+        "term_real": 4.306897243995373e-56,
         "term_imag": 0.0
       },
       {
@@ -470,8 +590,8 @@
         ],
         "abs_W": 1.0003703135351787,
         "abs_T": 0.19773584776812478,
-        "term_real": 0.052880772384668734,
-        "term_imag": 0.18966811377347728
+        "term_real": 0.053063391806754685,
+        "term_imag": 0.19032311709062788
       },
       {
         "pair": "(z4=-d-ig, z4=-d-ig)",
@@ -486,8 +606,8 @@
         ],
         "abs_W": 3.8113180181813614e-56,
         "abs_T": 2.436158630494236,
-        "term_real": -8.676831158439858e-56,
-        "term_imag": 3.1834671041532993e-56
+        "term_real": -8.70660884030534e-56,
+        "term_imag": 3.194970709060747e-56
       }
     ],
     "classification": "SIXTEEN_PAIR_QUARTET_POSITIVITY_PROVED_UNDER_H"
@@ -497,14 +617,14 @@
       0.12,
       14.134725141734693
     ],
-    "epsilon": 0.02,
+    "epsilon": 0.01,
     "profile_type": "cosine_power_6",
-    "c_eps_real": 0.9977043869062908,
-    "c_eps_imag": 3.8940445981991324e-05,
-    "abs_c_eps": 0.9977043876662145,
-    "actual_deviation_from_1": 0.0022959433430165856,
-    "cosh_bound": 0.040227827544314095,
-    "exp_bound": 0.326713312687215,
+    "c_eps_real": 0.9994256480895237,
+    "c_eps_imag": 9.750346166429241e-06,
+    "abs_c_eps": 0.9994256481370857,
+    "actual_deviation_from_1": 0.0005744346667098662,
+    "cosh_bound": 0.010006887982531062,
+    "exp_bound": 0.15183041837208613,
     "satisfies_cosh_bound": true,
     "satisfies_exp_bound": true,
     "eps_max_elementary_nonvanishing": 0.049036836265991236,
@@ -520,7 +640,72 @@
     "expected_jacobian_factor_tau_pow_h": 6.283185307179586,
     "actual_ratio": 6.283185307179586,
     "abs_jacobian_error": 1.0691058840368783e-50,
-    "haar_measure_dy_over_y_equals_dx_verified": true
+    "haar_measure_dy_over_y_equals_dx_verified": true,
+    "one_variable_jacobian_e_pow_x_minus_xp_over_2_proved": true,
+    "omitted_dy_typo_identified_and_corrected": true,
+    "paired_half_density_tau_pow_h_proved": true,
+    "additive_logarithmic_vs_physical_smoothing_distinguished": true,
+    "smoothing_family_note": "Additive logarithmic smoothing psi_eps(x -/+ log n) has constant width eps in x = log y (multiplicative support [n*e^{-eps}, n*e^{eps}] in y), making it an auxiliary logarithmic explicit-formula family distinct from constant-width physical smoothing on [8, 20].",
+    "classification": "WP3_COORDINATE_BRIDGE_AND_LEAN_SCOPE_SYNCHRONIZED"
+  },
+  "wp2_actual_zeta_consistency_check": {
+    "evidence_category": "CATEGORY_A_ACTUAL_ZETA_CONSISTENCY_CHECK",
+    "uses_synthetic_zero_replacement": false,
+    "certified_simultaneous_regime": {
+      "d_rational": "1/24",
+      "x_0": 0.04,
+      "x_w": 0.10731984257692415,
+      "x_shift": 1.9834860145364643,
+      "delta_min_lower_bound": 0.0765782111003894,
+      "max_admissible_epsilon": 0.0382891055501947,
+      "epsilon": 0.036,
+      "separation_certified": true,
+      "D_P_eps_P_eps": 0.0,
+      "zeros_used": 200,
+      "spectral_cutoff_T": 396.3818542225922,
+      "u0_eps_T": 14.269746752013319,
+      "D_A_A": 87.20178843848899,
+      "minus_2_D_A_S_T": -160.36428691497838,
+      "D_S_T_S_T": 73.269450377531,
+      "D_A_minus_S_T_total": 0.1069519010416085,
+      "abs_consistency_residual": 0.1069519010416085,
+      "unconditional_rvm_tail_bound": {
+        "t_cutoff": 396.3818542225922,
+        "epsilon": 0.036,
+        "u0_eps_T": 14.269746752013319,
+        "x_shift_max": 1.9834860145364643,
+        "delta_max": 0.0,
+        "m6_u0_constant_upper": 80033.42617453964,
+        "b_rvm_at_T_upper": 3.67731778504091,
+        "main_density_integral_part": 0.06022337641318307,
+        "rvm_remainder_stieltjes_part": 0.009801295112105958,
+        "total_tail_bound_arb_mid": 0.07002467152528903,
+        "total_tail_bound_arb_upper": 0.07002467152528903,
+        "counts_both_ordinate_signs": true,
+        "counts_zero_multiplicities_via_dN": true,
+        "includes_shifted_domain_exp_delta_x": true
+      },
+      "quadratic_truncation_error_budget": {
+        "w_l1_norm": 1.0,
+        "sup_S_T_bound_M": 100.80770234521349,
+        "sup_A_eps_bound_M_A": 100.2872727740337,
+        "pointwise_tail_bound_eta": 0.07002467152528903,
+        "D_SS_truncation_error_bound": 56.491823770030365,
+        "minus_2_D_AS_truncation_error_bound": 56.180666673350174,
+        "total_quadratic_truncation_error_bound": 112.67249044338054
+      },
+      "residual_within_certified_truncation_bound": true
+    },
+    "benchmark_window_admissible_eps_001_note": {
+      "d_rational": "1/20",
+      "x_0": 0.25,
+      "epsilon": 0.01,
+      "max_admissible_epsilon": 0.01294459116795809,
+      "separation_certified": true,
+      "D_P_eps_P_eps": 0.0,
+      "min_T_for_asymptotic_envelope_3pi_over_eps": 942.4777960769379
+    },
+    "classification": "WP2_REAL_ZETA_VS_SYNTHETIC_CONTROLS_SEPARATED"
   },
   "part_F_and_WP4_remainder_analysis": {
     "parameters": {
@@ -529,129 +714,145 @@
       "d_rational": "1/20",
       "x_0": 0.25,
       "x_w": 0.41669545863579344,
-      "epsilon": 0.08,
+      "delta_min_lower_bound": 0.02588918233591618,
+      "max_admissible_epsilon": 0.01294459116795809,
+      "epsilon": 0.01,
+      "separation_admissible": true,
+      "constructed_window_pairings": {
+        "Q_minus_1": 0.0,
+        "Q_0": 0.0,
+        "Q_plus_1": 0.0,
+        "D_P_eps_P_eps": 0.0
+      },
       "max_rest_zeros": 25,
       "profile_type": "cosine_power_6"
     },
+    "evidence_category": "SYNTHETIC_PERTURBED_SPECTRUM_IN_SEPARATED_REGIME",
+    "synthetic_perturbed_spectrum_note": {
+      "description": "Replaces critical-line pair +/- i*gamma_1 by synthetic 4-zero off-line quartet S_0 while holding A_eps and S_rest from actual zeta(s). Because the prime powers P_eps were not altered to match the synthetic quartet, A_eps - (S_0 + S_rest) differs from P_eps by Delta P_synth(x) = S_{gamma_1,crit}(x) - S_0(x).",
+      "S_0_at_x0": 3.997702592358095,
+      "S_gamma1_crit_at_x0": 1.998851213487536,
+      "perturbation_defect_at_x0": -1.9988513788705589
+    },
     "independently_assembled_terms": {
-      "C_eps_target_quartet": 0.19740718206270366,
-      "D_Apole_Apole_analytic": 8.942775546805256,
-      "R_AA_full_archimedean_pole": 52.7553758800484,
-      "R_AS0_minus_2D_A_S0": -3.9740919406114132,
-      "R_ASrest_minus_2D_A_Srest": -83.47670600018252,
-      "R_0_rest_plus_2D_S0_Srest": 2.44967838191224,
-      "R_rest_rest_D_Srest_Srest": 25.514619150919945,
-      "R_eps_assembled_sum": -6.731124527913351,
+      "C_eps_target_quartet": 0.21225356722701874,
+      "D_Apole_Apole_analytic": 8.941965500127132,
+      "R_AA_full_archimedean_pole": 330.01625759942664,
+      "R_AS0_minus_2D_A_S0": 79.47478074557381,
+      "R_ASrest_minus_2D_A_Srest": 493.5375621380925,
+      "R_0_rest_plus_2D_S0_Srest": 2.7993336181341077,
+      "R_rest_rest_D_Srest_Srest": -123.61963694940201,
+      "R_eps_assembled_sum": 782.208297151825,
       "uses_consistency_identity_R_eq_minus_C": false
     },
     "true_critical_line_spectrum_check": {
-      "D_A_A": 52.7553758800484,
-      "minus_2_D_A_Scrit": -85.43190611935016,
-      "D_Scrit_Scrit": 26.747738480575872,
-      "total_D_A_minus_Scrit": -5.928791758725892,
-      "archimedean_and_spectral_cancel_toward_D_P": true
+      "D_A_A": 330.01625759942664,
+      "minus_2_D_A_Scrit": 533.3055173819104,
+      "D_Scrit_Scrit": -122.20968286738916,
+      "total_D_A_minus_Scrit": 741.1120921139477,
+      "archimedean_and_spectral_cancel_toward_D_P": false
     },
     "mechanism_1_and_2_critical_line_table": [
       {
         "zero_index": 1,
         "gamma_n": 14.134725141734695,
-        "c_eps_i_gamma_n": 0.963836354409592,
+        "c_eps_i_gamma_n": 0.999425606743768,
         "W_2i_gamma_n": -3.3117137531103818e-21,
         "T_2i_gamma_n": -2.238422782726117,
-        "diagonal_pair_contribution": 1.3773093987026453e-20
+        "diagonal_pair_contribution": 1.480900397669617e-20
       },
       {
         "zero_index": 2,
         "gamma_n": 21.022039638771556,
-        "c_eps_i_gamma_n": 0.9215992705541081,
+        "c_eps_i_gamma_n": 0.9987298730157691,
         "W_2i_gamma_n": -0.006264642031262106,
         "T_2i_gamma_n": -2.596443467607343,
-        "diagonal_pair_contribution": 0.02763053992091081
+        "diagonal_pair_contribution": 0.03244899176911288
       },
       {
         "zero_index": 3,
         "gamma_n": 25.01085758014569,
-        "c_eps_i_gamma_n": 0.8906960306966212,
+        "c_eps_i_gamma_n": 0.9982025757097205,
         "W_2i_gamma_n": -0.00011912012903178634,
         "T_2i_gamma_n": -3.353324804751151,
-        "diagonal_pair_contribution": 0.0006337964556043878
+        "diagonal_pair_contribution": 0.0007960276342512391
       },
       {
         "zero_index": 4,
         "gamma_n": 30.424876125859512,
-        "c_eps_i_gamma_n": 0.8421983922217149,
+        "c_eps_i_gamma_n": 0.9973412280163481,
         "W_2i_gamma_n": 0.00016356229229019307,
         "T_2i_gamma_n": -1.3940268986411564,
-        "diagonal_pair_contribution": -0.0003234544675406537
+        "diagonal_pair_contribution": -0.00045359878485198466
       },
       {
         "zero_index": 5,
         "gamma_n": 32.93506158773919,
-        "c_eps_i_gamma_n": 0.8174791827888681,
+        "c_eps_i_gamma_n": 0.9968850552761375,
         "W_2i_gamma_n": -8.58983053579805e-05,
         "T_2i_gamma_n": -2.2193013172763174,
-        "diagonal_pair_contribution": 0.00025479110762309276
+        "diagonal_pair_contribution": 0.00037889688360881826
       },
       {
         "zero_index": 6,
         "gamma_n": 37.586178158825675,
-        "c_eps_i_gamma_n": 0.7685603033900784,
+        "c_eps_i_gamma_n": 0.9959448775210464,
         "W_2i_gamma_n": -4.851045131857186e-07,
         "T_2i_gamma_n": -0.005257868149933601,
-        "diagonal_pair_contribution": 3.0132204087224324e-09
+        "diagonal_pair_contribution": 5.059942789154327e-09
       },
       {
         "zero_index": 7,
         "gamma_n": 40.9187190121475,
-        "c_eps_i_gamma_n": 0.7314555839357162,
+        "c_eps_i_gamma_n": 0.9951955513282914,
         "W_2i_gamma_n": 1.4774997897445252e-07,
         "T_2i_gamma_n": -0.14964768151046817,
-        "diagonal_pair_contribution": -2.3659378682208364e-08
+        "diagonal_pair_contribution": -4.379699040119481e-08
       },
       {
         "zero_index": 8,
         "gamma_n": 43.327073280915,
-        "c_eps_i_gamma_n": 0.7038021049322072,
+        "c_eps_i_gamma_n": 0.9946147815236961,
         "W_2i_gamma_n": -7.465840107774924e-09,
         "T_2i_gamma_n": -3.1444881815127563,
-        "diagonal_pair_contribution": 2.3257325431403683e-08
+        "diagonal_pair_contribution": 4.6448154762823356e-08
       }
     ],
     "mechanism_3_small_delta_sweep": [
       {
         "delta": 0.2,
-        "C_eps": 0.5646670207128907,
-        "C_eps_over_delta_squared": 14.116675517822266,
-        "two_D_S0_Srest_10zeros": 2.7467746520568967,
-        "abs_ratio_cross_to_C_eps": 4.864414869827356
+        "C_eps": 0.607128194477437,
+        "C_eps_over_delta_squared": 15.178204861935926,
+        "two_D_S0_Srest_10zeros": 3.341696823436934,
+        "abs_ratio_cross_to_C_eps": 5.504104164217204
       },
       {
         "delta": 0.1,
-        "C_eps": 0.13639704748082293,
-        "C_eps_over_delta_squared": 13.639704748082295,
-        "two_D_S0_Srest_10zeros": 2.7741295407523685,
-        "abs_ratio_cross_to_C_eps": 20.338633364790418
+        "C_eps": 0.14665528490765842,
+        "C_eps_over_delta_squared": 14.665528490765842,
+        "two_D_S0_Srest_10zeros": 3.3726927075142576,
+        "abs_ratio_cross_to_C_eps": 22.997416762974996
       },
       {
         "delta": 0.05,
-        "C_eps": 0.03380631055894786,
-        "C_eps_over_delta_squared": 13.522524223579143,
-        "two_D_S0_Srest_10zeros": 2.780942095312526,
-        "abs_ratio_cross_to_C_eps": 82.26103497639632
+        "C_eps": 0.036348937261870426,
+        "C_eps_over_delta_squared": 14.53957490474817,
+        "two_D_S0_Srest_10zeros": 3.3804106530721754,
+        "abs_ratio_cross_to_C_eps": 92.99888546172664
       },
       {
         "delta": 0.01,
-        "C_eps": 0.001348519891793328,
-        "C_eps_over_delta_squared": 13.485198917933282,
-        "two_D_S0_Srest_10zeros": 2.7831198921279214,
-        "abs_ratio_cross_to_C_eps": 2063.833028392923
+        "C_eps": 0.0014499455044615236,
+        "C_eps_over_delta_squared": 14.499455044615237,
+        "two_D_S0_Srest_10zeros": 3.3828777647018686,
+        "abs_ratio_cross_to_C_eps": 2333.1068335276445
       },
       {
         "delta": 0.001,
-        "C_eps": 1.3483661040301246e-05,
-        "C_eps_over_delta_squared": 13.483661040301246,
-        "two_D_S0_Srest_10zeros": 2.783209703098222,
-        "abs_ratio_cross_to_C_eps": 206413.50259247105
+        "C_eps": 1.4497802024818823e-05,
+        "C_eps_over_delta_squared": 14.497802024818824,
+        "two_D_S0_Srest_10zeros": 3.382979505636198,
+        "abs_ratio_cross_to_C_eps": 233344.30280154652
       }
     ],
     "mechanism_4_narrow_smoothing_bandwidth_cost": [
@@ -700,6 +901,136 @@
       "NARROW_SMOOTHING_SPECTRAL_BANDWIDTH_COST_QUANTIFIED"
     ]
   },
+  "wp4_subgate_tc_041b_continuation": {
+    "subgate_id": "SUBGATE-TC-041B",
+    "regrouped_identity_verification": {
+      "identity_formula": "R_eps = D(A_eps - S_rest, A_eps - S_rest) - 2*D(A_eps - S_rest, S_0)",
+      "symbolic_polynomial_difference_zero": true,
+      "explicit_formula_substitution_A_minus_Srest_eq_P_plus_S0": "D(P_eps + S_0, P_eps + S_0) - 2*D(P_eps + S_0, S_0) = D(P_eps, P_eps) - D(S_0, S_0)",
+      "cancels_linear_cross_term_2_D_P_S0_identically": true,
+      "structural_implication": "Because 2*D(P_eps, S_0) cancels out identically between D(P_eps + S_0, P_eps + S_0) and -2*D(P_eps + S_0, S_0), regrouping alone cannot produce R_eps > -C_eps unless an independent spectral property of S_rest forbids A_eps - S_rest from equaling P_eps + S_0."
+    },
+    "multi_ordinate_filter_sweep": [
+      {
+        "J_filtered_ordinates": 0,
+        "window_half_width_X_w": 0.20669545863579342,
+        "enlarged_shift_X_shift": 2.0828616305953336,
+        "enlarged_station_count": 12,
+        "Delta_min_lower_bound": 0.05695318152413323,
+        "max_admissible_epsilon": 0.028476590762066614,
+        "spectral_passband_1_over_eps_max": 35.116563227508614,
+        "approx_unfiltered_zeros_in_passband": 4.028509655110965,
+        "W_J_at_2delta": 1.0002694058369537,
+        "max_vertical_zero_residual_on_filtered_set": 0.0
+      },
+      {
+        "J_filtered_ordinates": 1,
+        "window_half_width_X_w": 0.24405616087464355,
+        "enlarged_shift_X_shift": 2.120222332834184,
+        "enlarged_station_count": 12,
+        "Delta_min_lower_bound": 0.05695318152413323,
+        "max_admissible_epsilon": 0.028476590762066614,
+        "spectral_passband_1_over_eps_max": 35.116563227508614,
+        "approx_unfiltered_zeros_in_passband": 4.028509655110965,
+        "W_J_at_2delta": 1.000309616612057,
+        "max_vertical_zero_residual_on_filtered_set": 2.7529965190440717e-37
+      },
+      {
+        "J_filtered_ordinates": 2,
+        "window_half_width_X_w": 0.27545844929600977,
+        "enlarged_shift_X_shift": 2.15162462125555,
+        "enlarged_station_count": 12,
+        "Delta_min_lower_bound": 0.05695318152413323,
+        "max_admissible_epsilon": 0.028476590762066614,
+        "spectral_passband_1_over_eps_max": 35.116563227508614,
+        "approx_unfiltered_zeros_in_passband": 4.028509655110965,
+        "W_J_at_2delta": 1.0003380253266507,
+        "max_vertical_zero_residual_on_filtered_set": 2.7529965190440717e-37
+      },
+      {
+        "J_filtered_ordinates": 4,
+        "window_half_width_X_w": 0.3251196624354074,
+        "enlarged_shift_X_shift": 2.2012858343949477,
+        "enlarged_station_count": 14,
+        "Delta_min_lower_bound": 0.04120482455599406,
+        "max_admissible_epsilon": 0.02060241227799703,
+        "spectral_passband_1_over_eps_max": 48.53800547754208,
+        "approx_unfiltered_zeros_in_passband": 8.068597403717266,
+        "W_J_at_2delta": 1.000373607311895,
+        "max_vertical_zero_residual_on_filtered_set": 2.7529965190440717e-37
+      },
+      {
+        "J_filtered_ordinates": 8,
+        "window_half_width_X_w": 0.39969759499595214,
+        "enlarged_shift_X_shift": 2.275863766955492,
+        "enlarged_station_count": 14,
+        "Delta_min_lower_bound": 0.04120482455599406,
+        "max_admissible_epsilon": 0.02060241227799703,
+        "spectral_passband_1_over_eps_max": 48.53800547754208,
+        "approx_unfiltered_zeros_in_passband": 8.068597403717266,
+        "W_J_at_2delta": 1.000413981119085,
+        "max_vertical_zero_residual_on_filtered_set": 1.7799324209569353e-36
+      }
+    ],
+    "scoped_obstruction_proposition": {
+      "classification": "SUBGATE_TC_041B_FINITE_FILTER_OBSTRUCTION_PROVED_WITHIN_SCOPE",
+      "statement": "For any finite-ordinate convolution filter w_J = w_0 * mu_a * nu_b * prod_{j=1}^J mu_{a_j} annihilating J background vertical pair frequencies +/- 2*i*gamma_j: (1) the support half-width grows additively by sum_{j=1}^J tau/(8*gamma_j), shrinking Delta_min(X_w(J), d) and forcing smaller admissible eps < Delta_min/2; (2) shrinking eps expands the spectral passband 1/eps, admitting more unfiltered zeros |gamma_k| <= 1/eps and off-diagonal cross frequencies i*(gamma_j +/- gamma_k) than the J diagonal ordinates removed; and (3) archimedean-spectral cross terms -2*D(A_eps, S_0) and -2*D(A_eps, S_rest) remain O(1) while C_eps = O(delta^2) as delta -> 0+."
+    }
+  },
+  "wp5_provenance_and_novelty_calibration": {
+    "verified_arxiv_citations": [
+      {
+        "arxiv_id": "math/0101068",
+        "authors": "J.-F. Burnol",
+        "title": "Sur les 'formules explicites' I: analyse invariante",
+        "year": 2001,
+        "relevance": "Logarithmic-coordinate explicit-formula distributions and dilation-invariant pairings."
+      },
+      {
+        "arxiv_id": "2511.22755",
+        "authors": "A. Connes, C. Consani, H. Moscovici",
+        "title": "Zeta Spectral Triples",
+        "year": 2025,
+        "relevance": "Truncated Euler products, Weil explicit-formula quadratic forms, and spectral realizations."
+      },
+      {
+        "arxiv_id": "2609.04908",
+        "authors": "Yaoming Shi",
+        "title": "Construction of Finite Hilbert-Polya Matrices from Weil's Explicit Formula",
+        "year": 2026,
+        "relevance": "Finite matrix truncations of explicit-formula kernels in logarithmic coordinates."
+      },
+      {
+        "arxiv_id": "2606.09096",
+        "authors": "M. Suzuki",
+        "title": "Weil's quadratic form via the screw function",
+        "year": 2026,
+        "relevance": "Representation of Weil's explicit-formula quadratic functional via translation differences."
+      }
+    ],
+    "novelty_separation": {
+      "known_standard_ingredients": [
+        "Riemann-Weil explicit formula in logarithmic coordinates x = log y (Weil 1952, Burnol 2001)",
+        "Transcendence of tau = 2*pi (Lindemann 1882) and Baker linear forms in logarithms",
+        "Trigonometric quarter-period and half-period convolution annihilators for finite exponential sums",
+        "Unconditional Riemann-von Mangoldt zero-counting remainder bounds (Trudgian 2014)"
+      ],
+      "project_specific_combinations": [
+        "Pairing rational grade differences d in Q_{>0} of log(tau) with compactly supported prime-power bumps psi_eps to achieve exact support disjointness D(P_eps, P_eps) = 0 on finite enlarged windows",
+        "Six-translate nonnegative convolution window w = w_0 * mu_a * nu_b simultaneously annihilating opposite (T(0)=0), vertical (W(+/- 2*i*gamma)=0), and self (W(+/- 2*delta +/- 2*i*gamma)=0) pairs of a 4-zero off-line quartet while preserving C_eps = D(S_0, S_0) > 0",
+        "Quantitative identification of the 4 structural remainder mechanisms and the finite-filter support-separation-bandwidth trade-off on SUBGATE-TC-041B"
+      ],
+      "open_unsolved_problem": "SUBGATE-TC-041B: Establishing an unconditional, non-circular lower bound R_eps > -C_eps for the complete Riemann zeta spectrum."
+    },
+    "three_gate_status": {
+      "repair_gate": "REPAIR_GATE_PASSED_DEFECTS_FIXED_AND_REPRODUCED",
+      "construction_gate": "CONSTRUCTION_GATE_PASSED_WITH_EXACT_REMAINDER_IDENTITY",
+      "research_gate": "RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED",
+      "rh_gate": "RH_GATE_OPEN_PENDING_NONCIRCULAR_REMAINDER_DOMINANCE",
+      "independent_review_status": "AWAITING_INDEPENDENT_REVIEW"
+    },
+    "classification": "WP5_PROVENANCE_AND_NOVELTY_CALIBRATED"
+  },
   "WP6_reductio_interpretation_repair": {
     "algebraic_incompatibility_theorem_valid": true,
     "algebraic_statement": "Q = 0 and Q = C + R and C > 0 and R > -C implies False",
@@ -709,5 +1040,5 @@
     "finite_quartet_filter_vs_infinite_spectrum_distinguished": true,
     "classification": "REDUCTIO_SUBORDINATION_INTERPRETATION_CORRECTED"
   },
-  "artifact_sha256": "2f7f65a89a7ee4380ce8ac71ed60821098f98d229d8e2c6bf299c43b9084ee84"
+  "artifact_sha256": "80a515a52e03a476c4e287324718da39137c73b5c8f1ae8c43686c7d279822a7"
 }

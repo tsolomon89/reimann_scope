@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-041",
+  "active_task_id": "TASK-TC-041R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1221,11 +1221,11 @@
       "epic_id": "EPIC-TC-041",
       "priority": 51,
       "objective": "Establish the TC Arithmetic-Spectral Quartet Connection and Resolve the Remainder Inequality (EPIC-TC-041 / WP1-WP6 / SUBGATE-TC-041B)",
-      "status": "COMPLETED",
-      "review_status": "REVIEWED_AND_VERIFIED",
-      "open_implication": "Prove or falsify the remainder lower bound R_epsilon > -C_epsilon (or |R_epsilon| < C_epsilon) for an admissible window w in the quartet-isolating family so that C_epsilon + R_epsilon > 0 under H, contradicting exact arithmetic vanishing D(P_epsilon, P_epsilon) = 0 (SUBGATE-TC-041B: TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN).",
-      "planned_calculation": "1) WP1: Derive and verify Seed Derivation (A)-(E), physical-to-logarithmic coordinate Jacobian, and exact remainder identity 0 = C_epsilon + R_epsilon (H). 2) WP2: Implement tc/quartet_remainder_connection.py, export in tc/__init__.py and transcendental.py, and generate data/tc_quartet_remainder_connection.json with 256-bit Arb ball certificates. 3) WP3: Implement 10 adversarial unit tests in tests/test_tc_quartet_remainder_connection.py. 4) WP4: Assemble remainder components of R_epsilon independently without substituting R_epsilon := -C_epsilon, audit the 4 mechanisms governing R_epsilon > -C_epsilon, and register SUBGATE-TC-041B. 5) WP5: Formalize 2 def + 12 theorems in formal/RiemannScope/QuartetRemainderConnection.lean (675 total compiled theorems across 35 local modules + umbrella = 36 files, 0 sorry, 0 admit). 6) WP6: Repair earlier over-inference on TASK-TC-032R (REDUCTIO_CONTRADICTION_LOGIC_REPAIRED) while preserving all existing tests.",
-      "acceptance_criterion": "All 10 tests in tests/test_tc_quartet_remainder_connection.py, 24 tests in tests/test_tc_full_spectrum_common_referent_bridge.py, and 61 tests in tests/test_tc_fauzan_subfactorial_zero_kernel.py passing; formal/RiemannScope/QuartetRemainderConnection.lean compiled with 12 module theorems (675 total compiled theorems, 0 sorry, 0 admit); data/tc_quartet_remainder_connection.json and docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md generated; SUBGATE-TC-041B registered as OPEN.",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Prove or falsify the remainder lower bound R_epsilon > -C_epsilon (or |R_epsilon| < C_epsilon) for an admissible window w in the quartet-isolating family so that C_epsilon + R_epsilon > 0 under H, contradicting exact arithmetic vanishing D(P_epsilon, P_epsilon) = 0 (SUBGATE-TC-041B: TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN, RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED).",
+      "planned_calculation": "1) WP1: Derive and verify Seed Derivation (A)-(E), physical-to-logarithmic coordinate Jacobian, and exact remainder identity 0 = C_epsilon + R_epsilon (H). 2) WP2: Implement tc/quartet_remainder_connection.py, export in tc/__init__.py and transcendental.py, and generate data/tc_quartet_remainder_connection.json with 256-bit Arb ball certificates. 3) WP3: Implement adversarial unit tests in tests/test_tc_quartet_remainder_connection.py. 4) WP4: Assemble remainder components of R_epsilon independently without substituting R_epsilon := -C_epsilon, audit the 4 mechanisms governing R_epsilon > -C_epsilon, and register SUBGATE-TC-041B. 5) WP5: Formalize in formal/RiemannScope/QuartetRemainderConnection.lean. 6) WP6: Repair earlier over-inference on TASK-TC-032R (REDUCTIO_CONTRADICTION_LOGIC_REPAIRED) while preserving all existing tests.",
+      "acceptance_criterion": "All 15 tests in tests/test_tc_quartet_remainder_connection.py, 24 tests in tests/test_tc_full_spectrum_common_referent_bridge.py, and 61 tests in tests/test_tc_fauzan_subfactorial_zero_kernel.py passing; formal/RiemannScope/QuartetRemainderConnection.lean compiled with 44 declarations (6 def + 38 theorems, 701 total compiled theorems, 0 sorry, 0 admit); data/tc_quartet_remainder_connection.json and docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md generated; SUBGATE-TC-041B registered as OPEN.",
       "dependencies": [
         "TASK-TC-032",
         "TASK-TC-032R",
@@ -1253,7 +1253,38 @@
         "RESEARCH_LEDGER.md",
         ".agents/corpus_map/obligation_register.md"
       ],
-      "resolution": "EPIC-TC-041 / TASK-TC-041 completed: Seed derivation (A)-(E) and remainder decomposition (F)-(H) independently derived and verified; physical-to-logarithmic coordinate Jacobian derived (PHYSICAL_TO_LOG_COORDINATE_RELATION_ESTABLISHED); positive convolution window w = w_0 * mu_a * nu_b >= 0 and full 16-pair quartet calculation C_epsilon = 4*m^2*|c_epsilon(delta+i*gamma)|^2*W(2*delta)*cos(d*gamma*L)*(tau^delta - tau^{-delta})^2 > 0 under H verified and certified in 256-bit Arb ball arithmetic (ARITHMETIC_SECOND_DIFFERENCE_VANISHING_VERIFIED, QUARTET_ISOLATION_WINDOW_REALIZATION_VERIFIED, FULL_SIXTEEN_PAIR_QUARTET_POSITIVITY_VERIFIED); remainder R_epsilon assembled independently without circular substitution R_epsilon := -C_epsilon and 4 remainder mechanisms audited, isolating SUBGATE-TC-041B (TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN, REMAINDER_DOMINATION_INEQUALITY_OPEN); Lean 4 formal/RiemannScope/QuartetRemainderConnection.lean compiled (2 def + 12 theorems, 675 total compiled theorems across 35 local modules + umbrella = 36 files, 0 sorry, 0 admit); TASK-TC-032R reductio logic repaired (REDUCTIO_CONTRADICTION_LOGIC_REPAIRED); 10/10 unit tests passing."
+      "resolution": "EPIC-TC-041 / TASK-TC-041 seed construction and remainder decomposition verified and extended by TASK-TC-041R: CONSTRUCTION_GATE_PASSED_WITH_EXACT_REMAINDER_IDENTITY, RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED (SUBGATE-TC-041B = OPEN), AWAITING_INDEPENDENT_REVIEW."
+    },
+    {
+      "task_id": "TASK-TC-041R",
+      "epic_id": "EPIC-TC-041",
+      "priority": 52,
+      "objective": "Repair TC-041 Certification and Establish the Full Remainder Estimate (EPIC-TC-041 / TASK-TC-041R / WP1-WP5 / SUBGATE-TC-041B)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Under H, establish an independent lower bound R_epsilon > -C_epsilon on the complete explicit-formula remainder R_epsilon = D(A_epsilon - S_rest, A_epsilon - S_rest) - 2*D(A_epsilon - S_rest, S_0) that overcomes the multi-ordinate convolution filter support-separation-bandwidth trade-off X_max(J) = x_0 + a + b + sum a_j + dL/2 ==> epsilon_max(J) down ==> |c_epsilon(delta+i*gamma)|^2 ~ (epsilon*gamma)^{-14} (SUBGATE-TC-041B: TARGET_QUARTET_REMAINDER_LOWER_BOUND_SUBGATE = OPEN, RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED).",
+      "planned_calculation": "1) WP1: Reproduce and repair separation admissibility violation (epsilon = 0.08 > epsilon_max = 0.01294459 ==> D(P_epsilon, P_epsilon) = 2.200149 != 0) and cos^3 spectral-tail counterexample at u = 19.5*pi (ratio = 1.03786 > 1); prove valid envelope M_6(u_0, r)*e^{epsilon*|delta|}/(epsilon*|gamma|)^7 for u_0 = epsilon*|gamma| > 3*pi, general IBP bound e^{epsilon*|delta|}*||psi^(N)||_1 / (epsilon^N * |delta+i*gamma|^N), and unconditional Riemann-von Mangoldt Stieltjes tail bound; enforce genuine Arb/Acb ball enclosures and SymPy symbolic identities. 2) WP2: Separate Category A (actual unperturbed zeta consistency check in simultaneous separated + tail-convergent regime epsilon = 0.036 < epsilon_max = 0.038289, T = 396.381854, u_0 = 14.27 > 3*pi with quadratic truncation error bound 4*||w||_1*(2*M*eta + eta^2)), Category B (16-pair synthetic quartet finite algebra), Category C (synthetic perturbed-spectrum diagnostic reporting perturbation defect Delta P_synth = S_{gamma_1,crit} - S_0), and Category D (conditional analytic theorems under H). 3) WP3: Repair physical-to-logarithmic Jacobian dy/(y^{1/2}*(y')^{1/2}) = e^{(x-x')/2}dx = tau^{d/2}dx and paired-grade half-density tau^h dx, distinguish additive logarithmic smoothing from physical smoothing on [8, 20], and synchronize all 44 declarations (6 def + 38 theorems) in formal/RiemannScope/QuartetRemainderConnection.lean with a 5-column scope table. 4) WP4: Prove regrouped identity R_epsilon = D(A_epsilon - S_rest, A_epsilon - S_rest) - 2*D(A_epsilon - S_rest, S_0) and analyze multi-ordinate convolution filter extensions w_J = w_0 * mu_a * nu_b * prod_{j=1}^J mu_{a_j} (J in {0, 1, 2, 4, 8}), establishing the scoped support-separation-bandwidth obstruction. 5) WP5: Audit and fix arXiv bibliography (math/0101068, 2511.22755, 2609.04908, 2606.09096), add structured novelty separation, and calibrate three-gate status (REPAIR_GATE_PASSED_DEFECTS_FIXED_AND_REPRODUCED, CONSTRUCTION_GATE_PASSED_WITH_EXACT_REMAINDER_IDENTITY, RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED, AWAITING_INDEPENDENT_REVIEW).",
+      "acceptance_criterion": "All 15 unit and adversarial tests in tests/test_tc_quartet_remainder_connection.py passing; formal/RiemannScope/QuartetRemainderConnection.lean compiled with 44 declarations (6 def + 38 theorems, 701 total compiled theorems, 0 sorry, 0 admit); data/tc_quartet_remainder_connection.json and docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md updated; SUBGATE-TC-041B kept OPEN with review_status = AWAITING_INDEPENDENT_REVIEW.",
+      "dependencies": [
+        "TASK-TC-041"
+      ],
+      "evidence": [
+        "formal/RiemannScope/QuartetRemainderConnection.lean",
+        "tc/quartet_remainder_connection.py",
+        "tc/__init__.py",
+        "transcendental.py",
+        "tests/test_tc_quartet_remainder_connection.py",
+        "docs/reviews/TC_QUARTET_REMAINDER_CONNECTION_EPIC.md",
+        "data/tc_quartet_remainder_connection.json",
+        "formal/RiemannScope/README.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "MATH_CONTRACT.md",
+        "RESEARCH_HYPOTHESIS.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "WP1-WP5 repairs and remainder regrouping/multi-ordinate analysis completed: REPAIR_GATE_PASSED_DEFECTS_FIXED_AND_REPRODUCED, CONSTRUCTION_GATE_PASSED_WITH_EXACT_REMAINDER_IDENTITY, RESEARCH_GATE_OPEN_REMAINDER_INEQUALITY_UNPROVED (SUBGATE-TC-041B = OPEN), AWAITING_INDEPENDENT_REVIEW; 44 Lean declarations (6 def + 38 theorems, 701 total theorems, 0 sorry, 0 admit) compiled; 15/15 unit tests passing."
     }
   ]
 }
