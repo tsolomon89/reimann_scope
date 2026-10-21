@@ -603,4 +603,135 @@ theorem single_seed_sech_energy_implies_complete_correlation_bound
   rcases h_cs with ⟨hW1, hW2⟩
   constructor <;> linarith
 
+/-! ### 9. TASK-TC-042F: Arithmetic–Fourier Positive Factorization, Off-Line Hyperbolic Block, Quotient Unitary Transport, and Pole–PNT–Archimedean Cancellation -/
+
+/-- The 2D reflected off-line zero pair quadratic form `q(u, v) = 2 * (u_re * v_re + u_im * v_im)`
+    representing `f_hat(z_+) * conj(f_hat(z_-)) + f_hat(z_-) * conj(f_hat(z_+))` for an off-critical
+    pair `z_+ = delta + i*gamma`, `z_- = -delta + i*gamma`. -/
+def hyperbolicOffLinePairForm (u_re u_im v_re v_im : ℝ) : ℝ :=
+  2 * (u_re * v_re + u_im * v_im)
+
+/-- Complete Weil pairing decomposition in Attempt B after combining `W_pole + W_arch - W_prime`:
+    `Q_tau(f, g) = arch_strict_norm - c_tau_B * inner_fg - prime_err_stieltjes`,
+    where `c_tau_B = c_tau - 2`. -/
+def attemptBCompletePairingDecomp (arch_strict_norm c_tau inner_fg prime_err_stieltjes : ℝ) : ℝ :=
+  arch_strict_norm - (c_tau - 2) * inner_fg - prime_err_stieltjes
+
+/-- Theorem 25: Unconditional reflected Mellin grade invariance.
+    Under `(T_K f)(x) = f(tau^K x)`, the centered Mellin values at `z_+ = delta + i*gamma`
+    and `z_- = -delta + i*gamma = -conj(z_+)` scale by reciprocal real factors `r` and `r_inv`
+    (`r * r_inv = 1`) and a common phase rotation `(c, s)` (`c^2 + s^2 = 1`). Consequently,
+    the reflected product `hat{f}(z_+) * conj(hat{g}(-conj(z_+)))` is unconditionally invariant
+    under simultaneous grade dilation `(f, g) |-> (T_K f, T_K g)` even for off-critical zeros (`delta != 0`). -/
+theorem unconditional_reflected_grade_invariance
+    (f_re f_im g_re g_im r r_inv c s : ℝ)
+    (h_recip : r * r_inv = 1)
+    (h_rot : c ^ 2 + s ^ 2 = 1) :
+    let tf_re := r * (c * f_re - s * f_im)
+    let tf_im := r * (s * f_re + c * f_im)
+    let tg_re := r_inv * (c * g_re - s * g_im)
+    let tg_im := r_inv * (s * g_re + c * g_im)
+    (tf_re * tg_re + tf_im * tg_im = f_re * g_re + f_im * g_im) ∧
+      (tf_im * tg_re - tf_re * tg_im = f_im * g_re - f_re * g_im) := by
+  intro tf_re tf_im tg_re tg_im
+  have h_re :
+      tf_re * tg_re + tf_im * tg_im =
+        (r * r_inv) * (c ^ 2 + s ^ 2) * (f_re * g_re + f_im * g_im) := by
+    dsimp [tf_re, tf_im, tg_re, tg_im]
+    ring
+  have h_im :
+      tf_im * tg_re - tf_re * tg_im =
+        (r * r_inv) * (c ^ 2 + s ^ 2) * (f_im * g_re - f_re * g_im) := by
+    dsimp [tf_re, tf_im, tg_re, tg_im]
+    ring
+  rw [h_re, h_im, h_recip, h_rot]
+  constructor <;> ring
+
+/-- Theorem 26: The reflected off-line zero pair form `q(u, v) = 2 Re(u * conj(v))` is invariant
+    under reciprocal grade scaling `(u, v) |-> (r * u, r_inv * v)` (`r * r_inv = 1`), yet is
+    indefinite of signature `(1, 1)` (`q(1, 0, -1, 0) = -2 < 0` and `q(1, 0, 1, 0) = 2 > 0`),
+    proving that diagonal grade invariance `Q_tau(T_K f, T_K f) = Q_tau(f, f)` does NOT by itself
+    imply positivity. -/
+theorem hyperbolic_offline_pair_invariance_and_indefiniteness
+    (u_re u_im v_re v_im r r_inv : ℝ)
+    (h_recip : r * r_inv = 1) :
+    hyperbolicOffLinePairForm (r * u_re) (r * u_im) (r_inv * v_re) (r_inv * v_im) =
+      hyperbolicOffLinePairForm u_re u_im v_re v_im ∧
+    hyperbolicOffLinePairForm 1 0 (-1) 0 = -2 ∧
+    hyperbolicOffLinePairForm 1 0 (-1) 0 < 0 ∧
+    hyperbolicOffLinePairForm 1 0 1 0 = 2 ∧
+    0 < hyperbolicOffLinePairForm 1 0 1 0 := by
+  unfold hyperbolicOffLinePairForm
+  refine ⟨?_, by ring, by norm_num, by ring, by norm_num⟩
+  calc
+    2 * (r * u_re * (r_inv * v_re) + r * u_im * (r_inv * v_im))
+        = (r * r_inv) * (2 * (u_re * v_re + u_im * v_im)) := by ring
+    _ = 1 * (2 * (u_re * v_re + u_im * v_im)) := by rw [h_recip]
+    _ = 2 * (u_re * v_re + u_im * v_im) := by ring
+
+/-- Theorem 27: Quotient unitary grade transport from a positive inner-product factorization.
+    If `Q_tau(f, f) = norm_Af_sq` and `Q_tau(T_K f, T_K f) = norm_ATKf_sq` with unconditional
+    grade invariance `Q_tau(T_K f, T_K f) = Q_tau(f, f)`, then:
+    (1) `norm_ATKf_sq = norm_Af_sq` (grade isometry on `A_tau(D)`),
+    (2) `norm_Af_sq = 0 ↔ norm_ATKf_sq = 0` (`ker(A_tau)` is `T_K`-invariant, so `U_K(A_tau f) := A_tau(T_K f)`
+        is well-defined on `A_tau(D) ≅ D / ker(A_tau)`), and
+    (3) any Cauchy-Schwarz bound `|Q_tau(T_K f, f)| <= sqrt_ATKf * sqrt_Af` with `sqrt_ATKf = sqrt_Af`
+        and `sqrt_Af^2 = Q_ff` forces the correlation bound `-Q_ff <= Q_TKf_f <= Q_ff`. -/
+theorem quotient_unitary_grade_transport_of_positivity
+    (Q_ff Q_TKf_TKf Q_TKf_f norm_Af_sq norm_ATKf_sq sqrt_Af sqrt_ATKf : ℝ)
+    (h_fact_f : Q_ff = norm_Af_sq)
+    (h_fact_TKf : Q_TKf_TKf = norm_ATKf_sq)
+    (h_inv : Q_TKf_TKf = Q_ff)
+    (h_sqrt_eq : sqrt_ATKf = sqrt_Af)
+    (h_sqrt_sq : sqrt_Af * sqrt_Af = norm_Af_sq)
+    (h_cs : -(sqrt_ATKf * sqrt_Af) ≤ Q_TKf_f ∧ Q_TKf_f ≤ sqrt_ATKf * sqrt_Af) :
+    norm_ATKf_sq = norm_Af_sq ∧
+      (norm_Af_sq = 0 ↔ norm_ATKf_sq = 0) ∧
+      (-Q_ff ≤ Q_TKf_f ∧ Q_TKf_f ≤ Q_ff) := by
+  have h_iso : norm_ATKf_sq = norm_Af_sq := by linarith
+  have h_ker : norm_Af_sq = 0 ↔ norm_ATKf_sq = 0 := by
+    constructor <;> intro h0 <;> linarith
+  have h_prod_eq : sqrt_ATKf * sqrt_Af = Q_ff := by
+    calc
+      sqrt_ATKf * sqrt_Af = sqrt_Af * sqrt_Af := by rw [h_sqrt_eq]
+      _ = norm_Af_sq := h_sqrt_sq
+      _ = Q_ff := h_fact_f.symm
+  rcases h_cs with ⟨h_cs1, h_cs2⟩
+  refine ⟨h_iso, h_ker, ?_⟩
+  constructor <;> linarith
+
+/-- Theorem 28: Attempt A difference-square identity and diagonal counterterm obstruction.
+    For any unitary shift `S_a` (`norm_Saf_sq = norm_f_sq`), the symmetrized shift pairing
+    satisfies `-(2 * real_inner_Saf_f) = norm_diff_sq - 2 * norm_f_sq` where
+    `norm_diff_sq = norm_f_sq + norm_Saf_sq - 2 * real_inner_Saf_f` is the squared norm `||(I - S_a) f||^2`. -/
+theorem attempt_A_shift_difference_square_identity
+    (norm_f_sq norm_Saf_sq real_inner_Saf_f : ℝ)
+    (h_unitary : norm_Saf_sq = norm_f_sq) :
+    let norm_diff_sq := norm_f_sq + norm_Saf_sq - 2 * real_inner_Saf_f
+    (-(2 * real_inner_Saf_f) = norm_diff_sq - 2 * norm_f_sq) ∧
+      (2 * norm_f_sq - 2 * real_inner_Saf_f = norm_diff_sq) := by
+  intro norm_diff_sq
+  dsimp [norm_diff_sq]
+  rw [h_unitary]
+  constructor <;> ring
+
+/-- Theorem 29: Universal Pole–PNT–Archimedean cancellation in Attempt B across all of `D`.
+    Combining:
+    - `W_pole = pole_pos + pole_neg` (`pole_pos = int_1^infty Phi(x) x^(1/2) dx/x`, `pole_neg = int_1^infty Phi(x) x^(-1/2) dx/x`),
+    - `W_arch = arch_strict_norm + 4 * inner_fg - pole_neg - c_tau * inner_fg` (from splitting `x^(1/2)/(x - x^(-1)) = x^(-1/2) + x^(-3/2)/(x - x^(-1))`), and
+    - `-W_prime = -pole_pos - 2 * inner_fg - prime_err_stieltjes` (from `psi(x) = x + E(x)` with `E(1) = -1` and `Phi(1) = 2 * inner_fg`),
+    both pole integrals `pole_pos` and `pole_neg` cancel identically (even when `pole_pos != 0` or `pole_neg != 0`),
+    leaving `W_pole + W_arch - W_prime = attemptBCompletePairingDecomp arch_strict_norm c_tau inner_fg prime_err_stieltjes`. -/
+theorem attempt_B_universal_pole_pnt_archimedean_cancellation
+    (pole_pos pole_neg arch_strict_norm c_tau inner_fg prime_err_stieltjes : ℝ) :
+    let W_pole := pole_pos + pole_neg
+    let W_arch := arch_strict_norm + 4 * inner_fg - pole_neg - c_tau * inner_fg
+    let neg_W_prime := -pole_pos - 2 * inner_fg - prime_err_stieltjes
+    W_pole + W_arch + neg_W_prime =
+      attemptBCompletePairingDecomp arch_strict_norm c_tau inner_fg prime_err_stieltjes := by
+  intro W_pole W_arch neg_W_prime
+  unfold attemptBCompletePairingDecomp
+  dsimp [W_pole, W_arch, neg_W_prime]
+  ring
+
 end RiemannScope

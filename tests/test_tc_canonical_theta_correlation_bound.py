@@ -292,7 +292,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 14 defs, 24 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 16 defs, 29 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,8 +300,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 14
-    assert len(ver["actual_theorems"]) == 24
+    assert len(ver["actual_defs"]) == 16
+    assert len(ver["actual_theorems"]) == 29
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -316,6 +316,11 @@ def test_12_lean_formalization_module_verified():
     assert "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction" in lean_text
     assert "single_seed_stieltjes_and_squared_polynomial_identities" in lean_text
     assert "single_seed_sech_energy_implies_complete_correlation_bound" in lean_text
+    assert "unconditional_reflected_grade_invariance" in lean_text
+    assert "hyperbolic_offline_pair_invariance_and_indefiniteness" in lean_text
+    assert "quotient_unitary_grade_transport_of_positivity" in lean_text
+    assert "attempt_A_shift_difference_square_identity" in lean_text
+    assert "attempt_B_universal_pole_pnt_archimedean_cancellation" in lean_text
 
 
 def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
@@ -635,6 +640,142 @@ def test_22_attempt_a_b_c_repairs_and_mellin_vanishing_orders(artifact_payload):
         assert st_row["encloses"] is True
         assert st_row["abs_mid_diff"] < 1e-25
     assert attC["all_sampled_cauchy_schwarz_bounds_satisfied"] is True
+
+
+def test_23_repairs_8a_8b_8c_and_task_tc042f_arithmetic_fourier_factorization(
+    artifact_payload,
+):
+    """Verify Repairs 8A, 8B, 8C and TASK-TC-042F (Arithmetic–Fourier Positive Factorization)."""
+    from tc.canonical_theta_correlation_bound import (
+        ARITHMETIC_FOURIER_FACTORIZATION_STATUS,
+        TASK_TC_042F_ID,
+    )
+
+    # Repair 8C: F_tau''(1) = 1/16 = 0.0625 and hat{tilde{h}_0}(z) = (1/2 + z) H_0(z)
+    seed_sec = artifact_payload["section_2_seed_defect_and_mellin_audit"]
+    ep = seed_sec["endpoint_values"]
+    assert ep["F_tau_second_deriv_at_1_exact"] == "1/16"
+    assert math.isclose(ep["F_tau_second_deriv_at_1"], 0.0625, rel_tol=1e-15)
+
+    att3 = artifact_payload[
+        "section_9_arithmetic_proof_attempts_and_remaining_subgate"
+    ]["attempt_3_large_grade_wavelet_decomposition"]
+    wv = att3["uniform_prime_wavelet_boundedness"]
+    canc = wv["subgate_tc042b_cancellation_attempts"]
+    attA_wv = canc["attempt_A_multiscale_euler_operator_and_primitive_transfer"]
+    op_m = attA_wv["operator_multiplicity_vs_mellin_vanishing_order"]
+    assert "(1/2 + z) H_0(z)" in op_m["tilde_H0_mellin_formula"]
+
+    # Repair 8A: Derived [4, infty) tail bound for _f_conv_25 so enclosures overlap
+    attC = canc["attempt_C_seed_wavelet_multiplicative_convolution_factorization"]
+    assert attC["finite_sum_convolution_enclosures_overlap"] is True
+    assert 4.5e-19 < attC["finite_sum_convolution_tail_bound_4_inf_upper"] < 1.1e-18
+
+    # Repair 8B: Prime-power cutoff 25000 >= 5*exp(8.5) ~ 24574 and EMPIRICAL grid diagnostic status
+    assert attC["sech_squared_energy_prime_power_cutoff"] == 25000
+    assert (
+        attC["sech_squared_energy_samples_status"]
+        == "TRUNCATED_GRID_DIAGNOSTIC_NOT_CERTIFIED"
+    )
+    assert attC["sech_squared_energy_samples_evidence_class"] == "EMPIRICAL"
+    sens = attC["sech_squared_energy_cutoff_sensitivity_at_X_100"]
+    assert len(sens) == 4
+    sens_by_cut = {row["prime_power_cutoff"]: row for row in sens}
+    assert sens_by_cut[600]["covers_5_exp_8_5_eq_24574"] is False
+    assert sens_by_cut[25000]["covers_5_exp_8_5_eq_24574"] is True
+    assert (
+        sens_by_cut[25000]["E_tau_log_100_grid"]
+        < 0.01 * sens_by_cut[600]["E_tau_log_100_grid"]
+    )
+
+    # TASK-TC-042F: Arithmetic–Fourier Positive Factorization
+    assert artifact_payload["factorization_task_id"] == TASK_TC_042F_ID
+    assert (
+        artifact_payload["status_dimensions"][
+            "arithmetic_fourier_factorization_status"
+        ]
+        == ARITHMETIC_FOURIER_FACTORIZATION_STATUS
+    )
+    sec11 = artifact_payload[
+        "section_11_arithmetic_fourier_positive_factorization"
+    ]
+    assert sec11["task_id"] == TASK_TC_042F_ID
+    assert len(sec11["section_2_reuse_map"]) == 5
+
+    # Section 3: Unconditional grade invariance & reflected off-line pair hyperbolic form
+    sec3 = sec11["section_3_normalized_pairing_and_grade_invariance"]
+    pair = sec3["reflected_offline_pair_block"]
+    assert pair["symbolic_diagonal_invariance_verified"] is True
+    assert pair["q_at_u1_v_minus1"] == -2
+    assert pair["q_at_u1_v_plus1"] == 2
+    assert pair["symbolic_off_diagonal_cosh_verified"] is True
+
+    # Section 5: Five-place tau = 2*pi coupling audit
+    sec5 = sec11["section_5_five_place_tau_coupling_audit"]
+    assert len(sec5["five_places_of_tau_eq_2pi"]) == 5
+    incoh = sec5["incoherent_tau_perturbation_controls"]
+    assert len(incoh) == 4
+    canonical_rows = [
+        r for r in incoh if r["preserves_canonical_self_duality"] is True
+    ]
+    assert len(canonical_rows) == 1
+    assert math.isclose(
+        canonical_rows[0]["tau_arch_float"], 2.0 * math.pi, rel_tol=1e-14
+    )
+
+    # Section 6 & 7: Attempt A & Attempt B
+    sec67 = sec11["section_6_7_factorization_attempts_and_tests"]
+    attA_f = sec67["attempt_A_euler_resolvent_semilocal"]
+    assert math.isclose(
+        attA_f["c_tau_A_value"], 5.3721834192256654, rel_tol=1e-13
+    )
+    assert len(attA_f["three_structural_obstructions"]) == 3
+
+    attB_f = sec67[
+        "attempt_B_direct_arithmetic_kernel_and_pole_pnt_cancellation"
+    ]
+    assert math.isclose(
+        attB_f["c_tau_B_value"], 3.3721834192256654, rel_tol=1e-13
+    )
+    assert attB_f["spatial_vs_analytic_norm_A_B_abs_diff"] < 1e-13
+
+    unreg = attB_f["unregularized_pole_pnt_cancellation_check_at_B_50"]
+    assert unreg["encloses"] is True
+    assert unreg["abs_mid_diff"] < 1e-28
+    assert unreg["nonzero_growing_pole_integral_1_to_B"] > 0.43
+
+    sb = attB_f["quantitative_sign_balance_discovery_on_psi_tau"]
+    assert math.isclose(
+        sb["norm_A_B_sq_positive"], 0.594767833460595, rel_tol=1e-11
+    )
+    assert math.isclose(
+        sb["local_term_minus_c_tau_B_norm_f_sq_negative"],
+        -1.6771975212486425,
+        rel_tol=1e-11,
+    )
+    assert sb["net_smooth_part_strictly_negative"] < -1.082
+    assert sb["chebyshev_prime_error_stieltjes_positive"] > 1.083
+    assert math.isclose(
+        sb["net_complete_pairing_Q_tau_positive"],
+        0.0009504777883195959,
+        rel_tol=1e-9,
+    )
+
+    for d_row in sec67["diagonal_grade_evaluations"]:
+        assert d_row["attempt_A_identity_abs_diff"] < 1e-28
+        assert d_row["attempt_B_identity_abs_diff"] < 1e-28
+    for od_row in sec67["off_diagonal_grade_evaluations"]:
+        assert od_row["attempt_A_identity_abs_diff"] < 1e-28
+        assert od_row["attempt_B_identity_abs_diff"] < 1e-28
+        assert od_row["cauchy_schwarz_on_A_B_satisfied"] is True
+        assert od_row["cauchy_schwarz_on_Q_tau_satisfied"] is True
+    for mg_row in sec67["multi_grade_superposition_evaluations"]:
+        assert mg_row["Q_tau_positive"] is True
+        assert mg_row["attempt_A_identity_abs_diff"] < 1e-28
+        assert mg_row["attempt_B_identity_abs_diff"] < 1e-28
+        assert mg_row["attempt_B_smooth_part"] < 0.0
+        assert mg_row["attempt_B_prime_error_stieltjes"] > 0.0
+
 
 
 

@@ -350,6 +350,7 @@ from tc.canonical_theta_correlation_bound import (
     SUBGATE_TC_042A_NAME,
     SUBGATE_TC_042A_STATUS,
     TASK_TC_042_ID,
+    TASK_TC_042F_ID,
     UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN,
     audit_rh_equivalence_and_laplace_resolvent,
     build_canonical_theta_correlation_bound_report,
@@ -370,6 +371,7 @@ from tc.canonical_theta_correlation_bound import (
     evaluate_synthetic_off_critical_quartet_controls,
     evaluate_tau_scaling_controls,
     execute_arithmetic_proof_attempts,
+    execute_task_tc042f_arithmetic_fourier_factorization,
     verify_canonical_theta_correlation_lean_module,
     write_canonical_theta_correlation_bound_artifact,
 )
@@ -664,6 +666,7 @@ __all__ = [
     "SUBGATE_TC_042A_NAME",
     "SUBGATE_TC_042A_STATUS",
     "TASK_TC_042_ID",
+    "TASK_TC_042F_ID",
     "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN",
     "audit_rh_equivalence_and_laplace_resolvent",
     "build_canonical_theta_correlation_bound_report",
@@ -684,6 +687,7 @@ __all__ = [
     "evaluate_synthetic_off_critical_quartet_controls",
     "evaluate_tau_scaling_controls",
     "execute_arithmetic_proof_attempts",
+    "execute_task_tc042f_arithmetic_fourier_factorization",
     "verify_canonical_theta_correlation_lean_module",
     "write_canonical_theta_correlation_bound_artifact",
 ]
