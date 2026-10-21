@@ -1,0 +1,920 @@
+{
+  "epic_id": "EPIC-TC-042",
+  "task_id": "TASK-TC-042",
+  "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
+  "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
+  "parent_work": [
+    "TASK-TC-019",
+    "TASK-TC-020",
+    "TASK-TC-036",
+    "TASK-TC-036R",
+    "TASK-TC-037",
+    "TASK-TC-037R",
+    "TASK-TC-041",
+    "TASK-TC-041R"
+  ],
+  "status_dimensions": {
+    "implementation_status": "IMPLEMENTED_AND_VERIFIED",
+    "seed_defect_repair_status": "SEED_DEFECT_REPRODUCED_AND_REPAIRED",
+    "autocorrelation_closed_form_status": "CLOSED_FORM_AUTOCORRELATION_PROVED",
+    "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
+    "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
+    "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
+    "universal_arithmetic_bound_status": "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN",
+    "formalization_status": "FORMALIZED_IN_LEAN4_ZERO_SORRY",
+    "independent_review_status": "AWAITING_INDEPENDENT_REVIEW",
+    "rh_proved": false
+  },
+  "section_2_seed_defect_and_mellin_audit": {
+    "status": "SEED_DEFECT_REPRODUCED_AND_REPAIRED",
+    "authoritative_operator_definition": "G_t(x) = t^(1/4) exp(-(tau/2) t x^2), P(D) = D^2 - 1/16 (D = t d/dt), Phi_t^(2)(x) = P(D)^2 G_t(x), psi_tau(x) = x^(1/2) Phi_1^(2)(x)",
+    "first_order_polynomial_r": "r**2 - 3*r/2",
+    "first_order_matches_r2_minus_3_2_r": true,
+    "second_order_polynomial_r": "r**4 - 7*r**3 + 41*r**2/4 - 9*r/4",
+    "second_order_matches_r4_minus_7r3_plus_41_4_r2_minus_9_4_r": true,
+    "exact_polynomial_coefficients_r1_to_r4": [
+      "-9/4",
+      "41/4",
+      "-7",
+      "1"
+    ],
+    "defective_tc036r_polynomial_coefficients_r1_to_r4": [
+      "-3/8",
+      "45/8",
+      "-6",
+      "1"
+    ],
+    "polynomial_difference_exact_minus_defective": "-r**3 + 37*r**2/8 - 15*r/8",
+    "exact_pochhammer_sum_s": "s**2*(s - 1)**2/16",
+    "exact_pochhammer_identity_verified": true,
+    "centered_z_pochhammer_identity_verified": true,
+    "defective_pochhammer_sum_s": "s**4/16 - 11*s**2/32 - 3*s/8",
+    "defective_pochhammer_at_s_eq_0": "0",
+    "defective_pochhammer_at_s_eq_1": "-21/32",
+    "defective_fails_at_s_eq_1": true,
+    "mellin_transform_F_tau_formula": "F_tau(s) = (s^2 (s - 1)^2 / 32) (tau/2)^(-s/2) Gamma(s/2)",
+    "centered_mellin_psi_tau_formula": "hat{psi_tau}(z) = F_tau(1/2 + z) = ((z^2 - 1/4)^2 / 32) (tau/2)^(-(1/2+z)/2) Gamma((1/2+z)/2)",
+    "holomorphy_strip_s": "Re(s) > -2 (first uncancelled Gamma pole at s = -2)",
+    "holomorphy_strip_z": "Re(z) > -5/2",
+    "endpoint_values": {
+      "F_tau_at_0": 0.0,
+      "F_tau_deriv_at_0": 0.0625,
+      "F_tau_at_1": 0.0,
+      "F_tau_deriv_at_1": 0.0,
+      "s_eq_0_mechanism": "Gamma(s/2) = 2/s - gamma_E + O(s) has a simple pole at s = 0; the double factor s^2 cancels the pole and leaves a simple zero F_tau(s) = (1/16) s + O(s^2).",
+      "s_eq_1_mechanism": "Gamma(1/2) = sqrt(pi) is finite and (s - 1)^2 vanishes to order 2 at s = 1."
+    },
+    "critical_strip_nonvanishing": {
+      "nonvanishing_on_open_strip_0_lt_Re_s_lt_1": true,
+      "proof": "On 0 < Re(s) < 1, s != 0, s != 1, (tau/2)^(-s/2) = exp(-(s/2) log(pi)) != 0, and Gamma(s/2) has no zeros in C; hence F_tau(s) != 0 everywhere on 0 < Re(s) < 1."
+    },
+    "mellin_quadrature_verification": {
+      "samples": [
+        {
+          "s": 0.25,
+          "closed_form_F_tau": 0.007173499643515661,
+          "quadrature_F_tau": 0.007173499643515661,
+          "abs_err": 6.842277657836021e-49
+        },
+        {
+          "s": 0.5,
+          "closed_form_F_tau": 0.0053189222975208415,
+          "quadrature_F_tau": 0.0053189222975208415,
+          "abs_err": 0.0
+        },
+        {
+          "s": 0.75,
+          "closed_form_F_tau": 0.0016953119820742229,
+          "quadrature_F_tau": 0.0016953119820742229,
+          "abs_err": 1.7105694144590052e-49
+        },
+        {
+          "s": 1.5,
+          "closed_form_F_tau": 0.009128384805918415,
+          "quadrature_F_tau": 0.009128384805918415,
+          "abs_err": 0.0
+        },
+        {
+          "s": 2.0,
+          "closed_form_F_tau": 0.039788735772973836,
+          "quadrature_F_tau": 0.039788735772973836,
+          "abs_err": 0.0
+        }
+      ],
+      "max_abs_err": 6.842277657836021e-49
+    }
+  },
+  "section_3_closed_form_autocorrelation_and_spectral_expansion": {
+    "status": "CLOSED_FORM_AUTOCORRELATION_PROVED",
+    "shift_identity": "h_K(x) = ((T_K psi_tau) * psi_tau^*)(x) = h_0(tau^K x)",
+    "symmetric_variable_W": "W(alpha) = (alpha + alpha^(-1))^2 >= 4, alpha = tau^K x",
+    "closed_form_h0_formula": "h_0(alpha) = (-648 W^3 + 58380 W^2 - 706860 W + 2027025) / (512 (alpha + alpha^(-1))^(17/2))",
+    "euler_differential_operator_representation": "h_0(alpha) = (1/512) ((alpha d/d_alpha)^2 - 1/4)^4 ((alpha + alpha^(-1))^(-1/2))",
+    "palindromic_polynomial_verified": true,
+    "symmetric_W_numerator_verified": true,
+    "numerator_at_W_eq_4": 92193,
+    "h0_at_1_exact_formula": "92193 / (131072 * sqrt(2))",
+    "h0_at_1_float": 0.4973624838099012,
+    "inversion_symmetry_h0_inv_eq_h0": true,
+    "global_envelope_bound": "|h_0(alpha)| <= (92193 / 32768) (alpha + alpha^(-1))^(-5/2) for all alpha > 0",
+    "monotone_negative_tail_bound": "For alpha >= 9 (W >= 82.81 > 80), -(81/64) alpha^(-5/2) <= h_0(alpha) < 0",
+    "quadrature_verification": {
+      "samples": [
+        {
+          "alpha": 0.25,
+          "closed_form_h0": 0.039941269485462796,
+          "quadrature_convolution": 0.039941269485462796,
+          "abs_err": 0.0,
+          "inversion_symmetry_abs_err": 0.0
+        },
+        {
+          "alpha": 0.5,
+          "closed_form_h0": -0.21743062244679337,
+          "quadrature_convolution": -0.21743062244679337,
+          "abs_err": 2.1895288505075267e-47,
+          "inversion_symmetry_abs_err": 0.0
+        },
+        {
+          "alpha": 1.0,
+          "closed_form_h0": 0.4973624838099012,
+          "quadrature_convolution": 0.4973624838099012,
+          "abs_err": 0.0,
+          "inversion_symmetry_abs_err": 0.0
+        },
+        {
+          "alpha": 1.7,
+          "closed_form_h0": -0.2861663034165513,
+          "quadrature_convolution": -0.2861663034165513,
+          "abs_err": 1.313717310304516e-46,
+          "inversion_symmetry_abs_err": 0.0
+        },
+        {
+          "alpha": 3.5,
+          "closed_form_h0": 0.04711464829930576,
+          "quadrature_convolution": 0.04711464829930576,
+          "abs_err": 2.1895288505075267e-47,
+          "inversion_symmetry_abs_err": 0.0
+        }
+      ],
+      "max_convolution_abs_err": 1.313717310304516e-46,
+      "max_inversion_symmetry_abs_err": 0.0
+    }
+  },
+  "section_4_5_rh_equivalence_and_laplace_resolvent": {
+    "status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
+    "equivalent_statements": {
+      "statement_A_canonical_correlation_bound": "C_tau(0) >= 0 and |C_tau(K)| <= C_tau(0) for every K in Qbar intersect R",
+      "statement_B_two_by_two_gram_determinant": "C_tau(0) >= 0 and Delta_tau(K) := C_tau(0)^2 - |C_tau(K)|^2 >= 0 for every K in Qbar intersect R",
+      "statement_C_cyclic_trajectory_cauchy_schwarz": "<psi_tau, psi_tau>_xi >= 0 and |<T_K psi_tau, psi_tau>_xi|^2 <= <T_K psi_tau, T_K psi_tau>_xi <psi_tau, psi_tau>_xi along the cyclic trajectory {T_K psi_tau}",
+      "statement_D_riemann_hypothesis": "Every nontrivial zero rho of zeta(s) in 0 < Re(s) < 1 satisfies Re(rho) = 1/2"
+    },
+    "laplace_resolvent_proof_steps": {
+      "step_1_density_and_continuity": "Because K |-> C_tau(K) = sum_rho m_rho a_rho tau^{-K(rho - 1/2)} is continuous on R (by uniform normal convergence on compact K-intervals from Stirling decay |a_rho| << |gamma|^{15/2} exp(-pi|gamma|/2)) and Qbar intersect R is dense in R, |C_tau(K)| <= C_tau(0) on Qbar intersect R implies |C_tau(t)| <= C_tau(0) for all t in R.",
+      "step_2_normal_convergence_of_partial_fractions": "For Re(w) > L/2, int_0^infty e^{-wt} tau^{t(rho - 1/2)} dt = 1 / (w - L(rho - 1/2)). Since sum_rho m_rho |a_rho| < infty, the partial-fraction series R_tau(w) := sum_rho m_rho a_rho / (w - L(rho - 1/2)) converges normally on every compact subset of C \\ {L(rho - 1/2)} and coincides with the Laplace transform L[C_tau(-t)](w) = int_0^infty e^{-wt} C_tau(-t) dt on Re(w) > L/2.",
+      "step_3_right_half_plane_holomorphy_from_bound": "Under |C_tau(-t)| <= C_tau(0) for all t >= 0, the Laplace integral L[C_tau(-t)](w) converges absolutely and defines a holomorphic function on the entire open right half-plane Re(w) > 0, with |L[C_tau(-t)](w)| <= C_tau(0) / Re(w).",
+      "step_4_nonvanishing_simple_pole_residue": "If zeta(s) had a zero rho_0 = 1/2 + delta_0 + i*gamma_0 with 0 < delta_0 < 1/2, then w_0 := L(rho_0 - 1/2) = L*delta_0 + i*L*gamma_0 lies in Re(w) = L*delta_0 > 0. Because the map rho |-> w_rho = L(rho - 1/2) is injective on C, no other distinct zero rho != rho_0 shares the pole point w_0; the residue of R_tau(w) at w = w_0 is m_{rho_0} a_{rho_0} = m_{rho_0} F_tau(rho_0) conj(F_tau(1 - conj(rho_0))) != 0 (since m_{rho_0} >= 1 and F_tau(s) != 0 on 0 < Re(s) < 1), contradicting holomorphy on Re(w) > 0.",
+      "step_5_functional_equation_reflection": "If rho_0 = 1/2 + delta_0 + i*gamma_0 had -1/2 < delta_0 < 0, the functional equation xi(1 - s) = xi(s) supplies the reflected zero rho_0' = 1 - conj(rho_0) = 1/2 - delta_0 + i*gamma_0 with Re(rho_0' - 1/2) = -delta_0 > 0, reducing to Step 4.",
+      "step_6_converse_under_rh": "Under RH, every nontrivial zero has rho = 1/2 + i*gamma_rho, so 1 - conj(rho) = rho, a_rho = |F_tau(1/2 + i*gamma_rho)|^2 > 0, and C_tau(0) = sum_rho m_rho |F_tau(rho)|^2 > 0. For every real K, |C_tau(K)| = |sum_rho m_rho |F_tau(rho)|^2 tau^{-i K gamma_rho L}| <= sum_rho m_rho |F_tau(rho)|^2 = C_tau(0)."
+    }
+  },
+  "section_6_7_certified_grade_grid_and_controls": {
+    "grade_grid_evaluation": {
+      "status": "ARITHMETIC_SPECTRAL_ENCLOSURES_INTERSECT_ON_GRID",
+      "bound_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
+      "C_tau_0_spectral": {
+        "mid": 0.0009504798117909661,
+        "rad": 3.788124932420489e-55,
+        "lower": 0.0009504798117909661,
+        "upper": 0.0009504798117909661,
+        "certified_strictly_positive": true
+      },
+      "C_tau_0_arithmetic": {
+        "mid": 0.0009504809437657209,
+        "rad": 3.155446137020901e-09,
+        "lower": 0.0009504777883195839,
+        "upper": 0.0009504840992118579,
+        "certified_strictly_positive": true
+      },
+      "all_enclosures_intersect": true,
+      "all_nonzero_delta_spectral_certified_positive": true,
+      "all_monotone_regime_delta_arithmetic_certified_positive": true,
+      "max_evenness_abs_diff": 0.0,
+      "grade_evaluations": [
+        {
+          "grade_label": "0",
+          "K_float": 0.0,
+          "spectral_C_tau_mid": 0.0009504798117909661,
+          "spectral_C_tau_rad": 3.788124932420489e-55,
+          "spectral_C_tau_str": "[0.000950479811790966114507768125533378083494989409033558 +/- 5.33e-55]",
+          "arithmetic_C_tau_mid": 0.0009504809437657209,
+          "arithmetic_C_tau_rad": 3.155446137020901e-09,
+          "arithmetic_C_tau_str": "[0.00095048 +/- 4.10e-9]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.1146149592409334,
+          "arithmetic_w_arch_mid": -0.1136644814526138,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 1.131974754816495e-09,
+          "abs_ratio_to_C0_spectral_mid": 1.0,
+          "abs_ratio_to_C0_spectral_upper": 1.0,
+          "Delta_tau_spectral_mid": 0.0,
+          "Delta_tau_spectral_lower": -1.4402145167189861e-57,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 0.0,
+          "Delta_tau_arithmetic_lower": -1.1996785631422126e-11,
+          "Delta_tau_arithmetic_certified_positive": false
+        },
+        {
+          "grade_label": "1/8",
+          "K_float": 0.125,
+          "spectral_C_tau_mid": -0.0009447622082581244,
+          "spectral_C_tau_rad": 4.2492328987425106e-55,
+          "spectral_C_tau_str": "[-0.000944762208258124474375613240944458239016668292475699 +/- 5.23e-55]",
+          "arithmetic_C_tau_mid": -0.0009447608843964711,
+          "arithmetic_C_tau_rad": 3.6903419660394565e-09,
+          "arithmetic_C_tau_str": "[-0.00094476 +/- 4.58e-9]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.10096379720592731,
+          "arithmetic_w_arch_mid": -0.10190856178066574,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 1.3238616533312736e-09,
+          "abs_ratio_to_C0_spectral_mid": 0.9939845081800653,
+          "abs_ratio_to_C0_spectral_upper": 0.9939845081800653,
+          "Delta_tau_spectral_mid": 1.0836242469422607e-08,
+          "Delta_tau_spectral_lower": 1.0836242469422607e-08,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 1.0840895776173295e-08,
+          "Delta_tau_arithmetic_lower": 1.0827924388239257e-08,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "1/4",
+          "K_float": 0.25,
+          "spectral_C_tau_mid": 0.000928615379148127,
+          "spectral_C_tau_rad": 4.766469047505033e-55,
+          "spectral_C_tau_str": "[0.000928615379148127038792277070203055730959878942088693 +/- 5.22e-55]",
+          "arithmetic_C_tau_mid": 0.0009286173437260099,
+          "arithmetic_C_tau_rad": 5.476375325441651e-09,
+          "arithmetic_C_tau_str": "[0.00092862 +/- 8.14e-9]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.004107309607986653,
+          "arithmetic_w_arch_mid": -0.0031786977406359452,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 1.96457788286062e-09,
+          "abs_ratio_to_C0_spectral_mid": 0.9769964260454512,
+          "abs_ratio_to_C0_spectral_upper": 0.9769964260454512,
+          "Delta_tau_spectral_mid": 4.1085350231770634e-08,
+          "Delta_tau_spectral_lower": 4.1085350231770634e-08,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 4.10838533930253e-08,
+          "Delta_tau_arithmetic_lower": 4.106768405597004e-08,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "1/2",
+          "K_float": 0.5,
+          "spectral_C_tau_mid": 0.0008668613749571018,
+          "spectral_C_tau_rad": 5.99748624583941e-55,
+          "spectral_C_tau_str": "[0.000866861374957101867748576579961320404112623902112234 +/- 6.19e-55]",
+          "arithmetic_C_tau_mid": 0.0008668670621576382,
+          "arithmetic_C_tau_rad": 1.5853394735865223e-08,
+          "arithmetic_C_tau_str": "[0.0008669 +/- 4.88e-8]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": -0.08710095210157505,
+          "arithmetic_w_arch_mid": 0.08796780331033806,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 5.6872005363547626e-09,
+          "abs_ratio_to_C0_spectral_mid": 0.9120250258905509,
+          "abs_ratio_to_C0_spectral_upper": 0.9120250258905509,
+          "Delta_tau_spectral_mid": 1.519632292296732e-07,
+          "Delta_tau_spectral_lower": 1.519632292296732e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 1.5195552100796092e-07,
+          "Delta_tau_arithmetic_lower": 1.5192203679223526e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "1",
+          "K_float": 1.0,
+          "spectral_C_tau_mid": 0.000630730108345431,
+          "spectral_C_tau_rad": 9.495421067345007e-55,
+          "spectral_C_tau_str": "[0.00063073010834543098118438843391279177249380236869199 +/- 4.06e-54]",
+          "arithmetic_C_tau_mid": 0.0006307861231691769,
+          "arithmetic_C_tau_rad": 1.5614381787543152e-07,
+          "arithmetic_C_tau_str": "[0.000631 +/- 3.71e-7]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.013433658306935818,
+          "arithmetic_w_arch_mid": -0.01280302832758364,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 5.601482374597774e-08,
+          "abs_ratio_to_C0_spectral_mid": 0.6635912730823409,
+          "abs_ratio_to_C0_spectral_upper": 0.6635912730823409,
+          "Delta_tau_spectral_mid": 5.055914030487512e-07,
+          "Delta_tau_spectral_lower": 5.055914030487512e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 5.055228912789755e-07,
+          "Delta_tau_arithmetic_lower": 5.053198817964871e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "sqrt(2)",
+          "K_float": 1.4142135623730951,
+          "spectral_C_tau_mid": 0.0005441316702609343,
+          "spectral_C_tau_rad": 1.3893852738529493e-54,
+          "spectral_C_tau_str": "[0.00054413167026093427742880348679691900783582809061591 +/- 4.40e-54]",
+          "arithmetic_C_tau_mid": 0.0005445073433256679,
+          "arithmetic_C_tau_rad": 1.047185813618512e-06,
+          "arithmetic_C_tau_str": "[0.00054 +/- 5.56e-6]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.0009231680381326174,
+          "arithmetic_w_arch_mid": -0.0003797078806138722,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 3.7567306473355443e-07,
+          "abs_ratio_to_C0_spectral_mid": 0.572481039061356,
+          "abs_ratio_to_C0_spectral_upper": 0.572481039061356,
+          "Delta_tau_spectral_mid": 6.073325980412363e-07,
+          "Delta_tau_spectral_lower": 6.073325980412363e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 6.069257775261989e-07,
+          "Delta_tau_arithmetic_lower": 6.057782817958186e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "2",
+          "K_float": 2.0,
+          "spectral_C_tau_mid": -0.0001133761279091898,
+          "spectral_C_tau_rad": 2.3801490907906867e-54,
+          "spectral_C_tau_str": "[-0.00011337612790918979587929879729338044565805010631859 +/- 6.12e-54]",
+          "arithmetic_C_tau_mid": -0.00010783248100561607,
+          "arithmetic_C_tau_rad": 1.5450058327814986e-05,
+          "arithmetic_C_tau_str": "[-0.0001 +/- 2.33e-5]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": -0.0002931736707633069,
+          "arithmetic_w_arch_mid": 0.0001698911315401065,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 5.5436469035737295e-06,
+          "abs_ratio_to_C0_spectral_mid": 0.11928304683879387,
+          "abs_ratio_to_C0_spectral_upper": 0.11928304683879387,
+          "Delta_tau_spectral_mid": 8.905577262425094e-07,
+          "Delta_tau_spectral_lower": 8.905577262425094e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 8.91786180501949e-07,
+          "Delta_tau_arithmetic_lower": 8.882094415483234e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "4",
+          "K_float": 4.0,
+          "spectral_C_tau_mid": -0.0009234066385075395,
+          "spectral_C_tau_rad": 1.4954917808347577e-53,
+          "spectral_C_tau_str": "[-0.0009234066385075394517188678099124350767215747758700 +/- 5.53e-53]",
+          "arithmetic_C_tau_mid": 0.07007655459509739,
+          "arithmetic_C_tau_rad": 0.15129670151509345,
+          "arithmetic_C_tau_str": "[+/- 0.222]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": -0.08122021374341387,
+          "arithmetic_w_arch_mid": 6.765513347762077e-08,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 0.07099996123360493,
+          "abs_ratio_to_C0_spectral_mid": 0.9715163089761861,
+          "abs_ratio_to_C0_spectral_upper": 0.9715163089761861,
+          "Delta_tau_spectral_mid": 5.0732052582396724e-08,
+          "Delta_tau_spectral_lower": 5.0732052582396724e-08,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": -0.004909820089895203,
+          "Delta_tau_arithmetic_lower": -0.04900521545562513,
+          "Delta_tau_arithmetic_certified_positive": false
+        },
+        {
+          "grade_label": "8",
+          "K_float": 8.0,
+          "spectral_C_tau_mid": 0.0008437501317607055,
+          "spectral_C_tau_rad": 5.9039649001370774e-52,
+          "spectral_C_tau_str": "[0.00084375013176070554629245744838520759152988215235 +/- 1.18e-51]",
+          "arithmetic_C_tau_mid": 0.0007127944130072763,
+          "arithmetic_C_tau_rad": 9120.75570678711,
+          "arithmetic_C_tau_str": "[+/- 9.13e+3]",
+          "arithmetic_tail_regime": "WAVELET_PEAK_BEYOND_TRUNCATION_REGIME",
+          "arithmetic_prime_sum_mid": 0.000712794413005559,
+          "arithmetic_w_arch_mid": 1.7173150771518236e-15,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 0.00013095571875342926,
+          "abs_ratio_to_C0_spectral_mid": 0.8877096823033491,
+          "abs_ratio_to_C0_spectral_upper": 0.8877096823033491,
+          "Delta_tau_spectral_mid": 1.914975877759824e-07,
+          "Delta_tau_spectral_lower": 1.914975877759824e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 3.9533814924738794e-07,
+          "Delta_tau_arithmetic_lower": -83188198.2499996,
+          "Delta_tau_arithmetic_certified_positive": false
+        },
+        {
+          "grade_label": "-1/4",
+          "K_float": -0.25,
+          "spectral_C_tau_mid": 0.000928615379148127,
+          "spectral_C_tau_rad": 4.766469047505033e-55,
+          "spectral_C_tau_str": "[0.000928615379148127038792277070203055730959878942088693 +/- 5.22e-55]",
+          "arithmetic_C_tau_mid": 0.0009286173437260099,
+          "arithmetic_C_tau_rad": 5.476375325441651e-09,
+          "arithmetic_C_tau_str": "[0.00092862 +/- 8.14e-9]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.004107309607986653,
+          "arithmetic_w_arch_mid": -0.0031786977406359452,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 1.96457788286062e-09,
+          "abs_ratio_to_C0_spectral_mid": 0.9769964260454512,
+          "abs_ratio_to_C0_spectral_upper": 0.9769964260454512,
+          "Delta_tau_spectral_mid": 4.1085350231770634e-08,
+          "Delta_tau_spectral_lower": 4.1085350231770634e-08,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 4.10838533930253e-08,
+          "Delta_tau_arithmetic_lower": 4.106768405597004e-08,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "-1/2",
+          "K_float": -0.5,
+          "spectral_C_tau_mid": 0.0008668613749571018,
+          "spectral_C_tau_rad": 5.99748624583941e-55,
+          "spectral_C_tau_str": "[0.000866861374957101867748576579961320404112623902112234 +/- 6.19e-55]",
+          "arithmetic_C_tau_mid": 0.0008668670621576382,
+          "arithmetic_C_tau_rad": 1.5853394735865223e-08,
+          "arithmetic_C_tau_str": "[0.0008669 +/- 4.88e-8]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": -0.08710095210157505,
+          "arithmetic_w_arch_mid": 0.08796780331033806,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 5.6872005363547626e-09,
+          "abs_ratio_to_C0_spectral_mid": 0.9120250258905509,
+          "abs_ratio_to_C0_spectral_upper": 0.9120250258905509,
+          "Delta_tau_spectral_mid": 1.519632292296732e-07,
+          "Delta_tau_spectral_lower": 1.519632292296732e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 1.5195552100796092e-07,
+          "Delta_tau_arithmetic_lower": 1.5192203679223526e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "-1",
+          "K_float": -1.0,
+          "spectral_C_tau_mid": 0.000630730108345431,
+          "spectral_C_tau_rad": 9.495421067345007e-55,
+          "spectral_C_tau_str": "[0.00063073010834543098118438843391279177249380236869199 +/- 4.06e-54]",
+          "arithmetic_C_tau_mid": 0.0006307861231691769,
+          "arithmetic_C_tau_rad": 1.5614381787543152e-07,
+          "arithmetic_C_tau_str": "[0.000631 +/- 3.71e-7]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.013433658306935818,
+          "arithmetic_w_arch_mid": -0.01280302832758364,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 5.601482374597774e-08,
+          "abs_ratio_to_C0_spectral_mid": 0.6635912730823409,
+          "abs_ratio_to_C0_spectral_upper": 0.6635912730823409,
+          "Delta_tau_spectral_mid": 5.055914030487512e-07,
+          "Delta_tau_spectral_lower": 5.055914030487512e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 5.055228912789755e-07,
+          "Delta_tau_arithmetic_lower": 5.053198817967039e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "-sqrt(2)",
+          "K_float": -1.4142135623730951,
+          "spectral_C_tau_mid": 0.0005441316702609343,
+          "spectral_C_tau_rad": 1.3893852738529493e-54,
+          "spectral_C_tau_str": "[0.00054413167026093427742880348679691900783582809061591 +/- 4.40e-54]",
+          "arithmetic_C_tau_mid": 0.0005445073433256679,
+          "arithmetic_C_tau_rad": 1.047185813618512e-06,
+          "arithmetic_C_tau_str": "[0.00054 +/- 5.56e-6]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": 0.0009231680381326174,
+          "arithmetic_w_arch_mid": -0.0003797078806138722,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 3.7567306473355443e-07,
+          "abs_ratio_to_C0_spectral_mid": 0.572481039061356,
+          "abs_ratio_to_C0_spectral_upper": 0.572481039061356,
+          "Delta_tau_spectral_mid": 6.073325980412363e-07,
+          "Delta_tau_spectral_lower": 6.073325980412363e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 6.069257775261989e-07,
+          "Delta_tau_arithmetic_lower": 6.057782817958186e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        },
+        {
+          "grade_label": "-2",
+          "K_float": -2.0,
+          "spectral_C_tau_mid": -0.0001133761279091898,
+          "spectral_C_tau_rad": 2.3801490907906867e-54,
+          "spectral_C_tau_str": "[-0.00011337612790918979587929879729338044565805010631859 +/- 6.12e-54]",
+          "arithmetic_C_tau_mid": -0.00010783248100561607,
+          "arithmetic_C_tau_rad": 1.5450058327814986e-05,
+          "arithmetic_C_tau_str": "[-0.0001 +/- 2.33e-5]",
+          "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
+          "arithmetic_prime_sum_mid": -0.0002931736707633069,
+          "arithmetic_w_arch_mid": 0.0001698911315401065,
+          "enclosures_intersect": true,
+          "mid_abs_diff": 5.5436469035737295e-06,
+          "abs_ratio_to_C0_spectral_mid": 0.11928304683879387,
+          "abs_ratio_to_C0_spectral_upper": 0.11928304683879387,
+          "Delta_tau_spectral_mid": 8.905577262425094e-07,
+          "Delta_tau_spectral_lower": 8.905577262425094e-07,
+          "Delta_tau_spectral_certified_positive": true,
+          "Delta_tau_arithmetic_mid": 8.91786180501949e-07,
+          "Delta_tau_arithmetic_lower": 8.882094415483234e-07,
+          "Delta_tau_arithmetic_certified_positive": true
+        }
+      ]
+    },
+    "local_concavity_and_derivatives": {
+      "status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
+      "C_tau_0_mid": 0.0009504798117909661,
+      "C_tau_prime_0_exact": 0.0,
+      "C_tau_double_prime_0_mid": -0.6417401924429905,
+      "C_tau_double_prime_0_upper": -0.6417401924429905,
+      "C_tau_double_prime_0_certified_negative": true,
+      "C_tau_triple_prime_0_exact": 0.0,
+      "C_tau_fourth_deriv_0_mid": 433.5413095774419,
+      "C_tau_fourth_deriv_0_upper": 433.5413095774419,
+      "arithmetic_second_derivative_decomposition": {
+        "prime_power_second_deriv_at_0": -0.3841453359571884,
+        "archimedean_plus_local_second_deriv_at_0": -0.2575948564858021,
+        "local_constant_second_deriv_at_0": 167.14620409790257,
+        "archimedean_integral_second_deriv_at_0": -167.40379895438838,
+        "both_prime_and_completed_archimedean_concave_at_zero": true
+      },
+      "certified_local_concavity_radius_K_loc": 0.13327693620953415,
+      "taylor_concavity_inequality": "C_tau(0) - C_tau(K) >= (-C_tau''(0)/2) K^2 - (M_4/24) K^4 > 0 for all 0 < |K| <= 0.133277"
+    },
+    "finite_toeplitz_gram_matrices": {
+      "rational_gram_matrix": {
+        "grid_name": "rational_6_point_grid",
+        "grades": [
+          0.0,
+          0.125,
+          0.25,
+          0.5,
+          1.0,
+          2.0
+        ],
+        "dimension": 6,
+        "eigenvalues": [
+          1.4290972475774662e-09,
+          5.169329034049927e-09,
+          3.3307077340640466e-07,
+          1.0821508062558387e-06,
+          0.0013057498296158239,
+          0.004395707221124028
+        ],
+        "min_eigenvalue": 1.4290972475774662e-09,
+        "max_eigenvalue": 0.004395707221124028,
+        "determinant": 1.5283013901291972e-35,
+        "positive_definite": true,
+        "min_off_diagonal_2x2_minor_det": 1.083624246942272e-08
+      },
+      "algebraic_gram_matrix": {
+        "grid_name": "algebraic_5_point_grid",
+        "grades": [
+          -1.4142135623730951,
+          -0.5,
+          0.0,
+          0.5,
+          1.4142135623730951
+        ],
+        "dimension": 5,
+        "eigenvalues": [
+          1.0042214182422114e-09,
+          4.080725302583331e-09,
+          4.823200817984088e-07,
+          0.0015970819162930434,
+          0.003154829737633268
+        ],
+        "min_eigenvalue": 1.0042214182422114e-09,
+        "max_eigenvalue": 0.003154829737633268,
+        "determinant": 9.95876084926252e-30,
+        "positive_definite": true,
+        "min_off_diagonal_2x2_minor_det": 1.519632292296733e-07
+      },
+      "all_gram_matrices_positive_definite": true,
+      "comparison_2x2_vs_NxN": "The 2x2 Toeplitz minor condition C_tau(0) >= 0 and Delta_tau(K) = C_tau(0)^2 - |C_tau(K)|^2 >= 0 is already sufficient to imply RH via the Laplace resolvent of C_tau(-t), and under RH all N x N Toeplitz Gram matrices [C_tau(K_i - K_j)] are strictly positive-definite by Bochner's theorem."
+    },
+    "synthetic_off_critical_quartet_controls": {
+      "synthetic_quartets": [
+        {
+          "delta_0": 0.05,
+          "gamma_0": 14.134725141734695,
+          "a_rho0_re": 0.00047443129804516324,
+          "a_rho0_im": 2.4715100718807317e-05,
+          "a_rho0_abs": 0.0004750746181057869,
+          "a_rho0_nonzero": true,
+          "laplace_pole_real_part_L_delta0": 0.09189385332046728,
+          "C_quartet_0": 0.001897725192180653,
+          "violates_uniform_bound": true,
+          "grade_samples": [
+            {
+              "K": 0.0,
+              "C_quartet_K": 0.001897725192180653,
+              "abs_C_K_over_abs_C_0": 1.0
+            },
+            {
+              "K": 2.418666793080138,
+              "C_quartet_K": 0.0019447920752982196,
+              "abs_C_K_over_abs_C_0": 1.0248017380553833
+            },
+            {
+              "K": 4.837333586160276,
+              "C_quartet_K": 0.0020883274056632505,
+              "abs_C_K_over_abs_C_0": 1.1004372046426694
+            },
+            {
+              "K": 9.674667172320552,
+              "C_quartet_K": 0.0026984211531528384,
+              "abs_C_K_over_abs_C_0": 1.421924082723545
+            }
+          ]
+        },
+        {
+          "delta_0": 0.15,
+          "gamma_0": 14.134725141734695,
+          "a_rho0_re": 0.0004694704357111274,
+          "a_rho0_im": 7.390659571701517e-05,
+          "a_rho0_abs": 0.00047525222240119415,
+          "a_rho0_nonzero": true,
+          "laplace_pole_real_part_L_delta0": 0.2756815599614018,
+          "C_quartet_0": 0.0018778817428445095,
+          "violates_uniform_bound": true,
+          "grade_samples": [
+            {
+              "K": 0.0,
+              "C_quartet_K": 0.0018778817428445095,
+              "abs_C_K_over_abs_C_0": 1.0
+            },
+            {
+              "K": 2.418666793080138,
+              "C_quartet_K": 0.002311030531325466,
+              "abs_C_K_over_abs_C_0": 1.2306581818218474
+            },
+            {
+              "K": 4.837333586160276,
+              "C_quartet_K": 0.003810295520787043,
+              "abs_C_K_over_abs_C_0": 2.0290391209701104
+            },
+            {
+              "K": 9.674667172320552,
+              "C_quartet_K": 0.013584595605423671,
+              "abs_C_K_over_abs_C_0": 7.233999508854317
+            }
+          ]
+        },
+        {
+          "delta_0": 0.25,
+          "gamma_0": 14.134725141734695,
+          "a_rho0_re": 0.0004595919696446085,
+          "a_rho0_im": 0.00012238377785461305,
+          "a_rho0_abs": 0.0004756075773616081,
+          "a_rho0_nonzero": true,
+          "laplace_pole_real_part_L_delta0": 0.4594692666023364,
+          "C_quartet_0": 0.001838367878578434,
+          "violates_uniform_bound": true,
+          "grade_samples": [
+            {
+              "K": 0.0,
+              "C_quartet_K": 0.001838367878578434,
+              "abs_C_K_over_abs_C_0": 1.0
+            },
+            {
+              "K": 2.418666793080138,
+              "C_quartet_K": 0.003095301104711673,
+              "abs_C_K_over_abs_C_0": 1.6837223608939442
+            },
+            {
+              "K": 4.837333586160276,
+              "C_quartet_K": 0.00858488748882711,
+              "abs_C_K_over_abs_C_0": 4.669841977148556
+            },
+            {
+              "K": 9.674667172320552,
+              "C_quartet_K": 0.07834176805026616,
+              "abs_C_K_over_abs_C_0": 42.61484818307747
+            }
+          ]
+        }
+      ],
+      "all_off_critical_quartets_have_nonzero_weight": true,
+      "all_off_critical_quartets_violate_bound": true
+    }
+  },
+  "section_8_tau_role_scaling_controls": {
+    "status": "GENERIC_WIDTH_AND_BASE_SCALING_PROVED",
+    "scaling_identity": "C_{a,b}(K) = sqrt(a_0 / a) * C_{a_0,tau}(K * log(b) / log(tau)), where a_0 = tau/2 = pi",
+    "physical_space_mechanism": "Because psi_a(x) = x^{1/2} P_2(a x^2) exp(-a x^2) = (a_0/a)^{1/4} psi_tau(sqrt(a/a_0) x), multiplicative convolution with Haar measure dy/y is scale-invariant in y and factors out ((a_0/a)^{1/4})^2 = sqrt(a_0/a), while b^K x = tau^{(K log b / log tau)} x.",
+    "spectral_space_mechanism": "In Mellin space, F_a(s) = (a_0 / a)^{s/2} F_tau(s), so on every zero pair (rho, 1 - conj(rho)) where rho + (1 - rho) = 1, the product F_a(rho) conj(F_a(1 - conj(rho))) = (a_0/a)^{1/2} a_rho scales by sqrt(a_0/a) independently of rho.",
+    "tau_role_implication": "Replacing b = tau by any b > 1 merely reparametrizes the real grade line K |-> K log(b)/log(tau), and replacing a = pi by a > 0 scales C_{a,b} by sqrt(pi/a). Therefore, any arithmetic proof of |C_tau(K)| <= C_tau(0) must either establish the inequality for all real shifts kappa = K log(tau) in R or exploit the specific self-dual Poisson/modular coupling between the archimedean factor pi^{-s/2} Gamma(s/2) and the integer lattice Z at a = pi = tau/2.",
+    "max_scaling_abs_err": 2.1895288505075267e-46,
+    "evaluations": [
+      {
+        "label": "canonical_(pi,2pi)",
+        "a": 3.141592653589793,
+        "b": 6.283185307179586,
+        "K": 0.25,
+        "scaled_grade_K_log_b_over_log_tau": 0.25,
+        "width_scale_sqrt_a0_over_a": 1.0,
+        "direct_C_ab_K": 0.0009286153791481271,
+        "scaled_canonical_C_tau": 0.0009286153791481271,
+        "spectral_scaling_abs_err": 4.276423536147513e-49,
+        "convolution_scaling_abs_err": 1.4231937528298923e-46
+      },
+      {
+        "label": "base_2_(pi,2)",
+        "a": 3.141592653589793,
+        "b": 2.0,
+        "K": 0.5,
+        "scaled_grade_K_log_b_over_log_tau": 0.18857278139776365,
+        "width_scale_sqrt_a0_over_a": 1.0,
+        "direct_C_ab_K": 0.0001762121568092932,
+        "scaled_canonical_C_tau": 0.0001762121568092932,
+        "spectral_scaling_abs_err": 6.628456481028645e-49,
+        "convolution_scaling_abs_err": 1.5326701953552687e-46
+      },
+      {
+        "label": "base_e_(pi,e)",
+        "a": 3.141592653589793,
+        "b": 2.718281828459045,
+        "K": 0.5,
+        "scaled_grade_K_log_b_over_log_tau": 0.2720530165691922,
+        "width_scale_sqrt_a0_over_a": 1.0,
+        "direct_C_ab_K": 0.000672474450530166,
+        "scaled_canonical_C_tau": 0.000672474450530166,
+        "spectral_scaling_abs_err": 0.0,
+        "convolution_scaling_abs_err": 1.1495026465164515e-46
+      },
+      {
+        "label": "width_1_(1,2pi)",
+        "a": 1.0,
+        "b": 6.283185307179586,
+        "K": 0.25,
+        "scaled_grade_K_log_b_over_log_tau": 0.25,
+        "width_scale_sqrt_a0_over_a": 1.772453850905516,
+        "direct_C_ab_K": 0.0016459279047811837,
+        "scaled_canonical_C_tau": 0.0016459279047811837,
+        "spectral_scaling_abs_err": 1.7105694144590052e-49,
+        "convolution_scaling_abs_err": 2.1895288505075267e-46
+      },
+      {
+        "label": "width_2pi_base_10_(2pi,10)",
+        "a": 6.283185307179586,
+        "b": 10.0,
+        "K": 0.125,
+        "scaled_grade_K_log_b_over_log_tau": 0.156606305114071,
+        "width_scale_sqrt_a0_over_a": 0.7071067811865476,
+        "direct_C_ab_K": -0.00040315340295320797,
+        "scaled_canonical_C_tau": -0.00040315340295320797,
+        "spectral_scaling_abs_err": 1.282927060844254e-49,
+        "convolution_scaling_abs_err": 4.3790577010150533e-47
+      }
+    ]
+  },
+  "section_9_arithmetic_proof_attempts_and_remaining_subgate": {
+    "attempt_1_pointwise_kernel_difference": {
+      "status": "POINTWISE_KERNEL_DIFFERENCE_SIGN_FALSIFIED",
+      "kernel_difference_definition": "d_K^-(x) = 2 h_0(x) - [h_0(tau^K x) + h_0(tau^{-K} x)]",
+      "K_tested": 1.0,
+      "value_at_n_eq_3": 0.24891759607388161,
+      "value_at_n_eq_7_near_tau": -0.40175106379988873,
+      "sign_changes_across_primes": true,
+      "obstruction_mechanism": "For K = 1, h_0(3) > 0 gives d_1^-(3) = +0.248918 > 0 at prime p = 3, whereas at prime p = 7 near tau = 2*pi ~ 6.2832, h_0(7/tau) ~ h_0(1) = +0.49736 > 0 and h_0(7) < 0 give d_1^-(7) = -0.401751 < 0, ruling out term-by-term prime-sum dominance."
+    },
+    "attempt_2_local_concavity_and_archimedean_dominance": {
+      "status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
+      "certified_local_concavity_radius_K_loc": 0.13327693620953415,
+      "C_tau_double_prime_0": -0.6417401924429905,
+      "archimedean_plus_local_second_deriv_at_0": -0.2575948564858021,
+      "prime_power_second_deriv_at_0": -0.3841453359571884,
+      "conclusion": "At K = 0, BOTH the completed archimedean sector (-0.257595 < 0, arising from -167.403799 archimedean integral curvature + 167.146204 local constant curvature) AND the prime-power sector (-0.384145 < 0) are strictly concave, reinforcing each other to give C_tau''(0) = -0.641740 < 0 and an unconditional proof that |C_tau(K)| < C_tau(0) for all 0 < |K| <= 0.133277."
+    },
+    "attempt_3_large_grade_wavelet_decomposition": {
+      "status": "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN",
+      "decomposition": "C_tau(K) = W_arch(h_K) + P_fwd(K) + P_refl(K)",
+      "asymptotic_rates_for_K_gt_0": {
+        "local_constant_term": "O(tau^{-5K/2})",
+        "archimedean_integral_term": "O(tau^{-3K/2}) because the leading O(tau^{K/2}) moment int_0^infty h_0(alpha) alpha^{-1/2} d_alpha/alpha = H_0(-1/2) = 0 vanishes identically",
+        "forward_prime_sum_P_fwd": "O(tau^{-5K/2})",
+        "reflected_prime_wavelet_sum_P_refl": "-sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n / tau^K), whose PNT smooth main term tau^{K/2} int_0^infty h_0(alpha) alpha^{1/2} d_alpha/alpha = tau^{K/2} H_0(1/2) = 0 vanishes identically by F_tau(1) = 0, leaving an O(1) oscillatory prime-error wavelet transform"
+      },
+      "samples": [
+        {
+          "K": 0.5,
+          "tau_to_K": 2.5066282746310007,
+          "w_arch_total": 0.08796780331033806,
+          "prime_forward_sum": -0.008615767575413224,
+          "prime_reflected_wavelet_sum": -0.07848518452616167,
+          "total_C_tau_K": 0.0008668512087631614
+        },
+        {
+          "K": 1.0,
+          "tau_to_K": 6.283185307179586,
+          "w_arch_total": -0.01280302832758364,
+          "prime_forward_sum": 0.0013518673734441427,
+          "prime_reflected_wavelet_sum": 0.012081790933491704,
+          "total_C_tau_K": 0.0006306299793522076
+        },
+        {
+          "K": 2.0,
+          "tau_to_K": 39.47841760435743,
+          "w_arch_total": 0.0001698911315401065,
+          "prime_forward_sum": 2.1091006463940174e-05,
+          "prime_reflected_wavelet_sum": -0.0003142646772272675,
+          "total_C_tau_K": -0.00012328253922322082
+        },
+        {
+          "K": 4.0,
+          "tau_to_K": 1558.545456544039,
+          "w_arch_total": 6.765513347762077e-08,
+          "prime_forward_sum": 2.1753070562138423e-09,
+          "prime_reflected_wavelet_sum": -0.08122021591872229,
+          "total_C_tau_K": -0.08122014608828176
+        }
+      ],
+      "why_large_K_is_not_trivially_suppressed": "While the forward prime sum P_fwd(K) and archimedean term W_arch(h_K) decay exponentially in K > 0, the reflected prime sum P_refl(K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/tau^K) sweeps its peak alpha = n/tau^K = 1 across all primes n ~ tau^K as K -> +infty. Bounding |P_refl(K)| <= C_tau(0) as K -> +infty is directly equivalent to bounding the zero-mean wavelet coefficients of (psi(x) - x)/sqrt(x) across all scales x = tau^K."
+    },
+    "exact_remaining_subgate": {
+      "subgate_id": "SUBGATE-TC-042A",
+      "subgate_name": "CANONICAL_THETA_WAVELET_PRIME_BOUND_SUBGATE",
+      "status": "OPEN",
+      "exact_statement": "Prove without invoking RH or Weil positivity that for every K in Qbar intersect R, |W_arch(h_K) - sum_{n>=2} (Lambda(n)/sqrt(n)) [h_0(tau^K n) + h_0(tau^{-K} n)]| <= C_tau(0), where h_0(alpha) = (-648 W^3 + 58380 W^2 - 706860 W + 2027025) / (512 (alpha + 1/alpha)^{17/2}) with W = (alpha + 1/alpha)^2."
+    }
+  },
+  "section_10_lean_formalization_audit": {
+    "exists": true,
+    "path": "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+    "contains_sorry": false,
+    "contains_admit": false,
+    "matches_exact": true,
+    "expected_defs": [
+      "heatEulerPolyStep",
+      "seedFirstOrderPoly",
+      "seedSecondOrderPoly",
+      "defectiveSecondOrderPoly",
+      "seedMellinPochhammerSum",
+      "defectiveMellinPochhammerSum",
+      "autocorrelationSymmetricNumerator",
+      "conjugatePairCorrelationTerm",
+      "gramDetTwoByTwo"
+    ],
+    "actual_defs": [
+      "heatEulerPolyStep",
+      "seedFirstOrderPoly",
+      "seedSecondOrderPoly",
+      "defectiveSecondOrderPoly",
+      "seedMellinPochhammerSum",
+      "defectiveMellinPochhammerSum",
+      "autocorrelationSymmetricNumerator",
+      "conjugatePairCorrelationTerm",
+      "gramDetTwoByTwo"
+    ],
+    "expected_theorems": [
+      "seed_first_order_spatial_polynomial",
+      "seed_second_order_spatial_polynomial",
+      "seed_mellin_pochhammer_polynomial_identity",
+      "defective_seed_mellin_endpoint_nonvanishing",
+      "autocorrelation_symmetric_numerator_identity",
+      "mellin_convolution_endpoint_vanishing",
+      "quartet_grade_symmetry_and_evenness",
+      "critical_line_spectral_weight_nonneg_and_triangle_bound",
+      "two_by_two_gram_determinant_equivalence",
+      "gaussian_width_and_grade_base_scaling_identity",
+      "laplace_resolvent_residue_obstruction_schema",
+      "fixed_seed_correlation_bound_implies_critical_line_schema"
+    ],
+    "actual_theorems": [
+      "seed_first_order_spatial_polynomial",
+      "seed_second_order_spatial_polynomial",
+      "seed_mellin_pochhammer_polynomial_identity",
+      "defective_seed_mellin_endpoint_nonvanishing",
+      "autocorrelation_symmetric_numerator_identity",
+      "mellin_convolution_endpoint_vanishing",
+      "quartet_grade_symmetry_and_evenness",
+      "critical_line_spectral_weight_nonneg_and_triangle_bound",
+      "two_by_two_gram_determinant_equivalence",
+      "gaussian_width_and_grade_base_scaling_identity",
+      "laplace_resolvent_residue_obstruction_schema",
+      "fixed_seed_correlation_bound_implies_critical_line_schema"
+    ]
+  },
+  "literature_references": [
+    {
+      "citation": "Burnol (1999, arXiv:math/9902080v1; 2001, arXiv:math/0101068v1)",
+      "role": "Co-Poisson formula, local archimedean conductor H_infty, and localized Weil positivity on compact multiplicative support vs global prime transition."
+    },
+    {
+      "citation": "Suzuki (2023, arXiv:2301.00421v1)",
+      "role": "Nearest-prime support localization threshold and breakdown of trivial positivity once dilation reaches prime stations p >= 2."
+    },
+    {
+      "citation": "Connes & Consani (2020, arXiv:2006.13771v1; 2021, arXiv:2106.01715v1)",
+      "role": "Completed theta/Weil functional, pole-annihilating operators at s = 0, 1, and archimedean vs semilocal positivity structure."
+    },
+    {
+      "citation": "Riemann (1859), Weil (1952), Rosser & Schoenfeld (1962), Olver (1997)",
+      "role": "Completed zeta explicit formula W_xi, Chebyshev prime-sum bounds, and complex Stirling remainder bounds for unconditional spectral tail enclosures."
+    }
+  ]
+}

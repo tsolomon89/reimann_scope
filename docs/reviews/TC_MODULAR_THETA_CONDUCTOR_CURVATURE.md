@@ -522,9 +522,9 @@ We verify all endpoint, integral, and Mellin domain conditions explicitly:
    $$
    \widehat{J\Phi_t}(z) = \mathcal M[\Phi_t](s) = \frac{1}{8}s(s - 1)\pi^{-s/2}\Gamma(s/2)\,t^{1/4 - s/2},
    $$
-   which is holomorphic on $\operatorname{Re}(s) > -2$ ($\operatorname{Re}(z) > -5/2$). Because $\Gamma(s/2) = \frac{2}{s} + O(1)$ has a simple pole at $s = 0$, the single factor $\frac{1}{4}s(s-1)$ cancels the $\Gamma$-pole at $s = 0$ to leave the finite value $\mathcal M[\Phi_t](0) = -\frac{1}{4}t^{1/4}$ while vanishing at $s = 1$ ($\mathcal M[\Phi_t](1) = 0$). Applying $\mathcal P_{\mathrm{reg}}(\mathcal D)$ a second time produces the squared pole-vanishing state
+   which is holomorphic on $\operatorname{Re}(s) > -2$ ($\operatorname{Re}(z) > -5/2$). Because $\Gamma(s/2) = \frac{2}{s} + O(1)$ has a simple pole at $s = 0$, the single factor $\frac{1}{4}s(s-1)$ cancels the $\Gamma$-pole at $s = 0$ to leave the finite value $\mathcal M[\Phi_t](0) = -\frac{1}{4}t^{1/4}$ while vanishing at $s = 1$ ($\mathcal M[\Phi_t](1) = 0$). Applying $\mathcal P_{\mathrm{reg}}(\mathcal D)$ a second time produces the squared pole-vanishing state (spatial polynomial corrected in `TASK-TC-042` from the `TC-036R` display typo $r^4 - 6r^3 + \frac{45}{8}r^2 - \frac{3}{8}r$)
    $$
-   \Phi_t^{(2)}(u) := \left(\mathcal D^2 - \frac{1}{16}\right)^2\widetilde g_t(u) = t^{1/4}\left(r^4 - 6r^3 + \frac{45}{8}r^2 - \frac{3}{8}r\right)e^{-r},
+   \Phi_t^{(2)}(u) := \left(\mathcal D^2 - \frac{1}{16}\right)^2\widetilde g_t(u) = t^{1/4}\left(r^4 - 7r^3 + \frac{41}{4}r^2 - \frac{9}{4}r\right)e^{-r},
    $$
    whose Mellin transform $\mathcal M[\Phi_t^{(2)}](s) = \frac{1}{32}s^2(s-1)^2\pi^{-s/2}\Gamma(s/2)t^{1/4-s/2}$ vanishes at **both** $s = 0$ and $s = 1$: $\mathcal M[\Phi_t^{(2)}](0) = \mathcal M[\Phi_t^{(2)}](1) = 0$, so $W_{\mathrm{pole}}(J\Phi_t^{(2)}) = 0$.
 

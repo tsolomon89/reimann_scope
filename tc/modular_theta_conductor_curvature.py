@@ -1149,9 +1149,17 @@ def evaluate_unshifted_vs_corrected_pole_regularizer(
             ),
             "squared_regularizer_formula": (
                 "Phi_t^{(2)}(u) = (D^2 - 1/16)^2 tilde{g}_t(u) "
-                "= t^{1/4} (r^4 - 6 r^3 + (45/8) r^2 - (3/8) r) e^{-r}, "
+                "= t^{1/4} (r^4 - 7 r^3 + (41/4) r^2 - (9/4) r) e^{-r}, "
                 "with M[Phi_t^{(2)}](s) = (1/32) s^2 (s - 1)^2 pi^{-s/2} Gamma(s/2) t^{1/4 - s/2} "
                 "satisfying M[Phi_t^{(2)}](0) = M[Phi_t^{(2)}](1) = 0"
+            ),
+            "squared_spatial_polynomial_factor": "r^4 - 7 r^3 + (41/4) r^2 - (9/4) r (r = pi * t * u^2)",
+            "squared_spatial_polynomial_coefficients": [-9.0 / 4.0, 41.0 / 4.0, -7.0, 1.0],
+            "tc036r_display_string_repair": (
+                "Corrected TC-036R display polynomial from r^4 - 6r^3 + (45/8)r^2 - (3/8)r "
+                "(which gave sum_j p_j (s/2)_j = -21/32 != 0 at s = 1) to exact "
+                "(D^2 - 1/16)^2(t^{1/4} e^{-r}) = t^{1/4}(r^4 - 7r^3 + (41/4)r^2 - (9/4)r)e^{-r} "
+                "(giving sum_j p_j (s/2)_j = s^2(s-1)^2/16, vanishing at s = 0 and s = 1)."
             ),
             "annihilates_poles": True,
         },

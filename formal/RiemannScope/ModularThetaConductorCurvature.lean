@@ -233,7 +233,7 @@ theorem corrected_pole_regularizer_annihilates_quarter_powers (t_pos t_neg : ℝ
 
 /-- 17. Spatial polynomial jet of the corrected pole-regularized state
     Phi_t(u) = (D^2 - 1/16)(t^{1/4} exp(-r)) with r = pi t u^2:
-    ((1/4 - r)^2 - r) - 1/16 = r^2 - (3/2) r, which vanishes at r = 0 (u = 0). -/
+    ((1/4 - r)^2 - r) - 1/16 = r ^ 2 - (3 / 2) * r, which vanishes at r = 0 (u = 0). -/
 theorem corrected_pole_regularizer_spatial_jet (r : ℝ) :
     ((1 / 4 - r) ^ 2 - r) - 1 / 16 = r ^ 2 - (3 / 2) * r ∧
       (((1 / 4 - (0 : ℝ)) ^ 2 - (0 : ℝ)) - 1 / 16 = 0) := by

@@ -533,6 +533,8 @@ def test_32_corrected_pole_regularizer_mellin_and_spatial_identities():
     assert rep["origin_value_Phi_t_0"] == 0.0
     assert rep["origin_first_derivative_Phi_t_prime_0"] == 0.0
     assert rep["half_line_integral_int_0_infty_Phi_t_du"] == 0.0
+    assert "r^4 - 7 r^3 + (41/4) r^2 - (9/4) r" in rep["squared_regularizer_formula"]
+    assert rep["squared_spatial_polynomial_coefficients"] == [-9.0 / 4.0, 41.0 / 4.0, -7.0, 1.0]
 
 
 def test_33_completed_functional_uses_corrected_regularizer_D2_minus_1_16():
