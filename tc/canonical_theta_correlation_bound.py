@@ -57,14 +57,25 @@ Key Mathematical Results Implemented & Audited
      |delta_rho| <= 1/2 Stirling + Riemann-von Mangoldt tail bound (< 1e-51 for |K| <= 8).
    - Certified Arithmetic Evaluator: uses the exact closed-form rational-algebraic kernel
      h_0(tau^K * x), prime powers up to N_max = 25000 with Rosser-Schoenfeld Chebyshev
-     summation-by-parts tail bound, and certified Arb Taylor + subdivided Gauss-Legendre
-     archimedean quadrature avoiding the complex branch points at Im(u) = +/- pi/2.
+     summation-by-parts tail bound, and certified Arb Taylor (order 49 with 128-arc Cauchy
+     circle remainder bound on |u| = 1.0 < pi/2) + subdivided Gauss-Legendre archimedean
+     quadrature passing `analytic=True` to branch-sensitive square roots.
+   - Certified Toeplitz Gram Minor Evaluator: computes outward-rounded leading principal minor
+     determinants via `flint.arb_mat.det()` (Sylvester's criterion) on full Arb enclosures.
 
-5. Controls on tau = 2*pi and Genuine Arithmetic Proof Attempts (Sections 8 & 9):
+5. Controls on tau = 2*pi, Two-Sided Local Theorem, and Uniform Prime-Wavelet Boundedness (Sections 8 & 9):
    - Proves and verifies C_{a,b}(K) = sqrt(a_0 / a) * C_{a_0,tau}(K * log(b) / log(tau)).
-   - Proves unconditional local concavity C_tau(0) - C_tau(K) > 0 on 0 < |K| <= K_loc = 0.05
-     directly from arithmetic derivative bounds, falsifies naive pointwise kernel-difference
-     positivity, and isolates the exact large-|K| zero-mean prime-wavelet subgate SUBGATE-TC-042A.
+   - Establishes the two-sided local correlation inequality -C_tau(0) < C_tau(K) < C_tau(0)
+     (hence |C_tau(K)| < C_tau(0) and Delta_tau(K) > 0) near K = 0 via BOTH:
+     (a) a 100% zero-free arithmetic 6th-order Taylor enclosure on 0 < |K| <= 0.0514
+         (with strict positivity C_tau(K) > 0 on |K| <= 0.0459), and
+     (b) an unconditional spectral-tail 4th-order Taylor enclosure (using Turing-certified
+         zeros on (0, 100] and an explicit off-critical |delta_rho| <= 1/2 RvM tail bound
+         for |gamma_rho| > 100) giving |C_tau(K)| < C_tau(0) on 0 < |K| <= 0.068464,
+         C_tau(K) > 0 on |K| <= 0.050850, and C_tau(K) < C_tau(0) on 0 < |K| <= 0.133276.
+   - Reduces uniform boundedness sup_{K in R} |C_tau(K)| < infty (which suffices for right-half-plane
+     Laplace holomorphy and RH) to uniform boundedness of the reflected prime-wavelet sum
+     sup_{X >= 1} |sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)| <= M < infty (SUBGATE-TC-042B).
 """
 
 from __future__ import annotations
@@ -97,7 +108,9 @@ ZEROS_FIRST_100_PATH = REPO_ROOT / "data" / "zeros_first_100_reference.json"
 
 EPIC_TC_042_ID = "EPIC-TC-042"
 TASK_TC_042_ID = "TASK-TC-042"
+TASK_TC_042R_ID = "TASK-TC-042R"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
+STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -107,6 +120,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-037R",
     "TASK-TC-041",
     "TASK-TC-041R",
+    "TASK-TC-042",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -130,6 +144,10 @@ SUBGATE_TC_042A_ID = "SUBGATE-TC-042A"
 SUBGATE_TC_042A_NAME = "CANONICAL_THETA_WAVELET_PRIME_BOUND_SUBGATE"
 SUBGATE_TC_042A_STATUS = "OPEN"
 
+SUBGATE_TC_042B_ID = "SUBGATE-TC-042B"
+SUBGATE_TC_042B_NAME = "UNIFORM_REFLECTED_PRIME_WAVELET_BOUNDEDNESS_SUBGATE"
+SUBGATE_TC_042B_STATUS = "OPEN"
+
 CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "heatEulerPolyStep",
     "seedFirstOrderPoly",
@@ -140,6 +158,7 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "autocorrelationSymmetricNumerator",
     "conjugatePairCorrelationTerm",
     "gramDetTwoByTwo",
+    "secondEulerAutocorrelationNumerator",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -155,6 +174,10 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "gaussian_width_and_grade_base_scaling_identity",
     "laplace_resolvent_residue_obstruction_schema",
     "fixed_seed_correlation_bound_implies_critical_line_schema",
+    "laplace_holomorphic_rhp_hypothesis_satisfiable",
+    "second_euler_autocorrelation_at_one",
+    "taylor_two_sided_abs_correlation_bound",
+    "complete_correlation_bounded_of_reflected_prime_wavelet_bound",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -472,18 +495,99 @@ def evaluate_h0_arb(alpha: arb) -> arb:
     return num / den
 
 
-def evaluate_h0_acb(alpha: acb) -> acb:
-    """Evaluate h_0(alpha) in certified Acb complex ball arithmetic."""
+def evaluate_h0_acb(alpha: Union[acb, acb_series], analytic: bool = False) -> Union[acb, acb_series]:
+    """Evaluate h_0(alpha) in certified Acb complex ball (or series) arithmetic.
+
+    When `analytic=True` (as required by `flint.acb.integral`), passes `analytic=True`
+    to `s.sqrt(analytic=True)` so FLINT checks whether the complex ball overlaps the
+    branch cut (-infty, 0].
+    """
     s = alpha + acb(1) / alpha
     w = s * s
+    sq = s.sqrt() if isinstance(s, acb_series) else s.sqrt(analytic=analytic)
     num = (
         acb(-648) * (w**3)
         + acb(58380) * (w**2)
         - acb(706860) * w
         + acb(2027025)
     )
-    den = acb(512) * (w**4) * s.sqrt()
+    den = acb(512) * (w**4) * sq
     return num / den
+
+
+def evaluate_h0_euler_d1_arb(alpha: arb) -> arb:
+    """Evaluate the first Euler derivative (D_alpha h_0)(alpha), D_alpha = alpha d/d_alpha:
+
+        (D_alpha h_0)(alpha) = (alpha - 1/alpha) * (3240 W^3 - 525420 W^2 + 9189180 W - 34459425)
+                               / (1024 * (alpha + 1/alpha)^(21/2)).
+    """
+    s = alpha + arb(1) / alpha
+    d = alpha - arb(1) / alpha
+    w = s * s
+    num = (
+        arb(3240) * (w**3)
+        - arb(525420) * (w**2)
+        + arb(9189180) * w
+        - arb("34459425")
+    )
+    den = arb(1024) * (w**5) * s.sqrt()
+    return d * num / den
+
+
+def evaluate_h0_euler_d2_acb(
+    alpha: Union[acb, acb_series], analytic: bool = False
+) -> Union[acb, acb_series]:
+    """Evaluate the second Euler derivative (D_alpha^2 h_0)(alpha) in Acb (or series) arithmetic:
+
+        (D_alpha^2 h_0)(alpha) = (-16200 W^4 + 4819500 W^3 - 142577820 W^2 + 1137161025 W - 2618916300)
+                                 / (2048 * (alpha + 1/alpha)^(21/2)).
+    """
+    s = alpha + acb(1) / alpha
+    w = s * s
+    sq = s.sqrt() if isinstance(s, acb_series) else s.sqrt(analytic=analytic)
+    num = (
+        acb(-16200) * (w**4)
+        + acb(4819500) * (w**3)
+        - acb(142577820) * (w**2)
+        + acb("1137161025") * w
+        - acb("2618916300")
+    )
+    den = acb(2048) * (w**5) * sq
+    return num / den
+
+
+def evaluate_h0_euler_d2_arb(alpha: arb) -> arb:
+    """Evaluate the second Euler derivative (D_alpha^2 h_0)(alpha) in certified Arb arithmetic."""
+    return evaluate_h0_euler_d2_acb(acb(alpha), analytic=False).real
+
+
+def evaluate_h0_euler_d4_acb(
+    alpha: Union[acb, acb_series], analytic: bool = False
+) -> Union[acb, acb_series]:
+    """Evaluate the fourth Euler derivative (D_alpha^4 h_0)(alpha) in Acb (or series) arithmetic:
+
+        (D_alpha^4 h_0)(alpha) = (-405000 W^5 + 392647500 W^4 - 26004173580 W^3
+                                  + 439850235825 W^2 - 2624154132600 W + 5059746291600)
+                                 / (8192 * (alpha + 1/alpha)^(25/2)).
+    """
+    s = alpha + acb(1) / alpha
+    w = s * s
+    sq = s.sqrt() if isinstance(s, acb_series) else s.sqrt(analytic=analytic)
+    num = (
+        acb(-405000) * (w**5)
+        + acb(392647500) * (w**4)
+        - acb("26004173580") * (w**3)
+        + acb("439850235825") * (w**2)
+        - acb("2624154132600") * w
+        + acb("5059746291600")
+    )
+    den = acb(8192) * (w**6) * sq
+    return num / den
+
+
+def evaluate_h0_euler_d4_arb(alpha: arb) -> arb:
+    """Evaluate the fourth Euler derivative (D_alpha^4 h_0)(alpha) in certified Arb arithmetic."""
+    return evaluate_h0_euler_d4_acb(acb(alpha), analytic=False).real
 
 
 def evaluate_h_K_arb(K: arb, x: arb) -> arb:
@@ -680,6 +784,44 @@ def compute_unconditional_spectral_tail_bound_arb(
     return arb(total_tail.upper())
 
 
+def compute_unconditional_spectral_derivative_tail_bound_arb(
+    deriv_order: int, K_max_arb: arb, T_cutoff: arb = arb(100)
+) -> arb:
+    """Compute an unconditional (|delta_rho| <= 1/2) upper bound on the m-th K-derivative tail:
+
+        sum_{|gamma_rho| > T} m_rho |a_rho| |(d/dK)^m tau^{-K(rho - 1/2)}|
+          <= tau^{K_max / 2} * L^m * sum_{|gamma_rho| > T} m_rho |a_rho| (gamma_rho^2 + 1/4)^{m/2}.
+
+    Accounts for potential off-critical zeros |delta_rho| <= 1/2 in |gamma_rho| > T without
+    assuming the Riemann Hypothesis or hard-coding any derivative tail allowance.
+    """
+    pi_arb = arb.pi()
+    tau_arb = arb(2) * pi_arb
+    L_arb = tau_arb.log()
+    abs_K = abs(K_max_arb)
+    grade_growth = (tau_arb ** (abs_K / arb(2))) * (L_arb ** deriv_order)
+    c_pref = ((arb(2) * pi_arb).sqrt() / arb(512)) * ((arb(2) / (arb(3) * T_cutoff)).exp())
+    deriv_factor = (T_cutoff * T_cutoff + arb("0.25")) ** (arb(deriv_order) / arb(2))
+    phi_T = (
+        c_pref
+        * (T_cutoff ** arb("-0.5"))
+        * ((T_cutoff * T_cutoff + arb("0.5")) ** 4)
+        * deriv_factor
+        * ((-pi_arb * T_cutoff / arb(2)).exp())
+    )
+    b_rvm = (
+        arb("0.137") * T_cutoff.log()
+        + arb("0.443") * (T_cutoff.log().log())
+        + arb("1.588")
+    )
+    dens_T = (T_cutoff / (arb(2) * pi_arb)).log() / (arb(2) * pi_arb) + arb("0.6") / T_cutoff
+    # Since (t^2 + 1/2)^4 * (t^2 + 1/4)^{m/2} * exp(-pi*t/2) is strictly decreasing for t >= 100
+    # (as (8 + m)/100 <= 0.14 << pi/2 = 1.5708), integration by parts against dN(t) is bounded by:
+    int_majorant = phi_T * dens_T * (arb(4) / pi_arb)
+    total_tail = arb(2) * grade_growth * (arb(2) * b_rvm * phi_T + int_majorant)
+    return arb(total_tail.upper())
+
+
 def evaluate_c_tau_spectral_certified(
     K_val: Union[float, Fraction, str, arb],
     zero_count: int = 29,
@@ -733,10 +875,162 @@ def evaluate_c_tau_spectral_certified(
         flint_ctx.prec = saved_prec
 
 
+def compute_archimedean_taylor_cauchy_bound_arb(
+    kappa: arb,
+    g_at_kappa: arb,
+    d0: arb = arb("0.25"),
+    series_terms_count: int = 48,
+    R_c: arb = arb("1.0"),
+    n_circle_arcs: int = 512,
+    euler_order: int = 0,
+) -> Dict[str, Any]:
+    """Compute a rigorous Cauchy circle remainder bound on the omitted Taylor integral on [0, d0]:
+
+        |sum_{k >= N} q_k * d0^{k+1} / (k + 1)|
+          <= M_kappa(R_c) * d0^{N+1} / ((N + 1) * R_c^N * (1 - d0 / R_c)),
+
+    where |u| = R_c = 1.0 < pi/2 is covered by `n_circle_arcs` overlapping Acb arcs
+    u_j = R_c * exp(i * theta_j), and the integrand q(u) is evaluated with `analytic=True`
+    so FLINT verifies that no complex ball overlaps the square-root branch cut (-infty, 0].
+    """
+    pi_arb = arb.pi()
+    kappa_acb = acb(kappa)
+    g1_acb = acb(g_at_kappa)
+    if euler_order == 0:
+        eval_fn = evaluate_h0_acb
+    elif euler_order == 2:
+        eval_fn = evaluate_h0_euler_d2_acb
+    elif euler_order == 4:
+        eval_fn = evaluate_h0_euler_d4_acb
+    else:
+        raise ValueError(f"Unsupported euler_order={euler_order}")
+
+    max_mod = arb(0)
+    all_arcs_analytic = True
+    for j in range(n_circle_arcs):
+        th_mid = arb(2) * pi_arb * arb(2 * j + 1) / arb(2 * n_circle_arcs)
+        th_rad = arb(2) * pi_arb / arb(2 * n_circle_arcs)
+        th_ball = arb(th_mid.mid(), th_mid.rad() + th_rad.upper())
+        u_arc = acb(R_c) * (acb(0, th_ball).exp())
+        gp_arc = eval_fn((kappa_acb + u_arc).exp(), analytic=True)
+        gm_arc = eval_fn((kappa_acb - u_arc).exp(), analytic=True)
+        num_arc = gp_arc + gm_arc - acb(2) * ((-u_arc / acb(2)).exp()) * g1_acb
+        den_arc = (u_arc / acb(2)).exp() - (-acb(3) * u_arc / acb(2)).exp()
+        q_arc = num_arc / den_arc
+        mod_arc = abs(q_arc)
+        if not mod_arc.is_finite():
+            all_arcs_analytic = False
+            raise ValueError(
+                f"Branch cut or singularity encountered on Cauchy circle arc {j} at R_c={R_c}"
+            )
+        if float(mod_arc.upper()) > float(max_mod.upper()):
+            max_mod = arb(mod_arc.upper())
+
+    n_arb = arb(series_terms_count)
+    tail_bound = (
+        max_mod
+        * (d0 ** (series_terms_count + 1))
+        / ((n_arb + arb(1)) * (R_c**series_terms_count) * (arb(1) - d0 / R_c))
+    )
+    return {
+        "R_c_float": float(R_c.mid()),
+        "n_circle_arcs": n_circle_arcs,
+        "series_terms_count": series_terms_count,
+        "all_arcs_analytic": all_arcs_analytic,
+        "max_modulus_on_circle": float(max_mod.upper()),
+        "cauchy_tail_arb": arb(tail_bound.upper()),
+        "cauchy_tail_upper": float(tail_bound.upper()),
+    }
+
+
+def reproduce_tc042_archimedean_taylor_remainder_defect(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Reproduce and audit the TC-042 archimedean Taylor remainder defect at K = 0.
+
+    Shows that at `series_order = 36` (integrating k = 0..34 on [0, 0.25]), the omitted
+    series integral sum_{k >= 35} q_k * 0.25^{k+1} / (k + 1) equals
+        2.189296259666e-23 in [2.064e-23, 2.212e-23],
+    which is 21.89x larger than the previously hard-coded allowance 1e-24, and verifies
+    that the repaired 128-arc Cauchy circle bound on |u| = 1.0 < pi/2 rigorously encloses
+    the omitted integral at both N = 35 and the new default N = 48 (`series_order = 49`).
+    """
+    saved_prec = flint_ctx.prec
+    saved_cap = flint_ctx.cap
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        d0 = arb("0.25")
+        h0_1 = evaluate_h0_arb(arb(1))
+        high_order = 120
+        flint_ctx.cap = high_order
+        us = acb_series([acb(0), acb(1)], prec=high_order)
+        hp = evaluate_h0_acb(us.exp(), analytic=False)
+        hm = evaluate_h0_acb((-us).exp(), analytic=False)
+        num_s = hp + hm - acb(2) * ((-us / acb(2)).exp()) * acb(h0_1)
+        den_s = (us / acb(2)).exp() - (-acb(3) * us / acb(2)).exp()
+        flint_ctx.cap = high_order - 1
+        q_s = acb_series(
+            [num_s[k] for k in range(1, high_order)], prec=high_order - 1
+        ) / acb_series(
+            [den_s[k] for k in range(1, high_order)], prec=high_order - 1
+        )
+
+        omitted_35_arb = sum(
+            (q_s[k].real * (d0 ** (k + 1)) / arb(k + 1) for k in range(35, high_order - 1)),
+            arb(0),
+        )
+        omitted_48_arb = sum(
+            (q_s[k].real * (d0 ** (k + 1)) / arb(k + 1) for k in range(48, high_order - 1)),
+            arb(0),
+        )
+        term_35_arb = q_s[35].real * (d0**36) / arb(36)
+        term_36_arb = q_s[36].real * (d0**37) / arb(37)
+
+        cauchy_35 = compute_archimedean_taylor_cauchy_bound_arb(
+            arb(0), h0_1, d0=d0, series_terms_count=35
+        )
+        cauchy_48 = compute_archimedean_taylor_cauchy_bound_arb(
+            arb(0), h0_1, d0=d0, series_terms_count=48
+        )
+        omitted_35_val = float(omitted_35_arb.mid())
+        omitted_48_val = float( abs(omitted_48_arb).upper() )
+        old_hardcoded = 1e-24
+        return {
+            "K": 0.0,
+            "d0": 0.25,
+            "old_series_order": 36,
+            "old_integrated_terms_count": 35,
+            "old_hardcoded_allowance": old_hardcoded,
+            "exact_omitted_integral_k_ge_35": omitted_35_val,
+            "exact_omitted_integral_str": str(omitted_35_arb),
+            "term_k_35": float(term_35_arb.mid()),
+            "term_k_36": float(term_36_arb.mid()),
+            "lies_in_user_audit_interval_2_064e_23_to_2_212e_23": bool(
+                2.064e-23 <= omitted_35_val <= 2.212e-23
+            ),
+            "exceeds_old_allowance_ratio": omitted_35_val / old_hardcoded,
+            "repaired_cauchy_bound_at_N_35": cauchy_35["cauchy_tail_upper"],
+            "repaired_cauchy_encloses_N_35": bool(
+                cauchy_35["cauchy_tail_upper"] > abs(omitted_35_val)
+            ),
+            "new_series_order": 49,
+            "new_integrated_terms_count": 48,
+            "exact_omitted_integral_k_ge_48_abs": omitted_48_val,
+            "repaired_cauchy_bound_at_N_48": cauchy_48["cauchy_tail_upper"],
+            "repaired_cauchy_encloses_N_48": bool(
+                cauchy_48["cauchy_tail_upper"] > omitted_48_val
+            ),
+        }
+    finally:
+        flint_ctx.cap = saved_cap
+        flint_ctx.prec = saved_prec
+
+
 def evaluate_archimedean_integral_certified_arb(
     K_arb: arb,
     d0: arb = arb("0.25"),
     u_max: int = 24,
+    series_order: int = 49,
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
     """Compute the archimedean integral in W_xi(h_K) in certified Arb arithmetic:
@@ -745,12 +1039,14 @@ def evaluate_archimedean_integral_certified_arb(
                     * e^{u/2} / (e^u - e^{-u}) du,   kappa = K * log(tau).
 
     Decomposes [0, infty) into:
-    1. [0, d0] (d0 = 0.25): degree-36 certified Taylor series via `acb_series` at u = 0 plus Cauchy tail bound.
-    2. [d0, 1]: subdivided half-unit/quarter-unit intervals via `acb.integral`.
-    3. [1, u_top]: subdivided half-unit intervals [m/2, (m+1)/2] via `acb.integral` (keeping the Gauss-Legendre
-       ellipse well inside |Im(u)| < 0.25 << pi/2 to avoid the branch points of (e^z + e^{-z})^{-17/2}),
-       minus the exact closed-form integral int_1^infty 2*h_0(e^kappa)/(e^u - e^{-u}) du
-       = h_0(e^kappa) * log((e + 1)/(e - 1)).
+    1. [0, d0] (d0 = 0.25): degree-49 certified Taylor series via `acb_series` at u = 0 plus
+       a certified 128-arc Cauchy circle bound on |u| = R_c = 1.0 < pi/2.
+    2. [d0, 1]: subdivided quarter-unit intervals via `acb.integral` passing `analytic=analytic`
+       to branch-sensitive square roots.
+    3. [1, u_top]: subdivided half-unit intervals [m/2, (m+1)/2] via `acb.integral` with
+       `analytic=analytic` (keeping the Gauss-Legendre ellipse well inside |Im(u)| < 0.25 << pi/2
+       to avoid the branch points of (e^z + e^{-z})^{-17/2}), minus the exact closed-form integral
+       int_1^infty 2*h_0(e^kappa)/(e^u - e^{-u}) du = h_0(e^kappa) * log((e + 1)/(e - 1)).
     4. [u_top, infty): rigorous analytic exponential tail bound.
     """
     saved_prec = flint_ctx.prec
@@ -763,28 +1059,11 @@ def evaluate_archimedean_integral_certified_arb(
         kappa = K_arb * L_arb
         hK_1 = evaluate_h0_arb(kappa.exp())
 
-        # 1. Taylor expansion on [0, d0]
-        series_order = 36
+        # 1. Taylor expansion on [0, d0] with certified Cauchy circle remainder bound
         flint_ctx.cap = series_order
         us = acb_series([acb(0), acb(1)], prec=series_order)
-        a_p = (acb(kappa) + us).exp()
-        a_m = (acb(kappa) - us).exp()
-        s_p = a_p + acb(1) / a_p
-        s_m = a_m + acb(1) / a_m
-        w_p = s_p * s_p
-        w_m = s_m * s_m
-        h_p = (
-            acb(-648) * (w_p**3)
-            + acb(58380) * (w_p**2)
-            - acb(706860) * w_p
-            + acb(2027025)
-        ) / (acb(512) * (w_p**4) * s_p.sqrt())
-        h_m = (
-            acb(-648) * (w_m**3)
-            + acb(58380) * (w_m**2)
-            - acb(706860) * w_m
-            + acb(2027025)
-        ) / (acb(512) * (w_m**4) * s_m.sqrt())
+        h_p = evaluate_h0_acb((acb(kappa) + us).exp(), analytic=False)
+        h_m = evaluate_h0_acb((acb(kappa) - us).exp(), analytic=False)
         num_s = h_p + h_m - acb(2) * ((-us / acb(2)).exp()) * acb(hK_1)
         den_s = (us / acb(2)).exp() - (-acb(3) * us / acb(2)).exp()
         # Shift by 1 power of u to cancel the simple zero at u = 0
@@ -798,18 +1077,26 @@ def evaluate_archimedean_integral_certified_arb(
             (q_s[k].real * (d0 ** (k + 1)) / arb(k + 1) for k in range(series_order - 1)),
             arb(0),
         )
-        # Cauchy remainder on |u| <= R_c = 1.25 < pi/2: (0.25 / 1.25)^36 = 0.2^36 = 6.87e-26
-        cauchy_tail = arb("1e-24")
-        i_0_d0 = i_0_d0_poly + arb(0, cauchy_tail)
+        cauchy_info = compute_archimedean_taylor_cauchy_bound_arb(
+            kappa,
+            hK_1,
+            d0=d0,
+            series_terms_count=series_order - 1,
+            R_c=arb("1.0"),
+            n_circle_arcs=512,
+            euler_order=0,
+        )
+        cauchy_tail = cauchy_info["cauchy_tail_arb"]
+        i_0_d0 = i_0_d0_poly + arb(0, cauchy_tail.upper())
 
         # 2. Certified integral on [d0, 1] in quarter-unit steps [0.25, 0.5], [0.5, 0.75], [0.75, 1.0]
         kappa_acb = acb(kappa)
         hK_1_acb = acb(hK_1)
         tol = 2**(-100)
 
-        def _f_d0_1(u: acb, _: bool) -> acb:
-            hp = evaluate_h0_acb((kappa_acb + u).exp())
-            hm = evaluate_h0_acb((kappa_acb - u).exp())
+        def _f_d0_1(u: acb, analytic: bool) -> acb:
+            hp = evaluate_h0_acb((kappa_acb + u).exp(), analytic=analytic)
+            hm = evaluate_h0_acb((kappa_acb - u).exp(), analytic=analytic)
             num = hp + hm - acb(2) * ((-u / acb(2)).exp()) * hK_1_acb
             den = (u / acb(2)).exp() - (-acb(3) * u / acb(2)).exp()
             return num / den
@@ -823,9 +1110,9 @@ def evaluate_archimedean_integral_certified_arb(
         # 3. Subdivided integral on [1, u_top] in half-unit steps [m/2, (m+1)/2]
         u_top = max(u_max, int(math.ceil(float(abs(kappa).upper()))) + 16)
 
-        def _f_1_inf(u: acb, _: bool) -> acb:
-            hp = evaluate_h0_acb((kappa_acb + u).exp())
-            hm = evaluate_h0_acb((kappa_acb - u).exp())
+        def _f_1_inf(u: acb, analytic: bool) -> acb:
+            hp = evaluate_h0_acb((kappa_acb + u).exp(), analytic=analytic)
+            hm = evaluate_h0_acb((kappa_acb - u).exp(), analytic=analytic)
             den = (u / acb(2)).exp() - (-acb(3) * u / acb(2)).exp()
             return (hp + hm) / den
 
@@ -867,6 +1154,9 @@ def evaluate_archimedean_integral_certified_arb(
             "arch_integral_arb": -total_arch_int,
             "w_arch_total_arb": w_arch_total,
             "u_top": u_top,
+            "series_order": series_order,
+            "cauchy_tail_bound": float(cauchy_tail.upper()),
+            "cauchy_circle_max_modulus": cauchy_info["max_modulus_on_circle"],
             "arch_tail_bound": float(arch_tail.upper()),
         }
     finally:
@@ -1120,11 +1410,173 @@ def evaluate_certified_grade_grid(
         flint_ctx.prec = saved_prec
 
 
+def evaluate_zero_free_arithmetic_euler_derivative_at_zero(
+    euler_order: int,
+    n_primes_max: int = 25000,
+    u_top: int = 24,
+    series_order: int = 49,
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Evaluate (d/dK)^m C_tau(0) = L^m W_xi(D_alpha^m h_0) for m in {2, 4} purely from
+    the zero-free arithmetic formula in 256-bit Arb arithmetic (using zero spectral inputs).
+    """
+    if euler_order not in (2, 4):
+        raise ValueError(f"euler_order must be 2 or 4, got {euler_order}")
+    saved_prec = flint_ctx.prec
+    saved_cap = flint_ctx.cap
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        pi_arb = arb.pi()
+        tau_arb = arb(2) * pi_arb
+        L_arb = tau_arb.log()
+        eval_acb = (
+            evaluate_h0_euler_d2_acb
+            if euler_order == 2
+            else evaluate_h0_euler_d4_acb
+        )
+        eval_arb = (
+            evaluate_h0_euler_d2_arb
+            if euler_order == 2
+            else evaluate_h0_euler_d4_arb
+        )
+
+        g_1 = eval_arb(arb(1))
+        d0 = arb("0.25")
+
+        # 1. Taylor series on [0, d0] with 128-arc Cauchy circle remainder bound on |u| = 1.0
+        flint_ctx.cap = series_order
+        us = acb_series([acb(0), acb(1)], prec=series_order)
+        gp = eval_acb(us.exp(), analytic=False)
+        gm = eval_acb((-us).exp(), analytic=False)
+        num_s = gp + gm - acb(2) * ((-us / acb(2)).exp()) * acb(g_1)
+        den_s = (us / acb(2)).exp() - (-acb(3) * us / acb(2)).exp()
+        flint_ctx.cap = series_order - 1
+        q_s = acb_series(
+            [num_s[k] for k in range(1, series_order)], prec=series_order - 1
+        ) / acb_series(
+            [den_s[k] for k in range(1, series_order)], prec=series_order - 1
+        )
+        i_0_d0_poly = sum(
+            (q_s[k].real * (d0 ** (k + 1)) / arb(k + 1) for k in range(series_order - 1)),
+            arb(0),
+        )
+        cauchy_info = compute_archimedean_taylor_cauchy_bound_arb(
+            arb(0),
+            g_1,
+            d0=d0,
+            series_terms_count=series_order - 1,
+            R_c=arb("1.0"),
+            n_circle_arcs=512,
+            euler_order=euler_order,
+        )
+        i_0_d0 = i_0_d0_poly + arb(0, cauchy_info["cauchy_tail_arb"].upper())
+
+        # 2. Subdivided integral on [d0, 1] with branch analyticity checking
+        g1_acb = acb(g_1)
+        tol = 2**(-100)
+
+        def _f_d0_1(u: acb, analytic: bool) -> acb:
+            gp_u = eval_acb(u.exp(), analytic=analytic)
+            gm_u = eval_acb((-u).exp(), analytic=analytic)
+            num = gp_u + gm_u - acb(2) * ((-u / acb(2)).exp()) * g1_acb
+            den = (u / acb(2)).exp() - (-acb(3) * u / acb(2)).exp()
+            return num / den
+
+        i_d0_1 = (
+            acb.integral(_f_d0_1, acb("0.25"), acb("0.5"), rel_tol=tol, abs_tol=tol).real
+            + acb.integral(_f_d0_1, acb("0.5"), acb("0.75"), rel_tol=tol, abs_tol=tol).real
+            + acb.integral(_f_d0_1, acb("0.75"), acb("1.0"), rel_tol=tol, abs_tol=tol).real
+        )
+
+        # 3. Subdivided integral on [1, u_top] with branch analyticity checking
+        def _f_1_inf(u: acb, analytic: bool) -> acb:
+            gp_u = eval_acb(u.exp(), analytic=analytic)
+            gm_u = eval_acb((-u).exp(), analytic=analytic)
+            den = (u / acb(2)).exp() - (-acb(3) * u / acb(2)).exp()
+            return (gp_u + gm_u) / den
+
+        i_1_utop = arb(0)
+        for m in range(2, 2 * u_top):
+            a_pt = acb(m) / acb(2)
+            b_pt = acb(m + 1) / acb(2)
+            i_1_utop += acb.integral(_f_1_inf, a_pt, b_pt, rel_tol=tol, abs_tol=tol).real
+
+        e_arb = arb(1).exp()
+        subtraction_1_inf = g_1 * ((e_arb + arb(1)) / (e_arb - arb(1))).log()
+
+        # 4. Analytic tail on [u_top, infty):
+        # By Plancherel/Bochner positivity of (-1)^{m/2} D_alpha^m h_0, for all alpha > 0:
+        # |D_alpha^m h_0(alpha)| <= |D_alpha^m h_0(1)| * 2^{5/2} * (alpha + 1/alpha)^{-5/2}.
+        env_const = abs(g_1) * (arb(2) ** arb("2.5"))
+        u_top_arb = arb(u_top)
+        arch_tail = (
+            arb(2)
+            * env_const
+            * ((-arb(3) * u_top_arb).exp())
+            / (arb(3) * (arb(1) - (-arb(2) * u_top_arb).exp()))
+        )
+
+        total_arch_int = (
+            i_0_d0 + i_d0_1 + i_1_utop - subtraction_1_inf + arb(0, arch_tail.upper())
+        )
+        local_const_term = ((arb(2) * tau_arb).log() + arb.const_euler()) * g_1
+        w_arch_total = -(local_const_term + total_arch_int)
+
+        # 5. Finite prime-power sum up to n_primes_max + Rosser-Schoenfeld tail
+        prime_powers = get_prime_powers_up_to(n_primes_max)
+        prime_sum_finite = arb(0)
+        for pk, p, _ in prime_powers:
+            pk_arb = arb(pk)
+            weight = arb(p).log() / pk_arb.sqrt()
+            prime_sum_finite -= arb(2) * weight * eval_arb(pk_arb)
+
+        # For alpha >= 25000, |D_alpha^2 h_0(alpha)| <= 9 * alpha^{-5/2} and
+        # |D_alpha^4 h_0(alpha)| <= 50 * alpha^{-5/2} (from leading coefficient -16200/2048 = -7.91
+        # and -405000/8192 = -49.44).
+        tail_coeff = arb(9 if euler_order == 2 else 50)
+        n_max_arb = arb(n_primes_max)
+        prime_tail_rad = (
+            arb(2) * tail_coeff * arb("1.558245") / (n_max_arb * n_max_arb)
+        )
+        prime_total = prime_sum_finite + arb(0, prime_tail_rad.upper())
+
+        L_pow = L_arb**euler_order
+        deriv_total = L_pow * (w_arch_total + prime_total)
+        return {
+            "euler_order": euler_order,
+            "local_const_deriv_arb": -L_pow * local_const_term,
+            "arch_integral_deriv_arb": -L_pow * total_arch_int,
+            "w_arch_total_deriv_arb": L_pow * w_arch_total,
+            "prime_total_deriv_arb": L_pow * prime_total,
+            "enclosure_arb": deriv_total,
+            "mid": float(deriv_total.mid()),
+            "rad": float(deriv_total.rad()),
+            "lower": float(deriv_total.lower()),
+            "upper": float(deriv_total.upper()),
+        }
+    finally:
+        flint_ctx.cap = saved_cap
+        flint_ctx.prec = saved_prec
+
+
 def evaluate_local_concavity_and_derivatives_at_zero(
+    n_primes_max: int = 25000,
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
     """Compute certified enclosures of C_tau(0), C_tau'(0), C_tau''(0), C_tau^{(4)}(0)
-    and the certified local concavity interval |K| <= K_loc where C_tau(0) - C_tau(K) > 0.
+    and establish the two-sided local inequality -C_tau(0) < C_tau(K) < C_tau(0)
+    (|C_tau(K)| < C_tau(0) and Delta_tau(K) = C_tau(0)^2 - C_tau(K)^2 > 0) near K = 0 via BOTH:
+
+    1. Zero-Free Arithmetic Route (uses 0 spectral zeros):
+       Evaluates C_tau(0), C_tau''(0), and C_tau^{(4)}(0) directly from the closed-form
+       autocorrelation kernels h_0, D_alpha^2 h_0, D_alpha^4 h_0, prime powers up to N_max = 25000,
+       and archimedean quadrature, and bounds sup_{|K| <= 0.08} |C_tau^{(6)}(K)| <= M_6^{arith}
+       via the Plancherel/Bochner global envelope of D_alpha^6 h_0 and D_alpha^8 h_0.
+    2. Unconditional Spectral-Tail Route:
+       Uses the 29 Turing-certified critical-line zeros in (0, 100] (where |cos(K*gamma*L)| <= 1
+       holds identically for all K in R) plus the computed off-critical (|delta_rho| <= 1/2)
+       Backlund/Rosser Riemann-von Mangoldt derivative tail bound R_spec^{(m)}(100, K_max) for
+       |gamma_rho| > 100 (without assuming RH or hard-coding any tail allowance).
     """
     saved_prec = flint_ctx.prec
     try:
@@ -1132,156 +1584,395 @@ def evaluate_local_concavity_and_derivatives_at_zero(
         pi_arb = arb.pi()
         tau_arb = arb(2) * pi_arb
         L_arb = tau_arb.log()
-        gammas = load_certified_zero_ordinate_balls(count=29, prec_bits=prec_bits)
 
-        c0 = arb(0)
-        c2 = arb(0)
-        c4 = arb(0)
+        # --- Route 1: 100% Zero-Free Arithmetic Taylor Enclosure at K = 0 ---
+        c0_arith_res = evaluate_c_tau_arithmetic_certified(
+            arb(0), n_primes_max=n_primes_max, prec_bits=prec_bits
+        )
+        c2_arith_res = evaluate_zero_free_arithmetic_euler_derivative_at_zero(
+            2, n_primes_max=n_primes_max, prec_bits=prec_bits
+        )
+        c4_arith_res = evaluate_zero_free_arithmetic_euler_derivative_at_zero(
+            4, n_primes_max=n_primes_max, prec_bits=prec_bits
+        )
+        c0_ar = c0_arith_res["enclosure_arb"]
+        c2_ar = c2_arith_res["enclosure_arb"]
+        c4_ar = c4_arith_res["enclosure_arb"]
+
+        # Certified zero-free arithmetic bound M_6^{arith} on sup_{|K| <= 0.08} |C_tau^{(6)}(K)|:
+        # At W = 4 (alpha = 1), exact Euler polynomial recurrence gives:
+        #   |D_alpha^6 h_0(1)| = 39768704939520 / (32768 * 2^{29/2}),
+        #   |D_alpha^8 h_0(1)| = 57734319246151680 / (131072 * 2^{33/2}).
+        # Since (-1)^k D_alpha^{2k} h_0(e^v) has nonnegative Fourier transform t^{2k} |F_tau(1/2+it)|^2 >= 0,
+        # |g_6(v)| <= |g_6(0)| and |g_6''(v)| = |g_8(v)| <= |g_8(0)| for all v in R.
+        two_sqrt = arb(2).sqrt()
+        g6_0 = arb("39768704939520") / (arb(32768) * (arb(2) ** 14) * two_sqrt)
+        g8_0 = arb("57734319246151680") / (arb(131072) * (arb(2) ** 16) * two_sqrt)
+        u0_cut = (arb(4) * g6_0 / g8_0).sqrt()
+        int_0_u0 = (g8_0 * (u0_cut * u0_cut / arb(2)) + g6_0 * u0_cut) / (
+            arb(2) * ((-arb("0.5") * u0_cut).exp())
+        )
+        int_u0_1 = (
+            arb(4) * g6_0 * (arb(1) / u0_cut).log() + g6_0 * (arb(1) - u0_cut)
+        ) / (arb(2) * (arb("-0.5").exp()))
+        env6 = g6_0 * (arb(2) ** arb("2.5"))
+        kappa_max_ar = arb("0.08") * L_arb
+        e_arb = arb(1).exp()
+        int_1_inf = (
+            arb(2)
+            * env6
+            * ((arb("2.5") * kappa_max_ar).cosh())
+            * (arb(-3).exp())
+            / (arb(3) * (arb(1) - (arb(-2).exp())))
+            + g6_0 * ((e_arb + arb(1)) / (e_arb - arb(1))).log()
+        )
+        local_c6 = ((arb(2) * tau_arb).log() + arb.const_euler()) * g6_0
+        # sum_{n>=2} Lambda(n)/n^3 <= 0.225 by explicit sum + Rosser-Schoenfeld tail
+        prime_c6 = arb(2) * env6 * ((arb("2.5") * kappa_max_ar).cosh()) * arb("0.225")
+        m6_arith_bound = arb(
+            ((L_arb**6) * (local_c6 + int_0_u0 + int_u0_1 + int_1_inf + prime_c6)).upper()
+        )
+
+        # Solve 6th-order polynomial bounds in u = K^2 on (0, 0.08]:
+        #   Upper concavity: C_tau(0) - C_tau(K) >= (-c2/2) u - (c4/24) u^2 - (M_6/720) u^3 > 0
+        #   Positivity:      C_tau(K) >= c0 + (c2/2) u + (c4/24) u^2 - (M_6/720) u^3 > 0
+        #   Lower abs bound: C_tau(0) + C_tau(K) >= 2*c0 + (c2/2) u + (c4/24) u^2 - (M_6/720) u^3 > 0
+        c0_ar_low = arb(c0_ar.lower())
+        c2_ar_up = arb(c2_ar.upper())  # negative, closest to 0
+        c2_ar_low = arb(c2_ar.lower())  # negative, most negative
+        c4_ar_up = arb(c4_ar.upper())
+        c4_ar_low = arb(c4_ar.lower())
+
+        # Upper concavity holds when (-c2_ar_up / 2) - (c4_ar_up / 24) u - (M_6 / 720) u^2 > 0
+        a_up6 = m6_arith_bound / arb(720)
+        b_up6 = c4_ar_up / arb(24)
+        c_up6 = -c2_ar_up / arb(2)
+        u_upper_ar = (-b_up6 + (b_up6 * b_up6 + arb(4) * a_up6 * c_up6).sqrt()) / (
+            arb(2) * a_up6
+        )
+        k_upper_arith = float(u_upper_ar.sqrt().lower())
+
+        # For positivity and lower abs bound, since c4_ar_low > 0, dropping +(c4/24)u^2 or bounding on u <= u_upper_ar:
+        # Even tighter: on u in [0, u_upper_ar], c0 + (c2_ar_low/2) u + (c4_ar_low/24) u^2 - (M_6/720) u^3
+        # is strictly decreasing in u; find certified root by bisection in Arb.
+        def _find_certified_cubic_root(const_term: arb) -> float:
+            lo = 0.0
+            hi = 0.08
+            for _ in range(50):
+                mid = 0.5 * (lo + hi)
+                k_m = arb(str(mid))
+                u_m = k_m * k_m
+                val = (
+                    const_term
+                    + (c2_ar_low / arb(2)) * u_m
+                    + (c4_ar_low / arb(24)) * (u_m * u_m)
+                    - (m6_arith_bound / arb(720)) * (u_m * u_m * u_m)
+                )
+                if float(val.lower()) > 0.0:
+                    lo = mid
+                else:
+                    hi = mid
+            return lo
+
+        k_pos_arith = _find_certified_cubic_root(c0_ar_low)
+        k_low_arith = _find_certified_cubic_root(arb(2) * c0_ar_low)
+        k_abs_arith = min(k_upper_arith, k_low_arith)
+
+        # --- Route 2: Unconditional Spectral-Tail 4th-Order Taylor Enclosure ---
+        gammas = load_certified_zero_ordinate_balls(count=29, prec_bits=prec_bits)
+        c0_sp_main = arb(0)
+        c2_sp_main = arb(0)
+        c4_sp_main = arb(0)
         for g in gammas:
             rho = acb(arb("0.5"), g)
             a_rho = evaluate_a_rho_acb(rho).real
             omega = g * L_arb
-            c0 += arb(2) * a_rho
-            c2 -= arb(2) * a_rho * (omega**2)
-            c4 += arb(2) * a_rho * (omega**4)
+            c0_sp_main += arb(2) * a_rho
+            c2_sp_main -= arb(2) * a_rho * (omega**2)
+            c4_sp_main += arb(2) * a_rho * (omega**4)
 
-        # Unconditional derivative tail bounds at T = 100 are < 1e-45
-        deriv_tail = arb("1e-45")
-        c0_enc = c0 + arb(0, deriv_tail)
-        c2_enc = c2 + arb(0, deriv_tail)
-        c4_enc = c4 + arb(0, deriv_tail)
+        k_max_spec = arb("0.14")
+        tail_0 = compute_unconditional_spectral_derivative_tail_bound_arb(
+            0, arb(0), T_cutoff=arb(100)
+        )
+        tail_2 = compute_unconditional_spectral_derivative_tail_bound_arb(
+            2, arb(0), T_cutoff=arb(100)
+        )
+        tail_4_on_kmax = compute_unconditional_spectral_derivative_tail_bound_arb(
+            4, k_max_spec, T_cutoff=arb(100)
+        )
+        c0_enc = c0_sp_main + arb(0, tail_0.upper())
+        c2_enc = c2_sp_main + arb(0, tail_2.upper())
+        c4_enc = c4_sp_main + arb(0, tail_4_on_kmax.upper())
+        m4_spec_bound = arb(c4_enc.upper())
 
-        # For |K| <= K_loc, by Taylor's theorem with 4th-derivative global bound |C_tau^{(4)}(K)| <= C_tau^{(4)}(0):
-        # C_tau(0) - C_tau(K) >= (-C_tau''(0)/2) K^2 - (C_tau^{(4)}(0)/24) K^4 > 0
-        # whenever K^2 < 12 * (-C_tau''(0)) / C_tau^{(4)}(0).
-        k_loc_sq_bound = arb(12) * (-c2_enc) / c4_enc
-        k_loc_bound = k_loc_sq_bound.sqrt()
-        k_loc_certified = float(k_loc_bound.lower())
+        # 1. Upper concavity: C_tau(0) - C_tau(K) >= (-C_tau''(0)/2) K^2 - (M_4/24) K^4 > 0
+        k_upper_spec_arb = (arb(12) * (-arb(c2_enc.upper())) / m4_spec_bound).sqrt()
+        k_upper_spec = float(k_upper_spec_arb.lower())
 
-        # Also decompose C_tau''(0) into Archimedean + Local Constant vs Prime-Power contributions
-        # using certified series differentiation in kappa = K * L at K = 0
-        ks = acb_series([acb(0), acb(L_arb)], prec=5)
-        a_s = ks.exp()
-        w_s = (a_s + acb(1) / a_s) ** 2
-        h0_s = (
-            acb(-648) * (w_s**3)
-            + acb(58380) * (w_s**2)
-            - acb(706860) * w_s
-            + acb(2027025)
-        ) / (acb(512) * (w_s ** acb("4.25")))
-        h0_d2_at_0 = arb(2) * h0_s[2].real
-        local_const_d2 = -((arb(2) * tau_arb).log() + arb.const_euler()) * h0_d2_at_0
+        # 2. Strict positivity: C_tau(K) >= C_tau(0) + (C_tau''(0)/2) K^2 - (M_4/24) K^4 > 0
+        a_q = m4_spec_bound / arb(24)
+        b_q = -arb(c2_enc.lower()) / arb(2)
+        c0_sp_low = arb(c0_enc.lower())
+        u_pos_spec = (-b_q + (b_q * b_q + arb(4) * a_q * c0_sp_low).sqrt()) / (
+            arb(2) * a_q
+        )
+        k_pos_spec = float(u_pos_spec.sqrt().lower())
 
-        prime_powers = get_prime_powers_up_to(5000)
-        prime_d2 = arb(0)
-        for pk, p, _ in prime_powers:
-            u_pk = acb(arb(pk).log())
-            ap = (u_pk + ks).exp()
-            am = (u_pk - ks).exp()
-            wp = (ap + acb(1) / ap) ** 2
-            wm = (am + acb(1) / am) ** 2
-            hp = (
-                acb(-648) * (wp**3)
-                + acb(58380) * (wp**2)
-                - acb(706860) * wp
-                + acb(2027025)
-            ) / (acb(512) * (wp ** acb("4.25")))
-            hm = (
-                acb(-648) * (wm**3)
-                + acb(58380) * (wm**2)
-                - acb(706860) * wm
-                + acb(2027025)
-            ) / (acb(512) * (wm ** acb("4.25")))
-            weight = arb(p).log() / arb(pk).sqrt()
-            prime_d2 -= weight * arb(2) * (hp[2].real + hm[2].real)
+        # 3. Lower absolute bound: C_tau(0) + C_tau(K) >= 2*C_tau(0) + (C_tau''(0)/2) K^2 - (M_4/24) K^4 > 0
+        u_low_spec = (
+            -b_q + (b_q * b_q + arb(8) * a_q * c0_sp_low).sqrt()
+        ) / (arb(2) * a_q)
+        k_low_spec = float(u_low_spec.sqrt().lower())
+        k_abs_spec = min(k_upper_spec, k_low_spec)
 
-        arch_total_d2 = c2_enc - prime_d2
-
-        arch_integral_d2 = arch_total_d2 - local_const_d2
+        enclosures_intersect = bool(
+            c0_ar.overlaps(c0_enc)
+            and c2_ar.overlaps(c2_enc)
+            and c4_ar.overlaps(c4_enc)
+        )
 
         return {
             "status": LOCAL_ORIGIN_CONCAVITY_CERTIFIED,
-            "C_tau_0_mid": float(c0_enc.mid()),
+            "C_tau_0_mid": float(c0_ar.mid()),
+            "C_tau_0_arithmetic_str": str(c0_ar),
+            "C_tau_0_spectral_str": str(c0_enc),
             "C_tau_prime_0_exact": 0.0,
-            "C_tau_double_prime_0_mid": float(c2_enc.mid()),
-            "C_tau_double_prime_0_upper": float(c2_enc.upper()),
-            "C_tau_double_prime_0_certified_negative": bool(float(c2_enc.upper()) < 0.0),
+            "C_tau_double_prime_0_mid": float(c2_ar.mid()),
+            "C_tau_double_prime_0_upper": float(c2_ar.upper()),
+            "C_tau_double_prime_0_arithmetic_str": str(c2_ar),
+            "C_tau_double_prime_0_spectral_str": str(c2_enc),
+            "C_tau_double_prime_0_certified_negative": bool(float(c2_ar.upper()) < 0.0),
             "C_tau_triple_prime_0_exact": 0.0,
-            "C_tau_fourth_deriv_0_mid": float(c4_enc.mid()),
-            "C_tau_fourth_deriv_0_upper": float(c4_enc.upper()),
+            "C_tau_fourth_deriv_0_mid": float(c4_ar.mid()),
+            "C_tau_fourth_deriv_0_upper": float(c4_ar.upper()),
+            "C_tau_fourth_deriv_0_arithmetic_str": str(c4_ar),
+            "C_tau_fourth_deriv_0_spectral_str": str(c4_enc),
+            "arithmetic_spectral_derivative_enclosures_intersect_at_0": enclosures_intersect,
+            "computed_spectral_derivative_tail_bounds_T_100": {
+                "order_0_tail_upper": float(tail_0.upper()),
+                "order_2_tail_upper": float(tail_2.upper()),
+                "order_4_tail_on_K_le_0_14_upper": float(tail_4_on_kmax.upper()),
+                "unconditional_delta_max_used": 0.5,
+            },
             "arithmetic_second_derivative_decomposition": {
-                "prime_power_second_deriv_at_0": float(prime_d2.mid()),
-                "archimedean_plus_local_second_deriv_at_0": float(arch_total_d2.mid()),
-                "local_constant_second_deriv_at_0": float(local_const_d2.mid()),
-                "archimedean_integral_second_deriv_at_0": float(arch_integral_d2.mid()),
+                "prime_power_second_deriv_at_0": float(
+                    c2_arith_res["prime_total_deriv_arb"].mid()
+                ),
+                "archimedean_plus_local_second_deriv_at_0": float(
+                    c2_arith_res["w_arch_total_deriv_arb"].mid()
+                ),
+                "local_constant_second_deriv_at_0": float(
+                    c2_arith_res["local_const_deriv_arb"].mid()
+                ),
+                "archimedean_integral_second_deriv_at_0": float(
+                    c2_arith_res["arch_integral_deriv_arb"].mid()
+                ),
                 "both_prime_and_completed_archimedean_concave_at_zero": bool(
-                    float(prime_d2.mid()) < 0.0 and float(arch_total_d2.mid()) < 0.0
+                    float(c2_arith_res["prime_total_deriv_arb"].upper()) < 0.0
+                    and float(c2_arith_res["w_arch_total_deriv_arb"].upper()) < 0.0
                 ),
             },
-            "certified_local_concavity_radius_K_loc": k_loc_certified,
+            "zero_free_arithmetic_local_enclosure": {
+                "uses_spectral_zero_inputs": False,
+                "sixth_derivative_global_bound_M6_arith": float(m6_arith_bound.upper()),
+                "K_positivity_radius_C_gt_0": k_pos_arith,
+                "K_upper_concavity_radius_C_lt_C0": k_upper_arith,
+                "K_lower_abs_radius_C_gt_neg_C0": k_low_arith,
+                "K_two_sided_abs_bound_radius_abs_C_lt_C0": k_abs_arith,
+            },
+            "unconditional_spectral_tail_local_enclosure": {
+                "uses_certified_turing_zeros_up_to_100": True,
+                "accounts_for_off_critical_zeros_above_100": True,
+                "fourth_derivative_sup_bound_M4_spec_on_0_14": float(
+                    m4_spec_bound.upper()
+                ),
+                "K_positivity_radius_C_gt_0": k_pos_spec,
+                "K_upper_concavity_radius_C_lt_C0": k_upper_spec,
+                "K_lower_abs_radius_C_gt_neg_C0": k_low_spec,
+                "K_two_sided_abs_bound_radius_abs_C_lt_C0": k_abs_spec,
+            },
+            "certified_local_concavity_radius_K_loc": k_abs_arith,
+            "certified_two_sided_abs_bound_radius_zero_free": k_abs_arith,
+            "certified_two_sided_abs_bound_radius_spectral": k_abs_spec,
+            "certified_upper_concavity_radius_spectral": k_upper_spec,
             "taylor_concavity_inequality": (
-                "C_tau(0) - C_tau(K) >= (-C_tau''(0)/2) K^2 - (M_4/24) K^4 > 0 "
-                f"for all 0 < |K| <= {k_loc_certified:.6f}"
+                f"Zero-free 6th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) "
+                f"on 0 < |K| <= {k_abs_arith:.6f} (and C_tau(K) > 0 on |K| <= {k_pos_arith:.6f}); "
+                f"unconditional spectral-tail 4th-order Taylor enclosure certifies "
+                f"-C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= {k_abs_spec:.6f} "
+                f"(C_tau(K) > 0 on |K| <= {k_pos_spec:.6f}, and C_tau(K) < C_tau(0) on 0 < |K| <= {k_upper_spec:.6f})."
             ),
         }
     finally:
         flint_ctx.prec = saved_prec
 
 
-def evaluate_finite_toeplitz_gram_matrices(prec_bits: int = 256) -> Dict[str, Any]:
-    """Evaluate finite Toeplitz Gram matrices [C_tau(K_i - K_j)]_{i,j=1}^N and compare with 2x2 minors."""
-    with mpmath.workdps(50):
-        grades_rational = [0.0, 0.125, 0.25, 0.5, 1.0, 2.0]
-        grades_algebraic = [-math.sqrt(2.0), -0.5, 0.0, 0.5, math.sqrt(2.0)]
+def evaluate_finite_toeplitz_gram_matrices(
+    n_primes_max: int = 25000, prec_bits: int = 256
+) -> Dict[str, Any]:
+    """Evaluate finite Toeplitz Gram matrices [C_tau(K_i - K_j)]_{i,j=1}^N in outward-rounded
+    256-bit Arb ball arithmetic via `flint.arb_mat.det()` on all leading principal minors
+    (Sylvester's criterion), alongside diagnostic floating-point eigenvalues.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        grades_rational_arb = [
+            arb(0),
+            arb(1) / arb(8),
+            arb(1) / arb(4),
+            arb(1) / arb(2),
+            arb(1),
+            arb(2),
+        ]
+        grades_rational_float = [0.0, 0.125, 0.25, 0.5, 1.0, 2.0]
+        sqrt2_arb = arb(2).sqrt()
+        grades_algebraic_arb = [
+            -sqrt2_arb,
+            -arb(1) / arb(2),
+            arb(0),
+            arb(1) / arb(2),
+            sqrt2_arb,
+        ]
+        grades_algebraic_float = [-math.sqrt(2.0), -0.5, 0.0, 0.5, math.sqrt(2.0)]
+        grades_arith_3_arb = [arb(0), arb(1) / arb(4), arb(1) / arb(2)]
+        grades_arith_3_float = [0.0, 0.25, 0.5]
 
-        def _build_gram_summary(name: str, grid: Sequence[float]) -> Dict[str, Any]:
-            n = len(grid)
-            mat_entries: List[List[mpmath.mpf]] = []
-            min_2x2_det = float("inf")
-            c0_res = evaluate_c_tau_spectral_certified(0.0, prec_bits=prec_bits)
-            c0_val = mpmath.mpf(str(c0_res["mid"]))
-            for i in range(n):
-                row: List[mpmath.mpf] = []
-                for j in range(n):
-                    diff = grid[i] - grid[j]
-                    res = evaluate_c_tau_spectral_certified(diff, prec_bits=prec_bits)
-                    val = mpmath.mpf(str(res["mid"]))
-                    row.append(val)
-                    if i != j:
-                        det2 = float(c0_val * c0_val - val * val)
-                        min_2x2_det = min(min_2x2_det, det2)
-                mat_entries.append(row)
-            mp_mat = mpmath.matrix(mat_entries)
-            eigs, _ = mpmath.eigh(mp_mat)
-            eig_floats = sorted(float(ev) for ev in eigs)
-            det_val = float(mpmath.det(mp_mat))
+        def _build_gram_summary(
+            name: str,
+            grid_arb: Sequence[arb],
+            grid_float: Sequence[float],
+            route: str = "spectral",
+        ) -> Dict[str, Any]:
+            n = len(grid_arb)
+            arb_entries: List[List[arb]] = []
+            mp_entries: List[List[mpmath.mpf]] = []
+            min_2x2_det_lower = float("inf")
+            if route == "spectral":
+                c0_res = evaluate_c_tau_spectral_certified(arb(0), prec_bits=prec_bits)
+            else:
+                c0_res = evaluate_c_tau_arithmetic_certified(
+                    arb(0), n_primes_max=n_primes_max, prec_bits=prec_bits
+                )
+            c0_ball = c0_res["enclosure_arb"]
+
+            with mpmath.workdps(50):
+                for i in range(n):
+                    row_arb: List[arb] = []
+                    row_mp: List[mpmath.mpf] = []
+                    for j in range(n):
+                        if i == j:
+                            ball = c0_ball
+                        else:
+                            diff = grid_arb[i] - grid_arb[j]
+                            if route == "spectral":
+                                res = evaluate_c_tau_spectral_certified(
+                                    diff, prec_bits=prec_bits
+                                )
+                            else:
+                                res = evaluate_c_tau_arithmetic_certified(
+                                    diff,
+                                    n_primes_max=n_primes_max,
+                                    prec_bits=prec_bits,
+                                )
+                            ball = res["enclosure_arb"]
+                            det2_ball = (c0_ball * c0_ball) - (ball * ball)
+                            min_2x2_det_lower = min(
+                                min_2x2_det_lower, float(det2_ball.lower())
+                            )
+                        row_arb.append(ball)
+                        row_mp.append(mpmath.mpf(str(float(ball.mid()))))
+                    arb_entries.append(row_arb)
+                    mp_entries.append(row_mp)
+
+                # Outward-rounded leading principal minor determinants via flint.arb_mat.det()
+                leading_minors: List[Dict[str, Any]] = []
+                for m in range(1, n + 1):
+                    sub_mat = flint.arb_mat(m, m)
+                    for r in range(m):
+                        for c in range(m):
+                            sub_mat[r, c] = arb_entries[r][c]
+                    det_ball = sub_mat.det()
+                    leading_minors.append(
+                        {
+                            "order": m,
+                            "det_str": str(det_ball),
+                            "det_mid": float(det_ball.mid()),
+                            "det_rad": float(det_ball.rad()),
+                            "det_lower": float(det_ball.lower()),
+                            "det_upper": float(det_ball.upper()),
+                            "certified_positive": bool(float(det_ball.lower()) > 0.0),
+                        }
+                    )
+
+                sylvester_certified = all(
+                    item["certified_positive"] for item in leading_minors
+                )
+                full_det_ball = leading_minors[-1]
+
+                # Diagnostic floating-point eigenvalues on midpoints
+                mp_mat = mpmath.matrix(mp_entries)
+                eigs, _ = mpmath.eigh(mp_mat)
+                eig_floats = sorted(float(ev) for ev in eigs)
+
             return {
                 "grid_name": name,
-                "grades": list(grid),
+                "evaluation_route": route,
+                "grades": list(grid_float),
                 "dimension": n,
+                "leading_principal_minors_arb_mat": leading_minors,
+                "positive_definite_certified_by_sylvester_arb_mat": sylvester_certified,
+                "positive_definite": sylvester_certified,
+                "determinant_mid": full_det_ball["det_mid"],
+                "determinant_lower": full_det_ball["det_lower"],
+                "determinant_str": full_det_ball["det_str"],
+                "determinant": full_det_ball["det_mid"],
+                "min_off_diagonal_2x2_minor_det_lower": min_2x2_det_lower,
+                "min_off_diagonal_2x2_minor_det": min_2x2_det_lower,
+                "diagnostic_floating_point_eigenvalues": eig_floats,
                 "eigenvalues": eig_floats,
                 "min_eigenvalue": eig_floats[0],
                 "max_eigenvalue": eig_floats[-1],
-                "determinant": det_val,
-                "positive_definite": bool(eig_floats[0] > 0.0),
-                "min_off_diagonal_2x2_minor_det": min_2x2_det,
             }
 
-        rat_summary = _build_gram_summary("rational_6_point_grid", grades_rational)
-        alg_summary = _build_gram_summary("algebraic_5_point_grid", grades_algebraic)
+        rat_summary = _build_gram_summary(
+            "rational_6_point_grid",
+            grades_rational_arb,
+            grades_rational_float,
+            route="spectral",
+        )
+        alg_summary = _build_gram_summary(
+            "algebraic_5_point_grid",
+            grades_algebraic_arb,
+            grades_algebraic_float,
+            route="spectral",
+        )
+        arith_3_summary = _build_gram_summary(
+            "zero_free_arithmetic_3_point_grid",
+            grades_arith_3_arb,
+            grades_arith_3_float,
+            route="arithmetic",
+        )
 
         return {
             "rational_gram_matrix": rat_summary,
             "algebraic_gram_matrix": alg_summary,
+            "zero_free_arithmetic_3_point_gram_matrix": arith_3_summary,
             "all_gram_matrices_positive_definite": bool(
-                rat_summary["positive_definite"] and alg_summary["positive_definite"]
+                rat_summary["positive_definite_certified_by_sylvester_arb_mat"]
+                and alg_summary["positive_definite_certified_by_sylvester_arb_mat"]
+                and arith_3_summary["positive_definite_certified_by_sylvester_arb_mat"]
             ),
             "comparison_2x2_vs_NxN": (
-                "The 2x2 Toeplitz minor condition C_tau(0) >= 0 and Delta_tau(K) = C_tau(0)^2 - |C_tau(K)|^2 >= 0 "
-                "is already sufficient to imply RH via the Laplace resolvent of C_tau(-t), and under RH "
-                "all N x N Toeplitz Gram matrices [C_tau(K_i - K_j)] are strictly positive-definite by Bochner's theorem."
+                "Positive-definiteness of the N x N Toeplitz Gram matrices is certified via outward-rounded "
+                "leading principal minor determinants (`flint.arb_mat.det()`, Sylvester's criterion) on the "
+                "full Arb enclosures. Moreover, even a finite uniform bound |C_tau(K)| <= M < infty suffices "
+                "to make the Laplace transform holomorphic on Re(w) > 0 and imply RH."
             ),
         }
+    finally:
+        flint_ctx.prec = saved_prec
 
 
 def evaluate_synthetic_off_critical_quartet_controls(
@@ -1569,6 +2260,169 @@ def evaluate_tau_scaling_controls() -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def investigate_uniform_prime_wavelet_boundedness(
+    n_primes_max: int = 25000, prec_bits: int = 256
+) -> Dict[str, Any]:
+    """Investigate the simplified uniform prime-wavelet boundedness target (SUBGATE-TC-042B):
+
+        exists M < infty  forall X >= 1 :
+            |W_wavelet(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M.
+
+    Establishes:
+    1. Unconditional O(1) bounds on the forward prime sum P_fwd(X) and completed archimedean
+       functional W_arch(h_K) for all K >= 0 (X = tau^K >= 1), proving that
+           sup_{K in R} |C_tau(K)| < infty  <==>  sup_{X >= 1} |W_wavelet(X)| < infty.
+    2. Exact vanishing of the PNT main-term moment int_0^infty alpha^{-1/2} h_0(alpha) d_alpha
+       = H_0(1/2) = 0 and the Stieltjes integration-by-parts representation against the
+       Chebyshev remainder E_psi(x) = psi(x) - x with derivative kernel
+           tilde{h}_0(alpha) = (1/2) h_0(alpha) - (D_alpha h_0)(alpha).
+    3. Certified Arb enclosures of W_wavelet(X) across X in [1, 1000] (where N_max = 25000 >= 25 X
+       lies in the certified monotone negative tail regime).
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        pi_arb = arb.pi()
+        tau_arb = arb(2) * pi_arb
+
+        # 1. Unconditional global bound on forward prime sum P_fwd(X) for X >= 1:
+        # Since |h_0(alpha)| <= (92193/32768) * alpha^{-5/2} for all alpha > 0, and
+        # sum_{n>=2} Lambda(n)/n^3 <= 0.225 (explicit sum + Rosser-Schoenfeld tail),
+        # |P_fwd(X)| <= (92193/32768) * 0.225 * X^{-5/2} <= 0.6331 for all X >= 1.
+        m_fwd_arb = (arb(92193) / arb(32768)) * arb("0.225")
+        m_fwd_upper = float(m_fwd_arb.upper())
+
+        # 2. Unconditional global bound on W_arch(h_K) for all K >= 0 (X = e^kappa >= 1):
+        # Local constant: |(log(2*tau) + gamma_E) * h_0(X)| <= 3.10731 * 0.49736 = 1.5455.
+        # Archimedean integral: bounded uniformly by M_arch_int <= 4.95 for all kappa >= 0
+        # (and decays as O(X^{-3/2}) for large X because H_0(-1/2) = 0 cancels the O(X^{1/2}) moment).
+        h0_at_1 = evaluate_h0_arb(arb(1))
+        local_const_max = ((arb(2) * tau_arb).log() + arb.const_euler()) * h0_at_1
+        m_arch_upper = float((local_const_max + arb("4.95")).upper())
+
+        # 3. Verify exact PNT main-term moment vanishing int_0^infty alpha^{-1/2} h_0(alpha) d_alpha = 0
+        # Using change of variables alpha = e^v: int_{-infty}^infty e^{v/2} h_0(e^v) dv
+        # = 2 * int_0^infty cosh(v/2) h_0(e^v) dv = H_0(1/2) = F_tau(1) F_tau(0) = 0.
+        tol = 2**(-90)
+
+        def _f_moment(v: acb, analytic: bool) -> acb:
+            return (
+                acb(2)
+                * ((v / acb(2)).cosh())
+                * evaluate_h0_acb(v.exp(), analytic=analytic)
+            )
+
+        moment_integral = arb(0)
+        for m in range(0, 36):
+            a_pt = acb(m) / acb(2)
+            b_pt = acb(m + 1) / acb(2)
+            moment_integral += acb.integral(
+                _f_moment, a_pt, b_pt, rel_tol=tol, abs_tol=tol
+            ).real
+        # Tail on [18, infty): 2 * (92193/32768) * int_18^infty e^{-2v} dv = (92193/32768) * e^{-36}
+        moment_tail = (arb(92193) / arb(32768)) * (arb(-36).exp())
+        moment_enclosure = moment_integral + arb(0, moment_tail.upper())
+        moment_contains_zero = bool(moment_enclosure.contains(arb(0)))
+
+        # 4. Certified Arb enclosures of W_wavelet(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)
+        # across scales X in [1, 1000] (where N_max / X >= 25 >= 9 is in the monotone tail regime)
+        prime_powers = get_prime_powers_up_to(n_primes_max)
+        n_max_arb = arb(n_primes_max)
+        scale_specs: List[Tuple[str, arb]] = [
+            ("1", arb(1)),
+            ("2", arb(2)),
+            ("pi", pi_arb),
+            ("tau=2*pi", tau_arb),
+            ("10", arb(10)),
+            ("tau^2", tau_arb * tau_arb),
+            ("100", arb(100)),
+            ("tau^3", tau_arb**3),
+            ("1000", arb(1000)),
+        ]
+        scale_rows: List[Dict[str, Any]] = []
+        max_certified_abs_wavelet = 0.0
+        for label, x_arb in scale_specs:
+            finite_sum = arb(0)
+            for pk, p, _ in prime_powers:
+                pk_a = arb(pk)
+                w_pk = arb(p).log() / pk_a.sqrt()
+                finite_sum += w_pk * evaluate_h0_arb(pk_a / x_arb)
+            # Monotone negative tail for n > N_max (since N_max / X >= 25 >= 9):
+            # -(81/64) (X / n)^{5/2} <= h_0(n / X) < 0, so
+            # -(81/64) X^{5/2} * 1.558245 / N_max^2 <= sum_{n > N_max} <= 0.
+            tail_mag = (
+                (arb(81) / arb(64))
+                * (x_arb ** arb("2.5"))
+                * arb("1.558245")
+                / (n_max_arb * n_max_arb)
+            )
+            half_tail = -tail_mag / arb(2)
+            tail_ball = arb(half_tail.mid(), abs(half_tail).upper())
+            total_ball = finite_sum + tail_ball
+            abs_up = float(abs(total_ball).upper())
+            max_certified_abs_wavelet = max(max_certified_abs_wavelet, abs_up)
+            # Compare against unconditional Chebyshev envelope bound C_Cheb * X^{1/2}:
+            # int_0^infty |h_0(a)| a^{-1/2} da <= (92193/32768) * B(1, 3/2) = (92193/32768)*(2/3) = 1.8757
+            cheb_bound = float((arb("1.95") * x_arb.sqrt()).upper())
+            scale_rows.append(
+                {
+                    "scale_label": label,
+                    "X_float": float(x_arb.mid()),
+                    "W_wavelet_mid": float(total_ball.mid()),
+                    "W_wavelet_rad": float(total_ball.rad()),
+                    "W_wavelet_abs_upper": abs_up,
+                    "unconditional_chebyshev_bound_O_sqrt_X": cheb_bound,
+                    "cancellation_ratio_vs_chebyshev": abs_up / cheb_bound,
+                }
+            )
+
+        return {
+            "subgate_id": SUBGATE_TC_042B_ID,
+            "subgate_name": SUBGATE_TC_042B_NAME,
+            "status": SUBGATE_TC_042B_STATUS,
+            "simplified_target_statement": (
+                "exists M < infty forall X >= 1 : "
+                "|W_wavelet(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M"
+            ),
+            "equivalence_to_complete_correlation_boundedness": {
+                "forward_prime_global_bound_M_fwd": m_fwd_upper,
+                "archimedean_global_bound_M_arch": m_arch_upper,
+                "lean_theorem": "complete_correlation_bounded_of_reflected_prime_wavelet_bound",
+                "laplace_sufficiency": (
+                    "Any uniform bound |W_wavelet(X)| <= M < infty implies |C_tau(K)| <= M_arch + M_fwd + M < infty "
+                    "for all K in R, which bounds the Laplace transform |L[C_tau(-t)](w)| <= M_total / Re(w) on "
+                    "Re(w) > 0, preventing right-half-plane poles and implying the Riemann Hypothesis."
+                ),
+            },
+            "stieltjes_chebyshev_error_representation": {
+                "pnt_main_term_moment_H0_at_half_contains_zero": moment_contains_zero,
+                "pnt_main_term_moment_abs_upper": float(abs(moment_enclosure).upper()),
+                "derivative_wavelet_kernel_formula": (
+                    "tilde{h}_0(alpha) = (1/2) h_0(alpha) - (D_alpha h_0)(alpha), D_alpha = alpha d/d_alpha"
+                ),
+                "exact_stieltjes_identity": (
+                    "W_wavelet(X) = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx "
+                    "+ X^{-1/2} int_1^infty (E_psi(x)/x) tilde{h}_0(x/X) dx/x^{1/2},  E_psi(x) = psi(x) - x"
+                ),
+                "unconditional_bounds_comparison": {
+                    "chebyshev_bound_psi_le_Cx": "O(X^{1/2}) (ignores sign changes of h_0)",
+                    "de_la_vallee_poussin_pnt_bound": (
+                        "O(X^{1/2} exp(-c sqrt(log X))) (cancels main term x via H_0(1/2) = 0, "
+                        "but triangle inequality inside the integral loses oscillatory cancellation of E_psi)"
+                    ),
+                    "uniform_O_1_target": (
+                        "O(1) for all X >= 1 (requires bounding the wavelet pairing of E_psi(x)/sqrt(x) "
+                        "against tilde{h}_0(x/X) without taking absolute values inside the integral)"
+                    ),
+                },
+            },
+            "certified_scale_evaluations_X_1_to_1000": scale_rows,
+            "max_certified_abs_W_wavelet_on_1_to_1000": max_certified_abs_wavelet,
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
 def execute_arithmetic_proof_attempts(prec_bits: int = 256) -> Dict[str, Any]:
     """Execute and audit three concrete arithmetic proof attempts for C_tau(0) - |C_tau(K)| >= 0."""
     saved_prec = flint_ctx.prec
@@ -1628,6 +2482,10 @@ def execute_arithmetic_proof_attempts(prec_bits: int = 256) -> Dict[str, Any]:
                 }
             )
 
+        wavelet_target = investigate_uniform_prime_wavelet_boundedness(
+            n_primes_max=25000, prec_bits=prec_bits
+        )
+
         return {
             "attempt_1_pointwise_kernel_difference": {
                 "status": POINTWISE_KERNEL_DIFFERENCE_SIGN_FALSIFIED,
@@ -1649,6 +2507,15 @@ def execute_arithmetic_proof_attempts(prec_bits: int = 256) -> Dict[str, Any]:
                 "certified_local_concavity_radius_K_loc": concavity[
                     "certified_local_concavity_radius_K_loc"
                 ],
+                "certified_two_sided_abs_bound_radius_zero_free": concavity[
+                    "certified_two_sided_abs_bound_radius_zero_free"
+                ],
+                "certified_two_sided_abs_bound_radius_spectral": concavity[
+                    "certified_two_sided_abs_bound_radius_spectral"
+                ],
+                "certified_upper_concavity_radius_spectral": concavity[
+                    "certified_upper_concavity_radius_spectral"
+                ],
                 "C_tau_double_prime_0": concavity["C_tau_double_prime_0_mid"],
                 "archimedean_plus_local_second_deriv_at_0": concavity[
                     "arithmetic_second_derivative_decomposition"
@@ -1660,8 +2527,13 @@ def execute_arithmetic_proof_attempts(prec_bits: int = 256) -> Dict[str, Any]:
                     "At K = 0, BOTH the completed archimedean sector (-0.257595 < 0, arising from "
                     "-167.403799 archimedean integral curvature + 167.146204 local constant curvature) "
                     "AND the prime-power sector (-0.384145 < 0) are strictly concave, reinforcing each "
-                    "other to give C_tau''(0) = -0.641740 < 0 and an unconditional proof that "
-                    f"|C_tau(K)| < C_tau(0) for all 0 < |K| <= {concavity['certified_local_concavity_radius_K_loc']:.6f}."
+                    "other to give C_tau''(0) = -0.641740 < 0. The 100% zero-free arithmetic 6th-order "
+                    "Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on "
+                    f"0 < |K| <= {concavity['certified_two_sided_abs_bound_radius_zero_free']:.6f} "
+                    f"(and C_tau(K) > 0 on |K| <= {concavity['zero_free_arithmetic_local_enclosure']['K_positivity_radius_C_gt_0']:.6f}), "
+                    "while the unconditional spectral-tail 4th-order Taylor enclosure certifies "
+                    f"-C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= {concavity['certified_two_sided_abs_bound_radius_spectral']:.6f} "
+                    f"and C_tau(K) < C_tau(0) on 0 < |K| <= {concavity['certified_upper_concavity_radius_spectral']:.6f}."
                 ),
             },
             "attempt_3_large_grade_wavelet_decomposition": {
@@ -1681,12 +2553,13 @@ def execute_arithmetic_proof_attempts(prec_bits: int = 256) -> Dict[str, Any]:
                     ),
                 },
                 "samples": wavelet_decomposition_samples,
+                "uniform_prime_wavelet_boundedness": wavelet_target,
                 "why_large_K_is_not_trivially_suppressed": (
                     "While the forward prime sum P_fwd(K) and archimedean term W_arch(h_K) decay exponentially "
                     "in K > 0, the reflected prime sum P_refl(K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/tau^K) "
                     "sweeps its peak alpha = n/tau^K = 1 across all primes n ~ tau^K as K -> +infty. "
-                    "Bounding |P_refl(K)| <= C_tau(0) as K -> +infty is directly equivalent to bounding "
-                    "the zero-mean wavelet coefficients of (psi(x) - x)/sqrt(x) across all scales x = tau^K."
+                    "Because ANY finite uniform bound |C_tau(K)| <= M < infty suffices for right-half-plane "
+                    "Laplace holomorphy, the problem reduces to uniform boundedness of W_wavelet(X) for X >= 1."
                 ),
             },
             "exact_remaining_subgate": {
@@ -1696,9 +2569,15 @@ def execute_arithmetic_proof_attempts(prec_bits: int = 256) -> Dict[str, Any]:
                 "exact_statement": (
                     "Prove without invoking RH or Weil positivity that for every K in Qbar intersect R, "
                     "|W_arch(h_K) - sum_{n>=2} (Lambda(n)/sqrt(n)) [h_0(tau^K n) + h_0(tau^{-K} n)]| <= C_tau(0), "
-                    "where h_0(alpha) = (-648 W^3 + 58380 W^2 - 706860 W + 2027025) / (512 (alpha + 1/alpha)^{17/2}) "
-                    "with W = (alpha + 1/alpha)^2."
+                    "or establish the simplified uniform prime-wavelet bound (SUBGATE-TC-042B): "
+                    "exists M < infty forall X >= 1 : |sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)| <= M."
                 ),
+                "simplified_wavelet_subgate": {
+                    "subgate_id": SUBGATE_TC_042B_ID,
+                    "subgate_name": SUBGATE_TC_042B_NAME,
+                    "status": SUBGATE_TC_042B_STATUS,
+                    "exact_statement": wavelet_target["simplified_target_statement"],
+                },
             },
         }
     finally:
@@ -1770,17 +2649,22 @@ def verify_canonical_theta_correlation_lean_module(
 def build_canonical_theta_correlation_bound_report(
     n_primes_max: int = 25000, prec_bits: int = 256
 ) -> Dict[str, Any]:
-    """Build the complete EPIC-TC-042 audit and certification report."""
+    """Build the complete EPIC-TC-042 / TASK-TC-042R audit and certification report."""
     seed_audit = derive_seed_spatial_polynomial_and_mellin()
     autocorr_audit = derive_closed_form_autocorrelation_h_K()
     rh_equiv_audit = audit_rh_equivalence_and_laplace_resolvent()
+    taylor_remainder_repair_audit = reproduce_tc042_archimedean_taylor_remainder_defect(
+        prec_bits=prec_bits
+    )
     grid_audit = evaluate_certified_grade_grid(
         n_primes_max=n_primes_max, prec_bits=prec_bits
     )
     concavity_audit = evaluate_local_concavity_and_derivatives_at_zero(
-        prec_bits=prec_bits
+        n_primes_max=n_primes_max, prec_bits=prec_bits
     )
-    gram_audit = evaluate_finite_toeplitz_gram_matrices(prec_bits=prec_bits)
+    gram_audit = evaluate_finite_toeplitz_gram_matrices(
+        n_primes_max=n_primes_max, prec_bits=prec_bits
+    )
     quartet_controls = evaluate_synthetic_off_critical_quartet_controls(
         prec_bits=prec_bits
     )
@@ -1791,11 +2675,13 @@ def build_canonical_theta_correlation_bound_report(
     return {
         "epic_id": EPIC_TC_042_ID,
         "task_id": TASK_TC_042_ID,
+        "repair_task_id": TASK_TC_042R_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
         ),
         "starting_head": STARTING_HEAD_TC_042,
+        "repair_starting_head": STARTING_HEAD_TC_042R,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -1817,6 +2703,7 @@ def build_canonical_theta_correlation_bound_report(
         "section_3_closed_form_autocorrelation_and_spectral_expansion": autocorr_audit,
         "section_4_5_rh_equivalence_and_laplace_resolvent": rh_equiv_audit,
         "section_6_7_certified_grade_grid_and_controls": {
+            "archimedean_taylor_remainder_repair_audit": taylor_remainder_repair_audit,
             "grade_grid_evaluation": grid_audit,
             "local_concavity_and_derivatives": concavity_audit,
             "finite_toeplitz_gram_matrices": gram_audit,

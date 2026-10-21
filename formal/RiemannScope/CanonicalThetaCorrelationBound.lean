@@ -40,11 +40,22 @@ and its completed zeta correlation C_tau(K) = W_xi((T_K psi_tau) * psi_tau^*):
 10. `gaussian_width_and_grade_base_scaling_identity`:
       Under C_{a,b}(K) = s_a C_{a_0,tau}(K r_b), the 2x2 determinant scales by s_a^2 >= 0.
 11. `laplace_resolvent_residue_obstruction_schema`:
-      A nonzero spectral residue m_0 * a_norm_sq > 0 at Re(w_0) = L * delta_0 > 0 contradicts
-      vanishing of all right-half-plane residues.
+      For an explicit residue functional `resSq : ℝ → ℝ → ℝ`, a pole at `(L * delta_0, L * gamma_0)`
+      with `resSq (L * delta_0) (L * gamma_0) = m_0^2 * a_norm_sq > 0` and `L * delta_0 > 0`
+      contradicts right-half-plane residue vanishing `∀ w_re w_im, 0 < w_re → resSq w_re w_im = 0`.
 12. `fixed_seed_correlation_bound_implies_critical_line_schema`:
-      Combining right-half-plane residue vanishing (for delta > 0), functional-equation reflection
-      (for delta < 0), and strict strip nonvanishing a_norm_sq > 0 forces delta = 0.
+      Combining right-half-plane residue vanishing (for `delta > 0`), functional-equation reflection
+      (for `delta < 0`), and strict strip nonvanishing `a_norm_sq > 0` forces `delta = 0`.
+13. `laplace_holomorphic_rhp_hypothesis_satisfiable`:
+      Non-vacuity witness showing `∀ w_re w_im, 0 < w_re → resSq w_re w_im = 0` is consistent
+      with nonzero residues on the critical line `w_re = 0`.
+14. `second_euler_autocorrelation_at_one`:
+      Exact evaluation of the second Euler derivative numerator `N_2(4) = -47216520 < 0`.
+15. `taylor_two_sided_abs_correlation_bound`:
+      Two-sided fourth-order Taylor enclosure implying `-C_0 < C_K < C_0` and `C_0^2 - C_K^2 > 0`.
+16. `complete_correlation_bounded_of_reflected_prime_wavelet_bound`:
+      Reduction of uniform boundedness of `C_tau(K)` to boundedness of the archimedean,
+      forward-prime, and reflected prime-wavelet components.
 -/
 
 import Mathlib.Data.Real.Basic
@@ -256,46 +267,125 @@ theorem gaussian_width_and_grade_base_scaling_identity (sa C0 C_scaled : ℝ) :
 
 /-! ### 6. Laplace-Resolvent Residue Obstruction and RH-Equivalence Schema -/
 
-/-- Theorem 11: If an off-critical zero at rho_0 = 1/2 + delta_0 + i*gamma_0 has
-    delta_0 > 0, L > 0, multiplicity m_0 > 0, and nonzero spectral weight norm squared
-    a_norm_sq > 0, then the Laplace pole real part Re(w_0) = L * delta_0 is strictly positive
-    and the squared residue modulus m_0^2 * a_norm_sq is strictly positive, contradicting
-    any bound that forces all right-half-plane residues to vanish. -/
+/-- Theorem 11: For an explicit squared-residue functional `resSq : ℝ → ℝ → ℝ` mapping
+    `(w_re, w_im)` to `|Res_{w_re + i * w_im} L(w)|^2`, if an off-critical zero at
+    `rho_0 = 1/2 + delta_0 + i * gamma_0` has `delta_0 > 0`, `L > 0`, multiplicity `m_0 > 0`,
+    and nonzero spectral weight norm squared `a_norm_sq > 0` with pole residue
+    `resSq (L * delta_0) (L * gamma_0) = m_0^2 * a_norm_sq`, then the Laplace pole real part
+    `Re(w_0) = L * delta_0 > 0` and strictly positive residue contradict right-half-plane
+    holomorphy `∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0`. -/
 theorem laplace_resolvent_residue_obstruction_schema
-    (L delta0 m0 a_norm_sq : ℝ)
+    (resSq : ℝ → ℝ → ℝ)
+    (L delta0 gamma0 m0 a_norm_sq : ℝ)
     (hL : 0 < L)
     (h_delta : 0 < delta0)
     (hm : 0 < m0)
     (ha : 0 < a_norm_sq)
-    (h_holomorphic_rhp : ∀ w_re res_sq : ℝ, 0 < w_re → res_sq = 0) :
+    (h_holomorphic_rhp : ∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0)
+    (h_pole_residue : resSq (L * delta0) (L * gamma0) = m0 ^ 2 * a_norm_sq) :
     False := by
   have hw : 0 < L * delta0 := mul_pos hL h_delta
   have hres_pos : 0 < m0 ^ 2 * a_norm_sq := by positivity
-  have hres_zero : m0 ^ 2 * a_norm_sq = 0 := h_holomorphic_rhp (L * delta0) (m0 ^ 2 * a_norm_sq) hw
+  have hres_zero : resSq (L * delta0) (L * gamma0) = 0 :=
+    h_holomorphic_rhp (L * delta0) (L * gamma0) hw
   linarith
 
 /-- Theorem 12: Complete fixed-seed correlation bound -> critical-line reduction schema.
-    Given:
-    1. Right-half-plane residue vanishing from |C_tau(K)| <= C_tau(0) (via Laplace transform),
-    2. Functional-equation reflection (if delta < 0, the reflected zero has -delta > 0 with
-       the same multiplicity m0 > 0 and reflected weight norm a_reflected_sq > 0), and
-    3. Strict nonvanishing of F_tau on the open critical strip (a_norm_sq > 0 and a_reflected_sq > 0),
-    any nontrivial zero offset delta = Re(rho) - 1/2 must equal 0. -/
+    Given an explicit residue functional `resSq : ℝ → ℝ → ℝ` satisfying:
+    1. Right-half-plane residue vanishing `∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0`
+       (derived from any uniform bound `|C_tau(K)| <= M < infty` via the Laplace transform),
+    2. Explicit pole-residue assignment for `delta > 0` and functional-equation reflection
+       for `delta < 0`, and
+    3. Strict nonvanishing of `F_tau` on the open critical strip (`a_norm_sq > 0` and `a_reflected_sq > 0`),
+    any nontrivial zero offset `delta = Re(rho) - 1/2` must equal `0`. -/
 theorem fixed_seed_correlation_bound_implies_critical_line_schema
-    (L delta m0 a_norm_sq a_reflected_sq : ℝ)
+    (resSq : ℝ → ℝ → ℝ)
+    (L delta gamma m0 a_norm_sq a_reflected_sq : ℝ)
     (hL : 0 < L)
     (hm : 0 < m0)
     (ha : 0 < a_norm_sq)
     (ha_refl : 0 < a_reflected_sq)
-    (h_holomorphic_rhp : ∀ w_re res_sq : ℝ, 0 < w_re → res_sq = 0) :
+    (h_holomorphic_rhp : ∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0)
+    (h_pole_pos : 0 < delta → resSq (L * delta) (L * gamma) = m0 ^ 2 * a_norm_sq)
+    (h_pole_neg : delta < 0 → resSq (L * (-delta)) (L * gamma) = m0 ^ 2 * a_reflected_sq) :
     delta = 0 := by
   by_contra h_ne
   rcases lt_trichotomy delta 0 with h_neg | h_zero | h_pos
   · have h_pos_refl : 0 < -delta := by linarith
-    exact laplace_resolvent_residue_obstruction_schema L (-delta) m0 a_reflected_sq
-      hL h_pos_refl hm ha_refl h_holomorphic_rhp
+    exact laplace_resolvent_residue_obstruction_schema resSq L (-delta) gamma m0 a_reflected_sq
+      hL h_pos_refl hm ha_refl h_holomorphic_rhp (h_pole_neg h_neg)
   · exact h_ne h_zero
-  · exact laplace_resolvent_residue_obstruction_schema L delta m0 a_norm_sq
-      hL h_pos hm ha h_holomorphic_rhp
+  · exact laplace_resolvent_residue_obstruction_schema resSq L delta gamma m0 a_norm_sq
+      hL h_pos hm ha h_holomorphic_rhp (h_pole_pos h_pos)
+
+/-- Theorem 13: Non-vacuity witness for the right-half-plane residue-vanishing hypothesis.
+    Demonstrates that `∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0` is satisfiable
+    simultaneously with strictly positive spectral residues on the imaginary axis `w_re = 0`. -/
+theorem laplace_holomorphic_rhp_hypothesis_satisfiable :
+    ∃ resSq : ℝ → ℝ → ℝ,
+      (∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0) ∧
+      resSq 0 14 = 1 ∧
+      0 < resSq 0 14 := by
+  refine ⟨fun w_re _ => if 0 < w_re then 0 else 1, ?_, ?_, ?_⟩
+  · intro w_re w_im hw
+    simp [hw]
+  · simp
+  · simp
+
+/-! ### 7. Two-Sided Local Taylor Enclosure and Reflected Prime-Wavelet Reduction -/
+
+/-- The numerator polynomial `N_2(W)` of the second Euler derivative `(D_alpha^2 h_0)(alpha)`
+    in `W = (alpha + alpha^(-1))^2`. -/
+def secondEulerAutocorrelationNumerator (W : ℝ) : ℝ :=
+  -16200 * W ^ 4 + 4819500 * W ^ 3 - 142577820 * W ^ 2 + 1137161025 * W - 2618916300
+
+/-- Theorem 14: At `W = 4` (`alpha = 1`), the second Euler derivative numerator of `h_0`
+    evaluates to `-47216520 < 0`. -/
+theorem second_euler_autocorrelation_at_one :
+    secondEulerAutocorrelationNumerator 4 = -47216520 ∧
+      secondEulerAutocorrelationNumerator 4 < 0 := by
+  unfold secondEulerAutocorrelationNumerator
+  refine ⟨by ring, by norm_num⟩
+
+/-- Theorem 15: Two-sided fourth-order Taylor enclosure for `-C_0 < C_K < C_0` and
+    strict 2x2 Toeplitz Gram positivity `C_0^2 - C_K^2 > 0`.
+    If `C_K` is enclosed by the fourth-order even Taylor expansion
+      `C_0 + (C_2 / 2) * K^2 - (M_4 / 24) * K^4 <= C_K <= C_0 + (C_2 / 2) * K^2 + (M_4 / 24) * K^4`,
+    and `K` satisfies both the upper concavity condition
+      `(C_2 / 2) * K^2 + (M_4 / 24) * K^4 < 0`
+    and the lower absolute-value condition
+      `2 * C_0 + (C_2 / 2) * K^2 - (M_4 / 24) * K^4 > 0`,
+    then `-C_0 < C_K`, `C_K < C_0`, and `0 < gramDetTwoByTwo C_0 C_K`. -/
+theorem taylor_two_sided_abs_correlation_bound
+    (C0 CK C2 M4 K : ℝ)
+    (h_upper_taylor : CK ≤ C0 + (C2 / 2) * K ^ 2 + (M4 / 24) * K ^ 4)
+    (h_lower_taylor : C0 + (C2 / 2) * K ^ 2 - (M4 / 24) * K ^ 4 ≤ CK)
+    (h_concavity : (C2 / 2) * K ^ 2 + (M4 / 24) * K ^ 4 < 0)
+    (h_lower_abs : 0 < 2 * C0 + (C2 / 2) * K ^ 2 - (M4 / 24) * K ^ 4) :
+    -C0 < CK ∧ CK < C0 ∧ 0 < gramDetTwoByTwo C0 CK := by
+  unfold gramDetTwoByTwo
+  have h_lt : CK < C0 := by linarith
+  have h_gt : -C0 < CK := by linarith
+  have h1 : 0 < C0 - CK := by linarith
+  have h2 : 0 < C0 + CK := by linarith
+  have h_prod : 0 < (C0 - CK) * (C0 + CK) := mul_pos h1 h2
+  have h_id : C0 ^ 2 - CK ^ 2 = (C0 - CK) * (C0 + CK) := by ring
+  refine ⟨h_gt, h_lt, ?_⟩
+  linarith
+
+/-- Theorem 16: Reduction of uniform boundedness of the complete correlation
+    `C_K = W_arch - P_fwd - P_refl` to boundedness of its archimedean, forward-prime,
+    and reflected prime-wavelet components. -/
+theorem complete_correlation_bounded_of_reflected_prime_wavelet_bound
+    (W_arch P_fwd P_refl M_arch M_fwd M_refl : ℝ)
+    (h_arch : -M_arch ≤ W_arch ∧ W_arch ≤ M_arch)
+    (h_fwd : -M_fwd ≤ P_fwd ∧ P_fwd ≤ M_fwd)
+    (h_refl : -M_refl ≤ P_refl ∧ P_refl ≤ M_refl) :
+    -(M_arch + M_fwd + M_refl) ≤ W_arch - P_fwd - P_refl ∧
+      W_arch - P_fwd - P_refl ≤ M_arch + M_fwd + M_refl := by
+  rcases h_arch with ⟨ha1, ha2⟩
+  rcases h_fwd with ⟨hf1, hf2⟩
+  rcases h_refl with ⟨hr1, hr2⟩
+  refine ⟨by linarith, by linarith⟩
 
 end RiemannScope

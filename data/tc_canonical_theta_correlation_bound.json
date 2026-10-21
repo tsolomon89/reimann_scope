@@ -1,8 +1,10 @@
 {
   "epic_id": "EPIC-TC-042",
   "task_id": "TASK-TC-042",
+  "repair_task_id": "TASK-TC-042R",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
+  "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -11,7 +13,8 @@
     "TASK-TC-037",
     "TASK-TC-037R",
     "TASK-TC-041",
-    "TASK-TC-041R"
+    "TASK-TC-041R",
+    "TASK-TC-042"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -178,6 +181,26 @@
     }
   },
   "section_6_7_certified_grade_grid_and_controls": {
+    "archimedean_taylor_remainder_repair_audit": {
+      "K": 0.0,
+      "d0": 0.25,
+      "old_series_order": 36,
+      "old_integrated_terms_count": 35,
+      "old_hardcoded_allowance": 1e-24,
+      "exact_omitted_integral_k_ge_35": 2.1892962596660967e-23,
+      "exact_omitted_integral_str": "[2.1892962596660967357775950171027039798282533204387440923506128350e-23 +/- 5.53e-88]",
+      "term_k_35": 1.9835056892425202e-23,
+      "term_k_36": 2.8162282351764904e-24,
+      "lies_in_user_audit_interval_2_064e_23_to_2_212e_23": true,
+      "exceeds_old_allowance_ratio": 21.89296259666097,
+      "repaired_cauchy_bound_at_N_35": 4.12552189820835e-20,
+      "repaired_cauchy_encloses_N_35": true,
+      "new_series_order": 49,
+      "new_integrated_terms_count": 48,
+      "exact_omitted_integral_k_ge_48_abs": 3.0792084304759913e-33,
+      "repaired_cauchy_bound_at_N_48": 4.51653552102497e-28,
+      "repaired_cauchy_encloses_N_48": true
+    },
     "grade_grid_evaluation": {
       "status": "ARITHMETIC_SPECTRAL_ENCLOSURES_INTERSECT_ON_GRID",
       "bound_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
@@ -473,7 +496,7 @@
           "Delta_tau_spectral_lower": 5.055914030487512e-07,
           "Delta_tau_spectral_certified_positive": true,
           "Delta_tau_arithmetic_mid": 5.055228912789755e-07,
-          "Delta_tau_arithmetic_lower": 5.053198817967039e-07,
+          "Delta_tau_arithmetic_lower": 5.053198817964871e-07,
           "Delta_tau_arithmetic_certified_positive": true
         },
         {
@@ -526,27 +549,61 @@
     },
     "local_concavity_and_derivatives": {
       "status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
-      "C_tau_0_mid": 0.0009504798117909661,
+      "C_tau_0_mid": 0.0009504809437657209,
+      "C_tau_0_arithmetic_str": "[0.00095048 +/- 4.10e-9]",
+      "C_tau_0_spectral_str": "[0.000950479811790966114507768125533378083494989409033558 +/- 5.33e-55]",
       "C_tau_prime_0_exact": 0.0,
-      "C_tau_double_prime_0_mid": -0.6417401924429905,
-      "C_tau_double_prime_0_upper": -0.6417401924429905,
+      "C_tau_double_prime_0_mid": -0.6417402351608936,
+      "C_tau_double_prime_0_upper": -0.6417400835741756,
+      "C_tau_double_prime_0_arithmetic_str": "[-0.641740 +/- 3.87e-7]",
+      "C_tau_double_prime_0_spectral_str": "[-0.6417401924429905426112921634319108036319473141918 +/- 2.45e-50]",
       "C_tau_double_prime_0_certified_negative": true,
       "C_tau_triple_prime_0_exact": 0.0,
-      "C_tau_fourth_deriv_0_mid": 433.5413095774419,
-      "C_tau_fourth_deriv_0_upper": 433.5413095774419,
+      "C_tau_fourth_deriv_0_mid": 433.5413086756161,
+      "C_tau_fourth_deriv_0_upper": 433.54131152021847,
+      "C_tau_fourth_deriv_0_arithmetic_str": "[433.54131 +/- 4.17e-6]",
+      "C_tau_fourth_deriv_0_spectral_str": "[433.541309577441872130102413277701665696050733055 +/- 9.76e-46]",
+      "arithmetic_spectral_derivative_enclosures_intersect_at_0": true,
+      "computed_spectral_derivative_tail_bounds_T_100": {
+        "order_0_tail_upper": 3.788124925391993e-55,
+        "order_2_tail_upper": 1.2795818376818003e-50,
+        "order_4_tail_on_K_le_0_14_upper": 4.9156893795841845e-46,
+        "unconditional_delta_max_used": 0.5
+      },
       "arithmetic_second_derivative_decomposition": {
-        "prime_power_second_deriv_at_0": -0.3841453359571884,
-        "archimedean_plus_local_second_deriv_at_0": -0.2575948564858021,
+        "prime_power_second_deriv_at_0": -0.384144309850836,
+        "archimedean_plus_local_second_deriv_at_0": -0.2575959253100577,
         "local_constant_second_deriv_at_0": 167.14620409790257,
-        "archimedean_integral_second_deriv_at_0": -167.40379895438838,
+        "archimedean_integral_second_deriv_at_0": -167.40380002321263,
         "both_prime_and_completed_archimedean_concave_at_zero": true
       },
-      "certified_local_concavity_radius_K_loc": 0.13327693620953415,
-      "taylor_concavity_inequality": "C_tau(0) - C_tau(K) >= (-C_tau''(0)/2) K^2 - (M_4/24) K^4 > 0 for all 0 < |K| <= 0.133277"
+      "zero_free_arithmetic_local_enclosure": {
+        "uses_spectral_zero_inputs": false,
+        "sixth_derivative_global_bound_M6_arith": 27971954.786589753,
+        "K_positivity_radius_C_gt_0": 0.045775696145800286,
+        "K_upper_concavity_radius_C_lt_C0": 0.051485789116493534,
+        "K_lower_abs_radius_C_gt_neg_C0": 0.05514312281450686,
+        "K_two_sided_abs_bound_radius_abs_C_lt_C0": 0.051485789116493534
+      },
+      "unconditional_spectral_tail_local_enclosure": {
+        "uses_certified_turing_zeros_up_to_100": true,
+        "accounts_for_off_critical_zeros_above_100": true,
+        "fourth_derivative_sup_bound_M4_spec_on_0_14": 433.5413095774419,
+        "K_positivity_radius_C_gt_0": 0.05085052472641449,
+        "K_upper_concavity_radius_C_lt_C0": 0.13327693620953415,
+        "K_lower_abs_radius_C_gt_neg_C0": 0.06846475543527798,
+        "K_two_sided_abs_bound_radius_abs_C_lt_C0": 0.06846475543527798
+      },
+      "certified_local_concavity_radius_K_loc": 0.051485789116493534,
+      "certified_two_sided_abs_bound_radius_zero_free": 0.051485789116493534,
+      "certified_two_sided_abs_bound_radius_spectral": 0.06846475543527798,
+      "certified_upper_concavity_radius_spectral": 0.13327693620953415,
+      "taylor_concavity_inequality": "Zero-free 6th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.051486 (and C_tau(K) > 0 on |K| <= 0.045776); unconditional spectral-tail 4th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.068465 (C_tau(K) > 0 on |K| <= 0.050851, and C_tau(K) < C_tau(0) on 0 < |K| <= 0.133277)."
     },
     "finite_toeplitz_gram_matrices": {
       "rational_gram_matrix": {
         "grid_name": "rational_6_point_grid",
+        "evaluation_route": "spectral",
         "grades": [
           0.0,
           0.125,
@@ -556,6 +613,78 @@
           2.0
         ],
         "dimension": 6,
+        "leading_principal_minors_arb_mat": [
+          {
+            "order": 1,
+            "det_str": "[0.000950479811790966114507768125533378083494989409033558 +/- 5.33e-55]",
+            "det_mid": 0.0009504798117909661,
+            "det_rad": 3.788124932420489e-55,
+            "det_lower": 0.0009504798117909661,
+            "det_upper": 0.0009504798117909661,
+            "certified_positive": true
+          },
+          {
+            "order": 2,
+            "det_str": "[1.083624246942260690860718826796334922605748648676e-8 +/- 6.33e-57]",
+            "det_mid": 1.0836242469422607e-08,
+            "det_rad": 1.5230101962341754e-57,
+            "det_lower": 1.0836242469422607e-08,
+            "det_upper": 1.0836242469422607e-08,
+            "certified_positive": true
+          },
+          {
+            "order": 3,
+            "det_str": "[1.947646742961152531265944200439472020256119113e-14 +/- 6.33e-60]",
+            "det_mid": 1.9476467429611527e-14,
+            "det_rad": 4.4760921262146547e-60,
+            "det_lower": 1.9476467429611527e-14,
+            "det_upper": 1.9476467429611527e-14,
+            "certified_positive": true
+          },
+          {
+            "order": 4,
+            "det_str": "[1.0520735790095667496336138674385227729312288375e-19 +/- 6.48e-66]",
+            "det_mid": 1.0520735790095668e-19,
+            "det_rad": 2.3953289794741473e-66,
+            "det_lower": 1.0520735790095668e-19,
+            "det_upper": 1.0520735790095668e-19,
+            "certified_positive": true
+          },
+          {
+            "order": 5,
+            "det_str": "[2.3403859953246831599483303795470677380863433e-27 +/- 7.14e-71]",
+            "det_mid": 2.340385995324683e-27,
+            "det_rad": 3.2899600429027513e-71,
+            "det_lower": 2.340385995324683e-27,
+            "det_upper": 2.340385995324683e-27,
+            "certified_positive": true
+          },
+          {
+            "order": 6,
+            "det_str": "[1.528301390140581905408442058517396301031004e-35 +/- 4.50e-78]",
+            "det_mid": 1.528301390140582e-35,
+            "det_rad": 3.109120384485562e-78,
+            "det_lower": 1.528301390140582e-35,
+            "det_upper": 1.528301390140582e-35,
+            "certified_positive": true
+          }
+        ],
+        "positive_definite_certified_by_sylvester_arb_mat": true,
+        "positive_definite": true,
+        "determinant_mid": 1.528301390140582e-35,
+        "determinant_lower": 1.528301390140582e-35,
+        "determinant_str": "[1.528301390140581905408442058517396301031004e-35 +/- 4.50e-78]",
+        "determinant": 1.528301390140582e-35,
+        "min_off_diagonal_2x2_minor_det_lower": 1.0836242469422607e-08,
+        "min_off_diagonal_2x2_minor_det": 1.0836242469422607e-08,
+        "diagnostic_floating_point_eigenvalues": [
+          1.4290972475774662e-09,
+          5.169329034049927e-09,
+          3.3307077340640466e-07,
+          1.0821508062558387e-06,
+          0.0013057498296158239,
+          0.004395707221124028
+        ],
         "eigenvalues": [
           1.4290972475774662e-09,
           5.169329034049927e-09,
@@ -565,13 +694,11 @@
           0.004395707221124028
         ],
         "min_eigenvalue": 1.4290972475774662e-09,
-        "max_eigenvalue": 0.004395707221124028,
-        "determinant": 1.5283013901291972e-35,
-        "positive_definite": true,
-        "min_off_diagonal_2x2_minor_det": 1.083624246942272e-08
+        "max_eigenvalue": 0.004395707221124028
       },
       "algebraic_gram_matrix": {
         "grid_name": "algebraic_5_point_grid",
+        "evaluation_route": "spectral",
         "grades": [
           -1.4142135623730951,
           -0.5,
@@ -580,21 +707,139 @@
           1.4142135623730951
         ],
         "dimension": 5,
-        "eigenvalues": [
-          1.0042214182422114e-09,
-          4.080725302583331e-09,
-          4.823200817984088e-07,
-          0.0015970819162930434,
-          0.003154829737633268
+        "leading_principal_minors_arb_mat": [
+          {
+            "order": 1,
+            "det_str": "[0.000950479811790966114507768125533378083494989409033558 +/- 5.33e-55]",
+            "det_mid": 0.0009504798117909661,
+            "det_rad": 3.788124932420489e-55,
+            "det_lower": 0.0009504798117909661,
+            "det_upper": 0.0009504798117909661,
+            "certified_positive": true
+          },
+          {
+            "order": 2,
+            "det_str": "[8.7217771506864301737532456262867785685304366355403e-7 +/- 1.72e-57]",
+            "det_mid": 8.721777150686431e-07,
+            "det_rad": 1.0302935669321811e-57,
+            "det_lower": 8.721777150686431e-07,
+            "det_upper": 8.721777150686431e-07,
+            "certified_positive": true
+          },
+          {
+            "order": 3,
+            "det_str": "[5.733689753340201047401535485739632863593192250e-14 +/- 7.65e-60]",
+            "det_mid": 5.733689753340202e-14,
+            "det_rad": 4.234670677746786e-60,
+            "det_lower": 5.733689753340202e-14,
+            "det_upper": 5.733689753340202e-14,
+            "certified_positive": true
+          },
+          {
+            "order": 4,
+            "det_str": "[1.00140169916825703619980941071105312911119587e-21 +/- 6.96e-66]",
+            "det_mid": 1.001401699168257e-21,
+            "det_rad": 2.3381520540761524e-66,
+            "det_lower": 1.001401699168257e-21,
+            "det_upper": 1.001401699168257e-21,
+            "certified_positive": true
+          },
+          {
+            "order": 5,
+            "det_str": "[9.958760854560588554235080343268338020550179e-30 +/- 6.09e-73]",
+            "det_mid": 9.958760854560589e-30,
+            "det_rad": 2.6600471607487654e-73,
+            "det_lower": 9.958760854560589e-30,
+            "det_upper": 9.958760854560589e-30,
+            "certified_positive": true
+          }
         ],
-        "min_eigenvalue": 1.0042214182422114e-09,
-        "max_eigenvalue": 0.003154829737633268,
-        "determinant": 9.95876084926252e-30,
+        "positive_definite_certified_by_sylvester_arb_mat": true,
         "positive_definite": true,
-        "min_off_diagonal_2x2_minor_det": 1.519632292296733e-07
+        "determinant_mid": 9.958760854560589e-30,
+        "determinant_lower": 9.958760854560589e-30,
+        "determinant_str": "[9.958760854560588554235080343268338020550179e-30 +/- 6.09e-73]",
+        "determinant": 9.958760854560589e-30,
+        "min_off_diagonal_2x2_minor_det_lower": 1.519632292296732e-07,
+        "min_off_diagonal_2x2_minor_det": 1.519632292296732e-07,
+        "diagnostic_floating_point_eigenvalues": [
+          1.0042214187330079e-09,
+          4.0807253025853766e-09,
+          4.823200817965926e-07,
+          0.0015970819162930477,
+          0.003154829737633265
+        ],
+        "eigenvalues": [
+          1.0042214187330079e-09,
+          4.0807253025853766e-09,
+          4.823200817965926e-07,
+          0.0015970819162930477,
+          0.003154829737633265
+        ],
+        "min_eigenvalue": 1.0042214187330079e-09,
+        "max_eigenvalue": 0.003154829737633265
+      },
+      "zero_free_arithmetic_3_point_gram_matrix": {
+        "grid_name": "zero_free_arithmetic_3_point_grid",
+        "evaluation_route": "arithmetic",
+        "grades": [
+          0.0,
+          0.25,
+          0.5
+        ],
+        "dimension": 3,
+        "leading_principal_minors_arb_mat": [
+          {
+            "order": 1,
+            "det_str": "[0.00095048 +/- 4.10e-9]",
+            "det_mid": 0.0009504809437657209,
+            "det_rad": 3.155446137020901e-09,
+            "det_lower": 0.0009504777883195839,
+            "det_upper": 0.0009504840992118579,
+            "certified_positive": true
+          },
+          {
+            "order": 2,
+            "det_str": "[4.11e-8 +/- 3.24e-11]",
+            "det_mid": 4.10838533930253e-08,
+            "det_rad": 1.6169337082368868e-11,
+            "det_lower": 4.106768405594293e-08,
+            "det_upper": 4.110002273010767e-08,
+            "certified_positive": true
+          },
+          {
+            "order": 3,
+            "det_str": "[2e-13 +/- 9.17e-14]",
+            "det_mid": 2.2528135641816843e-13,
+            "det_rad": 6.641713209632269e-14,
+            "det_lower": 1.5886422432184575e-13,
+            "det_upper": 2.916984885144911e-13,
+            "certified_positive": true
+          }
+        ],
+        "positive_definite_certified_by_sylvester_arb_mat": true,
+        "positive_definite": true,
+        "determinant_mid": 2.2528135641816843e-13,
+        "determinant_lower": 1.5886422432184575e-13,
+        "determinant_str": "[2e-13 +/- 9.17e-14]",
+        "determinant": 2.2528135641816843e-13,
+        "min_off_diagonal_2x2_minor_det_lower": 4.106768405597004e-08,
+        "min_off_diagonal_2x2_minor_det": 4.106768405597004e-08,
+        "diagnostic_floating_point_eigenvalues": [
+          9.737790802731514e-07,
+          8.36138816080827e-05,
+          0.002766855170608807
+        ],
+        "eigenvalues": [
+          9.737790802731514e-07,
+          8.36138816080827e-05,
+          0.002766855170608807
+        ],
+        "min_eigenvalue": 9.737790802731514e-07,
+        "max_eigenvalue": 0.002766855170608807
       },
       "all_gram_matrices_positive_definite": true,
-      "comparison_2x2_vs_NxN": "The 2x2 Toeplitz minor condition C_tau(0) >= 0 and Delta_tau(K) = C_tau(0)^2 - |C_tau(K)|^2 >= 0 is already sufficient to imply RH via the Laplace resolvent of C_tau(-t), and under RH all N x N Toeplitz Gram matrices [C_tau(K_i - K_j)] are strictly positive-definite by Bochner's theorem."
+      "comparison_2x2_vs_NxN": "Positive-definiteness of the N x N Toeplitz Gram matrices is certified via outward-rounded leading principal minor determinants (`flint.arb_mat.det()`, Sylvester's criterion) on the full Arb enclosures. Moreover, even a finite uniform bound |C_tau(K)| <= M < infty suffices to make the Laplace transform holomorphic on Re(w) > 0 and imply RH."
     },
     "synthetic_off_critical_quartet_controls": {
       "synthetic_quartets": [
@@ -784,11 +1029,14 @@
     },
     "attempt_2_local_concavity_and_archimedean_dominance": {
       "status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
-      "certified_local_concavity_radius_K_loc": 0.13327693620953415,
-      "C_tau_double_prime_0": -0.6417401924429905,
-      "archimedean_plus_local_second_deriv_at_0": -0.2575948564858021,
-      "prime_power_second_deriv_at_0": -0.3841453359571884,
-      "conclusion": "At K = 0, BOTH the completed archimedean sector (-0.257595 < 0, arising from -167.403799 archimedean integral curvature + 167.146204 local constant curvature) AND the prime-power sector (-0.384145 < 0) are strictly concave, reinforcing each other to give C_tau''(0) = -0.641740 < 0 and an unconditional proof that |C_tau(K)| < C_tau(0) for all 0 < |K| <= 0.133277."
+      "certified_local_concavity_radius_K_loc": 0.051485789116493534,
+      "certified_two_sided_abs_bound_radius_zero_free": 0.051485789116493534,
+      "certified_two_sided_abs_bound_radius_spectral": 0.06846475543527798,
+      "certified_upper_concavity_radius_spectral": 0.13327693620953415,
+      "C_tau_double_prime_0": -0.6417402351608936,
+      "archimedean_plus_local_second_deriv_at_0": -0.2575959253100577,
+      "prime_power_second_deriv_at_0": -0.384144309850836,
+      "conclusion": "At K = 0, BOTH the completed archimedean sector (-0.257595 < 0, arising from -167.403799 archimedean integral curvature + 167.146204 local constant curvature) AND the prime-power sector (-0.384145 < 0) are strictly concave, reinforcing each other to give C_tau''(0) = -0.641740 < 0. The 100% zero-free arithmetic 6th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.051486 (and C_tau(K) > 0 on |K| <= 0.045776), while the unconditional spectral-tail 4th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.068465 and C_tau(K) < C_tau(0) on 0 < |K| <= 0.133277."
     },
     "attempt_3_large_grade_wavelet_decomposition": {
       "status": "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN",
@@ -833,13 +1081,126 @@
           "total_C_tau_K": -0.08122014608828176
         }
       ],
-      "why_large_K_is_not_trivially_suppressed": "While the forward prime sum P_fwd(K) and archimedean term W_arch(h_K) decay exponentially in K > 0, the reflected prime sum P_refl(K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/tau^K) sweeps its peak alpha = n/tau^K = 1 across all primes n ~ tau^K as K -> +infty. Bounding |P_refl(K)| <= C_tau(0) as K -> +infty is directly equivalent to bounding the zero-mean wavelet coefficients of (psi(x) - x)/sqrt(x) across all scales x = tau^K."
+      "uniform_prime_wavelet_boundedness": {
+        "subgate_id": "SUBGATE-TC-042B",
+        "subgate_name": "UNIFORM_REFLECTED_PRIME_WAVELET_BOUNDEDNESS_SUBGATE",
+        "status": "OPEN",
+        "simplified_target_statement": "exists M < infty forall X >= 1 : |W_wavelet(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M",
+        "equivalence_to_complete_correlation_boundedness": {
+          "forward_prime_global_bound_M_fwd": 0.6330390930175781,
+          "archimedean_global_bound_M_arch": 6.495921922845142,
+          "lean_theorem": "complete_correlation_bounded_of_reflected_prime_wavelet_bound",
+          "laplace_sufficiency": "Any uniform bound |W_wavelet(X)| <= M < infty implies |C_tau(K)| <= M_arch + M_fwd + M < infty for all K in R, which bounds the Laplace transform |L[C_tau(-t)](w)| <= M_total / Re(w) on Re(w) > 0, preventing right-half-plane poles and implying the Riemann Hypothesis."
+        },
+        "stieltjes_chebyshev_error_representation": {
+          "pnt_main_term_moment_H0_at_half_contains_zero": true,
+          "pnt_main_term_moment_abs_upper": 7.993816977127691e-16,
+          "derivative_wavelet_kernel_formula": "tilde{h}_0(alpha) = (1/2) h_0(alpha) - (D_alpha h_0)(alpha), D_alpha = alpha d/d_alpha",
+          "exact_stieltjes_identity": "W_wavelet(X) = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx + X^{-1/2} int_1^infty (E_psi(x)/x) tilde{h}_0(x/X) dx/x^{1/2},  E_psi(x) = psi(x) - x",
+          "unconditional_bounds_comparison": {
+            "chebyshev_bound_psi_le_Cx": "O(X^{1/2}) (ignores sign changes of h_0)",
+            "de_la_vallee_poussin_pnt_bound": "O(X^{1/2} exp(-c sqrt(log X))) (cancels main term x via H_0(1/2) = 0, but triangle inequality inside the integral loses oscillatory cancellation of E_psi)",
+            "uniform_O_1_target": "O(1) for all X >= 1 (requires bounding the wavelet pairing of E_psi(x)/sqrt(x) against tilde{h}_0(x/X) without taking absolute values inside the integral)"
+          }
+        },
+        "certified_scale_evaluations_X_1_to_1000": [
+          {
+            "scale_label": "1",
+            "X_float": 1.0,
+            "W_wavelet_mid": -0.057307481198189764,
+            "W_wavelet_rad": 1.577723066775727e-09,
+            "W_wavelet_abs_upper": 0.057307482775912834,
+            "unconditional_chebyshev_bound_O_sqrt_X": 1.95,
+            "cancellation_ratio_vs_chebyshev": 0.029388452705596327
+          },
+          {
+            "scale_label": "2",
+            "X_float": 2.0,
+            "W_wavelet_mid": 0.07937185481408209,
+            "W_wavelet_rad": 8.924949446154073e-09,
+            "W_wavelet_abs_upper": 0.07937186373903153,
+            "unconditional_chebyshev_bound_O_sqrt_X": 2.7577164466275352,
+            "cancellation_ratio_vs_chebyshev": 0.028781734915530172
+          },
+          {
+            "scale_label": "pi",
+            "X_float": 3.141592653589793,
+            "W_wavelet_mid": 0.025571615385218634,
+            "W_wavelet_rad": 2.7599769608643854e-08,
+            "W_wavelet_abs_upper": 0.025571642984988242,
+            "unconditional_chebyshev_bound_O_sqrt_X": 3.4562850092657564,
+            "cancellation_ratio_vs_chebyshev": 0.007398592105811497
+          },
+          {
+            "scale_label": "tau=2*pi",
+            "X_float": 6.283185307179586,
+            "W_wavelet_mid": -0.012081947061365263,
+            "W_wavelet_rad": 1.5612787418461949e-07,
+            "W_wavelet_abs_upper": 0.012082103189239447,
+            "unconditional_chebyshev_bound_O_sqrt_X": 4.887925135530451,
+            "cancellation_ratio_vs_chebyshev": 0.0024718265632618502
+          },
+          {
+            "scale_label": "10",
+            "X_float": 10.0,
+            "W_wavelet_mid": -0.0024166363290393836,
+            "W_wavelet_rad": 4.989198414406815e-07,
+            "W_wavelet_abs_upper": 0.0024171352488808243,
+            "unconditional_chebyshev_bound_O_sqrt_X": 6.16644143732834,
+            "cancellation_ratio_vs_chebyshev": 0.0003919821948277624
+          },
+          {
+            "scale_label": "tau^2",
+            "X_float": 39.47841760435743,
+            "W_wavelet_mid": 0.00029881461917077607,
+            "W_wavelet_rad": 1.545005812886302e-05,
+            "W_wavelet_abs_upper": 0.0003142646772996391,
+            "unconditional_chebyshev_bound_O_sqrt_X": 12.252211349000193,
+            "cancellation_ratio_vs_chebyshev": 2.5649629144316364e-05
+          },
+          {
+            "scale_label": "100",
+            "X_float": 100.0,
+            "W_wavelet_mid": 0.0005803633806617861,
+            "W_wavelet_rad": 0.00015777230692037847,
+            "W_wavelet_abs_upper": 0.0007381356875821646,
+            "unconditional_chebyshev_bound_O_sqrt_X": 19.5,
+            "cancellation_ratio_vs_chebyshev": 3.785311218370075e-05
+          },
+          {
+            "scale_label": "tau^3",
+            "X_float": 248.05021344239856,
+            "W_wavelet_mid": 0.00023275738671172134,
+            "W_wavelet_rad": 0.0015289024886442348,
+            "W_wavelet_abs_upper": 0.0017616598753559562,
+            "unconditional_chebyshev_bound_O_sqrt_X": 30.71173939415872,
+            "cancellation_ratio_vs_chebyshev": 5.7361123469646876e-05
+          },
+          {
+            "scale_label": "1000",
+            "X_float": 1000.0,
+            "W_wavelet_mid": -0.019304656793263514,
+            "W_wavelet_rad": 0.049891984032001346,
+            "W_wavelet_abs_upper": 0.06919664082526486,
+            "unconditional_chebyshev_bound_O_sqrt_X": 61.6644143732834,
+            "cancellation_ratio_vs_chebyshev": 0.0011221486740534887
+          }
+        ],
+        "max_certified_abs_W_wavelet_on_1_to_1000": 0.07937186373903153
+      },
+      "why_large_K_is_not_trivially_suppressed": "While the forward prime sum P_fwd(K) and archimedean term W_arch(h_K) decay exponentially in K > 0, the reflected prime sum P_refl(K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/tau^K) sweeps its peak alpha = n/tau^K = 1 across all primes n ~ tau^K as K -> +infty. Because ANY finite uniform bound |C_tau(K)| <= M < infty suffices for right-half-plane Laplace holomorphy, the problem reduces to uniform boundedness of W_wavelet(X) for X >= 1."
     },
     "exact_remaining_subgate": {
       "subgate_id": "SUBGATE-TC-042A",
       "subgate_name": "CANONICAL_THETA_WAVELET_PRIME_BOUND_SUBGATE",
       "status": "OPEN",
-      "exact_statement": "Prove without invoking RH or Weil positivity that for every K in Qbar intersect R, |W_arch(h_K) - sum_{n>=2} (Lambda(n)/sqrt(n)) [h_0(tau^K n) + h_0(tau^{-K} n)]| <= C_tau(0), where h_0(alpha) = (-648 W^3 + 58380 W^2 - 706860 W + 2027025) / (512 (alpha + 1/alpha)^{17/2}) with W = (alpha + 1/alpha)^2."
+      "exact_statement": "Prove without invoking RH or Weil positivity that for every K in Qbar intersect R, |W_arch(h_K) - sum_{n>=2} (Lambda(n)/sqrt(n)) [h_0(tau^K n) + h_0(tau^{-K} n)]| <= C_tau(0), or establish the simplified uniform prime-wavelet bound (SUBGATE-TC-042B): exists M < infty forall X >= 1 : |sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)| <= M.",
+      "simplified_wavelet_subgate": {
+        "subgate_id": "SUBGATE-TC-042B",
+        "subgate_name": "UNIFORM_REFLECTED_PRIME_WAVELET_BOUNDEDNESS_SUBGATE",
+        "status": "OPEN",
+        "exact_statement": "exists M < infty forall X >= 1 : |W_wavelet(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M"
+      }
     }
   },
   "section_10_lean_formalization_audit": {
@@ -857,7 +1218,8 @@
       "defectiveMellinPochhammerSum",
       "autocorrelationSymmetricNumerator",
       "conjugatePairCorrelationTerm",
-      "gramDetTwoByTwo"
+      "gramDetTwoByTwo",
+      "secondEulerAutocorrelationNumerator"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -868,7 +1230,8 @@
       "defectiveMellinPochhammerSum",
       "autocorrelationSymmetricNumerator",
       "conjugatePairCorrelationTerm",
-      "gramDetTwoByTwo"
+      "gramDetTwoByTwo",
+      "secondEulerAutocorrelationNumerator"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -882,7 +1245,11 @@
       "two_by_two_gram_determinant_equivalence",
       "gaussian_width_and_grade_base_scaling_identity",
       "laplace_resolvent_residue_obstruction_schema",
-      "fixed_seed_correlation_bound_implies_critical_line_schema"
+      "fixed_seed_correlation_bound_implies_critical_line_schema",
+      "laplace_holomorphic_rhp_hypothesis_satisfiable",
+      "second_euler_autocorrelation_at_one",
+      "taylor_two_sided_abs_correlation_bound",
+      "complete_correlation_bounded_of_reflected_prime_wavelet_bound"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -896,7 +1263,11 @@
       "two_by_two_gram_determinant_equivalence",
       "gaussian_width_and_grade_base_scaling_identity",
       "laplace_resolvent_residue_obstruction_schema",
-      "fixed_seed_correlation_bound_implies_critical_line_schema"
+      "fixed_seed_correlation_bound_implies_critical_line_schema",
+      "laplace_holomorphic_rhp_hypothesis_satisfiable",
+      "second_euler_autocorrelation_at_one",
+      "taylor_two_sided_abs_correlation_bound",
+      "complete_correlation_bounded_of_reflected_prime_wavelet_bound"
     ]
   },
   "literature_references": [

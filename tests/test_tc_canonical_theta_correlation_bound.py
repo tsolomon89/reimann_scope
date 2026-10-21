@@ -292,7 +292,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 9 defs, 12 theorems, and 0 sorry/admit."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 10 defs, 16 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,5 +300,108 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 9
-    assert len(ver["actual_theorems"]) == 12
+    assert len(ver["actual_defs"]) == 10
+    assert len(ver["actual_theorems"]) == 16
+
+    lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
+    # Ensure the vacuous universal quantification over res_sq is absent
+    assert "∀ w_re res_sq : ℝ, 0 < w_re → res_sq = 0" not in lean_text
+    assert "∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0" in lean_text
+    assert "laplace_holomorphic_rhp_hypothesis_satisfiable" in lean_text
+
+
+def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
+    """Verify reproduction of the 2.189e-23 Taylor remainder at series_order=36 and its Cauchy circle repair + analytic=True branch checking."""
+    from tc.canonical_theta_correlation_bound import (
+        evaluate_h0_acb,
+        reproduce_tc042_archimedean_taylor_remainder_defect,
+    )
+
+    rep = reproduce_tc042_archimedean_taylor_remainder_defect()
+    assert rep["old_series_order"] == 36
+    assert rep["old_integrated_terms_count"] == 35
+    assert rep["lies_in_user_audit_interval_2_064e_23_to_2_212e_23"] is True
+    assert rep["exceeds_old_allowance_ratio"] > 20.0
+    assert rep["repaired_cauchy_encloses_N_35"] is True
+    assert rep["new_series_order"] == 49
+    assert rep["new_integrated_terms_count"] == 48
+    assert rep["repaired_cauchy_encloses_N_48"] is True
+    assert rep["repaired_cauchy_bound_at_N_48"] < 1e-26
+
+    # Verify branch-cut sensitivity when analytic=True at u = i * pi / 2 (where e^u + e^{-u} = 0)
+    u_branch = acb(arb(0), arb.pi() / arb(2))
+    val_analytic = evaluate_h0_acb(u_branch.exp(), analytic=True)
+    assert not val_analytic.is_finite()
+
+
+def test_14_two_sided_local_theorem_zero_free_and_unconditional_spectral(artifact_payload):
+    """Verify zero-free arithmetic vs unconditional spectral-tail two-sided local Taylor bounds and computed derivative tails."""
+    conc = artifact_payload["section_6_7_certified_grade_grid_and_controls"][
+        "local_concavity_and_derivatives"
+    ]
+    assert conc["arithmetic_spectral_derivative_enclosures_intersect_at_0"] is True
+
+    tails = conc["computed_spectral_derivative_tail_bounds_T_100"]
+    assert tails["unconditional_delta_max_used"] == 0.5
+    assert 0.0 < tails["order_0_tail_upper"] < 1e-53
+    assert 0.0 < tails["order_2_tail_upper"] < 1e-48
+    assert 0.0 < tails["order_4_tail_on_K_le_0_14_upper"] < 1e-42
+
+    zf = conc["zero_free_arithmetic_local_enclosure"]
+    assert zf["uses_spectral_zero_inputs"] is False
+    assert zf["K_positivity_radius_C_gt_0"] > 0.045
+    assert zf["K_two_sided_abs_bound_radius_abs_C_lt_C0"] > 0.050
+
+    sp = conc["unconditional_spectral_tail_local_enclosure"]
+    assert sp["uses_certified_turing_zeros_up_to_100"] is True
+    assert sp["accounts_for_off_critical_zeros_above_100"] is True
+    assert 0.050 < sp["K_positivity_radius_C_gt_0"] < 0.052
+    assert 0.068 < sp["K_two_sided_abs_bound_radius_abs_C_lt_C0"] < 0.069
+    assert 0.133 < sp["K_upper_concavity_radius_C_lt_C0"] < 0.134
+
+
+def test_15_outward_rounded_arb_mat_sylvester_gram_minors(artifact_payload):
+    """Verify outward-rounded flint.arb_mat.det() leading principal minors certify Sylvester positive-definiteness."""
+    gram = artifact_payload["section_6_7_certified_grade_grid_and_controls"][
+        "finite_toeplitz_gram_matrices"
+    ]
+    assert gram["all_gram_matrices_positive_definite"] is True
+    for key, expected_dim in (
+        ("rational_gram_matrix", 6),
+        ("algebraic_gram_matrix", 5),
+        ("zero_free_arithmetic_3_point_gram_matrix", 3),
+    ):
+        mat_info = gram[key]
+        assert mat_info["dimension"] == expected_dim
+        assert mat_info["positive_definite_certified_by_sylvester_arb_mat"] is True
+        minors = mat_info["leading_principal_minors_arb_mat"]
+        assert len(minors) == expected_dim
+        for m_idx, minor in enumerate(minors, start=1):
+            assert minor["order"] == m_idx
+            assert minor["certified_positive"] is True
+            assert minor["det_lower"] > 0.0
+
+
+def test_16_uniform_prime_wavelet_boundedness_subgate_tc042b(artifact_payload):
+    """Verify SUBGATE-TC-042B reduction, PNT main-term moment vanishing H_0(1/2) = 0, and certified scale evaluations."""
+    from tc.canonical_theta_correlation_bound import (
+        SUBGATE_TC_042B_ID,
+        SUBGATE_TC_042B_STATUS,
+        TASK_TC_042R_ID,
+    )
+
+    assert artifact_payload["repair_task_id"] == TASK_TC_042R_ID
+    att3 = artifact_payload[
+        "section_9_arithmetic_proof_attempts_and_remaining_subgate"
+    ]["attempt_3_large_grade_wavelet_decomposition"]
+    wv = att3["uniform_prime_wavelet_boundedness"]
+    assert wv["subgate_id"] == SUBGATE_TC_042B_ID
+    assert wv["status"] == SUBGATE_TC_042B_STATUS
+    eq = wv["equivalence_to_complete_correlation_boundedness"]
+    assert 0.0 < eq["forward_prime_global_bound_M_fwd"] < 0.65
+    assert 0.0 < eq["archimedean_global_bound_M_arch"] < 6.6
+    st = wv["stieltjes_chebyshev_error_representation"]
+    assert st["pnt_main_term_moment_H0_at_half_contains_zero"] is True
+    assert st["pnt_main_term_moment_abs_upper"] < 1e-13
+    assert len(wv["certified_scale_evaluations_X_1_to_1000"]) == 9
+    assert wv["max_certified_abs_W_wavelet_on_1_to_1000"] < 0.15
