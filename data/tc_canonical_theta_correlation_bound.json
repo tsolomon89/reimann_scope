@@ -2,9 +2,11 @@
   "epic_id": "EPIC-TC-042",
   "task_id": "TASK-TC-042",
   "repair_task_id": "TASK-TC-042R",
+  "sprint_task_id": "TASK-TC-042R2",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
+  "sprint_starting_head": "62526298587db990b11fc0c191c2969652936c01",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -14,12 +16,15 @@
     "TASK-TC-037R",
     "TASK-TC-041",
     "TASK-TC-041R",
-    "TASK-TC-042"
+    "TASK-TC-042",
+    "TASK-TC-042R"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
     "seed_defect_repair_status": "SEED_DEFECT_REPRODUCED_AND_REPAIRED",
     "autocorrelation_closed_form_status": "CLOSED_FORM_AUTOCORRELATION_PROVED",
+    "bernstein_kernel_envelopes_status": "BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED",
+    "stieltjes_multiscale_reduction_status": "STIELTJES_IDENTITY_REPAIRED_AND_CERTIFIED",
     "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
     "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
     "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
@@ -110,8 +115,9 @@
   "section_3_closed_form_autocorrelation_and_spectral_expansion": {
     "status": "CLOSED_FORM_AUTOCORRELATION_PROVED",
     "shift_identity": "h_K(x) = ((T_K psi_tau) * psi_tau^*)(x) = h_0(tau^K x)",
-    "symmetric_variable_W": "W(alpha) = (alpha + alpha^(-1))^2 >= 4, alpha = tau^K x",
-    "closed_form_h0_formula": "h_0(alpha) = (-648 W^3 + 58380 W^2 - 706860 W + 2027025) / (512 (alpha + alpha^(-1))^(17/2))",
+    "symmetric_variable_W_alpha": "W_alpha = (alpha + alpha^(-1))^2 >= 4, alpha = tau^K x",
+    "symmetric_variable_W": "W_alpha = (alpha + alpha^(-1))^2 >= 4, alpha = tau^K x (distinct from prime wavelet sum W(X))",
+    "closed_form_h0_formula": "h_0(alpha) = (-648 W_alpha^3 + 58380 W_alpha^2 - 706860 W_alpha + 2027025) / (512 (alpha + alpha^(-1))^(17/2))",
     "euler_differential_operator_representation": "h_0(alpha) = (1/512) ((alpha d/d_alpha)^2 - 1/4)^4 ((alpha + alpha^(-1))^(-1/2))",
     "palindromic_polynomial_verified": true,
     "symmetric_W_numerator_verified": true,
@@ -120,7 +126,773 @@
     "h0_at_1_float": 0.4973624838099012,
     "inversion_symmetry_h0_inv_eq_h0": true,
     "global_envelope_bound": "|h_0(alpha)| <= (92193 / 32768) (alpha + alpha^(-1))^(-5/2) for all alpha > 0",
-    "monotone_negative_tail_bound": "For alpha >= 9 (W >= 82.81 > 80), -(81/64) alpha^(-5/2) <= h_0(alpha) < 0",
+    "monotone_negative_tail_bound": "For alpha >= 9 (W_alpha >= 82.81 > 80), -(81/64) alpha^(-5/2) <= h_0(alpha) < 0",
+    "bernstein_weighted_kernel_envelopes": {
+      "status": "BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED",
+      "variable_definitions": "v = log(alpha), S = 2 cosh(v) = alpha + alpha^(-1) >= 2, W_alpha = S^2 >= 4, y = 4 / S^2 in (0, 1]",
+      "recurrence_formula": "d^2/dv^2 (S^q) = q^2 S^q - 4 q (q - 1) S^(q - 2)",
+      "all_even_envelopes_certified": true,
+      "all_interior_bernstein_strictly_smaller_than_endpoint": true,
+      "even_derivative_certificates": {
+        "m_0": {
+          "order_m": 0,
+          "degree_in_y": 3,
+          "S_power_coefficients_c_m_j": {
+            "S^(-5/2-0)": "-81/64",
+            "S^(-5/2-2)": "14595/128",
+            "S^(-5/2-4)": "-176715/128",
+            "S^(-5/2-6)": "2027025/512"
+          },
+          "polynomial_P_m_y_coefficients": [
+            "-81/64",
+            "14595/512",
+            "-176715/2048",
+            "2027025/32768"
+          ],
+          "P_m_at_y_eq_0_rational": "-81/64",
+          "P_m_at_y_eq_1_rational": "92193/32768",
+          "abs_P_m_at_y_eq_1_rational": "92193/32768",
+          "abs_P_m_at_y_eq_1_float": 2.813507080078125,
+          "abs_g_m_at_0_exact_formula": "(92193/32768) / (4 * sqrt(2))",
+          "abs_g_m_at_0_float": 0.4973624838099012,
+          "subdivisions_count": 8,
+          "max_abs_bernstein_coeff_rational": "92193/32768",
+          "max_non_endpoint_abs_bernstein_rational": "10358531/4194304",
+          "max_non_endpoint_ratio_to_endpoint": 0.877789240370744,
+          "max_interior_bernstein_to_endpoint_ratio": 0.877789240370744,
+          "envelope_certified_on_0_1": true,
+          "all_bernstein_control_points_bounded_by_endpoint": true,
+          "strict_interior_dominance_certified": true,
+          "subintervals": [
+            {
+              "subinterval": "[0, 1/8]",
+              "bernstein_coeffs_rational": [
+                "-81/64",
+                "-319/4096",
+                "86567/131072",
+                "17954961/16777216"
+              ],
+              "min_bernstein_rational": "-81/64",
+              "max_bernstein_rational": "17954961/16777216",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/8, 1/4]",
+              "bernstein_coeffs_rational": [
+                "17954961/16777216",
+                "12414673/8388608",
+                "6547729/4194304",
+                "3008337/2097152"
+              ],
+              "min_bernstein_rational": "17954961/16777216",
+              "max_bernstein_rational": "6547729/4194304",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/4, 3/8]",
+              "bernstein_coeffs_rational": [
+                "3008337/2097152",
+                "5485619/4194304",
+                "8166233/8388608",
+                "9263691/16777216"
+              ],
+              "min_bernstein_rational": "9263691/16777216",
+              "max_bernstein_rational": "3008337/2097152",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/8, 1/2]",
+              "bernstein_coeffs_rational": [
+                "9263691/16777216",
+                "548729/4194304",
+                "-395789/1048576",
+                "-223311/262144"
+              ],
+              "min_bernstein_rational": "-223311/262144",
+              "max_bernstein_rational": "9263691/16777216",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/2, 5/8]",
+              "bernstein_coeffs_rational": [
+                "-223311/262144",
+                "-1390699/1048576",
+                "-7410551/4194304",
+                "-34437939/16777216"
+              ],
+              "min_bernstein_rational": "-34437939/16777216",
+              "max_bernstein_rational": "-223311/262144",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[5/8, 3/4]",
+              "bernstein_coeffs_rational": [
+                "-34437939/16777216",
+                "-19616837/8388608",
+                "-10358531/4194304",
+                "-4876533/2097152"
+              ],
+              "min_bernstein_rational": "-10358531/4194304",
+              "max_bernstein_rational": "-34437939/16777216",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/4, 7/8]",
+              "bernstein_coeffs_rational": [
+                "-4876533/2097152",
+                "-9147601/4194304",
+                "-14773117/8388608",
+                "-15852729/16777216"
+              ],
+              "min_bernstein_rational": "-4876533/2097152",
+              "max_bernstein_rational": "-15852729/16777216",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[7/8, 1]",
+              "bernstein_coeffs_rational": [
+                "-15852729/16777216",
+                "-269903/2097152",
+                "284119/262144",
+                "92193/32768"
+              ],
+              "min_bernstein_rational": "-15852729/16777216",
+              "max_bernstein_rational": "92193/32768",
+              "certified_within_pm_abs_P_at_1": true
+            }
+          ]
+        },
+        "m_2": {
+          "order_m": 2,
+          "degree_in_y": 4,
+          "S_power_coefficients_c_m_j": {
+            "S^(-5/2-0)": "-2025/256",
+            "S^(-5/2-2)": "1204875/512",
+            "S^(-5/2-4)": "-35644455/512",
+            "S^(-5/2-6)": "1137161025/2048",
+            "S^(-5/2-8)": "-654729075/512"
+          },
+          "polynomial_P_m_y_coefficients": [
+            "-2025/256",
+            "1204875/2048",
+            "-35644455/8192",
+            "1137161025/131072",
+            "-654729075/131072"
+          ],
+          "P_m_at_y_eq_0_rational": "-2025/256",
+          "P_m_at_y_eq_1_rational": "-5902065/65536",
+          "abs_P_m_at_y_eq_1_rational": "5902065/65536",
+          "abs_P_m_at_y_eq_1_float": 90.05836486816406,
+          "abs_g_m_at_0_exact_formula": "(5902065/65536) / (4 * sqrt(2))",
+          "abs_g_m_at_0_float": 15.920220125212785,
+          "subdivisions_count": 8,
+          "max_abs_bernstein_coeff_rational": "5902065/65536",
+          "max_non_endpoint_abs_bernstein_rational": "10479888135/134217728",
+          "max_non_endpoint_ratio_to_endpoint": 0.8670072048372847,
+          "max_interior_bernstein_to_endpoint_ratio": 0.8670072048372847,
+          "envelope_certified_on_0_1": true,
+          "all_bernstein_control_points_bounded_by_endpoint": true,
+          "strict_interior_dominance_certified": true,
+          "subintervals": [
+            {
+              "subinterval": "[0, 1/8]",
+              "bernstein_coeffs_rational": [
+                "-2025/256",
+                "686475/65536",
+                "18380115/1048576",
+                "4694318145/268435456",
+                "7177248405/536870912"
+              ],
+              "min_bernstein_rational": "-2025/256",
+              "max_bernstein_rational": "18380115/1048576",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/8, 1/4]",
+              "bernstein_coeffs_rational": [
+                "7177248405/536870912",
+                "620732565/67108864",
+                "141266835/134217728",
+                "-275346135/33554432",
+                "-561318255/33554432"
+              ],
+              "min_bernstein_rational": "-561318255/33554432",
+              "max_bernstein_rational": "7177248405/536870912",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/4, 3/8]",
+              "bernstein_coeffs_rational": [
+                "-561318255/33554432",
+                "-847290375/33554432",
+                "-4434287085/134217728",
+                "-642429225/16777216",
+                "-21708271755/536870912"
+              ],
+              "min_bernstein_rational": "-21708271755/536870912",
+              "max_bernstein_rational": "-561318255/33554432",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/8, 1/2]",
+              "bernstein_coeffs_rational": [
+                "-21708271755/536870912",
+                "-11429404155/268435456",
+                "-698102955/16777216",
+                "-619987365/16777216",
+                "-61344945/2097152"
+              ],
+              "min_bernstein_rational": "-11429404155/268435456",
+              "max_bernstein_rational": "-61344945/2097152",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/2, 5/8]",
+              "bernstein_coeffs_rational": [
+                "-61344945/2097152",
+                "-361531755/16777216",
+                "-181191735/16777216",
+                "631870875/268435456",
+                "8617292325/536870912"
+              ],
+              "min_bernstein_rational": "-61344945/2097152",
+              "max_bernstein_rational": "8617292325/536870912",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[5/8, 3/4]",
+              "bernstein_coeffs_rational": [
+                "8617292325/536870912",
+                "3992710725/134217728",
+                "5904016695/134217728",
+                "477400635/8388608",
+                "2195594505/33554432"
+              ],
+              "min_bernstein_rational": "8617292325/536870912",
+              "max_bernstein_rational": "2195594505/33554432",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/4, 7/8]",
+              "bernstein_coeffs_rational": [
+                "2195594505/33554432",
+                "1240793235/16777216",
+                "10479888135/134217728",
+                "10029491685/134217728",
+                "31991844645/536870912"
+              ],
+              "min_bernstein_rational": "31991844645/536870912",
+              "max_bernstein_rational": "10479888135/134217728",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[7/8, 1]",
+              "bernstein_coeffs_rational": [
+                "31991844645/536870912",
+                "11932861275/268435456",
+                "294220755/16777216",
+                "-106788375/4194304",
+                "-5902065/65536"
+              ],
+              "min_bernstein_rational": "-5902065/65536",
+              "max_bernstein_rational": "31991844645/536870912",
+              "certified_within_pm_abs_P_at_1": true
+            }
+          ]
+        },
+        "m_4": {
+          "order_m": 4,
+          "degree_in_y": 5,
+          "S_power_coefficients_c_m_j": {
+            "S^(-5/2-0)": "-50625/1024",
+            "S^(-5/2-2)": "98161875/2048",
+            "S^(-5/2-4)": "-6501043395/2048",
+            "S^(-5/2-6)": "439850235825/8192",
+            "S^(-5/2-8)": "-328019266575/1024",
+            "S^(-5/2-10)": "316234143225/512"
+          },
+          "polynomial_P_m_y_coefficients": [
+            "-50625/1024",
+            "98161875/8192",
+            "-6501043395/32768",
+            "439850235825/524288",
+            "-328019266575/262144",
+            "316234143225/524288"
+          ],
+          "P_m_at_y_eq_0_rational": "-50625/1024",
+          "P_m_at_y_eq_1_rational": "571397895/131072",
+          "abs_P_m_at_y_eq_1_rational": "571397895/131072",
+          "abs_P_m_at_y_eq_1_float": 4359.419975280762,
+          "abs_g_m_at_0_exact_formula": "(571397895/131072) / (4 * sqrt(2))",
+          "abs_g_m_at_0_float": 770.6438566402794,
+          "subdivisions_count": 8,
+          "max_abs_bernstein_coeff_rational": "571397895/131072",
+          "max_non_endpoint_abs_bernstein_rational": "31866820223949/8589934592",
+          "max_non_endpoint_ratio_to_endpoint": 0.8509815876900401,
+          "max_interior_bernstein_to_endpoint_ratio": 0.8509815876900401,
+          "envelope_certified_on_0_1": true,
+          "all_bernstein_control_points_bounded_by_endpoint": true,
+          "strict_interior_dominance_certified": true,
+          "subintervals": [
+            {
+              "subinterval": "[0, 1/8]",
+              "bernstein_coeffs_rational": [
+                "-50625/1024",
+                "16392375/65536",
+                "1005375321/4194304",
+                "44633082429/536870912",
+                "-125420838939/1073741824",
+                "-5155006521015/17179869184"
+              ],
+              "min_bernstein_rational": "-5155006521015/17179869184",
+              "max_bernstein_rational": "16392375/65536",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/8, 1/4]",
+              "bernstein_coeffs_rational": [
+                "-5155006521015/17179869184",
+                "-4151639809503/8589934592",
+                "-2791208438559/4294967296",
+                "-1588464572535/2147483648",
+                "-789587703783/1073741824",
+                "-345642572655/536870912"
+              ],
+              "min_bernstein_rational": "-1588464572535/2147483648",
+              "max_bernstein_rational": "-5155006521015/17179869184",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/4, 3/8]",
+              "bernstein_coeffs_rational": [
+                "-345642572655/536870912",
+                "-592982586837/1073741824",
+                "-802044104751/2147483648",
+                "-491281300197/4294967296",
+                "1665049812849/8589934592",
+                "8832500521515/17179869184"
+              ],
+              "min_bernstein_rational": "-345642572655/536870912",
+              "max_bernstein_rational": "8832500521515/17179869184",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/8, 1/2]",
+              "bernstein_coeffs_rational": [
+                "8832500521515/17179869184",
+                "3583725354333/4294967296",
+                "1252779898905/1073741824",
+                "395693910891/268435456",
+                "114987956319/67108864",
+                "31112785665/16777216"
+              ],
+              "min_bernstein_rational": "8832500521515/17179869184",
+              "max_bernstein_rational": "31112785665/16777216",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/2, 5/8]",
+              "bernstein_coeffs_rational": [
+                "31112785665/16777216",
+                "133914329001/67108864",
+                "547104892347/268435456",
+                "2095932609711/1073741824",
+                "7383865914045/4294967296",
+                "23240617372125/17179869184"
+              ],
+              "min_bernstein_rational": "23240617372125/17179869184",
+              "max_bernstein_rational": "547104892347/268435456",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[5/8, 3/4]",
+              "bernstein_coeffs_rational": [
+                "23240617372125/17179869184",
+                "8472885544035/8589934592",
+                "2088884154789/4294967296",
+                "-288225934389/2147483648",
+                "-892654598259/1073741824",
+                "-811591588845/536870912"
+              ],
+              "min_bernstein_rational": "-811591588845/536870912",
+              "max_bernstein_rational": "23240617372125/17179869184",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/4, 7/8]",
+              "bernstein_coeffs_rational": [
+                "-811591588845/536870912",
+                "-2353711757121/1073741824",
+                "-6132454569837/2147483648",
+                "-14642036337105/4294967296",
+                "-31866820223949/8589934592",
+                "-60940870472385/17179869184"
+              ],
+              "min_bernstein_rational": "-31866820223949/8589934592",
+              "max_bernstein_rational": "-811591588845/536870912",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[7/8, 1]",
+              "bernstein_coeffs_rational": [
+                "-60940870472385/17179869184",
+                "-7268512562109/2147483648",
+                "-1481158295199/536870912",
+                "-97939507563/67108864",
+                "415185021/524288",
+                "571397895/131072"
+              ],
+              "min_bernstein_rational": "-60940870472385/17179869184",
+              "max_bernstein_rational": "571397895/131072",
+              "certified_within_pm_abs_P_at_1": true
+            }
+          ]
+        },
+        "m_6": {
+          "order_m": 6,
+          "degree_in_y": 6,
+          "S_power_coefficients_c_m_j": {
+            "S^(-5/2-0)": "-1265625/4096",
+            "S^(-5/2-2)": "7965286875/8192",
+            "S^(-5/2-4)": "-1137548436255/8192",
+            "S^(-5/2-6)": "147399973545825/32768",
+            "S^(-5/2-8)": "-431384619290625/8192",
+            "S^(-5/2-10)": "514512951027075/2048",
+            "S^(-5/2-12)": "-213458046676875/512"
+          },
+          "polynomial_P_m_y_coefficients": [
+            "-1265625/4096",
+            "7965286875/32768",
+            "-1137548436255/131072",
+            "147399973545825/2097152",
+            "-431384619290625/2097152",
+            "514512951027075/2097152",
+            "-213458046676875/2097152"
+          ],
+          "P_m_at_y_eq_0_rational": "-1265625/4096",
+          "P_m_at_y_eq_1_rational": "-77673251835/262144",
+          "abs_P_m_at_y_eq_1_rational": "77673251835/262144",
+          "abs_P_m_at_y_eq_1_float": 296299.9413871765,
+          "abs_g_m_at_0_exact_formula": "(77673251835/262144) / (4 * sqrt(2))",
+          "abs_g_m_at_0_float": 52378.92445501227,
+          "subdivisions_count": 8,
+          "max_abs_bernstein_coeff_rational": "77673251835/262144",
+          "max_non_endpoint_abs_bernstein_rational": "2205950048825967/8589934592",
+          "max_non_endpoint_ratio_to_endpoint": 0.8667108864954091,
+          "max_interior_bernstein_to_endpoint_ratio": 0.8667108864954091,
+          "envelope_certified_on_0_1": true,
+          "all_bernstein_control_points_bounded_by_endpoint": true,
+          "strict_interior_dominance_certified": true,
+          "subintervals": [
+            {
+              "subinterval": "[0, 1/8]",
+              "bernstein_coeffs_rational": [
+                "-1265625/4096",
+                "2493095625/524288",
+                "6534497583/8388608",
+                "-23080439083347/4294967296",
+                "-87508717556103/8589934592",
+                "-1683058122409455/137438953472",
+                "-6253009947525555/549755813888"
+              ],
+              "min_bernstein_rational": "-1683058122409455/137438953472",
+              "max_bernstein_rational": "2493095625/524288",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/8, 1/4]",
+              "bernstein_coeffs_rational": [
+                "-6253009947525555/549755813888",
+                "-2886893702706645/274877906944",
+                "-920916938785383/137438953472",
+                "14207369571783/68719476736",
+                "314531549798373/34359738368",
+                "321179473987875/17179869184",
+                "235998593453745/8589934592"
+              ],
+              "min_bernstein_rational": "-6253009947525555/549755813888",
+              "max_bernstein_rational": "235998593453745/8589934592",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/4, 3/8]",
+              "bernstein_coeffs_rational": [
+                "235998593453745/8589934592",
+                "622814899827105/17179869184",
+                "1521073253155293/34359738368",
+                "3447466457630373/68719476736",
+                "7240488511972617/137438953472",
+                "14048400658627305/274877906944",
+                "24951642387847605/549755813888"
+              ],
+              "min_bernstein_rational": "235998593453745/8589934592",
+              "max_bernstein_rational": "7240488511972617/137438953472",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/8, 1/2]",
+              "bernstein_coeffs_rational": [
+                "24951642387847605/549755813888",
+                "2725810432305075/68719476736",
+                "1023832395641403/34359738368",
+                "67527468140823/4294967296",
+                "-4238859512007/2147483648",
+                "-5899828061205/268435456",
+                "-5711797579905/134217728"
+              ],
+              "min_bernstein_rational": "-5711797579905/134217728",
+              "max_bernstein_rational": "24951642387847605/549755813888",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/2, 5/8]",
+              "bernstein_coeffs_rational": [
+                "-5711797579905/134217728",
+                "-16947362258415/268435456",
+                "-180999406667367/2147483648",
+                "-447846974989227/4294967296",
+                "-4155474766577157/34359738368",
+                "-9071835336026775/68719476736",
+                "-74651809111288875/549755813888"
+              ],
+              "min_bernstein_rational": "-74651809111288875/549755813888",
+              "max_bernstein_rational": "-5711797579905/134217728",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[5/8, 3/4]",
+              "bernstein_coeffs_rational": [
+                "-74651809111288875/549755813888",
+                "-38364467767181775/274877906944",
+                "-18699025489383303/137438953472",
+                "-8489930678065827/68719476736",
+                "-3467622240079587/34359738368",
+                "-1173898404414135/17179869184",
+                "-242840582773695/8589934592"
+              ],
+              "min_bernstein_rational": "-38364467767181775/274877906944",
+              "max_bernstein_rational": "-242840582773695/8589934592",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/4, 7/8]",
+              "bernstein_coeffs_rational": [
+                "-242840582773695/8589934592",
+                "202536073319355/17179869184",
+                "2038115670854373/34359738368",
+                "7683789911472783/68719476736",
+                "22598932651982217/137438953472",
+                "57415833708941475/274877906944",
+                "127527935547116205/549755813888"
+              ],
+              "min_bernstein_rational": "-242840582773695/8589934592",
+              "max_bernstein_rational": "127527935547116205/549755813888",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[7/8, 1]",
+              "bernstein_coeffs_rational": [
+                "127527935547116205/549755813888",
+                "35056050919087365/137438953472",
+                "2205950048825967/8589934592",
+                "962090154047853/4294967296",
+                "9299126266029/67108864",
+                "-201056304465/8388608",
+                "-77673251835/262144"
+              ],
+              "min_bernstein_rational": "-77673251835/262144",
+              "max_bernstein_rational": "2205950048825967/8589934592",
+              "certified_within_pm_abs_P_at_1": true
+            }
+          ]
+        },
+        "m_8": {
+          "order_m": 8,
+          "degree_in_y": 7,
+          "S_power_coefficients_c_m_j": {
+            "S^(-5/2-0)": "-31640625/16384",
+            "S^(-5/2-2)": "645542611875/32768",
+            "S^(-5/2-4)": "-195399939329595/32768",
+            "S^(-5/2-6)": "46147743475859025/131072",
+            "S^(-5/2-8)": "-59462702140616775/8192",
+            "S^(-5/2-10)": "264964682754646875/4096",
+            "S^(-5/2-12)": "-131703614799631875/512",
+            "S^(-5/2-14)": "191898783962510625/512"
+          },
+          "polynomial_P_m_y_coefficients": [
+            "-31640625/16384",
+            "645542611875/131072",
+            "-195399939329595/524288",
+            "46147743475859025/8388608",
+            "-59462702140616775/2097152",
+            "264964682754646875/4194304",
+            "-131703614799631875/2097152",
+            "191898783962510625/8388608"
+          ],
+          "P_m_at_y_eq_0_rational": "-31640625/16384",
+          "P_m_at_y_eq_1_rational": "14095292784705/524288",
+          "abs_P_m_at_y_eq_1_rational": "14095292784705/524288",
+          "abs_P_m_at_y_eq_1_float": 26884637.421998978,
+          "abs_g_m_at_0_exact_formula": "(14095292784705/524288) / (4 * sqrt(2))",
+          "abs_g_m_at_0_float": 4752577.357709275,
+          "subdivisions_count": 8,
+          "max_abs_bernstein_coeff_rational": "14095292784705/524288",
+          "max_non_endpoint_abs_bernstein_rational": "862995495263635125/34359738368",
+          "max_non_endpoint_ratio_to_endpoint": 0.9342314789235593,
+          "max_interior_bernstein_to_endpoint_ratio": 0.9342314789235593,
+          "envelope_certified_on_0_1": true,
+          "all_bernstein_control_points_bounded_by_endpoint": true,
+          "strict_interior_dominance_certified": true,
+          "subintervals": [
+            {
+              "subinterval": "[0, 1/8]",
+              "bernstein_coeffs_rational": [
+                "-31640625/16384",
+                "90195373125/1048576",
+                "-3467455135695/33554432",
+                "-1129610960613765/4294967296",
+                "-2437700156797365/8589934592",
+                "-22325962191192225/137438953472",
+                "30703764709548675/549755813888",
+                "5484996379100838465/17592186044416"
+              ],
+              "min_bernstein_rational": "-2437700156797365/8589934592",
+              "max_bernstein_rational": "5484996379100838465/17592186044416",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/8, 1/4]",
+              "bernstein_coeffs_rational": [
+                "5484996379100838465/17592186044416",
+                "4993736143748059665/8796093022208",
+                "3788045118277129665/4398046511104",
+                "2491974542828173905/2199023255552",
+                "1440395251624193985/1099511627776",
+                "735808457914294545/549755813888",
+                "328800714809390145/274877906944",
+                "122408472810392145/137438953472"
+              ],
+              "min_bernstein_rational": "5484996379100838465/17592186044416",
+              "max_bernstein_rational": "735808457914294545/549755813888",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/4, 3/8]",
+              "bernstein_coeffs_rational": [
+                "122408472810392145/137438953472",
+                "160833176432178435/274877906944",
+                "63938304405447705/549755813888",
+                "-558985807638289125/1099511627776",
+                "-2753151475130141535/2199023255552",
+                "-9013020254614009485/4398046511104",
+                "-24813387261745388055/8796093022208",
+                "-61370620213318731765/17592186044416"
+              ],
+              "min_bernstein_rational": "-61370620213318731765/17592186044416",
+              "max_bernstein_rational": "122408472810392145/137438953472",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/8, 1/2]",
+              "bernstein_coeffs_rational": [
+                "-61370620213318731765/17592186044416",
+                "-18278616475786671855/4398046511104",
+                "-5189216486110491285/1099511627776",
+                "-1402045964599306815/274877906944",
+                "-358848287571184965/68719476736",
+                "-86288720063355135/17179869184",
+                "-19221167562946245/4294967296",
+                "-3857945281874415/1073741824"
+              ],
+              "min_bernstein_rational": "-358848287571184965/68719476736",
+              "max_bernstein_rational": "-61370620213318731765/17592186044416",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[1/2, 5/8]",
+              "bernstein_coeffs_rational": [
+                "-3857945281874415/1073741824",
+                "-11642394692049075/4294967296",
+                "-25658537096177775/17179869184",
+                "3115193816640285/68719476736",
+                "509038027706546145/274877906944",
+                "4204395915996571965/1099511627776",
+                "25565257122625605825/4398046511104",
+                "134516099304191494125/17592186044416"
+              ],
+              "min_bernstein_rational": "-3857945281874415/1073741824",
+              "max_bernstein_rational": "134516099304191494125/17592186044416",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[5/8, 3/4]",
+              "bernstein_coeffs_rational": [
+                "134516099304191494125/17592186044416",
+                "83385585058940282475/8796093022208",
+                "49072654477675358685/4398046511104",
+                "27505003338744353595/2199023255552",
+                "14660170521561142605/1099511627776",
+                "7386611193683534475/549755813888",
+                "3479656737599819325/274877906944",
+                "1506178413304100955/137438953472"
+              ],
+              "min_bernstein_rational": "134516099304191494125/17592186044416",
+              "max_bernstein_rational": "7386611193683534475/549755813888",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[3/4, 7/8]",
+              "bernstein_coeffs_rational": [
+                "1506178413304100955/137438953472",
+                "2545056915616584495/274877906944",
+                "3648211905750595155/549755813888",
+                "3351058849312404615/1099511627776",
+                "-3153501432318521205/2199023255552",
+                "-28802636099478397665/4398046511104",
+                "-103292819879806034685/8796093022208",
+                "-281855764470174080265/17592186044416"
+              ],
+              "min_bernstein_rational": "-281855764470174080265/17592186044416",
+              "max_bernstein_rational": "1506178413304100955/137438953472",
+              "certified_within_pm_abs_P_at_1": true
+            },
+            {
+              "subinterval": "[7/8, 1]",
+              "bernstein_coeffs_rational": [
+                "-281855764470174080265/17592186044416",
+                "-44640736147592011395/2199023255552",
+                "-6504547550627525535/274877906944",
+                "-862995495263635125/34359738368",
+                "-6234188713191855/268435456",
+                "-1071280444571685/67108864",
+                "-2238308965215/4194304",
+                "14095292784705/524288"
+              ],
+              "min_bernstein_rational": "-862995495263635125/34359738368",
+              "max_bernstein_rational": "14095292784705/524288",
+              "certified_within_pm_abs_P_at_1": true
+            }
+          ]
+        }
+      },
+      "first_euler_derivative_and_tilde_h0_envelope": {
+        "Q1_y_coefficients": [
+          "405/128",
+          "-131355/1024",
+          "2297295/4096",
+          "-34459425/65536"
+        ],
+        "odd_subdivisions_count": 32,
+        "max_bernstein_of_one_minus_y_Q1_sq_rational": "3326037324483521528775/16140901064495857664",
+        "max_bernstein_of_one_minus_y_Q1_sq_float": 206.06267959845192,
+        "certified_D1_envelope_constant_rational": "2871/200",
+        "certified_D1_envelope_constant_float": 14.355,
+        "certified_D1_sq_exceeds_bernstein_max": true,
+        "certified_tilde_h0_envelope_constant_rational": "25824057/1638400",
+        "certified_tilde_h0_envelope_constant_float": 15.761753540039063,
+        "inequality": "|tilde{h}_0(alpha)| <= (25824057/1638400) * (alpha + alpha^(-1))^(-5/2) <= 15.761754 * (alpha + alpha^(-1))^(-5/2) for all alpha > 0"
+      }
+    },
     "quadrature_verification": {
       "samples": [
         {
@@ -209,6 +981,7 @@
         "rad": 3.788124932420489e-55,
         "lower": 0.0009504798117909661,
         "upper": 0.0009504798117909661,
+        "str_15": "[0.000950479811790966 +/- 1.15e-19]",
         "certified_strictly_positive": true
       },
       "C_tau_0_arithmetic": {
@@ -216,6 +989,7 @@
         "rad": 3.155446137020901e-09,
         "lower": 0.0009504777883195839,
         "upper": 0.0009504840992118579,
+        "str_15": "[0.00095048 +/- 4.10e-9]",
         "certified_strictly_positive": true
       },
       "all_enclosures_intersect": true,
@@ -228,10 +1002,16 @@
           "K_float": 0.0,
           "spectral_C_tau_mid": 0.0009504798117909661,
           "spectral_C_tau_rad": 3.788124932420489e-55,
+          "spectral_C_tau_lower": 0.0009504798117909661,
+          "spectral_C_tau_upper": 0.0009504798117909661,
           "spectral_C_tau_str": "[0.000950479811790966114507768125533378083494989409033558 +/- 5.33e-55]",
+          "spectral_C_tau_str_15": "[0.000950479811790966 +/- 1.15e-19]",
           "arithmetic_C_tau_mid": 0.0009504809437657209,
           "arithmetic_C_tau_rad": 3.155446137020901e-09,
+          "arithmetic_C_tau_lower": 0.0009504777883195839,
+          "arithmetic_C_tau_upper": 0.0009504840992118579,
           "arithmetic_C_tau_str": "[0.00095048 +/- 4.10e-9]",
+          "arithmetic_C_tau_str_15": "[0.00095048 +/- 4.10e-9]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.1146149592409334,
           "arithmetic_w_arch_mid": -0.1136644814526138,
@@ -251,10 +1031,16 @@
           "K_float": 0.125,
           "spectral_C_tau_mid": -0.0009447622082581244,
           "spectral_C_tau_rad": 4.2492328987425106e-55,
+          "spectral_C_tau_lower": -0.0009447622082581244,
+          "spectral_C_tau_upper": -0.0009447622082581244,
           "spectral_C_tau_str": "[-0.000944762208258124474375613240944458239016668292475699 +/- 5.23e-55]",
+          "spectral_C_tau_str_15": "[-0.000944762208258124 +/- 4.75e-19]",
           "arithmetic_C_tau_mid": -0.0009447608843964711,
           "arithmetic_C_tau_rad": 3.6903419660394565e-09,
+          "arithmetic_C_tau_lower": -0.0009447645747384371,
+          "arithmetic_C_tau_upper": -0.0009447571940545051,
           "arithmetic_C_tau_str": "[-0.00094476 +/- 4.58e-9]",
+          "arithmetic_C_tau_str_15": "[-0.00094476 +/- 4.58e-9]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.10096379720592731,
           "arithmetic_w_arch_mid": -0.10190856178066574,
@@ -274,10 +1060,16 @@
           "K_float": 0.25,
           "spectral_C_tau_mid": 0.000928615379148127,
           "spectral_C_tau_rad": 4.766469047505033e-55,
+          "spectral_C_tau_lower": 0.000928615379148127,
+          "spectral_C_tau_upper": 0.000928615379148127,
           "spectral_C_tau_str": "[0.000928615379148127038792277070203055730959878942088693 +/- 5.22e-55]",
+          "spectral_C_tau_str_15": "[0.000928615379148127 +/- 3.89e-20]",
           "arithmetic_C_tau_mid": 0.0009286173437260099,
           "arithmetic_C_tau_rad": 5.476375325441651e-09,
+          "arithmetic_C_tau_lower": 0.0009286118673506844,
+          "arithmetic_C_tau_upper": 0.0009286228201013353,
           "arithmetic_C_tau_str": "[0.00092862 +/- 8.14e-9]",
+          "arithmetic_C_tau_str_15": "[0.00092862 +/- 8.14e-9]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.004107309607986653,
           "arithmetic_w_arch_mid": -0.0031786977406359452,
@@ -297,10 +1089,16 @@
           "K_float": 0.5,
           "spectral_C_tau_mid": 0.0008668613749571018,
           "spectral_C_tau_rad": 5.99748624583941e-55,
+          "spectral_C_tau_lower": 0.0008668613749571018,
+          "spectral_C_tau_upper": 0.0008668613749571018,
           "spectral_C_tau_str": "[0.000866861374957101867748576579961320404112623902112234 +/- 6.19e-55]",
+          "spectral_C_tau_str_15": "[0.000866861374957102 +/- 1.33e-19]",
           "arithmetic_C_tau_mid": 0.0008668670621576382,
           "arithmetic_C_tau_rad": 1.5853394735865223e-08,
+          "arithmetic_C_tau_lower": 0.0008668512087629023,
+          "arithmetic_C_tau_upper": 0.0008668829155523741,
           "arithmetic_C_tau_str": "[0.0008669 +/- 4.88e-8]",
+          "arithmetic_C_tau_str_15": "[0.0008669 +/- 4.88e-8]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": -0.08710095210157505,
           "arithmetic_w_arch_mid": 0.08796780331033806,
@@ -320,10 +1118,16 @@
           "K_float": 1.0,
           "spectral_C_tau_mid": 0.000630730108345431,
           "spectral_C_tau_rad": 9.495421067345007e-55,
+          "spectral_C_tau_lower": 0.000630730108345431,
+          "spectral_C_tau_upper": 0.000630730108345431,
           "spectral_C_tau_str": "[0.00063073010834543098118438843391279177249380236869199 +/- 4.06e-54]",
+          "spectral_C_tau_str_15": "[0.000630730108345431 +/- 1.89e-20]",
           "arithmetic_C_tau_mid": 0.0006307861231691769,
           "arithmetic_C_tau_rad": 1.5614381787543152e-07,
+          "arithmetic_C_tau_lower": 0.0006306299793513015,
+          "arithmetic_C_tau_upper": 0.0006309422669870524,
           "arithmetic_C_tau_str": "[0.000631 +/- 3.71e-7]",
+          "arithmetic_C_tau_str_15": "[0.000631 +/- 3.71e-7]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.013433658306935818,
           "arithmetic_w_arch_mid": -0.01280302832758364,
@@ -343,10 +1147,16 @@
           "K_float": 1.4142135623730951,
           "spectral_C_tau_mid": 0.0005441316702609343,
           "spectral_C_tau_rad": 1.3893852738529493e-54,
+          "spectral_C_tau_lower": 0.0005441316702609343,
+          "spectral_C_tau_upper": 0.0005441316702609343,
           "spectral_C_tau_str": "[0.00054413167026093427742880348679691900783582809061591 +/- 4.40e-54]",
+          "spectral_C_tau_str_15": "[0.000544131670260934 +/- 2.78e-19]",
           "arithmetic_C_tau_mid": 0.0005445073433256679,
           "arithmetic_C_tau_rad": 1.047185813618512e-06,
+          "arithmetic_C_tau_lower": 0.0005434601575120494,
+          "arithmetic_C_tau_upper": 0.0005455545291392864,
           "arithmetic_C_tau_str": "[0.00054 +/- 5.56e-6]",
+          "arithmetic_C_tau_str_15": "[0.00054 +/- 5.56e-6]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.0009231680381326174,
           "arithmetic_w_arch_mid": -0.0003797078806138722,
@@ -366,10 +1176,16 @@
           "K_float": 2.0,
           "spectral_C_tau_mid": -0.0001133761279091898,
           "spectral_C_tau_rad": 2.3801490907906867e-54,
+          "spectral_C_tau_lower": -0.0001133761279091898,
+          "spectral_C_tau_upper": -0.0001133761279091898,
           "spectral_C_tau_str": "[-0.00011337612790918979587929879729338044565805010631859 +/- 6.12e-54]",
+          "spectral_C_tau_str_15": "[-0.000113376127909190 +/- 2.05e-19]",
           "arithmetic_C_tau_mid": -0.00010783248100561607,
           "arithmetic_C_tau_rad": 1.5450058327814986e-05,
+          "arithmetic_C_tau_lower": -0.00012328253933343105,
+          "arithmetic_C_tau_upper": -9.238242267780108e-05,
           "arithmetic_C_tau_str": "[-0.0001 +/- 2.33e-5]",
+          "arithmetic_C_tau_str_15": "[-0.0001 +/- 2.33e-5]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": -0.0002931736707633069,
           "arithmetic_w_arch_mid": 0.0001698911315401065,
@@ -389,10 +1205,16 @@
           "K_float": 4.0,
           "spectral_C_tau_mid": -0.0009234066385075395,
           "spectral_C_tau_rad": 1.4954917808347577e-53,
+          "spectral_C_tau_lower": -0.0009234066385075395,
+          "spectral_C_tau_upper": -0.0009234066385075395,
           "spectral_C_tau_str": "[-0.0009234066385075394517188678099124350767215747758700 +/- 5.53e-53]",
+          "spectral_C_tau_str_15": "[-0.000923406638507539 +/- 4.52e-19]",
           "arithmetic_C_tau_mid": 0.07007655459509739,
           "arithmetic_C_tau_rad": 0.15129670151509345,
+          "arithmetic_C_tau_lower": -0.08122014691999606,
+          "arithmetic_C_tau_upper": 0.22137325611019082,
           "arithmetic_C_tau_str": "[+/- 0.222]",
+          "arithmetic_C_tau_str_15": "[+/- 0.222]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": -0.08122021374341387,
           "arithmetic_w_arch_mid": 6.765513347762077e-08,
@@ -412,10 +1234,16 @@
           "K_float": 8.0,
           "spectral_C_tau_mid": 0.0008437501317607055,
           "spectral_C_tau_rad": 5.9039649001370774e-52,
+          "spectral_C_tau_lower": 0.0008437501317607055,
+          "spectral_C_tau_upper": 0.0008437501317607055,
           "spectral_C_tau_str": "[0.00084375013176070554629245744838520759152988215235 +/- 1.18e-51]",
+          "spectral_C_tau_str_15": "[0.000843750131760706 +/- 4.54e-19]",
           "arithmetic_C_tau_mid": 0.0007127944130072763,
           "arithmetic_C_tau_rad": 9120.75570678711,
+          "arithmetic_C_tau_lower": -9120.754993992696,
+          "arithmetic_C_tau_upper": 9120.756419581523,
           "arithmetic_C_tau_str": "[+/- 9.13e+3]",
+          "arithmetic_C_tau_str_15": "[+/- 9.13e+3]",
           "arithmetic_tail_regime": "WAVELET_PEAK_BEYOND_TRUNCATION_REGIME",
           "arithmetic_prime_sum_mid": 0.000712794413005559,
           "arithmetic_w_arch_mid": 1.7173150771518236e-15,
@@ -435,10 +1263,16 @@
           "K_float": -0.25,
           "spectral_C_tau_mid": 0.000928615379148127,
           "spectral_C_tau_rad": 4.766469047505033e-55,
+          "spectral_C_tau_lower": 0.000928615379148127,
+          "spectral_C_tau_upper": 0.000928615379148127,
           "spectral_C_tau_str": "[0.000928615379148127038792277070203055730959878942088693 +/- 5.22e-55]",
+          "spectral_C_tau_str_15": "[0.000928615379148127 +/- 3.89e-20]",
           "arithmetic_C_tau_mid": 0.0009286173437260099,
           "arithmetic_C_tau_rad": 5.476375325441651e-09,
+          "arithmetic_C_tau_lower": 0.0009286118673506844,
+          "arithmetic_C_tau_upper": 0.0009286228201013353,
           "arithmetic_C_tau_str": "[0.00092862 +/- 8.14e-9]",
+          "arithmetic_C_tau_str_15": "[0.00092862 +/- 8.14e-9]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.004107309607986653,
           "arithmetic_w_arch_mid": -0.0031786977406359452,
@@ -458,10 +1292,16 @@
           "K_float": -0.5,
           "spectral_C_tau_mid": 0.0008668613749571018,
           "spectral_C_tau_rad": 5.99748624583941e-55,
+          "spectral_C_tau_lower": 0.0008668613749571018,
+          "spectral_C_tau_upper": 0.0008668613749571018,
           "spectral_C_tau_str": "[0.000866861374957101867748576579961320404112623902112234 +/- 6.19e-55]",
+          "spectral_C_tau_str_15": "[0.000866861374957102 +/- 1.33e-19]",
           "arithmetic_C_tau_mid": 0.0008668670621576382,
           "arithmetic_C_tau_rad": 1.5853394735865223e-08,
+          "arithmetic_C_tau_lower": 0.0008668512087629023,
+          "arithmetic_C_tau_upper": 0.0008668829155523741,
           "arithmetic_C_tau_str": "[0.0008669 +/- 4.88e-8]",
+          "arithmetic_C_tau_str_15": "[0.0008669 +/- 4.88e-8]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": -0.08710095210157505,
           "arithmetic_w_arch_mid": 0.08796780331033806,
@@ -481,10 +1321,16 @@
           "K_float": -1.0,
           "spectral_C_tau_mid": 0.000630730108345431,
           "spectral_C_tau_rad": 9.495421067345007e-55,
+          "spectral_C_tau_lower": 0.000630730108345431,
+          "spectral_C_tau_upper": 0.000630730108345431,
           "spectral_C_tau_str": "[0.00063073010834543098118438843391279177249380236869199 +/- 4.06e-54]",
+          "spectral_C_tau_str_15": "[0.000630730108345431 +/- 1.89e-20]",
           "arithmetic_C_tau_mid": 0.0006307861231691769,
           "arithmetic_C_tau_rad": 1.5614381787543152e-07,
+          "arithmetic_C_tau_lower": 0.0006306299793513015,
+          "arithmetic_C_tau_upper": 0.0006309422669870524,
           "arithmetic_C_tau_str": "[0.000631 +/- 3.71e-7]",
+          "arithmetic_C_tau_str_15": "[0.000631 +/- 3.71e-7]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.013433658306935818,
           "arithmetic_w_arch_mid": -0.01280302832758364,
@@ -504,10 +1350,16 @@
           "K_float": -1.4142135623730951,
           "spectral_C_tau_mid": 0.0005441316702609343,
           "spectral_C_tau_rad": 1.3893852738529493e-54,
+          "spectral_C_tau_lower": 0.0005441316702609343,
+          "spectral_C_tau_upper": 0.0005441316702609343,
           "spectral_C_tau_str": "[0.00054413167026093427742880348679691900783582809061591 +/- 4.40e-54]",
+          "spectral_C_tau_str_15": "[0.000544131670260934 +/- 2.78e-19]",
           "arithmetic_C_tau_mid": 0.0005445073433256679,
           "arithmetic_C_tau_rad": 1.047185813618512e-06,
+          "arithmetic_C_tau_lower": 0.0005434601575120494,
+          "arithmetic_C_tau_upper": 0.0005455545291392864,
           "arithmetic_C_tau_str": "[0.00054 +/- 5.56e-6]",
+          "arithmetic_C_tau_str_15": "[0.00054 +/- 5.56e-6]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": 0.0009231680381326174,
           "arithmetic_w_arch_mid": -0.0003797078806138722,
@@ -527,10 +1379,16 @@
           "K_float": -2.0,
           "spectral_C_tau_mid": -0.0001133761279091898,
           "spectral_C_tau_rad": 2.3801490907906867e-54,
+          "spectral_C_tau_lower": -0.0001133761279091898,
+          "spectral_C_tau_upper": -0.0001133761279091898,
           "spectral_C_tau_str": "[-0.00011337612790918979587929879729338044565805010631859 +/- 6.12e-54]",
+          "spectral_C_tau_str_15": "[-0.000113376127909190 +/- 2.05e-19]",
           "arithmetic_C_tau_mid": -0.00010783248100561607,
           "arithmetic_C_tau_rad": 1.5450058327814986e-05,
+          "arithmetic_C_tau_lower": -0.00012328253933343105,
+          "arithmetic_C_tau_upper": -9.238242267780108e-05,
           "arithmetic_C_tau_str": "[-0.0001 +/- 2.33e-5]",
+          "arithmetic_C_tau_str_15": "[-0.0001 +/- 2.33e-5]",
           "arithmetic_tail_regime": "MONOTONE_NEGATIVE_TAIL_REGIME",
           "arithmetic_prime_sum_mid": -0.0002931736707633069,
           "arithmetic_w_arch_mid": 0.0001698911315401065,
@@ -551,19 +1409,32 @@
       "status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
       "C_tau_0_mid": 0.0009504809437657209,
       "C_tau_0_arithmetic_str": "[0.00095048 +/- 4.10e-9]",
+      "C_tau_0_arithmetic_str_15": "[0.00095048 +/- 4.10e-9]",
       "C_tau_0_spectral_str": "[0.000950479811790966114507768125533378083494989409033558 +/- 5.33e-55]",
+      "C_tau_0_spectral_str_15": "[0.000950479811790966 +/- 1.15e-19]",
       "C_tau_prime_0_exact": 0.0,
       "C_tau_double_prime_0_mid": -0.6417402351608936,
       "C_tau_double_prime_0_upper": -0.6417400835741756,
       "C_tau_double_prime_0_arithmetic_str": "[-0.641740 +/- 3.87e-7]",
+      "C_tau_double_prime_0_arithmetic_str_15": "[-0.641740 +/- 3.87e-7]",
       "C_tau_double_prime_0_spectral_str": "[-0.6417401924429905426112921634319108036319473141918 +/- 2.45e-50]",
+      "C_tau_double_prime_0_spectral_str_15": "[-0.641740192442991 +/- 4.58e-16]",
       "C_tau_double_prime_0_certified_negative": true,
       "C_tau_triple_prime_0_exact": 0.0,
       "C_tau_fourth_deriv_0_mid": 433.5413086756161,
       "C_tau_fourth_deriv_0_upper": 433.54131152021847,
       "C_tau_fourth_deriv_0_arithmetic_str": "[433.54131 +/- 4.17e-6]",
+      "C_tau_fourth_deriv_0_arithmetic_str_15": "[433.54131 +/- 4.17e-6]",
       "C_tau_fourth_deriv_0_spectral_str": "[433.541309577441872130102413277701665696050733055 +/- 9.76e-46]",
+      "C_tau_fourth_deriv_0_spectral_str_15": "[433.541309577442 +/- 1.28e-13]",
       "arithmetic_spectral_derivative_enclosures_intersect_at_0": true,
+      "elementary_prime_cube_sum_bound": {
+        "formula": "log(2)/8 + log(3)/27 + log(3)/18 + 1/36",
+        "elementary_upper_bound_float": 0.21614453540963294,
+        "direct_sum_25000_plus_rs_tail_upper": 0.16482268385207308,
+        "adopted_bound": 0.225,
+        "elementary_bound_strictly_below_0_225": true
+      },
       "computed_spectral_derivative_tail_bounds_T_100": {
         "order_0_tail_upper": 3.788124925391993e-55,
         "order_2_tail_upper": 1.2795818376818003e-50,
@@ -579,7 +1450,21 @@
       },
       "zero_free_arithmetic_local_enclosure": {
         "uses_spectral_zero_inputs": false,
+        "sixth_derivative_domain_scope": "sup_{|K| <= 0.08} |C_tau^{(6)}(K)| (compact interval |K| <= 0.08, kappa_max = 0.08 * log(tau))",
+        "sixth_derivative_bound_M6_arith_on_0_08": 27971954.786589753,
         "sixth_derivative_global_bound_M6_arith": 27971954.786589753,
+        "certified_exact_rational_endpoint": "1/20",
+        "certified_exact_rational_endpoint_float": 0.05,
+        "certified_exact_rational_positivity_endpoint": "9/200",
+        "certified_exact_rational_positivity_endpoint_float": 0.045,
+        "exact_rational_1_20_certified": true,
+        "upper_concavity_margin_at_1_20_lower": 8.2243452453128e-05,
+        "positivity_margin_at_9_200_lower": 5.218947020396149e-05,
+        "positivity_margin_at_1_20_lower": 5.218947020396149e-05,
+        "lower_abs_margin_at_1_20_lower": 0.0006046512061252784,
+        "taylor_polynomial_root_K_positivity": 0.045775696145800286,
+        "taylor_polynomial_root_K_upper_concavity": 0.051485789116493534,
+        "taylor_polynomial_root_K_lower_abs": 0.05514312281450686,
         "K_positivity_radius_C_gt_0": 0.045775696145800286,
         "K_upper_concavity_radius_C_lt_C0": 0.051485789116493534,
         "K_lower_abs_radius_C_gt_neg_C0": 0.05514312281450686,
@@ -588,17 +1473,32 @@
       "unconditional_spectral_tail_local_enclosure": {
         "uses_certified_turing_zeros_up_to_100": true,
         "accounts_for_off_critical_zeros_above_100": true,
+        "fourth_derivative_domain_scope": "sup_{|K| <= 0.14} |C_tau^{(4)}(K)|",
         "fourth_derivative_sup_bound_M4_spec_on_0_14": 433.5413095774419,
+        "certified_exact_rational_endpoint": "17/250",
+        "certified_exact_rational_endpoint_float": 0.068,
+        "certified_exact_rational_positivity_endpoint": "1/20",
+        "certified_exact_rational_positivity_endpoint_float": 0.05,
+        "exact_rational_17_250_certified": true,
+        "upper_concavity_margin_at_17_250_lower": 0.0010974654186112073,
+        "positivity_margin_at_1_20_lower": 3.5403188534769115e-05,
+        "positivity_margin_at_17_250_lower": 3.5403188534769115e-05,
+        "lower_abs_margin_at_17_250_lower": 3.101839233675119e-05,
+        "taylor_polynomial_root_K_positivity": 0.05085052472641449,
+        "taylor_polynomial_root_K_upper_concavity": 0.13327693620953415,
+        "taylor_polynomial_root_K_lower_abs": 0.06846475543527798,
         "K_positivity_radius_C_gt_0": 0.05085052472641449,
         "K_upper_concavity_radius_C_lt_C0": 0.13327693620953415,
         "K_lower_abs_radius_C_gt_neg_C0": 0.06846475543527798,
         "K_two_sided_abs_bound_radius_abs_C_lt_C0": 0.06846475543527798
       },
+      "certified_exact_rational_radius_zero_free": 0.05,
+      "certified_exact_rational_radius_spectral": 0.068,
       "certified_local_concavity_radius_K_loc": 0.051485789116493534,
       "certified_two_sided_abs_bound_radius_zero_free": 0.051485789116493534,
       "certified_two_sided_abs_bound_radius_spectral": 0.06846475543527798,
       "certified_upper_concavity_radius_spectral": 0.13327693620953415,
-      "taylor_concavity_inequality": "Zero-free 6th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.051486 (and C_tau(K) > 0 on |K| <= 0.045776); unconditional spectral-tail 4th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.068465 (C_tau(K) > 0 on |K| <= 0.050851, and C_tau(K) < C_tau(0) on 0 < |K| <= 0.133277)."
+      "taylor_concavity_inequality": "Zero-free 6th-order Taylor enclosure (using sup_{|K| <= 0.08} |C_tau^(6)(K)| <= M_6^arith = 27971954.7866) certifies the exact rational interval 0 < |K| <= 1/20 = 0.05 with strict margin (and polynomial root |K| <= 0.051486 for C_tau(K) > 0 and |C_tau(K)| < C_tau(0)); unconditional spectral-tail 4th-order Taylor enclosure certifies the exact rational interval 0 < |K| <= 17/250 = 0.068 with strict margin (polynomial root |K| <= 0.068465 for two-sided |C_tau(K)| < C_tau(0), and C_tau(K) < C_tau(0) on 0 < |K| <= 0.133277)."
     },
     "finite_toeplitz_gram_matrices": {
       "rational_gram_matrix": {
@@ -945,6 +1845,35 @@
       ],
       "all_off_critical_quartets_have_nonzero_weight": true,
       "all_off_critical_quartets_violate_bound": true
+    },
+    "baseline_narrative_discrepancy_reconciliation": {
+      "all_discrepancies_reconciled": true,
+      "reconciled_items": [
+        {
+          "item": "Fourth derivative C_tau^{(4)}(0) vs sixth-derivative bound M_6^{arith} on |K| <= 0.08",
+          "stale_narrative_value": 1943.7705,
+          "cause_of_stale_value": "Stale narrative in docs/TC_CURRENT_CANONICAL_STATUS.md reported C_tau^{(4)}(0) = 1943.7705 from an earlier un-normalized draft, whereas the certified fourth derivative at K = 0 in the artifact is C_tau^{(4)}(0) = 433.5413086756161 (and sup_{|K| <= 0.08} |C_tau^{(6)}(K)| <= 27971954.786589753).",
+          "certified_fourth_deriv_at_0": 433.5413086756161,
+          "certified_sixth_deriv_bound_M6_on_0_08": 27971954.786589753,
+          "reconciled_scope": "C_tau^{(4)}(0) = [433.54130868 +/- 5.83e-6], sup_{|K| <= 0.08} |C_tau^{(6)}(K)| <= M_6^{arith} = 27971954.786589753"
+        },
+        {
+          "item": "K=1 archimedean sample value 0.0566039457 (and 4.95 ad-hoc constant) vs derived uniform archimedean bound",
+          "stale_narrative_value": 0.0566039457,
+          "cause_of_stale_value": "Stale narrative in docs/TC_CURRENT_CANONICAL_STATUS.md used 0.0566039457 + 0.0319695591 = 0.0885735048 (point values at K = 1) while the code used an ad-hoc 4.95 bound on |I_arch(K)|; now derive_and_certify_uniform_archimedean_bound derives and certifies |I_arch(K)| <= 4.448356826459047 < 4.95 and |W_arch(h_K)| <= 5.994278749304189 for all K in R.",
+          "certified_taylor_positivity_root": 0.045775696145800286,
+          "certified_exact_rational_interval": "0 < |K| <= 1/20 = 0.05 (two-sided |C_tau(K)| < C_tau(0)), 0 <= |K| <= 9/200 = 0.045 (C_tau(K) > 0)",
+          "derived_uniform_archimedean_integral_bound": 4.448356826459047,
+          "derived_uniform_w_arch_total_bound": 5.994278749304189
+        },
+        {
+          "item": "Forward prime sum global bound M_fwd vs K=1 sample value",
+          "stale_narrative_value": 0.0319695591,
+          "cause_of_stale_value": "0.0319695591 is the magnitude of the prime wavelet sum at K = 1 (X = tau), whereas the global upper bound on |P_fwd(X)| for all X >= 1 is (92193/32768) * 0.225 = 0.6330390930175781.",
+          "certified_global_M_fwd_bound": 0.6330390930175781,
+          "certified_W_at_tau_mid": -0.0319695591
+        }
+      ]
     }
   },
   "section_8_tau_role_scaling_controls": {
@@ -1029,6 +1958,8 @@
     },
     "attempt_2_local_concavity_and_archimedean_dominance": {
       "status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
+      "certified_exact_rational_radius_zero_free": 0.05,
+      "certified_exact_rational_radius_spectral": 0.068,
       "certified_local_concavity_radius_K_loc": 0.051485789116493534,
       "certified_two_sided_abs_bound_radius_zero_free": 0.051485789116493534,
       "certified_two_sided_abs_bound_radius_spectral": 0.06846475543527798,
@@ -1036,7 +1967,7 @@
       "C_tau_double_prime_0": -0.6417402351608936,
       "archimedean_plus_local_second_deriv_at_0": -0.2575959253100577,
       "prime_power_second_deriv_at_0": -0.384144309850836,
-      "conclusion": "At K = 0, BOTH the completed archimedean sector (-0.257595 < 0, arising from -167.403799 archimedean integral curvature + 167.146204 local constant curvature) AND the prime-power sector (-0.384145 < 0) are strictly concave, reinforcing each other to give C_tau''(0) = -0.641740 < 0. The 100% zero-free arithmetic 6th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.051486 (and C_tau(K) > 0 on |K| <= 0.045776), while the unconditional spectral-tail 4th-order Taylor enclosure certifies -C_tau(0) < C_tau(K) < C_tau(0) on 0 < |K| <= 0.068465 and C_tau(K) < C_tau(0) on 0 < |K| <= 0.133277."
+      "conclusion": "At K = 0, BOTH the completed archimedean sector (-0.257595 < 0, arising from -167.403799 archimedean integral curvature + 167.146204 local constant curvature) AND the prime-power sector (-0.384145 < 0) are strictly concave, reinforcing each other to give C_tau''(0) = -0.641740 < 0. The 100% zero-free arithmetic 6th-order Taylor enclosure (using sup_{|K| <= 0.08} |C_tau^{(6)}(K)| <= M_6^{arith} = 433.5413) certifies the exact rational interval 0 < |K| <= 1/20 = 0.05 with strict margin (lower-bound polynomial root 0.051486), while the unconditional spectral-tail 4th-order Taylor enclosure certifies the exact rational interval 0 < |K| <= 17/250 = 0.068 with strict margin (lower-bound polynomial root 0.068465, upper concavity root 0.133277)."
     },
     "attempt_3_large_grade_wavelet_decomposition": {
       "status": "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN",
@@ -1045,7 +1976,7 @@
         "local_constant_term": "O(tau^{-5K/2})",
         "archimedean_integral_term": "O(tau^{-3K/2}) because the leading O(tau^{K/2}) moment int_0^infty h_0(alpha) alpha^{-1/2} d_alpha/alpha = H_0(-1/2) = 0 vanishes identically",
         "forward_prime_sum_P_fwd": "O(tau^{-5K/2})",
-        "reflected_prime_wavelet_sum_P_refl": "-sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n / tau^K), whose PNT smooth main term tau^{K/2} int_0^infty h_0(alpha) alpha^{1/2} d_alpha/alpha = tau^{K/2} H_0(1/2) = 0 vanishes identically by F_tau(1) = 0, leaving an O(1) oscillatory prime-error wavelet transform"
+        "reflected_prime_wavelet_sum_P_refl": "-W(tau^K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n / tau^K), whose PNT smooth main term tau^{K/2} int_0^infty h_0(alpha) alpha^{-1/2} d_alpha = tau^{K/2} H_0(1/2) = 0 vanishes identically by F_tau(1) = 0; whether the remaining prime-error wavelet pairing I(X) is uniformly O(1) as X = tau^K -> infty is the open research target SUBGATE-TC-042B"
       },
       "samples": [
         {
@@ -1085,30 +2016,266 @@
         "subgate_id": "SUBGATE-TC-042B",
         "subgate_name": "UNIFORM_REFLECTED_PRIME_WAVELET_BOUNDEDNESS_SUBGATE",
         "status": "OPEN",
-        "simplified_target_statement": "exists M < infty forall X >= 1 : |W_wavelet(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M",
+        "notation_separation": {
+          "W_alpha": "W_alpha = (alpha + alpha^(-1))^2 >= 4 (symmetric kernel variable of h_0)",
+          "W_X": "W(X) = sum_{n >= 2} (Lambda(n)/sqrt(n)) h_0(n/X) (reflected prime wavelet sum)"
+        },
+        "simplified_target_statement": "exists M < infty forall X >= 1 : |W(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M",
         "equivalence_to_complete_correlation_boundedness": {
           "forward_prime_global_bound_M_fwd": 0.6330390930175781,
-          "archimedean_global_bound_M_arch": 6.495921922845142,
+          "derived_archimedean_integral_bound_M_arch_int": 4.448356826459047,
+          "archimedean_global_bound_M_arch": 5.994278749304189,
+          "derived_archimedean_bound_details": {
+            "g0_at_0_float": 0.4973624838099012,
+            "abs_g2_at_0_float": 15.920220125212786,
+            "optimal_split_u0_float": 0.35350207966149916,
+            "bound_on_0_to_u0": 0.6984247406904245,
+            "bound_on_u0_to_1": 1.9704733319481476,
+            "bound_on_1_to_inf_subtraction": 0.38393242055813104,
+            "bound_on_1_to_inf_main": 1.3955263332623444,
+            "derived_arch_integral_uniform_bound": 4.448356826459047,
+            "derived_arch_integral_str_15": "[4.44835682645905 +/- 2.54e-15]",
+            "previous_ad_hoc_bound": 4.95,
+            "strictly_improves_previous_4_95_bound": true,
+            "local_constant_uniform_bound": 1.5459219228451413,
+            "derived_w_arch_total_uniform_bound": 5.994278749304189,
+            "derived_w_arch_total_str_15": "[5.99427874930419 +/- 1.14e-15]",
+            "valid_for_all_real_K": true
+          },
           "lean_theorem": "complete_correlation_bounded_of_reflected_prime_wavelet_bound",
-          "laplace_sufficiency": "Any uniform bound |W_wavelet(X)| <= M < infty implies |C_tau(K)| <= M_arch + M_fwd + M < infty for all K in R, which bounds the Laplace transform |L[C_tau(-t)](w)| <= M_total / Re(w) on Re(w) > 0, preventing right-half-plane poles and implying the Riemann Hypothesis."
+          "laplace_sufficiency": "Any uniform bound |W(X)| <= M < infty implies |C_tau(K)| <= M_arch + M_fwd + M < infty for all K in R, which bounds the Laplace transform |L[C_tau(-t)](w)| <= M_total / Re(w) on Re(w) > 0, preventing right-half-plane poles and implying the Riemann Hypothesis."
         },
         "stieltjes_chebyshev_error_representation": {
           "pnt_main_term_moment_H0_at_half_contains_zero": true,
           "pnt_main_term_moment_abs_upper": 7.993816977127691e-16,
+          "H0_at_0_mellin_value_positive": 2.829093440706439e-05,
+          "H0_half_vs_H0_0_distinction": "H_0(1/2) = int_0^infty alpha^(-1/2) h_0(alpha) d_alpha = F_tau(1) F_tau(0) = 0 cancels the smooth PNT main term x, whereas H_0(0) = int_0^infty h_0(alpha) d_alpha/alpha = F_tau(1/2)^2 = 0.0000282909 > 0.",
           "derivative_wavelet_kernel_formula": "tilde{h}_0(alpha) = (1/2) h_0(alpha) - (D_alpha h_0)(alpha), D_alpha = alpha d/d_alpha",
-          "exact_stieltjes_identity": "W_wavelet(X) = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx + X^{-1/2} int_1^infty (E_psi(x)/x) tilde{h}_0(x/X) dx/x^{1/2},  E_psi(x) = psi(x) - x",
+          "exact_stieltjes_identity_form_A_original_variable": "W(X) = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx + int_1^infty E(x) x^{-3/2} tilde{h}_0(x/X) dx,  E(x) = psi(x) - x",
+          "exact_stieltjes_identity_form_B_rescaled_variable": "W(X) = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx + X^{-1/2} int_{1/X}^infty E(X alpha) alpha^{-3/2} tilde{h}_0(alpha) d_alpha,  E(x) = psi(x) - x",
+          "exact_stieltjes_identity": "W(X) = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx + int_1^infty E(x) x^{-3/2} tilde{h}_0(x/X) dx = h_0(1/X) - int_0^1 x^{-1/2} h_0(x/X) dx + X^{-1/2} int_{1/X}^infty E(X alpha) alpha^{-3/2} tilde{h}_0(alpha) d_alpha",
+          "finite_cutoff_stieltjes_verification": {
+            "status": "STIELTJES_IDENTITY_REPAIRED_AND_CERTIFIED",
+            "B_cutoff": 50,
+            "form_A_original_variable_identity": "W(X) = h_0(1/X) - int_0^1 x^(-1/2) h_0(x/X) dx + int_1^infty E(x) x^(-3/2) tilde{h}_0(x/X) dx",
+            "form_B_rescaled_variable_identity": "W(X) = h_0(1/X) - int_0^1 x^(-1/2) h_0(x/X) dx + X^(-1/2) int_{1/X}^infty E(X alpha) alpha^(-3/2) tilde{h}_0(alpha) d_alpha",
+            "finite_cutoff_identity_form_A": "sum_{2<=n<=B} Lambda(n) n^(-1/2) h_0(n/X) = int_1^B x^(-1/2) h_0(x/X) dx + B^(-1/2) h_0(B/X) E(B) + h_0(1/X) + int_1^B E(x) x^(-3/2) tilde{h}_0(x/X) dx",
+            "all_form_A_enclose_lhs": true,
+            "all_form_B_enclose_lhs": true,
+            "old_erroneous_formula_refuted_at_X_ne_1": true,
+            "scale_verifications": [
+              {
+                "X": 1,
+                "B_cutoff": 50,
+                "lhs_direct_sum_mid": -0.05707286258003279,
+                "lhs_direct_sum_str_15": "[-0.0570728625800328 +/- 1.50e-17]",
+                "rhs_form_A_mid": -0.05707286258003279,
+                "rhs_form_A_str_15": "[-0.0570728625800328 +/- 1.50e-17]",
+                "rhs_form_B_mid": -0.05707286258003279,
+                "rhs_form_B_str_15": "[-0.0570728625800328 +/- 1.50e-17]",
+                "stieltjes_integral_form_A_mid": -0.541708942244859,
+                "stieltjes_integral_form_A_str_15": "[-0.541708942244859 +/- 4.51e-17]",
+                "stieltjes_integral_certified_nonzero": true,
+                "form_A_abs_mid_diff": 1.7587650786757683e-69,
+                "form_B_abs_mid_diff": 1.7587650786757683e-69,
+                "form_A_encloses_lhs": true,
+                "form_B_encloses_lhs": true,
+                "old_erroneous_formula_rhs_mid": -0.05707286258003279,
+                "old_erroneous_formula_abs_discrepancy": 1.7587650786757683e-69,
+                "old_erroneous_formula_encloses_lhs": true
+              },
+              {
+                "X": 4,
+                "B_cutoff": 50,
+                "lhs_direct_sum_mid": -0.006257065379223594,
+                "lhs_direct_sum_str_15": "[-0.00625706537922359 +/- 4.68e-18]",
+                "rhs_form_A_mid": -0.006257065379223594,
+                "rhs_form_A_str_15": "[-0.00625706537922359 +/- 4.68e-18]",
+                "rhs_form_B_mid": -0.006257065379223594,
+                "rhs_form_B_str_15": "[-0.00625706537922359 +/- 4.68e-18]",
+                "stieltjes_integral_form_A_mid": -0.04303523162945011,
+                "stieltjes_integral_form_A_str_15": "[-0.0430352316294501 +/- 9.42e-18]",
+                "stieltjes_integral_certified_nonzero": true,
+                "form_A_abs_mid_diff": 1.2155224772426429e-67,
+                "form_B_abs_mid_diff": 7.91988359989706e-68,
+                "form_A_encloses_lhs": true,
+                "form_B_encloses_lhs": true,
+                "old_erroneous_formula_rhs_mid": 0.01526055043550146,
+                "old_erroneous_formula_abs_discrepancy": 0.021517615814725055,
+                "old_erroneous_formula_encloses_lhs": false
+              },
+              {
+                "X": 100,
+                "B_cutoff": 50,
+                "lhs_direct_sum_mid": -0.10909165585634636,
+                "lhs_direct_sum_str_15": "[-0.109091655856346 +/- 3.67e-16]",
+                "rhs_form_A_mid": -0.10909165585634636,
+                "rhs_form_A_str_15": "[-0.109091655856346 +/- 3.67e-16]",
+                "rhs_form_B_mid": -0.10909165585634636,
+                "rhs_form_B_str_15": "[-0.109091655856346 +/- 3.67e-16]",
+                "stieltjes_integral_form_A_mid": -0.052485739935030806,
+                "stieltjes_integral_form_A_str_15": "[-0.0524857399350308 +/- 2.95e-18]",
+                "stieltjes_integral_certified_nonzero": true,
+                "form_A_abs_mid_diff": 4.7498927053019445e-77,
+                "form_B_abs_mid_diff": 7.448695378768958e-77,
+                "form_A_encloses_lhs": true,
+                "form_B_encloses_lhs": true,
+                "old_erroneous_formula_rhs_mid": -0.06185448991481864,
+                "old_erroneous_formula_abs_discrepancy": 0.04723716594152772,
+                "old_erroneous_formula_encloses_lhs": false
+              }
+            ]
+          },
           "unconditional_bounds_comparison": {
             "chebyshev_bound_psi_le_Cx": "O(X^{1/2}) (ignores sign changes of h_0)",
-            "de_la_vallee_poussin_pnt_bound": "O(X^{1/2} exp(-c sqrt(log X))) (cancels main term x via H_0(1/2) = 0, but triangle inequality inside the integral loses oscillatory cancellation of E_psi)",
-            "uniform_O_1_target": "O(1) for all X >= 1 (requires bounding the wavelet pairing of E_psi(x)/sqrt(x) against tilde{h}_0(x/X) without taking absolute values inside the integral)"
+            "de_la_vallee_poussin_pnt_bound": "O(X^{1/2} exp(-c sqrt(log X))) (cancels main term x via H_0(1/2) = 0, but triangle inequality inside the integral loses oscillatory cancellation of E)",
+            "uniform_O_1_target_hypothesis": "Target hypothesis (OPEN): exists M < infty forall X >= 1 : |I(X)| <= M (requires bounding the signed wavelet pairing of E(x)/sqrt(x) against tilde{h}_0(x/X) without taking absolute values inside the integral)"
           }
         },
+        "subgate_tc042b_cancellation_attempts": {
+          "boundary_term_uniform_bound": {
+            "formula": "B_boundary(X) = h_0(1/X) - int_0^1 x^(-1/2) h_0(x/X) dx",
+            "exact_rational_coeff": "92193/24576",
+            "exact_rational_coeff_reduced": "30731/8192",
+            "bound_for_X_ge_1": "|B_boundary(X)| <= (92193/24576) * X^(-5/2) = (30731/8192) * X^(-5/2) <= 3.751343 * X^(-5/2)",
+            "equivalence_proved": "sup_{X >= 1} |I(X)| < infty  <==>  sup_{X >= 1} |W(X)| < infty  <==>  sup_{K in R} |C_tau(K)| < infty",
+            "lean_theorem": "stieltjes_signed_pairing_uniform_bound_equivalence"
+          },
+          "attempt_A_multiscale_euler_operator_and_primitive_transfer": {
+            "status": "STRUCTURAL_REDUCTION_AND_RESONANT_BAND_OBSTRUCTION_IDENTIFIED",
+            "euler_operator_factorization": "tilde{h}_0(alpha) = -(1/512) (D_alpha - 1/2)^5 (D_alpha + 1/2)^4 ((alpha + alpha^(-1))^(-1/2))",
+            "symbolic_factorization_verified": true,
+            "annihilation_orders": {
+              "at_s_eq_pos_half_pnt_main_term": 5,
+              "at_s_eq_neg_half": 4
+            },
+            "primitive_transfer_analysis": "Integrating by parts against E_1(x) = int_1^x E(t) dt = psi_1(x) - x^2/2 + 1/2 gives I(X) = (1/2) h_1(1/X) + int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx where h_1(alpha) = (3/2) tilde{h}_0(alpha) - D_alpha tilde{h}_0(alpha). At the classical PNT exponent s = 1 (weights Lambda(n)/n), int_1^infty E(x) x^(-2) dx = -gamma_E - 1 converges unconditionally because E_1(x)/x^3 = O(x^(-1) exp(-c sqrt(log x))) is L^1. At the critical-line exponent s = 1/2 (weights Lambda(n)/sqrt(n)), transferring derivatives suppresses the high-frequency tail x >> X by (X/x)^k, but on the resonant scale band x in [X/4, 4X] the scale derivative d/dx [tilde{h}_0(x/X)] = x^(-1) (D_alpha tilde{h}_0)(x/X) has scale factor x^(-1) ~ X^(-1), which exactly balances the extra power of x in E_1(x)."
+          },
+          "attempt_B_signed_dyadic_scale_decomposition": {
+            "status": "CONDITIONAL_ON_SIGNED_DYADIC_SHELL_CANCELLATION",
+            "decomposition_formula": "I(X) = sum_{j in Z} omega_j * mu_j(X),  omega_j = int_{2^j}^{2^(j+1)} |tilde{h}_0(alpha)| alpha^(-1/2) d_alpha",
+            "l1_majorant_weight_sum_upper": 5.254074691038639,
+            "dyadic_shells_minus6_to_5": [
+              {
+                "j": -6,
+                "alpha_interval": [
+                  0.015625,
+                  0.03125
+                ],
+                "majorant_weight_omega_j_upper": 0.00014007166321911547
+              },
+              {
+                "j": -5,
+                "alpha_interval": [
+                  0.03125,
+                  0.0625
+                ],
+                "majorant_weight_omega_j_upper": 0.0011151464255503545
+              },
+              {
+                "j": -4,
+                "alpha_interval": [
+                  0.0625,
+                  0.125
+                ],
+                "majorant_weight_omega_j_upper": 0.00875071094819949
+              },
+              {
+                "j": -3,
+                "alpha_interval": [
+                  0.125,
+                  0.25
+                ],
+                "majorant_weight_omega_j_upper": 0.06493286765887696
+              },
+              {
+                "j": -2,
+                "alpha_interval": [
+                  0.25,
+                  0.5
+                ],
+                "majorant_weight_omega_j_upper": 0.39497984149954485
+              },
+              {
+                "j": -1,
+                "alpha_interval": [
+                  0.5,
+                  1.0
+                ],
+                "majorant_weight_omega_j_upper": 1.3876570377495323
+              },
+              {
+                "j": 0,
+                "alpha_interval": [
+                  1.0,
+                  2.0
+                ],
+                "majorant_weight_omega_j_upper": 1.901913677169511
+              },
+              {
+                "j": 1,
+                "alpha_interval": [
+                  2.0,
+                  4.0
+                ],
+                "majorant_weight_omega_j_upper": 1.0378558633814776
+              },
+              {
+                "j": 2,
+                "alpha_interval": [
+                  4.0,
+                  8.0
+                ],
+                "majorant_weight_omega_j_upper": 0.3359285216776851
+              },
+              {
+                "j": 3,
+                "alpha_interval": [
+                  8.0,
+                  16.0
+                ],
+                "majorant_weight_omega_j_upper": 0.09014437094137341
+              },
+              {
+                "j": 4,
+                "alpha_interval": [
+                  16.0,
+                  32.0
+                ],
+                "majorant_weight_omega_j_upper": 0.02294893892208067
+              },
+              {
+                "j": 5,
+                "alpha_interval": [
+                  32.0,
+                  64.0
+                ],
+                "majorant_weight_omega_j_upper": 0.005763500898858915
+              }
+            ],
+            "single_unresolved_hypothesis": "exists M_dyadic < infty forall X >= 1, j in Z : |mu_j(X)| := |X^(-1/2) int_{2^j X}^{2^(j+1) X} E(x) x^(-3/2) (tilde{h}_0(x/X)/omega_j) dx| <= M_dyadic"
+          },
+          "attempt_C_seed_wavelet_multiplicative_convolution_factorization": {
+            "status": "REDUCED_TO_GAUSSIAN_SEED_LOCAL_L2_SCALE_ENERGY",
+            "convolution_identity": "W(X) = int_0^infty V_tau(X/y) psi_tau(y) dy/y = int_0^infty V_tau(u) psi_tau(X/u) du/u,  V_tau(u) := sum_{n >= 2} (Lambda(n)/sqrt(n)) psi_tau(n/u)",
+            "single_seed_pnt_moment_vanishes": true,
+            "single_seed_pnt_moment_abs_upper": 7.161113569678223e-27,
+            "weighted_psi_tau_l2_norm_C_psi": 1.5326496414421078,
+            "finite_sum_convolution_verification_at_X_4_abs_diff": 4.575767488281127e-19,
+            "cauchy_schwarz_reduction": "|W(X)| <= C_psi * (int_0^infty |V_tau(X/y)|^2 (y + y^(-1))^(-2) dy/y)^(1/2), where C_psi <= 1.532650 is certified finite and V_tau(u) already has vanishing PNT main term F_tau(1) = 0 and Gaussian decay exp(-pi (n/u)^2).",
+            "single_unresolved_hypothesis": "sup_{X >= 1} int_0^infty |V_tau(X/y)|^2 (y + y^(-1))^(-2) dy/y < infty"
+          }
+        },
+        "certified_scale_evaluation_scope": "9 discrete sample scales X in {1, 2, pi, tau, 10, tau^2, 100, tau^3, 1000} (finite point certificates, not a continuous interval enclosure over [1, 1000])",
         "certified_scale_evaluations_X_1_to_1000": [
           {
             "scale_label": "1",
             "X_float": 1.0,
             "W_wavelet_mid": -0.057307481198189764,
             "W_wavelet_rad": 1.577723066775727e-09,
+            "W_wavelet_lower": -0.057307482775912834,
+            "W_wavelet_upper": -0.0573074796204667,
+            "W_wavelet_str_15": "[-0.05730748 +/- 2.78e-9]",
             "W_wavelet_abs_upper": 0.057307482775912834,
             "unconditional_chebyshev_bound_O_sqrt_X": 1.95,
             "cancellation_ratio_vs_chebyshev": 0.029388452705596327
@@ -1118,6 +2285,9 @@
             "X_float": 2.0,
             "W_wavelet_mid": 0.07937185481408209,
             "W_wavelet_rad": 8.924949446154073e-09,
+            "W_wavelet_lower": 0.07937184588913264,
+            "W_wavelet_upper": 0.07937186373903153,
+            "W_wavelet_str_15": "[0.0793719 +/- 5.42e-8]",
             "W_wavelet_abs_upper": 0.07937186373903153,
             "unconditional_chebyshev_bound_O_sqrt_X": 2.7577164466275352,
             "cancellation_ratio_vs_chebyshev": 0.028781734915530172
@@ -1127,6 +2297,9 @@
             "X_float": 3.141592653589793,
             "W_wavelet_mid": 0.025571615385218634,
             "W_wavelet_rad": 2.7599769608643854e-08,
+            "W_wavelet_lower": 0.025571587785449025,
+            "W_wavelet_upper": 0.025571642984988242,
+            "W_wavelet_str_15": "[0.0255716 +/- 4.30e-8]",
             "W_wavelet_abs_upper": 0.025571642984988242,
             "unconditional_chebyshev_bound_O_sqrt_X": 3.4562850092657564,
             "cancellation_ratio_vs_chebyshev": 0.007398592105811497
@@ -1136,6 +2309,9 @@
             "X_float": 6.283185307179586,
             "W_wavelet_mid": -0.012081947061365263,
             "W_wavelet_rad": 1.5612787418461949e-07,
+            "W_wavelet_lower": -0.012082103189239447,
+            "W_wavelet_upper": -0.012081790933491078,
+            "W_wavelet_str_15": "[-0.012082 +/- 2.10e-7]",
             "W_wavelet_abs_upper": 0.012082103189239447,
             "unconditional_chebyshev_bound_O_sqrt_X": 4.887925135530451,
             "cancellation_ratio_vs_chebyshev": 0.0024718265632618502
@@ -1145,6 +2321,9 @@
             "X_float": 10.0,
             "W_wavelet_mid": -0.0024166363290393836,
             "W_wavelet_rad": 4.989198414406815e-07,
+            "W_wavelet_lower": -0.0024171352488808243,
+            "W_wavelet_upper": -0.002416137409197943,
+            "W_wavelet_str_15": "[-0.002417 +/- 8.63e-7]",
             "W_wavelet_abs_upper": 0.0024171352488808243,
             "unconditional_chebyshev_bound_O_sqrt_X": 6.16644143732834,
             "cancellation_ratio_vs_chebyshev": 0.0003919821948277624
@@ -1154,6 +2333,9 @@
             "X_float": 39.47841760435743,
             "W_wavelet_mid": 0.00029881461917077607,
             "W_wavelet_rad": 1.545005812886302e-05,
+            "W_wavelet_lower": 0.00028336456104191305,
+            "W_wavelet_upper": 0.0003142646772996391,
+            "W_wavelet_str_15": "[0.0003 +/- 1.67e-5]",
             "W_wavelet_abs_upper": 0.0003142646772996391,
             "unconditional_chebyshev_bound_O_sqrt_X": 12.252211349000193,
             "cancellation_ratio_vs_chebyshev": 2.5649629144316364e-05
@@ -1163,6 +2345,9 @@
             "X_float": 100.0,
             "W_wavelet_mid": 0.0005803633806617861,
             "W_wavelet_rad": 0.00015777230692037847,
+            "W_wavelet_lower": 0.0004225910737414077,
+            "W_wavelet_upper": 0.0007381356875821646,
+            "W_wavelet_str_15": "[+/- 7.39e-4]",
             "W_wavelet_abs_upper": 0.0007381356875821646,
             "unconditional_chebyshev_bound_O_sqrt_X": 19.5,
             "cancellation_ratio_vs_chebyshev": 3.785311218370075e-05
@@ -1172,6 +2357,9 @@
             "X_float": 248.05021344239856,
             "W_wavelet_mid": 0.00023275738671172134,
             "W_wavelet_rad": 0.0015289024886442348,
+            "W_wavelet_lower": -0.0012961451019325135,
+            "W_wavelet_upper": 0.0017616598753559562,
+            "W_wavelet_str_15": "[+/- 1.77e-3]",
             "W_wavelet_abs_upper": 0.0017616598753559562,
             "unconditional_chebyshev_bound_O_sqrt_X": 30.71173939415872,
             "cancellation_ratio_vs_chebyshev": 5.7361123469646876e-05
@@ -1181,14 +2369,18 @@
             "X_float": 1000.0,
             "W_wavelet_mid": -0.019304656793263514,
             "W_wavelet_rad": 0.049891984032001346,
+            "W_wavelet_lower": -0.06919664082526486,
+            "W_wavelet_upper": 0.030587327238737833,
+            "W_wavelet_str_15": "[+/- 0.0692]",
             "W_wavelet_abs_upper": 0.06919664082526486,
             "unconditional_chebyshev_bound_O_sqrt_X": 61.6644143732834,
             "cancellation_ratio_vs_chebyshev": 0.0011221486740534887
           }
         ],
+        "max_certified_abs_W_wavelet_on_sampled_scales": 0.07937186373903153,
         "max_certified_abs_W_wavelet_on_1_to_1000": 0.07937186373903153
       },
-      "why_large_K_is_not_trivially_suppressed": "While the forward prime sum P_fwd(K) and archimedean term W_arch(h_K) decay exponentially in K > 0, the reflected prime sum P_refl(K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/tau^K) sweeps its peak alpha = n/tau^K = 1 across all primes n ~ tau^K as K -> +infty. Because ANY finite uniform bound |C_tau(K)| <= M < infty suffices for right-half-plane Laplace holomorphy, the problem reduces to uniform boundedness of W_wavelet(X) for X >= 1."
+      "why_large_K_is_not_trivially_suppressed": "While the forward prime sum P_fwd(K) and archimedean term W_arch(h_K) decay exponentially in K > 0 (and are uniformly bounded for all K >= 0 by 0.633039 and 5.464660 respectively), the reflected prime sum P_refl(K) = -W(tau^K) = -sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/tau^K) sweeps its peak alpha = n/tau^K = 1 across all primes n ~ tau^K as K -> +infty. Because ANY finite uniform bound |C_tau(K)| <= M < infty suffices for right-half-plane Laplace holomorphy, the problem reduces to uniform boundedness of W(X) for X >= 1."
     },
     "exact_remaining_subgate": {
       "subgate_id": "SUBGATE-TC-042A",
@@ -1199,7 +2391,7 @@
         "subgate_id": "SUBGATE-TC-042B",
         "subgate_name": "UNIFORM_REFLECTED_PRIME_WAVELET_BOUNDEDNESS_SUBGATE",
         "status": "OPEN",
-        "exact_statement": "exists M < infty forall X >= 1 : |W_wavelet(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M"
+        "exact_statement": "exists M < infty forall X >= 1 : |W(X)| := |sum_{n >= 2} (Lambda(n) / sqrt(n)) h_0(n / X)| <= M"
       }
     }
   },
@@ -1219,7 +2411,8 @@
       "autocorrelationSymmetricNumerator",
       "conjugatePairCorrelationTerm",
       "gramDetTwoByTwo",
-      "secondEulerAutocorrelationNumerator"
+      "secondEulerAutocorrelationNumerator",
+      "bernsteinWeightedH0Poly"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -1231,7 +2424,8 @@
       "autocorrelationSymmetricNumerator",
       "conjugatePairCorrelationTerm",
       "gramDetTwoByTwo",
-      "secondEulerAutocorrelationNumerator"
+      "secondEulerAutocorrelationNumerator",
+      "bernsteinWeightedH0Poly"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -1249,7 +2443,11 @@
       "laplace_holomorphic_rhp_hypothesis_satisfiable",
       "second_euler_autocorrelation_at_one",
       "taylor_two_sided_abs_correlation_bound",
-      "complete_correlation_bounded_of_reflected_prime_wavelet_bound"
+      "complete_correlation_bounded_of_reflected_prime_wavelet_bound",
+      "stieltjes_rescaled_variable_and_erroneous_factor_obstruction",
+      "bernstein_weighted_h0_polynomial_endpoints",
+      "taylor_sixth_order_two_sided_abs_correlation_bound",
+      "stieltjes_signed_pairing_uniform_bound_equivalence"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -1267,7 +2465,11 @@
       "laplace_holomorphic_rhp_hypothesis_satisfiable",
       "second_euler_autocorrelation_at_one",
       "taylor_two_sided_abs_correlation_bound",
-      "complete_correlation_bounded_of_reflected_prime_wavelet_bound"
+      "complete_correlation_bounded_of_reflected_prime_wavelet_bound",
+      "stieltjes_rescaled_variable_and_erroneous_factor_obstruction",
+      "bernstein_weighted_h0_polynomial_endpoints",
+      "taylor_sixth_order_two_sided_abs_correlation_bound",
+      "stieltjes_signed_pairing_uniform_bound_equivalence"
     ]
   },
   "literature_references": [

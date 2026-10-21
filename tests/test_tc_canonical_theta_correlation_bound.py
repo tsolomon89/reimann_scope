@@ -292,7 +292,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 10 defs, 16 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 11 defs, 20 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,14 +300,18 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 10
-    assert len(ver["actual_theorems"]) == 16
+    assert len(ver["actual_defs"]) == 11
+    assert len(ver["actual_theorems"]) == 20
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
     assert "∀ w_re res_sq : ℝ, 0 < w_re → res_sq = 0" not in lean_text
     assert "∀ w_re w_im : ℝ, 0 < w_re → resSq w_re w_im = 0" in lean_text
     assert "laplace_holomorphic_rhp_hypothesis_satisfiable" in lean_text
+    assert "stieltjes_rescaled_variable_and_erroneous_factor_obstruction" in lean_text
+    assert "bernstein_weighted_h0_polynomial_endpoints" in lean_text
+    assert "taylor_sixth_order_two_sided_abs_correlation_bound" in lean_text
+    assert "stieltjes_signed_pairing_uniform_bound_equivalence" in lean_text
 
 
 def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
@@ -405,3 +409,141 @@ def test_16_uniform_prime_wavelet_boundedness_subgate_tc042b(artifact_payload):
     assert st["pnt_main_term_moment_abs_upper"] < 1e-13
     assert len(wv["certified_scale_evaluations_X_1_to_1000"]) == 9
     assert wv["max_certified_abs_W_wavelet_on_1_to_1000"] < 0.15
+
+
+def test_17_stieltjes_finite_cutoff_identities_and_old_formula_refutation(artifact_payload):
+    """Verify repaired Stieltjes identities (Form A in x and Form B in alpha = x/X) at B = 50 for X in {1, 4, 100} and failure of old X^{-1/2} formula at X != 1."""
+    from tc.canonical_theta_correlation_bound import (
+        STIELTJES_IDENTITY_REPAIRED_AND_CERTIFIED,
+        TASK_TC_042R2_ID,
+    )
+
+    assert artifact_payload["sprint_task_id"] == TASK_TC_042R2_ID
+    att3 = artifact_payload[
+        "section_9_arithmetic_proof_attempts_and_remaining_subgate"
+    ]["attempt_3_large_grade_wavelet_decomposition"]
+    wv = att3["uniform_prime_wavelet_boundedness"]
+    st = wv["stieltjes_chebyshev_error_representation"]
+    assert st["H0_at_0_mellin_value_positive"] > 0.0
+    assert "W_alpha" in wv["notation_separation"]
+    assert "W_X" in wv["notation_separation"]
+
+    fc = st["finite_cutoff_stieltjes_verification"]
+    assert fc["status"] == STIELTJES_IDENTITY_REPAIRED_AND_CERTIFIED
+    assert fc["B_cutoff"] == 50
+    assert fc["all_form_A_enclose_lhs"] is True
+    assert fc["all_form_B_enclose_lhs"] is True
+    assert fc["old_erroneous_formula_refuted_at_X_ne_1"] is True
+
+    by_X = {row["X"]: row for row in fc["scale_verifications"]}
+    for x_val in (1, 4, 100):
+        row = by_X[x_val]
+        assert row["form_A_encloses_lhs"] is True
+        assert row["form_B_encloses_lhs"] is True
+        assert row["form_A_abs_mid_diff"] < 1e-28
+        assert row["form_B_abs_mid_diff"] < 1e-28
+        assert row["stieltjes_integral_certified_nonzero"] is True
+        if x_val != 1:
+            assert row["old_erroneous_formula_encloses_lhs"] is False
+            assert row["old_erroneous_formula_abs_discrepancy"] > 1e-2
+
+
+def test_18_exact_rational_bernstein_weighted_kernel_envelopes():
+    """Verify exact rational Bernstein polynomial certificates for |g^{(m)}(v)| <= |g^{(m)}(0)| 2^{5/2} (2 cosh v)^{-5/2}."""
+    from tc.canonical_theta_correlation_bound import (
+        BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED,
+        certify_weighted_kernel_envelopes_bernstein,
+    )
+
+    res = certify_weighted_kernel_envelopes_bernstein()
+    assert res["status"] == BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED
+    assert res["all_even_envelopes_certified"] is True
+    assert res["all_interior_bernstein_strictly_smaller_than_endpoint"] is True
+    for m_key in ("m_0", "m_2", "m_4", "m_6", "m_8"):
+        cert = res["even_derivative_certificates"][m_key]
+        assert cert["all_bernstein_control_points_bounded_by_endpoint"] is True
+        assert cert["strict_interior_dominance_certified"] is True
+        assert cert["max_interior_bernstein_to_endpoint_ratio"] < 0.95
+
+    odd = res["first_euler_derivative_and_tilde_h0_envelope"]
+    assert odd["certified_D1_sq_exceeds_bernstein_max"] is True
+    assert 15.7 < odd["certified_tilde_h0_envelope_constant_float"] < 15.8
+
+
+def test_19_scoped_m6_elementary_prime_bound_and_exact_rational_endpoints(artifact_payload):
+    """Verify M_6^{arith} scope |K| <= 0.08, elementary prime cube sum bound < 0.225, and exact rational endpoints 1/20 = 0.05 and 17/250 = 0.068."""
+    conc = artifact_payload["section_6_7_certified_grade_grid_and_controls"][
+        "local_concavity_and_derivatives"
+    ]
+    elem = conc["elementary_prime_cube_sum_bound"]
+    assert elem["elementary_bound_strictly_below_0_225"] is True
+    assert 0.216 < elem["elementary_upper_bound_float"] < 0.217
+    assert 0.164 < elem["direct_sum_25000_plus_rs_tail_upper"] < 0.165
+
+    assert math.isclose(conc["C_tau_fourth_deriv_0_mid"], 433.5413086756161, rel_tol=1e-12)
+    zf = conc["zero_free_arithmetic_local_enclosure"]
+    assert "|K| <= 0.08" in zf["sixth_derivative_domain_scope"]
+    assert math.isclose(zf["sixth_derivative_bound_M6_arith_on_0_08"], 27971954.786589753, rel_tol=1e-12)
+    assert zf["certified_exact_rational_endpoint"] == "1/20"
+    assert zf["certified_exact_rational_endpoint_float"] == 0.05
+    assert zf["certified_exact_rational_positivity_endpoint"] == "9/200"
+    assert zf["certified_exact_rational_positivity_endpoint_float"] == 0.045
+    assert zf["exact_rational_1_20_certified"] is True
+    assert zf["upper_concavity_margin_at_1_20_lower"] > 0.0
+    assert zf["positivity_margin_at_9_200_lower"] > 0.0
+    assert zf["lower_abs_margin_at_1_20_lower"] > 0.0
+
+    sp = conc["unconditional_spectral_tail_local_enclosure"]
+    assert sp["certified_exact_rational_endpoint"] == "17/250"
+    assert sp["certified_exact_rational_endpoint_float"] == 0.068
+    assert sp["certified_exact_rational_positivity_endpoint"] == "1/20"
+    assert sp["certified_exact_rational_positivity_endpoint_float"] == 0.05
+    assert sp["exact_rational_17_250_certified"] is True
+    assert sp["upper_concavity_margin_at_17_250_lower"] > 0.0
+    assert sp["positivity_margin_at_1_20_lower"] > 0.0
+    assert sp["lower_abs_margin_at_17_250_lower"] > 0.0
+
+
+def test_20_derived_uniform_archimedean_bound_and_discrepancy_reconciliation(artifact_payload):
+    """Verify derived uniform archimedean bound < 4.95 (total W_arch <= 5.9943) and baseline narrative discrepancy reconciliation."""
+    from tc.canonical_theta_correlation_bound import (
+        derive_and_certify_uniform_archimedean_bound,
+    )
+
+    arch_b = derive_and_certify_uniform_archimedean_bound()
+    assert arch_b["valid_for_all_real_K"] is True
+    assert arch_b["strictly_improves_previous_4_95_bound"] is True
+    assert 4.448 < arch_b["derived_arch_integral_uniform_bound"] < 4.449
+    assert 5.994 < arch_b["derived_w_arch_total_uniform_bound"] < 5.995
+
+    reconcil = artifact_payload["section_6_7_certified_grade_grid_and_controls"][
+        "baseline_narrative_discrepancy_reconciliation"
+    ]
+    assert reconcil["all_discrepancies_reconciled"] is True
+    assert len(reconcil["reconciled_items"]) == 3
+
+
+def test_21_subgate_tc042b_cancellation_attempts_and_seed_convolution(artifact_payload):
+    """Verify the three SUBGATE-TC-042B cancellation attempts (Euler operator factorization, dyadic decomposition, and single-seed convolution V_tau)."""
+    att3 = artifact_payload[
+        "section_9_arithmetic_proof_attempts_and_remaining_subgate"
+    ]["attempt_3_large_grade_wavelet_decomposition"]
+    wv = att3["uniform_prime_wavelet_boundedness"]
+    canc = wv["subgate_tc042b_cancellation_attempts"]
+
+    assert canc["boundary_term_uniform_bound"]["exact_rational_coeff"] == "92193/24576"
+    attA = canc["attempt_A_multiscale_euler_operator_and_primitive_transfer"]
+    assert attA["symbolic_factorization_verified"] is True
+    assert attA["annihilation_orders"]["at_s_eq_pos_half_pnt_main_term"] == 5
+    assert attA["annihilation_orders"]["at_s_eq_neg_half"] == 4
+
+    attB = canc["attempt_B_signed_dyadic_scale_decomposition"]
+    assert 0.0 < attB["l1_majorant_weight_sum_upper"] < 17.5
+    assert len(attB["dyadic_shells_minus6_to_5"]) == 12
+
+    attC = canc["attempt_C_seed_wavelet_multiplicative_convolution_factorization"]
+    assert attC["single_seed_pnt_moment_vanishes"] is True
+    assert attC["single_seed_pnt_moment_abs_upper"] < 1e-18
+    assert attC["finite_sum_convolution_verification_at_X_4_abs_diff"] < 1e-10
+    assert 0.0 < attC["weighted_psi_tau_l2_norm_C_psi"] < 5.0
+

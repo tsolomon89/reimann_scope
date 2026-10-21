@@ -56,6 +56,20 @@ and its completed zeta correlation C_tau(K) = W_xi((T_K psi_tau) * psi_tau^*):
 16. `complete_correlation_bounded_of_reflected_prime_wavelet_bound`:
       Reduction of uniform boundedness of `C_tau(K)` to boundedness of the archimedean,
       forward-prime, and reflected prime-wavelet components.
+17. `stieltjes_rescaled_variable_and_erroneous_factor_obstruction`:
+      Equivalence of the original-variable Stieltjes form `B_0 + I_A` and rescaled form
+      `B_0 + inv_sqrt_X * I_B` when `I_A = inv_sqrt_X * I_B`, and proof that the erroneous
+      expression `B_0 + inv_sqrt_X * I_A` differs from `B_0 + I_A` by `(1 - inv_sqrt_X) * I_A ≠ 0`
+      whenever `inv_sqrt_X ≠ 1` and `I_A ≠ 0`.
+18. `bernstein_weighted_h0_polynomial_endpoints`:
+      Exact evaluation of `P_0(y) = S^(5/2) h_0(e^v)` in `y = 4 / S^2` at `y = 0` (`-81/64 < 0`)
+      and `y = 1` (`92193/32768 > 0`).
+19. `taylor_sixth_order_two_sided_abs_correlation_bound`:
+      Two-sided sixth-order even Taylor enclosure (used by the zero-free arithmetic local proof on
+      `0 < |K| <= 1/20 = 0.05` inside `|K| <= 0.08`) implying `-C_0 < C_K < C_0` and `C_0^2 - C_K^2 > 0`.
+20. `stieltjes_signed_pairing_uniform_bound_equivalence`:
+      Mutual implication between `|I(X)| <= M_I` and `|W(X)| <= M_W` under a uniform boundary bound
+      `|B_boundary(X)| <= M_B` when `W(X) = B_boundary(X) + I(X)`.
 -/
 
 import Mathlib.Data.Real.Basic
@@ -387,5 +401,92 @@ theorem complete_correlation_bounded_of_reflected_prime_wavelet_bound
   rcases h_fwd with ⟨hf1, hf2⟩
   rcases h_refl with ⟨hr1, hr2⟩
   refine ⟨by linarith, by linarith⟩
+
+/-! ### 8. TASK-TC-042R2: Stieltjes Variable Rescaling, Weighted Bernstein Polynomial, and Sixth-Order Taylor Algebra -/
+
+/-- The exact degree-3 polynomial `P_0(y) = S^(5/2) * h_0(e^v)` in `y = 4 / S^2 ∈ (0, 1]`,
+    where `S = alpha + alpha^(-1) = 2 * cosh(v)`. -/
+def bernsteinWeightedH0Poly (y : ℝ) : ℝ :=
+  (-81 / 64) + (14595 / 512) * y - (176715 / 2048) * y ^ 2 + (2027025 / 32768) * y ^ 3
+
+/-- Theorem 17: Equivalence of the original-variable Stieltjes representation `W_A = B_0 + I_A`
+    and the rescaled-variable representation `W_B = B_0 + inv_sqrt_X * I_B` under the substitution
+    identity `I_A = inv_sqrt_X * I_B`, together with proof that the erroneous hybrid formula
+    `W_err = B_0 + inv_sqrt_X * I_A` differs from `W_A` by `(1 - inv_sqrt_X) * I_A ≠ 0` whenever
+    `inv_sqrt_X ≠ 1` and `I_A ≠ 0`. -/
+theorem stieltjes_rescaled_variable_and_erroneous_factor_obstruction
+    (B0 IA IB inv_sqrt_X : ℝ)
+    (h_sub : IA = inv_sqrt_X * IB)
+    (h_scale : inv_sqrt_X ≠ 1)
+    (h_nonzero : IA ≠ 0) :
+    (B0 + IA = B0 + inv_sqrt_X * IB) ∧
+      (B0 + IA) - (B0 + inv_sqrt_X * IA) = (1 - inv_sqrt_X) * IA ∧
+      (B0 + IA) - (B0 + inv_sqrt_X * IA) ≠ 0 := by
+  have h1 : B0 + IA = B0 + inv_sqrt_X * IB := by linarith [h_sub]
+  have h2 : (B0 + IA) - (B0 + inv_sqrt_X * IA) = (1 - inv_sqrt_X) * IA := by ring
+  have h_diff_ne : 1 - inv_sqrt_X ≠ 0 := sub_ne_zero.mpr (Ne.symm h_scale)
+  have h3 : (B0 + IA) - (B0 + inv_sqrt_X * IA) ≠ 0 := by
+    rw [h2]
+    exact mul_ne_zero h_diff_ne h_nonzero
+  exact ⟨h1, h2, h3⟩
+
+/-- Theorem 18: Exact endpoint values of the weighted autocorrelation polynomial
+    `P_0(y) = S^(5/2) * h_0(e^v)` in `y = 4 / S^2 = 4 / W` (`W * y = 4`):
+    `P_0(0) = -81/64 < 0` (asymptotic tail as `alpha -> infty`),
+    `P_0(1) = 92193/32768 > 0` (global maximum at `alpha = 1`, `S = 2`), and
+    `W^3 * P_0(y) = (1 / 512) * autocorrelationSymmetricNumerator W`. -/
+theorem bernstein_weighted_h0_polynomial_endpoints (W y : ℝ)
+    (hWy : W * y = 4) :
+    bernsteinWeightedH0Poly 0 = -81 / 64 ∧
+      bernsteinWeightedH0Poly 0 < 0 ∧
+      bernsteinWeightedH0Poly 1 = 92193 / 32768 ∧
+      0 < bernsteinWeightedH0Poly 1 ∧
+      W ^ 3 * bernsteinWeightedH0Poly y =
+        (1 / 512) * autocorrelationSymmetricNumerator W := by
+  unfold bernsteinWeightedH0Poly autocorrelationSymmetricNumerator
+  refine ⟨by ring, by norm_num, by ring, by norm_num, ?_⟩
+  calc
+    W ^ 3 * (-81 / 64 + 14595 / 512 * y - 176715 / 2048 * y ^ 2 + 2027025 / 32768 * y ^ 3)
+        = (-81 / 64) * W ^ 3 + (14595 / 512) * W ^ 2 * (W * y)
+          - (176715 / 2048) * W * (W * y) ^ 2 + (2027025 / 32768) * (W * y) ^ 3 := by ring
+    _ = (-81 / 64) * W ^ 3 + (14595 / 512) * W ^ 2 * 4
+          - (176715 / 2048) * W * 4 ^ 2 + (2027025 / 32768) * 4 ^ 3 := by rw [hWy]
+    _ = 1 / 512 * (-648 * W ^ 3 + 58380 * W ^ 2 - 706860 * W + 2027025) := by ring
+
+/-- Theorem 19: Conditional sixth-order even Taylor enclosure for `-C_0 < C_K < C_0` and
+    strict 2x2 Toeplitz Gram positivity `C_0^2 - C_K^2 > 0` (matching the 6th-order
+    zero-free arithmetic local proof on `0 < |K| <= 1/20 = 0.05` inside `|K| <= 0.08`). -/
+theorem taylor_sixth_order_two_sided_abs_correlation_bound
+    (C0 CK C2 C4 M6 K : ℝ)
+    (h_upper_taylor : CK ≤ C0 + (C2 / 2) * K ^ 2 + (C4 / 24) * K ^ 4 + (M6 / 720) * K ^ 6)
+    (h_lower_taylor : C0 + (C2 / 2) * K ^ 2 + (C4 / 24) * K ^ 4 - (M6 / 720) * K ^ 6 ≤ CK)
+    (h_concavity : (C2 / 2) * K ^ 2 + (C4 / 24) * K ^ 4 + (M6 / 720) * K ^ 6 < 0)
+    (h_lower_abs : 0 < 2 * C0 + (C2 / 2) * K ^ 2 + (C4 / 24) * K ^ 4 - (M6 / 720) * K ^ 6) :
+    -C0 < CK ∧ CK < C0 ∧ 0 < gramDetTwoByTwo C0 CK := by
+  unfold gramDetTwoByTwo
+  have h_lt : CK < C0 := by linarith
+  have h_gt : -C0 < CK := by linarith
+  have h1 : 0 < C0 - CK := by linarith
+  have h2 : 0 < C0 + CK := by linarith
+  have h_prod : 0 < (C0 - CK) * (C0 + CK) := mul_pos h1 h2
+  have h_id : C0 ^ 2 - CK ^ 2 = (C0 - CK) * (C0 + CK) := by ring
+  refine ⟨h_gt, h_lt, ?_⟩
+  linarith
+
+/-- Theorem 20: Equivalence between uniform boundedness of the signed Stieltjes pairing `I(X)`
+    and uniform boundedness of the reflected prime-wavelet sum `W(X) = B_boundary(X) + I(X)`
+    given the unconditional uniform boundary bound `|B_boundary(X)| <= M_B`. -/
+theorem stieltjes_signed_pairing_uniform_bound_equivalence
+    (W_X B_X I_X M_B M_I M_W : ℝ)
+    (h_decomp : W_X = B_X + I_X)
+    (h_bound_B : -M_B ≤ B_X ∧ B_X ≤ M_B) :
+    ((-M_I ≤ I_X ∧ I_X ≤ M_I) → (-(M_B + M_I) ≤ W_X ∧ W_X ≤ M_B + M_I)) ∧
+      ((-M_W ≤ W_X ∧ W_X ≤ M_W) → (-(M_W + M_B) ≤ I_X ∧ I_X ≤ M_W + M_B)) := by
+  rcases h_bound_B with ⟨hB1, hB2⟩
+  refine ⟨?_, ?_⟩
+  · rintro ⟨hI1, hI2⟩
+    refine ⟨by linarith, by linarith⟩
+  · rintro ⟨hW1, hW2⟩
+    refine ⟨by linarith, by linarith⟩
 
 end RiemannScope
