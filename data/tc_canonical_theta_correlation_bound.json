@@ -67,10 +67,14 @@
     "endpoint_values": {
       "F_tau_at_0": 0.0,
       "F_tau_deriv_at_0": 0.0625,
+      "F_tau_vanishing_order_at_0": 1,
       "F_tau_at_1": 0.0,
       "F_tau_deriv_at_1": 0.0,
-      "s_eq_0_mechanism": "Gamma(s/2) = 2/s - gamma_E + O(s) has a simple pole at s = 0; the double factor s^2 cancels the pole and leaves a simple zero F_tau(s) = (1/16) s + O(s^2).",
-      "s_eq_1_mechanism": "Gamma(1/2) = sqrt(pi) is finite and (s - 1)^2 vanishes to order 2 at s = 1."
+      "F_tau_second_deriv_at_1": 0.044194173824159216,
+      "F_tau_vanishing_order_at_1": 2,
+      "H0_vanishing_order_at_z_eq_pm_half": 3,
+      "s_eq_0_mechanism": "Gamma(s/2) = 2/s - gamma_E + O(s) has a simple pole at s = 0; the double polynomial factor s^2 cancels the simple pole and leaves a SIMPLE zero (order 1): F_tau(s) = (1/16) s + O(s^2).",
+      "s_eq_1_mechanism": "Gamma(1/2) = sqrt(pi) is finite and nonzero, so (s - 1)^2 produces a DOUBLE zero (order 2) at s = 1; consequently H_0(z) = F_tau(1/2 + z) F_tau(1/2 - z) vanishes to order 1 + 2 = 3 at z = +/- 1/2 (not order 4)."
     },
     "critical_strip_nonvanishing": {
       "nonvanishing_on_open_strip_0_lt_Re_s_lt_1": true,
@@ -1858,20 +1862,23 @@
           "reconciled_scope": "C_tau^{(4)}(0) = [433.54130868 +/- 5.83e-6], sup_{|K| <= 0.08} |C_tau^{(6)}(K)| <= M_6^{arith} = 27971954.786589753"
         },
         {
-          "item": "K=1 archimedean sample value 0.0566039457 (and 4.95 ad-hoc constant) vs derived uniform archimedean bound",
+          "item": "Stale narrative 0.0566039457 (and 4.95 ad-hoc constant) vs derived uniform archimedean bound",
           "stale_narrative_value": 0.0566039457,
-          "cause_of_stale_value": "Stale narrative in docs/TC_CURRENT_CANONICAL_STATUS.md used 0.0566039457 + 0.0319695591 = 0.0885735048 (point values at K = 1) while the code used an ad-hoc 4.95 bound on |I_arch(K)|; now derive_and_certify_uniform_archimedean_bound derives and certifies |I_arch(K)| <= 4.448356826459047 < 4.95 and |W_arch(h_K)| <= 5.994278749304189 for all K in R.",
+          "cause_of_stale_value": "Stale narrative in docs/TC_CURRENT_CANONICAL_STATUS.md used 0.0566039457 + 0.0319695591 = 0.0885735048 while the code used an ad-hoc 4.95 bound on |I_arch(K)|; now derive_and_certify_uniform_archimedean_bound derives and certifies |I_arch(K)| <= 4.448356826459047 < 4.95 and |W_arch(h_K)| <= 5.994278749304189 for all K in R.",
           "certified_taylor_positivity_root": 0.045775696145800286,
           "certified_exact_rational_interval": "0 < |K| <= 1/20 = 0.05 (two-sided |C_tau(K)| < C_tau(0)), 0 <= |K| <= 9/200 = 0.045 (C_tau(K) > 0)",
           "derived_uniform_archimedean_integral_bound": 4.448356826459047,
           "derived_uniform_w_arch_total_bound": 5.994278749304189
         },
         {
-          "item": "Forward prime sum global bound M_fwd vs K=1 sample value",
+          "item": "Forward prime sum global bound M_fwd = 0.6330390930 vs stale 0.0319695591 and actual W(tau) = -0.0120819471",
           "stale_narrative_value": 0.0319695591,
-          "cause_of_stale_value": "0.0319695591 is the magnitude of the prime wavelet sum at K = 1 (X = tau), whereas the global upper bound on |P_fwd(X)| for all X >= 1 is (92193/32768) * 0.225 = 0.6330390930175781.",
+          "cause_of_stale_value": "0.0319695591 was a stale uncertified draft constant in docs/TC_CURRENT_CANONICAL_STATUS.md (paired with 0.0566039457 to give 0.0885735048); the certified global upper bound on |P_fwd(X)| for all X >= 1 is (92193/32768) * 0.225 = 0.6330390930175781, while the certified reflected prime wavelet sum at X = tau is W(tau) = -0.0120819471 ([-0.012082 +/- 2.10e-7]) and at X = 1 is W(1) = -0.0573074812. Moreover, H_0(0) = F_tau(1/2)^2 = 2.8290934407e-05 > 0 is the centered Mellin value at z = 0 of the actual differentiated seed psi_tau.",
           "certified_global_M_fwd_bound": 0.6330390930175781,
-          "certified_W_at_tau_mid": -0.0319695591
+          "certified_W_at_tau_mid": -0.012081947061365263,
+          "certified_W_at_tau_str_15": "[-0.012082 +/- 2.10e-7]",
+          "certified_W_at_1_mid": -0.057307481198189764,
+          "certified_H0_at_0_mellin_mid": 2.829093440706439e-05
         }
       ]
     }
@@ -2145,15 +2152,60 @@
             "status": "STRUCTURAL_REDUCTION_AND_RESONANT_BAND_OBSTRUCTION_IDENTIFIED",
             "euler_operator_factorization": "tilde{h}_0(alpha) = -(1/512) (D_alpha - 1/2)^5 (D_alpha + 1/2)^4 ((alpha + alpha^(-1))^(-1/2))",
             "symbolic_factorization_verified": true,
-            "annihilation_orders": {
-              "at_s_eq_pos_half_pnt_main_term": 5,
-              "at_s_eq_neg_half": 4
+            "operator_multiplicity_vs_mellin_vanishing_order": {
+              "operator_factor_multiplicity_at_D_eq_pos_half": 5,
+              "operator_factor_multiplicity_at_D_eq_neg_half": 4,
+              "base_kernel_mellin_pole_order_at_z_eq_pm_half": 1,
+              "H0_mellin_vanishing_order_at_z_eq_pm_half": 3,
+              "tilde_H0_mellin_vanishing_order_at_z_eq_pos_half": 3,
+              "tilde_H0_mellin_vanishing_order_at_z_eq_neg_half": 4,
+              "explanation": "Because Gamma(s/2) has a simple pole at s = 0, F_tau(s) has a simple zero at s = 0 (order 1) and a double zero at s = 1 (order 2), so H_0(z) = F_tau(1/2+z) F_tau(1/2-z) vanishes to order 3 at z = +/- 1/2 (equivalently, one factor of (D_alpha^2 - 1/4) cancels the simple Mellin poles of (alpha + alpha^(-1))^(-1/2) at z = +/- 1/2)."
             },
-            "primitive_transfer_analysis": "Integrating by parts against E_1(x) = int_1^x E(t) dt = psi_1(x) - x^2/2 + 1/2 gives I(X) = (1/2) h_1(1/X) + int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx where h_1(alpha) = (3/2) tilde{h}_0(alpha) - D_alpha tilde{h}_0(alpha). At the classical PNT exponent s = 1 (weights Lambda(n)/n), int_1^infty E(x) x^(-2) dx = -gamma_E - 1 converges unconditionally because E_1(x)/x^3 = O(x^(-1) exp(-c sqrt(log x))) is L^1. At the critical-line exponent s = 1/2 (weights Lambda(n)/sqrt(n)), transferring derivatives suppresses the high-frequency tail x >> X by (X/x)^k, but on the resonant scale band x in [X/4, 4X] the scale derivative d/dx [tilde{h}_0(x/X)] = x^(-1) (D_alpha tilde{h}_0)(x/X) has scale factor x^(-1) ~ X^(-1), which exactly balances the extra power of x in E_1(x)."
+            "exact_primitive_transfer_identity": "I(X) = int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx,  E_1(x) = int_1^x E(t) dt (E_1(1) = 0, no lower boundary term),  h_1(alpha) = (3/2) tilde{h}_0(alpha) - (D_alpha tilde{h}_0)(alpha)",
+            "finite_cutoff_primitive_transfer_identity": "I_B(X) = E_1(B) B^(-3/2) tilde{h}_0(B/X) + int_1^B E_1(x) x^(-5/2) h_1(x/X) dx",
+            "all_primitive_transfer_finite_cutoff_enclose": true,
+            "spurious_half_h1_at_X_eq_1_refuted_value": -7.77359913117768,
+            "primitive_transfer_verifications": [
+              {
+                "X": 1,
+                "B_cutoff": 50,
+                "E1_at_1_exact": 0.0,
+                "I_B_lhs_mid": -0.541708942244859,
+                "I_B_rhs_exact_no_lower_boundary_mid": -0.541708942244859,
+                "exact_abs_mid_diff": 2.2815636606966128e-69,
+                "exact_encloses_lhs": true,
+                "spurious_half_h1_at_1_over_X": -7.77359913117768,
+                "erroneous_rhs_with_spurious_term_abs_discrepancy": 7.77359913117768
+              },
+              {
+                "X": 4,
+                "B_cutoff": 50,
+                "E1_at_1_exact": 0.0,
+                "I_B_lhs_mid": -0.04303523162945011,
+                "I_B_rhs_exact_no_lower_boundary_mid": -0.04303523162945011,
+                "exact_abs_mid_diff": 6.592425024216342e-67,
+                "exact_encloses_lhs": true,
+                "spurious_half_h1_at_1_over_X": -0.18491445999775158,
+                "erroneous_rhs_with_spurious_term_abs_discrepancy": 0.18491445999775158
+              },
+              {
+                "X": 100,
+                "B_cutoff": 50,
+                "E1_at_1_exact": 0.0,
+                "I_B_lhs_mid": -0.052485739935030806,
+                "I_B_rhs_exact_no_lower_boundary_mid": -0.052485739935030806,
+                "exact_abs_mid_diff": 1.9809211623247882e-76,
+                "exact_encloses_lhs": true,
+                "spurious_half_h1_at_1_over_X": -1.1955969827325967e-05,
+                "erroneous_rhs_with_spurious_term_abs_discrepancy": 1.1955969827325967e-05
+              }
+            ],
+            "lean_theorem": "primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction",
+            "primitive_transfer_analysis": "Because E_1(x) = int_1^x E(t) dt satisfies E_1(1) = 0 and the upper boundary E_1(B) B^(-3/2) tilde{h}_0(B/X) = O(X^(5/2) B^(-2)) -> 0 as B -> infty, integration by parts gives I(X) = int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx with NO (1/2) h_1(1/X) boundary term (at X = 1, the erroneous extra term (1/2) h_1(1) = -7.773599 creates a 7.7736 discrepancy). At the classical PNT exponent s = 1 (weights Lambda(n)/n), int_1^infty E(x) x^(-2) dx = -gamma_E - 1 converges unconditionally because E_1(x)/x^3 = O(x^(-1) exp(-c sqrt(log x))) is L^1. At the critical-line exponent s = 1/2 (weights Lambda(n)/sqrt(n)), transferring derivatives suppresses the high-frequency tail x >> X by (X/x)^k, but on the resonant scale band x in [X/4, 4X] the scale derivative d/dx [tilde{h}_0(x/X)] = x^(-1) (D_alpha tilde{h}_0)(x/X) has scale factor x^(-1) ~ X^(-1), which exactly balances the extra power of x in E_1(x)."
           },
           "attempt_B_signed_dyadic_scale_decomposition": {
             "status": "CONDITIONAL_ON_SIGNED_DYADIC_SHELL_CANCELLATION",
-            "decomposition_formula": "I(X) = sum_{j in Z} omega_j * mu_j(X),  omega_j = int_{2^j}^{2^(j+1)} |tilde{h}_0(alpha)| alpha^(-1/2) d_alpha",
+            "decomposition_formula": "I(X) = sum_{j in Z} omega_j * mu_j(X),  omega_j = int_{2^j}^{2^(j+1)} |tilde{h}_0(alpha)| alpha^(-1/2) d_alpha,  mu_j(X) = (1 / omega_j) int_{[2^j X, 2^(j+1) X] cap [1, infty)} E(x) x^(-3/2) tilde{h}_0(x/X) dx",
             "l1_majorant_weight_sum_upper": 5.254074691038639,
             "dyadic_shells_minus6_to_5": [
               {
@@ -2253,17 +2305,157 @@
                 "majorant_weight_omega_j_upper": 0.005763500898858915
               }
             ],
-            "single_unresolved_hypothesis": "exists M_dyadic < infty forall X >= 1, j in Z : |mu_j(X)| := |X^(-1/2) int_{2^j X}^{2^(j+1) X} E(x) x^(-3/2) (tilde{h}_0(x/X)/omega_j) dx| <= M_dyadic"
+            "all_dyadic_shell_sums_enclose_I_B": true,
+            "erroneous_X_minus_half_factor_refuted": true,
+            "dyadic_shell_finite_cutoff_verifications": [
+              {
+                "X": 1,
+                "B_cutoff": 50,
+                "dyadic_shell_sum_in_x_mid": -0.541708942244859,
+                "target_I_B_mid": -0.541708942244859,
+                "exact_abs_diff": 0.0,
+                "erroneous_X_minus_half_shell_sum_mid": -0.541708942244859,
+                "erroneous_X_minus_half_abs_discrepancy": 0.0
+              },
+              {
+                "X": 4,
+                "B_cutoff": 50,
+                "dyadic_shell_sum_in_x_mid": -0.04303523162945011,
+                "target_I_B_mid": -0.04303523162945011,
+                "exact_abs_diff": 0.0,
+                "erroneous_X_minus_half_shell_sum_mid": -0.021517615814725055,
+                "erroneous_X_minus_half_abs_discrepancy": 0.021517615814725055
+              },
+              {
+                "X": 100,
+                "B_cutoff": 50,
+                "dyadic_shell_sum_in_x_mid": -0.052485739935030806,
+                "target_I_B_mid": -0.052485739935030806,
+                "exact_abs_diff": 0.0,
+                "erroneous_X_minus_half_shell_sum_mid": -0.0052485739935030805,
+                "erroneous_X_minus_half_abs_discrepancy": 0.04723716594152772
+              }
+            ],
+            "lean_theorem": "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction",
+            "single_unresolved_hypothesis": "exists M_dyadic < infty forall X >= 1, j in Z : |mu_j(X)| := |(1 / omega_j) int_{[2^j X, 2^(j+1) X] cap [1, infty)} E(x) x^(-3/2) tilde{h}_0(x/X) dx| <= M_dyadic",
+            "why_no_X_minus_half_factor_matters": "In the original variable x, mu_j(X) has NO X^(-1/2) factor; under the elementary Chebyshev estimate |E(x)| <= A x, |mu_j(X)| <= A X^(1/2) grows like X^(1/2), isolating the exact signed cancellation requirement on each dyadic shell. Multiplying the x-integral by X^(-1/2) erroneously represented X^(-1/2) I(X) instead of I(X) and made the shell bound follow trivially from |E(x)| <= A x."
           },
           "attempt_C_seed_wavelet_multiplicative_convolution_factorization": {
             "status": "REDUCED_TO_GAUSSIAN_SEED_LOCAL_L2_SCALE_ENERGY",
-            "convolution_identity": "W(X) = int_0^infty V_tau(X/y) psi_tau(y) dy/y = int_0^infty V_tau(u) psi_tau(X/u) du/u,  V_tau(u) := sum_{n >= 2} (Lambda(n)/sqrt(n)) psi_tau(n/u)",
+            "convolution_identity": "W(X) = int_0^infty V_tau(X/y) psi_tau(y) dy/y = int_0^infty V_tau(u) psi_tau(X/u) du/u = int_R v(r) phi_tau(t - r) dr,  v(r) := V_tau(e^r) = sum_{n >= 2} (Lambda(n)/sqrt(n)) psi_tau(n e^(-r))",
             "single_seed_pnt_moment_vanishes": true,
             "single_seed_pnt_moment_abs_upper": 7.161113569678223e-27,
+            "exact_gaussian_moment_formula_C_psi_sq": "C_psi^2 = (1 / sqrt(2)) * (1143585 / (524288 * pi) + 92193 / 65536 + 12735 * pi / 32768)",
+            "symbolic_gaussian_moment_identity_verified": true,
+            "C_psi_sq_exact_mid": 2.3490149234126214,
+            "C_psi_exact_mid": 1.5326496414421078,
+            "C_psi_exact_str_15": "[1.53264964144211 +/- 2.30e-15]",
             "weighted_psi_tau_l2_norm_C_psi": 1.5326496414421078,
+            "C_psi_certified_lt_1_533": true,
+            "quadrature_with_tail_overlaps_exact_C_psi_sq": true,
             "finite_sum_convolution_verification_at_X_4_abs_diff": 4.575767488281127e-19,
-            "cauchy_schwarz_reduction": "|W(X)| <= C_psi * (int_0^infty |V_tau(X/y)|^2 (y + y^(-1))^(-2) dy/y)^(1/2), where C_psi <= 1.532650 is certified finite and V_tau(u) already has vanishing PNT main term F_tau(1) = 0 and Gaussian decay exp(-pi (n/u)^2).",
-            "single_unresolved_hypothesis": "sup_{X >= 1} int_0^infty |V_tau(X/y)|^2 (y + y^(-1))^(-2) dy/y < infty"
+            "finite_sum_convolution_enclosures_overlap": false,
+            "single_seed_stieltjes_identity_verified": true,
+            "single_seed_stieltjes_verifications": [
+              {
+                "u": 1,
+                "B_cutoff": 50,
+                "lhs_sum_mid": 0.03054516536171422,
+                "rhs_stieltjes_mid": 0.03054516536171422,
+                "abs_mid_diff": 7.738707760699001e-36,
+                "encloses": true
+              },
+              {
+                "u": 2,
+                "B_cutoff": 50,
+                "lhs_sum_mid": -0.17476656325659848,
+                "rhs_stieltjes_mid": -0.17476656325659848,
+                "abs_mid_diff": 1.9789661773426703e-27,
+                "encloses": true
+              },
+              {
+                "u": 4,
+                "B_cutoff": 50,
+                "lhs_sum_mid": -0.05715293239665946,
+                "rhs_stieltjes_mid": -0.05715293239665946,
+                "abs_mid_diff": 7.0446614564028e-27,
+                "encloses": true
+              }
+            ],
+            "sech_squared_energy_formulation": "exists M < infty forall t >= 0 : E_tau(t) := int_R |v(r)|^2 / (4 cosh^2(t - r)) dr <= M,  v(r) = V_tau(e^r)",
+            "sech_squared_energy_samples": [
+              {
+                "scale_label": "1",
+                "X_float": 1.0,
+                "t_eq_log_X": 0.0,
+                "E_tau_t": 0.0065848638345263845,
+                "abs_W_X": 0.05730569222912915,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.12437018700614122,
+                "cauchy_schwarz_satisfied": true
+              },
+              {
+                "scale_label": "2",
+                "X_float": 2.0,
+                "t_eq_log_X": 0.6931471805599453,
+                "E_tau_t": 0.008880733701940336,
+                "abs_W_X": 0.07938197076904378,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.14443329254957551,
+                "cauchy_schwarz_satisfied": true
+              },
+              {
+                "scale_label": "4",
+                "X_float": 4.0,
+                "t_eq_log_X": 1.3862943611198906,
+                "E_tau_t": 0.006688341274125669,
+                "abs_W_X": 0.011848941056947613,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.12534358166973603,
+                "cauchy_schwarz_satisfied": true
+              },
+              {
+                "scale_label": "tau=2*pi",
+                "X_float": 6.283185307179586,
+                "t_eq_log_X": 1.8378770664093456,
+                "E_tau_t": 0.00513612614044896,
+                "abs_W_X": 0.011905807308945247,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.1098400516771741,
+                "cauchy_schwarz_satisfied": true
+              },
+              {
+                "scale_label": "10",
+                "X_float": 10.0,
+                "t_eq_log_X": 2.302585092994046,
+                "E_tau_t": 0.005647488197058283,
+                "abs_W_X": 0.0018582393742598887,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.11517827075749378,
+                "cauchy_schwarz_satisfied": true
+              },
+              {
+                "scale_label": "25",
+                "X_float": 25.0,
+                "t_eq_log_X": 3.2188758248682006,
+                "E_tau_t": 0.023082208919542466,
+                "abs_W_X": 0.005446437594494823,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.2328528574386262,
+                "cauchy_schwarz_satisfied": true
+              },
+              {
+                "scale_label": "100",
+                "X_float": 100.0,
+                "t_eq_log_X": 4.605170185988092,
+                "E_tau_t": 0.3342320910389487,
+                "abs_W_X": 0.006363104297086272,
+                "cauchy_schwarz_upper_bound_C_psi_sqrt_E": 0.8860678132817468,
+                "cauchy_schwarz_satisfied": true
+              }
+            ],
+            "max_sampled_sech_squared_energy": 0.3342320910389487,
+            "all_sampled_cauchy_schwarz_bounds_satisfied": true,
+            "lean_theorems": [
+              "single_seed_stieltjes_and_squared_polynomial_identities",
+              "single_seed_sech_energy_implies_complete_correlation_bound"
+            ],
+            "cauchy_schwarz_reduction": "|W(e^t)| <= C_psi * (int_R |v(r)|^2 / (4 cosh^2(t - r)) dr)^(1/2), where C_psi = 1.53264964144 < 1.533 is given in exact closed form by Gaussian moments and v(r) = V_tau(e^r) already has vanishing PNT main term F_tau(1) = 0 and Gaussian upper-scale decay exp(-pi n^2 e^(-2r)).",
+            "single_unresolved_hypothesis": "exists M < infty forall t >= 0 : int_R |v(r)|^2 / (4 cosh^2(t - r)) dr <= M"
           }
         },
         "certified_scale_evaluation_scope": "9 discrete sample scales X in {1, 2, pi, tau, 10, tau^2, 100, tau^3, 1000} (finite point certificates, not a continuous interval enclosure over [1, 1000])",
@@ -2412,7 +2604,10 @@
       "conjugatePairCorrelationTerm",
       "gramDetTwoByTwo",
       "secondEulerAutocorrelationNumerator",
-      "bernsteinWeightedH0Poly"
+      "bernsteinWeightedH0Poly",
+      "seedSquaredPoly",
+      "singleSeedStieltjesPoly",
+      "primitiveTransferFiniteRHS"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -2425,7 +2620,10 @@
       "conjugatePairCorrelationTerm",
       "gramDetTwoByTwo",
       "secondEulerAutocorrelationNumerator",
-      "bernsteinWeightedH0Poly"
+      "bernsteinWeightedH0Poly",
+      "seedSquaredPoly",
+      "singleSeedStieltjesPoly",
+      "primitiveTransferFiniteRHS"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2447,7 +2645,11 @@
       "stieltjes_rescaled_variable_and_erroneous_factor_obstruction",
       "bernstein_weighted_h0_polynomial_endpoints",
       "taylor_sixth_order_two_sided_abs_correlation_bound",
-      "stieltjes_signed_pairing_uniform_bound_equivalence"
+      "stieltjes_signed_pairing_uniform_bound_equivalence",
+      "primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction",
+      "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction",
+      "single_seed_stieltjes_and_squared_polynomial_identities",
+      "single_seed_sech_energy_implies_complete_correlation_bound"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2469,7 +2671,11 @@
       "stieltjes_rescaled_variable_and_erroneous_factor_obstruction",
       "bernstein_weighted_h0_polynomial_endpoints",
       "taylor_sixth_order_two_sided_abs_correlation_bound",
-      "stieltjes_signed_pairing_uniform_bound_equivalence"
+      "stieltjes_signed_pairing_uniform_bound_equivalence",
+      "primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction",
+      "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction",
+      "single_seed_stieltjes_and_squared_polynomial_identities",
+      "single_seed_sech_energy_implies_complete_correlation_bound"
     ]
   },
   "literature_references": [

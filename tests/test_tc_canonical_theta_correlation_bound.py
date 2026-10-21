@@ -292,7 +292,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 11 defs, 20 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 14 defs, 24 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,8 +300,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 11
-    assert len(ver["actual_theorems"]) == 20
+    assert len(ver["actual_defs"]) == 14
+    assert len(ver["actual_theorems"]) == 24
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -312,6 +312,10 @@ def test_12_lean_formalization_module_verified():
     assert "bernstein_weighted_h0_polynomial_endpoints" in lean_text
     assert "taylor_sixth_order_two_sided_abs_correlation_bound" in lean_text
     assert "stieltjes_signed_pairing_uniform_bound_equivalence" in lean_text
+    assert "primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction" in lean_text
+    assert "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction" in lean_text
+    assert "single_seed_stieltjes_and_squared_polynomial_identities" in lean_text
+    assert "single_seed_sech_energy_implies_complete_correlation_bound" in lean_text
 
 
 def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
@@ -521,6 +525,14 @@ def test_20_derived_uniform_archimedean_bound_and_discrepancy_reconciliation(art
     ]
     assert reconcil["all_discrepancies_reconciled"] is True
     assert len(reconcil["reconciled_items"]) == 3
+    disc3 = reconcil["reconciled_items"][2]
+    assert disc3["stale_narrative_value"] == 0.0319695591
+    assert math.isclose(disc3["certified_W_at_tau_mid"], -0.012081947061365263, rel_tol=1e-9)
+    assert math.isclose(
+        disc3["certified_H0_at_0_mellin_mid"],
+        2.8290934399732197e-05,
+        rel_tol=1e-9,
+    )
 
 
 def test_21_subgate_tc042b_cancellation_attempts_and_seed_convolution(artifact_payload):
@@ -534,16 +546,95 @@ def test_21_subgate_tc042b_cancellation_attempts_and_seed_convolution(artifact_p
     assert canc["boundary_term_uniform_bound"]["exact_rational_coeff"] == "92193/24576"
     attA = canc["attempt_A_multiscale_euler_operator_and_primitive_transfer"]
     assert attA["symbolic_factorization_verified"] is True
-    assert attA["annihilation_orders"]["at_s_eq_pos_half_pnt_main_term"] == 5
-    assert attA["annihilation_orders"]["at_s_eq_neg_half"] == 4
+    op_m = attA["operator_multiplicity_vs_mellin_vanishing_order"]
+    assert op_m["operator_factor_multiplicity_at_D_eq_pos_half"] == 5
+    assert op_m["operator_factor_multiplicity_at_D_eq_neg_half"] == 4
+    assert op_m["H0_mellin_vanishing_order_at_z_eq_pm_half"] == 3
+    assert op_m["tilde_H0_mellin_vanishing_order_at_z_eq_pos_half"] == 3
+    assert op_m["tilde_H0_mellin_vanishing_order_at_z_eq_neg_half"] == 4
 
     attB = canc["attempt_B_signed_dyadic_scale_decomposition"]
     assert 0.0 < attB["l1_majorant_weight_sum_upper"] < 17.5
     assert len(attB["dyadic_shells_minus6_to_5"]) == 12
+    assert attB["all_dyadic_shell_sums_enclose_I_B"] is True
 
     attC = canc["attempt_C_seed_wavelet_multiplicative_convolution_factorization"]
     assert attC["single_seed_pnt_moment_vanishes"] is True
     assert attC["single_seed_pnt_moment_abs_upper"] < 1e-18
     assert attC["finite_sum_convolution_verification_at_X_4_abs_diff"] < 1e-10
-    assert 0.0 < attC["weighted_psi_tau_l2_norm_C_psi"] < 5.0
+    assert math.isclose(attC["weighted_psi_tau_l2_norm_C_psi"], 1.5326496414421077, rel_tol=1e-11)
+
+
+def test_22_attempt_a_b_c_repairs_and_mellin_vanishing_orders(artifact_payload):
+    """Verify the four substantive repairs:
+    1. Attempt B dyadic shell definition without X^{-1/2} and [1, inf) cutoff at B=50;
+    2. Attempt A primitive transfer without spurious (1/2)*h_1(1/X) boundary term at B=50;
+    3. Differentiated seed H_0(0) = F_tau(1/2)^2 ~ 2.82909344e-5 and Mellin vanishing orders (1, 2, 3);
+    4. Attempt C exact Gaussian moment formula for C_psi^2, single-seed Stieltjes identity, and sech^2 energy.
+    """
+    seed_sec = artifact_payload["section_2_seed_defect_and_mellin_audit"]
+    ep = seed_sec["endpoint_values"]
+    assert ep["F_tau_vanishing_order_at_0"] == 1
+    assert ep["F_tau_vanishing_order_at_1"] == 2
+    assert ep["H0_vanishing_order_at_z_eq_pm_half"] == 3
+
+    att3 = artifact_payload[
+        "section_9_arithmetic_proof_attempts_and_remaining_subgate"
+    ]["attempt_3_large_grade_wavelet_decomposition"]
+    wv = att3["uniform_prime_wavelet_boundedness"]
+    st = wv["stieltjes_chebyshev_error_representation"]
+    assert math.isclose(
+        st["H0_at_0_mellin_value_positive"],
+        2.8290934399732197e-05,
+        rel_tol=1e-9,
+    )
+
+    canc = wv["subgate_tc042b_cancellation_attempts"]
+
+    # Point 2: Attempt A primitive transfer without spurious (1/2) h_1(1/X)
+    attA = canc["attempt_A_multiscale_euler_operator_and_primitive_transfer"]
+    assert attA["all_primitive_transfer_finite_cutoff_enclose"] is True
+    assert math.isclose(
+        attA["spurious_half_h1_at_X_eq_1_refuted_value"],
+        -7.77359913117768,
+        rel_tol=1e-10,
+    )
+    pt_by_X = {row["X"]: row for row in attA["primitive_transfer_verifications"]}
+    for x_val in (1, 4, 100):
+        assert pt_by_X[x_val]["exact_encloses_lhs"] is True
+        assert pt_by_X[x_val]["exact_abs_mid_diff"] < 1e-28
+    assert pt_by_X[1]["erroneous_rhs_with_spurious_term_abs_discrepancy"] > 7.77
+
+    # Point 1: Attempt B dyadic shells without misplaced X^{-1/2}
+    attB = canc["attempt_B_signed_dyadic_scale_decomposition"]
+    assert attB["all_dyadic_shell_sums_enclose_I_B"] is True
+    assert attB["erroneous_X_minus_half_factor_refuted"] is True
+    sh_by_X = {row["X"]: row for row in attB["dyadic_shell_finite_cutoff_verifications"]}
+    for x_val in (1, 4, 100):
+        assert sh_by_X[x_val]["exact_abs_diff"] < 1e-28
+        if x_val != 1:
+            assert sh_by_X[x_val]["erroneous_X_minus_half_abs_discrepancy"] > 1e-2
+
+    # Point 4: Attempt C exact Gaussian moment C_psi, single-seed Stieltjes, and sech^2 energy
+    attC = canc["attempt_C_seed_wavelet_multiplicative_convolution_factorization"]
+    assert (
+        attC["exact_gaussian_moment_formula_C_psi_sq"]
+        == "C_psi^2 = (1 / sqrt(2)) * (1143585 / (524288 * pi) + 92193 / 65536 + 12735 * pi / 32768)"
+    )
+    assert attC["symbolic_gaussian_moment_identity_verified"] is True
+    assert math.isclose(
+        attC["C_psi_sq_exact_mid"], 2.3490149234126213, rel_tol=1e-12
+    )
+    assert math.isclose(
+        attC["C_psi_exact_mid"], 1.5326496414421077, rel_tol=1e-12
+    )
+    assert attC["C_psi_certified_lt_1_533"] is True
+    assert attC["quadrature_with_tail_overlaps_exact_C_psi_sq"] is True
+    assert attC["single_seed_stieltjes_identity_verified"] is True
+    for st_row in attC["single_seed_stieltjes_verifications"]:
+        assert st_row["encloses"] is True
+        assert st_row["abs_mid_diff"] < 1e-25
+    assert attC["all_sampled_cauchy_schwarz_bounds_satisfied"] is True
+
+
 

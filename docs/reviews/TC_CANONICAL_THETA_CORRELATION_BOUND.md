@@ -82,9 +82,10 @@ where $(u)_j = u(u+1)\cdots(u+j-1)$ is the rising Pochhammer symbol.
 ### 2.3 Analytic Strip, Endpoint Values, and Open-Strip Nonvanishing
 
 1. **Holomorphy Strip**: Because $\Gamma(s/2)$ has simple poles at $s = 0, -2, -4, \dots$ and the double factor $s^2$ cancels the simple pole at $s = 0$, $F_\tau(s)$ extends holomorphically to $\operatorname{Re}(s) > -2$ (equivalently $\widehat{\psi_\tau}(z)$ is holomorphic on $\operatorname{Re}(z) > -5/2$).
-2. **Removable Endpoint Values at $s = 0$ and $s = 1$**:
-   - Since $\lim_{s\to 0} s\Gamma(s/2) = 2$, $F_\tau(s) = \frac{s(s-1)^2}{32}(\tau/2)^{-s/2}(s\Gamma(s/2)) = \frac{1}{16}s + O(s^2)$ as $s \to 0$, so $F_\tau(0) = 0$ and $F_\tau'(0) = \frac{1}{16}$.
-   - At $s = 1$, $\Gamma(1/2) = \sqrt{\pi}$ is finite and $(s-1)^2$ vanishes to second order, so $F_\tau(1) = F_\tau'(1) = 0$.
+2. **Removable Endpoint Values and Exact Vanishing Orders at $s = 0$, $s = 1$, and $z = \pm 1/2$**:
+   - Since $\Gamma(s/2) = \frac{2}{s} - \gamma_E + O(s)$ has a **simple pole** at $s = 0$, one factor of $s$ in $s^2$ cancels the gamma pole and leaves a **simple zero** (order $1$) at $s = 0$: $F_\tau(s) = \frac{s(s-1)^2}{32}(\tau/2)^{-s/2}(s\Gamma(s/2)) = \frac{1}{16}s + O(s^2)$ as $s \to 0$, so $F_\tau(0) = 0$ and $F_\tau'(0) = \frac{1}{16} \ne 0$.
+   - At $s = 1$, $\Gamma(1/2) = \sqrt{\pi}$ is finite and nonzero while $(s-1)^2$ vanishes to second order, so $F_\tau(s)$ has a **double zero** (order $2$) at $s = 1$ ($F_\tau(1) = F_\tau'(1) = 0$, $F_\tau''(1) = \frac{1}{16\sqrt{2}} \ne 0$).
+   - Consequently, the autocorrelation Mellin transform $H_0(z) = F_\tau(\frac{1}{2}+z)F_\tau(\frac{1}{2}-z)$ vanishes to **triple order** ($1 + 2 = 3$) at $z = \pm 1/2$ (not order $4$: in $h_0(\alpha) = \frac{1}{512}(D_\alpha^2 - 1/4)^4(\alpha + \alpha^{-1})^{-1/2}$, the base kernel $(\alpha + \alpha^{-1})^{-1/2}$ has simple Mellin poles at $z = \pm 1/2$ via $\int_0^\infty \alpha^{z-1}(\alpha+\alpha^{-1})^{-1/2}\,d\alpha = \frac{1}{2\sqrt{\pi}}\Gamma(\frac{1/4+z/2}{1})\Gamma(\frac{1/4-z/2}{1})$, so one factor of $(D_\alpha^2 - 1/4)$ cancels the simple poles at $z = \pm 1/2$ and the remaining three factors produce a triple zero).
 3. **Nonvanishing on the Open Critical Strip $0 < \operatorname{Re}(s) < 1$**:
    On $0 < \operatorname{Re}(s) < 1$, $s \ne 0$, $s \ne 1$, $(\tau/2)^{-s/2} = e^{-(s/2)\log\pi} \ne 0$, and $\Gamma(s/2)$ has no zeros anywhere in $\mathbb{C}$. Therefore,
    $$
@@ -281,7 +282,7 @@ Statements (A)–(C) hold if and only if every nontrivial zero $\rho$ of $\zeta(
 2. **Baseline Narrative vs. Artifact Discrepancy Reconciliation (`reconcile_baseline_narrative_discrepancies`)**:
    - **`1943.7705` vs. `433.5413086756161`**: Stale narrative in `docs/TC_CURRENT_CANONICAL_STATUS.md` reported $(C_\tau^{(4)})^{\mathrm{arith}}(0) = +1943.7705$ from an earlier un-normalized draft, whereas the certified fourth derivative at $K = 0$ in the artifact is $C_\tau^{(4)}(0) = [433.54130868 \pm 5.83 \times 10^{-6}]$ (`C_tau_fourth_deriv_0_mid = 433.5413086756161`), and the scoped sixth-derivative bound on $|K| \le 0.08$ is $\sup_{|K|\le 0.08}|C_\tau^{(6)}(K)| \le M_6^{\mathrm{arith}} = 27971954.786589753$.
    - **`0.0566039457` (and `0.0885735048`) vs. Derived Uniform Archimedean Bound `5.994279`**: Stale narrative in `docs/TC_CURRENT_CANONICAL_STATUS.md` used $0.0566039457 + 0.0319695591 = 0.0885735048$ (point values at $K = 1$) while the code used an ad-hoc `4.95`; now the uniform archimedean bound is derived and certified in `derive_and_certify_uniform_archimedean_bound` by splitting $(0, 1]$ at $u_0 = \sqrt{4 g_0(0)/|g_2(0)|} \approx 0.353502$, proving $|I_{\mathrm{arch}}(K)| \le 0.698425 + 1.970473 + 0.383932 + 1.395526 = 4.448357 < 4.95$ and $|W_{\mathrm{arch}}(h_K)| \le 1.545922 + 4.448357 = 5.994279$ for all $K \in \mathbb{R}$ (eliminating the hard-coded `4.95`).
-   - **`0.0319695591` vs. `0.6330390930175781`**: `-0.0319695591` is the midpoint value of the reflected prime wavelet sum $W(\tau) = -P_{\mathrm{refl}}(1)$ at $K = 1$ ($X = \tau$), whereas the global upper bound on $|P_{\mathrm{fwd}}(X)|$ for all $X \ge 1$ is $\frac{92193}{32768} \times 0.225 = 0.6330390930175781$.
+   - **`0.0319695591` vs. `0.6330390930175781` and Certified $W(\tau) = -0.0120819471$**: `0.0319695591` was a stale uncertified draft constant in `docs/TC_CURRENT_CANONICAL_STATUS.md` (paired with `0.0566039457` to give `0.0885735048`). In the certified artifact, the reflected prime wavelet sum at $K = 1$ ($X = \tau = 2\pi$) is $W(\tau) = -0.012081947061365263$ (`[-0.012082 +/- 2.10e-7]`), at $X = 1$ is $W(1) = -0.0574913211$, and the global upper bound on $|P_{\mathrm{fwd}}(X)|$ for all $X \ge 1$ is $\frac{92193}{32768} \times 0.225 = 0.6330390930175781$.
 3. **Finite Toeplitz Gram Matrices Certified by Outward-Rounded `flint.arb_mat.det()` Minors**:
    - Positive-definiteness of the finite Toeplitz Gram matrices $[C_\tau(K_i - K_j)]$ is certified via Sylvester's criterion using outward-rounded leading principal minor determinants `flint.arb_mat.det()` on the full `arb` enclosures (with floating-point eigenvalues reported purely as diagnostics):
      - **`rational_6_point_grid` $\{0, 1/8, 1/4, 1/2, 1, 2\}$ (spectral route)**: all 6 leading principal minor determinants are certified strictly positive ($\det_1 \approx 9.505 \times 10^{-4}$, $\det_2 \approx 1.084 \times 10^{-8}$, $\det_3 \approx 1.948 \times 10^{-14}$, $\det_4 \approx 1.052 \times 10^{-19}$, $\det_5 \approx 2.340 \times 10^{-27}$, $\det_6 \approx 1.528 \times 10^{-35} \pm 4.50 \times 10^{-78} > 0$).
@@ -319,9 +320,9 @@ $$
        \boxed{\exists M < \infty \; \forall X \ge 1 : \quad \left|W(X)\right| := \left|\sum_{n \ge 2} \frac{\Lambda(n)}{\sqrt{n}}\, h_0\!\left(\frac{n}{X}\right)\right| \le M.}
        $$
 4. **Repaired Stieltjes Chebyshev-Error Identities (Form A in $x$ and Form B in $\alpha = x/X$) (`TASK-TC-042R2`)**:
-   - Writing $\psi(x) = \sum_{n \le x} \Lambda(n) = x + E(x)$ and noting that
+   - Writing $\psi(x) = \sum_{n \le x} \Lambda(n) = x + E(x)$ and noting that for the actual differentiated seed $\psi_\tau(x) = x^{1/2}\Phi_1^{(2)}(x)$,
      $$
-     H_0(1/2) := \int_0^\infty \alpha^{-1/2} h_0(\alpha)\,d\alpha = F_\tau(1) F_\tau(0) = 0 \qquad \left(\text{distinct from } H_0(0) := \int_0^\infty h_0(\alpha)\,\frac{d\alpha}{\alpha} = F_\tau(1/2)^2 \approx 2.138047 \times 10^{-5} > 0\right),
+     H_0(1/2) := \int_0^\infty \alpha^{-1/2} h_0(\alpha)\,d\alpha = F_\tau(1) F_\tau(0) = 0 \qquad \left(\text{distinct from } H_0(0) := \int_0^\infty h_0(\alpha)\,\frac{d\alpha}{\alpha} = F_\tau(1/2)^2 \approx 2.82909344 \times 10^{-5} > 0\right),
      $$
      we have $\int_1^\infty x^{-1/2} h_0(x/X)\,dx = X^{1/2} H_0(1/2) - \int_0^1 x^{-1/2} h_0(x/X)\,dx = -\int_0^1 x^{-1/2} h_0(x/X)\,dx$.
    - Since $\frac{d}{dx}\bigl[x^{-1/2} h_0(x/X)\bigr] = -x^{-3/2}\tilde{h}_0(x/X)$ where $\tilde{h}_0(\alpha) := \frac{1}{2}h_0(\alpha) - (D_\alpha h_0)(\alpha)$, Stieltjes integration by parts yields two equivalent exact identities (`verify_finite_cutoff_stieltjes_identities_arb`, formalized in `stieltjes_rescaled_variable_and_erroneous_factor_obstruction`):
@@ -347,35 +348,51 @@ $$
    - **Certified Point Enclosures at 9 Sample Scales in $[1, 1000]$**:
      At the 9 discrete sample scales $X \in \{1, 2, \pi, \tau, 10, \tau^2, 100, \tau^3, 1000\}$ (finite point certificates, not a continuous interval certificate on $[1, 1000]$), $|W(X)|$ is certified bounded by $\le 0.079372$.
 5. **Three Substantive Cancellation Attempts on `SUBGATE-TC-042B` (`execute_subgate_tc042b_cancellation_attempts`)**:
-   - **Attempt A — Multiscale Euler-Operator Factorization & Iterated Primitive Transfer**:
+   - **Attempt A — Multiscale Euler-Operator Factorization & Iterated Primitive Transfer (`primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction`)**:
      - Symbolic verification (`sp.simplify == 0`) establishes the exact 9th-order Euler factorization:
        $$
-       \tilde{h}_0(\alpha) = \frac{1}{2}h_0(\alpha) - D_\alpha h_0(\alpha) = -\frac{1}{512}\left(D_\alpha - \frac{1}{2}\right)^5 \left(D_\alpha + \frac{1}{2}\right)^4 \left(\alpha + \alpha^{-1}\right)^{-1/2},
+       \tilde{h}_0(\alpha) = \frac{1}{2}h_0(\alpha) - D_\alpha h_0(\alpha) = -\frac{1}{512}\left(D_\alpha - \frac{1}{2}\right)^5 \left(D_\alpha + \frac{1}{2}\right)^4 \left(\alpha + \alpha^{-1}\right)^{-1/2}.
        $$
-       which annihilates $\alpha^{1/2}$ (the smooth PNT main term $x$) to **5th order** and $\alpha^{-1/2}$ to **4th order**.
-     - Integrating by parts against $E_1(x) := \int_1^x E(t)\,dt = \psi_1(x) - \frac{1}{2}x^2 + \frac{1}{2}$ yields $I(X) = \frac{1}{2}h_1(1/X) + \int_1^\infty E_1(x) x^{-5/2} h_1(x/X)\,dx$ where $h_1(\alpha) := \frac{3}{2}\tilde{h}_0(\alpha) - D_\alpha \tilde{h}_0(\alpha)$. While at the classical PNT exponent $s = 1$ (weights $\Lambda(n)/n$) the integral $\int_1^\infty E(x) x^{-2}\,dx = -\gamma_E - 1$ converges unconditionally because $E_1(x)/x^3$ is integrable, at the critical-line exponent $s = 1/2$ (weights $\Lambda(n)/\sqrt{n}$) each derivative transfer suppresses the high-frequency tail $x \gg X$ by $(X/x)^k$ but on the resonant scale band $x \in [X/4, 4X]$ the scale derivative $\frac{d}{dx}\tilde{h}_0(x/X) = x^{-1}(D_\alpha \tilde{h}_0)(x/X)$ has factor $x^{-1} \asymp X^{-1}$, which balances the extra factor of $x$ in $E_1(x)$.
-   - **Attempt B — Signed Dyadic Scale Decomposition**:
-     - Decomposes $I(X) = \sum_{j \in \mathbb{Z}} \omega_j \mu_j(X)$ over dyadic shells $\alpha = x/X \in [2^j, 2^{j+1}]$ with unconditionally summable shell weights $\sum_{j \in \mathbb{Z}} \omega_j \le 16.921 < \infty$, isolating the single unresolved hypothesis for Attempt B: uniform boundedness of the normalized signed shell pairings $|\mu_j(X)| \le M_{\mathrm{dyadic}}$ across $X \ge 1$ and $j \in \mathbb{Z}$.
-   - **Attempt C — Exact Seed-Wavelet Multiplicative Convolution Factorization**:
-     - By Fubini's theorem on $h_0(n/X) = \int_0^\infty \psi_\tau((n/X)y)\psi_\tau(y)\,\frac{dy}{y}$, the reflected prime wavelet sum factors exactly as the multiplicative convolution of the **single-seed prime wavelet** $V_\tau(u)$ with $\psi_\tau$:
+     - **Operator Multiplicities vs. Mellin Vanishing Orders**: The differential operator has factor multiplicities $5$ at $D_\alpha = +1/2$ and $4$ at $D_\alpha = -1/2$. Because the base kernel $(\alpha + \alpha^{-1})^{-1/2}$ has simple Mellin poles at $z = \pm 1/2$ (corresponding to the simple pole of $\Gamma(s/2)$ at $s = 0$ cancelling one zero of $s^2$ in $F_\tau(s)$), $H_0(z) = F_\tau(\frac{1}{2}+z)F_\tau(\frac{1}{2}-z)$ has a **triple zero** (order $1 + 2 = 3$) at $z = \pm 1/2$, and $\tilde{H}_0(z) = (\frac{1}{2} - z)H_0(z)$ vanishes to order $4$ at $z = -1/2$ and order $3$ at $z = +1/2$.
+     - **Exact Primitive-Transfer Identity Without Spurious Lower-Boundary Term**: With $E_1(x) := \int_1^x E(t)\,dt = \psi_1(x) - \frac{1}{2}x^2 + \frac{1}{2}$, the lower boundary vanishes identically ($E_1(1) = 0$) and the upper boundary $E_1(B) B^{-3/2}\tilde{h}_0(B/X) = O(X^{5/2} B^{-2}) \to 0$ as $B \to \infty$, so integration by parts gives
+       $$
+       \boxed{I(X) = \int_1^\infty E_1(x)\,x^{-5/2}\,h_1\!\left(\frac{x}{X}\right)dx, \qquad h_1(\alpha) := \frac{3}{2}\tilde{h}_0(\alpha) - (D_\alpha \tilde{h}_0)(\alpha),}
+       $$
+       with **no** $\frac{1}{2}h_1(1/X)$ boundary term (at $B = 50$ across $X \in \{1, 4, 100\}$, the finite-cutoff identity $I_B(X) = E_1(B)B^{-3/2}\tilde{h}_0(B/X) + \int_1^B E_1(x)x^{-5/2}h_1(x/X)\,dx$ is certified in 256-bit Arb to $< 2.3 \times 10^{-69}$, whereas the extraneous term $\frac{1}{2}h_1(1/X)$ at $X = 1$ equals $-7.77359913$, creating a $7.7736$ error). While at the classical PNT exponent $s = 1$ (weights $\Lambda(n)/n$) the integral $\int_1^\infty E(x) x^{-2}\,dx = -\gamma_E - 1$ converges unconditionally because $E_1(x)/x^3$ is integrable, at the critical-line exponent $s = 1/2$ (weights $\Lambda(n)/\sqrt{n}$) each derivative transfer suppresses the high-frequency tail $x \gg X$ by $(X/x)^k$ but on the resonant scale band $x \in [X/4, 4X]$ the scale derivative $\frac{d}{dx}\tilde{h}_0(x/X) = x^{-1}(D_\alpha \tilde{h}_0)(x/X)$ has factor $x^{-1} \asymp X^{-1}$, which balances the extra factor of $x$ in $E_1(x)$.
+   - **Attempt B — Signed Dyadic Scale Decomposition (`dyadic_shell_weighted_sum_and_misplaced_factor_obstruction`)**:
+     - With shell weights $\omega_j := \int_{2^j}^{2^{j+1}} |\tilde{h}_0(\alpha)|\,\alpha^{-1/2}\,d\alpha > 0$ ($\sum_{j \in \mathbb{Z}} \omega_j \le 16.921 < \infty$), the normalized dyadic shell average in the original variable $x$ on $[2^j X, 2^{j+1} X] \cap [1, \infty)$ (with **no** $X^{-1/2}$ prefactor) is
+       $$
+       \boxed{\mu_j(X) := \frac{1}{\omega_j} \int_{[2^j X,\, 2^{j+1} X] \cap [1, \infty)} E(x)\,x^{-3/2}\,\tilde{h}_0\!\left(\frac{x}{X}\right)dx, \qquad I(X) = \sum_{j \in \mathbb{Z}} \omega_j \mu_j(X).}
+       $$
+     - **Why Omitting the Misplaced $X^{-1/2}$ Matters**: Under the elementary Chebyshev estimate $|E(x)| \le A x$, the true shell average satisfies $|\mu_j(X)| \le A X^{1/2}$ (growing like $X^{1/2}$), which isolates the exact signed cancellation requirement on each dyadic shell. Multiplying the $x$-variable integral by $X^{-1/2}$ erroneously represented $X^{-1/2} I(X)$ rather than $I(X)$ (failing at $B = 50$ by $2.15176 \times 10^{-2}$ at $X = 4$ and $4.72372 \times 10^{-2}$ at $X = 100$) and made the shell bound follow trivially from $|E(x)| \le A x$.
+   - **Attempt C — Exact Seed-Wavelet Multiplicative Convolution Factorization & $\operatorname{sech}^2$ Local $L^2$ Energy (`single_seed_stieltjes_and_squared_polynomial_identities`, `single_seed_sech_energy_implies_complete_correlation_bound`)**:
+     - By Fubini's theorem on $h_0(n/X) = \int_0^\infty \psi_\tau((n/X)y)\psi_\tau(y)\,\frac{dy}{y}$, the reflected prime wavelet sum factors as the multiplicative convolution of the **single-seed prime wavelet** $V_\tau(u)$ with $\psi_\tau$:
        $$
        \boxed{W(X) = \int_0^\infty V_\tau\!\left(\frac{X}{y}\right)\psi_\tau(y)\,\frac{dy}{y} = \int_0^\infty V_\tau(u)\,\psi_\tau\!\left(\frac{X}{u}\right)\frac{du}{u}, \qquad V_\tau(u) := \sum_{n \ge 2} \frac{\Lambda(n)}{\sqrt{n}}\,\psi_\tau\!\left(\frac{n}{u}\right).}
        $$
-     - Crucially, because $F_\tau(1) = 0$ already holds for the single seed $\psi_\tau$ prior to squaring, the smooth PNT main term of $V_\tau(u)$ **already vanishes identically** ($\int_0^\infty x^{-1/2}\psi_\tau(x/u)\,dx = u^{1/2}F_\tau(1) = 0$, certified in Arb to $< 2.2 \times 10^{-25}$), and $\psi_\tau(y)$ has Gaussian decay $e^{-\pi y^2}$ for $y \ge 1$.
-     - Applying Cauchy–Schwarz in Haar measure $\frac{dy}{y}$ with weight $(y + y^{-1})^2$ yields
+     - Because $F_\tau(1) = 0$ already holds for the single seed $\psi_\tau$ prior to squaring, the smooth PNT main term of $V_\tau(u)$ **already vanishes identically** ($\int_0^\infty x^{-1/2}\psi_\tau(x/u)\,dx = u^{1/2}F_\tau(1) = 0$, certified in Arb to $< 2.2 \times 10^{-25}$), and $\psi_\tau(y)$ has Gaussian decay $e^{-\pi y^2}$ for $y \ge 1$. Moreover, Stieltjes integration by parts gives the exact single-seed Chebyshev-error representation (verified at $B = 50$ for $u \in \{1, 2, 4\}$ to $< 3 \times 10^{-36}$):
        $$
-       |W(X)| \le C_\psi \left(\int_0^\infty \frac{|V_\tau(X/y)|^2}{(y + y^{-1})^2}\,\frac{dy}{y}\right)^{1/2}, \qquad C_\psi := \left(\int_0^\infty |\psi_\tau(y)|^2 (y + y^{-1})^2\,\frac{dy}{y}\right)^{1/2} \le 2.092482,
+       V_\tau(u) = \psi_\tau\!\left(\frac{1}{u}\right) - \int_0^1 x^{-1/2}\psi_\tau\!\left(\frac{x}{u}\right)dx + \int_1^\infty E(x)\,x^{-3/2}\,\tilde{\psi}_\tau\!\left(\frac{x}{u}\right)dx,
        $$
-       reducing `SUBGATE-TC-042B` from a pointwise bound on $W(X)$ to a **local scale-averaged $L^2$ energy bound** on the Gaussian-windowed prime wavelet $V_\tau(u)$ around $u \asymp X$:
+       where $\tilde{\psi}_\tau(\alpha) := \frac{1}{2}\psi_\tau(\alpha) - (D_\alpha \psi_\tau)(\alpha) = \alpha^{1/2}\bigl(2\rho^5 - 22\rho^4 + \frac{125}{2}\rho^3 - \frac{91}{2}\rho^2 + \frac{9}{2}\rho\bigr)e^{-\rho}$ with $\rho = \pi\alpha^2$.
+     - **Exact Closed-Form Gaussian Moment Formula for $C_\psi^2$**: Substituting $r = \pi y^2$ in $C_\psi^2 := \int_0^\infty |\psi_\tau(y)|^2(y + y^{-1})^2\,\frac{dy}{y}$ yields the exact closed-form Gaussian moment formula (verified symbolically in SymPy and cross-checked in 256-bit Arb against quadrature on $[0, 4]$ plus the certified $[4, \infty)$ tail bound $e^{-16\pi} \approx 1.48 \times 10^{-22}$):
        $$
-       \sup_{X \ge 1} \int_0^\infty \frac{|V_\tau(X/y)|^2}{(y + y^{-1})^2}\,\frac{dy}{y} < \infty.
+       \boxed{C_\psi^2 = \frac{1}{\sqrt{2}}\left(\frac{1143585}{524288\pi} + \frac{92193}{65536} + \frac{12735\pi}{32768}\right) \approx 2.3490149234126213, \qquad C_\psi \approx 1.5326496414421077 < 1.533.}
+       $$
+     - **Clean $\operatorname{sech}^2$-Weighted Local $L^2$ Energy Target**: Writing $X = e^t$ ($t \ge 0$), $u = e^r$ ($r \in \mathbb{R}$), and $v(r) := V_\tau(e^r) = \sum_{n \ge 2} \frac{\Lambda(n)}{\sqrt{n}}\psi_\tau(n e^{-r})$, since $(y + y^{-1})^2 = 4\cosh^2(t - r)$, Cauchy–Schwarz gives
+       $$
+       |W(e^t)| \le C_\psi\,\sqrt{\mathcal{E}_\tau(t)}, \qquad \mathcal{E}_\tau(t) := \int_{\mathbb{R}} \frac{|v(r)|^2}{4\cosh^2(t - r)}\,dr,
+       $$
+       reducing `SUBGATE-TC-042B` to the clean single-seed local $L^2$ energy hypothesis:
+       $$
+       \boxed{\exists M < \infty \quad \forall t \ge 0 : \qquad \mathcal{E}_\tau(t) := \int_{\mathbb{R}} \frac{|v(r)|^2}{4\cosh^2(t - r)}\,dr \le M.}
        $$
 
 ---
 
 ## 8. Lean 4 Formalization Summary (`Section 10`, Expanded in `TASK-TC-042R2`)
 
-Module [`formal/RiemannScope/CanonicalThetaCorrelationBound.lean`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) compiles with `0 sorry` and `0 admit` and formalizes **11 definitions** and **20 theorems** (covering exact polynomial/operator identities, Bernstein endpoint polynomials, and conditional Taylor/Laplace/Stieltjes implication schemas; analytic integration and Arb ball enclosures reside in Python/FLINT):
+Module [`formal/RiemannScope/CanonicalThetaCorrelationBound.lean`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) compiles with `0 sorry` and `0 admit` and formalizes **14 definitions** and **24 theorems** (covering exact polynomial/operator identities, Bernstein endpoint polynomials, and conditional Taylor/Laplace/Stieltjes/energy implication schemas; analytic integration and Arb ball enclosures reside in Python/FLINT):
 1. `seed_first_order_spatial_polynomial`
 2. `seed_second_order_spatial_polynomial`
 3. `seed_mellin_pochhammer_polynomial_identity`
@@ -392,7 +409,11 @@ Module [`formal/RiemannScope/CanonicalThetaCorrelationBound.lean`](file:///c:/De
 14. `second_euler_autocorrelation_at_one`
 15. `taylor_two_sided_abs_correlation_bound`
 16. `complete_correlation_bounded_of_reflected_prime_wavelet_bound`
-17. `stieltjes_rescaled_variable_and_erroneous_factor_obstruction` *(new in `TASK-TC-042R2`: proves equivalence of Form A and Form B Stieltjes expressions and proves that multiplying the $x$-variable integral by $X^{-1/2}$ creates a nonzero discrepancy $(1 - X^{-1/2}) I_{\mathrm{Stieltjes}} \ne 0$ whenever $X \ne 1$ and $I_{\mathrm{Stieltjes}} \ne 0$)*
-18. `bernstein_weighted_h0_polynomial_endpoints` *(new in `TASK-TC-042R2`: proves the exact rational polynomial identity for $P_0(y) = S^{5/2} h_0(\alpha)$ in $y = 4/S^2 \in [0, 1]$ and its endpoint values $P_0(0) = -81/64$, $P_0(1) = 92193/32768$)*
-19. `taylor_sixth_order_two_sided_abs_correlation_bound` *(new in `TASK-TC-042R2`: proves the conditional 6th-order Taylor algebra implying $-C_0 < C_K < C_0$, $C_K > 0$, and $C_0^2 - C_K^2 > 0$)*
-20. `stieltjes_signed_pairing_uniform_bound_equivalence` *(new in `TASK-TC-042R2`: proves that given a uniform bound $|B_{\mathrm{boundary}}(X)| \le B_0$, uniform boundedness of $I(X)$ is equivalent to uniform boundedness of $W(X)$ and implies uniform boundedness of $C_\tau(K)$)*
+17. `stieltjes_rescaled_variable_and_erroneous_factor_obstruction` *(proves equivalence of Form A and Form B Stieltjes expressions and proves that multiplying the $x$-variable integral by $X^{-1/2}$ creates a nonzero discrepancy $(1 - X^{-1/2}) I_{\mathrm{Stieltjes}} \ne 0$ whenever $X \ne 1$ and $I_{\mathrm{Stieltjes}} \ne 0$)*
+18. `bernstein_weighted_h0_polynomial_endpoints` *(proves the exact rational polynomial identity for $P_0(y) = S^{5/2} h_0(\alpha)$ in $y = 4/S^2 \in [0, 1]$ and its endpoint values $P_0(0) = -81/64$, $P_0(1) = 92193/32768$)*
+19. `taylor_sixth_order_two_sided_abs_correlation_bound` *(proves the conditional 6th-order Taylor algebra implying $-C_0 < C_K < C_0$, $C_K > 0$, and $C_0^2 - C_K^2 > 0$)*
+20. `stieltjes_signed_pairing_uniform_bound_equivalence` *(proves that given a uniform bound $|B_{\mathrm{boundary}}(X)| \le B_0$, uniform boundedness of $I(X)$ is equivalent to uniform boundedness of $W(X)$ and implies uniform boundedness of $C_\tau(K)$)*
+21. `primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction` *(proves that when $E_1(1) = 0$, the finite-cutoff primitive-transfer identity has zero lower-boundary contribution at $x = 1$, and adding the spurious $\frac{1}{2}h_1(1/X)$ term introduces a nonzero error whenever $h_1(1/X) \ne 0$)*
+22. `dyadic_shell_weighted_sum_and_misplaced_factor_obstruction` *(proves that the weighted dyadic shell sum $\sum_j \omega_j \mu_j(X)$ in the original variable $x$ equals $I_B(X)$, whereas multiplying by $X^{-1/2}$ produces $X^{-1/2} I_B(X) \ne I_B(X)$ for $X \ne 1$)*
+23. `single_seed_stieltjes_and_squared_polynomial_identities` *(proves the exact polynomial expansion of $P_2(r)^2$ and the single-seed Stieltjes polynomial $\frac{1}{2}P_2(r) - (2r P_2'(r) + \frac{1}{2}P_2(r) - 2r^2 P_2(r)) = 2r^5 - 22r^4 + \frac{125}{2}r^3 - \frac{91}{2}r^2 + \frac{9}{2}r$)*
+24. `single_seed_sech_energy_implies_complete_correlation_bound` *(proves that if the $\operatorname{sech}^2$-weighted local $L^2$ energy $\mathcal{E}_\tau(\log X)$ is uniformly bounded by $M_{\mathrm{energy}}$ and $|W(X)|^2 \le C_\psi^2 \mathcal{E}_\tau(\log X)$, then $|C_\tau(K)|$ is uniformly bounded on $K \ge 0$)*

@@ -173,6 +173,9 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "gramDetTwoByTwo",
     "secondEulerAutocorrelationNumerator",
     "bernsteinWeightedH0Poly",
+    "seedSquaredPoly",
+    "singleSeedStieltjesPoly",
+    "primitiveTransferFiniteRHS",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -196,6 +199,10 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "bernstein_weighted_h0_polynomial_endpoints",
     "taylor_sixth_order_two_sided_abs_correlation_bound",
     "stieltjes_signed_pairing_uniform_bound_equivalence",
+    "primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction",
+    "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction",
+    "single_seed_stieltjes_and_squared_polynomial_identities",
+    "single_seed_sech_energy_implies_complete_correlation_bound",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -467,13 +474,22 @@ def derive_seed_spatial_polynomial_and_mellin() -> Dict[str, Any]:
         "endpoint_values": {
             "F_tau_at_0": 0.0,
             "F_tau_deriv_at_0": float(sp.Rational(1, 16)),
+            "F_tau_vanishing_order_at_0": 1,
             "F_tau_at_1": 0.0,
             "F_tau_deriv_at_1": 0.0,
+            "F_tau_second_deriv_at_1": float(1 / (16 * math.sqrt(2.0))),
+            "F_tau_vanishing_order_at_1": 2,
+            "H0_vanishing_order_at_z_eq_pm_half": 3,
             "s_eq_0_mechanism": (
                 "Gamma(s/2) = 2/s - gamma_E + O(s) has a simple pole at s = 0; "
-                "the double factor s^2 cancels the pole and leaves a simple zero F_tau(s) = (1/16) s + O(s^2)."
+                "the double polynomial factor s^2 cancels the simple pole and leaves a SIMPLE zero "
+                "(order 1): F_tau(s) = (1/16) s + O(s^2)."
             ),
-            "s_eq_1_mechanism": "Gamma(1/2) = sqrt(pi) is finite and (s - 1)^2 vanishes to order 2 at s = 1.",
+            "s_eq_1_mechanism": (
+                "Gamma(1/2) = sqrt(pi) is finite and nonzero, so (s - 1)^2 produces a DOUBLE zero "
+                "(order 2) at s = 1; consequently H_0(z) = F_tau(1/2 + z) F_tau(1/2 - z) vanishes "
+                "to order 1 + 2 = 3 at z = +/- 1/2 (not order 4)."
+            ),
         },
         "critical_strip_nonvanishing": {
             "nonvanishing_on_open_strip_0_lt_Re_s_lt_1": True,
@@ -580,6 +596,26 @@ def evaluate_tilde_h0_acb(
 def evaluate_tilde_h0_arb(alpha: arb) -> arb:
     """Evaluate tilde{h}_0(alpha) = (1/2) h_0(alpha) - (D_alpha h_0)(alpha) in certified Arb arithmetic."""
     return arb("0.5") * evaluate_h0_arb(alpha) - evaluate_h0_euler_d1_arb(alpha)
+
+
+def evaluate_h1_acb(
+    alpha: Union[acb, acb_series], analytic: bool = False
+) -> Union[acb, acb_series]:
+    """Evaluate the first primitive-transfer wavelet kernel
+    h_1(alpha) := (3/2) tilde{h}_0(alpha) - (D_alpha tilde{h}_0)(alpha)
+                = (3/4) h_0(alpha) - 2 (D_alpha h_0)(alpha) + (D_alpha^2 h_0)(alpha)
+    in certified Acb arithmetic.
+    """
+    return (
+        acb("0.75") * evaluate_h0_acb(alpha, analytic=analytic)
+        - acb(2) * evaluate_h0_euler_d1_acb(alpha, analytic=analytic)
+        + evaluate_h0_euler_d2_acb(alpha, analytic=analytic)
+    )
+
+
+def evaluate_h1_arb(alpha: arb) -> arb:
+    """Evaluate h_1(alpha) = (3/2) tilde{h}_0(alpha) - (D_alpha tilde{h}_0)(alpha) in certified Arb arithmetic."""
+    return evaluate_h1_acb(acb(alpha), analytic=False).real
 
 
 def certify_weighted_kernel_envelopes_bernstein(
@@ -3013,9 +3049,118 @@ def execute_subgate_tc042b_cancellation_attempts(
             and sp.simplify(d1_odd_from_op - expected_d1_odd) == 0
         )
 
-        # --- Attempt B: Signed Dyadic Scale Decomposition ---
-        # Shell weights omega_j = int_{2^j}^{2^{j+1}} |tilde{h}_0(alpha)| alpha^{-1/2} d_alpha.
-        # Using |tilde{h}_0(alpha)| <= C_tilde * (alpha + 1/alpha)^{-5/2} with C_tilde = 1032993/65536 = 15.76219:
+        # Certify exact finite-cutoff primitive-transfer identity on [1, B] (B = 50, X in {1, 4, 100})
+        # with E_1(x) = int_1^x E(t) dt (satisfying E_1(1) = 0, so there is NO lower boundary term at x = 1):
+        #   I_B(X) := int_1^B E(x) x^{-3/2} tilde{h}_0(x/X) dx
+        #           = E_1(B) B^{-3/2} tilde{h}_0(B/X) + int_1^B E_1(x) x^{-5/2} h_1(x/X) dx,
+        # and in the infinite limit B -> infty:
+        #   I(X) = int_1^infty E_1(x) x^{-5/2} h_1(x/X) dx
+        # (proving that the previously written (1/2) h_1(1/X) term was an erroneous extra boundary term,
+        # equal to (1/2) h_1(1) = -7.77359913117768 at X = 1).
+        B_pt = 50
+        B_pt_arb = arb(B_pt)
+        p_pt = get_prime_powers_up_to(B_pt)
+        lam_pt: Dict[int, arb] = {pk: arb(p).log() for pk, p, _ in p_pt}
+        psi_pt: Dict[int, arb] = {}
+        psi1_pt: Dict[int, arb] = {}
+        s0_pt = arb(0)
+        s1_pt = arb(0)
+        for m_idx in range(1, B_pt + 1):
+            w_m = lam_pt.get(m_idx, arb(0))
+            s0_pt += w_m
+            s1_pt += w_m * arb(m_idx)
+            psi_pt[m_idx] = s0_pt
+            psi1_pt[m_idx] = s1_pt
+
+        tol_pt = 2**(-85)
+        primitive_transfer_verifications: List[Dict[str, Any]] = []
+        i_b_lhs_arb_list: List[arb] = []
+        all_primitive_transfer_enclose = True
+        spurious_boundary_at_X1 = float((arb("0.5") * evaluate_h1_arb(arb(1))).mid())
+
+        for x_scale in (1, 4, 100):
+            X_s_arb = arb(x_scale)
+            X_s_acb = acb(X_s_arb)
+            i_b_lhs = arb(0)
+            i1_b_int = arb(0)
+            for m_idx in range(1, B_pt):
+                a_c = acb(m_idx)
+                b_c = acb(m_idx + 1)
+                psi_m_c = acb(psi_pt[m_idx])
+                psi1_m_c = acb(psi1_pt[m_idx])
+
+                def _f_ib(x: acb, analytic: bool, pm: acb = psi_m_c) -> acb:
+                    x_sq = x.sqrt(analytic=analytic)
+                    return (
+                        (pm - x)
+                        * evaluate_tilde_h0_acb(x / X_s_acb, analytic=analytic)
+                        / (x * x_sq)
+                    )
+
+                def _f_i1b(
+                    x: acb,
+                    analytic: bool,
+                    pm: acb = psi_m_c,
+                    p1m: acb = psi1_m_c,
+                ) -> acb:
+                    x_sq = x.sqrt(analytic=analytic)
+                    e1_x = pm * x - p1m - acb("0.5") * (x * x - acb(1))
+                    return (
+                        e1_x
+                        * evaluate_h1_acb(x / X_s_acb, analytic=analytic)
+                        / ((x * x) * x_sq)
+                    )
+
+                i_b_lhs += acb.integral(
+                    _f_ib, a_c, b_c, rel_tol=tol_pt, abs_tol=tol_pt
+                ).real
+                i1_b_int += acb.integral(
+                    _f_i1b, a_c, b_c, rel_tol=tol_pt, abs_tol=tol_pt
+                ).real
+
+            i_b_lhs_arb_list.append(i_b_lhs)
+
+            e1_B_val = (
+                psi_pt[B_pt] * B_pt_arb
+                - psi1_pt[B_pt]
+                - arb("0.5") * (B_pt_arb * B_pt_arb - arb(1))
+            )
+            upper_bound_term = (
+                e1_B_val
+                * (B_pt_arb ** arb("-1.5"))
+                * evaluate_tilde_h0_arb(B_pt_arb / X_s_arb)
+            )
+            rhs_exact_pt = upper_bound_term + i1_b_int
+            spurious_half_h1 = arb("0.5") * evaluate_h1_arb(arb(1) / X_s_arb)
+            rhs_erroneous_pt = spurious_half_h1 + rhs_exact_pt
+            encloses_pt = bool(i_b_lhs.overlaps(rhs_exact_pt))
+            if not encloses_pt:
+                all_primitive_transfer_enclose = False
+            primitive_transfer_verifications.append(
+                {
+                    "X": x_scale,
+                    "B_cutoff": B_pt,
+                    "E1_at_1_exact": 0.0,
+                    "I_B_lhs_mid": float(i_b_lhs.mid()),
+                    "I_B_rhs_exact_no_lower_boundary_mid": float(rhs_exact_pt.mid()),
+                    "exact_abs_mid_diff": abs(float((i_b_lhs - rhs_exact_pt).mid())),
+                    "exact_encloses_lhs": encloses_pt,
+                    "spurious_half_h1_at_1_over_X": float(spurious_half_h1.mid()),
+                    "erroneous_rhs_with_spurious_term_abs_discrepancy": abs(
+                        float((i_b_lhs - rhs_erroneous_pt).mid())
+                    ),
+                }
+            )
+
+        # --- Attempt B: Signed Dyadic Scale Decomposition (in original variable x, NO X^{-1/2} factor) ---
+        # Shell weights omega_j = int_{2^j}^{2^{j+1}} |tilde{h}_0(alpha)| alpha^{-1/2} d_alpha > 0.
+        # In the original variable x, the normalized shell average on [2^j X, 2^{j+1} X] cap [1, infty) is:
+        #   mu_j(X) := (1 / omega_j) int_{[2^j X, 2^{j+1} X] cap [1, infty)} E(x) x^{-3/2} tilde{h}_0(x/X) dx
+        #            = (X^{-1/2} / omega_j) int_{[2^j, 2^{j+1}] cap [1/X, infty)} E(X alpha) alpha^{-3/2} tilde{h}_0(alpha) d_alpha,
+        # so that I(X) = sum_{j in Z} omega_j * mu_j(X) holds identically (without an extra X^{-1/2} factor!).
+        # Note: Under the elementary Chebyshev bound |E(x)| <= A x, |mu_j(X)| <= A * X^{1/2} grows like X^{1/2};
+        # multiplying the x-integral by X^{-1/2} erroneously produced X^{-1/2} I(X) and made the shell bound
+        # follow trivially from |E(x)| <= A x, removing the exact X^{1/2} cancellation difficulty.
         c_tilde_arb = arb(1032993) / arb(65536)
         tol = 2**(-85)
         dyadic_shells = []
@@ -3051,8 +3196,71 @@ def execute_subgate_tc042b_cancellation_attempts(
         tail_high = c_tilde_arb * (arb(64) ** (-2)) / arb(2)
         total_l1_majorant = shell_weight_sum + tail_low + tail_high
 
-        # --- Attempt C: Exact Seed-Wavelet Multiplicative Convolution Factorization ---
-        # Verify single-seed PNT main-term moment int_0^infty y^{-1/2} psi_tau(y) dy = F_tau(1) = 0 in Arb:
+        # Verify finite-cutoff dyadic shell sum sum_j omega_j mu_{j,B}(X) == I_B(X) at B = 50 for X in {1, 4, 100}
+        # and verify that the erroneously scaled X^{-1/2} shell sum equals X^{-1/2} I_B(X) != I_B(X) for X != 1:
+        dyadic_shell_verifications: List[Dict[str, Any]] = []
+        all_dyadic_shell_sums_enclose = True
+        erroneous_dyadic_factor_refuted = True
+        for idx_s, x_scale in enumerate((1, 4, 100)):
+            X_s_arb = arb(x_scale)
+            X_s_acb = acb(X_s_arb)
+            i_b_target = i_b_lhs_arb_list[idx_s]
+            # Partition [1, B_pt] by dyadic shell boundaries 2^j * X_scale (which are integers or rationals):
+            shell_sum_x = arb(0)
+            for j_sh in range(-8, 7):
+                sh_low = max(Fraction(1), Fraction(x_scale) * (Fraction(2) ** j_sh))
+                sh_high = min(
+                    Fraction(B_pt), Fraction(x_scale) * (Fraction(2) ** (j_sh + 1))
+                )
+                if sh_low >= sh_high:
+                    continue
+                # Subdivide [sh_low, sh_high] at integer points m where psi(x) jumps:
+                m_start = int(math.floor(float(sh_low)))
+                m_end = int(math.ceil(float(sh_high)))
+                for m_sub in range(max(1, m_start), min(B_pt, m_end)):
+                    sub_a = max(sh_low, Fraction(m_sub))
+                    sub_b = min(sh_high, Fraction(m_sub + 1))
+                    if sub_a >= sub_b:
+                        continue
+                    a_c = acb(sub_a.numerator) / acb(sub_a.denominator)
+                    b_c = acb(sub_b.numerator) / acb(sub_b.denominator)
+                    psi_m_c = acb(psi_pt[m_sub])
+
+                    def _f_sh(x: acb, analytic: bool, pm: acb = psi_m_c) -> acb:
+                        x_sq = x.sqrt(analytic=analytic)
+                        return (
+                            (pm - x)
+                            * evaluate_tilde_h0_acb(x / X_s_acb, analytic=analytic)
+                            / (x * x_sq)
+                        )
+
+                    shell_sum_x += acb.integral(
+                        _f_sh, a_c, b_c, rel_tol=tol_pt, abs_tol=tol_pt
+                    ).real
+
+            erroneous_shell_sum = (arb(1) / X_s_arb.sqrt()) * shell_sum_x
+            diff_exact = abs(float((shell_sum_x - i_b_target).mid()))
+            diff_erroneous = abs(float((erroneous_shell_sum - i_b_target).mid()))
+            if diff_exact > 1e-14:
+                all_dyadic_shell_sums_enclose = False
+            if x_scale != 1 and diff_erroneous < 1e-3:
+                erroneous_dyadic_factor_refuted = False
+            dyadic_shell_verifications.append(
+                {
+                    "X": x_scale,
+                    "B_cutoff": B_pt,
+                    "dyadic_shell_sum_in_x_mid": float(shell_sum_x.mid()),
+                    "target_I_B_mid": float(i_b_target.mid()),
+                    "exact_abs_diff": diff_exact,
+                    "erroneous_X_minus_half_shell_sum_mid": float(
+                        erroneous_shell_sum.mid()
+                    ),
+                    "erroneous_X_minus_half_abs_discrepancy": diff_erroneous,
+                }
+            )
+
+        # --- Attempt C: Exact Seed-Wavelet Multiplicative Convolution & sech^2 Energy ---
+        # 1. Verify single-seed PNT main-term moment int_0^infty y^{-1/2} psi_tau(y) dy = F_tau(1) = 0 in Arb:
         # Since y^{-1/2} psi_tau(y) = P_2(pi y^2) exp(-pi y^2) is an entire function of y:
         def _eval_p2_acb(r: acb) -> acb:
             return (
@@ -3079,11 +3287,74 @@ def execute_subgate_tc042b_cancellation_attempts(
         seed_pnt_enclosure = seed_pnt_int + arb(0, seed_pnt_tail.upper())
         seed_pnt_contains_zero = bool(seed_pnt_enclosure.contains(arb(0)))
 
-        # Compute weighted L^2 norm squared of psi_tau:
-        # C_psi^2 = int_0^infty |psi_tau(y)|^2 (y + 1/y)^2 dy/y.
-        # Since psi_tau(y) = y^{1/2} * (pi y^2) * Q_3(pi y^2) * exp(-pi y^2) where
-        # Q_3(r) = r^3 - 7 r^2 + (41/4) r - 9/4, the integrand is the entire function
-        # pi^2 * Q_3(pi y^2)^2 * (y^3 + y)^2 * exp(-2 pi y^2) with no singularity at y = 0.
+        # 2. Exact closed-form Gaussian moment formula for C_psi^2:
+        # Substituting r = pi y^2 (dy/y = dr/(2r), |psi_tau(y)|^2 = (r/pi)^{1/2} P_2(r)^2 e^{-2r},
+        # (y + 1/y)^2 = r/pi + 2 + pi/r) gives:
+        #   C_psi^2 = int_0^infty |psi_tau(y)|^2 (y + 1/y)^2 dy/y
+        #           = (1 / sqrt(2)) * (1143585 / (524288 * pi) + 92193 / 65536 + 12735 * pi / 32768).
+        r_sym = sp.Symbol("r", positive=True)
+        p2_sym = (
+            r_sym**4
+            - 7 * r_sym**3
+            + sp.Rational(41, 4) * r_sym**2
+            - sp.Rational(9, 4) * r_sym
+        )
+        p2_sq_sym = sp.expand(p2_sym**2)
+        mom_y2_sym = sp.simplify(
+            sum(
+                p2_sq_sym.coeff(r_sym, k)
+                * sp.gamma(k + sp.Rational(3, 2))
+                / (2 ** (k + sp.Rational(3, 2)))
+                for k in range(2, 9)
+            )
+            / (2 * sp.pi ** sp.Rational(3, 2))
+        )
+        mom_2_sym = sp.simplify(
+            sum(
+                p2_sq_sym.coeff(r_sym, k)
+                * sp.gamma(k + sp.Rational(1, 2))
+                / (2 ** (k + sp.Rational(1, 2)))
+                for k in range(2, 9)
+            )
+            / (sp.pi ** sp.Rational(1, 2))
+        )
+        mom_ym2_sym = sp.simplify(
+            sum(
+                p2_sq_sym.coeff(r_sym, k)
+                * sp.gamma(k - sp.Rational(1, 2))
+                / (2 ** (k - sp.Rational(1, 2)))
+                for k in range(2, 9)
+            )
+            * (sp.pi ** sp.Rational(1, 2))
+            / 2
+        )
+        gaussian_moment_identity_verified = bool(
+            sp.simplify(
+                mom_y2_sym
+                - sp.Rational(1143585, 524288) / (sp.sqrt(2) * sp.pi)
+            )
+            == 0
+            and sp.simplify(
+                mom_2_sym - sp.Rational(92193, 65536) / sp.sqrt(2)
+            )
+            == 0
+            and sp.simplify(
+                mom_ym2_sym
+                - sp.Rational(12735, 32768) * sp.pi / sp.sqrt(2)
+            )
+            == 0
+        )
+
+        c_psi_sq_exact_arb = (arb(1) / arb(2).sqrt()) * (
+            arb(1143585) / (arb(524288) * pi_arb)
+            + arb(92193) / arb(65536)
+            + arb(12735) * pi_arb / arb(32768)
+        )
+        c_psi_exact_arb = c_psi_sq_exact_arb.sqrt()
+
+        # Also cross-check against quadrature on [0, 4] PLUS an explicit certified tail bound on [4, infty):
+        # For y >= 4, r = pi y^2 >= 16*pi > 50, |Q_3(r)| < r^3, y^3 + y < (17/16) y^3,
+        # so the integrand is < 2 * r^9 * exp(-2r) < exp(-r), and int_4^infty < exp(-16*pi) ~ 1.48e-22.
         def _f_psi_weighted_l2(y: acb, analytic: bool) -> acb:
             pi_c = acb.pi()
             r = pi_c * y * y
@@ -3096,21 +3367,23 @@ def execute_subgate_tc042b_cancellation_attempts(
             y_poly = (y**3) + y
             return (pi_c * pi_c) * (q3 * q3) * (y_poly * y_poly) * ((-acb(2) * r).exp())
 
-        psi_w_l2 = arb(0)
+        psi_w_l2_0_4 = arb(0)
         for m_step in range(0, 8):
-            psi_w_l2 += acb.integral(
+            psi_w_l2_0_4 += acb.integral(
                 _f_psi_weighted_l2,
                 acb(m_step) / acb(2),
                 acb(m_step + 1) / acb(2),
                 rel_tol=tol,
                 abs_tol=tol,
             ).real
-        c_psi_weighted = psi_w_l2.sqrt()
+        psi_w_l2_tail_4_inf = (-arb(16) * pi_arb).exp()
+        psi_w_l2_quad_enclosure = psi_w_l2_0_4 + arb(0, psi_w_l2_tail_4_inf.upper())
+        c_psi_quad_overlaps_exact = bool(
+            psi_w_l2_quad_enclosure.overlaps(c_psi_sq_exact_arb)
+        )
 
-        # Verify exact convolution identity sum_{2<=n<=25} (Lambda(n)/sqrt(n)) h_0(n/X)
-        # = int_0^infty V_{tau,<=25}(X/y) psi_tau(y) dy/y at X = 4:
-        # Since psi_tau((n/X) y) psi_tau(y) / y = sqrt(n/X) P_2(pi (n/X)^2 y^2) P_2(pi y^2) exp(-pi ((n/X)^2 + 1) y^2),
-        # the integrand is an entire function of y.
+        # 3. Verify exact convolution identity sum_{2<=n<=25} (Lambda(n)/sqrt(n)) h_0(n/X)
+        # = int_0^infty V_{tau,<=25}(X/y) psi_tau(y) dy/y at X = 4 (with certified [4, infty) tail):
         p25 = get_prime_powers_up_to(25)
         X_conv_test = arb(4)
         lhs_conv_25 = arb(0)
@@ -3131,16 +3404,215 @@ def execute_subgate_tc042b_cancellation_attempts(
                 v_sum += coeff_c * _eval_p2_acb(r_n) * ((-r_n).exp())
             return v_sum * p2_y
 
-        rhs_conv_25 = arb(0)
+        rhs_conv_25_0_4 = arb(0)
         for m_step in range(0, 8):
-            rhs_conv_25 += acb.integral(
+            rhs_conv_25_0_4 += acb.integral(
                 _f_conv_25,
                 acb(m_step) / acb(2),
                 acb(m_step + 1) / acb(2),
                 rel_tol=tol,
                 abs_tol=tol,
             ).real
+        rhs_conv_25_tail = arb(1000) * ((-arb(16) * pi_arb).exp())
+        rhs_conv_25 = rhs_conv_25_0_4 + arb(0, rhs_conv_25_tail.upper())
         conv_abs_diff = abs(float((lhs_conv_25 - rhs_conv_25).mid()))
+        conv_enclosures_overlap = bool(lhs_conv_25.overlaps(rhs_conv_25))
+
+        # 4. Certify the exact single-seed Stieltjes identity for v(r) = V_tau(u) (u = e^r) at B = 50:
+        #   V_tau(u) = psi_tau(1/u) - int_0^1 x^{-1/2} psi_tau(x/u) dx + int_1^infty E(x) x^{-3/2} tilde{psi}_tau(x/u) dx,
+        # where tilde{psi}_tau(alpha) = (1/2) psi_tau(alpha) - (D_alpha psi_tau)(alpha)
+        # = alpha^{1/2} * (2 rho^5 - 22 rho^4 + (125/2) rho^3 - (91/2) rho^2 + (9/2) rho) * exp(-rho), rho = pi alpha^2.
+        def _eval_tilde_psi_acb(alpha: acb, analytic: bool = False) -> acb:
+            a_sq = alpha.sqrt(analytic=analytic)
+            rho = acb.pi() * alpha * alpha
+            q_st = (
+                acb(2) * (rho**5)
+                - acb(22) * (rho**4)
+                + (acb(125) / acb(2)) * (rho**3)
+                - (acb(91) / acb(2)) * (rho * rho)
+                + (acb(9) / acb(2)) * rho
+            )
+            return a_sq * q_st * ((-rho).exp())
+
+        single_seed_stieltjes_checks: List[Dict[str, Any]] = []
+        all_single_seed_stieltjes_enclose = True
+        for u_val in (1, 2, 4):
+            u_arb = arb(u_val)
+            u_acb = acb(u_arb)
+            lhs_v_b = arb(0)
+            for n_idx in range(2, B_pt + 1):
+                if n_idx in lam_pt:
+                    n_a = arb(n_idx)
+                    al_n = n_a / u_arb
+                    r_n = pi_arb * al_n * al_n
+                    p2_n = (
+                        (r_n**4)
+                        - arb(7) * (r_n**3)
+                        + (arb(41) / arb(4)) * (r_n * r_n)
+                        - (arb(9) / arb(4)) * r_n
+                    )
+                    psi_n = al_n.sqrt() * p2_n * ((-r_n).exp())
+                    lhs_v_b += (lam_pt[n_idx] / n_a.sqrt()) * psi_n
+
+            def _f_v_main(x: acb, analytic: bool) -> acb:
+                # x^{-1/2} psi_tau(x/u) = u^{-1/2} P_2(pi x^2 / u^2) exp(-pi x^2 / u^2) (entire in x!)
+                r_x = acb.pi() * (x * x) / (u_acb * u_acb)
+                return _eval_p2_acb(r_x) * ((-r_x).exp()) / u_acb.sqrt()
+
+            v_main_1_B = arb(0)
+            v_rem_1_B = arb(0)
+            for m_idx in range(1, B_pt):
+                a_c = acb(m_idx)
+                b_c = acb(m_idx + 1)
+                psi_m_c = acb(psi_pt[m_idx])
+
+                def _f_v_rem(x: acb, analytic: bool, pm: acb = psi_m_c) -> acb:
+                    x_sq = x.sqrt(analytic=analytic)
+                    return (
+                        (pm - x)
+                        * _eval_tilde_psi_acb(x / u_acb, analytic=analytic)
+                        / (x * x_sq)
+                    )
+
+                v_main_1_B += acb.integral(
+                    _f_v_main, a_c, b_c, rel_tol=tol_pt, abs_tol=tol_pt
+                ).real
+                v_rem_1_B += acb.integral(
+                    _f_v_rem, a_c, b_c, rel_tol=tol_pt, abs_tol=tol_pt
+                ).real
+
+            al_B = B_pt_arb / u_arb
+            r_B = pi_arb * al_B * al_B
+            psi_B = (
+                al_B.sqrt()
+                * (
+                    (r_B**4)
+                    - arb(7) * (r_B**3)
+                    + (arb(41) / arb(4)) * (r_B * r_B)
+                    - (arb(9) / arb(4)) * r_B
+                )
+                * ((-r_B).exp())
+            )
+            al_1 = arb(1) / u_arb
+            r_1 = pi_arb * al_1 * al_1
+            psi_1 = (
+                al_1.sqrt()
+                * (
+                    (r_1**4)
+                    - arb(7) * (r_1**3)
+                    + (arb(41) / arb(4)) * (r_1 * r_1)
+                    - (arb(9) / arb(4)) * r_1
+                )
+                * ((-r_1).exp())
+            )
+            v_bound_B = (arb(1) / B_pt_arb.sqrt()) * psi_B * (psi_pt[B_pt] - B_pt_arb)
+            rhs_v_b = v_main_1_B + v_bound_B + psi_1 + v_rem_1_B
+            encloses_v = bool(lhs_v_b.overlaps(rhs_v_b))
+            if not encloses_v:
+                all_single_seed_stieltjes_enclose = False
+            single_seed_stieltjes_checks.append(
+                {
+                    "u": u_val,
+                    "B_cutoff": B_pt,
+                    "lhs_sum_mid": float(lhs_v_b.mid()),
+                    "rhs_stieltjes_mid": float(rhs_v_b.mid()),
+                    "abs_mid_diff": abs(float((lhs_v_b - rhs_v_b).mid())),
+                    "encloses": encloses_v,
+                }
+            )
+
+        # 5. Evaluate the clean sech^2-weighted single-seed energy
+        #   E_tau(t) := int_R |v(r)|^2 / (4 cosh^2(t - r)) dr,   v(r) = V_tau(e^r), t = log X >= 0,
+        # across sample scales X in {1, 2, 4, tau, 10, 25, 100} and verify Cauchy-Schwarz
+        #   |W(X)| <= C_psi * sqrt(E_tau(log X))
+        # at every scale:
+        p_sech = get_prime_powers_up_to(600)
+        sech_energy_samples: List[Dict[str, Any]] = []
+        max_sampled_sech_energy = 0.0
+        all_cauchy_schwarz_satisfied = True
+        with mpmath.workdps(25):
+            pi_mp = mpmath.pi
+            tau_mp = 2 * pi_mp
+            c_psi_mp = mpmath.mpf(str(float(c_psi_exact_arb.upper())))
+            p_mp_list = [
+                (pk, float(pk), mpmath.log(p) / mpmath.sqrt(pk))
+                for pk, p, _ in p_sech
+            ]
+
+            def _v_mp(r_val: mpmath.mpf) -> mpmath.mpf:
+                u_inv = mpmath.exp(-r_val)
+                u_cut = 5.0 * float(mpmath.exp(r_val))
+                acc = mpmath.mpf(0)
+                for pk_i, pk_f, w_p in p_mp_list:
+                    if pk_f > u_cut:
+                        break
+                    al = pk_i * u_inv
+                    rho = pi_mp * al * al
+                    p2_v = (
+                        rho**4
+                        - 7 * rho**3
+                        + mpmath.mpf("41/4") * rho * rho
+                        - mpmath.mpf("9/4") * rho
+                    )
+                    acc += w_p * mpmath.sqrt(al) * p2_v * mpmath.exp(-rho)
+                return acc
+
+            # Precompute v(r) on a fine uniform grid r in [-1.5, 8.5] (step h_r = 1/32 = 0.03125, 321 nodes)
+            # for fast composite Simpson/trapezoidal evaluation of E_tau(t) and diagonal energy E_{tau,diag}(t):
+            r_grid = [mpmath.mpf(k) / 32 for k in range(-48, 273)]
+            v_sq_grid = [_v_mp(r_pt) ** 2 for r_pt in r_grid]
+            h_r = mpmath.mpf(1) / 32
+
+            for x_label, x_val_mp in (
+                ("1", mpmath.mpf(1)),
+                ("2", mpmath.mpf(2)),
+                ("4", mpmath.mpf(4)),
+                ("tau=2*pi", tau_mp),
+                ("10", mpmath.mpf(10)),
+                ("25", mpmath.mpf(25)),
+                ("100", mpmath.mpf(100)),
+            ):
+                t_mp = mpmath.log(x_val_mp)
+                e_tau_t = mpmath.mpf(0)
+                for idx_r, r_pt in enumerate(r_grid):
+                    w_tr = (
+                        mpmath.mpf("0.5")
+                        if (idx_r == 0 or idx_r == len(r_grid) - 1)
+                        else mpmath.mpf(1)
+                    )
+                    e_tau_t += (
+                        w_tr
+                        * h_r
+                        * v_sq_grid[idx_r]
+                        / (4 * mpmath.cosh(t_mp - r_pt) ** 2)
+                    )
+                e_tau_f = float(e_tau_t)
+                max_sampled_sech_energy = max(max_sampled_sech_energy, e_tau_f)
+                cs_rhs_f = float(c_psi_mp * mpmath.sqrt(e_tau_t))
+
+                # Evaluate W(X) at X = x_val_mp:
+                x_arb_s = arb(str(x_val_mp))
+                w_x_sum = arb(0)
+                for pk_i, p_i, _ in p_sech:
+                    pk_a = arb(pk_i)
+                    w_x_sum += (arb(p_i).log() / pk_a.sqrt()) * evaluate_h0_arb(
+                        pk_a / x_arb_s
+                    )
+                abs_w_x = abs(float(w_x_sum.mid()))
+                cs_ok = bool(abs_w_x <= cs_rhs_f)
+                if not cs_ok:
+                    all_cauchy_schwarz_satisfied = False
+                sech_energy_samples.append(
+                    {
+                        "scale_label": x_label,
+                        "X_float": float(x_val_mp),
+                        "t_eq_log_X": float(t_mp),
+                        "E_tau_t": e_tau_f,
+                        "abs_W_X": abs_w_x,
+                        "cauchy_schwarz_upper_bound_C_psi_sqrt_E": cs_rhs_f,
+                        "cauchy_schwarz_satisfied": cs_ok,
+                    }
+                )
 
         return {
             "boundary_term_uniform_bound": {
@@ -3159,17 +3631,41 @@ def execute_subgate_tc042b_cancellation_attempts(
                     "tilde{h}_0(alpha) = -(1/512) (D_alpha - 1/2)^5 (D_alpha + 1/2)^4 ((alpha + alpha^(-1))^(-1/2))"
                 ),
                 "symbolic_factorization_verified": operator_factorization_verified,
-                "annihilation_orders": {
-                    "at_s_eq_pos_half_pnt_main_term": 5,
-                    "at_s_eq_neg_half": 4,
+                "operator_multiplicity_vs_mellin_vanishing_order": {
+                    "operator_factor_multiplicity_at_D_eq_pos_half": 5,
+                    "operator_factor_multiplicity_at_D_eq_neg_half": 4,
+                    "base_kernel_mellin_pole_order_at_z_eq_pm_half": 1,
+                    "H0_mellin_vanishing_order_at_z_eq_pm_half": 3,
+                    "tilde_H0_mellin_vanishing_order_at_z_eq_pos_half": 3,
+                    "tilde_H0_mellin_vanishing_order_at_z_eq_neg_half": 4,
+                    "explanation": (
+                        "Because Gamma(s/2) has a simple pole at s = 0, F_tau(s) has a simple zero at s = 0 "
+                        "(order 1) and a double zero at s = 1 (order 2), so H_0(z) = F_tau(1/2+z) F_tau(1/2-z) "
+                        "vanishes to order 3 at z = +/- 1/2 (equivalently, one factor of (D_alpha^2 - 1/4) "
+                        "cancels the simple Mellin poles of (alpha + alpha^(-1))^(-1/2) at z = +/- 1/2)."
+                    ),
                 },
+                "exact_primitive_transfer_identity": (
+                    "I(X) = int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx,  "
+                    "E_1(x) = int_1^x E(t) dt (E_1(1) = 0, no lower boundary term),  "
+                    "h_1(alpha) = (3/2) tilde{h}_0(alpha) - (D_alpha tilde{h}_0)(alpha)"
+                ),
+                "finite_cutoff_primitive_transfer_identity": (
+                    "I_B(X) = E_1(B) B^(-3/2) tilde{h}_0(B/X) + int_1^B E_1(x) x^(-5/2) h_1(x/X) dx"
+                ),
+                "all_primitive_transfer_finite_cutoff_enclose": all_primitive_transfer_enclose,
+                "spurious_half_h1_at_X_eq_1_refuted_value": spurious_boundary_at_X1,
+                "primitive_transfer_verifications": primitive_transfer_verifications,
+                "lean_theorem": "primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction",
                 "primitive_transfer_analysis": (
-                    "Integrating by parts against E_1(x) = int_1^x E(t) dt = psi_1(x) - x^2/2 + 1/2 gives "
-                    "I(X) = (1/2) h_1(1/X) + int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx where "
-                    "h_1(alpha) = (3/2) tilde{h}_0(alpha) - D_alpha tilde{h}_0(alpha). At the classical PNT "
-                    "exponent s = 1 (weights Lambda(n)/n), int_1^infty E(x) x^(-2) dx = -gamma_E - 1 converges "
-                    "unconditionally because E_1(x)/x^3 = O(x^(-1) exp(-c sqrt(log x))) is L^1. At the critical-line "
-                    "exponent s = 1/2 (weights Lambda(n)/sqrt(n)), transferring derivatives suppresses the high-frequency "
+                    "Because E_1(x) = int_1^x E(t) dt satisfies E_1(1) = 0 and the upper boundary "
+                    "E_1(B) B^(-3/2) tilde{h}_0(B/X) = O(X^(5/2) B^(-2)) -> 0 as B -> infty, integration "
+                    "by parts gives I(X) = int_1^infty E_1(x) x^(-5/2) h_1(x/X) dx with NO (1/2) h_1(1/X) "
+                    "boundary term (at X = 1, the erroneous extra term (1/2) h_1(1) = -7.773599 creates a "
+                    "7.7736 discrepancy). At the classical PNT exponent s = 1 (weights Lambda(n)/n), "
+                    "int_1^infty E(x) x^(-2) dx = -gamma_E - 1 converges unconditionally because "
+                    "E_1(x)/x^3 = O(x^(-1) exp(-c sqrt(log x))) is L^1. At the critical-line exponent "
+                    "s = 1/2 (weights Lambda(n)/sqrt(n)), transferring derivatives suppresses the high-frequency "
                     "tail x >> X by (X/x)^k, but on the resonant scale band x in [X/4, 4X] the scale derivative "
                     "d/dx [tilde{h}_0(x/X)] = x^(-1) (D_alpha tilde{h}_0)(x/X) has scale factor x^(-1) ~ X^(-1), "
                     "which exactly balances the extra power of x in E_1(x)."
@@ -3179,34 +3675,72 @@ def execute_subgate_tc042b_cancellation_attempts(
                 "status": "CONDITIONAL_ON_SIGNED_DYADIC_SHELL_CANCELLATION",
                 "decomposition_formula": (
                     "I(X) = sum_{j in Z} omega_j * mu_j(X),  "
-                    "omega_j = int_{2^j}^{2^(j+1)} |tilde{h}_0(alpha)| alpha^(-1/2) d_alpha"
+                    "omega_j = int_{2^j}^{2^(j+1)} |tilde{h}_0(alpha)| alpha^(-1/2) d_alpha,  "
+                    "mu_j(X) = (1 / omega_j) int_{[2^j X, 2^(j+1) X] cap [1, infty)} E(x) x^(-3/2) tilde{h}_0(x/X) dx"
                 ),
                 "l1_majorant_weight_sum_upper": float(total_l1_majorant.upper()),
                 "dyadic_shells_minus6_to_5": dyadic_shells,
+                "all_dyadic_shell_sums_enclose_I_B": all_dyadic_shell_sums_enclose,
+                "erroneous_X_minus_half_factor_refuted": erroneous_dyadic_factor_refuted,
+                "dyadic_shell_finite_cutoff_verifications": dyadic_shell_verifications,
+                "lean_theorem": "dyadic_shell_weighted_sum_and_misplaced_factor_obstruction",
                 "single_unresolved_hypothesis": (
                     "exists M_dyadic < infty forall X >= 1, j in Z : "
-                    "|mu_j(X)| := |X^(-1/2) int_{2^j X}^{2^(j+1) X} E(x) x^(-3/2) (tilde{h}_0(x/X)/omega_j) dx| <= M_dyadic"
+                    "|mu_j(X)| := |(1 / omega_j) int_{[2^j X, 2^(j+1) X] cap [1, infty)} E(x) x^(-3/2) tilde{h}_0(x/X) dx| <= M_dyadic"
+                ),
+                "why_no_X_minus_half_factor_matters": (
+                    "In the original variable x, mu_j(X) has NO X^(-1/2) factor; under the elementary "
+                    "Chebyshev estimate |E(x)| <= A x, |mu_j(X)| <= A X^(1/2) grows like X^(1/2), isolating "
+                    "the exact signed cancellation requirement on each dyadic shell. Multiplying the x-integral "
+                    "by X^(-1/2) erroneously represented X^(-1/2) I(X) instead of I(X) and made the shell bound "
+                    "follow trivially from |E(x)| <= A x."
                 ),
             },
             "attempt_C_seed_wavelet_multiplicative_convolution_factorization": {
                 "status": "REDUCED_TO_GAUSSIAN_SEED_LOCAL_L2_SCALE_ENERGY",
                 "convolution_identity": (
-                    "W(X) = int_0^infty V_tau(X/y) psi_tau(y) dy/y = int_0^infty V_tau(u) psi_tau(X/u) du/u,  "
-                    "V_tau(u) := sum_{n >= 2} (Lambda(n)/sqrt(n)) psi_tau(n/u)"
+                    "W(X) = int_0^infty V_tau(X/y) psi_tau(y) dy/y = int_0^infty V_tau(u) psi_tau(X/u) du/u "
+                    "= int_R v(r) phi_tau(t - r) dr,  v(r) := V_tau(e^r) = sum_{n >= 2} (Lambda(n)/sqrt(n)) psi_tau(n e^(-r))"
                 ),
                 "single_seed_pnt_moment_vanishes": seed_pnt_contains_zero,
                 "single_seed_pnt_moment_abs_upper": float(
                     abs(seed_pnt_enclosure).upper()
                 ),
-                "weighted_psi_tau_l2_norm_C_psi": float(c_psi_weighted.upper()),
+                "exact_gaussian_moment_formula_C_psi_sq": (
+                    "C_psi^2 = (1 / sqrt(2)) * (1143585 / (524288 * pi) + 92193 / 65536 + 12735 * pi / 32768)"
+                ),
+                "symbolic_gaussian_moment_identity_verified": gaussian_moment_identity_verified,
+                "C_psi_sq_exact_mid": float(c_psi_sq_exact_arb.mid()),
+                "C_psi_exact_mid": float(c_psi_exact_arb.mid()),
+                "C_psi_exact_str_15": c_psi_exact_arb.str(15, radius=True),
+                "weighted_psi_tau_l2_norm_C_psi": float(c_psi_exact_arb.upper()),
+                "C_psi_certified_lt_1_533": bool(
+                    float(c_psi_exact_arb.upper()) < 1.533
+                ),
+                "quadrature_with_tail_overlaps_exact_C_psi_sq": c_psi_quad_overlaps_exact,
                 "finite_sum_convolution_verification_at_X_4_abs_diff": conv_abs_diff,
+                "finite_sum_convolution_enclosures_overlap": conv_enclosures_overlap,
+                "single_seed_stieltjes_identity_verified": all_single_seed_stieltjes_enclose,
+                "single_seed_stieltjes_verifications": single_seed_stieltjes_checks,
+                "sech_squared_energy_formulation": (
+                    "exists M < infty forall t >= 0 : "
+                    "E_tau(t) := int_R |v(r)|^2 / (4 cosh^2(t - r)) dr <= M,  v(r) = V_tau(e^r)"
+                ),
+                "sech_squared_energy_samples": sech_energy_samples,
+                "max_sampled_sech_squared_energy": max_sampled_sech_energy,
+                "all_sampled_cauchy_schwarz_bounds_satisfied": all_cauchy_schwarz_satisfied,
+                "lean_theorems": [
+                    "single_seed_stieltjes_and_squared_polynomial_identities",
+                    "single_seed_sech_energy_implies_complete_correlation_bound",
+                ],
                 "cauchy_schwarz_reduction": (
-                    "|W(X)| <= C_psi * (int_0^infty |V_tau(X/y)|^2 (y + y^(-1))^(-2) dy/y)^(1/2), "
-                    f"where C_psi <= {float(c_psi_weighted.upper()):.6f} is certified finite and V_tau(u) "
-                    "already has vanishing PNT main term F_tau(1) = 0 and Gaussian decay exp(-pi (n/u)^2)."
+                    "|W(e^t)| <= C_psi * (int_R |v(r)|^2 / (4 cosh^2(t - r)) dr)^(1/2), "
+                    f"where C_psi = {float(c_psi_exact_arb.mid()):.11f} < 1.533 is given in exact closed form "
+                    "by Gaussian moments and v(r) = V_tau(e^r) already has vanishing PNT main term F_tau(1) = 0 "
+                    "and Gaussian upper-scale decay exp(-pi n^2 e^(-2r))."
                 ),
                 "single_unresolved_hypothesis": (
-                    "sup_{X >= 1} int_0^infty |V_tau(X/y)|^2 (y + y^(-1))^(-2) dy/y < infty"
+                    "exists M < infty forall t >= 0 : int_R |v(r)|^2 / (4 cosh^2(t - r)) dr <= M"
                 ),
             },
         }
@@ -3219,7 +3753,7 @@ def reconcile_baseline_narrative_discrepancies(
     arch_bound_audit: Dict[str, Any],
     wavelet_audit: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """Document and verify the reconciliation of the three baseline TC-042R narrative/artifact discrepancies."""
+    """Document and verify the reconciliation of the baseline TC-042R narrative/artifact discrepancies."""
     c4_val = concavity_audit["C_tau_fourth_deriv_0_mid"]
     m6_val = concavity_audit["zero_free_arithmetic_local_enclosure"][
         "sixth_derivative_bound_M6_arith_on_0_08"
@@ -3229,6 +3763,16 @@ def reconcile_baseline_narrative_discrepancies(
     ]
     m_fwd_val = wavelet_audit["equivalence_to_complete_correlation_boundedness"][
         "forward_prime_global_bound_M_fwd"
+    ]
+    scale_by_label = {
+        row["scale_label"]: row
+        for row in wavelet_audit["certified_scale_evaluations_X_1_to_1000"]
+    }
+    w_at_1_mid = scale_by_label["1"]["W_wavelet_mid"]
+    w_at_tau_mid = scale_by_label["tau=2*pi"]["W_wavelet_mid"]
+    w_at_tau_str = scale_by_label["tau=2*pi"]["W_wavelet_str_15"]
+    h0_at_0_mellin = wavelet_audit["stieltjes_chebyshev_error_representation"][
+        "H0_at_0_mellin_value_positive"
     ]
     return {
         "all_discrepancies_reconciled": True,
@@ -3249,11 +3793,11 @@ def reconcile_baseline_narrative_discrepancies(
                 ),
             },
             {
-                "item": "K=1 archimedean sample value 0.0566039457 (and 4.95 ad-hoc constant) vs derived uniform archimedean bound",
+                "item": "Stale narrative 0.0566039457 (and 4.95 ad-hoc constant) vs derived uniform archimedean bound",
                 "stale_narrative_value": 0.0566039457,
                 "cause_of_stale_value": (
                     "Stale narrative in docs/TC_CURRENT_CANONICAL_STATUS.md used 0.0566039457 + 0.0319695591 = 0.0885735048 "
-                    "(point values at K = 1) while the code used an ad-hoc 4.95 bound on |I_arch(K)|; now "
+                    "while the code used an ad-hoc 4.95 bound on |I_arch(K)|; now "
                     "derive_and_certify_uniform_archimedean_bound derives and certifies |I_arch(K)| <= 4.448356826459047 < 4.95 "
                     "and |W_arch(h_K)| <= 5.994278749304189 for all K in R."
                 ),
@@ -3267,14 +3811,21 @@ def reconcile_baseline_narrative_discrepancies(
                 ],
             },
             {
-                "item": "Forward prime sum global bound M_fwd vs K=1 sample value",
+                "item": "Forward prime sum global bound M_fwd = 0.6330390930 vs stale 0.0319695591 and actual W(tau) = -0.0120819471",
                 "stale_narrative_value": 0.0319695591,
                 "cause_of_stale_value": (
-                    "0.0319695591 is the magnitude of the prime wavelet sum at K = 1 (X = tau), whereas the "
-                    "global upper bound on |P_fwd(X)| for all X >= 1 is (92193/32768) * 0.225 = 0.6330390930175781."
+                    "0.0319695591 was a stale uncertified draft constant in docs/TC_CURRENT_CANONICAL_STATUS.md "
+                    "(paired with 0.0566039457 to give 0.0885735048); the certified global upper bound on |P_fwd(X)| "
+                    "for all X >= 1 is (92193/32768) * 0.225 = 0.6330390930175781, while the certified reflected "
+                    f"prime wavelet sum at X = tau is W(tau) = {w_at_tau_mid:.10f} ({w_at_tau_str}) and at X = 1 is "
+                    f"W(1) = {w_at_1_mid:.10f}. Moreover, H_0(0) = F_tau(1/2)^2 = {h0_at_0_mellin:.10e} > 0 "
+                    "is the centered Mellin value at z = 0 of the actual differentiated seed psi_tau."
                 ),
                 "certified_global_M_fwd_bound": m_fwd_val,
-                "certified_W_at_tau_mid": -0.0319695591,
+                "certified_W_at_tau_mid": w_at_tau_mid,
+                "certified_W_at_tau_str_15": w_at_tau_str,
+                "certified_W_at_1_mid": w_at_1_mid,
+                "certified_H0_at_0_mellin_mid": h0_at_0_mellin,
             },
         ],
     }

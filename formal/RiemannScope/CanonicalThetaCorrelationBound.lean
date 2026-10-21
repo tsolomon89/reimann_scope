@@ -70,6 +70,24 @@ and its completed zeta correlation C_tau(K) = W_xi((T_K psi_tau) * psi_tau^*):
 20. `stieltjes_signed_pairing_uniform_bound_equivalence`:
       Mutual implication between `|I(X)| <= M_I` and `|W(X)| <= M_W` under a uniform boundary bound
       `|B_boundary(X)| <= M_B` when `W(X) = B_boundary(X) + I(X)`.
+21. `primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction`:
+      With `E_1(x) = int_1^x E(t) dt` satisfying `E_1(1) = 0`, integration by parts gives
+      `I_B(X) = E_1(B) B^(-3/2) tilde_h_0(B/X) + I_{1,B}(X)` (and `I(X) = I_1(X)` in the infinite limit)
+      with zero lower boundary term at `x = 1`, whereas adding `(1/2) h_1(1/X)` introduces a nonzero
+      error `(1/2) h_1(1/X) != 0` whenever `h_1(1/X) != 0`.
+22. `dyadic_shell_weighted_sum_and_misplaced_factor_obstruction`:
+      For shell weights `omega_j > 0` and shell integrals `S_j` in the original variable `x`,
+      defining `mu_j = S_j / omega_j` (without `X^(-1/2)`) satisfies `omega_j * mu_j = S_j`,
+      whereas multiplying by `X^(-1/2)` yields `X^(-1/2) * S_j`, which differs from `S_j` by
+      `(1 - X^(-1/2)) * S_j != 0` whenever `X^(-1/2) != 1` and `S_j != 0`.
+23. `single_seed_stieltjes_and_squared_polynomial_identities`:
+      Exact polynomial identities for the single-seed Stieltjes kernel polynomial
+      `2 r (P_2(r) - P_2'(r)) = 2 r^5 - 22 r^4 + (125/2) r^3 - (91/2) r^2 + (9/2) r`
+      and the squared seed polynomial `P_2(r)^2` used in the exact Gaussian moment evaluation of `C_psi^2`.
+24. `single_seed_sech_energy_implies_complete_correlation_bound`:
+      Conditional reduction showing that `|W(e^t)| <= C_psi * E_sqrt` (from Cauchy-Schwarz on the
+      `sech^2`-weighted single-seed energy `E_tau(t) <= E_sqrt^2`) together with `|W_arch| <= M_arch`
+      and `|P_fwd| <= M_fwd` implies `|C_tau(K)| <= M_arch + M_fwd + C_psi * E_sqrt`.
 -/
 
 import Mathlib.Data.Real.Basic
@@ -488,5 +506,101 @@ theorem stieltjes_signed_pairing_uniform_bound_equivalence
     refine ⟨by linarith, by linarith⟩
   · rintro ⟨hW1, hW2⟩
     refine ⟨by linarith, by linarith⟩
+
+/-! ### 8. Attempt A/B/C Repairs: Primitive Transfer Boundary, Dyadic Shell Scaling, and Single-Seed Energy -/
+
+/-- Squared second-order seed polynomial `P_2(r)^2` appearing in the exact Gaussian moment
+    evaluation of `C_psi^2 = int_0^infty |psi_tau(y)|^2 (y + y^(-1))^2 dy/y`. -/
+def seedSquaredPoly (r : ℝ) : ℝ :=
+  (seedSecondOrderPoly r) ^ 2
+
+/-- Single-seed Stieltjes derivative polynomial `Q_{St}(r) = 2 r (P_2(r) - P_2'(r))`
+    such that `tilde{psi}_tau(alpha) = (1/2) psi_tau(alpha) - (D_alpha psi_tau)(alpha)
+    = alpha^(1/2) Q_{St}(pi alpha^2) exp(-pi alpha^2)`. -/
+def singleSeedStieltjesPoly (r : ℝ) : ℝ :=
+  2 * r ^ 5 - 22 * r ^ 4 + (125 / 2) * r ^ 3 - (91 / 2) * r ^ 2 + (9 / 2) * r
+
+/-- Exact finite-cutoff primitive-transfer expression `E_1(B) B^(-3/2) tilde{h}_0(B/X) + I_{1,B}(X)`
+    when `E_1(x) = int_1^x E(t) dt` satisfies `E_1(1) = 0`. -/
+def primitiveTransferFiniteRHS (E1_B B_pow_m32 tilde_h0_BX I1_BX : ℝ) : ℝ :=
+  E1_B * B_pow_m32 * tilde_h0_BX + I1_BX
+
+/-- Theorem 21: Because `E_1(x) = int_1^x E(t) dt` vanishes at `x = 1` (`E1_1 = 0`), integration
+    by parts on `[1, B]` gives `I_B = E_1(B) B^(-3/2) tilde{h}_0(B/X) + I_{1,B}` (and `I = I_1`
+    when the upper boundary vanishes at infinity) with zero lower-endpoint term at `x = 1`;
+    adding `(1/2) * h1_inv_X` introduces a nonzero error `(1/2) * h1_inv_X != 0` whenever `h1_inv_X != 0`. -/
+theorem primitive_transfer_zero_lower_boundary_and_spurious_term_obstruction
+    (E1_1 E1_B B_pow_m32 tilde_h0_1X tilde_h0_BX I1_BX h1_inv_X : ℝ)
+    (h_E1_one : E1_1 = 0)
+    (h_h1_ne : h1_inv_X ≠ 0) :
+    (E1_B * B_pow_m32 * tilde_h0_BX - E1_1 * 1 * tilde_h0_1X + I1_BX =
+      primitiveTransferFiniteRHS E1_B B_pow_m32 tilde_h0_BX I1_BX) ∧
+    (E1_B = 0 → primitiveTransferFiniteRHS E1_B B_pow_m32 tilde_h0_BX I1_BX = I1_BX) ∧
+    ((1 / 2) * h1_inv_X + primitiveTransferFiniteRHS E1_B B_pow_m32 tilde_h0_BX I1_BX -
+      primitiveTransferFiniteRHS E1_B B_pow_m32 tilde_h0_BX I1_BX = (1 / 2) * h1_inv_X) ∧
+    ((1 / 2) * h1_inv_X ≠ 0) := by
+  unfold primitiveTransferFiniteRHS
+  refine ⟨?_, ?_, by ring, ?_⟩
+  · rw [h_E1_one]
+    ring
+  · intro hEB
+    rw [hEB]
+    ring
+  · intro h_zero
+    apply h_h1_ne
+    linarith
+
+/-- Theorem 22: For positive dyadic shell weight `omega_j > 0` and shell integral `S_j` in the
+    original variable `x`, defining `mu_j = S_j / omega_j` (without `X^(-1/2)`) satisfies
+    `omega_j * mu_j = S_j`, whereas multiplying `mu_j` by `inv_sqrt_X = X^(-1/2)` gives
+    `inv_sqrt_X * S_j`, which differs from `S_j` by `(1 - inv_sqrt_X) * S_j != 0` whenever
+    `inv_sqrt_X != 1` and `S_j != 0`. -/
+theorem dyadic_shell_weighted_sum_and_misplaced_factor_obstruction
+    (omega_j S_j inv_sqrt_X : ℝ)
+    (h_omega : omega_j ≠ 0)
+    (h_scale : inv_sqrt_X ≠ 1)
+    (h_Sj : S_j ≠ 0) :
+    (omega_j * (S_j / omega_j) = S_j) ∧
+    (omega_j * (inv_sqrt_X * (S_j / omega_j)) = inv_sqrt_X * S_j) ∧
+    (S_j - omega_j * (inv_sqrt_X * (S_j / omega_j)) = (1 - inv_sqrt_X) * S_j) ∧
+    ((1 - inv_sqrt_X) * S_j ≠ 0) := by
+  have h_cancel : omega_j * (S_j / omega_j) = S_j := mul_div_cancel₀ S_j h_omega
+  have h_scaled : omega_j * (inv_sqrt_X * (S_j / omega_j)) = inv_sqrt_X * S_j := by
+    calc
+      omega_j * (inv_sqrt_X * (S_j / omega_j))
+          = inv_sqrt_X * (omega_j * (S_j / omega_j)) := by ring
+      _ = inv_sqrt_X * S_j := by rw [h_cancel]
+  have h_sub_ne : 1 - inv_sqrt_X ≠ 0 := sub_ne_zero.mpr (Ne.symm h_scale)
+  refine ⟨h_cancel, h_scaled, ?_, mul_ne_zero h_sub_ne h_Sj⟩
+  rw [h_scaled]
+  ring
+
+/-- Theorem 23: Exact polynomial identities for the single-seed Stieltjes kernel polynomial
+    `2 r (P_2(r) - P_2'(r))` and the squared seed polynomial `P_2(r)^2` used in the exact
+    Gaussian moment formula for `C_psi^2`. -/
+theorem single_seed_stieltjes_and_squared_polynomial_identities (r : ℝ) :
+    (singleSeedStieltjesPoly r =
+      2 * r * (seedSecondOrderPoly r - (4 * r ^ 3 - 21 * r ^ 2 + (41 / 2) * r - 9 / 4))) ∧
+    (seedSquaredPoly r =
+      r ^ 8 - 14 * r ^ 7 + (139 / 2) * r ^ 6 - 148 * r ^ 5
+        + (2185 / 16) * r ^ 4 - (369 / 8) * r ^ 3 + (81 / 16) * r ^ 2) := by
+  unfold singleSeedStieltjesPoly seedSquaredPoly seedSecondOrderPoly
+  constructor <;> ring
+
+/-- Theorem 24: Conditional reduction from a uniform bound on the `sech^2`-weighted single-seed
+    prime-wavelet energy `E_tau(t) <= E_sqrt^2` (via Cauchy-Schwarz `|W(e^t)| <= C_psi * E_sqrt`)
+    to a uniform bound on the complete correlation `|C_tau(K)| <= M_arch + M_fwd + C_psi * E_sqrt`. -/
+theorem single_seed_sech_energy_implies_complete_correlation_bound
+    (C_K W_arch P_fwd W_X C_psi E_sqrt M_arch M_fwd : ℝ)
+    (h_decomp : C_K = W_arch + P_fwd - W_X)
+    (h_arch : -M_arch ≤ W_arch ∧ W_arch ≤ M_arch)
+    (h_fwd : -M_fwd ≤ P_fwd ∧ P_fwd ≤ M_fwd)
+    (h_cs : -(C_psi * E_sqrt) ≤ W_X ∧ W_X ≤ C_psi * E_sqrt) :
+    -(M_arch + M_fwd + C_psi * E_sqrt) ≤ C_K ∧
+      C_K ≤ M_arch + M_fwd + C_psi * E_sqrt := by
+  rcases h_arch with ⟨hA1, hA2⟩
+  rcases h_fwd with ⟨hF1, hF2⟩
+  rcases h_cs with ⟨hW1, hW2⟩
+  constructor <;> linarith
 
 end RiemannScope
