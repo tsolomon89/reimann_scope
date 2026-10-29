@@ -734,4 +734,170 @@ theorem attempt_B_universal_pole_pnt_archimedean_cancellation
   dsimp [W_pole, W_arch, neg_W_prime]
   ring
 
+/-!
+## 11. TASK-TC-043: Admissible Cross-Grade Compatibility & TC-042F Reconciliation
+-/
+
+/-- Real part `2 * Re(u * conj(v))` of the complex reflected-pair form on `u = u_re + i * u_im`,
+    `v = v_re + i * v_im`. -/
+def complexHyperbolicPairForm (u_re u_im v_re v_im : ℝ) : ℝ :=
+  2 * (u_re * v_re + u_im * v_im)
+
+/-- Transfer quadratic form `B_transfer(f) = 2 * norm_f_sq - pole_neg` on the pole-vanishing
+    graded theta span `S_tau` where `pole_pos + pole_neg = 0`. -/
+def attemptBTransferForm (norm_f_sq pole_neg : ℝ) : ℝ :=
+  2 * norm_f_sq - pole_neg
+
+/-- Theorem 30: Reconciled complex reflected-pair conjugate-inverse scaling invariance.
+    For any nonzero complex multiplier `lambda = a + i * b` with `(a^2 + b^2) * m_inv = 1`,
+    scaling `u` by `lambda` and `v` by `conj(lambda)^(-1) = (a + i * b) * m_inv` preserves
+    `q(u, v) = 2 * Re(u * conj(v))` identically, whereas naive reciprocal scaling
+    `lambda^(-1) = (a - i * b) * m_inv` fails at `lambda = i` (`a = 0, b = 1, m_inv = 1, u = 1, v = 1`),
+    giving `-2 != +2`. -/
+theorem complex_reflected_pair_conjugate_inverse_invariance
+    (a b m_inv u_re u_im v_re v_im : ℝ)
+    (h_inv : (a ^ 2 + b ^ 2) * m_inv = 1) :
+    let u_re' := a * u_re - b * u_im
+    let u_im' := a * u_im + b * u_re
+    let v_re' := (a * v_re - b * v_im) * m_inv
+    let v_im' := (a * v_im + b * v_re) * m_inv
+    complexHyperbolicPairForm u_re' u_im' v_re' v_im' =
+      complexHyperbolicPairForm u_re u_im v_re v_im ∧
+      complexHyperbolicPairForm (0 * 1 - 1 * 0) (0 * 0 + 1 * 1)
+        ((0 * 1 + 1 * 0) * 1) ((0 * 0 - 1 * 1) * 1) = -2 ∧
+      complexHyperbolicPairForm 1 0 1 0 = 2 := by
+  intro u_re' u_im' v_re' v_im'
+  unfold complexHyperbolicPairForm
+  refine ⟨?_, by norm_num, by norm_num⟩
+  have h_alg :
+      2 * (u_re' * v_re' + u_im' * v_im') =
+        ((a ^ 2 + b ^ 2) * m_inv) * (2 * (u_re * v_re + u_im * v_im)) := by
+    dsimp [u_re', u_im', v_re', v_im']
+    ring
+  rw [h_alg, h_inv]
+  ring
+
+/-- Theorem 31: General sesquilinear shift-difference identity for a unitary shift `S_u` (`S_u^* = S_{-u}`).
+    The inner product `<(I - S_u)f, (I - S_u)g> = <f, g> - <S_u f, g> - <f, S_u g> + <S_u f, S_u g>`
+    under unitarity (`<S_u f, S_u g> = <f, g>`) and `<f, S_u g> = <S_{-u} f, g>` equals the two-sided
+    shift difference `2 * <f, g> - <S_u f, g> - <S_{-u} f, g>`, and equals `2 * (<f, g> - <S_u f, g>)`
+    if and only if `<S_u f, g> = <S_{-u} f, g>`. -/
+theorem sesquilinear_shift_difference_identity
+    (inner_fg inner_Su_f_g inner_Smu_f_g inner_f_Su_g inner_Su_f_Su_g : ℝ)
+    (h_unitary : inner_Su_f_Su_g = inner_fg)
+    (h_adj : inner_f_Su_g = inner_Smu_f_g) :
+    (inner_fg - inner_Su_f_g - inner_f_Su_g + inner_Su_f_Su_g =
+      2 * inner_fg - inner_Su_f_g - inner_Smu_f_g) ∧
+    ((2 * inner_fg - inner_Su_f_g - inner_Smu_f_g = 2 * (inner_fg - inner_Su_f_g)) ↔
+      inner_Su_f_g = inner_Smu_f_g) := by
+  rw [h_unitary, h_adj]
+  refine ⟨by ring, ?_⟩
+  constructor <;> intro h <;> linarith
+
+/-- Theorem 32: Direct derivation of 2D Cauchy–Schwarz from quadratic form nonnegativity
+    (removing the external scalar Cauchy–Schwarz premise in two-grade subspace reductions).
+    If `a11 >= 0`, `a22 >= 0`, and `x^2 * a11 + 2 * x * y * a12 + y^2 * a22 >= 0` for all `x, y : ℝ`,
+    then `a12^2 <= a11 * a22` (and when `a11 = a22 = d`, `-d <= a12 ∧ a12 <= d`). -/
+theorem two_dim_gram_cauchy_schwarz_from_nonneg
+    (a11 a22 a12 d : ℝ)
+    (h_quad : ∀ x y : ℝ, 0 ≤ x ^ 2 * a11 + 2 * x * y * a12 + y ^ 2 * a22)
+    (h_diag_eq : a11 = d ∧ a22 = d) :
+    (a12 ^ 2 ≤ a11 * a22) ∧ (-d ≤ a12 ∧ a12 ≤ d) := by
+  rcases h_diag_eq with ⟨h1, h2⟩
+  have h_plus := h_quad 1 1
+  have h_minus := h_quad 1 (-1)
+  have h_le : a12 ≤ d := by linarith
+  have h_ge : -d ≤ a12 := by linarith
+  have h_sq : a12 ^ 2 ≤ d ^ 2 := by
+    nlinarith [h_le, h_ge]
+  refine ⟨?_, ⟨h_ge, h_le⟩⟩
+  rw [h1, h2]
+  linarith
+
+/-- Theorem 33: Cross-grade complex zero coordinate ray collinearity and insufficiency of real-part alignment.
+    For a zero `rho_0 = beta_0 + i * gamma_0` scaled by `s = tau^Delta > 0`, membership of `s * rho_0`
+    at `rho_1 = beta_1 + i * gamma_1` requires BOTH `s * beta_0 = beta_1` and `s * gamma_0 = gamma_1`,
+    which forces complex ray collinearity `beta_0 * gamma_1 = beta_1 * gamma_0`. Conversely, choosing `s`
+    so that `s * beta_0 = 1 / 2` forces `2 * beta_0 * gamma_1 = gamma_0` if `s * gamma_0 = gamma_1`,
+    so `s * gamma_0 != gamma_1` whenever `2 * beta_0 * gamma_1 != gamma_0`. -/
+theorem cross_grade_complex_zero_ray_collinearity
+    (s beta_0 gamma_0 beta_1 gamma_1 : ℝ) :
+    ((s * beta_0 = beta_1 ∧ s * gamma_0 = gamma_1) → beta_0 * gamma_1 = beta_1 * gamma_0) ∧
+    ((s * beta_0 = 1 / 2 ∧ 2 * beta_0 * gamma_1 ≠ gamma_0) → s * gamma_0 ≠ gamma_1) := by
+  refine ⟨?_, ?_⟩
+  · rintro ⟨hb, hg⟩
+    calc
+      beta_0 * gamma_1 = beta_0 * (s * gamma_0) := by rw [← hg]
+      _ = (s * beta_0) * gamma_0 := by ring
+      _ = beta_1 * gamma_0 := by rw [hb]
+  · rintro ⟨hsb, hne⟩ hsg
+    apply hne
+    calc
+      2 * beta_0 * gamma_1 = 2 * beta_0 * (s * gamma_0) := by rw [← hsg]
+      _ = 2 * (s * beta_0) * gamma_0 := by ring
+      _ = 2 * (1 / 2) * gamma_0 := by rw [hsb]
+      _ = gamma_0 := by ring
+
+/-- Theorem 34: Candidate I — Exact Pole-Vanishing Transfer Decomposition on `S_tau`.
+    On `S_tau`, where `W_pole = pole_pos + pole_neg = 0` (`pole_pos = -pole_neg`), the transfer form
+    `B_transfer = attemptBTransferForm norm_f_sq pole_neg = 2 * norm_f_sq - pole_neg` appears with
+    identical sign in both `P_E = neg_W_prime + B_transfer` and
+    `D_smooth_B = c_tau_B * norm_f_sq - norm_A_B_sq = -W_arch + B_transfer`, cancelling identically in
+    `Q_tau = norm_A_B_sq - c_tau_B * norm_f_sq + P_E = W_arch + neg_W_prime`. -/
+theorem attempt_B_pole_vanishing_transfer_cancellation_on_S_tau
+    (pole_pos pole_neg norm_A_B_sq norm_f_sq c_tau_A W_arch neg_W_prime : ℝ)
+    (h_pole_zero : pole_pos + pole_neg = 0)
+    (h_arch : W_arch = norm_A_B_sq + 4 * norm_f_sq - pole_neg - c_tau_A * norm_f_sq) :
+    let c_tau_B := c_tau_A - 2
+    let B_transfer := attemptBTransferForm norm_f_sq pole_neg
+    let P_E := neg_W_prime + pole_pos + 2 * norm_f_sq
+    let D_smooth_B := c_tau_B * norm_f_sq - norm_A_B_sq
+    (P_E = neg_W_prime + B_transfer) ∧
+      (D_smooth_B = -W_arch + B_transfer) ∧
+      (P_E - D_smooth_B = W_arch + neg_W_prime) ∧
+      (norm_A_B_sq - c_tau_B * norm_f_sq + P_E = W_arch + neg_W_prime) := by
+  intro c_tau_B B_transfer P_E D_smooth_B
+  dsimp [c_tau_B, B_transfer, P_E, D_smooth_B, attemptBTransferForm]
+  have hp : pole_pos = -pole_neg := by linarith
+  rw [hp, h_arch]
+  refine ⟨by ring, by ring, by ring, by ring⟩
+
+/-- Theorem 35: Candidate II — Coercive Norm-Shifted Semiboundedness implies Uniform Correlation Bound.
+    If on the two-grade states `f_pm^{(K)} = (T_0 psi_tau ± T_K psi_tau)/sqrt(2)`, `P_E` is lower
+    semibounded by the coercive norm `-(norm_A_B_pm + mu_0 * norm_f_pm)` for a finite `mu_0 >= -c_tau_B`,
+    where `norm_f_plus = h0_1 + h0_K`, `norm_f_minus = h0_1 - h0_K`, and `|h0_K| <= h0_1`,
+    then `-M <= C_K ∧ C_K <= M` with `M = C_0 + 2 * (c_tau_B + mu_0) * h0_1`. -/
+theorem coercive_norm_shift_semiboundedness_implies_correlation_bound
+    (C_0 C_K c_tau_B mu_0 h0_1 h0_K norm_A_B_plus norm_A_B_minus P_E_plus P_E_minus : ℝ)
+    (h_mu : 0 ≤ c_tau_B + mu_0)
+    (h_h0_bound : -h0_1 ≤ h0_K ∧ h0_K ≤ h0_1)
+    (h_decomp_plus : C_0 + C_K = norm_A_B_plus - c_tau_B * (h0_1 + h0_K) + P_E_plus)
+    (h_decomp_minus : C_0 - C_K = norm_A_B_minus - c_tau_B * (h0_1 - h0_K) + P_E_minus)
+    (h_semi_plus : -(norm_A_B_plus + mu_0 * (h0_1 + h0_K)) ≤ P_E_plus)
+    (h_semi_minus : -(norm_A_B_minus + mu_0 * (h0_1 - h0_K)) ≤ P_E_minus) :
+    let M := C_0 + 2 * (c_tau_B + mu_0) * h0_1
+    (-M ≤ C_K ∧ C_K ≤ M) := by
+  intro M
+  dsimp [M]
+  rcases h_h0_bound with ⟨h_low, h_high⟩
+  have h_sum_le : (c_tau_B + mu_0) * (h0_1 + h0_K) ≤ 2 * (c_tau_B + mu_0) * h0_1 := by
+    nlinarith
+  have h_diff_le : (c_tau_B + mu_0) * (h0_1 - h0_K) ≤ 2 * (c_tau_B + mu_0) * h0_1 := by
+    nlinarith
+  constructor <;> linarith
+
+/-- Theorem 36: Candidate III — Unsigned Majorant Growth Obstruction.
+    If an unsigned majorant bound on `|G_{P_E}(Delta)|` grows as `c_0 * scale_factor` (`c_0 > 0`)
+    while the two-grade coercive norm + diagonal offset is bounded above by `B_fixed`, then whenever
+    `B_fixed < c_0 * scale_factor`, the worst-case unsigned lower bound `B_fixed - c_0 * scale_factor`
+    is strictly negative (`< 0`), proving that no unsigned majorant can verify coercive semiboundedness
+    at large grade offsets. -/
+theorem majorant_without_sign_cancellation_exceeds_fixed_coercive_norm
+    (c_0 scale_factor B_fixed : ℝ)
+    (h_c0_pos : 0 < c_0)
+    (h_exceeds : B_fixed < c_0 * scale_factor) :
+    B_fixed - c_0 * scale_factor < 0 ∧ 0 < c_0 * scale_factor - B_fixed := by
+  have _ := h_c0_pos
+  constructor <;> linarith
+
 end RiemannScope

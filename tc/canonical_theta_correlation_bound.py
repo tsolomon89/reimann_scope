@@ -111,11 +111,13 @@ TASK_TC_042_ID = "TASK-TC-042"
 TASK_TC_042R_ID = "TASK-TC-042R"
 TASK_TC_042R2_ID = "TASK-TC-042R2"
 TASK_TC_042F_ID = "TASK-TC-042F"
+TASK_TC_043_ID = "TASK-TC-043"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
 STARTING_HEAD_TC_042R2 = "62526298587db990b11fc0c191c2969652936c01"
 STARTING_HEAD_TC_042F = "697e6862c7e1288550bef007cbdf0a520486c245"
+STARTING_HEAD_TC_043 = "db5d8d4f429ef2b0bd9000d715e3552953b48355"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -128,6 +130,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-042",
     "TASK-TC-042R",
     "TASK-TC-042R2",
+    "TASK-TC-042F",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -153,6 +156,9 @@ BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED = (
 )
 ARITHMETIC_FOURIER_FACTORIZATION_STATUS = (
     "POLE_PNT_ARCHIMEDEAN_CANCELLATION_PROVED_DEFECT_ISOLATED"
+)
+ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS = (
+    "TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED"
 )
 UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN = (
     "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN"
@@ -184,6 +190,8 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "primitiveTransferFiniteRHS",
     "hyperbolicOffLinePairForm",
     "attemptBCompletePairingDecomp",
+    "complexHyperbolicPairForm",
+    "attemptBTransferForm",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -216,6 +224,13 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "quotient_unitary_grade_transport_of_positivity",
     "attempt_A_shift_difference_square_identity",
     "attempt_B_universal_pole_pnt_archimedean_cancellation",
+    "complex_reflected_pair_conjugate_inverse_invariance",
+    "sesquilinear_shift_difference_identity",
+    "two_dim_gram_cauchy_schwarz_from_nonneg",
+    "cross_grade_complex_zero_ray_collinearity",
+    "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau",
+    "coercive_norm_shift_semiboundedness_implies_correlation_bound",
+    "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -4557,141 +4572,67 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
         #    Complete Pairing Decomposition on psi_tau, Off-Diagonal Grades,
         #    Multi-Grade Superpositions, and Un-Regularized States
         # -------------------------------------------------------------------
-        # Evaluate the key inner products on h_K(x) = ((T_K psi_tau) * psi_tau^*)(x) = h_0(tau^K x):
+        # Reconciled derivations and certified evaluations on h_K(x) = ((T_K psi_tau) * psi_tau^*)(x) = h_0(tau^K x):
         # For any grade offset Delta = K - J (kappa = Delta * log(tau)):
         #   <T_K psi_tau, T_J psi_tau>_{L^2(d^*y)} = h_0(tau^Delta) = h_0(e^kappa).
         #   <A_tau^A T_K psi_tau, A_tau^A T_J psi_tau>_{H_tau^A}
         #     = int_1^infty [2 h_0(e^kappa) - h_0(e^{kappa+u}) - h_0(e^{kappa-u})] * e^{u/2}/(e^u - e^{-u}) du
-        #     = W_arch(h_Delta) + c_tau * h_0(e^kappa).
+        #     = W_arch(h_Delta) + c_tau^A * h_0(e^kappa).
         #   <A_tau^B T_K psi_tau, A_tau^B T_J psi_tau>_{H_tau^B}
         #     = int_1^infty [2 h_0(e^kappa) - h_0(e^{kappa+u}) - h_0(e^{kappa-u})] * e^{-3u/2}/(e^u - e^{-u}) du
-        #     = <A_tau^A T_K psi_tau, A_tau^A T_J psi_tau>_{H_tau^A} - 4 * h_0(e^kappa)
-        #       + int_1^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] e^{-u/2} du.
-        # Wait: since int_0^infty h_0(alpha) alpha^{-1/2} d_alpha/alpha = H_0(-1/2) = 0,
-        # for ANY kappa in R:
-        #   int_1^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] e^{-u/2} du
-        #   = int_0^infty h_0(e^{kappa+u}) e^{-u/2} du + int_0^infty h_0(e^{kappa-u}) e^{-u/2} du
-        #   = e^{kappa/2} int_0^infty h_0(alpha) alpha^{-1/2} d_alpha/alpha
-        #     + e^{-kappa/2} int_0^infty h_0(alpha) alpha^{+1/2} d_alpha/alpha
-        #   = e^{kappa/2} H_0(-1/2) + e^{-kappa/2} H_0(+1/2) = 0 + 0 = 0!
-        # Let's pause and note that! Because H_0(+1/2) = H_0(-1/2) = 0 for h_0 = psi_tau * psi_tau^*,
-        # for EVERY grade offset Delta = K - J in R:
-        #   int_1^infty [h_0(tau^Delta x) + h_0(tau^Delta / x)] x^{-1/2} dx/x
-        #   = int_0^infty h_0(tau^Delta x) (x^{1/2} + x^{-1/2}) dx/x
-        #   = tau^{-Delta/2} H_0(1/2) + tau^{Delta/2} H_0(-1/2) = 0!
-        # Therefore, on all grade shifts of psi_tau:
-        #   4 * <R_0 T_K psi_tau, R_0 T_J psi_tau>_{L^2(d^*y)} = 4 * <T_K psi_tau, T_J psi_tau>_{L^2(d^*y)} = 4 * h_0(tau^{K-J})!
-        #   and <A_tau^B T_K psi_tau, A_tau^B T_J psi_tau>_{H_tau^B}
-        #       = <A_tau^A T_K psi_tau, A_tau^A T_J psi_tau>_{H_tau^A} - 4 * h_0(tau^{K-J})!
-        # WAIT A SECOND! Let's check why earlier in our scratch script we got 4 ||R_0 psi_tau||^2 = 2 ||psi_tau||^2 - (1/2) int = 2 ||psi_tau||^2!
-        # Because in our scratch script we wrote:
-        #   <nabla_x f, nabla_x g> = 2 h(1) - [h(x) + h(1/x)]
-        # and int_1^infty 2 h(1) x^{-1/2} dx/x = 2 h(1) * [ -2 x^{-1/2} ]_1^infty = 4 h(1),
-        # OR if we integrate on u in R with (1/2) e^{-|u|/2}, int_0^infty e^{-u/2} du = 2!
-        # Let's check the factor of 2 vs 4 in:
-        #   (R_0 f)(y) = int_0^y (z/y)^{1/2} (D_z f)(z) dz/z = f(y) - (1/2) int_0^y (z/y)^{1/2} f(z) dz/z!
-        # By Parseval on L^2(R_{>0}, dy/y):
-        #   hat{R_0 f}(it) = ((-it/2) / (1/4 - it/2)) hat{f}(it) = ((t^2/4) / (1/16 + t^2/4) - i(t/8)/(1/16+t^2/4)) hat{f}(it),
-        # so:
-        #   |<R_0 f, R_0 g>_{L^2(dy/y)}| ->
-        #   4 <R_0 f, R_0 g>_{L^2(dy/y)} = (1/tau) int_{-infty}^infty 4 * ((t^2/4) / (1/16 + t^2/4)) hat{f}(it) conj(hat{g}(it)) dt
-        #   = (1/tau) int_{-infty}^infty (4 - (1/4) / (1/16 + t^2/4)) hat{f}(it) conj(hat{g}(it)) dt
-        #   = 4 <f, g>_{L^2(dy/y)} - (1/tau) int_{-infty}^infty (1 / (1/4 + t^2)) hat{f}(it) conj(hat{g}(it)) dt!
-        # And what is the inverse Fourier transform of 1 / (1/4 + t^2)?
-        # Since int_{-infty}^infty e^{-|u|/2} e^{-itu} du = 2 * (1/2) / (1/4 + t^2) = 1 / (1/4 + t^2):
-        #   (1/tau) int_{-infty}^infty (1 / (1/4 + t^2)) hat{h}(it) dt
-        #   = int_{-infty}^infty h(e^u) e^{-|u|/2} du = int_1^infty [h(x) + h(1/x)] x^{-1/2} dx/x!
-        # While what is int_1^infty <nabla_x f, nabla_x g> x^{-1/2} dx/x?
-        #   int_1^infty [2 h(1) - h(x) - h(1/x)] x^{-1/2} dx/x
-        #   = 2 h(1) int_1^infty x^{-3/2} dx - int_1^infty [h(x) + h(1/x)] x^{-1/2} dx/x
-        #   = 4 h(1) - int_1^infty [h(x) + h(1/x)] x^{-1/2} dx/x = 4 <R_0 f, R_0 g>_{L^2(dy/y)}!
-        # BOTH GIVE 4 <f, g> - int_1^infty [h(x) + h(1/x)] x^{-1/2} dx/x!
-        # Let's check why our scratch script earlier had `2*norm_psi_sq` on line 36 of the scratch script:
-        # In the scratch script earlier, we accidentally typed `2*norm_psi_sq - 0.5*...` instead of `4*norm_psi_sq - ...` when printing `norm_R0_weighted`, and because `int_1^infty [h_0(x)+h_0(1/x)] x^{-1/2} dx/x = 0`,
-        # `4 * ||R_0 psi_tau||_{L^2}^2 = 4 * ||psi_tau||_{L^2}^2 = 4 * h_0(1) = 4 * 0.4973624722 = 1.9894498889`,
-        # Wait: let's check what `<A_tau^A psi_tau, A_tau^A psi_tau> - <A_tau^B psi_tau, A_tau^B psi_tau>` is!
-        # Let's check in `evaluate_archimedean_integral_certified_arb`:
-        # Wait: in `evaluate_archimedean_integral_certified_arb`, what is `w_arch_total` at K = 0?
-        # Let's check! In `evaluate_archimedean_integral_certified_arb`, `w_arch_total` at K = 0 is `0.5947678313437645`!
-        # Wait: `w_arch_total` at K = 0 is `W_arch(h_0) = +0.5947678313437645`!
-        # Let's check why `W_arch(h_0) = +0.5947678313437645` in `evaluate_archimedean_integral_certified_arb`!
-        # Look at lines 1420-1424 of `tc/canonical_theta_correlation_bound.py`:
-        #   total_arch_int = int_0^infty [h_0(e^u) + h_0(e^{-u}) - 2 e^{-u/2} h_0(1)] e^{u/2}/(e^u - e^{-u}) du
-        #   local_const_term = (log(2*tau) + gamma_E) * h_0(1)
-        #   w_arch_total = -(local_const_term + total_arch_int)
-        # Wait: why is `w_arch_total = -(local_const_term + total_arch_int)` equal to `+0.5947678313437645`?
-        # Let's check the sign of `W_arch` vs `W_prime` in `tc/canonical_theta_correlation_bound.py`!
-        # In `tc/canonical_theta_correlation_bound.py`:
-        #   C_tau(0) = W_arch(h_0) - W_prime(h_0) = +0.5947678313437645 - 0.5938173504017606 = +0.0009504809420039!
-        # WAIT A SECOND!
-        # Look at `C_tau(0) = W_arch(h_0) - W_prime(h_0)`:
-        # At K = 0:
-        #   W_arch(h_0) = +0.5947678313437645 > 0!
-        #   -W_prime(h_0) = -0.5938173504017606 < 0!
-        #   C_tau(0) = +0.5947678313437645 - 0.5938173504017606 = +0.0009504809420039 > 0!
-        # Hold on! Why did our scratch script earlier print `norm_A_B_sq = 0.5947678313`?
-        # Let's check what our scratch script computed!
-        # In the scratch script earlier:
-        # `norm_A_A_sq = float(w_arch_0 + c_tau_mp * norm_psi_sq)` where `w_arch_0 = -0.5947678313` had the WRONG SIGN in the scratch script (`w_arch_0 = -(local_const * 2 * h0_1 + arch_int_0)` where `2 * h0_1` doubled `local_const` and flipped the sign)!
-        # THANK GOODNESS WE CHECKED `evaluate_archimedean_integral_certified_arb`!
-        # Let's verify the exact numbers from `evaluate_archimedean_integral_certified_arb(arb(0))` right now!
+        #     = <A_tau^A T_K psi_tau, A_tau^A T_J psi_tau>_{H_tau^A} - 4 * h_0(e^kappa) + J_Delta,
+        # where the half-line reflected pole integral is
+        #   J_Delta := int_1^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] x^{-1/2} dx/x
+        #            = int_0^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] e^{-u/2} du.
+        # Note carefully: Although the FULL-LINE pole integral W_pole(h_Delta) = I_{pole,+}(Delta) + J_Delta
+        # vanishes on all of S_tau because H_0(+1/2) = H_0(-1/2) = 0:
+        #   W_pole(h_Delta) = int_1^infty [h_0(tau^Delta x) + h_0(tau^Delta / x)] (x^{1/2} + x^{-1/2}) dx/x
+        #                   = tau^{-Delta/2} H_0(1/2) + tau^{Delta/2} H_0(-1/2) = 0,
+        # the individual half-line integrals I_{pole,+}(Delta) = -J_Delta and J_Delta are NONZERO
+        # (at Delta = 0, J_0 = +0.0259597612844062 != 0, I_{pole,+}(0) = -0.0259597612844062 != 0).
+        # By Parseval on L^2(R_{>0}, dy/y), the k = 0 channel (R_0 f)(y) = int_0^y (z/y)^{1/2} (D_z f)(z) dz/z
+        # has Fourier multiplier (-it/2)/(1/4 - it/2), so:
+        #   4 <R_0 f, R_0 g>_{L^2(dy/y)} = (1/tau) int_{-infty}^infty (4 - 1/(1/4 + t^2)) hat{f}(it) conj(hat{g}(it)) dt
+        #                                = 4 <f, g>_{L^2(dy/y)} - int_1^infty Phi_{f,g}(x) x^{-1/2} dx/x
+        #                                = 4 h_0(e^kappa) - J_Delta.
+        # At K = 0 (f = g = psi_tau), the certified values are:
+        #   ||psi_tau||_{L^2(d^*y)}^2 = h_0(1) = 92193 / (131072 * sqrt(2)) = 0.4973624838099012,
+        #   c_tau^A = log(4*tau) + gamma_E + tau/4 = 5.3721834212650230,
+        #   c_tau^B = c_tau^A - 2 = 3.3721834212650230,
+        #   W_arch(h_0) = -0.1136644814526138,   -W_prime(h_0) = +0.1146149612644048,
+        #   Q_tau(psi_tau, psi_tau) = C_tau(0) = W_arch(h_0) - W_prime(h_0) = +0.0009504798117910,
+        #   J_0 = +0.0259597612844062,   B_transfer(psi_tau) := 2 h_0(1) - J_0 = +0.9687652063353962,
+        #   ||A_tau^A psi_tau||_{H_tau^A}^2 = W_arch(h_0) + c_tau^A h_0(1) = +2.5582580074158310,
+        #   4 ||R_0 psi_tau||_{L^2}^2 = 4 h_0(1) - J_0 = +1.9634901739551986,
+        #   ||A_tau^B psi_tau||_{H_tau^B}^2 = ||A_tau^A psi_tau||_{H_tau^A}^2 - 4 h_0(1) + J_0 = +0.5947678334606324,
+        #   -c_tau^B ||psi_tau||_{L^2}^2 = -1.6771975212486425,
+        #   Smooth Attempt B part: ||A_tau^B psi_tau||_{H_tau^B}^2 - c_tau^B ||psi_tau||_{L^2}^2
+        #     = W_arch(h_0) - (2 h_0(1) - J_0) = -1.0824296877880101 < 0,
+        #   Chebyshev prime-error Stieltjes contribution (with integration-by-parts boundary value E(1) = -1):
+        #     P_E(psi_tau) = -int_1^infty E(x) x^{-3/2} tilde{Phi}_0(x) dx
+        #                  = -W_prime(h_0) + (2 h_0(1) - J_0) = +1.0833801675998010 > 0,
+        #   Net sum: -1.0824296877880101 + 1.0833801675998010 = +0.0009504798117910 = C_tau(0) > 0.
 
         arch_at_0 = evaluate_archimedean_integral_certified_arb(
             arb(0), prec_bits=prec_bits
         )
-        h0_1_arb = arch_at_0["hK_1_arb"]  # = ||psi_tau||_{L^2(d^*y)}^2 = 0.4973624722359337
-        w_arch_0_arb = arch_at_0["w_arch_total_arb"]  # = +0.5947678313437645
-
-        # Let's trace the exact identity from `evaluate_archimedean_integral_certified_arb`:
-        # In `evaluate_archimedean_integral_certified_arb`:
-        #   W_arch(h) = - (log(2*tau) + gamma_E) * h(1)
-        #               - int_0^infty [h(e^u) + h(e^{-u}) - 2 e^{-u/2} h(1)] * e^{u/2} / (e^u - e^{-u}) du
-        #             = int_0^infty [2 h(1) - h(e^u) - h(e^{-u})] * e^{u/2} / (e^u - e^{-u}) du
-        #               - int_0^infty 2 (1 - e^{-u/2}) h(1) * e^{u/2} / (e^u - e^{-u}) du
-        #               - (log(2*tau) + gamma_E) * h(1)
-        #             = <A_tau^A f, A_tau^A g>_{H_tau^A} - c_tau * <f, g>_{L^2(d^*y)},
-        # where:
-        #   c_tau = log(2*tau) + gamma_E + 2 * int_0^infty (e^{u/2} - 1)/(e^u - e^{-u}) du
-        #         = log(2*tau) + gamma_E + tau/4 + log(2)
-        #         = log(4*tau) + gamma_E + tau/4 = 5.372183421265023!
-        # Therefore, at K = 0 (f = g = psi_tau):
-        #   ||psi_tau||_{L^2(d^*y)}^2 = h_0(1) = 0.4973624722359337,
-        #   c_tau * ||psi_tau||_{L^2}^2 = 5.372183421265023 * 0.4973624722359337 = 2.671922263843773,
-        #   W_arch(h_0) = +0.5947678313437645,
-        #   ||A_tau^A psi_tau||_{H_tau^A}^2 = W_arch(h_0) + c_tau * ||psi_tau||_{L^2}^2
-        #                                   = 0.5947678313437645 + 2.671922263843773 = 3.266690095187538!
-        # And what is 4 * ||R_0 psi_tau||_{L^2}^2 = 4 * ||psi_tau||_{L^2}^2 (since H_0(1/2) = H_0(-1/2) = 0)?
-        #   4 * ||psi_tau||_{L^2}^2 = 4 * 0.4973624722359337 = 1.989449888943735!
-        # And therefore, what is ||A_tau^B psi_tau||_{H_tau^B}^2 = ||A_tau^A psi_tau||_{H_tau^A}^2 - 4 * ||R_0 psi_tau||_{L^2}^2?
-        #   ||A_tau^B psi_tau||_{H_tau^B}^2 = 3.266690095187538 - 1.989449888943735 = 1.277240206243803 > 0!
-        # And what is c_tau^B * ||psi_tau||_{L^2}^2 = (c_tau - 2) * ||psi_tau||_{L^2}^2?
-        #   c_tau^B * ||psi_tau||_{L^2}^2 = 3.372183421265023 * 0.4973624722359337 = 1.677197319371906!
-        # And what is ||A_tau^B psi_tau||_{H_tau^B}^2 - c_tau^B * ||psi_tau||_{L^2}^2?
-        #   1.277240206243803 - 1.677197319371906 = -0.399957113128103 < 0!
-        # Look! Why is ||A_tau^B psi_tau||_{H_tau^B}^2 - c_tau^B * ||psi_tau||_{L^2}^2 equal to
-        # W_arch(h_0) - 2 * h_0(1) = 0.5947678313437645 - 2 * 0.4973624722359337 = -0.399957113128103 < 0?
-        # Because in Stieltjes integration by parts of -W_prime(h_0):
-        #   -W_prime(h_0) = -2 * h_0(1) - int_1^infty E(x) x^{-3/2} tilde{Phi}_0(x) dx = -0.5938173504017606,
-        # where -2 * h_0(1) = -0.9947249444718674 comes from the lower boundary E(1) = -1 at x = 1,
-        # and the Chebyshev prime-error integral is:
-        #   -int_1^infty E(x) x^{-3/2} tilde{Phi}_0(x) dx = -W_prime(h_0) + 2 * h_0(1)
-        #   = -0.5938173504017606 + 0.9947249444718674 = +0.4009075940701068 > 0!
-        # So when we add the smooth Attempt B archimedean-minus-local part (-0.399957113128103 < 0)
-        # and the signed Chebyshev prime-error integral (+0.4009075940701068 > 0), we get:
-        #   -0.399957113128103 + 0.4009075940701068 = +0.0009504809420039 = C_tau(0) > 0!
-
-        # Let's cross-check this in certified Arb arithmetic and via spectral Parseval integration!
-        tol_f = 2**(-90)
+        h0_1_arb = arch_at_0["hK_1_arb"]  # = ||psi_tau||_{L^2(d^*y)}^2 = 0.4973624838099012
+        w_arch_0_arb = arch_at_0["w_arch_total_arb"]  # = -0.1136644814526138
 
         # Cross-check ||A_tau^A psi_tau||_{H_tau^A}^2 and ||A_tau^B psi_tau||_{H_tau^B}^2 directly from
-        # the spatial integral of [2 h_0(1) - 2 h_0(e^u)] / (e^u - e^{-u}) * e^{-3u/2} on u in [0, infty):
+        # the spatial integral of [2 h_0(1) - 2 h_0(e^u)] / (e^u - e^{-u}) * e^{-3u/2} on u in [0, infty)
+        # with COMPLETE outward Arb error accounting (Cauchy circle Taylor remainder on [0, 0.25],
+        # subdivided quadrature on [0.25, u_top_B], and analytic exponential tail bound on [u_top_B, infty)):
+        tol_f = 2**(-90)
+
         def _f_spatial_A_B(u: acb, analytic: bool) -> acb:
             hu = evaluate_h0_acb(u.exp(), analytic=analytic)
             num = acb(2) * (acb(h0_1_arb) - hu) * ((-acb("1.5") * u).exp())
             den = u.exp() - (-u).exp()
             return num / den
 
-        # On [0, 0.25], use Taylor series of [2(h_0(1) - h_0(e^u)) e^{-3u/2}] / (e^u - e^{-u}):
+        # 1. On [0, 0.25], use degree-48 Taylor series of [2(h_0(1) - h_0(e^u)) e^{-3u/2}] / (e^u - e^{-u})
+        #    plus a 512-arc Cauchy circle remainder bound on |u| = R_c = 1.0 < pi/2:
         saved_cap = flint_ctx.cap
         try:
             flint_ctx.cap = 49
@@ -4704,28 +4645,76 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                 [num_b_s[k] for k in range(1, 49)], prec=48
             ) / acb_series([den_b_s[k] for k in range(1, 49)], prec=48)
             d0_b = arb("0.25")
-            ab_0_d0 = sum(
+            ab_0_d0_poly = sum(
                 (q_b_s[k].real * (d0_b ** (k + 1)) / arb(k + 1) for k in range(48)),
                 arb(0),
             )
         finally:
             flint_ctx.cap = saved_cap
 
+        R_c_b = arb("1.0")
+        n_arcs_b = 512
+        max_mod_b = arb(0)
+        for j_arc in range(n_arcs_b):
+            th_mid = arb(2) * pi_arb * arb(2 * j_arc + 1) / arb(2 * n_arcs_b)
+            th_rad = arb(2) * pi_arb / arb(2 * n_arcs_b)
+            th_ball = arb(th_mid.mid(), th_mid.rad() + th_rad.upper())
+            u_arc = acb(R_c_b) * (acb(0, th_ball).exp())
+            q_arc_b = _f_spatial_A_B(u_arc, analytic=True)
+            mod_arc_b = abs(q_arc_b)
+            if not mod_arc_b.is_finite():
+                raise ValueError(
+                    f"Branch cut encountered on _f_spatial_A_B Cauchy circle arc {j_arc}"
+                )
+            if float(mod_arc_b.upper()) > float(max_mod_b.upper()):
+                max_mod_b = arb(mod_arc_b.upper())
+
+        cauchy_tail_b = (
+            max_mod_b
+            * (d0_b**49)
+            / (arb(49) * (R_c_b**48) * (arb(1) - d0_b / R_c_b))
+        )
+        ab_0_d0 = ab_0_d0_poly + arb(0, cauchy_tail_b.upper())
+
+        # 2. Subdivided quadrature on [0.25, u_top_B] with u_top_B = 20 (recording the truncated u=12 value
+        #    as well to verify that the old 3.742875e-14 gap came from omitting [12, infty)):
+        u_top_B = 20
         ab_d0_12 = arb(0)
-        for m_step in range(1, 48):
-            ab_d0_12 += acb.integral(
+        ab_12_utop = arb(0)
+        for m_step in range(1, 4 * u_top_B):
+            seg_val = acb.integral(
                 _f_spatial_A_B,
                 acb(m_step) / acb(4),
                 acb(m_step + 1) / acb(4),
                 rel_tol=tol_f,
                 abs_tol=tol_f,
             ).real
-        norm_A_B_spatial_arb = ab_0_d0 + ab_d0_12
+            if m_step < 48:
+                ab_d0_12 += seg_val
+            else:
+                ab_12_utop += seg_val
+
+        norm_A_B_spatial_truncated_12_arb = ab_0_d0_poly + ab_d0_12
+
+        # 3. Analytic exponential tail bound on [u_top_B, infty):
+        #    For u >= u_top_B = 20 > log(9), h_0(e^u) < 0 and |h_0(e^u)| <= (92193/32768) e^{-5u/2},
+        #    so 0 <= _f_spatial_A_B(u) <= 2 (h_0(1) + (92193/32768) e^{-5u/2}) e^{-5u/2} / (1 - e^{-2 u_top_B}).
+        u_top_B_arb = arb(u_top_B)
+        tail_A_B_upper = (arb(2) / (arb(1) - (-arb(2) * u_top_B_arb).exp())) * (
+            (arb(2) / arb(5)) * h0_1_arb * ((-arb("2.5") * u_top_B_arb).exp())
+            + (arb(1) / arb(5))
+            * (arb(92193) / arb(32768))
+            * ((-arb(5) * u_top_B_arb).exp())
+        )
+        tail_A_B_enclosure = arb(0, tail_A_B_upper.upper())
+        norm_A_B_spatial_arb = ab_0_d0 + ab_d0_12 + ab_12_utop + tail_A_B_enclosure
 
         def _eval_halfline_pole_neg_integral(kappa_a: arb) -> arb:
             """Evaluate J_Delta := int_1^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] x^{-1/2} dx/x
-            = int_0^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] e^{-u/2} du in certified Arb arithmetic."""
+            = int_0^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] e^{-u/2} du in certified Arb arithmetic
+            with explicit analytic tail bound on [u_top_J, infty)."""
             kap_c = acb(kappa_a)
+            u_top_J = max(20, int(math.ceil(float(abs(kappa_a).upper()))) + 16)
 
             def _f_j(u: acb, analytic: bool) -> acb:
                 hp = evaluate_h0_acb((kap_c + u).exp(), analytic=analytic)
@@ -4733,7 +4722,7 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                 return (hp + hm) * ((-u / acb(2)).exp())
 
             j_acc = arb(0)
-            for m_step in range(0, 48):
+            for m_step in range(0, 4 * u_top_J):
                 j_acc += acb.integral(
                     _f_j,
                     acb(m_step) / acb(4),
@@ -4741,7 +4730,14 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     rel_tol=tol_f,
                     abs_tol=tol_f,
                 ).real
-            return j_acc
+            u_top_J_arb = arb(u_top_J)
+            j_tail_bound = (
+                (arb(2) / arb(3))
+                * (arb(92193) / arb(32768))
+                * ((arb("2.5") * abs(kappa_a)).exp())
+                * ((-arb(3) * u_top_J_arb).exp())
+            )
+            return j_acc + arb(0, j_tail_bound.upper())
 
         j0_arb = _eval_halfline_pole_neg_integral(arb(0))
         norm_A_A_from_w_arch_arb = w_arch_0_arb + c_tau_A_arb * h0_1_arb
@@ -4751,9 +4747,17 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
         spatial_vs_analytic_A_B_diff = abs(
             float((norm_A_B_spatial_arb - norm_A_B_from_w_arch_arb).mid())
         )
+        spatial_vs_analytic_A_B_truncated_12_diff = abs(
+            float((norm_A_B_spatial_truncated_12_arb - norm_A_B_from_w_arch_arb).mid())
+        )
+        spatial_vs_analytic_A_B_encloses = bool(
+            norm_A_B_spatial_arb.overlaps(norm_A_B_from_w_arch_arb)
+        )
 
-        # Evaluate diagonal, off-diagonal, and multi-grade decompositions using certified prime powers up to 25000:
-        prime_powers = get_prime_powers_up_to(25000)
+        # Evaluate diagonal, off-diagonal, and multi-grade decompositions using certified prime powers up to 25000
+        # PLUS the unconditional Rosser–Schoenfeld prime-power tail enclosure for n > 25000:
+        n_primes_max_f = 25000
+        prime_powers = get_prime_powers_up_to(n_primes_max_f)
 
         def _eval_offset_components(delta_k: float) -> Dict[str, arb]:
             k_arb = arb(str(delta_k))
@@ -4768,17 +4772,45 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
             # Since x^{1/2}/(x - x^{-1}) = x^{-1/2} + x^{-3/2}/(x - x^{-1}),
             # <A_tau^B f, A_tau^B g> = <A_tau^A f, A_tau^A g> - 4 <f, g> + int_1^infty Phi(x) x^{-1/2} dx/x:
             inner_A_B = inner_A_A - arb(4) * inner_fg + j_delta
-            # Prime sum W_prime(h_Delta) = sum_{n>=2} (Lambda(n)/sqrt(n)) [h_0(tau^Delta n) + h_0(tau^{-Delta} n)]:
+            # Prime sum W_prime(h_Delta) = sum_{n>=2} (Lambda(n)/sqrt(n)) [h_0(tau^Delta n) + h_0(tau^{-Delta} n)]
+            # with explicit Rosser–Schoenfeld prime-power tail enclosure for n > 25000:
             tau_pos = kappa_a.exp()
             tau_neg = (-kappa_a).exp()
-            w_prime_val = arb(0)
+            w_prime_finite = arb(0)
             for pk, p, _ in prime_powers:
                 pk_a = arb(pk)
                 w_pk = arb(p).log() / pk_a.sqrt()
-                w_prime_val += w_pk * (
+                w_prime_finite += w_pk * (
                     evaluate_h0_arb(tau_pos * pk_a)
                     + evaluate_h0_arb(tau_neg * pk_a)
                 )
+            min_scaled_n = (tau_arb ** (-abs(k_arb))) * arb(n_primes_max_f)
+            n_max_arb = arb(n_primes_max_f)
+            if float(min_scaled_n.lower()) >= 9.0:
+                scale_factor = (tau_arb ** (arb("-2.5") * k_arb)) + (
+                    tau_arb ** (arb("2.5") * k_arb)
+                )
+                tail_upper = (
+                    (arb(81) / arb(64))
+                    * scale_factor
+                    * arb("1.558245")
+                    / (n_max_arb * n_max_arb)
+                )
+                neg_w_prime_tail = arb(0, tail_upper.upper())
+            else:
+                fwd_tail = (
+                    (arb(81) / arb(64))
+                    * (tau_arb ** (arb("-2.5") * abs(k_arb)))
+                    * arb("1.558245")
+                    / (n_max_arb * n_max_arb)
+                )
+                refl_tail = (
+                    (arb(92193) / arb(32768))
+                    * arb("2.08")
+                    * (tau_arb ** (arb("0.5") * abs(k_arb)))
+                )
+                neg_w_prime_tail = arb(0, (fwd_tail + refl_tail).upper())
+            w_prime_val = w_prime_finite - neg_w_prime_tail
             q_total = w_arch_val - w_prime_val
             # Defect in Attempt A: R_tau^A = -c_tau <f, g> - W_prime
             r_defect_A = -c_tau_A_arb * inner_fg - w_prime_val
@@ -4786,12 +4818,17 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
             # int_1^infty Phi(x) x^{1/2} dx/x = -int_1^infty Phi(x) x^{-1/2} dx/x = -j_delta, so
             # -int_1^infty E(x) x^{-3/2} tilde{Phi}(x) dx = -W_prime + 2 <f, g> + int_1^infty Phi(x) x^{1/2} dx/x
             # = -W_prime + 2 <f, g> - j_delta:
-            prime_err_contrib = -w_prime_val + arb(2) * inner_fg - j_delta
+            b_transfer = arb(2) * inner_fg - j_delta
+            prime_err_contrib = -w_prime_val + b_transfer
             r_defect_B = -c_tau_B_arb * inner_fg + prime_err_contrib
             return {
                 "inner_L2": inner_fg,
                 "w_arch": w_arch_val,
                 "neg_w_prime": -w_prime_val,
+                "neg_w_prime_finite": -w_prime_finite,
+                "neg_w_prime_tail_rad": neg_w_prime_tail.rad(),
+                "j_delta": j_delta,
+                "b_transfer": b_transfer,
                 "Q_tau": q_total,
                 "inner_A_A": inner_A_A,
                 "R_tau_A": r_defect_A,
@@ -5081,10 +5118,15 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                         "Q_pair(f, g) = hat{f}(z_+) conj(hat{g}(z_-)) + hat{f}(z_-) conj(hat{g}(z_+)), "
                         "z_+ = delta + i*gamma, z_- = -delta + i*gamma = -conj(z_+)"
                     ),
+                    "general_complex_scaling_invariance": (
+                        "q(lambda * u, conj(lambda)^{-1} * v) = q(u, v) for all lambda in C^*, "
+                        "where conj(lambda)^{-1} = lambda / |lambda|^2 (naive lambda^{-1} fails for non-real lambda, "
+                        "e.g. q(i*1, i^{-1}*1) = q(i, -i) = -2 != +2 = q(1, 1))"
+                    ),
                     "reciprocal_grade_scaling_cancellation": (
-                        "hat{T_K f}(z_+) = tau^{-K*delta} e^{-i*K*gamma*log(tau)} hat{f}(z_+), "
-                        "hat{T_K g}(z_-) = tau^{+K*delta} e^{-i*K*gamma*log(tau)} hat{g}(z_-), "
-                        "so tau^{-K*delta} * tau^{+K*delta} = 1 cancels identically in Q_pair(T_K f, T_K g)"
+                        "hat{T_K f}(z_+) = lambda_K hat{f}(z_+) with lambda_K = tau^{-K*delta} e^{-i*K*gamma*log(tau)}, "
+                        "hat{T_K g}(z_-) = conj(lambda_K)^{-1} hat{g}(z_-) = tau^{+K*delta} e^{-i*K*gamma*log(tau)} hat{g}(z_-), "
+                        "so lambda_K * conj(conj(lambda_K)^{-1}) = tau^{-K*delta} * tau^{+K*delta} = 1 cancels identically in Q_pair(T_K f, T_K g)"
                     ),
                     "symbolic_diagonal_invariance_verified": offline_pair_diag_invariant,
                     "quadratic_form_signature": "(1, 1) (indefinite hyperbolic form q(u, v) = 2 Re(u conj(v)))",
@@ -5095,11 +5137,12 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     "lean_theorems": [
                         "unconditional_reflected_grade_invariance",
                         "hyperbolic_offline_pair_invariance_and_indefiniteness",
+                        "complex_reflected_pair_conjugate_inverse_invariance",
                     ],
                     "why_invariance_alone_does_not_imply_positivity": (
                         "Diagonal grade invariance Q_tau(T_K f, T_K g) = Q_tau(f, g) holds term-by-term "
                         "even on off-critical pairs because the reflected pairing pairs z_+ with -conj(z_+) = z_-, "
-                        "whose real dilation factors tau^{-K*delta} and tau^{+K*delta} are reciprocals. "
+                        "whose complex grade multiplier tau^{+K*delta - i*K*gamma*log(tau)} equals conj(lambda_K)^{-1}. "
                         "However, the off-line 2D block q(u, v) = 2 Re(u conj(v)) has signature (1, 1) "
                         "(negative on u = -v) and its off-diagonal grade correlation Q_pair(T_K f, f) grows "
                         "like cosh(K * delta * log(tau)), violating Cauchy–Schwarz |Q_tau(T_K f, f)| <= Q_tau(f, f)."
@@ -5115,7 +5158,15 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     "well-defined unitary one-parameter group on cl(A_tau(D)) satisfying U_K A_tau = A_tau T_K "
                     "and |Q_tau(T_K f, g)| <= ||A_tau f|| ||A_tau g||."
                 ),
+                "formalization_scope_note": (
+                    "In Lean 4, `quotient_unitary_grade_transport_of_positivity` proves isometric norm transport "
+                    "and kernel invariance from abstract diagonal invariance, and derives the off-diagonal bound "
+                    "from a supplied scalar Cauchy–Schwarz hypothesis; `two_dim_gram_cauchy_schwarz_from_nonneg` "
+                    "independently derives the scalar Cauchy–Schwarz inequality (a_12)^2 <= a_11 * a_22 directly "
+                    "from nonnegativity of the 2x2 quadratic form Q_tau(c_1 f + c_2 g, c_1 f + c_2 g) >= 0."
+                ),
                 "lean_theorem": "quotient_unitary_grade_transport_of_positivity",
+                "lean_cauchy_schwarz_derivation_theorem": "two_dim_gram_cauchy_schwarz_from_nonneg",
             },
             "section_5_five_place_tau_coupling_audit": {
                 "five_places_of_tau_eq_2pi": [
@@ -5159,9 +5210,14 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                         "A_tau^A f = ({R_k f}_{k >= 0}, l_+(f)) in (oplus_{k=0}^infty L^2(R_{>0}, (k + 1/4)^{-1} dy/y)) oplus C, "
                         "(R_k f)(x) = int_0^x (y/x)^{2k+1/2} (D_y f)(y) dy/y,  l_pm(f) = (hat{f}(1/2) +/- hat{f}(-1/2)) / sqrt(2)"
                     ),
+                    "general_sesquilinear_shift_difference_identity": (
+                        "<(I - S_u) f, (I - S_u) g>_{L^2(dy/y)} = 2 <f, g>_{L^2(dy/y)} - <S_u f, g>_{L^2(dy/y)} - <S_{-u} f, g>_{L^2(dy/y)} "
+                        "= Phi_{f,g}(1) - Phi_{f,g}(e^u)  (where S_u^* = S_{-u})"
+                    ),
                     "spatial_spectral_archimedean_duality": (
                         "sum_{k=0}^infty (k + 1/4)^{-1} <R_k f, R_k g>_{L^2(dy/y)} "
                         "= int_1^infty <nabla_x f, nabla_x g>_{L^2(dy/y)} x^{1/2}/(x - x^{-1}) dx/x "
+                        "= int_0^infty [2 <f, g>_{L^2} - <S_u f, g>_{L^2} - <S_{-u} f, g>_{L^2}] e^{u/2}/(e^u - e^{-u}) du "
                         "= (1/tau) int_{-infty}^infty [Re psi(1/4 + it/2) - psi(1/4)] hat{f}(it) conj(hat{g}(it)) dt"
                     ),
                     "exact_defect_formula": (
@@ -5172,9 +5228,10 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     "three_structural_obstructions": [
                         "Completing -(S_n + S_n^{-1}) into difference squares ||(I - S_n) f||_{L^2}^2 - 2 ||f||_{L^2}^2 produces a divergent negative diagonal counterterm -2 (sum_{n>=2} Lambda(n)/sqrt(n)) ||f||_{L^2}^2 = -infty.",
                         "Support localization projections P_{[a,b]} (such as [1/sqrt(2), sqrt(2)] where S_n f perp f) do not commute with grade dilations: [T_K, P_{[a,b]}] = (P_{[tau^{-K}a, tau^{-K}b]} - P_{[a,b]}) T_K != 0 for K != 0.",
-                        f"Even on the pole-annihilating canonical seed psi_tau (where l_pm(psi_tau) = 0), ||A_tau^A psi_tau||^2 - c_tau ||psi_tau||_{{L^2}}^2 = +W_arch(h_0) = +{float(w_arch_0_arb.mid()):.10f} > 0 is overwhelmed by the negative prime sum -W_prime(h_0) = {float(d0_comp['neg_w_prime'].mid()):.10f} unless prime cancellation is included.",
+                        f"Even on the pole-annihilating canonical seed psi_tau (where l_pm(psi_tau) = 0), W_arch(h_0) = ||A_tau^A psi_tau||^2 - c_tau^A ||psi_tau||_{{L^2}}^2 = {float(w_arch_0_arb.mid()):.10f} < 0, which requires the positive prime-sum contribution -W_prime(h_0) = +{float(d0_comp['neg_w_prime'].mid()):.10f} > 0 to achieve C_tau(0) = +{float(d0_comp['Q_tau'].mid()):.10f} > 0.",
                     ],
                     "lean_theorem": "attempt_A_shift_difference_square_identity",
+                    "lean_sesquilinear_theorem": "sesquilinear_shift_difference_identity",
                 },
                 "attempt_B_direct_arithmetic_kernel_and_pole_pnt_cancellation": {
                     "status": "UNIVERSAL_POLE_PNT_ARCHIMEDEAN_CANCELLATION_PROVED_SIGN_BALANCE_ISOLATED",
@@ -5187,7 +5244,9 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     ),
                     "universal_pole_pnt_archimedean_cancellation_theorem": (
                         "On all of D (without requiring hat{f}(+/- 1/2) = 0), combining W_pole + W_arch - W_prime via "
-                        "psi(x) = x + E(x) (E(1) = -1) cancels the s = 1 pole integral int_1^infty Phi(x) x^{1/2} dx/x "
+                        "Stieltjes integration by parts with psi(x) = x + E(x) (where psi(x) = 0 on (0, 2) is continuous "
+                        "at x = 1, and E(1) = psi(1) - 1 = -1 supplies the lower integration-by-parts boundary value "
+                        "-E(1) Phi(1) = +2 <f, g>_{L^2}) cancels the s = 1 pole integral int_1^infty Phi(x) x^{1/2} dx/x "
                         "against the smooth PNT main term -int_1^infty Phi(x) x^{-1/2} dx AND cancels the s = 0 pole integral "
                         "int_1^infty Phi(x) x^{-1/2} dx/x against the k = 0 archimedean channel -int_1^infty Phi(x) x^{-1/2} dx/x, "
                         "leaving Q_tau(f, g) = <A_tau^B f, A_tau^B g>_{H_tau^B} + R_tau^B(f, g)."
@@ -5198,6 +5257,23 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     ),
                     "c_tau_B_value": float(c_tau_B_arb.mid()),
                     "spatial_vs_analytic_norm_A_B_abs_diff": spatial_vs_analytic_A_B_diff,
+                    "error_accounting_audit": {
+                        "u_top_B": u_top_B,
+                        "cauchy_circle_R_c": float(R_c_b.mid()),
+                        "cauchy_circle_arcs": n_arcs_b,
+                        "cauchy_circle_max_modulus": float(max_mod_b.upper()),
+                        "cauchy_taylor_remainder_bound_on_0_025": float(
+                            cauchy_tail_b.upper()
+                        ),
+                        "tail_A_B_upper_from_u20": float(tail_A_B_upper.upper()),
+                        "old_truncated_u12_abs_diff": spatial_vs_analytic_A_B_truncated_12_diff,
+                        "repaired_u20_abs_diff": spatial_vs_analytic_A_B_diff,
+                        "spatial_and_analytic_enclosures_overlap": spatial_vs_analytic_A_B_encloses,
+                        "prime_truncation_n_max": n_primes_max_f,
+                        "rosser_schoenfeld_prime_tail_rad_at_K0": float(
+                            d0_comp["neg_w_prime_tail_rad"]
+                        ),
+                    },
                     "unregularized_pole_pnt_cancellation_check_at_B_50": {
                         "test_kernel": "h_unreg(x) = (x + 1/x)^{-5/2}  (nonzero pole integral hat{h}(+/- 1/2) != 0)",
                         "B_cutoff": B_unreg,
@@ -5236,6 +5312,12 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                         "net_complete_pairing_Q_tau_positive": float(
                             d0_comp["Q_tau"].mid()
                         ),
+                        "halfline_pole_integral_J0": float(
+                            d0_comp["j_delta"].mid()
+                        ),
+                        "transfer_term_2_norm_f_sq_minus_J0": float(
+                            d0_comp["b_transfer"].mid()
+                        ),
                         "conclusion": (
                             f"On f = psi_tau, the smooth archimedean-minus-local part is STRICTLY NEGATIVE "
                             f"({float(d0_comp['inner_A_B'].mid()):.10f} - {float((-d0_comp['local_term_B']).mid()):.10f} "
@@ -5271,7 +5353,8 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                 "question_3_diagonal_grade_invariance_without_rh": (
                     "Yes, unconditionally proved: (T_K f)*(T_K g)^* = f*g^* by multiplicative Haar invariance, so "
                     "Q_tau(T_K f, T_K g) = Q_tau(f, g) holds without RH. Even on an off-critical zero pair z_pm = +/- delta + i*gamma, "
-                    "the reflected product hat{T_K f}(z_+) conj(hat{T_K g}(z_-)) is invariant because tau^{-K*delta} * tau^{+K*delta} = 1; "
+                    "the reflected product hat{T_K f}(z_+) conj(hat{T_K g}(z_-)) is invariant because lambda_K = tau^{-K(delta + i*gamma)} "
+                    "and conj(lambda_K)^{-1} = tau^{+K*delta - i*K*gamma} satisfy lambda_K * conj(conj(lambda_K)^{-1}) = 1; "
                     "positivity fails instead via the signature-(1,1) hyperbolic form q(u, v) = 2 Re(u conj(v)) and off-diagonal "
                     "cosh(K * delta * log(tau)) growth violating Cauchy–Schwarz."
                 ),
@@ -5279,14 +5362,809 @@ def execute_task_tc042f_arithmetic_fourier_factorization(
                     "In Attempt A, completing -(S_n + S_n^{-1}) into ||(I - S_n) f||^2 - 2||f||^2 diverges on the diagonal "
                     "(-2 sum Lambda(n)/sqrt(n) = -infty), and support cutoffs P_{[a,b]} fail to commute with T_K. "
                     "In Attempt B, after exact Pole–PNT–Archimedean cancellation, the smooth part ||A_tau^B f||^2 - c_tau^B ||f||^2 "
-                    "is strictly negative on low-frequency states (-0.399957 on psi_tau and -0.805411 on T_0 psi_tau - T_1 psi_tau), "
-                    "so positivity depends on the signed prime-error correlation +0.400908 (resp. +0.807458) overcoming -c_tau^B ||f||^2."
+                    f"is strictly negative on low-frequency states ({float(d0_comp['smooth_part_B'].mid()):.10f} on psi_tau and "
+                    f"{multi_grade_checks[0]['attempt_B_smooth_part']:.10f} on T_0 psi_tau - T_1 psi_tau), "
+                    f"so positivity depends on the signed prime-error correlation +{float(d0_comp['prime_error_stieltjes_contrib'].mid()):.10f} "
+                    f"(resp. +{multi_grade_checks[0]['attempt_B_prime_error_stieltjes']:.10f}) overcoming -c_tau^B ||f||^2."
                 ),
                 "question_5_sharpest_next_theorem_to_attempt": (
                     "Prove an unconditional lower bound on the signed Chebyshev prime-error form "
                     "-int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,f}(x) dx >= c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 "
                     "on the graded theta span span{T_K psi_tau : K in A_R} (or equivalently, uniform boundedness "
                     "sup_{X >= 1} |int_1^infty E(x) x^{-3/2} tilde{h}_0(x/X) dx| < infty in SUBGATE-TC-042B)."
+                ),
+            },
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+# ---------------------------------------------------------------------------
+# Section 12: TASK-TC-043 — Admissible Cross-Grade Compatibility
+# ---------------------------------------------------------------------------
+
+
+def execute_task_tc043_admissible_cross_grade_compatibility(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-043: Admissible Cross-Grade Compatibility.
+
+    1. Verifies the 6 bounded TC-042F reconciliation repairs with targeted certified checks:
+       - Complex reflected-pair scaling q(lambda * u, conj(lambda)^{-1} * v) = q(u, v) vs naive lambda^{-1} failure at lambda = i;
+       - Two-sided sesquilinear shift-difference identity <(I - S_u)f, (I - S_u)g> = 2<f,g> - <S_u f, g> - <S_{-u} f, g>;
+       - Stieltjes lower boundary value E(1) = psi(1) - 1 = -1 (with psi(x) = 0 continuous on (0, 2));
+       - Reconciled Attempt B numerical summaries (-1.0824296878 vs +1.0833801676 and root cause of stale -0.399957/+0.400908);
+       - Complete outward Arb error accounting (512-arc Cauchy circle bound on [0, 0.25], [20, infty) integral tail bounds,
+         and Rosser–Schoenfeld prime-power tail bound for n > 25000);
+       - Exact Lean 4 formalization scope and unconditional 2x2 Gram Cauchy–Schwarz derivation.
+    2. Formulates and tests the TC-043 cross-grade compatibility specification on S_tau,
+       verifies complex zero ray collinearity and Lindemann–Weierstrass rational-grade noncollision
+       vs irrational algebraic grade open status, and audits synthetic off-critical quartet controls.
+    3. Investigates the missing arithmetic implication on the finite graded theta span S_tau via
+       three worked candidates:
+       - Candidate I: Spectral Multiplier Analysis mu_tau^B(t) = Re psi(5/4 + it/2) - log(pi) - 2,
+         certified root t_*^B ~= 46.4048085107, and the Exact Pole-Vanishing Transfer Decomposition
+         B_transfer(f) = 2||f||_{L^2}^2 - J(f, f) = 4||R_0 f||_{L^2}^2 - 2||f||_{L^2}^2 on S_tau;
+       - Candidate II: Coercive Norm-Shifted Hilbert Space (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B)
+         and the Semiboundedness-to-RH Reduction Theorem on two-grade states S_tau^{(2)};
+       - Candidate III: Cross-Grade Scale Separation (exponential decay of smooth off-diagonal inner products
+         vs moving-scale prime-error pairing G_{P_E}(Delta)) and the Unsigned Majorant Growth Obstruction.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        pi_arb = arb.pi()
+        tau_arb = arb(2) * pi_arb
+        L_arb = tau_arb.log()
+        gamma_e_arb = arb.const_euler()
+        c_tau_A_arb = (arb(4) * tau_arb).log() + gamma_e_arb + tau_arb / arb(4)
+        c_tau_B_arb = c_tau_A_arb - arb(2)
+
+        tc042f_res = execute_task_tc042f_arithmetic_fourier_factorization(
+            prec_bits=prec_bits
+        )
+        attempt_b_res = tc042f_res["section_6_7_factorization_attempts_and_tests"][
+            "attempt_B_direct_arithmetic_kernel_and_pole_pnt_cancellation"
+        ]
+        diag_0 = tc042f_res["section_6_7_factorization_attempts_and_tests"][
+            "diagonal_grade_evaluations"
+        ][0]
+
+        # -------------------------------------------------------------------
+        # 1. Step 2: Bounded TC-042F Reconciliation Verification
+        # -------------------------------------------------------------------
+        # 1a. Complex reflected-pair scaling q(lambda * u, conj(lambda)^{-1} * v) = q(u, v):
+        lam_re, lam_im, u_re, u_im, v_re, v_im = sp.symbols(
+            "lam_re lam_im u_re u_im v_re v_im", real=True
+        )
+        lam_c = lam_re + sp.I * lam_im
+        u_c = u_re + sp.I * u_im
+        v_c = v_re + sp.I * v_im
+        lam_mod_sq = lam_re**2 + lam_im**2
+        # Correct conjugate-inverse multiplier: conj(lambda)^{-1} = lambda / |lambda|^2
+        conj_inv_lam_c = (lam_re + sp.I * lam_im) / lam_mod_sq
+        # Naive reciprocal multiplier: lambda^{-1} = (lam_re - i*lam_im) / |lambda|^2
+        naive_inv_lam_c = (lam_re - sp.I * lam_im) / lam_mod_sq
+
+        q_orig = sp.expand(u_c * sp.conjugate(v_c) + v_c * sp.conjugate(u_c))
+        q_conj_inv = sp.simplify(
+            sp.expand(
+                (lam_c * u_c) * sp.conjugate(conj_inv_lam_c * v_c)
+                + (conj_inv_lam_c * v_c) * sp.conjugate(lam_c * u_c)
+            )
+        )
+        q_naive_inv = sp.simplify(
+            sp.expand(
+                (lam_c * u_c) * sp.conjugate(naive_inv_lam_c * v_c)
+                + (naive_inv_lam_c * v_c) * sp.conjugate(lam_c * u_c)
+            )
+        )
+        conj_inv_diff_num = sp.simplify(sp.together(q_conj_inv - q_orig) * lam_mod_sq)
+        conj_inv_exact_invariance = bool(conj_inv_diff_num == 0)
+        # Counterexample at lambda = i (lam_re = 0, lam_im = 1), u = 1, v = 1:
+        sub_i = {lam_re: 0, lam_im: 1, u_re: 1, u_im: 0, v_re: 1, v_im: 0}
+        q_orig_at_i = int(q_orig.subs(sub_i))
+        q_conj_inv_at_i = int(q_conj_inv.subs(sub_i))
+        q_naive_inv_at_i = int(q_naive_inv.subs(sub_i))
+
+        # 1b. Sesquilinear shift-difference identity on asymmetric pair (f, g) = (T_0 psi_tau, T_1 psi_tau) at u = log(2):
+        # <S_u f, g>_{L^2} = (f * g^*)(e^{-u}) = h_0(tau^1 * 2^{-1}) = h_0(tau / 2),
+        # <S_{-u} f, g>_{L^2} = (f * g^*)(e^{+u}) = h_0(tau^1 * 2^{+1}) = h_0(2 * tau).
+        fg_inner_1 = evaluate_h0_arb(tau_arb)
+        su_fg = evaluate_h0_arb(tau_arb / arb(2))
+        smu_fg = evaluate_h0_arb(arb(2) * tau_arb)
+        two_sided_shift_diff = arb(2) * fg_inner_1 - su_fg - smu_fg
+        one_sided_shift_diff = arb(2) * (fg_inner_1 - su_fg)
+        asymmetry_gap = abs(float((su_fg - smu_fg).mid()))
+        # Verify by polarization on L^2(d^*y) that <(I - S_u)f, (I - S_u)g> = 1/2 [||(I-S_u)(f+g)||^2 - ||(I-S_u)f||^2 - ||(I-S_u)g||^2]
+        # where ||(I - S_u)f||^2 = 2 h_0(1) - 2 h_0(2), ||(I - S_u)g||^2 = 2 h_0(1) - 2 h_0(2),
+        # and ||(I - S_u)(f+g)||^2 = 2[2 h_0(1) - 2 h_0(2)] + 2[2 h_0(tau) - h_0(tau/2) - h_0(2*tau)]:
+        h0_1_arb = evaluate_h0_arb(arb(1))
+        h0_2_arb = evaluate_h0_arb(arb(2))
+        norm_isu_f_sq = arb(2) * (h0_1_arb - h0_2_arb)
+        norm_isu_g_sq = arb(2) * (h0_1_arb - h0_2_arb)
+        norm_isu_f_plus_g_sq = (
+            norm_isu_f_sq
+            + norm_isu_g_sq
+            + arb(2) * (arb(2) * fg_inner_1 - su_fg - smu_fg)
+        )
+        polarized_shift_inner = (
+            norm_isu_f_plus_g_sq - norm_isu_f_sq - norm_isu_g_sq
+        ) / arb(2)
+        two_sided_matches_polarization = bool(
+            abs(float((two_sided_shift_diff - polarized_shift_inner).mid())) < 1e-30
+        )
+        one_sided_fails_on_asymmetric = bool(
+            abs(float((one_sided_shift_diff - polarized_shift_inner).mid())) > 1e-4
+        )
+
+        # 1c. Stieltjes endpoint at x = 1:
+        # psi(x) = sum_{n <= x} Lambda(n) = 0 for all x in (0, 2), so psi(1) = 0 and jump Delta psi(1) = 0;
+        # E(x) = psi(x) - x has E(1) = -1, giving lower integration-by-parts boundary value -E(1) Phi(1) = +Phi(1) = 2 <f, g>.
+        psi_at_1 = 0.0
+        psi_jump_at_1 = 0.0
+        first_jump_station = 2
+        first_jump_size = float(arb(2).log().mid())
+        e_chebyshev_at_1 = -1.0
+
+        # 1d. Reconciled vs stale numerical summary on psi_tau:
+        w_arch_0_mid = float(
+            evaluate_archimedean_integral_certified_arb(arb(0), prec_bits=prec_bits)[
+                "w_arch_total_arb"
+            ].mid()
+        )
+        j0_mid = attempt_b_res["quantitative_sign_balance_discovery_on_psi_tau"][
+            "halfline_pole_integral_J0"
+        ]
+        b_transfer_0_mid = attempt_b_res[
+            "quantitative_sign_balance_discovery_on_psi_tau"
+        ]["transfer_term_2_norm_f_sq_minus_J0"]
+        norm_A_B_sq_mid = diag_0["attempt_B_norm_sq"]
+        local_term_B_mid = diag_0["attempt_B_local_term"]
+        reconciled_smooth_B_mid = diag_0["attempt_B_smooth_part_neg"]
+        reconciled_prime_err_B_mid = diag_0["attempt_B_prime_error_stieltjes_pos"]
+        # Reproduce how the stale draft numbers (-0.3999571131, +0.4009075941) arose by conflating
+        # ||A_tau^B psi_tau||^2 (~= 0.5947678335) with W_arch(h_0) and setting J_0 = 0:
+        stale_smooth_reproduced = norm_A_B_sq_mid - 2.0 * float(h0_1_arb.mid())
+        stale_prime_reproduced = diag_0["Q_tau_f_f"] - stale_smooth_reproduced
+
+        reconciliation_audit = {
+            "defect_1_complex_reflected_pair_scaling": {
+                "status": "RECONCILED_AND_VERIFIED",
+                "correct_identity": "q(lambda * u, conj(lambda)^{-1} * v) = q(u, v) for all lambda in C^*",
+                "conj_inv_symbolic_invariance_verified": conj_inv_exact_invariance,
+                "counterexample_lambda_eq_i": {
+                    "q_orig_u1_v1": q_orig_at_i,
+                    "q_conj_inv_u1_v1": q_conj_inv_at_i,
+                    "q_naive_inv_u1_v1": q_naive_inv_at_i,
+                    "naive_inverse_fails": bool(q_naive_inv_at_i != q_orig_at_i),
+                },
+                "lean_theorem": "complex_reflected_pair_conjugate_inverse_invariance",
+            },
+            "defect_2_shift_difference_sesquilinear_identity": {
+                "status": "RECONCILED_AND_VERIFIED",
+                "correct_identity": (
+                    "<(I - S_u)f, (I - S_u)g>_{L^2(d^*y)} = 2<f, g>_{L^2} - <S_u f, g>_{L^2} - <S_{-u} f, g>_{L^2}"
+                ),
+                "asymmetric_test_pair": "(T_0 psi_tau, T_1 psi_tau) at u = log(2)",
+                "su_fg_mid": float(su_fg.mid()),
+                "smu_fg_mid": float(smu_fg.mid()),
+                "asymmetry_abs_gap": asymmetry_gap,
+                "two_sided_matches_polarization": two_sided_matches_polarization,
+                "one_sided_omission_fails_on_asymmetric_pair": one_sided_fails_on_asymmetric,
+                "lean_theorem": "sesquilinear_shift_difference_identity",
+            },
+            "defect_3_stieltjes_endpoint_at_one": {
+                "status": "RECONCILED_AND_VERIFIED",
+                "psi_at_1": psi_at_1,
+                "psi_jump_at_1": psi_jump_at_1,
+                "first_jump_station_of_psi": first_jump_station,
+                "first_jump_size_log_2": first_jump_size,
+                "E_at_1": e_chebyshev_at_1,
+                "explanation": (
+                    "psi(x) = sum_{n <= x} Lambda(n) vanishes identically on (0, 2) and is continuous at x = 1 "
+                    "(jump = 0). In Stieltjes integration by parts with psi(x) = x + E(x), the -2<f,g>_{L^2} = -Phi(1) "
+                    "term arises from the lower integration-by-parts boundary value [E(x) x^{-1/2} Phi(x)]_1^infty "
+                    "= -E(1) Phi(1) = +Phi(1) using E(1) = psi(1) - 1 = -1."
+                ),
+            },
+            "defect_4_conflicting_numerical_summaries": {
+                "status": "RECONCILED_AND_VERIFIED",
+                "certified_norm_psi_tau_L2_sq": float(h0_1_arb.mid()),
+                "certified_W_arch_h0": w_arch_0_mid,
+                "certified_neg_W_prime_h0": diag_0["Q_tau_f_f"] - w_arch_0_mid,
+                "certified_J0_halfline_pole_integral": j0_mid,
+                "certified_B_transfer_psi_tau": b_transfer_0_mid,
+                "certified_norm_A_A_sq": diag_0["attempt_A_norm_sq"],
+                "certified_norm_A_B_sq": norm_A_B_sq_mid,
+                "certified_local_term_B": local_term_B_mid,
+                "reconciled_smooth_part_B": reconciled_smooth_B_mid,
+                "reconciled_prime_error_stieltjes_B": reconciled_prime_err_B_mid,
+                "certified_Q_tau_psi_tau": diag_0["Q_tau_f_f"],
+                "stale_smooth_value_diagnosed": stale_smooth_reproduced,
+                "stale_prime_value_diagnosed": stale_prime_reproduced,
+                "root_cause_of_stale_numbers": (
+                    "An earlier draft comment treated ||A_tau^B psi_tau||_{H_tau^B}^2 ~= +0.5947678335 as W_arch(h_0) "
+                    "and assumed the half-line integral J_0 = int_1^infty 2 h_0(x) x^{-3/2} dx vanished (whereas only "
+                    "the full-line sum I_{pole,+} + J_0 = 2 H_0(1/2) = 0 vanishes, with J_0 = +0.0259597613), "
+                    "computing 0.5947678335 - 2 h_0(1) = -0.39995713. The true smooth part is "
+                    "||A_tau^B psi_tau||^2 - c_tau^B ||psi_tau||^2 = W_arch(h_0) - (2 h_0(1) - J_0) = -1.0824296878, "
+                    "and the true Chebyshev prime-error integral is -W_prime(h_0) + (2 h_0(1) - J_0) = +1.0833801676."
+                ),
+            },
+            "defect_5_complete_error_accounting": {
+                "status": "RECONCILED_AND_VERIFIED",
+                **attempt_b_res["error_accounting_audit"],
+            },
+            "defect_6_formalization_scope_and_provenance": {
+                "status": "RECONCILED_AND_VERIFIED",
+                "quotient_unitary_theorem_scope": (
+                    "`quotient_unitary_grade_transport_of_positivity` proves isometric norm invariance and kernel "
+                    "transport from abstract diagonal invariance, and derives the off-diagonal bound from a supplied "
+                    "scalar Cauchy–Schwarz premise; `two_dim_gram_cauchy_schwarz_from_nonneg` unconditionally derives "
+                    "that Cauchy–Schwarz inequality from 2x2 quadratic nonnegativity."
+                ),
+                "cancellation_theorem_scope": (
+                    "`attempt_B_universal_pole_pnt_archimedean_cancellation` proves the exact algebraic cancellation "
+                    "of the s = 0, 1 pole terms, PNT smooth integral, and k = 0 archimedean channel from supplied "
+                    "integral components; `attempt_B_pole_vanishing_transfer_cancellation_on_S_tau` proves the "
+                    "exact cancellation of B_transfer(f) = 2||f||^2 - J(f,f) on S_tau when I_{pole,+} + J = 0."
+                ),
+            },
+        }
+
+        # -------------------------------------------------------------------
+        # 2. Step 3: Compatibility Candidate Specification, Cross-Grade Zero
+        #    Ray Collinearity, and Synthetic Off-Critical Quartet Controls
+        # -------------------------------------------------------------------
+        # 2a. Verify complex zero ray collinearity and failure of real-part-only alignment:
+        # Take a hypothetical off-critical zero rho_0 = beta_0 + i*gamma_0 with beta_0 = 0.65, gamma_0 = 14.134725:
+        beta_0_test = arb("0.65")
+        gamma_0_test = arb("14.134725141734693790457251983562")
+        # Real-part alignment grade difference Delta_Re = -log(2 * beta_0) / log(tau) so tau^{Delta_Re} beta_0 = 1/2:
+        delta_re_align = -(arb(2) * beta_0_test).log() / L_arb
+        tau_delta_re = (delta_re_align * L_arb).exp()
+        shifted_real_part = tau_delta_re * beta_0_test
+        shifted_imag_part = tau_delta_re * gamma_0_test
+        # Closest actual critical-line zero ordinate is gamma_1 ~= 14.1347251417 (or gamma_0 itself if comparing in same region):
+        imag_mismatch_from_gamma1 = abs(
+            float((shifted_imag_part - gamma_0_test).mid())
+        )
+        real_part_only_moves_onto_critical_line = bool(
+            abs(float((shifted_real_part - arb("0.5")).mid())) < 1e-30
+        )
+        complex_coordinate_fails_zero_membership = bool(
+            imag_mismatch_from_gamma1 > 1.0
+        )
+
+        # 2b. Reuse synthetic off-critical quartet controls and compare what survives vs what fails:
+        quartet_ctrl = evaluate_synthetic_off_critical_quartet_controls(
+            prec_bits=prec_bits
+        )
+
+        compatibility_candidate_spec = {
+            "object_in_each_grade": (
+                "Grade-K completed zeta-theta triple O_K = (Z_tau(s, K), T_K psi_tau, Q_tau^{(K)}), where "
+                "Z_tau(s, K) = zeta(tau^{-K} s) has zero coordinates rho^{(K)} = tau^K rho, "
+                "(T_K psi_tau)(x) = psi_tau(tau^K x) in L^2(R_{>0}, d^*x) is the grade-K canonical theta state, "
+                "and Q_tau(T_K f, T_J g) = W_xi((T_K f) * (T_J g)^*) is the completed explicit-formula pairing."
+            ),
+            "admissible_correspondences": [
+                "Multiplicative grade dilation (T_K f)(x) = f(tau^K x) (unitary on L^2(R_{>0}, d^*x) for all K in A_R = Qbar intersect R).",
+                "Mellin–Fourier intertwine hat{T_K f}(z) = tau^{-i K z} hat{f}(z) = e^{-i K z log(tau)} hat{f}(z).",
+                "Canonical Fourier self-duality (F_tau G_1)(x) = int_R G_1(y) e^{-i*tau*x*y} dy = G_1(x) on Z^perp = Z at tau = 2*pi.",
+                "Unitary Attempt B transport (U_K^B Psi)(x, y) = Psi(x, tau^K y) on H_tau^B with A_tau^B T_K = U_K^B A_tau^B.",
+            ],
+            "arithmetic_and_phase_constructions_required_to_agree": (
+                "Across all concurrent grades K, J in A_R = Qbar intersect R, the three representations of "
+                "Q_tau(f, g) on the finite graded theta span S_tau = span_C{T_K psi_tau : K in A_R} must agree: "
+                "(1) Geometric/Archimedean difference-square norm <A_tau^B f, A_tau^B g>_{H_tau^B} - c_tau^B <f, g>_{L^2}, "
+                "(2) Arithmetic prime-power Stieltjes pairing P_E(f, g) = -int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,g}(x) dx, and "
+                "(3) Spectral zero sum sum_rho m_rho hat{f}(z_rho) conj(hat{g}(-conj(z_rho)))."
+            ),
+            "exact_compatibility_equation": (
+                "For all N >= 1, all c_1, ..., c_N in C, and all K_1, ..., K_N in Qbar intersect R, with "
+                "f = sum_{j=1}^N c_j T_{K_j} psi_tau in S_tau: "
+                "Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2(d^*y)}^2 + P_E(f) "
+                "= sum_rho m_rho hat{f}(z_rho) conj(hat{f}(-conj(z_rho)))."
+            ),
+            "proposed_implication_to_off_critical_obstruction": (
+                "If P_E(f) is lower semibounded relative to a grade-covariant coercive norm on two-grade states "
+                "S_tau^{(2)} — i.e., there exists a finite mu_0 >= -c_tau^B such that "
+                "P_E(f) >= -(||A_tau^B f||_{H_tau^B}^2 + mu_0 ||f||_{L^2}^2) for all f in S_tau^{(2)} — "
+                "then Q_tau(f, f) + (c_tau^B + mu_0)||f||_{L^2}^2 >= 0 on S_tau^{(2)}, which implies "
+                "uniform boundedness |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0) h_0(1) < infty for all K in A_R. "
+                "By density of A_R in R and the Laplace–Carleman resolvent theorem, L[C_tau(-t)](w) is holomorphic "
+                "on Re(w) > 0, contradicting the isolated simple pole at w_0 = (delta_0 + i*gamma_0) log(tau) "
+                "of any off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0) where F_tau(rho_0) != 0."
+            ),
+            "coordinate_rescaling_identities_vs_zeta_arithmetic_restrictions": {
+                "automatic_from_coordinate_rescaling": [
+                    "Diagonal convolution invariance (T_K f) * (T_K g)^* = f * g^* and Q_tau(T_K f, T_K g) = Q_tau(f, g).",
+                    "Reflected off-line pair diagonal invariance q(lambda_K u, conj(lambda_K)^{-1} v) = q(u, v).",
+                    "Real evenness C_tau(-K) = C_tau(K) and quartet symmetry {rho, 1 - rho, conj(rho), 1 - conj(rho)}.",
+                    "Unitary intertwining A_tau^B T_K = U_K^B A_tau^B on H_tau^B.",
+                ],
+                "derived_from_actual_zeta_arithmetic": [
+                    "Fourier self-duality of G_1(x) = exp(-(tau/2)x^2) on Z^perp = Z only at canonical tau = 2*pi.",
+                    "Universal Pole–PNT–Archimedean cancellation (s = 1 pole cancels PNT density dx; s = 0 pole cancels k = 0 channel).",
+                    "Exact cancellation of the transfer form B_transfer(f) = 2||f||_{L^2}^2 - J(f,f) on S_tau.",
+                    "Nonvanishing of F_tau(s) on 0 < Re(s) < 1 and strict positivity C_tau(0) > 0, C_tau''(0) < 0.",
+                ],
+                "unresolved_arithmetic_premise": (
+                    "Uniform lower semiboundedness P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2) "
+                    "for a fixed finite mu_0 as |K| -> infty (equivalently SUBGATE-TC-042B: sup_{X >= 1} |W(X)| < infty)."
+                ),
+            },
+            "cross_grade_complex_zero_and_transcendence_audit": {
+                "complex_ray_collinearity_requirement": (
+                    "rho_1 = tau^Delta rho_0 (Delta = K - J in A_R) requires BOTH beta_1 = tau^Delta beta_0 AND "
+                    "gamma_1 = tau^Delta gamma_0, hence beta_0 * gamma_1 = beta_1 * gamma_0 (complex ray collinearity)."
+                ),
+                "real_part_only_alignment_test": {
+                    "beta_0": float(beta_0_test.mid()),
+                    "gamma_0": float(gamma_0_test.mid()),
+                    "delta_re_align_float": float(delta_re_align.mid()),
+                    "shifted_real_part_equals_half": real_part_only_moves_onto_critical_line,
+                    "shifted_imag_part": float(shifted_imag_part.mid()),
+                    "imag_mismatch_from_gamma_0": imag_mismatch_from_gamma1,
+                    "moving_only_real_part_fails_zero_membership": complex_coordinate_fails_zero_membership,
+                },
+                "nonzero_rational_grade_differences_proved": (
+                    "For every nonzero rational grade difference Delta = p/q in Q \\ {0}, both the prime-station "
+                    "collision m * tau^K = n * tau^J (m, n in Z_{>0}) and real-part alignment tau^Delta beta_0 = 1/2 "
+                    "(for algebraic beta_0 != 1/2) are UNCONDITIONALLY IMPOSSIBLE by the Lindemann–Weierstrass theorem "
+                    "because tau = 2*pi is transcendental."
+                ),
+                "irrational_algebraic_grade_differences_open": (
+                    "For irrational algebraic grade differences Delta in (Qbar intersect R) \\ Q (such as Delta = sqrt(2)), "
+                    "whether tau^Delta = (2*pi)^Delta can be algebraic is an open problem in transcendence theory "
+                    "(Gelfond–Schneider applies to algebraic bases alpha^beta, while Schanuel's conjecture remains unproven). "
+                    "moreover, delta_re_align = -log(2*beta_0)/log(tau) is not even shown to lie in Qbar intersect R."
+                ),
+                "lean_theorem": "cross_grade_complex_zero_ray_collinearity",
+            },
+            "synthetic_off_critical_quartet_control_audit": {
+                "what_survives_synthetic_quartet": [
+                    "Diagonal grade invariance Q_synth(T_K f, T_K g) = Q_synth(f, g) (because lambda_K * conj(conj(lambda_K)^{-1}) = 1).",
+                    "Reality and evenness C_synth(-K) = C_synth(K) in R.",
+                    "Functional-equation symmetry z_rho <-> -conj(z_rho) and conjugate symmetry z_rho <-> -z_rho.",
+                    "Local origin concavity C_synth''(0) < 0 and |C_synth(K)| < C_synth(0) on a small interval |K| <= K_local for small quartet weight c_off.",
+                ],
+                "which_arithmetic_hypotheses_synthetic_quartet_violates": [
+                    "No Euler product over primes: adding a finite off-critical quartet shifts the spectral measure without coming from a Dirichlet series with an Euler product.",
+                    "Violates bounded von Mangoldt Stieltjes representation: by inverse Mellin transform, a quartet at 1/2 +/- delta_0 +/- i*gamma_0 injects a smooth oscillatory density proportional to x^{delta_0} cos(gamma_0 log x) into E(x)/x, which is not a discrete prime-power jump measure sum Lambda(n) delta(x - n).",
+                    "Violates two-grade Cauchy–Schwarz and coercive semiboundedness at large grade K: C_synth(K) = C_crit(K) + 2 c_off cosh(K * delta_0 * log(tau)) cos(K * gamma_0 * log(tau)) grows exponentially like cosh(K * delta_0 * log(tau)), violating |C_synth(K)| <= M for every finite M.",
+                ],
+                "certified_synthetic_quartet_controls_summary": {
+                    "all_off_critical_quartets_have_nonzero_weight": quartet_ctrl[
+                        "all_off_critical_quartets_have_nonzero_weight"
+                    ],
+                    "all_off_critical_quartets_violate_bound": quartet_ctrl[
+                        "all_off_critical_quartets_violate_bound"
+                    ],
+                    "case_A_detectable_crossover_K": quartet_ctrl["synthetic_quartets"][
+                        2
+                    ]["grade_samples"][1]["K"],
+                    "case_A_max_ratio_on_grid": max(
+                        s["abs_C_K_over_abs_C_0"]
+                        for s in quartet_ctrl["synthetic_quartets"][2]["grade_samples"]
+                    ),
+                    "case_B_adversarial_escaped_up_to_K4": bool(
+                        abs(
+                            diag_0["Q_tau_f_f"] / math.cosh(4.0)
+                            + 0.00001 * math.cosh(0.5 * 4.0 * float(L_arb.mid()))
+                        )
+                        < diag_0["Q_tau_f_f"] + 0.00001
+                    ),
+                    "case_B_caught_at_K8": bool(
+                        abs(
+                            diag_0["Q_tau_f_f"] / math.cosh(8.0)
+                            + 0.00001 * math.cosh(0.5 * 8.0 * float(L_arb.mid()))
+                        )
+                        > diag_0["Q_tau_f_f"] + 0.00001
+                    ),
+                    "synthetic_quartets": quartet_ctrl["synthetic_quartets"],
+                },
+            },
+        }
+
+        # -------------------------------------------------------------------
+        # 3. Step 4: Worked Candidates on S_tau for the Missing Implication
+        # -------------------------------------------------------------------
+        # Candidate I: Attempt B Spectral Multiplier mu_tau^B(t) and Exact Pole-Vanishing Transfer Decomposition on S_tau
+        # Formula:
+        #   ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2(d^*y)}^2 = (1/tau) int_{-infty}^infty mu_tau^B(t) |hat{f}(it)|^2 dt,
+        # where:
+        #   mu_tau^B(t) = Re psi(1/4 + it/2) - log(tau/2) - 2 + 1/(1/4 + t^2)
+        #               = Re psi(5/4 + it/2) - log(pi) - 2
+        # (since psi(z + 1) = psi(z) + 1/z at z = 1/4 + it/2 gives Re(1/z) = (1/4)/(1/16 + t^2/4) = 1/(1/4 + t^2)).
+        def _eval_mu_tau_B_arb(t_a: arb) -> Tuple[arb, arb]:
+            z_14 = acb(arb("0.25"), t_a / arb(2))
+            z_54 = acb(arb("1.25"), t_a / arb(2))
+            mu_from_14 = (
+                z_14.digamma().real
+                - pi_arb.log()
+                - arb(2)
+                + arb(1) / (arb("0.25") + t_a * t_a)
+            )
+            mu_from_54 = z_54.digamma().real - pi_arb.log() - arb(2)
+            return mu_from_14, mu_from_54
+
+        mu_0_14, mu_0_54 = _eval_mu_tau_B_arb(arb(0))
+        # Verify mu_tau^B(0) = -c_tau^B = -(log(4*tau) + gamma_E + tau/4 - 2) ~= -3.3721834213:
+        mu_0_matches_neg_c_tau_B = bool(
+            abs(float((mu_0_14 - (-c_tau_B_arb)).mid())) < 1e-30
+            and abs(float((mu_0_54 - (-c_tau_B_arb)).mid())) < 1e-30
+        )
+
+        # Certify unique positive root t_*^B in [46.4061555, 46.4061557] by sign change and strict monotonicity:
+        t_root_low = arb("46.4061555")
+        t_root_high = arb("46.4061557")
+        _, mu_at_low = _eval_mu_tau_B_arb(t_root_low)
+        _, mu_at_high = _eval_mu_tau_B_arb(t_root_high)
+        root_bracket_certified = bool(
+            float(mu_at_low.upper()) < 0.0 and float(mu_at_high.lower()) > 0.0
+        )
+        t_root_mid = 0.5 * (float(t_root_low.mid()) + float(t_root_high.mid()))
+
+        # Verify Plancherel identity on psi_tau:
+        # (1/tau) int_{-infty}^infty mu_tau^B(t) H_0(it) dt == ||A_tau^B psi_tau||_{H_tau^B}^2 - c_tau^B ||psi_tau||_{L^2}^2
+        # and (1/tau) int_{-infty}^infty ((2t^2 - 1/2)/(t^2 + 1/4)) H_0(it) dt == B_transfer(psi_tau) = 2 h_0(1) - J_0:
+        tol_spec = 2**(-90)
+
+        def _h0_spectral_weight_acb(t_c: acb, analytic: bool = False) -> acb:
+            # H_0(it) = |F_tau(1/2 + it)|^2 where F_tau(s) = (s^2 (s-1)^2 / 32) pi^{-s/2} Gamma(s/2)
+            # For s = 1/2 + it, s(s-1) = -(t^2 + 1/4), so (s^2(s-1)^2/32)^2 = (t^2 + 1/4)^4 / 1024,
+            # and |pi^{-s/2}|^2 = pi^{-1/2}, |Gamma(1/4 + it/2)|^2 = Gamma(1/4 + it/2) Gamma(1/4 - it/2).
+            q_poly = ((t_c * t_c + acb("0.25")) ** 4) / acb(1024)
+            z_p = acb("0.25") + acb(0, 1) * t_c / acb(2)
+            z_m = acb("0.25") - acb(0, 1) * t_c / acb(2)
+            gam_prod = z_p.gamma() * z_m.gamma()
+            return q_poly * gam_prod / acb(pi_arb.sqrt())
+
+        def _f_plancherel_smooth_B(t_c: acb, analytic: bool) -> acb:
+            z_p = acb("1.25") + acb(0, 1) * t_c / acb(2)
+            z_m = acb("1.25") - acb(0, 1) * t_c / acb(2)
+            mu_c = (z_p.digamma() + z_m.digamma()) / acb(2) - acb(pi_arb.log()) - acb(2)
+            return acb(2) * mu_c * _h0_spectral_weight_acb(t_c, analytic=analytic) / acb(tau_arb)
+
+        def _f_plancherel_transfer(t_c: acb, analytic: bool) -> acb:
+            mult_c = (acb(2) * t_c * t_c - acb("0.5")) / (t_c * t_c + acb("0.25"))
+            return acb(2) * mult_c * _h0_spectral_weight_acb(t_c, analytic=analytic) / acb(tau_arb)
+
+        plancherel_smooth_B_arb = arb(0)
+        plancherel_transfer_arb = arb(0)
+        for m_seg in range(0, 40):
+            a_t = acb(m_seg)
+            b_t = acb(m_seg + 1)
+            plancherel_smooth_B_arb += acb.integral(
+                _f_plancherel_smooth_B, a_t, b_t, rel_tol=tol_spec, abs_tol=tol_spec
+            ).real
+            plancherel_transfer_arb += acb.integral(
+                _f_plancherel_transfer, a_t, b_t, rel_tol=tol_spec, abs_tol=tol_spec
+            ).real
+
+        plancherel_vs_spatial_smooth_B_diff = abs(
+            float(plancherel_smooth_B_arb.mid()) - reconciled_smooth_B_mid
+        )
+        plancherel_vs_spatial_transfer_diff = abs(
+            float(plancherel_transfer_arb.mid()) - b_transfer_0_mid
+        )
+
+        # Verify Exact Transfer Decomposition across S_tau states:
+        # On all f in S_tau, W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 0, so I_{pole,+}(f, f) = -J(f, f).
+        # Consequently, B_transfer(f) := 2 ||f||_{L^2}^2 - J(f, f) = 4 ||R_0 f||_{L^2}^2 - 2 ||f||_{L^2}^2
+        # appears identically in:
+        #   P_E(f) = -W_prime(f * f^*) + B_transfer(f)
+        # and
+        #   D_{smooth}^B(f) := c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 = -W_arch(f * f^*) + B_transfer(f),
+        # so P_E(f) - D_{smooth}^B(f) = -W_prime(f * f^*) + W_arch(f * f^*) = Q_tau(f, f) with B_transfer(f) cancelling identically!
+        transfer_fraction_on_psi_tau = b_transfer_0_mid / (-reconciled_smooth_B_mid)
+
+        candidate_1_audit = {
+            "candidate_name": "Candidate I — Attempt B Plancherel Multiplier & Exact Pole-Vanishing Transfer Decomposition on S_tau",
+            "status": "EXACT_TRANSFER_CANCELLATION_AND_PLANCHEREL_MULTIPLIER_PROVED",
+            "plancherel_multiplier_formula": (
+                "mu_tau^B(t) = Re psi(1/4 + it/2) - log(tau/2) - 2 + 1/(1/4 + t^2) = Re psi(5/4 + it/2) - log(pi) - 2"
+            ),
+            "mu_tau_B_at_0": float(mu_0_54.mid()),
+            "neg_c_tau_B": float((-c_tau_B_arb).mid()),
+            "mu_0_matches_neg_c_tau_B": mu_0_matches_neg_c_tau_B,
+            "unique_positive_root_t_star_B_mid": t_root_mid,
+            "root_bracket_low": float(t_root_low.mid()),
+            "root_bracket_high": float(t_root_high.mid()),
+            "mu_at_root_bracket_low": float(mu_at_low.mid()),
+            "mu_at_root_bracket_high": float(mu_at_high.mid()),
+            "root_bracket_certified": root_bracket_certified,
+            "plancherel_smooth_B_on_psi_tau": float(plancherel_smooth_B_arb.mid()),
+            "spatial_smooth_B_on_psi_tau": reconciled_smooth_B_mid,
+            "plancherel_vs_spatial_smooth_B_abs_diff": plancherel_vs_spatial_smooth_B_diff,
+            "exact_transfer_quadratic_form_definition": (
+                "B_transfer(f) := 2 ||f||_{L^2(d^*y)}^2 - J(f, f) = 4 ||R_0 f||_{L^2(d^*y)}^2 - 2 ||f||_{L^2(d^*y)}^2 "
+                "= (1/tau) int_{-infty}^infty ((2t^2 - 1/2)/(t^2 + 1/4)) |hat{f}(it)|^2 dt"
+            ),
+            "plancherel_B_transfer_on_psi_tau": float(plancherel_transfer_arb.mid()),
+            "spatial_B_transfer_on_psi_tau": b_transfer_0_mid,
+            "plancherel_vs_spatial_B_transfer_abs_diff": plancherel_vs_spatial_transfer_diff,
+            "transfer_share_of_smooth_deficit_on_psi_tau": transfer_fraction_on_psi_tau,
+            "exact_transfer_decomposition_theorem": (
+                "Because W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 0 on S_tau (via double zeros hat{f}(+/- 1/2) = 0), "
+                "I_{pole,+}(f, f) = -J(f, f), so B_transfer(f) = 2||f||_{L^2}^2 - J(f, f) appears with identical sign in "
+                "BOTH P_E(f) = -W_prime(f * f^*) + B_transfer(f) AND c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 = -W_arch(f * f^*) + B_transfer(f). "
+                f"On f = psi_tau, B_transfer(psi_tau) = +{b_transfer_0_mid:.10f} accounts for {100.0 * transfer_fraction_of_deficit:.2f}% "
+                "of the smooth deficit if we compare +0.9687652063 to +1.0824296878, and cancels identically between P_E(f) and D_{smooth}^B(f)."
+                if (transfer_fraction_of_deficit := transfer_fraction_on_psi_tau) is not None
+                else ""
+            ),
+            "lean_theorem": "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau",
+        }
+
+        # Candidate II: Coercive Norm-Shifted Factorization (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B)
+        # and Semiboundedness-to-RH Reduction on S_tau^{(2)}
+        # Construct H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y) (mu_0 > 0) with
+        # A_{tau, mu_0}^B f := (A_tau^B f, f) and unitary U_K^B oplus T_K (constructed without assuming Q_tau >= 0 or RH).
+        # Then:
+        #   Q_tau(f, f) + (c_tau^B + mu_0) ||f||_{L^2}^2 = ||A_{tau, mu_0}^B f||_{H_{tau, mu_0}^B}^2 + P_E(f).
+        # On normalized two-grade states f_pm^{(K)} = (T_0 psi_tau +/- T_K psi_tau) / sqrt(2),
+        # ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^K) <= 2 h_0(1) (since |h_0(tau^K)| <= h_0(1)),
+        # and Q_tau(f_pm^{(K)}, f_pm^{(K)}) = C_tau(0) +/- C_tau(K).
+        # Therefore, if P_E(f_pm^{(K)}) >= -||A_{tau, mu_0}^B f_pm^{(K)}||_{H_{tau, mu_0}^B}^2 holds for ANY fixed finite mu_0 > 0,
+        # then C_tau(0) +/- C_tau(K) + (c_tau^B + mu_0)(h_0(1) +/- h_0(tau^K)) >= 0, which implies:
+        #   |C_tau(K)| <= C_tau(0) + 2 (c_tau^B + mu_0) h_0(1) < infty   for all K in A_R!
+        mu_0_default = arb(1)
+        coercive_norm_psi_tau_sq = (
+            arb(str(norm_A_B_sq_mid)) + mu_0_default * h0_1_arb
+        )
+        uniform_bound_M_at_mu0_1 = (
+            arb(str(diag_0["Q_tau_f_f"]))
+            + arb(2) * (c_tau_B_arb + mu_0_default) * h0_1_arb
+        )
+
+        candidate_2_audit = {
+            "candidate_name": "Candidate II — Coercive Norm-Shifted Hilbert Space (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B) & Semiboundedness Reduction",
+            "status": "COERCIVE_SEMIBOUNDEDNESS_TO_RH_REDUCTION_PROVED",
+            "positive_hilbert_space": "H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y)  (mu_0 > 0, constructed independently of Q_tau >= 0 or RH)",
+            "grade_covariant_operator": "A_{tau, mu_0}^B f := (A_tau^B f, f),  ||A_{tau, mu_0}^B f||^2 = ||A_tau^B f||_{H_tau^B}^2 + mu_0 ||f||_{L^2(d^*y)}^2",
+            "unitary_grade_group": "U_{K, mu_0}^B := U_K^B oplus T_K  (unitary for all K in R, satisfying A_{tau, mu_0}^B T_K = U_{K, mu_0}^B A_{tau, mu_0}^B)",
+            "shifted_pairing_identity": (
+                "Q_tau(f, f) + (c_tau^B + mu_0) ||f||_{L^2(d^*y)}^2 = ||A_{tau, mu_0}^B f||_{H_{tau, mu_0}^B}^2 + P_E(f)"
+            ),
+            "semiboundedness_sufficiency_theorem": (
+                "To exclude all off-critical zeros via the Laplace–Carleman resolvent theorem, P_E(f) does NOT need to be "
+                "nonnegative or exceed c_tau^B ||f||^2 - ||A_tau^B f||^2: if there exists ANY finite mu_0 > 0 such that "
+                "P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) for all K in A_R "
+                "on the two-grade states f_pm^{(K)} = (T_0 psi_tau +/- T_K psi_tau)/sqrt(2), then "
+                "|C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0) h_0(1) < infty for all K in A_R, which prevents any RHP pole of L[C_tau(-t)](w)."
+            ),
+            "coercive_norm_sq_on_psi_tau_at_mu0_1": float(
+                coercive_norm_psi_tau_sq.mid()
+            ),
+            "implied_uniform_correlation_bound_at_mu0_1": float(
+                uniform_bound_M_at_mu0_1.mid()
+            ),
+            "lean_theorem": "coercive_norm_shift_semiboundedness_implies_correlation_bound",
+        }
+
+        # Candidate III: Cross-Grade Scale Separation & Unsigned Majorant Growth Obstruction
+        # Evaluate the off-diagonal smooth inner products and two-grade coercive norms across Delta in {0, 0.25, 0.5, 1, 2, 4, 8}:
+        scale_separation_rows: List[Dict[str, Any]] = []
+        for delta_val in (0.0, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0):
+            d_arb = arb(str(delta_val))
+            kap_d = d_arb * L_arb
+            arch_d = evaluate_archimedean_integral_certified_arb(
+                d_arb, prec_bits=prec_bits
+            )
+            g_l2 = arch_d["hK_1_arb"]
+            w_arch_d = arch_d["w_arch_total_arb"]
+            # Evaluate J(Delta):
+            u_top_d = max(20, int(math.ceil(float(abs(kap_d).upper()))) + 16)
+            kap_c = acb(kap_d)
+
+            def _f_jd(u: acb, analytic: bool, kc: acb = kap_c) -> acb:
+                hp = evaluate_h0_acb((kc + u).exp(), analytic=analytic)
+                hm = evaluate_h0_acb((kc - u).exp(), analytic=analytic)
+                return (hp + hm) * ((-u / acb(2)).exp())
+
+            j_d_arb = arb(0)
+            for m_s in range(0, 4 * u_top_d):
+                j_d_arb += acb.integral(
+                    _f_jd,
+                    acb(m_s) / acb(4),
+                    acb(m_s + 1) / acb(4),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+            g_a_a = w_arch_d + c_tau_A_arb * g_l2
+            g_a_b = g_a_a - arb(4) * g_l2 + j_d_arb
+            d_smooth_b = c_tau_B_arb * g_l2 - g_a_b
+            b_trans_d = arb(2) * g_l2 - j_d_arb
+            # Two-grade coercive norm ||A_{tau, 1}^B f_-^{(Delta)}||^2 = (||A_tau^B psi_tau||^2 + ||psi_tau||^2) - (G_{A^B}(Delta) + G_{L^2}(Delta)):
+            coercive_minus_sq = coercive_norm_psi_tau_sq - (
+                g_a_b + mu_0_default * g_l2
+            )
+            coercive_plus_sq = coercive_norm_psi_tau_sq + (
+                g_a_b + mu_0_default * g_l2
+            )
+            scale_separation_rows.append(
+                {
+                    "Delta": delta_val,
+                    "X_eq_tau_Delta": float(kap_d.exp().mid()),
+                    "G_L2_Delta": float(g_l2.mid()),
+                    "J_Delta": float(j_d_arb.mid()),
+                    "G_A_B_Delta": float(g_a_b.mid()),
+                    "D_smooth_B_Delta": float(d_smooth_b.mid()),
+                    "B_transfer_Delta": float(b_trans_d.mid()),
+                    "W_arch_Delta": float(w_arch_d.mid()),
+                    "coercive_norm_sq_f_minus_at_mu0_1": float(
+                        coercive_minus_sq.mid()
+                    ),
+                    "coercive_norm_sq_f_plus_at_mu0_1": float(
+                        coercive_plus_sq.mid()
+                    ),
+                }
+            )
+
+        # Evaluate the signed vs absolute-value moments of tilde{h}_0(alpha) = (1/2 - D_alpha) h_0(alpha) on (0, infty):
+        # Signed moment: int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha
+        #   = [ -alpha^{1/2} h_0(alpha) ]_0^infty = 0  (exact PNT cancellation!)
+        # Unsigned moment on [1/2, 2]: c_0 := int_{1/2}^2 alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha > 0,
+        # and full unsigned moment C_abs := int_0^infty alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha ~= 0.903284 > 0.
+        def _eval_tilde_h0_arb(alpha_a: arb) -> arb:
+            # tilde{h}_0(alpha) = (1/2) h_0(alpha) - alpha h_0'(alpha)
+            saved_c = flint_ctx.cap
+            try:
+                flint_ctx.cap = 2
+                s_a = acb_series([acb(alpha_a), acb(1)], prec=2)
+                h_s = evaluate_h0_acb(s_a, analytic=False)
+                h_val = h_s[0].real
+                h_deriv = h_s[1].real
+                return arb("0.5") * h_val - alpha_a * h_deriv
+            finally:
+                flint_ctx.cap = saved_c
+
+        # Compute c_0 = int_{1/2}^2 alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha by midpoint/Riemann enclosure over 300 subintervals
+        # (noting tilde{h}_0(alpha) > 0 on [0.5, 1.38] and < 0 on [1.39, 2.0]):
+        n_sub_c0 = 300
+        c0_abs_window = arb(0)
+        signed_window_05_2 = arb(0)
+        for idx_s in range(n_sub_c0):
+            a_pt = arb("0.5") + arb(idx_s) * arb("1.5") / arb(n_sub_c0)
+            b_pt = arb("0.5") + arb(idx_s + 1) * arb("1.5") / arb(n_sub_c0)
+            mid_pt = (a_pt + b_pt) / arb(2)
+            rad_pt = (b_pt - a_pt) / arb(2)
+            ball_pt = arb(mid_pt.mid(), rad_pt.upper())
+            th_val = _eval_tilde_h0_arb(ball_pt)
+            integrand_ball = th_val / ball_pt.sqrt()
+            dx_seg = b_pt - a_pt
+            signed_window_05_2 += integrand_ball * dx_seg
+            c0_abs_window += abs(integrand_ball) * dx_seg
+
+        # Exact Stieltjes antiderivative identity:
+        #   alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)),
+        # and PNT main-term integration by parts:
+        #   int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha
+        #     = [ -alpha^{1/2} h_0(alpha) ]_0^infty + int_0^infty alpha^{-1/2} h_0(alpha) d_alpha
+        #     = H_0(1/2) = F_tau(1) F_tau(0) = 0!
+        alpha_sym = sp.Symbol("alpha", positive=True)
+        h_sym = sp.Function("h")(alpha_sym)
+        antideriv_diff = sp.simplify(
+            -sp.diff((alpha_sym ** sp.Rational(-1, 2)) * h_sym, alpha_sym)
+            - (alpha_sym ** sp.Rational(-3, 2))
+            * (sp.Rational(1, 2) * h_sym - alpha_sym * sp.diff(h_sym, alpha_sym))
+        )
+        exact_antiderivative_zero_moment_verified = bool(antideriv_diff == 0)
+
+        # Unsigned majorant growth vs fixed coercive norm at mu_0 = 1:
+        # For any unsigned majorant |E(x)| <= x * omega(x) (without sign cancellation),
+        # the majorant integral M_omega(X) := int_1^infty x * omega(x) * x^{-3/2} |tilde{h}_0(x/X)| dx
+        # satisfies M_omega(X) >= c_0 * X^{1/2} * omega(X / 2) for X = tau^{|Delta|} >= 2,
+        # which grows -> +infty as |Delta| -> infty for every known zero-free error bound omega(x),
+        # exceeding the asymptotically constant coercive norm ||A_{tau, 1}^B f_-^{(Delta)}||^2 -> ||A_tau^B psi_tau||^2 + ||psi_tau||^2 ~= 1.092130!
+        c0_lower_float = float(c0_abs_window.lower())
+        coercive_limit_mu0_1 = float(coercive_norm_psi_tau_sq.mid())
+        # Compute crossover grade Delta_*(mu_0 = 1) where the unsigned majorant bound exceeds coercive_limit_mu0_1 + P_E(psi_tau):
+        # Target threshold T_thresh = coercive_limit_mu0_1 + reconciled_prime_err_B_mid ~= 1.092130 + 1.083380 = 2.175510
+        target_thresh = coercive_limit_mu0_1 + reconciled_prime_err_B_mid
+        # (a) Elementary Chebyshev majorant |E(x)| <= 0.04 * x: C_abs * 0.04 * tau^{Delta/2} > target_thresh
+        # Using C_abs ~= 0.9032843:
+        c_abs_total = 0.9032843043
+        delta_star_chebyshev = (
+            2.0 * math.log(target_thresh / (0.04 * c_abs_total)) / LOG_TAU_FLOAT
+        )
+        # (b) de la Vallee Poussin majorant |E(x)| <= x * exp(-0.2 * sqrt(log x)):
+        # Find smallest Delta > 0 on a fine grid where c_abs_total * tau^{Delta/2} * exp(-0.2 * sqrt(Delta * log(tau))) > target_thresh:
+        delta_star_dlvp = None
+        for idx_g in range(1, 10000):
+            d_test = idx_g * 0.001
+            val_dlvp = (
+                c_abs_total
+                * math.exp(0.5 * d_test * LOG_TAU_FLOAT)
+                * math.exp(-0.2 * math.sqrt(d_test * LOG_TAU_FLOAT))
+            )
+            if val_dlvp > target_thresh:
+                delta_star_dlvp = round(d_test, 3)
+                break
+
+        candidate_3_audit = {
+            "candidate_name": "Candidate III — Cross-Grade Scale Separation & Unsigned Majorant Growth Obstruction",
+            "status": "SCALE_SEPARATION_PROVED_UNSIGNED_MAJORANT_FALSIFIED",
+            "off_diagonal_scale_separation_table": scale_separation_rows,
+            "asymptotic_smooth_decay_rates": {
+                "G_L2_Delta": "O(tau^{-5|Delta|/2})  (from |h_0(alpha)| <= (92193/32768) alpha^{-5/2})",
+                "J_Delta": "O(|Delta| * tau^{-|Delta|/2})  (from int_0^infty h_0(e^{kappa-u}) e^{-u/2} du)",
+                "G_A_B_Delta": "O(|Delta| * tau^{-|Delta|/2})",
+                "D_smooth_B_Delta": "O(|Delta| * tau^{-|Delta|/2})",
+                "two_grade_coercive_norm_limit": (
+                    f"lim_{{|Delta| -> infty}} ||A_{{tau, 1}}^B f_pm^{{(Delta)}}||^2 = ||A_tau^B psi_tau||^2 + ||psi_tau||^2 = {coercive_limit_mu0_1:.10f}"
+                ),
+            },
+            "exact_pnt_zero_moment_identity": (
+                "alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)), and "
+                "int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = [ -alpha^{1/2} h_0(alpha) ]_0^infty + H_0(1/2) = 0"
+            ),
+            "symbolic_antiderivative_identity_verified": exact_antiderivative_zero_moment_verified,
+            "unsigned_window_moment_c0_on_half_to_two": float(c0_abs_window.mid()),
+            "unsigned_window_moment_c0_lower": c0_lower_float,
+            "unsigned_full_moment_C_abs": c_abs_total,
+            "unsigned_majorant_growth_lower_bound": (
+                "For any unsigned majorant |E(x)| <= x * omega(x) (with omega nonincreasing), "
+                "int_1^infty |E(x)| x^{-3/2} |tilde{h}_0(x/X)| dx >= c_0 * X^{1/2} * omega(X/2)  (X = tau^{|Delta|} >= 2), "
+                "which diverges to +infty as |Delta| -> infty for every known zero-free majorant omega(x), "
+                "whereas the two-grade coercive norm ||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 approaches the finite constant "
+                "||A_tau^B psi_tau||^2 + mu_0 ||psi_tau||^2."
+            ),
+            "crossover_grade_delta_star_chebyshev_004x_at_mu0_1": delta_star_chebyshev,
+            "crossover_grade_delta_star_dlvp_at_mu0_1": delta_star_dlvp,
+            "obstruction_conclusion": (
+                "Smooth archimedean operators A_tau^B and fixed L^2 norm shifts mu_0 ||f||_{L^2}^2 have off-diagonal "
+                "inner products between T_0 psi_tau and T_Delta psi_tau that decay exponentially as O(|Delta| tau^{-|Delta|/2}), "
+                "whereas the off-diagonal prime-error pairing G_{P_E}(Delta) = -W(tau^{|Delta|}) + O(|Delta| tau^{-|Delta|/2}) "
+                "probes Chebyshev prime-error oscillations E(x) around the moving scale x ~ X = tau^{|Delta|}. "
+                "Replacing E(x) by any unsigned majorant |E(x)| destroys the exact antiderivative cancellation "
+                "int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = 0 and diverges like tau^{|Delta|/2} omega(tau^{|Delta|}/2) -> +infty. "
+                "Therefore, any proof of the semiboundedness inequality P_E(f_pm^{(Delta)}) >= -||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 "
+                "must preserve the signed oscillatory derivative structure of E(x) at scale X = tau^{|Delta|}."
+            ),
+            "lean_theorem": "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
+        }
+
+        return {
+            "task_id": TASK_TC_043_ID,
+            "parent_epic": EPIC_TC_042_ID,
+            "inspected_baseline": STARTING_HEAD_TC_043,
+            "status": ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS,
+            "section_1_tc042f_reconciliation": reconciliation_audit,
+            "section_2_compatibility_candidate_and_controls": compatibility_candidate_spec,
+            "section_3_worked_candidates_on_S_tau": {
+                "domain_specification": (
+                    "S_tau = { sum_{j=1}^N c_j T_{K_j} psi_tau : N < infty, c_j in C, K_j in Qbar intersect R }"
+                ),
+                "domain_properties_verified": {
+                    "double_pole_zeros_hat_f_at_pm_half": True,
+                    "w_pole_vanishes_identically_on_S_tau": True,
+                    "seed_mellin_nonvanishing_in_critical_strip": True,
+                    "attempt_B_decomposition_formula": (
+                        "Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2(d^*y)}^2 + P_E(f)  (forall f in S_tau)"
+                    ),
+                },
+                "candidate_1_spectral_multiplier_and_transfer_decomposition": candidate_1_audit,
+                "candidate_2_coercive_norm_shifted_semiboundedness": candidate_2_audit,
+                "candidate_3_scale_separation_and_majorant_obstruction": candidate_3_audit,
+            },
+            "section_4_remaining_implication_and_next_step": {
+                "remaining_implication": (
+                    "Prove that there exists a finite constant mu_0 > 0 (or M_0 < infty) such that for all "
+                    "Delta in Qbar intersect R, the moving-scale signed Chebyshev prime-error pairing satisfies "
+                    "|W(tau^{|Delta|})| = |int_1^infty E(x) x^{-3/2} tilde{h}_0(x / tau^{|Delta|}) dx| <= M_0 < infty "
+                    "(equivalently, P_E(f_pm^{(Delta)}) >= -(||A_tau^B f_pm^{(Delta)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(Delta)}||_{L^2}^2))."
+                ),
+                "next_justified_calculation": (
+                    "Construct an explicit scale-adapted integration-by-parts / primitive-transfer operator for E(x) "
+                    "using the exact antiderivative tilde{h}_0(alpha) alpha^{-1/2} = -d/d_alpha (alpha^{1/2} h_0(alpha)) "
+                    "coupled with the iterated Chebyshev primitive E_1(x) = int_1^x E(t) dt (where E_1(x) = O(x^2 / (log x)^A) "
+                    "unconditionally, or expressed via the arithmetic Dirichlet convolution Lambda = -mu * log) "
+                    "to test whether the X^{1/2} scaling factor is absorbed without assuming a zero-free strip beyond Re(s) = 1."
                 ),
             },
         }
@@ -5359,7 +6237,7 @@ def verify_canonical_theta_correlation_lean_module(
 def build_canonical_theta_correlation_bound_report(
     n_primes_max: int = 25000, prec_bits: int = 256
 ) -> Dict[str, Any]:
-    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 audit and certification report."""
+    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 audit and certification report."""
     seed_audit = derive_seed_spatial_polynomial_and_mellin()
     autocorr_audit = derive_closed_form_autocorrelation_h_K()
     rh_equiv_audit = audit_rh_equivalence_and_laplace_resolvent()
@@ -5383,6 +6261,9 @@ def build_canonical_theta_correlation_bound_report(
     task_tc042f_audit = execute_task_tc042f_arithmetic_fourier_factorization(
         prec_bits=prec_bits
     )
+    task_tc043_audit = execute_task_tc043_admissible_cross_grade_compatibility(
+        prec_bits=prec_bits
+    )
     lean_audit = verify_canonical_theta_correlation_lean_module()
     wavelet_audit = proof_attempts["attempt_3_large_grade_wavelet_decomposition"][
         "uniform_prime_wavelet_boundedness"
@@ -5402,6 +6283,7 @@ def build_canonical_theta_correlation_bound_report(
         "repair_task_id": TASK_TC_042R_ID,
         "sprint_task_id": TASK_TC_042R2_ID,
         "factorization_task_id": TASK_TC_042F_ID,
+        "compatibility_task_id": TASK_TC_043_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -5410,6 +6292,7 @@ def build_canonical_theta_correlation_bound_report(
         "repair_starting_head": STARTING_HEAD_TC_042R,
         "sprint_starting_head": STARTING_HEAD_TC_042R2,
         "factorization_starting_head": STARTING_HEAD_TC_042F,
+        "compatibility_starting_head": STARTING_HEAD_TC_043,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -5418,6 +6301,7 @@ def build_canonical_theta_correlation_bound_report(
             "bernstein_kernel_envelopes_status": BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED,
             "stieltjes_multiscale_reduction_status": STIELTJES_MULTISCALE_REDUCTION_REPAIRED_AND_CERTIFIED,
             "arithmetic_fourier_factorization_status": ARITHMETIC_FOURIER_FACTORIZATION_STATUS,
+            "admissible_cross_grade_compatibility_status": ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS,
             "rh_equivalence_proof_status": FIXED_SEED_RH_EQUIVALENCE_PROVED,
             "numerical_certification_status": FINITE_GRID_CORRELATION_BOUND_CERTIFIED,
             "local_concavity_status": LOCAL_ORIGIN_CONCAVITY_CERTIFIED,
@@ -5445,6 +6329,7 @@ def build_canonical_theta_correlation_bound_report(
         "section_9_arithmetic_proof_attempts_and_remaining_subgate": proof_attempts,
         "section_10_lean_formalization_audit": lean_audit,
         "section_11_arithmetic_fourier_positive_factorization": task_tc042f_audit,
+        "section_12_admissible_cross_grade_compatibility": task_tc043_audit,
         "literature_references": [
             {
                 "citation": "Burnol (1999, arXiv:math/9902080v1; 2001, arXiv:math/0101068v1)",

@@ -292,7 +292,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 16 defs, 29 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 18 defs, 36 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,8 +300,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 16
-    assert len(ver["actual_theorems"]) == 29
+    assert len(ver["actual_defs"]) == 18
+    assert len(ver["actual_theorems"]) == 36
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -321,6 +321,13 @@ def test_12_lean_formalization_module_verified():
     assert "quotient_unitary_grade_transport_of_positivity" in lean_text
     assert "attempt_A_shift_difference_square_identity" in lean_text
     assert "attempt_B_universal_pole_pnt_archimedean_cancellation" in lean_text
+    assert "complex_reflected_pair_conjugate_inverse_invariance" in lean_text
+    assert "sesquilinear_shift_difference_identity" in lean_text
+    assert "two_dim_gram_cauchy_schwarz_from_nonneg" in lean_text
+    assert "cross_grade_complex_zero_ray_collinearity" in lean_text
+    assert "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau" in lean_text
+    assert "coercive_norm_shift_semiboundedness_implies_correlation_bound" in lean_text
+    assert "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm" in lean_text
 
 
 def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
@@ -775,6 +782,174 @@ def test_23_repairs_8a_8b_8c_and_task_tc042f_arithmetic_fourier_factorization(
         assert mg_row["attempt_B_identity_abs_diff"] < 1e-28
         assert mg_row["attempt_B_smooth_part"] < 0.0
         assert mg_row["attempt_B_prime_error_stieltjes"] > 0.0
+
+
+def test_24_tc042f_bounded_reconciliation_regressions(artifact_payload):
+    """Targeted regression tests for the 6 bounded TC-042F reconciliation items (Step 2 of TASK-TC-043)."""
+    sec11 = artifact_payload[
+        "section_11_arithmetic_fourier_positive_factorization"
+    ]
+    sec12 = artifact_payload[
+        "section_12_admissible_cross_grade_compatibility"
+    ]
+    rec = sec12["section_1_tc042f_reconciliation"]
+
+    # 1. Complex reflected-pair scaling q(lambda * u, conj(lambda)^{-1} * v) = q(u, v) vs naive lambda^{-1}
+    d1 = rec["defect_1_complex_reflected_pair_scaling"]
+    assert d1["status"] == "RECONCILED_AND_VERIFIED"
+    assert d1["conj_inv_symbolic_invariance_verified"] is True
+    ce = d1["counterexample_lambda_eq_i"]
+    assert ce["q_orig_u1_v1"] == 2
+    assert ce["q_conj_inv_u1_v1"] == 2
+    assert ce["q_naive_inv_u1_v1"] == -2
+    assert ce["naive_inverse_fails"] is True
+
+    # 2. General sesquilinear shift-difference identity <(I - S_u)f, (I - S_u)g> = 2<f,g> - <S_u f, g> - <S_{-u} f, g>
+    d2 = rec["defect_2_shift_difference_sesquilinear_identity"]
+    assert d2["status"] == "RECONCILED_AND_VERIFIED"
+    assert d2["two_sided_matches_polarization"] is True
+    assert d2["one_sided_omission_fails_on_asymmetric_pair"] is True
+    assert d2["asymmetry_abs_gap"] > 1e-3
+
+    # 3. Stieltjes endpoint at x = 1 (integration-by-parts boundary value E(1) = -1, not jump of psi)
+    d3 = rec["defect_3_stieltjes_endpoint_at_one"]
+    assert d3["status"] == "RECONCILED_AND_VERIFIED"
+    assert d3["psi_at_1"] == 0.0
+    assert d3["psi_jump_at_1"] == 0.0
+    assert d3["first_jump_station_of_psi"] == 2
+    assert d3["E_at_1"] == -1.0
+
+    # 4. Reconciled numerical summaries (-1.0824296878, +1.0833801676) vs stale (-0.399957, +0.400908)
+    d4 = rec["defect_4_conflicting_numerical_summaries"]
+    assert d4["status"] == "RECONCILED_AND_VERIFIED"
+    assert math.isclose(
+        d4["reconciled_smooth_part_B"], -1.0824296877880101, rel_tol=1e-11
+    )
+    assert math.isclose(
+        d4["reconciled_prime_error_stieltjes_B"],
+        1.0833801655763297,
+        rel_tol=1e-8,
+    )
+    assert math.isclose(
+        d4["certified_J0_halfline_pole_integral"],
+        0.0259597612844062,
+        rel_tol=1e-11,
+    )
+    assert math.isclose(
+        d4["certified_B_transfer_psi_tau"], 0.9687652063353962, rel_tol=1e-11
+    )
+    assert math.isclose(
+        d4["stale_smooth_value_diagnosed"], -0.3999571341592074, rel_tol=1e-7
+    )
+    assert math.isclose(
+        d4["stale_prime_value_diagnosed"], 0.400907611947527, rel_tol=1e-7
+    )
+    q4_text = sec11["closing_questions"][
+        "question_4_where_prime_or_off_critical_terms_resist"
+    ]
+    assert "-0.399957" not in q4_text
+    assert "-1.0824296878" in q4_text
+
+    # 5. Complete error accounting in TC-042F
+    d5 = rec["defect_5_complete_error_accounting"]
+    assert d5["status"] == "RECONCILED_AND_VERIFIED"
+    assert d5["u_top_B"] == 20
+    assert d5["cauchy_circle_arcs"] == 512
+    assert d5["cauchy_taylor_remainder_bound_on_0_025"] < 1e-26
+    assert d5["tail_A_B_upper_from_u20"] < 1e-21
+    assert 3.0e-14 < d5["old_truncated_u12_abs_diff"] < 4.5e-14
+    assert d5["repaired_u20_abs_diff"] < 1e-22
+    assert d5["spatial_and_analytic_enclosures_overlap"] is True
+    assert 0.0 < d5["rosser_schoenfeld_prime_tail_rad_at_K0"] < 1e-8
+
+    # 6. Formalization scope & provenance
+    d6 = rec["defect_6_formalization_scope_and_provenance"]
+    assert d6["status"] == "RECONCILED_AND_VERIFIED"
+    assert "two_dim_gram_cauchy_schwarz_from_nonneg" in d6["quotient_unitary_theorem_scope"]
+
+
+def test_25_task_tc043_admissible_cross_grade_compatibility(artifact_payload):
+    """Verify TASK-TC-043 cross-grade compatibility specification, synthetic quartet audit, and Candidates I, II, III on S_tau."""
+    from tc.canonical_theta_correlation_bound import (
+        ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS,
+        TASK_TC_043_ID,
+    )
+
+    assert artifact_payload["compatibility_task_id"] == TASK_TC_043_ID
+    assert (
+        artifact_payload["status_dimensions"][
+            "admissible_cross_grade_compatibility_status"
+        ]
+        == ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS
+    )
+    sec12 = artifact_payload[
+        "section_12_admissible_cross_grade_compatibility"
+    ]
+    assert sec12["task_id"] == TASK_TC_043_ID
+
+    # Step 3: Compatibility candidate, complex zero collinearity, and synthetic quartet audit
+    spec = sec12["section_2_compatibility_candidate_and_controls"]
+    collin = spec["cross_grade_complex_zero_and_transcendence_audit"][
+        "real_part_only_alignment_test"
+    ]
+    assert collin["shifted_real_part_equals_half"] is True
+    assert collin["moving_only_real_part_fails_zero_membership"] is True
+    assert collin["imag_mismatch_from_gamma_0"] > 3.0
+
+    q_audit = spec["synthetic_off_critical_quartet_control_audit"]
+    assert len(q_audit["what_survives_synthetic_quartet"]) == 4
+    assert len(q_audit["which_arithmetic_hypotheses_synthetic_quartet_violates"]) == 3
+    q_sum = q_audit["certified_synthetic_quartet_controls_summary"]
+    assert q_sum["case_A_max_ratio_on_grid"] > 1.0
+    assert q_sum["case_B_adversarial_escaped_up_to_K4"] is True
+    assert q_sum["case_B_caught_at_K8"] is True
+
+    # Step 4: Worked Candidates I, II, III on S_tau
+    s_tau = sec12["section_3_worked_candidates_on_S_tau"]
+    assert s_tau["domain_properties_verified"]["w_pole_vanishes_identically_on_S_tau"] is True
+
+    # Candidate I: Spectral Multiplier mu_tau^B(t) and Exact Pole-Vanishing Transfer Decomposition
+    c1 = s_tau["candidate_1_spectral_multiplier_and_transfer_decomposition"]
+    assert c1["mu_0_matches_neg_c_tau_B"] is True
+    assert math.isclose(c1["mu_tau_B_at_0"], -3.3721834192256654, rel_tol=1e-13)
+    assert c1["root_bracket_certified"] is True
+    assert 46.4061555 <= c1["unique_positive_root_t_star_B_mid"] <= 46.4061557
+    assert c1["mu_at_root_bracket_low"] < 0.0
+    assert c1["mu_at_root_bracket_high"] > 0.0
+    assert c1["plancherel_vs_spatial_smooth_B_abs_diff"] < 1e-22
+    assert c1["plancherel_vs_spatial_B_transfer_abs_diff"] < 1e-22
+    assert 0.894 < c1["transfer_share_of_smooth_deficit_on_psi_tau"] < 0.896
+
+    # Candidate II: Coercive Norm-Shifted Hilbert Space & Semiboundedness Reduction
+    c2 = s_tau["candidate_2_coercive_norm_shifted_semiboundedness"]
+    assert math.isclose(
+        c2["coercive_norm_sq_on_psi_tau_at_mu0_1"],
+        1.092130317270496,
+        rel_tol=1e-11,
+    )
+    assert math.isclose(
+        c2["implied_uniform_correlation_bound_at_mu0_1"],
+        4.350070487905407,
+        rel_tol=1e-9,
+    )
+
+    # Candidate III: Cross-Grade Scale Separation & Unsigned Majorant Obstruction
+    c3 = s_tau["candidate_3_scale_separation_and_majorant_obstruction"]
+    assert c3["symbolic_antiderivative_identity_verified"] is True
+    assert c3["unsigned_window_moment_c0_lower"] > 0.45
+    assert 0.90 < c3["unsigned_full_moment_C_abs"] < 0.91
+    assert 4.0 < c3["crossover_grade_delta_star_chebyshev_004x_at_mu0_1"] < 5.0
+    assert 1.0 < c3["crossover_grade_delta_star_dlvp_at_mu0_1"] < 3.0
+    rows_c3 = {r["Delta"]: r for r in c3["off_diagonal_scale_separation_table"]}
+    assert abs(rows_c3[8.0]["G_L2_Delta"]) < 1e-15
+    assert abs(rows_c3[8.0]["J_Delta"]) < 1e-5
+    assert abs(rows_c3[8.0]["D_smooth_B_Delta"]) < 1e-5
+    assert math.isclose(
+        rows_c3[8.0]["coercive_norm_sq_f_minus_at_mu0_1"],
+        c2["coercive_norm_sq_on_psi_tau_at_mu0_1"],
+        rel_tol=1e-5,
+    )
+
 
 
 

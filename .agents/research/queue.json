@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-042",
+  "active_task_id": "TASK-TC-043",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1321,7 +1321,36 @@
         "docs/TC_CURRENT_CANONICAL_STATUS.md",
         ".agents/corpus_map/obligation_register.md"
       ],
-      "resolution": "Seed Gate (SEED_AND_AUTOCORRELATION_PROVED_AND_REPAIRED), Repair Gates (TASK-TC-042R & TASK-TC-042R2: STIELTJES_SCALING_AND_DERIVATIVE_REPAIRED, WEIGHTED_KERNEL_ENVELOPES_CERTIFIED_BY_EXACT_BERNSTEIN, UNCONDITIONAL_LOCAL_BOUND_REPAIRED_BOTH_ZERO_FREE_AND_SPECTRAL_TAIL, ARCHIMEDEAN_TAYLOR_CAUCHY_REMAINDER_REPAIRED, ANALYTICITY_BRANCH_CUT_FLAGS_ENFORCED, TOEPLITZ_GRAM_ARB_PRINCIPAL_MINORS_CERTIFIED, LEAN_RESIDUE_HYPOTHESIS_VACUITY_REPAIRED, REPORT_AND_ARTIFACT_NUMBERS_RECONCILED, Repairs 8A/8B/8C), Finite-Grade Certification Gate (CERTIFIED_ON_TESTED_FINITE_GRADE_GRID), and TASK-TC-042F Universal Pole-PNT-Archimedean Cancellation & Quotient Unitary Grade Transport Gate (ARITHMETIC_FOURIER_FACTORIZATION_AND_POLE_PNT_CANCELLATION_PROVED_DEFECT_ISOLATED) passed; Global Arithmetic Proof Gate (SUBGATE-TC-042A: CANONICAL_THETA_WAVELET_PRIME_BOUND_SUBGATE = OPEN; SUBGATE-TC-042B: UNIFORM_PRIME_WAVELET_BOUNDEDNESS_SUBGATE = OPEN, GLOBAL_ARITHMETIC_PROOF_OPEN_SUBGATE_TC_042A) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 45 Lean declarations (16 def + 29 theorems, 730 total theorems, 0 sorry, 0 admit) compiled; 23/23 unit tests in tests/test_tc_canonical_theta_correlation_bound.py and 34/34 tests in tests/test_tc_modular_theta_conductor_curvature.py passing."
+      "resolution": "Seed Gate (SEED_AND_AUTOCORRELATION_PROVED_AND_REPAIRED), Repair Gates (TASK-TC-042R & TASK-TC-042R2: STIELTJES_SCALING_AND_DERIVATIVE_REPAIRED, WEIGHTED_KERNEL_ENVELOPES_CERTIFIED_BY_EXACT_BERNSTEIN, UNCONDITIONAL_LOCAL_BOUND_REPAIRED_BOTH_ZERO_FREE_AND_SPECTRAL_TAIL, ARCHIMEDEAN_TAYLOR_CAUCHY_REMAINDER_REPAIRED, ANALYTICITY_BRANCH_CUT_FLAGS_ENFORCED, TOEPLITZ_GRAM_ARB_PRINCIPAL_MINORS_CERTIFIED, LEAN_RESIDUE_HYPOTHESIS_VACUITY_REPAIRED, REPORT_AND_ARTIFACT_NUMBERS_RECONCILED, Repairs 8A/8B/8C), Finite-Grade Certification Gate (CERTIFIED_ON_TESTED_FINITE_GRADE_GRID), and TASK-TC-042F Universal Pole-PNT-Archimedean Cancellation & Quotient Unitary Grade Transport Gate (ARITHMETIC_FOURIER_FACTORIZATION_AND_POLE_PNT_CANCELLATION_PROVED_DEFECT_ISOLATED, reconciled in TASK-TC-043) passed; Global Arithmetic Proof Gate (SUBGATE-TC-042A: CANONICAL_THETA_WAVELET_PRIME_BOUND_SUBGATE = OPEN; SUBGATE-TC-042B: UNIFORM_PRIME_WAVELET_BOUNDEDNESS_SUBGATE = OPEN, GLOBAL_ARITHMETIC_PROOF_OPEN_SUBGATE_TC_042A) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 54 Lean declarations (18 def + 36 theorems, 737 total theorems, 0 sorry, 0 admit) compiled; 25/25 unit tests in tests/test_tc_canonical_theta_correlation_bound.py and 34/34 tests in tests/test_tc_modular_theta_conductor_curvature.py passing."
+    },
+    {
+      "task_id": "TASK-TC-043",
+      "epic_id": "EPIC-TC-042",
+      "priority": 54,
+      "objective": "Admissible Cross-Grade Compatibility: Bounded TC-042F Reconciliation, Exact Pole-Vanishing Transfer Cancellation on S_tau, Coercive Norm-Shifted Hilbert Realization, and Moving-Scale Unsigned Majorant Obstruction (TASK-TC-043 / SUBGATE-TC-043A)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Prove or falsify SUBGATE-TC-043A (MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE): the uniform lower semiboundedness inequality P_E(f_+-^{(K)}) >= -(||A_tau^B f_+-^{(K)}||^2 + mu_0 ||f_+-^{(K)}||^2) on the two-grade span f_+-^{(K)} = psi_tau +- T_K psi_tau in S_tau for some finite mu_0 >= 0 (or equivalently uniform boundedness of the signed Chebyshev prime-error integral I(tau^K) = int_1^infty E(x) x^{-3/2} tilde_h_0(x / tau^K) dx across all K >= 0), exploiting genuine prime-power sign cancellation beyond unsigned pointwise majorants |E(x)| <= x*omega(x).",
+      "planned_calculation": "1) Reconcile all 6 TC-042F discrepancies: complex reflected-pair conjugate-inverse scaling q(lambda*u, bar(lambda)^{-1}*v) = q(u, v); two-sided sesquilinear shift-difference identity <(I-S_u)f, (I-S_u)g> = 2<f,g> - <S_u f, g> - <S_{-u}f, g> = Phi_{f,g}(1) - Phi_{f,g}(e^u); Stieltjes lower integration-by-parts boundary value E(1) = psi(1) - 1 = -1 at x = 1; reconciled Attempt B values (-1.0824296878, +1.0833801656, J_0 = +0.0259597613, B_transfer = +0.9687652063) vs stale values (-0.399957, +0.400908); complete 256-bit Arb error enclosures for [0, 0.25] Taylor/Cauchy bound, [20, infty) analytic tail, and Rosser-Schoenfeld prime-power tail for n > 25,000; explicit Lean formalization scope with two_dim_gram_cauchy_schwarz_from_nonneg. 2) Formulate the cross-grade compatibility specification on S_tau distinguishing coordinate-rescaling identities from actual zeta-arithmetic restrictions, complex zero worldline collinearity tau^{K-J} = rho_prime/rho in R_{>0}, rational vs irrational algebraic grade differences, and synthetic quartet Case A vs Case B controls. 3) Prove Candidate I exact pole-vanishing transfer cancellation B_transfer(f) = 2||f||^2 - J(f,f) = 4||R_0 f||^2 - 2||f||^2 on S_tau and Plancherel multiplier sign change mu_tau^B(t_*^B) = 0 at t_*^B in [46.4061555, 46.4061557]. 4) Prove Candidate II coercive norm-shifted Hilbert realization (H_{tau,mu_0}^B, A_{tau,mu_0}^B, U_K^B) and semiboundedness reduction P_E(f_+-^{(K)}) >= -(||A_tau^B f_+-^{(K)}||^2 + mu_0||f_+-^{(K)}||^2) ==> |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1) < infty ==> RH. 5) Prove Candidate III off-diagonal smooth exponential decay vs moving-scale prime-error pairing and the Unsigned Majorant Growth Obstruction (majorant_without_sign_cancellation_exceeds_fixed_coercive_norm). 6) Formalize 2 new definitions and 7 new zero-sorry theorems in formal/RiemannScope/CanonicalThetaCorrelationBound.lean and add regression tests test_24 and test_25 in tests/test_tc_canonical_theta_correlation_bound.py.",
+      "acceptance_criterion": "All 25 tests in tests/test_tc_canonical_theta_correlation_bound.py passing; formal/RiemannScope/CanonicalThetaCorrelationBound.lean compiled with 54 declarations (18 def + 36 theorems, 737 total compiled theorems, 0 sorry, 0 admit); data/tc_canonical_theta_correlation_bound.json and docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md updated and reconciled; SUBGATE-TC-043A registered as OPEN alongside SUBGATE-TC-042A and SUBGATE-TC-042B.",
+      "dependencies": [
+        "TASK-TC-042"
+      ],
+      "evidence": [
+        "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+        "scripts/build_formal.py",
+        "certification.py",
+        "tc/canonical_theta_correlation_bound.py",
+        "tests/test_tc_canonical_theta_correlation_bound.py",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "data/tc_canonical_theta_correlation_bound.json",
+        "formal/RiemannScope/README.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "TC-042F Bounded Reconciliation Gate (TC042F_BOUNDED_RECONCILIATION_VERIFIED_ALL_SIX_DEFECTS_FIXED) and TASK-TC-043 Transfer Cancellation & Coercive Semiboundedness Gate (TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED) passed; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 54 Lean declarations (18 def + 36 theorems, 737 total theorems, 0 sorry, 0 admit) compiled; 25/25 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
     }
   ]
 }

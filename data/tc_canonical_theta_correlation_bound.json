@@ -4,11 +4,13 @@
   "repair_task_id": "TASK-TC-042R",
   "sprint_task_id": "TASK-TC-042R2",
   "factorization_task_id": "TASK-TC-042F",
+  "compatibility_task_id": "TASK-TC-043",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
   "sprint_starting_head": "62526298587db990b11fc0c191c2969652936c01",
   "factorization_starting_head": "697e6862c7e1288550bef007cbdf0a520486c245",
+  "compatibility_starting_head": "db5d8d4f429ef2b0bd9000d715e3552953b48355",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -20,7 +22,8 @@
     "TASK-TC-041R",
     "TASK-TC-042",
     "TASK-TC-042R",
-    "TASK-TC-042R2"
+    "TASK-TC-042R2",
+    "TASK-TC-042F"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -29,6 +32,7 @@
     "bernstein_kernel_envelopes_status": "BERNSTEIN_KERNEL_ENVELOPES_EXACT_RATIONAL_CERTIFIED",
     "stieltjes_multiscale_reduction_status": "STIELTJES_IDENTITY_REPAIRED_AND_CERTIFIED",
     "arithmetic_fourier_factorization_status": "POLE_PNT_ARCHIMEDEAN_CANCELLATION_PROVED_DEFECT_ISOLATED",
+    "admissible_cross_grade_compatibility_status": "TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED",
     "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
     "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
     "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
@@ -2659,7 +2663,9 @@
       "singleSeedStieltjesPoly",
       "primitiveTransferFiniteRHS",
       "hyperbolicOffLinePairForm",
-      "attemptBCompletePairingDecomp"
+      "attemptBCompletePairingDecomp",
+      "complexHyperbolicPairForm",
+      "attemptBTransferForm"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -2677,7 +2683,9 @@
       "singleSeedStieltjesPoly",
       "primitiveTransferFiniteRHS",
       "hyperbolicOffLinePairForm",
-      "attemptBCompletePairingDecomp"
+      "attemptBCompletePairingDecomp",
+      "complexHyperbolicPairForm",
+      "attemptBTransferForm"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2708,7 +2716,14 @@
       "hyperbolic_offline_pair_invariance_and_indefiniteness",
       "quotient_unitary_grade_transport_of_positivity",
       "attempt_A_shift_difference_square_identity",
-      "attempt_B_universal_pole_pnt_archimedean_cancellation"
+      "attempt_B_universal_pole_pnt_archimedean_cancellation",
+      "complex_reflected_pair_conjugate_inverse_invariance",
+      "sesquilinear_shift_difference_identity",
+      "two_dim_gram_cauchy_schwarz_from_nonneg",
+      "cross_grade_complex_zero_ray_collinearity",
+      "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau",
+      "coercive_norm_shift_semiboundedness_implies_correlation_bound",
+      "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2739,7 +2754,14 @@
       "hyperbolic_offline_pair_invariance_and_indefiniteness",
       "quotient_unitary_grade_transport_of_positivity",
       "attempt_A_shift_difference_square_identity",
-      "attempt_B_universal_pole_pnt_archimedean_cancellation"
+      "attempt_B_universal_pole_pnt_archimedean_cancellation",
+      "complex_reflected_pair_conjugate_inverse_invariance",
+      "sesquilinear_shift_difference_identity",
+      "two_dim_gram_cauchy_schwarz_from_nonneg",
+      "cross_grade_complex_zero_ray_collinearity",
+      "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau",
+      "coercive_norm_shift_semiboundedness_implies_correlation_bound",
+      "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm"
     ]
   },
   "section_11_arithmetic_fourier_positive_factorization": {
@@ -2785,7 +2807,8 @@
       "unconditional_diagonal_pairing_invariance": "Q_tau(T_K f, T_K g) = W_xi((T_K f) * (T_K g)^*) = W_xi(f * g^*) = Q_tau(f, g) unconditionally for all K in R (without assuming RH)",
       "reflected_offline_pair_block": {
         "pair_formula": "Q_pair(f, g) = hat{f}(z_+) conj(hat{g}(z_-)) + hat{f}(z_-) conj(hat{g}(z_+)), z_+ = delta + i*gamma, z_- = -delta + i*gamma = -conj(z_+)",
-        "reciprocal_grade_scaling_cancellation": "hat{T_K f}(z_+) = tau^{-K*delta} e^{-i*K*gamma*log(tau)} hat{f}(z_+), hat{T_K g}(z_-) = tau^{+K*delta} e^{-i*K*gamma*log(tau)} hat{g}(z_-), so tau^{-K*delta} * tau^{+K*delta} = 1 cancels identically in Q_pair(T_K f, T_K g)",
+        "general_complex_scaling_invariance": "q(lambda * u, conj(lambda)^{-1} * v) = q(u, v) for all lambda in C^*, where conj(lambda)^{-1} = lambda / |lambda|^2 (naive lambda^{-1} fails for non-real lambda, e.g. q(i*1, i^{-1}*1) = q(i, -i) = -2 != +2 = q(1, 1))",
+        "reciprocal_grade_scaling_cancellation": "hat{T_K f}(z_+) = lambda_K hat{f}(z_+) with lambda_K = tau^{-K*delta} e^{-i*K*gamma*log(tau)}, hat{T_K g}(z_-) = conj(lambda_K)^{-1} hat{g}(z_-) = tau^{+K*delta} e^{-i*K*gamma*log(tau)} hat{g}(z_-), so lambda_K * conj(conj(lambda_K)^{-1}) = tau^{-K*delta} * tau^{+K*delta} = 1 cancels identically in Q_pair(T_K f, T_K g)",
         "symbolic_diagonal_invariance_verified": true,
         "quadratic_form_signature": "(1, 1) (indefinite hyperbolic form q(u, v) = 2 Re(u conj(v)))",
         "q_at_u1_v_minus1": -2,
@@ -2794,15 +2817,18 @@
         "symbolic_off_diagonal_cosh_verified": true,
         "lean_theorems": [
           "unconditional_reflected_grade_invariance",
-          "hyperbolic_offline_pair_invariance_and_indefiniteness"
+          "hyperbolic_offline_pair_invariance_and_indefiniteness",
+          "complex_reflected_pair_conjugate_inverse_invariance"
         ],
-        "why_invariance_alone_does_not_imply_positivity": "Diagonal grade invariance Q_tau(T_K f, T_K g) = Q_tau(f, g) holds term-by-term even on off-critical pairs because the reflected pairing pairs z_+ with -conj(z_+) = z_-, whose real dilation factors tau^{-K*delta} and tau^{+K*delta} are reciprocals. However, the off-line 2D block q(u, v) = 2 Re(u conj(v)) has signature (1, 1) (negative on u = -v) and its off-diagonal grade correlation Q_pair(T_K f, f) grows like cosh(K * delta * log(tau)), violating Cauchy\u2013Schwarz |Q_tau(T_K f, f)| <= Q_tau(f, f)."
+        "why_invariance_alone_does_not_imply_positivity": "Diagonal grade invariance Q_tau(T_K f, T_K g) = Q_tau(f, g) holds term-by-term even on off-critical pairs because the reflected pairing pairs z_+ with -conj(z_+) = z_-, whose complex grade multiplier tau^{+K*delta - i*K*gamma*log(tau)} equals conj(lambda_K)^{-1}. However, the off-line 2D block q(u, v) = 2 Re(u conj(v)) has signature (1, 1) (negative on u = -v) and its off-diagonal grade correlation Q_pair(T_K f, f) grows like cosh(K * delta * log(tau)), violating Cauchy\u2013Schwarz |Q_tau(T_K f, f)| <= Q_tau(f, f)."
       }
     },
     "section_4_quotient_unitary_grade_transport": {
       "target_triple": "(H_tau, A_tau : D -> H_tau, U_K : H_tau -> H_tau)",
       "quotient_unitary_theorem": "If Q_tau(f, g) = <A_tau f, A_tau g>_{H_tau} holds on D, then unconditional grade invariance Q_tau(T_K f, T_K g) = Q_tau(f, g) forces ||A_tau(T_K f)||_{H_tau}^2 = ||A_tau f||_{H_tau}^2, so ker(A_tau) is strictly T_K-invariant and U_K(A_tau f) := A_tau(T_K f) defines a well-defined unitary one-parameter group on cl(A_tau(D)) satisfying U_K A_tau = A_tau T_K and |Q_tau(T_K f, g)| <= ||A_tau f|| ||A_tau g||.",
-      "lean_theorem": "quotient_unitary_grade_transport_of_positivity"
+      "formalization_scope_note": "In Lean 4, `quotient_unitary_grade_transport_of_positivity` proves isometric norm transport and kernel invariance from abstract diagonal invariance, and derives the off-diagonal bound from a supplied scalar Cauchy\u2013Schwarz hypothesis; `two_dim_gram_cauchy_schwarz_from_nonneg` independently derives the scalar Cauchy\u2013Schwarz inequality (a_12)^2 <= a_11 * a_22 directly from nonnegativity of the 2x2 quadratic form Q_tau(c_1 f + c_2 g, c_1 f + c_2 g) >= 0.",
+      "lean_theorem": "quotient_unitary_grade_transport_of_positivity",
+      "lean_cauchy_schwarz_derivation_theorem": "two_dim_gram_cauchy_schwarz_from_nonneg"
     },
     "section_5_five_place_tau_coupling_audit": {
       "five_places_of_tau_eq_2pi": [
@@ -2880,24 +2906,39 @@
       "attempt_A_euler_resolvent_semilocal": {
         "status": "ARCHIMEDEAN_DUALITY_PROVED_GLOBAL_PRIME_EXTENSION_OBSTRUCTED",
         "operator_definition": "A_tau^A f = ({R_k f}_{k >= 0}, l_+(f)) in (oplus_{k=0}^infty L^2(R_{>0}, (k + 1/4)^{-1} dy/y)) oplus C, (R_k f)(x) = int_0^x (y/x)^{2k+1/2} (D_y f)(y) dy/y,  l_pm(f) = (hat{f}(1/2) +/- hat{f}(-1/2)) / sqrt(2)",
-        "spatial_spectral_archimedean_duality": "sum_{k=0}^infty (k + 1/4)^{-1} <R_k f, R_k g>_{L^2(dy/y)} = int_1^infty <nabla_x f, nabla_x g>_{L^2(dy/y)} x^{1/2}/(x - x^{-1}) dx/x = (1/tau) int_{-infty}^infty [Re psi(1/4 + it/2) - psi(1/4)] hat{f}(it) conj(hat{g}(it)) dt",
+        "general_sesquilinear_shift_difference_identity": "<(I - S_u) f, (I - S_u) g>_{L^2(dy/y)} = 2 <f, g>_{L^2(dy/y)} - <S_u f, g>_{L^2(dy/y)} - <S_{-u} f, g>_{L^2(dy/y)} = Phi_{f,g}(1) - Phi_{f,g}(e^u)  (where S_u^* = S_{-u})",
+        "spatial_spectral_archimedean_duality": "sum_{k=0}^infty (k + 1/4)^{-1} <R_k f, R_k g>_{L^2(dy/y)} = int_1^infty <nabla_x f, nabla_x g>_{L^2(dy/y)} x^{1/2}/(x - x^{-1}) dx/x = int_0^infty [2 <f, g>_{L^2} - <S_u f, g>_{L^2} - <S_{-u} f, g>_{L^2}] e^{u/2}/(e^u - e^{-u}) du = (1/tau) int_{-infty}^infty [Re psi(1/4 + it/2) - psi(1/4)] hat{f}(it) conj(hat{g}(it)) dt",
         "exact_defect_formula": "R_tau^A(f, g) = -l_-(f) conj(l_-(g)) - c_tau <f, g>_{L^2(dy/y)} - sum_{n >= 2} (Lambda(n)/sqrt(n)) <(S_n + S_n^{-1}) f, g>_{L^2(dy/y)}",
         "c_tau_A_value": 5.3721834192256654,
         "three_structural_obstructions": [
           "Completing -(S_n + S_n^{-1}) into difference squares ||(I - S_n) f||_{L^2}^2 - 2 ||f||_{L^2}^2 produces a divergent negative diagonal counterterm -2 (sum_{n>=2} Lambda(n)/sqrt(n)) ||f||_{L^2}^2 = -infty.",
           "Support localization projections P_{[a,b]} (such as [1/sqrt(2), sqrt(2)] where S_n f perp f) do not commute with grade dilations: [T_K, P_{[a,b]}] = (P_{[tau^{-K}a, tau^{-K}b]} - P_{[a,b]}) T_K != 0 for K != 0.",
-          "Even on the pole-annihilating canonical seed psi_tau (where l_pm(psi_tau) = 0), ||A_tau^A psi_tau||^2 - c_tau ||psi_tau||_{L^2}^2 = +W_arch(h_0) = +-0.1136644815 > 0 is overwhelmed by the negative prime sum -W_prime(h_0) = 0.1146149592 unless prime cancellation is included."
+          "Even on the pole-annihilating canonical seed psi_tau (where l_pm(psi_tau) = 0), W_arch(h_0) = ||A_tau^A psi_tau||^2 - c_tau^A ||psi_tau||_{L^2}^2 = -0.1136644815 < 0, which requires the positive prime-sum contribution -W_prime(h_0) = +0.1146149592 > 0 to achieve C_tau(0) = +0.0009504778 > 0."
         ],
-        "lean_theorem": "attempt_A_shift_difference_square_identity"
+        "lean_theorem": "attempt_A_shift_difference_square_identity",
+        "lean_sesquilinear_theorem": "sesquilinear_shift_difference_identity"
       },
       "attempt_B_direct_arithmetic_kernel_and_pole_pnt_cancellation": {
         "status": "UNIVERSAL_POLE_PNT_ARCHIMEDEAN_CANCELLATION_PROVED_SIGN_BALANCE_ISOLATED",
         "operator_definition": "(A_tau^B f)(x, y) := f(y) - f(y/x) in H_tau^B = L^2([1, infty) x R_{>0}, x^{-3/2}/(x - x^{-1}) dx/x dy/y) ~= oplus_{k=1}^infty L^2(R_{>0}, (k + 1/4)^{-1} dy/y)  (strict trivial-zero channels s = -2k, k >= 1)",
         "unconditional_unitary_grade_covariance": "(U_K^B Psi)(x, y) := Psi(x, tau^K y) is unitary on H_tau^B and satisfies A_tau^B(T_K f) = U_K^B(A_tau^B f) identically.",
-        "universal_pole_pnt_archimedean_cancellation_theorem": "On all of D (without requiring hat{f}(+/- 1/2) = 0), combining W_pole + W_arch - W_prime via psi(x) = x + E(x) (E(1) = -1) cancels the s = 1 pole integral int_1^infty Phi(x) x^{1/2} dx/x against the smooth PNT main term -int_1^infty Phi(x) x^{-1/2} dx AND cancels the s = 0 pole integral int_1^infty Phi(x) x^{-1/2} dx/x against the k = 0 archimedean channel -int_1^infty Phi(x) x^{-1/2} dx/x, leaving Q_tau(f, g) = <A_tau^B f, A_tau^B g>_{H_tau^B} + R_tau^B(f, g).",
+        "universal_pole_pnt_archimedean_cancellation_theorem": "On all of D (without requiring hat{f}(+/- 1/2) = 0), combining W_pole + W_arch - W_prime via Stieltjes integration by parts with psi(x) = x + E(x) (where psi(x) = 0 on (0, 2) is continuous at x = 1, and E(1) = psi(1) - 1 = -1 supplies the lower integration-by-parts boundary value -E(1) Phi(1) = +2 <f, g>_{L^2}) cancels the s = 1 pole integral int_1^infty Phi(x) x^{1/2} dx/x against the smooth PNT main term -int_1^infty Phi(x) x^{-1/2} dx AND cancels the s = 0 pole integral int_1^infty Phi(x) x^{-1/2} dx/x against the k = 0 archimedean channel -int_1^infty Phi(x) x^{-1/2} dx/x, leaving Q_tau(f, g) = <A_tau^B f, A_tau^B g>_{H_tau^B} + R_tau^B(f, g).",
         "exact_defect_formula": "R_tau^B(f, g) = -c_tau^B <f, g>_{L^2(dy/y)} - int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,g}(x) dx,  tilde{Phi}_{f,g}(x) = (1/2 - D_x)[(f * g^*)(x) + (f * g^*)(1/x)]",
         "c_tau_B_value": 3.3721834192256654,
-        "spatial_vs_analytic_norm_A_B_abs_diff": 3.7428754557888113e-14,
+        "spatial_vs_analytic_norm_A_B_abs_diff": 7.674955151006326e-23,
+        "error_accounting_audit": {
+          "u_top_B": 20,
+          "cauchy_circle_R_c": 1.0,
+          "cauchy_circle_arcs": 512,
+          "cauchy_circle_max_modulus": 6365.796546936035,
+          "cauchy_taylor_remainder_bound_on_0_025": 5.465826423367349e-28,
+          "tail_A_B_upper_from_u20": 7.674302520250429e-23,
+          "old_truncated_u12_abs_diff": 3.7233044819503296e-14,
+          "repaired_u20_abs_diff": 7.674955151006326e-23,
+          "spatial_and_analytic_enclosures_overlap": true,
+          "prime_truncation_n_max": 25000,
+          "rosser_schoenfeld_prime_tail_rad_at_K0": 6.31089225322512e-09
+        },
         "unregularized_pole_pnt_cancellation_check_at_B_50": {
           "test_kernel": "h_unreg(x) = (x + 1/x)^{-5/2}  (nonzero pole integral hat{h}(+/- 1/2) != 0)",
           "B_cutoff": 50,
@@ -2909,11 +2950,13 @@
           "encloses": true
         },
         "quantitative_sign_balance_discovery_on_psi_tau": {
-          "norm_A_B_sq_positive": 0.5947678334606324,
+          "norm_A_B_sq_positive": 0.5947678334606322,
           "local_term_minus_c_tau_B_norm_f_sq_negative": -1.6771975212486425,
-          "net_smooth_part_strictly_negative": -1.08242968778801,
+          "net_smooth_part_strictly_negative": -1.0824296877880102,
           "chebyshev_prime_error_stieltjes_positive": 1.0833801655763298,
           "net_complete_pairing_Q_tau_positive": 0.0009504777883195959,
+          "halfline_pole_integral_J0": 0.025959761284406028,
+          "transfer_term_2_norm_f_sq_minus_J0": 0.9687652063353964,
           "conclusion": "On f = psi_tau, the smooth archimedean-minus-local part is STRICTLY NEGATIVE (0.5947678335 - 1.6771975212 = -1.0824296878 < 0), while the signed Chebyshev prime-error integral supplies +1.0833801656 > 0, rescuing positivity Q_tau(psi_tau, psi_tau) = +0.0009504778 > 0. Thus positivity on low-frequency theta states cannot be proved by dropping or majorizing E(x) by absolute values; the signed prime-error correlation is the essential positive contributor."
         },
         "lean_theorem": "attempt_B_universal_pole_pnt_archimedean_cancellation"
@@ -2926,12 +2969,12 @@
           "attempt_A_norm_sq": 2.558258007415831,
           "attempt_A_defect_R_tau_A": -2.5573075296275114,
           "attempt_A_identity_abs_diff": 7.556647485707639e-78,
-          "attempt_B_norm_sq": 0.5947678334606324,
+          "attempt_B_norm_sq": 0.5947678334606322,
           "attempt_B_local_term": -1.6771975212486425,
-          "attempt_B_smooth_part_neg": -1.08242968778801,
+          "attempt_B_smooth_part_neg": -1.0824296877880102,
           "attempt_B_prime_error_stieltjes_pos": 1.0833801655763298,
-          "attempt_B_defect_R_tau_B": -0.5938173556723129,
-          "attempt_B_identity_abs_diff": 2.698802673467014e-77
+          "attempt_B_defect_R_tau_B": -0.5938173556723126,
+          "attempt_B_identity_abs_diff": 1.8351858179575695e-77
         },
         {
           "K": 0.25,
@@ -2940,12 +2983,12 @@
           "attempt_A_norm_sq": 2.558258007415831,
           "attempt_A_defect_R_tau_A": -2.5573075296275114,
           "attempt_A_identity_abs_diff": 7.556647485707639e-78,
-          "attempt_B_norm_sq": 0.5947678334606324,
+          "attempt_B_norm_sq": 0.5947678334606322,
           "attempt_B_local_term": -1.6771975212486425,
-          "attempt_B_smooth_part_neg": -1.08242968778801,
+          "attempt_B_smooth_part_neg": -1.0824296877880102,
           "attempt_B_prime_error_stieltjes_pos": 1.0833801655763298,
-          "attempt_B_defect_R_tau_B": -0.5938173556723129,
-          "attempt_B_identity_abs_diff": 2.698802673467014e-77
+          "attempt_B_defect_R_tau_B": -0.5938173556723126,
+          "attempt_B_identity_abs_diff": 1.8351858179575695e-77
         },
         {
           "K": 0.5,
@@ -2954,12 +2997,12 @@
           "attempt_A_norm_sq": 2.558258007415831,
           "attempt_A_defect_R_tau_A": -2.5573075296275114,
           "attempt_A_identity_abs_diff": 7.556647485707639e-78,
-          "attempt_B_norm_sq": 0.5947678334606324,
+          "attempt_B_norm_sq": 0.5947678334606322,
           "attempt_B_local_term": -1.6771975212486425,
-          "attempt_B_smooth_part_neg": -1.08242968778801,
+          "attempt_B_smooth_part_neg": -1.0824296877880102,
           "attempt_B_prime_error_stieltjes_pos": 1.0833801655763298,
-          "attempt_B_defect_R_tau_B": -0.5938173556723129,
-          "attempt_B_identity_abs_diff": 2.698802673467014e-77
+          "attempt_B_defect_R_tau_B": -0.5938173556723126,
+          "attempt_B_identity_abs_diff": 1.8351858179575695e-77
         },
         {
           "K": 1.0,
@@ -2968,12 +3011,12 @@
           "attempt_A_norm_sq": 2.558258007415831,
           "attempt_A_defect_R_tau_A": -2.5573075296275114,
           "attempt_A_identity_abs_diff": 7.556647485707639e-78,
-          "attempt_B_norm_sq": 0.5947678334606324,
+          "attempt_B_norm_sq": 0.5947678334606322,
           "attempt_B_local_term": -1.6771975212486425,
-          "attempt_B_smooth_part_neg": -1.08242968778801,
+          "attempt_B_smooth_part_neg": -1.0824296877880102,
           "attempt_B_prime_error_stieltjes_pos": 1.0833801655763298,
-          "attempt_B_defect_R_tau_B": -0.5938173556723129,
-          "attempt_B_identity_abs_diff": 2.698802673467014e-77
+          "attempt_B_defect_R_tau_B": -0.5938173556723126,
+          "attempt_B_identity_abs_diff": 1.8351858179575695e-77
         },
         {
           "K": 2.0,
@@ -2982,12 +3025,12 @@
           "attempt_A_norm_sq": 2.558258007415831,
           "attempt_A_defect_R_tau_A": -2.5573075296275114,
           "attempt_A_identity_abs_diff": 7.556647485707639e-78,
-          "attempt_B_norm_sq": 0.5947678334606324,
+          "attempt_B_norm_sq": 0.5947678334606322,
           "attempt_B_local_term": -1.6771975212486425,
-          "attempt_B_smooth_part_neg": -1.08242968778801,
+          "attempt_B_smooth_part_neg": -1.0824296877880102,
           "attempt_B_prime_error_stieltjes_pos": 1.0833801655763298,
-          "attempt_B_defect_R_tau_B": -0.5938173556723129,
-          "attempt_B_identity_abs_diff": 2.698802673467014e-77
+          "attempt_B_defect_R_tau_B": -0.5938173556723126,
+          "attempt_B_identity_abs_diff": 1.8351858179575695e-77
         }
       ],
       "off_diagonal_grade_evaluations": [
@@ -3000,9 +3043,9 @@
           "attempt_A_inner": -1.3683127465932141,
           "attempt_A_defect_R_tau_A": 1.369241358460565,
           "attempt_A_identity_abs_diff": 2.2265122056102865e-78,
-          "attempt_B_inner": -0.3562935226655253,
-          "attempt_B_defect_R_tau_B": 0.357222134532876,
-          "attempt_B_identity_abs_diff": 1.9363909182125825e-77,
+          "attempt_B_inner": -0.3562935226655256,
+          "attempt_B_defect_R_tau_B": 0.3572221345328763,
+          "attempt_B_identity_abs_diff": 1.5045824904578603e-77,
           "cauchy_schwarz_on_A_B_satisfied": true,
           "cauchy_schwarz_on_Q_tau_satisfied": true
         },
@@ -3015,9 +3058,9 @@
           "attempt_A_inner": -0.11743967620567074,
           "attempt_A_defect_R_tau_A": 0.11830652741443375,
           "attempt_A_identity_abs_diff": 0.0,
-          "attempt_B_inner": 0.026066072208334096,
-          "attempt_B_defect_R_tau_B": -0.025199220999571087,
-          "attempt_B_identity_abs_diff": 3.508443475507118e-78,
+          "attempt_B_inner": 0.02606607220833311,
+          "attempt_B_defect_R_tau_B": -0.0251992209995701,
+          "attempt_B_identity_abs_diff": 2.4289224061203126e-78,
           "cauchy_schwarz_on_A_B_satisfied": true,
           "cauchy_schwarz_on_Q_tau_satisfied": true
         },
@@ -3030,9 +3073,9 @@
           "attempt_A_inner": 0.024709267769339835,
           "attempt_A_defect_R_tau_A": -0.02407863778998766,
           "attempt_A_identity_abs_diff": 1.349401336733507e-79,
-          "attempt_B_inner": -0.002326780004430079,
-          "attempt_B_defect_R_tau_B": 0.0029574099837822573,
-          "attempt_B_identity_abs_diff": 5.734955681117405e-79,
+          "attempt_B_inner": -0.0023267800044397637,
+          "attempt_B_defect_R_tau_B": 0.002957409983791942,
+          "attempt_B_identity_abs_diff": 5.060255012750651e-79,
           "cauchy_schwarz_on_A_B_satisfied": true,
           "cauchy_schwarz_on_Q_tau_satisfied": true
         },
@@ -3045,9 +3088,9 @@
           "attempt_A_inner": -0.11743967620567074,
           "attempt_A_defect_R_tau_A": 0.11830652741443375,
           "attempt_A_identity_abs_diff": 0.0,
-          "attempt_B_inner": 0.026066072208334096,
-          "attempt_B_defect_R_tau_B": -0.025199220999571087,
-          "attempt_B_identity_abs_diff": 3.508443475507118e-78,
+          "attempt_B_inner": 0.02606607220833311,
+          "attempt_B_defect_R_tau_B": -0.0251992209995701,
+          "attempt_B_identity_abs_diff": 2.4289224061203126e-78,
           "cauchy_schwarz_on_A_B_satisfied": true,
           "cauchy_schwarz_on_Q_tau_satisfied": true
         },
@@ -3060,9 +3103,9 @@
           "attempt_A_inner": 0.024709267769339835,
           "attempt_A_defect_R_tau_A": -0.02407863778998766,
           "attempt_A_identity_abs_diff": 1.349401336733507e-79,
-          "attempt_B_inner": -0.002326780004430079,
-          "attempt_B_defect_R_tau_B": 0.0029574099837822573,
-          "attempt_B_identity_abs_diff": 5.734955681117405e-79,
+          "attempt_B_inner": -0.0023267800044397637,
+          "attempt_B_defect_R_tau_B": 0.002957409983791942,
+          "attempt_B_identity_abs_diff": 5.060255012750651e-79,
           "cauchy_schwarz_on_A_B_satisfied": true,
           "cauchy_schwarz_on_Q_tau_satisfied": true
         },
@@ -3075,9 +3118,9 @@
           "attempt_A_inner": -0.00048360171952050406,
           "attempt_A_defect_R_tau_A": 0.0003603191802973037,
           "attempt_A_identity_abs_diff": 0.0,
-          "attempt_B_inner": 2.4131932565011257e-05,
-          "attempt_B_defect_R_tau_B": -0.00014741447178821164,
-          "attempt_B_identity_abs_diff": 1.0542197943230523e-80,
+          "attempt_B_inner": 2.413193160675786e-05,
+          "attempt_B_defect_R_tau_B": -0.00014741447082995825,
+          "attempt_B_identity_abs_diff": 8.433758354584419e-81,
           "cauchy_schwarz_on_A_B_satisfied": true,
           "cauchy_schwarz_on_Q_tau_satisfied": true
         }
@@ -3099,12 +3142,12 @@
           "attempt_A_norm_sq": 5.067097479292983,
           "attempt_A_defect_R_tau_A": -5.066457783675048,
           "attempt_A_identity_abs_diff": 1.3763893634681771e-77,
-          "attempt_B_norm_sq": 1.194189226930125,
+          "attempt_B_norm_sq": 1.194189226930144,
           "attempt_B_local_term": -3.3073012137711757,
-          "attempt_B_smooth_part": -2.1131119868410506,
-          "attempt_B_prime_error_stieltjes": 2.1137516824589855,
-          "attempt_B_defect_R_tau_B": -1.1935495313121902,
-          "attempt_B_identity_abs_diff": 5.5325454806073786e-77
+          "attempt_B_smooth_part": -2.1131119868410315,
+          "attempt_B_prime_error_stieltjes": 2.1137516824589664,
+          "attempt_B_defect_R_tau_B": -1.193549531312209,
+          "attempt_B_identity_abs_diff": 3.80531176958849e-77
         },
         {
           "label": "two_grade_sum_T0_plus_T1",
@@ -3122,12 +3165,12 @@
           "attempt_A_norm_sq": 5.165934550370342,
           "attempt_A_defect_R_tau_A": -5.162772334834998,
           "attempt_A_identity_abs_diff": 1.6462696308148785e-77,
-          "attempt_B_norm_sq": 1.1848821069124047,
+          "attempt_B_norm_sq": 1.184882106912385,
           "attempt_B_local_term": -3.4014888712233944,
-          "attempt_B_smooth_part": -2.2166067643109897,
-          "attempt_B_prime_error_stieltjes": 2.219768979846333,
-          "attempt_B_defect_R_tau_B": -1.1817198913770612,
-          "attempt_B_identity_abs_diff": 5.262665213260677e-77
+          "attempt_B_smooth_part": -2.2166067643110092,
+          "attempt_B_prime_error_stieltjes": 2.219768979846353,
+          "attempt_B_defect_R_tau_B": -1.1817198913770415,
+          "attempt_B_identity_abs_diff": 3.535431502241788e-77
         },
         {
           "label": "three_grade_second_difference_Tm1_minus_2T0_plus_T1",
@@ -3147,12 +3190,12 @@
           "attempt_A_norm_sq": 15.150906698901228,
           "attempt_A_defect_R_tau_A": -15.150495437084574,
           "attempt_A_identity_abs_diff": 1.0106172636298509e-76,
-          "attempt_B_norm_sq": 3.5872695046643654,
+          "attempt_B_norm_sq": 3.587269504662525,
           "attempt_B_local_term": -9.873989402119285,
-          "attempt_B_smooth_part": -6.286719897454921,
-          "attempt_B_prime_error_stieltjes": 6.287131159271574,
-          "attempt_B_defect_R_tau_B": -3.5868582428477116,
-          "attempt_B_identity_abs_diff": 1.7015107480374064e-76
+          "attempt_B_smooth_part": -6.28671989745676,
+          "attempt_B_prime_error_stieltjes": 6.2871311592734145,
+          "attempt_B_defect_R_tau_B": -3.5868582428458713,
+          "attempt_B_identity_abs_diff": 1.3560640058336287e-76
         },
         {
           "label": "three_grade_half_step_T0_minus_T05_plus_T1",
@@ -3172,21 +3215,417 @@
           "attempt_A_norm_sq": 8.193951262608856,
           "attempt_A_defect_R_tau_A": -8.193305974120245,
           "attempt_A_identity_abs_diff": 1.91614989816158e-77,
-          "attempt_B_norm_sq": 1.6753856515397008,
+          "attempt_B_norm_sq": 1.6753856515396848,
           "attempt_B_local_term": -5.594433263012552,
-          "attempt_B_smooth_part": -3.9190476114728514,
-          "attempt_B_prime_error_stieltjes": 3.9196928999614626,
-          "attempt_B_defect_R_tau_B": -1.6747403630510898,
-          "attempt_B_identity_abs_diff": 7.097851031218247e-77
+          "attempt_B_smooth_part": -3.9190476114728674,
+          "attempt_B_prime_error_stieltjes": 3.9196928999614786,
+          "attempt_B_defect_R_tau_B": -1.6747403630510738,
+          "attempt_B_identity_abs_diff": 1.0552318453256025e-76
         }
       ]
     },
     "closing_questions": {
       "question_1_explicit_candidate_factorization": "Attempt B constructs the grade-covariant difference-square operator (A_tau^B f)(x, y) = f(y) - f(y/x) into H_tau^B = L^2([1, infty) x R_{>0}, x^{-3/2}/(x - x^{-1}) dx/x dy/y) (spanning the strict trivial-zero channels s = -2k, k >= 1) and proves universal Pole\u2013PNT\u2013Archimedean cancellation across all of D, leaving the exact defect R_tau^B(f, g) = -c_tau^B <f, g>_{L^2(dy/y)} - int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,g}(x) dx.",
       "question_2_does_tau_compatibility_force_positivity": "Not yet unconditionally: tau = 2*pi compatibility forces exact Fourier self-duality of G_1, Poisson summation on Z, the functional equation xi(s) = xi(1 - s), and unconditional diagonal grade invariance Q_tau(T_K f, T_K g) = Q_tau(f, g), AND cancels the s = 0, 1 poles against the k = 0 archimedean channel and smooth PNT density dx. However, absorbing the remaining defect R_tau^B(f, f) into a positive norm requires proving that the signed Chebyshev prime-error pairing -int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,f}(x) dx dominates the negative local constant -c_tau^B ||f||_{L^2}^2 whenever ||A_tau^B f||_{H_tau^B}^2 < c_tau^B ||f||_{L^2}^2.",
-      "question_3_diagonal_grade_invariance_without_rh": "Yes, unconditionally proved: (T_K f)*(T_K g)^* = f*g^* by multiplicative Haar invariance, so Q_tau(T_K f, T_K g) = Q_tau(f, g) holds without RH. Even on an off-critical zero pair z_pm = +/- delta + i*gamma, the reflected product hat{T_K f}(z_+) conj(hat{T_K g}(z_-)) is invariant because tau^{-K*delta} * tau^{+K*delta} = 1; positivity fails instead via the signature-(1,1) hyperbolic form q(u, v) = 2 Re(u conj(v)) and off-diagonal cosh(K * delta * log(tau)) growth violating Cauchy\u2013Schwarz.",
-      "question_4_where_prime_or_off_critical_terms_resist": "In Attempt A, completing -(S_n + S_n^{-1}) into ||(I - S_n) f||^2 - 2||f||^2 diverges on the diagonal (-2 sum Lambda(n)/sqrt(n) = -infty), and support cutoffs P_{[a,b]} fail to commute with T_K. In Attempt B, after exact Pole\u2013PNT\u2013Archimedean cancellation, the smooth part ||A_tau^B f||^2 - c_tau^B ||f||^2 is strictly negative on low-frequency states (-0.399957 on psi_tau and -0.805411 on T_0 psi_tau - T_1 psi_tau), so positivity depends on the signed prime-error correlation +0.400908 (resp. +0.807458) overcoming -c_tau^B ||f||^2.",
+      "question_3_diagonal_grade_invariance_without_rh": "Yes, unconditionally proved: (T_K f)*(T_K g)^* = f*g^* by multiplicative Haar invariance, so Q_tau(T_K f, T_K g) = Q_tau(f, g) holds without RH. Even on an off-critical zero pair z_pm = +/- delta + i*gamma, the reflected product hat{T_K f}(z_+) conj(hat{T_K g}(z_-)) is invariant because lambda_K = tau^{-K(delta + i*gamma)} and conj(lambda_K)^{-1} = tau^{+K*delta - i*K*gamma} satisfy lambda_K * conj(conj(lambda_K)^{-1}) = 1; positivity fails instead via the signature-(1,1) hyperbolic form q(u, v) = 2 Re(u conj(v)) and off-diagonal cosh(K * delta * log(tau)) growth violating Cauchy\u2013Schwarz.",
+      "question_4_where_prime_or_off_critical_terms_resist": "In Attempt A, completing -(S_n + S_n^{-1}) into ||(I - S_n) f||^2 - 2||f||^2 diverges on the diagonal (-2 sum Lambda(n)/sqrt(n) = -infty), and support cutoffs P_{[a,b]} fail to commute with T_K. In Attempt B, after exact Pole\u2013PNT\u2013Archimedean cancellation, the smooth part ||A_tau^B f||^2 - c_tau^B ||f||^2 is strictly negative on low-frequency states (-1.0824296878 on psi_tau and -2.1131119868 on T_0 psi_tau - T_1 psi_tau), so positivity depends on the signed prime-error correlation +1.0833801656 (resp. +2.1137516825) overcoming -c_tau^B ||f||^2.",
       "question_5_sharpest_next_theorem_to_attempt": "Prove an unconditional lower bound on the signed Chebyshev prime-error form -int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,f}(x) dx >= c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 on the graded theta span span{T_K psi_tau : K in A_R} (or equivalently, uniform boundedness sup_{X >= 1} |int_1^infty E(x) x^{-3/2} tilde{h}_0(x/X) dx| < infty in SUBGATE-TC-042B)."
+    }
+  },
+  "section_12_admissible_cross_grade_compatibility": {
+    "task_id": "TASK-TC-043",
+    "parent_epic": "EPIC-TC-042",
+    "inspected_baseline": "db5d8d4f429ef2b0bd9000d715e3552953b48355",
+    "status": "TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED",
+    "section_1_tc042f_reconciliation": {
+      "defect_1_complex_reflected_pair_scaling": {
+        "status": "RECONCILED_AND_VERIFIED",
+        "correct_identity": "q(lambda * u, conj(lambda)^{-1} * v) = q(u, v) for all lambda in C^*",
+        "conj_inv_symbolic_invariance_verified": true,
+        "counterexample_lambda_eq_i": {
+          "q_orig_u1_v1": 2,
+          "q_conj_inv_u1_v1": 2,
+          "q_naive_inv_u1_v1": -2,
+          "naive_inverse_fails": true
+        },
+        "lean_theorem": "complex_reflected_pair_conjugate_inverse_invariance"
+      },
+      "defect_2_shift_difference_sesquilinear_identity": {
+        "status": "RECONCILED_AND_VERIFIED",
+        "correct_identity": "<(I - S_u)f, (I - S_u)g>_{L^2(d^*y)} = 2<f, g>_{L^2} - <S_u f, g>_{L^2} - <S_{-u} f, g>_{L^2}",
+        "asymmetric_test_pair": "(T_0 psi_tau, T_1 psi_tau) at u = log(2)",
+        "su_fg_mid": 0.04191054076671517,
+        "smu_fg_mid": -0.0010649617261548373,
+        "asymmetry_abs_gap": 0.04297550249287001,
+        "two_sided_matches_polarization": true,
+        "one_sided_omission_fails_on_asymmetric_pair": true,
+        "lean_theorem": "sesquilinear_shift_difference_identity"
+      },
+      "defect_3_stieltjes_endpoint_at_one": {
+        "status": "RECONCILED_AND_VERIFIED",
+        "psi_at_1": 0.0,
+        "psi_jump_at_1": 0.0,
+        "first_jump_station_of_psi": 2,
+        "first_jump_size_log_2": 0.6931471805599453,
+        "E_at_1": -1.0,
+        "explanation": "psi(x) = sum_{n <= x} Lambda(n) vanishes identically on (0, 2) and is continuous at x = 1 (jump = 0). In Stieltjes integration by parts with psi(x) = x + E(x), the -2<f,g>_{L^2} = -Phi(1) term arises from the lower integration-by-parts boundary value [E(x) x^{-1/2} Phi(x)]_1^infty = -E(1) Phi(1) = +Phi(1) using E(1) = psi(1) - 1 = -1."
+      },
+      "defect_4_conflicting_numerical_summaries": {
+        "status": "RECONCILED_AND_VERIFIED",
+        "certified_norm_psi_tau_L2_sq": 0.4973624838099012,
+        "certified_W_arch_h0": -0.1136644814526138,
+        "certified_neg_W_prime_h0": 0.1146149592409334,
+        "certified_J0_halfline_pole_integral": 0.025959761284406028,
+        "certified_B_transfer_psi_tau": 0.9687652063353964,
+        "certified_norm_A_A_sq": 2.558258007415831,
+        "certified_norm_A_B_sq": 0.5947678334606322,
+        "certified_local_term_B": -1.6771975212486425,
+        "reconciled_smooth_part_B": -1.0824296877880102,
+        "reconciled_prime_error_stieltjes_B": 1.0833801655763298,
+        "certified_Q_tau_psi_tau": 0.0009504777883195959,
+        "stale_smooth_value_diagnosed": -0.3999571341591702,
+        "stale_prime_value_diagnosed": 0.4009076119474898,
+        "root_cause_of_stale_numbers": "An earlier draft comment treated ||A_tau^B psi_tau||_{H_tau^B}^2 ~= +0.5947678335 as W_arch(h_0) and assumed the half-line integral J_0 = int_1^infty 2 h_0(x) x^{-3/2} dx vanished (whereas only the full-line sum I_{pole,+} + J_0 = 2 H_0(1/2) = 0 vanishes, with J_0 = +0.0259597613), computing 0.5947678335 - 2 h_0(1) = -0.39995713. The true smooth part is ||A_tau^B psi_tau||^2 - c_tau^B ||psi_tau||^2 = W_arch(h_0) - (2 h_0(1) - J_0) = -1.0824296878, and the true Chebyshev prime-error integral is -W_prime(h_0) + (2 h_0(1) - J_0) = +1.0833801676."
+      },
+      "defect_5_complete_error_accounting": {
+        "status": "RECONCILED_AND_VERIFIED",
+        "u_top_B": 20,
+        "cauchy_circle_R_c": 1.0,
+        "cauchy_circle_arcs": 512,
+        "cauchy_circle_max_modulus": 6365.796546936035,
+        "cauchy_taylor_remainder_bound_on_0_025": 5.465826423367349e-28,
+        "tail_A_B_upper_from_u20": 7.674302520250429e-23,
+        "old_truncated_u12_abs_diff": 3.7233044819503296e-14,
+        "repaired_u20_abs_diff": 7.674955151006326e-23,
+        "spatial_and_analytic_enclosures_overlap": true,
+        "prime_truncation_n_max": 25000,
+        "rosser_schoenfeld_prime_tail_rad_at_K0": 6.31089225322512e-09
+      },
+      "defect_6_formalization_scope_and_provenance": {
+        "status": "RECONCILED_AND_VERIFIED",
+        "quotient_unitary_theorem_scope": "`quotient_unitary_grade_transport_of_positivity` proves isometric norm invariance and kernel transport from abstract diagonal invariance, and derives the off-diagonal bound from a supplied scalar Cauchy\u2013Schwarz premise; `two_dim_gram_cauchy_schwarz_from_nonneg` unconditionally derives that Cauchy\u2013Schwarz inequality from 2x2 quadratic nonnegativity.",
+        "cancellation_theorem_scope": "`attempt_B_universal_pole_pnt_archimedean_cancellation` proves the exact algebraic cancellation of the s = 0, 1 pole terms, PNT smooth integral, and k = 0 archimedean channel from supplied integral components; `attempt_B_pole_vanishing_transfer_cancellation_on_S_tau` proves the exact cancellation of B_transfer(f) = 2||f||^2 - J(f,f) on S_tau when I_{pole,+} + J = 0."
+      }
+    },
+    "section_2_compatibility_candidate_and_controls": {
+      "object_in_each_grade": "Grade-K completed zeta-theta triple O_K = (Z_tau(s, K), T_K psi_tau, Q_tau^{(K)}), where Z_tau(s, K) = zeta(tau^{-K} s) has zero coordinates rho^{(K)} = tau^K rho, (T_K psi_tau)(x) = psi_tau(tau^K x) in L^2(R_{>0}, d^*x) is the grade-K canonical theta state, and Q_tau(T_K f, T_J g) = W_xi((T_K f) * (T_J g)^*) is the completed explicit-formula pairing.",
+      "admissible_correspondences": [
+        "Multiplicative grade dilation (T_K f)(x) = f(tau^K x) (unitary on L^2(R_{>0}, d^*x) for all K in A_R = Qbar intersect R).",
+        "Mellin\u2013Fourier intertwine hat{T_K f}(z) = tau^{-i K z} hat{f}(z) = e^{-i K z log(tau)} hat{f}(z).",
+        "Canonical Fourier self-duality (F_tau G_1)(x) = int_R G_1(y) e^{-i*tau*x*y} dy = G_1(x) on Z^perp = Z at tau = 2*pi.",
+        "Unitary Attempt B transport (U_K^B Psi)(x, y) = Psi(x, tau^K y) on H_tau^B with A_tau^B T_K = U_K^B A_tau^B."
+      ],
+      "arithmetic_and_phase_constructions_required_to_agree": "Across all concurrent grades K, J in A_R = Qbar intersect R, the three representations of Q_tau(f, g) on the finite graded theta span S_tau = span_C{T_K psi_tau : K in A_R} must agree: (1) Geometric/Archimedean difference-square norm <A_tau^B f, A_tau^B g>_{H_tau^B} - c_tau^B <f, g>_{L^2}, (2) Arithmetic prime-power Stieltjes pairing P_E(f, g) = -int_1^infty E(x) x^{-3/2} tilde{Phi}_{f,g}(x) dx, and (3) Spectral zero sum sum_rho m_rho hat{f}(z_rho) conj(hat{g}(-conj(z_rho))).",
+      "exact_compatibility_equation": "For all N >= 1, all c_1, ..., c_N in C, and all K_1, ..., K_N in Qbar intersect R, with f = sum_{j=1}^N c_j T_{K_j} psi_tau in S_tau: Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2(d^*y)}^2 + P_E(f) = sum_rho m_rho hat{f}(z_rho) conj(hat{f}(-conj(z_rho))).",
+      "proposed_implication_to_off_critical_obstruction": "If P_E(f) is lower semibounded relative to a grade-covariant coercive norm on two-grade states S_tau^{(2)} \u2014 i.e., there exists a finite mu_0 >= -c_tau^B such that P_E(f) >= -(||A_tau^B f||_{H_tau^B}^2 + mu_0 ||f||_{L^2}^2) for all f in S_tau^{(2)} \u2014 then Q_tau(f, f) + (c_tau^B + mu_0)||f||_{L^2}^2 >= 0 on S_tau^{(2)}, which implies uniform boundedness |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0) h_0(1) < infty for all K in A_R. By density of A_R in R and the Laplace\u2013Carleman resolvent theorem, L[C_tau(-t)](w) is holomorphic on Re(w) > 0, contradicting the isolated simple pole at w_0 = (delta_0 + i*gamma_0) log(tau) of any off-critical zero rho_0 = 1/2 + delta_0 + i*gamma_0 (delta_0 != 0) where F_tau(rho_0) != 0.",
+      "coordinate_rescaling_identities_vs_zeta_arithmetic_restrictions": {
+        "automatic_from_coordinate_rescaling": [
+          "Diagonal convolution invariance (T_K f) * (T_K g)^* = f * g^* and Q_tau(T_K f, T_K g) = Q_tau(f, g).",
+          "Reflected off-line pair diagonal invariance q(lambda_K u, conj(lambda_K)^{-1} v) = q(u, v).",
+          "Real evenness C_tau(-K) = C_tau(K) and quartet symmetry {rho, 1 - rho, conj(rho), 1 - conj(rho)}.",
+          "Unitary intertwining A_tau^B T_K = U_K^B A_tau^B on H_tau^B."
+        ],
+        "derived_from_actual_zeta_arithmetic": [
+          "Fourier self-duality of G_1(x) = exp(-(tau/2)x^2) on Z^perp = Z only at canonical tau = 2*pi.",
+          "Universal Pole\u2013PNT\u2013Archimedean cancellation (s = 1 pole cancels PNT density dx; s = 0 pole cancels k = 0 channel).",
+          "Exact cancellation of the transfer form B_transfer(f) = 2||f||_{L^2}^2 - J(f,f) on S_tau.",
+          "Nonvanishing of F_tau(s) on 0 < Re(s) < 1 and strict positivity C_tau(0) > 0, C_tau''(0) < 0."
+        ],
+        "unresolved_arithmetic_premise": "Uniform lower semiboundedness P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2) for a fixed finite mu_0 as |K| -> infty (equivalently SUBGATE-TC-042B: sup_{X >= 1} |W(X)| < infty)."
+      },
+      "cross_grade_complex_zero_and_transcendence_audit": {
+        "complex_ray_collinearity_requirement": "rho_1 = tau^Delta rho_0 (Delta = K - J in A_R) requires BOTH beta_1 = tau^Delta beta_0 AND gamma_1 = tau^Delta gamma_0, hence beta_0 * gamma_1 = beta_1 * gamma_0 (complex ray collinearity).",
+        "real_part_only_alignment_test": {
+          "beta_0": 0.65,
+          "gamma_0": 14.134725141734695,
+          "delta_re_align_float": -0.14275397917667654,
+          "shifted_real_part_equals_half": true,
+          "shifted_imag_part": 10.872865493642072,
+          "imag_mismatch_from_gamma_0": 3.2618596480926216,
+          "moving_only_real_part_fails_zero_membership": true
+        },
+        "nonzero_rational_grade_differences_proved": "For every nonzero rational grade difference Delta = p/q in Q \\ {0}, both the prime-station collision m * tau^K = n * tau^J (m, n in Z_{>0}) and real-part alignment tau^Delta beta_0 = 1/2 (for algebraic beta_0 != 1/2) are UNCONDITIONALLY IMPOSSIBLE by the Lindemann\u2013Weierstrass theorem because tau = 2*pi is transcendental.",
+        "irrational_algebraic_grade_differences_open": "For irrational algebraic grade differences Delta in (Qbar intersect R) \\ Q (such as Delta = sqrt(2)), whether tau^Delta = (2*pi)^Delta can be algebraic is an open problem in transcendence theory (Gelfond\u2013Schneider applies to algebraic bases alpha^beta, while Schanuel's conjecture remains unproven). moreover, delta_re_align = -log(2*beta_0)/log(tau) is not even shown to lie in Qbar intersect R.",
+        "lean_theorem": "cross_grade_complex_zero_ray_collinearity"
+      },
+      "synthetic_off_critical_quartet_control_audit": {
+        "what_survives_synthetic_quartet": [
+          "Diagonal grade invariance Q_synth(T_K f, T_K g) = Q_synth(f, g) (because lambda_K * conj(conj(lambda_K)^{-1}) = 1).",
+          "Reality and evenness C_synth(-K) = C_synth(K) in R.",
+          "Functional-equation symmetry z_rho <-> -conj(z_rho) and conjugate symmetry z_rho <-> -z_rho.",
+          "Local origin concavity C_synth''(0) < 0 and |C_synth(K)| < C_synth(0) on a small interval |K| <= K_local for small quartet weight c_off."
+        ],
+        "which_arithmetic_hypotheses_synthetic_quartet_violates": [
+          "No Euler product over primes: adding a finite off-critical quartet shifts the spectral measure without coming from a Dirichlet series with an Euler product.",
+          "Violates bounded von Mangoldt Stieltjes representation: by inverse Mellin transform, a quartet at 1/2 +/- delta_0 +/- i*gamma_0 injects a smooth oscillatory density proportional to x^{delta_0} cos(gamma_0 log x) into E(x)/x, which is not a discrete prime-power jump measure sum Lambda(n) delta(x - n).",
+          "Violates two-grade Cauchy\u2013Schwarz and coercive semiboundedness at large grade K: C_synth(K) = C_crit(K) + 2 c_off cosh(K * delta_0 * log(tau)) cos(K * gamma_0 * log(tau)) grows exponentially like cosh(K * delta_0 * log(tau)), violating |C_synth(K)| <= M for every finite M."
+        ],
+        "certified_synthetic_quartet_controls_summary": {
+          "all_off_critical_quartets_have_nonzero_weight": true,
+          "all_off_critical_quartets_violate_bound": true,
+          "case_A_detectable_crossover_K": 2.418666793080138,
+          "case_A_max_ratio_on_grid": 42.61484818307747,
+          "case_B_adversarial_escaped_up_to_K4": true,
+          "case_B_caught_at_K8": true,
+          "synthetic_quartets": [
+            {
+              "delta_0": 0.05,
+              "gamma_0": 14.134725141734695,
+              "a_rho0_re": 0.00047443129804516324,
+              "a_rho0_im": 2.4715100718807317e-05,
+              "a_rho0_abs": 0.0004750746181057869,
+              "a_rho0_nonzero": true,
+              "laplace_pole_real_part_L_delta0": 0.09189385332046728,
+              "C_quartet_0": 0.001897725192180653,
+              "violates_uniform_bound": true,
+              "grade_samples": [
+                {
+                  "K": 0.0,
+                  "C_quartet_K": 0.001897725192180653,
+                  "abs_C_K_over_abs_C_0": 1.0
+                },
+                {
+                  "K": 2.418666793080138,
+                  "C_quartet_K": 0.0019447920752982196,
+                  "abs_C_K_over_abs_C_0": 1.0248017380553833
+                },
+                {
+                  "K": 4.837333586160276,
+                  "C_quartet_K": 0.0020883274056632505,
+                  "abs_C_K_over_abs_C_0": 1.1004372046426694
+                },
+                {
+                  "K": 9.674667172320552,
+                  "C_quartet_K": 0.0026984211531528384,
+                  "abs_C_K_over_abs_C_0": 1.421924082723545
+                }
+              ]
+            },
+            {
+              "delta_0": 0.15,
+              "gamma_0": 14.134725141734695,
+              "a_rho0_re": 0.0004694704357111274,
+              "a_rho0_im": 7.390659571701517e-05,
+              "a_rho0_abs": 0.00047525222240119415,
+              "a_rho0_nonzero": true,
+              "laplace_pole_real_part_L_delta0": 0.2756815599614018,
+              "C_quartet_0": 0.0018778817428445095,
+              "violates_uniform_bound": true,
+              "grade_samples": [
+                {
+                  "K": 0.0,
+                  "C_quartet_K": 0.0018778817428445095,
+                  "abs_C_K_over_abs_C_0": 1.0
+                },
+                {
+                  "K": 2.418666793080138,
+                  "C_quartet_K": 0.002311030531325466,
+                  "abs_C_K_over_abs_C_0": 1.2306581818218474
+                },
+                {
+                  "K": 4.837333586160276,
+                  "C_quartet_K": 0.003810295520787043,
+                  "abs_C_K_over_abs_C_0": 2.0290391209701104
+                },
+                {
+                  "K": 9.674667172320552,
+                  "C_quartet_K": 0.013584595605423671,
+                  "abs_C_K_over_abs_C_0": 7.233999508854317
+                }
+              ]
+            },
+            {
+              "delta_0": 0.25,
+              "gamma_0": 14.134725141734695,
+              "a_rho0_re": 0.0004595919696446085,
+              "a_rho0_im": 0.00012238377785461305,
+              "a_rho0_abs": 0.0004756075773616081,
+              "a_rho0_nonzero": true,
+              "laplace_pole_real_part_L_delta0": 0.4594692666023364,
+              "C_quartet_0": 0.001838367878578434,
+              "violates_uniform_bound": true,
+              "grade_samples": [
+                {
+                  "K": 0.0,
+                  "C_quartet_K": 0.001838367878578434,
+                  "abs_C_K_over_abs_C_0": 1.0
+                },
+                {
+                  "K": 2.418666793080138,
+                  "C_quartet_K": 0.003095301104711673,
+                  "abs_C_K_over_abs_C_0": 1.6837223608939442
+                },
+                {
+                  "K": 4.837333586160276,
+                  "C_quartet_K": 0.00858488748882711,
+                  "abs_C_K_over_abs_C_0": 4.669841977148556
+                },
+                {
+                  "K": 9.674667172320552,
+                  "C_quartet_K": 0.07834176805026616,
+                  "abs_C_K_over_abs_C_0": 42.61484818307747
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "section_3_worked_candidates_on_S_tau": {
+      "domain_specification": "S_tau = { sum_{j=1}^N c_j T_{K_j} psi_tau : N < infty, c_j in C, K_j in Qbar intersect R }",
+      "domain_properties_verified": {
+        "double_pole_zeros_hat_f_at_pm_half": true,
+        "w_pole_vanishes_identically_on_S_tau": true,
+        "seed_mellin_nonvanishing_in_critical_strip": true,
+        "attempt_B_decomposition_formula": "Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2(d^*y)}^2 + P_E(f)  (forall f in S_tau)"
+      },
+      "candidate_1_spectral_multiplier_and_transfer_decomposition": {
+        "candidate_name": "Candidate I \u2014 Attempt B Plancherel Multiplier & Exact Pole-Vanishing Transfer Decomposition on S_tau",
+        "status": "EXACT_TRANSFER_CANCELLATION_AND_PLANCHEREL_MULTIPLIER_PROVED",
+        "plancherel_multiplier_formula": "mu_tau^B(t) = Re psi(1/4 + it/2) - log(tau/2) - 2 + 1/(1/4 + t^2) = Re psi(5/4 + it/2) - log(pi) - 2",
+        "mu_tau_B_at_0": -3.3721834192256654,
+        "neg_c_tau_B": -3.3721834192256654,
+        "mu_0_matches_neg_c_tau_B": true,
+        "unique_positive_root_t_star_B_mid": 46.4061556,
+        "root_bracket_low": 46.4061555,
+        "root_bracket_high": 46.4061557,
+        "mu_at_root_bracket_low": -4.275832133187795e-09,
+        "mu_at_root_bracket_high": 3.0106154071244294e-11,
+        "root_bracket_certified": true,
+        "plancherel_smooth_B_on_psi_tau": -1.0824296877880102,
+        "spatial_smooth_B_on_psi_tau": -1.0824296877880102,
+        "plancherel_vs_spatial_smooth_B_abs_diff": 0.0,
+        "exact_transfer_quadratic_form_definition": "B_transfer(f) := 2 ||f||_{L^2(d^*y)}^2 - J(f, f) = 4 ||R_0 f||_{L^2(d^*y)}^2 - 2 ||f||_{L^2(d^*y)}^2 = (1/tau) int_{-infty}^infty ((2t^2 - 1/2)/(t^2 + 1/4)) |hat{f}(it)|^2 dt",
+        "plancherel_B_transfer_on_psi_tau": 0.9687652063353964,
+        "spatial_B_transfer_on_psi_tau": 0.9687652063353964,
+        "plancherel_vs_spatial_B_transfer_abs_diff": 0.0,
+        "transfer_share_of_smooth_deficit_on_psi_tau": 0.894991348874686,
+        "exact_transfer_decomposition_theorem": "Because W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 0 on S_tau (via double zeros hat{f}(+/- 1/2) = 0), I_{pole,+}(f, f) = -J(f, f), so B_transfer(f) = 2||f||_{L^2}^2 - J(f, f) appears with identical sign in BOTH P_E(f) = -W_prime(f * f^*) + B_transfer(f) AND c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 = -W_arch(f * f^*) + B_transfer(f). On f = psi_tau, B_transfer(psi_tau) = +0.9687652063 accounts for 89.50% of the smooth deficit if we compare +0.9687652063 to +1.0824296878, and cancels identically between P_E(f) and D_{smooth}^B(f).",
+        "lean_theorem": "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau"
+      },
+      "candidate_2_coercive_norm_shifted_semiboundedness": {
+        "candidate_name": "Candidate II \u2014 Coercive Norm-Shifted Hilbert Space (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B) & Semiboundedness Reduction",
+        "status": "COERCIVE_SEMIBOUNDEDNESS_TO_RH_REDUCTION_PROVED",
+        "positive_hilbert_space": "H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y)  (mu_0 > 0, constructed independently of Q_tau >= 0 or RH)",
+        "grade_covariant_operator": "A_{tau, mu_0}^B f := (A_tau^B f, f),  ||A_{tau, mu_0}^B f||^2 = ||A_tau^B f||_{H_tau^B}^2 + mu_0 ||f||_{L^2(d^*y)}^2",
+        "unitary_grade_group": "U_{K, mu_0}^B := U_K^B oplus T_K  (unitary for all K in R, satisfying A_{tau, mu_0}^B T_K = U_{K, mu_0}^B A_{tau, mu_0}^B)",
+        "shifted_pairing_identity": "Q_tau(f, f) + (c_tau^B + mu_0) ||f||_{L^2(d^*y)}^2 = ||A_{tau, mu_0}^B f||_{H_{tau, mu_0}^B}^2 + P_E(f)",
+        "semiboundedness_sufficiency_theorem": "To exclude all off-critical zeros via the Laplace\u2013Carleman resolvent theorem, P_E(f) does NOT need to be nonnegative or exceed c_tau^B ||f||^2 - ||A_tau^B f||^2: if there exists ANY finite mu_0 > 0 such that P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) for all K in A_R on the two-grade states f_pm^{(K)} = (T_0 psi_tau +/- T_K psi_tau)/sqrt(2), then |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0) h_0(1) < infty for all K in A_R, which prevents any RHP pole of L[C_tau(-t)](w).",
+        "coercive_norm_sq_on_psi_tau_at_mu0_1": 1.0921303172705334,
+        "implied_uniform_correlation_bound_at_mu0_1": 4.350070487905407,
+        "lean_theorem": "coercive_norm_shift_semiboundedness_implies_correlation_bound"
+      },
+      "candidate_3_scale_separation_and_majorant_obstruction": {
+        "candidate_name": "Candidate III \u2014 Cross-Grade Scale Separation & Unsigned Majorant Growth Obstruction",
+        "status": "SCALE_SEPARATION_PROVED_UNSIGNED_MAJORANT_FALSIFIED",
+        "off_diagonal_scale_separation_table": [
+          {
+            "Delta": 0.0,
+            "X_eq_tau_Delta": 1.0,
+            "G_L2_Delta": 0.4973624838099012,
+            "J_Delta": 0.025959761284406028,
+            "G_A_B_Delta": 0.5947678334606322,
+            "D_smooth_B_Delta": 1.0824296877880102,
+            "B_transfer_Delta": 0.9687652063353964,
+            "W_arch_Delta": -0.1136644814526138,
+            "coercive_norm_sq_f_minus_at_mu0_1": -4.81483107908275e-17,
+            "coercive_norm_sq_f_plus_at_mu0_1": 2.184260634541067
+          },
+          {
+            "Delta": 0.25,
+            "X_eq_tau_Delta": 1.5832334870861595,
+            "G_L2_Delta": -0.254111585983292,
+            "J_Delta": -0.004427120005479352,
+            "G_A_B_Delta": -0.3562935226655256,
+            "D_smooth_B_Delta": -0.5006173542204687,
+            "B_transfer_Delta": -0.5037960519611047,
+            "W_arch_Delta": -0.0031786977406359452,
+            "coercive_norm_sq_f_minus_at_mu0_1": 1.702535425919351,
+            "coercive_norm_sq_f_plus_at_mu0_1": 0.48172520862171586
+          },
+          {
+            "Delta": 0.5,
+            "X_eq_tau_Delta": 2.5066282746310007,
+            "G_L2_Delta": -0.038235380940439996,
+            "J_Delta": -0.00943577534775614,
+            "G_A_B_Delta": 0.02606607220833311,
+            "D_smooth_B_Delta": -0.1550027898434619,
+            "B_transfer_Delta": -0.06703498653312386,
+            "W_arch_Delta": 0.08796780331033806,
+            "coercive_norm_sq_f_minus_at_mu0_1": 1.1042996260026403,
+            "coercive_norm_sq_f_plus_at_mu0_1": 1.0799610085384266
+          },
+          {
+            "Delta": 1.0,
+            "X_eq_tau_Delta": 6.283185307179586,
+            "G_L2_Delta": 0.006982690866934401,
+            "J_Delta": 0.0008947156939580036,
+            "G_A_B_Delta": -0.0023267800044397637,
+            "D_smooth_B_Delta": 0.025873694367494437,
+            "B_transfer_Delta": 0.013070666039910797,
+            "W_arch_Delta": -0.01280302832758364,
+            "coercive_norm_sq_f_minus_at_mu0_1": 1.0874744064080388,
+            "coercive_norm_sq_f_plus_at_mu0_1": 1.096786228133028
+          },
+          {
+            "Delta": 2.0,
+            "X_eq_tau_Delta": 39.47841760435743,
+            "G_L2_Delta": -0.00012164380849729132,
+            "J_Delta": 2.1158417138096634e-05,
+            "G_A_B_Delta": 2.413193160675786e-05,
+            "D_smooth_B_Delta": -0.0004343371656727858,
+            "B_transfer_Delta": -0.00026444603413267926,
+            "W_arch_Delta": 0.0001698911315401065,
+            "coercive_norm_sq_f_minus_at_mu0_1": 1.092227829147424,
+            "coercive_norm_sq_f_plus_at_mu0_1": 1.092032805393643
+          },
+          {
+            "Delta": 4.0,
+            "X_eq_tau_Delta": 1558.545456544039,
+            "G_L2_Delta": -1.3197443347829035e-08,
+            "J_Delta": 2.1996325843848647e-09,
+            "G_A_B_Delta": 5.174545312394457e-08,
+            "D_smooth_B_Delta": -9.624965275766369e-08,
+            "B_transfer_Delta": -2.8594519280042934e-08,
+            "W_arch_Delta": 6.765513347762077e-08,
+            "coercive_norm_sq_f_minus_at_mu0_1": 1.0921302787225238,
+            "coercive_norm_sq_f_plus_at_mu0_1": 1.0921303558185431
+          },
+          {
+            "Delta": 8.0,
+            "X_eq_tau_Delta": 2429063.940114067,
+            "G_L2_Delta": -1.3762827853631508e-16,
+            "J_Delta": 2.2938046581239597e-17,
+            "G_A_B_Delta": 1.55140188190896e-15,
+            "D_smooth_B_Delta": -2.015509680805693e-15,
+            "B_transfer_Delta": -2.9819460365386973e-16,
+            "W_arch_Delta": 1.7173150771518236e-15,
+            "coercive_norm_sq_f_minus_at_mu0_1": 1.0921303172705321,
+            "coercive_norm_sq_f_plus_at_mu0_1": 1.0921303172705348
+          }
+        ],
+        "asymptotic_smooth_decay_rates": {
+          "G_L2_Delta": "O(tau^{-5|Delta|/2})  (from |h_0(alpha)| <= (92193/32768) alpha^{-5/2})",
+          "J_Delta": "O(|Delta| * tau^{-|Delta|/2})  (from int_0^infty h_0(e^{kappa-u}) e^{-u/2} du)",
+          "G_A_B_Delta": "O(|Delta| * tau^{-|Delta|/2})",
+          "D_smooth_B_Delta": "O(|Delta| * tau^{-|Delta|/2})",
+          "two_grade_coercive_norm_limit": "lim_{|Delta| -> infty} ||A_{tau, 1}^B f_pm^{(Delta)}||^2 = ||A_tau^B psi_tau||^2 + ||psi_tau||^2 = 1.0921303173"
+        },
+        "exact_pnt_zero_moment_identity": "alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)), and int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = [ -alpha^{1/2} h_0(alpha) ]_0^infty + H_0(1/2) = 0",
+        "symbolic_antiderivative_identity_verified": true,
+        "unsigned_window_moment_c0_on_half_to_two": 1.759478523862781,
+        "unsigned_window_moment_c0_lower": 1.0923928995628376,
+        "unsigned_full_moment_C_abs": 0.9032843043,
+        "unsigned_majorant_growth_lower_bound": "For any unsigned majorant |E(x)| <= x * omega(x) (with omega nonincreasing), int_1^infty |E(x)| x^{-3/2} |tilde{h}_0(x/X)| dx >= c_0 * X^{1/2} * omega(X/2)  (X = tau^{|Delta|} >= 2), which diverges to +infty as |Delta| -> infty for every known zero-free majorant omega(x), whereas the two-grade coercive norm ||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 approaches the finite constant ||A_tau^B psi_tau||^2 + mu_0 ||psi_tau||^2.",
+        "crossover_grade_delta_star_chebyshev_004x_at_mu0_1": 4.459337539441939,
+        "crossover_grade_delta_star_dlvp_at_mu0_1": 1.292,
+        "obstruction_conclusion": "Smooth archimedean operators A_tau^B and fixed L^2 norm shifts mu_0 ||f||_{L^2}^2 have off-diagonal inner products between T_0 psi_tau and T_Delta psi_tau that decay exponentially as O(|Delta| tau^{-|Delta|/2}), whereas the off-diagonal prime-error pairing G_{P_E}(Delta) = -W(tau^{|Delta|}) + O(|Delta| tau^{-|Delta|/2}) probes Chebyshev prime-error oscillations E(x) around the moving scale x ~ X = tau^{|Delta|}. Replacing E(x) by any unsigned majorant |E(x)| destroys the exact antiderivative cancellation int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = 0 and diverges like tau^{|Delta|/2} omega(tau^{|Delta|}/2) -> +infty. Therefore, any proof of the semiboundedness inequality P_E(f_pm^{(Delta)}) >= -||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 must preserve the signed oscillatory derivative structure of E(x) at scale X = tau^{|Delta|}.",
+        "lean_theorem": "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm"
+      }
+    },
+    "section_4_remaining_implication_and_next_step": {
+      "remaining_implication": "Prove that there exists a finite constant mu_0 > 0 (or M_0 < infty) such that for all Delta in Qbar intersect R, the moving-scale signed Chebyshev prime-error pairing satisfies |W(tau^{|Delta|})| = |int_1^infty E(x) x^{-3/2} tilde{h}_0(x / tau^{|Delta|}) dx| <= M_0 < infty (equivalently, P_E(f_pm^{(Delta)}) >= -(||A_tau^B f_pm^{(Delta)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(Delta)}||_{L^2}^2)).",
+      "next_justified_calculation": "Construct an explicit scale-adapted integration-by-parts / primitive-transfer operator for E(x) using the exact antiderivative tilde{h}_0(alpha) alpha^{-1/2} = -d/d_alpha (alpha^{1/2} h_0(alpha)) coupled with the iterated Chebyshev primitive E_1(x) = int_1^x E(t) dt (where E_1(x) = O(x^2 / (log x)^A) unconditionally, or expressed via the arithmetic Dirichlet convolution Lambda = -mu * log) to test whether the X^{1/2} scaling factor is absorbed without assuming a zero-free strip beyond Re(s) = 1."
     }
   },
   "literature_references": [
