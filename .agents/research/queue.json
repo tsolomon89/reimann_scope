@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-044",
+  "active_task_id": "TASK-TC-045",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1407,6 +1407,34 @@
         ".agents/corpus_map/obligation_register.md"
       ],
       "resolution": "TASK-TC-044 narrow corrections (Step 2), prime-shift quadratic form D_N(f) analysis (Step 3), unconditional divisor-aggregated W_log(X) bound <= 3.34901 and exact Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) (Step 4), and modified-weight / synthetic quartet divisor-aggregation controls (Step 5) completed and certified; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN via Moebius De-Aggregation Cancellation Lemma, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 62 Lean declarations (22 def + 40 theorems, 741 total theorems, 0 sorry, 0 admit) compiled; 27/27 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
+    },
+    {
+      "task_id": "TASK-TC-045",
+      "epic_id": "EPIC-TC-042",
+      "priority": 57,
+      "objective": "Cross-Grade Compatibility and Moebius Recovery of the Actual Arithmetic Profile (TASK-TC-045 / SUBGATE-TC-043A)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Prove or falsify SUBGATE-TC-043A (MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE) via the Moebius De-Aggregation / Mertens Stieltjes Cancellation Lemma: given that Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| <= 9.276789 < 9.4468 and R_mu(X) = sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du, prove or falsify that sup_{X>=1} |R_mu(X)| < infty (equivalently sup_{K in A_R} |R_mu(tau^{|K|})| < infty by continuity and density of A_R in R).",
+      "planned_calculation": "1) Section 2: Recover W(X), W_log(X) = sum_{m>=1} m^{-1/2}W(X/m) = sum_{k>=2} (log k / sqrt(k))h_0(k/X), unconditional bound |W_log(X)| < 3.34901, W_log(X) = O(X^{-1/2}log(X+2)), exact Moebius inversion W(X) = W_log(X) + R_mu(X), boundedness equivalence sup_{X>=1}|R_mu(X)| < infty <=> sup_{X>=1}|W(X)| < infty, and complete implication chain to |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1) preserving all boundary terms, both scale directions, and normalization factors. 2) Section 3: Repair TC-044 Defect 3A (Mellin convention M_X[F](z) = int_0^infty F(X)X^{-z}dX/X, H_0(z) = int_0^infty h_0(alpha)alpha^z dalpha/alpha, absolute-convergence strip 1/2 < Re(z) < 5/2 via Fubini-Tonelli, meromorphic continuation, and Euler-Maclaurin pole-subtracted regularization lim_{M->infty}(sum_{m=1}^M m^{-rho_0} - M^{1-rho_0}/(1-rho_0) - (1/2)M^{-rho_0}) = zeta(rho_0)) and Defect 3B (outward-rounded Arb ball serialization serialize_arb_certified / verify_serialized_arb_roundtrip with round-trip enclosure verification). 3) Section 4: Prove small-scale bound |W_log(u)| <= C_{log,0} u^{5/2} (C_{log,0} = (92193/32768)(-zeta'(3)) ~ 0.5574295848) for all u > 0, uniform convergence of R_mu(X) on compact intervals [a, b] subset (0, infty), continuity of W_log, R_mu, W on (0, infty), and sup_{K in A_R}|R_mu(tau^{|K|})| = sup_{X>=1}|R_mu(X)|. 4) Section 5: Polarize mixed-grade pairing Q_tau(T_K psi_tau, T_L psi_tau) = C_tau(|K-L|) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| <= 9.276789 < 9.4468 (formalized in mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence), prove simultaneous-grade covariance and continuous Hermitian Toeplitz counterexample control K_model(K, L), and derive and certify the exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du (formalized in small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity).",
+      "acceptance_criterion": "All 28 tests in tests/test_tc_canonical_theta_correlation_bound.py passing; formal/RiemannScope/CanonicalThetaCorrelationBound.lean compiled with 66 declarations (24 def + 42 theorems, 743 total compiled theorems, 0 sorry, 0 admit); data/tc_canonical_theta_correlation_bound.json and docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md updated and reconciled; SUBGATE-TC-043A kept OPEN alongside SUBGATE-TC-042A and SUBGATE-TC-042B.",
+      "dependencies": [
+        "TASK-TC-044"
+      ],
+      "evidence": [
+        "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+        "scripts/build_formal.py",
+        "tc/canonical_theta_correlation_bound.py",
+        "tests/test_tc_canonical_theta_correlation_bound.py",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "data/tc_canonical_theta_correlation_bound.json",
+        "formal/RiemannScope/README.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "TASK-TC-045 established arithmetic baseline recovery (Section 2), TC-044 Mellin strip / Euler-Maclaurin regularization and outward-rounded Arb ball serialization repairs (Section 3), small-scale tail bound |W_log(u)| <= C_{log,0} u^{5/2}, continuity on (0, infty), and supremum equivalence over A_R vs R (Section 4), and mixed-grade polarization Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}), simultaneous-grade covariance + Toeplitz counterexample control, and exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du (Section 5) completed and certified; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN via Moebius De-Aggregation / Mertens Stieltjes Cancellation Lemma, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 66 Lean declarations (24 def + 42 theorems, 743 total theorems, 0 sorry, 0 admit) compiled; 28/28 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
     }
   ]
 }

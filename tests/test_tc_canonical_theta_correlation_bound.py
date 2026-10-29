@@ -17,6 +17,7 @@ from tc.canonical_theta_correlation_bound import (
     CANONICAL_THETA_CORRELATION_LEAN_DEFS,
     CANONICAL_THETA_CORRELATION_LEAN_THEOREMS,
     CLOSED_FORM_AUTOCORRELATION_PROVED,
+    CROSS_GRADE_MOEBIUS_RECOVERY_STATUS,
     DEFAULT_ARTIFACT_PATH,
     EPIC_TC_042_ID,
     FINITE_GRID_CORRELATION_BOUND_CERTIFIED,
@@ -30,6 +31,7 @@ from tc.canonical_theta_correlation_bound import (
     SUBGATE_TC_042A_ID,
     SUBGATE_TC_042A_STATUS,
     TASK_TC_042_ID,
+    TASK_TC_045_ID,
     UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN,
     audit_rh_equivalence_and_laplace_resolvent,
     compute_unconditional_spectral_tail_bound_arb,
@@ -45,7 +47,9 @@ from tc.canonical_theta_correlation_bound import (
     evaluate_local_concavity_and_derivatives_at_zero,
     evaluate_synthetic_off_critical_quartet_controls,
     evaluate_tau_scaling_controls,
+    serialize_arb_certified,
     verify_canonical_theta_correlation_lean_module,
+    verify_serialized_arb_roundtrip,
 )
 
 
@@ -292,7 +296,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 22 defs, 40 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 24 defs, 42 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,8 +304,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 22
-    assert len(ver["actual_theorems"]) == 40
+    assert len(ver["actual_defs"]) == 24
+    assert len(ver["actual_theorems"]) == 42
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -1253,6 +1257,198 @@ def test_27_task_tc044_prime_shift_quadratic_form_and_divisor_aggregation(
     sq_ctrl = sec5["synthetic_off_critical_quartet_divisor_aggregation_control"]
     assert sq_ctrl["zeta_at_rho_0_certified_nonzero"] is True
     assert sq_ctrl["abs_divisor_aggregated_quartet_amplitude_mid"] > 0.0
+    assert (
+        sq_ctrl["mellin_convention_and_common_strip"][
+            "common_absolute_convergence_strip"
+        ]
+        == "1/2 < Re(z) < 5/2"
+    )
+    assert (
+        sq_ctrl["isolated_mode_divergence_and_regularization"][
+            "regularized_error_below_1e_3"
+        ]
+        is True
+    )
+
+
+def test_28_task_tc045_cross_grade_moebius_recovery_and_serialization_roundtrip(
+    artifact_payload,
+):
+    """Verify TASK-TC-045 cross-grade compatibility, Moebius recovery, Mellin strip & regularization, continuity, Mertens IBP, and round-trip Arb enclosure."""
+    assert artifact_payload["moebius_recovery_task_id"] == TASK_TC_045_ID
+    dims = artifact_payload["status_dimensions"]
+    assert (
+        dims["cross_grade_moebius_recovery_status"]
+        == CROSS_GRADE_MOEBIUS_RECOVERY_STATUS
+    )
+    assert dims["rh_proved"] is False
+
+    sec14 = artifact_payload[
+        "section_14_cross_grade_compatibility_and_moebius_recovery"
+    ]
+    assert sec14["task_id"] == TASK_TC_045_ID
+    assert sec14["status"] == CROSS_GRADE_MOEBIUS_RECOVERY_STATUS
+
+    # 1. Section 1 & 2: Recovered arithmetic result and complete implication chain
+    s1 = sec14["section_1_recovered_arithmetic_result_and_implication_chain"]
+    assert (
+        "R_mu(X) := sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m)"
+        in s1["exact_moebius_recovery_and_equivalence"]["moebius_decomposition"]
+    )
+    assert (
+        "does NOT independently establish"
+        in s1["exact_moebius_recovery_and_equivalence"]["equivalence_statement"]
+    )
+    imp = s1["complete_implication_chain_to_correlation_bound"]
+    assert (
+        imp["lean_theorem"]
+        == "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence"
+    )
+    assert (
+        "tau^K and tau^{-K}"
+        in imp["step_2_both_scale_directions_in_two_grade_prime_pairing"]
+    )
+
+    # 2. Section 3: Repaired TC-044 defects (Mellin strip + synthetic quartet regularization + round-trip Arb serialization)
+    s2 = sec14["section_2_repaired_tc044_defects_audit"]
+    d3a = s2["defect_3a_spectral_aggregation_and_synthetic_quartet_repair"]
+    assert (
+        d3a["mellin_transform_conventions"]["symbolic_scale_shift_verified"]
+        is True
+    )
+    cs = d3a["common_strip_fubini_tonelli_derivation"]
+    assert cs["common_strip"] == "1/2 < Re(z) < 5/2"
+    assert cs["strip_aggregation_identity_encloses_zero"] is True
+    assert cs["strip_moebius_identity_encloses_zero"] is True
+    reg_table = d3a["synthetic_quartet_convergence_and_regularization"][
+        "regularization_convergence_table"
+    ]
+    assert len(reg_table) == 3
+    # Euler-Maclaurin order-1 and order-2 regularized errors strictly decrease with M while unsubtracted distance stays O(1):
+    assert (
+        reg_table[0]["euler_maclaurin_order1_error_upper"]
+        > reg_table[1]["euler_maclaurin_order1_error_upper"]
+        > reg_table[2]["euler_maclaurin_order1_error_upper"]
+    )
+    assert reg_table[2]["euler_maclaurin_order2_error_upper"] < 1e-7
+
+    d3b = s2["defect_3b_numerical_serialization_and_roundtrip_repair"]
+    assert d3b["all_acceptance_comparisons_in_interval_arithmetic"] is True
+    assert (
+        d3b["all_sample_roundtrips_enclose_original_256bit_arb_ball"] is True
+    )
+    for sample_name, sample_entry in d3b[
+        "roundtrip_sample_verifications"
+    ].items():
+        ver = sample_entry["verification"]
+        assert ver["decimal_endpoints_enclose_original"] is True, sample_name
+        assert ver["arb_ball_str_encloses_original"] is True, sample_name
+        assert (
+            ver["outward_float_mid_rad_encloses_original"] is True
+        ), sample_name
+        assert ver["all_reconstructions_enclose_original"] is True, sample_name
+
+    # Perform direct independent 256-bit Arb round-trip enclosure test on live Arb balls:
+    from flint import ctx as flint_ctx
+
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau_a = arb(2) * arb.pi()
+        c_tau_b_live = (
+            (arb(4) * tau_a).log()
+            + arb.const_euler()
+            + tau_a / arb(4)
+            - arb(2)
+        )
+        h0_1_live = evaluate_h0_arb(arb(1))
+        for live_ball, exported_key in (
+            (c_tau_b_live, "c_tau_B"),
+            (h0_1_live, "h0_at_1"),
+        ):
+            payload_json = d3b["roundtrip_sample_verifications"][exported_key][
+                "serialized"
+            ]
+            rt_check = verify_serialized_arb_roundtrip(live_ball, payload_json)
+            assert rt_check["all_reconstructions_enclose_original"] is True
+            # Also check that serialize_arb_certified reproduces an enclosing interval:
+            fresh_ser = serialize_arb_certified(live_ball)
+            assert (
+                verify_serialized_arb_roundtrip(live_ball, fresh_ser)[
+                    "all_reconstructions_enclose_original"
+                ]
+                is True
+            )
+    finally:
+        flint_ctx.prec = saved_prec
+
+    # 3. Section 4: Continuity and the role of algebraic grades A_R = Qbar intersect R
+    s3 = sec14["section_3_continuity_and_algebraic_grades_role"]
+    ss_rows = s3["small_scale_decay_lemma"]["certified_small_scale_table"]
+    assert len(ss_rows) == 7
+    for s_row in ss_rows:
+        assert s_row["certified_within_C_log_0_u_5_2_bound"] is True
+    # Check that as u -> 0^+, |W_log(u)| / u^{5/2} approaches (81/64)(-zeta'(3)) ~ 0.25069158:
+    assert math.isclose(
+        ss_rows[-1]["ratio_abs_W_log_to_u_5_2_mid"],
+        ss_rows[-1]["asymptotic_limit_81_64_neg_zeta_prime_3"],
+        rel_tol=2e-3,
+    )
+    ct_rows = s3["compact_interval_uniform_convergence_and_continuity"][
+        "compact_tail_bounds_table"
+    ]
+    assert len(ct_rows) == 6
+    assert (
+        "does NOT weaken its uniform boundedness requirement"
+        in s3["role_of_algebraic_grades_A_R"]["narrow_scope_statement"]
+    )
+
+    # 4. Section 5: Mixed-grade pairing polarization & Mertens Stieltjes representation
+    s4 = sec14["section_4_mixed_grade_relation_and_moebius_recovery"]
+    mp = s4["mixed_grade_polarization_identity"]
+    assert (
+        mp["lean_theorem"]
+        == "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence"
+    )
+    assert (
+        mp["unconditional_bound_on_B_known"]["certified_below_9_4468"] is True
+    )
+    mg_rows = mp["certified_mixed_grade_table"]
+    assert len(mg_rows) == 5
+    for m_row in mg_rows:
+        assert m_row["W_minus_W_log_plus_R_mu_encloses_zero"] is True
+        assert m_row["W_minus_W_log_plus_R_mu_abs_upper"] < 0.05
+
+    cov_ctrl = s4[
+        "simultaneous_grade_covariance_and_counterexample_control"
+    ]
+    ce_rows = cov_ctrl["counterexample_evaluation_table"]
+    assert len(ce_rows) == 5
+    assert all(r["shift_invariance_exact"] is True for r in ce_rows)
+    assert ce_rows[-1]["cosh_envelope_mid"] > 9.0 * ce_rows[0]["cosh_envelope_mid"]
+
+    mert = s4["mertens_stieltjes_representation_of_R_mu"]
+    assert mert["symbolic_derivative_verified"] is True
+    assert (
+        mert["lean_theorem"]
+        == "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity"
+    )
+    m_checks = mert["certified_finite_cutoff_checks"]
+    assert len(m_checks) == 4
+    for mc in m_checks:
+        assert mc["abel_summation_by_parts_encloses_zero"] is True
+        assert mc["abel_summation_by_parts_abs_upper"] < 1e-50
+        assert mc["stieltjes_integral_ibp_encloses_zero"] is True
+        assert mc["stieltjes_integral_ibp_abs_upper"] < 1e-24
+
+    s5 = sec14["section_5_premise_classification_and_next_lemma"]
+    assert len(s5["category_i_already_proved_in_repository"]) == 3
+    assert len(s5["category_ii_unconditional_external_theorems"]) == 4
+    assert len(s5["category_iii_new_statements_proved_in_task_tc045"]) == 3
+    assert (
+        s5["category_iv_unproved_premise"]["subgate_id"] == "SUBGATE-TC-043A"
+    )
+
 
 
 

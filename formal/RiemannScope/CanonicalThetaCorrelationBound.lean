@@ -1051,4 +1051,95 @@ theorem divisor_aggregated_stieltjes_and_moebius_inversion_identity
   rw [h_ibp_M]
   ring
 
+/-- Polarized mixed-grade complete arithmetic–Fourier pairing decomposition on `(T_K psi_tau, T_L psi_tau)`
+    (`Delta = |K - L|`, `X_Delta = tau^Delta >= 1`):
+    `M_KL = W_arch - W_fwd - W_log - R_mu`, where `B_known = W_arch - W_fwd - W_log` collects the
+    three unconditionally bounded terms (`W_arch(h_Delta)`, `W(X_Delta^{-1})`, and `W_log(X_Delta)`). -/
+def mixedGradeCompletePairingDecomp (W_arch W_fwd W_log R_mu : ℝ) : ℝ :=
+  (W_arch - W_fwd - W_log) - R_mu
+
+/-- Finite-cutoff Stieltjes summation-by-parts decomposition of the Möbius recovery remainder
+    `R_{mu, B}(X) = sum_{2 <= m <= B} (mu(m)/sqrt(m)) W_log(X/m)` in terms of the Mertens sum
+    `M_{>=2}(y) = sum_{2 <= m <= y} mu(m)` and smooth profile `phi_log(u) = sqrt(u) * W_log(u)`. -/
+def mertensStieltjesRemainderDecomp (upper_mertens_boundary mertens_stieltjes_int : ℝ) : ℝ :=
+  upper_mertens_boundary + mertens_stieltjes_int
+
+/-- Theorem 41: Mixed-Grade Complete Pairing Polarization, Unconditionally Bounded Background,
+    and Exact Equivalence with Möbius Recovery Boundedness.
+    For any concurrent grades `K, L` with `X_Delta = tau^{|K - L|} >= 1`:
+    (1) Given the Attempt B polarized decomposition `M_KL = inner_A_B - c_tau_B * inner_L2 + B_transfer - W_fwd - W_refl`,
+         the smooth archimedean identity `inner_A_B - c_tau_B * inner_L2 + B_transfer = W_arch`, and
+        the exact Möbius recovery `W_refl = W_log + R_mu`, the mixed-grade pairing equals
+        `mixedGradeCompletePairingDecomp W_arch W_fwd W_log R_mu = B_known - R_mu` where
+        `B_known = W_arch - W_fwd - W_log`.
+    (2) Under the unconditional bounds `|W_arch| <= M_arch`, `|W_fwd| <= M_fwd`, and `|W_log| <= M_log`,
+        the known background satisfies `|B_known| <= M_arch + M_fwd + M_log`.
+    (3) Any bound `|R_mu| <= M_mu` implies `|M_KL| <= (M_arch + M_fwd + M_log) + M_mu`; conversely,
+        any bound `|M_KL| <= M_corr` implies `|R_mu| <= M_corr + (M_arch + M_fwd + M_log)`.
+    Scope note: Formalizes the exact algebraic polarization and two-way triangle-inequality equivalence
+    from the supplied analytic Attempt B and Möbius inversion identities. -/
+theorem mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence
+    (inner_A_B c_tau_B inner_L2 B_transfer W_arch W_fwd W_refl W_log R_mu
+      M_arch M_fwd M_log M_mu M_corr : ℝ)
+    (h_smooth : inner_A_B - c_tau_B * inner_L2 + B_transfer = W_arch)
+    (h_moebius : W_refl = W_log + R_mu)
+    (h_arch_abs : -M_arch ≤ W_arch ∧ W_arch ≤ M_arch)
+    (h_fwd_abs : -M_fwd ≤ W_fwd ∧ W_fwd ≤ M_fwd)
+    (h_log_abs : -M_log ≤ W_log ∧ W_log ≤ M_log) :
+    let M_KL := inner_A_B - c_tau_B * inner_L2 + B_transfer - W_fwd - W_refl
+    let B_known := W_arch - W_fwd - W_log
+    let B_max := M_arch + M_fwd + M_log
+    (M_KL = mixedGradeCompletePairingDecomp W_arch W_fwd W_log R_mu) ∧
+      (M_KL = B_known - R_mu) ∧
+      (-B_max ≤ B_known ∧ B_known ≤ B_max) ∧
+      ((-M_mu ≤ R_mu ∧ R_mu ≤ M_mu) → (-(B_max + M_mu) ≤ M_KL ∧ M_KL ≤ B_max + M_mu)) ∧
+      ((-M_corr ≤ M_KL ∧ M_KL ≤ M_corr) → (-(M_corr + B_max) ≤ R_mu ∧ R_mu ≤ M_corr + B_max)) := by
+  intro M_KL B_known B_max
+  dsimp [M_KL, B_known, B_max, mixedGradeCompletePairingDecomp]
+  rcases h_arch_abs with ⟨hAl, hAu⟩
+  rcases h_fwd_abs with ⟨hFl, hFu⟩
+  rcases h_log_abs with ⟨hLl, hLu⟩
+  have h_id : inner_A_B - c_tau_B * inner_L2 + B_transfer - W_fwd - W_refl =
+      W_arch - W_fwd - W_log - R_mu := by
+    linarith
+  refine ⟨h_id, h_id, ⟨by linarith, by linarith⟩, ?_, ?_⟩
+  · rintro ⟨hRl, hRu⟩
+    constructor <;> linarith
+  · rintro ⟨hCl, hCu⟩
+    constructor <;> linarith
+
+/-- Theorem 42: Small-Scale `O(u^{5/2})` Möbius Tail Majorant & Mertens Stieltjes Integration-by-Parts Schema.
+    (1) If a small-scale term satisfies `|W_log_u| <= C_log0 * X_pow_5_2 * m_inv_5_2` (`u = X/m`) and
+        `|mu_m_over_sqrt_m| <= m_inv_1_2` with `m_inv_1_2 * m_inv_5_2 = m_inv_3` and `m_inv_1_2 >= 0`,
+        then `|mu_m_over_sqrt_m * W_log_u| <= C_log0 * X_pow_5_2 * m_inv_3` (justifying the `O(sum m^{-3})`
+        Weierstrass M-test tail on compact scale intervals).
+    (2) Under the Stieltjes summation-by-parts decomposition
+        `R_mu_B = mertensStieltjesRemainderDecomp upper_mertens_boundary mertens_stieltjes_int`,
+        when `upper_mertens_boundary = 0` in the `B -> infty` limit (since `|M(B) * phi_log(X/B)| = O(B^{-2}) -> 0`),
+        `R_mu_inf = mertens_stieltjes_int_inf`, and any unsigned Mertens envelope majorant `M_unsigned`
+        satisfying `mertens_stieltjes_int_inf <= M_unsigned` and `M_unsigned >= c_mertens * sqrt_X_omega`
+        strictly exceeds `B_fixed` whenever `c_mertens * sqrt_X_omega > B_fixed`.
+    Scope note: Formalizes the algebraic majorant and summation-by-parts deductions from supplied
+    small-scale kernel envelope and Stieltjes integration-by-parts hypotheses. -/
+theorem small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity
+    (mu_term_abs m_inv_1_2 W_log_u_abs C_log0 X_pow_5_2 m_inv_5_2 m_inv_3
+      upper_mertens_boundary mertens_stieltjes_int_inf M_unsigned c_mertens sqrt_X_omega B_fixed : ℝ)
+    (h_m_nonneg : 0 ≤ m_inv_1_2)
+    (h_prod_bound : mu_term_abs ≤ m_inv_1_2 * W_log_u_abs)
+    (h_w_small : W_log_u_abs ≤ C_log0 * X_pow_5_2 * m_inv_5_2)
+    (h_m_pow : m_inv_1_2 * (C_log0 * X_pow_5_2 * m_inv_5_2) = C_log0 * X_pow_5_2 * m_inv_3)
+    (h_upper_zero : upper_mertens_boundary = 0)
+    (h_unsigned_lower : c_mertens * sqrt_X_omega ≤ M_unsigned) :
+    let R_mu_inf := mertensStieltjesRemainderDecomp upper_mertens_boundary mertens_stieltjes_int_inf
+    (mu_term_abs ≤ C_log0 * X_pow_5_2 * m_inv_3) ∧
+      (R_mu_inf = mertens_stieltjes_int_inf) ∧
+      (B_fixed < c_mertens * sqrt_X_omega → B_fixed < M_unsigned) := by
+  intro R_mu_inf
+  dsimp [R_mu_inf, mertensStieltjesRemainderDecomp]
+  have h_step : m_inv_1_2 * W_log_u_abs ≤ m_inv_1_2 * (C_log0 * X_pow_5_2 * m_inv_5_2) :=
+    mul_le_mul_of_nonneg_left h_w_small h_m_nonneg
+  refine ⟨by linarith, by linarith, ?_⟩
+  intro h_ex
+  linarith
+
 end RiemannScope
