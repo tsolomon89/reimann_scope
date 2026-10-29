@@ -292,7 +292,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 18 defs, 36 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 22 defs, 40 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -300,8 +300,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 20
-    assert len(ver["actual_theorems"]) == 38
+    assert len(ver["actual_defs"]) == 22
+    assert len(ver["actual_theorems"]) == 40
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -1084,6 +1084,175 @@ def test_26_task_tc043r_repairs_and_signed_cancellation_invariants(
         assert sc["inc_equals_chord_minus_drift_abs_upper"] < 1e-24
         assert sc["primitive_transfer_encloses_zero"] is True
         assert sc["primitive_transfer_abs_upper"] < 1e-24
+
+
+def test_27_task_tc044_prime_shift_quadratic_form_and_divisor_aggregation(
+    artifact_payload,
+):
+    """Verify TASK-TC-044 narrow corrections, prime-shift quadratic form D_N(f), divisor-aggregated W_log(X) unconditional bound, Moebius inversion, and controls."""
+    from tc.canonical_theta_correlation_bound import (
+        PRIME_SHIFT_QUADRATIC_FORM_STATUS,
+        TASK_TC_044_ID,
+    )
+
+    assert artifact_payload["prime_shift_task_id"] == TASK_TC_044_ID
+    assert (
+        artifact_payload["status_dimensions"]["prime_shift_quadratic_form_status"]
+        == PRIME_SHIFT_QUADRATIC_FORM_STATUS
+    )
+    sec13 = artifact_payload[
+        "section_13_prime_shift_quadratic_form_and_divisor_aggregation"
+    ]
+    assert sec13["task_id"] == TASK_TC_044_ID
+    assert sec13["status"] == PRIME_SHIFT_QUADRATIC_FORM_STATUS
+
+    # 1. Step 1 & Step 2: Baseline recovery and narrow corrections
+    sec1 = sec13["section_1_baseline_and_narrow_corrections"]
+    nc = sec1["narrow_corrections_verified"]
+    assert nc["primitive_kernel_mellin_multiplier"]["symbolic_verified"] is True
+    assert (
+        "(z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)"
+        in nc["primitive_kernel_mellin_multiplier"]["formula"]
+    )
+    assert nc["stieltjes_x_differential_identity"]["symbolic_verified"] is True
+    assert (
+        "x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)]"
+        in nc["stieltjes_x_differential_identity"]["formula"]
+    )
+    assert (
+        "psi_1(x) = (x^2 - 1)/2 + E_1(x)"
+        in nc["chebyshev_primitive_relation"]["formula"]
+    )
+    assert (
+        "psi(x) < 1.03883 * x"
+        in nc["rosser_schoenfeld_primary_source_record"][
+            "theorem_12_one_sided_bound"
+        ]
+    )
+    assert math.isclose(
+        nc["authoritative_c_tau_B_enclosure"]["c_tau_B_mid"],
+        3.3721834192256654,
+        rel_tol=1e-15,
+    )
+
+    #Also check that Section 12 was updated with the narrow corrections:
+    sec12 = artifact_payload["section_12_admissible_cross_grade_compatibility"]
+    c3_12 = sec12["section_3_worked_candidates_on_S_tau"][
+        "candidate_3_scale_separation_and_majorant_obstruction"
+    ]
+    assert (
+        "1.03883*x"
+        in c3_12["separate_unsigned_definitions_and_envelope_ordering"][
+            "classical_bounds_vs_illustrative_models"
+        ]
+    )
+    assert (
+        "0.0397"
+        not in c3_12["separate_unsigned_definitions_and_envelope_ordering"][
+            "classical_bounds_vs_illustrative_models"
+        ]
+    )
+    c4_12 = sec12["section_5_signed_cancellation_investigation"]
+    assert (
+        "-d[x^{-1/2} h_0(x/X)]"
+        in c4_12["chordal_prime_power_stieltjes_equivalence"][
+            "closed_form_chordal_jump_integral"
+        ]
+    )
+    assert (
+        "psi_1(x) := int_1^x psi(t) dt = (x^2 - 1)/2 + E_1(x)"
+        in c4_12["next_justified_refinement_chebyshev_primitive_transfer"][
+            "normalized_primitive_definition"
+        ]
+    )
+    assert (
+        "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)"
+        in c4_12["next_justified_refinement_chebyshev_primitive_transfer"][
+            "what_improves_vs_where_obligation_reappears"
+        ]
+    )
+
+    # 2. Step 3: Prime-shift quadratic form D_N(f)
+    sec2 = sec13["section_2_prime_shift_quadratic_form"]
+    assert (
+        sec2["lean_theorem"]
+        == "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence"
+    )
+    cutoff_rows = sec2["cutoff_evaluation_table"]
+    assert len(cutoff_rows) == 4
+    for row in cutoff_rows:
+        assert row["D_N_psi_tau_positive"] is True
+        assert row["D_N_f_minus_K1_positive"] is True
+        assert row["D_N_f_plus_K1_positive"] is True
+        assert row["subtracted_equals_neg_W_prime_N_encloses_zero"] is True
+    # Verify D_N(psi_tau) - 2 L_N ||psi_tau||^2 converges to -2 W(1) ~ +0.114614959 while 2 L_N ||psi_tau||^2 grows as ~ 4 sqrt(N) h_0(1):
+    assert cutoff_rows[-1]["two_L_N_norm_psi_tau_sq_mid"] > 300.0
+    assert math.isclose(
+        cutoff_rows[-1]["subtracted_D_N_minus_2LN_psi_tau_mid"],
+        0.11461495924093341,
+        rel_tol=1e-6,
+    )
+    sm_rows = sec2["scale_matched_cutoff_table"]
+    assert len(sm_rows) == 4
+    assert (
+        sm_rows[-1]["trivial_lower_bound_from_D_N_nonneg_neg_2LN_norm_mid"]
+        < -90.0
+    )
+
+    # 3. Step 4: Divisor-aggregated functional W_log(X) and exact Moebius inversion
+    sec3 = sec13["section_3_divisor_aggregated_candidate_and_moebius_inversion"]
+    assert (
+        sec3["lean_theorem"]
+        == "divisor_aggregated_stieltjes_and_moebius_inversion_identity"
+    )
+    vm = sec3["vanishing_zeroth_and_first_logarithmic_moments"]
+    assert vm["H0_at_half_zero"] is True
+    assert vm["H0_prime_at_half_contains_zero"] is True
+    assert vm["H0_prime_at_half_abs_upper"] < 1e-13
+
+    st_rep = sec3["exact_stieltjes_representation"]
+    assert st_rep["boundary_rational_coeff"] == "30731/98304"
+    assert st_rep["M_tilde_h_0_tv_equals_two_sum_extrema"] is True
+    assert st_rep["M_tilde_h_log_methods_overlap"] is True
+    assert st_rep["signed_tilde_h_log_moment_encloses_zero"] is True
+    assert math.isclose(
+        st_rep["M_tilde_h_0_minus_3_2_mid"], 2.4304910449396404, rel_tol=1e-13
+    )
+    assert math.isclose(
+        st_rep["M_tilde_h_log_minus_3_2_mid"], 1.2118101520691849, rel_tol=1e-13
+    )
+    assert 3.34 < st_rep["unconditional_global_max_on_X_ge_1"] < 3.36
+
+    fc_checks = sec3["certified_finite_cutoff_checks"]
+    assert len(fc_checks) == 4
+    for fc in fc_checks:
+        assert fc["stieltjes_decomp_encloses_zero"] is True
+        assert fc["stieltjes_decomp_abs_upper"] < 1e-24
+        assert fc["B_log_boundary_within_rational_bound"] is True
+        assert fc["B_log_ibp_identity_encloses_zero"] is True
+        assert fc["moebius_inversion_finite_cutoff_encloses_zero"] is True
+        assert fc["moebius_inversion_finite_cutoff_abs_upper"] < 1e-50
+
+    w_log_rows = sec3["certified_w_log_scale_enclosures"]
+    assert len(w_log_rows) == 7
+    for w_row in w_log_rows:
+        assert w_row["certified_within_unconditional_stirling_bound"] is True
+        assert w_row["W_log_abs_upper"] < 0.08
+
+    # 4. Step 4 & Step 5: Premise classification & diagnostic controls
+    sec4 = sec13["section_4_premise_classification_and_next_lemma"]
+    assert len(sec4["category_i_already_proved_in_repository"]) == 4
+    assert len(sec4["category_ii_unconditional_external_theorems"]) == 4
+    assert len(sec4["category_iii_new_statements_proved_in_task_tc044"]) == 3
+    assert (
+        sec4["category_iv_unproved_premise"]["subgate_id"] == "SUBGATE-TC-043A"
+    )
+
+    sec5 = sec13["section_5_diagnostics_and_controls"]
+    assert len(sec5["modified_weight_controls"]) == 5
+    sq_ctrl = sec5["synthetic_off_critical_quartet_divisor_aggregation_control"]
+    assert sq_ctrl["zeta_at_rho_0_certified_nonzero"] is True
+    assert sq_ctrl["abs_divisor_aggregated_quartet_amplitude_mid"] > 0.0
 
 
 

@@ -945,7 +945,9 @@ theorem majorant_window_lower_bound_and_envelope_ordering
     `I_drift = (psi_X / X) * B_bound - psi_X * h0_invX` satisfy:
     (1) `I_inc = I_chord - I_drift = W_X - (psi_X / X) * B_bound` (exact cancellation of `psi_X * h0_invX`),
     (2) `zeroMomentSubtractedDecomp I_inc B_zm = W_X - B_bound = I_X` (recovering `W_X = B_bound + I_X`), and
-    (3) the prime-wavelet sum `W_X` reappears identically as `I_inc + (psi_X / X) * B_bound`. -/
+    (3) the prime-wavelet sum `W_X` reappears identically as `I_inc + (psi_X / X) * B_bound`.
+    Scope note: Formalizes the algebraic deductions from the analytic Stieltjes identities for `I_chord`,
+    `I_drift`, and the lower-tail integral, not the measure-theoretic Stieltjes integration itself. -/
 theorem zero_moment_subtracted_and_chordal_stieltjes_equivalence
     (W_X I_X B_bound psi_X X h0_invX sqrt_X_int_0_invX_k : ℝ)
     (h_W_decomp : W_X = B_bound + I_X)
@@ -960,5 +962,93 @@ theorem zero_moment_subtracted_and_chordal_stieltjes_equivalence
   dsimp [e_X, B_zm, I_inc, chordalStieltjesDecomp, zeroMomentSubtractedDecomp]
   rw [h_lower_tail, h_W_decomp]
   refine ⟨by ring, by ring, by ring⟩
+
+/-- Prime-shift quadratic form expansion `D_N(f) = 2 * L_N * ||f||^2 - W_{prime, N}(f * f^*)`,
+    where `L_N = sum_{2 <= n <= N} Lambda(n) / sqrt(n)` and `W_{prime, N}(f * f^*) = 2 * sum_{2 <= n <= N} w_n Re <f, S_n f>`. -/
+def primeShiftQuadraticFormDecomp (L_N norm_f_sq W_prime_N : ℝ) : ℝ :=
+  2 * L_N * norm_f_sq - W_prime_N
+
+/-- Finite-cutoff Stieltjes decomposition of the divisor-aggregated functional `W_{log, B}(X)`
+    into the Stirling remainder upper-boundary term, the smooth logarithmic main integral on `[1, B]`,
+    and the signed Stirling remainder integral on `[1, B]`. -/
+def divisorAggregatedStieltjesDecomp (E_log_B_term main_log_int_1_B err_log_int_1_B : ℝ) : ℝ :=
+  E_log_B_term + main_log_int_1_B + err_log_int_1_B
+
+/-- Theorem 39: Prime-Shift Quadratic Form Expansion, Subtracted Finite Part, and Two-Grade Completion Equivalence.
+    For `D_N = primeShiftQuadraticFormDecomp L_N norm_f_sq W_prime_N = 2 * L_N * norm_f_sq - W_prime_N`:
+    (1) Subtracting `2 * L_N * norm_f_sq` yields `D_N - 2 * L_N * norm_f_sq = -W_prime_N`.
+    (2) Nonnegativity `0 <= D_N` alone is equivalent to `-2 * L_N * norm_f_sq <= D_N - 2 * L_N * norm_f_sq`
+        (showing why `D_N >= 0` alone only bounds `-W_prime_N` from below by the diverging counterterm `-2 * L_N * norm_f_sq`).
+    (3) When the subtracted finite part `F_sub = -W_prime_inf` is combined with the canonical Attempt B
+        completion (`P_E = F_sub + B_transfer`), coercive semiboundedness `-(norm_A_B_sq + mu_0 * norm_f_sq) <= P_E`
+        is equivalent to `-(mu_0 * norm_f_sq) <= F_sub + B_transfer + norm_A_B_sq`, and on normalized two-grade
+        states `f_pm^{(K)}` where `W_prime_pm = 2 * W_1 ± (W_posK + W_negK)`, the subtracted finite parts are
+        `-2 * W_1 - (W_posK + W_negK)` and `-2 * W_1 + (W_posK + W_negK)`.
+    Scope note: Formalizes the algebraic deductions connecting `D_N`, `-W_prime`, and `P_E`; it does not
+    formalize the Hilbert-space shift unitarity `||S_n f|| = ||f||` or the `N -> infty` limit. -/
+theorem prime_shift_quadratic_form_and_subtracted_finite_part_equivalence
+    (L_N norm_f_sq W_prime_N W_prime_inf B_transfer norm_A_B_sq mu_0 W_1 W_posK W_negK : ℝ) :
+    let D_N := primeShiftQuadraticFormDecomp L_N norm_f_sq W_prime_N
+    let F_sub := -W_prime_inf
+    let P_E := F_sub + B_transfer
+    (D_N - 2 * L_N * norm_f_sq = -W_prime_N) ∧
+      ((0 ≤ D_N) ↔ (-2 * L_N * norm_f_sq ≤ D_N - 2 * L_N * norm_f_sq)) ∧
+      ((-(norm_A_B_sq + mu_0 * norm_f_sq) ≤ P_E) ↔
+        (-(mu_0 * norm_f_sq) ≤ F_sub + B_transfer + norm_A_B_sq)) ∧
+      (-(2 * W_1 + (W_posK + W_negK)) + -(2 * W_1 - (W_posK + W_negK)) = -4 * W_1) ∧
+      (-(2 * W_1 - (W_posK + W_negK)) - -(2 * W_1 + (W_posK + W_negK)) = 2 * (W_posK + W_negK)) := by
+  intro D_N F_sub P_E
+  dsimp [D_N, F_sub, P_E, primeShiftQuadraticFormDecomp]
+  refine ⟨by ring, ?_, ?_, by ring, by ring⟩
+  · constructor <;> intro h <;> linarith
+  · constructor <;> intro h <;> linarith
+
+/-- Theorem 40: Divisor-Aggregated Prime-Shift Stieltjes Cancellation and Boundedness Schema.
+    For `T(x) = sum_{2 <= k <= x} log k = M_log(x) + E_log(x)` (`M_log(x) = x * log x - x + 1`),
+    given the finite-cutoff Stieltjes identity `W_log_B = (M_log_B + E_log_B) * end_factor + int_1_B_M_log + err_log_int_1_B`
+    and the integration-by-parts identity `int_1_B_M_log = -M_log_B * end_factor + main_log_int_1_B`:
+    (1) The smooth upper-boundary term `M_log_B * end_factor` cancels identically, leaving
+        `W_log_B = divisorAggregatedStieltjesDecomp (E_log_B * end_factor) main_log_int_1_B err_log_int_1_B`.
+    (2) In the `B -> infty` limit, when the full-line logarithmic Mellin moment vanishes
+        (`main_log_int_0_1 + main_log_int_1_inf = sqrt_X * (log_X * H0_half + H0_prime_half)` with
+        `H0_half = 0` and `H0_prime_half = 0` from the triple zero of `H_0(z)` at `z = 1/2`),
+        `main_log_int_1_inf = -main_log_int_0_1 = B_log_bound_val`, so `W_log_X = B_log_bound_val + I_log_X`.
+    (3) If `|B_log_bound_val| <= B_max` and `|I_log_X| <= I_max`, then `|W_log_X| <= B_max + I_max`.
+    (4) Under the exact Möbius inversion decomposition `W_X = W_log_X + R_mu_X`, any bound
+        `|R_mu_X| <= R_max` on the Möbius remainder `R_mu_X = sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m)`
+        transfers immediately to `|W_X| <= B_max + I_max + R_max`.
+    Scope note: Formalizes the algebraic cancellation and triangle-inequality deductions from the assumed
+    Stieltjes integration-by-parts and vanishing Mellin moment identities `H_0(1/2) = H_0'(1/2) = 0`. -/
+theorem divisor_aggregated_stieltjes_and_moebius_inversion_identity
+    (M_log_B E_log_B end_factor int_1_B_M_log main_log_int_1_B err_log_int_1_B
+      main_log_int_0_1 main_log_int_1_inf sqrt_X log_X H0_half H0_prime_half
+      B_log_bound_val I_log_X B_max I_max W_X R_mu_X R_max : ℝ)
+    (h_ibp_M : int_1_B_M_log = -M_log_B * end_factor + main_log_int_1_B)
+    (h_full_moment : main_log_int_0_1 + main_log_int_1_inf = sqrt_X * (log_X * H0_half + H0_prime_half))
+    (h_H0_zero : H0_half = 0)
+    (h_H0_prime_zero : H0_prime_half = 0)
+    (h_B_log_def : B_log_bound_val = -main_log_int_0_1)
+    (h_B_abs : -B_max ≤ B_log_bound_val ∧ B_log_bound_val ≤ B_max)
+    (h_I_abs : -I_max ≤ I_log_X ∧ I_log_X ≤ I_max)
+    (h_moebius : W_X = (main_log_int_1_inf + I_log_X) + R_mu_X)
+    (h_R_abs : -R_max ≤ R_mu_X ∧ R_mu_X ≤ R_max) :
+    let W_log_B := (M_log_B + E_log_B) * end_factor + int_1_B_M_log + err_log_int_1_B
+    let W_log_X := main_log_int_1_inf + I_log_X
+    (W_log_B = divisorAggregatedStieltjesDecomp (E_log_B * end_factor) main_log_int_1_B err_log_int_1_B) ∧
+      (main_log_int_1_inf = B_log_bound_val) ∧
+      (W_log_X = B_log_bound_val + I_log_X) ∧
+      (-(B_max + I_max) ≤ W_log_X ∧ W_log_X ≤ B_max + I_max) ∧
+      (-(B_max + I_max + R_max) ≤ W_X ∧ W_X ≤ B_max + I_max + R_max) := by
+  intro W_log_B W_log_X
+  dsimp [W_log_B, W_log_X, divisorAggregatedStieltjesDecomp]
+  have h_m_eq : main_log_int_1_inf = B_log_bound_val := by
+    rw [h_H0_zero, h_H0_prime_zero] at h_full_moment
+    linarith
+  rcases h_B_abs with ⟨hBl, hBu⟩
+  rcases h_I_abs with ⟨hIl, hIu⟩
+  rcases h_R_abs with ⟨hRl, hRu⟩
+  refine ⟨?_, h_m_eq, by linarith, ⟨by linarith, by linarith⟩, ⟨by linarith, by linarith⟩⟩
+  rw [h_ibp_M]
+  ring
 
 end RiemannScope

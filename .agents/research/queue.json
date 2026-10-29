@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-043R",
+  "active_task_id": "TASK-TC-044",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1379,6 +1379,34 @@
         ".agents/corpus_map/obligation_register.md"
       ],
       "resolution": "TASK-TC-043R mathematical & numerical repairs (Steps 3A, 3B, 3C, 4) and signed cancellation investigation (Step 5: Zero-Moment Subtracted Identity, Lower-Tail Boundary Identity, Chordal Stieltjes Equivalence, and Chebyshev Primitive Transfer) completed and certified; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 58 Lean declarations (20 def + 38 theorems, 739 total theorems, 0 sorry, 0 admit) compiled; 26/26 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
+    },
+    {
+      "task_id": "TASK-TC-044",
+      "epic_id": "EPIC-TC-042",
+      "priority": 56,
+      "objective": "Arithmetic Cross-Grade Compatibility and the Prime-Shift Quadratic Form (TASK-TC-044 / SUBGATE-TC-043A)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Prove or falsify SUBGATE-TC-043A (MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE) via the Moebius De-Aggregation Cancellation Lemma: given that the harmonic divisor-aggregated prime-shift functional W_log(X) := sum_{m=1}^infty m^{-1/2}W(X/m) = sum_{k=2}^infty (log k / sqrt(k))h_0(k/X) is unconditionally bounded and decays as O(X^{-1/2} log(X+2)) -> 0 (|W_log(X)| <= 3.34901 for all X >= 1), prove or falsify that the exact Moebius de-aggregation series W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) remains uniformly bounded across all X = tau^K >= 1.",
+      "planned_calculation": "1) Step 1: Recover the TC-043R chordal Stieltjes identity I_inc(X) = W(X) - (psi(X)/X)B_boundary(X) and the sufficient relative semiboundedness statement on normalized two-grade states f_+-^{(K)} = (psi_tau +- T_K psi_tau)/sqrt(2), distinguishing it from full Weil positivity. 2) Step 2: Apply narrow corrections (primitive-kernel Mellin multiplier M[h_1](z) = (z+1/2)(z+3/2)H_0(z) = rho(rho+1)H_0(z), Stieltjes x-differential identity x^{-3/2}tilde{h}_0(x/X)dx = -d[x^{-1/2}h_0(x/X)], Chebyshev primitive psi_1(x) = (x^2-1)/2 + E_1(x), primary-source Rosser-Schoenfeld 1962 Thm. 12 psi(x) < 1.03883*x for x > 0 and Thm. 10 two-sided bound for x >= 2, authoritative c_tau^B = 3.3721834192256654 +- 3.92e-56, and Lean formalization scope clarity). 3) Step 3: Expand D_N(f) = sum_{2<=n<=N} w_n||(I-S_n)f||_{L^2(dx/x)}^2 = 2L_N||f||_{L^2}^2 - W_{prime,N}(f*f^*), derive its exact relationship to P_E(f) and Q_tau(f,f), and prove why D_N(f) >= 0 alone yields only -2L_N||f||^2 -> -infty (formalized in prime_shift_quadratic_form_and_subtracted_finite_part_equivalence). 4) Step 4: Prove unconditionally via sum_{d|k} Lambda(d) = log k, H_0(1/2) = H_0'(1/2) = 0, and Stirling/Robbins |E_log(x)| <= (1/2)log x + 1 that W_log(X) = B_{log,boundary}(X) + I_log(X) satisfies |W_log(X)| <= (30731/98304)X^{-5/2} + X^{-1/2}((1/2)M_{tilde{h},0}^{(-3/2)}log X + M_{tilde{h},0}^{(-3/2)} + (1/2)M_{tilde{h},log}^{(-3/2)}) <= 3.34901 for all X >= 1 (formalized in divisor_aggregated_stieltjes_and_moebius_inversion_identity), establish exact Moebius inversion W(X) = sum_{m=1}^infty (mu(m)/sqrt(m))W_log(X/m), and classify all premises into 4 categories. 5) Step 5: Execute modified-weight controls (Lambda(n)/sqrt(n) vs (log k)/sqrt(k) vs 1/sqrt(n)) and synthetic off-critical quartet divisor-aggregation controls.",
+      "acceptance_criterion": "All 27 tests in tests/test_tc_canonical_theta_correlation_bound.py passing; formal/RiemannScope/CanonicalThetaCorrelationBound.lean compiled with 62 declarations (22 def + 40 theorems, 741 total compiled theorems, 0 sorry, 0 admit); data/tc_canonical_theta_correlation_bound.json and docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md updated and reconciled; SUBGATE-TC-043A kept OPEN alongside SUBGATE-TC-042A and SUBGATE-TC-042B.",
+      "dependencies": [
+        "TASK-TC-043R"
+      ],
+      "evidence": [
+        "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+        "scripts/build_formal.py",
+        "tc/canonical_theta_correlation_bound.py",
+        "tests/test_tc_canonical_theta_correlation_bound.py",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "data/tc_canonical_theta_correlation_bound.json",
+        "formal/RiemannScope/README.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "TASK-TC-044 narrow corrections (Step 2), prime-shift quadratic form D_N(f) analysis (Step 3), unconditional divisor-aggregated W_log(X) bound <= 3.34901 and exact Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) (Step 4), and modified-weight / synthetic quartet divisor-aggregation controls (Step 5) completed and certified; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN via Moebius De-Aggregation Cancellation Lemma, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 62 Lean declarations (22 def + 40 theorems, 741 total theorems, 0 sorry, 0 admit) compiled; 27/27 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
     }
   ]
 }

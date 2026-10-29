@@ -113,6 +113,7 @@ TASK_TC_042R2_ID = "TASK-TC-042R2"
 TASK_TC_042F_ID = "TASK-TC-042F"
 TASK_TC_043_ID = "TASK-TC-043"
 TASK_TC_043R_ID = "TASK-TC-043R"
+TASK_TC_044_ID = "TASK-TC-044"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
@@ -120,6 +121,7 @@ STARTING_HEAD_TC_042R2 = "62526298587db990b11fc0c191c2969652936c01"
 STARTING_HEAD_TC_042F = "697e6862c7e1288550bef007cbdf0a520486c245"
 STARTING_HEAD_TC_043 = "db5d8d4f429ef2b0bd9000d715e3552953b48355"
 STARTING_HEAD_TC_043R = "726f7b4da8b7bd757b68f96783fee6b86f2f3f7b"
+STARTING_HEAD_TC_044 = "2122d7989d1821cf9048d7d32ad00c64f17e191b"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -134,6 +136,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-042R2",
     "TASK-TC-042F",
     "TASK-TC-043",
+    "TASK-TC-043R",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -162,6 +165,9 @@ ARITHMETIC_FOURIER_FACTORIZATION_STATUS = (
 )
 ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS = (
     "TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED"
+)
+PRIME_SHIFT_QUADRATIC_FORM_STATUS = (
+    "PRIME_SHIFT_QUADRATIC_FORM_DECOMPOSED_DIVISOR_AGGREGATED_W_LOG_UNCONDITIONALLY_BOUNDED_MOEBIUS_OBSTRUCTION_ISOLATED"
 )
 UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN = (
     "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN"
@@ -197,6 +203,8 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "attemptBTransferForm",
     "zeroMomentSubtractedDecomp",
     "chordalStieltjesDecomp",
+    "primeShiftQuadraticFormDecomp",
+    "divisorAggregatedStieltjesDecomp",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -238,6 +246,8 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
     "majorant_window_lower_bound_and_envelope_ordering",
     "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+    "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence",
+    "divisor_aggregated_stieltjes_and_moebius_inversion_identity",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -6478,8 +6488,9 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
         coercive_limit_mu0_1 = float(coercive_norm_psi_tau_sq.mid())
         # Target threshold T_thresh = coercive_limit_mu0_1 + reconciled_prime_err_B_mid ~= 1.092130 + 1.083380 = 2.175510
         target_thresh = coercive_limit_mu0_1 + reconciled_prime_err_B_mid
-        # (a) Illustrative Chebyshev constant-envelope model omega_Cheb(x) = 0.04 (cf. Rosser–Schoenfeld 1962 Thm 12:
-        #     |psi(x) - x| < 0.0397*x for all x > 0):
+        # (a) Illustrative Chebyshev constant-envelope model omega_Cheb(x) = 0.04
+        #     (cf. Rosser–Schoenfeld 1962 Thm 12 one-sided upper bound psi(x) < 1.03883*x for all x > 0;
+        #      at x = 1, |psi(1) - 1| = 1, so two-sided bounds |psi(x) - x| <= eps*x hold only for x >= x_0(eps) > 1):
         #     Full majorant M_{0.04}(X) = 0.04 * sqrt(X) * int_{1/X}^infty |k(alpha)| d_alpha ~ 0.04 * C_abs * sqrt(X)
         #     and window lower bound c_0 * sqrt(X) * 0.04:
         delta_star_chebyshev = (
@@ -6579,10 +6590,11 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                 ),
                 "classical_bounds_vs_illustrative_models": (
                     "The expressions omega_Cheb(x) = 0.04 and omega_dLVP(x) = exp(-0.2*sqrt(log x)) are evaluated as "
-                    "illustrative envelope models inside the class sqrt(X)*omega(2X) -> infty. Classical proven bounds "
-                    "with explicit constants and ranges include Rosser–Schoenfeld (1962, Theorem 12): |psi(x) - x| < 0.0397*x "
-                    "for all x > 0 (and |theta(x) - x| < 0.006788*x/log x for x >= 10^8), and Rosser–Schoenfeld (1962, Theorem 10): "
-                    "|psi(x) - x| <= x*(log x)^2*exp(-sqrt(log x / R_0)) with R_0 = 17.5163 for x >= 2."
+                    "illustrative envelope models on [1, infty) inside the class sqrt(X)*omega(2X) -> infty. Classical proven bounds "
+                    "with explicit constants and ranges include Rosser–Schoenfeld (1962, Theorem 12): one-sided upper bound "
+                    "psi(x) < 1.03883*x for all x > 0 (and |theta(x) - x| < 0.006788*x/log x for x >= 10^8; note that at x = 1, "
+                    "|psi(1) - 1| = 1, so two-sided bounds |psi(x) - x| <= eps*x with eps < 1 hold only for x >= x_0(eps) > 1), "
+                    "and Rosser–Schoenfeld (1962, Theorem 10): |psi(x) - x| <= x*(log x)^2*exp(-sqrt(log x / R_0)) with R_0 = 17.5163 for x >= 2."
                 ),
             },
             "unsigned_majorant_growth_lower_bound": (
@@ -6643,8 +6655,9 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
         #   Using int_{1/X}^infty k(alpha) d_alpha = -int_0^{1/X} k(alpha) d_alpha = B_boundary(X)/sqrt(X)
         #   and int_{1/X}^infty alpha^{-1} k(alpha) d_alpha = [ -alpha^{-1/2} h_0(alpha) ]_{1/X}^infty = sqrt(X) h_0(1/X):
         #     I_drift(X) = (psi(X)/X) B_boundary(X) - psi(X) h_0(1/X) = O(X^{-3/2}).
-        #   Using Stieltjes integration by parts of psi(x) - psi(X) against x^{-3/2} tilde{h}_0(x/X) dx = -X^{1/2} d(x^{-1/2} h_0(x/X))
-        #   on [1, infty) (with jump sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X) = W(X) and lower endpoint -[0 - psi(X)]*h_0(1/X) = -psi(X) h_0(1/X)):
+        #   Using Stieltjes integration by parts of psi(x) - psi(X) against x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)]
+        #   on [1, infty) (with jump sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X) = W(X) and boundary term
+        #   [-(psi(x) - psi(X)) x^{-1/2} h_0(x/X)]_1^infty = 0 - (-(psi(1) - psi(X)) h_0(1/X)) = -psi(X) h_0(1/X) since psi(1) = 0):
         #     I_chord(X) = W(X) - psi(X) h_0(1/X).
         #   Subtracting I_drift(X) cancels -psi(X) h_0(1/X) identically:
         #     I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X).
@@ -7061,7 +7074,9 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                 ),
                 "closed_form_chordal_jump_integral": (
                     "I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha "
-                    "= W(X) - psi(X) h_0(1/X)  (by Stieltjes integration by parts against alpha^{-1} k(alpha) d_alpha = -d(alpha^{-1/2} h_0(alpha)))."
+                    "= int_1^infty (psi(x) - psi(X)) x^{-3/2} tilde{h}_0(x/X) dx = W(X) - psi(X) h_0(1/X)  "
+                    "(by Stieltjes integration by parts against x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)], "
+                    "with boundary term [-(psi(x) - psi(X)) x^{-1/2} h_0(x/X)]_1^infty = 0 - (-(psi(1) - psi(X)) h_0(1/X)) = -psi(X) h_0(1/X) since psi(1) = 0)."
                 ),
                 "exact_equivalence_and_reappearance_of_W_X": (
                     "Subtracting I_drift(X) from I_chord(X) cancels the O(X^{-3/2}) endpoint term -psi(X) h_0(1/X) identically: "
@@ -7071,14 +7086,22 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                     "lower-tail boundary term B_zm(X), while the prime-wavelet sum W(X) reappears identically inside I_chord(X)."
                 ),
                 "lean_theorem": "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+                "lean_theorem_scope_note": (
+                    "Formalizes the algebraic cancellation and subtraction deductions from the analytic Stieltjes "
+                    "identities for I_chord, I_drift, and the lower-tail integral, not the measure-theoretic Stieltjes integration itself."
+                ),
             },
             "next_justified_refinement_chebyshev_primitive_transfer": {
                 "normalized_primitive_definition": (
-                    "E_1(x) := int_1^x E(t) dt (E_1(1) = 0),  e_1(x) := E_1(x)/x^2,  satisfying (2 + D_x) e_1(x) = e(x)."
+                    "E_1(x) := int_1^x [psi(t) - t] dt (so psi_1(x) := int_1^x psi(t) dt = (x^2 - 1)/2 + E_1(x) with E_1(1) = 0), "
+                    "e_1(x) := E_1(x)/x^2, satisfying (2 + D_x) e_1(x) = e(x)."
                 ),
                 "transferred_kernel_definition": (
                     "k_1(alpha) := (1 - D_alpha) k(alpha) = alpha^{-1/2} (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) = alpha^{-1/2} h_1(alpha), "
                     "satisfying int_0^infty k_1(alpha) d_alpha = 0 and int_0^{1/X} k_1(alpha) d_alpha = 2 int_0^{1/X} k(alpha) d_alpha - (1/X) k(1/X)."
+                ),
+                "primitive_kernel_mellin_multiplier": (
+                    "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)  (with z = rho - 1/2, under hat{f}(z) = int_0^infty f(alpha) alpha^z d_alpha/alpha, hat{D_alpha f}(z) = -z hat{f}(z))."
                 ),
                 "primitive_increment_identity": (
                     "I(X) = sqrt(X) int_{1/X}^infty e_1(X*alpha) k_1(alpha) d_alpha "
@@ -7104,8 +7127,9 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                     "conditionally convergent explicit-formula zero sum -sum_rho x^{rho-1}/rho), e_1(x) = E_1(x)/x^2 is continuous, "
                     "piecewise C^1, vanishes at x = 1, and has the UNCONDITIONALLY and ABSOLUTELY convergent explicit expansion "
                     "e_1(x) = -sum_rho x^{z_rho - 1/2}/(rho(rho+1)) + O(x^{-1}) (since sum_rho |rho(rho+1)|^{-1} < infty). "
-                    "Where the obligation reappears: Mellin integration of x^{z_rho - 1/2} against k_1(alpha) multiplies by "
-                    "(3/2 - (1/2 - z_rho))(1/2 - (1/2 - z_rho)) = (1 + z_rho) z_rho = rho(rho+1), cancelling 1/(rho(rho+1)) "
+                    "Where the obligation reappears: Under hat{f}(z) = int_0^infty f(alpha) alpha^z d_alpha/alpha (so hat{D_alpha f}(z) = -z hat{f}(z)), "
+                    "the primitive-kernel Mellin multiplier of h_1(alpha) = (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) is "
+                    "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z) (for z = rho - 1/2), cancelling 1/(rho(rho+1)) "
                     "and restoring the exact spectral weight X^{z_rho} H_0(z_rho); spatially, since c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha "
                     f"= {float(c1_abs_window.mid()):.10f} > 0, any monotone unsigned envelope |e_1(x)| <= omega_1(x) with "
                     "sqrt(X) * omega_1(2X) -> infty still yields a majorant >= c_1 * sqrt(X) * omega_1(2X) -> infty."
@@ -7161,6 +7185,1084 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                 ),
             },
             "section_5_signed_cancellation_investigation": candidate_4_audit,
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+# ---------------------------------------------------------------------------
+# Section 13 (TASK-TC-044): Arithmetic Cross-Grade Compatibility, the
+# Prime-Shift Quadratic Form D_N(f), and Divisor-Aggregated W_log(X)
+# ---------------------------------------------------------------------------
+
+
+def _compute_moebius_table(n_max: int) -> List[int]:
+    """Compute the classical Moebius function mu(n) for 0 <= n <= n_max via linear sieve."""
+    mu = [0] * (n_max + 1)
+    if n_max >= 1:
+        mu[1] = 1
+    primes: List[int] = []
+    is_comp = [False] * (n_max + 1)
+    for i in range(2, n_max + 1):
+        if not is_comp[i]:
+            primes.append(i)
+            mu[i] = -1
+        for p in primes:
+            ip = i * p
+            if ip > n_max:
+                break
+            is_comp[ip] = True
+            if i % p == 0:
+                mu[ip] = 0
+                break
+            else:
+                mu[ip] = -mu[i]
+    return mu
+
+
+def execute_task_tc044_prime_shift_quadratic_form(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-044: Arithmetic Cross-Grade Compatibility and the Prime-Shift Quadratic Form.
+
+    Establishes:
+    1. Baseline Recovery & Narrow Corrections Audit:
+       - Recovers the TC-043R chordal Stieltjes identity I_inc(X) = W(X) - (psi(X)/X) B_boundary(X)
+         (|B_boundary(X)| <= (92193/24576) X^{-5/2}) and the coercive relative semiboundedness statement
+         on normalized two-grade states f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2), distinguishing
+         it from full Weil positivity Q_tau(f, f) >= 0.
+       - Verifies the narrow corrections symbolically and in 256-bit Arb arithmetic:
+         * Primitive-kernel Mellin multiplier M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho+1) H_0(z) (z = rho - 1/2),
+         * Stieltjes differential identity x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)] (no extraneous sqrt(X)),
+         * Chebyshev primitive psi_1(x) = (x^2 - 1)/2 + E_1(x) for E_1(x) = int_1^x [psi(t) - t] dt,
+         * Primary-source Rosser–Schoenfeld (1962) Theorem 12 one-sided bound psi(x) < 1.03883*x (x > 0) vs
+           Theorem 10 two-sided bound (x >= 2) and illustrative envelope models,
+         * Authoritative c_tau^B = 3.3721834192256654 +/- 3.92e-56 and Lean formalization scope clarity.
+    2. Prime-Shift Quadratic Form D_N(f) on L^2((0, infty), dx/x):
+       - Defines (S_n f)(x) = f(nx), w_n = Lambda(n)/sqrt(n), D_N(f) = sum_{2<=n<=N} w_n ||(I - S_n)f||_{L^2}^2 >= 0,
+         and L_N = sum_{2<=n<=N} w_n.
+       - Proves D_N(f) - 2 L_N ||f||_{L^2}^2 = -2 sum_{2<=n<=N} w_n Re <f, S_n f>_{L^2} = -W_{prime, N}(f * f^*),
+         checking every sign, factor, involution f^*(x) = conj(f(1/x)), and normalization, and derives the exact
+         relationship to Q_tau(f, f) and Attempt B's P_E(f) = lim_{N->infty}(D_N(f) - 2 L_N ||f||_{L^2}^2) + B_transfer(f).
+       - Proves why D_N(f) >= 0 alone cannot control the finite part after subtracting 2 L_N ||f||_{L^2}^2 ~ 4 sqrt(N) ||f||_{L^2}^2
+         (neither as N -> infty at fixed K nor at a scale-matched cutoff N ~ tau^{|K|} where 2 L_N ||f_pm^{(K)}||^2 ~ tau^{|K|/2}).
+    3. Concrete Arithmetic Candidate — Divisor-Aggregated Prime-Shift Functional W_log(X) and Moebius Inversion:
+       - Uses the fundamental theorem of arithmetic sum_{d|k} Lambda(d) = log k to aggregate the prime-shift
+         wavelet functional across harmonic divisor scales:
+             W_log(X) := sum_{m=1}^infty m^{-1/2} W(X/m) = sum_{k=2}^infty (log k / sqrt(k)) h_0(k/X).
+       - Proves UNCONDITIONALLY (without RH or Weil positivity) that because H_0(z) has a triple zero at z = 1/2
+         so BOTH H_0(1/2) = 0 and H_0'(1/2) = 0 vanish identically, the entire smooth Stirling main term
+         x log x - x + 1 in T(x) = log(floor(x)!) = (x log x - x + 1) + E_log(x) cancels identically on (0, infty),
+         leaving W_log(X) = B_{log, boundary}(X) + int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx with
+             |B_{log, boundary}(X)| <= (30731/98304) X^{-5/2},
+             |W_log(X)| <= (30731/98304) X^{-5/2} + X^{-1/2} ((1/2) M_{tilde{h},0}^{(-3/2)} log X + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)})
+                        = O(X^{-1/2} log(X + 2)) -> 0   for all X >= 1!
+       - Establishes exact Moebius inversion W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m), proves that any
+         unsigned bound |mu(m)| <= 1 diverges as O(sqrt(X)), and isolates the Moebius De-Aggregation Cancellation Lemma
+         as the exact next unproved arithmetic premise.
+    4. Modified-Weight & Synthetic Off-Critical Quartet Controls:
+       - Compares authentic von Mangoldt weights Lambda(n)/sqrt(n), divisor-aggregated logarithmic weights (log k)/sqrt(k),
+         and non-standard smooth integer weights 1/sqrt(n).
+       - Demonstrates that harmonic divisor aggregation sum_{m>=1} m^{-1/2} annihilates actual zeta zeros via
+         (-zeta'/zeta(s)) * zeta(s) = -zeta'(s), whereas for a synthetic off-critical quartet at rho_0 not in Z(zeta)
+         it multiplies the growing mode X^{z_{rho_0}} by zeta(rho_0) != 0, failing to cancel its O(X^{delta_0}) growth.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        pi_arb = arb.pi()
+        tau_arb = arb(2) * pi_arb
+        L_arb = tau_arb.log()
+        gamma_e_arb = arb.const_euler()
+        c_tau_A_arb = (arb(4) * tau_arb).log() + gamma_e_arb + tau_arb / arb(4)
+        c_tau_B_arb = c_tau_A_arb - arb(2)
+        h0_1_arb = evaluate_h0_arb(arb(1))
+        tol_spec = 2**(-90)
+
+        # -------------------------------------------------------------------
+        # 1. Step 1 & Step 2: Baseline Recovery & Narrow Corrections Verification
+        # -------------------------------------------------------------------
+        z_sym, rho_sym = sp.symbols("z rho")
+        mellin_h1_factor = sp.expand(
+            (sp.Rational(3, 2) - (-z_sym)) * (sp.Rational(1, 2) - (-z_sym))
+        )
+        mellin_h1_in_rho = sp.expand(
+            mellin_h1_factor.subs(z_sym, rho_sym - sp.Rational(1, 2))
+        )
+        mellin_multiplier_identity_verified = bool(
+            sp.simplify(
+                mellin_h1_factor
+                - (z_sym + sp.Rational(1, 2)) * (z_sym + sp.Rational(3, 2))
+            )
+            == 0
+            and sp.simplify(mellin_h1_in_rho - rho_sym * (rho_sym + 1)) == 0
+        )
+
+        x_sym = sp.Symbol("x", positive=True)
+        X_sym = sp.Symbol("X", positive=True)
+        h_fun = sp.Function("h0")
+        alpha_expr = x_sym / X_sym
+        tilde_h0_x_expr = sp.Rational(1, 2) * h_fun(alpha_expr) - x_sym * sp.diff(
+            h_fun(alpha_expr), x_sym
+        )
+        stieltjes_diff_x_check = sp.simplify(
+            (x_sym ** sp.Rational(-3, 2)) * tilde_h0_x_expr
+            + sp.diff((x_sym ** sp.Rational(-1, 2)) * h_fun(alpha_expr), x_sym)
+        )
+        stieltjes_x_differential_verified = bool(stieltjes_diff_x_check == 0)
+
+        baseline_and_narrow_corrections = {
+            "chordal_stieltjes_baseline_identity": (
+                "I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X), "
+                "with |B_boundary(X)| <= (92193/24576) X^{-5/2} for all X >= 1."
+            ),
+            "sufficient_relative_semiboundedness_vs_full_weil_positivity": {
+                "normalized_two_grade_states": "f_pm^{(K)} = (psi_tau +/- T_K psi_tau) / sqrt(2) in S_tau",
+                "sufficient_relative_lower_bound": (
+                    "exists mu_0 >= 0 forall K in Qbar intersect R : "
+                    "P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2)"
+                ),
+                "implied_correlation_bound": "|C_tau(K)| <= C_tau(0) + 2 (c_tau^B + mu_0) h_0(1) < infty",
+                "relation_to_W_X": (
+                    "Since ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 = ||A_tau^B psi_tau||^2 + O(|K| tau^{-|K|/2}), "
+                    "||f_pm^{(K)}||_{L^2}^2 = h_0(1) + O(tau^{-5|K|/2}), and "
+                    "P_E(f_pm^{(K)}) = P_E(psi_tau) -/+ W(tau^{|K|}) + O(|K| tau^{-|K|/2}), "
+                    "the relative semiboundedness condition is equivalent to uniform boundedness "
+                    "sup_{X >= 1} |W(X)| < infty (where W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X))."
+                ),
+                "distinction_from_full_weil_positivity": (
+                    "Full Weil positivity requires Q_tau(f, f) >= 0 on all of S_tau (i.e. P_E(f) >= c_tau^B ||f||^2 - ||A_tau^B f||^2 "
+                    "with zero slack and arbitrary grade superpositions), whereas excluding off-critical zeros via the "
+                    "Laplace–Carleman resolvent theorem requires only a uniform lower bound on two-grade states f_pm^{(K)} "
+                    "with arbitrary finite norm-shift slack (c_tau^B + mu_0) ||f_pm^{(K)}||^2."
+                ),
+            },
+            "narrow_corrections_verified": {
+                "primitive_kernel_mellin_multiplier": {
+                    "formula": "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)  (z = rho - 1/2)",
+                    "symbolic_verified": mellin_multiplier_identity_verified,
+                },
+                "stieltjes_x_differential_identity": {
+                    "formula": "x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)]  (no extraneous sqrt(X) factor)",
+                    "lower_endpoint_explanation": (
+                        "[-(psi(x) - psi(X)) x^{-1/2} h_0(x/X)]_1^infty = 0 - (-(psi(1) - psi(X)) h_0(1/X)) = -psi(X) h_0(1/X) since psi(1) = 0"
+                    ),
+                    "symbolic_verified": stieltjes_x_differential_verified,
+                },
+                "chebyshev_primitive_relation": {
+                    "formula": "psi_1(x) = (x^2 - 1)/2 + E_1(x)  for E_1(x) = int_1^x [psi(t) - t] dt (E_1(1) = 0)",
+                    "boundary_estimate_preserved": "|B_boundary(X)| <= (92193/24576) X^{-5/2} = O(X^{-5/2})",
+                },
+                "rosser_schoenfeld_primary_source_record": {
+                    "theorem_12_one_sided_bound": "psi(x) < 1.03883 * x for all x > 0 (Rosser & Schoenfeld 1962, Theorem 12)",
+                    "why_two_sided_00397_fails_at_x_1": "At x = 1, |psi(1) - 1| = |0 - 1| = 1 > 0.0397, so two-sided bounds |psi(x) - x| <= eps*x with eps < 1 hold only for x >= x_0(eps) > 1.",
+                    "theorem_10_two_sided_bound": "|psi(x) - x| <= x (log x)^2 exp(-sqrt(log x / 17.5163)) for all x >= 2 (Rosser & Schoenfeld 1962, Theorem 10)",
+                    "illustrative_models_scope": "omega_Cheb(x) = 0.04 and omega_dLVP(x) = exp(-0.2*sqrt(log x)) are retained explicitly as illustrative envelope models on [1, infty).",
+                },
+                "authoritative_c_tau_B_enclosure": {
+                    "c_tau_B_mid": float(c_tau_B_arb.mid()),
+                    "c_tau_B_rad": float(c_tau_B_arb.rad()),
+                    "c_tau_B_str_20": c_tau_B_arb.str(20, radius=True),
+                },
+                "formalization_scope_note": (
+                    "Scalar Lean 4 theorems assuming analytic/integral identities formalize the algebraic deductions "
+                    "and inequality consequences from those identities, not the measure-theoretic/integral derivations themselves."
+                ),
+            },
+        }
+
+        # -------------------------------------------------------------------
+        # 2. Step 3: Prime-Shift Quadratic Form D_N(f) on L^2((0, infty), dx/x)
+        # -------------------------------------------------------------------
+        # On L^2((0, infty), dx/x), (S_n f)(x) = f(nx) is unitary (||S_n f||_{L^2} = ||f||_{L^2}, S_n^* = S_n^{-1})
+        # and commutes with grade dilations (S_n T_K = T_K S_n).
+        # With w_n = Lambda(n)/sqrt(n) >= 0 and L_N = sum_{2 <= n <= N} w_n:
+        #   D_N(f) := sum_{2 <= n <= N} w_n ||(I - S_n)f||_{L^2}^2
+        #           = 2 L_N ||f||_{L^2}^2 - 2 sum_{2 <= n <= N} w_n Re <f, S_n f>_{L^2}.
+        # Translation to W_{prime, N}(f * f^*):
+        #   Under f^*(x) = conj(f(1/x)),
+        #     (f * f^*)(n)   = int_0^infty f(nx) conj(f(x)) dx/x = <S_n f, f>_{L^2} = conj(<f, S_n f>_{L^2}),
+        #     (f * f^*)(1/n) = int_0^infty f(x/n) conj(f(x)) dx/x = <S_n^{-1} f, f>_{L^2} = <f, S_n f>_{L^2},
+        #   so Phi_{f,f}(n) := (f * f^*)(n) + (f * f^*)(1/n) = 2 Re <f, S_n f>_{L^2}, and
+        #     2 sum_{2 <= n <= N} w_n Re <f, S_n f>_{L^2} = sum_{2 <= n <= N} w_n Phi_{f,f}(n) = W_{prime, N}(f * f^*).
+        #   Hence:
+        #     D_N(f) - 2 L_N ||f||_{L^2}^2 = -W_{prime, N}(f * f^*),
+        #     lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2) = -W_prime(f * f^*).
+
+        n_max_pp = 25000
+        pp_all = get_prime_powers_up_to(n_max_pp)
+        cutoffs_N = (100, 1000, 5000, 25000)
+
+        def _eval_W_N_arb(X_scale: arb, N_cut: int) -> Tuple[arb, arb]:
+            w_sum = arb(0)
+            l_sum = arb(0)
+            for pk, p, _ in pp_all:
+                if pk > N_cut:
+                    break
+                pk_a = arb(pk)
+                w_pk = arb(p).log() / pk_a.sqrt()
+                l_sum += w_pk
+                w_sum += w_pk * evaluate_h0_arb(pk_a / X_scale)
+            return w_sum, l_sum
+
+        # Evaluate D_N(f), 2 L_N ||f||^2, and D_N(f) - 2 L_N ||f||^2 = -W_{prime, N}(f * f^*)
+        # on f = psi_tau and normalized two-grade states f_pm^{(K)} across K in {1.0, 2.0, 4.0} and N in cutoffs_N:
+        prime_shift_cutoff_rows: List[Dict[str, Any]] = []
+        for N_cut in cutoffs_N:
+            w_N_1, L_N_arb = _eval_W_N_arb(arb(1), N_cut)
+            # For f = psi_tau: ||psi_tau||^2 = h_0(1), W_{prime, N}(psi_tau * psi_tau^*) = 2 W_N(1)
+            w_prime_N_psi = arb(2) * w_N_1
+            two_LN_norm_psi = arb(2) * L_N_arb * h0_1_arb
+            D_N_psi = two_LN_norm_psi - w_prime_N_psi
+            sub_psi = D_N_psi - two_LN_norm_psi
+
+            k1_pos = tau_arb
+            k1_neg = arb(1) / tau_arb
+            w_N_tau_pos, _ = _eval_W_N_arb(k1_pos, N_cut)
+            w_N_tau_neg, _ = _eval_W_N_arb(k1_neg, N_cut)
+            h0_tau = evaluate_h0_arb(tau_arb)
+            norm_f_minus_k1 = h0_1_arb - h0_tau
+            norm_f_plus_k1 = h0_1_arb + h0_tau
+            w_prime_N_f_minus_k1 = arb(2) * w_N_1 - (w_N_tau_pos + w_N_tau_neg)
+            w_prime_N_f_plus_k1 = arb(2) * w_N_1 + (w_N_tau_pos + w_N_tau_neg)
+            D_N_f_minus_k1 = arb(2) * L_N_arb * norm_f_minus_k1 - w_prime_N_f_minus_k1
+            D_N_f_plus_k1 = arb(2) * L_N_arb * norm_f_plus_k1 - w_prime_N_f_plus_k1
+
+            prime_shift_cutoff_rows.append(
+                {
+                    "N_cutoff": N_cut,
+                    "L_N_mid": float(L_N_arb.mid()),
+                    "L_N_rad": float(L_N_arb.rad()),
+                    "four_sqrt_N_asymptotic": 4.0 * math.sqrt(float(N_cut)),
+                    "D_N_psi_tau_mid": float(D_N_psi.mid()),
+                    "D_N_psi_tau_rad": float(D_N_psi.rad()),
+                    "D_N_psi_tau_positive": bool(float(D_N_psi.lower()) > 0.0),
+                    "two_L_N_norm_psi_tau_sq_mid": float(two_LN_norm_psi.mid()),
+                    "subtracted_D_N_minus_2LN_psi_tau_mid": float(sub_psi.mid()),
+                    "neg_W_prime_N_psi_tau_mid": float((-w_prime_N_psi).mid()),
+                    "subtracted_equals_neg_W_prime_N_encloses_zero": bool(
+                        (sub_psi + w_prime_N_psi).contains(0)
+                    ),
+                    "D_N_f_minus_K1_mid": float(D_N_f_minus_k1.mid()),
+                    "D_N_f_minus_K1_positive": bool(
+                        float(D_N_f_minus_k1.lower()) > 0.0
+                    ),
+                    "subtracted_f_minus_K1_mid": float(
+                        (-w_prime_N_f_minus_k1).mid()
+                    ),
+                    "D_N_f_plus_K1_mid": float(D_N_f_plus_k1.mid()),
+                    "D_N_f_plus_K1_positive": bool(
+                        float(D_N_f_plus_k1.lower()) > 0.0
+                    ),
+                    "subtracted_f_plus_K1_mid": float(
+                        (-w_prime_N_f_plus_k1).mid()
+                    ),
+                }
+            )
+
+        # Evaluate scale-matched cutoff N_match(K) = ceil(9 * tau^K) for K in {0.5, 1.0, 2.0, 3.0}
+        # to demonstrate why D_N(f_pm^{(K)}) >= 0 alone gives only -2 L_{N_match} ||f_pm^{(K)}||^2 ~ -O(tau^{K/2}) -> -infty:
+        scale_matched_rows: List[Dict[str, Any]] = []
+        for k_val in (0.5, 1.0, 2.0, 3.0):
+            k_a = arb(str(k_val))
+            X_k = (k_a * L_arb).exp()
+            N_match = min(n_max_pp, int(math.ceil(9.0 * float(X_k.upper()))))
+            w_1_m, L_m = _eval_W_N_arb(arb(1), N_match)
+            w_pos_m, _ = _eval_W_N_arb(X_k, N_match)
+            w_neg_m, _ = _eval_W_N_arb(arb(1) / X_k, N_match)
+            h0_k = evaluate_h0_arb(X_k)
+            norm_minus = h0_1_arb - h0_k
+            w_prime_minus = arb(2) * w_1_m - (w_pos_m + w_neg_m)
+            d_n_minus = arb(2) * L_m * norm_minus - w_prime_minus
+            trivial_lower_bound_from_D_N_nonneg = -arb(2) * L_m * norm_minus
+            scale_matched_rows.append(
+                {
+                    "K": k_val,
+                    "X_eq_tau_K": float(X_k.mid()),
+                    "scale_matched_cutoff_N_eq_ceil_9X": N_match,
+                    "L_N_match_mid": float(L_m.mid()),
+                    "D_N_f_minus_K_mid": float(d_n_minus.mid()),
+                    "actual_subtracted_finite_part_neg_W_prime_mid": float(
+                        (-w_prime_minus).mid()
+                    ),
+                    "trivial_lower_bound_from_D_N_nonneg_neg_2LN_norm_mid": float(
+                        trivial_lower_bound_from_D_N_nonneg.mid()
+                    ),
+                    "ratio_trivial_bound_to_sqrt_X": float(
+                        (abs(trivial_lower_bound_from_D_N_nonneg) / X_k.sqrt()).mid()
+                    ),
+                }
+            )
+
+        prime_shift_quadratic_form_audit = {
+            "definition": (
+                "D_N(f) := sum_{2 <= n <= N} w_n ||(I - S_n)f||_{L^2(dx/x)}^2,  "
+                "(S_n f)(x) = f(nx),  w_n = Lambda(n)/sqrt(n),  L_N = sum_{2 <= n <= N} w_n"
+            ),
+            "unitarity_and_grade_invariance": (
+                "Each S_n is unitary on L^2((0, infty), dx/x) (||S_n f||_{L^2} = ||f||_{L^2}, S_n^* = S_n^{-1}) "
+                "and commutes with grade dilations (S_n T_K = T_K S_n), so D_N(f) >= 0 and D_N(T_K f) = D_N(f) "
+                "hold unconditionally for all f in L^2((0, infty), dx/x), K in R, and N >= 2."
+            ),
+            "exact_expansion_and_prime_translation": {
+                "shift_expansion": "D_N(f) = 2 L_N ||f||_{L^2}^2 - 2 sum_{2 <= n <= N} w_n Re <f, S_n f>_{L^2}",
+                "involution_and_autocorrelation_check": (
+                    "With f^*(x) := conj(f(1/x)), (f * f^*)(n) = int_0^infty f(nx) conj(f(x)) dx/x = <S_n f, f>_{L^2} "
+                    "= conj(<f, S_n f>_{L^2}) and (f * f^*)(1/n) = <S_n^{-1} f, f>_{L^2} = <f, S_n f>_{L^2}, so "
+                    "Phi_{f,f}(n) := (f * f^*)(n) + (f * f^*)(1/n) = 2 Re <f, S_n f>_{L^2}."
+                ),
+                "subtracted_finite_N_identity": (
+                    "D_N(f) - 2 L_N ||f||_{L^2}^2 = -2 sum_{2 <= n <= N} w_n Re <f, S_n f>_{L^2} = -W_{prime, N}(f * f^*)"
+                ),
+                "limit_as_N_to_infty_on_S_tau": (
+                    "lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2) = -W_prime(f * f^*)"
+                ),
+                "complete_arithmetic_fourier_form_relation": (
+                    "Q_tau(f, f) = W_pole(f * f^*) + W_arch(f * f^*) + lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2); "
+                    "on S_tau (where W_pole = 0), P_E(f) = lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2) + B_transfer(f) "
+                    "and Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + B_transfer(f) + lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2)."
+                ),
+            },
+            "central_question_resolution": {
+                "question": "Does the canonical completion control the finite part after subtraction of 2 L_N ||f||^2, uniformly across the required admissible grade states?",
+                "answer": (
+                    "At any FIXED state f in S_tau, the canonical Attempt B completion cancels the smooth PNT divergence "
+                    "2 L_N ||f||_{L^2}^2 ~ 4 sqrt(N) ||f||_{L^2}^2 against the s = 1 pole, leaving the convergent finite part "
+                    "-W_prime(f * f^*) (and P_E(f) = -W_prime(f * f^*) + B_transfer(f)). However, across the family of "
+                    "normalized two-grade states f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2), the subtracted finite part is "
+                    "lim_{N->infty}(D_N(f_pm^{(K)}) - 2 L_N ||f_pm^{(K)}||^2) = -2 W(1) -/+ [W(tau^K) + W(tau^{-K})], "
+                    "while the smooth completion terms ||A_tau^B f_pm^{(K)}||^2 and B_transfer(f_pm^{(K)}) approach finite "
+                    "constants as |K| -> infty. Positivity D_N(f) >= 0 alone gives only D_N(f) - 2 L_N ||f||^2 >= -2 L_N ||f||^2, "
+                    "which diverges to -infty as N -> infty (and at a scale-matched cutoff N ~ tau^{|K|} diverges as -O(tau^{|K|/2})), "
+                    "because D_N(f) >= 0 uses only nonnegativity w_n >= 0 and unitarity of S_n, ignoring unique prime factorization "
+                    "sum_{d|k} Lambda(d) = log k and zero-moment cancellation H_0(1/2) = 0."
+                ),
+            },
+            "cutoff_evaluation_table": prime_shift_cutoff_rows,
+            "scale_matched_cutoff_table": scale_matched_rows,
+            "lean_theorem": "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence",
+        }
+
+        # -------------------------------------------------------------------
+        # 3. Step 4: Concrete Arithmetic Candidate — Divisor-Aggregated
+        #    Prime-Shift Functional W_log(X) and Exact Moebius Inversion
+        # -------------------------------------------------------------------
+        # Why D_N(f) >= 0 failed: it treated the prime-power shifts S_n as independent unitaries with weights
+        # w_n = Lambda(n)/sqrt(n) >= 0, without using the fundamental theorem of arithmetic sum_{d|k} Lambda(d) = log k.
+        # Aggregating the prime-shift wavelet functional W(X/m) over all harmonic divisor scales m >= 1 with weight m^{-1/2}:
+        #   W_log(X) := sum_{m=1}^infty m^{-1/2} W(X/m)
+        #             = sum_{m=1}^infty sum_{n=2}^infty (Lambda(n)/sqrt(m*n)) h_0(m*n/X)
+        #             = sum_{k=2}^infty ((sum_{d|k} Lambda(d)) / sqrt(k)) h_0(k/X)
+        #             = sum_{k=2}^infty (log k / sqrt(k)) h_0(k/X).
+        #
+        # Unconditional Boundedness & Decay Theorem for W_log(X):
+        # 1. Because H_0(z) = F_tau(1/2 + z) F_tau(1/2 - z) has a TRIPLE zero (order 3) at z = 1/2,
+        #    BOTH the zeroth and first logarithmic Mellin moments vanish identically:
+        #      H_0(1/2)  = int_0^infty alpha^{-1/2} h_0(alpha) d_alpha = 0,
+        #      H_0'(1/2) = int_0^infty alpha^{-1/2} (log alpha) h_0(alpha) d_alpha = 0.
+        # 2. Let T(x) := sum_{2 <= k <= x} log k = log(floor(x)!) = M_log(x) + E_log(x) for x >= 1,
+        #    where M_log(x) = x log x - x + 1 (M_log(1) = 0, M_log'(x) = log x) and E_log(1) = 0.
+        #    By Robbins (1955) / Stirling's formula, for all x >= 1:
+        #      |E_log(x)| <= (1/2) log x + 1.
+        # 3. By Stieltjes integration by parts of T(x) against x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)]
+        #    and vanishing of int_0^infty x^{-1/2} (log x) h_0(x/X) dx = sqrt(X) [(log X) H_0(1/2) + H_0'(1/2)] = 0:
+        #      W_log(X) = B_{log, boundary}(X) + I_log(X),
+        #      B_{log, boundary}(X) := -int_0^1 (x log x - x + 1) x^{-3/2} tilde{h}_0(x/X) dx
+        #                            = -int_0^1 x^{-1/2} (log x) h_0(x/X) dx,
+        #      I_log(X)             := int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx.
+        # 4. For all X >= 1:
+        #      |B_{log, boundary}(X)| <= (92193/32768) X^{-5/2} int_0^1 x^2 |log x| dx = (30731/98304) X^{-5/2},
+        #      |I_log(X)| <= X^{-1/2} int_{1/X}^infty ((1/2) log(X*alpha) + 1) alpha^{-3/2} |tilde{h}_0(alpha)| d_alpha
+        #                 <= X^{-1/2} ((1/2) M_{tilde{h},0}^{(-3/2)} log X + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)}),
+        #    where
+        #      M_{tilde{h},0}^{(-3/2)}   := int_0^infty alpha^{-3/2} |tilde{h}_0(alpha)| d_alpha = 2 sum_{j=1}^7 |alpha_j^{-1/2} h_0(alpha_j)|,
+        #      M_{tilde{h},log}^{(-3/2)} := int_0^infty alpha^{-3/2} |log alpha| |tilde{h}_0(alpha)| d_alpha.
+
+        # Certify the 7 roots of Q_0(u) = 0 and evaluate M_{tilde{h},0}^{(-3/2)} and M_{tilde{h},log}^{(-3/2)} in 256-bit Arb:
+        u_poly_sym = sp.Symbol("u", real=True)
+        q0_poly_sym = (
+            648 * u_poly_sym**7
+            - 93844 * u_poly_sym**6
+            + 1345108 * u_poly_sym**5
+            - 4462075 * u_poly_sym**4
+            + 4306220 * u_poly_sym**3
+            - 1202252 * u_poly_sym**2
+            + 75896 * u_poly_sym
+            - 432
+        )
+        q0_deriv_sym = sp.diff(q0_poly_sym, u_poly_sym)
+        q0_coeffs_d = [
+            int(c) for c in sp.Poly(q0_poly_sym, u_poly_sym).all_coeffs()
+        ]
+        q0_deriv_coeffs_d = [
+            int(c) for c in sp.Poly(q0_deriv_sym, u_poly_sym).all_coeffs()
+        ]
+        q0_intervals = sp.Poly(q0_poly_sym, u_poly_sym).intervals(eps=1e-35)
+
+        def _horner_arb(coeffs_seq: Sequence[int], u_a: arb) -> arb:
+            acc = arb(0)
+            for c_i in coeffs_seq:
+                acc = acc * u_a + arb(c_i)
+            return acc
+
+        alpha_roots_7: List[arb] = []
+        for (a_rat, b_rat), _ in q0_intervals:
+            u_mid = arb(
+                (
+                    (
+                        arb(int(a_rat.p)) / arb(int(a_rat.q))
+                        + arb(int(b_rat.p)) / arb(int(b_rat.q))
+                    )
+                    / arb(2)
+                ).mid()
+            )
+            for _ in range(12):
+                u_mid = arb(
+                    (
+                        u_mid
+                        - _horner_arb(q0_coeffs_d, u_mid)
+                        / _horner_arb(q0_deriv_coeffs_d, u_mid)
+                    ).mid()
+                )
+            u_pt = arb(u_mid.mid())
+            rad_u = arb("1e-55")
+            u_ball = arb(u_pt.mid(), rad_u.upper())
+            n_step = u_pt - _horner_arb(q0_coeffs_d, u_pt) / _horner_arb(
+                q0_deriv_coeffs_d, u_ball
+            )
+            if not bool(abs(n_step - u_pt) < rad_u):
+                raise RuntimeError("Newton root certification failed in TC-044")
+            alpha_roots_7.append(u_ball.sqrt())
+
+        # Exact total variation formula for M_{tilde{h},0}^{(-3/2)} = int_0^infty alpha^{-3/2} |tilde{h}_0(alpha)| d_alpha
+        # using alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)):
+        g_extrema = [
+            (r_b ** arb("-0.5")) * evaluate_h0_arb(r_b) for r_b in alpha_roots_7
+        ]
+        m_th0_tv_arb = (
+            abs(g_extrema[0])
+            + sum(
+                (abs(g_extrema[j + 1] - g_extrema[j]) for j in range(6)),
+                arb(0),
+            )
+            + abs(g_extrema[-1])
+        )
+        m_th0_two_sum_arb = arb(2) * sum(
+            (abs(gv) for gv in g_extrema), arb(0)
+        )
+        tv_equals_two_sum_extrema = bool(
+            m_th0_tv_arb.overlaps(m_th0_two_sum_arb)
+        )
+
+        # Certify M_{tilde{h},log}^{(-3/2)} = int_0^infty alpha^{-3/2} |log alpha| |tilde{h}_0(alpha)| d_alpha
+        # via exact integration by parts on each sign-constant segment between {0, alpha_1..alpha_4, 1, alpha_5..alpha_7, infty}:
+        #   int_a^b alpha^{-3/2} (log alpha) tilde{h}_0(alpha) d_alpha
+        #     = -[ (log alpha) alpha^{-1/2} h_0(alpha) ]_a^b + int_a^b alpha^{-3/2} h_0(alpha) d_alpha.
+        def _h0_over_al32_acb(al: acb, analytic: bool = False) -> acb:
+            u2 = al * al
+            op = acb(1) + u2
+            op2 = op * op
+            op4 = op2 * op2
+            op6 = op4 * op2
+            num = (
+                -acb(648) * op6
+                + acb(58380) * u2 * op4
+                - acb(706860) * u2 * u2 * op2
+                + acb(2027025) * u2 * u2 * u2
+            )
+            return al * num / (acb(512) * (op**8) * op.sqrt(analytic=analytic))
+
+        def _h0_inv_u12_acb(u_c: acb, analytic: bool = False) -> acb:
+            u2 = u_c * u_c
+            op = acb(1) + u2
+            op2 = op * op
+            op4 = op2 * op2
+            op6 = op4 * op2
+            num = (
+                -acb(648) * op6
+                + acb(58380) * u2 * op4
+                - acb(706860) * u2 * u2 * op2
+                + acb(2027025) * u2 * u2 * u2
+            )
+            return u2 * num / (acb(512) * (op**8) * op.sqrt(analytic=analytic))
+
+        def _log_g_endpoint(a_ball: arb) -> arb:
+            m_f = float(a_ball.mid())
+            if m_f == 0.0 or m_f == 1.0:
+                return arb(0)
+            return a_ball.log() * (a_ball ** arb("-0.5")) * evaluate_h0_arb(a_ball)
+
+        nodes_log_ibp = [arb(0)] + alpha_roots_7[:4] + [arb(1)] + alpha_roots_7[4:]
+        m_th_log_ibp_arb = arb(0)
+        signed_th_log_ibp_arb = arb(0)
+        for idx_s in range(len(nodes_log_ibp) - 1):
+            a_b = nodes_log_ibp[idx_s]
+            b_b = nodes_log_ibp[idx_s + 1]
+            int_h0_seg = acb.integral(
+                _h0_over_al32_acb,
+                acb(a_b.mid()),
+                acb(b_b.mid()),
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+            end_err = (
+                arb(2) * abs(_h0_over_al32_acb(acb(a_b))).real * arb(a_b.rad())
+                + arb(2) * abs(_h0_over_al32_acb(acb(b_b))).real * arb(b_b.rad())
+            )
+            seg_signed = (
+                -(_log_g_at_b := _log_g_endpoint(b_b))
+                + _log_g_endpoint(a_b)
+                + int_h0_seg
+                + arb(0, end_err.upper())
+            )
+            signed_th_log_ibp_arb += seg_signed
+            m_th_log_ibp_arb += abs(seg_signed)
+
+        u_top_r7 = arb(1) / alpha_roots_7[-1]
+        tail_h0_int = acb.integral(
+            _h0_inv_u12_acb,
+            acb(0),
+            acb(u_top_r7.mid()),
+            rel_tol=tol_spec,
+            abs_tol=tol_spec,
+        ).real
+        tail_end_err = (
+            arb(2) * abs(_h0_inv_u12_acb(acb(u_top_r7))).real * arb(u_top_r7.rad())
+        )
+        tail_seg_signed = (
+            _log_g_endpoint(alpha_roots_7[-1])
+            + tail_h0_int
+            + arb(0, tail_end_err.upper())
+        )
+        signed_th_log_ibp_arb += tail_seg_signed
+        m_th_log_ibp_arb += abs(tail_seg_signed)
+
+        # Also certify M_{tilde{h},log}^{(-3/2)} via direct quadrature on [1/64, 64] + explicit Bernstein tails:
+        a_cut_log = arb(1) / arb(64)
+        b_cut_log = arb(64)
+        nodes_log_win = (
+            [a_cut_log]
+            + alpha_roots_7[:4]
+            + [arb(1)]
+            + alpha_roots_7[4:]
+            + [b_cut_log]
+        )
+        m_th_log_win_arb = arb(0)
+        for idx_s in range(len(nodes_log_win) - 1):
+            a_b = nodes_log_win[idx_s]
+            b_b = nodes_log_win[idx_s + 1]
+            d_seg = acb.integral(
+                lambda al, an: (al ** acb("-1.5"))
+                * al.log(analytic=an)
+                * evaluate_tilde_h0_acb(al, analytic=an),
+                acb(a_b.mid()),
+                acb(b_b.mid()),
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+            m_th_log_win_arb += abs(d_seg)
+        c_bern_th = arb(1032993) / arb(65536)
+        tail_log_low = (
+            c_bern_th
+            * (a_cut_log * a_cut_log)
+            * (abs(a_cut_log.log()) / arb(2) + arb(1) / arb(4))
+        )
+        tail_log_high = (
+            c_bern_th
+            * (arb(1) / (b_cut_log**3))
+            * (b_cut_log.log() / arb(3) + arb(1) / arb(9))
+        )
+        m_th_log_win_plus_tails_arb = m_th_log_win_arb + arb(
+            0, (tail_log_low + tail_log_high).upper()
+        )
+        m_th_log_methods_overlap = bool(
+            m_th_log_ibp_arb.overlaps(m_th_log_win_plus_tails_arb)
+        )
+        signed_th_log_encloses_zero = bool(signed_th_log_ibp_arb.contains(0))
+
+        # Certify vanishing of H_0'(1/2) = int_0^infty alpha^{-1/2} (log alpha) h_0(alpha) d_alpha = 0:
+        # Under alpha = e^v, int_{-infty}^infty v e^{v/2} h_0(e^v) dv = 2 int_0^infty v sinh(v/2) h_0(e^v) dv.
+        h0_prime_half_int = arb(0)
+        for m_v in range(0, 36):
+            a_v = acb(m_v) / acb(2)
+            b_v = acb(m_v + 1) / acb(2)
+            h0_prime_half_int += acb.integral(
+                lambda v_c, an: acb(2)
+                * v_c
+                * ((v_c / acb(2)).sinh())
+                * evaluate_h0_acb(v_c.exp(), analytic=an),
+                a_v,
+                b_v,
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+        # For v >= 18, 2 v sinh(v/2) |h_0(e^v)| <= (92193/32768) v e^{-2v}, and int_{18}^infty v e^{-2v} dv = (37/4) e^{-36}:
+        h0_prime_half_tail = (
+            (arb(92193) / arb(32768)) * (arb(37) / arb(4)) * (arb(-36).exp())
+        )
+        h0_prime_half_enclosure = h0_prime_half_int + arb(
+            0, h0_prime_half_tail.upper()
+        )
+        h0_prime_half_contains_zero = bool(h0_prime_half_enclosure.contains(0))
+
+        # Finite-cutoff verification at B = 24 across X in {1.0, 2.0, 4.0, tau} of:
+        # 1. Exact divisor-aggregated Stieltjes identity:
+        #      W_{log, B}(X) == E_log(B) B^{-1/2} h_0(B/X) + int_1^B x^{-1/2} (log x) h_0(x/X) dx
+        #                       + int_1^B E_log(x) x^{-3/2} tilde{h}_0(x/X) dx
+        # 2. Exact boundary integration-by-parts identity on [0, 1]:
+        #      -int_0^1 (x log x - x + 1) x^{-3/2} tilde{h}_0(x/X) dx == -int_0^1 x^{-1/2} (log x) h_0(x/X) dx
+        # 3. Exact finite-cutoff Moebius inversion identity:
+        #      W_B(X) == sum_{m=1}^{floor(B/2)} (mu(m)/sqrt(m)) W_{log, floor(B/m)}(X/m)
+        B_tc44 = 24
+        B_tc44_a = arb(B_tc44)
+        mu_table = _compute_moebius_table(n_max_pp)
+        T_step_24: Dict[int, arb] = {1: arb(0)}
+        s_t24 = arb(0)
+        for k_i in range(2, B_tc44 + 1):
+            s_t24 += arb(k_i).log()
+            T_step_24[k_i] = s_t24
+        pp_24 = get_prime_powers_up_to(B_tc44)
+        lam_24: Dict[int, arb] = {pk: arb(p).log() for pk, p, _ in pp_24}
+
+        b_log_coeff_rational = Fraction(30731, 98304)
+        b_log_coeff_arb = arb(30731) / arb(98304)
+
+        w_log_stieltjes_and_moebius_checks: List[Dict[str, Any]] = []
+        for x_sc in (1.0, 2.0, 4.0, float(tau_arb.mid())):
+            X_a = (
+                tau_arb
+                if abs(x_sc - float(tau_arb.mid())) < 1e-9
+                else arb(str(x_sc))
+            )
+            X_c = acb(X_a)
+            inv_X_a = arb(1) / X_a
+
+            # Direct W_{log, B}(X):
+            W_log_B_val = arb(0)
+            for k_i in range(2, B_tc44 + 1):
+                k_a = arb(k_i)
+                W_log_B_val += (k_a.log() / k_a.sqrt()) * evaluate_h0_arb(
+                    k_a / X_a
+                )
+
+            E_log_B_val = T_step_24[B_tc44] - (
+                B_tc44_a * B_tc44_a.log() - B_tc44_a + arb(1)
+            )
+            upper_E_log_term = (
+                E_log_B_val
+                * (B_tc44_a ** arb("-0.5"))
+                * evaluate_h0_arb(B_tc44_a / X_a)
+            )
+            int_1_B_main_log = arb(0)
+            int_1_B_err_log = arb(0)
+            for m_i in range(1, B_tc44):
+                tm_c = acb(T_step_24[m_i])
+                int_1_B_main_log += acb.integral(
+                    lambda xc, an: (xc ** acb("-0.5"))
+                    * xc.log(analytic=an)
+                    * evaluate_h0_acb(xc / X_c, analytic=an),
+                    acb(m_i),
+                    acb(m_i + 1),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+                int_1_B_err_log += acb.integral(
+                    lambda xc, an, tmc=tm_c: (
+                        tmc - (xc * xc.log(analytic=an) - xc + acb(1))
+                    )
+                    * (xc ** acb("-1.5"))
+                    * evaluate_tilde_h0_acb(xc / X_c, analytic=an),
+                    acb(m_i),
+                    acb(m_i + 1),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+            w_log_stieltjes_diff = W_log_B_val - (
+                upper_E_log_term + int_1_B_main_log + int_1_B_err_log
+            )
+
+            # Verify B_{log, boundary}(X) identity on [0, 1] via change of variables alpha = x/X in [0, 1/X]:
+            #   B_{log, boundary}(X) = -int_0^1 x^{-1/2} (log x) h_0(x/X) dx
+            #                        = -(log X) sqrt(X) int_0^{1/X} alpha^{-1/2} h_0(alpha) d_alpha
+            #                          - sqrt(X) int_0^{1/X} alpha^{-1/2} (log alpha) h_0(alpha) d_alpha
+            #                        = -int_0^1 (x log x - x + 1) x^{-3/2} tilde{h}_0(x/X) dx.
+            # Using integration by parts on [0, 1/X] with alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)):
+            #   -int_0^1 x^{-1/2} (log x) h_0(x/X) dx = -X^{3/2} int_0^{1/X} (log(X*alpha)) alpha^{-3/2} h_0(alpha) * alpha d_alpha
+            # We integrate directly on [1/256, 1] plus the certified Taylor/Bernstein bound on (0, 1/256]:
+            eps_b = arb(1) / arb(256)
+            b_log_rhs_1 = -acb.integral(
+                lambda xc, an: (xc ** acb("-0.5"))
+                * xc.log(analytic=an)
+                * evaluate_h0_acb(xc / X_c, analytic=an),
+                acb(eps_b),
+                acb(1),
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+            b_log_lhs_1 = -acb.integral(
+                lambda xc, an: (xc * xc.log(analytic=an) - xc + acb(1))
+                * (xc ** acb("-1.5"))
+                * evaluate_tilde_h0_acb(xc / X_c, analytic=an),
+                acb(eps_b),
+                acb(1),
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+            # On [eps_b, 1], boundary term [(x log x - x + 1) x^{-1/2} h_0(x/X)]_{eps_b}^1 is 0 - (eps_b log(eps_b) - eps_b + 1) eps_b^{-1/2} h_0(eps_b / X):
+            ibp_eps_term = (
+                (eps_b * eps_b.log() - eps_b + arb(1))
+                * (eps_b ** arb("-0.5"))
+                * evaluate_h0_arb(eps_b * inv_X_a)
+            )
+            b_log_ibp_diff = b_log_lhs_1 - (b_log_rhs_1 - ibp_eps_term)
+            b_log_bound_val = b_log_coeff_arb * (X_a ** arb("-2.5"))
+            eps_tail_bound = (
+                (arb(92193) / arb(32768))
+                * (X_a ** arb("-2.5"))
+                * (eps_b**3)
+                * (abs(eps_b.log()) / arb(3) + arb(1) / arb(9))
+            )
+            b_log_full_enclosure = b_log_rhs_1 + arb(0, eps_tail_bound.upper())
+
+            # Verify exact finite-cutoff Moebius inversion on [2, B_tc44]:
+            W_B_direct = arb(0)
+            for n_i in range(2, B_tc44 + 1):
+                if n_i in lam_24:
+                    n_a = arb(n_i)
+                    W_B_direct += (lam_24[n_i] / n_a.sqrt()) * evaluate_h0_arb(
+                        n_a / X_a
+                    )
+            W_B_from_moebius = arb(0)
+            for m_i in range(1, (B_tc44 // 2) + 1):
+                mu_m = mu_table[m_i]
+                if mu_m == 0:
+                    continue
+                m_a = arb(m_i)
+                w_log_sub = arb(0)
+                for k_i in range(2, (B_tc44 // m_i) + 1):
+                    k_a = arb(k_i)
+                    w_log_sub += (k_a.log() / k_a.sqrt()) * evaluate_h0_arb(
+                        (m_a * k_a) / X_a
+                    )
+                W_B_from_moebius += (arb(mu_m) / m_a.sqrt()) * w_log_sub
+            moebius_inv_diff = W_B_direct - W_B_from_moebius
+
+            w_log_stieltjes_and_moebius_checks.append(
+                {
+                    "X": round(x_sc, 10),
+                    "B_cutoff": B_tc44,
+                    "W_log_B_mid": float(W_log_B_val.mid()),
+                    "stieltjes_decomp_encloses_zero": bool(
+                        w_log_stieltjes_diff.contains(0)
+                    ),
+                    "stieltjes_decomp_abs_upper": float(
+                        abs(w_log_stieltjes_diff).upper()
+                    ),
+                    "B_log_boundary_mid": float(b_log_full_enclosure.mid()),
+                    "B_log_boundary_abs_upper": float(
+                        abs(b_log_full_enclosure).upper()
+                    ),
+                    "B_log_boundary_rational_bound": float(
+                        b_log_bound_val.upper()
+                    ),
+                    "B_log_boundary_within_rational_bound": bool(
+                        float(abs(b_log_full_enclosure).upper())
+                        <= float(b_log_bound_val.lower())
+                    ),
+                    "B_log_ibp_identity_encloses_zero": bool(
+                        b_log_ibp_diff.contains(0)
+                    ),
+                    "moebius_inversion_finite_cutoff_encloses_zero": bool(
+                        moebius_inv_diff.contains(0)
+                    ),
+                    "moebius_inversion_finite_cutoff_abs_upper": float(
+                        abs(moebius_inv_diff).upper()
+                    ),
+                }
+            )
+
+        # Evaluate certified infinite-series enclosures of W_log(X) vs W(X), the unconditional Stirling bound,
+        # and the signed vs unsigned Moebius sums across scales X in {1, 2, pi, tau, 10, tau^2, 100}:
+        # For N_max = 25000 and X <= 100, N_max / X >= 250 >= 9 so h_0(k/X) in [-(81/64)(X/k)^{5/2}, 0) for all k > N_max,
+        # and since t^{-3} log t is decreasing for t >= 3:
+        #   -(81/64) X^{5/2} (2 log N_max + 1)/(4 N_max^2) <= sum_{k > N_max} (log k / sqrt(k)) h_0(k/X) < 0.
+        N_max_a = arb(n_max_pp)
+        w_log_scale_rows: List[Dict[str, Any]] = []
+        for label, X_a in (
+            ("1", arb(1)),
+            ("2", arb(2)),
+            ("pi", pi_arb),
+            ("tau=2*pi", tau_arb),
+            ("10", arb(10)),
+            ("tau^2", tau_arb * tau_arb),
+            ("100", arb(100)),
+        ):
+            s_log_fin = arb(0)
+            for k_i in range(2, n_max_pp + 1):
+                k_a = arb(k_i)
+                s_log_fin += (k_a.log() / k_a.sqrt()) * evaluate_h0_arb(
+                    k_a / X_a
+                )
+            tail_log_mag = (
+                (arb(81) / arb(64))
+                * (X_a ** arb("2.5"))
+                * (arb(2) * N_max_a.log() + arb(1))
+                / (arb(4) * N_max_a * N_max_a)
+            )
+            half_tail_log = -tail_log_mag / arb(2)
+            w_log_ball = s_log_fin + arb(
+                half_tail_log.mid(), abs(half_tail_log).upper()
+            )
+            uncond_bound_ball = b_log_coeff_arb * (X_a ** arb("-2.5")) + (
+                X_a ** arb("-0.5")
+            ) * (
+                arb("0.5") * m_th0_tv_arb * X_a.log()
+                + m_th0_tv_arb
+                + arb("0.5") * m_th_log_ibp_arb
+            )
+            within_uncond = bool(
+                float(abs(w_log_ball).upper())
+                <= float(uncond_bound_ball.lower())
+            )
+            w_log_scale_rows.append(
+                {
+                    "scale_label": label,
+                    "X_float": float(X_a.mid()),
+                    "W_log_mid": float(w_log_ball.mid()),
+                    "W_log_rad": float(w_log_ball.rad()),
+                    "W_log_str_15": w_log_ball.str(15, radius=True),
+                    "W_log_abs_upper": float(abs(w_log_ball).upper()),
+                    "unconditional_stirling_bound_upper": float(
+                        uncond_bound_ball.upper()
+                    ),
+                    "certified_within_unconditional_stirling_bound": within_uncond,
+                }
+            )
+
+        # Global maximum of the unconditional bound for X >= 1:
+        # On X >= 1, B_bound(X) = (30731/98304) X^{-5/2} <= 30731/98304 at X = 1, and
+        # f_I(X) = X^{-1/2} (a log X + b) with a = (1/2) M_{tilde{h},0}^{(-3/2)} ~ 1.2152455,
+        # b = M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)} ~ 3.0363961 has derivative
+        # f_I'(X) = (1/2) X^{-3/2} (2a - b - a log X) < 0 for all X >= 1 since 2a - b = -0.605905 < 0!
+        # Therefore, the unconditional upper bound is STRICTLY DECREASING on [1, infty) and attains its global
+        # maximum on [1, infty) at X = 1:
+        uncond_global_max_at_X1_arb = (
+            b_log_coeff_arb + m_th0_tv_arb + arb("0.5") * m_th_log_ibp_arb
+        )
+
+        # -------------------------------------------------------------------
+        # 4. Step 4 & Step 5: Premise Classification & Diagnostic Controls
+        #    (Modified Weights + Synthetic Off-Critical Quartet under Divisor Aggregation)
+        # -------------------------------------------------------------------
+        # Control A: Modified-weight controls across scales X in {1, 2, tau, 10, 100} (truncated at N = 5000):
+        #   (1) Authentic prime-power weights w_n = Lambda(n)/sqrt(n) -> W_N(X) (has H_0(1/2) = 0 main-term cancellation),
+        #   (2) Divisor-aggregated logarithmic weights w_k^{log} = (log k)/sqrt(k) -> W_{log, N}(X) (has BOTH H_0(1/2)=0
+        #       and H_0'(1/2)=0 cancellation and unconditional O(X^{-1/2} log(X+2)) decay),
+        #   (3) Non-standard smooth unit weights w_n^{unit} = 1/sqrt(n) (DIAGNOSTIC CONTROL ONLY):
+        #       Smooth main term is int_0^infty x^{-1/2} h_0(x/X) dx = sqrt(X) H_0(1/2) = 0, so W_{unit}(X) also decays!
+        #   (4) Non-standard quadratic weights w_n^{quad} = sqrt(n) (DIAGNOSTIC CONTROL ONLY):
+        #       Smooth main term is X^{3/2} int_0^infty alpha^{1/2} h_0(alpha) d_alpha = X^{3/2} H_0(3/2) != 0,
+        #       which diverges as X^{3/2} because z = 3/2 is NOT a zero of H_0(z)!
+        N_ctrl = 5000
+        pp_ctrl = get_prime_powers_up_to(N_ctrl)
+        lam_ctrl = {pk: arb(p).log() for pk, p, _ in pp_ctrl}
+        modified_weight_rows: List[Dict[str, Any]] = []
+        for X_c_val in (1.0, 2.0, float(tau_arb.mid()), 10.0, 100.0):
+            X_a = (
+                tau_arb
+                if abs(X_c_val - float(tau_arb.mid())) < 1e-9
+                else arb(str(X_c_val))
+            )
+            w_auth = arb(0)
+            w_div_log = arb(0)
+            w_unit_ctrl = arb(0)
+            for n_i in range(2, N_ctrl + 1):
+                n_a = arb(n_i)
+                h_val = evaluate_h0_arb(n_a / X_a)
+                inv_sq = arb(1) / n_a.sqrt()
+                if n_i in lam_ctrl:
+                    w_auth += lam_ctrl[n_i] * inv_sq * h_val
+                w_div_log += n_a.log() * inv_sq * h_val
+                w_unit_ctrl += inv_sq * h_val
+            # Also evaluate signed vs unsigned Moebius reconstruction of W_{auth, N_ctrl}(X) from W_{log}:
+            moeb_unsigned_sum = arb(0)
+            for m_i in range(1, 201):
+                if mu_table[m_i] == 0:
+                    continue
+                m_a = arb(m_i)
+                # Approximate W_log(X/m) using precomputed finite sum up to 1000:
+                s_sub = arb(0)
+                X_sub = X_a / m_a
+                for k_i in range(2, 501):
+                    k_a = arb(k_i)
+                    s_sub += (k_a.log() / k_a.sqrt()) * evaluate_h0_arb(
+                        k_a / X_sub
+                    )
+                moeb_unsigned_sum += (arb(1) / m_a.sqrt()) * abs(s_sub)
+
+            modified_weight_rows.append(
+                {
+                    "X": round(X_c_val, 6),
+                    "authentic_von_mangoldt_W_X_mid": float(w_auth.mid()),
+                    "divisor_aggregated_log_W_log_X_mid": float(
+                        w_div_log.mid()
+                    ),
+                    "nonstandard_unit_weight_control_W_unit_X_mid": float(
+                        w_unit_ctrl.mid()
+                    ),
+                    "unsigned_moebius_majorant_partial_sum_m_le_200": float(
+                        moeb_unsigned_sum.mid()
+                    ),
+                }
+            )
+
+        # Control B: Synthetic Off-Critical Quartet Control under Harmonic Divisor Aggregation:
+        # Why does harmonic divisor aggregation sum_{m=1}^infty m^{-1/2} W(X/m) = W_log(X) annihilate the
+        # spectral sum over ALL actual zeta zeros rho, yet fail on a synthetic off-critical quartet at
+        # rho_0 = 1/2 + delta_0 + i*gamma_0 that is NOT a zero of zeta(s)?
+        # Spectral explanation:
+        #   In the Mellin/explicit-formula representation, W(X) has spectral zero terms X^{rho - 1/2} H_0(rho - 1/2)
+        #   arising from the poles of -zeta'(s)/zeta(s) at zeros rho of zeta(s).
+        #   Applying the harmonic divisor-aggregation operator (sum_{m=1}^infty m^{-1/2} T_{-log m/log tau})
+        #   multiplies any homogeneous mode X^{s - 1/2} (Re(s) > 0, with pole-cancelled analytic continuation)
+        #   by the Dirichlet series sum_{m=1}^infty m^{-s} = zeta(s)!
+        #   - At every ACTUAL nontrivial zero rho of zeta(s), zeta(rho) = 0, so the multiplier zeta(rho)
+        #     annihilates the pole of -zeta'(s)/zeta(s) identically: (-zeta'(s)/zeta(s)) * zeta(s) = -zeta'(s),
+        #     which is holomorphic on C \ {1}!
+        #   - By contrast, for a synthetic off-critical quartet injected at rho_0 = 1/2 + delta_0 + i*gamma_0
+        #     where zeta(rho_0) != 0 (e.g. delta_0 = 0.2, gamma_0 = 14.1347251417), harmonic divisor aggregation
+        #     multiplies the growing mode X^{delta_0 + i*gamma_0} H_0(delta_0 + i*gamma_0) by zeta(rho_0) != 0,
+        #     so the aggregated synthetic functional STILL grows as O(X^{delta_0})!
+        #   - Conversely, recovering W(X) from W_log(X/m) via Moebius inversion sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m)
+        #     multiplies by sum_{m=1}^infty mu(m) m^{-s} = 1/zeta(s), which re-introduces the poles at the zeros of zeta(s)!
+        rho0_synth = acb("0.7", "14.1347251417346937904572519835625")
+        z0_synth = rho0_synth - acb("0.5")
+        zeta_at_rho0 = rho0_synth.zeta()
+        h0_at_z0 = evaluate_f_tau_acb(rho0_synth) * evaluate_f_tau_acb(
+            acb(1) - rho0_synth
+        )
+        agg_quartet_multiplier_abs = abs(zeta_at_rho0 * h0_at_z0)
+        synthetic_quartet_divisor_control = {
+            "synthetic_rho_0": "0.7 + 14.13472514173469379 i  (delta_0 = 0.2, not a zero of zeta)",
+            "abs_zeta_at_rho_0_mid": float(abs(zeta_at_rho0).mid()),
+            "abs_zeta_at_rho_0_lower": float(abs(zeta_at_rho0).lower()),
+            "zeta_at_rho_0_certified_nonzero": bool(
+                float(abs(zeta_at_rho0).lower()) > 0.1
+            ),
+            "abs_H0_at_z_0_mid": float(abs(h0_at_z0).mid()),
+            "abs_divisor_aggregated_quartet_amplitude_mid": float(
+                agg_quartet_multiplier_abs.mid()
+            ),
+            "mechanism_comparison": (
+                "Harmonic divisor aggregation sum_{m>=1} m^{-1/2} W(X/m) multiplies a spectral mode X^{s-1/2} "
+                "by zeta(s): at actual zeros rho of zeta(s), (-zeta'(s)/zeta(s)) * zeta(s) = -zeta'(s) is holomorphic "
+                "away from s = 1 (and the s = 1 double pole of -zeta'(s) is annihilated by the triple zero of H_0(z) "
+                "at z = 1/2), which is the spectral dual of sum_{d|k} Lambda(d) = log k and explains why W_log(X) is "
+                "unconditionally O(X^{-1/2} log(X+2)). For a synthetic off-critical quartet at rho_0 not in Z(zeta), "
+                f"|zeta(rho_0)| = {float(abs(zeta_at_rho0).mid()):.10f} != 0 fails to annihilate the quartet mode. "
+                "Conversely, Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) multiplies by 1/zeta(s), "
+                "showing why recovering W(X) from W_log(X) requires signed Moebius cancellation across m ~ X."
+            ),
+        }
+
+        premise_classification = {
+            "category_i_already_proved_in_repository": [
+                "Seed Mellin zero orders F_tau(0)=0 (order 1), F_tau(1)=0 (order 2), and triple zeros H_0(+/- 1/2)=0 (order 3, so H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0).",
+                "Attempt B decomposition Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + P_E(f) on S_tau and transfer cancellation P_E(f) - D_{smooth}^B(f) = -W_prime(f*f^*) + W_arch(f*f^*).",
+                "Coercive norm-shifted semiboundedness reduction (`coercive_norm_shift_semiboundedness_implies_correlation_bound`): P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2) implies |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1).",
+                "Exact rational Bernstein kernel envelopes |h_0(alpha)| <= (92193/32768)(alpha + alpha^{-1})^{-5/2} and |tilde{h}_0(alpha)| <= (1032993/65536)(alpha + alpha^{-1})^{-5/2}.",
+            ],
+            "category_ii_unconditional_external_theorems": [
+                "Unique prime factorization / divisor-sum identity sum_{d|k} Lambda(d) = log k for all k >= 1 (Hardy & Wright 2008, Theorem 296; Apostol 1976, Theorem 2.11).",
+                "Moebius inversion formula sum_{d|k} mu(d) = delta_{k,1} and Lambda = mu * log (Hardy & Wright 2008, Theorem 266; Apostol 1976, Theorem 2.9).",
+                "Stirling / Robbins factorial remainder bound: T(x) = sum_{2<=k<=x} log k = (x log x - x + 1) + E_log(x) with E_log(1) = 0 and |E_log(x)| <= (1/2) log x + 1 for all x >= 1 (Robbins 1955, Amer. Math. Monthly 62, 26–29; Olver 1997, Ch. 8).",
+                "Rosser–Schoenfeld prime bounds: one-sided psi(x) < 1.03883*x for all x > 0 (Rosser & Schoenfeld 1962, Theorem 12) and two-sided |psi(x) - x| <= x (log x)^2 exp(-sqrt(log x / 17.5163)) for x >= 2 (Theorem 10).",
+            ],
+            "category_iii_new_statements_proved_in_task_tc044": [
+                "Prime-Shift Quadratic Form Identity (`prime_shift_quadratic_form_and_subtracted_finite_part_equivalence`): D_N(f) - 2 L_N ||f||_{L^2}^2 = -W_{prime, N}(f * f^*), its N -> infty limit -W_prime(f * f^*), its exact relation to P_E(f) and Q_tau(f, f), and the proof that D_N(f) >= 0 alone yields only -2 L_N ||f||^2 -> -infty.",
+                "Unconditional Uniform Boundedness and O(X^{-1/2} log(X+2)) Decay of the Divisor-Aggregated Prime-Shift Functional W_log(X) (`divisor_aggregated_stieltjes_and_moebius_inversion_identity`): W_log(X) = sum_{m=1}^infty m^{-1/2} W(X/m) = sum_{k=2}^infty (log k / sqrt(k)) h_0(k/X) = B_{log, boundary}(X) + int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx satisfies |W_log(X)| <= (30731/98304) X^{-5/2} + X^{-1/2}((1/2) M_{tilde{h},0}^{(-3/2)} log X + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)}) <= 3.34901 for all X >= 1 without assuming RH.",
+                "Exact Moebius Inversion W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) and proof that any unsigned bound |mu(m)| <= 1 diverges as O(sqrt(X)).",
+            ],
+            "category_iv_unproved_premise": {
+                "subgate_id": "SUBGATE-TC-043A",
+                "lemma_name": "Moebius De-Aggregation Cancellation Lemma for W(X)",
+                "exact_statement": (
+                    "Prove without assuming RH or universal Weil positivity that there exists a finite constant "
+                    "M_0 < infty such that for all X >= 1, the signed Moebius de-aggregation series "
+                    "W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) satisfies |W(X)| <= M_0 "
+                    "(equivalently, |I(X)| <= M_0' < infty and P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2))."
+                ),
+            },
+        }
+
+        divisor_aggregated_candidate_audit = {
+            "candidate_name": "Divisor-Aggregated Prime-Shift Functional W_log(X) & Exact Moebius Inversion",
+            "status": "W_LOG_UNCONDITIONALLY_BOUNDED_AND_DECAYING_MOEBIUS_OBSTRUCTION_ISOLATED",
+            "aggregation_identity": (
+                "W_log(X) := sum_{m=1}^infty m^{-1/2} W(X/m) = sum_{k=2}^infty (log k / sqrt(k)) h_0(k/X)  "
+                "(via sum_{d|k} Lambda(d) = log k)"
+            ),
+            "vanishing_zeroth_and_first_logarithmic_moments": {
+                "H0_at_half_zero": True,
+                "H0_prime_at_half_contains_zero": h0_prime_half_contains_zero,
+                "H0_prime_at_half_abs_upper": float(
+                    abs(h0_prime_half_enclosure).upper()
+                ),
+                "stirling_main_term_cancellation": (
+                    "int_0^infty x^{-1/2} (log x) h_0(x/X) dx = sqrt(X) [(log X) H_0(1/2) + H_0'(1/2)] = 0 "
+                    "for all X > 0 because H_0(z) = F_tau(1/2+z) F_tau(1/2-z) has a triple zero at z = 1/2."
+                ),
+            },
+            "exact_stieltjes_representation": {
+                "formula": (
+                    "W_log(X) = B_{log, boundary}(X) + int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx,  "
+                    "B_{log, boundary}(X) = -int_0^1 x^{-1/2} (log x) h_0(x/X) dx = -int_0^1 (x log x - x + 1) x^{-3/2} tilde{h}_0(x/X) dx"
+                ),
+                "boundary_rational_coeff": str(b_log_coeff_rational),
+                "boundary_bound_for_X_ge_1": f"|B_{{log, boundary}}(X)| <= (30731/98304) X^(-5/2) <= {float(b_log_coeff_arb.upper()):.10f} X^(-5/2)",
+                "M_tilde_h_0_minus_3_2_mid": float(m_th0_tv_arb.mid()),
+                "M_tilde_h_0_minus_3_2_rad": float(m_th0_tv_arb.rad()),
+                "M_tilde_h_0_tv_equals_two_sum_extrema": tv_equals_two_sum_extrema,
+                "M_tilde_h_log_minus_3_2_mid": float(m_th_log_ibp_arb.mid()),
+                "M_tilde_h_log_minus_3_2_rad": float(m_th_log_ibp_arb.rad()),
+                "M_tilde_h_log_methods_overlap": m_th_log_methods_overlap,
+                "signed_tilde_h_log_moment_encloses_zero": signed_th_log_encloses_zero,
+                "unconditional_stirling_bound_formula_for_X_ge_1": (
+                    "|W_log(X)| <= (30731/98304) X^{-5/2} + X^{-1/2} ((1/2) M_{tilde{h},0}^{(-3/2)} log X + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)})"
+                ),
+                "unconditional_global_max_on_X_ge_1": float(
+                    uncond_global_max_at_X1_arb.upper()
+                ),
+            },
+            "moebius_inversion_and_de_aggregation_obstruction": {
+                "exact_infinite_identity": "W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m)",
+                "exact_finite_cutoff_identity": "W_B(X) = sum_{m=1}^{floor(B/2)} (mu(m)/sqrt(m)) W_{log, floor(B/m)}(X/m)",
+                "unsigned_moebius_divergence": (
+                    "Replacing mu(m) by |mu(m)| = mu^2(m) yields sum_{m=1}^infty (mu^2(m)/sqrt(m)) |W_log(X/m)| "
+                    "~ (6/pi^2) (int_0^infty u^{-3/2} |W_log(u)| du) sqrt(X) -> +infty as X -> infty, "
+                    "because W_log(u) is peaking around u ~ 1 (m ~ X) where m^{-1/2} ~ X^{-1/2} summed over O(X) squarefree integers "
+                    "produces O(sqrt(X)). Thus recovering an O(1) bound on W(X) from the unconditionally bounded profile W_log "
+                    "requires signed cancellation of mu(m) across m ~ X."
+                ),
+            },
+            "certified_finite_cutoff_checks": w_log_stieltjes_and_moebius_checks,
+            "certified_w_log_scale_enclosures": w_log_scale_rows,
+            "lean_theorem": "divisor_aggregated_stieltjes_and_moebius_inversion_identity",
+        }
+
+        return {
+            "task_id": TASK_TC_044_ID,
+            "parent_epic": EPIC_TC_042_ID,
+            "inspected_baseline": STARTING_HEAD_TC_044,
+            "status": PRIME_SHIFT_QUADRATIC_FORM_STATUS,
+            "section_1_baseline_and_narrow_corrections": baseline_and_narrow_corrections,
+            "section_2_prime_shift_quadratic_form": prime_shift_quadratic_form_audit,
+            "section_3_divisor_aggregated_candidate_and_moebius_inversion": divisor_aggregated_candidate_audit,
+            "section_4_premise_classification_and_next_lemma": premise_classification,
+            "section_5_diagnostics_and_controls": {
+                "modified_weight_controls": modified_weight_rows,
+                "synthetic_off_critical_quartet_divisor_aggregation_control": synthetic_quartet_divisor_control,
+            },
         }
     finally:
         flint_ctx.prec = saved_prec
@@ -7231,7 +8333,7 @@ def verify_canonical_theta_correlation_lean_module(
 def build_canonical_theta_correlation_bound_report(
     n_primes_max: int = 25000, prec_bits: int = 256
 ) -> Dict[str, Any]:
-    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 audit and certification report."""
+    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 / TASK-TC-043R / TASK-TC-044 audit and certification report."""
     seed_audit = derive_seed_spatial_polynomial_and_mellin()
     autocorr_audit = derive_closed_form_autocorrelation_h_K()
     rh_equiv_audit = audit_rh_equivalence_and_laplace_resolvent()
@@ -7258,6 +8360,9 @@ def build_canonical_theta_correlation_bound_report(
     task_tc043_audit = execute_task_tc043_admissible_cross_grade_compatibility(
         prec_bits=prec_bits
     )
+    task_tc044_audit = execute_task_tc044_prime_shift_quadratic_form(
+        prec_bits=prec_bits
+    )
     lean_audit = verify_canonical_theta_correlation_lean_module()
     wavelet_audit = proof_attempts["attempt_3_large_grade_wavelet_decomposition"][
         "uniform_prime_wavelet_boundedness"
@@ -7279,6 +8384,7 @@ def build_canonical_theta_correlation_bound_report(
         "factorization_task_id": TASK_TC_042F_ID,
         "compatibility_task_id": TASK_TC_043_ID,
         "compatibility_repair_task_id": TASK_TC_043R_ID,
+        "prime_shift_task_id": TASK_TC_044_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -7289,6 +8395,7 @@ def build_canonical_theta_correlation_bound_report(
         "factorization_starting_head": STARTING_HEAD_TC_042F,
         "compatibility_starting_head": STARTING_HEAD_TC_043,
         "compatibility_repair_starting_head": STARTING_HEAD_TC_043R,
+        "prime_shift_starting_head": STARTING_HEAD_TC_044,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -7298,6 +8405,7 @@ def build_canonical_theta_correlation_bound_report(
             "stieltjes_multiscale_reduction_status": STIELTJES_MULTISCALE_REDUCTION_REPAIRED_AND_CERTIFIED,
             "arithmetic_fourier_factorization_status": ARITHMETIC_FOURIER_FACTORIZATION_STATUS,
             "admissible_cross_grade_compatibility_status": ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS,
+            "prime_shift_quadratic_form_status": PRIME_SHIFT_QUADRATIC_FORM_STATUS,
             "rh_equivalence_proof_status": FIXED_SEED_RH_EQUIVALENCE_PROVED,
             "numerical_certification_status": FINITE_GRID_CORRELATION_BOUND_CERTIFIED,
             "local_concavity_status": LOCAL_ORIGIN_CONCAVITY_CERTIFIED,
@@ -7326,6 +8434,7 @@ def build_canonical_theta_correlation_bound_report(
         "section_10_lean_formalization_audit": lean_audit,
         "section_11_arithmetic_fourier_positive_factorization": task_tc042f_audit,
         "section_12_admissible_cross_grade_compatibility": task_tc043_audit,
+        "section_13_prime_shift_quadratic_form_and_divisor_aggregation": task_tc044_audit,
         "literature_references": [
             {
                 "citation": "Burnol (1999, arXiv:math/9902080v1; 2001, arXiv:math/0101068v1)",

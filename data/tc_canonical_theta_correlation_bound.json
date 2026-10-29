@@ -6,6 +6,7 @@
   "factorization_task_id": "TASK-TC-042F",
   "compatibility_task_id": "TASK-TC-043",
   "compatibility_repair_task_id": "TASK-TC-043R",
+  "prime_shift_task_id": "TASK-TC-044",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
@@ -13,6 +14,7 @@
   "factorization_starting_head": "697e6862c7e1288550bef007cbdf0a520486c245",
   "compatibility_starting_head": "db5d8d4f429ef2b0bd9000d715e3552953b48355",
   "compatibility_repair_starting_head": "726f7b4da8b7bd757b68f96783fee6b86f2f3f7b",
+  "prime_shift_starting_head": "2122d7989d1821cf9048d7d32ad00c64f17e191b",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -26,7 +28,8 @@
     "TASK-TC-042R",
     "TASK-TC-042R2",
     "TASK-TC-042F",
-    "TASK-TC-043"
+    "TASK-TC-043",
+    "TASK-TC-043R"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -36,6 +39,7 @@
     "stieltjes_multiscale_reduction_status": "STIELTJES_IDENTITY_REPAIRED_AND_CERTIFIED",
     "arithmetic_fourier_factorization_status": "POLE_PNT_ARCHIMEDEAN_CANCELLATION_PROVED_DEFECT_ISOLATED",
     "admissible_cross_grade_compatibility_status": "TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED",
+    "prime_shift_quadratic_form_status": "PRIME_SHIFT_QUADRATIC_FORM_DECOMPOSED_DIVISOR_AGGREGATED_W_LOG_UNCONDITIONALLY_BOUNDED_MOEBIUS_OBSTRUCTION_ISOLATED",
     "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
     "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
     "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
@@ -2670,7 +2674,9 @@
       "complexHyperbolicPairForm",
       "attemptBTransferForm",
       "zeroMomentSubtractedDecomp",
-      "chordalStieltjesDecomp"
+      "chordalStieltjesDecomp",
+      "primeShiftQuadraticFormDecomp",
+      "divisorAggregatedStieltjesDecomp"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -2692,7 +2698,9 @@
       "complexHyperbolicPairForm",
       "attemptBTransferForm",
       "zeroMomentSubtractedDecomp",
-      "chordalStieltjesDecomp"
+      "chordalStieltjesDecomp",
+      "primeShiftQuadraticFormDecomp",
+      "divisorAggregatedStieltjesDecomp"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2732,7 +2740,9 @@
       "coercive_norm_shift_semiboundedness_implies_correlation_bound",
       "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
       "majorant_window_lower_bound_and_envelope_ordering",
-      "zero_moment_subtracted_and_chordal_stieltjes_equivalence"
+      "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+      "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence",
+      "divisor_aggregated_stieltjes_and_moebius_inversion_identity"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2772,7 +2782,9 @@
       "coercive_norm_shift_semiboundedness_implies_correlation_bound",
       "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
       "majorant_window_lower_bound_and_envelope_ordering",
-      "zero_moment_subtracted_and_chordal_stieltjes_equivalence"
+      "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+      "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence",
+      "divisor_aggregated_stieltjes_and_moebius_inversion_identity"
     ]
   },
   "section_11_arithmetic_fourier_positive_factorization": {
@@ -3747,7 +3759,7 @@
           "envelope_ordering": "Under an upper envelope |E(x)| <= x * omega(x), |I(X)| <= A_E(X) <= M_omega(X). An upper envelope on |E(x)| yields an upper bound on A_E(X), NOT a lower bound on A_E(X).",
           "monotone_majorant_lower_bound": "For nonnegative, nonincreasing omega on [1, infty), X >= 2, and c_0 = int_{1/2}^2 alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha = 1.7456980946 > 0, restricting M_omega(X) to x in [X/2, 2X] (where x >= 1 and omega(x) >= omega(2X)) proves M_omega(X) >= c_0 * sqrt(X) * omega(2X) (using omega(2X), not omega(X/2)).",
           "divergence_hypothesis_and_scope": "M_omega(X) -> +infty as X -> infty holds for the specified class of nonnegative, nonincreasing envelopes omega satisfying sqrt(X) * omega(2X) -> infty. The unsupported claim that every unsigned estimate must fail is withdrawn.",
-          "classical_bounds_vs_illustrative_models": "The expressions omega_Cheb(x) = 0.04 and omega_dLVP(x) = exp(-0.2*sqrt(log x)) are evaluated as illustrative envelope models inside the class sqrt(X)*omega(2X) -> infty. Classical proven bounds with explicit constants and ranges include Rosser\u2013Schoenfeld (1962, Theorem 12): |psi(x) - x| < 0.0397*x for all x > 0 (and |theta(x) - x| < 0.006788*x/log x for x >= 10^8), and Rosser\u2013Schoenfeld (1962, Theorem 10): |psi(x) - x| <= x*(log x)^2*exp(-sqrt(log x / R_0)) with R_0 = 17.5163 for x >= 2."
+          "classical_bounds_vs_illustrative_models": "The expressions omega_Cheb(x) = 0.04 and omega_dLVP(x) = exp(-0.2*sqrt(log x)) are evaluated as illustrative envelope models on [1, infty) inside the class sqrt(X)*omega(2X) -> infty. Classical proven bounds with explicit constants and ranges include Rosser\u2013Schoenfeld (1962, Theorem 12): one-sided upper bound psi(x) < 1.03883*x for all x > 0 (and |theta(x) - x| < 0.006788*x/log x for x >= 10^8; note that at x = 1, |psi(1) - 1| = 1, so two-sided bounds |psi(x) - x| <= eps*x with eps < 1 hold only for x >= x_0(eps) > 1), and Rosser\u2013Schoenfeld (1962, Theorem 10): |psi(x) - x| <= x*(log x)^2*exp(-sqrt(log x / R_0)) with R_0 = 17.5163 for x >= 2."
         },
         "unsigned_majorant_growth_lower_bound": "For any nonnegative, nonincreasing envelope omega with |E(x)| <= x * omega(x) and X >= 2, A_E(X) <= M_omega(X) and M_omega(X) >= c_0 * sqrt(X) * omega(2X). Whenever sqrt(X) * omega(2X) -> +infty as X = tau^{|Delta|} -> infty, the majorant M_omega(tau^{|Delta|}) diverges to +infty, exceeding the asymptotically constant coercive norm ||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 -> ||A_tau^B psi_tau||^2 + mu_0 ||psi_tau||^2.",
         "crossover_grade_delta_star_chebyshev_004x_at_mu0_1": 3.357494037859835,
@@ -3771,13 +3783,15 @@
         "chordal_prime_power_stieltjes_equivalence": {
           "increment_splitting": "e(X*alpha) - e(X) = (psi(X*alpha) - psi(X))/(X*alpha) - (1 - 1/alpha)*(psi(X)/X), splitting I_inc(X) = I_chord(X) - I_drift(X).",
           "closed_form_drift_integral": "I_drift(X) := sqrt(X) (psi(X)/X) int_{1/X}^infty (1 - 1/alpha) k(alpha) d_alpha = (psi(X)/X) B_boundary(X) - psi(X) h_0(1/X) = O(X^{-3/2}).",
-          "closed_form_chordal_jump_integral": "I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha = W(X) - psi(X) h_0(1/X)  (by Stieltjes integration by parts against alpha^{-1} k(alpha) d_alpha = -d(alpha^{-1/2} h_0(alpha))).",
+          "closed_form_chordal_jump_integral": "I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha = int_1^infty (psi(x) - psi(X)) x^{-3/2} tilde{h}_0(x/X) dx = W(X) - psi(X) h_0(1/X)  (by Stieltjes integration by parts against x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)], with boundary term [-(psi(x) - psi(X)) x^{-1/2} h_0(x/X)]_1^infty = 0 - (-(psi(1) - psi(X)) h_0(1/X)) = -psi(X) h_0(1/X) since psi(1) = 0).",
           "exact_equivalence_and_reappearance_of_W_X": "Subtracting I_drift(X) from I_chord(X) cancels the O(X^{-3/2}) endpoint term -psi(X) h_0(1/X) identically: I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X). Adding B_zm(X) = e(X) B_boundary(X) recovers I(X) = W(X) - B_boundary(X). Thus zero-moment subtraction and chordal prime-power increment decomposition isolate the O(X^{-5/2}) lower-tail boundary term B_zm(X), while the prime-wavelet sum W(X) reappears identically inside I_chord(X).",
-          "lean_theorem": "zero_moment_subtracted_and_chordal_stieltjes_equivalence"
+          "lean_theorem": "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+          "lean_theorem_scope_note": "Formalizes the algebraic cancellation and subtraction deductions from the analytic Stieltjes identities for I_chord, I_drift, and the lower-tail integral, not the measure-theoretic Stieltjes integration itself."
         },
         "next_justified_refinement_chebyshev_primitive_transfer": {
-          "normalized_primitive_definition": "E_1(x) := int_1^x E(t) dt (E_1(1) = 0),  e_1(x) := E_1(x)/x^2,  satisfying (2 + D_x) e_1(x) = e(x).",
+          "normalized_primitive_definition": "E_1(x) := int_1^x [psi(t) - t] dt (so psi_1(x) := int_1^x psi(t) dt = (x^2 - 1)/2 + E_1(x) with E_1(1) = 0), e_1(x) := E_1(x)/x^2, satisfying (2 + D_x) e_1(x) = e(x).",
           "transferred_kernel_definition": "k_1(alpha) := (1 - D_alpha) k(alpha) = alpha^{-1/2} (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) = alpha^{-1/2} h_1(alpha), satisfying int_0^infty k_1(alpha) d_alpha = 0 and int_0^{1/X} k_1(alpha) d_alpha = 2 int_0^{1/X} k(alpha) d_alpha - (1/X) k(1/X).",
+          "primitive_kernel_mellin_multiplier": "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)  (with z = rho - 1/2, under hat{f}(z) = int_0^infty f(alpha) alpha^z d_alpha/alpha, hat{D_alpha f}(z) = -z hat{f}(z)).",
           "primitive_increment_identity": "I(X) = sqrt(X) int_{1/X}^infty e_1(X*alpha) k_1(alpha) d_alpha = sqrt(X) int_{1/X}^infty [e_1(X*alpha) - e_1(X)] k_1(alpha) d_alpha - sqrt(X) e_1(X) int_0^{1/X} k_1(alpha) d_alpha.",
           "symbolic_ibp_verified": true,
           "k1_unsigned_window_moment_c1_on_half_to_two": 11.489756672104576,
@@ -3785,7 +3799,7 @@
           "k1_unsigned_full_moment_C1_abs": 14.75639894272054,
           "k1_unsigned_full_moment_C1_abs_rad": 4.523286342949466e-27,
           "k1_signed_full_moment_encloses_zero": true,
-          "what_improves_vs_where_obligation_reappears": "Analytic gain: Unlike e(x) = E(x)/x (which has jump discontinuities at every prime power n = p^k and only conditionally convergent explicit-formula zero sum -sum_rho x^{rho-1}/rho), e_1(x) = E_1(x)/x^2 is continuous, piecewise C^1, vanishes at x = 1, and has the UNCONDITIONALLY and ABSOLUTELY convergent explicit expansion e_1(x) = -sum_rho x^{z_rho - 1/2}/(rho(rho+1)) + O(x^{-1}) (since sum_rho |rho(rho+1)|^{-1} < infty). Where the obligation reappears: Mellin integration of x^{z_rho - 1/2} against k_1(alpha) multiplies by (3/2 - (1/2 - z_rho))(1/2 - (1/2 - z_rho)) = (1 + z_rho) z_rho = rho(rho+1), cancelling 1/(rho(rho+1)) and restoring the exact spectral weight X^{z_rho} H_0(z_rho); spatially, since c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha = 11.4897566721 > 0, any monotone unsigned envelope |e_1(x)| <= omega_1(x) with sqrt(X) * omega_1(2X) -> infty still yields a majorant >= c_1 * sqrt(X) * omega_1(2X) -> infty."
+          "what_improves_vs_where_obligation_reappears": "Analytic gain: Unlike e(x) = E(x)/x (which has jump discontinuities at every prime power n = p^k and only conditionally convergent explicit-formula zero sum -sum_rho x^{rho-1}/rho), e_1(x) = E_1(x)/x^2 is continuous, piecewise C^1, vanishes at x = 1, and has the UNCONDITIONALLY and ABSOLUTELY convergent explicit expansion e_1(x) = -sum_rho x^{z_rho - 1/2}/(rho(rho+1)) + O(x^{-1}) (since sum_rho |rho(rho+1)|^{-1} < infty). Where the obligation reappears: Under hat{f}(z) = int_0^infty f(alpha) alpha^z d_alpha/alpha (so hat{D_alpha f}(z) = -z hat{f}(z)), the primitive-kernel Mellin multiplier of h_1(alpha) = (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) is M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z) (for z = rho - 1/2), cancelling 1/(rho(rho+1)) and restoring the exact spectral weight X^{z_rho} H_0(z_rho); spatially, since c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha = 11.4897566721 > 0, any monotone unsigned envelope |e_1(x)| <= omega_1(x) with sqrt(X) * omega_1(2X) -> infty still yields a majorant >= c_1 * sqrt(X) * omega_1(2X) -> infty."
         },
         "certified_scale_checks": [
           {
@@ -3879,13 +3893,15 @@
       "chordal_prime_power_stieltjes_equivalence": {
         "increment_splitting": "e(X*alpha) - e(X) = (psi(X*alpha) - psi(X))/(X*alpha) - (1 - 1/alpha)*(psi(X)/X), splitting I_inc(X) = I_chord(X) - I_drift(X).",
         "closed_form_drift_integral": "I_drift(X) := sqrt(X) (psi(X)/X) int_{1/X}^infty (1 - 1/alpha) k(alpha) d_alpha = (psi(X)/X) B_boundary(X) - psi(X) h_0(1/X) = O(X^{-3/2}).",
-        "closed_form_chordal_jump_integral": "I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha = W(X) - psi(X) h_0(1/X)  (by Stieltjes integration by parts against alpha^{-1} k(alpha) d_alpha = -d(alpha^{-1/2} h_0(alpha))).",
+        "closed_form_chordal_jump_integral": "I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha = int_1^infty (psi(x) - psi(X)) x^{-3/2} tilde{h}_0(x/X) dx = W(X) - psi(X) h_0(1/X)  (by Stieltjes integration by parts against x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)], with boundary term [-(psi(x) - psi(X)) x^{-1/2} h_0(x/X)]_1^infty = 0 - (-(psi(1) - psi(X)) h_0(1/X)) = -psi(X) h_0(1/X) since psi(1) = 0).",
         "exact_equivalence_and_reappearance_of_W_X": "Subtracting I_drift(X) from I_chord(X) cancels the O(X^{-3/2}) endpoint term -psi(X) h_0(1/X) identically: I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X). Adding B_zm(X) = e(X) B_boundary(X) recovers I(X) = W(X) - B_boundary(X). Thus zero-moment subtraction and chordal prime-power increment decomposition isolate the O(X^{-5/2}) lower-tail boundary term B_zm(X), while the prime-wavelet sum W(X) reappears identically inside I_chord(X).",
-        "lean_theorem": "zero_moment_subtracted_and_chordal_stieltjes_equivalence"
+        "lean_theorem": "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+        "lean_theorem_scope_note": "Formalizes the algebraic cancellation and subtraction deductions from the analytic Stieltjes identities for I_chord, I_drift, and the lower-tail integral, not the measure-theoretic Stieltjes integration itself."
       },
       "next_justified_refinement_chebyshev_primitive_transfer": {
-        "normalized_primitive_definition": "E_1(x) := int_1^x E(t) dt (E_1(1) = 0),  e_1(x) := E_1(x)/x^2,  satisfying (2 + D_x) e_1(x) = e(x).",
+        "normalized_primitive_definition": "E_1(x) := int_1^x [psi(t) - t] dt (so psi_1(x) := int_1^x psi(t) dt = (x^2 - 1)/2 + E_1(x) with E_1(1) = 0), e_1(x) := E_1(x)/x^2, satisfying (2 + D_x) e_1(x) = e(x).",
         "transferred_kernel_definition": "k_1(alpha) := (1 - D_alpha) k(alpha) = alpha^{-1/2} (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) = alpha^{-1/2} h_1(alpha), satisfying int_0^infty k_1(alpha) d_alpha = 0 and int_0^{1/X} k_1(alpha) d_alpha = 2 int_0^{1/X} k(alpha) d_alpha - (1/X) k(1/X).",
+        "primitive_kernel_mellin_multiplier": "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)  (with z = rho - 1/2, under hat{f}(z) = int_0^infty f(alpha) alpha^z d_alpha/alpha, hat{D_alpha f}(z) = -z hat{f}(z)).",
         "primitive_increment_identity": "I(X) = sqrt(X) int_{1/X}^infty e_1(X*alpha) k_1(alpha) d_alpha = sqrt(X) int_{1/X}^infty [e_1(X*alpha) - e_1(X)] k_1(alpha) d_alpha - sqrt(X) e_1(X) int_0^{1/X} k_1(alpha) d_alpha.",
         "symbolic_ibp_verified": true,
         "k1_unsigned_window_moment_c1_on_half_to_two": 11.489756672104576,
@@ -3893,7 +3909,7 @@
         "k1_unsigned_full_moment_C1_abs": 14.75639894272054,
         "k1_unsigned_full_moment_C1_abs_rad": 4.523286342949466e-27,
         "k1_signed_full_moment_encloses_zero": true,
-        "what_improves_vs_where_obligation_reappears": "Analytic gain: Unlike e(x) = E(x)/x (which has jump discontinuities at every prime power n = p^k and only conditionally convergent explicit-formula zero sum -sum_rho x^{rho-1}/rho), e_1(x) = E_1(x)/x^2 is continuous, piecewise C^1, vanishes at x = 1, and has the UNCONDITIONALLY and ABSOLUTELY convergent explicit expansion e_1(x) = -sum_rho x^{z_rho - 1/2}/(rho(rho+1)) + O(x^{-1}) (since sum_rho |rho(rho+1)|^{-1} < infty). Where the obligation reappears: Mellin integration of x^{z_rho - 1/2} against k_1(alpha) multiplies by (3/2 - (1/2 - z_rho))(1/2 - (1/2 - z_rho)) = (1 + z_rho) z_rho = rho(rho+1), cancelling 1/(rho(rho+1)) and restoring the exact spectral weight X^{z_rho} H_0(z_rho); spatially, since c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha = 11.4897566721 > 0, any monotone unsigned envelope |e_1(x)| <= omega_1(x) with sqrt(X) * omega_1(2X) -> infty still yields a majorant >= c_1 * sqrt(X) * omega_1(2X) -> infty."
+        "what_improves_vs_where_obligation_reappears": "Analytic gain: Unlike e(x) = E(x)/x (which has jump discontinuities at every prime power n = p^k and only conditionally convergent explicit-formula zero sum -sum_rho x^{rho-1}/rho), e_1(x) = E_1(x)/x^2 is continuous, piecewise C^1, vanishes at x = 1, and has the UNCONDITIONALLY and ABSOLUTELY convergent explicit expansion e_1(x) = -sum_rho x^{z_rho - 1/2}/(rho(rho+1)) + O(x^{-1}) (since sum_rho |rho(rho+1)|^{-1} < infty). Where the obligation reappears: Under hat{f}(z) = int_0^infty f(alpha) alpha^z d_alpha/alpha (so hat{D_alpha f}(z) = -z hat{f}(z)), the primitive-kernel Mellin multiplier of h_1(alpha) = (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) is M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z) (for z = rho - 1/2), cancelling 1/(rho(rho+1)) and restoring the exact spectral weight X^{z_rho} H_0(z_rho); spatially, since c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha = 11.4897566721 > 0, any monotone unsigned envelope |e_1(x)| <= omega_1(x) with sqrt(X) * omega_1(2X) -> infty still yields a majorant >= c_1 * sqrt(X) * omega_1(2X) -> infty."
       },
       "certified_scale_checks": [
         {
@@ -3969,6 +3985,418 @@
           "primitive_transfer_abs_upper": 3.589796128699536e-32
         }
       ]
+    }
+  },
+  "section_13_prime_shift_quadratic_form_and_divisor_aggregation": {
+    "task_id": "TASK-TC-044",
+    "parent_epic": "EPIC-TC-042",
+    "inspected_baseline": "2122d7989d1821cf9048d7d32ad00c64f17e191b",
+    "status": "PRIME_SHIFT_QUADRATIC_FORM_DECOMPOSED_DIVISOR_AGGREGATED_W_LOG_UNCONDITIONALLY_BOUNDED_MOEBIUS_OBSTRUCTION_ISOLATED",
+    "section_1_baseline_and_narrow_corrections": {
+      "chordal_stieltjes_baseline_identity": "I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X), with |B_boundary(X)| <= (92193/24576) X^{-5/2} for all X >= 1.",
+      "sufficient_relative_semiboundedness_vs_full_weil_positivity": {
+        "normalized_two_grade_states": "f_pm^{(K)} = (psi_tau +/- T_K psi_tau) / sqrt(2) in S_tau",
+        "sufficient_relative_lower_bound": "exists mu_0 >= 0 forall K in Qbar intersect R : P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2)",
+        "implied_correlation_bound": "|C_tau(K)| <= C_tau(0) + 2 (c_tau^B + mu_0) h_0(1) < infty",
+        "relation_to_W_X": "Since ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 = ||A_tau^B psi_tau||^2 + O(|K| tau^{-|K|/2}), ||f_pm^{(K)}||_{L^2}^2 = h_0(1) + O(tau^{-5|K|/2}), and P_E(f_pm^{(K)}) = P_E(psi_tau) -/+ W(tau^{|K|}) + O(|K| tau^{-|K|/2}), the relative semiboundedness condition is equivalent to uniform boundedness sup_{X >= 1} |W(X)| < infty (where W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)).",
+        "distinction_from_full_weil_positivity": "Full Weil positivity requires Q_tau(f, f) >= 0 on all of S_tau (i.e. P_E(f) >= c_tau^B ||f||^2 - ||A_tau^B f||^2 with zero slack and arbitrary grade superpositions), whereas excluding off-critical zeros via the Laplace\u2013Carleman resolvent theorem requires only a uniform lower bound on two-grade states f_pm^{(K)} with arbitrary finite norm-shift slack (c_tau^B + mu_0) ||f_pm^{(K)}||^2."
+      },
+      "narrow_corrections_verified": {
+        "primitive_kernel_mellin_multiplier": {
+          "formula": "M[h_1](z) = (z + 1/2)(z + 3/2) H_0(z) = rho(rho + 1) H_0(z)  (z = rho - 1/2)",
+          "symbolic_verified": true
+        },
+        "stieltjes_x_differential_identity": {
+          "formula": "x^{-3/2} tilde{h}_0(x/X) dx = -d[x^{-1/2} h_0(x/X)]  (no extraneous sqrt(X) factor)",
+          "lower_endpoint_explanation": "[-(psi(x) - psi(X)) x^{-1/2} h_0(x/X)]_1^infty = 0 - (-(psi(1) - psi(X)) h_0(1/X)) = -psi(X) h_0(1/X) since psi(1) = 0",
+          "symbolic_verified": true
+        },
+        "chebyshev_primitive_relation": {
+          "formula": "psi_1(x) = (x^2 - 1)/2 + E_1(x)  for E_1(x) = int_1^x [psi(t) - t] dt (E_1(1) = 0)",
+          "boundary_estimate_preserved": "|B_boundary(X)| <= (92193/24576) X^{-5/2} = O(X^{-5/2})"
+        },
+        "rosser_schoenfeld_primary_source_record": {
+          "theorem_12_one_sided_bound": "psi(x) < 1.03883 * x for all x > 0 (Rosser & Schoenfeld 1962, Theorem 12)",
+          "why_two_sided_00397_fails_at_x_1": "At x = 1, |psi(1) - 1| = |0 - 1| = 1 > 0.0397, so two-sided bounds |psi(x) - x| <= eps*x with eps < 1 hold only for x >= x_0(eps) > 1.",
+          "theorem_10_two_sided_bound": "|psi(x) - x| <= x (log x)^2 exp(-sqrt(log x / 17.5163)) for all x >= 2 (Rosser & Schoenfeld 1962, Theorem 10)",
+          "illustrative_models_scope": "omega_Cheb(x) = 0.04 and omega_dLVP(x) = exp(-0.2*sqrt(log x)) are retained explicitly as illustrative envelope models on [1, infty)."
+        },
+        "authoritative_c_tau_B_enclosure": {
+          "c_tau_B_mid": 3.3721834192256654,
+          "c_tau_B_rad": 8.754155735471535e-77,
+          "c_tau_B_str_20": "[3.3721834192256655822 +/- 3.30e-20]"
+        },
+        "formalization_scope_note": "Scalar Lean 4 theorems assuming analytic/integral identities formalize the algebraic deductions and inequality consequences from those identities, not the measure-theoretic/integral derivations themselves."
+      }
+    },
+    "section_2_prime_shift_quadratic_form": {
+      "definition": "D_N(f) := sum_{2 <= n <= N} w_n ||(I - S_n)f||_{L^2(dx/x)}^2,  (S_n f)(x) = f(nx),  w_n = Lambda(n)/sqrt(n),  L_N = sum_{2 <= n <= N} w_n",
+      "unitarity_and_grade_invariance": "Each S_n is unitary on L^2((0, infty), dx/x) (||S_n f||_{L^2} = ||f||_{L^2}, S_n^* = S_n^{-1}) and commutes with grade dilations (S_n T_K = T_K S_n), so D_N(f) >= 0 and D_N(T_K f) = D_N(f) hold unconditionally for all f in L^2((0, infty), dx/x), K in R, and N >= 2.",
+      "exact_expansion_and_prime_translation": {
+        "shift_expansion": "D_N(f) = 2 L_N ||f||_{L^2}^2 - 2 sum_{2 <= n <= N} w_n Re <f, S_n f>_{L^2}",
+        "involution_and_autocorrelation_check": "With f^*(x) := conj(f(1/x)), (f * f^*)(n) = int_0^infty f(nx) conj(f(x)) dx/x = <S_n f, f>_{L^2} = conj(<f, S_n f>_{L^2}) and (f * f^*)(1/n) = <S_n^{-1} f, f>_{L^2} = <f, S_n f>_{L^2}, so Phi_{f,f}(n) := (f * f^*)(n) + (f * f^*)(1/n) = 2 Re <f, S_n f>_{L^2}.",
+        "subtracted_finite_N_identity": "D_N(f) - 2 L_N ||f||_{L^2}^2 = -2 sum_{2 <= n <= N} w_n Re <f, S_n f>_{L^2} = -W_{prime, N}(f * f^*)",
+        "limit_as_N_to_infty_on_S_tau": "lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2) = -W_prime(f * f^*)",
+        "complete_arithmetic_fourier_form_relation": "Q_tau(f, f) = W_pole(f * f^*) + W_arch(f * f^*) + lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2); on S_tau (where W_pole = 0), P_E(f) = lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2) + B_transfer(f) and Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + B_transfer(f) + lim_{N -> infty} (D_N(f) - 2 L_N ||f||_{L^2}^2)."
+      },
+      "central_question_resolution": {
+        "question": "Does the canonical completion control the finite part after subtraction of 2 L_N ||f||^2, uniformly across the required admissible grade states?",
+        "answer": "At any FIXED state f in S_tau, the canonical Attempt B completion cancels the smooth PNT divergence 2 L_N ||f||_{L^2}^2 ~ 4 sqrt(N) ||f||_{L^2}^2 against the s = 1 pole, leaving the convergent finite part -W_prime(f * f^*) (and P_E(f) = -W_prime(f * f^*) + B_transfer(f)). However, across the family of normalized two-grade states f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2), the subtracted finite part is lim_{N->infty}(D_N(f_pm^{(K)}) - 2 L_N ||f_pm^{(K)}||^2) = -2 W(1) -/+ [W(tau^K) + W(tau^{-K})], while the smooth completion terms ||A_tau^B f_pm^{(K)}||^2 and B_transfer(f_pm^{(K)}) approach finite constants as |K| -> infty. Positivity D_N(f) >= 0 alone gives only D_N(f) - 2 L_N ||f||^2 >= -2 L_N ||f||^2, which diverges to -infty as N -> infty (and at a scale-matched cutoff N ~ tau^{|K|} diverges as -O(tau^{|K|/2})), because D_N(f) >= 0 uses only nonnegativity w_n >= 0 and unitarity of S_n, ignoring unique prime factorization sum_{d|k} Lambda(d) = log k and zero-moment cancellation H_0(1/2) = 0."
+      },
+      "cutoff_evaluation_table": [
+        {
+          "N_cutoff": 100,
+          "L_N_mid": 16.896201344213686,
+          "L_N_rad": 3.957402136187961e-75,
+          "four_sqrt_N_asymptotic": 40.0,
+          "D_N_psi_tau_mid": 16.92155126565869,
+          "D_N_psi_tau_rad": 5.044267580139623e-75,
+          "D_N_psi_tau_positive": true,
+          "two_L_N_norm_psi_tau_sq_mid": 16.807073335020622,
+          "subtracted_D_N_minus_2LN_psi_tau_mid": 0.11447793063806772,
+          "neg_W_prime_N_psi_tau_mid": 0.11447793063806772,
+          "subtracted_equals_neg_W_prime_N_encloses_zero": true,
+          "D_N_f_minus_K1_mid": 16.677680566970466,
+          "D_N_f_minus_K1_positive": true,
+          "subtracted_f_minus_K1_mid": 0.10656913357409654,
+          "D_N_f_plus_K1_mid": 17.165421964346912,
+          "D_N_f_plus_K1_positive": true,
+          "subtracted_f_plus_K1_mid": 0.12238672770203887
+        },
+        {
+          "N_cutoff": 1000,
+          "L_N_mid": 60.507756467851905,
+          "L_N_rad": 8.094943616862495e-74,
+          "four_sqrt_N_asymptotic": 126.49110640673517,
+          "D_N_psi_tau_mid": 60.303189782927916,
+          "D_N_psi_tau_rad": 8.325998062937315e-74,
+          "D_N_psi_tau_positive": true,
+          "two_L_N_norm_psi_tau_sq_mid": 60.188576093230886,
+          "subtracted_D_N_minus_2LN_psi_tau_mid": 0.11461368969703196,
+          "neg_W_prime_N_psi_tau_mid": 0.11461368969703196,
+          "subtracted_equals_neg_W_prime_N_encloses_zero": true,
+          "D_N_f_minus_K1_mid": 59.444804916905376,
+          "D_N_f_minus_K1_positive": true,
+          "subtracted_f_minus_K1_mid": 0.1012427406080151,
+          "D_N_f_plus_K1_mid": 61.161574648950456,
+          "D_N_f_plus_K1_positive": true,
+          "subtracted_f_plus_K1_mid": 0.12798463878604882
+        },
+        {
+          "N_cutoff": 5000,
+          "L_N_mid": 138.73186280730468,
+          "L_N_rad": 7.433170337172474e-73,
+          "four_sqrt_N_asymptotic": 282.842712474619,
+          "D_N_psi_tau_mid": 138.1146626494669,
+          "D_N_psi_tau_rad": 7.476349682955839e-73,
+          "D_N_psi_tau_positive": true,
+          "two_L_N_norm_psi_tau_sq_mid": 138.00004773883103,
+          "subtracted_D_N_minus_2LN_psi_tau_mid": 0.11461491063589226,
+          "neg_W_prime_N_psi_tau_mid": 0.11461491063589226,
+          "subtracted_equals_neg_W_prime_N_encloses_zero": true,
+          "D_N_f_minus_K1_mid": 136.16378797339462,
+          "D_N_f_minus_K1_positive": true,
+          "subtracted_f_minus_K1_mid": 0.10118365731832556,
+          "D_N_f_plus_K1_mid": 140.0655373255392,
+          "D_N_f_plus_K1_positive": true,
+          "subtracted_f_plus_K1_mid": 0.12804616395345894
+        },
+        {
+          "N_cutoff": 25000,
+          "L_N_mid": 313.5826902512861,
+          "L_N_rad": 7.294538639936903e-72,
+          "four_sqrt_N_asymptotic": 632.4555320336759,
+          "D_N_psi_tau_mid": 312.0431463655821,
+          "D_N_psi_tau_rad": 7.274644424463199e-72,
+          "D_N_psi_tau_positive": true,
+          "two_L_N_norm_psi_tau_sq_mid": 311.92853140634116,
+          "subtracted_D_N_minus_2LN_psi_tau_mid": 0.1146149592409334,
+          "neg_W_prime_N_psi_tau_mid": 0.1146149592409334,
+          "subtracted_equals_neg_W_prime_N_encloses_zero": true,
+          "D_N_f_minus_K1_mid": 307.6504107327824,
+          "D_N_f_minus_K1_positive": true,
+          "subtracted_f_minus_K1_mid": 0.10118130093399759,
+          "D_N_f_plus_K1_mid": 316.4358819983818,
+          "D_N_f_plus_K1_positive": true,
+          "subtracted_f_plus_K1_mid": 0.12804861754786923
+        }
+      ],
+      "scale_matched_cutoff_table": [
+        {
+          "K": 0.5,
+          "X_eq_tau_K": 2.5066282746310007,
+          "scale_matched_cutoff_N_eq_ceil_9X": 23,
+          "L_N_match_mid": 7.161622730928504,
+          "D_N_f_minus_K_mid": 7.877342523004393,
+          "actual_subtracted_finite_part_neg_W_prime_mid": 0.20584283733876416,
+          "trivial_lower_bound_from_D_N_nonneg_neg_2LN_norm_mid": -7.671499685665629,
+          "ratio_trivial_bound_to_sqrt_X": 4.845463254939444
+        },
+        {
+          "K": 1.0,
+          "X_eq_tau_K": 6.283185307179586,
+          "scale_matched_cutoff_N_eq_ceil_9X": 57,
+          "L_N_match_mid": 12.191645917578077,
+          "D_N_f_minus_K_mid": 12.067771960413907,
+          "actual_subtracted_finite_part_neg_W_prime_mid": 0.1106983590220991,
+          "trivial_lower_bound_from_D_N_nonneg_neg_2LN_norm_mid": -11.957073601391809,
+          "ratio_trivial_bound_to_sqrt_X": 4.770182209467019
+        },
+        {
+          "K": 2.0,
+          "X_eq_tau_K": 39.47841760435743,
+          "scale_matched_cutoff_N_eq_ceil_9X": 356,
+          "L_N_match_mid": 35.00395822578264,
+          "D_N_f_minus_K_mid": 34.96723520410395,
+          "actual_subtracted_finite_part_neg_W_prime_mid": 0.13940796181526469,
+          "trivial_lower_bound_from_D_N_nonneg_neg_2LN_norm_mid": -34.827827242288684,
+          "ratio_trivial_bound_to_sqrt_X": 5.543020862760818
+        },
+        {
+          "K": 3.0,
+          "X_eq_tau_K": 248.05021344239856,
+          "scale_matched_cutoff_N_eq_ceil_9X": 2233,
+          "L_N_match_mid": 91.51928706712359,
+          "D_N_f_minus_K_mid": 91.21371850504998,
+          "actual_subtracted_finite_part_neg_W_prime_mid": 0.17695994481525243,
+          "trivial_lower_bound_from_D_N_nonneg_neg_2LN_norm_mid": -91.03675856023473,
+          "ratio_trivial_bound_to_sqrt_X": 5.7802548046569395
+        }
+      ],
+      "lean_theorem": "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence"
+    },
+    "section_3_divisor_aggregated_candidate_and_moebius_inversion": {
+      "candidate_name": "Divisor-Aggregated Prime-Shift Functional W_log(X) & Exact Moebius Inversion",
+      "status": "W_LOG_UNCONDITIONALLY_BOUNDED_AND_DECAYING_MOEBIUS_OBSTRUCTION_ISOLATED",
+      "aggregation_identity": "W_log(X) := sum_{m=1}^infty m^{-1/2} W(X/m) = sum_{k=2}^infty (log k / sqrt(k)) h_0(k/X)  (via sum_{d|k} Lambda(d) = log k)",
+      "vanishing_zeroth_and_first_logarithmic_moments": {
+        "H0_at_half_zero": true,
+        "H0_prime_at_half_contains_zero": true,
+        "H0_prime_at_half_abs_upper": 8.75201697008892e-15,
+        "stirling_main_term_cancellation": "int_0^infty x^{-1/2} (log x) h_0(x/X) dx = sqrt(X) [(log X) H_0(1/2) + H_0'(1/2)] = 0 for all X > 0 because H_0(z) = F_tau(1/2+z) F_tau(1/2-z) has a triple zero at z = 1/2."
+      },
+      "exact_stieltjes_representation": {
+        "formula": "W_log(X) = B_{log, boundary}(X) + int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx,  B_{log, boundary}(X) = -int_0^1 x^{-1/2} (log x) h_0(x/X) dx = -int_0^1 (x log x - x + 1) x^{-3/2} tilde{h}_0(x/X) dx",
+        "boundary_rational_coeff": "30731/98304",
+        "boundary_bound_for_X_ge_1": "|B_{log, boundary}(X)| <= (30731/98304) X^(-5/2) <= 0.3126118978 X^(-5/2)",
+        "M_tilde_h_0_minus_3_2_mid": 2.4304910449396404,
+        "M_tilde_h_0_minus_3_2_rad": 2.3727308909773287e-53,
+        "M_tilde_h_0_tv_equals_two_sum_extrema": true,
+        "M_tilde_h_log_minus_3_2_mid": 1.2118101520691849,
+        "M_tilde_h_log_minus_3_2_rad": 6.414337389098764e-27,
+        "M_tilde_h_log_methods_overlap": true,
+        "signed_tilde_h_log_moment_encloses_zero": true,
+        "unconditional_stirling_bound_formula_for_X_ge_1": "|W_log(X)| <= (30731/98304) X^{-5/2} + X^{-1/2} ((1/2) M_{tilde{h},0}^{(-3/2)} log X + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)})",
+        "unconditional_global_max_on_X_ge_1": 3.349008018760691
+      },
+      "moebius_inversion_and_de_aggregation_obstruction": {
+        "exact_infinite_identity": "W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m)",
+        "exact_finite_cutoff_identity": "W_B(X) = sum_{m=1}^{floor(B/2)} (mu(m)/sqrt(m)) W_{log, floor(B/m)}(X/m)",
+        "unsigned_moebius_divergence": "Replacing mu(m) by |mu(m)| = mu^2(m) yields sum_{m=1}^infty (mu^2(m)/sqrt(m)) |W_log(X/m)| ~ (6/pi^2) (int_0^infty u^{-3/2} |W_log(u)| du) sqrt(X) -> +infty as X -> infty, because W_log(u) is peaking around u ~ 1 (m ~ X) where m^{-1/2} ~ X^{-1/2} summed over O(X) squarefree integers produces O(sqrt(X)). Thus recovering an O(1) bound on W(X) from the unconditionally bounded profile W_log requires signed cancellation of mu(m) across m ~ X."
+      },
+      "certified_finite_cutoff_checks": [
+        {
+          "X": 1.0,
+          "B_cutoff": 24,
+          "W_log_B_mid": -0.04043853726584094,
+          "stieltjes_decomp_encloses_zero": true,
+          "stieltjes_decomp_abs_upper": 7.995181071795328e-27,
+          "B_log_boundary_mid": -0.024535387282645905,
+          "B_log_boundary_abs_upper": 0.024535715887656663,
+          "B_log_boundary_rational_bound": 0.3126118977864583,
+          "B_log_boundary_within_rational_bound": true,
+          "B_log_ibp_identity_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_abs_upper": 2.163291522203302e-76
+        },
+        {
+          "X": 2.0,
+          "B_cutoff": 24,
+          "W_log_B_mid": 0.08665011188327253,
+          "stieltjes_decomp_encloses_zero": true,
+          "stieltjes_decomp_abs_upper": 1.1091562761807508e-27,
+          "B_log_boundary_mid": 0.00864253097083981,
+          "B_log_boundary_abs_upper": 0.008642589060547632,
+          "B_log_boundary_rational_bound": 0.05526249820110014,
+          "B_log_boundary_within_rational_bound": true,
+          "B_log_ibp_identity_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_abs_upper": 2.2692748649252364e-75
+        },
+        {
+          "X": 4.0,
+          "B_cutoff": 24,
+          "W_log_B_mid": 0.010187591229115948,
+          "stieltjes_decomp_encloses_zero": true,
+          "stieltjes_decomp_abs_upper": 1.2462923510889231e-27,
+          "B_log_boundary_mid": 0.0011440246847459381,
+          "B_log_boundary_abs_upper": 0.0011440349536525243,
+          "B_log_boundary_rational_bound": 0.009769121805826822,
+          "B_log_boundary_within_rational_bound": true,
+          "B_log_ibp_identity_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_abs_upper": 7.3378756045596e-75
+        },
+        {
+          "X": 6.2831853072,
+          "B_cutoff": 24,
+          "W_log_B_mid": -0.17100229878874562,
+          "stieltjes_decomp_encloses_zero": true,
+          "stieltjes_decomp_abs_upper": 3.7534342398904034e-27,
+          "B_log_boundary_mid": -0.0004456727033699688,
+          "B_log_boundary_abs_upper": 0.00044567602403072906,
+          "B_log_boundary_rational_bound": 0.0031590451429285237,
+          "B_log_boundary_within_rational_bound": true,
+          "B_log_ibp_identity_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_encloses_zero": true,
+          "moebius_inversion_finite_cutoff_abs_upper": 3.1469296790951273e-74
+        }
+      ],
+      "certified_w_log_scale_enclosures": [
+        {
+          "scale_label": "1",
+          "X_float": 1.0,
+          "W_log_mid": -0.04406137942524803,
+          "W_log_rad": 5.379732014032523e-09,
+          "W_log_str_15": "[-0.04406138 +/- 5.96e-9]",
+          "W_log_abs_upper": 0.04406138480498004,
+          "unconditional_stirling_bound_upper": 3.349008018760691,
+          "certified_within_unconditional_stirling_bound": true
+        },
+        {
+          "scale_label": "2",
+          "X_float": 2.0,
+          "W_log_mid": 0.07050840119017171,
+          "W_log_rad": 3.043235996535998e-08,
+          "W_log_str_15": "[0.0705084 +/- 3.17e-8]",
+          "W_log_abs_upper": 0.07050843162253168,
+          "unconditional_stirling_bound_upper": 2.797945945567874,
+          "certified_within_unconditional_stirling_bound": true
+        },
+        {
+          "scale_label": "pi",
+          "X_float": 3.141592653589793,
+          "W_log_mid": -0.010011161458742307,
+          "W_log_rad": 9.410990253755358e-08,
+          "W_log_str_15": "[-0.010011 +/- 2.56e-7]",
+          "W_log_abs_upper": 0.010011255568644845,
+          "unconditional_stirling_bound_upper": 2.5158331735499795,
+          "certified_within_unconditional_stirling_bound": true
+        },
+        {
+          "scale_label": "tau=2*pi",
+          "X_float": 6.283185307179586,
+          "W_log_mid": -0.0007290067341571871,
+          "W_log_rad": 5.323660028366817e-07,
+          "W_log_str_15": "[-0.000729 +/- 5.40e-7]",
+          "W_log_abs_upper": 0.0007295391001600238,
+          "unconditional_stirling_bound_upper": 2.105532201192137,
+          "certified_within_unconditional_stirling_bound": true
+        },
+        {
+          "scale_label": "10",
+          "X_float": 10.0,
+          "W_log_mid": -0.00015371685504494026,
+          "W_log_rad": 1.7012206345867753e-06,
+          "W_log_str_15": "[-0.00015 +/- 5.42e-6]",
+          "W_log_abs_upper": 0.00015541807567952704,
+          "unconditional_stirling_bound_upper": 1.8460518308844611,
+          "certified_within_unconditional_stirling_bound": true
+        },
+        {
+          "scale_label": "tau^2",
+          "X_float": 39.47841760435743,
+          "W_log_mid": 4.866881780403248e-05,
+          "W_log_rad": 5.268172458272602e-05,
+          "W_log_str_15": "[+/- 1.02e-4]",
+          "W_log_abs_upper": 0.00010135054238675851,
+          "unconditional_stirling_bound_upper": 1.1942255536010125,
+          "certified_within_unconditional_stirling_bound": true
+        },
+        {
+          "scale_label": "100",
+          "X_float": 100.0,
+          "W_log_mid": 0.0005367678344143965,
+          "W_log_rad": 0.0005379732010624139,
+          "W_log_str_15": "[+/- 1.08e-3]",
+          "W_log_abs_upper": 0.0010747410354768102,
+          "unconditional_stirling_bound_upper": 0.863283983089755,
+          "certified_within_unconditional_stirling_bound": true
+        }
+      ],
+      "lean_theorem": "divisor_aggregated_stieltjes_and_moebius_inversion_identity"
+    },
+    "section_4_premise_classification_and_next_lemma": {
+      "category_i_already_proved_in_repository": [
+        "Seed Mellin zero orders F_tau(0)=0 (order 1), F_tau(1)=0 (order 2), and triple zeros H_0(+/- 1/2)=0 (order 3, so H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0).",
+        "Attempt B decomposition Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + P_E(f) on S_tau and transfer cancellation P_E(f) - D_{smooth}^B(f) = -W_prime(f*f^*) + W_arch(f*f^*).",
+        "Coercive norm-shifted semiboundedness reduction (`coercive_norm_shift_semiboundedness_implies_correlation_bound`): P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2) implies |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1).",
+        "Exact rational Bernstein kernel envelopes |h_0(alpha)| <= (92193/32768)(alpha + alpha^{-1})^{-5/2} and |tilde{h}_0(alpha)| <= (1032993/65536)(alpha + alpha^{-1})^{-5/2}."
+      ],
+      "category_ii_unconditional_external_theorems": [
+        "Unique prime factorization / divisor-sum identity sum_{d|k} Lambda(d) = log k for all k >= 1 (Hardy & Wright 2008, Theorem 296; Apostol 1976, Theorem 2.11).",
+        "Moebius inversion formula sum_{d|k} mu(d) = delta_{k,1} and Lambda = mu * log (Hardy & Wright 2008, Theorem 266; Apostol 1976, Theorem 2.9).",
+        "Stirling / Robbins factorial remainder bound: T(x) = sum_{2<=k<=x} log k = (x log x - x + 1) + E_log(x) with E_log(1) = 0 and |E_log(x)| <= (1/2) log x + 1 for all x >= 1 (Robbins 1955, Amer. Math. Monthly 62, 26\u201329; Olver 1997, Ch. 8).",
+        "Rosser\u2013Schoenfeld prime bounds: one-sided psi(x) < 1.03883*x for all x > 0 (Rosser & Schoenfeld 1962, Theorem 12) and two-sided |psi(x) - x| <= x (log x)^2 exp(-sqrt(log x / 17.5163)) for x >= 2 (Theorem 10)."
+      ],
+      "category_iii_new_statements_proved_in_task_tc044": [
+        "Prime-Shift Quadratic Form Identity (`prime_shift_quadratic_form_and_subtracted_finite_part_equivalence`): D_N(f) - 2 L_N ||f||_{L^2}^2 = -W_{prime, N}(f * f^*), its N -> infty limit -W_prime(f * f^*), its exact relation to P_E(f) and Q_tau(f, f), and the proof that D_N(f) >= 0 alone yields only -2 L_N ||f||^2 -> -infty.",
+        "Unconditional Uniform Boundedness and O(X^{-1/2} log(X+2)) Decay of the Divisor-Aggregated Prime-Shift Functional W_log(X) (`divisor_aggregated_stieltjes_and_moebius_inversion_identity`): W_log(X) = sum_{m=1}^infty m^{-1/2} W(X/m) = sum_{k=2}^infty (log k / sqrt(k)) h_0(k/X) = B_{log, boundary}(X) + int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx satisfies |W_log(X)| <= (30731/98304) X^{-5/2} + X^{-1/2}((1/2) M_{tilde{h},0}^{(-3/2)} log X + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)}) <= 3.34901 for all X >= 1 without assuming RH.",
+        "Exact Moebius Inversion W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) and proof that any unsigned bound |mu(m)| <= 1 diverges as O(sqrt(X))."
+      ],
+      "category_iv_unproved_premise": {
+        "subgate_id": "SUBGATE-TC-043A",
+        "lemma_name": "Moebius De-Aggregation Cancellation Lemma for W(X)",
+        "exact_statement": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_0 < infty such that for all X >= 1, the signed Moebius de-aggregation series W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) satisfies |W(X)| <= M_0 (equivalently, |I(X)| <= M_0' < infty and P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2))."
+      }
+    },
+    "section_5_diagnostics_and_controls": {
+      "modified_weight_controls": [
+        {
+          "X": 1.0,
+          "authentic_von_mangoldt_W_X_mid": -0.05730745531794613,
+          "divisor_aggregated_log_W_log_X_mid": -0.044061156600391414,
+          "nonstandard_unit_weight_control_W_unit_X_mid": -0.1033623650598051,
+          "unsigned_moebius_majorant_partial_sum_m_le_200": 0.06139734763797586
+        },
+        {
+          "X": 2.0,
+          "authentic_von_mangoldt_W_X_mid": 0.07937200121405409,
+          "divisor_aggregated_log_W_log_X_mid": 0.07050966167095038,
+          "nonstandard_unit_weight_control_W_unit_X_mid": 0.17868205543925333,
+          "unsigned_moebius_majorant_partial_sum_m_le_200": 0.12960018436484227
+        },
+        {
+          "X": 6.283185,
+          "authentic_von_mangoldt_W_X_mid": -0.012079386189707898,
+          "divisor_aggregated_log_W_log_X_mid": -0.0007069580561142823,
+          "nonstandard_unit_weight_control_W_unit_X_mid": -0.006980150156967994,
+          "unsigned_moebius_majorant_partial_sum_m_le_200": 0.15541734647485125
+        },
+        {
+          "X": 10.0,
+          "authentic_von_mangoldt_W_X_mid": -0.0024084537424120824,
+          "divisor_aggregated_log_W_log_X_mid": -8.326628431661639e-05,
+          "nonstandard_unit_weight_control_W_unit_X_mid": 0.000861813452723975,
+          "unsigned_moebius_majorant_partial_sum_m_le_200": 0.14915420822496553
+        },
+        {
+          "X": 100.0,
+          "authentic_von_mangoldt_W_X_mid": 0.003121797023069244,
+          "divisor_aggregated_log_W_log_X_mid": 0.022411024261064852,
+          "nonstandard_unit_weight_control_W_unit_X_mid": 0.002496628804448445,
+          "unsigned_moebius_majorant_partial_sum_m_le_200": 0.8933360776306604
+        }
+      ],
+      "synthetic_off_critical_quartet_divisor_aggregation_control": {
+        "synthetic_rho_0": "0.7 + 14.13472514173469379 i  (delta_0 = 0.2, not a zero of zeta)",
+        "abs_zeta_at_rho_0_mid": 0.14645357697255823,
+        "abs_zeta_at_rho_0_lower": 0.14645357697255823,
+        "zeta_at_rho_0_certified_nonzero": true,
+        "abs_H0_at_z_0_mid": 0.0004754076661799843,
+        "abs_divisor_aggregated_quartet_amplitude_mid": 6.96251532322346e-05,
+        "mechanism_comparison": "Harmonic divisor aggregation sum_{m>=1} m^{-1/2} W(X/m) multiplies a spectral mode X^{s-1/2} by zeta(s): at actual zeros rho of zeta(s), (-zeta'(s)/zeta(s)) * zeta(s) = -zeta'(s) is holomorphic away from s = 1 (and the s = 1 double pole of -zeta'(s) is annihilated by the triple zero of H_0(z) at z = 1/2), which is the spectral dual of sum_{d|k} Lambda(d) = log k and explains why W_log(X) is unconditionally O(X^{-1/2} log(X+2)). For a synthetic off-critical quartet at rho_0 not in Z(zeta), |zeta(rho_0)| = 0.1464535770 != 0 fails to annihilate the quartet mode. Conversely, Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) multiplies by 1/zeta(s), showing why recovering W(X) from W_log(X) requires signed Moebius cancellation across m ~ X."
+      }
     }
   },
   "literature_references": [
