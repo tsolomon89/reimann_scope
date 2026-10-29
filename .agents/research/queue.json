@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-043",
+  "active_task_id": "TASK-TC-043R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1350,7 +1350,35 @@
         "RESEARCH_LEDGER.md",
         ".agents/corpus_map/obligation_register.md"
       ],
-      "resolution": "TC-042F Bounded Reconciliation Gate (TC042F_BOUNDED_RECONCILIATION_VERIFIED_ALL_SIX_DEFECTS_FIXED) and TASK-TC-043 Transfer Cancellation & Coercive Semiboundedness Gate (TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED) passed; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 54 Lean declarations (18 def + 36 theorems, 737 total theorems, 0 sorry, 0 admit) compiled; 25/25 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
+      "resolution": "TC-042F Bounded Reconciliation Gate (TC042F_BOUNDED_RECONCILIATION_VERIFIED_ALL_SIX_DEFECTS_FIXED) and TASK-TC-043 Transfer Cancellation & Coercive Semiboundedness Gate (TRANSFER_CANCELLATION_AND_COERCIVE_SEMIBOUNDEDNESS_PROVED_MOVING_SCALE_OBSTRUCTION_ISOLATED) passed; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 58 Lean declarations (20 def + 38 theorems, 739 total theorems, 0 sorry, 0 admit) compiled; 26/26 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
+    },
+    {
+      "task_id": "TASK-TC-043R",
+      "epic_id": "EPIC-TC-042",
+      "priority": 55,
+      "objective": "Repair TC-043 Mathematical Claims and Numerical Certificates, Then Investigate Signed Cross-Grade Cancellation (TASK-TC-043R / SUBGATE-TC-043A)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Prove or falsify SUBGATE-TC-043A (MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE): the uniform lower semiboundedness inequality P_E(f_+-^{(K)}) >= -(||A_tau^B f_+-^{(K)}||^2 + mu_0 ||f_+-^{(K)}||^2) on the normalized two-grade span f_+-^{(K)} = (psi_tau +- T_K psi_tau)/sqrt(2) in S_tau for some finite mu_0 >= 0 (or equivalently uniform boundedness of the signed Chebyshev prime-error integral I(X) = int_1^infty E(x)x^{-3/2}tilde{h}_0(x/X)dx = sqrt(X)int_{1/X}^infty [e(X*alpha)-e(X)]k(alpha)d_alpha + e(X)B_boundary(X) = sqrt(X)int_{1/X}^infty [e_1(X*alpha)-e_1(X)]k_1(alpha)d_alpha - sqrt(X)e_1(X)int_0^{1/X}k_1(alpha)d_alpha across all X = tau^K >= 1), using an arithmetic cancellation mechanism beyond zero-moment subtraction, chordal Stieltjes re-indexing, and integration by parts.",
+      "planned_calculation": "1) Step 3A: Separate A_E(X) = int_1^infty |E(x)|x^{-3/2}|tilde{h}_0(x/X)|dx <= M_omega(X) = int_1^infty x*omega(x)*x^{-3/2}|tilde{h}_0(x/X)|dx under |E(x)| <= x*omega(x), prove M_omega(X) >= c_0*sqrt(X)*omega(2X) for nonnegative nonincreasing omega and X >= 2 (using omega(2X), not omega(X/2)), scope divergence to envelopes with sqrt(X)*omega(2X) -> infty, withdraw the unsupported claim that every unsigned estimate must fail, label 0.04*x and x*exp(-0.2*sqrt(log x)) as illustrative models alongside Rosser-Schoenfeld (1962) Theorems 10 & 12, clarify majorant_without_sign_cancellation_exceeds_fixed_coercive_norm, and formalize majorant_window_lower_bound_and_envelope_ordering. 2) Step 3B: Preserve linear operator R_0 and J(f,f) = (1/tau)int_R |hat{f}(it)|^2/(t^2+1/4)dt = 4||f||^2 - 4||R_0 f||^2, remove false intervening equality with (1/2)W_pole(f*f^*) = 0, fix positive shifted norm multiplier to mu_tau^B(t) + c_tau^B + mu_0, and use normalized f_+-^{(K)} = (psi_tau +- T_K psi_tau)/sqrt(2) consistently. 3) Step 3C: Keep centered z = rho - 1/2 distinct from uncentered s, fix seed zero orders (s=0 simple, s=1 double, H_0(z) triple zeros at z = +-1/2), and fix continuation identity alpha^{-3/2}tilde{h}_0(alpha) = -d/d_alpha(alpha^{-1/2}h_0(alpha)) with exact boundary term B_boundary(X). 4) Step 4: Recompute c_0 = int_{1/2}^2 |k(alpha)|d_alpha = 1.7456980946 +- 4.60e-48 and C_abs = int_0^infty |k(alpha)|d_alpha = 2.4863319706 +- 4.39e-46 (removing hardcoded 0.9032843043 and verifying 0 < c_0 < C_abs), add analytic Olver-Stirling Plancherel tail bounds on [T_top, infty) with full Arb subtraction enclosures, and add certified infinite-tail enclosures to Candidate III moving-grade J(Delta). 5) Step 5: Derive zero-moment subtracted identity I(X) = sqrt(X)int_{1/X}^infty [e(X*alpha)-e(X)]k(alpha)d_alpha - sqrt(X)e(X)int_0^{1/X}k(alpha)d_alpha, prove Lower-Tail Boundary Identity sqrt(X)int_0^{1/X}k(alpha)d_alpha = -B_boundary(X), prove Chordal Stieltjes Equivalence I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X)B_boundary(X) = I(X) - e(X)B_boundary(X) (formalized in zero_moment_subtracted_and_chordal_stieltjes_equivalence), and derive Chebyshev primitive transfer I(X) = sqrt(X)int_{1/X}^infty [e_1(X*alpha)-e_1(X)]k_1(alpha)d_alpha - sqrt(X)e_1(X)int_0^{1/X}k_1(alpha)d_alpha with c_1 = 11.4897566721 and C_{1,abs} = 14.7563989427.",
+      "acceptance_criterion": "All 26 tests in tests/test_tc_canonical_theta_correlation_bound.py passing; formal/RiemannScope/CanonicalThetaCorrelationBound.lean compiled with 58 declarations (20 def + 38 theorems, 739 total compiled theorems, 0 sorry, 0 admit); data/tc_canonical_theta_correlation_bound.json and docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md updated and reconciled; SUBGATE-TC-043A kept OPEN alongside SUBGATE-TC-042A and SUBGATE-TC-042B.",
+      "dependencies": [
+        "TASK-TC-043"
+      ],
+      "evidence": [
+        "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+        "scripts/build_formal.py",
+        "tc/canonical_theta_correlation_bound.py",
+        "tests/test_tc_canonical_theta_correlation_bound.py",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "data/tc_canonical_theta_correlation_bound.json",
+        "formal/RiemannScope/README.md",
+        "docs/TC_CURRENT_CANONICAL_STATUS.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "TASK-TC-043R mathematical & numerical repairs (Steps 3A, 3B, 3C, 4) and signed cancellation investigation (Step 5: Zero-Moment Subtracted Identity, Lower-Tail Boundary Identity, Chordal Stieltjes Equivalence, and Chebyshev Primitive Transfer) completed and certified; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 58 Lean declarations (20 def + 38 theorems, 739 total theorems, 0 sorry, 0 admit) compiled; 26/26 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
     }
   ]
 }

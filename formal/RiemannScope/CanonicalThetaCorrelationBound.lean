@@ -886,12 +886,14 @@ theorem coercive_norm_shift_semiboundedness_implies_correlation_bound
     nlinarith
   constructor <;> linarith
 
-/-- Theorem 36: Candidate III — Unsigned Majorant Growth Obstruction.
-    If an unsigned majorant bound on `|G_{P_E}(Delta)|` grows as `c_0 * scale_factor` (`c_0 > 0`)
-    while the two-grade coercive norm + diagonal offset is bounded above by `B_fixed`, then whenever
-    `B_fixed < c_0 * scale_factor`, the worst-case unsigned lower bound `B_fixed - c_0 * scale_factor`
-    is strictly negative (`< 0`), proving that no unsigned majorant can verify coercive semiboundedness
-    at large grade offsets. -/
+/-- Theorem 36: Candidate III — Conditional Scalar Threshold Lemma for Unsigned Majorant Bounds.
+    Given a positive window constant `c_0 > 0` and a scale factor `scale_factor` (representing
+    `sqrt(X) * omega(2 * X)` in the majorant lower bound `M_omega(X) >= c_0 * sqrt(X) * omega(2 * X)`
+    for a nonnegative, nonincreasing envelope `|E(x)| <= x * omega(x)` and `X >= 2`), this lemma
+    assumes the scalar threshold inequality `B_fixed < c_0 * scale_factor` and performs scalar
+    subtraction to conclude `B_fixed - c_0 * scale_factor < 0`.
+    Scope note: This is a conditional algebraic threshold step on the majorant integral `M_omega(X)`
+    (not a lower bound on `A_E(X)`, and not an analytic proof that `sqrt(X) * omega(2 * X) -> infty`). -/
 theorem majorant_without_sign_cancellation_exceeds_fixed_coercive_norm
     (c_0 scale_factor B_fixed : ℝ)
     (h_c0_pos : 0 < c_0)
@@ -899,5 +901,64 @@ theorem majorant_without_sign_cancellation_exceeds_fixed_coercive_norm
     B_fixed - c_0 * scale_factor < 0 ∧ 0 < c_0 * scale_factor - B_fixed := by
   have _ := h_c0_pos
   constructor <;> linarith
+
+/-- Zero-moment subtracted decomposition of `I(X)` into the signed increment integral `I_inc`
+    plus the lower-tail zero-moment boundary term `B_zm`. -/
+def zeroMomentSubtractedDecomp (I_inc B_zm : ℝ) : ℝ :=
+  I_inc + B_zm
+
+/-- Chordal prime-power Stieltjes decomposition of the increment integral `I_inc(X)` into
+    `I_chord(X) = W_X - psi_X * h0_invX` minus `I_drift(X) = (psi_X / X) * B_bound - psi_X * h0_invX`. -/
+def chordalStieltjesDecomp (W_X psi_X h0_invX B_bound X : ℝ) : ℝ :=
+  (W_X - psi_X * h0_invX) - ((psi_X / X) * B_bound - psi_X * h0_invX)
+
+/-- Theorem 37: Separation of Actual Unsigned Integral `A_E(X)` from Envelope Majorant `M_omega(X)`
+    and Monotone Window Lower Bound `M_omega(X) >= c_0 * sqrt(X) * omega(2 * X)`.
+    If `A_E = A_E_win + A_E_comp` and `M_omega = M_omega_win + M_omega_comp` with nonnegative window
+    and complement parts satisfying `A_E_win <= M_omega_win` and `A_E_comp <= M_omega_comp` (from
+    `|E(x)| <= x * omega(x)`), and if nonincreasing monotonicity of `omega >= 0` on `[X/2, 2*X]`
+    (`X >= 2`) gives `c_0 * sqrt_X * omega_2X <= M_omega_win`, then:
+    (1) `A_E <= M_omega` (upper bound on `A_E`),
+    (2) `c_0 * sqrt_X * omega_2X <= M_omega` (lower bound on the majorant `M_omega`, using `omega(2*X)`), and
+    (3) whenever `B_fixed < c_0 * sqrt_X * omega_2X`, the majorant `M_omega` strictly exceeds `B_fixed`. -/
+theorem majorant_window_lower_bound_and_envelope_ordering
+    (A_E A_E_win A_E_comp M_omega M_omega_win M_omega_comp c_0 sqrt_X omega_2X B_fixed : ℝ)
+    (h_AE_split : A_E = A_E_win + A_E_comp)
+    (h_M_split : M_omega = M_omega_win + M_omega_comp)
+    (h_M_comp_nonneg : 0 ≤ M_omega_comp)
+    (h_win_env : A_E_win ≤ M_omega_win)
+    (h_comp_env : A_E_comp ≤ M_omega_comp)
+    (h_win_lower : c_0 * sqrt_X * omega_2X ≤ M_omega_win) :
+    (A_E ≤ M_omega) ∧
+      (c_0 * sqrt_X * omega_2X ≤ M_omega) ∧
+      (B_fixed < c_0 * sqrt_X * omega_2X → B_fixed < M_omega) := by
+  refine ⟨?_, ?_, ?_⟩
+  · linarith
+  · linarith
+  · intro h_ex
+    linarith
+
+/-- Theorem 38: Zero-Moment Subtracted Increment & Chordal Prime-Power Stieltjes Equivalence.
+    Under the lower-tail boundary identity `sqrt_X_int_0_invX_k = -B_bound` (so the zero-moment
+    boundary term is `B_zm = -(psi_X / X - 1) * sqrt_X_int_0_invX_k = (psi_X / X - 1) * B_bound`),
+    the chordal jump integral `I_chord = W_X - psi_X * h0_invX` and dilation drift integral
+    `I_drift = (psi_X / X) * B_bound - psi_X * h0_invX` satisfy:
+    (1) `I_inc = I_chord - I_drift = W_X - (psi_X / X) * B_bound` (exact cancellation of `psi_X * h0_invX`),
+    (2) `zeroMomentSubtractedDecomp I_inc B_zm = W_X - B_bound = I_X` (recovering `W_X = B_bound + I_X`), and
+    (3) the prime-wavelet sum `W_X` reappears identically as `I_inc + (psi_X / X) * B_bound`. -/
+theorem zero_moment_subtracted_and_chordal_stieltjes_equivalence
+    (W_X I_X B_bound psi_X X h0_invX sqrt_X_int_0_invX_k : ℝ)
+    (h_W_decomp : W_X = B_bound + I_X)
+    (h_lower_tail : sqrt_X_int_0_invX_k = -B_bound) :
+    let e_X := psi_X / X - 1
+    let B_zm := -e_X * sqrt_X_int_0_invX_k
+    let I_inc := chordalStieltjesDecomp W_X psi_X h0_invX B_bound X
+    (I_inc = W_X - (psi_X / X) * B_bound) ∧
+      (zeroMomentSubtractedDecomp I_inc B_zm = I_X) ∧
+      (W_X = I_inc + (psi_X / X) * B_bound) := by
+  intro e_X B_zm I_inc
+  dsimp [e_X, B_zm, I_inc, chordalStieltjesDecomp, zeroMomentSubtractedDecomp]
+  rw [h_lower_tail, h_W_decomp]
+  refine ⟨by ring, by ring, by ring⟩
 
 end RiemannScope

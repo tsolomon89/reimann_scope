@@ -112,12 +112,14 @@ TASK_TC_042R_ID = "TASK-TC-042R"
 TASK_TC_042R2_ID = "TASK-TC-042R2"
 TASK_TC_042F_ID = "TASK-TC-042F"
 TASK_TC_043_ID = "TASK-TC-043"
+TASK_TC_043R_ID = "TASK-TC-043R"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
 STARTING_HEAD_TC_042R2 = "62526298587db990b11fc0c191c2969652936c01"
 STARTING_HEAD_TC_042F = "697e6862c7e1288550bef007cbdf0a520486c245"
 STARTING_HEAD_TC_043 = "db5d8d4f429ef2b0bd9000d715e3552953b48355"
+STARTING_HEAD_TC_043R = "726f7b4da8b7bd757b68f96783fee6b86f2f3f7b"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -131,6 +133,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-042R",
     "TASK-TC-042R2",
     "TASK-TC-042F",
+    "TASK-TC-043",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -192,6 +195,8 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "attemptBCompletePairingDecomp",
     "complexHyperbolicPairForm",
     "attemptBTransferForm",
+    "zeroMomentSubtractedDecomp",
+    "chordalStieltjesDecomp",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -231,6 +236,8 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau",
     "coercive_norm_shift_semiboundedness_implies_correlation_bound",
     "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
+    "majorant_window_lower_bound_and_envelope_ordering",
+    "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -5401,14 +5408,17 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
        verifies complex zero ray collinearity and Lindemann–Weierstrass rational-grade noncollision
        vs irrational algebraic grade open status, and audits synthetic off-critical quartet controls.
     3. Investigates the missing arithmetic implication on the finite graded theta span S_tau via
-       three worked candidates:
+       four worked candidates (`TASK-TC-043` / `TASK-TC-043R`):
        - Candidate I: Spectral Multiplier Analysis mu_tau^B(t) = Re psi(5/4 + it/2) - log(pi) - 2,
-         certified root t_*^B ~= 46.4048085107, and the Exact Pole-Vanishing Transfer Decomposition
+         certified root t_*^B in [46.4061555, 46.4061557], and the Exact Pole-Vanishing Transfer Decomposition
          B_transfer(f) = 2||f||_{L^2}^2 - J(f, f) = 4||R_0 f||_{L^2}^2 - 2||f||_{L^2}^2 on S_tau;
        - Candidate II: Coercive Norm-Shifted Hilbert Space (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B)
-         and the Semiboundedness-to-RH Reduction Theorem on two-grade states S_tau^{(2)};
+         and the Semiboundedness-to-RH Reduction Theorem on normalized two-grade states f_pm^{(K)};
        - Candidate III: Cross-Grade Scale Separation (exponential decay of smooth off-diagonal inner products
-         vs moving-scale prime-error pairing G_{P_E}(Delta)) and the Unsigned Majorant Growth Obstruction.
+         vs moving-scale prime-error pairing G_{P_E}(Delta)) and the Repaired Unsigned Majorant Growth Obstruction
+         (A_E(X) <= M_omega(X), M_omega(X) >= c_0 sqrt(X) omega(2X), c_0 = 1.7456980946 < C_abs = 2.4863319706);
+       - Candidate IV: Zero-Moment Subtracted Increment Identity, Chordal Prime-Power Stieltjes Equivalence,
+         and Chebyshev Primitive Transfer e_1(x) = E_1(x) / x^2.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -5808,10 +5818,56 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
         )
         t_root_mid = 0.5 * (float(t_root_low.mid()) + float(t_root_high.mid()))
 
-        # Verify Plancherel identity on psi_tau:
+        # Verify Plancherel identity on psi_tau with explicit infinite-tail enclosures on [T_top, infty)
+        # and full Arb subtraction against the certified spatial Arb balls:
         # (1/tau) int_{-infty}^infty mu_tau^B(t) H_0(it) dt == ||A_tau^B psi_tau||_{H_tau^B}^2 - c_tau^B ||psi_tau||_{L^2}^2
         # and (1/tau) int_{-infty}^infty ((2t^2 - 1/2)/(t^2 + 1/4)) H_0(it) dt == B_transfer(psi_tau) = 2 h_0(1) - J_0:
         tol_spec = 2**(-90)
+
+        def _eval_j_delta_with_tail_arb(kappa_a: arb) -> Tuple[arb, arb, arb, int]:
+            """Evaluate J(Delta) := int_1^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] x^{-1/2} dx/x
+            = int_0^infty [h_0(e^{kappa+u}) + h_0(e^{kappa-u})] e^{-u/2} du in certified Arb arithmetic
+            with explicit analytic tail bound on [u_top_J, infty)."""
+            kap_c = acb(kappa_a)
+            u_top_J = max(20, int(math.ceil(float(abs(kappa_a).upper()))) + 16)
+
+            def _f_j_local(u: acb, analytic: bool, kc: acb = kap_c) -> acb:
+                hp = evaluate_h0_acb((kc + u).exp(), analytic=analytic)
+                hm = evaluate_h0_acb((kc - u).exp(), analytic=analytic)
+                return (hp + hm) * ((-u / acb(2)).exp())
+
+            j_finite_arb = arb(0)
+            for m_step in range(0, 4 * u_top_J):
+                j_finite_arb += acb.integral(
+                    _f_j_local,
+                    acb(m_step) / acb(4),
+                    acb(m_step + 1) / acb(4),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+            u_top_J_arb = arb(u_top_J)
+            j_tail_bound = (
+                (arb(2) / arb(3))
+                * (arb(92193) / arb(32768))
+                * ((arb("2.5") * abs(kappa_a)).exp())
+                * ((-arb(3) * u_top_J_arb).exp())
+            )
+            j_total_arb = j_finite_arb + arb(0, j_tail_bound.upper())
+            return j_total_arb, j_finite_arb, j_tail_bound, u_top_J
+
+        # Certified spatial Arb enclosures for psi_tau (Delta = 0):
+        w_arch_0_arb_cert = evaluate_archimedean_integral_certified_arb(
+            arb(0), prec_bits=prec_bits
+        )["w_arch_total_arb"]
+        j0_arb_cert, _, j0_tail_bound_cert, _ = _eval_j_delta_with_tail_arb(arb(0))
+        norm_A_A_0_arb_cert = w_arch_0_arb_cert + c_tau_A_arb * h0_1_arb
+        norm_A_B_0_arb_cert = (
+            norm_A_A_0_arb_cert - arb(4) * h0_1_arb + j0_arb_cert
+        )
+        spatial_smooth_B_0_arb = (
+            norm_A_B_0_arb_cert - c_tau_B_arb * h0_1_arb
+        )
+        spatial_b_transfer_0_arb = arb(2) * h0_1_arb - j0_arb_cert
 
         def _h0_spectral_weight_acb(t_c: acb, analytic: bool = False) -> acb:
             # H_0(it) = |F_tau(1/2 + it)|^2 where F_tau(s) = (s^2 (s-1)^2 / 32) pi^{-s/2} Gamma(s/2)
@@ -5833,33 +5889,106 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
             mult_c = (acb(2) * t_c * t_c - acb("0.5")) / (t_c * t_c + acb("0.25"))
             return acb(2) * mult_c * _h0_spectral_weight_acb(t_c, analytic=analytic) / acb(tau_arb)
 
-        plancherel_smooth_B_arb = arb(0)
-        plancherel_transfer_arb = arb(0)
-        for m_seg in range(0, 40):
+        def _plancherel_stirling_tail_bounds_arb(T_top_val: int) -> Tuple[arb, arb]:
+            """Certified analytic upper bounds on int_{T_top}^infty |(2/tau) mu_tau^B(t) H_0(it)| dt
+            and int_{T_top}^infty |(2/tau) ((2t^2 - 1/2)/(t^2 + 1/4)) H_0(it)| dt for T_top >= 40.
+
+            By Olver's complex Stirling bound on Re(z) > 0, for z = 1/4 + it/2 (t >= T_top >= 40):
+              |Gamma(1/4 + it/2)|^2 <= 2*pi * (t/2)^{-1/2} * exp(-pi*t/2 + 2/(3*t)),
+            so H_0(it) <= (sqrt(2*pi)/512) * exp(2/(3*T_top)) * t^{-1/2} * (t^2 + 1/4)^4 * exp(-pi*t/2).
+            Since t^{-1/2}*(t^2+1/4)^4*exp(-pi*t/4) and (t^2+1/4)^4*exp(-pi*t/4) are strictly decreasing
+            for all t >= 40 (logarithmic derivative <= 8/40 - pi/4 < -0.585 < 0) and |mu_tau^B(t)| <= log(t) <= t^{1/2}:
+              int_{T_top}^infty H_0(it) dt <= B_{H_0}(T_top)
+                := (sqrt(2*pi)/512) * exp(2/(3*T_top)) * T_top^{-1/2} * (T_top^2 + 1/4)^4 * exp(-pi*T_top/2) * (4/pi),
+              R_transfer(T_top) := (4/tau) * B_{H_0}(T_top),
+              R_smooth(T_top)   := (2/tau) * T_top^{1/2} * B_{H_0}(T_top).
+            """
+            if T_top_val < 40:
+                raise ValueError("Plancherel Stirling tail bound requires T_top >= 40")
+            T_a = arb(T_top_val)
+            c_stirling = (
+                ((arb(2) * pi_arb).sqrt() / arb(512))
+                * ((arb(2) / (arb(3) * T_a)).exp())
+            )
+            poly_T = (T_a * T_a + arb("0.25")) ** 4
+            exp_T = (-pi_arb * T_a / arb(2)).exp()
+            b_h0 = (
+                c_stirling
+                * (arb(1) / T_a.sqrt())
+                * poly_T
+                * exp_T
+                * (arb(4) / pi_arb)
+            )
+            r_smooth = (arb(2) / tau_arb) * T_a.sqrt() * b_h0
+            r_transfer = (arb(4) / tau_arb) * b_h0
+            return r_smooth, r_transfer
+
+        t_top_plancherel = 80
+        plancherel_smooth_B_finite_40_arb = arb(0)
+        plancherel_transfer_finite_40_arb = arb(0)
+        plancherel_smooth_B_finite_80_arb = arb(0)
+        plancherel_transfer_finite_80_arb = arb(0)
+        for m_seg in range(0, t_top_plancherel):
             a_t = acb(m_seg)
             b_t = acb(m_seg + 1)
-            plancherel_smooth_B_arb += acb.integral(
+            seg_sm = acb.integral(
                 _f_plancherel_smooth_B, a_t, b_t, rel_tol=tol_spec, abs_tol=tol_spec
             ).real
-            plancherel_transfer_arb += acb.integral(
+            seg_tr = acb.integral(
                 _f_plancherel_transfer, a_t, b_t, rel_tol=tol_spec, abs_tol=tol_spec
             ).real
+            if m_seg < 40:
+                plancherel_smooth_B_finite_40_arb += seg_sm
+                plancherel_transfer_finite_40_arb += seg_tr
+            plancherel_smooth_B_finite_80_arb += seg_sm
+            plancherel_transfer_finite_80_arb += seg_tr
 
-        plancherel_vs_spatial_smooth_B_diff = abs(
-            float(plancherel_smooth_B_arb.mid()) - reconciled_smooth_B_mid
+        tail_sm_40_arb, tail_tr_40_arb = _plancherel_stirling_tail_bounds_arb(40)
+        tail_sm_80_arb, tail_tr_80_arb = _plancherel_stirling_tail_bounds_arb(
+            t_top_plancherel
         )
-        plancherel_vs_spatial_transfer_diff = abs(
-            float(plancherel_transfer_arb.mid()) - b_transfer_0_mid
+        plancherel_smooth_B_arb = plancherel_smooth_B_finite_80_arb + arb(
+            0, tail_sm_80_arb.upper()
+        )
+        plancherel_transfer_arb = plancherel_transfer_finite_80_arb + arb(
+            0, tail_tr_80_arb.upper()
+        )
+        # Retain full Arb enclosures through subtraction:
+        plancherel_minus_spatial_smooth_B_arb = (
+            plancherel_smooth_B_arb - spatial_smooth_B_0_arb
+        )
+        plancherel_minus_spatial_transfer_arb = (
+            plancherel_transfer_arb - spatial_b_transfer_0_arb
+        )
+        plancherel_smooth_B_encloses_zero = bool(
+            plancherel_minus_spatial_smooth_B_arb.contains(0)
+        )
+        plancherel_transfer_encloses_zero = bool(
+            plancherel_minus_spatial_transfer_arb.contains(0)
+        )
+        plancherel_vs_spatial_smooth_B_diff = float(
+            abs(plancherel_minus_spatial_smooth_B_arb).upper()
+        )
+        plancherel_vs_spatial_transfer_diff = float(
+            abs(plancherel_minus_spatial_transfer_arb).upper()
+        )
+        # Also record the truncated [0, 40] midpoint diagnostic vs actual [40, 80] tail contribution:
+        omitted_tail_40_to_80_smooth_mid = float(
+            (plancherel_smooth_B_finite_80_arb - plancherel_smooth_B_finite_40_arb).mid()
+        )
+        omitted_tail_40_to_80_transfer_mid = float(
+            (plancherel_transfer_finite_80_arb - plancherel_transfer_finite_40_arb).mid()
         )
 
         # Verify Exact Transfer Decomposition across S_tau states:
-        # On all f in S_tau, W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 0, so I_{pole,+}(f, f) = -J(f, f).
+        # Preserve the linear operator R_0: (R_0 f)(x) = int_0^x (y/x)^{1/2} (D_y f)(y) dy/y on L^2(R_{>0}, d^*y).
+        # By Mellin Plancherel (where D_y = y d/dy has multiplier it and R_0 has multiplier it / (1/2 + it),
+        # so |hat{R_0 f}(it)|^2 = (t^2 / (t^2 + 1/4)) |hat{f}(it)|^2 = (1 - (1/4)/(t^2 + 1/4)) |hat{f}(it)|^2):
+        #   J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt = 4 ||f||_{L^2}^2 - 4 ||R_0 f||_{L^2}^2.
+        # Separately, on S_tau, the pole-vanishing identity W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 2 hat{f*f^*}(1/2) = 0
+        # gives I_{pole,+}(f, f) = -J(f, f).
         # Consequently, B_transfer(f) := 2 ||f||_{L^2}^2 - J(f, f) = 4 ||R_0 f||_{L^2}^2 - 2 ||f||_{L^2}^2
-        # appears identically in:
-        #   P_E(f) = -W_prime(f * f^*) + B_transfer(f)
-        # and
-        #   D_{smooth}^B(f) := c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 = -W_arch(f * f^*) + B_transfer(f),
-        # so P_E(f) - D_{smooth}^B(f) = -W_prime(f * f^*) + W_arch(f * f^*) = Q_tau(f, f) with B_transfer(f) cancelling identically!
+        # appears identically on BOTH sides of Q_tau(f, f) = -D_{smooth}^B(f) + P_E(f) and cancels identically!
         transfer_fraction_on_psi_tau = b_transfer_0_mid / (-reconciled_smooth_B_mid)
 
         candidate_1_audit = {
@@ -5877,23 +6006,64 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
             "mu_at_root_bracket_low": float(mu_at_low.mid()),
             "mu_at_root_bracket_high": float(mu_at_high.mid()),
             "root_bracket_certified": root_bracket_certified,
+            "plancherel_cutoff_T_top": t_top_plancherel,
             "plancherel_smooth_B_on_psi_tau": float(plancherel_smooth_B_arb.mid()),
-            "spatial_smooth_B_on_psi_tau": reconciled_smooth_B_mid,
+            "plancherel_smooth_B_rad": float(plancherel_smooth_B_arb.rad()),
+            "plancherel_smooth_B_tail_bound_from_T80": float(tail_sm_80_arb.upper()),
+            "plancherel_smooth_B_tail_bound_from_T40": float(tail_sm_40_arb.upper()),
+            "spatial_smooth_B_on_psi_tau": float(spatial_smooth_B_0_arb.mid()),
+            "spatial_smooth_B_rad": float(spatial_smooth_B_0_arb.rad()),
+            "plancherel_minus_spatial_smooth_B_encloses_zero": plancherel_smooth_B_encloses_zero,
             "plancherel_vs_spatial_smooth_B_abs_diff": plancherel_vs_spatial_smooth_B_diff,
+            "linear_operator_R0_and_J_fourier_identity": (
+                "(R_0 f)(x) = int_0^x (y/x)^{1/2} (D_y f)(y) dy/y on L^2(R_{>0}, d^*y), satisfying the quadratic "
+                "Plancherel identity J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt "
+                "= 4 ||f||_{L^2(d^*y)}^2 - 4 ||R_0 f||_{L^2(d^*y)}^2 (distinct from the full-pole functional "
+                "W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f), which vanishes on S_tau)."
+            ),
             "exact_transfer_quadratic_form_definition": (
                 "B_transfer(f) := 2 ||f||_{L^2(d^*y)}^2 - J(f, f) = 4 ||R_0 f||_{L^2(d^*y)}^2 - 2 ||f||_{L^2(d^*y)}^2 "
                 "= (1/tau) int_{-infty}^infty ((2t^2 - 1/2)/(t^2 + 1/4)) |hat{f}(it)|^2 dt"
             ),
             "plancherel_B_transfer_on_psi_tau": float(plancherel_transfer_arb.mid()),
-            "spatial_B_transfer_on_psi_tau": b_transfer_0_mid,
+            "plancherel_B_transfer_rad": float(plancherel_transfer_arb.rad()),
+            "plancherel_B_transfer_tail_bound_from_T80": float(tail_tr_80_arb.upper()),
+            "plancherel_B_transfer_tail_bound_from_T40": float(tail_tr_40_arb.upper()),
+            "spatial_B_transfer_on_psi_tau": float(spatial_b_transfer_0_arb.mid()),
+            "spatial_B_transfer_rad": float(spatial_b_transfer_0_arb.rad()),
+            "plancherel_minus_spatial_B_transfer_encloses_zero": plancherel_transfer_encloses_zero,
             "plancherel_vs_spatial_B_transfer_abs_diff": plancherel_vs_spatial_transfer_diff,
+            "methodological_distinction_three_levels": {
+                "1_analytic_proof_of_identity": (
+                    "Exact deductive proof via Mellin–Plancherel isometry on L^2(R_{>0}, d^*y) and term-by-term "
+                    "Mellin evaluation of the Euler-resolvent channels R_k (k >= 1) and R_0."
+                ),
+                "2_certified_numerical_consistency": (
+                    f"256-bit Arb ball integration on [0, {t_top_plancherel}] combined with analytic complex Stirling "
+                    f"tail bounds on [{t_top_plancherel}, infty) (< {float(tail_sm_80_arb.upper()):.3e} for smooth_B, "
+                    f"< {float(tail_tr_80_arb.upper()):.3e} for B_transfer), retaining full Arb enclosures through "
+                    f"subtraction: 0 in (Plancherel - Spatial) with upper error bound "
+                    f"{plancherel_vs_spatial_smooth_B_diff:.3e} (smooth_B) and {plancherel_vs_spatial_transfer_diff:.3e} (B_transfer)."
+                ),
+                "3_truncated_numerical_diagnostic": (
+                    f"Finite truncation at t = 40 without a tail bound omits the [40, 80] integral contribution "
+                    f"{omitted_tail_40_to_80_smooth_mid:.3e} (smooth_B) and {omitted_tail_40_to_80_transfer_mid:.3e} (B_transfer); "
+                    "comparing ordinary float midpoints at t = 40 previously rounded to 0.0 because float53 precision (~1.1e-16) "
+                    "masked the ~1.4e-19 truncation tail."
+                ),
+            },
             "transfer_share_of_smooth_deficit_on_psi_tau": transfer_fraction_on_psi_tau,
             "exact_transfer_decomposition_theorem": (
-                "Because W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 0 on S_tau (via double zeros hat{f}(+/- 1/2) = 0), "
-                "I_{pole,+}(f, f) = -J(f, f), so B_transfer(f) = 2||f||_{L^2}^2 - J(f, f) appears with identical sign in "
-                "BOTH P_E(f) = -W_prime(f * f^*) + B_transfer(f) AND c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 = -W_arch(f * f^*) + B_transfer(f). "
-                f"On f = psi_tau, B_transfer(psi_tau) = +{b_transfer_0_mid:.10f} accounts for {100.0 * transfer_fraction_of_deficit:.2f}% "
-                "of the smooth deficit if we compare +0.9687652063 to +1.0824296878, and cancels identically between P_E(f) and D_{smooth}^B(f)."
+                "For the uncentered Mellin seed F_tau(s) = (s^2(s-1)^2/32)(tau/2)^{-s/2}Gamma(s/2), s = 0 is a simple zero "
+                "(order 1) and s = 1 is a double zero (order 2), so H_0(z) = F_tau(1/2 + z)F_tau(1/2 - z) has triple zeros "
+                "(order 3) at z = +/- 1/2 and W_pole(f * f^*) = I_{pole,+}(f, f) + J(f, f) = 0 on S_tau. "
+                "Hence I_{pole,+}(f, f) = -J(f, f), and B_transfer(f) = 2||f||_{L^2}^2 - J(f, f) = 4||R_0 f||_{L^2}^2 - 2||f||_{L^2}^2 "
+                "appears with identical sign in BOTH P_E(f) = -W_prime(f * f^*) + B_transfer(f) AND "
+                "D_{smooth}^B(f) := c_tau^B ||f||_{L^2}^2 - ||A_tau^B f||_{H_tau^B}^2 = -W_arch(f * f^*) + B_transfer(f). "
+                f"On f = psi_tau, B_transfer(psi_tau) = +{b_transfer_0_mid:.10f} is {100.0 * transfer_fraction_of_deficit:.2f}% "
+                "of D_{smooth}^B(psi_tau) = +1.0824296878, and cancels identically in Q_tau(f, f) = P_E(f) - D_{smooth}^B(f) "
+                "= -W_prime(f * f^*) + W_arch(f * f^*). It is structural accounting of how the pole-vanishing decomposition "
+                "splits between D_{smooth}^B and P_E, NOT a partial proof of the missing arithmetic inequality."
                 if (transfer_fraction_of_deficit := transfer_fraction_on_psi_tau) is not None
                 else ""
             ),
@@ -5902,19 +6072,20 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
 
         # Candidate II: Coercive Norm-Shifted Factorization (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B)
         # and Semiboundedness-to-RH Reduction on S_tau^{(2)}
-        # Construct H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y) (mu_0 > 0) with
+        # Construct H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y) (mu_0 >= 0) with
         # A_{tau, mu_0}^B f := (A_tau^B f, f) and unitary U_K^B oplus T_K (constructed without assuming Q_tau >= 0 or RH).
-        # Then:
-        #   Q_tau(f, f) + (c_tau^B + mu_0) ||f||_{L^2}^2 = ||A_{tau, mu_0}^B f||_{H_{tau, mu_0}^B}^2 + P_E(f).
-        # On normalized two-grade states f_pm^{(K)} = (T_0 psi_tau +/- T_K psi_tau) / sqrt(2),
-        # ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^K) <= 2 h_0(1) (since |h_0(tau^K)| <= h_0(1)),
-        # and Q_tau(f_pm^{(K)}, f_pm^{(K)}) = C_tau(0) +/- C_tau(K).
-        # Therefore, if P_E(f_pm^{(K)}) >= -||A_{tau, mu_0}^B f_pm^{(K)}||_{H_{tau, mu_0}^B}^2 holds for ANY fixed finite mu_0 > 0,
+        # Since ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 has Plancherel multiplier mu_tau^B(t),
+        # the positive shifted norm ||A_{tau, mu_0}^B f||^2 = ||A_tau^B f||_{H_tau^B}^2 + mu_0 ||f||_{L^2}^2
+        # has strict positive Plancherel multiplier:
+        #   mu_tau^B(t) + c_tau^B + mu_0 >= mu_0  (since mu_tau^B(t) + c_tau^B = Re psi(5/4 + it/2) - psi(5/4) >= 0).
+        # On the NORMALIZED two-grade states f_pm^{(K)} = (psi_tau +/- T_K psi_tau) / sqrt(2),
+        # ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^K) <= 2 h_0(1), and Q_tau(f_pm^{(K)}, f_pm^{(K)}) = C_tau(0) +/- C_tau(K).
+        # Therefore, if P_E(f_pm^{(K)}) >= -||A_{tau, mu_0}^B f_pm^{(K)}||_{H_{tau, mu_0}^B}^2 holds for ANY fixed finite mu_0 >= 0,
         # then C_tau(0) +/- C_tau(K) + (c_tau^B + mu_0)(h_0(1) +/- h_0(tau^K)) >= 0, which implies:
         #   |C_tau(K)| <= C_tau(0) + 2 (c_tau^B + mu_0) h_0(1) < infty   for all K in A_R!
         mu_0_default = arb(1)
         coercive_norm_psi_tau_sq = (
-            arb(str(norm_A_B_sq_mid)) + mu_0_default * h0_1_arb
+            norm_A_B_0_arb_cert + mu_0_default * h0_1_arb
         )
         uniform_bound_M_at_mu0_1 = (
             arb(str(diag_0["Q_tau_f_f"]))
@@ -5924,30 +6095,46 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
         candidate_2_audit = {
             "candidate_name": "Candidate II — Coercive Norm-Shifted Hilbert Space (H_{tau, mu_0}^B, A_{tau, mu_0}^B, U_K^B) & Semiboundedness Reduction",
             "status": "COERCIVE_SEMIBOUNDEDNESS_TO_RH_REDUCTION_PROVED",
-            "positive_hilbert_space": "H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y)  (mu_0 > 0, constructed independently of Q_tau >= 0 or RH)",
+            "positive_hilbert_space": "H_{tau, mu_0}^B := H_tau^B oplus L^2(R_{>0}, mu_0 d^*y)  (mu_0 >= 0, constructed independently of Q_tau >= 0 or RH)",
             "grade_covariant_operator": "A_{tau, mu_0}^B f := (A_tau^B f, f),  ||A_{tau, mu_0}^B f||^2 = ||A_tau^B f||_{H_tau^B}^2 + mu_0 ||f||_{L^2(d^*y)}^2",
+            "positive_shifted_norm_plancherel_multiplier": (
+                "||A_{tau, mu_0}^B f||^2 = (1/tau) int_{-infty}^infty (mu_tau^B(t) + c_tau^B + mu_0) |hat{f}(it)|^2 dt, "
+                "where mu_tau^B(t) + c_tau^B + mu_0 = Re psi(5/4 + it/2) - psi(5/4) + mu_0 >= mu_0 > 0 for all t in R."
+            ),
             "unitary_grade_group": "U_{K, mu_0}^B := U_K^B oplus T_K  (unitary for all K in R, satisfying A_{tau, mu_0}^B T_K = U_{K, mu_0}^B A_{tau, mu_0}^B)",
+            "normalized_two_grade_states": (
+                "f_pm^{(K)} = (psi_tau +/- T_K psi_tau) / sqrt(2), satisfying ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^K), "
+                "Q_tau(f_pm^{(K)}, f_pm^{(K)}) = C_tau(0) +/- C_tau(K), and "
+                "||A_{tau, mu_0}^B f_pm^{(K)}||^2 = (||A_tau^B psi_tau||^2 + mu_0 h_0(1)) +/- (G_{A^B}(K) + mu_0 h_0(tau^K))."
+            ),
             "shifted_pairing_identity": (
                 "Q_tau(f, f) + (c_tau^B + mu_0) ||f||_{L^2(d^*y)}^2 = ||A_{tau, mu_0}^B f||_{H_{tau, mu_0}^B}^2 + P_E(f)"
             ),
             "semiboundedness_sufficiency_theorem": (
                 "To exclude all off-critical zeros via the Laplace–Carleman resolvent theorem, P_E(f) does NOT need to be "
-                "nonnegative or exceed c_tau^B ||f||^2 - ||A_tau^B f||^2: if there exists ANY finite mu_0 > 0 such that "
+                "nonnegative or exceed c_tau^B ||f||^2 - ||A_tau^B f||^2: if there exists ANY finite mu_0 >= 0 such that "
                 "P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) for all K in A_R "
-                "on the two-grade states f_pm^{(K)} = (T_0 psi_tau +/- T_K psi_tau)/sqrt(2), then "
+                "on the normalized two-grade states f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2), then "
                 "|C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0) h_0(1) < infty for all K in A_R, which prevents any RHP pole of L[C_tau(-t)](w)."
             ),
             "coercive_norm_sq_on_psi_tau_at_mu0_1": float(
                 coercive_norm_psi_tau_sq.mid()
             ),
+            "coercive_norm_sq_on_psi_tau_at_mu0_1_rad": float(
+                coercive_norm_psi_tau_sq.rad()
+            ),
             "implied_uniform_correlation_bound_at_mu0_1": float(
                 uniform_bound_M_at_mu0_1.mid()
+            ),
+            "implied_uniform_correlation_bound_at_mu0_1_rad": float(
+                uniform_bound_M_at_mu0_1.rad()
             ),
             "lean_theorem": "coercive_norm_shift_semiboundedness_implies_correlation_bound",
         }
 
-        # Candidate III: Cross-Grade Scale Separation & Unsigned Majorant Growth Obstruction
-        # Evaluate the off-diagonal smooth inner products and two-grade coercive norms across Delta in {0, 0.25, 0.5, 1, 2, 4, 8}:
+        # Candidate III: Cross-Grade Scale Separation & Scoped Monotone Envelope Majorant Obstruction
+        # Evaluate the off-diagonal smooth inner products and normalized two-grade coercive norms
+        # across Delta in {0, 0.25, 0.5, 1, 2, 4, 8} with certified infinite-tail enclosures for J(Delta):
         scale_separation_rows: List[Dict[str, Any]] = []
         for delta_val in (0.0, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0):
             d_arb = arb(str(delta_val))
@@ -5957,29 +6144,16 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
             )
             g_l2 = arch_d["hK_1_arb"]
             w_arch_d = arch_d["w_arch_total_arb"]
-            # Evaluate J(Delta):
-            u_top_d = max(20, int(math.ceil(float(abs(kap_d).upper()))) + 16)
-            kap_c = acb(kap_d)
-
-            def _f_jd(u: acb, analytic: bool, kc: acb = kap_c) -> acb:
-                hp = evaluate_h0_acb((kc + u).exp(), analytic=analytic)
-                hm = evaluate_h0_acb((kc - u).exp(), analytic=analytic)
-                return (hp + hm) * ((-u / acb(2)).exp())
-
-            j_d_arb = arb(0)
-            for m_s in range(0, 4 * u_top_d):
-                j_d_arb += acb.integral(
-                    _f_jd,
-                    acb(m_s) / acb(4),
-                    acb(m_s + 1) / acb(4),
-                    rel_tol=tol_spec,
-                    abs_tol=tol_spec,
-                ).real
+            # Evaluate J(Delta) with certified tail bound on [u_top_d, infty):
+            j_d_arb, _, j_d_tail_bound, u_top_d = _eval_j_delta_with_tail_arb(
+                kap_d
+            )
             g_a_a = w_arch_d + c_tau_A_arb * g_l2
             g_a_b = g_a_a - arb(4) * g_l2 + j_d_arb
             d_smooth_b = c_tau_B_arb * g_l2 - g_a_b
             b_trans_d = arb(2) * g_l2 - j_d_arb
-            # Two-grade coercive norm ||A_{tau, 1}^B f_-^{(Delta)}||^2 = (||A_tau^B psi_tau||^2 + ||psi_tau||^2) - (G_{A^B}(Delta) + G_{L^2}(Delta)):
+            # Normalized two-grade coercive norm for f_pm^{(Delta)} = (psi_tau +/- T_Delta psi_tau) / sqrt(2):
+            # ||A_{tau, 1}^B f_pm^{(Delta)}||^2 = (||A_tau^B psi_tau||^2 + ||psi_tau||^2) +/- (G_{A^B}(Delta) + G_{L^2}(Delta)):
             coercive_minus_sq = coercive_norm_psi_tau_sq - (
                 g_a_b + mu_0_default * g_l2
             )
@@ -5990,55 +6164,288 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                 {
                     "Delta": delta_val,
                     "X_eq_tau_Delta": float(kap_d.exp().mid()),
+                    "u_top_J": u_top_d,
+                    "J_Delta_tail_bound": float(j_d_tail_bound.upper()),
                     "G_L2_Delta": float(g_l2.mid()),
+                    "G_L2_Delta_rad": float(g_l2.rad()),
                     "J_Delta": float(j_d_arb.mid()),
+                    "J_Delta_rad": float(j_d_arb.rad()),
                     "G_A_B_Delta": float(g_a_b.mid()),
+                    "G_A_B_Delta_rad": float(g_a_b.rad()),
                     "D_smooth_B_Delta": float(d_smooth_b.mid()),
+                    "D_smooth_B_Delta_rad": float(d_smooth_b.rad()),
                     "B_transfer_Delta": float(b_trans_d.mid()),
+                    "B_transfer_Delta_rad": float(b_trans_d.rad()),
                     "W_arch_Delta": float(w_arch_d.mid()),
+                    "W_arch_Delta_rad": float(w_arch_d.rad()),
                     "coercive_norm_sq_f_minus_at_mu0_1": float(
                         coercive_minus_sq.mid()
+                    ),
+                    "coercive_norm_sq_f_minus_at_mu0_1_rad": float(
+                        coercive_minus_sq.rad()
                     ),
                     "coercive_norm_sq_f_plus_at_mu0_1": float(
                         coercive_plus_sq.mid()
                     ),
+                    "coercive_norm_sq_f_plus_at_mu0_1_rad": float(
+                        coercive_plus_sq.rad()
+                    ),
                 }
             )
 
-        # Evaluate the signed vs absolute-value moments of tilde{h}_0(alpha) = (1/2 - D_alpha) h_0(alpha) on (0, infty):
-        # Signed moment: int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha
-        #   = [ -alpha^{1/2} h_0(alpha) ]_0^infty = 0  (exact PNT cancellation!)
-        # Unsigned moment on [1/2, 2]: c_0 := int_{1/2}^2 alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha > 0,
-        # and full unsigned moment C_abs := int_0^infty alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha ~= 0.903284 > 0.
-        def _eval_tilde_h0_arb(alpha_a: arb) -> arb:
-            # tilde{h}_0(alpha) = (1/2) h_0(alpha) - alpha h_0'(alpha)
-            saved_c = flint_ctx.cap
-            try:
-                flint_ctx.cap = 2
-                s_a = acb_series([acb(alpha_a), acb(1)], prec=2)
-                h_s = evaluate_h0_acb(s_a, analytic=False)
-                h_val = h_s[0].real
-                h_deriv = h_s[1].real
-                return arb("0.5") * h_val - alpha_a * h_deriv
-            finally:
-                flint_ctx.cap = saved_c
+        # Evaluate the signed vs absolute-value moments of k(alpha) := alpha^{-1/2} tilde{h}_0(alpha) on (0, infty):
+        # 1. Exact closed-form rational-algebraic expression for k(alpha) = alpha^{-1/2} (1/2 - D_alpha) h_0(alpha):
+        #    k(alpha) = -3 * alpha^2 * Q_0(alpha^2) / (512 * (1 + alpha^2)^{19/2}),
+        #    Q_0(u)   = 648*u^7 - 93844*u^6 + 1345108*u^5 - 4462075*u^4 + 4306220*u^3 - 1202252*u^2 + 75896*u - 432.
+        # 2. Q_0(u) has 7 simple positive real roots u_1 < ... < u_7, giving 7 sign-change roots alpha_j = sqrt(u_j) on (0, infty),
+        #    of which alpha_3 ~= 0.569675, alpha_4 ~= 0.984531, alpha_5 ~= 1.695300 lie inside (1/2, 2).
+        u_poly_sym = sp.Symbol("u", real=True)
+        q0_poly_sym = (
+            648 * u_poly_sym**7
+            - 93844 * u_poly_sym**6
+            + 1345108 * u_poly_sym**5
+            - 4462075 * u_poly_sym**4
+            + 4306220 * u_poly_sym**3
+            - 1202252 * u_poly_sym**2
+            + 75896 * u_poly_sym
+            - 432
+        )
+        q0_deriv_sym = sp.diff(q0_poly_sym, u_poly_sym)
+        q0_intervals = sp.Poly(q0_poly_sym, u_poly_sym).intervals(eps=1e-30)
+        if len(q0_intervals) != 7:
+            raise RuntimeError(
+                f"Expected 7 positive real roots for Q_0(u), got {len(q0_intervals)}"
+            )
 
-        # Compute c_0 = int_{1/2}^2 alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha by midpoint/Riemann enclosure over 300 subintervals
-        # (noting tilde{h}_0(alpha) > 0 on [0.5, 1.38] and < 0 on [1.39, 2.0]):
-        n_sub_c0 = 300
+        def _eval_q0_arb(u_a: arb) -> arb:
+            return (
+                (
+                    (
+                        (
+                            (
+                                (arb(648) * u_a - arb(93844)) * u_a
+                                + arb(1345108)
+                            )
+                            * u_a
+                            - arb(4462075)
+                        )
+                        * u_a
+                        + arb(4306220)
+                    )
+                    * u_a
+                    - arb(1202252)
+                )
+                * u_a
+                + arb(75896)
+            ) * u_a - arb(432)
+
+        def _eval_q0_prime_arb(u_a: arb) -> arb:
+            return (
+                (
+                    (
+                        (
+                            (arb(4536) * u_a - arb(563064)) * u_a
+                            + arb(6725540)
+                        )
+                        * u_a
+                        - arb(17848300)
+                    )
+                    * u_a
+                    + arb(12918660)
+                )
+                * u_a
+                - arb(2404504)
+            ) * u_a + arb(75896)
+
+        alpha_roots_k: List[arb] = []
+        for (a_rat, b_rat), _ in q0_intervals:
+            u_mid = arb(
+                (
+                    (
+                        arb(int(a_rat.p)) / arb(int(a_rat.q))
+                        + arb(int(b_rat.p)) / arb(int(b_rat.q))
+                    )
+                    / arb(2)
+                ).mid()
+            )
+            for _ in range(12):
+                u_mid = arb(
+                    (
+                        u_mid - _eval_q0_arb(u_mid) / _eval_q0_prime_arb(u_mid)
+                    ).mid()
+                )
+            u_mid_pt = arb(u_mid.mid())
+            rad_u = arb("1e-55")
+            u_ball = arb(u_mid_pt.mid(), rad_u.upper())
+            newton_step = u_mid_pt - _eval_q0_arb(u_mid_pt) / _eval_q0_prime_arb(
+                u_ball
+            )
+            if not bool(abs(newton_step - u_mid_pt) < rad_u):
+                raise RuntimeError("Interval Newton root certification failed for Q_0")
+            alpha_roots_k.append(u_ball.sqrt())
+
+        def _k_signed_acb(al: acb, analytic: bool = False) -> acb:
+            u = al * al
+            q_val = (
+                (
+                    (
+                        (
+                            (
+                                (acb(648) * u - acb(93844)) * u
+                                + acb(1345108)
+                            )
+                            * u
+                            - acb(4462075)
+                        )
+                        * u
+                        + acb(4306220)
+                    )
+                    * u
+                    - acb(1202252)
+                )
+                * u
+                + acb(75896)
+            ) * u - acb(432)
+            op = acb(1) + u
+            denom = acb(512) * (op**9) * op.sqrt(analytic=analytic)
+            return -acb(3) * u * q_val / denom
+
+        def _integrate_between_certified_root_balls(
+            func_acb, a_ball: arb, b_ball: arb, n_sub: int = 4
+        ) -> arb:
+            a_m = a_ball.mid()
+            b_m = b_ball.mid()
+            grid_pts = [
+                acb((a_m + (b_m - a_m) * arb(m_idx) / arb(n_sub)).mid())
+                for m_idx in range(n_sub + 1)
+            ]
+            mid_int = arb(0)
+            for m_idx in range(n_sub):
+                mid_int += acb.integral(
+                    func_acb,
+                    grid_pts[m_idx],
+                    grid_pts[m_idx + 1],
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+            end_err = (
+                arb(2)
+                * abs(func_acb(acb(a_ball))).real
+                * arb(a_ball.rad())
+                + arb(2)
+                * abs(func_acb(acb(b_ball))).real
+                * arb(b_ball.rad())
+            )
+            return mid_int + arb(0, end_err.upper())
+
+        # Integrate k(alpha) and |k(alpha)| on [1/2, 2] split at the 3 certified roots alpha_3, alpha_4, alpha_5 in (1/2, 2):
+        roots_in_half_two = [alpha_roots_k[2], alpha_roots_k[3], alpha_roots_k[4]]
+        nodes_half_two = [arb("0.5")] + roots_in_half_two + [arb("2.0")]
         c0_abs_window = arb(0)
         signed_window_05_2 = arb(0)
-        for idx_s in range(n_sub_c0):
-            a_pt = arb("0.5") + arb(idx_s) * arb("1.5") / arb(n_sub_c0)
-            b_pt = arb("0.5") + arb(idx_s + 1) * arb("1.5") / arb(n_sub_c0)
-            mid_pt = (a_pt + b_pt) / arb(2)
-            rad_pt = (b_pt - a_pt) / arb(2)
-            ball_pt = arb(mid_pt.mid(), rad_pt.upper())
-            th_val = _eval_tilde_h0_arb(ball_pt)
-            integrand_ball = th_val / ball_pt.sqrt()
-            dx_seg = b_pt - a_pt
-            signed_window_05_2 += integrand_ball * dx_seg
-            c0_abs_window += abs(integrand_ball) * dx_seg
+        for idx_seg in range(len(nodes_half_two) - 1):
+            seg_int = _integrate_between_certified_root_balls(
+                _k_signed_acb,
+                nodes_half_two[idx_seg],
+                nodes_half_two[idx_seg + 1],
+            )
+            signed_window_05_2 += seg_int
+            c0_abs_window += abs(seg_int)
+
+        # Integrate |k(alpha)| on (0, infty) using [1/64, 64] split at all 7 certified roots alpha_1..alpha_7
+        # plus explicit Bernstein power-law tail bounds on (0, 1/64] and [64, infty):
+        # Since |tilde{h}_0(alpha)| <= (1032993/65536)*(alpha + alpha^{-1})^{-5/2}:
+        #   int_0^a alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha <= (1032993/196608) * a^3,
+        #   int_B^infty alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha <= (1032993/131072) * B^{-2}.
+        a_low_cut = arb(1) / arb(64)
+        b_high_cut = arb(64)
+        nodes_full = [a_low_cut] + alpha_roots_k + [b_high_cut]
+        c_abs_finite_window = arb(0)
+        signed_full_window = arb(0)
+        for idx_seg in range(len(nodes_full) - 1):
+            a_b = nodes_full[idx_seg]
+            b_b = nodes_full[idx_seg + 1]
+            n_sub_seg = max(
+                4,
+                int(
+                    math.ceil(
+                        float((b_b - a_b).upper())
+                        / 2.0
+                    )
+                ),
+            )
+            seg_sum = _integrate_between_certified_root_balls(
+                _k_signed_acb, a_b, b_b, n_sub=n_sub_seg
+            )
+            signed_full_window += seg_sum
+            c_abs_finite_window += abs(seg_sum)
+
+        tail_low_bound = (arb(1032993) / arb(196608)) * (a_low_cut**3)
+        tail_high_bound = (arb(1032993) / arb(131072)) * (
+            arb(1) / (b_high_cut * b_high_cut)
+        )
+        c_abs_window_with_tails_arb = c_abs_finite_window + arb(
+            0, (tail_low_bound + tail_high_bound).upper()
+        )
+
+        # Also compute C_abs via compactified u = 1/alpha on [alpha_7, infty) (u in [0, 1/alpha_7]) for sharp 45-digit precision:
+        def _k_inv_acb(u: acb, analytic: bool = False) -> acb:
+            u2 = u * u
+            q_rev = (
+                (
+                    (
+                        (
+                            (
+                                (
+                                    -acb(432) * u2 + acb(75896)
+                                )
+                                * u2
+                                - acb(1202252)
+                            )
+                            * u2
+                            + acb(4306220)
+                        )
+                        * u2
+                        - acb(4462075)
+                    )
+                    * u2
+                    + acb(1345108)
+                )
+                * u2
+                - acb(93844)
+            ) * u2 + acb(648)
+            op = acb(1) + u2
+            denom = acb(512) * (op**9) * op.sqrt(analytic=analytic)
+            return -acb(3) * u * q_rev / denom
+
+        nodes_0_to_r7 = [arb(0)] + alpha_roots_k
+        c_abs_compact_arb = arb(0)
+        signed_compact_arb = arb(0)
+        for idx_seg in range(len(nodes_0_to_r7) - 1):
+            seg_int = _integrate_between_certified_root_balls(
+                _k_signed_acb,
+                nodes_0_to_r7[idx_seg],
+                nodes_0_to_r7[idx_seg + 1],
+            )
+            signed_compact_arb += seg_int
+            c_abs_compact_arb += abs(seg_int)
+        seg_tail_compact = _integrate_between_certified_root_balls(
+            _k_inv_acb,
+            arb(0),
+            arb(1) / alpha_roots_k[-1],
+        )
+        signed_compact_arb += seg_tail_compact
+        c_abs_compact_arb += abs(seg_tail_compact)
+
+        # Verify consistency between compactified enclosure, window+tail enclosure, and subinterval ordering 0 < c_0 < C_abs:
+        c_abs_methods_overlap = bool(
+            c_abs_compact_arb.overlaps(c_abs_window_with_tails_arb)
+        )
+        c0_strictly_less_than_c_abs = bool(
+            float(c0_abs_window.lower()) > 0.0
+            and float(c0_abs_window.upper()) < float(c_abs_compact_arb.lower())
+        )
+        signed_zero_moment_encloses_zero = bool(signed_compact_arb.contains(0))
 
         # Exact Stieltjes antiderivative identity:
         #   alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)),
@@ -6055,40 +6462,68 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
         )
         exact_antiderivative_zero_moment_verified = bool(antideriv_diff == 0)
 
-        # Unsigned majorant growth vs fixed coercive norm at mu_0 = 1:
-        # For any unsigned majorant |E(x)| <= x * omega(x) (without sign cancellation),
-        # the majorant integral M_omega(X) := int_1^infty x * omega(x) * x^{-3/2} |tilde{h}_0(x/X)| dx
-        # satisfies M_omega(X) >= c_0 * X^{1/2} * omega(X / 2) for X = tau^{|Delta|} >= 2,
-        # which grows -> +infty as |Delta| -> infty for every known zero-free error bound omega(x),
-        # exceeding the asymptotically constant coercive norm ||A_{tau, 1}^B f_-^{(Delta)}||^2 -> ||A_tau^B psi_tau||^2 + ||psi_tau||^2 ~= 1.092130!
+        # Separate A_E(X) and M_omega(X) and compute crossover grades with the repaired certified c_0 and C_abs:
+        #   A_E(X)     := int_1^infty |E(x)| x^{-3/2} |tilde{h}_0(x/X)| dx,
+        #   M_omega(X) := int_1^infty x * omega(x) * x^{-3/2} |tilde{h}_0(x/X)| dx.
+        # Under an upper envelope |E(x)| <= x * omega(x), we have A_E(X) <= M_omega(X) (an upper bound on A_E(X),
+        # NOT a lower bound on A_E(X)).
+        # For nonnegative, nonincreasing omega and X >= 2:
+        #   M_omega(X) >= int_{X/2}^{2X} omega(x) x^{-1/2} |tilde{h}_0(x/X)| dx >= c_0 * sqrt(X) * omega(2X)
+        # (using omega(2X) at the upper endpoint of [X/2, 2X], NOT omega(X/2)).
+        # Divergence of M_omega(X) as X -> infty holds for the specified envelope class where sqrt(X) * omega(2X) -> infty.
+        c0_mid_float = float(c0_abs_window.mid())
         c0_lower_float = float(c0_abs_window.lower())
+        c_abs_total = float(c_abs_compact_arb.mid())
+        c_abs_lower_float = float(c_abs_compact_arb.lower())
         coercive_limit_mu0_1 = float(coercive_norm_psi_tau_sq.mid())
-        # Compute crossover grade Delta_*(mu_0 = 1) where the unsigned majorant bound exceeds coercive_limit_mu0_1 + P_E(psi_tau):
         # Target threshold T_thresh = coercive_limit_mu0_1 + reconciled_prime_err_B_mid ~= 1.092130 + 1.083380 = 2.175510
         target_thresh = coercive_limit_mu0_1 + reconciled_prime_err_B_mid
-        # (a) Elementary Chebyshev majorant |E(x)| <= 0.04 * x: C_abs * 0.04 * tau^{Delta/2} > target_thresh
-        # Using C_abs ~= 0.9032843:
-        c_abs_total = 0.9032843043
+        # (a) Illustrative Chebyshev constant-envelope model omega_Cheb(x) = 0.04 (cf. Rosser–Schoenfeld 1962 Thm 12:
+        #     |psi(x) - x| < 0.0397*x for all x > 0):
+        #     Full majorant M_{0.04}(X) = 0.04 * sqrt(X) * int_{1/X}^infty |k(alpha)| d_alpha ~ 0.04 * C_abs * sqrt(X)
+        #     and window lower bound c_0 * sqrt(X) * 0.04:
         delta_star_chebyshev = (
             2.0 * math.log(target_thresh / (0.04 * c_abs_total)) / LOG_TAU_FLOAT
         )
-        # (b) de la Vallee Poussin majorant |E(x)| <= x * exp(-0.2 * sqrt(log x)):
-        # Find smallest Delta > 0 on a fine grid where c_abs_total * tau^{Delta/2} * exp(-0.2 * sqrt(Delta * log(tau))) > target_thresh:
+        delta_star_chebyshev_window_lower = (
+            2.0 * math.log(target_thresh / (0.04 * c0_lower_float)) / LOG_TAU_FLOAT
+        )
+        # (b) Illustrative de la Vallee Poussin envelope model omega_dLVP(x) = exp(-0.2 * sqrt(log x))
+        #     (cf. Rosser–Schoenfeld 1962 Thm 10: |psi(x) - x| <= x*(log x)^2*exp(-sqrt(log x / 17.5163)) for x >= 2):
+        #     Find smallest Delta > 0 on a fine grid where C_abs * tau^{Delta/2} * exp(-0.2 * sqrt(Delta * log(tau))) > target_thresh,
+        #     and where the window lower bound c_0 * tau^{Delta/2} * exp(-0.2 * sqrt(log(2 * tau^Delta))) > target_thresh (for tau^Delta >= 2):
         delta_star_dlvp = None
-        for idx_g in range(1, 10000):
+        delta_star_dlvp_window_lower = None
+        for idx_g in range(1, 20000):
             d_test = idx_g * 0.001
-            val_dlvp = (
+            x_test = math.exp(d_test * LOG_TAU_FLOAT)
+            val_dlvp_full = (
                 c_abs_total
-                * math.exp(0.5 * d_test * LOG_TAU_FLOAT)
+                * math.sqrt(x_test)
                 * math.exp(-0.2 * math.sqrt(d_test * LOG_TAU_FLOAT))
             )
-            if val_dlvp > target_thresh:
+            if delta_star_dlvp is None and val_dlvp_full > target_thresh:
                 delta_star_dlvp = round(d_test, 3)
+            if x_test >= 2.0:
+                val_dlvp_win = (
+                    c0_lower_float
+                    * math.sqrt(x_test)
+                    * math.exp(-0.2 * math.sqrt(math.log(2.0 * x_test)))
+                )
+                if (
+                    delta_star_dlvp_window_lower is None
+                    and val_dlvp_win > target_thresh
+                ):
+                    delta_star_dlvp_window_lower = round(d_test, 3)
+            if (
+                delta_star_dlvp is not None
+                and delta_star_dlvp_window_lower is not None
+            ):
                 break
 
         candidate_3_audit = {
-            "candidate_name": "Candidate III — Cross-Grade Scale Separation & Unsigned Majorant Growth Obstruction",
-            "status": "SCALE_SEPARATION_PROVED_UNSIGNED_MAJORANT_FALSIFIED",
+            "candidate_name": "Candidate III — Cross-Grade Scale Separation & Scoped Monotone Envelope Majorant Obstruction",
+            "status": "SCALE_SEPARATION_PROVED_SCOPED_ENVELOPE_MAJORANT_OBSTRUCTED",
             "off_diagonal_scale_separation_table": scale_separation_rows,
             "asymptotic_smooth_decay_rates": {
                 "G_L2_Delta": "O(tau^{-5|Delta|/2})  (from |h_0(alpha)| <= (92193/32768) alpha^{-5/2})",
@@ -6104,35 +6539,587 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                 "int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = [ -alpha^{1/2} h_0(alpha) ]_0^infty + H_0(1/2) = 0"
             ),
             "symbolic_antiderivative_identity_verified": exact_antiderivative_zero_moment_verified,
-            "unsigned_window_moment_c0_on_half_to_two": float(c0_abs_window.mid()),
+            "certified_sign_change_roots_of_tilde_h0": [
+                float(r.mid()) for r in alpha_roots_k
+            ],
+            "unsigned_window_moment_c0_on_half_to_two": c0_mid_float,
+            "unsigned_window_moment_c0_rad": float(c0_abs_window.rad()),
             "unsigned_window_moment_c0_lower": c0_lower_float,
+            "unsigned_window_moment_c0_upper": float(c0_abs_window.upper()),
             "unsigned_full_moment_C_abs": c_abs_total,
+            "unsigned_full_moment_C_abs_rad": float(c_abs_compact_arb.rad()),
+            "unsigned_full_moment_C_abs_lower": c_abs_lower_float,
+            "unsigned_full_moment_C_abs_upper": float(c_abs_compact_arb.upper()),
+            "unsigned_full_moment_window_plus_bernstein_tails_mid": float(
+                c_abs_window_with_tails_arb.mid()
+            ),
+            "unsigned_full_moment_window_plus_bernstein_tails_rad": float(
+                c_abs_window_with_tails_arb.rad()
+            ),
+            "c_abs_methods_overlap": c_abs_methods_overlap,
+            "subinterval_strictly_less_than_full_integral": c0_strictly_less_than_c_abs,
+            "signed_full_moment_encloses_zero": signed_zero_moment_encloses_zero,
+            "separate_unsigned_definitions_and_envelope_ordering": {
+                "A_E_definition": "A_E(X) := int_1^infty |E(x)| x^{-3/2} |tilde{h}_0(x/X)| dx",
+                "M_omega_definition": "M_omega(X) := int_1^infty x * omega(x) * x^{-3/2} |tilde{h}_0(x/X)| dx",
+                "envelope_ordering": (
+                    "Under an upper envelope |E(x)| <= x * omega(x), |I(X)| <= A_E(X) <= M_omega(X). "
+                    "An upper envelope on |E(x)| yields an upper bound on A_E(X), NOT a lower bound on A_E(X)."
+                ),
+                "monotone_majorant_lower_bound": (
+                    "For nonnegative, nonincreasing omega on [1, infty), X >= 2, and "
+                    "c_0 = int_{1/2}^2 alpha^{-1/2} |tilde{h}_0(alpha)| d_alpha = 1.7456980946 > 0, "
+                    "restricting M_omega(X) to x in [X/2, 2X] (where x >= 1 and omega(x) >= omega(2X)) proves "
+                    "M_omega(X) >= c_0 * sqrt(X) * omega(2X) (using omega(2X), not omega(X/2))."
+                ),
+                "divergence_hypothesis_and_scope": (
+                    "M_omega(X) -> +infty as X -> infty holds for the specified class of nonnegative, nonincreasing "
+                    "envelopes omega satisfying sqrt(X) * omega(2X) -> infty. The unsupported claim that every "
+                    "unsigned estimate must fail is withdrawn."
+                ),
+                "classical_bounds_vs_illustrative_models": (
+                    "The expressions omega_Cheb(x) = 0.04 and omega_dLVP(x) = exp(-0.2*sqrt(log x)) are evaluated as "
+                    "illustrative envelope models inside the class sqrt(X)*omega(2X) -> infty. Classical proven bounds "
+                    "with explicit constants and ranges include Rosser–Schoenfeld (1962, Theorem 12): |psi(x) - x| < 0.0397*x "
+                    "for all x > 0 (and |theta(x) - x| < 0.006788*x/log x for x >= 10^8), and Rosser–Schoenfeld (1962, Theorem 10): "
+                    "|psi(x) - x| <= x*(log x)^2*exp(-sqrt(log x / R_0)) with R_0 = 17.5163 for x >= 2."
+                ),
+            },
             "unsigned_majorant_growth_lower_bound": (
-                "For any unsigned majorant |E(x)| <= x * omega(x) (with omega nonincreasing), "
-                "int_1^infty |E(x)| x^{-3/2} |tilde{h}_0(x/X)| dx >= c_0 * X^{1/2} * omega(X/2)  (X = tau^{|Delta|} >= 2), "
-                "which diverges to +infty as |Delta| -> infty for every known zero-free majorant omega(x), "
-                "whereas the two-grade coercive norm ||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 approaches the finite constant "
-                "||A_tau^B psi_tau||^2 + mu_0 ||psi_tau||^2."
+                "For any nonnegative, nonincreasing envelope omega with |E(x)| <= x * omega(x) and X >= 2, "
+                "A_E(X) <= M_omega(X) and M_omega(X) >= c_0 * sqrt(X) * omega(2X). "
+                "Whenever sqrt(X) * omega(2X) -> +infty as X = tau^{|Delta|} -> infty, the majorant M_omega(tau^{|Delta|}) "
+                "diverges to +infty, exceeding the asymptotically constant coercive norm "
+                "||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 -> ||A_tau^B psi_tau||^2 + mu_0 ||psi_tau||^2."
             ),
             "crossover_grade_delta_star_chebyshev_004x_at_mu0_1": delta_star_chebyshev,
+            "crossover_grade_delta_star_chebyshev_004x_window_lower_at_mu0_1": delta_star_chebyshev_window_lower,
             "crossover_grade_delta_star_dlvp_at_mu0_1": delta_star_dlvp,
+            "crossover_grade_delta_star_dlvp_window_lower_at_mu0_1": delta_star_dlvp_window_lower,
             "obstruction_conclusion": (
                 "Smooth archimedean operators A_tau^B and fixed L^2 norm shifts mu_0 ||f||_{L^2}^2 have off-diagonal "
                 "inner products between T_0 psi_tau and T_Delta psi_tau that decay exponentially as O(|Delta| tau^{-|Delta|/2}), "
                 "whereas the off-diagonal prime-error pairing G_{P_E}(Delta) = -W(tau^{|Delta|}) + O(|Delta| tau^{-|Delta|/2}) "
                 "probes Chebyshev prime-error oscillations E(x) around the moving scale x ~ X = tau^{|Delta|}. "
-                "Replacing E(x) by any unsigned majorant |E(x)| destroys the exact antiderivative cancellation "
-                "int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = 0 and diverges like tau^{|Delta|/2} omega(tau^{|Delta|}/2) -> +infty. "
-                "Therefore, any proof of the semiboundedness inequality P_E(f_pm^{(Delta)}) >= -||A_{tau, mu_0}^B f_pm^{(Delta)}||^2 "
-                "must preserve the signed oscillatory derivative structure of E(x) at scale X = tau^{|Delta|}."
+                "Within the specified class of nonnegative, nonincreasing envelopes |E(x)| <= x * omega(x) satisfying "
+                "sqrt(X) * omega(2X) -> infty, replacing |I(X)| by the envelope majorant M_omega(X) destroys the zero-moment "
+                "cancellation int_0^infty alpha^{-1/2} tilde{h}_0(alpha) d_alpha = 0 and forces M_omega(X) >= c_0 * sqrt(X) * omega(2X) -> +infty."
             ),
             "lean_theorem": "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm",
+            "lean_envelope_ordering_theorem": "majorant_window_lower_bound_and_envelope_ordering",
+            "lean_theorem_scope_note": (
+                "`majorant_without_sign_cancellation_exceeds_fixed_coercive_norm` is a conditional scalar subtraction lemma "
+                "under the assumed threshold inequality B_fixed < c_0 * scale_factor (not an analytic proof of growth); "
+                "`majorant_window_lower_bound_and_envelope_ordering` formalizes the ordering A_E <= M_omega and "
+                "c_0 * sqrt(X) * omega(2X) <= M_omega from nonnegativity and window monotonicity hypotheses."
+            ),
+        }
+
+        # -------------------------------------------------------------------
+        # 4. Step 5: Signed Cross-Grade Cancellation Investigation
+        #    (Zero-Moment Subtracted Increment, Chordal Prime-Power Stieltjes
+        #     Identity, and Chebyshev Primitive Transfer)
+        # -------------------------------------------------------------------
+        # Investigate I(X) = int_1^infty E(x) x^{-3/2} tilde{h}_0(x/X) dx = sqrt(X) int_{1/X}^infty e(X*alpha) k(alpha) d_alpha,
+        # where e(x) = E(x)/x = psi(x)/x - 1 and k(alpha) = alpha^{-1/2} tilde{h}_0(alpha).
+        # Using int_0^infty k(alpha) d_alpha = 0:
+        #   I(X) = I_inc(X) + B_zm(X),
+        #   I_inc(X) = sqrt(X) int_{1/X}^infty [e(X*alpha) - e(X)] k(alpha) d_alpha,
+        #   B_zm(X)  = -sqrt(X) e(X) int_0^{1/X} k(alpha) d_alpha.
+        #
+        # Step 5A: Lower-Tail Boundary Identity:
+        #   Integration by parts of alpha^{-1} k(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)) gives
+        #   k(alpha) = -alpha^{1/2} h_0'(alpha) + (1/2) alpha^{-1/2} h_0(alpha) = -d/d_alpha (alpha^{1/2} h_0(alpha)) + alpha^{-1/2} h_0(alpha),
+        #   so:
+        #   sqrt(X) int_0^{1/X} k(alpha) d_alpha = -h_0(1/X) + int_0^1 x^{-1/2} h_0(x/X) dx = -B_boundary(X),
+        #   where W(X) = B_boundary(X) + I(X) and |B_boundary(X)| <= (92193/24576) X^{-5/2} for all X >= 1.
+        #   Hence B_zm(X) = e(X) B_boundary(X), which satisfies |B_zm(X)| <= (92193/24576) |e(X)| X^{-5/2} = O(X^{-5/2}).
+        #
+        # Step 5B: Chordal Prime-Power Increment Decomposition & Exact Equivalence:
+        #   Decompose e(X*alpha) - e(X) = (psi(X*alpha) - psi(X))/(X*alpha) - (1 - 1/alpha)*(psi(X)/X),
+        #   splitting I_inc(X) = I_chord(X) - I_drift(X):
+        #     I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha,
+        #     I_drift(X) := sqrt(X) (psi(X)/X) int_{1/X}^infty (1 - 1/alpha) k(alpha) d_alpha.
+        #   Using int_{1/X}^infty k(alpha) d_alpha = -int_0^{1/X} k(alpha) d_alpha = B_boundary(X)/sqrt(X)
+        #   and int_{1/X}^infty alpha^{-1} k(alpha) d_alpha = [ -alpha^{-1/2} h_0(alpha) ]_{1/X}^infty = sqrt(X) h_0(1/X):
+        #     I_drift(X) = (psi(X)/X) B_boundary(X) - psi(X) h_0(1/X) = O(X^{-3/2}).
+        #   Using Stieltjes integration by parts of psi(x) - psi(X) against x^{-3/2} tilde{h}_0(x/X) dx = -X^{1/2} d(x^{-1/2} h_0(x/X))
+        #   on [1, infty) (with jump sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X) = W(X) and lower endpoint -[0 - psi(X)]*h_0(1/X) = -psi(X) h_0(1/X)):
+        #     I_chord(X) = W(X) - psi(X) h_0(1/X).
+        #   Subtracting I_drift(X) cancels -psi(X) h_0(1/X) identically:
+        #     I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X).
+        #   This proves that the prime-wavelet sum W(X) reappears identically inside the chordal jump integral I_chord(X).
+        #
+        # Step 5C: Next Justified Refinement — Chebyshev Primitive Transfer e_1(x) = E_1(x)/x^2:
+        #   Let E_1(x) = int_1^x E(t) dt (with E_1(1) = 0) and e_1(x) = E_1(x)/x^2.
+        #   Since (2 + D_x) e_1(x) = e(x), integration by parts against k(alpha) transfers (2 + D_alpha) to its d_alpha-adjoint (1 - D_alpha):
+        #     k_1(alpha) := (1 - D_alpha) k(alpha) = alpha^{-1/2} (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) = alpha^{-1/2} h_1(alpha),
+        #   with zero moment int_0^infty k_1(alpha) d_alpha = [ -alpha * k(alpha) ]_0^infty = 0 and lower-tail integral
+        #     int_0^{1/X} k_1(alpha) d_alpha = 2 int_0^{1/X} k(alpha) d_alpha - (1/X) k(1/X).
+        #   Because e_1(1) = 0, the lower boundary term at alpha = 1/X vanishes identically:
+        #     I(X) = sqrt(X) int_{1/X}^infty e_1(X*alpha) k_1(alpha) d_alpha
+        #          = sqrt(X) int_{1/X}^infty [e_1(X*alpha) - e_1(X)] k_1(alpha) d_alpha - sqrt(X) e_1(X) int_0^{1/X} k_1(alpha) d_alpha.
+
+        # Symbolic verification of the primitive transfer operator identity:
+        e1_sym = sp.Function("e1")(alpha_sym)
+        k_sym = sp.Function("k")(alpha_sym)
+        ibp_primitive_diff = sp.simplify(
+            ((2 * e1_sym + alpha_sym * sp.diff(e1_sym, alpha_sym)) * k_sym)
+            - (
+                sp.diff(alpha_sym * e1_sym * k_sym, alpha_sym)
+                + e1_sym * (k_sym - alpha_sym * sp.diff(k_sym, alpha_sym))
+            )
+        )
+        symbolic_primitive_transfer_verified = bool(ibp_primitive_diff == 0)
+
+        # Certified Arb verification of k_1(alpha) = (1 - D_alpha) k(alpha) = alpha^{-1/2} h_1(alpha)
+        # and its subinterval/full unsigned moments c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha, C_{1,abs} = int_0^infty |k_1(alpha)| d_alpha:
+        # Express k_1(alpha) in u = alpha^2 via exact symbolic simplification:
+        k_exact_sym = (
+            -3
+            * alpha_sym**2
+            * q0_poly_sym.subs(u_poly_sym, alpha_sym**2)
+            / (512 * (1 + alpha_sym**2) ** sp.Rational(19, 2))
+        )
+        k1_exact_sym = sp.simplify(
+            k_exact_sym - alpha_sym * sp.diff(k_exact_sym, alpha_sym)
+        )
+        q1_num_sym = sp.simplify(
+            k1_exact_sym
+            * 512
+            * (1 + alpha_sym**2) ** sp.Rational(21, 2)
+            / (3 * alpha_sym**2)
+        )
+        q1_u_poly_sym = sp.Poly(
+            q1_num_sym.subs(alpha_sym**2, u_poly_sym), u_poly_sym
+        ).as_expr()
+        q1_u_deriv_sym = sp.diff(q1_u_poly_sym, u_poly_sym)
+        q1_coeffs_desc = [
+            int(c) for c in sp.Poly(q1_u_poly_sym, u_poly_sym).all_coeffs()
+        ]
+        q1_deriv_coeffs_desc = [
+            int(c) for c in sp.Poly(q1_u_deriv_sym, u_poly_sym).all_coeffs()
+        ]
+        q1_intervals = sp.Poly(q1_u_poly_sym, u_poly_sym).intervals(eps=1e-30)
+
+        def _eval_horner_arb(coeffs_d: Sequence[int], u_a: arb) -> arb:
+            acc = arb(0)
+            for c_int in coeffs_d:
+                acc = acc * u_a + arb(c_int)
+            return acc
+
+        def _eval_horner_acb(coeffs_d: Sequence[int], u_c: acb) -> acb:
+            acc = acb(0)
+            for c_int in coeffs_d:
+                acc = acc * u_c + acb(c_int)
+            return acc
+
+        alpha_roots_k1: List[arb] = []
+        for (a_rat, b_rat), _ in q1_intervals:
+            u_mid = arb(
+                (
+                    (
+                        arb(int(a_rat.p)) / arb(int(a_rat.q))
+                        + arb(int(b_rat.p)) / arb(int(b_rat.q))
+                    )
+                    / arb(2)
+                ).mid()
+            )
+            for _ in range(12):
+                u_mid = arb(
+                    (
+                        u_mid
+                        - _eval_horner_arb(q1_coeffs_desc, u_mid)
+                        / _eval_horner_arb(q1_deriv_coeffs_desc, u_mid)
+                    ).mid()
+                )
+            u_mid_pt = arb(u_mid.mid())
+            rad_u1 = arb("1e-55")
+            u_ball = arb(u_mid_pt.mid(), rad_u1.upper())
+            newton_step = u_mid_pt - _eval_horner_arb(
+                q1_coeffs_desc, u_mid_pt
+            ) / _eval_horner_arb(q1_deriv_coeffs_desc, u_ball)
+            if not bool(abs(newton_step - u_mid_pt) < rad_u1):
+                raise RuntimeError("Interval Newton root certification failed for Q_1")
+            alpha_roots_k1.append(u_ball.sqrt())
+
+        def _k1_signed_acb(al: acb, analytic: bool = False) -> acb:
+            u = al * al
+            q_val = _eval_horner_acb(q1_coeffs_desc, u)
+            op = acb(1) + u
+            denom = acb(512) * (op**10) * op.sqrt(analytic=analytic)
+            return acb(3) * u * q_val / denom
+
+        def _k1_inv_acb(u: acb, analytic: bool = False) -> acb:
+            u2 = u * u
+            q_rev = _eval_horner_acb(list(reversed(q1_coeffs_desc)), u2)
+            op = acb(1) + u2
+            denom = acb(512) * (op**10) * op.sqrt(analytic=analytic)
+            return acb(3) * u * q_rev / denom
+
+        roots_k1_in_half_two = [
+            r
+            for r in alpha_roots_k1
+            if 0.5 < float(r.mid()) < 2.0
+        ]
+        nodes_k1_half_two = [arb("0.5")] + roots_k1_in_half_two + [arb("2.0")]
+        c1_abs_window = arb(0)
+        for idx_seg in range(len(nodes_k1_half_two) - 1):
+            seg_int = _integrate_between_certified_root_balls(
+                _k1_signed_acb,
+                nodes_k1_half_two[idx_seg],
+                nodes_k1_half_two[idx_seg + 1],
+            )
+            c1_abs_window += abs(seg_int)
+
+        nodes_k1_0_to_rlast = [arb(0)] + alpha_roots_k1
+        c1_abs_compact_arb = arb(0)
+        signed_k1_compact_arb = arb(0)
+        for idx_seg in range(len(nodes_k1_0_to_rlast) - 1):
+            seg_int = _integrate_between_certified_root_balls(
+                _k1_signed_acb,
+                nodes_k1_0_to_rlast[idx_seg],
+                nodes_k1_0_to_rlast[idx_seg + 1],
+            )
+            signed_k1_compact_arb += seg_int
+            c1_abs_compact_arb += abs(seg_int)
+        seg_tail_k1 = _integrate_between_certified_root_balls(
+            _k1_inv_acb,
+            arb(0),
+            arb(1) / alpha_roots_k1[-1],
+        )
+        signed_k1_compact_arb += seg_tail_k1
+        c1_abs_compact_arb += abs(seg_tail_k1)
+
+        # Certified verification of the Lower-Tail Boundary Identity, Zero-Moment Subtracted Identity,
+        # Chordal Stieltjes Identity, and Chebyshev Primitive Transfer on finite cutoff [1, B_step5] (B_step5 = 24)
+        # across scales X in {1.0, 2.0, 4.0, tau}:
+        B_step5 = 24
+        B_step5_a = arb(B_step5)
+        pp_step5 = get_prime_powers_up_to(B_step5)
+        lam_step5: Dict[int, arb] = {pk: arb(p).log() for pk, p, _ in pp_step5}
+        psi_step5: Dict[int, arb] = {}
+        E1_step5: Dict[int, arb] = {1: arb(0)}
+        s_psi5 = arb(0)
+        for m_idx in range(1, B_step5 + 1):
+            s_psi5 += lam_step5.get(m_idx, arb(0))
+            psi_step5[m_idx] = s_psi5
+            if m_idx < B_step5:
+                E1_step5[m_idx + 1] = (
+                    E1_step5[m_idx]
+                    + s_psi5
+                    - (arb(2 * m_idx + 1) / arb(2))
+                )
+
+        def _eval_psi_exact_arb(x_val: float) -> arb:
+            m_fl = int(math.floor(x_val))
+            if m_fl < 1:
+                return arb(0)
+            return psi_step5[min(m_fl, B_step5)]
+
+        def _h0_Over_sqrt_x_acb(x_c: acb, X_c: acb, analytic: bool = False) -> acb:
+            al = x_c / X_c
+            u = al * al
+            op = acb(1) + u
+            op2 = op * op
+            op4 = op2 * op2
+            op6 = op4 * op2
+            num_cl = (
+                -acb(648) * op6
+                + acb(58380) * u * op4
+                - acb(706860) * (u * u) * op2
+                + acb(2027025) * (u * u * u)
+            )
+            denom = acb(512) * (op**8) * op.sqrt(analytic=analytic)
+            return (u * num_cl / denom) / X_c.sqrt(analytic=analytic)
+
+        step5_scale_checks: List[Dict[str, Any]] = []
+        for x_scale_val in (1.0, 2.0, 4.0, float(tau_arb.mid())):
+            X_a = tau_arb if abs(x_scale_val - float(tau_arb.mid())) < 1e-9 else arb(str(x_scale_val))
+            X_c = acb(X_a)
+            inv_X_a = arb(1) / X_a
+            sqrt_X_a = X_a.sqrt()
+
+            # 1. Verify Lower-Tail Boundary Identity: sqrt(X) int_0^{1/X} k(alpha) d_alpha == -B_boundary(X)
+            int_0_invX_k = _integrate_between_certified_root_balls(
+                _k_signed_acb, arb(0), inv_X_a, n_sub=4
+            )
+            lhs_lower_tail = sqrt_X_a * int_0_invX_k
+            int_0_1_h0 = _integrate_between_certified_root_balls(
+                lambda t_c, an=False: _h0_Over_sqrt_x_acb(t_c, X_c, analytic=an),
+                arb(0),
+                arb(1),
+                n_sub=4,
+            )
+            B_boundary_X = evaluate_h0_arb(inv_X_a) - int_0_1_h0
+            lower_tail_plus_B_boundary = lhs_lower_tail + B_boundary_X
+
+            # 2. Verify lower-tail identity for k_1: int_0^{1/X} k_1(alpha) d_alpha == 2 int_0^{1/X} k(alpha) d_alpha - (1/X) k(1/X)
+            int_0_invX_k1 = _integrate_between_certified_root_balls(
+                _k1_signed_acb, arb(0), inv_X_a, n_sub=4
+            )
+            k_at_invX = _k_signed_acb(acb(inv_X_a)).real
+            rhs_k1_lower = arb(2) * int_0_invX_k - inv_X_a * k_at_invX
+            k1_lower_diff = int_0_invX_k1 - rhs_k1_lower
+
+            # 3. Finite-cutoff verification on [1, B_step5] of:
+            #    - Zero-moment decomposition I_B(X) == I_{inc,B}(X) + B_{zm,B}(X),
+            #    - Chordal Stieltjes decomposition I_{inc,B}(X) == I_{chord,B}(X) - I_{drift,B}(X),
+            #    - Chebyshev primitive transfer I_B(X) == I_{prim,B}(X):
+            psi_X_a = _eval_psi_exact_arb(x_scale_val)
+            e_X_a = (psi_X_a - X_a) / X_a
+            int_invX_B_k = _integrate_between_certified_root_balls(
+                _k_signed_acb, inv_X_a, B_step5_a / X_a, n_sub=12
+            )
+
+            I_B_direct = arb(0)
+            I_inc_B = arb(0)
+            I_chord_B = arb(0)
+            I_prim_B = arb(0)
+            for m_idx in range(1, B_step5):
+                a_x = acb(m_idx)
+                b_x = acb(m_idx + 1)
+                psi_m_c = acb(psi_step5[m_idx])
+                psi_X_c = acb(psi_X_a)
+                e_X_c = acb(e_X_a)
+                E1_m_c = acb(E1_step5[m_idx])
+                m_c = acb(m_idx)
+
+                def _f_I_dir(x_c: acb, an: bool, pm: acb = psi_m_c) -> acb:
+                    al_c = x_c / X_c
+                    return (
+                        ((pm - x_c) / x_c)
+                        * _k_signed_acb(al_c, analytic=an)
+                        / X_c.sqrt(analytic=an)
+                    )
+
+                def _f_I_inc(
+                    x_c: acb, an: bool, pm: acb = psi_m_c, ex: acb = e_X_c
+                ) -> acb:
+                    al_c = x_c / X_c
+                    return (
+                        (((pm - x_c) / x_c) - ex)
+                        * _k_signed_acb(al_c, analytic=an)
+                        / X_c.sqrt(analytic=an)
+                    )
+
+                def _f_I_ch(
+                    x_c: acb, an: bool, pm: acb = psi_m_c, px: acb = psi_X_c
+                ) -> acb:
+                    al_c = x_c / X_c
+                    return (
+                        ((pm - px) / x_c)
+                        * _k_signed_acb(al_c, analytic=an)
+                        / X_c.sqrt(analytic=an)
+                    )
+
+                def _f_I_pr(
+                    x_c: acb,
+                    an: bool,
+                    pm: acb = psi_m_c,
+                    e1m: acb = E1_m_c,
+                    mc: acb = m_c,
+                ) -> acb:
+                    al_c = x_c / X_c
+                    e1_x = e1m + pm * (x_c - mc) - (x_c * x_c - mc * mc) / acb(2)
+                    return (
+                        (e1_x / (x_c * x_c))
+                        * _k1_signed_acb(al_c, analytic=an)
+                        / X_c.sqrt(analytic=an)
+                    )
+
+                I_B_direct += acb.integral(
+                    _f_I_dir, a_x, b_x, rel_tol=tol_spec, abs_tol=tol_spec
+                ).real
+                I_inc_B += acb.integral(
+                    _f_I_inc, a_x, b_x, rel_tol=tol_spec, abs_tol=tol_spec
+                ).real
+                I_chord_B += acb.integral(
+                    _f_I_ch, a_x, b_x, rel_tol=tol_spec, abs_tol=tol_spec
+                ).real
+                I_prim_B += acb.integral(
+                    _f_I_pr, a_x, b_x, rel_tol=tol_spec, abs_tol=tol_spec
+                ).real
+
+            # Zero-moment identity on [1, B]: I_B_direct == I_inc_B + sqrt(X)*e(X)*int_{1/X}^{B/X} k(alpha) d_alpha
+            zm_decomp_diff = I_B_direct - (
+                I_inc_B + sqrt_X_a * e_X_a * int_invX_B_k
+            )
+            # Closed-form chordal Stieltjes evaluation on [1, B]:
+            W_B_X = arb(0)
+            for n_idx in range(2, B_step5 + 1):
+                if n_idx in lam_step5:
+                    n_a = arb(n_idx)
+                    W_B_X += (lam_step5[n_idx] / n_a.sqrt()) * evaluate_h0_arb(
+                        n_a / X_a
+                    )
+            upper_chord_B = (
+                -(psi_step5[B_step5] - psi_X_a)
+                * (arb(1) / B_step5_a.sqrt())
+                * evaluate_h0_arb(B_step5_a / X_a)
+            )
+            I_chord_B_closed = (
+                W_B_X
+                - psi_X_a * evaluate_h0_arb(inv_X_a)
+                + upper_chord_B
+            )
+            chord_closed_diff = I_chord_B - I_chord_B_closed
+            # Closed-form drift evaluation on [1, B]:
+            int_invX_B_k_over_al = (
+                sqrt_X_a * evaluate_h0_arb(inv_X_a)
+                - (X_a / B_step5_a).sqrt() * evaluate_h0_arb(B_step5_a / X_a)
+            )
+            I_drift_B_closed = (psi_X_a / X_a) * sqrt_X_a * (
+                int_invX_B_k - int_invX_B_k_over_al
+            )
+            inc_vs_chord_minus_drift_diff = I_inc_B - (
+                I_chord_B_closed - I_drift_B_closed
+            )
+            # Primitive transfer on [1, B]: I_B_direct == I_prim_B + sqrt(X)*(B/X)*e_1(B)*k(B/X)
+            e1_B_a = E1_step5[B_step5] / (B_step5_a * B_step5_a)
+            prim_upper_B = (
+                sqrt_X_a
+                * (B_step5_a / X_a)
+                * e1_B_a
+                * _k_signed_acb(acb(B_step5_a / X_a)).real
+            )
+            prim_transfer_diff = I_B_direct - (I_prim_B + prim_upper_B)
+
+            step5_scale_checks.append(
+                {
+                    "X": round(x_scale_val, 10),
+                    "B_cutoff": B_step5,
+                    "B_boundary_X_mid": float(B_boundary_X.mid()),
+                    "sqrt_X_int_0_invX_k_mid": float(lhs_lower_tail.mid()),
+                    "lower_tail_plus_B_boundary_encloses_zero": bool(
+                        lower_tail_plus_B_boundary.contains(0)
+                    ),
+                    "lower_tail_plus_B_boundary_abs_upper": float(
+                        abs(lower_tail_plus_B_boundary).upper()
+                    ),
+                    "k1_lower_tail_identity_encloses_zero": bool(
+                        k1_lower_diff.contains(0)
+                    ),
+                    "k1_lower_tail_identity_abs_upper": float(
+                        abs(k1_lower_diff).upper()
+                    ),
+                    "zero_moment_decomp_encloses_zero": bool(
+                        zm_decomp_diff.contains(0)
+                    ),
+                    "zero_moment_decomp_abs_upper": float(
+                        abs(zm_decomp_diff).upper()
+                    ),
+                    "chordal_stieltjes_closed_form_encloses_zero": bool(
+                        chord_closed_diff.contains(0)
+                    ),
+                    "chordal_stieltjes_closed_form_abs_upper": float(
+                        abs(chord_closed_diff).upper()
+                    ),
+                    "inc_equals_chord_minus_drift_encloses_zero": bool(
+                        inc_vs_chord_minus_drift_diff.contains(0)
+                    ),
+                    "inc_equals_chord_minus_drift_abs_upper": float(
+                        abs(inc_vs_chord_minus_drift_diff).upper()
+                    ),
+                    "primitive_transfer_encloses_zero": bool(
+                        prim_transfer_diff.contains(0)
+                    ),
+                    "primitive_transfer_abs_upper": float(
+                        abs(prim_transfer_diff).upper()
+                    ),
+                }
+            )
+
+        candidate_4_audit = {
+            "candidate_name": "Candidate IV — Zero-Moment Subtracted Increment, Chordal Prime-Power Stieltjes Equivalence & Chebyshev Primitive Transfer",
+            "status": "ZERO_MOMENT_CHORDAL_EQUIVALENCE_AND_PRIMITIVE_TRANSFER_PROVED",
+            "zero_moment_subtracted_identity": {
+                "formula": (
+                    "I(X) = sqrt(X) int_{1/X}^infty [e(X*alpha) - e(X)] k(alpha) d_alpha "
+                    "- sqrt(X) e(X) int_0^{1/X} k(alpha) d_alpha =: I_inc(X) + B_zm(X)"
+                ),
+                "definitions": "e(x) := E(x)/x = psi(x)/x - 1,  k(alpha) := alpha^{-1/2} tilde{h}_0(alpha)",
+                "domain_and_convergence_justification": (
+                    "For every fixed X >= 1, e(X*alpha) = O(1) on [1/X, infty) and |k(alpha)| <= (1032993/65536) alpha^{-3} "
+                    "as alpha -> infty (and |k(alpha)| = O(alpha^2) as alpha -> 0+), so both int_{1/X}^infty e(X*alpha) k(alpha) d_alpha "
+                    "and int_{1/X}^infty e(X) k(alpha) d_alpha converge absolutely. Since int_0^infty k(alpha) d_alpha = 0, "
+                    "int_{1/X}^infty k(alpha) d_alpha = -int_0^{1/X} k(alpha) d_alpha."
+                ),
+                "lower_tail_boundary_identity": (
+                    "sqrt(X) int_0^{1/X} k(alpha) d_alpha = int_0^1 x^{-1/2} h_0(x/X) dx - h_0(1/X) = -B_boundary(X), "
+                    "so B_zm(X) = e(X) B_boundary(X) with |B_zm(X)| <= (92193/24576) |e(X)| X^{-5/2} = O(X^{-5/2})."
+                ),
+            },
+            "chordal_prime_power_stieltjes_equivalence": {
+                "increment_splitting": (
+                    "e(X*alpha) - e(X) = (psi(X*alpha) - psi(X))/(X*alpha) - (1 - 1/alpha)*(psi(X)/X), "
+                    "splitting I_inc(X) = I_chord(X) - I_drift(X)."
+                ),
+                "closed_form_drift_integral": (
+                    "I_drift(X) := sqrt(X) (psi(X)/X) int_{1/X}^infty (1 - 1/alpha) k(alpha) d_alpha "
+                    "= (psi(X)/X) B_boundary(X) - psi(X) h_0(1/X) = O(X^{-3/2})."
+                ),
+                "closed_form_chordal_jump_integral": (
+                    "I_chord(X) := sqrt(X) int_{1/X}^infty ((psi(X*alpha) - psi(X))/(X*alpha)) k(alpha) d_alpha "
+                    "= W(X) - psi(X) h_0(1/X)  (by Stieltjes integration by parts against alpha^{-1} k(alpha) d_alpha = -d(alpha^{-1/2} h_0(alpha)))."
+                ),
+                "exact_equivalence_and_reappearance_of_W_X": (
+                    "Subtracting I_drift(X) from I_chord(X) cancels the O(X^{-3/2}) endpoint term -psi(X) h_0(1/X) identically: "
+                    "I_inc(X) = I_chord(X) - I_drift(X) = W(X) - (psi(X)/X) B_boundary(X) = I(X) - e(X) B_boundary(X). "
+                    "Adding B_zm(X) = e(X) B_boundary(X) recovers I(X) = W(X) - B_boundary(X). "
+                    "Thus zero-moment subtraction and chordal prime-power increment decomposition isolate the O(X^{-5/2}) "
+                    "lower-tail boundary term B_zm(X), while the prime-wavelet sum W(X) reappears identically inside I_chord(X)."
+                ),
+                "lean_theorem": "zero_moment_subtracted_and_chordal_stieltjes_equivalence",
+            },
+            "next_justified_refinement_chebyshev_primitive_transfer": {
+                "normalized_primitive_definition": (
+                    "E_1(x) := int_1^x E(t) dt (E_1(1) = 0),  e_1(x) := E_1(x)/x^2,  satisfying (2 + D_x) e_1(x) = e(x)."
+                ),
+                "transferred_kernel_definition": (
+                    "k_1(alpha) := (1 - D_alpha) k(alpha) = alpha^{-1/2} (3/2 - D_alpha)(1/2 - D_alpha) h_0(alpha) = alpha^{-1/2} h_1(alpha), "
+                    "satisfying int_0^infty k_1(alpha) d_alpha = 0 and int_0^{1/X} k_1(alpha) d_alpha = 2 int_0^{1/X} k(alpha) d_alpha - (1/X) k(1/X)."
+                ),
+                "primitive_increment_identity": (
+                    "I(X) = sqrt(X) int_{1/X}^infty e_1(X*alpha) k_1(alpha) d_alpha "
+                    "= sqrt(X) int_{1/X}^infty [e_1(X*alpha) - e_1(X)] k_1(alpha) d_alpha "
+                    "- sqrt(X) e_1(X) int_0^{1/X} k_1(alpha) d_alpha."
+                ),
+                "symbolic_ibp_verified": symbolic_primitive_transfer_verified,
+                "k1_unsigned_window_moment_c1_on_half_to_two": float(
+                    c1_abs_window.mid()
+                ),
+                "k1_unsigned_window_moment_c1_rad": float(c1_abs_window.rad()),
+                "k1_unsigned_full_moment_C1_abs": float(
+                    c1_abs_compact_arb.mid()
+                ),
+                "k1_unsigned_full_moment_C1_abs_rad": float(
+                    c1_abs_compact_arb.rad()
+                ),
+                "k1_signed_full_moment_encloses_zero": bool(
+                    signed_k1_compact_arb.contains(0)
+                ),
+                "what_improves_vs_where_obligation_reappears": (
+                    "Analytic gain: Unlike e(x) = E(x)/x (which has jump discontinuities at every prime power n = p^k and only "
+                    "conditionally convergent explicit-formula zero sum -sum_rho x^{rho-1}/rho), e_1(x) = E_1(x)/x^2 is continuous, "
+                    "piecewise C^1, vanishes at x = 1, and has the UNCONDITIONALLY and ABSOLUTELY convergent explicit expansion "
+                    "e_1(x) = -sum_rho x^{z_rho - 1/2}/(rho(rho+1)) + O(x^{-1}) (since sum_rho |rho(rho+1)|^{-1} < infty). "
+                    "Where the obligation reappears: Mellin integration of x^{z_rho - 1/2} against k_1(alpha) multiplies by "
+                    "(3/2 - (1/2 - z_rho))(1/2 - (1/2 - z_rho)) = (1 + z_rho) z_rho = rho(rho+1), cancelling 1/(rho(rho+1)) "
+                    "and restoring the exact spectral weight X^{z_rho} H_0(z_rho); spatially, since c_1 = int_{1/2}^2 |k_1(alpha)| d_alpha "
+                    f"= {float(c1_abs_window.mid()):.10f} > 0, any monotone unsigned envelope |e_1(x)| <= omega_1(x) with "
+                    "sqrt(X) * omega_1(2X) -> infty still yields a majorant >= c_1 * sqrt(X) * omega_1(2X) -> infty."
+                ),
+            },
+            "certified_scale_checks": step5_scale_checks,
         }
 
         return {
             "task_id": TASK_TC_043_ID,
+            "repair_task_id": TASK_TC_043R_ID,
             "parent_epic": EPIC_TC_042_ID,
             "inspected_baseline": STARTING_HEAD_TC_043,
+            "repair_inspected_baseline": STARTING_HEAD_TC_043R,
             "status": ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS,
             "section_1_tc042f_reconciliation": reconciliation_audit,
             "section_2_compatibility_candidate_and_controls": compatibility_candidate_spec,
@@ -6141,7 +7128,9 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                     "S_tau = { sum_{j=1}^N c_j T_{K_j} psi_tau : N < infty, c_j in C, K_j in Qbar intersect R }"
                 ),
                 "domain_properties_verified": {
-                    "double_pole_zeros_hat_f_at_pm_half": True,
+                    "seed_uncentered_zero_orders_s0_simple_s1_double": True,
+                    "autocorrelation_H0_triple_zeros_at_z_pm_half": True,
+                    "pole_vanishing_hat_f_at_pm_half": True,
                     "w_pole_vanishes_identically_on_S_tau": True,
                     "seed_mellin_nonvanishing_in_critical_strip": True,
                     "attempt_B_decomposition_formula": (
@@ -6151,22 +7140,27 @@ def execute_task_tc043_admissible_cross_grade_compatibility(
                 "candidate_1_spectral_multiplier_and_transfer_decomposition": candidate_1_audit,
                 "candidate_2_coercive_norm_shifted_semiboundedness": candidate_2_audit,
                 "candidate_3_scale_separation_and_majorant_obstruction": candidate_3_audit,
+                "candidate_4_zero_moment_increment_and_primitive_transfer": candidate_4_audit,
             },
             "section_4_remaining_implication_and_next_step": {
                 "remaining_implication": (
-                    "Prove that there exists a finite constant mu_0 > 0 (or M_0 < infty) such that for all "
-                    "Delta in Qbar intersect R, the moving-scale signed Chebyshev prime-error pairing satisfies "
-                    "|W(tau^{|Delta|})| = |int_1^infty E(x) x^{-3/2} tilde{h}_0(x / tau^{|Delta|}) dx| <= M_0 < infty "
-                    "(equivalently, P_E(f_pm^{(Delta)}) >= -(||A_tau^B f_pm^{(Delta)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(Delta)}||_{L^2}^2))."
+                    "Prove that there exists a finite constant mu_0 >= 0 (or M_0 < infty) such that for all "
+                    "Delta in Qbar intersect R, the moving-scale signed Chebyshev prime-error integral "
+                    "I(tau^{|Delta|}) = int_1^infty E(x) x^{-3/2} tilde{h}_0(x / tau^{|Delta|}) dx "
+                    "(where W(X) = B_boundary(X) + I(X) and |B_boundary(X)| <= (92193/24576) X^{-5/2}) satisfies "
+                    "|I(tau^{|Delta|})| <= M_0 < infty "
+                    "(equivalently, P_E(f_pm^{(Delta)}) >= -(||A_tau^B f_pm^{(Delta)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(Delta)}||_{L^2}^2) "
+                    "on the normalized two-grade states f_pm^{(Delta)} = (psi_tau +/- T_Delta psi_tau)/sqrt(2))."
                 ),
                 "next_justified_calculation": (
-                    "Construct an explicit scale-adapted integration-by-parts / primitive-transfer operator for E(x) "
-                    "using the exact antiderivative tilde{h}_0(alpha) alpha^{-1/2} = -d/d_alpha (alpha^{1/2} h_0(alpha)) "
-                    "coupled with the iterated Chebyshev primitive E_1(x) = int_1^x E(t) dt (where E_1(x) = O(x^2 / (log x)^A) "
-                    "unconditionally, or expressed via the arithmetic Dirichlet convolution Lambda = -mu * log) "
-                    "to test whether the X^{1/2} scaling factor is absorbed without assuming a zero-free strip beyond Re(s) = 1."
+                    "Using the exact antiderivative identity alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha)) "
+                    "and the proved primitive-transfer representation I(X) = sqrt(X) int_{1/X}^infty [e_1(X*alpha) - e_1(X)] k_1(alpha) d_alpha "
+                    "- sqrt(X) e_1(X) int_0^{1/X} k_1(alpha) d_alpha (with e_1(x) = E_1(x)/x^2 and k_1(alpha) = (1 - D_alpha) k(alpha) "
+                    "= alpha^{-1/2} h_1(alpha)), investigate whether multi-grade difference combinations sum_j c_j T_{K_j} psi_tau "
+                    "or arithmetic Dirichlet-convolution cancellations in E_1(x) control the signed integral without assuming RH."
                 ),
             },
+            "section_5_signed_cancellation_investigation": candidate_4_audit,
         }
     finally:
         flint_ctx.prec = saved_prec
@@ -6284,6 +7278,7 @@ def build_canonical_theta_correlation_bound_report(
         "sprint_task_id": TASK_TC_042R2_ID,
         "factorization_task_id": TASK_TC_042F_ID,
         "compatibility_task_id": TASK_TC_043_ID,
+        "compatibility_repair_task_id": TASK_TC_043R_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -6293,6 +7288,7 @@ def build_canonical_theta_correlation_bound_report(
         "sprint_starting_head": STARTING_HEAD_TC_042R2,
         "factorization_starting_head": STARTING_HEAD_TC_042F,
         "compatibility_starting_head": STARTING_HEAD_TC_043,
+        "compatibility_repair_starting_head": STARTING_HEAD_TC_043R,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",

@@ -300,8 +300,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 18
-    assert len(ver["actual_theorems"]) == 36
+    assert len(ver["actual_defs"]) == 20
+    assert len(ver["actual_theorems"]) == 38
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -328,6 +328,8 @@ def test_12_lean_formalization_module_verified():
     assert "attempt_B_pole_vanishing_transfer_cancellation_on_S_tau" in lean_text
     assert "coercive_norm_shift_semiboundedness_implies_correlation_bound" in lean_text
     assert "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm" in lean_text
+    assert "majorant_window_lower_bound_and_envelope_ordering" in lean_text
+    assert "zero_moment_subtracted_and_chordal_stieltjes_equivalence" in lean_text
 
 
 def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
@@ -933,13 +935,43 @@ def test_25_task_tc043_admissible_cross_grade_compatibility(artifact_payload):
         rel_tol=1e-9,
     )
 
-    # Candidate III: Cross-Grade Scale Separation & Unsigned Majorant Obstruction
+    # Candidate III: Cross-Grade Scale Separation & Scoped Monotone Envelope Majorant Obstruction
     c3 = s_tau["candidate_3_scale_separation_and_majorant_obstruction"]
     assert c3["symbolic_antiderivative_identity_verified"] is True
-    assert c3["unsigned_window_moment_c0_lower"] > 0.45
-    assert 0.90 < c3["unsigned_full_moment_C_abs"] < 0.91
-    assert 4.0 < c3["crossover_grade_delta_star_chebyshev_004x_at_mu0_1"] < 5.0
-    assert 1.0 < c3["crossover_grade_delta_star_dlvp_at_mu0_1"] < 3.0
+    assert c3["subinterval_strictly_less_than_full_integral"] is True
+    assert c3["c_abs_methods_overlap"] is True
+    assert (
+        0.0
+        < c3["unsigned_window_moment_c0_lower"]
+        <= c3["unsigned_window_moment_c0_upper"]
+        < c3["unsigned_full_moment_C_abs_lower"]
+        <= c3["unsigned_full_moment_C_abs_upper"]
+    )
+    assert math.isclose(
+        c3["unsigned_window_moment_c0_on_half_to_two"],
+        1.7456980946329538,
+        rel_tol=1e-13,
+    )
+    assert math.isclose(
+        c3["unsigned_full_moment_C_abs"],
+        2.486331970643793,
+        rel_tol=1e-13,
+    )
+    assert 3.0 < c3["crossover_grade_delta_star_chebyshev_004x_at_mu0_1"] < 4.0
+    assert (
+        c3["crossover_grade_delta_star_chebyshev_004x_at_mu0_1"]
+        < c3["crossover_grade_delta_star_chebyshev_004x_window_lower_at_mu0_1"]
+    )
+    assert 0.0 < c3["crossover_grade_delta_star_dlvp_at_mu0_1"] <= 0.01
+    assert (
+        0.5
+        < c3["crossover_grade_delta_star_dlvp_window_lower_at_mu0_1"]
+        < 0.7
+    )
+    assert (
+        c3["crossover_grade_delta_star_dlvp_at_mu0_1"]
+        < c3["crossover_grade_delta_star_dlvp_window_lower_at_mu0_1"]
+    )
     rows_c3 = {r["Delta"]: r for r in c3["off_diagonal_scale_separation_table"]}
     assert abs(rows_c3[8.0]["G_L2_Delta"]) < 1e-15
     assert abs(rows_c3[8.0]["J_Delta"]) < 1e-5
@@ -949,6 +981,111 @@ def test_25_task_tc043_admissible_cross_grade_compatibility(artifact_payload):
         c2["coercive_norm_sq_on_psi_tau_at_mu0_1"],
         rel_tol=1e-5,
     )
+
+
+def test_26_task_tc043r_repairs_and_signed_cancellation_invariants(
+    artifact_payload,
+):
+    """Verify TASK-TC-043R mathematical & numerical repairs (Steps 3A, 3B, 3C, 4) and signed cancellation invariants (Step 5)."""
+    from tc.canonical_theta_correlation_bound import TASK_TC_043R_ID
+
+    assert artifact_payload["compatibility_repair_task_id"] == TASK_TC_043R_ID
+    sec12 = artifact_payload["section_12_admissible_cross_grade_compatibility"]
+    assert sec12["repair_task_id"] == TASK_TC_043R_ID
+
+    s_tau = sec12["section_3_worked_candidates_on_S_tau"]
+    dom = s_tau["domain_properties_verified"]
+    assert dom["seed_uncentered_zero_orders_s0_simple_s1_double"] is True
+    assert dom["autocorrelation_H0_triple_zeros_at_z_pm_half"] is True
+
+    # 1. Step 3B & 4B: Plancherel tail bounds, Arb subtraction enclosures, and R_0 / positive shifted norm multiplier
+    c1 = s_tau["candidate_1_spectral_multiplier_and_transfer_decomposition"]
+    assert c1["plancherel_cutoff_T_top"] == 80
+    assert 0.0 < c1["plancherel_smooth_B_tail_bound_from_T80"] < 1e-41
+    assert 0.0 < c1["plancherel_B_transfer_tail_bound_from_T80"] < 1e-41
+    assert 1e-19 < c1["plancherel_smooth_B_tail_bound_from_T40"] < 1e-17
+    assert 1e-19 < c1["plancherel_B_transfer_tail_bound_from_T40"] < 1e-17
+    assert c1["plancherel_minus_spatial_smooth_B_encloses_zero"] is True
+    assert c1["plancherel_minus_spatial_B_transfer_encloses_zero"] is True
+    assert 0.0 < c1["plancherel_vs_spatial_smooth_B_abs_diff"] < 1e-24
+    assert 0.0 < c1["plancherel_vs_spatial_B_transfer_abs_diff"] < 1e-24
+    assert "4 ||f||_{L^2(d^*y)}^2 - 4 ||R_0 f||_{L^2(d^*y)}^2" in c1[
+        "linear_operator_R0_and_J_fourier_identity"
+    ]
+    levels = c1["methodological_distinction_three_levels"]
+    assert "1_analytic_proof_of_identity" in levels
+    assert "2_certified_numerical_consistency" in levels
+    assert "3_truncated_numerical_diagnostic" in levels
+
+    c2 = s_tau["candidate_2_coercive_norm_shifted_semiboundedness"]
+    assert "mu_tau^B(t) + c_tau^B + mu_0" in c2[
+        "positive_shifted_norm_plancherel_multiplier"
+    ]
+    assert "(psi_tau +/- T_K psi_tau) / sqrt(2)" in c2["normalized_two_grade_states"]
+    assert 0.0 < c2["coercive_norm_sq_on_psi_tau_at_mu0_1_rad"] < 1e-24
+
+    # 2. Step 3A & 4A: Subinterval c_0 < full integral C_abs with complete error budgets and Candidate III J(Delta) tail bounds
+    c3 = s_tau["candidate_3_scale_separation_and_majorant_obstruction"]
+    assert len(c3["certified_sign_change_roots_of_tilde_h0"]) == 7
+    assert 0.0 < c3["unsigned_window_moment_c0_rad"] < 1e-25
+    assert 0.0 < c3["unsigned_full_moment_C_abs_rad"] < 1e-25
+    assert 0.0 < c3["unsigned_full_moment_window_plus_bernstein_tails_rad"] < 2e-3
+    assert c3["signed_full_moment_encloses_zero"] is True
+    sep_defs = c3["separate_unsigned_definitions_and_envelope_ordering"]
+    assert "A_E(X) <= M_omega(X)" in sep_defs["envelope_ordering"]
+    assert "omega(2X)" in sep_defs["monotone_majorant_lower_bound"]
+    for row in c3["off_diagonal_scale_separation_table"]:
+        assert row["u_top_J"] >= 20
+        assert 0.0 < row["J_Delta_tail_bound"] < 1e-20
+        assert 0.0 < row["J_Delta_rad"] < 1e-20
+        assert 0.0 < row["coercive_norm_sq_f_minus_at_mu0_1_rad"] < 1e-20
+
+    # 3. Step 3C: Continuation identity alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha))
+    sec4 = sec12["section_4_remaining_implication_and_next_step"]
+    assert (
+        "alpha^{-3/2} tilde{h}_0(alpha) = -d/d_alpha (alpha^{-1/2} h_0(alpha))"
+        in sec4["next_justified_calculation"]
+    )
+    assert "B_boundary(X)" in sec4["remaining_implication"]
+
+    # 4. Step 5: Zero-moment subtracted increment, chordal Stieltjes equivalence, and Chebyshev primitive transfer
+    c4 = sec12["section_5_signed_cancellation_investigation"]
+    prim = c4["next_justified_refinement_chebyshev_primitive_transfer"]
+    assert prim["symbolic_ibp_verified"] is True
+    assert prim["k1_signed_full_moment_encloses_zero"] is True
+    assert (
+        0.0
+        < prim["k1_unsigned_window_moment_c1_on_half_to_two"]
+        < prim["k1_unsigned_full_moment_C1_abs"]
+    )
+    assert math.isclose(
+        prim["k1_unsigned_window_moment_c1_on_half_to_two"],
+        11.489756672104577,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        prim["k1_unsigned_full_moment_C1_abs"],
+        14.756398942720541,
+        rel_tol=1e-12,
+    )
+
+    scale_checks = c4["certified_scale_checks"]
+    assert len(scale_checks) == 4
+    for sc in scale_checks:
+        assert sc["lower_tail_plus_B_boundary_encloses_zero"] is True
+        assert sc["lower_tail_plus_B_boundary_abs_upper"] < 1e-27
+        assert sc["k1_lower_tail_identity_encloses_zero"] is True
+        assert sc["k1_lower_tail_identity_abs_upper"] < 1e-27
+        assert sc["zero_moment_decomp_encloses_zero"] is True
+        assert sc["zero_moment_decomp_abs_upper"] < 1e-24
+        assert sc["chordal_stieltjes_closed_form_encloses_zero"] is True
+        assert sc["chordal_stieltjes_closed_form_abs_upper"] < 1e-24
+        assert sc["inc_equals_chord_minus_drift_encloses_zero"] is True
+        assert sc["inc_equals_chord_minus_drift_abs_upper"] < 1e-24
+        assert sc["primitive_transfer_encloses_zero"] is True
+        assert sc["primitive_transfer_abs_upper"] < 1e-24
+
+
 
 
 
