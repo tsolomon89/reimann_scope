@@ -8,6 +8,7 @@
   "compatibility_repair_task_id": "TASK-TC-043R",
   "prime_shift_task_id": "TASK-TC-044",
   "moebius_recovery_task_id": "TASK-TC-045",
+  "moebius_recovery_repair_task_id": "TASK-TC-045R",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
@@ -17,6 +18,7 @@
   "compatibility_repair_starting_head": "726f7b4da8b7bd757b68f96783fee6b86f2f3f7b",
   "prime_shift_starting_head": "2122d7989d1821cf9048d7d32ad00c64f17e191b",
   "moebius_recovery_starting_head": "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a",
+  "moebius_recovery_repair_starting_head": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -32,7 +34,8 @@
     "TASK-TC-042F",
     "TASK-TC-043",
     "TASK-TC-043R",
-    "TASK-TC-044"
+    "TASK-TC-044",
+    "TASK-TC-045"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -2752,7 +2755,8 @@
       "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence",
       "divisor_aggregated_stieltjes_and_moebius_inversion_identity",
       "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence",
-      "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity"
+      "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
+      "transfer_form_plancherel_bound_and_minus_state_vanishing"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2796,7 +2800,8 @@
       "prime_shift_quadratic_form_and_subtracted_finite_part_equivalence",
       "divisor_aggregated_stieltjes_and_moebius_inversion_identity",
       "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence",
-      "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity"
+      "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
+      "transfer_form_plancherel_bound_and_minus_state_vanishing"
     ]
   },
   "section_11_arithmetic_fourier_positive_factorization": {
@@ -4010,7 +4015,7 @@
         "normalized_two_grade_states": "f_pm^{(K)} = (psi_tau +/- T_K psi_tau) / sqrt(2) in S_tau",
         "sufficient_relative_lower_bound": "exists mu_0 >= 0 forall K in Qbar intersect R : P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2)",
         "implied_correlation_bound": "|C_tau(K)| <= C_tau(0) + 2 (c_tau^B + mu_0) h_0(1) < infty",
-        "relation_to_W_X": "Since ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 = ||A_tau^B psi_tau||^2 + O(|K| tau^{-|K|/2}), ||f_pm^{(K)}||_{L^2}^2 = h_0(1) + O(tau^{-5|K|/2}), and P_E(f_pm^{(K)}) = P_E(psi_tau) -/+ W(tau^{|K|}) + O(|K| tau^{-|K|/2}), the relative semiboundedness condition is equivalent to uniform boundedness sup_{X >= 1} |W(X)| < infty (where W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)).",
+        "relation_to_W_X": "For separated grades (|K| bounded away from 0), ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 = ||A_tau^B psi_tau||^2 + O(|K| tau^{-|K|/2}), ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}) = h_0(1) + O(tau^{-5|K|/2}), and P_E(f_pm^{(K)}) = P_E(psi_tau) -/+ [W(tau^K) + W(tau^{-K})] + B_transfer(f_pm^{(K)}) - B_transfer(psi_tau). However, as K -> 0 along nonzero admissible grades in Qbar intersect R, the minus-state norm ||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 (while P_E(f_-^{(K)}) -> 0 at the same O(K^2) rate), so one cannot construct a uniform mu_0 by dividing an unnormalized bound on |P_E(f_pm^{(K)})| by ||f_-^{(K)}||_{L^2}^2. Instead, uniform boundedness sup_{X >= 1} |W(X)| < infty (equivalently, sup_{X >= 1} |R_mu(X)| < infty) is directly equivalent to uniform boundedness of the polarized mixed-grade pairing C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}), while coercive relative semiboundedness remains a conditional one-way sufficient hypothesis.",
         "distinction_from_full_weil_positivity": "Full Weil positivity requires Q_tau(f, f) >= 0 on all of S_tau (i.e. P_E(f) >= c_tau^B ||f||^2 - ||A_tau^B f||^2 with zero slack and arbitrary grade superpositions), whereas excluding off-critical zeros via the Laplace\u2013Carleman resolvent theorem requires only a uniform lower bound on two-grade states f_pm^{(K)} with arbitrary finite norm-shift slack (c_tau^B + mu_0) ||f_pm^{(K)}||^2."
       },
       "narrow_corrections_verified": {
@@ -4541,7 +4546,7 @@
       "category_iv_unproved_premise": {
         "subgate_id": "SUBGATE-TC-043A",
         "lemma_name": "Moebius De-Aggregation Cancellation Lemma for W(X)",
-        "exact_statement": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_0 < infty such that for all X >= 1, the signed Moebius de-aggregation series W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) satisfies |W(X)| <= M_0 (equivalently, |I(X)| <= M_0' < infty and P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2))."
+        "exact_statement": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_0 < infty such that for all X >= 1, the signed Moebius de-aggregation series W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) satisfies |W(X)| <= M_0 (equivalently, |I(X)| <= M_0' < infty and |C_tau(K - L)| = |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_B + M_mu < infty)."
       }
     },
     "section_5_diagnostics_and_controls": {
@@ -4612,8 +4617,10 @@
   },
   "section_14_cross_grade_compatibility_and_moebius_recovery": {
     "task_id": "TASK-TC-045",
+    "repair_task_id": "TASK-TC-045R",
     "parent_epic": "EPIC-TC-042",
     "inspected_baseline": "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a",
+    "repair_inspected_baseline": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
     "status": "MIXED_GRADE_PAIRING_POLARIZED_AND_EQUIVALENT_TO_MOEBIUS_RECOVERY_MERTENS_STIELTJES_CANCELLATION_OBLIGATION_ISOLATED",
     "section_1_recovered_arithmetic_result_and_implication_chain": {
       "W_definition": "W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)",
@@ -4634,6 +4641,7 @@
             "upper_dec": "-5.730747962046668445975894299486992937127e-2",
             "arb_ball_str": "[-0.0573075 +/- 2.04e-8]"
           },
+          "W_1_is_strictly_negative": true,
           "W_log_1_certified": {
             "mid_float": -0.04406137942524803,
             "rad_float_outward": 5.3797320152248264e-09,
@@ -4647,14 +4655,492 @@
             "lower_dec": "-1.324611633441469877592597911410923472944e-2",
             "upper_dec": "-1.324609481548664264583268320842837340534e-2",
             "arb_ball_str": "[-0.0132461 +/- 1.64e-8]"
-          }
+          },
+          "h0_at_9_certified": {
+            "mid_float": -0.0003411302950613169,
+            "rad_float_outward": 2.0286214591664585e-20,
+            "lower_dec": "-3.411302950613168662275546170684543061424e-4",
+            "upper_dec": "-3.411302950613168662275546170684543061421e-4",
+            "arb_ball_str": "[-0.0003411302950613168662275546170684543061422 +/- 4.55e-44]"
+          },
+          "h0_at_9_is_strictly_negative": true
         }
       },
+      "norm_floor_and_transfer_bound_repair_tc045r": {
+        "exact_two_grade_norm_identity": "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|})",
+        "minus_state_vanishing_as_K_to_0": "For f_-^{(K)} = (psi_tau - T_K psi_tau)/sqrt(2), continuity of h_0 gives ||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0 along nonzero admissible rational grades K = 1/n in A_R \\ {0} (e.g. ||f_-^{(+/- 1/1000)}||_{L^2}^2 = 2.68872306e-5 and ||f_-^{(+/- 1/100)}||_{L^2}^2 = 2.68509890e-3). Excluding K = 0 does NOT produce a uniform positive lower bound on ||f_-^{(K)}||_{L^2}^2, so the TC-045 division construction of mu_0 is withdrawn.",
+        "plus_state_norm_floor_certified": {
+          "mid_float": 0.49685063380990124,
+          "rad_float_outward": 1.330439514555187e-18,
+          "lower_dec": "4.968506338099012444846118490259731100370e-1",
+          "upper_dec": "4.968506338099012444846118490259731100373e-1",
+          "arb_ball_str": "[0.4968506338099012444846118490259731100371 +/- 3.14e-41]"
+        },
+        "false_0_633039_transfer_bound_reproduction_and_origin": {
+          "counterexample_at_K_eq_0": "At K = 0, f_+^(0) = sqrt(2) psi_tau gives B_transfer(f_+^(0)) = 2 B_transfer(psi_tau) = 1.9375304127 > 0.633039 (and as |K| -> infty, B_transfer(f_pm^(K)) -> B_transfer(psi_tau) = 0.9687652063 > 0.633039).",
+          "origin_of_0_633039": "The constant 0.633039 was erroneously copied from the earlier loose forward-prime bound (92193/32768) * 0.225 = 0.6330390930 for |W(tau^(-|K|))|, which has no relation to B_transfer.",
+          "B_transfer_psi_tau_certified": {
+            "mid_float": 0.9687652063353964,
+            "rad_float_outward": 3.991876284458583e-17,
+            "lower_dec": "9.687652063353964626064850954660331117190e-1",
+            "upper_dec": "9.687652063353964626064852509941063328400e-1",
+            "arb_ball_str": "[0.968765206335396462606485 +/- 2.51e-25]"
+          },
+          "B_transfer_f_plus_0_certified": {
+            "mid_float": 1.9375304126707928,
+            "rad_float_outward": 7.983752568917166e-17,
+            "lower_dec": "1.937530412670792925212970190932065838251e+0",
+            "upper_dec": "1.937530412670792925212970501988213050867e+0",
+            "arb_ball_str": "[1.937530412670792925212970 +/- 5.02e-25]"
+          },
+          "B_transfer_f_minus_0_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          }
+        },
+        "proven_plancherel_transfer_bounds": {
+          "quadratic_bound_formula": "B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f) with 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt <= 4 ||f||_{L^2}^2 => |B_transfer(f)| <= 2 ||f||_{L^2}^2.",
+          "two_grade_uniform_bound_4_h0_1_certified": {
+            "mid_float": 1.989449935239605,
+            "rad_float_outward": 8.381683516311055e-17,
+            "lower_dec": "1.989449935239604977938447396103892440147e+0",
+            "upper_dec": "1.989449935239604977938447396103892440150e+0",
+            "arb_ball_str": "[1.989449935239604977938447396103892440149 +/- 4.75e-40]"
+          },
+          "mixed_grade_uniform_bound_2_h0_1_certified": {
+            "mid_float": 0.9947249676198024,
+            "rad_float_outward": 4.1908417581555276e-17,
+            "lower_dec": "9.947249676198024889692236980519462200741e-1",
+            "upper_dec": "9.947249676198024889692236980519462200744e-1",
+            "arb_ball_str": "[0.9947249676198024889692236980519462200743 +/- 3.74e-41]"
+          },
+          "lean_theorem": "transfer_form_plancherel_bound_and_minus_state_vanishing"
+        },
+        "two_grade_norm_and_transfer_table": [
+          {
+            "K_label": "0",
+            "K_float": 0.0,
+            "X_K_eq_tau_abs_K": 1.0,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.9947249676198024,
+              "rad_float_outward": 4.1908417581555276e-17,
+              "lower_dec": "9.947249676198024889692236980519462200741e-1",
+              "upper_dec": "9.947249676198024889692236980519462200744e-1",
+              "arb_ball_str": "[0.9947249676198024889692236980519462200743 +/- 3.74e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.9687652063353964,
+              "rad_float_outward": 3.991876284458583e-17,
+              "lower_dec": "9.687652063353964626064850954660331117190e-1",
+              "upper_dec": "9.687652063353964626064852509941063328400e-1",
+              "arb_ball_str": "[0.968765206335396462606485 +/- 2.51e-25]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 1.9375304126707928,
+              "rad_float_outward": 7.983752568917166e-17,
+              "lower_dec": "1.937530412670792925212970190932065838251e+0",
+              "upper_dec": "1.937530412670792925212970501988213050867e+0",
+              "arb_ball_str": "[1.937530412670792925212970 +/- 5.02e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "1/1000",
+            "K_float": 0.001,
+            "X_K_eq_tau_abs_K": 1.0018395669976017,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 2.688723061660361e-05,
+              "rad_float_outward": 9.28358115616061e-22,
+              "lower_dec": "2.688723061660360924287480356539684874336e-5",
+              "upper_dec": "2.688723061660360924287480356539684874339e-5",
+              "arb_ball_str": "[2.688723061660360924287480356539684874337e-5 +/- 1.84e-45]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.9946980803891858,
+              "rad_float_outward": 5.065564550268207e-17,
+              "lower_dec": "9.946980803891858853599808232483808232254e-1",
+              "upper_dec": "9.946980803891858853599808232483808232257e-1",
+              "arb_ball_str": "[0.9946980803891858853599808232483808232255 +/- 1.94e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.9687122608993558,
+              "rad_float_outward": 5.168025548468773e-17,
+              "lower_dec": "9.687122608993557520424434807423018822504e-1",
+              "upper_dec": "9.687122608993557520424436365022969354256e-1",
+              "arb_ball_str": "[0.968712260899355752042444 +/- 5.20e-25]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 5.2945436040710567e-05,
+              "rad_float_outward": 2.513029883576774e-21,
+              "lower_dec": "5.294543604071056404145896373607999721002e-5",
+              "upper_dec": "5.294543604071056404177025180454688580730e-5",
+              "arb_ball_str": "[5.2945436040710564042e-5 +/- 5.42e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 1.9374774672347521,
+              "rad_float_outward": 9.926080997817376e-17,
+              "lower_dec": "1.937477467234752214648928576208334897672e+0",
+              "upper_dec": "1.937477467234752214648928887496403364563e+0",
+              "arb_ball_str": "[1.937477467234752214648929 +/- 4.24e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "-1/1000",
+            "K_float": -0.001,
+            "X_K_eq_tau_abs_K": 1.0018395669976017,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 2.688723061660361e-05,
+              "rad_float_outward": 9.28358115616061e-22,
+              "lower_dec": "2.688723061660360924287480356539684874336e-5",
+              "upper_dec": "2.688723061660360924287480356539684874339e-5",
+              "arb_ball_str": "[2.688723061660360924287480356539684874337e-5 +/- 1.84e-45]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.9946980803891858,
+              "rad_float_outward": 5.065564550268207e-17,
+              "lower_dec": "9.946980803891858853599808232483808232254e-1",
+              "upper_dec": "9.946980803891858853599808232483808232257e-1",
+              "arb_ball_str": "[0.9946980803891858853599808232483808232255 +/- 1.94e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.9687122608993558,
+              "rad_float_outward": 5.168025548468773e-17,
+              "lower_dec": "9.687122608993557520424434807423018822504e-1",
+              "upper_dec": "9.687122608993557520424436365022969354256e-1",
+              "arb_ball_str": "[0.968712260899355752042444 +/- 5.20e-25]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 5.2945436040710567e-05,
+              "rad_float_outward": 2.513029883576774e-21,
+              "lower_dec": "5.294543604071056404145896373607999721002e-5",
+              "upper_dec": "5.294543604071056404177025180454688580730e-5",
+              "arb_ball_str": "[5.2945436040710564042e-5 +/- 5.42e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 1.9374774672347521,
+              "rad_float_outward": 9.926080997817376e-17,
+              "lower_dec": "1.937477467234752214648928576208334897672e+0",
+              "upper_dec": "1.937477467234752214648928887496403364563e+0",
+              "arb_ball_str": "[1.937477467234752214648929 +/- 4.24e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "1/100",
+            "K_float": 0.01,
+            "X_K_eq_tau_abs_K": 1.0185486997022424,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.002685098897295476,
+              "rad_float_outward": 6.285739600405678e-20,
+              "lower_dec": "2.685098897295476051286889868896572849849e-3",
+              "upper_dec": "2.685098897295476051286889868896572849852e-3",
+              "arb_ball_str": "[0.002685098897295476051286889868896572849851 +/- 4.48e-43]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.992039868722507,
+              "rad_float_outward": 3.262183448944339e-17,
+              "lower_dec": "9.920398687225070129179368081830496472243e-1",
+              "upper_dec": "9.920398687225070129179368081830496472246e-1",
+              "arb_ball_str": "[0.9920398687225070129179368081830496472244 +/- 1.22e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.9634778367515462,
+              "rad_float_outward": 1.7035749629735626e-17,
+              "lower_dec": "9.634778367515461735055125193184686952698e-1",
+              "upper_dec": "9.634778367515461735055126757111386685240e-1",
+              "arb_ball_str": "[0.9634778367515461735055126 +/- 8.07e-26]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.005287369583850289,
+              "rad_float_outward": 2.9136254483393224e-19,
+              "lower_dec": "5.287369583850289100972419754894346898788e-3",
+              "upper_dec": "5.287369583850289100972731675637733866395e-3",
+              "arb_ball_str": "[0.005287369583850289100973 +/- 5.81e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 1.9322430430869426,
+              "rad_float_outward": 2.2883013371242874e-17,
+              "lower_dec": "1.932243043086942636111997614784501710691e+0",
+              "upper_dec": "1.932243043086942636111997926705245097662e+0",
+              "arb_ball_str": "[1.932243043086942636111998 +/- 3.86e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "-1/100",
+            "K_float": -0.01,
+            "X_K_eq_tau_abs_K": 1.0185486997022424,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.002685098897295476,
+              "rad_float_outward": 6.285739600405678e-20,
+              "lower_dec": "2.685098897295476051286889868896572849849e-3",
+              "upper_dec": "2.685098897295476051286889868896572849852e-3",
+              "arb_ball_str": "[0.002685098897295476051286889868896572849851 +/- 4.48e-43]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.992039868722507,
+              "rad_float_outward": 3.262183448944339e-17,
+              "lower_dec": "9.920398687225070129179368081830496472243e-1",
+              "upper_dec": "9.920398687225070129179368081830496472246e-1",
+              "arb_ball_str": "[0.9920398687225070129179368081830496472244 +/- 1.22e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.9634778367515462,
+              "rad_float_outward": 1.7035749629735626e-17,
+              "lower_dec": "9.634778367515461735055125193184686952698e-1",
+              "upper_dec": "9.634778367515461735055126757111386685240e-1",
+              "arb_ball_str": "[0.9634778367515461735055126 +/- 8.07e-26]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.005287369583850289,
+              "rad_float_outward": 2.9136254483393224e-19,
+              "lower_dec": "5.287369583850289100972419754894346898788e-3",
+              "upper_dec": "5.287369583850289100972731675637733866395e-3",
+              "arb_ball_str": "[0.005287369583850289100973 +/- 5.81e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 1.9322430430869426,
+              "rad_float_outward": 2.2883013371242874e-17,
+              "lower_dec": "1.932243043086942636111997614784501710691e+0",
+              "upper_dec": "1.932243043086942636111997926705245097662e+0",
+              "arb_ball_str": "[1.932243043086942636111998 +/- 3.86e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "1/10",
+            "K_float": 0.1,
+            "X_K_eq_tau_abs_K": 1.201760670204157,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.23489662959563742,
+              "rad_float_outward": 1.2419491430857933e-17,
+              "lower_dec": "2.348966295956374363679091077689801706800e-1",
+              "upper_dec": "2.348966295956374363679091077689801706803e-1",
+              "arb_ball_str": "[0.2348966295956374363679091077689801706801 +/- 1.55e-41]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.759828338024165,
+              "rad_float_outward": 1.7333505350684233e-18,
+              "lower_dec": "7.598283380241650526013145902829660493940e-1",
+              "upper_dec": "7.598283380241650526013145902829660493943e-1",
+              "arb_ball_str": "[0.7598283380241650526013145902829660493941 +/- 4.73e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.5065506779336097,
+              "rad_float_outward": 2.3295638137768807e-18,
+              "lower_dec": "5.065506779336097474849725577824900115300e-1",
+              "upper_dec": "5.065506779336097474849727332216586142763e-1",
+              "arb_ball_str": "[0.506550677933609747484973 +/- 4.43e-25]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.46221452840178673,
+              "rad_float_outward": 1.3262824903862367e-17,
+              "lower_dec": "4.622145284017867151215123622443744974429e-1",
+              "upper_dec": "4.622145284017867151215126932116163213099e-1",
+              "arb_ball_str": "[0.462214528401786715121513 +/- 6.38e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 1.4753158842690062,
+              "rad_float_outward": 3.7589199206248114e-17,
+              "lower_dec": "1.475315884269006210091457653248523123248e+0",
+              "upper_dec": "1.475315884269006210091457984215764947117e+0",
+              "arb_ball_str": "[1.475315884269006210091458 +/- 3.47e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "1",
+            "K_float": 1.0,
+            "X_K_eq_tau_abs_K": 6.283185307179586,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.49037979294296685,
+              "rad_float_outward": 8.390980665701201e-18,
+              "lower_dec": "4.903797929429668438961759326211265702166e-1",
+              "upper_dec": "4.903797929429668438961759326211265702169e-1",
+              "arb_ball_str": "[0.4903797929429668438961759326211265702167 +/- 3.21e-42]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.5043451746768356,
+              "rad_float_outward": 5.0299398247256476e-17,
+              "lower_dec": "5.043451746768356450730477654308196498574e-1",
+              "upper_dec": "5.043451746768356450730477654308196498577e-1",
+              "arb_ball_str": "[0.5043451746768356450730477654308196498576 +/- 4.06e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.013070666039910797,
+              "rad_float_outward": 8.008518422833455e-19,
+              "lower_dec": "1.307066603991079757212133778394900321326e-2",
+              "upper_dec": "1.307066603991079757212469180910328035625e-2",
+              "arb_ball_str": "[0.01307066603991079757212 +/- 4.70e-24]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.9556945402954856,
+              "rad_float_outward": 4.7791531736211674e-17,
+              "lower_dec": "9.556945402954856650343604036569257869098e-1",
+              "upper_dec": "9.556945402954856650343639132101613740796e-1",
+              "arb_ball_str": "[0.95569454029548566503436 +/- 3.92e-24]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 0.9818358723753072,
+              "rad_float_outward": 3.204599730698514e-17,
+              "lower_dec": "9.818358723753072601786064332499780704794e-1",
+              "upper_dec": "9.818358723753072601786099428032136576492e-1",
+              "arb_ball_str": "[0.98183587237530726017861 +/- 3.57e-24]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "-1",
+            "K_float": -1.0,
+            "X_K_eq_tau_abs_K": 6.283185307179586,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.49037979294296685,
+              "rad_float_outward": 8.390980665701201e-18,
+              "lower_dec": "4.903797929429668438961759326211265702166e-1",
+              "upper_dec": "4.903797929429668438961759326211265702169e-1",
+              "arb_ball_str": "[0.4903797929429668438961759326211265702167 +/- 3.21e-42]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.5043451746768356,
+              "rad_float_outward": 5.0299398247256476e-17,
+              "lower_dec": "5.043451746768356450730477654308196498574e-1",
+              "upper_dec": "5.043451746768356450730477654308196498577e-1",
+              "arb_ball_str": "[0.5043451746768356450730477654308196498576 +/- 4.06e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": 0.013070666039910797,
+              "rad_float_outward": 8.008518422833455e-19,
+              "lower_dec": "1.307066603991079757212133778394900321326e-2",
+              "upper_dec": "1.307066603991079757212469180910328035625e-2",
+              "arb_ball_str": "[0.01307066603991079757212 +/- 4.70e-24]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.9556945402954856,
+              "rad_float_outward": 4.7791531736211674e-17,
+              "lower_dec": "9.556945402954856650343604036569257869098e-1",
+              "upper_dec": "9.556945402954856650343639132101613740796e-1",
+              "arb_ball_str": "[0.95569454029548566503436 +/- 3.92e-24]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 0.9818358723753072,
+              "rad_float_outward": 3.204599730698514e-17,
+              "lower_dec": "9.818358723753072601786064332499780704794e-1",
+              "upper_dec": "9.818358723753072601786099428032136576492e-1",
+              "arb_ball_str": "[0.98183587237530726017861 +/- 3.57e-24]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "2",
+            "K_float": 2.0,
+            "X_K_eq_tau_abs_K": 39.47841760435743,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.49748412761839855,
+              "rad_float_outward": 1.6978635603806934e-17,
+              "lower_dec": "4.974841276183985358050383454998995923979e-1",
+              "upper_dec": "4.974841276183985358050383454998995923982e-1",
+              "arb_ball_str": "[0.4974841276183985358050383454998995923980 +/- 4.75e-41]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.49724084000140395,
+              "rad_float_outward": 3.3759019541043723e-18,
+              "lower_dec": "4.972408400014039531641853525520466276761e-1",
+              "upper_dec": "4.972408400014039531641853525520466276764e-1",
+              "arb_ball_str": "[0.4972408400014039531641853525520466276762 +/- 1.53e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": -0.00026444603413267926,
+              "rad_float_outward": 1.321554608089839e-20,
+              "lower_dec": "-2.644460341326792761494698170547048761979e-4",
+              "upper_dec": "-2.644460341326792758276918887150182022828e-4",
+              "arb_ball_str": "[-0.000264446034132679276 +/- 1.73e-22]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 0.9690296523695291,
+              "rad_float_outward": 4.876822609642388e-17,
+              "lower_dec": "9.690296523695291418823127873544544256047e-1",
+              "upper_dec": "9.690296523695291418826347208114547420327e-1",
+              "arb_ball_str": "[0.969029652369529141882 +/- 6.35e-22]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 0.9685007603012638,
+              "rad_float_outward": 3.1069621370676705e-17,
+              "lower_dec": "9.685007603012637833303356256486847025262e-1",
+              "upper_dec": "9.685007603012637833306575591056850189543e-1",
+              "arb_ball_str": "[0.968500760301263783330 +/- 6.58e-22]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          }
+        ]
+      },
       "complete_implication_chain_to_correlation_bound": {
-        "step_1_moebius_to_W_bound": "If |R_mu(X)| <= M_mu for all X >= 1, then |W(X)| <= M_log + M_mu =: M_0 for all X >= 1.",
-        "step_2_both_scale_directions_in_two_grade_prime_pairing": "For normalized f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) and X_K = tau^{|K|} >= 1, W_prime(f_pm^{(K)} * (f_pm^{(K)})^*) = 2 W(1) +/- [W(tau^K) + W(tau^{-K})] = 2 W(1) +/- [W(X_K) + W(X_K^{-1})], preserving BOTH scale directions tau^K and tau^{-K}. For the small-scale direction X_K^(-1) <= 1, |W(X_K^(-1))| <= C_{W,0} X_K^(-5/2) <= 0.46372978 X_K^(-5/2).",
-        "step_3_transfer_and_PE_lower_bound": "On S_tau, P_E(f_pm^{(K)}) = -W_prime(f_pm^{(K)} * (f_pm^{(K)})^*) + B_transfer(f_pm^{(K)}) with |B_transfer(f_pm^{(K)})| <= 0.633039 for all K in R. Hence |P_E(f_pm^{(K)})| <= 2|W(1)| + M_log + M_mu + C_{W,0} + 0.633039 =: M_PE < infty.",
-        "step_4_coercive_relative_semiboundedness_to_correlation_bound": "Since ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 >= 0 and ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(X_K) >= 0.49685063 > 0 for all K != 0 (and ||f_+^(0)||^2 = 2 h_0(1)), setting mu_0 := M_PE / (h_0(1) - 0.00051185) >= 0 yields P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) for all K in A_R, which by `coercive_norm_shift_semiboundedness_implies_correlation_bound` implies |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1) < infty for all K in A_R.",
+        "step_1_moebius_to_W_bound": "If |R_mu(X)| <= M_mu for all X >= 1, then |W(X)| <= M_log + M_mu =: M_0 for all X >= 1 (and conversely |W(X)| <= M_0 implies |R_mu(X)| <= M_0 + M_log).",
+        "step_2_both_scale_directions_in_mixed_and_two_grade_prime_pairings": "For concurrent grades K, L in A_R with X_Delta = tau^{|K-L|} >= 1, the polarized prime pairing is W_prime((T_K psi_tau) * (T_L psi_tau)^*) = W(tau^{K-L}) + W(tau^{L-K}) = W(X_Delta) + W(X_Delta^{-1}) and for f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) it is 2 W(1) +/- [W(tau^K) + W(tau^{-K})], preserving BOTH scale directions tau^K and tau^{-K}. For the small-scale direction X_Delta^{-1} <= 1, |W(X_Delta^(-1))| <= C_{W,0} X_Delta^(-5/2) <= 0.46372978 X_Delta^(-5/2).",
+        "step_3_direct_mixed_grade_polarization_with_retained_transfer": "By polarized Attempt B (`attempt_B_pole_vanishing_transfer_cancellation_on_S_tau`), C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(X_Delta), where B_known(K, L) = W_arch(h_{K-L}) - W(X_Delta^{-1}) - W_log(X_Delta) and W_arch(h_{K-L}) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B} - c_tau^B h_0(X_Delta) + B_transfer(T_K psi_tau, T_L psi_tau) retains the transfer form (with |B_transfer(T_K psi_tau, T_L psi_tau)| <= 2 h_0(1) = 0.99472497). Every term of B_known(K, L) is unconditionally bounded: |B_known(K, L)| <= 5.464660 + 0.46372979 + 3.34900802 = 9.27739781 < 9.4468 (spatial Bernstein\u2013Taylor archimedean bound) and |B_known(K, L)| <= 3.26669033 + 0.46372979 + 3.34900802 = 7.07942813 (Attempt B Cauchy\u2013Schwarz + Plancherel transfer bound).",
+        "step_4_direct_equivalence_to_correlation_bound_and_separate_conditional_semiboundedness": "Consequently, without dividing by ||f_-^{(K)}||_{L^2}^2, |R_mu(X)| <= M_mu for all X >= 1 directly implies |C_tau(K - L)| = |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_B + M_mu < infty for all K, L in A_R (and conversely |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_Q implies |R_mu(X_Delta)| <= M_Q + M_B), which by `fixed_seed_correlation_bound_implies_critical_line_schema` excludes off-critical zeros. Separately, `coercive_norm_shift_semiboundedness_implies_correlation_bound` remains a valid conditional one-way theorem: if P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) holds for some fixed finite mu_0 >= 0, then |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1).",
         "lean_theorem": "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence"
       }
     },
@@ -4673,10 +5159,26 @@
           "strip_aggregation_identity_encloses_zero": true,
           "strip_moebius_identity_encloses_zero": true
         },
-        "meromorphic_continuation_statement": "By meromorphic continuation from 1/2 < Re(z) < 5/2 to C, harmonic divisor aggregation multiplies M_X[W](z) by zeta(z + 1/2), cancelling the poles of -zeta'(z+1/2)/zeta(z+1/2) at all actual nontrivial zeros rho = 1/2 + z_rho of zeta(s) IRRESPECTIVE of their real parts (while the triple zero H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0 cancels the double pole of -zeta'(z+1/2) at z = 1/2, so M_X[W_log](z) = -H_0(z) zeta'(z+1/2) is entire on C). Conversely, Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) multiplies M_X[W_log](z) by sum_{m>=1} mu(m) m^{-(z+1/2)} = 1/zeta(z+1/2) on Re(z) > 1/2 and by meromorphic continuation restores the denominator zeta(z + 1/2).",
+        "meromorphic_continuation_statement": "By meromorphic continuation from 1/2 < Re(z) < 5/2 to the open kernel strip |Re(z)| < 5/2 (and C), harmonic divisor aggregation multiplies M_X[W](z) by zeta(z + 1/2), cancelling the poles of -zeta'(z+1/2)/zeta(z+1/2) at all actual nontrivial zeros rho = 1/2 + z_rho of zeta(s) IRRESPECTIVE of their real parts, while the triple zero H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0 cancels the double pole of -zeta'(z+1/2) at z = 1/2. Thus M_X[W_log](z) = -H_0(z) zeta'(z+1/2) extends HOLOMORPHICALLY to the open kernel strip |Re(z)| < 5/2, and MEROMORPHICALLY (NOT entire) to C, where H_0(z) = F_tau(1/2+z)F_tau(1/2-z) has simple poles at z = +/-(2k + 1/2) (k >= 1) from the Gamma poles of F_tau(s) at s = -2k <= -2 (in particular a simple pole at z = 5/2 with residue Res_{z=5/2}[-H_0(z)zeta'(z+1/2)] = (81/64)(-zeta'(3)) = +0.2507535262 != 0). Conversely, Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) multiplies M_X[W_log](z) by sum_{m>=1} mu(m) m^{-(z+1/2)} = 1/zeta(z+1/2) on Re(z) > 1/2 and by meromorphic continuation restores the denominator zeta(z + 1/2).",
+        "kernel_strip_holomorphy_vs_global_poles": {
+          "holomorphic_open_strip": "|Re(z)| < 5/2",
+          "is_entire_on_C": false,
+          "global_poles_of_H0_z": "z = +/-(2k + 1/2) for integers k >= 1 (from Gamma((1/2 +/- z)/2) poles at -k <= -1)",
+          "first_right_pole_z": "5/2  (where 1/2 - z = -2 and z + 1/2 = 3)",
+          "res_H0_at_5_2_rational": "81/64",
+          "res_H0_at_5_2_symbolic_verified": true,
+          "res_neg_H0_zeta_prime_at_5_2_certified": {
+            "mid_float": 0.25075352615213414,
+            "rad_float_outward": 4.824779086054912e-19,
+            "lower_dec": "2.507535261521341424966441803400960866705e-1",
+            "upper_dec": "2.507535261521341424966441803400960866708e-1",
+            "arb_ball_str": "[0.2507535261521341424966441803400960866706 +/- 8.85e-42]"
+          },
+          "res_neg_H0_zeta_prime_at_5_2_certified_nonzero": true
+        },
         "synthetic_quartet_convergence_and_regularization": {
           "ordinary_dirichlet_series_divergence": "For 0 < Re(rho_0) < 1, the ordinary Dirichlet series sum_{m=1}^infty m^{-rho_0} diverges (its partial sums oscillate with amplitude O(M^{1 - Re(rho_0)}) / |1 - rho_0|); a numerical evaluation of zeta(rho_0) does NOT make the unsubtracted series converge on an isolated mode X^{rho_0 - 1/2}.",
-          "actual_W_vs_isolated_mode_explanation": "On the actual profile W(X), the unsubtracted sum sum_{m=1}^infty m^{-1/2} W(X/m) converges absolutely because W(u) = O(u^{5/2}) as u -> 0^+ (since all poles in Re(s) <= 3 including s = 1 and all nontrivial zeros cancel in the contour shift to Re(z) = -5/2). An isolated synthetic mode X^{rho_0 - 1/2} has not been combined with a pole-cancelling completion at small scales, so divisor aggregation on the isolated mode requires the Euler-Maclaurin pole-subtracted regularization lim_{M->infty} (sum_{m=1}^M m^{-rho_0} - M^{1-rho_0}/(1-rho_0) - (1/2) M^{-rho_0}) = zeta(rho_0).",
+          "actual_W_vs_isolated_mode_explanation": "On the actual profile W(X), the unsubtracted sum sum_{m=1}^infty m^{-1/2} W(X/m) converges absolutely because W(u) = O(u^{5/2}) as u -> 0^+ (since all poles in |Re(z)| < 5/2 including s = 1 and all nontrivial zeros cancel in the contour shift to Re(z) -> -5/2^+, where the simple pole of H_0(z) at z = -5/2 generates the leading small-scale term O(u^{5/2})). An isolated synthetic mode X^{rho_0 - 1/2} has not been combined with a pole-cancelling completion at small scales, so divisor aggregation on the isolated mode requires the Euler-Maclaurin pole-subtracted regularization lim_{M->infty} (sum_{m=1}^M m^{-rho_0} - M^{1-rho_0}/(1-rho_0) - (1/2) M^{-rho_0}) = zeta(rho_0).",
           "regularization_convergence_table": [
             {
               "M_cutoff": 100,
@@ -4811,6 +5313,161 @@
               "all_reconstructions_enclose_original": true
             }
           }
+        },
+        "full_section_14_tree_roundtrip_verification": {
+          "total_certified_arb_balls_checked": 113,
+          "compared_against_live_original_arb_count": 113,
+          "all_enclose_original_256bit_arb_ball": true,
+          "failed_paths": [],
+          "checked_paths": [
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.W_1_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.W_log_1_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.R_mu_1_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.h0_at_9_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.plus_state_norm_floor_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.false_0_633039_transfer_bound_reproduction_and_origin.B_transfer_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.false_0_633039_transfer_bound_reproduction_and_origin.B_transfer_f_plus_0_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.false_0_633039_transfer_bound_reproduction_and_origin.B_transfer_f_minus_0_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.proven_plancherel_transfer_bounds.two_grade_uniform_bound_4_h0_1_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.proven_plancherel_transfer_bounds.mixed_grade_uniform_bound_2_h0_1_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[0].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[0].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[0].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[0].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[0].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[1].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[1].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[1].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[1].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[1].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[2].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[2].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[2].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[2].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[2].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[3].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[3].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[3].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[3].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[3].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[4].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[4].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[4].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[4].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[4].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[5].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[5].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[5].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[5].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[5].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[6].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[6].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[6].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[6].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[6].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[7].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[7].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[7].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[7].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[7].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].B_transfer_f_plus_certified",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3a_spectral_aggregation_and_synthetic_quartet_repair.kernel_strip_holomorphy_vs_global_poles.res_neg_H0_zeta_prime_at_5_2_certified",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.c_tau_B.serialized",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.h0_at_1.serialized",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.W_at_1.serialized",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.W_log_at_1.serialized",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.R_mu_at_1.serialized",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.C_log_0_small_scale_coeff.serialized",
+            "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.C_W_0_small_scale_coeff.serialized",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.C_log_0_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[0].W_log_u_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[1].W_log_u_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[2].W_log_u_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[3].W_log_u_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[4].W_log_u_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[5].W_log_u_certified",
+            "section_14.section_3_continuity_and_algebraic_grades_role.small_scale_decay_lemma.certified_small_scale_table[6].W_log_u_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.unconditional_bound_on_B_known.archimedean_operator_plus_plancherel_transfer_bound_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.unconditional_bound_on_B_known.B_known_operator_plus_transfer_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].W_arch_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].B_transfer_mixed_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].W_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].W_inv_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].W_log_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].B_known_K_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].R_mu_X_Delta_direct_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[0].Q_tau_T_K_T_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].W_arch_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].B_transfer_mixed_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].W_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].W_inv_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].W_log_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].B_known_K_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].R_mu_X_Delta_direct_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[1].Q_tau_T_K_T_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].W_arch_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].B_transfer_mixed_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].W_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].W_inv_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].W_log_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].B_known_K_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].R_mu_X_Delta_direct_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[2].Q_tau_T_K_T_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].W_arch_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].B_transfer_mixed_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].W_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].W_inv_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].W_log_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].B_known_K_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].R_mu_X_Delta_direct_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[3].Q_tau_T_K_T_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].W_arch_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].B_transfer_mixed_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].W_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].W_inv_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].W_log_X_Delta_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].B_known_K_L_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].R_mu_X_Delta_direct_certified",
+            "section_14.section_4_mixed_grade_relation_and_moebius_recovery.mixed_grade_polarization_identity.certified_mixed_grade_table[4].Q_tau_T_K_T_L_certified"
+          ]
+        },
+        "full_section_13_tree_roundtrip_verification": {
+          "total_certified_arb_balls_checked": 26,
+          "compared_against_live_original_arb_count": 26,
+          "all_enclose_original_256bit_arb_ball": true,
+          "failed_paths": [],
+          "checked_paths": [
+            "section_13.section_1_baseline_and_narrow_corrections.narrow_corrections_verified.authoritative_c_tau_B_enclosure.certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[0].L_N_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[0].D_N_psi_tau_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[1].L_N_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[1].D_N_psi_tau_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[2].L_N_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[2].D_N_psi_tau_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[3].L_N_certified_enclosure",
+            "section_13.section_2_prime_shift_quadratic_form.cutoff_evaluation_table[3].D_N_psi_tau_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.exact_stieltjes_representation.M_tilde_h_0_minus_3_2_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.exact_stieltjes_representation.M_tilde_h_log_minus_3_2_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.exact_stieltjes_representation.unconditional_global_max_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[0].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[0].unconditional_stirling_bound_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[1].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[1].unconditional_stirling_bound_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[2].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[2].unconditional_stirling_bound_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[3].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[3].unconditional_stirling_bound_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[4].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[4].unconditional_stirling_bound_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[5].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[5].unconditional_stirling_bound_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[6].W_log_certified_enclosure",
+            "section_13.section_3_divisor_aggregated_candidate_and_moebius_inversion.certified_w_log_scale_enclosures[6].unconditional_stirling_bound_certified_enclosure"
+          ]
         }
       }
     },
@@ -4985,19 +5642,51 @@
     },
     "section_4_mixed_grade_relation_and_moebius_recovery": {
       "mixed_grade_polarization_identity": {
-        "formula": "Q_tau(T_K psi_tau, T_L psi_tau) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B} - c_tau^B h_0(tau^{|K-L|}) + B_transfer(T_K psi_tau, T_L psi_tau) - W(tau^{-|K-L|}) - W_log(tau^{|K-L|}) - R_mu(tau^{|K-L|}) = B_known(K, L) - R_mu(tau^{|K-L|})",
+        "formula": "C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B} - c_tau^B h_0(tau^{|K-L|}) + B_transfer(T_K psi_tau, T_L psi_tau) - W(tau^{-|K-L|}) - W_log(tau^{|K-L|}) - R_mu(tau^{|K-L|}) = B_known(K, L) - R_mu(tau^{|K-L|})",
+        "retains_B_transfer_and_both_scale_directions": "B_known(K, L) = W_arch(h_{K-L}) - W(tau^{-|K-L|}) - W_log(tau^{|K-L|}) retains B_transfer(T_K psi_tau, T_L psi_tau) inside W_arch(h_{K-L}) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau> - c_tau^B h_0(tau^{|K-L|}) + B_transfer(T_K psi_tau, T_L psi_tau) and retains both scale directions tau^{|K-L|} (in W_log(tau^{|K-L|}) + R_mu(tau^{|K-L|})) and tau^{-|K-L|} (in W(tau^{-|K-L|})).",
         "unconditional_bound_on_B_known": {
           "archimedean_pairing_bound": 5.46466,
+          "archimedean_operator_plus_plancherel_transfer_bound_certified": {
+            "mid_float": 3.2666903223290773,
+            "rad_float_outward": 4.433685832632357e-17,
+            "lower_dec": "3.266690322329077256285798949784363623577e+0",
+            "upper_dec": "3.266690322329077256285799106352928778655e+0",
+            "arb_ball_str": "[3.266690322329077256285799 +/- 1.07e-25]"
+          },
           "small_scale_W_inv_X_bound": 0.4637297832097795,
           "divisor_aggregated_W_log_bound": 3.34900802,
           "B_known_universal_upper_bound": 9.27739780320978,
-          "certified_below_9_4468": true
+          "B_known_operator_plus_transfer_upper_bound": 7.079428125538857,
+          "B_known_operator_plus_transfer_certified": {
+            "mid_float": 7.079428125538857,
+            "rad_float_outward": 2.6623054683766146e-17,
+            "lower_dec": "7.079428125538856724196974045815491503179e+0",
+            "upper_dec": "7.079428125538856724196974202384057043443e+0",
+            "arb_ball_str": "[7.079428125538856724196974 +/- 2.03e-25]"
+          },
+          "certified_below_9_4468": true,
+          "certified_below_7_07943_via_operator_transfer": true
         },
-        "equivalence_theorem": "For all K, L in A_R, |Q_tau(T_K psi_tau, T_L psi_tau) + R_mu(tau^{|K-L|})| = |B_known(K, L)| < 9.4468. Consequently, uniform boundedness of the mixed-grade pairings sup_{K,L in A_R} |Q_tau(T_K psi_tau, T_L psi_tau)| < infty (and relative semiboundedness on normalized two-grade states f_pm^{(K)}) is unconditionally equivalent to uniform boundedness sup_{X >= 1} |R_mu(X)| < infty.",
+        "equivalence_theorem": "For all K, L in A_R, |C_tau(K - L) + R_mu(tau^{|K-L|})| = |Q_tau(T_K psi_tau, T_L psi_tau) + R_mu(tau^{|K-L|})| = |B_known(K, L)| <= 7.07942813 < 9.27739781 < 9.4468. Consequently, uniform boundedness of the mixed-grade pairings sup_{K,L in A_R} |Q_tau(T_K psi_tau, T_L psi_tau)| = sup_{K in A_R} |C_tau(K)| < infty is unconditionally equivalent to uniform boundedness sup_{X >= 1} |R_mu(X)| < infty (and sup_{X >= 1} |W(X)| < infty), without dividing by ||f_-^{(K)}||_{L^2}^2. Coercive relative semiboundedness on f_pm^{(K)} is treated separately as a conditional one-way sufficient hypothesis (`coercive_norm_shift_semiboundedness_implies_correlation_bound`).",
         "certified_mixed_grade_table": [
           {
             "Delta_eq_K_minus_L": 0.0,
             "X_Delta_eq_tau_abs_Delta": 1.0,
+            "W_arch_certified": {
+              "mid_float": -0.1136644814526138,
+              "rad_float_outward": 3.101122502045863e-18,
+              "lower_dec": "-1.136644814526138084134685756518853314853e-1",
+              "upper_dec": "-1.136644814526138084134685746113936804020e-1",
+              "arb_ball_str": "[-0.113664481452613808413468575 +/- 6.52e-28]"
+            },
+            "B_transfer_mixed_certified": {
+              "mid_float": 0.9687652063353964,
+              "rad_float_outward": 3.991876284458583e-17,
+              "lower_dec": "9.687652063353964626064850954660331117190e-1",
+              "upper_dec": "9.687652063353964626064852509941063328400e-1",
+              "arb_ball_str": "[0.968765206335396462606485 +/- 2.51e-25]"
+            },
+            "smooth_plus_transfer_equals_W_arch_encloses_zero": true,
             "W_X_Delta_certified": {
               "mid_float": -0.057307569441797455,
               "rad_float_outward": 1.1412385159273628e-07,
@@ -5019,6 +5708,14 @@
               "upper_dec": "-4.406115660039115506391881606565008531119e-2",
               "arb_ball_str": "[-0.044061 +/- 3.85e-7]"
             },
+            "B_known_K_L_certified": {
+              "mid_float": -0.012295641286573605,
+              "rad_float_outward": 2.282477034048897e-07,
+              "lower_dec": "-1.229586953427700952881642147221841738584e-2",
+              "upper_dec": "-1.229541303887020082977178967812337801813e-2",
+              "arb_ball_str": "[-0.012296 +/- 5.87e-7]"
+            },
+            "abs_B_known_below_operator_transfer_bound": true,
             "R_mu_X_Delta_direct_certified": {
               "mid_float": -0.01324612353550824,
               "rad_float_outward": 1.5772842165695768e-07,
@@ -5026,12 +5723,35 @@
               "upper_dec": "-1.324596580708658350132138241631699377157e-2",
               "arb_ball_str": "[-0.013246 +/- 2.82e-7]"
             },
+            "Q_tau_T_K_T_L_certified": {
+              "mid_float": 0.0009506574309811057,
+              "rad_float_outward": 2.2824770340439148e-07,
+              "lower_dec": "9.504291832777012726030250872105852759240e-4",
+              "upper_dec": "9.508856786845099716476568813056246436001e-4",
+              "arb_ball_str": "[0.000951 +/- 5.71e-7]"
+            },
+            "Q_tau_equals_B_known_minus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_abs_upper": 5.611581721977835e-07
           },
           {
             "Delta_eq_K_minus_L": 0.5,
             "X_Delta_eq_tau_abs_Delta": 2.5066282746310007,
+            "W_arch_certified": {
+              "mid_float": 0.08796780331033806,
+              "rad_float_outward": 3.1043575083830255e-18,
+              "lower_dec": "8.796780331033805489387249077402197584422e-2",
+              "upper_dec": "8.796780331033805489387249094850416135754e-2",
+              "arb_ball_str": "[0.087967803310338054893872491 +/- 2.26e-28]"
+            },
+            "B_transfer_mixed_certified": {
+              "mid_float": -0.06703498653312386,
+              "rad_float_outward": 1.8672228803850347e-18,
+              "lower_dec": "-6.703498653312385722396455197007551875461e-2",
+              "upper_dec": "-6.703498653312385722396411541458692528671e-2",
+              "arb_ball_str": "[-0.067034986533123857223964 +/- 5.52e-25]"
+            },
+            "smooth_plus_transfer_equals_W_arch_encloses_zero": true,
             "W_X_Delta_certified": {
               "mid_float": 0.07848429100361466,
               "rad_float_outward": 1.1352754754073663e-06,
@@ -5053,6 +5773,14 @@
               "upper_dec": "2.623251579239533698437442623036359221183e-2",
               "arb_ball_str": "[0.02623 +/- 2.52e-6]"
             },
+            "B_known_K_L_certified": {
+              "mid_float": 0.05312073785897887,
+              "rad_float_outward": 1.2457260005781689e-06,
+              "lower_dec": "5.311949213297829449157445522242345644512e-2",
+              "upper_dec": "5.312198358497944657511409202807702852767e-2",
+              "arb_ball_str": "[0.05312 +/- 1.99e-6]"
+            },
+            "abs_B_known_below_operator_transfer_bound": true,
             "R_mu_X_Delta_direct_certified": {
               "mid_float": 0.0522546531359911,
               "rad_float_outward": 1.5690424142208315e-06,
@@ -5060,12 +5788,35 @@
               "upper_dec": "5.225622217840531928720214048959034577428e-2",
               "arb_ball_str": "[0.05225 +/- 6.23e-6]"
             },
+            "Q_tau_T_K_T_L_certified": {
+              "mid_float": 0.0008678273722841384,
+              "rad_float_outward": 1.2457259987997084e-06,
+              "lower_dec": "8.665816462853386475579258868107528742375e-4",
+              "upper_dec": "8.690730982829380174187621915349693354194e-4",
+              "arb_ball_str": "[0.00087 +/- 3.42e-6]"
+            },
+            "Q_tau_equals_B_known_minus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_abs_upper": 5.582242672056639e-06
           },
           {
             "Delta_eq_K_minus_L": 1.0,
             "X_Delta_eq_tau_abs_Delta": 6.283185307179586,
+            "W_arch_certified": {
+              "mid_float": -0.01280302832758364,
+              "rad_float_outward": 3.5912015010500607e-20,
+              "lower_dec": "-1.280302832758364001714360985925457520261e-2",
+              "upper_dec": "-1.280302832758364001714360970853553291992e-2",
+              "arb_ball_str": "[-0.0128030283275836400171436098 +/- 9.15e-29]"
+            },
+            "B_transfer_mixed_certified": {
+              "mid_float": 0.013070666039910797,
+              "rad_float_outward": 8.008518422833455e-19,
+              "lower_dec": "1.307066603991079757212133778394900321326e-2",
+              "upper_dec": "1.307066603991079757212469180910328035625e-2",
+              "arb_ball_str": "[0.01307066603991079757212 +/- 4.70e-24]"
+            },
+            "smooth_plus_transfer_equals_W_arch_encloses_zero": true,
             "W_X_Delta_certified": {
               "mid_float": -0.012090679625582494,
               "rad_float_outward": 1.1293435903781031e-05,
@@ -5087,6 +5838,14 @@
               "upper_dec": "-7.069580560850967765767788501250907507515e-4",
               "arb_ball_str": "[-0.0007 +/- 2.96e-5]"
             },
+            "B_known_K_L_certified": {
+              "mid_float": -0.010732901154653633,
+              "rad_float_outward": 1.1304538986679175e-05,
+              "lower_dec": "-1.074420569364031237650524551688459813174e-2",
+              "upper_dec": "-1.072159661566695561500128085433271824890e-2",
+              "arb_ball_str": "[-0.0107 +/- 4.43e-5]"
+            },
+            "abs_B_known_below_operator_transfer_bound": true,
             "R_mu_X_Delta_direct_certified": {
               "mid_float": -0.011355093807577986,
               "rad_float_outward": 1.5608448393323546e-05,
@@ -5094,12 +5853,35 @@
               "upper_dec": "-1.133948535918466354128829782393857242541e-2",
               "arb_ball_str": "[-0.0114 +/- 6.06e-5]"
             },
+            "Q_tau_T_K_T_L_certified": {
+              "mid_float": 0.000639526978939982,
+              "rad_float_outward": 1.130453897246754e-05,
+              "lower_dec": "6.282224399675144754180392901252170897092e-4",
+              "upper_dec": "6.508315179124495274915999452422520018189e-4",
+              "arb_ball_str": "[0.0006 +/- 5.09e-5]"
+            },
+            "Q_tau_equals_B_known_minus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_abs_upper": 5.5529646330200985e-05
           },
           {
             "Delta_eq_K_minus_L": 1.5,
             "X_Delta_eq_tau_abs_Delta": 15.749609945722419,
+            "W_arch_certified": {
+              "mid_float": 5.996390945780747e-05,
+              "rad_float_outward": 2.092851430489361e-21,
+              "lower_dec": "5.996390945780747455100359548471940336735e-5",
+              "upper_dec": "5.996390945780747455100391174325092170458e-5",
+              "arb_ball_str": "[5.9963909457807474551004e-5 +/- 4.05e-28]"
+            },
+            "B_transfer_mixed_certified": {
+              "mid_float": -0.001863365279245965,
+              "rad_float_outward": 3.328590028711272e-20,
+              "lower_dec": "-1.863365279245964933244553223280017190763e-3",
+              "upper_dec": "-1.863365279245964933212105634267639090533e-3",
+              "arb_ball_str": "[-0.0018633652792459649332 +/- 4.46e-23]"
+            },
+            "smooth_plus_transfer_equals_W_arch_encloses_zero": true,
             "W_X_Delta_certified": {
               "mid_float": -0.00011223364803057969,
               "rad_float_outward": 0.00011234427006456828,
@@ -5121,6 +5903,14 @@
               "upper_dec": "1.813741466805642065390333853341404708318e-4",
               "arb_ball_str": "[+/- 1.82e-4]"
             },
+            "B_known_K_L_certified": {
+              "mid_float": 0.00018980450776217574,
+              "rad_float_outward": 0.0001123453861282542,
+              "lower_dec": "7.745912163392155866456719725367721860835e-5",
+              "upper_dec": "3.021498938904299118308493742251127654835e-4",
+              "arb_ball_str": "[+/- 3.03e-4]"
+            },
+            "abs_B_known_below_operator_transfer_bound": true,
             "R_mu_X_Delta_direct_certified": {
               "mid_float": -8.895518240513219e-06,
               "rad_float_outward": 0.00015526887455052932,
@@ -5128,12 +5918,35 @@
               "upper_dec": "1.463733563100160708039253450630446111617e-4",
               "arb_ball_str": "[+/- 1.65e-4]"
             },
+            "Q_tau_T_K_T_L_certified": {
+              "mid_float": 0.0003710680325224382,
+              "rad_float_outward": 0.00011234538635562787,
+              "lower_dec": "2.587226461668103463443590311292015196294e-4",
+              "upper_dec": "4.834134188780660503971053270581565977547e-4",
+              "arb_ball_str": "[+/- 4.84e-4]"
+            },
+            "Q_tau_equals_B_known_minus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_abs_upper": 0.0005523254225636571
           },
           {
             "Delta_eq_K_minus_L": 2.0,
             "X_Delta_eq_tau_abs_Delta": 39.47841760435743,
+            "W_arch_certified": {
+              "mid_float": 0.0001698911315401065,
+              "rad_float_outward": 2.4879979703180077e-21,
+              "lower_dec": "1.698911315401064992688364192424170089208e-4",
+              "upper_dec": "1.698911315401064992688384967299577143417e-4",
+              "arb_ball_str": "[0.00016989113154010649926884 +/- 3.59e-27]"
+            },
+            "B_transfer_mixed_certified": {
+              "mid_float": -0.00026444603413267926,
+              "rad_float_outward": 1.321554608089839e-20,
+              "lower_dec": "-2.644460341326792761494698170547048761979e-4",
+              "upper_dec": "-2.644460341326792758276918887150182022828e-4",
+              "arb_ball_str": "[-0.000264446034132679276 +/- 1.73e-22]"
+            },
+            "smooth_plus_transfer_equals_W_arch_encloses_zero": true,
             "W_X_Delta_certified": {
               "mid_float": -0.0005660356678300711,
               "rad_float_outward": 0.0011175726431247315,
@@ -5155,6 +5968,14 @@
               "upper_dec": "2.224460475076987176757974187917165476136e-3",
               "arb_ball_str": "[+/- 2.23e-3]"
             },
+            "B_known_K_L_certified": {
+              "mid_float": -0.0009159056099982581,
+              "rad_float_outward": 0.0011175727559020745,
+              "lower_dec": "-2.033478365900332410035504843379395541997e-3",
+              "upper_dec": "2.016671459038161447664360745893544580042e-4",
+              "arb_ball_str": "[+/- 2.04e-3]"
+            },
+            "abs_B_known_below_operator_transfer_bound": true,
             "R_mu_X_Delta_direct_certified": {
               "mid_float": 3.7407680019917766e-05,
               "rad_float_outward": 0.0015445755070686575,
@@ -5162,6 +5983,14 @@
               "upper_dec": "1.581983187088575083014625907855343743325e-3",
               "arb_ball_str": "[+/- 1.59e-3]"
             },
+            "Q_tau_T_K_T_L_certified": {
+              "mid_float": 0.0007570178897840688,
+              "rad_float_outward": 0.0011175727559020745,
+              "lower_dec": "-3.605548661180054625270349075607402100756e-4",
+              "upper_dec": "1.874590645686143092274906010408009789926e-3",
+              "arb_ball_str": "[+/- 1.88e-3]"
+            },
+            "Q_tau_equals_B_known_minus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_encloses_zero": true,
             "W_minus_W_log_plus_R_mu_abs_upper": 0.005490051985853291
           }
@@ -5252,13 +6081,13 @@
             "stieltjes_integral_ibp_abs_upper": 5.9628416754773586e-33
           }
         ],
-        "unconditional_mertens_bound_obstruction": "Inserting the strongest known unconditional zero-free-region Mertens bounds |M(y)| <= C_mu y exp(-c_mu sqrt(log y)) (Schoenfeld 1969; El Marraki 1995; Titchmarsh 1986, Section 14.26) into R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du yields only |R_mu(X)| <= X^{1/2} int_0^{X/2} |M_{>=2}(X/u)/(X/u)| u^{-1} |phi_log'(u)| du = O(X^{1/2} exp(-c_mu' sqrt(log X))) -> +infty as X -> infty, because the X^{-1/2} prefactor cancels only half a power of y = X/u ~ X. Achieving O(1) boundedness requires exploiting signed oscillation of M_{>=2}(X/u) against the smooth derivative kernel phi_log'(u) (or an arithmetic-Fourier positivity identity on S_tau).",
+        "unconditional_mertens_bound_obstruction": "Inserting the strongest known unconditional zero-free-region Mertens bounds |M(y)| <= C_mu y exp(-c_mu sqrt(log y)) (Schoenfeld 1969; El Marraki 1995; Titchmarsh 1986, Section 14.26) into R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du yields only an unsigned upper bound |R_mu(X)| <= X^{1/2} int_0^{X/2} |M_{>=2}(X/u)/(X/u)| u^{-1} |phi_log'(u)| du = O(X^{1/2} exp(-c_mu' sqrt(log X))) -> +infty as X -> infty, because the X^{-1/2} prefactor cancels only half a power of y = X/u ~ X. This growing upper bound shows that an unsigned point-wise Mertens bound is insufficient to prove O(1) boundedness (it does NOT prove that the signed integral R_mu(X) itself diverges). Achieving O(1) boundedness requires exploiting signed cancellation of M_{>=2}(X/u) against the smooth derivative kernel phi_log'(u) (or an arithmetic-Fourier positivity identity on S_tau).",
         "lean_theorem": "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity"
       }
     },
     "section_5_premise_classification_and_next_lemma": {
       "category_i_already_proved_in_repository": [
-        "Attempt B decomposition Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + P_E(f) and coercive norm-shifted semiboundedness reduction (`coercive_norm_shift_semiboundedness_implies_correlation_bound`).",
+        "Attempt B decomposition Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + P_E(f), conditional coercive norm-shifted semiboundedness reduction (`coercive_norm_shift_semiboundedness_implies_correlation_bound`), and Plancherel transfer bound |B_transfer(f)| <= 2||f||_{L^2}^2 (`transfer_form_plancherel_bound_and_minus_state_vanishing`).",
         "Prime-shift quadratic form identity D_N(f) - 2 L_N ||f||_{L^2}^2 = -W_{prime, N}(f*f^*) (`prime_shift_quadratic_form_and_subtracted_finite_part_equivalence`).",
         "Unconditional uniform bound |W_log(X)| <= 3.34900802 < 3.34901 and O(X^{-1/2} log(X+2)) decay of the divisor-aggregated functional W_log(X), and exact Moebius inversion W(X) = W_log(X) + R_mu(X) (`divisor_aggregated_stieltjes_and_moebius_inversion_identity`)."
       ],
@@ -5269,14 +6098,14 @@
         "Unconditional Mertens function bounds M(y) = O(y exp(-c_mu sqrt(log y))) from the classical/Korobov-Vinogradov zero-free region (Schoenfeld 1969; El Marraki 1995; Titchmarsh 1986, Section 14.26)."
       ],
       "category_iii_new_statements_proved_in_task_tc045": [
-        "Repaired Mellin Strip & Synthetic-Quartet Regularization: Fubini-Tonelli derivation of M_X[W](z) = -H_0(z) zeta'(z+1/2)/zeta(z+1/2) and M_X[W_log](z) = -H_0(z) zeta'(z+1/2) on 1/2 < Re(z) < 5/2, meromorphic continuation pole cancellation vs Moebius restoration, and Euler-Maclaurin pole-subtracted regularization on isolated synthetic modes.",
+        "Repaired Mellin Strip, Kernel-Strip Holomorphy vs Global Poles, & Synthetic-Quartet Regularization: Fubini-Tonelli derivation of M_X[W](z) = -H_0(z) zeta'(z+1/2)/zeta(z+1/2) and M_X[W_log](z) = -H_0(z) zeta'(z+1/2) on 1/2 < Re(z) < 5/2, holomorphy of -H_0(z)zeta'(z+1/2) on the open kernel strip |Re(z)| < 5/2 vs global meromorphy with simple pole at z = 5/2 (Res_{z=5/2} = (81/64)(-zeta'(3)) != 0), and Euler-Maclaurin pole-subtracted regularization on isolated synthetic modes.",
         "Small-Scale O(u^{5/2}) Bound, Compact-Interval Uniform Convergence, and Algebraic-Grade Supremum Equality (`small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity`): |W_log(u)| <= C_{log,0} u^{5/2} for all u > 0 (C_{log,0} = (92193/32768)(-zeta'(3)) <= 0.55742959), uniform convergence of R_mu(X) on compact intervals [a, b] subset (0, infty), continuity of R_mu(X) and W(X) on (0, infty), and sup_{K in A_R} |R_mu(tau^{|K|})| = sup_{X >= 1} |R_mu(X)|.",
-        "Mixed-Grade Pairing Polarization & Mertens Stieltjes Representation (`mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence`): Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| < 9.4468, simultaneous-grade Toeplitz counterexample control, and exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du."
+        "Mixed-Grade Pairing Polarization & Mertens Stieltjes Representation (`mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence`): C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| <= 7.07942813 < 9.27739781 < 9.4468 (retaining B_transfer(T_K psi_tau, T_L psi_tau) and both scale directions), simultaneous-grade Toeplitz counterexample control, and exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du."
       ],
       "category_iv_unproved_premise": {
         "subgate_id": "SUBGATE-TC-043A",
         "lemma_name": "Smooth-Kernel Mertens / Moebius Cancellation Lemma for R_mu(X)",
-        "exact_statement": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_mu < infty such that for all X >= 1, the signed Moebius recovery remainder R_mu(X) = sum_{m=2}^infty (mu(m)/sqrt(m)) W_log(X/m) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du satisfies |R_mu(X)| <= M_mu (equivalently, |W(X)| <= M_log + M_mu and |Q_tau(T_K psi_tau, T_L psi_tau)| <= 9.4468 + M_mu for all K, L in A_R)."
+        "exact_statement": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_mu < infty such that for all X >= 1, the signed Moebius recovery remainder R_mu(X) = sum_{m=2}^infty (mu(m)/sqrt(m)) W_log(X/m) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du satisfies |R_mu(X)| <= M_mu (equivalently, |W(X)| <= M_log + M_mu and |C_tau(K - L)| = |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_B + M_mu for all K, L in A_R)."
       }
     }
   },

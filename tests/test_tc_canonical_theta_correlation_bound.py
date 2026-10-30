@@ -32,6 +32,7 @@ from tc.canonical_theta_correlation_bound import (
     SUBGATE_TC_042A_STATUS,
     TASK_TC_042_ID,
     TASK_TC_045_ID,
+    TASK_TC_045R_ID,
     UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN,
     audit_rh_equivalence_and_laplace_resolvent,
     compute_unconditional_spectral_tail_bound_arb,
@@ -48,6 +49,7 @@ from tc.canonical_theta_correlation_bound import (
     evaluate_synthetic_off_critical_quartet_controls,
     evaluate_tau_scaling_controls,
     serialize_arb_certified,
+    verify_all_serialized_arb_in_tree,
     verify_canonical_theta_correlation_lean_module,
     verify_serialized_arb_roundtrip,
 )
@@ -305,7 +307,7 @@ def test_12_lean_formalization_module_verified():
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
     assert len(ver["actual_defs"]) == 24
-    assert len(ver["actual_theorems"]) == 42
+    assert len(ver["actual_theorems"]) == 43
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -334,6 +336,7 @@ def test_12_lean_formalization_module_verified():
     assert "majorant_without_sign_cancellation_exceeds_fixed_coercive_norm" in lean_text
     assert "majorant_window_lower_bound_and_envelope_ordering" in lean_text
     assert "zero_moment_subtracted_and_chordal_stieltjes_equivalence" in lean_text
+    assert "transfer_form_plancherel_bound_and_minus_state_vanishing" in lean_text
 
 
 def test_13_archimedean_taylor_remainder_defect_and_branch_analyticity_repair():
@@ -1306,7 +1309,9 @@ def test_28_task_tc045_cross_grade_moebius_recovery_and_serialization_roundtrip(
     )
     assert (
         "tau^K and tau^{-K}"
-        in imp["step_2_both_scale_directions_in_two_grade_prime_pairing"]
+        in imp[
+            "step_2_both_scale_directions_in_mixed_and_two_grade_prime_pairings"
+        ]
     )
 
     # 2. Section 3: Repaired TC-044 defects (Mellin strip + synthetic quartet regularization + round-trip Arb serialization)
@@ -1448,6 +1453,187 @@ def test_28_task_tc045_cross_grade_moebius_recovery_and_serialization_roundtrip(
     assert (
         s5["category_iv_unproved_premise"]["subgate_id"] == "SUBGATE-TC-043A"
     )
+
+
+def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressions(
+    artifact_payload,
+):
+    """Verify TASK-TC-045R mathematical repairs and live 256-bit Arb regressions for Steps 2, 3, 4, 5, 6, and 7."""
+    from flint import ctx as flint_ctx
+
+    assert artifact_payload["moebius_recovery_repair_task_id"] == TASK_TC_045R_ID
+    sec13 = artifact_payload[
+        "section_13_prime_shift_quadratic_form_and_divisor_aggregation"
+    ]
+    sec14 = artifact_payload[
+        "section_14_cross_grade_compatibility_and_moebius_recovery"
+    ]
+    assert sec14["repair_task_id"] == TASK_TC_045R_ID
+
+    s1 = sec14["section_1_recovered_arithmetic_result_and_implication_chain"]
+    imp = s1["complete_implication_chain_to_correlation_bound"]
+    nft = s1["norm_floor_and_transfer_bound_repair_tc045r"]
+
+    # 1. Step 2: Norm-floor behavior of f_pm^{(K)} at K = 0 and small rational grades K = +/- 1/100, +/- 1/1000
+    assert (
+        nft["exact_two_grade_norm_identity"]
+        == "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|})"
+    )
+    assert "Excluding K = 0 does NOT produce" in nft["minus_state_vanishing_as_K_to_0"]
+    nf_by_label = {
+        row["K_label"]: row for row in nft["two_grade_norm_and_transfer_table"]
+    }
+    assert nf_by_label["0"]["norm_f_minus_sq_certified"]["mid_float"] == 0.0
+    assert (
+        0.0
+        < nf_by_label["1/1000"]["norm_f_minus_sq_certified"]["mid_float"]
+        < nf_by_label["1/100"]["norm_f_minus_sq_certified"]["mid_float"]
+        < 3e-3
+    )
+    for k_lbl in ("0", "1/1000", "-1/1000", "1/100", "-1/100", "1/10"):
+        assert nf_by_label[k_lbl]["norm_f_minus_sq_below_false_floor_0_258495"] is True
+    assert math.isclose(
+        nf_by_label["-1/1000"]["norm_f_minus_sq_certified"]["mid_float"],
+        nf_by_label["1/1000"]["norm_f_minus_sq_certified"]["mid_float"],
+        rel_tol=1e-14,
+    )
+    assert math.isclose(
+        nf_by_label["-1/100"]["norm_f_minus_sq_certified"]["mid_float"],
+        nf_by_label["1/100"]["norm_f_minus_sq_certified"]["mid_float"],
+        rel_tol=1e-14,
+    )
+
+    # 2. Step 3: Corrected transfer-term bound across K = 0, small |K|, and large |K|
+    tb_false = nft["false_0_633039_transfer_bound_reproduction_and_origin"]
+    tb_planch = nft["proven_plancherel_transfer_bounds"]
+    assert (
+        tb_planch["lean_theorem"]
+        == "transfer_form_plancherel_bound_and_minus_state_vanishing"
+    )
+    assert tb_false["B_transfer_f_plus_0_certified"]["mid_float"] > 1.93
+    assert tb_false["B_transfer_psi_tau_certified"]["mid_float"] > 0.96
+    assert (
+        1.98944
+        < tb_planch["two_grade_uniform_bound_4_h0_1_certified"]["mid_float"]
+        < 1.98946
+    )
+    assert (
+        0.99472
+        < tb_planch["mixed_grade_uniform_bound_2_h0_1_certified"]["mid_float"]
+        < 0.99473
+    )
+    for row in nft["two_grade_norm_and_transfer_table"]:
+        assert row["abs_B_transfer_f_minus_le_2_norm_minus_sq"] is True
+        assert row["abs_B_transfer_f_plus_le_2_norm_plus_sq"] is True
+        assert row["abs_B_transfer_f_pm_le_4_h0_1"] is True
+        assert row["abs_B_transfer_mixed_le_2_h0_1"] is True
+        assert row["refutes_false_0_633039_bound"] is True
+
+    # 3. Step 4: Mixed-grade decomposition with retained transfer term and both scale directions
+    mp = sec14["section_4_mixed_grade_relation_and_moebius_recovery"][
+        "mixed_grade_polarization_identity"
+    ]
+    assert "B_transfer(T_K psi_tau, T_L psi_tau)" in mp["formula"]
+    assert "W(tau^{-|K-L|})" in mp["formula"]
+    assert "W_log(tau^{|K-L|})" in mp["formula"]
+    assert (
+        "without dividing by ||f_-^{(K)}||_{L^2}^2"
+        in imp[
+            "step_4_direct_equivalence_to_correlation_bound_and_separate_conditional_semiboundedness"
+        ]
+    )
+    b_known = mp["unconditional_bound_on_B_known"]
+    assert b_known["certified_below_9_4468"] is True
+    assert b_known["certified_below_7_07943_via_operator_transfer"] is True
+    assert 9.277 < b_known["B_known_universal_upper_bound"] < 9.278
+    assert (
+        7.0794
+        < b_known["B_known_operator_plus_transfer_upper_bound"]
+        < 7.0795
+    )
+    for m_row in mp["certified_mixed_grade_table"]:
+        assert m_row["smooth_plus_transfer_equals_W_arch_encloses_zero"] is True
+        assert m_row["abs_B_known_below_operator_transfer_bound"] is True
+        assert m_row["Q_tau_equals_B_known_minus_R_mu_encloses_zero"] is True
+
+    # 4. Step 5: Mellin pole behavior of -H_0(z) zeta'(z + 1/2) at z = 5/2
+    d3a_pole = sec14["section_2_repaired_tc044_defects_audit"][
+        "defect_3a_spectral_aggregation_and_synthetic_quartet_repair"
+    ]["kernel_strip_holomorphy_vs_global_poles"]
+    assert d3a_pole["holomorphic_open_strip"] == "|Re(z)| < 5/2"
+    assert d3a_pole["is_entire_on_C"] is False
+    assert d3a_pole["res_H0_at_5_2_rational"] == "81/64"
+    assert d3a_pole["res_H0_at_5_2_symbolic_verified"] is True
+    assert d3a_pole["res_neg_H0_zeta_prime_at_5_2_certified_nonzero"] is True
+    assert math.isclose(
+        d3a_pole["res_neg_H0_zeta_prime_at_5_2_certified"]["mid_float"],
+        0.25075352615213414,
+        rel_tol=1e-13,
+    )
+
+    # 5. Step 6 & 7: Live 256-bit Arb regressions and full-tree round-trip verification
+    d3b = sec14["section_2_repaired_tc044_defects_audit"][
+        "defect_3b_numerical_serialization_and_roundtrip_repair"
+    ]
+    rt13 = d3b["full_section_13_tree_roundtrip_verification"]
+    rt14 = d3b["full_section_14_tree_roundtrip_verification"]
+    assert rt13["all_enclose_original_256bit_arb_ball"] is True
+    assert rt14["all_enclose_original_256bit_arb_ball"] is True
+    assert rt13["total_certified_arb_balls_checked"] == 26
+    assert rt14["total_certified_arb_balls_checked"] == 113
+
+    v1 = s1["exact_moebius_recovery_and_equivalence"]["values_at_X_eq_1"]
+    assert v1["W_1_is_strictly_negative"] is True
+    assert v1["W_1_certified"]["mid_float"] < -0.057
+    assert v1["h0_at_9_is_strictly_negative"] is True
+    assert v1["h0_at_9_certified"]["mid_float"] < -0.00034
+
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau_a = arb(2) * arb.pi()
+        h0_1_live = evaluate_h0_arb(arb(1))
+        h0_9_live = evaluate_h0_arb(arb(9))
+        assert bool(h0_1_live > arb(0))
+        assert bool(h0_9_live < arb(0))
+
+        # Live norm-floor check at K = 0, +/-1/1000, +/-1/100
+        diff_k0 = h0_1_live - evaluate_h0_arb(arb(1))
+        assert bool(diff_k0.contains(0)) and bool(abs(diff_k0) < arb("1e-75"))
+        for n_denom in (1000, 100):
+            k_arb = arb(1) / arb(n_denom)
+            norm_minus = h0_1_live - evaluate_h0_arb((tau_a ** k_arb))
+            assert bool(norm_minus > arb(0))
+            assert bool(norm_minus < arb("0.003"))
+
+        # Live Plancherel transfer bound check: 4 * h0(1) and 2 * h0(1)
+        four_h0_1 = arb(4) * h0_1_live
+        two_h0_1 = arb(2) * h0_1_live
+        assert bool(four_h0_1 > arb("1.98944")) and bool(
+            four_h0_1 < arb("1.98945")
+        )
+        assert bool(two_h0_1 > arb("0.99472")) and bool(
+            two_h0_1 < arb("0.99473")
+        )
+
+        # Live pole residue of -H_0(z) * zeta'(z + 1/2) at z = 5/2 (s = 3)
+        from flint import acb_series
+        neg_zeta_prime_3 = -acb_series([acb(3), acb(1)], prec=flint_ctx.prec).zeta()[1].real
+        res_z_5_2_live = (arb(81) / arb(64)) * neg_zeta_prime_3
+        assert bool(res_z_5_2_live > arb("0.2507535")) and bool(
+            res_z_5_2_live < arb("0.2507536")
+        )
+        # Verify by evaluating (z - 5/2) * H_0(z) near z = 5/2 that H_0(z) has simple pole of residue +81/64:
+        eps_z = arb("1e-30")
+        z_near = acb(arb(5) / arb(2) - eps_z)
+        h0_z_near = evaluate_f_tau_acb(
+            acb(arb(1) / arb(2)) + z_near
+        ) * evaluate_f_tau_acb(acb(arb(1) / arb(2)) - z_near)
+        approx_res = (-eps_z) * h0_z_near.real
+        assert abs(float(approx_res.mid()) - (81.0 / 64.0)) < 1e-12
+    finally:
+        flint_ctx.prec = saved_prec
+
 
 
 

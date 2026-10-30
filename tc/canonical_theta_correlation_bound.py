@@ -116,6 +116,7 @@ TASK_TC_043_ID = "TASK-TC-043"
 TASK_TC_043R_ID = "TASK-TC-043R"
 TASK_TC_044_ID = "TASK-TC-044"
 TASK_TC_045_ID = "TASK-TC-045"
+TASK_TC_045R_ID = "TASK-TC-045R"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
@@ -125,6 +126,7 @@ STARTING_HEAD_TC_043 = "db5d8d4f429ef2b0bd9000d715e3552953b48355"
 STARTING_HEAD_TC_043R = "726f7b4da8b7bd757b68f96783fee6b86f2f3f7b"
 STARTING_HEAD_TC_044 = "2122d7989d1821cf9048d7d32ad00c64f17e191b"
 STARTING_HEAD_TC_045 = "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a"
+STARTING_HEAD_TC_045R = "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -141,6 +143,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-043",
     "TASK-TC-043R",
     "TASK-TC-044",
+    "TASK-TC-045",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -259,6 +262,7 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "divisor_aggregated_stieltjes_and_moebius_inversion_identity",
     "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence",
     "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
+    "transfer_form_plancherel_bound_and_minus_state_vanishing",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -7284,6 +7288,7 @@ def serialize_arb_certified(ball: arb, dec_digits: int = 40) -> Dict[str, Any]:
         "lower_dec": lower_dec,
         "upper_dec": upper_dec,
         "arb_ball_str": arb_ball_str,
+        "enclosure_arb": ball,
     }
 
 
@@ -7312,6 +7317,64 @@ def verify_serialized_arb_roundtrip(
         "all_reconstructions_enclose_original": bool(
             dec_encloses and ball_str_encloses and float_encloses
         ),
+    }
+
+
+def verify_all_serialized_arb_in_tree(
+    tree: Any, path_prefix: str = ""
+) -> Dict[str, Any]:
+    """Recursively enumerate every serialized certified Arb ball in `tree` and verify round-trip enclosure.
+
+    When `enclosure_arb` is present (in memory before `_clean` strips it for JSON export), compares
+    all three reconstructions (`[lower_dec, upper_dec]`, `arb_ball_str`, and `(mid_float, rad_float_outward)`)
+    directly against the original 256-bit `flint.arb` ball.
+    """
+    required_keys = {
+        "mid_float",
+        "rad_float_outward",
+        "lower_dec",
+        "upper_dec",
+        "arb_ball_str",
+    }
+    checked_paths: List[str] = []
+    failed_paths: List[str] = []
+    compared_against_live_original_count = 0
+
+    def _walk(node: Any, cur_path: str) -> None:
+        nonlocal compared_against_live_original_count
+        if isinstance(node, dict):
+            if required_keys.issubset(node.keys()):
+                orig_ball = node.get("enclosure_arb")
+                if isinstance(orig_ball, arb):
+                    compared_against_live_original_count += 1
+                    res = verify_serialized_arb_roundtrip(orig_ball, node)
+                else:
+                    rec_dec = arb.union(
+                        arb(node["lower_dec"]), arb(node["upper_dec"])
+                    )
+                    res = verify_serialized_arb_roundtrip(rec_dec, node)
+                checked_paths.append(cur_path)
+                if not res["all_reconstructions_enclose_original"]:
+                    failed_paths.append(cur_path)
+                return
+            for k, v in node.items():
+                if k == "enclosure_arb":
+                    continue
+                sub_p = f"{cur_path}.{k}" if cur_path else str(k)
+                _walk(v, sub_p)
+        elif isinstance(node, (list, tuple)):
+            for idx, item in enumerate(node):
+                sub_p = f"{cur_path}[{idx}]"
+                _walk(item, sub_p)
+
+    _walk(tree, path_prefix)
+    return {
+        "total_certified_arb_balls_checked": len(checked_paths),
+        "compared_against_live_original_arb_count": compared_against_live_original_count,
+        "all_enclose_original_256bit_arb_ball": len(failed_paths) == 0
+        and len(checked_paths) > 0,
+        "failed_paths": failed_paths,
+        "checked_paths": checked_paths,
     }
 
 
@@ -7419,11 +7482,16 @@ def execute_task_tc044_prime_shift_quadratic_form(
                 ),
                 "implied_correlation_bound": "|C_tau(K)| <= C_tau(0) + 2 (c_tau^B + mu_0) h_0(1) < infty",
                 "relation_to_W_X": (
-                    "Since ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 = ||A_tau^B psi_tau||^2 + O(|K| tau^{-|K|/2}), "
-                    "||f_pm^{(K)}||_{L^2}^2 = h_0(1) + O(tau^{-5|K|/2}), and "
-                    "P_E(f_pm^{(K)}) = P_E(psi_tau) -/+ W(tau^{|K|}) + O(|K| tau^{-|K|/2}), "
-                    "the relative semiboundedness condition is equivalent to uniform boundedness "
-                    "sup_{X >= 1} |W(X)| < infty (where W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X))."
+                    "For separated grades (|K| bounded away from 0), ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 = ||A_tau^B psi_tau||^2 + O(|K| tau^{-|K|/2}), "
+                    "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}) = h_0(1) + O(tau^{-5|K|/2}), and "
+                    "P_E(f_pm^{(K)}) = P_E(psi_tau) -/+ [W(tau^K) + W(tau^{-K})] + B_transfer(f_pm^{(K)}) - B_transfer(psi_tau). "
+                    "However, as K -> 0 along nonzero admissible grades in Qbar intersect R, the minus-state norm "
+                    "||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 (while P_E(f_-^{(K)}) -> 0 at the same O(K^2) rate), "
+                    "so one cannot construct a uniform mu_0 by dividing an unnormalized bound on |P_E(f_pm^{(K)})| by ||f_-^{(K)}||_{L^2}^2. "
+                    "Instead, uniform boundedness sup_{X >= 1} |W(X)| < infty (equivalently, sup_{X >= 1} |R_mu(X)| < infty) is "
+                    "directly equivalent to uniform boundedness of the polarized mixed-grade pairing "
+                    "C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}), while "
+                    "coercive relative semiboundedness remains a conditional one-way sufficient hypothesis."
                 ),
                 "distinction_from_full_weil_positivity": (
                     "Full Weil positivity requires Q_tau(f, f) >= 0 on all of S_tau (i.e. P_E(f) >= c_tau^B ||f||^2 - ||A_tau^B f||^2 "
@@ -8228,10 +8296,14 @@ def execute_task_tc044_prime_shift_quadratic_form(
         #                    = (sum_{m>=1} m^{-(z+1/2)}) M_X[W](z)
         #                    = -H_0(z) * zeta'(z + 1/2).
         # 3. Meromorphic continuation:
-        #    By meromorphic continuation from 1/2 < Re(z) < 5/2 to |Re(z)| < 5/2 (and C), aggregation cancels
-        #    the poles of -zeta'(z+1/2)/zeta(z+1/2) at all actual nontrivial zeros rho = 1/2 + z_rho of zeta(s)
-        #    IRRESPECTIVE of their real parts (and the double pole of -zeta'(z+1/2) at z = 1/2 is annihilated by
-        #    the triple zero H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0, making -H_0(z) zeta'(z+1/2) entire on C).
+        #    By meromorphic continuation from 1/2 < Re(z) < 5/2 to the open kernel strip |Re(z)| < 5/2 (and C),
+        #    aggregation cancels the poles of -zeta'(z+1/2)/zeta(z+1/2) at all actual nontrivial zeros
+        #    rho = 1/2 + z_rho of zeta(s) IRRESPECTIVE of their real parts, and the double pole of -zeta'(z+1/2)
+        #    at z = 1/2 is annihilated by the triple zero H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0, making
+        #    M_X[W_log](z) = -H_0(z) zeta'(z+1/2) HOLOMORPHIC on the open kernel strip |Re(z)| < 5/2
+        #    (and meromorphic on C, where H_0(z) = F_tau(1/2+z)F_tau(1/2-z) has simple poles at z = +/-(2k + 1/2)
+        #    for integers k >= 1; in particular at z = 5/2 from F_tau(-2) with Res_{z=5/2}[-H_0(z)zeta'(z+1/2)]
+        #    = (81/64)(-zeta'(3)) = +0.2507535262 != 0).
         #    Conversely, Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) multiplies M_X[W_log](z)
         #    by sum_{m>=1} mu(m) m^{-(z+1/2)} = 1/zeta(z + 1/2) on Re(z) > 1/2 and by meromorphic continuation
         #    restores the denominator zeta(z + 1/2).
@@ -8347,7 +8419,7 @@ def execute_task_tc044_prime_shift_quadratic_form(
                     "Prove without assuming RH or universal Weil positivity that there exists a finite constant "
                     "M_0 < infty such that for all X >= 1, the signed Moebius de-aggregation series "
                     "W(X) = sum_{m=1}^infty (mu(m)/sqrt(m)) W_log(X/m) satisfies |W(X)| <= M_0 "
-                    "(equivalently, |I(X)| <= M_0' < infty and P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||^2 + mu_0 ||f_pm^{(K)}||^2))."
+                    "(equivalently, |I(X)| <= M_0' < infty and |C_tau(K - L)| = |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_B + M_mu < infty)."
                 ),
             },
         }
@@ -8435,51 +8507,59 @@ def execute_task_tc044_prime_shift_quadratic_form(
 def execute_task_tc045_cross_grade_moebius_recovery(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute TASK-TC-045: Cross-Grade Compatibility and Moebius Recovery of the Actual Arithmetic Profile.
+    r"""Execute TASK-TC-045 / TASK-TC-045R: Cross-Grade Compatibility and Moebius Recovery of the Actual Arithmetic Profile.
 
-    Establishes:
-    1. Recovered Arithmetic Result & Complete Implication Chain (Sections 1 & 2):
+    Establishes (with TASK-TC-045R correctness repairs verified in 256-bit Arb arithmetic):
+    1. Recovered Arithmetic Result & Direct Mixed-Grade Implication Chain (Sections 1 & 2):
        - Recovers W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X),
          W_log(X) = sum_{m>=1} m^{-1/2} W(X/m) = sum_{k>=2} (log k / sqrt(k)) h_0(k/X),
          |W_log(X)| <= 3.34900802 < 3.34901, W_log(X) = O(X^{-1/2} log(X+2)) (X >= 1),
          and exact Moebius inversion W(X) = W_log(X) + R_mu(X) with
-         R_mu(X) := sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m).
+         R_mu(X) := sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m) (where W(1) = -0.05730748512 < 0 and h_0(9) = -0.000341130295 < 0).
        - States explicitly that because W_log(X) is unconditionally bounded, boundedness of R_mu(X)
          is equivalent to boundedness of W(X) (|W(X)| <= |W_log(X)| + |R_mu(X)| and
          |R_mu(X)| <= |W(X)| + |W_log(X)|); naming R_mu does not independently establish the bound.
-       - Recovers the exact implication chain from sup_{X>=1} |R_mu(X)| <= M_mu < infty to the
-         two-grade correlation bound |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1), preserving all
-         boundary terms, both scale directions (tau^K and tau^{-K}), and normalization factors on
-         f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2).
-    2. Repaired TC-044 Defects (Section 3):
-       - Defect 3A (Spectral Aggregation & Synthetic-Quartet Regularization):
+       - Repairs the false uniform norm-floor claim on f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2):
+         verifies ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}), proves that for the minus state
+         ||f_-^{(K)}||_{L^2}^2 -> 0 as K -> 0 along nonzero admissible rational grades K = 1/n in A_R \ {0}
+         (with ||f_-^{(0)}||_{L^2}^2 = 0, ||f_-^{(+/- 1/1000)}||_{L^2}^2 = 2.68872306e-5, and
+         ||f_-^{(+/- 1/100)}||_{L^2}^2 = 2.68509890e-3), and removes the invalid division construction of mu_0.
+       - Replaces the false transfer-term bound 0.633039 (which was copied from the loose forward-prime bound
+         (92193/32768)*0.225 = 0.6330390930 and is violated at K = 0 where B_transfer(f_+^{(0)}) = 2 B_transfer(psi_tau)
+         = 1.9375304127 > 0.633039 and as |K| -> infty where B_transfer(f_pm^{(K)}) -> 0.9687652063 > 0.633039)
+         with the proven Plancherel bound |B_transfer(f)| <= 2 ||f||_{L^2}^2 (from B_transfer(f) = 2||f||_{L^2}^2 - J(f,f)
+         and 0 <= J(f,f) <= 4||f||_{L^2}^2), giving |B_transfer(f_pm^{(K)})| <= 4 h_0(1) = 1.9894499352 < 1.98945
+         and |B_transfer(T_K psi_tau, T_L psi_tau)| <= 2 h_0(1) = 0.9947249676 < 0.994725.
+       - Establishes the implication chain directly through the polarized mixed-grade identity
+         C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}), where
+         B_known(K, L) = W_arch(h_{K-L}) - W(tau^{-|K-L|}) - W_log(tau^{|K-L|}) retains B_transfer(T_K psi_tau, T_L psi_tau)
+         inside W_arch(h_{K-L}) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau> - c_tau^B h_0(tau^{|K-L|}) + B_transfer(T_K psi_tau, T_L psi_tau)
+         and preserves both scale directions tau^{|K-L|} and tau^{-|K-L|}, while preserving the conditional
+         one-way coercive relative semiboundedness theorem separately.
+    2. Repaired TC-044 Defects & Corrected Global Mellin Continuation (Section 3):
+       - Defect 3A (Spectral Aggregation, Kernel-Strip Holomorphy vs Global Poles, & Synthetic-Quartet Regularization):
          Defines M_X[F](z) = int_0^infty F(X) X^{-z} dX/X and H_0(z) = int_0^infty h_0(alpha) alpha^z d_alpha/alpha,
          justifies Fubini-Tonelli interchange on the common strip 1/2 < Re(z) < 5/2 to derive
          M_X[W](z) = -H_0(z) zeta'(z+1/2)/zeta(z+1/2) and M_X[W_log](z) = -H_0(z) zeta'(z+1/2),
-         states what holds by meromorphic continuation (pole cancellation at all actual nontrivial zeros
-         irrespective of their real parts, and Moebius restoration of 1/zeta(z+1/2)), and certifies the
-         Euler-Maclaurin pole-subtracted regularization on an isolated synthetic mode X^{rho_0 - 1/2}.
-       - Defect 3B (Certified Outward Serialization & Round-Trip Enclosure):
-         Verifies round-trip interval containment for all exported center-radius pairs, Arb ball strings,
-         and outward-rounded decimal endpoint strings (`lower_dec`, `upper_dec`) in 256-bit Arb arithmetic,
-         keeping all acceptance comparisons in interval arithmetic.
+         proves that -H_0(z) zeta'(z+1/2) is HOLOMORPHIC on the open kernel strip |Re(z)| < 5/2 (where the
+         triple zero of H_0(z) at z = 1/2 cancels the double pole of -zeta'(z+1/2) and all nontrivial-zero poles
+         are cancelled irrespective of their real parts) and MEROMORPHIC on C with simple poles at z = +/-(2k + 1/2)
+         (k >= 1) from the Gamma poles of H_0(z) (in particular Res_{z=5/2}[-H_0(z)zeta'(z+1/2)] = (81/64)(-zeta'(3))
+         = +0.2507535262 != 0), and certifies Euler-Maclaurin regularization on isolated synthetic modes.
+       - Defect 3B (Certified Outward Serialization & Full-Tree Original-Ball Round-Trip Enclosure):
+         Verifies round-trip interval containment against the live original 256-bit Arb balls across every
+         exported certified Arb ball in Section 13 and Section 14.
     3. Continuity and the Role of Algebraic Grades (Section 4):
        - Proves W_log(u) = O(u^{5/2}) as u -> 0^+ (|W_log(u)| <= C_{log,0} u^{5/2} for all u > 0 with
-         C_{log,0} = (92193/32768)(-zeta'(3)) = 0.5574295871 <= 0.55742959).
-       - Proves local uniform convergence of R_mu(X) = sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m) on every
-         compact interval X in [a, b] subset (0, infty) via |mu(m) m^{-1/2} W_log(X/m)| <= C_{log,0} b^{5/2} m^{-3},
-         deducing continuity of W_log(X), R_mu(X), and W(X) on (0, infty) and establishing by density of
-         A_R = Qbar intersect R in R that sup_{K in A_R} |R_mu(tau^{|K|})| = sup_{X >= 1} |R_mu(X)|.
+         C_{log,0} = (92193/32768)(-zeta'(3)) = 0.5574295871 <= 0.55742959), uniform convergence of R_mu(X) on
+         compact intervals [a, b] subset (0, infty), continuity on (0, infty), and sup_{K in A_R} |R_mu(tau^{|K|})| = sup_{X >= 1} |R_mu(X)|.
     4. Mixed-Grade Relation & Mertens Stieltjes Representation of R_mu(X) (Section 5):
-       - Polarizes Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with
-         |B_known(K, L)| <= 9.27739780321 < 9.4468 for all K, L in A_R.
-       - Proves simultaneous-grade covariance Q_tau(T_{K+S} psi_tau, T_{L+S} psi_tau) = Q_tau(T_K psi_tau, T_L psi_tau)
-         and provides the continuous Hermitian Toeplitz counterexample control showing covariance, Hermitian
-         symmetry, and diagonal positivity alone permit exponential growth.
-       - Derives and certifies the Mertens Stieltjes integration-by-parts identity
-         R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du (phi_log(u) = u^{1/2} W_log(u)),
-         proves that unconditional zero-free-region Mertens bounds yield O(X^{1/2} exp(-c_mu' sqrt(log X))) -> infty,
-         and isolates the Smooth-Kernel Mertens / Moebius Cancellation Lemma (`SUBGATE-TC-043A`).
+       - Polarizes C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with
+         |B_known(K, L)| <= 9.27739780321 < 9.4468 (via spatial Bernstein-Taylor |W_arch| <= 5.464660) and
+         |B_known(K, L)| <= 7.0794281255 < 7.07943 (via Attempt B Cauchy-Schwarz + Plancherel transfer bound |W_arch| <= 3.26669033).
+       - Certifies the Mertens Stieltjes integration-by-parts identity R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du,
+         proves that inserting an unsigned zero-free-region Mertens bound yields a growing upper bound O(X^{1/2} exp(-c_mu' sqrt(log X)))
+         (which shows the unsigned bound is insufficient, not that the signed integral R_mu(X) diverges), and isolates `SUBGATE-TC-043A`.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -8491,14 +8571,43 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         c_tau_A_arb = (arb(4) * tau_arb).log() + gamma_e_arb + tau_arb / arb(4)
         c_tau_B_arb = c_tau_A_arb - arb(2)
         h0_1_arb = evaluate_h0_arb(arb(1))
+        h0_9_arb = evaluate_h0_arb(arb(9))
         tol_spec = 2**(-90)
 
         n_max_pp = 25000
         pp_all = get_prime_powers_up_to(n_max_pp)
         mu_table = _compute_moebius_table(n_max_pp)
 
+        # Helper to evaluate J(Delta) = J(T_K psi_tau, T_L psi_tau) in certified 256-bit Arb with tail bound:
+        def _eval_j_delta_certified_arb(kappa_a: arb) -> Tuple[arb, arb]:
+            kap_c = acb(kappa_a)
+            u_top_J = max(20, int(math.ceil(float(abs(kappa_a).upper()))) + 16)
+
+            def _f_j_loc(u: acb, analytic: bool, kc: acb = kap_c) -> acb:
+                hp = evaluate_h0_acb((kc + u).exp(), analytic=analytic)
+                hm = evaluate_h0_acb((kc - u).exp(), analytic=analytic)
+                return (hp + hm) * ((-u / acb(2)).exp())
+
+            j_fin = arb(0)
+            for m_step in range(0, 4 * u_top_J):
+                j_fin += acb.integral(
+                    _f_j_loc,
+                    acb(m_step) / acb(4),
+                    acb(m_step + 1) / acb(4),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+            u_top_a = arb(u_top_J)
+            j_tail = (
+                (arb(2) / arb(3))
+                * (arb(92193) / arb(32768))
+                * ((arb("2.5") * abs(kappa_a)).exp())
+                * ((-arb(3) * u_top_a).exp())
+            )
+            return j_fin + arb(0, j_tail.upper()), j_tail
+
         # -------------------------------------------------------------------
-        # 1. Section 1 & 2: Recovered Arithmetic Result & Exact Implication Chain
+        # 1. Section 1 & 2: Recovered Arithmetic Result & Direct Mixed-Grade Implication Chain
         # -------------------------------------------------------------------
         # Certify C_{log,0} = (92193/32768) * (-zeta'(3)) and C_{W,0} = (92193/32768) * (-zeta'(3)/zeta(3)):
         s3_series = acb_series([acb(3), acb(1)], prec=flint_ctx.prec)
@@ -8540,12 +8649,111 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         # Unconditional global bound on |W_log(X)| for X >= 1 from TC-044:
         # M_{log} = (30731/98304) + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)} <= 3.34900802 < 3.34901.
         m_log_uncond_bound_arb = arb("3.34900802")
-        b_transfer_two_grade_bound_arb = arb("0.633039")
-        # For normalized f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2),
-        # ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}), and on X >= 1,
-        # h_0(X) >= min_{alpha >= 1} h_0(alpha) = h_0(alpha_5) >= -0.00051185, so
-        # ||f_pm^{(K)}||_{L^2}^2 >= h_0(1) - 0.00051185 >= 0.258495 > 1/4:
-        norm_sq_lower_bound_arb = h0_1_arb - arb("0.00051185")
+
+        # TASK-TC-045R Step 2 & Step 3:
+        # (a) Exact norm identity ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}) and vanishing of ||f_-^{(K)}||_{L^2}^2 as K -> 0:
+        #     For the plus state, ||f_+^{(K)}||_{L^2}^2 = h_0(1) + h_0(tau^{|K|}) >= h_0(1) - 0.00051185 >= 0.258495 > 0.
+        #     For the minus state, ||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0 along nonzero rational grades K = 1/n!
+        plus_state_norm_sq_lower_bound_arb = h0_1_arb - arb("0.00051185")
+        # (b) Proven Plancherel bound on B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f):
+        #     Since 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt <= 4 ||f||_{L^2}^2,
+        #     |B_transfer(f)| <= 2 ||f||_{L^2}^2 for all f in L^2(R_{>0}, dx/x).
+        #     Hence for f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) (where ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1)):
+        #       |B_transfer(f_pm^{(K)})| <= 2 ||f_pm^{(K)}||_{L^2}^2 <= 4 h_0(1) = 1.9894499352396050...,
+        #     and for polarized mixed-grade pairings (T_K psi_tau, T_L psi_tau):
+        #       |B_transfer(T_K psi_tau, T_L psi_tau)| <= 2 ||T_K psi_tau||_{L^2} ||T_L psi_tau||_{L^2} = 2 h_0(1) = 0.9947249676198025...
+        b_transfer_two_grade_plancherel_bound_arb = arb(4) * h0_1_arb
+        b_transfer_mixed_grade_plancherel_bound_arb = arb(2) * h0_1_arb
+        false_tc045_transfer_bound_arb = arb("0.633039")
+        loose_forward_prime_bound_origin_arb = (
+            arb(92193) / arb(32768)
+        ) * arb("0.225")
+
+        j0_arb, _ = _eval_j_delta_certified_arb(arb(0))
+        b_transfer_psi_tau_arb = arb(2) * h0_1_arb - j0_arb
+        b_transfer_f_plus_0_arb = arb(2) * b_transfer_psi_tau_arb
+        b_transfer_f_minus_0_arb = arb(0)
+
+        # Evaluate two-grade norms ||f_pm^{(K)}||_{L^2}^2 and transfer values B_transfer(f_pm^{(K)}), B_transfer(T_K psi_tau, psi_tau)
+        # across K in {0, 1/1000, -1/1000, 1/100, -1/100, 1/10, 1, -1, 2} in 256-bit Arb:
+        two_grade_norm_and_transfer_rows: List[Dict[str, Any]] = []
+        for k_label, k_num, k_den in (
+            ("0", 0, 1),
+            ("1/1000", 1, 1000),
+            ("-1/1000", -1, 1000),
+            ("1/100", 1, 100),
+            ("-1/100", -1, 100),
+            ("1/10", 1, 10),
+            ("1", 1, 1),
+            ("-1", -1, 1),
+            ("2", 2, 1),
+        ):
+            k_a = arb(k_num) / arb(k_den)
+            kap_k = abs(k_a) * L_arb
+            X_k = kap_k.exp()
+            h0_k = h0_1_arb if k_num == 0 else evaluate_h0_arb(X_k)
+            norm_minus_k = arb(0) if k_num == 0 else (h0_1_arb - h0_k)
+            norm_plus_k = arb(2) * h0_1_arb if k_num == 0 else (h0_1_arb + h0_k)
+            j_k_arb = j0_arb if k_num == 0 else _eval_j_delta_certified_arb(kap_k)[0]
+            b_tr_mixed_k = arb(2) * h0_k - j_k_arb
+            b_tr_minus_k = (
+                arb(0)
+                if k_num == 0
+                else (b_transfer_psi_tau_arb - b_tr_mixed_k)
+            )
+            b_tr_plus_k = (
+                arb(2) * b_transfer_psi_tau_arb
+                if k_num == 0
+                else (b_transfer_psi_tau_arb + b_tr_mixed_k)
+            )
+            two_grade_norm_and_transfer_rows.append(
+                {
+                    "K_label": k_label,
+                    "K_float": float(k_a.mid()),
+                    "X_K_eq_tau_abs_K": float(X_k.mid()),
+                    "norm_f_minus_sq_certified": serialize_arb_certified(
+                        norm_minus_k
+                    ),
+                    "norm_f_plus_sq_certified": serialize_arb_certified(
+                        norm_plus_k
+                    ),
+                    "norm_f_minus_sq_below_false_floor_0_258495": bool(
+                        norm_minus_k.upper() < arb("0.258495")
+                    ),
+                    "B_transfer_mixed_T_K_psi_tau_certified": serialize_arb_certified(
+                        b_tr_mixed_k
+                    ),
+                    "B_transfer_f_minus_certified": serialize_arb_certified(
+                        b_tr_minus_k
+                    ),
+                    "B_transfer_f_plus_certified": serialize_arb_certified(
+                        b_tr_plus_k
+                    ),
+                    "abs_B_transfer_f_minus_le_2_norm_minus_sq": bool(
+                        abs(b_tr_minus_k).lower()
+                        <= (arb(2) * norm_minus_k).upper()
+                    ),
+                    "abs_B_transfer_f_plus_le_2_norm_plus_sq": bool(
+                        abs(b_tr_plus_k).lower()
+                        <= (arb(2) * norm_plus_k).upper()
+                    ),
+                    "abs_B_transfer_f_pm_le_4_h0_1": bool(
+                        abs(b_tr_minus_k).upper()
+                        <= b_transfer_two_grade_plancherel_bound_arb.lower()
+                        and abs(b_tr_plus_k).upper()
+                        <= b_transfer_two_grade_plancherel_bound_arb.lower()
+                    ),
+                    "abs_B_transfer_mixed_le_2_h0_1": bool(
+                        abs(b_tr_mixed_k).upper()
+                        <= b_transfer_mixed_grade_plancherel_bound_arb.lower()
+                    ),
+                    "refutes_false_0_633039_bound": bool(
+                        abs(b_tr_plus_k).lower() > false_tc045_transfer_bound_arb
+                        or abs(b_tr_minus_k).lower()
+                        > false_tc045_transfer_bound_arb
+                    ),
+                }
+            )
 
         recovered_arithmetic_and_implication = {
             "W_definition": "W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)",
@@ -8575,32 +8783,95 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                 ),
                 "values_at_X_eq_1": {
                     "W_1_certified": serialize_arb_certified(w_1_arb),
+                    "W_1_is_strictly_negative": bool(w_1_arb.upper() < arb(0)),
                     "W_log_1_certified": serialize_arb_certified(w_log_1_arb),
                     "R_mu_1_certified": serialize_arb_certified(r_mu_1_arb),
+                    "h0_at_9_certified": serialize_arb_certified(h0_9_arb),
+                    "h0_at_9_is_strictly_negative": bool(
+                        h0_9_arb.upper() < arb(0)
+                    ),
                 },
+            },
+            "norm_floor_and_transfer_bound_repair_tc045r": {
+                "exact_two_grade_norm_identity": "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|})",
+                "minus_state_vanishing_as_K_to_0": (
+                    "For f_-^{(K)} = (psi_tau - T_K psi_tau)/sqrt(2), continuity of h_0 gives "
+                    "||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0 along nonzero admissible "
+                    "rational grades K = 1/n in A_R \\ {0} (e.g. ||f_-^{(+/- 1/1000)}||_{L^2}^2 = 2.68872306e-5 "
+                    "and ||f_-^{(+/- 1/100)}||_{L^2}^2 = 2.68509890e-3). Excluding K = 0 does NOT produce a "
+                    "uniform positive lower bound on ||f_-^{(K)}||_{L^2}^2, so the TC-045 division construction "
+                    "of mu_0 is withdrawn."
+                ),
+                "plus_state_norm_floor_certified": serialize_arb_certified(
+                    plus_state_norm_sq_lower_bound_arb
+                ),
+                "false_0_633039_transfer_bound_reproduction_and_origin": {
+                    "counterexample_at_K_eq_0": (
+                        f"At K = 0, f_+^(0) = sqrt(2) psi_tau gives B_transfer(f_+^(0)) = 2 B_transfer(psi_tau) "
+                        f"= {float(b_transfer_f_plus_0_arb.mid()):.10f} > 0.633039 (and as |K| -> infty, "
+                        f"B_transfer(f_pm^(K)) -> B_transfer(psi_tau) = {float(b_transfer_psi_tau_arb.mid()):.10f} > 0.633039)."
+                    ),
+                    "origin_of_0_633039": (
+                        f"The constant 0.633039 was erroneously copied from the earlier loose forward-prime bound "
+                        f"(92193/32768) * 0.225 = {float(loose_forward_prime_bound_origin_arb.mid()):.10f} for |W(tau^(-|K|))|, "
+                        f"which has no relation to B_transfer."
+                    ),
+                    "B_transfer_psi_tau_certified": serialize_arb_certified(
+                        b_transfer_psi_tau_arb
+                    ),
+                    "B_transfer_f_plus_0_certified": serialize_arb_certified(
+                        b_transfer_f_plus_0_arb
+                    ),
+                    "B_transfer_f_minus_0_certified": serialize_arb_certified(
+                        b_transfer_f_minus_0_arb
+                    ),
+                },
+                "proven_plancherel_transfer_bounds": {
+                    "quadratic_bound_formula": (
+                        "B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f) with 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt <= 4 ||f||_{L^2}^2 "
+                        "=> |B_transfer(f)| <= 2 ||f||_{L^2}^2."
+                    ),
+                    "two_grade_uniform_bound_4_h0_1_certified": serialize_arb_certified(
+                        b_transfer_two_grade_plancherel_bound_arb
+                    ),
+                    "mixed_grade_uniform_bound_2_h0_1_certified": serialize_arb_certified(
+                        b_transfer_mixed_grade_plancherel_bound_arb
+                    ),
+                    "lean_theorem": "transfer_form_plancherel_bound_and_minus_state_vanishing",
+                },
+                "two_grade_norm_and_transfer_table": two_grade_norm_and_transfer_rows,
             },
             "complete_implication_chain_to_correlation_bound": {
                 "step_1_moebius_to_W_bound": (
-                    "If |R_mu(X)| <= M_mu for all X >= 1, then |W(X)| <= M_log + M_mu =: M_0 for all X >= 1."
+                    "If |R_mu(X)| <= M_mu for all X >= 1, then |W(X)| <= M_log + M_mu =: M_0 for all X >= 1 "
+                    "(and conversely |W(X)| <= M_0 implies |R_mu(X)| <= M_0 + M_log)."
                 ),
-                "step_2_both_scale_directions_in_two_grade_prime_pairing": (
-                    "For normalized f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) and X_K = tau^{|K|} >= 1, "
-                    "W_prime(f_pm^{(K)} * (f_pm^{(K)})^*) = 2 W(1) +/- [W(tau^K) + W(tau^{-K})] "
-                    "= 2 W(1) +/- [W(X_K) + W(X_K^{-1})], preserving BOTH scale directions tau^K and tau^{-K}. "
-                    f"For the small-scale direction X_K^(-1) <= 1, |W(X_K^(-1))| <= C_{{W,0}} X_K^(-5/2) <= {float(c_w_0_arb.upper()):.8f} X_K^(-5/2)."
+                "step_2_both_scale_directions_in_mixed_and_two_grade_prime_pairings": (
+                    "For concurrent grades K, L in A_R with X_Delta = tau^{|K-L|} >= 1, the polarized prime pairing is "
+                    "W_prime((T_K psi_tau) * (T_L psi_tau)^*) = W(tau^{K-L}) + W(tau^{L-K}) = W(X_Delta) + W(X_Delta^{-1}) "
+                    "and for f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) it is 2 W(1) +/- [W(tau^K) + W(tau^{-K})], "
+                    "preserving BOTH scale directions tau^K and tau^{-K}. For the small-scale direction X_Delta^{-1} <= 1, "
+                    f"|W(X_Delta^(-1))| <= C_{{W,0}} X_Delta^(-5/2) <= {float(c_w_0_arb.upper()):.8f} X_Delta^(-5/2)."
                 ),
-                "step_3_transfer_and_PE_lower_bound": (
-                    "On S_tau, P_E(f_pm^{(K)}) = -W_prime(f_pm^{(K)} * (f_pm^{(K)})^*) + B_transfer(f_pm^{(K)}) "
-                    "with |B_transfer(f_pm^{(K)})| <= 0.633039 for all K in R. Hence "
-                    "|P_E(f_pm^{(K)})| <= 2|W(1)| + M_log + M_mu + C_{W,0} + 0.633039 =: M_PE < infty."
+                "step_3_direct_mixed_grade_polarization_with_retained_transfer": (
+                    "By polarized Attempt B (`attempt_B_pole_vanishing_transfer_cancellation_on_S_tau`), "
+                    "C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(X_Delta), where "
+                    "B_known(K, L) = W_arch(h_{K-L}) - W(X_Delta^{-1}) - W_log(X_Delta) and "
+                    "W_arch(h_{K-L}) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B} - c_tau^B h_0(X_Delta) "
+                    "+ B_transfer(T_K psi_tau, T_L psi_tau) retains the transfer form (with |B_transfer(T_K psi_tau, T_L psi_tau)| "
+                    f"<= 2 h_0(1) = {float(b_transfer_mixed_grade_plancherel_bound_arb.upper()):.8f}). Every term of B_known(K, L) is "
+                    "unconditionally bounded: |B_known(K, L)| <= 5.464660 + 0.46372979 + 3.34900802 = 9.27739781 < 9.4468 "
+                    "(spatial Bernstein–Taylor archimedean bound) and |B_known(K, L)| <= 3.26669033 + 0.46372979 + 3.34900802 = 7.07942813 "
+                    "(Attempt B Cauchy–Schwarz + Plancherel transfer bound)."
                 ),
-                "step_4_coercive_relative_semiboundedness_to_correlation_bound": (
-                    "Since ||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 >= 0 and ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(X_K) "
-                    f">= {float(norm_sq_lower_bound_arb.lower()):.8f} > 0 for all K != 0 (and ||f_+^(0)||^2 = 2 h_0(1)), "
-                    "setting mu_0 := M_PE / (h_0(1) - 0.00051185) >= 0 yields "
-                    "P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) "
-                    "for all K in A_R, which by `coercive_norm_shift_semiboundedness_implies_correlation_bound` "
-                    "implies |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1) < infty for all K in A_R."
+                "step_4_direct_equivalence_to_correlation_bound_and_separate_conditional_semiboundedness": (
+                    "Consequently, without dividing by ||f_-^{(K)}||_{L^2}^2, |R_mu(X)| <= M_mu for all X >= 1 directly implies "
+                    "|C_tau(K - L)| = |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_B + M_mu < infty for all K, L in A_R "
+                    "(and conversely |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_Q implies |R_mu(X_Delta)| <= M_Q + M_B), "
+                    "which by `fixed_seed_correlation_bound_implies_critical_line_schema` excludes off-critical zeros. "
+                    "Separately, `coercive_norm_shift_semiboundedness_implies_correlation_bound` remains a valid conditional "
+                    "one-way theorem: if P_E(f_pm^{(K)}) >= -(||A_tau^B f_pm^{(K)}||_{H_tau^B}^2 + mu_0 ||f_pm^{(K)}||_{L^2}^2) "
+                    "holds for some fixed finite mu_0 >= 0, then |C_tau(K)| <= C_tau(0) + 2(c_tau^B + mu_0)h_0(1)."
                 ),
                 "lean_theorem": "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence",
             },
@@ -8709,6 +8980,41 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                 "verification": ver_rt,
             }
 
+        # Step 5 (TASK-TC-045R): Verify that -H_0(z) zeta'(z + 1/2) is holomorphic on the open kernel strip
+        # |Re(z)| < 5/2, and MEROMORPHIC (NOT entire) on C with simple poles at z = +/-(2k + 1/2) (k >= 1):
+        # At z = 5/2 (s_+ = 3, s_- = -2):
+        #   F_tau(3) = (3^2 * 2^2 / 32) * pi^{-3/2} * Gamma(3/2) = (9/8) * pi^{-3/2} * (sqrt(pi)/2) = (9/16) * pi^{-1},
+        #   Res_{z=5/2} F_tau(1/2 - z) = ((-2)^2 * (-3)^2 / 32) * pi^1 * Res_{z=5/2} Gamma((1/2 - z)/2)
+        #                              = (9/8) * pi * ((-1) * (-2)) = (9/4) * pi,
+        #   Res_{z=5/2} H_0(z) = (9/16 * pi^{-1}) * (9/4 * pi) = 81/64 = 1.265625,
+        #   Res_{z=5/2}[-H_0(z) zeta'(z + 1/2)] = (81/64) * (-zeta'(3)) = +0.25075352615213414... != 0.
+        res_h0_at_5_2_rational = Fraction(81, 64)
+        res_h0_at_5_2_arb = arb(81) / arb(64)
+        res_neg_h0_zeta_prime_at_5_2_arb = (
+            res_h0_at_5_2_arb * neg_zeta_prime_3_arb
+        )
+        # Cross-check Res_{z=5/2} H_0(z) = lim_{z -> 5/2} (z - 5/2) * H_0(z) symbolically in SymPy:
+        eps_sym = sp.Symbol("eps", positive=True)
+        z_pole_expr = sp.Rational(5, 2) - eps_sym
+        s_plus_p = sp.Rational(1, 2) + z_pole_expr
+        s_minus_p = sp.Rational(1, 2) - z_pole_expr
+        f_plus_p = (
+            (s_plus_p**2 * (s_plus_p - 1) ** 2 / 32)
+            * (sp.pi ** (-s_plus_p / 2))
+            * sp.gamma(s_plus_p / 2)
+        )
+        f_minus_p = (
+            (s_minus_p**2 * (s_minus_p - 1) ** 2 / 32)
+            * (sp.pi ** (-s_minus_p / 2))
+            * sp.gamma(s_minus_p / 2)
+        )
+        res_h0_sym = sp.limit(
+            (z_pole_expr - sp.Rational(5, 2)) * f_plus_p * f_minus_p, eps_sym, 0
+        )
+        res_h0_at_5_2_symbolic_verified = bool(
+            sp.simplify(res_h0_sym - sp.Rational(81, 64)) == 0
+        )
+
         repaired_tc044_defects_audit = {
             "defect_3a_spectral_aggregation_and_synthetic_quartet_repair": {
                 "mellin_transform_conventions": {
@@ -8737,15 +9043,33 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     ),
                 },
                 "meromorphic_continuation_statement": (
-                    "By meromorphic continuation from 1/2 < Re(z) < 5/2 to C, harmonic divisor aggregation "
-                    "multiplies M_X[W](z) by zeta(z + 1/2), cancelling the poles of -zeta'(z+1/2)/zeta(z+1/2) "
-                    "at all actual nontrivial zeros rho = 1/2 + z_rho of zeta(s) IRRESPECTIVE of their real parts "
-                    "(while the triple zero H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0 cancels the double pole of "
-                    "-zeta'(z+1/2) at z = 1/2, so M_X[W_log](z) = -H_0(z) zeta'(z+1/2) is entire on C). "
+                    "By meromorphic continuation from 1/2 < Re(z) < 5/2 to the open kernel strip |Re(z)| < 5/2 (and C), "
+                    "harmonic divisor aggregation multiplies M_X[W](z) by zeta(z + 1/2), cancelling the poles of "
+                    "-zeta'(z+1/2)/zeta(z+1/2) at all actual nontrivial zeros rho = 1/2 + z_rho of zeta(s) IRRESPECTIVE "
+                    "of their real parts, while the triple zero H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0 cancels the double "
+                    "pole of -zeta'(z+1/2) at z = 1/2. Thus M_X[W_log](z) = -H_0(z) zeta'(z+1/2) extends HOLOMORPHICALLY "
+                    "to the open kernel strip |Re(z)| < 5/2, and MEROMORPHICALLY (NOT entire) to C, where H_0(z) = "
+                    "F_tau(1/2+z)F_tau(1/2-z) has simple poles at z = +/-(2k + 1/2) (k >= 1) from the Gamma poles of "
+                    "F_tau(s) at s = -2k <= -2 (in particular a simple pole at z = 5/2 with residue "
+                    f"Res_{{z=5/2}}[-H_0(z)zeta'(z+1/2)] = (81/64)(-zeta'(3)) = +{float(res_neg_h0_zeta_prime_at_5_2_arb.mid()):.10f} != 0). "
                     "Conversely, Moebius inversion W(X) = sum_{m>=1} (mu(m)/sqrt(m)) W_log(X/m) multiplies "
                     "M_X[W_log](z) by sum_{m>=1} mu(m) m^{-(z+1/2)} = 1/zeta(z+1/2) on Re(z) > 1/2 and by "
                     "meromorphic continuation restores the denominator zeta(z + 1/2)."
                 ),
+                "kernel_strip_holomorphy_vs_global_poles": {
+                    "holomorphic_open_strip": "|Re(z)| < 5/2",
+                    "is_entire_on_C": False,
+                    "global_poles_of_H0_z": "z = +/-(2k + 1/2) for integers k >= 1 (from Gamma((1/2 +/- z)/2) poles at -k <= -1)",
+                    "first_right_pole_z": "5/2  (where 1/2 - z = -2 and z + 1/2 = 3)",
+                    "res_H0_at_5_2_rational": str(res_h0_at_5_2_rational),
+                    "res_H0_at_5_2_symbolic_verified": res_h0_at_5_2_symbolic_verified,
+                    "res_neg_H0_zeta_prime_at_5_2_certified": serialize_arb_certified(
+                        res_neg_h0_zeta_prime_at_5_2_arb
+                    ),
+                    "res_neg_H0_zeta_prime_at_5_2_certified_nonzero": bool(
+                        res_neg_h0_zeta_prime_at_5_2_arb.lower() > arb("0.25")
+                    ),
+                },
                 "synthetic_quartet_convergence_and_regularization": {
                     "ordinary_dirichlet_series_divergence": (
                         "For 0 < Re(rho_0) < 1, the ordinary Dirichlet series sum_{m=1}^infty m^{-rho_0} diverges "
@@ -8754,8 +9078,9 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     ),
                     "actual_W_vs_isolated_mode_explanation": (
                         "On the actual profile W(X), the unsubtracted sum sum_{m=1}^infty m^{-1/2} W(X/m) converges "
-                        "absolutely because W(u) = O(u^{5/2}) as u -> 0^+ (since all poles in Re(s) <= 3 including s = 1 "
-                        "and all nontrivial zeros cancel in the contour shift to Re(z) = -5/2). An isolated synthetic mode "
+                        "absolutely because W(u) = O(u^{5/2}) as u -> 0^+ (since all poles in |Re(z)| < 5/2 including s = 1 "
+                        "and all nontrivial zeros cancel in the contour shift to Re(z) -> -5/2^+, where the simple pole of "
+                        "H_0(z) at z = -5/2 generates the leading small-scale term O(u^{5/2})). An isolated synthetic mode "
                         "X^{rho_0 - 1/2} has not been combined with a pole-cancelling completion at small scales, so "
                         "divisor aggregation on the isolated mode requires the Euler-Maclaurin pole-subtracted regularization "
                         "lim_{M->infty} (sum_{m=1}^M m^{-rho_0} - M^{1-rho_0}/(1-rho_0) - (1/2) M^{-rho_0}) = zeta(rho_0)."
@@ -8926,20 +9251,45 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         # -------------------------------------------------------------------
         # 4A. Mixed-grade polarization Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K - L|}):
         # For any K, L in A_R with Delta = K - L and X_Delta = tau^{|K - L|} >= 1:
-        #   Q_tau(T_K psi_tau, T_L psi_tau)
+        #   C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau)
         #     = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B}
         #       - c_tau^B h_0(X_Delta)
         #       + B_transfer(T_K psi_tau, T_L psi_tau)
         #       - W(X_Delta^{-1}) - W_log(X_Delta) - R_mu(X_Delta)
         #     = B_known(K, L) - R_mu(X_Delta),
-        # where EVERY constituent of B_known(K, L) is unconditionally bounded:
-        #   |<A_tau^B T_K psi_tau, A_tau^B T_L psi_tau> - c_tau^B h_0(X_Delta) + B_transfer(T_K psi_tau, T_L psi_tau)|
-        #     <= |W_arch(h_{K-L})| <= 5.464660,
-        #   |W(X_Delta^{-1})| <= C_{W,0} X_Delta^{-5/2} <= 0.46372978321 < 0.633039,
-        #   |W_log(X_Delta)| <= 3.34900802,
-        # so |B_known(K, L)| <= 5.464660 + 0.46372978321 + 3.34900802 = 9.27739780321 < 9.4468 for all K, L in A_R!
+        # where B_known(K, L) = W_arch(h_{K-L}) - W(X_Delta^{-1}) - W_log(X_Delta) retains B_transfer(T_K psi_tau, T_L psi_tau)
+        # inside W_arch(h_{K-L}) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau> - c_tau^B h_0(X_Delta) + B_transfer(T_K psi_tau, T_L psi_tau),
+        # and EVERY constituent of B_known(K, L) is unconditionally bounded via TWO independent archimedean bounds:
+        #   (1) Global spatial Bernstein-Taylor archimedean bound (Section 9):
+        #       |W_arch(h_{K-L})| <= 5.4646598515007655 < 5.464660,
+        #       |W(X_Delta^{-1})| <= C_{W,0} X_Delta^{-5/2} <= 0.46372978321,
+        #       |W_log(X_Delta)|  <= 3.34900802,
+        #       => |B_known(K, L)| <= 5.464660 + 0.46372978321 + 3.34900802 = 9.27739780321 < 9.4468.
+        #   (2) Attempt B Cauchy-Schwarz + Plancherel transfer bound:
+        #       |<A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>| <= ||A_tau^B psi_tau||_{H_tau^B}^2 = 0.59663797490,
+        #       |-c_tau^B h_0(X_Delta)| <= c_tau^B h_0(1) = 1.67532737975,
+        #       |B_transfer(T_K psi_tau, T_L psi_tau)| <= 2 h_0(1) = 0.99472496762,
+        #       => |W_arch(h_{K-L})| <= ||A_tau^B psi_tau||_{H_tau^B}^2 + (c_tau^B + 2) h_0(1) = 3.26669032227,
+        #       => |B_known(K, L)| <= 3.26669032227 + 0.46372978321 + 3.34900802 = 7.07942812548 < 7.07943!
+        w_arch_0_arb = evaluate_archimedean_integral_certified_arb(
+            arb(0), prec_bits=prec_bits
+        )["w_arch_total_arb"]
+        norm_A_B_0_sq_arb = (
+            w_arch_0_arb
+            + c_tau_A_arb * h0_1_arb
+            - arb(4) * h0_1_arb
+            + j0_arb
+        )
+        w_arch_operator_transfer_bound_arb = (
+            norm_A_B_0_sq_arb + (c_tau_B_arb + arb(2)) * h0_1_arb
+        )
         b_known_universal_bound_arb = (
             arb("5.464660") + c_w_0_arb + m_log_uncond_bound_arb
+        )
+        b_known_operator_transfer_bound_arb = (
+            w_arch_operator_transfer_bound_arb
+            + c_w_0_arb
+            + m_log_uncond_bound_arb
         )
 
         # Evaluate the mixed-grade pairing decomposition across Delta = K - L in {0.0, 0.5, 1.0, 1.5, 2.0}:
@@ -8958,8 +9308,27 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         mixed_grade_rows: List[Dict[str, Any]] = []
         for delta_val in (0.0, 0.5, 1.0, 1.5, 2.0):
             delta_a = arb(str(delta_val))
-            X_d = (abs(delta_a) * L_arb).exp()
+            kap_d = abs(delta_a) * L_arb
+            X_d = kap_d.exp()
             inv_X_d = arb(1) / X_d
+
+            arch_d = evaluate_archimedean_integral_certified_arb(
+                abs(delta_a), prec_bits=prec_bits
+            )
+            h0_d = arch_d["hK_1_arb"]
+            w_arch_d = arch_d["w_arch_total_arb"]
+            j_d_arb = (
+                j0_arb
+                if delta_val == 0.0
+                else _eval_j_delta_certified_arb(kap_d)[0]
+            )
+            inner_A_B_d = (
+                w_arch_d + c_tau_A_arb * h0_d - arb(4) * h0_d + j_d_arb
+            )
+            b_transfer_mixed_d = arb(2) * h0_d - j_d_arb
+            smooth_plus_transfer_diff_d = (
+                inner_A_B_d - c_tau_B_arb * h0_d + b_transfer_mixed_d
+            ) - w_arch_d
 
             w_pos_d = _eval_W_fast_arb(X_d, min_cut=5000)
             w_neg_d = (
@@ -8968,6 +9337,7 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                 else _eval_W_fast_arb(inv_X_d, min_cut=1500)
             )
             w_log_pos_d = _eval_W_log_fast_arb(X_d, min_cut=5000)
+            b_known_d = w_arch_d - w_neg_d - w_log_pos_d
 
             h_grid = [arb(0), arb(0)] + [
                 evaluate_h0_arb(arb(n_i) * inv_X_d)
@@ -9001,18 +9371,41 @@ def execute_task_tc045_cross_grade_moebius_recovery(
             r_mu_direct_d = r_mu_fin + arb(0, r_mu_tail.upper())
             w_moebius_reconstructed_d = w_log_pos_d + r_mu_direct_d
             moebius_consistency_diff = w_pos_d - w_moebius_reconstructed_d
+            q_tau_direct_d = w_arch_d - w_neg_d - w_pos_d
+            q_tau_from_b_known_minus_r_mu_d = b_known_d - r_mu_direct_d
+            q_tau_decomp_diff_d = (
+                q_tau_direct_d - q_tau_from_b_known_minus_r_mu_d
+            )
 
             mixed_grade_rows.append(
                 {
                     "Delta_eq_K_minus_L": delta_val,
                     "X_Delta_eq_tau_abs_Delta": float(X_d.mid()),
+                    "W_arch_certified": serialize_arb_certified(w_arch_d),
+                    "B_transfer_mixed_certified": serialize_arb_certified(
+                        b_transfer_mixed_d
+                    ),
+                    "smooth_plus_transfer_equals_W_arch_encloses_zero": bool(
+                        smooth_plus_transfer_diff_d.contains(0)
+                    ),
                     "W_X_Delta_certified": serialize_arb_certified(w_pos_d),
                     "W_inv_X_Delta_certified": serialize_arb_certified(w_neg_d),
                     "W_log_X_Delta_certified": serialize_arb_certified(
                         w_log_pos_d
                     ),
+                    "B_known_K_L_certified": serialize_arb_certified(b_known_d),
+                    "abs_B_known_below_operator_transfer_bound": bool(
+                        abs(b_known_d).upper()
+                        <= b_known_operator_transfer_bound_arb.lower()
+                    ),
                     "R_mu_X_Delta_direct_certified": serialize_arb_certified(
                         r_mu_direct_d
+                    ),
+                    "Q_tau_T_K_T_L_certified": serialize_arb_certified(
+                        q_tau_direct_d
+                    ),
+                    "Q_tau_equals_B_known_minus_R_mu_encloses_zero": bool(
+                        q_tau_decomp_diff_d.contains(0)
                     ),
                     "W_minus_W_log_plus_R_mu_encloses_zero": bool(
                         moebius_consistency_diff.contains(0)
@@ -9199,13 +9592,22 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         mixed_grade_and_mertens_audit = {
             "mixed_grade_polarization_identity": {
                 "formula": (
-                    "Q_tau(T_K psi_tau, T_L psi_tau) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B} "
+                    "C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau>_{H_tau^B} "
                     "- c_tau^B h_0(tau^{|K-L|}) + B_transfer(T_K psi_tau, T_L psi_tau) "
                     "- W(tau^{-|K-L|}) - W_log(tau^{|K-L|}) - R_mu(tau^{|K-L|}) "
                     "= B_known(K, L) - R_mu(tau^{|K-L|})"
                 ),
+                "retains_B_transfer_and_both_scale_directions": (
+                    "B_known(K, L) = W_arch(h_{K-L}) - W(tau^{-|K-L|}) - W_log(tau^{|K-L|}) retains "
+                    "B_transfer(T_K psi_tau, T_L psi_tau) inside W_arch(h_{K-L}) = <A_tau^B T_K psi_tau, A_tau^B T_L psi_tau> "
+                    "- c_tau^B h_0(tau^{|K-L|}) + B_transfer(T_K psi_tau, T_L psi_tau) and retains both scale directions "
+                    "tau^{|K-L|} (in W_log(tau^{|K-L|}) + R_mu(tau^{|K-L|})) and tau^{-|K-L|} (in W(tau^{-|K-L|}))."
+                ),
                 "unconditional_bound_on_B_known": {
                     "archimedean_pairing_bound": 5.464660,
+                    "archimedean_operator_plus_plancherel_transfer_bound_certified": serialize_arb_certified(
+                        w_arch_operator_transfer_bound_arb
+                    ),
                     "small_scale_W_inv_X_bound": float(c_w_0_arb.upper()),
                     "divisor_aggregated_W_log_bound": float(
                         m_log_uncond_bound_arb.upper()
@@ -9213,15 +9615,27 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     "B_known_universal_upper_bound": float(
                         b_known_universal_bound_arb.upper()
                     ),
+                    "B_known_operator_plus_transfer_upper_bound": float(
+                        b_known_operator_transfer_bound_arb.upper()
+                    ),
+                    "B_known_operator_plus_transfer_certified": serialize_arb_certified(
+                        b_known_operator_transfer_bound_arb
+                    ),
                     "certified_below_9_4468": bool(
                         b_known_universal_bound_arb.upper() <= arb("9.4468")
                     ),
+                    "certified_below_7_07943_via_operator_transfer": bool(
+                        b_known_operator_transfer_bound_arb.upper()
+                        <= arb("7.07943")
+                    ),
                 },
                 "equivalence_theorem": (
-                    "For all K, L in A_R, |Q_tau(T_K psi_tau, T_L psi_tau) + R_mu(tau^{|K-L|})| = |B_known(K, L)| < 9.4468. "
-                    "Consequently, uniform boundedness of the mixed-grade pairings sup_{K,L in A_R} |Q_tau(T_K psi_tau, T_L psi_tau)| < infty "
-                    "(and relative semiboundedness on normalized two-grade states f_pm^{(K)}) is unconditionally equivalent "
-                    "to uniform boundedness sup_{X >= 1} |R_mu(X)| < infty."
+                    "For all K, L in A_R, |C_tau(K - L) + R_mu(tau^{|K-L|})| = |Q_tau(T_K psi_tau, T_L psi_tau) + R_mu(tau^{|K-L|})| "
+                    "= |B_known(K, L)| <= 7.07942813 < 9.27739781 < 9.4468. Consequently, uniform boundedness of the mixed-grade "
+                    "pairings sup_{K,L in A_R} |Q_tau(T_K psi_tau, T_L psi_tau)| = sup_{K in A_R} |C_tau(K)| < infty "
+                    "is unconditionally equivalent to uniform boundedness sup_{X >= 1} |R_mu(X)| < infty (and sup_{X >= 1} |W(X)| < infty), "
+                    "without dividing by ||f_-^{(K)}||_{L^2}^2. Coercive relative semiboundedness on f_pm^{(K)} is treated "
+                    "separately as a conditional one-way sufficient hypothesis (`coercive_norm_shift_semiboundedness_implies_correlation_bound`)."
                 ),
                 "certified_mixed_grade_table": mixed_grade_rows,
                 "lean_theorem": "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence",
@@ -9260,12 +9674,13 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                 "unconditional_mertens_bound_obstruction": (
                     "Inserting the strongest known unconditional zero-free-region Mertens bounds "
                     "|M(y)| <= C_mu y exp(-c_mu sqrt(log y)) (Schoenfeld 1969; El Marraki 1995; Titchmarsh 1986, Section 14.26) "
-                    "into R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du yields only "
+                    "into R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du yields only an unsigned upper bound "
                     "|R_mu(X)| <= X^{1/2} int_0^{X/2} |M_{>=2}(X/u)/(X/u)| u^{-1} |phi_log'(u)| du "
                     "= O(X^{1/2} exp(-c_mu' sqrt(log X))) -> +infty as X -> infty, because the X^{-1/2} prefactor "
-                    "cancels only half a power of y = X/u ~ X. Achieving O(1) boundedness requires exploiting "
-                    "signed oscillation of M_{>=2}(X/u) against the smooth derivative kernel phi_log'(u) "
-                    "(or an arithmetic-Fourier positivity identity on S_tau)."
+                    "cancels only half a power of y = X/u ~ X. This growing upper bound shows that an unsigned point-wise "
+                    "Mertens bound is insufficient to prove O(1) boundedness (it does NOT prove that the signed integral "
+                    "R_mu(X) itself diverges). Achieving O(1) boundedness requires exploiting signed cancellation of "
+                    "M_{>=2}(X/u) against the smooth derivative kernel phi_log'(u) (or an arithmetic-Fourier positivity identity on S_tau)."
                 ),
                 "lean_theorem": "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
             },
@@ -9273,7 +9688,7 @@ def execute_task_tc045_cross_grade_moebius_recovery(
 
         premise_classification_tc045 = {
             "category_i_already_proved_in_repository": [
-                "Attempt B decomposition Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + P_E(f) and coercive norm-shifted semiboundedness reduction (`coercive_norm_shift_semiboundedness_implies_correlation_bound`).",
+                "Attempt B decomposition Q_tau(f, f) = ||A_tau^B f||_{H_tau^B}^2 - c_tau^B ||f||_{L^2}^2 + P_E(f), conditional coercive norm-shifted semiboundedness reduction (`coercive_norm_shift_semiboundedness_implies_correlation_bound`), and Plancherel transfer bound |B_transfer(f)| <= 2||f||_{L^2}^2 (`transfer_form_plancherel_bound_and_minus_state_vanishing`).",
                 "Prime-shift quadratic form identity D_N(f) - 2 L_N ||f||_{L^2}^2 = -W_{prime, N}(f*f^*) (`prime_shift_quadratic_form_and_subtracted_finite_part_equivalence`).",
                 "Unconditional uniform bound |W_log(X)| <= 3.34900802 < 3.34901 and O(X^{-1/2} log(X+2)) decay of the divisor-aggregated functional W_log(X), and exact Moebius inversion W(X) = W_log(X) + R_mu(X) (`divisor_aggregated_stieltjes_and_moebius_inversion_identity`).",
             ],
@@ -9284,9 +9699,9 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                 "Unconditional Mertens function bounds M(y) = O(y exp(-c_mu sqrt(log y))) from the classical/Korobov-Vinogradov zero-free region (Schoenfeld 1969; El Marraki 1995; Titchmarsh 1986, Section 14.26).",
             ],
             "category_iii_new_statements_proved_in_task_tc045": [
-                "Repaired Mellin Strip & Synthetic-Quartet Regularization: Fubini-Tonelli derivation of M_X[W](z) = -H_0(z) zeta'(z+1/2)/zeta(z+1/2) and M_X[W_log](z) = -H_0(z) zeta'(z+1/2) on 1/2 < Re(z) < 5/2, meromorphic continuation pole cancellation vs Moebius restoration, and Euler-Maclaurin pole-subtracted regularization on isolated synthetic modes.",
+                "Repaired Mellin Strip, Kernel-Strip Holomorphy vs Global Poles, & Synthetic-Quartet Regularization: Fubini-Tonelli derivation of M_X[W](z) = -H_0(z) zeta'(z+1/2)/zeta(z+1/2) and M_X[W_log](z) = -H_0(z) zeta'(z+1/2) on 1/2 < Re(z) < 5/2, holomorphy of -H_0(z)zeta'(z+1/2) on the open kernel strip |Re(z)| < 5/2 vs global meromorphy with simple pole at z = 5/2 (Res_{z=5/2} = (81/64)(-zeta'(3)) != 0), and Euler-Maclaurin pole-subtracted regularization on isolated synthetic modes.",
                 "Small-Scale O(u^{5/2}) Bound, Compact-Interval Uniform Convergence, and Algebraic-Grade Supremum Equality (`small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity`): |W_log(u)| <= C_{log,0} u^{5/2} for all u > 0 (C_{log,0} = (92193/32768)(-zeta'(3)) <= 0.55742959), uniform convergence of R_mu(X) on compact intervals [a, b] subset (0, infty), continuity of R_mu(X) and W(X) on (0, infty), and sup_{K in A_R} |R_mu(tau^{|K|})| = sup_{X >= 1} |R_mu(X)|.",
-                "Mixed-Grade Pairing Polarization & Mertens Stieltjes Representation (`mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence`): Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| < 9.4468, simultaneous-grade Toeplitz counterexample control, and exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du.",
+                "Mixed-Grade Pairing Polarization & Mertens Stieltjes Representation (`mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence`): C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| <= 7.07942813 < 9.27739781 < 9.4468 (retaining B_transfer(T_K psi_tau, T_L psi_tau) and both scale directions), simultaneous-grade Toeplitz counterexample control, and exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du.",
             ],
             "category_iv_unproved_premise": {
                 "subgate_id": "SUBGATE-TC-043A",
@@ -9296,15 +9711,17 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     "M_mu < infty such that for all X >= 1, the signed Moebius recovery remainder "
                     "R_mu(X) = sum_{m=2}^infty (mu(m)/sqrt(m)) W_log(X/m) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du "
                     "satisfies |R_mu(X)| <= M_mu (equivalently, |W(X)| <= M_log + M_mu and "
-                    "|Q_tau(T_K psi_tau, T_L psi_tau)| <= 9.4468 + M_mu for all K, L in A_R)."
+                    "|C_tau(K - L)| = |Q_tau(T_K psi_tau, T_L psi_tau)| <= M_B + M_mu for all K, L in A_R)."
                 ),
             },
         }
 
-        return {
+        result_tc045 = {
             "task_id": TASK_TC_045_ID,
+            "repair_task_id": TASK_TC_045R_ID,
             "parent_epic": EPIC_TC_042_ID,
             "inspected_baseline": STARTING_HEAD_TC_045,
+            "repair_inspected_baseline": STARTING_HEAD_TC_045R,
             "status": CROSS_GRADE_MOEBIUS_RECOVERY_STATUS,
             "section_1_recovered_arithmetic_result_and_implication_chain": recovered_arithmetic_and_implication,
             "section_2_repaired_tc044_defects_audit": repaired_tc044_defects_audit,
@@ -9312,6 +9729,13 @@ def execute_task_tc045_cross_grade_moebius_recovery(
             "section_4_mixed_grade_relation_and_moebius_recovery": mixed_grade_and_mertens_audit,
             "section_5_premise_classification_and_next_lemma": premise_classification_tc045,
         }
+        full_tree_rt_sec14 = verify_all_serialized_arb_in_tree(
+            result_tc045, path_prefix="section_14"
+        )
+        repaired_tc044_defects_audit[
+            "defect_3b_numerical_serialization_and_roundtrip_repair"
+        ]["full_section_14_tree_roundtrip_verification"] = full_tree_rt_sec14
+        return result_tc045
     finally:
         flint_ctx.prec = saved_prec
 
@@ -9414,6 +9838,12 @@ def build_canonical_theta_correlation_bound_report(
     task_tc045_audit = execute_task_tc045_cross_grade_moebius_recovery(
         prec_bits=prec_bits
     )
+    full_tree_rt_sec13 = verify_all_serialized_arb_in_tree(
+        task_tc044_audit, path_prefix="section_13"
+    )
+    task_tc045_audit["section_2_repaired_tc044_defects_audit"][
+        "defect_3b_numerical_serialization_and_roundtrip_repair"
+    ]["full_section_13_tree_roundtrip_verification"] = full_tree_rt_sec13
     lean_audit = verify_canonical_theta_correlation_lean_module()
     wavelet_audit = proof_attempts["attempt_3_large_grade_wavelet_decomposition"][
         "uniform_prime_wavelet_boundedness"
@@ -9437,6 +9867,7 @@ def build_canonical_theta_correlation_bound_report(
         "compatibility_repair_task_id": TASK_TC_043R_ID,
         "prime_shift_task_id": TASK_TC_044_ID,
         "moebius_recovery_task_id": TASK_TC_045_ID,
+        "moebius_recovery_repair_task_id": TASK_TC_045R_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -9449,6 +9880,7 @@ def build_canonical_theta_correlation_bound_report(
         "compatibility_repair_starting_head": STARTING_HEAD_TC_043R,
         "prime_shift_starting_head": STARTING_HEAD_TC_044,
         "moebius_recovery_starting_head": STARTING_HEAD_TC_045,
+        "moebius_recovery_repair_starting_head": STARTING_HEAD_TC_045R,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",

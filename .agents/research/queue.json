@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-045",
+  "active_task_id": "TASK-TC-045R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1435,6 +1435,33 @@
         ".agents/corpus_map/obligation_register.md"
       ],
       "resolution": "TASK-TC-045 established arithmetic baseline recovery (Section 2), TC-044 Mellin strip / Euler-Maclaurin regularization and outward-rounded Arb ball serialization repairs (Section 3), small-scale tail bound |W_log(u)| <= C_{log,0} u^{5/2}, continuity on (0, infty), and supremum equivalence over A_R vs R (Section 4), and mixed-grade polarization Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}), simultaneous-grade covariance + Toeplitz counterexample control, and exact Mertens Stieltjes representation R_mu(X) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du (Section 5) completed and certified; Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN via Moebius De-Aggregation / Mertens Stieltjes Cancellation Lemma, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 66 Lean declarations (24 def + 42 theorems, 743 total theorems, 0 sorry, 0 admit) compiled; 28/28 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
+    },
+    {
+      "task_id": "TASK-TC-045R",
+      "epic_id": "EPIC-TC-042",
+      "priority": 58,
+      "objective": "Verify and Repair the TC-045 Mathematical Claims and Completion Report (TASK-TC-045R / SUBGATE-TC-043A)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "Prove or falsify SUBGATE-TC-043A (MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE) via the Moebius De-Aggregation / Mertens Stieltjes Cancellation Lemma: given the direct mixed-grade polarization identity C_tau(K - L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) with |B_known(K, L)| <= 9.27739781 < 9.4468 (and <= 7.07942813 < 7.07943 via Attempt B) and R_mu(X) = sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m) = X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du, prove or falsify that sup_{X>=1} |R_mu(X)| < infty (equivalently sup_{K in A_R} |C_tau(K)| < infty without dividing by ||f_-^{(K)}||_{L^2}^2).",
+      "planned_calculation": "1) Step 2: Verify ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}) and that ||f_-^{(K)}||_{L^2}^2 -> 0 as K -> 0 along K = 1/n in A_R \\ {0}, removing the false uniform norm-floor claim on f_-^{(K)} and the division construction of mu_0 while keeping coercive_norm_shift_semiboundedness_implies_correlation_bound as a conditional one-way theorem. 2) Step 3: Reproduce the counterexamples to |B_transfer(f_pm^{(K)})| <= 0.633039 at K = 0 (B_transfer(f_+^(0)) = 1.9375304127 > 0.633039) and as |K| -> infty (B_transfer(psi_tau) = 0.9687652063 > 0.633039), trace 0.633039 to (92193/32768)*0.225, and prove/formalize the Plancherel bound |B_transfer(f)| <= 2||f||_{L^2}^2 (|B_transfer(f_pm^{(K)})| <= 4h_0(1) = 1.9894499352, |B_transfer(T_K psi_tau, T_L psi_tau)| <= 2h_0(1) = 0.9947249676, transfer_form_plancherel_bound_and_minus_state_vanishing). 3) Step 4: Repair the implication chain directly through C_tau(K-L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) retaining B_transfer(T_K psi_tau, T_L psi_tau) and both scale directions tau^{+/-|K-L|} with |B_known(K, L)| <= 9.27739781 < 9.4468 and <= 7.07942813 < 7.07943. 4) Step 5: Prove -H_0(z)zeta'(z+1/2) is holomorphic on the open kernel strip |Re(z)| < 5/2 and meromorphic on C with simple poles at z = +/-(2k+1/2) (k >= 1) and exact residue Res_{z=5/2} H_0(z) = +81/64, Res_{z=5/2}[-H_0(z)zeta'(z+1/2)] = (81/64)(-zeta'(3)) = +0.25075352615213414 != 0. 5) Step 6 & 7: Reconcile narrative details, verify full-tree outward-rounded Arb ball serialization (26 balls in Section 13 and 113 balls in Section 14), and add live 256-bit Arb regression tests in test_29.",
+      "acceptance_criterion": "All 29 tests in tests/test_tc_canonical_theta_correlation_bound.py passing; formal/RiemannScope/CanonicalThetaCorrelationBound.lean compiled with 67 declarations (24 def + 43 theorems, 744 total compiled theorems, 0 sorry, 0 admit); data/tc_canonical_theta_correlation_bound.json and docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md updated and reconciled; SUBGATE-TC-043A kept OPEN alongside SUBGATE-TC-042A and SUBGATE-TC-042B.",
+      "dependencies": [
+        "TASK-TC-045"
+      ],
+      "evidence": [
+        "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+        "scripts/build_formal.py",
+        "tc/canonical_theta_correlation_bound.py",
+        "tests/test_tc_canonical_theta_correlation_bound.py",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "data/tc_canonical_theta_correlation_bound.json",
+        "formal/RiemannScope/README.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "resolution": "TASK-TC-045R verified and repaired the false uniform norm-floor claim on f_-^{(K)} (Step 2), replaced the false 0.633039 transfer bound with the Plancherel bound |B_transfer(f)| <= 2||f||_{L^2}^2 <= 4h_0(1) = 1.9894499352 formalized in transfer_form_plancherel_bound_and_minus_state_vanishing (Step 3), repaired the implication chain directly through C_tau(K-L) = Q_tau(T_K psi_tau, T_L psi_tau) = B_known(K, L) - R_mu(tau^{|K-L|}) retaining B_transfer and both scale directions tau^{+/-|K-L|} with |B_known(K, L)| <= 7.07943 < 9.2774 < 9.4468 (Step 4), proved -H_0(z)zeta'(z+1/2) is holomorphic on |Re(z)| < 5/2 and meromorphic on C with simple pole at z = 5/2 of residue (81/64)(-zeta'(3)) = +0.2507535262 != 0 (Step 5), verified full-tree outward-rounded Arb ball serialization (26 balls in Section 13 and 113 balls in Section 14) and reconciled narrative summaries (Step 6), and added live 256-bit Arb regressions in test_29 (Step 7); Global Arithmetic Proof Gate (SUBGATE-TC-043A: MOVING_SCALE_PRIME_ERROR_COERCIVE_LOWER_BOUND_SUBGATE = OPEN via Moebius De-Aggregation / Mertens Stieltjes Cancellation Lemma, alongside SUBGATE-TC-042A and SUBGATE-TC-042B) remains OPEN and AWAITING_INDEPENDENT_REVIEW; 67 Lean declarations (24 def + 43 theorems, 744 total theorems, 0 sorry, 0 admit) compiled; 29/29 unit tests in tests/test_tc_canonical_theta_correlation_bound.py passing."
     }
   ]
 }

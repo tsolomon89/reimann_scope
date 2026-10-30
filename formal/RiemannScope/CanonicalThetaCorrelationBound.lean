@@ -1068,7 +1068,7 @@ def mertensStieltjesRemainderDecomp (upper_mertens_boundary mertens_stieltjes_in
     and Exact Equivalence with Möbius Recovery Boundedness.
     For any concurrent grades `K, L` with `X_Delta = tau^{|K - L|} >= 1`:
     (1) Given the Attempt B polarized decomposition `M_KL = inner_A_B - c_tau_B * inner_L2 + B_transfer - W_fwd - W_refl`,
-         the smooth archimedean identity `inner_A_B - c_tau_B * inner_L2 + B_transfer = W_arch`, and
+        the smooth archimedean identity `inner_A_B - c_tau_B * inner_L2 + B_transfer = W_arch`, and
         the exact Möbius recovery `W_refl = W_log + R_mu`, the mixed-grade pairing equals
         `mixedGradeCompletePairingDecomp W_arch W_fwd W_log R_mu = B_known - R_mu` where
         `B_known = W_arch - W_fwd - W_log`.
@@ -1076,8 +1076,9 @@ def mertensStieltjesRemainderDecomp (upper_mertens_boundary mertens_stieltjes_in
         the known background satisfies `|B_known| <= M_arch + M_fwd + M_log`.
     (3) Any bound `|R_mu| <= M_mu` implies `|M_KL| <= (M_arch + M_fwd + M_log) + M_mu`; conversely,
         any bound `|M_KL| <= M_corr` implies `|R_mu| <= M_corr + (M_arch + M_fwd + M_log)`.
-    Scope note: Formalizes the exact algebraic polarization and two-way triangle-inequality equivalence
-    from the supplied analytic Attempt B and Möbius inversion identities. -/
+    Scope note: Formalizes the direct two-way triangle-inequality equivalence between bounded `R_mu`
+    and bounded `M_KL = Q_tau(T_K psi_tau, T_L psi_tau) = C_tau(K - L)` without dividing by `||f_-^{(K)}||^2`
+    (which vanishes as `K -> 0`). -/
 theorem mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence
     (inner_A_B c_tau_B inner_L2 B_transfer W_arch W_fwd W_refl W_log R_mu
       M_arch M_fwd M_log M_mu M_corr : ℝ)
@@ -1118,7 +1119,8 @@ theorem mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence
         when `upper_mertens_boundary = 0` in the `B -> infty` limit (since `|M(B) * phi_log(X/B)| = O(B^{-2}) -> 0`),
         `R_mu_inf = mertens_stieltjes_int_inf`, and any unsigned Mertens envelope majorant `M_unsigned`
         satisfying `mertens_stieltjes_int_inf <= M_unsigned` and `M_unsigned >= c_mertens * sqrt_X_omega`
-        strictly exceeds `B_fixed` whenever `c_mertens * sqrt_X_omega > B_fixed`.
+        strictly exceeds `B_fixed` whenever `c_mertens * sqrt_X_omega > B_fixed` (demonstrating only that the
+        unsigned majorant grows, not that the signed integral `R_mu_inf` diverges).
     Scope note: Formalizes the algebraic majorant and summation-by-parts deductions from supplied
     small-scale kernel envelope and Stieltjes integration-by-parts hypotheses. -/
 theorem small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity
@@ -1141,5 +1143,39 @@ theorem small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity
   refine ⟨by linarith, by linarith, ?_⟩
   intro h_ex
   linarith
+
+/-- Theorem 43: Transfer-Form Plancherel Bound `|B_transfer(f)| <= 2 ||f||_{L^2}^2 <= 4 h_0(1)`
+    and Minus-State Norm Vanishing at `K = 0`.
+    Given `B_transfer(f) = attemptBTransferForm norm_sq J_val = 2 * norm_sq - J_val` and the Plancherel
+    resolvent bounds `0 <= J_val <= 4 * norm_sq` (since `0 < 1 / (t^2 + 1/4) <= 4` for all `t in R`):
+    (1) `-2 * norm_sq <= B_transfer(f) <= 2 * norm_sq` (so `|B_transfer(f)| <= 2 * ||f||_{L^2}^2`).
+    (2) For any two-grade state `f_pm^{(K)} = (psi_tau ± T_K psi_tau) / sqrt(2)` with
+        `norm_sq = h0_1 + h0_K` or `h0_1 - h0_K` where `-h0_1 <= h0_K <= h0_1`, we have
+        `0 <= norm_sq <= 2 * h0_1`, and hence `-4 * h0_1 <= B_transfer(f_pm^{(K)}) <= 4 * h0_1`.
+    (3) At `K = 0` (`h0_K = h0_1`), the minus-state norm squared `h0_1 - h0_K = 0` vanishes identically
+        (demonstrating that `||f_-^{(K)}||^2 -> 0` as `K -> 0` and has no uniform positive floor on `K != 0`),
+        while the plus-state norm squared equals `2 * h0_1`. -/
+theorem transfer_form_plancherel_bound_and_minus_state_vanishing
+    (norm_sq J_val h0_1 h0_K : ℝ)
+    (h_J_nonneg : 0 ≤ J_val)
+    (h_J_upper : J_val ≤ 4 * norm_sq)
+    (h_h0_abs : -h0_1 ≤ h0_K ∧ h0_K ≤ h0_1)
+    (h_norm_two_grade : norm_sq = h0_1 + h0_K ∨ norm_sq = h0_1 - h0_K) :
+    let B_tr := attemptBTransferForm norm_sq J_val
+    (-2 * norm_sq ≤ B_tr ∧ B_tr ≤ 2 * norm_sq) ∧
+      (0 ≤ norm_sq ∧ norm_sq ≤ 2 * h0_1) ∧
+      (-4 * h0_1 ≤ B_tr ∧ B_tr ≤ 4 * h0_1) ∧
+      (h0_K = h0_1 → (h0_1 - h0_K = 0 ∧ h0_1 + h0_K = 2 * h0_1)) := by
+  intro B_tr
+  dsimp [B_tr, attemptBTransferForm]
+  rcases h_h0_abs with ⟨h_low, h_high⟩
+  have h_norm_bounds : 0 ≤ norm_sq ∧ norm_sq ≤ 2 * h0_1 := by
+    rcases h_norm_two_grade with h_plus | h_minus
+    · constructor <;> linarith
+    · constructor <;> linarith
+  rcases h_norm_bounds with ⟨h_n0, h_n2⟩
+  refine ⟨⟨by linarith, by linarith⟩, ⟨h_n0, h_n2⟩, ⟨by linarith, by linarith⟩, ?_⟩
+  intro h_eq
+  constructor <;> linarith
 
 end RiemannScope
