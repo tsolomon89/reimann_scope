@@ -4,7 +4,7 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "3b40650603e662d04f43b05e9899789ff9a0f781",
+  "producing_git_commit": "0a0f8e0593d0a9d20d930f4a58f8c83da88f344b",
   "timestamp": "2026-10-30T10:13:43.209240+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
