@@ -20,7 +20,7 @@
   "prime_shift_starting_head": "2122d7989d1821cf9048d7d32ad00c64f17e191b",
   "moebius_recovery_starting_head": "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a",
   "moebius_recovery_repair_starting_head": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
-  "moebius_recovery_followup_repair_starting_head": "71398c709f3469e7db2d35cc5d882cb85d505832",
+  "moebius_recovery_followup_repair_starting_head": "71398c70c049b53d3546a7258ccda765481114f7",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -4625,7 +4625,7 @@
     "parent_epic": "EPIC-TC-042",
     "inspected_baseline": "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a",
     "repair_inspected_baseline": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
-    "followup_repair_inspected_baseline": "71398c709f3469e7db2d35cc5d882cb85d505832",
+    "followup_repair_inspected_baseline": "71398c70c049b53d3546a7258ccda765481114f7",
     "status": "MIXED_GRADE_PAIRING_POLARIZED_AND_EQUIVALENT_TO_MOEBIUS_RECOVERY_MERTENS_STIELTJES_CANCELLATION_OBLIGATION_ISOLATED",
     "section_1_recovered_arithmetic_result_and_implication_chain": {
       "W_definition": "W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)",

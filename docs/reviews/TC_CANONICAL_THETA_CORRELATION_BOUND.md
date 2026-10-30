@@ -883,12 +883,12 @@ Every statement in `TASK-TC-044` is classified into four disjoint categories:
 
 3. **Repair of the False Transfer-Term Bound `0.633039` (`TASK-TC-045R` / `TASK-TC-045R2` Step 3, `transfer_form_plancherel_bound_and_minus_state_vanishing`)**:
    - **Established Transfer-Form Definitions & Reproduced Counterexample to `0.633039`**:
-     By Section 10.2, the Volterra-type operator $R_0$ and pole-vanishing integral $J(f, f)$ on $\mathcal{S}_\tau \subset L^2(\mathbb{R}_{>0}, d^\times x)$ are
+     By Section 10.2, the Volterra-type operator $R_0$ and half-line $x^{-1/2}$ integral $J(f, f)$ (which satisfies $I_{\mathrm{pole},+}(f, f) + J(f, f) = W_{\mathrm{pole}}(f * f^*) = 0$ on $\mathcal{S}_\tau$, whereas $J(\psi_\tau, \psi_\tau) = +0.0259597612733706 \ne 0$ itself does not vanish on the canonical seed) on $\mathcal{S}_\tau \subset L^2(\mathbb{R}_{>0}, d^\times x)$ are
      $$
      (R_0 f)(x) = \int_0^x (y/x)^{1/2}(D_y f)(y)\,\frac{dy}{y}, \qquad D_y = y\frac{d}{dy},
      $$
      $$
-     J(f, f) = 2\int_1^\infty \Phi_{f,f}(x)x^{-1/2}\,\frac{dx}{x} = \frac{1}{\tau}\int_{\mathbb{R}} \frac{|\widehat{f}(it)|^2}{t^2 + 1/4}\,dt = 4\|f\|_{L^2(d^\times x)}^2 - 4\|R_0 f\|_{L^2(d^\times x)}^2,
+     J(f, f) = \int_1^\infty \Phi_{f,f}(x)x^{-1/2}\,\frac{dx}{x} = \frac{1}{\tau}\int_{\mathbb{R}} \frac{|\widehat{f}(it)|^2}{t^2 + 1/4}\,dt = 4\|f\|_{L^2(d^\times x)}^2 - 4\|R_0 f\|_{L^2(d^\times x)}^2,
      $$
      and the transfer form is $B_{\mathrm{transfer}}(f) = 2\|f\|_{L^2(d^\times x)}^2 - J(f, f) = 4\|R_0 f\|_{L^2(d^\times x)}^2 - 2\|f\|_{L^2(d^\times x)}^2$. On the seed state $\psi_\tau$, $J(\psi_\tau, \psi_\tau) = 0.0259597612733706$ and $B_{\mathrm{transfer}}(\psi_\tau) = 2h_0(1) - J(\psi_\tau, \psi_\tau) = +0.9687652063464319$. Therefore:
      - at $K = 0$, $f_+^{(0)} = \sqrt{2}\psi_\tau$ has $B_{\mathrm{transfer}}(f_+^{(0)}) = 2\,B_{\mathrm{transfer}}(\psi_\tau) = +1.9375304126928638 > 0.633039$,

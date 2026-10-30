@@ -30,6 +30,7 @@ from tc.canonical_theta_correlation_bound import (
     SEED_DEFECT_REPRODUCED_AND_REPAIRED,
     SUBGATE_TC_042A_ID,
     SUBGATE_TC_042A_STATUS,
+    STARTING_HEAD_TC_045R2,
     TASK_TC_042_ID,
     TASK_TC_045_ID,
     TASK_TC_045R_ID,
@@ -1467,6 +1468,14 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
         artifact_payload["moebius_recovery_followup_repair_task_id"]
         == TASK_TC_045R2_ID
     )
+    assert (
+        STARTING_HEAD_TC_045R2
+        == "71398c70c049b53d3546a7258ccda765481114f7"
+    )
+    assert (
+        artifact_payload["moebius_recovery_followup_repair_starting_head"]
+        == STARTING_HEAD_TC_045R2
+    )
     sec13 = artifact_payload[
         "section_13_prime_shift_quadratic_form_and_divisor_aggregation"
     ]
@@ -1475,6 +1484,7 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
     ]
     assert sec14["repair_task_id"] == TASK_TC_045R_ID
     assert sec14["followup_repair_task_id"] == TASK_TC_045R2_ID
+    assert sec14["followup_repair_inspected_baseline"] == STARTING_HEAD_TC_045R2
 
     s1 = sec14["section_1_recovered_arithmetic_result_and_implication_chain"]
     imp = s1["complete_implication_chain_to_correlation_bound"]
