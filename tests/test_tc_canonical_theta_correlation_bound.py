@@ -33,6 +33,7 @@ from tc.canonical_theta_correlation_bound import (
     TASK_TC_042_ID,
     TASK_TC_045_ID,
     TASK_TC_045R_ID,
+    TASK_TC_045R2_ID,
     UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN,
     audit_rh_equivalence_and_laplace_resolvent,
     compute_unconditional_spectral_tail_bound_arb,
@@ -1462,6 +1463,10 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
     from flint import ctx as flint_ctx
 
     assert artifact_payload["moebius_recovery_repair_task_id"] == TASK_TC_045R_ID
+    assert (
+        artifact_payload["moebius_recovery_followup_repair_task_id"]
+        == TASK_TC_045R2_ID
+    )
     sec13 = artifact_payload[
         "section_13_prime_shift_quadratic_form_and_divisor_aggregation"
     ]
@@ -1469,17 +1474,26 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
         "section_14_cross_grade_compatibility_and_moebius_recovery"
     ]
     assert sec14["repair_task_id"] == TASK_TC_045R_ID
+    assert sec14["followup_repair_task_id"] == TASK_TC_045R2_ID
 
     s1 = sec14["section_1_recovered_arithmetic_result_and_implication_chain"]
     imp = s1["complete_implication_chain_to_correlation_bound"]
     nft = s1["norm_floor_and_transfer_bound_repair_tc045r"]
 
-    # 1. Step 2: Norm-floor behavior of f_pm^{(K)} at K = 0 and small rational grades K = +/- 1/100, +/- 1/1000
+    # 1. Step 2: Norm-floor behavior of f_pm^{(K)} at K = 0, K = +/- 1/4, and small rational grades K = +/- 1/100, +/- 1/1000
+    assert "plus_state_norm_floor_certified" not in nft
     assert (
         nft["exact_two_grade_norm_identity"]
         == "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|})"
     )
+    assert (
+        nft["valid_two_grade_norm_bounds"]
+        == "0 <= ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1) for all K in A_R"
+    )
     assert "Excluding K = 0 does NOT produce" in nft["minus_state_vanishing_as_K_to_0"]
+    assert (
+        "0.243250897826609" in nft["plus_state_counterexample_at_K_pm_1_4"]
+    )
     nf_by_label = {
         row["K_label"]: row for row in nft["two_grade_norm_and_transfer_table"]
     }
@@ -1492,6 +1506,19 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
     )
     for k_lbl in ("0", "1/1000", "-1/1000", "1/100", "-1/100", "1/10"):
         assert nf_by_label[k_lbl]["norm_f_minus_sq_below_false_floor_0_258495"] is True
+    for k_lbl in ("1/4", "-1/4"):
+        assert nf_by_label[k_lbl]["norm_f_plus_sq_in_0_2432_0_2433"] is True
+        assert nf_by_label[k_lbl]["norm_f_plus_sq_below_false_floor_0_258495"] is True
+        assert (
+            0.2432
+            < nf_by_label[k_lbl]["norm_f_plus_sq_certified"]["mid_float"]
+            < 0.2433
+        )
+    assert math.isclose(
+        nf_by_label["-1/4"]["norm_f_plus_sq_certified"]["mid_float"],
+        nf_by_label["1/4"]["norm_f_plus_sq_certified"]["mid_float"],
+        rel_tol=1e-14,
+    )
     assert math.isclose(
         nf_by_label["-1/1000"]["norm_f_minus_sq_certified"]["mid_float"],
         nf_by_label["1/1000"]["norm_f_minus_sq_certified"]["mid_float"],
@@ -1506,6 +1533,14 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
     # 2. Step 3: Corrected transfer-term bound across K = 0, small |K|, and large |K|
     tb_false = nft["false_0_633039_transfer_bound_reproduction_and_origin"]
     tb_planch = nft["proven_plancherel_transfer_bounds"]
+    assert (
+        tb_planch["operator_R0_definition"]
+        == "(R_0 f)(x) = int_0^x (y/x)^{1/2} (D_y f)(y) dy/y,   D_y = y d/dy"
+    )
+    assert (
+        "b(t) = 2 - 1/(t^2 + 1/4) in [-2, 2]"
+        in tb_planch["polarized_mixed_bound_formula"]
+    )
     assert (
         tb_planch["lean_theorem"]
         == "transfer_form_plancherel_bound_and_minus_state_vanishing"
@@ -1579,8 +1614,36 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
     rt14 = d3b["full_section_14_tree_roundtrip_verification"]
     assert rt13["all_enclose_original_256bit_arb_ball"] is True
     assert rt14["all_enclose_original_256bit_arb_ball"] is True
-    assert rt13["total_certified_arb_balls_checked"] == 26
-    assert rt14["total_certified_arb_balls_checked"] == 113
+    assert rt13["live_original_count_matches_enumerated_total"] is True
+    assert rt14["live_original_count_matches_enumerated_total"] is True
+    assert (
+        rt13["compared_against_live_original_arb_count"]
+        == rt13["total_certified_arb_balls_checked"]
+        == len(rt13["checked_paths"])
+    )
+    assert (
+        rt14["compared_against_live_original_arb_count"]
+        == rt14["total_certified_arb_balls_checked"]
+        == len(rt14["checked_paths"])
+    )
+    enum13_recheck = verify_all_serialized_arb_in_tree(
+        sec13, path_prefix="section_13"
+    )
+    enum14_recheck = verify_all_serialized_arb_in_tree(
+        sec14, path_prefix="section_14"
+    )
+    assert (
+        rt13["compared_against_live_original_arb_count"]
+        == enum13_recheck["total_certified_arb_balls_checked"]
+    )
+    assert (
+        rt14["compared_against_live_original_arb_count"]
+        == enum14_recheck["total_certified_arb_balls_checked"]
+    )
+    assert all(
+        "plus_state_norm_floor_certified" not in p
+        for p in rt14["checked_paths"]
+    )
 
     v1 = s1["exact_moebius_recovery_and_equivalence"]["values_at_X_eq_1"]
     assert v1["W_1_is_strictly_negative"] is True
@@ -1597,7 +1660,18 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
         assert bool(h0_1_live > arb(0))
         assert bool(h0_9_live < arb(0))
 
-        # Live norm-floor check at K = 0, +/-1/1000, +/-1/100
+        # Live plus-state counterexample at K = +/- 1/4:
+        # ||f_+^{(+/- 1/4)}||_{L^2}^2 = h_0(1) + h_0(tau^{1/4}) in (0.2432, 0.2433)
+        for k_sign in (1, -1):
+            k_1_4 = arb(k_sign) / arb(4)
+            h0_tau_1_4 = evaluate_h0_arb(tau_a ** abs(k_1_4))
+            norm_plus_1_4 = h0_1_live + h0_tau_1_4
+            assert bool(h0_tau_1_4 < arb("-0.2541"))
+            assert bool(norm_plus_1_4.lower() > arb("0.2432"))
+            assert bool(norm_plus_1_4.upper() < arb("0.2433"))
+            assert bool(norm_plus_1_4.upper() < arb("0.258495"))
+
+        # Live minus-state norm-floor check at K = 0, +/-1/1000, +/-1/100
         diff_k0 = h0_1_live - evaluate_h0_arb(arb(1))
         assert bool(diff_k0.contains(0)) and bool(abs(diff_k0) < arb("1e-75"))
         for n_denom in (1000, 100):

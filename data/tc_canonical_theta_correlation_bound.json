@@ -9,6 +9,7 @@
   "prime_shift_task_id": "TASK-TC-044",
   "moebius_recovery_task_id": "TASK-TC-045",
   "moebius_recovery_repair_task_id": "TASK-TC-045R",
+  "moebius_recovery_followup_repair_task_id": "TASK-TC-045R2",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
@@ -19,6 +20,7 @@
   "prime_shift_starting_head": "2122d7989d1821cf9048d7d32ad00c64f17e191b",
   "moebius_recovery_starting_head": "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a",
   "moebius_recovery_repair_starting_head": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
+  "moebius_recovery_followup_repair_starting_head": "71398c709f3469e7db2d35cc5d882cb85d505832",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -35,7 +37,8 @@
     "TASK-TC-043",
     "TASK-TC-043R",
     "TASK-TC-044",
-    "TASK-TC-045"
+    "TASK-TC-045",
+    "TASK-TC-045R"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -4618,9 +4621,11 @@
   "section_14_cross_grade_compatibility_and_moebius_recovery": {
     "task_id": "TASK-TC-045",
     "repair_task_id": "TASK-TC-045R",
+    "followup_repair_task_id": "TASK-TC-045R2",
     "parent_epic": "EPIC-TC-042",
     "inspected_baseline": "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a",
     "repair_inspected_baseline": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
+    "followup_repair_inspected_baseline": "71398c709f3469e7db2d35cc5d882cb85d505832",
     "status": "MIXED_GRADE_PAIRING_POLARIZED_AND_EQUIVALENT_TO_MOEBIUS_RECOVERY_MERTENS_STIELTJES_CANCELLATION_OBLIGATION_ISOLATED",
     "section_1_recovered_arithmetic_result_and_implication_chain": {
       "W_definition": "W(X) = sum_{n>=2} (Lambda(n)/sqrt(n)) h_0(n/X)",
@@ -4668,14 +4673,9 @@
       },
       "norm_floor_and_transfer_bound_repair_tc045r": {
         "exact_two_grade_norm_identity": "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|})",
+        "valid_two_grade_norm_bounds": "0 <= ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1) for all K in A_R",
         "minus_state_vanishing_as_K_to_0": "For f_-^{(K)} = (psi_tau - T_K psi_tau)/sqrt(2), continuity of h_0 gives ||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0 along nonzero admissible rational grades K = 1/n in A_R \\ {0} (e.g. ||f_-^{(+/- 1/1000)}||_{L^2}^2 = 2.68872306e-5 and ||f_-^{(+/- 1/100)}||_{L^2}^2 = 2.68509890e-3). Excluding K = 0 does NOT produce a uniform positive lower bound on ||f_-^{(K)}||_{L^2}^2, so the TC-045 division construction of mu_0 is withdrawn.",
-        "plus_state_norm_floor_certified": {
-          "mid_float": 0.49685063380990124,
-          "rad_float_outward": 1.330439514555187e-18,
-          "lower_dec": "4.968506338099012444846118490259731100370e-1",
-          "upper_dec": "4.968506338099012444846118490259731100373e-1",
-          "arb_ball_str": "[0.4968506338099012444846118490259731100371 +/- 3.14e-41]"
-        },
+        "plus_state_counterexample_at_K_pm_1_4": "At the admissible rational grades K = +/- 1/4 in A_R, h_0(tau^{1/4}) = -0.254111585983292..., so ||f_+^{(+/- 1/4)}||_{L^2}^2 = h_0(1) + h_0(tau^{1/4}) = 0.243250897826609... in (0.2432, 0.2433), refuting the discarded plus-state norm floors 0.4968506338, 0.4946950365, and 0.258495. The repaired direct mixed-grade correlation argument requires no positive norm floor.",
         "false_0_633039_transfer_bound_reproduction_and_origin": {
           "counterexample_at_K_eq_0": "At K = 0, f_+^(0) = sqrt(2) psi_tau gives B_transfer(f_+^(0)) = 2 B_transfer(psi_tau) = 1.9375304127 > 0.633039 (and as |K| -> infty, B_transfer(f_pm^(K)) -> B_transfer(psi_tau) = 0.9687652063 > 0.633039).",
           "origin_of_0_633039": "The constant 0.633039 was erroneously copied from the earlier loose forward-prime bound (92193/32768) * 0.225 = 0.6330390930 for |W(tau^(-|K|))|, which has no relation to B_transfer.",
@@ -4702,7 +4702,9 @@
           }
         },
         "proven_plancherel_transfer_bounds": {
-          "quadratic_bound_formula": "B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f) with 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt <= 4 ||f||_{L^2}^2 => |B_transfer(f)| <= 2 ||f||_{L^2}^2.",
+          "operator_R0_definition": "(R_0 f)(x) = int_0^x (y/x)^{1/2} (D_y f)(y) dy/y,   D_y = y d/dy",
+          "quadratic_bound_formula": "B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f) with 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt = 4 ||f||_{L^2}^2 - 4 ||R_0 f||_{L^2}^2 <= 4 ||f||_{L^2}^2 => |B_transfer(f)| <= 2 ||f||_{L^2}^2.",
+          "polarized_mixed_bound_formula": "B_transfer(f, g) = (1/tau) int_{-infty}^infty b(t) hat{f}(it) conj(hat{g}(it)) dt with bounded Fourier multiplier b(t) = 2 - 1/(t^2 + 1/4) in [-2, 2] => |B_transfer(f, g)| <= 2 ||f||_{L^2} ||g||_{L^2} by ordinary L^2 Cauchy-Schwarz.",
           "two_grade_uniform_bound_4_h0_1_certified": {
             "mid_float": 1.989449935239605,
             "rad_float_outward": 8.381683516311055e-17,
@@ -4739,6 +4741,8 @@
               "arb_ball_str": "[0.9947249676198024889692236980519462200743 +/- 3.74e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.9687652063353964,
               "rad_float_outward": 3.991876284458583e-17,
@@ -4785,6 +4789,8 @@
               "arb_ball_str": "[0.9946980803891858853599808232483808232255 +/- 1.94e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.9687122608993558,
               "rad_float_outward": 5.168025548468773e-17,
@@ -4831,6 +4837,8 @@
               "arb_ball_str": "[0.9946980803891858853599808232483808232255 +/- 1.94e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.9687122608993558,
               "rad_float_outward": 5.168025548468773e-17,
@@ -4877,6 +4885,8 @@
               "arb_ball_str": "[0.9920398687225070129179368081830496472244 +/- 1.22e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.9634778367515462,
               "rad_float_outward": 1.7035749629735626e-17,
@@ -4923,6 +4933,8 @@
               "arb_ball_str": "[0.9920398687225070129179368081830496472244 +/- 1.22e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.9634778367515462,
               "rad_float_outward": 1.7035749629735626e-17,
@@ -4969,6 +4981,8 @@
               "arb_ball_str": "[0.7598283380241650526013145902829660493941 +/- 4.73e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.5065506779336097,
               "rad_float_outward": 2.3295638137768807e-18,
@@ -4997,6 +5011,102 @@
             "refutes_false_0_633039_bound": true
           },
           {
+            "K_label": "1/4",
+            "K_float": 0.25,
+            "X_K_eq_tau_abs_K": 1.5832334870861595,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.7514740697931932,
+              "rad_float_outward": 3.035034260572983e-17,
+              "lower_dec": "7.514740697931932304344896710838682054339e-1",
+              "upper_dec": "7.514740697931932304344896710838682054342e-1",
+              "arb_ball_str": "[0.7514740697931932304344896710838682054340 +/- 3.85e-41]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.24325089782660925,
+              "rad_float_outward": 1.1558074975825447e-17,
+              "lower_dec": "2.432508978266092585347340269680780146401e-1",
+              "upper_dec": "2.432508978266092585347340269680780146404e-1",
+              "arb_ball_str": "[0.2432508978266092585347340269680780146402 +/- 2.42e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_in_0_2432_0_2433": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": -0.5037960519611047,
+              "rad_float_outward": 4.251710097583885e-17,
+              "lower_dec": "-5.037960519611046202914652372113624969080e-1",
+              "upper_dec": "-5.037960519611046202914650145784153648758e-1",
+              "arb_ball_str": "[-0.503796051961104620291465 +/- 2.38e-25]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 1.472561258296501,
+              "rad_float_outward": 2.5983382867811005e-18,
+              "lower_dec": "1.472561258296501082897950110044448091408e+0",
+              "upper_dec": "1.472561258296501082897950488205469214935e+0",
+              "arb_ball_str": "[1.472561258296501082897950 +/- 4.89e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 0.4649691543742918,
+              "rad_float_outward": 2.6924712589166847e-17,
+              "lower_dec": "4.649691543742918423150198582546704222181e-1",
+              "upper_dec": "4.649691543742918423150202364156911605571e-1",
+              "arb_ball_str": "[0.464969154374291842315020 +/- 2.37e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
+            "K_label": "-1/4",
+            "K_float": -0.25,
+            "X_K_eq_tau_abs_K": 1.5832334870861595,
+            "norm_f_minus_sq_certified": {
+              "mid_float": 0.7514740697931932,
+              "rad_float_outward": 3.035034260572983e-17,
+              "lower_dec": "7.514740697931932304344896710838682054339e-1",
+              "upper_dec": "7.514740697931932304344896710838682054342e-1",
+              "arb_ball_str": "[0.7514740697931932304344896710838682054340 +/- 3.85e-41]"
+            },
+            "norm_f_plus_sq_certified": {
+              "mid_float": 0.24325089782660925,
+              "rad_float_outward": 1.1558074975825447e-17,
+              "lower_dec": "2.432508978266092585347340269680780146401e-1",
+              "upper_dec": "2.432508978266092585347340269680780146404e-1",
+              "arb_ball_str": "[0.2432508978266092585347340269680780146402 +/- 2.42e-41]"
+            },
+            "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_below_false_floor_0_258495": true,
+            "norm_f_plus_sq_in_0_2432_0_2433": true,
+            "B_transfer_mixed_T_K_psi_tau_certified": {
+              "mid_float": -0.5037960519611047,
+              "rad_float_outward": 4.251710097583885e-17,
+              "lower_dec": "-5.037960519611046202914652372113624969080e-1",
+              "upper_dec": "-5.037960519611046202914650145784153648758e-1",
+              "arb_ball_str": "[-0.503796051961104620291465 +/- 2.38e-25]"
+            },
+            "B_transfer_f_minus_certified": {
+              "mid_float": 1.472561258296501,
+              "rad_float_outward": 2.5983382867811005e-18,
+              "lower_dec": "1.472561258296501082897950110044448091408e+0",
+              "upper_dec": "1.472561258296501082897950488205469214935e+0",
+              "arb_ball_str": "[1.472561258296501082897950 +/- 4.89e-25]"
+            },
+            "B_transfer_f_plus_certified": {
+              "mid_float": 0.4649691543742918,
+              "rad_float_outward": 2.6924712589166847e-17,
+              "lower_dec": "4.649691543742918423150198582546704222181e-1",
+              "upper_dec": "4.649691543742918423150202364156911605571e-1",
+              "arb_ball_str": "[0.464969154374291842315020 +/- 2.37e-25]"
+            },
+            "abs_B_transfer_f_minus_le_2_norm_minus_sq": true,
+            "abs_B_transfer_f_plus_le_2_norm_plus_sq": true,
+            "abs_B_transfer_f_pm_le_4_h0_1": true,
+            "abs_B_transfer_mixed_le_2_h0_1": true,
+            "refutes_false_0_633039_bound": true
+          },
+          {
             "K_label": "1",
             "K_float": 1.0,
             "X_K_eq_tau_abs_K": 6.283185307179586,
@@ -5015,6 +5125,8 @@
               "arb_ball_str": "[0.5043451746768356450730477654308196498576 +/- 4.06e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.013070666039910797,
               "rad_float_outward": 8.008518422833455e-19,
@@ -5061,6 +5173,8 @@
               "arb_ball_str": "[0.5043451746768356450730477654308196498576 +/- 4.06e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": 0.013070666039910797,
               "rad_float_outward": 8.008518422833455e-19,
@@ -5107,6 +5221,8 @@
               "arb_ball_str": "[0.4972408400014039531641853525520466276762 +/- 1.53e-41]"
             },
             "norm_f_minus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_below_false_floor_0_258495": false,
+            "norm_f_plus_sq_in_0_2432_0_2433": false,
             "B_transfer_mixed_T_K_psi_tau_certified": {
               "mid_float": -0.00026444603413267926,
               "rad_float_outward": 1.321554608089839e-20,
@@ -5315,8 +5431,9 @@
           }
         },
         "full_section_14_tree_roundtrip_verification": {
-          "total_certified_arb_balls_checked": 113,
-          "compared_against_live_original_arb_count": 113,
+          "total_certified_arb_balls_checked": 122,
+          "compared_against_live_original_arb_count": 122,
+          "live_original_count_matches_enumerated_total": true,
           "all_enclose_original_256bit_arb_ball": true,
           "failed_paths": [],
           "checked_paths": [
@@ -5324,7 +5441,6 @@
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.W_log_1_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.R_mu_1_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.exact_moebius_recovery_and_equivalence.values_at_X_eq_1.h0_at_9_certified",
-            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.plus_state_norm_floor_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.false_0_633039_transfer_bound_reproduction_and_origin.B_transfer_psi_tau_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.false_0_633039_transfer_bound_reproduction_and_origin.B_transfer_f_plus_0_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.false_0_633039_transfer_bound_reproduction_and_origin.B_transfer_f_minus_0_certified",
@@ -5375,6 +5491,16 @@
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].B_transfer_mixed_T_K_psi_tau_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].B_transfer_f_minus_certified",
             "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[8].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[9].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[9].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[9].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[9].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[9].B_transfer_f_plus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[10].norm_f_minus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[10].norm_f_plus_sq_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[10].B_transfer_mixed_T_K_psi_tau_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[10].B_transfer_f_minus_certified",
+            "section_14.section_1_recovered_arithmetic_result_and_implication_chain.norm_floor_and_transfer_bound_repair_tc045r.two_grade_norm_and_transfer_table[10].B_transfer_f_plus_certified",
             "section_14.section_2_repaired_tc044_defects_audit.defect_3a_spectral_aggregation_and_synthetic_quartet_repair.kernel_strip_holomorphy_vs_global_poles.res_neg_H0_zeta_prime_at_5_2_certified",
             "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.c_tau_B.serialized",
             "section_14.section_2_repaired_tc044_defects_audit.defect_3b_numerical_serialization_and_roundtrip_repair.roundtrip_sample_verifications.h0_at_1.serialized",
@@ -5438,6 +5564,7 @@
         "full_section_13_tree_roundtrip_verification": {
           "total_certified_arb_balls_checked": 26,
           "compared_against_live_original_arb_count": 26,
+          "live_original_count_matches_enumerated_total": true,
           "all_enclose_original_256bit_arb_ball": true,
           "failed_paths": [],
           "checked_paths": [

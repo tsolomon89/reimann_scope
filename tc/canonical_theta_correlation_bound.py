@@ -117,6 +117,7 @@ TASK_TC_043R_ID = "TASK-TC-043R"
 TASK_TC_044_ID = "TASK-TC-044"
 TASK_TC_045_ID = "TASK-TC-045"
 TASK_TC_045R_ID = "TASK-TC-045R"
+TASK_TC_045R2_ID = "TASK-TC-045R2"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
@@ -127,6 +128,7 @@ STARTING_HEAD_TC_043R = "726f7b4da8b7bd757b68f96783fee6b86f2f3f7b"
 STARTING_HEAD_TC_044 = "2122d7989d1821cf9048d7d32ad00c64f17e191b"
 STARTING_HEAD_TC_045 = "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a"
 STARTING_HEAD_TC_045R = "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5"
+STARTING_HEAD_TC_045R2 = "71398c709f3469e7db2d35cc5d882cb85d505832"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -144,6 +146,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-043R",
     "TASK-TC-044",
     "TASK-TC-045",
+    "TASK-TC-045R",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -7371,6 +7374,9 @@ def verify_all_serialized_arb_in_tree(
     return {
         "total_certified_arb_balls_checked": len(checked_paths),
         "compared_against_live_original_arb_count": compared_against_live_original_count,
+        "live_original_count_matches_enumerated_total": (
+            compared_against_live_original_count == len(checked_paths)
+        ),
         "all_enclose_original_256bit_arb_ball": len(failed_paths) == 0
         and len(checked_paths) > 0,
         "failed_paths": failed_paths,
@@ -8650,15 +8656,25 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         # M_{log} = (30731/98304) + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)} <= 3.34900802 < 3.34901.
         m_log_uncond_bound_arb = arb("3.34900802")
 
-        # TASK-TC-045R Step 2 & Step 3:
-        # (a) Exact norm identity ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}) and vanishing of ||f_-^{(K)}||_{L^2}^2 as K -> 0:
-        #     For the plus state, ||f_+^{(K)}||_{L^2}^2 = h_0(1) + h_0(tau^{|K|}) >= h_0(1) - 0.00051185 >= 0.258495 > 0.
-        #     For the minus state, ||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0 along nonzero rational grades K = 1/n!
-        plus_state_norm_sq_lower_bound_arb = h0_1_arb - arb("0.00051185")
+        # TASK-TC-045R / TASK-TC-045R2 Step 2 & Step 3:
+        # (a) Exact norm identities ||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|}) and valid bounds
+        #     0 <= ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1) for all K in A_R:
+        #     - For the minus state, ||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0
+        #       along nonzero rational grades K = 1/n.
+        #     - For the plus state at the admissible rational grade K = +/- 1/4:
+        #       h_0(tau^{1/4}) = -0.254111585983292..., so ||f_+^{(+/- 1/4)}||_{L^2}^2 = h_0(1) + h_0(tau^{1/4})
+        #       = 0.243250897826609... in (0.2432, 0.2433), refuting the discarded plus-state floors
+        #       0.4968506338, 0.4946950365, and 0.258495. The repaired direct correlation argument
+        #       requires no positive norm floor.
         # (b) Proven Plancherel bound on B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f):
-        #     Since 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt <= 4 ||f||_{L^2}^2,
+        #     Since (R_0 f)(x) = int_0^x (y/x)^{1/2} (D_y f)(y) dy/y (D_y = y d/dy) and
+        #     0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt
+        #                  = 4 ||f||_{L^2}^2 - 4 ||R_0 f||_{L^2}^2 <= 4 ||f||_{L^2}^2,
         #     |B_transfer(f)| <= 2 ||f||_{L^2}^2 for all f in L^2(R_{>0}, dx/x).
-        #     Hence for f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) (where ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1)):
+        #     For the polarized form B_transfer(f, g) = (1/tau) int_{-infty}^infty b(t) hat{f}(it) conj(hat{g}(it)) dt
+        #     with bounded multiplier b(t) = 2 - 1/(t^2 + 1/4) in [-2, 2], ordinary L^2 Cauchy-Schwarz gives
+        #     |B_transfer(f, g)| <= 2 ||f||_{L^2} ||g||_{L^2}.
+        #     Hence for f_pm^{(K)} = (psi_tau +/- T_K psi_tau)/sqrt(2) (where 0 <= ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1)):
         #       |B_transfer(f_pm^{(K)})| <= 2 ||f_pm^{(K)}||_{L^2}^2 <= 4 h_0(1) = 1.9894499352396050...,
         #     and for polarized mixed-grade pairings (T_K psi_tau, T_L psi_tau):
         #       |B_transfer(T_K psi_tau, T_L psi_tau)| <= 2 ||T_K psi_tau||_{L^2} ||T_L psi_tau||_{L^2} = 2 h_0(1) = 0.9947249676198025...
@@ -8675,7 +8691,7 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         b_transfer_f_minus_0_arb = arb(0)
 
         # Evaluate two-grade norms ||f_pm^{(K)}||_{L^2}^2 and transfer values B_transfer(f_pm^{(K)}), B_transfer(T_K psi_tau, psi_tau)
-        # across K in {0, 1/1000, -1/1000, 1/100, -1/100, 1/10, 1, -1, 2} in 256-bit Arb:
+        # across K in {0, 1/1000, -1/1000, 1/100, -1/100, 1/10, 1/4, -1/4, 1, -1, 2} in 256-bit Arb:
         two_grade_norm_and_transfer_rows: List[Dict[str, Any]] = []
         for k_label, k_num, k_den in (
             ("0", 0, 1),
@@ -8684,6 +8700,8 @@ def execute_task_tc045_cross_grade_moebius_recovery(
             ("1/100", 1, 100),
             ("-1/100", -1, 100),
             ("1/10", 1, 10),
+            ("1/4", 1, 4),
+            ("-1/4", -1, 4),
             ("1", 1, 1),
             ("-1", -1, 1),
             ("2", 2, 1),
@@ -8719,6 +8737,13 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     ),
                     "norm_f_minus_sq_below_false_floor_0_258495": bool(
                         norm_minus_k.upper() < arb("0.258495")
+                    ),
+                    "norm_f_plus_sq_below_false_floor_0_258495": bool(
+                        norm_plus_k.upper() < arb("0.258495")
+                    ),
+                    "norm_f_plus_sq_in_0_2432_0_2433": bool(
+                        norm_plus_k.lower() > arb("0.2432")
+                        and norm_plus_k.upper() < arb("0.2433")
                     ),
                     "B_transfer_mixed_T_K_psi_tau_certified": serialize_arb_certified(
                         b_tr_mixed_k
@@ -8794,6 +8819,7 @@ def execute_task_tc045_cross_grade_moebius_recovery(
             },
             "norm_floor_and_transfer_bound_repair_tc045r": {
                 "exact_two_grade_norm_identity": "||f_pm^{(K)}||_{L^2}^2 = h_0(1) +/- h_0(tau^{|K|})",
+                "valid_two_grade_norm_bounds": "0 <= ||f_pm^{(K)}||_{L^2}^2 <= 2 h_0(1) for all K in A_R",
                 "minus_state_vanishing_as_K_to_0": (
                     "For f_-^{(K)} = (psi_tau - T_K psi_tau)/sqrt(2), continuity of h_0 gives "
                     "||f_-^{(K)}||_{L^2}^2 = h_0(1) - h_0(tau^{|K|}) -> 0 as K -> 0 along nonzero admissible "
@@ -8802,8 +8828,11 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     "uniform positive lower bound on ||f_-^{(K)}||_{L^2}^2, so the TC-045 division construction "
                     "of mu_0 is withdrawn."
                 ),
-                "plus_state_norm_floor_certified": serialize_arb_certified(
-                    plus_state_norm_sq_lower_bound_arb
+                "plus_state_counterexample_at_K_pm_1_4": (
+                    "At the admissible rational grades K = +/- 1/4 in A_R, h_0(tau^{1/4}) = -0.254111585983292..., "
+                    "so ||f_+^{(+/- 1/4)}||_{L^2}^2 = h_0(1) + h_0(tau^{1/4}) = 0.243250897826609... in (0.2432, 0.2433), "
+                    "refuting the discarded plus-state norm floors 0.4968506338, 0.4946950365, and 0.258495. "
+                    "The repaired direct mixed-grade correlation argument requires no positive norm floor."
                 ),
                 "false_0_633039_transfer_bound_reproduction_and_origin": {
                     "counterexample_at_K_eq_0": (
@@ -8827,9 +8856,19 @@ def execute_task_tc045_cross_grade_moebius_recovery(
                     ),
                 },
                 "proven_plancherel_transfer_bounds": {
+                    "operator_R0_definition": (
+                        "(R_0 f)(x) = int_0^x (y/x)^{1/2} (D_y f)(y) dy/y,   D_y = y d/dy"
+                    ),
                     "quadratic_bound_formula": (
-                        "B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f) with 0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt <= 4 ||f||_{L^2}^2 "
+                        "B_transfer(f) = 2 ||f||_{L^2}^2 - J(f, f) with "
+                        "0 <= J(f, f) = (1/tau) int_{-infty}^infty |hat{f}(it)|^2 / (t^2 + 1/4) dt "
+                        "= 4 ||f||_{L^2}^2 - 4 ||R_0 f||_{L^2}^2 <= 4 ||f||_{L^2}^2 "
                         "=> |B_transfer(f)| <= 2 ||f||_{L^2}^2."
+                    ),
+                    "polarized_mixed_bound_formula": (
+                        "B_transfer(f, g) = (1/tau) int_{-infty}^infty b(t) hat{f}(it) conj(hat{g}(it)) dt "
+                        "with bounded Fourier multiplier b(t) = 2 - 1/(t^2 + 1/4) in [-2, 2] "
+                        "=> |B_transfer(f, g)| <= 2 ||f||_{L^2} ||g||_{L^2} by ordinary L^2 Cauchy-Schwarz."
                     ),
                     "two_grade_uniform_bound_4_h0_1_certified": serialize_arb_certified(
                         b_transfer_two_grade_plancherel_bound_arb
@@ -9719,9 +9758,11 @@ def execute_task_tc045_cross_grade_moebius_recovery(
         result_tc045 = {
             "task_id": TASK_TC_045_ID,
             "repair_task_id": TASK_TC_045R_ID,
+            "followup_repair_task_id": TASK_TC_045R2_ID,
             "parent_epic": EPIC_TC_042_ID,
             "inspected_baseline": STARTING_HEAD_TC_045,
             "repair_inspected_baseline": STARTING_HEAD_TC_045R,
+            "followup_repair_inspected_baseline": STARTING_HEAD_TC_045R2,
             "status": CROSS_GRADE_MOEBIUS_RECOVERY_STATUS,
             "section_1_recovered_arithmetic_result_and_implication_chain": recovered_arithmetic_and_implication,
             "section_2_repaired_tc044_defects_audit": repaired_tc044_defects_audit,
@@ -9868,6 +9909,7 @@ def build_canonical_theta_correlation_bound_report(
         "prime_shift_task_id": TASK_TC_044_ID,
         "moebius_recovery_task_id": TASK_TC_045_ID,
         "moebius_recovery_repair_task_id": TASK_TC_045R_ID,
+        "moebius_recovery_followup_repair_task_id": TASK_TC_045R2_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -9881,6 +9923,7 @@ def build_canonical_theta_correlation_bound_report(
         "prime_shift_starting_head": STARTING_HEAD_TC_044,
         "moebius_recovery_starting_head": STARTING_HEAD_TC_045,
         "moebius_recovery_repair_starting_head": STARTING_HEAD_TC_045R,
+        "moebius_recovery_followup_repair_starting_head": STARTING_HEAD_TC_045R2,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",
