@@ -300,7 +300,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 24 defs, 42 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 26 defs, 45 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -308,8 +308,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 24
-    assert len(ver["actual_theorems"]) == 43
+    assert len(ver["actual_defs"]) == 26
+    assert len(ver["actual_theorems"]) == 45
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -1717,6 +1717,53 @@ def test_29_task_tc045r_norm_floor_transfer_bound_mellin_pole_and_live_regressio
         assert abs(float(approx_res.mid()) - (81.0 / 64.0)) < 1e-12
     finally:
         flint_ctx.prec = saved_prec
+
+
+def test_30_task_tc046_prime_euler_moebius_recovery(artifact_payload):
+    """Verify TASK-TC-046 finite-prime Euler inversion, coupled cutoff y=M(X), and section_15 round-trip in the main artifact."""
+    from tc.canonical_theta_correlation_bound import (
+        PRIME_EULER_MOEBIUS_RECOVERY_STATUS,
+        STARTING_HEAD_TC_046,
+        TASK_TC_046_ID,
+        verify_all_serialized_arb_in_tree,
+    )
+
+    assert artifact_payload["prime_euler_moebius_recovery_task_id"] == TASK_TC_046_ID
+    assert (
+        artifact_payload["status_dimensions"]["prime_euler_moebius_recovery_status"]
+        == PRIME_EULER_MOEBIUS_RECOVERY_STATUS
+    )
+    sec15 = artifact_payload[
+        "section_15_prime_by_prime_moebius_recovery_and_euler_compatibility"
+    ]
+    assert sec15["task_id"] == TASK_TC_046_ID
+    assert sec15["inspected_baseline"] == STARTING_HEAD_TC_046
+    s2 = sec15["section_2_finite_prime_euler_inversion_and_coefficients"]
+    win = s2["exact_agreement_window_with_von_mangoldt"]
+    assert win["all_three_lambda_methods_agree_up_to_120"] is True
+    assert win["all_delta_nonnegative_verified"] is True
+    assert all(
+        row["prod_minus_divisor_encloses_zero"]
+        and row["coeff_minus_divisor_encloses_zero"]
+        and row["coeff_minus_prod_encloses_zero"]
+        for row in s2["three_way_W_y_representation_checks"]
+    )
+    s4 = sec15["section_4_coupled_cutoff_passage_and_grade_certification"]
+    assert len(s4["certified_coupled_grade_table"]) == 13
+    assert all(
+        row["abs_W_minus_W_M_X_below_analytic_bound"]
+        and row["abs_W_minus_W_M_X_below_half_C_log_0"]
+        for row in s4["certified_coupled_grade_table"]
+    )
+    rt15 = sec15["full_section_15_tree_roundtrip_verification"]
+    assert rt15["all_enclose_original_256bit_arb_ball"] is True
+    assert rt15["live_original_count_matches_enumerated_total"] is True
+    enum15_recheck = verify_all_serialized_arb_in_tree(sec15, path_prefix="section_15")
+    assert (
+        rt15["compared_against_live_original_arb_count"]
+        == enum15_recheck["total_certified_arb_balls_checked"]
+    )
+
 
 
 

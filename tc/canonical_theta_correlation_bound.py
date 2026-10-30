@@ -118,6 +118,7 @@ TASK_TC_044_ID = "TASK-TC-044"
 TASK_TC_045_ID = "TASK-TC-045"
 TASK_TC_045R_ID = "TASK-TC-045R"
 TASK_TC_045R2_ID = "TASK-TC-045R2"
+TASK_TC_046_ID = "TASK-TC-046"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
@@ -129,6 +130,7 @@ STARTING_HEAD_TC_044 = "2122d7989d1821cf9048d7d32ad00c64f17e191b"
 STARTING_HEAD_TC_045 = "d8b6d1299a0520da66643fdf1aa6b962c6d92a9a"
 STARTING_HEAD_TC_045R = "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5"
 STARTING_HEAD_TC_045R2 = "71398c70c049b53d3546a7258ccda765481114f7"
+STARTING_HEAD_TC_046 = "1fc477927ccbb242dec10217744b1ad054877e12"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -147,6 +149,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-044",
     "TASK-TC-045",
     "TASK-TC-045R",
+    "TASK-TC-045R2",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -181,6 +184,10 @@ PRIME_SHIFT_QUADRATIC_FORM_STATUS = (
 )
 CROSS_GRADE_MOEBIUS_RECOVERY_STATUS = (
     "MIXED_GRADE_PAIRING_POLARIZED_AND_EQUIVALENT_TO_MOEBIUS_RECOVERY_MERTENS_STIELTJES_CANCELLATION_OBLIGATION_ISOLATED"
+)
+PRIME_EULER_MOEBIUS_RECOVERY_STATUS = (
+    "FINITE_PRIME_EULER_INVERSION_AND_COUPLED_CUTOFF_REDUCTION_PROVED_"
+    "HORIZON_COLLAPSE_AND_LOW_FREQUENCY_EULER_SPIKE_OBSTRUCTIONS_QUANTIFIED"
 )
 UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN = (
     "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN"
@@ -220,6 +227,8 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "divisorAggregatedStieltjesDecomp",
     "mixedGradeCompletePairingDecomp",
     "mertensStieltjesRemainderDecomp",
+    "finitePrimeEulerRecursionStep",
+    "finitePrimeCoeffCases",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -266,6 +275,8 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "mixed_grade_pairing_moebius_recovery_and_semiboundedness_equivalence",
     "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
     "transfer_form_plancherel_bound_and_minus_state_vanishing",
+    "finite_prime_euler_recursion_and_coefficient_cases",
+    "coupled_prime_cutoff_comparison_and_boundedness_equivalence",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -9843,10 +9854,21 @@ def verify_canonical_theta_correlation_lean_module(
 # ---------------------------------------------------------------------------
 
 
+def execute_task_tc046_prime_euler_moebius_recovery(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-046: Prime-by-Prime Möbius Recovery and Arithmetic Cross-Grade Compatibility."""
+    from tc.prime_euler_moebius_recovery import (
+        execute_task_tc046_prime_euler_moebius_recovery as _exec_tc046,
+    )
+
+    return _exec_tc046(prec_bits=prec_bits)
+
+
 def build_canonical_theta_correlation_bound_report(
     n_primes_max: int = 25000, prec_bits: int = 256
 ) -> Dict[str, Any]:
-    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 / TASK-TC-043R / TASK-TC-044 audit and certification report."""
+    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 / TASK-TC-043R / TASK-TC-044 / TASK-TC-045 / TASK-TC-046 audit and certification report."""
     seed_audit = derive_seed_spatial_polynomial_and_mellin()
     autocorr_audit = derive_closed_form_autocorrelation_h_K()
     rh_equiv_audit = audit_rh_equivalence_and_laplace_resolvent()
@@ -9885,6 +9907,9 @@ def build_canonical_theta_correlation_bound_report(
     task_tc045_audit["section_2_repaired_tc044_defects_audit"][
         "defect_3b_numerical_serialization_and_roundtrip_repair"
     ]["full_section_13_tree_roundtrip_verification"] = full_tree_rt_sec13
+    task_tc046_audit = execute_task_tc046_prime_euler_moebius_recovery(
+        prec_bits=prec_bits
+    )
     lean_audit = verify_canonical_theta_correlation_lean_module()
     wavelet_audit = proof_attempts["attempt_3_large_grade_wavelet_decomposition"][
         "uniform_prime_wavelet_boundedness"
@@ -9910,6 +9935,7 @@ def build_canonical_theta_correlation_bound_report(
         "moebius_recovery_task_id": TASK_TC_045_ID,
         "moebius_recovery_repair_task_id": TASK_TC_045R_ID,
         "moebius_recovery_followup_repair_task_id": TASK_TC_045R2_ID,
+        "prime_euler_moebius_recovery_task_id": TASK_TC_046_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -9924,6 +9950,7 @@ def build_canonical_theta_correlation_bound_report(
         "moebius_recovery_starting_head": STARTING_HEAD_TC_045,
         "moebius_recovery_repair_starting_head": STARTING_HEAD_TC_045R,
         "moebius_recovery_followup_repair_starting_head": STARTING_HEAD_TC_045R2,
+        "prime_euler_moebius_recovery_starting_head": STARTING_HEAD_TC_046,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -9935,6 +9962,7 @@ def build_canonical_theta_correlation_bound_report(
             "admissible_cross_grade_compatibility_status": ADMISSIBLE_CROSS_GRADE_COMPATIBILITY_STATUS,
             "prime_shift_quadratic_form_status": PRIME_SHIFT_QUADRATIC_FORM_STATUS,
             "cross_grade_moebius_recovery_status": CROSS_GRADE_MOEBIUS_RECOVERY_STATUS,
+            "prime_euler_moebius_recovery_status": PRIME_EULER_MOEBIUS_RECOVERY_STATUS,
             "rh_equivalence_proof_status": FIXED_SEED_RH_EQUIVALENCE_PROVED,
             "numerical_certification_status": FINITE_GRID_CORRELATION_BOUND_CERTIFIED,
             "local_concavity_status": LOCAL_ORIGIN_CONCAVITY_CERTIFIED,
@@ -9965,6 +9993,7 @@ def build_canonical_theta_correlation_bound_report(
         "section_12_admissible_cross_grade_compatibility": task_tc043_audit,
         "section_13_prime_shift_quadratic_form_and_divisor_aggregation": task_tc044_audit,
         "section_14_cross_grade_compatibility_and_moebius_recovery": task_tc045_audit,
+        "section_15_prime_by_prime_moebius_recovery_and_euler_compatibility": task_tc046_audit,
         "literature_references": [
             {
                 "citation": "Burnol (1999, arXiv:math/9902080v1; 2001, arXiv:math/0101068v1)",

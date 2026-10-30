@@ -1178,4 +1178,97 @@ theorem transfer_form_plancherel_bound_and_minus_state_vanishing
   intro h_eq
   constructor <;> linarith
 
+/-- One-prime step recursion of finite-prime Euler inversion:
+    `W_{p_k}(X) = (I - p_k^{-1/2} D_{p_k}) W_{p_{k-1}}(X) = W_prev_X - inv_sqrt_p * W_prev_X_div_p`. -/
+def finitePrimeEulerRecursionStep (W_prev_X inv_sqrt_p W_prev_X_div_p : ℝ) : ℝ :=
+  W_prev_X - inv_sqrt_p * W_prev_X_div_p
+
+/-- Closed-form arithmetic coefficient `lambda_y(n) = (mu_y * log)(n)` across the three disjoint
+    prime-divisor-count cases `omega_le_y = 0` (`log n`), `omega_le_y = 1` (`log p`), and `omega_le_y >= 2` (`0`). -/
+def finitePrimeCoeffCases (omega_le_y : ℕ) (log_n log_p : ℝ) : ℝ :=
+  match omega_le_y with
+  | 0 => log_n
+  | 1 => log_p
+  | _ + 2 => 0
+
+/-- Theorem 44: Finite-Prime Euler Recursion Expansion and Arithmetic Coefficient Cases (`lambda_y = mu_y * log`).
+    (1) Iterating `finitePrimeEulerRecursionStep` across two distinct primes `p_1, p_2` reproduces the
+        4-divisor inclusion-exclusion expansion over `d | p_1 * p_2`:
+        `W_{p_1, p_2}(X) = W_0(X) - p_1^{-1/2} W_0(X/p_1) - p_2^{-1/2} W_0(X/p_2) + (p_1^{-1/2} p_2^{-1/2}) W_0(X/(p_1 p_2))`.
+    (2) When adjoining the next prime `p_k` dividing `n = p_k^a * m` (`p_k` not dividing `m`, `a >= 1`),
+        the coefficient step `lambda_{p_k}(n) = lambda_{p_{k-1}}(n) - lambda_{p_{k-1}}(n / p_k)` satisfies:
+        - if `omega_{<= p_{k-1}}(m) = 0`: `log_n - (log_n - log_p) = log_p = finitePrimeCoeffCases 1 log_n log_p`;
+        - if `omega_{<= p_{k-1}}(m) = 1`: `log_q - log_q = 0 = finitePrimeCoeffCases 2 log_n log_q`;
+        - if `omega_{<= p_{k-1}}(m) >= 2`: `0 - 0 = 0`.
+    (3) Whenever `0 <= log_p <= log_n`, all three cases of `finitePrimeCoeffCases` are nonnegative (`>= 0`)
+        and bounded above by `log_n`.
+    Scope note: Formalizes the algebraic recursion and case split of `lambda_y(n)`; unique prime factorization
+    and infinite series convergence are handled externally. -/
+theorem finite_prime_euler_recursion_and_coefficient_cases
+    (W_0_X W_0_Xp1 W_0_Xp2 W_0_Xp1p2 inv_sqrt_p1 inv_sqrt_p2 log_n log_p log_q : ℝ)
+    (h_log_nonneg : 0 ≤ log_p ∧ log_p ≤ log_n) :
+    let W_p1_X := finitePrimeEulerRecursionStep W_0_X inv_sqrt_p1 W_0_Xp1
+    let W_p1_Xp2 := finitePrimeEulerRecursionStep W_0_Xp2 inv_sqrt_p1 W_0_Xp1p2
+    let W_p1p2_X := finitePrimeEulerRecursionStep W_p1_X inv_sqrt_p2 W_p1_Xp2
+    (W_p1p2_X = W_0_X - inv_sqrt_p1 * W_0_Xp1 - inv_sqrt_p2 * W_0_Xp2 +
+        (inv_sqrt_p1 * inv_sqrt_p2) * W_0_Xp1p2) ∧
+      (finitePrimeCoeffCases 0 log_n log_p - finitePrimeCoeffCases 0 (log_n - log_p) log_p =
+        finitePrimeCoeffCases 1 log_n log_p) ∧
+      (finitePrimeCoeffCases 1 log_n log_q - finitePrimeCoeffCases 1 (log_n - log_p) log_q =
+        finitePrimeCoeffCases 2 log_n log_q) ∧
+      (finitePrimeCoeffCases 2 log_n log_q - finitePrimeCoeffCases 2 (log_n - log_p) log_q =
+        finitePrimeCoeffCases 3 log_n log_q) ∧
+      (0 ≤ finitePrimeCoeffCases 0 log_n log_p ∧ finitePrimeCoeffCases 0 log_n log_p ≤ log_n) ∧
+      (0 ≤ finitePrimeCoeffCases 1 log_n log_p ∧ finitePrimeCoeffCases 1 log_n log_p ≤ log_n) ∧
+      (0 ≤ finitePrimeCoeffCases 2 log_n log_p ∧ finitePrimeCoeffCases 2 log_n log_p ≤ log_n) := by
+  intro W_p1_X W_p1_Xp2 W_p1p2_X
+  dsimp [W_p1_X, W_p1_Xp2, W_p1p2_X, finitePrimeEulerRecursionStep, finitePrimeCoeffCases]
+  rcases h_log_nonneg with ⟨h_p0, h_pn⟩
+  refine ⟨by ring, by ring, by ring, by ring, ⟨by linarith, by linarith⟩, ⟨h_p0, h_pn⟩, ⟨by linarith, by linarith⟩⟩
+
+/-- Theorem 45: Coupled-Prime-Cutoff Comparison Bound, Smooth/Rough Tail Partition, and Boundedness Equivalence.
+    For scale `X >= 1` and prime cutoff `y >= M >= max(2, X)` where `mu_y(m) = mu(m)` for `1 <= m <= M`:
+    (1) Given the small-scale tail bound `|W_X - W_y_X| <= C_log0_half * X_pow_5_2 * M_inv_sq`
+        (`C_log0_half = C_{log,0} / 2 >= 0`) and the coupled cutoff condition `X_pow_5_2 * M_inv_sq <= 1`
+        (satisfied by `y = M(X) = ceil(max(2, X^{5/4}))`), we have `|W_X - W_y_X| <= C_log0_half`.
+    (2) Under this coupled comparison bound, any bound `|W_y_X| <= B_y` implies `|W_X| <= B_y + C_log0_half`
+        and `|R_mu_X| <= B_y + C_log0_half + M_log` (where `W_X = W_log_X + R_mu_X` and `|W_log_X| <= M_log`),
+        and conversely any bound `|W_X| <= B_W` implies `|W_y_X| <= B_W + C_log0_half`.
+    (3) Partitioning the `m > M` remainder into `y`-smooth squarefree divisors `T_smooth` (`m | P_y, m > M`)
+        and `y`-rough divisors `T_rough` (`m not dividing P_y, m > M`) with
+        `W_y_X = W_log_X + R_mu_M + T_smooth` and `W_X - W_y_X = T_rough` yields the exact identity
+        `R_mu_X - R_mu_M = T_smooth + T_rough`.
+    Scope note: Formalizes the quantitative reduction from `W(X)` and `R_mu(X)` to the coupled finite-prime
+    profile `W_{M(X)}(X)` from the supplied `O(u^{5/2})` small-scale tail bound. -/
+theorem coupled_prime_cutoff_comparison_and_boundedness_equivalence
+    (W_X W_y_X W_log_X R_mu_X R_mu_M T_smooth T_rough
+      C_log0_half X_pow_5_2 M_inv_sq M_log B_y B_W : ℝ)
+    (h_C_nonneg : 0 ≤ C_log0_half)
+    (h_tail_bound : -(C_log0_half * (X_pow_5_2 * M_inv_sq)) ≤ W_X - W_y_X ∧
+      W_X - W_y_X ≤ C_log0_half * (X_pow_5_2 * M_inv_sq))
+    (h_coupled : X_pow_5_2 * M_inv_sq ≤ 1)
+    (h_W_decomp : W_X = W_log_X + R_mu_X)
+    (h_Wy_decomp : W_y_X = W_log_X + R_mu_M + T_smooth)
+    (h_rough_def : W_X - W_y_X = T_rough)
+    (h_log_abs : -M_log ≤ W_log_X ∧ W_log_X ≤ M_log) :
+    (-C_log0_half ≤ W_X - W_y_X ∧ W_X - W_y_X ≤ C_log0_half) ∧
+      ((-B_y ≤ W_y_X ∧ W_y_X ≤ B_y) →
+        (-(B_y + C_log0_half) ≤ W_X ∧ W_X ≤ B_y + C_log0_half) ∧
+        (-(B_y + C_log0_half + M_log) ≤ R_mu_X ∧ R_mu_X ≤ B_y + C_log0_half + M_log)) ∧
+      ((-B_W ≤ W_X ∧ W_X ≤ B_W) →
+        (-(B_W + C_log0_half) ≤ W_y_X ∧ W_y_X ≤ B_W + C_log0_half)) ∧
+      (R_mu_X - R_mu_M = T_smooth + T_rough) := by
+  rcases h_tail_bound with ⟨h_tl, h_tu⟩
+  rcases h_log_abs with ⟨h_ll, h_lu⟩
+  have h_prod_le : C_log0_half * (X_pow_5_2 * M_inv_sq) ≤ C_log0_half * 1 :=
+    mul_le_mul_of_nonneg_left h_coupled h_C_nonneg
+  have h_diff_bounds : -C_log0_half ≤ W_X - W_y_X ∧ W_X - W_y_X ≤ C_log0_half := by
+    constructor <;> linarith
+  rcases h_diff_bounds with ⟨h_dl, h_du⟩
+  refine ⟨⟨h_dl, h_du⟩, ?_, ?_, by linarith⟩
+  · rintro ⟨h_yl, h_yu⟩
+    refine ⟨⟨by linarith, by linarith⟩, ⟨by linarith, by linarith⟩⟩
+  · rintro ⟨h_wl, h_wu⟩
+    exact ⟨by linarith, by linarith⟩
+
 end RiemannScope
