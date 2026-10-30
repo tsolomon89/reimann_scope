@@ -1748,13 +1748,32 @@ def test_30_task_tc046_prime_euler_moebius_recovery(artifact_payload):
         and row["coeff_minus_prod_encloses_zero"]
         for row in s2["three_way_W_y_representation_checks"]
     )
+    s3 = sec15["section_3_quantitative_compatibility_and_obstruction_analysis"]
+    mech_a = s3["mechanism_A_critical_line_mellin_fourier_and_gram_bound"]
+    assert len(mech_a["low_frequency_spike_table"]) == 11
+    assert (
+        mech_a["low_frequency_spike_table"][-1][
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified"
+        ]["mid_float"]
+        > 153.0
+    )
     s4 = sec15["section_4_coupled_cutoff_passage_and_grade_certification"]
+    ceil_regs = {
+        row["X_label"]: row for row in s4["certified_cutoff_ceiling_regression"]
+    }
+    assert ceil_regs["16 + 10^{-30}"]["certified_M_X"] == 33
+    assert ceil_regs["16 + 10^{-30}"]["naive_float_ceil_value"] == 32
     assert len(s4["certified_coupled_grade_table"]) == 13
     assert all(
         row["abs_W_minus_W_M_X_below_analytic_bound"]
         and row["abs_W_minus_W_M_X_below_half_C_log_0"]
         for row in s4["certified_coupled_grade_table"]
     )
+    rem_obl = sec15["section_5_outcome_and_remaining_obligation"][
+        "remaining_open_obligation"
+    ]
+    assert "|R_{mu, M(X)}(X)| <= M_trunc" in rem_obl["exact_surviving_lemma"]
+    assert "|R_{mu, floor(X)}(X)| <=" not in rem_obl["exact_surviving_lemma"]
     rt15 = sec15["full_section_15_tree_roundtrip_verification"]
     assert rt15["all_enclose_original_256bit_arb_ball"] is True
     assert rt15["live_original_count_matches_enumerated_total"] is True

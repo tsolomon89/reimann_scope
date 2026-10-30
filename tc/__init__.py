@@ -1014,6 +1014,8 @@ from tc.prime_euler_moebius_recovery import (
     evaluate_euler_dirichlet_poly_acb,
     evaluate_H0_critical_line_arb,
     evaluate_b_log_boundary_term_arb,
+    certified_coupled_cutoff_M_X_arb,
+    evaluate_euler_spike_interval_gram_lower_bound_arb,
     compute_coupled_cutoff_comparison_bound_arb,
     verify_symbolic_finite_prime_identities,
 )
@@ -1886,6 +1888,8 @@ __all__ = [
     "evaluate_euler_dirichlet_poly_acb",
     "evaluate_H0_critical_line_arb",
     "evaluate_b_log_boundary_term_arb",
+    "certified_coupled_cutoff_M_X_arb",
+    "evaluate_euler_spike_interval_gram_lower_bound_arb",
     "compute_coupled_cutoff_comparison_bound_arb",
     "verify_symbolic_finite_prime_identities",
     "execute_task_tc046_prime_euler_moebius_recovery",

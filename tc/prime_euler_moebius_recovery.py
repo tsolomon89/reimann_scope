@@ -564,12 +564,135 @@ def evaluate_b_log_boundary_term_arb(u: arb, prec_bits: int = 256) -> arb:
         flint_ctx.prec = saved_prec
 
 
+def certified_coupled_cutoff_M_X_arb(X: arb, prec_bits: int = 256) -> int:
+    """
+    Compute the certified coupled prime cutoff M(X) = ceil(max(2, X^{5/4}))
+    directly from the Arb ball enclosure of X^{5/4} = (X^5)^{1/4} without
+    passing through binary64 float conversion.
+
+    Certifies in Arb ball arithmetic that arb(M_X) >= X^{5/4} and
+    arb(M_X)^2 >= X^{5/2}.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        X_arb = arb(X)
+        if bool(X_arb <= arb(0)):
+            raise ValueError("X must be strictly positive")
+        u_arb = (X_arb**5).root(4)
+        ceil_upper = u_arb.upper().ceil()
+        fmpz_val = ceil_upper.unique_fmpz()
+        if fmpz_val is None:
+            raise RuntimeError(
+                f"Non-unique integer ceiling for upper endpoint of X^(5/4): {ceil_upper}"
+            )
+        M_X = max(2, int(fmpz_val))
+        M_X_arb = arb(M_X)
+        if not (
+            bool(M_X_arb >= u_arb) and bool((M_X_arb**2) >= (X_arb**5).sqrt())
+        ):
+            raise RuntimeError(
+                f"Certified cutoff M(X)={M_X} failed Arb inequality check for X={X_arb}"
+            )
+        return M_X
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_euler_spike_interval_gram_lower_bound_arb(
+    y: int, prec_bits: int = 256
+) -> Dict[str, Any]:
+    """
+    Certify the controlled-width frequency interval lower bound on the Euler-sieved
+    seed Gram norm squared ||Psi_y||_{L^2(d^*x)}^2 across
+      I_y := [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y],
+      |I_y| = pi / (8*log y) > 0.
+
+    Because for every prime p <= y and every t in [0, pi / log y] the phase
+    t*log(p) lies in [0, pi] where sin(t*log p) >= 0, each factor
+    g_p(t) = 1 + p^{-1} - 2*p^{-1/2}*cos(t*log p) is monotonically non-decreasing
+    in t on I_y, so inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 exactly.
+    Likewise H_0(it) is strictly increasing in |t| on [0, infty), so
+    inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) >= H_0(0) > 0.
+    By Plancherel's identity and evenness of |E_y(it)|^2 H_0(it) on (-I_y) union I_y:
+      ||Psi_y||_{L^2}^2 >= (2 / tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt
+                        >= (2 |I_y| / tau) |E_y(i t_{y,-})|^2 H_0(i t_{y,-})
+                        = (H_0(i t_{y,-}) / (8 log y)) |E_y(i t_{y,-})|^2
+                        >= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        ps = primes_up_to(y)
+        y_arb = arb(y)
+        log_y_arb = y_arb.log()
+        t_y_plus_arb = arb.pi() / log_y_arb
+        t_y_minus_arb = (arb(7) * arb.pi()) / (arb(8) * log_y_arb)
+        interval_width_arb = arb.pi() / (arb(8) * log_y_arb)
+
+        e_sq_at_plus_arb = arb(1)
+        e_sq_at_minus_arb = arb(1)
+        constructive_at_plus_count = 0
+        constructive_across_interval_count = 0
+        for p in ps:
+            p_arb = arb(p)
+            log_p_arb = p_arb.log()
+            inv_p = arb(1) / p_arb
+            two_inv_sqrt_p = arb(2) / p_arb.sqrt()
+
+            cos_plus = (t_y_plus_arb * log_p_arb).cos()
+            cos_minus = (t_y_minus_arb * log_p_arb).cos()
+            if bool(cos_plus < arb(0)):
+                constructive_at_plus_count += 1
+            if bool(cos_minus < arb(0)):
+                constructive_across_interval_count += 1
+
+            e_sq_at_plus_arb *= arb(1) + inv_p - two_inv_sqrt_p * cos_plus
+            e_sq_at_minus_arb *= arb(1) + inv_p - two_inv_sqrt_p * cos_minus
+
+        H0_at_0_arb = evaluate_H0_critical_line_arb(arb(0))
+        H0_at_minus_arb = evaluate_H0_critical_line_arb(t_y_minus_arb)
+        H0_at_plus_arb = evaluate_H0_critical_line_arb(t_y_plus_arb)
+
+        # Since 2 * |I_y| / tau = 2 * (pi / (8 log y)) / (2 pi) = 1 / (8 log y):
+        gram_sq_lb_H0_0_arb = (
+            H0_at_0_arb / (arb(8) * log_y_arb)
+        ) * e_sq_at_minus_arb
+        gram_sq_lb_H0_minus_arb = (
+            H0_at_minus_arb / (arb(8) * log_y_arb)
+        ) * e_sq_at_minus_arb
+
+        return {
+            "y": y,
+            "pi_y": len(ps),
+            "t_y_minus_arb": t_y_minus_arb,
+            "t_y_plus_arb": t_y_plus_arb,
+            "interval_width_arb": interval_width_arb,
+            "constructive_at_plus_count": constructive_at_plus_count,
+            "constructive_across_interval_count": constructive_across_interval_count,
+            "e_sq_at_minus_arb": e_sq_at_minus_arb,
+            "e_sq_at_plus_arb": e_sq_at_plus_arb,
+            "H0_at_0_arb": H0_at_0_arb,
+            "H0_at_minus_arb": H0_at_minus_arb,
+            "H0_at_plus_arb": H0_at_plus_arb,
+            "gram_sq_lb_H0_0_arb": gram_sq_lb_H0_0_arb,
+            "gram_sq_lb_H0_minus_arb": gram_sq_lb_H0_minus_arb,
+            "monotonicity_verified": bool(e_sq_at_minus_arb <= e_sq_at_plus_arb),
+            "H0_monotonicity_verified": bool(
+                H0_at_0_arb <= H0_at_minus_arb and H0_at_minus_arb <= H0_at_plus_arb
+            ),
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
 def compute_coupled_cutoff_comparison_bound_arb(
     X: arb, prec_bits: int = 256
 ) -> Dict[str, Any]:
     """
-    Compute the coupled prime cutoff M(X) = ceil(max(2, X^{5/4})) and the certified
-    comparison bound C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0}.
+    Compute the coupled prime cutoff M(X) = ceil(max(2, X^{5/4})) directly in Arb
+    (without float conversion) and the certified comparison bound
+    C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0}.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -579,20 +702,26 @@ def compute_coupled_cutoff_comparison_bound_arb(
         neg_zeta_prime_3_arb = -s3_series[1].real
         c_log_0_arb = (arb(92193) / arb(32768)) * neg_zeta_prime_3_arb
         half_c_log_0_arb = c_log_0_arb / arb(2)
-        X_pow_5_4 = X_arb ** (arb(5) / arb(4))
-        M_X = max(2, int(math.ceil(float(X_pow_5_4.upper()))))
+        X_pow_5_4 = (X_arb**5).root(4)
+        X_pow_5_2 = (X_arb**5).sqrt()
+        M_X = certified_coupled_cutoff_M_X_arb(X_arb, prec_bits=prec_bits)
         M_X_arb = arb(M_X)
-        bound_at_M_X = (
-            c_log_0_arb * (X_arb ** (arb(5) / arb(2))) / (arb(2) * (M_X_arb**2))
-        )
+        ratio_to_M_sq = X_pow_5_2 / (M_X_arb**2)
+        bound_at_M_X = half_c_log_0_arb * ratio_to_M_sq
         return {
             "X": float(X_arb.mid()),
+            "X_pow_5_4_arb": X_pow_5_4,
             "M_X": M_X,
             "q_gt_M_X": next_prime_above(M_X),
             "c_log_0_arb": c_log_0_arb,
             "half_c_log_0_arb": half_c_log_0_arb,
             "bound_at_M_X_arb": bound_at_M_X,
-            "satisfies_uniform_bound": bool(bound_at_M_X <= half_c_log_0_arb),
+            "M_X_ge_X_pow_5_4": bool(M_X_arb >= X_pow_5_4),
+            "M_X_sq_ge_X_pow_5_2": bool((M_X_arb**2) >= X_pow_5_2),
+            "satisfies_uniform_bound": bool(
+                ratio_to_M_sq <= arb(1)
+                and bound_at_M_X.upper() <= half_c_log_0_arb.upper()
+            ),
         }
     finally:
         flint_ctx.prec = saved_prec
@@ -1009,45 +1138,68 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 }
             )
 
-        # 4B. Certify the low-frequency coherent arch spike of |E_y(i t_y)|^2 at t_y = pi / log(y)
-        #     in 256-bit Arb across y in {2, 5, 11, 31, 97, 199, 499, 997}
+        # 4B. Certify the low-frequency coherent arch spike of |E_y(it)|^2 across the
+        #     controlled-width frequency interval I_y = [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y]
+        #     of width |I_y| = pi / (8*log y) in 256-bit Arb across y in {2, 5, 11, 31, 97, 199, 499, 997, 1999, 4999, 9973}
         f_half_acb = evaluate_f_tau_acb(acb(arb(1) / arb(2)))
         H0_at_0_arb = (f_half_acb * f_half_acb).real
         low_freq_spike_table: List[Dict[str, Any]] = []
-        all_primes_997 = primes_up_to(997)
-        for y in (2, 5, 11, 31, 97, 199, 499, 997):
-            ps = [p for p in all_primes_997 if p <= y]
-            y_arb = arb(y)
-            t_y_arb = arb.pi() / y_arb.log()
-            e_sq_arb = arb(1)
-            constructive_count = 0
-            for p in ps:
-                p_arb = arb(p)
-                phase = t_y_arb * p_arb.log()
-                cos_val = phase.cos()
-                if bool(cos_val < arb(0)):
-                    constructive_count += 1
-                factor_sq = (
-                    arb(1) + arb(1) / p_arb - arb(2) * cos_val / p_arb.sqrt()
-                )
-                e_sq_arb *= factor_sq
-            f_ty_pos = evaluate_f_tau_acb(acb(arb(1) / arb(2), t_y_arb))
-            f_ty_neg = evaluate_f_tau_acb(acb(arb(1) / arb(2), -t_y_arb))
-            H0_ty_arb = (f_ty_pos * f_ty_neg).real
+        for y in (2, 5, 11, 31, 97, 199, 499, 997, 1999, 4999, 9973):
+            spike_info = evaluate_euler_spike_interval_gram_lower_bound_arb(
+                y, prec_bits=prec_bits
+            )
+            t_y_minus_arb = spike_info["t_y_minus_arb"]
+            t_y_plus_arb = spike_info["t_y_plus_arb"]
+            width_arb = spike_info["interval_width_arb"]
+            e_sq_minus_arb = spike_info["e_sq_at_minus_arb"]
+            e_sq_plus_arb = spike_info["e_sq_at_plus_arb"]
+            H0_minus_arb = spike_info["H0_at_minus_arb"]
+            H0_plus_arb = spike_info["H0_at_plus_arb"]
+            gram_lb_0_arb = spike_info["gram_sq_lb_H0_0_arb"]
+            gram_lb_minus_arb = spike_info["gram_sq_lb_H0_minus_arb"]
             low_freq_spike_table.append(
                 {
                     "y": y,
-                    "pi_y": len(ps),
+                    "pi_y": spike_info["pi_y"],
+                    "interval_left_t_y_minus_7pi_over_8log_y_certified": serialize_arb_certified(
+                        t_y_minus_arb
+                    ),
                     "coherent_frequency_t_y_certified": serialize_arb_certified(
-                        t_y_arb
+                        t_y_plus_arb
                     ),
-                    "primes_with_negative_cos_count": constructive_count,
-                    "E_y_abs_sq_at_t_y_certified": serialize_arb_certified(e_sq_arb),
+                    "interval_width_pi_over_8log_y_certified": serialize_arb_certified(
+                        width_arb
+                    ),
+                    "primes_with_negative_cos_count": spike_info[
+                        "constructive_at_plus_count"
+                    ],
+                    "primes_with_negative_cos_across_interval_count": spike_info[
+                        "constructive_across_interval_count"
+                    ],
+                    "interval_min_E_y_abs_sq_at_t_y_minus_certified": serialize_arb_certified(
+                        e_sq_minus_arb
+                    ),
+                    "E_y_abs_sq_at_t_y_certified": serialize_arb_certified(
+                        e_sq_plus_arb
+                    ),
                     "E_y_abs_at_t_y_certified": serialize_arb_certified(
-                        e_sq_arb.sqrt()
+                        e_sq_plus_arb.sqrt()
                     ),
-                    "H0_at_i_t_y_certified": serialize_arb_certified(H0_ty_arb),
-                    "H0_at_i_t_y_exceeds_H0_at_0": bool(H0_ty_arb >= H0_at_0_arb),
+                    "interval_min_H0_at_i_t_y_minus_certified": serialize_arb_certified(
+                        H0_minus_arb
+                    ),
+                    "H0_at_i_t_y_certified": serialize_arb_certified(H0_plus_arb),
+                    "H0_at_i_t_y_exceeds_H0_at_0": bool(H0_plus_arb >= H0_at_0_arb),
+                    "interval_monotonicity_E_y_sq_and_H0_verified": bool(
+                        spike_info["monotonicity_verified"]
+                        and spike_info["H0_monotonicity_verified"]
+                    ),
+                    "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": serialize_arb_certified(
+                        gram_lb_0_arb
+                    ),
+                    "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": serialize_arb_certified(
+                        gram_lb_minus_arb
+                    ),
                 }
             )
 
@@ -1161,12 +1313,22 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "H0_at_0_certified": serialize_arb_certified(H0_at_0_arb),
                 "euler_sieved_seed_gram_norm_table": euler_gram_norm_table,
                 "low_frequency_coherent_arch_obstruction": (
-                    "At frequency t_y = pi / log(y) -> 0, every prime p in [y^{2/3}, y] has phase t_y log(p) in [2*pi/3, pi] "
-                    "with -cos(t_y log p) >= 1/2, so all primes in [y^{2/3}, y] align constructively in "
-                    "|E_y(i t_y)| = prod_{p <= y} |1 - p^{-1/2 - i t_y}| >= exp((2 + o(1)) sqrt(y) / log y), "
-                    "while H_0(i t_y) >= H_0(0) = F_tau(1/2)^2 = 2.82909344e-5 > 0. "
-                    "Reason: keeping E_y(it) factored on Re(z) = 0 includes all 2^{pi(y)} divisors m | P_y up to the primorial "
-                    "P_y ~ e^y without the right-shift spatial decay O((X/m)^{5/2}) that suppresses m > X."
+                    "On the controlled-width frequency interval I_y := [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y] "
+                    "of width |I_y| = pi / (8*log y) > 0, every prime p <= y and every t in [0, pi / log y] has phase "
+                    "t*log(p) in [0, pi] where (d/dt)(1 + p^{-1} - 2*p^{-1/2}*cos(t*log p)) = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0. "
+                    "Thus |E_y(it)|^2 is monotonically non-decreasing in t on I_y, with exact interval minimum at the left endpoint: "
+                    "inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 >= exp((4 + o(1)) sqrt(y) / log y) "
+                    "(since every prime p in [y^{16/21}, y] has t*log(p) in [2*pi/3, pi] with -cos(t*log p) >= 1/2 throughout I_y), "
+                    "while inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) >= H_0(0) = F_tau(1/2)^2 = 2.82909344e-5 > 0. "
+                    "Integrating over (-I_y) union I_y gives the rigorous integrated Gram-norm lower bound "
+                    "||Psi_y||_{L^2(d^*x)}^2 >= (2/tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt "
+                    ">= (2 |I_y| / tau) |E_y(i t_{y,-})|^2 H_0(i t_{y,-}) "
+                    ">= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = exp((4 + o(1)) sqrt(y) / log y) -> +infty as y -> infty "
+                    "(reaching >= 153.39 at y = 9973). "
+                    "Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm bound as y -> infty "
+                    "(because keeping E_y(it) factored on Re(z) = 0 retains all 2^{pi(y)} divisors m | P_y up to P_y ~ e^y "
+                    "without the right-shift spatial decay O((X/m)^{5/2}) that suppresses m > X); it does NOT establish failure "
+                    "of the coupled profile W_{M(X)}(X) or of the broader concurrent-grade hypothesis."
                 ),
                 "low_frequency_spike_table": low_freq_spike_table,
             },
@@ -1180,12 +1342,15 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                     "For any fixed prime cutoff y >= 2, |W_y(X)| <= 2^{pi(y)} O(X^{-1/2} log(X+2)) -> 0 as X -> infty."
                 ),
                 "horizon_collapse_for_y_ge_X": (
-                    "Whenever y >= X (including the coupled cutoff y = M(X) = ceil(max(2, X^{5/4}))), "
-                    "every integer m <= X has all prime factors <= m <= X <= y, so m | P_y iff m is squarefree (mu(m) != 0). "
-                    "Consequently, the m <= X portion of W_y(X) collapses term-by-term to the standard additive Moebius "
-                    "truncation W_log(X) + R_{mu, floor(X)}(X) with Q(X) = (6/pi^2) X + O(X^{1/2}) active squarefree terms, "
-                    "while on the coefficient side lambda_y(n) = Lambda(n) for all 2 <= n < 2 q_{>y} (> 2X), reproducing the "
-                    "original prime sum across the entire bulk oscillation region of h_0(n/X)."
+                    "Whenever y >= N >= 2, every integer 1 <= m <= N has all prime factors <= m <= N <= y, so m | P_y iff m is "
+                    "squarefree (mu(m) != 0) and mu_y(m) = mu(m) for all 1 <= m <= N. Splitting at the bare scale horizon "
+                    "N = floor(X) eliminates the primorial count for m > P_y, but the available small-scale tail bound "
+                    "C_{log,0} X^{5/2} sum_{m > floor(X)} m^{-3} <= C_{log,0} X^{5/2} / (2 floor(X)^2) = O(X^{1/2}) grows as O(sqrt(X)) "
+                    "and does NOT give a uniform O(1) comparison with W(X). Uniform O(1) comparison requires the coupled cutoff "
+                    "N = M(X) = ceil(max(2, X^{5/4})), where the m > M(X) tail is bounded by (1/2) C_{log,0} < 0.278715 and the "
+                    "m <= M(X) portion of W_{M(X)}(X) collapses term-by-term to the additive Moebius truncation "
+                    "W_log(X) + R_{mu, M(X)}(X), while on the coefficient side lambda_{M(X)}(n) = Lambda(n) for all "
+                    "2 <= n < 2 q_{>M(X)} (> 2 M(X) >= 2 X^{5/4}), reproducing the original prime sum across the bulk oscillation region of h_0(n/X)."
                 ),
             },
         }
@@ -1221,8 +1386,7 @@ def execute_task_tc046_prime_euler_moebius_recovery(
             if abs_k not in abs_k_cache:
                 k_arb = arb(abs_k.numerator) / arb(abs_k.denominator)
                 X_K_arb = tau_arb**k_arb
-                X_pow_5_4 = X_K_arb ** (arb(5) / arb(4))
-                M_X = max(2, int(math.ceil(float(X_pow_5_4.upper()))))
+                M_X = certified_coupled_cutoff_M_X_arb(X_K_arb, prec_bits=prec_bits)
                 q_gt_M = next_prime_above(M_X)
 
                 # Choose truncation n_max so tail is tiny even at X_K = tau^2 ~ 39.48
@@ -1255,7 +1419,7 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 t_smooth = w_y_coupled - (w_log_val + r_mu_additive_M)
                 analytic_tail_bound = (
                     c_log_0_arb
-                    * (X_K_arb ** (arb(5) / arb(2)))
+                    * (X_K_arb**5).sqrt()
                     / (arb(2) * (arb(M_X) ** 2))
                 )
 
@@ -1330,6 +1494,37 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 }
             )
 
+        # Certify the near-integer ceiling regression at X = 16 - 10^{-30}, 16, 16 + 10^{-30}:
+        # For X = 16 + 10^{-30}, X^{5/4} = 32 + 2.5e-30 + ... > 32, so the exact ceiling is 33,
+        # whereas binary64 float rounding of upper() produces 32.0 and a false cutoff 32.
+        ceiling_regression_checks: List[Dict[str, Any]] = []
+        for x_reg_label, x_reg_arb, expected_m_x in (
+            ("16 - 10^{-30}", arb(16) - arb("1e-30"), 32),
+            ("16", arb(16), 32),
+            ("16 + 10^{-30}", arb(16) + arb("1e-30"), 33),
+        ):
+            reg_info = compute_coupled_cutoff_comparison_bound_arb(
+                x_reg_arb, prec_bits=prec_bits
+            )
+            u_reg = reg_info["X_pow_5_4_arb"]
+            naive_float_ceil = max(2, int(math.ceil(float(u_reg.upper()))))
+            ceiling_regression_checks.append(
+                {
+                    "X_label": x_reg_label,
+                    "X_pow_5_4_certified": serialize_arb_certified(u_reg),
+                    "certified_M_X": reg_info["M_X"],
+                    "expected_M_X": expected_m_x,
+                    "naive_float_ceil_value": naive_float_ceil,
+                    "matches_expected_M_X": (reg_info["M_X"] == expected_m_x),
+                    "M_X_ge_X_pow_5_4_verified": reg_info["M_X_ge_X_pow_5_4"],
+                    "M_X_sq_ge_X_pow_5_2_verified": reg_info["M_X_sq_ge_X_pow_5_2"],
+                    "satisfies_uniform_bound": reg_info["satisfies_uniform_bound"],
+                    "bound_at_M_X_certified": serialize_arb_certified(
+                        reg_info["bound_at_M_X_arb"]
+                    ),
+                }
+            )
+
         coupled_passage_audit = {
             "comparison_theorem_statement": (
                 "For any X > 0 and any integer M >= 2 with prime cutoff y >= M, mu_y(m) = mu(m) for all 1 <= m <= M "
@@ -1337,7 +1532,13 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "Using |W_log(X/m)| <= C_{log,0} (X/m)^{5/2} yields "
                 "|W(X) - W_y(X)| = |R_mu(X) - R_{mu, y}(X)| <= C_{log,0} X^{5/2} sum_{m > M} m^{-3} <= C_{log,0} X^{5/2} / (2 M^2)."
             ),
-            "coupled_cutoff_schedule": "y = M(X) := ceil(max(2, X^{5/4})) for X >= 1",
+            "coupled_cutoff_schedule": "y = M(X) := ceil(max(2, X^{5/4})) for X >= 1 (computed directly from Arb ball enclosure of (X^5)^{1/4} without float conversion)",
+            "scale_horizon_vs_coupled_cutoff_tail_comparison": (
+                "At the bare scale horizon N = floor(X), the small-scale tail bound is "
+                "C_{log,0} X^{5/2} / (2 floor(X)^2) = O(sqrt(X)), which diverges as X -> infty and does NOT establish uniform "
+                "boundedness equivalence with W(X). Choosing the coupled cutoff N = M(X) = ceil(max(2, X^{5/4})) makes "
+                "M(X)^2 >= X^{5/2} and yields the uniform O(1) comparison bound C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715."
+            ),
             "uniform_coupled_comparison_bound_formula": (
                 "|W(X) - W_{M(X)}(X)| = |R_mu(X) - R_{mu, M(X)}(X)| <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0}"
             ),
@@ -1362,6 +1563,7 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "mu_{M(X)}(m) = mu(m) for all 1 <= m <= M(X), so the coupled finite-prime Euler construction is an exact "
                 "quantitative reformulation of the Moebius/prime cancellation obligation within +/- 0.278715."
             ),
+            "certified_cutoff_ceiling_regression": ceiling_regression_checks,
             "certified_coupled_grade_table": coupled_grade_table,
             "lean_theorem": "coupled_prime_cutoff_comparison_and_boundedness_equivalence",
         }
@@ -1369,15 +1571,15 @@ def execute_task_tc046_prime_euler_moebius_recovery(
         premise_and_outcome_classification = {
             "strongest_new_mathematical_results": [
                 "Exact Finite-Prime Euler Inversion & Agreement Horizon (`finite_prime_euler_recursion_and_coefficient_cases`): W_y(X) = [prod_{p <= y}(I - p^{-1/2} D_p)] W_log(X) = sum_{n>=2} lambda_y(n) n^{-1/2} h_0(n/X) with lambda_y = mu_y * log >= Lambda >= 0, exact agreement lambda_y(n) = Lambda(n) for all 2 <= n < 2 q_{>y} (first discrepancy at 2 q_{>y} of value log 2), and summatory identity L_y(x) = sum_{d | P_y, d <= x} mu(d) log(floor(x/d)!).",
-                "Coupled-Cutoff Quantitative Reduction & Smooth/Rough Tail Partition (`coupled_prime_cutoff_comparison_and_boundedness_equivalence`): For y >= M >= max(2, X), |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2), and at y = M(X) = ceil(max(2, X^{5/4})), sup_{X >= 1} |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} = 0.2787147936 < 0.278715, reducing uniform boundedness of R_mu(X) to uniform boundedness of W_{M(X)}(X).",
-                "Quantified Dual Obstruction (Critical-Line Coherent Euler Spike vs. Scale-Horizon Collapse): (1) On the critical line Re(z) = 0, holomorphy of M_X[W_y](z) = -E_y(z) H_0(z) zeta'(z+1/2) yields sup_{X > 0} |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}, but constructive phase alignment of 1 - p^{-1/2 - it} at t_y = pi / log(y) drives |E_y(i t_y)| >= exp((2+o(1)) sqrt(y)/log y) -> +infty because the unfactored product retains divisors m | P_y up to P_y ~ e^y; (2) splitting at the scale horizon m <= X eliminates the m > X primorial blowup, but for any y >= X (including y = M(X)) every squarefree m <= X divides P_y, collapsing the m <= X sum identically to W_log(X) + R_{mu, floor(X)}(X).",
+                "Coupled-Cutoff Quantitative Reduction & Smooth/Rough Tail Partition (`coupled_prime_cutoff_comparison_and_boundedness_equivalence`): For y >= M >= max(2, X), |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2), and at y = M(X) = ceil(max(2, X^{5/4})), sup_{X >= 1} |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} = 0.2787147936 < 0.278715 (and |W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| <= (1/2) C_{log,0} < 0.278715), reducing uniform boundedness of R_mu(X) to uniform boundedness of W_{M(X)}(X) or R_{mu, M(X)}(X) (whereas at N = floor(X) the available small-scale tail estimate grows as O(sqrt(X))).",
+                "Quantified Dual Obstruction (Controlled-Width Coherent Euler Spike vs. Coupled-Cutoff Horizon Collapse): (1) On the critical line Re(z) = 0, holomorphy of M_X[W_y](z) = -E_y(z) H_0(z) zeta'(z+1/2) yields sup_{X > 0} |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}, but on the controlled-width frequency interval I_y = [7*pi / (8*log y), pi / log y] of width |I_y| = pi / (8*log y), monotonicity of each prime factor proves inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 >= exp((4+o(1)) sqrt(y)/log y) and ||Psi_y||_{L^2}^2 >= (H_0(0)/(8 log y)) |E_y(i t_{y,-})|^2 -> +infty, establishing divergence of the unsplit Cauchy-Schwarz/Gram-norm bound (without refuting boundedness of the coupled profile W_{M(X)}(X) or the broader concurrent-grade hypothesis); (2) splitting at the coupled cutoff M(X) = ceil(max(2, X^{5/4})) bounds the m > M(X) tail by (1/2) C_{log,0} < 0.278715, but for y >= M(X) every squarefree m <= M(X) divides P_y, collapsing the m <= M(X) sum identically to W_log(X) + R_{mu, M(X)}(X).",
             ],
             "advances_uniform_cancellation_estimate": False,
             "why_reformulation_not_closure": (
                 "Finite-prime Euler inversion provides a genuine fixed-y uniform bound (via ||Psi_y||_{L^2}) and a "
                 "quantitative coupled-cutoff reduction to y = M(X) = ceil(max(2, X^{5/4})) within 0.278715, "
-                "but at any cutoff y >= X the bulk divisors m <= X and bulk coefficients n < 2 q_{>y} reproduce "
-                "the exact untruncated Moebius and von Mangoldt sums without supplying an independent signed cancellation bound."
+                "but at y >= M(X) the divisors m <= M(X) and coefficients n < 2 q_{>y} reproduce the additive truncation "
+                "W_log(X) + R_{mu, M(X)}(X) and the bulk von Mangoldt sum without supplying an independent signed cancellation bound."
             ),
             "remaining_open_obligation": {
                 "subgate_id": "SUBGATE-TC-043A",
@@ -1385,7 +1587,10 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "exact_surviving_lemma": (
                     "Prove without assuming RH or universal Weil positivity that there exists a finite constant "
                     "M_mu < infty such that for all X >= 1, |R_mu(X)| <= M_mu "
-                    "(equivalently, |W_{M(X)}(X)| <= M_y or |R_{mu, floor(X)}(X)| <= M_trunc for M(X) = ceil(max(2, X^{5/4})))."
+                    "(equivalently, |W_{M(X)}(X)| <= M_y or |R_{mu, M(X)}(X)| <= M_trunc at the coupled cutoff "
+                    "M(X) = ceil(max(2, X^{5/4})), where |W(X) - W_{M(X)}(X)| < 0.278715 and "
+                    "|W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| < 0.278715; by contrast, at N = floor(X) the "
+                    "available small-scale tail estimate grows as O(sqrt(X)))."
                 ),
             },
         }
@@ -1434,6 +1639,8 @@ __all__ = [
     "evaluate_euler_dirichlet_poly_acb",
     "evaluate_H0_critical_line_arb",
     "evaluate_b_log_boundary_term_arb",
+    "certified_coupled_cutoff_M_X_arb",
+    "evaluate_euler_spike_interval_gram_lower_bound_arb",
     "compute_coupled_cutoff_comparison_bound_arb",
     "verify_symbolic_finite_prime_identities",
     "execute_task_tc046_prime_euler_moebius_recovery",

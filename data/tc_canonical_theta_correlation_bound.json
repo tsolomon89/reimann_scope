@@ -8722,11 +8722,18 @@
             "is_strictly_positive": true
           }
         ],
-        "low_frequency_coherent_arch_obstruction": "At frequency t_y = pi / log(y) -> 0, every prime p in [y^{2/3}, y] has phase t_y log(p) in [2*pi/3, pi] with -cos(t_y log p) >= 1/2, so all primes in [y^{2/3}, y] align constructively in |E_y(i t_y)| = prod_{p <= y} |1 - p^{-1/2 - i t_y}| >= exp((2 + o(1)) sqrt(y) / log y), while H_0(i t_y) >= H_0(0) = F_tau(1/2)^2 = 2.82909344e-5 > 0. Reason: keeping E_y(it) factored on Re(z) = 0 includes all 2^{pi(y)} divisors m | P_y up to the primorial P_y ~ e^y without the right-shift spatial decay O((X/m)^{5/2}) that suppresses m > X.",
+        "low_frequency_coherent_arch_obstruction": "On the controlled-width frequency interval I_y := [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y] of width |I_y| = pi / (8*log y) > 0, every prime p <= y and every t in [0, pi / log y] has phase t*log(p) in [0, pi] where (d/dt)(1 + p^{-1} - 2*p^{-1/2}*cos(t*log p)) = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0. Thus |E_y(it)|^2 is monotonically non-decreasing in t on I_y, with exact interval minimum at the left endpoint: inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 >= exp((4 + o(1)) sqrt(y) / log y) (since every prime p in [y^{16/21}, y] has t*log(p) in [2*pi/3, pi] with -cos(t*log p) >= 1/2 throughout I_y), while inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) >= H_0(0) = F_tau(1/2)^2 = 2.82909344e-5 > 0. Integrating over (-I_y) union I_y gives the rigorous integrated Gram-norm lower bound ||Psi_y||_{L^2(d^*x)}^2 >= (2/tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt >= (2 |I_y| / tau) |E_y(i t_{y,-})|^2 H_0(i t_{y,-}) >= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = exp((4 + o(1)) sqrt(y) / log y) -> +infty as y -> infty (reaching >= 153.39 at y = 9973). Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm bound as y -> infty (because keeping E_y(it) factored on Re(z) = 0 retains all 2^{pi(y)} divisors m | P_y up to P_y ~ e^y without the right-shift spatial decay O((X/m)^{5/2}) that suppresses m > X); it does NOT establish failure of the coupled profile W_{M(X)}(X) or of the broader concurrent-grade hypothesis.",
         "low_frequency_spike_table": [
           {
             "y": 2,
             "pi_y": 1,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 3.9658151240987944,
+              "rad_float_outward": 1.4150393216744912e-16,
+              "lower_dec": "3.965815124098794583424222577502083458899e+0",
+              "upper_dec": "3.965815124098794583424222577502083458902e+0",
+              "arb_ball_str": "[3.965815124098794583424222577502083458900 +/- 3.79e-40]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 4.532360141827194,
               "rad_float_outward": 3.458117459229869e-16,
@@ -8734,7 +8741,22 @@
               "upper_dec": "4.532360141827193809627682945716666810173e+0",
               "arb_ball_str": "[4.532360141827193809627682945716666810172 +/- 1.39e-40]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.5665450177283993,
+              "rad_float_outward": 4.3226468240373363e-17,
+              "lower_dec": "5.665450177283992262034603682145833512713e-1",
+              "upper_dec": "5.665450177283992262034603682145833512716e-1",
+              "arb_ball_str": "[0.5665450177283992262034603682145833512715 +/- 1.74e-41]"
+            },
             "primes_with_negative_cos_count": 1,
+            "primes_with_negative_cos_across_interval_count": 1,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 2.8065629648763766,
+              "rad_float_outward": 4.7916876843382744e-17,
+              "lower_dec": "2.806562964876376527856643173427187153582e+0",
+              "upper_dec": "2.806562964876376527856643173427187153585e+0",
+              "arb_ball_str": "[2.806562964876376527856643173427187153584 +/- 2.39e-40]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 2.914213562373095,
               "rad_float_outward": 1.253716717905022e-16,
@@ -8749,6 +8771,13 @@
               "upper_dec": "1.707106781186547524400844362104849039286e+0",
               "arb_ball_str": "[1.707106781186547524400844362104849039285 +/- 1.65e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.3170187251623806,
+              "rad_float_outward": 2.4275163082331486e-18,
+              "lower_dec": "3.170187251623806125994246099419023421644e-1",
+              "upper_dec": "3.170187251623806125994246099419023421647e-1",
+              "arb_ball_str": "[0.3170187251623806125994246099419023421645 +/- 2.46e-41]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.34890831432092845,
               "rad_float_outward": 1.9529076527185717e-17,
@@ -8756,11 +8785,33 @@
               "upper_dec": "3.489083143209284281313871621313992081387e-1",
               "arb_ball_str": "[0.3489083143209284281313871621313992081386 +/- 2.19e-41]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 1.4318800352847098e-05,
+              "rad_float_outward": 5.5305983400647235e-22,
+              "lower_dec": "1.431880035284709832883087706648354241606e-5",
+              "upper_dec": "1.431880035284709832883087706648354241609e-5",
+              "arb_ball_str": "[1.431880035284709832883087706648354241607e-5 +/- 1.56e-45]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 0.16045167573470953,
+              "rad_float_outward": 1.0744585264550075e-17,
+              "lower_dec": "1.604516757347095420070526724916578001915e-1",
+              "upper_dec": "1.604516757347095420070526724916578001918e-1",
+              "arb_ball_str": "[0.1604516757347095420070526724916578001916 +/- 4.64e-41]"
+            }
           },
           {
             "y": 5,
             "pi_y": 3,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 1.707983607602275,
+              "rad_float_outward": 6.5815609888992205e-18,
+              "lower_dec": "1.707983607602274973489445834467552469938e+0",
+              "upper_dec": "1.707983607602274973489445834467552469941e+0",
+              "arb_ball_str": "[1.707983607602274973489445834467552469939 +/- 1.61e-40]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 1.9519812658311715,
               "rad_float_outward": 8.764018955198575e-17,
@@ -8768,7 +8819,22 @@
               "upper_dec": "1.951981265831171398273652382248631394218e+0",
               "arb_ball_str": "[1.951981265831171398273652382248631394216 +/- 1.84e-40]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.24399765822889644,
+              "rad_float_outward": 1.0955023693998218e-17,
+              "lower_dec": "2.439976582288964247842065477810789242769e-1",
+              "upper_dec": "2.439976582288964247842065477810789242772e-1",
+              "arb_ball_str": "[0.2439976582288964247842065477810789242770 +/- 2.30e-41]"
+            },
             "primes_with_negative_cos_count": 2,
+            "primes_with_negative_cos_across_interval_count": 2,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 3.291271573900269,
+              "rad_float_outward": 8.866041505108465e-17,
+              "lower_dec": "3.291271573900269054193443232985511160512e+0",
+              "upper_dec": "3.291271573900269054193443232985511160515e+0",
+              "arb_ball_str": "[3.291271573900269054193443232985511160514 +/- 5.39e-41]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 4.903276139158417,
               "rad_float_outward": 1.6969053201835455e-16,
@@ -8783,6 +8849,13 @@
               "upper_dec": "2.214334242872655625776397936823596427995e+0",
               "arb_ball_str": "[2.214334242872655625776397936823596427994 +/- 1.98e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.02647119870225133,
+              "rad_float_outward": 1.2274518052223646e-18,
+              "lower_dec": "2.647119870225133256912452952895513207738e-2",
+              "upper_dec": "2.647119870225133256912452952895513207741e-2",
+              "arb_ball_str": "[0.02647119870225133256912452952895513207739 +/- 3.56e-42]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.04527639096297251,
               "rad_float_outward": 2.4363820648905078e-18,
@@ -8790,11 +8863,33 @@
               "upper_dec": "4.527639096297250941802511538482001691775e-2",
               "arb_ball_str": "[0.04527639096297250941802511538482001691774 +/- 7.70e-43]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 7.231806481449209e-06,
+              "rad_float_outward": 2.8026439334464365e-22,
+              "lower_dec": "7.231806481449209013453090623614340152625e-6",
+              "upper_dec": "7.231806481449209013453090623614340152628e-6",
+              "arb_ball_str": "[7.231806481449209013453090623614340152626e-6 +/- 2.33e-46]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 0.006766640634494875,
+              "rad_float_outward": 1.1951073976638115e-19,
+              "lower_dec": "6.766640634494874904763301186906002536068e-3",
+              "upper_dec": "6.766640634494874904763301186906002536071e-3",
+              "arb_ball_str": "[0.006766640634494874904763301186906002536070 +/- 2.28e-43]"
+            }
           },
           {
             "y": 11,
             "pi_y": 5,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 1.146377660056471,
+              "rad_float_outward": 7.196943053942654e-17,
+              "lower_dec": "1.146377660056470943112594138695720188781e+0",
+              "upper_dec": "1.146377660056470943112594138695720188784e+0",
+              "arb_ball_str": "[1.146377660056470943112594138695720188782 +/- 4.17e-40]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 1.3101458972073954,
               "rad_float_outward": 1.8809462066478524e-17,
@@ -8802,7 +8897,22 @@
               "upper_dec": "1.310145897207395363557250444223680215753e+0",
               "arb_ball_str": "[1.310145897207395363557250444223680215751 +/- 3.33e-40]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.16376823715092442,
+              "rad_float_outward": 2.3511827583098155e-18,
+              "lower_dec": "1.637682371509244204446563055279600269688e-1",
+              "upper_dec": "1.637682371509244204446563055279600269691e-1",
+              "arb_ball_str": "[0.1637682371509244204446563055279600269689 +/- 1.67e-41]"
+            },
             "primes_with_negative_cos_count": 3,
+            "primes_with_negative_cos_across_interval_count": 3,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 1.9045480482913932,
+              "rad_float_outward": 8.876557769839431e-17,
+              "lower_dec": "1.904548048291393325063186080695700077964e+0",
+              "upper_dec": "1.904548048291393325063186080695700077967e+0",
+              "arb_ball_str": "[1.904548048291393325063186080695700077966 +/- 1.82e-41]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 3.701910613184654,
               "rad_float_outward": 1.8207438666046688e-16,
@@ -8817,6 +8927,13 @@
               "upper_dec": "1.924034982318319013108083449701189874310e+0",
               "arb_ball_str": "[1.924034982318319013108083449701189874308 +/- 3.53e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.004780890375077492,
+              "rad_float_outward": 3.36718182473427e-19,
+              "lower_dec": "4.780890375077491611334439022008284531958e-3",
+              "upper_dec": "4.780890375077491611334439022008284531961e-3",
+              "arb_ball_str": "[0.004780890375077491611334439022008284531960 +/- 2.16e-44]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.008545000231743663,
               "rad_float_outward": 2.5230851778689845e-19,
@@ -8824,11 +8941,33 @@
               "upper_dec": "8.545000231743662713879906192576074352982e-3",
               "arb_ball_str": "[0.008545000231743662713879906192576074352980 +/- 4.93e-43]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 2.8087884258615925e-06,
+              "rad_float_outward": 7.102318921476909e-23,
+              "lower_dec": "2.808788425861592470486117538209067966925e-6",
+              "upper_dec": "2.808788425861592470486117538209067966928e-6",
+              "arb_ball_str": "[2.808788425861592470486117538209067966927e-6 +/- 2.76e-47]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 0.0004746576891952207,
+              "rad_float_outward": 2.0556144028185362e-20,
+              "lower_dec": "4.746576891952207358397514326297691670317e-4",
+              "upper_dec": "4.746576891952207358397514326297691670320e-4",
+              "arb_ball_str": "[0.0004746576891952207358397514326297691670318 +/- 3.41e-44]"
+            }
           },
           {
             "y": 31,
             "pi_y": 11,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.8004961603528187,
+              "rad_float_outward": 2.3239845376552445e-17,
+              "lower_dec": "8.004961603528186520810729969200822376696e-1",
+              "upper_dec": "8.004961603528186520810729969200822376699e-1",
+              "arb_ball_str": "[0.8004961603528186520810729969200822376697 +/- 2.02e-41]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 0.9148527546889356,
               "rad_float_outward": 3.688149240537759e-17,
@@ -8836,7 +8975,22 @@
               "upper_dec": "9.148527546889356023783691393372368430513e-1",
               "arb_ball_str": "[0.9148527546889356023783691393372368430511 +/- 8.71e-42]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.11435659433611695,
+              "rad_float_outward": 4.610186550672199e-18,
+              "lower_dec": "1.143565943361169502972961424171546053812e-1",
+              "upper_dec": "1.143565943361169502972961424171546053815e-1",
+              "arb_ball_str": "[0.1143565943361169502972961424171546053814 +/- 1.15e-41]"
+            },
             "primes_with_negative_cos_count": 8,
+            "primes_with_negative_cos_across_interval_count": 7,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 1.613632464266177,
+              "rad_float_outward": 1.860137508722344e-17,
+              "lower_dec": "1.613632464266177032058001897007648166276e+0",
+              "upper_dec": "1.613632464266177032058001897007648166279e+0",
+              "arb_ball_str": "[1.613632464266177032058001897007648166278 +/- 2.26e-40]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 4.804661626375782,
               "rad_float_outward": 3.0474637718981583e-16,
@@ -8851,6 +9005,13 @@
               "upper_dec": "2.191953837647084679704887993386728234188e+0",
               "arb_ball_str": "[2.191953837647084679704887993386728234187 +/- 3.87e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.0010624073557086212,
+              "rad_float_outward": 2.4582256456951463e-20,
+              "lower_dec": "1.062407355708621241268372563538182868255e-3",
+              "upper_dec": "1.062407355708621241268372563538182868258e-3",
+              "arb_ball_str": "[0.001062407355708621241268372563538182868257 +/- 1.19e-43]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.001827008654444161,
               "rad_float_outward": 6.627839794269032e-20,
@@ -8858,11 +9019,33 @@
               "upper_dec": "1.827008654444160880627430581532360001880e-3",
               "arb_ball_str": "[0.001827008654444160880627430581532360001878 +/- 3.88e-43]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 1.6617406925701007e-06,
+              "rad_float_outward": 1.580079268635491e-23,
+              "lower_dec": "1.661740692570100753760107997342479491732e-6",
+              "upper_dec": "1.661740692570100753760107997342479491735e-6",
+              "arb_ball_str": "[1.661740692570100753760107997342479491733e-6 +/- 1.64e-46]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 6.240322463955001e-05,
+              "rad_float_outward": 2.6412566334182476e-21,
+              "lower_dec": "6.240322463955000642409634224965925812604e-5",
+              "upper_dec": "6.240322463955000642409634224965925812607e-5",
+              "arb_ball_str": "[6.240322463955000642409634224965925812606e-5 +/- 1.96e-45]"
+            }
           },
           {
             "y": 97,
             "pi_y": 25,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.600889014586528,
+              "rad_float_outward": 3.063724989442944e-17,
+              "lower_dec": "6.008890145865280225607534721386322776232e-1",
+              "upper_dec": "6.008890145865280225607534721386322776235e-1",
+              "arb_ball_str": "[0.6008890145865280225607534721386322776233 +/- 2.80e-41]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 0.6867303023846034,
               "rad_float_outward": 3.501399987934793e-17,
@@ -8870,7 +9053,22 @@
               "upper_dec": "6.867303023846034543551468253012940315697e-1",
               "arb_ball_str": "[0.6867303023846034543551468253012940315695 +/- 1.77e-41]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.08584128779807543,
+              "rad_float_outward": 4.376749984918491e-18,
+              "lower_dec": "8.584128779807543179439335316266175394617e-2",
+              "upper_dec": "8.584128779807543179439335316266175394620e-2",
+              "arb_ball_str": "[0.08584128779807543179439335316266175394619 +/- 2.97e-43]"
+            },
             "primes_with_negative_cos_count": 21,
+            "primes_with_negative_cos_across_interval_count": 19,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 1.7560721600737161,
+              "rad_float_outward": 1.552095886324854e-18,
+              "lower_dec": "1.756072160073716135866291120294160066548e+0",
+              "upper_dec": "1.756072160073716135866291120294160066551e+0",
+              "arb_ball_str": "[1.756072160073716135866291120294160066550 +/- 9.68e-41]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 9.660916994474842,
               "rad_float_outward": 8.039022429953643e-16,
@@ -8885,6 +9083,13 @@
               "upper_dec": "3.108201569151338278131574582987833570063e+0",
               "arb_ball_str": "[3.108201569151338278131574582987833570061 +/- 4.05e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.0003714921162378335,
+              "rad_float_outward": 7.887497581258664e-21,
+              "lower_dec": "3.714921162378334917930064645114723265234e-4",
+              "upper_dec": "3.714921162378334917930064645114723265237e-4",
+              "arb_ball_str": "[0.0003714921162378334917930064645114723265236 +/- 1.80e-44]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.000592578370872122,
               "rad_float_outward": 2.267681194297529e-20,
@@ -8892,11 +9097,33 @@
               "upper_dec": "5.925783708721220160784355765283685351702e-4",
               "arb_ball_str": "[0.0005925783708721220160784355765283685351700 +/- 3.32e-44]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 1.3574880065693927e-06,
+              "rad_float_outward": 8.617176038180369e-23,
+              "lower_dec": "1.357488006569392647468517773190315175839e-6",
+              "upper_dec": "1.357488006569392647468517773190315175842e-6",
+              "arb_ball_str": "[1.357488006569392647468517773190315175841e-6 +/- 4.20e-46]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 1.782536006311677e-05,
+              "rad_float_outward": 3.1783618728487655e-22,
+              "lower_dec": "1.782536006311676922446946067046157959002e-5",
+              "upper_dec": "1.782536006311676922446946067046157959005e-5",
+              "arb_ball_str": "[1.782536006311676922446946067046157959003e-5 +/- 1.09e-45]"
+            }
           },
           {
             "y": 199,
             "pi_y": 46,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.5193151845424175,
+              "rad_float_outward": 3.42910985432754e-17,
+              "lower_dec": "5.193151845424175748607572836990124357792e-1",
+              "upper_dec": "5.193151845424175748607572836990124357795e-1",
+              "arb_ball_str": "[0.5193151845424175748607572836990124357793 +/- 2.94e-41]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 0.5935030680484772,
               "rad_float_outward": 3.918982690660046e-17,
@@ -8904,7 +9131,22 @@
               "upper_dec": "5.935030680484772284122940385131570694622e-1",
               "arb_ball_str": "[0.5935030680484772284122940385131570694621 +/- 9.38e-42]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.07418788350605965,
+              "rad_float_outward": 4.898728363325057e-18,
+              "lower_dec": "7.418788350605965355153675481414463368275e-2",
+              "upper_dec": "7.418788350605965355153675481414463368278e-2",
+              "arb_ball_str": "[0.07418788350605965355153675481414463368276 +/- 1.33e-42]"
+            },
             "primes_with_negative_cos_count": 40,
+            "primes_with_negative_cos_across_interval_count": 38,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 4.041989322334484,
+              "rad_float_outward": 1.0626582457057231e-16,
+              "lower_dec": "4.041989322334483496806106131272090379104e+0",
+              "upper_dec": "4.041989322334483496806106131272090379107e+0",
+              "arb_ball_str": "[4.041989322334483496806106131272090379105 +/- 4.87e-41]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 38.815210232049964,
               "rad_float_outward": 1.0090250465132163e-15,
@@ -8919,6 +9161,13 @@
               "upper_dec": "6.230185409123067395931023505631867007753e+0",
               "arb_ball_str": "[6.230185409123067395931023505631867007751 +/- 3.27e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.00023466212889070934,
+              "rad_float_outward": 6.300781042598509e-21,
+              "lower_dec": "2.346621288907093476463222926552912342310e-4",
+              "upper_dec": "2.346621288907093476463222926552912342313e-4",
+              "arb_ball_str": "[0.0002346621288907093476463222926552912342312 +/- 4.68e-44]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.0003565434929151065,
               "rad_float_outward": 1.7260526508724652e-20,
@@ -8926,11 +9175,33 @@
               "upper_dec": "3.565434929151064992296495399306301781132e-4",
               "arb_ball_str": "[0.0003565434929151064992296495399306301781131 +/- 3.13e-44]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 2.700384225420348e-06,
+              "rad_float_outward": 1.164129115107547e-22,
+              "lower_dec": "2.700384225420348122182747063957203159316e-6",
+              "upper_dec": "2.700384225420348122182747063957203159319e-6",
+              "arb_ball_str": "[2.700384225420348122182747063957203159317e-6 +/- 1.19e-46]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 2.2398620775204774e-05,
+              "rad_float_outward": 1.0596313421032154e-21,
+              "lower_dec": "2.239862077520477531913392742393991716059e-5",
+              "upper_dec": "2.239862077520477531913392742393991716062e-5",
+              "arb_ball_str": "[2.239862077520477531913392742393991716061e-5 +/- 2.00e-45]"
+            }
           },
           {
             "y": 499,
             "pi_y": 95,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.4424702821205574,
+              "rad_float_outward": 6.8060143606165115e-18,
+              "lower_dec": "4.424702821205573967437016365768539659319e-1",
+              "upper_dec": "4.424702821205573967437016365768539659322e-1",
+              "arb_ball_str": "[0.4424702821205573967437016365768539659321 +/- 3.18e-41]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 0.5056803224234941,
               "rad_float_outward": 2.3638631049635395e-17,
@@ -8938,7 +9209,22 @@
               "upper_dec": "5.056803224234941677070875846592616753511e-1",
               "arb_ball_str": "[0.5056803224234941677070875846592616753509 +/- 3.52e-41]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.06321004030293677,
+              "rad_float_outward": 2.9548288812044244e-18,
+              "lower_dec": "6.321004030293677096338594808240770941885e-2",
+              "upper_dec": "6.321004030293677096338594808240770941888e-2",
+              "arb_ball_str": "[0.06321004030293677096338594808240770941887 +/- 3.12e-42]"
+            },
             "primes_with_negative_cos_count": 87,
+            "primes_with_negative_cos_across_interval_count": 84,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 16.24308951443497,
+              "rad_float_outward": 1.236700948635333e-15,
+              "lower_dec": "1.624308951443496927389144447610472215146e+1",
+              "upper_dec": "1.624308951443496927389144447610472215149e+1",
+              "arb_ball_str": "[16.24308951443496927389144447610472215148 +/- 2.95e-39]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 389.1809066757799,
               "rad_float_outward": 1.9605941803941417e-14,
@@ -8953,6 +9239,13 @@
               "upper_dec": "1.972766855651675653212019630144644130422e+1",
               "arb_ball_str": "[19.72766855651675653212019630144644130420 +/- 5.30e-40]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.0001513472395459428,
+              "rad_float_outward": 1.2557759421852438e-20,
+              "lower_dec": "1.513472395459427746760859505885733314767e-4",
+              "upper_dec": "1.513472395459427746760859505885733314770e-4",
+              "arb_ball_str": "[0.0001513472395459427746760859505885733314768 +/- 1.81e-44]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.0002171190293650505,
               "rad_float_outward": 9.237385853218849e-21,
@@ -8960,11 +9253,33 @@
               "upper_dec": "2.171190293650504949708901522167589563720e-4",
               "arb_ball_str": "[0.0002171190293650504949708901522167589563718 +/- 4.65e-44]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 9.245962421776699e-06,
+              "rad_float_outward": 8.00428320893563e-22,
+              "lower_dec": "9.245962421776697942854182596263606804103e-6",
+              "upper_dec": "9.245962421776697942854182596263606804106e-6",
+              "arb_ball_str": "[9.245962421776697942854182596263606804104e-6 +/- 3.44e-46]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 4.946287278273842e-05,
+              "rad_float_outward": 3.1927467701796513e-22,
+              "lower_dec": "4.946287278273841749170906899534096273118e-5",
+              "upper_dec": "4.946287278273841749170906899534096273121e-5",
+              "arb_ball_str": "[4.946287278273841749170906899534096273119e-5 +/- 4.22e-45]"
+            }
           },
           {
             "y": 997,
             "pi_y": 168,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.39811626276936013,
+              "rad_float_outward": 2.5649461037584558e-17,
+              "lower_dec": "3.981162627693601553413367646605221016464e-1",
+              "upper_dec": "3.981162627693601553413367646605221016467e-1",
+              "arb_ball_str": "[0.3981162627693601553413367646605221016465 +/- 2.58e-41]"
+            },
             "coherent_frequency_t_y_certified": {
               "mid_float": 0.4549900145935545,
               "rad_float_outward": 1.8267317012410077e-17,
@@ -8972,7 +9287,22 @@
               "upper_dec": "4.549900145935544632472420167548824018819e-1",
               "arb_ball_str": "[0.4549900145935544632472420167548824018817 +/- 4.37e-41]"
             },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.05687375182419431,
+              "rad_float_outward": 2.2834146265512596e-18,
+              "lower_dec": "5.687375182419430790590525209436030023520e-2",
+              "upper_dec": "5.687375182419430790590525209436030023523e-2",
+              "arb_ball_str": "[0.05687375182419430790590525209436030023522 +/- 2.05e-42]"
+            },
             "primes_with_negative_cos_count": 157,
+            "primes_with_negative_cos_across_interval_count": 153,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 102.96506393845225,
+              "rad_float_outward": 1.1185219508070864e-17,
+              "lower_dec": "1.029650639384522463503360278006304147965e+2",
+              "upper_dec": "1.029650639384522463503360278006304147968e+2",
+              "arb_ball_str": "[102.9650639384522463503360278006304147967 +/- 2.46e-38]"
+            },
             "E_y_abs_sq_at_t_y_certified": {
               "mid_float": 6228.892804469704,
               "rad_float_outward": 3.814655157740823e-13,
@@ -8987,6 +9317,13 @@
               "upper_dec": "7.892333498066147786726533120769834193971e+1",
               "arb_ball_str": "[78.92333498066147786726533120769834193970 +/- 3.04e-39]"
             },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 0.00011774537930590925,
+              "rad_float_outward": 4.14343382352326e-21,
+              "lower_dec": "1.177453793059092549307588834514386392605e-4",
+              "upper_dec": "1.177453793059092549307588834514386392608e-4",
+              "arb_ball_str": "[0.0001177453793059092549307588834514386392606 +/- 7.96e-45]"
+            },
             "H0_at_i_t_y_certified": {
               "mid_float": 0.00016254510243822896,
               "rad_float_outward": 5.285783101302872e-21,
@@ -8994,19 +9331,269 @@
               "upper_dec": "1.625451024382289516456599353347037183071e-4",
               "arb_ball_str": "[0.0001625451024382289516456599353347037183069 +/- 1.68e-44]"
             },
-            "H0_at_i_t_y_exceeds_H0_at_0": true
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 5.273502924201208e-05,
+              "rad_float_outward": 3.1478958151157045e-21,
+              "lower_dec": "5.273502924201207714739321864433821503828e-5",
+              "upper_dec": "5.273502924201207714739321864433821503831e-5",
+              "arb_ball_str": "[5.273502924201207714739321864433821503830e-5 +/- 3.17e-45]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 0.00021948041487305676,
+              "rad_float_outward": 9.901900663927051e-21,
+              "lower_dec": "2.194804148730567491236123877481549691534e-4",
+              "upper_dec": "2.194804148730567491236123877481549691537e-4",
+              "arb_ball_str": "[0.0002194804148730567491236123877481549691535 +/- 5.52e-45]"
+            }
+          },
+          {
+            "y": 1999,
+            "pi_y": 303,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.3616773758690451,
+              "rad_float_outward": 2.468112205312111e-17,
+              "lower_dec": "3.616773758690451059724973074165239601942e-1",
+              "upper_dec": "3.616773758690451059724973074165239601945e-1",
+              "arb_ball_str": "[0.3616773758690451059724973074165239601944 +/- 1.79e-41]"
+            },
+            "coherent_frequency_t_y_certified": {
+              "mid_float": 0.41334557242176584,
+              "rad_float_outward": 3.513661214294637e-18,
+              "lower_dec": "4.133455724217658353971397799045988116506e-1",
+              "upper_dec": "4.133455724217658353971397799045988116509e-1",
+              "arb_ball_str": "[0.4133455724217658353971397799045988116507 +/- 2.25e-41]"
+            },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.05166819655272073,
+              "rad_float_outward": 4.392076517868296e-19,
+              "lower_dec": "5.166819655272072942464247248807485145633e-2",
+              "upper_dec": "5.166819655272072942464247248807485145636e-2",
+              "arb_ball_str": "[0.05166819655272072942464247248807485145634 +/- 3.05e-43]"
+            },
+            "primes_with_negative_cos_count": 289,
+            "primes_with_negative_cos_across_interval_count": 282,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 1757.0975673407245,
+              "rad_float_outward": 3.201305846817926e-14,
+              "lower_dec": "1.757097567340724513268223769442582591375e+3",
+              "upper_dec": "1.757097567340724513268223769442582591378e+3",
+              "arb_ball_str": "[1757.097567340724513268223769442582591377 +/- 4.95e-37]"
+            },
+            "E_y_abs_sq_at_t_y_certified": {
+              "mid_float": 357730.088145905,
+              "rad_float_outward": 2.3112407217573683e-11,
+              "lower_dec": "3.577300881459050228044002156968490135159e+5",
+              "upper_dec": "3.577300881459050228044002156968490135162e+5",
+              "arb_ball_str": "[357730.0881459050228044002156968490135160 +/- 1.49e-35]"
+            },
+            "E_y_abs_at_t_y_certified": {
+              "mid_float": 598.1054155798165,
+              "rad_float_outward": 8.953127782403415e-15,
+              "lower_dec": "5.981054155798165173510534275164057603003e+2",
+              "upper_dec": "5.981054155798165173510534275164057603006e+2",
+              "arb_ball_str": "[598.1054155798165173510534275164057603005 +/- 1.22e-38]"
+            },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 9.61734666183759e-05,
+              "rad_float_outward": 2.9695495199774035e-21,
+              "lower_dec": "9.617346661837590162153757403295361053003e-5",
+              "upper_dec": "9.617346661837590162153757403295361053006e-5",
+              "arb_ball_str": "[9.617346661837590162153757403295361053004e-5 +/- 2.71e-45]"
+            },
+            "H0_at_i_t_y_certified": {
+              "mid_float": 0.00012829013943819537,
+              "rad_float_outward": 3.897964249217215e-21,
+              "lower_dec": "1.282901394381953678845303201065598046586e-4",
+              "upper_dec": "1.282901394381953678845303201065598046589e-4",
+              "arb_ball_str": "[0.0001282901394381953678845303201065598046587 +/- 1.56e-44]"
+            },
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 0.0008175542858895977,
+              "rad_float_outward": 4.073928337247264e-21,
+              "lower_dec": "8.175542858895976487876650869866246967457e-4",
+              "upper_dec": "8.175542858895976487876650869866246967460e-4",
+              "arb_ball_str": "[0.0008175542858895976487876650869866246967458 +/- 4.24e-44]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 0.0027792305722881953,
+              "rad_float_outward": 2.164499826870129e-19,
+              "lower_dec": "2.779230572288195503334109786837452460169e-3",
+              "upper_dec": "2.779230572288195503334109786837452460172e-3",
+              "arb_ball_str": "[0.002779230572288195503334109786837452460170 +/- 1.09e-43]"
+            }
+          },
+          {
+            "y": 4999,
+            "pi_y": 669,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.3227539950504426,
+              "rad_float_outward": 1.0033799706614344e-17,
+              "lower_dec": "3.227539950504426203155487184611838783681e-1",
+              "upper_dec": "3.227539950504426203155487184611838783684e-1",
+              "arb_ball_str": "[0.3227539950504426203155487184611838783683 +/- 2.32e-41]"
+            },
+            "coherent_frequency_t_y_certified": {
+              "mid_float": 0.3688617086290773,
+              "rad_float_outward": 2.025345818173094e-17,
+              "lower_dec": "3.688617086290772803606271068127815752779e-1",
+              "upper_dec": "3.688617086290772803606271068127815752782e-1",
+              "arb_ball_str": "[0.3688617086290772803606271068127815752780 +/- 3.08e-41]"
+            },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.04610771357863466,
+              "rad_float_outward": 2.5316822727163676e-18,
+              "lower_dec": "4.610771357863466004507838835159769690974e-2",
+              "upper_dec": "4.610771357863466004507838835159769690977e-2",
+              "arb_ball_str": "[0.04610771357863466004507838835159769690975 +/- 3.84e-42]"
+            },
+            "primes_with_negative_cos_count": 650,
+            "primes_with_negative_cos_across_interval_count": 638,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 563542.8167517012,
+              "rad_float_outward": 6.8791609361917885e-12,
+              "lower_dec": "5.635428167517011683560509130208585728509e+5",
+              "upper_dec": "5.635428167517011683560509130208585728512e+5",
+              "arb_ball_str": "[563542.8167517011683560509130208585728511 +/- 9.5e-37]"
+            },
+            "E_y_abs_sq_at_t_y_certified": {
+              "mid_float": 1008391196.1948231,
+              "rad_float_outward": 3.1981464004942394e-08,
+              "lower_dec": "1.008391196194823113884930038026360415985e+9",
+              "upper_dec": "1.008391196194823113884930038026360415988e+9",
+              "arb_ball_str": "[1008391196.194823113884930038026360415987 +/- 2.89e-31]"
+            },
+            "E_y_abs_at_t_y_certified": {
+              "mid_float": 31755.175896140507,
+              "rad_float_outward": 1.3116278152593508e-12,
+              "lower_dec": "3.175517589614050797731582332934262881374e+4",
+              "upper_dec": "3.175517589614050797731582332934262881377e+4",
+              "arb_ball_str": "[31755.17589614050797731582332934262881375 +/- 1.32e-36]"
+            },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 7.798099220168814e-05,
+              "rad_float_outward": 9.22890794413432e-22,
+              "lower_dec": "7.798099220168814329873633047185245309634e-5",
+              "upper_dec": "7.798099220168814329873633047185245309637e-5",
+              "arb_ball_str": "[7.798099220168814329873633047185245309636e-5 +/- 2.21e-45]"
+            },
+            "H0_at_i_t_y_certified": {
+              "mid_float": 0.00010004968176708013,
+              "rad_float_outward": 2.867417453746045e-21,
+              "lower_dec": "1.000496817670801288688408767310406311642e-4",
+              "upper_dec": "1.000496817670801288688408767310406311645e-4",
+              "arb_ball_str": "[0.0001000496817670801288688408767310406311643 +/- 3.98e-44]"
+            },
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 0.2339903376611577,
+              "rad_float_outward": 6.518645945166233e-18,
+              "lower_dec": "2.339903376611576980887160615883239922799e-1",
+              "upper_dec": "2.339903376611576980887160615883239922802e-1",
+              "arb_ball_str": "[0.2339903376611576980887160615883239922801 +/- 2.34e-41]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 0.6449698137884338,
+              "rad_float_outward": 2.561243134562721e-18,
+              "lower_dec": "6.449698137884337630832268514376105061853e-1",
+              "upper_dec": "6.449698137884337630832268514376105061856e-1",
+              "arb_ball_str": "[0.6449698137884337630832268514376105061855 +/- 8.38e-42]"
+            }
+          },
+          {
+            "y": 9973,
+            "pi_y": 1229,
+            "interval_left_t_y_minus_7pi_over_8log_y_certified": {
+              "mid_float": 0.2985449638559473,
+              "rad_float_outward": 2.1024204324011937e-17,
+              "lower_dec": "2.985449638559473305853494994058384854053e-1",
+              "upper_dec": "2.985449638559473305853494994058384854056e-1",
+              "arb_ball_str": "[0.2985449638559473305853494994058384854054 +/- 2.56e-41]"
+            },
+            "coherent_frequency_t_y_certified": {
+              "mid_float": 0.34119424440679696,
+              "rad_float_outward": 1.562316022345624e-17,
+              "lower_dec": "3.411942444067969492403994278923868404632e-1",
+              "upper_dec": "3.411942444067969492403994278923868404635e-1",
+              "arb_ball_str": "[0.3411942444067969492403994278923868404633 +/- 4.36e-41]"
+            },
+            "interval_width_pi_over_8log_y_certified": {
+              "mid_float": 0.04264928055084962,
+              "rad_float_outward": 1.95289502793203e-18,
+              "lower_dec": "4.264928055084961865504992848654835505790e-2",
+              "upper_dec": "4.264928055084961865504992848654835505793e-2",
+              "arb_ball_str": "[0.04264928055084961865504992848654835505792 +/- 2.07e-42]"
+            },
+            "primes_with_negative_cos_count": 1204,
+            "primes_with_negative_cos_across_interval_count": 1186,
+            "interval_min_E_y_abs_sq_at_t_y_minus_certified": {
+              "mid_float": 399370923.3407518,
+              "rad_float_outward": 2.962930499945562e-08,
+              "lower_dec": "3.993709233407518563924580756274910161972e+8",
+              "upper_dec": "3.993709233407518563924580756274910161975e+8",
+              "arb_ball_str": "[399370923.3407518563924580756274910161974 +/- 4.43e-32]"
+            },
+            "E_y_abs_sq_at_t_y_certified": {
+              "mid_float": 6657848550741.658,
+              "rad_float_outward": 0.0002353916033439839,
+              "lower_dec": "6.657848550741658438516603343983878537779e+12",
+              "upper_dec": "6.657848550741658438516603343983878537782e+12",
+              "arb_ball_str": "[6657848550741.658438516603343983878537781 +/- 1.93e-28]"
+            },
+            "E_y_abs_at_t_y_certified": {
+              "mid_float": 2580280.711616792,
+              "rad_float_outward": 1.990636070165312e-10,
+              "lower_dec": "2.580280711616791983826943198171802009419e+6",
+              "upper_dec": "2.580280711616791983826943198171802009422e+6",
+              "arb_ball_str": "[2580280.711616791983826943198171802009421 +/- 1.20e-34]"
+            },
+            "interval_min_H0_at_i_t_y_minus_certified": {
+              "mid_float": 6.876783417995417e-05,
+              "rad_float_outward": 4.482364593272262e-22,
+              "lower_dec": "6.876783417995417160126698812305034564299e-5",
+              "upper_dec": "6.876783417995417160126698812305034564302e-5",
+              "arb_ball_str": "[6.876783417995417160126698812305034564300e-5 +/- 3.30e-45]"
+            },
+            "H0_at_i_t_y_certified": {
+              "mid_float": 8.603842929734122e-05,
+              "rad_float_outward": 4.700665135119648e-21,
+              "lower_dec": "8.603842929734122951237501617923211663476e-5",
+              "upper_dec": "8.603842929734122951237501617923211663479e-5",
+              "arb_ball_str": "[8.603842929734122951237501617923211663478e-5 +/- 1.70e-45]"
+            },
+            "H0_at_i_t_y_exceeds_H0_at_0": true,
+            "interval_monotonicity_E_y_sq_and_H0_verified": true,
+            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": {
+              "mid_float": 153.38594662524903,
+              "rad_float_outward": 1.365613068188149e-15,
+              "lower_dec": "1.533859466252490349247704648548543950190e+2",
+              "upper_dec": "1.533859466252490349247704648548543950193e+2",
+              "arb_ball_str": "[153.3859466252490349247704648548543950191 +/- 3.26e-38]"
+            },
+            "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": {
+              "mid_float": 372.84096704937866,
+              "rad_float_outward": 2.8316369907057345e-14,
+              "lower_dec": "3.728409670493786337518231728463788979176e+2",
+              "upper_dec": "3.728409670493786337518231728463788979179e+2",
+              "arb_ball_str": "[372.8409670493786337518231728463788979177 +/- 2.40e-38]"
+            }
           }
         ]
       },
       "mechanism_B_prime_by_prime_recursion_and_horizon_collapse": {
         "recursion_scale_cancellation": "In each prime-by-prime step W_{p_k}(X) = W_{p_{k-1}}(X) - p_k^{-1/2} W_{p_{k-1}}(X / p_k), evaluating the O(u^{-1/2} log(u+2)) bound of W_log at u = X / m >= 1 gives m^{-1/2} (X / m)^{-1/2} = X^{-1/2}, canceling the m^{-1/2} damping weight identically for every m <= X.",
         "fixed_y_asymptotic_decay": "For any fixed prime cutoff y >= 2, |W_y(X)| <= 2^{pi(y)} O(X^{-1/2} log(X+2)) -> 0 as X -> infty.",
-        "horizon_collapse_for_y_ge_X": "Whenever y >= X (including the coupled cutoff y = M(X) = ceil(max(2, X^{5/4}))), every integer m <= X has all prime factors <= m <= X <= y, so m | P_y iff m is squarefree (mu(m) != 0). Consequently, the m <= X portion of W_y(X) collapses term-by-term to the standard additive Moebius truncation W_log(X) + R_{mu, floor(X)}(X) with Q(X) = (6/pi^2) X + O(X^{1/2}) active squarefree terms, while on the coefficient side lambda_y(n) = Lambda(n) for all 2 <= n < 2 q_{>y} (> 2X), reproducing the original prime sum across the entire bulk oscillation region of h_0(n/X)."
+        "horizon_collapse_for_y_ge_X": "Whenever y >= N >= 2, every integer 1 <= m <= N has all prime factors <= m <= N <= y, so m | P_y iff m is squarefree (mu(m) != 0) and mu_y(m) = mu(m) for all 1 <= m <= N. Splitting at the bare scale horizon N = floor(X) eliminates the primorial count for m > P_y, but the available small-scale tail bound C_{log,0} X^{5/2} sum_{m > floor(X)} m^{-3} <= C_{log,0} X^{5/2} / (2 floor(X)^2) = O(X^{1/2}) grows as O(sqrt(X)) and does NOT give a uniform O(1) comparison with W(X). Uniform O(1) comparison requires the coupled cutoff N = M(X) = ceil(max(2, X^{5/4})), where the m > M(X) tail is bounded by (1/2) C_{log,0} < 0.278715 and the m <= M(X) portion of W_{M(X)}(X) collapses term-by-term to the additive Moebius truncation W_log(X) + R_{mu, M(X)}(X), while on the coefficient side lambda_{M(X)}(n) = Lambda(n) for all 2 <= n < 2 q_{>M(X)} (> 2 M(X) >= 2 X^{5/4}), reproducing the original prime sum across the bulk oscillation region of h_0(n/X)."
       }
     },
     "section_4_coupled_cutoff_passage_and_grade_certification": {
       "comparison_theorem_statement": "For any X > 0 and any integer M >= 2 with prime cutoff y >= M, mu_y(m) = mu(m) for all 1 <= m <= M (and up to q_{>y} - 1), and |mu(m) - mu_y(m)| = |mu(m)| * 1_{m not dividing P_y} <= 1 for m > M. Using |W_log(X/m)| <= C_{log,0} (X/m)^{5/2} yields |W(X) - W_y(X)| = |R_mu(X) - R_{mu, y}(X)| <= C_{log,0} X^{5/2} sum_{m > M} m^{-3} <= C_{log,0} X^{5/2} / (2 M^2).",
-      "coupled_cutoff_schedule": "y = M(X) := ceil(max(2, X^{5/4})) for X >= 1",
+      "coupled_cutoff_schedule": "y = M(X) := ceil(max(2, X^{5/4})) for X >= 1 (computed directly from Arb ball enclosure of (X^5)^{1/4} without float conversion)",
+      "scale_horizon_vs_coupled_cutoff_tail_comparison": "At the bare scale horizon N = floor(X), the small-scale tail bound is C_{log,0} X^{5/2} / (2 floor(X)^2) = O(sqrt(X)), which diverges as X -> infty and does NOT establish uniform boundedness equivalence with W(X). Choosing the coupled cutoff N = M(X) = ceil(max(2, X^{5/4})) makes M(X)^2 >= X^{5/2} and yields the uniform O(1) comparison bound C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715.",
       "uniform_coupled_comparison_bound_formula": "|W(X) - W_{M(X)}(X)| = |R_mu(X) - R_{mu, M(X)}(X)| <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0}",
       "uniform_coupled_comparison_bound_certified": {
         "mid_float": 0.27871479355400874,
@@ -9018,6 +9605,80 @@
       "smooth_and_rough_tail_partition": "R_mu(X) - R_{mu, M}(X) = T_{smooth, y}(X) + T_{rough, y}(X), where T_{smooth, y}(X) = W_y(X) - (W_log(X) + R_{mu, M}(X)) sums over y-smooth squarefree m > M (m | P_y) and T_{rough, y}(X) = W(X) - W_y(X) sums over y-rough squarefree m > M (m not dividing P_y), with |T_{smooth, y}(X)| + |T_{rough, y}(X)| <= C_{log,0} X^{5/2} / (2 M^2).",
       "coupled_boundedness_equivalence": "sup_{X >= 1} |R_mu(X)| < infty  <==>  sup_{X >= 1} |W(X)| < infty  <==>  sup_{X >= 1} |W_{M(X)}(X)| < infty  <==>  sup_{X >= 1} |R_{mu, M(X)}(X)| < infty",
       "anti_circularity_diagnosis": "Because |W_{M(X)}(X) - W(X)| <= (1/2) C_{log,0} < 0.278715 and |W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| <= (1/2) C_{log,0} < 0.278715 for all X >= 1, bounding W_{M(X)}(X) by assuming boundedness of W(X), R_mu(X), R_{mu, M(X)}(X), or C_tau(K) is strictly circular. Furthermore, at y = M(X) >= X, lambda_{M(X)}(n) = Lambda(n) for all 2 <= n < 2 q_{>M(X)} and mu_{M(X)}(m) = mu(m) for all 1 <= m <= M(X), so the coupled finite-prime Euler construction is an exact quantitative reformulation of the Moebius/prime cancellation obligation within +/- 0.278715.",
+      "certified_cutoff_ceiling_regression": [
+        {
+          "X_label": "16 - 10^{-30}",
+          "X_pow_5_4_certified": {
+            "mid_float": 32.0,
+            "rad_float_outward": 2.5000000000000002e-30,
+            "lower_dec": "3.199999999999999999999999999999749999999e+1",
+            "upper_dec": "3.199999999999999999999999999999750000002e+1",
+            "arb_ball_str": "[31.99999999999999999999999999999750000000 +/- 1e-43]"
+          },
+          "certified_M_X": 32,
+          "expected_M_X": 32,
+          "naive_float_ceil_value": 32,
+          "matches_expected_M_X": true,
+          "M_X_ge_X_pow_5_4_verified": true,
+          "M_X_sq_ge_X_pow_5_2_verified": true,
+          "satisfies_uniform_bound": true,
+          "bound_at_M_X_certified": {
+            "mid_float": 0.27871479355400874,
+            "rad_float_outward": 2.0936947837418476e-17,
+            "lower_dec": "2.787147935540087649401176325965816258522e-1",
+            "upper_dec": "2.787147935540087649401176325965816258525e-1",
+            "arb_ball_str": "[0.2787147935540087649401176325965816258524 +/- 3.00e-41]"
+          }
+        },
+        {
+          "X_label": "16",
+          "X_pow_5_4_certified": {
+            "mid_float": 32.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "3.199999999999999999999999999999999999999e+1",
+            "upper_dec": "3.200000000000000000000000000000000000001e+1",
+            "arb_ball_str": "32.00000000000000000000000000000000000000"
+          },
+          "certified_M_X": 32,
+          "expected_M_X": 32,
+          "naive_float_ceil_value": 32,
+          "matches_expected_M_X": true,
+          "M_X_ge_X_pow_5_4_verified": true,
+          "M_X_sq_ge_X_pow_5_2_verified": true,
+          "satisfies_uniform_bound": true,
+          "bound_at_M_X_certified": {
+            "mid_float": 0.27871479355400874,
+            "rad_float_outward": 2.093694783741852e-17,
+            "lower_dec": "2.787147935540087649401176325966251750387e-1",
+            "upper_dec": "2.787147935540087649401176325966251750390e-1",
+            "arb_ball_str": "[0.2787147935540087649401176325966251750389 +/- 3.72e-41]"
+          }
+        },
+        {
+          "X_label": "16 + 10^{-30}",
+          "X_pow_5_4_certified": {
+            "mid_float": 32.0,
+            "rad_float_outward": 2.5000000000000002e-30,
+            "lower_dec": "3.200000000000000000000000000000249999999e+1",
+            "upper_dec": "3.200000000000000000000000000000250000002e+1",
+            "arb_ball_str": "[32.00000000000000000000000000000250000000 +/- 1e-43]"
+          },
+          "certified_M_X": 33,
+          "expected_M_X": 33,
+          "naive_float_ceil_value": 32,
+          "matches_expected_M_X": true,
+          "M_X_ge_X_pow_5_4_verified": true,
+          "M_X_sq_ge_X_pow_5_2_verified": true,
+          "satisfies_uniform_bound": true,
+          "bound_at_M_X_certified": {
+            "mid_float": 0.2620789243336134,
+            "rad_float_outward": 2.144909500285442e-17,
+            "lower_dec": "2.620789243336133841126542293654626020263e-1",
+            "upper_dec": "2.620789243336133841126542293654626020266e-1",
+            "arb_ball_str": "[0.2620789243336133841126542293654626020264 +/- 1.35e-41]"
+          }
+        }
+      ],
       "certified_coupled_grade_table": [
         {
           "K_label": "0",
@@ -10078,20 +10739,20 @@
     "section_5_outcome_and_remaining_obligation": {
       "strongest_new_mathematical_results": [
         "Exact Finite-Prime Euler Inversion & Agreement Horizon (`finite_prime_euler_recursion_and_coefficient_cases`): W_y(X) = [prod_{p <= y}(I - p^{-1/2} D_p)] W_log(X) = sum_{n>=2} lambda_y(n) n^{-1/2} h_0(n/X) with lambda_y = mu_y * log >= Lambda >= 0, exact agreement lambda_y(n) = Lambda(n) for all 2 <= n < 2 q_{>y} (first discrepancy at 2 q_{>y} of value log 2), and summatory identity L_y(x) = sum_{d | P_y, d <= x} mu(d) log(floor(x/d)!).",
-        "Coupled-Cutoff Quantitative Reduction & Smooth/Rough Tail Partition (`coupled_prime_cutoff_comparison_and_boundedness_equivalence`): For y >= M >= max(2, X), |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2), and at y = M(X) = ceil(max(2, X^{5/4})), sup_{X >= 1} |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} = 0.2787147936 < 0.278715, reducing uniform boundedness of R_mu(X) to uniform boundedness of W_{M(X)}(X).",
-        "Quantified Dual Obstruction (Critical-Line Coherent Euler Spike vs. Scale-Horizon Collapse): (1) On the critical line Re(z) = 0, holomorphy of M_X[W_y](z) = -E_y(z) H_0(z) zeta'(z+1/2) yields sup_{X > 0} |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}, but constructive phase alignment of 1 - p^{-1/2 - it} at t_y = pi / log(y) drives |E_y(i t_y)| >= exp((2+o(1)) sqrt(y)/log y) -> +infty because the unfactored product retains divisors m | P_y up to P_y ~ e^y; (2) splitting at the scale horizon m <= X eliminates the m > X primorial blowup, but for any y >= X (including y = M(X)) every squarefree m <= X divides P_y, collapsing the m <= X sum identically to W_log(X) + R_{mu, floor(X)}(X)."
+        "Coupled-Cutoff Quantitative Reduction & Smooth/Rough Tail Partition (`coupled_prime_cutoff_comparison_and_boundedness_equivalence`): For y >= M >= max(2, X), |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2), and at y = M(X) = ceil(max(2, X^{5/4})), sup_{X >= 1} |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} = 0.2787147936 < 0.278715 (and |W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| <= (1/2) C_{log,0} < 0.278715), reducing uniform boundedness of R_mu(X) to uniform boundedness of W_{M(X)}(X) or R_{mu, M(X)}(X) (whereas at N = floor(X) the available small-scale tail estimate grows as O(sqrt(X))).",
+        "Quantified Dual Obstruction (Controlled-Width Coherent Euler Spike vs. Coupled-Cutoff Horizon Collapse): (1) On the critical line Re(z) = 0, holomorphy of M_X[W_y](z) = -E_y(z) H_0(z) zeta'(z+1/2) yields sup_{X > 0} |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}, but on the controlled-width frequency interval I_y = [7*pi / (8*log y), pi / log y] of width |I_y| = pi / (8*log y), monotonicity of each prime factor proves inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 >= exp((4+o(1)) sqrt(y)/log y) and ||Psi_y||_{L^2}^2 >= (H_0(0)/(8 log y)) |E_y(i t_{y,-})|^2 -> +infty, establishing divergence of the unsplit Cauchy-Schwarz/Gram-norm bound (without refuting boundedness of the coupled profile W_{M(X)}(X) or the broader concurrent-grade hypothesis); (2) splitting at the coupled cutoff M(X) = ceil(max(2, X^{5/4})) bounds the m > M(X) tail by (1/2) C_{log,0} < 0.278715, but for y >= M(X) every squarefree m <= M(X) divides P_y, collapsing the m <= M(X) sum identically to W_log(X) + R_{mu, M(X)}(X)."
       ],
       "advances_uniform_cancellation_estimate": false,
-      "why_reformulation_not_closure": "Finite-prime Euler inversion provides a genuine fixed-y uniform bound (via ||Psi_y||_{L^2}) and a quantitative coupled-cutoff reduction to y = M(X) = ceil(max(2, X^{5/4})) within 0.278715, but at any cutoff y >= X the bulk divisors m <= X and bulk coefficients n < 2 q_{>y} reproduce the exact untruncated Moebius and von Mangoldt sums without supplying an independent signed cancellation bound.",
+      "why_reformulation_not_closure": "Finite-prime Euler inversion provides a genuine fixed-y uniform bound (via ||Psi_y||_{L^2}) and a quantitative coupled-cutoff reduction to y = M(X) = ceil(max(2, X^{5/4})) within 0.278715, but at y >= M(X) the divisors m <= M(X) and coefficients n < 2 q_{>y} reproduce the additive truncation W_log(X) + R_{mu, M(X)}(X) and the bulk von Mangoldt sum without supplying an independent signed cancellation bound.",
       "remaining_open_obligation": {
         "subgate_id": "SUBGATE-TC-043A",
         "status": "OPEN",
-        "exact_surviving_lemma": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_mu < infty such that for all X >= 1, |R_mu(X)| <= M_mu (equivalently, |W_{M(X)}(X)| <= M_y or |R_{mu, floor(X)}(X)| <= M_trunc for M(X) = ceil(max(2, X^{5/4})))."
+        "exact_surviving_lemma": "Prove without assuming RH or universal Weil positivity that there exists a finite constant M_mu < infty such that for all X >= 1, |R_mu(X)| <= M_mu (equivalently, |W_{M(X)}(X)| <= M_y or |R_{mu, M(X)}(X)| <= M_trunc at the coupled cutoff M(X) = ceil(max(2, X^{5/4})), where |W(X) - W_{M(X)}(X)| < 0.278715 and |W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| < 0.278715; by contrast, at N = floor(X) the available small-scale tail estimate grows as O(sqrt(X)))."
       }
     },
     "full_section_15_tree_roundtrip_verification": {
-      "total_certified_arb_balls_checked": 408,
-      "compared_against_live_original_arb_count": 408,
+      "total_certified_arb_balls_checked": 492,
+      "compared_against_live_original_arb_count": 492,
       "live_original_count_matches_enumerated_total": true,
       "all_enclose_original_256bit_arb_ball": true,
       "failed_paths": [],
@@ -10341,39 +11002,123 @@
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.euler_sieved_seed_gram_norm_table[5].diagonal_main_term_h0_1_prod_1_plus_1_over_p_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.euler_sieved_seed_gram_norm_table[5].euler_sieved_seed_norm_sq_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.euler_sieved_seed_gram_norm_table[5].euler_sieved_seed_norm_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[0].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[1].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[2].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[3].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[4].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[5].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[6].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].interval_left_t_y_minus_7pi_over_8log_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].interval_min_E_y_abs_sq_at_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].E_y_abs_sq_at_t_y_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].interval_min_H0_at_i_t_y_minus_certified",
         "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[7].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].interval_left_t_y_minus_7pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].interval_min_E_y_abs_sq_at_t_y_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].E_y_abs_sq_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].interval_min_H0_at_i_t_y_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[8].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].interval_left_t_y_minus_7pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].interval_min_E_y_abs_sq_at_t_y_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].E_y_abs_sq_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].interval_min_H0_at_i_t_y_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[9].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].interval_left_t_y_minus_7pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].coherent_frequency_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].interval_width_pi_over_8log_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].interval_min_E_y_abs_sq_at_t_y_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].E_y_abs_sq_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].E_y_abs_at_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].interval_min_H0_at_i_t_y_minus_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].H0_at_i_t_y_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].integrated_gram_norm_sq_lower_bound_via_H0_0_certified",
+        "section_15.section_3_quantitative_compatibility_and_obstruction_analysis.mechanism_A_critical_line_mellin_fourier_and_gram_bound.low_frequency_spike_table[10].integrated_gram_norm_sq_lower_bound_via_H0_minus_certified",
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.uniform_coupled_comparison_bound_certified",
+        "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_cutoff_ceiling_regression[0].X_pow_5_4_certified",
+        "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_cutoff_ceiling_regression[0].bound_at_M_X_certified",
+        "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_cutoff_ceiling_regression[1].X_pow_5_4_certified",
+        "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_cutoff_ceiling_regression[1].bound_at_M_X_certified",
+        "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_cutoff_ceiling_regression[2].X_pow_5_4_certified",
+        "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_cutoff_ceiling_regression[2].bound_at_M_X_certified",
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_coupled_grade_table[0].X_K_certified",
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_coupled_grade_table[0].W_X_certified",
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_coupled_grade_table[0].W_log_X_certified",

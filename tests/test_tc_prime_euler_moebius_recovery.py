@@ -49,6 +49,7 @@ from tc.canonical_theta_correlation_bound import (
     verify_canonical_theta_correlation_lean_module,
 )
 from tc.prime_euler_moebius_recovery import (
+    certified_coupled_cutoff_M_X_arb,
     compute_coupled_cutoff_comparison_bound_arb,
     divisors_of_primorial,
     evaluate_H0_critical_line_arb,
@@ -56,6 +57,7 @@ from tc.prime_euler_moebius_recovery import (
     evaluate_chebyshev_psi_arb,
     evaluate_euler_dirichlet_poly_acb,
     evaluate_euler_sieved_seed_gram_norm_arb,
+    evaluate_euler_spike_interval_gram_lower_bound_arb,
     evaluate_lambda_y_closed_form_arb,
     evaluate_lambda_y_convolution_arb,
     evaluate_lambda_y_recursion_arb,
@@ -220,7 +222,8 @@ def test_05_stieltjes_boundary_envelope_and_critical_line_spike():
             assert bool(g_res["gram_norm_sq_arb"] > arb("0.5"))
             assert bool(g_res["gram_norm_arb"] > arb("0.7"))
 
-        # 3. Critical-line H_0(0) > 0 and low-frequency coherent spike at t_y = pi / log(y)
+        # 3. Critical-line H_0(0) > 0, low-frequency coherent spike at t_y = pi / log(y),
+        #    and controlled-width frequency interval Gram-norm lower bound on I_y = [7*pi / (8*log y), pi / log y]
         h0_0 = evaluate_H0_critical_line_arb(arb(0))
         assert bool(h0_0 > arb("2.82e-5")) and bool(h0_0 < arb("2.83e-5"))
 
@@ -234,15 +237,50 @@ def test_05_stieltjes_boundary_envelope_and_critical_line_spike():
             assert bool(e_sq > prev_spike)
             prev_spike = e_sq
         assert bool(prev_spike > arb(6000))
+
+        prev_gram_lb = arb(0)
+        for y in (97, 199, 499, 997, 1999, 4999, 9973):
+            iv = evaluate_euler_spike_interval_gram_lower_bound_arb(y, prec_bits=256)
+            assert iv["monotonicity_verified"] is True
+            assert iv["H0_monotonicity_verified"] is True
+            assert bool(iv["interval_width_arb"] > arb(0))
+            assert bool(iv["e_sq_at_minus_arb"] <= iv["e_sq_at_plus_arb"])
+            assert bool(iv["gram_sq_lb_H0_0_arb"] <= iv["gram_sq_lb_H0_minus_arb"])
+            assert bool(iv["gram_sq_lb_H0_0_arb"] > prev_gram_lb)
+            prev_gram_lb = iv["gram_sq_lb_H0_0_arb"]
+        assert bool(prev_gram_lb > arb(153))
     finally:
         flint_ctx.prec = saved_prec
 
 
 def test_06_coupled_cutoff_comparison_bound_across_admissible_grades():
-    """Verify |W(X) - W_{M(X)}(X)| <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715 across rational grades."""
+    """Verify |W(X) - W_{M(X)}(X)| <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715 across rational grades and X = 16 +/- 10^{-30} ceiling regression."""
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = 256
+        # Near-integer ceiling regression without float rounding loss:
+        x_below_16 = arb(16) - arb("1e-30")
+        x_exact_16 = arb(16)
+        x_above_16 = arb(16) + arb("1e-30")
+        assert certified_coupled_cutoff_M_X_arb(x_below_16, prec_bits=256) == 32
+        assert certified_coupled_cutoff_M_X_arb(x_exact_16, prec_bits=256) == 32
+        assert certified_coupled_cutoff_M_X_arb(x_above_16, prec_bits=256) == 33
+
+        # Reproduce why binary64 float rounding fails at X = 16 + 10^{-30}:
+        u_above_16 = (x_above_16**5).root(4)
+        assert bool(u_above_16 > arb(32))
+        naive_float_cutoff = int(math.ceil(float(u_above_16.upper())))
+        assert naive_float_cutoff == 32
+        assert not bool(arb(naive_float_cutoff) >= u_above_16)
+
+        cmp_above_16 = compute_coupled_cutoff_comparison_bound_arb(
+            x_above_16, prec_bits=256
+        )
+        assert cmp_above_16["M_X"] == 33
+        assert cmp_above_16["M_X_ge_X_pow_5_4"] is True
+        assert cmp_above_16["M_X_sq_ge_X_pow_5_2"] is True
+        assert cmp_above_16["satisfies_uniform_bound"] is True
+
         tau_a = arb(2) * arb.pi()
         for k_frac in (
             Fraction(0, 1),
@@ -344,7 +382,37 @@ def test_07_lean_module_and_artifact_section_15():
         and row["coeff_minus_prod_encloses_zero"]
         for row in s2["three_way_W_y_representation_checks"]
     )
+    s3 = sec15["section_3_quantitative_compatibility_and_obstruction_analysis"]
+    mech_a = s3["mechanism_A_critical_line_mellin_fourier_and_gram_bound"]
+    assert "does NOT establish failure" in mech_a["low_frequency_coherent_arch_obstruction"]
+    spike_rows = mech_a["low_frequency_spike_table"]
+    assert len(spike_rows) == 11
+    assert all(
+        row["interval_monotonicity_E_y_sq_and_H0_verified"] is True
+        for row in spike_rows
+    )
+    assert (
+        spike_rows[-1]["integrated_gram_norm_sq_lower_bound_via_H0_0_certified"][
+            "mid_float"
+        ]
+        > 153.0
+    )
+
     s4 = sec15["section_4_coupled_cutoff_passage_and_grade_certification"]
+    ceil_regs = {
+        row["X_label"]: row for row in s4["certified_cutoff_ceiling_regression"]
+    }
+    assert ceil_regs["16 - 10^{-30}"]["certified_M_X"] == 32
+    assert ceil_regs["16"]["certified_M_X"] == 32
+    assert ceil_regs["16 + 10^{-30}"]["certified_M_X"] == 33
+    assert ceil_regs["16 + 10^{-30}"]["naive_float_ceil_value"] == 32
+    assert all(
+        row["matches_expected_M_X"]
+        and row["M_X_ge_X_pow_5_4_verified"]
+        and row["M_X_sq_ge_X_pow_5_2_verified"]
+        and row["satisfies_uniform_bound"]
+        for row in s4["certified_cutoff_ceiling_regression"]
+    )
     assert len(s4["certified_coupled_grade_table"]) == 13
     assert all(
         row["abs_W_minus_W_M_X_below_analytic_bound"]
@@ -353,18 +421,14 @@ def test_07_lean_module_and_artifact_section_15():
         and row["smooth_plus_rough_partition_encloses_zero"]
         for row in s4["certified_coupled_grade_table"]
     )
-    assert (
-        sec15["section_5_outcome_and_remaining_obligation"][
-            "remaining_open_obligation"
-        ]["subgate_id"]
-        == "SUBGATE-TC-043A"
-    )
-    assert (
-        sec15["section_5_outcome_and_remaining_obligation"][
-            "remaining_open_obligation"
-        ]["status"]
-        == "OPEN"
-    )
+    rem_obl = sec15["section_5_outcome_and_remaining_obligation"][
+        "remaining_open_obligation"
+    ]
+    assert rem_obl["subgate_id"] == "SUBGATE-TC-043A"
+    assert rem_obl["status"] == "OPEN"
+    assert "|R_{mu, M(X)}(X)| <= M_trunc" in rem_obl["exact_surviving_lemma"]
+    assert "|R_{mu, floor(X)}(X)| <=" not in rem_obl["exact_surviving_lemma"]
+    assert "O(sqrt(X))" in rem_obl["exact_surviving_lemma"]
 
     rt15 = sec15["full_section_15_tree_roundtrip_verification"]
     assert rt15["all_enclose_original_256bit_arb_ball"] is True
