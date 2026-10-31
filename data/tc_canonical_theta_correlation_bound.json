@@ -13,6 +13,7 @@
   "prime_euler_moebius_recovery_task_id": "TASK-TC-046",
   "common_referent_prime_theta_bridge_task_id": "TASK-TC-047",
   "single_observable_common_referent_audit_task_id": "TASK-TC-048",
+  "arithmetic_cancellation_canonical_theta_correlation_task_id": "TASK-TC-049",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
@@ -27,6 +28,7 @@
   "prime_euler_moebius_recovery_starting_head": "1fc477927ccbb242dec10217744b1ad054877e12",
   "common_referent_prime_theta_bridge_starting_head": "c39eb27b31fc4eed98300be0118d8c670f92d32a",
   "single_observable_common_referent_audit_starting_head": "39b4e3aec6d4357d283932ad296b6148477e00e4",
+  "arithmetic_cancellation_canonical_theta_correlation_starting_head": "5da0eb79e1732ff871ee1c7fee729c62972aa406",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -47,7 +49,8 @@
     "TASK-TC-045R",
     "TASK-TC-045R2",
     "TASK-TC-046",
-    "TASK-TC-047"
+    "TASK-TC-047",
+    "TASK-TC-048"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -62,6 +65,7 @@
     "prime_euler_moebius_recovery_status": "FINITE_PRIME_EULER_INVERSION_AND_COUPLED_CUTOFF_REDUCTION_PROVED_HORIZON_COLLAPSE_AND_LOW_FREQUENCY_EULER_SPIKE_OBSTRUCTIONS_QUANTIFIED",
     "common_referent_prime_theta_bridge_status": "COMMON_REFERENT_PRIME_THETA_INTEGER_LAYER_MEMBERSHIP_PROVED_AND_CERTIFIED_SUBGATE_OPEN",
     "single_observable_common_referent_audit_status": "COUPLED_CUTOFF_JUMP_FORMULA_AND_SINGLE_OBSERVABLE_CANDIDATE_AUDIT_PROVED_COVARIANCE_INVARIANCE_DISCRETENESS_TRILEMMA_ISOLATED_SUBGATE_OPEN",
+    "arithmetic_cancellation_canonical_theta_correlation_status": "SUPERCRITICAL_DYADIC_BLOCK_OBSTRUCTION_SUBCRITICAL_COMPENSATION_AND_W_LOG_X_NEG_5_2_RESONANT_BAND_REDUCTION_PROVED_SUBGATE_OPEN",
     "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
     "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
     "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
@@ -2706,7 +2710,9 @@
       "finitePrimeMultiplicativeFactorCases",
       "gradeLayerRealizedObservable",
       "coupledCutoffPrimeStepJump",
-      "thetaZeroRadialDefectObservable"
+      "thetaZeroRadialDefectObservable",
+      "primeIncrementStep",
+      "localizedResonantBandDecomp"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -2738,7 +2744,9 @@
       "finitePrimeMultiplicativeFactorCases",
       "gradeLayerRealizedObservable",
       "coupledCutoffPrimeStepJump",
-      "thetaZeroRadialDefectObservable"
+      "thetaZeroRadialDefectObservable",
+      "primeIncrementStep",
+      "localizedResonantBandDecomp"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2789,7 +2797,8 @@
       "prime_euler_multiplicative_integrality_and_grade_layer_membership",
       "common_referent_integer_layer_bridge_and_station_ratio_identity",
       "coupled_cutoff_prime_step_jump_and_dense_comparison_extension",
-      "single_observable_common_referent_candidate_audit_and_trilemma"
+      "single_observable_common_referent_candidate_audit_and_trilemma",
+      "prime_increment_telescoping_and_resonant_band_reduction"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2840,7 +2849,8 @@
       "prime_euler_multiplicative_integrality_and_grade_layer_membership",
       "common_referent_integer_layer_bridge_and_station_ratio_identity",
       "coupled_cutoff_prime_step_jump_and_dense_comparison_extension",
-      "single_observable_common_referent_candidate_audit_and_trilemma"
+      "single_observable_common_referent_candidate_audit_and_trilemma",
+      "prime_increment_telescoping_and_resonant_band_reduction"
     ]
   },
   "section_11_arithmetic_fourier_positive_factorization": {
@@ -15347,6 +15357,2098 @@
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_1_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_minus_D_1_2B_CR1_diff_certified"
+      ]
+    }
+  },
+  "section_18_arithmetic_cancellation_in_canonical_theta_correlation": {
+    "task_id": "TASK-TC-049",
+    "parent_epic": "EPIC-TC-042",
+    "inspected_baseline": "5da0eb79e1732ff871ee1c7fee729c62972aa406",
+    "status": "SUPERCRITICAL_DYADIC_BLOCK_OBSTRUCTION_SUBCRITICAL_COMPENSATION_AND_W_LOG_X_NEG_5_2_RESONANT_BAND_REDUCTION_PROVED_SUBGATE_OPEN",
+    "section_1_starting_point_and_cancellation_loss_audit": {
+      "canonical_correlation_and_identities": {
+        "canonical_correlation": "C_tau(K) = Q_tau(T_K psi_tau, psi_tau),   K in A_R = Qbar cap R (positive and negative grades)",
+        "moebius_inversion_identity": "W(X) = W_log(X) + R_mu(X),   R_mu(X) = sum_{m >= 2} (mu(m) / sqrt(m)) W_log(X / m)",
+        "finite_prime_euler_identity": "W_y(X) = [prod_{p <= y} (I - p^{-1/2} D_p)] W_log(X),   D_p F(X) = F(X / p)",
+        "coupled_cutoff_comparison": "|W(X) - W_{M(X)}(X)| = |R_mu(X) - R_{mu, M(X)}(X)| <= (1/2) C_{log,0} < 0.278715,   M(X) = ceil(max(2, X^{5/4}))",
+        "preserved_tc048r_candidate_classifications": {
+          "candidate_1_integer_carrier_N_y_x_tau_K": {
+            "established": "Integer-layer membership (CR2) and one-way off-critical nonvanishing (CR3)",
+            "missing": "Raw cross-grade equality (CR1)"
+          },
+          "candidate_2A_theta_detector": {
+            "established": "Raw cross-grade equality (CR1) and one-way off-critical nonvanishing (CR3)",
+            "missing": "Integer-layer membership (CR2)"
+          },
+          "candidate_2B_shift_difference": {
+            "established": "Raw cross-grade equality (CR1)",
+            "missing": "General off-critical nonvanishing (CR3) and integer-layer membership (CR2)"
+          }
+        }
+      },
+      "exact_cancellation_loss_diagnosis": {
+        "route_1_spatial_chebyshev_prime_error_majorant_tc043": {
+          "exact_signed_expression": "I(X) = int_1^infty E(x) x^{-3/2} tilde{h}_0(x/X) dx = sqrt(X) int_{1/X}^infty (E(X*alpha)/(X*alpha)) k(alpha) d_alpha",
+          "step_where_cancellation_is_lost": "Triangle inequality |I(X)| <= A_E(X) := int_1^infty |E(x)| x^{-3/2} |tilde{h}_0(x/X)| dx <= M_omega(X), which replaces the zero-mean signed kernel k(alpha) = alpha^{-1/2} tilde{h}_0(alpha) (satisfying int_0^infty k(alpha) d_alpha = H_0(1/2) = 0 across its 7 sign changes) by |k(alpha)| >= 0 (c_0 = int_{1/2}^2 |k(alpha)| d_alpha = 1.7456980946 > 0), forcing M_omega(X) >= c_0 sqrt(X) omega(2X)."
+        },
+        "route_2_critical_line_euler_seed_gram_norm_tc046": {
+          "exact_signed_expression": "W_y(X) = -(1/tau) int_{-infty}^infty E_y(it) H_0(it) zeta'(1/2 + it) X^{it} dt",
+          "step_where_cancellation_is_lost": "Applying Cauchy-Schwarz on Re(z) = 0, |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}, which drops the oscillatory Fourier phase X^{it} and the phase correlation with zeta'(1/2 + it). On the coherent low-frequency interval I_y = [7*tau/(16*log y), tau/(2*log y)] of width |I_y| = tau/(16*log y), every prime factor p <= y has t*log p in (0, pi] where (d/dt)|1 - p^{-1/2-it}|^2 >= 0, forcing ||Psi_y||_{L^2}^2 >= (H_0(0)/(8 log y)) exp[(4*cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty."
+        },
+        "route_3_divisor_aggregated_stieltjes_and_moebius_bounds_tc044_tc045": {
+          "exact_signed_expression": "W_log(X) = B_{log,boundary}(X) + int_1^infty E_log(x) x^{-3/2} tilde{h}_0(x/X) dx and R_mu(X) = sum_{m >= 2} (mu(m)/sqrt(m)) W_log(X/m)",
+          "step_where_cancellation_is_lost_in_W_log": "In TC-044, bounding I_log(X) by inserting the unsigned Stirling remainder bound |E_log(x)| <= (1/2) log x + 1 inside the integral destroys the exact cancellation of the smooth Stirling (1/2) log(2*pi*x) main term against tilde{h}_0(x/X) (which vanishes identically on (0, infty) because H_0(z) also has a triple zero at z = -1/2: H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0!). That triangle inequality lost two full powers of X, giving O(X^{-1/2} log X) instead of the true O(X^{-5/2}) decay of W_log(X).",
+          "step_where_cancellation_is_lost_in_R_mu": "In R_mu(X) = sum_{m >= 2} (mu(m)/sqrt(m)) W_log(X/m) (and its Mertens Stieltjes form X^{-1/2} int_0^{X/2} M_{>=2}(X/u) phi_log'(u) du), replacing mu(m) by |mu(m)| <= 1 (or M_{>=2}(y) by |M_{>=2}(y)| <= C_mu y exp(-c_mu sqrt(log y))) across the resonant transition band m ~ X loses the alternating sign cancellation of mu(m)."
+        }
+      }
+    },
+    "section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation": {
+      "prime_increment_definition_and_telescoping": {
+        "definition": "J_p(X) := p^{-1/2} W_{p^-}(X / p) = W_{p^-}(X) - W_p(X)",
+        "telescoping_identity": "W_y(X) = W_log(X) - sum_{p <= y} J_p(X),   W_{M(X)}(X) - W_log(X) = -sum_{p <= M(X)} J_p(X)",
+        "sample_prime_increments_at_X_2": [
+          {
+            "X": 2.0,
+            "p": 11,
+            "alpha_2_eq_2p_over_X": 11.0,
+            "is_supercritical_2p_ge_9X": true,
+            "step_residual_encloses_zero": true,
+            "satisfies_n2_lower_bound": true,
+            "J_p_direct_certified": {
+              "mid_float": -0.00048425904947180243,
+              "rad_float_outward": 6.71195721224649e-08,
+              "lower_dec": "-4.843261690439248923212289810180664062501e-4",
+              "upper_dec": "-4.841919298996799625456333160400390624999e-4",
+              "arb_ball_str": "[-0.000484 +/- 3.27e-7]"
+            },
+            "n2_lower_bound_certified": {
+              "mid_float": 0.00015431891363857825,
+              "rad_float_outward": 6.824971666137844e-21,
+              "lower_dec": "1.543189136385782468675048945277833431453e-4",
+              "upper_dec": "1.543189136385782468675048945277833431456e-4",
+              "arb_ball_str": "[0.0001543189136385782468675048945277833431455 +/- 4.07e-44]"
+            }
+          },
+          {
+            "X": 2.0,
+            "p": 13,
+            "alpha_2_eq_2p_over_X": 13.0,
+            "is_supercritical_2p_ge_9X": true,
+            "step_residual_encloses_zero": true,
+            "satisfies_n2_lower_bound": true,
+            "J_p_direct_certified": {
+              "mid_float": -0.0003565994595646771,
+              "rad_float_outward": 4.06628259952413e-08,
+              "lower_dec": "-3.566401223906723316758871078491210937501e-4",
+              "upper_dec": "-3.565587967386818490922451019287109374999e-4",
+              "arb_ball_str": "[-0.0003566 +/- 4.13e-8]"
+            },
+            "n2_lower_bound_certified": {
+              "mid_float": 0.00014184430991106406,
+              "rad_float_outward": 2.42368392563509e-22,
+              "lower_dec": "1.418443099110640621263801813690463805514e-4",
+              "upper_dec": "1.418443099110640621263801813690463805517e-4",
+              "arb_ball_str": "[0.0001418443099110640621263801813690463805515 +/- 8.51e-45]"
+            }
+          },
+          {
+            "X": 2.0,
+            "p": 17,
+            "alpha_2_eq_2p_over_X": 17.0,
+            "is_supercritical_2p_ge_9X": true,
+            "step_residual_encloses_zero": true,
+            "satisfies_n2_lower_bound": true,
+            "J_p_direct_certified": {
+              "mid_float": -0.00019131351530177199,
+              "rad_float_outward": 1.8184096006734766e-08,
+              "lower_dec": "-1.913316993977787205949425697326660156251e-4",
+              "upper_dec": "-1.912953312057652510702610015869140624999e-4",
+              "arb_ball_str": "[-0.0001913 +/- 3.17e-8]"
+            },
+            "n2_lower_bound_certified": {
+              "mid_float": 8.801840361994379e-05,
+              "rad_float_outward": 1.3368559703692437e-21,
+              "lower_dec": "8.801840361994379386836352408062194897921e-5",
+              "upper_dec": "8.801840361994379386836352408062194897924e-5",
+              "arb_ball_str": "[8.801840361994379386836352408062194897922e-5 +/- 6.51e-46]"
+            }
+          },
+          {
+            "X": 2.0,
+            "p": 19,
+            "alpha_2_eq_2p_over_X": 19.0,
+            "is_supercritical_2p_ge_9X": true,
+            "step_residual_encloses_zero": true,
+            "satisfies_n2_lower_bound": true,
+            "J_p_direct_certified": {
+              "mid_float": -0.00014372842292686983,
+              "rad_float_outward": 1.302510099776555e-08,
+              "lower_dec": "-1.437414480278675910085439682006835937501e-4",
+              "upper_dec": "-1.437153978258720599114894866943359374999e-4",
+              "arb_ball_str": "[-0.0001437 +/- 4.15e-8]"
+            },
+            "n2_lower_bound_certified": {
+              "mid_float": 6.826209476154956e-05,
+              "rad_float_outward": 3.877145457378107e-21,
+              "lower_dec": "6.826209476154956800387043338790330864998e-5",
+              "upper_dec": "6.826209476154956800387043338790330865001e-5",
+              "arb_ball_str": "[6.826209476154956800387043338790330864999e-5 +/- 4.14e-45]"
+            }
+          }
+        ]
+      },
+      "proved_supercritical_dyadic_block_obstruction": {
+        "theorem_statement": "For every real A >= 9/2 (e.g. A = 5), every X > 0, and every prime p > A X: (1) In J_p(X) = sum_{n=2}^infty (lambda_{p^-}(n) / sqrt(n p)) h_0(n p / X), every integer n >= 2 has alpha_n = n p / X >= 2 p / X > 2 A >= 9 > alpha_3^* ~ 8.621336, where -h_0(alpha) = (alpha + alpha^{-1})^{-5/2} kappa(alpha) > 0 and lambda_{p^-}(n) >= 0 with lambda_{p^-}(2) = log 2 > 0. Hence every term in -J_p(X) is nonnegative, and retaining the n = 2 term gives the unconditional two-sided inequality: c_0(A) X^{5/2} p^{-3} <= (log 2 / sqrt(2 p)) (-h_0(2 p / X)) <= -J_p(X) <= C_{log,0} X^{5/2} p^{-3}, where c_0(A) := (log 2 / 8) kappa(2A) (1 + (2A)^{-2})^{-5/2} > 0 (c_0(5) = 0.0219284968 > 0.0219). (2) Consequently, for any fixed A >= 5 and X >= max(59/A, (2A)^4) (so A X < p <= 2 A X <= M(X) = ceil(X^{5/4})), Rosser-Schoenfeld (1962, Corollary 1: pi(2u) - pi(u) >= 3u / (4 log(2u)) for u >= 59) gives: |-sum_{A X < p <= 2 A X} J_p(X)| = -sum_{A X < p <= 2 A X} J_p(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty.",
+        "scoped_obstruction_conclusion": "Any proof strategy that attempts to bound the coupled prime-increment sum sum_{p <= M(X)} J_p(X) by bounding dyadic prime blocks A X < p <= 2 A X separately in absolute value (or summing |J_p(X)| over p <= M(X)) is unconditionally obstructed: every supercritical prime p > (9/2) X has the same negative sign J_p(X) < 0, and a single dyadic block (A X, 2 A X] inside [1, M(X)] already grows as Theta_A(sqrt(X) / log X)."
+      },
+      "cancellation_mechanism_1_subcritical_vs_supercritical_resummation": {
+        "theorem_statement": "For any prime cutoffs y_2 > y_1 >= floor(A X) with A >= 9/2 (e.g. A = 5, y_1 = floor(5 X), y_2 = max(floor(10 X), M(X))): every unsieved composite n >= 2 q_{> y_1} > 2 A X >= 9 X lies in the negative tail h_0(n/X) < 0, so both sieve defects D_{y_1}(X) := W_{y_1}(X) - W(X) = sum_{n >= 2 q_{> y_1}} (Delta_{y_1}(n)/sqrt(n)) h_0(n/X) < 0 and D_{y_2}(X) := W_{y_2}(X) - W(X) < 0 are strictly negative, while every prime p in (y_1, y_2] satisfies J_p(X) < 0 so T_{(y_1, y_2]}(X) := -sum_{y_1 < p <= y_2} J_p(X) > 0 is strictly positive. The exact coefficient identity Delta_{y_1}(n) - sum_{y_1 < p <= y_2, p | n} lambda_{p^-}(n/p) = Delta_{y_2}(n) annihilates every composite multiple n = m p < 2 q_{> y_2} identically, proving: D_{y_1}(X) + T_{(y_1, y_2]}(X) = D_{y_2}(X) < 0, and at y_2 = M(X) (for X >= (2A)^4) 0 < -D_{M(X)}(X) = -D_{y_1}(X) - T_{(y_1, M(X)]}(X) <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715. Corollary (Unconditional Linear-Cutoff Divergence): For any fixed A >= 5 and all X >= 59/A, taking y_1 = floor(A X) and y_2 = floor(2 A X) gives W(X) - W_{floor(A X)}(X) = -D_{floor(A X)}(X) = T_{(floor(A X), floor(2 A X)]}(X) + (-D_{floor(2 A X)}(X)) > T_{(floor(A X), floor(2 A X)]}(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty, proving unconditionally that linear prime cutoffs y = floor(A X) diverge from W(X) at rate Theta_A(sqrt(X)/log X) and that super-linear sieving (such as y = M(X) = ceil(X^{5/4})) is necessary and sufficient for O(1) comparison."
+      },
+      "certified_audit_data": {
+        "kappa_10_certified": {
+          "mid_float": 0.259490185546875,
+          "rad_float_outward": 2.593480985524366e-17,
+          "lower_dec": "2.594901855468749999999999999999999999998e-1",
+          "upper_dec": "2.594901855468750000000000000000000000002e-1",
+          "arb_ball_str": "[0.2594901855468750000000000000000000000000 +/- 3e-45]"
+        },
+        "c0_A5_certified": {
+          "mid_float": 0.021930724347535374,
+          "rad_float_outward": 2.311351123852572e-19,
+          "lower_dec": "2.193072434753537437245096830784202508656e-2",
+          "upper_dec": "2.193072434753537437245096830784202508659e-2",
+          "arb_ball_str": "[0.02193072434753537437245096830784202508658 +/- 2.06e-42]"
+        },
+        "c0_inf_certified": {
+          "mid_float": 0.1096580500495226,
+          "rad_float_outward": 3.486929808686551e-18,
+          "lower_dec": "1.096580500495225977788980504650630898712e-1",
+          "upper_dec": "1.096580500495225977788980504650630898715e-1",
+          "arb_ball_str": "[0.1096580500495225977788980504650630898713 +/- 1.94e-41]"
+        },
+        "dyadic_rosser_schoenfeld_coeff_A5_certified": {
+          "mid_float": 8.224021630325765e-05,
+          "rad_float_outward": 1.4088577576874667e-21,
+          "lower_dec": "8.224021630325765389669113115440759407465e-5",
+          "upper_dec": "8.224021630325765389669113115440759407468e-5",
+          "arb_ball_str": "[8.224021630325765389669113115440759407467e-5 +/- 2.70e-45]"
+        },
+        "dyadic_block_table": [
+          {
+            "X_label": "2",
+            "X_certified": {
+              "mid_float": 2.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.999999999999999999999999999999999999999e+0",
+              "upper_dec": "2.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "2.000000000000000000000000000000000000000"
+            },
+            "dyadic_interval_5X_to_10X": [
+              10,
+              20
+            ],
+            "prime_count_in_block": 4,
+            "neg_dyadic_block_sum_certified": {
+              "mid_float": 0.0011758878964656105,
+              "rad_float_outward": 2.3719906083741196e-07,
+              "lower_dec": "1.175650697404773126208965550176799297331e-3",
+              "upper_dec": "1.176125095526447950078363646753132343294e-3",
+              "arb_ball_str": "[0.001176 +/- 3.50e-7]"
+            },
+            "n2_term_lower_bound_sum_certified": {
+              "mid_float": 0.00045244372193113566,
+              "rad_float_outward": 1.2183925310241825e-20,
+              "lower_dec": "4.524437219311356708661190333653549813260e-4",
+              "upper_dec": "4.524437219311356708661190333653549813263e-4",
+              "arb_ball_str": "[0.0004524437219311356708661190333653549813262 +/- 1.74e-44]"
+            },
+            "analytic_c0_A5_lower_bound_certified": {
+              "mid_float": 0.00019301288967195782,
+              "rad_float_outward": 2.1164256667240938e-21,
+              "lower_dec": "1.930128896719578254684227189876778602152e-4",
+              "upper_dec": "1.930128896719578254684227189876778602155e-4",
+              "arb_ball_str": "[0.0001930128896719578254684227189876778602153 +/- 2.43e-44]"
+            },
+            "analytic_C_log_0_upper_bound_certified": {
+              "mid_float": 0.004905952657621914,
+              "rad_float_outward": 2.3549646896762664e-21,
+              "lower_dec": "4.905952657621914269202397096659338745375e-3",
+              "upper_dec": "4.905952657621914269202397096659338745378e-3",
+              "arb_ball_str": "[0.004905952657621914269202397096659338745376 +/- 1.44e-43]"
+            },
+            "all_primes_satisfy_two_sided_inequality": true,
+            "block_satisfies_lower_and_upper_bounds": true
+          },
+          {
+            "X_label": "4",
+            "X_certified": {
+              "mid_float": 4.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "3.999999999999999999999999999999999999999e+0",
+              "upper_dec": "4.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "4.000000000000000000000000000000000000000"
+            },
+            "dyadic_interval_5X_to_10X": [
+              20,
+              40
+            ],
+            "prime_count_in_block": 4,
+            "neg_dyadic_block_sum_certified": {
+              "mid_float": 0.000794711035553064,
+              "rad_float_outward": 1.5222184446272993e-07,
+              "lower_dec": "7.945588137086012636700615985319018363951e-4",
+              "upper_dec": "7.948632573975267234800412552431225776674e-4",
+              "arb_ball_str": "[0.000795 +/- 4.42e-7]"
+            },
+            "n2_term_lower_bound_sum_certified": {
+              "mid_float": 0.0003218578354095815,
+              "rad_float_outward": 5.112577156144059e-21,
+              "lower_dec": "3.218578354095815051996719412944950640727e-4",
+              "upper_dec": "3.218578354095815051996719412944950640730e-4",
+              "arb_ball_str": "[0.0003218578354095815051996719412944950640729 +/- 2.95e-44]"
+            },
+            "analytic_c0_A5_lower_bound_certified": {
+              "mid_float": 0.00012386541337163542,
+              "rad_float_outward": 5.906009397609874e-21,
+              "lower_dec": "1.238654133716354122277416078107330939783e-4",
+              "upper_dec": "1.238654133716354122277416078107330939786e-4",
+              "arb_ball_str": "[0.0001238654133716354122277416078107330939785 +/- 1.60e-44]"
+            },
+            "analytic_C_log_0_upper_bound_certified": {
+              "mid_float": 0.0031483796494151924,
+              "rad_float_outward": 2.0474370206682947e-19,
+              "lower_dec": "3.148379649415192185017162632781010298461e-3",
+              "upper_dec": "3.148379649415192185017162632781010298464e-3",
+              "arb_ball_str": "[0.003148379649415192185017162632781010298462 +/- 4.25e-44]"
+            },
+            "all_primes_satisfy_two_sided_inequality": true,
+            "block_satisfies_lower_and_upper_bounds": true
+          },
+          {
+            "X_label": "tau",
+            "X_certified": {
+              "mid_float": 6.283185307179586,
+              "rad_float_outward": 2.449293598294707e-16,
+              "lower_dec": "6.283185307179586476925286766559005768393e+0",
+              "upper_dec": "6.283185307179586476925286766559005768396e+0",
+              "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
+            },
+            "dyadic_interval_5X_to_10X": [
+              31,
+              62
+            ],
+            "prime_count_in_block": 7,
+            "neg_dyadic_block_sum_certified": {
+              "mid_float": 0.0010397523101914885,
+              "rad_float_outward": 1.9323334865539723e-07,
+              "lower_dec": "1.039559076842833107434671546798199415205e-3",
+              "upper_dec": "1.039945543540143901850569818634539842607e-3",
+              "arb_ball_str": "[0.001040 +/- 4.41e-7]"
+            },
+            "n2_term_lower_bound_sum_certified": {
+              "mid_float": 0.00043228702826577547,
+              "rad_float_outward": 1.8611542165230988e-20,
+              "lower_dec": "4.322870282657754843043805515200403761256e-4",
+              "upper_dec": "4.322870282657754843043805515200403761259e-4",
+              "arb_ball_str": "[0.0004322870282657754843043805515200403761257 +/- 4.55e-44]"
+            },
+            "analytic_c0_A5_lower_bound_certified": {
+              "mid_float": 0.00015723740789405242,
+              "rad_float_outward": 7.077129809431536e-21,
+              "lower_dec": "1.572374078940524299256984825064996843638e-4",
+              "upper_dec": "1.572374078940524299256984825064996843641e-4",
+              "arb_ball_str": "[0.0001572374078940524299256984825064996843639 +/- 4.40e-44]"
+            },
+            "analytic_C_log_0_upper_bound_certified": {
+              "mid_float": 0.00399662053890011,
+              "rad_float_outward": 5.095168305649596e-20,
+              "lower_dec": "3.996620538900109588905444718079975454736e-3",
+              "upper_dec": "3.996620538900109588905444718079975454739e-3",
+              "arb_ball_str": "[0.003996620538900109588905444718079975454737 +/- 4.90e-43]"
+            },
+            "all_primes_satisfy_two_sided_inequality": true,
+            "block_satisfies_lower_and_upper_bounds": true
+          },
+          {
+            "X_label": "10",
+            "X_certified": {
+              "mid_float": 10.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e+0",
+              "upper_dec": "1.000000000000000000000000000000000000001e+1",
+              "arb_ball_str": "10.00000000000000000000000000000000000000"
+            },
+            "dyadic_interval_5X_to_10X": [
+              50,
+              100
+            ],
+            "prime_count_in_block": 10,
+            "neg_dyadic_block_sum_certified": {
+              "mid_float": 0.0013348119837246486,
+              "rad_float_outward": 2.6397077812490016e-07,
+              "lower_dec": "1.334548012946523698474265984259545803069e-3",
+              "upper_dec": "1.335075954502773498688839026726782321931e-3",
+              "arb_ball_str": "[0.001335 +/- 4.52e-7]"
+            },
+            "n2_term_lower_bound_sum_certified": {
+              "mid_float": 0.0005253937700243378,
+              "rad_float_outward": 7.467817572931457e-21,
+              "lower_dec": "5.253937700243377721244096981212503397455e-4",
+              "upper_dec": "5.253937700243377721244096981212503397458e-4",
+              "arb_ball_str": "[0.0005253937700243377721244096981212503397456 +/- 3.72e-44]"
+            },
+            "analytic_c0_A5_lower_bound_certified": {
+              "mid_float": 0.00021479702723945234,
+              "rad_float_outward": 5.7444899432246254e-21,
+              "lower_dec": "2.147970272394523412748269003946745330250e-4",
+              "upper_dec": "2.147970272394523412748269003946745330253e-4",
+              "arb_ball_str": "[0.0002147970272394523412748269003946745330251 +/- 4.28e-44]"
+            },
+            "analytic_C_log_0_upper_bound_certified": {
+              "mid_float": 0.005459656339147481,
+              "rad_float_outward": 6.596998396731238e-20,
+              "lower_dec": "5.459656339147481097317539064300731510945e-3",
+              "upper_dec": "5.459656339147481097317539064300731510948e-3",
+              "arb_ball_str": "[0.005459656339147481097317539064300731510946 +/- 2.00e-43]"
+            },
+            "all_primes_satisfy_two_sided_inequality": true,
+            "block_satisfies_lower_and_upper_bounds": true
+          },
+          {
+            "X_label": "16",
+            "X_certified": {
+              "mid_float": 16.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.599999999999999999999999999999999999999e+1",
+              "upper_dec": "1.600000000000000000000000000000000000001e+1",
+              "arb_ball_str": "16.00000000000000000000000000000000000000"
+            },
+            "dyadic_interval_5X_to_10X": [
+              80,
+              160
+            ],
+            "prime_count_in_block": 15,
+            "neg_dyadic_block_sum_certified": {
+              "mid_float": 0.0015332867371000702,
+              "rad_float_outward": 3.0291167663065726e-07,
+              "lower_dec": "1.532983825423439583346407744102180004118e-3",
+              "upper_dec": "1.533589648776700897769842413254082202913e-3",
+              "arb_ball_str": "[0.001533 +/- 5.90e-7]"
+            },
+            "n2_term_lower_bound_sum_certified": {
+              "mid_float": 0.0006042264503452518,
+              "rad_float_outward": 2.5331549598350387e-20,
+              "lower_dec": "6.042264503452518090893879802667567574728e-4",
+              "upper_dec": "6.042264503452518090893879802667567574731e-4",
+              "arb_ball_str": "[0.0006042264503452518090893879802667567574729 +/- 3.64e-44]"
+            },
+            "analytic_c0_A5_lower_bound_certified": {
+              "mid_float": 0.00024648360214202535,
+              "rad_float_outward": 1.362316152542982e-20,
+              "lower_dec": "2.464836021420253327151827683541443553807e-4",
+              "upper_dec": "2.464836021420253327151827683541443553810e-4",
+              "arb_ball_str": "[0.0002464836021420253327151827683541443553808 +/- 3.99e-44]"
+            },
+            "analytic_C_log_0_upper_bound_certified": {
+              "mid_float": 0.006265057660367113,
+              "rad_float_outward": 3.803549401493555e-20,
+              "lower_dec": "6.265057660367112684362353263737610979934e-3",
+              "upper_dec": "6.265057660367112684362353263737610979937e-3",
+              "arb_ball_str": "[0.006265057660367112684362353263737610979936 +/- 1.7e-46]"
+            },
+            "all_primes_satisfy_two_sided_inequality": true,
+            "block_satisfies_lower_and_upper_bounds": true
+          },
+          {
+            "X_label": "25",
+            "X_certified": {
+              "mid_float": 25.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "2.499999999999999999999999999999999999999e+1",
+              "upper_dec": "2.500000000000000000000000000000000000001e+1",
+              "arb_ball_str": "25.00000000000000000000000000000000000000"
+            },
+            "dyadic_interval_5X_to_10X": [
+              125,
+              250
+            ],
+            "prime_count_in_block": 23,
+            "neg_dyadic_block_sum_certified": {
+              "mid_float": 0.0019398585765770804,
+              "rad_float_outward": 3.921931086559028e-07,
+              "lower_dec": "1.939466383468424481861802632920444011687e-3",
+              "upper_dec": "1.940250769685736287328836624510586261751e-3",
+              "arb_ball_str": "[0.001940 +/- 5.34e-7]"
+            },
+            "n2_term_lower_bound_sum_certified": {
+              "mid_float": 0.000747899489513823,
+              "rad_float_outward": 4.270432376704425e-20,
+              "lower_dec": "7.478994895138229915450164043978569185369e-4",
+              "upper_dec": "7.478994895138229915450164043978569185372e-4",
+              "arb_ball_str": "[0.0007478994895138229915450164043978569185370 +/- 6.25e-45]"
+            },
+            "analytic_c0_A5_lower_bound_certified": {
+              "mid_float": 0.00031913422900617454,
+              "rad_float_outward": 1.7985240019543073e-20,
+              "lower_dec": "3.191342290061745534282978132141428215370e-4",
+              "upper_dec": "3.191342290061745534282978132141428215373e-4",
+              "arb_ball_str": "[0.0003191342290061745534282978132141428215371 +/- 4.26e-44]"
+            },
+            "analytic_C_log_0_upper_bound_certified": {
+              "mid_float": 0.008111672860770767,
+              "rad_float_outward": 3.044250316840134e-20,
+              "lower_dec": "8.111672860770767459847963925981287129471e-3",
+              "upper_dec": "8.111672860770767459847963925981287129474e-3",
+              "arb_ball_str": "[0.008111672860770767459847963925981287129472 +/- 4.63e-44]"
+            },
+            "all_primes_satisfy_two_sided_inequality": true,
+            "block_satisfies_lower_and_upper_bounds": true
+          }
+        ],
+        "subcritical_compensation_table": [
+          {
+            "X_label": "2",
+            "X_certified": {
+              "mid_float": 2.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.999999999999999999999999999999999999999e+0",
+              "upper_dec": "2.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "2.000000000000000000000000000000000000000"
+            },
+            "y_sub": 2,
+            "coupled_cutoff_M_X": 3,
+            "y1_lin_5X": 10,
+            "y2_lin_10X": 20,
+            "W_X_certified": {
+              "mid_float": 0.07937215293276888,
+              "rad_float_outward": 5.626013880546761e-06,
+              "lower_dec": "7.936652691888833580104648970005499141868e-2",
+              "upper_dec": "7.937777894664942415782963760135160701930e-2",
+              "arb_ball_str": "[0.07937 +/- 7.78e-6]"
+            },
+            "W_y_sub_certified": {
+              "mid_float": 0.10166584134255974,
+              "rad_float_outward": 5.6260138805481095e-06,
+              "lower_dec": "1.016602153286791892618741798028216520042e-1",
+              "upper_dec": "1.016714673564402776186573277041182676050e-1",
+              "arb_ball_str": "[0.1017 +/- 3.98e-5]"
+            },
+            "W_M_X_certified": {
+              "mid_float": 0.08152228928451781,
+              "rad_float_outward": 5.626013880550116e-06,
+              "lower_dec": "8.151666327063725975582492766879536086903e-2",
+              "upper_dec": "8.152791529839834811260807557009197646964e-2",
+              "arb_ball_str": "[0.08152 +/- 7.92e-6]"
+            },
+            "subcritical_sieve_defect_D_y_sub_certified": {
+              "mid_float": 0.022293688409790853,
+              "rad_float_outward": 1.1252027761088785e-05,
+              "lower_dec": "2.228243638202976510404454220147004498501e-2",
+              "upper_dec": "2.230494043755194181761083800406327618622e-2",
+              "arb_ball_str": "[0.0223 +/- 1.76e-5]"
+            },
+            "supercritical_increment_sum_T_gt_y_sub_certified": {
+              "mid_float": -0.020143470203038305,
+              "rad_float_outward": 1.3074895832687618e-06,
+              "lower_dec": "-2.014477769262157380580902099609375000001e-2",
+              "upper_dec": "-2.014216271345503628253936767578124999999e-2",
+              "arb_ball_str": "[-0.02014 +/- 4.78e-6]"
+            },
+            "net_sum_D_plus_T_certified": {
+              "mid_float": 0.0021502182067525484,
+              "rad_float_outward": 1.2559517358567982e-05,
+              "lower_dec": "2.137658689393980443520319201658872499677e-3",
+              "upper_dec": "2.162777724111116389786672331999448671555e-3",
+              "arb_ball_str": "[0.0022 +/- 6.24e-5]"
+            },
+            "D_y1_lin_5X_certified": {
+              "mid_float": -0.001455611736409831,
+              "rad_float_outward": 1.9675191573754234e-06,
+              "lower_dec": "-1.457579255567206306455232625445144676898e-3",
+              "upper_dec": "-1.453644217252455579160055568059700035781e-3",
+              "arb_ball_str": "[-0.00146 +/- 6.36e-6]"
+            },
+            "T_y1_to_y2_lin_certified": {
+              "mid_float": 0.0011758595416040407,
+              "rad_float_outward": 4.639133530659479e-07,
+              "lower_dec": "1.175395628250974766615399857982993125914e-3",
+              "upper_dec": "1.176323454957106662277510622516274452211e-3",
+              "arb_ball_str": "[0.001176 +/- 6.05e-7]"
+            },
+            "D_y2_lin_10X_certified": {
+              "mid_float": -0.00027980223051240837,
+              "rad_float_outward": 1.967519157375368e-06,
+              "lower_dec": "-2.817697496697837386347298346027282414932e-4",
+              "upper_dec": "-2.778347113550330113395527772172836003796e-4",
+              "arb_ball_str": "[-0.00028 +/- 2.17e-6]"
+            },
+            "telescoping_at_y_sub_encloses_zero": true,
+            "telescoping_at_M_X_encloses_zero": true,
+            "compensation_identity_encloses_zero": true,
+            "net_sum_bounded_by_half_C_log_0": true,
+            "linear_cutoff_D_5X_strictly_negative": true,
+            "linear_cutoff_T_5X_to_10X_strictly_positive": true,
+            "linear_cutoff_D_10X_strictly_negative": true,
+            "linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X": true,
+            "linear_cutoff_compensation_encloses_zero": true
+          },
+          {
+            "X_label": "4",
+            "X_certified": {
+              "mid_float": 4.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "3.999999999999999999999999999999999999999e+0",
+              "upper_dec": "4.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "4.000000000000000000000000000000000000000"
+            },
+            "y_sub": 3,
+            "coupled_cutoff_M_X": 6,
+            "y1_lin_5X": 20,
+            "y2_lin_10X": 40,
+            "W_X_certified": {
+              "mid_float": -0.011904389135100873,
+              "rad_float_outward": 3.182554053182701e-05,
+              "lower_dec": "-1.193621467563269948548734927754575173153e-2",
+              "upper_dec": "-1.187256359456904579381556058507138649712e-2",
+              "arb_ball_str": "[-0.0119 +/- 3.63e-5]"
+            },
+            "W_y_sub_certified": {
+              "mid_float": 0.0070388107259194005,
+              "rad_float_outward": 3.182554053182694e-05,
+              "lower_dec": "7.006985185387573556925522639425825893101e-3",
+              "upper_dec": "7.070636266451227248597311331900191127479e-3",
+              "arb_ball_str": "[0.0070 +/- 7.07e-5]"
+            },
+            "W_M_X_certified": {
+              "mid_float": -0.0003224500534064862,
+              "rad_float_outward": 3.182554053182685e-05,
+              "lower_dec": "-3.542755939383130608792290812535564069685e-4",
+              "upper_dec": "-2.906245128746593692074403887791911725932e-4",
+              "arb_ball_str": "[-0.0003 +/- 5.43e-5]"
+            },
+            "subcritical_sieve_defect_D_y_sub_certified": {
+              "mid_float": 0.018943199861020273,
+              "rad_float_outward": 6.365108117734079e-05,
+              "lower_dec": "1.887954877984293251301946719475783250741e-2",
+              "upper_dec": "1.900685094219761357180627663918532274182e-2",
+              "arb_ball_str": "[0.019 +/- 1.21e-4]"
+            },
+            "supercritical_increment_sum_T_gt_y_sub_certified": {
+              "mid_float": -0.007360980667726835,
+              "rad_float_outward": 3.6114106478635226e-06,
+              "lower_dec": "-7.364592078374698758125305175781250000001e-3",
+              "upper_dec": "-7.357369257078971713781356811523437499999e-3",
+              "arb_ball_str": "[-0.00736 +/- 4.60e-6]"
+            },
+            "net_sum_D_plus_T_certified": {
+              "mid_float": 0.011582219193293438,
+              "rad_float_outward": 6.726249193889115e-05,
+              "lower_dec": "1.151495670135454691717254598923720262460e-2",
+              "upper_dec": "1.164948168523232869574653585740126512463e-2",
+              "arb_ball_str": "[0.0116 +/- 8.51e-5]"
+            },
+            "D_y1_lin_5X_certified": {
+              "mid_float": -0.0012679716192781452,
+              "rad_float_outward": 1.1129969095691278e-05,
+              "lower_dec": "-1.279101588373836269391267444064284502381e-3",
+              "upper_dec": "-1.256841650182453880341290379931594072691e-3",
+              "arb_ball_str": "[-0.0013 +/- 4.32e-5]"
+            },
+            "T_y1_to_y2_lin_certified": {
+              "mid_float": 0.0007946679066321849,
+              "rad_float_outward": 5.445890014499356e-07,
+              "lower_dec": "7.941233176307349594935658387839794158934e-4",
+              "upper_dec": "7.952124956336348304830607958137989044191e-4",
+              "arb_ball_str": "[0.000795 +/- 8.77e-7]"
+            },
+            "D_y2_lin_10X_certified": {
+              "mid_float": -0.00047347651182174657,
+              "rad_float_outward": 1.1129969095691203e-05,
+              "lower_dec": "-4.846064809174377706459656307211609310600e-4",
+              "upper_dec": "-4.623465427260553815959885665884705013722e-4",
+              "arb_ball_str": "[-0.0005 +/- 3.77e-5]"
+            },
+            "telescoping_at_y_sub_encloses_zero": true,
+            "telescoping_at_M_X_encloses_zero": true,
+            "compensation_identity_encloses_zero": true,
+            "net_sum_bounded_by_half_C_log_0": true,
+            "linear_cutoff_D_5X_strictly_negative": true,
+            "linear_cutoff_T_5X_to_10X_strictly_positive": true,
+            "linear_cutoff_D_10X_strictly_negative": true,
+            "linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X": true,
+            "linear_cutoff_compensation_encloses_zero": true
+          },
+          {
+            "X_label": "tau",
+            "X_certified": {
+              "mid_float": 6.283185307179586,
+              "rad_float_outward": 2.449293598294707e-16,
+              "lower_dec": "6.283185307179586476925286766559005768393e+0",
+              "upper_dec": "6.283185307179586476925286766559005768396e+0",
+              "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
+            },
+            "y_sub": 5,
+            "coupled_cutoff_M_X": 10,
+            "y1_lin_5X": 31,
+            "y2_lin_10X": 62,
+            "W_X_certified": {
+              "mid_float": -0.012076732644838602,
+              "rad_float_outward": 9.841821429290619e-05,
+              "lower_dec": "-1.217515085913150857458035529583897793292e-2",
+              "upper_dec": "-1.197831443054569705644766868084874355789e-2",
+              "arb_ball_str": "[-0.012 +/- 1.76e-4]"
+            },
+            "W_y_sub_certified": {
+              "mid_float": -0.0033595066500743385,
+              "rad_float_outward": 9.841821429290599e-05,
+              "lower_dec": "-3.457924864367244042419871382871427993590e-3",
+              "upper_dec": "-3.261088435781432524287184767881193618587e-3",
+              "arb_ball_str": "[-0.003 +/- 4.58e-4]"
+            },
+            "W_M_X_certified": {
+              "mid_float": 0.00262612133200366,
+              "rad_float_outward": 9.841821429290591e-05,
+              "lower_dec": "2.527703117710754275137151204407373727551e-3",
+              "upper_dec": "2.724539546296565793269837819397608102554e-3",
+              "arb_ball_str": "[0.003 +/- 4.73e-4]"
+            },
+            "subcritical_sieve_defect_D_y_sub_certified": {
+              "mid_float": 0.008717225994764264,
+              "rad_float_outward": 0.0001968364288131854,
+              "lower_dec": "8.520389565951079338584565238498555798691e-3",
+              "upper_dec": "8.914062423577449725736402587436544079944e-3",
+              "arb_ball_str": "[0.009 +/- 4.80e-4]"
+            },
+            "supercritical_increment_sum_T_gt_y_sub_certified": {
+              "mid_float": 0.005986258296616143,
+              "rad_float_outward": 6.702179234707729e-06,
+              "lower_dec": "5.979556117381434887647628784179687499999e-3",
+              "upper_dec": "5.992960475850850343704223632812500000001e-3",
+              "arb_ball_str": "[0.0060 +/- 2.05e-5]"
+            },
+            "net_sum_D_plus_T_certified": {
+              "mid_float": 0.014703484291380407,
+              "rad_float_outward": 0.00020353860827526681,
+              "lower_dec": "1.449994568310514055078896196319948353305e-2",
+              "upper_dec": "1.490702289965567374488385827972780384558e-2",
+              "arb_ball_str": "[0.015 +/- 5.01e-4]"
+            },
+            "D_y1_lin_5X_certified": {
+              "mid_float": -0.0015153644962250282,
+              "rad_float_outward": 3.441863566422405e-05,
+              "lower_dec": "-1.549783131889252166115957272308593144401e-3",
+              "upper_dec": "-1.480945860560804197416919243591552128773e-3",
+              "arb_ball_str": "[-0.0015 +/- 4.98e-5]"
+            },
+            "T_y1_to_y2_lin_certified": {
+              "mid_float": 0.001039701661682102,
+              "rad_float_outward": 6.952440720908727e-07,
+              "lower_dec": "1.039006417610011112628853879868984222411e-3",
+              "upper_dec": "1.040396905754192857784801162779331207277e-3",
+              "arb_ball_str": "[0.001040 +/- 9.94e-7]"
+            },
+            "D_y2_lin_10X_certified": {
+              "mid_float": -0.0004762524453533987,
+              "rad_float_outward": 3.441863566422401e-05,
+              "lower_dec": "-5.106710810176227300074654688306331627719e-4",
+              "upper_dec": "-4.418338096891747613084274401135921471466e-4",
+              "arb_ball_str": "[-0.0005 +/- 5.82e-5]"
+            },
+            "telescoping_at_y_sub_encloses_zero": true,
+            "telescoping_at_M_X_encloses_zero": true,
+            "compensation_identity_encloses_zero": true,
+            "net_sum_bounded_by_half_C_log_0": true,
+            "linear_cutoff_D_5X_strictly_negative": true,
+            "linear_cutoff_T_5X_to_10X_strictly_positive": true,
+            "linear_cutoff_D_10X_strictly_negative": true,
+            "linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X": true,
+            "linear_cutoff_compensation_encloses_zero": true
+          },
+          {
+            "X_label": "10",
+            "X_certified": {
+              "mid_float": 10.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e+0",
+              "upper_dec": "1.000000000000000000000000000000000000001e+1",
+              "arb_ball_str": "10.00000000000000000000000000000000000000"
+            },
+            "y_sub": 11,
+            "coupled_cutoff_M_X": 18,
+            "y1_lin_5X": 50,
+            "y2_lin_10X": 100,
+            "W_X_certified": {
+              "mid_float": -0.0023999770262041736,
+              "rad_float_outward": 0.00031450373671759746,
+              "lower_dec": "-2.714480762921770856339142479324307862713e-3",
+              "upper_dec": "-2.085473289486576159108088173294034425210e-3",
+              "arb_ball_str": "[-0.002 +/- 7.15e-4]"
+            },
+            "W_y_sub_certified": {
+              "mid_float": 0.01951618071854886,
+              "rad_float_outward": 0.000314503736717598,
+              "lower_dec": "1.920167698183126237307805017414064273251e-2",
+              "upper_dec": "1.983068445526645707030910448017091617004e-2",
+              "arb_ball_str": "[0.020 +/- 7.99e-4]"
+            },
+            "W_M_X_certified": {
+              "mid_float": 0.004437943969452878,
+              "rad_float_outward": 0.0003145037367175978,
+              "lower_dec": "4.123440232735280235558071755929180463598e-3",
+              "upper_dec": "4.752447706170474932789126061959453901101e-3",
+              "arb_ball_str": "[0.004 +/- 7.53e-4]"
+            },
+            "subcritical_sieve_defect_D_y_sub_certified": {
+              "mid_float": 0.021916157744753032,
+              "rad_float_outward": 0.0006290074743446906,
+              "lower_dec": "2.128715027040834383041321010951963809522e-2",
+              "upper_dec": "2.254516521909772262842117519741026309525e-2",
+              "arb_ball_str": "[0.022 +/- 7.13e-4]"
+            },
+            "supercritical_increment_sum_T_gt_y_sub_certified": {
+              "mid_float": -0.01507604970538523,
+              "rad_float_outward": 1.2118733138777317e-05,
+              "lower_dec": "-1.508816843852400779724121093750000000001e-2",
+              "upper_dec": "-1.506393097224645316600799560546874999999e-2",
+              "arb_ball_str": "[-0.0151 +/- 3.61e-5]"
+            },
+            "net_sum_D_plus_T_certified": {
+              "mid_float": 0.0068401080393678025,
+              "rad_float_outward": 0.0006411262083929617,
+              "lower_dec": "6.198981830974841331399070934104599032735e-3",
+              "upper_dec": "7.481234247760764164186107829856552157738e-3",
+              "arb_ball_str": "[0.007 +/- 8.02e-4]"
+            },
+            "D_y1_lin_5X_certified": {
+              "mid_float": -0.00193771854946883,
+              "rad_float_outward": 0.00010998766447301027,
+              "lower_dec": "-2.047706213941840224938187075836049043838e-3",
+              "upper_dec": "-1.827730884995819770769867373687611543835e-3",
+              "arb_ball_str": "[-0.002 +/- 1.73e-4]"
+            },
+            "T_y1_to_y2_lin_certified": {
+              "mid_float": 0.001334747945008985,
+              "rad_float_outward": 9.497513886458365e-07,
+              "lower_dec": "1.333798193620339134213281795382499694823e-3",
+              "upper_dec": "1.335697696397630807041423395276069641115e-3",
+              "arb_ball_str": "[0.00133 +/- 5.70e-6]"
+            },
+            "D_y2_lin_10X_certified": {
+              "mid_float": -0.0006046867157217562,
+              "rad_float_outward": 0.00010998766447301027,
+              "lower_dec": "-7.146743801947664207113247450291439530154e-4",
+              "upper_dec": "-4.946990512487459665430050428807064530151e-4",
+              "arb_ball_str": "[+/- 7.15e-4]"
+            },
+            "telescoping_at_y_sub_encloses_zero": true,
+            "telescoping_at_M_X_encloses_zero": true,
+            "compensation_identity_encloses_zero": true,
+            "net_sum_bounded_by_half_C_log_0": true,
+            "linear_cutoff_D_5X_strictly_negative": true,
+            "linear_cutoff_T_5X_to_10X_strictly_positive": true,
+            "linear_cutoff_D_10X_strictly_negative": true,
+            "linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X": true,
+            "linear_cutoff_compensation_encloses_zero": true
+          },
+          {
+            "X_label": "16",
+            "X_certified": {
+              "mid_float": 16.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.599999999999999999999999999999999999999e+1",
+              "upper_dec": "1.600000000000000000000000000000000000001e+1",
+              "arb_ball_str": "16.00000000000000000000000000000000000000"
+            },
+            "y_sub": 19,
+            "coupled_cutoff_M_X": 32,
+            "y1_lin_5X": 80,
+            "y2_lin_10X": 160,
+            "W_X_certified": {
+              "mid_float": 0.0002452615555727781,
+              "rad_float_outward": 0.0008224999755839236,
+              "lower_dec": "-5.772384200111454173552245690470980684423e-4",
+              "upper_dec": "1.067761531156701612509563486372823806559e-3",
+              "arb_ball_str": "[+/- 1.07e-3]"
+            },
+            "W_y_sub_certified": {
+              "mid_float": 0.019038543653548682,
+              "rad_float_outward": 0.0008224999755839243,
+              "lower_dec": "1.821604367796475905707485598297375445110e-2",
+              "upper_dec": "1.986104362913260608693964403839367632613e-2",
+              "arb_ball_str": "[0.019 +/- 8.62e-4]"
+            },
+            "W_M_X_certified": {
+              "mid_float": 0.0015986878633511335,
+              "rad_float_outward": 0.0008224999755839237,
+              "lower_dec": "7.761878877672099316731529741744203344445e-4",
+              "upper_dec": "2.421187838935056961537941029594342209446e-3",
+              "arb_ball_str": "[+/- 2.43e-3]"
+            },
+            "subcritical_sieve_defect_D_y_sub_certified": {
+              "mid_float": 0.018793282097975903,
+              "rad_float_outward": 0.001644999952986838,
+              "lower_dec": "1.714828214498906804101943602077085251955e-2",
+              "upper_dec": "2.043828205096274090784072508327085251958e-2",
+              "arb_ball_str": "[0.02 +/- 2.86e-3]"
+            },
+            "supercritical_increment_sum_T_gt_y_sub_certified": {
+              "mid_float": -0.0174350010966009,
+              "rad_float_outward": 1.4651963297751537e-05,
+              "lower_dec": "-1.744965305989865100855240598320960998537e-2",
+              "upper_dec": "-1.742034913330314793711295351386070251463e-2",
+              "arb_ball_str": "[-0.0174 +/- 4.97e-5]"
+            },
+            "net_sum_D_plus_T_certified": {
+              "mid_float": 0.001358281001375005,
+              "rad_float_outward": 0.0016596519180893667,
+              "lower_dec": "-3.013709167143615163636244345514131054381e-4",
+              "upper_dec": "3.017932919464371519558426041522805644564e-3",
+              "arb_ball_str": "[+/- 3.02e-3]"
+            },
+            "D_y1_lin_5X_certified": {
+              "mid_float": -0.002196406157862301,
+              "rad_float_outward": 0.00016149445104929346,
+              "lower_dec": "-2.357900608911594173942827337182243092328e-3",
+              "upper_dec": "-2.034911706813007623960398786462028248575e-3",
+              "arb_ball_str": "[-0.002 +/- 3.58e-4]"
+            },
+            "T_y1_to_y2_lin_certified": {
+              "mid_float": 0.0015332195994517406,
+              "rad_float_outward": 1.089857832425878e-06,
+              "lower_dec": "1.532129741619314700074028223752975463866e-3",
+              "upper_dec": "1.534309457284166455792728811502456665041e-3",
+              "arb_ball_str": "[0.00153 +/- 4.31e-6]"
+            },
+            "D_y2_lin_10X_certified": {
+              "mid_float": -0.0006653935247661363,
+              "rad_float_outward": 0.00016149445104929336,
+              "lower_dec": "-8.268879758154294966265396035943542688490e-4",
+              "upper_dec": "-5.038990737168429466441110528741394250987e-4",
+              "arb_ball_str": "[+/- 8.27e-4]"
+            },
+            "telescoping_at_y_sub_encloses_zero": true,
+            "telescoping_at_M_X_encloses_zero": true,
+            "compensation_identity_encloses_zero": true,
+            "net_sum_bounded_by_half_C_log_0": true,
+            "linear_cutoff_D_5X_strictly_negative": true,
+            "linear_cutoff_T_5X_to_10X_strictly_positive": true,
+            "linear_cutoff_D_10X_strictly_negative": true,
+            "linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X": true,
+            "linear_cutoff_compensation_encloses_zero": true
+          }
+        ]
+      }
+    },
+    "section_3_w_log_large_scale_decay_and_resonant_band_reduction": {
+      "cancellation_mechanism_2_higher_order_stirling_and_mellin_cancellation": {
+        "why_tc044_lost_two_powers_of_X": "In TC-044, Stieltjes integration by parts of T(x) = log(floor(x)!) = (x log x - x + 1) + E_log(x) used H_0(1/2) = H_0'(1/2) = 0 to cancel x log x - x + 1, but bounded the remainder E_log(x) = (1/2) log(2*pi*x) - B_1({x}) log x + O(1/x) in absolute value |E_log(x)| <= (1/2) log x + 1. Because H_0(z) = F_tau(1/2+z) F_tau(1/2-z) is EVEN in z, it ALSO has a triple zero at z = -1/2 (H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0), which cancels the entire smooth Stirling (1/2) log(2*pi*x) moment int_0^infty x^{-1/2} (log x) h_0(x/X) dx = 0 identically! Retaining the signed Bernoulli oscillation via 4th-order Euler-Maclaurin on g_X(x) = x^{-1/2} (log x) h_0(x/X) = X^{-1/2} (log x) psi_0(x/X) recovers two full powers of X, improving O(X^{-1/2} log X) to O(X^{-5/2}).",
+        "exact_asymptotic_and_global_bound_theorem": "Theorem: For all X > 0, the Mellin transform M_X[W_log](z) = -H_0(z) zeta'(z + 1/2) is holomorphic across the entire open strip -5/2 < Re(z) < 5/2, with its first left-half-plane simple pole at z = -5/2 (s = -2, the first trivial zero of zeta(s)), where Res_{z=-5/2}(-H_0(z) zeta'(z+1/2) X^z) = (-81/64)(-zeta'(-2)) X^{-5/2} = -(81 zeta(3) / (256 pi^2)) X^{-5/2} (~ -0.0385363285 X^{-5/2}) and second simple pole at z = -9/2 (s = -4) with residue -(5625 zeta(5) / (64 pi^4)) X^{-9/2} (~ -0.93556235 X^{-9/2}). In the spatial domain, 4th-order Euler-Maclaurin integration by parts on [1, infty) using int_0^infty g_X(x) dx = 0 gives W_log(X) = -int_0^1 g_X(x) dx + (1/12) g_X'(1) + (1/24) int_1^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx, proving unconditionally for all X >= 1: |W_log(X)| <= (217709/393216 + (I_{d4,0}/384)*(log X / X) + ((I_{d4,log} + I_{R_L})/384)*(1/X)) X^{-5/2} <= C_{log,EM} X^{-5/2} with C_{log,EM} = 13.468515 < 13.47.",
+        "unconditional_small_divisor_head_bound_and_resonant_band_reduction": "Theorem (`prime_increment_telescoping_and_resonant_band_reduction`): Combining the small-scale bound |W_log(u)| <= C_{log,0} u^{5/2} (u > 0) with the new large-scale bound |W_log(u)| <= C_{log,EM} u^{-5/2} (u >= 1) gives the two-sided localization envelope |W_log(u)| <= C_{log,*} min(u^{5/2}, u^{-5/2}) for all u > 0. Splitting R_mu(X) = sum_{m=2}^infty (mu(m)/sqrt(m)) W_log(X/m) at the lower divisor cutoff M_-(X) := floor(X^{5/6}) and upper divisor cutoff M_+(X) := M(X) = ceil(max(2, X^{5/4})) yields: (1) Small-divisor head (2 <= m <= floor(X^{5/6})): |R_{mu,head}(X)| <= C_{log,EM} X^{-5/2} sum_{2 <= m <= M_-(X)} m^2 <= (5/6) C_{log,EM} < 11.224 unconditionally for all X >= 1 (even with |mu(m)| <= 1); (2) Large-divisor tail (m > M(X)): |R_{mu,tail}(X)| <= (1/2) C_{log,0} < 0.278715 unconditionally for all X >= 1; (3) Localized Resonant-Band Equivalence: |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.503 for all X >= 1, where R_{mu,band}(X) := sum_{X^{5/6} < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)."
+      },
+      "certified_audit_data": {
+        "leading_pole_coeff_neg_81_zeta3_over_256_pi2_certified": {
+          "mid_float": -0.038536328464528986,
+          "rad_float_outward": 3.0282160860379664e-18,
+          "lower_dec": "-3.853632846452898333125584325255526419387e-2",
+          "upper_dec": "-3.853632846452898333125584325255526419384e-2",
+          "arb_ball_str": "[-0.03853632846452898333125584325255526419386 +/- 1.33e-44]"
+        },
+        "subleading_pole_coeff_neg_5625_zeta5_over_64_pi4_certified": {
+          "mid_float": -0.9356029043283544,
+          "rad_float_outward": 5.119413731818564e-17,
+          "lower_dec": "-9.356029043283544078941411092331215513952e-1",
+          "upper_dec": "-9.356029043283544078941411092331215513949e-1",
+          "arb_ball_str": "[-0.9356029043283544078941411092331215513950 +/- 4.22e-41]"
+        },
+        "I_d4_0_total_variation_certified": {
+          "mid_float": 2171.9928553696172,
+          "rad_float_outward": 8.007275243439393e-14,
+          "lower_dec": "2.171992855369617325814872283122107780336e+3",
+          "upper_dec": "2.171992855369617325814872283122107780339e+3",
+          "arb_ball_str": "[2171.992855369617325814872283122107780337 +/- 3.67e-37]"
+        },
+        "I_d4_log_integral_certified": {
+          "mid_float": 2357.2264310154037,
+          "rad_float_outward": 0.0005826204233928116,
+          "lower_dec": "2.357225848394980311993504488890199355448e+3",
+          "upper_dec": "2.357227013635826915403822982733277968732e+3",
+          "arb_ball_str": "[2357.23 +/- 4.16e-3]"
+        },
+        "I_RL_integral_certified": {
+          "mid_float": 1803.0446784011015,
+          "rad_float_outward": 3.76563011315243e-14,
+          "lower_dec": "1.803044678401101501916281727131894899298e+3",
+          "upper_dec": "1.803044678401101501916437840141505252833e+3",
+          "arb_ball_str": "[1803.044678401101501916 +/- 4.38e-19]"
+        },
+        "c_em_log_coeff_I_d4_0_over_384_certified": {
+          "mid_float": 5.656231394191712,
+          "rad_float_outward": 3.8359615366884935e-16,
+          "lower_dec": "5.656231394191711785976229903963822344627e+0",
+          "upper_dec": "5.656231394191711785976229903963822344630e+0",
+          "arb_ball_str": "[5.656231394191711785976229903963822344629 +/- 4.42e-40]"
+        },
+        "c_em_const_coeff_I_d4_log_plus_I_RL_over_384_certified": {
+          "mid_float": 10.834039347438816,
+          "rad_float_outward": 1.5172406929261446e-06,
+          "lower_dec": "1.083403783019812321041519374212043011758e+1",
+          "upper_dec": "1.083404086467950760007972042167352164365e+1",
+          "arb_ball_str": "[10.83404 +/- 2.17e-6]"
+        },
+        "global_euler_maclaurin_constant_C_log_EM_certified": {
+          "mid_float": 13.468513209871732,
+          "rad_float_outward": 1.5172406943076564e-06,
+          "lower_dec": "1.346851169263103853775144800388647785996e+1",
+          "upper_dec": "1.346851472711242648012965348394049874164e+1",
+          "arb_ball_str": "[13.46851 +/- 4.73e-6]"
+        },
+        "small_divisor_head_global_bound_5_6_C_log_EM_certified": {
+          "mid_float": 11.223761008226443,
+          "rad_float_outward": 1.2643672532499861e-06,
+          "lower_dec": "1.122375974385919108391323593548671794611e+1",
+          "upper_dec": "1.122376227259369643098768197103576255521e+1",
+          "arb_ball_str": "[11.22376 +/- 2.28e-6]"
+        },
+        "resonant_band_comparison_bound_certified": {
+          "mid_float": 11.502475801780452,
+          "rad_float_outward": 1.2643672564905699e-06,
+          "lower_dec": "1.150247453741319629613967476758241376553e+1",
+          "upper_dec": "1.150247706614770874864147840413331708587e+1",
+          "arb_ball_str": "[11.50248 +/- 5.47e-6]"
+        },
+        "w_log_asymptotic_table": [
+          {
+            "X_label": "1",
+            "X_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -0.044061156600391414,
+              "rad_float_outward": 5.07398739027782e-07,
+              "lower_dec": "-4.406166399913044207716743513922733286770e-2",
+              "upper_dec": "-4.406064920165239263207772565986556033044e-2",
+              "arb_ball_str": "[-0.044061 +/- 6.64e-7]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -0.038536328464528986,
+              "rad_float_outward": 3.0282160860379664e-18,
+              "lower_dec": "-3.853632846452898333125584325255526419387e-2",
+              "upper_dec": "-3.853632846452898333125584325255526419384e-2",
+              "arb_ball_str": "[-0.03853632846452898333125584325255526419386 +/- 1.33e-44]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -0.005524828135862434,
+              "rad_float_outward": 5.073987399129171e-07,
+              "lower_dec": "-5.525335534602346924331292011904407579163e-3",
+              "upper_dec": "-5.524320737122521122402182282077957231259e-3",
+              "arb_ball_str": "[-0.005525 +/- 6.80e-7]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.044061156600391414,
+              "rad_float_outward": 5.073987416923173e-07,
+              "lower_dec": "-4.406166399913310661242653551492434958371e-2",
+              "upper_dec": "-4.406064920164972809681862528416854361444e-2",
+              "arb_ball_str": "[-0.044061 +/- 6.64e-7]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -0.005524828135862434,
+              "rad_float_outward": 5.073987416892739e-07,
+              "lower_dec": "-5.525335534604123281170692262369085389832e-3",
+              "upper_dec": "-5.524320737120744765562782031613279420590e-3",
+              "arb_ball_str": "[-0.005525 +/- 6.80e-7]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 11.387701965440117,
+              "rad_float_outward": 1.5172407015295423e-06,
+              "lower_dec": "1.138770044819941641196433007420144006186e+1",
+              "upper_dec": "1.138770348268081856519725075625917836603e+1",
+              "arb_ball_str": "[11.38770 +/- 3.49e-6]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "2",
+            "X_certified": {
+              "mid_float": 2.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.999999999999999999999999999999999999999e+0",
+              "upper_dec": "2.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "2.000000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": 0.07050966167095038,
+              "rad_float_outward": 2.8702807100040784e-06,
+              "lower_dec": "7.050679139024038601693756553902103205767e-2",
+              "upper_dec": "7.051253195166038391964103702082111140340e-2",
+              "arb_ball_str": "[0.07051 +/- 3.21e-6]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -0.006812324794825154,
+              "rad_float_outward": 4.0180015592380185e-19,
+              "lower_dec": "-6.812324794825154689780662419416257307256e-3",
+              "upper_dec": "-6.812324794825154689780662419416257307253e-3",
+              "arb_ball_str": "[-0.006812324794825154689780662419416257307254 +/- 4.53e-43]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": 0.07732198646577554,
+              "rad_float_outward": 2.870280717105571e-06,
+              "lower_dec": "7.731911618505843527936062695657857812225e-2",
+              "upper_dec": "7.732485674649264403677930044209607995333e-2",
+              "arb_ball_str": "[0.07732 +/- 4.86e-6]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": 0.3988628792535857,
+              "rad_float_outward": 1.623675973408169e-05,
+              "lower_dec": "3.988466424938516298038312947253966078334e-1",
+              "upper_dec": "3.988791160133197423032844221095823988494e-1",
+              "arb_ball_str": "[0.3989 +/- 5.34e-5]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": 1.7495968308724588,
+              "rad_float_outward": 6.494703904999796e-05,
+              "lower_dec": "1.749531883833408765702626935882068108225e+0",
+              "upper_dec": "1.749661777911508589375882677478290032057e+0",
+              "arb_ball_str": "[1.7496 +/- 6.82e-5]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 1.4020129145402176,
+              "rad_float_outward": 1.341063989721731e-07,
+              "lower_dec": "1.402012780433818619690254975394494331857e+0",
+              "upper_dec": "1.402013048646616369046723532774634159588e+0",
+              "arb_ball_str": "[1.402013 +/- 2.20e-7]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "4",
+            "X_certified": {
+              "mid_float": 4.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "3.999999999999999999999999999999999999999e+0",
+              "upper_dec": "4.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "4.000000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -0.005965332371094642,
+              "rad_float_outward": 1.623675964879119e-05,
+              "lower_dec": "-5.981569130743433325046640225367826444087e-3",
+              "upper_dec": "-5.949095611445851082175936885791105252678e-3",
+              "arb_ball_str": "[-0.0060 +/- 5.10e-5]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -0.0012042602645165308,
+              "rad_float_outward": 9.463175268868645e-20,
+              "lower_dec": "-1.204260264516530729101745101642352006060e-3",
+              "upper_dec": "-1.204260264516530729101745101642352006057e-3",
+              "arb_ball_str": "[-0.001204260264516530729101745101642352006058 +/- 1.25e-43]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -0.004761072106578112,
+              "rad_float_outward": 1.623675970563473e-05,
+              "lower_dec": "-4.777308866283746014805703138595164379435e-3",
+              "upper_dec": "-4.744835346872476934213383769279063305214e-3",
+              "arb_ball_str": "[-0.0048 +/- 5.52e-5]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.19089063587502855,
+              "rad_float_outward": 0.0005195763114898022,
+              "lower_dec": "-1.914102121865183505068112719255155633984e-1",
+              "upper_dec": "-1.903710595635387505243111956315702508981e-1",
+              "arb_ball_str": "[-0.191 +/- 6.29e-4]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -2.437668918567993,
+              "rad_float_outward": 0.008313221012940727,
+              "lower_dec": "-2.445982139580933705265620562380646037272e+0",
+              "upper_dec": "-2.429355697555052444632151934450958537269e+0",
+              "arb_ball_str": "[-2.4 +/- 0.0460]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 0.1632022773937601,
+              "rad_float_outward": 1.1853442977846329e-08,
+              "lower_dec": "1.632022655403171089525076973024884985762e-1",
+              "upper_dec": "1.632022892472030632746398901310645790776e-1",
+              "arb_ball_str": "[0.1632023 +/- 3.45e-8]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "tau",
+            "X_certified": {
+              "mid_float": 6.283185307179586,
+              "rad_float_outward": 2.449293598294707e-16,
+              "lower_dec": "6.283185307179586476925286766559005768393e+0",
+              "upper_dec": "6.283185307179586476925286766559005768396e+0",
+              "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
+            },
+            "W_log_X_certified": {
+              "mid_float": -0.0007069580561142823,
+              "rad_float_outward": 5.021102117552803e-05,
+              "lower_dec": "-7.571690772898103030772886391129468670211e-4",
+              "upper_dec": "-6.567470349387542963402352447953199138958e-4",
+              "arb_ball_str": "[-0.0007 +/- 5.72e-5]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -0.0003894221625093948,
+              "rad_float_outward": 2.1702950417621153e-20,
+              "lower_dec": "-3.894221625093947968513140386634864829852e-4",
+              "upper_dec": "-3.894221625093947968513140386634864829849e-4",
+              "arb_ball_str": "[-0.0003894221625093947968513140386634864829850 +/- 2.77e-44]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -0.0003175358936048875,
+              "rad_float_outward": 5.021102123237144e-05,
+              "lower_dec": "-3.677469148372589250867826153191503254424e-4",
+              "upper_dec": "-2.673248723725160806281131912621434895046e-4",
+              "arb_ball_str": "[-0.0003 +/- 6.78e-5]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.06995895581676774,
+              "rad_float_outward": 0.004968768094840931,
+              "lower_dec": "-7.492772391160866005597111169398426038631e-2",
+              "upper_dec": "-6.499018772192680968222614709437488538628e-2",
+              "arb_ball_str": "[-0.07 +/- 5.01e-3]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -1.2405156048377857,
+              "rad_float_outward": 0.19615910178981735,
+              "lower_dec": "-1.436674706627602981856088531737148014869e+0",
+              "upper_dec": "-1.044356503047968553831796539549648014866e+0",
+              "arb_ball_str": "[-1e+0 +/- 0.437]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 0.03973860898715582,
+              "rad_float_outward": 2.4402345796703223e-09,
+              "lower_dec": "3.973860654692123740575387583966858900673e-2",
+              "upper_dec": "3.973861142739039121754890030651496007631e-2",
+              "arb_ball_str": "[0.03973861 +/- 3.46e-9]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "10",
+            "X_certified": {
+              "mid_float": 10.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e+0",
+              "upper_dec": "1.000000000000000000000000000000000000001e+1",
+              "arb_ball_str": "10.00000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -0.0001547899118758113,
+              "rad_float_outward": 4.884285880280005e-05,
+              "lower_dec": "-2.036327706786113409635208311151556667845e-4",
+              "upper_dec": "-1.059470530730112656329355897974066433467e-4",
+              "arb_ball_str": "[-0.0002 +/- 9.41e-5]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -0.00012186257060829082,
+              "rad_float_outward": 6.159309325325154e-21,
+              "lower_dec": "-1.218625706082908276554900700348010781511e-4",
+              "upper_dec": "-1.218625706082908276554900700348010781508e-4",
+              "arb_ball_str": "[-0.0001218625706082908276554900700348010781509 +/- 2.87e-44]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -3.2927341267520473e-05,
+              "rad_float_outward": 4.884285885964346e-05,
+              "lower_dec": "-8.177020012716393216883877595004453003967e-5",
+              "upper_dec": "1.591551759212298088336249510708437621036e-5",
+              "arb_ball_str": "[+/- 8.18e-5]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.04894886803443102,
+              "rad_float_outward": 0.015445468190591784,
+              "lower_dec": "-6.439433622502280240719548416022023672333e-2",
+              "upper_dec": "-3.350339984383923774426213455084523672330e-2",
+              "arb_ball_str": "[+/- 0.0644]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -1.0412539569902037,
+              "rad_float_outward": 1.5445468220859768,
+              "lower_dec": "-2.585800779076180275094269266547747252947e+0",
+              "upper_dec": "5.032928650957729261996760459522527470546e-1",
+              "arb_ball_str": "[+/- 2.59]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 0.009295394894791574,
+              "rad_float_outward": 4.797936418110221e-10,
+              "lower_dec": "9.295394414997933307776452796498502261078e-3",
+              "upper_dec": "9.295395374585216205465694930263721739017e-3",
+              "arb_ball_str": "[0.009295395 +/- 5.86e-10]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "16",
+            "X_certified": {
+              "mid_float": 16.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.599999999999999999999999999999999999999e+1",
+              "upper_dec": "1.600000000000000000000000000000000000001e+1",
+              "arb_ball_str": "16.00000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -4.103429241242486e-05,
+              "rad_float_outward": 1.0060989311000417e-05,
+              "lower_dec": "-5.109528172342527588091099800187791268538e-5",
+              "upper_dec": "-3.097330310142445133726352991182053963847e-5",
+              "arb_ball_str": "[+/- 5.11e-5]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -3.763313326614159e-05,
+              "rad_float_outward": 2.9572422715214515e-21,
+              "lower_dec": "-3.763313326614158528442953442632350018933e-5",
+              "upper_dec": "-3.763313326614158528442953442632350018930e-5",
+              "arb_ball_str": "[-3.763313326614158528442953442632350018932e-5 +/- 3.61e-45]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -3.4011591462832783e-06,
+              "rad_float_outward": 1.0060989325211269e-05,
+              "lower_dec": "-1.346214847149454531168346729297689784762e-5",
+              "upper_dec": "6.659830178927988662368008231925445902394e-6",
+              "arb_ball_str": "[+/- 1.35e-5]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.04201911543032306,
+              "rad_float_outward": 0.010302453098120173,
+              "lower_dec": "-5.232156852844322818715341737384485758983e-2",
+              "upper_dec": "-3.171666233220289248425729920978235758980e-2",
+              "arb_ball_str": "[+/- 0.0524]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -0.8915934632432837,
+              "rad_float_outward": 2.6374279931187634,
+              "lower_dec": "-3.529021456362046683109778975050135909365e+0",
+              "upper_dec": "1.745834529875479256831627274949864090638e+0",
+              "arb_ball_str": "[+/- 3.53]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 0.0021591213750838736,
+              "rad_float_outward": 9.260502340584267e-11,
+              "lower_dec": "2.159121282478850233757180202345923802102e-3",
+              "upper_dec": "2.159121467688896751898837958819174431020e-3",
+              "arb_ball_str": "[0.002159121 +/- 4.68e-10]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "25",
+            "X_certified": {
+              "mid_float": 25.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "2.499999999999999999999999999999999999999e+1",
+              "upper_dec": "2.500000000000000000000000000000000000001e+1",
+              "arb_ball_str": "25.00000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -1.2629362599759733e-05,
+              "rad_float_outward": 2.2361575418017323e-06,
+              "lower_dec": "-1.486552014156146445617223361827581170810e-5",
+              "upper_dec": "-1.039320505795800248466575721599309686432e-5",
+              "arb_ball_str": "[-1e-5 +/- 4.87e-6]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -1.2331625108649274e-05,
+              "rad_float_outward": 3.661658278837497e-22,
+              "lower_dec": "-1.233162510864927466600186984081768454205e-5",
+              "upper_dec": "-1.233162510864927466600186984081768454202e-5",
+              "arb_ball_str": "[-1.233162510864927466600186984081768454204e-5 +/- 4.81e-45]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -2.977374911104588e-07,
+              "rad_float_outward": 2.236157545354445e-06,
+              "lower_dec": "-2.533895036464903468970864706813748503941e-6",
+              "upper_dec": "1.938420054243985860136613554180209015593e-6",
+              "arb_ball_str": "[+/- 2.54e-6]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.039466758124249164,
+              "rad_float_outward": 0.006987992346694231,
+              "lower_dec": "-4.645475047094339440309425752913110714442e-2",
+              "upper_dec": "-3.247876577755493978702446382795923214439e-2",
+              "arb_ball_str": "[-0.04 +/- 7.53e-3]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -0.5815185373251148,
+              "rad_float_outward": 4.367495223879815,
+              "lower_dec": "-4.949013761204929000326417141243690906592e+0",
+              "upper_dec": "3.785976686554699295572020358756309093411e+0",
+              "arb_ball_str": "[+/- 4.95]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 0.000548893584538824,
+              "rad_float_outward": 1.9420681200444724e-11,
+              "lower_dec": "5.488935651181428696544043957226960234702e-4",
+              "upper_dec": "5.488936039595051792858819075514303737448e-4",
+              "arb_ball_str": "[0.0005488936 +/- 3.49e-11]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "tau^2",
+            "X_certified": {
+              "mid_float": 39.47841760435743,
+              "rad_float_outward": 2.506118203495885e-15,
+              "lower_dec": "3.947841760435743447533796399950460454124e+1",
+              "upper_dec": "3.947841760435743447533796399950460454127e+1",
+              "arb_ball_str": "[39.47841760435743447533796399950460454125 +/- 4.80e-39]"
+            },
+            "W_log_X_certified": {
+              "mid_float": -3.8928106558083545e-06,
+              "rad_float_outward": 4.789349627998264e-07,
+              "lower_dec": "-4.371745618608180790448109404127354371711e-6",
+              "upper_dec": "-3.413875693008528229671078518907780397099e-6",
+              "arb_ball_str": "[-4e-6 +/- 5.87e-7]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -3.935237909160972e-06,
+              "rad_float_outward": 3.47984574799841e-23,
+              "lower_dec": "-3.935237909160972092439600592533740033351e-6",
+              "upper_dec": "-3.935237909160972092439600592533740033348e-6",
+              "arb_ball_str": "[-3.935237909160972092439600592533740033350e-6 +/- 1.55e-46]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": 4.2427253352617584e-08,
+              "rad_float_outward": 4.789349636880048e-07,
+              "lower_dec": "-4.365077103353871177086340439325196728327e-7",
+              "upper_dec": "5.213622170406222824686473059648649707223e-7",
+              "arb_ball_str": "[+/- 5.22e-7]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.03812085407421624,
+              "rad_float_outward": 0.0046900328743504395,
+              "lower_dec": "-4.281088694856667349736339648229805968099e-2",
+              "upper_dec": "-3.343082119986580143372661669714180968096e-2",
+              "arb_ball_str": "[-0.04 +/- 6.57e-3]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": 0.6475357233323348,
+              "rad_float_outward": 7.309629425406457,
+              "lower_dec": "-6.662093702074121235686613784539381329548e+0",
+              "upper_dec": "7.957165148738790751618073715460618670455e+0",
+              "arb_ball_str": "[+/- 7.96]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 0.000138342008754341,
+              "rad_float_outward": 3.9246599864216295e-12,
+              "lower_dec": "1.383420048296810374879107834809936901795e-4",
+              "upper_dec": "1.383420126790009999392867594901539303897e-4",
+              "arb_ball_str": "[0.00013834201 +/- 5.18e-12]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "64",
+            "X_certified": {
+              "mid_float": 64.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "6.399999999999999999999999999999999999999e+1",
+              "upper_dec": "6.400000000000000000000000000000000000001e+1",
+              "arb_ball_str": "64.00000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -1.12853295145654e-06,
+              "rad_float_outward": 9.320685523395165e-08,
+              "lower_dec": "-1.221739806690491507148533884076846376004e-6",
+              "upper_dec": "-1.035326096222588391762099519012940660058e-6",
+              "arb_ball_str": "[-1e-6 +/- 2.22e-7]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -1.1760354145669246e-06,
+              "rad_float_outward": 9.241382098504536e-23,
+              "lower_dec": "-1.176035414566924540138422950822609380918e-6",
+              "upper_dec": "-1.176035414566924540138422950822609380915e-6",
+              "arb_ball_str": "[-1.176035414566924540138422950822609380916e-6 +/- 1.38e-46]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": 4.750246311038459e-08,
+              "rad_float_outward": 9.320685534497387e-08,
+              "lower_dec": "-4.570439223458926947262658729660016189502e-8",
+              "upper_dec": "1.407093184553584508388390858520318876657e-7",
+              "arb_ball_str": "[+/- 1.41e-7]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.036979767753327904,
+              "rad_float_outward": 0.003054202243220064,
+              "lower_dec": "-4.003396999654796212751829716841057079885e-2",
+              "upper_dec": "-3.392556551010783999998533818403557079882e-2",
+              "arb_ball_str": "[-0.04 +/- 6.08e-3]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": 6.375672673079633,
+              "rad_float_outward": 12.510012388229372,
+              "lower_dec": "-6.134339715149737149491011239343335853981e+0",
+              "upper_dec": "1.888568506130900308488398876065666414604e+1",
+              "arb_ball_str": "[+/- 18.9]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 3.327944372195909e-05,
+              "rad_float_outward": 7.234767453481381e-13,
+              "lower_dec": "3.327944299848234630290713101184497038342e-5",
+              "upper_dec": "3.327944444543583472588883223429224092184e-5",
+              "arb_ball_str": "[3.327944e-5 +/- 4.45e-12]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          }
+        ],
+        "resonant_band_table": [
+          {
+            "X_label": "1",
+            "X_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 1,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 2,
+            "R_mu_total_certified": {
+              "mid_float": -0.01324649095698365,
+              "rad_float_outward": 1.9890962832397047e-06,
+              "lower_dec": "-1.324848005326688966862924956136751476187e-2",
+              "upper_dec": "-1.324450186070041131289976276808786693469e-2",
+              "arb_ball_str": "[-0.01325 +/- 5.50e-6]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": -0.013885654802608057,
+              "rad_float_outward": 5.646779523979006e-07,
+              "lower_dec": "-1.388621948056045505170879459150137106424e-2",
+              "upper_dec": "-1.388509012465566081362305248297752539160e-2",
+              "arb_ball_str": "[-0.013886 +/- 9.10e-7]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": 0.0006391638456244074,
+              "rad_float_outward": 2.5537742374126923e-06,
+              "lower_dec": "6.366100713869947881544026711453328190939e-4",
+              "upper_dec": "6.417176198618200956484320738781819401879e-4",
+              "arb_ball_str": "[0.00064 +/- 3.39e-6]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": 0.0006391638456244074,
+              "rad_float_outward": 2.5537742374126923e-06,
+              "lower_dec": "6.366100713869947881544026711453328190939e-4",
+              "upper_dec": "6.417176198618200956484320738781819401879e-4",
+              "arb_ball_str": "[0.00064 +/- 3.39e-6]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "2",
+            "X_certified": {
+              "mid_float": 2.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.999999999999999999999999999999999999999e+0",
+              "upper_dec": "2.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "2.000000000000000000000000000000000000000"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 1,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 3,
+            "R_mu_total_certified": {
+              "mid_float": 0.008861252090969989,
+              "rad_float_outward": 1.1252027761088767e-05,
+              "lower_dec": "8.850000063208899739071921607708961749612e-3",
+              "upper_dec": "8.872504118731076452638217410302192950787e-3",
+              "arb_ball_str": "[0.0089 +/- 5.01e-5]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.010896856976370783,
+              "rad_float_outward": 4.524296201680397e-06,
+              "lower_dec": "1.089233268016910304502747123783239882905e-2",
+              "upper_dec": "1.090138127257246313454746370857367080173e-2",
+              "arb_ball_str": "[0.01090 +/- 7.67e-6]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": -0.002035604885400795,
+              "rad_float_outward": 1.5776323976979368e-05,
+              "lower_dec": "-2.051381209377774250190744104582131537456e-3",
+              "upper_dec": "-2.019828561423815737674051823812783392922e-3",
+              "arb_ball_str": "[-0.0020 +/- 5.14e-5]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.002035604885400795,
+              "rad_float_outward": 1.5776323976979368e-05,
+              "lower_dec": "-2.051381209377774250190744104582131537456e-3",
+              "upper_dec": "-2.019828561423815737674051823812783392922e-3",
+              "arb_ball_str": "[-0.0020 +/- 5.14e-5]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "4",
+            "X_certified": {
+              "mid_float": 4.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "3.999999999999999999999999999999999999999e+0",
+              "upper_dec": "4.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "4.000000000000000000000000000000000000000"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 3,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 6,
+            "R_mu_total_certified": {
+              "mid_float": -0.005946066100467631,
+              "rad_float_outward": 6.365108106365383e-05,
+              "lower_dec": "-6.009717181531284159133724746023556040826e-3",
+              "upper_dec": "-5.882415019403976775790147361074825572073e-3",
+              "arb_ball_str": "[-0.006 +/- 1.18e-4]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": -0.0013295261223067118,
+              "rad_float_outward": 2.559328416396057e-05,
+              "lower_dec": "-1.355119406470672347358513769375455772127e-3",
+              "upper_dec": "-1.303932838142751224813137349354398643218e-3",
+              "arb_ball_str": "[-0.0013 +/- 5.52e-5]"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.005384039179301535,
+              "rad_float_outward": 4.108542981384989e-06,
+              "lower_dec": "5.379930636320150242883885077144366096096e-3",
+              "upper_dec": "5.388147722282919730989435485507708381255e-3",
+              "arb_ball_str": "[0.00538 +/- 8.15e-6]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": -0.010000579157462454,
+              "rad_float_outward": 9.335290826584254e-05,
+              "lower_dec": "-1.009393206572829608417083089704655572028e-2",
+              "upper_dec": "-9.907226249196611252454710653974045954638e-3",
+              "arb_ball_str": "[-0.010 +/- 9.40e-5]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.011330105279769166,
+              "rad_float_outward": 0.00011894619251506886,
+              "lower_dec": "-1.144905147228423355982055668872654640452e-2",
+              "upper_dec": "-1.121115908725409734897663598102390968574e-2",
+              "arb_ball_str": "[-0.011 +/- 4.50e-4]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "tau",
+            "X_certified": {
+              "mid_float": 6.283185307179586,
+              "rad_float_outward": 2.449293598294707e-16,
+              "lower_dec": "6.283185307179586476925286766559005768393e+0",
+              "upper_dec": "6.283185307179586476925286766559005768396e+0",
+              "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 4,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 10,
+            "R_mu_total_certified": {
+              "mid_float": -0.011391447603594939,
+              "rad_float_outward": 0.0001968364288131858,
+              "lower_dec": "-1.158828403240812325662122885119102505032e-2",
+              "upper_dec": "-1.119461117478175286946939150225303676904e-2",
+              "arb_ball_str": "[-0.011 +/- 5.89e-4]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": -0.03277625909429452,
+              "rad_float_outward": 7.914540606179958e-05,
+              "lower_dec": "-3.285540450035631506892709764257715052731e-2",
+              "upper_dec": "-3.269711368823271909917562040106103724603e-2",
+              "arb_ball_str": "[-0.033 +/- 3.03e-4]"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.030511727022908417,
+              "rad_float_outward": 1.7957076721587245e-05,
+              "lower_dec": "3.049376994618683152937876014402906750560e-2",
+              "upper_dec": "3.052968409963000436535650818041365002516e-2",
+              "arb_ball_str": "[0.0305 +/- 2.97e-5]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": -0.009126915532208839,
+              "rad_float_outward": 0.00029393891190920856,
+              "lower_dec": "-9.420854444118047326536560712326932507146e-3",
+              "upper_dec": "-8.832976620299630526186609921921659069643e-3",
+              "arb_ball_str": "[-0.009 +/- 4.21e-4]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.04190317462650336,
+              "rad_float_outward": 0.00037308431819838163,
+              "lower_dec": "-4.227625894470173607090689041438284280008e-2",
+              "upper_dec": "-4.153009030830497594991899826350393655005e-2",
+              "arb_ball_str": "[-0.042 +/- 4.70e-4]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "10",
+            "X_certified": {
+              "mid_float": 10.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e+0",
+              "upper_dec": "1.000000000000000000000000000000000000001e+1",
+              "arb_ball_str": "10.00000000000000000000000000000000000000"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 6,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 18,
+            "R_mu_total_certified": {
+              "mid_float": -0.002373793778114663,
+              "rad_float_outward": 0.0005664559948854732,
+              "lower_dec": "-2.940249773000135903721861716611648518602e-3",
+              "upper_dec": "-1.807337783229189810818247672422195393599e-3",
+              "arb_ball_str": "[-0.002 +/- 9.41e-4]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": -0.017825768432300923,
+              "rad_float_outward": 0.0002935169532065643,
+              "lower_dec": "-1.811928538550748728336551356447529633605e-2",
+              "upper_dec": "-1.753225147909436147780873942507099946102e-2",
+              "arb_ball_str": "[-0.018 +/- 4.68e-4]"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.016356629804215095,
+              "rad_float_outward": 2.9941888669783245e-05,
+              "lower_dec": "1.632668791554531366316678933771183733020e-2",
+              "upper_dec": "1.638657169288487806668582372339298967398e-2",
+              "arb_ball_str": "[0.0164 +/- 7.34e-5]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": -0.0009046551500288344,
+              "rad_float_outward": 0.0008899148378986866,
+              "lower_dec": "-1.794569987927520869815106312327437559655e-3",
+              "upper_dec": "-1.474031213014781340336314826493755965377e-5",
+              "arb_ball_str": "[+/- 1.80e-3]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.01873042358232976,
+              "rad_float_outward": 0.0011834317938337353,
+              "lower_dec": "-1.991385537616349225849940459054785108321e-2",
+              "upper_dec": "-1.754699178849602518589331785959081983318e-2",
+              "arb_ball_str": "[-0.02 +/- 2.46e-3]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "16",
+            "X_certified": {
+              "mid_float": 16.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.599999999999999999999999999999999999999e+1",
+              "upper_dec": "1.600000000000000000000000000000000000001e+1",
+              "arb_ball_str": "16.00000000000000000000000000000000000000"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 10,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 32,
+            "R_mu_total_certified": {
+              "mid_float": -1.6721113026691418e-05,
+              "rad_float_outward": 0.0013115819401718911,
+              "lower_dec": "-1.328303053198582310181299887796636800471e-3",
+              "upper_dec": "1.294860827145199473995526589254144449532e-3",
+              "arb_ball_str": "[+/- 1.33e-3]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": -0.01210837939495379,
+              "rad_float_outward": 0.0010048023032140927,
+              "lower_dec": "-1.311318169816788152951576646318895138223e-2",
+              "upper_dec": "-1.110357709173969791430809434404832638220e-2",
+              "arb_ball_str": "[-0.01 +/- 3.12e-3]"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.00503840630056742,
+              "rad_float_outward": 6.094624603747451e-05,
+              "lower_dec": "4.977460054529946217696837439337146444110e-3",
+              "upper_dec": "5.099352546604894895024321331777942342551e-3",
+              "arb_ball_str": "[0.005 +/- 9.94e-5]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": 0.0070532519813596775,
+              "rad_float_outward": 0.0023773304965288853,
+              "lower_dec": "4.675921484830793351501471265762504563410e-3",
+              "upper_dec": "9.430582477888562143415457471817192063413e-3",
+              "arb_ball_str": "[+/- 9.44e-3]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.005055127413594112,
+              "rad_float_outward": 0.003382132803380956,
+              "lower_dec": "-8.437260216975066985106008149086603068802e-3",
+              "upper_dec": "-1.672994610213156963800923920570978068799e-3",
+              "arb_ball_str": "[+/- 8.44e-3]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "25",
+            "X_certified": {
+              "mid_float": 25.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "2.499999999999999999999999999999999999999e+1",
+              "upper_dec": "2.500000000000000000000000000000000000001e+1",
+              "arb_ball_str": "25.00000000000000000000000000000000000000"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 14,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 56,
+            "R_mu_total_certified": {
+              "mid_float": -0.00020996816954749046,
+              "rad_float_outward": 0.0026485633061383855,
+              "lower_dec": "-2.858531475685875556358240646769325680514e-3",
+              "upper_dec": "2.438595136590894618145085769246299319489e-3",
+              "arb_ball_str": "[+/- 2.86e-3]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": -0.012302314829944176,
+              "rad_float_outward": 0.003160467633279041,
+              "lower_dec": "-1.546278246322321608389927127047355602125e-2",
+              "upper_dec": "-9.141847196665135172262918731411056021236e-3",
+              "arb_ball_str": "[-0.01 +/- 5.47e-3]"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.01059916276220459,
+              "rad_float_outward": 0.00012017986625778652,
+              "lower_dec": "1.047898289594680487024008808671208553438e-2",
+              "upper_dec": "1.071934262846237639276653109132023983129e-2",
+              "arb_ball_str": "[0.011 +/- 5.22e-4]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": 0.0014931838981920946,
+              "rad_float_outward": 0.005929210819886067,
+              "lower_dec": "-4.436026921693971492063856724100994842111e-3",
+              "upper_dec": "7.422394718078160547006272670430255157892e-3",
+              "arb_ball_str": "[+/- 7.43e-3]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.010809130931752082,
+              "rad_float_outward": 0.009089678467717023,
+              "lower_dec": "-1.989880939946910280432997980121517586336e-2",
+              "upper_dec": "-1.719452464035059396889794254340175863346e-3",
+              "arb_ball_str": "[+/- 0.0199]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          },
+          {
+            "X_label": "tau^2",
+            "X_certified": {
+              "mid_float": 39.47841760435743,
+              "rad_float_outward": 2.506118203495885e-15,
+              "lower_dec": "3.947841760435743447533796399950460454124e+1",
+              "upper_dec": "3.947841760435743447533796399950460454127e+1",
+              "arb_ball_str": "[39.47841760435743447533796399950460454125 +/- 4.80e-39]"
+            },
+            "lower_divisor_cutoff_M_minus_floor_X_5_6": 21,
+            "upper_divisor_cutoff_M_plus_ceil_X_5_4": 99,
+            "R_mu_total_certified": {
+              "mid_float": -0.0006830867271741713,
+              "rad_float_outward": 0.0049380475902580665,
+              "lower_dec": "-5.621134317432236895117526174634071262222e-3",
+              "upper_dec": "4.254960863083894327130551217944053737781e-3",
+              "arb_ball_str": "[+/- 5.63e-3]"
+            },
+            "R_mu_head_2_to_M_minus_certified": {
+              "mid_float": -0.010894933733045911,
+              "rad_float_outward": 0.010083872286486441,
+              "lower_dec": "-2.097880601953235042601831854459360684593e-2",
+              "upper_dec": "-8.110614465594716122747272359998568459142e-4",
+              "arb_ball_str": "[+/- 0.0210]"
+            },
+            "R_mu_band_M_minus_to_M_plus_certified": {
+              "mid_float": 0.009489820950619333,
+              "rad_float_outward": 0.00023802664918548623,
+              "lower_dec": "9.251794301433846557903622589538446573141e-3",
+              "upper_dec": "9.727847599804817436653708420226923135644e-3",
+              "arb_ball_str": "[0.009 +/- 7.28e-4]"
+            },
+            "R_mu_tail_gt_M_plus_certified": {
+              "mid_float": 0.0007220260552524078,
+              "rad_float_outward": 0.015259946536389181,
+              "lower_dec": "-1.453792048113677178988518209488408677071e-2",
+              "upper_dec": "1.598197259164158726563392190902216322932e-2",
+              "arb_ball_str": "[+/- 0.0160]"
+            },
+            "R_mu_minus_R_mu_band_certified": {
+              "mid_float": -0.010172907677793504,
+              "rad_float_outward": 0.025343818851979453,
+              "lower_dec": "-3.551672652977295267263720425275894361663e-2",
+              "upper_dec": "1.517091117418594611009289828630355638340e-2",
+              "arb_ball_str": "[+/- 0.0356]"
+            },
+            "head_satisfies_global_bound": true,
+            "tail_satisfies_half_C_log_0_bound": true,
+            "band_comparison_satisfies_global_bound": true,
+            "three_zone_decomposition_encloses_zero": true
+          }
+        ]
+      }
+    },
+    "section_4_outcome_and_remaining_obligation": {
+      "symbolic_identities_verification": {
+        "kappa_factorization_verified": true,
+        "kappa_at_10_exact_rational": "132858975/512000000",
+        "kappa_at_10_exact_match": true,
+        "dkappa_at_9_pos": true,
+        "psi0_series_verified": true,
+        "poly_coeffs_verified": true,
+        "antideriv_L_verified": true,
+        "subcritical_supercritical_coeff_cancellation_verified_n_2_to_400": true,
+        "head_sum_bound_identity_verified": true,
+        "all_verified": true
+      },
+      "lean_theorem": "prime_increment_telescoping_and_resonant_band_reduction",
+      "advances_uniform_cancellation_analysis": true,
+      "closes_subgate_tc043a": false,
+      "remaining_open_obligation": {
+        "subgate_id": "SUBGATE-TC-043A",
+        "status": "OPEN",
+        "exact_surviving_lemma": "Localized Resonant-Band Moebius Cancellation Lemma: Prove without assuming RH or universal Weil positivity that there exists a finite constant M_band < infty such that for all X >= 1, the finite resonant-band Moebius sum R_{mu,band}(X) := sum_{X^{5/6} < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m) (where M(X) = ceil(max(2, X^{5/4})) and |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.503 unconditionally) satisfies |R_{mu,band}(X)| <= M_band."
+      }
+    },
+    "full_section_18_tree_roundtrip_verification": {
+      "total_certified_arb_balls_checked": 213,
+      "compared_against_live_original_arb_count": 213,
+      "live_original_count_matches_enumerated_total": true,
+      "all_enclose_original_256bit_arb_ball": true,
+      "failed_paths": [],
+      "checked_paths": [
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[0].J_p_direct_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[0].n2_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[1].J_p_direct_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[1].n2_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[2].J_p_direct_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[2].n2_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[3].J_p_direct_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.prime_increment_definition_and_telescoping.sample_prime_increments_at_X_2[3].n2_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.kappa_10_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.c0_A5_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.c0_inf_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_rosser_schoenfeld_coeff_A5_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[0].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[0].neg_dyadic_block_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[0].n2_term_lower_bound_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[0].analytic_c0_A5_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[0].analytic_C_log_0_upper_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[1].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[1].neg_dyadic_block_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[1].n2_term_lower_bound_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[1].analytic_c0_A5_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[1].analytic_C_log_0_upper_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[2].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[2].neg_dyadic_block_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[2].n2_term_lower_bound_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[2].analytic_c0_A5_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[2].analytic_C_log_0_upper_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[3].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[3].neg_dyadic_block_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[3].n2_term_lower_bound_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[3].analytic_c0_A5_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[3].analytic_C_log_0_upper_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[4].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[4].neg_dyadic_block_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[4].n2_term_lower_bound_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[4].analytic_c0_A5_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[4].analytic_C_log_0_upper_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[5].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[5].neg_dyadic_block_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[5].n2_term_lower_bound_sum_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[5].analytic_c0_A5_lower_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.dyadic_block_table[5].analytic_C_log_0_upper_bound_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].W_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].W_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].W_M_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].subcritical_sieve_defect_D_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].supercritical_increment_sum_T_gt_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].net_sum_D_plus_T_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].D_y1_lin_5X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].T_y1_to_y2_lin_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[0].D_y2_lin_10X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].W_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].W_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].W_M_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].subcritical_sieve_defect_D_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].supercritical_increment_sum_T_gt_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].net_sum_D_plus_T_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].D_y1_lin_5X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].T_y1_to_y2_lin_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[1].D_y2_lin_10X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].W_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].W_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].W_M_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].subcritical_sieve_defect_D_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].supercritical_increment_sum_T_gt_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].net_sum_D_plus_T_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].D_y1_lin_5X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].T_y1_to_y2_lin_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[2].D_y2_lin_10X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].W_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].W_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].W_M_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].subcritical_sieve_defect_D_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].supercritical_increment_sum_T_gt_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].net_sum_D_plus_T_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].D_y1_lin_5X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].T_y1_to_y2_lin_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[3].D_y2_lin_10X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].W_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].W_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].W_M_X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].subcritical_sieve_defect_D_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].supercritical_increment_sum_T_gt_y_sub_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].net_sum_D_plus_T_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].D_y1_lin_5X_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].T_y1_to_y2_lin_certified",
+        "section_18.section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation.certified_audit_data.subcritical_compensation_table[4].D_y2_lin_10X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.leading_pole_coeff_neg_81_zeta3_over_256_pi2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.subleading_pole_coeff_neg_5625_zeta5_over_64_pi4_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.I_d4_0_total_variation_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.I_d4_log_integral_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.I_RL_integral_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.c_em_log_coeff_I_d4_0_over_384_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.c_em_const_coeff_I_d4_log_plus_I_RL_over_384_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.global_euler_maclaurin_constant_C_log_EM_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.small_divisor_head_global_bound_5_6_C_log_EM_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_comparison_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[1].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[1].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[1].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[1].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[1].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[1].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[2].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[2].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[2].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[2].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[2].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[2].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[3].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[3].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[3].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[3].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[3].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[3].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[4].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[4].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[4].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[4].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[4].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[4].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[5].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[5].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[5].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[5].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[5].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[5].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[6].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[6].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[6].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[6].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[6].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[6].R_mu_minus_R_mu_band_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[7].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[7].R_mu_total_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[7].R_mu_head_2_to_M_minus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[7].R_mu_band_M_minus_to_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[7].R_mu_tail_gt_M_plus_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[7].R_mu_minus_R_mu_band_certified"
       ]
     }
   },

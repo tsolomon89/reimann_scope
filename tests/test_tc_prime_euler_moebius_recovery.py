@@ -40,6 +40,7 @@ from pathlib import Path
 from flint import acb, arb, ctx as flint_ctx
 
 from tc.canonical_theta_correlation_bound import (
+    ARITHMETIC_CANCELLATION_CANONICAL_THETA_CORRELATION_STATUS,
     CANONICAL_THETA_CORRELATION_LEAN_DEFS,
     CANONICAL_THETA_CORRELATION_LEAN_THEOREMS,
     COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS,
@@ -48,9 +49,11 @@ from tc.canonical_theta_correlation_bound import (
     STARTING_HEAD_TC_046,
     STARTING_HEAD_TC_047,
     STARTING_HEAD_TC_048,
+    STARTING_HEAD_TC_049,
     TASK_TC_046_ID,
     TASK_TC_047_ID,
     TASK_TC_048_ID,
+    TASK_TC_049_ID,
     verify_all_serialized_arb_in_tree,
     verify_canonical_theta_correlation_lean_module,
 )
@@ -70,8 +73,10 @@ from tc.common_referent_prime_theta_bridge import (
 )
 from tc.prime_euler_moebius_recovery import (
     certified_coupled_cutoff_M_X_arb,
+    certify_dyadic_prime_block_and_subcritical_compensation_arb,
     certify_H0_local_monotonicity_and_global_decay_arb,
     certify_subproduct_counterexample_at_y210_arb,
+    certify_w_log_large_scale_decay_and_resonant_band_reduction_arb,
     compute_coupled_cutoff_comparison_bound_arb,
     divisors_of_primorial,
     evaluate_H0_critical_line_arb,
@@ -83,6 +88,7 @@ from tc.prime_euler_moebius_recovery import (
     evaluate_lambda_y_closed_form_arb,
     evaluate_lambda_y_convolution_arb,
     evaluate_lambda_y_recursion_arb,
+    evaluate_prime_increment_J_p_arb,
     evaluate_summatory_L_y_direct_arb,
     evaluate_summatory_L_y_factorial_divisor_sum_arb,
     evaluate_w_log_divisor_aggregated_certified_arb,
@@ -93,6 +99,7 @@ from tc.prime_euler_moebius_recovery import (
     next_prime_above,
     primes_up_to,
     verify_symbolic_finite_prime_identities,
+    verify_symbolic_tc049_prime_increment_and_w_log_asymptotic_identities,
     von_mangoldt_arb,
 )
 
@@ -417,8 +424,8 @@ def test_07_lean_module_and_artifact_section_15():
     assert lean_audit["contains_sorry"] is False
     assert lean_audit["contains_admit"] is False
     assert lean_audit["matches_exact"] is True
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 30
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 49
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 32
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 50
     assert "finitePrimeEulerRecursionStep" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeCoeffCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeMultiplicativeFactorCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
@@ -874,4 +881,141 @@ def test_09_task_tc048_coupled_cutoff_jump_and_single_observable_audit():
         rt17["compared_against_live_original_arb_count"]
         == enum17["total_certified_arb_balls_checked"]
     )
+
+
+def test_10_task_tc049_arithmetic_cancellation_and_resonant_band_reduction():
+    """Verify TASK-TC-049 prime-increment telescoping J_p(X) = p^{-1/2} W_{p^-}(X/p),
+    supercritical dyadic prime block obstruction (5X < p <= 10X), subcritical vs supercritical
+    resummation cancellation, 4th-order Euler-Maclaurin O(X^{-5/2}) decay of W_log(X),
+    two-sided localized resonant divisor band reduction (X^{5/6} < m <= M(X)), and section_18 round-trip.
+    """
+    sym49 = verify_symbolic_tc049_prime_increment_and_w_log_asymptotic_identities()
+    assert sym49["kappa_factorization_verified"] is True
+    assert sym49["kappa_at_10_exact_match"] is True
+    assert sym49["dkappa_at_9_pos"] is True
+    assert sym49["psi0_series_verified"] is True
+    assert sym49["poly_coeffs_verified"] is True
+    assert sym49["antideriv_L_verified"] is True
+    assert sym49["subcritical_supercritical_coeff_cancellation_verified_n_2_to_400"] is True
+    assert sym49["head_sum_bound_identity_verified"] is True
+    assert sym49["all_verified"] is True
+
+    assert "primeIncrementStep" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
+    assert "localizedResonantBandDecomp" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
+    assert (
+        "prime_increment_telescoping_and_resonant_band_reduction"
+        in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
+    )
+
+    # 1. Live 256-bit Arb verification of single-prime increments J_p(X) at X = 2 (p in {11, 13, 17, 19}):
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        for p_val in (11, 13, 17, 19):
+            jp = evaluate_prime_increment_J_p_arb(
+                arb(2), p=p_val, n_max=800, prec_bits=256
+            )
+            assert jp["is_supercritical_2p_ge_9X"] is True
+            assert jp["step_residual_encloses_zero"] is True
+            assert jp["satisfies_n2_lower_bound"] is True
+            assert bool(jp["J_p_direct_arb"] < arb(0))
+            assert bool(jp["neg_J_p_arb"] >= jp["n2_lower_bound_arb"])
+    finally:
+        flint_ctx.prec = saved_prec
+
+    # 2. Live 256-bit Arb verification of dyadic block and subcritical compensation:
+    dyadic_cert = certify_dyadic_prime_block_and_subcritical_compensation_arb(
+        prec_bits=256
+    )
+    assert dyadic_cert["c0_A5_certified"]["mid_float"] > 0.0219
+    assert all(
+        row["all_primes_satisfy_two_sided_inequality"]
+        and row["block_satisfies_lower_and_upper_bounds"]
+        for row in dyadic_cert["dyadic_block_table"]
+    )
+    assert all(
+        row["telescoping_at_y_sub_encloses_zero"]
+        and row["telescoping_at_M_X_encloses_zero"]
+        and row["compensation_identity_encloses_zero"]
+        and row["net_sum_bounded_by_half_C_log_0"]
+        and row["linear_cutoff_D_5X_strictly_negative"]
+        and row["linear_cutoff_T_5X_to_10X_strictly_positive"]
+        and row["linear_cutoff_D_10X_strictly_negative"]
+        and row["linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X"]
+        and row["linear_cutoff_compensation_encloses_zero"]
+        for row in dyadic_cert["subcritical_compensation_table"]
+    )
+
+    # 3. Artifact section_18 verification:
+    artifact_path = (
+        Path(__file__).resolve().parent.parent
+        / "data"
+        / "tc_canonical_theta_correlation_bound.json"
+    )
+    payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+    assert (
+        payload["arithmetic_cancellation_canonical_theta_correlation_task_id"]
+        == TASK_TC_049_ID
+    )
+    assert (
+        payload["status_dimensions"][
+            "arithmetic_cancellation_canonical_theta_correlation_status"
+        ]
+        == ARITHMETIC_CANCELLATION_CANONICAL_THETA_CORRELATION_STATUS
+    )
+    sec18 = payload[
+        "section_18_arithmetic_cancellation_in_canonical_theta_correlation"
+    ]
+    assert sec18["task_id"] == TASK_TC_049_ID
+    assert sec18["inspected_baseline"] == STARTING_HEAD_TC_049
+
+    s2_18 = sec18[
+        "section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation"
+    ]["certified_audit_data"]
+    assert len(s2_18["dyadic_block_table"]) == 6
+    assert len(s2_18["subcritical_compensation_table"]) == 5
+
+    s3_18 = sec18[
+        "section_3_w_log_large_scale_decay_and_resonant_band_reduction"
+    ]["certified_audit_data"]
+    assert (
+        s3_18["global_euler_maclaurin_constant_C_log_EM_certified"]["mid_float"]
+        < 13.47
+    )
+    assert (
+        s3_18["small_divisor_head_global_bound_5_6_C_log_EM_certified"]["mid_float"]
+        < 11.224
+    )
+    assert (
+        s3_18["resonant_band_comparison_bound_certified"]["mid_float"] < 11.503
+    )
+    assert all(
+        row["satisfies_euler_maclaurin_bound"]
+        for row in s3_18["w_log_asymptotic_table"]
+    )
+    assert all(
+        row["head_satisfies_global_bound"]
+        and row["tail_satisfies_half_C_log_0_bound"]
+        and row["band_comparison_satisfies_global_bound"]
+        and row["three_zone_decomposition_encloses_zero"]
+        for row in s3_18["resonant_band_table"]
+    )
+
+    s4_18 = sec18["section_4_outcome_and_remaining_obligation"]
+    assert s4_18["symbolic_identities_verification"]["all_verified"] is True
+    assert s4_18["closes_subgate_tc043a"] is False
+    rem18 = s4_18["remaining_open_obligation"]
+    assert rem18["subgate_id"] == "SUBGATE-TC-043A"
+    assert rem18["status"] == "OPEN"
+    assert "X^{5/6} < m <= M(X)" in rem18["exact_surviving_lemma"]
+
+    rt18 = sec18["full_section_18_tree_roundtrip_verification"]
+    assert rt18["all_enclose_original_256bit_arb_ball"] is True
+    assert rt18["live_original_count_matches_enumerated_total"] is True
+    enum18 = verify_all_serialized_arb_in_tree(sec18, path_prefix="section_18")
+    assert (
+        rt18["compared_against_live_original_arb_count"]
+        == enum18["total_certified_arb_balls_checked"]
+    )
+
 

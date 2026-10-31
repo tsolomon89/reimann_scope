@@ -121,6 +121,7 @@ TASK_TC_045R2_ID = "TASK-TC-045R2"
 TASK_TC_046_ID = "TASK-TC-046"
 TASK_TC_047_ID = "TASK-TC-047"
 TASK_TC_048_ID = "TASK-TC-048"
+TASK_TC_049_ID = "TASK-TC-049"
 STARTING_HEAD_TC_042 = "8fb8a7608212402659a9dee2d22481e3b91fc1c3"
 STARTING_HEAD_TC_042R = "9b51ae68c08488a7191dc5fb04c740ba44012974"
 SUBSTANTIVE_REPAIR_COMMIT_TC_042R = "1b41016be9fa321f45047946b8beba3db0a7b2cc"
@@ -135,6 +136,7 @@ STARTING_HEAD_TC_045R2 = "71398c70c049b53d3546a7258ccda765481114f7"
 STARTING_HEAD_TC_046 = "1fc477927ccbb242dec10217744b1ad054877e12"
 STARTING_HEAD_TC_047 = "c39eb27b31fc4eed98300be0118d8c670f92d32a"
 STARTING_HEAD_TC_048 = "39b4e3aec6d4357d283932ad296b6148477e00e4"
+STARTING_HEAD_TC_049 = "5da0eb79e1732ff871ee1c7fee729c62972aa406"
 PARENT_WORK_IDS = [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -156,6 +158,7 @@ PARENT_WORK_IDS = [
     "TASK-TC-045R2",
     "TASK-TC-046",
     "TASK-TC-047",
+    "TASK-TC-048",
 ]
 
 SEED_DEFECT_REPRODUCED_AND_REPAIRED = "SEED_DEFECT_REPRODUCED_AND_REPAIRED"
@@ -202,6 +205,10 @@ SINGLE_OBSERVABLE_COMMON_REFERENT_AUDIT_STATUS = (
     "COUPLED_CUTOFF_JUMP_FORMULA_AND_SINGLE_OBSERVABLE_CANDIDATE_AUDIT_PROVED_"
     "COVARIANCE_INVARIANCE_DISCRETENESS_TRILEMMA_ISOLATED_SUBGATE_OPEN"
 )
+ARITHMETIC_CANCELLATION_CANONICAL_THETA_CORRELATION_STATUS = (
+    "SUPERCRITICAL_DYADIC_BLOCK_OBSTRUCTION_SUBCRITICAL_COMPENSATION_AND_"
+    "W_LOG_X_NEG_5_2_RESONANT_BAND_REDUCTION_PROVED_SUBGATE_OPEN"
+)
 UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN = (
     "UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN"
 )
@@ -246,6 +253,8 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "gradeLayerRealizedObservable",
     "coupledCutoffPrimeStepJump",
     "thetaZeroRadialDefectObservable",
+    "primeIncrementStep",
+    "localizedResonantBandDecomp",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -298,6 +307,7 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "common_referent_integer_layer_bridge_and_station_ratio_identity",
     "coupled_cutoff_prime_step_jump_and_dense_comparison_extension",
     "single_observable_common_referent_candidate_audit_and_trilemma",
+    "prime_increment_telescoping_and_resonant_band_reduction",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -9908,10 +9918,21 @@ def execute_task_tc048_single_observable_common_referent_audit(
     return _exec_tc048(prec_bits=prec_bits)
 
 
+def execute_task_tc049_arithmetic_cancellation_audit(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-049: Arithmetic cancellation in the canonical theta correlation."""
+    from tc.prime_euler_moebius_recovery import (
+        execute_task_tc049_arithmetic_cancellation_audit as _exec_tc049,
+    )
+
+    return _exec_tc049(prec_bits=prec_bits)
+
+
 def build_canonical_theta_correlation_bound_report(
     n_primes_max: int = 25000, prec_bits: int = 256
 ) -> Dict[str, Any]:
-    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 / TASK-TC-043R / TASK-TC-044 / TASK-TC-045 / TASK-TC-046 / TASK-TC-047 / TASK-TC-048 audit and certification report."""
+    """Build the complete EPIC-TC-042 / TASK-TC-042R / TASK-TC-042R2 / TASK-TC-042F / TASK-TC-043 / TASK-TC-043R / TASK-TC-044 / TASK-TC-045 / TASK-TC-046 / TASK-TC-047 / TASK-TC-048 / TASK-TC-049 audit and certification report."""
     seed_audit = derive_seed_spatial_polynomial_and_mellin()
     autocorr_audit = derive_closed_form_autocorrelation_h_K()
     rh_equiv_audit = audit_rh_equivalence_and_laplace_resolvent()
@@ -9959,6 +9980,9 @@ def build_canonical_theta_correlation_bound_report(
     task_tc048_audit = execute_task_tc048_single_observable_common_referent_audit(
         prec_bits=prec_bits
     )
+    task_tc049_audit = execute_task_tc049_arithmetic_cancellation_audit(
+        prec_bits=prec_bits
+    )
     lean_audit = verify_canonical_theta_correlation_lean_module()
     wavelet_audit = proof_attempts["attempt_3_large_grade_wavelet_decomposition"][
         "uniform_prime_wavelet_boundedness"
@@ -9987,6 +10011,7 @@ def build_canonical_theta_correlation_bound_report(
         "prime_euler_moebius_recovery_task_id": TASK_TC_046_ID,
         "common_referent_prime_theta_bridge_task_id": TASK_TC_047_ID,
         "single_observable_common_referent_audit_task_id": TASK_TC_048_ID,
+        "arithmetic_cancellation_canonical_theta_correlation_task_id": TASK_TC_049_ID,
         "title": (
             "Canonical Theta Correlation Bound: Arithmetic Derivation, "
             "Certified Tests, and a Proof Attempt"
@@ -10004,6 +10029,7 @@ def build_canonical_theta_correlation_bound_report(
         "prime_euler_moebius_recovery_starting_head": STARTING_HEAD_TC_046,
         "common_referent_prime_theta_bridge_starting_head": STARTING_HEAD_TC_047,
         "single_observable_common_referent_audit_starting_head": STARTING_HEAD_TC_048,
+        "arithmetic_cancellation_canonical_theta_correlation_starting_head": STARTING_HEAD_TC_049,
         "parent_work": PARENT_WORK_IDS,
         "status_dimensions": {
             "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -10018,6 +10044,7 @@ def build_canonical_theta_correlation_bound_report(
             "prime_euler_moebius_recovery_status": PRIME_EULER_MOEBIUS_RECOVERY_STATUS,
             "common_referent_prime_theta_bridge_status": COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS,
             "single_observable_common_referent_audit_status": SINGLE_OBSERVABLE_COMMON_REFERENT_AUDIT_STATUS,
+            "arithmetic_cancellation_canonical_theta_correlation_status": ARITHMETIC_CANCELLATION_CANONICAL_THETA_CORRELATION_STATUS,
             "rh_equivalence_proof_status": FIXED_SEED_RH_EQUIVALENCE_PROVED,
             "numerical_certification_status": FINITE_GRID_CORRELATION_BOUND_CERTIFIED,
             "local_concavity_status": LOCAL_ORIGIN_CONCAVITY_CERTIFIED,
@@ -10051,6 +10078,7 @@ def build_canonical_theta_correlation_bound_report(
         "section_15_prime_by_prime_moebius_recovery_and_euler_compatibility": task_tc046_audit,
         "section_16_common_referent_prime_theta_integer_layer_bridge": task_tc047_audit,
         "section_17_single_prime_theta_observable_and_coupled_cutoff_jump_audit": task_tc048_audit,
+        "section_18_arithmetic_cancellation_in_canonical_theta_correlation": task_tc049_audit,
         "literature_references": [
             {
                 "citation": "Burnol (1999, arXiv:math/9902080v1; 2001, arXiv:math/0101068v1)",

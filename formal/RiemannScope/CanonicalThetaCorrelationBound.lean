@@ -1563,4 +1563,102 @@ theorem single_observable_common_referent_candidate_audit_and_trilemma
     · rintro ⟨rfl, rfl⟩
       exact ⟨rfl, ⟨0, by simp⟩, ⟨0, by simp⟩⟩
 
+/-- Signed single-prime Euler recursion increment
+    `J_p(X) = p^{-1/2} * W_{p^-}(X / p) = W_{p^-}(X) - W_p(X)`. -/
+def primeIncrementStep (inv_sqrt_p W_prev_X_over_p : ℝ) : ℝ :=
+  inv_sqrt_p * W_prev_X_over_p
+
+/-- Three-zone Möbius remainder decomposition into the small-divisor head
+    (`2 <= m <= floor(X^{5/6})`), the localized resonant divisor band
+    (`X^{5/6} < m <= M(X)`), and the large-divisor tail (`m > M(X)`). -/
+def localizedResonantBandDecomp (R_head R_band R_tail : ℝ) : ℝ :=
+  R_head + R_band + R_tail
+
+/-- Theorem 50: Prime-Increment Telescoping, Subcritical/Supercritical Resummation,
+    and Localized Resonant-Band Reduction (`TASK-TC-049`).
+    Scope Note: This theorem formalizes the algebraic telescoping, subcritical/supercritical
+    compensation, and triangle-inequality deductions from supplied analytic bounds (`B_block <= T_gt_A`,
+    `|W_M - W_X| <= half_C`, `|R_head| <= B_head`, `|R_tail| <= B_tail`); the analytic proofs of the
+    supercritical dyadic prime block bound, the `O(X^{-5/2})` large-scale decay of `W_log(X)` from the
+    triple zero of `H_0(z)` at `z = -1/2`, and the small-divisor head bound `|R_head| <= (5/6) C_{log,infty}`
+    are established in the paper derivation and certified in 256-bit Arb in `tc/prime_euler_moebius_recovery.py`.
+    (1) Prime-increment step and two-step telescoping:
+        For `W_1 = finitePrimeEulerRecursionStep W_0 inv_sqrt_p1 W_0_p1` and
+        `W_2 = finitePrimeEulerRecursionStep W_1 inv_sqrt_p2 W_1_p2` with increments
+        `J_1 = primeIncrementStep inv_sqrt_p1 W_0_p1` and `J_2 = primeIncrementStep inv_sqrt_p2 W_1_p2`,
+        we have `W_0 - W_1 = J_1`, `W_1 - W_2 = J_2`, `W_2 = W_0 - (J_1 + J_2)`, and `W_2 - W_0 = -(J_1 + J_2)`;
+        moreover, when `0 < inv_sqrt_p1` and `W_0_p1 < 0` (as holds for supercritical primes `p > (9/2) X`),
+        `J_1 < 0` (`0 < -J_1`).
+    (2) Subcritical sieve-defect vs. supercritical prime-increment compensation:
+        If `W_M = W_A + T_gt_A` (`T_gt_A = -sum_{A X < p <= M(X)} J_p(X)`), `W_A = W_X + D_A`,
+        `B_block <= T_gt_A`, and `|W_M - W_X| <= half_C`, then `W_M - W_X = D_A + T_gt_A`,
+        `-(half_C + T_gt_A) <= D_A ∧ D_A <= half_C - T_gt_A`, and `B_block - half_C <= W_X - W_A`
+        (with `W_X - W_A = -D_A`).
+    (3) Localized resonant-band reduction (`X^{5/6} < m <= M(X)`):
+        For `R_mu = localizedResonantBandDecomp R_head R_band R_tail` with `|R_head| <= B_head` and
+        `|R_tail| <= B_tail`, we have `|R_mu - R_band| <= B_head + B_tail`,
+        `|R_band| <= M_band → |R_mu| <= M_band + B_head + B_tail`, and
+        `|R_mu| <= M_mu → |R_band| <= M_mu + B_head + B_tail`. -/
+theorem prime_increment_telescoping_and_resonant_band_reduction
+    (W_0 W_0_p1 W_1_p2 inv_sqrt_p1 inv_sqrt_p2
+      W_X W_A W_M D_A T_gt_A B_block half_C
+      R_head R_band R_tail B_head B_tail M_band M_mu : ℝ)
+    (h_p1_pos : 0 < inv_sqrt_p1)
+    (h_WM_split : W_M = W_A + T_gt_A)
+    (h_WA_split : W_A = W_X + D_A)
+    (h_block_lb : B_block ≤ T_gt_A)
+    (h_comp_M : |W_M - W_X| ≤ half_C)
+    (h_head_abs : |R_head| ≤ B_head)
+    (h_tail_abs : |R_tail| ≤ B_tail) :
+    let W_1 := finitePrimeEulerRecursionStep W_0 inv_sqrt_p1 W_0_p1
+    let W_2 := finitePrimeEulerRecursionStep W_1 inv_sqrt_p2 W_1_p2
+    let J_1 := primeIncrementStep inv_sqrt_p1 W_0_p1
+    let J_2 := primeIncrementStep inv_sqrt_p2 W_1_p2
+    let R_mu := localizedResonantBandDecomp R_head R_band R_tail
+    ((W_0 - W_1 = J_1) ∧
+      (W_1 - W_2 = J_2) ∧
+      (W_2 = W_0 - (J_1 + J_2)) ∧
+      (W_2 - W_0 = -(J_1 + J_2)) ∧
+      (W_0_p1 < 0 → (J_1 < 0 ∧ 0 < -J_1))) ∧
+    ((W_M - W_X = D_A + T_gt_A) ∧
+      (-(half_C + T_gt_A) ≤ D_A ∧ D_A ≤ half_C - T_gt_A) ∧
+      (W_X - W_A = -D_A ∧ B_block - half_C ≤ W_X - W_A)) ∧
+    ((|R_mu - R_band| ≤ B_head + B_tail) ∧
+      (|R_band| ≤ M_band → |R_mu| ≤ M_band + B_head + B_tail) ∧
+      (|R_mu| ≤ M_mu → |R_band| ≤ M_mu + B_head + B_tail)) := by
+  intro W_1 W_2 J_1 J_2 R_mu
+  have h_comp_bounds := abs_le.mp h_comp_M
+  have h_head_bounds := abs_le.mp h_head_abs
+  have h_tail_bounds := abs_le.mp h_tail_abs
+  have h_diff_id : W_M - W_X = D_A + T_gt_A := by linarith
+  have h_rmu_diff : R_mu - R_band = R_head + R_tail := by
+    dsimp [R_mu, localizedResonantBandDecomp]
+    ring
+  refine ⟨⟨?_, ?_, ?_, ?_, ?_⟩, ⟨h_diff_id, ⟨by linarith, by linarith⟩, ⟨by linarith, by linarith⟩⟩, ⟨?_, ?_, ?_⟩⟩
+  · dsimp [W_1, J_1, finitePrimeEulerRecursionStep, primeIncrementStep]
+    ring
+  · dsimp [W_2, J_2, finitePrimeEulerRecursionStep, primeIncrementStep]
+    ring
+  · dsimp [W_1, W_2, J_1, J_2, finitePrimeEulerRecursionStep, primeIncrementStep]
+    ring
+  · dsimp [W_1, W_2, J_1, J_2, finitePrimeEulerRecursionStep, primeIncrementStep]
+    ring
+  · intro h_w_neg
+    dsimp [J_1, primeIncrementStep]
+    have h_j_neg : inv_sqrt_p1 * W_0_p1 < 0 := mul_neg_of_pos_of_neg h_p1_pos h_w_neg
+    exact ⟨h_j_neg, by linarith⟩
+  · rw [h_rmu_diff]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+  · intro h_band
+    have hb := abs_le.mp h_band
+    dsimp [R_mu, localizedResonantBandDecomp]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+  · intro h_rmu
+    have hr := abs_le.mp h_rmu
+    have h_band_id : R_band = R_mu - R_head - R_tail := by
+      dsimp [R_mu, localizedResonantBandDecomp]
+      ring
+    rw [h_band_id]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+
 end RiemannScope

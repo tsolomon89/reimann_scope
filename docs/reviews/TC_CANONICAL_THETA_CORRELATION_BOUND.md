@@ -1,8 +1,8 @@
-# Canonical Theta Correlation Bound, Arithmetic–Fourier Positive Factorization, Admissible Cross-Grade Compatibility, the Prime-Shift Quadratic Form, Prime-by-Prime Möbius Recovery & Single-Observable Common-Referent Audit (`EPIC-TC-042` / `TASK-TC-042` / `TASK-TC-042R` / `TASK-TC-042R2` / `TASK-TC-042F` / `TASK-TC-043` / `TASK-TC-043R` / `TASK-TC-044` / `TASK-TC-045` / `TASK-TC-045R` / `TASK-TC-045R2` / `TASK-TC-046` / `TASK-TC-047` / `TASK-TC-048`)
+# Canonical Theta Correlation Bound, Arithmetic–Fourier Positive Factorization, Admissible Cross-Grade Compatibility, the Prime-Shift Quadratic Form, Prime-by-Prime Möbius Recovery, Single-Observable Common-Referent Audit & Arithmetic Cancellation Analysis (`EPIC-TC-042` / `TASK-TC-042` / `TASK-TC-042R` / `TASK-TC-042R2` / `TASK-TC-042F` / `TASK-TC-043` / `TASK-TC-043R` / `TASK-TC-044` / `TASK-TC-045` / `TASK-TC-045R` / `TASK-TC-045R2` / `TASK-TC-046` / `TASK-TC-047` / `TASK-TC-048` / `TASK-TC-049`)
 
 ## 1. Executive Summary & Status Separation
 
-This document records the complete mathematical derivation, seed defect repair, closed-form multiplicative autocorrelation theorem, exact rational Bernstein weighted kernel envelopes, fixed-seed Riemann Hypothesis equivalence proof, certified arbitrary-precision evaluations, `TASK-TC-042R` and `TASK-TC-042R2` certification/formalization repairs, $\tau$-scaling controls, Lean 4 formalization, arithmetic proof attempts (`SUBGATE-TC-042A` and `SUBGATE-TC-042B`), the **`TASK-TC-042F` Arithmetic–Fourier Positive Factorization** (with bounded reconciliation), **`TASK-TC-043` / `TASK-TC-043R` Admissible Cross-Grade Compatibility & Signed Cross-Grade Cancellation Investigation**, **`TASK-TC-044` Arithmetic Cross-Grade Compatibility, the Prime-Shift Quadratic Form $D_N(f)$, and the Divisor-Aggregated Prime-Shift Functional $W_{\log}(X)$**, **`TASK-TC-045` / `TASK-TC-045R` / `TASK-TC-045R2` Cross-Grade Compatibility, Möbius Recovery of the Actual Arithmetic Profile, and Mathematical Claim / Certificate Repairs**, **`TASK-TC-046` Prime-by-Prime Möbius Recovery and Arithmetic Cross-Grade Compatibility**, **`TASK-TC-047` Common-Referent Observable from Actual Prime/Theta Data and Required Integer-Layer Membership**, and **`TASK-TC-048` A Single Prime/Theta Observable for the Common-Referent Collision Contract** of the complete Weil pairing $Q_\tau(f, g) = W_\xi(f * g^*)$ for **`EPIC-TC-042`**:
+This document records the complete mathematical derivation, seed defect repair, closed-form multiplicative autocorrelation theorem, exact rational Bernstein weighted kernel envelopes, fixed-seed Riemann Hypothesis equivalence proof, certified arbitrary-precision evaluations, `TASK-TC-042R` and `TASK-TC-042R2` certification/formalization repairs, $\tau$-scaling controls, Lean 4 formalization, arithmetic proof attempts (`SUBGATE-TC-042A` and `SUBGATE-TC-042B`), the **`TASK-TC-042F` Arithmetic–Fourier Positive Factorization** (with bounded reconciliation), **`TASK-TC-043` / `TASK-TC-043R` Admissible Cross-Grade Compatibility & Signed Cross-Grade Cancellation Investigation**, **`TASK-TC-044` Arithmetic Cross-Grade Compatibility, the Prime-Shift Quadratic Form $D_N(f)$, and the Divisor-Aggregated Prime-Shift Functional $W_{\log}(X)$**, **`TASK-TC-045` / `TASK-TC-045R` / `TASK-TC-045R2` Cross-Grade Compatibility, Möbius Recovery of the Actual Arithmetic Profile, and Mathematical Claim / Certificate Repairs**, **`TASK-TC-046` Prime-by-Prime Möbius Recovery and Arithmetic Cross-Grade Compatibility**, **`TASK-TC-047` Common-Referent Observable from Actual Prime/Theta Data and Required Integer-Layer Membership**, **`TASK-TC-048` A Single Prime/Theta Observable for the Common-Referent Collision Contract**, and **`TASK-TC-049` Arithmetic Cancellation in the Canonical Theta Correlation** of the complete Weil pairing $Q_\tau(f, g) = W_\xi(f * g^*)$ for **`EPIC-TC-042`**:
 
 $$
 C_\tau(0) \ge 0, \qquad |C_\tau(K)| \le C_\tau(0) \quad \forall K \in \overline{\mathbb{Q}} \cap \mathbb{R}, \qquad \tau = 2\pi,
@@ -25,8 +25,9 @@ where $C_\tau(K) := W_\xi(h_K)$ is the completed Riemann explicit-formula functi
 | **Cross-Grade Compatibility & Möbius Recovery (`Section 12`, `TASK-TC-045` / `TASK-TC-045R` / `TASK-TC-045R2`)** | `MIXED_GRADE_PAIRING_POLARIZED_MERTENS_STIELTJES_REMAINDER_ISOLATED_CLAIMS_AND_CERTIFICATES_REPAIRED` | Repaired `TC-044` Mellin strip derivation ($1/2 < \operatorname{Re}(z) < 5/2$ Fubini–Tonelli interchange, holomorphic continuation of $-H_0(z)\zeta'(z+1/2)$ on the open kernel strip $|\operatorname{Re}(z)| < 5/2$ where $H_0(1/2) = H_0'(1/2) = H_0''(1/2) = 0$ cancels the double pole of $-\zeta'(z+1/2)$, global meromorphic continuation on $\mathbb{C}$ with simple poles from $H_0(z)$ at $z = \pm(2k+1/2)$ ($k \ge 1$) and residue $\operatorname*{Res}_{z=5/2}[-H_0(z)\zeta'(z+1/2)] = \frac{81}{64}(-\zeta'(3)) = +0.2507535262 \ne 0$, Möbius $1/\zeta(z+1/2)$ denominator restoration, and Euler–Maclaurin pole-subtracted regularization on isolated synthetic modes) and outward-rounded decimal/float Arb serialization (`serialize_arb_certified`, `verify_serialized_arb_roundtrip`, `verify_all_serialized_arb_in_tree` across all `26` balls in `section_13` and `122` balls in `section_14`); repaired in `TASK-TC-045R` / `TASK-TC-045R2` the false uniform norm floors on $f_\pm^{(K)}$ ($\|f_-^{(K)}\|_{L^2}^2 = h_0(1) - h_0(\tau^{|K|}) \to 0$ as $K \to 0$, and at $K = \pm 1/4$, $\|f_+^{(\pm 1/4)}\|_{L^2}^2 = h_0(1) + h_0(\tau^{1/4}) = 0.243250897826609 \in (0.2432, 0.2433)$), the false transfer bound `0.633039` (proving the Plancherel bound $|B_{\mathrm{transfer}}(f)| \le 2\|f\|_{L^2}^2$, $|B_{\mathrm{transfer}}(f_\pm^{(K)})| \le 4h_0(1) = 1.9894499352 < 1.98945$, and $|B_{\mathrm{transfer}}(T_K\psi_\tau, T_L\psi_\tau)| \le 2h_0(1) = 0.9947249676 < 0.994725$), and the direct mixed-grade implication chain through $C_\tau(K-L) = Q_\tau(T_K\psi_\tau, T_L\psi_\tau) = B_{\mathrm{known}}(K, L) - R_\mu(\tau^{|K-L|})$ (`|B_known(K, L)| <= 9.27739781 < 9.4468` via the spatial archimedean bound `5.464660`, or `<= 7.07942813 < 7.07943` via the Attempt B Cauchy–Schwarz + Plancherel transfer bound `3.26669033`); proved $|W_{\log}(u)| \le C_{\log,0}\,u^{5/2}$ ($C_{\log,0} = \frac{92193}{32768}(-\zeta'(3)) \le 0.55742959$) for all $u > 0$, uniform convergence of $R_\mu(X)$ on compact intervals $[a, b] \subset (0, \infty)$, continuity of $R_\mu(X)$ and $W(X)$ on $(0, \infty)$, $\sup_{K\in\mathbb{A}_{\mathbb{R}}}|R_\mu(\tau^{|K|})| = \sup_{X\ge 1}|R_\mu(X)|$, simultaneous-grade Toeplitz counterexample control, and the exact Mertens Stieltjes representation $R_\mu(X) = X^{-1/2}\int_0^{X/2} M_{\ge 2}(X/u)\phi_{\log}'(u)\,du$, isolating the **Smooth-Kernel Mertens / Möbius Cancellation Lemma** (`SUBGATE-TC-043A`) |
 | **Prime-by-Prime Möbius Recovery (`Section 13`, `TASK-TC-046` / `TASK-TC-046R2`)** | `FINITE_PRIME_EULER_INVERSION_PROVED_COUPLED_CUTOFF_REDUCTION_CERTIFIED_UNIFORM_REMAINDER_OPEN` | Constructed finite-prime Euler inversion $W_y(X) := \sum_{m \mid P_y}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m) = \prod_{p\le y}(I - p^{-1/2}D_p)W_{\log}(X) = \sum_{n\ge 2}\frac{\lambda_y(n)}{\sqrt{n}}h_0(n/X)$ ($P_y = \prod_{p\le y}p$, $\mu_y(m) = \mu(m)\mathbf{1}_{m\mid P_y}$, $\lambda_y = \mu_y * \log$) on the ambient space $\mathcal{F}_{5/2} \subset C((0, \infty))$ before restricting to admissible grade scales $X = \tau^{|K-L|}$ ($K, L \in \mathbb{A}_{\mathbb{R}}$); proved the closed-form prime-power classification ($\lambda_y(n) = \log n$ if $\omega_{\le y}(n)=0$, $\log p$ if $\omega_{\le y}(n)=1$, $0$ if $\omega_{\le y}(n)\ge 2$), the exact summatory factorial identity $L_y(x) = \sum_{d\mid P_y, d\le x}\mu(d)\log(\lfloor x/d\rfloor!)$, and the exact agreement window $\lambda_y(n) = \Lambda(n)$ for all $2 \le n < 2 q_{>y}$ ($q_{>y} = \min\{p \text{ prime} : p > y\}$, first discrepancy $\Delta_y(2q_{>y}) = \log 2 > 0$); proved the critical-line Mellin/Fourier identity $W_y(X) = -\frac{1}{\tau}\int_{-\infty}^\infty E_y(it)H_0(it)\zeta'(1/2+it)X^{it}\,dt$ and Euler-sieved seed Gram bound $\sup_{X>0}|W_y(X)| \le \|\Psi_y\|_{L^2(d^\times x)} N_{\zeta',\tau}$, quantifying both the controlled-width low-frequency interval lower bound $\inf_{t\in I_y}|E_y(it)|^2 = |E_y(i t_{y,-})|^2 = \exp\bigl[(4\cos(\tau/16)+o(1))\sqrt{y}/\log y\bigr]$ ($4\cos(\tau/16) = 2\sqrt{2+\sqrt{2}} \approx 3.695518130045147$, proved via PNT partial summation of the full prime product while refuting the false subproduct inequality at $y = 210$ where $3.3605057481 < 18.2536118944$) on $I_y = [\frac{7\tau}{16\log y}, \frac{\tau}{2\log y}]$ ($|I_y| = \frac{\tau}{16\log y}$) together with Weierstrass product local monotonicity of $H_0(it)$ on $[0, 1]$ ($y \ge 24$, plus 64-subinterval Arb certification on $[0, t_{2,+}]$ for $y \in \{2, 5, 11\}$ and global non-monotonicity $H_0(5i) < H_0(i t_{2,+})$, $H_0(20i) < H_0(0)$), which forces $\|\Psi_y\|_{L^2(d^\times x)}^2 \ge \frac{H_0(0)}{8\log y}|E_y(i t_{y,-})|^2 \to +\infty$ as $y \to \infty$ (establishing failure of the unsplit critical-line Cauchy–Schwarz/Gram-norm bound without refuting boundedness of $W_{M(X)}(X)$ or the concurrent-grade hypothesis), and the horizon collapse of the $m \le M(X)$ divisor sum to $W_{\log}(X) + R_{\mu,M(X)}(X)$ for $y \ge M(X)$; proved $|W(X) - W_y(X)| \le \frac{C_{\log,0}X^{5/2}}{2M^2}$ for $y \ge M \ge \max(2, X)$ and $|W(X) - W_{M(X)}(X)| \le \frac{1}{2}C_{\log,0} = 0.2787147936 < 0.278715$ at $y = M(X) = \lceil\max(2, X^{5/4})\rceil$ (computed as a certified safe integer cutoff directly from the Arb ball enclosure of $(X^5)^{1/4}$ without `float` rounding, with certified regression at $X = 16 \pm 10^{-30}$), establishing $\sup_{X\ge 1}|W_{M(X)}(X)| < \infty \iff \sup_{X\ge 1}|R_{\mu, M(X)}(X)| < \infty \iff \sup_{X\ge 1}|R_\mu(X)| < \infty$ (`SUBGATE-TC-043A`, whereas at $N = \lfloor X\rfloor$ the available small-scale tail estimate grows as $O(\sqrt{X})$) |
 | **Common-Referent Prime/Theta Bridge & Single-Observable Collision Audit (`Section 14` & `Section 15`, `TASK-TC-047` / `TASK-TC-048` / `TASK-TC-048R`)** | `COMMON_REFERENT_PRIME_THETA_INTEGER_LAYER_MEMBERSHIP_PROVED_AND_CERTIFIED_SUBGATE_OPEN` / `COUPLED_CUTOFF_JUMP_FORMULA_AND_SINGLE_OBSERVABLE_CANDIDATE_AUDIT_PROVED_COVARIANCE_INVARIANCE_DISCRETENESS_TRILEMMA_ISOLATED_SUBGATE_OPEN` | Constructed $\mathcal{N}_y(x) = \prod_{d\mid P_y, d\le x}(\lfloor x/d\rfloor!)^{\mu(d)} = \prod_{n\le x}m_y(n) \in \mathbb{Z}_{\ge 1}$ and $\mathcal{A}_{K,y}(x) = \mathcal{N}_y(x)\tau^K \in L_K^\times = \tau^K(\mathbb{Z}\setminus\{0\})$ (`CR2`), proved its Chebyshev LCM agreement window $1 \le x < 2 q_{>y}$ and first discrepancy $\mathcal{N}_y(2q_{>y}) = 2\operatorname{lcm}(1, \dots, 2q_{>y})$, and proved the logarithmic-jump reconstruction $W_y(\tau^{K-J}) = \sum_{n\ge 2}\log(\mathcal{A}_{K,y}(n)/\mathcal{A}_{K,y}(n-1))n^{-1/2}h_0(\Phi_J(n)/\Phi_K(1))$ under the explicit lower-endpoint convention $\mathcal{A}_{K,y}(x) = \tau^K$ on $(0, 2)$ (zero atom at $x = 1$); reconciled in `TASK-TC-048` / `TASK-TC-048R` that $\tau^{-K}\mathcal{A}_{K,y}(x) = \mathcal{N}_y(x)$ is unit-converted coordinate recovery (whereas raw $\mathcal{A}_{K,y}(x) \ne \mathcal{A}_{J,y}(x)$ for $K \ne J$), proved the exact right-hand jump formula $F(X_0^+) - F(X_0) = -p^{-1/2}W_{p^-}(X_0/p)$ of $F(X) = W_{M(X)}(X)$ at $X_0 = (p-1)^{4/5}$ (certified strictly negative for $p \in \{3, 5, 7, 11, 13, 17, 19, 23\}$ and proved $> 0$ for all $p \ge 1901$ where $u_p \le 2/9$), corrected the dense-grade-to-all-$X$ extension to use continuity of $W(X)$ plus $|F(X) - W(X)| \le \frac{1}{2}C_{\log,0} < 0.278715$, and established the 3-row substantive candidate classification (`Integer carrier N_y(x)tau^K`: `CR2` + one-way `CR3` established, raw `CR1` missing; `Theta detector D^{(2A)}`: raw `CR1` + `CR3` established, `CR2` missing; `Shift difference D^{(2B)}`: raw `CR1` established, general `CR3` and `CR2` missing, with first 10 zeta zeros certified across `198` outward-rounded 256-bit Arb balls in `section_17`), isolating the **Covariance–Invariance–Discreteness Trilemma** and the decisive zero-identity question while keeping `SUBGATE-TC-043A` `OPEN` |
-| **Universal Arithmetic Inequality (`Section 7`, `Section 10`, `Section 11`, `Section 12`, `Section 13`, `Section 14` & `Section 15`)** | `UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN` | Isolated as `SUBGATE-TC-042A`, `SUBGATE-TC-042B`, and `SUBGATE-TC-043A`: $\exists M < \infty \; \forall X \ge 1 : |R_\mu(X)| := |\sum_{m\ge 2}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)| \le M$ (equivalently $\sup_{X\ge 1}|W_{M(X)}(X)| < \infty$ for $M(X) = \lceil\max(2, X^{5/4})\rceil$) |
-| **Formalization Coverage (`Section 8`, expanded in `TASK-TC-042R2`, `TASK-TC-042F`, `TASK-TC-043`, `TASK-TC-043R`, `TASK-TC-044`, `TASK-TC-045`, `TASK-TC-045R`, `TASK-TC-046`, `TASK-TC-047` & `TASK-TC-048`)** | `FORMALIZED_IN_LEAN4_ZERO_SORRY` | [`formal/RiemannScope/CanonicalThetaCorrelationBound.lean`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean): **30 definitions**, **49 theorems**, 0 `sorry`, 0 `admit` (including `prime_euler_multiplicative_integrality_and_grade_layer_membership`, `common_referent_integer_layer_bridge_and_station_ratio_identity`, `coupled_cutoff_prime_step_jump_and_dense_comparison_extension`, and `single_observable_common_referent_candidate_audit_and_trilemma`; Lean scope explicitly distinguished from paper factorial-divisor proofs and finite computational checks) |
+| **Arithmetic Cancellation in the Canonical Theta Correlation (`Section 16`, `TASK-TC-049`)** | `SUPERCRITICAL_DYADIC_BLOCK_OBSTRUCTION_SUBCRITICAL_COMPENSATION_AND_W_LOG_X_NEG_5_2_RESONANT_BAND_REDUCTION_PROVED_SUBGATE_OPEN` | Diagnosed the exact inequality step where signed cancellation is lost in all three prior routes (`TC-043`, `TC-046`, `TC-044`/`045`); defined the single-prime Euler recursion increments $J_p(X) := p^{-1/2}W_{p^-}(X/p) = W_{p^-}(X) - W_p(X)$ ($W_{M(X)}(X) = W_{\log}(X) - \sum_{p\le M(X)}J_p(X)$) and proved the **Supercritical Dyadic Prime Block Obstruction**: for all $A \ge 9/2$ and every prime $p > AX$, $J_p(X) < 0$ satisfies $c_0(A)X^{5/2}p^{-3} \le -J_p(X) \le C_{\log,0}X^{5/2}p^{-3}$ ($c_0(5) \approx 0.021931 > 0.0219$), so $-\sum_{AX < p \le 2AX}J_p(X) \ge \frac{3c_0(A)}{32 A^2}\frac{\sqrt{X}}{\log(2AX)} \to +\infty$; proved **Cancellation Mechanism 1** (exact coefficient annihilation $\Delta_{y_1}(n) - \sum_{y_1 < p \le y_2, p\mid n}\lambda_{p^-}(n/p) = \Delta_{y_2}(n)$, yielding $D_{y_1}(X) + T_{(y_1, y_2]}(X) = D_{y_2}(X) < 0$ and the **Unconditional Linear-Cutoff Divergence Theorem** $W(X) - W_{\lfloor AX\rfloor}(X) > T_{(\lfloor AX\rfloor, \lfloor 2AX\rfloor]}(X) \ge \frac{3c_0(A)}{32 A^2}\frac{\sqrt{X}}{\log(2AX)} \to +\infty$); and proved **Cancellation Mechanism 2**: because $H_0(z)$ is even, its triple zero at $z = -1/2$ cancels the smooth Stirling $\frac{1}{2}\log(2\pi x)$ moment identically, so 4th-order Euler–Maclaurin proves $W_{\log}(X) = -\frac{81\zeta(3)}{256\pi^2}X^{-5/2} + R_{\log,\mathrm{EM}}(X)$ and $|W_{\log}(X)| \le C_{\log,\mathrm{EM}}X^{-5/2}$ ($C_{\log,\mathrm{EM}} \approx 13.468513 < 13.47$) for all $X \ge 1$ (improving `TC-044`'s $O(X^{-1/2}\log X)$ bound by two full powers of $X$), which bounds the small-divisor head $|R_{\mu,\mathrm{head}}(X)| \le \frac{5}{6}C_{\log,\mathrm{EM}} < 11.224$ ($2 \le m \le \lfloor X^{5/6}\rfloor$) unconditionally and reduces `SUBGATE-TC-043A` to the **Localized Resonant Divisor Band** $X^{5/6} < m \le M(X)$ ($|R_\mu(X) - R_{\mu,\mathrm{band}}(X)| < 11.503$ for all $X \ge 1$, certified across `213` outward-rounded 256-bit Arb balls in `section_18`) |
+| **Universal Arithmetic Inequality (`Section 7`, `Section 10`, `Section 11`, `Section 12`, `Section 13`, `Section 14`, `Section 15` & `Section 16`)** | `UNIVERSAL_ARITHMETIC_CORRELATION_BOUND_OPEN` | Isolated as `SUBGATE-TC-042A`, `SUBGATE-TC-042B`, and `SUBGATE-TC-043A`: $\exists M < \infty \; \forall X \ge 1 : |R_\mu(X)| := |\sum_{m\ge 2}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)| \le M$ (equivalently $\sup_{X\ge 1}|R_{\mu,\mathrm{band}}(X)| < \infty$ over the localized resonant band $X^{5/6} < m \le M(X) = \lceil\max(2, X^{5/4})\rceil$) |
+| **Formalization Coverage (`Section 8`, expanded in `TASK-TC-042R2`, `TASK-TC-042F`, `TASK-TC-043`, `TASK-TC-043R`, `TASK-TC-044`, `TASK-TC-045`, `TASK-TC-045R`, `TASK-TC-046`, `TASK-TC-047`, `TASK-TC-048` & `TASK-TC-049`)** | `FORMALIZED_IN_LEAN4_ZERO_SORRY` | [`formal/RiemannScope/CanonicalThetaCorrelationBound.lean`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean): **32 definitions**, **50 theorems**, 0 `sorry`, 0 `admit` (including `prime_euler_multiplicative_integrality_and_grade_layer_membership`, `common_referent_integer_layer_bridge_and_station_ratio_identity`, `coupled_cutoff_prime_step_jump_and_dense_comparison_extension`, `single_observable_common_referent_candidate_audit_and_trilemma`, and `prime_increment_telescoping_and_resonant_band_reduction`; Lean scope explicitly distinguished from paper factorial-divisor/Euler–Maclaurin proofs and finite computational checks) |
 | **Independent Review Status** | `AWAITING_INDEPENDENT_REVIEW` | Mathematical status separated from structural and test execution |
 
 ---
@@ -1373,30 +1374,32 @@ For a hypothetical nontrivial zero $\rho = \frac{1}{2} + \delta + i\gamma$ ($\de
 
 3. **Candidate 2B — Prime-Euler Stieltjes Shift Difference $D_{K,y}^{(2\mathrm{B})}(\rho_K) = W_y(\tau^{1+|\delta(\rho_K)|}) - W_y(\tau)$ (Correction 2)**:
    - **Established (`CR1`)**: Since $d\log\mathcal{A}_{K,y}(x) = d\log\mathcal{N}_y(x)$ cancels $\tau^K$ and $\delta(\rho_K) = \operatorname{Re}(\tau^{-K}\rho_K) - \frac{1}{2} = \delta$ is grade-invariant, $D_{K,y}^{(2\mathrm{B})}(\rho_K) = D_{J,y}^{(2\mathrm{B})}(\rho_J)$ holds unconditionally (`CR1`).
-   - **Missing (General `CR3` and `CR2`) & Enclosure Audit at $\delta = 1/20, y = 28$**: At series truncation `n_cut = 800`, the exported 256-bit Arb enclosure at $\delta = 1/20, y = 28$ is
+   - **Missing (General `CR3` and `CR2`) & Enclosure Audit at $\delta = 1/20, y = 28$**: At series truncation `n_cut = 800`, the exported 256-bit Arb outward-rounded enclosure at $\delta = 1/20, y = 28$ is
      $$
      D_{K,28}^{(2\mathrm{B})}\big|_{\delta=1/20,\, n_{\mathrm{cut}}=800} \in \bigl[-0.0000715342,\; +0.0069867010\bigr] \qquad (\text{mid } +0.0034575834 \pm 3.53 \times 10^{-3}),
      $$
-     which **includes zero** because of the $O(n_{\mathrm{cut}}^{-2})$ series tail radius $3.5291 \times 10^{-3}$. Refining the truncation to `n_cut = 2500` certifies positivity at that specific sample point:
+     which **includes zero** because of the $O(n_{\mathrm{cut}}^{-2})$ series tail radius $3.5291 \times 10^{-3}$. Refining the truncation to `n_cut = 2500` certifies positivity at that specific sample point via the outward-rounded interval:
      $$
-     D_{K,28}^{(2\mathrm{B})}\big|_{\delta=1/20,\, n_{\mathrm{cut}}=2500} \in \bigl[+0.0030019824,\; +0.0038393714\bigr] \qquad (\text{mid } +0.0034206769 \pm 4.19 \times 10^{-4} > 0),
+     D_{K,28}^{(2\mathrm{B})}\big|_{\delta=1/20,\, n_{\mathrm{cut}}=2500} \in \bigl[+0.0030019823,\; +0.0038393714\bigr] \qquad (\text{mid } +0.0034206769 \pm 4.19 \times 10^{-4} > 0),
      $$
-     alongside $\delta = 1/10$ ($[+0.0064310655, +0.0074691038]$) and $\delta = 1/4$ ($[+0.0175051660, +0.0192578283]$). However, finite-point Arb enclosures do **not** establish general off-critical nonvanishing $W_y(\tau^{1+|\delta|}) \ne W_y(\tau)$ for all $\delta \in (-1/2, 1/2)\setminus\{0\}$ and all $y \ge 2$, and $D_{K,y}^{(2\mathrm{B})}$ also lacks integer-layer membership `CR2`. Accordingly, Candidate 2B is classified as **Established: Raw equality (`CR1`); Missing: General off-critical nonvanishing (`CR3`) and integer-layer membership (`CR2`)**.
+     alongside $\delta = 1/10$ ($[+0.0054161953,\; +0.0063740858]$) and $\delta = 1/4$ ($[+0.0089056168,\; +0.0104459661]$). However, finite-point Arb enclosures do **not** establish general off-critical nonvanishing $W_y(\tau^{1+|\delta|}) \ne W_y(\tau)$ for all $\delta \in (-1/2, 1/2)\setminus\{0\}$ and all $y \ge 2$, and $D_{K,y}^{(2\mathrm{B})}$ also lacks integer-layer membership `CR2`. Accordingly, Candidate 2B is classified as **Established: Raw equality (`CR1`); Missing: General off-critical nonvanishing (`CR3`) and integer-layer membership (`CR2`)**.
 
 #### Certified 256-Bit Arb Evaluation Across the First 10 Nontrivial Zeta Zero Ordinates $\gamma_1, \dots, \gamma_{10}$ (`Section 17.3`, `198` Outward-Rounded Arb Balls)
 
-| Zero Index $k$ | Certified Ordinate $\gamma_k$ | $\|H_0(i\gamma_k)\|^2$ ($\delta = 0$) | $\|H_0(\tfrac{1}{10} + i\gamma_k)\|^2$ | $D^{(2\mathrm{A})}\bigl(\tfrac{1}{2} + \tfrac{1}{10} + i\gamma_k\bigr)$ ($\delta = 1/10$) | Cross-Grade Agreement $\|D_{K=1}^{(2\mathrm{A})} - D_{K=0}^{(2\mathrm{A})}\|$ |
+*(Note: In the last column below, `[+/- ...]` records the exported 256-bit Arb ball enclosure of $D_{K=0}^{(2\mathrm{A})} - D_{K=1}^{(2\mathrm{A})}$ evaluated via independent grade-scaled pullbacks; numerical zero-containment of these finite-precision Arb balls is a consistency check, whereas exact raw cross-grade equality $D_K^{(2\mathrm{A})}(\rho_K) = D_J^{(2\mathrm{A})}(\rho_J)$ (`CR1`) is proved symbolically by $\tau^{-K}\rho_K - \frac{1}{2} = \rho - \frac{1}{2}$.)*
+
+| Zero Index $k$ | Certified Ordinate $\gamma_k$ | $\|H_0(i\gamma_k)\|^2$ ($\delta = 0$) | $\|H_0(\tfrac{1}{10} + i\gamma_k)\|^2$ | $D^{(2\mathrm{A})}\bigl(\tfrac{1}{2} + \tfrac{1}{10} + i\gamma_k\bigr)$ ($\delta = 1/10$) | Exported 256-Bit Arb Ball $D_{K=0}^{(2\mathrm{A})} - D_{K=1}^{(2\mathrm{A})}$ |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| $1$ | $14.1347251417$ | $2.25674803 \times 10^{-7}$ | $2.25759173 \times 10^{-7}$ | $7.64716468 \times 10^{-9} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $2$ | $21.0220396388$ | $3.46638531 \times 10^{-14}$ | $3.46767921 \times 10^{-14}$ | $1.17437131 \times 10^{-15} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $3$ | $25.0108575801$ | $1.69364019 \times 10^{-18}$ | $1.69427210 \times 10^{-18}$ | $5.73757252 \times 10^{-20} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $4$ | $30.4248761259$ | $1.31246449 \times 10^{-24}$ | $1.31295405 \times 10^{-24}$ | $4.44608494 \times 10^{-26} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $5$ | $32.9350615877$ | $1.62012542 \times 10^{-27}$ | $1.62072971 \times 10^{-27}$ | $5.48824737 \times 10^{-29} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $6$ | $37.5861781588$ | $5.29691470 \times 10^{-33}$ | $5.29889021 \times 10^{-33}$ | $1.79432479 \times 10^{-34} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $7$ | $40.9187190121$ | $5.37636689 \times 10^{-37}$ | $5.37837195 \times 10^{-37}$ | $1.82122406 \times 10^{-38} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $8$ | $43.3270732809$ | $6.56277597 \times 10^{-40}$ | $6.56522346 \times 10^{-40}$ | $2.22310492 \times 10^{-41} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $9$ | $48.0051508812$ | $1.26550907 \times 10^{-45}$ | $1.26598101 \times 10^{-45}$ | $4.28681189 \times 10^{-47} > 0$ | $0$ (`0` in 256-bit Arb) |
-| $10$ | $49.7738324777$ | $8.40985680 \times 10^{-48}$ | $8.41299305 \times 10^{-48}$ | $2.84876602 \times 10^{-49} > 0$ | $0$ (`0` in 256-bit Arb) |
+| $1$ | $14.1347251417$ | $2.25674803 \times 10^{-7}$ | $2.25759173 \times 10^{-7}$ | $7.64716468 \times 10^{-9} > 0$ | `[+/- 1.50e-80]` (encloses $0$) |
+| $2$ | $21.0220396388$ | $3.46638531 \times 10^{-14}$ | $3.46697251 \times 10^{-14}$ | $1.17437131 \times 10^{-15} > 0$ | `[+/- 3.38e-88]` (encloses $0$) |
+| $3$ | $25.0108575801$ | $1.69364019 \times 10^{-18}$ | $1.69384299 \times 10^{-18}$ | $5.73757252 \times 10^{-20} > 0$ | `[+/- 1.27e-92]` (encloses $0$) |
+| $4$ | $30.4248761259$ | $1.31246449 \times 10^{-24}$ | $1.31257074 \times 10^{-24}$ | $4.44608494 \times 10^{-26} > 0$ | `[+/- 1.15e-98]` (encloses $0$) |
+| $5$ | $32.9350615877$ | $1.62012542 \times 10^{-27}$ | $1.62023736 \times 10^{-27}$ | $5.48824737 \times 10^{-29} > 0$ | `[+/- 1.80e-101]` (encloses $0$) |
+| $6$ | $37.5861781588$ | $5.29691470 \times 10^{-33}$ | $5.29719574 \times 10^{-33}$ | $1.79432479 \times 10^{-34} > 0$ | `[+/- 4.95e-107]` (encloses $0$) |
+| $7$ | $40.9187190121$ | $5.37636689 \times 10^{-37}$ | $5.37660760 \times 10^{-37}$ | $1.82122406 \times 10^{-38} > 0$ | `[+/- 5.27e-111]` (encloses $0$) |
+| $8$ | $43.3270732809$ | $6.56277597 \times 10^{-40}$ | $6.56303805 \times 10^{-40}$ | $2.22310492 \times 10^{-41} > 0$ | `[+/- 6.98e-114]` (encloses $0$) |
+| $9$ | $48.0051508812$ | $1.26550907 \times 10^{-45}$ | $1.26555024 \times 10^{-45}$ | $4.28681189 \times 10^{-47} > 0$ | `[+/- 1.97e-119]` (encloses $0$) |
+| $10$ | $49.7738324777$ | $8.40985680 \times 10^{-48}$ | $8.41011131 \times 10^{-48}$ | $2.84876602 \times 10^{-49} > 0$ | `[+/- 1.02e-121]` (encloses $0$) |
 
 #### Research Gain, Decisive Open Question, and Status of `SUBGATE-TC-043A` (`OPEN`)
 
@@ -1405,6 +1408,148 @@ For a hypothetical nontrivial zero $\rho = \frac{1}{2} + \delta + i\gamma$ ($\de
   > **What additional identity satisfied specifically by actual zeta zeros $\zeta(\rho) = 0$ forces this same detector into the required integer layers $L_K = \tau^K\mathbb{Z}$ (`CR2`)?**
 - **Status of `SUBGATE-TC-043A` (`OPEN`)**:
   `SUBGATE-TC-043A` remains `OPEN` and `common_referent_bridge_complete = False`: closing `SUBGATE-TC-043A` requires either proving the uniform signed Möbius cancellation bound $\sup_{X\ge 1}|R_\mu(X)| < \infty$ (equivalently $\sup_{X\ge 1}|W_{M(X)}(X)| < \infty$), or deriving an independent zero-specific identity from $\zeta(\rho) = 0$ that forces a raw-invariant, off-critical-positive detector into $L_K = \tau^K\mathbb{Z}$.
+
+---
+
+## 16. Arithmetic Cancellation in the Canonical Theta Correlation (`TASK-TC-049`, `Section 18`)
+
+### 16.1 Exact Starting Point and Diagnosis of Where Existing Estimates Lose Cancellation (`Section 18.1`)
+
+1. **Established Starting Identities**:
+   For $X = \tau^{|K-L|} \ge 1$ ($K, L \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}}\cap\mathbb{R}$, positive and negative grades) and $M(X) = \lceil\max(2, X^{5/4})\rceil$:
+   $$
+   C_\tau(K - L) = Q_\tau(T_K\psi_\tau, T_L\psi_\tau) = B_{\mathrm{known}}(K, L) - R_\mu(X), \qquad W(X) = W_{\log}(X) + R_\mu(X), \qquad R_\mu(X) = \sum_{m\ge 2}\frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right),
+   $$
+   $$
+   W_y(X) = \prod_{p\le y}\bigl(I - p^{-1/2}D_p\bigr)W_{\log}(X) = W_{\log}(X) + \sum_{\substack{m\mid P_y \\ m\ge 2}}\frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right), \qquad \bigl|W(X) - W_{M(X)}(X)\bigr| = \bigl|R_\mu(X) - R_{\mu,M(X)}(X)\bigr| \le \frac{1}{2}C_{\log,0} < 0.278715.
+   $$
+2. **Exact Step Where Signed Arithmetic Cancellation Is Lost in Each Prior Route**:
+   - **Route 1 — Spatial Chebyshev Prime-Error Majorant (`TC-043` / `TC-043R`)**:
+     In $I(X) = \int_1^\infty E(x)x^{-3/2}\widetilde{h}_0(x/X)\,dx = \sqrt{X}\int_{1/X}^\infty \frac{E(X\alpha)}{X\alpha}k(\alpha)\,d\alpha$ ($k(\alpha) = \alpha^{-1/2}\widetilde{h}_0(\alpha)$), the triangle inequality
+     $$
+     |I(X)| \le A_E(X) := \int_1^\infty |E(x)|\,x^{-3/2}\,\bigl|\widetilde{h}_0(x/X)\bigr|\,dx \le M_\omega(X) := \sqrt{X}\int_{1/X}^\infty \omega(X\alpha)\,|k(\alpha)|\,d\alpha
+     $$
+     replaces the zero-mean signed kernel $k(\alpha)$ (satisfying $\int_0^\infty k(\alpha)\,d\alpha = H_0(1/2) = 0$ across its 7 sign changes) by $|k(\alpha)| \ge 0$ ($c_0 = \int_{1/2}^2 |k(\alpha)|\,d\alpha \approx 1.74569809 > 0$), forcing $M_\omega(X) \ge c_0\sqrt{X}\,\omega(2X)$.
+   - **Route 2 — Critical-Line Euler-Sieved Seed Gram Norm (`TC-046` / `TC-046R2`)**:
+     In $W_y(X) = -\frac{1}{\tau}\int_{-\infty}^\infty E_y(it)H_0(it)\zeta'(1/2+it)X^{it}\,dt$, applying Cauchy–Schwarz on $\operatorname{Re}(z) = 0$,
+     $$
+     |W_y(X)| \le \|\Psi_y\|_{L^2(d^\times x)}\,N_{\zeta',\tau}, \qquad \|\Psi_y\|_{L^2(d^\times x)}^2 = \frac{1}{\tau}\int_{-\infty}^\infty |E_y(it)|^2 H_0(it)\,dt,
+     $$
+     drops the oscillatory Fourier phase $X^{it}$ and the phase correlation with $\zeta'(1/2+it)$. On the coherent low-frequency interval $I_y = [\frac{7\tau}{16\log y}, \frac{\tau}{2\log y}]$ of width $|I_y| = \frac{\tau}{16\log y}$, every prime $p \le y$ has $t\log p \in (0, \pi]$ where $\frac{d}{dt}|1 - p^{-1/2-it}|^2 \ge 0$, forcing $\|\Psi_y\|_{L^2}^2 \ge \frac{H_0(0)}{8\log y}\exp\bigl[(4\cos(\tau/16)+o(1))\sqrt{y}/\log y\bigr] \to +\infty$.
+   - **Route 3 — Divisor-Aggregated Stieltjes & Möbius Bounds (`TC-044` / `TC-045`)**:
+     1. *Loss of two powers of $X$ in `TC-044`'s bound on $W_{\log}(X)$*: In $W_{\log}(X) = B_{\log,\mathrm{boundary}}(X) + \int_1^\infty E_{\log}(x)x^{-3/2}\widetilde{h}_0(x/X)\,dx$, inserting the unsigned Stirling bound $|E_{\log}(x)| \le \frac{1}{2}\log x + 1$ inside the integral destroys the exact vanishing of the smooth Stirling $\frac{1}{2}\log(2\pi x)$ moment against $\widetilde{h}_0(x/X)$ (which vanishes identically on $(0, \infty)$ because $H_0(z)$ is even and therefore also has a triple zero at $z = -1/2$: $H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0$!). That triangle inequality lost two full powers of $X$, giving $O(X^{-1/2}\log X)$ instead of the true $O(X^{-5/2})$ decay of $W_{\log}(X)$.
+     2. *Loss of Möbius sign cancellation in $R_\mu(X)$*: In $R_\mu(X) = \sum_{m\ge 2}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)$, replacing $\mu(m)$ by $|\mu(m)| \le 1$ across the resonant transition band $m \asymp X$ loses the alternating sign cancellation of $\mu(m)$.
+
+---
+
+### 16.2 Prime-Increment Telescoping, Proved Supercritical Dyadic Block Obstruction, and Cancellation Mechanism 1 (`Section 18.2`, Theorem 50)
+
+1. **Single-Prime Euler Recursion Increments $J_p(X)$**:
+   Enumerating the primes $2 = p_1 < p_2 < \dots < p_k \le y$ with $W_{p_0}(X) := W_{\log}(X)$ and $p^- := p_{j-1}$ for $p = p_j$, the one-prime step $W_p(X) = (I - p^{-1/2}D_p)W_{p^-}(X) = W_{p^-}(X) - p^{-1/2}W_{p^-}(X/p)$ defines the single-prime increment (`primeIncrementStep` in `CanonicalThetaCorrelationBound.lean`):
+   $$
+   J_p(X) := p^{-1/2}\,W_{p^-}\!\left(\frac{X}{p}\right) = W_{p^-}(X) - W_p(X), \qquad W_y(X) = W_{\log}(X) - \sum_{p\le y} J_p(X), \qquad R_{\mu,M(X)}(X) = W_{M(X)}(X) - W_{\log}(X) = -\sum_{p\le M(X)} J_p(X).
+   $$
+
+2. **Theorem (Proved Supercritical Dyadic Prime Block Obstruction)**:
+   Write $-h_0(\alpha) = (\alpha + \alpha^{-1})^{-5/2}\kappa(\alpha + \alpha^{-1})$ where $\kappa(S) = \frac{81}{64} - \frac{14595}{128 S^2} + \frac{176715}{128 S^4} - \frac{2027025}{512 S^6}$ satisfies $\kappa'(S) > 0$ for all $S \ge 9 > \alpha_3^* + (\alpha_3^*)^{-1} \approx 8.7373$ and $\kappa(10) = \frac{132858975}{512000000} \approx 0.25949019 > \frac{1}{4}$.
+   - **Pointwise Two-Sided Supercritical Inequality**: For every $A \ge 9/2$ (e.g. $A = 5$), every $X > 0$, and every prime $p > AX$, in the expansion $J_p(X) = \sum_{n=2}^\infty \frac{\lambda_{p^-}(n)}{\sqrt{np}}h_0(np/X)$, every integer $n \ge 2$ satisfies $\alpha_n = np/X \ge 2p/X > 2A \ge 9 > \alpha_3^* \approx 8.621336$, so $-h_0(np/X) > 0$ and $\lambda_{p^-}(n) \ge 0$ with $\lambda_{p^-}(2) = \log 2 > 0$. Thus **every term in $-J_p(X)$ is nonnegative**, and retaining the $n = 2$ term gives:
+     $$
+     \boxed{J_p(X) < 0, \qquad c_0(A)\,X^{5/2}\,p^{-3} \le \frac{\log 2}{\sqrt{2p}}\bigl(-h_0(2p/X)\bigr) \le -J_p(X) \le C_{\log,0}\,X^{5/2}\,p^{-3} \qquad (\forall p > AX, \; A \ge 9/2),}
+     $$
+     where $c_0(A) := \frac{\log 2}{8}\kappa(2A)\bigl(1 + (2A)^{-2}\bigr)^{-5/2} > 0$, with $c_0(5) \approx 0.02193072 > 0.0219$ and $\lim_{A\to\infty}c_0(A) = \frac{81\log 2}{512} \approx 0.10965805$.
+   - **Dyadic Block Divergence**: For any fixed $A \ge 5$ and $X \ge 59/A$ (and when $X \ge (2A)^4$, the entire dyadic block $(AX, 2AX]$ lies inside $[1, M(X)] = [1, \lceil X^{5/4}\rceil]$), Rosser–Schoenfeld (1962, Cor. 1: $\pi(2u) - \pi(u) \ge \frac{3u}{4\log(2u)}$ for $u \ge 59$) yields:
+     $$
+     \boxed{\left|\sum_{AX < p \le 2AX} J_p(X)\right| = -\sum_{AX < p \le 2AX} J_p(X) \ge c_0(A)\,X^{5/2}\sum_{AX < p \le 2AX} p^{-3} \ge \frac{3\,c_0(A)}{32\,A^2}\,\frac{\sqrt{X}}{\log(2AX)} \asymp_A \frac{\sqrt{X}}{\log X} \to +\infty.}
+     $$
+     *Scoped Obstruction Conclusion*: Any proof strategy that attempts to bound $\sum_{p\le M(X)} J_p(X)$ by bounding dyadic prime blocks $AX < p \le 2AX$ in absolute value (or summing $|J_p(X)|$) is unconditionally obstructed because every supercritical prime $p > \frac{9}{2}X$ has the **same negative sign** $J_p(X) < 0$.
+
+3. **Cancellation Mechanism 1 (Subcritical Sieve-Defect vs. Supercritical Prime-Increment Resummation & Unconditional Linear-Cutoff Divergence Theorem)**:
+   For any prime cutoffs $y_2 > y_1 \ge \lfloor AX\rfloor$ with $A \ge 9/2$ (e.g. $A = 5$, $y_1 = \lfloor 5X\rfloor$, $y_2 = \max(\lfloor 10X\rfloor, M(X))$):
+   - Every unsieved composite $n \ge 2 q_{>y_1} > 2AX \ge 9X$ lies in the negative tail $h_0(n/X) < 0$, so both sieve defects $D_{y_1}(X) := W_{y_1}(X) - W(X) = \sum_{n\ge 2q_{>y_1}}\frac{\Delta_{y_1}(n)}{\sqrt{n}}h_0(n/X) < 0$ and $D_{y_2}(X) := W_{y_2}(X) - W(X) < 0$ are **strictly negative**, while $T_{(y_1, y_2]}(X) := -\sum_{y_1 < p \le y_2} J_p(X) > 0$ is **strictly positive**.
+   - The exact coefficient identity
+     $$
+     \Delta_{y_1}(n) - \sum_{\substack{y_1 < p \le y_2 \\ p \mid n}} \lambda_{p^-}(n/p) = \Delta_{y_2}(n)
+     $$
+     annihilates every composite multiple $n = mp < 2 q_{>y_2}$ identically, proving the exact sign-definite compensation identity:
+     $$
+     \boxed{D_{y_1}(X) + T_{(y_1, y_2]}(X) = D_{y_2}(X) < 0 \iff W(X) - W_{y_1}(X) = -D_{y_1}(X) = T_{(y_1, y_2]}(X) + \bigl(-D_{y_2}(X)\bigr) > T_{(y_1, y_2]}(X) > 0!}
+     $$
+   - **Corollary (Unconditional Linear-Cutoff Divergence Theorem)**: Taking $y_1 = \lfloor AX\rfloor$ and $y_2 = \lfloor 2AX\rfloor$ ($A \ge 5, X \ge 59/A$) proves unconditionally:
+     $$
+     \boxed{W(X) - W_{\lfloor AX\rfloor}(X) = -D_{\lfloor AX\rfloor}(X) > T_{(\lfloor AX\rfloor, \lfloor 2AX\rfloor]}(X) \ge \frac{3\,c_0(A)}{32\,A^2}\,\frac{\sqrt{X}}{\log(2AX)} \to +\infty \qquad (X \to \infty),}
+     $$
+     establishing unconditionally that any linear prime cutoff $y = \lfloor AX\rfloor$ diverges from $W(X)$ at rate $\Theta_A(\sqrt{X}/\log X)$, and that super-linear sieving (such as $y = M(X) = \lceil X^{5/4}\rceil$, where $|D_{M(X)}(X)| = |D_{\lfloor AX\rfloor}(X) + T_{(\lfloor AX\rfloor, M(X)]}(X)| \le \frac{1}{2}C_{\log,0} < 0.278715$) is necessary and sufficient for $O(1)$ comparison.
+
+| Scale $X$ | Block $(5X, 10X]$ | Primes in Block | Analytic Lower Bound $c_0(5)X^{5/2}\sum p^{-3}$ | $n = 2$ Lower Bound $\sum \frac{\log 2}{\sqrt{2p}}(-h_0(2p/X))$ | Dyadic Block Sum $T_{(5X,10X]}(X) = -\sum J_p(X)$ | Sieve Defect $D_{\lfloor 5X\rfloor}(X) < 0$ | Compensated Defect $D_{\lfloor 10X\rfloor}(X) = D_{\lfloor 5X\rfloor} + T_{(5X,10X]} < 0$ |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $2$ | $(10, 20]$ | $4$ | $+0.00019301$ | $+0.00045244$ | $+0.00117589$ | $-0.00145561$ | $-0.00027980$ |
+| $4$ | $(20, 40]$ | $4$ | $+0.00012387$ | $+0.00032186$ | $+0.00079471$ | $-0.00126797$ | $-0.00047348$ |
+| $\tau \approx 6.2832$ | $(31, 62]$ | $7$ | $+0.00015724$ | $+0.00043229$ | $+0.00103975$ | $-0.00151536$ | $-0.00047625$ |
+| $10$ | $(50, 100]$ | $10$ | $+0.00021480$ | $+0.00052539$ | $+0.00133481$ | $-0.00193772$ | $-0.00060469$ |
+| $16$ | $(80, 160]$ | $15$ | $+0.00024648$ | $+0.00060423$ | $+0.00153329$ | $-0.00219641$ | $-0.00066539$ |
+| $25$ | $(125, 250]$ | $23$ | $+0.00031913$ | $+0.00074790$ | $+0.00193986$ | — | — |
+
+---
+
+### 16.3 Cancellation Mechanism 2: 4th-Order Euler–Maclaurin $O(X^{-5/2})$ Decay of $W_{\log}(X)$ and Localized Resonant-Band Reduction (`Section 18.3`, Theorem 50)
+
+1. **Exact Large-$X$ Asymptotic & Global $O(X^{-5/2})$ Bound for $W_{\log}(X)$**:
+   Because $H_0(z) = F_\tau(1/2+z)F_\tau(1/2-z)$ is **even** in $z$, it has triple zeros at **both** $z = +1/2$ and $z = -1/2$:
+   $$
+   H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0 \implies \int_0^\infty x^{-1/2}(\log x)\,h_0(x/X)\,dx = 0 \qquad (\forall X > 0).
+   $$
+   Consequently, in the Mellin representation $\mathcal{M}_X[W_{\log}](z) = -H_0(z)\zeta'(z+1/2)$, the integrand is holomorphic across the entire open strip $-5/2 < \operatorname{Re}(z) < 5/2$, and its first left-half-plane simple pole is at $z = -5/2$ ($s = -2$, the first trivial zero of $\zeta(s)$, where $\zeta'(-2) = -\frac{\zeta(3)}{4\pi^2}$ and $\lim_{z\to -5/2}\frac{H_0(z)}{z+5/2} = -\frac{81}{64}$), with residue:
+   $$
+   \operatorname*{Res}_{z=-5/2}\bigl(-H_0(z)\zeta'(z+1/2)X^z\bigr) = -\frac{81\,\zeta(3)}{256\,\pi^2}\,X^{-5/2} \approx -0.0385363285\,X^{-5/2},
+   $$
+   followed by the second simple pole at $z = -9/2$ ($s = -4$) with residue $-\frac{5625\,\zeta(5)}{64\,\pi^4}X^{-9/2} \approx -0.93560290\,X^{-9/2}$.
+   In the spatial domain, writing $g_X(x) := x^{-1/2}(\log x)h_0(x/X) = X^{-1/2}(\log x)\psi_0(x/X)$ where $\psi_0(\alpha) := \alpha^{-1/2}h_0(\alpha) = -\frac{81}{64}\alpha^2 + \frac{1875}{16}\alpha^4 - \frac{972405}{512}\alpha^6 + O(\alpha^8)$ satisfies $\psi_0(0) = \psi_0'(0) = \psi_0'''(0) = 0$ and $\int_1^\infty g_X(x)\,dx = -\int_0^1 g_X(x)\,dx$, 4th-order Euler–Maclaurin summation on $[1, \infty)$ gives the exact identity:
+   $$
+   \boxed{W_{\log}(X) = -\int_0^1 g_X(x)\,dx + \frac{1}{12}g_X'(1) + \frac{1}{24}\int_1^\infty \{x\}^2\bigl(1 - \{x\}\bigr)^2\,g_X^{(4)}(x)\,dx = -\frac{81\,\zeta(3)}{256\,\pi^2}\,X^{-5/2} + R_{\log,\mathrm{EM}}(X),}
+   $$
+   where $\sup_{x \in \mathbb{R}}\{x\}^2(1-\{x\})^2 = \frac{1}{16}$ (so $\frac{1}{24}\cdot\frac{1}{16} = \frac{1}{384}$) and
+   $$
+   g_X^{(4)}(x)\,dx = X^{-7/2}\Bigl[(\log X + \log\alpha)\,\psi_0^{(4)}(\alpha) + L(\alpha)\Bigr]\,d\alpha, \qquad L(\alpha) = \frac{81}{32\,\alpha^2(1+\alpha^2)^{23/2}} + R_L(\alpha),
+   $$
+   with the singular term $\frac{1}{24}\int_1^\infty \{x\}^2(1-\{x\})^2\frac{81}{32}x^{-2}\,dx = \frac{27}{256}\int_1^\infty \{x\}^2(1-\{x\})^2 x^{-2}\,dx$ combining with $\frac{1}{12}g_X'(1)\big|_{O(X^{-5/2})} = -\frac{27}{128}X^{-5/2}$ to produce the exact constant $-\frac{81\zeta(3)}{256\pi^2}X^{-5/2}$!
+   With the certified 256-bit Arb integrals $I_{d4,0} := \int_0^\infty |\psi_0^{(4)}(\alpha)|\,d\alpha = 2\sum_{j=1}^9 |\psi_0'''(r_j)| \approx 2171.992855$, $I_{d4,\log} := \int_0^\infty |\log\alpha|\,|\psi_0^{(4)}(\alpha)|\,d\alpha \approx 2357.226431$, and $I_{R_L} := \int_0^\infty |R_L(\alpha)|\,d\alpha \approx 1803.044678$, we obtain unconditionally for **all $X \ge 1$**:
+   $$
+   \boxed{\bigl|W_{\log}(X)\bigr| \le \left(\frac{217709}{393216} + \frac{I_{d4,0}}{384}\,\frac{\log X}{X} + \frac{I_{d4,\log} + I_{R_L}}{384}\,\frac{1}{X}\right) X^{-5/2} \le C_{\log,\mathrm{EM}}\,X^{-5/2}, \qquad C_{\log,\mathrm{EM}} \approx 13.468513 < 13.47,}
+   $$
+   improving `TC-044`'s $O(X^{-1/2}\log X)$ bound by **two full powers of $X$**.
+
+2. **Theorem (Unconditional Small-Divisor Head Bound & Localized Resonant-Band Reduction — `prime_increment_telescoping_and_resonant_band_reduction` in Lean 4)**:
+   Combining the small-scale bound $|W_{\log}(u)| \le C_{\log,0}\,u^{5/2}$ ($u > 0$, $C_{\log,0} \approx 0.557430$) with the new large-scale bound $|W_{\log}(u)| \le C_{\log,\mathrm{EM}}\,u^{-5/2}$ ($u \ge 1$) gives the two-sided localization envelope $|W_{\log}(u)| \le C_{\log,*}\min(u^{5/2}, u^{-5/2})$. Splitting $R_\mu(X) = \sum_{m=2}^\infty \frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)$ at the lower divisor cutoff $M_-(X) := \lfloor X^{5/6}\rfloor$ and upper divisor cutoff $M_+(X) := M(X) = \lceil\max(2, X^{5/4})\rceil$ (`localizedResonantBandDecomp`) proves unconditionally for **all $X \ge 1$**:
+   - **Small-Divisor Head ($2 \le m \le M_-(X) = \lfloor X^{5/6}\rfloor$)**: Since $X/m \ge X^{1/6} \ge 1$ and $\sum_{m=2}^N m^2 = \frac{N(N+1)(2N+1)}{6} - 1 \le \frac{5}{6}N^3$ for all $N \ge 2$ (by $\frac{5}{6}N^3 - (\frac{N(N+1)(2N+1)}{6}-1) = \frac{3N^2(N-2)+3N(N-1)+2N+6}{6} > 0$),
+     $$
+     \bigl|R_{\mu,\mathrm{head}}(X)\bigr| \le \sum_{2 \le m \le M_-(X)} m^{-1/2}\,C_{\log,\mathrm{EM}}\!\left(\frac{X}{m}\right)^{-5/2} = C_{\log,\mathrm{EM}}\,X^{-5/2}\sum_{2 \le m \le M_-(X)} m^2 \le \frac{5}{6}\,C_{\log,\mathrm{EM}} \approx 11.223761 < 11.224.
+     $$
+   - **Large-Divisor Tail ($m > M_+(X) = M(X)$)**:
+     $$
+     \bigl|R_{\mu,\mathrm{tail}}(X)\bigr| \le \frac{1}{2}\,C_{\log,0} \approx 0.278715.
+     $$
+   - **Localized Resonant-Band Reduction (`SUBGATE-TC-043A`)**:
+     $$
+     \boxed{\bigl|R_\mu(X) - R_{\mu,\mathrm{band}}(X)\bigr| \le \frac{5}{6}\,C_{\log,\mathrm{EM}} + \frac{1}{2}\,C_{\log,0} \approx 11.502476 < 11.503 \qquad (\forall X \ge 1),}
+     $$
+     where
+     $$
+     R_{\mu,\mathrm{band}}(X) := \sum_{X^{5/6} < m \le M(X)} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right).
+     $$
+     Thus $\sup_{X\ge 1}|R_\mu(X)| < \infty \iff \sup_{X\ge 1}|R_{\mu,\mathrm{band}}(X)| < \infty$ (`SUBGATE-TC-043A`, which remains `OPEN`).
+
+| Scale $X$ | Certified $W_{\log}(X)$ | Leading Pole $-\frac{81\zeta(3)}{256\pi^2}X^{-5/2}$ | Scaled $X^{5/2}W_{\log}(X)$ | Cutoffs $[M_-(X), M_+(X)]$ | Head $R_{\mu,\mathrm{head}}(X)$ | Resonant Band $R_{\mu,\mathrm{band}}(X)$ | Tail $R_{\mu,\mathrm{tail}}(X)$ | Total $R_\mu(X)$ |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $1$ | $-0.04406116$ | $-0.03853633$ | $-0.04406116$ | $[1, 2]$ | $0.00000000$ | $-0.01388565$ | $+0.00063916$ | $-0.01324649$ |
+| $2$ | $+0.07050966$ | $-0.00681232$ | $+0.39886288$ | $[1, 3]$ | $0.00000000$ | $+0.01089686$ | $-0.00203560$ | $+0.00886125$ |
+| $4$ | $-0.00596533$ | $-0.00120426$ | $-0.19089064$ | $[3, 6]$ | $-0.00132953$ | $+0.00538404$ | $-0.01000058$ | $-0.00594607$ |
+| $\tau \approx 6.2832$ | $-0.00070696$ | $-0.00038942$ | $-0.06995896$ | $[4, 10]$ | $-0.03277626$ | $+0.03051173$ | $-0.00912692$ | $-0.01139145$ |
+| $10$ | $-0.00015479$ | $-0.00012186$ | $-0.04894887$ | $[6, 18]$ | $-0.01782577$ | $+0.01635663$ | $-0.00090466$ | $-0.00237379$ |
+| $16$ | $-0.00004103$ | $-0.00003763$ | $-0.04201912$ | $[10, 32]$ | $-0.01210838$ | $+0.00503841$ | $+0.00705325$ | $-0.00001672$ |
+| $25$ | $-0.00001263$ | $-0.00001233$ | $-0.03946676$ | $[14, 56]$ | $-0.01230231$ | $+0.01059916$ | $+0.00149318$ | $-0.00020997$ |
+| $\tau^2 \approx 39.4784$ | $-0.00000389$ | $-0.00000394$ | $-0.03812085$ | $[21, 99]$ | $-0.01089493$ | $+0.00948982$ | $+0.00072203$ | $-0.00068309$ |
+| $64$ | $-0.00000113$ | $-0.00000118$ | $-0.03697977$ | — | — | — | — | — |
+
 
 
 

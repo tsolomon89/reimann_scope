@@ -308,8 +308,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 30
-    assert len(ver["actual_theorems"]) == 49
+    assert len(ver["actual_defs"]) == 32
+    assert len(ver["actual_theorems"]) == 50
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -1983,6 +1983,125 @@ def test_32_task_tc048_single_observable_common_referent_audit(artifact_payload)
         rt17["compared_against_live_original_arb_count"]
         == enum17_recheck["total_certified_arb_balls_checked"]
     )
+
+
+def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
+    artifact_payload,
+):
+    """Verify TASK-TC-049 arithmetic cancellation diagnosis, supercritical dyadic prime block obstruction,
+    subcritical vs supercritical resummation, 4th-order Euler-Maclaurin O(X^{-5/2}) decay of W_log(X),
+    two-sided localized resonant divisor band reduction (X^{5/6} < m <= M(X)), and section_18 round-trip.
+    """
+    from tc.canonical_theta_correlation_bound import (
+        ARITHMETIC_CANCELLATION_CANONICAL_THETA_CORRELATION_STATUS,
+        STARTING_HEAD_TC_049,
+        TASK_TC_049_ID,
+        verify_all_serialized_arb_in_tree,
+    )
+
+    assert (
+        artifact_payload[
+            "arithmetic_cancellation_canonical_theta_correlation_task_id"
+        ]
+        == TASK_TC_049_ID
+    )
+    assert (
+        artifact_payload["status_dimensions"][
+            "arithmetic_cancellation_canonical_theta_correlation_status"
+        ]
+        == ARITHMETIC_CANCELLATION_CANONICAL_THETA_CORRELATION_STATUS
+    )
+    sec18 = artifact_payload[
+        "section_18_arithmetic_cancellation_in_canonical_theta_correlation"
+    ]
+    assert sec18["task_id"] == TASK_TC_049_ID
+    assert sec18["inspected_baseline"] == STARTING_HEAD_TC_049
+
+    s1_18 = sec18["section_1_starting_point_and_cancellation_loss_audit"]
+    assert (
+        "route_1_spatial_chebyshev_prime_error_majorant_tc043"
+        in s1_18["exact_cancellation_loss_diagnosis"]
+    )
+    assert (
+        "route_2_critical_line_euler_seed_gram_norm_tc046"
+        in s1_18["exact_cancellation_loss_diagnosis"]
+    )
+    assert (
+        "route_3_divisor_aggregated_stieltjes_and_moebius_bounds_tc044_tc045"
+        in s1_18["exact_cancellation_loss_diagnosis"]
+    )
+
+    s2_18 = sec18[
+        "section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation"
+    ]["certified_audit_data"]
+    assert s2_18["c0_A5_certified"]["mid_float"] > 0.0219
+    assert all(
+        row["all_primes_satisfy_two_sided_inequality"]
+        and row["block_satisfies_lower_and_upper_bounds"]
+        for row in s2_18["dyadic_block_table"]
+    )
+    assert all(
+        row["telescoping_at_y_sub_encloses_zero"]
+        and row["telescoping_at_M_X_encloses_zero"]
+        and row["compensation_identity_encloses_zero"]
+        and row["net_sum_bounded_by_half_C_log_0"]
+        and row["linear_cutoff_D_5X_strictly_negative"]
+        and row["linear_cutoff_T_5X_to_10X_strictly_positive"]
+        and row["linear_cutoff_D_10X_strictly_negative"]
+        and row["linear_cutoff_neg_D_5X_exceeds_T_5X_to_10X"]
+        and row["linear_cutoff_compensation_encloses_zero"]
+        for row in s2_18["subcritical_compensation_table"]
+    )
+
+    s3_18 = sec18[
+        "section_3_w_log_large_scale_decay_and_resonant_band_reduction"
+    ]["certified_audit_data"]
+    assert (
+        s3_18["global_euler_maclaurin_constant_C_log_EM_certified"]["mid_float"]
+        < 13.47
+    )
+    assert (
+        s3_18["small_divisor_head_global_bound_5_6_C_log_EM_certified"]["mid_float"]
+        < 11.224
+    )
+    assert (
+        s3_18["resonant_band_comparison_bound_certified"]["mid_float"] < 11.503
+    )
+    assert all(
+        row["satisfies_euler_maclaurin_bound"]
+        for row in s3_18["w_log_asymptotic_table"]
+    )
+    assert all(
+        row["head_satisfies_global_bound"]
+        and row["tail_satisfies_half_C_log_0_bound"]
+        and row["band_comparison_satisfies_global_bound"]
+        and row["three_zone_decomposition_encloses_zero"]
+        for row in s3_18["resonant_band_table"]
+    )
+
+    s4_18 = sec18["section_4_outcome_and_remaining_obligation"]
+    assert s4_18["symbolic_identities_verification"]["all_verified"] is True
+    assert (
+        s4_18["lean_theorem"]
+        == "prime_increment_telescoping_and_resonant_band_reduction"
+    )
+    assert s4_18["closes_subgate_tc043a"] is False
+    rem18 = s4_18["remaining_open_obligation"]
+    assert rem18["subgate_id"] == "SUBGATE-TC-043A"
+    assert rem18["status"] == "OPEN"
+    assert "X^{5/6} < m <= M(X)" in rem18["exact_surviving_lemma"]
+
+    rt18 = sec18["full_section_18_tree_roundtrip_verification"]
+    assert rt18["all_enclose_original_256bit_arb_ball"] is True
+    assert rt18["live_original_count_matches_enumerated_total"] is True
+    enum18_recheck = verify_all_serialized_arb_in_tree(
+        sec18, path_prefix="section_18"
+    )
+    assert (
+        rt18["compared_against_live_original_arb_count"]
+        == enum18_recheck["total_certified_arb_balls_checked"]
+    )
+
 
 
 
