@@ -308,8 +308,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 26
-    assert len(ver["actual_theorems"]) == 45
+    assert len(ver["actual_defs"]) == 28
+    assert len(ver["actual_theorems"]) == 47
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -1793,6 +1793,60 @@ def test_30_task_tc046_prime_euler_moebius_recovery(artifact_payload):
     assert (
         rt15["compared_against_live_original_arb_count"]
         == enum15_recheck["total_certified_arb_balls_checked"]
+    )
+
+
+def test_31_task_tc047_common_referent_prime_theta_bridge(artifact_payload):
+    """Verify TASK-TC-047 common-referent observable N_y(x), grade-K realization A_{K,y}(x) = N_y(x)*tau^K in L_K^x,
+    Stieltjes station-ratio reconstruction of W_{M(X)}(X), CR1-CR2-CR3 bridge classification, and section_16 round-trip.
+    """
+    from tc.canonical_theta_correlation_bound import (
+        COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS,
+        STARTING_HEAD_TC_047,
+        TASK_TC_047_ID,
+        verify_all_serialized_arb_in_tree,
+    )
+
+    assert (
+        artifact_payload["common_referent_prime_theta_bridge_task_id"]
+        == TASK_TC_047_ID
+    )
+    assert (
+        artifact_payload["status_dimensions"][
+            "common_referent_prime_theta_bridge_status"
+        ]
+        == COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS
+    )
+    sec16 = artifact_payload[
+        "section_16_common_referent_prime_theta_integer_layer_bridge"
+    ]
+    assert sec16["task_id"] == TASK_TC_047_ID
+    assert sec16["inspected_baseline"] == STARTING_HEAD_TC_047
+    s12 = sec16["section_1_2_factorial_ratio_integrality_and_lcm_audit"]
+    assert s12["all_factorial_ratio_denominators_equal_one"] is True
+    assert s12["all_local_factor_products_match_factorial_ratio"] is True
+    assert s12["all_prime_valuations_nonnegative"] is True
+    assert s12["all_lcm_agreement_windows_verified"] is True
+    assert s12["all_first_discrepancy_ratios_equal_two"] is True
+    assert s12["all_arb_logs_match_summatory_L_y"] is True
+    s3 = sec16["section_3_grade_layer_membership_and_station_ratio_bridge"]
+    assert s3["all_grade_size_recoveries_enclose_zero"] is True
+    assert s3["all_grade_coboundary_transfers_enclose_zero"] is True
+    assert s3["all_grade_jump_reconstructions_enclose_zero"] is True
+    assert s3["all_nonzero_rational_grades_avoid_self_dual_peak"] is True
+    assert len(s3["certified_grade_layer_bridge_table"]) == 15
+    s4 = sec16["section_4_cr1_cr2_cr3_bridge_and_open_obligation"]
+    assert s4["remaining_open_obligation"]["subgate_id"] == "SUBGATE-TC-043A"
+    assert s4["remaining_open_obligation"]["status"] == "OPEN"
+    rt16 = sec16["full_section_16_tree_roundtrip_verification"]
+    assert rt16["all_enclose_original_256bit_arb_ball"] is True
+    assert rt16["live_original_count_matches_enumerated_total"] is True
+    enum16_recheck = verify_all_serialized_arb_in_tree(
+        sec16, path_prefix="section_16"
+    )
+    assert (
+        rt16["compared_against_live_original_arb_count"]
+        == enum16_recheck["total_certified_arb_balls_checked"]
     )
 
 

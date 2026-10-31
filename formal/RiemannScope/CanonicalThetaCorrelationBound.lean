@@ -1271,4 +1271,115 @@ theorem coupled_prime_cutoff_comparison_and_boundedness_equivalence
   · rintro ⟨h_wl, h_wu⟩
     exact ⟨by linarith, by linarith⟩
 
+/-- Multiplicative prime-Euler integer factor `m_y(n) = exp(lambda_y(n))` across the three disjoint
+    prime-divisor-count cases `omega_le_y = 0` (`n`), `omega_le_y = 1` (`p`), and `omega_le_y >= 2` (`1`). -/
+def finitePrimeMultiplicativeFactorCases (omega_le_y : ℕ) (n p : ℤ) : ℤ :=
+  match omega_le_y with
+  | 0 => n
+  | 1 => p
+  | _ + 2 => 1
+
+/-- Ambient grade-`K` integer-layer realization `A_{K,y}(x) = N_y(x) * tau^K in L_K = tau^K Z`
+    of an integer prime-Euler referent `N_ref : ℤ` at positive scale `tau_K = tau^K`. -/
+def gradeLayerRealizedObservable (N_ref : ℤ) (tau_K : ℝ) : ℝ :=
+  (N_ref : ℝ) * tau_K
+
+/-- Theorem 46: Prime-Euler Multiplicative Integrality, Grade-Layer Membership (`CR2`), and Intrinsic Size Recovery (`CR1`).
+    (1) Whenever `1 <= p <= n` in `ℤ`, all three cases of `finitePrimeMultiplicativeFactorCases omega_le_y n p`
+        (`omega_le_y = 0, 1, 2`) are positive integers in `[1, n]`.
+    (2) For any positive integer prefix product `N_prev >= 1` and step factor `m_step >= 1` (`N_next = N_prev * m_step`),
+        `N_next >= N_prev >= 1` (`N_next != 0`), and at any positive scale `tau_K > 0`, the grade-`K` realized observable
+        `A_{K,next} = gradeLayerRealizedObservable N_next tau_K` belongs to the nonzero integer layer
+        `L_K^x = { (m : ℝ) * tau_K | m : ℤ, m ≠ 0 }` (`CR2`) with `A_{K,next} >= tau_K > 0`.
+    (3) For any two nonzero grade scales `tau_K, tau_J != 0`, the intrinsic normalized size recovers the common
+        integer referent across grades (`CR1` on fiber size):
+        `A_{K,next} / tau_K = (N_next : ℝ) = A_{J,next} / tau_J`,
+        and the consecutive grade-`K` step ratio cancels `tau_K` identically:
+        `A_{K,next} = (m_step : ℝ) * A_{K,prev}`. -/
+theorem prime_euler_multiplicative_integrality_and_grade_layer_membership
+    (n p N_prev m_step : ℤ) (tau_K tau_J : ℝ)
+    (h_p_bounds : 1 ≤ p ∧ p ≤ n)
+    (h_N_pos : 1 ≤ N_prev)
+    (h_m_pos : 1 ≤ m_step)
+    (h_tau_K_pos : 0 < tau_K)
+    (h_tau_J_ne : tau_J ≠ 0) :
+    let N_next : ℤ := N_prev * m_step
+    let A_K_prev := gradeLayerRealizedObservable N_prev tau_K
+    let A_K_next := gradeLayerRealizedObservable N_next tau_K
+    let A_J_next := gradeLayerRealizedObservable N_next tau_J
+    (1 ≤ finitePrimeMultiplicativeFactorCases 0 n p ∧ finitePrimeMultiplicativeFactorCases 0 n p ≤ n) ∧
+      (1 ≤ finitePrimeMultiplicativeFactorCases 1 n p ∧ finitePrimeMultiplicativeFactorCases 1 n p ≤ n) ∧
+      (1 ≤ finitePrimeMultiplicativeFactorCases 2 n p ∧ finitePrimeMultiplicativeFactorCases 2 n p ≤ n) ∧
+      (1 ≤ N_next ∧ N_prev ≤ N_next ∧ N_next ≠ 0) ∧
+      (∃ m : ℤ, m ≠ 0 ∧ A_K_next = (m : ℝ) * tau_K) ∧
+      (tau_K ≤ A_K_next) ∧
+      (A_K_next / tau_K = (N_next : ℝ) ∧ A_J_next / tau_J = (N_next : ℝ)) ∧
+      (A_K_next = (m_step : ℝ) * A_K_prev) := by
+  intro N_next A_K_prev A_K_next A_J_next
+  dsimp [N_next, A_K_prev, A_K_next, A_J_next, finitePrimeMultiplicativeFactorCases, gradeLayerRealizedObservable]
+  rcases h_p_bounds with ⟨hp1, hpn⟩
+  have hn1 : 1 ≤ n := le_trans hp1 hpn
+  have h_N_nonneg : (0 : ℤ) ≤ N_prev := by linarith
+  have h_prev_le_next : N_prev * 1 ≤ N_prev * m_step := mul_le_mul_of_nonneg_left h_m_pos h_N_nonneg
+  have h_next_ge_prev : N_prev ≤ N_prev * m_step := by linarith
+  have h_next_ge_one : 1 ≤ N_prev * m_step := le_trans h_N_pos h_next_ge_prev
+  have h_next_ne : N_prev * m_step ≠ 0 := by linarith
+  have h_next_real_ge_one : (1 : ℝ) ≤ ((N_prev * m_step : ℤ) : ℝ) := by exact_mod_cast h_next_ge_one
+  have h_tau_K_nonneg : 0 ≤ tau_K := le_of_lt h_tau_K_pos
+  have h_tau_K_ne : tau_K ≠ 0 := ne_of_gt h_tau_K_pos
+  have h_A_ge_tau : 1 * tau_K ≤ ((N_prev * m_step : ℤ) : ℝ) * tau_K :=
+    mul_le_mul_of_nonneg_right h_next_real_ge_one h_tau_K_nonneg
+  refine ⟨⟨hn1, le_refl n⟩, ⟨hp1, hpn⟩, ⟨le_refl 1, hn1⟩,
+    ⟨h_next_ge_one, h_next_ge_prev, h_next_ne⟩,
+    ⟨N_prev * m_step, h_next_ne, rfl⟩,
+    by linarith,
+    ⟨mul_div_cancel_right₀ _ h_tau_K_ne, mul_div_cancel_right₀ _ h_tau_J_ne⟩,
+    ?_⟩
+  push_cast
+  ring
+
+/-- Theorem 47: Common-Referent Integer-Layer Bridge (`CR1`-`CR2`-`CR3`), Cross-Grade Station Ratio Identity,
+    and Stieltjes Jump Reconstruction.
+    (1) Cross-grade station ratio identity: for any station integer `n : ℤ` and nonzero grade scales `tau_K, tau_J != 0`
+        with relative scale `X_{K,J} = tau_K / tau_J`, the theta-wavelet kernel argument `(n : ℝ) / X_{K,J}` equals
+        the ratio of the grade-`J` realized station `Phi_J(n) = gradeLayerRealizedObservable n tau_J` to the grade-`K`
+        unit `Phi_K(1) = gradeLayerRealizedObservable 1 tau_K`.
+    (2) Scale-coboundary transfer vs. Common-Referent collision (`CR1 + CR2 + CR3`):
+        `gradeLayerRealizedObservable N_ref tau_K = (tau_K / tau_J) * gradeLayerRealizedObservable N_ref tau_J`,
+        while if two integer-layer defect observables `D_K = gradeLayerRealizedObservable m_K tau_K` and
+        `D_J = gradeLayerRealizedObservable m_J tau_J` (`CR2`) satisfy `D_K = D_J` (`CR1`), rational-grade
+        noncollision (`D_K = D_J → m_K = 0 ∧ m_J = 0`), and off-critical sensitivity (`delta ≠ 0 → m_K ≠ 0`, `CR3`),
+        then `delta = 0`.
+    (3) Two-step Stieltjes jump reconstruction: for cumulative sums `L_1 = 0`, `L_2 = lam_2`, `L_3 = lam_2 + lam_3`,
+        weighting kernel samples `h0_2, h0_3` by the jumps `L_2 - L_1` and `L_3 - L_2` reproduces
+        `lam_2 * h0_2 + lam_3 * h0_3` identically. -/
+theorem common_referent_integer_layer_bridge_and_station_ratio_identity
+    (n N_ref m_K m_J : ℤ) (tau_K tau_J delta lam_2 lam_3 h0_2 h0_3 : ℝ)
+    (h_tau_K_ne : tau_K ≠ 0)
+    (h_tau_J_ne : tau_J ≠ 0) :
+    let Phi_J_n := gradeLayerRealizedObservable n tau_J
+    let Phi_K_1 := gradeLayerRealizedObservable 1 tau_K
+    let A_K := gradeLayerRealizedObservable N_ref tau_K
+    let A_J := gradeLayerRealizedObservable N_ref tau_J
+    let D_K := gradeLayerRealizedObservable m_K tau_K
+    let D_J := gradeLayerRealizedObservable m_J tau_J
+    let L_1 : ℝ := 0
+    let L_2 : ℝ := lam_2
+    let L_3 : ℝ := lam_2 + lam_3
+    ((n : ℝ) / (tau_K / tau_J) = Phi_J_n / Phi_K_1) ∧
+      (A_K = (tau_K / tau_J) * A_J) ∧
+      ((D_K = D_J ∧ (D_K = D_J → (m_K = 0 ∧ m_J = 0)) ∧ (delta ≠ 0 → m_K ≠ 0)) → delta = 0) ∧
+      ((L_2 - L_1) * h0_2 + (L_3 - L_2) * h0_3 = lam_2 * h0_2 + lam_3 * h0_3) := by
+  intro Phi_J_n Phi_K_1 A_K A_J D_K D_J L_1 L_2 L_3
+  dsimp [Phi_J_n, Phi_K_1, A_K, A_J, D_K, D_J, L_1, L_2, L_3, gradeLayerRealizedObservable]
+  refine ⟨?_, ?_, ?_, by ring⟩
+  · push_cast
+    rw [div_div_eq_mul_div, one_mul]
+  · calc (N_ref : ℝ) * tau_K
+      _ = (N_ref : ℝ) * ((tau_K / tau_J) * tau_J) := by rw [div_mul_cancel₀ tau_K h_tau_J_ne]
+      _ = (tau_K / tau_J) * ((N_ref : ℝ) * tau_J) := by ring
+  · rintro ⟨h_CR1, h_noncoll, h_CR3⟩
+    by_contra h_delta_ne
+    exact (h_CR3 h_delta_ne) (h_noncoll h_CR1).1
+
 end RiemannScope

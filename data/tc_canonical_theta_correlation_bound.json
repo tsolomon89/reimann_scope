@@ -11,6 +11,7 @@
   "moebius_recovery_repair_task_id": "TASK-TC-045R",
   "moebius_recovery_followup_repair_task_id": "TASK-TC-045R2",
   "prime_euler_moebius_recovery_task_id": "TASK-TC-046",
+  "common_referent_prime_theta_bridge_task_id": "TASK-TC-047",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
@@ -23,6 +24,7 @@
   "moebius_recovery_repair_starting_head": "dddee8ecd5cf38dbb6777190b3f48fdd5f8adca5",
   "moebius_recovery_followup_repair_starting_head": "71398c70c049b53d3546a7258ccda765481114f7",
   "prime_euler_moebius_recovery_starting_head": "1fc477927ccbb242dec10217744b1ad054877e12",
+  "common_referent_prime_theta_bridge_starting_head": "c39eb27b31fc4eed98300be0118d8c670f92d32a",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -41,7 +43,8 @@
     "TASK-TC-044",
     "TASK-TC-045",
     "TASK-TC-045R",
-    "TASK-TC-045R2"
+    "TASK-TC-045R2",
+    "TASK-TC-046"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -54,6 +57,7 @@
     "prime_shift_quadratic_form_status": "PRIME_SHIFT_QUADRATIC_FORM_DECOMPOSED_DIVISOR_AGGREGATED_W_LOG_UNCONDITIONALLY_BOUNDED_MOEBIUS_OBSTRUCTION_ISOLATED",
     "cross_grade_moebius_recovery_status": "MIXED_GRADE_PAIRING_POLARIZED_AND_EQUIVALENT_TO_MOEBIUS_RECOVERY_MERTENS_STIELTJES_CANCELLATION_OBLIGATION_ISOLATED",
     "prime_euler_moebius_recovery_status": "FINITE_PRIME_EULER_INVERSION_AND_COUPLED_CUTOFF_REDUCTION_PROVED_HORIZON_COLLAPSE_AND_LOW_FREQUENCY_EULER_SPIKE_OBSTRUCTIONS_QUANTIFIED",
+    "common_referent_prime_theta_bridge_status": "COMMON_REFERENT_PRIME_THETA_INTEGER_LAYER_MEMBERSHIP_PROVED_AND_CERTIFIED_SUBGATE_OPEN",
     "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
     "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
     "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
@@ -2694,7 +2698,9 @@
       "mixedGradeCompletePairingDecomp",
       "mertensStieltjesRemainderDecomp",
       "finitePrimeEulerRecursionStep",
-      "finitePrimeCoeffCases"
+      "finitePrimeCoeffCases",
+      "finitePrimeMultiplicativeFactorCases",
+      "gradeLayerRealizedObservable"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -2722,7 +2728,9 @@
       "mixedGradeCompletePairingDecomp",
       "mertensStieltjesRemainderDecomp",
       "finitePrimeEulerRecursionStep",
-      "finitePrimeCoeffCases"
+      "finitePrimeCoeffCases",
+      "finitePrimeMultiplicativeFactorCases",
+      "gradeLayerRealizedObservable"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2769,7 +2777,9 @@
       "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
       "transfer_form_plancherel_bound_and_minus_state_vanishing",
       "finite_prime_euler_recursion_and_coefficient_cases",
-      "coupled_prime_cutoff_comparison_and_boundedness_equivalence"
+      "coupled_prime_cutoff_comparison_and_boundedness_equivalence",
+      "prime_euler_multiplicative_integrality_and_grade_layer_membership",
+      "common_referent_integer_layer_bridge_and_station_ratio_identity"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2816,7 +2826,9 @@
       "small_scale_w_log_tail_and_mertens_stieltjes_ibp_identity",
       "transfer_form_plancherel_bound_and_minus_state_vanishing",
       "finite_prime_euler_recursion_and_coefficient_cases",
-      "coupled_prime_cutoff_comparison_and_boundedness_equivalence"
+      "coupled_prime_cutoff_comparison_and_boundedness_equivalence",
+      "prime_euler_multiplicative_integrality_and_grade_layer_membership",
+      "common_referent_integer_layer_bridge_and_station_ratio_identity"
     ]
   },
   "section_11_arithmetic_fourier_positive_factorization": {
@@ -8722,7 +8734,7 @@
             "is_strictly_positive": true
           }
         ],
-        "low_frequency_coherent_arch_obstruction": "On the controlled-width frequency interval I_y := [t_{y,-}, t_{y,+}] = [7*tau / (16*log y), tau / (2*log y)] = [7*pi / (8*log y), pi / log y] of width |I_y| = tau / (16*log y) = pi / (8*log y) > 0, every prime p <= y and every t in [0, tau / (2*log y)] has phase t*log(p) in [0, pi] where (d/dt)|1 - p^{-1/2 - it}|^2 = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0. Thus |E_y(it)|^2 is monotonically non-decreasing in t on I_y, with exact interval minimum at the left endpoint: inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2. Retaining every prime factor p <= y, log|E_y(it)|^2 = -2*sum_{p<=y} p^{-1/2}*cos(t*log p) + O(sum_{p<=y} p^{-1}); by the Prime Number Theorem with partial summation (and Mertens' bound sum_{p<=y} p^{-1} = O(log log y)), sum_{p<=y} p^{-1/2}*cos(a*log p / log y) = (2*cos a + o(1))*sqrt(y)/log y, giving at a = 7*tau/16 the exact left-endpoint asymptotic log|E_y(i t_{y,-})|^2 = (4*cos(tau/16) + o(1))*sqrt(y)/log y (where 4*cos(tau/16) = 2*sqrt(2 + sqrt(2)) ~ 3.695518130045147, whereas the right endpoint t_{y,+} = tau/(2*log y) has coefficient 4; the earlier subproduct claim |E_y(i t_{y,-})|^2 >= prod_{y^{16/21}<=p<=y}(1 + p^{-1/2} + p^{-1}) is refuted at y = 210 in 256-bit Arb: 3.3605057481 < 18.2536118944). For the kernel weight H_0(it) (which decays to 0 as t -> infty and is NOT globally increasing on [0, infty)), the canonical Weierstrass product H_0(it)/H_0(0) = (1 + v)^3 * prod_{n>=1} (1 + v/(4n+1)^2)^{-1} (v = 4*t^2) gives on 0 <= t <= 1 (0 <= v <= 4): (d/dv) log(H_0(it)/H_0(0)) = 3/(1+v) - sum_{n>=1} 1/((4n+1)^2 + v) >= 3/5 - tau^2/384 > 0, proving strict monotonicity on [0, 1] and hence on I_y subset [0, 1] for all integer y >= 24 (while for y in {2, 5, 11}, both a 64-subinterval Arb logarithmic-derivative certificate on [0, t_{2,+}] and direct 64-subinterval Arb ball enclosures on I_y certify inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) > H_0(0) > 0). Integrating over (-I_y) union I_y gives for y >= 24 (and all certified table rows): ||Psi_y||_{L^2(d^*x)}^2 >= (2/tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt >= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = (H_0(0) / (8 log y)) exp[(4*cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty as y -> infty (with lower-bound expression (H_0(0)/(8 log y))|E_y(i t_{y,-})|^2 reaching 153.39246 at y = 9973). Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm estimate as y -> infty; it does NOT establish divergence of W_{M(X)}(X), failure of the concurrent-grade hypothesis, or closure of the arithmetic cancellation obligation.",
+        "low_frequency_coherent_arch_obstruction": "On the controlled-width frequency interval I_y := [t_{y,-}, t_{y,+}] = [7*tau / (16*log y), tau / (2*log y)] = [7*pi / (8*log y), pi / log y] of width |I_y| = tau / (16*log y) = pi / (8*log y) > 0, every prime p <= y and every t in [0, tau / (2*log y)] has phase t*log(p) in [0, pi] where (d/dt)|1 - p^{-1/2 - it}|^2 = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0. Thus |E_y(it)|^2 is monotonically non-decreasing in t on I_y, with exact interval minimum at the left endpoint: inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2. Retaining every prime factor p <= y, log|E_y(it)|^2 = -2*sum_{p<=y} p^{-1/2}*cos(t*log p) + O(sum_{p<=y} p^{-1}); by the Prime Number Theorem with partial summation (and Mertens' bound sum_{p<=y} p^{-1} = O(log log y)), sum_{p<=y} p^{-1/2}*cos(a*log p / log y) = (2*cos a + o(1))*sqrt(y)/log y, giving at a = 7*tau/16 the exact left-endpoint asymptotic log|E_y(i t_{y,-})|^2 = (4*cos(tau/16) + o(1))*sqrt(y)/log y (where 4*cos(tau/16) = 2*sqrt(2 + sqrt(2)) ~ 3.695518130045147, whereas the right endpoint t_{y,+} = tau/(2*log y) has coefficient 4; the earlier subproduct claim |E_y(i t_{y,-})|^2 >= prod_{y^{16/21}<=p<=y}(1 + p^{-1/2} + p^{-1}) is refuted at y = 210 in 256-bit Arb: 3.3605057481 < 18.2536118944). For the kernel weight H_0(it) (which decays to 0 as t -> infty and is NOT globally increasing on [0, infty)), the canonical Weierstrass product H_0(it)/H_0(0) = (1 + v)^3 * prod_{n>=1} (1 + v/(4n+1)^2)^{-1} (v = 4*t^2) gives on 0 <= t <= 1 (0 <= v <= 4): (d/dv) log(H_0(it)/H_0(0)) = 3/(1+v) - sum_{n>=1} 1/((4n+1)^2 + v) >= 3/5 - tau^2/384 > 0, proving strict monotonicity on [0, 1] and hence on I_y subset [0, 1] for all integer y >= 24 (while for y in {2, 5, 11}, both a 64-subinterval Arb logarithmic-derivative certificate on [0, t_{2,+}] and direct 64-subinterval Arb ball enclosures on I_y certify inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) > H_0(0) > 0). Integrating over (-I_y) union I_y gives for y >= 24 (and all certified table rows): ||Psi_y||_{L^2(d^*x)}^2 >= (2/tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt >= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = (H_0(0) / (8 log y)) exp[(4*cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty as y -> infty (with right-endpoint value |E_y(i t_{y,+})|^2 reaching 6.65784855e12, left-endpoint minimum |E_y(i t_{y,-})|^2 reaching 3.99370923e8, and lower-bound expression (H_0(0)/(8 log y))|E_y(i t_{y,-})|^2 reaching 153.3859466 at y = 9973). Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm estimate as y -> infty; it does NOT establish divergence of W_{M(X)}(X), failure of the concurrent-grade hypothesis, or closure of the arithmetic cancellation obligation.",
         "subproduct_counterexample_y210": {
           "y": 210,
           "pi_y": 46,
@@ -11820,6 +11832,1526 @@
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_coupled_grade_table[12].T_rough_W_minus_W_M_X_certified",
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_coupled_grade_table[12].T_smooth_W_M_X_minus_additive_certified",
         "section_15.section_4_coupled_cutoff_passage_and_grade_certification.certified_coupled_grade_table[12].analytic_comparison_bound_certified"
+      ]
+    }
+  },
+  "section_16_common_referent_prime_theta_integer_layer_bridge": {
+    "task_id": "TASK-TC-047",
+    "parent_epic": "EPIC-TC-042",
+    "inspected_baseline": "c39eb27b31fc4eed98300be0118d8c670f92d32a",
+    "status": "COMMON_REFERENT_PRIME_THETA_INTEGER_LAYER_MEMBERSHIP_PROVED_AND_CERTIFIED_SUBGATE_OPEN",
+    "symbolic_identities_verification": {
+      "multiplicative_step_0_to_1_equals_p": true,
+      "multiplicative_step_1_to_2_equals_1": true,
+      "grade_layer_step_ratio_cancels_tau_K": true,
+      "cross_grade_station_ratio_identity_verified": true,
+      "ambient_coboundary_transfer_identity_verified": true
+    },
+    "section_1_2_factorial_ratio_integrality_and_lcm_audit": {
+      "all_factorial_ratio_denominators_equal_one": true,
+      "all_local_factor_products_match_factorial_ratio": true,
+      "all_prime_valuations_nonnegative": true,
+      "all_lcm_agreement_windows_verified": true,
+      "all_first_discrepancy_ratios_equal_two": true,
+      "all_arb_logs_match_summatory_L_y": true,
+      "prime_cutoff_integrality_table": [
+        {
+          "y": 2,
+          "q_next": 3,
+          "first_discrepancy_n": 6,
+          "max_n_verified": 45,
+          "all_factorial_ratio_denominators_equal_one": true,
+          "all_local_factor_products_match_factorial_ratio": true,
+          "all_prime_valuations_nonnegative": true,
+          "exact_lcm_agreement_below_2_q_next": true,
+          "N_y_at_2_q_next_minus_1_exact": "60",
+          "N_y_at_2_q_next_exact": "120",
+          "lcm_at_2_q_next_exact": "60",
+          "first_discrepancy_multiplicative_ratio": 2,
+          "log_N_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 4.0943445622221,
+            "rad_float_outward": 2.7051338576280105e-16,
+            "lower_dec": "4.094344562222100684830468813065066480323e+0",
+            "upper_dec": "4.094344562222100684830468813065066480326e+0",
+            "arb_ball_str": "[4.094344562222100684830468813065066480324 +/- 9.22e-41]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.748824137554183e-76,
+            "lower_dec": "-1.748824137554182626108765170356033086624e-76",
+            "upper_dec": "1.748824137554182626108765170356033086624e-76",
+            "arb_ball_str": "[+/- 1.75e-76]"
+          },
+          "log_N_y_at_2_q_next_certified": {
+            "mid_float": 4.787491742782046,
+            "rad_float_outward": 1.826815514387484e-16,
+            "lower_dec": "4.787491742782045994247700934523243048398e+0",
+            "upper_dec": "4.787491742782045994247700934523243048401e+0",
+            "arb_ball_str": "[4.787491742782045994247700934523243048400 +/- 4.08e-40]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 2.4505128352293854e-76,
+            "lower_dec": "-2.450512835229385046655420718278041638513e-76",
+            "upper_dec": "2.450512835229385046655420718278041638513e-76",
+            "arb_ball_str": "[+/- 2.46e-76]"
+          },
+          "arb_log_identities_enclose_zero": true
+        },
+        {
+          "y": 3,
+          "q_next": 5,
+          "first_discrepancy_n": 10,
+          "max_n_verified": 45,
+          "all_factorial_ratio_denominators_equal_one": true,
+          "all_local_factor_products_match_factorial_ratio": true,
+          "all_prime_valuations_nonnegative": true,
+          "exact_lcm_agreement_below_2_q_next": true,
+          "N_y_at_2_q_next_minus_1_exact": "2520",
+          "N_y_at_2_q_next_exact": "5040",
+          "lcm_at_2_q_next_exact": "2520",
+          "first_discrepancy_multiplicative_ratio": 2,
+          "log_N_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 7.832014180505469,
+            "rad_float_outward": 2.788847686822805e-16,
+            "lower_dec": "7.832014180505468990748298914888948482683e+0",
+            "upper_dec": "7.832014180505468990748298914888948482686e+0",
+            "arb_ball_str": "[7.832014180505468990748298914888948482684 +/- 1.68e-40]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 6.908934844075556e-77,
+            "rad_float_outward": 4.177746553969611e-76,
+            "lower_dec": "-3.486853069562054785903826319022517847255e-76",
+            "upper_dec": "4.868640038377165925965642617070581778633e-76",
+            "arb_ball_str": "[+/- 4.87e-76]"
+          },
+          "log_N_y_at_2_q_next_certified": {
+            "mid_float": 8.525161361065415,
+            "rad_float_outward": 3.6671660300633317e-16,
+            "lower_dec": "8.525161361065414300165531036347125050758e+0",
+            "upper_dec": "8.525161361065414300165531036347125050761e+0",
+            "arb_ball_str": "[8.525161361065414300165531036347125050760 +/- 3.33e-40]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_certified": {
+            "mid_float": 1.3817869688151111e-76,
+            "rad_float_outward": 6.261222223033704e-76,
+            "lower_dec": "-4.879435254218591571215404475038034451569e-76",
+            "upper_dec": "7.643009191848813851339037071134162314326e-76",
+            "arb_ball_str": "[+/- 7.65e-76]"
+          },
+          "arb_log_identities_enclose_zero": true
+        },
+        {
+          "y": 5,
+          "q_next": 7,
+          "first_discrepancy_n": 14,
+          "max_n_verified": 45,
+          "all_factorial_ratio_denominators_equal_one": true,
+          "all_local_factor_products_match_factorial_ratio": true,
+          "all_prime_valuations_nonnegative": true,
+          "exact_lcm_agreement_below_2_q_next": true,
+          "N_y_at_2_q_next_minus_1_exact": "360360",
+          "N_y_at_2_q_next_exact": "720720",
+          "lcm_at_2_q_next_exact": "360360",
+          "first_discrepancy_multiplicative_ratio": 2,
+          "log_N_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 12.794858810765376,
+            "rad_float_outward": 3.728792251574517e-17,
+            "lower_dec": "1.279485881076537627086372993441939638730e+1",
+            "upper_dec": "1.279485881076537627086372993441939638733e+1",
+            "arb_ball_str": "[12.79485881076537627086372993441939638731 +/- 1.15e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 1.3817869688151111e-76,
+            "rad_float_outward": 8.323107475857618e-76,
+            "lower_dec": "-6.941320507042505404462453818559534196116e-76",
+            "upper_dec": "9.704894444672727684586086414655662058873e-76",
+            "arb_ball_str": "[+/- 9.71e-76]"
+          },
+          "log_N_y_at_2_q_next_certified": {
+            "mid_float": 13.488005991325322,
+            "rad_float_outward": 5.05439118083075e-17,
+            "lower_dec": "1.348800599132532158028096205587757295537e+1",
+            "upper_dec": "1.348800599132532158028096205587757295540e+1",
+            "arb_ball_str": "[13.48800599132532158028096205587757295539 +/- 3.36e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_certified": {
+            "mid_float": 2.7635739376302223e-76,
+            "rad_float_outward": 9.715689665661712e-76,
+            "lower_dec": "-6.952115728031488639180244594665939042523e-76",
+            "upper_dec": "1.247926360329193319942750978685819476805e-75",
+            "arb_ball_str": "[+/- 1.25e-75]"
+          },
+          "arb_log_identities_enclose_zero": true
+        },
+        {
+          "y": 7,
+          "q_next": 11,
+          "first_discrepancy_n": 22,
+          "max_n_verified": 45,
+          "all_factorial_ratio_denominators_equal_one": true,
+          "all_local_factor_products_match_factorial_ratio": true,
+          "all_prime_valuations_nonnegative": true,
+          "exact_lcm_agreement_below_2_q_next": true,
+          "N_y_at_2_q_next_minus_1_exact": "232792560",
+          "N_y_at_2_q_next_exact": "465585120",
+          "lcm_at_2_q_next_exact": "232792560",
+          "first_discrepancy_multiplicative_ratio": 2,
+          "log_N_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 19.265658314547977,
+            "rad_float_outward": 9.50389262733311e-16,
+            "lower_dec": "1.926565831454797812053952410563855302820e+1",
+            "upper_dec": "1.926565831454797812053952410563855302823e+1",
+            "arb_ball_str": "[19.26565831454797812053952410563855302821 +/- 2.23e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 5.527147875260445e-76,
+            "rad_float_outward": 1.7315518035325285e-75,
+            "lower_dec": "-1.178837016006483834514083298294578019014e-75",
+            "upper_dec": "2.284266591058572746563536336733029164116e-75",
+            "arb_ball_str": "[+/- 2.29e-75]"
+          },
+          "log_N_y_at_2_q_next_certified": {
+            "mid_float": 19.958805495107924,
+            "rad_float_outward": 9.137994109909926e-16,
+            "lower_dec": "1.995880549510792342995675622709672959627e+1",
+            "upper_dec": "1.995880549510792342995675622709672959630e+1",
+            "arb_ball_str": "[19.95880549510792342995675622709672959629 +/- 2.28e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_certified": {
+            "mid_float": 5.527147875260445e-76,
+            "rad_float_outward": 2.0089887204239606e-75,
+            "lower_dec": "-1.456273932897915903891831419142621724624e-75",
+            "upper_dec": "2.561703507950004815941284457581072869727e-75",
+            "arb_ball_str": "[+/- 2.57e-75]"
+          },
+          "arb_log_identities_enclose_zero": true
+        },
+        {
+          "y": 11,
+          "q_next": 13,
+          "first_discrepancy_n": 26,
+          "max_n_verified": 45,
+          "all_factorial_ratio_denominators_equal_one": true,
+          "all_local_factor_products_match_factorial_ratio": true,
+          "all_prime_valuations_nonnegative": true,
+          "exact_lcm_agreement_below_2_q_next": true,
+          "N_y_at_2_q_next_minus_1_exact": "26771144400",
+          "N_y_at_2_q_next_exact": "53542288800",
+          "lcm_at_2_q_next_exact": "26771144400",
+          "first_discrepancy_multiplicative_ratio": 2,
+          "log_N_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 24.010590442911226,
+            "rad_float_outward": 1.7250822542865471e-15,
+            "lower_dec": "2.401059044291122818594703627067493678617e+1",
+            "upper_dec": "2.401059044291122818594703627067493678620e+1",
+            "arb_ball_str": "[24.01059044291122818594703627067493678618 +/- 2.07e-40]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 1.105429575052089e-75,
+            "rad_float_outward": 2.336083606507186e-75,
+            "lower_dec": "-1.230654031455096573840824543982542155218e-75",
+            "upper_dec": "3.441513181559274397939730620859444445423e-75",
+            "arb_ball_str": "[+/- 3.45e-75]"
+          },
+          "log_N_y_at_2_q_next_certified": {
+            "mid_float": 24.703737623471174,
+            "rad_float_outward": 1.3910641943775626e-16,
+            "lower_dec": "2.470373762347117349536426839213311335424e+1",
+            "upper_dec": "2.470373762347117349536426839213311335427e+1",
+            "arb_ball_str": "[24.70373762347117349536426839213311335426 +/- 4.30e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_certified": {
+            "mid_float": 1.105429575052089e-75,
+            "rad_float_outward": 2.613520525457641e-75,
+            "lower_dec": "-1.508090950405551679005784232086166730217e-75",
+            "upper_dec": "3.718950100509729503104690308963069020423e-75",
+            "arb_ball_str": "[+/- 3.72e-75]"
+          },
+          "arb_log_identities_enclose_zero": true
+        },
+        {
+          "y": 13,
+          "q_next": 17,
+          "first_discrepancy_n": 34,
+          "max_n_verified": 45,
+          "all_factorial_ratio_denominators_equal_one": true,
+          "all_local_factor_products_match_factorial_ratio": true,
+          "all_prime_valuations_nonnegative": true,
+          "exact_lcm_agreement_below_2_q_next": true,
+          "N_y_at_2_q_next_minus_1_exact": "144403552893600",
+          "N_y_at_2_q_next_exact": "288807105787200",
+          "lcm_at_2_q_next_exact": "144403552893600",
+          "first_discrepancy_multiplicative_ratio": 2,
+          "log_N_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 32.6036329466109,
+            "rad_float_outward": 2.5153656661364824e-15,
+            "lower_dec": "3.260363294661090345987194998595990787483e+1",
+            "upper_dec": "3.260363294661090345987194998595990787486e+1",
+            "arb_ball_str": "[32.60363294661090345987194998595990787485 +/- 2.36e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_minus_1_certified": {
+            "mid_float": 1.105429575052089e-75,
+            "rad_float_outward": 3.8053117984148127e-75,
+            "lower_dec": "-2.699882223362723252032370192686107087363e-75",
+            "upper_dec": "4.910741373466901076131276269563009377569e-75",
+            "arb_ball_str": "[+/- 4.92e-75]"
+          },
+          "log_N_y_at_2_q_next_certified": {
+            "mid_float": 33.29678012717085,
+            "rad_float_outward": 6.511769924121791e-16,
+            "lower_dec": "3.329678012717084876928918210741808444291e+1",
+            "upper_dec": "3.329678012717084876928918210741808444294e+1",
+            "arb_ball_str": "[33.29678012717084876928918210741808444292 +/- 3.15e-39]"
+          },
+          "log_N_y_minus_L_y_at_2_q_next_certified": {
+            "mid_float": 1.6581443625781334e-75,
+            "rad_float_outward": 4.35910611112829e-75,
+            "lower_dec": "-2.700961748550156129184966621180118876087e-75",
+            "upper_dec": "6.017250473706422865333325736495472311395e-75",
+            "arb_ball_str": "[+/- 6.02e-75]"
+          },
+          "arb_log_identities_enclose_zero": true
+        }
+      ]
+    },
+    "section_3_grade_layer_membership_and_station_ratio_bridge": {
+      "all_grade_size_recoveries_enclose_zero": true,
+      "all_grade_coboundary_transfers_enclose_zero": true,
+      "all_grade_jump_reconstructions_enclose_zero": true,
+      "all_nonzero_rational_grades_avoid_self_dual_peak": true,
+      "certified_grade_layer_bridge_table": [
+        {
+          "grade_K": "0",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 1.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "9.999999999999999999999999999999999999990e-1",
+            "upper_dec": "1.000000000000000000000000000000000000001e+0",
+            "arb_ball_str": "1.000000000000000000000000000000000000000"
+          },
+          "coupled_cutoff_M_X_K": 2,
+          "agreement_window_2_q_next": 6,
+          "sample_horizon_N": 5,
+          "N_M_X_K_at_sample_N_exact_int": "60",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 60.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "5.999999999999999999999999999999999999999e+1",
+            "upper_dec": "6.000000000000000000000000000000000000001e+1",
+            "arb_ball_str": "60.00000000000000000000000000000000000000"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": -0.057944966013296795,
+            "rad_float_outward": 7.414838520959108e-06,
+            "lower_dec": "-5.795238085181775215349742661986582787087e-2",
+            "upper_dec": "-5.793755117477583564212662618432276756810e-2",
+            "arb_ball_str": "[-0.0579 +/- 5.24e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": -0.057944966013296795,
+            "rad_float_outward": 7.414838520959108e-06,
+            "lower_dec": "-5.795238085181775215349742661986582787087e-2",
+            "upper_dec": "-5.793755117477583564212662618432276756810e-2",
+            "arb_ball_str": "[-0.0579 +/- 5.24e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.4829677041916513e-05,
+            "lower_dec": "-1.482967704191651137080043554306030273439e-5",
+            "upper_dec": "1.482967704191651137080043554306030273439e-5",
+            "arb_ball_str": "[+/- 1.49e-5]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 2,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 1.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "9.999999999999999999999999999999999999990e-1",
+            "upper_dec": "1.000000000000000000000000000000000000001e+0",
+            "arb_ball_str": "1.000000000000000000000000000000000000000"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "1/100",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 1.0185486997022424,
+            "rad_float_outward": 3.337834790199947e-17,
+            "lower_dec": "1.018548699702242343806909380690682441240e+0",
+            "upper_dec": "1.018548699702242343806909380690682441243e+0",
+            "arb_ball_str": "[1.018548699702242343806909380690682441242 +/- 2.24e-41]"
+          },
+          "coupled_cutoff_M_X_K": 2,
+          "agreement_window_2_q_next": 6,
+          "sample_horizon_N": 5,
+          "N_M_X_K_at_sample_N_exact_int": "60",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 61.11292198213454,
+            "rad_float_outward": 3.326369644080784e-15,
+            "lower_dec": "6.111292198213454062841456284144094647450e+1",
+            "upper_dec": "6.111292198213454062841456284144094647453e+1",
+            "arb_ball_str": "[61.11292198213454062841456284144094647452 +/- 1.35e-39]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -5.527147875260445e-76,
+            "rad_float_outward": 2.7361196904276054e-75,
+            "lower_dec": "-3.288834477953649369953276219079008247614e-75",
+            "upper_dec": "2.183404902901560457903823180640557102512e-75",
+            "arb_ball_str": "[+/- 3.29e-75]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 3.2773363950382394e-75,
+            "lower_dec": "-3.277336395038238920056521779653771491075e-75",
+            "upper_dec": "3.277336395038238920056521779653771491075e-75",
+            "arb_ball_str": "[+/- 3.28e-75]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": -0.06521479904060955,
+            "rad_float_outward": 7.763475650793004e-06,
+            "lower_dec": "-6.522256251626034035647725297816760526559e-2",
+            "upper_dec": "-6.520703556495875936301862432368762479681e-2",
+            "arb_ball_str": "[-0.0652 +/- 2.26e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": -0.06521479904060955,
+            "rad_float_outward": 7.763475650793004e-06,
+            "lower_dec": "-6.522256251626034035647725297816760526559e-2",
+            "upper_dec": "-6.520703556495875936301862432368762479681e-2",
+            "arb_ball_str": "[-0.0652 +/- 2.26e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.5526951301580997e-05,
+            "lower_dec": "-1.552695130158099345862865447998046875001e-5",
+            "upper_dec": "1.552695130158099345862865447998046875001e-5",
+            "arb_ball_str": "[+/- 1.56e-5]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 2,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.9635781780337753,
+            "rad_float_outward": 2.3973842215592215e-17,
+            "lower_dec": "9.635781780337753472595234402531610088118e-1",
+            "upper_dec": "9.635781780337753472595234402531610088121e-1",
+            "arb_ball_str": "[0.9635781780337753472595234402531610088119 +/- 2.04e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-1/100",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 1.0185486997022424,
+            "rad_float_outward": 3.337834790199947e-17,
+            "lower_dec": "1.018548699702242343806909380690682441240e+0",
+            "upper_dec": "1.018548699702242343806909380690682441243e+0",
+            "arb_ball_str": "[1.018548699702242343806909380690682441242 +/- 2.24e-41]"
+          },
+          "coupled_cutoff_M_X_K": 2,
+          "agreement_window_2_q_next": 6,
+          "sample_horizon_N": 5,
+          "N_M_X_K_at_sample_N_exact_int": "60",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 58.90734534101326,
+            "rad_float_outward": 1.0571415729324843e-15,
+            "lower_dec": "5.890734534101326041778570320759483026434e+1",
+            "upper_dec": "5.890734534101326041778570320759483026437e+1",
+            "arb_ball_str": "[58.90734534101326041778570320759483026436 +/- 2.94e-39]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -5.527147875260445e-76,
+            "rad_float_outward": 2.756437277309217e-75,
+            "lower_dec": "-3.309152064835260757793365447287655771400e-75",
+            "upper_dec": "2.203722489783171845743912408849204626297e-75",
+            "arb_ball_str": "[+/- 3.31e-75]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 2.2336590663314123e-75,
+            "lower_dec": "-2.233659066331411773183516691803552629839e-75",
+            "upper_dec": "2.233659066331411773183516691803552629839e-75",
+            "arb_ball_str": "[+/- 2.24e-75]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": -0.06521479904060955,
+            "rad_float_outward": 7.763475650793004e-06,
+            "lower_dec": "-6.522256251626034035647725297816760526559e-2",
+            "upper_dec": "-6.520703556495875936301862432368762479681e-2",
+            "arb_ball_str": "[-0.0652 +/- 2.26e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": -0.06521479904060955,
+            "rad_float_outward": 7.763475650793004e-06,
+            "lower_dec": "-6.522256251626034035647725297816760526559e-2",
+            "upper_dec": "-6.520703556495875936301862432368762479681e-2",
+            "arb_ball_str": "[-0.0652 +/- 2.26e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.5526951301580997e-05,
+            "lower_dec": "-1.552695130158099345862865447998046875001e-5",
+            "upper_dec": "1.552695130158099345862865447998046875001e-5",
+            "arb_ball_str": "[+/- 1.56e-5]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 2,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.9635781780337753,
+            "rad_float_outward": 2.3973842215592215e-17,
+            "lower_dec": "9.635781780337753472595234402531610088118e-1",
+            "upper_dec": "9.635781780337753472595234402531610088121e-1",
+            "arb_ball_str": "[0.9635781780337753472595234402531610088119 +/- 2.04e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "1/4",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 1.5832334870861595,
+            "rad_float_outward": 1.9726979423333776e-17,
+            "lower_dec": "1.583233487086159538579903034454558455660e+0",
+            "upper_dec": "1.583233487086159538579903034454558455663e+0",
+            "arb_ball_str": "[1.583233487086159538579903034454558455661 +/- 2.83e-40]"
+          },
+          "coupled_cutoff_M_X_K": 2,
+          "agreement_window_2_q_next": 6,
+          "sample_horizon_N": 5,
+          "N_M_X_K_at_sample_N_exact_int": "60",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 94.99400922516958,
+            "rad_float_outward": 5.033630172500851e-15,
+            "lower_dec": "9.499400922516957231479418206727350733966e+1",
+            "upper_dec": "9.499400922516957231479418206727350733969e+1",
+            "arb_ball_str": "[94.99400922516957231479418206727350733968 +/- 3.07e-39]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -1.6581443625781334e-75,
+            "rad_float_outward": 3.414751445574284e-75,
+            "lower_dec": "-5.072895808152416712685242351794577468642e-75",
+            "upper_dec": "1.756607082996149976536883236479224033334e-75",
+            "arb_ball_str": "[+/- 5.08e-75]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5.373156738017672e-75,
+            "lower_dec": "-5.373156738017670548884572679632185969555e-75",
+            "upper_dec": "5.373156738017670548884572679632185969555e-75",
+            "arb_ball_str": "[+/- 5.38e-75]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": -0.027264264339513948,
+            "rad_float_outward": 2.3386439949037083e-05,
+            "lower_dec": "-2.728765077946298253615416741898634762797e-2",
+            "upper_dec": "-2.724087789956491098515719330838301510841e-2",
+            "arb_ball_str": "[-0.0273 +/- 5.92e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": -0.027264264339513948,
+            "rad_float_outward": 2.3386439949037083e-05,
+            "lower_dec": "-2.728765077946298253615416741898634762797e-2",
+            "upper_dec": "-2.724087789956491098515719330838301510841e-2",
+            "arb_ball_str": "[-0.0273 +/- 5.92e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 1.6192816040802084e-78,
+            "rad_float_outward": 4.677287989807156e-05,
+            "lower_dec": "-4.677287989807155099697411060333251953126e-5",
+            "upper_dec": "4.677287989807155099697411060333251953127e-5",
+            "arb_ball_str": "[+/- 4.68e-5]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 2,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.2632375554921294,
+            "rad_float_outward": 2.1638851867150837e-18,
+            "lower_dec": "2.632375554921294025800210202164861516936e-1",
+            "upper_dec": "2.632375554921294025800210202164861516939e-1",
+            "arb_ball_str": "[0.2632375554921294025800210202164861516937 +/- 2.15e-41]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-1/4",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 1.5832334870861595,
+            "rad_float_outward": 1.9726979423333776e-17,
+            "lower_dec": "1.583233487086159538579903034454558455660e+0",
+            "upper_dec": "1.583233487086159538579903034454558455663e+0",
+            "arb_ball_str": "[1.583233487086159538579903034454558455661 +/- 2.83e-40]"
+          },
+          "coupled_cutoff_M_X_K": 2,
+          "agreement_window_2_q_next": 6,
+          "sample_horizon_N": 5,
+          "N_M_X_K_at_sample_N_exact_int": "60",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 37.89712666476388,
+            "rad_float_outward": 7.122395616361572e-16,
+            "lower_dec": "3.789712666476388207740063060649458455080e+1",
+            "upper_dec": "3.789712666476388207740063060649458455083e+1",
+            "arb_ball_str": "[37.89712666476388207740063060649458455081 +/- 1.65e-39]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -1.105429575052089e-75,
+            "rad_float_outward": 3.591617933412231e-75,
+            "lower_dec": "-4.697047508464319317390796935522802915202e-75",
+            "upper_dec": "2.486188358360141493291890858645900624996e-75",
+            "arb_ball_str": "[+/- 4.70e-75]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 2.577282354206881e-75,
+            "lower_dec": "-2.577282354206880689932701761942284956693e-75",
+            "upper_dec": "2.577282354206880689932701761942284956693e-75",
+            "arb_ball_str": "[+/- 2.58e-75]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": -0.027264264339513948,
+            "rad_float_outward": 2.3386439949037083e-05,
+            "lower_dec": "-2.728765077946298253615416741898634762797e-2",
+            "upper_dec": "-2.724087789956491098515719330838301510841e-2",
+            "arb_ball_str": "[-0.0273 +/- 5.92e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": -0.027264264339513948,
+            "rad_float_outward": 2.3386439949037083e-05,
+            "lower_dec": "-2.728765077946298253615416741898634762797e-2",
+            "upper_dec": "-2.724087789956491098515719330838301510841e-2",
+            "arb_ball_str": "[-0.0273 +/- 5.92e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 1.6192816040802084e-78,
+            "rad_float_outward": 4.677287989807156e-05,
+            "lower_dec": "-4.677287989807155099697411060333251953126e-5",
+            "upper_dec": "4.677287989807155099697411060333251953127e-5",
+            "arb_ball_str": "[+/- 4.68e-5]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 2,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.2632375554921294,
+            "rad_float_outward": 2.1638851867150837e-18,
+            "lower_dec": "2.632375554921294025800210202164861516936e-1",
+            "upper_dec": "2.632375554921294025800210202164861516939e-1",
+            "arb_ball_str": "[0.2632375554921294025800210202164861516937 +/- 2.15e-41]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "1/2",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 2.5066282746310007,
+            "rad_float_outward": 1.832857998045917e-16,
+            "lower_dec": "2.506628274631000502415765284811045253005e+0",
+            "upper_dec": "2.506628274631000502415765284811045253008e+0",
+            "arb_ball_str": "[2.506628274631000502415765284811045253007 +/- 1.33e-41]"
+          },
+          "coupled_cutoff_M_X_K": 4,
+          "agreement_window_2_q_next": 10,
+          "sample_horizon_N": 9,
+          "N_M_X_K_at_sample_N_exact_int": "2520",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 6316.703252070121,
+            "rad_float_outward": 1.1371427498512195e-13,
+            "lower_dec": "6.316703252070121266087728517723834037576e+3",
+            "upper_dec": "6.316703252070121266087728517723834037579e+3",
+            "arb_ball_str": "[6316.703252070121266087728517723834037578 +/- 3.94e-37]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -7.074749280333369e-74,
+            "rad_float_outward": 1.4318432749561895e-73,
+            "lower_dec": "-2.139318202989526065689469776730302199448e-73",
+            "upper_dec": "7.243683469228522582661698875290847337150e-74",
+            "arb_ball_str": "[+/- 2.14e-73]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 4.373822085154747e-73,
+            "lower_dec": "-4.373822085154746588875216030320993246470e-73",
+            "upper_dec": "4.373822085154746588875216030320993246470e-73",
+            "arb_ball_str": "[+/- 4.38e-73]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.08818180215681316,
+            "rad_float_outward": 7.376095538802723e-05,
+            "lower_dec": "8.810804120142513603231236225375789583029e-2",
+            "upper_dec": "8.825556311220118551308587080249446809594e-2",
+            "arb_ball_str": "[0.0882 +/- 9.20e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.08818180215681316,
+            "rad_float_outward": 7.376095538802723e-05,
+            "lower_dec": "8.810804120142513603231236225375789583029e-2",
+            "upper_dec": "8.825556311220118551308587080249446809594e-2",
+            "arb_ball_str": "[0.0882 +/- 9.20e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 2.1590421387736112e-78,
+            "rad_float_outward": 0.0001475219107760495,
+            "lower_dec": "-1.475219107760494807735085487365722656251e-4",
+            "upper_dec": "1.475219107760494807735085487365722656252e-4",
+            "arb_ball_str": "[+/- 1.48e-4]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 3,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.19682684120429803,
+            "rad_float_outward": 8.496910778554839e-18,
+            "lower_dec": "1.968268412042980338198381798031456054274e-1",
+            "upper_dec": "1.968268412042980338198381798031456054277e-1",
+            "arb_ball_str": "[0.1968268412042980338198381798031456054276 +/- 2.42e-41]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-1/2",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 2.5066282746310007,
+            "rad_float_outward": 1.832857998045917e-16,
+            "lower_dec": "2.506628274631000502415765284811045253005e+0",
+            "upper_dec": "2.506628274631000502415765284811045253008e+0",
+            "arb_ball_str": "[2.506628274631000502415765284811045253007 +/- 1.33e-41]"
+          },
+          "coupled_cutoff_M_X_K": 4,
+          "agreement_window_2_q_next": 10,
+          "sample_horizon_N": 9,
+          "N_M_X_K_at_sample_N_exact_int": "2520",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 1005.3345466116103,
+            "rad_float_outward": 1.3132609386961911e-14,
+            "lower_dec": "1.005334546611610348408664071034642308558e+3",
+            "upper_dec": "1.005334546611610348408664071034642308561e+3",
+            "arb_ball_str": "[1005.334546611610348408664071034642308559 +/- 1.64e-37]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -7.074749280333369e-74,
+            "rad_float_outward": 1.371273693391938e-73,
+            "lower_dec": "-2.078748621425274773489583668910312304535e-73",
+            "upper_dec": "6.637987653586009660662837797090948388023e-74",
+            "arb_ball_str": "[+/- 2.08e-73]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 3.4095730504086133e-74,
+            "lower_dec": "-3.409573050408612937782723368579864401703e-74",
+            "upper_dec": "3.409573050408612937782723368579864401703e-74",
+            "arb_ball_str": "[+/- 3.41e-74]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.08818180215681316,
+            "rad_float_outward": 7.376095538802723e-05,
+            "lower_dec": "8.810804120142513603231236225375789583029e-2",
+            "upper_dec": "8.825556311220118551308587080249446809594e-2",
+            "arb_ball_str": "[0.0882 +/- 9.20e-5]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.08818180215681316,
+            "rad_float_outward": 7.376095538802723e-05,
+            "lower_dec": "8.810804120142513603231236225375789583029e-2",
+            "upper_dec": "8.825556311220118551308587080249446809594e-2",
+            "arb_ball_str": "[0.0882 +/- 9.20e-5]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 2.1590421387736112e-78,
+            "rad_float_outward": 0.0001475219107760495,
+            "lower_dec": "-1.475219107760494807735085487365722656251e-4",
+            "upper_dec": "1.475219107760494807735085487365722656252e-4",
+            "arb_ball_str": "[+/- 1.48e-4]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 3,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.19682684120429803,
+            "rad_float_outward": 8.496910778554839e-18,
+            "lower_dec": "1.968268412042980338198381798031456054274e-1",
+            "upper_dec": "1.968268412042980338198381798031456054277e-1",
+            "arb_ball_str": "[0.1968268412042980338198381798031456054276 +/- 2.42e-41]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "sqrt(2)/2",
+          "is_rational_grade": false,
+          "X_K_certified": {
+            "mid_float": 3.6677387825986876,
+            "rad_float_outward": 2.0633090502882217e-16,
+            "lower_dec": "3.667738782598687368345527603436947629218e+0",
+            "upper_dec": "3.667738782598687368345527603436947629221e+0",
+            "arb_ball_str": "[3.667738782598687368345527603436947629220 +/- 3.14e-41]"
+          },
+          "coupled_cutoff_M_X_K": 6,
+          "agreement_window_2_q_next": 14,
+          "sample_horizon_N": 13,
+          "N_M_X_K_at_sample_N_exact_int": "360360",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 1321706.347697263,
+            "rad_float_outward": 9.500800884591234e-11,
+            "lower_dec": "1.321706347697262980056994327174538447664e+6",
+            "upper_dec": "1.321706347697262980056994327174538447667e+6",
+            "arb_ball_str": "[1321706.347697262980056994327174538447666 +/- 2.93e-34]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -1.3583518618240069e-71,
+            "rad_float_outward": 5.409498282121316e-71,
+            "lower_dec": "-6.767850143945322142361805988864554857429e-71",
+            "upper_dec": "4.051146420297308432109070201598217323224e-71",
+            "arb_ball_str": "[+/- 6.77e-71]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.9139340516241355e-70,
+            "lower_dec": "-1.913934051624135156391726752863760985322e-70",
+            "upper_dec": "1.913934051624135156391726752863760985322e-70",
+            "arb_ball_str": "[+/- 1.92e-70]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.004933537147205555,
+            "rad_float_outward": 0.00019102829151052027,
+            "lower_dec": "4.742508855695034795252194126474394672941e-3",
+            "upper_dec": "5.124565438716074636948814113962187641694e-3",
+            "arb_ball_str": "[0.005 +/- 2.58e-4]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.004933537147205555,
+            "rad_float_outward": 0.00019102829151052027,
+            "lower_dec": "4.742508855695034795252194126474394672941e-3",
+            "upper_dec": "5.124565438716074636948814113962187641694e-3",
+            "arb_ball_str": "[0.005 +/- 2.58e-4]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": -1.754221737753559e-78,
+            "rad_float_outward": 0.0003820565830210399,
+            "lower_dec": "-3.820565830210398416966199874877929687502e-4",
+            "upper_dec": "3.820565830210398416966199874877929687501e-4",
+            "arb_ball_str": "[+/- 3.83e-4]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 4,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.0905902075081522,
+            "rad_float_outward": 3.079725834509056e-18,
+            "lower_dec": "9.059020750815220371480138246183599074018e-2",
+            "upper_dec": "9.059020750815220371480138246183599074021e-2",
+            "arb_ball_str": "[0.09059020750815220371480138246183599074020 +/- 1.70e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-sqrt(2)/2",
+          "is_rational_grade": false,
+          "X_K_certified": {
+            "mid_float": 3.6677387825986876,
+            "rad_float_outward": 2.0633090502882217e-16,
+            "lower_dec": "3.667738782598687368345527603436947629218e+0",
+            "upper_dec": "3.667738782598687368345527603436947629221e+0",
+            "arb_ball_str": "[3.667738782598687368345527603436947629220 +/- 3.14e-41]"
+          },
+          "coupled_cutoff_M_X_K": 6,
+          "agreement_window_2_q_next": 14,
+          "sample_horizon_N": 13,
+          "N_M_X_K_at_sample_N_exact_int": "360360",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 98251.27179440943,
+            "rad_float_outward": 8.814415814026217e-13,
+            "lower_dec": "9.825127179440943203266645654598680440577e+4",
+            "upper_dec": "9.825127179440943203266645654598680440580e+4",
+            "arb_ball_str": "[98251.27179440943203266645654598680440578 +/- 4.47e-36]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -1.3583518618240069e-71,
+            "rad_float_outward": 5.330869840209018e-71,
+            "lower_dec": "-6.689221702033023649212674951845920693888e-71",
+            "upper_dec": "3.972517978385009938959939164579583159683e-71",
+            "arb_ball_str": "[+/- 6.69e-71]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.5065088418301278e-71,
+            "lower_dec": "-1.506508841830127559792999823044953884409e-71",
+            "upper_dec": "1.506508841830127559792999823044953884409e-71",
+            "arb_ball_str": "[+/- 1.51e-71]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.004933537147205555,
+            "rad_float_outward": 0.00019102829151052027,
+            "lower_dec": "4.742508855695034795252194126474394672941e-3",
+            "upper_dec": "5.124565438716074636948814113962187641694e-3",
+            "arb_ball_str": "[0.005 +/- 2.58e-4]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.004933537147205555,
+            "rad_float_outward": 0.00019102829151052027,
+            "lower_dec": "4.742508855695034795252194126474394672941e-3",
+            "upper_dec": "5.124565438716074636948814113962187641694e-3",
+            "arb_ball_str": "[0.005 +/- 2.58e-4]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": -1.754221737753559e-78,
+            "rad_float_outward": 0.0003820565830210399,
+            "lower_dec": "-3.820565830210398416966199874877929687502e-4",
+            "upper_dec": "3.820565830210398416966199874877929687501e-4",
+            "arb_ball_str": "[+/- 3.83e-4]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 4,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.0905902075081522,
+            "rad_float_outward": 3.079725834509056e-18,
+            "lower_dec": "9.059020750815220371480138246183599074018e-2",
+            "upper_dec": "9.059020750815220371480138246183599074021e-2",
+            "arb_ball_str": "[0.09059020750815220371480138246183599074020 +/- 1.70e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "1",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 6.283185307179586,
+            "rad_float_outward": 2.449293598294707e-16,
+            "lower_dec": "6.283185307179586476925286766559005768393e+0",
+            "upper_dec": "6.283185307179586476925286766559005768396e+0",
+            "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
+          },
+          "coupled_cutoff_M_X_K": 10,
+          "agreement_window_2_q_next": 22,
+          "sample_horizon_N": 21,
+          "N_M_X_K_at_sample_N_exact_int": "232792560",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 1462678792.6127224,
+            "rad_float_outward": 8.114576750237862e-08,
+            "lower_dec": "1.462678792612722315704818435121393343878e+9",
+            "upper_dec": "1.462678792612722315704818435121393343881e+9",
+            "arb_ball_str": "[1462678792.612722315704818435121393343879 +/- 2.86e-31]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -4.636507688359277e-69,
+            "rad_float_outward": 1.0987717402632204e-68,
+            "lower_dec": "-1.562422509099147822580871822976617431356e-68",
+            "upper_dec": "6.351209714272924761479380075897075530128e-69",
+            "arb_ball_str": "[+/- 1.57e-68]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5.317554793730841e-68,
+            "lower_dec": "-5.317554793730840518780390533527461521996e-68",
+            "upper_dec": "5.317554793730840518780390533527461521996e-68",
+            "arb_ball_str": "[+/- 5.32e-68]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.002708639546543393,
+            "rad_float_outward": 0.0007337554980040297,
+            "lower_dec": "1.974884048539363525151457004262016902389e-3",
+            "upper_dec": "3.442395044547422535061086826039360652392e-3",
+            "arb_ball_str": "[+/- 3.45e-3]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.002708639546543393,
+            "rad_float_outward": 0.0007337554980040297,
+            "lower_dec": "1.974884048539363525151457004262016902389e-3",
+            "upper_dec": "3.442395044547422535061086826039360652392e-3",
+            "arb_ball_str": "[+/- 3.45e-3]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": -2.395187372701975e-78,
+            "rad_float_outward": 0.0014675109960080592,
+            "lower_dec": "-1.467510996008059009909629821777343750002e-3",
+            "upper_dec": "1.467510996008059009909629821777343750001e-3",
+            "arb_ball_str": "[+/- 1.47e-3]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 6,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.04507034144862799,
+            "rad_float_outward": 3.414015109617595e-18,
+            "lower_dec": "4.507034144862798538669741976491382779323e-2",
+            "upper_dec": "4.507034144862798538669741976491382779326e-2",
+            "arb_ball_str": "[0.04507034144862798538669741976491382779324 +/- 2.13e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-1",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 6.283185307179586,
+            "rad_float_outward": 2.449293598294707e-16,
+            "lower_dec": "6.283185307179586476925286766559005768393e+0",
+            "upper_dec": "6.283185307179586476925286766559005768396e+0",
+            "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
+          },
+          "coupled_cutoff_M_X_K": 10,
+          "agreement_window_2_q_next": 22,
+          "sample_horizon_N": 21,
+          "N_M_X_K_at_sample_N_exact_int": "232792560",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 37050086.63901663,
+            "rad_float_outward": 2.200317160242922e-09,
+            "lower_dec": "3.705008663901663046569801961792185197475e+7",
+            "upper_dec": "3.705008663901663046569801961792185197478e+7",
+            "arb_ball_str": "[37050086.63901663046569801961792185197477 +/- 1.34e-33]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -4.636507688359277e-69,
+            "rad_float_outward": 1.1677529569647313e-68,
+            "lower_dec": "-1.631403725800658753061697100444616876682e-68",
+            "upper_dec": "7.041021881288034066287632850577069983388e-69",
+            "arb_ball_str": "[+/- 1.64e-68]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 2.5717505095679033e-69,
+            "lower_dec": "-2.571750509567902808029616901844859378231e-69",
+            "upper_dec": "2.571750509567902808029616901844859378231e-69",
+            "arb_ball_str": "[+/- 2.58e-69]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.002708639546543393,
+            "rad_float_outward": 0.0007337554980040297,
+            "lower_dec": "1.974884048539363525151457004262016902389e-3",
+            "upper_dec": "3.442395044547422535061086826039360652392e-3",
+            "arb_ball_str": "[+/- 3.45e-3]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.002708639546543393,
+            "rad_float_outward": 0.0007337554980040297,
+            "lower_dec": "1.974884048539363525151457004262016902389e-3",
+            "upper_dec": "3.442395044547422535061086826039360652392e-3",
+            "arb_ball_str": "[+/- 3.45e-3]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": -2.395187372701975e-78,
+            "rad_float_outward": 0.0014675109960080592,
+            "lower_dec": "-1.467510996008059009909629821777343750002e-3",
+            "upper_dec": "1.467510996008059009909629821777343750001e-3",
+            "arb_ball_str": "[+/- 1.47e-3]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 6,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.04507034144862799,
+            "rad_float_outward": 3.414015109617595e-18,
+            "lower_dec": "4.507034144862798538669741976491382779323e-2",
+            "upper_dec": "4.507034144862798538669741976491382779326e-2",
+            "arb_ball_str": "[0.04507034144862798538669741976491382779324 +/- 2.13e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "3/2",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 15.749609945722419,
+            "rad_float_outward": 7.310541421791889e-16,
+            "lower_dec": "1.574960994572241974429064599446720454230e+1",
+            "upper_dec": "1.574960994572241974429064599446720454233e+1",
+            "arb_ball_str": "[15.74960994572241974429064599446720454231 +/- 1.69e-39]"
+          },
+          "coupled_cutoff_M_X_K": 32,
+          "agreement_window_2_q_next": 74,
+          "sample_horizon_N": 40,
+          "N_M_X_K_at_sample_N_exact_int": "5342931457063200",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 8.414908641547576e+16,
+            "rad_float_outward": 5.609501954437472,
+            "lower_dec": "8.414908641547575439049804556252904393081e+16",
+            "upper_dec": "8.414908641547575439049804556252904393084e+16",
+            "arb_ball_str": "[84149086415475754.39049804556252904393082 +/- 7.20e-25]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -1.5557538194652854e-61,
+            "rad_float_outward": 4.107730052001042e-61,
+            "lower_dec": "-5.663483871466326812541181532733546671948e-61",
+            "upper_dec": "2.551976232535755958969149505843484551653e-61",
+            "arb_ball_str": "[+/- 5.67e-61]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 6.448488405647655e-60,
+            "lower_dec": "-6.448488405647653539946841838428659376914e-60",
+            "upper_dec": "6.448488405647653539946841838428659376914e-60",
+            "arb_ball_str": "[+/- 6.45e-60]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.0015916026401914455,
+            "rad_float_outward": 0.007299215802049731,
+            "lower_dec": "-5.707613161858284373964694385056025993430e-3",
+            "upper_dec": "8.890818442241175572190853710647099006573e-3",
+            "arb_ball_str": "[+/- 8.90e-3]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.0015916026401914455,
+            "rad_float_outward": 0.007299215802049731,
+            "lower_dec": "-5.707613161858284373964694385056025993430e-3",
+            "upper_dec": "8.890818442241175572190853710647099006573e-3",
+            "arb_ball_str": "[+/- 8.90e-3]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": -9.71568962448125e-78,
+            "rad_float_outward": 0.014598431604099462,
+            "lower_dec": "-1.459843160409945994615554809570312500002e-2",
+            "upper_dec": "1.459843160409945994615554809570312500001e-2",
+            "arb_ball_str": "[+/- 0.0146]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 16,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.015898174947855517,
+            "rad_float_outward": 7.527332273736669e-19,
+            "lower_dec": "1.589817494785551657221287895417632248085e-2",
+            "upper_dec": "1.589817494785551657221287895417632248088e-2",
+            "arb_ball_str": "[0.01589817494785551657221287895417632248086 +/- 2.39e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-3/2",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 15.749609945722419,
+            "rad_float_outward": 7.310541421791889e-16,
+            "lower_dec": "1.574960994572241974429064599446720454230e+1",
+            "upper_dec": "1.574960994572241974429064599446720454233e+1",
+            "arb_ball_str": "[15.74960994572241974429064599446720454231 +/- 1.69e-39]"
+          },
+          "coupled_cutoff_M_X_K": 32,
+          "agreement_window_2_q_next": 74,
+          "sample_horizon_N": 40,
+          "N_M_X_K_at_sample_N_exact_int": "5342931457063200",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 339242144756374.44,
+            "rad_float_outward": 0.021177585341982014,
+            "lower_dec": "3.392421447563744586775853419820103618034e+14",
+            "upper_dec": "3.392421447563744586775853419820103618037e+14",
+            "arb_ball_str": "[339242144756374.4586775853419820103618036 +/- 7.51e-27]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -2.333630729197928e-61,
+            "rad_float_outward": 4.083189932516825e-61,
+            "lower_dec": "-6.416820661714752325147996548553990326665e-61",
+            "upper_dec": "1.749559203318896044789948508218897146222e-61",
+            "arb_ball_str": "[+/- 6.42e-61]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 2.6011652084762977e-62,
+            "lower_dec": "-2.601165208476297280172959590148425566615e-62",
+            "upper_dec": "2.601165208476297280172959590148425566615e-62",
+            "arb_ball_str": "[+/- 2.61e-62]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.0015916026401914455,
+            "rad_float_outward": 0.007299215802049731,
+            "lower_dec": "-5.707613161858284373964694385056025993430e-3",
+            "upper_dec": "8.890818442241175572190853710647099006573e-3",
+            "arb_ball_str": "[+/- 8.90e-3]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.0015916026401914455,
+            "rad_float_outward": 0.007299215802049731,
+            "lower_dec": "-5.707613161858284373964694385056025993430e-3",
+            "upper_dec": "8.890818442241175572190853710647099006573e-3",
+            "arb_ball_str": "[+/- 8.90e-3]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": -9.71568962448125e-78,
+            "rad_float_outward": 0.014598431604099462,
+            "lower_dec": "-1.459843160409945994615554809570312500002e-2",
+            "upper_dec": "1.459843160409945994615554809570312500001e-2",
+            "arb_ball_str": "[+/- 0.0146]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 16,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.015898174947855517,
+            "rad_float_outward": 7.527332273736669e-19,
+            "lower_dec": "1.589817494785551657221287895417632248085e-2",
+            "upper_dec": "1.589817494785551657221287895417632248088e-2",
+            "arb_ball_str": "[0.01589817494785551657221287895417632248086 +/- 2.39e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "2",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 39.47841760435743,
+            "rad_float_outward": 2.506118203495885e-15,
+            "lower_dec": "3.947841760435743447533796399950460454124e+1",
+            "upper_dec": "3.947841760435743447533796399950460454127e+1",
+            "arb_ball_str": "[39.47841760435743447533796399950460454125 +/- 4.80e-39]"
+          },
+          "coupled_cutoff_M_X_K": 99,
+          "agreement_window_2_q_next": 202,
+          "sample_horizon_N": 40,
+          "N_M_X_K_at_sample_N_exact_int": "5342931457063200",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 2.1093047929339894e+17,
+            "rad_float_outward": 8.92269488841813,
+            "lower_dec": "2.109304792933989529226948884181280433444e+17",
+            "upper_dec": "2.109304792933989529226948884181280433447e+17",
+            "arb_ball_str": "[210930479293398952.9226948884181280433446 +/- 1.60e-23]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -3.111507638930571e-61,
+            "rad_float_outward": 5.350318296929517e-61,
+            "lower_dec": "-8.461825935860087147794579637410878902504e-61",
+            "upper_dec": "2.238810657998945440650515583630754661914e-61",
+            "arb_ball_str": "[+/- 8.47e-61]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.5523392429775596e-59,
+            "lower_dec": "-1.552339242977559408655795721378778672738e-59",
+            "upper_dec": "1.552339242977559408655795721378778672738e-59",
+            "arb_ball_str": "[+/- 1.56e-59]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.0045046259312766105,
+            "rad_float_outward": 0.07261076953727753,
+            "lower_dec": "-6.810614360600090923713093083908323887510e-2",
+            "upper_dec": "7.711539546855413016869182306716676112493e-2",
+            "arb_ball_str": "[+/- 0.0772]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.0045046259312766105,
+            "rad_float_outward": 0.07261076953727753,
+            "lower_dec": "-6.810614360600090923713093083908323887510e-2",
+            "upper_dec": "7.711539546855413016869182306716676112493e-2",
+            "arb_ball_str": "[+/- 0.0772]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 8.636168555094445e-78,
+            "rad_float_outward": 0.14522153907455507,
+            "lower_dec": "-1.452215390745550394058227539062500000001e-1",
+            "upper_dec": "1.452215390745550394058227539062500000002e-1",
+            "arb_ball_str": "[+/- 0.146]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 39,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.012118459487206728,
+            "rad_float_outward": 5.074098530447999e-19,
+            "lower_dec": "1.211845948720672842217523370515552068249e-2",
+            "upper_dec": "1.211845948720672842217523370515552068252e-2",
+            "arb_ball_str": "[0.01211845948720672842217523370515552068250 +/- 1.95e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        },
+        {
+          "grade_K": "-2",
+          "is_rational_grade": true,
+          "X_K_certified": {
+            "mid_float": 39.47841760435743,
+            "rad_float_outward": 2.506118203495885e-15,
+            "lower_dec": "3.947841760435743447533796399950460454124e+1",
+            "upper_dec": "3.947841760435743447533796399950460454127e+1",
+            "arb_ball_str": "[39.47841760435743447533796399950460454125 +/- 4.80e-39]"
+          },
+          "coupled_cutoff_M_X_K": 99,
+          "agreement_window_2_q_next": 202,
+          "sample_horizon_N": 40,
+          "N_M_X_K_at_sample_N_exact_int": "5342931457063200",
+          "A_K_M_X_K_at_sample_N_certified": {
+            "mid_float": 135338034837380.95,
+            "rad_float_outward": 0.0005932439103136954,
+            "lower_dec": "1.353380348373809537182439103136952930947e+14",
+            "upper_dec": "1.353380348373809537182439103136952930950e+14",
+            "arb_ball_str": "[135338034837380.9537182439103136952930948 +/- 2.26e-26]"
+          },
+          "normalized_fiber_size_recovery_diff_certified": {
+            "mid_float": -3.111507638930571e-61,
+            "rad_float_outward": 5.1996286152544394e-61,
+            "lower_dec": "-8.311136254185009517445570444406352000939e-61",
+            "upper_dec": "2.088120976323867810301506390626227760349e-61",
+            "arb_ball_str": "[+/- 8.32e-61]"
+          },
+          "normalized_fiber_size_recovery_encloses_zero": true,
+          "coboundary_transfer_diff_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.563494452388552e-62,
+            "lower_dec": "-1.563494452388551734249214172252193795125e-62",
+            "upper_dec": "1.563494452388551734249214172252193795125e-62",
+            "arb_ball_str": "[+/- 1.57e-62]"
+          },
+          "coboundary_transfer_encloses_zero": true,
+          "W_M_X_K_from_grade_layer_jumps_certified": {
+            "mid_float": 0.0045046259312766105,
+            "rad_float_outward": 0.07261076953727753,
+            "lower_dec": "-6.810614360600090923713093083908323887510e-2",
+            "upper_dec": "7.711539546855413016869182306716676112493e-2",
+            "arb_ball_str": "[+/- 0.0772]"
+          },
+          "W_M_X_K_direct_certified": {
+            "mid_float": 0.0045046259312766105,
+            "rad_float_outward": 0.07261076953727753,
+            "lower_dec": "-6.810614360600090923713093083908323887510e-2",
+            "upper_dec": "7.711539546855413016869182306716676112493e-2",
+            "arb_ball_str": "[+/- 0.0772]"
+          },
+          "W_M_X_K_jump_vs_direct_diff_certified": {
+            "mid_float": 8.636168555094445e-78,
+            "rad_float_outward": 0.14522153907455507,
+            "lower_dec": "-1.452215390745550394058227539062500000001e-1",
+            "upper_dec": "1.452215390745550394058227539062500000002e-1",
+            "arb_ball_str": "[+/- 0.146]"
+          },
+          "W_M_X_K_jump_reconstruction_encloses_zero": true,
+          "closest_station_n_to_self_dual_peak": 39,
+          "min_station_ratio_distance_to_peak_1_certified": {
+            "mid_float": 0.012118459487206728,
+            "rad_float_outward": 5.074098530447999e-19,
+            "lower_dec": "1.211845948720672842217523370515552068249e-2",
+            "upper_dec": "1.211845948720672842217523370515552068252e-2",
+            "arb_ball_str": "[0.01211845948720672842217523370515552068250 +/- 1.95e-42]"
+          },
+          "self_dual_peak_strictly_avoided_on_window": true
+        }
+      ]
+    },
+    "section_4_cr1_cr2_cr3_bridge_and_open_obligation": {
+      "constructed_common_referent_observable": {
+        "local_prime_euler_integer_factor": "m_y(n) := exp(lambda_y(n)) = prod_{d | gcd(n, P_y)} (n/d)^{mu(d)} = { 1 if n = 1 or omega_{<=y}(n) >= 2; n if omega_{<=y}(n) = 0; p if omega_{<=y}(n) = 1 } in Z_{>=1}",
+        "cumulative_prime_euler_factorial_observable": "N_y(x) := exp(L_y(x)) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{1 <= n <= floor(x)} m_y(n) in Z_{>=1}",
+        "grade_K_integer_layer_realization": "A_{K,y}(x) := Phi_K(fromZ(K, N_y(x))) = N_y(x) * tau^K in L_K^x = tau^K (Z \\ {0}) subset L_K = tau^K Z",
+        "intrinsic_common_referent_projection": "N_K(A_{K,y}(x)) := tau^{-K} A_{K,y}(x) = N_y(x) = N_J(A_{J,y}(x)) in Z_{>=1}"
+      },
+      "proved_integer_layer_membership_theorems": {
+        "unconditional_factorial_ratio_integrality": "For every real x >= 1 and every prime cutoff y >= 2, all factorial denominators (floor(x/d)!)^{-1} with mu(d) = -1 in prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} divide the numerator identically, yielding the exact positive integer N_y(x) = prod_{2 <= n <= floor(x)} m_y(n) in Z_{>=1} with prime valuations E_{y,p}(x) = sum_{d | P_y, d <= x} mu(d) v_p(floor(x/d)!) >= 0.",
+        "exact_chebyshev_lcm_agreement_window": "For all 1 <= x < 2 q_{>y} (in particular across the entire coupled-cutoff agreement window 1 <= x < 2 q_{>M(X)} where M(X) = ceil(max(2, X^{5/4}))), N_y(x) = lcm(1, 2, ..., floor(x)) = exp(psi(x)) in Z_{>=1}, and at the first discrepancy x = 2 q_{>y}, N_y(2 q_{>y}) = 2 * lcm(1, 2, ..., 2 q_{>y}) in Z_{>=1}.",
+        "required_grade_layer_membership_CR2": "For every concurrent grade K in A_R = Qbar cap R, every y >= 2, and every x >= 1, A_{K,y}(x) = N_y(x) * tau^K belongs unconditionally to the discrete integer layer L_K^x = tau^K (Z \\ {0}) subset L_K = tau^K Z (`CR2`), and its consecutive step ratio A_{K,y}(n) / A_{K,y}(n-1) = m_y(n) in Z_{>=1} cancels tau^K identically.",
+        "mellin_stieltjes_and_station_ratio_bridge": "For any grades K >= J in A_R with relative scale X_{K,J} = tau^{K-J}, W_y(tau^{K-J}) = sum_{n>=2} log(A_{K,y}(n)/A_{K,y}(n-1)) * n^{-1/2} * h_0(Phi_J(n)/Phi_K(1)), where Phi_J(n)/Phi_K(1) = (n * tau^J)/tau^K = n / tau^{K-J}. For rational K - J != 0, Lindemann's theorem (tau = 2*pi not in Qbar) implies L_K cap L_J = {0}, so Phi_J(n) != Phi_K(m) for all nonzero integers n, m and no prime-power station ever collides with the self-dual peak alpha = 1."
+      },
+      "three_class_cr1_cr2_cr3_audit": {
+        "class_I_intrinsic_fiber_referent": {
+          "observable": "N_K(A_{K,y}(x)) = tau^{-K} A_{K,y}(x) = N_y(x) in Z_{>=1}",
+          "CR1_cross_grade_equality": "SATISFIED (N_K = N_J = N_y(x) for all K, J in A_R)",
+          "CR2_distinct_scaled_layer_membership": "LIVES_IN_SINGLE_RING_Z_NOT_L_K_CAP_L_J",
+          "CR3_off_critical_zero_sensitivity": "ARITHMETIC_CARRIER_INDEPENDENT_OF_ZERO_DEFECT_DELTA"
+        },
+        "class_II_ambient_integer_layer_observable": {
+          "observable": "A_{K,y}(x) = N_y(x) * tau^K in L_K^x subset L_K = tau^K Z",
+          "CR1_cross_grade_equality": "OBEYS_SCALE_COBOUNDARY A_{K,y}(x) = tau^{K-J} A_{J,y}(x); ambient equality m_K * tau^K = m_J * tau^J for rational K - J != 0 forces m_K = m_J = 0 by Lindemann",
+          "CR2_distinct_scaled_layer_membership": "PROVED_UNCONDITIONALLY (A_{K,y}(x) in L_K = tau^K Z for all x >= 1, y >= 2)",
+          "CR3_off_critical_zero_sensitivity": "CONDITIONAL_REDUCTIO_SCHEMA (`common_referent_integer_layer_bridge_and_station_ratio_identity`): if a zero-defect-modulated integer-layer observable D_K = m_K(delta) * tau^K in L_K satisfies D_K = D_J for rational K != J and delta != 0 => m_K(delta) != 0, then D_K in L_K cap L_J = {0} forces delta = 0"
+        },
+        "class_III_coupled_theta_wavelet_profile": {
+          "observable": "W_{M(X)}(X) = sum_{n>=2} log(A_{K,M(X)}(n)/A_{K,M(X)}(n-1)) n^{-1/2} h_0(Phi_J(n)/Phi_K(1))  (X = tau^{K-J})",
+          "CR1_cross_grade_equality": "SATISFIED_UNDER_SIMULTANEOUS_SHIFT (Q_tau(T_{K+A} psi_tau, T_{J+A} psi_tau) = C_tau(|K-J|))",
+          "CR2_distinct_scaled_layer_membership": "CONTINUOUS_MELLIN_STIELTJES_INTEGRAL_OVER_INTEGER_LAYER_JUMPS (arithmetic carrier A_{K,M(X)}(n) lies in L_K^x, while kernel values h_0(n/X) are continuous real numbers)",
+          "CR3_off_critical_zero_sensitivity": "PROVED_VIA_LAPLACE_CARLEMAN_AND_COUPLED_CUTOFF_EQUIVALENCE (sup_{X>=1} |W_{M(X)}(X)| < infty <=> sup_{X>=1} |R_mu(X)| < infty <=> sup_{K in A_R} |C_tau(K)| < infty <=> RH)"
+        }
+      },
+      "lean_theorems": [
+        "prime_euler_multiplicative_integrality_and_grade_layer_membership",
+        "common_referent_integer_layer_bridge_and_station_ratio_identity"
+      ],
+      "remaining_open_obligation": {
+        "subgate_id": "SUBGATE-TC-043A",
+        "status": "OPEN",
+        "scope_note": "SUBGATE-TC-043A remains OPEN. Divergence of the unsplit critical-line Gram norm ||Psi_y||_{L^2(d^*x)} establishes failure of that Cauchy-Schwarz norm estimate as y -> infty; it does NOT establish divergence of the signed coupled profile W_{M(X)}(X) or failure of the concurrent-grade hypothesis. Passing from the proved integer-layer membership A_{K,M(X)}(x) = N_{M(X)}(x) * tau^K in L_K^x = tau^K (Z \\ {0}) to a uniform signed cancellation bound sup_{X >= 1} |W_{M(X)}(X)| < infty (or a zero-defect-modulated cross-grade equality D_K = D_J in L_K cap L_J = {0}) is the exact open obligation."
+      }
+    },
+    "full_section_16_tree_roundtrip_verification": {
+      "total_certified_arb_balls_checked": 144,
+      "compared_against_live_original_arb_count": 144,
+      "live_original_count_matches_enumerated_total": true,
+      "all_enclose_original_256bit_arb_ball": true,
+      "failed_paths": [],
+      "checked_paths": [
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[0].log_N_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[0].log_N_y_minus_L_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[0].log_N_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[0].log_N_y_minus_L_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[1].log_N_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[1].log_N_y_minus_L_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[1].log_N_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[1].log_N_y_minus_L_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[2].log_N_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[2].log_N_y_minus_L_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[2].log_N_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[2].log_N_y_minus_L_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[3].log_N_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[3].log_N_y_minus_L_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[3].log_N_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[3].log_N_y_minus_L_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[4].log_N_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[4].log_N_y_minus_L_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[4].log_N_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[4].log_N_y_minus_L_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[5].log_N_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[5].log_N_y_minus_L_y_at_2_q_next_minus_1_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[5].log_N_y_at_2_q_next_certified",
+        "section_16.section_1_2_factorial_ratio_integrality_and_lcm_audit.prime_cutoff_integrality_table[5].log_N_y_minus_L_y_at_2_q_next_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[0].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[1].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[2].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[3].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[4].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[5].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[6].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[7].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[8].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[9].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[10].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[11].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[12].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[13].min_station_ratio_distance_to_peak_1_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].X_K_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].A_K_M_X_K_at_sample_N_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].normalized_fiber_size_recovery_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].coboundary_transfer_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].W_M_X_K_from_grade_layer_jumps_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].W_M_X_K_direct_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].W_M_X_K_jump_vs_direct_diff_certified",
+        "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].min_station_ratio_distance_to_peak_1_certified"
       ]
     }
   },

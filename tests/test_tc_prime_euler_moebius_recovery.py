@@ -42,11 +42,25 @@ from flint import acb, arb, ctx as flint_ctx
 from tc.canonical_theta_correlation_bound import (
     CANONICAL_THETA_CORRELATION_LEAN_DEFS,
     CANONICAL_THETA_CORRELATION_LEAN_THEOREMS,
+    COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS,
     PRIME_EULER_MOEBIUS_RECOVERY_STATUS,
     STARTING_HEAD_TC_046,
+    STARTING_HEAD_TC_047,
     TASK_TC_046_ID,
+    TASK_TC_047_ID,
     verify_all_serialized_arb_in_tree,
     verify_canonical_theta_correlation_lean_module,
+)
+from tc.common_referent_prime_theta_bridge import (
+    alternating_factorial_prime_valuation_exact,
+    cumulative_N_y_alternating_factorial_fraction,
+    cumulative_N_y_from_local_factors_exact,
+    evaluate_grade_layer_observable_A_K_y_arb,
+    evaluate_w_y_from_grade_layer_jumps_arb,
+    lcm_prefix_exact,
+    local_prime_euler_factor_divisor_product_fraction,
+    local_prime_euler_factor_m_y_exact,
+    verify_symbolic_common_referent_identities,
 )
 from tc.prime_euler_moebius_recovery import (
     certified_coupled_cutoff_M_X_arb,
@@ -397,16 +411,26 @@ def test_07_lean_module_and_artifact_section_15():
     assert lean_audit["contains_sorry"] is False
     assert lean_audit["contains_admit"] is False
     assert lean_audit["matches_exact"] is True
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 26
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 45
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 28
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 47
     assert "finitePrimeEulerRecursionStep" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeCoeffCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
+    assert "finitePrimeMultiplicativeFactorCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
+    assert "gradeLayerRealizedObservable" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert (
         "finite_prime_euler_recursion_and_coefficient_cases"
         in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
     )
     assert (
         "coupled_prime_cutoff_comparison_and_boundedness_equivalence"
+        in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
+    )
+    assert (
+        "prime_euler_multiplicative_integrality_and_grade_layer_membership"
+        in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
+    )
+    assert (
+        "common_referent_integer_layer_bridge_and_station_ratio_identity"
         in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
     )
 
@@ -528,4 +552,115 @@ def test_07_lean_module_and_artifact_section_15():
     assert (
         rt15["compared_against_live_original_arb_count"]
         == enum15["total_certified_arb_balls_checked"]
+    )
+
+
+def test_08_task_tc047_common_referent_prime_theta_integer_layer_bridge():
+    """Verify TASK-TC-047 common-referent observable N_y(x), A_{K,y}(x) = N_y(x)*tau^K in L_K^x,
+    exact factorial-ratio integrality (denominator == 1), LCM agreement below 2 q_{>y},
+    Mellin-Stieltjes station-ratio reconstruction of W_{M(X)}(X), and section_16 round-trip.
+    """
+    sym = verify_symbolic_common_referent_identities()
+    assert sym["multiplicative_step_0_to_1_equals_p"] is True
+    assert sym["multiplicative_step_1_to_2_equals_1"] is True
+    assert sym["grade_layer_step_ratio_cancels_tau_K"] is True
+    assert sym["cross_grade_station_ratio_identity_verified"] is True
+    assert sym["ambient_coboundary_transfer_identity_verified"] is True
+
+    # 1. Exact factorial-ratio integrality (denominator == 1), LCM agreement, and prime valuations:
+    for y_cut in (2, 3, 5, 7, 11, 13):
+        q_next = next_prime_above(y_cut)
+        first_disc = 2 * q_next
+        for n in range(1, first_disc + 6):
+            m_int = local_prime_euler_factor_m_y_exact(n, y_cut)
+            m_frac = local_prime_euler_factor_divisor_product_fraction(n, y_cut)
+            assert m_int >= 1
+            assert m_frac.denominator == 1
+            assert m_frac.numerator == m_int
+
+            N_prod = cumulative_N_y_from_local_factors_exact(n, y_cut)
+            N_fact = cumulative_N_y_alternating_factorial_fraction(n, y_cut)
+            assert N_fact.denominator == 1
+            assert N_fact.numerator == N_prod
+            if n < first_disc:
+                assert N_prod == lcm_prefix_exact(n)
+            elif n == first_disc:
+                assert N_prod == 2 * lcm_prefix_exact(first_disc)
+
+        for p_c in primes_up_to(first_disc):
+            assert alternating_factorial_prime_valuation_exact(first_disc, y_cut, p_c) >= 0
+
+    # 2. Grade-layer observable A_{K,y}(x) = N_y(x)*tau^K in L_K^x and Stieltjes station-ratio reconstruction:
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau_a = arb(2) * arb.pi()
+        for k_arb in (
+            arb(0),
+            arb(1) / arb(4),
+            -arb(1) / arb(4),
+            arb(2).sqrt() / arb(2),
+            arb(1),
+            -arb(1),
+        ):
+            abs_k = abs(k_arb)
+            X_a = tau_a**abs_k
+            M_k = certified_coupled_cutoff_M_X_arb(X_a, prec_bits=256)
+            obs_k = evaluate_grade_layer_observable_A_K_y_arb(
+                25, M_k, k_arb, prec_bits=256
+            )
+            obs_0 = evaluate_grade_layer_observable_A_K_y_arb(
+                25, M_k, arb(0), prec_bits=256
+            )
+            assert obs_k["size_recovery_encloses_zero"] is True
+            assert obs_k["log_N_y_equals_L_y_encloses_zero"] is True
+            assert bool(
+                (obs_k["A_K_y_arb"] - (tau_a**k_arb) * obs_0["A_K_y_arb"]).contains(0)
+            )
+            jump_res = evaluate_w_y_from_grade_layer_jumps_arb(
+                X_a, M_k, abs_k, arb(0), n_cut=1200, prec_bits=256
+            )
+            assert jump_res["jump_vs_direct_encloses_zero"] is True
+            assert jump_res["tau_K_cancellation_in_step_ratio_verified"] is True
+    finally:
+        flint_ctx.prec = saved_prec
+
+    # 3. Artifact section_16 verification:
+    artifact_path = (
+        Path(__file__).resolve().parent.parent
+        / "data"
+        / "tc_canonical_theta_correlation_bound.json"
+    )
+    payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+    assert payload["common_referent_prime_theta_bridge_task_id"] == TASK_TC_047_ID
+    assert (
+        payload["status_dimensions"]["common_referent_prime_theta_bridge_status"]
+        == COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS
+    )
+    sec16 = payload["section_16_common_referent_prime_theta_integer_layer_bridge"]
+    assert sec16["task_id"] == TASK_TC_047_ID
+    assert sec16["inspected_baseline"] == STARTING_HEAD_TC_047
+    s12 = sec16["section_1_2_factorial_ratio_integrality_and_lcm_audit"]
+    assert s12["all_factorial_ratio_denominators_equal_one"] is True
+    assert s12["all_local_factor_products_match_factorial_ratio"] is True
+    assert s12["all_prime_valuations_nonnegative"] is True
+    assert s12["all_lcm_agreement_windows_verified"] is True
+    assert s12["all_first_discrepancy_ratios_equal_two"] is True
+    assert s12["all_arb_logs_match_summatory_L_y"] is True
+    s3 = sec16["section_3_grade_layer_membership_and_station_ratio_bridge"]
+    assert s3["all_grade_size_recoveries_enclose_zero"] is True
+    assert s3["all_grade_coboundary_transfers_enclose_zero"] is True
+    assert s3["all_grade_jump_reconstructions_enclose_zero"] is True
+    assert s3["all_nonzero_rational_grades_avoid_self_dual_peak"] is True
+    assert len(s3["certified_grade_layer_bridge_table"]) == 15
+    s4 = sec16["section_4_cr1_cr2_cr3_bridge_and_open_obligation"]
+    assert s4["remaining_open_obligation"]["subgate_id"] == "SUBGATE-TC-043A"
+    assert s4["remaining_open_obligation"]["status"] == "OPEN"
+    rt16 = sec16["full_section_16_tree_roundtrip_verification"]
+    assert rt16["all_enclose_original_256bit_arb_ball"] is True
+    assert rt16["live_original_count_matches_enumerated_total"] is True
+    enum16 = verify_all_serialized_arb_in_tree(sec16, path_prefix="section_16")
+    assert (
+        rt16["compared_against_live_original_arb_count"]
+        == enum16["total_certified_arb_balls_checked"]
     )

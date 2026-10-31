@@ -1810,7 +1810,8 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                     "Integrating over (-I_y) union I_y gives for y >= 24 (and all certified table rows): "
                     "||Psi_y||_{L^2(d^*x)}^2 >= (2/tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt "
                     ">= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = (H_0(0) / (8 log y)) exp[(4*cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty as y -> infty "
-                    "(with lower-bound expression (H_0(0)/(8 log y))|E_y(i t_{y,-})|^2 reaching 153.39246 at y = 9973). "
+                    "(with right-endpoint value |E_y(i t_{y,+})|^2 reaching 6.65784855e12, left-endpoint minimum |E_y(i t_{y,-})|^2 reaching "
+                    "3.99370923e8, and lower-bound expression (H_0(0)/(8 log y))|E_y(i t_{y,-})|^2 reaching 153.3859466 at y = 9973). "
                     "Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm estimate as y -> infty; "
                     "it does NOT establish divergence of W_{M(X)}(X), failure of the concurrent-grade hypothesis, or closure of the arithmetic cancellation obligation."
                 ),
