@@ -13383,6 +13383,7 @@
     "symbolic_identities_verification": {
       "euler_prime_step_jump_identity_verified": true,
       "candidate_1_coboundary_ratio_verified": true,
+      "candidate_1B_grade_invariant_modulation_still_leaves_tau_K_verified": true,
       "candidate_2A_pullback_grade_invariance_verified": true,
       "candidate_2A_radial_factor_square_identity_verified": true
     },
@@ -14071,6 +14072,38 @@
       "lean_theorem": "coupled_cutoff_prime_step_jump_and_dense_comparison_extension"
     },
     "section_3_single_observable_common_referent_candidate_audit": {
+      "substantive_candidate_classification_table": [
+        {
+          "candidate": "Integer carrier A_{K,y}(x) = N_y(x) * tau^K",
+          "established": [
+            "Integer-layer membership (CR2: A_{K,y}(x) in L_K^x = tau^K (Z \\ {0}) subset L_K = tau^K Z)",
+            "Nonvanishing (one-way CR3 implication: always positive N_y(x) * tau^K > 0 != 0)"
+          ],
+          "missing": [
+            "Raw cross-grade equality (CR1: A_{K,y}(x) = tau^{K-J} A_{J,y}(x) != A_{J,y}(x) for K != J; multiplying by a grade-invariant factor c(delta) still leaves the factor tau^K)"
+          ]
+        },
+        {
+          "candidate": "Theta detector D_K^{(2A)}(rho_K) = |H_0(tau^{-K} rho_K - 1/2)|^2 * (tau^delta + tau^{-delta} - 2)",
+          "established": [
+            "Raw cross-grade equality (CR1: D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) across all K, J in A_R)",
+            "Off-critical nonvanishing (CR3: delta != 0 ==> D^{(2A)}(rho) > 0 != 0 throughout 0 < |delta| < 1/2, gamma != 0)"
+          ],
+          "missing": [
+            "Integer-layer membership (CR2: by L_K cap L_J = {0} for rational K - J != 0, simultaneous membership in L_K and L_J holds iff D^{(2A)} = 0 <=> delta = 0, without needing any upper bound D^{(2A)} < 1)"
+          ]
+        },
+        {
+          "candidate": "Shift difference D_{K,y}^{(2B)}(rho_K) = W_y(tau^{1 + |delta(rho_K)|}) - W_y(tau)",
+          "established": [
+            "Raw cross-grade equality (CR1: D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) because d log A_{K,y} = d log N_y cancels tau^K and delta(rho_K) = delta is grade-invariant)"
+          ],
+          "missing": [
+            "General off-critical nonvanishing (CR3: W_y(X) is oscillatory so general nonvanishing for delta != 0 is not proved; at n_cut = 800 and delta = 1/20 its enclosure [-0.0000715342, 0.0069867010] includes zero)",
+            "Integer-layer membership (CR2)"
+          ]
+        }
+      ],
       "collision_contract_specification": {
         "zero_setup": "For a nontrivial Riemann zeta zero rho = 1/2 + delta + i*gamma (delta = Re(rho) - 1/2 in (-1/2, 1/2)), its grade-K image is rho_K = tau^K * rho in C_K, considered across all concurrent grades K in A_R = Qbar cap R (both positive and negative), with contradiction witnesses taken at a justified nonzero rational difference K - J in Q \\ {0} (canonical benchmark pair: K = 0, J = 1).",
         "CR1_raw_cross_grade_common_referent_equality": "D_K(rho_K) = D_J(rho_J) = D(rho) as the exact same external real value in R.",
@@ -14082,10 +14115,17 @@
         "definition": "D_{K,y}^{(1)}(rho_K) := c_K(rho_K) * A_{K,y}(X_K(rho_K)) = c_K(rho_K) * N_y(X_K(rho_K)) * tau^K, where N_y(x) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{n <= x} m_y(n) in Z_{>=1}.",
         "domain_and_dependencies": "Defined for all K in A_R = Qbar cap R, y >= 2, and complex zero image rho_K = tau^K rho != 0, with invariant zero-height scale X_0(rho_K) = tau^{-K} |rho_K| = |rho| >= 14.13 > 1 (or raw scale X_K(rho_K) = |rho_K| for K >= 0).",
         "subcase_1A_unmodulated_carrier_c_K_eq_1": {
+          "established_properties": [
+            "CR2 (integer-layer membership A_{K,y}(X) = N_y(X) * tau^K in L_K^x subset L_K)",
+            "CR3 (one-way nonvanishing implication delta != 0 ==> D_{K,y}^{(1A)} > 0 != 0, satisfied because the carrier is always positive)"
+          ],
+          "missing_properties": [
+            "CR1 (raw cross-grade equality D_{K,y}^{(1A)} = D_{J,y}^{(1A)} fails for K != J)"
+          ],
           "transformation_law": "At invariant scale X_0 = tau^{-K}|rho_K| = |rho|, D_{K,y}^{(1A)}(rho_K) = N_y(|rho|) * tau^K obeys the exact weight-1 scale-coboundary law D_{K,y}^{(1A)}(rho_K) = tau^{K-J} D_{J,y}^{(1A)}(rho_J).",
-          "CR1_status": "FAILS_RAW_EQUALITY: Since N_y(|rho|) >= 1 and tau = 2*pi > 1, D_{K,y}^{(1A)}(rho_K) - D_{J,y}^{(1A)}(rho_J) = N_y(|rho|) * (tau^K - tau^J) != 0 whenever K != J (and at raw scale |rho_K|, N_y(|rho_J|) * tau^J > N_y(|rho_K|) * tau^K for J > K >= 0).",
-          "CR2_status": "PROVED_UNCONDITIONALLY: By Theorem `unconditional_factorial_ratio_integrality`, N_y(X) in Z_{>=1}, so D_{K,y}^{(1A)}(rho_K) = N_y(X) * tau^K in L_K^x = tau^K (Z \\ {0}) subset L_K.",
-          "CR3_status": "VACUOUSLY_NONZERO_UNSENSITIVE_TO_DELTA: Since N_y(X) >= 1 and tau^K > 0, D_{K,y}^{(1A)}(rho_K) > 0 for ALL zeros (both delta != 0 and delta = 0).",
+          "CR1_status": "MISSING (FAILS_RAW_EQUALITY): Since N_y(|rho|) >= 1 and tau = 2*pi > 1, D_{K,y}^{(1A)}(rho_K) - D_{J,y}^{(1A)}(rho_J) = N_y(|rho|) * (tau^K - tau^J) != 0 whenever K != J (and at raw scale |rho_K|, N_y(|rho_J|) * tau^J > N_y(|rho_K|) * tau^K for J > K >= 0).",
+          "CR2_status": "ESTABLISHED (PROVED_UNCONDITIONALLY): By Theorem `unconditional_factorial_ratio_integrality`, N_y(X) in Z_{>=1}, so D_{K,y}^{(1A)}(rho_K) = N_y(X) * tau^K in L_K^x = tau^K (Z \\ {0}) subset L_K.",
+          "CR3_status": "ESTABLISHED (ONE_WAY_IMPLICATION_SATISFIED_BY_ALWAYS_POSITIVE_CARRIER): Since N_y(X) >= 1 and tau^K > 0, D_{K,y}^{(1A)}(rho_K) > 0 != 0 for all inputs, so the one-way implication delta != 0 ==> D_{K,y}^{(1A)}(rho_K) != 0 holds unconditionally (though the carrier is non-selective and also nonzero at delta = 0).",
           "certified_benchmark_at_rho_1_K0_vs_J1": {
             "floor_abs_rho_1": 14,
             "coupled_cutoff_y": 28,
@@ -14132,28 +14172,582 @@
           }
         },
         "subcase_1B_zero_defect_modulated_carrier": {
-          "definition": "D_{K,y}^{(1B)}(rho_K) = m_K(rho_K) * N_y(X_0) * tau^K with integer multiplier m_K(rho_K) in Z",
-          "trilemma_obstruction": "To preserve CR2 (D_{K,y}^{(1B)} in L_K = tau^K Z), the multiplier c_K(rho_K) * N_y(X_0) must be an integer M_K in Z. At any rational grade difference K - J in Q \\ {0} (such as K = 0, J = 1), Lindemann's theorem gives L_K cap L_J = {0}, so raw equality CR1 (M_K * tau^K = M_J * tau^J) holds if and only if M_K = M_J = 0. Furthermore, by `invariant_covariant_observable_vanishing` in `formal/RiemannScope/Grade.lean`, any multiplier extending continuously to a real interval I subset R (necessary because A_R is totally disconnected) while taking integer values on I cap A_R must be a constant integer M_0 in Z: if M_0 != 0 then CR1 fails (M_0 * tau^K != M_0 * tau^J), and if M_0 = 0 then CR3 fails (D = 0 even for delta != 0). Conversely, if c_K(rho_K) = tau^{-K} Theta_0(delta) is chosen to cancel tau^K and enforce CR1, then CR2 at J = 1 requires Theta_0(delta) * N_y(X_0) in Z cap tau Z = {0}, reducing to Candidate 2."
+          "definition": "D_{K,y}^{(1B)}(rho_K) = c_K(rho_K) * N_y(X_0) * tau^K",
+          "grade_invariant_modulation_fails_raw_CR1": "Multiplying the carrier A_{K,y}(X_0) = N_y(X_0) * tau^K by a grade-invariant factor c_K(rho_K) = c(delta) (such as c(delta) = tau^delta + tau^{-delta} - 2) gives D_{K,y}^{(1B)}(rho_K) = c(delta) * N_y(X_0) * tau^K = tau^{K-J} D_{J,y}^{(1B)}(rho_J), which STILL leaves the factor tau^K and therefore does NOT establish raw CR1 (for delta != 0 and K != J, D_{K,y}^{(1B)} != D_{J,y}^{(1B)}, while CR2 also fails unless c(delta) * N_y(X_0) in Z).",
+          "certified_grade_invariant_modulation_at_delta_1_10": {
+            "c_delta_1_10_certified": {
+              "mid_float": 0.03387310722551371,
+              "rad_float_outward": 3.392051775570012e-18,
+              "lower_dec": "3.387310722551371478560147398407441162474e-2",
+              "upper_dec": "3.387310722551371478560147398407441162477e-2",
+              "arb_ball_str": "[0.03387310722551371478560147398407441162475 +/- 2.31e-42]"
+            },
+            "D_0_1B_modulated_certified": {
+              "mid_float": 12206.512919786122,
+              "rad_float_outward": 1.7824207887145686e-13,
+              "lower_dec": "1.220651291978612226013934716490105497308e+4",
+              "upper_dec": "1.220651291978612226013934716490105497311e+4",
+              "arb_ball_str": "[12206.51291978612226013934716490105497310 +/- 4.26e-36]"
+            },
+            "D_1_1B_modulated_certified": {
+              "mid_float": 76695.78262949796,
+              "rad_float_outward": 2.8244565771159097e-12,
+              "lower_dec": "7.669578262949795761822056311999162495393e+4",
+              "upper_dec": "7.669578262949795761822056311999162495396e+4",
+              "arb_ball_str": "[76695.78262949795761822056311999162495395 +/- 4.98e-36]"
+            },
+            "raw_CR1_difference_D_1_minus_D_0_modulated_certified": {
+              "mid_float": 64489.269709711836,
+              "rad_float_outward": 8.27225094698596e-13,
+              "lower_dec": "6.448926970971183535808121595509056998083e+4",
+              "upper_dec": "6.448926970971183535808121595509056998086e+4",
+              "arb_ball_str": "[64489.26970971183535808121595509056998085 +/- 7.16e-37]"
+            },
+            "grade_invariant_modulation_raw_CR1_difference_strictly_positive": true
+          },
+          "trilemma_obstruction": "To preserve CR2 (D_{K,y}^{(1B)} in L_K = tau^K Z), the product M_K := c_K(rho_K) * N_y(X_0) must be an integer M_K in Z. At any rational grade difference K - J in Q \\ {0} (such as K = 0, J = 1), Lindemann's theorem gives L_K cap L_J = {0}, so raw equality CR1 (M_K * tau^K = M_J * tau^J) holds if and only if M_K = M_J = 0. Conversely, if c_K(rho_K) = tau^{-K} Theta_0(delta) is chosen to strip tau^K and enforce raw CR1, then D_{K,y}^{(1B)} = Theta_0(delta) * N_y(X_0) loses the tau^K scale factor and is missing CR2 across K != J."
         }
       },
       "candidate_2_canonical_theta_and_stieltjes_zero_defect_observables": {
         "subcase_2A_normalized_pullback_theta_zero_radial_defect": {
           "definition": "D_K^{(2A)}(rho_K) := |H_0(tau^{-K} rho_K - 1/2)|^2 * (tau^{tau^{-K} Re(rho_K) - 1/2} + tau^{-(tau^{-K} Re(rho_K) - 1/2)} - 2) = |H_0(delta + i*gamma)|^2 * (tau^delta + tau^{-delta} - 2), where H_0(z) = F_tau(1/2 + z) * F_tau(1/2 - z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4).",
+          "established_properties": [
+            "CR1 (raw cross-grade equality D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) across all K, J in A_R)",
+            "CR3 (off-critical nonvanishing: delta != 0 ==> D^{(2A)}(rho) > 0 != 0 throughout 0 < |delta| < 1/2, gamma != 0)"
+          ],
+          "missing_properties": [
+            "CR2 (integer-layer membership D_K^{(2A)}(rho_K) in L_K = tau^K Z across distinct grades K != J)"
+          ],
           "domain_and_transformation_law": "Defined for all K in A_R = Qbar cap R and all rho_K = tau^K rho with Re(rho) in (0, 1). Because tau^{-K} rho_K = rho is invariant under the grade-K ray dilation Phi_K, D_K^{(2A)}(rho_K) has weight 0 (strict cross-grade invariance D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J)).",
-          "CR1_status": "PROVED_UNCONDITIONALLY: For all K, J in A_R (both rational and irrational algebraic grades), tau^{-K} rho_K - 1/2 = delta + i*gamma = tau^{-J} rho_J - 1/2, so D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) = D^{(2A)}(rho) as the exact same external real number.",
-          "CR3_status": "PROVED_UNCONDITIONALLY_ONE_WAY (delta != 0 ==> D^{(2A)}(rho) > 0): (1) By the squared pole-annihilating normalization P(D)^2 = (D^2 - 1/16)^2 of psi_tau, H_0(z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4). Since 1/Gamma(w) is entire on C, Gamma((1 +/- 2z)/4) has no zeros anywhere in C; hence the ONLY zeros of H_0(z) in C are z = +/- 1/2 (corresponding to s = 0, 1). Every nontrivial zero rho = 1/2 + delta + i*gamma in the critical strip has |delta| < 1/2 (and gamma != 0), so z = delta + i*gamma != +/- 1/2 and |H_0(delta + i*gamma)|^2 > 0 unconditionally. (2) Since tau = 2*pi > 1, tau^delta + tau^{-delta} - 2 = (tau^{delta/2} - tau^{-delta/2})^2 > 0 for all delta != 0. Therefore delta != 0 ==> D^{(2A)}(rho) > 0 != 0 unconditionally.",
-          "CR2_status": "EQUIVALENT_TO_DELTA_EQ_0_NOT_UNCONDITIONALLY_PROVED: For every nontrivial zero rho = 1/2 + delta + i*gamma in the critical strip |delta| < 1/2 (with |gamma| >= 14.13), 0 <= D^{(2A)}(rho) < 1 (for instance at gamma = gamma_1 ~ 14.1347, |H_0(delta + i*gamma_1)|^2 < 3e-11 and 0 <= tau^delta + tau^{-delta} - 2 < 0.91). Consequently: (a) even at the single grade K = 0 (where L_0 = Z), D_0^{(2A)}(rho) in Z holds if and only if D_0^{(2A)}(rho) = 0 <=> delta = 0; (b) across K = 0 and J = 1 (rational difference K - J = -1 != 0), Lindemann's theorem gives L_0 cap L_1 = Z cap tau Z = {0}, so simultaneous layer membership D_0^{(2A)}(rho) in L_0 and D_1^{(2A)}(rho_1) in L_1 holds if and only if D^{(2A)}(rho) = 0 <=> delta = 0. Thus CR2 for Candidate 2A is logically equivalent to RH for rho and cannot be asserted unconditionally without circularity."
+          "CR1_status": "ESTABLISHED (PROVED_UNCONDITIONALLY): For all K, J in A_R (both rational and irrational algebraic grades), tau^{-K} rho_K - 1/2 = delta + i*gamma = tau^{-J} rho_J - 1/2, so D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) = D^{(2A)}(rho) as the exact same external real number.",
+          "CR3_status": "ESTABLISHED (PROVED_UNCONDITIONALLY_ONE_WAY, delta != 0 ==> D^{(2A)}(rho) > 0): (1) By the squared pole-annihilating normalization P(D)^2 = (D^2 - 1/16)^2 of psi_tau, H_0(z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4). Since 1/Gamma(w) is entire on C, Gamma((1 +/- 2z)/4) has no zeros anywhere in C; hence the ONLY zeros of H_0(z) in C are z = +/- 1/2 (corresponding to s = 0, 1). Every off-critical point rho = 1/2 + delta + i*gamma in the critical strip has |delta| < 1/2 (and gamma != 0), so z = delta + i*gamma != +/- 1/2 and |H_0(delta + i*gamma)|^2 > 0 unconditionally (for example, at gamma = gamma_1 ~ 14.13472514, |H_0(delta + i*gamma_1)|^2 ~ 2.26e-7). (2) Since tau = 2*pi > 1, tau^delta + tau^{-delta} - 2 = (tau^{delta/2} - tau^{-delta/2})^2 > 0 for all delta != 0. Therefore delta != 0 ==> D^{(2A)}(rho) > 0 != 0 unconditionally.",
+          "CR2_status": "MISSING (EQUIVALENT_TO_DELTA_EQ_0_BY_TWO_LAYER_DISJOINTNESS_WITHOUT_UPPER_BOUND): Across any two concurrent grades with nonzero rational difference K - J in Q \\ {0} (such as K = 0 and J = 1), Lindemann's theorem gives L_K cap L_J = tau^K Z cap tau^J Z = {0}. Because raw CR1 (D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) = D^{(2A)}(rho)) holds unconditionally, simultaneous layer membership D_K^{(2A)}(rho_K) in L_K and D_J^{(2A)}(rho_J) in L_J (`CR2`) holds if and only if D^{(2A)}(rho) in L_K cap L_J = {0}, i.e. D^{(2A)}(rho) = 0 <=> delta = 0. This valid two-layer argument does NOT require any universal upper bound D^{(2A)}(rho) < 1.",
+          "first_10_zeta_zeros_certification": {
+            "all_first_10_zeros_abs_H0_sq_strictly_positive": true,
+            "all_first_10_zeros_on_line_D_2A_enclose_zero": true,
+            "all_first_10_zeros_off_line_D_2A_strictly_positive": true,
+            "all_first_10_zeros_off_line_CR1_enclose_zero": true,
+            "certified_first_10_zeros_table": [
+              {
+                "zero_index": 1,
+                "gamma_n_certified": {
+                  "mid_float": 14.134725141734695,
+                  "rad_float_outward": 8.407109157053215e-16,
+                  "lower_dec": "1.413472514173469379045725198356247027077e+1",
+                  "upper_dec": "1.413472514173469379045725198356247027080e+1",
+                  "arb_ball_str": "[14.13472514173469379045725198356247027078 +/- 4.26e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 2.2567480269679515e-07,
+                  "rad_float_outward": 7.193671008776191e-24,
+                  "lower_dec": "2.256748026967951546108093440660440032519e-7",
+                  "upper_dec": "2.256748026967951546108093440660440032522e-7",
+                  "arb_ball_str": "[2.256748026967951546108093440660440032521e-7 +/- 6.14e-48]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 2.2575917324127818e-07,
+                  "rad_float_outward": 1.0462019694002403e-23,
+                  "lower_dec": "2.257591732412781673087576385062770482495e-7",
+                  "upper_dec": "2.257591732412781673087576385062770482498e-7",
+                  "arb_ball_str": "[2.257591732412781673087576385062770482497e-7 +/- 2.01e-47]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 7.647164682345142e-09,
+                  "rad_float_outward": 1.071315685261197e-25,
+                  "lower_dec": "7.647164682345141982580246406875900629226e-9",
+                  "upper_dec": "7.647164682345141982580246406875900629229e-9",
+                  "arb_ball_str": "[7.647164682345141982580246406875900629227e-9 +/- 3.07e-49]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 7.647164682345142e-09,
+                  "rad_float_outward": 1.071315685261197e-25,
+                  "lower_dec": "7.647164682345141982580246406875900629226e-9",
+                  "upper_dec": "7.647164682345141982580246406875900629229e-9",
+                  "arb_ball_str": "[7.647164682345141982580246406875900629227e-9 +/- 3.07e-49]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -4.504112890784525e-84,
+                  "rad_float_outward": 1.49730690131865e-80,
+                  "lower_dec": "-1.497757312607728346927288631760462955333e-80",
+                  "upper_dec": "1.496856490029571441866614315130105409763e-80",
+                  "arb_ball_str": "[+/- 1.50e-80]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 2,
+                "gamma_n_certified": {
+                  "mid_float": 21.022039638771556,
+                  "rad_float_outward": 1.0211791602349864e-15,
+                  "lower_dec": "2.102203963877155499262847959389690277732e+1",
+                  "upper_dec": "2.102203963877155499262847959389690277735e+1",
+                  "arb_ball_str": "[21.02203963877155499262847959389690277733 +/- 4.35e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 3.466385309166594e-14,
+                  "rad_float_outward": 1.7916776172417319e-31,
+                  "lower_dec": "3.466385309166594117353576491925532451715e-14",
+                  "upper_dec": "3.466385309166594117353576491925532451718e-14",
+                  "arb_ball_str": "[3.466385309166594117353576491925532451717e-14 +/- 2.93e-54]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 3.4669725073046025e-14,
+                  "rad_float_outward": 6.5799536951639e-31,
+                  "lower_dec": "3.466972507304602432438026372162909433562e-14",
+                  "upper_dec": "3.466972507304602432438026372162909433565e-14",
+                  "arb_ball_str": "[3.466972507304602432438026372162909433563e-14 +/- 4.97e-55]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 1.1743713148783692e-15,
+                  "rad_float_outward": 5.476045340897437e-32,
+                  "lower_dec": "1.174371314878369289682452740063873155383e-15",
+                  "upper_dec": "1.174371314878369289682452740063873155386e-15",
+                  "arb_ball_str": "[1.174371314878369289682452740063873155385e-15 +/- 4.02e-55]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 1.1743713148783692e-15,
+                  "rad_float_outward": 5.476045340897437e-32,
+                  "lower_dec": "1.174371314878369289682452740063873155383e-15",
+                  "upper_dec": "1.174371314878369289682452740063873155386e-15",
+                  "arb_ball_str": "[1.174371314878369289682452740063873155385e-15 +/- 4.02e-55]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -1.6875008786960935e-90,
+                  "rad_float_outward": 3.359029057452419e-88,
+                  "lower_dec": "-3.375904066239379542021332620222296315000e-88",
+                  "upper_dec": "3.342154048665457671968799188031765669954e-88",
+                  "arb_ball_str": "[+/- 3.38e-88]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 3,
+                "gamma_n_certified": {
+                  "mid_float": 25.01085758014569,
+                  "rad_float_outward": 6.195751961392267e-16,
+                  "lower_dec": "2.501085758014568876321379099256282181864e+1",
+                  "upper_dec": "2.501085758014568876321379099256282181867e+1",
+                  "arb_ball_str": "[25.01085758014568876321379099256282181866 +/- 4.51e-40]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 1.6936401942485187e-18,
+                  "rad_float_outward": 1.8649039201916802e-35,
+                  "lower_dec": "1.693640194248518740635819639449667006529e-18",
+                  "upper_dec": "1.693640194248518740635819639449667006532e-18",
+                  "arb_ball_str": "[1.693640194248518740635819639449667006530e-18 +/- 8.20e-59]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 1.6938429893745611e-18,
+                  "rad_float_outward": 1.3438111716127948e-35,
+                  "lower_dec": "1.693842989374561083910031623912535549710e-18",
+                  "upper_dec": "1.693842989374561083910031623912535549713e-18",
+                  "arb_ball_str": "[1.693842989374561083910031623912535549711e-18 +/- 2.53e-58]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 5.73757252022692e-20,
+                  "rad_float_outward": 1.1859847042637783e-36,
+                  "lower_dec": "5.737572520226919547072583587283602808431e-20",
+                  "upper_dec": "5.737572520226919547072583587283602808434e-20",
+                  "arb_ball_str": "[5.737572520226919547072583587283602808432e-20 +/- 3.86e-61]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 5.73757252022692e-20,
+                  "rad_float_outward": 1.1859847042637783e-36,
+                  "lower_dec": "5.737572520226919547072583587283602808431e-20",
+                  "upper_dec": "5.737572520226919547072583587283602808434e-20",
+                  "arb_ball_str": "[5.737572520226919547072583587283602808432e-20 +/- 3.86e-61]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -8.052483330070581e-95,
+                  "rad_float_outward": 1.2617928139668553e-92,
+                  "lower_dec": "-1.269845297296925704484604849310595672586e-92",
+                  "upper_dec": "1.253740330636784542239188727326921825186e-92",
+                  "arb_ball_str": "[+/- 1.27e-92]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 4,
+                "gamma_n_certified": {
+                  "mid_float": 30.424876125859512,
+                  "rad_float_outward": 8.112374506549821e-16,
+                  "lower_dec": "3.042487612585951321031189753058409132017e+1",
+                  "upper_dec": "3.042487612585951321031189753058409132020e+1",
+                  "arb_ball_str": "[30.42487612585951321031189753058409132018 +/- 1.57e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 1.3124644933451122e-24,
+                  "rad_float_outward": 2.128566897630808e-41,
+                  "lower_dec": "1.312464493345112163130363727982571406377e-24",
+                  "upper_dec": "1.312464493345112163130363727982571406380e-24",
+                  "arb_ball_str": "[1.312464493345112163130363727982571406379e-24 +/- 2.69e-65]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 1.3125707381167599e-24,
+                  "rad_float_outward": 4.019680255762863e-41,
+                  "lower_dec": "1.312570738116759912942496637327790782585e-24",
+                  "upper_dec": "1.312570738116759912942496637327790782588e-24",
+                  "arb_ball_str": "[1.312570738116759912942496637327790782587e-24 +/- 4.03e-64]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 4.446084935330069e-26,
+                  "rad_float_outward": 1.5395144158697892e-42,
+                  "lower_dec": "4.446084935330069009600127363021464679155e-26",
+                  "upper_dec": "4.446084935330069009600127363021464679158e-26",
+                  "arb_ball_str": "[4.446084935330069009600127363021464679157e-26 +/- 4.83e-66]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 4.446084935330069e-26,
+                  "rad_float_outward": 1.5395144158697892e-42,
+                  "lower_dec": "4.446084935330069009600127363021464679155e-26",
+                  "upper_dec": "4.446084935330069009600127363021464679158e-26",
+                  "arb_ball_str": "[4.446084935330069009600127363021464679157e-26 +/- 4.83e-66]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -1.0269027343551689e-100,
+                  "rad_float_outward": 1.1355450320386305e-98,
+                  "lower_dec": "-1.145814059382181986712275465811542465319e-98",
+                  "upper_dec": "1.125276004695078608125585605177930869954e-98",
+                  "arb_ball_str": "[+/- 1.15e-98]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 5,
+                "gamma_n_certified": {
+                  "mid_float": 32.93506158773919,
+                  "rad_float_outward": 1.989039975153612e-15,
+                  "lower_dec": "3.293506158773918969066236896407490348880e+1",
+                  "upper_dec": "3.293506158773918969066236896407490348883e+1",
+                  "arb_ball_str": "[32.93506158773918969066236896407490348881 +/- 2.72e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 1.6201254211774074e-27,
+                  "rad_float_outward": 1.3654576882809374e-43,
+                  "lower_dec": "1.620125421177407553482122156768782639387e-27",
+                  "upper_dec": "1.620125421177407553482122156768782639390e-27",
+                  "arb_ball_str": "[1.620125421177407553482122156768782639388e-27 +/- 2.87e-67]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 1.620237356093033e-27,
+                  "rad_float_outward": 9.905942617417788e-45,
+                  "lower_dec": "1.620237356093032938439768023127857551748e-27",
+                  "upper_dec": "1.620237356093032938439768023127857551751e-27",
+                  "arb_ball_str": "[1.620237356093032938439768023127857551750e-27 +/- 5.60e-68]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 5.488247369372215e-29,
+                  "rad_float_outward": 3.3843563078688663e-46,
+                  "lower_dec": "5.488247369372215168523591792522017009067e-29",
+                  "upper_dec": "5.488247369372215168523591792522017009070e-29",
+                  "arb_ball_str": "[5.488247369372215168523591792522017009068e-29 +/- 7.06e-70]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 5.488247369372215e-29,
+                  "rad_float_outward": 3.3843563078688663e-46,
+                  "lower_dec": "5.488247369372215168523591792522017009067e-29",
+                  "upper_dec": "5.488247369372215168523591792522017009070e-29",
+                  "arb_ball_str": "[5.488247369372215168523591792522017009068e-29 +/- 7.06e-70]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -1.6132558241822881e-103,
+                  "rad_float_outward": 1.7751056971792922e-101,
+                  "lower_dec": "-1.791238255421114744296493603478508466934e-101",
+                  "upper_dec": "1.758973138937468981401303180438272859405e-101",
+                  "arb_ball_str": "[+/- 1.80e-101]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 6,
+                "gamma_n_certified": {
+                  "mid_float": 37.586178158825675,
+                  "rad_float_outward": 3.4427654468221844e-15,
+                  "lower_dec": "3.758617815882567125721776348070533282139e+1",
+                  "upper_dec": "3.758617815882567125721776348070533282142e+1",
+                  "arb_ball_str": "[37.58617815882567125721776348070533282141 +/- 4.41e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 5.296914696308223e-33,
+                  "rad_float_outward": 7.773376033125749e-50,
+                  "lower_dec": "5.296914696308222871408006531468278394825e-33",
+                  "upper_dec": "5.296914696308222871408006531468278394828e-33",
+                  "arb_ball_str": "[5.296914696308222871408006531468278394827e-33 +/- 1.18e-73]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 5.2971957417586454e-33,
+                  "rad_float_outward": 1.1052449228707362e-49,
+                  "lower_dec": "5.297195741758645482986658996230400322303e-33",
+                  "upper_dec": "5.297195741758645482986658996230400322306e-33",
+                  "arb_ball_str": "[5.297195741758645482986658996230400322304e-33 +/- 2.26e-73]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 1.7943247935512526e-34,
+                  "rad_float_outward": 1.7460890442101295e-51,
+                  "lower_dec": "1.794324793551252562907355969372245142129e-34",
+                  "upper_dec": "1.794324793551252562907355969372245142132e-34",
+                  "arb_ball_str": "[1.794324793551252562907355969372245142131e-34 +/- 2.68e-74]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 1.7943247935512526e-34,
+                  "rad_float_outward": 1.7460890442101295e-51,
+                  "lower_dec": "1.794324793551252562907355969372245142129e-34",
+                  "upper_dec": "1.794324793551252562907355969372245142132e-34",
+                  "arb_ball_str": "[1.794324793551252562907355969372245142131e-34 +/- 2.68e-74]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -2.794286145005349e-109,
+                  "rad_float_outward": 4.919823539790686e-107,
+                  "lower_dec": "-4.947766401240738716813379091439705930903e-107",
+                  "upper_dec": "4.891880678340631738614559636413960002270e-107",
+                  "arb_ball_str": "[+/- 4.95e-107]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 7,
+                "gamma_n_certified": {
+                  "mid_float": 40.9187190121475,
+                  "rad_float_outward": 3.2165214718715273e-15,
+                  "lower_dec": "4.091871901214749518739812691463325439571e+1",
+                  "upper_dec": "4.091871901214749518739812691463325439574e+1",
+                  "arb_ball_str": "[40.91871901214749518739812691463325439573 +/- 3.84e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 5.376366891966727e-37,
+                  "rad_float_outward": 1.2056824310894294e-53,
+                  "lower_dec": "5.376366891966726810199409468573956018548e-37",
+                  "upper_dec": "5.376366891966726810199409468573956018551e-37",
+                  "arb_ball_str": "[5.376366891966726810199409468573956018550e-37 +/- 3.07e-77]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 5.376607601911793e-37,
+                  "rad_float_outward": 3.6716708447083665e-53,
+                  "lower_dec": "5.376607601911792329952143591947743863626e-37",
+                  "upper_dec": "5.376607601911792329952143591947743863629e-37",
+                  "arb_ball_str": "[5.376607601911792329952143591947743863627e-37 +/- 2.85e-77]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 1.821224058090703e-38,
+                  "rad_float_outward": 4.8505645969729484e-55,
+                  "lower_dec": "1.821224058090702994058809105895152428516e-38",
+                  "upper_dec": "1.821224058090702994058809105895152428519e-38",
+                  "arb_ball_str": "[1.821224058090702994058809105895152428517e-38 +/- 1.61e-80]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 1.821224058090703e-38,
+                  "rad_float_outward": 4.8505645969729484e-55,
+                  "lower_dec": "1.821224058090702994058809105895152428516e-38",
+                  "upper_dec": "1.821224058090702994058809105895152428519e-38",
+                  "arb_ball_str": "[1.821224058090702994058809105895152428517e-38 +/- 1.61e-80]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -5.644382646190004e-113,
+                  "rad_float_outward": 5.212695295767567e-111,
+                  "lower_dec": "-5.269139122229466342213613292986588105115e-111",
+                  "upper_dec": "5.156251469305666264762384680743245528153e-111",
+                  "arb_ball_str": "[+/- 5.27e-111]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 8,
+                "gamma_n_certified": {
+                  "mid_float": 43.327073280915,
+                  "rad_float_outward": 2.3543403229910784e-15,
+                  "lower_dec": "4.332707328091499951949612216540680578263e+1",
+                  "upper_dec": "4.332707328091499951949612216540680578266e+1",
+                  "arb_ball_str": "[43.32707328091499951949612216540680578265 +/- 4.34e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 6.562775968491003e-40,
+                  "rad_float_outward": 3.6004030801943566e-56,
+                  "lower_dec": "6.562775968491002823552467729799029463357e-40",
+                  "upper_dec": "6.562775968491002823552467729799029463360e-40",
+                  "arb_ball_str": "[6.562775968491002823552467729799029463359e-40 +/- 2.10e-80]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 6.5630380527811306e-40,
+                  "rad_float_outward": 1.2783601857810507e-56,
+                  "lower_dec": "6.563038052781130716388960099514354095851e-40",
+                  "upper_dec": "6.563038052781130716388960099514354095854e-40",
+                  "arb_ball_str": "[6.563038052781130716388960099514354095853e-40 +/- 4.35e-80]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 2.2231049168698197e-41,
+                  "rad_float_outward": 8.550602824322117e-58,
+                  "lower_dec": "2.223104916869819798991630841203612726260e-41",
+                  "upper_dec": "2.223104916869819798991630841203612726263e-41",
+                  "arb_ball_str": "[2.223104916869819798991630841203612726262e-41 +/- 4.27e-81]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 2.2231049168698197e-41,
+                  "rad_float_outward": 8.550602824322117e-58,
+                  "lower_dec": "2.223104916869819798991630841203612726260e-41",
+                  "upper_dec": "2.223104916869819798991630841203612726263e-41",
+                  "arb_ball_str": "[2.223104916869819798991630841203612726262e-41 +/- 4.27e-81]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -1.0409527067114968e-115,
+                  "rad_float_outward": 6.874745520136115e-114,
+                  "lower_dec": "-6.978840790807263149549364066490944039874e-114",
+                  "upper_dec": "6.770650249464963799202666739645469764549e-114",
+                  "arb_ball_str": "[+/- 6.98e-114]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 9,
+                "gamma_n_certified": {
+                  "mid_float": 48.00515088116716,
+                  "rad_float_outward": 1.2753620271505412e-15,
+                  "lower_dec": "4.800515088116715972794247274942751604167e+1",
+                  "upper_dec": "4.800515088116715972794247274942751604170e+1",
+                  "arb_ball_str": "[48.00515088116715972794247274942751604169 +/- 3.16e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 1.265509065700609e-45,
+                  "rad_float_outward": 8.364265528644921e-63,
+                  "lower_dec": "1.265509065700609065805529425575835424288e-45",
+                  "upper_dec": "1.265509065700609065805529425575835424291e-45",
+                  "arb_ball_str": "[1.265509065700609065805529425575835424289e-45 +/- 9.02e-86]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 1.2655502372083021e-45,
+                  "rad_float_outward": 6.246580839678322e-62,
+                  "lower_dec": "1.265550237208302067540410028739573086471e-45",
+                  "upper_dec": "1.265550237208302067540410028739573086474e-45",
+                  "arb_ball_str": "[1.265550237208302067540410028739573086473e-45 +/- 7.36e-86]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 4.2868118884231133e-47,
+                  "rad_float_outward": 7.838469929537798e-64,
+                  "lower_dec": "4.286811888423113246276085836402246210733e-47",
+                  "upper_dec": "4.286811888423113246276085836402246210736e-47",
+                  "arb_ball_str": "[4.286811888423113246276085836402246210734e-47 +/- 2.74e-87]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 4.2868118884231133e-47,
+                  "rad_float_outward": 7.838469929537798e-64,
+                  "lower_dec": "4.286811888423113246276085836402246210733e-47",
+                  "upper_dec": "4.286811888423113246276085836402246210736e-47",
+                  "arb_ball_str": "[4.286811888423113246276085836402246210734e-47 +/- 2.74e-87]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -1.312294330520228e-121,
+                  "rad_float_outward": 1.947097457532481e-119,
+                  "lower_dec": "-1.960220400837683137142571063860838524858e-119",
+                  "upper_dec": "1.933974514227278577754526989061026726204e-119",
+                  "arb_ball_str": "[+/- 1.97e-119]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              },
+              {
+                "zero_index": 10,
+                "gamma_n_certified": {
+                  "mid_float": 49.7738324776723,
+                  "rad_float_outward": 1.7258104711742852e-15,
+                  "lower_dec": "4.977383247767230218191678467856372405771e+1",
+                  "upper_dec": "4.977383247767230218191678467856372405774e+1",
+                  "arb_ball_str": "[49.77383247767230218191678467856372405772 +/- 3.18e-39]"
+                },
+                "abs_H0_at_i_gamma_n_sq_certified": {
+                  "mid_float": 8.40985680029329e-48,
+                  "rad_float_outward": 5.898663834604373e-64,
+                  "lower_dec": "8.409856800293290316737519274561016494328e-48",
+                  "upper_dec": "8.409856800293290316737519274561016494331e-48",
+                  "arb_ball_str": "[8.409856800293290316737519274561016494330e-48 +/- 3.33e-88]"
+                },
+                "abs_H0_at_i_gamma_n_sq_strictly_positive": true,
+                "D_0_2A_on_critical_line_encloses_zero": true,
+                "off_critical_probe_delta": "1/10",
+                "abs_H0_at_delta_plus_i_gamma_n_sq_certified": {
+                  "mid_float": 8.410111310018459e-48,
+                  "rad_float_outward": 1.1286211872200413e-64,
+                  "lower_dec": "8.410111310018458744226594415248142458465e-48",
+                  "upper_dec": "8.410111310018458744226594415248142458468e-48",
+                  "arb_ball_str": "[8.410111310018458744226594415248142458467e-48 +/- 2.46e-88]"
+                },
+                "D_0_2A_at_delta_1_10_certified": {
+                  "mid_float": 2.8487660218276087e-49,
+                  "rad_float_outward": 5.15334405873046e-66,
+                  "lower_dec": "2.848766021827608683009369463602543109602e-49",
+                  "upper_dec": "2.848766021827608683009369463602543109605e-49",
+                  "arb_ball_str": "[2.848766021827608683009369463602543109604e-49 +/- 1.33e-89]"
+                },
+                "D_1_2A_at_delta_1_10_certified": {
+                  "mid_float": 2.8487660218276087e-49,
+                  "rad_float_outward": 5.15334405873046e-66,
+                  "lower_dec": "2.848766021827608683009369463602543109602e-49",
+                  "upper_dec": "2.848766021827608683009369463602543109605e-49",
+                  "arb_ball_str": "[2.848766021827608683009369463602543109604e-49 +/- 1.33e-89]"
+                },
+                "D_0_minus_D_1_2A_CR1_diff_certified": {
+                  "mid_float": -1.3531853462226774e-123,
+                  "rad_float_outward": 1.002393451658976e-121,
+                  "lower_dec": "-1.015925305121202484972097198302500992584e-121",
+                  "upper_dec": "9.888615981967489362515366204514702744092e-122",
+                  "arb_ball_str": "[+/- 1.02e-121]"
+                },
+                "D_2A_at_delta_1_10_strictly_positive": true,
+                "CR1_raw_equality_encloses_zero": true
+              }
+            ]
+          }
         },
         "subcase_2B_prime_euler_stieltjes_shift_difference": {
           "definition": "D_{K,y}^{(2B)}(rho_K) := W_y(tau^{1 + |delta(rho_K)|}) - W_y(tau) = int_{(1, infty)} x^{-1/2} [h_0(x / tau^{1+|delta|}) - h_0(x / tau)] d(log A_{K,y})(x), where delta(rho_K) = tau^{-K} Re(rho_K) - 1/2 = delta.",
-          "CR1_status": "PROVED_UNCONDITIONALLY: Because d(log A_{K,y})(x) = d(log N_y)(x) cancels tau^K and delta(rho_K) = delta is grade-invariant, D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) for all K, J in A_R.",
-          "CR2_status": "FAILS_FOR_NONZERO_VALUES: For delta != 0, D_{K,y}^{(2B)}(rho_K) is a continuous Mellin-Stieltjes sum of (log m_y(n)) n^{-1/2} [h_0(n / tau^{1+|delta|}) - h_0(n / tau)] in (-1, 1) \\ {0}, which does not lie in L_0 = Z or L_1 = tau Z.",
-          "CR3_status": "CERTIFIED_NONZERO_FOR_SAMPLED_OFF_LINE_SHIFTS: Vanishes at delta = 0 and is certified nonzero for delta in {1/20, 1/10, 1/4} at y = M(|rho_1|) = 28."
+          "established_properties": [
+            "CR1 (raw cross-grade equality D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) across all K, J in A_R)"
+          ],
+          "missing_properties": [
+            "CR3 (general off-critical nonvanishing is NOT established; at n_cut = 800 and delta = 1/20, the enclosure [-0.0000715342, 0.0069867010] includes zero, and W_y(X) is oscillatory)",
+            "CR2 (integer-layer membership D_{K,y}^{(2B)}(rho_K) in L_K = tau^K Z)"
+          ],
+          "CR1_status": "ESTABLISHED (PROVED_UNCONDITIONALLY): Because d(log A_{K,y})(x) = d(log N_y)(x) cancels tau^K and delta(rho_K) = delta is grade-invariant, D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) for all K, J in A_R.",
+          "CR2_status": "MISSING: For delta != 0, D_{K,y}^{(2B)}(rho_K) is a continuous Mellin-Stieltjes sum of (log m_y(n)) n^{-1/2} [h_0(n / tau^{1+|delta|}) - h_0(n / tau)], which is not proved to lie in L_K = tau^K Z.",
+          "CR3_status": "MISSING (GENERAL_OFF_CRITICAL_NONVANISHING_NOT_PROVED): Vanishes at delta = 0, but because W_y(X) is an oscillatory wavelet profile on (0, infty), general nonvanishing W_y(tau^{1+|delta|}) != W_y(tau) for all delta in (-1/2, 1/2) \\ {0} is not proved. Moreover, at the n_cut = 800 truncation used in TC-048, the exported enclosure at delta = 1/20, y = 28 was [-0.0000715342, 0.0069867010], which includes zero (refining to n_cut = 2500 encloses [+0.0030019824, +0.0038393714], midpoint +0.0034206769 +- 4.19e-4 > 0 at that sample point, but does not establish general CR3).",
+          "cand2b_n_cut_800_delta_1_20_encloses_zero": true
         },
         "all_cand2a_cr1_enclose_zero": true,
         "all_cand2a_off_line_strictly_positive": true,
         "all_cand2a_on_line_enclose_zero": true,
-        "all_cand2a_strictly_below_one": true,
         "all_cand2b_cr1_enclose_zero": true,
         "certified_candidate_2_evaluation_table": [
           {
@@ -14217,29 +14811,37 @@
             },
             "CR1_raw_equality_2A_encloses_zero": true,
             "D_2A_strictly_positive_when_delta_nonzero": true,
-            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": false,
-            "D_0_2B_stieltjes_shift_diff_certified": {
+            "D_0_2B_stieltjes_shift_diff_n_cut_800_certified": {
               "mid_float": 0.0,
               "rad_float_outward": 0.0031255108660843693,
               "lower_dec": "-3.125510866084368899464607238769531250001e-3",
               "upper_dec": "3.125510866084368899464607238769531250001e-3",
               "arb_ball_str": "[+/- 3.13e-3]"
+            },
+            "D_0_2B_n_cut_800_encloses_zero": true,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 0.00037081059872434713,
+              "lower_dec": "-3.708105987243470735847949981689453125001e-4",
+              "upper_dec": "3.708105987243470735847949981689453125001e-4",
+              "arb_ball_str": "[+/- 3.71e-4]"
             },
             "D_1_2B_stieltjes_shift_diff_certified": {
               "mid_float": 0.0,
-              "rad_float_outward": 0.0031255108660843693,
-              "lower_dec": "-3.125510866084368899464607238769531250001e-3",
-              "upper_dec": "3.125510866084368899464607238769531250001e-3",
-              "arb_ball_str": "[+/- 3.13e-3]"
+              "rad_float_outward": 0.00037081059872434713,
+              "lower_dec": "-3.708105987243470735847949981689453125001e-4",
+              "upper_dec": "3.708105987243470735847949981689453125001e-4",
+              "arb_ball_str": "[+/- 3.71e-4]"
             },
             "D_0_minus_D_1_2B_CR1_diff_certified": {
               "mid_float": 0.0,
-              "rad_float_outward": 0.006251021732168739,
-              "lower_dec": "-6.251021732168737798929214477539062500001e-3",
-              "upper_dec": "6.251021732168737798929214477539062500001e-3",
-              "arb_ball_str": "[+/- 6.26e-3]"
+              "rad_float_outward": 0.0007416211974486943,
+              "lower_dec": "-7.416211974486941471695899963378906250001e-4",
+              "upper_dec": "7.416211974486941471695899963378906250001e-4",
+              "arb_ball_str": "[+/- 7.42e-4]"
             },
-            "CR1_raw_equality_2B_encloses_zero": true
+            "CR1_raw_equality_2B_encloses_zero": true,
+            "D_2B_sampled_point_strictly_nonzero_at_n_cut_2500": false
           },
           {
             "delta_label": "1/20",
@@ -14302,29 +14904,37 @@
             },
             "CR1_raw_equality_2A_encloses_zero": true,
             "D_2A_strictly_positive_when_delta_nonzero": true,
-            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": true,
-            "D_0_2B_stieltjes_shift_diff_certified": {
+            "D_0_2B_stieltjes_shift_diff_n_cut_800_certified": {
               "mid_float": 0.0034575834021969413,
               "rad_float_outward": 0.0035291175627207854,
               "lower_dec": "-7.153416052384366711737771672063691047274e-5",
               "upper_dec": "6.986700964917726167830208342849675589529e-3",
               "arb_ball_str": "[+/- 6.99e-3]"
             },
+            "D_0_2B_n_cut_800_encloses_zero": true,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.0034206768631465084,
+              "rad_float_outward": 0.0004186944956927619,
+              "lower_dec": "3.001982367453746498390866043367639830989e-3",
+              "upper_dec": "3.839371358839270193889570953645960143492e-3",
+              "arb_ball_str": "[0.003 +/- 8.40e-4]"
+            },
             "D_1_2B_stieltjes_shift_diff_certified": {
-              "mid_float": 0.0034575834021969413,
-              "rad_float_outward": 0.0035291175627207854,
-              "lower_dec": "-7.153416052384366711737771672063691047274e-5",
-              "upper_dec": "6.986700964917726167830208342849675589529e-3",
-              "arb_ball_str": "[+/- 6.99e-3]"
+              "mid_float": 0.0034206768631465084,
+              "rad_float_outward": 0.0004186944956927619,
+              "lower_dec": "3.001982367453746498390866043367639830989e-3",
+              "upper_dec": "3.839371358839270193889570953645960143492e-3",
+              "arb_ball_str": "[0.003 +/- 8.40e-4]"
             },
             "D_0_minus_D_1_2B_CR1_diff_certified": {
               "mid_float": 1.3305097180192379e-76,
-              "rad_float_outward": 0.007058235125441571,
-              "lower_dec": "-7.058235125441569834947586059570312500001e-3",
-              "upper_dec": "7.058235125441569834947586059570312500002e-3",
-              "arb_ball_str": "[+/- 7.06e-3]"
+              "rad_float_outward": 0.0008373889913855238,
+              "lower_dec": "-8.373889913855236954987049102783203125001e-4",
+              "upper_dec": "8.373889913855236954987049102783203125002e-4",
+              "arb_ball_str": "[+/- 8.38e-4]"
             },
-            "CR1_raw_equality_2B_encloses_zero": true
+            "CR1_raw_equality_2B_encloses_zero": true,
+            "D_2B_sampled_point_strictly_nonzero_at_n_cut_2500": true
           },
           {
             "delta_label": "1/10",
@@ -14387,29 +14997,37 @@
             },
             "CR1_raw_equality_2A_encloses_zero": true,
             "D_2A_strictly_positive_when_delta_nonzero": true,
-            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": true,
-            "D_0_2B_stieltjes_shift_diff_certified": {
+            "D_0_2B_stieltjes_shift_diff_n_cut_800_certified": {
               "mid_float": 0.005978427360566792,
               "rad_float_outward": 0.00403696217108518,
               "lower_dec": "1.941465189481613283712566303418718951895e-3",
               "upper_dec": "1.001538953165197098787516395966871895191e-2",
               "arb_ball_str": "[+/- 0.0101]"
             },
+            "D_0_2B_n_cut_800_encloses_zero": false,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.005895140565357269,
+              "rad_float_outward": 0.00047894517865643176,
+              "lower_dec": "5.416195386700837235259308023193341493564e-3",
+              "upper_dec": "6.374085744013699996577991647460919618567e-3",
+              "arb_ball_str": "[0.006 +/- 5.84e-4]"
+            },
             "D_1_2B_stieltjes_shift_diff_certified": {
-              "mid_float": 0.005978427360566792,
-              "rad_float_outward": 0.00403696217108518,
-              "lower_dec": "1.941465189481613283712566303418718951895e-3",
-              "upper_dec": "1.001538953165197098787516395966871895191e-2",
-              "arb_ball_str": "[+/- 0.0101]"
+              "mid_float": 0.005895140565357269,
+              "rad_float_outward": 0.00047894517865643176,
+              "lower_dec": "5.416195386700837235259308023193341493564e-3",
+              "upper_dec": "6.374085744013699996577991647460919618567e-3",
+              "arb_ball_str": "[0.006 +/- 5.84e-4]"
             },
             "D_0_minus_D_1_2B_CR1_diff_certified": {
               "mid_float": 1.6975468816107518e-76,
-              "rad_float_outward": 0.00807392434217036,
-              "lower_dec": "-8.073924342170357704162597656250000000001e-3",
-              "upper_dec": "8.073924342170357704162597656250000000002e-3",
-              "arb_ball_str": "[+/- 8.08e-3]"
+              "rad_float_outward": 0.0009578903573128629,
+              "lower_dec": "-9.578903573128627613186836242675781250001e-4",
+              "upper_dec": "9.578903573128627613186836242675781250002e-4",
+              "arb_ball_str": "[+/- 9.58e-4]"
             },
-            "CR1_raw_equality_2B_encloses_zero": true
+            "CR1_raw_equality_2B_encloses_zero": true,
+            "D_2B_sampled_point_strictly_nonzero_at_n_cut_2500": true
           },
           {
             "delta_label": "1/4",
@@ -14472,51 +15090,61 @@
             },
             "CR1_raw_equality_2A_encloses_zero": true,
             "D_2A_strictly_positive_when_delta_nonzero": true,
-            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": true,
-            "D_0_2B_stieltjes_shift_diff_certified": {
+            "D_0_2B_stieltjes_shift_diff_n_cut_800_certified": {
               "mid_float": 0.00998242719011436,
               "rad_float_outward": 0.006491694344731514,
               "lower_dec": "3.490732845382847277367337293090029349187e-3",
               "upper_dec": "1.647412153484587409898064906066815434920e-2",
               "arb_ball_str": "[+/- 0.0165]"
             },
+            "D_0_2B_n_cut_800_encloses_zero": false,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.009675791440595594,
+              "rad_float_outward": 0.0007701745953454529,
+              "lower_dec": "8.905616845250141507642030444082164568746e-3",
+              "upper_dec": "1.044596603594104543204760524266614894376e-2",
+              "arb_ball_str": "[+/- 0.0105]"
+            },
             "D_1_2B_stieltjes_shift_diff_certified": {
-              "mid_float": 0.00998242719011436,
-              "rad_float_outward": 0.006491694352007472,
-              "lower_dec": "3.490732838106889663183911389769716849187e-3",
-              "upper_dec": "1.647412154212183171316407496398846684920e-2",
-              "arb_ball_str": "[+/- 0.0165]"
+              "mid_float": 0.009675791440595594,
+              "rad_float_outward": 0.0007701745962549476,
+              "lower_dec": "8.905616844340646805869102206167125506246e-3",
+              "upper_dec": "1.044596603685054013382053348058118800626e-2",
+              "arb_ball_str": "[+/- 0.0105]"
             },
             "D_0_minus_D_1_2B_CR1_diff_certified": {
               "mid_float": 1.9174992994983134e-76,
-              "rad_float_outward": 0.012983388704014944,
-              "lower_dec": "-1.298338870401494204998016357421875000001e-2",
-              "upper_dec": "1.298338870401494204998016357421875000002e-2",
-              "arb_ball_str": "[+/- 0.0130]"
+              "rad_float_outward": 0.0015403491925098935,
+              "lower_dec": "-1.540349192509893327951431274414062500001e-3",
+              "upper_dec": "1.540349192509893327951431274414062500002e-3",
+              "arb_ball_str": "[+/- 1.55e-3]"
             },
-            "CR1_raw_equality_2B_encloses_zero": true
+            "CR1_raw_equality_2B_encloses_zero": true,
+            "D_2B_sampled_point_strictly_nonzero_at_n_cut_2500": true
           }
         ]
       },
       "role_of_theta_normalization_tau_transcendence_and_regularity": {
         "theta_normalization_role": "The squared pole-annihilating operator P(D)^2 = (D^2 - 1/16)^2 produces the exact factor (s^2 (s - 1)^2 / 32)^2 in H_0(s - 1/2), which (1) kills the simple poles of xi(s) at s = 0, 1 (z = +/- 1/2) in the explicit formula and (2) ensures by Euler's Gamma nonvanishing theorem that H_0(z) has NO zeros in the critical strip |Re(z)| < 1/2, making CR3 for Candidate 2A unconditional.",
         "tau_transcendence_and_rational_vs_irrational_grade_differences": "By Lindemann-Weierstrass, tau = 2*pi is transcendental over Q, so for any nonzero RATIONAL grade difference K - J = p/q in Q \\ {0} (in particular K = 0, J = 1), (tau^{K-J})^q = tau^p not in Q, which implies tau^{K-J} not in Q and L_K cap L_J = tau^K Z cap tau^J Z = {0} (`layer_disjointness` in `formal/RiemannScope/Grade.lean`). For general irrational algebraic grade differences K - J in (Qbar cap R) \\ Q (such as K - J = sqrt(2)), rationality of tau^{K-J} is an open problem in transcendental number theory (beyond Lindemann-Weierstrass and Gelfond-Schneider) and is NEVER assumed; a single rational-difference pair (K = 0, J = 1) suffices for the collision step while retaining the full concurrent grade family K in Qbar cap R.",
-        "regularity_and_connectedness_scope": "Because A_R = Qbar cap R is totally disconnected in the Euclidean topology (every point can be separated by irrational real cuts), continuity on A_R alone never forces a Z-valued function to be constant. Constant-integer rigidity (`invariant_covariant_observable_vanishing` in `Grade.lean`) requires a continuous extension to a connected real interval I subset R."
+        "regularity_and_connectedness_scope": "Because A_R = Qbar cap R is totally disconnected in the Euclidean topology (every point can be separated by irrational real cuts), continuity on A_R alone never forces a Z-valued function to be constant. Constant-integer rigidity (`invariant_covariant_observable_vanishing` in `Grade.lean`) requires a continuous extension to a connected real interval I subset R.",
+        "pure_pullback_positivity_vs_actual_zeta_zero_identity": "The positivity D_K^{(2A)}(tau^K s) = |H_0(s - 1/2)|^2 (tau^{Re(s)-1/2} + tau^{-(Re(s)-1/2)} - 2) > 0 and raw cross-grade equality D_K^{(2A)}(tau^K s) = D_J^{(2A)}(tau^J s) follow throughout the punctured strip 0 < |Re(s) - 1/2| < 1/2, Im(s) != 0 WITHOUT using zeta(s) = 0. Consequently, D_K^{(2A)} cannot belong to the integer layers L_K = tau^K Z for arbitrary off-critical complex numbers s (which would contradict Lindemann's theorem for every point in the strip). The decisive open question is: what additional arithmetic-spectral identity satisfied specifically by actual zeta zeros zeta(rho) = 0 forces this detector into the required integer layers L_K = tau^K Z?"
       },
       "covariance_invariance_discreteness_trilemma": {
-        "statement": "For any single observable D_K(rho_K) evaluated at rational-difference grades K != J (e.g. K = 0, J = 1) where L_K cap L_J = {0}: (CR1: D_K(rho_K) = D_J(rho_J) = D) and (CR2: D_K(rho_K) in L_K and D_J(rho_J) in L_J) hold simultaneously if and only if D_K(rho_K) = D_J(rho_J) = 0. Consequently: (i) Weight-1 covariant prime-Euler integer-layer carriers D_K^{(1A)} = N_y(X_0) * tau^K satisfy CR2 unconditionally with N_y(X_0) >= 1, so D_K^{(1A)} = tau^{K-J} D_J^{(1A)} != D_J^{(1A)} and raw CR1 fails. (ii) Weight-0 pullback zero-defect observables D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2) satisfy raw CR1 and one-way CR3 (delta != 0 ==> D^{(2A)} > 0) unconditionally, so CR2 (D_K^{(2A)} in L_K) holds if and only if D^{(2A)}(rho) = 0 <=> delta = 0, which is equivalent to RH for rho rather than an independent consequence of prime/theta algebra.",
+        "statement": "For any single observable D_K(rho_K) evaluated at rational-difference grades K != J (e.g. K = 0, J = 1) where L_K cap L_J = {0}: (CR1: D_K(rho_K) = D_J(rho_J) = D) and (CR2: D_K(rho_K) in L_K and D_J(rho_J) in L_J) hold simultaneously if and only if D_K(rho_K) = D_J(rho_J) = 0 (without needing any upper bound D < 1). Consequently: (i) Weight-1 prime-Euler integer-layer carriers D_K^{(1A)} = N_y(X_0) * tau^K establish CR2 and one-way CR3 (always positive N_y(X_0) * tau^K > 0), but fail raw CR1 (D_K^{(1A)} = tau^{K-J} D_J^{(1A)} != D_J^{(1A)}), and multiplying by a grade-invariant factor c(delta) still leaves the factor tau^K. (ii) Weight-0 pullback theta detectors D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2) establish raw CR1 and off-critical nonvanishing CR3 (delta != 0 ==> D^{(2A)} > 0) unconditionally across the strip without using zeta(rho) = 0, while missing integer-layer membership CR2 (which by L_K cap L_J = {0} holds across rational-difference grades K != J iff D^{(2A)}(rho) = 0 <=> delta = 0). (iii) Shift differences D_{K,y}^{(2B)}(rho_K) = W_y(tau^{1+|delta|}) - W_y(tau) establish raw CR1, while missing both general off-critical nonvanishing CR3 and integer-layer membership CR2.",
         "lean_theorem": "single_observable_common_referent_candidate_audit_and_trilemma"
       },
       "remaining_open_obligation": {
         "subgate_id": "SUBGATE-TC-043A",
         "status": "OPEN",
         "common_referent_bridge_complete": false,
-        "exact_open_gap": "SUBGATE-TC-043A remains OPEN and the common-referent bridge is NOT complete: Candidate 1 (A_{K,y}(x) = N_y(x) * tau^K) satisfies CR2 unconditionally on the arithmetic side but transforms with weight 1 (failing raw CR1), whereas Candidate 2A (D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2)) satisfies raw CR1 and one-way CR3 unconditionally on the spectral/theta side but satisfies CR2 if and only if delta = 0. Closing SUBGATE-TC-043A requires either (a) proving the uniform signed Moebius cancellation bound sup_{X >= 1} |R_mu(X)| < infty (equivalently sup_{X >= 1} |W_{M(X)}(X)| < infty), or (b) establishing an independent arithmetic-spectral identity that forces a genuine raw-invariant, off-line-sensitive observable D_K(rho_K) to lie in L_K = tau^K Z without assuming delta = 0."
+        "decisive_open_question": "What additional identity satisfied specifically by actual zeta zeros zeta(rho) = 0 forces the explicit off-critical theta detector D_K^{(2A)}(rho_K) (whose raw equality CR1 and off-critical positivity CR3 hold throughout the strip without using zeta(rho) = 0) into the required integer layers L_K = tau^K Z?",
+        "exact_open_gap": "SUBGATE-TC-043A remains OPEN and the common-referent bridge is NOT complete: Integer carrier N_y(x) * tau^K establishes CR2 and nonvanishing CR3 but is missing raw CR1; theta detector D^{(2A)} establishes raw CR1 and off-critical nonvanishing CR3 but is missing CR2; shift difference D^{(2B)} establishes raw CR1 but is missing general off-critical nonvanishing CR3 and CR2. Closing SUBGATE-TC-043A requires either (a) proving the uniform signed Moebius cancellation bound sup_{X >= 1} |R_mu(X)| < infty (equivalently sup_{X >= 1} |W_{M(X)}(X)| < infty), or (b) deriving an additional identity satisfied by actual zeta zeros zeta(rho) = 0 that forces the off-critical detector into the integer layers L_K = tau^K Z."
       }
     },
     "full_section_17_tree_roundtrip_verification": {
-      "total_certified_arb_balls_checked": 130,
-      "compared_against_live_original_arb_count": 130,
+      "total_certified_arb_balls_checked": 198,
+      "compared_against_live_original_arb_count": 198,
       "live_original_count_matches_enumerated_total": true,
       "all_enclose_original_256bit_arb_ball": true,
       "failed_paths": [],
@@ -14607,6 +15235,70 @@
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.D_sqrt2_half_1A_invariant_scale_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.raw_CR1_difference_D_1_minus_D_0_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.coboundary_D_1_minus_tau_D_0_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1B_zero_defect_modulated_carrier.certified_grade_invariant_modulation_at_delta_1_10.c_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1B_zero_defect_modulated_carrier.certified_grade_invariant_modulation_at_delta_1_10.D_0_1B_modulated_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1B_zero_defect_modulated_carrier.certified_grade_invariant_modulation_at_delta_1_10.D_1_1B_modulated_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1B_zero_defect_modulated_carrier.certified_grade_invariant_modulation_at_delta_1_10.raw_CR1_difference_D_1_minus_D_0_modulated_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[0].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[0].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[0].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[0].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[0].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[0].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[1].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[1].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[1].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[1].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[1].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[1].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[2].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[2].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[2].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[2].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[2].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[2].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[3].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[3].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[3].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[3].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[3].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[3].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[4].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[4].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[4].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[4].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[4].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[4].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[5].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[5].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[5].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[5].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[5].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[5].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[6].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[6].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[6].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[6].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[6].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[6].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[7].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[7].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[7].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[7].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[7].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[7].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[8].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[8].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[8].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[8].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[8].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[8].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[9].gamma_n_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[9].abs_H0_at_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[9].abs_H0_at_delta_plus_i_gamma_n_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[9].D_0_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[9].D_1_2A_at_delta_1_10_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.subcase_2A_normalized_pullback_theta_zero_radial_defect.first_10_zeta_zeros_certification.certified_first_10_zeros_table[9].D_0_minus_D_1_2A_CR1_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].delta_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].gamma_1_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].abs_H0_at_delta_plus_i_gamma1_sq_certified",
@@ -14615,6 +15307,7 @@
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_1_2A_at_rho_1_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_sqrt2_half_2A_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_2B_stieltjes_shift_diff_n_cut_800_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_1_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_minus_D_1_2B_CR1_diff_certified",
@@ -14626,6 +15319,7 @@
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_1_2A_at_rho_1_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_sqrt2_half_2A_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_2B_stieltjes_shift_diff_n_cut_800_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_1_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_minus_D_1_2B_CR1_diff_certified",
@@ -14637,6 +15331,7 @@
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_1_2A_at_rho_1_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_sqrt2_half_2A_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_2B_stieltjes_shift_diff_n_cut_800_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_1_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_minus_D_1_2B_CR1_diff_certified",
@@ -14648,6 +15343,7 @@
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_1_2A_at_rho_1_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_sqrt2_half_2A_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_2B_stieltjes_shift_diff_n_cut_800_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_1_2B_stieltjes_shift_diff_certified",
         "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_minus_D_1_2B_CR1_diff_certified"

@@ -1900,22 +1900,68 @@ def test_32_task_tc048_single_observable_common_referent_audit(artifact_payload)
     )
 
     s3_cand = sec17["section_3_single_observable_common_referent_candidate_audit"]
-    c1_bench = s3_cand["candidate_1_grade_K_prime_euler_integer_layer_observable"][
-        "subcase_1A_unmodulated_carrier_c_K_eq_1"
-    ]["certified_benchmark_at_rho_1_K0_vs_J1"]
+    sub_table = s3_cand["substantive_candidate_classification_table"]
+    assert len(sub_table) == 3
+    assert "N_y(x) * tau^K" in sub_table[0]["candidate"]
+    assert len(sub_table[0]["established"]) == 2
+    assert "Integer-layer membership (CR2" in sub_table[0]["established"][0]
+    assert "Nonvanishing (one-way CR3 implication" in sub_table[0]["established"][1]
+    assert "Raw cross-grade equality (CR1" in sub_table[0]["missing"][0]
+    assert "D_K^{(2A)}" in sub_table[1]["candidate"]
+    assert len(sub_table[1]["established"]) == 2
+    assert "Raw cross-grade equality (CR1" in sub_table[1]["established"][0]
+    assert "Off-critical nonvanishing (CR3" in sub_table[1]["established"][1]
+    assert "Integer-layer membership (CR2" in sub_table[1]["missing"][0]
+    assert "D_{K,y}^{(2B)}" in sub_table[2]["candidate"]
+    assert len(sub_table[2]["established"]) == 1
+    assert "Raw cross-grade equality (CR1" in sub_table[2]["established"][0]
+    assert len(sub_table[2]["missing"]) == 2
+    assert "General off-critical nonvanishing (CR3" in sub_table[2]["missing"][0]
+    assert "Integer-layer membership (CR2" in sub_table[2]["missing"][1]
+
+    c1_sub = s3_cand["candidate_1_grade_K_prime_euler_integer_layer_observable"]
+    assert "ESTABLISHED" in c1_sub["subcase_1A_unmodulated_carrier_c_K_eq_1"]["CR3_status"]
+    c1_bench = c1_sub["subcase_1A_unmodulated_carrier_c_K_eq_1"][
+        "certified_benchmark_at_rho_1_K0_vs_J1"
+    ]
     assert c1_bench["raw_CR1_difference_strictly_positive"] is True
     assert c1_bench["coboundary_encloses_zero"] is True
     assert c1_bench["raw_scale_CR1_difference_D_1_minus_D_0_strictly_positive"] is True
+    c1b_sub = c1_sub["subcase_1B_zero_defect_modulated_carrier"]
+    assert (
+        c1b_sub["certified_grade_invariant_modulation_at_delta_1_10"][
+            "grade_invariant_modulation_raw_CR1_difference_strictly_positive"
+        ]
+        is True
+    )
 
     c2_audit = s3_cand[
         "candidate_2_canonical_theta_and_stieltjes_zero_defect_observables"
     ]
+    assert "all_cand2a_strictly_below_one" not in c2_audit
     assert c2_audit["all_cand2a_cr1_enclose_zero"] is True
     assert c2_audit["all_cand2a_off_line_strictly_positive"] is True
     assert c2_audit["all_cand2a_on_line_enclose_zero"] is True
-    assert c2_audit["all_cand2a_strictly_below_one"] is True
+    z10_cert = c2_audit["subcase_2A_normalized_pullback_theta_zero_radial_defect"][
+        "first_10_zeta_zeros_certification"
+    ]
+    assert z10_cert["all_first_10_zeros_abs_H0_sq_strictly_positive"] is True
+    assert z10_cert["all_first_10_zeros_on_line_D_2A_enclose_zero"] is True
+    assert z10_cert["all_first_10_zeros_off_line_D_2A_strictly_positive"] is True
+    assert z10_cert["all_first_10_zeros_off_line_CR1_enclose_zero"] is True
+    assert len(z10_cert["certified_first_10_zeros_table"]) == 10
     assert c2_audit["all_cand2b_cr1_enclose_zero"] is True
+    assert (
+        c2_audit["subcase_2B_prime_euler_stieltjes_shift_difference"][
+            "cand2b_n_cut_800_delta_1_20_encloses_zero"
+        ]
+        is True
+    )
     assert len(c2_audit["certified_candidate_2_evaluation_table"]) == 4
+    assert (
+        "What additional identity satisfied specifically by actual zeta zeros"
+        in s3_cand["remaining_open_obligation"]["decisive_open_question"]
+    )
 
     tri = s3_cand["covariance_invariance_discreteness_trilemma"]
     assert (

@@ -1452,18 +1452,23 @@ theorem coupled_cutoff_prime_step_jump_and_dense_comparison_extension
     exact ⟨abs_le.mpr ⟨by linarith, by linarith⟩, abs_le.mpr ⟨by linarith, by linarith⟩⟩
 
 /-- Theorem 49: Single-Observable Common-Referent Candidate Audit (`CR1` + `CR2` + `CR3`)
-    and the Covariance-Invariance-Discreteness Trilemma (`TASK-TC-048`).
+    and the Covariance-Invariance-Discreteness Trilemma (`TASK-TC-048` / `TASK-TC-048R`).
     (1) Candidate 1 (`D_K^{(1A)} = gradeLayerRealizedObservable N_ref tau_K` with `N_ref >= 1`):
-        satisfies `CR2` (`∃ m : ℤ, m ≠ 0 ∧ D_K^{(1A)} = (m : ℝ) * tau_K`), obeys the weight-1
-        scale coboundary `D_K^{(1A)} = (tau_K / tau_J) * D_J^{(1A)}`, and for any `tau_K ≠ tau_J`,
-        fails raw `CR1` equality (`D_K^{(1A)} ≠ D_J^{(1A)}`).
+        - satisfies `CR2` (`∃ m : ℤ, m ≠ 0 ∧ D_K^{(1A)} = (m : ℝ) * tau_K`),
+        - satisfies one-way `CR3` nonvanishing (`D_K^{(1A)} ≠ 0`),
+        - obeys the weight-1 scale coboundary `D_K^{(1A)} = (tau_K / tau_J) * D_J^{(1A)}`,
+        - fails raw `CR1` equality for `tau_K ≠ tau_J` (`D_K^{(1A)} ≠ D_J^{(1A)}`), and multiplying
+          by a grade-invariant factor `(r - inv_r)^2` (`r ≠ 1`) still leaves `tau_K ≠ tau_J` and does
+          not establish raw `CR1` (`r ≠ 1 → (r - inv_r)^2 * D_K^{(1A)} ≠ (r - inv_r)^2 * D_J^{(1A)}`).
     (2) Candidate 2A (`D_K^{(2A)} = thetaZeroRadialDefectObservable abs_H0_sq (r^2) (inv_r^2)`
         where `r = tau^{delta/2} > 0`, `r * inv_r = 1`, and pullback coordinates satisfy
         `tau_K⁻¹ * (tau_K * rho) = rho = tau_J⁻¹ * (tau_J * rho)`):
         - satisfies raw `CR1` unconditionally (`tau_K⁻¹ * (tau_K * rho) = tau_J⁻¹ * (tau_J * rho)`),
         - factors as `abs_H0_sq * (r - inv_r)^2`,
         - satisfies one-way `CR3`: if `abs_H0_sq > 0` and `r > 0` with `r ≠ 1` (`delta ≠ 0`), then `0 < D^{(2A)}` (`D^{(2A)} ≠ 0`),
-        - at `K = 0` (`L_0 = ℤ`), whenever `0 ≤ D^{(2A)} < 1`, integer membership `(∃ m : ℤ, D^{(2A)} = (m : ℝ))` holds iff `D^{(2A)} = 0`.
+        - across any two disjoint integer layers `L_K ∩ L_J = {0}` (`h_disjoint`), simultaneous integer-layer
+          membership `(∃ m_K : ℤ, D^{(2A)} = (m_K : ℝ) * tau_K) ∧ (∃ m_J : ℤ, D^{(2A)} = (m_J : ℝ) * tau_J)` (`CR2`)
+          holds if and only if `D^{(2A)} = 0` (without requiring any upper bound `D^{(2A)} < 1`).
     (3) Covariance-Invariance-Discreteness Trilemma: for any single observable with values `D_K, D_J : ℝ` at scales
         `tau_K, tau_J` satisfying rational-grade layer disjointness
         (`∀ m_K m_J : ℤ, (m_K : ℝ) * tau_K = (m_J : ℝ) * tau_J → m_K = 0 ∧ m_J = 0`),
@@ -1484,65 +1489,72 @@ theorem single_observable_common_referent_candidate_audit_and_trilemma
     let D1_J := gradeLayerRealizedObservable N_ref tau_J
     let D2A := thetaZeroRadialDefectObservable abs_H0_sq (r ^ 2) (inv_r ^ 2)
     ((∃ m : ℤ, m ≠ 0 ∧ D1_K = (m : ℝ) * tau_K) ∧
+      D1_K ≠ 0 ∧
       D1_K = (tau_K / tau_J) * D1_J ∧
-      D1_K ≠ D1_J) ∧
+      D1_K ≠ D1_J ∧
+      (r ≠ 1 → (r - inv_r) ^ 2 * D1_K ≠ (r - inv_r) ^ 2 * D1_J)) ∧
     (tau_K⁻¹ * (tau_K * rho) = tau_J⁻¹ * (tau_J * rho) ∧
       D2A = abs_H0_sq * (r - inv_r) ^ 2 ∧
       (r ≠ 1 → 0 < D2A) ∧
-      ((0 ≤ D2A ∧ D2A < 1) → ((∃ m : ℤ, D2A = (m : ℝ)) ↔ D2A = 0))) ∧
+      (((∃ m_K : ℤ, D2A = (m_K : ℝ) * tau_K) ∧ (∃ m_J : ℤ, D2A = (m_J : ℝ) * tau_J)) ↔ D2A = 0)) ∧
     ((D_K = D_J ∧ (∃ m_K : ℤ, D_K = (m_K : ℝ) * tau_K) ∧ (∃ m_J : ℤ, D_J = (m_J : ℝ) * tau_J)) ↔
       (D_K = 0 ∧ D_J = 0)) := by
   intro D1_K D1_J D2A
   have h_N_ne : N_ref ≠ 0 := by linarith
   have h_N_real_pos : (0 : ℝ) < (N_ref : ℝ) := by exact_mod_cast (by linarith : (0 : ℤ) < N_ref)
   have h_N_real_ne : (N_ref : ℝ) ≠ 0 := ne_of_gt h_N_real_pos
+  have h_D1_K_ne_zero : D1_K ≠ 0 := by
+    dsimp [D1_K, gradeLayerRealizedObservable]
+    exact mul_ne_zero h_N_real_ne h_tau_K_ne
+  have h_D1_ne : D1_K ≠ D1_J := by
+    dsimp [D1_K, D1_J, gradeLayerRealizedObservable]
+    intro h_eq
+    have h_sub : (N_ref : ℝ) * (tau_K - tau_J) = 0 := by linarith
+    rcases mul_eq_zero.mp h_sub with hN0 | h_tdiff
+    · exact h_N_real_ne hN0
+    · exact h_tau_diff (sub_eq_zero.mp h_tdiff)
+  have h_r_diff_ne : r ≠ 1 → r - inv_r ≠ 0 := by
+    intro h_r_ne_one h_zero
+    have h_r_eq_inv : inv_r = r := by linarith
+    have h_r_sq : r * r = 1 := by
+      calc r * r = r * inv_r := by rw [h_r_eq_inv]
+      _ = 1 := h_r_inv
+    have h_prod_id : (r - 1) * (r + 1) = r * r - 1 := by ring
+    have h_r_m1_p1 : (r - 1) * (r + 1) = 0 := by linarith [h_r_sq, h_prod_id]
+    rcases mul_eq_zero.mp h_r_m1_p1 with hr1 | hr_neg1
+    · exact h_r_ne_one (by linarith)
+    · linarith
   have h_sq_id : D2A = abs_H0_sq * (r - inv_r) ^ 2 := by
     dsimp [D2A, thetaZeroRadialDefectObservable]
     calc abs_H0_sq * (r ^ 2 + inv_r ^ 2 - 2)
       _ = abs_H0_sq * (r ^ 2 + inv_r ^ 2 - 2 * 1) := by ring
       _ = abs_H0_sq * (r ^ 2 + inv_r ^ 2 - 2 * (r * inv_r)) := by rw [← h_r_inv]
       _ = abs_H0_sq * (r - inv_r) ^ 2 := by ring
-  refine ⟨⟨⟨N_ref, h_N_ne, rfl⟩, ?_, ?_⟩, ⟨?_, h_sq_id, ?_, ?_⟩, ?_⟩
+  refine ⟨⟨⟨N_ref, h_N_ne, rfl⟩, h_D1_K_ne_zero, ?_, h_D1_ne, ?_⟩, ⟨?_, h_sq_id, ?_, ?_⟩, ?_⟩
   · dsimp [D1_K, D1_J, gradeLayerRealizedObservable]
     calc (N_ref : ℝ) * tau_K
       _ = (N_ref : ℝ) * ((tau_K / tau_J) * tau_J) := by rw [div_mul_cancel₀ tau_K h_tau_J_ne]
       _ = (tau_K / tau_J) * ((N_ref : ℝ) * tau_J) := by ring
-  · dsimp [D1_K, D1_J, gradeLayerRealizedObservable]
-    intro h_eq
-    have h_sub : (N_ref : ℝ) * (tau_K - tau_J) = 0 := by linarith
-    rcases mul_eq_zero.mp h_sub with hN0 | h_tdiff
-    · exact h_N_real_ne hN0
-    · exact h_tau_diff (sub_eq_zero.mp h_tdiff)
+  · intro h_r_ne_one h_mod_eq
+    have h_sq_ne : (r - inv_r) ^ 2 ≠ 0 := pow_ne_zero 2 (h_r_diff_ne h_r_ne_one)
+    have h_sub_mod : (r - inv_r) ^ 2 * (D1_K - D1_J) = 0 := by linarith
+    rcases mul_eq_zero.mp h_sub_mod with h_c0 | h_d0
+    · exact h_sq_ne h_c0
+    · exact h_D1_ne (sub_eq_zero.mp h_d0)
   · have hK : tau_K⁻¹ * (tau_K * rho) = rho := inv_mul_cancel_left₀ h_tau_K_ne rho
     have hJ : tau_J⁻¹ * (tau_J * rho) = rho := inv_mul_cancel_left₀ h_tau_J_ne rho
     rw [hK, hJ]
   · intro h_r_ne_one
     rw [h_sq_id]
-    have h_diff_ne : r - inv_r ≠ 0 := by
-      intro h_zero
-      have h_r_eq_inv : inv_r = r := by linarith
-      have h_r_sq : r * r = 1 := by
-        calc r * r = r * inv_r := by rw [h_r_eq_inv]
-        _ = 1 := h_r_inv
-      have h_prod_id : (r - 1) * (r + 1) = r * r - 1 := by ring
-      have h_r_m1_p1 : (r - 1) * (r + 1) = 0 := by linarith [h_r_sq, h_prod_id]
-      rcases mul_eq_zero.mp h_r_m1_p1 with hr1 | hr_neg1
-      · exact h_r_ne_one (by linarith)
-      · linarith
-    have h_sq_pos : 0 < (r - inv_r) ^ 2 := sq_pos_of_ne_zero h_diff_ne
+    have h_sq_pos : 0 < (r - inv_r) ^ 2 := sq_pos_of_ne_zero (h_r_diff_ne h_r_ne_one)
     exact mul_pos h_H0_pos h_sq_pos
-  · rintro ⟨h_nonneg, h_lt_one⟩
-    constructor
-    · rintro ⟨m, hm_eq⟩
-      have hm_ge_zero : (0 : ℝ) ≤ (m : ℝ) := by linarith
-      have hm_lt_one : (m : ℝ) < (1 : ℝ) := by linarith
-      have hm_int_ge : (0 : ℤ) ≤ m := by exact_mod_cast hm_ge_zero
-      have hm_int_lt : m < (1 : ℤ) := by exact_mod_cast hm_lt_one
-      have hm_zero : m = 0 := by omega
-      rw [hm_eq, hm_zero]
-      simp
+  · constructor
+    · rintro ⟨⟨m_K, hmK⟩, ⟨m_J, hmJ⟩⟩
+      have h_layer_eq : (m_K : ℝ) * tau_K = (m_J : ℝ) * tau_J := by linarith
+      rcases h_disjoint m_K m_J h_layer_eq with ⟨rfl, _⟩
+      simp [hmK]
     · intro h_zero
-      exact ⟨0, by simp [h_zero]⟩
+      exact ⟨⟨0, by simp [h_zero]⟩, ⟨0, by simp [h_zero]⟩⟩
   · constructor
     · rintro ⟨h_eq, ⟨m_K, hmK⟩, ⟨m_J, hmJ⟩⟩
       have h_layer_eq : (m_K : ℝ) * tau_K = (m_J : ℝ) * tau_J := by linarith

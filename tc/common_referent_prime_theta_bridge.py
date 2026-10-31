@@ -959,10 +959,16 @@ def verify_symbolic_tc048_jump_and_single_observable_identities() -> Dict[str, A
     tau_sym, K_sym, J_sym, delta_sym = sp.symbols("tau K J delta", real=True, positive=True)
     N_sym, H0_sq_sym = sp.symbols("N_y H0_sq", positive=True)
 
-    # Candidate 1A ratio:
+    # Candidate 1A ratio and Candidate 1B grade-invariant modulation ratio:
     d1_K = N_sym * (tau_sym**K_sym)
     d1_J = N_sym * (tau_sym**J_sym)
     d1_coboundary_diff = sp.simplify(d1_K - (tau_sym ** (K_sym - J_sym)) * d1_J)
+    c_delta_sym = sp.Symbol("c_delta", positive=True)
+    d1b_mod_K = c_delta_sym * d1_K
+    d1b_mod_J = c_delta_sym * d1_J
+    d1b_mod_coboundary_diff = sp.simplify(
+        d1b_mod_K - (tau_sym ** (K_sym - J_sym)) * d1b_mod_J
+    )
 
     # Candidate 2A grade invariance and square factorization:
     rho_sym = sp.Symbol("rho", positive=True)
@@ -977,6 +983,9 @@ def verify_symbolic_tc048_jump_and_single_observable_identities() -> Dict[str, A
     return {
         "euler_prime_step_jump_identity_verified": bool(jump_diff == 0),
         "candidate_1_coboundary_ratio_verified": bool(d1_coboundary_diff == 0),
+        "candidate_1B_grade_invariant_modulation_still_leaves_tau_K_verified": bool(
+            d1b_mod_coboundary_diff == 0
+        ),
         "candidate_2A_pullback_grade_invariance_verified": bool(pullback_diff == 0),
         "candidate_2A_radial_factor_square_identity_verified": bool(radial_sq_diff == 0),
     }
@@ -1175,13 +1184,79 @@ def execute_task_tc048_single_observable_common_referent_audit(
         # Part 2: Audit of Two Explicit Single-Observable Candidates D_K(rho_K)
         #         Against the Original Collision Contract (CR1 + CR2 + CR3)
         # -------------------------------------------------------------------
-        gammas_100 = load_certified_zero_ordinate_balls(count=1, prec_bits=prec_bits)
-        gamma_1_arb = gammas_100[0]  # First nontrivial zero height ~ 14.13472514
+        gammas_10 = load_certified_zero_ordinate_balls(count=10, prec_bits=prec_bits)
+        gamma_1_arb = gammas_10[0]  # First nontrivial zero height ~ 14.13472514
         rho_1_on_line_mod_arb = abs(acb(arb(1) / arb(2), gamma_1_arb))
         x_rho_1_int = int(math.floor(float(rho_1_on_line_mod_arb.mid())))  # floor(|rho_1|) = 14
         y_rho_1 = certified_coupled_cutoff_M_X_arb(
             rho_1_on_line_mod_arb, prec_bits=prec_bits
         )
+
+        # Evaluate Candidate 2A across the first 10 certified zeta zero ordinates gamma_1, ..., gamma_10
+        # both on the critical line (delta = 0) and at off-critical displacement delta = 1/10:
+        first_10_zeros_rows: List[Dict[str, Any]] = []
+        all_first_10_zeros_abs_H0_sq_strictly_positive = True
+        all_first_10_zeros_on_line_D_2A_enclose_zero = True
+        all_first_10_zeros_off_line_D_2A_strictly_positive = True
+        all_first_10_zeros_off_line_CR1_enclose_zero = True
+        delta_probe_arb = arb(1) / arb(10)
+
+        for idx_z, gamma_n_arb in enumerate(gammas_10, start=1):
+            c2a_on = evaluate_theta_zero_radial_defect_observable_arb(
+                arb(0), gamma_n_arb, arb(0), prec_bits=prec_bits
+            )
+            c2a_off_k0 = evaluate_theta_zero_radial_defect_observable_arb(
+                delta_probe_arb, gamma_n_arb, arb(0), prec_bits=prec_bits
+            )
+            c2a_off_j1 = evaluate_theta_zero_radial_defect_observable_arb(
+                delta_probe_arb, gamma_n_arb, arb(1), prec_bits=prec_bits
+            )
+            cr1_diff_n = c2a_off_k0["D_K_2A_arb"] - c2a_off_j1["D_K_2A_arb"]
+
+            if not (
+                c2a_on["abs_H0_at_z_sq_strictly_positive"]
+                and c2a_off_k0["abs_H0_at_z_sq_strictly_positive"]
+            ):
+                all_first_10_zeros_abs_H0_sq_strictly_positive = False
+            if not c2a_on["D_K_2A_arb"].contains(0):
+                all_first_10_zeros_on_line_D_2A_enclose_zero = False
+            if not (c2a_off_k0["D_K_2A_arb"].lower() > arb(0)):
+                all_first_10_zeros_off_line_D_2A_strictly_positive = False
+            if not cr1_diff_n.contains(0):
+                all_first_10_zeros_off_line_CR1_enclose_zero = False
+
+            first_10_zeros_rows.append(
+                {
+                    "zero_index": idx_z,
+                    "gamma_n_certified": serialize_arb_certified(gamma_n_arb),
+                    "abs_H0_at_i_gamma_n_sq_certified": serialize_arb_certified(
+                        c2a_on["abs_H0_at_z_sq_arb"]
+                    ),
+                    "abs_H0_at_i_gamma_n_sq_strictly_positive": c2a_on[
+                        "abs_H0_at_z_sq_strictly_positive"
+                    ],
+                    "D_0_2A_on_critical_line_encloses_zero": bool(
+                        c2a_on["D_K_2A_arb"].contains(0)
+                    ),
+                    "off_critical_probe_delta": "1/10",
+                    "abs_H0_at_delta_plus_i_gamma_n_sq_certified": serialize_arb_certified(
+                        c2a_off_k0["abs_H0_at_z_sq_arb"]
+                    ),
+                    "D_0_2A_at_delta_1_10_certified": serialize_arb_certified(
+                        c2a_off_k0["D_K_2A_arb"]
+                    ),
+                    "D_1_2A_at_delta_1_10_certified": serialize_arb_certified(
+                        c2a_off_j1["D_K_2A_arb"]
+                    ),
+                    "D_0_minus_D_1_2A_CR1_diff_certified": serialize_arb_certified(
+                        cr1_diff_n
+                    ),
+                    "D_2A_at_delta_1_10_strictly_positive": bool(
+                        c2a_off_k0["D_K_2A_arb"].lower() > arb(0)
+                    ),
+                    "CR1_raw_equality_encloses_zero": bool(cr1_diff_n.contains(0)),
+                }
+            )
 
         # Evaluate Candidate 1 (Grade-K Zero-Scale Prime-Euler Integer-Layer Observable)
         # at K = 0, J = 1 (rational difference K - J = -1 != 0), and K = sqrt(2)/2:
@@ -1201,6 +1276,12 @@ def execute_task_tc048_single_observable_common_referent_audit(
             cand1_j1["A_K_y_arb"] - tau_a * cand1_k0["A_K_y_arb"]
         )
 
+        # Also evaluate Candidate 1B with grade-invariant factor c(delta) = tau^delta + tau^{-delta} - 2 at delta = 1/10:
+        c_delta_1_10_arb = (tau_a**delta_probe_arb) + (tau_a ** (-delta_probe_arb)) - arb(2)
+        cand1b_k0_mod_arb = c_delta_1_10_arb * cand1_k0["A_K_y_arb"]
+        cand1b_j1_mod_arb = c_delta_1_10_arb * cand1_j1["A_K_y_arb"]
+        cand1b_mod_raw_diff_J1_minus_K0_arb = cand1b_j1_mod_arb - cand1b_k0_mod_arb
+
         # Also evaluate Candidate 1 at raw scaled zero modulus floor(|rho_K|) for K = 0 (14) and J = 1 (floor(14.143 * 2*pi) = 88)
         rho_J1_mod_arb = tau_a * rho_1_on_line_mod_arb
         x_rho_J1_int = int(math.floor(float(rho_J1_mod_arb.mid())))  # 88
@@ -1218,8 +1299,8 @@ def execute_task_tc048_single_observable_common_referent_audit(
         all_cand2a_cr1_enclose_zero = True
         all_cand2a_off_line_strictly_positive = True
         all_cand2a_on_line_enclose_zero = True
-        all_cand2a_strictly_below_one = True
         all_cand2b_cr1_enclose_zero = True
+        cand2b_n_cut_800_delta_1_20_encloses_zero = False
 
         for delta_label, delta_arb in (
             ("0", arb(0)),
@@ -1248,13 +1329,11 @@ def execute_task_tc048_single_observable_common_referent_audit(
                 if not (c2a_k0["D_K_2A_arb"].lower() > arb(0)):
                     all_cand2a_off_line_strictly_positive = False
 
-            if not (c2a_k0["D_K_2A_arb"].upper() < arb(1)):
-                all_cand2a_strictly_below_one = False
-
             # Candidate 2B: D_{K,y}^{(2B)}(rho_K) = W_y(tau^{1 + |delta(rho_K)|}) - W_y(tau)
-            # reconstructed directly from grade-K integer-layer jumps A_{K,y}(n)/A_{K,y}(n-1)
+            # Evaluate both at n_cut = 800 (reproducing the wide enclosure [-0.0000715342, 0.0069867010]
+            # at delta = 1/20 that includes zero) and at n_cut = 2500:
             x_shift_arb = tau_a ** (arb(1) + abs(delta_arb))
-            w_shift_k0 = evaluate_w_y_from_grade_layer_jumps_arb(
+            w_shift_k0_800 = evaluate_w_y_from_grade_layer_jumps_arb(
                 x_shift_arb,
                 y=y_rho_1,
                 K_arb=arb(1) + abs(delta_arb),
@@ -1262,12 +1341,34 @@ def execute_task_tc048_single_observable_common_referent_audit(
                 n_cut=800,
                 prec_bits=prec_bits,
             )["w_y_from_grade_layer_jumps_arb"]
-            w_base_k0 = evaluate_w_y_from_grade_layer_jumps_arb(
+            w_base_k0_800 = evaluate_w_y_from_grade_layer_jumps_arb(
                 tau_a,
                 y=y_rho_1,
                 K_arb=arb(1),
                 J_arb=arb(0),
                 n_cut=800,
+                prec_bits=prec_bits,
+            )["w_y_from_grade_layer_jumps_arb"]
+            d2b_k0_800_arb = w_shift_k0_800 - w_base_k0_800
+            if delta_label == "1/20":
+                cand2b_n_cut_800_delta_1_20_encloses_zero = bool(
+                    d2b_k0_800_arb.contains(0)
+                )
+
+            w_shift_k0 = evaluate_w_y_from_grade_layer_jumps_arb(
+                x_shift_arb,
+                y=y_rho_1,
+                K_arb=arb(1) + abs(delta_arb),
+                J_arb=arb(0),
+                n_cut=2500,
+                prec_bits=prec_bits,
+            )["w_y_from_grade_layer_jumps_arb"]
+            w_base_k0 = evaluate_w_y_from_grade_layer_jumps_arb(
+                tau_a,
+                y=y_rho_1,
+                K_arb=arb(1),
+                J_arb=arb(0),
+                n_cut=2500,
                 prec_bits=prec_bits,
             )["w_y_from_grade_layer_jumps_arb"]
             d2b_k0_arb = w_shift_k0 - w_base_k0
@@ -1277,7 +1378,7 @@ def execute_task_tc048_single_observable_common_referent_audit(
                 y=y_rho_1,
                 K_arb=arb(2) + abs(delta_arb),
                 J_arb=arb(1),
-                n_cut=800,
+                n_cut=2500,
                 prec_bits=prec_bits,
             )["w_y_from_grade_layer_jumps_arb"]
             w_base_j1 = evaluate_w_y_from_grade_layer_jumps_arb(
@@ -1285,7 +1386,7 @@ def execute_task_tc048_single_observable_common_referent_audit(
                 y=y_rho_1,
                 K_arb=arb(2),
                 J_arb=arb(1),
-                n_cut=800,
+                n_cut=2500,
                 prec_bits=prec_bits,
             )["w_y_from_grade_layer_jumps_arb"]
             d2b_j1_arb = w_shift_j1 - w_base_j1
@@ -1327,14 +1428,10 @@ def execute_task_tc048_single_observable_common_referent_audit(
                         if delta_label == "0"
                         else bool(c2a_k0["D_K_2A_arb"].lower() > arb(0))
                     ),
-                    "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": (
-                        False
-                        if delta_label == "0"
-                        else bool(
-                            c2a_k0["D_K_2A_arb"].lower() > arb(0)
-                            and c2a_k0["D_K_2A_arb"].upper() < arb(1)
-                        )
+                    "D_0_2B_stieltjes_shift_diff_n_cut_800_certified": serialize_arb_certified(
+                        d2b_k0_800_arb
                     ),
+                    "D_0_2B_n_cut_800_encloses_zero": bool(d2b_k0_800_arb.contains(0)),
                     "D_0_2B_stieltjes_shift_diff_certified": serialize_arb_certified(
                         d2b_k0_arb
                     ),
@@ -1347,10 +1444,49 @@ def execute_task_tc048_single_observable_common_referent_audit(
                     "CR1_raw_equality_2B_encloses_zero": bool(
                         d2b_cr1_diff.contains(0)
                     ),
+                    "D_2B_sampled_point_strictly_nonzero_at_n_cut_2500": (
+                        False
+                        if delta_label == "0"
+                        else bool(not d2b_k0_arb.contains(0))
+                    ),
                 }
             )
 
+        substantive_candidate_classification_table = [
+            {
+                "candidate": "Integer carrier A_{K,y}(x) = N_y(x) * tau^K",
+                "established": [
+                    "Integer-layer membership (CR2: A_{K,y}(x) in L_K^x = tau^K (Z \\ {0}) subset L_K = tau^K Z)",
+                    "Nonvanishing (one-way CR3 implication: always positive N_y(x) * tau^K > 0 != 0)",
+                ],
+                "missing": [
+                    "Raw cross-grade equality (CR1: A_{K,y}(x) = tau^{K-J} A_{J,y}(x) != A_{J,y}(x) for K != J; multiplying by a grade-invariant factor c(delta) still leaves the factor tau^K)",
+                ],
+            },
+            {
+                "candidate": "Theta detector D_K^{(2A)}(rho_K) = |H_0(tau^{-K} rho_K - 1/2)|^2 * (tau^delta + tau^{-delta} - 2)",
+                "established": [
+                    "Raw cross-grade equality (CR1: D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) across all K, J in A_R)",
+                    "Off-critical nonvanishing (CR3: delta != 0 ==> D^{(2A)}(rho) > 0 != 0 throughout 0 < |delta| < 1/2, gamma != 0)",
+                ],
+                "missing": [
+                    "Integer-layer membership (CR2: by L_K cap L_J = {0} for rational K - J != 0, simultaneous membership in L_K and L_J holds iff D^{(2A)} = 0 <=> delta = 0, without needing any upper bound D^{(2A)} < 1)",
+                ],
+            },
+            {
+                "candidate": "Shift difference D_{K,y}^{(2B)}(rho_K) = W_y(tau^{1 + |delta(rho_K)|}) - W_y(tau)",
+                "established": [
+                    "Raw cross-grade equality (CR1: D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) because d log A_{K,y} = d log N_y cancels tau^K and delta(rho_K) = delta is grade-invariant)",
+                ],
+                "missing": [
+                    "General off-critical nonvanishing (CR3: W_y(X) is oscillatory so general nonvanishing for delta != 0 is not proved; at n_cut = 800 and delta = 1/20 its enclosure [-0.0000715342, 0.0069867010] includes zero)",
+                    "Integer-layer membership (CR2)",
+                ],
+            },
+        ]
+
         single_observable_candidate_audit = {
+            "substantive_candidate_classification_table": substantive_candidate_classification_table,
             "collision_contract_specification": {
                 "zero_setup": (
                     "For a nontrivial Riemann zeta zero rho = 1/2 + delta + i*gamma (delta = Re(rho) - 1/2 in (-1/2, 1/2)), "
@@ -1384,22 +1520,30 @@ def execute_task_tc048_single_observable_common_referent_audit(
                     "(or raw scale X_K(rho_K) = |rho_K| for K >= 0)."
                 ),
                 "subcase_1A_unmodulated_carrier_c_K_eq_1": {
+                    "established_properties": [
+                        "CR2 (integer-layer membership A_{K,y}(X) = N_y(X) * tau^K in L_K^x subset L_K)",
+                        "CR3 (one-way nonvanishing implication delta != 0 ==> D_{K,y}^{(1A)} > 0 != 0, satisfied because the carrier is always positive)",
+                    ],
+                    "missing_properties": [
+                        "CR1 (raw cross-grade equality D_{K,y}^{(1A)} = D_{J,y}^{(1A)} fails for K != J)",
+                    ],
                     "transformation_law": (
                         "At invariant scale X_0 = tau^{-K}|rho_K| = |rho|, D_{K,y}^{(1A)}(rho_K) = N_y(|rho|) * tau^K "
                         "obeys the exact weight-1 scale-coboundary law D_{K,y}^{(1A)}(rho_K) = tau^{K-J} D_{J,y}^{(1A)}(rho_J)."
                     ),
                     "CR1_status": (
-                        "FAILS_RAW_EQUALITY: Since N_y(|rho|) >= 1 and tau = 2*pi > 1, "
+                        "MISSING (FAILS_RAW_EQUALITY): Since N_y(|rho|) >= 1 and tau = 2*pi > 1, "
                         "D_{K,y}^{(1A)}(rho_K) - D_{J,y}^{(1A)}(rho_J) = N_y(|rho|) * (tau^K - tau^J) != 0 whenever K != J "
                         "(and at raw scale |rho_K|, N_y(|rho_J|) * tau^J > N_y(|rho_K|) * tau^K for J > K >= 0)."
                     ),
                     "CR2_status": (
-                        "PROVED_UNCONDITIONALLY: By Theorem `unconditional_factorial_ratio_integrality`, "
+                        "ESTABLISHED (PROVED_UNCONDITIONALLY): By Theorem `unconditional_factorial_ratio_integrality`, "
                         "N_y(X) in Z_{>=1}, so D_{K,y}^{(1A)}(rho_K) = N_y(X) * tau^K in L_K^x = tau^K (Z \\ {0}) subset L_K."
                     ),
                     "CR3_status": (
-                        "VACUOUSLY_NONZERO_UNSENSITIVE_TO_DELTA: Since N_y(X) >= 1 and tau^K > 0, "
-                        "D_{K,y}^{(1A)}(rho_K) > 0 for ALL zeros (both delta != 0 and delta = 0)."
+                        "ESTABLISHED (ONE_WAY_IMPLICATION_SATISFIED_BY_ALWAYS_POSITIVE_CARRIER): Since N_y(X) >= 1 and tau^K > 0, "
+                        "D_{K,y}^{(1A)}(rho_K) > 0 != 0 for all inputs, so the one-way implication delta != 0 ==> D_{K,y}^{(1A)}(rho_K) != 0 "
+                        "holds unconditionally (though the carrier is non-selective and also nonzero at delta = 0)."
                     ),
                     "certified_benchmark_at_rho_1_K0_vs_J1": {
                         "floor_abs_rho_1": x_rho_1_int,
@@ -1433,17 +1577,38 @@ def execute_task_tc048_single_observable_common_referent_audit(
                     },
                 },
                 "subcase_1B_zero_defect_modulated_carrier": {
-                    "definition": "D_{K,y}^{(1B)}(rho_K) = m_K(rho_K) * N_y(X_0) * tau^K with integer multiplier m_K(rho_K) in Z",
+                    "definition": "D_{K,y}^{(1B)}(rho_K) = c_K(rho_K) * N_y(X_0) * tau^K",
+                    "grade_invariant_modulation_fails_raw_CR1": (
+                        "Multiplying the carrier A_{K,y}(X_0) = N_y(X_0) * tau^K by a grade-invariant factor "
+                        "c_K(rho_K) = c(delta) (such as c(delta) = tau^delta + tau^{-delta} - 2) gives "
+                        "D_{K,y}^{(1B)}(rho_K) = c(delta) * N_y(X_0) * tau^K = tau^{K-J} D_{J,y}^{(1B)}(rho_J), "
+                        "which STILL leaves the factor tau^K and therefore does NOT establish raw CR1 "
+                        "(for delta != 0 and K != J, D_{K,y}^{(1B)} != D_{J,y}^{(1B)}, while CR2 also fails unless "
+                        "c(delta) * N_y(X_0) in Z)."
+                    ),
+                    "certified_grade_invariant_modulation_at_delta_1_10": {
+                        "c_delta_1_10_certified": serialize_arb_certified(
+                            c_delta_1_10_arb
+                        ),
+                        "D_0_1B_modulated_certified": serialize_arb_certified(
+                            cand1b_k0_mod_arb
+                        ),
+                        "D_1_1B_modulated_certified": serialize_arb_certified(
+                            cand1b_j1_mod_arb
+                        ),
+                        "raw_CR1_difference_D_1_minus_D_0_modulated_certified": serialize_arb_certified(
+                            cand1b_mod_raw_diff_J1_minus_K0_arb
+                        ),
+                        "grade_invariant_modulation_raw_CR1_difference_strictly_positive": bool(
+                            cand1b_mod_raw_diff_J1_minus_K0_arb.lower() > arb(0)
+                        ),
+                    },
                     "trilemma_obstruction": (
-                        "To preserve CR2 (D_{K,y}^{(1B)} in L_K = tau^K Z), the multiplier c_K(rho_K) * N_y(X_0) must be an integer "
+                        "To preserve CR2 (D_{K,y}^{(1B)} in L_K = tau^K Z), the product M_K := c_K(rho_K) * N_y(X_0) must be an integer "
                         "M_K in Z. At any rational grade difference K - J in Q \\ {0} (such as K = 0, J = 1), Lindemann's theorem "
                         "gives L_K cap L_J = {0}, so raw equality CR1 (M_K * tau^K = M_J * tau^J) holds if and only if M_K = M_J = 0. "
-                        "Furthermore, by `invariant_covariant_observable_vanishing` in `formal/RiemannScope/Grade.lean`, any multiplier "
-                        "extending continuously to a real interval I subset R (necessary because A_R is totally disconnected) while "
-                        "taking integer values on I cap A_R must be a constant integer M_0 in Z: if M_0 != 0 then CR1 fails "
-                        "(M_0 * tau^K != M_0 * tau^J), and if M_0 = 0 then CR3 fails (D = 0 even for delta != 0). Conversely, "
-                        "if c_K(rho_K) = tau^{-K} Theta_0(delta) is chosen to cancel tau^K and enforce CR1, then CR2 at J = 1 "
-                        "requires Theta_0(delta) * N_y(X_0) in Z cap tau Z = {0}, reducing to Candidate 2."
+                        "Conversely, if c_K(rho_K) = tau^{-K} Theta_0(delta) is chosen to strip tau^K and enforce raw CR1, then "
+                        "D_{K,y}^{(1B)} = Theta_0(delta) * N_y(X_0) loses the tau^K scale factor and is missing CR2 across K != J."
                     ),
                 },
             },
@@ -1456,39 +1621,51 @@ def execute_task_tc048_single_observable_common_referent_audit(
                         "where H_0(z) = F_tau(1/2 + z) * F_tau(1/2 - z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * "
                         "Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4)."
                     ),
+                    "established_properties": [
+                        "CR1 (raw cross-grade equality D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) across all K, J in A_R)",
+                        "CR3 (off-critical nonvanishing: delta != 0 ==> D^{(2A)}(rho) > 0 != 0 throughout 0 < |delta| < 1/2, gamma != 0)",
+                    ],
+                    "missing_properties": [
+                        "CR2 (integer-layer membership D_K^{(2A)}(rho_K) in L_K = tau^K Z across distinct grades K != J)",
+                    ],
                     "domain_and_transformation_law": (
                         "Defined for all K in A_R = Qbar cap R and all rho_K = tau^K rho with Re(rho) in (0, 1). "
                         "Because tau^{-K} rho_K = rho is invariant under the grade-K ray dilation Phi_K, "
                         "D_K^{(2A)}(rho_K) has weight 0 (strict cross-grade invariance D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J))."
                     ),
                     "CR1_status": (
-                        "PROVED_UNCONDITIONALLY: For all K, J in A_R (both rational and irrational algebraic grades), "
+                        "ESTABLISHED (PROVED_UNCONDITIONALLY): For all K, J in A_R (both rational and irrational algebraic grades), "
                         "tau^{-K} rho_K - 1/2 = delta + i*gamma = tau^{-J} rho_J - 1/2, so "
                         "D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) = D^{(2A)}(rho) as the exact same external real number."
                     ),
                     "CR3_status": (
-                        "PROVED_UNCONDITIONALLY_ONE_WAY (delta != 0 ==> D^{(2A)}(rho) > 0): "
+                        "ESTABLISHED (PROVED_UNCONDITIONALLY_ONE_WAY, delta != 0 ==> D^{(2A)}(rho) > 0): "
                         "(1) By the squared pole-annihilating normalization P(D)^2 = (D^2 - 1/16)^2 of psi_tau, "
                         "H_0(z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4). "
                         "Since 1/Gamma(w) is entire on C, Gamma((1 +/- 2z)/4) has no zeros anywhere in C; hence the "
-                        "ONLY zeros of H_0(z) in C are z = +/- 1/2 (corresponding to s = 0, 1). Every nontrivial zero "
+                        "ONLY zeros of H_0(z) in C are z = +/- 1/2 (corresponding to s = 0, 1). Every off-critical point "
                         "rho = 1/2 + delta + i*gamma in the critical strip has |delta| < 1/2 (and gamma != 0), so "
-                        "z = delta + i*gamma != +/- 1/2 and |H_0(delta + i*gamma)|^2 > 0 unconditionally. "
+                        "z = delta + i*gamma != +/- 1/2 and |H_0(delta + i*gamma)|^2 > 0 unconditionally "
+                        "(for example, at gamma = gamma_1 ~ 14.13472514, |H_0(delta + i*gamma_1)|^2 ~ 2.26e-7). "
                         "(2) Since tau = 2*pi > 1, tau^delta + tau^{-delta} - 2 = (tau^{delta/2} - tau^{-delta/2})^2 > 0 "
                         "for all delta != 0. Therefore delta != 0 ==> D^{(2A)}(rho) > 0 != 0 unconditionally."
                     ),
                     "CR2_status": (
-                        "EQUIVALENT_TO_DELTA_EQ_0_NOT_UNCONDITIONALLY_PROVED: "
-                        "For every nontrivial zero rho = 1/2 + delta + i*gamma in the critical strip |delta| < 1/2 "
-                        "(with |gamma| >= 14.13), 0 <= D^{(2A)}(rho) < 1 (for instance at gamma = gamma_1 ~ 14.1347, "
-                        "|H_0(delta + i*gamma_1)|^2 < 3e-11 and 0 <= tau^delta + tau^{-delta} - 2 < 0.91). "
-                        "Consequently: (a) even at the single grade K = 0 (where L_0 = Z), D_0^{(2A)}(rho) in Z holds "
-                        "if and only if D_0^{(2A)}(rho) = 0 <=> delta = 0; (b) across K = 0 and J = 1 (rational difference "
-                        "K - J = -1 != 0), Lindemann's theorem gives L_0 cap L_1 = Z cap tau Z = {0}, so simultaneous "
-                        "layer membership D_0^{(2A)}(rho) in L_0 and D_1^{(2A)}(rho_1) in L_1 holds if and only if "
-                        "D^{(2A)}(rho) = 0 <=> delta = 0. Thus CR2 for Candidate 2A is logically equivalent to RH for rho "
-                        "and cannot be asserted unconditionally without circularity."
+                        "MISSING (EQUIVALENT_TO_DELTA_EQ_0_BY_TWO_LAYER_DISJOINTNESS_WITHOUT_UPPER_BOUND): "
+                        "Across any two concurrent grades with nonzero rational difference K - J in Q \\ {0} "
+                        "(such as K = 0 and J = 1), Lindemann's theorem gives L_K cap L_J = tau^K Z cap tau^J Z = {0}. "
+                        "Because raw CR1 (D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) = D^{(2A)}(rho)) holds unconditionally, "
+                        "simultaneous layer membership D_K^{(2A)}(rho_K) in L_K and D_J^{(2A)}(rho_J) in L_J (`CR2`) holds "
+                        "if and only if D^{(2A)}(rho) in L_K cap L_J = {0}, i.e. D^{(2A)}(rho) = 0 <=> delta = 0. "
+                        "This valid two-layer argument does NOT require any universal upper bound D^{(2A)}(rho) < 1."
                     ),
+                    "first_10_zeta_zeros_certification": {
+                        "all_first_10_zeros_abs_H0_sq_strictly_positive": all_first_10_zeros_abs_H0_sq_strictly_positive,
+                        "all_first_10_zeros_on_line_D_2A_enclose_zero": all_first_10_zeros_on_line_D_2A_enclose_zero,
+                        "all_first_10_zeros_off_line_D_2A_strictly_positive": all_first_10_zeros_off_line_D_2A_strictly_positive,
+                        "all_first_10_zeros_off_line_CR1_enclose_zero": all_first_10_zeros_off_line_CR1_enclose_zero,
+                        "certified_first_10_zeros_table": first_10_zeros_rows,
+                    },
                 },
                 "subcase_2B_prime_euler_stieltjes_shift_difference": {
                     "definition": (
@@ -1496,24 +1673,35 @@ def execute_task_tc048_single_observable_common_referent_audit(
                         "= int_{(1, infty)} x^{-1/2} [h_0(x / tau^{1+|delta|}) - h_0(x / tau)] d(log A_{K,y})(x), "
                         "where delta(rho_K) = tau^{-K} Re(rho_K) - 1/2 = delta."
                     ),
+                    "established_properties": [
+                        "CR1 (raw cross-grade equality D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) across all K, J in A_R)",
+                    ],
+                    "missing_properties": [
+                        "CR3 (general off-critical nonvanishing is NOT established; at n_cut = 800 and delta = 1/20, the enclosure [-0.0000715342, 0.0069867010] includes zero, and W_y(X) is oscillatory)",
+                        "CR2 (integer-layer membership D_{K,y}^{(2B)}(rho_K) in L_K = tau^K Z)",
+                    ],
                     "CR1_status": (
-                        "PROVED_UNCONDITIONALLY: Because d(log A_{K,y})(x) = d(log N_y)(x) cancels tau^K and "
+                        "ESTABLISHED (PROVED_UNCONDITIONALLY): Because d(log A_{K,y})(x) = d(log N_y)(x) cancels tau^K and "
                         "delta(rho_K) = delta is grade-invariant, D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) for all K, J in A_R."
                     ),
                     "CR2_status": (
-                        "FAILS_FOR_NONZERO_VALUES: For delta != 0, D_{K,y}^{(2B)}(rho_K) is a continuous Mellin-Stieltjes "
-                        "sum of (log m_y(n)) n^{-1/2} [h_0(n / tau^{1+|delta|}) - h_0(n / tau)] in (-1, 1) \\ {0}, "
-                        "which does not lie in L_0 = Z or L_1 = tau Z."
+                        "MISSING: For delta != 0, D_{K,y}^{(2B)}(rho_K) is a continuous Mellin-Stieltjes "
+                        "sum of (log m_y(n)) n^{-1/2} [h_0(n / tau^{1+|delta|}) - h_0(n / tau)], "
+                        "which is not proved to lie in L_K = tau^K Z."
                     ),
                     "CR3_status": (
-                        "CERTIFIED_NONZERO_FOR_SAMPLED_OFF_LINE_SHIFTS: Vanishes at delta = 0 and is certified nonzero "
-                        "for delta in {1/20, 1/10, 1/4} at y = M(|rho_1|) = 28."
+                        "MISSING (GENERAL_OFF_CRITICAL_NONVANISHING_NOT_PROVED): "
+                        "Vanishes at delta = 0, but because W_y(X) is an oscillatory wavelet profile on (0, infty), "
+                        "general nonvanishing W_y(tau^{1+|delta|}) != W_y(tau) for all delta in (-1/2, 1/2) \\ {0} is not proved. "
+                        "Moreover, at the n_cut = 800 truncation used in TC-048, the exported enclosure at delta = 1/20, y = 28 "
+                        "was [-0.0000715342, 0.0069867010], which includes zero (refining to n_cut = 2500 encloses "
+                        "[+0.0030019824, +0.0038393714], midpoint +0.0034206769 +- 4.19e-4 > 0 at that sample point, but does not establish general CR3)."
                     ),
+                    "cand2b_n_cut_800_delta_1_20_encloses_zero": cand2b_n_cut_800_delta_1_20_encloses_zero,
                 },
                 "all_cand2a_cr1_enclose_zero": all_cand2a_cr1_enclose_zero,
                 "all_cand2a_off_line_strictly_positive": all_cand2a_off_line_strictly_positive,
                 "all_cand2a_on_line_enclose_zero": all_cand2a_on_line_enclose_zero,
-                "all_cand2a_strictly_below_one": all_cand2a_strictly_below_one,
                 "all_cand2b_cr1_enclose_zero": all_cand2b_cr1_enclose_zero,
                 "certified_candidate_2_evaluation_table": cand2_evaluation_rows,
             },
@@ -1540,20 +1728,32 @@ def execute_task_tc048_single_observable_common_referent_audit(
                     "constant. Constant-integer rigidity (`invariant_covariant_observable_vanishing` in `Grade.lean`) "
                     "requires a continuous extension to a connected real interval I subset R."
                 ),
+                "pure_pullback_positivity_vs_actual_zeta_zero_identity": (
+                    "The positivity D_K^{(2A)}(tau^K s) = |H_0(s - 1/2)|^2 (tau^{Re(s)-1/2} + tau^{-(Re(s)-1/2)} - 2) > 0 "
+                    "and raw cross-grade equality D_K^{(2A)}(tau^K s) = D_J^{(2A)}(tau^J s) follow throughout the punctured "
+                    "strip 0 < |Re(s) - 1/2| < 1/2, Im(s) != 0 WITHOUT using zeta(s) = 0. Consequently, D_K^{(2A)} cannot "
+                    "belong to the integer layers L_K = tau^K Z for arbitrary off-critical complex numbers s (which would "
+                    "contradict Lindemann's theorem for every point in the strip). The decisive open question is: "
+                    "what additional arithmetic-spectral identity satisfied specifically by actual zeta zeros zeta(rho) = 0 "
+                    "forces this detector into the required integer layers L_K = tau^K Z?"
+                ),
             },
             "covariance_invariance_discreteness_trilemma": {
                 "statement": (
                     "For any single observable D_K(rho_K) evaluated at rational-difference grades K != J (e.g. K = 0, J = 1) "
                     "where L_K cap L_J = {0}: "
                     "(CR1: D_K(rho_K) = D_J(rho_J) = D) and (CR2: D_K(rho_K) in L_K and D_J(rho_J) in L_J) "
-                    "hold simultaneously if and only if D_K(rho_K) = D_J(rho_J) = 0. "
+                    "hold simultaneously if and only if D_K(rho_K) = D_J(rho_J) = 0 (without needing any upper bound D < 1). "
                     "Consequently: "
-                    "(i) Weight-1 covariant prime-Euler integer-layer carriers D_K^{(1A)} = N_y(X_0) * tau^K satisfy CR2 "
-                    "unconditionally with N_y(X_0) >= 1, so D_K^{(1A)} = tau^{K-J} D_J^{(1A)} != D_J^{(1A)} and raw CR1 fails. "
-                    "(ii) Weight-0 pullback zero-defect observables D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2) "
-                    "satisfy raw CR1 and one-way CR3 (delta != 0 ==> D^{(2A)} > 0) unconditionally, so CR2 (D_K^{(2A)} in L_K) "
-                    "holds if and only if D^{(2A)}(rho) = 0 <=> delta = 0, which is equivalent to RH for rho rather than an "
-                    "independent consequence of prime/theta algebra."
+                    "(i) Weight-1 prime-Euler integer-layer carriers D_K^{(1A)} = N_y(X_0) * tau^K establish CR2 and one-way CR3 "
+                    "(always positive N_y(X_0) * tau^K > 0), but fail raw CR1 (D_K^{(1A)} = tau^{K-J} D_J^{(1A)} != D_J^{(1A)}), "
+                    "and multiplying by a grade-invariant factor c(delta) still leaves the factor tau^K. "
+                    "(ii) Weight-0 pullback theta detectors D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2) "
+                    "establish raw CR1 and off-critical nonvanishing CR3 (delta != 0 ==> D^{(2A)} > 0) unconditionally across the strip "
+                    "without using zeta(rho) = 0, while missing integer-layer membership CR2 (which by L_K cap L_J = {0} holds across "
+                    "rational-difference grades K != J iff D^{(2A)}(rho) = 0 <=> delta = 0). "
+                    "(iii) Shift differences D_{K,y}^{(2B)}(rho_K) = W_y(tau^{1+|delta|}) - W_y(tau) establish raw CR1, while "
+                    "missing both general off-critical nonvanishing CR3 and integer-layer membership CR2."
                 ),
                 "lean_theorem": "single_observable_common_referent_candidate_audit_and_trilemma",
             },
@@ -1561,16 +1761,21 @@ def execute_task_tc048_single_observable_common_referent_audit(
                 "subgate_id": "SUBGATE-TC-043A",
                 "status": "OPEN",
                 "common_referent_bridge_complete": False,
+                "decisive_open_question": (
+                    "What additional identity satisfied specifically by actual zeta zeros zeta(rho) = 0 forces the "
+                    "explicit off-critical theta detector D_K^{(2A)}(rho_K) (whose raw equality CR1 and off-critical "
+                    "positivity CR3 hold throughout the strip without using zeta(rho) = 0) into the required integer "
+                    "layers L_K = tau^K Z?"
+                ),
                 "exact_open_gap": (
                     "SUBGATE-TC-043A remains OPEN and the common-referent bridge is NOT complete: "
-                    "Candidate 1 (A_{K,y}(x) = N_y(x) * tau^K) satisfies CR2 unconditionally on the arithmetic side "
-                    "but transforms with weight 1 (failing raw CR1), whereas Candidate 2A "
-                    "(D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2)) satisfies raw CR1 and "
-                    "one-way CR3 unconditionally on the spectral/theta side but satisfies CR2 if and only if delta = 0. "
+                    "Integer carrier N_y(x) * tau^K establishes CR2 and nonvanishing CR3 but is missing raw CR1; "
+                    "theta detector D^{(2A)} establishes raw CR1 and off-critical nonvanishing CR3 but is missing CR2; "
+                    "shift difference D^{(2B)} establishes raw CR1 but is missing general off-critical nonvanishing CR3 and CR2. "
                     "Closing SUBGATE-TC-043A requires either (a) proving the uniform signed Moebius cancellation bound "
                     "sup_{X >= 1} |R_mu(X)| < infty (equivalently sup_{X >= 1} |W_{M(X)}(X)| < infty), or "
-                    "(b) establishing an independent arithmetic-spectral identity that forces a genuine raw-invariant, "
-                    "off-line-sensitive observable D_K(rho_K) to lie in L_K = tau^K Z without assuming delta = 0."
+                    "(b) deriving an additional identity satisfied by actual zeta zeros zeta(rho) = 0 that forces the "
+                    "off-critical detector into the integer layers L_K = tau^K Z."
                 ),
             },
         }
